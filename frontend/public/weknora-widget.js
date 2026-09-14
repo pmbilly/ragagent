@@ -157,7 +157,6 @@
     var launcher = document.createElement('button');
     launcher.type = 'button';
     launcher.setAttribute('aria-label', title);
-    launcher.textContent = '💬';
     launcher.style.cssText = [
       'position:fixed',
       'z-index:2147483000',
@@ -174,6 +173,37 @@
       'transition:opacity .2s',
       positionStyles(position, 'launcher'),
     ].join(';');
+
+    var launcherIconUrl = '';
+    var launcherImg = null;
+
+    function renderLauncherContent() {
+      launcher.textContent = '';
+      if (panelOpen) {
+        launcher.textContent = '✕';
+        return;
+      }
+      if (launcherIconUrl) {
+        if (!launcherImg) {
+          launcherImg = document.createElement('img');
+          launcherImg.src = launcherIconUrl;
+          launcherImg.alt = '';
+          launcherImg.style.cssText =
+            'width:100%;height:100%;object-fit:cover;border-radius:50%;' +
+            'pointer-events:none;display:block';
+          launcherImg.onerror = function () {
+            launcherIconUrl = '';
+            launcherImg = null;
+            renderLauncherContent();
+          };
+        }
+        launcher.style.overflow = 'hidden';
+        launcher.appendChild(launcherImg);
+        return;
+      }
+      launcher.textContent = '💬';
+    }
+    renderLauncherContent();
 
     var panel = document.createElement('div');
     panel.style.cssText = [
@@ -333,7 +363,7 @@
     function setOpen(next) {
       panelOpen = !!next;
       panel.style.display = panelOpen ? 'block' : 'none';
-      launcher.textContent = panelOpen ? '✕' : '💬';
+      renderLauncherContent();
       if (panelOpen) {
         emit('open', { channelId: channelId });
       } else {
@@ -367,6 +397,27 @@
     document.body.appendChild(launcher);
     document.body.appendChild(panel);
     global.addEventListener('message', onMessage);
+
+    // Fetch the channel's public config for appearance extras (launcher icon).
+    // Runs after the token is available; failures keep the default 💬 launcher.
+    function loadChannelAppearance() {
+      loadToken().then(function (tok) {
+        return fetch(baseUrl + '/api/v1/embed/' + encodeURIComponent(channelId) + '/config', {
+          headers: { Authorization: 'Embed ' + tok, Accept: 'application/json' },
+        });
+      }).then(function (res) {
+        if (!res || !res.ok) return null;
+        return res.json();
+      }).then(function (payload) {
+        var cfg = payload && payload.data;
+        if (cfg && typeof cfg.launcher_icon === 'string' && cfg.launcher_icon) {
+          launcherIconUrl = cfg.launcher_icon;
+          launcherImg = null;
+          renderLauncherContent();
+        }
+      }).catch(function () { /* keep default launcher */ });
+    }
+    loadChannelAppearance();
 
     return {
       open: open,
