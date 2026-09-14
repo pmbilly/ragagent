@@ -119,7 +119,7 @@ func (s *embedChannelService) ListByTenant(
 func (s *embedChannelService) Update(
 	ctx context.Context, tenantID uint64, id string, req *types.EmbedChannel,
 	enabled *bool, showSuggested *bool, allowWebSearch *bool, allowFileUpload *bool,
-	defaultLocale *string, webhookURL *string, webhookSecret *string,
+	defaultLocale *string, webhookURL *string, webhookSecret *string, launcherIcon *string,
 ) (*types.EmbedChannel, error) {
 	ch, err := s.getOwned(ctx, tenantID, id)
 	if err != nil {
@@ -153,6 +153,13 @@ func (s *embedChannelService) Update(
 	}
 	if webhookSecret != nil {
 		ch.WebhookSecret = strings.TrimSpace(*webhookSecret)
+	}
+	if launcherIcon != nil {
+		trimmed := strings.TrimSpace(*launcherIcon)
+		if err := ValidateEmbedLauncherIcon(trimmed); err != nil {
+			return nil, err
+		}
+		ch.LauncherIcon = trimmed
 	}
 	if req.WidgetPosition != "" {
 		ch.WidgetPosition = types.NormalizeEmbedWidgetPosition(req.WidgetPosition)
@@ -238,9 +245,11 @@ func (s *embedChannelService) PublicConfig(ctx context.Context, ch *types.EmbedC
 	displayTitle, agentName, agentAvatar := s.resolveDisplayMeta(ctx, ch)
 	agentWebSearchEnabled := false
 	agentImageUploadEnabled := false
-	if agent, err := s.agentService.GetAgentByID(ctx, ch.AgentID); err == nil && agent != nil {
-		agentWebSearchEnabled = agent.Config.WebSearchEnabled
-		agentImageUploadEnabled = agent.Config.ImageUploadEnabled
+	if s.agentService != nil {
+		if agent, err := s.agentService.GetAgentByID(ctx, ch.AgentID); err == nil && agent != nil {
+			agentWebSearchEnabled = agent.Config.WebSearchEnabled
+			agentImageUploadEnabled = agent.Config.ImageUploadEnabled
+		}
 	}
 	return types.EmbedChannelPublicConfig{
 		ChannelID:               ch.ID,
@@ -262,6 +271,7 @@ func (s *embedChannelService) PublicConfig(ctx context.Context, ch *types.EmbedC
 		AgentWebSearchEnabled:   agentWebSearchEnabled,
 		AgentImageUploadEnabled: agentImageUploadEnabled,
 		DefaultLocale:           types.NormalizeEmbedDefaultLocale(ch.DefaultLocale),
+		LauncherIcon:            ch.LauncherIcon,
 	}
 }
 
@@ -342,12 +352,14 @@ func (s *embedChannelService) resolveDisplayMeta(
 	} else if name := strings.TrimSpace(ch.Name); name != "" {
 		displayTitle = name
 	}
-	agent, err := s.agentService.GetAgentByID(ctx, ch.AgentID)
-	if err == nil && agent != nil {
-		agentName = strings.TrimSpace(agent.Name)
-		agentAvatar = strings.TrimSpace(agent.Avatar)
-		if displayTitle == "" && agentName != "" {
-			displayTitle = agentName
+	if s.agentService != nil {
+		agent, err := s.agentService.GetAgentByID(ctx, ch.AgentID)
+		if err == nil && agent != nil {
+			agentName = strings.TrimSpace(agent.Name)
+			agentAvatar = strings.TrimSpace(agent.Avatar)
+			if displayTitle == "" && agentName != "" {
+				displayTitle = agentName
+			}
 		}
 	}
 	if displayTitle == "" {
@@ -357,6 +369,9 @@ func (s *embedChannelService) resolveDisplayMeta(
 }
 
 func (s *embedChannelService) resolveKnowledgeBaseIDs(ctx context.Context, ch *types.EmbedChannel) []string {
+	if s.agentService == nil {
+		return nil
+	}
 	agent, err := s.agentService.GetAgentByID(ctx, ch.AgentID)
 	if err == nil && agent != nil && agent.Config.KBSelectionMode == "selected" {
 		return append([]string(nil), agent.Config.KnowledgeBases...)

@@ -136,3 +136,15 @@ func TestPublicConfigDisplayTitleFallsBackToAgentName(t *testing.T) {
 		t.Fatalf("agent_name = %q", cfg.AgentName)
 	}
 }
+
+func TestPublicConfigIncludesLauncherIcon(t *testing.T) {
+	svc := &embedChannelService{}
+	cfg := svc.PublicConfig(context.Background(), &types.EmbedChannel{
+		ID:           "ch-icon",
+		AgentID:      "agent-1",
+		LauncherIcon: "data:image/png;base64,aWNvbg==",
+	})
+	if cfg.LauncherIcon != "data:image/png;base64,aWNvbg==" {
+		t.Fatalf("launcher_icon = %q, want data URL", cfg.LauncherIcon)
+	}
+}
