@@ -31,6 +31,7 @@ type EmbedChannel struct {
 	DefaultLocale          string         `json:"default_locale"            gorm:"type:varchar(16);not null;default:''"`
 	WebhookURL             string         `json:"webhook_url"               gorm:"type:varchar(512);not null;default:''"`
 	WebhookSecret          string         `json:"-"                         gorm:"type:varchar(128);not null;default:''"`
+	LauncherIcon           string         `json:"launcher_icon"             gorm:"type:text;not null;default:''"`
 	CreatedAt              time.Time      `json:"created_at"`
 	UpdatedAt              time.Time      `json:"updated_at"`
 	DeletedAt              gorm.DeletedAt `json:"deleted_at"          gorm:"index"`
@@ -124,6 +125,7 @@ type EmbedChannelPublicConfig struct {
 	// AgentImageUploadEnabled reflects whether the bound agent supports image upload.
 	AgentImageUploadEnabled bool   `json:"agent_image_upload_enabled"`
 	DefaultLocale           string `json:"default_locale,omitempty"`
+	LauncherIcon            string `json:"launcher_icon,omitempty"`
 }
 
 // Supported embed UI locales.
