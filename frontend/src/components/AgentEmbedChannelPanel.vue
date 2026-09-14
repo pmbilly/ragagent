@@ -239,12 +239,34 @@
           </div>
 
           <div class="form-item">
+            <label class="form-label">{{ $t('embedPublish.launcherIcon') }}</label>
+            <div class="launcher-icon-field">
+              <div class="launcher-icon-preview"
+                :style="{ background: form.primary_color || defaultPrimaryColor }" aria-hidden="true">
+                <img v-if="form.launcher_icon" :src="form.launcher_icon" alt="" />
+                <t-icon v-else name="chat" />
+              </div>
+              <t-button size="small" variant="outline" :disabled="!isAdmin" @click="triggerLauncherIconPick">
+                {{ $t('embedPublish.launcherIconUpload') }}
+              </t-button>
+              <t-button v-if="form.launcher_icon" size="small" variant="text" :disabled="!isAdmin"
+                @click="form.launcher_icon = ''">
+                {{ $t('embedPublish.launcherIconRemove') }}
+              </t-button>
+              <input ref="launcherIconInput" type="file" style="display:none"
+                accept="image/png,image/jpeg,image/svg+xml,image/webp" @change="handleLauncherIconChange" />
+            </div>
+            <p class="form-desc">{{ $t('embedPublish.launcherIconDesc') }}</p>
+          </div>
+
+          <div class="form-item">
             <label class="form-label">{{ $t('embedPublish.widgetPreview') }}</label>
             <div class="widget-preview" :class="`pos-${form.widget_position}`">
               <div class="preview-surface">
                 <button type="button" class="preview-launcher"
                   :style="{ background: form.primary_color || defaultPrimaryColor }" aria-hidden="true">
-                  <t-icon name="chat" />
+                  <img v-if="form.launcher_icon" :src="form.launcher_icon" class="preview-launcher__img" alt="" />
+                  <t-icon v-else name="chat" />
                 </button>
               </div>
             </div>
@@ -389,7 +411,7 @@
     <EmbedChannelPreview v-model:visible="previewVisible" :channel-id="previewChannel?.id || ''" :token="previewToken"
       :mode="previewMode" :title="previewChannel?.name || $t('embedPublish.preview')"
       :primary-color="previewChannel?.primary_color" :position="previewPosition" :refresh-key="previewNonce"
-      :locale="previewLocale" />
+      :locale="previewLocale" :launcher-icon="previewChannel?.launcher_icon" />
   </div>
 </template>
 
@@ -505,6 +527,7 @@ const defaultForm = () => ({
   rate_limit_per_minute: 30,
   rate_limit_per_day: 10000,
   primary_color: getDefaultEmbedPrimaryColor(),
+  launcher_icon: '',
   page_title: '',
   header_title_mode: 'channel' as HeaderTitleMode,
   show_suggested_questions: true,
@@ -516,6 +539,33 @@ const defaultForm = () => ({
   webhook_secret: '',
 })
 const form = ref(defaultForm())
+const launcherIconInput = ref<HTMLInputElement | null>(null)
+const LAUNCHER_ICON_MAX_BYTES = 200 * 1024
+const LAUNCHER_ICON_TYPES = ['image/png', 'image/jpeg', 'image/svg+xml', 'image/webp']
+
+function triggerLauncherIconPick() {
+  launcherIconInput.value?.click()
+}
+
+function handleLauncherIconChange(event: Event) {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  input.value = ''
+  if (!file) return
+  if (!LAUNCHER_ICON_TYPES.includes(file.type)) {
+    MessagePlugin.warning(t('embedPublish.launcherIconInvalidType'))
+    return
+  }
+  if (file.size > LAUNCHER_ICON_MAX_BYTES) {
+    MessagePlugin.warning(t('embedPublish.launcherIconTooLarge'))
+    return
+  }
+  const reader = new FileReader()
+  reader.onload = () => {
+    form.value.launcher_icon = typeof reader.result === 'string' ? reader.result : ''
+  }
+  reader.readAsDataURL(file)
+}
 const webhookSecretPlaceholder = computed(() =>
   drawerChannel.value?.has_webhook_secret
     ? t('embedPublish.webhookSecretKeep')
@@ -820,6 +870,7 @@ const fillFormFromChannel = (ch: EmbedChannel) => {
     rate_limit_per_minute: ch.rate_limit_per_minute || 30,
     rate_limit_per_day: ch.rate_limit_per_day || 10000,
     primary_color: ch.primary_color || getDefaultEmbedPrimaryColor(),
+    launcher_icon: ch.launcher_icon || '',
     page_title: ch.page_title || '',
     header_title_mode: (ch.header_title_mode as HeaderTitleMode) || 'channel',
     show_suggested_questions: ch.show_suggested_questions !== false,
@@ -915,6 +966,7 @@ const saveForm = async () => {
       rate_limit_per_minute: form.value.rate_limit_per_minute,
       rate_limit_per_day: form.value.rate_limit_per_day,
       primary_color: form.value.primary_color,
+      launcher_icon: form.value.launcher_icon,
       page_title: form.value.page_title,
       header_title_mode: form.value.header_title_mode,
       show_suggested_questions: form.value.show_suggested_questions,
@@ -1014,6 +1066,7 @@ async function openPreviewForChannel(
       ...ch,
       agent_id: agentId || ch.agent_id,
       primary_color: opts?.useDraft ? form.value.primary_color : ch.primary_color,
+      launcher_icon: opts?.useDraft ? form.value.launcher_icon : ch.launcher_icon,
       widget_position: (opts?.useDraft ? form.value.widget_position : ch.widget_position) as WidgetPosition,
       default_locale: opts?.useDraft ? (form.value.default_locale || ch.default_locale) : ch.default_locale,
     }
@@ -1518,6 +1571,7 @@ const toggleEnabled = async (ch: EmbedChannel, enabled: boolean) => {
   line-height: 1;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
   cursor: default;
+  overflow: hidden;
 
   :deep(.t-icon) {
     display: flex;
@@ -1545,5 +1599,37 @@ const toggleEnabled = async (ch: EmbedChannel, enabled: boolean) => {
 .pos-top-left .preview-launcher {
   left: 10px;
   top: 10px;
+}
+
+.launcher-icon-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.launcher-icon-preview {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.launcher-icon-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.preview-launcher__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 </style>
