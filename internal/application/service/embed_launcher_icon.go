@@ -29,6 +29,11 @@ func ValidateEmbedLauncherIcon(v string) error {
 	if loc == nil || loc[0] != 0 {
 		return fmt.Errorf("%w: must be a base64 data URL of png/jpeg/svg/webp", ErrEmbedLauncherIconInvalid)
 	}
+	// base64 expands 3 bytes into 4 chars; reject anything that could not fit
+	// the cap without materializing the decoded buffer first.
+	if len(v)-loc[1] > (MaxEmbedLauncherIconBytes/3+1)*4 {
+		return fmt.Errorf("%w: image exceeds %d bytes", ErrEmbedLauncherIconInvalid, MaxEmbedLauncherIconBytes)
+	}
 	decoded, err := base64.StdEncoding.DecodeString(v[loc[1]:])
 	if err != nil {
 		return fmt.Errorf("%w: invalid base64 payload", ErrEmbedLauncherIconInvalid)

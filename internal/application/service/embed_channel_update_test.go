@@ -11,7 +11,14 @@ import (
 
 type stubEmbedChannelRepo struct {
 	interfaces.EmbedChannelRepository
-	ch *types.EmbedChannel
+	ch      *types.EmbedChannel
+	created *types.EmbedChannel
+}
+
+func (r *stubEmbedChannelRepo) Create(_ context.Context, ch *types.EmbedChannel) error {
+	cp := *ch
+	r.created = &cp
+	return nil
 }
 
 func (r *stubEmbedChannelRepo) GetByID(_ context.Context, id string) (*types.EmbedChannel, error) {

@@ -164,6 +164,8 @@
       'height:56px',
       'border-radius:50%',
       'border:none',
+      'padding:0',
+      'box-sizing:border-box',
       'cursor:pointer',
       'font-size:24px',
       'box-shadow:0 4px 16px rgba(0,0,0,.18)',

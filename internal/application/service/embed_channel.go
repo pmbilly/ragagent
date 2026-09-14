@@ -61,6 +61,9 @@ func (s *embedChannelService) Create(
 	if _, err := s.ensureAgentOwned(ctx, tenantID, agentID); err != nil {
 		return nil, "", err
 	}
+	if err := ValidateEmbedLauncherIcon(strings.TrimSpace(req.LauncherIcon)); err != nil {
+		return nil, "", err
+	}
 	token, err := generateEmbedPublishToken()
 	if err != nil {
 		return nil, "", err
@@ -87,6 +90,7 @@ func (s *embedChannelService) Create(
 		AllowWebSearch:         req.AllowWebSearch,
 		AllowFileUpload:        req.AllowFileUpload,
 		DefaultLocale:          types.NormalizeEmbedDefaultLocale(req.DefaultLocale),
+		LauncherIcon:           strings.TrimSpace(req.LauncherIcon),
 	}
 	if ch.RateLimitPerMinute <= 0 {
 		ch.RateLimitPerMinute = 30

@@ -4442,7 +4442,7 @@ export default {
     publishTokenWarning: '发布 Token 会以明文出现在嵌入页面源码中，任何访问该网站的人都能看到，请将其视为「可公开密钥」而非机密：切勿把含敏感数据的智能体做成嵌入渠道；务必配置域名白名单与请求上限；Token 泄露时可随时「重置 Token」作废旧值。',
     primaryColor: '主题色',
     launcherIcon: '浮标图片',
-    launcherIconDesc: '自定义右下角浮标的图片,支持 PNG/JPEG/SVG/WebP,不超过 200KB。留空则显示默认对话图标。',
+    launcherIconDesc: '自定义右下角浮标的图片，支持 PNG/JPEG/SVG/WebP，不超过 200KB。留空则显示默认对话图标。',
     launcherIconUpload: '上传图片',
     launcherIconRemove: '清除',
     launcherIconTooLarge: '图片不能超过 200KB',
