@@ -77,6 +77,7 @@ type embedChannelRequest struct {
 	WebhookURL             *string  `json:"webhook_url"`
 	WebhookSecret          *string  `json:"webhook_secret"`
 	AgentID                *string  `json:"agent_id"`
+	LauncherIcon           *string  `json:"launcher_icon"`
 }
 
 // isProductionMode reports whether the server runs in a hardened (release) mode.
@@ -139,6 +140,12 @@ func (h *EmbedChannelHandler) CreateEmbedChannel(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	if req.LauncherIcon != nil {
+		if err := service.ValidateEmbedLauncherIcon(strings.TrimSpace(*req.LauncherIcon)); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+	}
 	originsJSON, _ := json.Marshal(req.AllowedOrigins)
 	enabled := true
 	if req.Enabled != nil {
@@ -171,6 +178,7 @@ func (h *EmbedChannelHandler) CreateEmbedChannel(c *gin.Context) {
 		AllowWebSearch:         allowWebSearch,
 		AllowFileUpload:        allowFileUpload,
 		DefaultLocale:          types.NormalizeEmbedDefaultLocale(stringOrEmpty(req.DefaultLocale)),
+		LauncherIcon:           stringOrEmpty(req.LauncherIcon),
 	})
 	if err != nil {
 		writeEmbedMgmtError(c, err)
@@ -235,6 +243,12 @@ func (h *EmbedChannelHandler) UpdateEmbedChannel(c *gin.Context) {
 			return
 		}
 	}
+	if req.LauncherIcon != nil {
+		if err := service.ValidateEmbedLauncherIcon(strings.TrimSpace(*req.LauncherIcon)); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+	}
 	originsJSON, _ := json.Marshal(req.AllowedOrigins)
 	update := &types.EmbedChannel{
 		Name:               req.Name,
@@ -250,7 +264,7 @@ func (h *EmbedChannelHandler) UpdateEmbedChannel(c *gin.Context) {
 	if req.AgentID != nil {
 		update.AgentID = strings.TrimSpace(*req.AgentID)
 	}
-	ch, err := h.embedSvc.Update(c.Request.Context(), tenantID, channelID, update, req.Enabled, req.ShowSuggestedQuestions, req.AllowWebSearch, req.AllowFileUpload, req.DefaultLocale, req.WebhookURL, req.WebhookSecret, nil)
+	ch, err := h.embedSvc.Update(c.Request.Context(), tenantID, channelID, update, req.Enabled, req.ShowSuggestedQuestions, req.AllowWebSearch, req.AllowFileUpload, req.DefaultLocale, req.WebhookURL, req.WebhookSecret, req.LauncherIcon)
 	if err != nil {
 		writeEmbedMgmtError(c, err)
 		return
@@ -794,6 +808,7 @@ func embedChannelResponse(ch *types.EmbedChannel, publishToken string) gin.H {
 		"allow_web_search":         ch.AllowWebSearch,
 		"allow_file_upload":        ch.AllowFileUpload,
 		"default_locale":           ch.DefaultLocale,
+		"launcher_icon":            ch.LauncherIcon,
 		"webhook_url":              ch.WebhookURL,
 		"has_webhook_secret":       ch.WebhookSecret != "",
 		"created_at":               ch.CreatedAt,
@@ -810,6 +825,8 @@ func writeEmbedMgmtError(c *gin.Context, err error) {
 	case errors.Is(err, service.ErrEmbedChannelNotFound):
 		c.JSON(http.StatusNotFound, gin.H{"error": "embed channel not found"})
 	case errors.Is(err, service.ErrEmbedWebhookURLInvalid):
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	case errors.Is(err, service.ErrEmbedLauncherIconInvalid):
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	default:
 		var appErr *apperrors.AppError
