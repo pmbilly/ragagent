@@ -12,6 +12,7 @@ export interface EmbedChannel {
   rate_limit_per_minute: number
   rate_limit_per_day?: number
   primary_color?: string
+  launcher_icon?: string
   page_title?: string
   header_title_mode?: HeaderTitleMode
   show_suggested_questions?: boolean
@@ -36,6 +37,7 @@ export interface EmbedChannelPublicConfig {
   agent_avatar?: string
   welcome_message: string
   primary_color?: string
+  launcher_icon?: string
   page_title?: string
   header_title_mode?: HeaderTitleMode
   show_suggested_questions?: boolean
