@@ -29,7 +29,8 @@
           <button type="button" class="widget-launcher" :style="{ background: primaryColor || 'var(--td-brand-color)' }"
             :aria-label="widgetOpen ? $t('common.close') : $t('embedPublish.preview')"
             @click="widgetOpen = !widgetOpen">
-            <t-icon :name="widgetOpen ? 'close' : 'chat'" />
+            <img v-if="!widgetOpen && launcherIcon" :src="launcherIcon" class="widget-launcher__img" alt="" />
+            <t-icon v-else :name="widgetOpen ? 'close' : 'chat'" />
           </button>
           <transition name="widget-panel">
             <div v-show="widgetOpen" class="widget-panel">
@@ -54,6 +55,8 @@ const props = defineProps<{
   mode?: 'iframe' | 'widget'
   title?: string
   primaryColor?: string
+  /** Custom launcher image as a data URL; empty falls back to the chat icon. */
+  launcherIcon?: string
   position?: WidgetPosition
   /**
    * Bumped by the parent every time a preview is (re)opened. Folded into the
@@ -242,11 +245,19 @@ watch(() => props.visible, async (open) => {
   cursor: pointer;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
   z-index: 3;
+  overflow: hidden;
   transition: transform 0.15s ease;
 
   &:hover {
     transform: scale(1.04);
   }
+}
+
+.widget-launcher__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .widget-panel {
