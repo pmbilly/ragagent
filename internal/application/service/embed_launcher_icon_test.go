@@ -23,6 +23,8 @@ func TestValidateEmbedLauncherIcon(t *testing.T) {
 		{"svg ok", iconDataURL("image/svg+xml", 128), false},
 		{"webp ok", iconDataURL("image/webp", 128), false},
 		{"gif rejected", iconDataURL("image/gif", 128), true},
+		{"uppercase media type rejected", iconDataURL("image/PNG", 128), true},
+		{"text media type rejected", iconDataURL("text/plain", 128), true},
 		{"not a data url", "https://example.com/icon.png", true},
 		{"bad base64", "data:image/png;base64,!!!not-base64!!!", true},
 		{"too large", iconDataURL("image/png", MaxEmbedLauncherIconBytes+1), true},
