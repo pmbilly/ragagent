@@ -400,8 +400,14 @@
     document.body.appendChild(panel);
     global.addEventListener('message', onMessage);
 
-    // Fetch the channel's public config for appearance extras (launcher icon).
-    // Runs after the token is available; failures keep the default 💬 launcher.
+    // Fetch the channel's public config for appearance (colour + launcher icon).
+    // Runs after the token is available; failures keep the snippet-provided look.
+    //
+    // The channel config wins over data-primary-color: the snippet builder bakes
+    // that attribute in when the code is copied, so without this an admin colour
+    // change would never reach embeds that were pasted earlier. The attribute
+    // still provides the initial paint (no flash while this request is in flight)
+    // and the fallback when the request fails.
     function loadChannelAppearance() {
       loadToken().then(function (tok) {
         return fetch(baseUrl + '/api/v1/embed/' + encodeURIComponent(channelId) + '/config', {
@@ -412,12 +418,17 @@
         return res.json();
       }).then(function (payload) {
         var cfg = payload && payload.data;
-        if (cfg && typeof cfg.launcher_icon === 'string' && cfg.launcher_icon) {
+        if (!cfg) return;
+        if (typeof cfg.primary_color === 'string' && cfg.primary_color) {
+          primaryColor = cfg.primary_color;
+          launcher.style.background = primaryColor;
+        }
+        if (typeof cfg.launcher_icon === 'string' && cfg.launcher_icon) {
           launcherIconUrl = cfg.launcher_icon;
           launcherImg = null;
           renderLauncherContent();
         }
-      }).catch(function () { /* keep default launcher */ });
+      }).catch(function () { /* keep snippet-provided appearance */ });
     }
     loadChannelAppearance();
 
