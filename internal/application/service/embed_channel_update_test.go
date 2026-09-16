@@ -139,7 +139,7 @@ func TestEmbedChannelUpdateShowThinking(t *testing.T) {
 	}
 	svc := &embedChannelService{repo: repo}
 
-	// nil 指针不改动存量值（零值 false 保持 false）。
+	// A nil pointer leaves the stored value untouched (zero value false stays false).
 	updated, err := svc.Update(
 		context.Background(),
 		42,
@@ -154,7 +154,7 @@ func TestEmbedChannelUpdateShowThinking(t *testing.T) {
 		t.Fatalf("ShowThinking = true, want false (untouched)")
 	}
 
-	// 显式开启。
+	// Explicitly enable.
 	showThinking := true
 	updated, err = svc.Update(
 		context.Background(),
@@ -170,7 +170,7 @@ func TestEmbedChannelUpdateShowThinking(t *testing.T) {
 		t.Fatalf("ShowThinking = false, want true")
 	}
 
-	// 显式关闭。
+	// Explicitly disable.
 	showThinking = false
 	updated, err = svc.Update(
 		context.Background(),
