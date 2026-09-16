@@ -217,12 +217,14 @@ onMounted(() => {
 @import '../../components/css/chat-citations.less';
 
 .embed-bot-msg {
-  border-radius: 4px;
+  border-radius: 8px;
   color: var(--td-text-color-primary);
-  font-size: 16px;
+  font-size: 14px;
   margin-right: auto;
   max-width: 100%;
   box-sizing: border-box;
+  background: var(--td-bg-color-secondarycontainer);
+  padding: 12px;
 
   &.is-embedded {
     width: 100%;
