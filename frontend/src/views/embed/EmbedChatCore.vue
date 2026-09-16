@@ -67,6 +67,7 @@
               :session="session"
               :session-id="sessionId"
               :user-query="getUserQuery(index)"
+              :show-thinking="showThinking"
               :embedded-mode="true"
               :embed-channel-id="channelId"
               :embed-token="token"
@@ -150,6 +151,7 @@ const props = defineProps<{
   kbIds: string[]
   welcomeMessage?: string
   showSuggestedQuestions?: boolean
+  showThinking?: boolean
   allowWebSearch?: boolean
   agentWebSearchEnabled?: boolean
   allowFileUpload?: boolean

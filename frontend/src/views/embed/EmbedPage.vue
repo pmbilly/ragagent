@@ -36,6 +36,7 @@
         :kb-ids="kbIds"
         :welcome-message="config.welcome_message"
         :show-suggested-questions="config.show_suggested_questions !== false"
+        :show-thinking="config.show_thinking === true"
         :allow-web-search="config.allow_web_search === true"
         :agent-web-search-enabled="config.agent_web_search_enabled === true"
         :allow-file-upload="config.allow_file_upload === true"

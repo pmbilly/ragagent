@@ -101,6 +101,7 @@ const props = withDefaults(
     sessionId?: string
     userQuery?: string
     embeddedMode?: boolean
+    showThinking?: boolean
     embedChannelId?: string
     embedToken?: string
     embedSessionSig?: string
@@ -112,6 +113,7 @@ const props = withDefaults(
     sessionId: '',
     userQuery: '',
     embeddedMode: true,
+    showThinking: false,
     embedChannelId: '',
     embedToken: '',
     embedSessionSig: '',

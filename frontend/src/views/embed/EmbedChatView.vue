@@ -9,6 +9,7 @@
     :kb-ids="kbIds"
     :welcome-message="welcomeMessage"
     :show-suggested-questions="showSuggestedQuestions"
+    :show-thinking="showThinking"
     :allow-web-search="allowWebSearch"
     :agent-web-search-enabled="agentWebSearchEnabled"
     :allow-file-upload="allowFileUpload"
@@ -35,6 +36,7 @@ defineProps<{
   kbIds: string[]
   welcomeMessage?: string
   showSuggestedQuestions?: boolean
+  showThinking?: boolean
   allowWebSearch?: boolean
   agentWebSearchEnabled?: boolean
   allowFileUpload?: boolean
