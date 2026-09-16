@@ -56,7 +56,7 @@ func TestEmbedChannelUpdateAgentID(t *testing.T) {
 		42,
 		"ch-1",
 		&types.EmbedChannel{AgentID: "agent-new"},
-		&enabled, nil, nil, nil, nil, nil, nil, nil,
+		&enabled, nil, nil, nil, nil, nil, nil, nil, nil,
 	)
 	if err != nil {
 		t.Fatalf("Update() error = %v", err)
@@ -80,7 +80,7 @@ func TestEmbedChannelUpdateLauncherIcon(t *testing.T) {
 	updated, err := svc.Update(
 		context.Background(), 42, "ch-1",
 		&types.EmbedChannel{},
-		nil, nil, nil, nil, nil, nil, nil, nil,
+		nil, nil, nil, nil, nil, nil, nil, nil, nil,
 	)
 	if err != nil {
 		t.Fatalf("Update() error = %v", err)
@@ -94,7 +94,7 @@ func TestEmbedChannelUpdateLauncherIcon(t *testing.T) {
 	updated, err = svc.Update(
 		context.Background(), 42, "ch-1",
 		&types.EmbedChannel{},
-		nil, nil, nil, nil, nil, nil, nil, &icon,
+		nil, nil, nil, nil, nil, nil, nil, nil, &icon,
 	)
 	if err != nil {
 		t.Fatalf("Update() error = %v", err)
@@ -108,7 +108,7 @@ func TestEmbedChannelUpdateLauncherIcon(t *testing.T) {
 	updated, err = svc.Update(
 		context.Background(), 42, "ch-1",
 		&types.EmbedChannel{},
-		nil, nil, nil, nil, nil, nil, nil, &empty,
+		nil, nil, nil, nil, nil, nil, nil, nil, &empty,
 	)
 	if err != nil {
 		t.Fatalf("Update() error = %v", err)
@@ -122,8 +122,67 @@ func TestEmbedChannelUpdateLauncherIcon(t *testing.T) {
 	if _, err = svc.Update(
 		context.Background(), 42, "ch-1",
 		&types.EmbedChannel{},
-		nil, nil, nil, nil, nil, nil, nil, &bad,
+		nil, nil, nil, nil, nil, nil, nil, nil, &bad,
 	); !errors.Is(err, ErrEmbedLauncherIconInvalid) {
 		t.Fatalf("Update() error = %v, want ErrEmbedLauncherIconInvalid", err)
+	}
+}
+
+func TestEmbedChannelUpdateShowThinking(t *testing.T) {
+	repo := &stubEmbedChannelRepo{
+		ch: &types.EmbedChannel{
+			ID:       "ch-1",
+			TenantID: 42,
+			AgentID:  "agent-1",
+			Name:     "Support",
+		},
+	}
+	svc := &embedChannelService{repo: repo}
+
+	// nil 指针不改动存量值（零值 false 保持 false）。
+	updated, err := svc.Update(
+		context.Background(),
+		42,
+		"ch-1",
+		&types.EmbedChannel{},
+		nil, nil, nil, nil, nil, nil, nil, nil, nil,
+	)
+	if err != nil {
+		t.Fatalf("Update returned error: %v", err)
+	}
+	if updated.ShowThinking {
+		t.Fatalf("ShowThinking = true, want false (untouched)")
+	}
+
+	// 显式开启。
+	showThinking := true
+	updated, err = svc.Update(
+		context.Background(),
+		42,
+		"ch-1",
+		&types.EmbedChannel{},
+		nil, nil, &showThinking, nil, nil, nil, nil, nil, nil,
+	)
+	if err != nil {
+		t.Fatalf("Update returned error: %v", err)
+	}
+	if !updated.ShowThinking {
+		t.Fatalf("ShowThinking = false, want true")
+	}
+
+	// 显式关闭。
+	showThinking = false
+	updated, err = svc.Update(
+		context.Background(),
+		42,
+		"ch-1",
+		&types.EmbedChannel{},
+		nil, nil, &showThinking, nil, nil, nil, nil, nil, nil,
+	)
+	if err != nil {
+		t.Fatalf("Update returned error: %v", err)
+	}
+	if updated.ShowThinking {
+		t.Fatalf("ShowThinking = true, want false")
 	}
 }

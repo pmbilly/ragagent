@@ -32,7 +32,7 @@ func (f *flowEmbedSvc) ListByAgent(context.Context, uint64, string) ([]*types.Em
 func (f *flowEmbedSvc) ListByTenant(context.Context, uint64) ([]*types.EmbedChannel, error) {
 	return nil, nil
 }
-func (f *flowEmbedSvc) Update(context.Context, uint64, string, *types.EmbedChannel, *bool, *bool, *bool, *bool, *string, *string, *string, *string) (*types.EmbedChannel, error) {
+func (f *flowEmbedSvc) Update(context.Context, uint64, string, *types.EmbedChannel, *bool, *bool, *bool, *bool, *bool, *string, *string, *string, *string) (*types.EmbedChannel, error) {
 	return nil, nil
 }
 func (f *flowEmbedSvc) GetOwnedChannel(_ context.Context, tenantID uint64, id string) (*types.EmbedChannel, error) {

@@ -148,3 +148,15 @@ func TestPublicConfigIncludesLauncherIcon(t *testing.T) {
 		t.Fatalf("launcher_icon = %q, want data URL", cfg.LauncherIcon)
 	}
 }
+
+func TestPublicConfigIncludesShowThinking(t *testing.T) {
+	svc := &embedChannelService{}
+	cfg := svc.PublicConfig(context.Background(), &types.EmbedChannel{
+		ID:           "ch-thinking",
+		AgentID:      "agent-1",
+		ShowThinking: true,
+	})
+	if !cfg.ShowThinking {
+		t.Fatalf("expected show_thinking=true to be included in public config")
+	}
+}

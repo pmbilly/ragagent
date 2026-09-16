@@ -86,6 +86,7 @@ func (s *embedChannelService) Create(
 		PageTitle:              strings.TrimSpace(req.PageTitle),
 		HeaderTitleMode:        types.NormalizeEmbedHeaderTitleMode(req.HeaderTitleMode),
 		ShowSuggestedQuestions: req.ShowSuggestedQuestions,
+		ShowThinking:           req.ShowThinking,
 		WidgetPosition:         types.NormalizeEmbedWidgetPosition(req.WidgetPosition),
 		AllowWebSearch:         req.AllowWebSearch,
 		AllowFileUpload:        req.AllowFileUpload,
@@ -122,7 +123,7 @@ func (s *embedChannelService) ListByTenant(
 
 func (s *embedChannelService) Update(
 	ctx context.Context, tenantID uint64, id string, req *types.EmbedChannel,
-	enabled *bool, showSuggested *bool, allowWebSearch *bool, allowFileUpload *bool,
+	enabled *bool, showSuggested *bool, showThinking *bool, allowWebSearch *bool, allowFileUpload *bool,
 	defaultLocale *string, webhookURL *string, webhookSecret *string, launcherIcon *string,
 ) (*types.EmbedChannel, error) {
 	ch, err := s.getOwned(ctx, tenantID, id)
@@ -138,6 +139,9 @@ func (s *embedChannelService) Update(
 	ch.HeaderTitleMode = types.NormalizeEmbedHeaderTitleMode(req.HeaderTitleMode)
 	if showSuggested != nil {
 		ch.ShowSuggestedQuestions = *showSuggested
+	}
+	if showThinking != nil {
+		ch.ShowThinking = *showThinking
 	}
 	if allowWebSearch != nil {
 		ch.AllowWebSearch = *allowWebSearch
@@ -268,6 +272,7 @@ func (s *embedChannelService) PublicConfig(ctx context.Context, ch *types.EmbedC
 		PageTitle:               ch.PageTitle,
 		HeaderTitleMode:         types.NormalizeEmbedHeaderTitleMode(ch.HeaderTitleMode),
 		ShowSuggestedQuestions:  ch.ShowSuggestedQuestions,
+		ShowThinking:            ch.ShowThinking,
 		AllowedOrigins:          ch.AllowedOriginsList(),
 		WidgetPosition:          types.NormalizeEmbedWidgetPosition(ch.WidgetPosition),
 		AllowWebSearch:          ch.AllowWebSearch,

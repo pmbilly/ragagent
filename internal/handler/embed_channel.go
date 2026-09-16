@@ -70,6 +70,7 @@ type embedChannelRequest struct {
 	PageTitle              string   `json:"page_title"`
 	HeaderTitleMode        string   `json:"header_title_mode"`
 	ShowSuggestedQuestions *bool    `json:"show_suggested_questions"`
+	ShowThinking           *bool    `json:"show_thinking"`
 	WidgetPosition         string   `json:"widget_position"`
 	AllowWebSearch         *bool    `json:"allow_web_search"`
 	AllowFileUpload        *bool    `json:"allow_file_upload"`
@@ -155,6 +156,10 @@ func (h *EmbedChannelHandler) CreateEmbedChannel(c *gin.Context) {
 	if req.ShowSuggestedQuestions != nil {
 		showSuggested = *req.ShowSuggestedQuestions
 	}
+	showThinking := false
+	if req.ShowThinking != nil {
+		showThinking = *req.ShowThinking
+	}
 	allowWebSearch := false
 	if req.AllowWebSearch != nil {
 		allowWebSearch = *req.AllowWebSearch
@@ -174,6 +179,7 @@ func (h *EmbedChannelHandler) CreateEmbedChannel(c *gin.Context) {
 		PageTitle:              req.PageTitle,
 		HeaderTitleMode:        req.HeaderTitleMode,
 		ShowSuggestedQuestions: showSuggested,
+		ShowThinking:           showThinking,
 		WidgetPosition:         req.WidgetPosition,
 		AllowWebSearch:         allowWebSearch,
 		AllowFileUpload:        allowFileUpload,
@@ -264,7 +270,7 @@ func (h *EmbedChannelHandler) UpdateEmbedChannel(c *gin.Context) {
 	if req.AgentID != nil {
 		update.AgentID = strings.TrimSpace(*req.AgentID)
 	}
-	ch, err := h.embedSvc.Update(c.Request.Context(), tenantID, channelID, update, req.Enabled, req.ShowSuggestedQuestions, req.AllowWebSearch, req.AllowFileUpload, req.DefaultLocale, req.WebhookURL, req.WebhookSecret, req.LauncherIcon)
+	ch, err := h.embedSvc.Update(c.Request.Context(), tenantID, channelID, update, req.Enabled, req.ShowSuggestedQuestions, req.ShowThinking, req.AllowWebSearch, req.AllowFileUpload, req.DefaultLocale, req.WebhookURL, req.WebhookSecret, req.LauncherIcon)
 	if err != nil {
 		writeEmbedMgmtError(c, err)
 		return
@@ -804,6 +810,7 @@ func embedChannelResponse(ch *types.EmbedChannel, publishToken string) gin.H {
 		"page_title":               ch.PageTitle,
 		"header_title_mode":        types.NormalizeEmbedHeaderTitleMode(ch.HeaderTitleMode),
 		"show_suggested_questions": ch.ShowSuggestedQuestions,
+		"show_thinking":            ch.ShowThinking,
 		"widget_position":          ch.WidgetPosition,
 		"allow_web_search":         ch.AllowWebSearch,
 		"allow_file_upload":        ch.AllowFileUpload,
