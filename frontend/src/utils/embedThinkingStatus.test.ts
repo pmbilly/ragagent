@@ -15,6 +15,7 @@ test('isThinkingInProgress: agent mode scans thinking events', () => {
   assert.equal(
     isThinkingInProgress({
       isAgentMode: true,
+      is_completed: false,
       agentEventStream: [{ type: 'thinking', thinking: true, done: false }],
     }),
     true,
@@ -22,16 +23,26 @@ test('isThinkingInProgress: agent mode scans thinking events', () => {
   assert.equal(
     isThinkingInProgress({
       isAgentMode: true,
+      is_completed: true,
       agentEventStream: [{ type: 'thinking', thinking: false, done: true }],
     }),
     false,
   )
+  // Tool-only phase of an in-flight message counts as thinking (no thinking
+  // events are emitted, but the answer has not started yet).
   assert.equal(
     isThinkingInProgress({
       isAgentMode: true,
+      is_completed: false,
       agentEventStream: [{ type: 'tool_call', thinking: false }],
     }),
-    false,
+    true,
   )
   assert.equal(isThinkingInProgress({ isAgentMode: true }), false)
+  assert.equal(isThinkingInProgress({ isAgentMode: true, is_completed: true }), false)
+  // Answer already streaming: dots must give way to the answer text.
+  assert.equal(
+    isThinkingInProgress({ isAgentMode: true, is_completed: false, content: '2' }),
+    false,
+  )
 })

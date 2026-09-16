@@ -230,6 +230,15 @@ onMounted(() => {
   background: var(--td-bg-color-secondarycontainer);
   padding: 12px;
 
+  // The TDesign image-viewer trigger (picturePreview sibling) renders hidden
+  // thumbnail wrappers even when no preview is active, adding ~17px of dead
+  // height below the content and breaking vertical centering of compact
+  // bubbles such as the thinking-dots indicator. Preview opens programmatically
+  // via v-model, so the trigger can be hidden outright.
+  :deep(.t-image-viewer__trigger) {
+    display: none;
+  }
+
   &.is-embedded {
     width: 100%;
 
@@ -254,6 +263,9 @@ onMounted(() => {
   // Do not add element-level Markdown rules here; update the shared mixin.
   .chat-markdown-typography();
   .chat-citation-pills();
+  // The shared mixin bakes in a 16px base for the main chat; the embed widget
+  // uses the bubble's 14px for denser reading.
+  font-size: 14px;
 }
 
 .embed-citation-float {

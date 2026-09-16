@@ -1696,6 +1696,10 @@ const hasPendingStreamingActivity = computed(() => {
 // feedback-less timeline. Once a real pending step exists it carries its own
 // shimmer, and once answer text starts the stream itself is enough feedback.
 const showAgentActivityIndicator = computed(() => {
+  // Embed suppress mode renders no intermediate UI at all — the embed chat
+  // shows its own dots/typing indicators, so the native placeholder card
+  // would leak a second "thinking" surface.
+  if (props.suppressThinking) return false;
   if (isSegmentDone.value) return false;
   if (props.ragMode || hasAnswerStarted.value) return false;
   return !hasPendingStreamingActivity.value;
@@ -2055,6 +2059,10 @@ const hiddenThinkingEventIds = computed<Set<string>>(() => {
 const intermediateEvents = computed(() => {
   const stream = eventStream.value;
   if (!stream || !Array.isArray(stream)) return [];
+  // Embed suppress mode hides all intermediate agent activity (thinking cards,
+  // tool calls, tool results, plan changes) from visitors — the embed UI shows
+  // a lightweight dots indicator instead, and only the final answer renders.
+  if (props.suppressThinking) return [];
   const result = buildFullEventList(stream);
   const hidden = hiddenThinkingEventIds.value;
   return result.filter((e: any) => {
@@ -2064,9 +2072,6 @@ const intermediateEvents = computed(() => {
     // branch for this type and would otherwise emit an empty node.
     if (e.type === 'user_message_injected') return false;
     if (e.type === 'thinking' && e.event_id && hidden.has(e.event_id)) return false;
-    // Embed suppress mode hides reasoning from visitors entirely — no thinking
-    // cards (or "N reasoning rounds" counts) may leak into the collapsed tree.
-    if (props.suppressThinking && e.type === 'thinking') return false;
     return true;
   });
 });
@@ -2090,14 +2095,14 @@ const displayEvents = computed(() => {
     (e: any) => e.type !== 'user_message_injected',
   );
 
-  // Embed channels can hide reasoning text from visitors while still receiving
-  // the events; the embed UI shows a lightweight dots indicator instead. The
-  // gate composes with (not replaces) the branches below, and the unfiltered
-  // fullList is retained so the natural-stop promotion can still source the
-  // trailing thinking content — the synthesized answer is not reasoning and
-  // must survive the gate.
+  // Embed channels can hide all intermediate agent activity from visitors
+  // (thinking, tool calls/results, plan changes) while still receiving the
+  // events; the embed UI shows a lightweight dots indicator instead. Only
+  // answer events survive the gate. The unfiltered fullList is retained so
+  // the natural-stop promotion can still source the trailing thinking
+  // content — the synthesized answer is not reasoning and must survive.
   const result = props.suppressThinking
-    ? fullList.filter((e: any) => e.type !== 'thinking')
+    ? fullList.filter((e: any) => e.type === 'answer')
     : fullList;
 
   // Quick-answer RAG: pipeline steps (including attachment prep) live in
@@ -3160,6 +3165,14 @@ const handleAddToKnowledge = (answerEvent: any) => {
   gap: 0;
   margin-bottom: 10px;
   position: relative;
+
+  // Embed widget answers use the denser 14px bubble base instead of the
+  // mixin's baked-in 16px main-chat size.
+  &.is-embedded {
+    .answer-content.markdown-content {
+      font-size: 14px;
+    }
+  }
   --agent-step-text-size: 14px;
   --agent-step-summary-size: 13px;
   --agent-step-line-color: color-mix(in srgb, var(--td-text-color-primary) 16%, transparent);

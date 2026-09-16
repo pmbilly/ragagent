@@ -13,10 +13,16 @@ const { t } = useI18n()
 
 <style scoped lang="less">
 .embed-thinking-dots {
-  display: inline-flex;
+  // Block-level flex (not inline-flex): an inline-level box would sit on the
+  // text baseline and inherit the line box's strut, so the dots never centered
+  // vertically inside the bubble.
+  display: flex;
   align-items: center;
   gap: 4px;
-  padding: 10px 2px;
+  width: fit-content;
+  height: 14px;
+  padding: 0 2px;
+  font-size: 0;
 
   &__dot {
     width: 6px;
