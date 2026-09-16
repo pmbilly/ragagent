@@ -32,7 +32,7 @@ embed widget（浮窗聊天）目前完全不渲染模型的思考过程（think
 
 - `internal/types/embed_channel.go`
   - `EmbedChannel` 加字段：`ShowThinking bool \`json:"show_thinking" gorm:"not null;default:false"\``
-  - `EmbedChannelPublicConfig` 加 `ShowThinking bool \`json:"show_thinking,omitempty"\``
+  - `EmbedChannelPublicConfig` 加 `ShowThinking bool`（`json:"show_thinking"`，**不带 omitempty**——与该结构体中 `ShowSuggestedQuestions` 等布尔字段的现有风格一致，显式下发 false）
   - 渠道 create/update 请求结构体加 `show_thinking`
 - `internal/handler/embed_channel.go`
   - create/update 接受 `show_thinking`（布尔，无特殊校验，沿用 `show_suggested_questions` 的处理模式）

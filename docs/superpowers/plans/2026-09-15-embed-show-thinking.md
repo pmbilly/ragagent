@@ -17,6 +17,10 @@
 **Files:**
 - Create: `migrations/versioned/000097_embed_show_thinking.up.sql`
 - Create: `migrations/versioned/000097_embed_show_thinking.down.sql`
+- Create: `migrations/sqlite/000018_embed_show_thinking.up.sql`（SQLite 树，审查补充：两树需同步）
+- Create: `migrations/sqlite/000018_embed_show_thinking.down.sql`
+
+> SQLite 树风格与 versioned 树不同：单行语句、不带 `IF [NOT] EXISTS`、无注释头（参照 `migrations/sqlite/000017_embed_launcher_icon.*`）。
 
 - [ ] **Step 1: 写迁移文件**
 
@@ -645,11 +649,12 @@ import { safeMarkdownToHTML, sanitizeMarkdownHTML, createSafeImage, isValidImage
 style：文件顶部 `.deep-think` 规则前加 import，并给 `.content-inner` 应用排版 mixin、去掉纯文本的 `white-space: pre-wrap`：
 
 ```less
-@import '../../components/css/chat-markdown.less';
+@import '../../../components/css/chat-markdown.less';
 
 .deep-think {
     ...
 ```
+（注意：从 `views/chat/components/` 出发的正确路径是 `../../../components/css/chat-markdown.less`，与同目录 `botmsg.vue` 一致；`../../components/...` 会解析到不存在的 `views/components/`，实现时已按正确路径执行。）
 
 ```less
         .content-inner {
