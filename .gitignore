@@ -63,3 +63,10 @@ miniprogram/project.private.config.json
 
 # Locally built BrowserSkill runtime and extension bundles
 /artifacts/browserskill/
+
+# Local knowledge-graph artifacts (graphify tool output)
+graphify-out/
+frontend/graphify-out/
+
+# Local test static page
+static-pages/
