@@ -2064,6 +2064,9 @@ const intermediateEvents = computed(() => {
     // branch for this type and would otherwise emit an empty node.
     if (e.type === 'user_message_injected') return false;
     if (e.type === 'thinking' && e.event_id && hidden.has(e.event_id)) return false;
+    // Embed suppress mode hides reasoning from visitors entirely — no thinking
+    // cards (or "N reasoning rounds" counts) may leak into the collapsed tree.
+    if (props.suppressThinking && e.type === 'thinking') return false;
     return true;
   });
 });
@@ -2080,7 +2083,7 @@ const displayEvents = computed(() => {
     return [];
   }
 
-  const result = buildFullEventList(stream).filter(
+  const fullList = buildFullEventList(stream).filter(
     // Injected user messages render as normal user bubbles in the message
     // list — never inside the agent timeline (the template has no branch for
     // the type and would render an empty card).
@@ -2088,10 +2091,14 @@ const displayEvents = computed(() => {
   );
 
   // Embed channels can hide reasoning text from visitors while still receiving
-  // the events; the embed UI shows a lightweight dots indicator instead.
-  if (props.suppressThinking) {
-    return result.filter((e: any) => e.type !== 'thinking');
-  }
+  // the events; the embed UI shows a lightweight dots indicator instead. The
+  // gate composes with (not replaces) the branches below, and the unfiltered
+  // fullList is retained so the natural-stop promotion can still source the
+  // trailing thinking content — the synthesized answer is not reasoning and
+  // must survive the gate.
+  const result = props.suppressThinking
+    ? fullList.filter((e: any) => e.type !== 'thinking')
+    : fullList;
 
   // Quick-answer RAG: pipeline steps (including attachment prep) live in
   // RagPipelineProgress; this component only renders the answer stream.
@@ -2132,7 +2139,10 @@ const displayEvents = computed(() => {
     // the answer card UI (expanded markdown + copy/add toolbar) rather than
     // the collapsed "思考" card. The original thinking event is still in
     // the intermediate-steps tree when applicable.
-    const thinking = result.find((e: any) =>
+    // Source from fullList (unfiltered): in embed suppress mode the thinking
+    // event was removed from `result`, but its content is the final answer
+    // here, not reasoning, and must still be promoted.
+    const thinking = fullList.find((e: any) =>
       e.type === 'thinking' && e.event_id === final.event_id
     );
     if (!thinking || !thinking.content) return result;
