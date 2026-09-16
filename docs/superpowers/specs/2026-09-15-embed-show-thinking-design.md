@@ -46,19 +46,24 @@ embed widget（浮窗聊天）目前完全不渲染模型的思考过程（think
   - 新增「显示思考过程」开关，与 `show_suggested_questions` 等现有 toggle 同风格、同区块
   - i18n 补齐 zh-CN / en-US / ko-KR / ja-JP / ru-RU 词条
 
-### 4. 前端渲染（核心新增）
+### 4. 前端渲染（调研后修订）
 
-- `frontend/src/composables/useEmbedChatSession.ts`
-  - 解析 SSE 流中的 thinking 事件（`ResponseTypeThinking`），把内容累积到当前 assistant 消息的 `thinking` buffer：流式追加，消息完成时定型
-  - 暴露每个消息的 `thinking` 内容与「思考是否进行中」状态（两种渲染模式共用）
-- 新组件 `frontend/src/views/embed/EmbedThinkingBlock.vue`
-  - `mode` prop 区分两种渲染：
-    - **dots**：三个点闪烁的纯 CSS 动画（typing dots 脉冲），仅思考进行中显示，回答输出后消失；不可展开、无文本内容
-    - **card**：折叠卡片，默认折叠，标题「思考中」（思考结束后标题定型，实现时可微调为「思考过程」），展开后 markdown 渲染；样式参考主站思考卡片（`AgentStreamDisplay.vue` 的 thinking-event-card）但自包含
-  - markdown 渲染复用 embed 消息现有的渲染工具，不新增依赖
-- `frontend/src/views/embed/EmbedChatCore.vue` / `EmbedBotMessage.vue`
-  - 从渠道 config 读取 `show_thinking`，为 true 时以 card 模式渲染 EmbedThinkingBlock，false 时以 dots 模式渲染
-  - false 模式下 thinking 内容照常到达但仅用于判断「进行中」，不渲染文本
+> **修订说明**：原方案假设 embed 完全不存在 thinking 渲染，计划新建累积逻辑 + 新组件。
+> 实际调研发现共享的 `useChatStreamHandler` 已把 thinking 解析进消息对象
+> （RAG 模式：`thinkContent`/`showThink`/`thinking` 字段，来自 content 中的 `<think>` 标签；
+> Agent 模式：`agentEventStream` 中的 thinking 事件），且 embed 已在渲染：
+> - RAG 模式：`EmbedBotMessage.vue` 已挂 `deepThink.vue`（折叠卡片，思考中文案 + 脉冲指示，完成后自动折叠）
+> - Agent 模式：`AgentStreamDisplay.vue`（embeddedMode）已渲染 thinking-event-card
+>
+> 因此实现改为**复用现有渲染 + 新增 gate 与 dots 指示器**，不再新建累积逻辑。
+
+- `frontend/src/utils/embedThinkingStatus.ts`（新）：从消息对象提取「思考是否进行中」状态（RAG 看 `thinking` 字段，Agent 模式扫描 `agentEventStream` 中未完成的 thinking 事件），供 dots 指示器使用；附单测
+- `frontend/src/views/embed/EmbedThinkingDots.vue`（新）：三个点闪烁的纯 CSS 动画指示器，仅思考进行中显示
+- `EmbedBotMessage.vue` 改造：
+  - 新增 `showThinking` prop（渠道配置传入，默认 false）
+  - `showThinking=true`：保持现有渲染（RAG 走 deepThink，Agent 走 AgentStreamDisplay），但 deepThink 的内容区从纯文本升级为 markdown 渲染（复用 `renderChatMarkdown` + security 工具，主站同步受益）
+  - `showThinking=false`：RAG 模式隐藏 DeepThink；Agent 模式给 `AgentStreamDisplay` 传新增的 `suppressThinking` prop（在 `displayEvents` 中过滤 thinking 事件）；两种模式统一在思考进行中显示 EmbedThinkingDots
+- 配置透传：`EmbedPage.vue` → `EmbedChatView.vue` → `EmbedChatCore.vue` → `EmbedBotMessage.vue` 新增 `showThinking` prop 链（模式同 `showSuggestedQuestions`）
 
 ## 数据流
 
@@ -77,8 +82,8 @@ embed widget（浮窗聊天）目前完全不渲染模型的思考过程（think
 
 ## 测试
 
-- 后端：`internal/handler/embed_channel_test.go` 补充 create/update 的 `show_thinking` 字段往返、公开 config 下发字段
-- 前端：`useEmbedChatSession` 对 thinking 事件的累积逻辑单测（仿现有测试风格）；EmbedThinkingBlock 两种模式的渲染/折叠交互测试
+- 后端：`internal/application/service/embed_channel_update_test.go` 补充 `show_thinking` 的 Update 用例（nil 保留、true/false 写入）；`embed_channel_public_config_test.go` 补充 public config 下发字段用例
+- 前端：`frontend/src/utils/embedThinkingStatus.test.ts` 覆盖两种模式的「思考进行中」判断
 - 手工验证（本地）：
   1. `docker compose build app frontend && docker compose up -d`
   2. 渠道开关关闭 → 发起会话（agent 已开 thinking）→ 思考中出现闪烁三点，回答出现后消失
