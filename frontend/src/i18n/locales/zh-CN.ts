@@ -4430,6 +4430,8 @@ export default {
     welcomeMessageDesc: '访客打开嵌入聊天后、尚未发言时展示；留空则不显示',
     showSuggestedQuestions: '推荐问题',
     showSuggestedQuestionsDesc: '访客未发言前展示快捷提问，内容来自智能体配置与关联知识库',
+    showThinking: '显示思考过程',
+    showThinkingDesc: '向访客展示模型的思考过程；关闭后仅显示思考中的动态指示',
     originsHint: '每行一个完整来源地址（如 https://shop.example.com），至少填写一个；支持 *.example.com 子域通配',
     originsRequired: '请至少填写一个域名白名单',
     originsInvalid: '域名格式无效：{origin}',

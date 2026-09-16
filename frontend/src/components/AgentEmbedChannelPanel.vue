@@ -176,6 +176,16 @@
 
             <div class="setting-row">
               <div class="setting-info">
+                <label>{{ $t('embedPublish.showThinking') }}</label>
+                <p class="desc">{{ $t('embedPublish.showThinkingDesc') }}</p>
+              </div>
+              <div class="setting-control">
+                <t-switch v-model="form.show_thinking" :disabled="!isAdmin" size="small" />
+              </div>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-info">
                 <label>{{ $t('embedPublish.allowWebSearch') }}</label>
                 <p class="desc">{{ $t('embedPublish.allowWebSearchDesc') }}</p>
                 <p v-if="form.allow_web_search && !agentWebSearchEnabledEffective" class="desc desc--warn">
@@ -531,6 +541,7 @@ const defaultForm = () => ({
   page_title: '',
   header_title_mode: 'channel' as HeaderTitleMode,
   show_suggested_questions: true,
+  show_thinking: false,
   widget_position: 'bottom-right' as WidgetPosition,
   allow_web_search: false,
   allow_file_upload: false,
@@ -874,6 +885,7 @@ const fillFormFromChannel = (ch: EmbedChannel) => {
     page_title: ch.page_title || '',
     header_title_mode: (ch.header_title_mode as HeaderTitleMode) || 'channel',
     show_suggested_questions: ch.show_suggested_questions !== false,
+    show_thinking: ch.show_thinking === true,
     widget_position: (ch.widget_position as WidgetPosition) || 'bottom-right',
     allow_web_search: ch.allow_web_search === true,
     allow_file_upload: ch.allow_file_upload === true,
@@ -970,6 +982,7 @@ const saveForm = async () => {
       page_title: form.value.page_title,
       header_title_mode: form.value.header_title_mode,
       show_suggested_questions: form.value.show_suggested_questions,
+      show_thinking: form.value.show_thinking,
       widget_position: form.value.widget_position,
       allow_web_search: form.value.allow_web_search,
       allow_file_upload: form.value.allow_file_upload,
@@ -1133,6 +1146,7 @@ const toggleEnabled = async (ch: EmbedChannel, enabled: boolean) => {
     page_title: ch.page_title,
     header_title_mode: ch.header_title_mode || 'channel',
     show_suggested_questions: ch.show_suggested_questions !== false,
+    show_thinking: ch.show_thinking === true,
     widget_position: ch.widget_position,
     enabled,
   })
