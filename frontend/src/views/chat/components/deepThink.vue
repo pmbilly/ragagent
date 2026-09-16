@@ -19,13 +19,15 @@
             </div>
         </div>
         <div class="think-content" v-show="!isFold || deepSession.thinking">
-            <div ref="contentInnerRef" class="content-inner">{{ deepSession.thinkContent }}</div>
+            <div ref="contentInnerRef" class="content-inner markdown-content" v-html="thinkHTML" />
         </div>
     </div>
 </template>
 <script setup>
-import { watch, ref, onMounted, nextTick } from 'vue';
+import { watch, ref, computed, onMounted, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { renderChatMarkdown, createChatMarkdownRenderer } from '@/utils/chatMarkdownRenderer';
+import { safeMarkdownToHTML, sanitizeMarkdownHTML, createSafeImage, isValidImageURL } from '@/utils/security';
 
 const isFold = ref(false)
 const contentInnerRef = ref(null)
@@ -37,6 +39,22 @@ const props = defineProps({
         required: false
     }
 });
+
+const thinkRenderer = createChatMarkdownRenderer({
+    imageRenderer: ({ href, title, text }) => createSafeImage(href, text || '', title || ''),
+    isValidImageUrl: isValidImageURL,
+})
+
+const thinkHTML = computed(() => {
+    const text = String(props.deepSession?.thinkContent || '')
+    if (!text.trim()) return ''
+    return renderChatMarkdown(text, {
+        renderer: thinkRenderer,
+        escapeMarkdown: safeMarkdownToHTML,
+        sanitizeHtml: sanitizeMarkdownHTML,
+        streaming: props.deepSession?.thinking === true,
+    })
+})
 
 // 初始化时检查：如果 thinking 已完成（从历史记录加载），默认折叠
 onMounted(() => {
@@ -80,6 +98,8 @@ const toggleFold = () => {
 }
 </script>
 <style lang="less" scoped>
+@import '../../../components/css/chat-markdown.less';
+
 .deep-think {
     display: flex;
     flex-direction: column;
@@ -183,6 +203,7 @@ const toggleFold = () => {
         border-top: 1px solid var(--td-bg-color-secondarycontainer);
 
         .content-inner {
+            .chat-markdown-typography();
             padding: 8px 14px;
             font-size: 12px;
             line-height: 1.6;
@@ -190,7 +211,6 @@ const toggleFold = () => {
             max-height: 200px;
             overflow-y: auto;
             word-break: break-word;
-            white-space: pre-wrap;
 
             &::-webkit-scrollbar {
                 width: 4px;
