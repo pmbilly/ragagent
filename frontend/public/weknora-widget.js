@@ -32,8 +32,8 @@
   var DEFAULT_POSITION = 'bottom-right';
   var DEFAULT_COLOR = '#07C05F';
   var DEFAULT_TITLE = 'AI Assistant';
-  var DEFAULT_WIDTH = 400;
-  var DEFAULT_HEIGHT = 600;
+  var DEFAULT_WIDTH = 420;
+  var DEFAULT_HEIGHT = 720;
 
   var instance = null;
   var listeners = {};

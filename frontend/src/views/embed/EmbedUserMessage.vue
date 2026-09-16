@@ -108,12 +108,12 @@ const formatFileSize = (bytes: number): string => {
 .user_msg {
   width: max-content;
   max-width: min(76%, 680px);
-  padding: 8px 12px;
+  padding: 12px;
   border-radius: 8px;
-  background: var(--td-bg-color-secondarycontainer);
+  background: var(--td-gray-color-14);
   margin-left: auto;
-  color: var(--td-text-color-primary);
-  font-size: 16px;
+  color: var(--td-text-color-anti);
+  font-size: 14px;
   line-height: 1.6;
   text-align: left;
   word-break: break-word;
