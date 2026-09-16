@@ -959,6 +959,7 @@ const props = defineProps<{
   embedToken?: string;
   embedSessionSig?: string;
   embedVisitorId?: string;
+  suppressThinking?: boolean;
   ragMode?: boolean;
   followUpLoading?: boolean;
 }>();
@@ -2085,6 +2086,12 @@ const displayEvents = computed(() => {
     // the type and would render an empty card).
     (e: any) => e.type !== 'user_message_injected',
   );
+
+  // Embed channels can hide reasoning text from visitors while still receiving
+  // the events; the embed UI shows a lightweight dots indicator instead.
+  if (props.suppressThinking) {
+    return result.filter((e: any) => e.type !== 'thinking');
+  }
 
   // Quick-answer RAG: pipeline steps (including attachment prep) live in
   // RagPipelineProgress; this component only renders the answer stream.

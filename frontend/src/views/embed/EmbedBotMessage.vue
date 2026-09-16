@@ -4,15 +4,16 @@
       <RagPipelineProgress :session="session" embedded-mode />
       <AgentStreamDisplay v-if="session?.isAgentMode" :session="session" :session-id="sessionId" :user-query="userQuery"
         rag-mode :embedded-mode="embeddedMode" :embed-channel-id="embedChannelId" :embed-token="embedToken"
-        :embed-session-sig="embedSessionSig" :embed-visitor-id="embedVisitorId" />
+        :embed-session-sig="embedSessionSig" :embed-visitor-id="embedVisitorId" :suppress-thinking="!showThinking" />
     </div>
     <template v-else>
       <DocInfo v-if="session?.knowledge_references?.length" :session="session" embedded-mode />
       <AgentStreamDisplay v-if="session?.isAgentMode" :session="session" :session-id="sessionId" :user-query="userQuery"
         :embedded-mode="embeddedMode" :embed-channel-id="embedChannelId" :embed-token="embedToken"
-        :embed-session-sig="embedSessionSig" :embed-visitor-id="embedVisitorId" />
+        :embed-session-sig="embedSessionSig" :embed-visitor-id="embedVisitorId" :suppress-thinking="!showThinking" />
     </template>
-    <DeepThink v-if="session?.showThink && !session?.isAgentMode" :deep-session="session" />
+    <EmbedThinkingDots v-if="!showThinking && isThinkingInProgress(session as EmbedThinkingMessage | undefined)" />
+    <DeepThink v-if="showThinking && session?.showThink && !session?.isAgentMode" :deep-session="session" />
     <div v-if="!session?.hideContent && !session?.isAgentMode" ref="parentMd">
       <div v-if="hasActualContent" class="content-wrapper">
         <div class="ai-markdown-template markdown-content" v-stable-html="renderedHTML" />
@@ -61,6 +62,8 @@ import {
 import { useEmbedCitationPopover } from '@/composables/useEmbedCitationPopover'
 import { useTypewriter } from '@/composables/useTypewriter'
 import { vStableHtml } from '@/directives/stableHtml'
+import EmbedThinkingDots from '@/views/embed/EmbedThinkingDots.vue'
+import { isThinkingInProgress, type EmbedThinkingMessage } from '@/utils/embedThinkingStatus'
 
 const RagPipelineProgress = defineAsyncComponent(
   () => import('@/views/chat/components/RagPipelineProgress.vue'),
@@ -88,6 +91,7 @@ type EmbedSession = {
   isRagMode?: boolean
   isAgentMode?: boolean
   showThink?: boolean
+  thinking?: boolean
   hideContent?: boolean
   is_completed?: boolean
   agentEventStream?: Array<Record<string, unknown>>
