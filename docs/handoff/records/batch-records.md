@@ -635,3 +635,12 @@
 - **三项疑点复核（B48 待人工复核项，全部闭环）**：① score 字节形态（`"score":1` vs `1.0`）——`ContractJson` 语义比较器把整值浮点归一（`d == Math.rint(d)` 即按整数比），金片绿是真绿，字节变化对 JSON 消费方透明，**无需动作**；② `ModelParametersTypeHandler` 解密失败的空 if「观测点」——按 house 惯例（`DataSource`/`APIPrincipalConfig`/`WebSearchParams` 三处同类均为宽容置空、不记日志）**删除死分支**，注释并入口径说明；③ wiki 零值 `page_type` 分叉——四处创建点（`WikiPageServiceImpl`×2 / `WikiIngestReducePhase` / `AgentToolWikiBackends`）**全部显式 setPageType**，`''` 落库分叉不可达，**无需动作**。
 - **闸门**：ApprovalBridgeTest 4/4 绿 + model 域绿 + spotlessCheck 绿。
 - **教训**：两个包各有一个同名 DTO（`ToolApprovalRequiredData` 等），桥接层"原样转投"时类型失配是静默的——接线处（桥/适配器）必须对数据体做**类型验收**或单测锁形态，instanceof 防御分支吞掉不匹配事件时至少要 debug 日志。
+
+**✅ B53（2026-10-04，走查修复：知识面卡片视图模型键 snake→camel 收口 + 失败原因接上接口）**
+- **触发**：点检中用户问 `DocumentCardView.vue` 里的 `original_file_name` / `display_name` 这类 snake 键是否正常。逐个定性（写侧 / 读侧 / 接口实际键）：① `original_file_name`、`display_name` 是**前端内部视图模型键**（`useKnowledgeBase` 把接口项映射成卡片模型时写入，读侧仅下载名解析与标签编辑弹窗，写读同一套 ⇒ 功能正常，但属 Go 时代命名遗留）；② `error_message` 是**死字段**——接口下发的是 camel `errorMessage`，而前端全仓既无人写、也无人读（卡片接口声明后即被遗忘）。
+- **用户拍板**：内部视图模型键一并 camel 收口；失败原因接上接口。口径确立：契约纪律只管对外 JSON 键名，**内部视图模型同样不留两套命名**（两套命名正是本仓多次「读错键、静默 undefined」故障的同源温床）。
+- **收口（5 文件）**：写侧 `hooks/useKnowledgeBase.ts`（唯一生产者）`original_file_name` → `originalFileName`、`display_name` → `displayName`；`errorMessage` 靠该层已有的 `...item` 直通，**不建映射层**。读侧同步：`views/knowledge/knowledgeDownloadFileName.ts`（+ 其单测）、`KnowledgeBase.vue`（标签编辑弹窗 `knowledge-name`）、以及 `DocumentCardView.vue` / `KnowledgeBase.vue` 两处重复的卡片类型声明。
+- **接线**：卡片悬停浮层的失败态新增原因行（读 `errorMessage`）。动机是实锤：**紧凑模式时间线不渲染 `lastError`**（`knowledge-processing-timeline.vue` 的 `v-if="compact"` 分支只有阶段点 + 耗时），故修复前卡片表面没有任何失败原因出口。样式沿用描述行排版（红色、三行截断 + 原生 title 显示全文），零新增 i18n 文案（文本来自后端）。
+- **守卫（第 4 条 / 第三类形态）**：`components/crossFaceKeyContract.test.ts` 新增「知识面卡片视图模型：键一律 camel」——扫描 `views/knowledge/**` + `hooks/useKnowledgeBase.ts` 不得出现三个旧键名；同时钉住写侧必须提供 `originalFileName` / `displayName`、下载解析必须读 `originalFileName`、卡片必须消费 `errorMessage`（只删旧名不补新名同为断链）。**红态探针**：注入 `error_message` → 该用例红且报出文件与建议键名；还原 → 绿。
+- **验证**：前端全量 **704/704**（原 696 + 其间提交进来的 7 条守卫 + 本批 1 条）、`vue-tsc --build` 0 错误、`scripts/check-fe-contract-keys.py` ✓ 无新增（基线 42 条）。
+- **边界（未动）**：`types/tool-results.ts` + `views/chat/components/tool-results/*` 的 `error_message` / `summary_error_message` 属**工具结果载荷面**的另一套约定，需单独核实后再议，本批不碰。

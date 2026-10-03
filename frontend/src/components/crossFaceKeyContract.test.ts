@@ -8,13 +8,18 @@ import test from 'node:test'
  * 跨面对照守卫（源码扫描）——本仓反复栽在"写的人按一套键名、读的人按另一套"上
  * （HANDOFF §15.1.1 B19/B20 教训：静默失效，不报错）。
  *
- * 本文件钉两类 2026-10-03 点检实锤的形态：
+ * 本文件钉三类形态：
  * ① 侧栏会话"乐观行"：写入侧（views 里 updataMenuChildren({...})）与读取侧
  *    （components/menu.vue 的 menuChildToSessionRow）必须用同一套 camel 键；
  *    曾写成 created_at/updated_at → 时间戳读成 undefined → 新会话落「更早」。
+ *    （2026-10-03 点检实锤）
  * ② 表格死插槽：`<template #x>` 的名字必须等于同文件某个 `colKey: 'x'`，
  *    否则插槽永不生效、单元格回落原始值（曾出现 #created_at vs colKey 'createdAt'
- *    → 审计页时间列显示原始 UTC 字符串而不是格式化后的本地时间）。
+ *    → 审计页时间列显示原始 UTC 字符串而不是格式化后的本地时间）。（同上）
+ * ③ 知识面卡片视图模型的键一律 camel：Go 时代遗留的 original_file_name /
+ *    display_name / error_message 属内部映射层键（接口给的是 fileName/errorMessage），
+ *    写读两套命名会静默失效 —— 其中 error_message 全仓无人读，失败原因因此在
+ *    卡片上不可见。（2026-10-04 收口，见 §15.1.1）
  */
 const SRC = fileURLToPath(new URL('..', import.meta.url))
 
@@ -121,4 +126,46 @@ test('表格插槽名必须等于同文件某个 colKey（防死插槽）', () =
       )
     }
   }
+})
+
+test('知识面卡片视图模型：键一律 camel（防 snake 遗留回流）', () => {
+  // 2026-10-04 收口。这三个键只活在前端映射层（useKnowledgeBase 把接口项映射成卡片
+  // 视图模型），接口下发的是 camel（fileName / errorMessage）：
+  //   original_file_name → originalFileName（全名，供下载）
+  //   display_name       → displayName（去扩展名，供卡片展示）
+  //   error_message      → errorMessage（失败原因；旧名全仓无人读写=死字段，
+  //                        紧凑模式时间线又不显示原因，于是卡片上永远看不到失败原因）
+  // 旧名一旦回流，读侧拿到的就是 undefined 且不报错，正是本仓反复踩的坑。
+  const legacy: Array<[string, string]> = [
+    ['original_file_name', 'originalFileName'],
+    ['display_name', 'displayName'],
+    ['error_message', 'errorMessage'],
+  ]
+  const knowledgeFace = [
+    ...walk(join(SRC, 'views/knowledge')).filter((f) => !f.endsWith('.test.ts')),
+    join(SRC, 'hooks/useKnowledgeBase.ts'),
+  ]
+  for (const file of knowledgeFace) {
+    const source = readFileSync(file, 'utf8')
+    for (const [oldKey, camelKey] of legacy) {
+      assert.doesNotMatch(
+        source,
+        new RegExp(`\\b${oldKey}\\b`),
+        `${file}: 内部视图模型键请用 camel ${camelKey}（旧名 ${oldKey} 读到的恒为 undefined）`,
+      )
+    }
+  }
+
+  // 写入侧（映射层）必须真的提供这三个 camel 键 —— 只删旧名不补新名同样是断链。
+  const mapping = readFileSync(join(SRC, 'hooks/useKnowledgeBase.ts'), 'utf8')
+  assert.match(mapping, /\boriginalFileName\s*:/, 'useKnowledgeBase: 卡片映射缺 originalFileName')
+  assert.match(mapping, /\bdisplayName\s*[,:]/, 'useKnowledgeBase: 卡片映射缺 displayName')
+  // 读取侧：下载名解析（原名称 → camel 键）
+  const download = readFileSync(join(SRC, 'views/knowledge/knowledgeDownloadFileName.ts'), 'utf8')
+  assert.match(download, /\boriginalFileName\b/, 'knowledgeDownloadFileName: 需读 camel originalFileName')
+
+  // 失败原因必须被消费：接口给 errorMessage，卡片浮层是唯一出口
+  // （紧凑模式时间线只渲染阶段点+耗时，不含 lastError）。
+  const card = readFileSync(join(SRC, 'views/knowledge/components/DocumentCardView.vue'), 'utf8')
+  assert.match(card, /\berrorMessage\b/, 'DocumentCardView: 需消费接口 errorMessage（否则失败原因不可见）')
 })

@@ -76,8 +76,8 @@ export default function (knowledgeBaseId?: string) {
       const fileTypeSource = item.fileType || (item.type === 'manual' ? 'MANUAL' : '')
       return {
         ...item,
-        original_file_name: item.fileName,
-        display_name: displayName,
+        originalFileName: item.fileName,
+        displayName,
         fileName: displayName,
         folderPath: item.folderPath || '',
         // 时间不在此预格式化：接口给的是 camel（updatedAt/createdAt，ISO UTC），

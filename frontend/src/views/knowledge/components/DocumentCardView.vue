@@ -21,15 +21,18 @@ interface KnowledgeCard {
   description?: string;
   fileName?: string;
   folderPath?: string;
-  original_file_name?: string;
-  display_name?: string;
+  /** Full original name (with extension), kept for downloads. */
+  originalFileName?: string;
+  /** Extension-less display name rendered on the card. */
+  displayName?: string;
   title?: string;
   type?: string;
   updatedAt?: string;
   fileType?: string;
   isMore?: boolean;
   metadata?: any;
-  error_message?: string;
+  /** Parse failure reason, same camel key as the API payload. */
+  errorMessage?: string;
   tags?: Array<{ id: string; name: string; color?: string }>;
   source?: string;
   createdAt?: string;
@@ -627,6 +630,11 @@ const handleAction = (action: 'download' | 'edit' | 'view-trace' | 'reparse' | '
     >
       <template v-if="hoveredCardItem">
         <div class="card-popover-title">{{ hoveredCardItem.fileName }}</div>
+        <div
+          v-if="hoveredCardItem.parseStatus === 'failed' && hoveredCardItem.errorMessage"
+          class="card-popover-desc card-popover-error"
+          :title="hoveredCardItem.errorMessage"
+        >{{ hoveredCardItem.errorMessage }}</div>
         <div v-if="isParseInFlight(hoveredCardItem.parseStatus)" class="card-popover-status parsing">
           <KnowledgeProcessingTimeline
             :knowledge-id="hoveredCardItem.id"
@@ -1167,6 +1175,14 @@ const handleAction = (action: 'download' | 'edit' | 'view-trace' | 'reparse' | '
     -webkit-line-clamp: 5;
     line-clamp: 5;
     overflow: hidden;
+  }
+
+  // Failure reason from the API (errorMessage); three lines is enough to
+  // recognise the cause, the full text stays in the native title tooltip.
+  .card-popover-error {
+    color: var(--td-error-color);
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
   }
 
   .card-popover-source {

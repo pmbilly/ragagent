@@ -6,7 +6,7 @@ import { resolveKnowledgeDownloadFileName } from './knowledgeDownloadFileName.ts
 test('prefers the original filename over the extensionless display name', () => {
   assert.equal(resolveKnowledgeDownloadFileName({
     id: 'knowledge-1',
-    original_file_name: 'quarterly-report.pdf',
+    originalFileName: 'quarterly-report.pdf',
     fileName: 'quarterly-report',
     type: 'file',
   }), 'quarterly-report.pdf');

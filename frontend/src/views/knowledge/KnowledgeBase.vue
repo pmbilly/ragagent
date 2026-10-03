@@ -1275,15 +1275,15 @@ type KnowledgeCard = {
   summaryStatus?: string;
   description?: string;
   fileName?: string;
-  original_file_name?: string;
-  display_name?: string;
+  originalFileName?: string;
+  displayName?: string;
   title?: string;
   type?: string;
   updatedAt?: string;
   fileType?: string;
   isMore?: boolean;
   metadata?: any;
-  error_message?: string;
+  errorMessage?: string;
   tags?: Array<{ id: string; name: string; color?: string }>;
 };
 // needsStatusPolling decides whether a card row is still "in flight"
@@ -2659,7 +2659,7 @@ const handleKBEditorSuccess = (kbIdValue: string) => {
 
   <!-- 标签编辑弹窗 -->
   <TagEditDialog :visible="tagEditDialogVisible"
-    :knowledge-name="tagEditTarget?.display_name || tagEditTarget?.fileName || tagEditTarget?.title || ''"
+    :knowledge-name="tagEditTarget?.displayName || tagEditTarget?.fileName || tagEditTarget?.title || ''"
     :kb-id="kbId" :tag-list="tagList" :selected-tags="tagEditTarget?.tags || []" :can-manage="canEdit"
     @update:visible="tagEditDialogVisible = $event" @confirm="onTagEditConfirm" @tag-created="loadTags(kbId, true)"
     @open-manage="openTagManageFromEditDialog" />
