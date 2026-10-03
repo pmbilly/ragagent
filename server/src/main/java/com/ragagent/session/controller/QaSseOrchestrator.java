@@ -68,7 +68,7 @@ final class QaSseOrchestrator {
         EventBus eventBus = new EventBus();
         streamCtx.eventBus = eventBus;
 
-        // Mid-run steering：仅 agent 模式有引擎排空点（Go L713-731）
+        // Mid-run steering：仅 agent 模式有引擎排空点
         if (mode == QaMode.AGENT && reqCtx.agentConfig != null) {
             SteerSinkBridge sink = new SteerSinkBridge(reqCtx.sessionId, reqCtx.requestId,
                     messageService, streamManager,

@@ -31,24 +31,21 @@ import org.junit.jupiter.api.Test;
 /**
  * {@link RssConnector} 的端到端对等测试（stub server，**不碰真实网络**）。
  *
- * <h2>stub 的形状照抄 Go 的 {@code fakeFeed}</h2>
- * <p>{@code connector_test.go} 里的 {@code newFakeFeed} 起一个 httptest server，
- * {@code /article/*} 返回带导航/页脚的 HTML、{@code /feed.xml} 返回一个两 W3C 条目的
+ * <h2>stub 的形状</h2>
+ * <p>{@code /article/*} 返回带导航/页脚的 HTML、{@code /feed.xml} 返回一个两 W3C 条目的
  * RSS 2.0（{@code pubDate} + {@code description} + {@code guid}），
  * 并且能切成 503（{@code failFeed}）或"需要 X-Test-Auth"（{@code itemContent=="needs-auth"}）。
- * Java 侧用 {@code com.sun.net.httpserver.HttpServer} 复刻同样的形状。</p>
+ * 用 {@code com.sun.net.httpserver.HttpServer} 起服务。</p>
  *
  * <h2>SSRF 白名单是静态状态</h2>
- * <p>对照 Go 的 {@code TestMain} 设 {@code SSRF_WHITELIST=127.0.0.1,::1}：
+ * <p>白名单取 {@code SSRF_WHITELIST=127.0.0.1,::1}：
  * Java 进程内改不了 env，所以用 {@code new SsrfGuard()} + {@code reloadWhitelist(...)}
  * 注入，并在 {@code @AfterAll} <b>还原</b>成默认实例（否则会污染同 JVM 的其它测试）。</p>
  *
- * <h2>与 Go 的<b>关键差异</b>：文章正文</h2>
- * <p>Go 的 {@code TestConnector_FetchAll_FullTextMarkdown} 断言正文里有
- * {@code "first paragraph"}（readability 抽出来的全文）。Java 侧默认的
- * {@link UnavailableArticleExtractor} <b>永远失败</b>，所以这里断言的是
- * <b>Go 的回落分支</b>：正文 = feed 的 {@code description}。
- * 期望值来自 Go 探针实测（把 {@code /article/*} 换成 404 强制走回落，见
+ * <h2>关键差异：文章正文</h2>
+ * <p>默认装配的 {@link UnavailableArticleExtractor} <b>永远失败</b>，所以这里断言的是
+ * <b>回落分支</b>：正文 = feed 的 {@code description}
+ * （把 {@code /article/*} 换成 404 即强制走回落，见
  * {@link #fetchAllMatchesGoFallbackOutput()} 的注释）。
  * "抽取成功"那条路径用注入的假抽取器单独测（{@link #articleExtractorSeamRecoversGoSuccessPath()}）。</p>
  */
@@ -69,9 +66,9 @@ class RssConnectorTest {
         ConnectorHttp.setSsrfGuard(originalGuard == null ? new SsrfGuard() : originalGuard);
     }
 
-    // ── stub server（对照 Go 的 fakeFeed） ────────────────────────────────
+    // ── stub server ───────────────────────────────────────────────────────
 
-    /** 对照 Go 的 {@code fakeFeed}：一个 RSS feed + 若干"文章页"。 */
+    /** RSS feed + 若干"文章页"的本机桩服务。 */
     private static final class FakeFeed implements AutoCloseable {
 
         private final HttpServer server;
@@ -203,7 +200,7 @@ class RssConnectorTest {
         }
     }
 
-    /** 与 Go 的 {@code longArticleBody} 同形（本模块用不到它做断言，只保证页面"像文章"）。 */
+    /** 只保证页面"像文章"（本模块用不到它做断言）。 */
     private static String longArticleBody() {
         return "<p>This is the first paragraph of a reasonably long article that the readability "
                 + "extractor should detect as the main content of the page.</p>"
@@ -277,14 +274,12 @@ class RssConnectorTest {
             feed.feedXmlOverride("not a feed at all");
             assertThatThrownBy(() -> new RssConnector().validate(makeConfig(feed.feedUrl(), null)))
                     .isInstanceOf(ConnectorException.class)
-                    // Go 实录：`parse feed <url>: Failed to detect feed type`
                     .hasMessage("parse feed " + feed.feedUrl() + ": Failed to detect feed type");
         }
     }
 
     @Test
     void validateRequiresFeedUrls() {
-        // Go 实录：`invalid credentials: feed_urls is required`
         DataSourceConfig config = new DataSourceConfig();
         Map<String, Object> settings = new LinkedHashMap<>();
         settings.put("feed_urls", "   ");
@@ -309,7 +304,7 @@ class RssConnectorTest {
             assertThat(res.getName()).isEqualTo("Test Feed");
             assertThat(res.getDescription()).isEqualTo("A test feed");
             assertThat(res.getUrl()).isEqualTo(feed.baseUrl());
-            // 没有 <lastBuildDate>/<dc:date> → UpdatedParsed 为 nil → modified_at 留零值
+            // 没有 <lastBuildDate>/<dc:date> → 解析不出时间 → modified_at 留零值
             assertThat(res.getModifiedAt().toInstant())
                     .isEqualTo(java.time.Instant.parse("0001-01-01T00:00:00Z"));
             assertThat(res.getMetadata()).containsEntry("item_count", 2);
@@ -368,11 +363,11 @@ class RssConnectorTest {
         }
     }
 
-    // ── FetchAll：Go 的"回落"分支（默认装配） ────────────────────────────
+    // ── FetchAll：正文回落分支（默认装配） ────────────────────────────────
 
     /**
-     * 期望值 = <b>Go 探针实录</b>：把 {@code /article/*} 换成 404 强制 Go 走
-     * "全文抓取失败 → 用 feed 内容"那条分支，跑出来的 {@code FetchedItem}：
+     * 期望值：把 {@code /article/*} 换成 404，强制走"全文抓取失败 → 用 feed 内容"
+     * 那条分支时，{@code FetchedItem} 的完整形状：
      * <pre>
      *   external_id      "<feedURL>:guid-1"
      *   title            "Article One"
@@ -427,7 +422,6 @@ class RssConnectorTest {
 
     @Test
     void fetchAllDoesNotSendAuthHeadersToArticlePages() throws IOException {
-        // 照抄 Go 的 TestConnector_FetchAll_DoesNotSendAuthHeadersToArticles：
         // 文章页在第三方域名上，把凭据发过去就是泄漏。
         // 2026-09-28 起：抽取器不可用（UnavailableArticleExtractor）时 resolveItem
         // **直接跳过文章页请求**（抓回的字节必被丢弃，省一次无效外网调用）——
@@ -460,7 +454,7 @@ class RssConnectorTest {
 
     @Test
     void itemWithoutGUIDFallsBackToLinkAndUntitled() throws IOException {
-        // Go 探针实录：无 title/guid 的条目 → itemID=link、"untitled"、guid=""、updated_at=now
+        // 无 title/guid 的条目 → itemID=link、"untitled"、guid=""、updated_at=now
         try (FakeFeed feed = new FakeFeed()) {
             feed.feedXmlOverride("<?xml version=\"1.0\"?>"
                     + "<rss version=\"2.0\"><channel><title>Ext Feed</title>"
@@ -501,7 +495,7 @@ class RssConnectorTest {
 
     @Test
     void feedContentPrefersContentEncodedOverDescription() throws IOException {
-        // Go 探针实录：<content:encoded><![CDATA[<p>encoded <em>body</em></p>]]> + <description>
+        // 同时有 <content:encoded><![CDATA[<p>encoded <em>body</em></p>]]> 与 <description> 时：
         //   → content = markdown("encoded *body*")、author 来自 dc:creator、updated_at 来自 dc:date
         try (FakeFeed feed = new FakeFeed()) {
             feed.feedXmlOverride("<?xml version=\"1.0\"?>"
@@ -535,7 +529,7 @@ class RssConnectorTest {
     @Test
     void fetchAllHonoursResourceSelection() throws IOException {
         try (FakeFeed feed = new FakeFeed()) {
-            // 选中的 URL 不在 settings 里：Go 的 walk 直接拿它当 feed 去抓，
+            // 选中的 URL 不在 settings 里：walk 直接拿它当 feed 去抓，
             // **不校验它属于已配置 feed** → 抓不到 → 全部失败。
             List<String> selection = List.of(feed.baseUrl() + "/nope.xml");
             assertThatThrownBy(() -> new RssConnector().fetchAll(makeConfig(feed.feedUrl(), null), selection))
@@ -566,14 +560,13 @@ class RssConnectorTest {
             assertThat(result.items()).hasSize(2);
             assertThat(result.cursor()).isNotNull();
             // 2026-09-28 起：默认 UnavailableArticleExtractor → 文章页请求整个跳过
-            //（Go 侧抽取器可用会真抓；Java 抓回必弃，省一次无效外网调用）
+            //（抓回的字节必被丢弃，省一次无效外网调用）
             assertThat(feed.articleFetches()).isZero();
         }
     }
 
     @Test
     void incrementalSecondSyncSkipsWithoutFetchingArticles() throws IOException {
-        // 照抄 Go 的 TestConnector_FetchIncremental_SkipsWithoutArticleFetch：
         // feed 信号没变 → 连文章页都不抓（这是第一级去重）。
         try (FakeFeed feed = new FakeFeed()) {
             DataSourceConfig config = makeConfig(feed.feedUrl(), null);
@@ -632,7 +625,7 @@ class RssConnectorTest {
             @SuppressWarnings("unchecked")
             Map<String, Object> items = (Map<String, Object>) feedItems.get(feed.feedUrl());
             assertThat(items).containsOnlyKeys("guid-1", "guid-2");
-            // Go 实录（同一份 stub feed）：内容都是 "summary fallback" → h:ab781b82e8cb102c，
+            // 同一份 stub feed：内容都是 "summary fallback" → h:ab781b82e8cb102c，
             // 且两条**相同**。这个值是跨语言的（只取决于内容），所以它能证伪整条链路上的偏差。
             assertThat(items.get("guid-1")).isEqualTo("h:ab781b82e8cb102c");
             assertThat(items.get("guid-2")).isEqualTo(items.get("guid-1"));
@@ -648,24 +641,21 @@ class RssConnectorTest {
         }
     }
 
-    // ── 跨语言：与 Go 探针录下的**内容指纹**逐字对齐 ──────────────────────
+    // ── 内容指纹：期望值逐字钉死 ──────────────────────────────────────────
 
     /**
-     * 这是本模块最强的一条等价性证据：把 Go 探针跑过的<b>同一份 feed</b> 再跑一遍，
-     * 断言 {@code connector_cursor.feed_items} 里的 {@code "h:…"} 指纹与 Go 录下的<b>完全一样</b>。
+     * 一条断言覆盖整条链路：XML 字段抽取 → {@code firstNonEmpty(Content, Description)}
+     * 的选择 → HTML→Markdown 的字节输出 → SHA-256 前缀。任何一环差一点都会在这里红。
      *
-     * <p>Go 探针实录（{@code /tmp} 里挂 overlay 跑的，文章页故意不可达 → 走回落分支）：</p>
+     * <p>期望指纹（文章页故意不可达 → 走回落分支时的真值）：</p>
      * <pre>
      *   Atom feed : e1 -&gt; h:54d426c03e8e01af    e2 -&gt; h:16367aacb67a4a01
      *   扩展 RSS  : ext-1 -&gt; h:fe31a71ced1d86e1  x2 -&gt; h:e204db00c5fd2586
      * </pre>
-     * <p>{@code h:} 是<b>内容 Markdown</b> 的哈希，与 URL 无关，所以可以跨语言直接比。
-     * 它一条断言就同时覆盖了：XML 字段抽取 → {@code firstNonEmpty(Content, Description)}
-     * 的选择 → HTML→Markdown 的字节输出 → SHA-256 前缀。任何一环差一点都会在这里红。</p>
+     * <p>{@code h:} 是<b>内容 Markdown</b> 的哈希，与 URL 无关。</p>
      *
-     * <p>（{@code s:…} 信号指纹含 link/guid，Go 探针里用的是 {@code atom.example} 这种域名，
-     * 端口/域名不同就对不上，故不在这里比——它的算法由
-     * {@link RssPureFunctionsTest#feedSignalFingerprintMatchesGo()} 单独钉住。）</p>
+     * <p>（{@code s:…} 信号指纹含 link/guid，端口/域名一变就对不上，故不在这里比——
+     * 它的算法由 {@link RssPureFunctionsTest#feedSignalFingerprintMatchesGo()} 单独钉住。）</p>
      */
     @Test
     void contentFingerprintsMatchGoProbeForAtomFeed() throws IOException {
@@ -753,7 +743,7 @@ class RssConnectorTest {
                         assertThat(partial.getDetails().get(0)).contains("http://127.0.0.1:1/boom.xml");
                         // ★ 异常与结果同时有效：items 是从异常上拿的
                         assertThat(partial.items()).hasSize(2);
-                        // FetchAll 路径照抄 Go 的 `_`：cursor 被丢弃
+                        // FetchAll 路径的 cursor 被丢弃
                         assertThat(partial.cursor()).isNull();
                     });
         }
@@ -762,7 +752,7 @@ class RssConnectorTest {
     @Test
     void partialFailureInFetchIncrementalCarriesCursorToo() throws IOException {
         try (FakeFeed feed = new FakeFeed()) {
-            // resourceIds 留空 → walk 回落到全部已配置 feed（与 Go 的 len==0 分支一致）
+            // resourceIds 留空 → walk 回落到全部已配置 feed
             DataSourceConfig config =
                     makeConfig(feed.feedUrl() + ", http://127.0.0.1:1/boom.xml", null);
             assertThatThrownBy(() -> new RssConnector().fetchIncremental(config, null))
@@ -796,9 +786,9 @@ class RssConnectorTest {
                     .satisfies(e -> {
                         AllFeedsFailedException failed = (AllFeedsFailedException) e;
                         assertThat(failed.getMessage()).startsWith("all feeds failed: ");
-                        // items 恒非 null（Java 侧把 Go 的 nil slice 归一成空列表）
+                        // items 恒非 null（失败时也返回空列表，不是 null）
                         assertThat(failed.items()).isEmpty();
-                        // 照抄 Go 的 `return nil, newCursor, err`：cursor 有值
+                        // 失败时 cursor 仍有值
                         assertThat(failed.cursor()).isNotNull();
                     });
         }
@@ -806,7 +796,6 @@ class RssConnectorTest {
 
     @Test
     void failedFeedCursorIsRolledForwardFromPreviousSync() throws IOException {
-        // 照抄 Go 的 TestConnector_Walk_PreservesCursorOnFeedFailure：
         // 唯一的 feed 挂了，但新游标里必须有上一轮的指纹，否则下次会把整个 feed 重灌。
         try (FakeFeed feed = new FakeFeed()) {
             DataSourceConfig config = makeConfig(feed.feedUrl(), null);
@@ -845,7 +834,7 @@ class RssConnectorTest {
 
     @Test
     void succeedFeedWithZeroItemsIsPartialNotAllFailed() throws IOException {
-        // 照抄 Go 的判据：len(out)==0 && len(feedErrors)==len(feedURLs)。
+        // 判据：成功产出 0 条且失败 feed 数 == 全部 feed 数。
         // 这里两个 feed、一个成功但 0 条、一个失败 → 是 PartialFetch，不是 all-failed。
         try (FakeFeed feed = new FakeFeed()) {
             // 成功的 feed 返回 0 条（唯一的 entry 没有 guid/link/title → 被跳过）
@@ -860,7 +849,7 @@ class RssConnectorTest {
         }
     }
 
-    // ── 接缝：换掉 ArticleExtractor 就能恢复 Go 的"全文"分支 ──────────────
+    // ── 接缝：换掉 ArticleExtractor 就能启用"全文"分支 ────────────────────
 
     @Test
     void articleExtractorSeamRecoversGoSuccessPath() throws IOException {

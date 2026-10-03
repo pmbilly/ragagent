@@ -21,12 +21,12 @@ public class OAuthProtocolException extends RuntimeException {
         this.oauthError = oauthError;
     }
 
-    /** 对照 {@code extractOAuthError} 的结构化分支：{@code "<context>: <OAuth error: ...>"}。 */
+    /** 结构化 OAuth 错误：消息形如 {@code "<context>: <OAuth error: ...>"}。 */
     public static OAuthProtocolException ofOAuthError(String context, OAuthError error) {
         return new OAuthProtocolException(context + ": " + error.toMessage(), error, null);
     }
 
-    /** 对照 {@code extractOAuthError} 的兜底分支：{@code "<context> with status <n>: <body>"}。 */
+    /** 兜底分支（非结构化错误体）：消息形如 {@code "<context> with status <n>: <body>"}。 */
     public static OAuthProtocolException ofRawStatus(String context, int statusCode, String body) {
         return new OAuthProtocolException(
                 context + " with status " + statusCode + ": " + (body == null ? "" : body),

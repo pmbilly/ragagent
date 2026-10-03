@@ -28,10 +28,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
- * 系统管理员 P0 用户管理（对照 Go user.go 的 Register/AdminCreateUser/AdminResetPassword/
- * ListSystemAdmins + user repository 的 RevokeSystemAdmin，经 SystemHandler 暴露）。
+ * 系统管理员 P0 用户管理（注册 / 建管理员 / 重置密码 / 列管理员 / 撤管理员）。
  *
- * <p>异常语义逐分支对照 Go 的 handler（消息 = Go 原文）：</p>
+ * <p>异常语义逐分支固定（错误消息是契约）：</p>
  * <ul>
  *   <li>promote：user_id/email 双空 → 400 "Either user_id or email is required"；
  *       查无 → 404 "User not found"；已是管理员 → 幂等 200（审计 idempotent=true）。</li>
@@ -41,21 +40,21 @@ import org.springframework.stereotype.Service;
  *   <li>create：身份重复且完全一致 → 200 幂等返回既有行；仅部分冲突 → 409。</li>
  * </ul>
  *
- * <p><b>已知差异（Lite）</b>：Go 的 RevokeSystemAdmin 用 SELECT ... FOR UPDATE 事务
- * 防并发撤掉最后一名管理员；Java 顺序读-判-写（SystemAdmin 面无并发竞争窗）。
- * 密码生成用 SecureRandom + base64url（与 Go 的 OIDC 风格生成等价，输出长度可能不同——
- * 生成密码只出现一次且契约测试掩码）。</p>
+ * <p><b>已知差异（Lite）</b>：撤管理员无 SELECT ... FOR UPDATE 事务，
+ * 用顺序读-判-写（SystemAdmin 面无并发竞争窗）。
+ * 密码生成用 SecureRandom + base64url，输出长度可能与旧实现不同——
+ * 生成密码只出现一次且契约测试掩码。</p>
  */
 @Service
 public class SystemAdminUserService {
 
     private static final Logger log = LoggerFactory.getLogger(SystemAdminUserService.class);
 
-    /** Go ErrPasswordPolicy / ErrComplexPasswordPolicy 的原文（400 响应体）；实现已收拢到 PasswordPolicy。 */
+    /** 密码策略错误原文（400 响应体）；实现收拢到 {@link PasswordPolicy}。 */
     public static final String ERR_PASSWORD_POLICY = PasswordPolicy.ERR_PASSWORD_POLICY;
     public static final String ERR_COMPLEX_PASSWORD_POLICY = PasswordPolicy.ERR_COMPLEX_PASSWORD_POLICY;
 
-    /** Go binding 的 email 正则（go-playground validator 同族的宽松域名校验）。 */
+    /** email 正则（宽松域名校验）。 */
     private static final java.util.regex.Pattern EMAIL = java.util.regex.Pattern.compile(
             "^[a-zA-Z0-9!#$%&'*+/=?^_`{|}~.\\-]+@[a-zA-Z0-9](?:[a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])?"
                     + "(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])?)*$");
@@ -84,19 +83,19 @@ public class SystemAdminUserService {
         this.settingService = settingService;
     }
 
-    // ── 密码策略（对照 password_policy.go ValidatePasswordPolicy） ─────────
+    // ── 密码策略 ──────────────────────────────────────────────────────────
 
     public boolean complexPasswordEnabled() {
         return settingService.getBool(
                 "auth.complex_password_enabled", "WEKNORA_AUTH_COMPLEX_PASSWORD_ENABLED", false);
     }
 
-    /** @return null = 通过；否则 = 错误消息（Go 原文）。实现委托 PasswordPolicy.validate。 */
+    /** @return null = 通过；否则 = 错误消息（契约原文）。实现委托 PasswordPolicy.validate。 */
     public String validatePasswordPolicy(String password, boolean complexEnabled) {
         return PasswordPolicy.validate(password, complexEnabled);
     }
 
-    /** 对照 generatePolicyCompliantPassword：生成直到过策略（复杂 → 16 位复杂密码）。 */
+    /** 生成直到过策略（复杂 → 16 位复杂密码）。 */
     public String generatePolicyCompliantPassword(boolean complexEnabled) {
         java.security.SecureRandom random = new java.security.SecureRandom();
         while (true) {
@@ -133,7 +132,7 @@ public class SystemAdminUserService {
                 .eq(User::getEmail, email).isNull(User::getDeletedAt).last("LIMIT 1"));
     }
 
-    /** 对照 PromoteUserToSystemAdmin 的真实写分支（幂等分支由 controller 处理）。 */
+    /** 真实写分支（幂等分支由 controller 处理）。 */
     public User promote(User user) {
         user.setIsSystemAdmin(true);
         user.setUpdatedAt(OffsetDateTime.now());
@@ -142,7 +141,7 @@ public class SystemAdminUserService {
     }
 
     /**
-     * 对照 RevokeSystemAdmin（repo 事务的顺序化等价）：
+     * 撤管理员（无事务，顺序读-判-写）：
      * @return user 行；self/last-admin/not-found 抛 AppError 信封（400/404）。
      */
     public User revoke(String userId, String callerId) {
@@ -167,7 +166,7 @@ public class SystemAdminUserService {
         return user;
     }
 
-    /** 对照 ListSystemAdmins：count + created_at DESC, id ASC 分页。 */
+    /** count + created_at DESC, id ASC 分页。 */
     public record AdminPage(List<User> users, long total) {
     }
 
@@ -190,7 +189,7 @@ public class SystemAdminUserService {
 
     // ── reset-password ────────────────────────────────────────────────────
 
-    /** 对照 AdminResetPassword：换 hash + 吊销全部会话。 */
+    /** 换 hash + 吊销全部会话。 */
     public void adminResetPassword(User user, String newPassword) {
         user.setPasswordHash(passwordEncoder.encode(newPassword));
         user.setUpdatedAt(OffsetDateTime.now());
@@ -208,7 +207,7 @@ public class SystemAdminUserService {
         }
     }
 
-    // ── create-user（对照 AdminCreateUser + Register） ─────────────────────
+    // ── create-user ──────────────────────────────────────────────────────
 
     public static final String ERR_USER_EMAIL_EXISTS = "user with this email already exists";
     public static final String ERR_USER_USERNAME_EXISTS = "user with this username already exists";
@@ -224,7 +223,7 @@ public class SystemAdminUserService {
         }
     }
 
-    /** 注册后的空间预配模式（Go types.TenantProvisioningMode）。 */
+    /** 注册后的空间预配模式。 */
     public String resolveDefaultTenantMode() {
         String def = "create_personal";
         String mode = settingService.getString(
@@ -279,7 +278,7 @@ public class SystemAdminUserService {
                 .eq(User::getUsername, username).isNull(User::getDeletedAt).last("LIMIT 1"));
     }
 
-    /** 对照 Register（create_personal：建空间 + Owner 成员；失败回滚）。 */
+    /** create_personal 租户：建空间 + Owner 成员；失败回滚。 */
     private User register(String username, String email, String hashedPassword, String provisioning) {
         if (getUserByEmail(email) != null) {
             throw new DuplicateIdentityException(ERR_USER_EMAIL_EXISTS);
@@ -333,9 +332,9 @@ public class SystemAdminUserService {
         return user;
     }
 
-    // ── 审计（对照 SystemHandler.emitAdminAudit / emitAPIKeyAudit） ────────
+    // ── 审计 ──────────────────────────────────────────────────────────────
 
-    /** 对照 systemAuditActorRole：平台 API-Key 主体 → "platform_api_key"。 */
+    /** 主体角色：平台 API-Key 主体 → "platform_api_key"。 */
     public static String systemAuditActorRole() {
         var scope = com.ragagent.auth.apikey.domain.APIKeyScopeContext.current();
         if (scope != null && scope.isPlatform()) {
@@ -344,7 +343,7 @@ public class SystemAdminUserService {
         return "system_admin";
     }
 
-    /** 对照 emitAdminAudit：tenant_id=0 + target user。details 可空 → {}。 */
+    /** tenant_id=0 + target user。details 可空 → {}。 */
     public void emitAdminAudit(String action, User target, Map<String, Object> details) {
         if (auditService == null) {
             return;

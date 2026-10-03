@@ -18,10 +18,9 @@ import com.ragagent.datasource.ConnectorException;
  * 数据库回落、下载与 SSRF。
  *
  * <h2>没有一条用例在等墙钟</h2>
- * <p>Go 的 {@code 1&lt;&lt;attempt} 秒退避与 429 的 {@code Retry-After}
+ * <p>指数退避（{@code 1&lt;&lt;attempt} 秒量级）与 429 的 {@code Retry-After}
  * 在 Java 侧是可注入的（{@link NotionClient.Backoff} / {@link NotionClient.Sleeper}），
- * 测试注入"记账但不真睡"的 Sleeper，于是：
- * Go 侧那条 500 重试用例实测要 7–8 秒，这里断言的是
+ * 测试注入"记账但不真睡"的 Sleeper，于是断言的是
  * <b>休眠序列 {@code [1000, 2000, 4000]}</b>（更精确、且零耗时）。</p>
  */
 class NotionClientTest {
@@ -101,7 +100,7 @@ class NotionClientTest {
                     .isInstanceOf(ConnectorException.FetchFailed.class)
                     .hasMessage("failed to fetch items from source: server error 500: boom");
 
-            // Go 实测：4 次请求（1 + maxRetries），退避 1s / 2s / 4s
+            // 4 次请求（1 + maxRetries），退避 1s / 2s / 4s
             assertThat(server.requestCount()).isEqualTo(4);
             assertThat(sleeper.slept).containsExactly(1000L, 2000L, 4000L);
         }
@@ -125,7 +124,7 @@ class NotionClientTest {
             byte[] body = client.doRequest("GET", "/v1/limited", null);
             assertThat(new String(body)).isEqualTo("{\"object\":\"ok\"}");
             assertThat(calls.get()).isEqualTo(3);
-            // 小数秒被保留：0.25s → 250ms（Go 的 ParseFloat 语义）
+            // 小数秒被保留：0.25s → 250ms
             assertThat(sleeper.slept).containsExactly(250L, 250L);
         }
     }
@@ -239,7 +238,7 @@ class NotionClientTest {
         try (NotionStubServer server = new NotionStubServer()) {
             server.status("/v1/search", 404, "{}");
             NotionClient client = NotionTestSupport.fastClient(server.baseUrl());
-            // Go: 404 是裸哨兵（ResourceNotFound），paginatePages 只在**其它**错误上加前缀
+            // 404 是裸哨兵（ResourceNotFound），paginatePages 只在**其它**错误上加前缀
             assertThatThrownBy(client::searchPages)
                     .isInstanceOf(ConnectorException.class)
                     .hasMessage("paginate /v1/search: "
@@ -275,7 +274,7 @@ class NotionClientTest {
             NotionClient client = NotionTestSupport.fastClient(server.baseUrl());
             List<NotionBlock> blocks = client.getBlockChildrenAll("l0");
 
-            // Go 实测：l0…l5 共 6 次请求，Children 层数 5
+            // l0…l5 共 6 次请求，Children 层数 5
             assertThat(server.requestCount()).isEqualTo(6);
             assertThat(server.requestDescribes()).containsExactly(
                     "GET /v1/blocks/l0/children", "GET /v1/blocks/l1/children",
@@ -313,7 +312,7 @@ class NotionClientTest {
             assertThat(blocks).hasSize(8);
             // 只有那个 has_children=true 的 toggle 被递归（其余六种被跳过）。
             // 桩对任何路径都回同一份 payload，所以 tc 会被逐层递归到 maxBlockDepth=5
-            // ——Go 实录同样是 6 次请求（l0 + tc×5）。
+            // ——同样是 6 次请求（l0 + tc×5）。
             assertThat(server.requestCount()).isEqualTo(6);
             assertThat(server.requestDescribes().get(1)).isEqualTo("GET /v1/blocks/tc/children");
             assertThat(blocks.get(0).children).isNull();
@@ -343,7 +342,7 @@ class NotionClientTest {
             });
             NotionClient client = NotionTestSupport.fastClient(server.baseUrl());
             List<NotionBlock> blocks = client.getBlockChildrenAll("root");
-            // Go 实测：3 次请求、1200 块后停下
+            // 3 次请求、1200 块后停下
             assertThat(server.requestCount()).isEqualTo(3);
             assertThat(blocks).hasSize(1200);
         }
@@ -526,9 +525,8 @@ class NotionClientTest {
     }
 
     /**
-     * 上限判定：Go 是 {@code io.LimitReader(maxDownloadSize+1)} 流式截断，
-     * Java 侧只能在读完后判。这里把上限调小（测试缝）来验同一条分支，
-     * 免得真的往测试 JVM 里灌 100MB。文案里仍是 Go 的常量值。
+     * 上限判定在读完整份响应体之后进行（不中途截断下载）。这里把上限调小（测试缝）
+     * 来验同一条分支，免得真的往测试 JVM 里灌 100MB。错误文案里的常量值不变。
      */
     @Test
     void downloadFileRejectsOversizedBody() throws Exception {
@@ -547,8 +545,7 @@ class NotionClientTest {
      * SSRF：默认（无白名单）下，任何直连 IP 的附件地址都被拒。
      *
      * <p>不用真实公网域名——{@code 169.254.169.254} 是 link-local 的云元数据地址，
-     * 一定会被 {@code SsrfGuard} 拒绝（对照 Go 的
-     * {@code TestDownloadFile_RejectsLoopbackURL}）。</p>
+     * 一定会被 {@code SsrfGuard} 拒绝。</p>
      */
     @Test
     void downloadFileRejectsBlockedUrls() throws Exception {
@@ -624,7 +621,7 @@ class NotionClientTest {
         assertThat(NotionClient.retryAfterMillis("abc")).isEqualTo(1000L);
         assertThat(NotionClient.retryAfterMillis("0")).isEqualTo(1000L);
         assertThat(NotionClient.retryAfterMillis("-1")).isEqualTo(1000L);
-        // Go 的 strconv.ParseFloat 不接受首尾空白
+        // 数值解析不接受首尾空白
         assertThat(NotionClient.retryAfterMillis(" 2 ")).isEqualTo(1000L);
     }
 }

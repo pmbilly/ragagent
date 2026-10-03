@@ -11,8 +11,7 @@ import org.junit.jupiter.api.Test;
  * {@code extractLeafValue} / {@code extractPropertySchema} / {@code extractTitle}）
  * 的对等测试。
  *
- * <p>期望值全部来自 Go 实录（{@code /tmp/weknora-copy} 的 {@code probe_test.go}）。
- * 语料刻意覆盖了 22 种属性类型、以及一批"边界输入"（{@code type} 不存在、
+ * <p>语料刻意覆盖了 22 种属性类型、以及一批"边界输入"（{@code type} 不存在、
  * 内层是 {@code null}、数字的三种形态、数组里混进非字符串……）。</p>
  */
 class NotionPropertiesTest {
@@ -47,9 +46,9 @@ class NotionPropertiesTest {
     }
 
     /**
-     * 数字的三种形态：Go 的 {@code %d} 分支、{@code %g} 的 'f' 形态、
-     * 以及 {@code %g} 的 'e' 形态（指数至少两位）。这一组是把 Go 的
-     * {@code extractValue} 与 {@code GoDoubleSerializer} 的差异钉死的地方。
+     * 数字的三种形态：整数值、普通小数（'f' 形态）、
+     * 以及指数形态（指数至少两位）。这一组是把 {@code extractValue}
+     * 与 {@code GoDoubleSerializer} 的差异钉死的地方。
      */
     @Test
     void numbersFollowGoFormatting() {
@@ -168,16 +167,16 @@ class NotionPropertiesTest {
         assertThat(schema("{\"Name\":{\"type\":\"title\"},\"Status\":{\"type\":\"select\"},"
                 + "\"Zed\":{\"type\":\"number\"},\"Alpha\":{\"type\":\"rich_text\"}}"))
                 .containsExactly("Alpha", "Status", "Zed");
-        // 只有 title → nil（Go 的 nil 切片）
+        // 只有 title → null
         assertThat(schema("{\"Name\":{\"type\":\"title\"}}")).isNull();
         assertThat(schema("{}")).isNull();
         assertThat(schema("[1,2]")).isNull();
-        // 值是 JSON null → Go 解进 struct 成功、Type 为空 → 算作非 title
+        // 值是 JSON null → 解析成功、Type 为空 → 算作非 title
         assertThat(schema("{\"A\":null,\"B\":{\"type\":\"title\"}}")).containsExactly("A");
         // 没有 type 字段 → 同样算非 title
         assertThat(schema("{\"A\":{},\"B\":{\"type\":\"title\"}}")).containsExactly("A");
-        // 值是字符串 → Go 解 struct 失败但**忽略错误**、Type 留空 → 照样收进来
-        // （probe 实录：{"A":"str","B":{"type":"title"}} → ["A"]）
+        // 值是字符串 → 解析失败但**忽略错误**、Type 留空 → 照样收进来
+        // （例：{"A":"str","B":{"type":"title"}} → ["A"]）
         assertThat(schema("{\"A\":\"str\",\"B\":{\"type\":\"title\"}}")).containsExactly("A");
         assertThat(schema("{\"A\":[1,2],\"B\":{\"type\":\"title\"}}")).containsExactly("A");
         // ASCII 排序：'A' < 'Z' < 'e'
@@ -251,15 +250,15 @@ class NotionPropertiesTest {
     void trimSpaceMatchesGoUnicodeSpace() {
         assertThat(NotionValues.trimSpace("  x  ")).isEqualTo("x");
         assertThat(NotionValues.trimSpace("\t\n\r x \f\u000b")).isEqualTo("x");
-        // U+00A0（NBSP）：Go 算空白、Java 的 Character.isWhitespace 不算
+        // U+00A0（NBSP）：这里算空白、Java 的 Character.isWhitespace 不算
         assertThat(NotionValues.trimSpace("\u00a0x\u00a0")).isEqualTo("x");
         assertThat(Character.isWhitespace('\u00a0')).isFalse();
-        // U+2007 / U+202F：同上（Go 的 White_Space 含、Java 不含）
+        // U+2007 / U+202F：同上，这里算空白、Java 不算
         assertThat(NotionValues.trimSpace("\u2007x\u202f")).isEqualTo("x");
         // U+2028 / U+2029 / U+3000：两边都算空白
         assertThat(NotionValues.trimSpace("\u2028x\u2029")).isEqualTo("x");
         assertThat(NotionValues.trimSpace("\u2003x\u3000")).isEqualTo("x");
-        // U+001C–U+001F：Java 的 isWhitespace **会**当成空白、Go 不算（双向差异）
+        // U+001C–U+001F：Java 的 isWhitespace **会**当成空白、这里不算（方向相反的差异）
         assertThat(NotionValues.trimSpace("\u001cx\u001c")).isEqualTo("\u001cx\u001c");
         assertThat(Character.isWhitespace('\u001c')).isTrue();
         assertThat(NotionValues.trimSpace(null)).isEmpty();

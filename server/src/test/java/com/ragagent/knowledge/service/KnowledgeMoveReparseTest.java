@@ -115,7 +115,7 @@ class KnowledgeMoveReparseTest {
         Map<String, Object> row = jdbc.queryForMap(
                 "SELECT knowledge_base_id, embedding_model_id, parse_status, description, "
                         + "storage_size, processed_at FROM knowledges WHERE id = ?", kId);
-        // 1) 行落在目标 KB 的待解析态（Go moveKnowledgeReparse 的字段集）
+        // 1) 行落在目标 KB 的待解析态（reparse 落库字段集如下）
         assertThat(row.get("KNOWLEDGE_BASE_ID")).isEqualTo(dstKb);
         assertThat(row.get("EMBEDDING_MODEL_ID")).isEqualTo("emb-1").as("嵌入模型随目标 KB");
         assertThat(row.get("DESCRIPTION")).isEqualTo("");

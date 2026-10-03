@@ -21,15 +21,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * jieba 分词<b>差分测试</b>：Java {@link JiebaTokenizer} vs Go 基准
- * （{@code scripts/jieba-diff-probe/}，gse v0.80.3 + SDK 同参数）。
+ * jieba 分词<b>差分测试</b>：Java {@link JiebaTokenizer} vs 参考基准
+ * （{@code scripts/jieba-diff-probe/} 录制，gse v0.80.3 + SDK 同参数）。
  *
- * <p>基准 {@code src/test/resources/jieba/jieba_baseline.json} 由 Go 探针生成，三份可对照：
+ * <p>基准 {@code src/test/resources/jieba/jieba_baseline.json} 由探针脚本生成，三份可对照：
  * {@code cutHmmOn}（裸 {@code seg.Cut(s, true)}）、{@code cutHmmOff}（关 HMM 的对照，本仓不实现）、
  * {@code sdkTokenize}（含停用词过滤的 SDK 出口）。本测试对前两者之一的 {@code cutHmmOn} 与
  * {@code sdkTokenize} 逐句、逐 token、逐序断言。</p>
  *
- * <p>重录基线（Go 侧行为变更时）：{@code cd scripts/jieba-diff-probe && 见 main.go 顶部命令}。</p>
+ * <p>重录基线：{@code cd scripts/jieba-diff-probe}，重录命令见该目录脚本顶部注释。</p>
  */
 class JiebaTokenizerDiffTest {
 

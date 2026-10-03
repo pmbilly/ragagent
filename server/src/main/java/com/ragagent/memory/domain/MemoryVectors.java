@@ -95,8 +95,7 @@ public final class MemoryVectors {
      *   期望（最短 1 位有效数字）: "0.000000000000000000000000000000000000000000001"
      *   Java Float.toString(1.4e-45f)          → "1.4E-45"
      * </pre>
-     * <p>修法与 {@code GoDoubleSerializer} 同款（§9 记过）：
-     * 在 Java 结果上再做一轮"有效位数递减"，用 {@code Float.parseFloat} 校验往返。</p>
+     * <p>修法：在 Java 结果上再做一轮"有效位数递减"，用 {@code Float.parseFloat} 校验往返。</p>
      */
     public static String formatFloat32(float value) {
         if (Float.isNaN(value)) {
@@ -114,8 +113,7 @@ public final class MemoryVectors {
 
     /**
      * 最短能唯一往返到该 float32 的十进制——先取 {@code Float.toString}，
-     * 再尝试压缩有效位数（同 {@code GoDoubleSerializer.shortestRoundTrip} 的模子，
-     * 只是这里用 {@code Float.parseFloat} 做往返校验）。
+     * 再尝试压缩有效位数（用 {@code Float.parseFloat} 做往返校验）。
      */
     private static BigDecimal shortestRoundTrip(float value) {
         BigDecimal stripped = new BigDecimal(Float.toString(value)).stripTrailingZeros();

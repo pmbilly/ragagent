@@ -21,12 +21,12 @@ import org.apache.ibatis.annotations.Update;
  *       实际 SQL 是
  *       {@code … AND (expires_at IS NULL OR expires_at > ?)}——
  *       少了它整条查询的优先级就变了。</li>
- *   <li><b>{@code id DESC} 破平局</b>：{@code ListItems} 的 {@code valid_from DESC, id DESC}
+ *   <li><b>{@code id DESC} 破平局</b>：列表页的 {@code valid_from DESC, id DESC}
  *       不是装饰。一次蒸馏会同时写好几条，只按 valid_from 排会让数据库在翻页时
  *       给出不同顺序，于是 offset 遍历会**既重复又漏行**。</li>
  *   <li><b>{@code COALESCE(last_used_at, valid_from)}</b>：容量归档的排名是
  *       重要度 → 使用时间（没有就退回生效时间）→ 生效时间，**没有衰减曲线**。</li>
- *   <li><b>子查询里的 scope 重复</b>：{@code ItemsMissingEmbeddings} 的子查询必须自己带
+ *   <li><b>子查询里的 scope 重复</b>：向量积压子查询必须自己带
  *       {@code tenant_id}/{@code subject_id}，否则会看到别的 subject 的向量。</li>
  * </ul>
  *
@@ -43,14 +43,14 @@ public interface MemoryItemMapper extends BaseMapper<MemoryItem> {
     MemoryItem selectScoped(@Param("tenantId") long tenantId, @Param("subjectId") String subjectId,
                             @Param("id") String id);
 
-    /** 对照 {@code CountActive}。 */
+    /** 按状态计数。 */
     @Select("SELECT COUNT(*) FROM memory_items WHERE tenant_id = #{tenantId} "
             + "AND subject_id = #{subjectId} AND status = #{status}")
     long countByStatus(@Param("tenantId") long tenantId, @Param("subjectId") String subjectId,
                        @Param("status") String status);
 
     /**
-     * 对照 {@code ListActiveByKinds}：{@code kinds} 为空时这里不兜底，
+     * 按多个 kind 列活跃条目；{@code kinds} 为空时这里不兜底，
      * 调用方必须先判空。
      */
     @Select("<script>"
@@ -68,7 +68,7 @@ public interface MemoryItemMapper extends BaseMapper<MemoryItem> {
                                        @Param("limit") int limit);
 
     /**
-     * 对照 {@code ListActiveResident}：{@code kind IN (常驻三种) OR origin = 'explicit'}。
+     * 常驻块条目：{@code kind IN (常驻三种) OR origin = 'explicit'}。
      *
      * <p>用户**明确要求**记住的东西不问 kind：他说了"记住这个"，
      * 而让这件事取决于他之后的问题恰好与它共享词汇，是让这个功能失去信任最快的方式。</p>
@@ -89,7 +89,7 @@ public interface MemoryItemMapper extends BaseMapper<MemoryItem> {
                                         @Param("now") OffsetDateTime now,
                                         @Param("limit") int limit);
 
-    /** 对照 {@code ListItems} 的计数（先 Count 再取页）。 */
+    /** 列表计数（先 Count 再取页）。 */
     @Select("<script>"
             + "SELECT COUNT(*) FROM memory_items WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId}"
             + "<if test='status != null and status != \"\"'> AND status = #{status}</if>"
@@ -97,7 +97,7 @@ public interface MemoryItemMapper extends BaseMapper<MemoryItem> {
     long countListItems(@Param("tenantId") long tenantId, @Param("subjectId") String subjectId,
                         @Param("status") String status);
 
-    /** 对照 {@code ListItems} 的数据页：{@code valid_from DESC, id DESC}（见类注释）。 */
+    /** 列表数据页：{@code valid_from DESC, id DESC}（见类注释）。 */
     @Select("<script>"
             + "SELECT * FROM memory_items WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId}"
             + "<if test='status != null and status != \"\"'> AND status = #{status}</if>"
@@ -107,7 +107,7 @@ public interface MemoryItemMapper extends BaseMapper<MemoryItem> {
                                @Param("status") String status,
                                @Param("limit") int limit, @Param("offset") int offset);
 
-    /** 对照 {@code ListLive}：用户当前**看得到**的条目 = 在用 + 待确认。 */
+    /** 用户当前**看得到**的条目 = 在用 + 待确认。 */
     @Select("<script>"
             + "SELECT * FROM memory_items WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId} "
             + "AND status IN <foreach collection='statuses' item='s' open='(' separator=',' close=')'>#{s}</foreach> "
@@ -120,7 +120,7 @@ public interface MemoryItemMapper extends BaseMapper<MemoryItem> {
                               @Param("now") OffsetDateTime now, @Param("limit") int limit);
 
     /**
-     * 对照 {@code FindActiveByKey}：{@code pending} 在这里算"活着"——
+     * 按 normalized_key 找活键；{@code pending} 在这里算"活着"——
      * 一条等待确认的记忆是用户已经看得到的，忽略它会让同一推断每重推一次就多堆一份。
      */
     @Select("<script>"
@@ -132,7 +132,7 @@ public interface MemoryItemMapper extends BaseMapper<MemoryItem> {
                              @Param("statuses") List<String> statuses,
                              @Param("normalizedKey") String normalizedKey);
 
-    /** 对照 {@code SaveItem} 里 {@code normalized_key = ? AND status IN ?} 的那次 {@code Find}。 */
+    /** 保存条目时按 {@code normalized_key = ? AND status IN ?} 的那次查找。 */
     @Select("<script>"
             + "SELECT * FROM memory_items WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId} "
             + "AND normalized_key = #{normalizedKey} "
@@ -143,7 +143,7 @@ public interface MemoryItemMapper extends BaseMapper<MemoryItem> {
                                          @Param("normalizedKey") String normalizedKey,
                                          @Param("statuses") List<String> statuses);
 
-    /** 对照 {@code SearchItemsByVector} 里按 id 载入条目的那一次 {@code Find}。 */
+    /** 向量检索命中后按 id 载入条目。 */
     @Select("<script>"
             + "SELECT * FROM memory_items WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId} "
             + "AND id IN <foreach collection='ids' item='i' open='(' separator=',' close=')'>#{i}</foreach>"
@@ -165,15 +165,14 @@ public interface MemoryItemMapper extends BaseMapper<MemoryItem> {
     int deleteScoped(@Param("tenantId") long tenantId, @Param("subjectId") String subjectId,
                      @Param("id") String id);
 
-    /** 对照 {@code DeleteAll}：整 scope 的物理删，返回受影响行数。 */
+    /** 整 scope 的物理删，返回受影响行数。 */
     @Delete("DELETE FROM memory_items WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId}")
     int deleteAllInScope(@Param("tenantId") long tenantId, @Param("subjectId") String subjectId);
 
     // ── 容量 / 过期 ────────────────────────────────────────────────────────
 
     /**
-     * 对照 {@code ArchiveLowestRanked} 的 {@code Pluck("id", &survivors)}：
-     * 留下排名最好的 {@code keep} 条。
+     * 容量归档的幸存者：留下排名最好的 {@code keep} 条。
      *
      * <p>排名 = 重要度 → {@code COALESCE(last_used_at, valid_from)} → {@code valid_from}</p>
      */
@@ -184,7 +183,7 @@ public interface MemoryItemMapper extends BaseMapper<MemoryItem> {
     List<String> selectSurvivorIds(@Param("tenantId") long tenantId, @Param("subjectId") String subjectId,
                                    @Param("status") String status, @Param("keep") int keep);
 
-    /** 对照 {@code ArchiveLowestRanked} 的批量 UPDATE（{@code id NOT IN ?} 仅在幸存者非空时加）。 */
+    /** 容量归档的批量 UPDATE（{@code id NOT IN ?} 仅在幸存者非空时加）。 */
     @Update("<script>"
             + "UPDATE memory_items SET status = #{archived}, updated_at = #{now} "
             + "WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId} AND status = #{active}"
@@ -196,7 +195,7 @@ public interface MemoryItemMapper extends BaseMapper<MemoryItem> {
                       @Param("active") String active, @Param("archived") String archived,
                       @Param("survivors") List<String> survivors, @Param("now") OffsetDateTime now);
 
-    /** 对照 {@code ExpireOverdue}：{@code status=active AND expires_at IS NOT NULL AND expires_at <= now}。 */
+    /** 过期归档：{@code status=active AND expires_at IS NOT NULL AND expires_at <= now}。 */
     @Update("UPDATE memory_items SET status = #{archived}, updated_at = #{now} "
             + "WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId} "
             + "AND status = #{active} AND expires_at IS NOT NULL AND expires_at <= #{now}")
@@ -205,7 +204,7 @@ public interface MemoryItemMapper extends BaseMapper<MemoryItem> {
                       @Param("now") OffsetDateTime now);
 
     /**
-     * 对照 {@code TouchUsed}：{@code use_count = use_count + 1} 是 SQL 侧自增，
+     * 使用计数：{@code use_count = use_count + 1} 是 SQL 侧自增，
      * 读回来再写会丢并发。
      *
      * <p>⚠️ {@code updated_at} 虽然调用方没有明说，但落库语义会**自动补**
@@ -222,7 +221,7 @@ public interface MemoryItemMapper extends BaseMapper<MemoryItem> {
                   @Param("ids") List<String> ids, @Param("now") OffsetDateTime now);
 
     /**
-     * 对照 {@code ItemsMissingEmbeddings}：找出向量积压。
+     * 找出向量积压。
      *
      * <p>子查询里重复 scope 是刻意的——不带就会看到别的 subject 的向量，
      * 于是本 subject 的条目被误判成"已有向量"。</p>
@@ -243,10 +242,9 @@ public interface MemoryItemMapper extends BaseMapper<MemoryItem> {
     // ── 生命周期 ────────────────────────────────────
 
     /**
-     * 对照 {@code SaveItem} 尾部的批量取代 UPDATE。
+     * 保存条目尾部的批量取代 UPDATE。
      *
-     * <p>SQL 逐字对照：
-     * {@code id <> ? AND (id IN ? OR replaces_id IN ?) AND status IN ?}。</p>
+     * <p>条件：{@code id <> ? AND (id IN ? OR replaces_id IN ?) AND status IN ?}。</p>
      */
     @Update("<script>"
             + "UPDATE memory_items SET status = #{superseded}, invalid_at = #{now}, "
@@ -263,7 +261,7 @@ public interface MemoryItemMapper extends BaseMapper<MemoryItem> {
                        @Param("superseded") String superseded, @Param("now") OffsetDateTime now);
 
     /**
-     * 对照 {@code SupersedeItem}。
+     * 取代单条。
      *
      * <p>注意 {@code (id = ? AND status = 'active') OR (replaces_id = ? AND status = 'pending')}
      * 这两支**都**带状态——直接按 id 更新会误伤已经取代过的行。</p>
@@ -277,7 +275,7 @@ public interface MemoryItemMapper extends BaseMapper<MemoryItem> {
                       @Param("active") String active, @Param("pending") String pending,
                       @Param("superseded") String superseded, @Param("now") OffsetDateTime now);
 
-    /** 对照 {@code UpdateItemContent} 里"编辑确认过的事实会作废基于旧措辞的提议"那一次 UPDATE。 */
+    /** 编辑确认过的事实会作废基于旧措辞的提议：作废其待确认替换者。 */
     @Update("UPDATE memory_items SET status = #{superseded}, invalid_at = #{now}, superseded_by = #{id} "
             + "WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId} "
             + "AND replaces_id = #{id} AND status = #{pending}")
@@ -285,7 +283,7 @@ public interface MemoryItemMapper extends BaseMapper<MemoryItem> {
                              @Param("id") String id, @Param("pending") String pending,
                              @Param("superseded") String superseded, @Param("now") OffsetDateTime now);
 
-    /** 对照 {@code UpdateItemContent} 对当前行的 {@code Updates(map)}（五列，无条件覆盖）。 */
+    /** 内容更新：五列无条件覆盖。 */
     @Update("UPDATE memory_items SET content = #{content}, normalized_key = #{normalizedKey}, "
             + "importance = #{importance}, origin = #{origin}, updated_at = #{now} "
             + "WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId} AND id = #{id}")
@@ -295,7 +293,7 @@ public interface MemoryItemMapper extends BaseMapper<MemoryItem> {
                           @Param("origin") String origin, @Param("now") OffsetDateTime now);
 
     /**
-     * 对照 {@code DeleteItem} 对"待确认的替换者"那一次 UPDATE。
+     * 作废"待确认的替换者"。
      *
      * <p>语义上是 status / invalid_at 两列，但落库语义会自动补
      * {@code updated_at = now}（见 {@link #touchUsed} 的说明）——所以要写三列。</p>
@@ -308,10 +306,9 @@ public interface MemoryItemMapper extends BaseMapper<MemoryItem> {
                                      @Param("superseded") String superseded, @Param("now") OffsetDateTime now);
 
     /**
-     * 对照 {@code ConfirmPendingItem} 的第一步：把与待确认项同 key / 同目标的东西全部作废。
+     * 确认待确认项的第一步：把与待确认项同 key / 同目标的东西全部作废。
      *
-     * <p>SQL 逐字对照：
-     * {@code id <> ? AND (normalized_key = ? OR id = ? OR (replaces_id <> '' AND replaces_id = ?)) AND status IN ?}。
+     * <p>条件：{@code id <> ? AND (normalized_key = ? OR id = ? OR (replaces_id <> '' AND replaces_id = ?)) AND status IN ?}。
      * {@code replaces_id <> ''} 那个守卫不能省：{@code replaces_id} 为空的待确认项
      * 会匹配上所有 {@code replaces_id = ''} 的行。</p>
      */
@@ -329,7 +326,7 @@ public interface MemoryItemMapper extends BaseMapper<MemoryItem> {
                             @Param("replacesId") String replacesId, @Param("statuses") List<String> statuses,
                             @Param("superseded") String superseded, @Param("now") OffsetDateTime now);
 
-    /** 对照 {@code ConfirmPendingItem} 的第二步：把这一行置为 active（**只动 status 与 updated_at**）。 */
+    /** 确认待确认项的第二步：把这一行置为 active（**只动 status 与 updated_at**）。 */
     @Update("UPDATE memory_items SET status = #{active}, updated_at = #{now} "
             + "WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId} AND id = #{id}")
     int activateItem(@Param("tenantId") long tenantId, @Param("subjectId") String subjectId,

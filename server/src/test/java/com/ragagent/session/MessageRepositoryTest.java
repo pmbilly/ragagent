@@ -77,7 +77,7 @@ class MessageRepositoryTest {
         Message m = message(Message.ROLE_USER, "hi", "r1");
 
         assertThat(m.getId()).isNotBlank();
-        // 钩子把 nil 切片置空，各 Value() 也把 nil 写成 []——所以库里是 [] 不是 NULL
+        // 钩子把 null 列表置空，各序列化出口也把 null 写成 []——所以库里是 [] 不是 NULL
         assertThat(jdbc.queryForObject(
                 "SELECT knowledge_references FROM messages WHERE id = ?", String.class, m.getId()))
                 .isEqualTo("[]");

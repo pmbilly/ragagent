@@ -19,8 +19,8 @@ import com.ragagent.agent.tools.SearchAuth.TagView;
 import com.ragagent.agent.tools.SearchTarget.SearchTargets;
 
 /**
- * SearchAuth/SearchTargets 的 Go 实录回放（26 条）。错误文案逐字比对；
- * 知识/chunk 视图只比对 id（Go 侧 marshal 了整个 types 结构，Java 是窄视图）。
+ * SearchAuth/SearchTargets 的录制回放（26 条）。错误文案逐字比对；
+ * 知识/chunk 视图只比对 id（录制侧 marshal 了整个结构，Java 是窄视图）。
  */
 class ScopeAuthRecordingTest {
 
@@ -226,7 +226,7 @@ class ScopeAuthRecordingTest {
         Rec mixed = new Rec("R_SCOPE_AUTH_FILTER_MIXED");
         List<RId> filtered = SearchAuth.filterSearchResultsInSearchTargets(
                 t, "kb1", results, RId::id, r -> "kb1", svc);
-        // 对照探针：passthrough 后跳过 nil 条目再取 id/score
+        // passthrough 后跳过 null 条目再取 id/score
         List<RId> filteredView = new ArrayList<>();
         for (RId r : filtered) {
             if (r != null) {
@@ -252,7 +252,7 @@ class ScopeAuthRecordingTest {
         Rec passthrough = new Rec("R_SCOPE_AUTH_FILTER_WHOLE_KB_PASSTHROUGH");
         List<RId> whole = SearchAuth.filterSearchResultsInSearchTargets(
                 t, "kb2", List.of(new RId("r1", 0)), RId::id, r -> "kb2", svc);
-        // Go 侧录了整个 SearchResult；这里只比对保留的条目 id
+        // 录制里含整个 SearchResult；这里只比对保留的条目 id
         List<String> wholeIds = new ArrayList<>();
         for (RId r : whole) {
             if (r != null) {

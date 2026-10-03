@@ -45,14 +45,14 @@ import org.springframework.beans.factory.ObjectProvider;
  *       force 删除仍有引用 400 "标签仍有知识或FAQ条目引用，无法删除"、
  *       排除项校验族（仅 FAQ 型 400 / 跨库 403 / 缺失 404）。</li>
  *       {@link IllegalStateException} → 控制器本地 handler 输出 500 code=1007
- *       "Internal server error" 无 details 键（FAQ 同款，契约样例 实录）。</li>
+ *       "Internal server error" 无 details 键（FAQ 同款，契约样例锁定）。</li>
  * </ul>
  * <h2>已知差异（备案）</h2>
  * <ul>
  *       （TypeKnowledgeListDelete / TypeIndexDelete）：Java 侧索引删除 no-op
  *       （向量索引随检索引擎批），document 型 KB 的 knowledge 文件异步删除同样
  *       不落地——HTTP 契约（{"success":true}）与 FAQ 型 chunk 的同步删除路径一致。</li>
- *   <li>org-share / shared-agent 授予路径未翻译（同 wiki/chunk 的已知收紧）。</li>
+ *   <li>org-share / shared-agent 授予路径未实现（同 wiki/chunk 的已知收紧）。</li>
  * </ul>
  */
 @Service
@@ -123,7 +123,7 @@ public class KnowledgeTagService {
         String trimmedKeyword = keyword == null ? "" : keyword.strip();
         KnowledgeBase kb = requireKb(kbId);
         // resolveKBReadTenant：路由级 KBAccessRead 已放行 → 同租户必过
-        //（org-share 分支未翻译，见类注释）；requireKBWrite 同理。
+        //（org-share 分支未实现，见类注释）；requireKBWrite 同理。
         long tenantId = TenantContext.currentTenantId() == null ? 0 : TenantContext.currentTenantId();
 
         KnowledgeTagRepository.TagPage result = tagRepo.listByKb(tenantId, kb.getId(), page, pageSize, trimmedKeyword);
@@ -292,7 +292,7 @@ public class KnowledgeTagService {
         return kb;
     }
 
-    /** 同租户即过（org-share 未翻译，放行不扩大）。
+    /** 同租户即过（org-share 未实现，放行不扩大）。
      *  ⚠️ Long 比较用 equals——10002 超出 Long 缓存区间，`!=` 是引用比较（本仓约定 #6）。 */
     private static void requireKbWrite(KnowledgeBase kb) {
         Long tenantId = TenantContext.currentTenantId();

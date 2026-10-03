@@ -12,9 +12,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.auth.domain.Tenant;
 
 /**
- * A3-3 接线：{@code storageurl.FileServiceResolver} 的 provider 级文件服务此前恒为
- * {@code defaultSvc}（重写器因此永远拿不到 HTTP URL、引用原样保留），现在按 Go 的
- * {@code BuildFileServiceForProvider} 顺序取：真实服务 → local/默认 → null。
+ * 接线：{@code storageurl.FileServiceResolver} 的 provider 级文件服务解析顺序：
+ * 真实服务 → local/默认 → null。
  *
  * <p>用 {@code cos} 代表云 provider（构造函数不触网）。断言"解析出非空服务"即
  * 证明工厂被接上；真正的 URL 生成要凭据，属部署态。</p>

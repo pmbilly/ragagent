@@ -37,8 +37,8 @@ public class KnowledgeSearchService {
     // ── 搜索与移动/复制批：搜索与移动/复制（8 条路由的服务面） ──────────────────
 
     /**
-     * * <b>已知差异</b>：org-share（kbShareService）未翻译——共享库的补捞分支恒空，
-     * 与 ChunkAccessGuard/KnowledgeAccessGuard 的既有收紧同源；本租户文档库路径完整翻译
+     * <b>已知差异</b>：org-share（kbShareService）未实现——共享库的补捞分支恒空，
+     * 与 ChunkAccessGuard/KnowledgeAccessGuard 的既有收紧同源；本租户文档库路径完整
      * （含 keyword LIKE 转义、file_types 别名、offset/limit+has_more、knowledge_base_name 回填）。
      */
     public SearchOutcome searchKnowledge(String keyword, int offset, int limit, List<String> fileTypes) {

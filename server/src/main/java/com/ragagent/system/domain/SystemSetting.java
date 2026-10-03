@@ -75,10 +75,10 @@ public class SystemSetting {
     public void setValueType(String valueType) { this.valueType = valueType; }
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
-    /** Go 非指针 string：NULL → ""（IsBootstrapDefaultRow 依赖 trim 后非空判定） */
+    /** NULL → ""（IsBootstrapDefaultRow 依赖 trim 后非空判定） */
     public String getDescription() { return description == null ? "" : description; }
     public void setDescription(String description) { this.description = description; }
-    /** 字段名带 is 前缀但 getter isIsSecret() 的隐式属性名与字段一致 → 合并为一个属性（§9 通用坑） */
+    /** 字段名带 is 前缀但 getter isIsSecret() 的隐式属性名与字段一致 → 合并为一个属性 */
     public boolean isIsSecret() { return isSecret; }
     public void setIsSecret(boolean secret) { isSecret = secret; }
     public boolean isRequiresRestart() { return requiresRestart; }

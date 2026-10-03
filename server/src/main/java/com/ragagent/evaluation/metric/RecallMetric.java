@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * 对照 Go metric.RecallMetric（recall.go 全文）：
+ * Recall 指标：
  * 每真值组算「命中数 / 真值组大小」（空真值组跳过该项），再按真值组数平均。
  */
 public final class RecallMetric implements Metrics {

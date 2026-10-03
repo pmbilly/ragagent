@@ -12,37 +12,31 @@ import com.ragagent.common.security.SsrfGuard;
 import com.ragagent.llm.chat.LlmTransport;
 
 /**
- * embedding 包共享的 SSRF 安全 HTTP 设施（对照 Go
- * {@code internal/models/embedding/transport.go} + 各 embedder 的
- * {@code doRequestWithRetry}）。
+ * embedding 包共享的 SSRF 安全 HTTP 设施。
  *
- * <p>Go 侧语义与 Java 对应：</p>
  * <ol>
- *   <li>{@code sharedEmbeddingHTTPTransport}（进程级共享连接池）→ JDK HttpClient
- *       连接池由 {@link LlmTransport#sharedClient()} 进程级持有（同一守卫/重定向校验）。
- *       各 embedder 仍是独立 client 语义（各自超时），对应 Go 的
- *       {@code newEmbeddingHTTPClient(timeout)} 每客户端 timeout。</li>
- *   <li>{@code validateEmbeddingBaseURL}（空 URL 放行，失败前缀
- *       {@code "base URL SSRF check failed: "}）→ {@link #validateEmbeddingBaseUrl}。</li>
+ *   <li>连接池：JDK HttpClient 连接池由 {@link LlmTransport#sharedClient()} 进程级持有
+ *       （同一守卫/重定向校验）；各 embedder 仍是独立 client 语义（各自超时）。</li>
+ *   <li>{@link #validateEmbeddingBaseUrl}：空 URL 放行，失败前缀
+ *       {@code "base URL SSRF check failed: "}。</li>
  *   <li>重试：每 embedder {@code maxRetries=3}（共 4 次尝试），指数退避
  *       {@code 1<<（i-1）} 秒封顶 10s，仅传输层错误重试（HTTP 非 2xx 由调用方直接
- *       报错不重试）；等待中被打断 = Go 的 {@code ctx.Done()} 分支。</li>
- *   <li>自定义头：对照 {@code secutils.ApplyCustomHeaders}——保留头
- *       （Content-Type / Authorization 等）被跳过。</li>
+ *       报错不重试）；等待中被打断 = 以 {@link InterruptedException} 收场。</li>
+ *   <li>自定义头：保留头（Content-Type / Authorization 等）被跳过。</li>
  * </ol>
  */
 public final class EmbeddingHttp {
 
-    /** Go 各 embedder 的统一超时：60s（openai.go L65 等）。 */
+    /** 各 embedder 的统一超时：60s。 */
     public static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(60);
 
-    /** 对照各 embedder 的 {@code maxRetries: 3}。 */
+    /** 各 embedder 统一 {@code maxRetries=3}。 */
     private static final int MAX_RETRIES = 3;
 
     private EmbeddingHttp() {
     }
 
-    /** 对照 validateEmbeddingBaseURL：空 URL 允许（调用方会套 provider 默认地址）。 */
+    /** 空 URL 允许（调用方会套 provider 默认地址）。 */
     public static void validateEmbeddingBaseUrl(String baseUrl) {
         if (baseUrl == null || baseUrl.isEmpty()) {
             return;
@@ -55,8 +49,8 @@ public final class EmbeddingHttp {
     }
 
     /**
-     * 对照 {@code doRequestWithRetry}：POST JSON，最多 {@value #MAX_RETRIES}+1 次尝试。
-     * 传输层失败抛 {@link EmbeddingException}（Go 的 {@code send request: %w} 前缀由
+     * POST JSON，最多 {@value #MAX_RETRIES}+1 次尝试。
+     * 传输层失败抛 {@link EmbeddingException}（"send request: " 前缀由
      * 调用方补）；成功返回 {@link Result}（含非 2xx，由调用方按各自文案分支）。
      */
     public static Result postWithRetry(String url, byte[] jsonBody, String authHeaderName,
@@ -150,11 +144,11 @@ public final class EmbeddingHttp {
         };
     }
 
-    /** 一次 HTTP 结果（Go 的 {@code (resp.StatusCode, resp.Status, body)} 三元组）。 */
+    /** 一次 HTTP 结果（statusCode/statusLine/body 三元组）。 */
     public record Result(int status, String statusLine, String bodyText) {
     }
 
-    /** embedding 包的运行期失败（对照 Go 各构造/调用 error 返回值）。 */
+    /** embedding 包的运行期失败。 */
     public static class EmbeddingException extends RuntimeException {
         public EmbeddingException(String message) {
             super(message);

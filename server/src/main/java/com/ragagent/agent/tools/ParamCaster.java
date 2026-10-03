@@ -191,7 +191,7 @@ public final class ParamCaster {
         if (e < 0) {
             return s;
         }
-        // GoDoubleSerializer 对 |v|<1e-6 或 ≥1e21 走 'e' 形态；'f' 形态需展开为定点
+        // 指数形态（|v|<1e-6 或 ≥1e21）需展开为定点
         // （先取最短往返十进制，再按定点排布）。
         String mant = s.substring(0, e);
         int exp = Integer.parseInt(s.substring(e + 1));

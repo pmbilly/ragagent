@@ -15,12 +15,12 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 /**
- * 对照 Go internal/mcp/client_test.go 全文：
- * {@code TestAsOAuthRequired} / {@code TestApplyAuthHeaders} / {@code TestMCPTextPreview}。
+ * MCP 认证头与文本预览的行为测试
+ * （{@code applyAuthHeaders} / {@code asOAuthRequired} / {@code mcpTextPreview}）。
  */
 class McpAuthHeadersTest {
 
-    /** 对照 Go TestApplyAuthHeaders 的表驱动用例。 */
+    /** 表驱动用例。 */
     @Nested
     @DisplayName("applyAuthHeaders 只注入被选中的策略")
     class ApplyAuthHeaders {
@@ -112,7 +112,6 @@ class McpAuthHeadersTest {
         }
     }
 
-    /** 对照 Go TestAsOAuthRequired。 */
     @Nested
     @DisplayName("asOAuthRequired 只认带 metadata URL 的 401")
     class AsOAuthRequired {
@@ -147,7 +146,6 @@ class McpAuthHeadersTest {
         }
     }
 
-    /** 对照 Go TestMCPTextPreview。 */
     @Nested
     @DisplayName("mcpTextPreview 截断纪律")
     class TextPreview {
@@ -178,7 +176,7 @@ class McpAuthHeadersTest {
         }
     }
 
-    /** 对照 mcp-go 的 WWW-Authenticate 解析（streamable_http.go:347-400 的用例）。 */
+    /** WWW-Authenticate 的解析用例（mcp-go 同款语义）。 */
     @Nested
     @DisplayName("WWW-Authenticate 的 resource_metadata 提取")
     class ResourceMetadata {

@@ -32,14 +32,14 @@ public final class ImageInfoEnricher {
         if (perChunk == null || perChunk.isEmpty()) {
             return "";
         }
-        // Go 用 map[string]bool 去重 + 依赖 map 遍历序（无序）；Java 用插入序保证确定性，
-        // 集合内容一致（顺序契约在 Go 侧本就不存在）。
+        // 用插入序保证确定性，
+        // 集合内容一致（顺序契约本就不存在）。
         Set0 seen = new Set0();
         List<ImageInfo> all = new ArrayList<>();
         for (String raw : perChunk.values()) {
             List<ImageInfo> infos = ImageInfoMatchUtil.parseInfos(raw);
             if (infos == null) {
-                continue; // Go：unmarshal 失败 → continue
+                continue; // 解析失败 → 跳过该块
             }
             for (ImageInfo info : infos) {
                 String key = info.getUrl().isEmpty() ? info.getOriginalUrl() : info.getUrl();

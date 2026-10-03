@@ -19,10 +19,10 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 /**
- * 波 4.3 im channels 契约测试：清单面 CRUD + toggle + 微信扫码绑定分支
- * （imc-* golden 逐条掩码比对；golden 来源：scripts/record-emb-golden.sh 实录）。
+ * im channels 契约测试：清单面 CRUD + toggle + 微信扫码绑定分支
+ * （imc-* golden 逐条掩码比对；golden 录制脚本：scripts/record-emb-golden.sh）。
  *
- * <p>场景顺序严格复刻录制脚本：校验错误家族 → 三渠道 create → duplicate /
+ * <p>场景顺序固定：校验错误家族 → 三渠道 create → duplicate /
  * session_mode 校验 → 列表 → update（改名/绑 KB/停用）→ 换绑 agent / 重复 bot →
  * toggle ×2 → delete 家族 → qrcode/status 空体。</p>
  *

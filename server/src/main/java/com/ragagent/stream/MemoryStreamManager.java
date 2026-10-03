@@ -11,27 +11,27 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * 进程内的流管理器（对照 Go {@code MemoryStreamManager}，internal/stream/memory_manager.go）。
+ * 进程内的流管理器。
  *
  * <p><b>只适合单副本部署</b>：live-run 标记是本进程的 map，多副本下
- * {@code /steer} 会被路由到没有这一轮的副本。这正是 Go 把它标为 Lite 模式、
- * 由 {@code STREAM_MANAGER_TYPE=redis} 切到 {@link RedisStreamManager} 的原因。</p>
+ * {@code /steer} 会被路由到没有这一轮的副本。此时应经
+ * {@code STREAM_MANAGER_TYPE=redis} 切到 {@link RedisStreamManager}。</p>
  *
- * <p>锁结构与 Go 逐一对齐：外层一把读写锁护住两张表（streams / liveRuns），
+ * <p>锁结构：外层一把读写锁护住两张表（streams / liveRuns），
  * 每条流自己一把读写锁护住事件列表。加锁顺序恒为「先外后内」。</p>
  */
 public class MemoryStreamManager implements StreamManager {
 
-    /** 一条流的事件与 steer 子列表（对照 Go 的 memoryStreamData）。 */
+    /** 一条流的事件与 steer 子列表。 */
     private static final class StreamData {
         final List<StreamEvent> events = new ArrayList<>();
         final List<StreamEvent> steerEvents = new ArrayList<>();
-        /** 最后写入时刻。Go 侧字段存在但当前无人读取（留给将来的清理任务）。 */
+        /** 最后写入时刻。当前无人读取（留给将来的清理任务）。 */
         volatile OffsetDateTime lastUpdated = OffsetDateTime.now();
         final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     }
 
-    /** 会话当前正在生成的那一轮（对照 Go 的 liveRunMarker）。 */
+    /** 会话当前正在生成的那一轮。 */
     private record LiveRunMarker(String assistantMessageId, String requestId) {
     }
 
@@ -96,7 +96,7 @@ public class MemoryStreamManager implements StreamManager {
             }
             List<StreamEvent> out = new ArrayList<>(stream.events.size() - fromOffset);
             for (StreamEvent e : stream.events.subList(fromOffset, stream.events.size())) {
-                // 元素级拷贝（data 仍是共享引用）——与 Go 的 `copy(eventsCopy, events)` 同语义
+                // 元素级拷贝（data 仍是共享引用）
                 out.add(e.copy());
             }
             return new StreamBatch(out, stream.events.size());
@@ -126,8 +126,7 @@ public class MemoryStreamManager implements StreamManager {
                 if (event.getTimestamp() == null) {
                     event.setTimestamp(OffsetDateTime.now());
                 }
-                // 但存进管理器的是**拷贝**——Go 的 append 也是把 struct 值复制进切片，
-                // 之后调用方再改 id/content 不会影响已入列的事件（data 仍是共享引用）。
+                // 但存进管理器的是**拷贝**——之后调用方再改 id/content 不会影响已入列的事件（data 仍是共享引用）。
                 stream.steerEvents.add(event.copy());
             }
             stream.lastUpdated = OffsetDateTime.now();

@@ -23,7 +23,7 @@ import com.sun.net.httpserver.HttpServer;
  *       {@code http://localhost:11434}，测试 JVM 无该 env → 打 11434；
  *       bean 在上下文启动时创建，探活发生在请求期 → 先起 stub 再发请求即可）。
  *       HEAD / 探活、GET /api/version、GET /api/tags、POST /api/pull（NDJSON 进度）。
- *       与 scripts/stub-ollama-server.py（Go 录制用）同一份剧本。</li>
+ *       与 scripts/stub-ollama-server.py（录制用）同一份剧本。</li>
  *   <li>{@link #startUpstream()}：OpenAI 兼容上游 stub（chat/embeddings/rerank/
  *       audio transcriptions，端口随机）。与扩展后的 scripts/stub-llm-server.py
  *       同一份剧本：chat 场景按末条 user 消息里的 {@code <<SCENARIO:...>>} 标记路由；
@@ -123,9 +123,8 @@ final class W5bStubServers {
             if (method.equals("POST") && path.endsWith("/chat/completions")) {
                 String text = new String(body, StandardCharsets.UTF_8);
                 String content;
-                // 标记匹配只认 `SCENARIO:graph`：Go 的 json.Marshal 默认做 HTML 转义
-                // （`<`→`\u003c`），出站体里看不到裸 `<<`——§0.-10/§0.-11 两批做过
-                // 全 body 逐字节对拍，转义形态即 Go 形态。
+                // 标记匹配只认 `SCENARIO:graph`：出站 JSON 体默认做 HTML 转义
+                // （`<`→`\u003c`），出站体里看不到裸 `<<`。
                 if (text.contains("SCENARIO:graph")) {
                     content = GRAPH_REPLY;
                 } else if (text.contains("Please randomly generate a text")) {
@@ -167,8 +166,8 @@ final class W5bStubServers {
                     default -> {
                         if (auth == null || auth.strip().isEmpty()
                                 || auth.strip().equals("Bearer")) {
-                            // fillSecrets 探针：未带 key（JDK 会把 "Bearer " 尾随空格
-                            // 规范化成 "Bearer"，Go 原样 "Bearer " —— 两者同判）→ 401
+                            // 未带 key（JDK 会把 "Bearer " 尾随空格
+                            // 规范化成 "Bearer"，录制侧原样 "Bearer " —— 两者同判）→ 401
                             respond(ex, 401, "application/json",
                                     "{\"error\":{\"message\":\"invalid api key\",\"type\":\"invalid_request_error\"}}");
                             return;

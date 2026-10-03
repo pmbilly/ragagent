@@ -110,7 +110,7 @@ final class QaTurnExecutor {
             throw BizException.internal(e.getMessage());
         }
 
-        // steer carry-over：本 run 公布为 live 之前接上（Go L1131-1138）
+        // steer carry-over：本 run 公布为 live 之前接上
         if (reqCtx.steerCarryOver != null && !reqCtx.steerCarryOver.isEmpty() && reqCtx.assistantMessage != null) {
             try {
                 streamManager.appendSteerEvents(sessionId, reqCtx.assistantMessage.getId(), reqCtx.steerCarryOver);
@@ -129,7 +129,7 @@ final class QaTurnExecutor {
             throw BizException.serviceUnavailable("Failed to publish running turn");
         }
 
-        // 快答路径：timeline 记录器 + reasoning 累积 + 完成事件（Go L1159-1206）
+        // 快答路径：timeline 记录器 + reasoning 累积 + 完成事件
         if (mode == QaMode.NORMAL) {
             sseOrchestrator.registerQuickAnswerTimelineRecorder(streamCtx.eventBus, streamCtx.assistantMessage);
             streamCtx.eventBus.on(EventType.EVENT_AGENT_THOUGHT, evt -> {
@@ -173,7 +173,7 @@ final class QaTurnExecutor {
             });
         }
 
-        // 异步执行（虚拟线程，Go L1209-1313 的 goroutine）。
+        // 异步执行（虚拟线程）。
         // 纪律 #1：TenantContext 是 ThreadLocal，跨虚拟线程必须显式 capture/replay。
         // 共享 agent → 异步段以源租户为
         // 执行租户（模型/KB/MCP 解析范围；身份不变）；租户不存在则不切换。
@@ -226,7 +226,7 @@ final class QaTurnExecutor {
             } finally {
                 if (mode == QaMode.AGENT) {
                     Message am = streamCtx.assistantMessage;
-                    // agent 收尾（Go L1224-1270）：steer 交接 + 完成 + ClearLiveRun
+                    // agent 收尾：steer 交接 + 完成 + 清除 live 标记
                     //
                     // 顺序纪律：收尾必须在**本线程上下文仍完整**时进行，clear 放到最后。
                     // 旧实现先 clear 再 runWithTenant，prev 已空、只剩 tenantId——
@@ -313,7 +313,7 @@ final class QaTurnExecutor {
     private void executeQaInternal(QaRequestContext reqCtx, QaMode mode, boolean generateTitle,
             HttpServletResponse response) throws IOException {
         if (response == null) {
-            // skipSSE 路径：等待异步段完成后返回（Go L1315-1318 的 <-asyncDone）
+            // skipSSE 路径：等待异步段完成后返回
             CompletableFuture<Void> asyncDone = new CompletableFuture<>();
             try {
                 executeQA(reqCtx, mode, generateTitle, null, asyncDone);

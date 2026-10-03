@@ -7,9 +7,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 /**
  * 检索配置段。
  *
- * <p>前六个字段恒输出；rrf_* 三个空值（0 / 0.0）省略键。
- * 浮点字段一律挂 {@link GoDoubleSerializer}——零值输出 {@code 0} 而非
- * {@code 0.0}（golden ct-kv-ret-get-default 钉住）。</p>
+ * <p>前六个字段恒输出；rrf_* 三个空值（0 / 0.0）省略键。浮点走 Jackson 默认形态（0.0）。</p>
  */
 @JsonPropertyOrder({
         "embedding_top_k", "vector_threshold", "keyword_threshold",

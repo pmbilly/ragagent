@@ -609,7 +609,7 @@ class ImaConnectorTest {
                 .hasMessageContaining("SSRF");
     }
 
-    /** 对照 Go {@code TestFetchIncremental_RequiresResourceIDs}。 */
+    /** 增量同步缺 resource_ids 时必须报错。 */
     @Test
     void fetchIncrementalRequiresResourceIds() throws Exception {
         try (FakeIma f = new FakeIma()) {
@@ -618,7 +618,7 @@ class ImaConnectorTest {
         }
     }
 
-    /** 全量同步不返回 cursor（对照 Go 的 {@code if !incremental { return out, nil, nil }}）。 */
+    /** 全量同步不返回 cursor。 */
     @Test
     void fetchAllDoesNotProduceCursor() throws Exception {
         try (FakeIma f = new FakeIma()) {
@@ -631,8 +631,8 @@ class ImaConnectorTest {
     }
 
     /**
-     * connector cursor 的键集合与值形态（Go 的 marshal/unmarshal 往返净效果）：
-     * 恒有 {@code last_sync_time}（**字符串**——roundtrip 把 time.Time 变成 string）
+     * connector cursor 的键集合与值形态（序列化/反序列化往返的净效果）：
+     * 恒有 {@code last_sync_time}（**字符串**——roundtrip 把时间变成字符串）
      * 与 {@code kb_logical}；遗留的 {@code kb_media} 永不出现。
      */
     @Test
@@ -658,7 +658,7 @@ class ImaConnectorTest {
     }
 
     /**
-     * 一个 KB 枚举失败必须**整体失败**（Go 的 {@code return nil, nil, fmt.Errorf("list KB %s: %w")}），
+     * 一个 KB 枚举失败必须**整体失败**（抛出带 KB 标识的错误），
      * 而不是"跳过这个 KB 继续"。
      */
     @Test

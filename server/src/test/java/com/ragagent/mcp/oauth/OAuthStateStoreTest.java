@@ -10,9 +10,7 @@ import com.ragagent.mcp.domain.McpPrincipal;
 import org.junit.jupiter.api.Test;
 
 /**
- * 对照 Go internal/mcp/oauth_state_test.go。
- *
- * <p>核心两条语义（Go 注释原文精神）：
+ * OAuth state 存储的核心两条语义：
  * <ol>
  *   <li><b>进入回调 ≠ 授权完成</b>：{@code Take} 消费 state 只说明回调开始了，
  *       必须等 code 交换并落库 token 之后 {@code completeAttempt} 才置完成——
@@ -21,7 +19,7 @@ import org.junit.jupiter.api.Test;
  *       attemptID 来问，必须报不匹配而不是回 true。</li>
  * </ol>
  *
- * <p>两种后端（内存 / Redis）都跑同一组用例——Go 的 Lite 与多副本分支在 Java 侧是
+ * <p>两种后端（内存 / Redis）都跑同一组用例——Java 侧是
  * {@code redis == null} 与否，行为必须一致。</p>
  */
 class OAuthStateStoreTest {
@@ -38,7 +36,7 @@ class OAuthStateStoreTest {
 
     // ── 1. attempt 只在 code 交换后完成 ─────────────────────────────────
 
-    /** 对照 Go {@code TestOAuthAttemptCompletesOnlyAfterCallbackExchange}。 */
+    /** attempt 只在 code 交换后完成。 */
     @Test
     void attemptCompletesOnlyAfterCallbackExchangeInMemory() {
         attemptCompletesOnlyAfterCallbackExchange(new OAuthStateStore(null));
@@ -77,7 +75,7 @@ class OAuthStateStoreTest {
 
     // ── 2. state 单次使用 ──────────────────────────────────────────────
 
-    /** 对照 Go {@code Take} 的"取出即删"：第二次必须报"不存在或已过期"。 */
+    /** {@code Take} 的"取出即删"：第二次必须报"不存在或已过期"。 */
     @Test
     void takeIsSingleUseInMemory() {
         takeIsSingleUse(new OAuthStateStore(null));
@@ -96,7 +94,7 @@ class OAuthStateStoreTest {
                 () -> store.attempt("unknown"), "未写过的 attempt 也必须报不存在");
     }
 
-    /** 从未写过的 state 取用必须报错（对照 Go 的 {@code "oauth state not found or expired"}）。 */
+    /** 从未写过的 state 取用必须报错（固定文案 "oauth state not found or expired"）。 */
     @Test
     void unknownStateIsNotFound() {
         OAuthStateStore store = new OAuthStateStore(null);
@@ -107,7 +105,7 @@ class OAuthStateStoreTest {
 
     // ── 3. 按 principal + service 隔离（经由 OAuthManager） ──────────────
 
-    /** 对照 Go {@code TestAuthorizationAttemptStatusIsScopedToPrincipalAndService}。 */
+    /** attempt 状态按 principal + service 隔离。 */
     @Test
     void authorizationAttemptStatusIsScopedToPrincipalAndService() {
         OAuthManager manager = new OAuthManager(null, null, new OAuthStateStore(null));

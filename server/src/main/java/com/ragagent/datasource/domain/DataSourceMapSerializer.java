@@ -13,7 +13,7 @@ import com.ragagent.common.web.SortedMapSerializer;
 
 /**
  * {@link SortedMapSerializer} 的 datasource 版本：在"按键排序且递归"之上，**再把嵌套的
- * {@code Double} 按 {@code Double.toString} 语义输出（B50 前为 GoDoubleSerializer 的 Go 浮点形态）。
+ * {@code Double} 按 {@code Double.toString} 语义输出。
  *
  * <h2>为什么不能直接用 {@code SortedMapSerializer}</h2>
  * <p>{@code SortedMapSerializer} 只重排键序，值<b>原样</b>交给 Jackson。而本模块的 map 字段

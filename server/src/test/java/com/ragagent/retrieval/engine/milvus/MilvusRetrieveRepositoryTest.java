@@ -180,7 +180,7 @@ class MilvusRetrieveRepositoryTest {
         assertThat(indexes.get(1).path("indexType").asText()).isEqualTo("AUTOINDEX");
         assertThat(indexes.get(2).path("fieldName").asText()).isEqualTo("chunk_id");
 
-        // 建完即 load（照 Go：每次 ensure 都 load）
+        // 建完即 load（每次 ensure 都 load）
         assertThat(last("/collections/load").json().path("collectionName").asText())
                 .isEqualTo("weknora_embeddings_2");
     }
@@ -231,7 +231,7 @@ class MilvusRetrieveRepositoryTest {
         assertThatThrownBy(() -> repo.save(info("s1", "c1"), embeddings()))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("empty embedding vector for chunk ID: c1");
-        // 批量路径照 Go：空向量只 WARN 跳过（不抛、不写）
+        // 批量路径：空向量只 WARN 跳过（不抛、不写）
         int before = captured.size();
         repo.batchSave(List.of(info("s1", "c1")), embeddings());
         assertThat(captured).hasSize(before);
@@ -398,7 +398,7 @@ class MilvusRetrieveRepositoryTest {
         assertThat(results.get(0).results().get(0).matchType)
                 .isEqualTo(EngineTypes.MATCH_KEYWORDS);
 
-        // 单集合失败 → 跳过（与 Weaviate 的"直接抛"不同，照 Go）
+        // 单集合失败 → 跳过（与 Weaviate 的"直接抛"不同）
         statuses.put("POST /v2/vectordb/entities/search", 500);
         assertThat(repo.retrieve(params).get(0).results()).isEmpty();
     }
@@ -452,7 +452,7 @@ class MilvusRetrieveRepositoryTest {
         assertThat(row.path("knowledge_id").asText()).isEqualTo("tk1");
         assertThat(row.path("knowledge_base_id").asText()).isEqualTo("targetKb");
         assertThat(row.path("tag_id").asText()).isEqualTo("t");
-        assertThat(row.path("is_enabled").asBoolean()).isFalse(); // 照 Go：沿用源值
+        assertThat(row.path("is_enabled").asBoolean()).isFalse(); // 沿用源值
         assertThat(row.path("source_type").asInt()).isEqualTo(2);
         assertThat(row.path("embedding").get(0).asDouble()).isEqualTo(0.5);
     }

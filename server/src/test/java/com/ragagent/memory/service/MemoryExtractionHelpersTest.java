@@ -23,12 +23,11 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 /**
- * extract.go 的纯函数对等测试（{@code resolveSource} / {@code parseExpiry} /
+ * 抽取纯函数的对等测试（{@code resolveSource} / {@code parseExpiry} /
  * {@code parseExtractionResponse} / {@code isTruncated} / {@code statusForWrite} /
  * {@code buildExtractionPrompt} / 负载 JSON）。
  *
- * <p><b>全部期望值是 Go 实录</b>（{@code go test -run TestTruthExtractHelpers} /
- * {@code TestTruthExtractionPrompt} / {@code TestTruthPayload}）。
+ * <p><b>全部期望值逐条实测钉死</b>。
  * {@code buildExtractionPrompt} 更是逐字节比对——它是喂给模型的契约，
  * 措辞松紧直接改变线上抽取质量。</p>
  */
@@ -77,13 +76,13 @@ class MemoryExtractionHelpersTest {
 
         @Test
         void fallsBackToTheFirstLineWhenTheIndexIsMissingOrOutOfRange() {
-            // Go 实录：nil→m1|line1、1→m1|line1、3→m3|line3、9→m1|line1、0→m1|line1
+            // 实测：null→m1|line1、1→m1|line1、3→m3|line3、9→m1|line1、0→m1|line1
             assertThat(lineOf(decision(null).resolveSource(segment(3)))).isEqualTo("m1|line1");
             assertThat(lineOf(decision(1).resolveSource(segment(3)))).isEqualTo("m1|line1");
             assertThat(lineOf(decision(3).resolveSource(segment(3)))).isEqualTo("m3|line3");
             assertThat(lineOf(decision(9).resolveSource(segment(3)))).isEqualTo("m1|line1");
             assertThat(lineOf(decision(0).resolveSource(segment(3)))).isEqualTo("m1|line1");
-            // 片段没有行时回零值（Go 实录："<zero>"）
+            // 片段没有行时回零值（实测："<zero>"）
             assertThat(lineOf(decision(1).resolveSource(
                     new MemoryExtractionService.TranscriptSegment()))).isEqualTo("<zero>");
         }
@@ -101,7 +100,7 @@ class MemoryExtractionHelpersTest {
 
         @Test
         void dropsBlankNullPastAndUnparsableValues() {
-            // Go 实录：这九种输入全部 null
+            // 实测：这九种输入全部 null
             for (String v : List.of("", "  ", "null", "NULL", "not-a-date", "2026/08/15",
                     "2099-01-01 10:00", "2099-1-1", "2020-01-01")) {
                 assertThat(MemoryExtractionLlm.parseExpiry(v))
@@ -114,7 +113,7 @@ class MemoryExtractionHelpersTest {
 
         @Test
         void acceptsFutureDatesInBothLayoutsWithGoSemantics() {
-            // Go 实录：日期布局解析成 **UTC 午夜**（time.Parse 的 location 是 UTC）
+            // 实测：日期布局解析成 **UTC 午夜**（无时区即按 UTC）
             assertThat(MemoryExtractionLlm.parseExpiry("2099-01-01").toInstant())
                     .isEqualTo(java.time.Instant.parse("2099-01-01T00:00:00Z"));
             // RFC3339 布局保留原偏移
@@ -131,7 +130,7 @@ class MemoryExtractionHelpersTest {
 
         @Test
         void emptyAndNoObjectCases() {
-            // Go 实录："" → 零值（memories/topics 都空）
+            // 实测："" → 零值（memories/topics 都空）
             MemoryExtractionLlm.ExtractionResponse parsed =
                     MemoryExtractionLlm.parseExtractionResponse("");
             assertThat(parsed.memories).isEmpty();
@@ -147,7 +146,7 @@ class MemoryExtractionHelpersTest {
 
         @Test
         void parsesAPlainObject() {
-            // Go 实录：[{"action":"add",...,"content":"c","importance":0,"expires_at":"","inferred":false}]
+            // 实测：[{"action":"add",...,"content":"c","importance":0,"expires_at":"","inferred":false}]
             MemoryExtractionLlm.ExtractionResponse parsed = MemoryExtractionLlm
                     .parseExtractionResponse("{\"memories\":[{\"action\":\"add\",\"kind\":\"fact\","
                             + "\"topic\":\"t\",\"content\":\"c\"}],\"topics\":[\"x\"]}");
@@ -167,7 +166,7 @@ class MemoryExtractionHelpersTest {
 
         @Test
         void stripsFencesAndProse() {
-            // Go 实录：两种包装都解出 {"memories":[],"topics":[]}
+            // 实测：两种包装都解出 {"memories":[],"topics":[]}
             MemoryExtractionLlm.ExtractionResponse fenced = MemoryExtractionLlm
                     .parseExtractionResponse("```json\n{\"memories\":[],\"topics\":[]}\n```");
             assertThat(fenced.memories).isEmpty();
@@ -182,13 +181,13 @@ class MemoryExtractionHelpersTest {
 
         @Test
         void missingKeysBecomeDefaults() {
-            // Go 实录：[{"action":"add","kind":"","topic":"","content":"",...,"inferred":false}]、topics null
+            // 实测：[{"action":"add","kind":"","topic":"","content":"",...,"inferred":false}]、topics null
             MemoryExtractionLlm.ExtractionResponse parsed = MemoryExtractionLlm
                     .parseExtractionResponse("{\"memories\":[{\"action\":\"add\"}],\"topics\":null}");
             assertThat(parsed.memories).hasSize(1);
             assertThat(parsed.memories.get(0).kind).isEmpty();
             assertThat(parsed.memories.get(0).content).isEmpty();
-            // Go 里显式 null 会把切片置成 nil；Java 侧 Jackson 同样写 null。
+            // 显式 null 不会变成空列表；Jackson 同样写 null。
             assertThat(parsed.topics).isNull();
         }
     }
@@ -199,7 +198,7 @@ class MemoryExtractionHelpersTest {
 
         @Test
         void isTruncatedTreatsEmptyBodyAsTruncation() {
-            // Go 实录：nil→true、空白→true、finish=length→true、finish=stop→false
+            // 实测：null→true、空白→true、finish=length→true、finish=stop→false
             assertThat(MemoryExtractionLlm.isTruncated(null)).isTrue();
             ChatResponse blank = new ChatResponse();
             blank.setContent("  ");
@@ -216,8 +215,8 @@ class MemoryExtractionHelpersTest {
 
         @Test
         void statusForWriteOnlyDefersInferredNonUserStatements() {
-            // Go 实录：inferred+extracted→pending，inferred+explicit→active，
-            // inferred+manual→active，not inferred→active
+            // 实测：inferred+extracted→pending，inferred+explicit→active，
+            // inferred+manual→active，非 inferred→active
             assertThat(MemoryService.statusForWrite(
                     itemWith(true, MemoryKinds.ORIGIN_EXTRACTED))).isEqualTo(MemoryKinds.STATUS_PENDING);
             assertThat(MemoryService.statusForWrite(
@@ -233,10 +232,10 @@ class MemoryExtractionHelpersTest {
             List<MemoryItem> items = List.of(
                     item("i1", MemoryKinds.KIND_FACT, "在用的数据库", "生产库用的是 MySQL"),
                     item("i2", MemoryKinds.KIND_TASK, "在做的重构", "重构支付流程，计划本周完成"));
-            // Go 实录：["i1"]
+            // 实测：["i1"]
             assertThat(MemoryRecallOps.residentItemsWithinBlock(items, "- 生产库用的是 MySQL\n- 别的东西"))
                     .extracting(MemoryItem::getId).containsExactly("i1");
-            // 空块 → 空（Go 实录：[]）
+            // 空块 → 空（实测：[]）
             assertThat(MemoryRecallOps.residentItemsWithinBlock(items, "")).isEmpty();
         }
 
@@ -259,7 +258,7 @@ class MemoryExtractionHelpersTest {
             segment.sessionId = "s";
             segment.lines.add(line("m1", at("2026-03-02", 9, 5), "hi"));
 
-            // Go 实录（逐字节）
+            // 实测（逐字节）
             assertThat(MemoryExtractionLlm.buildExtractionPrompt(segment, null, null, null, ""))
                     .isEqualTo("Existing notes:\n(none)\n\nWhat the user said:\n<transcript>\n"
                             + "[1] (2026-03-02 09:05) hi\n</transcript>\n");
@@ -267,7 +266,7 @@ class MemoryExtractionHelpersTest {
 
         @Test
         void workspaceRulesOnly() {
-            // Go 实录（逐字节）：零值时间印成 0001-01-01 00:00
+            // 实测（逐字节）：零值时间印成 0001-01-01 00:00
             assertThat(MemoryExtractionLlm.buildExtractionPrompt(segment(1), null, null, null, "r"))
                     .isEqualTo("Existing notes:\n(none)\n\nWorkspace rules (follow these in addition to "
                             + "the above):\n<rules>\nr\n</rules>\n\nWhat the user said:\n<transcript>\n"
@@ -305,8 +304,8 @@ class MemoryExtractionHelpersTest {
             blank.setTopic("");
             known.add(blank);
 
-            // Go 实录（逐字节）。注意三处容易写错的地方：
-            // 1) 序号用的是**原切片下标**（nil 被跳过但占位 → [0] 与 [2]）；
+            // 实测（逐字节）。注意三处容易写错的地方：
+            // 1) 序号用的是**原列表下标**（null 被跳过但占位 → [0] 与 [2]）；
             // 2) 话题只展示 12 条（extractShownTopics 的截断）；
             // 3) 空主题的墓碑被跳过。
             assertThat(MemoryExtractionLlm.buildExtractionPrompt(
@@ -366,7 +365,7 @@ class MemoryExtractionHelpersTest {
         void omitsBlankChatModelAndLanguage() throws Exception {
             MemoryExtractPayload payload = new MemoryExtractPayload(
                     7, "web_user:u1", "s", "m", "", "");
-            // Go 实录：{"tenant_id":7,"subject_id":"web_user:u1","session_id":"s","message_id":"m"}
+            // 实测：{"tenant_id":7,"subject_id":"web_user:u1","session_id":"s","message_id":"m"}
             assertThat(mapper.writeValueAsString(payload)).isEqualTo(
                     "{\"tenant_id\":7,\"subject_id\":\"web_user:u1\",\"session_id\":\"s\","
                             + "\"message_id\":\"m\"}");
@@ -376,7 +375,7 @@ class MemoryExtractionHelpersTest {
         void keepsPopulatedFields() throws Exception {
             MemoryExtractPayload payload = new MemoryExtractPayload(
                     7, "web_user:u1", "s", "m", "chat-1", "Chinese (Simplified)");
-            // Go 实录：...{"chat_model_id":"chat-1","language":"Chinese (Simplified)"}
+            // 实测：...{"chat_model_id":"chat-1","language":"Chinese (Simplified)"}
             assertThat(mapper.writeValueAsString(payload)).isEqualTo(
                     "{\"tenant_id\":7,\"subject_id\":\"web_user:u1\",\"session_id\":\"s\","
                             + "\"message_id\":\"m\",\"chat_model_id\":\"chat-1\","
@@ -390,7 +389,7 @@ class MemoryExtractionHelpersTest {
             MemoryExtractPayload payload = new MemoryExtractPayload(
                     7, "web_user:u1", "s", "m", "chat-1", "");
             assertThat(MemoryExtractPayload.fromJson(payload.toJson())).isEqualTo(payload);
-            // Go 的 json.Unmarshal 忽略未知字段；负载加了新键后旧消费者必须还能读。
+            // 解析忽略未知字段；负载加了新键后旧消费者必须还能读。
             MemoryExtractPayload read =
                     MemoryExtractPayload.fromJson("{\"tenant_id\":1,\"subject_id\":\"a\",\"extra\":1}");
             assertThat(read.subjectId()).isEqualTo("a");

@@ -11,19 +11,17 @@ import java.util.Map;
 import com.ragagent.llm.chat.LlmTransport;
 
 /**
- * rerank 包共享的 SSRF 安全 HTTP 设施（对照 Go
- * {@code internal/models/rerank/transport.go}）。
+ * rerank 包共享的 SSRF 安全 HTTP 设施。
  *
- * <p>Go：{@code sharedRerankHTTPTransport} 进程级共享连接池 + 每 client 自己的
- * timeout（大多为 0 = 不设 client 级超时，依赖 ctx；Java 用 request timeout 为
- * null 表达"不设"）。失败类型 {@link RerankException}。</p>
+ * <p>HTTP 连接池进程级共享；超时按请求设置——timeout 传 null 表示不设。
+ * 失败类型 {@link RerankException}。</p>
  */
 public final class RerankHttp {
 
     private RerankHttp() {
     }
 
-    /** 对照 validateRerankBaseURL：空 URL 放行；失败前缀 "base URL SSRF check failed: "。 */
+    /** 空 URL 放行；失败前缀 "base URL SSRF check failed: "。 */
     public static void validateRerankBaseUrl(String baseUrl) {
         if (baseUrl == null || baseUrl.isEmpty()) {
             return;
@@ -36,8 +34,8 @@ public final class RerankHttp {
     }
 
     /**
-     * 单次 POST（Go 的 rerank 各实现<b>没有重试循环</b>——直接 client.Do 一次）。
-     * timeout 传 null 表示不设（对照 Go 的 newRerankHTTPClient(0)）。
+     * 单次 POST，<b>没有重试循环</b>——发一次即返回。
+     * timeout 传 null 表示不设。
      */
     public static Result post(String url, byte[] jsonBody, String authHeaderName,
                               String authHeaderValue, Map<String, String> customHeaders,
@@ -77,7 +75,7 @@ public final class RerankHttp {
     public record Result(int status, String statusLine, String bodyText) {
     }
 
-    /** rerank 包的运行期失败（对照 Go 各 error 返回值）。 */
+    /** rerank 包的运行期失败。 */
     public static class RerankException extends RuntimeException {
         public RerankException(String message) {
             super(message);

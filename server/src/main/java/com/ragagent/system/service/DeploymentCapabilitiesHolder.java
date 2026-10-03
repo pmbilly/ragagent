@@ -9,26 +9,22 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
 /**
- * GET /system/capabilities 的启动快照（对照 Go 的
- * {@code router.NewRouter → params.SystemHandler.BindDeploymentCapabilities(
- * deploymentCapabilitiesFromRouter(params))} 装配点）。
+ * GET /system/capabilities 的启动快照（组合根装配期一次性绑定）。
  *
- * <p>Go 的可用性判定是"对应 handler 是否被注入"（nil = 路由未注册）。Java 侧等价物是
- * "对应模块的控制器/服务 bean 是否存在"——用 {@link ObjectProvider} 在启动期探测，
- * 结果绑定进本 holder（快照 = 启动期装配，运行期不重算；docker 的活值覆盖在
- * controller 里做，对照 overlayLiveDockerSandboxCapability）。</p>
+ * <p>可用性判定 = "对应模块的控制器/服务 bean 是否存在"——用 {@link ObjectProvider}
+ * 在启动期探测，结果绑定进本 holder（快照 = 启动期装配，运行期不重算；docker 的
+ * 活值覆盖在 controller 的 overlayLiveDockerSandboxCapability）。</p>
  *
- * <p>当前 Java 部署的注册状态（= 快照值，随模块翻译推进而变化——这正是该端点的语义）：
+ * <p>当前部署的注册状态（= 快照值，随部署形态而变化——这正是该端点的语义）：
      * 全部能力路由已注册 → supported=true；唯 settings.sandbox.docker 因 Java 进程无 docker
-     * 后端执行体（对照 Go DockerBackendEnabled 恒 false）→ supported=false +
+     * 后端执行体 → supported=false +
      * "docker_backend_disabled"（活值覆盖在 controller 的 overlayLiveDockerSandboxCapability）。
-     * 与 Go dev 的差异属于<b>部署状态漂移</b>（同 §9 "vector_store_engine_type 键的有无"
-     * 的先例），A/B 时按部署各自断言。</p>
+     * 与 dev 部署的差异属于<b>部署状态漂移</b>，A/B 时按部署各自断言。</p>
  */
 @Component
 public class DeploymentCapabilitiesHolder {
 
-    /** 部署形态（B6 批 4：{@code WEKNORA_EDITION} 走属性绑定，取代裸 env 读）。 */
+    /** 部署形态（{@code WEKNORA_EDITION} 走属性绑定，不读裸 env）。 */
     private final DeploymentProperties deploymentProperties;
 
     private volatile SystemDtos.DeploymentCapabilitiesData snapshot =
@@ -43,8 +39,7 @@ public class DeploymentCapabilitiesHolder {
     }
 
     /**
-     * 组合根（WebConfig）在装配完成后调用一次——对照 Go 在 NewRouter 尾部的
-     * BindDeploymentCapabilities。
+     * 组合根（WebConfig）在装配完成后调用一次。
      */
     public void bind(boolean agents, boolean im, boolean embed,
                      boolean api, boolean mcp, boolean webSearch, boolean vectorStore,

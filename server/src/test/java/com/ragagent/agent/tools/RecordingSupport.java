@@ -7,15 +7,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.web.ToolJson;
 
-/** 4.5a 实录测试的共享小工具。 */
+/** 4.5a 录制测试的共享小工具。 */
 public final class RecordingSupport {
 
     public static final ObjectMapper PLAIN = new ObjectMapper();
 
     /**
-     * B50：数字文本归一——把文本里的数字 token 统一成 Java {@code Double.toString} 形态
-     * （Go 侧 {@code 1 / 1e+21 / 1e-7} ↔ Java 侧 {@code 1.0 / 1.0E21 / 1.0E-7}；
-     * 大整数两侧同转）。两侧同归一后比较；非数字文本不受影响。
+     * 数字文本归一——把文本里的数字 token 统一成 Java {@code Double.toString} 形态
+     * （录制语料里的 {@code 1 / 1e+21 / 1e-7} ↔ Java 侧 {@code 1.0 / 1.0E21 / 1.0E-7}；
+     * 大整数同转）。两侧同归一后比较；非数字文本不受影响。
      */
     public static String normalizeNumberText(String text) {
         if (text == null) {
@@ -41,8 +41,8 @@ public final class RecordingSupport {
             java.util.regex.Pattern.compile("(?<![\\w.\\\\])-?\\d+(?:\\.\\d+)?(?:[eE][+-]?\\d+)?(?![\\w.])");
 
     /**
-     * 实录文本里的 Go 形态 HTML 转义还原（B42 基线收编）：{@code \u003c/\u003e/\u0026} →
-     * {@code < > &}。Go 版已下线，转义形态不再构成断言目标；键序/结构/数字形态仍被钉住。
+     * 录制文本里的 HTML 转义还原：{@code \u003c/\u003e/\u0026} →
+     * {@code < > &}。转义形态不再构成断言目标；键序/结构/数字形态仍被钉住。
      */
     public static String normalizeEscapes(String s) {
         return s == null ? null
@@ -72,14 +72,14 @@ public final class RecordingSupport {
         }
     }
 
-    /** 用 ToolJson 把 data map 编成 Go json.Marshal 字节形态（对照录制时的 mustJSON(res.Data)）。 */
+    /** 用 ToolJson 把 data map 编成录制时的 JSON 字节形态（对照录制时的 mustJSON）。 */
     public static String goJsonOfData(java.util.Map<String, Object> data) {
         return ToolJson.write(PLAIN.valueToTree(data));
     }
 
     /**
      * 键序无关的规范化 JSON：递归排序对象键后序列化。用于 data map 比较——
-     * Go 只排 map 键序、struct 键序按声明（{@code steps} 是 struct 数组），
+     * 录制侧 map 键序不定、{@code steps} 这类数组按声明序，
      * Java 经 valueToTree 的键序取决于序列化层；两边都规范化后比较值本身，
      * 键序契约由 steps_json 字符串与 output 文本的字节断言承担。
      */
@@ -116,11 +116,11 @@ public final class RecordingSupport {
             }
             return sb.append(']').toString();
         }
-        // 标量借道 ToolJson 的编码（数字/字符串/布尔与 Go 一致）
+        // 标量借道 ToolJson 的编码（数字/字符串/布尔与录制侧一致）
         return ToolJson.write(node);
     }
 
-    /** 重建 trunc 语料的输入串（对照探针的 pieces/repeats 拼接）。 */
+    /** 重建 trunc 语料的输入串（pieces/repeats 拼接）。 */
     public static String buildTruncInput(JsonNode rec) {
         JsonNode pieces = rec.get("pieces");
         JsonNode repeats = rec.get("repeats");

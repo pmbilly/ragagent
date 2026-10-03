@@ -11,11 +11,11 @@ import com.ragagent.embedding.EmbeddingHttp;
 import com.ragagent.common.web.ProviderJson;
 
 /**
- * OpenAI 兼容 embedding 客户端（对照 Go {@code internal/models/embedding/openai.go} 全文）。
+ * OpenAI 兼容 embedding 客户端。
  *
- * <p>请求体 = Go {@code OpenAIEmbedRequest} 字段序；{@code encoding_format} 恒
- * {@code "float"}；{@code dimensions} 仅在「显式覆盖 + 维度为正」时出现（omitempty）。
- * 错误文案逐字对照（含 body 1000 字节截断、send/unmarshal 前缀）。</p>
+ * <p>请求体字段序固定；{@code encoding_format} 恒
+ * {@code "float"}；{@code dimensions} 仅在「显式覆盖 + 维度为正」时出现（否则整键省略）。
+ * 错误文案逐字固定（含 body 1000 字节截断、send/unmarshal 前缀）。</p>
  */
 public final class OpenAiEmbedder extends BaseEmbedder {
 
@@ -43,7 +43,7 @@ public final class OpenAiEmbedder extends BaseEmbedder {
 
     @Override
     public List<float[]> batchEmbed(List<String> texts) {
-        // 对照 OpenAIEmbedRequest：字段序 model/input/encoding_format/dimensions/truncate_prompt_tokens
+        // 请求体字段序：model/input/encoding_format/dimensions/truncate_prompt_tokens
         ObjectNode reqBody = ProviderJson.object();
         reqBody.put("model", modelName);
         reqBody.set("input", ProviderJson.arrayOfStrings(texts));

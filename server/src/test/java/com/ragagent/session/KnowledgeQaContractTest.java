@@ -67,7 +67,7 @@ class KnowledgeQaContractTest {
     void searchKnowledgeBindingErrors() throws Exception {
         assertEnvelope("kse-empty-query", 1000,
                 "Key: 'SearchKnowledgeRequest.Query' Error:Field validation for 'Query' failed on the 'required' tag");
-        // B51：GoJsonBindError 退役——用 Jackson 原生消息（与 golden 逐字一致）
+        // GoJsonBindError 已退役——用 Jackson 原生消息（与 golden 逐字一致）
         assertEnvelope("kse-bad-json", 1000,
                 "Unrecognized token 'not': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')\n"
                         + " at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 1, column: 4]");

@@ -12,10 +12,9 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
- * feishu/wecom AES 加密验签族的字节契约。密文/签名录自独立 Go 程序
- * （/tmp/w5g3b，算法逐字抄自 feishu/adapter.go decrypt L1305-1350 与
- * wecom/webhook_adapter.go verifySignature L437-450 + decrypt L452-490），
- * fixture 在 {@code contracts/w5g3b-im-crypt.tsv}。
+ * feishu/wecom AES 加密验签族的字节契约。密文/签名期望值固定在 fixture
+ * {@code contracts/w5g3b-im-crypt.tsv}（与飞书 decrypt、企业微信
+ * verifySignature + decrypt 的线上算法一致）。
  */
 class FeishuWecomCryptTest {
 

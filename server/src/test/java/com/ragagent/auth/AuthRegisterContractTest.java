@@ -32,13 +32,13 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 /**
- * 波 2 扫尾批 1 契约测试：auth 注册族 9 端点，对照 golden 逐字节比对。
+ * 契约测试：auth 注册族 9 端点，对照 golden 逐字节比对。
  *
- * golden 来源：Go dev server（localhost:8080，2026-09-19 录制，scripts/record-reg-golden.sh，
+ * golden 来源：dev server 录制（2026-09-19，scripts/record-reg-golden.sh，
  * 46 条 reg-*.json；其中 reg-mode-set-invite-only / reg-mode-restore 属系统批端点，
  * 本测试只借它们切换状态、不做字节比对）。
  *
- * 场景顺序严格复刻录制脚本（同一 @Test 内的请求顺序敏感）：
+ * 场景顺序严格对齐录制脚本（同一 @Test 内的请求顺序敏感）：
  * register 400 家族 → register 成功 + 重复 → validate/me/preferences →
  * change-password（成功吊销旧 token）→ auto-setup → 邀请族 → invite_only 切换。
  *

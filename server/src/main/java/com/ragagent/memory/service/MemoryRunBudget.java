@@ -48,7 +48,7 @@ import com.ragagent.llm.domain.ChatResponse;
  */
 final class MemoryRunBudget {
 
-    /** 没有预算上限（对照 HTTP 请求路径上的 ctx：{@code ConsolidateNow} 走这个）。 */
+    /** 没有预算上限（后台手动触发的整合任务走这个）。 */
     static final MemoryRunBudget UNBOUNDED = new MemoryRunBudget(null);
 
     /** 单次模型调用的兜底上限，仅在无上限预算下用。 */

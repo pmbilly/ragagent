@@ -38,7 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
  * <h3>端点清单（路由前缀 {@code /api/v1} 由主会话在 WebConfig 注册）</h3>
  * <ol>
  *   <li>{@code POST /mcp-services/{id}/oauth/authorize-url} —— 发起授权，返回浏览器应打开的
- *       授权地址与本次尝试 ID（RBAC：<b>Viewer+</b>，对照 {@code g.Viewer()}）；</li>
+ *       授权地址与本次尝试 ID（RBAC：<b>Viewer+</b>）；</li>
  *   <li>{@code GET /mcp-services/{id}/oauth/status} —— 查询授权状态；带
  *       {@code authorization_attempt} 时只认本次流程（RBAC：<b>Viewer+</b>）；</li>
  *   <li>{@code DELETE /mcp-services/{id}/oauth/token} —— 撤销当前用户的 token，返回 204

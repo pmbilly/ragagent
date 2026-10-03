@@ -18,7 +18,7 @@ import com.ragagent.storage.fileserve.WritableFileContentService;
 import com.ragagent.storage.service.ResourceCatalogService;
 
 /**
- * 存储写字节面（2026-09-24 批，对照 Go {@code file/local.go SaveBytes/DeleteFile} +
+ * 存储写字节面（SaveBytes/DeleteFile +
  * {@code resourceCatalogFileService.SaveBytes} + {@code resourceCatalog.Register/Bind}）。
  *
  * <p>写读回环：SaveBytes → 资源注册（resource:// 手柄）→ ResolvePath → 物理路径回读；
@@ -43,7 +43,7 @@ class StorageWriteFaceContractTest {
         byte[] data = "页面正文".getBytes(StandardCharsets.UTF_8);
         String ref = svc.saveBytes(data, TENANT, "web-abc.md", false);
 
-        // resource:// 手柄 + 22 字符 handle（对照 BuildResourcePath）
+        // resource:// 手柄 + 22 字符 handle（见 {@code StoragePaths.buildResourcePath}）
         assertThat(ref).startsWith("resource://");
         assertThat(ref.substring("resource://".length())).hasSize(22);
 

@@ -16,12 +16,12 @@ import com.ragagent.common.session.PipelineMessageAttachmentView;
 import com.ragagent.common.session.PipelineUsedMemoryView;
 
 /**
- * 实录回放：event_manager / builder / plugin_error / chat_manage 组
- * （期望值 = {@link GoRecording46C} 的 Go 实录常量）。
+ * 录制回放：event_manager / builder / plugin_error / chat_manage 组
+ * （期望值 = {@link GoRecording46C} 的录制常量）。
  */
 class PipelineCoreRecordingTest {
 
-    // ----- event_manager（对照 recEventManager） -----
+    // ----- event_manager -----
 
     @Test
     void eventManager() {
@@ -39,7 +39,7 @@ class PipelineCoreRecordingTest {
         mgr.register(p3);
 
         PluginError errNone = new EventManager().trigger(PipelineEventType.FILTER_TOP_K, new ChatManage());
-        // Go: fmt.Sprintf("%v", nil *PluginError) → "<nil>"
+        // 无错误时渲染为 "<nil>"（录制格式约定）
         assertRec("event_manager", "no_handler", errNone == null ? "<nil>" : json(errOf(errNone)));
 
         PluginError err = mgr.trigger(PipelineEventType.CHUNK_SEARCH, new ChatManage());

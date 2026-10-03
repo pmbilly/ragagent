@@ -25,23 +25,18 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.stereotype.Service;
 
 /**
- * /system 组读端点的计算逻辑（对照 Go internal/handler/system.go 的
- * GetSystemInfo / GetStorageEngineStatus 与 deployment_capabilities.go 的快照装配）。
+ * /system 组读端点的计算逻辑。
  *
- * <p><b>已知差异（部署状态语义，非降级）</b>：</p>
+ * <p><b>字段口径</b>：</p>
  * <ul>
- *   <li>version/commit_id/build_time：Go 用 ldflags 注入（缺注入的 dev 形态恒 "unknown"）；
- *       Java 改用 Spring Boot build-info.properties（构建期生成，dev 也有真实值），
- *       {@code weknora.system.*} 配置仍可覆盖（测试固定值走这条路径）。</li>
- *   <li>java_version（原 go_version）：字段随实现改名——Java 后端没有 Go 版本，
- *       此处输出 JVM 运行时版本（{@code System.getProperty("java.version")}）。
+ *   <li>version/commit_id/build_time：取 Spring Boot build-info.properties（构建期生成，
+ *       dev 也有真实值）；{@code weknora.system.*} 配置仍可覆盖（测试固定值走这条路径）。</li>
+ *   <li>java_version：输出 JVM 运行时版本（{@code System.getProperty("java.version")}）。
  *       前端 SystemInfo.vue 与 i18n 已同步。</li>
- *   <li>db_version：Go 读 golang-migrate 的缓存版本；Java 读同一 dev 库的
- *       flyway_schema_history（同一套迁移、同一条数据库）。H2 测试库无该表 → 空串省略。</li>
- *   <li>graph_database_engine：Go 看 neo4j driver 是否为 nil；Java 看 NEO4J_ENABLE env
- *       （同一判定源，未启用 → "Not Enabled"）。</li>
- *   <li>vector_store_engine：Go 先看 cfg.VectorDatabase.Driver（yaml）；Java 无该 cfg
- *       层，恒走 RETRIEVE_DRIVER env 路径（dev 两侧 yaml/env 都未配置 → "未配置"）。</li>
+ *   <li>db_version：读 flyway_schema_history（同一套迁移、同一条数据库）。
+ *       H2 测试库无该表 → 空串省略。</li>
+ *   <li>graph_database_engine：看 NEO4J_ENABLE env（未启用 → "Not Enabled"）。</li>
+ *   <li>vector_store_engine：恒走 RETRIEVE_DRIVER env 路径（未配置 → "未配置"）。</li>
  * </ul>
  */
 @Service
@@ -55,11 +50,11 @@ public class SystemInfoService {
     private final DataSource dataSource;
     /** 构建期生成的 META-INF/build-info.properties；缺失（如纯 IDE 运行）时回退 "unknown"。 */
     private final ObjectProvider<BuildProperties> buildProperties;
-    /** 图库仓储（D 批）：引擎名按**真实驱动**报告（对照 Go 的 neo4jDriver != nil 判定）。 */
+    /** 图库仓储：引擎名按**真实驱动**报告。 */
     private final com.ragagent.retrieval.graph.RetrieveGraphRepository graphRepository;
-    /** RETRIEVE_DRIVER（B6 批 3：属性绑定，取代裸 env 读；未配置 → 页面显示「未配置」）。 */
+    /** RETRIEVE_DRIVER（属性绑定，不读裸 env；未配置 → 页面显示「未配置」）。 */
     private final RetrievalDriverProperties driverProperties;
-    /** env 读取面（B6 批 4：存储 env 可用性探测等按名读取）。 */
+    /** env 读取面（存储 env 可用性探测等按名读取）。 */
     private final Environment environment;
 
     /** 覆盖项（配置/测试可固定值）；为空则取构建信息或运行时值。edition 无构建注入。 */
@@ -106,7 +101,7 @@ public class SystemInfoService {
         return orUnknown(firstNonEmpty(buildTimeOverride, fromBuild));
     }
 
-    /** 对照 Go 的 runtime.Version()（golden 的 go_version 形态）；Java 输出 JVM 版本。 */
+    /** 输出 JVM 运行时版本。 */
     public String getJavaVersion() {
         return orUnknown(firstNonEmpty(javaVersionOverride, System.getProperty("java.version")));
     }
@@ -139,7 +134,6 @@ public class SystemInfoService {
     }
 
     /**
-     * 对照 supportsRetrieverType + getKeywordIndexEngine / getVectorStoreEngine：
      * RETRIEVE_DRIVER 逗号拆分 → 按映射表过滤该能力 → ", " 连接；空 → "未配置"。
      */
     public String keywordIndexEngine() {
@@ -166,7 +160,7 @@ public class SystemInfoService {
     }
 
     /**
-     * 对照 retrieverEngineMapping（types/tenant.go L17-57）：
+     * 向量库能力表：
      * postgres/qdrant/milvus/weaviate/doris/sqlite/tencent_vectordb/opensearch 双能力，
      * elasticsearch_v7 仅 keywords、elasticsearch_v8 双能力。
      */
@@ -180,8 +174,7 @@ public class SystemInfoService {
     }
 
     /**
-     * 对照 {@code getGraphDatabaseEngine}（system.go L610-616）：Go 看
-     * {@code h.neo4jDriver == nil}；Java 同口径——看仓储的**真实驱动**是否已建
+     * 看仓储的**真实驱动**是否已建
      * （NEO4J_ENABLE=true 且连上才是 Neo4j；配了但没连上属于启动失败，不会走到这里）。
      */
     public String graphDatabaseEngine() {
@@ -192,7 +185,6 @@ public class SystemInfoService {
         return "Not Enabled";
     }
 
-    /** 对照 isMinioEnvAvailable。 */
     public boolean isMinioEnvAvailable() {
         return env("MINIO_ENDPOINT") && env("MINIO_ACCESS_KEY_ID") && env("MINIO_SECRET_ACCESS_KEY");
     }
@@ -203,7 +195,7 @@ public class SystemInfoService {
     }
 
     /**
-     * 对照 database.CachedMigrationVersion：同一 dev 库上 Java 侧迁移由 Flyway 执行，
+     * 读 flyway_schema_history：Java 侧迁移由 Flyway 执行，
      * 版本号同源。H2 测试库无 flyway_schema_history → 空串（键省略）。
      */
     public String dbVersion() {
@@ -221,21 +213,21 @@ public class SystemInfoService {
         return "";
     }
 
-    /** 对照 runtime.ServerStartedAt 的 RFC3339(UTC) 形态（/info 的 started_at）。 */
+    /** RFC3339(UTC) 形态（/info 的 started_at）。 */
     public String startedAt() {
         long start = java.lang.management.ManagementFactory.getRuntimeMXBean().getStartTime();
         return RFC3339_UTC.format(Instant.ofEpochMilli(start));
     }
 
-    /** 对照 runtime.ServerUptime().Seconds() 截断。 */
+    /** 进程运行秒数（截断取整）。 */
     public long uptimeSeconds() {
         long start = java.lang.management.ManagementFactory.getRuntimeMXBean().getStartTime();
         return Duration.between(Instant.ofEpochMilli(start), Instant.now()).toSeconds();
     }
 
     /**
-     * 对照 activeBackendProviders：status=active 的多实例后端 provider 集合
-     * （小写去空白；查询失败回落空集合走 legacy 检查，Go 同为 best-effort）。
+     * status=active 的多实例后端 provider 集合
+     * （小写去空白；查询失败回落空集合走 legacy 检查，同为 best-effort）。
      */
     public Map<String, Boolean> activeBackendProviders(long tenantId) {
         Map<String, Boolean> result = new LinkedHashMap<>();
@@ -251,7 +243,7 @@ public class SystemInfoService {
                 result.put(provider.toLowerCase().trim(), true);
             }
         } catch (RuntimeException e) {
-            // best-effort：查询失败回落 legacy 配置检查（Go 同样记 WARN + 空集合）
+            // best-effort：查询失败记 WARN 并回落 legacy 配置检查（空集合）
         }
         return result;
     }

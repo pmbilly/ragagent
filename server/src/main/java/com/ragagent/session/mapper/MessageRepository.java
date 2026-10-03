@@ -28,7 +28,7 @@ import com.ragagent.common.session.SessionMessagePort;
  *
  * <h2>落库隐式行为清单</h2>
  * <ol>
- *   <li><b>钩子 BeforeCreate</b>（Go L463-484）：无条件新 UUID + 六个 nil 切片置空。
+ *   <li><b>插入前</b>：无条件新 UUID + 六个 null 列表置空。
  *       → {@link #create} 里调 {@code normalizeListsForInsert()} 并覆盖 ID。</li>
  *   <li><b>⚠️ 实体式整行更新跳过零值</b>：只写非零字段——string "" / 数值 0 / bool false /
  *       指针 null / 集合 null 一律跳过。
@@ -36,7 +36,7 @@ import com.ragagent.common.session.SessionMessagePort;
  *       → {@link #update} 逐字段按同一规则判断后才 SET（见该方法注释）。</li>
  *   <li><b>软删除</b>：deleted_at 列。查询显式 {@code deleted_at IS NULL}，
  *       删除是 UPDATE。</li>
- *   <li><b>默认排序</b>：{@code created_at ASC/DESC} 各查询自带（Go L54/L68/L94/L121/L134）。</li>
+ *   <li><b>默认排序</b>：{@code created_at ASC/DESC} 各查询自带。</li>
  * </ol>
  *
  * <p><b>JOIN sessions 的三条检索查询</b>：{@code SearchMessagesByKeyword} 与

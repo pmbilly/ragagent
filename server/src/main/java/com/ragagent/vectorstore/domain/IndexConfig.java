@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
- * 对照 Go {@code types.IndexConfig}（internal/types/vectorstore.go L244-268）。
- * 全字段 omitempty；未知键容忍（jsonb 演进 + 其它引擎的键可能出现在历史行里——
- * Go 的注释明说「All omitempty so other engines' serialized IndexConfig is unchanged」）。
+ * 向量库索引配置。
+ * 空字段整键省略；未知键容忍（jsonb 演进 + 其它引擎的键可能出现在历史行里——
+ * 序列化形态不得因引擎不同而变化）。
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class IndexConfig {
@@ -28,7 +28,7 @@ public class IndexConfig {
     public int hnswEfSearch;
     public String knnEngine = "";
 
-    /** 对照 GetIndexNameOrDefault（服务层去重用；env 回退不在本层）。@JsonIgnore 同上 */
+    /** 引擎缺省索引名（服务层去重用；env 回退不在本层）。@JsonIgnore 同上 */
     @JsonIgnore
     public String getIndexNameOrDefault(String engineType) {
         return switch (engineType == null ? "" : engineType) {

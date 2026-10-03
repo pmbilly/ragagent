@@ -34,26 +34,24 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.web.servlet.HandlerMapping;
 
 /**
- * RBAC 拒绝审计落库的回补测试（约定 §9「阶段 1 已知差异」第 8 条）。
+ * RBAC 拒绝审计落库的回补测试。
  *
- * <p>Go 侧链路：{@code middleware/rbac.go} 拒绝分支 →
- * {@code AuditServiceFromContext(c)} → {@code svc.LogDenied(...)}。
- * Java 侧同一条链路：{@link RbacInterceptor} 拒绝分支 →
+ * <p>链路：{@link RbacInterceptor} 拒绝分支 →
  * {@link RbacInterceptor#setDeniedAuditor} 注册的钩子 →
  * {@link AuditLogService#logDenied} → {@link AuditLogRepository} 落库。</p>
  *
  * <p>断言四件事：</p>
  * <ol>
  *   <li>拒绝时<b>确实</b>调了 LogDenied，且 request_path 用<b>路由模板</b>
- *       （对照实测 Go 的 {@code /api/v1/tenants/:id/audit-log}）；</li>
+ *       （实测形态 {@code /api/v1/tenants/:id/audit-log}）；</li>
  *   <li>放行路径（角色达标 / EnableRBAC=false / API Key 主体短路）<b>不</b>落审计行；</li>
- *   <li>审计本身失败时 403 仍然照发（Go 的 {@code _ = svc.LogDenied(...)}）；</li>
- *   <li>未注册实现 bean 时退化为空操作（Go 的 {@code if svc := ...; svc != nil}）。</li>
+ *   <li>审计本身失败时 403 仍然照发（best-effort 写入）；</li>
+ *   <li>未注册实现 bean 时退化为空操作。</li>
  * </ol>
  */
 class RbacDeniedAuditTest {
 
-    /** 对照 Go TenantConfig 的开关构造（跨空间访问与自助创建本测试不用）。 */
+    /** 开关构造（跨空间访问与自助创建本测试不用）。 */
     private static TenantProperties props(Boolean enableRbac) {
         return new TenantProperties(enableRbac, false, null);
     }
@@ -159,7 +157,7 @@ class RbacDeniedAuditTest {
         verify(repo, never()).create(any(AuditLog.class));
     }
 
-    /** EnableRBAC=false 的滚动窗口：记日志放行，**不**落审计行（对照 Go 的分支顺序）。 */
+    /** EnableRBAC=false 的滚动窗口：记日志放行，**不**落审计行（分支顺序：先放行判定）。 */
     @Test
     void rbacDisabledLogsButDoesNotWriteAuditRow() throws Exception {
         AuditLogRepository repo = mock(AuditLogRepository.class);
@@ -193,7 +191,7 @@ class RbacDeniedAuditTest {
         verify(repo, never()).create(any(AuditLog.class));
     }
 
-    /** 审计落库失败**不能**把一次 403 变成 500（对照 Go 的 {@code _ = svc.LogDenied(...)}）。 */
+    /** 审计落库失败**不能**把一次 403 变成 500（best-effort 写入）。 */
     @Test
     void auditFailureDoesNotBreakTheRejection() throws Exception {
         AuditLogRepository repo = mock(AuditLogRepository.class);
@@ -216,7 +214,7 @@ class RbacDeniedAuditTest {
                 .isEqualTo("{\"error\":\"Forbidden: insufficient workspace role\"}");
     }
 
-    /** 未注册实现 bean 时退化为空操作（对照 Go 的 {@code if svc := ...; svc != nil}）。 */
+    /** 未注册实现 bean 时退化为空操作。 */
     @Test
     void missingAuditorDegradesToNoOp() throws Exception {
         RbacInterceptor.setDeniedAuditor(null);

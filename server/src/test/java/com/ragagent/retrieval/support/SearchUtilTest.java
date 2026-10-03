@@ -15,8 +15,8 @@ import com.ragagent.knowledge.support.SearchChunkMerge;
 import com.ragagent.retrieval.domain.ImageInfo;
 
 /**
- * searchutil 纯函数测试（Go 实录：chunkmerge_test.go / imageinfo_html_test.go /
- * normalize、textutil、conversion 的语义移植）。已有部分的回归随 knowledge 包套件。
+ * searchutil 纯函数测试（chunkmerge / imageinfo_html /
+ * normalize、textutil、conversion 的语义）。已有部分的回归随 knowledge 包套件。
  */
 class SearchUtilTest {
 
@@ -30,7 +30,7 @@ class SearchUtilTest {
         return c;
     }
 
-    // ── chunkmerge（对照 Go chunkmerge_test.go 全部用例）──────────────
+    // ── chunkmerge ──────────────────────────────────────────────────
 
     @Test
     void appendWithOverlapContiguousNoTrim() {
@@ -139,7 +139,7 @@ class SearchUtilTest {
         assertEquals("abcdef", SearchChunkMerge.mergeTextChunks(chunks, "\n"));
     }
 
-    // ── imageinfo（对照 Go imageinfo_html_test.go 语义）──────────────
+    // ── imageinfo ───────────────────────────────────────────────────
 
     private static String marshalOf(String url, String original, String caption, String ocr) {
         ImageInfo i = new ImageInfo();
@@ -165,7 +165,7 @@ class SearchUtilTest {
     @Test
     void enrichContentWithImageInfoAppendsMissingImages() {
         String content = "no images here";
-        // 无 caption/ocr 的图：BuildImageInfoXMLWithURL 内层为空 → 刻意不追加（照抄 Go）
+        // 无 caption/ocr 的图：buildImageInfoXmlWithUrl 内层为空 → 刻意不追加
         String noInfo = ImageInfoMatchUtil.marshalImageInfos(List.of(infoOf(
                 "local://2/b.png", "", "", "")));
         assertEquals("no images here",
@@ -241,7 +241,7 @@ class SearchUtilTest {
     void mergeImageInfoJsonDedupesByUrl() {
         String a = marshalOf("u1", "", "cap-a", "");
         String b = marshalOf("u1", "orig", "cap-b", "");
-        // Go 的 map 遍历无序；Java 用插入序保证确定性（先到先得的去重语义一致）
+        // 用插入序保证确定性（先到先得的去重语义一致）
         Map<String, String> perChunk = new java.util.LinkedHashMap<>();
         perChunk.put("c1", a);
         perChunk.put("c2", b);
@@ -266,7 +266,7 @@ class SearchUtilTest {
         assertEquals("", ImageInfoEnricher.clearImageInfoTextMatchingBody("", "x", "image_ocr"));
     }
 
-    // ── imageinfo_match（对照 Go imageinfo_match_test.go 语义）────────
+    // ── imageinfo_match ─────────────────────────────────────────────
 
     @Test
     void sliceContentByDocumentRange() {
@@ -320,7 +320,7 @@ class SearchUtilTest {
         assertFalse(got.contains("out"));
     }
 
-    // ── normalize（对照 Go normalize.go 语义）─────────────────────────
+    // ── normalize ───────────────────────────────────────────────────
 
     @Test
     void normalizeKeywordScoresTable() {
@@ -377,7 +377,7 @@ class SearchUtilTest {
         assertEquals(0.0, scores.get(0));
     }
 
-    // ── textutil（对照 Go textutil.go 语义）───────────────────────────
+    // ── textutil ────────────────────────────────────────────────────
 
     @Test
     void buildContentSignatureNormalizesCaseAndWhitespace() {
@@ -391,8 +391,8 @@ class SearchUtilTest {
     @Test
     void tokenizeSimpleFiltersSingleRunesAndPunctuation() {
         Set<String> tokens = SearchTextUtil.tokenizeSimple("Hello, world! Hello");
-        // "Hello," 归一后 "hello," 分词（whitespace 路径）：逗号尾随不剥离——对照 Go 的
-        // strings.Fields 行为（只按空白切）；单 rune/纯标点 token 被过滤
+        // "Hello," 归一后 "hello," 分词（whitespace 路径）：逗号尾随不剥离——
+        // 只按空白切分；单 rune/纯标点 token 被过滤
         assertTrue(tokens.contains("hello,"));
         assertTrue(tokens.contains("world!"));
         assertFalse(tokens.contains("x"));
@@ -429,7 +429,7 @@ class SearchUtilTest {
         tokens.forEach(t -> assertTrue(t.codePointCount(0, t.length()) > 1));
     }
 
-    // ── conversion（对照 Go conversion.go 语义）───────────────────────
+    // ── conversion ──────────────────────────────────────────────────
 
     @Test
     void convertWebSearchResultsDefaultsAndSeqOverride() {

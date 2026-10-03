@@ -14,7 +14,7 @@ import com.ragagent.rerank.Reranker;
 import com.ragagent.rerank.RerankerConfig;
 
 /**
- * NVIDIA rerank 客户端（对照 Go {@code rerank/nvidia_reranker.go} 全文）。
+ * NVIDIA rerank 客户端。
  *
  * <p>请求体形如 {@code {"model":...,"query":{"text":...},"passages":[{"text":...}]}}
  * （字段名是 query/passages，非 OpenAI 形）；响应是 {@code rankings[].logit}，
@@ -82,7 +82,7 @@ public final class NvidiaReranker implements Reranker {
     }
 
     /**
-     * 对照 normalizeNvidiaLogit：把原始 logit 转成概率（按符号分两个分支防溢出）。
+     * 把原始 logit 转成概率（按符号分两个分支防溢出）。
      */
     static double normalizeNvidiaLogit(double logit) {
         if (logit >= 0) {

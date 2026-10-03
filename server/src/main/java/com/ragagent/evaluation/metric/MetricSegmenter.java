@@ -4,14 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 中文分词接缝（对照 Go {@code types.Jieba.Cut(block, true)}，internal/types/evaluation.go:8-26
- * 的全局 jieba 实例，默认模式 + HMM）。
+ * 中文分词接缝（jieba 默认模式 + HMM 的语义位）。
  *
- * <p>Go 的 gojieba 绑定 C++ 词典分词；Java 侧无真实 jieba（同 searchutil.SearchTextUtil
- * 的既有降级），故默认实现为<b>二字滑窗近似</b>——与 Go 的分词边界会分叉：
- * 受影响的只有 BLEU/ROUGE（生成类指标），<b>已知降级（备案）</b>；检索类指标
- * （Precision/Recall/NDCG/MRR/MAP）不经过分词，恒与 Go 逐值一致。
- * 单测/联调可经 {@link #setSegmenter} 注入真实分词器恢复。</p>
+ * <p>本仓无真实 jieba（同 searchutil.SearchTextUtil 的既有降级），默认实现为
+ * <b>二字滑窗近似</b>——与词典分词的边界会分叉：受影响的只有 BLEU/ROUGE（生成类指标），
+ * <b>已知降级（备案）</b>；检索类指标（Precision/Recall/NDCG/MRR/MAP）不经过分词，
+ * 不受影响。单测/联调可经 {@link #setSegmenter} 注入真实分词器恢复。</p>
  *
  * <p>纪律同 chatpipeline.QueryTokenizer：不在 searchutil 上加出口，在本包立同款接缝。</p>
  */
@@ -20,7 +18,7 @@ public final class MetricSegmenter {
     private MetricSegmenter() {
     }
 
-    /** 分词接口：对照 Jieba.Cut(text, true)。 */
+    /** 分词接口（词典切词语义位；默认实现为二字滑窗近似）。 */
     public interface Segmenter {
         List<String> cut(String text);
     }

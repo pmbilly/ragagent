@@ -36,10 +36,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * 对照 Go internal/application/service/mcp_service_test.go。
+ * MCP 服务管理的服务层契约（真 H2）。
  *
- * <p>Go 用内存 fake 仓储断言"仓储里存了什么"；Java 用真 H2 断言"落库后读回来是什么"，
- * 顺带把 MyBatis 侧的部分列更新语义也钉住（这正是最容易翻错的地方）。</p>
+ * <p>断言"落库后读回来是什么"，
+ * 顺带把 MyBatis 侧的部分列更新语义也钉住（这正是最容易出错的地方）。</p>
  */
 @SpringBootTest
 class McpServiceServiceTest {
@@ -62,7 +62,7 @@ class McpServiceServiceTest {
     void setUp() {
         TestSchema.createTables(jdbc);
         TestSchema.resetData(jdbc);
-        // 出站 URL 校验对测试域名放行（对照 Go 测试的 utils.SetSSRFWhitelistFromRaw("127.0.0.1")）
+        // 出站 URL 校验对测试域名放行
         ssrfGuard.reloadWhitelist("example.com,127.0.0.1");
         clientManager = mock(McpClientManager.class);
         svc = new McpServiceService(mcpServiceMapper, oauthRepo, metadataService, ssrfGuard,
@@ -198,7 +198,7 @@ class McpServiceServiceTest {
         McpService u = new McpService();
         u.setId(id);
         u.setTenantId(1L);
-        u.setAuthConfig(new McpAuthConfig()); // CustomHeaders 为 nil → 保持
+        u.setAuthConfig(new McpAuthConfig()); // CustomHeaders 为 null → 保持
         svc.updateMCPService(u, null);
 
         assertEquals("acme", stored(id).getAuthConfig().getCustomHeaders().get("X-Tenant"),
@@ -308,7 +308,7 @@ class McpServiceServiceTest {
     @Test
     void updateCredentialsRejectsBuiltin() {
         String id = seed("stored-api", "");
-        // is_builtin 不在 Update 的列集里（Go 亦然），只能直接改库
+        // is_builtin 不在 Update 的列集里，只能直接改库
         markBuiltin(id);
 
         BizException e = assertThrows(BizException.class,

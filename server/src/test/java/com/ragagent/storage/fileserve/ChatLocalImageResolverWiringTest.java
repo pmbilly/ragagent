@@ -38,12 +38,12 @@ import org.mockito.MockedStatic;
  * （真实 {@link ResourceCatalogService} / {@link StorageFileResolver} /
  * {@link LocalFileContentService} 链 + 临时目录落盘）。
  *
- * <p>对照 Go container.go registerChatLocalImageResolver（L489-536）的闭包各分支。
+ * <p>覆盖解析闭包的各分支。
  * 环境变量说明：测试 JVM 无法设置 {@code LOCAL_STORAGE_BASE_DIR}
  * （JDK 21 模块系统挡掉 ProcessEnvironment 反射；Mockito 显式拒绝 mock
  * {@code java.lang.System}），集成式断言改用 {@code mockStatic(StoragePaths)} 把
  * {@code localStorageBaseDir()}（env 读数的唯一收口，含工厂缺省路径）钉到临时目录
- * ——try-with-resources 退出即还原，语义等同 Go 测试的 {@code t.Setenv}。</p>
+ * ——try-with-resources 退出即还原。</p>
  */
 class ChatLocalImageResolverWiringTest {
 
@@ -106,7 +106,7 @@ class ChatLocalImageResolverWiringTest {
         verifyNoInteractions(tenantService, storageResolver);
     }
 
-    /** 租户查不到（Go: err/nil）→ null，不再解析后端。 */
+    /** 租户查不到 → null，不再解析后端。 */
     @Test
     void tenantMissingReturnsNull() {
         String url = "resource://" + HANDLE;
@@ -133,7 +133,7 @@ class ChatLocalImageResolverWiringTest {
         verifyNoInteractions(tenantService, storageResolver);
     }
 
-    /** 后端解析失败（Go: ResolveFileService err）→ null。 */
+    /** 后端解析失败 → null。 */
     @Test
     void resolveFileServiceErrorReturnsNull() {
         String url = "resource://" + HANDLE;
@@ -152,7 +152,7 @@ class ChatLocalImageResolverWiringTest {
         assertThat(wiring.resolve(url)).isNull();
     }
 
-    /** 成功读字节（seekable 文件支路 = Go 的 io.ReadAll(*os.File)）；provider 从路径前缀解析为 local。 */
+    /** 成功读字节（seekable 文件支路）；provider 从路径前缀解析为 local。 */
     @Test
     void readsBytesFromSeekableFile(@TempDir Path tmp) throws IOException {
         Path img = tmp.resolve("img.png");

@@ -16,9 +16,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * 能力模型 / 作用域判定 / 请求上下文语义的单测——逐条对照 Go
- * internal/types/tenant_api_key_test.go、tenant_api_key_scope_test.go
- * 与 types/tenant_api_key.go 里的判定函数。
+ * 能力模型 / 作用域判定 / 请求上下文语义的单测。
  *
  * <p>这一组是本模块**权限语义**的守门人：能力枚举、KB 白名单三态、
  * full-access 与能力的关系，任何一条改动都应当先在这里变红。</p>
@@ -30,11 +28,11 @@ class TenantAPIKeyDomainTest {
         APIKeyScopeContext.clear();
     }
 
-    // ── TenantAPIKeyScope.Normalize（对照 tenant_api_key_test.go L5-32） ──
+    // ── TenantAPIKeyScope.Normalize ──
 
     @Test
     void normalizePreservesFullAccess() {
-        // 归一化不能把 full access 弄丢（Go: TestTenantAPIKeyScopeNormalizePreservesFullAccess）
+        // 归一化不能把 full access 弄丢
         TenantAPIKeyScope scope = new TenantAPIKeyScope(0L, null, true, null, null).normalize();
         assertThat(scope.fullAccess()).isTrue();
     }
@@ -55,7 +53,7 @@ class TenantAPIKeyDomainTest {
         assertThat(scope.capabilities()).containsExactly("chat", "retrieve");
     }
 
-    // ── HasCapability（对照 tenant_api_key_scope_test.go L61-73） ──
+    // ── HasCapability ──
 
     @Test
     void hasCapability() {
@@ -67,7 +65,7 @@ class TenantAPIKeyDomainTest {
         assertThat(s.hasCapability(null)).isFalse();
     }
 
-    // ── NormalizeAPIKeyCapabilities（对照 tenant_api_key_test.go L75-97） ──
+    // ── NormalizeAPIKeyCapabilities ──
 
     @Test
     void normalizeAllCapabilities() {
@@ -81,7 +79,7 @@ class TenantAPIKeyDomainTest {
 
     @Test
     void normalizeAllCapabilitiesNeverReturnsNull() {
-        // Go 的 make(StringArray, 0, ...) 保证空输入产出 []，绝不产出 nil。
+        // 空输入产出空列表，绝不产出 null。
         // 这个差别有外部契约后果：响应里的 capabilities 永远不是 null。
         assertThat(APIKeyCapability.normalizeAll(null)).isNotNull().isEmpty();
         assertThat(APIKeyCapability.normalizeAll(List.of("nope"))).isNotNull().isEmpty();
@@ -94,7 +92,7 @@ class TenantAPIKeyDomainTest {
         assertThat(APIKeyCapability.normalize(null)).isNull();
     }
 
-    // ── APIKeyScopeType（对照 types/tenant_api_key.go L47-54） ──
+    // ── APIKeyScopeType ──
 
     @Test
     void normalizeScopeType() {
@@ -106,7 +104,7 @@ class TenantAPIKeyDomainTest {
         assertThat(APIKeyScopeType.normalize(null)).isEqualTo("tenant");
     }
 
-    // ── KB 白名单判定（对照 types/tenant_api_key.go L320-355） ──
+    // ── KB 白名单判定 ──
 
     @Test
     void allowsKnowledgeBaseSemantics() {
@@ -132,7 +130,7 @@ class TenantAPIKeyDomainTest {
         assertThat(unrestricted.allowsKnowledgeBases(List.of())).isTrue();
     }
 
-    // ── 下游守卫（对照 tenant_api_key_scope_test.go L8-59） ──
+    // ── 下游守卫 ──
 
     @Test
     void authorizeKnowledgeTargetsRejectsKnowledgeIds() {
@@ -228,7 +226,7 @@ class TenantAPIKeyDomainTest {
         key.setKnowledgeBaseIds(List.of("kb-1"));
         key.setCapabilities(List.of("retrieve"));
 
-        // 契约实体：isPlatform()/tenantIdValue() 在 Go 里是**方法**，key_hash 的 tag 是 "-"
+        // 契约实体：isPlatform()/tenantIdValue() 是派生方法，key_hash 不出站
         String json = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(key);
         assertThat(json).doesNotContain("\"platform\"");
         assertThat(json).doesNotContain("\"tenantIdValue\"");
@@ -269,7 +267,7 @@ class TenantAPIKeyDomainTest {
 
     @Test
     void stringArrayHandlerPreservesNullEmptyAndValues() {
-        // null → 字面量 "null"（Go 的 json.Marshal(nil StringArray)）；
+        // null → 字面量 "null"（存储形态）；
         // 不是 SQL NULL —— 列是 NOT NULL，且响应里这一列会输出 null
         assertThat(APIKeyStringListTypeHandler.encode(null)).isEqualTo("null");
         assertThat(APIKeyStringListTypeHandler.encode(List.of())).isEqualTo("[]");

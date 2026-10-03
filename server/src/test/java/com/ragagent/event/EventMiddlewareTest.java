@@ -11,13 +11,13 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 /**
- * 中间件行为断言（对照 Go middleware.go；执行序与文案有 /tmp Go 实录钉住）。
+ * 中间件行为断言（执行序与文案由固定录制钉住）。
  */
 class EventMiddlewareTest {
 
     @Test
     void chainAppliesFirstListedAsOutermost() throws Exception {
-        // Go 实录：chainOrder => [first-in second-in core second-out first-out]
+        // 录制期望：chainOrder => [first-in second-in core second-out first-out]
         List<String> order = new ArrayList<>();
         EventMiddleware first = next -> event -> {
             order.add("first-in");
@@ -43,7 +43,7 @@ class EventMiddlewareTest {
 
     @Test
     void withRecoveryConvertsPanicToPanicError() {
-        // Go 实录：panicError => "panic in event handler: recovered-panic"
+        // 录制期望：panicError => "panic in event handler: recovered-panic"
         EventHandler h = EventMiddleware.withRecovery().apply(event -> {
             throw new IllegalStateException("recovered-panic");
         });
@@ -62,7 +62,7 @@ class EventMiddlewareTest {
 
     @Test
     void withTimingWritesDurationIntoSharedMetadata() throws Exception {
-        // Go 实录：timingSharedMetadata => callerSees=5——metadata map 跨值拷贝共享
+        // 录制期望：timingSharedMetadata => callerSees=5——metadata map 跨值拷贝共享
         EventHandler h = EventMiddleware.withTiming().apply(event -> {
         });
         Event event = new Event("", "evt", "", null, new java.util.LinkedHashMap<>(), "");
@@ -74,7 +74,7 @@ class EventMiddlewareTest {
 
     @Test
     void withTimingCreatesMetadataWhenAbsent() throws Exception {
-        // Go：event.Metadata == nil 时先 make 再写入
+        // metadata 为 null 时先初始化再写入
         EventHandler h = EventMiddleware.withTiming().apply(event -> {
         });
         Event event = new Event("", "evt", "", null, null, "");
@@ -94,7 +94,7 @@ class EventMiddlewareTest {
 
     @Test
     void withLoggingPassesResultThrough() throws Exception {
-        // Go 的 WithLogging 返回原 error / 原成功——Java 侧异常透传（日志内容不作为契约断言）
+        // withLogging 返回原异常 / 原成功——异常透传（日志内容不作为契约断言）
         List<String> calls = new ArrayList<>();
         EventHandler ok = EventMiddleware.withLogging().apply(event -> calls.add("ok"));
         ok.handle(new Event("", "evt", "s-1", null, null, "r-1"));
@@ -110,7 +110,7 @@ class EventMiddlewareTest {
 
     @Test
     void chainEqualsApplyMiddleware() throws Exception {
-        // Go：ApplyMiddleware(handler, mws...) = Chain(mws...)(handler)
+        // ApplyMiddleware(handler, mws...) 等价于 Chain(mws...)(handler)
         List<String> order = new ArrayList<>();
         EventMiddleware mw = next -> event -> {
             order.add("mw");
@@ -124,7 +124,7 @@ class EventMiddlewareTest {
 
     @Test
     void recoveryErrorInsideEmitIsWrappedLikeGo() {
-        // Go 组合：WithRecovery 返回的 PanicError 经 Emit 包装 =>
+        // 组合语义：WithRecovery 返回的 PanicError 经 Emit 包装 =>
         // "event handler failed for evt: panic in event handler: kaboom"
         EventBus bus = new EventBus();
         bus.on("evt", EventMiddleware.withRecovery().apply(event -> {

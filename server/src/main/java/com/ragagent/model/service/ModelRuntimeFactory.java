@@ -25,23 +25,20 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
 /**
- * 模型运行时工厂（对照 Go {@code internal/application/service/model.go} 的
- * {@code GetChatModel}/{@code GetEmbeddingModel}/{@code GetRerankModel}/
- * {@code GetVLMModel}/{@code GetASRModel}——阶段 7 的归口批次由 models/{id}/debug
- * 端点落地）。
+ * 模型运行时工厂（chat / embedding / rerank / vlm / asr 五类运行时客户端的装配归口，
+ * 服务于 models/{id}/debug 端点与 agent 引擎装配）。
  *
- * <p>与 Go 一致的两类取数口径（差别是契约，别统一）：</p>
+ * <p>两类取数口径（差别是契约，别统一）：</p>
  * <ul>
- *   <li><b>embedding / rerank</b> 走 {@code GetModelByID}（带状态闸门：
+ *   <li><b>embedding / rerank</b> 走 {@code getModelGated}（带状态闸门：
  *       downloading → "model is currently downloading" 等）；</li>
- *   <li><b>chat / vlm / asr</b> 走 {@code repo.GetByID} 直取（无状态闸门）。</li>
+ *   <li><b>chat / vlm / asr</b> 走 {@code getModelDirect} 直取（无状态闸门）。</li>
  * </ul>
  *
- * <p>错误形态：Go 这些工厂返回 {@code error}，调用方（DebugModel）把
- * {@code err.Error()} 写进 {@code data.error}（HTTP 200）。因此本类抛出的
- * {@link RuntimeException} 的 {@code getMessage()} 逐字对照 Go 错误文案；
- * 底层部件抛 {@link BizException} 时在此拆包取其 message（BizException 的
- * getMessage 带 "error code: ..." 前缀，不能直接当 Go 文案用）。</p>
+ * <p>错误形态：调用方（DebugModel）把异常消息写进 {@code data.error}（HTTP 200）。
+ * 因此本类抛出的 {@link RuntimeException} 的 {@code getMessage()} 即对外文案
+ * （错误文案是契约）；底层部件抛 {@link BizException} 时在此拆包取其 message
+ * （BizException 的 getMessage 带 "error code: ..." 前缀，不能直接当对外文案用）。</p>
  */
 @Component
 public class ModelRuntimeFactory {
@@ -66,14 +63,13 @@ public class ModelRuntimeFactory {
         this.ssrfGuard = ssrfGuard;
     }
 
-    /** 对照 GetChatModel：repo 直取（无状态闸门）→ chat.NewChat。 */
+    /** repo 直取（无状态闸门）→ chat 客户端装配。 */
     public LlmChatClient getChatModel(String modelId) {
         Model model = getModelDirect(modelId);
         log.info("Getting chat model: {}, source: {}", model.getName(), model.getSource());
         String[] creds = resolveWeKnoraCloudCredentials(model.getParameters());
         try {
-            // C 批：langfuse generation 装饰（对照 Go NewChat 末段的 wrapChatLangfuse；
-            // 管理器未启用时原样返回，零成本）
+            // langfuse generation 装饰（未启用时原样返回，零成本）
             return com.ragagent.tracing.langfuse.LangfuseChatClient.wrap(
                     LlmChatClients.create(ModelRuntimeConfigs.chatConfig(model, creds[0], creds[1]),
                             ollamaService.getIfAvailable(), concurrencyGovernor));
@@ -82,14 +78,14 @@ public class ModelRuntimeFactory {
         }
     }
 
-    /** 对照 GetEmbeddingModel：GetModelByID（状态闸门）→ embedding.NewEmbedder。 */
+    /** GetModelByID（状态闸门）→ embedder 工厂装配。 */
     public Embedder getEmbeddingModel(String modelId) {
         Model model = getModelGated(modelId);
         log.info("Getting embedding model: {}, source: {}", model.getName(), model.getSource());
         String[] creds = resolveWeKnoraCloudCredentials(model.getParameters());
         try {
-            // Go 的 pooler 只服务 BatchEmbedWithPool；debug 只走单文本 Embed，传 null
-            // C 批：langfuse generation 装饰（对照 Go NewEmbedder 末段的 wrapEmbedderLangfuse）
+            // pooler 只服务批量向量化；debug 只走单文本 embed，传 null
+            // langfuse generation 装饰
             return com.ragagent.tracing.langfuse.LangfuseEmbedder.wrap(
                     EmbedderFactory.newEmbedder(
                             ModelRuntimeConfigs.embedderConfig(model, creds[0], creds[1]),
@@ -99,13 +95,13 @@ public class ModelRuntimeFactory {
         }
     }
 
-    /** 对照 GetRerankModel：GetModelByID（状态闸门）→ rerank.NewReranker。 */
+    /** GetModelByID（状态闸门）→ reranker 工厂装配。 */
     public Reranker getRerankModel(String modelId) {
         Model model = getModelGated(modelId);
         log.info("Getting rerank model: {}, source: {}", model.getName(), model.getSource());
         String[] creds = resolveWeKnoraCloudCredentials(model.getParameters());
         try {
-            // C 批：langfuse generation 装饰（对照 Go NewReranker 末段的 wrapRerankerLangfuse）
+            // langfuse generation 装饰
             return com.ragagent.tracing.langfuse.LangfuseReranker.wrap(
                     RerankerFactory.newReranker(
                             ModelRuntimeConfigs.rerankerConfig(model, creds[0], creds[1])));
@@ -114,7 +110,7 @@ public class ModelRuntimeFactory {
         }
     }
 
-    /** 对照 GetVLMModel：repo 直取（无状态闸门）。调用方再 configFromModel + predict。 */
+    /** repo 直取（无状态闸门）。调用方再 configFromModel + predict。 */
     public Model getVlmModel(String modelId) {
         Model model = getModelDirect(modelId);
         log.info("Getting VLM model: {}, source: {}", model.getName(), model.getSource());
@@ -122,14 +118,12 @@ public class ModelRuntimeFactory {
     }
 
     /**
-     * 对照 GetVLMModel（model.go）的凭证解析 + {@code vlm.NewVLM} 构造期校验段
-     * （模型由 {@link #getVlmModel} 取到，二者合起来是 Go 的一次 GetVLMModel）：
-     * {@code resolveWeKnoraCloudCredentials} → weknoracloud 凭证检查（先于基址，
-     * 照 NewWeKnoraCloudVLM 的顺序）→ 非 ollama 的基址 SSRF 校验
-     * （validateVLMBaseURL；ollama 不校验基址）。
+     * VLM 客户端配置：凭证解析 + 构造期校验
+     * {@code resolveWeKnoraCloudCredentials} → weknoracloud 凭证检查（先于基址）
+     * → 非 ollama 的基址 SSRF 校验（validateVLMBaseURL；ollama 不校验基址）。
      *
-     * <p>失败抛 {@link RuntimeException}，message 逐字对照 Go 错误文案——调用方
-     * （模型调试端点、agent 引擎装配）按 Go 的 err 分支处理。</p>
+     * <p>失败抛 {@link RuntimeException}，message 即对外错误文案——调用方
+     * （模型调试端点、agent 引擎装配）直接写进 {@code data.error}。</p>
      */
     public VlmClient.VlmConfig vlmConfigFor(Model model) {
         String[] creds = resolveWeKnoraCloudCredentials(model.getParameters());
@@ -148,7 +142,7 @@ public class ModelRuntimeFactory {
         return config;
     }
 
-    /** 对照 GetASRModel：repo 直取（无状态闸门）。调用方再组 AsrConfig + transcribe。 */
+    /** repo 直取（无状态闸门）。调用方再组 AsrConfig + transcribe。 */
     public Model getAsrModel(String modelId) {
         Model model = getModelDirect(modelId);
         log.info("Getting ASR model: {}, source: {}", model.getName(), model.getSource());
@@ -156,7 +150,7 @@ public class ModelRuntimeFactory {
     }
 
     /**
-     * 对照 vlm.NewVLM 的构造期校验（validateVLMBaseURL）：SSRF 失败文案
+     * 构造期校验（validateVLMBaseURL）：SSRF 失败文案
      * "base URL SSRF check failed: ..."。
      */
     public void validateVlmBaseUrl(String baseUrl) {
@@ -172,7 +166,7 @@ public class ModelRuntimeFactory {
 
     // ── 取数口径 ─────────────────────────────────────────────────────────
 
-    /** 对照 repo.GetByID（tenant 可见性含 is_builtin；无状态闸门）。 */
+    /** 按 ID 直取（tenant 可见性含 is_builtin；无状态闸门）。 */
     private Model getModelDirect(String modelId) {
         if (modelId == null || modelId.isEmpty()) {
             throw new RuntimeException("model ID cannot be empty");
@@ -185,7 +179,7 @@ public class ModelRuntimeFactory {
         return model;
     }
 
-    /** 对照 GetModelByID（状态闸门），错误文案拆包成 Go 原文。 */
+    /** 带状态闸门取模型，错误文案拆包为对外原文。 */
     private Model getModelGated(String modelId) {
         if (modelId == null || modelId.isEmpty()) {
             throw new RuntimeException("model ID cannot be empty");
@@ -199,7 +193,7 @@ public class ModelRuntimeFactory {
         }
     }
 
-    // ── WeKnoraCloud 凭证（对照 resolveWeKnoraCloudCredentials + decryptAppSecret） ──
+    // ── WeKnoraCloud 凭证 ─────────────────────────────────────────────────
 
     private String[] resolveWeKnoraCloudCredentials(ModelParameters params) {
         String appId = params == null || params.getAppId() == null ? "" : params.getAppId();
@@ -228,7 +222,7 @@ public class ModelRuntimeFactory {
         return new String[] {appId, appSecret};
     }
 
-    /** 对照 decryptAppSecret：空原样返回；宽容解密（失败原样返回）。 */
+    /** 空原样返回；宽容解密（失败原样返回）。 */
     private String decryptAppSecret(String encrypted) {
         if (encrypted == null || encrypted.isEmpty()) {
             return encrypted;

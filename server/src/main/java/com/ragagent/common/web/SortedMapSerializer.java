@@ -14,12 +14,11 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
 /**
- * 让 {@code Map} 的输出键序与 Go 的 {@code encoding/json} 一致：<b>按键排序，且递归到嵌套的 map 与数组</b>。
+ * 让 {@code Map} 的输出键序确定且稳定：<b>按键排序，且递归到嵌套的 map 与数组</b>。
  *
  * <h2>为什么需要它</h2>
- * <p>目标格式（{@code json.Marshal}）对 {@code map} 恒按 key 排序（{@code struct} 才按声明序）。
+ * <p>序列化输出要求键序确定：map 恒按 key 排序。
  * 「手工按字母序 {@code put}」对<b>一层</b>的 map 有效，对<b>从外部解析出来的嵌套 map</b> 无效：
- * 对<b>一层</b>的 map 有效，对<b>从外部解析出来的嵌套 map</b> 无效：
  * 例如 {@code tool_call.data.arguments} 是模型返回的 JSON 参数，其键序由模型决定，
  * 代码里再怎么排外层也管不到它。</p>
  *
@@ -27,9 +26,9 @@ import com.fasterxml.jackson.databind.SerializerProvider;
  * 因此也让上层的「手工排序」退化成无害的防御性写法。</p>
  *
  * <h2>键序：按 UTF-8 字节，不是 Java 的 {@code String.compareTo}</h2>
- * <p>目标格式的字符串比较是<b>逐字节</b>（UTF-8）。Java 的 {@code String.compareTo} 比的是
+ * <p>键序比较按<b>逐字节</b>（UTF-8）进行。Java 的 {@code String.compareTo} 比的是
  * UTF-16 code unit，两者只在「BMP 的 U+E000–U+FFFF」与「增补平面（U+10000 起）」
- * 混排时不同。JSON 键基本都是 ASCII，但既然要做到逐字节一致，就用
+ * 混排时不同。JSON 键基本都是 ASCII，但为了键序跨语言稳定，用
  * {@link #GO_KEY_ORDER} 直接比 UTF-8 字节——ASCII 下与自然序完全相同。</p>
  *
  * <h2>使用方式与边界</h2>
@@ -65,7 +64,7 @@ public class SortedMapSerializer extends JsonSerializer<Map<String, Object>> {
      *
      * <p>踩坑：{@code JsonSerializer.isEmpty} 的默认实现<b>只看 {@code value == null}</b>——
      * 一旦字段挂上自定义序列化器，Jackson 就不再调用 {@code MapSerializer.isEmpty} 去判"空容器"，
-     * 于是 {@code omitempty}（len==0 省略）语义会退化成"空 map 也输出 {@code {}}"。
+     * 于是「空则省略」语义会退化成"空 map 也输出 {@code {}}"。
      * 由 {@code StreamResponseBuilderTest.omitsEmptyDataMap} 钉住。</p>
      */
     @Override

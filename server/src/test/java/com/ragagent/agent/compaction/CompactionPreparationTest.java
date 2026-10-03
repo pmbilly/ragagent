@@ -14,7 +14,7 @@ import com.ragagent.llm.domain.ChatMessage;
 /**
  * 准备/重建的录制常量断言。
  * 覆盖：split-turn 准备、边界切分准备、先前摘要的识别（摘要不进自身后继的输入）、
- * 无事可压返回 null、nil estimator、Apply 重建、SummaryMessage 信封、unwrap 边界。
+ * 无事可压返回 null、缺 estimator、Apply 重建、SummaryMessage 信封、unwrap 边界。
  */
 class CompactionPreparationTest {
 

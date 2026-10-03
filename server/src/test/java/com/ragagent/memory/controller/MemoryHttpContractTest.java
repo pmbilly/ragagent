@@ -38,13 +38,11 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.web.servlet.HandlerMapping;
 
 /**
- * 长期记忆 HTTP 层的契约测试（对照 Go {@code internal/handler/memory.go} 的 16 个端点，
- * 路由见 {@code internal/router/routes_memory.go}）。
+ * 长期记忆 HTTP 层的契约测试（16 个端点）。
  *
  * <h2>期望值来源</h2>
- * <p>错误面（{@code memory-not-found.json} 等）仍是 2026-09-18 对<b>运行中的 Go dev
- * server</b>（:8080，db=localhost:15432）打真实请求、{@code curl -o} 落盘录下来的实录；
- * 成功面在 <b>2026-10-01 契约换锚</b>（§14.9k M1）后重录：信封退役、键名 camelCase、
+ * <p>golden 均为对运行中的服务打真实请求后落盘录制：错误面（{@code memory-not-found.json} 等）
+ * 录于契约换锚前；成功面在 <b>2026-10-01 契约换锚</b>后重录——信封退役、键名 camelCase、
  * 列表改 {@code {items,page,pageSize,total}}、创建 201 / 删除类 204。文件都在
  * {@code server/src/test/resources/contracts/memory-*.json}。</p>
  *
@@ -61,20 +59,18 @@ import org.springframework.web.servlet.HandlerMapping;
  * </pre>
  *
  * <h2>掩码</h2>
- * <p>UUID、时间戳两侧同掩码后逐字节比对（中文按原始字节，
- * 见 §9「中文 golden 比较必须按原始字节」）。</p>
+ * <p>UUID、时间戳两侧同掩码后逐字节比对（中文按原始字节）。</p>
  *
  * <h2>换锚后仍要盯住的形态</h2>
  * <ol>
  *   <li>{@code GET /memory/items} 空仓库是 {@code "items":[]}，
  *       而 {@code GET /memory/export} 空仓库是 {@code "items":null}——
- *       同一个 service 方法，两条响应路径的 nil 语义不同（GORM {@code Find} 会把
- *       nil slice 初始化成空切片，Export 的 {@code var items} 不会）；换锚保留了它。</li>
+ *       同一个 service 方法，两条响应路径的空值语义不同（列表查询输出空数组、
+ *       导出保持 null）；换锚保留了它。</li>
  *   <li>清空（{@code DELETE /memory/items}）是同步删除 → <b>204</b>，
- *       旧 Go 的 {@code {"removed":N}} 计数不再下发。</li>
+ *       {@code {"removed":N}} 计数不再下发。</li>
  *   <li>{@code Export} 的 Content-Type 仍是 {@code application/json; charset=utf-8}
- *       （Go 是 {@code c.Header("Content-Disposition", …)} + {@code c.JSON}，
- *       不是 {@code application/octet-stream}）。</li>
+ *       （附 Content-Disposition 头），不是 {@code application/octet-stream}。</li>
  * </ol>
  */
 @SpringBootTest
@@ -87,7 +83,7 @@ class MemoryHttpContractTest {
     private static final long TENANT = 10002L;
     private static final String USER_ID = "11111111-2222-3333-4444-555555555501";
     private static final String USER_EMAIL = "memory-contract@weknora.test";
-    /** Go 的 {@code Principal.StorageID()}：web 主体是 {@code web_user:<user_id>}。 */
+    /** 主体 ID 约定：web 主体是 {@code web_user:<user_id>}。 */
     private static final String SUBJECT_ID = "web_user:" + USER_ID;
 
     private static final String UNKNOWN_ID = "11111111-2222-3333-4444-999999999999";
@@ -129,7 +125,7 @@ class MemoryHttpContractTest {
         tenant.setId(TENANT);
         tenant.setName("memory-contract-tenant");
         tenant.setStatus("active");
-        // golden 是记忆**开着**的租户录的（Go 的 tenants.memory_config）
+        // golden 是记忆**开着**的租户录的（tenants.memory_config）
         tenant.setMemoryConfig(
                 new com.fasterxml.jackson.databind.ObjectMapper().createObjectNode()
                         .put("enabled", true));
@@ -175,8 +171,8 @@ class MemoryHttpContractTest {
     /**
      * 非法 JSON → 400「请求参数不合法 / 请求体格式不正确」。
      *
-     * <p>M3 起走标准请求绑定（不再是手写的 {@code rawBody} 解析）：details 由全局处理器
-     * 给中文文案，不再逐字节复刻 Go 的 {@code encoding/json} 消息。</p>
+     * <p>走标准请求绑定（不再是手写的 {@code rawBody} 解析）：details 由全局处理器
+     * 给中文文案，不沿用上游解析器的逐字节错误消息。</p>
      */
     @Test
     void settingsInvalidJsonIsBadRequest() throws Exception {
@@ -187,7 +183,7 @@ class MemoryHttpContractTest {
         assertEquals(golden("memory-body-malformed.json"), raw(r));
     }
 
-    /** 空体与字面量 {@code null} 落同一条 400「请求体不能为空」（标准绑定，M3）。 */
+    /** 空体与字面量 {@code null} 落同一条 400「请求体不能为空」（标准绑定）。 */
     @Test
     void settingsEmptyOrNullBodyIsBadRequest() throws Exception {
         MvcResult empty = perform(put("/api/v1/memory/settings")
@@ -202,7 +198,7 @@ class MemoryHttpContractTest {
         assertEquals(golden("memory-body-empty.json"), raw(nullBody));
     }
 
-    /** 未知字段被**忽略**（与 Go 的 {@code encoding/json} 同款）：多带一个字段不该整条 400。 */
+    /** 未知字段被**忽略**：多带一个字段不该整条 400。 */
     @Test
     void settingsToleratesUnknownFields() throws Exception {
         MvcResult r = perform(jsonBody(put("/api/v1/memory/settings"),
@@ -226,7 +222,7 @@ class MemoryHttpContractTest {
         assertEquals(golden("memory-settings.json"), raw(on));
     }
 
-    /** {@code {"enabled":null}} 与"根本没给 enabled"落同一条 400（Go 的 *bool 判 nil）。 */
+    /** {@code {"enabled":null}} 与"根本没给 enabled"落同一条 400（缺失与显式 null 等价）。 */
     @Test
     void updateSettingsWithNullEnabledIsBadRequest() throws Exception {
         MvcResult r = perform(jsonBody(put("/api/v1/memory/settings"), "{\"enabled\":null}")
@@ -265,7 +261,7 @@ class MemoryHttpContractTest {
         assertEquals(golden("memory-items-empty.json"), raw(r));
     }
 
-    /** 四个合法 status 都放行（白名单来自 Go 的 types.MemoryStatus* 常量）。 */
+    /** 四个合法 status 都放行（白名单常量）。 */
     @Test
     void listItemsAcceptsEachSupportedStatus() throws Exception {
         for (String status : List.of("active", "superseded", "archived", "pending")) {
@@ -321,7 +317,7 @@ class MemoryHttpContractTest {
         MvcResult r = perform(post("/api/v1/memory/items/" + id + "/reject")
                 .header("Authorization", bearer()));
 
-        // 拒绝就是删除（Go 的 service 侧如此）：换锚后是 204，无响应体
+        // 拒绝就是删除：换锚后是 204，无响应体
         assertEquals(204, r.getResponse().getStatus(), raw(r));
         assertEquals("", raw(r), "204 必须无响应体");
     }
@@ -335,7 +331,7 @@ class MemoryHttpContractTest {
         assertEquals(golden("memory-not-found.json"), raw(r));
     }
 
-    /** 空内容落 Go 的 default 分支：<b>500</b> + details（不参与白名单映射）。 */
+    /** 空内容落 default 分支：<b>500</b> + details（不参与白名单映射）。 */
     @Test
     void emptyContentIsInternalServerError() throws Exception {
         MvcResult r = createItem("{\"kind\":\"fact\",\"content\":\"   \",\"importance\":1}");
@@ -376,7 +372,7 @@ class MemoryHttpContractTest {
     }
 
     /**
-     * 清空是<b>同步删除</b>：换锚后按 §1.13 返 204，旧 Go 的 {@code {"removed":N}}
+     * 清空是<b>同步删除</b>：换锚后按 §1.13 返 204，{@code {"removed":N}}
      * 计数不再下发（前端也不再展示条数）。
      */
     @Test
@@ -495,14 +491,13 @@ class MemoryHttpContractTest {
      * 空仓库导出：{@code "data":null}（<b>不是</b> {@code []}）+ 两个响应头。
      *
      * <h2>Content-Disposition</h2>
-     * <p>逐字节对照 Go：{@code attachment; filename="weknora-memories.json"}。
+     * <p>逐字节断言：{@code attachment; filename="weknora-memories.json"}。
      * 它是这条端点唯一真正的"下载"信号——<b>文件本体仍然是普通 JSON</b>，
      * 不是 {@code application/octet-stream}（实测，别照直觉改）。</p>
      *
      * <h2>Content-Type</h2>
-     * <p>Go 的 {@code c.JSON} 恒写 {@code application/json; charset=utf-8}。
-     * Java 侧这条端点<b>显式</b>带上 charset，是全局 JSON 端点里最接近 Go 的一条
-     * （其余 Java 端点是裸的 {@code application/json}，那是既有的全局差异）。</p>
+     * <p>这条端点<b>显式</b>带上 charset：{@code application/json; charset=utf-8}
+     * （其余端点是裸的 {@code application/json}，那是既有的全局差异）。</p>
      *
      * <p>⚠️ <b>已知的容器层差异（一个空格）</b>：MockMvc 原样保留
      * {@code application/json; charset=utf-8}（分隔符后有 OWS），但真容器上
@@ -510,7 +505,7 @@ class MemoryHttpContractTest {
      * {@code application/json;charset=utf-8}——已对运行中的 Java :8082 实测。
      * 两者按 RFC 7231 语义等价（OWS 可选），但字节差一个空格。与既有的
      * "status line 无 reason phrase / CORS 多三个 Vary / X-Request-ID 大小写"
-     * 属同一族容器固有差异（§9 阶段 5.2 步 4），<b>正文不受影响</b>。
+     * 属同一族容器固有差异，<b>正文不受影响</b>。
      * 这里两条都钉住：解析后的 MediaType 必须相等（语义），MockMvc 这一层保留原样（字节）。</p>
      */
     @Test
@@ -576,7 +571,7 @@ class MemoryHttpContractTest {
     /**
      * 记忆整组要求 <b>full-access</b> Key——带 {@code chat} 的 scoped Key 也进不来。
      *
-     * <p>理由在 Go 的 {@code routes_memory.go} 注释里：记忆空间属于<b>一个人</b>，
+     * <p>理由：记忆空间属于<b>一个人</b>，
      * 而 scoped 集成 key 代表的是一个系统，不该继承某个人（或"系统合成用户"）的记忆。
      * 与 {@code /sessions/continue-stream} 的 {@code chat(fullAccess())} 是<b>有意</b>的差别。</p>
      */
@@ -595,9 +590,7 @@ class MemoryHttpContractTest {
     }
 
     /**
-     * 16 条路由在策略表里的登记形态，逐条对照 Go 的
-     * {@code g.apiKeyGroup(r.Group("/memory", g.Viewer()), apiKeyFullAccess())}：
-     * 每一条都是 {@code {RequireFullAccess: true}} 且<b>不带任何能力</b>。
+     * 16 条路由在策略表里的登记形态：每一条都是纯 full-access 且<b>不带任何能力</b>。
      */
     @Test
     void allMemoryRoutesAreRegisteredAsFullAccessOnly() {
@@ -651,7 +644,7 @@ class MemoryHttpContractTest {
                 "full-access 必须放行");
     }
 
-    /** 对照 Go 的 {@code runGate}：直接驱动 {@link APIKeyGateInterceptor}。 */
+    /** 行为验证：直接驱动 {@link APIKeyGateInterceptor}。 */
     private static boolean gateAllows(APIKeyRouteAuthorizer authorizer, TenantAPIKeyScope scope,
                                       String method, String pattern) throws Exception {
         com.ragagent.auth.apikey.domain.APIKeyScopeContext.set(scope);

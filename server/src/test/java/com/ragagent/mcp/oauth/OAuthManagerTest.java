@@ -27,8 +27,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * 端到端走一遍授权码流程（对照 Go {@code OAuthManager} 的行为，及
- * {@code oauth_manager} 相关用例的语义）。
+ * 端到端走一遍授权码流程。
  *
  * <p>覆盖：动态客户端注册 → 授权 URL → 回调 code 交换（PKCE）→ token 落库 →
  * attempt 完成 → 状态查询 → 撤销；以及"第二次授权复用已注册客户端"
@@ -175,7 +174,7 @@ class OAuthManagerTest {
         assertFalse(manager.isAuthorized(TENANT_ID, PRINCIPAL, SERVICE_ID));
     }
 
-    /** 非 OAuth 服务直接拒绝（对照 Go 文案）。 */
+    /** 非 OAuth 服务直接拒绝（文案逐字）。 */
     @Test
     void nonOAuthServiceIsRejected() {
         McpService apiKeyService = oauthService(server.url(), server.url("/metadata"));
@@ -198,7 +197,7 @@ class OAuthManagerTest {
         assertTrue(e.getMessage().contains("principal context is required"), e.getMessage());
     }
 
-    /** 服务 URL 缺失时拒绝（对照 Go {@code "MCP service URL is required for OAuth"}）。 */
+    /** 服务 URL 缺失时拒绝（固定文案 "MCP service URL is required for OAuth"）。 */
     @Test
     void missingServiceUrlIsRejected() {
         McpService noUrl = oauthService(null, null);
@@ -245,7 +244,7 @@ class OAuthManagerTest {
         return service;
     }
 
-    /** 从授权 URL 里取 state 参数（对照 Go 测试里手工解析 {@code url.Parse}）。 */
+    /** 从授权 URL 里取 state 参数（手工解析 query）。 */
     private static String stateOf(String url) {
         for (String pair : url.substring(url.indexOf('?') + 1).split("&")) {
             if (pair.startsWith("state=")) {

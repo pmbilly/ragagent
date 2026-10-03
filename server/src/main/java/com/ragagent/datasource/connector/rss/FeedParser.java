@@ -65,7 +65,7 @@ public interface FeedParser {
     ParsedFeed parse(byte[] data);
 
     /**
-     * 连接器用到的 feed 字段子集（参照 {@code gofeed.Feed} 的子集）。
+     * 连接器用到的 feed 字段子集（参照库 {@code Feed} 的子集）。
      *
      * <p>{@code updatedParsed} 可为 {@code null}（RSS 没有 {@code lastBuildDate}/{@code dc:date}
      * 时就是这样）——{@code ListResources} 只有非 null 才回填 {@code modified_at}。</p>
@@ -79,14 +79,14 @@ public interface FeedParser {
     }
 
     /**
-     * 连接器用到的条目字段子集（对照 {@code gofeed.Item} 的子集）。
+     * 连接器用到的条目字段子集（参照库 {@code Item} 的子集）。
      *
-     * <p>{@code authorName} 是 {@code item.Author == null ? "" : item.Author.Name} 里的
-     * {@code Name}——{@code null} 与空串在连接器里等价（都写成 {@code ""}）。</p>
+     * <p>{@code authorName} 对应作者名（作者缺失时为 {@code null}）——
+     * {@code null} 与空串在连接器里等价（都写成 {@code ""}）。</p>
      *
-     * <p>{@code content} 对应 {@code item.Content}：RSS 来自 {@code content:encoded}，
+     * <p>{@code content} 对应条目正文：RSS 来自 {@code content:encoded}，
      * Atom 来自 {@code <content>}。<b>它不是 {@code description}</b>——
-     * 连接器的 {@code firstNonEmpty(item.Content, item.Description)} 才决定用哪个。</p>
+     * 连接器的 {@code RssUtil.firstNonEmpty(item.content(), item.description())} 才决定用哪个。</p>
      */
     record ParsedItem(String guid, String link, String title, String content, String description,
                       OffsetDateTime updatedParsed, OffsetDateTime publishedParsed, String authorName) {

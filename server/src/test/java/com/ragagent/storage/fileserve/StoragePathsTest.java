@@ -9,16 +9,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 /**
- * {@link StoragePaths} 的解析与签名契约（对照 Go utils/presign.go、
- * types/knowledgebase.go、types/file_reference.go；签名用 Go
- * presign_test.go 的语义自证 round-trip + 篡改/过期拒绝）。
+ * {@link StoragePaths} 的解析与签名契约（签名用语义自证 round-trip + 篡改/过期拒绝）。
  */
 class StoragePathsTest {
 
     @Test
     void parseStorageTarget() {
-        // go1.26 实录（/tmp/w5crec2 探针）：Go files.go 注释里的 "backend://3/…"
-        // 是**误导性写法**——代码只认 "storage://" 前缀；"backend://…" 不是任何
+        // "backend://3/…" 是**误导性写法**——代码只认 "storage://" 前缀；"backend://…" 不是任何
         // 已知 provider → ("", "")
         var scoped = StoragePaths.parseStorageTarget("storage://3/local://7/x.png");
         assertEquals("3", scoped.backendId());

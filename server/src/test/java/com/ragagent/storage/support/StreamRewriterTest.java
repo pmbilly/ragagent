@@ -11,10 +11,9 @@ import com.ragagent.storage.support.RewriterTest.FixedResolver;
 import com.ragagent.storage.support.RewriterTest.StubFileService;
 
 /**
- * {@link StreamRewriter} 的对等测试（对照 Go
- * {@code internal/storageurl/stream_test.go}）。
+ * {@link StreamRewriter} 的对等测试。
  *
- * <p>期望值全部照抄 Go 的表驱动用例——尤其是那几个"边界该落在哪个偏移"的用例，
+ * <p>期望值全部来自表驱动语料——尤其是那几个"边界该落在哪个偏移"的用例，
  * 它们记录的是正则与扣留规则的真实行为，不是直觉。</p>
  */
 class StreamRewriterTest {
@@ -42,8 +41,8 @@ class StreamRewriterTest {
     }
 
     /**
-     * Go 的 {@code $} 只匹配文本末尾，Java 的 {@code $} 还匹配"末尾换行符之前"。
-     * 用错锚点的话，一个以换行结尾的普通分片会被 Java 整段扣住——而 Go 照常发出。
+     * Java 的 {@code $} 除文本末尾外还匹配"末尾换行符之前"。
+     * 用错锚点的话，一个以换行结尾的普通分片会被整段扣住。
      * 这条用例专门钉住 {@code \z} 的改写。
      */
     @Test
@@ -170,7 +169,7 @@ class StreamRewriterTest {
     }
 
     /**
-     * <b>上限按 UTF-8 字节数算</b>（Go 的 {@code maxHeldBytes} 是字节）。
+     * <b>上限按 UTF-8 字节数算</b>（{@code maxHeldBytes} 的语义是字节）。
      * 直接拿 Java 的字符数当字节数，会让中文尾巴的扣留上限放宽 3 倍——
      * 差别在这条用例里是可观察的：pending 有 9015 字节但只有 3016 个 Java 字符，
      * <b>按字节算会释放</b>（emitted 非空），<b>按字符算什么都不会释放</b>（emitted 为空）。
@@ -200,7 +199,7 @@ class StreamRewriterTest {
         assertThat(sr.enabled()).isFalse();
     }
 
-    /** 两条流共用同一个 resolver，所以解析必须串行——这条在 Go 侧靠 -race 兜底。 */
+    /** 两条流共用同一个 resolver，所以解析必须串行。 */
     @Test
     void concurrentPushIsSafe() throws Exception {
         StubFileService svc = new StubFileService();
@@ -226,18 +225,15 @@ class StreamRewriterTest {
         assertThat(svc.calls.get()).isGreaterThan(0);
     }
 
-    // ── 与 Go 的差分语料（期望值全部来自 Go 实录） ──────────────────────────
+    // ── 差分语料（期望值全部来自探针录制） ──────────────────────────────────
 
     /**
-     * 把 {@code stream.go} 的两个正则与三个函数原样抄进一个独立 Go 程序，
-     * 对下面这批输入打印结果，再把输出抄进来。
-     *
      * <p>其中 {@code "text local://1/a.png\v"} 一条<b>刻意钉住已知差异</b>：
-     * Go 的 RE2 里 {@code \s} 是 {@code [\t\n\f\r ]}（<b>不含</b>垂直制表 {@code \x0B}），
+     * 参考语义里 {@code \s} 是 {@code [\t\n\f\r ]}（<b>不含</b>垂直制表 {@code \x0B}），
      * Java 默认的 {@code \s} <b>含</b> {@code \x0B}。于是同一个 URL：
-     * Go 认为 {@code local://1/a.png\v} 是一个完整 token（{@code refs} 里带上了 {@code \v}），
+     * 参考行为认为 {@code local://1/a.png\v} 是一个完整 token（{@code refs} 里带上了 {@code \v}），
      * Java 在 {@code \v} 处截断。用 {@code [ \t\n\x0B\f\r]} 之类的显式字符类可以消除，
-     * 但那会把 Go 的写法改得面目全非、也更容易在下一次维护时写错——
+     * 但那会把现有写法改得面目全非、也更容易在下一次维护时写错——
      * 权衡后保留差异并在此可见（URL 里出现垂直制表符本身是不可能的）。</p>
      */
     @Test
@@ -274,10 +270,10 @@ class StreamRewriterTest {
         }
     }
 
-    /** 上表那条已知差异，单独写出来免得被"修好"。Go 实录：{@code incRef=5}。 */
+    /** 上表那条已知差异，单独写出来免得被"修好"。录制值：{@code incRef=5}。 */
     @Test
     void verticalTabIsAWhitespaceDifferenceFromGo() {
-        // Go: \v 不是空白 → `local://1/a.png\v` 是一个完整的尾部引用（incRef=5）
+        // 参考语义：\v 不是空白 → `local://1/a.png\v` 是一个完整的尾部引用（incRef=5）
         // Java: \v 是空白 → 引用在 \v 前结束，且没到串尾 → 不算"不完整"（-1）
         assertThat(StreamRewriter.findIncompleteRef("text local://1/a.png\u000B")).isEqualTo(-1);
         assertThat(StreamRewriter.holdbackCutoff("text local://1/a.png\u000B")).isEqualTo(21);

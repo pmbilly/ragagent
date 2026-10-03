@@ -34,14 +34,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 /**
- * 阶段 4.1 MCP 契约测试：MCP 服务 CRUD + 工具审批 + 凭据子资源，对照 golden 比对。
+ * MCP 契约测试：MCP 服务 CRUD + 工具审批 + 凭据子资源，对照 golden 比对。
  *
- * golden 录制序（Go dev server + SSRF_WHITELIST_EXTRA=mcp.example.com）：
+ * golden 录制序（dev server + SSRF_WHITELIST_EXTRA=mcp.example.com）：
  * create（SSRF 拒绝 / 成功）→ list → get → 404 → update → tool-approvals（空/设置/有值）
  * → credentials（put/delete/非法 field）→ metadata → test → tools → viewer 403 → delete。
  *
  * 掩码：UUID（id / service_id）、时间戳。
- * `test` 与 `tools` 用结构化断言——前者的消息含 JDK/Go 各异的网络错误文案，
+ * `test` 与 `tools` 用结构化断言——前者的消息含随运行时不同的网络错误文案，
  * 后者依赖服务启用状态而非纯契约。
  */
 @SpringBootTest
@@ -301,7 +301,7 @@ class McpContractTest {
         assertGolden(gb3, "mcp-create-ssrf-rejected.json");
     }
 
-    /** Viewer 无权创建 MCP 服务（对照 Go g.Admin()）。 */
+    /** Viewer 无权创建 MCP 服务（创建要求 Admin）。 */
     @Test
     void createForbiddenForViewer() throws Exception {
         String token = login("java-phase1-viewer@weknora.test");
@@ -367,7 +367,7 @@ class McpContractTest {
     }
 
     /** 与 golden 比对前的统一掩码：UUID + 时间戳 */
-    // ── 金片对比（B2 统一基建：语义归一 + strip + -Dcontract.refresh 重录） ──
+    // ── 金片对比（统一基建：语义归一 + strip + -Dcontract.refresh 重录） ──
 
     private static void assertGolden(org.springframework.test.web.servlet.MvcResult r,
             String name) throws Exception {

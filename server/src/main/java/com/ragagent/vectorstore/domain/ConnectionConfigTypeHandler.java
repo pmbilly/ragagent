@@ -12,13 +12,12 @@ import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 
 /**
- * vector_stores.connection_config jsonb 列的 TypeHandler
- * （对照 Go {@code ConnectionConfig.Value()/Scan()}）。
+ * vector_stores.connection_config jsonb 列的 TypeHandler。
  *
  * <ul>
  *   <li><b>写</b>：password / api_key 非空且有 key → AES-GCM 加密（失败保留明文）。</li>
  *   <li><b>读</b>：**严格**解密（DecryptStoredSecret）——失败抛错拖垮行加载
- *       （Go Scan 同语义，与 wsp 参数列的宽容策略刻意不同）。</li>
+ *       （与 wsp 参数列的宽容策略刻意不同）。</li>
  * </ul>
  */
 public class ConnectionConfigTypeHandler extends BaseTypeHandler<ConnectionConfig> {
@@ -46,7 +45,7 @@ public class ConnectionConfigTypeHandler extends BaseTypeHandler<ConnectionConfi
                 try {
                     out.password = cryptoService.encryptAESGCM(out.password, key);
                 } catch (RuntimeException e) {
-                    // Go: err == nil 才替换
+                    // 加密失败保留明文
                 }
             }
             if (out.apiKey != null && !out.apiKey.isEmpty()) {
@@ -58,7 +57,7 @@ public class ConnectionConfigTypeHandler extends BaseTypeHandler<ConnectionConfi
             }
         }
         try {
-            // PG jsonb 列必须 setObject(Types.OTHER)（setString 报 "column ... is of type jsonb but expression is of type character varying"，§9 阶段 2）
+            // PG jsonb 列必须 setObject(Types.OTHER)（setString 报 "column ... is of type jsonb but expression is of type character varying"）
             ps.setObject(i, MAPPER.writeValueAsString(out), java.sql.Types.OTHER);
         } catch (SQLException e) {
             throw e;

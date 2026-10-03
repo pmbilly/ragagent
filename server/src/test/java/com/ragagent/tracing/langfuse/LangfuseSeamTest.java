@@ -9,8 +9,8 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
- * langfuse seam 的形状测试（波 4.6a）：GetManager 单例、no-op span 非空、
- * 调用点三参 finish 形状与 Go 一致（engine.go L303/L391 + act.go L513/L105）。
+ * langfuse seam 的形状测试：GetManager 单例、no-op span 非空、
+ * 调用点三参 finish 形状钉死。
  */
 class LangfuseSeamTest {
 

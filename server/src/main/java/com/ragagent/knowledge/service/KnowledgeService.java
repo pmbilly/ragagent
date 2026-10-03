@@ -195,7 +195,7 @@ public class KnowledgeService implements KnowledgeDocumentGateway {
         return k;
     }
 
-    /** 阶段 3 拉取 URL 内容按文件入库（SSRF 校验在 controller） */
+    /** 拉取 URL 内容按文件入库（SSRF 校验在 controller） */
     public Knowledge createFromUrl(String kbId, String url, String fileName, String fileType,
                                    String title, String channel) {
         KnowledgeBase kb = requireKb(kbId);
@@ -266,8 +266,8 @@ public class KnowledgeService implements KnowledgeDocumentGateway {
     /**
      * 段落<b>直接成 chunk</b>（不经 docreader/chunker），
      * 同步建索引后立即可检索。评估链路（EvalDataset 的临时 "evaluation" KB）专用。
-     * <p>照抄语义：type="passage"、title 零值 ""、channel 空 → "web"；逐段 ValidateInput
-     * 空段跳过后索引不回填）、Start/End 按字符数累计（len([]rune) 语义）；终态
+     * <p>固定语义：type="passage"、title 零值 ""、channel 空 → "web"；逐段 ValidateInput
+     * 空段跳过后索引不回填）、Start/End 按码点数累计；终态
      * enable_status=enabled + processed_at + updated_at，parse_status 有文本 chunk 时
      * 保持 processing。</p>
      * （KnowledgeService 无 audit 依赖，文件/手工路径同形）；② 问题生成

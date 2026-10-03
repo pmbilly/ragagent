@@ -20,8 +20,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * 异步追踪接线测试（对照 Go asynq.go 的 InjectTracing/AsynqMiddleware 与
- * context.go 的 TraceparentFromContext/AttachTraceparent）：载体注入、跨线程续接、
+ * 异步追踪接线测试（InjectTracing/任务中间件与
+ * TraceparentFromContext/AttachTraceparent）：载体注入、跨线程续接、
  * 任务作用域（续接 vs 独立根）、MemoryTrace 门面转真。
  */
 class LangfuseTracingTest {

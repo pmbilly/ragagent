@@ -126,7 +126,7 @@ class StreamResponseBuilderTest {
 
     // ── 场景 C/D/E：references 数据不成立时的三种退路 ───────────────────────
 
-    /** data 里没有 {@code references} 键 → 不设该字段（omitempty 让整键消失），data 原样带出。 */
+    /** data 里没有 {@code references} 键 → 不设该字段（键整颗省略），data 原样带出。 */
     @Test
     void leavesReferencesUnsetWhenKeyAbsent() throws Exception {
         StreamEvent evt = new StreamEvent("evt-3", ResponseType.REFERENCES, "", false);

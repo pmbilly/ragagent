@@ -28,15 +28,15 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 /**
- * 收尾批 W5b 契约测试：initialization 系统级 14 条（ollama 管理 6 + 模型测试 5 +
- * 抽取 3），对照 golden w5b-*.json（Go dev server 实录，
+ * W5b 契约测试：initialization 系统级 14 条（ollama 管理 6 + 模型测试 5 +
+ * 抽取 3），对照 golden w5b-*.json（dev server 录制，
  * scripts/record-w5b-golden.sh）逐字节/掩码比对。
  *
  * <p>结构（顺序敏感）：</p>
  * <ol>
  *   <li><b>down 家族</b>（@Order(1)）：ollama stub 未启动——status/models/check/
  *       download 的不可用形态 + progress 404 + tasks 空表 + viewer 403 + noauth。
- *       ollama 错误内文两侧措辞不同（Go dial tcp vs JDK），掩码 <ollama-err>。</li>
+ *       ollama 错误内文两侧措辞不同（底层 dial 错误文案），掩码 <ollama-err>。</li>
  *   <li><b>up 家族</b>（@Order(2)）：in-JVM Ollama stub（11434，与 bean 缺省基址
  *       对齐）——status/models/check/download 全周期（轮询到 completed）。</li>
  *   <li><b>upstream 家族</b>（@Order(3)）：SSRF 白名单先撤（127.0.0.1 被拒的确定性
@@ -47,7 +47,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
  * </ol>
  *
  * <p>multimodal 的 docreader 执行步（成功/失败两态）不进 golden——Java 测试 JVM 无
- * docreader，Go dev 有；该路径放 ab-w5b.sh（双端同打同一 docreader）。</p>
+ * docreader（dev 环境有）；该路径放 ab-w5b.sh（双端同打同一 docreader）。</p>
  */
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -64,7 +64,7 @@ class W5bInitializationContractTest {
             "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})");
     private static final Pattern UUID_PATTERN = Pattern.compile(
             "\"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\"");
-    /** ollama 不可用错误内文（Go dial tcp 文案 vs JDK 文案，掩到值）。 */
+    /** ollama 不可用错误内文（底层 dial 文案两侧不同，掩到值）。 */
     private static final Pattern OLLAMA_ERR = Pattern.compile(
             "(ollama service unavailable: (?:[^\"\\\\]|\\\\.)*)");
     /** 下载任务进度值（up 家族轮询中的中间态，不比对；终态是确定的 100）。 */
@@ -389,7 +389,7 @@ class W5bInitializationContractTest {
         String expected = com.ragagent.support.ContractJson.semantic(
                 new String(new ClassPathResource("contracts/" + golden)
                         .getInputStream().readAllBytes(), StandardCharsets.UTF_8));
-        // golden 是 Go 原始实录（uuid/时间戳/ollama 错误内文为动态值）→ 两侧同掩码
+        // golden 是 dev server 原始录制（uuid/时间戳/ollama 错误内文为动态值）→ 两侧同掩码
         org.junit.jupiter.api.Assertions.assertEquals(mask(expected), mask(actual),
                 () -> golden + " body mismatch (status " + status + ")");
     }

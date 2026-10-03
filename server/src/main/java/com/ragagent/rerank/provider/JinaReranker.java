@@ -13,7 +13,7 @@ import com.ragagent.rerank.Reranker;
 import com.ragagent.rerank.RerankerConfig;
 
 /**
- * Jina rerank 客户端（对照 Go {@code rerank/jina_reranker.go} 全文）。
+ * Jina rerank 客户端。
  *
  * <p>POST {@code {base}/rerank}；不支持 truncate_prompt_tokens；恒发
  * {@code return_documents:true}（top_n 未设 → omitempty 省略）。响应直接是

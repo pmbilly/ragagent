@@ -30,12 +30,12 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 /**
- * 跨空间租户目录 + KV 配置分发器契约测试（波 2 扫尾批 3，5 条路由）。
- * golden：record-ct-golden.sh（67 条 ct-*，全部 Go 实录；本类覆盖 flag-on 的
+ * 跨空间租户目录 + KV 配置分发器契约测试（5 条路由）。
+ * golden：record-ct-golden.sh（67 条 ct-*；本类覆盖 flag-on 的
  * H2 自足部分，list/search 成功路径留给 A/B——依赖 dev DB 租户清单；
- * prompt-templates GET 已于走查补翻落地，双端逐字节一致，见下「已知不录」）。
+ * prompt-templates GET 已落地，双端逐字节一致，见下「已知不录」）。
  *
- * <p>种子严格复刻录制脚本：租户 10002 + 四人（ct-super 跨空间超管 /
+ * <p>种子与录制脚本严格一致：租户 10002 + 四人（ct-super 跨空间超管 /
  * ct-viewer / ct-self / javasysadmin 系统管理员），密码全部 Passw0rd!
  * （bcrypt 常量），成员行 joined_at 固定。</p>
  *
@@ -48,9 +48,9 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
  * apiKey 明文、parser SSRF 错误里的解析 IP（fake-ip 段每次解析可能不同）。</p>
  *
  * <p><b>已知不录</b>：parser 三条 PUT 全是 SSRF 失败路径（无成功路径 golden，
- * 见 docs §9）。GET prompt-templates 的推迟已随走查补翻清零——Java 侧
+ * 见 docs §9）。GET prompt-templates 已随走查补齐——Java 侧
  * PromptTemplateCatalog 装载 vendored yaml + LocalizeTemplates 本地化，
- * 本类直接对 ct-kv-get-prompt-templates.json（Go 实录）断言 200 逐字节一致。</p>
+ * 本类直接对 ct-kv-get-prompt-templates.json 断言 200 逐字节一致。</p>
  */
 @SpringBootTest(properties = "weknora.tenant.enable-cross-tenant-access=true")
 @AutoConfigureMockMvc
@@ -67,7 +67,7 @@ class TenantCatalogContractTest {
     private static final String SUPER_EMAIL = "ct-super@weknora.test";
     private static final String VIEWER_EMAIL = "ct-viewer@weknora.test";
     private static final String SELF_EMAIL = "ct-self@weknora.test";
-    /** 录制脚本用的 dev DB 真实 embedding 模型 id（字面量复刻进请求体） */
+    /** 录制脚本用的 dev DB 真实 embedding 模型 id（字面量写进请求体） */
     private static final String EMBEDDING_MODEL = "9aa07763-6b4f-4152-9f2b-3ad0e2d2f69f";
 
     private static final Pattern TOKEN = Pattern.compile("\"token\":\"([^\"]+)\"");
@@ -229,8 +229,8 @@ class TenantCatalogContractTest {
         assertGolden(jsonBody(put("/api/v1/tenants/kv/prompt-templates"), selfTok, "{}")
                         .header("X-Tenant-ID", alpha),
                 400, "ct-kv-put-prompt-templates.json");
-        // GET prompt-templates：走查补翻后双端 200 逐字节一致（zh-CN/en-US/ja-JP/空头
-        // 四组 A/B 全 MATCH，见 docs §9「波 2 扫尾批 3」更新）。golden 是 Go 实录。
+        // GET prompt-templates：走查补齐后双端 200 逐字节一致（zh-CN/en-US/ja-JP/空头
+        // 四组 A/B 全 MATCH，见 docs §9 记录）。golden 即既定线格式。
         assertGolden(get("/api/v1/tenants/kv/prompt-templates")
                         .header("Authorization", selfTok).header("X-Tenant-ID", alpha),
                 200, "ct-kv-get-prompt-templates.json");
@@ -373,7 +373,7 @@ class TenantCatalogContractTest {
 
     // ════════════════ 辅助 ════════════════
 
-    /** ct-self 自助创建 alpha（复刻录制脚本 §1 第一枪），返回租户 id。 */
+    /** ct-self 自助创建 alpha（录制脚本 §1 第一步），返回租户 id。 */
     private long createAlpha() throws Exception {
         MvcResult r = mockMvc.perform(jsonBody(post("/api/v1/tenants"), selfTok,
                 "{\"name\":\"ct-alpha\",\"description\":\"alpha workspace\"}")).andReturn();
@@ -468,7 +468,7 @@ class TenantCatalogContractTest {
         out = SSRF_HOSTNAME_TAIL.matcher(out).replaceAll("<ssrf-host>");
         return out;
     }
-    // ── 补测：GET /tenants/search 与 /tenants/all（2026-10-02 补齐漏翻译路由）──
+    // ── 补测：GET /tenants/search 与 /tenants/all（2026-10-02 补齐）──
 
     /** search：裸分页形态 {items,total,page,pageSize}；keyword 命中与不命中两种。 */
     @org.junit.jupiter.api.Test

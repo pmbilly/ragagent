@@ -21,9 +21,9 @@ import com.ragagent.websearch.mapper.WebSearchProviderRepository;
 import com.ragagent.websearch.provider.WebSearchProviderRegistry;
 
 /**
- * WebSearchService 执行链（对照 Go web_search.go 的 Search/resolveProvider/
+ * WebSearchService 执行链（Search/resolveProvider/
  * 过滤分支/黑名单）：provider 实体从仓储加载 → 注册表创建 stub provider 打本地
- * stub，确定性分支对照 Go 文案。
+ * stub，确定性分支核对错误文案。
  */
 class WebSearchServiceExecTest {
 
@@ -56,7 +56,7 @@ class WebSearchServiceExecTest {
         when(repo.getByID(anyLong(), anyString())).thenReturn(stored);
 
         WebSearchProviderRegistry registry = new WebSearchProviderRegistry();
-        // 注入 stub provider（对照 Go 注册表工厂）
+        // 注入 stub provider（经注册表工厂）
         registry.register("bocha", params -> new com.ragagent.websearch.provider.WebSearchProvider() {
             @Override
             public String name() {
@@ -110,7 +110,7 @@ class WebSearchServiceExecTest {
                 "provider bocha does not support country/freshness filters; "
                         + "omit them or select Brave"), err.getMessage());
 
-        // 过滤非法：freshness 校验先于能力断言（对照 Go 的 Validate 顺序）
+        // 过滤非法：freshness 校验先于能力断言（Validate 的判定顺序）
         WebSearchService.WebSearchConfig badFilter = new WebSearchService.WebSearchConfig();
         badFilter.filters = new WebSearchFilters("", "nope");
         RuntimeException invalid = assertThrows(RuntimeException.class,

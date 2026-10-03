@@ -11,7 +11,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
- * Slack 适配器确定性核心（对照 slack/adapter.go 的 URL verification、事件分支、
+ * Slack 适配器确定性核心（URL verification、事件分支、
  * 提及剥离；mattermost outgoing payload 双态解析）。
  */
 class SlackAdapterCoreTest {

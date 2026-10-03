@@ -63,7 +63,7 @@ public class TemporaryDocument {
     @JsonIgnore
     private String chunks;
 
-    /** image_refs（jsonb）：@JsonRawValue 对齐 Go types.JSON.MarshalJSON 的原样输出。 */
+    /** image_refs（jsonb）：@JsonRawValue 原样输出（不转义、不重排）。 */
     @TableField(value = "image_refs", typeHandler = com.ragagent.common.web.PgJsonTypeHandler.class)
     @JsonRawValue
     private String imageRefs;

@@ -25,8 +25,8 @@ import com.ragagent.agent.tools.GoRecording45B;
 import com.ragagent.agent.tools.RecordingSupport;
 
 /**
- * 波 4.5b 回放：knowledge_search（对照 Go 实录，探针 {@code zz_rec45b_ksearch_test.go}）。
- * 纯 fake backend（seam 已隔离）。语料设计约束（Go 侧本就不定的序）：
+ * 4.5b 回放：knowledge_search 的录制回放。
+ * 纯 fake backend（seam 已隔离）。语料设计约束（录制侧本就不定的序）：
  * 单文档、分数各异、英文内容——final sort 在 (score, knowledgeID) 唯一时两边一致。
  */
 class KnowledgeSearchRecordingTest {
@@ -77,8 +77,8 @@ class KnowledgeSearchRecordingTest {
             if (hybridFn != null) {
                 return hybridFn.apply(params.knowledgeBaseIDs() == null ? "" : String.join(",", params.knowledgeBaseIDs()), params);
             }
-            // 对照 Go HybridSearch(ctx, kbID, params)：kbID 由调用点显式传入
-            // （whole-KB 分支 = fullKBIDs[0]；定向分支 = target.KnowledgeBaseID）。
+            // kbID 由调用点显式传入
+            // （whole-KB 分支 = fullKBIDs[0]；定向分支 = target 的 knowledgeBaseID）。
             RuntimeException err = hybridErr.get(kbId);
             if (err != null) {
                 throw err;
@@ -237,7 +237,7 @@ class KnowledgeSearchRecordingTest {
 
     @Test
     void multiQuery() {
-        // 跨 query 同 id chunk 在 Go 侧因 goroutine 追加序不定（已知差异），语料避开。
+        // 跨 query 同 id chunk 的追加序在录制侧不定（已知差异），语料避开。
         FakeBackend svc = kbSvc();
         svc.hybrid.put("skb1|RAG benefits overview", new ArrayList<>(List.of(
                 result("sc5", "skd1", "skb1", "RAG Guide", 4,
@@ -351,8 +351,7 @@ class KnowledgeSearchRecordingTest {
         FakeBackend svc = kbSvc();
         SearchTarget.SearchTargets targets = new SearchTarget.SearchTargets(List.of(
                 new SearchTarget(SearchTarget.TYPE_KNOWLEDGE_BASE, "skb1", 10002, null, null, null, true)));
-        // 已知差异（Go 非确定性）：Go dedup 第二轮按 map 迭代序重建 slice
-        // （knowledge_search.go deduplicateResults 的 for range seenByID），rerank 输入
+        // 已知差异（参照端非确定性）：dedup 第二轮按 map 迭代序重建列表，rerank 输入
         // 顺序每次运行随机；语料锁住的采样里 originals[2]=sc2。Java dedup 用
         // LinkedHashMap 保插入序（确定性），故 stub 的 RankResult.index 改用 1
         // 指向同一 chunk sc2——args→output 契约不变，仍端到端逐字回放。

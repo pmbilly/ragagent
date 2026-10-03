@@ -1,11 +1,9 @@
 package com.ragagent.evaluation.service;
 
 /**
- * 评估参数的配置常量（对照 Go dev 部署 config.yaml + prompt 模板回填的生效值，
- * golden ev-post.json 钉住）。这些字符串是**响应体的一部分**，不是注释——
- * Go 侧由 backfillConversationDefaults 从 prompt_templates 注入，Java 侧按部署
- * 生效值固化（WeKnora 的 config.yaml/prompt_templates 是这些值的唯一来源，
- * 随配置漂移而漂移；A/B 时按部署各自断言）。
+ * 评估参数的配置常量（golden ev-post.json 钉住的生效值）。这些字符串是**响应体的一部分**，
+ * 不是注释——来源是部署的 config.yaml / prompt_templates 生效值
+ * （随配置漂移而漂移；A/B 时按部署各自断言）。
  */
 public final class EvaluationPromptDefaults {
 

@@ -658,7 +658,7 @@ public class KnowledgeSummaryService {
      * IsZero（4 字段全 false）→ Default），即 vector||keyword。
      * 服务层（kbService，含 EnsureDefaults 钩子）与 repo 层（kbRepository，仅 Scan：
      * NULL→Default、全 false 保持）。本方法对应服务层；{@link ChunkVectorIndexer}
-     * updateImageInfo/regenerate 路径仍被判定为需要 embedding（契约样例 1007 实录）。</p>
+     * updateImageInfo/regenerate 路径仍被判定为需要 embedding（契约样例 1007 锁定）。</p>
      */
     private static boolean kbNeedsEmbedding(KnowledgeBase kb) {
         KnowledgeBaseIndexingStrategy strategy = kb.getIndexingStrategy();

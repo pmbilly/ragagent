@@ -9,7 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * 配置解析单测（对照 Go internal/tracing/langfuse/config.go 与 config_test.go）：
+ * 配置解析单测：
  * parseBool 的真值表、ParseDuration 的复合串、Validate 的原文消息。
  */
 class LangfuseConfigTest {

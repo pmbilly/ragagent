@@ -19,26 +19,24 @@ import com.ragagent.common.web.SortedMapSerializer;
  * <h2>字段序</h2>
  * <p>响应按 {@link JsonPropertyOrder} 声明序输出，必须与下方字段声明一致。</p>
  *
- * <h2>零值语义（逐字段对照 json tag）</h2>
+ * <h2>零值语义（逐字段）</h2>
  * <ul>
- *   <li><b>无 omitempty → 恒输出，nil 输出 {@code null}</b>：
- *       {@code sub_chunk_id}（nil slice → {@code null}）、{@code metadata}（nil map → {@code null}）。</li>
- *   <li><b>无 omitempty 的数值/字符串 → 恒输出零值</b>：{@code match_type} 输出 {@code 0}、
+ *   <li><b>恒输出，null 输出 {@code null}</b>：
+ *       {@code sub_chunk_id}（null 列表 → {@code null}）、{@code metadata}（null 映射 → {@code null}）。</li>
+ *   <li><b>数值/字符串恒输出零值</b>：{@code match_type} 输出 {@code 0}、
  *       {@code score} 输出 {@code 0}、{@code chunk_type} 输出 {@code ""}。</li>
- *   <li><b>有 omitempty → 空时省略整个键</b>：{@code chunk_metadata} /
+ *   <li><b>空时省略整个键</b>：{@code chunk_metadata} /
  *       {@code matched_content} / {@code knowledge_description} /
  *       {@code knowledge_custom_metadata} / {@code knowledge_base_id}。</li>
  * </ul>
  *
- * <h2>两个 {@code json:"-"} 字段</h2>
+ * <h2>两个不出响应的内部字段</h2>
  * <p>{@code ContentRevision} / {@code ContentRewritten} 是合并管线内部字段：
  * <b>不出响应</b>（{@code @JsonIgnore}），但 {@code content_revision} 有对应的数据库列，
  * 直查行时要能落进对象。故用 {@code @JsonIgnore} 而非删字段。</p>
  *
  * <h2>{@code score} 的浮点输出</h2>
- * <p>输出为最短 'f' 表示，绝对值 &lt; 1e-6 或 ≥ 1e21 时转 'e'——与 Jackson 默认的
- * {@code Double.toString} 不同（{@code 1} vs {@code 1.0}，{@code 1e+21} vs {@code 1.0E21}）。
- * 由 {@link GoDoubleSerializer} 处理，见该类注释。</p>
+ * <p>走 Jackson 默认的 double 序列化（{@code 1.0} / {@code 1.0E21} 形态）。</p>
  */
 public class SearchResult {
 
@@ -58,21 +56,21 @@ public class SearchResult {
 
     private int seq;
 
-    /** 相似度/融合分。**无 omitempty**：{@code 0} 恒输出（不是 {@code 0.0}，见类注释）。 */
+    /** 相似度/融合分。恒输出（Jackson 默认 double 形态，零值输出 {@code 0.0}）。 */
 
     private double score;
 
     /**
-     * 匹配算法（Go {@code MatchType} 是 int 枚举，零值 {@code MatchTypeEmbedding}）。
-     * 无 omitempty，恒输出数字。
+     * 匹配算法（int 枚举，0 = embedding、1 = keywords）。
+     * 恒输出数字。
      */
     private int matchType;
 
-    /** 子 chunk ID。**无 omitempty**：nil 输出 {@code null}（不是 {@code []}）。 */
+    /** 子 chunk ID。恒输出：null 输出 {@code null}（不是 {@code []}）。 */
     private List<String> subChunkId;
 
     /**
-     * 元数据。**无 omitempty**：null 输出 {@code null}。
+     * 元数据。恒输出：null 输出 {@code null}。
      * 输出**恒按 key 字母序**：setter 归一化为 {@link TreeMap}——
      * 无论产出方给的是什么 Map 实现，输出字节都一致。
      */
@@ -91,8 +89,7 @@ public class SearchResult {
     private String knowledgeChannel = "";
 
     /**
-     * chunk 级元数据（如生成的问题）。原样内联的 JSON 载荷 + omitempty：
-     * null/空 时省略。
+     * chunk 级元数据（如生成的问题）。原样内联的 JSON 载荷，null 时整键省略。
      *
      * <p>已知边界：{@code @JsonInclude(NON_NULL)} 只看 null，产出方若真写入空对象
      * {@code {}}，它仍会输出——实际语义里该字段要么是结构化 JSON 要么不设，
@@ -101,19 +98,19 @@ public class SearchResult {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private JsonNode chunkMetadata;
 
-    /** 向量检索实际命中的文本（FAQ 场景是命中的问题）。omitempty。 */
+    /** 向量检索实际命中的文本（FAQ 场景是命中的问题）。空时整键省略。 */
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String matchedContent;
 
-    /** 知识条目描述。omitempty。 */
+    /** 知识条目描述。空时整键省略。 */
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String knowledgeDescription;
 
-    /** 用户自撰、可安全下发给模型的上下文。omitempty。 */
+    /** 用户自撰、可安全下发给模型的上下文。空时整键省略。 */
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String knowledgeCustomMetadata;
 
-    /** 所属知识库 ID。omitempty。 */
+    /** 所属知识库 ID。空时整键省略。 */
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String knowledgeBaseId;
 

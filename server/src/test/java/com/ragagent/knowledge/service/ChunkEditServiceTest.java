@@ -254,7 +254,7 @@ class ChunkEditServiceTest {
         Chunk c = chunk(DOC, "body");
         Chunk image = chunk(DOC, "ocr text", "image_ocr");
 
-        // 纯空白 → "chunk content cannot be empty"（Go fmt.Errorf → handler 500 面）
+        // 纯空白 → "chunk content cannot be empty"（service 层抛错走 500 面）
         assertThatThrownBy(() -> service.updateDocumentChunk(c.getId(), "   \n\t ", null, null))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("chunk content cannot be empty");
@@ -577,7 +577,7 @@ class ChunkEditServiceTest {
 
     @Test
     void updateDocumentChunkMarksFailedWhenEmbeddingModelRowMissing() {
-        kb(KB, true); // 策略开、模型行缺 → Go GetEmbeddingModel 失败同款
+        kb(KB, true); // 策略开、模型行缺 → embedding 模型查询失败
         knowledge(DOC, KB);
         jdbc.update("UPDATE knowledge_bases SET embedding_model_id = 'ghost' WHERE id = ?", KB);
         Chunk c = chunk(DOC, "body");

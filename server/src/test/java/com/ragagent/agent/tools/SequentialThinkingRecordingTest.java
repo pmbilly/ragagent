@@ -7,14 +7,14 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
- * SequentialThinkingTool 的 Go 实录状态机（case1..case9 + case11 共 10 步，
+ * SequentialThinkingTool 的录制状态机（case1..case9 + case11 共 10 步，
  * 全部打在同一个工具实例上——thought_history_length 与 branches 是跨调用
- * 累积状态）。case10（裸 bad json）不录：Go 在 json.Unmarshal 层失败，
+ * 累积状态）。case10（裸 bad json）不录：录制侧在 JSON 解析层失败，
  * Java 的 args 在上游已解析成 JsonNode（分层差异，与 TodoWriteRecordingTest
- * 同款备案）。
+ * 相同）。
  *
- * <p>校验失败（空 thought/number&lt;1/total&lt;1）不进历史——Go 先 validate
- * 后 append，case7/8/9 失败故 case11 的 history_length 接续 case6。</p>
+ * <p>校验失败（空 thought/number&lt;1/total&lt;1）不进历史——先校验
+ * 后追加，case7/8/9 失败故 case11 的 history_length 接续 case6。</p>
  */
 class SequentialThinkingRecordingTest {
 
@@ -48,7 +48,7 @@ class SequentialThinkingRecordingTest {
                         .isEqualTo(r.get("output").asText());
             }
             if (r.hasNonNull("goErr")) {
-                // Go 的错误通道折叠进 result.Error（Java 签名说明见 ToolRegistry 类注释）
+                // 录制里的错误通道折叠进 result.Error（Java 签名说明见 ToolRegistry 类注释）
                 assertThat(result.getError())
                         .as("seqthink %s error", r.get("id").asText())
                         .isEqualTo("Validation failed: " + validationMessage(r));
@@ -60,7 +60,7 @@ class SequentialThinkingRecordingTest {
         }
     }
 
-    /** case7/8/9 的 Go 校验错误文案（validate 逐字）。 */
+    /** case7/8/9 的校验错误文案（逐字）。 */
     private static String validationMessage(JsonNode r) {
         String args = r.get("args").asText();
         if (args.contains("\"thought\":\"\"")) {

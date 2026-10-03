@@ -23,14 +23,13 @@ import com.ragagent.agent.tools.knowledge.ListKnowledgeChunksTool;
 import com.ragagent.agent.tools.wiki.WikiReadSourceDocTool;
 
 /**
- * 波 4.5b 回放：wiki_read_source_doc / get_document_info / list_knowledge_chunks
- * （对照 Go 实录，探针 {@code zz_rec45b_doc_tools_test.go}）。
- * 图片富化 collector 返回 Go CollectImageInfoByChunkIDs 真实合并产物
- * （struct 全字段序列化串）。
+ * 4.5b 回放：wiki_read_source_doc / get_document_info / list_knowledge_chunks
+ * 的录制回放。
+ * 图片富化 collector 返回真实合并产物（全字段序列化串）。
  */
 class DocToolsRecordingTest {
 
-    /** Go types.ImageInfo 全字段序列化（json.Marshal struct 序）。 */
+    /** 全字段序列化形态（键序 = 声明序）。 */
     static final String MERGED_P1 =
             "[{\"url\":\"http://x/1.png\",\"original_url\":\"\",\"start_pos\":0,\"end_pos\":0,"
                     + "\"caption\":\"  图 一  \",\"ocr_text\":\"识别文字\"}]";
@@ -82,7 +81,7 @@ class DocToolsRecordingTest {
         }
     }
 
-    /** 对照 zzFakeChunkRepo.children + Go CollectImageInfoByChunkIDs 产物。 */
+    /** chunk children + 图片富化的合并产物。 */
     static final class FakeImageCollector implements ImageInfoCollector {
         final Map<String, String> merged = new LinkedHashMap<>();
 

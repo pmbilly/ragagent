@@ -568,7 +568,7 @@ class KnowledgeOperationsContractTest {
 
     @Test
     void folderRenameMatchesGo() throws Exception {
-        // 前缀 1：batch-delete 消费 KG3（Go 异步、Java 同步，计数收敛）
+        // 前缀 1：batch-delete 消费 KG3（异步任务同步完成，计数收敛）
         assertPost("/api/v1/knowledge/batch-delete",
                 "{\"kbId\":\"" + KB1 + "\",\"ids\":[\"" + KG3 + "\"]}", "kg-batch-delete.json");
         // 前缀 2：move 链（KG2 最终落在 <scriptx）

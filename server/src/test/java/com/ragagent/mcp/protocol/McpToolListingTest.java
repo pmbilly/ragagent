@@ -23,17 +23,15 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 /**
- * 对照 Go internal/mcp/client_tools_test.go：
- * {@code TestRawToolsPaginationErrorsAndCancellation} + {@code TestRawToolsBoundsHostileDirectorySize}。
+ * MCP 工具列表（tools/list）的分页、错误与边界语义测试。
  *
- * <p>Go 用 {@code rawToolsTransport}（内嵌 {@code transport.Interface} 只覆盖 SendRequest）来打桩；
- * Java 侧打桩点是 {@link McpTransport#send}，等价。</p>
+ * <p>打桩点是 {@link McpTransport#send}：只覆盖 send 的可编程传输。</p>
  */
 class McpToolListingTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    /** 对照 Go rawToolsTransport：只覆盖 send 的可编程传输。 */
+    /** 只覆盖 send 的可编程传输。 */
     private static final class FakeTransport implements McpTransport {
         private final java.util.function.Function<JsonRpcRequest, JsonRpcResponse> handler;
         int calls;
@@ -75,7 +73,7 @@ class McpToolListingTest {
         return client;
     }
 
-    /** 构造一条成功的 JSON-RPC 响应；入参是 {@code result} 的内容（对照 Go 的 Result 字段）。 */
+    /** 构造一条成功的 JSON-RPC 响应；入参是 {@code result} 字段的内容。 */
     private static JsonRpcResponse ok(String resultJson) {
         try {
             var envelope = MAPPER.createObjectNode();
@@ -88,7 +86,6 @@ class McpToolListingTest {
         }
     }
 
-    /** 对照 Go TestRawToolsPaginationErrorsAndCancellation。 */
     @Nested
     @DisplayName("分页错误与取消")
     class PaginationErrorsAndCancellation {
@@ -116,7 +113,7 @@ class McpToolListingTest {
             assertNotNull(err);
             assertEquals(2, transport.calls, label + "：恰好请求两页（第二页失败后不再继续）");
 
-            // 请求 ID 不能重复（Go：字符串 ID 不会与 SDK 数字 ID 撞车）
+            // 请求 ID 不能重复（字符串 ID 不会与数字 ID 撞车）
             Set<String> unique = new HashSet<>(transport.ids);
             assertEquals(transport.ids.size(), unique.size(), label + "：请求 ID 必须唯一");
 
@@ -126,7 +123,7 @@ class McpToolListingTest {
             cancelled.cancel();
             McpException cancelErr = assertThrows(McpException.class,
                     () -> client.listTools(McpContext.cancellable(cancelled)));
-            // 对照 Go：ctx 错误被 "failed to list tools: %w" 包裹，errors.Is 仍能认出 context.Canceled
+            // ctx 错误被 "failed to list tools: " 前缀包裹，根因（context canceled）保留在消息尾部
             assertTrue(cancelErr.getMessage().endsWith("context canceled"), cancelErr.getMessage());
             assertEquals(callsBefore, transport.calls, label + "：ctx 已取消时不得再发请求");
         }
@@ -155,7 +152,6 @@ class McpToolListingTest {
         }
     }
 
-    /** 对照 Go TestRawToolsBoundsHostileDirectorySize。 */
     @Nested
     @DisplayName("恶意/失控目录的硬上限")
     class HostileDirectoryBounds {
@@ -252,7 +248,7 @@ class McpToolListingTest {
         }
     }
 
-    /** 传输错误必须原样（不被吞成"列表失败"）传给上层——对照 Go 的错误链保留。 */
+    /** 传输错误必须原样（不被吞成"列表失败"）传给上层——错误链保留。 */
     @Test
     @DisplayName("传输层失败保持错误链与原始异常")
     void transportErrorsArePreserved() {

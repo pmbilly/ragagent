@@ -18,7 +18,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * 存储 provider 配置的<b>两面一源</b>契约钉（B14 合并后）。
+ * 存储 provider 配置的<b>两面一源</b>契约钉。
  *
  * <p>同一个「环境变量 → provider 配置」的投影，对外有两个面：</p>
  *
@@ -32,12 +32,12 @@ import org.junit.jupiter.api.Test;
  *       各 provider 段与解析器的完备性自校验。</li>
  * </ul>
  *
- * <p><b>为什么不许再出现第二份投影</b>：B14 前这里有两套手写实现、两套键名，产出过两个静默
+ * <p><b>为什么不许再出现第二份投影</b>：这里曾有两套手写实现、两套键名，产出过两个静默
  * 缺陷——①（引擎面）凭据键被统一写成 minio 形态，s3/tos/oss/ks3/obs/cos 段的凭据被 Jackson
  * 静默丢弃；②（落库面）供给器写 snake，被 camel 的行读侧静默丢空。本测试把「两面各自的键集合」
  * 与「两面之差＝凭据命名」一起钉住：任何一处再长出一份手写投影都会立刻变红。</p>
  *
- * <p><b>输入一律「全开值」</b>：落库面是 omitempty 语义（空串/假值整键省略），喂空值会一个键
+ * <p><b>输入一律「全开值」</b>：落库面是空值省略语义（空串/假值整键省略），喂空值会一个键
  * 都不写、钉出空集合（首版实测踩过）；全开值才能让最大键集合显现。</p>
  */
 class StorageProjectionVocabularyTest {

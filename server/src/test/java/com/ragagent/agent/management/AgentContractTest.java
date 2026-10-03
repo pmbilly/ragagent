@@ -20,13 +20,13 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 /**
- * 波 3 agents 批契约测试：agents CRUD 家族（8 条路由）+ initialization 三条
+ * agents 契约测试：agents CRUD 家族（8 条路由）+ initialization 三条
  * （对照 golden 逐字节/掩码比对）。
  *
- * golden 来源：Go dev server（localhost:8080，2026-09-20 录制，
- * scripts/record-ag-golden.sh，43 条 ag-*.json + 17 条 init-*.json）。
+ * golden 来源：dev server 录制（scripts/record-ag-golden.sh，
+ * 43 条 ag-*.json + 17 条 init-*.json）。
  *
- * 场景顺序严格复刻录制脚本（同请求序列有状态依赖）：鉴权 → 静态面 → 空列表 →
+ * 场景顺序严格按录制脚本的请求序列（有状态依赖）：鉴权 → 静态面 → 空列表 →
  * 内建 get → CRUD → creator 筛选 → update → delete → copy → 内建 PUT（落 DB 行）→
  * suggested-questions → initialization。
  *

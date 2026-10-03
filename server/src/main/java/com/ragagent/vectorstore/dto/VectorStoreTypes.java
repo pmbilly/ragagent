@@ -6,11 +6,10 @@ import java.util.List;
 
 
 /**
- * 对照 Go {@code types.GetVectorStoreTypes()}（types/vectorstore.go L665-784）：
- * /vector-stores/types 的静态元数据。postgres/sqlite 不在列（仅 env store 可达——
- * Go 原注释）。tencent_vectordb 的 replica_number 缺省读 TENCENT_VECTORDB_REPLICA_NUMBER
- * （非法/负值回落 1）。条目与字段顺序、每个 default 的有无（interface 持 false 也会
- * 输出 {@code "default":false}）= Go 数组/struct 字面量形态（契约）。
+ * /vector-stores/types 的静态元数据（契约样例锁定）：
+ * postgres/sqlite 不在列（仅 env store 可达）。tencent_vectordb 的 replica_number 缺省读
+ * TENCENT_VECTORDB_REPLICA_NUMBER（非法/负值回落 1）。条目与字段顺序、每个 default 的有无
+ * （interface 持 false 也会输出 {@code "default":false}）都是既定契约形态。
  */
 public final class VectorStoreTypes {
 

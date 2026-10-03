@@ -17,7 +17,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * OTLP 载荷结构测试（对照 Go exporter.go 的端点/头与 manager.go 的 resource/scope
+ * OTLP 载荷结构测试（端点/头与 resource/scope
  * 装配；wire 形态用生成的 opentelemetry.proto 类断言）。
  */
 class OtlpHttpExporterTest {

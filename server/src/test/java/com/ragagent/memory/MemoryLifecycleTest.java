@@ -21,11 +21,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * {@code SaveItem} 与 {@code ConfirmPendingItem} 的并发语义
- * （对照 Go internal/application/repository/memory_lifecycle.go 全 125 行）。
+ * {@code saveItem} 与 {@code confirmPendingItem} 的并发语义
+ * （提议与确认两条生命周期的全部分支）。
  *
  * <p>这两个方法是**提议（pending）与已确认事实（active）之间唯一的闸门**，
- * 四条分支都必须照抄，否则会出现"一条提议悄悄让一条已生效的事实退休"
+ * 四条分支都必须覆盖，否则会出现"一条提议悄悄让一条已生效的事实退休"
  * 或者"重放把同一条写两遍"。</p>
  */
 @SpringBootTest
@@ -55,9 +55,8 @@ class MemoryLifecycleTest {
     }
 
     /**
-     * ⚠️ id 必须由调用方给：{@code SaveItem} **不生成** id（Go 侧
-     * {@code tx.Create(item)} 直接插，服务层在调用前就 {@code uuid.New()} 好了）。
-     * 不给的话第二次插入会撞主键。
+     * ⚠️ id 必须由调用方给：{@code SaveItem} **不生成** id（直接插入，
+     * 服务层在调用前就生成好 uuid）。不给的话第二次插入会撞主键。
      */
     private MemoryItem item(String content, String key, String status) {
         MemoryItem item = new MemoryItem();
@@ -94,7 +93,7 @@ class MemoryLifecycleTest {
      * 提议（pending）**不能**让一条已生效的事实退休——这是本方法存在的核心理由。
      *
      * <p>目标 active 时 {@code item.replaces_id} 指向它，但取代集合里**跳过**它
-     * （Go 的 {@code if item.Status == pending && old.Status == active { continue }}）。</p>
+     * （待定提议不取代已生效事实）。</p>
      */
     @Test
     void saveItemPendingProposalDoesNotRetireTheActiveFact() {
@@ -130,7 +129,7 @@ class MemoryLifecycleTest {
 
     /**
      * 内容与状态都已有同款时**复用**那一行，不再插一条
-     * （Go 的 {@code if old.Content == item.Content && old.Status == item.Status { *item = *old }}）。
+     * （内容与状态完全一致的旧行原样复用）。
      */
     @Test
     void saveItemReusesAnIdenticalLiveRow() {

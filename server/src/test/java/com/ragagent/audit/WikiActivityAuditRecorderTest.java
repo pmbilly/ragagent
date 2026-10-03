@@ -21,9 +21,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Wiki 活动埋点的落库实现测试——对照 Go
- * {@code internal/application/service/kb_activity.go} 的
- * {@code RecordWikiContentActivity}（L162-181）/ {@code recordKBActivity}（L85-151）。
+ * Wiki 活动埋点的落库实现测试（{@code RecordWikiContentActivity} /
+ * {@code recordKBActivity}）。
  *
  * <p>这是本轮的"接上既有桩"验证：{@code WikiActivityAudit} 此前只有接口没有实现 bean，
  * 6 处埋点全部退化成 debug 日志；{@link WikiActivityAuditRecorder} 补上之后
@@ -76,7 +75,7 @@ class WikiActivityAuditRecorderTest {
         assertThat(row.getTenantId()).isEqualTo(7L);
         assertThat(row.getActorUserId()).isEqualTo("u-editor");
         assertThat(row.getActorRole()).isEqualTo("contributor");
-        // Details 对照 Go 的 map[string]any{"count": N, "actions": {...}}；字母序 actions < count
+        // Details 形如 {"count": N, "actions": {...}}；字母序 actions < count
         assertThat(row.getDetails().get("count").asInt()).isEqualTo(1);
         assertThat(row.getDetails().get("actions").get("manual_edit").asInt()).isEqualTo(1);
         List<String> names = new ArrayList<>();
@@ -84,7 +83,7 @@ class WikiActivityAuditRecorderTest {
         assertThat(names).containsExactly("actions", "count");
     }
 
-    /** 对照 Go {@code count := sum(actions); if count == 0 { return }}：全零不写。 */
+    /** count = sum(actions)；全零不写。 */
     @Test
     void skipsWhenCountIsZero() {
         TenantContext.set(9L, TenantContext.webUserPrincipal("u"), "owner", false, "u", false);
@@ -95,7 +94,7 @@ class WikiActivityAuditRecorderTest {
         assertThat(written).isEmpty();
     }
 
-    /** 对照 Go {@code recordKBActivity} 的入参守卫：kbID 为空 → 不写。 */
+    /** 入参守卫：kbID 为空 → 不写。 */
     @Test
     void skipsWhenKnowledgeBaseMissing() {
         TenantContext.set(9L, TenantContext.webUserPrincipal("u"), "owner", false, "u", false);
@@ -106,7 +105,7 @@ class WikiActivityAuditRecorderTest {
         assertThat(written).isEmpty();
     }
 
-    /** tenantId 传 0 时回落到上下文租户；仍为 0 则不写（对照 Go 的两段判定）。 */
+    /** tenantId 传 0 时回落到上下文租户；仍为 0 则不写（两段判定）。 */
     @Test
     void fallsBackToContextTenantAndSkipsWhenAbsent() {
         TenantContext.set(9L, TenantContext.webUserPrincipal("u"), "owner", false, "u", false);
@@ -119,7 +118,7 @@ class WikiActivityAuditRecorderTest {
         assertThat(written).hasSize(1);   // 没新增
     }
 
-    /** 无 actor 时 actor_role 留空（对照 Go {@code if actorID != "" { actorRole = ... }}）。 */
+    /** 无 actor 时 actor_role 留空（actorID 为空才赋角色）。 */
     @Test
     void omitsActorRoleWhenActorMissing() {
         TenantContext.set(7L, null, null, false, null, false);

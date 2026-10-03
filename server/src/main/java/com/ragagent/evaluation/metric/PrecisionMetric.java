@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * 对照 Go metric.PrecisionMetric（precision.go 全文）：
+ * Precision 指标：
  * 每真值组算「命中数 / 命中序列长度」，再按真值组数平均。
  */
 public final class PrecisionMetric implements Metrics {

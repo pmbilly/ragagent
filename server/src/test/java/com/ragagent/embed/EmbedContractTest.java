@@ -26,17 +26,17 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 /**
- * 波 4.3 embed 契约测试：管理面（emb-mgmt-*）+ 公开面（emb-pub-*），golden 逐条
- * 掩码比对。golden 来源：Go dev server 实录（scripts/record-emb-golden.sh）。
+ * embed 契约测试：管理面（emb-mgmt-*）+ 公开面（emb-pub-*），golden 逐条
+ * 掩码比对。golden 录制脚本：scripts/record-emb-golden.sh。
  *
- * <p>场景顺序严格复刻录制脚本（同请求序列有状态依赖）：
+ * <p>场景顺序严格按录制脚本（同请求序列有状态依赖）：
  * 管理面 → 渠道标记回填（SQL）→ 公开面。禁用态/推荐问题开关的状态转换
  * （create quirk：default:true 走 DB 默认；update 不带 allowed_origins 清空 allowlist）
  * 都发生在请求序列中间，不可拆分重放。</p>
  *
  * <p>掩码面：uuid / 时间戳 / publish token（em_…）/ session token（ems_…）/ sig。</p>
  *
- * <p><b>刻意不重放</b>：emb-pub-load-badvisitor（Go 的 400 Bad Request 是 HTTP 服务器
+ * <p><b>刻意不重放</b>：emb-pub-load-badvisitor（录制环境的 400 Bad Request 是 HTTP 服务器
  * 对畸形头行的裸拒绝，属容器层，MockMvc 不经容器解析；A/B 侧对真实栈验证）、
  * mcp-oauth-resolutions ×2 与 tool-approvals 的 gate 依赖分支（录制脚本本就未录）。</p>
  */

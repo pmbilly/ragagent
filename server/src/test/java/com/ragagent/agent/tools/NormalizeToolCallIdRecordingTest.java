@@ -7,8 +7,7 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
- * NormalizeToolCallId 的 Go 实录（9 条，探针原样调用 Go
- * {@code NormalizeToolCallID}）。确定性生成（空 id → 同一 tool+index 同值）、
+ * NormalizeToolCallId 的录制判定（9 条）。确定性生成（空 id → 同一 tool+index 同值）、
  * 非法字符替换、64 字符截断带哈希，全部逐字比对。
  */
 class NormalizeToolCallIdRecordingTest {

@@ -15,16 +15,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * 对照 Go internal/application/service/mcp_tool_approval_service_test.go。
+ * MCP 工具审批的服务层契约。
  *
  * <p>语义核心：SetEnabled 保留 approval、SetRequireApproval 保留 disabled——
  * 两条都用同一条部分列补丁路径实现。</p>
  *
- * <p>差异说明（与 Go 测试）：Go 用内存 fake 仓储满足"服务存在"检查；Java 直接落库
- * （mcp_services 一行）以复用同一份装配。Go 的
- * {@code TestMCPDirectoryBatchPolicyUsesOneDatabaseQuery} 断言的是
- * {@code internal/agent/approval.Gate.EnabledTools} 的查询次数，该包不在本次范围内，
- * 故此处只覆盖策略仓储/服务本身（批量读取由 {@code listByService} 一次查询完成）。</p>
+ * <p>夹具差异：直接落库（mcp_services 一行）以满足"服务存在"检查、复用同一份装配。
+ * "批量读取只发一条查询"的次数断言属于 agent 审批门（{@code Gate}），不在本文件范围；
+ * 此处只覆盖策略仓储/服务本身（批量读取由 {@code listByService} 一次查询完成）。</p>
  */
 @SpringBootTest
 class McpToolApprovalServiceTest {

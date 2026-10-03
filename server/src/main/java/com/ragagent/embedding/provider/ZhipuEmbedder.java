@@ -11,15 +11,15 @@ import com.ragagent.embedding.EmbeddingHttp;
 import com.ragagent.common.web.ProviderJson;
 
 /**
- * 智谱 embedding 客户端（对照 Go {@code internal/models/embedding/zhipu.go} 全文）。
+ * 智谱 embedding 客户端。
  *
- * <p>请求体 = Go {@code ZhipuEmbedRequest}（model/input/dimensions/
- * truncate_prompt_tokens）；无 encoding_format（Go 结构体没有该字段）。
- * 默认 base = provider.ZhipuEmbeddingBaseURL。</p>
+ * <p>请求体字段序固定（model/input/dimensions/
+ * truncate_prompt_tokens）；无 encoding_format。
+ * 默认 base = 智谱 embedding 端点。</p>
  */
 public final class ZhipuEmbedder extends BaseEmbedder {
 
-    /** 对照 provider.ZhipuEmbeddingBaseURL。 */
+    /** 与 {@code ProviderBaseURLs.ZHIPU_EMBEDDING_BASE_URL} 一致。 */
     public static final String ZHIPU_EMBEDDING_BASE_URL = "https://open.bigmodel.cn/api/paas/v4";
 
     private final String baseUrl;

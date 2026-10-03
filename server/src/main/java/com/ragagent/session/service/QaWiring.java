@@ -184,12 +184,12 @@ public class QaWiring {
 
             @Override
             public List<SearchResult> hybridSearch(String knowledgeBaseId, com.ragagent.common.pipeline.SearchParams params) {
-                // KB 元数据缺失时保持 Go 同形的 1003 错误（A/B 场景 kse-unknown-kb 依赖）。
+                // KB 元数据缺失时保持既定的 1003 错误（A/B 场景 kse-unknown-kb 依赖）。
                 if (kbService.getAllTenantById(knowledgeBaseId) == null) {
                     throw new PipelinePorts.PipelinePortException(
                             "error code: 1003, error message: knowledge base not found");
                 }
-                // Go 侧 params 是值拷贝（归一化不回传调用方）——Java 显式浅拷贝。
+                // 入参是值拷贝（归一化不回传调用方）——显式浅拷贝。
                 com.ragagent.common.pipeline.SearchParams local = new com.ragagent.common.pipeline.SearchParams();
                 local.setQueryText(params.getQueryText());
                 local.setQueryEmbedding(params.getQueryEmbedding());
@@ -223,7 +223,7 @@ public class QaWiring {
         return new PipelinePorts.KnowledgeService() {
             @Override
             public Knowledge getKnowledgeById(String id) {
-                // ctx 租户过滤（Go GetKnowledgeByID 带 ctx 过滤；Java 从 TenantContext 取）
+                // 知识查询带租户过滤（从 TenantContext 取）
                 return knowledgeService.getKnowledgeInTenant(TenantContext.currentTenantId(), id);
             }
 
@@ -385,9 +385,9 @@ public class QaWiring {
     }
 
     /**
-     * 对照 container.Provide(chatpipeline.NewEventManager) + L380-397 的 Invoke 注册序。
+     * Bean 注册序（与 chatpipeline 事件管理器的装配顺序一致）。
      * RetrieveGraphRepository / TenantService / SessionService / WebSearchStateService /
-     * WebSearchProviderRepository 传 null（Go 侧 nil 分支，见类注释）。
+     * WebSearchProviderRepository 传 null（见类注释的取舍）。
      * DataAnalysisSessionFactory：dev 无分析面，工厂恒返回不可用会话——
      * DATA_ANALYSIS 阶段只在 MergeResult 出现 CSV/Excel 命中时进入。
      */

@@ -11,8 +11,7 @@ import com.ragagent.embedding.EmbeddingHttp;
 import com.ragagent.common.web.ProviderJson;
 
 /**
- * Azure OpenAI embedding 客户端（对照 Go
- * {@code internal/models/embedding/azure_openai.go} 全文）。
+ * Azure OpenAI embedding 客户端。
  *
  * <p>URL 公式：{@code {base}/openai/deployments/{model}/embeddings?api-version={v}}
  * （api_version 默认 2024-10-21，取 extra_config）；鉴权头是 {@code api-key}
@@ -49,7 +48,7 @@ public final class AzureOpenAiEmbedder extends BaseEmbedder {
 
     @Override
     public List<float[]> batchEmbed(List<String> texts) {
-        // 对照 azureOpenAIEmbedRequest：model/input/encoding_format/dimensions
+        // 请求体字段序：model/input/encoding_format/dimensions
         ObjectNode reqBody = ProviderJson.object();
         reqBody.put("model", modelName);
         reqBody.set("input", ProviderJson.arrayOfStrings(texts));

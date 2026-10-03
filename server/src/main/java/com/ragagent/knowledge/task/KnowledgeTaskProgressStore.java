@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
  *   <li>{@code save*Initial}（handler 准入时）= Redis {@code SETNX} → {@link #putIfAbsent}；
  *       只在键不存在时落「Task queued, waiting to start...」的初始进度；</li>
  *   <li>{@code save*}（worker 每步）= Redis {@code SET} → {@link #put}，无条件覆写。
- *       响应里的 {@code created_at} 变成 0——这是源码行为的实录（契约样例锁定），别"修好"。</li>
+ *       响应里的 {@code created_at} 变成 0——这是源码行为（契约样例锁定），别"修好"。</li>
  * </ul></p>
  */
 @Component

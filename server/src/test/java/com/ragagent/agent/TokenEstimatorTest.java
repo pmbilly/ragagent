@@ -113,7 +113,7 @@ class TokenEstimatorTest {
         assertThat(e.estimateMessage(thinking)).isEqualTo(1807);
         assertThat(e.estimateMessage(plain)).isEqualTo(6);
         assertThat(e.estimateMessage(thinking)).isGreaterThan(e.estimateMessage(plain) + 1000);
-        // 差值 ≈ reasoning 自身的 token 数（±2，Go InDelta 同断言）
+        // 差值 ≈ reasoning 自身的 token 数（±2 容差）
         assertThat(Math.abs(e.estimateString(reasoning)
                 - (e.estimateMessage(thinking) - e.estimateMessage(plain)))).isLessThanOrEqualTo(2);
 

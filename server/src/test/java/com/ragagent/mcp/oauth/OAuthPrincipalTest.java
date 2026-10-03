@@ -21,7 +21,7 @@ import com.ragagent.mcp.protocol.McpContext;
 import org.junit.jupiter.api.Test;
 
 /**
- * 对照 Go internal/mcp/oauth_principal_test.go。
+ * OAuth 主体隔离的三条契约。
  *
  * <p>三条：{@code dbTokenStore} 写的是 principal（不是 user）、
  * {@code managedTokenStore} 不自行刷新（对依赖库隐藏过期时间）、
@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
  */
 class OAuthPrincipalTest {
 
-    /** 对照 Go {@code TestDBTokenStoreUsesPrincipal}。 */
+    /** {@code dbTokenStore} 写的是 principal（不是 user）。 */
     @Test
     void dbTokenStoreUsesPrincipal() {
         FakeOAuthRepository repo = new FakeOAuthRepository();
@@ -76,9 +76,8 @@ class OAuthPrincipalTest {
     }
 
     /**
-     * 对照 Go {@code TestManagedTokenStoreLeavesRefreshToOAuthRuntime}：
      * 读出来的 token 必须<b>看不到</b>过期时间，而数据库里的真实过期时间必须还在
-     * （运行期预检还要用它）。
+     * （运行期预检还要用）。
      */
     @Test
     void managedTokenStoreLeavesRefreshToOAuthRuntime() {
@@ -111,9 +110,9 @@ class OAuthPrincipalTest {
     }
 
     /**
-     * 对照 Go {@code TestOAuthCacheKeyUsesPrincipalForOAuthServices}。
+     * OAuth 服务的连接缓存键按 principal 隔离。
      *
-     * <p>{@code cacheKey} 属于协议层（已翻译在 {@code McpClientManager}，包级私有），
+     * <p>{@code cacheKey} 属于协议层（在 {@code McpClientManager}，包级私有），
      * 本包无法直接调用，故用反射对齐这条契约——它决定了 OAuth 服务"每个身份一条连接"。</p>
      */
     @Test
@@ -152,7 +151,7 @@ class OAuthPrincipalTest {
         return (String) method.invoke(null, service, principal);
     }
 
-    /** 对照 Go：非 OAuth 服务不会走 OAuth 装配（IsOAuth 判定）。 */
+    /** 非 OAuth 服务不会走 OAuth 装配（IsOAuth 判定）。 */
     @Test
     void nonOAuthServiceHasNoOAuthConfig() {
         McpService service = new McpService();

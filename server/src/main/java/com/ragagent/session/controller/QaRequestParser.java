@@ -102,7 +102,7 @@ final class QaRequestParser {
             throw BizException.notFound("Session not found");
         }
 
-        // resolveAgent（Go L548-600：共享优先，source==0 才回落 own）
+        // 解析 agent：共享优先，source==0 才回落自有
         var resolvedAgent = agentResolver.resolve(request.agentId,
                 request.agentSourceTenantId);
         CustomAgentEntity customAgent = resolvedAgent.row();
@@ -124,10 +124,9 @@ final class QaRequestParser {
         com.ragagent.auth.apikey.domain.TenantAPIKeyScope.authorizeKnowledgeTargets(
                 merged.kbIds(), merged.knowledgeIds());
 
-        // wiki fixer 的租户作用域（Go L206-218）：内建 agent id 不匹配即跳过（同款守卫）
+        // wiki fixer 的租户作用域：内建 agent id 不匹配即跳过（同款守卫）
         if (rc.agentConfig != null && "builtin-wiki-fixer".equals(customAgent.getId())) {
-            // wiki fixer 的租户作用域随 wiki_config 面（Go resolveWikiFixerTenantScope
-            // 的命中条件是 KB 共享关系；dev 单租户等价于不动）。
+            // 租户作用域随 wiki_config 面（命中条件是 KB 共享关系；dev 单租户等价于不动）。
         }
 
         // 内联 base64 图片（落盘后回填 URL，消息/检索/VLM
@@ -233,7 +232,7 @@ final class QaRequestParser {
             rc.attachmentIDs = normalizedIds;
         }
 
-        // tag scopes / ids / mcp / skills（Go L359-367）
+        // tag scopes / ids / mcp / skills
         List<QaSupport.TagScope> mentionScopes = QaSupport.tagScopesFromMentionedItems(request.mentionedItems());
         List<String> requestTagIds = QaSupport.dedupRequestStrings(request.tagIds());
         String tagError = QaSupport.validateUnscopedTagIds(
@@ -249,9 +248,9 @@ final class QaRequestParser {
         List<String> skillNames = QaSupport.dedupRequestStrings(QaRequestBinder.appendAll(request.skillNames(),
                 QaSupport.mentionedIdsByType(request.mentionedItems(), "skill")));
 
-        // assistant 消息骨架（buildMessageExecutionContext 的 agent 字段，Go L368-426）
+        // assistant 消息骨架（buildMessageExecutionContext 的 agent 字段）
         String agentId = customAgent == null ? "" : customAgent.getId();
-        // Go：agentTenantID = effectiveTenantID，为 0 才回落 agent.TenantID（L493-495）
+        // 共享 agent 的租户以 effectiveTenantId 为准，为 0 才回落 agent 自身租户
         long agentTenantId = resolvedAgent.effectiveTenantId() != 0 ? resolvedAgent.effectiveTenantId()
                 : (customAgent != null && customAgent.getTenantId() != null ? customAgent.getTenantId() : 0);
         String modelId = request.summaryModelId;

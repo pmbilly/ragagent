@@ -87,9 +87,9 @@ public class KnowledgeCloneService {
      * EnsureDefaults 补成 vector+keyword）；已有目标做 preflight（add=源里 target 没有的、
      * remove=target 里的多余行；file_hash+completed 二次匹配），total=add+remove，
      * 逐步 "Processed X/N clone operations"，终态 completed/100 +
-     * "Knowledge base clone completed successfully"（created_at=0 实录）。
+     * "Knowledge base clone completed successfully"（created_at=0 为既有行为）。
      * <p><b>已知差异</b>：克隆只到"行级"（KB 行 + knowledge 行 + chunk 行），向量索引/
-     * 文件对象/wiki/FAQ tag 映射不复制；transfer-state 续跑/重试语义不翻译。</p>
+     * 文件对象/wiki/FAQ tag 映射不复制；transfer-state 续跑/重试语义未实现。</p>
      */
     public void startKBClone(long tenantId, String taskId, String sourceId, String targetId,
                              boolean createTarget, String creatorId) {

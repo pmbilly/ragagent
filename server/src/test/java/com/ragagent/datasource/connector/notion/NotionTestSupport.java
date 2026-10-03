@@ -16,21 +16,19 @@ import com.ragagent.datasource.domain.DataSourceConstants;
  * Notion 测试的公共夹具。
  *
  * <h2>SSRF 白名单是进程级静态状态（必须还原）</h2>
- * <p>对照 Go 测试的 {@code t.Setenv("SSRF_WHITELIST", "127.0.0.1,::1,localhost")}
- * + {@code ResetSSRFWhitelistForTest()}。Java 进程内改不了 env，
+ * <p>白名单取 {@code SSRF_WHITELIST=127.0.0.1,::1,localhost}。Java 进程内改不了 env，
  * 按 {@code FakeYuque} / {@code FeishuTestSupport} 的既有惯例：
  * {@code @BeforeAll} 调 {@link #allowLoopback()}，{@code @AfterAll} 调
  * {@link #restoreSsrf()}。</p>
  *
  * <h2>限流与退避必须被替换掉，否则测试变成慢测</h2>
- * <p>Go 的默认限流是 3 req/s，Go 自己那套连接器测试因此实测要跑 1.7 秒；
- * 重试退避更是 1s/2s/4s。Java 侧在测试里一律注入
+ * <p>生产默认限流是 3 req/s、重试退避 1s/2s/4s。测试里一律注入
  * {@link NotionClient.RateLimiter#unlimited()} + 零退避 + 记账 Sleeper，
- * 于是没有一条用例真的在等墙钟（约定 §7.5 第 7 条）。</p>
+ * 于是没有一条用例真的在等墙钟。</p>
  */
 final class NotionTestSupport {
 
-    /** 放行本机回环的原始白名单（对照 Go 测试的 {@code SSRF_WHITELIST}）。 */
+    /** 放行本机回环的原始白名单（对应 {@code SSRF_WHITELIST}）。 */
     static final String LOOPBACK_WHITELIST = "127.0.0.1,::1,localhost";
 
     private NotionTestSupport() {
@@ -63,7 +61,7 @@ final class NotionTestSupport {
 
     // ── 配置 ──────────────────────────────────────────────────────────────
 
-    /** 对照 Go {@code makeNotionConfig}。 */
+    /** 造一份标准的数据源配置。 */
     static DataSourceConfig config(String baseUrl, List<String> resourceIds) {
         return config("tok", baseUrl, resourceIds);
     }

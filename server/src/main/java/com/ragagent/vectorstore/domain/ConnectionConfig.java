@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
- * 对照 Go {@code types.ConnectionConfig}（internal/types/vectorstore.go L120-236）。
- * 全字段 omitempty（@JsonInclude(NON_DEFAULT)/NON_NULL）；未知键容忍（jsonb 演进，§9）。
+ * 向量库连接配置。
+ * 空字段整键省略（@JsonInclude(NON_DEFAULT)/NON_NULL）；未知键容忍（jsonb 演进）。
  * password / api_key 落库加密由 {@link ConnectionConfigTypeHandler} 处理。
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -36,8 +36,8 @@ public class ConnectionConfig {
     /** TestConnection 探测到的服务端版本（成功后回存） */
     public String version = "";
 
-    /** 对照 GetEndpoint：去重判定的规范化端点（Qdrant 缺省端口 6334）。
-     *  ⚠️ §7.5 第 2 条：Go 的**方法**——必须 @JsonIgnore，否则 Jackson 把它当
+    /** 去重判定的规范化端点（Qdrant 缺省端口 6334）。
+     *  ⚠️ 这是**派生值不是存储字段**——必须 @JsonIgnore，否则 Jackson 把它当
      *  "endpoint" 属性写进响应/jsonb（实测 vs-get 抓回）。 */
     @JsonIgnore
     public String getEndpoint() {
@@ -60,7 +60,7 @@ public class ConnectionConfig {
         return "";
     }
 
-    /** 对照 MaskSensitiveFields：非空密码/密钥 → "***"（空保持空，前端区分未配置） */
+    /** 非空密码/密钥 → "***"（空保持空，前端区分未配置） */
     public ConnectionConfig maskSensitiveFields() {
         ConnectionConfig out = copy();
         if (out.password != null && !out.password.isEmpty()) {

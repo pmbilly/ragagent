@@ -147,7 +147,7 @@ class DorisPureFunctionsTest {
         assertThat(ddl).contains("\"metric_type\"=\"inner_product\"");
         assertThat(ddl).contains("\"dim\"=\"768\"");
         assertThat(ddl).contains("DISTRIBUTED BY HASH(id) BUCKETS 10");
-        // 模板的 PROPERTIES( 行本身带一个制表符，properties 串再带一个（照 Go 原文）
+        // 模板的 PROPERTIES( 行本身带一个制表符，properties 串再带一个（原文逐字）
         assertThat(ddl).contains("PROPERTIES(\n\t\t\"replication_num\"=\"1\"\n);");
         assertThat(ddl).contains("INDEX idx_content  (content)           USING INVERTED"
                 + " PROPERTIES(\"parser\"=\"chinese\",\"support_phrase\"=\"true\")");

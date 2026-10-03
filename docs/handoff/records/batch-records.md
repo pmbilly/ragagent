@@ -619,3 +619,12 @@
 - **登记**：零值时间判断现存 3 处实现（`ZeroTimeSerializer.isZeroValue` / `RssUtil.isZeroTime` / `DataSourceSupport.isZeroTime`）——潜在收敛点。
 - **验证**：datasource / session / llm / auth 四域探针绿。
 
+
+**✅ B48（2026-10-03，注释大清洗专项——Go 锚点/翻译腔/过期引用全仓归零，B9 专项化收官）**
+- **规模与终态**：起步基线扫描 11,932 匹配行 / 1,723 文件（main 9,058 + test 2,874；口径=对照 Go/波 N/Go 的/GORM/.go 引用/实录·照抄·复刻等翻译措辞/§·B 批次码/agentm·modelcontext 旧包名）；收官 main+test 棘轮基线 **3,999 → 0**（`check-go-anchors.py --write` 已刷新），base 模式余量 876 行**全部为白名单类**（见下）。
+- **口径（先摘不变量，再删锚点）**：① 纯考古删（.go 文件行号/迁移号指针/波次·批次码/实录编号/`/tmp` 探针路径）；② 不变量中性改写（「Go 的 len() 是 UTF-8 字节数」→「按 UTF-8 字节数计」；「GORM 隐式行为清单」→「落库行为清单」逐条保留；「照抄/直译/复刻/对拍」去属性留行为）；③ 过期引用修（旧信封响应形态、旧包名、`§x.y` 悬空指针）；④ D 类错误陈述就地核实修正——典型：favorite 控制器类注释仍描述去信封前的 `{"data":…,"success":true}` 形态、`McpHttpContractTest` 键名方向写反（camelCase 断言配 snake 注释）、`RssCursorJsonTest` 时区描述与断言矛盾、`ElasticsearchV7` 命中类型标注与向量回填两处「照抄缺陷」注释滞后于已修代码。
+- **裸形态盲区补扫**（base grep 抓不到，第一批实测反馈后并入协议）：`Go X:`/`照 Go`/`近似 Go`/`Go 注释原文`、不带 Go 字样的 Go 专名指针（mapper 层「对照 {@code Pluck("id", &survivors)}」「OnConflict DoUpdates」等）、`omitempty/nil/len/rune/ctx` 词汇 → Java 本位（恒输出/null/长度/码点/上下文）。
+- **白名单五类（留档不追）**：① 域词——wiki ingest「批次」、句柄「翻译」（cite 管道运行时语义）、「可移植」（SQL 方言）；② `@DisplayName` 注解串与 `.as()`/assertEquals 断言消息（约 200 处，改则动契约）；③ 方法/类名标识符（`xxxMatchesGo`、`goFormatFloat`、`tierToGo`、`isGoSpace` 等）；④ 有效交叉引用（契约文档 §1.x/§2.x、`docs/known-issues`、本仓 Java 符号）；⑤ `GoRecording*`/`GoJsonBridge` 录制夹具（B39 已定禁止手改）与 `EventPayloadJsonTest` 64 条 `// Go: {…}` 期望形状（文件头注明保留为历史记录）。
+- **执行方式**：逐域清单 + 并行 agent 批（main 21 域 + test 27 清单，~20 批）+ 小域内联；与档 3（B37~B47）及批量清洗提交 `ad704ca7`（1,338 文件，并行会话）**同窗交叉**，分发清单三次过期——收尾批改用「开工实时 grep」为准；档 3 退役留下的悬挂 `{@link GoXxx}`（约 15 文件）按 C 类过期引用清。
+- **闸门与顺手修复**：compileJava/compileTestJava 绿；spotlessCheck 绿（顺手清 6 个测试文件的未用 import——并行功能提交遗留；修 1 处编辑事故 doubled `*/`，spotless 抓住）；全量 `:server:test` 绿（BUILD SUCCESSFUL）；棘轮绿。会话期间用户限速/配额三度打断，中断批以「协议 grep 逐文件自查」无损续跑。
+- **待人工复核（3 项）**：① `SearchResult`/`MessageSearchGroupItem` 的 score 注释已按 GoDoubleSerializer 退役后的 Jackson 默认（1.0 形态）改写——若 SSE/接口 golden 仍按旧最短表示断言，需随档 3 口径重录；② `ModelParametersTypeHandler` 解密失败分支为空 if（注释改「保留观测点」），是否应有日志待定；③ `WikiPageRepository` 零值 page_type 落 `''` 而非 DDL `'summary'` 的语义差异已中性登记，是否属行为变更待裁决。

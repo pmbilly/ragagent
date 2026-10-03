@@ -27,8 +27,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
- * API 主体解析（对照 Go middleware/auth.go resolveAPIPrincipal L561-620 +
- * attachAPIKeyAuthContext L488-560）：tenant/direct_header/signed_token 三模式、
+ * API 主体解析：tenant/direct_header/signed_token 三模式、
  * 401 文案、首位用户身份、JWT 校验链（aud/exp/TTL/nbf/tenant_id/sub）。
  */
 class APIKeyAuthChannelPrincipalTest {

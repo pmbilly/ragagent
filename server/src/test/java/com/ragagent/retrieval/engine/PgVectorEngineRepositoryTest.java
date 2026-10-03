@@ -183,7 +183,7 @@ class PgVectorEngineRepositoryTest {
         Map<String, Object> params = Map.of("embedding", Map.of("dup", new float[] {1f}));
 
         adapter.save(info, params);
-        // 同 SourceID 再存不炸（Go 裸 Create 的偏离备案：统一走 ON CONFLICT DO NOTHING）
+        // 同 SourceID 再存不炸：统一走 ON CONFLICT DO NOTHING（幂等）
         adapter.save(info, params);
         Integer count = jdbc.queryForObject(
                 "SELECT COUNT(*) FROM embeddings WHERE source_id = 'dup'", Integer.class);

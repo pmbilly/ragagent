@@ -11,16 +11,11 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 /**
- * IMA 纯函数的对等测试（对照 Go {@code ima/types_test.go}）。
+ * IMA 纯函数的对等测试。
  *
- * <h2>期望值全部是 Go 实录</h2>
- * <p>把 Go 的 {@code logicalKey} / {@code Config.GetBaseURL} /
- * {@code extensionForContentType} / {@code mimeForExtension} /
- * {@code extensionForMediaType} / {@code isSkippableMediaType} /
- * {@code sanitizeFileName} / {@code redact} / {@code apiEnvelope} 连同它们依赖的
- * 常量<b>原样抄进</b>一个独立 Go 程序（{@code gochk-iy}）跑出真值，再抄回断言。
- * 这种做法在本项目已经抓到过两个"只看代码看不出来"的坑（见 HANDOFF §3.6），
- * 所以凡是字节级对齐的模块都沿用。</p>
+ * <h2>期望值</h2>
+ * <p>断言里的期望值都是逐字节核对过的真值。这类"只看代码看不出来"的值
+ * （哈希、截断边界、错误映射）必须单独钉住，防止无声漂移。</p>
  */
 class ImaFormatsTest {
 
@@ -40,9 +35,9 @@ class ImaFormatsTest {
     }
 
     /**
-     * Go 实录：14 组 {@code (kb_id, parent_folder_id, title)} → 逻辑键。
+     * 14 组 {@code (kb_id, parent_folder_id, title)} → 逻辑键的期望值。
      *
-     * <p>这些值一旦变了，Go 已写进 {@code knowledges.external_id} 的行就再也认不出来
+     * <p>这些值一旦变了，已落库的 {@code knowledges.external_id} 行就再也认不出来
      * ——会被当成新文档重复灌入、旧文档被当成已删除。所以逐字节钉住。</p>
      */
     @ParameterizedTest
@@ -66,7 +61,7 @@ class ImaFormatsTest {
         assertThat(ImaFormats.logicalKey(kbId, folderId, title)).isEqualTo(want);
     }
 
-    /** 对照 Go {@code TestLogicalKey_DelimiterIsUnambiguous}：朴素拼接会碰撞。 */
+    /** 分隔符无歧义：朴素拼接会碰撞。 */
     @Test
     void logicalKeyDelimiterIsUnambiguous() {
         assertThat(ImaFormats.logicalKey("kb", "a", "bc"))
@@ -75,7 +70,7 @@ class ImaFormatsTest {
 
     // ── Config.GetBaseURL ────────────────────────────────────────────────
 
-    /** 对照 Go {@code TestConfig_GetBaseURL}（含实测的真值）。 */
+    /** baseURL 归一的期望值全表。 */
     @ParameterizedTest
     @CsvSource({
             "'',                          https://ima.qq.com",
@@ -91,7 +86,7 @@ class ImaFormatsTest {
         assertThat(cfg.baseURL()).isEqualTo(want);
     }
 
-    /** {@code GetBaseURL} 是 Go 的**方法**：不得成为 JSON 属性（约定 §7.5 第 2 条）。 */
+    /** {@code baseURL()} 是方法：不得成为 JSON 属性。 */
     @Test
     void configGetBaseUrlIsNotAJsonProperty() throws Exception {
         ImaConfig cfg = new ImaConfig();
@@ -105,7 +100,7 @@ class ImaFormatsTest {
 
     // ── 媒体类型映射 ─────────────────────────────────────────────────────
 
-    /** 对照 Go 的 {@code extensionForMediaType} 全表（含没有扩展名的那些类型）。 */
+    /** {@code extensionForMediaType} 全表（含没有扩展名的那些类型）。 */
     @ParameterizedTest
     @CsvSource({
             "0,  ''", "1,  pdf", "2,  ''", "3,  docx", "4,  pptx", "5,  xlsx", "6,  ''",
@@ -118,7 +113,7 @@ class ImaFormatsTest {
         assertThat(ImaFormats.extensionForMediaType(mediaType)).isEqualTo(expected);
     }
 
-    /** 对照 Go {@code TestExtensionForContentType}。 */
+    /** Content-Type → 扩展名。 */
     @ParameterizedTest
     @CsvSource({
             "image/jpeg,               jpg",
@@ -139,7 +134,7 @@ class ImaFormatsTest {
         assertThat(ImaFormats.extensionForContentType(in)).isEqualTo(want == null ? "" : want);
     }
 
-    /** 对照 Go {@code mimeForExtension} 全表。 */
+    /** {@code mimeForExtension} 全表。 */
     @ParameterizedTest
     @CsvSource({
             "'',      application/octet-stream",
@@ -174,7 +169,7 @@ class ImaFormatsTest {
         assertThat(ImaFormats.mimeForExtension(ext)).isEqualTo(want);
     }
 
-    /** 对照 Go {@code TestIsSkippableMediaType}：AI 会话与视频跳过，笔记**不**跳过。 */
+    /** AI 会话与视频跳过，笔记**不**跳过。 */
     @Test
     void isSkippableMediaTypeMatchesGo() {
         assertThat(ImaFormats.isSkippableMediaType(ImaFormats.MEDIA_TYPE_AI_SESSION)).isTrue();
@@ -196,8 +191,8 @@ class ImaFormatsTest {
     }
 
     /**
-     * 长中文标题必须在 rune 边界上截断（Go 实录：{@code strings.Repeat("知识", 200)}
-     * → 66 个「知识」= 198 字节，且结果仍是合法 UTF-8 前缀）。
+     * 长中文标题必须在码点边界上截断（200 个「知识」截到 66 个 = 198 字节，
+     * 且结果仍是合法 UTF-8 前缀）。
      */
     @Test
     void sanitizeFileNameTruncatesAtRuneBoundary() {
@@ -219,8 +214,7 @@ class ImaFormatsTest {
     }
 
     /**
-     * 对照 Go {@code redact}（Go 实录）：
-     * {@code len < 12 → "***"}，否则前 6 + {@code "..."} + 后 4。
+     * 脱敏规则：长度不足 12 → {@code "***"}，否则前 6 + {@code "..."} + 后 4。
      */
     @ParameterizedTest
     @CsvSource({
@@ -238,7 +232,7 @@ class ImaFormatsTest {
     // ── apiEnvelope 的两种拼法 ───────────────────────────────────────────
 
     /**
-     * 对照 Go {@code TestAPIEnvelope_AcceptsBothSpellings}：只读 {@code code} 的话，
+     * 信封兼容两种拼法：只读 {@code code} 的话，
      * 非零 {@code retcode} 会被解成 0、每个 API 错误都被静默当成成功。
      */
     @ParameterizedTest
@@ -259,7 +253,7 @@ class ImaFormatsTest {
         assertThat(env.message()).isEqualTo(wantMsg == null ? "" : wantMsg);
     }
 
-    /** 上限 36 字符这个不变式单独钉一条（Go 的 {@code len(base) != 36} 断言）。 */
+    /** 上限 36 字符这个不变式单独钉一条。 */
     @ParameterizedTest
     @ValueSource(strings = {"kb1", "a-very-long-knowledge-base-id-0123456789", "知识库"})
     void logicalKeyAlways36Chars(String kbId) {

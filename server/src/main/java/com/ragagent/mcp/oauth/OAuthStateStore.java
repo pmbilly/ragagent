@@ -111,7 +111,7 @@ public class OAuthStateStore {
     /**
      * <b>仅</b>在 code 交换已成功落库 token 后调用。
      *
-     * <p>内存分支会把过期时间再顺延一个 TTL（Go 一致），让发起方在回调完成后仍有
+     * <p>内存分支会把过期时间再顺延一个 TTL，让发起方在回调完成后仍有
      * 足够窗口轮询到结果。</p>
      */
     public void completeAttempt(String state) {

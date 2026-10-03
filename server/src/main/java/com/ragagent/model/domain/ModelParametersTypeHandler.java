@@ -12,11 +12,11 @@ import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedTypes;
 
 /**
- * ModelParameters 的 jsonb TypeHandler（对照 Go ModelParameters.Value()/Scan()）：
- * - setNonNullParameter：拷贝 → api_key/app_secret AES-256-GCM 加密（key 缺失时明文落库，
- *   与 Go GetAESKey()==nil 行为一致）→ Jackson 序列化 → setString
+ * ModelParameters 的 jsonb TypeHandler：
+ * - setNonNullParameter：拷贝 → api_key/app_secret AES-256-GCM 加密（key 缺失时明文落库）
+ *   → Jackson 序列化 → setString
  * - getNullableResult：反序列化 → api_key/app_secret 宽容解密
- *   （解密失败置空并记日志，行可加载，对照 DecryptStoredSecretLenient）
+ *   （解密失败置空并记日志，行可加载）
  */
 @MappedTypes(ModelParameters.class)
 public class ModelParametersTypeHandler extends BaseTypeHandler<ModelParameters> {
@@ -79,7 +79,7 @@ public class ModelParametersTypeHandler extends BaseTypeHandler<ModelParameters>
             CryptoService.LenientResult apiKey = cryptoService.decryptStoredSecretLenient(params.getApiKey());
             params.setApiKey(apiKey.ok() ? apiKey.plaintext() : "");
             if (!apiKey.ok() && !json.contains("\"api_key\":\"\"")) {
-                // 对照 Go log.Printf("[crypto] model parameters api_key: decrypt failed ...")
+                // 解密失败且存量值非空串：保留观测点（当前无操作）
             }
             CryptoService.LenientResult appSecret = cryptoService.decryptStoredSecretLenient(params.getAppSecret());
             params.setAppSecret(appSecret.ok() ? appSecret.plaintext() : "");

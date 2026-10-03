@@ -63,7 +63,7 @@ class ImChannelWechatQrcodeTest {
         StubService stub = new StubService();
         controller.wechatQRCodeService(stub);
 
-        // 注意 record 序是 (qrcodeUrl, qrcode)，照 Go 的 QRCodeResult 字段序
+        // 注意 record 组件序是 (qrcodeUrl, qrcode)
         stub.qrResult = new QRCodeResult("https://x/qr.png", "q-1");
         ResponseEntity<Map<String, Object>> ok = controller.wechatQrcode();
         assertEquals(200, ok.getStatusCode().value());
@@ -111,7 +111,7 @@ class ImChannelWechatQrcodeTest {
         assertEquals("qrcode is required", bad.getBody().get("error"));
         assertEquals(400, controller.wechatQrcodeStatus(null).getStatusCode().value());
 
-        // 出站失败 → 500 固定文案（不带原因，照 Go）
+        // 出站失败 → 500 固定文案（不带原因）
         stub.failPoll = true;
         ResponseEntity<Map<String, Object>> failed =
                 controller.wechatQrcodeStatus("{\"qrcode\":\"q-1\"}");

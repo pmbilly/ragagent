@@ -25,18 +25,18 @@ import org.springframework.stereotype.Component;
  *
  * <h2>落库隐式行为清单</h2>
  * <ol>
- *   <li><b>钩子 BeforeCreate</b>（Go L141-144）：无条件 {@code s.ID = uuid.New().String()}。
+ *   <li><b>插入前</b>：无条件生成新 UUID。
  *       → {@link #create} 里无条件覆盖新 UUID（**不是**"为空才生成"）。</li>
  *   <li><b>软删除</b>：deleted_at 列。Java 不用 {@code @TableLogic}，每条查询显式加
  *       {@code deleted_at IS NULL}；
  *       删除走 UPDATE 置 {@code deleted_at}——**硬删会连带触发
  *       {@code im_channel_sessions_session_id_fkey} 的 ON DELETE CASCADE**。</li>
- *   <li><b>可见性范围 {@code applySessionUserScope}</b>（Go L20-26）：{@code userID} 非空时加
+ *   <li><b>可见性范围</b>：{@code userID} 非空时加
  *       {@code (user_id = ? OR user_id IS NULL OR user_id = '')}——**空 owner 的历史行/API 行
  *       对所有人都可见**。这条件出现在 Get/GetByTenantID/GetPagedByTenantID/Update/Delete/
  *       BatchDelete/DeleteAllByTenantID/UpdateLastRequestState 共 8 处，Java 侧收敛成
  *       {@link #applyUserScope}。</li>
- *   <li><b>默认排序</b>：列表类查询显式 {@code updated_at DESC}（Go L100/L129）。</li>
+ *   <li><b>默认排序</b>：列表类查询显式 {@code updated_at DESC}。</li>
  *   <li><b>更新语义</b>：{@code title}/{@code description}
  *       无条件覆盖（改成空串也真的写空，绕开零值跳过规则）。用 {@code LambdaUpdateWrapper.set} 逐列写。</li>
  * </ol>

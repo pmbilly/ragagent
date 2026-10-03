@@ -12,13 +12,13 @@ import com.ragagent.mcp.domain.McpOAuthToken;
 import com.ragagent.mcp.domain.McpPrincipal;
 
 /**
- * 内存版 OAuth 仓储（对照 Go 测试的 {@code fakeOAuthRepo} / {@code lockedOAuthRepo}）。
+ * 内存版 OAuth 仓储。
  *
- * <p>与 Go 测试一致的两条关键语义：
+ * <p>两条关键语义：
  * <ol>
  *   <li><b>读写都返回克隆</b>——否则运行期拿到的是同一个对象引用，租约/材料的比对会被
- *       调用方的原地改写污染（Go 用 {@code cloneOAuthToken}）；</li>
- *   <li><b>租约 CAS 在锁内完成</b>——对照 {@code lockedOAuthRepo}，
+ *       调用方的原地改写污染；</li>
+ *   <li><b>租约 CAS 在锁内完成</b>——
  *       保证并发用例测的是"只有一个所有者"而不是测试自身的竞态。</li>
  * </ol>
  */
@@ -37,7 +37,7 @@ public final class FakeOAuthRepository implements OAuthRepository {
         return tenantId + "|" + serviceId;
     }
 
-    /** 测试可见：直接塞一行（对照 Go 测试里的 {@code repo.tokens[key] = row}）。 */
+    /** 测试可见：直接塞一行。 */
     public void seed(TenantContext.Principal principal, McpOAuthToken row) {
         lock.lock();
         try {
@@ -160,7 +160,7 @@ public final class FakeOAuthRepository implements OAuthRepository {
         }
     }
 
-    /** 对照 Go {@code cloneOAuthToken}（含租约时刻的深拷贝）。 */
+    /** 行克隆（含租约时刻的深拷贝）。 */
     static McpOAuthToken cloneToken(McpOAuthToken token) {
         if (token == null) {
             return null;

@@ -22,7 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * 对照 Go internal/application/repository/mcp_metadata_test.go。
+ * MCP 元数据仓储语义。
  *
  * <p>覆盖：复合主键 (tenant, service, principal) 的作用域、<b>陈旧快照不得覆盖新快照</b>、
  * 计数摘要只回计数不回 payload。</p>

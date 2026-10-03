@@ -21,16 +21,15 @@ import com.ragagent.common.error.ErrorCode;
 import com.ragagent.llm.extract.PipelineConfig;
 
 /**
- * 回归（W5γ5.14，2026-09-25 E2E 抓回）：KB 检索的 <b>"硬错 vs 降级" 分级</b>。
+ * 回归：KB 检索的 <b>"硬错 vs 降级" 分级</b>。
  *
  * <p><b>场景来源</b>：dev PG 里租户 10002 的 `ks-golden-store` 仍绑定着**已被删除的 store**
  * （`vector_stores` 表 0 行）⇒ 任何把该 KB 纳入范围的检索都在引擎解析处失败（2200
  * "vector store bound to the knowledge base is not available"）⇒ 双端实测**都是硬错中止**
  * （`error`×2 帧、不做 fallback 作答），而**无错但 0 命中**时双端都降级作答
- * （Go `stage_fallback` + 固定/模型 fallback）。</p>
+ * （`stage_fallback` + 固定/模型 fallback）。</p>
  *
- * <p>钉住的分级（对照 Go `chat_pipeline/search.go:127-133`、`search_parallel.go:115-130` 与
- * `:168-176`，两侧逐字一致）：</p>
+ * <p>钉住的分级：</p>
  * <ol>
  *   <li><b>chunk 检索抛错 + 0 结果 ⇒ 该硬错上抛</b>（`search_failed`，**不**降级为 `search_nothing`）；</li>
  *   <li><b>无错 + 0 结果 ⇒ `SEARCH_NOTHING`</b>（降级分支）；</li>

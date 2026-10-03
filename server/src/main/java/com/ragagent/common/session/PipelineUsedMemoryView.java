@@ -9,7 +9,7 @@ package com.ragagent.common.session;
 public record PipelineUsedMemoryView(String id, String kind, String content) {
 
     /**
-     * 与实体同约定：三个键都无 omitempty，空值归一为空串
+     * 与实体同约定：三个键恒输出，空值归一为空串
      * （SSE 的 {@code memory_recalled} 事件载荷逐字节依赖这一点）。
      */
     public PipelineUsedMemoryView {

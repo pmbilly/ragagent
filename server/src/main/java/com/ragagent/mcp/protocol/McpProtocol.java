@@ -26,7 +26,7 @@ public final class McpProtocol {
         return version != null && VALID_PROTOCOL_VERSIONS.contains(version);
     }
 
-    /** clientInfo.name（Go 写作 "WeKnora"；Java 侧服务标识沿用同一字符串，前端/服务端日志可对照）。 */
+    /** clientInfo.name：客户端服务标识（与前端/服务端日志对照用）。 */
     public static final String CLIENT_NAME = "WeKnora";
 
     public static final String CLIENT_VERSION = "1.0.0";

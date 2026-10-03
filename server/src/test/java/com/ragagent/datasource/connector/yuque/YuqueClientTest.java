@@ -34,11 +34,10 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.slf4j.LoggerFactory;
 
 /**
- * 语雀客户端的对等测试（逐条对照 Go {@code yuque/client_test.go}）。
+ * 语雀客户端的对等测试。
  *
  * <p>退避注入 {@link YuqueRetryPolicy#immediate()}，所以重试矩阵（429 / 5xx /
- * 传输失败）都是毫秒级的——Go 那边 {@code TestClient_5xxRetriesOnce} 还得开一个
- * 5 秒超时的 ctx 才不至于等 2 秒。</p>
+ * 传输失败）都是毫秒级的。</p>
  */
 class YuqueClientTest {
 
@@ -159,7 +158,7 @@ class YuqueClientTest {
         }
     }
 
-    /** 对照 Go {@code TestClient_ListUserRepos_FiltersType}：查询串必须按 key 升序且带 type=Book。 */
+    /** 查询串必须按 key 升序且带 type=Book。 */
     @Test
     void listUserReposSendsBookFilterAndPagination() throws Exception {
         try (FakeYuque f = new FakeYuque()) {
@@ -176,7 +175,7 @@ class YuqueClientTest {
         }
     }
 
-    /** 对照 Go {@code TestClient_ListBookDocs_Pagination}：满页继续、不满页停（2 次调用）。 */
+    /** 满页继续、不满页停（2 次调用）。 */
     @Test
     void listBookDocsPaginates() throws Exception {
         StringBuilder page1 = new StringBuilder("{\"data\":[");
@@ -209,7 +208,7 @@ class YuqueClientTest {
 
     // ── 重试矩阵 ─────────────────────────────────────────────────────────
 
-    /** 对照 Go {@code TestClient_Ping_401}：401 必须包成 ErrInvalidCredentials 且不重试。 */
+    /** 401 必须包成 {@code InvalidCredentials} 且不重试。 */
     @Test
     void http401WrapsInvalidCredentials() throws Exception {
         try (Scripted stub = new Scripted(Rs.of(401, "{\"message\":\"Unauthorized\"}"))) {
@@ -220,7 +219,7 @@ class YuqueClientTest {
         }
     }
 
-    /** 对照 Go {@code TestClient_Ping_403WrapsInvalidCredentials}。 */
+    /** 403 同样包成 {@code InvalidCredentials}。 */
     @Test
     void http403WrapsInvalidCredentials() throws Exception {
         try (Scripted stub = new Scripted(Rs.of(403, "{\"message\":\"Forbidden\"}"))) {
@@ -231,7 +230,7 @@ class YuqueClientTest {
         }
     }
 
-    /** 对照 Go {@code TestClient_429WithRetryAfter_Retries}：{@code Retry-After: 0} → 100ms → 重试成功。 */
+    /** {@code Retry-After: 0} → 100ms → 重试成功。 */
     @Test
     void http429WithRetryAfterRetries() throws Exception {
         try (Scripted stub = new Scripted(
@@ -242,7 +241,7 @@ class YuqueClientTest {
         }
     }
 
-    /** 对照 Go {@code TestClient_429ExhaustsRetries}：4 次尝试（1 + 3 重试）。 */
+    /** 4 次尝试（1 + 3 重试）。 */
     @Test
     void http429ExhaustsRetries() throws Exception {
         try (Scripted stub = new Scripted(
@@ -253,7 +252,7 @@ class YuqueClientTest {
         }
     }
 
-    /** 对照 Go {@code TestClient_5xxRetriesOnce}：5xx 恰好重试 1 次 → 2 次尝试。 */
+    /** 5xx 恰好重试 1 次 → 2 次尝试。 */
     @Test
     void http5xxRetriesOnce() throws Exception {
         try (Scripted stub = new Scripted(Rs.of(500, "{\"message\":\"internal error\"}"))) {
@@ -263,7 +262,7 @@ class YuqueClientTest {
         }
     }
 
-    /** 对照 Go {@code TestClient_4xxNotRetried}：非 429/5xx 的 4xx 不重试。 */
+    /** 非 429/5xx 的 4xx 不重试。 */
     @Test
     void http4xxIsNotRetried() throws Exception {
         try (Scripted stub = new Scripted(Rs.of(400, "{\"message\":\"bad request\"}"))) {
@@ -295,8 +294,7 @@ class YuqueClientTest {
     // ── 令牌不进日志 ─────────────────────────────────────────────────────
 
     /**
-     * 对照 Go {@code TestClient_TokenNeverLoggedInFull}：原始令牌绝不落日志，
-     * 只出现脱敏形态。
+     * 原始令牌绝不落日志，只出现脱敏形态。
      */
     @Test
     void tokenIsNeverLoggedInFull() throws Exception {
@@ -324,8 +322,7 @@ class YuqueClientTest {
     }
 
     /**
-     * 取 logback 的具体 logger；没有 logback 绑定时跳过（对照 Go 的
-     * "SetOutput wiring may be broken" sanity check）。
+     * 取 logback 的具体 logger；没有 logback 绑定时跳过。
      */
     static Logger logbackLoggerOrSkip(Class<?> type) {
         org.slf4j.Logger raw = LoggerFactory.getLogger(type);
@@ -337,7 +334,7 @@ class YuqueClientTest {
 
     // ── flexibleStatus ───────────────────────────────────────────────────
 
-    /** 对照 Go {@code TestV2Doc_Status_AcceptsNumberAndString}。 */
+    /** status 接受数字与字符串两种形态。 */
     @ParameterizedTest
     @CsvSource({
             "'{\"id\":1,\"status\":1}',      1",
@@ -355,7 +352,6 @@ class YuqueClientTest {
     }
 
     /**
-     * 对照 Go {@code TestV2Doc_Status_RejectsUnexpectedShapes}：
      * 浮点 / 布尔 / 数组 / 对象都<b>大声失败</b>，而不是被静默字符串化
      * ——否则草稿可能被当成已发布文档灌进知识库。
      */
@@ -372,7 +368,7 @@ class YuqueClientTest {
                 .hasMessageContaining("flexibleStatus: expected string or integer");
     }
 
-    /** 超长整数（超出 int64）也必须失败——Go 解到 int64 会报 out of range。 */
+    /** 超长整数（超出 long 范围）也必须失败，不能被静默截断。 */
     @Test
     void flexibleStatusRejectsOutOfRangeInteger() {
         assertThatThrownBy(() -> JsonMappers.lenient()
@@ -380,7 +376,7 @@ class YuqueClientTest {
                 .hasMessageContaining("flexibleStatus: expected string or integer");
     }
 
-    /** 端到端：列表响应里 {@code status} 是数字时照样能解码（Go 的真实故障复现）。 */
+    /** 端到端：列表响应里 {@code status} 是数字时照样能解码（真实故障的回归）。 */
     @Test
     void numericStatusDecodesEndToEnd() throws Exception {
         try (FakeYuque f = new FakeYuque()) {
@@ -408,14 +404,13 @@ class YuqueClientTest {
         }
     }
 
-    // ── parseRetryAfter（B44：Java 原生 Double 解析，与 FeishuTransport 同款）────
+    // ── parseRetryAfter（Java 原生 Double 解析，与 FeishuTransport 同款）────
 
     /**
      * header 为秒数：可带小数/正负号（Java {@code Double.parseDouble} 语义）；
      * 不可解析回落 fallback；{@code <= 0} 强制 100ms。
      *
-     * <p><b>2026-10-03（B44）</b>：原 Go duration 文法随 {@code GoDuration} 退役——
-     * {@code "90m"} 不再解析为 90ms（回落），{@code "1e2"} 按 Java 语义解析为 100 秒；
+     * <p>{@code "90m"} 不被接受（回落 fallback），{@code "1e2"} 按秒数解析为 100 秒；
      * 实现与 {@code feishu/FeishuTransport#parseRetryAfter} 一致。</p>
      */
     @ParameterizedTest
@@ -442,7 +437,7 @@ class YuqueClientTest {
 
     // ── buildQuery ───────────────────────────────────────────────────────
 
-    /** 对照 Go 的 {@code url.Values.Encode()}：key 升序、省略空值、带前导 {@code ?}。 */
+    /** query 串编码：key 升序、省略空值、带前导 {@code ?}。 */
     @Test
     void buildQueryMatchesGoUrlEncoding() {
         Map<String, String> params = new LinkedHashMap<>();
@@ -461,7 +456,7 @@ class YuqueClientTest {
         assertThat(YuqueClient.buildQuery(null)).isEmpty();
     }
 
-    /** 转义按 Go 的 {@code QueryEscape}：空格转 {@code +}，保留 {@code -_.~}。 */
+    /** 转义规则：空格转 {@code +}，保留 {@code -_.~}。 */
     @Test
     void buildQueryEscapesLikeGo() {
         Map<String, String> params = new LinkedHashMap<>();
@@ -489,7 +484,7 @@ class YuqueClientTest {
         return out;
     }
 
-    /** {@link FlexibleStatus} 的直接构造语义（Go 的 {@code flexibleStatus("1")}）。 */
+    /** {@link FlexibleStatus} 的直接构造语义（等价于 {@code FlexibleStatus.of("1")}）。 */
     @Test
     void flexibleStatusOfNormalizesNull() {
         assertThat(FlexibleStatus.of(null).value()).isEmpty();

@@ -158,7 +158,7 @@ class OllamaChatTest {
         assertTrue(sent.get("think") == null);
     }
 
-    /** 工具 schema 原样透传（不做 Go SDK 那套丢字段的强类型往返）。 */
+    /** 工具 schema 原样透传（不做丢字段的强类型往返）。 */
     @Test
     void toolsSchemaPassesThroughVerbatim() throws Exception {
         FakeOllamaService service = new FakeOllamaService();

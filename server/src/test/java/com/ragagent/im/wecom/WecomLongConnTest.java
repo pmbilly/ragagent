@@ -24,7 +24,7 @@ import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
 
 /**
- * 企业微信长连接（W5γ3.5）对照 Go {@code wecom/longconn.go} + {@code ws_adapter.go} 的
+ * 企业微信长连接的
  * 确定性面：逐消息文件解密（含容错填充）、@提及剥离（带机器人名学习）、回调体解析
  * （五种类型 + 引用上下文 + 事件）、流帧构造、退避曲线、工厂模式分派。
  *
@@ -119,7 +119,7 @@ class WecomLongConnTest {
                   "file":{"url":"https://x/doc.pdf","aeskey":"K2"}}}
                 """));
         assertEquals(ImTypes.MESSAGE_TYPE_FILE, file.messageType);
-        assertEquals("m4", file.fileName); // WeCom 不给文件名 → 用 msgid（照 Go）
+        assertEquals("m4", file.fileName); // WeCom 不给文件名 → 用 msgid
 
         IncomingMessage mixedText = client.parseCallbackBody(frame("""
                 {"cmd":"aibot_msg_callback","body":{"msgid":"m5","msgtype":"mixed",

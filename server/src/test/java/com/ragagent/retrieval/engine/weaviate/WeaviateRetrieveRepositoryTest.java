@@ -30,13 +30,13 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 
 /**
- * Weaviate 驱动（W5γ4.13）对照 Go {@code retriever/weaviate/} 全包：惰性建类
+ * Weaviate 驱动：惰性建类
  * （命名向量 + gse 分词 + 可过滤属性 + cluster 选项）、单对象/批量创建、批量删除、
- * <b>merge 更新</b>（有意修正：Go 的 PUT 会清属性与向量）、GraphQL 向量/关键词检索的
+ * <b>merge 更新</b>（PUT 全量替换会清属性与向量，故用 merge）、GraphQL 向量/关键词检索的
  * 解析、CopyIndices 的 offset 分页与命名向量回搬、move 的 seen-set 循环。
  *
- * <p>桩逐请求断言 HTTP 形状（该批无 golden 面）；GraphQL 串的字节契约在
- * {@code WeaviateGqlTest}（Go 实录）。真实服务端验证见 {@code WeaviateDriverLocalIT}。</p>
+ * <p>桩逐请求断言 HTTP 形状；GraphQL 串的字节契约在
+ * {@code WeaviateGqlTest}。真实服务端验证见 {@code WeaviateDriverLocalIT}。</p>
  */
 class WeaviateRetrieveRepositoryTest {
 
@@ -262,7 +262,7 @@ class WeaviateRetrieveRepositoryTest {
         assertThat(body.path("properties").size()).isEqualTo(1); // merge：只发变更字段
         assertThat(captured.stream().noneMatch(c -> c.path().contains("other_base"))).isTrue();
 
-        // 逐对象失败只记日志（照 Go）
+        // 逐对象失败只记日志
         statuses.put("PATCH /v1/objects/Weknora_embeddings_3/" + CHUNK, 500);
         repo.batchUpdateChunkTagID(Map.of(CHUNK, "t9"));
     }
@@ -319,7 +319,7 @@ class WeaviateRetrieveRepositoryTest {
         responses.put("GET /v1/schema",
                 "{\"classes\":[{\"class\":\"Weknora_embeddings_2\"},"
                         + "{\"class\":\"other_base\"}]}");
-        // score 用真服务端的字符串形态（Go 实录），并混一条缺失 score 的
+        // score 用真服务端返回的字符串形态，并混一条缺失 score 的
         responses.put("POST /v1/graphql",
                 "{\"data\":{\"Get\":{\"Weknora_embeddings_2\":["
                         + "{\"content\":\"a\",\"chunk_id\":\"c1\",\"_additional\":{\"id\":\"p1\","
@@ -341,7 +341,7 @@ class WeaviateRetrieveRepositoryTest {
                 .isEqualTo(EngineTypes.MATCH_KEYWORDS);
         assertThat(captured.stream().noneMatch(c -> c.path().contains("other_base"))).isTrue();
 
-        // 单集合失败 → 抛（与 Qdrant 的跳过继续相反，照 Go）
+        // 单集合失败 → 抛（与 Qdrant 的跳过继续相反）
         statuses.put("POST /v1/graphql", 500);
         assertThatThrownBy(() -> repo.retrieve(params))
                 .isInstanceOf(IllegalStateException.class)
@@ -468,7 +468,7 @@ class WeaviateRetrieveRepositoryTest {
         WeaviateVectorEmbedding empty = new WeaviateVectorEmbedding();
         empty.embedding = new float[0];
         assertThat(WeaviateRetrieveRepository.calculateStorageSize(empty))
-                .isEqualTo(8 + 512 + 24); // 非 null 空数组也计（照 Go 的 nil 判定）
+                .isEqualTo(8 + 512 + 24); // 非 null 空数组也计入（null 不计）
     }
 
     @Test

@@ -3,9 +3,7 @@ package com.ragagent.common.text;
 /**
  * Unicode White_Space 空白处理（Java 原生组合实现）。
  *
- * <p><b>2026-10-03（B45）</b>：收编全仓多份重复实现（原 {@code common.wiki.GoStrings}、
- * {@code gitlab.GoStrings}、{@code rss.RssUtil}、{@code MemoryScopes}、{@code MemoryText}）。
- * 定义统一为 Unicode White_Space 属性（与 Go 的 {@code unicode.IsSpace} 一致）。</p>
+ * <p>定义统一为 Unicode White_Space 属性。</p>
  *
  * <h2>为什么不能用 {@code String.trim()} / {@code String.strip()}</h2>
  * <ul>
@@ -18,14 +16,14 @@ package com.ragagent.common.text;
  *
  * <p><b>实现选择</b>：{@link Character#isSpaceChar}（覆盖全部 Zs / Zl / Zp，含 U+00A0 /
  * U+2007 / U+202F）+ 6 个 ASCII 控制字符（09-0D、85）——与 White_Space 精确等价，
- * 且复用 JDK 的 Unicode 表（不复刻码点清单）。</p>
+ * 且复用 JDK 的 Unicode 表（不维护自有码点清单）。</p>
  */
 public final class Whitespace {
 
     private Whitespace() {
     }
 
-    /** Unicode White_Space 判定（与 Go 的 {@code unicode.IsSpace} 一致）。 */
+    /** Unicode White_Space 判定。 */
     public static boolean isSpace(int cp) {
         return Character.isSpaceChar(cp)
                 || cp == 0x09 || cp == 0x0A || cp == 0x0B || cp == 0x0C || cp == 0x0D

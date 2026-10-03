@@ -22,17 +22,17 @@ import com.ragagent.common.retrieval.SearchResult;
  *
  * <h2>落库隐式行为清单</h2>
  * <ol>
- *   <li><b>钩子 BeforeCreate</b>（Go L463-484）：无条件生成新 UUID，并把
+ *   <li><b>插入前</b>：无条件生成新 UUID，并把
  *       KnowledgeReferences / AgentSteps / MentionedItems / Images / Attachments / Artifacts
- *       这六个 nil 切片**就地置为空切片**——所以落库时写的是 {@code []} 而不是 SQL NULL
- *       （各类型的 {@code Value()} 也做同样的 nil→[] 兜底）。<br>
+ *       这六个 null 列表**就地置为空列表**——所以落库时写的是 {@code []} 而不是 SQL NULL
+ *       （jsonb 序列化也做同样的 null→[] 兜底）。<br>
  *       等效 Java：这六个字段**默认值是空列表**，实体的 create 路径无条件覆盖 ID。</li>
  *   <li><b>软删除</b>：deleted_at 列。不用 {@code @TableLogic}，
  *       查询显式 {@code deleted_at IS NULL}，删除是 UPDATE。</li>
  *   <li><b>⚠️ updateMessage 的落库语义</b>：实体式整行更新会**跳过零值字段**（string ""、数值 0、
  *       bool false、指针 null、集合 null）。所以"把 content 改成空串"在这条路径上**不会生效**。
  *       这是既定落库行为，不是缺陷（见 {@code MessageRepository.update}）。</li>
- *   <li><b>默认排序</b>：各查询自带 {@code created_at ASC/DESC}（Go L54/L68/L94/L121/L134）。</li>
+ *   <li><b>默认排序</b>：各查询自带 {@code created_at ASC/DESC}。</li>
  *   <li><b>各 jsonb 列</b>：元素类型已知的走 {@code AbstractJsonListTypeHandler} 的
  *       子类（泛型擦除会让元素退化成 map）；{@code usage} / {@code execution_context}
  *       是单个对象，走 {@code PgJsonTypeHandler}。</li>

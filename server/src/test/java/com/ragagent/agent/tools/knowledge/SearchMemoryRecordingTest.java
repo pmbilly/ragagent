@@ -13,7 +13,7 @@ import com.ragagent.agent.tools.GoRecording45B;
 import com.ragagent.agent.tools.RecordingSupport;
 
 /**
- * SearchMemoryTool 的 Go 实录回放（6 条：hits/limit_clamp/limit_zero/disabled/empty/blank_query）。
+ * SearchMemoryTool 的录制回放（6 条：hits/limit_clamp/limit_zero/disabled/empty/blank_query）。
  * output 文本逐字比对，data 键序无关规范化比对；limit 断言 stub 收到的值。
  */
 class SearchMemoryRecordingTest {

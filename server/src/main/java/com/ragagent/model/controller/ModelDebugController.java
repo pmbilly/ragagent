@@ -65,9 +65,9 @@ import com.ragagent.model.service.ModelRuntimeConfigs;
 public class ModelDebugController {
 
 
-    /** 对照 modelDebugMaxInputBytes = 64 * 1024。 */
+    /** 调试请求体字节上限。 */
     private static final int MAX_INPUT_BYTES = 64 * 1024;
-    /** 对照 documents 上限（model.go:394）。 */
+    /** documents 上限。 */
     private static final int MAX_DOCUMENTS = 100;
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -103,7 +103,7 @@ public class ModelDebugController {
             throw new BizException(AppError.notFound("Model not found"));
         }
 
-        // ── 表单字段校验（对照 handler L378-398） ──
+        // ── 表单字段校验 ──
         if (input == null) {
             input = "";
         }
@@ -120,7 +120,7 @@ public class ModelDebugController {
             }
         }
 
-        // ── 可选文件（对照 L400-425） ──
+        // ── 可选文件 ──
         byte[] fileBytes = null;
         String fileName = "";
         long fileSize = 0;
@@ -157,7 +157,7 @@ public class ModelDebugController {
         };
     }
 
-    // ── KnowledgeQA（对照 L431-475） ─────────────────────────────────────
+    // ── KnowledgeQA ──────────────────────────────────────────────────────
 
     private ResponseEntity<ModelDebugResult> debugChat(Model model, String input, DebugOptions opts,
                                         long startedNanos, Map<String, Object> requestPreview,
@@ -188,7 +188,7 @@ public class ModelDebugController {
         }
         chatOpts.setThinking(opts.thinking);
 
-        // 对照 chat.ConfigFromModel(model, "", "") + EffectiveThinkingControl
+        // 组 chat 配置 + thinking 观测
         ChatConfig chatConfig = ModelRuntimeConfigs.chatConfig(model, "", "");
         String thinkingControl = effectiveThinkingControl(chatConfig);
         observations.put("stream", true);
@@ -205,8 +205,7 @@ public class ModelDebugController {
         ModelDebugChatResponse resp = new ModelDebugChatResponse();
         String streamError = null;
         try {
-            // 对照 Go consumeModelDebugChatStream 的 range-over-channel（收到 channel
-            // 关闭才停）：Go/Java 的适配器都会在最后一个内容分片（done=true）之后再
+            // 流式消费：适配器会在最后一个内容分片（done=true）之后再
             // 补一条带 usage 的终态 done 事件，因此看到 done 不能立刻停——
             // 改成「done 之后短超时排空队列」：终态事件由同一线程紧跟着 put，
             // 2 秒窗口足够覆盖调度交错；poll 超时 = 对 channel close 的模拟。
@@ -251,7 +250,7 @@ public class ModelDebugController {
             Thread.currentThread().interrupt();
             streamError = "interrupted";
         }
-        // 对照 L470-474：resp 恒非 null（consume 出错也返回部分结果）
+        // resp 恒非 null（consume 出错也返回部分结果）
         String reasoning = resp.getReasoningContent() == null ? "" : resp.getReasoningContent();
         observations.put("reasoningReturned", !reasoning.trim().isEmpty());
         observations.put("reasoningCharacters", reasoning.codePointCount(0, reasoning.length()));
@@ -259,7 +258,7 @@ public class ModelDebugController {
         return writeResult(startedNanos, requestPreview, resp, streamError, observations);
     }
 
-    // ── Embedding（对照 L476-488） ───────────────────────────────────────
+    // ── Embedding ────────────────────────────────────────────────────────
 
     private ResponseEntity<ModelDebugResult> debugEmbedding(Model model, String input, long startedNanos,
                                              Map<String, Object> requestPreview, Map<String, Object> observations) {
@@ -283,7 +282,7 @@ public class ModelDebugController {
         return writeResult(startedNanos, requestPreview, vector, error, observations);
     }
 
-    // ── Rerank（对照 L489-501） ──────────────────────────────────────────
+    // ── Rerank ───────────────────────────────────────────────────────────
 
     private ResponseEntity<ModelDebugResult> debugRerank(Model model, String input, List<String> documents,
                                           long startedNanos, Map<String, Object> requestPreview,
@@ -308,7 +307,7 @@ public class ModelDebugController {
         return writeResult(startedNanos, requestPreview, results, error, observations);
     }
 
-    // ── VLLM（对照 L502-514） ────────────────────────────────────────────
+    // ── VLLM ─────────────────────────────────────────────────────────────
 
     private ResponseEntity<ModelDebugResult> debugVlm(Model model, String input, byte[] fileBytes,
                                        long startedNanos, Map<String, Object> requestPreview,
@@ -322,9 +321,9 @@ public class ModelDebugController {
         } catch (RuntimeException e) {
             return writeResult(startedNanos, requestPreview, null, e.getMessage(), observations);
         }
-        // 凭证 + 构造期校验：照 Go GetVLMModel 的 resolveWeKnoraCloudCredentials
-        // （model 级优先、租户回落）与 vlm.NewVLM（weknoracloud 的凭证检查先于基址；
-        // ollama 不校验基址）——与 agent 侧 VLM 装配共用 vlmConfigFor 同一实现。
+        // 凭证 + 构造期校验：model 级凭证优先、租户回落；
+        // weknoracloud 的凭证检查先于基址、ollama 不校验基址
+        // ——与 agent 侧 VLM 装配共用 vlmConfigFor 同一实现。
         VlmClient.VlmConfig config;
         try {
             config = runtimeFactory.vlmConfigFor(vlmModel);
@@ -345,7 +344,7 @@ public class ModelDebugController {
         return writeResult(startedNanos, requestPreview, result, error, observations);
     }
 
-    // ── ASR（对照 L515-530） ─────────────────────────────────────────────
+    // ── ASR ──────────────────────────────────────────────────────────────
 
     private ResponseEntity<ModelDebugResult> debugAsr(Model model, byte[] fileBytes, String fileName,
                                        long startedNanos, Map<String, Object> requestPreview,
@@ -359,7 +358,7 @@ public class ModelDebugController {
             return writeResult(startedNanos, requestPreview, null, e.getMessage(), observations);
         }
         ModelParameters p = model.getParameters();
-        // 对照 asr.ConfigFromModel：language 不从模型来（恒空），customHeaders 透传
+        // language 不从模型来（恒空），customHeaders 透传
         var config = new AsrTranscriber.AsrConfig(
                 p == null ? "" : p.getBaseUrl(), model.getName(), p == null ? "" : p.getApiKey(),
                 model.getId(), "", p == null ? null : p.getCustomHeaders());
@@ -387,7 +386,7 @@ public class ModelDebugController {
         return writeResult(startedNanos, requestPreview, raw, error, observations);
     }
 
-    // ── 结果整形（对照 writeModelDebugResult + modelDebugRequestPreview + redactedDebugConfig） ──
+    // ── 结果整形 ─────────────────────────────────────────────────────────
 
     /** 结果整形：HTTP 恒 200，裸结果对象（无信封）。 */
     private ResponseEntity<ModelDebugResult> writeResult(long startedNanos, Map<String, Object> request,
@@ -451,7 +450,7 @@ public class ModelDebugController {
         return preview;
     }
 
-    /** 对照 redactedDebugConfig：空 → null；命中敏感词的值换 [REDACTED]（键序按字母序）。 */
+    /** 配置脱敏：空 → null；命中敏感词的值换 [REDACTED]（键序按字母序）。 */
     private static Map<String, String> redactedDebugConfig(Map<String, String> config) {
         if (config == null || config.isEmpty()) {
             return null;
@@ -548,7 +547,7 @@ public class ModelDebugController {
         return new DebugOptions(systemPrompt, temperature, topP, maxTokens, thinking);
     }
 
-    /** 对照 documents 解析（L388-398）：非法 JSON / 非字符串数组 → 固定文案。 */
+    /** documents 解析：非法 JSON / 非字符串数组 → 固定文案。 */
     private static List<String> parseDocuments(String raw) {
         JsonNode node;
         try {
@@ -569,7 +568,7 @@ public class ModelDebugController {
         return documents;
     }
 
-    // ── thinking 观测（对照 chat.EffectiveThinkingControl，thinking.go:147-159） ──
+    // ── thinking 观测 ─────────────────────────────────────────────────────
 
     static String effectiveThinkingControl(ChatConfig config) {
         if (config == null) {
@@ -579,8 +578,8 @@ public class ModelDebugController {
         if (override != null) {
             return override.name();
         }
-        // 对照 Go：provider 为空串才 DetectProvider 回落；非空但未知名（Java 的
-        // fromValue=null）不回落——resolve(null) 无命中 → BaseProvider（Go baseProvider 同形）
+        // provider 为空串才探测回落；非空但未知名（fromValue=null）不回落
+        // ——resolve(null) 无命中 → BaseProvider
         String pv = config.getProvider() == null ? "" : config.getProvider();
         ProviderName name = pv.isEmpty()
                 ? ProviderRegistry.detectProvider(config.getBaseUrl())
@@ -590,7 +589,7 @@ public class ModelDebugController {
 
     // ── 小工具 ───────────────────────────────────────────────────────────
 
-    /** 对照 secutils.SanitizeForLog：\n\r\t → 空格，其余 C0 控制符移除。 */
+    /** 日志脱敏：\n\r\t → 空格，其余 C0 控制符移除。 */
     private static String sanitizeForLog(String input) {
         if (input == null || input.isEmpty()) {
             return "";

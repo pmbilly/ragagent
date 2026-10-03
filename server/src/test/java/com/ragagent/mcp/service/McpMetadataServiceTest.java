@@ -43,11 +43,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * 对照 Go internal/application/service/mcp_metadata_test.go。
+ * MCP 元数据刷新的服务层契约。
  *
- * <p>Go 用 httptest + mcp-go 的 in-process server 做端到端刷新；Java 用
- * {@link com.sun.net.httpserver.HttpServer} 起一个最小的 JSON-RPC stub
- * （content-type: application/json，正是 Streamable HTTP 传输接受的形态之一）。</p>
+ * <p>用 {@link com.sun.net.httpserver.HttpServer} 起一个最小的 JSON-RPC stub
+ * （content-type: application/json，正是 Streamable HTTP 传输接受的形态之一）做端到端刷新。</p>
  */
 @SpringBootTest
 class McpMetadataServiceTest {
@@ -395,7 +394,7 @@ class McpMetadataServiceTest {
         }
     }
 
-    /** 供调试：打印 utf-8 字节数（对齐 Go len(string)） */
+    /** 供调试：打印 utf-8 字节数 */
     static int utf8Length(String s) {
         return s == null ? 0 : s.getBytes(StandardCharsets.UTF_8).length;
     }

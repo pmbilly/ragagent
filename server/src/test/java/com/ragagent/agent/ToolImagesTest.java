@@ -90,7 +90,7 @@ class ToolImagesTest {
                 new ArrayList<>(toolMessages(step)), step, false, images -> List.of());
         assertThat(failed.get(0).getContent()).contains("cannot view");
 
-        // 描述为纯空白 → TrimSpace 后丢弃 → 默认"cannot view"（Go describeImages L909-911）
+        // 描述为纯空白 → trim 后丢弃 → 默认"cannot view"
         List<ChatMessage> blank = ToolImages.appendToolImages(
                 new ArrayList<>(toolMessages(step)), step, false, images -> List.of("  "));
         assertThat(blank.get(0).getContent()).contains("cannot view");

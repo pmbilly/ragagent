@@ -32,8 +32,8 @@ import com.ragagent.im.runtime.ReplyMessage;
 import com.sun.net.httpserver.HttpServer;
 
 /**
- * 云之家（W5γ3.12）对照 Go {@code internal/im/yunzhijia/{adapter,sign,url,websocket,factory}.go}：
- * 签名（Go 录向量交叉核对）、回调解析（@提及三形态 / 内嵌图 / ID 回落链 / 线程根）、
+ * 云之家适配器行为测试：
+ * 签名（固定向量交叉核对）、回调解析（@提及三形态 / 内嵌图 / ID 回落链 / 线程根）、
  * 出站体（引用语义 + markdown 开关 + group_type=3 不发 notifyParams）、下载
  * （token 缓存 / 手动一次重定向且不转发 token / 文件名与扩展名）、端点校验与 WS 帧分类、
  * 工厂（模式与凭据）。
@@ -47,7 +47,7 @@ class YunzhijiaAdapterTest {
                             Map<String, List<String>> headers) {
     }
 
-    /** 打开出站校验的桩（照 Go 覆写包级 var 的测试手法）。 */
+    /** 打开出站校验的桩。 */
     private static final class StubAdapter extends YunzhijiaAdapter {
         StubAdapter(String sendMsgUrl, String secret, String appId, String appSecret,
                     String allowedSuffix, String authUrl, String downloadBaseUrl) {
@@ -347,7 +347,7 @@ class YunzhijiaAdapterTest {
         a.sendReply(incoming, new ReplyMessage("x", false, true));
         assertTrue(!MAPPER.readTree(captured.get(0).body()).has("notifyParams"));
 
-        // 无 messageId + 显式关掉 markdown → 整体不出 param（照 Go 的 opt-out）
+        // 无 messageId + 显式关掉 markdown → 整体不出 param（显式 opt-out）
         captured.clear();
         IncomingMessage noRef = new IncomingMessage();
         noRef.platform = ImTypes.PLATFORM_YUNZHIJIA;

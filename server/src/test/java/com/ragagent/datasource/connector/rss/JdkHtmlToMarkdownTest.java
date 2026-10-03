@@ -8,10 +8,8 @@ import org.junit.jupiter.api.Test;
 /**
  * {@link JdkHtmlToMarkdown} 的**语料级**对等测试。
  *
- * <h2>期望值全部是 Go 实录</h2>
- * <p>把 {@code github.com/JohannesKaufmann/html-to-markdown/v2} 的
- * {@code htmltomd.ConvertString} 连同同一个输入喂进一个独立 Go 程序
- * （{@code /tmp/gochk-md}），输出抄进下面的断言。逐条：
+ * <h2>期望值语料</h2>
+ * <p>下面的断言逐条钉住转换行为：
  * <pre>
  *   "summary fallback"                                     -&gt; "summary fallback"
  *   "&lt;p&gt;hello &lt;b&gt;world&lt;/b&gt;&lt;/p&gt;"                        -&gt; "hello **world**"
@@ -43,12 +41,13 @@ import org.junit.jupiter.api.Test;
  * 而 {@code *} / {@code _} / {@code #} <b>不会</b>；{@code <td>} 被当未知标签丢掉后
  * 内容直接相连（{@code "c1c2"}，不是 {@code "c1|c2"}）。</p>
  *
- * <h2>刻意<b>不</b>对齐的边角（也在这里钉住，免得被误以为对齐了）</h2>
+ * <h2>刻意<b>不</b>做的边角（也在这里钉住，免得被误以为支持）</h2>
  * <ul>
- *   <li>嵌套列表：Go 是 {@code "- a\n  \n  - b"}，本实现只缩进不插空行；</li>
- *   <li>{@code ]} 与行首 {@code -}/{@code 1.} 的转义规则没有复刻；</li>
+ *   <li>嵌套列表：只缩进不插空行（输出 {@code "- a\n  - b"}，
+ *       不是带空行的 {@code "- a\n  \n  - b"}）；</li>
+ *   <li>{@code ]} 与行首 {@code -}/{@code 1.} 的转义规则未实现；</li>
  *   <li>希腊/数学实体（{@code &alpha;} 之类）不在 {@link HtmlEntities} 表里，
- *       保持字面量而 Go 会解出来。</li>
+ *       保持字面量而不解码。</li>
  * </ul>
  */
 class JdkHtmlToMarkdownTest {
@@ -91,7 +90,7 @@ class JdkHtmlToMarkdownTest {
     @Test
     void linksAndImages() {
         assertThat(md("<a href=\"http://x/y\">link</a>")).isEqualTo("[link](http://x/y)");
-        // Go 实录：没有 href 也会包成 [text]()
+        // 没有 href 也会包成 [text]()
         assertThat(md("<a>nolink</a>")).isEqualTo("[nolink]()");
         assertThat(md("<img src=\"http://x/i.png\" alt=\"alt text\">"))
                 .isEqualTo("![alt text](http://x/i.png)");
@@ -101,7 +100,7 @@ class JdkHtmlToMarkdownTest {
     @Test
     void blockquotes() {
         assertThat(md("<blockquote><p>quote</p></blockquote>")).isEqualTo("> quote");
-        // Go 实录：空行也带 "> "（含尾随空格）
+        // 空行也带 "> "（含尾随空格）
         assertThat(md("<blockquote><p>a</p><p>b</p></blockquote>")).isEqualTo("> a\n> \n> b");
     }
 
@@ -127,7 +126,7 @@ class JdkHtmlToMarkdownTest {
 
     @Test
     void entityDecodingAndEscaping() {
-        // Go 实录：&amp; -> &（不转义）、&lt;b&gt; -> &lt;b&gt;（< > 转义）、&nbsp; -> U+00A0、&#169; -> ©
+        // &amp; -> &（不转义）、&lt;b&gt; -> &lt;b&gt;（< > 转义）、&nbsp; -> U+00A0、&#169; -> ©
         assertThat(md("<p>AT&amp;T &lt;b&gt; &nbsp; &#169;</p>"))
                 .isEqualTo("AT&T &lt;b&gt; \u00A0 ©");
         assertThat(md("<p>a&nbsp;b</p>")).isEqualTo("a\u00A0b");
@@ -135,7 +134,7 @@ class JdkHtmlToMarkdownTest {
 
     @Test
     void markdownEscapingMatchesGo() {
-        // Go 实录：只有 \ [ < > 被转义，* _ # 不动
+        // 只有 \ [ < > 被转义，* _ # 不动
         assertThat(md("<p>a * b _ c [d] # e \\ f</p>"))
                 .isEqualTo("a * b _ c \\[d] # e \\\\ f");
         assertThat(md("<p>quote \" and 'apos'</p>")).isEqualTo("quote \" and 'apos'");
@@ -160,20 +159,20 @@ class JdkHtmlToMarkdownTest {
         assertThat(md("<p>emoji 🚀 and 中文</p>")).isEqualTo("emoji 🚀 and 中文");
     }
 
-    // ── 已知差异：这里刻意钉住当前行为，别误以为与 Go 对齐了 ──────────────
+    // ── 已知差异：这里刻意钉住当前行为 ────────────────────────────────────
 
     @Test
     void nestedListsDifferFromGoAndArePinned() {
-        // Go 实录是 "- a\n  \n  - b"（多一个空行）。本实现只缩进，**不**逐字节对齐。
+        // 嵌套列表只缩进、不插空行。
         assertThat(md("<ul><li>a<ul><li>b</li></ul></li></ul>")).isEqualTo("- a\n  - b");
     }
 
     @Test
     void unsupportedGreekEntitiesStayLiteral() {
-        // Go 的 html.UnescapeString 认识全部 HTML5 实体；HtmlEntities 表是有界的。
-        // 差异方向是"少解码"，不是"丢内容"。
+        // {@link HtmlEntities} 表是有界的，不覆盖全部 HTML5 实体：
+        // 未知实体保持字面量，不丢内容。
         assertThat(md("<p>&alpha;&sum;</p>")).isEqualTo("&alpha;&sum;");
-        // 表里有的那些两边一致
+        // 表里有的实体正常解码
         assertThat(md("<p>&hellip;&mdash;&laquo;x&raquo;</p>")).isEqualTo("…—«x»");
     }
 
@@ -185,7 +184,7 @@ class JdkHtmlToMarkdownTest {
 
     @Test
     void htmlToMarkdownFallbackMatchesGo() {
-        // 对照 connector.go 的 htmlToMarkdown：空白输入 -> ""；
+        // 回落语义：空白输入 -> ""；
         // 转换失败或结果为空 -> TrimSpace(html)。
         assertThat(RssUtil.goTrim(converter.convert("   "))).isEmpty();
         // 一个"转换器总是抛错"的替身：走回落分支
@@ -195,7 +194,7 @@ class JdkHtmlToMarkdownTest {
         assertThat(fallback(failing, "  <p>raw</p>  ")).isEqualTo("<p>raw</p>");
     }
 
-    /** 复刻 {@code RssConnector.htmlToMarkdown} 的三条分支（私有方法，就地重写以便单测）。 */
+    /** {@code RssConnector.htmlToMarkdown} 的三条分支（私有方法，就地重写以便单测）。 */
     private static String fallback(HtmlToMarkdown converter, String html) {
         if (RssUtil.goTrim(html).isEmpty()) {
             return "";

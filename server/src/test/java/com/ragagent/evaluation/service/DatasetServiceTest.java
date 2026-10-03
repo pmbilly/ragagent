@@ -9,7 +9,7 @@ import com.ragagent.evaluation.domain.QaPair;
 import org.junit.jupiter.api.Test;
 
 /**
- * DatasetService 单测：转换 JSON 与 Go dataset.go 的 DefaultDataset/Iterate 语义
+ * DatasetService 单测：转换 JSON 与 DefaultDataset/Iterate 语义
  * 逐字段一致（样例数据固化：1 QA 对 / 4 passage）。
  */
 class DatasetServiceTest {

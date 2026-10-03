@@ -28,8 +28,8 @@ import org.junit.jupiter.api.Test;
  * DTO 层的核心保证是**结构性的**：序列化后的响应体在任何情况下都不得出现
  * api_key / token，无论底层实体是什么状态。
  *
- * <p>对照 Go {@code internal/handler/dto/mcp_test.go} 的五条测试，逐条翻译。
- * Go 断言的是序列化后的 JSON（而不只是结构体形状），Java 侧同样如此——
+ * <p>与既有 DTO 测试同构的五条场景。断言的是序列化后的 JSON
+ * （而不只是 DTO 形状）——
  * 只有走一遍真实序列化才能发现"某个下游的反射式自定义序列化器又把密钥带回来"。</p>
  */
 class McpServiceResponseTest {
@@ -163,7 +163,7 @@ class McpServiceResponseTest {
         assertEquals("abc", resp.getAuthConfig().customHeaders().get("X-Auth"));
     }
 
-    /** 内置服务在 Admin 视角下 advanced_config 会被保留——照抄 Go 的剥离清单，别"顺手修好" */
+    /** 内置服务在 Admin 视角下 advanced_config 会被保留——剥离清单是既定契约，别"顺手修好" */
     @Test
     void builtinKeepsAdvancedConfigForAdmin() {
         asAdmin();
@@ -236,7 +236,7 @@ class McpServiceResponseTest {
         assertFalse(body.contains("leak-me-not"), body);
     }
 
-    /** Go 的 omitempty：NONE 的空串 auth_type 不输出 */
+    /** NONE 的空串 auth_type 不输出（键恒省略） */
     @Test
     void emptyAuthTypeIsOmitted() {
         asAdmin();
@@ -251,7 +251,7 @@ class McpServiceResponseTest {
         assertNull(resp.getAuthConfig().authType(), "空串 auth_type 必须省略（Go omitempty）");
     }
 
-    /** 字段序 = Go struct 声明序（usage_instructions 在首位，别按字母序） */
+    /** 字段序 = DTO 声明序（usage_instructions 在首位，别按字母序） */
     @Test
     void fieldOrderMatchesGoStruct() throws Exception {
         asAdmin();

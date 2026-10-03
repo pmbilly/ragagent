@@ -9,9 +9,8 @@ import java.time.OffsetDateTime;
  * <p><b>响应体形态</b>：{@code POST /messages/search} 的 data.items 元素就是本类型，
  * 键名＝Java 字段名、键序＝声明序。</p>
  *
- * <p><b>score 必须挂 {@link GoDoubleSerializer}</b>（逐字段，勿全局注册）：
- * 分值序列化用最短表示，输出 {@code 1} 而不是 {@code 1.0}；关键词路径的分值是
- * {@code (n-i)/n}，单个结果时正好是 {@code 1}，裸 double 会写成 {@code 1.0}。</p>
+ * <p><b>score 的浮点输出</b>：走 Jackson 默认 double 序列化（{@code 1.0} 形态）：
+ * 关键词路径的分值是 {@code (n-i)/n}，单个结果时正好是 1。
  */
 public class MessageSearchGroupItem {
 

@@ -21,11 +21,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * 对照 mcp-go {@code client/transport/oauth_test.go} 中本项目用到的协议行为，
- * 以及 {@code oauth_utils_test.go}。
+ * OAuth handler 的协议行为测试。
  *
  * <p>重点钉住四件事：PKCE/state 的生成口径、发现链的候选顺序与路径插入语义、
- * 授权 URL 的字节级形态（Go {@code url.Values.Encode()} 的字典序）、
+ * 授权 URL 的字节级形态（表单键按字典序）、
  * 以及 <b>CSRF expected-state 的跨请求重建语义</b>（{@code SetExpectedState}）。</p>
  */
 class OAuthHandlerTest {
@@ -50,7 +49,7 @@ class OAuthHandlerTest {
 
     // ── PKCE / state ───────────────────────────────────────────────────
 
-    /** 对照 {@code oauth_utils_test.go}：verifier 64 字符、state 32 字符、challenge=S256。 */
+    /** verifier 64 字符、state 32 字符、challenge=S256。 */
     @Test
     void pkceGenerationMatchesRfc7636() throws Exception {
         String verifier = Pkce.generateCodeVerifier();
@@ -69,7 +68,7 @@ class OAuthHandlerTest {
 
     // ── 发现链的静态形状 ────────────────────────────────────────────────
 
-    /** 对照 Go {@code buildWellKnownURL} 的<b>路径插入</b>语义（不是简单拼接）。 */
+    /** {@code buildWellKnownUrl} 的<b>路径插入</b>语义（不是简单拼接）。 */
     @Test
     void wellKnownUrlInsertsSegmentBetweenAuthorityAndPath() {
         assertEquals("https://host/.well-known/oauth-protected-resource",
@@ -80,7 +79,7 @@ class OAuthHandlerTest {
                 OAuthHandler.buildWellKnownUrl("https://host/mcp", "oauth-protected-resource"));
     }
 
-    /** 对照 Go {@code authorizationServerMetadataURLs} 的候选顺序。 */
+    /** {@code authorizationServerMetadataUrls} 的候选顺序。 */
     @Test
     void authorizationServerMetadataUrlsFollowMcpSpecOrder() {
         assertEquals(List.of(
@@ -95,7 +94,7 @@ class OAuthHandlerTest {
                 OAuthHandler.authorizationServerMetadataUrls("https://host/tenant/a"));
     }
 
-    /** 对照 Go {@code resourceIdentifiersEqual}：尾部单斜杠忽略，其余分量显著。 */
+    /** {@code resourceIdentifiersEqual}：尾部单斜杠忽略，其余分量显著。 */
     @Test
     void resourceIdentifierComparison() {
         assertTrue(OAuthHandler.resourceIdentifiersEqual("https://Host/mcp", "https://host/mcp/"));
@@ -106,7 +105,7 @@ class OAuthHandlerTest {
         assertFalse(OAuthHandler.resourceIdentifiersEqual("not a url", "not a url2"));
     }
 
-    /** 对照 Go {@code url.Values.Encode()}：键按字典序，空格编成 {@code +}，{@code ~} 不编码。 */
+    /** 表单编码：键按字典序，空格编成 {@code +}，{@code ~} 不编码。 */
     @Test
     void formEncodingMatchesGoUrlValues() {
         Map<String, String> params = new LinkedHashMap<>();
@@ -124,7 +123,7 @@ class OAuthHandlerTest {
 
     // ── 元数据 URL 校验 ────────────────────────────────────────────────
 
-    /** 对照 Go {@code validateAuthServerMetadataURLs}：拒绝非 http(s) 与缺 host。 */
+    /** 拒绝非 http(s) 与缺 host 的元数据 URL。 */
     @Test
     void rejectsDisallowedMetadataSchemes() {
         AuthServerMetadata metadata = new AuthServerMetadata("https://host",
@@ -239,7 +238,7 @@ class OAuthHandlerTest {
 
     // ── 动态客户端注册 ─────────────────────────────────────────────────
 
-    /** 对照 Go {@code RegisterClient}：公共客户端用 token_endpoint_auth_method=none。 */
+    /** 公共客户端用 token_endpoint_auth_method=none。 */
     @Test
     void registersPublicClientAndAdoptsClientId() {
         OAuthHandler handler = newHandler(Map.of("client_id", ""));
@@ -258,9 +257,7 @@ class OAuthHandlerTest {
     /**
      * 显式配置的 metadata URL 拿不到元数据时必须明确失败。
      *
-     * <p>Go 在这个分支会返回 {@code (nil, nil)}，调用方随后解引用空指针 panic
-     * （gin recovery → 500）。Java 侧改为同名语义的显式异常（仍是对外 500），
-     * 见 {@code OAuthHandler.discover} 的注释。</p>
+     * <p>该分支以显式异常失败（仍是对外 500），见 {@code OAuthHandler.discover} 的注释。</p>
      */
     @Test
     void explicitMetadataUrlThatFailsDiscoveryIsAnError() {
@@ -274,7 +271,7 @@ class OAuthHandlerTest {
         assertEquals(0, server.registerRequests(), "元数据都没有，不该去打注册端点");
     }
 
-    /** 元数据里没有 registration_endpoint 时报"不支持动态注册"（对照 Go 文案）。 */
+    /** 元数据里没有 registration_endpoint 时报"不支持动态注册"（文案逐字）。 */
     @Test
     void registrationWithoutEndpointFails() {
         server.includeRegistrationEndpoint = false;
@@ -299,7 +296,7 @@ class OAuthHandlerTest {
         assertEquals("keep-me", token.refreshToken());
     }
 
-    /** 对照 Go {@code getValidToken}：没有 token 时抛"需要授权"并携带 handler。 */
+    /** 没有 token 时抛"需要授权"并携带 handler。 */
     @Test
     void authorizationHeaderRequiresAToken() {
         OAuthHandler handler = newHandler(Map.of("client_id", "c1"));

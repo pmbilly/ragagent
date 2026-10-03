@@ -13,12 +13,12 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 /**
- * 对照 Go types.MCPConfigFingerprint（internal/types/mcp_metadata.go:57-68）。
+ * MCP 配置指纹（{@code McpConfigFingerprint}）的跨实现一致性。
  *
- * <p><b>golden 来源</b>：用与 Go 同构的独立程序（复刻 MCPService/MCPAuthConfig/
- * MCPStdioConfig 的字段声明序与 json tag）跑 {@code json.Marshal} + SHA-256 得到，
- * 与 Java 实现逐字节比对。指纹跨语言必须一致——否则同一行 mcp_metadata
- * 在 Go 实例与 Java 实例之间会被互相判成 stale。</p>
+ * <p><b>golden 来源</b>：用同构的独立程序（按 MCPService/MCPAuthConfig/
+ * MCPStdioConfig 的字段声明序与 json 键名逐一对齐）做规范化序列化 + SHA-256 得到，
+ * 与 Java 实现逐字节比对。指纹跨实现必须一致——否则同一行 mcp_metadata
+ * 在新旧实例之间会被互相判成 stale。</p>
  */
 class McpConfigFingerprintTest {
 

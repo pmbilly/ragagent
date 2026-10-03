@@ -26,8 +26,8 @@ import com.ragagent.memory.service.MemoryRecall;
 import com.ragagent.common.retrieval.SearchResult;
 
 /**
- * 实录回放：rerank（清洗/段落/编排）+ wiki_boost + memory_recall/affinity + progress
- * （期望值 = {@link GoRecording46C} Go 实录常量）。
+ * 录制回放：rerank（清洗/段落/编排）+ wiki_boost + memory_recall/affinity + progress
+ * （期望值 = {@link GoRecording46C} 录制常量）。
  */
 class RerankRecordingTest {
 
@@ -118,7 +118,7 @@ class RerankRecordingTest {
             Map<String, Object> in = new LinkedHashMap<>();
             in.put("content", r.getContent());
             in.put("image_info", r.getImageInfo());
-            // Go 的 len() 是 UTF-8 字节数
+            // meta_len 按 UTF-8 字节数计
             in.put("meta_len", r.getChunkMetadata() == null ? 0
                     : r.getChunkMetadata().toString().getBytes(java.nio.charset.StandardCharsets.UTF_8).length);
             Map<String, Object> shape = new LinkedHashMap<>();

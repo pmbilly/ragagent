@@ -104,7 +104,7 @@ public class AttachmentFileStore {
         return base;
     }
 
-    /** 上传存储名：chat_attachment_{uuid12}{ext}——ext 已带点（Go L175 语义）。 */
+    /** 上传存储名：chat_attachment_{uuid12}{ext}——ext 已带点。 */
     static String storageName(String ext) {
         return "chat_attachment_" + UUID.randomUUID().toString().substring(0, 12)
                 + (ext == null ? "" : ext);

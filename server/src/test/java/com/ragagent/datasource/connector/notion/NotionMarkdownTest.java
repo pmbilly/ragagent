@@ -11,11 +11,6 @@ import org.junit.jupiter.api.Test;
 /**
  * {@code BlocksToMarkdown} / 富文本渲染的**逐字符**对等测试。
  *
- * <h2>期望值的来源</h2>
- * <p>全部是 <b>Go 实录</b>：在 {@code /tmp/weknora-copy}（WeKnora 的完整副本）里
- * 加一个 {@code probe_test.go}，把生产代码原样跑起来、用 {@code %q} 打印结果，
- * 再把输出抄进下面的断言。所以这里没有"我觉得应该是这样"的期望值。</p>
- *
  * <p>块对象一律**用 JSON 构造**（走 {@link NotionBlock.Deserializer}），
  * 好让"以 type 命名的字段被抽进 RawContent"这条自定义反序列化也一起被测到，
  * 而不是绕过它手工塞 RawContent。</p>
@@ -349,9 +344,8 @@ class NotionMarkdownTest {
     }
 
     /**
-     * NBSP（U+00A0）必须被当作空白裁掉——这正是 {@code strings.TrimSpace} 与
-     * {@code String.strip()} 分叉的地方（Java 的 {@code isWhitespace} 不含 U+00A0）。
-     * Go 实录：{@code "  \t"} 的段落 → {@code "\n"}。
+     * NBSP（U+00A0）必须被当作空白裁掉——Java 的 {@code String.strip()}
+     * 不含 U+00A0，这里的裁剪语义比它宽。空白段（如 {@code "  \t"}）→ {@code "\n"}。
      */
     @Test
     void trimsNonBreakingSpaceLikeGo() {
@@ -387,7 +381,7 @@ class NotionMarkdownTest {
                 + "\"annotations\":{\"code\":true,\"bold\":true,\"italic\":true,"
                 + "\"strikethrough\":true,\"underline\":true}"))).isEqualTo("<u>~~***`x`***~~</u>");
 
-        // 空文本不套任何标记（Go 的 applyAnnotations 首行 return）
+        // 空文本不套任何标记（渲染函数对空文本直接返回）
         assertThat(render(richText("text", "\"plain_text\":\"\",\"text\":{\"content\":\"\"},"
                 + "\"annotations\":{\"bold\":true}"))).isEmpty();
 

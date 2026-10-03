@@ -120,7 +120,7 @@ public class AgentToolBackends {
      * Go {@code registerTools} 的构造面（KB 检索族 5 件 + 会话/记忆/DB 3 件）——
      * allowedTools 命中即构造。非本族名返回 {@code null}（调用方照旧记 "Unknown tool"）。
      *
-     * @param ownerId   search_conversations 的 owner（引擎装配期从调用方身份捕获，Go 同款）
+     * @param ownerId   search_conversations 的 owner（引擎装配期从调用方身份捕获）
      * @param sessionId 当前会话（工具用于剔除本轮会话自身）
      */
     public com.ragagent.agent.tools.AgentTool createTool(String toolName,
@@ -459,7 +459,7 @@ public class AgentToolBackends {
         };
     }
 
-    /** 对照 chunkRepo.ListPagedChunksByKnowledgeID（tenant 取 knowledge 行，Go 同款）。 */
+    /** 分页取 chunk（先按租户取 knowledge 行）。 */
     public DataSchemaTool.ChunkLister dataSchemaChunkLister() {
         return (knowledgeId, page, pageSize, chunkTypes, enabled) -> {
             Knowledge k = knowledgeService.getKnowledgeByIdOnly(knowledgeId);
@@ -488,7 +488,7 @@ public class AgentToolBackends {
         };
     }
 
-    /** 对照 {@code db.Raw(securedSQL).Rows()}（值类型约定见 seam 文档）。 */
+    /** 执行受控 SQL 并遍历结果行（值类型约定见 seam 文档）。 */
     public DatabaseQueryTool.SqlQueryExecutor sqlQueryExecutor() {
         return securedSql -> jdbc.query(securedSql, rs -> {
             java.sql.ResultSetMetaData md = rs.getMetaData();

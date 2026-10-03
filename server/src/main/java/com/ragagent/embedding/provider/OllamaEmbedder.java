@@ -12,12 +12,12 @@ import com.ragagent.common.web.ProviderJson;
 import com.ragagent.llm.ollama.OllamaService;
 
 /**
- * Ollama embedding 客户端（对照 Go {@code internal/models/embedding/ollama.go} 全文）。
+ * Ollama embedding 客户端。
  *
  * <p>不走 SSRF HTTP 设施（Ollama 是本地服务）：先 {@code ensureModelAvailable}
- * （对照 Go 的探活），再经 {@link OllamaService#embeddings} 走 {@code POST /api/embed}。
- * 请求体对照 ollama {@code api.EmbedRequest}：model/input/options（num_ctx）/
- * truncate/dimensions。空批响应导致 {@code failed to embed text: ...} 语义保留。</p>
+ * 探活，再经 {@link OllamaService#embeddings} 走 {@code POST /api/embed}。
+ * 请求体字段：model/input/options（num_ctx）/truncate/dimensions。
+ * 空批响应导致 {@code failed to embed text: ...} 语义保留。</p>
  */
 public final class OllamaEmbedder extends BaseEmbedder {
 

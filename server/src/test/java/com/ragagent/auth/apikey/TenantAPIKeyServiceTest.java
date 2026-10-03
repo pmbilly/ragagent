@@ -27,11 +27,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 /**
- * API Key 服务语义测试——逐条对照 Go
- * internal/application/service/tenant_api_key_test.go（L1-361）。
+ * API Key 服务语义测试。
  *
- * <p>Go 的测试用一个手写的 {@code fakeTenantAPIKeyRepo}；Java 侧用 Mockito 打桩
- * 同一组行为（约定 §7：Go mock → Mockito）。被替换掉的"仓储语义"部分
+ * <p>仓储用 Mockito 打桩。被替换掉的"仓储语义"部分
  * （租户边界、撤销行数、jsonb 三态）由
  * {@code TenantAPIKeyRepositoryTest} 在 H2 上真跑。</p>
  */
@@ -40,7 +38,7 @@ class TenantAPIKeyServiceTest {
     private TenantAPIKeyRepository repo = mock(TenantAPIKeyRepository.class);
     private TenantAPIKeyService service = new TenantAPIKeyService(repo);
 
-    // ── 创建（对照 Go L21-39 / L266-294） ──
+    // ── 创建 ──
 
     @Test
     void createUsesSkPrefix() {
@@ -111,7 +109,7 @@ class TenantAPIKeyServiceTest {
                         42L, "tenant", "owner", true, List.of("kb-ignored"),
                         List.of("retrieve"), null));
         assertThat(created.apiKey().isFullAccess()).isTrue();
-        // 对照 Go：full-access 时两者一律置 nil（★注意不是空列表）
+        // full-access 时两者一律置 null（★注意不是空列表）
         assertThat(created.apiKey().getKnowledgeBaseIds()).isNull();
         assertThat(created.apiKey().getCapabilities()).isNull();
     }
@@ -135,7 +133,7 @@ class TenantAPIKeyServiceTest {
         assertThat(created.apiKey().getKnowledgeBaseIds()).containsExactly("kb-1", "kb-2");
     }
 
-    // ── 更新（对照 Go L118-165） ──
+    // ── 更新 ──
 
     @Test
     void updateNormalizesConfiguration() {
@@ -162,7 +160,7 @@ class TenantAPIKeyServiceTest {
         assertThat(patch.getValue().getName()).isEqualTo("updated");
         assertThat(patch.getValue().getKnowledgeBaseIds()).containsExactly("kb-1", "kb-2");
         assertThat(patch.getValue().getCapabilities()).containsExactly("retrieve", "chat");
-        // UTC 归一（Go: updated.ExpiresAt.Location() == time.UTC）
+        // UTC 归一
         assertThat(patch.getValue().getExpiresAt().getOffset()).isEqualTo(ZoneOffset.UTC);
         assertThat(updated.getName()).isEqualTo("updated");
     }
@@ -203,7 +201,7 @@ class TenantAPIKeyServiceTest {
                 .hasMessageContaining("api_key_id is required");
     }
 
-    // ── 认证（对照 Go L296-361） ──
+    // ── 认证 ──
 
     @Test
     void authenticateRevokedKeyFails() {
@@ -240,7 +238,6 @@ class TenantAPIKeyServiceTest {
     }
 
     /**
-     * 对照 Go {@code TestTenantAPIKeyServiceAuthenticateThrottlesLastUsedUpdates}：
      * 同一把 Key 连续认证 5 次，{@code last_used_at} 只应落库**一次**
      * （1 分钟节流窗口），且写入发生在分离线程上。
      */
@@ -258,7 +255,7 @@ class TenantAPIKeyServiceTest {
             service.authenticate("sk-token-" + i);
         }
 
-        // 异步写：等一会儿（Go 用 500ms deadline 轮询）
+        // 异步写：轮询等待落库
         long deadline = System.currentTimeMillis() + 2000;
         while (writes.get() == 0 && System.currentTimeMillis() < deadline) {
             Thread.sleep(10);
@@ -268,7 +265,7 @@ class TenantAPIKeyServiceTest {
         verify(repo, times(1)).updateLastUsed(eq(key.getId()), any());
     }
 
-    /** 写失败时必须清掉节流标记，让下一次认证立刻重试（对照 Go 的 lastUsedTouch.Delete）。 */
+    /** 写失败时必须清掉节流标记，让下一次认证立刻重试。 */
     @Test
     void lastUsedWriteFailureClearsThrottle() throws Exception {
         TenantAPIKey key = keyWith("hash-fail");
@@ -295,7 +292,7 @@ class TenantAPIKeyServiceTest {
         assertThat(attempts.get()).isGreaterThanOrEqualTo(2);
     }
 
-    // ── 回填（对照 Go L232-262） ──
+    // ── 回填 ──
 
     @Test
     void backfillMissingKeyHashes() {
@@ -333,7 +330,7 @@ class TenantAPIKeyServiceTest {
         verify(repo, never()).updateKeyHash(anyLong(), anyString());
     }
 
-    // ── 撤销（对照 Go L296-314） ──
+    // ── 撤销 ──
 
     @Test
     void revokePropagatesNotFound() {
@@ -346,7 +343,7 @@ class TenantAPIKeyServiceTest {
 
     @Test
     void hashTokenIsStableSha256Hex() {
-        // 与 Go 的 sha256 + hex.EncodeToString 一致：64 位小写十六进制
+        // sha256 + 小写 hex：64 位小写十六进制
         String h = TenantAPIKeyService.hashToken("sk-abc");
         assertThat(h).hasSize(64).matches("[0-9a-f]{64}");
         assertThat(TenantAPIKeyService.hashToken("sk-abc")).isEqualTo(h);

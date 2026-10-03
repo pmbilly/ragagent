@@ -353,7 +353,7 @@ public class KnowledgeFolderService {
                 if (kb == null || !kb.getTenantId().equals(row.getTenantId())) {
                     throw BizException.forbidden("knowledge does not belong to its knowledge base");
                 }
-                // requireKBWrite：grant 只覆盖授权 KB（org-share 分支未翻译）
+                // requireKBWrite：grant 只覆盖授权 KB（org-share 分支未实现）
                 if (grantedKbId == null || !grantedKbId.equals(row.getKnowledgeBaseId())) {
                     throw BizException.forbidden("无权修改该知识库");
                 }

@@ -1,6 +1,6 @@
 package com.ragagent.evaluation.metric;
 
-/** 对照 Go {@code interfaces.Metrics}：单一 Compute 入口（internal/types/interfaces/metric.go）。 */
+/** 评估指标接口：单一 Compute 入口。 */
 public interface Metrics {
 
     double compute(MetricInput input);

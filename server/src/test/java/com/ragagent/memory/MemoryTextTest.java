@@ -12,12 +12,11 @@ import com.ragagent.memory.domain.MemoryText;
 import org.junit.jupiter.api.Test;
 
 /**
- * 文本 / key / 渲染的纯函数（对照 Go internal/types/memory_test.go 的
- * {@code Test*} 全集，逐条搬过来）。
+ * 文本 / key / 渲染的纯函数的全集覆盖。
  *
  * <p>这些函数是**提示词与去重语义**的载体：一个字符的差别会让"我用 MySQL"与
  * "我迁到 Postgres"不再互相取代，或者让一条记忆能伪造出提示词结构。
- * 所以 Go 侧那 17 个测试一条不落地搬过来，断言措辞也保持原意。</p>
+ * 每个函数的分支一条不落，断言措辞保持原意。</p>
  */
 class MemoryTextTest {
 
@@ -54,9 +53,9 @@ class MemoryTextTest {
     }
 
     /**
-     * 去重**保留首次出现**、排序在去重之后（Go 的 {@code words[:0] + sort.Strings}）。
+     * 去重**保留首次出现**、排序在去重之后。
      *
-     * <p>Go 实录：{@code NormalizeMemoryKey("", "数据库 偏好 数据库")} = {@code "偏-好-库-据-数"}。</p>
+     * <p>实测：{@code normalizeMemoryKey("", "数据库 偏好 数据库")} = {@code "偏-好-库-据-数"}。</p>
      */
     @Test
     void normalizeMemoryKeyDeduplicatesThenSorts() {
@@ -68,7 +67,7 @@ class MemoryTextTest {
      * 最长 200 个 **rune**（不是 UTF-16 码元）。
      *
      * <p>语料必须用**互不相同**的字：{@code "字".repeat(500)} 去重之后只剩一个字，
-     * 长度断言会假绿（Go 实录：那个输入的结果就是 {@code "字"}，长度 1）。</p>
+     * 长度断言会假绿（实测：那个输入的结果就是 {@code "字"}，长度 1）。</p>
      */
     @Test
     void normalizeMemoryKeyTruncatesAtTwoHundredRunes() {
@@ -118,7 +117,7 @@ class MemoryTextTest {
         assertThat(MemoryKeys.normalizeTopicKey("问题排查")).isEqualTo("问题排查");
     }
 
-    /** 主题恰好等于噪声词本身时不去掉（去完就空了，Go 的 {@code trimmed != ""} 守卫）。 */
+    /** 主题恰好等于噪声词本身时不去掉（去完就空了，空结果不采用）。 */
     @Test
     void normalizeTopicKeyKeepsLabelThatIsEntirelyANoiseWord() {
         assertThat(MemoryKeys.normalizeTopicKey("问题")).isEqualTo("问题");
@@ -131,7 +130,7 @@ class MemoryTextTest {
         assertThat(MemoryKeys.normalizeTopicKey(null)).isEmpty();
     }
 
-    /** 最长 120 个 rune（Go 实录：250 个互不相同的字 → 120）。 */
+    /** 最长 120 个 rune（实测：250 个互不相同的字 → 120）。 */
     @Test
     void normalizeTopicKeyTruncatesAtOneHundredTwentyRunes() {
         StringBuilder sb = new StringBuilder();
@@ -168,12 +167,12 @@ class MemoryTextTest {
 
     @Test
     void topicLooksLikeOneQuestionAtTwentyFourRunes() {
-        // Go 实录：归一化后 6 rune → false
+        // 实测：归一化后 6 rune → false
         assertThat(MemoryKeys.topicLooksLikeOneQuestion("门店排班管理")).isFalse();
-        // Go 实录：22 rune → false（**不到** 24 这条线，别想当然）
+        // 实测：22 rune → false（**不到** 24 这条线，别想当然）
         assertThat(MemoryKeys.topicLooksLikeOneQuestion("v2.3版本orders接口分页参数默认值查询"))
                 .isFalse();
-        // Go 实录：26 rune → true
+        // 实测：26 rune → true
         assertThat(MemoryKeys.topicLooksLikeOneQuestion("v2.3版本orders接口分页参数默认值查询逻辑梳理"))
                 .isTrue();
     }
@@ -220,7 +219,7 @@ class MemoryTextTest {
     /**
      * 控制字符被**丢弃**（不是替换成空格），与 {@code \n\r\t} 的替换处置不同。
      *
-     * <p>Go 实录：{@code SanitizeMemoryContent("a\x00b\x07c")} = {@code "abc"}。</p>
+     * <p>实测：{@code sanitizeMemoryContent("a\x00b\x07c")} = {@code "abc"}。</p>
      */
     @Test
     void sanitizeMemoryContentDropsControlCharacters() {
@@ -228,11 +227,11 @@ class MemoryTextTest {
     }
 
     /**
-     * Go 的 {@code unicode.IsSpace} 含**不换行空格** U+00A0，而
-     * {@code Character.isWhitespace} 恰好把它排除在外——所以 Java 侧用的是
+     * 空白判定**含**不换行空格 U+00A0，而
+     * {@code Character.isWhitespace} 恰好把它排除在外——所以这里用的是
      * {@code isSpaceChar || 六个 ASCII 空白}（见 {@code MemoryText.isGoSpace}）。
      *
-     * <p>Go 实录：{@code SanitizeMemoryContent("a\u00A0b")} = {@code "a b"}（普通空格）。</p>
+     * <p>实测：{@code sanitizeMemoryContent("a\u00A0b")} = {@code "a b"}（普通空格）。</p>
      */
     @Test
     void sanitizeMemoryContentTreatsNonBreakingSpaceAsGoDoes() {
@@ -322,7 +321,7 @@ class MemoryTextTest {
     }
 
     /**
-     * 块与召回之间**只**加一个换行；空的那一份不占位（Go 的 {@code if body.Len() > 0}）。
+     * 块与召回之间**只**加一个换行；空的那一份不占位。
      */
     @Test
     void wrapMemoryForPromptJoinsBlockAndRecallWithOneNewline() {
@@ -337,7 +336,7 @@ class MemoryTextTest {
 
     /**
      * 用户写的句子绝不能从数据信封里逃出去：尖括号与和号必须转义，
-     * 且只转义一次（Go 用的是单趟 Replacer）。
+     * 且只转义一次（单趟替换）。
      */
     @Test
     void memoryCannotBreakOutOfEnvelope() {
@@ -350,7 +349,7 @@ class MemoryTextTest {
         assertThat(got).contains("A &amp; B");
     }
 
-    /** 五个转义映射逐字对照 Go 的 {@code html.EscapeString}（含 {@code &#39;} / {@code &#34;}）。 */
+    /** 五个转义映射逐字断言（含 {@code &#39;} / {@code &#34;}）。 */
     @Test
     void escapeHtmlMatchesGoHtmlPackage() {
         assertThat(MemoryRender.escapeHtml("a&b'c<d>e\"f")).isEqualTo("a&amp;b&#39;c&lt;d&gt;e&#34;f");

@@ -291,7 +291,7 @@ class AgentPromptsTest {
         assertThat(AgentPromptTemplates.defaultTemplateByMode(tmpls, "data_analyst").id()).isEqualTo("t2");
         assertThat(AgentPromptTemplates.defaultTemplateByMode(List.of(), "rag")).isNull();
 
-        // vendored yaml 的 pure/rag 模式可解析并含 Go 同名模板 id
+        // vendored yaml 的 pure/rag 模式可解析并含同名模板 id
         List<AgentPromptTemplates.PromptTemplate> loaded = AgentPromptTemplates.loadAgentSystemPromptTemplates();
         assertThat(AgentPromptTemplates.defaultTemplateByMode(loaded, "pure").id()).isEqualTo("pure_agent");
         assertThat(AgentPromptTemplates.defaultTemplateByMode(loaded, "rag").id()).isEqualTo("progressive_rag_agent");
@@ -389,7 +389,7 @@ class AgentPromptsTest {
         assertThat(custom).startsWith("Create the requested slides using the selected skill.");
         // legacy builder 推断不了工具，但证据策略仍在
         assertThat(AgentPrompts.buildSystemPrompt(null, false, "Custom")).contains("Content grounding");
-        // 逐字对齐 Go 同名测试的 web 覆盖分支（registry 覆盖陈旧 flag：
+        // web 覆盖分支（registry 覆盖陈旧 flag：
         // 传参 !web 故意与注册表相反，断言 base 以注册表为准）
         for (boolean web : new boolean[] {false, true}) {
             List<String> names = new java.util.ArrayList<>(

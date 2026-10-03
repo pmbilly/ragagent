@@ -19,9 +19,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * 观测生命周期单测（对照 Go tracer_test.go 的核心用例，用记录出口替代
- * in-memory exporter；FlushAt=1 → 每次 Finish 立即同步导出，等价 Go 的
- * SimpleSpanProcessor 测试模式）。
+ * 观测生命周期单测（核心用例，用记录出口替代
+ * in-memory exporter；FlushAt=1 → 每次 Finish 立即同步导出，
+ * 即 SimpleSpanProcessor 式的测试模式）。
  */
 class LangfuseTracerTest {
 

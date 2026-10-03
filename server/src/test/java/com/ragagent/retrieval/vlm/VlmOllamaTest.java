@@ -21,7 +21,7 @@ import com.ragagent.llm.ollama.OllamaService;
 import com.sun.net.httpserver.HttpServer;
 
 /**
- * Ollama 界面的 VLM（W5γ4.16 小账批补齐）——对照 Go {@code vlm/ollama.go}：
+ * Ollama 界面的 VLM：
  * 单条 user 消息（prompt + 图片原始字节）、{@code stream=false}、
  * {@code options.temperature=0.1}，取 {@code message.content}；心跳走 {@code HEAD /}
  * （OllamaService.startService 的探活），对话走 {@code POST /api/chat}（NDJSON）。
@@ -79,11 +79,11 @@ class VlmOllamaTest {
         JsonNode request = MAPPER.readTree(chatBodies.get(0));
         assertThat(request.path("model").asText()).isEqualTo("llava");
         assertThat(request.has("stream")).isTrue();
-        assertThat(request.path("stream").asBoolean()).isFalse(); // 照 Go：streamFlag=false
+        assertThat(request.path("stream").asBoolean()).isFalse(); // stream=false
         JsonNode message = request.path("messages").get(0);
         assertThat(message.path("role").asText()).isEqualTo("user");
         assertThat(message.path("content").asText()).isEqualTo("这张图里有什么？");
-        // Go 的 []ImageData = [][]byte → JSON base64（Jackson 同款）
+        // images 是 byte[][]，每个元素序列化为 JSON base64 串（Jackson 同款）
         assertThat(message.path("images").get(0).asText())
                 .isEqualTo(Base64.getEncoder().encodeToString(new byte[] {1, 2, 3}));
         assertThat(request.path("options").path("temperature").asDouble()).isEqualTo(0.1);

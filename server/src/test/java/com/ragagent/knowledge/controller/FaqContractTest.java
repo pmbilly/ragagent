@@ -161,7 +161,7 @@ class FaqContractTest {
         jdbc.update("INSERT INTO knowledge_tags (id, seq_id, tenant_id, knowledge_base_id, "
                 + "name, color, sort_order) VALUES (?, 965002, ?, ?, '售后', '', 0)",
                 FT2, TENANT, FKB1);
-        // dev PG 残留位：录制时 tag seq 960002 是 kg 波的 T2（别的 KB）——
+        // dev PG 残留位：tag seq 960002 已被别的 KB 的标签 T2 占用——
         // fields/upsert 的"外来 tag"用例据此 403；H2 播一个同位标签
         jdbc.update("INSERT INTO knowledge_tags (id, seq_id, tenant_id, knowledge_base_id, "
                 + "name, color, sort_order) VALUES ('bfb00001-0000-0000-0000-00000000e002', 960002, ?, "
@@ -507,8 +507,8 @@ class FaqContractTest {
         compare("faq-progress-dryrun.json", progress);
 
         // 自定义 task_id：通过 ValidateTaskID、非 dry_run —— 进度查询恒 400（id 无租户段）。
-        // 该任务在 Go 卡在 asynq 重试窗口（running key 被占数分钟）；Java 直落 failed 并释放
-        // ——faq-upsert-running 的 running-key 窗口是 Go 重试语义的存档，Java 不比。
+        // 该任务在录制侧卡在重试窗口（running key 被占数分钟）；Java 直落 failed 并释放
+        // ——faq-upsert-running 的 running-key 中间态不比，该 golden 仅作存档。
         compareAndStatus("faq-upsert-customtask.json", 202, "POST", B1 + "/faq/entries", owner,
                 "{\"entries\":[{\"standardQuestion\":\"自定义任务ID问题\",\"answers\":[\"答案\"]}],"
                         + "\"mode\":\"append\",\"taskId\":\"faqgolden_custom_1\"}");

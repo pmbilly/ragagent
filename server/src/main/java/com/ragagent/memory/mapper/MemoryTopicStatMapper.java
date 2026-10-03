@@ -32,7 +32,7 @@ import org.apache.ibatis.annotations.Update;
 public interface MemoryTopicStatMapper extends BaseMapper<MemoryTopicStat> {
 
     /**
-     * 对照 {@code BumpTopic} 的第一步："先插入、再自增"——这个形状让两个并发轮次
+     * 计数第一步："先插入、再自增"——这个形状让两个并发轮次
      * 不会都认为这个话题是新的。
      *
      * <p>插入的 {@code hits} 是 **0**，
@@ -63,14 +63,14 @@ public interface MemoryTopicStatMapper extends BaseMapper<MemoryTopicStat> {
             + "  AND normalized_key = #{s.normalizedKey})")
     int insertIfAbsentOther(@Param("s") MemoryTopicStat stat);
 
-    /** 对照 {@code BumpTopic} 的自增：{@code hits = hits + 1} 必须在 SQL 侧做。 */
+    /** 计数自增：{@code hits = hits + 1} 必须在 SQL 侧做。 */
     @Update("UPDATE memory_topic_stats SET hits = hits + 1, last_seen_at = #{now}, updated_at = #{now} "
             + "WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId} AND normalized_key = #{normalizedKey}")
     int bumpHits(@Param("tenantId") long tenantId, @Param("subjectId") String subjectId,
                  @Param("normalizedKey") String normalizedKey, @Param("now") OffsetDateTime now);
 
     /**
-     * 对照 {@code BumpTopic} 记录别名的那一次 {@code Updates(map)}。
+     * 记录别名的按列更新。
      *
      * <p>{@code aliases} 必须走类型处理器；写成裸 {@code #{aliases}} 的话，
      * MyBatis 会拿 {@code List} 找默认处理器，在 PG 上直接报类型不匹配。</p>
@@ -85,7 +85,7 @@ public interface MemoryTopicStatMapper extends BaseMapper<MemoryTopicStat> {
                       @Param("aliases") List<String> aliases, @Param("now") OffsetDateTime now);
 
     /**
-     * 对照 {@code RenameTopic}：改标签、改 key、换一组别名。
+     * 重命名主题：改标签、改 key、换一组别名。
      *
      * <p>调用方负责两件事：先确认新 key 没被别的行占（那个 {@code clash} 计数），
      * 以及把"要采纳的新说法"从别名里剔掉——否则规范标签会被列成它自己的别名。</p>
@@ -100,7 +100,7 @@ public interface MemoryTopicStatMapper extends BaseMapper<MemoryTopicStat> {
                @Param("newLabel") String newLabel, @Param("aliases") List<String> aliases,
                @Param("now") OffsetDateTime now);
 
-    /** 对照 {@code MarkTopicPromoted}。 */
+    /** 记录提升时刻。 */
     @Update("UPDATE memory_topic_stats SET promoted_at = #{now}, updated_at = #{now} "
             + "WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId} AND normalized_key = #{normalizedKey}")
     int markPromoted(@Param("tenantId") long tenantId, @Param("subjectId") String subjectId,
@@ -113,7 +113,6 @@ public interface MemoryTopicStatMapper extends BaseMapper<MemoryTopicStat> {
      * 所以这个坑只在"库里明明有值、读出来却是 null"时才暴露）。
      *
      * <p>其余列交给 MyBatis 的自动映射（{@code mapUnderscoreToCamelCase} 已开）。</p>
-     * <p>对照 {@code TopicByKey}。</p>
      */
     @Results({
             @Result(column = "aliases", property = "aliases",
@@ -124,7 +123,7 @@ public interface MemoryTopicStatMapper extends BaseMapper<MemoryTopicStat> {
     MemoryTopicStat selectByKey(@Param("tenantId") long tenantId, @Param("subjectId") String subjectId,
                                 @Param("normalizedKey") String normalizedKey);
 
-    /** 对照 {@code RenameTopic} 里的 {@code clash} 计数。 */
+    /** 改名前的冲突（clash）计数。 */
     @Select("SELECT COUNT(*) FROM memory_topic_stats WHERE tenant_id = #{tenantId} "
             + "AND subject_id = #{subjectId} AND normalized_key = #{normalizedKey}")
     long countByKey(@Param("tenantId") long tenantId, @Param("subjectId") String subjectId,
@@ -137,7 +136,6 @@ public interface MemoryTopicStatMapper extends BaseMapper<MemoryTopicStat> {
      * 所以这个坑只在"库里明明有值、读出来却是 null"时才暴露）。
      *
      * <p>其余列交给 MyBatis 的自动映射（{@code mapUnderscoreToCamelCase} 已开）。</p>
-     * <p>对照 {@code TopicByID}。</p>
      */
     @Results({
             @Result(column = "aliases", property = "aliases",
@@ -155,7 +153,7 @@ public interface MemoryTopicStatMapper extends BaseMapper<MemoryTopicStat> {
      * 所以这个坑只在"库里明明有值、读出来却是 null"时才暴露）。
      *
      * <p>其余列交给 MyBatis 的自动映射（{@code mapUnderscoreToCamelCase} 已开）。</p>
-     * <p>对照 {@code TopTopics}：{@code hits DESC, last_seen_at DESC}。</p>
+     * <p>最热主题：{@code hits DESC, last_seen_at DESC}。</p>
      */
     @Results({
             @Result(column = "aliases", property = "aliases",
@@ -169,13 +167,13 @@ public interface MemoryTopicStatMapper extends BaseMapper<MemoryTopicStat> {
     List<MemoryTopicStat> topTopics(@Param("tenantId") long tenantId, @Param("subjectId") String subjectId,
                                     @Param("limit") int limit);
 
-    /** 对照 {@code ListUnpromotedTopics} 的计数。 */
+    /** 未提升主题的计数。 */
     @Select("SELECT COUNT(*) FROM memory_topic_stats WHERE tenant_id = #{tenantId} "
             + "AND subject_id = #{subjectId} AND promoted_at IS NULL")
     long countUnpromoted(@Param("tenantId") long tenantId, @Param("subjectId") String subjectId);
 
     /**
-     * 对照 {@code ListUnpromotedTopics}：{@code promoted_at IS NULL} 的那些，
+     * 未提升主题：{@code promoted_at IS NULL} 的那些，
      * 按"离阈值最近"排（= hits DESC）。
      */
     /**
@@ -196,7 +194,7 @@ public interface MemoryTopicStatMapper extends BaseMapper<MemoryTopicStat> {
                                          @Param("limit") int limit, @Param("offset") int offset);
 
     /**
-     * 对照 {@code DeleteTopic}：带 scope 的物理删。
+     * 删掉一条主题：带 scope 的物理删。
      *
      * <p>⚠️ 不能用 MyBatis-Plus 的 {@code deleteById}——传一个别的主体的 id
      * 会真的删掉它的行。</p>
@@ -206,7 +204,7 @@ public interface MemoryTopicStatMapper extends BaseMapper<MemoryTopicStat> {
     int deleteScoped(@Param("tenantId") long tenantId, @Param("subjectId") String subjectId,
                      @Param("id") String id);
 
-    /** 对照 {@code DeleteAllTopics}：整 scope 的物理删（"清空记忆"必须包含计数器）。 */
+    /** 整 scope 的物理删（"清空记忆"必须包含计数器）。 */
     @Delete("DELETE FROM memory_topic_stats WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId}")
     int deleteAllInScope(@Param("tenantId") long tenantId, @Param("subjectId") String subjectId);
 }

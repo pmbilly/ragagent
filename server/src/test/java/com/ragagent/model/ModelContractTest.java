@@ -74,7 +74,7 @@ class ModelContractTest {
 
     @BeforeEach
     void seed() {
-        // 对照 Go dev server 录制时的 SSRF_WHITELIST_EXTRA（含 api.deepseek.com，豁免 DNS 检查）
+        // 与录制环境的 SSRF_WHITELIST_EXTRA 对齐（含 api.deepseek.com，豁免 DNS 检查）
         ssrfGuard.reloadWhitelist("api.deepseek.com");
         TestSchema.createTables(jdbc);
         TestSchema.resetData(jdbc);

@@ -247,8 +247,8 @@ class ChunkQuestionServiceTest {
                     assertThat(e.appError().httpCode()).isEqualTo(400);
                     assertThat(e.appError().message()).isEqualTo("question not found");
                 });
-        // chunk 缺失：writableChunk 的 AppError 被 400 原文包装（Go handler 同款：
-        // 信封 code=1000，message = "error code: 1003, error message: chunk not found"）
+        // chunk 缺失：writableChunk 的 AppError 被 400 原文包装，信封
+        // code=1000，message = "error code: 1003, error message: chunk not found"
         assertThatThrownBy(() -> service.upsertGeneratedQuestion("missing", "", "q"))
                 .isInstanceOfSatisfying(BizException.class, e -> {
                     assertThat(e.appError().httpCode()).isEqualTo(400);
@@ -278,7 +278,7 @@ class ChunkQuestionServiceTest {
         assertThat(meta.path("generatedQuestions")).hasSize(1);
         assertThat(meta.path("generatedQuestions").get(0).path("id").asText()).isEqualTo("q2");
 
-        // 再删不存在的 → Go 原文
+        // 再删不存在的 → 报错文案原样保留
         assertThatThrownBy(() -> service.deleteGeneratedQuestion(c.getId(), "q1"))
                 .isInstanceOfSatisfying(BizException.class, e -> {
                     assertThat(e.appError().message())
@@ -327,7 +327,7 @@ class ChunkQuestionServiceTest {
         Chunk image = chunk(DOC, "ocr", "image_ocr");
         Chunk text = chunk(DOC, "body");
 
-        // chunk 缺失 → Go 哨兵原文 400
+        // chunk 缺失 → 400，报错文案原样
         assertThatThrownBy(() -> service.regenerateChunkQuestions("missing"))
                 .isInstanceOfSatisfying(BizException.class, e -> {
                     assertThat(e.appError().message()).isEqualTo("chunk not found");

@@ -54,7 +54,7 @@ public interface McpOAuthTokenMapper extends BaseMapper<McpOAuthToken> {
 
     /**
      * ON CONFLICT ... DO UPDATE SET user_id, access_token, refresh_token,
-     * token_type, expires_at, updated_at —— 租约列**不在**更新集里（Go 一致）。
+     * token_type, expires_at, updated_at —— 租约列**不在**更新集里。
      */
     @Update("UPDATE mcp_oauth_tokens SET user_id = #{userId}, "
             + "access_token = #{accessToken, typeHandler=com.ragagent.mcp.domain.McpSecretTypeHandler}, "

@@ -144,7 +144,7 @@ public final class JdkXmlFeedParser implements FeedParser {
             throw new FeedParseException(FeedParseException.FAILED_TO_DETECT);
         }
         // ISO-8859-1 逐字节往返：让预处理只动 ASCII、不破坏原文档的编码
-        // （真编码由解析器按 XML 声明去解，与 Go 侧 charsetconv 的分工一致）。
+        // （真编码由解析器按 XML 声明去解）。
         String source = new String(data, StandardCharsets.ISO_8859_1);
         int first = firstMeaningfulChar(source);
         if (first < 0) {

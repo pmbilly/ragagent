@@ -28,8 +28,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 /**
- * vector-stores 9 条的契约测试（波 2 第五批）。golden：
- * scripts/record-infra-config-golden.sh（28 个 vs-* 文件，Go 实录）。
+ * vector-stores 9 条的契约测试。golden：
+ * scripts/record-infra-config-golden.sh（28 个 vs-* 文件）。
  *
  * <p>种子：ES 向量库一行（固定 hex id，connection_config 指向**环回死端口 19214**——
  * test-by-id 的连接拒绝分支确定性）。本部署 RETRIEVE_DRIVER 未配置 → env stores 恒空

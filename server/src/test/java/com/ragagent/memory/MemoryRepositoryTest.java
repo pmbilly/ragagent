@@ -27,13 +27,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * 记忆仓储在 H2 上的语义（对照 Go internal/application/repository/memory.go）。
+ * 记忆仓储在 H2 上的语义。
  *
  * <p>重点是那些**只在真 SQL 上才暴露**的行为：</p>
  * <ul>
  *   <li>jsonb 列（{@code pending_sessions} / {@code aliases} / {@code extraction_state}）
- *       在 nil 时写的是 {@code []} / {@code {...}} 而**不是** SQL NULL；</li>
- *   <li>GORM 在 CREATE 时对带字面量 default tag 的零值字段做的替换
+ *       为 null 时写的是 {@code []} / {@code {...}} 而**不是** SQL NULL；</li>
+ *   <li>CREATE 时对声明了字面量默认值的列做零值替换
  *       （{@code importance 0→3}、{@code origin ""→extracted}、{@code status ""→active}）；</li>
  *   <li>{@code created_at} 零值才补 / {@code updated_at} 恒被覆盖；</li>
  *   <li>{@code withSubject} 的 {@code SELECT … FOR UPDATE} 在 H2 上真的能跑；</li>
@@ -84,7 +84,7 @@ class MemoryRepositoryTest {
         assertThat(created.getTenantId()).isEqualTo(TENANT);
         assertThat(created.getSubjectId()).isEqualTo("web_user:u1");
         assertThat(created.isEnabled()).isTrue();
-        // GORM 的自动时间戳：created_at 与 updated_at 都被显式写入
+        // 落库自动时间戳：created_at 与 updated_at 都被显式写入
         assertThat(created.getCreatedAt()).isNotEqualTo(ZeroTimeSerializer.ZERO_DATE_TIME);
         assertThat(created.getUpdatedAt()).isNotEqualTo(ZeroTimeSerializer.ZERO_DATE_TIME);
 
@@ -95,8 +95,8 @@ class MemoryRepositoryTest {
     }
 
     /**
-     * 两个 jsonb 列在 Go 里**从不**为 NULL：{@code pending_sessions} 写 {@code []}、
-     * {@code extraction_state} 写一段对象。落到 SQL NULL 会让读路径与 Go 分叉。
+     * 两个 jsonb 列**从不**为 NULL：{@code pending_sessions} 写 {@code []}、
+     * {@code extraction_state} 写一段对象。落到 SQL NULL 会让读路径分叉。
      */
     @Test
     void ensureSubjectWritesEmptyJsonbNotNull() {
@@ -131,7 +131,7 @@ class MemoryRepositoryTest {
         assertThat(after.getBlockUpdatedAt()).isNotNull();
     }
 
-    /** {@code updateSubjectEnabled} 对还没有主体的 scope 会先建行（Go 的 {@code EnsureSubject} 前置调用）。 */
+    /** {@code updateSubjectEnabled} 对还没有主体的 scope 会先建行（前置 {@code ensureSubject}）。 */
     @Test
     void updateSubjectEnabledEnsuresSubjectFirst() {
         repo.updateSubjectEnabled(scope, false);
@@ -150,7 +150,7 @@ class MemoryRepositoryTest {
         assertThat(repo.getSubject(scope).getForcedConsolidatedAt()).isNotNull();
     }
 
-    // ── 条目：创建与 GORM 默认值 ───────────────────────────────────────────
+    // ── 条目：创建与落库默认值 ───────────────────────────────────────────
 
     private MemoryItem newItem(String content, String topic) {
         MemoryItem item = new MemoryItem();
@@ -174,7 +174,7 @@ class MemoryRepositoryTest {
         assertThat(repo.getItem(scope, item.getId()).getContent()).isEqualTo("生产库是 PostgreSQL");
     }
 
-    /** {@code valid_from} 若调用方已经给了就不动（Go 的 {@code if item.ValidFrom.IsZero()}）。 */
+    /** {@code valid_from} 若调用方已经给了就不动（为 null 时才由仓储补默认）。 */
     @Test
     void createItemKeepsCallerSuppliedValidFrom() {
         OffsetDateTime when = OffsetDateTime.now().minusDays(3);
@@ -187,10 +187,10 @@ class MemoryRepositoryTest {
     }
 
     /**
-     * GORM 的"零值 → 默认值"替换（callbacks/create.go L336-341）：三个带字面量
-     * default tag 的字段即使是零值也会被**显式写入默认值**，而不是落 DDL 默认。
+     * 落库的"零值 → 默认值"替换：三个声明了字面量默认值的列即使是零值也会被
+     * **显式写入默认值**，而不是落 DDL 默认。
      *
-     * <p>{@code importance=0}、{@code origin=""} 在 {@code CreateItem} 这条路径上
+     * <p>{@code importance=0}、{@code origin=""} 在 {@code createItem} 这条路径上
      * 都没有被上层补齐，全靠这一条兜住。</p>
      */
     @Test
@@ -198,14 +198,14 @@ class MemoryRepositoryTest {
         MemoryItem item = newItem("x", "t");
         item.setImportance(0);
         item.setOrigin("");
-        // Status 由 CreateItem 显式补成 active
+        // status 由 createItem 显式补成 active
         repo.createItem(item);
 
         MemoryItem stored = repo.getItem(scope, item.getId());
         assertThat(stored.getImportance()).as("importance 0 → 3").isEqualTo(3);
         assertThat(stored.getOrigin()).as("origin \"\" → extracted").isEqualTo("extracted");
         assertThat(stored.getStatus()).isEqualTo("active");
-        // 字段被回写进内存对象（Go 的 field.Set）
+        // 字段被回写进内存对象
         assertThat(item.getImportance()).isEqualTo(3);
         assertThat(item.getOrigin()).isEqualTo("extracted");
     }
@@ -358,7 +358,7 @@ class MemoryRepositoryTest {
 
     @Test
     void updateItemContentOverwritesFiveColumnsAndMarksManual() {
-        // withSubject 要锁主体行（Go 的 First 未命中即报错），所以先建
+        // withSubject 要锁主体行（未命中即报错），所以先建
         repo.ensureSubject(scope);
         MemoryItem item = newItem("旧内容", "t");
         repo.createItem(item);
@@ -372,10 +372,10 @@ class MemoryRepositoryTest {
         assertThat(after.getOrigin()).isEqualTo(MemoryKinds.ORIGIN_MANUAL);
     }
 
-    /** 内容**没变**时不动向量、也不作废提议（Go 的 {@code if current.Content != content}）。 */
+    /** 内容**没变**时不动向量、也不作废提议（内容一致即短路）。 */
     @Test
     void updateItemContentSkipsSideEffectsWhenContentUnchanged() {
-        // withSubject 要锁主体行（Go 的 First 未命中即报错），所以先建
+        // withSubject 要锁主体行（未命中即报错），所以先建
         repo.ensureSubject(scope);
         MemoryItem item = newItem("同样的内容", "t");
         repo.createItem(item);
@@ -393,7 +393,7 @@ class MemoryRepositoryTest {
     /** 改了内容 → 基于旧措辞的提议作废。 */
     @Test
     void updateItemContentSupersedesProposalsBasedOnOldWording() {
-        // withSubject 要锁主体行（Go 的 First 未命中即报错），所以先建
+        // withSubject 要锁主体行（未命中即报错），所以先建
         repo.ensureSubject(scope);
         MemoryItem item = newItem("旧内容", "t");
         repo.createItem(item);
@@ -409,7 +409,7 @@ class MemoryRepositoryTest {
         assertThat(after.getSupersededBy()).isEqualTo(item.getId());
     }
 
-    /** 目标行不存在时原样上抛（对照 Go 的 {@code gorm.ErrRecordNotFound}）。 */
+    /** 目标行不存在时原样上抛（"record not found"）。 */
     @Test
     void updateItemContentThrowsWhenItemMissing() {
         repo.ensureSubject(scope);
@@ -420,7 +420,7 @@ class MemoryRepositoryTest {
 
     @Test
     void supersedeItemOnlyTouchesLiveRows() {
-        // withSubject 要锁主体行（Go 的 First 未命中即报错），所以先建
+        // withSubject 要锁主体行（未命中即报错），所以先建
         repo.ensureSubject(scope);
         MemoryItem active = newItem("在用", "a");
         repo.createItem(active);
@@ -437,10 +437,10 @@ class MemoryRepositoryTest {
         assertThat(after.getInvalidAt()).isNotNull();
     }
 
-    /** {@code DeleteItem} 是**物理删**：忘记就是忘记，没有软删也没有墓碑。 */
+    /** {@code deleteItem} 是**物理删**：忘记就是忘记，没有软删也没有墓碑。 */
     @Test
     void deleteItemPhysicallyRemovesAndSupersedesPendingReplacements() {
-        // withSubject 要锁主体行（Go 的 First 未命中即报错），所以先建
+        // withSubject 要锁主体行（未命中即报错），所以先建
         repo.ensureSubject(scope);
         MemoryItem item = newItem("要被忘掉的", "a");
         repo.createItem(item);
@@ -458,7 +458,7 @@ class MemoryRepositoryTest {
 
     /**
      * 删除一律带 scope——而且这条路走的是 {@code withSubject}，
-     * 所以**跨主体/跨租户的删除会在锁主体那一步就失败**（Go 的 {@code First} 未命中）。
+     * 所以**跨主体/跨租户的删除会在锁主体那一步就失败**（主体行未命中）。
      * 这比"静默不删"更强：调用方不会以为删成功了。
      */
     @Test
@@ -515,7 +515,7 @@ class MemoryRepositoryTest {
         assertThat(repo.countActive(scope)).isEqualTo(2);
     }
 
-    /** {@code keep <= 0} 直接返回 0（Go 的短路），不能变成"全部归档"。 */
+    /** {@code keep <= 0} 直接返回 0（入参短路），不能变成"全部归档"。 */
     @Test
     void archiveLowestRankedDoesNothingForNonPositiveKeep() {
         repo.createItem(newItem("a", "a"));
@@ -579,7 +579,7 @@ class MemoryRepositoryTest {
                 .containsExactly("新", "旧");
     }
 
-    /** 时间窗只过滤更早的记录；{@code within <= 0} 时不加窗（Go 的 {@code if within > 0}）。 */
+    /** 时间窗只过滤更早的记录；{@code within <= 0} 时不加窗（within 为正才生效）。 */
     @Test
     void hasTombstoneForMessageHonoursTheWindow() {
         repo.ensureSubject(scope);
@@ -787,7 +787,7 @@ class MemoryRepositoryTest {
 
     /**
      * {@code withSubject} 里的主体行不存在时把 not-found **原样上抛**
-     * （Go 的 {@code gorm.ErrRecordNotFound}），不是静默当成"没有主体"继续。
+     * （"record not found"），不是静默当成"没有主体"继续。
      */
     @Test
     void transactionalWritesThrowWhenSubjectRowIsMissing() {
@@ -799,9 +799,9 @@ class MemoryRepositoryTest {
     // ── 抽取进度：快照的"更新前"语义 ───────────────────────────────────────
 
     /**
-     * {@code EnqueuePendingSession} 返回的是**更新之前**的快照。
-     * Go 里 {@code snapshot = *subject} 是结构体按值复制；Java 侧若忘了拷贝，
-     * 返回的就会是改过之后的状态（{@code pending_sessions} 被清空、{@code extract_scheduled_at} 被写上）。
+     * {@code EnqueuePendingSession} 返回的是**更新之前**的快照（按值复制的语义）。
+     * 若实现忘了拷贝，返回的就会是改过之后的状态
+     * （{@code pending_sessions} 被清空、{@code extract_scheduled_at} 被写上）。
      */
     @Test
     void enqueuePendingSessionReturnsThePreUpdateSnapshot() {

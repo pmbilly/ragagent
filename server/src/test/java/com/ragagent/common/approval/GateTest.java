@@ -171,7 +171,7 @@ class GateTest {
         assertFalse(gate.needsApproval(Cancellation.none(), 1, "x", "y"));
     }
 
-    /** 补充用例（Go 未覆盖）：策略查询异常时默认 fail-close（要求审批）。 */
+    /** 补充用例：策略查询异常时默认 fail-close（要求审批）。 */
     @Test
     void needsApprovalFailCloseOnCheckerError() {
         StubChecker checker = new StubChecker();
@@ -180,7 +180,7 @@ class GateTest {
         assertTrue(gate.needsApproval(Cancellation.none(), 1, "svc", "tool"));
     }
 
-    /** 补充用例（Go 未覆盖）：WEKNORA_AGENT_TOOL_APPROVAL_FAIL_OPEN=true 的 fail-open 行为。 */
+    /** 补充用例：WEKNORA_AGENT_TOOL_APPROVAL_FAIL_OPEN=true 的 fail-open 行为。 */
     @Test
     void needsApprovalFailOpenOnCheckerError() {
         StubChecker checker = new StubChecker();

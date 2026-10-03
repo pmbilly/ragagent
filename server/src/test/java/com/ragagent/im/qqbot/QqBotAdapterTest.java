@@ -27,9 +27,9 @@ import com.ragagent.im.runtime.ReplyMessage;
 import com.sun.net.httpserver.HttpServer;
 
 /**
- * QQ 机器人出站客户端（W5γ3.3）对照 Go {@code internal/im/qqbot}：
+ * QQ 机器人出站客户端行为测试：
  * 网关载荷解析（C2C/群/非 dispatch）、发送路径与鉴权头、token 缓存与失效余量、
- * 工厂只支持 websocket、以及客户端参数的照抄文案。
+ * 工厂只支持 websocket、以及客户端参数的原样透传文案。
  */
 class QqBotAdapterTest {
 

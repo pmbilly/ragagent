@@ -16,7 +16,7 @@ public final class SearchParams {
     /** 检索词。query_embedding 提供且两种匹配未被禁用时可为空。 */
     @JsonProperty("query_text")
     private String queryText = "";
-    /** 查询向量（nil = 由实现侧现算）。 */
+    /** 查询向量（null = 由实现侧现算）。 */
     @JsonProperty("query_embedding")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private float[] queryEmbedding;

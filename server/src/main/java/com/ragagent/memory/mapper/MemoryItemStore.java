@@ -33,7 +33,7 @@ final class MemoryItemStore {
     // ── 条目：写 ───────────────────────────────────────────────────────────
 
     /**
-     * 对照 {@code CreateItem}：id 为空则生成、{@code valid_from} 为零值则补 {@code now}、
+     * 插入条目：id 为空则生成、{@code valid_from} 为零值则补 {@code now}、
      * {@code status} 为空则 active，然后插入。
      *
      * <p>注意顺序：先补 {@code status}，
@@ -54,7 +54,7 @@ final class MemoryItemStore {
         repo.itemMapper.insert(item);
     }
 
-    /** 对照 {@code UpdateItemContent}：内容变了才删向量、作废提议，最后无条件覆盖五列。 */
+    /** 内容更新：内容变了才删向量、作废提议，最后无条件覆盖五列。 */
     public void updateItemContent(MemoryScope scope, String id, String content,
                                   String normalizedKey, int importance) {
         repo.tx.withSubject(scope, subject -> {
@@ -75,7 +75,7 @@ final class MemoryItemStore {
         });
     }
 
-    /** 对照 {@code SupersedeItem}。 */
+    /** 取代单条（status 迁移由 mapper 定义）。 */
     public void supersedeItem(MemoryScope scope, String id, String supersededBy) {
         repo.tx.withSubject(scope, subject -> {
             repo.itemMapper.supersedeItem(scope.tenantId(), scope.subjectId(), id, supersededBy,
@@ -86,7 +86,7 @@ final class MemoryItemStore {
     }
 
     /**
-     * 对照 {@code DeleteItem}：**物理删**。
+     * **物理删**。
      *
      * <p>三步：作废指向它的待确认项 → 删向量 → 删条目。"忘记就是忘记"，
      * 所以这里不软删、也不留墓碑（墓碑由 reject 路径单独写）。</p>
@@ -102,7 +102,7 @@ final class MemoryItemStore {
     }
 
     /**
-     * 对照 {@code DeleteAll}：物理删本 scope 的全部条目，返回删了几行。
+     * 物理删本 scope 的全部条目，返回删了几行。
      *
      * <p>⚠️ 这条 DELETE 只对 {@code memory_items} 生效——**不动**
      * {@code memory_item_embeddings}。清空路径由 service 层另外调
@@ -113,7 +113,7 @@ final class MemoryItemStore {
         return repo.itemMapper.deleteAllInScope(scope.tenantId(), scope.subjectId());
     }
 
-    /** 对照 {@code TouchUsed}：{@code use_count} 在 SQL 侧自增。 */
+    /** 使用计数：{@code use_count} 在 SQL 侧自增。 */
     public void touchUsed(MemoryScope scope, List<String> ids) {
         if (ids == null || ids.isEmpty()) {
             return;
@@ -122,7 +122,7 @@ final class MemoryItemStore {
     }
 
     /**
-     * 对照 {@code ArchiveLowestRanked}：留下排名最好的 {@code keep} 条，其余归档。
+     * 容量归档：留下排名最好的 {@code keep} 条，其余归档。
      *
      * <p>排名是"重要度 → 使用时间 → 生效时间"，**没有衰减曲线**——
      * 一条会悄悄埋掉正确记忆的半衰期，比用户能在列表里看见的硬上限更糟。</p>
@@ -137,7 +137,7 @@ final class MemoryItemStore {
                 MemoryKinds.STATUS_ACTIVE, MemoryKinds.STATUS_ARCHIVED, survivors, OffsetDateTime.now());
     }
 
-    /** 对照 {@code ExpireOverdue}：{@code expires_at} 已过的 active 条目归档。 */
+    /** 过期归档：{@code expires_at} 已过的 active 条目归档。 */
     public long expireOverdue(MemoryScope scope) {
         OffsetDateTime now = OffsetDateTime.now();
         return repo.itemMapper.expireOverdue(scope.tenantId(), scope.subjectId(),
@@ -146,12 +146,12 @@ final class MemoryItemStore {
 
     // ── 条目：读 ───────────────────────────────────────────────────────────
 
-    /** 对照 {@code GetItem}：不存在时回 {@code null}。 */
+    /** 取单条：不存在时回 {@code null}。 */
     public MemoryItem getItem(MemoryScope scope, String id) {
         return repo.itemMapper.selectScoped(scope.tenantId(), scope.subjectId(), id);
     }
 
-    /** 对照 {@code ListActiveByKinds}：{@code kinds} 为空时直接回 {@code null}。 */
+    /** 按 kind 列活跃条目：{@code kinds} 为空时直接回 {@code null}。 */
     public List<MemoryItem> listActiveByKinds(MemoryScope scope, List<String> kinds, int limit) {
         if (kinds == null || kinds.isEmpty()) {
             return null;
@@ -161,7 +161,7 @@ final class MemoryItemStore {
     }
 
     /**
-     * 对照 {@code ListActiveResident}：常驻块由哪些条目构成。
+     * 常驻块由哪些条目构成。
      *
      * <p>稳定特质按 kind 入选；**用户明确要求记住**的按 origin 入选、不问 kind
      * ——他说了"记住这个"，让这件事取决于他之后的问题恰好与它共享词汇，
@@ -174,7 +174,7 @@ final class MemoryItemStore {
     }
 
     /**
-     * 对照 {@code ListItems}：记忆管理器的分页列表。
+     * 记忆管理器的分页列表。
      *
      * <p>{@code limit <= 0} 时取 50（硬编码）；返回值同时带总数与这一页。</p>
      */
@@ -187,7 +187,7 @@ final class MemoryItemStore {
     }
 
     /**
-     * 对照 {@code ListLive}：用户当前**看得到**的某一 kind 的条目
+     * 用户当前**看得到**的某一 kind 的条目
      * ——在用 + 提议中待定。去重必须同时考虑两者，否则确认一条提议会留下重复。
      */
     public List<MemoryItem> listLive(MemoryScope scope, String kind, int limit) {
@@ -197,7 +197,7 @@ final class MemoryItemStore {
     }
 
     /**
-     * 对照 {@code FindActiveByKey}。
+     * 按规范化 key 找活键。
      *
      * <p>{@code pending} 在这里算"活着"：一条等待确认的记忆是用户已经看得到的，
      * 忽略它会让同一个推断每重推一次就在他的待办列表里多堆一份。</p>
@@ -210,13 +210,13 @@ final class MemoryItemStore {
                 List.of(MemoryKinds.STATUS_ACTIVE, MemoryKinds.STATUS_PENDING), normalizedKey);
     }
 
-    /** 对照 {@code CountActive}。 */
+    /** 在用条目计数。 */
     public long countActive(MemoryScope scope) {
         return repo.itemMapper.countByStatus(scope.tenantId(), scope.subjectId(), MemoryKinds.STATUS_ACTIVE);
     }
 
     /**
-     * 对照 {@code ItemsMissingEmbeddings}：找出向量积压。
+     * 找出向量积压。
      *
      * <p>在配置 embedding 模型之前写的每一条、模型不可达时写的每一条都没有向量，
      * 而没有向量的记忆对语义召回是**不可见**的。没有这个补扫，
@@ -384,7 +384,7 @@ final class MemoryItemStore {
     // ── 墓碑 ───────────────────────────────────────────────────────────────
 
     /**
-     * 对照 {@code AddTombstone}：记一条"刻意忘掉"，然后做一次修剪。
+     * 记一条"刻意忘掉"，然后做一次修剪。
      *
      * <p>{@code fingerprint} 为空时直接返回——空指纹是全表冲突，不能插。</p>
      */
@@ -410,7 +410,7 @@ final class MemoryItemStore {
     }
 
     /**
-     * 对照 {@code trimTombstones}：让这张表保持有界。很久以前的一次拒绝，
+     * 修剪墓碑，让这张表保持有界。很久以前的一次拒绝，
      * 没有这张表无上限长大重要。
      *
      * <p>⚠️ 那个 {@code len(keep) < Max} 就返回的判断不能省——它保证"还没到上限时不删"，
@@ -425,12 +425,12 @@ final class MemoryItemStore {
         repo.tombstoneMapper.deleteExcept(scope.tenantId(), scope.subjectId(), keep);
     }
 
-    /** 对照 {@code ListTombstones}：最近的拒绝，{@code created_at DESC}。 */
+    /** 最近的拒绝，{@code created_at DESC}。 */
     public List<MemoryTombstone> listTombstones(MemoryScope scope, int limit) {
         return repo.tombstoneMapper.listTombstones(scope.tenantId(), scope.subjectId(), limit);
     }
 
-    /** 对照 {@code HasTombstone}。 */
+    /** 这个指纹是否已经被忘过。 */
     public boolean hasTombstone(MemoryScope scope, String fingerprint) {
         if (fingerprint == null || fingerprint.isEmpty()) {
             return false;
@@ -439,7 +439,7 @@ final class MemoryItemStore {
     }
 
     /**
-     * 对照 {@code HasTombstoneForMessage}。
+     * 按来源消息查墓碑。
      *
      * <p>{@code within} 非正时不加时间窗。
      * 窗口是有意义的：这条规则拦的是一个 debounce 之后的重推，不是永久封禁一条消息。</p>

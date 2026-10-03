@@ -15,15 +15,12 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 
 /**
- * 本机 Notion API 桩服务器（对照 Go 测试的 {@code httptest.NewServer} +
- * {@code fakeNotion()}）。
+ * 本机 Notion API 桩服务器。
  *
- * <p>绑定 {@code 127.0.0.1:0}（端口由内核分配），所以**不依赖任何真实网络**
- * （约定 §7.5 第 7 条）。用 JDK 自带的 {@code com.sun.net.httpserver}，
- * 不引新依赖。</p>
+ * <p>绑定 {@code 127.0.0.1:0}（端口由内核分配），所以**不依赖任何真实网络**。
+ * 用 JDK 自带的 {@code com.sun.net.httpserver}，不引新依赖。</p>
  *
- * <p>它同时是<b>请求记录器</b>：Go 侧的 {…} 断言不到"发了什么请求"，
- * 这里把 method/path/query/body/headers 全部留下来，
+ * <p>它同时是<b>请求记录器</b>：把 method/path/query/body/headers 全部留下来，
  * 好让分页、重试、退避这些"只有看请求才验得了"的契约能被钉住。</p>
  */
 final class NotionStubServer implements AutoCloseable {
@@ -75,7 +72,7 @@ final class NotionStubServer implements AutoCloseable {
         return "http://127.0.0.1:" + server.getAddress().getPort();
     }
 
-    /** 登记一条**精确路径**的路由（与 Go 的 {@code ServeMux} 不同，这里不按前缀匹配）。 */
+    /** 登记一条**精确路径**的路由（不按前缀匹配）。 */
     void route(String path, Route route) {
         routes.put(path, route);
     }

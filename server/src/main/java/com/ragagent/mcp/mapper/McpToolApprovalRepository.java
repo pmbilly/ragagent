@@ -65,7 +65,7 @@ public class McpToolApprovalRepository {
         }
 
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
-        // 新行省略字段的缺省：require_approval=false、enabled=true（Go 同）
+        // 新行省略字段的缺省：require_approval=false、enabled=true
         boolean insertRequireApproval = patch.requireApproval() != null && patch.requireApproval();
         boolean insertEnabled = patch.enabled() == null || patch.enabled();
 

@@ -40,35 +40,30 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
- * 评估服务（对照 Go internal/application/service/evaluation.go 的 Evaluation /
- * EvaluationResult；内存任务存储 evaluationMemoryStorage 的等价 ConcurrentHashMap）。
+ * 评估服务（评估任务 + 结果；内存任务存储）。
  *
- * <h2>执行步（2026-09-24 接线，对照 Go EvalDataset 全文）</h2>
+ * <h2>执行步</h2>
  * <p>后台虚拟线程跑完整流水线：取 dataset → passages 建进临时 KB（同步建索引，
  * {@link KnowledgeService#createFromPassageSync}）→ 逐 QA 对<b>并行</b>跑
  * KnowledgeQAByEvent（rag 管线）→ {@link MetricHook} 汇总 retrieval/generation
- * metrics → 清理临时知识与 KB。失败 → status=failed + err_msg=Go 的 err.Error()
- * 语义（BizException 取 appError 原文）；全部成功 → status=success + metric 产出。</p>
+ * metrics → 清理临时知识与 KB。失败 → status=failed + err_msg=异常原文
+ * （BizException 取 appError 原文）；全部成功 → status=success + metric 产出。</p>
  *
  * <p><b>已知差异（备案）</b>：① 指标分词走 MetricSegmenter 的降级实现（只影响
- * BLEU/ROUGE；检索类指标逐值一致）；② NDCG 的 math.Log2 以 frexp 同式仿真
+ * BLEU/ROUGE；检索类指标逐值一致）；② NDCG 的 log2 以 frexp 同式仿真
  * （libm 差异或致末位分叉）；③ 清理用 deleteKnowledge + deleteKnowledgeBase，
- * 与 Go 的 deleteReferencedKnowledge 计划面（引用检查/副本保留）非逐行等价；
- * ④ TenantContext 经 capture/replay 显式传播（虚拟线程无隐式继承，约定 §5）。</p>
+ * 不做引用检查/副本保留；④ TenantContext 经 capture/replay 显式传播（虚拟线程无隐式继承）。</p>
  *
- * <h2>Go 竞态的确定性化</h2>
- * <p>Go 在注册任务后立刻 {@code go func()} 把 status 翻成 running——HTTP 响应序列化
- * 与 goroutine 竞争（实测 0/1 两种值都出现过）。Java 侧返回<b>创建时刻的快照</b>
- * （status=pending），后台线程只改存储里的对象——GET 才能看到 running/failed。</p>
+ * <h2>任务状态竞争的确定性化</h2>
+ * <p>创建接口返回<b>创建时刻的快照</b>（status=pending），后台线程只改存储里的对象
+ * ——GET 才能看到 running/failed，避免响应序列化与后台启动互相竞争。</p>
  *
- * <h2>其他照抄点</h2>
+ * <h2>其他固定语义</h2>
  * <ul>
- *   <li>模型类型字面量是 Go 的 {@code "Embedding"/"KnowledgeQA"/"Rerank"}
- *       （types/model.go 常量值，首字母大写）；</li>
- *   <li>KB 非空分支：读源 KB（跨租户在 Go 的 GetKnowledgeBaseByID 是**租户无关**的——
- *       Java 的 getKnowledgeBase 带租户过滤，跨租户源 KB 会落 404 同文案；已知差异）；</li>
- *   <li>"evaluation" KB 是真实创建（Go 同样泄漏——EvalDataset 的清理 defer 只在
- *       passage 建索引成功后注册，前置失败即泄漏该 KB）。</li>
+ *   <li>模型类型字面量为 {@code "Embedding"/"KnowledgeQA"/"Rerank"}（首字母大写）；</li>
+ *   <li>KB 非空分支：读源 KB（{@code getKnowledgeBase} 带租户过滤，跨租户源 KB 会落
+ *       404 同文案；已知差异）；</li>
+ *   <li>"evaluation" KB 是真实创建（passage 建索引失败时不清理，会残留该 KB）。</li>
  * </ul>
  */
 @Service
@@ -85,7 +80,7 @@ public class EvaluationService {
     private static final String MODEL_TYPE_RERANK = "Rerank";
     private static final String MODEL_TYPE_KNOWLEDGE_QA = "KnowledgeQA";
 
-    /** Go config.yaml conversation 段的生效值（dev 部署；golden 钉住）。 */
+    /** config.yaml conversation 段的生效值（golden 钉住）。 */
     @Value("${conversation.max-rounds:5}")
     private int maxRounds;
     @Value("${conversation.vector-threshold:0.2}")
@@ -105,7 +100,7 @@ public class EvaluationService {
     private final KnowledgeService knowledgeService;
     private final SessionKnowledgeQaService sessionKnowledgeQaService;
 
-    /** 对照 evaluationMemoryStorage：taskID → detail。 */
+    /** 任务存储：taskID → detail。 */
     private final Map<String, EvaluationDetail> store = new ConcurrentHashMap<>();
 
     public EvaluationService(ModelService modelService,
@@ -121,7 +116,7 @@ public class EvaluationService {
     }
 
     /**
-     * 对照 Evaluation：KB 处理 → dataset/rerank/chat 缺省解析 → 建任务注册 + 后台执行。
+     * KB 处理 → dataset/rerank/chat 缺省解析 → 建任务注册 + 后台执行。
      * 失败抛 IllegalStateException（handler → 500 信封 code 1007 + 原文）。
      */
     public EvaluationDetail evaluation(long tenantId, String datasetId, String knowledgeBaseId,
@@ -129,7 +124,7 @@ public class EvaluationService {
         String sourceEmbeddingModelId;
         String sourceSummaryModelId;
         if (knowledgeBaseId.isEmpty()) {
-            // 按模型表挑默认 embedding/KnowledgeQA（Go 的 ListModels 扫描分支）
+            // 按模型表挑默认 embedding/KnowledgeQA（顺序扫描）
             String embeddingModelId = "";
             String llmModelId = "";
             for (Model model : modelService.listModels()) {
@@ -153,7 +148,7 @@ public class EvaluationService {
             try {
                 kb = knowledgeBaseService.getKnowledgeBase(knowledgeBaseId);
             } catch (BizException e) {
-                // Go: GetKnowledgeBaseByID err → handler NewInternalServerError(err.Error())
+                // 失败 → 500，消息为 not-found 原文
                 throw new IllegalStateException(kbNotFoundMessage(e));
             }
             sourceEmbeddingModelId = kb.getEmbeddingModelId();
@@ -171,7 +166,7 @@ public class EvaluationService {
         }
         final String dsId = datasetId;
 
-        // rerank 缺省：模型表挑第一个 Rerank；无则跳过（Go 的 WARN 分支）
+        // rerank 缺省：模型表挑第一个 Rerank；无则跳过（记 WARN）
         if (rerankModelId.isEmpty()) {
             for (Model model : modelService.listModels()) {
                 if (model != null && MODEL_TYPE_RERANK.equals(model.getType())) {
@@ -205,9 +200,9 @@ public class EvaluationService {
         detail.params = buildParams(chatModelId, rerankModelId);
         store.put(task.id, detail);
 
-        // 后台执行（对照 Go 的 go func：running → EvalDataset → failed(err 原文)/success）
+        // 后台执行：running → evalDataset → failed(err 原文)/success
         final String evalKbId = newKb.getId();
-        // 约定 §5：提交线程（HTTP 线程）capture，后台虚拟线程 replay，finally clear
+        // 提交线程（HTTP 线程）capture，后台虚拟线程 replay，finally clear
         final TenantContextSnapshot tenantSnap = TenantContextSnapshot.capture();
         Thread.ofVirtual().name("evaluation-" + task.id).start(() -> {
             tenantSnap.replay();
@@ -237,21 +232,21 @@ public class EvaluationService {
     }
 
     /**
-     * 对照 Go EvalDataset（evaluation.go L333-472）：取数据集 → 段落建临时知识（同步索引）
+     * 完整流水线：取数据集 → 段落建临时知识（同步索引）
      * → 并行逐 QA 跑 rag 管线 → 指标汇总 → 清理临时资源。
      */
     private void evalDataset(EvaluationDetail detail, String knowledgeBaseId) {
-        // 1) 取数据集（Go: dataset.GetDatasetByID → PrintStats + Iterate）
+        // 1) 取数据集（PrintStats + Iterate）
         List<QaPair> dataset = datasetService.getDatasetByID(detail.task.datasetId);
         detail.task.total = dataset.size();
 
-        // 2) 段落表（对照 getPassageList：按 PID 铺平，空洞留 ""）
+        // 2) 段落表（按 PID 铺平，空洞留 ""）
         List<String> passages = getPassageList(dataset);
-        // 3) 建临时知识（同步建索引；此步失败即抛出——清理 defer 尚未注册，Go 同款泄漏）
+        // 3) 建临时知识（同步建索引；此步失败即抛出——清理尚未注册，会残留临时 KB）
         Knowledge knowledge = knowledgeService.createFromPassageSync(knowledgeBaseId, passages, "");
 
         try {
-            // 4) 并行评估（对照 errgroup + SetLimit(GOMAXPROCS-1)）
+            // 4) 并行评估（并发上限 = CPU 核数-1）
             int limit = Math.max(Runtime.getRuntime().availableProcessors() - 1, 1);
             MetricHook.HookMetric metricHook = new MetricHook.HookMetric(dataset.size());
             AtomicInteger finished = new AtomicInteger();
@@ -299,13 +294,13 @@ public class EvaluationService {
                 executor.shutdown();
             }
 
-            // 5) 终态指标（对照 g.Wait 后的最终 update）
+            // 5) 终态指标（并行全部完成后的最终 update）
             synchronized (progressLock) {
                 detail.metric = metricHook.metricResult();
                 detail.task.finished = finished.get();
             }
         } finally {
-            // 6) 清理（对照 defer：deleteReferencedKnowledge + DeleteKnowledgeBase）
+            // 6) 清理（deleteKnowledge + deleteKnowledgeBase）
             try {
                 knowledgeService.deleteKnowledge(knowledge.getId());
             } catch (RuntimeException e) {
@@ -321,7 +316,7 @@ public class EvaluationService {
         }
     }
 
-    /** 单个 QA 对的评估（对照 errgroup 的 g.Go 体）：跑 rag 管线 → 记录全链路产物 → 进度。 */
+    /** 单个 QA 对的评估（并行任务体）：跑 rag 管线 → 记录全链路产物 → 进度。 */
     private void runQaPair(int index, QaPair qaPair, EvaluationDetail detail,
                            String knowledgeBaseId, long tenantId,
                            MetricHook.HookMetric metricHook, AtomicInteger finished,
@@ -346,9 +341,9 @@ public class EvaluationService {
     }
 
     /**
-     * 从创建时的 params 快照构造运行时 ChatManage（Go 侧 Params 本身就是 *ChatManage；
-     * Java 的 JSON DTO 与运行时类型分离，故在此还原），并逐 QA 对设置 query/rewriteQuery/
-     * knowledgeBaseIds/searchTargets（对照 EvalDataset 循环内的赋值）。
+     * 从创建时的 params 快照构造运行时 ChatManage（JSON DTO 与运行时类型分离，故在此还原），
+     * 并逐 QA 对设置 query/rewriteQuery/
+     * knowledgeBaseIds/searchTargets（评估循环内的赋值）。
      */
     private static ChatManage buildChatManage(PipelineParams params, String knowledgeBaseId,
                                               QaPair qaPair, long tenantId) {
@@ -374,7 +369,7 @@ public class EvaluationService {
         return cm;
     }
 
-    /** 对照 params 的 SummaryConfig 子集（其余字段 Go dev 配置为零值，DTO 未携带）。 */
+    /** params 的 SummaryConfig 子集（其余字段为部署零值，DTO 未携带）。 */
     private static SummaryConfig toSummaryConfig(SummaryConfigParams dto) {
         SummaryConfig sc = new SummaryConfig();
         if (dto == null) {
@@ -389,7 +384,7 @@ public class EvaluationService {
         return sc;
     }
 
-    /** 对照 getPassageList：PIDs → passages 铺平（maxPID+1 长，空洞留 ""）。 */
+    /** PIDs → passages 铺平（maxPID+1 长，空洞留 ""）。 */
     private static List<String> getPassageList(List<QaPair> dataset) {
         Map<Integer, String> pidMap = new HashMap<>();
         int maxPid = 0;
@@ -410,7 +405,7 @@ public class EvaluationService {
         return passages;
     }
 
-    /** 对照 Go err.Error()：BizException 取 AppError 原文（Go AppError.Error() 语义），其余取 getMessage()。 */
+    /** 失败消息：BizException 取 appError 原文，其余取 getMessage()。 */
     private static String errorText(RuntimeException e) {
         if (e instanceof BizException be) {
             String msg = be.appError().message();
@@ -421,7 +416,7 @@ public class EvaluationService {
         return e.getMessage() == null ? e.toString() : e.getMessage();
     }
 
-    /** 对照 EvaluationResult：内存查 → 租户匹配校验。失败消息 = Go 原文。 */
+    /** 内存查 → 租户匹配校验。失败消息是契约原文。 */
     public EvaluationDetail evaluationResult(long tenantId, String taskId) {
         EvaluationDetail detail = store.get(taskId);
         if (detail == null) {
@@ -433,7 +428,7 @@ public class EvaluationService {
         return detail;
     }
 
-    /** 对照 EvaluationService 构造 detail.params 的字段集（只赋 PipelineRequest 的固定子集）。 */
+    /** 构造 detail.params 的字段集（只赋 PipelineRequest 的固定子集）。 */
     private PipelineParams buildParams(String chatModelId, String rerankModelId) {
         PipelineParams params = new PipelineParams();
         params.maxRounds = maxRounds;
@@ -474,15 +469,15 @@ public class EvaluationService {
         return copy;
     }
 
-    /** Go 的 GetKnowledgeBaseByID 失败消息（"knowledge base not found"）透传。
-     *  ⚠️ BizException.getMessage() 是 "error code: N, error message: …" 前缀形态
-     *  （§9 波1 G1 #1），取 appError().message() 才是原文。 */
+    /** "knowledge base not found" 消息透传。
+     *  ⚠️ BizException.getMessage() 是 "error code: N, error message: …" 前缀形态，
+     *  取 appError().message() 才是原文。 */
     private static String kbNotFoundMessage(BizException e) {
         String msg = e.appError().message();
         return msg == null || msg.isEmpty() ? "knowledge base not found" : msg;
     }
 
-    /** 供契约测试直种任务（Go 的 register 等价；包内可见）。 */
+    /** 供契约测试直种任务（包内可见）。 */
     void registerForTest(EvaluationDetail detail) {
         store.put(detail.task.id, detail);
     }

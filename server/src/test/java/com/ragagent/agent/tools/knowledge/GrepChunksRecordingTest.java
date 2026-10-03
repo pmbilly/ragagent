@@ -26,10 +26,10 @@ import com.ragagent.agent.tools.GoRecording45B;
 import com.ragagent.agent.tools.RecordingSupport;
 
 /**
- * 波 4.5b 回放：grep_chunks（对照 Go 实录，探针 {@code zz_rec45b_grep_test.go}）。
+ * 4.5b 回放：grep_chunks 的录制回放。
  *
- * <p>与 Go 探针连同一 dev PG（localhost:15432，租户 10002）：本测试自行种同一份种子
- * （id 前缀 aa45b），经 {@link JdbcGrepSearch} 真跑与 Go gorm 相同的 SQL
+ * <p>连接同一 dev PG（localhost:15432，租户 10002）：本测试自行种同一份种子
+ * （id 前缀 aa45b），经 {@link JdbcGrepSearch} 真跑与仓储层同构的 SQL
  * （~* 正则、scopeClause OR、created_at DESC LIMIT 500、COUNT(*) 回填）。
  * dev PG 不可达时测试显式失败（不允许跳过）。</p>
  */
@@ -145,10 +145,10 @@ class GrepChunksRecordingTest {
         }
     }
 
-    // ==================== JDBC seam（对照 Go gorm searchChunks 的同构 SQL） ====================
+    // ==================== JDBC seam（同构 SQL） ====================
 
     /**
-     * 对照 Go {@code searchChunks}：同样的 scopeClause OR 组合、
+     * 与仓储层同构的 SQL：同样的 scopeClause OR 组合、
      * {@code (content ~* ? OR knowledges.title ~* ?)}、created_at DESC LIMIT 500、
      * COUNT(*) 回填 totalChunkCount。无有效 scope 返回空表。
      */
@@ -309,7 +309,7 @@ class GrepChunksRecordingTest {
 
     private static void assertToolResult(String label, ToolResult result, JsonNode r) {
         assertThat(result.isSuccess()).as("%s success", label).isEqualTo(r.get("success").asBoolean());
-        // B43：输出数字形态 Go→标准（ToolJson 换 Jackson）——语义比较吸收
+        // 输出数字形态与录制侧不同（1 vs 1.0）——语义比较吸收
         assertThat(com.ragagent.support.ContractJson.deep(result.getOutput())).as("%s output", label)
                 .isEqualTo(com.ragagent.support.ContractJson.deep(r.get("output").asText()));
         String wantError = r.hasNonNull("error") ? r.get("error").asText() : "";

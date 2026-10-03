@@ -27,18 +27,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
- * 对照 Go internal/application/service/weknoracloud.go（SaveCredentials + CheckStatus）。
+ * WeKnoraCloud 凭据保存与状态检查。
  *
- * 注意 CheckStatus 的实际行为以代码为准（注释与实现有出入）：
- * CredentialsConfig.Scan 读库时已宽容解密——失败会把 app_secret 置空，
- * 因此 enc:v1: 前缀永远不会到达 CheckStatus，needs_reinit=true 分支在 Go 中不可达。
- * Java 复刻同样链路：读库 → 宽容解密 → GetWeKnoraCloud() 要求 app_id+app_secret 均非空。
+ * 注意：CheckStatus 的实际行为以代码为准。CredentialsConfig.Scan 读库时已宽容解密——失败会把
+ * app_secret 置空，因此 enc:v1: 前缀永远不会到达 CheckStatus，needs_reinit=true 分支不可达。
+ * 链路：读库 → 宽容解密 → GetWeKnoraCloud() 要求 app_id+app_secret 均非空。
  */
 @Service
 public class WeKnoraCloudService {
 
     private static final Logger log = LoggerFactory.getLogger(WeKnoraCloudService.class);
-    /** 对照 provider.WeKnoraCloudBaseURL */
+    /** WeKnoraCloud 服务基址。 */
     public static final String BASE_URL = "https://weknora.weixin.qq.com";
 
     private final TenantService tenantService;
@@ -73,14 +72,14 @@ public class WeKnoraCloudService {
         if (tenant == null) {
             throw new IllegalArgumentException("tenant not found");
         }
-        // 对照 CredentialsConfig.Value()：落库前 AES-256-GCM 加密 app_secret
+        // 落库前 AES-256-GCM 加密 app_secret
         String encrypted = cryptoService.encryptAESGCM(appSecret, cryptoService.getAESKey());
         tenant.setCredentials(credentialsNode(appId, encrypted));
-        // credentials 列由 JacksonTypeHandler 原样写回（app_secret 已加密，对照 Value()）
+        // credentials 列由 JacksonTypeHandler 原样写回（app_secret 已加密）
         tenantMapper.updateById(tenant);
     }
 
-    /** 对照 verifyCredentials：GET {base}/api/v1/health + 签名头，10s 超时 */
+    /** 健康检查：GET {base}/api/v1/health + 签名头，10s 超时 */
     private void verifyCredentials(String appId, String appSecret) throws Exception {
         String healthUrl = BASE_URL + "/api/v1/health";
         String requestId = "verify-" + System.nanoTime();
@@ -132,9 +131,8 @@ public class WeKnoraCloudService {
     /**
      * 解析当前租户的 WeKnoraCloud 凭证（{appId, appSecret}）。
      *
-     * <p>对照 Go {@code modelService.resolveWeKnoraCloudCredentials}：租户信息缺失 → {@code null}
-     * （Go 的 {@code !ok}）；凭证未配 / 解密失败 → 空串对；否则返回已解密明文。
-     * VLM 的 weknoracloud 界面（{@code GetVLMModel} 同源路径）与模型调试端点共用此口。</p>
+     * <p>租户信息缺失 → {@code null}；凭证未配 / 解密失败 → 空串对；否则返回已解密明文。
+     * VLM 的 weknoracloud 界面与模型调试端点共用此口。</p>
      */
     public String[] resolveCredentials() {
         Long tid = TenantContext.currentTenantId();
@@ -165,7 +163,7 @@ public class WeKnoraCloudService {
         return root;
     }
 
-    // ── 对照 internal/models/utils/signer.go Sign ─────────────────────────
+    // ── 请求签名 ──────────────────────────────────────────────────────────
 
     private static final String NONCE_CHARS =
             "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -212,7 +210,7 @@ public class WeKnoraCloudService {
         }
     }
 
-    /** RFC3986 编码：保留 A-Z a-z 0-9 - _ . ~，其余 %XX（对照 rfc3986Encode） */
+    /** RFC3986 编码：保留 A-Z a-z 0-9 - _ . ~，其余 %XX */
     static String rfc3986Encode(String s) {
         StringBuilder buf = new StringBuilder();
         for (char r : s.toCharArray()) {

@@ -60,7 +60,7 @@ public class ConversationProperties {
             </think>
             NO_MATCH""";
 
-    // ---- 回填产物（Go yaml:"-" 的运行时字段） ----
+    // ---- 回填产物（运行时字段，不参与配置绑定） ----
     private String fallbackPrompt = "";
     private String rewritePromptSystem = "";
     private String rewritePromptUser = "";
@@ -132,7 +132,7 @@ public class ConversationProperties {
                     byId.put(id, new String[] {t.path("content").asText(""), t.path("user").asText("")});
                 }
             } catch (Exception ignored) {
-                // Go：目录/文件缺失 → 跳过
+                // 目录/文件缺失 → 跳过
             }
         }
         return byId;

@@ -30,7 +30,7 @@ import com.ragagent.im.runtime.ReplyMessage;
 import com.sun.net.httpserver.HttpServer;
 
 /**
- * Mattermost（W5γ3.11）对照 Go {@code internal/im/mattermost/{adapter,client,factory}.go}：
+ * Mattermost 适配器行为测试：
  * 入站体三支（JSON / 表单 / 兜底）、token 验签、自环与空消息丢弃、线程根三级回落、
  * file_ids 两形态、发送（channel 回落 + root_id）、流式（建帖/改帖/定稿）、下载名字三级回落、
  * 工厂（默认 webhook + 模式报错 + 凭据校验）。
@@ -299,7 +299,7 @@ class MattermostAdapterTest {
 
         assertThrows(IllegalStateException.class,
                 () -> a.updateStreamContent(incoming, "nope", "x"));
-        a.endStream(incoming, "nope");   // 未知流：静默（照 Go）
+        a.endStream(incoming, "nope");   // 未知流：静默
     }
 
     @Test
@@ -342,7 +342,7 @@ class MattermostAdapterTest {
         channel.setId("ch-1");
         channel.setCredentials("{\"site_url\":\"" + apiBase + "\",\"bot_token\":\"tk\","
                 + "\"outgoing_token\":\"ot\",\"post_to_main\":true}");
-        // 未设 mode → 默认 webhook（照 Go）
+        // 未设 mode → 默认 webhook
         var reg = new MattermostAdapterFactory(null).create(channel, (m, c) -> { });
         assertNotNull(reg.adapter());
         assertEquals(ImTypes.PLATFORM_MATTERMOST, reg.adapter().platform());
@@ -376,7 +376,7 @@ class MattermostAdapterTest {
         assertEquals("bot_token is required", assertThrows(IllegalArgumentException.class,
                 () -> new MattermostClient(apiBase, "  ", null)).getMessage());
 
-        // 403 提示文案（照 Go）
+        // 403 提示文案
         responder = c -> "{\"id\":\"\"}";
         MattermostClient client = new MattermostClient(apiBase, "tk", null);
         MattermostAdapter adapter = new MattermostAdapter(client, "ot", "", false);

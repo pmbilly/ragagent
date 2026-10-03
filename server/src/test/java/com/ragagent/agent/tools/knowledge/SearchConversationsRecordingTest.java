@@ -16,8 +16,8 @@ import com.ragagent.agent.tools.GoRecording45B;
 import com.ragagent.agent.tools.RecordingSupport;
 
 /**
- * SearchConversationsTool 的 Go 实录回放（7 条）。output 逐字比对；limit/owner 断言
- * stub 收到的值（对照 Go 超取 limit+2 与构造期 ownerID）。
+ * SearchConversationsTool 的录制回放（7 条）。output 逐字比对；limit/owner 断言
+ * stub 收到的值（录制侧超取 limit+2 与构造期 ownerID）。
  */
 class SearchConversationsRecordingTest {
 

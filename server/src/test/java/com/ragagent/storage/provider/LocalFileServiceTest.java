@@ -19,7 +19,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * 本地后端 + 工厂 + 租户回退的契约测试（对照 Go local.go / factory.go / resolve_tenant.go）：
+ * 本地后端 + 工厂 + 租户回退的契约测试：
  * 路径布局、{@code local://} 形态、路径遍历拒绝、跨后端复制拒绝、缺省链与回退规则。
  */
 class LocalFileServiceTest {
@@ -82,7 +82,7 @@ class LocalFileServiceTest {
         // 路径遍历：baseDir 之外一律拒绝
         assertThrows(RuntimeException.class, () -> service.getFile("../../etc/passwd"));
         assertThrows(RuntimeException.class, () -> service.getFile(base.getParent().resolve("x").toString()));
-        // 文件名照 Go 取 basename（目录部分丢弃，不是拒绝）；只有 "."/".."/含 ".."/超长才拒
+        // 文件名取 basename（目录部分丢弃，不是拒绝）；只有 "."/".."/含 ".."/超长才拒
         assertEquals("x.txt", LocalFileService.safeFileName("../x.txt"));
         assertEquals("b.txt", LocalFileService.safeFileName("a/b.txt"));
         assertThrows(IllegalArgumentException.class, () -> LocalFileService.safeFileName(".."));
@@ -122,7 +122,7 @@ class LocalFileServiceTest {
     void getFileURLWithoutSignerFallsBack() throws Exception {
         LocalFileService withUrl = new LocalFileService(base.toString(), "https://files.example.com/");
         String path = withUrl.saveBytes("x".getBytes(StandardCharsets.UTF_8), 7L, "b.txt", false);
-        // 不注入 signer：与 Go 未配 SYSTEM_AES_KEY 时一致
+        // 不注入 signer：等价于未配 SYSTEM_AES_KEY 的部署
         assertEquals(path, withUrl.getFileURL(path));
     }
 
@@ -152,7 +152,7 @@ class LocalFileServiceTest {
                 "local", escaping, base.toString()).service();
         assertEquals(base.toAbsolutePath().normalize(), kept.baseDir());
 
-        // 批次二已补齐：oss 无配置时是"不完整"（而非"未实现"）
+        // 已补齐：oss 无配置时是"不完整"（而非"未实现"）
         assertEquals("incomplete oss config", assertThrows(IllegalArgumentException.class,
                 () -> FileServiceFactory.fromStorageConfig("oss", sec, base.toString()))
                 .getMessage());

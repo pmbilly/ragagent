@@ -26,9 +26,9 @@ import com.ragagent.agent.tools.GoRecording45B;
 import com.ragagent.agent.tools.RecordingSupport;
 
 /**
- * 波 4.5b 回放：database_query（对照 Go 实录，探针 {@code zz_rec45b_dbquery_test.go}）。
+ * 4.5b 回放：database_query 的录制回放。
  *
- * <p>与 Go 探针连同一 dev PG（localhost:15432，租户 10002）：本测试自行种同一份
+ * <p>连接同一 dev PG（localhost:15432，租户 10002）：本测试自行种同一份
  * 种子（id 前缀 aa45bq），经 {@link JdbcExecutor} 真跑注入后的 SQL 端到端验证
  * （tenant 过滤 / soft-delete / hidden-KB / chunk-enabled / scope 注入都在
  * 语料的结果集里可见）。dev PG 不可达时测试显式失败（不允许跳过）。</p>
@@ -122,9 +122,9 @@ class DatabaseQueryRecordingTest {
         }
     }
 
-    // ==================== JDBC seam（对照 Go gorm Raw(securedSQL).Rows()） ====================
+    // ==================== JDBC seam ====================
 
-    /** 对照 {@code db.Raw(securedSQL).Rows()}：列名 + 行扫描（值原样交给工具侧做 []byte→string）。 */
+    /** 执行 securedSQL：列名 + 行扫描（值原样以字符串交给工具侧）。 */
     static final class JdbcExecutor implements SqlQueryExecutor {
         @Override
         public QueryResult query(String securedSQL) {
@@ -200,7 +200,7 @@ class DatabaseQueryRecordingTest {
 
     @Test
     void schemaContract() {
-        // 探针 _schema 语料：Go utils.GenerateSchema[DatabaseQueryInput]() 的字节。
+        // _schema 语料：录制下来的 schema 原字节。
         JsonNode schema = RecordingSupport.readTree(rec("database_query_schema").get("schema").asText());
         assertThat(tool(wholeKb("aa45bq01")).getParameters()).isEqualTo(schema);
     }
@@ -308,7 +308,7 @@ class DatabaseQueryRecordingTest {
 
     @Test
     void validationErrors() {
-        // 校验失败语料共用 whole-KB scope，逐条回放（错误文案逐字对照 Go）。
+        // 校验失败语料共用 whole-KB scope，逐条回放（错误文案逐字）。
         String[] ids = {
                 "not_select", "multiple_statements", "table_not_allowed",
                 "injection_or_1or1", "injection_always_false", "input_too_short",

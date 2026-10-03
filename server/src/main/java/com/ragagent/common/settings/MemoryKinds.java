@@ -17,7 +17,7 @@ public final class MemoryKinds {
 
     private MemoryKinds() {}
 
-    // ── 记忆种类（Go MemoryKind*，L24-34） ──────────────────────────────────
+    // ── 记忆种类 ──────────────────────────────────────────────────────────
 
     /**
      * 稳定特质：构成每轮都注入的常驻块。
@@ -61,7 +61,7 @@ public final class MemoryKinds {
         return kind != null && ALL.contains(kind);
     }
 
-    // ── 来源（Go MemoryOrigin*，L38-42） ───────────────────────────────────
+    // ── 来源 ──────────────────────────────────────────────────────────────
 
     /** 用户在对话里明确要求的。 */
     public static final String ORIGIN_EXPLICIT = "explicit";
@@ -70,7 +70,7 @@ public final class MemoryKinds {
     /** 在记忆管理器里创建或编辑的。 */
     public static final String ORIGIN_MANUAL = "manual";
 
-    // ── 状态（Go MemoryStatus*，L46-56） ───────────────────────────────────
+    // ── 状态 ──────────────────────────────────────────────────────────────
 
     public static final String STATUS_ACTIVE = "active";
     /** 被矛盾陈述取代。**取代而非删除**，这样记忆管理器仍能解释"改了什么、什么时候改的"。 */
@@ -84,7 +84,7 @@ public final class MemoryKinds {
      */
     public static final String STATUS_PENDING = "pending";
 
-    // ── 预算（Go L71-106） ────────────────────────────────────────────────
+    // ── 预算 ─────────────────────────────────────────────────────────────
 
     /** 常驻块的 rune 预算。 */
     public static final int BLOCK_RUNE_BUDGET = 900;
@@ -92,7 +92,7 @@ public final class MemoryKinds {
     public static final int RECALL_RUNE_BUDGET = 600;
     /** 一轮最多拉进多少条情境条目，与 rune 预算彼此独立。 */
     public static final int RECALL_MAX_ITEMS = 5;
-    /** 一次按需查找的上限。比召回宽松得多，因为两者付费方式不同（见 Go 注释）。 */
+    /** 一次按需查找的上限。比召回宽松得多，因为两者付费方式不同。 */
     public static final int SEARCH_MAX_ITEMS = 20;
     /** 一次按需查找的 rune 预算。 */
     public static final int SEARCH_RUNE_BUDGET = 2000;

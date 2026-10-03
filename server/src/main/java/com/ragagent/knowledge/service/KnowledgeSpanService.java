@@ -218,7 +218,7 @@ public class KnowledgeSpanService {
      * span 失败行优先（字母序
      * code/error_code/error_message/finished_at/message/name/stage；finished_at 为
      * null 时输出 null）；否则 currentAttempt==latestAttempt 且 parse_status=failed
-     * 且 error_message 非空才落知识行回退（SERVER_RESTART 文案 EqualFold 判定照抄）。
+     * 且 error_message 非空才落知识行回退（SERVER_RESTART 文案按 EqualFold 判定）。
      */
     private static JsonNode knowledgeSpansLastError(
             int currentAttempt, int latestAttempt, Knowledge knowledge,

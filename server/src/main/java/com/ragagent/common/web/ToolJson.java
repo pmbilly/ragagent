@@ -15,10 +15,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * 工具参数/输出的 JSON 编码（标准 Jackson 实现）。
  *
- * <p><b>2026-10-03（B43）</b>：手写 writer 退役——原实现（135 行）为逐字节对齐 Go
- * {@code encoding/json} 而写（紧凑输出 / map 键字节序 / HTML 转义 / Go 浮点形态）。
- * Go 版下线后改回 Java 生态原生做法：标准 Jackson 序列化；仅保留<b>递归键排序</b>
- * 一条（不是 Go 复刻，是 LLM 载荷的字节稳定性前提——同一参数两次编码需同字节）。</p>
+ * <p>历史上的手写逐字节对齐 writer 已退役：现在就是标准 Jackson 序列化；
+ * 仅保留<b>递归键排序</b>一条——LLM 载荷的字节稳定性前提（同一参数两次编码需同字节）。</p>
  */
 public final class ToolJson {
 
@@ -38,7 +36,7 @@ public final class ToolJson {
         }
     }
 
-    /** 标准 Jackson 缩进 JSON（替代原 GoJsonMarshal 的手写缩进器）。 */
+    /** 标准 Jackson 缩进 JSON。 */
     public static String prettyJson(Object value) {
         try {
             return PRETTY.writeValueAsString(value);
@@ -47,12 +45,7 @@ public final class ToolJson {
         }
     }
 
-    /**
-     * JSON 字符串字面量（连引号）：标准 Jackson 转义——Java 生态原生做法。
-     *
-     * <p>替代原 {@code GoQuoting.quoteGo}、{@code WeaviateGql.quoteGo} 与手写
-     * {@code writeString}（三份复刻，Go 版已下线）。</p>
-     */
+    /** JSON 字符串字面量（连引号）：标准 Jackson 转义。 */
     public static String quoted(String s) {
         try {
             return MAPPER.writeValueAsString(s);

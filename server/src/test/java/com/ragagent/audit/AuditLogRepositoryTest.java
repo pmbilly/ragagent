@@ -24,9 +24,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * audit_logs 仓储语义测试（H2）——对照 Go
- * internal/application/repository/audit_log_scope_test.go（L13-51），
- * 并按 {@code audit_log.go} 的 SQL 行为补齐 mock 测不出来的部分。
+ * audit_logs 仓储语义测试（H2）——补齐 mock 测不出来的 SQL 行为部分。
  *
  * <p>覆盖：作用域过滤（scope_type/scope_id）、UnscopedOnly、租户边界、
  * id DESC 排序与游标、limit 默认/上限、action/outcome/actor 过滤、
@@ -68,7 +66,7 @@ class AuditLogRepositoryTest {
         repo.create(e);
     }
 
-    // ── 作用域（对照 audit_log_scope_test.go） ───────────────────────────
+    // ── 作用域 ───────────────────────────────────────────────────────────
 
     @Test
     void listFiltersKnowledgeBaseScope() {
@@ -102,7 +100,7 @@ class AuditLogRepositoryTest {
 
     // ── 排序 / 游标 / 分页 ───────────────────────────────────────────────
 
-    /** 对照 Go 的 {@code Order("id DESC")}：最新在前，游标取 id &lt; after_id。 */
+    /** id DESC：最新在前，游标取 id &lt; after_id。 */
     @Test
     void listOrdersByIdDescAndHonorsCursor() {
         for (int i = 0; i < 5; i++) {
@@ -120,7 +118,7 @@ class AuditLogRepositoryTest {
         assertThat(older).allSatisfy(e -> assertThat(e.getId()).isLessThan(newest));
     }
 
-    /** 对照 Go {@code limit := 50}（默认）与 {@code auditLogListLimitMax = 100}（硬上限）。 */
+    /** limit 默认 50，{@code auditLogListLimitMax = 100} 是硬上限。 */
     @Test
     void listAppliesDefaultAndMaxLimit() {
         for (int i = 0; i < 60; i++) {
@@ -140,7 +138,7 @@ class AuditLogRepositoryTest {
 
     // ── 过滤器 ───────────────────────────────────────────────────────────
 
-    /** action / outcome / actor 都是精确匹配（对照 Go 的三条独立 Where）。 */
+    /** action / outcome / actor 都是精确匹配（三条独立 Where）。 */
     @Test
     void listAppliesExactMatchFilters() {
         AuditLog a = row(7, AuditAction.ACCESS_DENIED, "", "");
@@ -162,7 +160,7 @@ class AuditLogRepositoryTest {
                 .isEmpty();
     }
 
-    /** 空串过滤器 = 不过滤（Go 的 string 零值语义），不能被当成"匹配空串"。 */
+    /** 空串过滤器 = 不过滤（空值即"未设该条件"），不能被当成"匹配空串"。 */
     @Test
     void listTreatsEmptyFiltersAsAbsent() {
         insert(row(7, AuditAction.MEMBER_ADDED, "", ""));
@@ -197,7 +195,7 @@ class AuditLogRepositoryTest {
 
     // ── 保留期 ───────────────────────────────────────────────────────────
 
-    /** 对照 Go {@code DeleteOlderThan}：严格早于 cutoff 的行被删，返回影响行数。 */
+    /** 严格早于 cutoff 的行被删，返回影响行数。 */
     @Test
     void deleteOlderThanRemovesOnlyStrictlyOlderRows() {
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
@@ -223,9 +221,8 @@ class AuditLogRepositoryTest {
     // ── details（jsonb） ─────────────────────────────────────────────────
 
     /**
-     * details 与 DDL 默认值：Go 的 nil JSON 被 GORM 省略 → 库默认 {@code '{}'}。
-     * Java 侧 null 字段被 MyBatis-Plus 省略 → 同样落 {@code '{}'}。
-     * 读回经 PgJsonTypeHandler 规范化键序（（长度,字节序）——复刻 PG jsonb）。
+     * details 与 DDL 默认值：null 字段被 MyBatis-Plus 省略 → 库默认 {@code '{}'}。
+     * 读回经 PgJsonTypeHandler 规范化键序（（长度,字节序）——与 PG jsonb 同形）。
      */
     @Test
     void detailsRoundTripsThroughJsonbColumn() {
@@ -266,7 +263,7 @@ class AuditLogRepositoryTest {
         assertThat(back.getDetails().size()).isZero();
     }
 
-    /** 零值列语义：Go 的非指针 string 零值写 ''，outcome 默认 'success'。 */
+    /** 零值列语义：未设置的 string 列写 ''，outcome 默认 'success'。 */
     @Test
     void zeroValueColumnsMatchGoSemantics() {
         AuditLog e = row(7, AuditAction.MEMBER_ADDED, null, null);
@@ -280,11 +277,11 @@ class AuditLogRepositoryTest {
         assertThat(back.getScopeId()).isEmpty();
         assertThat(back.getActorRole()).isEmpty();
         assertThat(back.getRequestPath()).isEmpty();
-        // 列默认 'success'（对照 Go 的 gorm:"default:success"；服务层也会做同样归一）
+        // 列默认 'success'（服务层也会做同样归一）
         assertThat(back.getOutcome()).isEqualTo(AuditOutcome.SUCCESS);
     }
 
-    /** 自增主键回填（GORM 的 Create 会写回主键；MyBatis-Plus 的 AUTO 同样回填）。 */
+    /** 自增主键回填（MyBatis-Plus 的 AUTO 会写回主键）。 */
     @Test
     void createBackfillsGeneratedId() {
         AuditLog e = row(7, AuditAction.MEMBER_ADDED, "", "");

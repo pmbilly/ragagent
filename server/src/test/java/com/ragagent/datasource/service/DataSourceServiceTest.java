@@ -52,15 +52,14 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
 
 /**
- * {@link DataSourceService} 的语义测试（对照 Go
- * {@code internal/application/service/datasource_service.go}）。
+ * {@link DataSourceService} 的语义测试。
  *
  * <h2>为什么用真仓储 + H2 而不是 fake</h2>
  * <p>与 {@code SchedulerTest} 同一处置：{@code DataSourceRepository} /
  * {@code SyncLogRepository} 是具体类，而 TestSchema 里已经有这两张表。
  * 走真仓储才能覆盖到"两处 {@code Updates} 的零值跳过差异"
  * （{@code update} 跳零值、{@code updateSyncState} 不跳）——那正是本模块最容易
- * 写错的地方（§9 的 session/message 同款坑）。</p>
+ * 写错的地方（session/message 同款坑）。</p>
  *
  * <h2>知识库一侧用假实现</h2>
  * <p>{@link KnowledgeBridge} 是端口（见其类注释）：真实的
@@ -325,7 +324,7 @@ class DataSourceServiceTest {
         ds.setType(type);
         ds.setSyncMode(syncMode == null ? DataSourceConstants.SYNC_MODE_INCREMENTAL : syncMode);
         // 真实行总有 config（CreateDataSource 会先让连接器校验它），
-        // 而 handle() 对"空 config"走的是 Go 里那条 panic 等价分支——测试要覆盖的是
+        // 而 handle() 对"空 config"会走异常分支——测试要覆盖的是
         // 正常路径，所以这里补一份最小配置。
         DataSourceConfig cfg = new DataSourceConfig();
         cfg.setType(type);
@@ -416,7 +415,7 @@ class DataSourceServiceTest {
                 .hasMessage("connector type not found in registry");
     }
 
-    /** CREATE 时 GORM 的默认值替换：sync_mode / status / conflict_strategy / retention_days。 */
+    /** CREATE 时零值字段落 DDL 默认值：sync_mode / status / conflict_strategy / retention_days。 */
     @Test
     void createAppliesGormInsertDefaults() {
         DataSource ds = new DataSource();
@@ -473,8 +472,6 @@ class DataSourceServiceTest {
 
     /**
      * ⚠️ 凭据永不从 PUT 流入：请求体里带 credentials，落库的仍是原来的那张 map。
-     *
-     * <p>这条是 Go 注释里"Credentials NEVER flow through this endpoint"的实测版。</p>
      */
     @Test
     void updateForcePreservesStoredCredentials() {
@@ -518,7 +515,7 @@ class DataSourceServiceTest {
         DataSourceConfig parsed = updated.parseConfig();
         assertThat(parsed.getCredentials()).containsEntry("api_token", "secret-token");
         assertThat(parsed.hasConfiguredCredentials(updated.getType())).isTrue();
-        // 写库后立刻做一次真实连接校验（对照 Go 的"当场告诉用户新 token 对不对"）
+        // 写库后立刻做一次真实连接校验（当场告诉用户新 token 对不对）
         assertThat(notion.validateCalls).isEqualTo(1);
     }
 
@@ -571,9 +568,8 @@ class DataSourceServiceTest {
     /**
      * 反向对称：原本是 error 的源校验通过后回到 active。
      *
-     * <p>⚠️ 但 <b>error_message 不会从库里清掉</b>——这是 GORM
-     * {@code Updates(结构体)} 跳过零值字段的净效果（§9 同款），Java 侧照抄。
-     * Go 的源码读起来是"置空并落库"，实际上那条 SET 里根本没有 error_message；
+     * <p>⚠️ 但 <b>error_message 不会从库里清掉</b>——落库语义：update 跳过零值字段，
+     * 置空 error_message 根本不会进那条 SET；
      * 真正的清空要走 {@code UpdateSyncState}（同步结果路径用的是它）。
      * 这条断言就是为了钉住这个反直觉的事实，别"顺手修好"。</p>
      */
@@ -654,7 +650,7 @@ class DataSourceServiceTest {
         assertThat(enqueued.get(0).forceFull()).isFalse();
     }
 
-    /** 投递失败：两侧都落失败（数据源转 error + Go 的原文案）。 */
+    /** 投递失败：两侧都落失败（数据源转 error + 固定错误文案）。 */
     @Test
     void manualSyncMarksBothSidesFailedOnEnqueueError() {
         DataSource ds = newDataSource(DataSourceConstants.CONNECTOR_TYPE_RSS, null, null);
@@ -900,7 +896,7 @@ class DataSourceServiceTest {
         assertThat(syncLogRepo.findById(log.getId()).getItemsSkipped()).isEqualTo(1);
     }
 
-    /** 空 external_id 的删除项跳过并计入 skipped（对照 Go 的 warn 分支）。 */
+    /** 空 external_id 的删除项跳过并计入 skipped（记 warn 日志的分支）。 */
     @Test
     void handleSkipsDeletionWithEmptyExternalId() {
         DataSource ds = newDataSource(DataSourceConstants.CONNECTOR_TYPE_RSS, null, null);
@@ -974,7 +970,7 @@ class DataSourceServiceTest {
                 .isEqualTo("all fetched items failed during sync (3/3)");
     }
 
-    /** 详情超过 500 字节要截断（对照 Go 的 {@code maxDetailLen}）。 */
+    /** 详情超过 500 字节要截断（{@code maxDetailLen}）。 */
     @Test
     void allFetchedItemsFailedTruncatesLongDetail() {
         SyncResult result = new SyncResult();
@@ -1066,7 +1062,7 @@ class DataSourceServiceTest {
 
         assertThat(syncLogRepo.findById(log.getId()).getItemsCreated()).isEqualTo(1);
         assertThat(bridge.created).hasSize(1);
-        // 标题就是文件名（Go 的 CreateKnowledgeFromFile 用 fileName 当 Title）
+        // 标题就是文件名（fileName 当 Title）
         assertThat(bridge.created.get(0).getTitle()).isEqualTo("a.md");
     }
 
@@ -1102,7 +1098,7 @@ class DataSourceServiceTest {
         assertThat(created.getStatus()).isEqualTo(DataSourceConstants.DATA_SOURCE_STATUS_ACTIVE);
     }
 
-    /** 时长常量与调度器共享（对照 Go 的 asynq.MaxRetry(5) / Timeout(2h)）。 */
+    /** 任务预算常量与调度器共享：最大重试 5 次、超时 2 小时。 */
     @Test
     void taskBudgetMatchesGoAsynqOptions() {
         assertThat(Scheduler.MAX_RETRY).isEqualTo(5);

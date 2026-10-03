@@ -6,19 +6,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 4.6c Go 实录常量（chat_pipeline 检索管线 26 文件）。生成方法：/tmp/toolrec46c 复制
- * WeKnora internal/ + go.mod/go.sum，同包探针
- * internal/application/service/chat_pipeline/zz_rec46c_support_test.go + zz_rec46c_test.go，
- * 脚本化驱动管线纯函数与各插件 OnEvent，真值写入 /tmp/toolrec46c/rec46c.jsonl，
- * 本文件由该 rec.jsonl 生成——<b>禁止手改</b>。
- * 重生成：{@code cd /tmp/toolrec46c && go test ./internal/application/service/chat_pipeline/ -run TestRec46C -count=1}
- * 然后重跑生成器把每行 rec.jsonl → 一条 R_<GROUP>_<KEY> 常量。
+ * 4.6c 录制常量（chat_pipeline 检索管线 26 文件）：由录制探针脚本化驱动管线纯函数
+ * 与各插件 OnEvent 生成，本文件由录制 JSONL 生成——<b>禁止手改</b>。
  *
- * <p>掩码约定（探针 zzMask 与 Java {@code Rec46cSupport.mask} 两侧同款后处理，掩码后逐字节可比）：</p>
+ * <p>掩码约定（与 Java {@code Rec46cSupport.mask} 同款后处理，掩码后逐字节可比）：</p>
  * <ul>
  *   <li>完整 uuid（tool_call_id 等）→ {@code MASKED-UUID}；事件 id 的 8-hex 前缀
  *       {@code xxxxxxxx-thinking/-answer/-error}（后缀保留）；</li>
- *   <li>{@code "duration_ms":N} 连键带值删除（含前导逗号，Go omitempty 语义两侧一致）；</li>
+ *   <li>{@code "duration_ms":N} 连键带值删除（含前导逗号，零值字段不输出的录制语义）；</li>
  *   <li>日期 {@code YYYY-MM-DD} → {@code DATE}、英文星期名 → {@code WEEKDAY}
  *       （RenderPromptPlaceholders 的 wall-clock autofill；Java 测试当日现算后同款掩码）；</li>
  *   <li>本地 stub 端口 {@code 127.0.0.1:N} → {@code 127.0.0.1:PORT}（web_fetch 组）。</li>
@@ -31,7 +26,7 @@ public final class GoRecording46C {
 
     private static final Map<String, String> REGISTRY = new HashMap<>();
 
-    /** 解析一条实录记录（传常量原文）。 */
+    /** 解析一条录制记录（传常量原文）。 */
     public static JsonNode rec(String json) {
         try {
             return new com.fasterxml.jackson.databind.ObjectMapper().readTree(json);
@@ -40,7 +35,7 @@ public final class GoRecording46C {
         }
     }
 
-    /** 按组/键查实录常量（REGISTRY 静态表，静态块填充）。 */
+    /** 按组/键查录制常量（REGISTRY 静态表，静态块填充）。 */
     public static String constant(String group, String key) {
         String v = REGISTRY.get(group + "/" + key);
         if (v == null) {

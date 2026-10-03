@@ -18,7 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * 对照 Go internal/application/repository/mcp_tool_approval_repository_test.go。
+ * MCP 工具审批仓储语义。
  *
  * <p>核心是 UpsertPolicy 的四条语义：缺行 = enabled、插入的显式 false、补丁只动自己那一列、
  * 并发列补丁互不覆盖。</p>

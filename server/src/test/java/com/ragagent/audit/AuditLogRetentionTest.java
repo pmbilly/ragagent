@@ -22,19 +22,18 @@ import com.ragagent.audit.service.AuditLogService;
 import org.junit.jupiter.api.Test;
 
 /**
- * 保留期清扫语义测试——对照 Go
- * internal/application/service/audit_log_retention_test.go（L19-296）。
+ * 保留期清扫语义测试。
  *
- * <p>Go 的 {@code stubAuditRepoForRetention} 记 {@code DeleteOlderThan} 的 cutoff
+ * <p>仓储行为用 Mockito 桩记录 {@code DeleteOlderThan} 的 cutoff
  * 并可注入错误；{@code purgeCountingService} 只数 Purge 次数。
- * Java 侧对应 Mockito 桩 + 真实 {@link AuditLogService}（服务本身很薄，
+ * 服务层用真实 {@link AuditLogService}（服务本身很薄，
  * 用真货比桩更能钉住 cutoff 计算）。</p>
  */
 class AuditLogRetentionTest {
 
     private static final Instant BASE = Instant.parse("2026-05-14T10:00:00Z");
 
-    /** 记录 cutoff、可注入错误、可设定删除行数（对照 Go 的 stubAuditRepoForRetention）。 */
+    /** 记录 cutoff、可注入错误、可设定删除行数。 */
     private static final class PurgingRepo {
         final AuditLogRepository mock = mock(AuditLogRepository.class);
         final List<OffsetDateTime> cutoffs = new ArrayList<>();
@@ -111,7 +110,7 @@ class AuditLogRetentionTest {
 
     // ── Runner ───────────────────────────────────────────────────────────
 
-    /** 对照 Go {@code purgeCountingService}：只数 Purge 次数。 */
+    /** 只数 Purge 次数。 */
     private static final class CountingRepo {
         final AuditLogRepository mock = mock(AuditLogRepository.class);
         final AtomicInteger purges = new AtomicInteger();
@@ -170,10 +169,9 @@ class AuditLogRetentionTest {
     }
 
     /**
-     * 对照 {@code TestAuditLogRetentionRunner_NilSvcShortCircuits}：
      * 装配失败（service 构造不出来）不能拖垮应用；Start 是 no-op，
-     * 随后的 Stop 也<b>不能</b>挂在没人关闭的 done 上（Go 的回归：
-     * startOnce 提前返回却不关 doneCh → Stop 永久阻塞，优雅关停死锁）。
+     * 随后的 Stop 也<b>不能</b>挂在没人关闭的 done 上（历史回归：
+     * start 提前返回却不关 done → Stop 永久阻塞，优雅关停死锁）。
      */
     @Test
     void nilSvcShortCircuits() {
@@ -181,8 +179,7 @@ class AuditLogRetentionTest {
                 null, 90, Duration.ofMillis(1), Duration.ZERO);
 
         runner.start();
-        // 能返回 = 通过（Go 用 2s 超时 + 子协程探测；Java 这边同步调用即可，
-        // 真挂了这条测试会超时失败）
+        // 能返回 = 通过（同步调用；真挂了这条测试会超时失败）
         runner.stop();
     }
 

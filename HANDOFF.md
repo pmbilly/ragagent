@@ -682,7 +682,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | **B6 getenv 收敛 151 处** | 裸 `System.getenv()` → `@ConfigurationProperties`，按域分批 | P1 | 中 | ✅ **完成（2026-10-02，批 1~10）**：storage 装配 / langfuse / 检索驱动 / 系统部署面（含 `GIN_MODE`→`WEKNORA_DEPLOYMENT_MODE`）/ 知识域单值 / common 静态工具族（**启动期快照口径确立**）/ 存储静态单值族 + JWT / 存储 provider 环境族查找面（**storage 域归零**）/ 检索域引擎命名·开关·超时族（**retrieval 域归零**）/ 收尾批（全局查找面 + `EnvironmentPostProcessor`）——**全仓裸 getenv 代码内 149→0**（余 7 处为注释引用）；十批明细与两处新机制见 15.1.1 |
 | **B7 死成员清扫** | 只注入不读取依赖（依赖级口径）+ 死 logger/`ObjectMapper`/`Pattern`/私有方法/冗余 import | P1 | 小-中 | ✅ |
 | **B8 注解形态收尾** | 全限定名注解 → import 短名；`@JsonIgnoreProperties` 44 处接工厂评估 | P2 | 小 | ✅（FQ 177→0；`@JsonIgnoreProperties` 评估后保留） |
-| **B9 Go 锚点注释清洗** | ~6,000 处；按 §4 既定"随触碰清洗"继续；若专项则按域分批 | P2 | 大（专项）/零（随批） | ✅ **机制已落地（2026-10-02）**——政策不变（随触碰、先摘不变量再删锚点、不立专项）；新增 `scripts/check-go-anchors.py` 棘轮守卫（按文件只许减不许增）+ CI guards job 一行；main 基线 3,999 处 / 1,029 文件，探针证伪过。详见 15.1.1 |
+| **B9 Go 锚点注释清洗** | ~6,000 处；按 §4 既定"随触碰清洗"继续；若专项则按域分批 | P2 | 大（专项）/零（随批） | ✅ **机制已落地（2026-10-02）**——政策不变（随触碰、先摘不变量再删锚点、不立专项）；新增 `scripts/check-go-anchors.py` 棘轮守卫（按文件只许减不许增）+ CI guards job 一行；main 基线 3,999 处 / 1,029 文件，探针证伪过。**2026-10-03 用户立项专项，B48 一次清扫收官，基线已刷新 0**。详见 15.1.1 |
 | **B10 ArchUnit 边界规则进 CI** | 环 0 组基线 + 包依赖白名单固化（§5 阶段 4） | P2 | 中 | ✅ **完成（2026-10-02）**——包级部分已于 2026-09-30 在 CI（脚本棘轮 guards job）；本批补**代码级**四条（禁裸 getenv / 属性类须被扫描覆盖 / 配置类不双装配 / install* 只许装配层）+ 探针自证会红。详见 15.1.1 |
 | **B11 Gradle 多模块** | 按域拆模块（§5 阶段 4 尾） | P2 | 大 | ✅ **判定：不做（2026-10-02 搁置）**——立项目的（边界固化）已由 B10 + 包级棘轮达成；量化：冷编译 32s vs 全量测试 ≈2m50s（85% 在测试），拆模块收益≈0 而成本数天；重访触发条件已写死。详见 15.1.1 |
 | **B12 B0 残留批 1** | wiki 任务级死信释放槽位（②）+ 孤儿 op 启动重放（③）+ 裸 NUL 审计盲区（R5） | P1 | 小 | ✅ **完成（2026-10-02）**——详见 15.1.1 |
@@ -720,6 +720,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | **B45 档 3 第八刀（GoStrings 收敛）** | 两份 GoStrings → common/text/Whitespace + CodePointOrder（Unicode 空白统一） | P2 | 中 | ✅ **完成（2026-10-03）**——16 文件 / 45 处改写；`isSpaceChar`+6（Java 原生，精确等于 White_Space）+ 码点序比较器迁出；`trim(x,'/')` 退役为正则一行；**Go\* 12 → 10**；全量 4706 + spotlessCheck 绿。⚠️ 空白判断另剩 3 处私有实现（rss/memory 两处）待收敛。详见 15.1.1 |
 | **B46 档 3 第九刀（验证驱动裁决）** | GoUrl / GoPath×2 / GoStyleErrorReportValve 逐类裁决 | P2 | 小 | ✅ **完成（2026-10-03）**——`GoUrl` 保留（95 位全表实测 7+2 处转义差异、无真实环境可验证）；`GoPath`×2 保留（POSIX 语义/平台相关性/安全面，21/24 一致但空结果差异含安全退步）；`GoStyleErrorReportValve` 裁决误标（非 Go 复刻）。**档 3 收口口径确立：逐类裁决（退役/误标/契约保留），不因名字强删**。详见 15.1.1 |
 | **B47 保留类改名** | 契约保留类修标签（GitLabUrl/GitLabPath/PosixPath/PlainTextErrorReportValve） | P3 | 小 | ✅ **完成（2026-10-03）**——用户拍板：保留类的 `Go*` 名误导后人；行为零变更（~85 处引用 + 4 处 javadoc）；`PosixPath` 顺带归位 `common/text`；**误标修正不计退役进度**；全量 4706 + spotlessCheck 绿。剩 `Go*` 名字仅 C 类 5 个（+ GoogleProvider 误报）。详见 15.1.1 |
+| **B48 注释大清洗专项** | 全仓注释去 Go 锚点/翻译腔/过期引用（用户 2026-10-03 立项，B9 专项化；main+test） | P2 | 大 | ✅ **完成（2026-10-03）**——11,932 匹配行/1,723 文件起步 → 棘轮基线 3,999→**0**（`--write` 已刷新）；口径=先摘不变量再删锚点、不变量中性化（「GORM 隐式行为清单」→「落库行为清单」逐条保留）、裸形态盲区补扫（`Go X:`/`照 Go`/Go 专名指针/omitempty/nil/len→Java 本位）；白名单=域词（wiki 批次·句柄翻译·SQL 可移植）/`@DisplayName`·断言消息/方法名/有效 § 引用/`GoRecording*` 实录（禁止手改）；与档 3（B37~B47）交叉期清单三次过期，收尾改「开工实时 grep」。compile + spotlessCheck 绿。详见 15.1.1 |
 
 ### 15.1.1 执行记录（索引：正文已移出，按批号 Ctrl-F）
 
@@ -787,6 +788,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | ✅ B45（2026-10-03，档 3 第八刀：GoStrings 收敛） | **✅ B45（2026-10-03，空白实现统一）**——两份 `GoStrings`（wiki 96 行 + gitlab 82 行）删除 → `common/text/Whitespace`（`isSpaceChar`+6 = White_Space 精确等价）+ `common/text/CodePointOrder`；16 文件 45 处改写；`trim(x,'/')` → 正则；**Go\* 12 → 10**；全量 4706 + spotlessCheck 绿。 |
 | ✅ B46（2026-10-03，档 3 第九刀：验证驱动裁决） | **✅ B46（2026-10-03）**——`GoUrl`/`GoPath`×2 **保留**（探针实测：转义 7+2 处差异 / 路径 21/24 一致但空结果差异含安全退步；无真实环境可验证）；`GoStyleErrorReportValve` = 误标（HTTP 契约非 Go 复刻）；**档 3 口径改为逐类裁决**。 |
 | ✅ B47（2026-10-03，保留类改名） | **✅ B47（2026-10-03）**——保留类修标签：`GoUrl`→`GitLabUrl`、`GoPath`→`GitLabPath`/`PosixPath`（归位 common/text）、`GoStyleErrorReportValve`→`PlainTextErrorReportValve`、`GoCompatTest`→`GitLabCompatTest`；行为零变更；全量 4706 + spotlessCheck 绿。 |
+| ✅ B48（2026-10-03，注释大清洗专项：Go 锚点/翻译腔/过期引用归零） | **✅ B48（2026-10-03，B9 专项化收官）**——main+test 11,932 匹配行/1,723 文件起步 → 棘轮基线 3,999→**0**（`--write` 已刷新）；不变量中性化（落库行为清单/SSE 帧契约/签名算法等事实逐条保留）+ 裸形态盲区补扫 + D 类错误陈述就地核实修正（wiki 列默认值、favorite 旧信封形态、mcp 键名方向等）；白名单五类留档（域词/@DisplayName·断言消息/方法名/有效 § 引用/GoRecording* 实录）；与档 3 交叉期悬挂 `{@link GoXxx}` 按过期引用清。compile + spotlessCheck + 棘轮绿。 |
 
 ### 15.2 批次纪律（每批通用，违者必翻车——全是本轮实锤）
 

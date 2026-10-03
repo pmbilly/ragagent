@@ -61,7 +61,7 @@ final class AgentConfigAssembler {
         ac.setRetainRetrievalHistory(c.path("retainRetrievalHistory").asBoolean(false));
         ac.setSharedAgentReadOnly(req.sharedAgentReadOnly);
 
-        // skills 配置（configureSkillsFromAgent，Go L616-647）；指令型数据源 =
+        // skills 配置（configureSkillsFromAgent）；指令型数据源 =
         // 宿主技能目录（选项 B），不再有沙箱镜像技能集
         String skillsMode = c.path("skillsSelectionMode").asText("");
         switch (skillsMode) {
@@ -106,12 +106,12 @@ final class AgentConfigAssembler {
                 ? new ArrayList<>(com.ragagent.agent.tools.ToolDefinitions.defaultAllowedTools())
                 : allowed);
 
-        // Per-request skill/MCP scope（Go L364-366）
+        // Per-request skill/MCP scope
         applyPerRequestSkillScope(ac, skillsMode, req.skillNames);
         applyPerRequestMcpScope(ac, stringListOf(c.get("mcpServices")),
                 req.sharedAgentReadOnly, req.mcpServiceIds);
 
-        // Custom system prompt（Go L369-372）
+        // Custom system prompt
         Prompts prompts = resolveAgentPrompts(req);
         if (!prompts.system().isEmpty()) {
             ac.setUseCustomSystemPrompt(true);
@@ -125,11 +125,11 @@ final class AgentConfigAssembler {
         if (ac.getWebSearchMaxResults() == 0) {
             ac.setWebSearchMaxResults(5);
         }
-        // web_search provider 默认解析（Go L387-390）由 handler 层 web repo 完成，dev 空。
+        // web_search provider 默认解析由 handler 层 web repo 完成，dev 空。
 
         log.info("Merged agent config from tenant {} and session {}", agentTenantId, req.session.getId());
 
-        // Search targets（Go L407-424）
+        // Search targets
         List<SessionKnowledgeQaService.SearchTargetView> targets;
         try {
             targets = knowledgeQa.buildSearchTargets(agentTenantId, ac.getKnowledgeBases(),
@@ -169,7 +169,7 @@ final class AgentConfigAssembler {
         }
         return new Prompts(system, context);
     }
-    /** applyPerRequestSkillScope（Go L464-487）。 */
+    /** 逐请求 skill 范围收敛。 */
     private static void applyPerRequestSkillScope(QaAgentConfig ac, String skillsMode, List<String> requested) {
         if (requested == null || requested.isEmpty()) {
             return;
@@ -186,7 +186,7 @@ final class AgentConfigAssembler {
         log.info("Applied per-request @skill scope: requested={} effective={} pinned={}",
                 requested, allowed, ac.getPinnedSkillNames());
     }
-    /** applyPerRequestMCPScope（Go L492-518）。 */
+    /** 逐请求 MCP 范围收敛。 */
     private static void applyPerRequestMcpScope(QaAgentConfig ac, List<String> agentPresetMcps,
             boolean isSharedAgent, List<String> requested) {
         if (requested == null || requested.isEmpty()) {

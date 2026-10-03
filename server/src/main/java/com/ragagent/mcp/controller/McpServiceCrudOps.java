@@ -137,7 +137,7 @@ final class McpServiceCrudOps {
         service.setId(serviceId);
         service.setTenantId(tenantId);
 
-        // 记录哪些字段被显式更新（Go: updateFields）
+        // 记录哪些字段被显式更新
         Map<String, Boolean> updateFields = new LinkedHashMap<>();
 
         if (updateData.has("usageInstructions")) {
@@ -216,12 +216,12 @@ final class McpServiceCrudOps {
                 log.warn("deprecated: token in PUT /mcp-services/{} body is ignored; "
                         + "use PUT /credentials instead", serviceId);
             }
-            // CustomHeaders 是结构性配置（不是秘密）：nil 保持既有，非 nil 整体替换
+            // CustomHeaders 是结构性配置（不是秘密）：null 保持既有，非 null 整体替换
             if (authConfig.path("customHeaders").isObject()) {
                 auth.setCustomHeaders(stringMap(authConfig.get("customHeaders")));
             }
             // auth_type / scopes / auth_server_metadata_url 属非秘密 OAuth 配置，允许经主 PUT 切换。
-            // 写侧用 parseStrict：未知取值 → 400（不再静默写 null——2026-10-03 缺陷实录：
+            // 写侧用 parseStrict：未知取值 → 400（不再静默写 null。历史缺陷：
             // 前端发 "apiKey"、枚举取值 "api_key"，策略被静默清空、凭据改发 X-API-Key）。
             if (authConfig.path("authType").isTextual()) {
                 try {

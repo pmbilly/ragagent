@@ -39,10 +39,10 @@ import com.ragagent.common.pipeline.SearchParams;
 import com.ragagent.session.support.PipelineViews;
 
 /**
- * 4.6c 实录回放的替身与掩码工具（对照 Go 探针的 zz_ 前缀同款）。
- * 期望值全部是 {@link GoRecording46C} 的 Go 实录常量；两侧掩码后逐字节可比。
+ * 4.6c 录制回放的替身与掩码工具。
+ * 期望值全部是 {@link GoRecording46C} 的录制常量；掩码后逐字节可比。
  *
- * <p>掩码约定（Go 探针 zzMask 与本类 {@link #mask} 同款）：完整 uuid → MASKED-UUID；
+ * <p>掩码约定（本类 {@link #mask}）：完整 uuid → MASKED-UUID；
  * 事件 id 的 8-hex 前缀 → xxxxxxxx-；"duration_ms":N 连键带值删除；日期 → DATE；
  * 英文星期名 → WEEKDAY；127.0.0.1:PORT。</p>
  */
@@ -89,7 +89,7 @@ final class Rec46cSupport {
         return GoRecording46C.constant(group, key);
     }
 
-    /** 断言"无错误"（对照 Go 的 errString null）。 */
+    /** 断言"无错误"（无错误时 err 键不出现/整体为 null）。 */
     static Map<String, Object> errOf(PluginError err) {
         Map<String, Object> m = new LinkedHashMap<>();
         if (err == null) {
@@ -104,7 +104,7 @@ final class Rec46cSupport {
     }
 
     // ------------------------------------------------------------------
-    // 形状函数（对照 Go 探针的 *Shape 函数；map 键序无关——Go 侧 marshal 排序）
+    // 形状函数（把对象投影成可比较的键值形状；map 键序无关——录制侧序列化按键排序）
     // ------------------------------------------------------------------
 
     static List<Map<String, Object>> searchResultsShape(List<SearchResult> rs) {
@@ -869,7 +869,7 @@ final class Rec46cSupport {
         return StreamResponse.of(type, content, done);
     }
     // ------------------------------------------------------------------
-    // 分词接缝的实录注入（jieba 真值来自 Go 探针同语料；键 = 整句或 Han 连段）
+    // 分词接缝的录制注入（jieba 真值分词表；键 = 整句或 Han 连段）
     // ------------------------------------------------------------------
 
     static final java.util.Map<String, List<String>> SEGMENTS = new LinkedHashMap<>();
@@ -935,7 +935,7 @@ final class Rec46cSupport {
         }
     }
 
-    /** 注入实录分词器（jieba 真值表；未命中回落二字滑窗）。 */
+    /** 注入录制分词器（jieba 真值表；未命中回落二字滑窗）。 */
     static void installSegmenter() {
         SearchTextUtil.Segmenter jieba = text -> {
             List<String> fixed = SEGMENTS.get(text);

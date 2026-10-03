@@ -23,9 +23,9 @@ import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
 
 /**
- * SQLite 驱动（W5γ4.16）对<b>真实 SQLite</b>（xerial 3.46.1，FTS5 可用）的端到端测试：
+ * SQLite 驱动对<b>真实 SQLite</b>（xerial 3.46.1，FTS5 可用）的端到端测试：
  * 建表/FTS 迁移、写入与去重（INSERT OR IGNORE）、FTS5 二元切分关键词、平面 cosine 向量检索
- * （含 Go 的"先取 k 近邻再过滤"语义与阈值衰减）、三种删除、批量更新、拷贝、move、估算。
+ * （含"先取 k 近邻再过滤"语义与阈值衰减）、三种删除、批量更新、拷贝、move、估算。
  */
 class SqliteRetrieveRepositoryTest {
 
@@ -161,7 +161,7 @@ class SqliteRetrieveRepositoryTest {
         assertThat(cnHits.get(0).results().get(0).score).isGreaterThan(0);
         assertThat(cnHits.get(0).results().get(0).matchType)
                 .isEqualTo(EngineTypes.MATCH_KEYWORDS);
-        // ID 是 rowid 的十进制串（照 Go 的 fmt.Sprintf("%d")）
+        // ID 是 rowid 的十进制串
         assertThat(cnHits.get(0).results().get(0).id).matches("\\d+");
 
         // 英文整词
@@ -197,7 +197,7 @@ class SqliteRetrieveRepositoryTest {
         assertThat(repo.retrieve(bogus)).isEmpty();
     }
 
-    // ── 向量（平面 cosine + Go 的 k-then-filter 语义） ─────────────────────
+    // ── 向量（平面 cosine + 先取 k 近邻再过滤语义） ─────────────────────────
 
     @Test
     @DisplayName("向量：cosine 排名与分数（对齐向量分数≈1）；阈值衰减在取回后生效")

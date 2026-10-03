@@ -21,8 +21,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 
 /**
- * 语雀 Open API v2 的进程内替身（对照 Go {@code yuque/client_test.go} 里的
- * {@code fakeYuque}），绑在 {@code 127.0.0.1} 的随机端口上。
+ * 语雀 Open API v2 的进程内替身，绑在 {@code 127.0.0.1} 的随机端口上。
  *
  * <h2>用法</h2>
  * <p>默认已经挂好 {@code GET /api/v2/user}；其余端点用
@@ -61,7 +60,7 @@ final class FakeYuque implements AutoCloseable {
         handleJson("/api/v2/user", 200, data(user));
     }
 
-    // ── SSRF 白名单（对照 Go 的 TestMain） ─────────────────────────────────
+    // ── SSRF 白名单 ────────────────────────────────────────────────────────
 
     static void allowLoopback() {
         SsrfGuard guard = new SsrfGuard();
@@ -94,7 +93,7 @@ final class FakeYuque implements AutoCloseable {
         return "http://127.0.0.1:" + server.getAddress().getPort();
     }
 
-    /** 登记一条响应；同名 path 覆盖（Go 的 fake 会 panic，Java 侧刻意为覆盖以便简化用例）。 */
+    /** 登记一条响应；同名 path 覆盖（刻意允许覆盖，以便简化用例）。 */
     void handleJson(String path, int status, Object body) {
         handlers.put(path, new Canned(status, body));
     }
@@ -153,7 +152,7 @@ final class FakeYuque implements AutoCloseable {
         calls.clear();
     }
 
-    /** 全部请求的 {@code "METHOD path?query"} 记录（对照 Go 的 {@code calls}）。 */
+    /** 全部请求的 {@code "METHOD path?query"} 记录。 */
     List<String> calls() {
         return new ArrayList<>(calls);
     }

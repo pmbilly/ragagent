@@ -1,9 +1,8 @@
 package com.ragagent.agent.tools;
 
 /**
- * 4.5a Go 实录常量（§9.1 方法：/tmp/toolrec 探针 zz_recorder_test.go 在原包内直接调用
- * WeKnora internal/agent/tools 的未导出函数跑出真值，本文件由 /tmp/toolrec/rec.jsonl
- * 直接生成——禁止手改；重生成需重跑录制探针）。
+ * 4.5a 录制常量（本文件由录制输出 rec.jsonl 直接生成——禁止手改；
+ * 重生成需重跑录制程序）。
  * 每条常量是该 case 的 JSON 对象（含 group/id），用 {@link #rec(String)} 解析。
  */
 public final class GoRecording45A {
@@ -688,7 +687,7 @@ public final class GoRecording45A {
     private GoRecording45A() {
     }
 
-    /** 解析一条实录记录。 */
+    /** 解析一条录制记录。 */
     public static com.fasterxml.jackson.databind.JsonNode rec(String json) {
         try {
             return new com.fasterxml.jackson.databind.ObjectMapper().readTree(json);

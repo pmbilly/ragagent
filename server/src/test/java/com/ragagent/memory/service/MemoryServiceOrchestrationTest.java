@@ -96,10 +96,10 @@ class MemoryServiceOrchestrationTest {
         void unavailableWithoutAPrincipal() {
             TenantContext.set(TENANT, null, "viewer", false, "", false);
             assertThat(memoryService.memoryAvailable()).isFalse();
-            // ⚠️ 两条路抛的不是同一个异常，与 Go 一致：
-            //   1) 经过 enabledScope 的写路径 → ErrMemoryDisabled（Go 的 enabledScope 把
-            //      ResolveScope 的失败吞成了"没开"，所以 handler 给 400 而不是 401）；
-            //   2) 直接调 ResolveScope 的管理器路径 → ErrNoMemoryScope（handler 给 401）。
+            // ⚠️ 两条路抛的不是同一个异常：
+            //   1) 经过 enabledScope 的写路径 → Disabled（enabledScope 把
+            //      MemoryScopes.resolve 的失败吞成了"没开"，所以 handler 给 400 而不是 401）；
+            //   2) 管理器路径直接 MemoryScopes.resolve → NoScope（handler 给 401）。
             assertThatThrownBy(() -> memoryService.createItem("fact", "x", 3))
                     .isInstanceOf(MemoryScopeExceptions.Disabled.class);
             assertThatThrownBy(() -> memoryService.listItems(null, 10, 0))

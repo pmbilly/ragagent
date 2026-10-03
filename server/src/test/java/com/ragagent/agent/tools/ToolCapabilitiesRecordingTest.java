@@ -13,9 +13,9 @@ import com.ragagent.agent.tools.ToolCapabilities.KbCaps;
 import com.ragagent.agent.tools.ToolCapabilities.KbFilter;
 
 /**
- * ToolCapabilities 的 Go 实录（12 组，探针原样调用 Go {@code DeriveKBFilter*}
- * {@code /KBSatisfies* /ToolsConsumeFiles}）。Go 的 filter.AnyOf 来自 map 迭代
- * （随机序），录制时已排序——Java 侧按集合比对；布尔判定逐值比对。
+ * ToolCapabilities 的录制判定（12 组：{@code deriveKbFilter*}
+ * {@code /kbSatisfies* /toolsConsumeFiles}）。AnyOf 的成员序在录制侧不定
+ * （map 迭代随机序），录制时已排序——Java 侧按集合比对；布尔判定逐值比对。
  */
 class ToolCapabilitiesRecordingTest {
 

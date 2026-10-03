@@ -20,14 +20,13 @@ import com.ragagent.agent.tools.GoRecording45B;
 import com.ragagent.agent.tools.RecordingSupport;
 
 /**
- * 波 4.5b 回放：wiki_read_page / wiki_search（对照 Go 实录，
- * 探针 {@code zz_rec45b_wiki_tools_test.go}）。Fake 行为与 Go 的 zzFakeWiki2
- * 逐一对齐（含派生搜索：小写子串匹配 slug\u0000title\u0000content\u0000summary，
+ * 4.5b 回放：wiki_read_page / wiki_search 的录制回放。
+ * Fake 行为与录制时的同款 fake 逐一对齐（含派生搜索：小写子串匹配 slug\u0000title\u0000content\u0000summary，
  * 按 slug 排序后截断）。
  */
 class WikiToolsRecordingTest {
 
-    // ==================== Fake（对照 zzFakeWiki2） ====================
+    // ==================== Fake ====================
 
     static final class FakeWiki2 implements WikiPages {
         final Map<String, PageView> pages = new LinkedHashMap<>();

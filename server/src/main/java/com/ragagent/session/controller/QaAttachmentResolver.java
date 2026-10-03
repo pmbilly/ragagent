@@ -138,7 +138,7 @@ final class QaAttachmentResolver {
         reqCtx.attachments.addAll(attachments);
         persistResolvedAttachmentContent(reqCtx, attachments);
         // 图片进 vision：ImageURLs 挂到本回合的 images（与内联 base64 图片同一条下游，
-        // 经 extractImageURLsAndOCRText 读 url）。Go 同样以 ImageUploadEnabled 为闸。
+        // 经 extractImageURLsAndOCRText 读 url）。以 ImageUploadEnabled 为闸。
         if (reqCtx.agentConfig != null
                 && reqCtx.agentConfig.path("imageUploadEnabled").asBoolean(false)) {
             for (String imageUrl : resolved.imageUrls()) {

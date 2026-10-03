@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 对照 Go metric.RougeMetric（rouge.go 全文）：句切后按 metric 名选算法，
+ * ROUGE 指标入口：句切后按 metric 名选算法，
  * 取指定统计量（{@code "f"}）——调用侧只用 rouge-1/rouge-2/rouge-l + exclusive=true。
  */
 public final class RougeMetric implements Metrics {

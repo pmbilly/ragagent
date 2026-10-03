@@ -12,11 +12,10 @@ import com.ragagent.auth.apikey.domain.APIKeyScopeContext;
 import com.ragagent.auth.apikey.domain.TenantAPIKeyScope;
 
 /**
- * {@link Mode} 的解析与合并（对照 Go {@code mode.go} 的
- * {@code TestParseMode} / {@code TestDefaultMode} / {@code TestResolveMode_*}）。
+ * {@link Mode} 的解析与合并。
  *
  * <h2>为什么没有 {@code DefaultMode} 的 env 用例</h2>
- * <p>Go 用 {@code t.Setenv} 直接改 {@code RESOURCE_URL_MODE}。Java 的
+ * <p>Java 的
  * {@code System.getenv()} 在进程内不可变，而本项目至今没有环境注入的测试缝
  * （其它读 env 的地方同样没测）——与其为此在生产代码里开一个只有测试用的口子，
  * 不如：{@code DefaultMode} 只测"未设置 → handle"这一支，

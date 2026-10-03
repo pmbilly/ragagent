@@ -72,7 +72,7 @@ public final class LangfuseAttributes {
     private static final ObjectMapper JSON = buildJson();
 
     private static ObjectMapper buildJson() {
-        // B50：GoDoubleSerializer 退役——浮点走 Jackson 默认（上报面，形态无契约意义）
+        // 浮点走 Jackson 默认（上报面，形态无契约意义）
         return JsonMapper.builder()
                 .enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS)
                 .build();

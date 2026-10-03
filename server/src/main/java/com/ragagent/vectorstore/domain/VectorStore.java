@@ -8,9 +8,9 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 /**
- * 对照 Go {@code types.VectorStore}（表 vector_stores，迁移 000032）。
+ * vector_stores 表实体（迁移 000032）。
  * connection_config / index_config 两 jsonb 列均有 PG DEFAULT（'{}'）——
- * 实体恒持非 null 对象（Go 的 Value() 也恒序列化结构体），不依赖列默认。
+ * 实体恒持非 null 对象，不依赖列默认。
  */
 @TableName(value = "vector_stores", autoResultMap = true)
 public class VectorStore {
@@ -47,7 +47,7 @@ public class VectorStore {
     public OffsetDateTime getDeletedAt() { return deletedAt; }
     public void setDeletedAt(OffsetDateTime v) { deletedAt = v; }
 
-    /** 对照 VectorStore.Validate（name/engine/tenant 必填 + 引擎白名单） */
+    /** 校验（name/engine/tenant 必填 + 引擎白名单） */
     public void validate() {
         if (name == null || name.isEmpty()) {
             throw validation("name is required");

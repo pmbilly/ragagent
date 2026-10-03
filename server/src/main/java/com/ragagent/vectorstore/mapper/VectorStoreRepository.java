@@ -15,8 +15,8 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 /**
- * 对照 Go {@code repository.vectorStoreRepository}（internal/application/repository/vectorstore.go）。
- * List 排序 created_at DESC（与 wsp 的 ASC 相反，Go 原文如此）。
+ * vector_stores 表 Mapper。
+ * List 排序 created_at DESC（与 wsp 的 ASC 相反，既有行为如此）。
  */
 @Mapper
 public interface VectorStoreRepository {
@@ -53,7 +53,7 @@ public interface VectorStoreRepository {
             + "#{s.indexConfig,typeHandler=" + IC_TH + "}, #{now}, #{now}, NULL)")
     int create(@Param("s") VectorStore store, @Param("now") OffsetDateTime now);
 
-    /** Go Update：Select("name") + GORM autoUpdateTime（engine/config/index 不可变） */
+    /** 只改 name；engine/config/index 不可变 */
     @Update("UPDATE vector_stores SET name = #{s.name}, updated_at = #{now} "
             + "WHERE id = #{s.id} AND tenant_id = #{s.tenantId}")
     int updateName(@Param("s") VectorStore store, @Param("now") OffsetDateTime now);

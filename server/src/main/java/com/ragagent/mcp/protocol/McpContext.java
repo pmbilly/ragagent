@@ -28,12 +28,12 @@ public final class McpContext {
         this.cancellation = cancellation == null ? McpCancellation.NEVER : cancellation;
     }
 
-    /** 无 deadline、不可取消（对照 {@code context.Background()}）。 */
+    /** 无 deadline、不可取消。 */
     public static McpContext none() {
         return NONE;
     }
 
-    /** 只带 deadline（对照 {@code context.WithTimeout(ctx, d)} 的 deadline 侧）。 */
+    /** 只带 deadline、不可取消。 */
     public static McpContext deadline(Instant deadline) {
         return new McpContext(deadline, McpCancellation.NEVER);
     }

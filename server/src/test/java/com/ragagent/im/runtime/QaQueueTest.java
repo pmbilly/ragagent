@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -12,8 +11,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 
 /**
- * QA 队列行为（对照 Go qaqueue_test 语义面：队满/每用户限额/Remove/排空退出）。
- * Go 的 redis==nil 分支即本实现的唯一路径（波 5 纪律：内存形态先行）。
+ * QA 队列行为（语义面：队满/每用户限额/Remove/排空退出）。
+ * 本实现是纯内存形态，无持久化后端分支。
  */
 class QaQueueTest {
 

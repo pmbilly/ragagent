@@ -38,7 +38,7 @@ import org.springframework.test.web.servlet.MvcResult;
  *
  * <p>掩码：UUID 值/文案内嵌 UUID/ISO 时间戳沿用既有三件套，另加 task_id（嵌租户+时间戳
  * +uuid，两侧必然不同）与 updated_at 的 10 位 Unix 秒（进度对象的 created_at 恒 0
- * ——Go worker 覆写不带 created_at，两侧同为字面量 0，不掩）。</p>
+ * ——覆写时不带 created_at，两侧同为字面量 0，不掩）。</p>
  */
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -141,7 +141,7 @@ class KnowledgeSearchMoveContractTest {
         jdbc.update("INSERT INTO knowledge_bases (id, name, tenant_id, type, creator_id) "
                 + "VALUES (?, 'cross-kb', 10000, 'document', ?)", CROSS_KB, OWNER);
 
-        // created_at 互不相同（Go 按 created_at DESC；并列顺序不稳定），DESC 序：
+        // created_at 互不相同（列表按 created_at DESC 排序；并列顺序不稳定），DESC 序：
         // KG6 > KG5 > KG9 > KG4 > KG3 > KG7 > KG8 > KG2 > KG1
         seedDoc(KG1, KB1, "ksdoc alpha 指南", "ksdoc-alpha.txt", "txt", 10, "a1", "completed", 50);
         seedDoc(KG2, KB1, "beta 报表", "ksdoc-beta.txt", "txt", 10, "a2", "completed", 40);

@@ -104,7 +104,7 @@ class MemoryExtractionRepositoryTest {
         // ⚠️ **不要靠墙钟造"窗口已经过去"**：写成"第一次用 90s 窗口、第二次用 1ms 窗口"，
         // 就要求两次调用间隔 ≥1ms——全量跑（JIT/GC 压力下）两者可能落在同一毫秒，
         // 于是 `now - scheduled < 1ms` 仍成立、shouldSend 为 false，**测试随机红**。
-        // （本轮就是这么发现的：单跑绿、全量红。Go 侧没有这个用例，没有可照抄的写法。）
+        // （这个坑就是这么发现的：单跑绿、全量红。）
         //
         // 改成确定性造法：直接把 extract_scheduled_at 推到窗口之外。
         repo.enqueuePendingSession(scope, "sess-1", Duration.ofSeconds(90));
@@ -261,7 +261,7 @@ class MemoryExtractionRepositoryTest {
                 String.class)).isEqualTo("msg-b");
     }
 
-    /** 没失败过的时候 checkpoint 会重置失败计数（Go 的 {@code if progress.FailedAt == nil}）。 */
+    /** 没失败过的时候 checkpoint 会重置失败计数（progress 的 failedAt 为 null 时）。 */
     @Test
     void checkpointResetsFailureCountersWhenThereWasNoFailure() {
         repo.enqueuePendingSession(scope, "sess-1", Duration.ofMillis(1));

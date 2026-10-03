@@ -14,18 +14,17 @@ import org.junit.jupiter.api.Test;
 /**
  * lark {@code pbbp2} 帧编解码的字节契约。
  *
- * <p>三段 fixture 由<b>独立 Go 程序</b>用官方 SDK 的 {@code ws} 包录出（{@code ws.NewPingFrame}、
- * 事件数据帧、回执帧三例；录制程序用 {@code Frame.Marshal()} 打 hex），断言 Java 侧
- * <b>解码字段一致</b>且<b>重编码逐字节相等</b>——覆盖 Go 的无条件书写规则（空串写成 0 长度字段、
- * {@code payload} 非 nil 才写、{@code headers} 非空才写）与字段升序。</p>
+ * <p>三段 fixture 分别是 ping 帧、事件数据帧、回执帧的线上 hex 字节，断言 Java 侧
+ * <b>解码字段一致</b>且<b>重编码逐字节相等</b>——覆盖编码的无条件书写规则（空串写成 0 长度字段、
+ * {@code payload} 缺省不写、{@code headers} 为空不写）与字段编号升序。</p>
  */
 class LarkFrameTest {
 
-    /** Go: ws.NewPingFrame(41) + SeqID=0, LogID=7 + Marshal()。 */
+    /** ping 帧线上字节（service=41、seqId=0、logId=7）。 */
     private static final String PING_HEX =
             "08001007182920002a0c0a0474797065120470696e6732003a004a00";
 
-    /** Go: 事件数据帧（method=1 + type/message_id/sum/seq/trace_id + json/event + payload）。 */
+    /** 事件数据帧（method=1 + type/message_id/sum/seq/trace_id + json/event + payload）。 */
     private static final String DATA_HEX =
             "08031009182920012a0d0a047479706512056576656e742a120a0a6d6573736167655f696412"
                     + "046f6d5f312a080a0373756d1201312a080a037365711201302a100a0874726163655f69"
@@ -33,7 +32,7 @@ class LarkFrameTest {
                     + "222c22686561646572223a7b226576656e745f74797065223a22696d2e6d6573736167"
                     + "652e726563656976655f7631227d7d4a00";
 
-    /** Go: 同上并追加 biz_rt=12、payload={"code":200}（即回执帧）。 */
+    /** 回执帧：同事件数据帧并追加 biz_rt=12、payload={"code":200}。 */
     private static final String ACK_HEX =
             "08031009182920012a0d0a047479706512056576656e742a120a0a6d6573736167655f696412"
                     + "046f6d5f312a080a0373756d1201312a080a037365711201302a100a0874726163655f69"

@@ -111,7 +111,7 @@ class HybridSearchServiceStoreGroupTest {
 
         assertThatThrownBy(() -> service.hybridSearch("kb-a", params("kb-a", "kb-b")))
                 .isInstanceOfSatisfying(BizException.class, e -> {
-                    // Go NewBadRequestError：HTTP 400，AppError code 1000
+                    // HTTP 400，AppError code 1000
                     assertThat(e.appError().httpCode()).isEqualTo(400);
                     assertThat(e.appError().message()).contains(
                             "selected knowledge bases use different embedding models");
@@ -237,7 +237,7 @@ class HybridSearchServiceStoreGroupTest {
 
     @Test
     void multiGroupFanoutIsAllOrNothing() {
-        // 两组：一组成功、一组失败 → 整条检索 2201（all-or-nothing，照 Go errgroup）
+        // 两组：一组成功、一组失败 → 整条检索 2201（all-or-nothing，任一失败即整条失败）
         RecordingRepo ok = new RecordingRepo(new AtomicReference<>(-1));
         RecordingRepo bad = new RecordingRepo(new AtomicReference<>(-1));
         bad.failureOnRetrieve = new IllegalStateException("store down");

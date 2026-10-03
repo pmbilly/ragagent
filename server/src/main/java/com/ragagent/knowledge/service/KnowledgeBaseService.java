@@ -426,10 +426,8 @@ public class KnowledgeBaseService
     /**
      * 全量（无分页）+ 计数/置顶/创建者名回填。
      *
-     * <p><b>必须排除隐藏库</b>（{@code is_temporary = false}）：Go 原版列表走
-     * {@code repo.ListKnowledgeBasesByTenantID}，其中带该过滤（Go 仓库
-     * {@code internal/application/repository/knowledgebase.go}）；翻译期漏掉后，
-     * 「聊天历史」自动开通的 {@code __chat_history__} 泄漏进列表与所有复用本方法的
+     * <p><b>必须排除隐藏库</b>（{@code is_temporary = false}）：否则
+     * 「聊天历史」自动开通的 {@code __chat_history__} 会泄漏进列表与所有复用本方法的
      * 消费面（IM {@code /kb}、建议问题范围、QA 范围）——2026-10-03 点检实锤。
      * 隐藏库的正当访问路径是按配置里的 id 直查（MessageSearch），不依赖本列表。</p>
      */

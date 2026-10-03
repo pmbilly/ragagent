@@ -18,7 +18,7 @@ import com.ragagent.knowledge.service.KnowledgeBaseService;
 import com.ragagent.knowledge.service.KnowledgeTagService;
 
 /**
- * 自动标签生产实现（对照 Go tag.go FindOrCreateTagByName L475-506）：
+ * 自动标签生产实现（按名称查找或创建标签）：
  * 空参 400 文案、KB 缺失 404、同名直取不建、缺名走 createTag。
  */
 class KnowledgeTagAutoTagProviderTest {

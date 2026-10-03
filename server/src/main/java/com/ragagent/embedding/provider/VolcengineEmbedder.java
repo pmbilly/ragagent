@@ -12,16 +12,15 @@ import com.ragagent.embedding.EmbeddingHttp;
 import com.ragagent.common.web.ProviderJson;
 
 /**
- * 火山引擎 Ark 多模态 embedding 客户端（对照 Go
- * {@code internal/models/embedding/volcengine.go} 全文）。
+ * 火山引擎 Ark 多模态 embedding 客户端。
  *
- * <p>多模态 API 对整批输入只返回<b>一个</b>合并向量，所以 Go 逐文本调用一次 API；
- * Java 照抄该逐条循环。请求体 = Go {@code VolcengineEmbedRequest}（model/input/
- * dimensions），每个 input 元素 {@code {"type":"text","text":...}}（text omitempty）。</p>
+ * <p>多模态 API 对整批输入只返回<b>一个</b>合并向量，所以逐文本调用一次 API。
+ * 请求体字段序固定（model/input/dimensions），每个 input 元素
+ * {@code {"type":"text","text":...}}（text 空则省略）。</p>
  */
 public final class VolcengineEmbedder extends BaseEmbedder {
 
-    /** 火山引擎 Ark 多模态 Embedding API 路径（Go VolcengineMultimodalEmbeddingPath）。 */
+    /** 火山引擎 Ark 多模态 Embedding API 路径。 */
     public static final String MULTIMODAL_PATH = "/api/v3/embeddings/multimodal";
 
     private final String baseUrl;

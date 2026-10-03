@@ -41,7 +41,7 @@ public interface MemoryExtractionSessionMapper extends BaseMapper<MemoryExtracti
             + "failed_at, updated_at";
 
     /**
-     * 对照 {@code enqueueExtractionSession(id, bump=false)}：{@code DoNothing}，
+     * 入队（冲突时什么都不做）：
      * 即"已经推进过的行不许被重复入队重新激活"。
      *
      * <p>插入的 {@code revision} 恒为 **1**、{@code pending} 恒为 **true**、
@@ -75,8 +75,8 @@ public interface MemoryExtractionSessionMapper extends BaseMapper<MemoryExtracti
     int insertIfAbsentOther(@Param("r") MemoryExtractionSession row);
 
     /**
-     * 对照 {@code enqueueExtractionSession(id, bump=true)}：
-     * {@code DoUpdates: revision = revision + 1, pending = true, updated_at = now}。
+     * 入队并推进（冲突时更新）：
+     * {@code revision = revision + 1, pending = true, updated_at = now}。
      *
      * <p>表名限定 {@code memory_extraction_sessions.revision}——PG 的
      * {@code ON CONFLICT DO UPDATE} 右侧不加限定会歧义。</p>
@@ -101,8 +101,8 @@ public interface MemoryExtractionSessionMapper extends BaseMapper<MemoryExtracti
     int bumpExisting(@Param("r") MemoryExtractionSession row);
 
     /**
-     * 对照 {@code extractionRows(tx, scope).Where("pending = ?", true)
-     * .Order("updated_at ASC, session_id ASC").Limit(MaxMemoryPendingSessions).Find()}.
+     * 待处理会话列表（{@code pending = true}，按
+     * {@code updated_at ASC, session_id ASC} 排序，限量）。
      *
      * <p><b>{@code updated_at ASC}</b> 是关键：它让"最早没推完的会话"先被处理，
      * 而不是让一个刚来的会话插队。</p>
@@ -132,7 +132,7 @@ public interface MemoryExtractionSessionMapper extends BaseMapper<MemoryExtracti
                                               @Param("limit") int limit);
 
     /**
-     * 对照 {@code hasPendingExtraction}：{@code Select("session_id").Where("pending = ?", true).Limit(1)}。
+     * 待处理会话存在性：{@code SELECT session_id WHERE pending = true LIMIT 1}。
      *
      * <p>存在性判断按"拿到的行数 > 0"，所以返回 {@code COUNT} 即可
      * （上限 1 行，语义等价且不用拉回一行实体）。</p>
@@ -141,7 +141,7 @@ public interface MemoryExtractionSessionMapper extends BaseMapper<MemoryExtracti
             + "WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId} AND pending = TRUE")
     long countPendingProbe(@Param("tenantId") long tenantId, @Param("subjectId") String subjectId);
 
-    /** 对照 {@code CheckpointExtraction} 与 {@code RecordExtractionFailure} 里按 session_id 取行。 */
+    /** 确认/失败记录路径里按 session_id 取行。 */
     @Select("SELECT " + COLUMNS + " FROM memory_extraction_sessions "
             + "WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId} AND session_id = #{sessionId}")
     @Results({
@@ -166,7 +166,7 @@ public interface MemoryExtractionSessionMapper extends BaseMapper<MemoryExtracti
                                               @Param("sessionId") String sessionId);
 
     /**
-     * 对照 {@code CheckpointExtraction}：只更新这一行的游标与 pending，
+     * 检查点：只更新这一行的游标与 pending，
      * "转动未完成的工作而不重写主体的整个历史"。
      *
      * <p>{@code failure_count}/{@code failure_code} 只在 {@code FailedAt == nil} 时才被重置
@@ -187,7 +187,7 @@ public interface MemoryExtractionSessionMapper extends BaseMapper<MemoryExtracti
                    @Param("now") OffsetDateTime now);
 
     /**
-     * 对照 {@code RecordExtractionFailure} 的那一条 UPDATE。
+     * 记录失败的那一条 UPDATE。
      *
      * <p><b>{@code failed_at} 是条件写的</b>：只有"重试预算耗尽"（{@code skip=true}）时
      * 才落时间戳，否则写 SQL NULL——两支分别对应

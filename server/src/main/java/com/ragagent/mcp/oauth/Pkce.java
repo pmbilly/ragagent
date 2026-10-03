@@ -25,19 +25,19 @@ public final class Pkce {
     private Pkce() {
     }
 
-    /** 对照 {@code GenerateRandomString}。 */
+    /** 生成无填充 Base64url 随机串，截取前 length 个字符。 */
     public static String generateRandomString(int length) {
         byte[] bytes = new byte[length];
         RANDOM.nextBytes(bytes);
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes).substring(0, length);
     }
 
-    /** 对照 {@code GenerateCodeVerifier}：RFC 7636 要求 43–128 字符，这里取 64。 */
+    /** RFC 7636 要求 43–128 字符，这里取 64。 */
     public static String generateCodeVerifier() {
         return generateRandomString(64);
     }
 
-    /** 对照 {@code GenerateCodeChallenge}：S256。 */
+    /** 计算 S256 code_challenge（BASE64URL(SHA256(verifier))）。 */
     public static String generateCodeChallenge(String codeVerifier) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -49,7 +49,7 @@ public final class Pkce {
         }
     }
 
-    /** 对照 {@code GenerateState}。 */
+    /** 生成 state 随机串（32 字符）。 */
     public static String generateState() {
         return generateRandomString(32);
     }

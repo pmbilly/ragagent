@@ -11,10 +11,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * S3 协议族后端的离线契约测试（对照 Go s3.go / fileutil.go / security.go）：
+ * S3 协议族后端的离线契约测试：
  * 路径解析、path-style 推断、对象名与内容类型规则、以及工厂对四个 provider 的校验。
  *
- * <p>真连 S3/MinIO 的路径不在 CI（与 Go 侧同样只靠 dev 自检）；这里锁住的是
+ * <p>真连 S3/MinIO 的路径不在 CI（只靠 dev 自检）；这里锁住的是
  * <b>纯逻辑</b>——拼错路径/放行越界 key 这类错误正是最贵的。</p>
  */
 class S3CompatibleFileServiceTest {
@@ -82,7 +82,7 @@ class S3CompatibleFileServiceTest {
     @Test
     @DisplayName("SaveBytes 的文件名校验照 Go：Base(Clean(name)) 取 basename，非法名才拒")
     void saveBytesFileNameGuard() {
-        // Go 的 filepath.Base：目录部分被丢弃（skill 归档 "tenant-skills/catalog/x.zip"、
+        // basename 语义：目录部分被丢弃（skill 归档 "tenant-skills/catalog/x.zip"、
         // FAQ 导出等路径形 key 依赖这一行为）
         assertEquals("x.txt", S3CompatibleFileService.safeFileNameOrThrow("../x.txt"));
         assertEquals("b.txt", S3CompatibleFileService.safeFileNameOrThrow("a/b.txt"));
@@ -123,7 +123,7 @@ class S3CompatibleFileServiceTest {
         sec.setS3(new StorageEngineConfig.S3EngineConfig());
         sec.getS3().setBucketName("b");
         sec.getS3().setRegion("cn-north-1");
-        // 只给 AK 不给 SK → 成对校验失败（Go 的 incomplete s3 config）
+        // 只给 AK 不给 SK → 成对校验失败（incomplete s3 config）
         sec.getS3().setAccessKey("ak");
         IllegalArgumentException err = assertThrows(IllegalArgumentException.class,
                 () -> FileServiceFactory.fromStorageConfig("s3", sec, "/tmp"));
@@ -165,7 +165,7 @@ class S3CompatibleFileServiceTest {
         assertEquals("minio", minio.provider());
         assertEquals("minio://", ((S3CompatibleFileService) minio.service()).objectScheme());
 
-        // 批次二已补齐：oss 无自己的配置段时是"不完整"
+        // 已补齐：oss 无自己的配置段时是"不完整"
         assertEquals("incomplete oss config", assertThrows(IllegalArgumentException.class,
                 () -> FileServiceFactory.fromStorageConfig("oss", minioSec, "/tmp")).getMessage());
     }

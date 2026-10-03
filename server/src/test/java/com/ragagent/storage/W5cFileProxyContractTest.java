@@ -32,19 +32,19 @@ import com.ragagent.auth.mapper.UserMapper;
 import com.ragagent.knowledge.storage.LocalStorageService;
 
 /**
- * 文件代理面 8 条路由的契约测试（收尾批 W5c）。golden：w5c-*（76 个，
- * scripts/record-w5c-golden.sh 的 Go 实录；种子态见脚本头注释——双端共享
+ * 文件代理面 8 条路由的契约测试。golden：w5c-*（76 个，
+ * scripts/record-w5c-golden.sh 录制；种子态见脚本头注释——双端共享
  * dev PG + 同一 LOCAL_STORAGE_BASE_DIR）。
  *
  * <h2>本测试的覆盖边界</h2>
  * <ul>
  *   <li>二进制 golden（*.bin + *.bin.headers 双锚）与 HEAD 形态逐字节比对；</li>
  *   <li>presigned 的<b>有效签名 200 分支</b>依赖 SYSTEM_AES_KEY（≥16 字节）——
- *       测试 JVM 无该 env（签名恒拒 → 403，与 Go 的 key=nil 分支同形），
+ *       测试 JVM 无该 env（签名恒拒 → 403，与 key 未配置分支同形），
  *       该分支由真 PG A/B（ab-w5c.sh，双端同 key）字节级覆盖；本测试比对
  *       403 形态 + 无 key 时的"有效签名也 403"恒等行为；</li>
- *   <li>头部比对归一化容器噪音：status line reason-phrase（gin vs Tomcat）、
- *       Date / X-Request-Id / Vary / Keep-Alive / Connection（g5/bs 批先例）。</li>
+ *   <li>头部比对归一化容器噪音：status line reason-phrase（录制容器 vs Tomcat）、
+ *       Date / X-Request-Id / Vary / Keep-Alive / Connection。</li>
  * </ul>
  */
 @SpringBootTest
@@ -74,7 +74,7 @@ class W5cFileProxyContractTest {
 
     private static final String TXT = "local://10002/exports/w5c-seed.txt";
     // ⚠️ MockMvc 的 query 参数不做百分号解码，直接用解码后的值
-    // （Go 的 c.Query 拿到的也是解码值，两侧 handler 输入一致）。
+    // （查询串侧拿到的也是解码值，两侧 handler 输入一致）。
     private static final String TXT_ENC = TXT;
     private static final String PNG_ENC = "local://10002/exports/w5c-image.png";
 
@@ -94,7 +94,7 @@ class W5cFileProxyContractTest {
     private String owner;
     private String viewer;
 
-    // ── 种子（复刻 record-w5c-golden.sh 的录制态）────────────────────────────
+    // ── 种子（record-w5c-golden.sh 的录制态）────────────────────────────────
 
     @BeforeEach
     void seed() throws Exception {
@@ -367,7 +367,7 @@ class W5cFileProxyContractTest {
                 "/files?file_path=local://10002/exports/w5c-page.html", owner);
         compareBinary("w5c-files-pdf", 200, "GET",
                 "/files?file_path=local://10002/exports/w5c-report.pdf", owner);
-        // CJK 文件名直接放查询串（MockMvc 不解码 → 与 Go 的解码后输入一致）
+        // CJK 文件名直接放查询串（MockMvc 不解码 → handler 输入与录制时一致）
         compareBinary("w5c-files-cjk", 200, "GET",
                 "/files?file_path=local://10002/exports/w5c-数据.txt", owner);
         compareBinary("w5c-files-unknownext", 200, "GET",

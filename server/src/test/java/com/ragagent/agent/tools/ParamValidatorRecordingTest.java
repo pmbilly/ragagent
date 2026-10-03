@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
- * ParamValidator 的 Go 实录判定表（15 条 ValidateParams + 3 条
- * FormatValidationErrors，探针原样调用 Go 函数）。错误文案逐字比对
+ * ParamValidator 的录制判定表（15 条 validateParams + 3 条
+ * formatValidationErrors）。错误文案逐字比对
  * （"required parameter 'query' is missing"、"must be >= 1"、
  * "must be one of ..." 等——registry 校验失败信息是发给模型的契约）。
  */

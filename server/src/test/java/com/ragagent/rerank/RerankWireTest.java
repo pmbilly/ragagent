@@ -29,8 +29,8 @@ import com.ragagent.rerank.provider.ZhipuReranker;
 import com.ragagent.common.web.ProviderJson;
 
 /**
- * rerank 客户端的 stub server A/B：请求体与 Go 实录（wire/*.json）逐字节比对 +
- * Go 测试语义移植（RankResult 宽容解析表 / NVIDIA logit / truncate opt-in / SSRF）。
+ * rerank 客户端的 stub server A/B：请求体与录制（wire/*.json）逐字节比对 +
+ * 确定性语义（RankResult 宽容解析表 / NVIDIA logit / truncate opt-in / SSRF）。
  */
 class RerankWireTest {
 
@@ -267,7 +267,7 @@ class RerankWireTest {
             Reranker r = new WeknoraCloudReranker(c);
             List<RankResult> results = r.rerank("query", List.of("A", "B"));
             assertEquals(wireBody("rerank_weknoracloud"), stub.requests.get(0).body());
-            // 对照 Go：按响应顺序 append（Go 无按 index 重排）
+            // 按响应顺序 append（不做按 index 重排）
             assertEquals(0.4, results.get(0).getRelevanceScore());
             assertEquals(0.9, results.get(1).getRelevanceScore());
             assertEquals(1, results.get(0).getIndex());
@@ -425,7 +425,7 @@ class RerankWireTest {
             c.setModelId("rr-l");
             LkeapReranker r = new LkeapReranker(c);
             // Tc3Signer.post 直连固定域名；批式纯函数用本地数据验证，线格式用
-            // Go 实录比对（stub 不参与 LKEAP 域名路由）
+            // 录制比对（stub 不参与 LKEAP 域名路由）
             List<LkeapReranker.Batch> batches = LkeapReranker.lkeapRerankBatches(
                     "query", List.of("A", "B", "C"));
             assertEquals(1, batches.size());
@@ -437,7 +437,7 @@ class RerankWireTest {
         }
     }
 
-    /** 复刻 Go SDK 对 RunRerankRequest 的 marshal（字段序 Query/Docs/Model）。 */
+    /** 构造 RunRerankRequest 的请求体（字段序 Query/Docs/Model）。 */
     private static String lkeapBody(String query, List<String> docs, String model) {
         var body = ProviderJson.object();
         body.put("Query", query);
@@ -499,7 +499,7 @@ class RerankWireTest {
         assertTrue(oversize.getMessage().contains("at most 2000 characters"), oversize.getMessage());
     }
 
-    // ── RankResult 宽容解析（对照 reranker_test.go 全表）────────────
+    // ── RankResult 宽容解析（全表）────────────
 
     @Test
     void rankResultUnmarshalTable() {
@@ -548,7 +548,7 @@ class RerankWireTest {
         r.setIndex(1);
         r.getDocument().setText("Test document");
         r.setRelevanceScore(0.95);
-        // Go 实录 marshal：{"index":1,"document":{"text":"Test document"},"relevance_score":0.95}
+        // 录制 marshal 形状：{"index":1,"document":{"text":"Test document"},"relevance_score":0.95}
         assertEquals("{\"index\":1,\"document\":{\"text\":\"Test document\"},\"relevance_score\":0.95}",
                 r.marshal());
         RankResult back = RankResult.parse(ProviderJson.parse(r.marshal()));
@@ -557,7 +557,7 @@ class RerankWireTest {
         assertEquals(0.95, back.getRelevanceScore());
     }
 
-    // ── SSRF / 工厂（对照 transport_security_test.go / reranker.go）─
+    // ── SSRF / 工厂 ─────────────────────────────────────
 
     @Test
     void openAiRerankerRejectsInternalBaseURL() {

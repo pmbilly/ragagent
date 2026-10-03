@@ -31,8 +31,7 @@ import com.ragagent.im.runtime.ReplyMessage;
 import com.sun.net.httpserver.HttpServer;
 
 /**
- * 钉钉适配器（W5γ3.7）对照 Go {@code internal/im/dingtalk/adapter.go}：
- * 验签（HMAC + 时间窗）、解析四段链（richText/file/picture/audio/text，含多图提示与
+ * 钉钉适配器行为测试：验签（HMAC + 时间窗）、解析四段链（richText/file/picture/audio/text，含多图提示与
  * 首图提取）、下载（downloadCode → 临时 URL → 白名单）、发送（sessionWebhook 优先 /
  * OpenAPI 群与私聊两条）、流式（AI 卡片建/更新/节流/定稿，无卡退回 webhook 整段）。
  */
@@ -391,7 +390,7 @@ class DingtalkAdapterTest {
                 .findFirst().orElseThrow();
         assertTrue(send.body().contains("群答内容"));
 
-        // 未知流 ID 结束 → 静默（照 Go）
+        // 未知流 ID 结束 → 静默
         a.endStream(incoming, "nope");
     }
 

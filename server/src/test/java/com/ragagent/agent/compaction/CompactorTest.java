@@ -115,7 +115,7 @@ class CompactorTest {
             // freed > 0 且终态远低于阈值
             assertThat(res.freed()).isGreaterThan(0);
             if (rounds == 40) {
-                // Go TestCompactsInsideASingleTurn：40 轮的终态必须低于阈值一半
+                // 单轮内压缩：40 轮的终态必须低于阈值一半
                 assertThat(res.getTokensAfter()).isLessThan(res.getTokensBefore() / 2);
             }
             // 消息列表骨架：system + summary + 6 组 assistant/tool

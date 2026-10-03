@@ -11,9 +11,9 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
- * Weaviate GraphQL 串的字节契约——<b>对照 Go 实录</b>：下面四条期望串录自
+ * Weaviate GraphQL 串的字节契约——<b>golden 期望串</b>：下面四条录自
  * {@code weaviate-go-client v5.7.3} 的 {@code GetBuilder.Build()}（与
- * {@code filters.WhereBuilder.String()}），即 Go 驱动真正发到 {@code /v1/graphql} 的报文。
+ * {@code filters.WhereBuilder.String()}），即参考客户端真正发到 {@code /v1/graphql} 的报文。
  * 任何"顺手改格式"（加空格、调参数序）都会在这里翻红。
  */
 class WeaviateGqlTest {
@@ -25,7 +25,7 @@ class WeaviateGqlTest {
                 WeaviateGql.Where.notEqual("knowledge_id").valueText("k9")));
     }
 
-    // 以下四条 = Go 实录（v5 客户端 Build() 的输出，逐字节）
+    // 以下四条 = golden 期望串（参考客户端 Build() 的输出，逐字节）
     private static final String GO_QUERY_VECTOR =
             "{Get {Weknora_embeddings_3 (where:{operator: And operands:[{operator: Equal "
                     + "path: [\"is_enabled\"] valueBoolean: true},{operator: ContainsAny "
@@ -104,7 +104,7 @@ class WeaviateGqlTest {
                         + "[\"knowledge_base_id\"] valueString: \"srcKb\"}, limit: 64, offset: 64) "
                         + "{content source_id source_type chunk_id knowledge_id "
                         + "knowledge_base_id tag_id _additional{id vectors{embedding}}}}}");
-        // Go 的 where+after 组合被服务端直接拒绝（实测），本仓不再使用 after
+        // where+after 组合被服务端直接拒绝（实测），不再使用 after
         assertThat(actual).doesNotContain("after:");
     }
 

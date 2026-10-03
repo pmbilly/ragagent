@@ -155,7 +155,7 @@ class KeywordsVectorHybridRetrieveEngineServiceTest {
         return info;
     }
 
-    /** 底延迟压到 1ms → 退避测试不慢（默认 200ms，照 Go 常量）。 */
+    /** 底延迟压到 1ms → 退避测试不慢（默认 200ms）。 */
     private static KeywordsVectorHybridRetrieveEngineService service(StubRepo repo) {
         return new KeywordsVectorHybridRetrieveEngineService(repo,
                 EngineTypes.ENGINE_ELASTICSEARCH, 1L);
@@ -185,7 +185,7 @@ class KeywordsVectorHybridRetrieveEngineServiceTest {
         Map<String, float[]> map2 = (Map<String, float[]>) repo.saveParams.get(0).get("embedding");
         assertTrue(map2.containsKey("c1-q9"));
 
-        // 非向量路：不调用嵌入器，params 里 embedding 是空 map（照 Go 恒设键）
+        // 非向量路：不调用嵌入器，params 里 embedding 是空 map（键恒设）
         embedder.calls.clear();
         repo.saveParams.clear();
         service(repo).index(embedder, info("c2", "c2", "关键词"), List.of("keywords"));

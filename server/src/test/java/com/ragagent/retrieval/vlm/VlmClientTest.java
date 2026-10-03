@@ -16,7 +16,7 @@ import com.ragagent.retrieval.vlm.VlmClient.VlmConfig;
 import com.ragagent.retrieval.vlm.VlmClient.VlmException;
 
 /**
- * VLM Predict 客户端（对照 Go vlm/remote_api.go）：请求体形状（multipart、
+ * VLM Predict 客户端：请求体形状（multipart、
  * data-URI、max_tokens/temperature）、reasoning/GPT5 整形、错误族、MIME 嗅探。
  * 出站用 stub transport 捕获（约定 §5：测试禁真实网络）。
  */

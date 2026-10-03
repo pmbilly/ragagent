@@ -14,14 +14,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * 在建连接的生命周期，让"正在建连的调用"带着错误退出。故用本类显式建模：</p>
  *
  * <ul>
- *   <li>{@link #cancel()} = {@code cancelFunc()}；</li>
- *   <li>{@link #isCancelled()} = {@code ctx.Err() != nil}；</li>
- *   <li>{@link #future()} 供 select 式等待（{@code select { case &lt;-ctx.Done(): ... }}）；</li>
+ *   <li>{@link #cancel()} 触发取消，幂等；</li>
+ *   <li>{@link #isCancelled()} 查询是否已取消；</li>
+ *   <li>{@link #future()} 供异步等待取消；</li>
  *   <li>{@link #onCancel(Runnable)} 供"取消时中断阻塞中的 HTTP 调用"用
  *       （阻塞式 {@code HttpClient.send} 只能靠线程中断 —— 见 {@code McpClientManager#connectClient}）。</li>
  * </ul>
  *
- * <p>父子关系对照 {@code context.WithCancel(parent)}：父取消 ⇒ 子取消，子取消不影响父。
+ * <p>父子关系：父取消 ⇒ 子取消，子取消不影响父。
  * 子从父的回调表里显式摘除，避免长时间运行的服务反复建连导致回调表无限增长。</p>
  */
 public final class McpCancellation {
@@ -35,7 +35,7 @@ public final class McpCancellation {
     private final AtomicBoolean cancelled = new AtomicBoolean();
     private final McpCancellation parent;
 
-    /** 对照 {@code context.Background()}：根 token，不可取消（除非显式 cancel）。 */
+    /** 根实例：无父，不随任何父级取消。 */
     public McpCancellation() {
         this(null);
     }
@@ -51,7 +51,7 @@ public final class McpCancellation {
         }
     }
 
-    /** 对照 {@code context.WithCancel(parent)}：父取消 ⇒ 子取消。 */
+    /** 派生一个子实例：父取消 ⇒ 子取消。 */
     public McpCancellation child() {
         return new McpCancellation(this);
     }
@@ -79,12 +79,12 @@ public final class McpCancellation {
         children.clear();
     }
 
-    /** select 式等待用的信号（对照 {@code ctx.Done()}）；取消时正常完成，用 {@link #isCancelled()} 判定。 */
+    /** 取消信号；取消时正常完成，用 {@link #isCancelled()} 判定。 */
     public CompletableFuture<Void> future() {
         return signal;
     }
 
-    /** 注册取消回调；若已取消则立即执行（对照 {@code select { case &lt;-ctx.Done(): }} 的"已关闭也能立即返回"）。 */
+    /** 注册取消回调；若已取消则立即执行。 */
     public void onCancel(Runnable listener) {
         if (cancelled.get()) {
             runQuietly(listener);

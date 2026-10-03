@@ -16,15 +16,15 @@ import com.ragagent.rerank.Reranker;
 import com.ragagent.rerank.RerankerConfig;
 
 /**
- * 腾讯云 LKEAP rerank 客户端（对照 Go {@code rerank/lkeap_reranker.go} 全文）。
+ * 腾讯云 LKEAP rerank 客户端。
  *
- * <p>Go 用 tencentcloud-sdk-go；本项目不允许新增依赖，Java 侧按 TC3-HMAC-SHA256
- * 签名规范<b>裸 HTTP 复刻</b> SDK 的线格式：POST
+ * <p>本项目不允许新增 SDK 依赖，按 TC3-HMAC-SHA256
+ * 签名规范裸 HTTP 实现 SDK 的线格式：POST
  * {@code https://lkeap.tencentcloudapi.com}，请求体
- * {@code {"Docs":[...],"Model":...,"Query":...}}（SDK struct 序），头
+ * {@code {"Docs":[...],"Model":...,"Query":...}}（SDK 线格式字段序），头
  * {@code X-TC-Action: RunRerank / X-TC-Version: 2024-05-22 / Authorization: TC3-HMAC-SHA256 ...}。</p>
  *
- * <p><b>批式语义逐条对照</b>（Go 测试钉住）：空 documents 直接返回空；每请求最多
+ * <p><b>批式语义</b>（有测试钉住）：空 documents 直接返回空；每请求最多
  * 60 条文档、Query+Docs 合计最多 2000 字符（rune 计）；超限的单条文档报错；
  * 超批的分片各自请求后按批起点平移 index 合并。</p>
  */
@@ -97,7 +97,7 @@ public final class LkeapReranker implements Reranker {
     public record Batch(int start, List<String> documents) {
     }
 
-    /** 对照 lkeapRerankBatches：60 条/2000 字符双限切批；单条超限即错。 */
+    /** 60 条/2000 字符双限切批；单条超限即错。 */
     public static List<Batch> lkeapRerankBatches(String query, List<String> documents) {
         int queryLength = runeCount(query);
         if (queryLength >= MAX_REQUEST_CHARACTERS) {
@@ -134,7 +134,7 @@ public final class LkeapReranker implements Reranker {
     }
 
     private List<RankResult> rerankBatch(String query, List<String> documents) {
-        // 对照 lkeap SDK 的 RunRerankRequest struct 序：Query/Docs/Model（models.go 实测）
+        // 线格式字段序按 SDK 的 RunRerankRequest：Query/Docs/Model
         var body = ProviderJson.object();
         body.put("Query", query == null ? "" : query);
         var docs = body.putArray("Docs");
@@ -194,8 +194,7 @@ public final class LkeapReranker implements Reranker {
     }
 
     /**
-     * TC3-HMAC-SHA256 签名 POST（对照 tencentcloud SDK common 的
-     * ConstructSignedRequest；签名算法为腾讯云公开规范）。
+     * TC3-HMAC-SHA256 签名 POST（签名算法为腾讯云公开规范）。
      */
     static final class Tc3Signer {
         private Tc3Signer() {

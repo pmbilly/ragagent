@@ -11,23 +11,21 @@ import com.ragagent.common.llm.ResponseType;
 import com.ragagent.llm.domain.TokenUsage;
 
 /**
- * 流中的单个事件（对照 Go {@code interfaces.StreamEvent}，internal/types/interfaces/stream_manager.go:11-19）。
+ * 流中的单个事件。
  *
- * <p>字段序 = Go struct 声明序；{@code data}/{@code usage} 带 omitempty → NON_EMPTY，
- * 其余四个恒输出（Go 的 string 零值是 {@code ""}、bool 零值是 {@code false}，不带 omitempty）。</p>
+ * <p>字段序固定；{@code data}/{@code usage} 空则省略（NON_EMPTY），
+ * 其余四个恒输出（string 零值 {@code ""}、bool 零值 {@code false}）。</p>
  *
- * <p><b>这是跨语言的存储契约，不只是内部类型</b>：事件经 {@link StreamJson} 序列化后
- * 落进 Redis List，Go 与 Java 两个实现共享同一批键。因此
+ * <p><b>这是跨实现的存储契约，不只是内部类型</b>：事件经 {@link StreamJson} 序列化后
+ * 落进 Redis List，所有实现共享同一批键。因此
  * <ul>
- *   <li>键名必须逐字对齐 Go 的 json tag；</li>
- *   <li>map 的键**按字母序**输出（Go 的 {@code json.Marshal} 对 map 如此，Java 侧由
- *       {@code ORDER_MAP_ENTRIES_BY_KEYS} 对齐），否则 {@code steer} 子列表里
- *       {@code LSET} 的 CAS 比对会跨语言失败；</li>
- *   <li>timestamp 用 RFC3339Nano（服务器本地时区偏移），与 Go 的 {@code time.Time} 一致。</li>
+ *   <li>键名必须逐字对齐存储契约；</li>
+ *   <li>map 的键**按字母序**输出（{@code ORDER_MAP_ENTRIES_BY_KEYS}），
+ *       否则 {@code steer} 子列表里 {@code LSET} 的 CAS 比对会失败；</li>
+ *   <li>timestamp 用 RFC3339Nano（服务器本地时区偏移）。</li>
  * </ul></p>
  *
- * <p>已知差异：Go 的 {@code Type} 是 string 类型，零值序列化为 {@code ""}；Java 用枚举，
- * 未设置时为 {@code null}。真实产出方（agent 引擎 / QA 主链路）恒会赋值，故未复刻该零值。</p>
+ * <p>已知差异：type 未设置时为 {@code null}。真实产出方（agent 引擎 / QA 主链路）恒会赋值。</p>
  */
 @JsonPropertyOrder({"id", "type", "content", "done", "timestamp", "data", "usage"})
 public class StreamEvent {
@@ -49,12 +47,12 @@ public class StreamEvent {
     @JsonProperty("timestamp")
     private OffsetDateTime timestamp;
 
-    /** 附加数据（引用、元信息等）。Go 是 omitempty：null 时整键省略。 */
+    /** 附加数据（引用、元信息等）。null 时整键省略。 */
     @JsonProperty("data")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, Object> data;
 
-    /** 整轮聚合的 token 用量（complete 事件）。Go 是 omitempty。 */
+    /** 整轮聚合的 token 用量（complete 事件）。空时整键省略。 */
     @JsonProperty("usage")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private TokenUsage usage;
@@ -128,11 +126,9 @@ public class StreamEvent {
     /**
      * 浅拷贝。
      *
-     * <p>Go 的 {@code StreamManager.AppendEvent} 收的是 StreamEvent <b>值</b>，
-     * 方法内补时间戳不会影响调用方；Java 的对象是引用语义，故在两个
-     * manager 的写路径上显式拷贝，复刻"调用方的对象不被改写"这一行为。</p>
+     * <p>两个 manager 的写路径都先拷贝再补时间戳，保证"调用方的对象不被改写"。</p>
      *
-     * <p>{@code data} 仍是共享引用——与 Go 的浅拷贝一致（Go 里也是同一个 map）。</p>
+     * <p>{@code data} 仍是共享引用（浅拷贝）。</p>
      */
     public StreamEvent copy() {
         StreamEvent c = new StreamEvent();
@@ -146,7 +142,7 @@ public class StreamEvent {
         return c;
     }
 
-    /** 就地合并 data（对照 Go 里对 {@code event.Data[k] = v} 的写入）。 */
+    /** 就地合并 data。 */
     public void mergeData(Map<String, Object> extra) {
         if (extra == null || extra.isEmpty()) {
             return;

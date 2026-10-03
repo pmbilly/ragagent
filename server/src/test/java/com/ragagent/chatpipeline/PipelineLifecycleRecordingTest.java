@@ -31,8 +31,8 @@ import com.ragagent.llm.extract.EntityExtraction;
 import com.ragagent.llm.extract.PipelineConfig;
 
 /**
- * 实录回放：progress / into_chat / references / completion / stream / entity / web_fetch
- * （期望值 = {@link GoRecording46C} Go 实录常量；web_fetch 打 127.0.0.1 本地 stub，无外网）。
+ * 录制回放：progress / into_chat / references / completion / stream / entity / web_fetch
+ * （期望值 = {@link GoRecording46C} 录制常量；web_fetch 打 127.0.0.1 本地 stub，无外网）。
  */
 class PipelineLifecycleRecordingTest {
 
@@ -686,14 +686,13 @@ class PipelineLifecycleRecordingTest {
                 .as("entity_format/render").isEqualTo(renderExpected);
     }
 
-    // ----- web_fetch（对照 recWebFetch；本地 httptest stub，无外网） -----
+    // ----- web_fetch（本地 httptest stub，无外网） -----
 
     /**
-     * 对照 recWebFetch。语义备案：Go 探针的 httptest 服务器虽在本地起真，
-     * 但 web_fetch 的 SSRF 守卫默认拒绝 loopback —— Go 实录里所有抓取都以
+     * 语义备案：SSRF 守卫默认拒绝 loopback，本地 stub 的抓取全部以
      * 失败收场（内容保持原样），本组锁的就是"抓取失败 → 内容不变"的管线行为。
-     * Java 侧用 127.0.0.1:9（discard 保留端口，白名单无论放宽与否都必拒/必拒连），
-     * 不依赖进程级 SsrfGuard 的状态（4.5a 踩过的静态白名单污染），确定性成立。
+     * 用 127.0.0.1:9（discard 保留端口，白名单无论放宽与否都必拒/必拒连），
+     * 不依赖进程级 SsrfGuard 的状态（避免静态白名单污染），确定性成立。
      */
     @Test
     void webFetch() {
@@ -714,7 +713,7 @@ class PipelineLifecycleRecordingTest {
         s2.put("n", 0);
         assertRec("web_fetch", "no_web_results", json(s2));
 
-        // 3) 抓取失败路径（与 Go 实录同语义：内容保持原样）
+        // 3) 抓取失败路径（内容保持原样）
         ChatManage cm3 = new ChatManage();
         cm3.setWebFetchEnabled(true);
         cm3.setWebSearchEnabled(true);
@@ -731,7 +730,7 @@ class PipelineLifecycleRecordingTest {
         for (SearchResult r : cm3.getRerankResult()) {
             Map<String, Object> row = new LinkedHashMap<>();
             row.put("id", r.getId());
-            // Go 的 len() 是 UTF-8 字节数
+            // len 按 UTF-8 字节数计
             row.put("len", r.getContent().getBytes(java.nio.charset.StandardCharsets.UTF_8).length);
             int runeLen = r.getContent().codePointCount(0, r.getContent().length());
             row.put("head", runeList(r.getContent(), Math.min(30, runeLen), 0));

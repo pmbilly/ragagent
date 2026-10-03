@@ -37,10 +37,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 /**
- * 四个 API Key 管理端点的 HTTP 契约测试——对照 Go
- * internal/handler/tenant.go 的 List/Create/Update/DeleteAPIKey（L660-782）。
+ * 四个 API Key 管理端点的 HTTP 契约测试。
  *
- * <p>没有 golden 文件（这四条端点尚未在 Go dev server 上录制），
+ * <p>没有 golden 文件（这四条端点尚未录制），
  * 因此这里用**逐字段 + 键序**的结构化断言钉住契约：
  * {@code createdAt} 之后的 {@code token} 位置、以及 {@code DELETE} 的 204（§2.1：无信封）。</p>
  *
@@ -261,8 +260,8 @@ class TenantAPIKeyControllerTest {
                 .andExpect(status().isCreated())
                 .andReturn();
         JsonNode data = MAPPER.readTree(result.getResponse().getContentAsString());
-        // 建 Key 时 lastUsedAt 恒为 nil → omitempty 省略；expiresAt 有值 → 出现在
-        // createdAt 之前（Go struct 声明序）
+        // 建 Key 时 lastUsedAt 恒为 null → 空值省略；expiresAt 有值 → 出现在
+        // createdAt 之前（字段声明序）
         assertThat(fieldNames(data)).containsExactly(
                 "id", "scopeType", "name", "apiKey", "fullAccess",
                 "knowledgeBaseIds", "capabilities", "lastUsedAt", "expiresAt", "createdAt", "token");
@@ -300,7 +299,7 @@ class TenantAPIKeyControllerTest {
     @Test
     void createWithInvalidWorkspaceIdIs400() throws Exception {
         // 文案与 code 来自 **PathTenantMatch 中间件**，不是 handler：
-        // Go 的 tenantByID 组挂着 g.PathTenantMatch()，它在 handler 之前就拒掉了非法 id，
+        // 租户不匹配在进入 handler 之前就拒掉了非法 id，
         // 所以 handler 里的 "Invalid workspace ID"（code 1000）是**不可达的死代码**。
         mockMvc.perform(post("/api/v1/tenants/not-a-number/api-keys")
                         .header("Authorization", "Bearer " + token)
@@ -397,7 +396,7 @@ class TenantAPIKeyControllerTest {
         assertThat(data.get("capabilities")).isEmpty();
     }
 
-    /** 对照 Go：更新时**不校验** expiresAt 是否在未来（只有创建才校验）。 */
+    /** 更新时**不校验** expiresAt 是否在未来（只有创建才校验）。 */
     @Test
     void updateAcceptsPastExpiry() throws Exception {
         String keyId = createKey("before", "retrieve");
@@ -475,8 +474,7 @@ class TenantAPIKeyControllerTest {
     void keysAreTenantScoped() throws Exception {
         String keyId = createKey("mine", "retrieve");
         // 用另一个租户的 id 操作同一把 Key → **PathTenantMatch 中间件先拒**（403），
-        // 走不到 service 层的租户边界（RowsAffected=0 → 404）。这与 Go 的路由分层一致：
-        // tenantByID 组挂着 g.PathTenantMatch()，它比 handler/service 都靠前。
+        // 走不到 service 层的租户边界（RowsAffected=0 → 404）。中间件比 handler/service 都靠前。
         mockMvc.perform(put("/api/v1/tenants/" + OTHER_TENANT_ID + "/api-keys/" + keyId)
                         .header("Authorization", "Bearer " + token)
                         .contentType("application/json")
@@ -509,7 +507,7 @@ class TenantAPIKeyControllerTest {
         return MAPPER.readTree(result.getResponse().getContentAsString()).get("id").asText();
     }
 
-    /** 顶层 JSON 键序（契约：gin.H 是 map → 字母序）。 */
+    /** 顶层 JSON 键序（契约：响应由 map 构造 → 字母序）。 */
     private static List<String> keyOrder(String json) throws Exception {
         return fieldNames(MAPPER.readTree(json));
     }

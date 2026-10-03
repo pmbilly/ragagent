@@ -49,7 +49,7 @@ class EmbedChatPayloadPatchTest {
                  "mcpServiceIds":["客户端乱给的"],"webSearchEnabled":true,"agentEnabled":false}
                 """, true, true, true);
 
-        // 渠道值覆盖客户端值（对照 Go patchEmbedChatPayload）
+        // 渠道值覆盖客户端值（patchEmbedChatPayload 的覆盖语义）
         assertThat(req.agentId).isEqualTo("agent-1");
         assertThat(req.agentEnabled).isTrue();
         assertThat(req.mcpServiceIds()).isEmpty();
@@ -66,7 +66,7 @@ class EmbedChatPayloadPatchTest {
     void clientWebSearchCountsOnlyWhenChannelAllowsIt() {
         assertThat(patch("{\"webSearchEnabled\":true}", true, true, false).webSearchEnabled).isTrue();
         assertThat(patch("{\"webSearchEnabled\":true}", false, true, false).webSearchEnabled).isFalse();
-        // Go：仅当客户端给了 bool 才算 opt-in（字符串/数字一律 false）
+        // 仅当客户端给了 bool 才算 opt-in（字符串/数字一律 false）
         assertThat(patch("{\"webSearchEnabled\":\"yes\"}", true, true, false).webSearchEnabled).isFalse();
     }
 
@@ -93,7 +93,7 @@ class EmbedChatPayloadPatchTest {
     void malformedBodiesKeepExistingContract() {
         // 空体 → 视同 {}
         assertThat(patch("", true, true, false).query).isEmpty();
-        // 字面量 null → 视同空体（Go 的 nil map）
+        // 字面量 null → 视同空体
         assertThat(patch("null", true, true, false).query).isEmpty();
         // 非对象 → 400 invalid json（PlainErrorException 带 400）
         assertThatThrownBy(() -> EmbedChannelDelegateOps.patchEmbedChatPayload(

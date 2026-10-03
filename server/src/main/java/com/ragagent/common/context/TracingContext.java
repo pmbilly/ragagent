@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * 把请求侧的 W3C traceparent（外加 trace id / 用户 / 会话提示）随任务负载跨进程携带，
  * worker 侧取出后续接同一条 trace —— 让 Langfuse 把「HTTP 请求 + 异步处理」缝成一棵树。
  *
- * <p>五个键一律 {@code lf_} 前缀 + omitempty：空值**整键省略**，
+ * <p>五个键一律 {@code lf_} 前缀，空值**整键省略**，
  * 未启用 langfuse 时负载字节不变；旧负载（无这些键）也能反序列化。</p>
  */
 @JsonPropertyOrder({"lf_trace_id", "lf_parent_obs_id", "lf_traceparent", "lf_user_id", "lf_session_id"})

@@ -29,19 +29,17 @@ import com.ragagent.audit.service.AuditLogService;
 import org.junit.jupiter.api.Test;
 
 /**
- * 审计服务语义测试——对照 Go
- * internal/application/service/audit_log_test.go（L16-175）。
+ * 审计服务语义测试。
  *
- * <p>Go 用 {@code stubAuditRepo}（内嵌接口的桩）+ {@code fakeClock} 驱动；
- * Java 侧用 Mockito 桩 + 可推进的 {@link FakeClock}，一一对应那两个测试
- * 辅助类型。断言逐条对齐 Go 的用例名与语义。</p>
+ * <p>仓储用 Mockito 桩 + 可推进的 {@link FakeClock}：
+ * 断言钉住服务语义本身。</p>
  */
 class AuditLogServiceTest {
 
     private static final Instant BASE = Instant.parse("2026-05-14T10:00:00Z");
     private static final ZoneId ZONE = ZoneOffset.UTC;
 
-    /** 对照 Go 的 {@code fakeClock}：可控时间源，测试无需 sleep 即可模拟"一分钟后"。 */
+    /** 可控时间源，测试无需 sleep 即可模拟"一分钟后"。 */
     static final class FakeClock extends Clock {
         private Instant instant;
         private final ZoneId zone;
@@ -55,7 +53,7 @@ class AuditLogServiceTest {
         @Override public Clock withZone(ZoneId z) { return new FakeClock(instant, z); }
         @Override public Instant instant() { return instant; }
 
-        /** 对照 Go 的 {@code Advance(by)}。 */
+        /** 推进时钟。 */
         void advance(Duration by) { instant = instant.plus(by); }
     }
 
@@ -64,9 +62,8 @@ class AuditLogServiceTest {
                            List<AuditLog> created, AtomicInteger dedupErrorInjector) {}
 
     /**
-     * 对照 Go {@code newSvcForTest} + {@code stubAuditRepo}：
-     * Create 收进内存列表；CountSinceForDedup 从该列表现算；
-     * {@code dedupErrorInjector} 非零时让 count 抛错（对照 Go 的 {@code countErr}）。
+     * 测试夹具：Create 收进内存列表；CountSinceForDedup 从该列表现算；
+     * {@code dedupErrorInjector} 非零时让 count 抛错。
      */
     private static Fixture newFixture() {
         FakeClock clock = new FakeClock(BASE, ZONE);
@@ -136,7 +133,7 @@ class AuditLogServiceTest {
         assertThat(f.created()).isEmpty();
     }
 
-    /** 对照 Go {@code if entry == nil { return fmt.Errorf("audit log: nil entry") } }。 */
+    /** null entry → 拒绝且不落库。 */
     @Test
     void logRejectsNullEntry() {
         Fixture f = newFixture();
@@ -155,10 +152,10 @@ class AuditLogServiceTest {
         entry.setTenantId(7L);
         entry.setAction(AuditAction.KB_CREATED);
 
-        // 不抛 = 通过（Go 的 `_ = svc.Log(...)`）
+        // 不抛 = 通过（best-effort 入口吞错）
         f.svc().logBestEffort(entry);
 
-        // 但严格入口仍然要抛（对照 Go 的 error 返回）
+        // 但严格入口仍然要抛
         assertThatThrownBy(() -> f.svc().log(entry))
                 .isInstanceOf(IllegalStateException.class);
     }
@@ -166,7 +163,6 @@ class AuditLogServiceTest {
     // ── LogDenied 去重 ────────────────────────────────────────────────────
 
     /**
-     * 对照 {@code TestAuditLog_LogDenied_DedupesRepeatedRejectsWithinWindow}：
      * 窗口内第二次拒绝<b>不</b>落库——去重原语就是"探测型客户端无法以线速刷表"的保证。
      */
     @Test
@@ -184,7 +180,7 @@ class AuditLogServiceTest {
         assertThat(row.getRequestMethod()).isEqualTo("PUT");
         assertThat(row.getActorRole()).isEqualTo("viewer");
         assertThat(row.getDetails().get("required_role").asText()).isEqualTo("admin");
-        // raw_path 与 request_path 相同时**不写**（对照 Go 的 `if rawPath != dedupPath`）
+        // raw_path 与 request_path 相同时**不写**（去重同一资源）
         assertThat(row.getDetails().has("raw_path")).isFalse();
         assertThat(row.getDetails().fieldNames()).toIterable().containsExactly("required_role");
     }
@@ -239,7 +235,7 @@ class AuditLogServiceTest {
      * 路由模板与原始 URL 不同时：{@code request_path} 记<b>模板</b>（去重键稳定，
      * 遍历 UUID 无法绕开窗口），原始 URL 进 Details 的 {@code raw_path} 供取证。
      *
-     * <p>这是对运行中的 Go dev server 实测确认的契约：
+     * <p>这是对运行中 dev server 实测确认的契约：
      * {@code {"request_path":"/api/v1/tenants/:id/audit-log",
      * "details":{"raw_path":"/api/v1/tenants/10002/audit-log","required_role":"admin"}}}。</p>
      */
@@ -257,12 +253,12 @@ class AuditLogServiceTest {
         assertThat(row.getDetails().get("raw_path").asText())
                 .isEqualTo("/api/v1/tenants/10002/audit-log");
         assertThat(row.getDetails().get("required_role").asText()).isEqualTo("admin");
-        // 键序对照 Go 的 map 序列化（字母序）：raw_path 在 required_role 之前
+        // 键序按字母序：raw_path 在 required_role 之前
         assertThat(row.getDetails().fieldNames()).toIterable()
                 .containsExactly("raw_path", "required_role");
     }
 
-    /** Go 的调用点会传 {@code "system_admin"} 字面量（RequireSystemAdmin 路径，实测所见）。 */
+    /** 调用点会传 {@code "system_admin"} 字面量（RequireSystemAdmin 路径，实测所见）。 */
     @Test
     void logDeniedAcceptsSystemAdminLiteralRole() {
         Fixture f = newFixture();
@@ -276,7 +272,7 @@ class AuditLogServiceTest {
 
     // ── List ─────────────────────────────────────────────────────────────
 
-    /** 对照 Go {@code List}：纯粹代理到仓储，不在服务层重复校验租户。 */
+    /** List 纯粹代理到仓储，不在服务层重复校验租户。 */
     @Test
     void listDelegatesToRepository() {
         Fixture f = newFixture();

@@ -8,9 +8,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * provider（模型 / 搜索厂商）请求与响应的共享 JSON 编解码。
  *
- * <p><b>2026-10-03（B41）</b>：由 embedding / rerank / websearch / retrieval 四份包内副本
- * 收敛而来（原为 Go {@code encoding/json} 等价实现——Go 版下线后转义复刻退役，
- * 语义收敛为「标准 Jackson + 字段序由 ObjectNode 插入序保证 + 解析容忍未知字段」）。</p>
+ * <p>由 embedding / rerank / websearch / retrieval 四份包内副本
+ * 收敛而来，语义约定为「标准 Jackson + 字段序由 ObjectNode 插入序保证 + 解析容忍未知字段」。</p>
  */
 public final class ProviderJson {
 

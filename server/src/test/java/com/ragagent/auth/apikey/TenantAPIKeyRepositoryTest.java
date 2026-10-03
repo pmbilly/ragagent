@@ -20,9 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * 仓储语义测试（H2）——对照 Go
- * internal/application/repository/tenant_api_key_test.go（L1-85）与
- * internal/application/repository/tenant_api_key.go 的 SQL 行为。
+ * 仓储语义测试（H2）。
  *
  * <p>覆盖 mock 测不出来的部分：真实 UPDATE 的影响行数（租户边界）、
  * 复查 SELECT 的条件、{@code revoked_at IS NULL} 过滤、
@@ -65,7 +63,7 @@ class TenantAPIKeyRepositoryTest {
         return key;
     }
 
-    /** 对照 Go {@code TestTenantAPIKeyRepositoryPersistsUTCExpiry}。 */
+    /** expiresAt 以 UTC 落库。 */
     @Test
     void persistsUtcExpiry() {
         OffsetDateTime expiresAt = OffsetDateTime.now(ZoneOffset.UTC).plusHours(1).withNano(0);
@@ -79,7 +77,7 @@ class TenantAPIKeyRepositoryTest {
         assertThat(loaded.getExpiresAt().toInstant()).isEqualTo(expiresAt.toInstant());
     }
 
-    /** 对照 Go {@code TestTenantAPIKeyRepositoryUpdateIsTenantScoped}。 */
+    /** UPDATE 的租户边界。 */
     @Test
     void updateIsTenantScoped() {
         TenantAPIKey scoped = key(42L, "scoped", "hash-scoped", "sk-scoped", false);
@@ -142,10 +140,10 @@ class TenantAPIKeyRepositoryTest {
         TenantAPIKey loadedFull = keys.stream().filter(k -> "hash-null".equals(k.getKeyHash())).findFirst().orElseThrow();
         TenantAPIKey loadedScoped = keys.stream().filter(k -> "hash-empty".equals(k.getKeyHash())).findFirst().orElseThrow();
 
-        // full-access：读回 null（Go 的 jsonb `null` → nil 切片）
+        // full-access：jsonb `null` → 读回 null
         assertThat(loadedFull.getKnowledgeBaseIds()).isNull();
         assertThat(loadedFull.getCapabilities()).isNull();
-        // scoped：读回**空列表**（Go 的 `[]` → 非 nil 空切片），二者不可混淆
+        // scoped：jsonb `[]` → 读回**空列表**，二者不可混淆
         assertThat(loadedScoped.getKnowledgeBaseIds()).isNotNull().isEmpty();
         assertThat(loadedScoped.getCapabilities()).containsExactly("chat");
     }
@@ -220,7 +218,7 @@ class TenantAPIKeyRepositoryTest {
         assertThat(byHash.getId()).isEqualTo(legacy.getId());
     }
 
-    /** last_used_at 写入（对照 Go 的 UpdateAPIKeyLastUsed）。 */
+    /** last_used_at 写入。 */
     @Test
     void updateLastUsed() {
         TenantAPIKey k = key(42L, "touch", "hash-touch", "sk-5", false);

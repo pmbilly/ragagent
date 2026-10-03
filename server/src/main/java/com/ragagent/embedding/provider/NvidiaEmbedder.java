@@ -12,13 +12,12 @@ import com.ragagent.embedding.EmbeddingHttp;
 import com.ragagent.common.web.ProviderJson;
 
 /**
- * NVIDIA embedding 客户端（对照 Go {@code internal/models/embedding/nvidia.go} 全文）。
+ * NVIDIA embedding 客户端。
  *
- * <p>请求体 = Go {@code NvidiaEmbedRequest}（model/input/encoding_format/dimensions/
+ * <p>请求体字段序固定（model/input/encoding_format/dimensions/
  * truncate_prompt_tokens/input_type）；{@code input_type} 默认 {@code "passage"}，
- * {@link EmbedQueryContext#isQuery()} 时改 {@code "query"}（对照 Go 的 ctx value）。
- * 构造器<b>不收</b> truncatePromptTokens（Go 的 NewNvidiaEmbedder 无此参、字段恒 0 →
- * omitempty 恒省略）。</p>
+ * {@link EmbedQueryContext#isQuery()} 时改 {@code "query"}。
+ * 构造器<b>不收</b> truncatePromptTokens（恒 0 → 整键省略）。</p>
  */
 public final class NvidiaEmbedder extends BaseEmbedder {
 
@@ -48,7 +47,7 @@ public final class NvidiaEmbedder extends BaseEmbedder {
         if (supportsDimensionsParam()) {
             reqBody.put("dimensions", dimensions);
         }
-        // truncate_prompt_tokens 恒 0 → omitempty 恒省略
+        // truncate_prompt_tokens 恒 0 → 整键省略
         reqBody.put("input_type", EmbedQueryContext.isQuery() ? "query" : "passage");
         byte[] jsonData = ProviderJson.marshal(reqBody);
 

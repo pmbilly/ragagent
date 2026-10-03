@@ -199,10 +199,8 @@ public final class GitLabClient {
     /**
      * GitLab 文件内容的 base64 解码（Java 原生）。
      *
-     * <p><b>2026-10-03（B44）</b>：原 {@code GoBase64} 手写复刻已退役——GitLab 的 base64
-     * 按每 60 字符换行，故先去换行再走 JDK 标准解码器；非法字符由
-     * {@link IllegalArgumentException} 报出（原 Go 的 {@code CorruptInputException}
-     * 带字节偏移诊断，属复刻面、不保留）。</p>
+     * <p>GitLab 的 base64 按每 60 字符换行，故先去换行再走 JDK 标准解码器；
+     * 非法字符由 {@link IllegalArgumentException} 报出。</p>
      */
     static byte[] decodeBase64Content(String content) {
         return java.util.Base64.getDecoder().decode(content.replace("\n", "").replace("\r", ""));

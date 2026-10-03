@@ -27,15 +27,14 @@ import com.ragagent.common.model.ModelFacts;
 import com.ragagent.common.model.ModelGateway;
 
 /**
- * 对照 Go internal/application/service/model.go 的 modelService（阶段 2 子集：
- * 配置 CRUD + credentials 子资源 + 删除守卫；GetChatModel 等运行时工厂随阶段 7 agent 引擎）。
+ * 模型配置服务（配置 CRUD + credentials 子资源 + 删除守卫；运行时工厂见 ModelRuntimeFactory）。
  *
  * 语义要点（golden 已锁定）：
- * - CreateModel：source=remote → active；其他 → downloading（Go 会起 ollama 拉取协程，
- *   阶段 2 无 OllamaService → 保持 downloading 不轮转，记录为已知差异 §9）
+ * - CreateModel：source=remote → active；其他 → downloading（本地 ollama 拉取不轮转，
+ *   保持 downloading，记录为已知差异）
  * - GetModelByID：downloading → 500 "model is currently downloading"；download_failed → 500
  * - UpdateModel：内置模型仅系统管理员可改（403），系统管理员修改时 managed_by 清空
- * - 凭证永不经 PUT /models/:id 正文（controller 层快照保留，对照 handler）
+ * - 凭证永不经 PUT /models/:id 正文（controller 层快照保留）
  * - DeleteModel：内置 400；被 KB/agent/长期记忆引用 → 400 code=2300 + usage details
  */
 @Service
@@ -86,7 +85,7 @@ public class ModelService implements ModelGateway  {
 
     // ── CRUD ─────────────────────────────────────────────────────────────
 
-    /** 对照 CreateModel（本地源的后台拉取协程见类注释的阶段性说明） */
+    /** 创建模型（本地源保持 downloading，见类注释）。 */
     public Model createModel(Model model) {
         log.info("Creating model: {}, type: {}, source: {}", model.getName(), model.getType(), model.getSource());
         if (model.getId() == null || model.getId().isEmpty()) {
@@ -106,7 +105,7 @@ public class ModelService implements ModelGateway  {
     }
 
     /**
-     * 对照 GetModelByID：带状态闸门（downloading/download_failed → 500）。
+     * 带状态闸门（downloading/download_failed → 500）。
      * @throws ModelNotFoundException 不存在
      * @throws BizException 500（1007）状态异常
      */
@@ -129,7 +128,7 @@ public class ModelService implements ModelGateway  {
         };
     }
 
-    /** 对照 repo.GetByID：WHERE (tenant_id = ? OR is_builtin = true) AND deleted_at IS NULL */
+    /** WHERE (tenant_id = ? OR is_builtin = true) AND deleted_at IS NULL */
     public Model getByIdVisible(long tenantId, String id) {
         return modelMapper.selectOne(new LambdaQueryWrapper<Model>()
                 .eq(Model::getId, id)
@@ -138,7 +137,7 @@ public class ModelService implements ModelGateway  {
                 .last("LIMIT 1"));
     }
 
-    /** 对照 ListModels：无排序（DB 自然序，与 Go 一致） */
+    /** 无排序（DB 自然序）。 */
     public List<Model> listModels() {
         return modelMapper.selectList(new LambdaQueryWrapper<Model>()
                 .and(w -> w.eq(Model::getTenantId, tenantId()).or().eq(Model::isIsBuiltin, true))
@@ -146,7 +145,7 @@ public class ModelService implements ModelGateway  {
     }
 
     /**
-     * 对照 UpdateModel：内置模型守卫 + 系统管理员修改时清空 managed_by。
+     * 内置模型守卫 + 系统管理员修改时清空 managed_by。
      * 注意 model 须为"读-改-写"后的完整对象（controller 负责字段合并）。
      */
     public Model updateModel(Model model) {
@@ -169,7 +168,7 @@ public class ModelService implements ModelGateway  {
 
     // ── credentials 子资源 ────────────────────────────────────────────────
 
-    /** 对照 UpdateModelCredentials：仅写入非空且变化的值；内置模型需系统管理员 */
+    /** 仅写入非空且变化的值；内置模型需系统管理员 */
     public Model updateModelCredentials(String id, String apiKey, String appSecret) {
         long tid = tenantId();
         Model existing = getByIdVisible(tid, id);
@@ -201,7 +200,7 @@ public class ModelService implements ModelGateway  {
         return existing;
     }
 
-    /** 对照 ClearModelCredential：幂等清除单字段 */
+    /** 幂等清除单字段 */
     public void clearModelCredential(String id, String field) {
         long tid = tenantId();
         Model existing = getByIdVisible(tid, id);
@@ -242,7 +241,7 @@ public class ModelService implements ModelGateway  {
 
     // ── 删除守卫 ─────────────────────────────────────────────────────────
 
-    /** 对照 DeleteModel */
+    /** 删除模型（内置/被引用见调用方守卫）。 */
     public void deleteModel(String id) {
         long tid = tenantId();
         Model existing = getByIdVisible(tid, id);
@@ -261,7 +260,7 @@ public class ModelService implements ModelGateway  {
             log.warn("Model {} is in use: kb={} agent={} memory={}", id, kbCount, agentCount, memory);
             throw new BizException(new AppError(2300, formatInUseMessage(kbCount, agentCount, memory), usage, 400));
         }
-        // GORM 软删除：UPDATE deleted_at = now
+        // 软删除：UPDATE deleted_at = now
         modelMapper.update(null, new UpdateWrapper<Model>()
                 .eq("id", id)
                 .eq("tenant_id", tid)
@@ -277,7 +276,7 @@ public class ModelService implements ModelGateway  {
                 || usage.get("long_term_memory").get("bindings").size() > 0;
     }
 
-    /** 对照 formatModelInUseMessage */
+    /** 组装 2300 错误的 in-use 文案。 */
     static String formatInUseMessage(long kbCount, long agentCount, boolean memory) {
         List<String> parts = new ArrayList<>();
         if (kbCount > 0) {
@@ -294,8 +293,8 @@ public class ModelService implements ModelGateway  {
     }
 
     /**
-     * 对照 getModelUsageDetails：KB/agent 引用 + 空间长期记忆模型绑定。
-     * 返回 ObjectNode（字段序 = Go struct 序），作为 2300 错误的 details 原样输出。
+     * KB/agent 引用 + 空间长期记忆模型绑定。
+     * 返回 ObjectNode（字段序固定），作为 2300 错误的 details 原样输出。
      */
     public JsonNode getModelUsageDetails(long tid, String modelId) {
         ObjectNode details = MAPPER.createObjectNode();
@@ -339,7 +338,7 @@ public class ModelService implements ModelGateway  {
         var tenant = tenantService.getTenantById(tid);
         if (tenant != null && tenant.getMemoryConfig() != null) {
             JsonNode memoryConfig = tenant.getMemoryConfig();
-            // 两个记忆模型钉都要查：删任一会让空间指向不存在的模型（对照 Go 注释）
+            // 两个记忆模型钉都要查：删任一会让空间指向不存在的模型
             if (modelId.equals(text(memoryConfig.get("embeddingModelId")))) {
                 memoryBindings.add("embedding_model");
             }
@@ -353,7 +352,7 @@ public class ModelService implements ModelGateway  {
         return details;
     }
 
-    /** 对照 knowledgeBaseModelUsageBindings（绑定序固定） */
+    /** KB 引用绑定（绑定序固定） */
     private static List<String> kbBindings(Map<String, Object> row, String modelId) {
         List<String> bindings = new ArrayList<>();
         if (modelId.equals(stringOrNull(row.get("embedding_model_id")))) {
@@ -377,7 +376,7 @@ public class ModelService implements ModelGateway  {
         return bindings;
     }
 
-    /** 对照 customAgentModelUsageBindings（绑定序固定） */
+    /** agent 引用绑定（绑定序固定） */
     private static List<String> agentBindings(Map<String, Object> row, String modelId) {
         List<String> bindings = new ArrayList<>();
         Object configRaw = row.get("config");
@@ -437,7 +436,7 @@ public class ModelService implements ModelGateway  {
         return node == null || node.isNull() ? null : node.asText();
     }
 
-    /** 模型不存在（对照 Go ErrModelNotFound → handler 404 "Model not found"） */
+    /** 模型不存在（404 "Model not found"） */
     public static class ModelNotFoundException extends RuntimeException {
     }
 }

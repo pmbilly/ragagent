@@ -4,7 +4,7 @@ import java.util.Map;
 
 
 /**
- * reranker 构造配置（对照 Go {@code rerank.RerankerConfig}）。
+ * reranker 构造配置。
  */
 public final class RerankerConfig {
 

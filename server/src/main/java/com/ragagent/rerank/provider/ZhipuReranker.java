@@ -13,7 +13,7 @@ import com.ragagent.rerank.Reranker;
 import com.ragagent.rerank.RerankerConfig;
 
 /**
- * 智谱 rerank 客户端（对照 Go {@code rerank/zhipu_reranker.go} 全文）。
+ * 智谱 rerank 客户端。
  *
  * <p>POST 到 base URL 本身（默认
  * {@code https://open.bigmodel.cn/api/paas/v4/rerank}）；请求体

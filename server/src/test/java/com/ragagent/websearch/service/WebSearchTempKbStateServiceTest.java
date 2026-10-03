@@ -20,9 +20,9 @@ import com.ragagent.knowledge.service.KnowledgeBaseService;
 import com.ragagent.knowledge.service.KnowledgeService;
 
 /**
- * web 搜索临时 KB 状态服务（对照 Go web_search_state.go 全文）。
+ * web 搜索临时 KB 状态服务。
  * 重点钉 Delete 的四分支语义与 Get 的空三元组兜底；save 的 JSON 键序
- * 键名 = Java 字段名（camelCase，§2 第 11 条）；部署窗口内的旧键读走 migrateLegacyKeys。
+ * 键名 = Java 字段名（camelCase）；部署窗口内的旧键读走 migrateLegacyKeys。
  */
 class WebSearchTempKbStateServiceTest {
 
@@ -43,7 +43,7 @@ class WebSearchTempKbStateServiceTest {
         service = new WebSearchTempKbStateService(redis, knowledgeService, knowledgeBaseService);
     }
 
-    /** Go：getErr / unmarshal err / 键缺失 → ("", 空 map, 空 []string)。 */
+    /** 读错误 / 反序列化错误 / 键缺失 → 空三元组（空 kbId、空 map、空列表）。 */
     @Test
     void getReturnsEmptyTripleWhenMissingOrCorrupt() {
         when(valueOps.get("tempkb:s1")).thenReturn(null);

@@ -21,9 +21,8 @@ import com.ragagent.event.payload.AgentThoughtData;
 import org.junit.jupiter.api.Test;
 
 /**
- * EventBus 行为断言——每条都对应一条 /tmp Go 实录（fakeBus 逐行复刻 event.go 的
- * Emit / EmitAndWait / On / Off，跑出真值）。异步行为全部用 latch/barrier 做
- * <b>确定性</b>断言，禁止靠墙钟（任务书 §9.1）。
+ * EventBus 行为断言——期望值由录制真值钉住。
+ * 异步行为全部用 latch/barrier 做<b>确定性</b>断言，禁止靠墙钟。
  */
 class EventBusTest {
 
@@ -41,7 +40,7 @@ class EventBusTest {
 
     @Test
     void syncErrorAbortsChainAndWrapsMessage() {
-        // Go 实录：h1 called → h2 error("boom") → h3 未被调用；
+        // 录制期望：h1 called → h2 error("boom") → h3 未被调用；
         // err = "event handler failed for evt: boom"
         EventBus bus = new EventBus();
         List<String> order = new ArrayList<>();
@@ -58,7 +57,7 @@ class EventBusTest {
 
     @Test
     void syncPanicPropagatesToCaller() {
-        // Go 实录：syncPanic => recovered in caller: kaboom——同步 Emit 不 recover，
+        // 录制期望：syncPanic => recovered in caller: kaboom——同步 Emit 不 recover，
         // panic 冒到调用方。Java 侧以 Error 表示 panic 等价物，原样冒出。
         EventBus bus = new EventBus();
         bus.on("evt", e -> {
@@ -71,7 +70,7 @@ class EventBusTest {
 
     @Test
     void noHandlersIsSilentSuccess() {
-        // Go 实录：noHandler => err=<nil>
+        // 录制期望：noHandler => err=<nil>
         EventBus bus = new EventBus();
         assertDoesNotThrow(() -> bus.emit(new Event("", "nobody", "", null, null, "")));
         assertFalse(bus.hasHandlers("nobody"));
@@ -81,7 +80,7 @@ class EventBusTest {
         r.run();
     }    @Test
     void idAutogenIsValueSemantics() {
-        // Go 实录：idAutogenByValue => handlerSeenIsUUID=true, callerStillEmpty=true
+        // 录制期望：idAutogenByValue => handlerSeenIsUUID=true, callerStillEmpty=true
         EventBus bus = new EventBus();
         AtomicReference<String> seen = new AtomicReference<>();
         bus.on("evt", e -> seen.set(e.getId()));
@@ -93,7 +92,7 @@ class EventBusTest {
 
     @Test
     void explicitIdPreserved() {
-        // Go 实录：explicitID => answer-1
+        // 录制期望：explicitID => answer-1
         EventBus bus = new EventBus();
         AtomicReference<String> seen = new AtomicReference<>();
         bus.on("evt", e -> seen.set(e.getId()));
@@ -103,7 +102,7 @@ class EventBusTest {
 
     @Test
     void metadataMapSharedAcrossCopy() {
-        // Go 实录：timingSharedMetadata => callerSees=5——结构体拷贝但 map 同引用
+        // 录制期望：timingSharedMetadata => callerSees=5——结构体拷贝但 map 同引用
         EventBus bus = new EventBus();
         AtomicReference<Map<String, Object>> seen = new AtomicReference<>();
         bus.on("evt", e -> {
@@ -124,7 +123,7 @@ class EventBusTest {
 
     @Test
     void asyncEmitReturnsImmediatelyAndRunsAllHandlers() throws Exception {
-        // Go 实录：asyncEmitReturnsNil => <nil>；handler 在 goroutine 里完成
+        // 录制期望：asyncEmitReturnsNil => <nil>；handler 在 goroutine 里完成
         EventBus bus = new EventBus(true);
         CountDownLatch done = new CountDownLatch(1);
         AtomicBoolean panicked = new AtomicBoolean(false);
@@ -145,7 +144,7 @@ class EventBusTest {
 
     @Test
     void asyncPanicDoesNotKillOtherHandlersNorCaller() throws Exception {
-        // Go 实录：(async panic recovered, type=evt): async panic——panic 被隔离
+        // 录制期望：(async panic recovered, type=evt): async panic——panic 被隔离
         EventBus bus = new EventBus(true);
         CountDownLatch done = new CountDownLatch(1);
         bus.on("evt", e -> {
@@ -180,7 +179,7 @@ class EventBusTest {
 
     @Test
     void emitAndWaitRunsHandlersConcurrently() {
-        // Go 实录：emitAndWaitConcurrent => err=nil, allRan=true——barrier 证明三个 handler
+        // 录制期望：emitAndWaitConcurrent => err=nil, allRan=true——barrier 证明三个 handler
         // 是并发执行（顺序执行会在 barrier 上死锁超时）
         EventBus bus = new EventBus();
         CyclicBarrier barrier = new CyclicBarrier(3);
@@ -199,7 +198,7 @@ class EventBusTest {
 
     @Test
     void emitAndWaitPanicBecomesWrappedError() {
-        // Go 实录：emitAndWaitPanic =>
+        // 录制期望：emitAndWaitPanic =>
         //   "event handler failed for evt: event handler panic (type=evt): wait panic"
         EventBus bus = new EventBus();
         bus.on("evt", e -> {
@@ -213,7 +212,7 @@ class EventBusTest {
 
     @Test
     void emitAndWaitHandlerErrorWrappedLikeGoError() {
-        // Go 实录：emitAndWaitError => "event handler failed for evt: plain error"
+        // 录制期望：emitAndWaitError => "event handler failed for evt: plain error"
         EventBus bus = new EventBus();
         bus.on("evt", e -> {
             throw new IllegalStateException("plain error");

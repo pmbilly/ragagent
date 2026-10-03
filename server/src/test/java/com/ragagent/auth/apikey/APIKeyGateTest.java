@@ -19,14 +19,11 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.HandlerMapping;
 
 /**
- * API-Key 门禁的行为测试——逐条对照 Go internal/middleware/api_key_gate_test.go
- * （L1-327）。
+ * API-Key 门禁的行为测试。
  *
- * <p>把 gin 的 {@code engine.Use(a.Middleware()) + engine.Handle(method, path)} 换成
- * "直接驱动 {@link HandlerInterceptor}"：{@code preHandle} 的时序与
- * gin 中间件一致（路由已确定、handler 未执行），
- * {@code HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE} 在这里手工注入，
- * 充当 {@code c.FullPath()}。</p>
+ * <p>直接驱动 {@link HandlerInterceptor}：{@code preHandle} 的时序为
+ * 路由已确定、handler 未执行；{@code HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE}
+ * 在这里手工注入，充当路由模板路径。</p>
  */
 class APIKeyGateTest {
 
@@ -35,7 +32,6 @@ class APIKeyGateTest {
         com.ragagent.auth.apikey.domain.APIKeyScopeContext.clear();
     }
 
-    /** 对照 Go 的 {@code newTestAuthorizer()}（api_key_gate_test.go L12-22）。 */
     private static APIKeyRouteAuthorizer newTestAuthorizer() {
         APIKeyRouteAuthorizer a = new APIKeyRouteAuthorizer();
         a.register("GET", "/api/v1/auth/me", APIKeyRoutePolicy.any());
@@ -49,7 +45,7 @@ class APIKeyGateTest {
     }
 
     /**
-     * 对照 Go 的 {@code runGate}：scope 为 null 表示 JWT 主体。
+     * scope 为 null 表示 JWT 主体。
      *
      * @return 是否被放行（未进拦截器视为放行）
      */
@@ -65,7 +61,7 @@ class APIKeyGateTest {
         return allowed && response.getStatus() == 200;
     }
 
-    /** 对照 Go 的 {@code concretePath}：把模板参数换成字面量。 */
+    /** 把模板参数换成字面量。 */
     private static String concretePath(String template) {
         return switch (template) {
             case "/api/v1/knowledge-bases/:id/knowledge/file" -> "/api/v1/knowledge-bases/kb-1/knowledge/file";
@@ -180,7 +176,7 @@ class APIKeyGateTest {
                 .isFalse();
     }
 
-    // ── DenyAPIKeyPrincipal（对照 api_key_gate_test.go L203-245） ──
+    // ── DenyAPIKeyPrincipal ──
 
     private static boolean runDenyAPIKey(TenantAPIKeyScope scope) throws Exception {
         if (scope != null) {
@@ -204,7 +200,7 @@ class APIKeyGateTest {
         assertThat(runDenyAPIKey(null)).isTrue();
     }
 
-    // ── AllowFileServeAPIKey（对照 api_key_gate_test.go L247-313） ──
+    // ── AllowFileServeAPIKey ──
 
     private static boolean runAllowFileServe(TenantAPIKeyScope scope) throws Exception {
         if (scope != null) {

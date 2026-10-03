@@ -5,7 +5,7 @@ import com.ragagent.mcp.protocol.McpContext;
 /**
  * token 存储。
  *
- * <p>契约（Go 接口文档逐条）：
+ * <p>契约：
  * <ul>
  *   <li>尚未授权时抛 {@link OAuthNoTokenException}，<b>不要</b>与其它运维错误混为一谈；</li>
  *   <li>其它错误（库连接失败、IO）原样上抛；</li>

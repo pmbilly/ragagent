@@ -37,7 +37,7 @@ import com.ragagent.im.runtime.ReplyMessage;
 import com.sun.net.httpserver.HttpServer;
 
 /**
- * 飞书 / Lark 适配器（W5γ3.6）对照 Go {@code internal/im/feishu/adapter.go}：
+ * 飞书 / Lark 适配器行为测试：
  * 验签（明文与加密两形态）、URL 挑战、解析（text/file/image/post + @_user_ 剥离）、
  * 发送（reply 优先 + 可回落码改走 send-message + 路径参数安全）、CardKit 流式三件套
  * （建卡/更新元素/关流回填摘要）、卡片 markdown 图片换 image_key（失败降级为链接）、

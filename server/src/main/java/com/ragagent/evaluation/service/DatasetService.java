@@ -15,17 +15,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
- * 对照 Go {@code DatasetService}（internal/application/service/dataset.go 全文）。
+ * 评估数据集服务。
  *
- * <p>与 Go 一致：{@code GetDatasetByID} <b>忽略入参 datasetID</b>，总返回默认数据集
+ * <p>{@code getDatasetByID} <b>忽略入参 datasetID</b>，总返回默认数据集
  * （{@code DefaultDataset()} + {@code PrintStats} 日志 + {@code Iterate()}）。</p>
  *
- * <p><b>数据加载实现差异（Javadoc 即契约）</b>：Go 运行时从
- * {@code ./dataset/samples/{queries,corpus,answers,qrels,qas}.parquet}（parquet-go）读
- * 5 张表；Java 以<b>同数据</b>的一次性转换 JSON（classpath
+ * <p><b>数据加载实现（Javadoc 即契约）</b>：数据以一次性转换 JSON（classpath
  * {@code dataset/samples.json}）内置读取——样例数据极小（1 QA 对 / 4 passage / 1 答案）
- * 且随仓库固化，QA 对内容逐字一致。数据集更新时需用 Go 转换脚本重新生成
- * （见 docs/known-issues）。文件缺失 Go panic、Java 抛 IllegalStateException
+ * 且随仓库固化，QA 对内容逐字一致。数据集更新时需用转换脚本重新生成
+ * （见 docs/known-issues）。文件缺失抛 IllegalStateException
  * （均为部署期错误，非运行期契约）。</p>
  */
 @Service
@@ -35,7 +33,7 @@ public class DatasetService {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    /** 对照 Go 的 dataset 结构（5 张表；键序 = 转换 JSON 键序，即数值升序）。 */
+    /** 数据集结构（5 张表；键序 = 转换 JSON 键序，即数值升序）。 */
     private record Dataset(Map<Long, String> queries, Map<Long, String> corpus,
                            Map<Long, String> answers, Map<Long, List<Long>> qrels,
                            Map<Long, Long> qas) {
@@ -43,7 +41,7 @@ public class DatasetService {
 
     private volatile Dataset cached;
 
-    /** 对照 GetDatasetByID：忽略 datasetID，恒取默认数据集。 */
+    /** 忽略 datasetID，恒取默认数据集。 */
     public List<QaPair> getDatasetByID(String datasetId) {
         Dataset dataset = dataset();
         printStats(dataset);
@@ -52,7 +50,7 @@ public class DatasetService {
         return pairs;
     }
 
-    /** 对照 dataset.Iterate：qid → QAPair（无答案时 aid=0/answer=""；passages 与 pids 同序）。 */
+    /** qid → QAPair（无答案时 aid=0/answer=""；passages 与 pids 同序）。 */
     static List<QaPair> iterate(Dataset dataset) {
         List<QaPair> pairs = new ArrayList<>();
         for (Map.Entry<Long, String> entry : dataset.queries().entrySet()) {
@@ -76,7 +74,7 @@ public class DatasetService {
         return pairs;
     }
 
-    /** 对照 dataset.PrintStats：统计日志（0/0 时 Go/Java 同为 NaN——除法语义照抄）。 */
+    /** 统计日志（0/0 时为 NaN——除法语义如此）。 */
     private static void printStats(Dataset dataset) {
         log.info("QA System Statistics:");
         log.info("- Total queries: {}", dataset.queries().size());
@@ -110,7 +108,7 @@ public class DatasetService {
     private static Dataset load() {
         try (InputStream in = DatasetService.class.getResourceAsStream("/dataset/samples.json")) {
             if (in == null) {
-                // 对照 Go DefaultDataset 的 panic（部署期错误）
+                // 部署期错误（样例数据必须随仓库存在）
                 throw new IllegalStateException("dataset samples missing: /dataset/samples.json");
             }
             JsonNode root = MAPPER.readTree(in);

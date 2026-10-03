@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 /**
-/**
  * {@code JsonFieldExtractor} 全分支用例（11 个用例）。
  *
  * <p>额外补了多字节 UTF-8 边界一例（见 {@link #multibyteSplitAcrossChunks}），

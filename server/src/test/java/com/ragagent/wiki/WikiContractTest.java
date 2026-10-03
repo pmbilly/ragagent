@@ -91,7 +91,7 @@ class WikiContractTest {
         insertMember("11111111-2222-3333-4444-555555555501", "admin");
         insertMember("11111111-2222-3333-4444-555555555504", "viewer");
 
-        // wiki_enabled 的 KB（对照 golden 录制时的 KB 配置）
+        // wiki_enabled 的 KB（与 golden 夹具录制时的 KB 配置一致）
         kbId = "35ed3096-d9ee-4561-96f0-ee38eb559122";
         KnowledgeBase kb = new KnowledgeBase();
         kb.setId(kbId);

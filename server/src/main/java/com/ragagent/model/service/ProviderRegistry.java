@@ -8,16 +8,16 @@ import com.ragagent.model.dto.ModelProviderDTO;
 import org.springframework.stereotype.Component;
 
 /**
- * 模型厂商注册表（对照 Go internal/models/provider 的 registry + 各 provider 文件 Info()）。
+ * 模型厂商注册表（静态数据 + 查询）。
  *
- * 静态数据由 golden（contracts/model-providers.json，Go dev server 2026-09-17 实录）生成，
- * 顺序 = Go AllProviders() 声明序；defaultUrls/modelTypes 输出形态（前端字符串）与 golden 字节一致。
- * 阶段 2 仅消费 List / ListByModelType；DetectProvider / ValidateConfig 随阶段 7 运行时客户端翻译。
+ * 静态数据由 golden（contracts/model-providers.json）生成，
+ * 顺序 = 声明序；defaultUrls/modelTypes 输出形态（前端字符串）与 golden 字节一致。
+ * 消费面：List / ListByModelType / DetectProvider / ValidateConfig。
  */
 @Component
 public class ProviderRegistry {
 
-    /** 后端类型 → 前端字符串（对照 modelTypeToFrontend） */
+    /** 后端类型 → 前端字符串 */
     public static String toFrontend(String backendType) {
         return switch (backendType) {
             case "KnowledgeQA" -> "chat";
@@ -29,7 +29,7 @@ public class ProviderRegistry {
         };
     }
 
-    /** 前端查询参数 → 后端类型（对照 ListModelProviders 的映射） */
+    /** 前端查询参数 → 后端类型 */
     public static String queryToBackend(String modelType) {
         return switch (modelType) {
             case "chat" -> "KnowledgeQA";
@@ -184,12 +184,12 @@ public class ProviderRegistry {
     );
     // @formatter:on
 
-    /** 对照 provider.List()：全量（注册表顺序） */
+    /** 全量（注册表顺序）。 */
     public List<ModelProviderDTO> list() {
         return ENTRIES.stream().map(ProviderRegistry::toDTO).toList();
     }
 
-    /** 对照 provider.ListByModelType()：按后端类型过滤，保持注册表顺序 */
+    /** 按后端类型过滤，保持注册表顺序。 */
     public List<ModelProviderDTO> listByModelType(String backendType) {
         return ENTRIES.stream()
                 .filter(e -> e.backendTypes().contains(backendType))
@@ -198,7 +198,7 @@ public class ProviderRegistry {
     }
 
     private static ModelProviderDTO toDTO(ProviderEntry e) {
-        // defaultUrls 为 map：TreeMap 保证 JSON key 字母序（对照 Go map 序列化）
+        // defaultUrls 为 map：TreeMap 保证 JSON key 字母序（输出稳定字节）
         return new ModelProviderDTO(e.value(), e.label(), e.description(),
                 new TreeMap<>(e.defaultUrls()), e.modelTypes());
     }

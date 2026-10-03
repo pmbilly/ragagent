@@ -28,10 +28,10 @@ import com.ragagent.storage.provider.SeekableFileService;
 import com.ragagent.storage.provider.SeekableSource;
 
 /**
- * A3-3 接线测试：provider 服务 → fileserve 读取面（适配器）、云 provider 分支经工厂落地、
+ * 接线测试：provider 服务 → fileserve 读取面（适配器）、云 provider 分支经工厂落地、
  * 以及 {@code storageurl.StorageBackendResolver} 桥的失败分支。
  *
- * <p>用 {@code cos} 作代表：它的构造函数不触网（Go 的 cos 构造器也不用探桶），
+ * <p>用 {@code cos} 作代表：它的构造函数不触网（不探桶），
  * 因此能在无凭据/无网络的 CI 上验证"完备配置 → 真服务"这条此前恒
  * {@code cloudUnavailable} 的路径。oss/tos 构造函数要探桶，属部署态自检。</p>
  */
@@ -47,7 +47,7 @@ class ProviderWiringTest {
 
         FileTransport.OpenedFile opened = svc.getFile("cos://b/r/k.png");
         assertEquals("cos://b/r/k.png", stub.lastPath);
-        // W5γ5.1：读面已是流形态——长度未知（0，照 Go 的 SDK body）、不整对象入堆
+        // 读面已是流形态——长度未知（0，SDK body 语义）、不整对象入堆
         assertNull(opened.bytes());
         assertEquals(0, opened.size());
         assertArrayEquals(new byte[]{1, 2, 3}, opened.readAllBytes());
@@ -69,7 +69,7 @@ class ProviderWiringTest {
         StubProvider stub = new StubProvider();
         ProviderFileContentService svc = new ProviderFileContentService(stub);
 
-        // 1) GET：Accept-Ranges: none，无 Content-Length（Options.size=0，照 Go 的非 seekable 分支）
+        // 1) GET：Accept-Ranges: none，无 Content-Length（Options.size=0，非 seekable 分支）
         MockHttpServletResponse response = new MockHttpServletResponse();
         FileTransport.serve(response, new MockHttpServletRequest("GET", "/files"),
                 svc.getFile("cos://b/r/k.png"),
@@ -148,7 +148,7 @@ class ProviderWiringTest {
         // minio：access_key_id / secret_access_key
         assertRowCredentialsBind(mapper, engineMapper, crypto, "minio", "AK-minio", "SK-minio");
 
-        // s3：access_key / secret_key（B14 前这里恒为「无凭据」，行校验还恰好不报错）
+        // s3：access_key / secret_key（此前这里恒为「无凭据」，行校验还恰好不报错）
         assertRowCredentialsBind(mapper, engineMapper, crypto, "s3", "AK-s3", "SK-s3");
 
         // cos：secret_id / secret_key
@@ -198,7 +198,7 @@ class ProviderWiringTest {
         assertNull(opened.stream());
         assertEquals(10, opened.size());
 
-        // 单段 Range → 206 + Content-Range + 体切片（照 Go 的 ServeContent）
+        // 单段 Range → 206 + Content-Range + 体切片
         MockHttpServletRequest ranged = new MockHttpServletRequest("GET", "/files");
         ranged.addHeader("Range", "bytes=2-5");
         MockHttpServletResponse partial = new MockHttpServletResponse();
@@ -283,7 +283,7 @@ class ProviderWiringTest {
         }
     }
 
-    // ── StorageFileResolver 的云分支（A3-3 接线前恒 cloudUnavailable） ──
+    // ── StorageFileResolver 的云分支（接线前恒 cloudUnavailable） ──
 
     @Test
     @DisplayName("StorageFileResolver：完备 cos 配置 → 真 provider 服务；不完备 → 照 Go 的错误文案")

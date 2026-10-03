@@ -111,7 +111,7 @@ public final class WikiImageMarkup {
         java.util.Collections.sort(keys);
 
         for (String key : keys) {
-            // nil 值按 "" 归一
+            // null 值按 "" 归一
             String value = data.get(key);
             masked.put(key, maskImageURLsWithState(value == null ? "" : value, urlToToken, tokenToUrl));
         }

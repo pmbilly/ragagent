@@ -30,7 +30,7 @@ import com.ragagent.im.runtime.ReplyMessage;
 import com.sun.net.httpserver.HttpServer;
 
 /**
- * Telegram 出站客户端（W5γ3 第一支）对照 Go {@code internal/im/telegram} 的行为验收。
+ * Telegram 出站客户端的行为验收。
  *
  * <p>用 JDK {@code HttpServer} 做 stub（与 OTLP 端到端同一套路）：断言请求路径/体、
  * 节流、Markdown 失败后的纯文本重试、文件下载。</p>
@@ -130,7 +130,7 @@ class TelegramAdapterTest {
                         + "\"photo\":[{\"file_id\":\"small\",\"file_size\":10},"
                         + "{\"file_id\":\"big\",\"file_size\":99}]}}"));
         assertEquals(ImTypes.MESSAGE_TYPE_IMAGE, photo.messageType);
-        assertEquals("big", photo.fileKey); // 取最大那张（末位，照 Go）
+        assertEquals("big", photo.fileKey); // 取最大那张（末位）
         assertEquals("photo.jpg", photo.fileName);
 
         // 非消息事件（如 edited_message）→ null
@@ -144,7 +144,7 @@ class TelegramAdapterTest {
 
         TelegramAdapter withSecret = adapter("s3cret");
         assertNull(withSecret.verifyCallback(exchangeWithHeader("{}", "s3cret")));
-        // 失败是"返回异常对象"（照 Go 的 error 约定），不是抛出
+        // 失败是"返回异常对象"（错误以返回值表达），不是抛出
         assertInstanceOf(AdapterInterfaces.VerifyException.class,
                 withSecret.verifyCallback(exchangeWithHeader("{}", "wrong")));
         assertInstanceOf(AdapterInterfaces.VerifyException.class,
@@ -195,7 +195,7 @@ class TelegramAdapterTest {
         assertEquals("/botTOK/editMessageText", captured.get(1).path());
         assertEquals("77", captured.get(1).body().get("message_id"));
 
-        // 节流窗口内：不再发请求（照 Go 的 minEditInterval=500ms）
+        // 节流窗口内：不再发请求（minEditInterval=500ms）
         a.updateStreamContent(incoming, streamId, "第二段");
         assertEquals(2, captured.size());
 

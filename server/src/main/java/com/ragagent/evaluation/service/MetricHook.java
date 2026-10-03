@@ -24,26 +24,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 对照 Go metric_hook.go 全文：{@code MetricList}（逐条计算 + 均值）与
- * {@code HookMetric}（按 QA 对记录检索/重排/生成产物，recordFinish 时把命中分块
+ * 指标挂钩：逐指标计算 + 均值（{@code MetricList} 语义），
+ * 并按 QA 对记录检索/重排/生成产物（recordFinish 时把命中分块
  * 反查回 passage ID 并计入指标）。
  *
- * <p>照抄要点：检索源<b>优先 rerank 结果、空则回退 search 结果</b>；命中 ID 靠
+ * <p>要点：检索源<b>优先 rerank 结果、空则回退 search 结果</b>；命中 ID 靠
  * 「分块内容与真值 passage 互为包含」反查（ChunkIndex 与数据集 PID 无对应关系）；
- * {@code Append} 的日志在 Go 用 Background ctx（与调用 ctx 无关）。</p>
+ * 记录用的日志走后台上下文（与调用上下文无关）。</p>
  */
 public final class MetricHook {
 
     private MetricHook() {
     }
 
-    /** 单个指标项（对照 Go metricCalculators 的匿名 struct {calc, getField}）。 */
+    /** 单个指标项：计算器 + 读写器。 */
     private record Slot(Metrics calc,
                         ToDoubleFunction<MetricResult> getter,
                         ObjDoubleConsumer<MetricResult> setter) {
     }
 
-    /** 对照 metricCalculators：6 检索 + 6 生成，顺序/参数照 Go（BLEU 用 1/2/4 三档权重，smoothing=true）。 */
+    /** 6 检索 + 6 生成，顺序固定（BLEU 用 1/2/4 三档权重，smoothing=true）。 */
     private static final List<Slot> CALCULATORS = List.of(
             new Slot(new PrecisionMetric(),
                     r -> r.retrievalMetrics.precision,
@@ -82,14 +82,14 @@ public final class MetricHook {
                     r -> r.generationMetrics.rougel,
                     (r, v) -> r.generationMetrics.rougel = v));
 
-    /** 对照 MetricList：逐条 Append 计算，Avg 取每字段均值（空 → 全零）。 */
+    /** 逐条计算，取每字段均值（空 → 全零）。 */
     public static final class MetricList {
 
         private static final Logger log = LoggerFactory.getLogger(MetricList.class);
 
         private final List<MetricResult> results = new ArrayList<>();
 
-        /** 对照 Append：一次算全 12 项并记录（日志形态非契约）。 */
+        /** 一次算全 12 项并记录（日志形态非契约）。 */
         public void append(MetricInput metricInput) {
             MetricResult result = new MetricResult();
             for (Slot c : CALCULATORS) {
@@ -106,7 +106,7 @@ public final class MetricHook {
             results.add(result);
         }
 
-        /** 对照 Avg：空列表 → 全零（Go 返回 &MetricResult{}）。 */
+        /** 空列表 → 全零。 */
         public MetricResult avg() {
             MetricResult avgResult = new MetricResult();
             if (results.isEmpty()) {
@@ -124,14 +124,14 @@ public final class MetricHook {
         }
     }
 
-    /** 对照 HookMetric：按 QA 对收集产物 → recordFinish 计指标（RWMutex → synchronized）。 */
+    /** 按 QA 对收集产物 → recordFinish 计指标（synchronized 加锁）。 */
     public static final class HookMetric {
 
         private final QaPairMetric[] qaPairMetricList;
         private final MetricList metricResults = new MetricList();
         private final Object mu = new Object();
 
-        /** 对照 qaPairMetric（运行中数据，clone 不复制）。 */
+        /** 运行中数据（clone 不复制）。 */
         private static final class QaPairMetric {
             QaPair qaPair;
             List<SearchResult> searchResult;
@@ -164,9 +164,9 @@ public final class MetricHook {
         }
 
         /**
-         * 对照 recordFinish：检索源优先 rerank、空则回退 search；分块内容与真值 passage
+         * 收尾：检索源优先 rerank、空则回退 search；分块内容与真值 passage
          * 互为包含 → 记该 passage 的 PID（去重）；生成文本取 chatResponse.Content；
-         * RetrievalGT=[qaPair.PIDs]、GeneratedGT=qaPair.Answer；加锁 Append。
+         * RetrievalGT=[qaPair.PIDs]、GeneratedGT=qaPair.Answer；加锁记录。
          */
         public void recordFinish(int index) {
             List<SearchResult> retrievalSource = qaPairMetricList[index].rerankResult;
@@ -214,7 +214,7 @@ public final class MetricHook {
             }
         }
 
-        /** 对照 MetricResult()：加锁取均值。 */
+        /** 加锁取均值。 */
         public MetricResult metricResult() {
             synchronized (mu) {
                 return metricResults.avg();

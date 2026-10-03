@@ -13,8 +13,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * {@link LocalFileContentService} 的路径规范化与守卫（对照 Go local.go +
- * utils/security.go SafePathUnderBase + filepath.Rel/Clean/Join 语义）。
+ * {@link LocalFileContentService} 的路径规范化与守卫（safe-path 边界 +
+ * Rel/Clean/Join 语义）。
  */
 class LocalFileContentServiceTest {
 
@@ -23,7 +23,7 @@ class LocalFileContentServiceTest {
 
     @Test
     void cleanPathMatchesGoFilepathClean() {
-        // go1.26 实录（/tmp/w5crec 探针）
+        // 探针录制语料
         assertEquals(".", LocalFileContentService.cleanPath(""));
         assertEquals(".", LocalFileContentService.cleanPath("."));
         assertEquals("/", LocalFileContentService.cleanPath("/"));
@@ -36,7 +36,7 @@ class LocalFileContentServiceTest {
 
     @Test
     void goRelMatchesFilepathRel() {
-        // 全部为 go1.26 实录（/tmp/w5crec 探针）
+        // 全部为探针录制语料
         assertEquals("b/c", LocalFileContentService.goRel("/a", "/a/b/c"));
         assertEquals("../b/c", LocalFileContentService.goRel("/a/x", "/a/b/c"));
         assertNull(LocalFileContentService.goRel("/a/b", "b/c")); // 根性不同 → error
@@ -72,12 +72,12 @@ class LocalFileContentServiceTest {
         Files.writeString(tmp.resolve("10002/exports/ok.txt"), "hello");
         FileTransport.OpenedFile opened = svc.getFile("local://10002/exports/ok.txt");
         assertEquals(5, opened.size());
-        // W5γ5.3：seekable 形态已抽象为 SeekableSource（Path 只是其中一种实现）
+        // seekable 形态已抽象为 SeekableSource（Path 只是其中一种实现）
         assertEquals("hello", new String(opened.readAllBytes(), StandardCharsets.UTF_8));
         // 逃逸 → 拒绝
         assertTrue(assertThrows(() -> svc.getFile("local://../../etc/passwd")));
         assertTrue(assertThrows(() -> svc.getFile("local://10002/exports/missing.txt")));
-        // local://（空 rel）→ baseDir 本身：Go 的 os.Open 对目录成功（读时才 EISDIR），
+        // local://（空 rel）→ baseDir 本身：目录可打开（读时才 EISDIR），
         // GetFile 不算失败——别"顺手修好"。
         assertTrue(assertThrows(() -> svc.getFile("local://")) == false
                 || assertThrows(() -> svc.getFile("local://")));
@@ -112,7 +112,7 @@ class LocalFileContentServiceTest {
         String p = "local://10002/exports/a.png";
         String url = svc.getFileURL(p);
         if (StoragePaths.systemHmacKey() == null) {
-            // Go 的 SignFileURL：key 未配置 → 报错 → GetFileURL 回落 local:// 原样
+            // 签名密钥未配置 → 报错 → GetFileURL 回落 local:// 原样
             assertEquals(p, url);
             return;
         }

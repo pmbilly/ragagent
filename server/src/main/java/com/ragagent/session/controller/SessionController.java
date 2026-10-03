@@ -127,7 +127,7 @@ public class SessionController {
         try {
             saved = sessionService.createSession(created);
         } catch (RuntimeException e) {
-            // Go：NewInternalServerError(err.Error())
+            // 500，异常原文透出
             throw toInternal(e);
         }
 
@@ -433,7 +433,7 @@ public class SessionController {
         try {
             message = messageService.getMessage(sessionId, mid);
         } catch (com.ragagent.session.domain.MessageNotFoundException e) {
-            // Go：err != nil || msg == nil → 404 "message not found"（固定文案）
+            // 不存在 → 404 "message not found"（固定文案）
             throw BizException.notFound("message not found");
         } catch (RuntimeException e) {
             throw BizException.notFound("message not found");

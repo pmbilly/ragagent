@@ -13,14 +13,13 @@ import org.junit.jupiter.api.Test;
 import com.ragagent.common.retrieval.SearchResult;
 
 /**
- * {@link Rewriter} / {@link FileServiceResolver} 的对等测试
- * （对照 Go {@code internal/storageurl/storageurl_test.go} 与 {@code request_test.go}）。
+ * {@link Rewriter} / {@link FileServiceResolver} 的对等测试。
  *
- * <p>断言文案尽量照抄 Go 的注释或断言消息——它们记录的是"为什么这条规则存在"。</p>
+ * <p>断言文案尽量保留原表述——它们记录的是"为什么这条规则存在"。</p>
  */
 class RewriterTest {
 
-    // ── 测试替身（对照 Go 的 stubFileService / fixedResolver / stubResolver） ──
+    // ── 测试替身 ──
 
     /** 只关心 {@code getFileURL} 的 FileService 替身；{@code calls} 用于钉"只解析一次"。 */
     static final class StubFileService implements FileService {
@@ -297,10 +296,10 @@ class RewriterTest {
     }
 
     /**
-     * <b>未翻译的存储后端在此处显形</b>：既没有 provider 级 FileService、
+     * <b>未接线的存储后端在此处显形</b>：既没有 provider 级 FileService、
      * 也没有进程级默认服务时，{@code minio://} 之类引用解析不出 HTTP URL，
      * 于是被原样保留成 handle——正是 {@link Rewriter} "绝不发出取不到的 URL"的降级。
-     * 与 Go 未配置 {@code APP_EXTERNAL_URL} 的部署表现一致。
+     * 与未配置 {@code APP_EXTERNAL_URL} 的部署表现一致。
      */
     @Test
     void unresolvableProviderReferenceIsLeftAsHandle() {
@@ -321,7 +320,7 @@ class RewriterTest {
                 .isEqualTo("![a](https://cdn.example.com/minio://bucket/10000/exports/a.png)");
     }
 
-    // ── 消息历史（对照 request_test.go 的 TestRewriteMessages*） ─────────────
+    // ── 消息历史 ────────────────────────────────────────────────────────────
 
     /** 响应形态必须**不改原对象**——原对象可能与 service 缓存共享。 */
 

@@ -13,18 +13,14 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 /**
- * 语雀纯函数的对等测试（对照 Go {@code yuque/types_test.go} 与
- * {@code connector.go} 里的 {@code buildDocURL}）。
- *
- * <p>期望值全部来自 Go 实录程序（把 Go 的 {@code Config.GetBaseURL} /
- * {@code buildDocURL} / {@code parseContentUpdatedAt} / {@code sanitizeFileName} /
- * {@code redactToken} / {@code parseRetryAfter} 原样抄进独立程序跑出真值）。</p>
+ * 语雀纯函数的对等测试（{@code baseURL} / {@code buildDocURL} /
+ * {@code parseContentUpdatedAt} / {@code sanitizeFileName} / {@code redactToken}）。
  */
 class YuqueFormatsTest {
 
     // ── GetBaseURL ───────────────────────────────────────────────────────
 
-    /** 对照 Go {@code TestGetBaseURL_*} 四条（含实录的真值）。 */
+    /** baseURL 归一的期望值全表。 */
     @ParameterizedTest
     @CsvSource({
             "'',                        https://www.yuque.com",
@@ -40,7 +36,7 @@ class YuqueFormatsTest {
         assertThat(cfg.baseURL()).isEqualTo(want);
     }
 
-    /** {@code GetBaseURL} 是 Go 的**方法**：不得成为 JSON 属性（约定 §7.5 第 2 条）。 */
+    /** {@code baseURL()} 是方法：不得成为 JSON 属性。 */
     @Test
     void getBaseUrlIsNotAJsonProperty() throws Exception {
         YuqueConfig cfg = new YuqueConfig();
@@ -53,7 +49,7 @@ class YuqueFormatsTest {
 
     // ── buildDocURL ──────────────────────────────────────────────────────
 
-    /** 对照 Go 实录：namespace 为空时只回基地址。 */
+    /** namespace 为空时只回基地址。 */
     @ParameterizedTest
     @CsvSource({
             "https://www.yuque.com, alice/demo, hello,   https://www.yuque.com/alice/demo/hello",
@@ -71,13 +67,13 @@ class YuqueFormatsTest {
 
     // ── parseContentUpdatedAt ────────────────────────────────────────────
 
-    /** 对照 Go 实录：解析失败/空一律回**零值时间**（不是 null、不抛错）。 */
+    /** 解析失败/空一律回**零值时间**（不是 null、不抛错）。 */
     @Test
     void parseContentUpdatedAtMatchesGo() {
         assertThat(ZeroTimeSerializer.isZeroValue(YuqueFormats.parseContentUpdatedAt(""))).isTrue();
         assertThat(ZeroTimeSerializer.isZeroValue(YuqueFormats.parseContentUpdatedAt(null))).isTrue();
         assertThat(ZeroTimeSerializer.isZeroValue(YuqueFormats.parseContentUpdatedAt("not-a-time"))).isTrue();
-        // Go 的 RFC3339 不接受"只有日期"
+        // "只有日期"的串不算合法时间戳
         assertThat(ZeroTimeSerializer.isZeroValue(YuqueFormats.parseContentUpdatedAt("2026-04-20"))).isTrue();
 
         assertThat(YuqueFormats.parseContentUpdatedAt("2026-04-20T10:00:00Z").toInstant())
@@ -103,9 +99,8 @@ class YuqueFormatsTest {
     }
 
     /**
-     * 对照 Go {@code TestSanitizeFileName_TruncatesAtRuneBoundary}：
-     * 长中文标题按字节截断必须落在 rune 边界上，否则下游的
-     * {@code utf8.ValidString} 会以"文件名包含非法字符"拒绝。
+     * 长中文标题按字节截断必须落在码点边界上，否则下游的
+     * UTF-8 校验会以"文件名包含非法字符"拒绝。
      */
     @Test
     void sanitizeFileNameTruncatesAtRuneBoundary() {
@@ -120,7 +115,7 @@ class YuqueFormatsTest {
 
     // ── redactToken ──────────────────────────────────────────────────────
 
-    /** 对照 Go {@code TestRedactToken}。 */
+    /** 令牌脱敏规则。 */
     @ParameterizedTest
     @CsvSource({
             "short,            ***",

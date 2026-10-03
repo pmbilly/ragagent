@@ -26,7 +26,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * 模型装饰器测试（对照 Go internal/models 下各族的 langfuse_wrapper.go）：
+ * 模型装饰器测试（各模型族的 langfuse 包装）：
  * chat/embedding/rerank 的 generation 载荷、流式累积与用量估算；未启用时 wrap 原样返回。
  */
 class LangfuseModelDecoratorsTest {
@@ -61,7 +61,7 @@ class LangfuseModelDecoratorsTest {
                         "no span named " + name + " (exported=" + exported.size() + ")"));
     }
 
-    /** autoTrace 根条数（对照 Go StartGeneration 的"无 trace 则开浅根"）。 */
+    /** autoTrace 根条数（StartGeneration 的"无 trace 则开浅根"语义）。 */
     private long traceRoots() {
         return exported.stream()
                 .filter(s -> LangfuseAttributes.OBS_TYPE_TRACE
@@ -92,7 +92,7 @@ class LangfuseModelDecoratorsTest {
         ChatResponse got = wrapped.chat(List.of(message), options);
         assertEquals("hi there", got.getContent());
 
-        // 无活跃 trace → generation 先导出、autoTrace 根随后（Go 的 autoTrace 语义）
+        // 无活跃 trace → generation 先导出、autoTrace 根随后（autoTrace 语义）
         assertEquals(2, exported.size());
         assertEquals(1, traceRoots());
         RecordedSpan gen = exported.get(0);

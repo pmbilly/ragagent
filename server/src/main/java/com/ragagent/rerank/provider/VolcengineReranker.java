@@ -17,23 +17,21 @@ import com.ragagent.rerank.Reranker;
 import com.ragagent.rerank.RerankerConfig;
 
 /**
- * 火山引擎（托管知识服务）rerank 客户端（对照 Go
- * {@code rerank/volcengine_reranker.go} 全文）。
+ * 火山引擎（托管知识服务）rerank 客户端。
  *
- * <p>Go 用 vikingdb-go-sdk（AuthIAM AK/SK 签名，service="air"）；本项目不允许新增
- * 依赖，Java 侧按 volcengine V4 签名（{@code base/sign.go} 的 HMAC-SHA256 方案）
- * 裸 HTTP 复刻：POST {@code {base}/api/knowledge/service/rerank}，请求体
+ * <p>本项目不允许新增 SDK 依赖，按 volcengine V4 签名规范（HMAC-SHA256）
+ * 裸 HTTP 实现：POST {@code {base}/api/knowledge/service/rerank}，请求体
  * {@code {"datas":[{"content":...,"query":...}],"rerank_instruction":...,"rerank_model":...}}
- * （map 键序 = 字母序，与 Go SDK 的 json tag 序一致）。</p>
+ * （官方 SDK 的 json 字段序，非字母序）。</p>
  *
- * <p><b>批式语义逐条对照</b>（Go 测试钉住）：空 documents 直接返回空；API 单请求
+ * <p><b>批式语义</b>（有测试钉住）：空 documents 直接返回空；API 单请求
  * 上限 50 条文档，超限切批<b>并发</b>（上限 4）重排后按原 index 合并——分数跨请求
  * 可比，不丢候选也不偏序；score 数量与文档数不等报 {@code score count mismatch}；
  * {@code code != 0} 报 {@code Volcengine rerank API error %d: %s}。</p>
  */
 public final class VolcengineReranker implements Reranker {
 
-    /** 对照 Go provider.VolcengineRerankBaseURL。 */
+    /** 托管知识服务 rerank 的默认端点。 */
     public static final String RERANK_BASE_URL = "https://ark.cn-beijing.volces.com";
 
     static final String RERANK_PATH = "/api/knowledge/service/rerank";
@@ -154,7 +152,7 @@ public     static final int MAX_DOCUMENTS = 50;
 
     /** 单批打分（入参已确保 ≤ API 上限），按输入顺序返回相关性分。 */
     private List<Float> rerankBatch(String query, List<String> documents) {
-        // datas[] 每项 {query, content}；Go SDK 实录顺序：datas → rerank_model →
+        // datas[] 每项 {query, content}；线格式字段序：datas → rerank_model →
         // rerank_instruction（A/B 钉住，不是字母序）
         var request = ProviderJson.object();
         ArrayNode datas = request.putArray("datas");
@@ -210,7 +208,7 @@ public     static final int MAX_DOCUMENTS = 50;
         return modelId;
     }
 
-    /** volcengine V4（HMAC-SHA256）签名 POST——对照 volc-sdk-golang base/sign.go。 */
+    /** volcengine V4（HMAC-SHA256）签名 POST。 */
     static final class VolcengineSigner {
         private VolcengineSigner() {
         }

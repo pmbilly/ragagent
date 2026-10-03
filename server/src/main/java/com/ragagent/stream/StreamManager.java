@@ -4,12 +4,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 流管理器——极简的 append-only 设计（对照 Go {@code interfaces.StreamManager}，
- * internal/types/interfaces/stream_manager.go:23-74）。
+ * 流管理器——极简的 append-only 设计。
  *
  * <p>所有流状态都通过事件承载：元信息、引用、完成标记等等，没有单独的元数据存储。</p>
  *
- * <p>实现有两个：{@link MemoryStreamManager}（单进程，Go 的 Lite 模式）与
+ * <p>实现有两个：{@link MemoryStreamManager}（单进程，Lite 模式）与
  * {@link RedisStreamManager}（多副本共享）。由 {@code StreamManagerConfig} 按
  * {@code STREAM_MANAGER_TYPE} 选择。</p>
  *

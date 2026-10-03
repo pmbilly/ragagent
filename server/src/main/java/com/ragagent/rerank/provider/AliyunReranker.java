@@ -13,7 +13,7 @@ import com.ragagent.rerank.Reranker;
 import com.ragagent.rerank.RerankerConfig;
 
 /**
- * 阿里云 DashScope rerank 客户端（对照 Go {@code rerank/aliyun_reranker.go} 全文）。
+ * 阿里云 DashScope rerank 客户端。
  *
  * <p>POST 到 base URL 本身（无 /rerank 后缀）；请求体恒带
  * {@code parameters:{return_documents:true, top_n:N}}；响应从

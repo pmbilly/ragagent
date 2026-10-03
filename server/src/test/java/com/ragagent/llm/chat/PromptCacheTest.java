@@ -185,7 +185,7 @@ class PromptCacheTest {
         assertNull(headers.getFirst("session_id"));
     }
 
-    /** 策略分叉逐条对齐 Go promptCachePolicyFor。 */
+    /** 策略分叉逐条对齐 {@link PromptCache#promptCachePolicyFor}。 */
     @Test
     void promptCachePolicyForBranches() {
         assertEquals(new PromptCache.Policy(true, false, true),

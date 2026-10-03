@@ -42,12 +42,12 @@ import org.springframework.beans.factory.ObjectProvider;
 import com.ragagent.common.session.SessionMessagePort;
 
 /**
- * 蒸馏编排的对等测试（对照 Go extract.go 的 {@code Handle} /
- * {@code ScheduleExtraction} / {@code collectSessionSegments} / {@code applyDecisions}）。
+ * 蒸馏编排的对等测试（{@code handle} /
+ * {@code scheduleExtraction} / {@code collectSessionSegments} / {@code applyDecisions}）。
  *
  * <p>仓储、消息读取、队列、模型全部是替身——这一层要验的是**分支与调用序列**
  * （租约释放时机、checkpoint 的 drained 取值、失败预算、段切分），
- * 而不是 SQL 或模型输出。三个真值来自 Go 侧的注释与语义，逐条标在断言旁边。</p>
+ * 而不是 SQL 或模型输出。关键分支真值逐条标在断言旁边。</p>
  *
  * <p>不依赖任何网络：模型是返回固定正文的假客户端。</p>
  */
@@ -159,9 +159,9 @@ class MemoryExtractionServiceTest {
             service.handle(payloadHolder().build());
 
             verify(repo, never()).finishExtraction(any(), anyString());
-            // ⚠️ 与 Go 一致：**没有**要释放的租约。
-            // Go 的 `if batch == nil { return nil }` 在 `defer release(leaseID)` **之前**，
-            // 而 ClaimPendingSessions 在"没有待办"时根本没设租约——所以这里不该释放任何东西。
+            // ⚠️ **没有**要释放的租约。
+            // "没有待办直接返回"发生在释放租约 **之前**，
+            // 而 claimPendingSessions 在"没有待办"时根本没设租约——所以这里不该释放任何东西。
             verify(repo, never()).releaseExtractionSlot(any(), anyString());
         }
     }
@@ -181,7 +181,7 @@ class MemoryExtractionServiceTest {
 
             ArgumentCaptor<Duration> delay = ArgumentCaptor.forClass(Duration.class);
             verify(queue).enqueue(any(), delay.capture());
-            // Go: time.Until(batch.RetryAt) + time.Second
+            // 重投延迟 = RetryAt 距今 + 1 秒
             assertThat(delay.getValue()).isBetween(Duration.ofSeconds(59), Duration.ofSeconds(62));
             // 重投分支在 defer 之前返回 → 绝不释放当前这个 worker 的租约
             verify(repo, never()).releaseExtractionSlot(any(), anyString());
@@ -241,7 +241,7 @@ class MemoryExtractionServiceTest {
 
             service.handle(payloadHolder().build());
 
-            // Go: CheckpointExtraction(ctx, scope, leaseID, session, session.Cursor, true)
+            // 检查点：cursor 取 session 当前值，drained=true
             ArgumentCaptor<MemoryMessageCursor> cursor = ArgumentCaptor.forClass(MemoryMessageCursor.class);
             verify(repo).checkpointExtraction(eq(SCOPE), anyString(), eq(s), cursor.capture(), eq(true));
             assertThat(cursor.getValue().getId()).isEmpty();
@@ -268,7 +268,7 @@ class MemoryExtractionServiceTest {
 
             ArgumentCaptor<Duration> delay = ArgumentCaptor.forClass(Duration.class);
             verify(queue).enqueue(any(), delay.capture());
-            // Go: extractFollowUpDelay（15s）
+            // 后续抽取延迟（15s）
             assertThat(delay.getValue()).isEqualTo(MemoryExtractionService.EXTRACT_FOLLOW_UP_DELAY);
         }
 
@@ -381,7 +381,7 @@ class MemoryExtractionServiceTest {
 
             assertThat(collected.segments()).hasSize(1);
             assertThat(collected.segments().get(0).lines).hasSize(1);
-            // 内容去掉了首尾空白（对照 Go 的 strings.TrimSpace）
+            // 内容去掉了首尾空白（trim）
             assertThat(collected.segments().get(0).lines.get(0).content).isEqualTo("有内容");
             assertThat(collected.segments().get(0).endId).isEqualTo("m3");
         }
@@ -416,7 +416,7 @@ class MemoryExtractionServiceTest {
             var collected = service.transcriptOps.collectSessionSegments(sessionWithCursor("sess-1"));
 
             assertThat(collected.segments()).hasSize(2);
-            // 第一段：priorContext 从消息历史取，历史为空 → Go 的 tailContents 回 **nil**
+            // 第一段：priorContext 从消息历史取，历史为空 → tailContents 返回 **null**
             assertThat(collected.segments().get(0).context).isNull();
             // 第二段：取上一段 lines 的**尾部 4 条**（extractContextLines = 4）
             assertThat(collected.segments().get(1).context).containsExactly("二", "三", "四", "五");

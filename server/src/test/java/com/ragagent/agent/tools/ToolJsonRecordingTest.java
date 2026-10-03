@@ -8,9 +8,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.web.ToolJson;
 
 /**
- * ToolJson 的 Go 实录语料（9 条：把 JSON 解析成树再重编码）。
+ * ToolJson 的录制语料（9 条：把 JSON 解析成树再重编码）。
  *
- * <p><b>2026-10-03（B42）</b>：Go 版已下线——HTML 转义形态不再构成断言目标（对比经
+ * <p>HTML 转义形态不再构成断言目标（对比经
  * {@link com.ragagent.support.ContractJson#deep} 语义归一）；**键序**改由本类的
  * {@code keysAreSortedAlphabetically} 单独钉住（它是 LLM 载荷的确定性前提）。</p>
  */

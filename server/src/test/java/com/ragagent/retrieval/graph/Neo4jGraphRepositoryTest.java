@@ -15,7 +15,7 @@ import com.ragagent.common.graph.GraphRelation;
 import com.ragagent.common.graph.NameSpace;
 
 /**
- * 图仓储的离线契约测试（对照 Go repository.go 的标签推导与 Cypher 文本）：
+ * 图仓储的离线契约测试（标签推导与 Cypher 文本）：
  * 覆盖命名空间 → 标签、驱动缺失时的 no-op 语义、查询文本的关键片段。
  * 真连 Neo4j 的路径（Bolt 会话）与本仓既有约定一致——不上 CI，靠 dev 环境自检。
  */

@@ -18,8 +18,7 @@ import com.ragagent.mcp.domain.McpToolApproval;
 import org.junit.jupiter.api.Test;
 
 /**
- * 对照 Go {@code mcp_usage_instructions.go} 的 {@code buildMCPUsageInput} /
- * {@code mcpUsageExcerpt}。
+ * MCP 使用说明投影的行为契约（{@code buildMCPUsageInput} / {@code mcpUsageExcerpt}）。
  *
  * <p>这段是**提示注入的第一道防线**：只把白名单字段（名称/描述/说明）喂给 LLM，
  * 绝不序列化连接配置或凭据；同时用 100 条 / 24000 字符的预算挡住超大目录。</p>
@@ -50,7 +49,7 @@ class McpUsageInputTest {
     @Test
     void excerptTrimsAndTruncatesByRune() {
         assertEquals("abc", excerpt("  abc  ", 10));
-        // Go: string(runes[:limit-1]) + "…"
+        // 取前 limit-1 个码点再接 "…"
         assertEquals("abc…", excerpt("abcdefgh", 4));
         // 按码点而非 UTF-16 char 计数
         assertEquals("中文…", excerpt("中文字符串", 3));

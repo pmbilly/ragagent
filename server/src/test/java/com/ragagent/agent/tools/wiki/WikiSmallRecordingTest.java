@@ -18,11 +18,11 @@ import com.ragagent.agent.tools.RecordingSupport;
 
 /**
  * wiki 小件（wiki_support 行为 + write/replace/delete/rename/flag/read_issue/update_issue）
- * 的 Go 实录回放。FakeWiki 镜像 /tmp/toolrec45b 探针的 zzFakeWiki。
+ * 的录制回放。FakeWiki 与录制时的同款 fake 一致。
  */
 class WikiSmallRecordingTest {
 
-    // ==================== FakeWiki（镜像 zzFakeWiki） ====================
+    // ==================== FakeWiki ====================
 
     static final class FakeWiki implements WikiPages {
         final Map<String, PageView> pages = new LinkedHashMap<>();

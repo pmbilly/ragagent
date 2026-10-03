@@ -23,10 +23,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * 向量存取与语义召回（对照 Go internal/application/repository/memory_vector.go）。
+ * 向量存取与语义召回。
  *
  * <p><b>测试恒走内存兜底路径</b>：H2 上没有 pgvector（{@code memory_item_embeddings.embedding}
- * 列不存在），{@code vectorColumnReady()} 为 false——与 Go 在 SQLite 上的情形一致。
+ * 列不存在），{@code vectorColumnReady()} 为 false。
  * SQL 排名那条路（{@code <=>} + {@code halfvec}）在测试里**不可达**，已在
  * {@code MemoryItemEmbeddingMapper.rankInDatabase} 的注释里标明。</p>
  *
@@ -286,7 +286,7 @@ class MemoryVectorRepositoryTest {
     @Test
     void searchItemsByVectorSkipsExpiredItems() {
         MemoryItem expired = newItem("过期的", MemoryKinds.KIND_FACT, 3);
-        // createItem 会写全部列，所以到期时间要在插入之后单独改（Go 侧同样由上层写）
+        // createItem 会写全部列，所以到期时间要在插入之后单独改（同样由上层写）
         jdbc.update("UPDATE memory_items SET expires_at = ? WHERE id = ?",
                 OffsetDateTime.now().minusMinutes(1), expired.getId());
         repo.upsertItemEmbedding(scope, embedding(expired, new float[]{1.0f, 0.0f}));
@@ -317,7 +317,7 @@ class MemoryVectorRepositoryTest {
                 .isNull();
     }
 
-    /** {@code limit <= 0} → 20（Go 的 {@code query.Limit} 默认值）。 */
+    /** {@code limit <= 0} → 20（默认页大小）。 */
     @Test
     void searchItemsByVectorUsesTheDefaultLimit() {
         for (int i = 0; i < 25; i++) {

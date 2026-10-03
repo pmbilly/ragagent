@@ -1,10 +1,9 @@
 package com.ragagent.stream;
 
 /**
- * 流存储读写失败（对照 Go 里 {@code fmt.Errorf("failed to ...: %w", err)} 那一批包装错误）。
+ * 流存储读写失败（底层 I/O / Redis 错误的包装）。
  *
- * <p>Go 用 {@code error} 返回，Java 用非受检异常——由全局异常处理器兜成 500，
- * 与 Go 的"往上抛、由 ErrorHandler 统一成信封"路径一致。</p>
+ * <p>非受检异常——由全局异常处理器兜成 500 信封。</p>
  */
 public class StreamStoreException extends RuntimeException {
 

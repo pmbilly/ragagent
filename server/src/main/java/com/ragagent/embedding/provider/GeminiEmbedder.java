@@ -12,13 +12,12 @@ import com.ragagent.embedding.EmbeddingHttp;
 import com.ragagent.common.web.ProviderJson;
 
 /**
- * Gemini 原生 batchEmbedContents embedding 客户端（对照 Go
- * {@code internal/models/embedding/gemini.go} 全文）。
+ * Gemini 原生 batchEmbedContents embedding 客户端。
  *
  * <p>URL：{@code {base}/models/{model}:batchEmbedContents}；鉴权头
  * {@code x-goog-api-key}；模型名剥 {@code models/} 前缀、URL 处剥 {@code /openai}
  * 后缀；请求体的 {@code model} 字段恒带 {@code models/} 前缀。空输入恒返回
- * {@code []}（Go 的 len(texts)==0 早退）。响应数量与输入不等时报错。</p>
+ * {@code []}（空列表早退）。响应数量与输入不等时报错。</p>
  */
 public final class GeminiEmbedder extends BaseEmbedder {
 
@@ -58,8 +57,8 @@ public final class GeminiEmbedder extends BaseEmbedder {
             return List.of();
         }
 
-        // 对照 geminiBatchEmbedRequest：requests[] 每项 model/content(/taskType/
-        // output_dimensionality omitempty)
+        // 请求体：requests[] 每项 model/content(/taskType/
+        // output_dimensionality 空则省略)
         ObjectNode root = ProviderJson.object();
         ArrayNode requests = root.putArray("requests");
         for (String text : texts) {

@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 内存版 {@link OAuthStateRedis}（对照 Go 测试里 Lite 分支以外的"Redis 存在"路径）。
+ * 内存版 {@link OAuthStateRedis}（模拟 Redis 后端在位的路径）。
  *
  * <p>刻意实现成"带 TTL 的 map"而不是 no-op，才能验证 Redis 分支真正的差异点：
  * state / attempt 成对写入、{@code getAndDelete} 的<b>原子单次消费</b>、

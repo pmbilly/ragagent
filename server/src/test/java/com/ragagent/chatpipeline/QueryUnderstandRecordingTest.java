@@ -24,8 +24,8 @@ import com.ragagent.session.domain.MessageAttachment;
 import com.ragagent.llm.extract.PipelineConfig;
 
 /**
- * 实录回放：query_understand 族 + load_history + history_messages
- * （期望值 = {@link GoRecording46C} 的 Go 实录常量；墙钟段两侧 DATE/WEEKDAY 掩码）。
+ * 录制回放：query_understand 族 + load_history + history_messages
+ * （期望值 = {@link GoRecording46C} 的录制常量；墙钟段以 DATE/WEEKDAY 掩码）。
  */
 class QueryUnderstandRecordingTest {
 

@@ -19,17 +19,15 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 /**
  * 流事件进出 Redis 用的 ObjectMapper（**不是** HTTP 响应那个）。
  *
- * <p><b>2026-10-03（B38）</b>：Go 版已下线、不再双跑——不再复刻 Go 的
- * {@code encoding/json} 转义（{@code < > &} 形态）。以下两处保留：</p>
+ * <p>本 mapper 与 HTTP 响应那个的差异，以下两处保留：</p>
  * <ol>
  *   <li><b>map 按键字母序</b>：{@code UpdateSteerEventData} 的 CAS 把**读到的原文**
  *       与 LSET 前的槽位比对——同一 data 必须序列化出<b>稳定字节</b>，键序不能随机。</li>
  *   <li><b>timestamp 用本地时区 + ISO_OFFSET_DATE_TIME</b>：与
  *       {@code config.JacksonConfig} 对 OffsetDateTime 的处置一致（RFC3339Nano，
- *       纳秒尾部零裁剪），见约定 §9「Go 时间序列化」。该覆盖在 JavaTimeModule
+ *       纳秒尾部零裁剪）。该覆盖在 JavaTimeModule
  *       之后注册（后者后注册者胜），由 {@code StreamJsonTest} 钉住。</li>
- *   <li><b>容忍未知属性</b>：Go 的 {@code json.Unmarshal} 默认忽略未知字段，
- *       Jackson 默认失败。旧版本写下的行不能因为多了个字段就整条读不出来。</li>
+ *   <li><b>容忍未知属性</b>：Jackson 默认失败，这里关闭——旧版本写下的行不能因为多了个字段就整条读不出来。</li>
  * </ol>
  */
 public final class StreamJson {
@@ -63,7 +61,7 @@ public final class StreamJson {
     }
 
     /**
-     * 序列化单个字符串（对照 Go 的 {@code json.Marshal(id)}）。
+     * 序列化单个字符串（连引号的 JSON 字面量）。
      *
      * <p>{@code ClearLiveRun} 的 CAS 要在原始 JSON 里做子串匹配
      * （{@code "assistant_message_id":<这里>}），所以引号与转义必须由同一个

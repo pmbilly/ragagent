@@ -9,11 +9,10 @@ import com.ragagent.memory.domain.MemoryVectors;
 import org.junit.jupiter.api.Test;
 
 /**
- * 向量编解码与相似度（对照 Go internal/types/memory.go L1389-1451）。
+ * 向量编解码与相似度。
  *
- * <p><b>最容易分叉的是 {@code FormatEmbeddingLiteral}</b>：Go 用的是
- * {@code strconv.FormatFloat(float64(v), 'f', -1, 32)}——定点格式、能唯一往返 float32
- * 的最少位数。Java 直接 {@code Float.toString} 会在两处不同：整数值多 {@code ".0"}、
+ * <p><b>最容易分叉的是 {@code formatEmbeddingLiteral}</b>：输出是定点格式、能唯一往返
+ * float32 的最少位数。直接用 {@code Float.toString} 会在两处不同：整数值多 {@code ".0"}、
  * {@code <1e-3} 或 {@code >=1e7} 时改用指数记法。所以断言里逐条钉住这两种情形。</p>
  */
 class MemoryVectorsTest {
@@ -48,7 +47,7 @@ class MemoryVectorsTest {
         assertThat(back).containsExactly(original);
     }
 
-    /** {@code len(raw) < 4} 回 null；尾部不足 4 字节的部分被丢弃（Go 的 {@code len/4}）。 */
+    /** 不足 4 字节回 null；尾部不足 4 字节的部分被丢弃（每 4 字节解出一个 float）。 */
     @Test
     void decodeEmbeddingHandlesShortAndRaggedInput() {
         assertThat(MemoryVectors.decodeEmbedding(null)).isNull();
@@ -59,7 +58,7 @@ class MemoryVectorsTest {
 
     // ── pgvector 字面量 ────────────────────────────────────────────────────
 
-    /** 语料逐条来自 Go 的 {@code FormatEmbeddingLiteral} 实录。 */
+    /** 语料逐条来自 {@code formatEmbeddingLiteral} 的实测输出。 */
     @Test
     void formatEmbeddingLiteralRendersPinnedDecimalNotExponent() {
         assertThat(MemoryVectors.formatEmbeddingLiteral(new float[]{1.0f}))
@@ -83,11 +82,11 @@ class MemoryVectorsTest {
      * ⚠️ **本模块自己踩到的坑**：Java 的 {@code Float.toString} 在次正规数上不是最短表示。
      *
      * <pre>
-     *   Go   FormatFloat(1.4e-45, 'f', -1, 32) → 0.000000000000000000000000000000000000000000001  (1e-45)
+     *   目标格式（定点、最短往返）: 1.4e-45f → 0.000000000000000000000000000000000000000000001  (1e-45)
      *   Java Float.toString(1.4e-45f)          → "1.4E-45"
      * </pre>
-     * <p>照抄 {@code Float.toString} 就会在这里与 Go 分叉——与 §9 记的
-     * {@code GoDoubleSerializer} 是同一个坑。</p>
+     * <p>直接用 {@code Float.toString} 就会在这里分叉——与 {@code GoDoubleSerializer}
+     * 防的是同一个坑。</p>
      */
     @Test
     void formatEmbeddingLiteralUsesShortestRoundTripForSubnormals() {
@@ -103,7 +102,7 @@ class MemoryVectorsTest {
         assertThat(MemoryVectors.formatEmbeddingLiteral(null)).isEmpty();
     }
 
-    /** 三个非常规值逐条对齐 Go 的 {@code FormatFloat}：{@code NaN} / {@code +Inf} / {@code -Inf}。 */
+    /** 三个非常规值逐条钉死输出文案：{@code NaN} / {@code +Inf} / {@code -Inf}。 */
     @Test
     void formatEmbeddingLiteralSpecialValuesMatchGo() {
         assertThat(MemoryVectors.formatFloat32(Float.NaN)).isEqualTo("NaN");

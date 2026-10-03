@@ -35,7 +35,7 @@ import com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbBm25.SparseV
  * （DF 与语料统计取自 {@code bm25_zh_default.json}：b=0.75、k1=1.2、doc_count=382835、
  * avg_doc_len=245.61638；测试用内存参数表复现同值——不依赖 85 MB 的线上文件。）</p>
  *
- * <p><b>分词接缝</b>：这里用"按 token ID 直算"的口绕开分词（Go 的 ID 由 gse/jieba 分词后
+ * <p><b>分词接缝</b>：这里用"按 token ID 直算"的口绕开分词（token ID 由分词后
  * murmur3 得到）；Java 默认分词是仓库既有近似实现，<b>与 jieba 不逐词一致</b>——故只校验
  * 哈希与 BM25 数学（它们与分词无关），分词差异见 known-issues。</p>
  */

@@ -95,8 +95,8 @@ public class KnowledgeMoveService {
      * <p><b>已知差异（2026-09-25 写链改道 + reparse 收尾后更新）</b>：reuse_vectors 模式已搬
      * 向量行（同店 + 同模型校验后 MoveKnowledgeIndices——绑定店走引擎口、未绑定走 postgres
      * cleanupMovedSourceWiki / EnqueueWikiIngest 随 wiki 消费面）、transfer-state 续跑/重试
-     * 语义不翻译（Java 无该状态机，见 {@code moveOneKnowledgeRow} 注释）；任务队列 的
-     * retry/marker 语义不翻译（既有取舍）。</p>
+     * 语义未实现（Java 无该状态机，见 {@code moveOneKnowledgeRow} 注释）；任务队列 的
+     * retry/marker 语义同样未实现（既有取舍）。</p>
      */
     public void startKnowledgeMove(long tenantId, String taskId, List<String> knowledgeIds,
                                    String sourceKbId, String targetKbId, String mode) {

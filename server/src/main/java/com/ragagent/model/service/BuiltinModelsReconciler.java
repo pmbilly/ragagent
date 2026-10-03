@@ -21,18 +21,17 @@ import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 
 /**
- * 对照 Go types/builtin_models_config.go LoadBuiltinModelsConfig：
  * 声明式内置模型（config/builtin_models.yaml，env BUILTIN_MODELS_CONFIG 可覆盖）与
  * models 表的 YAML 托管切片（managed_by='yaml'）对账。
  *
- * 生命周期契约（逐条对照 Go 注释）：
+ * 生命周期契约：
  * - 只写 managed_by='yaml' 行；UI/API/SQL 创建的同名行（managed_by=''）保留不动
  * - 逐条 UPSERT（deleted_at 强制复位 NULL）；运行时覆盖（系统管理员编辑清空 managed_by）保留
  * - 对账清扫：文件里消失且 managed_by='yaml' 的行软删除
  * - is_default 维持 (tenant_id, type) 桶内唯一
  * - 文件缺失/目录/解析失败 → no-op（清扫不跑）
  *
- * 阶段说明：Java 仓默认不捆绑 builtin_models.yaml（Go 仓同样没有）→ 默认 no-op。
+ * 默认不捆绑 builtin_models.yaml → 默认 no-op。
  */
 @Component
 public class BuiltinModelsReconciler implements ApplicationRunner {
@@ -89,7 +88,7 @@ public class BuiltinModelsReconciler implements ApplicationRunner {
                         i, id, type);
                 continue;
             }
-            // 运行时覆盖保留（含软删除的手工行，对照 Unscoped 检查）
+            // 运行时覆盖保留（含软删除的手工行，查询不过滤 deleted_at）
             Model existing = modelMapper.selectById(id);
             if (existing != null && !MANAGED_BY_YAML.equals(str(existing.getManagedBy()))) {
                 log.info("[builtin-models] preserving runtime override: id={}", id);
@@ -146,9 +145,9 @@ public class BuiltinModelsReconciler implements ApplicationRunner {
     }
 
     /**
-     * INSERT ... ON CONFLICT(id) DO UPDATE（对照 clause.OnConflict DoUpdates 列集）。
-     * 更新路径不携带 created_at：MyBatis-Plus 非空字段全量 SET，实体的 createdAt
-     * 恒为 now，会把已存在行的 created_at 每次启动改写（Go 的 DOUpdates 列集不含它）。
+     * INSERT ... ON CONFLICT(id) DO UPDATE。
+     * 更新列集不含 created_at：MyBatis-Plus 非空字段全量 SET，实体的 createdAt
+     * 恒为 now，不携带它才能避免已存在行的 created_at 每次启动被改写。
      */
     private void upsert(Model m) {
         com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper<Model> uw =
@@ -210,7 +209,7 @@ public class BuiltinModelsReconciler implements ApplicationRunner {
         return p;
     }
 
-    /** 对照 interpolateBuiltinModelEnv：${NAME} 用 env 替换，未设置保留字面量 */
+    /** ${NAME} 用 env 替换，未设置保留字面量 */
     static String interpolateEnv(String s) {
         java.util.regex.Matcher m = ENV_PATTERN.matcher(s);
         StringBuilder sb = new StringBuilder();

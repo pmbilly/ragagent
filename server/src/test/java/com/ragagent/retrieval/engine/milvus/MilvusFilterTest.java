@@ -80,7 +80,7 @@ class MilvusFilterTest {
         params.tagIds = List.of("t1");
         params.excludeKnowledgeIds = List.of("k9");
         params.excludeChunkIds = List.of("c9");
-        // 左结合全括号（照 Go：每一步把已有结果整体加括号再与下一项连接）
+        // 左结合全括号（每一步把已有结果整体加括号再与下一项连接）
         assertThat(MilvusRetrieveRepository.baseFilter(params)).isEqualTo(
                 "(((((knowledge_base_id in [\"kb1\"]) and (knowledge_id in [\"k1\",\"k2\"])) "
                         + "and (tag_id in [\"t1\"])) and (knowledge_id not in [\"k9\"])) "

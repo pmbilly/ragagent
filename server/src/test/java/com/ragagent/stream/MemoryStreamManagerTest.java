@@ -19,12 +19,12 @@ import com.ragagent.common.llm.ResponseType;
 import org.junit.jupiter.api.Test;
 
 /**
- * 内存流管理器的语义（对照 Go {@code internal/stream/memory_manager.go} 及其测试）。
+ * 内存流管理器的语义。
  *
  * <p>重点钉两类行为：</p>
  * <ul>
- *   <li><b>Go 的值语义</b>：{@code AppendEvent} 收的是值，补时间戳不该写回调用方的对象
- *       （Java 的对象是引用语义，靠 {@code copy()} 复刻）。</li>
+ *   <li><b>值语义</b>：{@code AppendEvent} 收的是值，补时间戳不该写回调用方的对象
+ *       （引用语义下靠 {@code copy()} 保证）。</li>
  *   <li><b>live-run 的排他性</b>：{@code SetLiveRun} 是第二个引擎的闸门，
  *       接手的后续轮次只能走 {@code ClaimLiveRun}。</li>
  * </ul>
@@ -44,7 +44,6 @@ class MemoryStreamManagerTest {
 
     @Test
     void setLiveRunRejectsADifferentAssistantButClaimOverwrites() {
-        // 对照 Go TestMemorySetLiveRunRejectsADifferentAssistant
         manager.setLiveRun("sess-1", "assist-1", "req-1");
 
         assertThrows(LiveRunExistsException.class,
@@ -82,7 +81,7 @@ class MemoryStreamManagerTest {
 
     @Test
     void appendEventStampsTheTimestampWithoutMutatingTheCaller() {
-        // Go 的 AppendEvent 收值，补时间戳不写回调用方 —— Java 用 copy() 复刻
+        // AppendEvent 收值，补时间戳不写回调用方（copy() 保证）
         StreamEvent event = new StreamEvent("e-1", ResponseType.ANSWER, "chunk", false);
         assertNull(event.getTimestamp(), "调用方的对象不该被补上时间戳");
 
@@ -124,14 +123,14 @@ class MemoryStreamManagerTest {
 
     @Test
     void appendSteerEventsDeduplicatesClientIds() throws Exception {
-        // 对照 Go TestAppendSteerEventsDeduplicatesClientIDs（内存分支）
+        // 客户端 ID 去重（内存分支）
         int threads = 8;
         ExecutorService pool = Executors.newFixedThreadPool(threads);
         try {
             List<Callable<Void>> tasks = new ArrayList<>();
             for (int i = 0; i < threads; i++) {
                 tasks.add(() -> {
-                    // 每个线程自己的实例——Go 的 []StreamEvent{evt} 也是复制了一份
+                    // 每个线程自己的实例——列表元素是各自独立的副本
                     StreamEvent evt = new StreamEvent("same-client-id", ResponseType.STEER, "do this next",
                             false);
                     evt.setData(Map.of("delivery", "after"));

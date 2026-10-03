@@ -52,7 +52,7 @@ public class OAuthManager {
         this.states = states;
     }
 
-    /** 测试可见：state 存储（Go 测试直接读 {@code manager.states}）。 */
+    /** 测试可见：state 存储。 */
     public OAuthStateStore states() {
         return states;
     }

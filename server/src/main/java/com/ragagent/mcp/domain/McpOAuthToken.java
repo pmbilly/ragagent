@@ -26,9 +26,9 @@ import com.baomidou.mybatisplus.annotation.TableName;
  *
  * 落库行为清单：
  * <ul>
- *   <li>表名 {@code mcp_oauth_tokens}（Go 显式 TableName）</li>
- *   <li>钩子 BeforeCreate/BeforeSave：加密 access_token / refresh_token → TypeHandler</li>
- *   <li>钩子 AfterFind：宽容解密 → TypeHandler 读路径</li>
+ *   <li>表名 {@code mcp_oauth_tokens}</li>
+ *   <li>写入前：加密 access_token / refresh_token → TypeHandler</li>
+ *   <li>读取后：宽容解密 → TypeHandler 读路径</li>
  *   <li>无 DeletedAt（唯一索引 idx_mcp_oauth_tokens_tenant_principal_svc）→ 硬删除</li>
  * </ul>
  */

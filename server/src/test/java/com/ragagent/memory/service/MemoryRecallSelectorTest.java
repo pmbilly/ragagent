@@ -15,11 +15,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 /**
- * {@link MemoryRecallSelector} 的纯函数部分（对照 Go recall_trace.go 的
- * {@code mergeVectorHits} / {@code selectResidentInterests}）。
+ * {@link MemoryRecallSelector} 的纯函数部分
+ * （{@code mergeVectorHits} / {@code selectResidentInterests}）。
  *
- * <p>期望值全部是 Go 实录（{@code go test -run TestTruthMergeHits} /
- * {@code TestTruthResidentInterests}）。</p>
+ * <p>期望值全部实测钉死。</p>
  */
 class MemoryRecallSelectorTest {
 
@@ -73,7 +72,7 @@ class MemoryRecallSelectorTest {
             MemoryRecallSelector.MergedHits merged =
                     MemoryRecallSelector.mergeVectorHits(pool, hits, null);
 
-            // Go 实录：ranking [1,3,0]、pool ["i1","i2","i3","i5"]、added 1
+            // 实测：ranking [1,3,0]、pool ["i1","i2","i3","i5"]、added 1
             assertThat(merged.ranking()).containsExactly(1, 3, 0);
             assertThat(ids(merged.pool())).containsExactly("i1", "i2", "i3", "i5");
             assertThat(merged.added()).isEqualTo(1);
@@ -92,7 +91,7 @@ class MemoryRecallSelectorTest {
             MemoryRecallSelector.MergedHits merged =
                     MemoryRecallSelector.mergeVectorHits(pool, hits, Set.of("i1"));
 
-            // Go 实录：ranking [1,3]、pool ["i1","i2","i3","i5"]、added 1
+            // 实测：ranking [1,3]、pool ["i1","i2","i3","i5"]、added 1
             assertThat(merged.ranking()).containsExactly(1, 3);
             assertThat(ids(merged.pool())).containsExactly("i1", "i2", "i3", "i5");
             assertThat(merged.added()).isEqualTo(1);
@@ -104,7 +103,7 @@ class MemoryRecallSelectorTest {
             MemoryRecallSelector.MergedHits merged =
                     MemoryRecallSelector.mergeVectorHits(pool, null, null);
 
-            // Go 实录：ranking null、pool ["i1","i2","i3"]、added 0
+            // 实测：ranking null、pool ["i1","i2","i3"]、added 0
             assertThat(merged.ranking()).isNull();
             assertThat(ids(merged.pool())).containsExactly("i1", "i2", "i3");
             assertThat(merged.added()).isZero();
@@ -117,36 +116,36 @@ class MemoryRecallSelectorTest {
 
         @Test
         void reportsOnlyTheQuestionsOwnMatchesAndInjectsTheRestAsFiller() {
-            // ⚠️ 不能用 List.of(i3(), null)：它拒绝 null 元素（Go 的切片可以有 nil 条目）。
+            // ⚠️ 不能用 List.of(i3(), null)：它拒绝 null 元素（列表需允许 null 条目）。
             List<MemoryItem> interests = new ArrayList<>();
             interests.add(i3());
             interests.add(null);
             MemoryRecallSelector.Selected picked =
                     MemoryRecallSelector.selectResidentInterests("医疗影像的分割怎么调", interests, 5);
 
-            // Go 实录：selected ["i3","<nil>"]、relevant ["i3"]
-            // —— 上限还有位置，所以 nil 那条也被填进去了；但只有真的匹配上的进 relevant。
+            // 实测：selected ["i3","<nil>"]、relevant ["i3"]
+            // —— 上限还有位置，所以 null 那条也被填进去了；但只有真的匹配上的进 relevant。
             assertThat(ids(picked.selected())).containsExactly("i3", "<nil>");
             assertThat(ids(picked.relevant())).containsExactly("i3");
         }
 
         @Test
         void fillsFromRepositoryOrderWhenNothingMatches() {
-            // ⚠️ 不能用 List.of(i3(), null)：它拒绝 null 元素（Go 的切片可以有 nil 条目）。
+            // ⚠️ 不能用 List.of(i3(), null)：它拒绝 null 元素（列表需允许 null 条目）。
             List<MemoryItem> interests = new ArrayList<>();
             interests.add(i3());
             interests.add(null);
             MemoryRecallSelector.Selected picked =
                     MemoryRecallSelector.selectResidentInterests("完全无关的问题", interests, 1);
 
-            // Go 实录：selected ["i3"]、relevant []
+            // 实测：selected ["i3"]、relevant []
             assertThat(ids(picked.selected())).containsExactly("i3");
             assertThat(picked.relevant()).isEmpty();
         }
 
         @Test
         void emptyInputsProduceEmptyOutputs() {
-            // Go 实录：selected []、relevant []
+            // 实测：selected []、relevant []
             MemoryRecallSelector.Selected picked =
                     MemoryRecallSelector.selectResidentInterests("q", null, 5);
             assertThat(picked.selected()).isNull();

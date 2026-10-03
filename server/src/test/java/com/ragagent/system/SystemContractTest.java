@@ -31,21 +31,21 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 /**
- * 系统管理端契约测试（波 2 收官批：/system 组 7 条 + /system/admin 组 16 条）。
- * golden：record-system-golden.sh（sys-* / adm-*，全部 Go dev 实录）。
+ * 系统管理端契约测试（/system 组 7 条 + /system/admin 组 16 条）。
+ * golden：record-system-golden.sh（sys-* / adm-*）。
  *
- * <p>种子严格复刻录制脚本：租户 10002 + 系统管理员 javasysadmin（is_system_admin=true，
+ * <p>种子严格按录制脚本：租户 10002 + 系统管理员 javasysadmin（is_system_admin=true，
  * owner 成员行）+ 基线 owner/viewer。掩码：UUID / 时间戳 / key 数字 id / key 明文 /
  * quota affected / started_at / uptime_seconds / db_version / timestamp。</p>
  *
  * <p><b>部署状态差异（不做 golden 字节比对的条目，报告注明）</b>：</p>
  * <ul>
- *   <li>capabilities：Go dev 已注册 agents/im/embed 路由，
- *       Java 均未翻译 → supported=false。按 Java 部署断言 + 与 golden 的键集对比；</li>
+ *   <li>capabilities：录制环境的路由注册与本部署不同 → 不做字节比对，
+ *       按本部署断言 + 与 golden 的键集对比；</li>
  *   <li>parser-engines（与 check）：golden 打了真 docreader（connected=true，远端覆盖
  *       builtin 描述/文件类型 + markitdown/opendataloader 追加）；测试禁真实网络 →
- *       connected=false 分支按 Go 源（静态注册表）内联断言；</li>
- *   <li>info 的 db_version：Go=golang-migrate 97；Java 在 H2 无 flyway_schema_history →
+ *       connected=false 分支按静态注册表内联断言；</li>
+ *   <li>info 的 db_version：录制环境为 golang-migrate 97；本仓在 H2 无 flyway_schema_history →
  *       键省略（掩码比对）。</li>
  * </ul>
  */
@@ -164,8 +164,8 @@ class SystemContractTest {
         for (String key : subsetKeys(goldenCaps).split("\\|")) {
             assertThat(java).contains(key);
         }
-        // Java 部署：api/mcp/websearch/vectorstore/storage=true；agents 随波 3 agents 批
-        // 注册（routes_agent.go 的 agents 家族落地）→ supported=true；其余 route_not_registered
+        // 本部署：api/mcp/websearch/vectorstore/storage=true；agents 家族已注册
+        // → supported=true；其余 route_not_registered
         assertThat(java).contains("\"agents\":{\"reason\":null,\"supported\":true}");
         assertThat(java).contains("\"integrations.api\":{\"reason\":null,\"supported\":true}");
         assertThat(java).contains("\"settings.mcp\":{\"reason\":null,\"supported\":true}");
@@ -195,7 +195,7 @@ class SystemContractTest {
         assertEquals(200, r.getResponse().getStatus(), raw(r));
     }
 
-    /** scoped/full key 无 X-Tenant-ID → 409 TENANT_REQUIRED（平台 Key 专属文案，Go 实录）。 */
+    /** scoped/full key 无 X-Tenant-ID → 409 TENANT_REQUIRED（平台 Key 专属文案，录制钉住）。 */
     @Test
     void capabilitiesWithApiKeyWithoutTenant() throws Exception {
         String key = createPlatformKeyRaw();
@@ -207,7 +207,7 @@ class SystemContractTest {
         deletePlatformKey(key);
     }
 
-    /** info：掩码 db_version/started_at/uptime_seconds 后与 Go golden 字节比对。 */
+    /** info：掩码 db_version/started_at/uptime_seconds 后与 golden 字节比对。 */
     @Test
     void infoMatchesGo() throws Exception {
         MvcResult r = mockMvc.perform(get("/api/v1/system/info")
@@ -216,7 +216,7 @@ class SystemContractTest {
         assertEquals(maskInfo(golden("sys-info.json")), maskInfo(raw(r)));
     }
 
-    /** parser-engines：测试禁网络 → connected=false 的静态注册表形态（Go 源内联断言）。 */
+    /** parser-engines：测试禁网络 → connected=false 的静态注册表形态（内联断言）。 */
     @Test
     void parserEnginesOfflineShape() throws Exception {
         MvcResult r = mockMvc.perform(get("/api/v1/system/parser-engines")
@@ -534,7 +534,7 @@ class SystemContractTest {
         assertThat(mask(raw(created))).contains("\"token\":\"<keytoken>\"");
         assertEquals(mask(golden("adm-key-create.json")), mask(raw(created)));
 
-        // 列表（掩码 id；录制序：list 在 key 被使用之前——Go 的 last_used_at 触碰
+        // 列表（掩码 id；录制序：list 在 key 被使用之前——last_used_at 的触碰
         // 在 AuthenticateAPIKey，list 先行才与 golden 的键省略一致）
         MvcResult list = mockMvc.perform(get("/api/v1/system/admin/api-keys")
                 .header("Authorization", sysAdmin)).andReturn();

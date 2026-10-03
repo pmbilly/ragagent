@@ -31,12 +31,10 @@ class StreamJsonTest {
 
     @Test
     void eventBytesStableWithSortedKeys() {
-        // B38：Go 版已下线——不再复刻 Go 转义；本用例钉住「键序 + 结构 + 字节稳定」
-        //      "data":{"alpha":"a","consumed":true,"zebra":1},
-        //      "usage":{"prompt_tokens":3,"completion_tokens":4,"total_tokens":7,"cache_reported":false}}
+        // 本用例钉住「键序 + 结构 + 字节稳定」
         StreamEvent event = new StreamEvent("e-1", ResponseType.ANSWER, "hi <b>&</b>", true);
         event.setTimestamp(OffsetDateTime.of(2026, 9, 18, 10, 30, 0, 123_456_000, ZoneOffset.ofHours(8)));
-        // 刻意乱序插入：Go 的 map 按 key 字母序输出，Java 侧必须对齐
+        // 刻意乱序插入：序列化按 key 字母序输出，必须对齐
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("zebra", 1);
         data.put("alpha", "a");
@@ -60,7 +58,7 @@ class StreamJsonTest {
 
     @Test
     void omitsEmptyDataAndUsage() {
-        // Go: {"id":"e-2","type":"steer","content":"","done":false,"timestamp":"..."}
+        // 期望形状（data/usage 为空时整键省略）：{"id":"e-2","type":"steer","content":"","done":false,"timestamp":"..."}
         StreamEvent event = new StreamEvent("e-2", ResponseType.STEER, "", false);
         event.setTimestamp(OffsetDateTime.now());
 
@@ -72,7 +70,7 @@ class StreamJsonTest {
 
     @Test
     void stringEscapingIsStandardJackson() {
-        // 标准 Jackson 输出（B38 起不再对齐 Go）：
+        // 标准 Jackson 输出：
         //   · < > &       → 原样输出
         //   · 0x08 / 0x0C → \b / \f 短转义
         //   · 0x00 / 0x1F → \\u0000 / \\u001F（大写十六进制）
@@ -89,13 +87,13 @@ class StreamJsonTest {
 
     @Test
     void nonAsciiPassesThroughUnescaped() {
-        // Go 只在 escapeHTML 下动 < > &，中文原样输出
+        // < > & 不做 HTML 转义，非 ASCII 原样输出
         assertEquals("\"中文 ok\"", StreamJson.write("中文 ok"));
     }
 
     @Test
     void liveRunPayloadMatchesGo() {
-        // Go: {"assistant_message_id":"msg-1","request_id":"req-1"}
+        // 期望形状：{"assistant_message_id":"msg-1","request_id":"req-1"}
         assertEquals(
                 "{\"assistant_message_id\":\"msg-1\",\"request_id\":\"req-1\"}",
                 StreamJson.write(new LiveRunPayload("msg-1", "req-1")));
@@ -110,7 +108,7 @@ class StreamJsonTest {
 
     @Test
     void timestampIsRfc3339NanoInLocalZone() {
-        // 形状与 Go 的 time.Time 一致：纳秒尾部零裁剪
+        // 时间戳形状：RFC3339 纳秒、尾部零裁剪
         OffsetDateTime instant = OffsetDateTime.of(2026, 9, 18, 10, 30, 0, 123_456_000, ZoneOffset.ofHours(8));
         StreamEvent event = new StreamEvent("t", ResponseType.ANSWER, "x", false);
         event.setTimestamp(instant);
@@ -127,7 +125,7 @@ class StreamJsonTest {
 
     @Test
     void readsGoWrittenJsonIncludingUnknownKeys() {
-        // Go 的行可能带 Java 尚未建模的键；json.Unmarshal 默认忽略，Java 侧必须同样宽容
+        // 线上行可能带尚未建模的键；反序列化默认忽略未知字段，必须同样宽容
         String goRow = "{\"id\":\"e-9\",\"type\":\"answer\",\"content\":\"c\",\"done\":false,"
                 + "\"timestamp\":\"2026-09-18T10:30:00+08:00\",\"some_future_key\":42}";
 

@@ -21,9 +21,9 @@ import com.ragagent.support.ContractJson;
  * 引擎录制回放：Java 引擎用同一脚本驱动，事件序列 / AgentState 快照 /
  * stub 收到的消息与选项 / steer 注入路径与 {@link GoRecording46B} 的录制常量比对。
  *
- * <p><b>2026-10-03（B40）</b>：比对方式从「逐字节」升级为「{@link com.ragagent.support.ContractJson#deep}
- * 语义比较」——Go 版已下线，键序 / HTML 转义形态 / 时间写法不再构成断言目标；
- * 实录文件保留为历史基准（禁止手改）。</p>
+ * <p>比对方式为「{@link com.ragagent.support.ContractJson#deep}
+ * 语义比较」：键序 / HTML 转义形态 / 时间写法不再构成断言目标；
+ * 录制文件保留为历史基准（禁止手改）。</p>
  *
  * <p>掩码约定见 {@link Engine46bStubSupport}。LLM 全走 stub（纪律：真实 LLM 链路零测试）；
  * 全部纯单测，无 @SpringBootTest。</p>
@@ -31,9 +31,9 @@ import com.ragagent.support.ContractJson;
 class EngineRecordingTest {
 
     /**
-     * 实录语义比较（B40 基线重建）：两侧经 {@link ContractJson#deep} 归一后比较——
+     * 录制语义比较：两侧经 {@link ContractJson#deep} 归一后比较——
      * 键序 / HTML 转义形态 / 时间写法不再构成断言目标（与 ContractJson 的既定方针一致；
-     * Go 版已下线，GoRecording* 实录保留为历史基准，不再逐字节对齐）。
+     * GoRecording* 常量保留为历史基准，不再逐字节对齐）。
      */
     private static void assertRecording(String actual, String recording) {
         assertThat(ContractJson.deep(actual)).isEqualTo(ContractJson.deep(recording));

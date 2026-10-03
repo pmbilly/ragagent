@@ -27,14 +27,14 @@ import com.ragagent.llm.chat.LlmTransport;
 import com.sun.net.httpserver.HttpServer;
 
 /**
- * WeKnoraCloud 界面的 VLM（W5γ4.19 小账批补齐）——对照 Go {@code vlm/weknoracloud.go}：
+ * WeKnoraCloud 界面的 VLM：
  * {@code POST /api/v1/chat/completions}，multipart 内容（text + 各图 data URI）、
  * {@code max_tokens=5000}、{@code temperature=0.1}、{@code stream=false}；鉴权走
  * 六个签名头（{@code WeknoraCloudSign}，与 chat/embedding/rerank 同一份实现）；
- * {@code extra.remote_model_name} 覆盖模型名；错误族照 Go 原文。
+ * {@code extra.remote_model_name} 覆盖模型名；错误文案为既定原文。
  *
  * <p>签名校验：用**抓到的头**（request-id/timestamp/nonce）与**实际发出的 body** 独立重算
- * 一遍（Go 的算法：md5(sorted rfc3986 k=v & …)，body 先取 md5）——钉住"VLM 路径确实按
+ * 一遍（算法：md5(sorted rfc3986 k=v & …)，body 先取 md5）——钉住"VLM 路径确实按
  * 该算法签名且 body 哈希覆盖的是发出去的 JSON"。</p>
  */
 class VlmWeKnoraCloudTest {
@@ -201,7 +201,7 @@ class VlmWeKnoraCloudTest {
         assertThat(calls).isEmpty();
     }
 
-    /** 测试本地重算 Go 的签名（独立于生产实现）。 */
+    /** 测试本地重算签名（独立于生产实现）。 */
     private static String goSignature(String appId, String apiKey, String requestId,
             String timestamp, String nonce, String bodyJson) throws Exception {
         String bodyHash = md5(bodyJson == null || bodyJson.isEmpty() ? "{}" : bodyJson);

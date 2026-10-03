@@ -128,7 +128,7 @@ class AgentStepsJsonTest {
         assertThat(write((List<AgentStep>) null)).isEqualTo("null");
     }
 
-    /** {@code result} 没有 omitempty：nil 也要输出 {@code "result":null}。 */
+    /** {@code result} 键恒出现：null 也要输出 {@code "result":null}。 */
     @Test
     void nilResultStillEmitsTheKey() throws Exception {
         ToolCall call = new ToolCall();

@@ -1,7 +1,6 @@
 package com.ragagent.mcp.protocol;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -28,7 +27,7 @@ import org.junit.jupiter.api.Test;
  * 协议行为的端到端用例（内嵌 MCP 服务端桩）：initialize 握手 + session 回传 +
  * notifications/initialized + 各方法的线上形状 + 传输层分支与拒绝分支。
  *
- * <p>对照 Go：mcp-go 的 {@code client.Client} 已实现的这些行为，在本项目里由
+ * <p>第三方 SDK（mcp-go 的 {@code client.Client}）已实现的这些行为，在本项目里由
  * {@link StreamableHttpTransport} + {@link DefaultMcpClient} 自研承担。</p>
  */
 class McpClientProtocolTest {
@@ -122,7 +121,7 @@ class McpClientProtocolTest {
                 assertNull(e.code(), "SDK 自带错误在 Go 侧不对应任何哨兵");
                 assertTrue(!server.initializedNotificationSeen, "版本校验失败时不得补发 initialized 通知");
 
-                // 握手失败 → initialized 未置位 → 后续调用按"未初始化"拒绝（照 Go 的 initialized 标志）
+                // 握手失败 → initialized 未置位 → 后续调用按"未初始化"拒绝（initialized 标志位）
                 McpException notConnected = assertThrows(McpException.class, () -> client.listTools(ctx()));
                 assertTrue(notConnected.hasCode(McpErrorCode.NOT_CONNECTED));
                 client.disconnect();

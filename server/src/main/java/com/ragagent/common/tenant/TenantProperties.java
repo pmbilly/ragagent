@@ -5,8 +5,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * tenant 配置段（WEKNORA_TENANT_* env / application.yml）。
  *
- * - enableRbac：指针语义（Go *bool），null → 默认 true（对照 IsRBACEnforced：
- *   "operator did not opt out" 即为强制）。env: WEKNORA_TENANT_ENABLE_RBAC
+ * - enableRbac：可空布尔，null → 默认 true（未显式关闭即强制开启，
+ *   "operator did not opt out"）。env: WEKNORA_TENANT_ENABLE_RBAC
  * - enableCrossTenantAccess：随空间分享裁撤（跨租户授予链已退役）。
  * - selfServiceCreationEnabled：指针语义，null → 默认 true
  *   （对照 TenantConfig.IsSelfServiceCreationEnabled）。

@@ -8,9 +8,8 @@ import java.util.Map;
  * GitLab 出站 URL 的转义原语：{@code PathEscape} / {@code PathUnescape} /
  * {@code Values.Encode}。
  *
- * <p><b>2026-10-03（B47）</b>：原 {@code GoUrl} 改名——转义集合源自 Go {@code net/url}
- * 的历史对齐；B46 已用 95 位可打印 ASCII 全表实测裁决<b>保留行为</b>（与 JDK/Spring
- * 原生编码器有 7+2 处语义差异，替换会改出站 URL 字节）。</p>
+     * <p>转义规则按 GitLab 侧语义实现；已用 95 位可打印 ASCII 全表实测<b>保留行为</b>
+     * （与 JDK/Spring 原生编码器有 7+2 处语义差异，替换会改出站 URL 字节）。</p>
  *
  * <h2>为什么不直接用 {@code java.net.URLEncoder} / {@code URI}</h2>
  * <p>连接器的请求 URL 是<b>发往 GitLab 的线上字节</b>，而 GitLab 侧对

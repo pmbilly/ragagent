@@ -70,7 +70,7 @@ class FileOpsTest {
 
     @Test
     void inheritsFromPreviousSummary() {
-        // Go 测试直接构造 fileOps{written:..., read:...}；Java 用等价的 extractFileOps
+        // Java 用等价的 extractFileOps
         // 攒出同样的三套集合（write 一次 + read 一次）
         FileOps earlier = FileOps.extractFileOps("", List.of(List.of(
                 toolCallMsg("write_sandbox_file", "{\"path\":\"/workspace/output/deck.html\"}"),

@@ -5,8 +5,7 @@ import java.util.List;
 import java.util.function.UnaryOperator;
 
 /**
- * 对照 Go {@code types.BuildEnvVectorStores / FindEnvVectorStore / buildEnvStoreForDriver}
- * （types/vectorstore.go L789-968）：由 RETRIEVE_DRIVER 派生的虚拟库（__env_* 前缀 id）。
+ * 由 RETRIEVE_DRIVER 派生的虚拟库（__env_* 前缀 id）。
  * 纯函数（env 经 {@link EnvLookup} 注入）；本部署 RETRIEVE_DRIVER 未配置 → 空列表。
  */
 public final class EnvVectorStores {
@@ -114,7 +113,7 @@ public final class EnvVectorStores {
                     try {
                         httpPort = Integer.parseInt(raw);
                     } catch (NumberFormatException ignored) {
-                        // Go: err → 保持 0
+                        // 解析失败 → 保持 0
                     }
                 }
                 ConnectionConfig c = new ConnectionConfig();

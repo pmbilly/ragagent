@@ -7,9 +7,8 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
- * ToolOutput.truncateToolOutput 的 Go 实录边界（15 条，探针原样调用 Go
- * {@code TruncateToolOutput}）。覆盖：上限内原样/恰等上限/零与负上限/
- * 头尾 70/30 拆分/CJK 按 rune 计/24000 默认边界/200 rune 标记保留的
+ * ToolOutput.truncateToolOutput 的录制边界（15 条）。覆盖：上限内原样/恰等上限/零与负上限/
+ * 头尾 70/30 拆分/CJK 按码点计/24000 默认边界/200 码点标记保留的
  * 临界（199/200/201）。
  */
 class TruncateRecordingTest {

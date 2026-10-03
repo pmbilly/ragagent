@@ -87,7 +87,7 @@ final class SessionQaFallback {
 
     record FallbackPrepared(List<ChatMessage> messages, Registry registry) {}
 
-    /** prepareFallbackMessages + buildFallbackMessages（Go L1004-1052）。 */
+    /** 组装 fallback 消息（prepare + build 两步）。 */
     FallbackPrepared prepareFallbackMessages(ChatManage chatManage, String promptContent) {
         List<ChatMessage> messages = new ArrayList<>();
         if (!promptContent.trim().isEmpty()) {

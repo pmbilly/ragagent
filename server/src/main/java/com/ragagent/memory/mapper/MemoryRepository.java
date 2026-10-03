@@ -145,7 +145,7 @@ public class MemoryRepository {
     }
 
     /**
-     * 对照 {@code EnsureSubject}：首次使用时创建。
+     * 首次使用时创建主体。
      *
      * <p>"DoNothing + 重读"让并发的第一次对话不会撞进唯一键冲突；
      * 行已存在时那次插入是空操作。</p>
@@ -177,24 +177,24 @@ public class MemoryRepository {
         return existing;
     }
 
-    /** 对照 {@code UpdateSubjectEnabled}：先确保主体存在，再翻那一列。 */
+    /** 开关主体：先确保主体存在，再翻那一列。 */
     public void updateSubjectEnabled(MemoryScope scope, boolean enabled) {
         ensureSubject(scope);
         subjectMapper.updateEnabled(scope.tenantId(), scope.subjectId(), enabled, OffsetDateTime.now());
     }
 
-    /** 对照 {@code UpdateSubjectBlock}：写渲染好的常驻块与条目数。 */
+    /** 写渲染好的常驻块与条目数。 */
     public void updateSubjectBlock(MemoryScope scope, String block, int itemCount) {
         subjectMapper.updateBlock(scope.tenantId(), scope.subjectId(), block, itemCount, OffsetDateTime.now());
     }
 
-    /** 对照 {@code MarkConsolidated}。 */
+    /** 记录整体审阅完成时刻。 */
     public void markConsolidated(MemoryScope scope) {
         OffsetDateTime now = OffsetDateTime.now();
         subjectMapper.markConsolidated(scope.tenantId(), scope.subjectId(), now);
     }
 
-    /** 对照 {@code MarkForcedConsolidated}：与每日任务**互不影响**的另一只钟。 */
+    /** 强制审阅完成时刻：与每日任务**互不影响**的另一只钟。 */
     public void markForcedConsolidated(MemoryScope scope) {
         OffsetDateTime now = OffsetDateTime.now();
         subjectMapper.markForcedConsolidated(scope.tenantId(), scope.subjectId(), now);

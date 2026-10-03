@@ -34,19 +34,19 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * <p>响应一律为裸资源对象（无 {@code code/data/msg} 信封）；错误走 AppError 信封，
  * docreader 连接失败 → 503、被禁用的存储引擎 → 403。
- * parser/storage 的请求键名保持 snake（§11 边界：与租户配置 jsonb 同形，待解冻后
- * 随批次 DTO 化）。</p>
+ * parser/storage 的请求键名保持 snake（与租户配置 jsonb 同形，待解冻后
+ * 再 DTO 化）。</p>
  *
- * <p><b>POST /system/sandbox-check 未实现</b>（依赖波 3 sandbox）——Go 注册了该路由，
- * Java 侧不映射 → Spring 404。RBAC 与 API-Key 策略表的同名死登记已于
- * 2026-09-28 评审删除（落地 handler 时随批恢复）。</p>
+ * <p><b>POST /system/sandbox-check 未实现</b>（依赖 sandbox 能力）——
+ * Java 侧不映射 → Spring 404。RBAC 与 API-Key 策略表的同名死登记已删除
+ * （落地 handler 时一并恢复）。</p>
  */
 @RestController
 @RequestMapping("/api/v1/system")
 public class SystemController {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    /** cosFieldPattern/ossFieldPattern（同一正则，Go 两条 var 同值）。 */
+    /** cosFieldPattern/ossFieldPattern（同一正则）。 */
     private static final Pattern FIELD_PATTERN = Pattern.compile("^[a-zA-Z0-9][a-zA-Z0-9._-]{0,62}$");
 
     private final SystemInfoService infoService;
@@ -56,9 +56,9 @@ public class SystemController {
     private final SsrfGuard ssrfGuard;
     private final com.ragagent.system.service.DeploymentCapabilitiesHolder capabilitiesHolder;
     private final com.ragagent.storage.service.StorageBackendService storageBackendService;
-    /** env 读取面（B6 批 4：取代裸 System.getenv；含 DOCREADER_* 与存储 env 可用性探测）。 */
+    /** env 读取面（不读裸 System.getenv；含 DOCREADER_* 与存储 env 可用性探测）。 */
     private final Environment environment;
-    /** DocReader 连接信息（B6 批 5：走属性绑定，取代 DOCREADER_* 的 env 直读）。 */
+    /** DocReader 连接信息（走属性绑定，不直读 DOCREADER_* env）。 */
     private final com.ragagent.knowledge.config.DocReaderProperties docReaderProperties;
 
     public SystemController(SystemInfoService infoService,
@@ -84,7 +84,7 @@ public class SystemController {
     // ── GET /capabilities ─────────────────────────────────────────────────
 
     /**
-     * 对照 GetDeploymentCapabilities：启动快照 + 运行时 docker 覆盖
+     * 启动快照 + 运行时 docker 覆盖
      * （overlayLiveDockerSandboxCapability）。Java 无 docker 后端 → docker 键恒按
      * sandbox=false 推导（route_not_registered）。
      */
@@ -130,7 +130,7 @@ public class SystemController {
     /**
      * 请求体 = ParserEngineConfig（未保存的表单值）。
      *
-     * <p>请求键名保持 snake：与租户配置 jsonb（§11 边界）同形，待该边界解冻后随批次 DTO 化。</p>
+     * <p>请求键名保持 snake：与租户配置 jsonb 同形，待边界解冻后再 DTO 化。</p>
      */
     @PostMapping("/parser-engines/check")
     public ResponseEntity<SystemDtos.ParserEnginesResponse> checkParserEngines(
@@ -231,7 +231,7 @@ public class SystemController {
      * 连通性检测。
      *
      * <p>请求体 = 存储配置表单（键名 snake，与前端的存储设置一致；该配置最终落租户
-     * jsonb，属 §11 边界——请求键名随该边界解冻后统一 DTO 化）。</p>
+     * jsonb，与上一致地待解冻后统一 DTO 化）。</p>
      */
     @PostMapping("/storage-engine-check")
     public ResponseEntity<SystemDtos.StorageCheckResponse> storageEngineCheck(
@@ -273,7 +273,7 @@ public class SystemController {
         if (!bucketName.isEmpty() && !FIELD_PATTERN.matcher(bucketName).matches()) {
             return checkResponse(false, "Bucket 名称格式不正确，仅允许字母、数字、点、连字符");
         }
-        // mode != "remote" → env 兜底（Go checkMinio 的 env 路径；任一缺失即拒绝）
+        // mode != "remote" → env 兜底（任一缺失即拒绝）
         String endpoint = cfg.path("endpoint").asText("");
         String accessKey = cfg.path("access_key_id").asText("");
         String secretKey = cfg.path("secret_access_key").asText("");
@@ -414,9 +414,9 @@ public class SystemController {
     }
 
     /**
-     * 真实连通性检测：复用波 2 第五批的 StorageBackendService.test（同一批 SDK 探测）。
-     * Go 的失败文案分派按 err 串子串（403 / 404|NoSuchBucket|NotFound / AccessDenied），
-     * 这里对异常消息做同款子串分派；两侧 SDK 错误串不完全一致 → 失败文案是已知差异
+     * 真实连通性检测：复用 {@code StorageBackendService.test}（同一套 SDK 探测）。
+     * 失败文案按异常消息子串分派（403 / 404|NoSuchBucket|NotFound / AccessDenied）；
+     * 各 SDK 错误串不完全一致 → 失败文案是已知差异
      * （golden 只覆盖 nil-config / SSRF / 禁用 provider 等确定性分支）。
      */
     private ResponseEntity<SystemDtos.StorageCheckResponse> connectivityFallback(
@@ -516,8 +516,8 @@ public class SystemController {
     }
 
     /**
-     * 对照 ListParserEngines 的 overrides 组装：tenant.ParserEngineConfig.ToOverridesMap()
-     * + weknoracloud_app_id（tenant.Credentials.GetWeKnoraCloud）。
+     * overrides 组装：租户 ParserEngineConfig → map
+     * + weknoracloud_app_id（租户凭据）。
      */
     private Map<String, String> engineOverrides() {
         Map<String, String> overrides = new LinkedHashMap<>();
@@ -532,7 +532,7 @@ public class SystemController {
         return overrides;
     }
 
-    /** 从 jsonb（Go ParserEngineConfig 的 json 形状）按 ToOverridesMap 的键提取。 */
+    /** 从 jsonb 按固定键集提取解析引擎覆盖项。 */
     static Map<String, String> overridesFromRaw(JsonNode node) {
         Map<String, String> overrides = new LinkedHashMap<>();
         if (node == null || node.isNull() || !node.isObject()) {
@@ -544,7 +544,7 @@ public class SystemController {
         putString(overrides, node, "mineru_vlm_server_url");
         putBool(overrides, node, "mineru_enable_formula");
         putBool(overrides, node, "mineru_enable_table");
-        // mineru_parse_method：显式值归一；否则 legacy enable_ocr 推导（Go ResolveMinerUParseMethod）
+        // mineru_parse_method：显式值归一；否则 legacy enable_ocr 推导
         String method = node.path("mineru_parse_method").asText("").trim().toLowerCase();
         JsonNode legacyOcr = node.get("mineru_enable_ocr");
         String resolved = switch (method) {
@@ -672,7 +672,7 @@ public class SystemController {
                 List.of("endpoint", "region", "access_key", "secret_key", "bucket_name"), false);
     }
 
-    /** 对照 isS3Configured：region/bucket 非空 + (accessKey 空) == (secretKey 空)。 */
+    /** region/bucket 非空 + (accessKey 空) == (secretKey 空)。 */
     private boolean isS3Configured(long tenantId) {
         Tenant tenant = currentTenant();
         if (tenant != null && tenant.getStorageEngineConfig() != null) {
@@ -705,7 +705,7 @@ public class SystemController {
         return docReaderProperties.addr() == null ? "" : docReaderProperties.addr().trim();
     }
 
-    /** 对照 getDocReaderConnInfo：transport 缺省 grpc（小写归一）。 */
+    /** transport 缺省 grpc（小写归一）。 */
     private String docreaderTransport() {
         return docReaderProperties.transportOrDefault();
     }

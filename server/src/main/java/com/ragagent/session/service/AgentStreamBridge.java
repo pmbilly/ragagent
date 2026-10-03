@@ -180,7 +180,7 @@ public final class AgentStreamBridge {
         eventBus.on(EventType.EVENT_MCP_OAUTH_RESOLVED, this::handleMCPOAuthResolved);
     }
 
-    // ── handleThought（Go L134-179） ─────────────────────────────────────────
+    // ── handleThought ─────────────────────────────────────────
 
     private Object handleThought(Event evt) {
         if (!(evt.getData() instanceof AgentThoughtData data)) {
@@ -207,7 +207,7 @@ public final class AgentStreamBridge {
         return null;
     }
 
-    // ── handleToolCall（Go L182-228，含 superseded preamble 剔除） ────────────
+    // ── handleToolCall（含 superseded preamble 剔除） ─────────────────────────
 
     private Object handleToolCall(Event evt) {
         if (!(evt.getData() instanceof AgentToolCallData data)) {
@@ -242,7 +242,7 @@ public final class AgentStreamBridge {
         return null;
     }
 
-    // ── handleToolResult（Go L231-291） ──────────────────────────────────────
+    // ── handleToolResult ──────────────────────────────────────
 
     private Object handleToolResult(Event evt) {
         if (!(evt.getData() instanceof AgentToolResultData data)) {
@@ -294,7 +294,7 @@ public final class AgentStreamBridge {
         return null;
     }
 
-    // ── 审批 / OAuth（Go L305-388；#1173） ───────────────────────────────────
+    // ── 审批 / OAuth ─────────────────────────────────────────────────────────
 
     private static final com.fasterxml.jackson.databind.ObjectMapper GO_JSON =
             new com.fasterxml.jackson.databind.ObjectMapper();
@@ -353,7 +353,7 @@ public final class AgentStreamBridge {
         return null;
     }
 
-    // ── handleReferences（Go L391-434） ──────────────────────────────────────
+    // ── handleReferences ──────────────────────────────────────
 
     private Object handleReferences(Event evt) {
         if (!(evt.getData() instanceof AgentReferencesData data)) {
@@ -380,7 +380,7 @@ public final class AgentStreamBridge {
         return null;
     }
 
-    // ── handleMemoryRecalled（Go L439-463） ──────────────────────────────────
+    // ── handleMemoryRecalled ──────────────────────────────────
 
     private Object handleMemoryRecalled(Event evt) {
         if (!(evt.getData() instanceof MemoryRecalledData data)) {
@@ -404,7 +404,7 @@ public final class AgentStreamBridge {
         return null;
     }
 
-    // ── handleContextCompacted（Go L470-496） ────────────────────────────────
+    // ── handleContextCompacted ────────────────────────────────
 
     private Object handleContextCompacted(Event evt) {
         if (!(evt.getData() instanceof ContextCompactedData data)) {
@@ -425,7 +425,7 @@ public final class AgentStreamBridge {
         return null;
     }
 
-    // ── handleFinalAnswer（Go L499-572，event-id 分片重组） ───────────────────
+    // ── handleFinalAnswer（event-id 分片重组） ────────────────────────────────
 
     private Object handleFinalAnswer(Event evt) {
         if (!(evt.getData() instanceof AgentFinalAnswerData data)) {
@@ -478,7 +478,7 @@ public final class AgentStreamBridge {
         return null;
     }
 
-    // ── handleReflection（Go L575-593） ──────────────────────────────────────
+    // ── handleReflection ──────────────────────────────────────
 
     private Object handleReflection(Event evt) {
         if (!(evt.getData() instanceof AgentReflectionData data)) {
@@ -489,7 +489,7 @@ public final class AgentStreamBridge {
         return null;
     }
 
-    // ── handleError（Go L596-621） ───────────────────────────────────────────
+    // ── handleError ───────────────────────────────────────────
 
     private Object handleError(Event evt) {
         if (!(evt.getData() instanceof ErrorData data)) {
@@ -503,7 +503,7 @@ public final class AgentStreamBridge {
         return null;
     }
 
-    // ── handleSessionTitle（Go L624-649） ────────────────────────────────────
+    // ── handleSessionTitle ────────────────────────────────────
 
     private Object handleSessionTitle(Event evt) {
         if (!(evt.getData() instanceof SessionTitleData data)) {
@@ -517,7 +517,7 @@ public final class AgentStreamBridge {
         return null;
     }
 
-    // ── handleUserMessageInjected（Go L655-676） ─────────────────────────────
+    // ── handleUserMessageInjected ─────────────────────────────
 
     private Object handleUserMessageInjected(Event evt) {
         if (!(evt.getData() instanceof UserMessageInjectedData data)) {
@@ -533,7 +533,7 @@ public final class AgentStreamBridge {
         return null;
     }
 
-    // ── handleComplete（Go L679-836） ────────────────────────────────────────
+    // ── handleComplete ────────────────────────────────────────
 
     private Object handleComplete(Event evt) {
         if (!(evt.getData() instanceof AgentCompleteData data)) {
@@ -664,7 +664,7 @@ public final class AgentStreamBridge {
         return s == null ? "" : s;
     }
 
-    /** 供 executeQA 的「无 answer 事件但有最终答案」判定读取（Go 直接读字段）。 */
+    /** 供 executeQA 的「无 answer 事件但有最终答案」判定读取。 */
     public String composedFinalAnswer() {
         synchronized (mu) {
             return finalAnswer;

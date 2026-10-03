@@ -101,8 +101,8 @@ public final class ConversationSerializer {
      * 把参数 JSON 渲染成 {@code key=value} 对，丢弃超长值。
      * 键排序保证同一调用渲染结果恒定——跨压缩比较文字记录时用得上。
      *
-     * <p><b>数值语义</b>：数值节点统一转 double 再由 {@link GoDoubleSerializer}
-     * 编码（最短往返 + 科学计数切换）；大整数会丢精度、1e21 记成 1e+21，
+     * <p><b>数值语义</b>：数值节点统一转 double 再按 {@code Double.toString} 语义编码
+     * （最短往返 + 科学计数切换）；大整数会丢精度、1e21 记成 1e+21，
      * 保证渲染结果确定。</p>
      */
     public static String renderToolArgs(String arguments) {

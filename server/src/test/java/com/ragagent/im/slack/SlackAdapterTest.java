@@ -31,7 +31,7 @@ import com.ragagent.im.runtime.ReplyMessage;
 import com.sun.net.httpserver.HttpServer;
 
 /**
- * Slack 出站客户端（W5γ3.2）对照 Go {@code internal/im/slack}：验签（v0 签名 + 5 分钟窗）、
+ * Slack 出站客户端行为测试：验签（v0 签名 + 5 分钟窗）、
  * 入站委托已翻核心、{@code chat.postMessage}/{@code chat.update} 的 body、流生命周期、
  * 私有文件下载、工厂模式分派。
  */
@@ -136,7 +136,7 @@ class SlackAdapterTest {
         Captured req = captured.get(0);
         assertEquals("/chat.postMessage", req.path());
         assertEquals("C1", req.body().get("channel"));
-        assertEquals("<think>内部</think>答案", req.body().get("text")); // 原样，照 Go
+        assertEquals("<think>内部</think>答案", req.body().get("text")); // 原样透传
         assertEquals("1700000000.000100", req.body().get("thread_ts"));
         assertEquals(List.of("Bearer TOK"), req.headers().get("Authorization"));
     }

@@ -44,7 +44,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
  *   <li><b>search 的 match_type 全是 "hybrid"</b>：关键词只命中 assistant 一侧时，
  *       partner 补对的 matchType 是空串，但合并分支只看关键词参数是否非空 →
  *       直接升 "hybrid"——不排除空串；</li>
- *   <li>RRF 分值 1/61 = {@code 0.01639344262295082}（Go float64 最短表示，
+ *   <li>RRF 分值 1/61 = {@code 0.01639344262295082}（双精度浮点最短表示，
  *       GoDoubleSerializer 逐字段）；keyword 模式单结果分值是 {@code 1} 不是 {@code 1.0}；</li>
  *   <li>{@code limit} 非整数**容错**回落 20；{@code before_time} 边界是严格小于；</li>
  *   <li>两个 404 文案不同：会话 "session not found" / 消息 "record not found"；</li>
@@ -306,7 +306,7 @@ class MessageHttpContractTest {
 
     // ══════════════════════════ 3. stats ══════════════════════════
 
-    /** 未配置聊天历史 KB：全零统计（恒输出的三个键，无 omitempty）。 */
+    /** 未配置聊天历史 KB：全零统计（恒输出的三个键，键恒出现）。 */
     @Test
     void chatHistoryStatsUnconfiguredMatchesGo() throws Exception {
         MvcResult r = perform(get("/api/v1/messages/chat-history-stats")

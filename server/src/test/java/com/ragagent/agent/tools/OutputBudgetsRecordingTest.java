@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
- * OutputBudgets.splitBudgetFairly 的 Go 实录（10 组，探针原样调用 Go
- * max-min 公平分配）+ OutputBudget 的 ctx 缺省语义（3 条，Java 侧对应
+ * OutputBudgets.splitBudgetFairly 的录制判定（10 组，max-min 公平分配）+
+ * OutputBudget 的 ctx 缺省语义（3 条，Java 侧对应
  * {@link ToolRequest#outputBudget()}）。
  */
 class OutputBudgetsRecordingTest {

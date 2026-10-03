@@ -84,7 +84,7 @@ class KnowledgeVectorRoutingTest {
         String dstKb = UUID.randomUUID().toString();
         kb(srcKb, "src");
         kb(dstKb, "dst");
-        // Go validateMoveItem：knowledge 的嵌入模型必须与源 KB 一致
+        // move 校验：knowledge 的嵌入模型必须与源 KB 一致
         jdbc.update("UPDATE knowledge_bases SET embedding_model_id = 'emb-1' WHERE id = ?", srcKb);
         String kId = UUID.randomUUID().toString();
         knowledge(kId, srcKb, "emb-1");
@@ -122,14 +122,14 @@ class KnowledgeVectorRoutingTest {
         jdbc.update("UPDATE knowledge_bases SET embedding_model_id = 'emb-1' WHERE id = ?", dstKb);
         String kId = UUID.randomUUID().toString();
         knowledge(kId, srcKb, "emb-1");
-        // clone preflight：源知识必须 completed（Go knowledgeClonePlan）
+        // clone preflight：源知识必须 completed
         jdbc.update("UPDATE knowledges SET parse_status = 'completed' WHERE id = ?", kId);
         jdbc.update("INSERT INTO chunks (id, tenant_id, knowledge_id, knowledge_base_id, "
                 + "content, chunk_index, is_enabled, chunk_type, start_at, end_at, "
                 + "created_at, updated_at) "
                 + "VALUES ('c1', ?, ?, ?, 'body', 0, TRUE, 'text', 0, 0, CURRENT_TIMESTAMP, "
                 + "CURRENT_TIMESTAMP)", TENANT, kId, srcKb);
-        // 常规 chunk 的 source_id == chunk_id（Go CopyIndices 三态改写的"本块"分支）
+        // 常规 chunk 的 source_id == chunk_id（copyIndices 三态改写的"本块"分支）
         insertEmbedding("c1", "c1", kId, srcKb, "");
 
         knowledgeService.startKBClone(TENANT, "clone-1", srcKb, dstKb, false, "user-1");

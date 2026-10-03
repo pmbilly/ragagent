@@ -15,9 +15,7 @@ import com.ragagent.agent.tools.GoRecording45A;
 import com.ragagent.agent.tools.RecordingSupport;
 
 /**
- * FaqSnippet 的 Go 实录（10 条，探针原样调用 Go {@code writeFAQ*XML/
- * faqMatchSnippetFromQueries/searchQueryTokens/truncateSimilarQuestionsForDisplay/
- * appendFAQChunkData}）。XML 投影逐字节比对（含相似问截断的 omitted 标记）。
+ * FaqSnippet 的录制语料（10 条）。XML 投影逐字节比对（含相似问截断的 omitted 标记）。
  */
 class FaqSnippetRecordingTest {
 

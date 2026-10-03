@@ -32,18 +32,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
- * 对照 Go {@code service.vectorStoreService}（internal/application/service/vectorstore.go
- * + vectorstore_healthcheck.go）。命名带 Config 以区别 retrieval.engine.VectorStoreService
- * （检索引擎的 embeddings 索引写面）。
+ * 向量库配置服务（CRUD + 连通性探测 + 健康检查）。命名带 Config 以区别
+ * retrieval.engine.VectorStoreService（检索引擎的 embeddings 索引写面）。
  *
- * <p>校验顺序逐字对照：Validate → validateConnectionConfig → validateConnectionAddrSSRF →
+ * <p>校验顺序固定：Validate → validateConnectionConfig → validateConnectionAddrSSRF →
  * ValidateIndexConfig → OpenSearch HNSW → DB 去重 → env 去重 → TestConnection（失败=
- * "connection test failed: ..."）→ 落库 → 注册（进程内注册表随波 4，当前 no-op）。</p>
+ * "connection test failed: ..."）→ 落库 → 注册（进程内注册表当前 no-op）。</p>
  *
- * <p><b>TestConnection 的引擎覆盖（已知差异，记入报告）</b>：elasticsearch 走与 Go
- * 相同的裸 HTTP GET（含 basic auth、不跟随重定向、版本解析）；milvus 与 Go 同为
+ * <p><b>TestConnection 的引擎覆盖（已知差异，记入报告）</b>：elasticsearch 走
+ * 裸 HTTP GET（含 basic auth、不跟随重定向、版本解析）；milvus 为
  * TCP 拨号（version 恒 ""）；postgres 用 JDBC 探测；weaviate/opensearch 走 HTTP 探测；
- * qdrant（Go=gRPC HealthCheck）/tencent/doris（Go=各 SDK）以 TCP/JDBC 探测替代——
+ * qdrant/tencent/doris 以 TCP/JDBC 探测替代——
  * 连接被拒的**错误文案逐字一致**，成功路径的 version 探测弱化为 ""。</p>
  */
 @Service
@@ -60,10 +59,10 @@ public class VectorStoreConfigService {
     private final SsrfGuard ssrfGuard;
     private final JdbcTemplate jdbc;
     private final TransactionTemplate tx;
-    /** 构造期派生一次的 env stores（对照 Go startup 缓存） */
+    /** 构造期派生一次的 env stores */
     private final EnvVectorStores.EnvLookup envLookup;
 
-    /** RETRIEVE_DRIVER（B6 批 3：属性绑定，取代裸 env 读）。 */
+    /** RETRIEVE_DRIVER（属性绑定，不读裸 env）。 */
     private final RetrievalDriverProperties driverProperties;
 
     private final List<VectorStore> envStores;
@@ -87,8 +86,8 @@ public class VectorStoreConfigService {
     /**
      * 按 id 取进程级（{@code __env_*}）向量库；不存在返回 null。
      *
-     * <p>env 族查找面由 {@link EnvVectorStores.EnvLookup} bean 提供（B6 批 3 前调用方
-     * 自传 {@code System::getenv}）。</p>
+     * <p>env 族查找面由 {@link EnvVectorStores.EnvLookup} bean 提供（调用方
+     * 不再自传 {@code System::getenv}）。</p>
      */
     public VectorStore findEnvStore(String id) {
         return EnvVectorStores.find(driverProperties.driver(), envLookup, id);
@@ -102,12 +101,12 @@ public class VectorStoreConfigService {
         return repo.list(tenantId);
     }
 
-    /** 对照 SaveDetectedVersion：在副本上写 connection_config.version */
+    /** 在副本上写 connection_config.version */
     public void saveDetectedVersion(VectorStore store) {
         repo.updateConnectionConfig(store);
     }
 
-    /** 对照 CreateStore（步骤注释与 Go L54-133 一一对应） */
+    /** 创建向量库（步骤注释为固定序）。 */
     public void create(VectorStore store) {
         // 1. 基础校验
         store.validate();
@@ -153,7 +152,7 @@ public class VectorStoreConfigService {
         }
         // 6. 落库
         repo.create(store, java.time.OffsetDateTime.now());
-        // 7. 进程内注册表（对照 registerInRegistry——引擎工厂随波 4，当前 no-op）
+        // 7. 进程内注册表（引擎工厂未实现，当前 no-op）
     }
 
     public void updateName(VectorStore store) {
@@ -166,7 +165,7 @@ public class VectorStoreConfigService {
         repo.updateName(store, java.time.OffsetDateTime.now());
     }
 
-    /** 对照 DeleteStore：事务内行锁（PG FOR UPDATE，H2 无锁提示）+ 绑定计数 → 软删 */
+    /** 事务内行锁（PG FOR UPDATE，H2 无锁提示）+ 绑定计数 → 软删 */
     public void delete(long tenantId, String id) {
         Integer deleted = tx.execute(status -> {
             Integer count = jdbc.queryForObject(
@@ -190,10 +189,10 @@ public class VectorStoreConfigService {
         if (deleted == null || deleted == 0) {
             throw BizException.notFound("vector store not found");
         }
-        // 对照 unregisterSafely：进程内注册表随波 4，当前 no-op
+        // 进程内注册表未实现，当前 no-op
     }
 
-    /** 对照 TestRawConnection：白名单 → 必填 → SSRF → TestConnection。失败抛 AppError */
+    /** 白名单 → 必填 → SSRF → TestConnection。失败抛 AppError */
     public String testRawConnection(String engineType, ConnectionConfig config) {
         if (!VectorStoreEngines.isValidEngineType(engineType)) {
             throw validation("connection test is not supported for engine type: " + engineType);
@@ -204,9 +203,9 @@ public class VectorStoreConfigService {
     }
 
     /**
-     * 对照 TestConnection（vectorstore_healthcheck.go）：成功返回探测版本（可空），
-     * 失败抛 AppError（各分支均为 errors.NewBadRequestError → code 1000，
-     * handler 以 err.Error() 的**双前缀**形态输出——golden vs-test-byid-connrefused 钉住）。
+     * 连通性测试：成功返回探测版本（可空），
+     * 失败抛 AppError（各分支均为 code 1000，
+     * handler 以**双前缀**形态输出——golden vs-test-byid-connrefused 钉住）。
      */
     public String testConnection(String engineType, ConnectionConfig config) {
         try {
@@ -235,7 +234,7 @@ public class VectorStoreConfigService {
         }
     }
 
-    // ── 各引擎探测（错误文案逐字对照 Go） ──────────────────────────────
+    // ── 各引擎探测（错误文案逐字固定，是契约） ──────────────────────────
 
     private String testElasticsearch(ConnectionConfig config) {
         HttpClient client = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NEVER)
@@ -293,7 +292,7 @@ public class VectorStoreConfigService {
     }
 
     /**
-     * 对照 testQdrantConnection（vectorstore_healthcheck.go L145-175）：走驱动的健康探针
+     * qdrant 探测：走驱动的健康探针
      * （gRPC HealthCheck → REST {@code GET /}），返回 {@code version}；失败折叠成通用文案。
      */
     private String testQdrant(ConnectionConfig config) {
@@ -309,10 +308,9 @@ public class VectorStoreConfigService {
     }
 
     /**
-     * 对照 testMilvusConnection（vectorstore_healthcheck.go L177-199）：Go 用 <b>TCP 拨号</b>
-     * （注释明说：避开 milvus-proto 与 qdrant 的 protobuf 命名冲突，不做 SDK 级验证），
-     * 因此<b>版本恒空</b>。本仓已有 REST v2 客户端 → 升级为 {@code collections/list} 探针
-     * （连通性 + 认证都验到，比 TCP 拨号更强），仍返回 ""（Milvus 无版本端点，照 Go 口径）。
+     * milvus 探测：<b>TCP 拨号</b>语义（不做 SDK 级验证），因此<b>版本恒空</b>。
+     * 本仓已有 REST v2 客户端 → 升级为 {@code collections/list} 探针
+     * （连通性 + 认证都验到，比 TCP 拨号更强），仍返回 ""（Milvus 无版本端点）。
      */
     private String testMilvus(ConnectionConfig config) {
         try {
@@ -326,9 +324,9 @@ public class VectorStoreConfigService {
     }
 
     /**
-     * 对照 testTencentVectorDBConnection（vectorstore_healthcheck.go L201-222）：{@code ListDatabase}
+     * tencent_vectordb 探测：{@code ListDatabase}
      * 探针——客户端构造失败（地址/用户名/密钥不合法）→ "connection refused or authentication
-     * failed"；调用失败 → "authentication failed or server error"。版本恒 ""（Go 同款）。
+     * failed"；调用失败 → "authentication failed or server error"。版本恒 ""。
      */
     private String testTencentVectorDB(ConnectionConfig config) {
         try {
@@ -378,7 +376,7 @@ public class VectorStoreConfigService {
     }
 
     /**
-     * 对照 testDorisConnection（vectorstore_healthcheck.go L280-327）：走 MySQL 协议驱动
+     * doris 探测：走 MySQL 协议驱动
      * 的完整探针——连接（Ping 语义）+ {@code SELECT @@version}（失败只 WARN，返回空版本）；
      * 版本串剥 {@code "Doris-"} 前缀（{@code "5.7.99 Doris-4.1.0"} → {@code "4.1.0"}）。
      * database 不强制：缺省用 information_schema。
@@ -398,7 +396,7 @@ public class VectorStoreConfigService {
     }
 
     /**
-     * 对照 testOpenSearchConnection（vectorstore_healthcheck.go L330-347）：走驱动的
+     * opensearch 探测：走驱动的
      * 连通性探针（版本 + 每节点 k-NN 插件，TestConnection→构造期探针复用）；失败折叠
      * 成通用文案（不向 API 调用方暴露集群内部细节）。版本在探针内解析但不在此暴露
      * （lazy index 首用再校验）→ 恒 ""。
@@ -422,7 +420,7 @@ public class VectorStoreConfigService {
 
     // ── 校验（文案逐字对照） ────────────────────────────────────────────
 
-    /** 对照 validateConnectionConfig */
+    /** 连接配置必填校验 */
     public void validateConnectionConfig(String engineType, ConnectionConfig config) {
         ConnectionConfig c = config == null ? new ConnectionConfig() : config;
         switch (engineType == null ? "" : engineType) {
@@ -454,7 +452,7 @@ public class VectorStoreConfigService {
         }
     }
 
-    /** 对照 validateConnectionAddrSSRF：逐地址字段的 SSRF 校验（白名单优先），未知引擎 fail-closed */
+    /** 逐地址字段的 SSRF 校验（白名单优先），未知引擎 fail-closed */
     public void validateConnectionAddrSSRF(String engineType, ConnectionConfig config) {
         ConnectionConfig c = config == null ? new ConnectionConfig() : config;
         switch (engineType == null ? "" : engineType) {
@@ -488,7 +486,7 @@ public class VectorStoreConfigService {
         }
     }
 
-    /** 对照 types.ValidateIndexConfig */
+    /** 索引配置校验 */
     public void validateIndexConfig(IndexConfig ic) {
         IndexConfig c = ic == null ? new IndexConfig() : ic;
         if (notEmpty(c.indexName) && !INDEX_NAME_PATTERN.matcher(c.indexName).matches()) {
@@ -520,7 +518,7 @@ public class VectorStoreConfigService {
         }
     }
 
-    /** 对照 validateOpenSearchIndexConfig（HNSW 边界） */
+    /** OpenSearch 索引配置校验（HNSW 边界） */
     public void validateOpenSearchIndexConfig(IndexConfig ic) {
         IndexConfig c = ic == null ? new IndexConfig() : ic;
         if (c.hnswM != 0 && (c.hnswM < 2 || c.hnswM > 100)) {
@@ -533,7 +531,7 @@ public class VectorStoreConfigService {
             throw validation("hnsw_ef_search must be between 1 and 10000");
         }
         if (notEmpty(c.knnEngine) && !c.knnEngine.equals("lucene") && !c.knnEngine.equals("faiss")) {
-            // Go 源：`knn_engine must be "lucene" or "faiss"`（反引号串，含真实引号）
+            // 文案含真实引号（错误契约的一部分）
             throw validation("knn_engine must be \"lucene\" or \"faiss\"");
         }
     }

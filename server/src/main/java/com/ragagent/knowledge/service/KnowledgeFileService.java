@@ -148,7 +148,7 @@ public class KnowledgeFileService {
 
     /**
      * 摘要路径的**窄写入**。
-     * <p>❌ 原实现走 {@link #updateKnowledgeRow}（**全列写**）：它会把<b>加载时</b>的旧
+     * <p>❌ 勿走 {@link #updateKnowledgeRow}（**全列写**）：它会把<b>加载时</b>的旧
      * {@code parse_status} 一并写回。摘要是在导入后处理的 finalizing 交接**之后**才跑完 LLM
      * （数十秒），回写就把 `finalizing/completed` 打回加载时的 {@code processing} ✗；而全列写按
      * （用户报障：`05.03-问题发布.md` 卡 processing ✗）。</p>

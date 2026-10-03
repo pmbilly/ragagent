@@ -139,7 +139,7 @@ final class MessageSearch {
                 vectorResults = vectorSearchViaKb(query, sessionIds);
                 log.info("Vector search found {} results", vectorResults.size());
             } catch (RuntimeException e) {
-                // Go：两种模式都先 Warnf，vector 模式再上抛（handler 500）、
+                // 两种模式都先记 WARN，vector 模式再上抛（500）、
                 // hybrid 模式吞掉降级 keyword-only
                 log.warn("Vector search via KB failed, falling back to keyword-only: {}",
                         e.toString());
@@ -353,7 +353,7 @@ final class MessageSearch {
             if (rr.getRelevanceScore() < threshold) {
                 continue;
             }
-            SearchResult item = results.get(rr.getIndex()).copy(); // Go: item := *results[...]
+            SearchResult item = results.get(rr.getIndex()).copy(); // 值拷贝，不污染原条目
             item.setScore(rr.getRelevanceScore());
             reranked.add(item);
             if (reranked.size() >= topK) {

@@ -28,9 +28,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 /**
- * 阶段 1 契约测试：auth 登录 + AuthFilter 全链，对照 golden 逐字节比对。
+ * 契约测试：auth 登录 + AuthFilter 全链，对照 golden 逐字节比对。
  *
- * golden 来源：Go dev server（localhost:8080，2026-09-17 录制，见 scripts/record-golden.sh）。
+ * golden 来源：dev server 录制（2026-09-17，见 scripts/record-golden.sh）。
  * 动态字段（token / refresh_token / 时间戳）两侧做同一种掩码后再比对；
  * 静态 golden（4xx/401/409/400）直接逐字节断言。
  *
@@ -207,7 +207,7 @@ class AuthContractTest {
                 "掩码后应与 golden 一致");
     }
 
-    /** 对照 Go：refresh token 当 Bearer 用 → 校验失败 → 401 "invalid or expired token" */
+    /** refresh token 当 Bearer 用 → 校验失败 → 401 "invalid or expired token" */
     @Test
     void refreshTokenRejectedAsBearer() throws Exception {
         MvcResult login = mockMvc.perform(post("/api/v1/auth/login")

@@ -7,9 +7,8 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
- * ThinkStreamSplitter 的 Go 实录（13 组逐 chunk 语料，探针原样驱动 Go
- * {@code ThinkStreamSplitter.Feed/Flush}）。标签跨 chunk 切分/未闭合
- * flush 归类/字面小于号保留，按每次 Feed 的 (think, answer) 双输出逐字比对。
+ * ThinkStreamSplitter 的录制语料（13 组逐 chunk 语料）。标签跨 chunk 切分/未闭合
+ * flush 归类/字面小于号保留，按每次 feed 的 (think, answer) 双输出逐字比对。
  */
 class ThinkStreamSplitterRecordingTest {
 

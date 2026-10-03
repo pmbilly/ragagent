@@ -28,13 +28,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 /**
- * storage-backends 9 条的契约测试（波 2 第五批）。golden：
- * scripts/record-infra-config-golden.sh（39 个 sb-* 文件，Go 实录）。
+ * storage-backends 9 条的契约测试。golden：
+ * scripts/record-infra-config-golden.sh（39 个 sb-* 文件）。
  *
- * <p>种子复刻 dev PG 录制态：tenants.default_storage_backend_id 指向 System LOCAL
+ * <p>种子与 dev PG 录制态一致：tenants.default_storage_backend_id 指向 System LOCAL
  * （source=env、legacy_alias=true）+ minio 种子行（immutable 用例）+ 固定 hex id。
  * local provider 的 Test 走 LOCAL_STORAGE_BASE_DIR 的 mkdir + 目录检查（确定性成功，
- * 且会在 /tmp 下建 sbgolden 目录——与 Go 录制时的副作用同构）。setdefault 中途会改
+ * 且会在 /tmp 下建 sbgolden 目录——与录制时的副作用同构）。setdefault 中途会改
  * 租户默认，本测试按录制序在 setdefault-restore 处还原。</p>
  */
 @SpringBootTest
@@ -244,7 +244,7 @@ class StorageBackendContractTest {
                 "{\"name\":\"x\",\"provider\":\"local\",\"config\":{},\"status\":\"bogus\"}");
         compareAndStatus("sb-create-path-traversal.json", 400, "POST", base, owner,
                 "{\"name\":\"x\",\"provider\":\"local\",\"config\":{\"pathPrefix\":\"../evil\"}}");
-        // minio 单缺失字段（Go 的 map 迭代序随机——多缺失时错误不进契约）
+        // minio 单缺失字段（多字段缺失时命中的错误不确定，故不进契约）
         compareAndStatus("sb-create-minio-missing.json", 400, "POST", base, owner,
                 "{\"name\":\"x\",\"provider\":\"minio\",\"config\":{\"endpoint\":\"http://minio.example.internal:9000\","
                         + "\"accessKeyId\":\"k\",\"secretAccessKey\":\"s\"}}");
@@ -299,7 +299,7 @@ class StorageBackendContractTest {
                 + "{\"pathPrefix\":\"sbgolden\",\"accessKeyId\":\"sb-ak\",\"secretAccessKey\":\"sb-sk\"}}");
         String local2 = createBackend("{\"name\":\"sb-golden-local2\",\"provider\":\"local\",\"config\":{}}");
 
-        // 录制序：setdefault-disabled 之前 local 行已被 section12 停用——本段复刻该前置
+        // 录制序：setdefault-disabled 之前 local 行已被 section12 停用——本段保持该前置
         perform("PUT", base + "/" + local, owner,
                 "{\"name\":\"sb-golden-local\",\"provider\":\"local\",\"config\":{\"pathPrefix\":\"sbgolden\"},"
                         + "\"status\":\"disabled\"}");

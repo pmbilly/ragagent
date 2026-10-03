@@ -11,9 +11,9 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
- * 平台验签核心的字节契约：期望签名由独立 Go 程序录制（算法逐字抄自 slack SDK
- * SecretsVerifier 与 dingtalk/adapter.go），fixture 在
- * {@code contracts/w5g3-im-adapter-signatures.tsv}。telegram/mattermost/qqbot
+ * 平台验签核心的字节契约：期望签名固定在 fixture
+ * {@code contracts/w5g3-im-adapter-signatures.tsv}（与 slack SDK
+ * SecretsVerifier、钉钉的验签算法一致）。telegram/mattermost/qqbot
  * 的比较语义一并钉住。
  */
 class ImAdapterVerifyTest {
@@ -69,7 +69,7 @@ class ImAdapterVerifyTest {
     void mattermostTokenEquality() {
         assertTrue(ImAdapterVerify.mattermostTokenMatches("tok", "tok"));
         assertFalse(ImAdapterVerify.mattermostTokenMatches("wrong", "tok"));
-        // outgoing_token 未配置（空）→ 免验（mattermost/adapter.go L79：token != "" 才比）
+        // outgoing_token 未配置（空）→ 免验（token 非空才比对）
         assertTrue(ImAdapterVerify.mattermostTokenMatches("", ""));
         assertTrue(ImAdapterVerify.mattermostTokenMatches("any", ""));
     }

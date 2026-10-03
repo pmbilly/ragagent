@@ -12,19 +12,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
- * 解析引擎注册表 + 合并逻辑（对照 Go internal/infrastructure/docparser/
- * engine_registry.go ListAllEngines + engines.go 的 8 个本地引擎）。
+ * 解析引擎注册表 + 合并逻辑（8 个本地引擎 + docreader 远端发现）。
  *
- * <p>合并规则（逐条照抄）：</p>
+ * <p>合并规则：</p>
  * <ul>
- *   <li>本地引擎恒在列表里（注册序 = 展示序），可用性走 Go 侧 CheckAvailable；</li>
+ *   <li>本地引擎恒在列表里（注册序 = 展示序），可用性逐引擎探测；</li>
  *   <li>远端（docreader ListEngines RPC）同名引擎的 FileTypes（非空）与 Description
  *       （非空）**覆盖**本地值——远端对自己能力是权威；</li>
  *   <li>远端独有的引擎**原样追加**（自动发现新增 Python 引擎，如 markitdown/opendataloader）。</li>
  * </ul>
  *
- * <p><b>已知差异（照抄 Go 的不可达分支）</b>：anydoc 是 Go 编译期绑定
- * （{@code -tags anydoc}），未打该 tag 的构建恒 false——Java 无对应物，
+ * <p><b>边界形态</b>：anydoc 是构建期绑定
+ * （{@code -tags anydoc}），本项目构建未启用 →
  * 恒走 "not built into this binary" 分支。mineru/mineru_cloud/paddleocr_vl(_cloud)
  * 的 Ping 分支只在对应 override 配置了才触达（配置了就会发真实网络请求），
  * 未配置的 "not configured" 文案分支确定。</p>
@@ -40,7 +39,7 @@ public class ParserEngineRegistry {
         this.docReader = docReader;
     }
 
-    /** 引擎名常量（Go engines.go 的常量组）。 */
+    /** 引擎名常量。 */
     public static final String BUILTIN = "builtin";
     public static final String SIMPLE = "simple";
     public static final String ANYDOC = "anydoc";
@@ -57,10 +56,10 @@ public class ParserEngineRegistry {
     }
 
     /**
-     * 对照 ListAllEngines：本地静态引擎 + 远端引擎合并。
+     * 本地静态引擎 + 远端引擎合并。
      *
-     * @param docreaderConnected 对照 DocumentReader.IsConnected()
-     * @param overrides          对照 ParserEngineConfig.ToOverridesMap() + weknoracloud_app_id
+     * @param docreaderConnected docreader 服务是否可达
+     * @param overrides          租户解析引擎覆盖配置 + weknoracloud_app_id
      * @param remoteEngines      远端 ListEngines 的结果（未连接/失败时为 null）
      */
     public List<SystemDtos.ParserEngineInfo> listAllEngines(
@@ -94,8 +93,8 @@ public class ParserEngineRegistry {
                         "mp3", "wav", "m4a", "flac", "ogg"),
                 true, "", result);
 
-        // anydoc — Go 编译期绑定；未打 tag 构建 → 恒 false（Java 无对应物，恒走此分支）。
-        // FileTypes = Go anydoc.SupportedFileTypes()（golden 实录的展示序）。
+        // anydoc — 构建期绑定；本项目构建未启用 → 恒 false，恒走此分支。
+        // FileTypes 按展示序固定（golden 钉住）。
         engine(ANYDOC, "anydoc in-process office document converter (no external service required)",
                 List.of("csv", "doc", "docm", "docx", "epub", "odp", "ods", "odt", "pdf",
                         "ppt", "pptm", "pptx", "rtf", "xls", "xlsm", "xlsx"),
@@ -164,8 +163,8 @@ public class ParserEngineRegistry {
     }
 
     /**
-     * 对照 fetchRemoteEngines：未连接 → null（回落本地静态注册表）；
-     * RPC 失败 → 记 WARN + null（Go 逐分支一致）。
+     * 未连接 → null（回落本地静态注册表）；
+     * RPC 失败 → 记 WARN + null（逐分支确定）。
      */
     public List<SystemDtos.ParserEngineInfo> fetchRemoteEngines(
             boolean connected, Map<String, String> overrides) {

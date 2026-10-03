@@ -53,7 +53,7 @@ public class ModelParameters {
     public String getAppSecret() { return appSecret; }
     public void setAppSecret(String v) { appSecret = v == null ? "" : v; }
 
-    /** 写库拷贝：加密时不能污染内存中的明文（对照 Go value receiver） */
+    /** 写库拷贝：加密时不能污染内存中的明文 */
     public ModelParameters copy() {
         ModelParameters cp = new ModelParameters();
         cp.baseUrl = baseUrl;

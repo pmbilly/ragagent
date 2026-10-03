@@ -22,8 +22,8 @@ import com.ragagent.knowledge.domain.FaqChunkMetadata;
 import com.ragagent.knowledge.support.SearchChunkMerge;
 
 /**
- * 实录回放：merge 五件（classify / sequential / group / parent / expand / faq / history）
- * （期望值 = {@link GoRecording46C} Go 实录常量）。
+ * 录制回放：merge 五件（classify / sequential / group / parent / expand / faq / history）
+ * （期望值 = {@link GoRecording46C} 录制常量）。
  */
 class MergeRecordingTest {
 
@@ -39,7 +39,7 @@ class MergeRecordingTest {
 
     private static final ObjectMapper JSON = new ObjectMapper();
 
-    /** 就地设值的小工具（对照 Go 的复合字面量）。 */
+    /** 就地设值的小工具（等价于构造后逐字段赋值）。 */
     private static SearchResult sr(String id, String content, double score,
                                    java.util.function.Consumer<SearchResult> mutate) {
         SearchResult r = sr(id, content, score);

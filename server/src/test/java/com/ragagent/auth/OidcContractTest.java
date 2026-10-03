@@ -22,15 +22,15 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 /**
- * 波 2 扫尾批 2 契约测试：auth OIDC 4 端点（未配置 = disabled 分支全覆盖）。
+ * 契约测试：auth OIDC 4 端点（未配置 = disabled 分支全覆盖）。
  *
- * golden 来源：Go dev server（localhost:8080，2026-09-19 录制，scripts/record-oidc-golden.sh，
+ * golden 来源：dev server 录制（2026-09-19，scripts/record-oidc-golden.sh，
  * 13 条 oidc-*.json）。
  *
  * golden 两种形态：
  * - JSON 端点（config / url / start 出错分支）：响应体逐字节。
  * - 302 端点（callback 全部分支）：合成信封 JSON（键字母序 body/location/set_cookie/status），
- *   测试从 MockMvc 结果组同一信封比对——复刻 gin Redirect 字节行为
+ *   测试从 MockMvc 结果组同一信封比对——重定向响应体为固定字节形态
  *   （body=`<a href="<html 转义 Location>">Found</a>.\n\n`）。
  *
  * 合法 state 由测试经 OidcStateCodec 现签（与录制脚本的 python 锻造同密钥族：

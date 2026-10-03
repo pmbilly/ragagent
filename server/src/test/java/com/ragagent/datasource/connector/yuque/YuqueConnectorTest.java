@@ -25,13 +25,13 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
- * 语雀连接器的对等测试（逐条对照 Go {@code yuque/connector_test.go}）。
+ * 语雀连接器的对等测试。
  *
  * <h2>限速注入 0</h2>
  * <p>生产的 300ms 文档限速与 2s/4s/8s 退避在这里全部注入 0：
  * {@code new YuqueConnector(YuqueRetryPolicy.immediate(), Duration.ZERO)}。
- * 否则每个含 N 篇文档的用例都要等 N×300ms，整套对等测试会从毫秒级涨到分钟级
- * ——这是任务书要求把两者抽成可注入参数的唯一理由。</p>
+ * 否则每个含 N 篇文档的用例都要等 N×300ms，整套测试会从毫秒级涨到分钟级
+ * ——这是把两者抽成可注入参数的唯一理由。</p>
  */
 class YuqueConnectorTest {
 
@@ -81,7 +81,7 @@ class YuqueConnectorTest {
 
     // ── ListResources ───────────────────────────────────────────────────
 
-    /** 对照 Go {@code TestConnector_ListResources_Aggregates}：个人 + 两个团队。 */
+    /** 个人 + 两个团队的仓库聚合。 */
     @Test
     void listResourcesAggregatesPersonalAndTeams() throws Exception {
         try (FakeYuque f = new FakeYuque()) {
@@ -106,12 +106,12 @@ class YuqueConnectorTest {
             assertThat(ab.getUrl()).isEqualTo(f.baseUrl() + "/team-a/ab");
             assertThat(ab.getMetadata()).containsEntry("book_type", "Book")
                     .containsEntry("public", 1);
-            // 未提供 updated_at 的仓库 → Go 零值时间
+            // 未提供 updated_at 的仓库 → 零值时间
             assertThat(ZeroTimeSerializer.isZeroValue(ab.getModifiedAt())).isTrue();
         }
     }
 
-    /** 对照 Go {@code TestConnector_ListResources_DedupByID}：同一个仓库在两个来源里只出一条。 */
+    /** 同一个仓库在两个来源里只出一条。 */
     @Test
     void listResourcesDedupesById() throws Exception {
         try (FakeYuque f = new FakeYuque()) {
@@ -127,7 +127,6 @@ class YuqueConnectorTest {
     }
 
     /**
-     * 对照 Go {@code TestConnector_ListResources_ContinuesOnGroupFailure}：
      * 某个团队 403 只跳过它，其余照常。
      */
     @Test
@@ -151,7 +150,7 @@ class YuqueConnectorTest {
     }
 
     /**
-     * 用户没加入任何团队时语雀返回 **404**——照抄 Go：当成"没有团队"继续，
+     * 用户没加入任何团队时语雀返回 **404**——当成"没有团队"继续，
      * 个人仓库照常返回。
      */
     @Test
@@ -188,7 +187,7 @@ class YuqueConnectorTest {
         }
     }
 
-    /** ExternalID 的排序是**字符串**序：{@code "10"} 在 {@code "9"} 之前（照抄 Go）。 */
+    /** ExternalID 的排序是**字符串**序：{@code "10"} 在 {@code "9"} 之前。 */
     @Test
     void listResourcesSortsByStringExternalId() throws Exception {
         try (FakeYuque f = new FakeYuque()) {
@@ -211,7 +210,7 @@ class YuqueConnectorTest {
 
     // ── FetchAll：过滤 + 正文 ────────────────────────────────────────────
 
-    /** 对照 Go {@code TestConnector_FetchAll_Markdown}（草稿被过滤）。 */
+    /** 草稿被过滤。 */
     @Test
     void fetchAllSkipsDrafts() throws Exception {
         try (FakeYuque f = new FakeYuque()) {
@@ -246,7 +245,7 @@ class YuqueConnectorTest {
         }
     }
 
-    /** 对照 Go {@code TestConnector_FetchAll_SkipsNonDocTypes}。 */
+    /** 非 Doc 类型被跳过。 */
     @Test
     void fetchAllSkipsNonDocTypes() throws Exception {
         try (FakeYuque f = new FakeYuque()) {
@@ -265,7 +264,7 @@ class YuqueConnectorTest {
         }
     }
 
-    /** 空 type / 空 status 视为可接受（Go 的前向兼容分支）。 */
+    /** 空 type / 空 status 视为可接受（前向兼容分支）。 */
     @Test
     void fetchAllAcceptsEmptyTypeAndStatus() throws Exception {
         try (FakeYuque f = new FakeYuque()) {
@@ -285,7 +284,7 @@ class YuqueConnectorTest {
         }
     }
 
-    /** 对照 Go {@code TestConnector_FetchAll_DocDetailError_EmitsPlaceholder}。 */
+    /** 文档详情拉取失败时灌入占位内容。 */
     @Test
     void docDetailErrorEmitsPlaceholder() throws Exception {
         try (FakeYuque f = new FakeYuque()) {
@@ -315,7 +314,7 @@ class YuqueConnectorTest {
         }
     }
 
-    /** 对照 Go {@code TestConnector_FetchAll_LakeFormatIngestedAsMarkdown}。 */
+    /** Lake 格式正文按 Markdown 灌入。 */
     @Test
     void lakeFormatIsIngestedAsMarkdown() throws Exception {
         try (FakeYuque f = new FakeYuque()) {
@@ -342,7 +341,7 @@ class YuqueConnectorTest {
         }
     }
 
-    /** 对照 Go {@code TestConnector_FetchAll_SkipsUnsupportedFormats}。 */
+    /** 不支持的格式被跳过。 */
     @Test
     void unsupportedFormatEmitsPlaceholderWithSkipReason() throws Exception {
         try (FakeYuque f = new FakeYuque()) {
@@ -392,7 +391,7 @@ class YuqueConnectorTest {
         }
     }
 
-    /** 对照 Go {@code TestConnector_FetchIncremental_NoChanges}：内容时间没变 → 0 条且不拉详情。 */
+    /** 内容时间没变 → 0 条且不拉详情。 */
     @Test
     void incrementalNoChangesYieldsNothing() throws Exception {
         try (FakeYuque f = new FakeYuque()) {
@@ -415,7 +414,7 @@ class YuqueConnectorTest {
         }
     }
 
-    /** 对照 Go {@code TestConnector_FetchIncremental_ReturnsOnlyChanged}。 */
+    /** 只返回有变化的文档。 */
     @Test
     void incrementalReturnsOnlyChanged() throws Exception {
         try (FakeYuque f = new FakeYuque()) {
@@ -447,7 +446,7 @@ class YuqueConnectorTest {
         }
     }
 
-    /** 对照 Go {@code TestConnector_FetchIncremental_DetectsDeletion}。 */
+    /** 检测删除。 */
     @Test
     void incrementalDetectsDeletion() throws Exception {
         try (FakeYuque f = new FakeYuque()) {
@@ -495,9 +494,9 @@ class YuqueConnectorTest {
     }
 
     /**
-     * 照抄 Go 的 map 零值比较：**没有** {@code content_updated_at} 的文档在增量同步里
-     * 会被判成"未变"而跳过（Go 写的是 {@code prevTimes[docIDStr] == d.ContentUpdatedAt}，
-     * 键缺失取到 ""），而**全量**同步照常抓。
+     * 增量同步对"上次时间"的比较是**字符串**相等：**没有** {@code content_updated_at}
+     * 的文档在增量同步里会被判成"未变"而跳过（键缺失取到 ""），
+     * 而**全量**同步照常抓。
      */
     @Test
     void incrementalSkipsDocsWithoutContentUpdatedAt() throws Exception {
@@ -536,7 +535,7 @@ class YuqueConnectorTest {
         }
     }
 
-    /** 全量同步不产生 cursor（对照 Go 的 {@code if !incremental { return out, nil, nil }}）。 */
+    /** 全量同步不产生 cursor。 */
     @Test
     void fetchAllHasNoCursor() throws Exception {
         try (FakeYuque f = new FakeYuque()) {
@@ -559,7 +558,7 @@ class YuqueConnectorTest {
         }
     }
 
-    /** 非法 book id 的文案逐字复刻 Go 的 {@code strconv.ParseInt} 错误。 */
+    /** 非法 book id 的错误文案与数字解析错误逐字一致。 */
     @Test
     void invalidBookIdReplicatesGoParseIntMessage() throws Exception {
         try (FakeYuque f = new FakeYuque()) {
@@ -580,7 +579,7 @@ class YuqueConnectorTest {
         }
     }
 
-    /** 对照 Go {@code TestParseYuqueConfig} 的 nil config 档。 */
+    /** config 为 null 的解析档。 */
     @Test
     void parseRejectsNilConfig() {
         assertThatThrownBy(() -> YuqueConfig.parse(null))
@@ -597,7 +596,7 @@ class YuqueConnectorTest {
     // ── 跳过样本（sampleSkipType / sampleSkipDraft） ─────────────────────
 
     /**
-     * 对照 Go 的日志行：{@code sampleSkipType} / {@code sampleSkipDraft} 只出现在
+     * 日志行：{@code sampleSkipType} / {@code sampleSkipDraft} 只出现在
      * {@code logger.Infof} 里（"id=%d type=%q title=%q" 的第一条样本）。
      * 它们是排障信息而不是控制流，所以这里用日志捕获来钉住。
      */
@@ -625,7 +624,7 @@ class YuqueConnectorTest {
                     .map(ILoggingEvent::getFormattedMessage)
                     .reduce("", (a, b) -> a + "\n" + b);
 
-            // 第一条非 Doc 的样本与第一条草稿的样本，逐字对照 Go 的 fmt.Sprintf。
+            // 第一条非 Doc 的样本与第一条草稿的样本，日志文案逐字断言。
             assertThat(out).contains("skipped_non_doc=2")
                     .contains("skipped_draft=1")
                     .contains("non_doc_sample={id=201 type=\"Sheet\" title=\"S\"}")

@@ -111,10 +111,8 @@ final class NotionValues {
     /**
      * {@code %g} 格式（最短可往返表示）。
      *
-     * <h2>与 {@code GoDoubleSerializer} 的浮点编码**不是**一回事</h2>
-     * <p>{@code GoDoubleSerializer}（'f' 与 'e' 的分界在 {@code 1e-6 / 1e21}）
-     * 服务的是 jsonb 载荷；这里的 {@code %g} 分界是
-     * <b>{@code exp < -4 || exp >= 6}</b>，
+     * <h2>{@code %g} 的分界与指数形态</h2>
+     * <p>分界是<b>{@code exp < -4 || exp >= 6}</b>，
      * 且指数**至少两位**（{@code 1e-05} 而不是 {@code 1e-5}）。</p>
      * <p>实测值：</p>
      * <pre>

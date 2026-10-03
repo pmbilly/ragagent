@@ -43,16 +43,14 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 /**
- * 数据源 HTTP 层的契约测试（对照 Go {@code internal/handler/datasource.go} +
- * {@code datasource_credentials.go} 的 17 个端点，路由见
- * {@code internal/router/routes_infra.go} L292-333）。
+ * 数据源 HTTP 层的契约测试（覆盖 17 个端点）。
  *
- * <h2>期望值来源：Go 实录</h2>
- * <p>全部 golden 都是对<b>运行中的 Go dev server</b>（:8080，db=localhost:15432）
+ * <h2>golden 的来源</h2>
+ * <p>全部 golden 都是对<b>运行中的 dev server</b>（录制时 :8080，db=localhost:15432）
  * 打真实请求录下来的，录制脚本是 {@code scripts/record-datasource-golden.sh}，
  * 文件在 {@code server/src/test/resources/contracts/ds-*.json}。</p>
  *
- * <p><b>录制前的额外准备</b>：Go server 带
+ * <p><b>录制前的额外准备</b>：服务带
  * {@code SSRF_WHITELIST=127.0.0.1,::1,localhost} 启动，且 127.0.0.1:18099 上跑着一个
  * stub feed（{@code python3 -m http.server}，内容与
  * {@code src/test/resources/datasource/stub-feed.xml} 同一份字节）。这一轮刻意让
@@ -73,9 +71,9 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
  *
  * <h2>掩码</h2>
  * <p>UUID（数据源 / 知识库 / 同步日志的 id）与 RFC3339 时间戳两侧同掩码后逐字节比对
- * （中文按原始字节，见 §9）。<b>但 Go 零值时间 {@code 0001-01-01T00:00:00Z} 与真实
+ * （中文按原始字节）。<b>但零值时间 {@code 0001-01-01T00:00:00Z} 与真实
  * 时间戳是两种形态</b>，掩码会把它们抹平，所以另有专门断言钉住
- * "PUT 的响应里 created_at 是零值、updated_at 是真实时间"这条 GORM 写回语义。</p>
+ * "PUT 的响应里 created_at 是零值、updated_at 是真实时间"这条落库写回语义。</p>
  *
  * <h2>为什么把 {@link DataSourceSyncTaskQueue} 换成 mock</h2>
  * <p>{@code POST /{id}/sync} 在真队列下会在后台虚拟线程里跑完整同步（抓 stub feed →
@@ -100,7 +98,7 @@ class DataSourceHttpContractTest {
     private static final String UNKNOWN_ID = "11111111-2222-3333-4444-999999999999";
 
     /**
-     * golden 录制时用的 feed 地址（Go 那轮跑在 18099）。
+     * golden 录制时用的 feed 地址（录制时跑在 18099）。
      *
      * <p>⚠️ <b>运行时不用这个端口</b>：stub 起在临时端口（{@link #stubFeedUrl}），
      * 比对前把它替换回这个录制值。固定端口会让"本机恰好有别的进程占着 18099"
@@ -120,7 +118,7 @@ class DataSourceHttpContractTest {
      */
     private static final Pattern UUID_VALUE = Pattern.compile(
             "\"([A-Za-z_]+)\":\"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\"");
-    /** 只匹配**真实**时间戳（年份 2xxx），以免把 Go 零值时间也抹掉。 */
+    /** 只匹配**真实**时间戳（年份 2xxx），以免把零值时间 {@code 0001-01-01T00:00:00Z} 也抹掉。 */
     private static final Pattern TS_VALUE = Pattern.compile(
             "\"([A-Za-z_]+)\":\"[2-9]\\d{3}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})\"");
 
@@ -255,7 +253,7 @@ class DataSourceHttpContractTest {
     /**
      * 连接器目录：<b>裸数组</b>，没有 data/success 信封。
      *
-     * <p>⚠️ 按 <b>type 建索引</b>比对，<b>不</b>按下标：Go 的实现先遍历 map（随机序）
+     * <p>⚠️ 按 <b>type 建索引</b>比对，<b>不</b>按下标：目录构建先遍历注册表（无固定序）
      * 再做稳定排序，同优先级的条目顺序每次调用都不同（golden 里
      * {@code feishu_drive} 与 {@code lark_drive} 的顺序就是录制那一刻的偶然）。
      * 这里额外钉住"优先级非递减"这条真正稳定的性质。</p>
@@ -270,7 +268,7 @@ class DataSourceHttpContractTest {
     /**
      * 按 type 建索引逐字段比对连接器目录。
      *
-     * <p>⚠️ <b>不能按下标比</b>：Go 的实现先遍历 map（随机序）再做<b>稳定</b>插入排序，
+     * <p>⚠️ <b>不能按下标比</b>：目录构建先遍历注册表（无固定序）再做<b>稳定</b>插入排序，
      * 于是同优先级的条目顺序每次调用都不同——实测两次相邻调用里
      * {@code feishu_drive}/{@code lark_drive} 就换了位置（golden 文件的
      * {@code ds-types.json} 与 {@code ds-types-viewer.json} 正是两次不同调用的产物，
@@ -301,7 +299,7 @@ class DataSourceHttpContractTest {
             assertThat(a).as("连接器 " + g.get("type").asText()).isNotNull();
             assertEquals(g.toString(), a.toString(), "连接器 " + g.get("type").asText() + " 的字段");
         }
-        // 内置连接器 icon 都是空串 → §1.6：空串照写（不再是 omitempty 式"键消失"）
+        // 内置连接器 icon 都是空串 → 空串照写（键不消失）
         assertThat(actualJson).contains("\"icon\":\"\"");
     }
 
@@ -312,7 +310,7 @@ class DataSourceHttpContractTest {
         assertGoldenBody("ds-list-kb-required.json", raw(r));
     }
 
-    /** 空仓库列表是 {@code []} 而不是 {@code null}（Go 显式做了 make）。 */
+    /** 空仓库列表是 {@code []} 而不是 {@code null}（显式初始化过的集合，恒输出）。 */
     @Test
     void listEmptyKbMatchesGo() throws Exception {
         MvcResult r = perform(get("/api/v1/datasource?kbId=" + KB_EMPTY)
@@ -373,7 +371,7 @@ class DataSourceHttpContractTest {
      * {@code "invalid configuration: config is nil"}（RSS 的 parseConfig 对 nil 配置的原文）。
      *
      * <p>这条顺带钉住一件事：service 的 {@code validateDataSourceConfig} 必须把
-     * {@code null} 配置<b>原样递给连接器</b>（Go 就是那么写的），而不是提前折叠成
+     * {@code null} 配置<b>原样递给连接器</b>，而不是提前折叠成
      * 泛泛的 {@code "invalid configuration"}。</p>
      */
     @Test
@@ -392,7 +390,7 @@ class DataSourceHttpContractTest {
 
         assertEquals(201, r.getResponse().getStatus(), raw(r));
         assertGoldenBody("ds-create.json", raw(r));
-        // config 里只有 settings（resource_ids 是 nil → omitempty 省略）
+        // config 里只有 settings（resource_ids 为 null → 键省略）
         // PR4：键序归一后邻接子串不可靠 → 树断言
         {
             var root = new com.fasterxml.jackson.databind.ObjectMapper().readTree(raw(r));
@@ -426,8 +424,8 @@ class DataSourceHttpContractTest {
     /**
      * PUT 的响应是<b>请求对象</b>（handler 只把 ID/租户/库 id 覆盖过去），
      * 不是重新读出来的行——所以 {@code type}/{@code sync_schedule}/{@code status}/
-     * {@code created_at} 都是零值，只有 {@code updated_at} 是真实的（GORM 的
-     * struct Updates 把新时间写回了内存对象）。
+     * {@code created_at} 都是零值，只有 {@code updated_at} 是真实的（更新时新时间
+     * 被写回了内存对象）。
      *
      * <p>同时钉住"凭据永不从这条端点流入"：body 里带的 {@code api_token} 不会出现，
      * 原来在 credentials 里的 {@code feed_urls} 也会被整块换成库里的旧值
@@ -482,7 +480,7 @@ class DataSourceHttpContractTest {
                 .header("Authorization", bearer));
         assertEquals(200, r.getResponse().getStatus(), raw(r));
         assertGoldenBody("ds-list.json", raw(r));
-        // 还没有同步日志 → latest_sync_log 的 omitempty 让它整个键消失
+        // 还没有同步日志 → latest_sync_log 键整个省略
         assertThat(raw(r)).doesNotContain("latest_sync_log");
     }
 
@@ -520,7 +518,7 @@ class DataSourceHttpContractTest {
      * 资源枚举真的去抓了 stub feed：名字与条目数都来自 feed 内容。
      *
      * <p>{@code external_id} 就是配置里的 feed 地址，所以要先做端口归一化；
-     * 其余字段（含 {@code modified_at} 的 Go 零值）<b>逐字节</b>比。</p>
+     * 其余字段（含 {@code modified_at} 的零值）<b>逐字节</b>比。</p>
      */
     @Test
     void listResourcesMatchesGo() throws Exception {
@@ -534,7 +532,7 @@ class DataSourceHttpContractTest {
     /**
      * 空 {@code resource_ids} 回 {@code {"ancestors":[]}}。
      *
-     * <p>注意：Go 的<b>短路在 service 里</b>（{@code len(resourceIDs) == 0} 直接返回空切片），
+     * <p>注意：短路<b>在 service 里</b>（空 {@code resourceIDs} 直接返回空列表），
      * 但 handler 仍然先跑 {@code getOwnedDataSource}，所以"未知 id + 空列表"回的
      * 是 <b>404</b> 而不是 200——本用例只覆盖前者（golden 也是那么录的）。</p>
      */
@@ -560,8 +558,8 @@ class DataSourceHttpContractTest {
     // ══════════════════════════ 5. 凭据子资源 ══════════════════════════
 
     /**
-     * 缺 {@code credentials} 时回的是 <b>go-playground/validator 的 required 原文</b>
-     * （gin 的 ShouldBindJSON 把 err.Error() 直接当 message）——逐字复刻，不掩码。
+     * 缺 {@code credentials} 时回的是 <b>required 校验的原文文案</b>
+     * （绑定层把 err.Error() 直接当 message）——逐字透传，不掩码。
      */
     @Test
     void credentialsPutWithoutFieldIsBadRequest() throws Exception {
@@ -603,7 +601,7 @@ class DataSourceHttpContractTest {
         assertThat(afterBody).contains(
                 "\"settings\":{\"feed_urls\":\"" + FEED_URL + "\"}");
         assertThat(afterBody).doesNotContain("enc:v1:");
-        // 落库的 config 里 credentials 为 null（剥完 map 空了 → Go 的 nil）
+        // 落库的 config 里 credentials 为 null（剥完 map 空了 → 整键为 null）
         String stored = jdbc.queryForObject(
                 "SELECT config FROM data_sources WHERE id = ?", String.class, id);
         assertThat(stored).contains("\"credentials\":null");
@@ -946,11 +944,11 @@ class DataSourceHttpContractTest {
     /**
      * 两侧同掩码：UUID 值 + <b>真实</b>时间戳（{@code 2xxx-…}）。
      *
-     * <p>Go 零值时间 {@code 0001-01-01T00:00:00Z} 刻意<b>不</b>掩码——它是"这个字段
+     * <p>零值时间 {@code 0001-01-01T00:00:00Z} 刻意<b>不</b>掩码——它是"这个字段
      * 从未被赋值"的信号，掩掉就把两种形态混为一谈了。需要它的用例另行显式断言。</p>
      */
     /**
-     * 夹具重录开关（同 EmbedContractTest/McpContractTest 的纪律，§13.12）：
+     * 夹具重录开关（同 EmbedContractTest/McpContractTest 的纪律）：
      * {@code -Dcontract.refresh=true} 时把**掩码后的实际响应**写回夹具，用于换锚批
      * （键名改名/条件键改恒输出会一次影响几十个 golden）。默认关闭——平时是断言。
      */

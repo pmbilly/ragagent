@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
  */
 class ChunkSearchUtilTest {
 
-    // ── 纯逻辑（searchutil / faq.go）───────────────────────────────────────
+    // ── 纯逻辑 ─────────────────────────────────────────────────────────────
 
     @Test
     void imageURLsInContentCoversMarkdownAndHtmlButNotDataSrcOrUnquoted() {
@@ -47,7 +47,7 @@ class ChunkSearchUtilTest {
         String q27 = "aaaaaaaaaaaaaaaaaaaaaaaaaaa";
         assertThat(kb36.length() + 1 + q27.length()).isEqualTo(64);
         assertThat(ChunkSearchUtil.generatedQuestionSourceId(kb36, q27)).isEqualTo(kb36 + "-" + q27);
-        // 73 字节的 UUID 对：sha256(questionID) 前 12 字节 hex（Go 实录语料）
+        // 73 字节的 UUID 对：sha256(questionID) 前 12 字节 hex（固定语料）
         String q36 = "3f2b8a1c-9d4e-4f0a-8b7c-1d2e3f4a5b6c";
         assertThat(ChunkSearchUtil.generatedQuestionSourceId(kb36, q36))
                 .isEqualTo(kb36 + "-q976c5fc9daf703cb3aff0926")

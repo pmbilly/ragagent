@@ -30,26 +30,25 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 /**
- * 系统设置服务（对照 Go internal/application/service/system_setting.go 的 Lite 模式）。
+ * 系统设置服务。
  *
- * <p><b>已知差异（Lite 取舍，Javadoc 即契约）</b>：Go 有 "preload + Redis pubsub 失效"
- * 的跨副本缓存；Java 侧（进程内队列同族取舍）是<b>单实例</b>语义——每请求直读 DB，
+ * <p><b>已知差异（Lite 取舍，Javadoc 即契约）</b>：没有 "preload + Redis pubsub 失效"
+ * 的跨副本缓存；本侧是<b>单实例</b>语义——每请求直读 DB，
  * 无缓存无 pubsub。行为差异只在多副本部署下可见（本副本 UI 改动不再即时广播给对端），
- * 单实例的解析优先级与响应形态与 Go 逐字段一致。</p>
+ * 解析优先级与响应形态逐字段固定。</p>
  *
- * <p>三层解析（逐字对照 Go resolveRaw/GetXxx）：DB 行 → ENV → default；DB 读失败
+ * <p>三层解析：DB 行 → ENV → default；DB 读失败
  * 降级到 ENV/default（记 WARN，不 500）。已知"引导默认行"（last_modified_by 为空且值
  * ==registry 默认）在<b>读取</b>时折叠回 ENV/default（isBootstrapDefaultRow）。</p>
  *
  * <p>副作用桥（dispatchSideEffects）：ssrf.whitelist 更新后推给
- * {@link SsrfGuard#reloadWhitelist(String)}（含 SSRF_WHITELIST_EXTRA 合并，对照
- * applySSRFWhitelist）。model.max_concurrency 的桥已随
+ * {@link SsrfGuard#reloadWhitelist(String)}（含 SSRF_WHITELIST_EXTRA 合并）。
+ * model.max_concurrency 的桥已随
  * 并发闸门装配接线（ConcurrencyGovernorWiring）。</p>
  *
- * <p><b>启动预载</b>（对照 Go preload 的 initial sync，走查补翻）：应用就绪后把
- * DB 的 ssrf.whitelist 推给 SsrfGuard——否则重启后 DB 白名单静默失效（guard 静态
- * 初始化只读 env），单实例下也可观测（走查实案：UI 存了 198.18.0.0/15，重启后
- * dashscope fake-IP 又被拦）。读失败降级 env-only（WARN，不阻断启动）。</p>
+ * <p><b>启动预载</b>：应用就绪后把 DB 的 ssrf.whitelist 推给 SsrfGuard——否则重启后
+ * DB 白名单静默失效（guard 静态初始化只读 env）。实测案例：UI 存了 198.18.0.0/15，
+ * 重启后 dashscope fake-IP 又被拦。读失败降级 env-only（WARN，不阻断启动）。</p>
  */
 @Service
 public class SystemSettingService implements SystemSettingGateway {
@@ -62,9 +61,9 @@ public class SystemSettingService implements SystemSettingGateway {
     private final AuditLogService auditService;
     /** 白名单是进程级静态——注入任意实例即可（reloadWhitelist 改的是静态字段）。 */
     private final SsrfGuard ssrfGuard;
-    /** 三层解析的 ENV 层（B6 批 4：取代裸 System.getenv；键名由调用方给）。 */
+    /** 三层解析的 ENV 层（Spring Environment，不读裸 System.getenv；键名由调用方给）。 */
     private final Environment environment;
-    /** 对照 Go 的 cfg.Auth.RegistrationMode 兜底（dev 未配置 → self_serve）。 */
+    /** 配置兜底：未配置 → self_serve。 */
     @Value("${weknora.auth.registration-mode:}")
     private String configuredRegistrationMode;
 
@@ -82,7 +81,7 @@ public class SystemSettingService implements SystemSettingGateway {
 
     // ── 三层解析（业务侧 GetXxx） ─────────────────────────────────────────
 
-    /** 对照 resolveRaw：DB 行（非引导默认）→ 有值；否则 ENV/default。 */
+    /** DB 行（非引导默认）→ 有值；否则 ENV/default。 */
     private record Resolved(JsonNode raw, boolean fromDB) {
     }
 
@@ -98,7 +97,7 @@ public class SystemSettingService implements SystemSettingGateway {
         return new Resolved(null, false);
     }
 
-    /** 对照 GetInt：DB（容忍 "42" 字符串行）→ ENV → def。任何错误路径回落 def。 */
+    /** DB（容忍 "42" 字符串行）→ ENV → def。任何错误路径回落 def。 */
     public long getInt(String key, String envName, long def) {
         Resolved r = resolveRaw(key);
         if (r.fromDB()) {
@@ -127,7 +126,6 @@ public class SystemSettingService implements SystemSettingGateway {
         return def;
     }
 
-    /** 对照 GetString。 */
     public String getString(String key, String envName, String def) {
         Resolved r = resolveRaw(key);
         if (r.fromDB() && r.raw() != null && r.raw().isTextual()) {
@@ -142,7 +140,7 @@ public class SystemSettingService implements SystemSettingGateway {
         return def;
     }
 
-    /** 对照 GetBool（ENV 走 Go strconv.ParseBool 语义：1/t/T/TRUE/true/True 等）。 */
+    /** ENV 解析走宽松布尔语义：1/t/T/TRUE/true/True 等。 */
     public boolean getBool(String key, String envName, boolean def) {
         Resolved r = resolveRaw(key);
         if (r.fromDB() && r.raw() != null && r.raw().isBoolean()) {
@@ -160,7 +158,7 @@ public class SystemSettingService implements SystemSettingGateway {
         return def;
     }
 
-    /** 对照 GetStringList：ENV 按逗号拆分 + trim + 丢弃空项；返回恒非 null。 */
+    /** ENV 按逗号拆分 + trim + 丢弃空项；返回恒非 null。 */
     public List<String> getStringList(String key, String envName, List<String> def) {
         Resolved r = resolveRaw(key);
         if (r.fromDB() && r.raw() != null && r.raw().isArray()) {
@@ -196,7 +194,7 @@ public class SystemSettingService implements SystemSettingGateway {
     // ── 管理面（List / Get / Update / Reset） ─────────────────────────────
 
     /**
-     * 对照 List：持久行 + registry 虚拟行（按 key 排序），退役键剔除，
+     * 持久行 + registry 虚拟行（按 key 排序），退役键剔除，
      * 额外（未知）行按 key 排序缀尾。
      */
     public List<SystemSetting> list() {
@@ -230,9 +228,9 @@ public class SystemSettingService implements SystemSettingGateway {
     }
 
     /**
-     * 对照 Get：未知 key → 抛 IllegalStateException（handler 折叠成 400，
-     * 消息 = {@code unknown setting key "x"}）；行缺失 → 虚拟行（nil 行语义在
-     * handler 里就是 200 虚拟行，Go 的 (nil,nil) 分支只在 DB 错误时出现）。
+     * 未知 key → 抛 IllegalStateException（handler 折叠成 400，
+     * 消息 = {@code unknown setting key "x"}）；行缺失 → 虚拟行（200 响应；
+     * 仅 DB 错误才走异常分支）。
      */
     public SystemSetting get(String key) {
         SystemSettingRegistry.Spec spec = SystemSettingRegistry.get(key);
@@ -251,8 +249,8 @@ public class SystemSettingService implements SystemSettingGateway {
     }
 
     /**
-     * 对照 Update：类型/枚举/结构校验 → upsert → 审计。错误消息 = Go 原文
-     * （handler 原文当 400 响应）。
+     * 类型/枚举/结构校验 → upsert → 审计。错误消息是契约
+     * （原文直接当 400 响应）。
      */
     public SystemSetting update(String key, JsonNode rawValue) {
         SystemSettingRegistry.Spec spec = SystemSettingRegistry.get(key);
@@ -322,7 +320,7 @@ public class SystemSettingService implements SystemSettingGateway {
         return persisted;
     }
 
-    /** 对照 Reset：未知 key 仍 400；幂等成功；仅真删除写审计。 */
+    /** 未知 key 仍 400；幂等成功；仅真删除写审计。 */
     public void reset(String key) {
         SystemSettingRegistry.Spec spec = SystemSettingRegistry.get(key);
         if (spec == null) {
@@ -346,7 +344,7 @@ public class SystemSettingService implements SystemSettingGateway {
                 .last("LIMIT 1"));
     }
 
-    /** 对照 virtualSetting：id=0 + Go 零值时间（实体字段默认值即零值）。 */
+    /** id=0 + 零值时间（实体字段默认值即零值）。 */
     private SystemSetting virtualSetting(String key, SystemSettingRegistry.Spec spec) {
         SystemSetting row = new SystemSetting();
         row.setId(0L);
@@ -363,8 +361,8 @@ public class SystemSettingService implements SystemSettingGateway {
     }
 
     /**
-     * 对照 fallbackJSONForSpec：ENV → (auth.registration_mode 的 cfg 兜底) → 内置默认。
-     * ENV 编码失败静默落默认（与 Go 逐分支一致）。
+     * ENV → (auth.registration_mode 的配置兜底) → 内置默认。
+     * ENV 编码失败静默落默认（逐分支确定）。
      */
     private JsonNode fallbackJsonForSpec(String key, SystemSettingRegistry.Spec spec) {
         if (!spec.envName().isEmpty()) {
@@ -379,7 +377,7 @@ public class SystemSettingService implements SystemSettingGateway {
                         default -> null;
                     };
                 } catch (IllegalArgumentException ignored) {
-                    // fall through to config/default（Go 同样忽略编码失败）
+                    // 编码失败 → 落到 config/default
                 }
             }
         }
@@ -392,7 +390,7 @@ public class SystemSettingService implements SystemSettingGateway {
         return SystemSettingRegistry.encodeDefault(spec);
     }
 
-    /** 对照 isBootstrapDefaultRow：无操作者（last_modified_by 空）且值 ==registry 默认。 */
+    /** 无操作者（last_modified_by 空）且值 ==registry 默认。 */
     private boolean isBootstrapDefaultRow(SystemSetting row, SystemSettingRegistry.Spec spec) {
         if (row == null || !row.getLastModifiedBy().trim().isEmpty()) {
             return false;
@@ -415,8 +413,8 @@ public class SystemSettingService implements SystemSettingGateway {
     }
 
     /**
-     * 对照 Go preload 的 initial sync（system_setting.go L405）：应用就绪后把 DB 的
-     * ssrf.whitelist / sandbox.docker_enabled 推给消费方。走查实案：UI 保存的白名单在
+     * 启动预载：应用就绪后把 DB 的
+     * ssrf.whitelist / sandbox.docker_enabled 推给消费方。否则 UI 保存的白名单在
      * 重启后静默失效（guard 静态初始化只读 env），单实例即可观测。
      */
     @org.springframework.context.event.EventListener(
@@ -431,7 +429,7 @@ public class SystemSettingService implements SystemSettingGateway {
         }
     }
 
-    /** 对照 dispatchSideEffects：ssrf.whitelist 与 sandbox.docker_enabled 已接线。 */
+    /** ssrf.whitelist 与 sandbox.docker_enabled 已接线。 */
     private void dispatchSideEffects(String changedKey) {        if ("ssrf.whitelist".equals(changedKey)) {
             List<String> list = getStringList("ssrf.whitelist", "SSRF_WHITELIST", new ArrayList<>());
             String primary = String.join(",", list);
@@ -444,7 +442,7 @@ public class SystemSettingService implements SystemSettingGateway {
         }
     }
 
-    /** 对照 emitChangeAudit：tenant_id=0 + old_value/new_value（RawMessage 直嵌）。 */
+    /** tenant_id=0 + old_value/new_value（RawMessage 直嵌）。 */
     private void emitChangeAudit(String key, String valueType, JsonNode oldValue, JsonNode newValue) {
         if (auditService == null) {
             return;
@@ -470,7 +468,7 @@ public class SystemSettingService implements SystemSettingGateway {
         }
     }
 
-    /** 对照 enrichSettingsModifiedBy：批量解析显示名（username → email 回落；失败静默）。 */
+    /** 批量解析显示名（username → email 回落；失败静默）。 */
     private void enrichModifiedBy(List<SystemSetting> rows) {
         if (rows.isEmpty()) {
             return;
@@ -510,7 +508,7 @@ public class SystemSettingService implements SystemSettingGateway {
         }
     }
 
-    /** 对照 auditActor：ctx 里的 UserID（系统管理员自己）。 */
+    /** 当前操作者（系统管理员自己）。 */
     private static String auditActor() {
         String uid = TenantContext.currentUserId();
         return uid == null ? "" : uid;
@@ -521,7 +519,7 @@ public class SystemSettingService implements SystemSettingGateway {
         return "[" + String.join(" ", values) + "]";
     }
 
-    /** 对照 validateRegistryEntry 的 asynq 正整数 + ssrf 白名单结构校验。 */
+    /** registry 条目校验：asynq 正整数 + ssrf 白名单结构。 */
     private static void validateRegistryEntry(String key, JsonNode rawValue) {
         if (key.startsWith("asynq.") && key.endsWith("_concurrency")) {
             long n;
@@ -546,8 +544,8 @@ public class SystemSettingService implements SystemSettingGateway {
                 throw new IllegalArgumentException("concurrency must be at least 1");
             }
         }
-        // ssrf.whitelist 的条目结构校验（ValidateSSRFWhitelistEntries）随 SsrfGuard 对齐：
-        // 拒绝空串/非法 CIDR——当前 SsrfGuard.reloadWhitelist 接受任意条目，先与 Go 的
-        // "校验失败 400" 行为对齐在 encodeForType 的 string_list 归一（trim+去空）层面。
+        // ssrf.whitelist 的条目结构校验（拒绝空串/非法 CIDR）尚未完整落地：
+        // 当前 SsrfGuard.reloadWhitelist 接受任意条目，仅 encodeForType 的
+        // string_list 归一（trim+去空）做了部分对齐。
     }
 }

@@ -20,9 +20,9 @@ import org.junit.jupiter.api.Test;
 import com.sun.net.httpserver.HttpServer;
 
 /**
- * 微信扫码登录服务（W5γ3.10b）——对照 Go {@code internal/im/wechat/qrcode.go}：
+ * 微信扫码登录服务行为测试：
  * 取码端点与参数、状态轮询的四个状态、confirmed 凭证、非 200 折错、以及
- * <b>客户端超时算 wait</b>（长轮询的正常形态，照 Go）。
+ * <b>客户端超时算 wait</b>（长轮询的正常形态）。
  */
 class WechatQRCodeServiceTest {
 

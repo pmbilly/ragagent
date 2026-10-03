@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -30,10 +29,10 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 
 /**
- * 腾讯 VectorDB 驱动（W5γ4.15）对照 Go {@code retriever/tencentvectordb/}：wire 形状
+ * 腾讯 VectorDB 驱动：wire 形状
  * （HTTP API 的 auth/path/信封）、集合命名开关、建集合索引表、Upsert 的稀疏向量、
  * 删除 filter 形态、向量/全文检索请求体、Update API 的批量更新、拷贝的 offset 分页与
- * sha256 三态 SourceID、move。BM25 用内存参数表注入（对照 Go 的数学已在
+ * sha256 三态 SourceID、move。BM25 用内存参数表注入（BM25 数学已在
  * {@code TencentVectorDbBm25Test} 验证）。
  */
 class TencentVectorDbRetrieveRepositoryTest {
@@ -170,7 +169,7 @@ class TencentVectorDbRetrieveRepositoryTest {
     void envelopeErrors() {
         responses.put("POST /collection/describe", "{\"code\":15202,\"msg\":\"collection not exist\"}");
         TencentVectorDbRetrieveRepository repo = repo("weknora_embeddings", true);
-        // existsCollection 把 15202 当"不存在"（照 Go）
+        // existsCollection 把 15202 当"不存在"
         assertThat(repo).isNotNull();
         statuses.put("POST /collection/create", 503);
         assertThatThrownBy(() -> repo.batchSave(List.of(info(CHUNK, CHUNK)),
@@ -228,7 +227,7 @@ class TencentVectorDbRetrieveRepositoryTest {
         assertThat(doc.path("is_enabled").asLong()).isEqualTo(1L);
         assertThat(last("/document/upsert").json().path("buildIndex").asBoolean()).isTrue();
 
-        // 空向量跳过（不抛，照 Go 的 WARN 语义）
+        // 空向量跳过（不抛，只 WARN）
         int before = captured.size();
         repo.batchSave(List.of(info("s", "c")), embeddings());
         assertThat(captured).hasSize(before);
@@ -335,7 +334,7 @@ class TencentVectorDbRetrieveRepositoryTest {
         assertThat(results.get(0).results().get(0).matchType)
                 .isEqualTo(EngineTypes.MATCH_KEYWORDS);
 
-        // 单集合失败 → 跳过；全失败 → 报错（照 Go 的提示文案）
+        // 单集合失败 → 跳过；全失败 → 报错（提示文案逐字断言）
         statuses.put("POST /document/fullTextSearch", 500);
         assertThatThrownBy(() -> repo.retrieve(params))
                 .isInstanceOf(IllegalStateException.class)

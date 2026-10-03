@@ -136,7 +136,7 @@ class QaRequestBindingTest {
     }
 
     /**
-     * 畸形 body 的措辞（B51：GoJsonBindError 退役——空体与字面量错误都用 Jackson 原生消息）。
+     * 畸形 body 的措辞（GoJsonBindError 已退役——空体与字面量错误都用 Jackson 原生消息）。
      */
     @Test
     void malformedBodyUsesJacksonWording() {

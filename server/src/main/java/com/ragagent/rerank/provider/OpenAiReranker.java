@@ -13,7 +13,7 @@ import com.ragagent.rerank.Reranker;
 import com.ragagent.rerank.RerankerConfig;
 
 /**
- * OpenAI 兼容 rerank 客户端（对照 Go {@code rerank/remote_api.go} 全文）。
+ * OpenAI 兼容 rerank 客户端。
  *
  * <p><b>truncate_prompt_tokens 是 opt-in</b>（issue #2143）：仅当 extra_config 显式
  * 配置正数时才发送（SiliconFlow 等 provider 会取模板 prompt 的<b>末</b> N token，
@@ -65,13 +65,13 @@ public final class OpenAiReranker implements Reranker {
 
     @Override
     public List<RankResult> rerank(String query, List<String> documents) {
-        // 对照 RerankRequest：model/query/documents/additional_data(omitempty)/
-        // truncate_prompt_tokens(omitempty)
+        // 请求体字段：model/query/documents/additional_data(空则省略)/
+        // truncate_prompt_tokens(空则省略)
         ObjectNode requestBody = ProviderJson.object();
         requestBody.put("model", modelName);
         requestBody.put("query", query == null ? "" : query);
         requestBody.set("documents", ProviderJson.arrayOfStrings(documents));
-        // additional_data 恒 nil → omitempty 恒省略
+        // additional_data 恒为 null → 整键省略
         if (truncatePromptTokens > 0) {
             requestBody.put("truncate_prompt_tokens", truncatePromptTokens);
         }

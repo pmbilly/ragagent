@@ -188,7 +188,7 @@ class JsonContractRoundTripTest {
 
     @Test
     void mcpToolApprovalRoundTrips() {
-        // 直接作为 GET /{id}/tool-approvals 的响应体，键名必须逐字对齐 Go tag。
+        // 直接作为 GET /{id}/tool-approvals 的响应体，键名必须逐字对齐既定线格式。
         McpToolApproval a = new McpToolApproval();
         a.setId("a-1");
         a.setTenantId(10002L);
@@ -287,7 +287,7 @@ class JsonContractRoundTripTest {
     /**
      * 批次执行体（wiki ingest / cite / dedup）读写的那批 jsonb 载荷。
      *
-     * <p>键名即 Java 字段名（camelCase，落库格式 §2 第 11 条）；
+     * <p>键名即 Java 字段名（camelCase，契约 §1.1）；
      * {@code WikiIngestPayload} 的五个 {@code lf_*} 追踪键是平铺载具的冻结面
      * （见 §14.6 边界清单）。任何 {@code isXxx()}/{@code getXxx()} 派生方法都必须
      * {@code @JsonIgnore}，否则整列回读会抛 {@code UnrecognizedPropertyException}。</p>
@@ -712,7 +712,7 @@ class JsonContractRoundTripTest {
         assertRoundTrips(s, Session.class,
                 "types.Session ← Session（裸响应体 + 复用 agent_config 列的 last_request_state）");
 
-        // 全空也要能往返：omitempty 的字段被省略后仍须幂等
+        // 全空也要能往返：空值省略的字段全部缺省时仍须幂等
         assertRoundTrips(new Session(), Session.class, "types.Session ← Session（全空）");
 
         // 列表项：同样是裸响应体元素，且内嵌了要遮蔽掉的内层 im_platform
@@ -1336,7 +1336,7 @@ class JsonContractRoundTripTest {
 
     @Test
     void tenantKvConfigsRoundTrip() {
-        // WebSearchConfig：omitempty 家族（空串/0/false 全省略）；api_key 序列化抑制
+        // WebSearchConfig：空值省略家族（空串/0/false 全省略）；api_key 序列化抑制
         // （write-only：响应与回读都见不到，黑名单保留）
         com.ragagent.auth.domain.tenantconfig.WebSearchConfig ws =
                 new com.ragagent.auth.domain.tenantconfig.WebSearchConfig();
@@ -1389,7 +1389,7 @@ class JsonContractRoundTripTest {
         assertRoundTrips(chat, com.ragagent.auth.domain.tenantconfig.ChatHistoryConfig.class,
                 "types.ChatHistoryConfig ← ChatHistoryConfig");
 
-        // RetrievalConfig：double 走 GoDoubleSerializer（0.5 → 0.5、0 → 0）；
+        // RetrievalConfig：double 用默认 Jackson 输出（0.5 → 0.5、0 → 0.0）；
         // rrf_* 零值 NON_DEFAULT 省略
         com.ragagent.auth.domain.tenantconfig.RetrievalConfig ret =
                 new com.ragagent.auth.domain.tenantconfig.RetrievalConfig();

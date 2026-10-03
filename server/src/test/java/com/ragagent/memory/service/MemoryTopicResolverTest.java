@@ -22,11 +22,11 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 /**
- * {@link MemoryTopicResolver} 的三层解析（对照 Go topic_resolve.go）。
+ * {@link MemoryTopicResolver} 的三层解析。
  *
- * <p>第 1、2 层的期望值是 Go 实录（{@code go test -run TestTruthTopicResolve}）。
+ * <p>第 1、2 层的期望值实测钉死。
  * 第 3 层（模型裁决）用一个返回固定 JSON 的假 {@link LlmChatClient} 驱动，
- * <b>不依赖任何网络</b>（约定 §7.5 第 7 条）。</p>
+ * <b>不依赖任何网络</b>。</p>
  */
 class MemoryTopicResolverTest {
 
@@ -43,7 +43,7 @@ class MemoryTopicResolverTest {
         return s;
     }
 
-    /** 与 Go 实录里那份 existing 逐条对应。 */
+    /** 与钉死样例里那份 existing 逐条对应。 */
     private static List<MemoryTopicStat> existing() {
         return List.of(
                 stat("t1", "门店排班管理", "店员班次安排"),
@@ -61,7 +61,7 @@ class MemoryTopicResolverTest {
 
         @Test
         void exactAndAliasAndNormalisedFormsAllHit() {
-            // Go 实录：全部 "t1"
+            // 实测：全部 "t1"
             assertThat(idOf(MemoryTopicResolver.matchTopicExactly("门店排班管理", existing())))
                     .isEqualTo("t1");
             assertThat(idOf(MemoryTopicResolver.matchTopicExactly("店员班次安排", existing())))
@@ -69,7 +69,7 @@ class MemoryTopicResolverTest {
             // "门店的排班管理" 只差一个无信息的"的"——归一化后同一个 key
             assertThat(idOf(MemoryTopicResolver.matchTopicExactly("门店的排班管理", existing())))
                     .isEqualTo("t1");
-            // Go 实录："<nil>"（空 key 直接短路，不去查一个不可能命中的条件）
+            // 实测："<nil>"（空 key 直接短路，不去查一个不可能命中的条件）
             assertThat(MemoryTopicResolver.matchTopicExactly("  ", existing())).isNull();
         }
     }
@@ -80,12 +80,12 @@ class MemoryTopicResolverTest {
 
         @Test
         void highOverlapOnSpecificLabelsMatches() {
-            // Go 实录："t2"
+            // 实测："t2"
             assertThat(idOf(MemoryTopicResolver.matchTopicLoosely(
                     "PostgreSQL 连接池调优", existing()))).isEqualTo("t2");
-            // 短标签被门禁挡在模糊匹配之外（Go 实录："<nil>"）
+            // 短标签被门禁挡在模糊匹配之外（实测："<nil>"）
             assertThat(MemoryTopicResolver.matchTopicLoosely("数据", existing())).isNull();
-            // 同一领域的不同问题不匹配（Go 实录："<nil>"）
+            // 同一领域的不同问题不匹配（实测："<nil>"）
             assertThat(MemoryTopicResolver.matchTopicLoosely("订单接口用法", existing())).isNull();
         }
 
@@ -113,7 +113,7 @@ class MemoryTopicResolverTest {
 
             MemoryTopicResolver.collapseNewTopicsWithinRun(resolutions);
 
-            // Go 实录：surface 依次为 订单接口用法 / 订单接口用法 / 门店排班管理 / 订单接口用法
+            // 实测：surface 依次为 订单接口用法 / 订单接口用法 / 门店排班管理 / 订单接口用法
             assertThat(resolutions.get(0).surface()).isEqualTo("订单接口用法");
             assertThat(resolutions.get(1).surface()).isEqualTo("订单接口用法");
             assertThat(resolutions.get(2).surface()).isEqualTo("门店排班管理");

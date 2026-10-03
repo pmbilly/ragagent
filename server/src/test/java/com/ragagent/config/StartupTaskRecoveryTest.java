@@ -15,7 +15,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import com.ragagent.TestSchema;
 
 /**
- * 启动恢复（对照 Go {@code container/reset_pending_tasks.go}）的 H2 钉子：
+ * 启动恢复的 H2 钉子：
  * Lite 模式下卡在处理态的知识/摘要行复位为 failed + 重启文案 + 子任务计数清零
  * （含 wiki 独槽的 finalizing 行——单机形态下无人重建触发器）、
  * 同步日志按模式复位（Lite 全量 / 分布式只判 30 分钟陈旧窗）。

@@ -72,7 +72,7 @@ public final class SystemDtos {
     /**
      * 系统信息（version/edition 恒输出，其余未采集时显式 null）。
      *
-     * <p>与上游 Go 的差异：{@code goVersion} 改为 {@code javaVersion}（输出 JVM 运行时版本）。</p>
+     * <p>{@code javaVersion} 输出 JVM 运行时版本。</p>
      */
     public record SystemInfoResponse(
             String version,

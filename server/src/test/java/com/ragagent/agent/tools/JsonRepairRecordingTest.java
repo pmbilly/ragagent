@@ -7,9 +7,8 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
- * JsonRepair 的 Go 实录语料（31 条，§9.1 方法：/tmp/toolrec 探针原样调用 Go
- * {@code RepairJSON/RepairJSONDetail}）。含 Go 测试文件全部用例 + 刻意探测的
- * 边界（单引号/未加引号的键不修——Go 就没有这俩修复，Java 侧注释声称的行为
+ * JsonRepair 的录制语料（31 条）。含历史用例全集 + 刻意探测的
+ * 边界（单引号/未加引号的键不修——这俩形态本就不在修复范围内，Java 侧注释声称的行为
  * 由本语料钉死）。
  */
 class JsonRepairRecordingTest {

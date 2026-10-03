@@ -15,8 +15,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  *
  * <h2>落库隐式行为清单</h2>
  * <ol>
- *   <li><b>钩子 BeforeCreate</b>（Go L98-106）：ID 为空时才生成 UUID（**不是**无条件覆盖），
- *       并把 nil 的 {@code Questions} 置为空切片。注意与 Session/Message 的
+ *   <li><b>插入前</b>：ID 为空时才生成 UUID（**不是**无条件覆盖），
+ *       并把 null 的 {@code Questions} 置为空列表。注意与 Session/Message 的
  *       "无条件覆盖"不同，这里保留调用方传入的 ID。</li>
  *   <li><b>无软删除列</b>：本表没有 {@code DeletedAt}，仓储的 Delete 是**硬删**。</li>
  *   <li><b>唯一索引</b>：{@code (tenant_id, assistant_message_id, placement, config_hash, locale)}

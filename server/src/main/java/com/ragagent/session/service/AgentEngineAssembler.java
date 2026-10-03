@@ -413,7 +413,7 @@ final class AgentEngineAssembler {
             allowedTools = filterSharedAgentWriteTools(allowedTools);
         }
 
-        // Capability detection from SearchTargets（Go L869-896）
+        // Capability detection from SearchTargets
         boolean hasVectorKb = false;
         List<String> detectedWikiKbIds = new ArrayList<>();
         if (config.getSearchTargets() != null) {
@@ -433,11 +433,11 @@ final class AgentEngineAssembler {
                         }
                     }
                 } catch (RuntimeException ignored) {
-                    // Go: continue
+                    // 该 KB 不可达时跳过
                 }
             }
         }
-        // Go L886-895：dedup → 由 SearchTargets 解析出带 doc/tag 窄化的 scope → **再用 scope
+        // dedup → 由 SearchTargets 解析出带 doc/tag 窄化的 scope → **再用 scope
         // 重建 KB 清单**。hasWikiKb 必须看窄化后的结果：畸形空 target 不会变成整库授权，
         // 因而该 KB 也不该挂 wiki 工具。
         List<WikiScope> wikiScopes = detectedWikiKbIds.isEmpty()
@@ -448,7 +448,7 @@ final class AgentEngineAssembler {
             wikiKbIds.add(scope.knowledgeBaseId());
         }
         boolean hasWikiKb = !wikiKbIds.isEmpty();
-        // Go L870：一个引擎一个 WikiRouteResolver，wiki 十件共享（search 见过的 slug
+        // 一个引擎一个 WikiRouteResolver，wiki 十件共享（search 见过的 slug
         // 会偏置 read_page 的查找序）
         WikiRouteResolver wikiRoutes = new WikiRouteResolver();
         boolean hasKnowledge = !config.getKnowledgeBases().isEmpty() || !config.getKnowledgeIds().isEmpty()
@@ -456,7 +456,7 @@ final class AgentEngineAssembler {
                         && com.ragagent.agent.tools.SearchTarget.SearchTargets
                                 .hasKnowledgeRetrievalScope(config.getSearchTargets(), List.of(), List.of()));
 
-        // KB 工具过滤（Go L899-936）
+        // KB 工具过滤
         if (!hasKnowledge) {
             List<String> filtered = new ArrayList<>();
             List<String> kbTools = List.of(
@@ -482,7 +482,7 @@ final class AgentEngineAssembler {
             log.info("Pure Agent Mode: Knowledge base tools filtered out, remaining: {}", allowedTools);
         }
 
-        // Web 工具跟运行时开关（Go L939-945）
+        // Web 工具跟运行时开关
         allowedTools.remove(ToolDefinitions.TOOL_WEB_SEARCH);
         allowedTools.remove(ToolDefinitions.TOOL_WEB_FETCH);
         if (config.isWebSearchEnabled()) {
@@ -490,7 +490,7 @@ final class AgentEngineAssembler {
             allowedTools.add(ToolDefinitions.TOOL_WEB_FETCH);
         }
 
-        // memory 工具跟开关（Go L956-962）：先摘，可用才挂回（"关掉"与"没存过"要答得不同）
+        // memory 工具跟开关：先摘，可用才挂回（"关掉"与"没存过"要答得不同）
         allowedTools.remove(ToolDefinitions.TOOL_SEARCH_MEMORY);
         if (memoryService.memoryAvailable()) {
             allowedTools.add(ToolDefinitions.TOOL_SEARCH_MEMORY);
@@ -498,7 +498,7 @@ final class AgentEngineAssembler {
             log.info("search_memory not registered: long-term memory is off for this request");
         }
 
-        // 硬安全网（Go L994-1023）
+        // 硬安全网
         List<String> ragToolSet = List.of(
                 ToolDefinitions.TOOL_KNOWLEDGE_SEARCH, ToolDefinitions.TOOL_GREP_CHUNKS,
                 ToolDefinitions.TOOL_LIST_KNOWLEDGE_CHUNKS, ToolDefinitions.TOOL_QUERY_KNOWLEDGE_GRAPH,
@@ -516,10 +516,10 @@ final class AgentEngineAssembler {
             allowedTools.removeIf(ragToolSet::contains);
         }
 
-        // Dedup 保序（Go L1026）
+        // Dedup 保序
         allowedTools = new ArrayList<>(new java.util.LinkedHashSet<>(allowedTools));
 
-        // Register each allowed tool（Go L1030-1137）
+        // Register each allowed tool
         String toolOwnerId = com.ragagent.session.domain.SessionOwnerIds.currentSessionOwnerId();
         for (String toolName : allowedTools) {
             com.ragagent.agent.tools.AgentTool toolToRegister = null;
@@ -538,7 +538,7 @@ final class AgentEngineAssembler {
                         ToolDefinitions.TOOL_DATA_SCHEMA, ToolDefinitions.TOOL_DATA_ANALYSIS ->
                         toolToRegister = toolBackends.createTool(toolName,
                                 config.getSearchTargets(), rerankModel, toolOwnerId, sessionId);
-                // wiki 族 10 件（2026-09-23 接线批·切片 2c）：Go L1093-1116
+                // wiki 族 10 件（2026-09-23 接线批·切片 2c）
                 case ToolDefinitions.TOOL_WIKI_READ_PAGE, ToolDefinitions.TOOL_WIKI_SEARCH,
                         ToolDefinitions.TOOL_WIKI_READ_SOURCE_DOC, ToolDefinitions.TOOL_WIKI_FLAG_ISSUE,
                         ToolDefinitions.TOOL_WIKI_WRITE_PAGE, ToolDefinitions.TOOL_WIKI_REPLACE_TEXT,
@@ -546,7 +546,7 @@ final class AgentEngineAssembler {
                         ToolDefinitions.TOOL_WIKI_READ_ISSUE, ToolDefinitions.TOOL_WIKI_UPDATE_ISSUE ->
                         toolToRegister = toolBackends.createWikiTool(toolName,
                                 config.getSearchTargets(), wikiScopes, wikiKbIds, wikiRoutes);
-                // web 两件（2026-09-23 接线批·切片 2d）：Go L1071-1082
+                // web 两件（2026-09-23 接线批·切片 2d）
                 case ToolDefinitions.TOOL_WEB_SEARCH, ToolDefinitions.TOOL_WEB_FETCH ->
                         toolToRegister = toolBackends.createWebTool(toolName,
                                 config.getWebSearchMaxResults(), config.getWebSearchProviderId());
@@ -555,7 +555,7 @@ final class AgentEngineAssembler {
                         ToolDefinitions.TOOL_LIST_SANDBOX_FILES, ToolDefinitions.LEGACY_TOOL_READ_SANDBOX_FILE,
                         ToolDefinitions.TOOL_WRITE_SANDBOX_FILE, ToolDefinitions.TOOL_EDIT_SANDBOX_FILE -> {
                     // Bound to the resolved sandbox manager in the file/shell registration
-                    // steps（Go 同款 continue；dev 无 sandbox → 恒走此分支跳过）
+                    // steps（同款 continue；dev 无 sandbox → 恒走此分支跳过）
                 }
                 default -> log.warn("Unknown tool: {}", toolName);
             }

@@ -33,8 +33,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 /**
- * web-search-providers 11 条 + 旧版 /web-search/providers 的契约测试（波 2 第五批）。
- * golden：scripts/record-infra-config-golden.sh（43 个 wsp-* 文件，Go 实录）。
+ * web-search-providers 11 条 + 旧版 /web-search/providers 的契约测试。
+ * golden：scripts/record-infra-config-golden.sh（43 个 wsp-* 文件）。
  *
  * <p>种子：仅跨租户 wsp 行（tenant 10000，固定 hex id）；其余行经 API 按录制顺序创建
  * （随机 id 掩码归一）。录制顺序影响状态：def1→def2 的默认抢占、DDG 行的凭据写入/清除、
@@ -288,7 +288,7 @@ class WebSearchProviderContractTest {
     void section5_credentials() throws Exception {
         String base = API + "/web-search-providers";
         // 录制序：DDG 行先经 create(带 description/params) → PUT(engine_id 合并、created_at 清零)
-        // → 才进入凭据流；本段必须复刻这些前置变更
+        // → 才进入凭据流；本段必须按序串起这些前置变更
         String ddg = createProvider(
                 "{\"name\":\"wsp-golden-ddg\",\"provider\":\"duckduckgo\",\"description\":\"d\","
                         + "\"parameters\":{\"baseUrl\":\"x\",\"extraConfig\":{\"k\":\"v\"}},\"isDefault\":false}");
@@ -334,13 +334,13 @@ class WebSearchProviderContractTest {
         compareAndStatus("wsp-get-after-delete.json", 404, "GET", base + "/" + ddg, owner, null);
     }
 
-    // ── 7) test 端点真实执行面（非 golden：Go 实录仅覆盖构造失败分支）──────
+    // ── 7) test 端点真实执行面（非 golden：录制仅覆盖构造失败分支）──────
 
     /**
-     * 2026-09-23 占位扫清回归（doTestSearch 真实执行编排）：构造成功 → 真实 search
+     * 占位扫清回归（doTestSearch 真实执行编排）：构造成功 → 真实 search
      * 的三种出口——有结果 {"connected":true}；空结果 → EmptyTestResults 文案；
      * search 抛错 → 原文透传（均 200 纯字符串）。以 registry.register 注入内存
-     * stub（无需外网；Go 侧无此路径实录，故为内联断言而非 golden）。
+     * stub（无需外网；该路径无录制，故为内联断言而非 golden）。
      */
     @Test
     void section7_testRealExecution() throws Exception {
@@ -385,7 +385,7 @@ class WebSearchProviderContractTest {
 
         @Override
         public List<WebSearchResult> search(String query, int maxResults, boolean includeDate) {
-            // 对照 Go doTestSearch 的调用参数：searchProvider.Search(ctx, "test", 1, false)
+            // doTestSearch 的调用参数固定：query="test"、maxResults=1、includeDate=false
             assertEquals("test", query);
             assertEquals(1, maxResults);
             assertFalse(includeDate);

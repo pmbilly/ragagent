@@ -20,12 +20,11 @@ import com.ragagent.embedding.EmbeddingHttp;
 import com.ragagent.common.web.ProviderJson;
 
 /**
- * WeKnoraCloud embedding 客户端（对照 Go
- * {@code internal/models/embedding/weknoracloud.go} 全文）。
+ * WeKnoraCloud embedding 客户端。
  *
  * <p>POST {@code {base}/api/v1/embeddings}，签名头由 {@link WeknoraCloudSign} 生成；
  * {@code dimensions} 仅在 supportsDimensionOverride + 维度为正时出现。响应按
- * index 回填且<b>严格校验</b>：越界 / 重复 / 缺失都报错（文案逐字对照）。</p>
+ * index 回填且<b>严格校验</b>：越界 / 重复 / 缺失都报错（文案逐字固定）。</p>
  */
 public class WeknoraCloudEmbedder extends BaseEmbedder implements EmbedderPooler {
 
@@ -137,7 +136,7 @@ public class WeknoraCloudEmbedder extends BaseEmbedder implements EmbedderPooler
         return result;
     }
 
-    /** 对照 BatchEmbedWithPool：自身直连（不再走池）。 */
+    /** 自身直连（不再走池）。 */
     @Override
     public List<float[]> batchEmbedWithPool(Embedder model, List<String> texts) {
         return batchEmbed(texts);

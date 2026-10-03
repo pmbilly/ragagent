@@ -31,16 +31,15 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 /**
- * 对照 Go {@code handler.VectorStoreHandler}（internal/handler/vectorstore.go，
- * routes_infra.go L252-268 的 8 条路由；读 Viewer+ / 写与测试 Admin+）。
+ * 向量库管理端（8 条路由；读 Viewer+ / 写与测试 Admin+）。
  *
  * <p>env store（__env_* 前缀）是**路径判定先于存在性**：PUT/DELETE 对任何 __env_*
  * id 一律 400 readonly（即使该 id 不存在）；GET /test 则先查 env 表 → 404。
  * 本部署 RETRIEVE_DRIVER 未配置 → env 列表恒空（部署状态，golden 钉住）。</p>
  *
  * <p>错误形态：getOwned 404 → 纯字符串；test 失败 → **200** 纯字符串 +
- * AppError 双前缀（err.Error()）；create/update/delete 的 service 失败 → c.Error
- * → AppError 信封（code 随错误种类 1000/1005/1010）。</p>
+ * AppError 双前缀；create/update/delete 的 service 失败 →
+ * AppError 信封（code 随错误种类 1000/1005/1010）。</p>
  */
 @RestController
 @RequestMapping("/api/v1/vector-stores")
@@ -54,7 +53,7 @@ public class VectorStoreController {
         this.service = service;
     }
 
-    // ── 请求 DTO（对照 Go handler 的三个 request struct） ───────────────
+    // ── 请求 DTO ─────────────────────────────────────────────────────────
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record CreateStoreRequest(
@@ -86,8 +85,7 @@ public class VectorStoreController {
         if (req.engineType() == null || req.engineType().isEmpty()) {
             throw validator("TestStoreRequest", "EngineType");
         }
-        // Go：ConnectionConfig 是值 struct + binding:"required"——零值实测**不触发**
-        // required（validator 对非浅层 struct 的行为，CreateStoreRequest 同观测），
+        // ConnectionConfig 的必填校验不在这里做（嵌套结构校验行为不触发），
         // 直接落到引擎必填校验。
         try {
             String version = service.testRawConnection(req.engineType(), req.connectionConfig());
@@ -129,7 +127,7 @@ public class VectorStoreController {
                 .body(VectorStoreResponse.of(store, "user", false));
     }
 
-    /** env stores 在前、DB stores 在后（Go ListStores 的合并顺序） */
+    /** env stores 在前、DB stores 在后（合并顺序固定） */
     @GetMapping
     public ResponseEntity<?> listStores() {
         long tenantId = requireTenant();
@@ -221,7 +219,7 @@ public class VectorStoreController {
                 store.getConnectionConfig().version = version;
                 service.saveDetectedVersion(store);
             } catch (RuntimeException e) {
-                // Go：仅 Warnf 后继续
+                // 仅记 WARN 后继续（不影响响应）
             }
         }
         return ResponseEntity.ok(versionBody(version));

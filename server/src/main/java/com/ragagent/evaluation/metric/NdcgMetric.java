@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 对照 Go metric.NDCGMetric（ndcg.go 全文）：命中序列截断到 top-k，
+ * NDCG 指标：命中序列截断到 top-k，
  * 相关性只取 0/1，IDCG 的理想序按「min(相关总数, 命中数) 个 1 打头」构造。
  */
 public final class NdcgMetric implements Metrics {
@@ -23,7 +23,7 @@ public final class NdcgMetric implements Metrics {
         List<List<Integer>> gts = input.retrievalGT;
         List<Integer> ids = input.retrievalIDs;
 
-        // 截断 top-k（Go：ids[:k]，len<=k 时原样）
+        // 截断 top-k（不足 k 时原样）
         if (ids.size() > k) {
             ids = ids.subList(0, k);
         }

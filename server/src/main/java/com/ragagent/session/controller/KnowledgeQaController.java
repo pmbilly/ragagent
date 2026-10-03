@@ -163,7 +163,7 @@ public class KnowledgeQaController {
         ParsedRequest parsed = qaRequestParser.parseQARequest(rawSessionId, request, resourceUrls, "AgentQA", agentResolverField, currentTenant());
         QaRequestContext reqCtx = parsed.reqCtx();
 
-        // agent 模式判定：customAgent.agent_mode > request.agent_enabled（Go L929-936）
+        // agent 模式判定：customAgent.agent_mode > request.agent_enabled
         boolean agentModeEnabled = request.agentEnabled;
         if (reqCtx.agentConfig != null) {
             agentModeEnabled = SessionKnowledgeQaService.isAgentMode(reqCtx.agentConfig);
@@ -188,7 +188,7 @@ public class KnowledgeQaController {
             throw BizException.badRequest("Query content cannot be empty");
         }
 
-        // Merge single knowledge_base_id into knowledge_base_ids（Go L819-832）
+        // 合并单个 knowledge_base_id 进 knowledge_base_ids
         List<String> knowledgeBaseIds = new ArrayList<>(request.knowledgeBaseIds());
         if (!request.knowledgeBaseId.isEmpty() && !knowledgeBaseIds.contains(request.knowledgeBaseId)) {
             knowledgeBaseIds.add(request.knowledgeBaseId);
@@ -220,7 +220,7 @@ public class KnowledgeQaController {
         return searchResults;
     }
 
-    // ── ShouldBindJSON 对应物（Go binding:required 文案逐字对齐） ─────────────
+    // ── 请求体绑定（绑定错误文案逐字对齐） ───────────────────────────────
 
 
     // ── parseQARequest ────────────────────────────────────────────────────────

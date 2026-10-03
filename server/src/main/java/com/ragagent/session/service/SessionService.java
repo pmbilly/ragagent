@@ -352,7 +352,7 @@ public class SessionService {
                 sessionRepository.get(tenantId, userId, id);
                 visibleIds.add(id);
             } catch (SessionNotFoundException notFound) {
-                // Go：该 id 不可见就跳过，不算错误
+                // 该 id 不可见就跳过，不算错误
             }
         }
         if (visibleIds.isEmpty()) {

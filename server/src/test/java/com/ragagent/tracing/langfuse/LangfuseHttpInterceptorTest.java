@@ -18,7 +18,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.web.servlet.HandlerMapping;
 
 /**
- * HTTP 中间件测试（对照 Go middleware.go 的 shouldTrace 规则、traceparent 继承
+ * HTTP 中间件测试（shouldTrace 规则、traceparent 继承
  * 与请求级 trace 生命周期；导出用记录出口观察）。
  */
 class LangfuseHttpInterceptorTest {

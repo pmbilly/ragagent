@@ -58,7 +58,7 @@ final class MemoryIndexStore {
     // ── 话题统计 ───────────────────────────────────────────────────────────
 
     /**
-     * 对照 {@code BumpTopic}：计数一次，并返回累计值。
+     * 话题计数一次，并返回累计值。
      *
      * <p>插入-再自增的形状让两个并发轮次不会都认为这个话题是新的。
      * 别名记录在最后：**只在这条说法还没被记过、且它归一化后不等于 key 本身**时才追加，
@@ -110,7 +110,7 @@ final class MemoryIndexStore {
     }
 
     /**
-     * 对照 {@code RenameTopic}：给一个主题换上更好的规范标签。
+     * 给一个主题换上更好的规范标签。
      *
      * <p>旧标签变成别名而不是被丢掉：之前的每一次统计都记在它名下，
      * 丢掉它会让那种措辞的下一次出现看起来像个全新主题。
@@ -169,12 +169,12 @@ final class MemoryIndexStore {
         return false;
     }
 
-    /** 对照 {@code MarkTopicPromoted}：别再提升它第二次。 */
+    /** 记录提升时刻：别再提升它第二次。 */
     public void markTopicPromoted(MemoryScope scope, String normalizedKey) {
         repo.topicMapper.markPromoted(scope.tenantId(), scope.subjectId(), normalizedKey, OffsetDateTime.now());
     }
 
-    /** 对照 {@code TopicByKey}：不存在时回 {@code null}。 */
+    /** 按 key 查主题：不存在时回 {@code null}。 */
     public MemoryTopicStat topicByKey(MemoryScope scope, String normalizedKey) {
         if (normalizedKey == null || normalizedKey.isEmpty()) {
             return null;
@@ -182,7 +182,7 @@ final class MemoryIndexStore {
         return repo.topicMapper.selectByKey(scope.tenantId(), scope.subjectId(), normalizedKey);
     }
 
-    /** 对照 {@code TopicByID}：记忆管理器用来提升/丢弃一个还没变成记忆的主题。 */
+    /** 按 ID 查主题：记忆管理器用来提升/丢弃一个还没变成记忆的主题。 */
     public MemoryTopicStat topicById(MemoryScope scope, String id) {
         if (id == null || id.isEmpty()) {
             return null;
@@ -190,12 +190,12 @@ final class MemoryIndexStore {
         return repo.topicMapper.selectScopedById(scope.tenantId(), scope.subjectId(), id);
     }
 
-    /** 对照 {@code TopTopics}：{@code hits DESC, last_seen_at DESC}。 */
+    /** 最热主题：{@code hits DESC, last_seen_at DESC}。 */
     public List<MemoryTopicStat> topTopics(MemoryScope scope, int limit) {
         return repo.topicMapper.topTopics(scope.tenantId(), scope.subjectId(), limit);
     }
 
-    /** 对照 {@code ListUnpromotedTopics}：已计数、尚未变成兴趣的主题。 */
+    /** 已计数、尚未变成兴趣的主题（分页）。 */
     public MemoryPage<MemoryTopicStat> listUnpromotedTopics(MemoryScope scope, int limit, int offset) {
         long total = repo.topicMapper.countUnpromoted(scope.tenantId(), scope.subjectId());
         int effectiveLimit = limit <= 0 ? 50 : limit;
@@ -203,13 +203,13 @@ final class MemoryIndexStore {
                 effectiveLimit, offset), total);
     }
 
-    /** 对照 {@code DeleteTopic}：删掉一条计数，之后若再被问到就从零开始。 */
+    /** 删掉一条计数，之后若再被问到就从零开始。 */
     public void deleteTopic(MemoryScope scope, String id) {
         repo.topicMapper.deleteScoped(scope.tenantId(), scope.subjectId(), id);
     }
 
     /**
-     * 对照 {@code DeleteAllTopics}：清空记忆必须包含这些计数器。
+     * 清空记忆必须包含这些计数器。
      *
      * <p>否则一个停在 N−1 次的主题会在用户要求"清空一切"之后的**下一个问题**上被提升。</p>
      */
@@ -220,7 +220,7 @@ final class MemoryIndexStore {
     // ── 文档亲和 ───────────────────────────────────────────────────────────
 
     /**
-     * 对照 {@code BumpDocAffinity}：逐条"先插后自增"。
+     * 文档亲和：逐条"先插后自增"。
      *
      * <p>{@code knowledge_id} 为空的条目跳过；{@code title} 与
      * {@code knowledge_base_id} **只在非空时才覆盖**——一次没带标题的引用
@@ -257,7 +257,7 @@ final class MemoryIndexStore {
         }
     }
 
-    /** 对照 {@code DocAffinity}：交给调用方的是一个 {@code knowledgeId → hits} 的映射。 */
+    /** 文档亲和映射：交给调用方的是一个 {@code knowledgeId → hits} 的映射。 */
     public Map<String, Integer> docAffinity(MemoryScope scope, List<String> knowledgeIds) {
         if (knowledgeIds == null || knowledgeIds.isEmpty()) {
             return null;
@@ -271,12 +271,12 @@ final class MemoryIndexStore {
         return affinity;
     }
 
-    /** 对照 {@code TopDocAffinity}。 */
+    /** 最热文档（限量）。 */
     public List<MemoryDocAffinity> topDocAffinity(MemoryScope scope, int limit) {
         return repo.affinityMapper.topAffinity(scope.tenantId(), scope.subjectId(), limit);
     }
 
-    /** 对照 {@code DocAffinityByID}：不存在时回 {@code null}。 */
+    /** 按 ID 取文档亲和：不存在时回 {@code null}。 */
     public MemoryDocAffinity docAffinityById(MemoryScope scope, String id) {
         if (id == null || id.isEmpty()) {
             return null;
@@ -285,7 +285,7 @@ final class MemoryIndexStore {
     }
 
     /**
-     * 对照 {@code ListFamiliarDocs}：{@code minHits < 1} 时回落到
+     * 熟悉文档列表：{@code minHits < 1} 时回落到
      * {@code MemoryDocAffinityMinHits}（= 2，一次引用是噪声、两次才是模式）。
      */
     public MemoryPage<MemoryDocAffinity> listFamiliarDocs(MemoryScope scope, int minHits, int limit, int offset) {
@@ -296,12 +296,12 @@ final class MemoryIndexStore {
                 effectiveMinHits, effectiveLimit, offset), total);
     }
 
-    /** 对照 {@code DeleteDocAffinity}。 */
+    /** 删一条文档亲和。 */
     public void deleteDocAffinity(MemoryScope scope, String id) {
         repo.affinityMapper.deleteScoped(scope.tenantId(), scope.subjectId(), id);
     }
 
-    /** 对照 {@code DeleteAllDocAffinity}。 */
+    /** 清空全部文档亲和。 */
     public void deleteAllDocAffinity(MemoryScope scope) {
         repo.affinityMapper.deleteAllInScope(scope.tenantId(), scope.subjectId());
     }
@@ -309,7 +309,7 @@ final class MemoryIndexStore {
     // ── 向量 ───────────────────────────────────────────────────────────────
 
     /**
-     * 对照 {@code UpsertItemEmbedding}：写向量，并在同一个事务里把它同步进
+     * 写向量，并在同一个事务里把它同步进
      * 数据库自己的 vector 列。
      *
      * <p>三项前置短路：{@code embedding == null}、{@code itemID == ""}、
@@ -365,7 +365,7 @@ final class MemoryIndexStore {
     }
 
     /**
-     * 对照 {@code DeleteItemEmbedding}：删掉一条记忆的向量，好让补扫重建它。
+     * 删掉一条记忆的向量，好让补扫重建它。
      *
      * <p>一条记忆该嵌入什么，在写下之后是可能变的（一条兴趣嵌入的是
      * 它主题的其它说法），删掉向量就是"请既有补扫重建"的表达方式。</p>
@@ -378,7 +378,7 @@ final class MemoryIndexStore {
     }
 
     /**
-     * 对照 {@code ItemEmbeddings}：按 item id 取向量。
+     * 按 item id 取向量。
      *
      * <p>只返回 {@code modelId} 产出的向量——不同模型的向量不可比，
      * 混在一起算出来的就是胡说。</p>
@@ -453,7 +453,7 @@ final class MemoryIndexStore {
     }
 
     /**
-     * 对照 {@code SyncVectorColumn}：把早于迁移 000095 写下的行搬进数据库的 vector 类型。
+     * 向量列回填：把早于迁移 000095 写下的行搬进数据库的 vector 类型。
      *
      * <p>一条 SQL 排名看不见的行，就是一条语义召回找不到的记忆——所以这件事必须自己排干，
      * 不能等下次调用 embedding 模型。**没有任何模型调用**：向量已经存在，
@@ -484,13 +484,13 @@ final class MemoryIndexStore {
 
     // ── 抽取进度 ───────────────────────────────────
 
-    /** 对照 {@code HasPendingExtraction}。 */
+    /** 是否有待处理的抽取会话。 */
     public boolean hasPendingExtraction(MemoryScope scope) {
         return repo.extractionMapper.countPendingProbe(scope.tenantId(), scope.subjectId()) > 0;
     }
 
     /**
-     * 对照 {@code EnqueuePendingSession}（L81-108）：记下"这个会话有越过游标的轮次"，
+     * 入队待抽取会话：记下"这个会话有越过游标的轮次"，
      * 并在没有运行中任务时抢下"在途"槽位。
      *
      * @return 更新**之前**的主体快照 + 这次调用是否该负责投递任务。
@@ -519,7 +519,7 @@ final class MemoryIndexStore {
     }
 
     /**
-     * 对照 {@code ClaimPendingSessions}（L110-140）：租下一个快照，但**不移除**持久工作。
+     * 租下一个待抽取快照，但**不移除**持久工作。
      *
      * @return {@code null} 表示没有剩活了；{@code retryAt} 非零表示租约正忙、请延后；
      *         {@code sessions} 非空表示这批已被本 worker 租下
@@ -550,7 +550,7 @@ final class MemoryIndexStore {
     }
 
     /**
-     * 对照 {@code CheckpointExtraction}（L146-171）：确认一个已处理的片段
+     * 抽取检查点：确认一个已处理的片段
      * （或一次记录在案的跳过）。并发的 enqueue 会改 {@code revision} 并让该会话保持 pending。
      *
      * <p>{@code failed_at} 为空时才重置失败计数——也就是"这次不是失败后的重试"。</p>
@@ -579,7 +579,7 @@ final class MemoryIndexStore {
     }
 
     /**
-     * 对照 {@code RecordExtractionFailure}（L173-203）：超过有界的
+     * 记录抽取失败：超过有界的
      * "输出不合法"重试预算后返回 {@code true}。它保存失败区间，但**不存对话原文**。
      *
      * <p>重试次数只在"失败区间起点就是当前游标"时才累加——也就是说，
@@ -616,7 +616,7 @@ final class MemoryIndexStore {
     }
 
     /**
-     * 对照 {@code FinishExtraction}（L205-218）：清掉租约、清掉在途标记、
+     * 收尾抽取：清掉租约、清掉在途标记、
      * 并记下"这个主体刚抽过"。
      *
      * <p>⚠️ 这里的租约判定**只看 leaseId、不看是否过期**——与
@@ -638,7 +638,7 @@ final class MemoryIndexStore {
     }
 
     /**
-     * 对照 {@code ReleaseExtractionSlot}（L220-230）：
+     * 释放在途槽位：
      * 租约对不上时**静默返回**（不是错误）——空 leaseID 只该释放一个排队的任务，
      * 绝不该释放一个正在跑的 worker。
      */
@@ -844,7 +844,7 @@ final class MemoryIndexStore {
         repo.embeddingMapper.writeVectorColumn(itemId, literal);
     }
 
-    /** 对照 {@code rankInDatabase} 的调用包装（只在 {@code vectorColumnReady()} 为真时进来）。 */
+    /** 数据库侧排名（只在 {@code vectorColumnReady()} 为真时进来）。 */
     private List<VectorHitRow> rankInDatabase(MemoryScope scope, MemoryVectorQuery query, int limit) {
         String literal = MemoryVectors.formatEmbeddingLiteral(query.vector());
         if (literal.isEmpty()) {

@@ -24,9 +24,9 @@ import com.ragagent.retrieval.engine.RetrieverEngineParams;
 import com.ragagent.retrieval.engine.sqlite.SqliteRetrieveRepository;
 
 /**
- * 检索引擎装配（对照 Go {@code initRetrieveEngineRegistry}）的钉子：
+ * 检索引擎装配的钉子：
  * env-store 注册主体按 RETRIEVE_DRIVER 逐段生效、缺失驱动明确跳过不炸启动、
- * 重复类型注册失败只记日志（照 Go 的 Register error 分支）。
+ * 重复类型注册失败只记日志（Register 的 error 分支语义）。
  */
 class RetrievalEngineWiringConfigTest {
 
@@ -69,7 +69,7 @@ class RetrievalEngineWiringConfigTest {
         EngineRegistry registry = new EngineRegistry(null, null);
         PgVectorEngineRepository adapter = newAdapter();
         // 两次装配都注册 postgres → 第二次 Register 报"already registered"，
-        // 装配路径吞掉只记日志（照 Go 的 Register ... failed 分支）
+        // 装配路径吞掉只记日志（Register failed 分支语义）
         RetrievalEngineWiringConfig.registerEnvStores(registry,
                 new String[] {"postgres"}, adapter, null, null);
         assertThatCode(() -> RetrievalEngineWiringConfig.registerEnvStores(registry,
@@ -105,7 +105,7 @@ class RetrievalEngineWiringConfigTest {
     @Test
     void tencentVectorDbWithoutEnvConfigIsSkipped() throws Exception {
         EngineRegistry registry = new EngineRegistry(null, null);
-        // 照 Go：TENCENT_VECTORDB_ADDR/USERNAME/API_KEY 三者缺一 → 只记 "Missing Tencent
+        // TENCENT_VECTORDB_ADDR/USERNAME/API_KEY 三者缺一 → 只记 "Missing Tencent
         // VectorDB configuration" 并跳过（本测试环境未配 env → 走该分支）
         assertThatCode(() -> RetrievalEngineWiringConfig.registerEnvStores(registry,
                 new String[] {"tencent_vectordb"}, newAdapter(), null, null))
@@ -116,7 +116,7 @@ class RetrievalEngineWiringConfigTest {
     @Test
     void milvusDriverRegistersEnvStoreEngine() throws Exception {
         EngineRegistry registry = new EngineRegistry(null, null);
-        // env 未配置 → Go 的缺省口径（localhost:19530）；REST 客户端构造不拨号
+        // env 未配置 → 缺省口径（localhost:19530）；REST 客户端构造不拨号
         RetrievalEngineWiringConfig.registerEnvStores(registry,
                 new String[] {"milvus"}, newAdapter(), null, null);
         var svc = registry.getRetrieveEngineService(EngineTypes.ENGINE_MILVUS);
@@ -128,7 +128,7 @@ class RetrievalEngineWiringConfigTest {
     @Test
     void weaviateDriverRegistersEnvStoreEngine() throws Exception {
         EngineRegistry registry = new EngineRegistry(null, null);
-        // env 未配置 → Go 的缺省口径（weaviate:8080 / http）；REST 客户端构造不拨号
+        // env 未配置 → 缺省口径（weaviate:8080 / http）；REST 客户端构造不拨号
         RetrievalEngineWiringConfig.registerEnvStores(registry,
                 new String[] {"weaviate"}, newAdapter(), null, null);
         var svc = registry.getRetrieveEngineService(EngineTypes.ENGINE_WEAVIATE);
@@ -140,7 +140,7 @@ class RetrievalEngineWiringConfigTest {
     @Test
     void qdrantDriverRegistersEnvStoreEngine() throws Exception {
         EngineRegistry registry = new EngineRegistry(null, null);
-        // env 未配置 → Go 的缺省口径（localhost:6334）；REST 客户端构造不拨号
+        // env 未配置 → 缺省口径（localhost:6334）；REST 客户端构造不拨号
         RetrievalEngineWiringConfig.registerEnvStores(registry,
                 new String[] {"qdrant"}, newAdapter(), null, null);
         var svc = registry.getRetrieveEngineService(EngineTypes.ENGINE_QDRANT);
@@ -152,7 +152,7 @@ class RetrievalEngineWiringConfigTest {
     @Test
     void dorisDriverRegistersEnvStoreEngine() throws Exception {
         EngineRegistry registry = new EngineRegistry(null, null);
-        // env 未配置 → Go 的缺省口径（doris-fe:9030 / weknora / root）；构造不拨号
+        // env 未配置 → 缺省口径（doris-fe:9030 / weknora / root）；构造不拨号
         // （Hikari initializationFailTimeout=-1 + Stream Load 客户端懒发请求）
         RetrievalEngineWiringConfig.registerEnvStores(registry,
                 new String[] {"doris"}, newAdapter(), null, null);
@@ -164,7 +164,7 @@ class RetrievalEngineWiringConfigTest {
 
     @Test
     void elasticsearchDriverWithoutAddrIsSkipped() throws Exception {
-        // ELASTICSEARCH_ADDR 未配置 → 建客户端失败 → 只记日志（与 Go 同形）
+        // ELASTICSEARCH_ADDR 未配置 → 建客户端失败 → 只记日志（跳过不炸启动）
         EngineRegistry registry = new EngineRegistry(null, null);
         assertThatCode(() -> RetrievalEngineWiringConfig.registerEnvStores(registry,
                 new String[] {"elasticsearch_v8", "elasticsearch_v7"}, newAdapter(), null, null))

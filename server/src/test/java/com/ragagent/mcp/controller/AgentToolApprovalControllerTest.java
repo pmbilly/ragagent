@@ -24,11 +24,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 /**
- * 对照 Go {@code mcp_service.go:646-733} 的 {@code ResolveToolApproval}。
+ * {@code ResolveToolApproval} 的行为契约。
  *
- * <p>重点钉住 716-733 的四哨兵 → HTTP 映射表与原文案，以及 {@code modified_args}
- * 的"非 null JSON 对象"前置校验（"null" 4 字节能骗过 Go 的 {@code len>0} 检查，
- * 让下游工具拿到 nil 参数表、静默丢掉原始参数）。</p>
+ * <p>重点钉住四哨兵 → HTTP 映射表与原文案，以及 {@code modified_args}
+ * 的"非 null JSON 对象"前置校验（字面量 "null" 只有 4 字节，非空长度检查挡不住，
+ * 会让下游工具拿到 null 参数表、静默丢掉原始参数）。</p>
  */
 class AgentToolApprovalControllerTest {
 
@@ -41,7 +41,7 @@ class AgentToolApprovalControllerTest {
     void setUp() {
         gate = mock(Gate.class);
         controller = new AgentToolApprovalController(Optional.of(gate));
-        // 对照 Go 的 types.TenantIDContextKey + PrincipalFromContext(web_user)
+        // 处理器从租户上下文取 tenant/principal/角色，先种好上下文
         TenantContext.set(7L, TenantContext.webUserPrincipal("user-1"), "admin", false, "user-1", false);
     }
 
@@ -125,8 +125,8 @@ class AgentToolApprovalControllerTest {
     }
 
     /**
-     * 显式 JSON {@code null} 是**跳过**（不是 400）：Go 的
-     * {@code trimmed != "null"} 把字面量 "null" 排除在解析之外，ModifiedArgs 保持 nil。
+     * 显式 JSON {@code null} 是**跳过**（不是 400）：字面量 "null" 被排除在
+     * 解析之外，modifiedArgs 保持 null。
      * 真正的 400 只留给"能解析但解析出来不是对象"的载荷。
      */
     @Test
@@ -215,7 +215,7 @@ class AgentToolApprovalControllerTest {
         assertEquals("not allowed", d.reason());
     }
 
-    /** 空对象 {} 是合法的"改用空参数表"，Go 侧 probe != nil 即可通过 */
+    /** 空对象 {} 是合法的"改用空参数表"（非 null 即通过） */
     @Test
     void acceptsEmptyObjectModifiedArgs() throws Exception {
         controller.resolveToolApproval("p1", approve("{}"));

@@ -366,7 +366,7 @@ class RemoteApiChatTest {
         ChatOptions opts = new ChatOptions();
         opts.setTools(List.of(tool));
 
-        // sessionId=null → prompt-cache 不改写 → Go 走 SDK 结构体直出
+        // sessionId=null → prompt-cache 不改写 → 请求体按结构体字段序直出
         String json = new String(chat.buildOutbound(userMessage("hi"), opts, false, null)
                 .bodyBytes(), java.nio.charset.StandardCharsets.UTF_8);
 

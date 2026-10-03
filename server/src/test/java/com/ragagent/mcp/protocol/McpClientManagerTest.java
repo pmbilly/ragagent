@@ -20,9 +20,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * 对照 Go internal/mcp/manager_startup_test.go：
- * {@code TestManagerConcurrentStartupCancellationAndConfigReplacement}
- * + {@code TestManagerCloseRetiresPendingConnection}。
+ * McpClientManager 的并发建连与关闭语义测试。
  */
 class McpClientManagerTest {
 
@@ -30,7 +28,6 @@ class McpClientManagerTest {
 
     @BeforeEach
     void allowLoopback() {
-        // 对照 Go 的 utils.SetSSRFWhitelistFromRaw("127.0.0.1")。
         // SsrfGuard 的白名单是进程级 static（known-issues W5a「互踩」家族），
         // 必须快照/还原，否则 127.0.0.1 泄漏给同 JVM 的后续契约测试。
         ssrfSnapshot = SsrfGuard.snapshotWhitelist();
@@ -59,7 +56,6 @@ class McpClientManagerTest {
         return McpContext.deadline(Instant.now().plusSeconds(5));
     }
 
-    /** 对照 Go TestManagerConcurrentStartupCancellationAndConfigReplacement。 */
     @Test
     @DisplayName("并发建连：调用方取消不杀共享连接；配置替换触发重建")
     void concurrentStartupCancellationAndConfigReplacement() throws Exception {
@@ -117,7 +113,6 @@ class McpClientManagerTest {
         }
     }
 
-    /** 对照 Go TestManagerCloseRetiresPendingConnection。 */
     @Test
     @DisplayName("CloseClient 退役建连中的 pending")
     void closeRetiresPendingConnection() throws Exception {
@@ -160,7 +155,7 @@ class McpClientManagerTest {
         }
     }
 
-    /** 对照 Go manager 的 Shutdown：取消 manager 级 ctx 并关闭所有连接。 */
+    /** Shutdown：取消 manager 级上下文并关闭所有连接。 */
     @Test
     @DisplayName("Shutdown 关闭全部连接并让后续取连接直接失败")
     void shutdownClosesEverything() throws Exception {
@@ -182,7 +177,7 @@ class McpClientManagerTest {
         }
     }
 
-    /** 对照 Go manager：stdio 与未启用的服务在取连接时就被拒。 */
+    /** stdio 与未启用的服务在取连接时就被拒。 */
     @Test
     @DisplayName("stdio 硬拒绝；未启用服务被拒")
     void rejectsStdioAndDisabled() {

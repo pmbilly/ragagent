@@ -96,7 +96,7 @@ public class SteerRunCoordinator {
                         .getSteerEvents(prevReqCtx.sessionId, prevMessageId, 0).events();
                 backlog = QaSupport.selectSteerBacklog(lateAll, injected);
             } catch (RuntimeException ignored) {
-                // Go：lateErr != nil 直接放弃
+                // 迟到的错误直接放弃
             }
             if (backlog.isEmpty()) {
                 return null;

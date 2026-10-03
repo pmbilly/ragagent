@@ -6,14 +6,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.web.ProviderJson;
 
 /**
- * 单条重排结果（对照 Go {@code rerank.RankResult} 与其自定义
- * {@code UnmarshalJSON}）。
+ * 单条重排结果。
  *
- * <p><b>宽容解析</b>（Go 注释逐条对照）：{@code document} 可以是字符串也可以是
+ * <p><b>宽容解析</b>：{@code document} 可以是字符串也可以是
  * {@code {"text":...}} 对象；分数字段先看 {@code relevance_score}，缺失回落
  * {@code score}；两者都没有时为 0。序列化形如
  * {@code {"index":N,"document":{"text":"..."},"relevance_score":X}}
- * （Go struct 字段序，DocumentInfo 恒输出对象）。</p>
+ * （按 {@code @JsonPropertyOrder} 声明序，document 恒输出对象）。</p>
  *
  * <p>Jackson 注解为 models/{id}/debug 的 raw_response 序列化而加（此前该类只走
  * {@link #marshal()} 内部路径，注解不改变任何既有行为）。</p>
@@ -48,7 +47,7 @@ public final class RankResult {
         relevanceScore = v;
     }
 
-    /** 文档信息（对照 Go {@code DocumentInfo}；自身按 {@code {"text":"..."}} 序列化）。 */
+    /** 文档信息；自身按 {@code {"text":"..."}} 序列化。 */
     @JsonPropertyOrder({"text"})
     public static final class DocumentInfo {
         private String text = "";
@@ -62,7 +61,7 @@ public final class RankResult {
             text = v == null ? "" : v;
         }
 
-        /** 对照 DocumentInfo.MarshalJSON（Go 默认 marshal：{"text":"..."}）。 */
+        /** 序列化（恒输出 {@code {"text":"..."}}）。 */
         public String marshal() {
             var node = ProviderJson.object();
             node.put("text", text);
@@ -70,7 +69,7 @@ public final class RankResult {
         }
     }
 
-    /** 对照 RankResult.UnmarshalJSON：relevance_score 优先，score 回落。 */
+    /** 反序列化：relevance_score 优先，score 回落。 */
     public static RankResult parse(JsonNode node) {
         if (node == null) {
             return null;
@@ -83,7 +82,7 @@ public final class RankResult {
         } else if (doc.isObject()) {
             r.document.setText(doc.path("text").asText(""));
         } else if (doc.isMissingNode() || doc.isNull()) {
-            // Go：字段缺失时 DocumentInfo 保持零值 ""
+            // 字段缺失时 document 保持零值 ""
         }
         JsonNode rel = node.path("relevance_score");
         JsonNode score = node.path("score");
@@ -95,7 +94,7 @@ public final class RankResult {
         return r;
     }
 
-    /** 对照 RankResult.MarshalJSON（index/document/relevance_score 声明序，恒输出）。 */
+    /** 序列化（index/document/relevance_score 声明序，恒输出）。 */
     public String marshal() {
         var node = ProviderJson.object();
         node.put("index", index);

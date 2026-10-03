@@ -240,7 +240,7 @@ class SessionServiceReadTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    /** 上下文里没有租户是**编程错误**（Go 直接 panic），不得降级成跨租户查询。 */
+    /** 上下文里没有租户是**编程错误**（必须快速失败），不得降级成跨租户查询。 */
     @Test
     void missingTenantInContextFailsClosed() {
         TenantContext.clear();

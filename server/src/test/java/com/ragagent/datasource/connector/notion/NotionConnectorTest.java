@@ -25,15 +25,13 @@ import com.ragagent.datasource.domain.Resource;
 import com.ragagent.datasource.domain.SyncCursor;
 
 /**
- * {@code NotionConnector} 的对等测试（对照 Go 的 connector_test.go）。
+ * {@code NotionConnector} 的对等测试。
  *
- * <p>夹具镜像 Go 的 {@code fakeNotion()}：同样的 endpoint、同样的页面/数据库/
- * 记录数据，期望值取 Go 实录。增量同步那几条用例刻意复刻
- * {@code TestConnectorFetchIncremental_NoChanges} 的场景：
+ * <p>夹具 {@code fakeNotion()} 登记标准的 endpoint 与页面/数据库/记录数据，
+ * 期望值逐字钉住。增量同步那几条用例钉住的关键点：
  * <b>cursor 里的 {@code "2026-01-15T10:00:00Z"} 与页面返回的
- * {@code "2026-01-15T10:00:00.000Z"} 必须判等</b>——Go 用
- * {@code time.Time.Equal} 比瞬时，Java 侧也要比 {@code Instant}
- * （比字面量的话这条就废了）。</p>
+ * {@code "2026-01-15T10:00:00.000Z"} 必须判等</b>——比较的是 {@code Instant}
+ * 瞬时（比字面量的话这条就废了）。</p>
  */
 class NotionConnectorTest {
 
@@ -55,7 +53,7 @@ class NotionConnectorTest {
 
     // ── 夹具 ─────────────────────────────────────────────────────────────
 
-    /** 对照 Go {@code fakeNotion()}：登记标准的 page / database / record 端点。 */
+    /** 登记标准的 page / database / record 端点。 */
     private static void fakeNotion(NotionStubServer server) {
         server.route("/v1/users/me", exchange -> {
             if (!"Bearer test-token".equals(
@@ -173,7 +171,7 @@ class NotionConnectorTest {
                 .isInstanceOf(ConnectorException.InvalidCredentials.class)
                 .hasMessage("invalid credentials: api_key must be a non-empty string");
 
-        // 非字符串：Go 的类型断言与"空串"合并成同一条分支
+        // 非字符串：与"空串"合并成同一条分支
         DataSourceConfig numeric = new DataSourceConfig();
         Map<String, Object> numericCreds = new LinkedHashMap<>();
         numericCreds.put("api_key", 42);
@@ -251,7 +249,7 @@ class NotionConnectorTest {
         }
     }
 
-    /** 完整树（含 trash、data_source 的 database_parent、孙辈）的实录。 */
+    /** 完整树（含 trash、data_source 的 database_parent、孙辈）的期望值。 */
     @Test
     void listResourcesBuildsTreeFromSearch() throws Exception {
         try (NotionStubServer server = new NotionStubServer()) {
@@ -362,7 +360,7 @@ class NotionConnectorTest {
                     .containsEntry("channel", "notion")
                     .containsEntry("object_type", "page");
             // 段落 + child_page 链接（子页面本身因 404 抓不到，被跳过）。
-            // 注意链接里的 ID 被去掉了连字符（Go 的 ReplaceAll(id, "-", "")）
+            // 注意链接里的 ID 被去掉了连字符
             assertThat(NotionTestSupport.contentOf(item))
                     .isEqualTo("Hello world\n\n- [Sub Page](https://notion.so/blk2)\n");
         }
@@ -407,8 +405,7 @@ class NotionConnectorTest {
             assertThat(item.getTitle()).isEqualTo("Record One");
             assertThat(item.getFileName()).isEqualTo("Record One.md");
             // database 这一项是**父库标题**：记录的父是 data_source（ds-1），
-            // 而桩里的 data_source 响应没有顶层 title → Go 的 extractTitle 回 ""
-            // （Go 的同名用例也只断言 object_type，不查这个键）
+            // 而桩里的 data_source 响应没有顶层 title → extractTitle 回 ""
             assertThat(item.getMetadata())
                     .containsEntry("object_type", "page")
                     .containsEntry("database", "");
@@ -423,7 +420,7 @@ class NotionConnectorTest {
         try (NotionStubServer server = new NotionStubServer()) {
             server.status("/v1/search", 401, "unauthorized");
             NotionConnector connector = NotionTestSupport.fastConnector();
-            // Go 实录：FetchAll 对每个资源失败只记日志，整体不报错、返回 0 条
+            // FetchAll 对每个资源失败只记日志，整体不报错、返回 0 条
             assertThat(connector.fetchAll(
                     NotionTestSupport.config("tok", server.baseUrl(), List.of("p1")),
                     List.of("p1"))).isEmpty();
@@ -432,7 +429,7 @@ class NotionConnectorTest {
 
     // ── 增量同步 ─────────────────────────────────────────────────────────
 
-    /** 对照 Go {@code TestConnectorFetchIncremental_NoChanges}。 */
+    /** 无变化时增量同步返回 0 条。 */
     @Test
     void incrementalSyncDetectsNoChangesByInstant() throws Exception {
         try (NotionStubServer server = new NotionStubServer()) {
@@ -470,7 +467,7 @@ class NotionConnectorTest {
                     connector.fetchIncremental(config, new SyncCursor());
 
             assertThat(ids(result.items())).containsExactly("root");
-            // cursor 形状：{"page_edit_times":{...}}，键排序、时间是 Go 的 RFC3339Nano
+            // cursor 形状：{"page_edit_times":{...}}，键排序、时间是保留小数位的 RFC3339
             Map<String, Object> connectorCursor = result.cursor().getConnectorCursor();
             assertThat(connectorCursor).containsOnlyKeys("page_edit_times");
             Map<?, ?> rootTimes = (Map<?, ?>) connectorCursor.get("page_edit_times");
@@ -547,7 +544,7 @@ class NotionConnectorTest {
         SyncCursor cursor = NotionConnector.buildCursor(editTimes);
         Map<?, ?> times = (Map<?, ?>) cursor.getConnectorCursor().get("page_edit_times");
 
-        // Go 的 json.Marshal 对 map 恒按键排序；时间保留自己的偏移（不归一化时区）
+        // cursor 的 map 恒按键排序；时间保留自己的偏移（不归一化时区）
         List<String> keys = new ArrayList<>();
         for (Object key : times.keySet()) {
             keys.add((String) key);
@@ -597,7 +594,7 @@ class NotionConnectorTest {
         Map<String, String> parentOf = new LinkedHashMap<>();
         parentOf.put("a", "b");
         parentOf.put("b", "a");
-        // Go 在这里会死循环；Java 侧加了 seen 集合（刻意的防御性差异）
+        // 循环父引用会死循环；seen 集合是刻意的防御性差异
         assertThat(NotionConnector.computeExcludedSet(List.of("a", "b"), parentOf, List.of("c")))
                 .containsOnlyKeys("a", "b");
     }
@@ -867,7 +864,7 @@ class NotionConnectorTest {
             List<NotionBlock> blocks = new ArrayList<>(List.of(fileBlock));
 
             NotionConnector.resolveFileUploads(client, blocks);
-            // 失败时保留原 RawContent（Go 的 continue）
+            // 失败时保留原 RawContent（跳过该项）
             assertThat(blocks.get(0).rawContent.get("file_upload").get("id").asText())
                     .isEqualTo("fu-1");
         }
@@ -948,7 +945,7 @@ class NotionConnectorTest {
                         "data_source_id", "block_id");
     }
 
-    /** 指数退避的默认实现（对照 Go 的 {@code 1<<attempt} 秒）。 */
+    /** 指数退避的默认实现（1s / 2s / 4s…）。 */
     @Test
     void defaultBackoffIsExponentialSeconds() {
         NotionClient.Backoff backoff = NotionClient.Backoff.exponentialSeconds();
@@ -957,7 +954,7 @@ class NotionConnectorTest {
         assertThat(backoff.delayMillis(2)).isEqualTo(4000L);
     }
 
-    /** 时间格式化：Go 的 RFC3339Nano（保留偏移、去尾随零）。 */
+    /** 时间格式化：RFC3339 带小数秒（保留偏移、去尾随零）。 */
     @Test
     void rfc3339NanoFormatting() {
         assertThat(NotionValues.rfc3339Nano(

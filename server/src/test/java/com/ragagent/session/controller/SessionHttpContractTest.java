@@ -192,7 +192,7 @@ class SessionHttpContractTest {
         assertEquals(mask(golden("session-create-empty-obj.json")), mask(raw(r)));
     }
 
-    /** 未知字段被忽略（Go {@code encoding/json} 默认语义），title 落 "u"。 */
+    /** 未知字段被忽略（JSON 绑定默认语义），title 落 "u"。 */
     @Test
     void createWithUnknownFieldMatchesGo() throws Exception {
         MvcResult r = perform(jsonBody(post("/api/v1/sessions"), "{\"title\":\"u\",\"unknown_key\":123}")
@@ -249,7 +249,7 @@ class SessionHttpContractTest {
         assertEquals(mask(golden("session-list.json")), mask(raw(r)));
     }
 
-    /** {@code page=0} 被 omitempty 跳过 → 200 且归一化成 page=1（golden 实测，不是 400）。 */
+    /** {@code page=0} 视为未提供 → 200 且归一化成 page=1（golden 实测，不是 400）。 */
     @Test
     void listPageZeroIsSkippedByOmitEmpty() throws Exception {
         seedListState();

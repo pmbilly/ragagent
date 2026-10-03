@@ -70,8 +70,7 @@ public class LocalStorageService {
 
     /**
      * （service/file/local + utils/security）。支持
-     * 空路径/读失败由调用方翻译成 "Failed to retrieve file" 信封（对照
-     * GetKnowledgeFile 的错误链）。
+     * 空路径/读失败由调用方转成 "Failed to retrieve file" 信封。
      */
     public byte[] readChecked(String filePath) {
         Path resolved = resolveUnderBase(filePath);

@@ -100,12 +100,12 @@ public class MemoryController {
     private static final Logger log = LoggerFactory.getLogger(MemoryController.class);
 
     /**
-     * 对照 {@code memoryExportPageSize}：一页导出读多少行。
+     * 一页导出读多少行。
      */
     static final int EXPORT_PAGE_SIZE = 500;
 
     /**
-     * 对照 {@code memoryExportMaxItems}：单次导出的硬上限，防止一个巨大的仓库
+     * 单次导出的硬上限，防止一个巨大的仓库
      * 把一次下载变成无界读。
      */
     static final int EXPORT_MAX_ITEMS = 20000;

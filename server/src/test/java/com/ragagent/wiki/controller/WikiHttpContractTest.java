@@ -44,7 +44,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
  *   <li><b>所有权</b>：{@code OwnedWikiKBOrAdmin}
  *       ——非创建者的 Contributor 写被拒、读放行，
  *       拒绝文案为固定的 must-own 文案。</li>
- *   <li><b>端点契约</b>：响应形态（实体直出 / gin.H / 裸数组 / handler 直写错误）、
+ *   <li><b>端点契约</b>：响应形态（实体直出 / JSON 对象 / 裸数组 / handler 直写错误）、
  *       状态码、关键字段序。</li>
  * </ol>
  *
@@ -393,7 +393,7 @@ class WikiHttpContractTest {
 
     /**
      * UpdatePage 的乐观锁：{@code version} 与库中不符 → 409，
-     * body 是 gin.H → <b>键字母序</b>（current_version 在 error 前）。
+     * 响应体为 JSON 对象，<b>键按字母序</b>输出（currentVersion 在 error 前）。
      */
     @Test
     void updatePageVersionConflictReturns409WithCurrentVersion() throws Exception {
@@ -805,7 +805,7 @@ class WikiHttpContractTest {
 
         String fix = body(perform(post("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/auto-fix")
                 .header("Authorization", "Bearer " + token)));
-        // gin.H 字母序：fixed < message
+        // 响应键按字母序：fixed < message
         assertTrue(fix.startsWith("{\"fixed\":"), fix);
         assertTrue(fix.contains("\"message\":\"Auto-fixed "), fix);
     }
@@ -831,7 +831,7 @@ class WikiHttpContractTest {
         assertEquals(400, bad.getResponse().getStatus(), body(bad));
         assertEquals("{\"error\":\"Invalid status. Must be pending, ignored, or resolved\"}", body(bad));
 
-        // 匿名 struct 的 required 报错不带结构体前缀（对照 go-playground/validator）
+        // 缺 required 字段时的 400 文案：字段级校验错误，不带类型名前缀
         MvcResult missing = perform(put("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/issues/i-1/status")
                 .header("Authorization", "Bearer " + token)
                 .contentType("application/json")

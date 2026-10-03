@@ -12,18 +12,15 @@ import com.ragagent.auth.apikey.filter.APIKeyRoutePolicy;
 import org.junit.jupiter.api.Test;
 
 /**
- * 策略注册表 / 查表 / 路径归一化的测试——对照 Go
- * internal/middleware/api_key_gate_test.go 的 {@code TestNormalizeRoutePath}（L315-327）
- * 与 internal/router/router_api_key_capabilities_test.go 的
- * {@code mustLookupAPIKeyPolicy} 断言方式（L659-680）。
+ * 策略注册表 / 查表 / 路径归一化的测试。
  *
- * <p>另外覆盖 Java 特有的一环：gin 模板（{@code :param} / {@code *wildcard}）
- * 与 Spring pattern（{@code {param}} / {@code {*wildcard}}）的转换——
- * 策略表按 Go 原文抄写，查表用的是 Spring 上报的 best-matching pattern。</p>
+ * <p>另外覆盖模板转换一环：路由模板（{@code :param} / {@code *wildcard}）
+ * 与 Spring pattern（{@code {param}} / {@code {*wildcard}}）的互转——
+ * 策略表按既定登记逐字注册，查表用的是 Spring 上报的 best-matching pattern。</p>
  */
 class APIKeyRouteAuthorizerTest {
 
-    // ── normalizeRoutePath（对照 TestNormalizeRoutePath） ──
+    // ── normalizeRoutePath ──
 
     @Test
     void normalizeRoutePath() {
@@ -31,7 +28,7 @@ class APIKeyRouteAuthorizerTest {
         assertThat(APIKeyRouteAuthorizer.normalizeRoutePath("/api/v1/models/")).isEqualTo("/api/v1/models");
         assertThat(APIKeyRouteAuthorizer.normalizeRoutePath("/")).isEqualTo("/");
         assertThat(APIKeyRouteAuthorizer.normalizeRoutePath("/api/v1/agents")).isEqualTo("/api/v1/agents");
-        // Java 侧补的 null 归一（Go 的 "" 分支）
+        // Java 侧补的 null 归一：null 与空串同归一为空
         assertThat(APIKeyRouteAuthorizer.normalizeRoutePath(null)).isEmpty();
         assertThat(APIKeyRouteAuthorizer.normalizeRoutePath("")).isEmpty();
     }
@@ -67,12 +64,12 @@ class APIKeyRouteAuthorizerTest {
         APIKeyRouteAuthorizer a = new APIKeyRouteAuthorizer();
         a.registerGin("GET", "/api/v1/knowledgebase/:kb_id/wiki/pages/*slug",
                 APIKeyRoutePolicy.retrieve(APIKeyRoutePolicy.fullAccess()));
-        // 注册用 gin 模板，查表用 Spring 上报的 pattern —— 两者必须命中同一条
+        // 注册用冒号参数模板，查表用 Spring 上报的 pattern —— 两者必须命中同一条
         assertThat(a.isDeclared("GET", "/api/v1/knowledgebase/{kb_id}/wiki/pages/{*slug}")).isTrue();
         assertThat(a.isDeclared("GET", "/api/v1/knowledgebase/{kb_id}/wiki/pages")).isFalse();
     }
 
-    // ── authorize 的判定链（对照 api_key_gate.go L130-153） ──
+    // ── authorize 的判定链 ──
 
     @Test
     void authorizeChain() {
@@ -115,7 +112,7 @@ class APIKeyRouteAuthorizerTest {
         assertThat(base.capabilities()).isEmpty();
     }
 
-    // ── 策略表覆盖（对照 router_api_key_capabilities_test.go 的断言方式） ──
+    // ── 策略表覆盖 ──
 
     private static APIKeyRouteAuthorizer catalog() {
         APIKeyRouteAuthorizer a = new APIKeyRouteAuthorizer();
@@ -238,7 +235,6 @@ class APIKeyRouteAuthorizerTest {
     }
 
     /**
-     * 对照 Go {@code TestAPIKeyGateDeniesTenantKeyManagementPaths}：
      * Key 管理端点与 API 主体配置端点**必须保持未声明**，否则一把 Key 能给自己扩权。
      */
     @Test
@@ -258,7 +254,7 @@ class APIKeyRouteAuthorizerTest {
         }
     }
 
-    /** 对照 Go：/agent/tool-approvals 注册在原始 group 上 → 对 API Key default-deny。 */
+    /** /agent/tool-approvals 未在策略表登记 → 对 API Key default-deny。 */
     @Test
     void agentToolApprovalRouteStaysDefaultDeny() {
         APIKeyRouteAuthorizer a = catalog();
@@ -277,19 +273,18 @@ class APIKeyRouteAuthorizerTest {
     }
 
     /**
-     * 对照 Go router/rbac.go L226-333 的策略构造器与
-     * router_api_key_capabilities_test.go 的若干断言：把尚未接入 Java 路由、
+     * 策略构造器形状钉子：把尚未接入路由、
      * 但后续模块必然要用的构造器先钉住形状（chat / read_agents 叠加 /
      * manage_spaces 不放宽分享 / message_history 不被 chat 满足）。
      */
     @Test
     void policyConstructorsMirrorGoRouterHelpers() {
-        // 会话：chat 能力 + RequireFullAccess（routes_chat.go L51）
+        // 会话：chat 能力 + RequireFullAccess
         APIKeyRoutePolicy chat = APIKeyRoutePolicies.chatPolicy();
         assertThat(chat.requireFullAccess()).isTrue();
         assertThat(chat.capabilities()).containsExactly(APIKeyCapability.CHAT);
 
-        // agent 读：chat / manage_agents / read_agents 三能力 any-of（routes_agent.go L26）
+        // agent 读：chat / manage_agents / read_agents 三能力 any-of
         APIKeyRoutePolicy agentRead = APIKeyRoutePolicies.agentReadPolicy();
         assertThat(agentRead.capabilities()).containsExactlyInAnyOrder(
                 APIKeyCapability.CHAT, APIKeyCapability.MANAGE_AGENTS, APIKeyCapability.READ_AGENTS);
@@ -301,7 +296,7 @@ class APIKeyRouteAuthorizerTest {
         // 平台策略刻意**不**要求 full access（平台 Key 的 full_access 恒为 false）
         assertThat(platform.requireFullAccess()).isFalse();
 
-        // 租户设置：manage_tenant_settings（routes_auth_tenant.go L73-81）
+        // 租户设置：manage_tenant_settings
         APIKeyRoutePolicy settings = APIKeyRoutePolicies.tenantSettingsPolicy();
         assertThat(settings.requireFullAccess()).isTrue();
         assertThat(settings.hasCapability(APIKeyCapability.MANAGE_TENANT_SETTINGS)).isTrue();
@@ -311,7 +306,7 @@ class APIKeyRouteAuthorizerTest {
         assertThat(spaces.capabilities()).containsExactly(APIKeyCapability.MANAGE_SPACES);
         assertThat(spaces.hasCapability(APIKeyCapability.MANAGE_KBS)).isFalse();
 
-        // message_history 与 chat 是两条独立能力（routes_chat.go L26）
+        // message_history 与 chat 是两条独立能力
         APIKeyRoutePolicy history = APIKeyRoutePolicy.messageHistory(APIKeyRoutePolicy.fullAccess());
         assertThat(history.hasCapability(APIKeyCapability.CHAT)).isFalse();
     }

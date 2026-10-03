@@ -34,13 +34,13 @@ import com.ragagent.agent.tools.GoRecording45B;
 import com.ragagent.agent.tools.RecordingSupport;
 
 /**
- * 波 4.5b 回放：data_analysis（对照 Go 实录，探针 {@code zz_rec45b_danalysis_test.go}）。
+ * 4.5b 回放：data_analysis 的录制回放。
  *
- * <p>与 Go 探针同构：duckdb_jdbc 内存库（excel/spatial 扩展需本机预装——
+ * <p>与录制时同构：duckdb_jdbc 内存库（excel/spatial 扩展需本机预装——
  * {@code INSTALL excel/spatial} 一次性联网，之后回放只 LOAD，缺扩展时显式失败）、
  * 纯 JDK 造同内容 xlsx、stub KnowledgeLoader/FileMaterializer。</p>
  *
- * <p>已知差异：DuckDB driver 错误文案 Go 1.5.2 vs Java 1.1.3（missing-column 的
+ * <p>已知差异：DuckDB 驱动版本不同（录制侧 1.5.2 / Java 侧 1.1.3，missing-column 的
  * Candidate bindings/LINE 细节不同）——两条 missing_column 语料只断言稳定部分
  * （前缀 + Referenced column 片段 + 建议后缀），其余语料逐字比对。</p>
  */
@@ -105,7 +105,7 @@ class DataAnalysisRecordingTest {
                 single.toString()));
     }
 
-    /** 最小 xlsx 写出器（sharedStrings + 数字/字符串单元格；与 Go excelize 造的内容等价）。 */
+    /** 最小 xlsx 写出器（sharedStrings + 数字/字符串单元格；与录制时造的内容等价）。 */
     static void zzWriteWorkbook(Path path, LinkedHashMap<String, List<List<String>>> sheets)
             throws Exception {
         List<String> shared = new ArrayList<>();
@@ -225,7 +225,7 @@ class DataAnalysisRecordingTest {
 
     // ==================== DuckDB JDBC seam ====================
 
-    /** 对照 Go {@code *sql.DB}：内存 DuckDB + excel/spatial 扩展（缺扩展显式失败）。 */
+    /** 内存 DuckDB + excel/spatial 扩展（缺扩展显式失败）。 */
     static final class JdbcDuckDb implements AnalysisDuckDb {
         final Connection conn;
 
@@ -347,7 +347,7 @@ class DataAnalysisRecordingTest {
 
     private static void assertToolResult(String label, ToolResult result, JsonNode r) {
         assertThat(result.isSuccess()).as("%s success", label).isEqualTo(r.get("success").asBoolean());
-        // B42：实录里的 Go 转义形态（\u003c>&，如 <nil> 被 Go 写成 \u003cnil\u003e）
+        // 录制里的 HTML 转义形态（\u003c>&，如 <nil> 写成 \u003cnil\u003e）
         // 不再构成断言目标——两侧归一后比较（其余逐字）。
         assertThat(RecordingSupport.normalizeEscapes(result.getOutput())).as("%s output", label)
                 .isEqualTo(RecordingSupport.normalizeEscapes(r.get("output").asText()));
@@ -467,7 +467,7 @@ class DataAnalysisRecordingTest {
 
     @Test
     void missingColumnSuggest() {
-        // 语料无建议后缀：Go normalize 只去空格不去下划线，"user_name" ≠ "User Name"
+        // 语料无建议后缀：normalize 只去空格不去下划线，"user_name" ≠ "User Name"
         // （username），suggestion 不触发——正是该语料锁的行为。
         JsonNode r = rec("data_analysis_missing_column_suggest");
         assertMissingColumn("missing_column_suggest", tool().execute(req(r)), r, "user_name", null);

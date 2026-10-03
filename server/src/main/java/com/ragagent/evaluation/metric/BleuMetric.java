@@ -6,15 +6,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 对照 Go metric.BLEUMetric（bleu.go 全文，算法源自 NLTK align/bleu）
- * 与 metric_hook.go 里的三档权重用法（BLEU-1/2/4，smoothing=true）。
+ * BLEU 指标（算法源自 NLTK align/bleu），
+ * 配套三档权重用法（BLEU-1/2/4，smoothing=true）。
  *
- * <p>ngram 键：Go 用 {@code phrase.String()}（JSON 数组字符串）；Java 用
- * {@code List<String>}（值等价键，HashMap 语义等价）。</p>
+ * <p>ngram 键：{@code List<String>}（值等价键，HashMap 语义等价）。</p>
  */
 public final class BleuMetric implements Metrics {
 
-    /** 对照 BLEU1Gram/BLEU2Gram/BLEU3Gram/BLEU4Gram 权重表。 */
+    /** BLEU-1/2/3/4 权重表。 */
     public static final double[] BLEU1_GRAM = {1.0, 0.0, 0.0, 0.0};
 
     public static final double[] BLEU2_GRAM = {0.5, 0.5, 0.0, 0.0};
@@ -71,7 +70,7 @@ public final class BleuMetric implements Metrics {
         return out;
     }
 
-    /** 对照 getNphrase：全部 n-gram（保序、含重复）。 */
+    /** 全部 n-gram（保序、含重复）。 */
     private static List<List<String>> getNphrase(List<String> s, int n) {
         List<List<String>> nphrase = new ArrayList<>();
         for (int i = 0; i < s.size() - n + 1; i++) {
@@ -80,7 +79,7 @@ public final class BleuMetric implements Metrics {
         return nphrase;
     }
 
-    /** 对照 countNphrase：ngram → 出现次数。 */
+    /** ngram → 出现次数。 */
     private static Map<List<String>, Integer> countNphrase(List<List<String>> nphrase) {
         Map<List<String>, Integer> counts = new HashMap<>();
         for (List<String> gram : nphrase) {

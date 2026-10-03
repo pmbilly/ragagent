@@ -11,12 +11,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * WeKnoraCloud 请求签名（对照 {@code internal/models/utils/signer.go} 的
- * {@code Sign/md5Hex/generateNonce/rfc3986Encode}）。
+ * WeKnoraCloud 请求签名（md5 摘要 + nonce + rfc3986 编码的组合签名串）。
  *
  * <p><b>本类是全项目的第二份副本</b>（第一份在 {@code llm.chat.ProviderAdapters}，
- * 包内可见复用不了）——embedding 与 rerank 两个包共用这一份，见 §9「阶段 4.0
- * 已知差异 6」的去重备案。</p>
+ * 包内可见复用不了）——embedding 与 rerank 两个包共用这一份。</p>
  */
 public final class WeknoraCloudSign {
 
@@ -28,7 +26,7 @@ public final class WeknoraCloudSign {
     private WeknoraCloudSign() {
     }
 
-    /** 对照 Go Sign：apiKey 槽位由 AppSecret 承载。 */
+    /** 签名入口：apiKey 槽位由 AppSecret 承载。 */
     public static Map<String, String> sign(String appID, String apiKey, String requestID,
                                            String bodyJSON) {
         String timestamp = String.valueOf(System.currentTimeMillis() / 1000);
@@ -37,7 +35,7 @@ public final class WeknoraCloudSign {
         String bodyForHash = bodyJSON == null || bodyJSON.isEmpty() ? "{}" : bodyJSON;
         String bodyMd5 = md5Hex(bodyForHash);
 
-        // Go 用 sort.Strings 排序后 "&" 拼接（TreeMap 字母序等价）
+        // 参数按字母序排列后 "&" 拼接（TreeMap）
         Map<String, String> params = new TreeMap<>();
         params.put("x-appid", appID);
         params.put("x-api-key", apiKey);
@@ -81,7 +79,7 @@ public final class WeknoraCloudSign {
         }
     }
 
-    /** 对照 Go rfc3986Encode：保留 RFC3986 unreserved，其余 %XX（大写十六进制）。 */
+    /** RFC3986 百分号编码：保留 unreserved 字符，其余 %XX（大写十六进制）。 */
     static String rfc3986Encode(String s) {
         StringBuilder out = new StringBuilder(s.length());
         for (byte b : s.getBytes(StandardCharsets.UTF_8)) {

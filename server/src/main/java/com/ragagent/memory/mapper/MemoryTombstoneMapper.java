@@ -21,7 +21,7 @@ import org.apache.ibatis.annotations.Select;
 public interface MemoryTombstoneMapper extends BaseMapper<MemoryTombstone> {
 
     /**
-     * 对照 {@code AddTombstone}：冲突时什么都不做。
+     * 插入墓碑：冲突时什么都不做。
      *
      * <p>{@code created_at} 语义上是自动时间戳（插入时写 {@code now}）；
      * 而这里**必须显式给 {@code created_at}**，否则 H2 会落到 DDL 的
@@ -47,13 +47,13 @@ public interface MemoryTombstoneMapper extends BaseMapper<MemoryTombstone> {
             + "  AND fingerprint = #{t.fingerprint})")
     int insertIfAbsentOther(@Param("t") MemoryTombstone tombstone);
 
-    /** 对照 {@code trimTombstones} 的 {@code Pluck("id", &keep)}：保留最近的 N 条。 */
+    /** 修剪时先取保留集的 id：保留最近的 N 条。 */
     @Select("SELECT id FROM memory_tombstones WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId} "
             + "ORDER BY created_at DESC LIMIT #{limit}")
     List<String> selectNewestIds(@Param("tenantId") long tenantId, @Param("subjectId") String subjectId,
                                  @Param("limit") int limit);
 
-    /** 对照 {@code trimTombstones} 的删除（{@code id NOT IN ?}）。 */
+    /** 修剪的删除（{@code id NOT IN ?}）。 */
     @Delete("<script>"
             + "DELETE FROM memory_tombstones WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId} "
             + "AND id NOT IN <foreach collection='keep' item='i' open='(' separator=',' close=')'>#{i}</foreach>"
@@ -61,7 +61,7 @@ public interface MemoryTombstoneMapper extends BaseMapper<MemoryTombstone> {
     int deleteExcept(@Param("tenantId") long tenantId, @Param("subjectId") String subjectId,
                      @Param("keep") List<String> keep);
 
-    /** 对照 {@code ListTombstones}：最近的拒绝，{@code created_at DESC}。 */
+    /** 最近的拒绝，{@code created_at DESC}。 */
     @Select("<script>"
             + "SELECT * FROM memory_tombstones WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId} "
             + "ORDER BY created_at DESC"
@@ -71,14 +71,14 @@ public interface MemoryTombstoneMapper extends BaseMapper<MemoryTombstone> {
                                          @Param("subjectId") String subjectId,
                                          @Param("limit") int limit);
 
-    /** 对照 {@code HasTombstone}：这个指纹是否已经被忘过。 */
+    /** 这个指纹是否已经被忘过。 */
     @Select("SELECT COUNT(*) FROM memory_tombstones WHERE tenant_id = #{tenantId} "
             + "AND subject_id = #{subjectId} AND fingerprint = #{fingerprint}")
     long countByFingerprint(@Param("tenantId") long tenantId, @Param("subjectId") String subjectId,
                             @Param("fingerprint") String fingerprint);
 
     /**
-     * 对照 {@code HasTombstoneForMessage}：{@code within > 0} 时才加时间窗。
+     * 按来源消息查墓碑：{@code within > 0} 时才加时间窗。
      *
      * <p>窗口是有意义的：这条规则是为了拦住"一个 debounce 之后的重推"，
      * 不是把一条消息永久封禁。</p>

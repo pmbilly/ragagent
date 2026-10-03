@@ -33,9 +33,9 @@ import com.sun.net.httpserver.HttpServer;
 import com.ragagent.model.service.ModelRuntimeConfigs;
 
 /**
- * embedding 客户端的 stub server A/B：请求体/路径/头部与 Go 实录（/tmp 录制，
- * server/src/test/resources/wire/*.json）逐字节比对；错误分支（401/429/5xx/SSRF）
- * 对照 Go 判定。测试禁真实网络——全部打 127.0.0.1 stub。
+ * embedding 客户端的 stub server A/B：请求体/路径/头部与录制
+ * （server/src/test/resources/wire/*.json）逐字节比对；错误分支（401/429/5xx/SSRF）
+ * 核对判定。测试禁真实网络——全部打 127.0.0.1 stub。
  */
 class EmbeddingWireTest {
 
@@ -396,7 +396,7 @@ class EmbeddingWireTest {
         }
     }
 
-    // ── 错误分类（对照 Go 判定）─────────────────────────────────────
+    // ── 错误分类─────────────────────────────────────
 
     @Test
     void openAiErrorTruncatesBodyAt1000() {
@@ -425,7 +425,7 @@ class EmbeddingWireTest {
         }
     }
 
-    // ── SSRF 与 base URL 校验（对照 transport_test.go）──────────────
+    // ── SSRF 与 base URL 校验──────────────
 
     @Test
     void ssrfRejectsLinkLocalMetadataBase() {
@@ -444,7 +444,7 @@ class EmbeddingWireTest {
         EmbeddingHttp.validateEmbeddingBaseUrl(url);
     }
 
-    // ── ConfigFromModel（对照 config_from_model_test.go）────────────
+    // ── ConfigFromModel────────────
 
     @Test
     void configFromModelMapsAllFields() {
@@ -478,7 +478,7 @@ class EmbeddingWireTest {
         assertEquals(ModelRuntimeConfigs.embedderConfig(null, "a", "b").getModelId(), "");
     }
 
-    // ── 并发治理（对照 concurrency_wrapper_test.go 的语义）──────────
+    // ── 并发治理──────────
 
     @Test
     void concurrencyGovernorGatesBackgroundCallsOnly() throws Exception {
@@ -548,7 +548,7 @@ class EmbeddingWireTest {
         assertTrue(maxSeen.get() >= 2, "交互式不被节流，max=" + maxSeen.get());
     }
 
-    // ── BatchEmbedder（对照 batch.go 语义）──────────────────────────
+    // ── BatchEmbedder──────────────────────────
 
     @Test
     void batchPoolCarriesResultsAndFirstError() {

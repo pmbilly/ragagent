@@ -9,9 +9,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * SQLite 关键词纯函数——对照 Go {@code tokenizeCJKBigram} / {@code sanitizeFTS5Query}
- * 的逐字语义（连续汉字切重叠二元组、单字保留、非 CJK 整词、标点/空白分隔）、
- * float32 小端序列化（等价 {@code sqlite_vec.SerializeFloat32}）。
+ * SQLite 关键词纯函数的逐字语义钉子（连续汉字切重叠二元组、单字保留、非 CJK 整词、
+ * 标点/空白分隔）、float32 小端序列化（等价 {@code sqlite_vec.SerializeFloat32}）。
  */
 class SqliteCjkBigramTest {
 

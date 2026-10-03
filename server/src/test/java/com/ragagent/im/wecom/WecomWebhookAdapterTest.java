@@ -39,17 +39,17 @@ import com.ragagent.im.runtime.ReplyMessage;
 import com.sun.net.httpserver.HttpServer;
 
 /**
- * 企业微信 webhook 适配器（W5γ3.4）对照 Go {@code internal/im/wecom/webhook_adapter.go}：
+ * 企业微信 webhook 适配器行为测试：
  * 验签与 AES 信封解密（含 corp_id 校验）、URL 验证回显、解析（群聊剥 @提及 / image 两型）、
  * 发送（群 appchat 优先、失败回落 message/send）、token 缓存、文件下载的文件名三级推断。
  *
- * <p>测试自持"加密"方向（Go 侧由企业微信发出）：AES-CBC + PKCS#7(32) + 信封，与适配器解密互逆。</p>
+ * <p>测试自持"加密"方向（线上由企业微信发出）：AES-CBC + PKCS#7(32) + 信封，与适配器解密互逆。</p>
  */
 class WecomWebhookAdapterTest {
 
     private static final String CORP_ID = "ww-test-corp";
     private static final String TOKEN = "test-token";
-    /** 43 字符（base64 去填充）→ 解出 32 字节（照 Go 的 encoding_aes_key）。 */
+    /** 43 字符（base64 去填充）→ 解出 32 字节（encoding_aes_key 的编码约定）。 */
     private static final String AES_KEY = Base64.getEncoder().withoutPadding()
             .encodeToString(new byte[32]);
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -277,7 +277,7 @@ class WecomWebhookAdapterTest {
         assertEquals(ImTypes.PLATFORM_WECOM, reg.adapter().platform());
         assertNull(reg.stop());
 
-        // websocket（Go 的默认模式）已落地为长连接适配器（W5γ3.5）：建得出来且带 stop
+        // websocket（默认模式）已落地为长连接适配器：建得出来且带 stop
         ImChannelEntity ws = new ImChannelEntity();
         ws.setId("ch-2");
         ws.setMode("websocket");

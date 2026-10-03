@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
  * <ol>
  *   <li>代码体内不得内联全限定类名（**任何**包，含 {@code java.*} / {@code com.fasterxml.*} / {@code jakarta.*} —— 一律走 import）；</li>
  *   <li>不得出现空 JavaDoc（{@code /** *​/}）；</li>
- *   <li>注释不得残留历史黑话（golden 字样、波次编号、Go 出处指针）；</li>
+ *   <li>注释不得残留历史黑话（golden 字样、波次编号、出处指针）；</li>
  *   <li>controller 包不得依赖 mapper 包（分层纪律）；</li>
  *   <li>controller 包不得自行开线程（后台任务走 KnowledgeTaskExecutor）；</li>
  *   <li>不得自行 new JdbcTemplate（用容器提供的 bean）。</li>

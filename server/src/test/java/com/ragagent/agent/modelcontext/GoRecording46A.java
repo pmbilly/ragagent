@@ -3,11 +3,8 @@ package com.ragagent.agent.modelcontext;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
- * 4.6a Go 实录常量（方法：/tmp/toolrec46a 复制 WeKnora 仓 internal/ + go.mod/go.sum，
- * 同包探针 zz_rec46a_mc_test.go / zz_rec46a_sk_test.go 直接调用未导出函数，真值写入
- * rec-mc.jsonl / rec-mc2.jsonl / rec-sk.jsonl，本文件由这三个 rec.jsonl 生成——禁止手改。
- * 重生成：`cd /tmp/toolrec46a && go test ./internal/modelcontext/ ./internal/agent/skills/ \
- *   -run TestZZRec46A -count=1`，然后按每行 rec.jsonl → 一条 R_<GROUP>_<ID> 常量重新生成本文件。
+ * 4.6a 录制常量。本文件由录制输出（rec-mc.jsonl / rec-mc2.jsonl / rec-sk.jsonl）生成——
+ * <b>禁止手改</b>；每行录制记录 → 一条 R_&lt;GROUP&gt;_&lt;ID&gt; 常量，重生成需重跑录制程序。
  * 用 {@link #rec(String)} 解析（传常量原文）。组清单：modelcontext=protocol/handle_table/
  * citations/citation_stream/decode_output/tool_policy/model_output/mcp/stream/sources/registry；
  * skills=frontmatter/skill_helpers/zip_limits/tenant_source/loader/shell_staging/env/manager。
@@ -17,7 +14,7 @@ public final class GoRecording46A {
     private GoRecording46A() {
     }
 
-    /** 解析一条实录记录。 */
+    /** 解析一条录制记录。 */
     public static JsonNode rec(String json) {
         try {
             return new com.fasterxml.jackson.databind.ObjectMapper().readTree(json);

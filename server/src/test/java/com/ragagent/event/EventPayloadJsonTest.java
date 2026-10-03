@@ -37,31 +37,30 @@ import com.ragagent.event.payload.ToolApprovalResolvedData;
 import com.ragagent.event.payload.UserMessageInjectedData;
 
 /**
- * 事件 payload 的 JSON 字节形状——<b>期望值全部是 /tmp Go 程序实录</b>
- * （类型逐字抄自 internal/event/event_data.go，跑 {@code json.Marshal}），
+ * 事件 payload 的 JSON 字节形状——<b>期望值全部是固定录制真值</b>，
  * 不是照直觉写的。覆盖三类形态：
  * <ol>
- *   <li>零值（无 omitempty 的字段恒输出，含 {@code "plan":null} 这类 nil slice/map）；</li>
- *   <li>全量（键序 = Go struct 声明序；HTML 转义；map 键字母序；浮点 Go 格式）；</li>
- *   <li>omitempty 边界（空串 / 0 / false / 空 map / 空列表整键省略）。</li>
+ *   <li>零值（零值字段恒输出，含 {@code "plan":null} 这类 null 列表/map）；</li>
+ *   <li>全量（键序 = 字段声明序；HTML 转义；map 键字母序；浮点格式）；</li>
+ *   <li>缺省边界（空串 / 0 / false / 空 map / 空列表整键省略）。</li>
  * </ol>
  *
  * <p>线上意义：payload 经 AgentStreamHandler 的 {@code toolApprovalDataToMap}
- * （{@code json.Marshal(payload)} → map）进 StreamResponse.data，最终出现在
- * continue-stream 的 SSE 帧里（§9.3 四路径 MATCH 基线）。</p>
+ * （payload 序列化 → map）进 StreamResponse.data，最终出现在
+ * continue-stream 的 SSE 帧里。</p>
  */
 class EventPayloadJsonTest {
 
-    // B40（2026-10-03）：Go 版已下线——期望值不再复刻 Go 的 \u003c 形态；
-    // 各用例的「// Go: ...」注释保留为历史记录。
+    // 期望值不再保留录制期的 \u003c HTML 转义形态；
+    // 各用例头部的录制形状注释保留为历史记录。
 
     private static String write(Object payload) {
         return EventJson.write(payload);
     }
 
     /**
-     * B50：`GoDoubleSerializer` 退役——数字形态改 Java 标准（{@code 2.0} / {@code 1.0E21}）；
-     * 期望值里的 Go 形态（{@code 2} / {@code 1e+21}）经语义归一后比较，形态差异不再构成断言目标。
+     * 数字形态用 Java 标准序列化（{@code 2.0} / {@code 1.0E21}）；
+     * 期望值里的旧录制形态（{@code 2} / {@code 1e+21}）经语义归一后比较，形态差异不构成断言目标。
      */
     private static void assertSemantic(String expected, String actual) {
         assertEquals(com.ragagent.support.ContractJson.deep(expected),
@@ -97,7 +96,7 @@ class EventPayloadJsonTest {
         d.setRewrittenQuery("explain retrieval-augmented generation");
         d.setSessionId("sess-1");
         d.setUserId("u-1");
-        // 刻意乱序插入：Go 的 map 按字母序输出
+        // 刻意乱序插入：序列化按键名字母序输出
         d.setExtra(mapOf("zebra", 1, "alpha", true, "mid", "m"));
         assertSemantic("{\"original_query\":\"What is <RAG> & why?\","
                 + "\"rewritten_query\":\"explain retrieval-augmented generation\","
@@ -694,7 +693,7 @@ class EventPayloadJsonTest {
 
     @Test
     void readToleratesUnknownFields() {
-        // Go 的 json.Unmarshal 默认忽略未知字段——旧事件多出的字段不能让读路径炸掉
+        // 反序列化默认忽略未知字段——旧事件多出的字段不能让读路径炸掉
         AgentThoughtData d = EventJson.read(
                 "{\"content\":\"c\",\"iteration\":1,\"done\":true,\"future_field\":42}",
                 AgentThoughtData.class);

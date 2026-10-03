@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * 对照 Go metric.MAPMetric（map.go 全文）：每真值组算 AP
+ * MAP 指标：每真值组算 AP
  * （命中位次上的 P@k 之和 / 命中数，无命中则 AP=0），再按真值组数平均。
  */
 public final class MapMetric implements Metrics {

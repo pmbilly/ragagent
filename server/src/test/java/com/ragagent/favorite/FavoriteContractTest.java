@@ -31,12 +31,11 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 /**
- * 波 2 终扫批契约测试：用户收藏 3 端点（对照 golden 逐字节比对）。
+ * 用户收藏 3 端点契约测试（对照 golden 逐字节比对）。
  *
- * golden 来源：Go dev server（localhost:8080，2026-09-19 录制，
- * scripts/record-fav-cprev-golden.sh，21 条 fav-*.json）。
+ * golden 录制：scripts/record-fav-cprev-golden.sh（21 条 fav-*.json）。
  *
- * 场景顺序严格复刻录制脚本（同请求序列有状态依赖）：
+ * 场景顺序严格按录制脚本（同请求序列有状态依赖）：
  * 空列表 → add ×2 + 重复 add → 列表回读 → remove 真实行 + 幽灵行 →
  * 列表回读 → 400 家族 → 鉴权家族。
  *

@@ -10,7 +10,7 @@ import com.ragagent.session.controller.KnowledgeQaController.Base64Support;
 
 /**
  * {@code KnowledgeQaController} 的**静态解析助手簇**：请求体绑定
- * （`ShouldBindJSON` 对应物，Go binding:required 文案逐字对齐）、绑定错误文案、附件上传的
+ * （绑定错误文案逐字对齐）、绑定错误文案、附件上传的
  * 解码与校验、以及仅解析簇使用的列表助手。全部静态、参数化、零字段依赖。
  *
  * <p>共享项留控制器：{@code stringListOf}（附件解析也在用）、
@@ -37,7 +37,7 @@ final class QaRequestBinder {
         return r;
     }
     static <T> T parseOrBindError(String rawBody, Class<T> type) {
-        // B51：GoJsonBindError 退役——空 body 用 Jackson 标准消息；其余错误留给下面的解析
+        // 空 body 用 Jackson 标准消息；其余错误留给下面的解析
         // try/catch（Jackson 原生消息）。
         if (rawBody == null || rawBody.isEmpty()) {
             throw BizException.badRequest("No content to map due to end-of-input");
@@ -45,8 +45,7 @@ final class QaRequestBinder {
         try {
             return BIND_JSON.readValue(rawBody, type);
         } catch (Exception e) {
-            // B51：GoJsonBindError 退役——字段级类型错误直接用 Jackson 原生消息
-            // （原实现仿真 Go 的 "json: cannot unmarshal ..." 措辞）。
+            // 字段级类型错误直接用 Jackson 原生消息。
             throw BizException.badRequest(e.getMessage());
         }
     }

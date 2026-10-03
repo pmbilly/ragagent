@@ -282,7 +282,7 @@ public final class QaSupport {
             return merged;
         }
         // A request tag ID without a scope attaches to a single-KB scope when the
-        // request names exactly one knowledge base (Go 同款判定).
+        // request names exactly one knowledge base.
         if (kbIds != null && kbIds.size() == 1 && !isEmpty(kbIds.get(0))) {
             String kbId = kbIds.get(0);
             TagScope scope = null;

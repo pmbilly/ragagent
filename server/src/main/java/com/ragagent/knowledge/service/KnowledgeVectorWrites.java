@@ -9,10 +9,10 @@ import com.ragagent.retrieval.engine.TenantStoreOwnership;
 import org.springframework.stereotype.Component;
 
 /**
- * 知识写链的向量店路由网关（W5γ4.6 follow-up：知识写链引擎改道）。
- * knowledge_delete.go / knowledge_faq.go / knowledge_clone_move.go）都经
+ * 知识写链的向量店路由网关。
+ * 所有知识写链（删除 / FAQ / 克隆移动等）都经
  * {@code retriever.CreateRetrieveEngineForKB} 路由——绑定外部 store 的 KB 写进自己的店。
- * Java 侧历史路径直连 pg JDBC（{@code VectorStoreService}），绑定店写落错店。</p>
+ * 历史路径直连 pg JDBC（{@code VectorStoreService}），绑定店会写落错店。</p>
  * <p><b>改道策略（风险最小切分）</b>：绑定 store（{@code hasVectorStore()}）的 KB 走引擎口
  * （本网关解析）；未绑定的 KB 保持既有 pg 直连路径不变——契约样例锁定的错误形态
  * （kg-image 族、ChunkServiceTest 桩）全部在未绑定路径上，行为逐字节不变。

@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 
 /**
- * 全局事件总线 + 适配器 + ID 生成的行为断言（global.go / adapter.go / agent/const.go L149-152）。
+ * 全局事件总线 + 适配器 + ID 生成的行为断言。
  */
 class GlobalEventBusAndAdapterTest {
 
@@ -27,8 +27,8 @@ class GlobalEventBusAndAdapterTest {
 
     @Test
     void setBeforeGetIsOverwrittenByOnce() {
-        // 刻意保留的 Go quirk（/tmp 实录：globalSetThenGet => overwritten=true）：
-        // sync.Once 在首次 Get 时才触发并无条件覆盖 SetGlobalEventBus 写入的实例
+        // 刻意保留的既有行为（录制 globalSetThenGet => overwritten=true）：
+        // 首次 Get 时才初始化（once 语义）并无条件覆盖 SetGlobalEventBus 写入的实例
         EventBus custom = new EventBus();
         GlobalEventBus.setGlobalEventBus(custom);
         EventBus got = GlobalEventBus.getGlobalEventBus();
@@ -37,7 +37,7 @@ class GlobalEventBusAndAdapterTest {
 
     @Test
     void facadeOnEmitHasHandlersOffAndClear() {
-        // 门面对照 Go 包级函数 On/Emit/HasHandlers/Clear——在当前全局实例上操作
+        // 门面方法 On/Emit/HasHandlers/Clear——在当前全局实例上操作
         EventBus global = GlobalEventBus.getGlobalEventBus();
         String type = "test.facade." + System.nanoTime();
         AtomicInteger count = new AtomicInteger();
@@ -65,12 +65,12 @@ class GlobalEventBusAndAdapterTest {
         assertEquals(1, count.get());
     }
 
-    // ===== EventBusAdapter（adapter.go） =====
+    // ===== EventBusAdapter =====
 
     @Test
     void adapterOnThenEmitDispatches() {
-        // Go：EventBusAdapter.On 注册（types.EventHandler 转 event.EventHandler）、
-        // Emit 把 types.Event 转回 event.Event 后走底层总线。Java 恒等转换：
+        // EventBusAdapter.On 注册到包装的总线、
+        // Emit 走底层总线。恒等转换：
         // 接口注册 → 底层 on；接口发射 → 底层 emit（含 ID 自动生成）。
         EventBus bus = new EventBus();
         EventBusInterface iface = new EventBusAdapter(bus);
@@ -83,7 +83,7 @@ class GlobalEventBusAndAdapterTest {
         iface.emit(caller);
         assertEquals(36, seen.get().length(), "underlying bus ID autogen must apply");
 
-        // asEventBusInterface 对照 Go (*EventBus).AsEventBusInterface()
+        // asEventBusInterface 返回同一适配器形态
         EventBusInterface viaMethod = bus.asEventBusInterface();
         assertTrue(viaMethod instanceof EventBusAdapter);
     }
@@ -109,12 +109,12 @@ class GlobalEventBusAndAdapterTest {
         throw new AssertionError("expected EventBusException");
     }
 
-    // ===== EventIds（agent/const.go generateEventID） =====
+    // ===== EventIds =====
 
     @Test
     void generateEventIdMatchesGoShape() {
-        // Go: fmt.Sprintf("%s-%s", uuid.New().String()[:8], suffix)
-        // 实录 sample => 286fbbe5-thinking
+        // 形如 "<uuid 前 8 位 hex>-<suffix>"
+        // 录制 sample => 286fbbe5-thinking
         String id = EventIds.generateEventID("thinking");
         assertTrue(id.matches("^[0-9a-f]{8}-thinking$"),
                 "must be 8 lowercase hex chars + '-' + suffix, got: " + id);

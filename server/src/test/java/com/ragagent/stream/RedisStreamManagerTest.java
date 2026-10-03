@@ -24,14 +24,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 /**
- * Redis 流管理器的语义（对照 Go {@code internal/stream/redis_manager.go} 与
- * {@code redis_live_run_test.go}）。
+ * Redis 流管理器的语义。
  *
- * <p>跑在真 redis-server 上（{@link EmbeddedRedis}，对应 Go 测试的 miniredis）——
+ * <p>跑在真 redis-server 上（{@link EmbeddedRedis}）——
  * 这里一半的行为在 Lua 脚本与真实 TTL 里，假实现替不掉。机器上没有
  * {@code redis-server} 时整类跳过。</p>
  *
- * <p>TTL 相关的用例用"观察 TTL 被推回去"代替 Go 的 {@code mini.FastForward}：
+ * <p>TTL 相关的用例用"观察 TTL 被推回去"代替时间快进：
  * 真 Redis 不会快进，但把到期时间读出来一样能证明续期发生了，还更省时间。</p>
  */
 class RedisStreamManagerTest {
@@ -77,8 +76,7 @@ class RedisStreamManagerTest {
      *
      * <p>⚠️ 读数用毫秒精度（PTTL），且调用方用**长 TTL**（≥2min）建 manager：
      * 全量慢跑时秒级取整可能让 renew 前后落在同一秒（after==before 假红）、
-     * 短 TTL 键可能撑不到断言就过期（读数 -2 假红）——波 3 sandbox 批验收时
-     * 两种形态都实测到了（§5 陷阱 9 的第三变种）。</p>
+     * 短 TTL 键可能撑不到断言就过期（读数 -2 假红）——两种形态都实测到过。</p>
      */
     private void assertRefreshesLiveRunTtl(String liveRunKey, Runnable action) {
         Long before = template.getExpire(liveRunKey, TimeUnit.MILLISECONDS);
@@ -92,8 +90,8 @@ class RedisStreamManagerTest {
 
     @Test
     void keyLayoutMatchesGoIncludingTheDoubleColonFromEnvPrefix() {
-        // Go 是 fmt.Sprintf("%s:%s:%s", prefix, sessionID, messageID) —— prefix 不做去尾冒号处理。
-        // dev .env 的 REDIS_PREFIX=stream: 因此拼出 stream::sess:msg，照抄不改。
+        // 键拼装格式 "%s:%s:%s"——prefix 不做去尾冒号处理。
+        // dev .env 的 REDIS_PREFIX=stream: 因此拼出 stream::sess:msg，保持原样。
         RedisStreamManager m = new RedisStreamManager(template, "stream:", Duration.ofHours(1));
         assertEquals("stream::sess-1:msg-1", m.buildKey("sess-1", "msg-1"));
         assertEquals("stream::sess-1:msg-1:steer", m.buildSteerKey("sess-1", "msg-1"));
@@ -120,7 +118,7 @@ class RedisStreamManagerTest {
 
     @Test
     void getLiveRunOnACorruptMarkerIsAnError() {
-        // 对照 Go TestGetLiveRunCorruptJSONIsError：损坏的标记**不能**折叠成"没有 live run"，
+        // 损坏的标记**不能**折叠成"没有 live run"，
         // 否则 /steer 会答 new_run，客户端在仍在生成的轮次上叠第二个 AgentQA。
         String key = manager(Duration.ofHours(1)).buildLiveRunKey("sess-1");
         template.opsForValue().set(key, "not-json");
@@ -130,7 +128,6 @@ class RedisStreamManagerTest {
 
     @Test
     void setLiveRunRejectsADifferentAssistantButClaimOverwrites() {
-        // 对照 Go TestSetLiveRunRejectsADifferentAssistant / TestClaimLiveRunOverwritesTheMarker
         RedisStreamManager m = manager(Duration.ofHours(1));
 
         m.setLiveRun("sess-1", "assist-1", "req-1");
@@ -167,13 +164,13 @@ class RedisStreamManagerTest {
         m.clearLiveRun("sess-1", "assist-2");
         assertFalse(m.getLiveRun("sess-1").isPresent());
 
-        // 空 ID 是 no-op（Go 直接 return nil）
+        // 空 ID 是 no-op（直接返回）
         m.setLiveRun("sess-1", "assist-3", "req-3");
         m.clearLiveRun("sess-1", "");
         assertEquals("assist-3", m.getLiveRun("sess-1").assistantMessageId());
     }
 
-    // ── live-run TTL 续期（对照 Go 的三个 FastForward 用例） ─────────────────
+    // ── live-run TTL 续期 ─────────────────
 
     @Test
     void appendEventRefreshesTheLiveRunTtl() {
@@ -251,7 +248,7 @@ class RedisStreamManagerTest {
 
     @Test
     void appendSteerEventsDeduplicatesClientIds() throws Exception {
-        // 对照 Go TestAppendSteerEventsDeduplicatesClientIDs（redis 分支）
+        // 客户端 ID 去重（redis 分支）
         RedisStreamManager m = manager(Duration.ofHours(1));
         int threads = 8;
         ExecutorService pool = Executors.newFixedThreadPool(threads);

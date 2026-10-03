@@ -12,17 +12,16 @@ import com.ragagent.embedding.EmbeddingHttp;
 import com.ragagent.common.web.ProviderJson;
 
 /**
- * 阿里云 DashScope 多模态 embedding 客户端（对照 Go
- * {@code internal/models/embedding/aliyun.go} 全文）。
+ * 阿里云 DashScope 多模态 embedding 客户端。
  *
- * <p>请求体 = Go {@code AliyunEmbedRequest} 字段序（model/input/parameters）；
+ * <p>请求体字段序固定（model/input/parameters）；
  * {@code parameters.dimension} 仅在 supportsDimensionsParam 时出现。响应按
  * {@code text_index} 回填到输入位置（越界丢弃）。错误优先解析
  * {@code code - message} 形态。</p>
  */
 public final class AliyunEmbedder extends BaseEmbedder {
 
-    /** 阿里云 DashScope 多模态 Embedding API 端点（Go AliyunMultimodalEmbeddingEndpoint）。 */
+    /** 阿里云 DashScope 多模态 Embedding API 端点。 */
     public static final String MULTIMODAL_ENDPOINT =
             "/api/v1/services/embeddings/multimodal-embedding/multimodal-embedding";
 
@@ -55,14 +54,14 @@ public final class AliyunEmbedder extends BaseEmbedder {
 
     @Override
     public List<float[]> batchEmbed(List<String> texts) {
-        // 对照 AliyunEmbedRequest：contents 数组 + 可选 parameters.dimension
+        // 请求体：contents 数组 + 可选 parameters.dimension
         ObjectNode reqBody = ProviderJson.object();
         reqBody.put("model", modelName);
         ObjectNode input = reqBody.putObject("input");
         ArrayNode contents = input.putArray("contents");
         for (String text : texts) {
             ObjectNode c = contents.addObject();
-            // AliyunContent.Text 带 omitempty：空文本省略 text 键
+            // 内容项的 text 空则省略 text 键
             if (text != null && !text.isEmpty()) {
                 c.put("text", text);
             }
@@ -97,7 +96,7 @@ public final class AliyunEmbedder extends BaseEmbedder {
                     + resp.bodyText());
         }
 
-        // 按 text_index 回填（Go：越界索引直接丢弃；未命中的位置保持 nil → Java null）
+        // 按 text_index 回填（越界索引直接丢弃；未命中的位置保持 null）
         List<float[]> embeddings = new ArrayList<>(texts.size());
         for (int i = 0; i < texts.size(); i++) {
             embeddings.add(null);

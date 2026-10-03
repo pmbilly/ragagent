@@ -10,9 +10,9 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * 契约测试的 JSON 语义比较器（阶段 1 收官批，PR4）。
+ * 契约测试的 JSON 语义比较器。
  *
- * <p>迁移基线化后，fixture 锚定的是<b>本仓自己的行为</b>，与 Go 录制机再无字节契约；
+ * <p>迁移基线化后，fixture 锚定的是<b>本仓自己的行为</b>，与录制机再无字节契约；
  * 键序（Jackson LinkedHashMap vs 旧 golden 的写入顺序）与 HTML 转义（\\u003c vs 字面
  * 字符）不再构成断言目标。{@link #semantic(ObjectMapper, String)} 把任意 JSON 文本
  * 归一为「键排序 + 数字统一 + 紧凑分隔」的规范形态：解析失败的文本原样返回，

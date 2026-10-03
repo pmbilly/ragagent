@@ -18,19 +18,17 @@ import com.ragagent.agent.tools.ToolCancellation;
 import com.ragagent.agent.tools.ToolRequest;
 
 /**
- * web_search / web_fetch 工具钉（2026-09-23 接线批·切片 2d，对照 Go
- * {@code web_search.go / web_fetch.go}）。
+ * web_search / web_fetch 工具钉。
  *
  * <p>此前 {@code registerTools} 对这两个名字只落 {@code default → "Unknown tool"}。
- * schema 与描述按 Go 实录逐字节钉住（GenerateSchema[WebSearchInput/WebFetchInput]
- * 与 fmt.Sprintf 注入后的描述）；行为用 stub fetcher/backend 实弹。</p>
+ * schema 与描述按录制原字节钉住（见下方常量）；行为用 stub fetcher/backend 实弹。</p>
  */
 class WebToolsRecordingTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     // ------------------------------------------------------------------
-    // Go 实录（独立程序GenerateSchema 输出原字节 + 描述模板）
+    // 录制的 schema 原字节 + 描述模板
     // ------------------------------------------------------------------
 
     private static final String GO_SEARCH_SCHEMA =
@@ -56,7 +54,7 @@ class WebToolsRecordingTest {
         WebFetchTool fetch = new WebFetchTool();
         WebSearchTool search = new WebSearchTool(
                 (tenantId, providerId, config, query) -> List.of(), 10, "p", () -> 10002L, null);
-        // schema 的 JsonNode toString 与 Go RAW 逐字节一致（同序同形）
+        // schema 的 JsonNode toString 与录制 RAW 常量逐字节一致（同序同形）
         assertThat(fetch.getParameters().toString()).isEqualTo(GO_FETCH_SCHEMA);
         assertThat(search.getParameters().toString()).isEqualTo(GO_SEARCH_SCHEMA);
         // 解析重排后仍然同构（防实现里改键序）
@@ -138,7 +136,7 @@ class WebToolsRecordingTest {
         ToolResult badLimit = tool.execute(ToolRequest.of(json(
                 "{\"items\":[{\"url\":\"https://e.com/a\",\"limit\":8001}]}")));
         assertThat(dataItem(badLimit, 0).get("error_code")).isEqualTo("invalid_arguments");
-        // offset 越界（先 offset-0 热缓存——Go 的 readPage 先于 content_length 校验，
+        // offset 越界（先 offset-0 热缓存——读页先于 content_length 校验，
         // 未缓存续读会先报 snapshot_expired）
         WebFetchTool small = fetchTool(url -> "abc");
         small.execute(ToolRequest.of(json("{\"items\":[{\"url\":\"https://e.com/a\"}]}")));
@@ -387,7 +385,7 @@ class WebToolsRecordingTest {
                 .isEqualTo("content fetch is limited to the first 3 results; use web_fetch for more");
         assertThat(r.getOutput()).contains("Fetched content (untrusted): page body https://e.com/a\n");
         assertThat(r.getOutput()).contains("Page fetch skipped: use web_fetch for this result.\n");
-        // 短内容：无截断；Go map 语义——success 页的派生键恒存在，缺席值即 null
+        // 短内容：无截断；success 页的派生键恒存在，缺席值即 null
         assertThat(rows.get(0).get("page_truncated")).isEqualTo(false);
         assertThat(rows.get(0).get("page_next_offset")).isNull();
         assertThat(rows.get(0).get("full_output_path")).isNull();
@@ -400,7 +398,7 @@ class WebToolsRecordingTest {
         WebSearchTool tool = new WebSearchTool(
                 (t, p, c, q) -> List.of(withDate), 10, "p", () -> 10002L, null);
         ToolResult r = tool.execute(ToolRequest.of(json("{\"query\":\"q\"}")));
-        // RFC3339 秒精度 + 偏移（Go 的 Format(time.RFC3339)）
+        // RFC3339 秒精度 + 偏移
         assertThat(r.getOutput()).contains("Published: 2026-09-23T12:34:56+08:00\n");
     }
 

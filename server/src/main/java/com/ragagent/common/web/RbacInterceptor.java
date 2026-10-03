@@ -170,7 +170,7 @@ public class RbacInterceptor implements HandlerInterceptor {
     }
 
     /**
-     * 取当前请求的路由模板（对照 gin 的 {@code c.FullPath()}）。
+     * 取当前请求的路由模板（Spring 匹配的 URL pattern，非原始 URI）。
      *
      * <p>拦截器 preHandle 跑在 handler mapping 之后，所以
      * {@code BEST_MATCHING_PATTERN_ATTRIBUTE} 已经就位；理论上拿不到时（未映射路径）

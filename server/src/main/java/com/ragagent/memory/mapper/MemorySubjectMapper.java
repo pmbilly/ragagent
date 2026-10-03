@@ -34,7 +34,7 @@ import org.apache.ibatis.annotations.Update;
 public interface MemorySubjectMapper extends BaseMapper<MemorySubject> {
 
     /**
-     * 对照 {@code GetSubject}：{@code First} 未命中即"没有"，由仓储回 {@code null}。
+     * 按 scope 取主体；未命中即"没有"，由仓储回 {@code null}。
      *
      * <p>⚠️ 自定义 {@code @Select} 的结果映射**不会**自动套实体上的
      * {@code @TableField(typeHandler=…)}（约定 §9）——那两个 jsonb 列必须在方法上
@@ -72,7 +72,7 @@ public interface MemorySubjectMapper extends BaseMapper<MemorySubject> {
                                          @Param("subjectId") String subjectId);
 
     /**
-     * 对照 {@code EnsureSubject} 的 {@code Clauses(OnConflict{DoNothing}).Create(subject)}。
+     * 主体不存在时插入（冲突忽略）。
      *
      * <p>唯一约束是 {@code idx_memory_subjects_scope (tenant_id, subject_id)}。</p>
      *
@@ -112,7 +112,7 @@ public interface MemorySubjectMapper extends BaseMapper<MemorySubject> {
     int updateEnabled(@Param("tenantId") long tenantId, @Param("subjectId") String subjectId,
                       @Param("enabled") boolean enabled, @Param("now") OffsetDateTime now);
 
-    /** 对照 {@code UpdateSubjectBlock}：写渲染好的常驻块与条目数。 */
+    /** 写渲染好的常驻块与条目数。 */
     @Update("UPDATE memory_subjects SET block_text = #{block}, block_updated_at = #{now}, "
             + "item_count = #{itemCount}, updated_at = #{now} "
             + "WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId}")
@@ -156,13 +156,13 @@ public interface MemorySubjectMapper extends BaseMapper<MemorySubject> {
     int updateLastExtractedAt(@Param("tenantId") long tenantId, @Param("subjectId") String subjectId,
                               @Param("now") OffsetDateTime now);
 
-    /** 对照 {@code MarkConsolidated}。 */
+    /** 记录整体审阅完成时刻。 */
     @Update("UPDATE memory_subjects SET consolidated_at = #{now}, updated_at = #{now} "
             + "WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId}")
     int markConsolidated(@Param("tenantId") long tenantId, @Param("subjectId") String subjectId,
                          @Param("now") OffsetDateTime now);
 
-    /** 对照 {@code MarkForcedConsolidated}：**另一只钟**，与 {@code consolidated_at} 互不影响。 */
+    /** 强制审阅完成时刻：**另一只钟**，与 {@code consolidated_at} 互不影响。 */
     @Update("UPDATE memory_subjects SET forced_consolidated_at = #{now}, updated_at = #{now} "
             + "WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId}")
     int markForcedConsolidated(@Param("tenantId") long tenantId, @Param("subjectId") String subjectId,

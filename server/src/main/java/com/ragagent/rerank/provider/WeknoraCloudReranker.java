@@ -20,7 +20,7 @@ import com.ragagent.rerank.Reranker;
 import com.ragagent.rerank.RerankerConfig;
 
 /**
- * WeKnoraCloud rerank 客户端（对照 Go {@code rerank/weknoracloud.go} 全文）。
+ * WeKnoraCloud rerank 客户端。
  *
  * <p>POST {@code {base}/api/v1/rerank}，签名头由
  * {@link com.ragagent.embedding.provider.WeknoraCloudSign}（全项目第二份 Sign 实现的复用点）

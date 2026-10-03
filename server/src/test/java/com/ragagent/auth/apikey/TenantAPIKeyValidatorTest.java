@@ -14,9 +14,7 @@ import com.ragagent.common.error.BizException;
 import org.junit.jupiter.api.Test;
 
 /**
- * 请求校验的文案与顺序测试——逐条对照 Go
- * internal/handler/tenant_api_key_validation_test.go（L1-62）
- * 与 {@code validateTenantAPIKeyRequest}（handler/tenant.go L802-867）。
+ * 请求校验的文案与顺序测试。
  *
  * <p>校验顺序**就是契约**：前端与集成方按 message 断言，
  * 所以"先报哪一条"必须有测试钉住。</p>
@@ -26,14 +24,13 @@ class TenantAPIKeyValidatorTest {
     private static final TenantAPIKeyValidator.KnowledgeBaseLookup LOOKUP = id -> switch (id) {
         case "kb-owned" -> 42L;
         case "kb-other" -> 43L;
-        default -> null; // 不存在 / 查询出错在 Go 里走同一分支
+        default -> null; // 不存在 / 查询出错同一分支
     };
 
     private static TenantAPIKeyRequest req(String name, boolean fullAccess, List<String> caps) {
         return new TenantAPIKeyRequest(name, fullAccess, null, caps, null);
     }
 
-    /** 对照 {@code TestValidateTenantAPIKeyRequestRequiresCapabilitiesForScopedKey}。 */
     @Test
     void requiresCapabilitiesForScopedKey() {
         assertThatThrownBy(() -> TenantAPIKeyValidator.validate(
@@ -42,14 +39,12 @@ class TenantAPIKeyValidatorTest {
                 .hasMessageContaining("capabilities are required for scoped API keys");
     }
 
-    /** 对照 {@code TestValidateTenantAPIKeyRequestAllowsFullAccessWithoutCapabilities}。 */
     @Test
     void allowsFullAccessWithoutCapabilities() {
         assertThatCode(() -> TenantAPIKeyValidator.validate(
                 req("owner", true, null), 1L, LOOKUP)).doesNotThrowAnyException();
     }
 
-    /** 对照 {@code TestValidateTenantAPIKeyRequestAcceptsScopedKeyWithCapability}。 */
     @Test
     void acceptsScopedKeyWithCapability() {
         assertThatCode(() -> TenantAPIKeyValidator.validate(
@@ -88,8 +83,7 @@ class TenantAPIKeyValidatorTest {
     }
 
     /**
-     * 对照 {@code TestValidateTenantAPIKeyKnowledgeBaseOwnership}：
-     * 同租户通过；跨租户 403；不存在 400。
+     * KB 归属校验：同租户通过；跨租户 403；不存在 400。
      */
     @Test
     void knowledgeBaseOwnership() {
@@ -126,7 +120,7 @@ class TenantAPIKeyValidatorTest {
 
     @Test
     void fullAccessSkipsKnowledgeBaseValidation() {
-        // 对照 Go 的 `if req.FullAccess { return nil }`：full-access 时 KB 白名单
+        // full-access 时 KB 白名单
         // **完全不校验**（哪怕里面全是垃圾 ID）
         assertThatCode(() -> TenantAPIKeyValidator.validate(
                 new TenantAPIKeyRequest("owner", true, List.of("kb-missing", "kb-other"), null, null),

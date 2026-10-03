@@ -16,7 +16,7 @@ import com.ragagent.knowledge.domain.QuestionBatchPayload;
  * 导入后问题生成的**选块与分批**契约（{@code QuestionBatchPlanner}
  * 的 {@code selectQuestionChunks} / {@code planBatches}）。
  *
- * <p>2026-09-25 走查：本仓此前只有手动 {@code regenerate} 路径，导入后的自动生成备案为"未翻"
+ * <p>本仓此前只有手动 {@code regenerate} 路径，导入后的自动生成备案为"未翻"
  * ⇒ 刚导入的 KB 推荐问题恒为空（用户报障的第二半）。本测试钉住扇出侧的三条规则：</p>
  * <ol>
  *   <li>只取 <b>text</b> 且仍可抽取散文的分块（纯图片标记的块必须被剔除）；</li>

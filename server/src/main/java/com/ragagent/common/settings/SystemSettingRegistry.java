@@ -27,7 +27,7 @@ public final class SystemSettingRegistry {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    /** auth.registration_mode 的 cfg 兜底常量（Go config.AuthRegistrationModeSelfServe）。 */
+    /** auth.registration_mode 的配置兜底常量。 */
     public static final String AUTH_REGISTRATION_MODE_DEFAULT = "self_serve";
 
     private static final Map<String, Spec> REGISTRY = new TreeMap<>();
@@ -120,7 +120,7 @@ public final class SystemSettingRegistry {
         return REGISTRY.containsKey(key);
     }
 
-    /** List 时显式退役的旧聚合键（Go 注释：keeping an old DB row visible would lie）。 */
+    /** List 时显式退役的旧聚合键：旧行继续可见会误导调用方。 */
     public static final String RETIRED_KEY = "asynq.concurrency";
 
     /** "general" 兜底分类（virtualSetting 的 category=="" 分支；registry 内无空分类，防御保留）。 */
@@ -128,7 +128,7 @@ public final class SystemSettingRegistry {
 
     /**
      * 内置默认值的 JSONB 编码（类型必须与声明 type 一致）。
-     * string_list 的 nil → []。
+     * string_list 的 null → []。
      */
     public static JsonNode encodeDefault(Spec spec) {
         Object v = spec.defaultValue();

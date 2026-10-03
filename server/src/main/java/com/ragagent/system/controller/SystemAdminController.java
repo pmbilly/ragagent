@@ -50,7 +50,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 动作成功（重置密码 / 删除密钥 / 重置设置）→ 204；错误一律 AppError 信封
  * （请求校验用显式 message，如 {@code userId: 不能为空}）。</p>
  *
- * <p><b>runtime/queues 是 Lite 形态</b>（进程内队列，确定性翻译非降级）：
+ * <p><b>runtime/queues 是 Lite 形态</b>（进程内队列）：
  * available=false + queues=[]；mutate/purge → 503 "Task queue is unavailable"。</p>
  */
 @RestController
@@ -308,7 +308,7 @@ public class SystemAdminController {
         return ResponseEntity.noContent().build();
     }
 
-    /** 对照 maskManagedAPIKey：<=12 位 → "***"；否则 first7 + "..." + last4。 */
+    /** 脱敏：<=12 位 → "***"；否则 first7 + "..." + last4。 */
     private static TenantAPIKeyResponse masked(TenantAPIKeyResponse item, String token) {
         String t = token == null ? "" : token.trim();
         String masked = t.length() <= 12 ? "***" : t.substring(0, 7) + "..." + t.substring(t.length() - 4);
@@ -317,7 +317,7 @@ public class SystemAdminController {
                 item.lastUsedAt(), item.expiresAt(), item.createdAt());
     }
 
-    /** 对照 emitAPIKeyAudit（details: scope_type/capabilities；target_type=api_key）。 */
+    /** API-Key 审计（details: scope_type/capabilities；target_type=api_key）。 */
     private void emitAPIKeyAudit(String action, long keyId, List<String> capabilities) {
         var details = new LinkedHashMap<String, Object>();
         details.put("scope_type", APIKeyScopeType.PLATFORM);
@@ -388,7 +388,7 @@ public class SystemAdminController {
         return ResponseEntity.noContent().build();
     }
 
-    /** 虚拟行的 id 归一为 0（Go uint64 零值输出 0，不是 null）。 */
+    /** 虚拟行的 id 归一为 0（零值输出 0，不是 null）。 */
     private static com.ragagent.system.domain.SystemSetting normalizeRow(
             com.ragagent.system.domain.SystemSetting row) {
         if (row.getId() == null) {
@@ -397,16 +397,16 @@ public class SystemAdminController {
         return row;
     }
 
-    // ── 运行时队列（Lite，确定性翻译） ────────────────────────────────────
+    // ── 运行时队列（Lite） ────────────────────────────────────────────────
 
-    /** Go QueueDefinitions 的队列名（isKnownRuntimeQueue 的判定集）。 */
+    /** 运行时队列名（isKnownRuntimeQueue 的判定集）。 */
     private static final List<String> KNOWN_QUEUES = List.of(
             "default", "chat_attachment", "postprocess", "summary", "multimodal",
             "graph", "question", "memory", "sync", "low", "wiki");
 
     @GetMapping("/runtime/queues")
     public ResponseEntity<SystemDtos.RuntimeQueuesResponse> runtimeQueues() {
-        // 对照 ResolveWorkerPoolConcurrency：每池 concurrency = setting/env/默认 的正数折叠
+        // 每池 concurrency = setting/env/默认 的正数折叠
         int core = positive("asynq.core_concurrency", "WEKNORA_ASYNQ_CORE_CONCURRENCY", 8);
         int postProcess = positive("asynq.postprocess_concurrency",
                 "WEKNORA_ASYNQ_POSTPROCESS_CONCURRENCY", 2);
@@ -432,7 +432,7 @@ public class SystemAdminController {
                 List.of(), true, List.of(), java.time.Instant.now().getEpochSecond()));
     }
 
-    /** 对照 ResolveWorkerPoolConcurrency 的 positive 折叠（<1 → fallback）。 */
+    /** 正数折叠（<1 → fallback）。 */
     private int positive(String key, String env, int fallback) {
         long v = settings.getInt(key, env, fallback);
         return v < 1 ? fallback : (int) v;
@@ -450,7 +450,7 @@ public class SystemAdminController {
                 .contains(state)) {
             throw new BizException(AppError.badRequest("Unknown task state"));
         }
-        // 对照 runtimeTaskPageSize：默认 20；<1 → 20；>100 → 100；非法 → 20
+        // 分页大小：默认 20；<1 → 20；>100 → 100；非法 → 20
         int size;
         try {
             size = pageSize == null ? 20 : Integer.parseInt(pageSize);

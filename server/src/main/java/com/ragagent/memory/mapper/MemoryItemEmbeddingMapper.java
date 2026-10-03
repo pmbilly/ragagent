@@ -36,7 +36,7 @@ import org.apache.ibatis.annotations.Update;
 @Mapper
 public interface MemoryItemEmbeddingMapper extends BaseMapper<MemoryItemEmbedding> {
 
-    /** 对照 {@code UpsertItemEmbedding} 的 {@code OnConflict{DoUpdates: [model_id, dims, vector, updated_at]}}。 */
+    /** 向量 upsert：冲突时更新 model_id, dims, vector, updated_at 四列。 */
     @Insert("INSERT INTO memory_item_embeddings "
             + "(item_id, tenant_id, subject_id, model_id, dims, vector, created_at, updated_at) "
             + "VALUES (#{e.itemId}, #{e.tenantId}, #{e.subjectId}, #{e.modelId}, #{e.dims}, "
@@ -76,13 +76,13 @@ public interface MemoryItemEmbeddingMapper extends BaseMapper<MemoryItemEmbeddin
     })
     MemoryItemEmbedding selectByItemId(@Param("itemId") String itemId);
 
-    /** 对照 {@code DeleteItemEmbedding} 与 {@code UpdateItemContent}/{@code DeleteItem} 里的向量删除。 */
+    /** 删一条记忆的向量（内容更新与删除路径共用）。 */
     @Delete("DELETE FROM memory_item_embeddings WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId} "
             + "AND item_id = #{itemId}")
     int deleteByItemId(@Param("tenantId") long tenantId, @Param("subjectId") String subjectId,
                        @Param("itemId") String itemId);
 
-    /** 对照 {@code ItemEmbeddings}：{@code item_id IN ? AND model_id = ?}。 */
+    /** 按条目集合取向量：{@code item_id IN ? AND model_id = ?}。 */
     @Select("<script>"
             + "SELECT item_id, tenant_id, subject_id, model_id, dims, vector, created_at, updated_at "
             + "FROM memory_item_embeddings WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId} "
@@ -105,7 +105,8 @@ public interface MemoryItemEmbeddingMapper extends BaseMapper<MemoryItemEmbeddin
                                               @Param("modelId") String modelId);
 
     /**
-     * 对照 {@code rankInProcess} 里那条"一次取全"的 SQL（内存兜底排名用）。
+     * {@link com.ragagent.memory.mapper.MemoryItemStore} 内存排名（rankInProcess）用的
+     * "一次取全" SQL。
      *
      * <p>只取 {@code item_id} 与 {@code vector} 两列；{@code LIMIT} 是
      * {@code fallbackVectorScanCap}（5000）。</p>
@@ -137,7 +138,7 @@ public interface MemoryItemEmbeddingMapper extends BaseMapper<MemoryItemEmbeddin
                                                   @Param("limit") int limit);
 
     /**
-     * 对照 {@code SyncVectorColumn} 的选行：只拿 blob、还没写进 vector 列的行。
+     * 向量列回填的选行：只拿 blob、还没写进 vector 列的行。
      *
      * <p>只在 {@code vectorColumnReady()} 为真时调用（{@code embedding} 列可能不存在）。</p>
      */
@@ -153,7 +154,7 @@ public interface MemoryItemEmbeddingMapper extends BaseMapper<MemoryItemEmbeddin
                                                         @Param("limit") int limit);
 
     /**
-     * 对照 {@code rankInDatabase}：让数据库自己按余弦距离排序、只回前 k 条。
+     * 数据库侧排名（rankInDatabase）：让数据库自己按余弦距离排序、只回前 k 条。
      *
      * <p><b>只在 {@code vectorColumnReady()} 为真时调用</b>（{@code embedding} 列与
      * {@code <=>} 运算符都是 pgvector 才有的东西）。SQL：</p>
@@ -196,7 +197,7 @@ public interface MemoryItemEmbeddingMapper extends BaseMapper<MemoryItemEmbeddin
                                       @Param("limit") int limit);
 
     /**
-     * 对照 {@code writeVectorColumn}：把 blob 同步进 pgvector 的 {@code halfvec} 列。
+     * 把 blob 同步进 pgvector 的 {@code halfvec} 列。
      *
      * <p>{@code ?::halfvec} 的强转是 PG 专有的，H2 上不可调用。</p>
      */

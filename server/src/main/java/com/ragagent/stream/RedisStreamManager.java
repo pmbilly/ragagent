@@ -13,8 +13,7 @@ import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
 
 /**
- * 基于 Redis List 的 append-only 流管理器（对照 Go {@code RedisStreamManager}，
- * internal/stream/redis_manager.go）。
+ * 基于 Redis List 的 append-only 流管理器。
  *
  * <p>事件用 RPush 追加、LRange 增量读——O(1) 追加 + 按 offset 批量拉取，
  * 正好是 SSE 轮询消费的形状。</p>
@@ -27,7 +26,7 @@ import org.springframework.data.redis.core.script.RedisScript;
  * </pre>
  * 注意 prefix 来自 {@code REDIS_PREFIX} 且**不做去尾冒号处理**——dev 的
  * {@code REDIS_PREFIX=stream:} 会让键长成 {@code stream::sess:msg}（双冒号）。
- * 这是 Go 的原样行为，照抄。
+ * 原样保留这一行为。
  *
  * <h2>三个 Lua 脚本各自解决什么</h2>
  * <ul>
@@ -40,7 +39,7 @@ import org.springframework.data.redis.core.script.RedisScript;
  *       否则会把后续轮次已经抢到的会话标记误删。</li>
  * </ul>
  *
- * <p>连接由 Spring 管理（{@code StringRedisTemplate}），故没有 Go 的 {@code Close()}。</p>
+ * <p>连接由 Spring 管理（{@code StringRedisTemplate}），无需显式关闭。</p>
  */
 public class RedisStreamManager implements StreamManager {
 
@@ -83,7 +82,7 @@ public class RedisStreamManager implements StreamManager {
     public void appendEvent(String sessionId, String messageId, StreamEvent event) {
         String key = buildKey(sessionId, messageId);
 
-        // Cf. Go 的按值传参：调用方的对象不被补上时间戳。
+        // 存拷贝：调用方的对象不被补上时间戳。
         StreamEvent stored = event.copy();
         if (stored.getTimestamp() == null) {
             stored.setTimestamp(OffsetDateTime.now());
@@ -188,7 +187,7 @@ public class RedisStreamManager implements StreamManager {
         try {
             template.expire(buildLiveRunKey(sessionId), ttl);
         } catch (DataAccessException ignored) {
-            // Go: `_ = r.client.Expire(...)` —— 有意吞掉
+            // 有意吞掉：TTL 刷新失败不影响主流程
         }
     }
 
@@ -280,7 +279,7 @@ public class RedisStreamManager implements StreamManager {
                 try {
                     template.expire(key, ttl);
                 } catch (DataAccessException ignored) {
-                    // Go 同样是 `_ = r.client.Expire(...)`
+                    // 有意吞掉：TTL 刷新失败不影响主流程
                 }
                 return true;
             }
@@ -440,7 +439,7 @@ public class RedisStreamManager implements StreamManager {
 
     /**
      * 延长 live-run 标记的 TTL，避免比 StreamManager TTL 更长的轮次看起来"空闲"。
-     * 键不存在时 EXPIRE 是空操作。错误有意吞掉（对照 Go）。
+     * 键不存在时 EXPIRE 是空操作。错误有意吞掉。
      */
     void touchLiveRun(String sessionId) {
         if (sessionId == null || sessionId.isEmpty()) {
@@ -449,11 +448,11 @@ public class RedisStreamManager implements StreamManager {
         try {
             template.expire(buildLiveRunKey(sessionId), ttl);
         } catch (DataAccessException ignored) {
-            // Go: `_ = r.client.Expire(...).Err()`
+            // 有意吞掉：TTL 刷新失败不影响主流程
         }
     }
 
-    /** 读单个事件；解码失败返回 null（Go 侧是 continue，跳过坏数据继续）。 */
+    /** 读单个事件；解码失败返回 null（跳过坏数据继续）。 */
     private static StreamEvent tryReadEvent(String raw) {
         try {
             return StreamJson.read(raw, StreamEvent.class);
@@ -462,7 +461,7 @@ public class RedisStreamManager implements StreamManager {
         }
     }
 
-    /** 供测试与调试：当前 prefix（对照 Go 的 buildKey 前缀，含 REDIS_PREFIX 原样值）。 */
+    /** 供测试与调试：当前 prefix（含 REDIS_PREFIX 原样值）。 */
     String prefix() {
         return prefix;
     }

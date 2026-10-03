@@ -32,8 +32,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 /**
- * MCP 服务 HTTP 层的契约测试（对照 Go internal/handler/mcp_service.go、
- * mcp_credentials.go、mcp_metadata.go、mcp_usage_instructions.go）。
+ * MCP 服务 HTTP 层的契约测试。
  *
  * <p>用 MockMvc 走完整过滤链（含登录签发的 JWT），因此角色可见性
  * （Admin vs Viewer 的集成细节剥离）是端到端验证的，而不是只测 DTO。</p>
@@ -152,7 +151,7 @@ class McpHttpContractTest {
             + "\"authConfig\":{\"apiKey\":\"sk-real-do-not-leak\",\"token\":\"tok-real-do-not-leak\","
             + "\"customHeaders\":{\"X-Trace\":\"abc\"}}}";
 
-    // ── 创建：密钥剥离 + GORM 默认值 ─────────────────────────────────────
+    // ── 创建：密钥剥离 + 落库默认值 ─────────────────────────────────────
 
     @Test
     void createOmitsSecretsAndDelegatesDeliveryToCredentialsMap() throws Exception {
@@ -173,9 +172,9 @@ class McpHttpContractTest {
         // §2.1：裸对象，不再有 {data,success} 信封
         assertFalse(s.contains("\"success\""), "响应不该带 success 键：" + s);
         assertFalse(s.startsWith("{\"data\":"), "响应不该被 data 包起来：" + s);
-        // GORM 的 default:true 语义：未传 enabled 时落库与响应都是 true
+        // 落库默认值：未传 enabled 时落库与响应都是 true
         assertTrue(s.contains("\"enabled\":true"), "enabled 必须命中 DB 默认值 true：" + s);
-        // 服务层补的默认高级配置，键名必须是蛇形（Go json tag）
+        // 服务层补的默认高级配置，键名与请求侧一致（camelCase）
         assertTrue(s.contains("\"retryCount\":3") && s.contains("\"retryDelay\":1"),
                 "advanced_config 必须用 Go 的蛇形键名：" + s);
     }

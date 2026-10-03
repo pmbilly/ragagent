@@ -16,13 +16,12 @@ import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
 
 /**
- * ToolRegistry 的 Go 实录（17 条，探针用 Go mockTool/outcomeTool 复刻注册/
- * 发现/执行管线）。覆盖：first-wins 拒绝重名、ListTools/defs 按名排序且
+ * ToolRegistry 的录制判定（17 条）。覆盖：first-wins 拒绝重名、ListTools/defs 按名排序且
  * 字节稳定、deferred 不进 model 投影、GetTool 错误文案、退役工具替代文案、
- * (nil,err)/(nil,nil) 结果归一化、小上限截断、校验失败信息与三个工具的
+ * 无结果（带错/不带错）结果的归一化、小上限截断、校验失败信息与三个工具的
  * hint 拼接、cast-then-validate 管线。
  *
- * <p>已知通道差异（备案）：Go 的 {@code (result, err)} 双通道在 Java 折叠为
+ * <p>已知通道差异：录制侧的「结果 + 错误」双通道在 Java 折叠为
  * 单返回——"工具返回 success=true 的 result 同时报 err"的形态不可表达；
  * Java 工具直接用 {@code success=false + error} 表达失败（registry 原样透传，
  * 见 {@code denied} case）。 {@code boom} case 因此按"工具已把错误写进
@@ -30,7 +29,7 @@ import com.ragagent.common.error.BizException;
  */
 class ToolRegistryRecordingTest {
 
-    /** 对照 mockTool：返回 Success=true 的最小工具。 */
+    /** 最小工具：返回 success=true 的结果。 */
     private static class MockTool implements AgentTool {
         private final String name;
         private final String description;
@@ -74,7 +73,7 @@ class ToolRegistryRecordingTest {
         }
     }
 
-    /** 对照 outcomeTool：返回 null result 的工具（Go 的 (nil, nil) 形态）。 */
+    /** 返回 null result 的工具（无结果且无错误的形态）。 */
     private static final class NullTool extends MockTool {
         NullTool(String name, String parameters) {
             super(name, "", parameters);
@@ -194,7 +193,7 @@ class ToolRegistryRecordingTest {
     private static void assertResult(ToolRegistry reg, String name, String constant, JsonNode args) {
         JsonNode r = RecordingSupport.rec(field(constant));
         ToolResult got = reg.executeTool(name, args);
-        // B40 基线重建：两侧经 ContractJson.deep 归一（转义形态不再构成断言目标）。
+        // 两侧经 ContractJson.deep 归一（转义形态不再构成断言目标）。
         assertThat(ContractJson.deep(RecordingSupport.normalizeNumberText(goJson(got))))
                 .as("executeTool %s (%s)", name, r.get("id").asText())
                 .isEqualTo(ContractJson.deep(RecordingSupport.normalizeNumberText(r.get("result").asText())));
@@ -225,7 +224,7 @@ class ToolRegistryRecordingTest {
         assertThat(plain.isSuccess()).isFalse();
         assertThat(plain.getError()).isEqualTo("transport failed");
 
-        // wireText 还要能穿过包装层（Go 的 err.Error() 在 fmt.Errorf 包裹后仍带内层原文）
+        // wireText 还要能穿过包装层（错误被包装后 wireText 仍带内层原文）
         assertThat(BizException.wireText(new RuntimeException(
                 new BizException(new AppError(2201, "vector store is not registered", null, 400)))))
                 .isEqualTo("error code: 2201, error message: vector store is not registered");
@@ -233,7 +232,7 @@ class ToolRegistryRecordingTest {
         assertThat(BizException.wireText(new RuntimeException())).isNotBlank();
     }
 
-    /** 抛异常的工具（Go 侧等价于 return nil, err）。 */
+    /** 抛异常的工具（等价于失败通道形态）。 */
     private static class ThrowingTool implements AgentTool {
         private final String name;
         private final RuntimeException error;

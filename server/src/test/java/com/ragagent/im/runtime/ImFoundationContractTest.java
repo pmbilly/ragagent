@@ -2,7 +2,6 @@ package com.ragagent.im.runtime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -17,10 +16,9 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
- * IM 地基的字节契约（对照 Go internal/im 的 think.go/tool_display.go/command 族/
- * credentials/service.go 纯助手）。期望值全部来自 2026-09-21 `go test -overlay`
- * 探针的实录（w5g1_probe_test.go，18 键原始字节 + 98 键全集），fixture 在
- * {@code contracts/w5g1-im-foundation.tsv}。
+ * IM 地基的字节契约（think / tool display / command 族 / credentials 纯助手）。
+ * 期望值固定在 fixture {@code contracts/w5g1-im-foundation.tsv}
+ * （18 键原始字节 + 98 键全集）。
  */
 class ImFoundationContractTest {
 

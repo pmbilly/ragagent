@@ -28,11 +28,11 @@ import com.ragagent.common.graph.GraphNode;
 import com.ragagent.llm.extract.PipelineConfig;
 
 /**
- * 实录回放：查询扩展 / 去重 / 部分重叠 / filter_top_k / search / search_by_targets /
- * search_parallel（期望值 = {@link GoRecording46C} Go 实录常量）。
+ * 录制回放：查询扩展 / 去重 / 部分重叠 / filter_top_k / search / search_by_targets /
+ * search_parallel（期望值 = {@link GoRecording46C} 录制常量）。
  *
- * <p>分词：jieba 是 4.4 的既有降级 seam；expansion 组语料按实录注入固定分词器
- * （输入段 → jieba 真值 token 表，源自 Go 探针同段实录），其余包组不受影响。</p>
+ * <p>分词：jieba 是既有降级 seam；expansion 组语料按录制注入固定分词器
+ * （输入段 → jieba 真值 token 表），其余包组不受影响。</p>
  */
 class SearchRecordingTest {
 
@@ -473,10 +473,10 @@ class SearchRecordingTest {
     }
 
     /**
-     * 回归（2026-09-22 走查抓回）：hybridSearch 返回 null（无可用检索管道，
-     * 对照 Go 的 nil 切片）时，合并整库检索路径曾 {@code results.addAll(null)} 抛
+     * 回归（走查抓回）：hybridSearch 返回 null（无可用检索管道）时，合并整库检索路径
+     * 曾 {@code results.addAll(null)} 抛
      * NPE（"Cannot invoke Collection.toArray() because c is null"），整个 QA 以
-     * PipelinePortException 收场。正确语义 = append(dst, nil...) 的 no-op：
+     * PipelinePortException 收场。正确语义 = null 视为空、追加为 no-op：
      * 视为空命中、无错误、流水线继续。
      */
     @Test

@@ -338,8 +338,8 @@ class KnowledgeContractTest {
     /**
      * 列表必须排除系统托管/隐藏库（{@code is_temporary = true}）。
      *
-     * <p>实案：「聊天历史」自动开通的 {@code __chat_history__} 曾出现在知识库列表里
-     * （翻译期漏了 Go 的 hidden-KB 过滤，见 {@code KnowledgeBaseService.listKnowledgeBases}
+     * <p>实案：「聊天历史」自动开通的 {@code __chat_history__} 曾因缺失 hidden-KB 过滤
+     * 出现在知识库列表里（见 {@code KnowledgeBaseService.listKnowledgeBases}
      * 的 javadoc）。这里直接落一行隐藏库，断言列表不含它、且普通库照常出现。</p>
      */
     @Test

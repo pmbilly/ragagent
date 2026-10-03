@@ -23,7 +23,7 @@ public interface OAuthStateRedis {
      */
     void setAll(Map<String, String> entries, Duration ttl);
 
-    /** 读一个键；不存在返回 {@code null}（对照 {@code redis.Nil}）。 */
+    /** 读一个键；不存在返回 {@code null}。 */
     String get(String key);
 
     /** 读并删除（单次使用）；不存在返回 {@code null}。 */

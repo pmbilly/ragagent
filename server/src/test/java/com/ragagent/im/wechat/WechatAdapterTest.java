@@ -35,7 +35,7 @@ import com.ragagent.im.runtime.ReplyMessage;
 import com.sun.net.httpserver.HttpServer;
 
 /**
- * 微信 iLink 机器人（W5γ3.10）对照 Go {@code internal/im/wechat/{adapter,crypto,longpoll,factory}.go}：
+ * 微信 iLink 机器人行为测试：
  * AES-128-ECB 与三形态密钥解析、发送体与认证头、下载（裸/解密两态 + SSRF 拒绝）、
  * 长轮询（游标推进、四型解析、BOT 消息丢弃、token 过期、退避上限）、工厂凭据文案。
  */
@@ -112,7 +112,7 @@ class WechatAdapterTest {
         assertEquals(0, cipher.length % 16);
         assertArrayEquals(plain, WechatCrypto.decryptAes128Ecb(cipher, KEY16));
 
-        // 免填充的密文（末字节非合法填充）→ 原样返回，不裁（照 Go）
+        // 免填充的密文（末字节非合法填充）→ 原样返回，不裁
         byte[] block = new byte[16];
         block[15] = 0x00;
         byte[] noPaddingPlain = new byte[16];
@@ -208,7 +208,7 @@ class WechatAdapterTest {
         encrypted.extra.put("aes_key", Base64.getEncoder().encodeToString(KEY16));
         AdapterInterfaces.FileDownloader.DownloadedFile file = a.downloadFile(encrypted);
         assertArrayEquals(plain, file.content());
-        assertEquals(apiBase + "/media", file.fileName());   // 文件名缺省回落 URL（照 Go）
+        assertEquals(apiBase + "/media", file.fileName());   // 文件名缺省回落 URL
 
         IncomingMessage noUrl = new IncomingMessage();
         noUrl.platform = ImTypes.PLATFORM_WECHAT;
@@ -336,7 +336,7 @@ class WechatAdapterTest {
         };
         ImChannelEntity channel = new ImChannelEntity();
         channel.setId("ch-1");
-        channel.setMode("anything");   // 照 Go：不读 mode
+        channel.setMode("anything");   // 不读 mode
         channel.setCredentials("{\"bot_token\":\"tk\",\"ilink_bot_id\":\"bot-9\"}");
         var reg = new WechatAdapterFactory(null, apiBase).create(channel, (m, c) -> { });
         assertNotNull(reg.adapter());

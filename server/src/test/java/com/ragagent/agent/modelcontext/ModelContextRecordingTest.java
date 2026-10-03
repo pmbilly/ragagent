@@ -22,9 +22,8 @@ import com.ragagent.llm.domain.ToolCall;
 import com.ragagent.common.retrieval.SearchResult;
 
 /**
- * 4.6a modelcontext 包的 Go 实录回放（探针见 /tmp/toolrec46a/internal/modelcontext/
- * zz_rec46a_mc_test.go；常量见 {@link GoRecording46A}——字节断言为准）。
- * model_output 组严格按探针的 registry 复用顺序回放（句柄编号跨用例累积）。
+ * 4.6a modelcontext 包的录制回放（常量见 {@link GoRecording46A}——字节断言为准）。
+ * model_output 组严格按录制时的 registry 复用顺序回放（句柄编号跨用例累积）。
  */
 class ModelContextRecordingTest {
 
@@ -55,7 +54,7 @@ class ModelContextRecordingTest {
         return s == null ? "" : s;
     }
 
-    /** 解析 Go %v 的 []string 记录形态 "[a b c]"。 */
+    /** 解析录制里 []string 的文本形态 "[a b c]"。 */
     private static String goSliceString(String goSlice, int index) {
         String inner = goSlice.substring(1, goSlice.length() - 1);
         return inner.split(" ")[index];
@@ -647,12 +646,12 @@ class ModelContextRecordingTest {
 
     private static ChatTool tool(String name, String description, String parameters) {
         ChatTool t = new ChatTool(name, description, GoJsonBridge.parseTree(parameters));
-        // Go 探针的字面量 chat.Tool{Function: ...} 没设 Type → 零值 ""
+        // 录制时的 Tool 字面量没设 Type → 空串 ""
         t.setType("");
         return t;
     }
 
-    /** Go json.Marshal([]chat.Tool)：struct 键序 type→function→(name,description,parameters RawMessage)。 */
+    /** Tool 数组的 JSON 键序：type→function→(name,description,parameters)。 */
     private static String goToolsJson(List<ChatTool> tools) {
         StringBuilder sb = new StringBuilder("[");
         for (int i = 0; i < tools.size(); i++) {

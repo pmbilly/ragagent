@@ -352,7 +352,7 @@ class ChunkRepositoryTest {
         loaded.setIndexStatus("processing");
         loaded.setLastEditorId("user-1");
         loaded.setMetadata(json("{\"standardQuestion\":\"q1\"}"));
-        // Go service 在调用前显式 chunk.UpdatedAt = now（map 里的 updated_at 键原样写）
+        // service 在调用前显式 chunk.updatedAt = now（map 更新里的 updated_at 键原样写）
         loaded.setUpdatedAt(OffsetDateTime.now());
         // saveChunkRevision 自己负责落库快照——这里只构建，不预插
         ChunkRevision rev = buildRevision(TENANT, "k1", c.getId(), 1, "old-content", true);
@@ -482,7 +482,7 @@ class ChunkRepositoryTest {
                 "SELECT deleted_at FROM chunks WHERE id = ?", OffsetDateTime.class, a3.getId())).isNull();
         assertThat(jdbc.queryForObject(
                 "SELECT deleted_at FROM chunks WHERE id = ?", OffsetDateTime.class, b1.getId())).isNull();
-        // 空列表短路（Go 同款：len == 0 直接返回）
+        // 空列表短路（size == 0 直接返回）
         repo.deleteChunks(TENANT, List.of());
     }
 

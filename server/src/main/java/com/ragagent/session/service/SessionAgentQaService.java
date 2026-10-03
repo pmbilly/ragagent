@@ -152,7 +152,7 @@ public class SessionAgentQaService {
         log.info("Start agent-based question answering, session ID: {}, agent tenant ID: {}, query: {}",
                 sessionId, agentTenantId, req.query);
 
-        // EnsureDefaults（Go L65；config 树在 parseQARequest 已跑一遍，这里再钉一次）
+        // 补默认值（config 树在 parseQARequest 已跑一遍，这里再钉一次）
         AgentConfigJson.ensureDefaults(req.agentConfig);
 
         // Build AgentConfig
@@ -182,7 +182,7 @@ public class SessionAgentQaService {
                     modelContextWindow = info.getParameters().getContextWindow();
                 }
             } catch (RuntimeException e) {
-                // Go: err != nil → 零值
+                // 获取失败 → 零值
             }
             agentConfig.setChatModelSupportsVision(supportsVision);
             // 上下文 token 上限：显式设置 > 模型声明 > 缺省
@@ -260,7 +260,7 @@ public class SessionAgentQaService {
                 engine.setCancellationSource(req.cancellationProbe);
             }
 
-            // Query composition（Go L241-263）
+            // 查询组装
             String agentQuery = req.query;
             List<String> agentImageUrls = new ArrayList<>();
             if (supportsVision && req.imageUrls != null && !req.imageUrls.isEmpty()) {
@@ -280,7 +280,7 @@ public class SessionAgentQaService {
                 log.info("Appended {} attachment(s) to agent query", req.attachments.size());
             }
 
-            // Execute（Go L272-284：失败 emit error 事件后返回 nil）
+            // 执行（失败 emit error 事件后返回）
             try {
                 engine.execute(sessionId, req.assistantMessageId, agentQuery, llmContext, agentImageUrls);
             } catch (RuntimeException e) {

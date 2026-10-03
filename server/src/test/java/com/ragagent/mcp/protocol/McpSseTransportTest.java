@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.common.security.SsrfGuard;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.domain.McpTransportType;
-import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,8 +30,7 @@ import org.junit.jupiter.api.Test;
  * 传统 HTTP+SSE 传输（MCP 2024-11-05）的端到端用例：
  * GET 建流 → {@code endpoint} 帧 → POST 发请求 → 响应从 SSE 流回。
  *
- * <p>对照 Go：mcp-go {@code transport.SSE} 的行为（sse.go 的
- * {@code start} / {@code handleSSEEvent} / {@code SendRequest}）。</p>
+ * <p>与第三方 SDK（mcp-go {@code transport.SSE}）的既有行为对齐。</p>
  */
 class McpSseTransportTest {
 

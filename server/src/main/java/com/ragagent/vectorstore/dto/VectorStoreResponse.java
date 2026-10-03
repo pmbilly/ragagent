@@ -25,7 +25,7 @@ public class VectorStoreResponse {
     public String source;
     public boolean readOnly;
 
-    /** 对照 NewVectorStoreResponse(store, source, readonly)：掩码后组装 */
+    /** 掩码后组装 */
     public static VectorStoreResponse of(VectorStore s, String source, boolean readonly) {
         ConnectionConfig conn = s.getConnectionConfig() == null
                 ? new ConnectionConfig()

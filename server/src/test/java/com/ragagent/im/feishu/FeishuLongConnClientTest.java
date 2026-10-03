@@ -19,8 +19,8 @@ import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
 
 /**
- * 飞书/Lark 长连接（W5γ3.9）：接入点协议与 ClientConfig 覆盖、数据帧分发与
- * <b>同帧回执</b>（code + biz_rt）、card 帧忽略（照 Go 不回执）、分片合包、
+ * 飞书/Lark 长连接：接入点协议与 ClientConfig 覆盖、数据帧分发与
+ * <b>同帧回执</b>（code + biz_rt）、card 帧忽略（不回执）、分片合包、
  * pong 带配置、事件转换（长连接分支：不设 threadId、post 取首图）。
  */
 class FeishuLongConnClientTest {
@@ -112,7 +112,7 @@ class FeishuLongConnClientTest {
         IncomingMessage msg = received.get(0);
         assertEquals(ImTypes.PLATFORM_FEISHU, msg.platform);
         assertEquals("你好", msg.content);
-        assertEquals("", msg.threadId);   // 长连接分支不设 threadId（照 Go）
+        assertEquals("", msg.threadId);   // 长连接分支不设 threadId
 
         assertEquals(1, sink.frames.size());
         LarkFrame ack = LarkFrame.decode(sink.frames.get(0));
@@ -133,7 +133,7 @@ class FeishuLongConnClientTest {
         assertTrue(received.isEmpty());
         assertTrue(sink.frames.isEmpty());   // card 直接 return，不回执
 
-        // 未知 event_type → 转换返回 null，但仍回 200（照 Go 的分发器语义）
+        // 未知 event_type → 转换返回 null，但仍回 200（分发器语义）
         c.handleFrame(dataFrame("event", Map.of(),
                 "{\"header\":{\"event_type\":\"im.chat.updated_v1\"},\"event\":{}}"));
         assertEquals(200, codeOf(sink.frames.get(0)));
@@ -221,7 +221,7 @@ class FeishuLongConnClientTest {
         assertEquals(ImTypes.CHAT_TYPE_GROUP, group.chatType);
         assertEquals("oc_1", group.chatId);
         assertEquals("问题", group.content);
-        assertEquals("", group.threadId);   // root_id 存在也不填（照 Go 的长连接分支）
+        assertEquals("", group.threadId);   // root_id 存在也不填（长连接分支行为）
 
         IncomingMessage file = LarkEventConverter.convert(FeishuRegion.FEISHU, utf8(
                 "{\"header\":{\"event_type\":\"im.message.receive_v1\"},\"event\":{\"message\":"
@@ -238,7 +238,7 @@ class FeishuLongConnClientTest {
         assertEquals(ImTypes.MESSAGE_TYPE_IMAGE, image.messageType);
         assertEquals("ik1.png", image.fileName);
 
-        // post：文本 + 首图 → 图片消息（webhook 分支只取文本，长连接取图——照 Go 的分歧）
+        // post：文本 + 首图 → 图片消息（webhook 分支只取文本，长连接分支取图——两分支行为不同）
         IncomingMessage post = LarkEventConverter.convert(FeishuRegion.FEISHU, utf8(
                 "{\"header\":{\"event_type\":\"im.message.receive_v1\"},\"event\":{\"message\":"
                         + "{\"message_id\":\"m4\",\"message_type\":\"post\",\"content\":"

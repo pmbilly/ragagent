@@ -8,11 +8,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * 检索类指标移植测试：用例逐条对应 Go
- * {@code internal/application/service/metric/{precision,recall,mrr,map}_test.go}；
- * NDCG 无 Go 测试，用例按 ndcg.go 算法手算（注释给出推导）。
+ * 检索类指标测试：precision/recall/mrr/map 用例为表驱动钉子；
+ * NDCG 用例按算法手算（注释给出推导）。
  *
- * <p>精度口径：precision/recall 用 Go 的<b>精确相等</b>断言；mrr/map 用 Go 的
+ * <p>精度口径：precision/recall 用<b>精确相等</b>断言；mrr/map 用
  * almostEqual(1e-6)；NDCG 含对数，用 1e-9。</p>
  */
 class RetrievalMetricsTest {
@@ -122,7 +121,7 @@ class RetrievalMetricsTest {
     @Test
     @DisplayName("公共层：splitSentences 分隔符丢弃 + splitIntoWords 的降级分词")
     void commonTokenization() {
-        // 对照 Go splitSentences：中文句号/英文句点分句，分隔符本身不进句子
+        // splitSentences 分句口径：中文句号/英文句点分句，分隔符本身不进句子
         assertEquals(List.of("你好", "世界"), MetricCommon.splitSentences("你好。世界。"));
         assertEquals(List.of("Hello", "World"), MetricCommon.splitSentences("Hello. World"));
         // 英文块 + 标点在 english 字符类内（逗号/叹号随块）→ 单 token

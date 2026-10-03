@@ -8,9 +8,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.web.ToolJson;
 
 /**
- * ParamCaster 的 Go 实录判定表（29 条，探针原样调用 Go {@code CastParams}）。
- * 期望值是 Go 输出的原始字节——发生转型的 case 按 Go 的 map 重编码（键序 +
- * HTML 转义 + float64 语义），不转型的 case 原样返回 args 字节；
+ * ParamCaster 的录制判定表（29 条）。
+ * 期望值是录制输出的原始字节——发生转型的 case 按 map 形态重编码（键序 +
+ * HTML 转义 + 双精度浮点语义），不转型的 case 原样返回 args 字节；
  * Java 侧统一用 {@link ToolJson#write(JsonNode)} 编码后逐字节比对。
  */
 class ParamCasterRecordingTest {
@@ -58,7 +58,7 @@ class ParamCasterRecordingTest {
             JsonNode argsNode = RecordingSupport.readTree(args);
             JsonNode schemaNode = schemaJson.isEmpty() ? null : RecordingSupport.readTree(schemaJson);
             JsonNode got = ParamCaster.castParams(argsNode, schemaNode);
-            // B43：ToolJson 换标准 Jackson（数字形态 Go→标准）——语义比较吸收形态差异
+            // ToolJson 的数字形态与录制侧不同（1 vs 1.0）——语义比较吸收形态差异
             assertThat(com.ragagent.support.ContractJson.deep(
                     RecordingSupport.normalizeNumberText(ToolJson.write(got))))
                     .as("castParams %s", r.get("id").asText())

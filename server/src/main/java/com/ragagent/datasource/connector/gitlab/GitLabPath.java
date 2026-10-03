@@ -3,15 +3,14 @@ package com.ragagent.datasource.connector.gitlab;
 /**
  * GitLab 项目/文件路径的 POSIX 清洗与连接（{@code clean} / {@code join}）。
  *
- * <p><b>2026-10-03（B47）</b>：原 {@code GoPath} 改名（B46 已裁决保留：{@code clean}
- * 对 {@code Path.normalize} 实测 21/24 一致，3 处差异全在"空结果"——含 {@code ""}
- * 输入，替换会让路径校验放行空串）。</p>
+     * <p>与 {@code java.nio.file.Path#normalize} 实测 21/24 一致，3 处差异全在"空结果"
+     * ——含 {@code ""} 输入，替换会让路径校验放行空串。</p>
  *
  * <h2>为什么不能用 {@code java.nio.file.Path.normalize()}</h2>
  * <p>两者在<b>很多</b>输入上给出不同答案，而 {@code normalizePath} 的接受/拒绝判定
- * 直接建立在 {@code path.Clean(v) != v} 上——用错实现会<b>放行或拒绝完全不同的路径集合</b>：</p>
+ * 直接建立在"{@code clean(v)} 结果与原值不等"之上——用错实现会<b>放行或拒绝完全不同的路径集合</b>：</p>
  * <pre>
- *   {@code path.Clean} 的行为（Go 语义，纯字符串、永远是正斜杠）：
+ *   {@code clean} 的行为（POSIX 语义，纯字符串、永远是正斜杠）：
  *     "docs//guide" → "docs/guide"    （折叠重复斜杠）
  *     "docs/./a"    → "docs/a"        （吃掉 .）
  *     "docs/"       → "docs"          （去尾斜杠）
@@ -22,17 +21,17 @@ package com.ragagent.datasource.connector.gitlab;
  *     "\\a\\b"       → "\\a\\b"        （<b>不是</b>分隔符，原样）
  *   {@code Path.normalize()} 的行为（JDK，平台相关）：
  *     "docs//guide" → "docs/guide"    （这一条相同）
- *     ""            → ""              （<b>不同</b>：Go 是 "."）
+ *     ""            → ""              （<b>不同</b>：{@code clean} 是 "."）
  *     ".."          → ".."            （相同）
- *     "a/.."        → ""              （<b>不同</b>：Go 是 "."）
+ *     "a/.."        → ""              （<b>不同</b>：{@code clean} 是 "."）
  *     "\\a\\b"       → "a\\b"           （macOS/Linux 下被当成单个文件名，但 "" 的处置仍不同）
  * </pre>
- * <p>差异集中在"空结果"这一支：Go 永远回落到 {@code "."}，JDK 回落成空串。
+ * <p>差异集中在"空结果"这一支：{@code clean} 永远回落到 {@code "."}，JDK 回落成空串。
  * 而 {@code normalizePath} 恰好有一条 {@code v == "."} 的显式拒绝，
- * 与 {@code Clean(v) != v} 并列——正是为了接住这个"Clean 之后才是点"的形态。</p>
+ * 与 "{@code clean(v)} 结果与原值不等"并列——正是为了接住这个"clean 之后才是点"的形态。</p>
  *
  * <h2>字符处理与字节处理等价</h2>
- * <p>{@code Clean} 只对 {@code /} 与 {@code .} 做判断，这两个都是 ASCII，
+ * <p>{@code clean} 只对 {@code /} 与 {@code .} 做判断，这两个都是 ASCII，
  * 而 UTF-8 的续字节恒 &ge; 0x80，不会伪装成它们。所以按
  * {@code char} 遍历与按字节遍历结果一致（{@code gitlabFilePathEscape} 则<b>必须</b>
  * 按字节，因为它的规则是"非 a-zA-Z0-9-_ 的每个字节都转义"）。</p>

@@ -75,7 +75,7 @@ public static EmbedderConfig embedderConfig(Model m, String appId, String appSec
         }
         ProviderName providerName = ProviderName.fromValue(model.getParameters().getProvider());
         if (providerName == null) {
-            // 对照 Go: if providerName == "" { providerName = DetectProvider(...) }
+            // provider 未配置时按 base URL 探测回落
             providerName = ProviderRegistry.detectProvider(model.getParameters().getBaseUrl());
         }
         return new Config(

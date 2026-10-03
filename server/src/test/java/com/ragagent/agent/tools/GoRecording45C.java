@@ -3,11 +3,8 @@ package com.ragagent.agent.tools;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
- * 4.5c Go 实录常量（方法：/tmp/toolrec45c 复制 WeKnora internal/ + 同包探针
- * zz_rec45c_a/b/c_test.go 直接调用未导出函数与 stub MCP server，真值写入
- * /tmp/toolrec45c/rec.jsonl，本文件由该 rec.jsonl 生成——禁止手改。
- * 重生成：`cd /tmp/toolrec45c && go test ./internal/agent/tools/ -run TestZZRec45C -count=1`，
- * 然后按每行 rec.jsonl → 一条 R_<GROUP>_<ID> 常量重新生成本文件。
+ * 4.5c 录制常量（本文件由录制输出 rec.jsonl 生成——禁止手改；
+ * 重生成需重跑录制程序，按每行 rec.jsonl → 一条 R_&lt;GROUP&gt;_&lt;ID&gt; 常量重新生成本文件。
  * 超长常量用 StringBuilder 运行期拼接（javac 对字面量常量折叠会再撞 CONSTANT_Utf8
  * 64KB 上限，故不能用字面量 + 号）。用 {@link #rec(String)} 解析。
  */
@@ -16,7 +13,7 @@ public final class GoRecording45C {
     private GoRecording45C() {
     }
 
-    /** 解析一条实录记录（同 GoRecording45B 的 rec 用法——传常量原文）。 */
+    /** 解析一条录制记录（同 GoRecording45B 的 rec 用法——传常量原文）。 */
     public static JsonNode rec(String json) {
         try {
             return RecordingSupport.PLAIN.readTree(json);

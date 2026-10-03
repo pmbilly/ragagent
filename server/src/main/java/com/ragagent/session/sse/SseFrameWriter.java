@@ -15,18 +15,15 @@ import com.ragagent.llm.domain.StreamResponse;
  * 把一个 {@link StreamResponse} 写成 gin 那条 SSE 帧——**逐字节**。
  *
  * <h2>为什么不能直接用 Spring 的 {@code SseEmitter}</h2>
- * <p>{@code SseEmitter} 自己拼帧，格式与 gin 不同（它在冒号后加空格、不做 HTML 转义）。
+ * <p>{@code SseEmitter} 自己拼帧，与既定线格式不同（它在冒号后加空格、不做 HTML 转义）。
  * 本项目要求响应逐字节一致，所以帧由本类手工拼。</p>
  *
- * <h2>gin 的帧长什么样</h2>
- * <p>{@code c.SSEvent("message", resp)} 走的是 {@code gin-contrib/sse} 的
- * {@code Encode}，对 {@code StreamResponse}（指针 → 结构体）这一支：</p>
+ * <h2>SSE 帧的逐字节形态（既定契约）</h2>
+ * <p>对 {@code StreamResponse} 载荷：</p>
  * <pre>
- *   writeEvent(w, "message") → "event:message\n"        ← 冒号后**没有空格**
- *   writeData(w, resp):
- *       w.WriteString("data:")
- *       json.NewEncoder(w).Encode(resp)                 ← JSON + '\n'
- *       w.WriteString("\n")
+ *   "event:message\n"        ← 冒号后**没有空格**
+ *   "data:" + &lt;JSON&gt; + "\n"
+ *   再补一个 "\n"
  * </pre>
  * <p>合起来就是 {@code event:message\ndata:<json>\n\n}。</p>
  *
@@ -38,8 +35,7 @@ import com.ragagent.llm.domain.StreamResponse;
  *       （原先只有 SSE 这一条路径特批），所以本类直接用注入的那个 mapper 即可。
  *       <b>不要</b>在这里再挂一个私有的 mapper——那正是"同一段文本在不同响应路径上
  *       给出不同字节"的来源。</li>
- *   <li><b>Content-Type 会被覆盖</b>：{@code sse.Event.Render} 里的
- *       {@code WriteContentType} 会<b>无条件</b>把 Content-Type 改写成
+ *   <li><b>Content-Type 会被覆盖</b>：SSE 渲染器会<b>无条件</b>把 Content-Type 改写成
  *       {@code text/event-stream;charset=utf-8}——即 {@code setSSEHeaders} 设的
  *       {@code text/event-stream} <b>不是</b>线上的最终值。
  *       本类照做（{@link #applyRenderedContentType}），否则头就不一致了。
@@ -50,12 +46,11 @@ import com.ragagent.llm.domain.StreamResponse;
 public class SseFrameWriter {
 
     /**
-     * gin 的 SSE renderer 最终写出的 Content-Type
-     * （{@code gin-contrib/sse.WriteContentType} 无条件覆盖）。
+     * SSE 渲染最终写出的 Content-Type（渲染器无条件覆盖，见类注释）。
      */
     public static final String RENDERED_CONTENT_TYPE = "text/event-stream;charset=utf-8";
 
-    /** 事件名固定为 {@code message}（gin 的 {@code c.SSEvent("message", …)}）。 */
+    /** 事件名固定为 {@code message}。 */
     public static final String EVENT_NAME = "message";
 
     private final ObjectMapper mapper;
@@ -65,7 +60,7 @@ public class SseFrameWriter {
     }
 
     /**
-     * 对照 gin 的 {@code WriteContentType}：把 Content-Type 覆盖成渲染器的值。
+     * 把 Content-Type 覆盖成渲染器的既定值。
      *
      * <p>必须在**任何正文写出之前**调用。</p>
      */
@@ -74,7 +69,7 @@ public class SseFrameWriter {
     }
 
     /**
-     * 写一帧并 flush（对照 {@code c.SSEvent("message", response)} + {@code c.Writer.Flush()}）。
+     * 写一帧并 flush。
      *
      * <p>序列化用的是应用统一的 mapper（其他转义规则见类注释）。序列化失败在写出任何字节前直接抛出，
      * 由调用方按"写失败"处理（关流）。</p>

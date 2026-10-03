@@ -16,23 +16,13 @@ import org.junit.jupiter.api.Test;
 /**
  * RSS 连接器的**纯函数**对等测试（{@link RssUtil} / {@link RssConfig}）。
  *
- * <h2>期望值的来源（本项目的验收标准）</h2>
- * <p>全部是 <b>Go 实录</b>：把 {@code internal/datasource/connector/rss/types.go} 里的
- * {@code contentFingerprint} / {@code feedSignalFingerprint} / {@code itemExternalID} /
- * {@code firstNonEmpty} / {@code sanitizeFileName} / {@code copyFeedCursor} /
- * {@code feedURLsFromSettings} / {@code Config.feedURLList} / {@code Config.parseHeaders}
- * <b>原样抄进</b>一个独立 Go 程序（{@code /tmp/gochk-r}），喂同样的输入跑出来，
- * 输出抄进下面的断言。</p>
+ * <h2>为什么必须逐字节一致</h2>
+ * <p>指纹进 {@code last_sync_cursor} 这个 jsonb 列，旧数据里已落库的 {@code feed_items}
+ * 指纹要和新算出来的逐字比——算法差一个字节，增量同步就会把整个 feed 重灌一遍。</p>
  *
- * <h2>它们为什么必须逐字节一致</h2>
- * <p>指纹进 {@code last_sync_cursor} 这个 jsonb 列。跨语言部署（或从 Go 迁到 Java）
- * 时，Go 写下的 {@code feed_items} 指纹要被 Java 读出来做"和上一轮比"——
- * 算法差一个字节，增量同步就会把整个 feed 重灌一遍。</p>
- *
- * <h2>{@code feedSignalFingerprint} 的输入是结构体不是 feed 文本</h2>
- * <p>Go 侧它只读 {@code gofeed.Item} 的五个字段（GUID / Link / Title /
- * UpdatedParsed / PublishedParsed）。复刻程序里用一个同形结构体顶替即可，
- * 不需要真的解析 feed——本项目就是这么录的。</p>
+ * <h2>{@code feedSignalFingerprint} 只看五个字段</h2>
+ * <p>它只读 {@link FeedParser.ParsedItem} 的 guid / link / title / updated / published，
+ * 测试直接构造 {@code ParsedItem} 即可，不需要真的解析 feed。</p>
  */
 class RssPureFunctionsTest {
 
@@ -49,7 +39,7 @@ class RssPureFunctionsTest {
 
     @Test
     void contentFingerprintMatchesGo() {
-        // Go 实录（/tmp/gochk-r）：
+        // 期望值：
         //   ""                   -> "h:e3b0c44298fc1c14"
         //   "hello"              -> "h:2cf24dba5fb0a30e"
         //   "# Title\n\nbody text\n" -> "h:9caaf00e46035184"
@@ -65,15 +55,15 @@ class RssPureFunctionsTest {
 
     @Test
     void feedSignalFingerprintMatchesGo() {
-        // Go 实录：
-        //   nil                                                  -> ""
+        // 期望值：
+        //   null                                                 -> ""
         //   {g1, https://example.com/a, t} + "body"              -> "s:20da6c79768c8916"
         //   同上 + "changed"                                      -> "s:8f05ceac4a9c8e43"
         //   {guid-1, http://127.0.0.1:1/article/a1, Article One,
         //    published=2006-01-02T15:04:05Z} + "summary fallback"-> "s:ab96c53c2e1d4196"
         //   {updated=2006-01-03T15:04:05Z} + ""                   -> "s:d0e7f3fb77983285"
         //   {updated=2006-01-02T23:04:05+08:00} + ""              -> "s:31567da82d89663c"
-        //   {updated=零值 time.Time} + ""                          -> "s:7c370d9536d7d0d6"
+        //   {updated=0001-01-01T00:00:00Z} + ""                   -> "s:7c370d9536d7d0d6"
         //   {} + ""                                               -> "s:7c370d9536d7d0d6"
         assertThat(RssUtil.feedSignalFingerprint(null, "x")).isEmpty();
 
@@ -87,7 +77,7 @@ class RssPureFunctionsTest {
         assertThat(RssUtil.feedSignalFingerprint(withPublished, "summary fallback"))
                 .isEqualTo("s:ab96c53c2e1d4196");
 
-        // Go 那次调用传的是 &Item{GUID: "g", UpdatedParsed: t2}，GUID 是 "g" 不是空串
+        // 这条输入的 guid 是 "g" 不是空串（指纹覆盖 guid）
         assertThat(RssUtil.feedSignalFingerprint(item("g", "", "", utc(2006, 1, 3, 15, 4, 5), null), ""))
                 .isEqualTo("s:d0e7f3fb77983285");
 
@@ -97,7 +87,7 @@ class RssPureFunctionsTest {
         assertThat(RssUtil.feedSignalFingerprint(item("", "", "", cst, null), ""))
                 .isEqualTo("s:31567da82d89663c");
 
-        // 零值时间与"没有时间"在 Go 里输出同一串（都是空段），所以指纹相同
+        // 0001-01-01 零值时间与 null 都输出空段，所以指纹相同
         OffsetDateTime goZero = OffsetDateTime.of(1, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
         assertThat(RssUtil.feedSignalFingerprint(item("", "", "", goZero, null), ""))
                 .isEqualTo("s:7c370d9536d7d0d6");
@@ -109,7 +99,7 @@ class RssPureFunctionsTest {
 
     @Test
     void itemExternalIdMatchesGo() {
-        // Go 实录：("https://a.com/feed", "guid-1") -> "https://a.com/feed:guid-1"; ("", "") -> ":"
+        // ("https://a.com/feed", "guid-1") -> "https://a.com/feed:guid-1"; ("", "") -> ":"
         assertThat(RssUtil.itemExternalID("https://a.com/feed", "guid-1"))
                 .isEqualTo("https://a.com/feed:guid-1");
         assertThat(RssUtil.itemExternalID("", "")).isEqualTo(":");
@@ -119,7 +109,7 @@ class RssPureFunctionsTest {
 
     @Test
     void firstNonEmptyMatchesGo() {
-        // Go 实录：
+        // 期望值：
         //   ("","","")     -> ""
         //   ("  ","x","y") -> "x"
         //   ("  a  ","b")  -> "  a  "    ← 返回原值，不 trim
@@ -134,7 +124,7 @@ class RssPureFunctionsTest {
 
     @Test
     void sanitizeFileNameMatchesGo() {
-        // Go 实录（len 是**字节**长度）：
+        // 长度按**字节**计（不是字符数）：
         //   ""                    -> "untitled" (8)
         //   "   "                 -> "untitled" (8)
         //   "hello"               -> "hello" (5)
@@ -153,7 +143,7 @@ class RssPureFunctionsTest {
 
     @Test
     void sanitizeFileNameTruncatesOnUtf8BoundaryInBytes() {
-        // Go 实录：
+        // 期望值：
         //   100 个 "中"（300 字节）        -> 198 字节（66 个字，第 67 个被截掉两个残字节）
         //   250 个 "a"                     -> 200 字节
         //   66 个 "中" + "abcdef"          -> 200 字节（66*3=198，再取 "ab"）
@@ -180,7 +170,7 @@ class RssPureFunctionsTest {
 
     @Test
     void goTrimCoversUnicodeSpacesJavaWouldMiss() {
-        // Go 的 unicode.IsSpace 含 U+00A0 / U+2007 / U+202F，Java 的 strip() 与 trim() 都不管它们。
+        // 这里的空白判定含 U+00A0 / U+2007 / U+202F，Java 的 strip() 与 trim() 都不管它们。
         assertThat(RssUtil.goTrim(" a ")).isEqualTo("a");
         assertThat(RssUtil.goTrim(" b ")).isEqualTo("b");
         assertThat(RssUtil.goTrim("\t\nc\r ")).isEqualTo("c");
@@ -192,7 +182,7 @@ class RssPureFunctionsTest {
 
     @Test
     void feedUrlListMatchesGo() {
-        // Go 实录：
+        // 期望值：
         //   "https://a.com/f, https://b.com/f\nhttps://a.com/f\n" -> ["https://a.com/f","https://b.com/f"]
         //   "a,b,\r\nc" -> ["a","b","c"]
         //   "\n\n"      -> []
@@ -215,15 +205,15 @@ class RssPureFunctionsTest {
 
     @Test
     void parseHeadersMatchesGo() {
-        // Go 实录：
-        //   ""                                             -> nil
-        //   "   "                                          -> nil
+        // 期望值（无分隔行/无名行回 null）：
+        //   ""                                             -> null
+        //   "   "                                          -> null
         //   "Authorization: Bearer x\nX-Foo:  bar \nbroken-line\n: noname"
         //                                                  -> {Authorization:"Bearer x", X-Foo:"bar"}
         //   "A: 1\nA: 2"                                   -> {A:"2"}
-        //   "Nosep"                                        -> nil
+        //   "Nosep"                                        -> null
         //   "  Name :  Value  "                            -> {Name:"Value"}
-        //   ":"                                            -> nil
+        //   ":"                                            -> null
         //   "a:b:c"                                        -> {a:"b:c"}
         RssConfig cfg = new RssConfig(null,
                 "Authorization: Bearer x\nX-Foo:  bar \nbroken-line\n: noname");
@@ -247,7 +237,7 @@ class RssPureFunctionsTest {
 
     @Test
     void feedUrlsFromSettingsMatchesGo() {
-        // Go 实录：nil/空 -> ""；无键 -> ""；非字符串 -> ""；"  https://a/f  " -> "https://a/f"；"   " -> ""
+        // null/空 -> ""；无键 -> ""；非字符串 -> ""；"  https://a/f  " -> "https://a/f"；"   " -> ""
         assertThat(RssConfig.feedUrlsFromSettings(null)).isEmpty();
         assertThat(RssConfig.feedUrlsFromSettings(Map.of())).isEmpty();
         assertThat(RssConfig.feedUrlsFromSettings(Map.of("x", 1))).isEmpty();
@@ -275,7 +265,7 @@ class RssPureFunctionsTest {
         prev.setFeedSignals(new LinkedHashMap<>(Map.of(
                 "f1", new LinkedHashMap<>(Map.of("i1", "s1")))));
 
-        // Go 实录：f1 -> {"feed_items":{"f1":{"i1":"h1"}},"feed_signals":{"f1":{"i1":"s1"}}}
+        // 期望值：f1 -> {"feed_items":{"f1":{"i1":"h1"}},"feed_signals":{"f1":{"i1":"s1"}}}
         RssCursor dst = new RssCursor();
         dst.setLastSyncTime(utc(2006, 1, 2, 15, 4, 5));
         dst.setFeedItems(new LinkedHashMap<>());
@@ -286,7 +276,7 @@ class RssPureFunctionsTest {
         assertThat(dst.getFeedSignals()).containsOnlyKeys("f1");
         assertThat(dst.getFeedSignals().get("f1")).containsEntry("i1", "s1");
 
-        // f2 的源 map 是**空 map**：Go 的 len(src) > 0 不成立，所以什么都不搬。
+        // f2 的源 map 是**空 map**：长度为 0，所以什么都不搬。
         RssCursor dst2 = new RssCursor();
         dst2.setFeedItems(new LinkedHashMap<>());
         dst2.setFeedSignals(new LinkedHashMap<>());
@@ -300,7 +290,7 @@ class RssPureFunctionsTest {
         RssUtil.copyFeedCursor(dst3, prev, "f3");
         assertThat(dst3.getFeedItems()).isEmpty();
 
-        // nil dst / nil prev：Go 的首行 no-op，两边都不能抛。
+        // dst / prev 为 null：直接 no-op，不抛异常。
         RssUtil.copyFeedCursor(null, prev, "f1");
         RssCursor dst4 = new RssCursor();
         dst4.setFeedItems(new LinkedHashMap<>());
@@ -312,7 +302,6 @@ class RssPureFunctionsTest {
 
     @Test
     void parseConfigRejectsNullConfig() {
-        // Go：fmt.Errorf("%w: config is nil", ErrInvalidConfig)
         assertThatThrownBy(() -> RssConfig.parse(null))
                 .isInstanceOf(ConnectorException.InvalidConfig.class)
                 .hasMessage("invalid configuration: config is nil");
@@ -320,7 +309,6 @@ class RssPureFunctionsTest {
 
     @Test
     void parseConfigRequiresFeedUrls() {
-        // Go 实录（实测）：`invalid credentials: feed_urls is required`
         DataSourceConfig config = new DataSourceConfig();
         config.setSettings(mapOfNullable("feed_urls", "   "));
         config.setCredentials(new LinkedHashMap<>());
@@ -353,7 +341,7 @@ class RssPureFunctionsTest {
 
     @Test
     void parseConfigRejectsNonStringFeedUrlsInCredentials() {
-        // Go 的 json.Unmarshal 对 "数字 -> string 字段" 报错；Jackson 默认会强转，故 mapper 关掉了它。
+        // JSON 规范里数字不能赋给 string 字段；Jackson 默认会强转，故 mapper 显式关掉了它。
         DataSourceConfig config = new DataSourceConfig();
         config.setSettings(new LinkedHashMap<>());
         config.setCredentials(mapOfNullable("feed_urls", 12));

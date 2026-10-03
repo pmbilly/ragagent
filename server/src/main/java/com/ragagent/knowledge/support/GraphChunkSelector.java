@@ -10,7 +10,7 @@ import com.ragagent.common.wiki.WikiImageMarkup;
 
 /**
  * 图抽取的分块筛选。
- * <p>规则（逐条照抄）：</p>
+ * <p>规则：</p>
  * <ol>
  *   <li>先记下所有<b>文本块</b>（{@code text}）；</li>
  *   <li>{@code image_caption} 一律跳过（caption 是图片的描述，不是实体的来源）；</li>

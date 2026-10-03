@@ -13,20 +13,16 @@ import org.junit.jupiter.api.Test;
 /**
  * {@link JdkXmlFeedParser} 的字段级对等测试。
  *
- * <h2>期望值的来源</h2>
- * <p>下面每条 XML 都<b>真的喂给过 Go 的 rss 包</b>（用 {@code go test -overlay}
- * 挂一个探针测试跑 {@code gofeed.NewParser().Parse} + 连接器的 {@code resolveItem}），
- * 断言里的值就是那次实测的输出——不是"照着 gofeed 源码推的"。</p>
- * <p>尤其这两条只看源码容易猜错、实测才确定：</p>
+ * <p>两条只看代码容易猜错的语义，用例单独钉住：</p>
  * <ol>
- *   <li><b>RSS 的 {@code UpdatedParsed} 只来自 {@code dc:date}</b>，{@code pubDate} 进的是
- *       {@code PublishedParsed}——所以只有 {@code pubDate} 的条目在该字段上是 {@code null}；</li>
+ *   <li><b>RSS 的 {@code updatedParsed} 只来自 {@code dc:date}</b>，{@code pubDate} 进的是
+ *       {@code publishedParsed}——所以只有 {@code pubDate} 的条目在该字段上是 {@code null}；</li>
  *   <li><b>Atom 的 {@code <link>} 必须带 {@code rel="alternate"}</b>，不带 {@code rel}
- *       时 gofeed 取不到值（{@code firstLinkWithType} 是精确匹配）。</li>
+ *       时取不到值（rel 是精确匹配）。</li>
  * </ol>
  *
- * <h2>与 goxpp 的宽松度差异也有用例</h2>
- * <p>{@code &nbsp;} 这类未声明的命名实体在 goxpp 下能过、在严格 XML 解析器下是致命错误；
+ * <h2>未声明实体的处理</h2>
+ * <p>{@code &nbsp;} 这类未声明的命名实体在严格 XML 解析下是致命错误；
  * {@link HtmlEntities#makeXmlSafe} 把它收窄成"表里没有的实体原样保留字面量"。</p>
  */
 class JdkXmlFeedParserTest {
@@ -82,7 +78,7 @@ class JdkXmlFeedParserTest {
 
     @Test
     void parsesContentEncodedAndDublinCore() {
-        // Go 探针实录：content = "<p>encoded <em>body</em></p>"，
+        // content = "<p>encoded <em>body</em></p>"，
         // author 来自 dc:creator = "Dave"，UpdatedParsed 来自 dc:date。
         FeedParser.ParsedFeed feed = parse("""
                 <?xml version="1.0"?>
@@ -113,7 +109,7 @@ class JdkXmlFeedParserTest {
 
     @Test
     void parsesNakedMarkupInsideDescription() {
-        // goxpp 的 ParseText 取的是"内层 XML"：裸标签会被保留（不是被当子元素吃掉）。
+        // description 取的是"内层 XML"：裸标签会被保留（不是被当子元素吃掉）。
         FeedParser.ParsedFeed feed = parse("""
                 <?xml version="1.0"?>
                 <rss version="2.0"><channel><title>T</title>
@@ -125,7 +121,7 @@ class JdkXmlFeedParserTest {
 
     @Test
     void parsesAuthorNameAddressForms() {
-        // 对照 gofeed 的 shared.ParseNameAddress 四条正则
+        // 作者字段按四条解析模式依序尝试：
         assertThat(parseNameAddressViaFeed("joe@example.com (Joe)")).isEqualTo("Joe");
         assertThat(parseNameAddressViaFeed("Joe (joe@example.com)")).isEqualTo("Joe");
         assertThat(parseNameAddressViaFeed("Joe")).isEqualTo("Joe");
@@ -147,7 +143,7 @@ class JdkXmlFeedParserTest {
 
     @Test
     void parsesRss10ItemsAtRootLevel() {
-        // RSS 1.0 的 <item> 挂在根下而不是 channel 下——gofeed 两种形状都收。
+        // RSS 1.0 的 <item> 挂在根下而不是 channel 下——解析器两种形状都收。
         FeedParser.ParsedFeed feed = parse("""
                 <?xml version="1.0"?>
                 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -174,7 +170,7 @@ class JdkXmlFeedParserTest {
     // ── Atom ─────────────────────────────────────────────────────────────
 
     /**
-     * Go 探针实录（同一个 feed）：
+     * 期望值（同一个 feed）：
      * <pre>
      *   feed.title="Atom Feed" description="atom sub" link="http://atom.example/"
      *   updatedParsed=2024-05-06T07:08:09Z
@@ -236,8 +232,8 @@ class JdkXmlFeedParserTest {
 
     @Test
     void atomLinkWithoutRelIsNotPickedUp() {
-        // ⚠️ 照抄 gofeed 的 firstLinkWithType("alternate", …)：精确匹配 rel，
-        // 没有 rel 属性的 <link href="…"/> 取不到值。实测确认过。
+        // ⚠️ link 的选择是精确匹配 rel == "alternate"，
+        // 没有 rel 属性的 <link href="…"/> 取不到值。
         FeedParser.ParsedFeed feed = parse("""
                 <?xml version="1.0" encoding="utf-8"?>
                 <feed xmlns="http://www.w3.org/2005/Atom">
@@ -293,7 +289,7 @@ class JdkXmlFeedParserTest {
                 .isEqualTo(OffsetDateTime.of(2006, 1, 2, 0, 0, 0, 0, ZoneOffset.UTC));
         assertThat(JdkXmlFeedParser.parseDate("  ")).isNull();
         assertThat(JdkXmlFeedParser.parseDate("")).isNull();
-        // 有界子集之外：解析不出来时返回 null（gofeed 也是抛错就跳过，不中断同步）
+        // 有界子集之外：解析不出来时返回 null（单条解析失败只跳过，不中断同步）
         assertThat(JdkXmlFeedParser.parseDate("6/1/2 15:04")).isNull();
         assertThat(JdkXmlFeedParser.parseDate("02 Monday, Jan 2006 15:04")).isNull();
     }
@@ -328,8 +324,7 @@ class JdkXmlFeedParserTest {
 
     @Test
     void jsonFeedIsExplicitlyUnsupported() {
-        // ⚠️ 已记入报告的缺口：gofeed 支持 JSON Feed，Java 侧不支持——
-        // Go 那边**会成功**，这里明确失败（不静默当成空 feed）。
+        // ⚠️ 已知缺口：JSON Feed 格式不支持——这里明确失败（不静默当成空 feed）。
         assertThatThrownBy(() -> parse("{\"version\":\"https://jsonfeed.org/version/1\","
                 + "\"title\":\"t\",\"items\":[]}"))
                 .isInstanceOf(FeedParseException.class)
@@ -343,11 +338,11 @@ class JdkXmlFeedParserTest {
                 .isInstanceOf(FeedParseException.class);
     }
 
-    // ── 宽松度：goxpp 放行、严格解析器会拒的东西 ──────────────────────────
+    // ── 宽松度：比严格 XML 解析更宽容的输入 ──────────────────────────────
 
     @Test
     void toleratesUndeclaredNamedEntities() {
-        // &nbsp; 在严格 XML 下是致命错误；goxpp 放行、html.UnescapeString 解成 U+00A0。
+        // &nbsp; 在严格 XML 下是致命错误；这里预解码成 U+00A0。
         FeedParser.ParsedFeed feed = parse("""
                 <?xml version="1.0"?>
                 <rss version="2.0"><channel><title>T</title>
@@ -371,7 +366,7 @@ class JdkXmlFeedParserTest {
 
     @Test
     void unknownNamedEntityStaysLiteral() {
-        // Go 的 html.UnescapeString 对未知实体原样返回，本实现同样——两边一致。
+        // 未知实体原样保留。
         FeedParser.ParsedFeed feed = parse("""
                 <?xml version="1.0"?>
                 <rss version="2.0"><channel><title>T</title>

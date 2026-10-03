@@ -24,7 +24,7 @@ import org.apache.ibatis.annotations.Update;
 @Mapper
 public interface MemoryDocAffinityMapper extends BaseMapper<MemoryDocAffinity> {
 
-    /** 对照 {@code BumpDocAffinity} 的 insert-or-ignore（{@code Hits: 0}，真值来自自增）。 */
+    /** 文档亲和插入：冲突时什么都不做（hits 起始 0，真值来自自增）。 */
     @Insert("INSERT INTO memory_doc_affinity "
             + "(id, tenant_id, subject_id, knowledge_id, knowledge_base_id, title, hits, "
             + " last_used_at, created_at, updated_at) "
@@ -45,7 +45,7 @@ public interface MemoryDocAffinityMapper extends BaseMapper<MemoryDocAffinity> {
     int insertIfAbsentOther(@Param("r") MemoryDocAffinity row);
 
     /**
-     * 对照 {@code BumpDocAffinity} 的 UPDATE。
+     * 命中数自增 UPDATE。
      *
      * <p>{@code title} / {@code knowledge_base_id} 走 {@code <if>}：
      * 只在非空时才写入，空值就保持原样。</p>
@@ -60,7 +60,7 @@ public interface MemoryDocAffinityMapper extends BaseMapper<MemoryDocAffinity> {
              @Param("knowledgeId") String knowledgeId, @Param("title") String title,
              @Param("knowledgeBaseId") String knowledgeBaseId, @Param("now") OffsetDateTime now);
 
-    /** 对照 {@code DocAffinity}：按 knowledge_id 批量取命中数。 */
+    /** 按 knowledge_id 批量取命中数。 */
     @Select("<script>"
             + "SELECT * FROM memory_doc_affinity WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId} "
             + "AND knowledge_id IN <foreach collection='ids' item='i' open='(' separator=',' close=')'>#{i}</foreach>"
@@ -69,7 +69,7 @@ public interface MemoryDocAffinityMapper extends BaseMapper<MemoryDocAffinity> {
                                                  @Param("subjectId") String subjectId,
                                                  @Param("ids") List<String> knowledgeIds);
 
-    /** 对照 {@code TopDocAffinity}：{@code hits DESC, last_used_at DESC}。 */
+    /** 最热文档：{@code hits DESC, last_used_at DESC}。 */
     @Select("<script>"
             + "SELECT * FROM memory_doc_affinity WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId} "
             + "ORDER BY hits DESC, last_used_at DESC"
@@ -78,19 +78,18 @@ public interface MemoryDocAffinityMapper extends BaseMapper<MemoryDocAffinity> {
     List<MemoryDocAffinity> topAffinity(@Param("tenantId") long tenantId, @Param("subjectId") String subjectId,
                                         @Param("limit") int limit);
 
-    /** 对照 {@code DocAffinityByID}。 */
     @Select("SELECT * FROM memory_doc_affinity WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId} "
             + "AND id = #{id}")
     MemoryDocAffinity selectScopedById(@Param("tenantId") long tenantId, @Param("subjectId") String subjectId,
                                        @Param("id") String id);
 
-    /** 对照 {@code ListFamiliarDocs} 的计数（{@code hits >= minHits}）。 */
+    /** 熟悉文档的计数（{@code hits >= minHits}）。 */
     @Select("SELECT COUNT(*) FROM memory_doc_affinity WHERE tenant_id = #{tenantId} "
             + "AND subject_id = #{subjectId} AND hits >= #{minHits}")
     long countFamiliar(@Param("tenantId") long tenantId, @Param("subjectId") String subjectId,
                        @Param("minHits") int minHits);
 
-    /** 对照 {@code ListFamiliarDocs} 的数据页。 */
+    /** 熟悉文档的数据页。 */
     @Select("SELECT * FROM memory_doc_affinity WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId} "
             + "AND hits >= #{minHits} ORDER BY hits DESC, last_used_at DESC LIMIT #{limit} OFFSET #{offset}")
     List<MemoryDocAffinity> listFamiliar(@Param("tenantId") long tenantId, @Param("subjectId") String subjectId,
@@ -98,7 +97,7 @@ public interface MemoryDocAffinityMapper extends BaseMapper<MemoryDocAffinity> {
                                          @Param("limit") int limit, @Param("offset") int offset);
 
     /**
-     * 对照 {@code DeleteDocAffinity}：带 scope 的物理删。
+     * 带 scope 的物理删。
      *
      * <p>⚠️ 不能用 {@code deleteById}——只按主键会删掉别的主体的行。</p>
      */
@@ -107,7 +106,7 @@ public interface MemoryDocAffinityMapper extends BaseMapper<MemoryDocAffinity> {
     int deleteScoped(@Param("tenantId") long tenantId, @Param("subjectId") String subjectId,
                      @Param("id") String id);
 
-    /** 对照 {@code DeleteAllDocAffinity}：整 scope 的物理删。 */
+    /** 整 scope 的物理删。 */
     @Delete("DELETE FROM memory_doc_affinity WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId}")
     int deleteAllInScope(@Param("tenantId") long tenantId, @Param("subjectId") String subjectId);
 }

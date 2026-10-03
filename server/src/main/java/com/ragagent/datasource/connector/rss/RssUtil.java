@@ -226,7 +226,7 @@ final class RssUtil {
             } else if ((c & 0xF8) == 0xF0) {
                 need = 4;
             } else {
-                end = lead; // 非法首字节：丢掉它（Go 也是退 1 字节）
+                end = lead; // 非法首字节：丢掉它（回退 1 字节）
                 continue;
             }
             if (lead + need == end) {

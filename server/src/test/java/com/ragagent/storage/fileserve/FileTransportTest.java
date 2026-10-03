@@ -11,13 +11,13 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 /**
- * {@link FileTransport} 的纯函数契约——期望值全部是 Go 实录
- * （/tmp/w5crec 探针跑 go1.26 的 {@code mime.FormatMediaType}；
- * parseRange 语义对照 go1.26 {@code net/http/fs.go}，错误文案逐字）。
+ * {@link FileTransport} 的纯函数契约——期望值全部是探针录制
+ * （{@code mime.FormatMediaType} 语料；
+ * parseRange 语义与标准库 {@code net/http} 一致，错误文案逐字）。
  */
 class FileTransportTest {
 
-    // ── FormatMediaType（Go 实录 24 条）─────────────────────────────────────
+    // ── FormatMediaType（24 条语料）─────────────────────────────────────────
 
     @Test
     void formatMediaTypeMatchesGo() {

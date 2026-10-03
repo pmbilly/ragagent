@@ -95,12 +95,12 @@ public class OAuthRuntime implements McpOAuthRuntime {
         return leaseDuration;
     }
 
-    /** 测试/日志可见：本 runtime 绑定的 principal（Go 测试直接读 {@code runtime.principal}）。 */
+    /** 测试/日志可见：本 runtime 绑定的 principal。 */
     public TenantContext.Principal principal() {
         return principal;
     }
 
-    /** 测试可见：底层 handler（Go 测试用 {@code runtime.handler} 造 401）。 */
+    /** 测试可见：底层 handler。 */
     public OAuthHandler handler() {
         return handler;
     }

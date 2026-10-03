@@ -14,7 +14,7 @@ import com.ragagent.knowledge.domain.Chunk;
  *   <li>按 {@code StartAt} 排序——保证逐块上下文的 prev/next 与整知识循环同序；</li>
  *   <li>按 {@link #BATCH_SIZE} 切批，<b>批间不重叠</b>；每批带窗口外的前/后邻块 id 作边界上下文。</li>
  * </ol>
- * post-process 大函数里，只能靠实录间接覆盖）。</p>
+ * post-process 大函数里，只能靠契约测试间接覆盖）。</p>
  */
 public final class QuestionBatchPlanner {
     public static final int BATCH_SIZE = 20;

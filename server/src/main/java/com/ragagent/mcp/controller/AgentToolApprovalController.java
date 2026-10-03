@@ -115,7 +115,7 @@ public class AgentToolApprovalController {
             if (!modified.isObject()) {
                 throw BizException.badRequest("modified_args must be a non-null JSON object");
             }
-            // 重新序列化成 raw JSON 交给 gate（Go 传的是原始字节）
+            // 重新序列化成 raw JSON 交给 gate
             return new Decision(true, writeJson(modified), reason, false, false);
         }
         if ("reject".equals(rawDecision)) {

@@ -10,12 +10,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * 批次二（oss/cos/tos）的离线契约测试（对照 Go oss.go / cos.go / tos.go）：
+ * oss/cos/tos 的离线契约测试：
  * 路径解析、对象名拼接、遗留 URL 形态、跨后端拒绝，以及工厂对三个 provider 的校验文案。
  *
  * <p><b>为什么只测纯逻辑</b>：OSS/TOS 的构造函数会确保桶存在（真网络），工厂一旦拿到
  * 完整配置就会建客户端——CI 无凭据，因此这里锁住"拼错路径/放行越界 key/校验文案漂移"
- * 这类真正昂贵的错误；真连三家云的对象操作按 Go 的老规矩留给 dev 自检。</p>
+ * 这类真正昂贵的错误；真连三家云的对象操作按惯例留给 dev 自检。</p>
  */
 class ProviderBatchTwoTest {
 
@@ -66,7 +66,7 @@ class ProviderBatchTwoTest {
                 svc.parseObjectName("cos://bk-125/ap-guangzhou/weknora/7/kb/x.png"));
         assertEquals("legacy/1.png",
                 svc.parseObjectName("https://bk-125.cos.ap-guangzhou.myqcloud.com/legacy/1.png"));
-        // 三段不足 → 原样返回（照 Go 的 SplitN 兜底）
+        // 三段不足 → 原样返回
         assertEquals("onlybucket", svc.parseObjectName("cos://onlybucket"));
 
         IllegalArgumentException err = assertThrows(IllegalArgumentException.class,
@@ -79,7 +79,7 @@ class ProviderBatchTwoTest {
         assertTrue(svc.bucketUrl().startsWith("https://bk-125.cos.ap-guangzhou.myqcloud.com"));
     }
 
-    // ── 工厂校验（照 Go 的 incomplete 文案） ──
+    // ── 工厂校验（incomplete 文案逐字） ──
 
     @Test
     @DisplayName("工厂：oss/cos/tos 缺字段时抛 incomplete 文案；不再报未实现")
@@ -108,7 +108,7 @@ class ProviderBatchTwoTest {
         assertEquals("incomplete tos config", assertThrows(IllegalArgumentException.class,
                 () -> FileServiceFactory.fromStorageConfig("tos", sec, "/tmp")).getMessage());
 
-        // 批次二已补齐：不再有"未实现"的 provider
+        // 已补齐：不再有"未实现"的 provider
         assertTrue(FileServiceFactory.PENDING.isEmpty());
         assertTrue(FileServiceFactory.IMPLEMENTED.containsAll(
                 java.util.Set.of("local", "s3", "minio", "obs", "ks3", "oss", "cos", "tos")));

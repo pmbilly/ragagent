@@ -9,19 +9,19 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * 对照 Go metric/common.go：句切（{@code splitSentences}）、词切（{@code splitIntoWords}）、
+ * 指标公用辅助：句切（{@code splitSentences}）、词切（{@code splitIntoWords}）、
  * 计数与集合辅助（sum/min/max/abs/ToSet/Hit）。
  *
- * <p><b>句切的 Java 差异（实现层，非行为）</b>：Go 用 {@code re.Split(text, -1)}，捕获组随
+ * <p><b>句切的实现差异（实现层，非行为）</b>：参考语义里捕获组随
  * 切分结果返回；Java 的 {@code Pattern.split} 不返回捕获组，故手工仿真为
- * 「文本段/分隔符」交替序列，再走 Go 的奇偶累积逻辑（分隔符本身丢弃）。</p>
+ * 「文本段/分隔符」交替序列，再走奇偶位累积逻辑（分隔符本身丢弃）。</p>
  */
 final class MetricCommon {
 
-    /** 对照 {@code ([。.])}：中文句号或英文句点。 */
+    /** 句界捕获组 {@code ([。.])}：中文句号或英文句点。 */
     private static final Pattern SENTENCE_DELIM = Pattern.compile("([。.])");
 
-    /** 对照 {@code ([\p{Han}]+)|([a-zA-Z0-9_.,!?]+)|(\p{P})}。 */
+    /** 词块捕获组 {@code ([\p{Han}]+)|([a-zA-Z0-9_.,!?]+)|(\p{P})}。 */
     private static final Pattern WORD_BLOCK =
             Pattern.compile("(\\p{IsHan}+)|([a-zA-Z0-9_.,!?]+)|(\\p{P})");
 
@@ -51,8 +51,8 @@ final class MetricCommon {
     }
 
     /**
-     * 对照 splitSentences：按 {@code 。}/{@code .} 切句，分隔符丢弃，段内 strip 后
-     * 非空才成句（Go strings.TrimSpace → Java String.strip，均为 Unicode 空白语义）。
+     * 按 {@code 。}/{@code .} 切句，分隔符丢弃，段内 strip 后
+     * 非空才成句（Unicode 空白语义）。
      */
     static List<String> splitSentences(String text) {
         // 仿真 Go re.Split 的「捕获组随切分返回」：段/分隔符交替
@@ -89,7 +89,7 @@ final class MetricCommon {
         return sentences;
     }
 
-    /** 对照 splitIntoWords：Han 块走分词器、英文块按空白切（fields）、标点成 token。 */
+    /** Han 块走分词器、英文块按空白切、标点成 token。 */
     static List<String> splitIntoWords(List<String> sentences) {
         List<String> tokens = new ArrayList<>();
         for (String text : sentences) {
@@ -110,7 +110,7 @@ final class MetricCommon {
         return tokens;
     }
 
-    /** 对照 strings.Fields：按 Unicode 空白切分并丢弃空段。 */
+    /** 按 Unicode 空白切分并丢弃空段。 */
     private static List<String> fields(String s) {
         List<String> out = new ArrayList<>();
         for (String part : WHITESPACE.split(s, -1)) {
@@ -136,8 +136,8 @@ final class MetricCommon {
     }
 
     /**
-     * 对照 Go {@code math.Log2}（frexp 归一 + {@code Log(frac)*(1/Ln2)} 缩放，
-     * 2 的整数幂走精确路径）——避免 {@code log(x)/log(2)} 在整数幂上的末位抖动。
+     * log2 以 frexp 归一 + {@code Log(frac)*(1/Ln2)} 缩放实现，
+     * 2 的整数幂走精确路径——避免 {@code log(x)/log(2)} 在整数幂上的末位抖动。
      * libm 实现差异仍可能造成末位分叉（无法消除，备案）。
      */
     static double log2(double x) {

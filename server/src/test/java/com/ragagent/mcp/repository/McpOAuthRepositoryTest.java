@@ -20,7 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * 对照 Go internal/application/repository/mcp_oauth_test.go。
+ * MCP OAuth 仓储语义。
  *
  * <p>覆盖三件事：principal 隔离、历史 (tenant,user,service) 兼容、refresh 租约单所有者。</p>
  */
@@ -61,7 +61,7 @@ class McpOAuthRepositoryTest {
                 "同一服务的不同 principal 必须各存各的 token");
     }
 
-    /** 对照 Go 测试里的 {@code PrincipalAPIExternalUser, "7:external-u1"} */
+    /** API 外部用户的样例 id（type 前缀 7:）。 */
     private static String apiExternalId() {
         return "7:external-u1";
     }

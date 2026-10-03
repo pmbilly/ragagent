@@ -3,9 +3,7 @@ package com.ragagent.common.text;
 /**
  * 码点序比较（对合法 UTF-8 字符串等价于 UTF-8 字节序）。
  *
- * <p><b>2026-10-03（B45）</b>：自 {@code common.wiki.GoStrings} 迁出（原为 Go
- * {@code strings.Compare} 语义的复刻）。Java 没有"按码点序比较"的标准 API，
- * 故保留自实现——它不是"复刻 Go 的字节形态"，而是"码点序"这一语义本身。</p>
+ * <p>Java 没有"按码点序比较"的标准 API，故保留自实现。</p>
  *
  * <p><b>为何不能用 {@link String#compareTo}</b>：那是 UTF-16 码元序，两者只在
  * 「增补平面字符 vs U+E000–U+FFFF 之间的 BMP 字符」上分歧（UTF-16 里代理对

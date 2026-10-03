@@ -11,10 +11,10 @@ import com.ragagent.embedding.EmbeddingHttp;
 import com.ragagent.common.web.ProviderJson;
 
 /**
- * Jina AI embedding 客户端（对照 Go {@code internal/models/embedding/jina.go} 全文）。
+ * Jina AI embedding 客户端。
  *
- * <p>Jina 与 OpenAI 兼容但<b>不支持</b> {@code truncate_prompt_tokens}（Go 结构体
- * 根本没有该字段、也不存 truncatePromptTokens）；用 {@code truncate:true} 布尔
+ * <p>Jina 与 OpenAI 兼容但<b>不支持</b> {@code truncate_prompt_tokens}
+ * （不存 truncatePromptTokens）；用 {@code truncate:true} 布尔
  * 开启长文本截断；{@code dimensions} 仅在 supportsDimensionsParam 时出现。</p>
  */
 public final class JinaEmbedder extends BaseEmbedder {
@@ -39,7 +39,7 @@ public final class JinaEmbedder extends BaseEmbedder {
 
     @Override
     public List<float[]> batchEmbed(List<String> texts) {
-        // 对照 JinaEmbedRequest：model/input/truncate/dimensions；truncate:true 恒发
+        // 请求体字段序：model/input/truncate/dimensions；truncate:true 恒发
         ObjectNode reqBody = ProviderJson.object();
         reqBody.put("model", modelName);
         reqBody.set("input", ProviderJson.arrayOfStrings(texts));

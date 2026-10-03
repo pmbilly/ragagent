@@ -7,9 +7,8 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
- * ThinkBlocks.stripThinkBlocks 的 Go 实录（11 条，探针原样调用 Go
- * {@code StripThinkBlocks}）。多行块/多个块/仅块/周围空白/未闭合/
- * 嵌套外观（Go 的非贪婪正则行为）逐字比对。
+ * ThinkBlocks.stripThinkBlocks 的录制语料（11 条）。多行块/多个块/仅块/周围空白/未闭合/
+ * 嵌套外观（非贪婪正则行为）逐字比对。
  */
 class StripThinkRecordingTest {
 

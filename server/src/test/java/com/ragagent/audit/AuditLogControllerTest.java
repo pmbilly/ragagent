@@ -29,19 +29,17 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 /**
- * 审计端点契约测试——对照 Go internal/handler/audit_log_test.go（L46-410）。
+ * 审计端点契约测试。
  *
- * <p>用 standalone MockMvc（等价 Go 测试里只挂 handler 的 {@code gin.New()}）+
- * 生产 {@link GlobalExceptionHandler}，所以错误信封的形态、状态码与键序都是真的。
- * 服务层用 Mockito 桩，等价 Go 的 {@code stubAuditService}。
- * 租户/角色上下文由测试手工写入 {@link TenantContext}（等价 Go 测试中间件里
- * 往 gin.Context 塞 TenantID/KBAccess/UserID/TenantRole 的那段）。</p>
+ * <p>用 standalone MockMvc（只挂 handler 与
+ * 生产 {@link GlobalExceptionHandler}），所以错误信封的形态、状态码与键序都是真的。
+ * 服务层用 Mockito 桩。
+ * 租户/角色上下文由测试手工写入 {@link TenantContext}。</p>
  *
- * <p><b>三条断言直接抄自对运行中 Go dev server 的实测</b>（2026-09-18）：</p>
+ * <p><b>三条断言直接抄自运行中 dev server 的实测</b>（2026-09-18）：</p>
  * <ul>
  *   <li>空页响应体是 {@code {"items":[],"nextCursor":0}}——
- *       Go 的 {@code []*types.AuditLog} 经 GORM {@code Find} 后是<b>非 nil 空切片</b>，
- *       序列化成 {@code []} 而不是 {@code null}（与 Wiki 的 nil slice 不同）；</li>
+ *       空列表序列化成 {@code []} 而不是 {@code null}（列表端点恒输出数组）；</li>
  *   <li>非法租户 ID 是 400 统一错误体 {@code {"error":{"code":1010,...}}}；</li>
  *   <li>非创建者读他人 KB 活动流是 <b>403 守卫形态</b>（纯字符串），
  *       因为线上是 {@code g.OwnedKBOrAdmin()} 中间件先拒。</li>
@@ -107,7 +105,6 @@ class AuditLogControllerTest {
 
     // ── GET /tenants/{id}/audit-log ──────────────────────────────────────
 
-    /** 对照 {@code TestAuditLogHandler_ReturnsEnvelopeAndCursor}。 */
     @Test
     void tenantListReturnsEnvelopeAndCursor() throws Exception {
         harness((tenantId, q) -> {
@@ -124,7 +121,7 @@ class AuditLogControllerTest {
         assertThat(body).endsWith(",\"nextCursor\":95}");
     }
 
-    /** 对照 {@code TestAuditLogHandler_PassesQueryFiltersThrough}：五个参数逐一直传。 */
+    /** 五个查询参数逐一直传。 */
     @Test
     void tenantListPassesQueryFiltersThrough() throws Exception {
         AtomicReference<AuditLogQuery> seen = new AtomicReference<>();
@@ -162,8 +159,7 @@ class AuditLogControllerTest {
     }
 
     /**
-     * 对照 {@code TestAuditLogHandler_InvalidTenantIDReturns400}：
-     * 非数字租户 ID 在碰到服务前就被 400 挡下。响应体逐字节对照实测的 Go 输出。
+     * 非数字租户 ID 在碰到服务前就被 400 挡下。响应体逐字节对照实测输出。
      */
     @Test
     void tenantListInvalidTenantIdReturns400() throws Exception {
@@ -174,7 +170,7 @@ class AuditLogControllerTest {
                 .andExpect(content().string("{\"error\":{\"code\":1010,"
                         + "\"message\":\"workspace id must be a positive integer\",\"details\":null}}"));
 
-        // 0 也不是合法空间 ID（对照 Go 的 `err != nil || v == 0`）
+        // 0 也不是合法空间 ID（非法与 0 同一分支拒绝）
         mvc.perform(get("/api/v1/tenants/0/audit-log"))
                 .andExpect(status().isBadRequest());
     }
@@ -227,7 +223,6 @@ class AuditLogControllerTest {
 
     // ── GET /knowledge-bases/{id}/activity ───────────────────────────────
 
-    /** 对照 {@code TestKnowledgeBaseActivityHandler_UsesKBScope}。 */
     @Test
     void kbActivityUsesKbScope() throws Exception {
         AtomicReference<AuditLogQuery> seen = new AtomicReference<>();
@@ -253,8 +248,7 @@ class AuditLogControllerTest {
     }
 
     /**
-     * 对照 {@code TestKnowledgeBaseActivityHandler_BlocksSharedWorkspace}：
-     * 调用方租户 ≠ KB 归属租户 → 403（Go handler 内的 AppError 信封形态）。
+     * 调用方租户 ≠ KB 归属租户 → 403（AppError 信封形态）。
      */
     @Test
     void kbActivityBlocksSharedWorkspace() throws Exception {
@@ -270,11 +264,10 @@ class AuditLogControllerTest {
     }
 
     /**
-     * 对照 {@code TestKnowledgeBaseActivityHandler_RequiresCreatorOrAdmin}：
      * 既不是创建者、角色又低于 Admin → 403。
      *
      * <p><b>形态取自实测</b>：线上先由 {@code g.OwnedKBOrAdmin()} 中间件拒绝，
-     * 所以响应体是<b>守卫形态的纯字符串</b>，而不是 Go handler 里那条
+     * 所以响应体是<b>守卫形态的纯字符串</b>，而不是 handler 里那条
      * 不可达的 AppError 信封。</p>
      */
     @Test
@@ -289,7 +282,7 @@ class AuditLogControllerTest {
                         "{\"error\":\"Forbidden: must own the resource or have the required role\"}"));
     }
 
-    /** Admin（非创建者）可以读——对照 Go {@code role.HasPermission(TenantRoleAdmin)}。 */
+    /** Admin（非创建者）可以读——admin 角色满足权限判定。 */
     @Test
     void kbActivityAllowsAdminNonCreator() throws Exception {
         harness((tenantId, q) -> List.of());
@@ -301,7 +294,7 @@ class AuditLogControllerTest {
                 .andExpect(content().string("{\"items\":[],\"nextCursor\":0}"));
     }
 
-    /** KB 不存在 → 404 AppError 信封（实测 Go：{@code {"error":{"code":1003,...}}}）。 */
+    /** KB 不存在 → 404 AppError 信封（{@code {"error":{"code":1003,...}}}）。 */
     @Test
     void kbActivityMissingKbReturns404() throws Exception {
         harnessForbidden();
@@ -314,7 +307,7 @@ class AuditLogControllerTest {
                         + "\"message\":\"knowledge base not found\",\"details\":null}}"));
     }
 
-    /** 未附加角色时回落 Viewer（对照 Go {@code TenantRoleFromContext} 的 fail-closed 默认）。 */
+    /** 未附加角色时回落 Viewer（fail-closed 默认）。 */
     @Test
     void kbActivityFailsClosedWhenRoleMissing() throws Exception {
         harnessForbidden();
@@ -327,7 +320,7 @@ class AuditLogControllerTest {
 
     // ── GET /system/admin/audit-log ──────────────────────────────────────
 
-    /** 对照 {@code TestSystemAuditLogHandler_AlwaysQueriesTenantZero}：硬钉 tenant_id=0。 */
+    /** 平台审计流硬钉 tenant_id=0。 */
     @Test
     void systemAuditAlwaysQueriesTenantZero() throws Exception {
         AtomicReference<Long> seenTenant = new AtomicReference<>();
@@ -345,7 +338,6 @@ class AuditLogControllerTest {
         assertThat(body).endsWith(",\"nextCursor\":42}");
     }
 
-    /** 对照 {@code TestSystemAuditLogHandler_PassesQueryFiltersThrough}。 */
     @Test
     void systemAuditPassesQueryFiltersThrough() throws Exception {
         AtomicReference<AuditLogQuery> seen = new AtomicReference<>();
@@ -365,11 +357,10 @@ class AuditLogControllerTest {
         assertThat(q.action()).isEqualTo("system.setting_changed");
         assertThat(q.outcome()).isEqualTo("success");
         assertThat(q.actorUserId()).isEqualTo("u-admin-1");
-        // 平台流<b>不</b>加 UnscopedOnly（与租户流不同，对照 Go 的查询构造）
+        // 平台流<b>不</b>加 UnscopedOnly（与租户流不同）
         assertThat(q.unscopedOnly()).isFalse();
     }
 
-    /** 对照 {@code TestSystemAuditLogHandler_EmptyResultProducesZeroCursor}。 */
     @Test
     void systemAuditEmptyResultProducesZeroCursor() throws Exception {
         harness((tenantId, q) -> List.of());
@@ -379,7 +370,6 @@ class AuditLogControllerTest {
                 .andExpect(content().string("{\"items\":[],\"nextCursor\":0}"));
     }
 
-    /** 对照 {@code TestSystemAuditLogHandler_GarbageCursorAndLimitTolerated}。 */
     @Test
     void systemAuditToleratesGarbageCursorAndLimit() throws Exception {
         AtomicReference<AuditLogQuery> seen = new AtomicReference<>();
@@ -397,7 +387,6 @@ class AuditLogControllerTest {
         assertThat(seen.get().limit()).isZero();
     }
 
-    /** 对照 {@code TestSystemAuditLogHandler_ServiceErrorReturns500}。 */
     @Test
     void systemAuditServiceErrorReturns500() throws Exception {
         harness((tenantId, q) -> {
@@ -414,7 +403,7 @@ class AuditLogControllerTest {
 
     // ── 桩 ───────────────────────────────────────────────────────────────
 
-    /** 对照 Go 的 {@code stubAuditService}：只实现 List。 */
+    /** 服务桩：只实现 List。 */
     @FunctionalInterface
     private interface ListFn {
         List<AuditLog> apply(long tenantId, AuditLogQuery q);

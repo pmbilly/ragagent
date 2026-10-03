@@ -15,11 +15,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * 存储后端默认装配（B6 批 1）：env → provider 环境变量族 → 落库 config 的形状钉子。
+ * 存储后端默认装配：env → provider 环境变量族 → 落库 config 的形状钉子。
  *
  * <p>取值走 {@code @ConfigurationProperties} 绑定（本类用测试属性代替 env，松散绑定与 env 同一条路）。
- * 断言要点：键名＝落库面 camel（与 {@code dto/StorageConfig} 同族，B14 合并后）、空值整键省略、
- * {@code use_ssl} 在 {@code S3_USE_SSL} 未设置时缺省为真（对照 Go {@code !EqualFold(env,"false")}）、
+ * 断言要点：键名＝落库面 camel（与 {@code dto/StorageConfig} 同族）、空值整键省略、
+ * {@code use_ssl} 在 {@code S3_USE_SSL} 未设置时缺省为真（仅当值大小写不敏感等于 "false" 才为假）、
  * {@code force_path_style} 只在恰为 "true" 时写出。</p>
  */
 @SpringBootTest(properties = {
@@ -61,13 +61,13 @@ class DefaultStorageBackendProvisionerTest {
 
         assertThat(config.path("endpoint").asText()).isEqualTo("https://s3.example.com");
         assertThat(config.path("region").asText()).isEqualTo("ap-east-1");
-        // 非凭据字段原样落库（camel，B14 后）
+        // 非凭据字段原样落库（camel）
         assertThat(config.path("bucketName").asText()).isEqualTo("b0-bucket");
         assertThat(config.path("pathPrefix").asText()).isEqualTo("b3/");
         // S3_USE_SSL 未设置 → 缺省真；S3_FORCE_PATH_STYLE="true" → 显式写出
         assertThat(config.path("useSsl").asBoolean()).isTrue();
         assertThat(config.path("forcePathStyle").asBoolean()).isTrue();
-        // 凭据必须**加密落库**（B15）：此前供给器直接 toString() 写库，私钥是明文
+        // 凭据必须**加密落库**：此前供给器直接 toString() 写库，私钥是明文
         assertThat(config.path("accessKeyId").asText()).startsWith("enc:v1:");
         assertThat(config.path("secretAccessKey").asText()).startsWith("enc:v1:");
 

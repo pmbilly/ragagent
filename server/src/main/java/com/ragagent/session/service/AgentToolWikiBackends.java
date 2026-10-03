@@ -97,7 +97,7 @@ final class AgentToolWikiBackends {
                             wikiPageService.repairContentLinks(kbId, slug, content);
                     return r == null ? null : new RepairResult(r.content(), r.changed());
                 } catch (RuntimeException e) {
-                    // Go: if rerr == nil { content = repaired } —— 修复失败永不阻塞写入
+                    // 修复失败永不阻塞写入
                     return null;
                 }
             }
@@ -156,12 +156,12 @@ final class AgentToolWikiBackends {
             @Override
             public IndexOverviewView getIndexView(String kbId, int topK) {
                 try {
-                    // Go: GetIndexView(ctx, kbID, nil, wikiIndexAgentTopK, "")
+                    // 索引视图（无过滤、全量统计）
                     WikiIndex.Response resp =
                             wikiPageService.getIndexView(kbId, null, topK, "");
                     return toIndexOverviewView(resp);
                 } catch (RuntimeException e) {
-                    // Go: err != nil || overview == nil 时静默跳过 overview
+                    // 获取失败或无 overview 时静默跳过
                     return null;
                 }
             }

@@ -4,9 +4,9 @@ import java.util.Map;
 
 
 /**
- * embedder 构造配置（对照 Go {@code embedding.Config}，embedder.go L43-61）。
+ * embedder 构造配置。
  *
- * <p>可变类而非 record：工厂链里 {@code SetSupportsDimensionOverride} 会就地改内层
+ * <p>可变类而非 record：工厂链里 {@code setSupportsDimensionOverride} 会就地改内层
  * embedder，Config 本身按值传递。</p>
  */
 public final class EmbedderConfig {

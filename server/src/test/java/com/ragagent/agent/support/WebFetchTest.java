@@ -13,9 +13,8 @@ import com.ragagent.common.security.SsrfGuard;
 import com.sun.net.httpserver.HttpServer;
 
 /**
- * web_fetch 的 stub server 测试（对照 Go fetcher_test.go / fetcher_ssrf_test.go /
- * markdown_test.go 的可移植用例；chromedp / readability / html-to-markdown 是接缝，
- * 用例按 Go 侧"接缝失败"分支的形态断言）。
+ * web_fetch 的 stub server 测试（chromedp / readability / html-to-markdown 是接缝，
+ * 用例按"接缝失败"分支的形态断言）。
  */
 class WebFetchTest {
 
@@ -80,7 +79,7 @@ class WebFetchTest {
             }
         });
         try {
-            // 对照 Go TestAgentFetchContentTypesAndSizeLimit/plain：markdown 模式下
+            // markdown 模式下
             // text/* 原样透传
             Fetcher f = new Fetcher(true, java.time.Duration.ofSeconds(5), 10_000, null);
             String content = f.fetch("http://127.0.0.1:" + server.getAddress().getPort());
@@ -102,7 +101,7 @@ class WebFetchTest {
             }
         });
         try {
-            // Go 实测（htmlToText probe）："if (a < b)\nkeep me"
+            // 实测形态："if (a < b)\nkeep me"
             String content = Fetcher.newPipelineFetcher()
                     .fetch("http://127.0.0.1:" + server.getAddress().getPort());
             assertEquals("if (a < b)\nkeep me", content);
@@ -256,7 +255,7 @@ class WebFetchTest {
             String content = ok.fetch(base);
             assertTrue(content.contains("rendered product specifications"), content);
 
-            // 接缝失败 → empty_content（对照 Go TestFetcherReturnsErrorWhenBrowserFallbackFailsOnSPA）
+            // 接缝失败 → empty_content
             Fetcher bad = new Fetcher(true, java.time.Duration.ofSeconds(5), 2_000_000,
                     url -> {
                         throw new IllegalStateException("browser unavailable");

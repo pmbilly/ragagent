@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * 对照 Go metric.MRRMetric（mrr.go 全文）：
+ * MRR 指标：
  * 每个真值组取命中序列里第一个相关项的 1/位次（1-based），再按真值组数平均。
  */
 public final class MrrMetric implements Metrics {

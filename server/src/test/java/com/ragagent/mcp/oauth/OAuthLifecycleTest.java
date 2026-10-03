@@ -29,16 +29,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * 对照 Go internal/mcp/oauth_lifecycle_test.go。
+ * OAuth 运行期生命周期测试。
  *
  * <p>覆盖：过期刷新、永久失败删 token、临时失败保留 token、<b>刷新令牌轮换串行化</b>、
  * 401 只重试一次（经由 {@code isAuthorizationFailure} + 强制刷新语义）、过期行不算已授权。</p>
  *
- * <p><b>与 Go 测试的差异</b>：Go 的 fixture 直接把 token 塞进 fake 仓储；
- * Java 同样用内存 fake（{@link FakeOAuthRepository}），HTTP 侧用手写
- * {@link OAuthServerStub} 替代 {@code httptest.NewServer}。
- * SSRF 白名单按项目既有做法用 {@link SsrfGuard#reloadWhitelist} 放开 127.0.0.1
- * （Go 测试直接拿 {@code server.Client()} 绕过 SSRF）。</p>
+ * <p>夹具：内存 fake 仓储（{@link FakeOAuthRepository}）+ 手写 HTTP 桩
+ * （{@link OAuthServerStub}）。SSRF 白名单按项目既有做法用
+ * {@link SsrfGuard#reloadWhitelist} 放开 127.0.0.1。</p>
  */
 class OAuthLifecycleTest {
 
@@ -73,7 +71,7 @@ class OAuthLifecycleTest {
 
     // ── fixture ────────────────────────────────────────────────────────
 
-    /** 对照 Go {@code newOAuthLifecycleFixture} 的初始行：已过期、带旧 refresh token。 */
+    /** 夹具初始行：已过期、带旧 refresh token。 */
     private static McpOAuthToken expiredRow() {
         McpOAuthToken row = new McpOAuthToken();
         row.setTenantId(TENANT_ID);
@@ -99,7 +97,7 @@ class OAuthLifecycleTest {
 
     // ── 用例 ───────────────────────────────────────────────────────────
 
-    /** 对照 Go {@code TestOAuthRuntimeRefreshesExpiredToken}。 */
+    /** 已过期的行在保鲜时被刷新。 */
     @Test
     void refreshesExpiredToken() {
         server.tokenStatus = 200;
@@ -122,7 +120,7 @@ class OAuthLifecycleTest {
         assertTrue(row.getExpiresAt().isAfter(OffsetDateTime.now(ZoneOffset.UTC)));
     }
 
-    /** 对照 Go {@code TestOAuthRuntimeDeletesPermanentlyInvalidRefreshToken}。 */
+    /** 永久失效的 refresh token 会被删除。 */
     @Test
     void deletesPermanentlyInvalidRefreshToken() {
         server.tokenStatus = 400;
@@ -138,7 +136,7 @@ class OAuthLifecycleTest {
         assertNull(repo.peek(PRINCIPAL, TENANT_ID, SERVICE_ID), "永久失败的 token 必须被删除");
     }
 
-    /** 对照 Go {@code TestOAuthRuntimePreservesTokenOnTemporaryRefreshFailure}。 */
+    /** 临时刷新失败时保留 token。 */
     @Test
     void preservesTokenOnTemporaryRefreshFailure() {
         server.tokenStatus = 503;
@@ -153,7 +151,7 @@ class OAuthLifecycleTest {
         assertEquals("old-refresh", row.getRefreshToken());
     }
 
-    /** 对照 Go {@code TestOAuthRuntimeSerializesRotatingRefreshToken}（12 个并发调用者）。 */
+    /** 刷新令牌轮换的串行化（12 个并发调用者）。 */
     @Test
     void serializesRotatingRefreshToken() throws Exception {
         server.tokenStatus = 200;
@@ -192,7 +190,6 @@ class OAuthLifecycleTest {
     }
 
     /**
-     * 对照 Go {@code TestOAuthRuntimeDoesNotExpireNonRefreshableTokenEarly}：
      * 没有 refresh token 的行，{@code skew} 不得缩短它的寿命。
      */
     @Test
@@ -219,7 +216,7 @@ class OAuthLifecycleTest {
         assertEquals(0, server.tokenRequests(), "没有任何 refresh 请求");
     }
 
-    /** 对照 Go {@code TestTokenStatusDoesNotTreatExpiredRowAsAuthorized}。 */
+    /** 已过期的行不算"已授权"（仍是可刷新态）。 */
     @Test
     void tokenStatusDoesNotTreatExpiredRowAsAuthorized() {
         OAuthToken expired = new OAuthToken("stale-access", "refresh", "Bearer",
@@ -237,7 +234,7 @@ class OAuthLifecycleTest {
         assertEquals(OAuthAuthorizationStatus.STATE_REAUTH_NEEDED, status.state());
     }
 
-    /** 对照 Go：没有 token 行时保鲜直接要重新授权，且不碰上游。 */
+    /** 没有 token 行时保鲜直接要重新授权，且不碰上游。 */
     @Test
     void missingTokenRowRequiresReauthorization() {
         FakeOAuthRepository empty = new FakeOAuthRepository();
@@ -253,11 +250,10 @@ class OAuthLifecycleTest {
     }
 
     /**
-     * 对照 Go {@code TestOAuthCallRefreshesAndRetriesResource401Once} /
-     * {@code TestOAuthCallDoesNotRetryMoreThanOnce} 的判定侧。
+     * "资源 401 后刷新并只重试一次"的判定侧。
      *
      * <p>Java 的"只重试一次"由 {@code DefaultMcpClient.oauthCall} 的结构保证
-     * （协议层已翻译，测试在 {@code McpClientProtocolTest}）。本用例钉住它依赖的
+     * （协议层已实现，测试在 {@code McpClientProtocolTest}）。本用例钉住它依赖的
      * 两个运行时判定：<b>哪些异常算授权失败</b>，以及<b>强制刷新确实会刷新</b>——
      * 后者是"重试一次能成功"的前提。</p>
      */
@@ -290,7 +286,7 @@ class OAuthLifecycleTest {
         runtime.ensureFresh(McpContext.none(), true, null);
         assertEquals(1, server.tokenRequests(), "强制刷新必须真的去刷新");
 
-        // 3. 触发异常里携带的 handler 会被用来刷新（对照 Go client.GetOAuthHandler）
+        // 3. 触发异常里携带的 handler 会被用来刷新
         repo.seed(PRINCIPAL, expiredRow());
         runtime.ensureFresh(McpContext.none(), true,
                 new OAuthAuthorizationRequiredException(runtime.handler()));

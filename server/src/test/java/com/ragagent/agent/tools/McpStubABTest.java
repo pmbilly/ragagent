@@ -28,12 +28,12 @@ import static org.assertj.core.api.Assertions.assertThat;
  * MCP stub A/B：双端同打同一形态的 stub MCP server（JSON-RPC over streamable HTTP），
  * 比对 initialize / notifications/initialized / tools/list / tools/call 的请求体逐字节。
  *
- * <p>Go 侧探针（/tmp/toolrec45c zz_rec45c_c_test.go TestZZRec45CMcpStub）以同款 stub 录下
- * 它发出的请求体（rec.jsonl 的 mcp_stub/req_NN 组）；本测试用同一应答脚本驱动 Java 的
+ * <p>录制程序以同款 stub 录下参照端发出的请求体
+ * （rec.jsonl 的 mcp_stub/req_NN 组）；本测试用同一应答脚本驱动 Java 的
  * McpClientManager → DefaultMcpClient → McpToolWrapper，再逐字节回放比对。</p>
  *
- * <p><b>W5γ4.21 对齐</b>：initialize 报文曾与 Go 有差异（旧常量 2024-11-05，且键序把
- * capabilities 放在 clientInfo 之前），现已照 mcp-go v0.52.0 对齐——protocolVersion 是
+ * <p>initialize 报文曾与参照端有差异（旧常量 2024-11-05，且键序把
+ * capabilities 放在 clientInfo 之前），现按 mcp-go v0.52.0 的形态对齐——protocolVersion 是
  * {@code 2025-11-25}、键序 protocolVersion→clientInfo→capabilities。故 <b>initialize 也纳入
  * 逐字节比对</b>（数值 id 两端都从 1 起步，可整串比）；tools/list / tools/call /
  * notifications/initialized 照旧比对。</p>
@@ -48,7 +48,7 @@ class McpStubABTest {
     record RecordedRequest(String body) {
     }
 
-    /** 与 Go 探针相同的应答脚本（initialize/tools/list/tools/call）。 */
+    /** 与录制时相同的应答脚本（initialize/tools/list/tools/call）。 */
     private static String resultFor(String method, JsonNode req) {
         Map<String, Object> result = new LinkedHashMap<>();
         switch (method) {
@@ -182,7 +182,7 @@ class McpStubABTest {
         REQUESTS.forEach(r -> javaBodies.add(r.body()));
         assertThat(javaBodies.size()).isGreaterThanOrEqualTo(5);
 
-        // Go 实录的请求序列：req_00 initialize, req_01 notifications/initialized,
+        // 录制常量的请求序列：req_00 initialize, req_01 notifications/initialized,
         // req_02 initialize, req_03 notifications/initialized, req_04 tools/list, req_05 tools/call
         JsonNode goInit = Tools45cFakes.rec45c("mcp_stub", "req_00");
         JsonNode goNotify = Tools45cFakes.rec45c("mcp_stub", "req_01");

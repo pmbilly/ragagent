@@ -46,7 +46,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 /**
- * MCP OAuth HTTP 层契约（对照 Go internal/handler/mcp_oauth.go）。
+ * MCP OAuth HTTP 层契约。
  *
  * <p>用 standalone MockMvc（不装 Filter 链）：鉴权/RBAC 由 AuthFilter 与 RbacInterceptor
  * 承担，路由注册是主会话的工作，本用例只钉住 <b>controller 自身的端点契约</b>：
@@ -54,7 +54,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
  *
  * <p>{@code Gate} 与 {@code McpClientManager} 都还没有 Spring bean，故用
  * {@link DefaultListableBeanFactory} 造 {@code ObjectProvider}：不注册 bean 即
- * 等价 Go 的 {@code h.gate == nil} 分支。</p>
+ * 等价于 gate 未装配的分支。</p>
  */
 class McpOAuthControllerTest {
 
@@ -340,7 +340,7 @@ class McpOAuthControllerTest {
         org.mockito.Mockito.verify(gate).resolve(anyLong(), anyString(), anyString(), any(Decision.class));
     }
 
-    /** 对照 Go {@code mcp_oauth.go:311-360} 的四条错误映射。 */
+    /** gate 错误的四条 HTTP 映射。 */
     @Test
     void resolveMapsGateErrors() throws Exception {
         Gate gate = mock(Gate.class);
@@ -360,7 +360,7 @@ class McpOAuthControllerTest {
                         .value("user mismatch: only the session owner may resolve this prompt"));
     }
 
-    // ── 6. urlQueryEscape（对照 Go handler/auth.go:494-505） ─────────────
+    // ── 6. urlQueryEscape ─────────────
 
     @Test
     void urlQueryEscapeReplacesOnlyTheSevenCharacters() {

@@ -25,9 +25,9 @@ import com.ragagent.agent.tools.GoRecording45B;
 import com.ragagent.agent.tools.RecordingSupport;
 
 /**
- * 波 4.5b 回放：query_knowledge_graph（对照 Go 实录，探针 {@code zz_rec45b_graph_test.go}）。
- * 纯 fake GraphSearch（seam 已隔离）；多成功 KB 的输出文本因 Go map 迭代序随机，
- * 探针/回放均只用单成功 KB 场景做文本比对（已知差异，见报告）。
+ * 4.5b 回放：query_knowledge_graph 的录制回放。
+ * 纯 fake GraphSearch（seam 已隔离）；多成功 KB 的输出文本因参照端 map 迭代序随机，
+ * 录制/回放均只用单成功 KB 场景做文本比对（已知差异，见报告）。
  */
 class WikiGraphRecordingTest {
 

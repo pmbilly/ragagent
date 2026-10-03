@@ -21,8 +21,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 /**
- * W5a 收尾批契约测试（56 条 w5a-* golden 逐条掩码比对；golden 来源：
- * scripts/record-w5a-golden.sh 对 Go dev server 的实录）。
+ * 契约测试（56 条 w5a-* golden 逐条掩码比对；golden 来源：
+ * scripts/record-w5a-golden.sh 录制）。
  *
  * <p>覆盖 13 条小散路由：</p>
  * <ul>
@@ -32,9 +32,9 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
  *   <li>IM 回调 2：GET|POST /im/callback/:channel_id（engine 级无鉴权）</li>
  * </ul>
  *
- * <p>场景顺序严格复刻录制脚本（顺序敏感：logout 放最后——它吊销 java-phase1 的
+ * <p>场景顺序与录制脚本严格一致（顺序敏感：logout 放最后——它吊销 java-phase1 的
  * 全部 token；refresh 的 sleep 是为了让轮换出的 refresh_token 与旧值不同，
- * 与录制脚本一致——同秒 JWT 会逐字节相同，Go 的 auth_tokens 撤销检查会变成
+ * 与录制脚本一致——同秒 JWT 会逐字节相同，令牌撤销检查会变成
  * 堆序掷硬币，见约定 §9「W5a 补充」）。</p>
  *
  * <p>掩码面：uuid / 时间戳 / JWT（access_token/refresh_token/token）/
@@ -244,7 +244,7 @@ class W5aSundryRoutesContractTest {
         assertGolden(putJson("/api/v1/knowledge-bases/" + kb + "/tags/" + tagA, owner,
                 "{\"name\":\"   \"}"), 400, "w5a-tag-update-blank.json");
 
-        // updates 键是 **knowledge_id**、值是 tag uuid 列表（knowledge.go L955-968）
+        // updates 键是 **knowledge_id**、值是 tag uuid 列表
         assertGolden(putJson("/api/v1/knowledge/tags", owner,
                 "{\"kbId\":\"" + kb + "\",\"updates\":{\"" + REF_KG + "\":[\"" + tagC + "\"]}}"),
                 204, "w5a-tag-ref-assign.json");
@@ -271,7 +271,7 @@ class W5aSundryRoutesContractTest {
         r = expect(201, postJson("/api/v1/agents/" + agent + "/im-channels", owner,
                 "{\"platform\":\"mattermost\",\"name\":\"w5a-im\"}"), "w5a-im-channel-create.json");
         String channel = jsonPath(r, "id");
-        // enabled 渠道：Go dev 的 mattermost webhook 工厂建适配器失败 → 503 not available
+        // enabled 渠道：mattermost webhook 工厂建适配器失败 → 503 not available
         //（Java 无 adapter factory → 同形 503，MATCH 非 XDEP）
         assertGolden(get("/api/v1/im/callback/" + channel), 503,
                 "w5a-im-callback-enabled-get.json");

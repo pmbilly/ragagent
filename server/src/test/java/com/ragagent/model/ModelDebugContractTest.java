@@ -45,11 +45,11 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 
 /**
- * 阶段 7 契约测试：POST /api/v1/models/{id}/debug（模型调试），对照 golden 逐字节比对。
+ * 模型调试契约测试：POST /api/v1/models/{id}/debug，对照 golden 逐字节比对。
  *
- * <p>golden 来源：Go dev server（2026-09-22 录制，scripts/record-modeldebug-golden.sh），
+ * <p>golden 录制：scripts/record-modeldebug-golden.sh，
  * 上游是脚本化 stub LLM（scripts/stub-llm-server.py）；本测试用 in-JVM
- * {@link HttpServer} 复刻同一 stub 的响应（chat 流式/非流式、embeddings、rerank、
+ * {@link HttpServer} 重放同一 stub 的响应（chat 流式/非流式、embeddings、rerank、
  * audio/transcriptions 401 探针），种子数据与录制脚本同构（租户 10009、模型
  * b0000000-…-01..09）。唯一掩码：elapsed_ms。</p>
  */
@@ -99,7 +99,7 @@ class ModelDebugContractTest {
 
     private String token;
 
-    // ── in-JVM stub LLM（复刻 scripts/stub-llm-server.py 的响应） ──────────
+    // ── in-JVM stub LLM（对齐 scripts/stub-llm-server.py 的响应） ──────────
 
     @BeforeAll
     static void startStub() throws IOException {
@@ -173,7 +173,7 @@ class ModelDebugContractTest {
         }
     }
 
-    /** audio/transcriptions：缺/空 Authorization（含 Go 的 "Bearer " 尾随空格形态）→ 401。 */
+    /** audio/transcriptions：缺/空 Authorization（含 "Bearer " 尾随空格形态）→ 401。 */
     private static void audio(HttpExchange ex) throws IOException {
         String auth = ex.getRequestHeaders().getFirst("Authorization");
         if (auth == null || auth.trim().isEmpty() || auth.trim().equals("Bearer")) {

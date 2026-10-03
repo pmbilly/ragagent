@@ -16,16 +16,16 @@ import com.ragagent.retrieval.support.ChunkSearchUtil;
 import com.ragagent.knowledge.support.KnowledgeIndexContent;
 
 /**
- * 摘要管线与向量索引的确定性纯逻辑（2026-09-22 走查批补全 regenerate-summary 时新增）。
+ * 摘要管线与向量索引的确定性纯逻辑。
  *
- * <p>覆盖：{@link Chunk#embeddingContent()}（Go Chunk.EmbeddingContent）、
- * {@link KnowledgeIndexContent#build}（Go buildKnowledgeIndexContent）、
- * {@link ImageInfoEnricher#collectImageInfoByChunkIds}（Go CollectImageInfoByChunkIDs
- * 的两级解析/去重/容错）、{@link ChunkSearchUtil#generatedQuestionSourceId}
- * （Go GeneratedQuestionSourceID 的 64 字节折叠）。</p>
+ * <p>覆盖：{@link Chunk#embeddingContent()}、
+ * {@link KnowledgeIndexContent#build}、
+ * {@link ImageInfoEnricher#collectImageInfoByChunkIds}
+ * 的两级解析/去重/容错、{@link ChunkSearchUtil#generatedQuestionSourceId}
+ * 的 64 字节折叠。</p>
  *
  * <p>不依赖 Spring 上下文：LLM 主链路（doRegenerate 状态机 / summary chunk 维护 /
- * 向量重建）已在真 PG 环境实测验证（走查文档 regenerate-summary 200 + completed +
+ * 向量重建）已在真 PG 环境实测验证（regenerate-summary 200 + completed +
  * summary chunk 复用 + source_id 形态对齐），此处只钉纯函数。</p>
  */
 class SummaryPipelineLogicTest {

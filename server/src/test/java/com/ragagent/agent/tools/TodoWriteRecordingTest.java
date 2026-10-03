@@ -7,9 +7,9 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
- * TodoWriteTool 的 Go 实录（5 条有效用例；bad_json 一条不录——Go 在
- * json.Unmarshal 层失败，Java 的 args 在上游已解析成 JsonNode，分层差异
- * 已在类注释备案）。output 文本与 data map 的 Go json.Marshal 字节逐字比对
+ * TodoWriteTool 的录制语料（5 条有效用例；bad_json 一条不录——录制侧
+ * 在 JSON 解析层失败，Java 的 args 在上游已解析成 JsonNode，分层差异
+ * 已在类注释说明）。output 文本与 data map 的 JSON 字节逐字比对
  * （data 用 ToolJson 编码：键序 + HTML 转义 + 数字形态）。
  */
 class TodoWriteRecordingTest {

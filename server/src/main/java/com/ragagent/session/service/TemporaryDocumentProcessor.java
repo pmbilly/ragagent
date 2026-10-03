@@ -121,8 +121,7 @@ final class TemporaryDocumentProcessor {
         Map<String, String> metadata;
         try {
             CreateOptions options = optionsOf(document);
-            // 资源租户：共享 agent 的解析依赖范围；文档行仍属上传方（照 Go Process 的
-            // "attachment row and file remain scoped to payload.TenantID"）
+            // 资源租户：共享 agent 的解析依赖范围；文档行仍属上传方
             long resourceTenantId = options.resourceTenantId() != 0 ? options.resourceTenantId()
                     : tenantId;
             byte[] data = fileStore.getFile(document.getResourceRef());
@@ -130,23 +129,23 @@ final class TemporaryDocumentProcessor {
             String extNoDot = ext.startsWith(".") ? ext.substring(1) : ext;
             String engine = options.parserEngine();
             if (engine.isEmpty() || "auto".equals(engine)) {
-                // 租户级规则兜底（照 Go parse：未显式指定时用租户配置解析）
+                // 租户级规则兜底（未显式指定时用租户配置解析）
                 engine = tenantParserEngine(resourceTenantId, ext);
             }
             if (TEXT_EXTENSIONS.contains(ext) && (engine.isEmpty() || engine.equals("auto"))) {
                 content = new String(data, StandardCharsets.UTF_8);
                 metadata = Map.of("parser", "plain_text");
-                // Go：nil slice json.Marshal → 4 字节 "null" 字面量写入 jsonb（不是 SQL NULL，
+                // 空列表写入 jsonb 的是 4 字节 "null" 字面量（不是 SQL NULL，
                 // golden 实测读回渲染 null）——H2 列 NOT NULL，必须写字符串 "null"
                 imageRefs = "null";
             } else if (AUDIO_FORMAT_EXTENSIONS.contains(extNoDot)) {
-                // 音频：ASR 转写（照 Go parse 的 docparser.IsAudioFormat 分支）
+                // 音频：ASR 转写
                 content = transcribeAudio(resourceTenantId, options.asrModelId(), data,
                         document.getFileName());
                 metadata = Map.of("parser", "asr");
                 imageRefs = "null";
             } else {
-                // Go 传给 docreader 的 fileType 去掉点（ReadRequest.FileType）
+                // 传给 docreader 的 fileType 去掉点
                 DocReaderClient.ParseResult parsed = docReader.read(data, document.getFileName(),
                         extNoDot, document.getFileName(), "auto".equals(engine) ? "" : engine);
                 // docreader

@@ -100,7 +100,7 @@ class ConversationSerializerTest {
         assertThat(ConversationSerializer.truncate("line1\n\nline3", 10)).isEqualTo(STR_TRUNC_MULTILINE);
         assertThat(ConversationSerializer.truncate("abc\n\nmore text here to be cut", 5))
                 .isEqualTo(STR_TRUNC_NEWLINE_MARKER);
-        // Go TrimSpace 的 unicode 空白（NBSP）——Java strip() 会漏
+        // NBSP 也算空白要剥掉——{@code String.strip()} 会漏
         assertThat(ConversationSerializer.truncate("\u00A0padded\u00A0", 10)).isEqualTo("padded");
     }
 
@@ -111,7 +111,7 @@ class ConversationSerializerTest {
     }
 
     /**
-     * B50：数字文本归一（Go `limit=5` ↔ Java `limit=5.0`）——两侧同归一后比较。
+     * 数字文本归一（{@code limit=5} ↔ {@code limit=5.0} 两种写法）——两侧同归一后比较。
      */
     private static String fold(String s) {
         return com.ragagent.agent.tools.RecordingSupport.normalizeNumberText(s);

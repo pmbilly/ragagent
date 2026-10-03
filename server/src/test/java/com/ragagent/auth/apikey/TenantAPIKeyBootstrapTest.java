@@ -10,9 +10,7 @@ import com.ragagent.auth.apikey.service.TenantAPIKeyBootstrap;
 import org.junit.jupiter.api.Test;
 
 /**
- * 建租户时自动发 Key / 响应嵌 Key 的支持函数测试——对照 Go
- * internal/handler/tenant.go 的 {@code autoCreateTenantAPIKey}（L513-526）与
- * {@code tenantWithAPIKey}（L496-511），以及 {@code isPlatformTenantOptionalAPI}。
+ * 建租户时自动发 Key / 响应嵌 Key 的支持函数测试。
  */
 class TenantAPIKeyBootstrapTest {
 
@@ -50,8 +48,7 @@ class TenantAPIKeyBootstrapTest {
         Map<String, Object> merged = TenantAPIKeyBootstrap.tenantWithApiKey(tenant, "sk-once");
 
         assertThat(merged).containsEntry("apiKey", "sk-once");
-        // Go 的实现走 map（Marshal → map → 加键），encoding/json 对 map 按字母序输出，
-        // 且**递归**对嵌套 map 生效
+        // 响应键按字母序输出，且**递归**对嵌套 map 生效
         assertThat(merged.keySet()).containsExactly("apiKey", "id", "name", "nested", "status");
         @SuppressWarnings("unchecked")
         Map<String, Object> nested = (Map<String, Object>) merged.get("nested");

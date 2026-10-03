@@ -17,9 +17,9 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 
 /**
- * 极简 OAuth 授权服务器桩（对照 Go 测试里的 {@code httptest.NewServer}）。
+ * 极简 OAuth 授权服务器桩。
  *
- * <p>Java 侧没有 httptest，故手写一个只实现本项目用例所需行为的桩：
+ * <p>手写一个只实现本项目用例所需行为的桩：
  * 元数据发现、token 端点、动态注册端点，以及每个端点的"被调用次数 / 收到的表单"记录。</p>
  */
 public final class OAuthServerStub implements AutoCloseable {

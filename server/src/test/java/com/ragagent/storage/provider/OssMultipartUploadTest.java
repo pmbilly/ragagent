@@ -35,13 +35,13 @@ import com.aliyun.oss.model.UploadPartRequest;
 import com.aliyun.oss.model.UploadPartResult;
 
 /**
- * OSS 大文件分片上传（W5γ4.20）——对照 Go {@code oss.go} 的
+ * OSS 大文件分片上传——
  * {@code multipartThreshold = 10MB} + {@code Uploader(PartSize=10MB, ParallelNum=3)}：
  * &gt;10MB 走 {@code initiate → uploadPart ×N（并发 3）→ complete}（失败 abort），
- * 小文件仍单次 {@code putObject}；错误前缀照 Go（分片带 {@code (multipart)}）。
+ * 小文件仍单次 {@code putObject}；分片错误前缀带 {@code (multipart)}。
  *
  * <p>用 Mockito 桩住 {@code OSS} 客户端（不触网）；片大小/阈值由包内构造器注入小值，
- * 以便在测试里断言片序、片大小与并发上限（Go 常量本身另有用例钉住）。</p>
+ * 以便在测试里断言片序、片大小与并发上限（常量本身另有用例钉住）。</p>
  */
 class OssMultipartUploadTest {
 
@@ -78,7 +78,7 @@ class OssMultipartUploadTest {
 
         String path = service.saveFile(file(data, "a.txt"), 7L, "kb-1");
 
-        // pathPrefix 补尾斜杠（照 Go）
+        // pathPrefix 补尾斜杠
         assertThat(path).startsWith("oss://" + BUCKET + "/pref/7/kb-1/").endsWith(".txt");
         verify(client, times(1)).putObject(eq(BUCKET), anyString(), any(InputStream.class),
                 any(ObjectMetadata.class));

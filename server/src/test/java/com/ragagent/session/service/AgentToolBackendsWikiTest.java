@@ -149,7 +149,7 @@ class AgentToolBackendsWikiTest {
         assertThat(after.outLinks()).isEmpty();
     }
 
-    /** deletePage 后读不到（Go 软删；接缝契约同 getPageBySlug → null）。 */
+    /** deletePage 后读不到（软删；接缝契约同 getPageBySlug → null）。 */
     @Test
     void deletePageRemovesFromReadPath() {
         pages.createPage(view("entity/acme-corp"), WikiContentRewrite.WIKI_EDIT_SOURCE_AGENT);

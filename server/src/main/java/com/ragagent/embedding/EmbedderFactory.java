@@ -20,13 +20,11 @@ import com.ragagent.llm.provider.ProviderName;
 import com.ragagent.llm.provider.ProviderRegistry;
 
 /**
- * embedder 工厂（对照 Go {@code internal/models/embedding/embedder.go} 的
- * {@code NewEmbedder/newEmbedder} 全文）。
+ * embedder 工厂。
  *
- * <p>装饰顺序（注释逐条对照 Go）：最内层是真实 embedder →
- * {@code wrapEmbeddingConcurrency}（子批往返逐个过闸）→ debug/langfuse 装饰器
- * <b>未翻译</b>（§9 阶段 4.0 差异 1/2：langfuse 与 LLM debug 日志未实现，等价于
- * Go 未启用路径）。</p>
+ * <p>装饰顺序：最内层是真实 embedder →
+ * {@code wrapEmbeddingConcurrency}（子批往返逐个过闸）→
+ * langfuse 与 LLM debug 日志装饰器未实现（等价于未启用路径）。</p>
  */
 public final class EmbedderFactory {
 
@@ -34,9 +32,9 @@ public final class EmbedderFactory {
     }
 
     /**
-     * 对照 {@code NewEmbedder}。
+     * 构造 embedder（含统一装饰）。
      *
-     * @param governor 进程级并发闸门（Go 的 limiter 包级 governor 的 Java 装配形态）
+     * @param governor 进程级并发闸门
      */
     public static Embedder newEmbedder(EmbedderConfig config, EmbedderPooler pooler,
                                        OllamaService ollamaService, ConcurrencyGovernor governor) {
@@ -46,7 +44,7 @@ public final class EmbedderFactory {
         return e;
     }
 
-    /** 对照 {@code newEmbedder}：按 source → provider 路由。 */
+    /** 按 source → provider 路由。 */
     static Embedder newEmbedderInner(EmbedderConfig config, EmbedderPooler pooler,
                                      OllamaService ollamaService) {
         String source = config.getSource() == null ? "" : config.getSource().toLowerCase(Locale.ROOT);

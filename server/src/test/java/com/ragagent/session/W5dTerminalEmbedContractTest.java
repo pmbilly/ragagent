@@ -221,7 +221,7 @@ class W5dTerminalEmbedContractTest {
                 call("GET", "/api/v1/embed/" + CID8 + "/files?file_path=local://77/exports/x.png",
                         embedHeaders()));
 
-        // 404 空体（Go c.Status(404)；plainStatus 提交空响应，Tomcat 阀门不补默认体）
+        // 404 空体（plainStatus 提交空响应，Tomcat 阀门不补默认体）
         MvcResult missing = call("GET",
                 "/api/v1/embed/" + CID8 + "/files?file_path=local://10008/exports/no-such.png",
                 embedHeaders());

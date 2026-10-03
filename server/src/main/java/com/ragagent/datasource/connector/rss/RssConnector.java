@@ -127,10 +127,9 @@ public class RssConnector implements Connector {
      * 每个 feed URL 都要<b>抓得到且解析得动</b>，
      * 任意一个失败就整体失败。
      *
-     * <p>失败文案逐字对齐 Go：抓取失败是 {@code "fetch feed <url>: <err>"}、
+     * <p>失败文案是既定契约：抓取失败是 {@code "fetch feed <url>: <err>"}、
      * 解析失败是 {@code "parse feed <url>: <err>"}。两者都是<b>普通
-     * {@link ConnectorException}</b>（不是 {@code InvalidConfig}/{@code InvalidCredentials}）
-     * ——Go 那边也只是 {@code fmt.Errorf}，没有哨兵。</p>
+     * {@link ConnectorException}</b>（不是 {@code InvalidConfig}/{@code InvalidCredentials}）。</p>
      */
     @Override
     public void validate(DataSourceConfig config) {
@@ -153,7 +152,7 @@ public class RssConnector implements Connector {
 
     /**
      * feed 是扁平列表、没有层级，
-     * 所以一个选择没有祖先要展开——恒回空列表（Go 也是 {@code []string{}}）。
+     * 所以一个选择没有祖先要展开——恒回空列表。
      */
     @Override
     public List<String> resolveResourceAncestors(DataSourceConfig config, List<String> resourceIds) {

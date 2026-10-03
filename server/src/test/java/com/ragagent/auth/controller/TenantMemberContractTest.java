@@ -30,10 +30,10 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 /**
- * 空间成员 / 邀请 / API-Principal 契约测试（波 2 第六批，17 条路由）。
- * golden：record-members-golden.sh（90+ 条 mb-*，全部 Go 实录）。
+ * 空间成员 / 邀请 / API-Principal 契约测试（17 条路由）。
+ * golden：record-members-golden.sh（90+ 条 mb-*）。
  *
- * <p>种子严格复刻录制脚本：租户 10002 基线成员行（owner/viewer/contributor，
+ * <p>种子与录制脚本严格一致：租户 10002 基线成员行（owner/viewer/contributor，
  * joined_at 显式固定 → 列表顺序稳定）、三个一次性用户（601/602/603）的用户名/邮箱
  * 逐字一致（成员列表的 email/username 是响应字段，不是掩码）。</p>
  *
@@ -41,8 +41,8 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
  * （@BeforeEach 重播种）。掩码：UUID / 时间戳 / 邀请 id / JWT / invite_url /
  * expires_at_unix。</p>
  *
- * <p><b>已知不录</b>：API-Key 直加成功（201）的 invited_by 依赖 Go 的
- * GetUserByTenantID（caller=租户第一个用户）；Java 侧未接线（合成用户兜底）——
+ * <p><b>已知不录</b>：API-Key 直加成功（201）的 invited_by 依赖
+ * 「caller=租户第一个用户」的用户解析；Java 侧未接线（合成用户兜底）——
  * 见 APIKeyRoutePolicies 注释与 §9 API Key 回补差异 #2。403 拒授 Owner 的用例
  * 与 caller 身份无关，正常覆盖。</p>
  */
@@ -451,7 +451,7 @@ class TenantMemberContractTest {
         assertEquals(200, e.getResponse().getStatus(), raw(e));
         assertEquals(golden("mb-inv-list-empty.json"), raw(e));
 
-        // 复刻录制态：B 先经 API 直加成员 → 登录（JWT 带租户 10002）→ 成员行被 SQL 删掉
+        // 与录制态一致：B 先经 API 直加成员 → 登录（JWT 带租户 10002）→ 成员行被 SQL 删掉
         // —— 这种 token 访问 /me/invitations 时 auth 中间件 403（有租户上下文但无成员关系）；
         // 而"从未是成员"的 B 登录解析为 tenantless，/me 是 tenant-optional 会 200 空列表。
         jdbc.update("INSERT INTO tenant_members (user_id, tenant_id, role, status) "

@@ -213,7 +213,7 @@ public class SessionKnowledgeQaService {
                     chatModelSupportsVision = chatModelInfo.getParameters() != null && chatModelInfo.getParameters().isSupportsVision();
                 }
             } catch (RuntimeException e) {
-                // Go: err != nil → 留 false
+                // 获取失败 → 保持 false
             }
         }
         if (req.agentConfig != null) {
@@ -277,7 +277,7 @@ public class SessionKnowledgeQaService {
         // Apply custom agent overrides
         resolution.applyAgentOverridesToChatManage(req, chatManage);
 
-        // Pipeline 选择（Go L167-207）
+        // Pipeline 选择
         boolean hasKb = hasKnowledgeRetrievalScope(searchTargets, kb.kbIds, kb.knowledgeIds);
         boolean needsRag = hasKb || req.webSearchEnabled;
         boolean hasHistory = chatManage.getMaxRounds() > 0;
@@ -341,7 +341,7 @@ public class SessionKnowledgeQaService {
     }
 
     // ==================================================================
-    // KnowledgeQAByEvent（Go L669-806）
+    // KnowledgeQAByEvent
     // ==================================================================
 
     public void knowledgeQAByEvent(ChatManage chatManage, List<String> eventList) {
@@ -406,7 +406,7 @@ public class SessionKnowledgeQaService {
                 stageSpan.finish(java.util.Map.of("duration_ms", stageDuration), null, stageErr);
             }
 
-            // 用户停止：先于 ErrSearchNothing 判定（Go L764-771）
+            // 用户停止：先于"检索无结果"判定
             if (cancelled()) {
                 PipelineLog.warn("Pipeline", "stage_cancelled", Map.of(
                         "event", eventType, "duration_ms", stageDuration, "reason", "context canceled"));
@@ -448,7 +448,7 @@ public class SessionKnowledgeQaService {
     }
 
     // ==================================================================
-    // SearchKnowledge（Go L811-927）
+    // SearchKnowledge
     // ==================================================================
 
     public List<SearchResult> searchKnowledge(List<String> knowledgeBaseIds, List<String> knowledgeIds,
@@ -481,13 +481,13 @@ public class SessionKnowledgeQaService {
                 rc = new RetrievalConfigView(tenant.getRetrievalConfig());
             }
         } catch (RuntimeException e) {
-            // Go: err2 != nil → rc 保持 nil（GetEffective* 兜底）
+            // 获取失败 → 保持 null（由 GetEffective* 兜底）
         }
 
         ChatManage chatManage = new ChatManage();
         chatManage.setQuery(query);
         chatManage.setUserId(userId);
-        // Go 侧插件从 ctx 取 tenant；Java 无 ctx，经 ChatManage 传递（对照 QA 路径
+        // 插件从 ChatManage 取租户（无隐式上下文；与 QA 路径同源
         // retrievalTenantId 的同款赋值）——漏了它 Merge 阶段 faq_enrich/expand 全跳过，
         // knowledge-search 响应的 content 就少了前后文扩块，与 Go 逐字节对不上。
         chatManage.setTenantId(tenantId);
@@ -586,7 +586,7 @@ public class SessionKnowledgeQaService {
     }
 
     // ==================================================================
-    // fallback（Go L929-1196）
+    // fallback
     // ==================================================================
 
     static String trailTrim(String s) {
@@ -602,7 +602,7 @@ public class SessionKnowledgeQaService {
         return s.substring(0, end);
     }
 
-    /** renderFallbackPrompt（Go L1055-1076）。 */
+    /** 渲染 fallback prompt。 */
     String renderFallbackPrompt(ChatManage chatManage) {
         String query = chatManage.getQuery();
         String rq = chatManage.getRewriteQuery() == null ? "" : chatManage.getRewriteQuery().trim();
@@ -623,7 +623,7 @@ public class SessionKnowledgeQaService {
         return result;
     }
 
-    /** buildKBDocumentListing（Go L1081-1146）。 */
+    /** 组装 KB 文档清单。 */
     private String buildKbDocumentListing(ChatManage chatManage) {
         Set<String> kbIds = new LinkedHashSet<>();
         if (chatManage.getSearchTargets() != null) {
@@ -698,7 +698,7 @@ public class SessionKnowledgeQaService {
         return s.substring(0, i);
     }
 
-    /** consumeFallbackStream（Go L1149-1197）。 */
+    /** 消费 fallback 流。 */
     void consumeFallbackStream(ChatManage chatManage,
             java.util.concurrent.BlockingQueue<StreamResponse> responseChan, Registry modelContext) {
         String fallbackId = com.ragagent.event.EventIds.generateEventID("fallback");
@@ -761,7 +761,7 @@ public class SessionKnowledgeQaService {
         }
     }
 
-    /** emitKnowledgeReferencesEvent（Go L1204-1219）。 */
+    /** 发送 knowledge_references 事件。 */
     private static void emitKnowledgeReferencesEvent(ChatManage chatManage) {
         if (chatManage == null || chatManage.getEventBus() == null
                 || chatManage.getMergeResult() == null || chatManage.getMergeResult().isEmpty()) {
@@ -780,7 +780,7 @@ public class SessionKnowledgeQaService {
         }
     }
 
-    /** emitFallbackAnswer（Go L1222-1245）。 */
+    /** 发送 fallback 答案。 */
     void emitFallbackAnswer(ChatManage chatManage, String content) {
         EventBusInterface eventBus = chatManage.getEventBus();
         if (eventBus == null) {
@@ -805,7 +805,7 @@ public class SessionKnowledgeQaService {
     }
 
     // ==================================================================
-    // web search 解析（Go L1249-1291）
+    // web search 解析
     // ==================================================================
 
     private String resolveWebSearchProviderId(QaSupport.QaRequest req, long tenantId) {
@@ -823,7 +823,7 @@ public class SessionKnowledgeQaService {
                 }
             }
         } catch (RuntimeException ignored) {
-            // Go: err != nil → 落空
+            // 获取失败 → 留空
         }
         return "";
     }
@@ -875,7 +875,7 @@ public class SessionKnowledgeQaService {
     }
 
     // ==================================================================
-    // 纯函数族（Go L617-666）
+    // 纯函数族
     // ==================================================================
 
     public static Map<String, List<String>> mergeTagScopesByKb(List<TagScope> scopes) {
@@ -964,7 +964,7 @@ public class SessionKnowledgeQaService {
         return tid;
     }
 
-    /** 当前语言（Go types.LanguageNameFromContext；dev 缺省 en-US）。 */
+    /** 当前语言（dev 缺省 en-US）。 */
     static String currentLanguage() {
         return "en-US";
     }
@@ -1013,7 +1013,7 @@ public class SessionKnowledgeQaService {
         }
     }
 
-    /** RetrievalConfig 的读取视图（GetEffective* 兜底，Go types.RetrievalConfig）。 */
+    /** RetrievalConfig 的读取视图（GetEffective* 兜底）。 */
     private record RetrievalConfigView(JsonNode raw) {
         String rerankModelId() { return raw == null ? null : raw.path("rerankModelId").asText(null); }
         int embeddingTopK() { return effInt("embeddingTopK", 30); }

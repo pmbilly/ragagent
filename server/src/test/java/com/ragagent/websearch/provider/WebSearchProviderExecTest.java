@@ -23,8 +23,8 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 
 /**
- * web_search 执行面的 stub server A/B：请求体/URL 与 Go 实录（wire/ws_*.json）
- * 逐字节比对 + Go 各 provider 测试的确定性分支移植（日期表/限额/错误文案）。
+ * web_search 执行面的 stub server A/B：请求体/URL 与录制（wire/ws_*.json）
+ * 逐字节比对 + 各 provider 确定性分支（日期表/限额/错误文案）。
  */
 class WebSearchProviderExecTest {
 
@@ -125,7 +125,7 @@ class WebSearchProviderExecTest {
         return p;
     }
 
-    // ── Bocha（对照 bocha.go / bocha_test.go）────────────────────────
+    // ── Bocha ────────────────────────
 
     @Test
     void bochaSearchBodyAndResultMapping() {
@@ -201,7 +201,7 @@ class WebSearchProviderExecTest {
 
         assertDoesNotThrow(() -> BochaProvider.validateParameters(params("sk-test")));
 
-        // 实录错误体（2026-09-05 采集）：message 字段 + 字符串 code
+        // 线上错误体形状：message 字段 + 字符串 code
         Stub unauthorized = new Stub(401,
                 "{\"log_id\":\"4a995aed60e4088e\",\"message\":\"Invalid API KEY\",\"code\":\"401\"}");
         try {
@@ -226,7 +226,7 @@ class WebSearchProviderExecTest {
         }
     }
 
-    // ── Brave（对照 brave_test.go）───────────────────────────────────
+    // ── Brave ───────────────────────────────────
 
     @Test
     void braveSearchUrlMatchesRecordingAndMapsAges() {
@@ -239,7 +239,7 @@ class WebSearchProviderExecTest {
             p.baseUrl = stub.url();
             List<WebSearchResult> results = p.searchWithFilters("rust & go", 2, false,
                     new WebSearchFilters("de", "pw"));
-            // Go 的 url.Values.Encode() 按键字母序（count/country/freshness/q）
+            // 查询串按键名字母序编码（count/country/freshness/q）
             assertEquals("count=2&country=DE&freshness=pw&q=rust+%26+go",
                     stub.requests.get(0).query());
             assertEquals("test-subscription",
@@ -391,7 +391,7 @@ class WebSearchProviderExecTest {
         }
     }
 
-    // ── Keenable（对照 keenable_test.go）─────────────────────────────
+    // ── Keenable ─────────────────────────────
 
     @Test
     void keenableKeylessAndKeyedBodies() {
@@ -445,7 +445,7 @@ class WebSearchProviderExecTest {
         }
     }
 
-    // ── Metaso（对照 metaso_test.go）─────────────────────────────────
+    // ── Metaso ─────────────────────────────────
 
     @Test
     void metasoBodyMappingAndValidation() {
@@ -491,7 +491,7 @@ class WebSearchProviderExecTest {
         }
     }
 
-    // ── Zhipu（对照 zhipu_test.go）───────────────────────────────────
+    // ── Zhipu ───────────────────────────────────
 
     @Test
     void zhipuBodyTruncationAndMapping() {
@@ -568,7 +568,7 @@ class WebSearchProviderExecTest {
         }
     }
 
-    // ── Exa（对照 exa_test.go）───────────────────────────────────────
+    // ── Exa ───────────────────────────────────────
 
     @Test
     void exaBodyMappingDatesAndHighlights() {
@@ -615,7 +615,7 @@ class WebSearchProviderExecTest {
         }
     }
 
-    // ── SearXNG（对照 searxng_test.go）───────────────────────────────
+    // ── SearXNG ───────────────────────────────
 
     @Test
     void searxngSearchAndUnresponsiveDiagnostics() {
@@ -630,7 +630,7 @@ class WebSearchProviderExecTest {
             provider.baseUrl = stub.url();
             List<WebSearchResult> results = provider.search("hello", 5, true);
             assertEquals(wireBody("ws_searxng"), stub.requests.get(0).body());
-            // URL 字母序：format 先于 language 先于 q（对照 Go 的 url.Values.Encode）
+            // URL 字母序：format 先于 language 先于 q（查询串按键名排序编码）
             String url = wireUrl("ws_searxng");
             assertEquals(url.substring(url.indexOf('?')),
                     "?" + stub.requests.get(0).query());
