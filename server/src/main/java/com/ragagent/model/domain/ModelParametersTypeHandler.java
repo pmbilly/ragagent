@@ -76,11 +76,9 @@ public class ModelParametersTypeHandler extends BaseTypeHandler<ModelParameters>
         try {
             ModelParameters params = MAPPER.readValue(json, ModelParameters.class);
             // 宽容解密：密钥缺失/轮换 → 置空（"credential not configured"），行照常加载
+            // （与 DataSource/APIPrincipal/WebSearch 各 Scan 路径同口径：置空即信号，不记日志）
             CryptoService.LenientResult apiKey = cryptoService.decryptStoredSecretLenient(params.getApiKey());
             params.setApiKey(apiKey.ok() ? apiKey.plaintext() : "");
-            if (!apiKey.ok() && !json.contains("\"api_key\":\"\"")) {
-                // 解密失败且存量值非空串：保留观测点（当前无操作）
-            }
             CryptoService.LenientResult appSecret = cryptoService.decryptStoredSecretLenient(params.getAppSecret());
             params.setAppSecret(appSecret.ok() ? appSecret.plaintext() : "");
             return params;

@@ -721,6 +721,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | **B46 档 3 第九刀（验证驱动裁决）** | GoUrl / GoPath×2 / GoStyleErrorReportValve 逐类裁决 | P2 | 小 | ✅ **完成（2026-10-03）**——`GoUrl` 保留（95 位全表实测 7+2 处转义差异、无真实环境可验证）；`GoPath`×2 保留（POSIX 语义/平台相关性/安全面，21/24 一致但空结果差异含安全退步）；`GoStyleErrorReportValve` 裁决误标（非 Go 复刻）。**档 3 收口口径确立：逐类裁决（退役/误标/契约保留），不因名字强删**。详见 15.1.1 |
 | **B47 保留类改名** | 契约保留类修标签（GitLabUrl/GitLabPath/PosixPath/PlainTextErrorReportValve） | P3 | 小 | ✅ **完成（2026-10-03）**——用户拍板：保留类的 `Go*` 名误导后人；行为零变更（~85 处引用 + 4 处 javadoc）；`PosixPath` 顺带归位 `common/text`；**误标修正不计退役进度**；全量 4706 + spotlessCheck 绿。剩 `Go*` 名字仅 C 类 5 个（+ GoogleProvider 误报）。详见 15.1.1 |
 | **B48 注释大清洗专项** | 全仓注释去 Go 锚点/翻译腔/过期引用（用户 2026-10-03 立项，B9 专项化；main+test） | P2 | 大 | ✅ **完成（2026-10-03）**——11,932 匹配行/1,723 文件起步 → 棘轮基线 3,999→**0**（`--write` 已刷新）；口径=先摘不变量再删锚点、不变量中性化（「GORM 隐式行为清单」→「落库行为清单」逐条保留）、裸形态盲区补扫（`Go X:`/`照 Go`/Go 专名指针/omitempty/nil/len→Java 本位）；白名单=域词（wiki 批次·句柄翻译·SQL 可移植）/`@DisplayName`·断言消息/方法名/有效 § 引用/`GoRecording*` 实录（禁止手改）；与档 3（B37~B47）交叉期清单三次过期，收尾改「开工实时 grep」。compile + spotlessCheck 绿。详见 15.1.1 |
+| **B52 B48 排查批** | 审批事件流断链修复 + 三项待复核疑点闭环 | P1 | 小 | ✅ **完成（2026-10-04）**——实锤修复：`ApprovalBridge` 原样转投使三类审批事件 instanceof 失配、聊天流审批卡静默消失（审批面板路径幸存故冒烟未抓到），补 `toPayloadData` 四对 DTO 映射 + `ApprovalBridgeTest` 4 用例；疑点①③ 复核**无需动作**（语义比较器整值浮点归一 / 四创建点全显式赋值）；疑点② 删空 if 死分支（对齐宽容置空 house 口径）。回归 + spotlessCheck 绿。详见 15.1.1 |
 
 ### 15.1.1 执行记录（索引：正文已移出，按批号 Ctrl-F）
 
@@ -789,6 +790,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | ✅ B46（2026-10-03，档 3 第九刀：验证驱动裁决） | **✅ B46（2026-10-03）**——`GoUrl`/`GoPath`×2 **保留**（探针实测：转义 7+2 处差异 / 路径 21/24 一致但空结果差异含安全退步；无真实环境可验证）；`GoStyleErrorReportValve` = 误标（HTTP 契约非 Go 复刻）；**档 3 口径改为逐类裁决**。 |
 | ✅ B47（2026-10-03，保留类改名） | **✅ B47（2026-10-03）**——保留类修标签：`GoUrl`→`GitLabUrl`、`GoPath`→`GitLabPath`/`PosixPath`（归位 common/text）、`GoStyleErrorReportValve`→`PlainTextErrorReportValve`、`GoCompatTest`→`GitLabCompatTest`；行为零变更；全量 4706 + spotlessCheck 绿。 |
 | ✅ B48（2026-10-03，注释大清洗专项：Go 锚点/翻译腔/过期引用归零） | **✅ B48（2026-10-03，B9 专项化收官）**——main+test 11,932 匹配行/1,723 文件起步 → 棘轮基线 3,999→**0**（`--write` 已刷新）；不变量中性化（落库行为清单/SSE 帧契约/签名算法等事实逐条保留）+ 裸形态盲区补扫 + D 类错误陈述就地核实修正（wiki 列默认值、favorite 旧信封形态、mcp 键名方向等）；白名单五类留档（域词/@DisplayName·断言消息/方法名/有效 § 引用/GoRecording* 实录）；与档 3 交叉期悬挂 `{@link GoXxx}` 按过期引用清。compile + spotlessCheck + 棘轮绿。 |
+| ✅ B52（2026-10-04，B48 排查批：审批事件流断链修复） | **✅ B52（2026-10-04）**——`ApprovalBridge` 原样转投致三类审批事件 instanceof 失配、聊天流审批卡静默消失；补 `toPayloadData` 四对 DTO 映射 + `ApprovalBridgeTest`；B48 三项待复核全部闭环（score=语义比较器归一无需动作 / 解密空 if 删除 / wiki 零值 page_type 不可达）。回归 + spotlessCheck 绿。 |
 
 ### 15.2 批次纪律（每批通用，违者必翻车——全是本轮实锤）
 

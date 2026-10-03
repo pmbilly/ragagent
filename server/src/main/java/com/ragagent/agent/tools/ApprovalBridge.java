@@ -10,7 +10,8 @@ import com.ragagent.event.EventBus;
  *   <li>{@code ToolCancellation}（ctx.Err() 语义）→ {@code approval.Cancellation}
  *       （isCancelled + onCancel 最小面；工具侧没有"取消时回调"的注册点，实现为 no-op）；</li>
  *   <li>{@code event.EventBus / event.Event} → {@code approval.EventBus / approval.Event}
- *       （gate 只发不订——逐字段转投真实总线）。</li>
+ *       （gate 只发不订——逐字段转投真实总线）；</li>
+ *   <li>{@code approval.*} 门内 DTO → {@code event.payload.*} 线格式 DTO（见 {@link #toPayloadData}）。</li>
  * </ul>
  */
 public final class ApprovalBridge {
@@ -75,8 +76,40 @@ public final class ApprovalBridge {
                 approvalEvent.id(),
                 approvalEvent.type() == null ? "" : approvalEvent.type().value(),
                 approvalEvent.sessionId(),
-                approvalEvent.data(),
+                toPayloadData(approvalEvent.data()),
                 approvalEvent.metadata(),
                 approvalEvent.requestId()));
+    }
+
+    /**
+     * common.approval 的门内 DTO → event.payload 的线格式 DTO。
+     * SSE 转发层（AgentStreamBridge）只认 event.payload 形态——缺了这层映射，
+     * 审批请求/决议事件会因 instanceof 失配被静默丢弃，聊天流里永远不出现审批卡。
+     * 未知形态原样透传（向后兼容）。
+     */
+    private static Object toPayloadData(Object data) {
+        if (data instanceof com.ragagent.common.approval.ToolApprovalRequiredData d) {
+            return new com.ragagent.event.payload.ToolApprovalRequiredData(
+                    d.pendingId(), d.tenantId(), d.sessionId(), d.assistantMessageId(),
+                    d.serviceId(), d.serviceName(), d.mcpToolName(), d.registeredToolName(),
+                    d.description(), d.args(), d.argsJson(), d.timeoutSeconds(),
+                    d.requestedAtUnix(), d.toolCallId(), d.requestId());
+        }
+        if (data instanceof com.ragagent.common.approval.ToolApprovalResolvedData d) {
+            return new com.ragagent.event.payload.ToolApprovalResolvedData(
+                    d.pendingId(), d.approved(), d.reason(), d.timedOut(), d.canceled());
+        }
+        if (data instanceof com.ragagent.common.approval.McpOauthRequiredData d) {
+            return new com.ragagent.event.payload.MCPOAuthRequiredData(
+                    d.pendingId(), d.tenantId(), d.sessionId(), d.assistantMessageId(),
+                    d.serviceId(), d.serviceName(), d.mcpToolName(), d.timeoutSeconds(),
+                    d.requestedAtUnix(), d.toolCallId(), d.requestId());
+        }
+        if (data instanceof com.ragagent.common.approval.McpOauthResolvedData d) {
+            return new com.ragagent.event.payload.MCPOAuthResolvedData(
+                    d.pendingId(), d.serviceId(), d.authorized(), d.reason(),
+                    d.timedOut(), d.canceled());
+        }
+        return data;
     }
 }
