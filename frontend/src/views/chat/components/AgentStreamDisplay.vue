@@ -3115,7 +3115,6 @@ const handleAddToKnowledge = (answerEvent: any) => {
 
 .tree-root-summary {
   :deep(strong) {
-    font-weight: 600;
     color: var(--td-text-color-primary);
   }
 }
@@ -3144,9 +3143,9 @@ const handleAddToKnowledge = (answerEvent: any) => {
 
 .tree-child {
   position: relative;
-  padding-left: 42px;
+  padding-left: 32px;
   padding-bottom: 0;
-  margin-bottom: 18px;
+  margin-bottom: 10px;
 
   // vertical trunk line (continues for non-last children)
   // bottom: -6px extends the line through the margin-bottom gap between siblings
@@ -3867,7 +3866,7 @@ const handleAddToKnowledge = (answerEvent: any) => {
 
   .tree-child .action-title-icon {
     position: absolute;
-    left: -42px;
+    left: -32px;
     top: 3px;
   }
 

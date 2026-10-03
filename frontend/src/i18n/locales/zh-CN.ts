@@ -4040,7 +4040,7 @@ export default {
   },
   input: {
     addModel: '添加模型',
-    placeholder: '你好，请提出你的问题',
+    placeholder: '您好，有什么可以帮您？',
     placeholderWithContext: '输入问题，将基于上方选中的知识库/文件回答',
     placeholderWebOnly: '输入问题，将结合网络搜索回答',
     placeholderKbAndWeb: '输入问题，将基于知识库和网络搜索回答',
