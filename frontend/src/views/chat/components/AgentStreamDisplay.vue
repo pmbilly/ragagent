@@ -3134,7 +3134,7 @@ const handleAddToKnowledge = (answerEvent: any) => {
 .tree-children {
   position: relative;
   padding-left: 0;
-  margin-top: 14px;
+  margin-top: 10px;
   margin-left: 10px;
   max-height: none;
   overflow-y: visible;
