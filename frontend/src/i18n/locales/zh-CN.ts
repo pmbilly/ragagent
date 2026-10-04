@@ -3052,7 +3052,7 @@ export default {
     memoryForgotten: '已删除这条记忆',
     memoryForgetFailed: '删除失败',
     memoryHint: '这些是助手在回答时看到的长期记忆，删除后不会再被使用。',
-    suggestedQuestions: '你可以这样问我',
+    suggestedQuestions: '您可以这样问我',
     followUpQuestions: '继续问',
     followUpQuestionsLoading: '加载推荐问题',
     refreshSuggestedQuestions: '换一批',

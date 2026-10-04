@@ -75,7 +75,7 @@ const messages = {
     "chat": {
       "title": "对话",
       "newChat": "新对话",
-      "suggestedQuestions": "你可以这样问我",
+      "suggestedQuestions": "您可以这样问我",
       "suggestedQuestionsLoading": "加载中...",
       "followUpQuestions": "继续问",
       "followUpQuestionsLoading": "加载推荐问题",
