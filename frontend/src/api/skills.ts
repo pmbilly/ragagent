@@ -1,4 +1,4 @@
-import { del, get, post } from '@/utils/request'
+import { del, get, post, put } from '@/utils/request'
 
 /**
  * 指令型技能（平台级技能库）。
@@ -48,6 +48,27 @@ export interface CreateSkillPayload {
   content: string
 }
 
+/** 更新载荷：slug 不可改（服务端也不接收）。 */
+export interface UpdateSkillPayload {
+  name: string
+  description: string
+  content: string
+}
+
+/** 编辑草稿：content 是**正文**（服务端已从落库的 SKILL.md 里剥掉 frontmatter）。 */
+export interface SkillDetail {
+  id: string
+  slug: string
+  name: string
+  description: string
+  content: string
+  version: number
+  createdBy: string
+  createdAt: string
+  updatedAt: string
+  referencedBy: SkillReference[]
+}
+
 /** 选择器数据源：智能体编辑器 → 技能区（Viewer）。 */
 export function listSkills() {
   return get<{ skills: InstructionalSkillInfo[]; skillsAvailable: boolean }>('/api/v1/skills')
@@ -61,6 +82,19 @@ export function listSkillCatalog() {
 /** 新建技能（SystemAdmin）；frontmatter 由服务端组装并自校验。 */
 export function createSkill(data: CreateSkillPayload) {
   return post<SkillCatalogItem>('/api/v1/skills/catalog', data)
+}
+
+/** 编辑草稿（SystemAdmin）：用于「编辑」弹窗回填，正文不含 frontmatter。 */
+export function getSkillCatalogItem(id: string) {
+  return get<SkillDetail>(`/api/v1/skills/catalog/${id}`)
+}
+
+/**
+ * 更新技能（SystemAdmin）。slug 不可改；name 是运行期身份（agent 的 selectedSkills 存的是它），
+ * 被引用时改名会返回 409 + 引用清单（前端应先行拦截，见 skillManagementForm.describeRenameBlock）。
+ */
+export function updateSkill(id: string, data: UpdateSkillPayload) {
+  return put<SkillCatalogItem>(`/api/v1/skills/catalog/${id}`, data)
 }
 
 /**

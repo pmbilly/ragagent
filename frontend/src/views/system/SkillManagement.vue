@@ -66,8 +66,8 @@
       </template>
       <template #actions="{ row }">
         <div class="sm-row-actions">
-          <t-link theme="primary" hover="color" @click="openDetail(row)">
-            {{ t('skillManagement.view') }}
+          <t-link theme="primary" hover="color" @click="openEdit(row)">
+            {{ t('skillManagement.edit') }}
           </t-link>
           <t-link theme="danger" hover="color" @click="askDelete(row)">
             {{ t('skillManagement.delete') }}
@@ -76,26 +76,35 @@
       </template>
     </t-table>
 
-    <!-- 新建：只填 slug/名称/描述/正文，frontmatter 由服务端组装 -->
+    <!-- 新建 / 编辑：同一个弹窗两种模式；frontmatter 始终由服务端组装 -->
     <t-dialog
-      v-model:visible="createVisible"
-      :header="t('skillManagement.createTitle')"
+      v-model:visible="editorVisible"
+      :header="editorHeader"
       width="720px"
-      :confirm-btn="{ content: t('skillManagement.createSubmit'), loading: creating }"
+      :confirm-btn="{
+        content: editorMode === 'create' ? t('skillManagement.createSubmit') : t('skillManagement.saveSubmit'),
+        loading: submitting,
+        disabled: saveBlocked,
+      }"
       :cancel-btn="{ content: t('skillManagement.createCancel') }"
-      @confirm="submitCreate"
-      @close="closeCreate"
+      @confirm="submitEditor"
+      @close="closeEditor"
     >
-      <div class="sm-form">
+      <div v-if="loadingDraft" class="sm-draft-loading">{{ t('skillManagement.loadingDraft') }}</div>
+
+      <div v-else class="sm-form">
         <div class="sm-field">
           <label>{{ t('skillManagement.slugLabel') }}</label>
           <t-input
             v-model="form.slug"
             :placeholder="t('skillManagement.slugPlaceholder')"
+            :disabled="editorMode === 'edit'"
             :status="errors.slug ? 'error' : undefined"
           />
           <p v-if="errors.slug" class="sm-field-error">{{ t(`skillManagement.${errors.slug}`) }}</p>
-          <p v-else class="sm-field-hint">{{ t('skillManagement.slugHint') }}</p>
+          <p v-else class="sm-field-hint">
+            {{ editorMode === 'edit' ? t('skillManagement.slugImmutable') : t('skillManagement.slugHint') }}
+          </p>
         </div>
 
         <div class="sm-field">
@@ -103,9 +112,16 @@
           <t-input
             v-model="form.name"
             :placeholder="t('skillManagement.namePlaceholder')"
-            :status="errors.name ? 'error' : undefined"
+            :status="errors.name || renameBlock ? 'error' : undefined"
           />
           <p v-if="errors.name" class="sm-field-error">{{ t(`skillManagement.${errors.name}`) }}</p>
+          <p v-else-if="renameBlock" class="sm-field-error">
+            {{ t('skillManagement.renameBlocked', {
+              count: renameBlock.count,
+              agents: renameBlock.names.join('、'),
+            }) }}
+            <span v-if="renameBlock.hasAllMode">{{ t('skillManagement.deleteAllModeHint') }}</span>
+          </p>
           <p v-else class="sm-field-hint">{{ t('skillManagement.nameHint') }}</p>
         </div>
 
@@ -137,18 +153,6 @@
       </div>
     </t-dialog>
 
-    <!-- 详情：完整 SKILL.md 原文（只读） -->
-    <t-drawer
-      v-model:visible="detailVisible"
-      :header="detailTitle"
-      size="640px"
-      :footer="false"
-    >
-      <p class="sm-drawer-hint">{{ t('skillManagement.detailHint') }}</p>
-      <div v-if="detailLoading" class="sm-drawer-loading">{{ t('skillManagement.loadingContent') }}</div>
-      <pre v-else class="sm-content">{{ detailContent }}</pre>
-    </t-drawer>
-
     <!-- 删除：被引用时展示影响面并要求二次确认（force） -->
     <t-dialog
       v-model:visible="deleteVisible"
@@ -164,7 +168,7 @@
       @confirm="confirmDelete"
     >
       <p>{{ t('skillManagement.deleteConfirm', { name: deleteTarget?.name || '' }) }}</p>
-      <p v-if="deleteImpact" class="sm-delete-impact">
+      <p v-if="deleteImpact" class="sm-warn">
         {{ t('skillManagement.deleteReferenced', {
           count: deleteImpact.count,
           agents: deleteImpact.names.join('、'),
@@ -184,18 +188,24 @@ import { useI18n } from 'vue-i18n'
 import {
   createSkill,
   deleteSkill,
-  getSkillFileContent,
+  getSkillCatalogItem,
   listSkillCatalog,
+  updateSkill,
   type SkillCatalogItem,
+  type SkillReference,
 } from '@/api/skills'
 import {
   buildSkillFilePreview,
   describeDeleteImpact,
+  describeRenameBlock,
   EMPTY_SKILL_FORM,
+  formFromDetail,
   hasErrors,
   toCreatePayload,
+  toUpdatePayload,
   validateSkillForm,
   type SkillFormErrors,
+  type SkillFormMode,
   type SkillFormValues,
 } from './skillManagementForm'
 
@@ -239,63 +249,99 @@ async function reload() {
 
 onMounted(reload)
 
-// ── 新建 ──────────────────────────────────────────────────────────────
-const createVisible = ref(false)
-const creating = ref(false)
+// ── 新建 / 编辑（同一弹窗两种模式）────────────────────────────────────
+const editorVisible = ref(false)
+const editorMode = ref<SkillFormMode>('create')
+const editorTarget = ref<SkillCatalogItem | null>(null)
+const editorRefs = ref<SkillReference[]>([])
+const loadingDraft = ref(false)
+const submitting = ref(false)
 const form = ref<SkillFormValues>({ ...EMPTY_SKILL_FORM })
 const errors = ref<SkillFormErrors>({})
 
 const preview = computed(() => buildSkillFilePreview(form.value))
 
+const editorHeader = computed(() => (
+  editorMode.value === 'create'
+    ? t('skillManagement.createTitle')
+    : t('skillManagement.editTitle', { name: editorTarget.value?.name || '' })
+))
+
+/**
+ * 改名拦截：name 是运行期身份（agent 的 selectedSkills 存的是它），被引用时改名会让那些
+ * 智能体静默失去技能（后端也会 409）——这里先行挡住并说明原因。
+ */
+const renameBlock = computed(() => (
+  editorMode.value === 'edit'
+    ? describeRenameBlock(editorTarget.value?.name || '', form.value.name, editorRefs.value)
+    : null
+))
+
+const saveBlocked = computed(() => loadingDraft.value || !!renameBlock.value)
+
 function openCreate() {
+  editorMode.value = 'create'
+  editorTarget.value = null
+  editorRefs.value = []
   form.value = { ...EMPTY_SKILL_FORM }
   errors.value = {}
-  createVisible.value = true
+  editorVisible.value = true
 }
 
-function closeCreate() {
-  createVisible.value = false
+async function openEdit(row: SkillCatalogItem) {
+  editorMode.value = 'edit'
+  editorTarget.value = row
+  editorRefs.value = row.referencedBy || []
+  // 先用列表里的字段占位，正文等草稿（GET /catalog/{id}）回来后再填
+  form.value = formFromDetail(row)
   errors.value = {}
-}
-
-async function submitCreate() {
-  const found = validateSkillForm(form.value)
-  errors.value = found
-  if (hasErrors(found)) return
-  creating.value = true
+  editorVisible.value = true
+  loadingDraft.value = true
   try {
-    await createSkill(toCreatePayload(form.value))
-    MessagePlugin.success(t('skillManagement.createSuccess'))
-    createVisible.value = false
-    await reload()
+    const detail = await getSkillCatalogItem(row.id)
+    form.value = formFromDetail(detail)
+    editorRefs.value = detail.referencedBy || editorRefs.value
   } catch (e: any) {
-    MessagePlugin.error(e?.message || t('skillManagement.createFailed'))
+    MessagePlugin.error(e?.message || t('skillManagement.loadDraftFailed'))
+    editorVisible.value = false
   } finally {
-    creating.value = false
+    loadingDraft.value = false
   }
 }
 
-// ── 详情 ──────────────────────────────────────────────────────────────
-const detailVisible = ref(false)
-const detailLoading = ref(false)
-const detailContent = ref('')
-const detailTarget = ref<SkillCatalogItem | null>(null)
-const detailTitle = computed(() =>
-  detailTarget.value ? `${t('skillManagement.detailTitle')} · ${detailTarget.value.name}` : t('skillManagement.detailTitle'),
-)
+function closeEditor() {
+  editorVisible.value = false
+  errors.value = {}
+  editorTarget.value = null
+  editorRefs.value = []
+}
 
-async function openDetail(row: SkillCatalogItem) {
-  detailTarget.value = row
-  detailContent.value = ''
-  detailVisible.value = true
-  detailLoading.value = true
+async function submitEditor() {
+  const mode = editorMode.value
+  const found = validateSkillForm(form.value, mode)
+  errors.value = found
+  if (hasErrors(found) || saveBlocked.value) {
+    if (renameBlock.value) MessagePlugin.warning(t('skillManagement.renameBlocked', {
+      count: renameBlock.value.count,
+      agents: renameBlock.value.names.join('、'),
+    }))
+    return
+  }
+  submitting.value = true
   try {
-    const res = await getSkillFileContent(row.id)
-    detailContent.value = res?.content || ''
+    if (mode === 'create') {
+      await createSkill(toCreatePayload(form.value))
+      MessagePlugin.success(t('skillManagement.createSuccess'))
+    } else {
+      await updateSkill(editorTarget.value!.id, toUpdatePayload(form.value))
+      MessagePlugin.success(t('skillManagement.saveSuccess'))
+    }
+    editorVisible.value = false
+    await reload()
   } catch (e: any) {
-    detailContent.value = e?.message || t('skillManagement.loadFailed')
+    MessagePlugin.error(e?.message || t(mode === 'create' ? 'skillManagement.createFailed' : 'skillManagement.saveFailed'))
   } finally {
-    detailLoading.value = false
+    submitting.value = false
   }
 }
 
@@ -436,6 +482,11 @@ function formatDateTime(value?: string) {
   gap: 14px;
 }
 
+.sm-draft-loading {
+  padding: 24px 0;
+  color: var(--td-text-color-secondary);
+}
+
 .sm-field {
   display: flex;
   flex-direction: column;
@@ -482,28 +533,7 @@ function formatDateTime(value?: string) {
   }
 }
 
-.sm-drawer-hint {
-  margin: 0 0 10px;
-  font-size: 12px;
-  color: var(--td-text-color-placeholder);
-}
-
-.sm-drawer-loading {
-  color: var(--td-text-color-secondary);
-}
-
-.sm-content {
-  margin: 0;
-  padding: 12px;
-  background: var(--td-bg-color-container-hover);
-  border-radius: 4px;
-  font-size: 12px;
-  line-height: 1.7;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-
-.sm-delete-impact {
+.sm-warn {
   margin: 10px 0 0;
   color: var(--td-warning-color);
   font-size: 13px;

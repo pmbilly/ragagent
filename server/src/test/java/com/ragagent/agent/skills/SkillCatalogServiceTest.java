@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
 /**
@@ -43,6 +45,30 @@ class SkillCatalogServiceTest {
         Skill.SkillValidationException e = assertThrows(Skill.SkillValidationException.class,
                 () -> SkillCatalogService.requireRuntimeIdentity("KB FAQ 整理", parsed));
         assertTrue(e.getMessage().contains("normalized to"), e.getMessage());
+    }
+
+    @Test
+    void bodyRoundTripsThroughAssembleAndParse() {
+        // 编辑弹窗的草稿靠这条可逆性回填：skillBody = parse(落库 SKILL.md).instructions
+        String body = "## 步骤\n\n1. 先检索\n2. 再补齐";
+        String content = SkillCatalogService.assembleSkillFile("skill-a", "skill-a", "说明", body);
+        assertEquals(body, Skill.parseSkillFile(content).instructions);
+    }
+
+    @Test
+    void renameAllowedOnlyWhenUnreferenced() {
+        var ref = new SkillCatalogService.SkillReference("agent-1", "probe", true);
+        // 同名不算改名 → 即使有引用也放行（只改描述/正文）
+        SkillCatalogService.requireRenameAllowed("a", "a", List.of(ref));
+        // 无引用 → 可改名
+        SkillCatalogService.requireRenameAllowed("a", "b", List.of());
+        // 有引用 + 真改名 → 拒绝，且带上引用清单供 409 details 使用
+        SkillCatalogService.RenameWhileReferencedException e = assertThrows(
+                SkillCatalogService.RenameWhileReferencedException.class,
+                () -> SkillCatalogService.requireRenameAllowed("a", "b", List.of(ref)));
+        assertEquals(1, e.references().size());
+        assertEquals("probe", e.references().get(0).agentName());
+        assertTrue(e.getMessage().contains("rename"), e.getMessage());
     }
 
     @Test

@@ -4,9 +4,12 @@ import { test } from 'node:test'
 import {
   buildSkillFilePreview,
   describeDeleteImpact,
+  describeRenameBlock,
   EMPTY_SKILL_FORM,
+  formFromDetail,
   hasErrors,
   toCreatePayload,
+  toUpdatePayload,
   validateSkillForm,
 } from './skillManagementForm.ts'
 
@@ -56,6 +59,33 @@ test('提交载荷去空白', () => {
   const payload = toCreatePayload({ ...valid, slug: ' kb-faq ', content: '  正文  ' })
   assert.equal(payload.slug, 'kb-faq')
   assert.equal(payload.content, '正文')
+})
+
+test('编辑模式：跳过 slug 校验，提交载荷不带 slug', () => {
+  // slug 只读展示、服务端不接收 → 编辑态不该因 slug 报错
+  assert.equal(validateSkillForm({ ...valid, slug: '' }, 'edit').slug, undefined)
+  assert.equal(validateSkillForm({ ...valid, slug: '' }, 'create').slug, 'slugRequired')
+  const payload = toUpdatePayload({ ...valid, name: ' 新名 ', description: ' 说明 ', content: ' 正文 ' })
+  assert.deepEqual(payload, { name: '新名', description: '说明', content: '正文' })
+  assert.equal('slug' in payload, false)
+})
+
+test('编辑草稿回填为表单值', () => {
+  assert.deepEqual(
+    formFromDetail({ slug: 's', name: 'n', description: 'd', content: 'c' }),
+    { slug: 's', name: 'n', description: 'd', content: 'c' },
+  )
+  assert.deepEqual(formFromDetail({}), EMPTY_SKILL_FORM)
+})
+
+test('改名拦截：只改描述/正文放行；被引用时改名被挡（与后端 409 同判据）', () => {
+  const refs = [{ agentId: '1', agentName: 'probe', allMode: false }]
+  assert.equal(describeRenameBlock('a', 'a', refs), null, '同名不算改名')
+  assert.equal(describeRenameBlock('a', ' a ', refs), null, '去空白后同名也算改名')
+  assert.equal(describeRenameBlock('a', 'b', []), null, '无引用可改名')
+  const blocked = describeRenameBlock('a', 'b', refs)
+  assert.equal(blocked?.count, 1)
+  assert.deepEqual(blocked?.names, ['probe'])
 })
 
 test('删除影响面：无引用返回 null，有引用给出数量/名称/allMode', () => {

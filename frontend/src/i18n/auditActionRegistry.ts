@@ -44,6 +44,7 @@ export const SYSTEM_GLOBAL_AUDIT_ACTIONS = [
   'system.queue_task_cancelled',
   'system.queue_archived_purged',
   'skill.created',
+  'skill.updated',
   'skill.deleted',
 ] as const
 

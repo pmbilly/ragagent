@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,7 +29,7 @@ import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
 
 /**
- * 技能管理（平台级，SystemAdmin）：查看 / 新建 / 删除。
+ * 技能管理（平台级，SystemAdmin）：查看 / 新建 / 编辑 / 删除。
  *
  * <p><b>路径沿用裁剪前的 {@code /api/v1/skills/catalog}</b>（当年是沙箱期技能目录），
  * 语义改为「指令型技能入库」——技能 = SKILL.md（frontmatter + 正文），运行期注入提示词，
@@ -55,6 +56,27 @@ public class SkillCatalogController {
 
     /** 新建请求体（content = 技能正文，不含 frontmatter）。 */
     public record CreateSkillRequest(String slug, String name, String description, String content) {
+    }
+
+    /** 更新请求体（编辑弹窗）：slug 不可改，故不接收。 */
+    public record UpdateSkillRequest(String name, String description, String content) {
+    }
+
+    /**
+     * 编辑草稿投影：content = **正文字段**（已从落库的 SKILL.md 里剥掉 frontmatter），
+     * 这样编辑弹窗回填的就是用户当初输入的内容，保存后由服务端重新组装 frontmatter。
+     */
+    public record SkillDetail(
+            String id,
+            String slug,
+            String name,
+            String description,
+            String content,
+            int version,
+            String createdBy,
+            OffsetDateTime createdAt,
+            OffsetDateTime updatedAt,
+            List<SkillCatalogService.SkillReference> referencedBy) {
     }
 
     /** 列表/详情投影（不含 content：内容走 files/content 端点，与裁剪前一致）。 */
@@ -117,6 +139,42 @@ public class SkillCatalogController {
         return ResponseEntity.noContent().build();
     }
 
+    /** 编辑草稿：正文从落库的 SKILL.md 还原（parse → instructions）。 */
+    @GetMapping("/api/v1/skills/catalog/{id}")
+    public ResponseEntity<SkillDetail> getCatalogItem(@PathVariable("id") String id) {
+        SkillCatalogService.SkillRow row = requireRow(id);
+        return ResponseEntity.ok(new SkillDetail(
+                row.id(), row.slug(), row.name(), row.description(), skillBody(row),
+                row.version() == null ? 1 : row.version(), row.createdBy(),
+                row.createdAt(), row.updatedAt(),
+                catalog.listReferences(row.slug(), row.name())));
+    }
+
+    /** 更新技能（slug 不可改；被引用时禁止改名，其余字段随时可改）。 */
+    @PutMapping("/api/v1/skills/catalog/{id}")
+    public ResponseEntity<SkillSummary> updateCatalog(
+            @PathVariable("id") String id,
+            @RequestBody(required = false) UpdateSkillRequest req) {
+        if (req == null) {
+            throw new BizException(AppError.badRequest("request body is required"));
+        }
+        SkillCatalogService.SkillRow current = requireRow(id);
+        SkillCatalogService.SkillRow updated;
+        try {
+            updated = catalog.update(current, req.name(), req.description(), req.content());
+        } catch (Skill.SkillValidationException e) {
+            throw new BizException(AppError.badRequest(e.getMessage()));
+        } catch (SkillCatalogService.RenameWhileReferencedException e) {
+            throw new BizException(AppError.conflict(
+                    "skill is referenced by " + e.references().size()
+                            + " agent(s); rename would make them lose the skill")
+                    .withDetails(referenceDetails(e.references())));
+        }
+        List<SkillCatalogService.SkillReference> refs = catalog.listReferences(updated.slug(), updated.name());
+        audit(AuditAction.SKILL_UPDATED, updated, refs);
+        return ResponseEntity.ok(summary(updated, refs));
+    }
+
     @GetMapping("/api/v1/skills/catalog/{id}/files")
     public ResponseEntity<Map<String, Object>> listCatalogFiles(@PathVariable("id") String id) {
         requireRow(id);
@@ -146,6 +204,11 @@ public class SkillCatalogController {
             throw new BizException(AppError.notFound("skill not found"));
         }
         return row.get();
+    }
+
+    /** 从落库的 SKILL.md 还原正文（与组装严格可逆：assembled body 与 instructions 都 strip）。 */
+    private static String skillBody(SkillCatalogService.SkillRow row) {
+        return Skill.parseSkillFile(row.content()).instructions;
     }
 
     private static SkillSummary summary(SkillCatalogService.SkillRow row, List<SkillCatalogService.SkillReference> refs) {

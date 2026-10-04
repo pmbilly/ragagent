@@ -37,6 +37,7 @@ const SYSTEM_GLOBAL_AUDIT_ACTION_LABELS_EN: Record<string, string> = {
   'system.queue_task_cancelled': 'Queue task cancelled',
   'system.queue_archived_purged': 'All failed tasks cleared',
   'skill.created': 'Skill created',
+  'skill.updated': 'Skill updated',
   'skill.deleted': 'Skill deleted',
 }
 

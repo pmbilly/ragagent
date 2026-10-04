@@ -40,6 +40,7 @@ public final class AuditAction {
 
     /** 新建技能：details 带 id/slug/name。 */
     public static final String SKILL_CREATED = "skill.created";
+    public static final String SKILL_UPDATED = "skill.updated";
     /** 删除技能（软删）：details 带 id/slug/name 与引用它的智能体。 */
     public static final String SKILL_DELETED = "skill.deleted";
 

@@ -131,6 +131,60 @@ public class SkillCatalogService {
         return toRow(row);
     }
 
+    /** 改名被引用保护（API 层映射 409 + 引用清单）。 */
+    public static final class RenameWhileReferencedException extends RuntimeException {
+
+        private final transient List<SkillReference> references;
+
+        public RenameWhileReferencedException(List<SkillReference> references) {
+            super("skill is referenced by " + (references == null ? 0 : references.size())
+                    + " agent(s); rename would orphan them");
+            this.references = references == null ? List.of() : List.copyOf(references);
+        }
+
+        public List<SkillReference> references() {
+            return references;
+        }
+    }
+
+    /**
+     * 更新技能（编辑弹窗）。**slug 不可改**（它是接口寻址与去重键，改名语义 = 删旧建新）。
+     *
+     * <p>name 是运行期身份（agent 配置的 {@code selectedSkills} 存的就是它），因此
+     * <b>被智能体引用时禁止改名</b>——否则那些 agent 会静默失去这个技能；描述与正文随时可改。</p>
+     */
+    public SkillRow update(SkillRow current, String name, String description, String body) {
+        String cleanName = requireName(name);
+        String cleanDesc = requireDescription(description);
+        String cleanBody = requireBody(body);
+        requireRenameAllowed(current.name(), cleanName, listReferences(current.slug(), current.name()));
+
+        String content = assembleSkillFile(cleanName, current.slug(), cleanDesc, cleanBody);
+        Skill parsed = Skill.parseSkillFile(content);
+        requireRuntimeIdentity(cleanName, parsed);
+
+        SkillEntity row = new SkillEntity();
+        row.setId(current.id());
+        row.setName(cleanName);
+        row.setDescription(cleanDesc);
+        row.setContent(content);
+        row.setVersion((current.version() == null ? 1 : current.version()) + 1);
+        row.setUpdatedAt(OffsetDateTime.now());
+        mapper.updateById(row);
+        log.info("[skills] updated skill {} (slug={}, v{})", cleanName, current.slug(), row.getVersion());
+        return findActiveById(current.id()).orElseThrow();
+    }
+
+    /** 改名前置校验（纯逻辑，便于单测）：无引用则可改名。 */
+    static void requireRenameAllowed(String currentName, String nextName, List<SkillReference> refs) {
+        if (currentName == null || currentName.equals(nextName)) {
+            return;
+        }
+        if (refs != null && !refs.isEmpty()) {
+            throw new RenameWhileReferencedException(refs);
+        }
+    }
+
     /** 软删（保留行供审计追溯）。返回是否命中未删行。 */
     public boolean softDelete(String id) {
         Optional<SkillRow> row = findActiveById(id);

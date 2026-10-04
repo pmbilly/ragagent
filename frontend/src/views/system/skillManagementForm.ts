@@ -1,4 +1,4 @@
-import type { CreateSkillPayload, SkillReference } from '@/api/skills'
+import type { CreateSkillPayload, SkillReference, UpdateSkillPayload } from '@/api/skills'
 
 /**
  * 技能新建表单的**纯逻辑**（校验 + SKILL.md 预览 + 删除提示语料）。
@@ -30,13 +30,21 @@ export const EMPTY_SKILL_FORM: SkillFormValues = {
   content: '',
 }
 
-export function validateSkillForm(values: SkillFormValues): SkillFormErrors {
+/** create = 新建（校验 slug）；edit = 编辑（slug 只读展示、不提交，跳过其校验）。 */
+export type SkillFormMode = 'create' | 'edit'
+
+export function validateSkillForm(
+  values: SkillFormValues,
+  mode: SkillFormMode = 'create',
+): SkillFormErrors {
   const errors: SkillFormErrors = {}
-  const slug = values.slug.trim()
-  if (!slug) {
-    errors.slug = 'slugRequired'
-  } else if (!SLUG_PATTERN.test(slug)) {
-    errors.slug = 'slugInvalid'
+  if (mode === 'create') {
+    const slug = values.slug.trim()
+    if (!slug) {
+      errors.slug = 'slugRequired'
+    } else if (!SLUG_PATTERN.test(slug)) {
+      errors.slug = 'slugInvalid'
+    }
   }
 
   const name = values.name.trim()
@@ -81,6 +89,46 @@ export function toCreatePayload(values: SkillFormValues): CreateSkillPayload {
     description: values.description.trim(),
     content: values.content.trim(),
   }
+}
+
+/** 编辑草稿 → 表单值（弹窗回填）；slug 来自落库值，只读展示。 */
+export function formFromDetail(detail: {
+  slug?: string
+  name?: string
+  description?: string
+  content?: string
+}): SkillFormValues {
+  return {
+    slug: detail.slug || '',
+    name: detail.name || '',
+    description: detail.description || '',
+    content: detail.content || '',
+  }
+}
+
+/** 编辑提交载荷：不带 slug（服务端不接收）。 */
+export function toUpdatePayload(values: SkillFormValues): UpdateSkillPayload {
+  return {
+    name: values.name.trim(),
+    description: values.description.trim(),
+    content: values.content.trim(),
+  }
+}
+
+/**
+ * 改名拦截：name 是运行期身份（agent 配置的 selectedSkills 存的是它），被引用时改名会让
+ * 那些智能体静默失去技能，因此服务端返回 409——这里先行拦截（返回 null = 可以保存）。
+ * 只改描述/正文（名字不动）永远放行。
+ */
+export function describeRenameBlock(
+  originalName: string,
+  nextName: string,
+  refs: SkillReference[],
+): { count: number; names: string[]; hasAllMode: boolean } | null {
+  if ((originalName || '').trim() === (nextName || '').trim()) {
+    return null
+  }
+  return describeDeleteImpact(refs)
 }
 
 /**
