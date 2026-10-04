@@ -46,7 +46,7 @@
                     <t-icon name="error-circle-filled" class="mtr-approval-icon" />
                     <span class="mtr-approval-label">{{ $t('mcp.testResult.requireApproval') }}</span>
                     <t-switch
-                      :value="tool.require_approval"
+                      :value="tool.requireApproval"
                       :loading="approvalLoading[tool.name]"
                       :disabled="isToolPolicyBusy(tool.name)"
                       size="small"

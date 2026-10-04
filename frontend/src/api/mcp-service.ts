@@ -61,7 +61,7 @@ export interface MCPTool {
   name: string
   description: string
   inputSchema: Record<string, any>
-  require_approval?: boolean
+  requireApproval?: boolean
   enabled?: boolean
 }
 

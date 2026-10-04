@@ -60,8 +60,8 @@ export interface WikiFolder {
 }
 
 export interface WikiFolderNode extends WikiFolder {
-  page_count: number;
-  has_children: boolean;
+  pageCount: number;
+  hasChildren: boolean;
 }
 
 export interface WikiFolderListResponse {
@@ -76,7 +76,7 @@ export interface WikiGraphMeta {
   truncated: boolean;
   center?: string;
   depth?: number;
-  familiar_count?: number;
+  familiarCount?: number;
 }
 
 export interface WikiGraphData {
@@ -101,11 +101,11 @@ export interface WikiPageIssue {
   tenantId: number;
   knowledgeBaseId: string;
   slug: string;
-  issue_type: string;
+  issueType: string;
   description: string;
-  suspected_knowledge_ids: string[];
+  suspectedKnowledgeIds: string[];
   status: string;
-  reported_by: string;
+  reportedBy: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -135,10 +135,10 @@ export function listWikiPages(kbId: string, params?: {
 }
 
 // listWikiFolders returns the direct child folders of parentId ("" = root),
-// each enriched with a recursive page_count and a has_children flag so the tree
+// each enriched with a recursive pageCount and a hasChildren flag so the tree
 // can render expand affordances and empty folders without a second request.
 // pageTypes scopes the view to a sidebar tab: only folders whose subtree holds
-// a page of those types (or are entirely empty) come back, and page_count is
+// a page of those types (or are entirely empty) come back, and pageCount is
 // counted within those types.
 export function listWikiFolders(kbId: string, parentId = '', pageTypes = '') {
   const query = new URLSearchParams();

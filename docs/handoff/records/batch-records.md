@@ -659,3 +659,18 @@
 - **守卫（第 5、6 条）**：`crossFaceKeyContract.test.ts` —— ⑤ api 面 `*_at` 一律 camel（含 auth 映射钉住，防「注册时间」再退回）；⑥ **api 面 snake 记号棘轮**：32 键基线（8 键已核实合法 + 24 键标「待核实」）+ 5 个面级白名单（chat / system / initialization / retrieval / modelUsage）+ **只许减**（清理后不删基线行会报过期）+ 扫描前剥离字符串字面量（避免把枚举值 `'rbac.member_added'` 当键）。**红态探针两轮**：首版锚定行首 → 漏检行内对象字面量（`{ some_new_key: 1 }` 探针未红），收紧为 `(?<![\w$.])…` 后精确报出 `api/mcp-service.ts:some_new_key`。
 - **验证**：前端全量 **706/706**、`vue-tsc --build` 0 错误、`check-fe-contract-keys.py` 无新增（基线 42 条）、后端 `compileJava + spotlessCheck` 绿（javadoc 改动）；守卫红/绿态各验一次。
 - **遗留（B55 候选）**：棘轮基线里 24 处「待核实」需逐条对后端核实（agent 配置/类型过滤 8、auth 空间知识库摘要与部署开关 9、wiki 页面树/问题载荷 6、mcp `require_approval` 1）。本轮已证明该清单里**藏着真断链**（改密恒失败、KB 复制键错），建议下一批按「读/写方向 + 真实接口实测」逐条给出结论。
+
+**✅ B55（2026-10-04，api 面 snake 记号逐条核实——32 键全部定性：13 改 camel / 6 删死字段 / 13 已核实合法）**
+- **方法**：对 B54 冻结的 32 个 `file:token` 键逐个查「后端 DTO 字段名 / 显式 `put(...)` 的键 / `JsonNode.path(...)` 读取 / 真实接口实测」四类依据；有消费点的用无损探针（错凭据、不存在的 id、写后回读）坐实。
+- **改 camel 13 键（6 处有真实消费点 = 用户可见故障）**：
+  - **偏好 `last_activeTenant_id` → `lastActiveTenantId`**：后端 `UserPreferences` 只有 camel 字段。探针：snake PUT 返回 200 但 `preferences` 仍 `{}`；camel 立即写入（已验并还原）→ 修前「刷新 / 换设备回到上次空间」**永不生效**。
+  - **`oidc_only_login` → `oidcOnlyLogin`**：`UserProfile.vue` 用它做改密门禁 → 恒 false（OIDC 专用账号仍被引导改密）。
+  - **wiki 六键**（`page_count`/`has_children`/`familiar_count`/`issue_type`/`suspected_knowledge_ids`/`reported_by` → camel）：后端 `WikiFolderNode` / `WikiPageIssue` / `WikiGraph.Meta` 全是 camel Java 字段直出（无 `@JsonProperty`）。消费点 13 处 → 修前**文件夹页数恒 0、问题类型标签与举报人永不显示**、图 meta 熟悉度写错键。类型修正后 `vue-tsc` 直接报出消费点行号（再次验证：类型本身是探测器）。
+  - **`require_approval` → `requireApproval`**：`McpTestResultBody.vue` 的「需人工审核」开关读它（`vue-tsc` 抓出）→ 修前开关初始态恒 undefined（后端已开启也显示关闭）。
+  - **KB 摘要四键**（`creator_id`/`creator_name`/`chunk_count`/`document_count` → `creatorId`/`creatorName`/`chunkCount`/`knowledgeCount`）：实测 KB 对象键；注意线上是 **`knowledgeCount`**（`documentCount` 根本不存在），且 4 键当前无消费点（仅注释提及）。
+  - **`is_default` → `isDefault`**：实测 `/api/v1/models` 下发 `isDefault`。
+- **删死字段 6 键**：agent `reflection_enabled`（后端配置白名单不含、仅前端一个默认值）、`sandbox_config_id`（后端注释：随沙箱裁剪退役）、`welcome_message`（后端不产出、无消费点）；建议问题接口的 `knowledge_base_ids`（实现从未发送）；auth `browser_search_instructions`（后端注释：随浏览器连接裁撤）、`UserInfo.knowledge_bases`（后端 user 载荷无此键、无消费点）。
+- **已核实合法 13 键（基线留档，逐条依据）**：`kb_filter`/`any_of`/`all_of`/`none_of`（后端 `AgentTypePresets` 从预设 JSON `item.putObject("kb_filter")` 原样透出）、`file_types`（`ParserEngineRules` 按 snake 读规则 jsonb）、`owner_id`（前端本地快照键）、chat-history 2 键（`node.path(...)` 读 jsonb）、embed 2 键（宿主↔iframe 消息协议）、KB 列表筛选 3 个查询参数。
+- **守卫**：棘轮基线 **32 → 13 键**（只许减，每条附判定依据）；红态探针复验：回流 `page_count` → 精确报 `api/wiki/index.ts:355`，还原即绿。
+- **验证**：前端全量 **706/706**、`vue-tsc --build` 0 错误、`check-fe-contract-keys.py` 无新增；api 面已无未定性 snake 记号（残留 13 键 = 基线本身）。
+- **教训**：① `vue-tsc` 是这类断链的天然探测器——改类型，真消费点立刻报错；② 无损探针（错凭据 / 不存在的 id / 写后回读）能在不动数据的前提下坐实键名方向；③ 死字段与真断链要分开处理：前者删、后者改键并补消费点。

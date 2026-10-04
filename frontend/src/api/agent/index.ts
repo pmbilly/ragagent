@@ -53,7 +53,6 @@ export interface CustomAgentConfig {
   maxIterations?: number;          // 最大迭代次数；-1 表示不限制
   llmCallTimeout?: number;        // LLM调用超时时间（秒）
   allowedTools?: string[];         // 允许的工具
-  reflection_enabled?: boolean;     // 是否启用反思
   // MCP服务选择模式：all=全部启用的MCP服务, selected=指定服务, none=不使用MCP
   mcpSelectionMode?: 'all' | 'selected' | 'none';
   mcpServices?: string[];          // 选择的MCP服务ID列表
@@ -67,9 +66,6 @@ export interface CustomAgentConfig {
   selectedSkills?: string[];       // 选择的Skill名称列表
 
   // ===== 沙箱设置 =====
-  // 该智能体的技能脚本运行在哪个沙箱配置上；为空表示不启用沙箱执行。
-  // 指向逻辑配置而非某个具体版本，凭据轮换时无需重新指派每个智能体。
-  sandbox_config_id?: string;
 
   // ===== 知识库设置 =====
   // 知识库选择模式：all=全部知识库, selected=指定知识库, none=不使用知识库
@@ -136,7 +132,6 @@ export interface CustomAgentConfig {
   intentPrompts?: Record<string, string>;
 
   // ===== 已废弃字段（保留兼容）=====
-  welcome_message?: string;
   questionSuggestions?: QuestionSuggestionConfig;
 }
 
@@ -378,7 +373,6 @@ export interface SuggestedQuestion {
 export function getSuggestedQuestions(
   agentId: string,
   params?: {
-    knowledge_base_ids?: string[];
     knowledgeIds?: string[];
     tagScopes?: Array<{ knowledgeBaseId: string; tagIds: string[] }>;
     limit?: number;

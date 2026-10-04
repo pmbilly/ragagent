@@ -95,13 +95,12 @@ export interface RegisterResponse {
 // 新加 key 时记得：后端 service.UpdateUserPreferences 也要在 merge 分支里
 // 处理；前端调用方按需读 / 默认值降级。
 export interface UserPreferences {
-  browser_search_instructions?: string | null
   // last_activeTenant_id 持久化「刷新 / 换设备 / 重新登录后回到上次的空间」
   // 偏好；后端在 Login / RefreshToken 时校验 membership 有效后才会沿用，
   // 否则回退到 home 并清掉这个字段。传 0 给 PATCH 表示「清除偏好」。
-  last_activeTenant_id?: number | null
+  lastActiveTenantId?: number | null
   // oidc_only_login 为 true 表示账号由 OIDC 自动开通且用户尚未设置已知密码。
-  oidc_only_login?: boolean
+  oidcOnlyLogin?: boolean
 }
 
 // 用户信息接口
@@ -172,7 +171,6 @@ export interface TenantInfo {
   storageUsed?: number
   createdAt: string
   updatedAt: string
-  knowledge_bases?: KnowledgeBaseInfo[]
 }
 
 // 知识库信息接口
@@ -184,14 +182,14 @@ export interface KnowledgeBaseInfo {
   // creator_id is the user id of whoever originally created the KB.
   // Set by PR 5 of the multi-tenant RBAC series; nullable for legacy
   // KBs created before that migration backfilled the column.
-  creator_id?: string
+  creatorId?: string
   // creator_name 由后端 list 接口批量回填（username 优先，退化到 email），
   // 仅用于列表卡片来源徽章；缺失代表无法解析（已删除 / 老数据）。
-  creator_name?: string
+  creatorName?: string
   createdAt: string
   updatedAt: string
-  document_count?: number
-  chunk_count?: number
+  knowledgeCount?: number
+  chunkCount?: number
 }
 
 // 模型信息接口
@@ -201,7 +199,7 @@ export interface ModelInfo {
   type: string
   source: string
   description?: string
-  is_default?: boolean
+  isDefault?: boolean
   createdAt: string
   updatedAt: string
 }

@@ -211,13 +211,17 @@ test('api 面时间键：`*_at` 一律 camel（防 snake 读到 undefined）', (
 })
 
 test('api 面 snake 记号棘轮：只许减不许增', () => {
-  // 2026-10-04 扩面：由「`*_at` 全禁」升级为「api 面所有 snake 声明/读取一律登记」。
-  // 动因：同一天在 api 面发现并修掉 7 处 snake 契约键（auth 时间键 / 邀请 4 字段 +
-  // responded_at + created_at / wiki edited_at / 改密 old_password+new_password），
-  // 其中「修改密码」是实测恒失败的故障（snake body → newPassword/oldPassword: 不能为空）。
-  // 剩余 40 处存量（扫描日 2026-10-04）多为冻结/直出/查询参数面，但**未逐条对后端核实**，
-  // 因此先冻结成棘轮：新增一处即红；清理一处后从 BASELINE 删除（只许减）。
-  // 逐条核实（把「待核实」变成结论：改 camel，或改成具体理由）留给后续核查批。
+  // 2026-10-04 扩面冻结 → 同日逐条核实（B55）。
+  // 首轮扫描 api 面 40 处存量记号（32 个 file:token 键），先冻结成棘轮防新增；
+  // 本轮对后端逐个核实（DTO 字段名 / 显式 put 的键 / JsonNode 读取 / 实测接口）后：
+  //   · 13 键改 camel：偏好 lastActiveTenantId、oidcOnlyLogin，模型 isDefault，
+  //     MCP requireApproval，KB 摘要 creatorId/creatorName/chunkCount/knowledgeCount，
+  //     wiki 六键（pageCount/hasChildren/familiarCount/issueType/suspectedKnowledgeIds/reportedBy）
+  //     —— 其中 6 处有真实消费点（wiki 页数/问题标签/举报人、MCP 审核开关、偏好落库…）。
+  //   · 6 键删除（死字段）：agent reflection_enabled/sandbox_config_id/welcome_message/
+  //     suggested-questions 的 knowledge_base_ids、auth browser_search_instructions、UserInfo.knowledge_bases。
+  //   · 13 键保留为「已核实合法」（下方 BASELINE，每条写明判定依据）。
+  // 口径：新增一处 snake 即红；清理一处后从 BASELINE 删除（只许减）；基线条目消失会报过期。
   const FACE_WHITELIST: Record<string, string> = {
     'api/chat/': 'SSE/事件载荷与本地游标（事件协议面）',
     'api/system/index.ts': '系统设置键 + 沙箱/任务引擎直出载荷（§15.2：不换）',
@@ -226,38 +230,19 @@ test('api 面 snake 记号棘轮：只许减不许增', () => {
     'api/model/modelUsage.ts': '后端 putObject 亲手构造的 snake 载荷（前后端一致）',
   }
   const BASELINE: Record<string, string> = {
-    'api/agent/index.ts:file_types': '解析引擎规则内部键（后端 ParserEngineRules 按 file_types 读，两侧一致）',
-    'api/agent/index.ts:any_of': '待核实：agent 类型过滤载荷',
-    'api/agent/index.ts:all_of': '待核实：agent 类型过滤载荷',
-    'api/agent/index.ts:none_of': '待核实：agent 类型过滤载荷',
-    'api/agent/index.ts:kb_filter': '待核实：agent 类型过滤载荷',
-    'api/agent/index.ts:reflection_enabled': '待核实：agent 配置载荷',
-    'api/agent/index.ts:sandbox_config_id': '待核实：agent 配置载荷',
-    'api/agent/index.ts:welcome_message': '待核实：agent 配置载荷（后端 agent 面无同名字面量，疑似只在前端往返）',
-    'api/agent/index.ts:knowledge_base_ids': '待核实：agent 绑定知识库列表',
-    'api/auth/index.ts:browser_search_instructions': '待核实：部署能力/开关（settings 直出形态）',
-    'api/auth/index.ts:oidc_only_login': '待核实：部署能力/开关（settings 直出形态）',
-    'api/auth/index.ts:owner_id': '待核实：空间知识库摘要',
-    'api/auth/index.ts:knowledge_bases': '待核实：空间知识库摘要',
-    'api/auth/index.ts:creator_id': '待核实：空间知识库摘要',
-    'api/auth/index.ts:creator_name': '待核实：空间知识库摘要',
-    'api/auth/index.ts:document_count': '待核实：空间知识库摘要',
-    'api/auth/index.ts:chunk_count': '待核实：空间知识库摘要',
-    'api/auth/index.ts:is_default': '待核实：空间知识库摘要',
-    'api/chat-history.ts:embedding_model_id': '会话历史知识库配置（后端 node.path 按 snake 读取，两侧一致）',
-    'api/chat-history.ts:knowledge_base_id': '会话历史知识库配置（同上）',
-    'api/embed/index.ts:channel_id': 'embed 宿主↔iframe 消息协议键（两侧同为 snake）',
-    'api/embed/index.ts:session_id': 'embed 宿主↔iframe 消息协议键（两侧同为 snake）',
-    'api/knowledge-base/index.ts:tag_ids': '列表筛选查询参数（后端按 snake 接收）',
-    'api/knowledge-base/index.ts:start_time': '列表筛选查询参数（同上）',
-    'api/knowledge-base/index.ts:end_time': '列表筛选查询参数（同上）',
-    'api/mcp-service.ts:require_approval': '待核实：MCP 工具审批字段',
-    'api/wiki/index.ts:page_count': '待核实：wiki 页面树载荷',
-    'api/wiki/index.ts:has_children': '待核实：wiki 页面树载荷',
-    'api/wiki/index.ts:familiar_count': '待核实：wiki 页面树载荷',
-    'api/wiki/index.ts:issue_type': '待核实：wiki 问题载荷',
-    'api/wiki/index.ts:suspected_knowledge_ids': '待核实：wiki 问题载荷',
-    'api/wiki/index.ts:reported_by': '待核实：wiki 问题载荷',
+    'api/agent/index.ts:kb_filter': '已核实：后端 AgentTypePresets 从预设 JSON 透出（item.putObject("kb_filter")）',
+    'api/agent/index.ts:any_of': '已核实：同上（kb_filter 内层键，定义在预设 JSON 里）',
+    'api/agent/index.ts:all_of': '已核实：同上',
+    'api/agent/index.ts:none_of': '已核实：同上',
+    'api/agent/index.ts:file_types': '已核实：后端 ParserEngineRules 按 file_types 读规则 jsonb，两侧一致',
+    'api/auth/index.ts:owner_id': '已核实：前端本地快照键（注释已声明后端 TenantResponse 无此键）',
+    'api/chat-history.ts:embedding_model_id': '已核实：后端 MessageService/MessageSearch 按 node.path(...) 读 jsonb',
+    'api/chat-history.ts:knowledge_base_id': '已核实：同上',
+    'api/embed/index.ts:channel_id': '已核实：embed 宿主↔iframe 消息协议（widget.js 与 Vue 侧同一套键）',
+    'api/embed/index.ts:session_id': '已核实：同上',
+    'api/knowledge-base/index.ts:tag_ids': '已核实：列表筛选查询参数（后端按 snake 接收）',
+    'api/knowledge-base/index.ts:start_time': '已核实：同上',
+    'api/knowledge-base/index.ts:end_time': '已核实：同上',
   }
   const stripStrings = (line: string): string => line.replace(/'[^']*'|"[^"]*"|`[^`]*`/g, '""')
   // 不锚定行首：行内对象字面量（`{ some_key: 1 }`）也要抓（初版锚定行首，红态探针漏检）

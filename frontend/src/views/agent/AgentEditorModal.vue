@@ -2360,7 +2360,6 @@ const defaultFormData = {
     maxIterations: 10,
     llmCallTimeout: 120,  // 120 seconds
     allowedTools: [] as string[],
-    reflection_enabled: false,
     // MCP 服务设置
     mcpSelectionMode: 'none' as 'all' | 'selected' | 'none',
     mcpServices: [] as string[],

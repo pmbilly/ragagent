@@ -432,13 +432,13 @@
                               <div v-for="issue in pageIssues" :key="issue.id" class="wiki-issue-popup-item">
                                 <div class="wiki-issue-popup-main">
                                   <div class="wiki-issue-popup-tags">
-                                    <t-tag v-if="issue.issue_type === 'mixed_entities'" theme="warning" variant="light"
+                                    <t-tag v-if="issue.issueType === 'mixed_entities'" theme="warning" variant="light"
                                       size="small">{{
                                         $t('knowledgeEditor.wikiBrowser.issueMixed') }}</t-tag>
-                                    <t-tag v-else-if="issue.issue_type === 'contradictory_facts'" theme="danger"
+                                    <t-tag v-else-if="issue.issueType === 'contradictory_facts'" theme="danger"
                                       variant="light" size="small">{{
                                         $t('knowledgeEditor.wikiBrowser.issueConflict') }}</t-tag>
-                                    <t-tag v-else-if="issue.issue_type === 'out_of_date'" theme="default" variant="light"
+                                    <t-tag v-else-if="issue.issueType === 'out_of_date'" theme="default" variant="light"
                                       size="small">{{
                                         $t('knowledgeEditor.wikiBrowser.issueOutdated') }}</t-tag>
                                     <t-tag v-else theme="primary" variant="light" size="small">{{
@@ -449,11 +449,11 @@
                                   </div>
                                   <div class="wiki-issue-popup-meta">
                                     <span class="wiki-issue-popup-reporter">
-                                      {{ issue.reported_by === 'wiki-researcher-agent' ?
+                                      {{ issue.reportedBy === 'wiki-researcher-agent' ?
                                         $t('knowledgeEditor.wikiBrowser.issueAiLinter') :
                                         $t('knowledgeEditor.wikiBrowser.issueReportedBy', {
                                           reporter:
-                                            issue.reported_by
+                                            issue.reportedBy
                                         }) }}
                                     </span>
                                     <div v-if="props.canEdit" class="wiki-issue-popup-actions">
@@ -675,12 +675,12 @@
         <div v-for="issue in globalIssues" :key="issue.id" class="wiki-issue-popup-item">
           <div class="wiki-issue-popup-main">
             <div class="wiki-issue-popup-tags">
-              <t-tag v-if="issue.issue_type === 'mixed_entities'" theme="warning" variant="light" size="small">{{
+              <t-tag v-if="issue.issueType === 'mixed_entities'" theme="warning" variant="light" size="small">{{
                 $t('knowledgeEditor.wikiBrowser.issueMixed') }}</t-tag>
-              <t-tag v-else-if="issue.issue_type === 'contradictory_facts'" theme="danger" variant="light"
+              <t-tag v-else-if="issue.issueType === 'contradictory_facts'" theme="danger" variant="light"
                 size="small">{{
                   $t('knowledgeEditor.wikiBrowser.issueConflict') }}</t-tag>
-              <t-tag v-else-if="issue.issue_type === 'out_of_date'" theme="default" variant="light" size="small">{{
+              <t-tag v-else-if="issue.issueType === 'out_of_date'" theme="default" variant="light" size="small">{{
                 $t('knowledgeEditor.wikiBrowser.issueOutdated') }}</t-tag>
               <t-tag v-else theme="primary" variant="light" size="small">{{
                 $t('knowledgeEditor.wikiBrowser.issueAttention')
@@ -696,8 +696,8 @@
             </div>
             <div class="wiki-issue-popup-meta">
               <span class="wiki-issue-popup-reporter">
-                {{ issue.reported_by === 'wiki-researcher-agent' ? $t('knowledgeEditor.wikiBrowser.issueAiLinter') :
-                  $t('knowledgeEditor.wikiBrowser.issueReportedBy', { reporter: issue.reported_by }) }}
+                {{ issue.reportedBy === 'wiki-researcher-agent' ? $t('knowledgeEditor.wikiBrowser.issueAiLinter') :
+                  $t('knowledgeEditor.wikiBrowser.issueReportedBy', { reporter: issue.reportedBy }) }}
               </span>
               <div class="wiki-issue-popup-actions">
                 <span class="wiki-issue-popup-action" @click="navigateToSlugAndFix(issue.slug)"
@@ -1432,7 +1432,7 @@ const graphFrontierCount = computed(() => {
   return count
 })
 
-const graphFamiliarCount = computed(() => graphData.value?.meta?.familiar_count || 0)
+const graphFamiliarCount = computed(() => graphData.value?.meta?.familiarCount || 0)
 
 // graphStatusCard drives the little summary panel below the legend.
 //
@@ -2184,7 +2184,7 @@ async function loadCategoriesForType(type: string, opts: { reset?: boolean; pare
     const incoming = folders
       .map(folder => ({
         path: String(folder.path || '').split('/').map(part => part.trim()).filter(Boolean),
-        count: Number(folder.page_count) || 0,
+        count: Number(folder.pageCount) || 0,
         id: String(folder.id || ''),
       }))
       .filter(entry => entry.path.length > 0)
@@ -3361,7 +3361,7 @@ function mergeGraphData(
       // hint still reflects the KB-wide total.
       ...incoming.meta,
       returned: nodes.length,
-      familiar_count: familiarCount || undefined,
+      familiarCount: familiarCount || undefined,
     },
   }
 }

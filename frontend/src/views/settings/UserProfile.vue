@@ -213,7 +213,7 @@ const loadPasswordPolicy = async () => {
 }
 
 const oidcOnlyLogin = computed(
-  () => userInfo.value?.preferences?.oidc_only_login === true,
+  () => userInfo.value?.preferences?.oidcOnlyLogin === true,
 )
 
 watch(passwordPopupVisible, (open) => {
