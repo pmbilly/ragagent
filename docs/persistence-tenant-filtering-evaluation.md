@@ -99,3 +99,18 @@ FullTableWriteGuard 同量级。
 3. 后台任务表 → 若确认 scope 三元组即租户边界，迁出并注释。
 
 建议按此清单单独立批（B71+）处置后再切 enforce；本批保持 alert 盘面。
+
+## 6. B71 定性与收口（2026-10-05 同日完成）
+
+72 条语句（去探针后）全部定性归入 `TenantFilterGuard.ALLOWED_STATEMENTS`，按五族登记：
+**认证面**（hash/bot 身份/邮箱定位——请求期无租户上下文，7 条）、**调度面**（IM 渠道投递/
+数据源同步轮询全表是设计行为，4 条）、**跨空间身份关系面**（成员/邀请/收藏按 user 维度
+天生跨空间，4 条）、**按 id/父键传递**（UUID 取行 + requireKb/AccessGuard 上层守卫，
+或按 kb_id/knowledge_id/item_id 传递，54 条——含 wiki 全族 33 条）、**内部任务队列**
+（scope 三元组即边界，5 条）。真漏（需补条件的）：**0 条**——与本仓「UUID + 上层守卫」
+的既有边界模型一致，B60 型漏洞的根因是「连守卫都没有」，不是「SQL 少了谓词」。
+
+**默认档已切 enforce**（`weknora.persistence.tenant-filter-guard`，env
+`WEKNORA_TENANT_FILTER_GUARD` 可降 alert/off 排障）：未登记的新增无租户谓词 SELECT
+在执行期直接红。enforce 档下全量 4,725/0 绿 = 收口验证。残余风险：测试未覆盖的冷路径
+首次触达会 500（红得响亮属设计意图），处置=按五族归入白名单或补条件。

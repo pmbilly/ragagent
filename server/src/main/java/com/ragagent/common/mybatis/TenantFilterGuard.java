@@ -25,10 +25,11 @@ import java.util.Set;
  * {@code docs/persistence-tenant-filtering-evaluation.md}）：与 B60 的
  * {@code tenant_id IS NULL = 平台内置} 语义冲突、方言 SQL 解析失败即炸、ignore 表清单维护。</p>
  *
- * <p><b>三档模式</b>（{@code weknora.persistence.tenant-filter-guard}，默认 alert）：
- * {@code off} 关闭；{@code alert} 只告警（当前档——先盘出「直连租户过滤 vs 传递范围」
- * 的真实面，再决定登记白名单还是补条件）；{@code enforce} 抛
- * {@link MybatisPlusException}（白名单补齐后切这档收口）。</p>
+ * <p><b>三档模式</b>（{@code weknora.persistence.tenant-filter-guard}，默认 enforce）：
+ * {@code off} 关闭；{@code alert} 只告警（盘面用）；{@code enforce} 抛
+ * {@link MybatisPlusException}——B71 已完成逐表定性（72 条存量语句归入
+ * {@link #ALLOWED_STATEMENTS}），默认档自 2026-10-05 起为 enforce；未登记的新增
+ * 无租户谓词查询会在执行期直接红。</p>
  *
  * <p><b>v1 边界（刻意从窄，减少告警噪音）</b>：只查 SELECT 主 from-item 表（B60 型
  * 「读全表」是主攻面），JOIN 的次表与 UNION 分支不查；WHERE 判定按渲染串包含
@@ -72,6 +73,97 @@ public class TenantFilterGuard implements InnerInterceptor {
         this.mode = mode;
     }
 
+    /**
+     * 语句级白名单（B71 逐表定性，2026-10-05；首次盘面 72 条语句全部归类）。
+     * 增删条目必须注明族别。族别口径：
+     * <ul>
+     *   <li><b>认证面</b>——按 hash/bot 身份/邮箱定位，请求期不存在租户上下文；</li>
+     *   <li><b>调度面</b>——后台轮询全表（IM 渠道投递、数据源同步），天然跨租户；</li>
+     *   <li><b>跨空间身份关系面</b>——成员/邀请/收藏按 user 维度，天生跨空间；</li>
+     *   <li><b>按 id/父键传递</b>——UUID 取行 + 上层守卫（requireKb / getKnowledgeInTenant /
+     *       ChunkAccessGuard）校验归属；或按父键（kb_id / knowledge_id / item_id）传递范围；</li>
+     *   <li><b>内部任务队列</b>——(task_type, scope, scope_id) 三元组即租户边界。</li>
+     * </ul>
+     */
+    public static final Set<String> ALLOWED_STATEMENTS = Set.of(
+            // ── 认证面 ──
+            "com.ragagent.auth.apikey.mapper.TenantAPIKeyMapper.listByPlaceholderHash",
+            "com.ragagent.auth.apikey.mapper.TenantAPIKeyMapper.listPlatform",
+            "com.ragagent.auth.apikey.mapper.TenantAPIKeyMapper.selectByHash",
+            "com.ragagent.auth.apikey.mapper.TenantAPIKeyMapper.selectFirstPlaceholderHashId",
+            "com.ragagent.auth.mapper.UserMapper.selectById",
+            "com.ragagent.auth.mapper.UserMapper.selectCount",
+            "com.ragagent.auth.mapper.UserMapper.selectList",
+            "com.ragagent.im.mapper.ImChannelMapper.findByBotIdentity",
+            // ── 调度面 ──
+            "com.ragagent.im.mapper.ImChannelMapper.listEnabled",
+            "com.ragagent.datasource.mapper.DataSourceMapper.selectActive",
+            "com.ragagent.datasource.mapper.SyncLogMapper.countByStatus",
+            "com.ragagent.datasource.mapper.SyncLogMapper.selectLatest",
+            // ── 跨空间身份关系面 ──
+            "com.ragagent.auth.mapper.TenantMemberMapper.selectList",
+            "com.ragagent.auth.mapper.TenantInvitationMapper.selectCount",
+            "com.ragagent.auth.mapper.TenantInvitationMapper.selectList",
+            "com.ragagent.knowledge.mapper.UserKbPinMapper.selectList",
+            // ── 按 id/父键传递（上层守卫校验归属）──
+            "com.ragagent.knowledge.mapper.ChunkMapper.selectById",
+            "com.ragagent.knowledge.mapper.ChunkMapper.selectCount",
+            "com.ragagent.knowledge.mapper.ChunkMapper.selectList",
+            "com.ragagent.knowledge.mapper.KnowledgeMapper.selectById",
+            "com.ragagent.knowledge.mapper.KnowledgeMapper.selectCount",
+            "com.ragagent.knowledge.mapper.KnowledgeMapper.selectList",
+            "com.ragagent.knowledge.mapper.KnowledgeBaseMapper.selectById",
+            "com.ragagent.knowledge.mapper.KnowledgeBaseMapper.selectList",
+            "com.ragagent.knowledge.mapper.KnowledgeTagMapper.maxSeqId",
+            "com.ragagent.agent.management.mapper.AgentQuestionMapper.findKbs",
+            "com.ragagent.memory.mapper.MemoryItemEmbeddingMapper.selectByItemId",
+            "com.ragagent.session.mapper.SessionMapper.selectList",
+            "com.ragagent.datasource.mapper.DataSourceMapper.selectByIdOrNull",
+            "com.ragagent.datasource.mapper.DataSourceMapper.selectByKnowledgeBase",
+            "com.ragagent.datasource.mapper.SyncLogMapper.selectByDataSource",
+            "com.ragagent.datasource.mapper.SyncLogMapper.selectByIdOrNull",
+            "com.ragagent.im.mapper.ImChannelMapper.getById",
+            "com.ragagent.embed.mapper.EmbedChannelMapper.getById",
+            "com.ragagent.wiki.mapper.WikiPageMapper.countByType",
+            "com.ragagent.wiki.mapper.WikiPageMapper.countByTypeLight",
+            "com.ragagent.wiki.mapper.WikiPageMapper.countList",
+            "com.ragagent.wiki.mapper.WikiPageMapper.countLiveById",
+            "com.ragagent.wiki.mapper.WikiPageMapper.countOrphans",
+            "com.ragagent.wiki.mapper.WikiPageMapper.countPagesByFolder",
+            "com.ragagent.wiki.mapper.WikiPageMapper.countPagesInFolder",
+            "com.ragagent.wiki.mapper.WikiPageMapper.findPagesByNormalizedTitles",
+            "com.ragagent.wiki.mapper.WikiPageMapper.list",
+            "com.ragagent.wiki.mapper.WikiPageMapper.listAll",
+            "com.ragagent.wiki.mapper.WikiPageMapper.listBySourceRef",
+            "com.ragagent.wiki.mapper.WikiPageMapper.listByType",
+            "com.ragagent.wiki.mapper.WikiPageMapper.listByTypeLight",
+            "com.ragagent.wiki.mapper.WikiPageMapper.listByTypeRecent",
+            "com.ragagent.wiki.mapper.WikiPageMapper.listLiteBySlugs",
+            "com.ragagent.wiki.mapper.WikiPageMapper.listPagesByFolderIds",
+            "com.ragagent.wiki.mapper.WikiPageMapper.listPagesCursor",
+            "com.ragagent.wiki.mapper.WikiPageMapper.listSlugsBySourceRef",
+            "com.ragagent.wiki.mapper.WikiPageMapper.listSummariesByKnowledgeIDs",
+            "com.ragagent.wiki.mapper.WikiPageMapper.search",
+            "com.ragagent.wiki.mapper.WikiPageMapper.selectAllLiveSlugs",
+            "com.ragagent.wiki.mapper.WikiPageMapper.selectLiveBySlug",
+            "com.ragagent.wiki.mapper.WikiPageMapper.selectLiveSlugs",
+            "com.ragagent.wiki.mapper.WikiFolderMapper.countLiveById",
+            "com.ragagent.wiki.mapper.WikiFolderMapper.listAllFolders",
+            "com.ragagent.wiki.mapper.WikiFolderMapper.listChildFolders",
+            "com.ragagent.wiki.mapper.WikiFolderMapper.listDistinctPaths",
+            "com.ragagent.wiki.mapper.WikiFolderMapper.selectChildByName",
+            "com.ragagent.wiki.mapper.WikiFolderMapper.selectFolderById",
+            "com.ragagent.wiki.mapper.WikiPageRevisionMapper.countRevisions",
+            "com.ragagent.wiki.mapper.WikiPageRevisionMapper.listRevisions",
+            "com.ragagent.wiki.mapper.WikiPageRevisionMapper.selectRevision",
+            "com.ragagent.wiki.mapper.WikiPageIssueMapper.listIssues",
+            // ── 内部任务队列（scope 三元组即租户边界）──
+            "com.ragagent.wiki.mapper.TaskPendingOpMapper.distinctIngestScopeIds",
+            "com.ragagent.wiki.mapper.TaskPendingOpMapper.selectById",
+            "com.ragagent.wiki.mapper.TaskPendingOpMapper.selectCount",
+            "com.ragagent.wiki.mapper.TaskPendingOpMapper.selectList",
+            "com.ragagent.wiki.mapper.TaskDeadLetterMapper.selectList");
+
     @Override
     public void beforeQuery(Executor executor, MappedStatement ms, Object parameter,
                             org.apache.ibatis.session.RowBounds rowBounds,
@@ -96,6 +188,9 @@ public class TenantFilterGuard implements InnerInterceptor {
         }
         String name = table.getName().toLowerCase();
         if (!TENANT_TABLES.contains(name)) {
+            return;
+        }
+        if (ALLOWED_STATEMENTS.contains(ms.getId())) {
             return;
         }
         String where = plain.getWhere() == null ? "" : plain.getWhere().toString().toLowerCase();

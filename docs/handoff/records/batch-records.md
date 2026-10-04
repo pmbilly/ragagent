@@ -814,3 +814,10 @@
 - **③ 首次盘面**（alert × H2 契约全量）：**6,084 告警 / 73 条去重语句 / 21 张表**。头部 users 2799 / tenant_members 1021 / knowledge_bases 831 = 按 id 直查与成员关系的**合法传递面**；直连缺失候选在腰部：chunks 47、task_pending_ops 37、im_channels 25、wiki 族 ~700。逐表三选一（迁出注册表并注释传递语义 / 白名单 / 补条件）的收口清单写回 `docs/persistence-tenant-filtering-evaluation.md` §5；**enforce 切档挂起**，待 B71+ 逐表定性。
 - **踩坑**：表注册表的 `"knowledge_bases"`/`"mcp_services"` 字面量撞 **B18 键名扫描器**（同一串既是表名也是 agent 配置键）→ 按其「表名=合法 snake 面」既有口径加 `common/mybatis/TenantFilterGuard` 路径豁免（该扫描器 javadoc 自述表名属合法面）。另一坑：MP `InnerInterceptor.beforeQuery` 是**六参**签名（带 RowBounds/ResultHandler/BoundSql），按记忆写三参编译不过——javap jar 确认后照抄，BoundSql 直接入参不再自取。
 - **闸门**：后端 **4,725**/0 失败（+6：TenantFilterGuardTest）+ spotlessCheck 绿；盘面运行即全量套件本身（告警走日志不拦断言）。
+
+**✅ B71（2026-10-05，租户探测切 enforce：逐表定性收口）**
+- **定性方法**：B70 alert 盘面去探针后 72 条语句，逐条读 SQL + 调用方，按「这条查询的租户边界在哪一层」归五族（口径写在 `TenantFilterGuard.ALLOWED_STATEMENTS` javadoc）：认证面 7 / 调度面 4 / 跨空间身份关系面 4 / 按 id/父键传递 54 / 内部任务队列 5。代表性核验：`ImChannelMapper.listEnabled` 的调用方是 `ImService:262` 的全局投递循环（调度面）；`WikiPageMapper.listAll(kbId, …)` WHERE 带 kb_id（父键传递，kb 归属由上层 KB 守卫）；`TenantAPIKeyMapper.selectByHash` 是 key 认证路径（认证面）。
+- **结论**：**真漏 0 条**。本仓租户边界模型是「UUID id + 上层守卫（requireKb/getKnowledgeInTenant/ChunkAccessGuard）」，SQL 直连谓词只服务于按租户列表的查询——B60 洞的根因是「选择器查询连守卫都没有」，不是「SQL 少谓词」。探测器的价值因此定位为：**未来新增的无守卫又无谓词的查询当场红**。
+- **切档**：默认 enforce（yml 默认值 + `@Value` 默认值 + javadoc 三处同步）；`WEKNORA_TENANT_FILTER_GUARD=alert|off` 可降档排障。enforce 档全量 **4,725**/0 + spotlessCheck 绿。
+- **残余风险（登记）**：测试未覆盖的冷路径首次触达会 500——响亮属设计意图；处置=按五族归入白名单（注明族别）或补条件。
+- **教训**：盘面（alert）→ 定性（读调用方）→ 收口（enforce）一天走完的前提是**全量套件本身就是查询面的高覆盖回放**——4,725 条测试把 72 条违例语句全部打出来了，"跑一周"的时间窗被套件覆盖率替代。
