@@ -423,7 +423,13 @@ const navGroups = computed<NavGroup[]>(() => {
     {
       key: 'system_administration',
       label: t('settings.navGroups.systemAdministration'),
-      items: pickItems(['system-global', 'runtime-queues', 'platform-api-keys', 'system-audit-log']),
+      items: pickItems([
+        'system-global',
+        'runtime-queues',
+        'platform-api-keys',
+        'system-audit-log',
+        'skill-management',
+      ]),
     },
     {
       key: 'platform',
