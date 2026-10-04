@@ -16,6 +16,8 @@
  *     Declarative alternative: `locale` option / `data-locale` attribute. It is
  *     folded into the iframe URL, so the first paint is already in that language
  *     and the channel's default locale won't override it.
+ *     When neither is set, the host page's own `<html lang>` is forwarded as a
+ *     weaker hint — honored only when the channel follows browser/host.
  *
  * Secure mode (recommended): instead of `token`, pass `tokenEndpoint` — a URL on
  * your own backend that returns { token: "ems_...", expiresIn: 1800 }. Your
@@ -149,12 +151,25 @@
 
     var panelWidth = Number(opts.width) > 0 ? Number(opts.width) : DEFAULT_WIDTH;
     var panelHeight = Number(opts.height) > 0 ? Number(opts.height) : DEFAULT_HEIGHT;
-    // 宿主声明的语言（init({locale}) / data-locale）：拼进 URL，embed 页首屏即用对语言，
+    // 宿主**显式**声明的语言（init({locale}) / data-locale）：拼进 URL，embed 页首屏即用对语言，
     // 且被视为「宿主已 pin」——不会被渠道默认语言覆盖，也不写访客的持久值。
     var hostLocale = String(opts.locale || opts.lang || '').trim();
+    // 宿主**页面**声明的语言（<html lang>）：弱信号，仅在渠道配「跟随浏览器/宿主」时生效，
+    // 优先级低于渠道默认语言 —— 所以走独立参数 hostLocale，不占用 ?locale=。
+    var hostPageLocale = '';
+    if (!hostLocale) {
+      try {
+        var rootEl = document.documentElement;
+        hostPageLocale = rootEl && rootEl.lang ? String(rootEl.lang).trim() : '';
+      } catch (e) {
+        hostPageLocale = '';
+      }
+    }
     var embedUrl = baseUrl + '/embed/' + encodeURIComponent(channelId);
     if (hostLocale) {
       embedUrl += '?locale=' + encodeURIComponent(hostLocale);
+    } else if (hostPageLocale) {
+      embedUrl += '?hostLocale=' + encodeURIComponent(hostPageLocale);
     }
     var embedOrigin = baseUrl;
     try {

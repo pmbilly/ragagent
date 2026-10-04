@@ -2056,21 +2056,39 @@ export type EmbedLocale = (typeof SUPPORTED_LOCALES)[number]
 /** Isolated from the main app `locale` key so embed preview never hijacks admin UI language. */
 export const EMBED_LOCALE_STORAGE_KEY = 'weknora-embed-locale'
 
-/** Map host-provided locale strings to a supported embed locale tag. */
-export function normalizeEmbedLocale(raw: string): EmbedLocale {
+/**
+ * 严格归一化：识别不了就返回 null。
+ * 用于「宿主声明」这类**可忽略**的信号——宿主页面写 `lang="de"` 时应回落浏览器语言，
+ * 而不是被 `normalizeEmbedLocale` 的兜底（zh-CN）强行改语言。
+ */
+export function matchEmbedLocale(raw: string): EmbedLocale | null {
   const s = raw.trim().toLowerCase()
+  if (!s) return null
   if (s.startsWith('en')) return 'en-US'
   if (s.startsWith('ko')) return 'ko-KR'
   if (s.startsWith('ja')) return 'ja-JP'
   if (s.startsWith('ru')) return 'ru-RU'
   if (s.startsWith('zh')) return 'zh-CN'
-  const exact = SUPPORTED_LOCALES.find((l) => l.toLowerCase() === s)
-  return exact || 'zh-CN'
+  return SUPPORTED_LOCALES.find((l) => l.toLowerCase() === s) || null
+}
+
+/** Map host-provided locale strings to a supported embed locale tag（认不出 → zh-CN）。 */
+export function normalizeEmbedLocale(raw: string): EmbedLocale {
+  return matchEmbedLocale(raw) || 'zh-CN'
 }
 
 export function readEmbedLocaleFromUrl(): string {
   if (typeof window === 'undefined') return ''
   return new URLSearchParams(window.location.search).get('locale')?.trim() || ''
+}
+
+/**
+ * 宿主**页面**声明的语言（widget 脚本读宿主页 `<html lang>` 后经 `?hostLocale=` 传入）。
+ * 与 `?locale=` 的区别：这是弱信号——渠道默认语言优先于它，它只优先于浏览器语言。
+ */
+export function readHostPageLocaleFromUrl(): string {
+  if (typeof window === 'undefined') return ''
+  return new URLSearchParams(window.location.search).get('hostLocale')?.trim() || ''
 }
 
 /** 浏览器语言 → 受支持的 embed 语言（跟随浏览器时的取值来源）。 */

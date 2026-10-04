@@ -34,6 +34,16 @@ test('embed 语言：派生不落盘 / 跟随清陈旧值 / 宿主声明走 URL'
     /resolveBrowserEmbedLocale\(\)/,
     '跟随模式要显式取浏览器语言',
   )
+  assert.match(
+    bridge,
+    /matchEmbedLocale\(readHostPageLocaleFromUrl\(\)\)/,
+    '跟随模式要读宿主页面语言（?hostLocale=）——「跟随宿主」不能只看浏览器语言',
+  )
+  assert.match(
+    bridge,
+    /hostPageLocale \|\| resolveBrowserEmbedLocale\(\)/,
+    '宿主页面未声明（或声明了不支持的语言）时才回落浏览器语言',
+  )
 
   const embed = readFileSync(join(SRC, 'i18n/embed.ts'), 'utf8')
   assert.match(
@@ -67,5 +77,15 @@ test('embed 语言：派生不落盘 / 跟随清陈旧值 / 宿主声明走 URL'
     widget,
     /if \(pendingLocale\) \{\s*postHostPayload\('set_locale'/,
     'ready 握手后要补发 pendingLocale',
+  )
+  assert.match(
+    widget,
+    /hostPageLocale = rootEl && rootEl\.lang \? String\(rootEl\.lang\)\.trim\(\) : ''/,
+    'widget 脚本要读宿主页 <html lang>，否则「跟随宿主」对只声明页面语言的站点无效',
+  )
+  assert.match(
+    widget,
+    /\} else if \(hostPageLocale\) \{\s*embedUrl \+= '\?hostLocale=' \+ encodeURIComponent\(hostPageLocale\)/,
+    '页面语言是弱信号：必须走 hostLocale 参数（不能占用 ?locale=，否则会压过渠道默认语言）',
   )
 })

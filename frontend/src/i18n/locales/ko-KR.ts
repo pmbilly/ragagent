@@ -4008,7 +4008,7 @@ export default {
     enabled: '채널 활성화',
     deleteConfirm: '이 임베드 채널을 삭제하시겠습니까? 배포된 코드가 작동하지 않습니다.',
     defaultLocale: '기본 언어',
-    defaultLocaleDesc: '방문자가 채팅을 열 때 사용할 UI 언어; 비우면 브라우저 또는 Widget setLocale()을 따릅니다.',
+    defaultLocaleDesc: '방문자가 채팅을 열 때 사용할 UI 언어; 비우면 호스트 페이지(<html lang> / Widget locale)를 따르고, 없으면 브라우저 언어를 사용합니다.',
     defaultLocaleBrowser: '브라우저 / 호스트 기본값'
   },
   knowledgeList: {

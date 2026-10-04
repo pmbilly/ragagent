@@ -2189,7 +2189,7 @@ export default {
     enabled: 'チャネルを有効化',
     deleteConfirm: 'この埋め込みチャネルを削除しますか？設置済みのスニペットは動作しなくなります。',
     defaultLocale: 'デフォルト言語',
-    defaultLocaleDesc: 'チャットを開いたときの訪問者UIの言語です。空欄の場合はブラウザまたはホストのWidget setLocale()に従います。',
+    defaultLocaleDesc: 'チャットを開いたときの訪問者UIの言語です。空欄の場合はホストページ（<html lang> / Widget の locale）に従い、未指定ならブラウザ言語を使用します。',
     defaultLocaleBrowser: 'ブラウザ／ホストのデフォルト'
   },
   knowledgeEditor: {

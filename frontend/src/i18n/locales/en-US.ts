@@ -2189,7 +2189,7 @@ export default {
     enabled: 'Enable channel',
     deleteConfirm: 'Delete this embed channel? Deployed snippets will stop working.',
     defaultLocale: 'Default language',
-    defaultLocaleDesc: 'Visitor UI language when chat opens; empty follows the browser or host Widget setLocale().',
+    defaultLocaleDesc: 'Visitor UI language when chat opens; empty follows the host page (<html lang> / host Widget locale), then the browser language.',
     defaultLocaleBrowser: 'Browser / host default'
   },
   knowledgeEditor: {

@@ -4010,7 +4010,7 @@ export default {
     enabled: '启用渠道',
     deleteConfirm: '确定删除该嵌入渠道？已部署的网站代码将失效。',
     defaultLocale: '默认语言',
-    defaultLocaleDesc: '访客打开聊天时使用的界面语言；留空则跟随浏览器或宿主页面通过 Widget 设置的 locale。',
+    defaultLocaleDesc: '访客打开聊天时使用的界面语言；留空则跟随宿主页面声明的语言（<html lang> / Widget 的 locale 设置），宿主未声明时用浏览器语言。',
     defaultLocaleBrowser: '跟随浏览器 / 宿主'
   },
   knowledgeList: {

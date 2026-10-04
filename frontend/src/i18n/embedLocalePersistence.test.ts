@@ -74,6 +74,23 @@ test('派生语言不落持久值；显式选择才落；跟随模式可清除�
   assert.equal(htmlAttrs['lang'], 'en-US')
 })
 
+test('宿主页面语言：严格归一化（认不出返回 null）+ 从 hostLocale 参数读取', () => {
+  installStubs('?hostLocale=zh-CN', 'en-US')
+
+  // 严格归一化：认不出的语言不落到 zh-CN（否则宿主写 lang="de" 会被强行改成中文）
+  assert.equal(mod.matchEmbedLocale('zh-CN'), 'zh-CN')
+  assert.equal(mod.matchEmbedLocale('zh-Hans'), 'zh-CN')
+  assert.equal(mod.matchEmbedLocale('EN-us'), 'en-US')
+  assert.equal(mod.matchEmbedLocale('de-DE'), null)
+  assert.equal(mod.matchEmbedLocale(''), null)
+  // 宽容归一化仍保留旧语义（认不出 → zh-CN）
+  assert.equal(mod.normalizeEmbedLocale('de-DE'), 'zh-CN')
+
+  assert.equal(mod.readHostPageLocaleFromUrl(), 'zh-CN')
+  installStubs('', 'en-US')
+  assert.equal(mod.readHostPageLocaleFromUrl(), '', '无参数时返回空串')
+})
+
 test('URL 无 locale 时 syncEmbedLocaleFromUrl 返回 false 且不改语言', () => {
   store.clear()
   installStubs('', 'zh-CN')

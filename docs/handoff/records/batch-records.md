@@ -741,6 +741,13 @@
 - **验证**：真机（Playwright，浏览器 locale=ja-JP）**6/6**——① 干净+跟随→ja；② 陈旧 en-US + 跟随→ja 且**存储被清**；③ 陈旧 zh-CN + 跟随→ja 且存储被清；④ `?locale=en-US`→en 且**不落存储**；⑤ `init({locale})` → iframe URL 带 `locale=ja-JP`；⑥ 握手前 `setLocale('ja-JP')` → 补发成功。另测渠道默认语言链路：DB 临时置 `en-US` → widget 显示 en 且不落存储，`?locale=zh-CN` 可覆盖（宿主优先），**验后已还原为空**。新增 2 条单测（持久化语义 + 2 条 URL/浏览器解析）+ 1 条源码守卫（**两个红态探针验过**：回退成 `applyEmbedLocale(res.defaultLocale…)` 或删掉 `clearStoredEmbedLocale()` 均点名报红）。前端 **723/723**、`vue-tsc` 0 错误、契约键守卫无新增。
 - **口径沉淀**：**"能重新推导的派生值，不要写持久存储"**——派生值一旦落盘就会盖住后续配置变更（本次是语言；同类风险：主题、尺寸、默认模型）。只有用户/宿主的**显式选择**才值得持久化。
 
+**✅ B64（2026-10-04，「跟随浏览器/宿主」只跟随了浏览器——补上宿主页面语言）**
+- **触发**：用户追问「`widget-test.html` 宿主浏览器语言是 zh-CN 吗？为什么配置为跟随还是显示英语」。
+- **实测三场景（Playwright）**：① 浏览器 `zh-CN` → widget **中文 ✓**；② 浏览器 `en-US` → 英文 ✓；③ **浏览器 `en-US` + 页面 `<html lang="zh-CN">` → 英文 ✗**。⇒ 两条结论：用户浏览器 UI 语言实为 `en*`（否则①会显示中文）；且「跟随宿主」此前只实现了**跟随浏览器**（`navigator.language`），**不读宿主页面的语言声明**——测试页明明写着 `<html lang="zh-CN">` 也没用。
+- **修复（给"宿主"补一条弱信号通道）**：widget 脚本在**没有显式 `locale`/`data-locale`** 时读宿主页 `document.documentElement.lang`，经**独立参数 `?hostLocale=`** 转发（不能占用 `?locale=`——那会被当作"宿主已 pin"从而压过渠道默认语言）；embed 侧新增 `matchEmbedLocale()`（**严格**归一化：认不出返回 `null`，避免宿主写 `lang="de"` 被兜底成中文）与 `readHostPageLocaleFromUrl()`；`useEmbedBridge` 跟随分支改为 `matchEmbedLocale(readHostPageLocaleFromUrl()) || resolveBrowserEmbedLocale()`。语言优先级最终为：**宿主显式（`?locale=` / `set_locale`）> 渠道默认语言 > 宿主页面 `<html lang>` > 浏览器语言**，且四条派生路径全部不落持久值 ✓（B63 口径）。渠道设置说明同步改五语言（写明"宿主页面声明的语言 `<html lang>`"）。
+- **验证**：真机 4/4——浏览器 en + 页面 zh-CN → **zh-CN**（原 ✗）；zh + zh → zh；页面 `de-DE`（不支持）→ 回落浏览器 `en-US`；显式 `init({locale:'ja-JP'})` → 压过页面声明。B63 六项回归全绿；新增/扩展单测 3 条 + 守卫补 2 条不变量（**两个红态探针**分别摘掉 widget 转发与 bridge 读取，均点名报红）。前端 **724/724**、`vue-tsc` 0 错误、i18n 审计 11/11、契约键守卫无新增。
+- **口径**：**"跟随"类设置要把信号分层**——宿主显式 > 站点（渠道）配置 > 页面声明 > 浏览器/平台默认；且只有**显式**选择才持久化。本次的坑是把"宿主"简化成了"浏览器"（宿主页声明既没被读取，也没有可携带它的通道）。
+
 **✅ B58（2026-10-04，旧信封读法清剿：Go `{success,data}` 残留 → Java 裸载荷）**
 - **触发**：用户点检 `?section=integration-api` 报「加载 API 集成设置失败」。
 - **根因**：`/auth/me` 是**裸信封**（`{user, tenant, memberships, tenantRequired, capabilities, preferenceDefaults}`，`tenant` 在顶层），而页面读 `userResp.data.tenant`（Go 时代 `{success,data}` 形状）→ 恒 undefined → 直接抛错。curl 实测坐实（200 + 顶层键清单里无 `data`）。

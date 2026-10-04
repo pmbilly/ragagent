@@ -4008,7 +4008,7 @@ export default {
     enabled: 'Включить канал',
     deleteConfirm: 'Удалить этот канал? Развёрнутые фрагменты перестанут работать.',
     defaultLocale: 'Язык по умолчанию',
-    defaultLocaleDesc: 'Язык интерфейса при открытии чата; пусто — браузер или setLocale() виджета.',
+    defaultLocaleDesc: 'Язык интерфейса при открытии чата; пусто — язык хост-страницы (<html lang> / locale виджета), при отсутствии — язык браузера.',
     defaultLocaleBrowser: 'Браузер / хост'
   },
   knowledgeList: {

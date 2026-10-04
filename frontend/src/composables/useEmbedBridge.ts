@@ -21,7 +21,9 @@ import {
   applyDerivedEmbedLocale,
   applyEmbedLocale,
   clearStoredEmbedLocale,
+  matchEmbedLocale,
   readEmbedLocaleFromUrl,
+  readHostPageLocaleFromUrl,
   resolveBrowserEmbedLocale,
   syncEmbedLocaleFromUrl,
 } from '@/i18n/embed'
@@ -152,7 +154,9 @@ export function useEmbedBridge(channelId: Ref<string>) {
       }
       config.value = res
 
-      // 语言优先级：宿主声明（URL ?locale= / set_locale）> 渠道默认语言 > 浏览器语言。
+      // 语言优先级：宿主显式声明（URL ?locale= / set_locale）> 渠道默认语言
+      // > 宿主页面声明的语言（<html lang>，widget 脚本经 ?hostLocale= 传入）
+      // > 浏览器语言。
       // 两条派生路径都**不写持久值**：渠道改了默认语言或被设回「跟随浏览器/宿主」时，
       // 必须立刻对所有人生效；旧实现把渠道默认语言写进 localStorage，之后
       // `resolveInitialEmbedLocale()` 永远先读它 → 「跟随」永久失效。
@@ -160,9 +164,12 @@ export function useEmbedBridge(channelId: Ref<string>) {
         if (res.defaultLocale) {
           applyDerivedEmbedLocale(res.defaultLocale, activeLocale)
         } else {
-          // 跟随浏览器/宿主：清掉可能的历史持久值，再按浏览器语言渲染。
+          // 跟随浏览器/宿主：先清掉可能的历史持久值（旧值会压过浏览器语言），
+          // 再按宿主页面声明的语言渲染；宿主没声明（或声明了我们不支持的语言）时
+          // 用浏览器语言。
           clearStoredEmbedLocale()
-          applyDerivedEmbedLocale(resolveBrowserEmbedLocale(), activeLocale)
+          const hostPageLocale = matchEmbedLocale(readHostPageLocaleFromUrl())
+          applyDerivedEmbedLocale(hostPageLocale || resolveBrowserEmbedLocale(), activeLocale)
         }
       }
 
