@@ -856,7 +856,7 @@ onUnmounted(() => {
   &--full {
     max-width: none;
     width: 100%;
-    padding: 30px 34px 40px;
+    padding: 56px 34px 40px;
     box-sizing: border-box;
   }
 }
