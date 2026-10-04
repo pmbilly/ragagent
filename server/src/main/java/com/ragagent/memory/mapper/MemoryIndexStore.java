@@ -32,7 +32,6 @@ import com.ragagent.memory.domain.MemoryTopicStat;
 import com.ragagent.memory.domain.MemoryVectorHit;
 import com.ragagent.memory.domain.MemoryVectorQuery;
 import com.ragagent.memory.domain.MemoryVectors;
-import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -893,16 +892,6 @@ final class MemoryIndexStore {
      */
     private static void sortVectorHitsDesc(List<VectorHitRow> rows) {
         rows.sort((a, b) -> Double.compare(b.getScore(), a.getScore()));
-    }
-
-    /** 探测数据源是不是 PostgreSQL。 */
-    static boolean detectPostgres(DataSource dataSource) {
-        try (Connection c = dataSource.getConnection()) {
-            String product = c.getMetaData().getDatabaseProductName();
-            return product != null && product.toLowerCase(Locale.ROOT).contains("postgres");
-        } catch (SQLException e) {
-            return false;
-        }
     }
 
     /**

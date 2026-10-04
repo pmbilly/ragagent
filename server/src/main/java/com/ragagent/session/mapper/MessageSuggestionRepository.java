@@ -1,16 +1,14 @@
 package com.ragagent.session.mapper;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Locale;
 
 import javax.sql.DataSource;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.ragagent.common.jdbc.DatabaseDialects;
 import com.ragagent.session.domain.MessageSuggestionEvent;
 import com.ragagent.session.domain.MessageSuggestionSet;
 import com.ragagent.session.domain.MessageSuggestionSetNotFoundException;
@@ -48,16 +46,7 @@ public class MessageSuggestionRepository {
 
     public MessageSuggestionRepository(MessageSuggestionMapper mapper, DataSource dataSource) {
         this.mapper = mapper;
-        this.postgres = detectPostgres(dataSource);
-    }
-
-    private static boolean detectPostgres(DataSource dataSource) {
-        try (Connection c = dataSource.getConnection()) {
-            String product = c.getMetaData().getDatabaseProductName();
-            return product != null && product.toLowerCase(Locale.ROOT).contains("postgres");
-        } catch (SQLException e) {
-            return false;
-        }
+        this.postgres = DatabaseDialects.isPostgres(dataSource);
     }
 
     /** 五元组命中；零行抛错。 */

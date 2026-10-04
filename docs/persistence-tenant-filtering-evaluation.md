@@ -3,6 +3,9 @@
 > M3 评估产出（2026-10-05）。结论先行：**不建议全仓引入 MP 的
 > TenantLineInnerInterceptor**；建议「域内仓储单点 + 小域试点验证 + 缺失过滤探测」
 > 三步走。试点通过前，维持手工过滤现状。
+>
+> **进展（同日 B70）**：Step 1（detectPostgres 八处归一）与 Step 2（探测拦截器
+> `TenantFilterGuard`，alert 档）已落地，首次盘面结果见文末 §5。
 
 ## 1. 现状盘点
 
@@ -67,3 +70,32 @@ FullTableWriteGuard 同量级。
 
 - Step 1/2 无争议可直接排期；
 - Step 3 依赖 Step 2 的盘点数据，试点前不需立项。
+
+## 5. 首次盘面结果（2026-10-05，alert 档 × H2 契约全量）
+
+探测面：47 张注册表（V1 baseline 46 张带 `tenant_id` + V5 skills）；哨声面：
+**6,084 条告警 / 73 条去重语句 / 21 张表**。分布：
+
+| 表 | 告警 | 表 | 告警 |
+|---|---|---|---|
+| users | 2799 | sync_logs | 75 |
+| tenant_members | 1021 | memory_item_embeddings | 65 |
+| knowledge_bases | 831 | tenant_api_keys | 63 |
+| wiki_pages | 564 | embed_channels | 59 |
+| knowledges | 144 | chunks | 47 |
+| data_sources | 142 | task_pending_ops | 37 |
+| wiki_folders | 93 | 其余 7 表 | ~137 |
+
+**定性（初步）**：头部三家是「按 id 直查 / 按用户-成员关系查」的合法传递范围
+（`users` 按 id 登录后取行、`tenant_members` 按 user_id）；真正的
+**直连租户过滤缺失候选**在腰部——`chunks`（47 条，部分查询按 knowledge_id 传递）、
+`task_pending_ops`/`task_dead_letters`（后台任务表，调用方已按 scope 三元组收敛）、
+`im_channels`（25 条）。
+
+**切 enforce 前的收口清单**（按表逐一定性，三选一：迁出注册表并注释传递语义 /
+登记白名单 / 补 `tenant_id` 条件）：
+1. `users`、`tenant_members`、`knowledge_bases` → 大概率整体迁出（auth 面按 id/成员关系是既有设计）；
+2. `chunks`、`knowledges`、`wiki_*` → 逐条看：传递范围迁出，真漏补条件；
+3. 后台任务表 → 若确认 scope 三元组即租户边界，迁出并注释。
+
+建议按此清单单独立批（B71+）处置后再切 enforce；本批保持 alert 盘面。

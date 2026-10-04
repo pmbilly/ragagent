@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.exceptions.MybatisPlusException;
 import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.ragagent.common.mybatis.FullTableWriteGuard;
+import com.ragagent.common.mybatis.TenantFilterGuard;
 import org.apache.ibatis.builder.StaticSqlSource;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlCommandType;
@@ -110,13 +111,15 @@ class FullTableWriteGuardTest {
     }
 
     @Test
-    @DisplayName("插件链装配顺序：分页在前、防护殿后")
+    @DisplayName("插件链装配顺序：分页在前、防护殿后、租户探测末位")
     void wiringOrder() {
-        var chain = new MybatisPlusConfig().mybatisPlusInterceptor().getInterceptors();
-        assertThat(chain).hasSize(2);
+        var chain = new MybatisPlusConfig()
+                .mybatisPlusInterceptor(TenantFilterGuard.Mode.ALERT).getInterceptors();
+        assertThat(chain).hasSize(3);
         InnerInterceptor pagination = chain.get(0);
         InnerInterceptor guard = chain.get(1);
         assertThat(pagination).isInstanceOf(PaginationInnerInterceptor.class);
         assertThat(guard).isInstanceOf(FullTableWriteGuard.class);
+        assertThat(chain.get(2)).isInstanceOf(TenantFilterGuard.class);
     }
 }

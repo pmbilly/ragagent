@@ -256,6 +256,7 @@ class ArchitectureRulesTest {
     /** 命中即算裸 JDBC 的目标类型（按声明类型判定，含子类）。 */
     private static final List<Class<?>> JDBC_TARGET_TYPES = List.of(
             org.springframework.jdbc.core.JdbcTemplate.class,
+            org.springframework.jdbc.core.simple.JdbcClient.class,
             java.sql.DriverManager.class,
             java.sql.Connection.class,
             java.sql.Statement.class,
@@ -263,16 +264,16 @@ class ArchitectureRulesTest {
             javax.sql.DataSource.class);
 
     /**
-     * 裸 JDBC 棘轮基线（类 → 理由）。业务单表 CRUD 走 MyBatis-Plus；以下四类是 MP 的
+     * 裸 JDBC 棘轮基线（类 → 理由）。业务单表 CRUD 走 MyBatis-Plus；以下三类是 MP 的
      * 能力边界，登记放行。新类加进来必须在 PR 里论证属于同一类：
      * <ul>
-     *   <li><b>方言探测</b>——各仓储构造期的 detectPostgres（逻辑多处复制，收敛归一到
-     *       DatabaseDialects 后可整组摘除）；</li>
      *   <li><b>PG/方言专有 SQL</b>——jsonb/向量操作符、批量写、清理任务等 wrapper
      *       表达不了的语句；</li>
      *   <li><b>非业务库引擎</b>——DuckDB / Doris / SQLite / pgvector，不在 MP 管辖；</li>
      *   <li><b>启动期修复</b>——StartupTaskRecovery。</li>
      * </ul>
+     * <p>方言探测类副本已于 B70 归一到 {@code DatabaseDialects.isPostgres}（原
+     * detectPostgres 八处复制清零，相应白名单条目随之摘除）。</p>
      */
     private static final Map<String, String> JDBC_BASELINE = Map.ofEntries(
             Map.entry("com.ragagent.common.jdbc.DatabaseDialects", "方言探测（收敛点）"),
@@ -296,13 +297,9 @@ class ArchitectureRulesTest {
             Map.entry("com.ragagent.session.service.SessionKnowledgeQaService", "PG 专有 SQL（多表 JOIN 标签检索）"),
             Map.entry("com.ragagent.system.service.SystemInfoService", "PG 专有 SQL（系统元数据）"),
             Map.entry("com.ragagent.vectorstore.service.VectorStoreConfigService", "PG 专有 SQL（向量库配置）"),
-            Map.entry("com.ragagent.datasource.service.MapperKnowledgeBridge", "方言探测（detectPostgres）"),
-            Map.entry("com.ragagent.memory.mapper.MemoryIndexStore", "方言探测 + 列存在性探测"),
-            Map.entry("com.ragagent.mcp.mapper.McpMetadataRepository", "方言探测（detectPostgres）"),
-            Map.entry("com.ragagent.storage.mapper.StorageBackendRepository", "方言探测（detectPostgres）"),
-            Map.entry("com.ragagent.session.mapper.MessageRepository", "方言探测（detectPostgres）"),
-            Map.entry("com.ragagent.session.mapper.SessionRepository", "方言探测（detectPostgres）"),
-            Map.entry("com.ragagent.session.mapper.MessageSuggestionRepository", "方言探测（detectPostgres）"));
+            Map.entry("com.ragagent.memory.mapper.MemoryIndexStore", "列存在性探测（JDBC 元数据）"),
+            Map.entry("com.ragagent.storage.mapper.ResourceRepository", "PG 专有 SQL（存储资源查询，JdbcClient）"),
+            Map.entry("com.ragagent.storage.mapper.StorageBackendRepository", "PG 专有 SQL（存储后端元数据，JdbcClient）"));
 
     @Test
     @DisplayName("R7：裸 JDBC（JdbcTemplate/java.sql 连接与语句/DataSource）只许白名单类")

@@ -40,6 +40,7 @@ class AgentConfigKeyUsageTest {
             "common/wiki/ExtractedItem", "chatpipeline/plugin", "agent/AgentEngine", "agent/ReActIteration",
             "retrieval/HybridSearchService", "retrieval/vlm/VlmClient", "knowledge/service/ChunkExtractService",
             "knowledge/task/KnowledgeProcessWorker", "memory/mapper", "agent/tools/",
+            "common/mybatis/TenantFilterGuard",   // 表注册表：内容是**数据库表名**（migrations 推导），非 agent 配置键
             "common/prompt/AgentPromptPlaceholders", "knowledge/domain/KnowledgeBase",
             // HTTP 面占位符定义：此处的 snake 是**模板令牌**（数据值，如 {{knowledge_bases}}），
             // 不是 agent 配置键；两面一致性由 AgentPlaceholdersTest 单独守。

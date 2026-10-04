@@ -1,8 +1,7 @@
 package com.ragagent.datasource.service;
 
+import com.ragagent.common.jdbc.DatabaseDialects;
 import com.ragagent.common.web.JsonMappers;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -96,7 +95,7 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
         this.storage = storage;
         this.fileStorage = fileStorage;
         this.worker = worker;
-        this.postgres = detectPostgres(dataSource);
+        this.postgres = DatabaseDialects.isPostgres(dataSource);
     }
 
     // ── 知识库 ───────────────────────────────────────────────────────────────
@@ -390,15 +389,4 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
         return v.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
     }
 
-    /** 与 {@code SessionRepository.detectPostgres} 同一处置：探测失败按非 postgres 走。 */
-    private static boolean detectPostgres(DataSource dataSource) {
-        try (Connection c = dataSource.getConnection()) {
-            String product = c.getMetaData().getDatabaseProductName();
-            return product != null && product.toLowerCase(Locale.ROOT).contains("postgres");
-        } catch (SQLException e) {
-            log.warn("[datasource] cannot detect database product, assuming non-postgres: {}",
-                    e.getMessage());
-            return false;
-        }
-    }
 }

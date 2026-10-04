@@ -1,7 +1,5 @@
 package com.ragagent.session.mapper;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Locale;
@@ -11,6 +9,7 @@ import javax.sql.DataSource;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.ragagent.common.jdbc.DatabaseDialects;
 import com.ragagent.common.mybatis.PageRequests;
 import com.ragagent.session.domain.Session;
 import com.ragagent.session.domain.SessionLastRequestState;
@@ -53,7 +52,7 @@ public class SessionRepository {
 
     public SessionRepository(SessionMapper mapper, DataSource dataSource) {
         this.mapper = mapper;
-        this.postgres = detectPostgres(dataSource);
+        this.postgres = DatabaseDialects.isPostgres(dataSource);
     }
 
     /**
@@ -315,17 +314,6 @@ public class SessionRepository {
                 embedLike, apiTenantLike, apiExternalLike, skillMarker, size, (page - 1) * size);
 
         return new SessionPage(items, total, page, size);
-    }
-
-    /** 与 {@code WikiPageRepository.detectPostgres} 同款探测。 */
-    private static boolean detectPostgres(DataSource dataSource) {
-        try (Connection c = dataSource.getConnection()) {
-            String product = c.getMetaData().getDatabaseProductName();
-            return product != null && product.toLowerCase(Locale.ROOT).contains("postgres");
-        } catch (SQLException e) {
-            // 与 wiki 的处置一致：探测失败按非 postgres 走（H2 路径），不阻断启动
-            return false;
-        }
     }
 
     /** {@code GetPagedByTenantID} 的返回：一页数据 + 总数。 */

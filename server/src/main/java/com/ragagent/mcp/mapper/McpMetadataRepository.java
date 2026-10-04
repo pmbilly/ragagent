@@ -1,11 +1,10 @@
 package com.ragagent.mcp.mapper;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 
 import javax.sql.DataSource;
 
+import com.ragagent.common.jdbc.DatabaseDialects;
 import com.ragagent.mcp.domain.McpMetadata;
 import com.ragagent.mcp.domain.McpMetadataSummary;
 import org.slf4j.Logger;
@@ -33,25 +32,12 @@ public class McpMetadataRepository {
 
     public McpMetadataRepository(McpMetadataMapper mapper, DataSource dataSource) {
         this.mapper = mapper;
-        this.postgres = detectPostgres(dataSource);
+        this.postgres = DatabaseDialects.isPostgres(dataSource);
     }
 
     /** 供测试断言方言探测 */
     public boolean isPostgres() {
         return postgres;
-    }
-
-    private static boolean detectPostgres(DataSource dataSource) {
-        try (Connection c = dataSource.getConnection()) {
-            String product = c.getMetaData().getDatabaseProductName();
-            boolean pg = product != null && product.toLowerCase().contains("postgres");
-            log.debug("mcp metadata dialect resolved: product={} postgres={}", product, pg);
-            return pg;
-        } catch (SQLException e) {
-            log.warn("mcp metadata dialect detection failed, falling back to non-postgres: {}",
-                    e.toString());
-            return false;
-        }
     }
 
     /** 对照 GetMetadata：不存在返回 null */

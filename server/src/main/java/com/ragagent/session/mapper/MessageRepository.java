@@ -11,6 +11,7 @@ import java.util.UUID;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.ragagent.common.jdbc.DatabaseDialects;
 import com.ragagent.common.mybatis.PageRequests;
 import com.ragagent.common.web.ZeroTimeSerializer;
 import com.ragagent.memory.domain.MemoryMessageCursor;
@@ -69,16 +70,7 @@ public class MessageRepository implements SessionMessagePort {
                              javax.sql.DataSource dataSource) {
         this.mapper = mapper;
         this.sessionMapper = sessionMapper;
-        this.postgres = detectPostgres(dataSource);
-    }
-
-    private static boolean detectPostgres(javax.sql.DataSource dataSource) {
-        try (java.sql.Connection c = dataSource.getConnection()) {
-            String product = c.getMetaData().getDatabaseProductName();
-            return product != null && product.toLowerCase(java.util.Locale.ROOT).contains("postgres");
-        } catch (java.sql.SQLException e) {
-            return false;
-        }
+        this.postgres = DatabaseDialects.isPostgres(dataSource);
     }
 
     // ── 写 ──────────────────────────────────────────────────────────────────

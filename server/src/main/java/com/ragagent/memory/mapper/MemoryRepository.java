@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import javax.sql.DataSource;
 
+import com.ragagent.common.jdbc.DatabaseDialects;
 import com.ragagent.memory.domain.MemoryDocAffinity;
 import com.ragagent.memory.domain.MemoryExtractionBatch;
 import com.ragagent.memory.domain.MemoryExtractionFailure;
@@ -128,7 +129,7 @@ public class MemoryRepository {
         this.indexStore = new MemoryIndexStore(this);
         this.itemStore = new MemoryItemStore(this);
         this.dataSource = dataSource;
-        this.postgres = MemoryIndexStore.detectPostgres(dataSource);
+        this.postgres = DatabaseDialects.isPostgres(dataSource);
     }
 
     // ── 返回值形状 ────────────────────────────────────────

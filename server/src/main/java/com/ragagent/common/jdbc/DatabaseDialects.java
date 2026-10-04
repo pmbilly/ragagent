@@ -6,6 +6,8 @@ import java.util.Locale;
 
 import javax.sql.DataSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
@@ -18,6 +20,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * 读代码时也不用再逐个实现去确认"它到底怎么判的"。</p>
  */
 public final class DatabaseDialects {
+
+    private static final Logger log = LoggerFactory.getLogger(DatabaseDialects.class);
 
     private DatabaseDialects() {
     }
@@ -32,6 +36,8 @@ public final class DatabaseDialects {
             String product = connection.getMetaData().getDatabaseProductName();
             return product != null && product.toLowerCase(Locale.ROOT).contains("postgres");
         } catch (SQLException e) {
+            // 失败按非 PG 分支走是既有语义；这里集中告警一次，替代此前各副本散落的日志
+            log.warn("database product detection failed, assuming non-postgres: {}", e.getMessage());
             return false;
         }
     }

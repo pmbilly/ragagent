@@ -61,6 +61,8 @@ grpc:
 
 # 流管理器（对照 Go internal/stream/factory.go 读的那组环境变量）
 weknora:
+  persistence:
+    tenant-filter-guard: ${WEKNORA_TENANT_FILTER_GUARD:alert}   # off | alert | enforce：SELECT 缺失租户谓词探测（B70 Step2，alert 先盘面）
   stream:
     type: ${STREAM_MANAGER_TYPE:memory}   # memory | redis（Go 是精确匹配，其余一律 memory）
     prefix: ${REDIS_PREFIX:}              # 原样使用，不去尾冒号（.env 的 "stream:" 会拼出双冒号，与 Go 一致）

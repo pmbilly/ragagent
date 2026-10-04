@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import javax.sql.DataSource;
 
+import com.ragagent.common.jdbc.DatabaseDialects;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.storage.domain.StorageBackend;
 import org.springframework.jdbc.core.RowMapper;
@@ -34,13 +35,8 @@ public class StorageBackendRepository {
 
     public StorageBackendRepository(JdbcClient jdbc, DataSource dataSource) {
         this.jdbc = jdbc;
-        boolean pg = false;
-        try (var conn = dataSource.getConnection()) {
-            pg = conn.getMetaData().getDatabaseProductName().toLowerCase().contains("postgres");
-        } catch (Exception e) {
-            // 默认按非 PG（H2）处理
-        }
-        this.postgres = pg;
+        // 方言判定统一走 DatabaseDialects（失败按非 PG；连不上=启动本身有问题，不再吞 RuntimeException）
+        this.postgres = DatabaseDialects.isPostgres(dataSource);
     }
 
     private static class BackendMapper implements RowMapper<StorageBackend> {
