@@ -758,6 +758,16 @@
 - **守卫与测试**：`embedChannelTokenContract.test.ts`（3 条不变量：hydrate 贴回 / remember 唯一取值来源 / forget 清理）+ `embedChannelTokenRegistry.test.ts`（3 条：跨刷新保留、轮换覆盖+删除清理、空值安全）；**两个红态探针**（把 `load()` 改回裸赋值、去掉 `remember`）均点名报红。前端 **728/728**、`vue-tsc` 0 错误、i18n 审计 11/11、契约键守卫无新增；临时探针渠道与 agent 已删除（204/204，无残留）。
 - **遗留**：非管理员视图（`hide-footer`）与卡片上的启用开关在自动化里不可达（元素被隐藏/拦截），该路径由单测语义覆盖，未做浏览器实测。
 
+**✅ B66（2026-10-04，Agent 编辑器「提示词变量」全空：裸载荷漏适配）**
+- **触发**：用户问 `/platform/agents` 的变量显示——「点击插入，或输入 `{{` 唤起列表」不工作。
+- **根因（真机复现 + 端点实测）**：`GET /api/v1/agents/placeholders` 返回**裸载荷**（顶层键 `all / systemPrompt / agentSystemPrompt / contextTemplate / rewriteSystemPrompt / rewritePrompt / fallbackPrompt`，**无 `data` 键**），而 `api/agent/index.ts` 把它声明成 `get<{ data: PlaceholdersResponse }>` 且**没有适配层** → `editorResources` store 读 `placeholdersRes?.data` **恒 undefined** → `placeholderData` 七组全空 ⇒ **变量芯片不渲染、`{{` 弹出列表不出现、点击插入无效**。同仓既有约定是「裸载荷 + 消费端要 `{data}` → 在 api 层 `return { data: resp }` 适配」（见 `api/system` 的 KV 三兄弟、`api/retrieval`、`api/web-search-provider`）——这两处漏了。
+- **同族第二处**：`getAgentTypePresets()` 同样漏适配（裸数组声明成 `{data}`）→ `agentTypePresets` 恒 `[]` → 编辑器「类型」下拉为空（用户未报，一并修）。**全仓扫查**：`get<{ data: … }>` 声明共 **2 处**，正是这两个——其余 6 处都显式适配 ✓ 无第三处。
+- **修复**：两个函数改为「裸类型取数 + 显式适配」，并保留消费端既有 `{ data }` 契约（store 读侧不动、一处改即可）：
+  `get<PlaceholdersResponse>(...).then((resp) => ({ data: resp }))`、`get<AgentTypePreset[]>(...).then((resp) => ({ data: Array.isArray(resp) ? resp : [] }))`。
+- **验证（Playwright 真机，smoke 账号真开编辑器）**：修复前——变量芯片 **0 个**、输入 `{{` 无弹出（红态复现）；修复后——芯片出现（`{{knowledge_bases}}` 等）、输入 `{{` 弹出 **5 项**（带描述，如 `{{query}}用户当前的问题或查询内容`）、**点击芯片成功插入 `{{query}}`**；直读 pinia store：`agentTypePresets` **5** 条、`placeholders` 七组齐全（all 10 / agentSystemPrompt 4 / systemPrompt 5 / contextTemplate 5 / rewriteSystemPrompt 5 / rewritePrompt 5 / fallbackPrompt 2）。（下拉选项数用合成点击验不出，属测试手法限制；数据层已由 store 直读确认。）
+- **守卫**：`crossFaceKeyContract.test.ts` 新增「裸载荷 API 必须在 api 层适配成 { data }」——禁止 `get<{ data: … }>(裸端点)` 写法、要求显式适配、并钉住 store 读侧契约（**红态探针**：把 `getPlaceholders` 改回声明 `{data}` → 点名报红）。前端 **729/729**、`vue-tsc` 0 错误、i18n 审计 11/11、契约键守卫无新增。
+- **口径**：**裸载荷 ≠ 没有包裹**——要么消费端直读裸键，要么在 api 层显式适配；**绝不能"声明 `{data}` 而运行时是裸的"**（类型与运行时不一致，静态检查完全抓不到，症状是静默空值）。与 B58「信封读法清剿」同族：B58 清的是**消费端**按旧信封取数，本批补的是 **api 层漏做适配**。
+
 **✅ B58（2026-10-04，旧信封读法清剿：Go `{success,data}` 残留 → Java 裸载荷）**
 - **触发**：用户点检 `?section=integration-api` 报「加载 API 集成设置失败」。
 - **根因**：`/auth/me` 是**裸信封**（`{user, tenant, memberships, tenantRequired, capabilities, preferenceDefaults}`，`tenant` 在顶层），而页面读 `userResp.data.tenant`（Go 时代 `{success,data}` 形状）→ 恒 undefined → 直接抛错。curl 实测坐实（200 + 顶层键清单里无 `data`）。

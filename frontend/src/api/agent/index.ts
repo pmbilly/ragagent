@@ -244,8 +244,10 @@ export interface PlaceholdersResponse {
 }
 
 // 获取占位符定义
-export function getPlaceholders() {
-  return get<{ data: PlaceholdersResponse }>('/api/v1/agents/placeholders');
+export function getPlaceholders(): Promise<{ data: PlaceholdersResponse }> {
+  // 后端 200 裸载荷（§2.1）；适配成消费端既有的 { data } 契约
+  // （漏了这层适配 → store 读 .data 恒 undefined → 编辑器变量芯片与 {{ 弹出列表全空）
+  return get<PlaceholdersResponse>('/api/v1/agents/placeholders').then((resp) => ({ data: resp }));
 }
 
 // ===== 智能体类型预设 =====
@@ -292,8 +294,11 @@ export interface AgentTypePreset {
 }
 
 // 拉取类型预设列表（编辑器用）
-export function getAgentTypePresets() {
-  return get<{ data: AgentTypePreset[] }>('/api/v1/agents/type-presets');
+export function getAgentTypePresets(): Promise<{ data: AgentTypePreset[] }> {
+  // 后端 200 裸数组（§2.1）；适配成消费端既有的 { data } 契约（同 web-search-provider）
+  return get<AgentTypePreset[]>('/api/v1/agents/type-presets').then((resp) => ({
+    data: Array.isArray(resp) ? resp : [],
+  }));
 }
 
 // ===== IM渠道 =====
