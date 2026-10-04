@@ -24,7 +24,6 @@ import com.ragagent.rerank.provider.LkeapReranker;
 import com.ragagent.rerank.provider.NvidiaReranker;
 import com.ragagent.rerank.provider.OpenAiReranker;
 import com.ragagent.rerank.provider.VolcengineReranker;
-import com.ragagent.rerank.provider.WeknoraCloudReranker;
 import com.ragagent.rerank.provider.ZhipuReranker;
 import com.ragagent.common.web.ProviderJson;
 
@@ -246,31 +245,6 @@ class RerankWireTest {
             assertTrue(results.get(0).getRelevanceScore() > results.get(1).getRelevanceScore());
             assertTrue(results.get(1).getRelevanceScore() > results.get(2).getRelevanceScore());
             assertEquals("A", results.get(0).getDocument().getText());
-        } finally {
-            stub.close();
-        }
-    }
-
-    @Test
-    void weknoraCloudRerankBody() {
-        Stub stub = new Stub(
-                "{\"results\":[{\"index\":1,\"relevance_score\":0.4,\"document\":{\"text\":\"B\"}},"
-                + "{\"index\":0,\"relevance_score\":0.9,\"document\":{\"text\":\"A\"}}]}");
-        try {
-            RerankerConfig c = new RerankerConfig();
-            c.setBaseUrl(stub.url());
-            c.setModelName("local-name");
-            c.setModelId("rr-w");
-            c.setAppId("app-test");
-            c.setAppSecret("secret-test");
-            c.setExtraConfig(Map.of("remote_model_name", "remote-name"));
-            Reranker r = new WeknoraCloudReranker(c);
-            List<RankResult> results = r.rerank("query", List.of("A", "B"));
-            assertEquals(wireBody("rerank_weknoracloud"), stub.requests.get(0).body());
-            // 按响应顺序 append（不做按 index 重排）
-            assertEquals(0.4, results.get(0).getRelevanceScore());
-            assertEquals(0.9, results.get(1).getRelevanceScore());
-            assertEquals(1, results.get(0).getIndex());
         } finally {
             stub.close();
         }

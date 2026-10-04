@@ -59,8 +59,6 @@ class ProviderAdapterRegistryTest {
                 new Case("moonshot fixed temp", ProviderName.MOONSHOT, "moonshot-v1-8k",
                         ProviderAdapters.Moonshot.class),
                 new Case("moonshot other falls back", ProviderName.MOONSHOT, "kimi-latest", BaseProvider.class),
-                new Case("weknora cloud", ProviderName.WEKNORA_CLOUD, "anything",
-                        ProviderAdapters.WeKnoraCloud.class),
                 new Case("unknown falls back", null, "x", BaseProvider.class));
 
         for (Case tc : cases) {
@@ -106,11 +104,6 @@ class ProviderAdapterRegistryTest {
         config.setModelId(model);
         config.setProvider(providerName);
         config.setExtraConfig(extra);
-        if (ProviderName.WEKNORA_CLOUD.value().equals(providerName)) {
-            // 该厂商的构造期硬校验：AppID/AppSecret 必填
-            config.setAppId("app-id");
-            config.setAppSecret("app-secret");
-        }
         return new RemoteApiChat(config);
     }
 
@@ -317,38 +310,4 @@ class ProviderAdapterRegistryTest {
         return opts;
     }
 
-    /** 补测：WeKnoraCloud 的签名头齐全且签名可复算（X-Signature）。 */
-    @Test
-    void weKnoraCloudSignsRequest() {
-        Map<String, String> headers = ProviderAdapters.WeKnoraCloud.sign(
-                "app-id", "secret", "req-1", "{\"a\":1}");
-        assertEquals("app-id", headers.get("X-APPID"));
-        assertEquals("secret", headers.get("X-API-Key"));
-        assertEquals("req-1", headers.get("X-Request-ID"));
-        assertTrue(headers.get("X-Timestamp").matches("^\\d+$"));
-        assertEquals(16, headers.get("X-Nonce").length());
-        assertEquals(32, headers.get("X-Signature").length(), "MD5 十六进制");
-
-        // 签名 = md5(排序后的 k=v 的 & 拼接)；用同一算法复算一遍
-        java.security.MessageDigest digest;
-        try {
-            digest = java.security.MessageDigest.getInstance("MD5");
-        } catch (java.security.NoSuchAlgorithmException e) {
-            throw new IllegalStateException(e);
-        }
-        String bodyMd5 = java.util.HexFormat.of().formatHex(
-                digest.digest("{\"a\":1}".getBytes(java.nio.charset.StandardCharsets.UTF_8)));
-        String canonical = "body=" + bodyMd5
-                + "&x-api-key=secret&x-appid=app-id&x-nonce=" + headers.get("X-Nonce")
-                + "&x-request-id=req-1&x-timestamp=" + headers.get("X-Timestamp");
-        digest.reset();
-        String expected = java.util.HexFormat.of().formatHex(
-                digest.digest(canonical.getBytes(java.nio.charset.StandardCharsets.UTF_8)));
-        assertEquals(expected, headers.get("X-Signature"));
-
-        // endpoint 覆写 + 空 body 按 "{}" 参与摘要
-        ProviderAdapters.WeKnoraCloud adapter = new ProviderAdapters.WeKnoraCloud();
-        assertEquals("https://cloud.example.com/api/v1/chat/completions",
-                adapter.endpoint("https://cloud.example.com/", "m", true));
-    }
 }

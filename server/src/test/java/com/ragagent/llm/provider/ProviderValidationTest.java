@@ -148,12 +148,6 @@ class ProviderValidationTest {
         }
     }
 
-    /** WeKnoraCloudProvider 的 ValidateConfig：无条件通过（结构校验） */
-    @Test
-    void weKnoraCloudAcceptsAnything() {
-        assertDoesNotThrow(() -> new WeKnoraCloudProvider().validateConfig(config("", "")));
-    }
-
     /** AzureOpenAIProvider：五项检验顺序 baseURL 最后（key → model → baseURL） */
     @Test
     void azureOpenAiValidation() {

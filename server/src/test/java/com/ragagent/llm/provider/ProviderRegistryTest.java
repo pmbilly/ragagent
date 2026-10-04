@@ -38,10 +38,10 @@ class ProviderRegistryTest {
         }
     }
 
-    /** List() 顺序 = allProviders() 声明序，且全部 27 个厂商都已注册 */
+    /** List() 顺序 = allProviders() 声明序，且全部 26 个厂商都已注册 */
     @Test
     void listFollowsAllProvidersOrder() {
-        assertEquals(27, ProviderRegistry.allProviders().size());
+        assertEquals(26, ProviderRegistry.allProviders().size());
         assertEquals(ProviderRegistry.allProviders(),
                 ProviderRegistry.list().stream().map(ProviderInfo::name).toList());
     }
@@ -92,7 +92,6 @@ class ProviderRegistryTest {
             "https://api.lkeap.cloud.tencent.com/v1, LKEAP",
             "https://lkeap.tencentcloudapi.com, LKEAP",
             "https://api.novita.ai/openai/v1, NOVITA",
-            "https://weknora.weixin.qq.com, WEKNORA_CLOUD",
             "http://your_gpustack_server_url/v1-openai, GPUSTACK"
     })
     void detectProvider(String url, ProviderName expected) {
@@ -237,7 +236,7 @@ class ProviderRegistryTest {
 
     /** 全部注册厂商的信息自洽：displayName/description 非空，Deprecated 之外的默认 URL 非占位 */
     @ParameterizedTest
-    @ValueSource(strings = {"GENERIC", "WEKNORA_CLOUD", "ALIYUN", "ZHIPU", "VOLCENGINE", "HUNYUAN",
+    @ValueSource(strings = {"GENERIC", "ALIYUN", "ZHIPU", "VOLCENGINE", "HUNYUAN",
             "SILICONFLOW", "DEEPSEEK", "MINIMAX", "MOONSHOT", "MODELSCOPE", "QIANFAN", "QINIU",
             "OPENAI", "ANTHROPIC", "GEMINI", "OPENROUTER", "LITELLM", "REQUESTY", "JINA", "MIMO",
             "LONGCAT", "LKEAP", "GPUSTACK", "NVIDIA", "NOVITA", "AZURE_OPEN_AI"})

@@ -23,7 +23,6 @@ import com.ragagent.embedding.provider.JinaEmbedder;
 import com.ragagent.embedding.provider.NvidiaEmbedder;
 import com.ragagent.embedding.provider.OpenAiEmbedder;
 import com.ragagent.embedding.provider.VolcengineEmbedder;
-import com.ragagent.embedding.provider.WeknoraCloudEmbedder;
 import com.ragagent.embedding.provider.ZhipuEmbedder;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.model.domain.Model;
@@ -332,67 +331,6 @@ class EmbeddingWireTest {
                     "Go 的 ZhipuEmbedRequest 无 encoding_format 字段");
         } finally {
             stub.close();
-        }
-    }
-
-    @Test
-    void weknoraCloudSignsRemoteModelNameAndValidatesIndexes() {
-        Stub stub = new Stub(
-                "{\"data\":[{\"index\":1,\"embedding\":[0.3,0.4]},{\"index\":0,\"embedding\":[0.1,0.2]}]}");
-        try {
-            EmbedderConfig cfg = new EmbedderConfig();
-            cfg.setBaseUrl(stub.url());
-            cfg.setModelName("local-name");
-            cfg.setModelId("emb-9");
-            cfg.setAppId("app-test");
-            cfg.setAppSecret("secret-test");
-            cfg.setDimensions(1024);
-            cfg.setSupportsDimensionOverride(true);
-            cfg.setExtraConfig(Map.of("remote_model_name", "remote-name"));
-            WeknoraCloudEmbedder e = new WeknoraCloudEmbedder(cfg);
-            List<float[]> got = embed(e, "hello world", "second text");
-            assertEquals(wireBody("weknoracloud"), stub.requests.get(0).body());
-            assertEquals("/api/v1/embeddings", stub.requests.get(0).path());
-            assertEquals(0.1f, got.get(0)[0]);
-            Captured c = stub.requests.get(0);
-            // 签名头六件套形状（nonce/timestamp 随机，只验存在与 appid/request-id）
-            assertEquals("app-test", c.headers().getFirst("X-APPID"));
-            assertNotNull(c.headers().getFirst("X-Signature"));
-            assertNotNull(c.headers().getFirst("X-Nonce"));
-        } finally {
-            stub.close();
-        }
-    }
-
-    @Test
-    void weknoraCloudRejectsMalformedResponses() {
-        for (String[] tc : new String[][] {
-                {"negative index", "{\"data\":[{\"index\":-1,\"embedding\":[0.1]}]}",
-                        "response index -1 out of range"},
-                {"index above range", "{\"data\":[{\"index\":1,\"embedding\":[0.1]}]}",
-                        "response index 1 out of range"},
-                {"duplicate", "{\"data\":[{\"index\":0,\"embedding\":[0.1]},{\"index\":0,\"embedding\":[0.2]}]}",
-                        "duplicate response index 0"},
-                {"missing", "{\"data\":[{\"index\":0,\"embedding\":[0.1,0.2]}]}",
-                        "missing embedding for input index 1"}}) {
-            Stub stub = new Stub(tc[1]);
-            try {
-                EmbedderConfig cfg = new EmbedderConfig();
-                cfg.setBaseUrl(stub.url());
-                cfg.setModelName("m");
-                cfg.setModelId("id");
-                cfg.setAppId("app");
-                cfg.setAppSecret("secret");
-                WeknoraCloudEmbedder e = new WeknoraCloudEmbedder(cfg);
-                boolean missing = tc[2].contains("missing");
-                EmbeddingHttp.EmbeddingException err = assertThrows(
-                        EmbeddingHttp.EmbeddingException.class,
-                        () -> e.batchEmbed(missing ? List.of("a", "b") : List.of("a")));
-                assertTrue(err.getMessage().contains(tc[2]),
-                        tc[0] + ": " + err.getMessage());
-            } finally {
-                stub.close();
-            }
         }
     }
 

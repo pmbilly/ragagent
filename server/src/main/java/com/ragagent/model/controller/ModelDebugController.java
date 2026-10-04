@@ -322,7 +322,7 @@ public class ModelDebugController {
             return writeResult(startedNanos, requestPreview, null, e.getMessage(), observations);
         }
         // 凭证 + 构造期校验：model 级凭证优先、租户回落；
-        // weknoracloud 的凭证检查先于基址、ollama 不校验基址
+        // ollama 不校验基址
         // ——与 agent 侧 VLM 装配共用 vlmConfigFor 同一实现。
         VlmClient.VlmConfig config;
         try {

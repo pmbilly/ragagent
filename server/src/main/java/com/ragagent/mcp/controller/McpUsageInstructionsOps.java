@@ -269,9 +269,6 @@ final class McpUsageInstructionsOps {
      * 模型选择：在 KnowledgeQA 且 active 的模型里，
      * 优先取 isDefault，否则取第一个遇到的。
      *
-     * <p>⚠️ 已知差异：provider=weknoracloud 且租户未存 app_id/app_secret 时的租户级
-     * 凭据回落尚未实现（{@code TenantService} 尚无该读取口），
-     * 故只使用模型自身参数（与 {@code ChatConfig.fromModel} 的既有行为一致）。</p>
      */
     private Model selectChatModel() {
         List<Model> models = ctrl.modelService.listModels();

@@ -152,27 +152,6 @@ class ModelContractTest {
     }
 
     @Test
-    void weknoracloudStatus() throws Exception {
-        MvcResult gb5 = mockMvc.perform(get("/api/v1/models/weknoracloud/status")
-                        .header("Authorization", "Bearer " + loginOwner()))
-                .andExpect(status().isOk())
-            .andReturn();
-        assertGolden(gb5, "weknoracloud-status.json");
-    }
-
-    /** 凭证保存的校验路径（外呼校验路径需真实 WeKnoraCloud，不做集成）。 */
-    @Test
-    void weknoracloudCredentialsValidation() throws Exception {
-        MvcResult gb6 = mockMvc.perform(post("/api/v1/weknoracloud/credentials")
-                        .header("Authorization", "Bearer " + loginOwner())
-                        .contentType("application/json")
-                        .content("{\"appId\":\"app-x\"}"))
-                .andExpect(status().isBadRequest())
-            .andReturn();
-        assertGolden(gb6, "weknoracloud-cred-validation.json");
-    }
-
-    @Test
     void createValidationError() throws Exception {
         MvcResult gb7 = mockMvc.perform(post("/api/v1/models")
                         .header("Authorization", "Bearer " + loginOwner())

@@ -387,7 +387,7 @@ export default {
       capabilityMessageHistory: 'История сообщений',
       capabilityMessageHistoryHint: 'Позволяет искать историю чатов пространства и читать статистику истории. Не даёт доступ к настройкам пространства.',
       capabilityManageModels: 'Управление моделями',
-      capabilityManageModelsHint: 'Управление конфигурациями моделей, учётными данными, проверками подключения и данными WeKnoraCloud.',
+      capabilityManageModelsHint: 'Управление конфигурациями моделей, учётными данными, проверками подключения .',
       capabilityManageMcpServices: 'Управление MCP-сервисами',
       capabilityManageMcpServicesHint: 'Управление MCP-сервисами, учётными данными, политиками подтверждения инструментов и OAuth-состоянием этого субъекта.',
       capabilityManageDatasources: 'Управление источниками данных',
@@ -1388,10 +1388,6 @@ export default {
         markitdown: {
           name: 'MarkItDown',
           desc: 'Конвертер Microsoft MarkItDown (PDF/Office/HTML и др.)'
-        },
-        weknoracloud: {
-          name: 'WeKnora Cloud',
-          desc: 'Парсинг документов через WeKnora Cloud'
         },
         paddleocr_vl_cloud: {
           name: 'PaddleOCR-VL Cloud',
@@ -5001,59 +4997,6 @@ export default {
       paddleocrVlEndpointPlaceholder: 'напр. http://your-paddleocr-vl:8080',
       paddleocrVlEndpointHint: 'Адрес полного сервиса PaddleOCR-VL (pipeline); суффикс /layout-parsing не требуется',
       paddleocrVlCloudTokenPlaceholder: 'Токен PaddleOCR-VL AI Studio'
-    },
-    weknoraCloud: {
-      title: 'WeKnora Cloud',
-      description: 'Настройте учётные данные APPID и APPSECRET для WeKnora Cloud. Данные используются для модельных сервисов и движка парсинга документов.',
-      viewDocs: 'Документация',
-      unconfigured: 'Учётные данные не настроены. Заполните APPID и APPSECRET.',
-      configured: 'Учётные данные настроены, статус в норме.',
-      expired: 'Учётные данные WeKnora Cloud истекли',
-      expiredDefault: 'Ключ шифрования изменился после перезапуска. Сохранённые данные не могут быть расшифрованы. Введите данные заново.',
-      reconfigure: 'Перенастроить',
-      appIdLabel: 'APPID',
-      appIdDesc: 'ID приложения WeKnora Cloud',
-      appIdPlaceholder: 'Введите APPID',
-      appSecretLabel: 'APPSECRET',
-      appSecretDesc: 'Секрет приложения WeKnora Cloud',
-      appSecretPlaceholder: 'Введите APPSECRET',
-      saveHint: 'Данные будут проверены и зашифрованы перед сохранением.',
-      saveBtn: 'Сохранить',
-      usageTitle: 'Инструкция',
-      usageSteps: '1. Сохраните APPID и APPSECRET\n2. Добавьте chat, embedding, rerank и vlm в разделе «Облачные модели» ниже\n3. Парсинг: Настройки БЗ → Движок парсинга → WeKnora Cloud',
-      fillRequired: 'Заполните APPID и APPSECRET',
-      saveSuccess: 'Учётные данные сохранены',
-      saveFailed: 'Не удалось сохранить данные',
-      credentialConfigured: 'Учётные данные WeKnoraCloud настроены.',
-      credentialExpired: 'Данные истекли. Перенастройте.',
-      credentialUnconfigured: 'Учётные данные WeKnoraCloud не настроены. Заполните APPID и APPSECRET.',
-      checkingStatus: 'Проверка статуса...',
-      goToSettings: 'Перейти в настройки',
-      modelHintConfigured: 'Учётные данные WeKnoraCloud настроены. Поддерживаемые модели см. в',
-      modelHintDocsLink: 'документации API',
-      addModelsSuccess: 'Успешно добавлено моделей: {count}',
-      addModelsPartial: 'Добавлено: {success}, ошибок: {failed}',
-      addModelsFailed: 'Не удалось добавить модели',
-      addModelsEmbeddingFailed: 'Тест подключения Embedding не пройден; не удалось определить размерность вектора',
-      addModelsDisplayName: {
-        chat: 'WeKnoraCloud Chat',
-        embedding: 'WeKnoraCloud Embedding',
-        rerank: 'WeKnoraCloud ReRank',
-        vllm: 'WeKnoraCloud Vision'
-      },
-      modelsSection: {
-        title: 'Облачные модели',
-        descReady: 'Зарегистрируйте четыре стандартные модели WeKnora Cloud для чата, поиска, реранкинга и зрения.',
-        descPending: 'Сначала сохраните учётные данные выше, затем добавьте модели здесь.',
-        statusAdded: 'Добавлена',
-        statusPending: 'Нужны учётные данные',
-        addOne: 'Добавить',
-        addAllBtn: 'Добавить все отсутствующие ({count})',
-        addAllConfirm: 'Подтвердить',
-        confirmAddOne: 'Добавить модель {type} «{name}»?',
-        confirmAddAll: 'Добавить все {count} отсутствующих облачных моделей сразу?',
-        allReady: 'Все четыре облачные модели готовы'
-      }
     },
     roleDenied: {
       title: 'Недостаточно прав',

@@ -848,24 +848,6 @@ class RemoteApiChatTest {
         assertTrue(err.getMessage().contains("API request failed with status 400"), err.getMessage());
     }
 
-    /** 构造期校验：WeKnoraCloud 缺 AppID/AppSecret 直接拒绝。 */
-    @Test
-    void weKnoraCloudRequiresCredentials() {
-        ChatConfig config = new ChatConfig();
-        config.setModelName("m");
-        config.setProvider("weknoracloud");
-        config.setApiKey("k");
-        assertTrue(assertThrows(BizException.class, () -> new RemoteApiChat(config))
-                .getMessage().contains("AppID is required"));
-
-        config.setAppId("app");
-        assertTrue(assertThrows(BizException.class, () -> new RemoteApiChat(config))
-                .getMessage().contains("AppSecret is required"));
-
-        config.setAppSecret("secret");
-        new RemoteApiChat(config); // 两个都齐了就不抛
-    }
-
     /** Azure 的 endpoint 需要自己拼（deployment 路径公式）。 */
     @Test
     void azureEndpointUsesDeploymentPath() {

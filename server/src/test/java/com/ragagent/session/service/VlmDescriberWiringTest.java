@@ -87,16 +87,6 @@ class VlmDescriberWiringTest {
     }
 
     @Test
-    void weKnoraCloudMissingAppIdFailsWithGoText() {
-        when(modelService.getByIdVisible(anyLong(), anyString()))
-                .thenReturn(vlmModel("remote", "weknoracloud", "https://cloud.test/v1"));
-
-        assertThatThrownBy(() -> wiring((url, apiKey, body) -> "{}").create("vlm-1"))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("WeKnoraCloud VLM: AppID is required");
-    }
-
-    @Test
     void ssrfFailurePropagatesWithGoPrefix() {
         when(modelService.getByIdVisible(anyLong(), anyString()))
                 .thenReturn(vlmModel("remote", "", "https://vision.test/v1"));

@@ -114,10 +114,6 @@ public final class ProviderBaseURLs {
     /** 火山引擎知识库托管 Rerank API BaseURL */
     public static final String VOLCENGINE_RERANK_BASE_URL = "https://api-knowledgebase.mlp.cn-beijing.volces.com";
 
-    // ---- WeKnoraCloud ----
-    /** WeKnoraCloud 服务硬编码 Base URL（统一入口，路径由各实现拼接） */
-    public static final String WEKNORA_CLOUD_BASE_URL = "https://weknora.weixin.qq.com";
-
     // ---- Zhipu ----
     /** 智谱 AI Chat 的默认 BaseURL */
     public static final String ZHIPU_CHAT_BASE_URL = "https://open.bigmodel.cn/api/paas/v4";

@@ -36,7 +36,7 @@ public final class APIKeyCapability {
     /** 检索/查看租户级聊天历史知识库；<b>与 chat 分离</b>——chat 只覆盖调用者自己的
      *  在线会话，message_history 可触达租户内历史消息。 */
     public static final String MESSAGE_HISTORY = "message_history";
-    /** 租户模型定义、凭据、模型检查、WeKnoraCloud 凭据。 */
+    /** 租户模型定义、凭据、模型检查。 */
     public static final String MANAGE_MODELS = "manage_models";
     /** 租户 MCP 服务定义、凭据、工具策略、逐主体 OAuth 状态。 */
     public static final String MANAGE_MCP_SERVICES = "manage_mcp_services";

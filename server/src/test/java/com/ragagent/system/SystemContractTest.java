@@ -226,7 +226,7 @@ class SystemContractTest {
         // 外壳字母序 + connected=false + 本地 8 引擎（无远端追加）
         assertThat(java).contains("\"connected\":false");
         assertThat(java).contains("\"docreaderTransport\":\"grpc\"");
-        for (String engine : new String[]{"builtin", "simple", "anydoc", "weknoracloud",
+        for (String engine : new String[]{"builtin", "simple", "anydoc",
                 "mineru", "mineru_cloud", "paddleocr_vl", "paddleocr_vl_cloud"}) {
             assertThat(java).contains("\"name\":\"" + engine + "\"");
         }

@@ -215,34 +215,3 @@ export async function deleteModelCredentialField(
   await del(`/api/v1/models/${id}/credentials/${field}`)
 }
 
-export interface InitializeWeKnoraCloudRequest {
-  appId: string
-  appSecret: string
-}
-
-// 仅保存 WeKnoraCloud 凭证，不自动创建模型（成功 = 204 无响应体）
-export function saveWeKnoraCloudCredentials(data: InitializeWeKnoraCloudRequest): Promise<void> {
-  return post('/api/v1/weknoracloud/credentials', data)
-}
-
-export interface WeKnoraCloudStatusResult {
-  hasModels: boolean
-  needsReinit: boolean
-  reason: string | null
-}
-
-export function getWeKnoraCloudStatus(): Promise<WeKnoraCloudStatusResult> {
-  return new Promise((resolve) => {
-    get('/api/v1/models/weknoracloud/status')
-      .then((response: any) => {
-        if (response && typeof response.hasModels === 'boolean') {
-          resolve(response)
-        } else {
-          resolve({ hasModels: false, needsReinit: false, reason: null })
-        }
-      })
-      .catch(() => {
-        resolve({ hasModels: false, needsReinit: false, reason: null })
-      })
-  })
-}

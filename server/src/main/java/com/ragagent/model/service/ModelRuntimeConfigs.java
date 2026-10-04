@@ -107,7 +107,7 @@ public static EmbedderConfig embedderConfig(Model m, String appId, String appSec
         return c;
     }
 
-    public static VlmConfig vlmConfig(Model m, String appId, String appSecret) {
+    public static VlmConfig vlmConfig(Model m) {
         if (m == null) {
             return null;
         }
@@ -120,6 +120,5 @@ public static EmbedderConfig embedderConfig(Model m, String appId, String appSec
                 : new LinkedHashMap<>(p.getExtraConfig() == null ? Map.of() : p.getExtraConfig());
         return new VlmConfig(m.getSource(), p == null ? "" : p.getBaseUrl(),
                 m.getName(), p == null ? "" : p.getApiKey(), m.getId(), ifType,
-                p == null ? "" : p.getProvider(), extra, appId == null ? "" : appId,
-                appSecret == null ? "" : appSecret);
+                p == null ? "" : p.getProvider(), extra);
     }}

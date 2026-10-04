@@ -8,7 +8,6 @@ import com.ragagent.rerank.provider.LkeapReranker;
 import com.ragagent.rerank.provider.NvidiaReranker;
 import com.ragagent.rerank.provider.OpenAiReranker;
 import com.ragagent.rerank.provider.VolcengineReranker;
-import com.ragagent.rerank.provider.WeknoraCloudReranker;
 import com.ragagent.rerank.provider.ZhipuReranker;
 
 /**
@@ -51,7 +50,6 @@ public final class RerankerFactory {
             case "zhipu" -> new ZhipuReranker(config);
             case "jina" -> new JinaReranker(config);
             case "nvidia" -> new NvidiaReranker(config);
-            case "weknoracloud" -> new WeknoraCloudReranker(config);
             case "lkeap" -> new LkeapReranker(config);
             case "volcengine" -> new VolcengineReranker(config);
             default -> new OpenAiReranker(config);

@@ -51,7 +51,7 @@ final class RemoteHttpOps {
 
     /** 组装鉴权凭据。 */
     private ProviderAdapter.AuthCreds authCreds() {
-        return new ProviderAdapter.AuthCreds(service.apiKey, service.appId, service.appSecret);
+        return new ProviderAdapter.AuthCreds(service.apiKey);
     }
 
     /** 保留头跳过，其余覆盖。 */

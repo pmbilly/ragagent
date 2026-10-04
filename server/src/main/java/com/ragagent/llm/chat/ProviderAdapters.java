@@ -1,22 +1,13 @@
 package com.ragagent.llm.chat;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TreeMap;
-import java.util.UUID;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
-import com.ragagent.llm.domain.MessageContentPart;
 import com.ragagent.llm.provider.AliyunProvider;
 import com.ragagent.llm.provider.MoonshotProvider;
 import com.ragagent.llm.provider.OpenAIProvider;
@@ -31,18 +22,13 @@ import org.springframework.http.HttpHeaders;
  * （例如 azureReasoningProvider 在 azureProvider 之前、openAIReasoningProvider 在所有 OpenAI
  * 兜底之前），逐条保序，见 {@link #REGISTRY}。</p>
  *
- * <p>weKnoraCloud / deepseek / gemini 原有"必须走裸 HTTP"的特例，在
+ * <p>deepseek / gemini 原有"必须走裸 HTTP"的特例，在
  * 统一 ObjectNode 请求体路径下天然满足，无需单独开关（见 {@link ProviderAdapter} 类注释）。</p>
- *
- * <p>注意：{@link WeKnoraCloud} 的签名算法与 {@code model.service.WeKnoraCloudService.sign}
- * 逻辑相同（后者包内可见、本包够不着，故在 {@link WeKnoraCloud#sign} 处保留一份实现，
- * 属于已知重复）。</p>
  */
 public final class ProviderAdapters {
 
     /** 有序注册表（逐个保序；别重排）。 */
     private static final List<ProviderAdapter> REGISTRY = List.of(
-            new WeKnoraCloud(),
             new QwenThinking(),
             new Lkeap(),
             new Deepseek(),
@@ -74,141 +60,6 @@ public final class ProviderAdapters {
             }
         }
         return new BaseProvider();
-    }
-
-    // ------------------------------------------------------------------
-    // WeKnoraCloud：自定义 endpoint + 请求签名 + 多内容降级
-    // ------------------------------------------------------------------
-
-    public static final class WeKnoraCloud implements ProviderAdapter {
-
-        @Override
-        public String name() {
-            return ProviderName.WEKNORA_CLOUD.value();
-        }
-
-        @Override
-        public String endpoint(String baseUrl, String modelId, boolean isStream) {
-            return trimRightSlash(baseUrl) + "/api/v1/chat/completions";
-        }
-
-        @Override
-        public void auth(HttpHeaders headers, AuthCreds creds, byte[] body) {
-            String requestId = UUID.randomUUID().toString();
-            sign(creds.appId(), creds.appSecret(), requestId,
-                    body == null ? "" : new String(body, StandardCharsets.UTF_8))
-                    .forEach(headers::set);
-        }
-
-        /**
-         * 把 MultiContent 降级为纯文本，
-         * 同时**保留** tool_calls / tool_call_id / name，函数调用协议不断。
-         */
-        @Override
-        public List<ChatMessage> transformMessages(
-                List<ChatMessage> messages) {
-            if (messages == null) {
-                return null;
-            }
-            List<ChatMessage> result = new ArrayList<>(messages.size());
-            for (ChatMessage m : messages) {
-                ChatMessage msg = m;
-                if (isBlank(m.getContent()) && m.getMultiContent() != null && !m.getMultiContent().isEmpty()) {
-                    StringBuilder text = new StringBuilder();
-                    for (MessageContentPart part : m.getMultiContent()) {
-                        if (MessageContentPart.TYPE_TEXT.equals(part.getType())
-                                && part.getText() != null && !part.getText().isEmpty()) {
-                            if (text.length() > 0) {
-                                text.append('\n');
-                            }
-                            text.append(part.getText());
-                        }
-                    }
-                    msg = new ChatMessage(m.getRole(), text.toString());
-                    msg.setName(m.getName());
-                    msg.setToolCallId(m.getToolCallId());
-                    msg.setToolCalls(m.getToolCalls());
-                    msg.setReasoningContent(m.getReasoningContent());
-                    msg.setKind(m.getKind());
-                }
-                result.add(msg);
-            }
-            return result;
-        }
-
-        // ── 签名算法（Sign/md5Hex/generateNonce/rfc3986Encode）──
-
-        /** 生成签名请求头（apiKey 槽位由 AppSecret 承载）。 */
-        static Map<String, String> sign(String appID, String apiKey, String requestID, String bodyJSON) {
-            String timestamp = String.valueOf(System.currentTimeMillis() / 1000);
-            String nonce = generateNonce(16);
-
-            String bodyForHash = bodyJSON == null || bodyJSON.isEmpty() ? "{}" : bodyJSON;
-            String bodyMD5 = md5Hex(bodyForHash);
-
-            // 参数按字母序排序后用 "&" 拼接（TreeMap 的遍历序）
-            Map<String, String> params = new TreeMap<>();
-            params.put("x-appid", appID);
-            params.put("x-api-key", apiKey);
-            params.put("x-request-id", requestID);
-            params.put("x-timestamp", timestamp);
-            params.put("x-nonce", nonce);
-            params.put("body", bodyMD5);
-
-            List<String> parts = new ArrayList<>(params.size());
-            params.forEach((k, v) -> parts.add(rfc3986Encode(k) + "=" + rfc3986Encode(v)));
-            String signature = md5Hex(String.join("&", parts));
-
-            Map<String, String> out = new LinkedHashMap<>();
-            out.put("X-APPID", appID);
-            out.put("X-API-Key", apiKey);
-            out.put("X-Request-ID", requestID);
-            out.put("X-Timestamp", timestamp);
-            out.put("X-Nonce", nonce);
-            out.put("X-Signature", signature);
-            return out;
-        }
-
-        private static final String NONCE_CHARS =
-                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        private static final SecureRandom NONCE_RANDOM = new SecureRandom();
-
-        private static String generateNonce(int length) {
-            StringBuilder b = new StringBuilder(length);
-            for (int i = 0; i < length; i++) {
-                b.append(NONCE_CHARS.charAt(NONCE_RANDOM.nextInt(NONCE_CHARS.length())));
-            }
-            return b.toString();
-        }
-
-        private static String md5Hex(String s) {
-            try {
-                MessageDigest md = MessageDigest.getInstance("MD5");
-                byte[] digest = md.digest(s.getBytes(StandardCharsets.UTF_8));
-                StringBuilder sb = new StringBuilder(digest.length * 2);
-                for (byte b : digest) {
-                    sb.append(String.format(Locale.ROOT, "%02x", b));
-                }
-                return sb.toString();
-            } catch (NoSuchAlgorithmException e) {
-                throw new IllegalStateException(e);
-            }
-        }
-
-        /** RFC3986 编码：保留 A-Z a-z 0-9 - _ . ~，其余 %XX（按码点，非 UTF-8 字节）。 */
-        static String rfc3986Encode(String s) {
-            StringBuilder buf = new StringBuilder(s.length());
-            for (int i = 0; i < s.length(); i++) {
-                char c = s.charAt(i);
-                if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')
-                        || (c >= '0' && c <= '9') || c == '-' || c == '_' || c == '.' || c == '~') {
-                    buf.append(c);
-                } else {
-                    buf.append(String.format(Locale.ROOT, "%%%02X", (int) c));
-                }
-            }
-            return buf.toString();
-        }
     }
 
     // ------------------------------------------------------------------

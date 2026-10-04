@@ -90,8 +90,6 @@ public class RemoteApiChat implements LlmChatClient {
     final String apiKey;
     /** provider 名；未知厂商为 null，调用方需判空。 */
     final ProviderName provider;
-    final String appId;
-    final String appSecret;
     /** 用户在模型配置里指定的自定义 HTTP 头（类 OpenAI Python SDK 的 extra_headers）。 */
     final Map<String, String> customHeaders;
     /** 仅 Azure 使用：URL 上的 api-version。 */
@@ -157,22 +155,11 @@ public class RemoteApiChat implements LlmChatClient {
                 modelName = override.trim();
             }
         }
-        if (providerName == ProviderName.WEKNORA_CLOUD) {
-            if (isBlank(chatConfig.getAppId())) {
-                throw BizException.badRequest("WeKnoraCloud provider: AppID is required");
-            }
-            if (isBlank(chatConfig.getAppSecret())) {
-                throw BizException.badRequest("WeKnoraCloud provider: AppSecret is required");
-            }
-        }
-
         this.modelName = modelName;
         this.modelId = chatConfig.getModelId();
         this.baseUrl = ProviderAdapters.trimRightSlash(resolvedBaseUrl);
         this.apiKey = chatConfig.getApiKey();
         this.provider = providerName;
-        this.appId = chatConfig.getAppId();
-        this.appSecret = chatConfig.getAppSecret();
         this.customHeaders = chatConfig.getCustomHeaders();
         this.adapter = ProviderAdapters.resolve(providerName, modelName);
         this.thinkingOverride = ThinkingStrategies.parseThinkingOverride(extraConfig);

@@ -63,7 +63,6 @@ const PARSER_ENGINE_NAMES = [
   'mineru_cloud',
   'paddleocr_vl',
   'paddleocr_vl_cloud',
-  'weknoracloud',
   'markitdown',
   'opendataloader',
 ] as const

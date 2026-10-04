@@ -44,7 +44,7 @@ import com.ragagent.common.security.SsrfGuard;
  * <h2>与 {@code llm.chat.LlmTransport} 的关系</h2>
  * <p>两者的重定向跟随逻辑刻意<b>各写一份</b>：{@code LlmTransport} 服务的是 LLM 调用
  * （它不设客户端超时、靠 deadline 施加超时），连接器这边要的是"整体超时预算"语义。
- * 合二为一会让两边的超时策略互相牵制。这与 WeKnoraCloud 签名函数重复实现的取舍同族
+ * 合二为一会让两边的超时策略互相牵制（与限流器的重复实现同族取舍）。
  * ——建议后续统一到 {@code common} 下一个共享底座，本模块先保证行为正确。</p>
  */
 public final class ConnectorHttp {

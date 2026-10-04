@@ -43,7 +43,6 @@ public class ParserEngineRegistry {
     public static final String BUILTIN = "builtin";
     public static final String SIMPLE = "simple";
     public static final String ANYDOC = "anydoc";
-    public static final String WEKNORACLOUD = "weknoracloud";
     public static final String MINERU = "mineru";
     public static final String MINERU_CLOUD = "mineru_cloud";
     public static final String PADDLEOCR_VL = "paddleocr_vl";
@@ -59,7 +58,7 @@ public class ParserEngineRegistry {
      * 本地静态引擎 + 远端引擎合并。
      *
      * @param docreaderConnected docreader 服务是否可达
-     * @param overrides          租户解析引擎覆盖配置 + weknoracloud_app_id
+     * @param overrides          租户解析引擎覆盖配置
      * @param remoteEngines      远端 ListEngines 的结果（未连接/失败时为 null）
      */
     public List<SystemDtos.ParserEngineInfo> listAllEngines(
@@ -100,14 +99,6 @@ public class ParserEngineRegistry {
                         "ppt", "pptm", "pptx", "rtf", "xls", "xlsm", "xlsx"),
                 false,
                 "anydoc engine not built into this binary (rebuild with `make build-anydoc` / `-tags anydoc`; Docker images need `--build-arg WITH_ANYDOC=1`)",
-                result);
-
-        // weknoracloud — 租户凭据（weknoracloud_app_id override）。
-        boolean cloud = overrides != null && !overrides.getOrDefault("weknoracloud_app_id", "").isEmpty();
-        engine(WEKNORACLOUD, "WeKnoraCloud document reader",
-                List.of("docx", "doc", "pdf", "md", "markdown", "xlsx", "xls", "pptx", "ppt"),
-                cloud,
-                cloud ? "" : "WeKnora Cloud credentials not configured. Go to Settings → WeKnora Cloud to set up.",
                 result);
 
         // mineru / mineru_cloud / paddleocr_vl / paddleocr_vl_cloud — override 未配置即不可用

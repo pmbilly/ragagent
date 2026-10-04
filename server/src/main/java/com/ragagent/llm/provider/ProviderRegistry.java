@@ -23,7 +23,6 @@ public final class ProviderRegistry {
     static {
         // 顺序 = allProviders() 声明序（List/ListByModelType 的输出顺序由 allProviders() 决定）
         register(new GenericProvider());
-        register(new WeKnoraCloudProvider());
         register(new AliyunProvider());
         register(new ZhipuProvider());
         register(new VolcengineProvider());
@@ -56,12 +55,10 @@ public final class ProviderRegistry {
 
     /**
      * 所有注册的提供者名称，顺序即 List/ListByModelType 的输出顺序。
-     * 注意 weknoracloud 排在第二位（紧跟在 generic 之后）。
      */
     public static List<ProviderName> allProviders() {
         return List.of(
                 ProviderName.GENERIC,
-                ProviderName.WEKNORA_CLOUD,
                 ProviderName.ALIYUN,
                 ProviderName.ZHIPU,
                 ProviderName.VOLCENGINE,
@@ -144,7 +141,7 @@ public final class ProviderRegistry {
      * dashscope → bigmodel/zhipu → openrouter → litellm → requesty → siliconflow → jina →
      * azure → openai → anthropic → deepseek → gemini → volces/volcengine → hunyuan →
      * minimax → xiaomimimo → gpustack → modelscope → qiniu → moonshot → qianfan/baidubce →
-     * longcat → lkeap → nvidia → novita → weknora；全部未命中返回 generic。
+     * longcat → lkeap → nvidia → novita；全部未命中返回 generic。
      *
      * 匹配为大小写敏感的子串匹配（String.contains）。
      */
@@ -203,8 +200,6 @@ public final class ProviderRegistry {
             return ProviderName.NVIDIA;
         } else if (containsAny(url, "api.novita.ai", "novita.ai")) {
             return ProviderName.NOVITA;
-        } else if (containsAny(url, "weknora.weixin.qq.com")) {
-            return ProviderName.WEKNORA_CLOUD;
         }
         return ProviderName.GENERIC;
     }

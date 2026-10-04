@@ -12,7 +12,6 @@ import com.ragagent.embedding.provider.NvidiaEmbedder;
 import com.ragagent.embedding.provider.OllamaEmbedder;
 import com.ragagent.embedding.provider.OpenAiEmbedder;
 import com.ragagent.embedding.provider.VolcengineEmbedder;
-import com.ragagent.embedding.provider.WeknoraCloudEmbedder;
 import com.ragagent.embedding.provider.ZhipuEmbedder;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.ollama.OllamaService;
@@ -118,7 +117,6 @@ public final class EmbedderFactory {
                         ze.setCustomHeaders(headers);
                         yield ze;
                     }
-                    case "weknoracloud" -> new WeknoraCloudEmbedder(config);
                     // 其它 provider 一律 OpenAI 兼容
                     default -> {
                         OpenAiEmbedder oe = new OpenAiEmbedder(config.getApiKey(),

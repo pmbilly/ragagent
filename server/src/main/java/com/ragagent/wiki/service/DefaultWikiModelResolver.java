@@ -22,9 +22,7 @@ import com.ragagent.model.service.ModelRuntimeConfigs;
  * <ul>
  *   <li>chat：{@code ModelService.getModelByID}（含"downloading → 500"状态闸门）
  *       → {@link ChatConfig#fromModel} → {@link LlmChatClients#create}
- *       （含并发闸门装饰器）。<b>已知差异</b>：provider=weknoracloud 且租户未存
- *       app_id/app_secret 时不会回落租户级凭据——Java 侧 {@code TenantService} 尚无该读取口
- *       （与 {@code McpServiceController#chatClientFor} 的既有取舍一致）。</li>
+ *       （含并发闸门装饰器）。</li>
  *   <li>embedding：先校验模型类型确为 embedding，再复用
  *       {@link EmbedderClient}（最小 OpenAI 兼容客户端）。</li>
  * </ul>

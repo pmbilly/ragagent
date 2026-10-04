@@ -241,7 +241,6 @@ const columns = computed(() => [
     // content: () => cellNode），所以次要色必须下放到列级 className（td 上），
     // 不能再包一层带颜色的 span——否则灰字会被带进深色气泡里，看不清。
     ellipsis: true,
-    className: 'sm-desc-cell',
   },
   { colKey: 'referencedBy', title: t('skillManagement.columns.referencedBy'), width: 130 },
   { colKey: 'updatedAt', title: t('skillManagement.columns.updatedAt'), width: 170 },

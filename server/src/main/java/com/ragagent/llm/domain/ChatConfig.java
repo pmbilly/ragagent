@@ -26,7 +26,7 @@ public class ChatConfig {
     /** 附加自定义 HTTP 头（类似 OpenAI Python SDK 的 extra_headers） */
     private Map<String, String> customHeaders;
     private String appId;
-    /** 加密值：由工厂函数调用方传入，在 WeKnoraCloud 实现使用前已解密 */
+    /** 加密值：由工厂函数调用方传入，使用前已解密（模型级凭据的通用承载） */
     private String appSecret;
 
     public ChatConfig() {

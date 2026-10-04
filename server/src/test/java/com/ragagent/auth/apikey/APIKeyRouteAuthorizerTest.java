@@ -137,9 +137,7 @@ class APIKeyRouteAuthorizerTest {
                 new String[]{"DELETE", "/api/v1/models/{id}"},
                 new String[]{"GET", "/api/v1/models/providers"},
                 new String[]{"PUT", "/api/v1/models/{id}/credentials"},
-                new String[]{"DELETE", "/api/v1/models/{id}/credentials/{field}"},
-                new String[]{"GET", "/api/v1/models/weknoracloud/status"},
-                new String[]{"POST", "/api/v1/weknoracloud/credentials"})) {
+                new String[]{"DELETE", "/api/v1/models/{id}/credentials/{field}"})) {
             APIKeyRoutePolicy p = policy(a, methodPath[0], methodPath[1]);
             assertThat(p.requireFullAccess()).isTrue();
             assertThat(p.hasCapability(APIKeyCapability.MANAGE_MODELS)).isTrue();

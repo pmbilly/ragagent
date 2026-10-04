@@ -10,7 +10,7 @@ package com.ragagent.llm.provider;
  */
 public enum ProviderName {
 
-    // ---- 声明序即注册表与展示顺序（OpenAI 起，Azure OpenAI 止），weknoracloud 排在最后 ----
+    // ---- 声明序即注册表与展示顺序（OpenAI 起，Azure OpenAI 止） ----
     /** 对照 ProviderOpenAI */
     OPENAI("openai"),
     /** 对照 ProviderAnthropic */
@@ -62,9 +62,7 @@ public enum ProviderName {
     /** 对照 ProviderNovita */
     NOVITA("novita"),
     /** 对照 ProviderAzureOpenAI */
-    AZURE_OPEN_AI("azure_openai"),
-    /** WeKnora 云服务 */
-    WEKNORA_CLOUD("weknoracloud");
+    AZURE_OPEN_AI("azure_openai");
 
     private final String value;
 

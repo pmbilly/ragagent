@@ -96,7 +96,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     /**
      * RBAC 守卫矩阵。拦截器运行在 servlet filter（Auth）之后、controller 之前。
-     * 静态段（providers / weknoracloud/status）规则先于 /{id} 通配注册（首个命中生效）。
+     * 静态段（providers / models 子资源）规则先于 /{id} 通配注册（首个命中生效）。
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -121,7 +121,6 @@ public class WebConfig implements WebMvcConfigurer {
         // /models 组
         rbac.addRule("GET", "/api/v1/models", TenantRole.VIEWER, false);
         rbac.addRule("GET", "/api/v1/models/providers", TenantRole.VIEWER, false);
-        rbac.addRule("GET", "/api/v1/models/weknoracloud/status", TenantRole.VIEWER, false);
         rbac.addRule("POST", "/api/v1/models/*/debug", TenantRole.ADMIN, false);
         rbac.addRule("POST", "/api/v1/models", TenantRole.ADMIN, false);
         rbac.addRule("PUT", "/api/v1/models/*/credentials", TenantRole.ADMIN, true);
@@ -129,8 +128,6 @@ public class WebConfig implements WebMvcConfigurer {
         rbac.addRule("PUT", "/api/v1/models/*", TenantRole.ADMIN, true);
         rbac.addRule("DELETE", "/api/v1/models/*", TenantRole.ADMIN, false);
         rbac.addRule("GET", "/api/v1/models/*", TenantRole.VIEWER, false);
-        // weknoracloud
-        rbac.addRule("POST", "/api/v1/weknoracloud/credentials", TenantRole.ADMIN, false);
         // 知识库
         rbac.addRule("POST", "/api/v1/knowledge-bases", TenantRole.CONTRIBUTOR, false);
         rbac.addRule("GET", "/api/v1/knowledge-bases", TenantRole.VIEWER, false);
@@ -607,7 +604,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(rbac).addPathPatterns("/api/v1/sessions/**",
                 "/api/v1/messages/**",
                 "/api/v1/models/**",
-                "/api/v1/weknoracloud/credentials", "/api/v1/knowledge-bases/**", "/api/v1/knowledge/**",
+                "/api/v1/knowledge-bases/**", "/api/v1/knowledge/**",
                 "/api/v1/chunks/**", "/api/v1/faq/**",
                 "/api/v1/knowledge-chat/**", "/api/v1/agent-chat/**", "/api/v1/knowledge-search",
                 "/api/v1/mcp-services/**", "/api/v1/agent/**", "/api/v1/knowledgebase/**",

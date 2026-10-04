@@ -481,7 +481,7 @@ public final class APIKeyRoutePolicies {
     }
 
     /**
-     * 模型 + WeKnoraCloud。
+     * 模型。
      *
      * <p>整个 {@code /models} 分组共用 {@code manageModels(fullAccess())}：
      * 要求 full-access 且能力清单含 {@code manage_models}。
@@ -499,9 +499,6 @@ public final class APIKeyRoutePolicies {
         a.registerGin("DELETE", "/api/v1/models/:id", models);
         a.registerGin("PUT", "/api/v1/models/:id/credentials", models);
         a.registerGin("DELETE", "/api/v1/models/:id/credentials/:field", models);
-        // WeKnoraCloud
-        a.registerGin("POST", "/api/v1/weknoracloud/credentials", models);
-        a.registerGin("GET", "/api/v1/models/weknoracloud/status", models);
     }
 
     /**

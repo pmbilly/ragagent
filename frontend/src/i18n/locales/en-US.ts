@@ -1082,59 +1082,6 @@ export default {
       desc: 'Your role can\'t access this settings page. Ask an admin of this workspace to grant the required role.'
     },
     capabilityUnavailable: 'This feature is not supported by the current deployment. You have been returned to an available page.',
-    weknoraCloud: {
-      title: 'WeKnora Cloud',
-      description: 'Configure WeKnora Cloud APPID and APPSECRET credentials. Credentials are used for model services and document parsing engine.',
-      viewDocs: 'View Docs',
-      unconfigured: 'Credentials not configured. Please fill in APPID and APPSECRET.',
-      configured: 'Credentials configured and working.',
-      expired: 'WeKnora Cloud credentials expired',
-      expiredDefault: 'Encryption key changed after service restart. Saved credentials cannot be decrypted. Please re-enter credentials.',
-      reconfigure: 'Reconfigure',
-      appIdLabel: 'APPID',
-      appIdDesc: 'WeKnora Cloud application ID',
-      appIdPlaceholder: 'Enter APPID',
-      appSecretLabel: 'APPSECRET',
-      appSecretDesc: 'WeKnora Cloud application secret',
-      appSecretPlaceholder: 'Enter APPSECRET',
-      saveHint: 'Credentials will be validated and encrypted before saving.',
-      saveBtn: 'Save Credentials',
-      usageTitle: 'Usage Guide',
-      usageSteps: '1. Save APPID and APPSECRET\n2. Register chat, embedding, rerank, and vlm in Cloud Models below\n3. Parser: Knowledge Base Settings → Parser Engine → WeKnora Cloud',
-      fillRequired: 'Please fill in APPID and APPSECRET',
-      saveSuccess: 'Credentials saved successfully',
-      saveFailed: 'Failed to save credentials',
-      credentialConfigured: 'WeKnoraCloud credentials configured.',
-      credentialExpired: 'Credentials expired. Please reconfigure.',
-      credentialUnconfigured: 'WeKnoraCloud credentials not configured. Please set up APPID and APPSECRET first.',
-      checkingStatus: 'Checking credential status...',
-      goToSettings: 'Go to Settings',
-      modelHintConfigured: 'WeKnoraCloud credentials configured. See supported models in',
-      modelHintDocsLink: 'API docs',
-      modelsSection: {
-        title: 'Cloud Models',
-        descReady: 'Register the four standard WeKnora Cloud models for chat, retrieval, reranking, and vision.',
-        descPending: 'Save credentials above before adding cloud models here.',
-        statusAdded: 'Added',
-        statusPending: 'Credentials required',
-        addOne: 'Add',
-        addAllBtn: 'Add all missing ({count})',
-        addAllConfirm: 'Confirm',
-        confirmAddOne: 'Add {type} model "{name}"?',
-        confirmAddAll: 'Add all {count} missing cloud models at once?',
-        allReady: 'All four cloud models are ready'
-      },
-      addModelsSuccess: 'Successfully added {count} model(s)',
-      addModelsPartial: 'Added {success}, {failed} failed',
-      addModelsFailed: 'Failed to add models',
-      addModelsEmbeddingFailed: 'Embedding connection test failed; could not detect vector dimension',
-      addModelsDisplayName: {
-        chat: 'WeKnoraCloud Chat',
-        embedding: 'WeKnoraCloud Embedding',
-        rerank: 'WeKnoraCloud ReRank',
-        vllm: 'WeKnoraCloud Vision'
-      }
-    },
     system: 'System Settings',
     parser: {
       title: 'Parser Engine',
@@ -4751,10 +4698,6 @@ export default {
           name: 'PaddleOCR-VL Cloud',
           desc: 'PaddleOCR-VL Cloud API'
         },
-        weknoracloud: {
-          name: 'WeKnora Cloud',
-          desc: 'Document parsing via WeKnora Cloud'
-        },
         markitdown: {
           name: 'MarkItDown',
           desc: 'Microsoft MarkItDown converter (PDF/Office/HTML and more)'
@@ -5676,7 +5619,7 @@ export default {
       capabilityMessageHistory: 'Message history',
       capabilityMessageHistoryHint: 'Let this key search workspace chat history and read chat-history stats. It does not grant workspace configuration access.',
       capabilityManageModels: 'Manage models',
-      capabilityManageModelsHint: 'Manage model definitions, credentials, connectivity checks, and WeKnoraCloud credentials.',
+      capabilityManageModelsHint: 'Manage model definitions, credentials, connectivity checks.',
       capabilityManageMcpServices: 'Manage MCP services',
       capabilityManageMcpServicesHint: 'Manage MCP services, credentials, tool approval policies, and OAuth state for this principal.',
       capabilityManageDatasources: 'Manage data sources',

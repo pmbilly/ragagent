@@ -19,13 +19,8 @@ import com.ragagent.model.service.ModelRuntimeConfigs;
  * {@link MemoryModelResolver} 的默认实现：按模型 id 取运行时的聊天 / 嵌入模型实例
  * （与 {@code wiki.service.DefaultWikiModelResolver} 同款）。
  *
- * <p>两处已知差异，两处都与 wiki 的处置一致：</p>
- * <ol>
- *   <li><b>weknoracloud 的租户级凭据回落缺失</b>：provider=weknoracloud 且租户未存
- *       app_id/app_secret 时，没有租户级凭据可回落（{@code TenantService} 尚无该读取口）。</li>
- *   <li><b>embedding 走 {@link EmbedderClient}</b>（最小 OpenAI 兼容客户端）。
- *       单条嵌入用 {@code embedBatch} 包一层。</li>
- * </ol>
+ * <p><b>embedding 走 {@link EmbedderClient}</b>（最小 OpenAI 兼容客户端），
+ * 单条嵌入用 {@code embedBatch} 包一层（与 wiki 的处置一致）。</p>
  */
 @Component
 public class DefaultMemoryModelResolver implements MemoryModelResolver {

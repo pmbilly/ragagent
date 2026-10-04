@@ -17,29 +17,17 @@ import java.util.Map;
  * <b>ollama interface</b>：经既有 {@code OllamaService} 走
  * {@code POST /api/chat}（images 为原始字节，Jackson 序列化成 base64），
  * stream=false、temperature=0.1，取响应的
- * {@code message.content}；weknoracloud 走云契约。</p>
+ * {@code message.content}。</p>
  */
 public final class VlmClient {
 
     private static final int DEFAULT_MAX_TOKS = 5000;
     private static final double DEFAULT_TEMP = 0.1;
 
-    /** VLM 消费面配置（appId/appSecret 为 WeKnoraCloud 已解密凭证）。 */
+    /** VLM 消费面配置。 */
     public record VlmConfig(String source, String baseUrl, String modelName, String apiKey,
             String modelId, String interfaceType, String provider,
-            Map<String, String> extra, String appId, String appSecret) {
-
-        /** 便捷构造（凭证缺省空——非 WeKnoraCloud 路径用）。 */
-        public VlmConfig(String source, String baseUrl, String modelName, String apiKey,
-                String modelId, String interfaceType, String provider,
-                Map<String, String> extra) {
-            this(source, baseUrl, modelName, apiKey, modelId, interfaceType, provider, extra,
-                    "", "");
-        }
-
-        public boolean isWeKnoraCloud() {
-            return "weknoracloud".equals(provider);
-        }
+            Map<String, String> extra) {
 
         public double temperature() {
             String v = extra == null ? null : extra.get("temperature");
@@ -67,7 +55,7 @@ public final class VlmClient {
     private VlmClient() {
     }
 
-    /** HTTP 非 2xx（带状态码与响应体原文；WeKnoraCloud 的错误文案需要它们）。 */
+    /** HTTP 非 2xx（带状态码与响应体原文，供调用方组装错误文案）。 */
     public static final class HttpStatusException extends RuntimeException {
 
         private final int status;
@@ -107,9 +95,6 @@ public final class VlmClient {
         if (config != null && config.isOllama()) {
             return predictOllama(com.ragagent.llm.ollama.OllamaService.getOllamaService(), config,
                     imgBytesList, prompt);
-        }
-        if (config != null && config.isWeKnoraCloud()) {
-            return predictWeKnoraCloud(config, transport, imgBytesList, prompt);
         }
         // 请求体构建（chat.completions 标准字段）
         List<Object> parts = new ArrayList<>();
@@ -214,97 +199,6 @@ public final class VlmClient {
         return result[0] == null ? "" : result[0];
     }
 
-    /** WeKnoraCloud 的 VLM 端点路径。 */
-    static final String WEKNORA_CLOUD_VLM_PATH = "/api/v1/chat/completions";
-
-    /**
-     * WeKnoraCloud 预测：{@code POST /api/v1/chat/completions}——multipart 内容（text + 每图 data URI）、
-     * {@code max_tokens=5000}、{@code temperature=0.1}（**用常量，不读 extra 覆盖**）、
-     * {@code stream=false}；鉴权走 {@code WeknoraCloudSign}（与 embedding/rerank/chat 同一份
-     * 实现）；模型名可被 {@code extra.remote_model_name} 覆盖（{@code effectiveModelName}）。
-     *
-     * <p>错误族：构造期 {@code WeKnoraCloud VLM: AppID is required} /
-     * {@code AppSecret is required}；运行期 {@code weknoracloud VLM: status %d: %s} /
-     * {@code WeKnoraCloud VLM: no choices in response}。</p>
-     */
-    static String predictWeKnoraCloud(VlmConfig config, Transport transport, byte[][] imgBytesList,
-            String prompt) throws VlmException {
-        if (config.appId() == null || config.appId().isEmpty()) {
-            throw new VlmException("WeKnoraCloud VLM: AppID is required");
-        }
-        if (config.appSecret() == null || config.appSecret().isEmpty()) {
-            throw new VlmException("WeKnoraCloud VLM: AppSecret is required");
-        }
-
-        List<Object> parts = new ArrayList<>();
-        Map<String, Object> textPart = new LinkedHashMap<>();
-        textPart.put("type", "text");
-        textPart.put("text", prompt);
-        parts.add(textPart);
-        for (byte[] img : imgBytesList) {
-            if (img != null && img.length > 0) {
-                Map<String, Object> imageUrl = new LinkedHashMap<>();
-                imageUrl.put("url", "data:" + detectImageMime(img) + ";base64,"
-                        + Base64.getEncoder().encodeToString(img));
-                Map<String, Object> imgPart = new LinkedHashMap<>();
-                imgPart.put("type", "image_url");
-                imgPart.put("image_url", imageUrl);
-                parts.add(imgPart);
-            }
-        }
-        Map<String, Object> message = new LinkedHashMap<>();
-        message.put("role", "user");
-        message.put("content", parts);
-
-        Map<String, Object> req = new LinkedHashMap<>();
-        req.put("model", effectiveCloudModelName(config));
-        req.put("messages", List.of(message));
-        req.put("max_tokens", DEFAULT_MAX_TOKS);
-        req.put("temperature", DEFAULT_TEMP);
-        req.put("stream", false);
-
-        String bodyJson;
-        try {
-            bodyJson = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(req);
-        } catch (Exception e) {
-            throw new VlmException("weknoracloud VLM: marshal: " + e.getMessage());
-        }
-        Map<String, String> headers = com.ragagent.embedding.provider.WeknoraCloudSign.sign(config.appId(),
-                config.appSecret(), java.util.UUID.randomUUID().toString(), bodyJson);
-
-        String baseUrl = config.baseUrl() == null ? "" : config.baseUrl().replaceAll("/+$", "");
-        String respBody;
-        try {
-            respBody = transport.postWithHeaders(baseUrl + WEKNORA_CLOUD_VLM_PATH, headers, req);
-        } catch (HttpStatusException e) {
-            // weknoracloud VLM: status %d: %s
-            throw new VlmException("weknoracloud VLM: status " + e.status() + ": " + e.body());
-        } catch (Exception e) {
-            throw new VlmException("weknoracloud VLM: do request: " + e.getMessage());
-        }
-
-        com.fasterxml.jackson.databind.JsonNode root;
-        try {
-            root = new com.fasterxml.jackson.databind.ObjectMapper().readTree(respBody);
-        } catch (Exception e) {
-            throw new VlmException("weknoracloud VLM: unmarshal: " + e.getMessage());
-        }
-        var choices = root.path("choices");
-        if (!choices.isArray() || choices.isEmpty()) {
-            throw new VlmException("WeKnoraCloud VLM: no choices in response");
-        }
-        return choices.get(0).path("message").path("content").asText("");
-    }
-
-    /** 云端模型名：{@code extra.remote_model_name} 优先。 */
-    static String effectiveCloudModelName(VlmConfig config) {
-        String remote = config.extra() == null ? null : config.extra().get("remote_model_name");
-        if (remote != null && !remote.trim().isEmpty()) {
-            return remote.trim();
-        }
-        return config.modelName();
-    }
-
     /**
      * 请求整形：OpenAI reasoning /
      * GPT5 家族把 max_tokens 平移到 max_completion_tokens，采样参数清零。
@@ -369,13 +263,5 @@ public final class VlmClient {
     public interface Transport {
         String post(String url, String apiKey, Object jsonBody) throws Exception;
 
-        /**
-         * 带自定义头的 POST（WeKnoraCloud 的签名头走这条；**不带** Authorization）。
-         * 缺省实现抛异常——保持接口的函数式接口性质（现有 lambda stub 不受影响）。
-         */
-        default String postWithHeaders(String url, Map<String, String> headers, Object jsonBody)
-                throws Exception {
-            throw new UnsupportedOperationException("postWithHeaders not supported");
-        }
     }
 }

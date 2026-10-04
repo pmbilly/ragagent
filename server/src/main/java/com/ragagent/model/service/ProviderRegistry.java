@@ -52,11 +52,6 @@ public class ProviderRegistry {
                     List.of("chat", "embedding", "rerank", "vllm", "asr"),
                     List.of("KnowledgeQA", "Embedding", "Rerank", "VLLM", "ASR")),
 
-            new ProviderEntry("weknoracloud", "WeKnoraCloud", "WeKnora云服务，模型：chat, embedding, rerank, vlm",
-                    Map.ofEntries(Map.entry("chat", "https://weknora.weixin.qq.com"), Map.entry("embedding", "https://weknora.weixin.qq.com"), Map.entry("rerank", "https://weknora.weixin.qq.com"), Map.entry("vllm", "https://weknora.weixin.qq.com")),
-                    List.of("chat", "embedding", "rerank", "vllm"),
-                    List.of("KnowledgeQA", "Embedding", "Rerank", "VLLM")),
-
             new ProviderEntry("aliyun", "阿里云 DashScope", "qwen-plus, tongyi-embedding-vision-plus, qwen3-rerank, etc.",
                     Map.ofEntries(Map.entry("chat", "https://dashscope.aliyuncs.com/compatible-mode/v1"), Map.entry("embedding", "https://dashscope.aliyuncs.com/compatible-mode/v1"), Map.entry("rerank", "https://dashscope.aliyuncs.com/api/v1/services/rerank/text-rerank/text-rerank"), Map.entry("vllm", "https://dashscope.aliyuncs.com/compatible-mode/v1")),
                     List.of("chat", "embedding", "rerank", "vllm"),

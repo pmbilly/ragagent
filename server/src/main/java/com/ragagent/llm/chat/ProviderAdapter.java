@@ -77,11 +77,7 @@ public interface ProviderAdapter {
     default void injectToolCallMetadata(ObjectNode toolCall, Map<String, JsonNode> metadata) {
     }
 
-    /**
-     * 原始 HTTP 请求鉴权所需的凭据。
-     * apiKey 覆盖常见的 Bearer / api-key 场景；appId/appSecret 仅签名类厂商
-     * （WeKnoraCloud）使用。
-     */
-    record AuthCreds(String apiKey, String appId, String appSecret) {
+    /** 原始 HTTP 请求鉴权所需的凭据（Bearer / Azure 的 api-key 都用它）。 */
+    record AuthCreds(String apiKey) {
     }
 }

@@ -72,16 +72,12 @@ public final class ModelConnectivityTestService {
             throw new BizException(AppError.badRequest("模型名称和Base URL不能为空"));
         }
         requireSsrf("Base URL", req.baseUrl());
-        String[] creds = resolveTenantWeKnoraCloudCreds();
-        if (creds == null) {
-            throw new BizException(AppError.badRequest("空间信息未找到"));
-        }
         Model model = buildTestModel(req, "KnowledgeQA", "remote");
         boolean available;
         String message;
         try {
             LlmChatClient chat = LlmChatClients.create(
-                    ModelRuntimeConfigs.chatConfig(model, creds[0], creds[1]), ollamaService, concurrencyGovernor);
+                    ModelRuntimeConfigs.chatConfig(model, "", ""), ollamaService, concurrencyGovernor);
             ChatOptions opts = new ChatOptions();
             opts.setMaxTokens(1);
             opts.setThinking(Boolean.FALSE); // for dashscope.aliyuncs qwen3-32b
@@ -126,12 +122,8 @@ public final class ModelConnectivityTestService {
                 return ok(data);
             }
         }
-        String[] creds = resolveTenantWeKnoraCloudCreds();
-        if (creds == null) {
-            throw new BizException(AppError.badRequest("空间信息未找到"));
-        }
         Model model = buildTestModel(r, "Embedding", "remote");
-        EmbedderConfig config = ModelRuntimeConfigs.embedderConfig(model, creds[0], creds[1]);
+        EmbedderConfig config = ModelRuntimeConfigs.embedderConfig(model, "", "");
         Embedder emb;
         try {
             // pooler：单文本 embed 不触达批路径
@@ -155,13 +147,9 @@ public final class ModelConnectivityTestService {
             throw new BizException(AppError.badRequest("模型名称和Base URL不能为空"));
         }
         requireSsrf("Base URL", req.baseUrl());
-        String[] creds = resolveTenantWeKnoraCloudCreds();
-        if (creds == null) {
-            throw new BizException(AppError.badRequest("空间信息未找到"));
-        }
         Model model = buildTestModel(req, "Rerank", "remote");
-        String appID = creds[0];
-        String appSecret = creds[1];
+        String appID = "";
+        String appSecret = "";
         String providerName = providerValue(model);
         if ("lkeap".equals(providerName) || "volcengine".equals(providerName)) {
             appID = "";
@@ -481,28 +469,7 @@ public final class ModelConnectivityTestService {
         return "连接失败";
     }
 
-    /** 解析当前空间凭证；null = 空间信息未找到。 */
-    private String[] resolveTenantWeKnoraCloudCreds() {
-        Long tid = TenantContext.currentTenantId();
-        if (tid == null) {
-            return null;
-        }
-        var tenant = tenantService.getTenantById(tid);
-        JsonNode creds = tenant == null || tenant.getCredentials() == null
-                ? null : tenant.getCredentials().get("weknoracloud");
-        if (creds == null) {
-            return new String[] {"", ""};
-        }
-        String appId = creds.path("app_id").asText("");
-        var decrypted = cryptoService.decryptStoredSecretLenient(creds.path("app_secret").asText(""));
-        String appSecret = decrypted.ok() ? decrypted.plaintext() : "";
-        if (appId.isEmpty() || appSecret.isEmpty()) {
-            return new String[] {"", ""};
-        }
-        return new String[] {appId, appSecret};
-    }
-
-    /** 无状态闸门版模型获取 + WeKnoraCloud 凭证解析。 */
+    /** 无状态闸门版模型获取。 */
     LlmChatClient getChatModelOr400(String modelId) {
         try {
             return getChatModel(modelId);
@@ -524,17 +491,6 @@ public final class ModelConnectivityTestService {
         String appID = p == null ? "" : orEmpty(p.getAppId());
         String appSecret = p == null ? "" : decryptModelAppSecret(p.getAppSecret());
         String provider = p == null ? "" : orEmpty(p.getProvider());
-        if ("weknoracloud".equals(provider) && (appID.isEmpty() || appSecret.isEmpty())) {
-            String[] tenantCreds = resolveTenantWeKnoraCloudCreds();
-            if (tenantCreds != null) {
-                if (appID.isEmpty()) {
-                    appID = tenantCreds[0];
-                }
-                if (appSecret.isEmpty()) {
-                    appSecret = tenantCreds[1];
-                }
-            }
-        }
         return LlmChatClients.create(ModelRuntimeConfigs.chatConfig(model, appID, appSecret),
                 ollamaService, concurrencyGovernor);
     }

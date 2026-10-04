@@ -1,7 +1,5 @@
 package com.ragagent.model.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.auth.domain.Tenant;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.crypto.CryptoService;
@@ -67,7 +65,7 @@ public class ModelRuntimeFactory {
     public LlmChatClient getChatModel(String modelId) {
         Model model = getModelDirect(modelId);
         log.info("Getting chat model: {}, source: {}", model.getName(), model.getSource());
-        String[] creds = resolveWeKnoraCloudCredentials(model.getParameters());
+        String[] creds = modelCredentials(model.getParameters());
         try {
             // langfuse generation 装饰（未启用时原样返回，零成本）
             return com.ragagent.tracing.langfuse.LangfuseChatClient.wrap(
@@ -82,7 +80,7 @@ public class ModelRuntimeFactory {
     public Embedder getEmbeddingModel(String modelId) {
         Model model = getModelGated(modelId);
         log.info("Getting embedding model: {}, source: {}", model.getName(), model.getSource());
-        String[] creds = resolveWeKnoraCloudCredentials(model.getParameters());
+        String[] creds = modelCredentials(model.getParameters());
         try {
             // pooler 只服务批量向量化；debug 只走单文本 embed，传 null
             // langfuse generation 装饰
@@ -99,7 +97,7 @@ public class ModelRuntimeFactory {
     public Reranker getRerankModel(String modelId) {
         Model model = getModelGated(modelId);
         log.info("Getting rerank model: {}, source: {}", model.getName(), model.getSource());
-        String[] creds = resolveWeKnoraCloudCredentials(model.getParameters());
+        String[] creds = modelCredentials(model.getParameters());
         try {
             // langfuse generation 装饰
             return com.ragagent.tracing.langfuse.LangfuseReranker.wrap(
@@ -118,24 +116,14 @@ public class ModelRuntimeFactory {
     }
 
     /**
-     * VLM 客户端配置：凭证解析 + 构造期校验
-     * {@code resolveWeKnoraCloudCredentials} → weknoracloud 凭证检查（先于基址）
-     * → 非 ollama 的基址 SSRF 校验（validateVLMBaseURL；ollama 不校验基址）。
+     * VLM 客户端配置：构造 + 非 ollama 的基址 SSRF 校验
+     * （validateVLMBaseURL；ollama 不校验基址）。
      *
      * <p>失败抛 {@link RuntimeException}，message 即对外错误文案——调用方
      * （模型调试端点、agent 引擎装配）直接写进 {@code data.error}。</p>
      */
     public VlmClient.VlmConfig vlmConfigFor(Model model) {
-        String[] creds = resolveWeKnoraCloudCredentials(model.getParameters());
-        VlmClient.VlmConfig config = ModelRuntimeConfigs.vlmConfig(model, creds[0], creds[1]);
-        if (config.isWeKnoraCloud()) {
-            if (creds[0].isEmpty()) {
-                throw new RuntimeException("WeKnoraCloud VLM: AppID is required");
-            }
-            if (creds[1].isEmpty()) {
-                throw new RuntimeException("WeKnoraCloud VLM: AppSecret is required");
-            }
-        }
+        VlmClient.VlmConfig config = ModelRuntimeConfigs.vlmConfig(model);
         if (!config.isOllama()) {
             validateVlmBaseUrl(config.baseUrl());
         }
@@ -193,32 +181,12 @@ public class ModelRuntimeFactory {
         }
     }
 
-    // ── WeKnoraCloud 凭证 ─────────────────────────────────────────────────
+    // ── 模型级凭证 ───────────────────────────────────────────────────────
 
-    private String[] resolveWeKnoraCloudCredentials(ModelParameters params) {
+    /** 模型级 appId/appSecret（通用凭据承载；cloud provider 已裁撤，无租户回落）。 */
+    private String[] modelCredentials(ModelParameters params) {
         String appId = params == null || params.getAppId() == null ? "" : params.getAppId();
         String appSecret = decryptAppSecret(params == null ? null : params.getAppSecret());
-        String provider = params == null || params.getProvider() == null ? "" : params.getProvider();
-        if (!"weknoracloud".equals(provider)) {
-            return new String[] {appId, appSecret};
-        }
-        if (!appId.isEmpty() && !appSecret.isEmpty()) {
-            return new String[] {appId, appSecret};
-        }
-        long tid = TenantContext.currentTenantId() == null ? 0 : TenantContext.currentTenantId();
-        Tenant tenant = tenantService.getTenantById(tid);
-        JsonNode creds = tenant == null || tenant.getCredentials() == null
-                ? null : tenant.getCredentials().get("weknoracloud");
-        if (creds == null) {
-            return new String[] {appId, appSecret};
-        }
-        if (appId.isEmpty()) {
-            appId = creds.path("app_id").asText("");
-        }
-        if (appSecret.isEmpty()) {
-            var decrypted = cryptoService.decryptStoredSecretLenient(creds.path("app_secret").asText(""));
-            appSecret = decrypted.ok() ? decrypted.plaintext() : "";
-        }
         return new String[] {appId, appSecret};
     }
 

@@ -140,11 +140,6 @@ public class SystemController {
             throw new BizException(AppError.badRequest("请求参数不合法").withDetails("请求体格式不正确"));
         }
         Map<String, String> overrides = overridesFromRaw(body);
-        // 现有租户配置的 weknoracloud_app_id 叠加（配置保存前的凭证步）
-        String cloudAppId = tenantWeKnoraCloudAppId();
-        if (!cloudAppId.isEmpty()) {
-            overrides.put("weknoracloud_app_id", cloudAppId);
-        }
         return ResponseEntity.ok(engineListBody(overrides));
     }
 
@@ -515,19 +510,12 @@ public class SystemController {
         return tid <= 0 ? null : tenantService.getTenantById(tid);
     }
 
-    /**
-     * overrides 组装：租户 ParserEngineConfig → map
-     * + weknoracloud_app_id（租户凭据）。
-     */
+    /** overrides 组装：租户 ParserEngineConfig → map。 */
     private Map<String, String> engineOverrides() {
         Map<String, String> overrides = new LinkedHashMap<>();
         Tenant tenant = currentTenant();
         if (tenant != null) {
             overrides.putAll(overridesFromRaw(tenant.getParserEngineConfig()));
-            String appId = tenantWeKnoraCloudAppId();
-            if (!appId.isEmpty()) {
-                overrides.put("weknoracloud_app_id", appId);
-            }
         }
         return overrides;
     }
@@ -590,19 +578,6 @@ public class SystemController {
         if (v != null && v.isBoolean()) {
             m.put(field, String.valueOf(v.asBoolean()));
         }
-    }
-
-    /** tenant.Credentials.GetWeKnoraCloud().AppID（无凭据 → ""）。 */
-    private String tenantWeKnoraCloudAppId() {
-        Tenant tenant = currentTenant();
-        if (tenant == null || tenant.getCredentials() == null) {
-            return "";
-        }
-        JsonNode cloud = tenant.getCredentials().get("weknoracloud");
-        if (cloud == null || cloud.isNull()) {
-            return "";
-        }
-        return cloud.path("app_id").asText("");
     }
 
     private boolean isMinioConfigured(long tenantId) {
