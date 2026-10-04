@@ -71,6 +71,7 @@ import { useI18n } from 'vue-i18n'
 import { type ParserEngineInfo } from '@/api/system'
 import { useEditorResourcesStore } from '@/stores/editorResources'
 import { useUIStore } from '@/stores/ui'
+import { normalizeKbParserRules, type KbParserEngineRule } from '@/utils/parserEngineRules'
 import { storeToRefs } from 'pinia'
 
 const { t } = useI18n()
@@ -82,11 +83,8 @@ function getEngineDisplayName(engineName: string): string {
   return translated !== key ? translated : engineName
 }
 
-export interface ParserEngineRule {
-  file_types: string[]
-  engine: string
-  xlsx_first_row_as_header?: boolean
-}
+/** KB 配置面规则（camel）——定义见 utils/parserEngineRules（两面互转的唯一出口）。 */
+export type ParserEngineRule = KbParserEngineRule
 
 interface EngineOption {
   value: string
@@ -118,7 +116,7 @@ const emit = defineEmits<{
 }>()
 
 const uiStore = useUIStore()
-const localEngineRules = ref<ParserEngineRule[]>([...props.parserEngineRules])
+const localEngineRules = ref<ParserEngineRule[]>(normalizeKbParserRules(props.parserEngineRules))
 const parserEngines = ref<ParserEngineInfo[]>([])
 const loading = ref(true)
 
@@ -234,7 +232,7 @@ function getDefaultEngine(extensions: string[]): string {
 
 function getEngineForGroup(extensions: string[]): string {
   for (const rule of localEngineRules.value) {
-    if (rule.file_types.some(ft => extensions.includes(ft))) {
+    if ((rule.fileTypes || []).some(ft => extensions.includes(ft))) {
       return rule.engine
     }
   }
@@ -244,14 +242,14 @@ function getEngineForGroup(extensions: string[]): string {
 function handleEngineChange(extensions: string[], engine: string) {
   const currentRule = getRuleForGroup(extensions)
   const otherRules = localEngineRules.value.filter(
-    r => !r.file_types.some(ft => extensions.includes(ft))
+    r => !(r.fileTypes || []).some(ft => extensions.includes(ft))
   )
   if (engine) {
     otherRules.push({
-      file_types: [...extensions],
+      fileTypes: [...extensions],
       engine,
-      ...(currentRule?.xlsx_first_row_as_header !== undefined
-        ? { xlsx_first_row_as_header: currentRule.xlsx_first_row_as_header }
+      ...(currentRule?.xlsxFirstRowAsHeader !== undefined
+        ? { xlsxFirstRowAsHeader: currentRule.xlsxFirstRowAsHeader }
         : {}),
     })
   }
@@ -261,20 +259,20 @@ function handleEngineChange(extensions: string[], engine: string) {
 
 function getRuleForGroup(extensions: string[]): ParserEngineRule | undefined {
   return localEngineRules.value.find(
-    rule => rule.file_types.some(fileType => extensions.includes(fileType))
+    rule => (rule.fileTypes || []).some(fileType => extensions.includes(fileType))
   )
 }
 
 function getXLSXFirstRowAsHeader(extensions: string[]): boolean {
-  return getRuleForGroup(extensions)?.xlsx_first_row_as_header === true
+  return getRuleForGroup(extensions)?.xlsxFirstRowAsHeader === true
 }
 
 function handleXLSXFirstRowAsHeaderChange(extensions: string[], checked: boolean) {
   const rules = buildCompleteRules()
-  const rule = rules.find(item => item.file_types.some(fileType => extensions.includes(fileType)))
+  const rule = rules.find(item => (item.fileTypes || []).some(fileType => extensions.includes(fileType)))
   if (!rule) return
 
-  rule.xlsx_first_row_as_header = checked
+  rule.xlsxFirstRowAsHeader = checked
   localEngineRules.value = rules
   emit('update:parserEngineRules', rules)
 }
@@ -286,10 +284,10 @@ function buildCompleteRules(): ParserEngineRule[] {
     if (engine) {
       const currentRule = getRuleForGroup(group.extensions)
       rules.push({
-        file_types: [...group.extensions],
+        fileTypes: [...group.extensions],
         engine,
-        ...(currentRule?.xlsx_first_row_as_header !== undefined
-          ? { xlsx_first_row_as_header: currentRule.xlsx_first_row_as_header }
+        ...(currentRule?.xlsxFirstRowAsHeader !== undefined
+          ? { xlsxFirstRowAsHeader: currentRule.xlsxFirstRowAsHeader }
           : {}),
       })
     }
@@ -333,7 +331,9 @@ watch(showSettingsModal, (open, wasOpen) => {
 })
 
 watch(() => props.parserEngineRules, (v) => {
-  localEngineRules.value = v?.length ? [...v] : []
+  // 宽容读取：接受 camel 或 snake（历史数据）——旧实现按 snake 直取，
+  // 遇到 B3b 迁移后的 camel 数据会 `undefined.some` 直接把整页打崩。
+  localEngineRules.value = normalizeKbParserRules(v)
 }, { deep: true })
 </script>
 

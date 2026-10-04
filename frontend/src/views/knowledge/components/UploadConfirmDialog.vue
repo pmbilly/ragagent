@@ -566,6 +566,7 @@ import KbUploadSourceDropdown from './KbUploadSourceDropdown.vue'
 import FolderPickerMenu, { type FolderOption } from './FolderPickerMenu.vue'
 import { folderOptionFromPath, sortFolderOptions } from '../folderTree'
 import type { KnowledgeProcessOverrides } from '@/types/knowledgeProcess'
+import { fromOverrideParserRules, toOverrideParserRules } from '@/utils/parserEngineRules'
 import type {
   UploadConfirmManualSource,
   UploadConfirmMode,
@@ -584,9 +585,9 @@ interface ChunkingUIConfig {
   chunkOverlap: number
   separators: string[]
   parserEngineRules?: Array<{
-    file_types: string[]
+    fileTypes: string[]
     engine: string
-    xlsx_first_row_as_header?: boolean
+    xlsxFirstRowAsHeader?: boolean
   }>
   enableParentChild: boolean
   parentChunkSize: number
@@ -739,7 +740,7 @@ function hasParserCustomization(): boolean {
   const rules = uiState.value.chunkingConfig.parserEngineRules
   if (!rules?.length) return false
   return rules.some(rule => rule.engine && rule.engine !== 'builtin')
-    || rules.some(rule => rule.xlsx_first_row_as_header)
+    || rules.some(rule => rule.xlsxFirstRowAsHeader)
 }
 
 function getFileExt(file: File): string {
@@ -1143,7 +1144,8 @@ function buildProcessOverrides(): KnowledgeProcessOverrides {
   const chunking = state.chunkingConfig
 
   const overrides: KnowledgeProcessOverrides = {
-    parser_engine_rules: chunking.parserEngineRules,
+    // KB 配置规则是 camel 面，覆盖是 snake 面 —— 显式转换（直接透传会让运行时读不到）
+    parser_engine_rules: toOverrideParserRules(chunking.parserEngineRules ?? []),
     chunking_config: {
       chunk_size: chunking.chunkSize,
       chunk_overlap: chunking.chunkOverlap,
@@ -1208,9 +1210,9 @@ function applyOverridesToState(o?: KnowledgeProcessOverrides | null) {
     if (cc.token_limit != null) s.chunkingConfig.tokenLimit = cc.token_limit
     if (cc.languages) s.chunkingConfig.languages = cc.languages
     if (cc.table_metadata_instructions != null) s.chunkingConfig.tableMetadataInstructions = cc.table_metadata_instructions
-    if (cc.parser_engine_rules) s.chunkingConfig.parserEngineRules = cc.parser_engine_rules
+    if (cc.parser_engine_rules) s.chunkingConfig.parserEngineRules = fromOverrideParserRules(cc.parser_engine_rules)
   }
-  if (o.parser_engine_rules) s.chunkingConfig.parserEngineRules = o.parser_engine_rules
+  if (o.parser_engine_rules) s.chunkingConfig.parserEngineRules = fromOverrideParserRules(o.parser_engine_rules)
   if (o.enable_multimodel != null) s.multimodalConfig.enabled = o.enable_multimodel
   if (o.vlm_config) {
     if (o.vlm_config.enabled != null) s.multimodalConfig.enabled = o.vlm_config.enabled
@@ -1354,9 +1356,9 @@ const removeFile = (index: number) => {
 }
 
 const handleParserEngineRulesUpdate = (rules: Array<{
-  file_types: string[]
+  fileTypes: string[]
   engine: string
-  xlsx_first_row_as_header?: boolean
+  xlsxFirstRowAsHeader?: boolean
 }>) => {
   uiState.value.chunkingConfig.parserEngineRules = rules
 }

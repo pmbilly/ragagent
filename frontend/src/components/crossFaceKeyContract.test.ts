@@ -325,6 +325,62 @@ test('裸载荷 API 必须在 api 层适配成 { data }（漏适配 = 消费端�
     'store 读侧保持 { data } 契约')
 })
 
+test('解析引擎规则两面：KB 配置面 camel / 覆盖与智能体面 snake（不得混读）', () => {
+  // B67 实锤：KB 配置 jsonb 键名 B3b 统一成 camel（V2 迁移 + 后端 ParserEngineRuleView），
+  // 但解析设置页仍按 snake 读 → 对 camel 数据 `undefined.some` 整页打崩（真机复现：
+  // 解析分区 select 数 0 + Unhandled Vue error）；写入侧也因键名不符被后端丢弃
+  // （库里出现 fileTypes: []）。
+  const parserSettings = readFileSync(join(SRC, 'views/knowledge/settings/KBParserSettings.vue'), 'utf8')
+  assert.doesNotMatch(
+    parserSettings,
+    /file_types|xlsx_first_row_as_header/,
+    'KBParserSettings：KB 配置面是 camel（fileTypes / xlsxFirstRowAsHeader），读 snake 会 undefined.some 崩页',
+  )
+  assert.match(
+    parserSettings,
+    /normalizeKbParserRules\(props\.parserEngineRules\)/,
+    'KBParserSettings：初始读取必须过归一化（容忍 legacy snake，且保证 fileTypes 一定是数组）',
+  )
+  assert.match(
+    parserSettings,
+    /localEngineRules\.value = normalizeKbParserRules\(v\)/,
+    'KBParserSettings：props 变化时的同步也必须归一化',
+  )
+
+  const chunking = readFileSync(join(SRC, 'views/knowledge/settings/KBChunkingSettings.vue'), 'utf8')
+  assert.doesNotMatch(
+    chunking,
+    /file_types|xlsx_first_row_as_header/,
+    'KBChunkingSettings：同样只认 KB 配置面（camel）',
+  )
+
+  const upload = readFileSync(join(SRC, 'views/knowledge/components/UploadConfirmDialog.vue'), 'utf8')
+  assert.doesNotMatch(
+    upload,
+    /parserEngineRules\?: Array<\{\s*file_types/,
+    'UploadConfirmDialog：chunkingConfig 的规则类型是 KB 配置面（camel）',
+  )
+  assert.match(
+    upload,
+    /parser_engine_rules: toOverrideParserRules\(chunking\.parserEngineRules \?\? \[\]\)/,
+    '搬进上传覆盖时必须显式转成 snake（后端运行时读 file_types）',
+  )
+  assert.match(
+    upload,
+    /s\.chunkingConfig\.parserEngineRules = fromOverrideParserRules\(/,
+    '从覆盖搬回 KB 配置时必须显式转回 camel',
+  )
+
+  // 反向：覆盖/智能体面**必须**保持 snake —— 别为了"统一"把运行时契约改掉
+  // （后端 ParserEngineRules.resolve 读 rule.get("file_types")）。
+  const overridesType = readFileSync(join(SRC, 'types/knowledgeProcess.ts'), 'utf8')
+  assert.match(overridesType, /file_types: string\[\]/,
+    'types/knowledgeProcess：上传覆盖仍是 snake 面（后端 resolve 读 file_types）')
+  const agentApi = readFileSync(join(SRC, 'api/agent/index.ts'), 'utf8')
+  assert.match(agentApi, /chatParserEngineRules\?: \{ file_types: string\[\]; engine: string \}\[\]/,
+    'api/agent：智能体 chatParserEngineRules 的内层键仍是 snake（运行时契约）')
+})
+
 test('api 面 snake 记号棘轮：只许减不许增', () => {
   // 2026-10-04 扩面冻结 → 同日逐条核实（B55）。
   // 首轮扫描 api 面 40 处存量记号（32 个 file:token 键），先冻结成棘轮防新增；

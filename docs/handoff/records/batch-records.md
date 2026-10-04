@@ -768,6 +768,16 @@
 - **守卫**：`crossFaceKeyContract.test.ts` 新增「裸载荷 API 必须在 api 层适配成 { data }」——禁止 `get<{ data: … }>(裸端点)` 写法、要求显式适配、并钉住 store 读侧契约（**红态探针**：把 `getPlaceholders` 改回声明 `{data}` → 点名报红）。前端 **729/729**、`vue-tsc` 0 错误、i18n 审计 11/11、契约键守卫无新增。
 - **口径**：**裸载荷 ≠ 没有包裹**——要么消费端直读裸键，要么在 api 层显式适配；**绝不能"声明 `{data}` 而运行时是裸的"**（类型与运行时不一致，静态检查完全抓不到，症状是静默空值）。与 B58「信封读法清剿」同族：B58 清的是**消费端**按旧信封取数，本批补的是 **api 层漏做适配**。
 
+**✅ B67（2026-10-04，KB 解析设置整页崩 + 规则读写键名错面）**
+- **触发**：用户贴控制台报错——`KBParserSettings.vue:237 getEngineForGroup` → `TypeError: Cannot read properties of undefined (reading 'some')`（Unhandled Vue error，解析分区渲染不出）。
+- **根因**：KB 配置面（`knowledge_bases.chunking_config.parserEngineRules`）按 **B3b** 已统一为 **camelCase**（`V2__kb_config_keys_camel.sql` 迁移 + 后端视图 `ChunkingConfigView.ParserEngineRuleView(fileTypes, engine, xlsxFirstRowAsHeader)`；库里实测 camel，用户那条「GACI」正是全仓唯一带 camel 规则的 KB），但**解析设置页仍按 snake 读**（`rule.file_types.some(...)`）→ 对 camel 数据 `.some` 于 undefined → 整页打崩。**真机复现**（给 smoke 的 KB 写入 camel 规则后打开其解析设置）：解析分区 **select 数 0** + 与用户完全一致的堆栈。
+- **同族三处**：① **写入侧同类错**——组件 emit 的是 snake 规则，后端按 camel 反序列化 → 规则落库成 `fileTypes: []`（库里那几条空数组即证据；KB 级规则因此从未真正生效）；② `UploadConfirmDialog` 在两面之间**直接透传**（KB 配置 camel ↔ 上传覆盖 snake）→ 覆盖里的规则运行时读不到（后端 `ParserEngineRules.resolve` 读 `file_types`）；③ `KBChunkingSettings` / `UploadConfirmDialog` 的规则类型声明也是 snake。
+- **修复**：新增 `utils/parserEngineRules.ts` 作为**两面互转的唯一出口**——`normalizeKbParserRules()` 宽容归一化（camel 与 legacy snake 都吃、畸形项丢弃而不抛错、`fileTypes` 必为数组），`toOverrideParserRules()` / `fromOverrideParserRules()` 显式互转；`KBParserSettings` 全面 camel 化（props 初始读取与 watch 都过归一化，`.some` 再加数组兜底）；`KBChunkingSettings` / `UploadConfirmDialog` 类型与转换改对；**刻意保留** `types/knowledgeProcess`（上传覆盖）与 `api/agent`（智能体 `chatParserEngineRules`）的 **snake**——那是后端运行时契约（`resolve` 读 `rule.get("file_types")`），不能"顺手统一"。
+- **验证（真机，smoke 账号）**：修复前——解析分区 select 数 **0** + Unhandled Vue error（复现）；修复后——分区渲染 **22** 个 select、控制台 **0** 报错，且**读值正确**（PDF/Word/演示文稿=内置(默认)、**Excel=`simple`＝库里写入的值**）；再在 UI 里保存 → 查库：规则以 **camel 完整落库**（pdf/docx/pptx→builtin、xlsx/xls→simple）⇒ **读、写两侧皆通**。
+- **守卫**：`crossFaceKeyContract.test.ts` 新增「解析引擎规则两面」——KB 配置面必须 camel 且必须过归一化、覆盖/智能体面必须保持 snake（防未来"顺手统一"打断运行时契约）；**两个红态探针**（去掉归一化读取 / 覆盖转换改回透传）均点名报红。3 条单测（归一化 / 畸形容错 / round-trip 不丢字段、不改入参）。前端 **733/733**、`vue-tsc` 0 错误、契约键守卫无新增。
+- **口径**：**同一个概念在不同"面"上可能有不同键名约定**（本次：KB 配置 camel / 运行时规则 snake）——搬运时必须**显式转换**，且读侧要能容忍历史数据；`B3b` 只把 KB 配置的**写入侧 + 存量数据**统一了，读取侧漏改会以"整页崩"的形式暴露（比静默更强的信号）。
+- **遗留**：smoke 空间的 `b3b-camel-kb` 现带一组完整 camel 规则（验证写入时产生，可当样板）、`d1-smoke-kb` 留 2 条；**用户空间（tenant 11）数据未动**。
+
 **✅ B58（2026-10-04，旧信封读法清剿：Go `{success,data}` 残留 → Java 裸载荷）**
 - **触发**：用户点检 `?section=integration-api` 报「加载 API 集成设置失败」。
 - **根因**：`/auth/me` 是**裸信封**（`{user, tenant, memberships, tenantRequired, capabilities, preferenceDefaults}`，`tenant` 在顶层），而页面读 `userResp.data.tenant`（Go 时代 `{success,data}` 形状）→ 恒 undefined → 直接抛错。curl 实测坐实（200 + 顶层键清单里无 `data`）。
