@@ -210,6 +210,83 @@ test('api 面时间键：`*_at` 一律 camel（防 snake 读到 undefined）', (
     'api/auth: userInfoFromApi 必须读 user.createdAt（camel），否则注册时间被兜底写成当前时刻')
 })
 
+test('信封读法：Java 后端是裸载荷，不得再按 Go 的 {success,data} 取数', () => {
+  // 2026-10-04 点检实锤：集成设置页读 `userResp.data.tenant`，而 /auth/me 的 tenant
+  // 在顶层（{user, tenant, memberships, …}）→ 恒 undefined → 整页抛
+  // 「加载 API 集成设置失败」；同页 agents 读 `resp.data`，而 /agents 返回
+  // {agents, disabledOwnAgentIds} → 选择器静默为空。
+  // 这两处读法随初始建仓从 Go 仓整份复制而来（Go 的响应是 {success,data} 包裹），
+  // 后端换 Java 后信封没了，读侧却没同步——与 ③④ 同族：**写侧换了形状，读侧没跟上**。
+  const page = readFileSync(join(SRC, 'views/integrations/ApiIntegrationSettings.vue'), 'utf8')
+  assert.doesNotMatch(
+    page,
+    /\?\.data\?\.tenant\b/,
+    '集成设置页：/auth/me 的 tenant 在顶层，读 .data.tenant 恒 undefined（整页报加载失败）',
+  )
+  assert.doesNotMatch(
+    page,
+    /Array\.isArray\(resp\?\.data\)/,
+    '集成设置页：/agents 返回 {agents,…}，读 resp.data 得到 undefined（智能体列表静默为空）',
+  )
+  // 钉住正确读法（与 IMChannelPanel / AgentEmbedChannelPanel 一致）
+  assert.match(page, /agents\.value = Array\.isArray\(resp\?\.agents\)/,
+    '集成设置页：agents 列表须读 resp.agents（裸信封）')
+  assert.match(page, /\?\.tenant\b/, '集成设置页：tenant 须从 /auth/me 顶层读取')
+
+  // 同族清剿（同日逐条实测端点形状）：这些消费点此前都按 Go 的 {success,data} 取数，
+  // Java 后端已改裸载荷 → 读到的恒 undefined，症状是「静默为空 / 误报失败 / 入口消失」。
+  // 每条都写明端点真实形状，防止有人照旧写法改回去。
+  const barePayloadReads: Array<{ file: string; forbid: RegExp; shape: string }> = [
+    {
+      file: 'views/chat/index.vue',
+      forbid: /res\?\.data\?\.questions/,
+      shape: '/agents/{id}/suggested-questions 直出数组（creatChat.vue 即规范读法），否则开场建议永远为空',
+    },
+    {
+      file: 'views/knowledge/components/FAQEntryManager.vue',
+      forbid: /res\?\.data\?\.taskId/,
+      shape: 'POST .../faq/entries → FaqTaskStartResponse{taskId}，否则导入进度条永不出现',
+    },
+    {
+      file: 'views/knowledge/KnowledgeBase.vue',
+      forbid: /res\?\.data\?\.moved_count/,
+      shape: 'PUT .../knowledge/folders → FolderMoveResponse{folderPath, movedCount}，否则成功也弹「重命名失败」',
+    },
+    {
+      file: 'views/knowledge/KnowledgeBase.vue',
+      forbid: /res\.data\?\.task_id/,
+      shape: 'POST /knowledge/move → MoveKnowledgeResponse{taskId,…}（camel 裸载荷）',
+    },
+    {
+      file: 'views/knowledge/KnowledgeBase.vue',
+      forbid: /folderTree\.value = \(res\?\.data/,
+      shape: 'GET .../knowledge/folders → {rootDocumentCount,totalDocumentCount,folders}，否则文件夹树为空',
+    },
+    {
+      file: 'views/knowledge/KnowledgeBase.vue',
+      forbid: /moveTargetKbs\.value = res\.data/,
+      shape: 'GET .../move-targets 直出数组，否则移动对话框没有目标库',
+    },
+    {
+      file: 'views/knowledge/KnowledgeBase.vue',
+      forbid: /const data = res\.data;/,
+      shape: 'GET /knowledge/move/progress/{taskId} 直出 KnowledgeMoveProgress，否则轮询永不推进',
+    },
+    {
+      file: 'views/knowledge/KnowledgeBase.vue',
+      forbid: /res\?\.success && knowledgeSpansPayloadHasTrace/,
+      shape: 'GET /knowledge/{id}/spans 直出载荷，否则「查看处理轨迹」入口被隐藏',
+    },
+  ]
+  for (const { file, forbid, shape } of barePayloadReads) {
+    assert.doesNotMatch(
+      readFileSync(join(SRC, file), 'utf8'),
+      forbid,
+      `${file}: 不得按旧 {success,data} 信封取数——${shape}`,
+    )
+  }
+})
+
 test('api 面 snake 记号棘轮：只许减不许增', () => {
   // 2026-10-04 扩面冻结 → 同日逐条核实（B55）。
   // 首轮扫描 api 面 40 处存量记号（32 个 file:token 键），先冻结成棘轮防新增；

@@ -1133,7 +1133,10 @@ async function load() {
       getCurrentUser(),
       loadAgents(),
     ])
-    const tenant = (userResp as any)?.data?.tenant
+    // /auth/me 是裸信封：{user, tenant, memberships, ...}（tenant 在顶层）。
+    // 曾按 Go 时代的 {success, data:{...}} 读 `.data.tenant` → 恒 undefined →
+    // 整页直接抛「加载 API 集成设置失败」。
+    const tenant = (userResp as any)?.tenant
     if (!tenant?.id) {
       throw new Error(t('integrations.api.loadFailed'))
     }
@@ -1200,8 +1203,10 @@ async function loadAgents() {
   agentsLoading.value = true
   agentsError.value = ''
   try {
+    // /agents 返回 {agents: [...], disabledOwnAgentIds: [...]}（裸信封，非 data 包裹）；
+    // 读法与 IMChannelPanel / AgentEmbedChannelPanel 一致。
     const resp = await listAgents({ creator: 'all' }) as any
-    agents.value = Array.isArray(resp?.data) ? resp.data : []
+    agents.value = Array.isArray(resp?.agents) ? resp.agents : []
     ensurePlaygroundAgent()
   } catch (err: any) {
     agentsError.value = err?.message || t('integrations.api.playgroundAgentsLoadFailed')

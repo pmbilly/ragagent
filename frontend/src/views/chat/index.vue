@@ -387,7 +387,9 @@ const fetchSuggestedQuestions = async () => {
         if (!agentId) return;
         const res = await getSuggestedQuestions(agentId, useSettingsStoreInstance.getSuggestedQuestionsParams());
         if (fetchId === suggestedQuestionsFetchId) {
-            suggestedQuestions.value = res?.data?.questions || [];
+            // /agents/{id}/suggested-questions 直出数组（裸载荷）；旧读法 res.data.questions
+            // 恒 undefined → 开场建议问题永远为空。creatChat.vue 的读法即规范。
+            suggestedQuestions.value = Array.isArray(res) ? res : [];
         }
     } catch (err) {
         console.warn('[SuggestedQuestions] Failed to fetch:', err);

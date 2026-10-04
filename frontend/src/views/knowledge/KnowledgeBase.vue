@@ -349,7 +349,9 @@ async function probeTraceAvailable(item: KnowledgeCard) {
   traceProbeInflight.add(id);
   try {
     const res: any = await getKnowledgeSpans(id);
-    traceAvailableById[id] = !!(res?.success && knowledgeSpansPayloadHasTrace(res.data));
+    // /knowledge/{id}/spans 是裸载荷（无 {success,data} 信封）；旧读法恒 false，
+    // 于是「查看处理轨迹」入口被静默隐藏。
+    traceAvailableById[id] = knowledgeSpansPayloadHasTrace(res);
   } catch {
     traceAvailableById[id] = false;
   } finally {
@@ -749,7 +751,8 @@ const loadFolderTree = async (kbIdValue: string) => {
   try {
     const res: any = await listKnowledgeFolders(kbIdValue);
     if (!isCurrentKb(kbIdValue)) return;
-    folderTree.value = (res?.data as KnowledgeFolderTree) || null;
+    // GET .../knowledge/folders 是裸载荷 {rootDocumentCount,totalDocumentCount,folders}
+    folderTree.value = (res as KnowledgeFolderTree) || null;
     // A folder can disappear (its last document was deleted or moved); fall
     // back to the root instead of leaving an empty, unreachable view.
     if (!folderExistsInTree(folderTree.value?.folders || [], selectedFolderPath.value)) {
@@ -811,7 +814,9 @@ const handleFolderRename = async ({ from, to }: { from: string; to: string }) =>
   }
   try {
     const res: any = await renameKnowledgeFolder(kbId.value, from, to);
-    const movedCount = res?.data?.moved_count ?? 0;
+    // POST 返回 FolderMoveResponse{folderPath, movedCount}（camel、裸载荷）；
+    // 旧读法恒 0 → 成功也弹「重命名失败」。
+    const movedCount = res?.movedCount ?? 0;
     if (movedCount === 0) {
       MessagePlugin.warning(t('knowledgeBase.folderTree.renameFailed'));
       await loadFolderTree(kbId.value);
@@ -1404,7 +1409,7 @@ const handleMoveKnowledge = async (item: KnowledgeCard) => {
   moveTargetKbs.value = [];
   try {
     const res: any = await listMoveTargets(kbId.value);
-    moveTargetKbs.value = res.data || [];
+    moveTargetKbs.value = Array.isArray(res) ? res : [];
   } catch {
     moveTargetKbs.value = [];
   } finally {
@@ -1437,7 +1442,8 @@ const handleMoveConfirm = async () => {
       targetKbId: moveSelectedTargetId.value,
       mode: moveMode.value,
     });
-    const taskId = res.data?.task_id;
+    // MoveKnowledgeResponse{taskId, sourceKbId, targetKbId, knowledgeCount}（裸载荷）
+    const taskId = res?.taskId;
     MessagePlugin.info(t('knowledgeBase.moveStarted'));
     // Close the card menu
     moveMenuMode.value = 'normal';
@@ -1462,7 +1468,8 @@ const startMovePoll = (taskId: string) => {
   movePollTimer = setInterval(async () => {
     try {
       const res: any = await getKnowledgeMoveProgress(taskId);
-      const data = res.data;
+      // GET /knowledge/move/progress/{taskId} 直出 KnowledgeMoveProgress（裸载荷）
+      const data = res;
       if (!data) return;
       if (data.status === 'completed') {
         stopMovePoll();

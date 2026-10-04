@@ -2361,7 +2361,9 @@ const handleImport = async () => {
       mode: importState.mode,
     })
 
-    const taskId = res?.data?.taskId
+    // POST .../faq/entries 返回 FaqTaskStartResponse{taskId}（裸载荷）；旧读法恒 undefined
+    // → 导入进度条永不出现。
+    const taskId = res?.taskId
     if (taskId) {
       importState.taskId = taskId
       importState.taskStatus = {
