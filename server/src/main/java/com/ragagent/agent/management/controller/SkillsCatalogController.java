@@ -19,7 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * <p>沙箱安装管线退役后，技能 = 宿主 skillDirs 里的 SKILL.md 目录（Loader 扫描），
  * agent 凭注入的指令用现有工具执行。目录由 {@code weknora.skills.host-dirs}
- * （逗号分隔，env {@code WEKNORA_SKILL_HOST_DIRS}）配置；未配置时
+ * （逗号分隔，env {@code WEKNORA_SKILLS_HOST_DIRS}——复数 SKILLS，对应属性
+ * {@code weknora.skills.host-dirs}）配置；未配置时
  * {@code skills_available=false}，前端选择器隐藏。</p>
  */
 @RestController

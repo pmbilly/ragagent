@@ -674,3 +674,10 @@
 - **守卫**：棘轮基线 **32 → 13 键**（只许减，每条附判定依据）；红态探针复验：回流 `page_count` → 精确报 `api/wiki/index.ts:355`，还原即绿。
 - **验证**：前端全量 **706/706**、`vue-tsc --build` 0 错误、`check-fe-contract-keys.py` 无新增；api 面已无未定性 snake 记号（残留 13 键 = 基线本身）。
 - **教训**：① `vue-tsc` 是这类断链的天然探测器——改类型，真消费点立刻报错；② 无损探针（错凭据 / 不存在的 id / 写后回读）能在不动数据的前提下坐实键名方向；③ 死字段与真断链要分开处理：前者删、后者改键并补消费点。
+
+**✅ B56（2026-10-04，技能区文案纠正 + 死键清理 + 宿主技能目录 dev 配置）**
+- **触发**：点检问「技能管理为什么没有了」。查明＝**计划内裁撤**（2026-09-28 用户定稿的第一批功能裁剪五项，PR3 `caef9d5`「移除沙箱 + 技能降级为指令型」）——前端删 `SkillSettings`/`SkillFilesPanel/Drawer`/`SkillInstallTimeline`/`EnvVarSettings`/`Sandbox*` 共 30 文件（含 `api/skill`、`api/env-vars`），技能能力保留、降级为指令型（SKILL.md 提示词注入）。
+- **本批改动**：① `agent.editor` 技能区 4 条**在用**文案仍是沙箱/安装期口径（"先选择运行沙箱…没装的会显示「安装」"）→ 五语言改为指令型口径（技能=宿主目录指令包、勾选即注入）；② 删 **19 个零引用死键 × 5 语言**（`skillsNeedSandbox`/`installToThisSandbox`/`installShort`/`viewInstallProgress`/`skillNotInstalled`/`skillNotReady`/`skillDisabledOnSandbox`/`sandboxBackend*`×4/`sandboxNoConfigs`/`goSandboxSettings`/`goSkillSettings`/`skillsGroupAvailable`/`Unavailable`/`skillsInfoTitle`/`Content`/`selectSkills`——`settings.sandbox/skills` 块当时删了、`agent.editor` 块漏网）；③ dev 基建：新建宿主技能目录 `/Users/billy/weknora-host-skills`（2 个示例技能：`kb-faq-curator`（含 references 二级文件）、`wiki-style-reviewer`）+ `.env` 配 `WEKNORA_SKILLS_HOST_DIRS` + `dev-env.sh` 按 key 读取并导出；④ 更正 `SkillsCatalogController` javadoc 写错的 env 名。
+- **踩坑（已记录）**：env 名必须是复数 **`WEKNORA_SKILLS_HOST_DIRS`**（Spring 把属性 `weknora.skills.host-dirs` 的 `.`/`-` 换成 `_` 再大写）；写成单数**不报任何错**，接口只回 `{"skills":[],"skillsAvailable":false}`（原 javadoc 恰好写错成单数，是这次踩坑的源头）。
+- **验证**：i18n 审计 11/11、前端全量 706/706、`vue-tsc` 0 错误、后端 `compileJava + spotlessCheck` 绿；重启后 `GET /api/v1/skills` 实测返回 2 个技能（`skillsAvailable:true`）。
+- **后续（B57）**：用户拍板技能改为**入库（DB）存储**（理由：未来多实例部署）+ **弃用宿主目录** → 本批的 ③（宿主目录 dev 配置）与 ④（该控制器 javadoc）将被 B57 取代并清理，此处留档。
