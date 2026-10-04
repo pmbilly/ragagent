@@ -3,6 +3,7 @@ package com.ragagent.knowledge.service;
 import java.util.ArrayList;
 import java.util.List;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.ragagent.common.mybatis.PageRequests;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
@@ -113,9 +114,9 @@ public class KnowledgeSearchService {
             });
         }
         long total = knowledgeMapper.selectCount(qw);
-        List<Knowledge> rows = knowledgeMapper.selectList(qw
-                .orderByDesc(Knowledge::getCreatedAt)
-                .last("LIMIT " + (limit + 1) + " OFFSET " + offset));
+        // limit+1 探测 has_more：atOffset 表达任意偏移，LIMIT/OFFSET 交给分页插件
+        List<Knowledge> rows = knowledgeMapper.selectList(PageRequests.atOffset(offset, (long) limit + 1),
+                qw.orderByDesc(Knowledge::getCreatedAt));
         boolean hasMore = rows.size() > limit;
         if (hasMore) {
             rows = rows.subList(0, limit);

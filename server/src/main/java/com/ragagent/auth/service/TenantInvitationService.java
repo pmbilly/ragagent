@@ -9,7 +9,8 @@ import java.util.Base64;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.ragagent.common.mybatis.PageRequests;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.audit.domain.AuditAction;
@@ -179,8 +180,8 @@ public class TenantInvitationService {
         if (!includeTerminal) {
             listScope.eq(TenantInvitation::getStatus, STATUS_PENDING);
         }
-        listScope.last("LIMIT " + pageSize + " OFFSET " + (long) (page - 1) * pageSize);
-        return new InvitationPage(invitationMapper.selectList(listScope), total);
+        return new InvitationPage(
+                invitationMapper.selectList(PageRequests.range(page, pageSize), listScope), total);
     }
 
     public record InvitationPage(List<TenantInvitation> invitations, long total) {
@@ -432,8 +433,8 @@ public class TenantInvitationService {
 
     private void bumpAcceptedCountBestEffort(long id) {
         try {
-            int rows = invitationMapper.update(null, new UpdateWrapper<TenantInvitation>()
-                    .eq("id", id)
+            int rows = invitationMapper.update(null, new LambdaUpdateWrapper<TenantInvitation>()
+                    .eq(TenantInvitation::getId, id)
                     .setSql("accepted_count = accepted_count + 1"));
             if (rows == 0) {
                 log.warn("share-link {} accepted_count bump failed: row missing", id);
@@ -463,13 +464,13 @@ public class TenantInvitationService {
      */
     private void markStatusIfPending(long id, String status) {
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
-        int rows = invitationMapper.update(null, new UpdateWrapper<TenantInvitation>()
-                .eq("id", id)
-                .eq("status", STATUS_PENDING)
-                .isNull("deleted_at")
-                .set("status", status)
-                .set("responded_at", now)
-                .set("updated_at", OffsetDateTime.now(ZoneOffset.UTC)));
+        int rows = invitationMapper.update(null, new LambdaUpdateWrapper<TenantInvitation>()
+                .eq(TenantInvitation::getId, id)
+                .eq(TenantInvitation::getStatus, STATUS_PENDING)
+                .isNull(TenantInvitation::getDeletedAt)
+                .set(TenantInvitation::getStatus, status)
+                .set(TenantInvitation::getRespondedAt, now)
+                .set(TenantInvitation::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC)));
         if (rows == 0) {
             throw TenantRbacException.invitationNotPending();
         }
@@ -505,12 +506,12 @@ public class TenantInvitationService {
     private void sweep() {
         try {
             OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
-            invitationMapper.update(null, new UpdateWrapper<TenantInvitation>()
-                    .eq("status", STATUS_PENDING)
-                    .lt("expires_at", now)
-                    .set("status", STATUS_EXPIRED)
-                    .set("responded_at", now)
-                    .set("updated_at", OffsetDateTime.now(ZoneOffset.UTC)));
+            invitationMapper.update(null, new LambdaUpdateWrapper<TenantInvitation>()
+                    .eq(TenantInvitation::getStatus, STATUS_PENDING)
+                    .lt(TenantInvitation::getExpiresAt, now)
+                    .set(TenantInvitation::getStatus, STATUS_EXPIRED)
+                    .set(TenantInvitation::getRespondedAt, now)
+                    .set(TenantInvitation::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC)));
         } catch (RuntimeException e) {
             log.warn("tenant_invitation lazy sweep failed: {}", e.getMessage());
         }

@@ -3,12 +3,12 @@ package com.ragagent.knowledge.service;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.ragagent.knowledge.task.KnowledgeProcessingQueue;
 import com.ragagent.common.error.BizException;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 /**
@@ -18,19 +18,22 @@ import org.springframework.stereotype.Service;
 public class KnowledgeParseService {
 
 
-    private final KnowledgeService facade;
+    private final KnowledgeAccessHelper access;
+    private final KnowledgeFolderService folderService;
     private final KnowledgeFileService fileService;
     private final KnowledgeMapper knowledgeMapper;
     private final SpanTracker spanTracker;
-    private final KnowledgeService.KnowledgeProcessWorker worker;
+    private final KnowledgeProcessingQueue worker;
 
     public KnowledgeParseService(
-                            @Lazy KnowledgeService facade,
+                            KnowledgeAccessHelper access,
+                            KnowledgeFolderService folderService,
                             KnowledgeFileService fileService,
                             KnowledgeMapper knowledgeMapper,
                             SpanTracker spanTracker,
-                            @Lazy KnowledgeService.KnowledgeProcessWorker worker) {
-        this.facade = facade;
+                            KnowledgeProcessingQueue worker) {
+        this.access = access;
+        this.folderService = folderService;
         this.fileService = fileService;
         this.knowledgeMapper = knowledgeMapper;
         this.spanTracker = spanTracker;
@@ -38,8 +41,8 @@ public class KnowledgeParseService {
     }
 
     public Knowledge reparseKnowledge(String id) {
-        Knowledge existing = facade.loadKnowledgeWrite(id);
-        KnowledgeBase kb = facade.requireKb(existing.getKnowledgeBaseId());
+        Knowledge existing = folderService.loadKnowledgeWrite(id);
+        KnowledgeBase kb = access.requireKb(existing.getKnowledgeBaseId());
         resetKnowledgeForReparse(existing, kb);
         fileService.updateKnowledgeRow(existing, existing.getMetadata());
         worker.enqueue(existing.getId());
@@ -81,12 +84,12 @@ public class KnowledgeParseService {
             }
         }
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
-        knowledgeMapper.update(null, new UpdateWrapper<Knowledge>()
-                .eq("id", existing.getId())
-                .set("parse_status", Knowledge.PARSE_CANCELLED)
-                .set("error_message", "用户已取消解析")
-                .set("pending_subtasks_count", 0)
-                .set("updated_at", now));
+        knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, existing.getId())
+                .set(Knowledge::getParseStatus, Knowledge.PARSE_CANCELLED)
+                .set(Knowledge::getErrorMessage, "用户已取消解析")
+                .set(Knowledge::getPendingSubtasksCount, 0)
+                .set(Knowledge::getUpdatedAt, now));
         existing.setParseStatus(Knowledge.PARSE_CANCELLED);
         existing.setErrorMessage("用户已取消解析");
         existing.setPendingSubtasksCount(0);

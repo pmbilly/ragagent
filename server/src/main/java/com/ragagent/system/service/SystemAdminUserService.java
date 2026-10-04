@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.ragagent.common.mybatis.PageRequests;
 import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.audit.domain.AuditOutcome;
 import com.ragagent.audit.service.AuditLogService;
@@ -172,19 +172,20 @@ public class SystemAdminUserService {
 
     public AdminPage listSystemAdmins(int offset, int limit) {
         Long total = countSystemAdmins();
-        List<User> users = userMapper.selectList(new LambdaQueryWrapper<User>()
-                .eq(User::isIsSystemAdmin, true)
-                .isNull(User::getDeletedAt)
-                .orderByDesc(User::getCreatedAt)
-                .orderByAsc(User::getId)
-                .last("LIMIT " + limit + " OFFSET " + Math.max(offset, 0)));
+        // offset/limit 语义的 API：atOffset 表达任意偏移，LIMIT/OFFSET 交给分页插件
+        List<User> users = userMapper.selectList(PageRequests.atOffset(offset, limit),
+                new LambdaQueryWrapper<User>()
+                        .eq(User::isIsSystemAdmin, true)
+                        .isNull(User::getDeletedAt)
+                        .orderByDesc(User::getCreatedAt)
+                        .orderByAsc(User::getId));
         return new AdminPage(users, total == null ? 0 : total);
     }
 
     private Long countSystemAdmins() {
-        return userMapper.selectCount(new QueryWrapper<User>()
-                .eq("is_system_admin", true)
-                .isNull("deleted_at"));
+        return userMapper.selectCount(new LambdaQueryWrapper<User>()
+                .eq(User::isIsSystemAdmin, true)
+                .isNull(User::getDeletedAt));
     }
 
     // ── reset-password ────────────────────────────────────────────────────
@@ -199,9 +200,9 @@ public class SystemAdminUserService {
 
     private void revokeTokensByUserId(String userId) {
         try {
-            authTokenMapper.update(null, new com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper<AuthToken>()
-                    .eq("user_id", userId)
-                    .set("is_revoked", true));
+            authTokenMapper.update(null, new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<AuthToken>()
+                    .eq(AuthToken::getUserId, userId)
+                    .set(AuthToken::isIsRevoked, true));
         } catch (RuntimeException e) {
             log.warn("Failed to revoke tokens for user {}: {}", userId, e.toString());
         }

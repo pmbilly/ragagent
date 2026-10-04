@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import com.ragagent.knowledge.config.BatchEmbedProperties;
 import java.util.concurrent.Executors;
 import java.util.List;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
@@ -20,6 +20,7 @@ import com.ragagent.model.domain.Model;
 import com.ragagent.model.service.ModelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
@@ -40,7 +41,6 @@ import com.ragagent.knowledge.domain.ExtractChunkPayload;
 import com.ragagent.knowledge.domain.QuestionBatchPayload;
 import com.ragagent.knowledge.support.GraphChunkSelector;
 import com.ragagent.knowledge.support.KnowledgeIndexContent;
-import com.ragagent.knowledge.service.KnowledgeService;
 import com.ragagent.knowledge.service.KnowledgeVectorWrites;
 import com.ragagent.knowledge.support.QuestionBatchPlanner;
 import com.ragagent.knowledge.service.SpanTracker;
@@ -48,7 +48,6 @@ import com.ragagent.retrieval.engine.VectorStoreService;
 import com.ragagent.knowledge.client.DocReaderClient;
 import com.ragagent.knowledge.client.EmbedderClient;
 import com.ragagent.knowledge.storage.TenantFileStorage;
-import org.springframework.context.annotation.Lazy;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import java.util.Map;
 import java.util.UUID;
@@ -80,7 +79,7 @@ import com.ragagent.common.wiki.WikiIngestPort;
  * <p>规模例外（§14.5）：~810 行——摄取 worker 的状态机与补偿面同生命周期，
  * 再切不落在自然接缝上，登记不硬切。</p> */
 @Service
-public class KnowledgeProcessWorker implements KnowledgeService.KnowledgeProcessWorker {
+public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
 
     private static final Logger log = LoggerFactory.getLogger(KnowledgeProcessWorker.class);
 
@@ -121,7 +120,7 @@ public class KnowledgeProcessWorker implements KnowledgeService.KnowledgeProcess
     private final ModelService modelService;
     private final KnowledgeVectorWrites vectorWrites;
     private final ModelRuntimeFactory modelRuntimeFactory;
-    private final KnowledgeService knowledgeService;
+    private final ApplicationEventPublisher eventPublisher;
     private final SpanTracker spanTracker;
     /** 图库仓储（D 批）：重处理前清旧图谱。 */
     private final RetrieveGraphRepository graphRepository;
@@ -148,7 +147,7 @@ public class KnowledgeProcessWorker implements KnowledgeService.KnowledgeProcess
                                   ModelService modelService,
                                   KnowledgeVectorWrites vectorWrites,
                                   ModelRuntimeFactory modelRuntimeFactory,
-                                  @Lazy KnowledgeService knowledgeService,
+                                  ApplicationEventPublisher eventPublisher,
                                   SpanTracker spanTracker,
                                   RetrieveGraphRepository graphRepository,
                                   ObjectProvider<
@@ -170,7 +169,7 @@ public class KnowledgeProcessWorker implements KnowledgeService.KnowledgeProcess
         this.modelService = modelService;
         this.vectorWrites = vectorWrites;
         this.modelRuntimeFactory = modelRuntimeFactory;
-        this.knowledgeService = knowledgeService;
+        this.eventPublisher = eventPublisher;
         this.spanTracker = spanTracker;
         this.graphRepository = graphRepository;
         this.wikiIngestService = wikiIngestService;
@@ -210,11 +209,11 @@ public class KnowledgeProcessWorker implements KnowledgeService.KnowledgeProcess
     private void processInner(String knowledgeId,
                               LangfuseTaskScope scope) {
         // CAS pending → processing：被抢/已取消则静默退出
-        int updated = knowledgeMapper.update(null, new UpdateWrapper<Knowledge>()
-                .eq("id", knowledgeId)
-                .eq("parse_status", Knowledge.PARSE_PENDING)
-                .set("parse_status", Knowledge.PARSE_PROCESSING)
-                .set("updated_at", OffsetDateTime.now(ZoneOffset.UTC)));
+        int updated = knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, knowledgeId)
+                .eq(Knowledge::getParseStatus, Knowledge.PARSE_PENDING)
+                .set(Knowledge::getParseStatus, Knowledge.PARSE_PROCESSING)
+                .set(Knowledge::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC)));
         if (updated == 0) {
             return;
         }
@@ -457,10 +456,10 @@ public class KnowledgeProcessWorker implements KnowledgeService.KnowledgeProcess
         SpanTracker.SpanHandle postSpan = beginStageSpan(attempt, knowledgeId,
                 KnowledgeProcessingSpan.STAGE_POST_PROCESS, null);
         if (hasSummaryModel(kb)) {
-            knowledgeMapper.update(null, new UpdateWrapper<Knowledge>()
-                    .eq("id", knowledgeId)
-                    .set("summary_status", "none")
-                    .set("updated_at", OffsetDateTime.now(ZoneOffset.UTC)));
+            knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                    .eq(Knowledge::getId, knowledgeId)
+                    .set(Knowledge::getSummaryStatus, "none")
+                    .set(Knowledge::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC)));
             spawnSummaryFanOut(knowledgeId);
         }
         int pendingSubtasks = (plan.wiki() ? 1 : 0) + plan.questionBatchCount()
@@ -593,7 +592,10 @@ public class KnowledgeProcessWorker implements KnowledgeService.KnowledgeProcess
             return;
         }
         try {
-            knowledgeService.requestPostProcessSummaryGeneration(knowledgeId);
+            // M2 解环：原直连 KnowledgeService（@Lazy 环的一角）改同步领域事件；
+            // 订阅方 KnowledgeSummaryService#onKnowledgeProcessed 在本线程内执行，
+            // 语义与原直调一致（异常照旧从这里冒出）。
+            eventPublisher.publishEvent(new KnowledgeProcessedEvent(knowledgeId));
         } catch (RuntimeException e) {
             log.warn("Post-process summary fan-out failed for knowledge {}: {}",
                     knowledgeId, e.toString());
@@ -605,11 +607,11 @@ public class KnowledgeProcessWorker implements KnowledgeService.KnowledgeProcess
      * + {@code processed_at}。{@code storage_size} 的 Java 侧计算未接线，保持既有形态。
      */
     private void markIndexedEnabled(String knowledgeId) {
-        knowledgeMapper.update(null, new UpdateWrapper<Knowledge>()
-                .eq("id", knowledgeId)
-                .set("enable_status", "enabled")
-                .set("processed_at", OffsetDateTime.now(ZoneOffset.UTC))
-                .set("updated_at", OffsetDateTime.now(ZoneOffset.UTC)));
+        knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, knowledgeId)
+                .set(Knowledge::getEnableStatus, "enabled")
+                .set(Knowledge::getProcessedAt, OffsetDateTime.now(ZoneOffset.UTC))
+                .set(Knowledge::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC)));
     }
 
     /**
@@ -620,12 +622,12 @@ public class KnowledgeProcessWorker implements KnowledgeService.KnowledgeProcess
      * 富化且不得覆盖状态。</p>
      */
     private boolean promoteFinalizing(String knowledgeId, int pendingSubtasks) {
-        int promoted = knowledgeMapper.update(null, new UpdateWrapper<Knowledge>()
-                .eq("id", knowledgeId)
-                .eq("parse_status", Knowledge.PARSE_PROCESSING)
-                .set("parse_status", Knowledge.PARSE_FINALIZING)
-                .set("pending_subtasks_count", pendingSubtasks)
-                .set("updated_at", OffsetDateTime.now(ZoneOffset.UTC)));
+        int promoted = knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, knowledgeId)
+                .eq(Knowledge::getParseStatus, Knowledge.PARSE_PROCESSING)
+                .set(Knowledge::getParseStatus, Knowledge.PARSE_FINALIZING)
+                .set(Knowledge::getPendingSubtasksCount, pendingSubtasks)
+                .set(Knowledge::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC)));
         if (promoted > 0) {
             log.info("[KnowledgePostProcess] Knowledge {} entered finalizing ({} subtask(s) pending)",
                     knowledgeId, pendingSubtasks);
@@ -770,14 +772,14 @@ public class KnowledgeProcessWorker implements KnowledgeService.KnowledgeProcess
             KnowledgeBase rowKb = row == null ? null
                     : kbMapper.selectById(row.getKnowledgeBaseId());
             boolean summaryModelConfigured = hasSummaryModel(rowKb);
-            UpdateWrapper<Knowledge> completeUpdate = new UpdateWrapper<Knowledge>()
-                    .eq("id", knowledgeId)
-                    .set("parse_status", Knowledge.PARSE_COMPLETED)
-                    .set("enable_status", "enabled")
-                    .set("processed_at", OffsetDateTime.now(ZoneOffset.UTC))
-                    .set("updated_at", OffsetDateTime.now(ZoneOffset.UTC));
+            LambdaUpdateWrapper<Knowledge> completeUpdate = new LambdaUpdateWrapper<Knowledge>()
+                    .eq(Knowledge::getId, knowledgeId)
+                    .set(Knowledge::getParseStatus, Knowledge.PARSE_COMPLETED)
+                    .set(Knowledge::getEnableStatus, "enabled")
+                    .set(Knowledge::getProcessedAt, OffsetDateTime.now(ZoneOffset.UTC))
+                    .set(Knowledge::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC));
             if (summaryModelConfigured) {
-                completeUpdate.set("summary_status", "none");
+                completeUpdate.set(Knowledge::getSummaryStatus, "none");
             }
             knowledgeMapper.update(null, completeUpdate);
             if (summaryModelConfigured) {
@@ -790,11 +792,11 @@ public class KnowledgeProcessWorker implements KnowledgeService.KnowledgeProcess
                         KnowledgeProcessingSpan.STATUS_DONE, null, "", "");
             }
         } else {
-            knowledgeMapper.update(null, new UpdateWrapper<Knowledge>()
-                    .eq("id", knowledgeId)
-                    .set("parse_status", Knowledge.PARSE_FAILED)
-                    .set("error_message", abbreviate(error))
-                    .set("updated_at", OffsetDateTime.now(ZoneOffset.UTC)));
+            knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                    .eq(Knowledge::getId, knowledgeId)
+                    .set(Knowledge::getParseStatus, Knowledge.PARSE_FAILED)
+                    .set(Knowledge::getErrorMessage, abbreviate(error))
+                    .set(Knowledge::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC)));
             // 非阶段失败（模型解析/预清理等）没有 failSpan 收口 → 显式 finalize（幂等）
             if (attempt > 0) {
                 spanTracker.finalizeAttempt(knowledgeId, attempt,

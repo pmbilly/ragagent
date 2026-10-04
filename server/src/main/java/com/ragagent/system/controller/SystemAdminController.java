@@ -15,7 +15,6 @@ import com.ragagent.audit.domain.AuditAction;
 import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.audit.domain.AuditOutcome;
 import com.ragagent.audit.service.AuditLogService;
-import com.ragagent.auth.domain.Tenant;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.mapper.TenantMapper;
 import com.ragagent.common.context.TenantContext;
@@ -500,9 +499,8 @@ public class SystemAdminController {
             gb = 10;
         }
         long quotaBytes = gb * 1024 * 1024 * 1024;
-        int affected = tenantMapper.update(null,
-                new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<Tenant>()
-                        .set(Tenant::getStorageQuota, quotaBytes));
+        // 全表写走具名 Mapper 方法（FullTableWriteGuard 登记例外），不再匿名 update(null, wrapper)
+        int affected = tenantMapper.applyDefaultStorageQuota(quotaBytes);
         var details = new LinkedHashMap<String, Object>();
         details.put("quota_bytes", quotaBytes);
         details.put("quota_gb", gb);

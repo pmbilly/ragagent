@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.web.ZeroTimeSerializer;
 import com.ragagent.common.web.PgJsonTypeHandler;
@@ -101,9 +102,9 @@ public class DataSourceRepository {
             throw new DataSourceException("data source id is empty");
         }
         tx.inTransaction(() -> {
-            UpdateWrapper<DataSource> w = new UpdateWrapper<DataSource>()
-                    .eq("id", ds.getId())
-                    .isNull("deleted_at");
+            LambdaUpdateWrapper<DataSource> w = new LambdaUpdateWrapper<DataSource>()
+                    .eq(DataSource::getId, ds.getId())
+                    .isNull(DataSource::getDeletedAt);
 
             // 按实体更新对 updated_at 是**无条件覆盖**，
             // 它在 SET 里的位置与零值规则无关。
@@ -114,58 +115,58 @@ public class DataSourceRepository {
             // Java 的 wrapper 不回写实体，少了这一步 PUT 响应会变成
             // `"updated_at":"0001-01-01T00:00:00Z"`。
             OffsetDateTime updatedAt = OffsetDateTime.now();
-            w.set("updated_at", updatedAt);
+            w.set(DataSource::getUpdatedAt, updatedAt);
             ds.setUpdatedAt(updatedAt);
 
             // created_at 走普通的零值规则：非零才进 SET。
             // 加载出来的 ds 一定带着原值，所以线上会多写一次同值列。
             if (!ZeroTimeSerializer.isZeroValue(ds.getCreatedAt())) {
-                w.set("created_at", ds.getCreatedAt());
+                w.set(DataSource::getCreatedAt, ds.getCreatedAt());
             }
             // deleted_at 非零时会被写进 SET；
             // 正常路径上它是 null（查询已滤掉已删行），保留判断只为逐条对齐。
             if (ds.getDeletedAt() != null) {
-                w.set("deleted_at", ds.getDeletedAt());
+                w.set(DataSource::getDeletedAt, ds.getDeletedAt());
             }
 
             if (ds.getTenantId() != null && ds.getTenantId() != 0L) {
-                w.set("tenant_id", ds.getTenantId());
+                w.set(DataSource::getTenantId, ds.getTenantId());
             }
             if (nonEmpty(ds.getKnowledgeBaseId())) {
-                w.set("knowledge_base_id", ds.getKnowledgeBaseId());
+                w.set(DataSource::getKnowledgeBaseId, ds.getKnowledgeBaseId());
             }
             if (nonEmpty(ds.getName())) {
-                w.set("name", ds.getName());
+                w.set(DataSource::getName, ds.getName());
             }
             if (nonEmpty(ds.getType())) {
-                w.set("type", ds.getType());
+                w.set(DataSource::getType, ds.getType());
             }
-            setJson(w, "config", ds.getConfig());
+            setJson(w, DataSource::getConfig, ds.getConfig());
             if (nonEmpty(ds.getSyncSchedule())) {
-                w.set("sync_schedule", ds.getSyncSchedule());
+                w.set(DataSource::getSyncSchedule, ds.getSyncSchedule());
             }
             if (nonEmpty(ds.getSyncMode())) {
-                w.set("sync_mode", ds.getSyncMode());
+                w.set(DataSource::getSyncMode, ds.getSyncMode());
             }
             if (nonEmpty(ds.getStatus())) {
-                w.set("status", ds.getStatus());
+                w.set(DataSource::getStatus, ds.getStatus());
             }
             if (nonEmpty(ds.getConflictStrategy())) {
-                w.set("conflict_strategy", ds.getConflictStrategy());
+                w.set(DataSource::getConflictStrategy, ds.getConflictStrategy());
             }
             if (ds.getLastSyncAt() != null) {
-                w.set("last_sync_at", ds.getLastSyncAt());
+                w.set(DataSource::getLastSyncAt, ds.getLastSyncAt());
             }
-            setJson(w, "last_sync_cursor", ds.getLastSyncCursor());
-            setJson(w, "last_sync_result", ds.getLastSyncResult());
+            setJson(w, DataSource::getLastSyncCursor, ds.getLastSyncCursor());
+            setJson(w, DataSource::getLastSyncResult, ds.getLastSyncResult());
             // ⚠️ error_message 是零值跳过的**最大受害者**：用本方法清空错误消息是做不到的
             // （"把 error_message 改成空串"在这种调用下不生效，session/message 同款）。
             // 清空要走 updateSyncState（它用显式列集）。
             if (nonEmpty(ds.getErrorMessage())) {
-                w.set("error_message", ds.getErrorMessage());
+                w.set(DataSource::getErrorMessage, ds.getErrorMessage());
             }
             if (ds.getSyncLogRetentionDays() != 0) {
-                w.set("sync_log_retention_days", ds.getSyncLogRetentionDays());
+                w.set(DataSource::getSyncLogRetentionDays, ds.getSyncLogRetentionDays());
             }
 
             mapper.update(null, w);
@@ -193,15 +194,15 @@ public class DataSourceRepository {
             throw new DataSourceException("data source id is empty");
         }
         tx.inTransaction(() -> {
-            UpdateWrapper<DataSource> w = new UpdateWrapper<DataSource>()
-                    .eq("id", ds.getId())
-                    .isNull("deleted_at");
-            w.set("status", ds.getStatus());
-            w.set("last_sync_at", ds.getLastSyncAt());
-            setJson(w, "last_sync_cursor", ds.getLastSyncCursor());
-            setJson(w, "last_sync_result", ds.getLastSyncResult());
-            w.set("error_message", ds.getErrorMessage());
-            w.set("updated_at", OffsetDateTime.now());
+            LambdaUpdateWrapper<DataSource> w = new LambdaUpdateWrapper<DataSource>()
+                    .eq(DataSource::getId, ds.getId())
+                    .isNull(DataSource::getDeletedAt);
+            w.set(DataSource::getStatus, ds.getStatus());
+            w.set(DataSource::getLastSyncAt, ds.getLastSyncAt());
+            setJson(w, DataSource::getLastSyncCursor, ds.getLastSyncCursor());
+            setJson(w, DataSource::getLastSyncResult, ds.getLastSyncResult());
+            w.set(DataSource::getErrorMessage, ds.getErrorMessage());
+            w.set(DataSource::getUpdatedAt, OffsetDateTime.now());
             mapper.update(null, w);
         });
     }
@@ -314,7 +315,8 @@ public class DataSourceRepository {
      * 会退化成 Java 序列化，落库时报
      * {@code Data conversion error converting "CAST(X'aced0005...)"}。</p>
      */
-    private static void setJson(UpdateWrapper<DataSource> w, String column, JsonNode value) {
+    private static void setJson(LambdaUpdateWrapper<DataSource> w, SFunction<DataSource, ?> column,
+            JsonNode value) {
         if (value == null) {
             return;
         }

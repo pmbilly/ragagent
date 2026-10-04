@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.model.domain.Model;
 import com.ragagent.model.domain.ModelParameters;
 import com.ragagent.model.mapper.ModelMapper;
@@ -114,12 +114,12 @@ public class BuiltinModelsReconciler implements ApplicationRunner {
 
             if (m.isIsDefault()) {
                 // 同 (tenant_id, type) 桶内清其他默认（排除自身）
-                modelMapper.update(null, new UpdateWrapper<Model>()
-                        .eq("tenant_id", m.getTenantId())
-                        .eq("type", m.getType())
-                        .ne("id", m.getId())
-                        .eq("is_default", true)
-                        .set("is_default", false));
+                modelMapper.update(null, new LambdaUpdateWrapper<Model>()
+                        .eq(Model::getTenantId, m.getTenantId())
+                        .eq(Model::getType, m.getType())
+                        .ne(Model::getId, m.getId())
+                        .eq(Model::isIsDefault, true)
+                        .set(Model::isIsDefault, false));
             }
             upsert(m);
             applied++;
@@ -135,9 +135,9 @@ public class BuiltinModelsReconciler implements ApplicationRunner {
                         .isNull(Model::getDeletedAt));
         for (Model row : managed) {
             if (!yamlIds.contains(row.getId())) {
-                modelMapper.update(null, new UpdateWrapper<Model>()
-                        .eq("id", row.getId())
-                        .set("deleted_at", OffsetDateTime.now(ZoneOffset.UTC)));
+                modelMapper.update(null, new LambdaUpdateWrapper<Model>()
+                        .eq(Model::getId, row.getId())
+                        .set(Model::getDeletedAt, OffsetDateTime.now(ZoneOffset.UTC)));
                 pruned++;
             }
         }
@@ -150,8 +150,7 @@ public class BuiltinModelsReconciler implements ApplicationRunner {
      * 恒为 now，不携带它才能避免已存在行的 created_at 每次启动被改写。
      */
     private void upsert(Model m) {
-        com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper<Model> uw =
-                new UpdateWrapper<Model>().eq("id", m.getId());
+        LambdaUpdateWrapper<Model> uw = new LambdaUpdateWrapper<Model>().eq(Model::getId, m.getId());
         OffsetDateTime createdAt = m.getCreatedAt();
         m.setCreatedAt(null);
         try {
@@ -164,7 +163,7 @@ public class BuiltinModelsReconciler implements ApplicationRunner {
                     modelMapper.insert(m);
                 } catch (org.springframework.dao.DuplicateKeyException ex) {
                     m.setCreatedAt(null);
-                    modelMapper.update(m, new UpdateWrapper<Model>().eq("id", m.getId()));
+                    modelMapper.update(m, new LambdaUpdateWrapper<Model>().eq(Model::getId, m.getId()));
                 }
             }
         } finally {

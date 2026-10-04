@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.ragagent.common.mybatis.PageRequests;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -110,11 +111,11 @@ public class TenantService {
                     .or().like(Tenant::getDescription, like));
         }
         Long total = tenantMapper.selectCount(wrapper);
-        if (page > 0 && pageSize > 0) {
-            wrapper.last("LIMIT " + pageSize + " OFFSET " + ((long) (page - 1) * pageSize));
-        }
         wrapper.orderByDesc(Tenant::getCreatedAt);
-        List<Tenant> tenants = tenantMapper.selectList(wrapper);
+        // page<=0 是"不分页"语义（拉全量）；分页时 LIMIT/OFFSET 交给分页插件按方言生成
+        List<Tenant> tenants = page > 0 && pageSize > 0
+                ? tenantMapper.selectList(PageRequests.range(page, pageSize), wrapper)
+                : tenantMapper.selectList(wrapper);
         for (Tenant t : tenants) {
             normalizeRetrieverEngines(t);
             normalizeContextConfig(t);
@@ -287,14 +288,14 @@ public class TenantService {
      */
     public void deleteTenant(long id) {
         java.time.OffsetDateTime now = java.time.OffsetDateTime.now(java.time.ZoneOffset.UTC);
-        memberMapper.update(null, new com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper<com.ragagent.auth.domain.TenantMember>()
-                .eq("tenant_id", id)
-                .isNull("deleted_at")
-                .set("deleted_at", now));
-        tenantMapper.update(null, new com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper<Tenant>()
-                .eq("id", id)
-                .isNull("deleted_at")
-                .set("deleted_at", now));
+        memberMapper.update(null, new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<com.ragagent.auth.domain.TenantMember>()
+                .eq(com.ragagent.auth.domain.TenantMember::getTenantId, id)
+                .isNull(com.ragagent.auth.domain.TenantMember::getDeletedAt)
+                .set(com.ragagent.auth.domain.TenantMember::getDeletedAt, now));
+        tenantMapper.update(null, new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<Tenant>()
+                .eq(Tenant::getId, id)
+                .isNull(Tenant::getDeletedAt)
+                .set(Tenant::getDeletedAt, now));
     }
 
     /**

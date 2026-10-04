@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.auth.domain.Tenant;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.auth.service.UserService;
@@ -42,7 +42,6 @@ import com.ragagent.common.security.LogSanitizer;
 import com.ragagent.retrieval.engine.RetrieveEngineFactories;
 import com.ragagent.knowledge.domain.KnowledgeBaseChunkingConfig;
 import com.ragagent.knowledge.domain.KnowledgeBaseImageProcessingConfig;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -390,11 +389,11 @@ public class KnowledgeBaseService
      */
     public List<KnowledgeBase> listKnowledgeBasesByTenantId(long tenantId) {
         List<KnowledgeBase> all = kbMapper.selectList(
-                new QueryWrapper<KnowledgeBase>()
-                        .eq("tenant_id", tenantId)
-                        .eq("is_temporary", false)
-                        .isNull("deleted_at")
-                        .orderByDesc("created_at"));
+                new LambdaQueryWrapper<KnowledgeBase>()
+                        .eq(KnowledgeBase::getTenantId, tenantId)
+                        .eq(KnowledgeBase::isIsTemporary, false)
+                        .isNull(KnowledgeBase::getDeletedAt)
+                        .orderByDesc(KnowledgeBase::getCreatedAt));
         for (KnowledgeBase kb : all) {
             // 对零值策略原样返回（capabilities 全假），见 W5sSharedAgentContractTest.kbListAgentBranch。
             fillCountsForSharedList(kb);
@@ -569,12 +568,12 @@ public class KnowledgeBaseService
             throw new BizException(AppError.notFound("knowledge base not found"));
         }
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
-        kbMapper.update(null, new UpdateWrapper<KnowledgeBase>()
-                .eq("id", id).set("deleted_at", now));
-        knowledgeMapper.update(null, new UpdateWrapper<Knowledge>()
-                .eq("knowledge_base_id", id).set("deleted_at", now));
-        chunkMapper.update(null, new UpdateWrapper<Chunk>()
-                .eq("knowledge_base_id", id).set("deleted_at", now));
+        kbMapper.update(null, new LambdaUpdateWrapper<KnowledgeBase>()
+                .eq(KnowledgeBase::getId, id).set(KnowledgeBase::getDeletedAt, now));
+        knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getKnowledgeBaseId, id).set(Knowledge::getDeletedAt, now));
+        chunkMapper.update(null, new LambdaUpdateWrapper<Chunk>()
+                .eq(Chunk::getKnowledgeBaseId, id).set(Chunk::getDeletedAt, now));
         pinMapper.delete(new LambdaQueryWrapper<UserKbPin>()
                 .eq(UserKbPin::getKnowledgeBaseId, id));
         log.info("Knowledge base deleted: {}", id);

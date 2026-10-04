@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.ragagent.common.mybatis.PageRequests;
 import com.ragagent.session.domain.TemporaryDocument;
 import org.springframework.stereotype.Component;
 
@@ -96,12 +97,11 @@ public class TemporaryDocumentRepository {
 
     /** expires_at <= before，按时间升序。 */
     public List<TemporaryDocument> listExpired(OffsetDateTime before, int limit) {
-        return mapper.selectList(new LambdaQueryWrapper<TemporaryDocument>()
+        return mapper.selectList(PageRequests.cap(limit), new LambdaQueryWrapper<TemporaryDocument>()
                 .le(TemporaryDocument::getExpiresAt, before)
                 // 软删后行仍在表里：不过滤会把已删行反复扫出来，清理循环死转
                 .isNull(TemporaryDocument::getDeletedAt)
-                .orderByAsc(TemporaryDocument::getExpiresAt)
-                .last("LIMIT " + limit));
+                .orderByAsc(TemporaryDocument::getExpiresAt));
     }
 
     /** 软删（置 deleted_at）。 */

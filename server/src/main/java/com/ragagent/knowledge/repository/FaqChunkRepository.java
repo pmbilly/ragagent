@@ -4,8 +4,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.ragagent.common.mybatis.PageRequests;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.FaqChunkMetadata;
 import org.springframework.stereotype.Component;
@@ -32,6 +32,9 @@ public class FaqChunkRepository {
 
     /** status=2（indexed，向量化完成）。 */
     private static final int STATUS_INDEXED = 2;
+
+    /** 批量扫描的行帽：offset 恒以它为步长（PageRequests.range 的页数学因此成立）。 */
+    private static final long SCAN_BATCH = 1000;
 
     private final ChunkMapper chunkMapper;
     /** 方言（构造期探测一次）：true = postgres。 */
@@ -75,20 +78,20 @@ public class FaqChunkRepository {
         List<Chunk> all = new ArrayList<>();
         int offset = 0;
         while (true) {
-            List<Chunk> batch = chunkMapper.selectList(new QueryWrapper<Chunk>()
-                    .select("id", "content_hash")
-                    .eq("tenant_id", tenantId)
-                    .eq("knowledge_id", knowledgeId)
-                    .eq("chunk_type", "faq")
-                    .last("LIMIT 1000 OFFSET " + offset));
+            List<Chunk> batch = chunkMapper.selectList(PageRequests.range(offset / SCAN_BATCH + 1, SCAN_BATCH),
+                    new LambdaQueryWrapper<Chunk>()
+                            .select(Chunk::getId, Chunk::getContentHash)
+                            .eq(Chunk::getTenantId, tenantId)
+                            .eq(Chunk::getKnowledgeId, knowledgeId)
+                            .eq(Chunk::getChunkType, "faq"));
             if (batch.isEmpty()) {
                 break;
             }
             all.addAll(batch);
-            if (batch.size() < 1000) {
+            if (batch.size() < SCAN_BATCH) {
                 break;
             }
-            offset += 1000;
+            offset += SCAN_BATCH;
         }
         return all;
     }
@@ -101,21 +104,21 @@ public class FaqChunkRepository {
         List<Chunk> all = new ArrayList<>();
         int offset = 0;
         while (true) {
-            List<Chunk> batch = chunkMapper.selectList(new QueryWrapper<Chunk>()
-                    .select("id", "metadata")
-                    .eq("tenant_id", tenantId)
-                    .eq("knowledge_base_id", kbId)
-                    .eq("chunk_type", "faq")
-                    .eq("status", STATUS_INDEXED)
-                    .last("LIMIT 1000 OFFSET " + offset));
+            List<Chunk> batch = chunkMapper.selectList(PageRequests.range(offset / SCAN_BATCH + 1, SCAN_BATCH),
+                    new LambdaQueryWrapper<Chunk>()
+                            .select(Chunk::getId, Chunk::getMetadata)
+                            .eq(Chunk::getTenantId, tenantId)
+                            .eq(Chunk::getKnowledgeBaseId, kbId)
+                            .eq(Chunk::getChunkType, "faq")
+                            .eq(Chunk::getStatus, STATUS_INDEXED));
             if (batch.isEmpty()) {
                 break;
             }
             all.addAll(batch);
-            if (batch.size() < 1000) {
+            if (batch.size() < SCAN_BATCH) {
                 break;
             }
-            offset += 1000;
+            offset += SCAN_BATCH;
         }
         return all;
     }
@@ -136,13 +139,13 @@ public class FaqChunkRepository {
             return chunkMapper.findFaqDuplicateChunk(tenantId, kbId, excludeChunkId, questions);
         }
         // 非 PG：同 WHERE 的 JVM 版（questions 的集合语义逐条对照）
-        List<Chunk> candidates = chunkMapper.selectList(new QueryWrapper<Chunk>()
-                .select("id", "metadata")
-                .eq("tenant_id", tenantId)
-                .eq("knowledge_base_id", kbId)
-                .eq("chunk_type", "faq")
-                .in("status", STATUS_DEFAULT, 1, STATUS_INDEXED)
-                .ne("id", excludeChunkId));
+        List<Chunk> candidates = chunkMapper.selectList(new LambdaQueryWrapper<Chunk>()
+                .select(Chunk::getId, Chunk::getMetadata)
+                .eq(Chunk::getTenantId, tenantId)
+                .eq(Chunk::getKnowledgeBaseId, kbId)
+                .eq(Chunk::getChunkType, "faq")
+                .in(Chunk::getStatus, STATUS_DEFAULT, 1, STATUS_INDEXED)
+                .ne(Chunk::getId, excludeChunkId));
         Set<String> wanted = new HashSet<>(questions);
         for (Chunk c : candidates) {
             FaqChunkMetadata meta = parseFaqMetadata(c.getMetadata());
@@ -170,22 +173,23 @@ public class FaqChunkRepository {
         List<Chunk> all = new ArrayList<>();
         int offset = 0;
         while (true) {
-            List<Chunk> batch = chunkMapper.selectList(new QueryWrapper<Chunk>()
-                    .select("id", "metadata", "tag_id", "is_enabled", "flags")
-                    .eq("tenant_id", tenantId)
-                    .eq("knowledge_id", knowledgeId)
-                    .eq("chunk_type", "faq")
-                    .eq("status", STATUS_INDEXED)
-                    .orderByAsc("created_at")
-                    .last("LIMIT 1000 OFFSET " + offset));
+            List<Chunk> batch = chunkMapper.selectList(PageRequests.range(offset / SCAN_BATCH + 1, SCAN_BATCH),
+                    new LambdaQueryWrapper<Chunk>()
+                            .select(Chunk::getId, Chunk::getMetadata, Chunk::getTagId,
+                                    Chunk::isIsEnabled, Chunk::getFlags)
+                            .eq(Chunk::getTenantId, tenantId)
+                            .eq(Chunk::getKnowledgeId, knowledgeId)
+                            .eq(Chunk::getChunkType, "faq")
+                            .eq(Chunk::getStatus, STATUS_INDEXED)
+                            .orderByAsc(Chunk::getCreatedAt));
             if (batch.isEmpty()) {
                 break;
             }
             all.addAll(batch);
-            if (batch.size() < 1000) {
+            if (batch.size() < SCAN_BATCH) {
                 break;
             }
-            offset += 1000;
+            offset += SCAN_BATCH;
         }
         return all;
     }
@@ -208,14 +212,14 @@ public class FaqChunkRepository {
         }
         String setExpr = buildFlagCase(setFlags);
         String clearExpr = buildFlagCase(clearFlags);
-        chunkMapper.update(null, new UpdateWrapper<Chunk>()
+        chunkMapper.update(null, new LambdaUpdateWrapper<Chunk>()
                 .setSql("flags = " + flagsBitExpr("(flags | (" + setExpr + ")) & ~(" + clearExpr + ")",
                         "BITAND(BITOR(flags, " + setExpr + "), BITNOT(" + clearExpr + "))"))
                 .setSql("updated_at = NOW()")
-                .eq("tenant_id", tenantId)
-                .eq("knowledge_base_id", kbId)
-                .isNull("deleted_at")
-                .in("id", allIds));
+                .eq(Chunk::getTenantId, tenantId)
+                .eq(Chunk::getKnowledgeBaseId, kbId)
+                .isNull(Chunk::getDeletedAt)
+                .in(Chunk::getId, allIds));
     }
 
     /**
@@ -256,36 +260,36 @@ public class FaqChunkRepository {
         if (isEnabled == null && setFlags == 0 && clearFlags == 0 && newTagId == null) {
             return List.of();
         }
-        QueryWrapper<Chunk> selection = new QueryWrapper<Chunk>()
-                .select("id")
-                .eq("tenant_id", tenantId)
-                .eq("knowledge_base_id", kbId)
-                .eq("chunk_type", "faq");
+        LambdaQueryWrapper<Chunk> selection = new LambdaQueryWrapper<Chunk>()
+                .select(Chunk::getId)
+                .eq(Chunk::getTenantId, tenantId)
+                .eq(Chunk::getKnowledgeBaseId, kbId)
+                .eq(Chunk::getChunkType, "faq");
         if (tagId != null && !tagId.isEmpty()) {
-            selection.eq("tag_id", tagId);
+            selection.eq(Chunk::getTagId, tagId);
         }
         if (excludeIds != null && !excludeIds.isEmpty()) {
-            selection.notIn("id", excludeIds);
+            selection.notIn(Chunk::getId, excludeIds);
         }
         List<String> affectedIds = chunkMapper.selectList(selection)
                 .stream().map(Chunk::getId).toList();
 
-        UpdateWrapper<Chunk> update = new UpdateWrapper<Chunk>()
-                .eq("tenant_id", tenantId)
-                .eq("knowledge_base_id", kbId)
-                .eq("chunk_type", "faq");
+        LambdaUpdateWrapper<Chunk> update = new LambdaUpdateWrapper<Chunk>()
+                .eq(Chunk::getTenantId, tenantId)
+                .eq(Chunk::getKnowledgeBaseId, kbId)
+                .eq(Chunk::getChunkType, "faq");
         if (tagId != null && !tagId.isEmpty()) {
-            update.eq("tag_id", tagId);
+            update.eq(Chunk::getTagId, tagId);
         }
         if (excludeIds != null && !excludeIds.isEmpty()) {
-            update.notIn("id", excludeIds);
+            update.notIn(Chunk::getId, excludeIds);
         }
-        update.set("updated_at", OffsetDateTime.now());
+        update.set(Chunk::getUpdatedAt, OffsetDateTime.now());
         if (isEnabled != null) {
-            update.set("is_enabled", isEnabled);
+            update.set(Chunk::isIsEnabled, isEnabled);
         }
         if (newTagId != null) {
-            update.set("tag_id", newTagId);
+            update.set(Chunk::getTagId, newTagId);
         }
         if (setFlags != 0 || clearFlags != 0) {
             String expr = "flags";

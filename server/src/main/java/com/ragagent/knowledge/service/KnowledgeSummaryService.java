@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.AppError;
@@ -23,6 +23,7 @@ import com.ragagent.knowledge.mapper.ChunkMapper;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
+import com.ragagent.knowledge.task.KnowledgeProcessedEvent;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
@@ -34,7 +35,7 @@ import com.ragagent.common.wiki.WikiImageMarkup;
 import com.ragagent.common.wiki.WikiLanguageSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
 import com.ragagent.knowledge.task.KnowledgeProcessWorker;
@@ -57,7 +58,7 @@ public class KnowledgeSummaryService {
     private final ChunkVectorIndexer chunkVectorIndexer;
     private final ConversationProperties conversationProps;
     private final KnowledgeFileService knowledgeFileService;
-    private final KnowledgeService facade;
+    private final KnowledgeAccessHelper access;
     /** 后台任务执行器（统一命名与关停）。 */
     private final KnowledgeTaskExecutor taskExecutor;
 
@@ -71,7 +72,7 @@ public class KnowledgeSummaryService {
                             ChunkVectorIndexer chunkVectorIndexer,
                             ConversationProperties conversationProps,
                             KnowledgeFileService knowledgeFileService,
-                            @Lazy KnowledgeService facade) {
+                            KnowledgeAccessHelper access) {
 
         this.taskExecutor = taskExecutor;
         this.knowledgeMapper = knowledgeMapper;
@@ -82,7 +83,7 @@ public class KnowledgeSummaryService {
         this.chunkVectorIndexer = chunkVectorIndexer;
         this.conversationProps = conversationProps;
         this.knowledgeFileService = knowledgeFileService;
-        this.facade = facade;
+        this.access = access;
     }
 
     /** summary_status 的五个取值。 */
@@ -128,7 +129,7 @@ public class KnowledgeSummaryService {
         if (knowledge == null) {
             throw BizException.notFound("record not found");
         }
-        KnowledgeBase kb = facade.requireKb(knowledge.getKnowledgeBaseId());
+        KnowledgeBase kb = access.requireKb(knowledge.getKnowledgeBaseId());
         if (kb.getSummaryModelId() == null || kb.getSummaryModelId().isEmpty()) {
             throw new BizException(AppError.badRequest("summary model is not configured"));
         }
@@ -572,10 +573,16 @@ public class KnowledgeSummaryService {
             return;
         }
         // pending 先落库再异步执行
-        knowledgeMapper.update(null, new UpdateWrapper<Knowledge>()
-                .eq("id", knowledgeId)
-                .set("summary_status", SUMMARY_PENDING));
+        knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, knowledgeId)
+                .set(Knowledge::getSummaryStatus, SUMMARY_PENDING));
         spawnSummaryRefreshWorker(knowledgeId, k.getTenantId());
+    }
+
+    /** M2 解环：worker 处理完成经<b>同步</b>领域事件触发后处理摘要（语义 = 原直调）。 */
+    @EventListener
+    public void onKnowledgeProcessed(KnowledgeProcessedEvent event) {
+        requestPostProcessSummaryGeneration(event.knowledgeId());
     }
 
     /**
@@ -596,22 +603,22 @@ public class KnowledgeSummaryService {
         if (status.isEmpty() || SUMMARY_NONE.equals(status)) {
             return; // 未启用摘要 → 静默成功
         }
-        KnowledgeBase kb = facade.requireKb(k.getKnowledgeBaseId());
+        KnowledgeBase kb = access.requireKb(k.getKnowledgeBaseId());
         if (kb.getSummaryModelId() == null || kb.getSummaryModelId().isEmpty()) {
             markSummaryFailed(k.getId());
             throw new BizException(AppError.badRequest("summary model is not configured"));
         }
         // pending 必须先落库
-        knowledgeMapper.update(null, new UpdateWrapper<Knowledge>()
-                .eq("id", k.getId())
-                .set("summary_status", SUMMARY_PENDING));
+        knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, k.getId())
+                .set(Knowledge::getSummaryStatus, SUMMARY_PENDING));
         spawnSummaryRefreshWorker(k.getId(), k.getTenantId());
     }
 
     private void markSummaryFailed(String knowledgeId) {
-        knowledgeMapper.update(null, new UpdateWrapper<Knowledge>()
-                .eq("id", knowledgeId)
-                .set("summary_status", SUMMARY_FAILED));
+        knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, knowledgeId)
+                .set(Knowledge::getSummaryStatus, SUMMARY_FAILED));
     }
 
     /**

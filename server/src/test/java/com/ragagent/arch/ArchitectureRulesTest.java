@@ -18,14 +18,23 @@ import com.ragagent.common.deployment.AppEnvLookup;
 import com.ragagent.retrieval.config.RetrievalEnvLookup;
 import com.ragagent.storage.config.StorageEnvLookup;
 import com.ragagent.common.storage.StorageRuntimeEnv;
+import com.tngtech.archunit.core.domain.JavaAnnotation;
+import com.tngtech.archunit.core.domain.JavaCall;
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.core.domain.JavaConstructor;
+import com.tngtech.archunit.core.domain.JavaConstructorCall;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.lang.ArchCondition;
 import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.Lazy;
+
+import java.util.Map;
+import java.util.TreeSet;
+import java.util.function.Predicate;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.stereotype.Component;
@@ -49,10 +58,20 @@ import org.springframework.stereotype.Service;
  *       双装配，语义含糊。</li>
  *   <li><b>{@code install*} 只许装配层调用</b>：查找面/快照类的 {@code install} 是启动期
  *       一次性写入，运行期调用即「把配置当状态改」（各 holder 注释均写明此约束）。</li>
+ *   <li><b>禁 {@code @Lazy} 注入</b>（R6）：循环依赖要拆（下沉/接口反转），不许懒加载
+ *       掩盖设计缺陷；knowledge 域门面环在棘轮基线，解环专项落地后清空。</li>
+ *   <li><b>裸 JDBC 白名单</b>（R7）：业务单表 CRUD 走 MyBatis-Plus；方言探测 / PG 专有
+ *       SQL / 非业务库引擎 / 启动修复四类 MP 能力边界场景登记放行，新类须在 PR 论证。</li>
+ *   <li><b>禁字符串列名 wrapper</b>（R8）：条件构造器一律 Lambda 方法引用，硬编码列名
+ *       无编译期保护；存量在基线，随逐域 Lambda 化清空。</li>
+ *   <li><b>{@code .last(} 只许纯字符串字面量</b>（R9）：拼接既是注入面也是方言漂移点；
+ *       动态行数走分页插件或注解 SQL {@code #{}} 参数化。</li>
  * </ol>
  *
  * <p>新加规则请只加<b>当前零违例</b>的规则，否则等于把存量违例变成噪声；确有存量违例要
- * 棘轮化的，用 ArchUnit 的 {@code FreezingArchRule}（本仓包级棘轮已在脚本里）。</p>
+ * 棘轮化的，走 R6-R9 的代码内基线模式——Set/Map 逐条登记（附理由）+ {@link #ratchet}
+ * 双断言：基线外新增违例即红（拦增量），基线条目不再违例也红（防规则空转，强制随清理
+ * 收紧）。不引入 FreezingArchRule 的存储文件；包级棘轮仍在脚本里。</p>
  */
 class ArchitectureRulesTest {
 
@@ -194,6 +213,282 @@ class ArchitectureRulesTest {
         assertThat(offenders)
                 .as("裸 NUL（常见于把 \\0 哨兵直接写成字节）会让文本工具跳过整个文件，"
                         + "审计因此静默漏文件；改写为 Java 的 \\0 八进制转义即可（B12 实测）")
+                .isEmpty();
+    }
+
+    // ── R6 禁 @Lazy 注入 ────────────────────────────────────────────────────
+
+    /**
+     * 棘轮基线：已清空（2026-10-05，M2 解环专项落地）。拆法：
+     * 门面 helper 下沉 {@code KnowledgeAccessHelper}（子服务不再回注门面）；
+     * enqueue 端口外提为 {@code KnowledgeProcessingQueue}（提交方不再依赖 worker 类型）；
+     * worker 的摘要触发改同步领域事件 {@code KnowledgeProcessedEvent}（订阅方
+     * KnowledgeSummaryService）。本规则现为零基线纯禁令。
+     */
+    private static final Set<String> LAZY_BASELINE = Set.of();
+
+    @Test
+    @DisplayName("R6：构造器参数/字段不得标 @Lazy（循环依赖要拆，不许懒加载掩盖）")
+    void noLazyInjection() {
+        ratchet("R6 @Lazy", LAZY_BASELINE, violatingClasses(ArchitectureRulesTest::hasLazyInjectionPoint));
+    }
+
+    private static boolean hasLazyInjectionPoint(JavaClass clazz) {
+        for (JavaConstructor ctor : clazz.getConstructors()) {
+            for (var annos : ctor.getParameterAnnotations()) {
+                for (JavaAnnotation<?> anno : annos) {
+                    if (anno.getRawType().getName().equals(Lazy.class.getName())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        for (var field : clazz.getFields()) {
+            if (field.isAnnotatedWith(Lazy.class)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ── R7 裸 JDBC 白名单 ───────────────────────────────────────────────────
+
+    /** 命中即算裸 JDBC 的目标类型（按声明类型判定，含子类）。 */
+    private static final List<Class<?>> JDBC_TARGET_TYPES = List.of(
+            org.springframework.jdbc.core.JdbcTemplate.class,
+            java.sql.DriverManager.class,
+            java.sql.Connection.class,
+            java.sql.Statement.class,
+            java.sql.PreparedStatement.class,
+            javax.sql.DataSource.class);
+
+    /**
+     * 裸 JDBC 棘轮基线（类 → 理由）。业务单表 CRUD 走 MyBatis-Plus；以下四类是 MP 的
+     * 能力边界，登记放行。新类加进来必须在 PR 里论证属于同一类：
+     * <ul>
+     *   <li><b>方言探测</b>——各仓储构造期的 detectPostgres（逻辑多处复制，收敛归一到
+     *       DatabaseDialects 后可整组摘除）；</li>
+     *   <li><b>PG/方言专有 SQL</b>——jsonb/向量操作符、批量写、清理任务等 wrapper
+     *       表达不了的语句；</li>
+     *   <li><b>非业务库引擎</b>——DuckDB / Doris / SQLite / pgvector，不在 MP 管辖；</li>
+     *   <li><b>启动期修复</b>——StartupTaskRecovery。</li>
+     * </ul>
+     */
+    private static final Map<String, String> JDBC_BASELINE = Map.ofEntries(
+            Map.entry("com.ragagent.common.jdbc.DatabaseDialects", "方言探测（收敛点）"),
+            Map.entry("com.ragagent.config.StartupTaskRecovery", "启动期任务修复"),
+            Map.entry("com.ragagent.agent.skills.SkillCatalogService", "PG 专有 SQL（技能目录）"),
+            Map.entry("com.ragagent.agent.tools.data.AnalysisDuckDbJdbc", "非业务库引擎（DuckDB）"),
+            Map.entry("com.ragagent.knowledge.repository.KnowledgeSpanRepository", "PG 专有 SQL（span 批量写）"),
+            Map.entry("com.ragagent.knowledge.service.HousekeepingService", "PG 专有 SQL（超时清理）"),
+            Map.entry("com.ragagent.knowledge.storage.TenantStorageService", "PG 专有 SQL（存储用量）"),
+            Map.entry("com.ragagent.retrieval.engine.PgVectorEngineRepository", "非业务库引擎（pgvector 管理）"),
+            Map.entry("com.ragagent.retrieval.engine.PgVectorRetrieveRepository", "非业务库引擎（pgvector 检索）"),
+            Map.entry("com.ragagent.retrieval.engine.VectorStoreService", "非业务库引擎（pgvector 读写）"),
+            Map.entry("com.ragagent.retrieval.engine.doris.DorisRetrieveRepository", "非业务库引擎（Doris）"),
+            Map.entry("com.ragagent.retrieval.engine.doris.JdbcDorisSqlExecutor", "非业务库引擎（Doris 连接池）"),
+            Map.entry("com.ragagent.retrieval.engine.sqlite.SqliteRetrieveRepository", "非业务库引擎（SQLite）"),
+            Map.entry("com.ragagent.retrieval.engine.sqlite.SqliteSearchOps", "非业务库引擎（SQLite）"),
+            Map.entry("com.ragagent.retrieval.engine.sqlite.SqliteWriteOps", "非业务库引擎（SQLite）"),
+            Map.entry("com.ragagent.session.service.AgentToolBackends", "PG 专有 SQL（工具后端）"),
+            Map.entry("com.ragagent.session.service.AgentToolKbBackends", "PG 专有 SQL（工具知识库后端）"),
+            Map.entry("com.ragagent.session.service.AgentWebPages", "PG 专有 SQL（网页缓存）"),
+            Map.entry("com.ragagent.session.service.SessionKnowledgeQaService", "PG 专有 SQL（多表 JOIN 标签检索）"),
+            Map.entry("com.ragagent.system.service.SystemInfoService", "PG 专有 SQL（系统元数据）"),
+            Map.entry("com.ragagent.vectorstore.service.VectorStoreConfigService", "PG 专有 SQL（向量库配置）"),
+            Map.entry("com.ragagent.datasource.service.MapperKnowledgeBridge", "方言探测（detectPostgres）"),
+            Map.entry("com.ragagent.memory.mapper.MemoryIndexStore", "方言探测 + 列存在性探测"),
+            Map.entry("com.ragagent.mcp.mapper.McpMetadataRepository", "方言探测（detectPostgres）"),
+            Map.entry("com.ragagent.storage.mapper.StorageBackendRepository", "方言探测（detectPostgres）"),
+            Map.entry("com.ragagent.session.mapper.MessageRepository", "方言探测（detectPostgres）"),
+            Map.entry("com.ragagent.session.mapper.SessionRepository", "方言探测（detectPostgres）"),
+            Map.entry("com.ragagent.session.mapper.MessageSuggestionRepository", "方言探测（detectPostgres）"));
+
+    @Test
+    @DisplayName("R7：裸 JDBC（JdbcTemplate/java.sql 连接与语句/DataSource）只许白名单类")
+    void rawJdbcOnlyFromWhitelist() {
+        Set<String> actual = new TreeSet<>();
+        for (JavaClass clazz : MAIN) {
+            if (isRawJdbcUser(clazz)) {
+                actual.add(topLevel(clazz).getName());
+            }
+        }
+        ratchet("R7 裸 JDBC", JDBC_BASELINE.keySet(), actual);
+    }
+
+    /**
+     * MyBatis TypeHandler 是框架回调扩展点——PreparedStatement/ResultSet 由框架传入，
+     * 属于 MyBatis 体系内，不算裸 JDBC。匿名/内部类归属其顶层类（同一源文件同责）。
+     */
+    private static boolean isRawJdbcUser(JavaClass clazz) {
+        if (clazz.isAssignableTo(org.apache.ibatis.type.BaseTypeHandler.class)) {
+            return false;
+        }
+        for (JavaCall<?> call : clazz.getMethodCallsFromSelf()) {
+            for (Class<?> type : JDBC_TARGET_TYPES) {
+                if (call.getTarget().getOwner().isAssignableTo(type)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static JavaClass topLevel(JavaClass clazz) {
+        JavaClass cur = clazz;
+        while (cur.getEnclosingClass().isPresent()) {
+            cur = cur.getEnclosingClass().get();
+        }
+        return cur;
+    }
+
+    // ── R8 禁字符串列名 wrapper ─────────────────────────────────────────────
+
+    /** 字符串列名 wrapper 的类型（应改用 LambdaQueryWrapper / LambdaUpdateWrapper）。 */
+    private static final Set<String> STRING_WRAPPER_TYPES = Set.of(
+            "com.baomidou.mybatisplus.core.conditions.query.QueryWrapper",
+            "com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper",
+            "com.baomidou.mybatisplus.core.conditions.query.QueryChainWrapper",
+            "com.baomidou.mybatisplus.core.conditions.update.UpdateChainWrapper");
+
+    /** {@code Wrappers} 上产出字符串 wrapper 的工厂方法（lambdaQuery/lambdaUpdate 不在内）。 */
+    private static final Set<String> STRING_WRAPPER_FACTORY_METHODS = Set.of("query", "update", "emptyWrapper");
+
+    /**
+     * 棘轮基线：唯一保留项 {@code MessageRepository.update}——字符串 UpdateWrapper 是
+     * 作者实测后的刻意选择：jsonb 列必须靠三参 {@code set(col, val, "typeHandler=…")}
+     * 显式挂处理器，方法注释里记载了 H2 下退化形态的具体报错。其余存量（含全限定名
+     * 形式，grep 之前漏数的）已于 2026-10-05 分三批 + knowledge 硬文件全部 Lambda 化。
+     */
+    private static final Set<String> STRING_WRAPPER_BASELINE = Set.of(
+            "com.ragagent.session.mapper.MessageRepository");
+
+    @Test
+    @DisplayName("R8：禁字符串列名 wrapper（new QueryWrapper/UpdateWrapper、Wrappers.query/update/emptyWrapper）")
+    void noStringColumnWrappers() {
+        ratchet("R8 字符串 wrapper", STRING_WRAPPER_BASELINE, violatingClasses(clazz -> {
+            for (JavaConstructorCall call : clazz.getConstructorCallsFromSelf()) {
+                if (STRING_WRAPPER_TYPES.contains(call.getTarget().getOwner().getName())) {
+                    return true;
+                }
+            }
+            for (JavaCall<?> call : clazz.getMethodCallsFromSelf()) {
+                if (call.getTarget().getOwner().getName().equals(com.baomidou.mybatisplus.core.toolkit.Wrappers.class
+                        .getName())
+                        && STRING_WRAPPER_FACTORY_METHODS.contains(call.getTarget().getName())) {
+                    return true;
+                }
+            }
+            return false;
+        }));
+    }
+
+    // ── R9 .last( 只许纯字符串字面量 ────────────────────────────────────────
+
+    /**
+     * 棘轮基线：已清空（2026-10-05）——13 文件 23 处拼接全部迁 {@code PageRequests}：
+     * 手搓分页 → {@code range}、任意 offset → {@code atOffset}、行帽 → {@code cap}。
+     * 本规则现为零基线纯禁令；{@code .last("LIMIT 1")} 等纯字面量仍合法。
+     */
+    private static final Map<String, String> LAST_CONCAT_BASELINE = Map.of();
+
+    @Test
+    @DisplayName("R9：.last(...) 参数必须是纯字符串字面量（拼接=注入面+方言漂移）")
+    void lastOnlyConstantStrings() throws java.io.IOException {
+        Set<String> actual = new TreeSet<>();
+        try (var walk = java.nio.file.Files.walk(java.nio.file.Path.of("src/main/java"))) {
+            for (java.nio.file.Path file : walk.filter(java.nio.file.Files::isRegularFile)
+                    .filter(f -> f.toString().endsWith(".java")).toList()) {
+                boolean[] inBlockComment = {false};
+                for (String line : java.nio.file.Files.readAllLines(file)) {
+                    if (isConcatLast(stripComments(line, inBlockComment))) {
+                        actual.add(file.toString().replace('\\', '/'));
+                        break;
+                    }
+                }
+            }
+        }
+        ratchet("R9 .last 拼接", LAST_CONCAT_BASELINE.keySet(), actual);
+    }
+
+    /** 剥掉块注释/行注释（保留字符串字面量），注释里的 {@code .last(} 样例不算违例。 */
+    private static String stripComments(String line, boolean[] inBlockComment) {
+        StringBuilder sb = new StringBuilder();
+        int i = 0;
+        while (i < line.length()) {
+            if (inBlockComment[0]) {
+                int end = line.indexOf("*/", i);
+                if (end < 0) {
+                    return sb.toString();
+                }
+                inBlockComment[0] = false;
+                i = end + 2;
+            } else if (i + 1 < line.length() && line.charAt(i) == '/' && line.charAt(i + 1) == '*') {
+                inBlockComment[0] = true;
+                i += 2;
+            } else if (i + 1 < line.length() && line.charAt(i) == '/' && line.charAt(i + 1) == '/') {
+                return sb.toString();
+            } else if (line.charAt(i) == '"') {
+                // 字符串字面量原样保留（含其中的 // 与 /*）；不做转义处理——本仓 SQL 字面量无嵌套引号
+                int close = line.indexOf('"', i + 1);
+                if (close < 0) {
+                    return sb.append(line, i, line.length()).toString();
+                }
+                sb.append(line, i, close + 1);
+                i = close + 1;
+            } else {
+                sb.append(line.charAt(i));
+                i++;
+            }
+        }
+        return sb.toString();
+    }
+
+    /** 行内出现 {@code .last(} 且参数不是单个纯字符串字面量 → 违例（注释里的样本同样命中，宁严勿漏）。 */
+    private static boolean isConcatLast(String line) {
+        int idx = line.indexOf(".last(");
+        if (idx < 0) {
+            return false;
+        }
+        String rest = line.substring(idx + ".last(".length()).trim();
+        if (!rest.startsWith("\"")) {
+            return true;
+        }
+        int close = rest.indexOf('"', 1);
+        if (close < 0) {
+            return true; // 字面量跨行：按违例处理
+        }
+        String tail = rest.substring(close + 1).trim();
+        return !tail.isEmpty() && !tail.startsWith(")");
+    }
+
+    // ── 棘轮辅助 ────────────────────────────────────────────────────────────
+
+    private static Set<String> violatingClasses(Predicate<JavaClass> detector) {
+        Set<String> out = new TreeSet<>();
+        for (JavaClass clazz : MAIN) {
+            if (detector.test(clazz)) {
+                out.add(clazz.getName());
+            }
+        }
+        return out;
+    }
+
+    /**
+     * 棘轮双断言：基线外新增违例=拦增量；基线条目不再违例=基线过期（也红——若检测逻辑
+     * 空转，所有条目同时过期，规则不可能静默变绿）。与 R4 的 INSTALL_TARGETS、包级棘轮
+     * 脚本同一套哲学。
+     */
+    private static void ratchet(String rule, Set<String> baseline, Set<String> actual) {
+        Set<String> fresh = new TreeSet<>(actual);
+        fresh.removeAll(baseline);
+        assertThat(fresh)
+                .as(rule + "：基线外新增违例——修掉，或论证属于同类场景后登记基线（附理由）")
+                .isEmpty();
+        Set<String> stale = new TreeSet<>(baseline);
+        stale.removeAll(actual);
+        assertThat(stale)
+                .as(rule + "：基线条目已不再违例——清理已完成，请删除条目收紧基线")
                 .isEmpty();
     }
 

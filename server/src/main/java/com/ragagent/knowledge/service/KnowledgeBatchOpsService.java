@@ -5,14 +5,14 @@ import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.ragagent.knowledge.task.KnowledgeProcessingQueue;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.mapper.ChunkMapper;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import com.ragagent.knowledge.security.ChunkAccessGuard;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,27 +20,27 @@ import org.springframework.transaction.annotation.Transactional;
  * 批量面：批量删除 / 批量重解析 / 重建索引 / 清空 KB 内容。
  * <p>复位/全列写复用 {@link KnowledgeFileService}/{@link KnowledgeParseService}（同包开放），
  * moving 状态防线复用 {@link ChunkAccessGuard#rejectMovingKnowledge}；
- * 门面 helper（requireKb/getKnowledge/tenantId）经 {@code @Lazy} 门面调用，不复制。</p>
+ * 门面 helper（requireKb/getKnowledge/tenantId）下沉在 {@link KnowledgeAccessHelper}，直接依赖不回注门面（M2 解环）。</p>
  */
 @Service
 public class KnowledgeBatchOpsService {
 
     private final KnowledgeMapper knowledgeMapper;
     private final ChunkMapper chunkMapper;
-    private final KnowledgeService.KnowledgeProcessWorker worker;
+    private final KnowledgeProcessingQueue worker;
     private final KnowledgeFileService knowledgeFileService;
-    private final KnowledgeService facade;
+    private final KnowledgeAccessHelper access;
 
     public KnowledgeBatchOpsService(KnowledgeMapper knowledgeMapper,
                                     ChunkMapper chunkMapper,
-                                    @Lazy KnowledgeService.KnowledgeProcessWorker worker,
+                                    KnowledgeProcessingQueue worker,
                                     KnowledgeFileService knowledgeFileService,
-                                    @Lazy KnowledgeService facade) {
+                                    KnowledgeAccessHelper access) {
         this.knowledgeMapper = knowledgeMapper;
         this.chunkMapper = chunkMapper;
         this.worker = worker;
         this.knowledgeFileService = knowledgeFileService;
-        this.facade = facade;
+        this.access = access;
     }
 
     // ── 批量删除 / 批量重解析 / 清空（任务队列 → 同步尽力而为，响应契约一致） ──
@@ -53,13 +53,13 @@ public class KnowledgeBatchOpsService {
     public String batchDeleteKnowledge(String kbId, List<String> ids) {
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
         for (String id : ids) {
-            knowledgeMapper.update(null, new UpdateWrapper<Knowledge>()
-                    .eq("id", id)
-                    .isNull("deleted_at")
-                    .set("deleted_at", now));
-            chunkMapper.update(null, new UpdateWrapper<Chunk>()
-                    .eq("knowledge_id", id)
-                    .set("deleted_at", now));
+            knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                    .eq(Knowledge::getId, id)
+                    .isNull(Knowledge::getDeletedAt)
+                    .set(Knowledge::getDeletedAt, now));
+            chunkMapper.update(null, new LambdaUpdateWrapper<Chunk>()
+                    .eq(Chunk::getKnowledgeId, id)
+                    .set(Chunk::getDeletedAt, now));
         }
         return UUID.randomUUID().toString();
     }
@@ -69,9 +69,9 @@ public class KnowledgeBatchOpsService {
      * 调用方已完成 requireKnowledgeInKB / RejectMoving 校验。
      */
     public String batchReparseKnowledge(String kbId, List<String> ids) {
-        KnowledgeBase kb = facade.requireKb(kbId);
+        KnowledgeBase kb = access.requireKb(kbId);
         for (String id : ids) {
-            Knowledge k = facade.getKnowledge(id);
+            Knowledge k = access.getKnowledge(id);
             KnowledgeParseService.resetKnowledgeForReparse(k, kb);
             knowledgeFileService.updateKnowledgeRow(k, k.getMetadata());
             worker.enqueue(k.getId());
@@ -86,7 +86,7 @@ public class KnowledgeBatchOpsService {
      * @return 提交重建的知识条数（document_count）
      */
     public int rebuildKnowledgeBaseIndex(String kbId) {
-        KnowledgeBase kb = facade.requireKb(kbId);
+        KnowledgeBase kb = access.requireKb(kbId);
         List<Knowledge> rows = knowledgeMapper.selectList(new LambdaQueryWrapper<Knowledge>()
                 .eq(Knowledge::getKnowledgeBaseId, kbId)
                 .eq(Knowledge::getTenantId, KnowledgeService.tenantId())
@@ -119,10 +119,10 @@ public class KnowledgeBatchOpsService {
             return 0;
         }
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
-        knowledgeMapper.update(null, new UpdateWrapper<Knowledge>()
-                .in("id", rows.stream().map(Knowledge::getId).toList())
-                .set("parse_status", Knowledge.PARSE_DELETING)
-                .set("updated_at", now));
+        knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .in(Knowledge::getId, rows.stream().map(Knowledge::getId).toList())
+                .set(Knowledge::getParseStatus, Knowledge.PARSE_DELETING)
+                .set(Knowledge::getUpdatedAt, now));
         return rows.size();
     }
 
@@ -132,15 +132,16 @@ public class KnowledgeBatchOpsService {
     }
 
     public void updateStatus(String id, String parseStatus, String errorMessage, Boolean enable) {
-        UpdateWrapper<Knowledge> uw = new UpdateWrapper<Knowledge>().eq("id", id);
-        uw.set("parse_status", parseStatus);
-        uw.set("updated_at", OffsetDateTime.now(ZoneOffset.UTC));
+        LambdaUpdateWrapper<Knowledge> uw = new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, id);
+        uw.set(Knowledge::getParseStatus, parseStatus);
+        uw.set(Knowledge::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC));
         if (errorMessage != null) {
-            uw.set("error_message", errorMessage);
+            uw.set(Knowledge::getErrorMessage, errorMessage);
         }
         if (enable != null) {
-            uw.set("enable_status", enable ? "enabled" : "disabled");
-            uw.set("processed_at", OffsetDateTime.now(ZoneOffset.UTC));
+            uw.set(Knowledge::getEnableStatus, enable ? "enabled" : "disabled");
+            uw.set(Knowledge::getProcessedAt, OffsetDateTime.now(ZoneOffset.UTC));
         }
         knowledgeMapper.update(null, uw);
     }

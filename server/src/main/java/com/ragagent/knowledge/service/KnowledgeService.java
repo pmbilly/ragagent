@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,13 +28,12 @@ import com.ragagent.knowledge.mapper.ChunkMapper;
 import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import com.ragagent.knowledge.mapper.KnowledgeTagMapper;
-import org.springframework.context.annotation.Lazy;
+import com.ragagent.knowledge.task.KnowledgeProcessingQueue;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.ragagent.knowledge.dto.doc.UpdateKnowledgeRequest;
 import com.ragagent.knowledge.dto.kb.KBCloneProgress;
 import com.ragagent.knowledge.dto.doc.KnowledgeMoveProgress;
-import com.ragagent.auth.apikey.domain.TenantAPIKeyScope;
 import com.ragagent.knowledge.storage.LocalStorageService;
 import com.ragagent.knowledge.storage.TenantFileStorage;
 import java.net.URI;
@@ -83,7 +82,9 @@ public class KnowledgeService implements KnowledgeDocumentGateway {
     private final KnowledgeTagMapper tagMapper;
     /** A3-3 尾批：租户感知文件存储（本地契约不变；云 provider 租户真正落对象存储）。 */
     private final TenantFileStorage fileStorage;
-    private final KnowledgeProcessWorker worker;
+    private final KnowledgeProcessingQueue knowledgeQueue;
+    /** 门面 helper 下沉（M2 解环）：requireKb/getKnowledge 等访问原语的收敛点。 */
+    private final KnowledgeAccessHelper access;
     private final ChunkVectorIndexer chunkVectorIndexer;
     /** 图库仓储（D 批）：知识移动后清源命名空间。 */
     private final KnowledgeMoveService moveService;
@@ -101,7 +102,8 @@ public class KnowledgeService implements KnowledgeDocumentGateway {
                             ChunkMapper chunkMapper,
                             KnowledgeTagMapper tagMapper,
                             TenantFileStorage fileStorage,
-                            @Lazy KnowledgeProcessWorker worker,
+                            KnowledgeProcessingQueue knowledgeQueue,
+                            KnowledgeAccessHelper access,
                             ChunkVectorIndexer chunkVectorIndexer,
                             KnowledgeMoveService moveService,
                             KnowledgeCloneService cloneService,
@@ -117,7 +119,8 @@ public class KnowledgeService implements KnowledgeDocumentGateway {
         this.chunkMapper = chunkMapper;
         this.tagMapper = tagMapper;
         this.fileStorage = fileStorage;
-        this.worker = worker;
+        this.knowledgeQueue = knowledgeQueue;
+        this.access = access;
         this.chunkVectorIndexer = chunkVectorIndexer;
         this.moveService = moveService;
         this.cloneService = cloneService;
@@ -136,27 +139,13 @@ public class KnowledgeService implements KnowledgeDocumentGateway {
         return tid == null ? 0 : tid;
     }
 
-    /** 按 id 查 KB（软删不可见）。 */
+    /** 按 id 查 KB（软删不可见）。实现下沉在 {@link KnowledgeAccessHelper}。 */
     public KnowledgeBase findKb(String kbId) {
-        return kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getId, kbId)
-                .isNull(KnowledgeBase::getDeletedAt)
-                .last("LIMIT 1"));
+        return access.findKb(kbId);
     }
 
     public KnowledgeBase requireKb(String kbId) {
-        // KB 受限的 API Key 不能触碰白名单外的库。
-        TenantAPIKeyScope.authorizeKnowledgeBases(
-                kbId == null ? List.of() : List.of(kbId));
-        KnowledgeBase kb = kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getId, kbId)
-                .eq(KnowledgeBase::getTenantId, tenantId())
-                .isNull(KnowledgeBase::getDeletedAt)
-                .last("LIMIT 1"));
-        if (kb == null) {
-            throw new BizException(AppError.notFound("knowledge base not found"));
-        }
-        return kb;
+        return access.requireKb(kbId);
     }
 
     // ── 创建 ─────────────────────────────────────────────────────────────
@@ -191,7 +180,7 @@ public class KnowledgeService implements KnowledgeDocumentGateway {
         k.setFilePath(fileStorage.save(tenantId(), k.getId(), fileName, fileContent));
         k.setCustomMetadata(mergeCustomMetadata(customMetadata));
         knowledgeMapper.insert(k);
-        worker.enqueue(k.getId());
+        knowledgeQueue.enqueue(k.getId());
         return k;
     }
 
@@ -226,7 +215,7 @@ public class KnowledgeService implements KnowledgeDocumentGateway {
         k.setFilePath(fileStorage.save(tenantId(), k.getId(), fname, content));
         k.setCustomMetadata(mergeCustomMetadata(null));
         knowledgeMapper.insert(k);
-        worker.enqueue(k.getId());
+        knowledgeQueue.enqueue(k.getId());
         return k;
     }
 
@@ -258,7 +247,7 @@ public class KnowledgeService implements KnowledgeDocumentGateway {
         }
         knowledgeMapper.insert(k);
         if ("publish".equals(status)) {
-            worker.enqueue(k.getId());
+            knowledgeQueue.enqueue(k.getId());
         }
         return k;
     }
@@ -447,22 +436,7 @@ public class KnowledgeService implements KnowledgeDocumentGateway {
     }
 
     public Knowledge getKnowledge(String id) {
-        Knowledge k = knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getId, id)
-                .eq(Knowledge::getTenantId, tenantId())
-                .isNull(Knowledge::getDeletedAt)
-                .last("LIMIT 1"));
-        if (k == null) {
-            throw new BizException(AppError.notFound("Knowledge not found"));
-        }
-        // 按 knowledgeId 操作的端点，
-        // 用其所属 KB 做 scope 校验（KB 受限的 Key 不得越界）。
-        TenantAPIKeyScope.authorizeKnowledgeBases(
-                List.of(k.getKnowledgeBaseId()));
-        // 回填 tags（knowledge_tag_relations 连接查；
-        // 无关系 → 保持 null，与 契约样例 "tags":null 一致）
-        attachTags(k);
-        return k;
+        return access.getKnowledge(id);
     }
 
     /** 无租户过滤（守卫/权限解析用）。 */
@@ -475,31 +449,21 @@ public class KnowledgeService implements KnowledgeDocumentGateway {
 
     /** 调用者空间内的可空读取。 */
     public Knowledge getKnowledgeInTenant(long tenantId, String id) {
-        return knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getId, id)
-                .eq(Knowledge::getTenantId, tenantId)
-                .isNull(Knowledge::getDeletedAt)
-                .last("LIMIT 1"));
+        return access.getKnowledgeInTenant(tenantId, id);
     }
 
     /**
      * 按 (tenant, ids) 批量取，<b>不回填 tags</b>
      */
     public List<Knowledge> getKnowledgeBatch(long tenantId, List<String> ids) {
-        if (ids == null || ids.isEmpty()) {
-            return new ArrayList<>();
-        }
-        return knowledgeMapper.selectList(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getTenantId, tenantId)
-                .in(Knowledge::getId, ids)
-                .isNull(Knowledge::getDeletedAt));
+        return access.getKnowledgeBatch(tenantId, ids);
     }
 
     /**
      * 本仓未实现，共享路径的"补捞"只对同租户行有效，而租户内行
      */
     public List<Knowledge> getKnowledgeBatchWithSharedAccess(long tenantId, List<String> ids) {
-        return getKnowledgeBatch(tenantId, ids);
+        return access.getKnowledgeBatchWithSharedAccess(tenantId, ids);
     }
 
     /**
@@ -573,10 +537,10 @@ public class KnowledgeService implements KnowledgeDocumentGateway {
     public String deleteKnowledge(String id) {
         Knowledge k = getKnowledge(id);
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
-        knowledgeMapper.update(null, new UpdateWrapper<Knowledge>()
-                .eq("id", k.getId()).set("deleted_at", now));
-        chunkMapper.update(null, new UpdateWrapper<Chunk>()
-                .eq("knowledge_id", k.getId()).set("deleted_at", now));
+        knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, k.getId()).set(Knowledge::getDeletedAt, now));
+        chunkMapper.update(null, new LambdaUpdateWrapper<Chunk>()
+                .eq(Chunk::getKnowledgeId, k.getId()).set(Chunk::getDeletedAt, now));
         fileStorage.delete(tenantId(), k.getId(), k.getFilePath());
         return UUID.randomUUID().toString();
     }
@@ -841,8 +805,7 @@ public class KnowledgeService implements KnowledgeDocumentGateway {
         public Knowledge existing() { return existing; }
     }
 
-    /** 占位：worker bean 由 KnowledgeProcessWorker 提供（@Lazy 避免循环依赖） */
-    public interface KnowledgeProcessWorker {
-        void enqueue(String knowledgeId);
-    }
+    /** 入队端口外提为 {@link com.ragagent.knowledge.task.KnowledgeProcessingQueue}
+     *  （实现：KnowledgeProcessWorker）——原嵌套接口让全部提交方反向依赖门面类型，
+     *  是 M2 解环的根之一，已删。 */
 }

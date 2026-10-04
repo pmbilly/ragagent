@@ -11,6 +11,7 @@ import java.util.UUID;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.ragagent.common.mybatis.PageRequests;
 import com.ragagent.common.web.ZeroTimeSerializer;
 import com.ragagent.memory.domain.MemoryMessageCursor;
 import com.ragagent.session.domain.Message;
@@ -245,13 +246,12 @@ public class MessageRepository implements SessionMessagePort {
         return m;
     }
 
-    /** created_at ASC，offset/limit 不做归一化。 */
+    /** created_at ASC，page/size 翻页（LIMIT/OFFSET 由分页插件按方言生成）。 */
     public List<Message> getMessagesBySession(String sessionId, int page, int pageSize) {
-        return mapper.selectList(new LambdaQueryWrapper<Message>()
+        return mapper.selectList(PageRequests.range(page, pageSize), new LambdaQueryWrapper<Message>()
                 .eq(Message::getSessionId, sessionId)
                 .isNull(Message::getDeletedAt)
-                .orderByAsc(Message::getCreatedAt)
-                .last("LIMIT " + pageSize + " OFFSET " + ((page - 1) * pageSize)));
+                .orderByAsc(Message::getCreatedAt));
     }
 
     /**
@@ -262,23 +262,23 @@ public class MessageRepository implements SessionMessagePort {
      * Java 用稳定排序，这种输入下会保留 SQL 顺序——只在"同微秒同角色"时可能不同序。</p>
      */
     public List<Message> getRecentMessagesBySession(String sessionId, int limit) {
-        List<Message> messages = new ArrayList<>(mapper.selectList(new LambdaQueryWrapper<Message>()
-                .eq(Message::getSessionId, sessionId)
-                .isNull(Message::getDeletedAt)
-                .orderByDesc(Message::getCreatedAt)
-                .last("LIMIT " + limit)));
+        List<Message> messages = new ArrayList<>(mapper.selectList(PageRequests.cap(limit),
+                new LambdaQueryWrapper<Message>()
+                        .eq(Message::getSessionId, sessionId)
+                        .isNull(Message::getDeletedAt)
+                        .orderByDesc(Message::getCreatedAt)));
         messages.sort(createdAtThenUserFirst());
         return messages;
     }
 
     /** 同样的倒序取 + 正序重排（带 beforeTime 上界）。 */
     public List<Message> getMessagesBySessionBeforeTime(String sessionId, OffsetDateTime beforeTime, int limit) {
-        List<Message> messages = new ArrayList<>(mapper.selectList(new LambdaQueryWrapper<Message>()
-                .eq(Message::getSessionId, sessionId)
-                .lt(Message::getCreatedAt, beforeTime)
-                .isNull(Message::getDeletedAt)
-                .orderByDesc(Message::getCreatedAt)
-                .last("LIMIT " + limit)));
+        List<Message> messages = new ArrayList<>(mapper.selectList(PageRequests.cap(limit),
+                new LambdaQueryWrapper<Message>()
+                        .eq(Message::getSessionId, sessionId)
+                        .lt(Message::getCreatedAt, beforeTime)
+                        .isNull(Message::getDeletedAt)
+                        .orderByDesc(Message::getCreatedAt)));
         messages.sort(createdAtThenUserFirst());
         return messages;
     }
@@ -296,8 +296,8 @@ public class MessageRepository implements SessionMessagePort {
         if (afterTime != null) {
             w.gt(Message::getCreatedAt, afterTime);
         }
-        w.orderByAsc(Message::getCreatedAt).last("LIMIT " + limit);
-        return mapper.selectList(w);
+        w.orderByAsc(Message::getCreatedAt);
+        return mapper.selectList(PageRequests.cap(limit), w);
     }
 
     /**
@@ -338,8 +338,8 @@ public class MessageRepository implements SessionMessagePort {
                     .gt(Message::getCreatedAt, at)
                     .or(inner -> inner.eq(Message::getCreatedAt, at).gt(Message::getId, id)));
         }
-        w.orderByAsc(Message::getCreatedAt).orderByAsc(Message::getId).last("LIMIT " + limit);
-        return mapper.selectList(w);
+        w.orderByAsc(Message::getCreatedAt).orderByAsc(Message::getId);
+        return mapper.selectList(PageRequests.cap(limit), w);
     }
 
     /** 只取非空 knowledge_id。 */
@@ -468,14 +468,13 @@ public class MessageRepository implements SessionMessagePort {
         LambdaQueryWrapper<Message> mw = new LambdaQueryWrapper<Message>()
                 .in(Message::getSessionId, candidates)
                 .isNull(Message::getDeletedAt)
-                .orderByDesc(Message::getCreatedAt)
-                .last("LIMIT " + limit);
+                .orderByDesc(Message::getCreatedAt);
         if (sessionIds != null && !sessionIds.isEmpty()) {
             mw.in(Message::getSessionId, sessionIds);
         }
         mw.apply(postgres ? "content ILIKE {0}" : "LOWER(content) LIKE LOWER({0})",
                 "%" + SessionRepository.escapeLikeKeyword(keyword) + "%");
-        return withSessionTitles(mapper.selectList(mw));
+        return withSessionTitles(mapper.selectList(PageRequests.cap(limit), mw));
     }
 
     /**

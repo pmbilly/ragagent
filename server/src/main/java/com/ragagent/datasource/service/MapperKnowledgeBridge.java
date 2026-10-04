@@ -15,15 +15,17 @@ import java.util.UUID;
 import javax.sql.DataSource;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.mapper.ChunkMapper;
 import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import com.ragagent.knowledge.service.KnowledgeService;
+import com.ragagent.knowledge.task.KnowledgeProcessingQueue;
 import com.ragagent.knowledge.storage.LocalStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,7 +80,7 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
     private final LocalStorageService storage;
     /** A3-3 尾批：租户感知文件存储（本地契约不变；云 provider 租户落对象存储）。 */
     private final com.ragagent.knowledge.storage.TenantFileStorage fileStorage;
-    private final KnowledgeService.KnowledgeProcessWorker worker;
+    private final KnowledgeProcessingQueue worker;
     private final boolean postgres;
 
     public MapperKnowledgeBridge(KnowledgeMapper knowledgeMapper,
@@ -86,7 +88,7 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
                                  ChunkMapper chunkMapper,
                                  LocalStorageService storage,
                                  com.ragagent.knowledge.storage.TenantFileStorage fileStorage,
-                                 KnowledgeService.KnowledgeProcessWorker worker,
+                                 KnowledgeProcessingQueue worker,
                                  DataSource dataSource) {
         this.knowledgeMapper = knowledgeMapper;
         this.kbMapper = kbMapper;
@@ -121,9 +123,9 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
                                                 String externalId) {
         if (postgres) {
             List<Knowledge> rows = knowledgeMapper.selectList(
-                    new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<Knowledge>()
-                            .eq("tenant_id", tenantId)
-                            .eq("knowledge_base_id", kbId)
+                    new LambdaQueryWrapper<Knowledge>()
+                            .eq(Knowledge::getTenantId, tenantId)
+                            .eq(Knowledge::getKnowledgeBaseId, kbId)
                             .apply("deleted_at IS NULL")
                             .apply("metadata->>'datasource_id' = {0}", dataSourceId)
                             .apply("metadata->>'external_id' = {0}", externalId)
@@ -147,9 +149,9 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
         }
         if (postgres) {
             List<Knowledge> rows = knowledgeMapper.selectList(
-                    new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<Knowledge>()
-                            .eq("tenant_id", tenantId)
-                            .eq("knowledge_base_id", kbId)
+                    new LambdaQueryWrapper<Knowledge>()
+                            .eq(Knowledge::getTenantId, tenantId)
+                            .eq(Knowledge::getKnowledgeBaseId, kbId)
                             .apply("deleted_at IS NULL")
                             .apply("metadata->>'" + key.replace("'", "''") + "' LIKE {0} ESCAPE '\\\\'",
                                     escapeLike(prefix) + "%"));
@@ -238,12 +240,12 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
 
     @Override
     public void attachMetadata(Knowledge knowledge, Map<String, String> metadata) {
-        UpdateWrapper<Knowledge> uw = new UpdateWrapper<Knowledge>()
-                .eq("id", knowledge.getId())
-                .eq("tenant_id", knowledge.getTenantId())
-                .set("metadata", metadataNode(metadata), "typeHandler="
+        LambdaUpdateWrapper<Knowledge> uw = new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, knowledge.getId())
+                .eq(Knowledge::getTenantId, knowledge.getTenantId())
+                .set(Knowledge::getMetadata, metadataNode(metadata), "typeHandler="
                         + com.ragagent.common.web.PgJsonTypeHandler.class.getName())
-                .set("updated_at", OffsetDateTime.now(ZoneOffset.UTC));
+                .set(Knowledge::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC));
         knowledgeMapper.update(null, uw);
         knowledge.setMetadata(metadataNode(metadata));
     }
@@ -254,10 +256,11 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
     @Override
     public void softDelete(long tenantId, String knowledgeId) {
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
-        knowledgeMapper.update(null, new UpdateWrapper<Knowledge>()
-                .eq("id", knowledgeId).eq("tenant_id", tenantId).set("deleted_at", now));
-        chunkMapper.update(null, new UpdateWrapper<com.ragagent.knowledge.domain.Chunk>()
-                .eq("knowledge_id", knowledgeId).set("deleted_at", now));
+        knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, knowledgeId).eq(Knowledge::getTenantId, tenantId)
+                .set(Knowledge::getDeletedAt, now));
+        chunkMapper.update(null, new LambdaUpdateWrapper<Chunk>()
+                .eq(Chunk::getKnowledgeId, knowledgeId).set(Chunk::getDeletedAt, now));
         // A3-3 尾批：本地目录树恒清 + 若是 provider 引用则额外删对象（best-effort）
         Knowledge row = knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
                 .eq(Knowledge::getId, knowledgeId)

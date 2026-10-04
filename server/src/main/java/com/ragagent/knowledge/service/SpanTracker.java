@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import com.ragagent.knowledge.domain.Knowledge;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 
 /**
  * 处理管道面向的
@@ -163,9 +163,9 @@ public class SpanTracker {
         }
         try {
             knowledgeMapper.update(null,
-                    new UpdateWrapper<Knowledge>()
-                            .eq("id", knowledgeId)
-                            .set("updated_at", OffsetDateTime.now(ZoneOffset.UTC)));
+                    new LambdaUpdateWrapper<Knowledge>()
+                            .eq(Knowledge::getId, knowledgeId)
+                            .set(Knowledge::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC)));
         } catch (RuntimeException e) {
             log.warn("[SpanTracker] heartbeat update failed kid={}: {}", knowledgeId, e.toString());
         }

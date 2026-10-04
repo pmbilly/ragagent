@@ -6,10 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.knowledge.task.KnowledgeProcessingQueue;
 import com.ragagent.common.CleanInvalidUtf8;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
@@ -21,7 +22,6 @@ import com.ragagent.knowledge.mapper.ChunkMapper;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.ragagent.storage.fileserve.FileTransport.OpenedFile;
@@ -45,21 +45,24 @@ public class KnowledgeFileService {
 
     private final ChunkMapper chunkMapper;
     private final ChunkVectorIndexer chunkVectorIndexer;
-    private final KnowledgeService facade;
+    private final KnowledgeAccessHelper access;
+    private final KnowledgeFolderService folderService;
     private final TenantFileStorage fileStorage;
     private final KnowledgeMapper knowledgeMapper;
-    private final KnowledgeService.KnowledgeProcessWorker worker;
+    private final KnowledgeProcessingQueue worker;
 
     public KnowledgeFileService(
                             ChunkMapper chunkMapper,
                             ChunkVectorIndexer chunkVectorIndexer,
-                            @Lazy KnowledgeService facade,
+                            KnowledgeAccessHelper access,
+                            KnowledgeFolderService folderService,
                             TenantFileStorage fileStorage,
                             KnowledgeMapper knowledgeMapper,
-                            @Lazy KnowledgeService.KnowledgeProcessWorker worker) {
+                            KnowledgeProcessingQueue worker) {
         this.chunkMapper = chunkMapper;
         this.chunkVectorIndexer = chunkVectorIndexer;
-        this.facade = facade;
+        this.access = access;
+        this.folderService = folderService;
         this.fileStorage = fileStorage;
         this.knowledgeMapper = knowledgeMapper;
         this.worker = worker;
@@ -89,11 +92,11 @@ public class KnowledgeFileService {
             throw new BizException(AppError.validation("状态仅支持 draft 或 publish"));
         }
 
-        Knowledge existing = facade.loadKnowledgeWrite(id);
+        Knowledge existing = folderService.loadKnowledgeWrite(id);
         if (!"manual".equals(existing.getType())) {
             throw BizException.badRequest("仅支持手工知识的在线编辑");
         }
-        KnowledgeBase kb = facade.requireKb(existing.getKnowledgeBaseId());
+        KnowledgeBase kb = access.requireKb(existing.getKnowledgeBaseId());
 
         int version = 1;
         JsonNode oldMeta = existing.getMetadata();
@@ -156,15 +159,15 @@ public class KnowledgeFileService {
      * 绝不碰 parse_status、enable_status、pending_subtasks_count。</p>
      */
     void updateSummaryColumns(Knowledge k) {
-        knowledgeMapper.update(null, new UpdateWrapper<Knowledge>()
-                .eq("id", k.getId())
-                .set("description", k.getDescription())
-                .set("summary_status", k.getSummaryStatus())
-                .set("metadata", k.getMetadata() == null
+        knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, k.getId())
+                .set(Knowledge::getDescription, k.getDescription())
+                .set(Knowledge::getSummaryStatus, k.getSummaryStatus())
+                .set(Knowledge::getMetadata, k.getMetadata() == null
                                 ? JsonNodeFactory.instance.objectNode()
                                 : k.getMetadata(),
                         "typeHandler=com.ragagent.common.web.PgJsonTypeHandler")
-                .set("updated_at", k.getUpdatedAt() == null ? OffsetDateTime.now(ZoneOffset.UTC) : k.getUpdatedAt()));
+                .set(Knowledge::getUpdatedAt, k.getUpdatedAt() == null ? OffsetDateTime.now(ZoneOffset.UTC) : k.getUpdatedAt()));
     }
 
     /**
@@ -172,26 +175,26 @@ public class KnowledgeFileService {
      * description=""/processed_at=NULL 这类零值也必须落库，不能走 MP 默认的跳空列。
      */
     void updateKnowledgeRow(Knowledge k, JsonNode metadata) {
-        knowledgeMapper.update(null, new UpdateWrapper<Knowledge>()
-                .eq("id", k.getId())
-                .set("type", k.getType())
-                .set("title", k.getTitle())
-                .set("description", k.getDescription())
-                .set("source", k.getSource())
-                .set("parse_status", k.getParseStatus())
-                .set("summary_status", k.getSummaryStatus())
-                .set("enable_status", k.getEnableStatus())
-                .set("embedding_model_id", k.getEmbeddingModelId())
-                .set("file_name", k.getFileName())
-                .set("file_type", k.getFileType())
-                .set("file_size", k.getFileSize() == null ? 0L : k.getFileSize())
-                .set("file_hash", k.getFileHash())
-                .set("file_path", k.getFilePath())
-                .set("metadata", metadata,
+        knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, k.getId())
+                .set(Knowledge::getType, k.getType())
+                .set(Knowledge::getTitle, k.getTitle())
+                .set(Knowledge::getDescription, k.getDescription())
+                .set(Knowledge::getSource, k.getSource())
+                .set(Knowledge::getParseStatus, k.getParseStatus())
+                .set(Knowledge::getSummaryStatus, k.getSummaryStatus())
+                .set(Knowledge::getEnableStatus, k.getEnableStatus())
+                .set(Knowledge::getEmbeddingModelId, k.getEmbeddingModelId())
+                .set(Knowledge::getFileName, k.getFileName())
+                .set(Knowledge::getFileType, k.getFileType())
+                .set(Knowledge::getFileSize, k.getFileSize() == null ? 0L : k.getFileSize())
+                .set(Knowledge::getFileHash, k.getFileHash())
+                .set(Knowledge::getFilePath, k.getFilePath())
+                .set(Knowledge::getMetadata, metadata,
                         "typeHandler=com.ragagent.common.web.PgJsonTypeHandler")
-                .set("updated_at", k.getUpdatedAt())
-                .set("processed_at", k.getProcessedAt())
-                .set("error_message", k.getErrorMessage()));
+                .set(Knowledge::getUpdatedAt, k.getUpdatedAt())
+                .set(Knowledge::getProcessedAt, k.getProcessedAt())
+                .set(Knowledge::getErrorMessage, k.getErrorMessage()));
     }
 
     /** 下载文件名清洗：换行/制表删除、斜杠转连字符、引号转单引号、
@@ -250,7 +253,7 @@ public class KnowledgeFileService {
      */
     @Transactional
     public void updateImageInfo(String knowledgeId, String chunkId, String rawImageInfo) {
-        Knowledge knowledge = facade.loadKnowledgeWrite(knowledgeId);
+        Knowledge knowledge = folderService.loadKnowledgeWrite(knowledgeId);
         String imageInfo = CleanInvalidUtf8.clean(rawImageInfo == null ? "" : rawImageInfo);
         final JsonNode images;
         try {
@@ -359,10 +362,10 @@ public class KnowledgeFileService {
             String fileHash = LocalStorageService.md5Hex((knowledgeId + (fresh.getFileHash() == null
                     ? "" : fresh.getFileHash()) + imageInfo)
                     .getBytes(StandardCharsets.UTF_8));
-            knowledgeMapper.update(null, new UpdateWrapper<Knowledge>()
-                    .eq("id", fresh.getId())
-                    .set("file_hash", fileHash)
-                    .set("updated_at", OffsetDateTime.now(ZoneOffset.UTC)));
+            knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                    .eq(Knowledge::getId, fresh.getId())
+                    .set(Knowledge::getFileHash, fileHash)
+                    .set(Knowledge::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC)));
         }
     }
 

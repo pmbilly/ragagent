@@ -11,6 +11,7 @@ import javax.sql.DataSource;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.ragagent.common.mybatis.PageRequests;
 import com.ragagent.session.domain.Session;
 import com.ragagent.session.domain.SessionLastRequestState;
 import com.ragagent.session.domain.SessionListItem;
@@ -225,11 +226,10 @@ public class SessionRepository {
         LambdaQueryWrapper<Session> listQ = new LambdaQueryWrapper<Session>()
                 .eq(Session::getTenantId, tenantId)
                 .isNull(Session::getDeletedAt)
-                .orderByDesc(Session::getUpdatedAt)
-                // p/size 是上面归一化过的 int，不来自用户输入的直接拼接
-                .last("OFFSET " + ((p - 1) * size) + " ROWS FETCH NEXT " + size + " ROWS ONLY");
+                .orderByDesc(Session::getUpdatedAt);
         applyUserScope(listQ, userId);
-        return new PagedSessions(mapper.selectList(listQ), total);
+        // LIMIT/OFFSET 语法由分页拦截器按方言生成（替代手写 FETCH 分支）
+        return new PagedSessions(mapper.selectList(PageRequests.range(p, size), listQ), total);
     }
 
     // ── 删 ──────────────────────────────────────────────────────────────────

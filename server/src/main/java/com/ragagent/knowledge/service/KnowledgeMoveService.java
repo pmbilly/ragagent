@@ -5,7 +5,8 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.ragagent.knowledge.task.KnowledgeProcessingQueue;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
@@ -19,7 +20,6 @@ import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import com.ragagent.knowledge.mapper.KnowledgeTagMapper;
 import com.ragagent.model.service.ModelRuntimeFactory;
 import com.ragagent.retrieval.engine.PgVectorEngineRepository;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import com.ragagent.common.graph.NameSpace;
 import com.ragagent.embedding.Embedder;
@@ -46,7 +46,7 @@ public class KnowledgeMoveService {
     private final KnowledgeTagMapper tagMapper;
     private final TenantStorageService tenantStorage;
     private final ModelRuntimeFactory modelRuntimeFactory;
-    private final KnowledgeService.KnowledgeProcessWorker worker;
+    private final KnowledgeProcessingQueue worker;
     private final KnowledgeTaskProgressStore progressStore;
     private final KnowledgeVectorWrites vectorWrites;
     private final PgVectorEngineRepository pgVectorEngineRepository;
@@ -62,7 +62,7 @@ public class KnowledgeMoveService {
             KnowledgeTagMapper tagMapper,
             TenantStorageService tenantStorage,
             ModelRuntimeFactory modelRuntimeFactory,
-            @Lazy KnowledgeService.KnowledgeProcessWorker worker,
+            KnowledgeProcessingQueue worker,
             KnowledgeTaskProgressStore progressStore,
             KnowledgeVectorWrites vectorWrites,
             PgVectorEngineRepository pgVectorEngineRepository,
@@ -179,20 +179,20 @@ public class KnowledgeMoveService {
         }
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
         String actualSourceKbId = row.getKnowledgeBaseId();
-        knowledgeMapper.update(null, new UpdateWrapper<Knowledge>()
-                .eq("id", knowledgeId)
-                .set("knowledge_base_id", targetKbId)
+        knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, knowledgeId)
+                .set(Knowledge::getKnowledgeBaseId, targetKbId)
                 // 搬走后行落在终态 completed、错误清空
-                .set("parse_status", Knowledge.PARSE_COMPLETED)
-                .set("error_message", "")
-                .set("updated_at", now));
+                .set(Knowledge::getParseStatus, Knowledge.PARSE_COMPLETED)
+                .set(Knowledge::getErrorMessage, "")
+                .set(Knowledge::getUpdatedAt, now));
         // 标签是 KB 作用域的：搬走后源 KB 的标签不该继续挂着该文档
         //
         tagMapper.deleteRelations(knowledgeId);
-        chunkMapper.update(null, new UpdateWrapper<Chunk>()
-                .eq("knowledge_id", knowledgeId)
-                .set("knowledge_base_id", targetKbId)
-                .set("updated_at", now));
+        chunkMapper.update(null, new LambdaUpdateWrapper<Chunk>()
+                .eq(Chunk::getKnowledgeId, knowledgeId)
+                .set(Chunk::getKnowledgeBaseId, targetKbId)
+                .set(Chunk::getUpdatedAt, now));
         // 搬走后源 KB 的命名空间不得继续
         // 暴露该文档（失败上抛——移动任务据此重试；命名空间删除可重复执行）
         graphRepository.delGraph(List.of(
@@ -244,17 +244,17 @@ public class KnowledgeMoveService {
         // 2) 标签关联（标签是 KB 作用域的）
         tagMapper.deleteRelations(knowledgeId);
         // 3) 行改写到目标 KB 的待解析态
-        knowledgeMapper.update(null, new UpdateWrapper<Knowledge>()
-                .eq("id", knowledgeId)
-                .set("knowledge_base_id", targetKbId)
-                .set("embedding_model_id", targetKb.getEmbeddingModelId())
-                .set("parse_status", Knowledge.PARSE_PENDING)
-                .set("error_message", "")
-                .set("enable_status", "disabled")
-                .set("description", "")
-                .set("processed_at", null)
-                .set("storage_size", 0L)
-                .set("updated_at", OffsetDateTime.now(ZoneOffset.UTC)));
+        knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, knowledgeId)
+                .set(Knowledge::getKnowledgeBaseId, targetKbId)
+                .set(Knowledge::getEmbeddingModelId, targetKb.getEmbeddingModelId())
+                .set(Knowledge::getParseStatus, Knowledge.PARSE_PENDING)
+                .set(Knowledge::getErrorMessage, "")
+                .set(Knowledge::getEnableStatus, "disabled")
+                .set(Knowledge::getDescription, "")
+                .set(Knowledge::getProcessedAt, null)
+                .set(Knowledge::getStorageSize, 0L)
+                .set(Knowledge::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC)));
         if (storageSize > 0) {
             tenantStorage.adjustStorageUsed(tenantId, -storageSize);
         }

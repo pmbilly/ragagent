@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -261,10 +261,10 @@ public class ModelService implements ModelGateway  {
             throw new BizException(new AppError(2300, formatInUseMessage(kbCount, agentCount, memory), usage, 400));
         }
         // 软删除：UPDATE deleted_at = now
-        modelMapper.update(null, new UpdateWrapper<Model>()
-                .eq("id", id)
-                .eq("tenant_id", tid)
-                .set("deleted_at", OffsetDateTime.now(ZoneOffset.UTC)));
+        modelMapper.update(null, new LambdaUpdateWrapper<Model>()
+                .eq(Model::getId, id)
+                .eq(Model::getTenantId, tid)
+                .set(Model::getDeletedAt, OffsetDateTime.now(ZoneOffset.UTC)));
         log.info("Model deleted successfully: {}", id);
     }
 

@@ -4,6 +4,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.ragagent.common.mybatis.PageRequests;
 import com.ragagent.wiki.domain.TaskDeadLetter;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,8 +63,7 @@ public class TaskDeadLetterRepository {
                 .eq(TaskDeadLetter::getScope, scope)
                 .eq(TaskDeadLetter::getScopeId, scopeId)
                 .orderByDesc(TaskDeadLetter::getFailedAt)
-                .orderByDesc(TaskDeadLetter::getId)
-                .last("LIMIT " + clamped);
+                .orderByDesc(TaskDeadLetter::getId);
         applyCursor(q, cursor);
         return page(q, clamped);
     }
@@ -76,8 +76,7 @@ public class TaskDeadLetterRepository {
         LambdaQueryWrapper<TaskDeadLetter> q = new LambdaQueryWrapper<TaskDeadLetter>()
                 .eq(TaskDeadLetter::getTaskType, taskType)
                 .orderByDesc(TaskDeadLetter::getFailedAt)
-                .orderByDesc(TaskDeadLetter::getId)
-                .last("LIMIT " + clamped);
+                .orderByDesc(TaskDeadLetter::getId);
         applyCursor(q, cursor);
         return page(q, clamped);
     }
@@ -94,7 +93,7 @@ public class TaskDeadLetterRepository {
     public record CursorPage(List<TaskDeadLetter> rows, String nextCursor) {}
 
     private CursorPage page(LambdaQueryWrapper<TaskDeadLetter> q, int limit) {
-        List<TaskDeadLetter> rows = mapper.selectList(q);
+        List<TaskDeadLetter> rows = mapper.selectList(PageRequests.cap(limit), q);
         // 多取一条判"还有下一页"会多一次查询；取 limit 条后
         // 用最后一条的 id 作为 nextCursor（满页即认为还有下一页）。
         String next = "";

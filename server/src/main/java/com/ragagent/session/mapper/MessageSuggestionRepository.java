@@ -10,7 +10,7 @@ import java.util.Locale;
 import javax.sql.DataSource;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.session.domain.MessageSuggestionEvent;
 import com.ragagent.session.domain.MessageSuggestionSet;
 import com.ragagent.session.domain.MessageSuggestionSetNotFoundException;
@@ -25,8 +25,9 @@ import org.springframework.stereotype.Component;
  *       → {@link #acquireGeneration} 里调 {@code normalizeForInsert()}。</li>
  *   <li><b>失败/抑制收尾的落库</b>：逐列写（绕开零值跳过），保证
  *       {@code suppression_reason}/{@code error_code} 会被**写成空串**、
- *       {@code generated_at} 会被**清成 NULL**。用字符串列名的 UpdateWrapper，
- *       不能用 lambda 形式（jsonb 列要显式带 typeHandler）。</li>
+ *       {@code generated_at} 会被**清成 NULL**。用 LambdaUpdateWrapper 显式列集；
+ *       jsonb 列必须用三参 {@code set(column, value, mapping)} 显式带 typeHandler
+ *       （wrapper 的 set 不套用实体上的 {@code @TableField(typeHandler=…)}）。</li>
  *   <li><b>无软删除列</b>：本表没有 {@code DeletedAt}，两处 Delete 是**硬删**——
  *       与 sessions/messages 的软删不同，别套用。</li>
  *   <li><b>唯一索引</b>：{@code AcquireGeneration} 的"插入或什么都不做"依赖
@@ -123,23 +124,23 @@ public class MessageSuggestionRepository {
             return new AcquireResult(existing, false);
         }
 
-        UpdateWrapper<MessageSuggestionSet> w = new UpdateWrapper<MessageSuggestionSet>()
-                .eq("id", existing.getId());
+        LambdaUpdateWrapper<MessageSuggestionSet> w = new LambdaUpdateWrapper<MessageSuggestionSet>()
+                .eq(MessageSuggestionSet::getId, existing.getId());
         if (MessageSuggestionSet.STATUS_READY.equals(existing.getStatus()) && regenerate) {
             // 重新生成只能从 ready 抢；其余状态走下面那条更宽的条件
-            w.eq("status", MessageSuggestionSet.STATUS_READY);
+            w.eq(MessageSuggestionSet::getStatus, MessageSuggestionSet.STATUS_READY);
         } else {
-            w.and(q -> q.ne("status", MessageSuggestionSet.STATUS_GENERATING)
-                    .or().isNull("lease_until")
-                    .or().lt("lease_until", now));
+            w.and(q -> q.ne(MessageSuggestionSet::getStatus, MessageSuggestionSet.STATUS_GENERATING)
+                    .or().isNull(MessageSuggestionSet::getLeaseUntil)
+                    .or().lt(MessageSuggestionSet::getLeaseUntil, now));
         }
-        w.set("status", MessageSuggestionSet.STATUS_GENERATING)
-                .set("lease_until", leaseUntil)
-                .set("suppression_reason", "")
-                .set("questions", List.of(), "typeHandler=" + QUESTIONS_HANDLER)
-                .set("error_code", "")
-                .set("generated_at", null)
-                .set("updated_at", now);
+        w.set(MessageSuggestionSet::getStatus, MessageSuggestionSet.STATUS_GENERATING)
+                .set(MessageSuggestionSet::getLeaseUntil, leaseUntil)
+                .set(MessageSuggestionSet::getSuppressionReason, "")
+                .set(MessageSuggestionSet::getQuestions, List.of(), "typeHandler=" + QUESTIONS_HANDLER)
+                .set(MessageSuggestionSet::getErrorCode, "")
+                .set(MessageSuggestionSet::getGeneratedAt, null)
+                .set(MessageSuggestionSet::getUpdatedAt, now);
 
         int affected = mapper.update(null, w);
         if (affected == 0) {
@@ -165,20 +166,20 @@ public class MessageSuggestionRepository {
             throw new IllegalArgumentException("message suggestion set is nil");
         }
         set.setUpdatedAt(OffsetDateTime.now());
-        UpdateWrapper<MessageSuggestionSet> w = new UpdateWrapper<MessageSuggestionSet>()
-                .eq("id", set.getId())
-                .set("status", set.getStatus())
-                .set("allow_regenerate", set.isAllowRegenerate())
-                .set("suppression_reason", set.getSuppressionReason())
-                .set("questions", set.getQuestions(), "typeHandler=" + QUESTIONS_HANDLER)
-                .set("model_id", set.getModelId())
-                .set("prompt_tokens", set.getPromptTokens())
-                .set("completion_tokens", set.getCompletionTokens())
-                .set("latency_ms", set.getLatencyMs())
-                .set("error_code", set.getErrorCode())
-                .set("lease_until", set.getLeaseUntil())
-                .set("generated_at", set.getGeneratedAt())
-                .set("updated_at", set.getUpdatedAt());
+        LambdaUpdateWrapper<MessageSuggestionSet> w = new LambdaUpdateWrapper<MessageSuggestionSet>()
+                .eq(MessageSuggestionSet::getId, set.getId())
+                .set(MessageSuggestionSet::getStatus, set.getStatus())
+                .set(MessageSuggestionSet::isAllowRegenerate, set.isAllowRegenerate())
+                .set(MessageSuggestionSet::getSuppressionReason, set.getSuppressionReason())
+                .set(MessageSuggestionSet::getQuestions, set.getQuestions(), "typeHandler=" + QUESTIONS_HANDLER)
+                .set(MessageSuggestionSet::getModelId, set.getModelId())
+                .set(MessageSuggestionSet::getPromptTokens, set.getPromptTokens())
+                .set(MessageSuggestionSet::getCompletionTokens, set.getCompletionTokens())
+                .set(MessageSuggestionSet::getLatencyMs, set.getLatencyMs())
+                .set(MessageSuggestionSet::getErrorCode, set.getErrorCode())
+                .set(MessageSuggestionSet::getLeaseUntil, set.getLeaseUntil())
+                .set(MessageSuggestionSet::getGeneratedAt, set.getGeneratedAt())
+                .set(MessageSuggestionSet::getUpdatedAt, set.getUpdatedAt());
         if (mapper.update(null, w) == 0) {
             mapper.insert(set);
         }

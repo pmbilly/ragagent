@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.ragagent.common.mybatis.PageRequests;
 import com.ragagent.wiki.domain.TaskPendingOp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -191,12 +192,11 @@ public class TaskPendingOpsRepository {
             // 避免一次拉全表。wiki 的调用点总是传 >0 的值。
             return List.of();
         }
-        return mapper.selectList(new LambdaQueryWrapper<TaskPendingOp>()
+        return mapper.selectList(PageRequests.cap(limit), new LambdaQueryWrapper<TaskPendingOp>()
                 .eq(TaskPendingOp::getTaskType, taskType)
                 .eq(TaskPendingOp::getScope, scope)
                 .eq(TaskPendingOp::getScopeId, scopeId)
-                .orderByAsc(TaskPendingOp::getId)
-                .last("LIMIT " + limit));
+                .orderByAsc(TaskPendingOp::getId));
     }
 
     /**
@@ -221,14 +221,14 @@ public class TaskPendingOpsRepository {
         OffsetDateTime now = OffsetDateTime.now();
 
         // (1) 该元组下的可认领行（未认领，或认领已陈旧），按 id ASC = FIFO。
-        List<TaskPendingOp> eligible = mapper.selectList(new LambdaQueryWrapper<TaskPendingOp>()
-                .eq(TaskPendingOp::getTaskType, taskType)
-                .eq(TaskPendingOp::getScope, scope)
-                .eq(TaskPendingOp::getScopeId, scopeId)
-                .and(w -> w.isNull(TaskPendingOp::getClaimedAt)
-                        .or().lt(TaskPendingOp::getClaimedAt, staleBefore))
-                .orderByAsc(TaskPendingOp::getId)
-                .last("LIMIT " + CLAIM_SCAN_CAP));
+        List<TaskPendingOp> eligible = mapper.selectList(PageRequests.cap(CLAIM_SCAN_CAP),
+                new LambdaQueryWrapper<TaskPendingOp>()
+                        .eq(TaskPendingOp::getTaskType, taskType)
+                        .eq(TaskPendingOp::getScope, scope)
+                        .eq(TaskPendingOp::getScopeId, scopeId)
+                        .and(w -> w.isNull(TaskPendingOp::getClaimedAt)
+                                .or().lt(TaskPendingOp::getClaimedAt, staleBefore))
+                        .orderByAsc(TaskPendingOp::getId));
         if (eligible.isEmpty()) {
             return List.of();
         }
@@ -236,15 +236,14 @@ public class TaskPendingOpsRepository {
         // (2) 新鲜认领的 dedup_key 整体阻塞——同一文档的多个 op 绝不会拆到
         //     两个并发批次。只取 dedup_key 一列，且这些行数 == 在飞批次 × 批大小，很小。
         Set<String> blockedKeys = new LinkedHashSet<>();
-        List<TaskPendingOp> freshClaimed = mapper.selectList(
+        List<TaskPendingOp> freshClaimed = mapper.selectList(PageRequests.cap(CLAIM_SCAN_CAP),
                 new LambdaQueryWrapper<TaskPendingOp>()
                         .select(TaskPendingOp::getDedupKey)
                         .eq(TaskPendingOp::getTaskType, taskType)
                         .eq(TaskPendingOp::getScope, scope)
                         .eq(TaskPendingOp::getScopeId, scopeId)
                         .isNotNull(TaskPendingOp::getClaimedAt)
-                        .ge(TaskPendingOp::getClaimedAt, staleBefore)
-                        .last("LIMIT " + CLAIM_SCAN_CAP));
+                        .ge(TaskPendingOp::getClaimedAt, staleBefore));
         for (TaskPendingOp row : freshClaimed) {
             if (row.getDedupKey() != null && !row.getDedupKey().isEmpty()) {
                 blockedKeys.add(row.getDedupKey());

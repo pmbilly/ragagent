@@ -3,7 +3,7 @@ package com.ragagent.wiki.service;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import org.slf4j.Logger;
@@ -72,11 +72,11 @@ public class DefaultWikiKnowledgeFinalizer implements WikiFinalizePort, WikiKnow
         // 1) 原子递减、钳在零
         boolean decremented;
         try {
-            int rows = knowledgeMapper.update(null, new UpdateWrapper<Knowledge>()
-                    .eq("id", knowledgeId)
-                    .gt("pending_subtasks_count", 0)
+            int rows = knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                    .eq(Knowledge::getId, knowledgeId)
+                    .gt(Knowledge::getPendingSubtasksCount, 0)
                     .setSql("pending_subtasks_count = pending_subtasks_count - 1")
-                    .set("updated_at", now));
+                    .set(Knowledge::getUpdatedAt, now));
             decremented = rows > 0;
         } catch (RuntimeException e) {
             log.warn("finalize subtask decrement failed source=wiki knowledge={} err={}",
@@ -87,14 +87,14 @@ public class DefaultWikiKnowledgeFinalizer implements WikiFinalizePort, WikiKnow
         // 2) 带守卫的晋升（无条件尝试，见类注释）
         boolean promoted;
         try {
-            int rows = knowledgeMapper.update(null, new UpdateWrapper<Knowledge>()
-                    .eq("id", knowledgeId)
-                    .eq("parse_status", Knowledge.PARSE_FINALIZING)
-                    .eq("pending_subtasks_count", 0)
-                    .set("parse_status", Knowledge.PARSE_COMPLETED)
-                    .set("error_message", "")
-                    .set("processed_at", now)
-                    .set("updated_at", now));
+            int rows = knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                    .eq(Knowledge::getId, knowledgeId)
+                    .eq(Knowledge::getParseStatus, Knowledge.PARSE_FINALIZING)
+                    .eq(Knowledge::getPendingSubtasksCount, 0)
+                    .set(Knowledge::getParseStatus, Knowledge.PARSE_COMPLETED)
+                    .set(Knowledge::getErrorMessage, "")
+                    .set(Knowledge::getProcessedAt, now)
+                    .set(Knowledge::getUpdatedAt, now));
             promoted = rows > 0;
         } catch (RuntimeException e) {
             log.warn("finalize subtask promote failed source=wiki knowledge={} err={}",

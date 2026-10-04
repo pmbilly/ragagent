@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.ragagent.common.mybatis.PageRequests;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.auth.apikey.domain.APIKeyScopeContext;
@@ -17,6 +17,7 @@ import com.ragagent.audit.domain.AuditOutcome;
 import com.ragagent.audit.service.AuditLogService;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.common.tenant.TenantRole;
+import com.ragagent.auth.domain.AuthToken;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.mapper.AuthTokenMapper;
 import com.ragagent.auth.mapper.TenantMemberMapper;
@@ -187,16 +188,16 @@ public class TenantMemberService {
         if (!q.isEmpty()) {
             listScope.in(TenantMember::getUserId, userIdsMatching(q));
         }
-        listScope.last("LIMIT " + pageSize + " OFFSET " + (long) (page - 1) * pageSize);
-        return new MemberPage(memberMapper.selectList(listScope), total);
+        return new MemberPage(
+                memberMapper.selectList(PageRequests.range(page, pageSize), listScope), total);
     }
 
     /** escapeLikePattern（\ % _ 依次转义）+ % 包裹，交由 LOWER(... LIKE LOWER(?)) 匹配 */
     private List<String> userIdsMatching(String q) {
         String escaped = q.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
         String like = "%" + escaped + "%";
-        QueryWrapper<User> w = new QueryWrapper<User>()
-                .select("id")
+        LambdaQueryWrapper<User> w = new LambdaQueryWrapper<User>()
+                .select(User::getId)
                 .apply("(LOWER(email) LIKE LOWER({0}) OR LOWER(username) LIKE LOWER({1}))", like, like);
         List<String> ids = new ArrayList<>();
         for (User u : userMapper.selectList(w)) {
@@ -262,12 +263,12 @@ public class TenantMemberService {
                 throw TenantRbacException.lastOwner();
             }
         }
-        memberMapper.update(null, new UpdateWrapper<TenantMember>()
-                .eq("user_id", userId)
-                .eq("tenant_id", tenantId)
-                .isNull("deleted_at")
-                .set("role", newRole.value())
-                .set("updated_at", OffsetDateTime.now(ZoneOffset.UTC)));
+        memberMapper.update(null, new LambdaUpdateWrapper<TenantMember>()
+                .eq(TenantMember::getUserId, userId)
+                .eq(TenantMember::getTenantId, tenantId)
+                .isNull(TenantMember::getDeletedAt)
+                .set(TenantMember::getRole, newRole.value())
+                .set(TenantMember::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC)));
         emitRoleChangeAudit(tenantId, userId, oldRole, newRole.value());
     }
 
@@ -283,11 +284,11 @@ public class TenantMemberService {
         if (TenantRole.OWNER.value().equals(current.getRole()) && !hasOtherActiveOwner(userId, tenantId)) {
             throw TenantRbacException.lastOwner();
         }
-        memberMapper.update(null, new UpdateWrapper<TenantMember>()
-                .eq("user_id", userId)
-                .eq("tenant_id", tenantId)
-                .isNull("deleted_at")
-                .set("deleted_at", OffsetDateTime.now(ZoneOffset.UTC)));
+        memberMapper.update(null, new LambdaUpdateWrapper<TenantMember>()
+                .eq(TenantMember::getUserId, userId)
+                .eq(TenantMember::getTenantId, tenantId)
+                .isNull(TenantMember::getDeletedAt)
+                .set(TenantMember::getDeletedAt, OffsetDateTime.now(ZoneOffset.UTC)));
 
         // 审计区分"自愿 leave"（caller == target）与"被移除"
         String actor = TenantContext.currentUserId() == null ? "" : TenantContext.currentUserId();
@@ -339,9 +340,9 @@ public class TenantMemberService {
                 }
                 if (tenantPointerChanged) {
                     // 显式写 NULL，别写 0（FK 拒绝）
-                    userMapper.update(null, new UpdateWrapper<User>()
-                            .eq("id", userId)
-                            .set("tenant_id", null));
+                    userMapper.update(null, new LambdaUpdateWrapper<User>()
+                            .eq(User::getId, userId)
+                            .set(User::getTenantId, null));
                 }
             }
         } catch (RuntimeException e) {
@@ -349,10 +350,10 @@ public class TenantMemberService {
                     userId, tenantId, e.toString());
         }
         try {
-            authTokenMapper.update(null, new UpdateWrapper<com.ragagent.auth.domain.AuthToken>()
-                    .eq("user_id", userId)
-                    .eq("is_revoked", false)
-                    .set("is_revoked", true));
+            authTokenMapper.update(null, new LambdaUpdateWrapper<AuthToken>()
+                    .eq(AuthToken::getUserId, userId)
+                    .eq(AuthToken::isIsRevoked, false)
+                    .set(AuthToken::isIsRevoked, true));
         } catch (RuntimeException e) {
             log.warn("RemoveMember cleanup: failed to revoke tokens for user {}: {}", userId, e.toString());
         }

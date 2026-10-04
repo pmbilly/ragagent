@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -20,7 +20,6 @@ import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import com.ragagent.knowledge.security.ChunkAccessGuard;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.nio.charset.StandardCharsets;
@@ -32,8 +31,9 @@ import java.util.Set;
 
 /**
  * 知识文件夹树与文件夹移动 / 重命名：树的增删改查、移动/重命名的路径重写与冲突校验。
- * <p>门面 helper（requireKb/findKb/tenantId/getKnowledgeBatch）经 {@code @Lazy}
- * 门面调用，不复制；搬移中防线统一走 {@link ChunkAccessGuard#rejectMovingKnowledge}（批量面同样复用）
+ * <p>门面 helper（requireKb/findKb/tenantId/getKnowledgeBatch）下沉在
+ * {@link KnowledgeAccessHelper}，直接依赖不回注门面（M2 解环）；搬移中防线统一走
+ * {@link ChunkAccessGuard#rejectMovingKnowledge}（批量面同样复用）
  * （KnowledgeBatchOpsService）复用。</p>
  */
 @Service
@@ -43,14 +43,14 @@ public class KnowledgeFolderService {
 
     private final KnowledgeMapper knowledgeMapper;
     private final KnowledgeBaseMapper kbMapper;
-    private final KnowledgeService facade;
+    private final KnowledgeAccessHelper access;
 
     public KnowledgeFolderService(KnowledgeMapper knowledgeMapper,
                                   KnowledgeBaseMapper kbMapper,
-                                  @Lazy KnowledgeService facade) {
+                                  KnowledgeAccessHelper access) {
         this.knowledgeMapper = knowledgeMapper;
         this.kbMapper = kbMapper;
-        this.facade = facade;
+        this.access = access;
     }
 
 
@@ -59,7 +59,7 @@ public class KnowledgeFolderService {
      * 计数只排除 parse_status='deleting'（draft 计入）+ 软删行；中间空目录会被
      */
     public JsonNode folderTree(String kbId) {
-        facade.requireKb(kbId);
+        access.requireKb(kbId);
         // GROUP BY folder_path（Java 侧取列后内存聚合，
         // 语义一致：tenant+kb+parse_status<>'deleting'+deleted_at IS NULL）
         List<Knowledge> docs = knowledgeMapper.selectList(new LambdaQueryWrapper<Knowledge>()
@@ -238,12 +238,12 @@ public class KnowledgeFolderService {
             checkedIds.add(row.getId());
         }
         long tenantId = rows.get(0).getTenantId();
-        return knowledgeMapper.update(null, new UpdateWrapper<Knowledge>()
-                .eq("tenant_id", tenantId)
-                .eq("knowledge_base_id", kbId)
-                .in("id", checkedIds)
-                .set("folder_path", normalized)
-                .set("updated_at", OffsetDateTime.now(ZoneOffset.UTC)));
+        return knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getTenantId, tenantId)
+                .eq(Knowledge::getKnowledgeBaseId, kbId)
+                .in(Knowledge::getId, checkedIds)
+                .set(Knowledge::getFolderPath, normalized)
+                .set(Knowledge::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC)));
     }
 
     /**
@@ -293,12 +293,12 @@ public class KnowledgeFolderService {
         long affected = 0;
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
         for (Map.Entry<String, List<String>> e : byTarget.entrySet()) {
-            affected += knowledgeMapper.update(null, new UpdateWrapper<Knowledge>()
-                    .eq("tenant_id", kb.getTenantId())
-                    .eq("knowledge_base_id", kbId)
-                    .in("id", e.getValue())
-                    .set("folder_path", e.getKey())
-                    .set("updated_at", now));
+            affected += knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                    .eq(Knowledge::getTenantId, kb.getTenantId())
+                    .eq(Knowledge::getKnowledgeBaseId, kbId)
+                    .in(Knowledge::getId, e.getValue())
+                    .set(Knowledge::getFolderPath, e.getKey())
+                    .set(Knowledge::getUpdatedAt, now));
         }
         return affected;
     }
@@ -334,7 +334,7 @@ public class KnowledgeFolderService {
                 cleaned.add(id);
             }
         }
-        List<Knowledge> rows = facade.getKnowledgeBatch(KnowledgeService.tenantId(), cleaned);
+        List<Knowledge> rows = access.getKnowledgeBatch(KnowledgeService.tenantId(), cleaned);
         Map<String, Knowledge> byId = new HashMap<>();
         for (Knowledge row : rows) {
             byId.put(row.getId(), row);
@@ -349,7 +349,7 @@ public class KnowledgeFolderService {
             ChunkAccessGuard.rejectMovingKnowledge(row);
             if (checkedKbs.add(row.getKnowledgeBaseId())) {
                 // knowledgeWriteKB：KB 行与 (id, tenant) 绑定一致，否则 403
-                KnowledgeBase kb = facade.findKb(row.getKnowledgeBaseId());
+                KnowledgeBase kb = access.findKb(row.getKnowledgeBaseId());
                 if (kb == null || !kb.getTenantId().equals(row.getTenantId())) {
                     throw BizException.forbidden("knowledge does not belong to its knowledge base");
                 }

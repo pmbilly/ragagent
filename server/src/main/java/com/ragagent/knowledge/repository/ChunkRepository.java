@@ -2,8 +2,8 @@ package com.ragagent.knowledge.repository;
 
 import java.util.List;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.ragagent.common.mybatis.PageRequests;
 import com.ragagent.common.CleanInvalidUtf8;
 import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.ChunkSearchGateway;
@@ -166,25 +166,24 @@ public class ChunkRepository implements ChunkSearchGateway {
         long total = chunkMapper.selectCount(pagedFilter(
                 tenantId, knowledgeId, chunkTypes, tagIds, kw, searchField, knowledgeType, isEnabled));
 
-        QueryWrapper<Chunk> data = pagedFilter(
+        LambdaQueryWrapper<Chunk> data = pagedFilter(
                 tenantId, knowledgeId, chunkTypes, tagIds, kw, searchField, knowledgeType, isEnabled);
 
         // 排序二选一：FAQ 按 updated_at（默认 DESC）、文档按 chunk_index（默认 ASC）；
         if (KNOWLEDGE_TYPE_FAQ.equals(knowledgeType)) {
             if ("asc".equals(sortOrder)) {
-                data.orderByAsc("updated_at");
+                data.orderByAsc(Chunk::getUpdatedAt);
             } else {
-                data.orderByDesc("updated_at");
+                data.orderByDesc(Chunk::getUpdatedAt);
             }
         } else {
             if ("desc".equals(sortOrder)) {
-                data.orderByDesc("chunk_index");
+                data.orderByDesc(Chunk::getChunkIndex);
             } else {
-                data.orderByAsc("chunk_index");
+                data.orderByAsc(Chunk::getChunkIndex);
             }
         }
-        data.last("LIMIT " + limit + " OFFSET " + offset);
-        return new ChunkPage(chunkMapper.selectList(data), total);
+        return new ChunkPage(chunkMapper.selectList(PageRequests.atOffset(offset, limit), data), total);
     }
 
     /**
@@ -279,20 +278,20 @@ public class ChunkRepository implements ChunkSearchGateway {
      */
     public void saveChunkRevision(Chunk chunk, ChunkRevision revision, int expectedRevision) {
         tx.inTransaction(() -> {
-            UpdateWrapper<Chunk> w = new UpdateWrapper<Chunk>()
-                    .eq("id", chunk.getId())
-                    .eq("tenant_id", chunk.getTenantId())
-                    .eq("content_revision", expectedRevision)
-                    .isNull("deleted_at")
-                    .set("content", CleanInvalidUtf8.clean(chunk.getContent()))
-                    .set("source_content", CleanInvalidUtf8.clean(
+            LambdaUpdateWrapper<Chunk> w = new LambdaUpdateWrapper<Chunk>()
+                    .eq(Chunk::getId, chunk.getId())
+                    .eq(Chunk::getTenantId, chunk.getTenantId())
+                    .eq(Chunk::getContentRevision, expectedRevision)
+                    .isNull(Chunk::getDeletedAt)
+                    .set(Chunk::getContent, CleanInvalidUtf8.clean(chunk.getContent()))
+                    .set(Chunk::getSourceContent, CleanInvalidUtf8.clean(
                             chunk.getSourceContent() == null ? "" : chunk.getSourceContent()))
-                    .set("content_revision", chunk.getContentRevision())
-                    .set("is_enabled", chunk.isIsEnabled())
-                    .set("metadata", chunk.getMetadata(), "typeHandler=" + PG_JSON)
-                    .set("index_status", chunk.getIndexStatus())
-                    .set("last_editor_id", chunk.getLastEditorId())
-                    .set("updated_at", chunk.getUpdatedAt());
+                    .set(Chunk::getContentRevision, chunk.getContentRevision())
+                    .set(Chunk::isIsEnabled, chunk.isIsEnabled())
+                    .set(Chunk::getMetadata, chunk.getMetadata(), "typeHandler=" + PG_JSON)
+                    .set(Chunk::getIndexStatus, chunk.getIndexStatus())
+                    .set(Chunk::getLastEditorId, chunk.getLastEditorId())
+                    .set(Chunk::getUpdatedAt, chunk.getUpdatedAt());
             int rows = chunkMapper.update(null, w);
             if (rows != 1) {
                 throw new ChunkRevisionConflictException();
@@ -332,11 +331,11 @@ public class ChunkRepository implements ChunkSearchGateway {
 
     /** tenant + id 软删；不存在时静默 no-op。 */
     public void deleteChunk(long tenantId, String id) {
-        chunkMapper.update(null, new UpdateWrapper<Chunk>()
-                .eq("tenant_id", tenantId)
-                .eq("id", id)
-                .isNull("deleted_at")
-                .set("deleted_at", OffsetDateTime.now()));
+        chunkMapper.update(null, new LambdaUpdateWrapper<Chunk>()
+                .eq(Chunk::getTenantId, tenantId)
+                .eq(Chunk::getId, id)
+                .isNull(Chunk::getDeletedAt)
+                .set(Chunk::getDeletedAt, OffsetDateTime.now()));
     }
 
     /**
@@ -348,11 +347,11 @@ public class ChunkRepository implements ChunkSearchGateway {
         }
         for (int i = 0; i < ids.size(); i += DELETE_BATCH_SIZE) {
             int end = Math.min(i + DELETE_BATCH_SIZE, ids.size());
-            chunkMapper.update(null, new UpdateWrapper<Chunk>()
-                    .eq("tenant_id", tenantId)
-                    .in("id", ids.subList(i, end))
-                    .isNull("deleted_at")
-                    .set("deleted_at", OffsetDateTime.now()));
+            chunkMapper.update(null, new LambdaUpdateWrapper<Chunk>()
+                    .eq(Chunk::getTenantId, tenantId)
+                    .in(Chunk::getId, ids.subList(i, end))
+                    .isNull(Chunk::getDeletedAt)
+                    .set(Chunk::getDeletedAt, OffsetDateTime.now()));
         }
     }
 
@@ -375,22 +374,22 @@ public class ChunkRepository implements ChunkSearchGateway {
         final int batchSize = 1000;
         for (int i = 0; i < toDelete.size(); i += batchSize) {
             int end = Math.min(i + batchSize, toDelete.size());
-            chunkMapper.update(null, new UpdateWrapper<Chunk>()
-                    .eq("tenant_id", tenantId)
-                    .in("id", toDelete.subList(i, end))
-                    .isNull("deleted_at")
-                    .set("deleted_at", OffsetDateTime.now()));
+            chunkMapper.update(null, new LambdaUpdateWrapper<Chunk>()
+                    .eq(Chunk::getTenantId, tenantId)
+                    .in(Chunk::getId, toDelete.subList(i, end))
+                    .isNull(Chunk::getDeletedAt)
+                    .set(Chunk::getDeletedAt, OffsetDateTime.now()));
         }
         return toDelete;
     }
 
     /** tenant + knowledge 软删。 */
     public void deleteChunksByKnowledgeId(long tenantId, String knowledgeId) {
-        chunkMapper.update(null, new UpdateWrapper<Chunk>()
-                .eq("tenant_id", tenantId)
-                .eq("knowledge_id", knowledgeId)
-                .isNull("deleted_at")
-                .set("deleted_at", OffsetDateTime.now()));
+        chunkMapper.update(null, new LambdaUpdateWrapper<Chunk>()
+                .eq(Chunk::getTenantId, tenantId)
+                .eq(Chunk::getKnowledgeId, knowledgeId)
+                .isNull(Chunk::getDeletedAt)
+                .set(Chunk::getDeletedAt, OffsetDateTime.now()));
     }
 
     /**
@@ -401,32 +400,32 @@ public class ChunkRepository implements ChunkSearchGateway {
         if (knowledgeIds == null || knowledgeIds.isEmpty()) {
             return;
         }
-        chunkMapper.update(null, new UpdateWrapper<Chunk>()
-                .eq("tenant_id", tenantId)
-                .in("knowledge_id", knowledgeIds)
-                .isNull("deleted_at")
-                .set("deleted_at", OffsetDateTime.now()));
+        chunkMapper.update(null, new LambdaUpdateWrapper<Chunk>()
+                .eq(Chunk::getTenantId, tenantId)
+                .in(Chunk::getKnowledgeId, knowledgeIds)
+                .isNull(Chunk::getDeletedAt)
+                .set(Chunk::getDeletedAt, OffsetDateTime.now()));
     }
 
     // ── 私有 ────────────────────────────────────────────────────────────────
 
-    private QueryWrapper<Chunk> pagedFilter(long tenantId, String knowledgeId, List<String> chunkTypes,
+    private LambdaQueryWrapper<Chunk> pagedFilter(long tenantId, String knowledgeId, List<String> chunkTypes,
             List<String> tagIds, String keyword, String searchField, String knowledgeType, Boolean isEnabled) {
-        QueryWrapper<Chunk> w = new QueryWrapper<Chunk>()
-                .eq("tenant_id", tenantId)
-                .eq("knowledge_id", knowledgeId)
-                .isNull("deleted_at");
+        LambdaQueryWrapper<Chunk> w = new LambdaQueryWrapper<Chunk>()
+                .eq(Chunk::getTenantId, tenantId)
+                .eq(Chunk::getKnowledgeId, knowledgeId)
+                .isNull(Chunk::getDeletedAt);
         if (chunkTypes == null || chunkTypes.isEmpty()) {
             w.apply("1 = 0");
         } else {
-            w.in("chunk_type", chunkTypes);
+            w.in(Chunk::getChunkType, chunkTypes);
         }
-        w.in("status", STATUS_INDEXED, STATUS_DEFAULT);
+        w.in(Chunk::getStatus, STATUS_INDEXED, STATUS_DEFAULT);
         if (tagIds != null && !tagIds.isEmpty()) {
-            w.in("tag_id", tagIds);
+            w.in(Chunk::getTagId, tagIds);
         }
         if (isEnabled != null) {
-            w.eq("is_enabled", isEnabled);
+            w.eq(Chunk::isIsEnabled, isEnabled);
         }
         if (!keyword.isEmpty()) {
             String like = "%" + keyword + "%";
@@ -435,7 +434,8 @@ public class ChunkRepository implements ChunkSearchGateway {
                 w.apply("content LIKE {0}", like);
                 return w;
             }
-            // FAQ：按 searchField 切 JSON 路径（PG ILIKE / 非 PG 是 MySQL 语法）
+            // FAQ：按 searchField 切 JSON 路径（PG ILIKE / 非 PG 是 MySQL 语法）。
+            // JSON 路径不是实体属性，Lambda 表达不了——保留 raw apply（{0} 占位参数化，无注入面）
             switch (searchField == null ? "" : searchField) {
                 case "standard_question" -> w.apply(postgres
                         ? "metadata->>'standard_question' ILIKE {0}"

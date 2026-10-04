@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
@@ -235,13 +235,13 @@ public class KnowledgeCloneService {
     /** knowledge 软删 + chunk 软删。 */
     private void removeKnowledgeRow(String knowledgeId) {
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
-        knowledgeMapper.update(null, new UpdateWrapper<Knowledge>()
-                .eq("id", knowledgeId)
-                .isNull("deleted_at")
-                .set("deleted_at", now));
-        chunkMapper.update(null, new UpdateWrapper<Chunk>()
-                .eq("knowledge_id", knowledgeId)
-                .set("deleted_at", now));
+        knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, knowledgeId)
+                .isNull(Knowledge::getDeletedAt)
+                .set(Knowledge::getDeletedAt, now));
+        chunkMapper.update(null, new LambdaUpdateWrapper<Chunk>()
+                .eq(Chunk::getKnowledgeId, knowledgeId)
+                .set(Chunk::getDeletedAt, now));
     }
 
     /** 行级克隆：新 knowledge id + 新 chunk id（向量/文件对象不复制，见 startKBClone 差异）。 */

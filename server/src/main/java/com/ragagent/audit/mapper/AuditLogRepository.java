@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.audit.domain.AuditLogQuery;
 import com.ragagent.audit.domain.AuditOutcome;
+import com.ragagent.common.mybatis.PageRequests;
 import org.springframework.stereotype.Component;
 
 /**
@@ -25,7 +26,7 @@ import org.springframework.stereotype.Component;
  *   <li><b>唯一索引 / 外键</b>：均无。</li>
  *   <li><b>自动时间戳</b>：无（本表没有 updated_at）。</li>
  *   <li><b>LIMIT</b>：默认 50、硬上限 100（见 {@link #DEFAULT_LIMIT} / {@link #MAX_LIMIT}），
- *       经 {@code .last("LIMIT n")} 下推——n 已先夹到安全区间。</li>
+ *       经 {@code PageRequests.cap} 下推——n 已先夹到安全区间。</li>
  * </ol>
  */
 @Component
@@ -104,9 +105,10 @@ public class AuditLogRepository {
                 w.eq(AuditLog::getScopeType, "");
             }
         }
-        w.orderByDesc(AuditLog::getId).last("LIMIT " + limit);
+        w.orderByDesc(AuditLog::getId);
 
-        List<AuditLog> rows = mapper.selectList(w);
+        // 行帽 LIMIT 由分页插件生成（原 .last("LIMIT n") 拼接退役）
+        List<AuditLog> rows = mapper.selectList(PageRequests.cap(limit), w);
         // 无行时统一返回空列表（响应体的 null vs [] 由控制器决定，见 AuditLogController）。
         return rows == null ? Collections.emptyList() : rows;
     }

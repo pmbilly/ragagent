@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.common.web.ZeroTimeSerializer;
 import com.ragagent.common.web.PgJsonTypeHandler;
 import com.ragagent.datasource.domain.DataSourceConstants;
@@ -85,51 +85,51 @@ public class SyncLogRepository {
         if (log.getId().isEmpty()) {
             throw new DataSourceException("sync log id is empty");
         }
-        UpdateWrapper<SyncLog> w = new UpdateWrapper<SyncLog>().eq("id", log.getId());
+        LambdaUpdateWrapper<SyncLog> w = new LambdaUpdateWrapper<SyncLog>().eq(SyncLog::getId, log.getId());
         // AutoUpdateTime：无条件覆盖
-        w.set("updated_at", OffsetDateTime.now());
+        w.set(SyncLog::getUpdatedAt, OffsetDateTime.now());
 
         if (!ZeroTimeSerializer.isZeroValue(log.getCreatedAt())) {
-            w.set("created_at", log.getCreatedAt());
+            w.set(SyncLog::getCreatedAt, log.getCreatedAt());
         }
         if (nonEmpty(log.getDataSourceId())) {
-            w.set("data_source_id", log.getDataSourceId());
+            w.set(SyncLog::getDataSourceId, log.getDataSourceId());
         }
         if (log.getTenantId() != null && log.getTenantId() != 0L) {
-            w.set("tenant_id", log.getTenantId());
+            w.set(SyncLog::getTenantId, log.getTenantId());
         }
         if (nonEmpty(log.getStatus())) {
-            w.set("status", log.getStatus());
+            w.set(SyncLog::getStatus, log.getStatus());
         }
         if (!ZeroTimeSerializer.isZeroValue(log.getStartedAt())) {
-            w.set("started_at", log.getStartedAt());
+            w.set(SyncLog::getStartedAt, log.getStartedAt());
         }
         if (log.getFinishedAt() != null) {
-            w.set("finished_at", log.getFinishedAt());
+            w.set(SyncLog::getFinishedAt, log.getFinishedAt());
         }
         if (log.getItemsTotal() != 0) {
-            w.set("items_total", log.getItemsTotal());
+            w.set(SyncLog::getItemsTotal, log.getItemsTotal());
         }
         if (log.getItemsCreated() != 0) {
-            w.set("items_created", log.getItemsCreated());
+            w.set(SyncLog::getItemsCreated, log.getItemsCreated());
         }
         if (log.getItemsUpdated() != 0) {
-            w.set("items_updated", log.getItemsUpdated());
+            w.set(SyncLog::getItemsUpdated, log.getItemsUpdated());
         }
         if (log.getItemsDeleted() != 0) {
-            w.set("items_deleted", log.getItemsDeleted());
+            w.set(SyncLog::getItemsDeleted, log.getItemsDeleted());
         }
         if (log.getItemsSkipped() != 0) {
-            w.set("items_skipped", log.getItemsSkipped());
+            w.set(SyncLog::getItemsSkipped, log.getItemsSkipped());
         }
         if (log.getItemsFailed() != 0) {
-            w.set("items_failed", log.getItemsFailed());
+            w.set(SyncLog::getItemsFailed, log.getItemsFailed());
         }
         if (nonEmpty(log.getErrorMessage())) {
-            w.set("error_message", log.getErrorMessage());
+            w.set(SyncLog::getErrorMessage, log.getErrorMessage());
         }
         if (log.getResult() != null) {
-            w.set("result", log.getResult(), PG_JSON);
+            w.set(SyncLog::getResult, log.getResult(), PG_JSON);
         }
         mapper.update(null, w);
     }
@@ -148,20 +148,20 @@ public class SyncLogRepository {
         if (log.getId().isEmpty()) {
             throw new DataSourceException("sync log id is empty");
         }
-        UpdateWrapper<SyncLog> w = new UpdateWrapper<SyncLog>().eq("id", log.getId());
-        w.set("status", log.getStatus());
-        w.set("finished_at", log.getFinishedAt());
-        w.set("items_total", log.getItemsTotal());
-        w.set("items_created", log.getItemsCreated());
-        w.set("items_updated", log.getItemsUpdated());
-        w.set("items_deleted", log.getItemsDeleted());
-        w.set("items_skipped", log.getItemsSkipped());
-        w.set("items_failed", log.getItemsFailed());
-        w.set("error_message", log.getErrorMessage());
+        LambdaUpdateWrapper<SyncLog> w = new LambdaUpdateWrapper<SyncLog>().eq(SyncLog::getId, log.getId());
+        w.set(SyncLog::getStatus, log.getStatus());
+        w.set(SyncLog::getFinishedAt, log.getFinishedAt());
+        w.set(SyncLog::getItemsTotal, log.getItemsTotal());
+        w.set(SyncLog::getItemsCreated, log.getItemsCreated());
+        w.set(SyncLog::getItemsUpdated, log.getItemsUpdated());
+        w.set(SyncLog::getItemsDeleted, log.getItemsDeleted());
+        w.set(SyncLog::getItemsSkipped, log.getItemsSkipped());
+        w.set(SyncLog::getItemsFailed, log.getItemsFailed());
+        w.set(SyncLog::getErrorMessage, log.getErrorMessage());
         if (log.getResult() != null) {
-            w.set("result", log.getResult(), PG_JSON);
+            w.set(SyncLog::getResult, log.getResult(), PG_JSON);
         }
-        w.set("updated_at", OffsetDateTime.now());
+        w.set(SyncLog::getUpdatedAt, OffsetDateTime.now());
         mapper.update(null, w);
     }
 
