@@ -778,6 +778,15 @@
 - **口径**：**同一个概念在不同"面"上可能有不同键名约定**（本次：KB 配置 camel / 运行时规则 snake）——搬运时必须**显式转换**，且读侧要能容忍历史数据；`B3b` 只把 KB 配置的**写入侧 + 存量数据**统一了，读取侧漏改会以"整页崩"的形式暴露（比静默更强的信号）。
 - **遗留**：smoke 空间的 `b3b-camel-kb` 现带一组完整 camel 规则（验证写入时产生，可当样板）、`d1-smoke-kb` 留 2 条；**用户空间（tenant 11）数据未动**。
 
+**✅ B68（2026-10-04，智能体「推荐问题」恒空：读取侧键名与写入侧不一致）**
+- **触发**：用户问「知识库 `bc2a8d00…`（GACI）有没有自动生成问题？」——顺带查出同族隐性 bug。
+- **先回答用户**：**有**。`question_generation_config = {enabled: true, questionCount: 4}`；该库 24 个 chunk 里 **23 个 text chunk 都带非空 `generatedQuestions`**（多数 4 个/块，`generatedQuestionsRevision=0` 即首次自动生成），第 24 个是 `summary` 块（本就不生成）✓。
+- **查出的 bug**：智能体推荐问题的**读取侧**查 **snake** `generated_questions` —— `AgentQuestionMapper.listRecentDocumentChunksWithQuestions` 的 `LIKE '%generated_questions%'` 过滤 + `AgentSuggestedQuestions.firstGeneratedQuestion` 的 `get("generated_questions")`；而**写入侧是 camel** `DocumentChunkMetadata.generatedQuestions`（Jackson 默认 camel），**从未有过改名迁移**，全库实测 **31 个 chunk 全 camel、0 snake** ⇒ SQL 恒命中 0 行 + 解析恒 null ⇒ **智能体「推荐问题」（"你可以这样问我"）永远为空**（真机：`GET /api/v1/agents/builtin-quick-answer/suggested-questions` 返回 `[]`，而库里明明有数据）。
+- **修复**：SQL 改为 **camel 主 + OR 容忍 snake 存量行**；解析改为 **camel 优先、snake 兜底**（并兼容纯字符串数组元素）；三处注释同步（说明键名依据 = 写入侧 Java 域类型）。**未动写入侧**（本来就对）。
+- **验证（真机红→绿）**：往 smoke 的一个 chunk 播一条 camel 生成问题 → 修复前端点返回 **`[]`**；重启后端（重新编译）后端点返回该问题 ✓（`{"question":"…","source":"document","knowledgeBaseId":"…"}`）；验完已把探针数据移除（`metadata - 'generatedQuestions'`）。
+- **测试**：新增 `AgentSuggestedQuestionsTest`（2 条）——① 解析：camel 命中、snake 回落、纯字符串元素、空数组/缺键/null/畸形 JSON 一律 null 不抛错；② **扫描 `AgentQuestionMapper` 所有 `@Select`，凡按生成问题键过滤的必须用 camel 且容忍 snake**（并断言至少扫到 1 条，防守卫空转；第一版钉死方法名 `listRecommendedFaqChunks` 得到假红——那是 FAQ 面，不按生成问题过滤）。**两个红态探针**（SQL 改回 snake-only / 解析改回 snake-only）均点名报红。后端 **4,706 测试 0 失败 + spotlessCheck 绿**。
+- **口径补一条**：本仓反复出现「**写入侧 camel、读取侧 snake（或反之）**」这一类错（B58 信封 / B62 键 / B66 裸载荷 / B67 规则面 / B68 这里）——凡按**字面键名**过滤或取值的地方（SQL `LIKE`、JSON path、`?` 判键），必须与写入侧对齐，并尽量容忍历史形态；静态检查抓不到，只能靠"以写入侧为基准 + 数据实测"来钉。
+
 **✅ B58（2026-10-04，旧信封读法清剿：Go `{success,data}` 残留 → Java 裸载荷）**
 - **触发**：用户点检 `?section=integration-api` 报「加载 API 集成设置失败」。
 - **根因**：`/auth/me` 是**裸信封**（`{user, tenant, memberships, tenantRequired, capabilities, preferenceDefaults}`，`tenant` 在顶层），而页面读 `userResp.data.tenant`（Go 时代 `{success,data}` 形状）→ 恒 undefined → 直接抛错。curl 实测坐实（200 + 顶层键清单里无 `data`）。

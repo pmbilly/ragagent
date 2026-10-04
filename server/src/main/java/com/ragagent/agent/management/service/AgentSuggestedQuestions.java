@@ -238,13 +238,23 @@ public final class AgentSuggestedQuestions {
         }
     }
 
-    /** metadata jsonb → generated_questions[0].question。 */
+    /**
+     * metadata jsonb → generatedQuestions[0].question。
+     *
+     * <p>键名 camel（写入侧 {@code DocumentChunkMetadata} 即 camel；B68 修复前这里读的是
+     * snake {@code generated_questions}，导致推荐问题恒空）。为兼容可能的 Go 期存量行，
+     * 缺失时回落到 snake 变体。</p>
+     */
     static String firstGeneratedQuestion(String metadata) {
         if (metadata == null || metadata.isEmpty()) {
             return null;
         }
         try {
-            JsonNode qs = MAPPER.readTree(metadata).get("generated_questions");
+            JsonNode root = MAPPER.readTree(metadata);
+            JsonNode qs = root.get("generatedQuestions");
+            if (qs == null) {
+                qs = root.get("generated_questions");
+            }
             if (qs == null || !qs.isArray() || qs.isEmpty()) {
                 return null;
             }

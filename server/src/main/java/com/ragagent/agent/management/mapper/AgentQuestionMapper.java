@@ -44,9 +44,14 @@ public interface AgentQuestionMapper {
             @Param("limit") int limit);
 
     /**
-     * metadata 带非空 generated_questions 的 text chunk。jsonb 数组长度判断
+     * metadata 带非空 generatedQuestions 的 text chunk。jsonb 数组长度判断
      * 统一改写成 CAST + LIKE 近似（键名必然出现在 jsonb 原文里；false positive
      * 由 Java 侧解析兜底），单语句通吃 PG/H2。
+     *
+     * <p>键名是 **camelCase** `generatedQuestions`：写入侧是 Java 域类型
+     * {@code DocumentChunkMetadata.generatedQuestions}（Jackson 默认 camel），
+     * 从未有过改名迁移、全库实测也全是 camel。这里仍 OR 上 snake 变体，
+     * 只为容忍可能的 Go 期存量行（读取侧 {@code firstGeneratedQuestion} 同样兼容）。</p>
      */
     @Select("<script>"
             + "SELECT id, knowledge_id AS \"knowledgeId\", knowledge_base_id AS \"knowledgeBaseId\", "
@@ -54,7 +59,8 @@ public interface AgentQuestionMapper {
             + "WHERE tenant_id = #{tenantId} AND chunk_type = 'text' "
             + "AND status IN (0, 2) AND is_enabled = TRUE "
             + "AND metadata IS NOT NULL "
-            + "AND CAST(metadata AS VARCHAR(1048576)) LIKE '%generated_questions%' "
+            + "AND (CAST(metadata AS VARCHAR(1048576)) LIKE '%generatedQuestions%' "
+            + "OR CAST(metadata AS VARCHAR(1048576)) LIKE '%generated_questions%') "
             + "<if test='hasKb and hasKnowledge'> AND (knowledge_base_id IN "
             + "<foreach item='i' collection='kbIds' open='(' separator=',' close=')'>#{i}</foreach>"
             + " OR knowledge_id IN "
