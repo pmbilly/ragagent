@@ -48,9 +48,6 @@ final class WikiKbAccessGuard {
      *       {@code {"error":"error code: 400, error message: Wiki feature is not enabled for this knowledge base"}}。</li>
      * </ol>
      *
-     * <p>共享 agent 的 {@code agent_id}/{@code agent_source_tenant_id} 取自 query——经
-     * {@code RequestContextHolder} 取当前请求，不改动端点签名。</p>
-     *
      * @param write 该端点是否属于写一侧
      */
     KnowledgeBase requireWikiKB(String kbId, boolean write) {

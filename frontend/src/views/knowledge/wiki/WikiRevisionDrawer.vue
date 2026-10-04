@@ -25,8 +25,8 @@
               <span class="wiki-rev-version">v{{ rev.version }}</span>
             </div>
             <div class="wiki-rev-item-secondary">
-              <span>{{ sourceLabel(rev.edit_source) }}</span>
-              <span class="wiki-rev-time">{{ formatShortTime(rev.edited_at) }}</span>
+              <span>{{ sourceLabel(rev.editSource) }}</span>
+              <span class="wiki-rev-time">{{ formatShortTime(rev.editedAt) }}</span>
             </div>
           </div>
 
@@ -207,8 +207,8 @@ const versionRangeLabel = computed(() => {
 const contextHint = computed(() => {
   if (viewMode.value === 'raw' && selectedRevision.value) {
     return [
-      sourceLabel(selectedRevision.value.edit_source),
-      formatShortTime(selectedRevision.value.edited_at),
+      sourceLabel(selectedRevision.value.editSource),
+      formatShortTime(selectedRevision.value.editedAt),
     ].filter(Boolean).join(' · ')
   }
   if (viewMode.value === 'incremental') {

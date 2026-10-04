@@ -302,8 +302,8 @@ const submitPasswordChange = async () => {
   passwordSubmitting.value = true
   try {
     const resp = await changePassword({
-      old_password: passwordForm.oldPassword,
-      new_password: passwordForm.newPassword,
+      oldPassword: passwordForm.oldPassword,
+      newPassword: passwordForm.newPassword,
     })
     if (!resp.success) {
       MessagePlugin.error(resp.message || t('userProfile.changePassword.failed'))

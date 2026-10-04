@@ -46,8 +46,8 @@ export interface LoginResponse {
     business?: string
     storageQuota?: number
     storageUsed?: number
-    created_at?: string
-    updated_at?: string
+    createdAt?: string
+    updatedAt?: string
   } | null
   memberships?: MembershipInfo[]
   token?: string
@@ -154,8 +154,8 @@ export function userInfoFromApi(
     canAccessAllTenants: u?.canAccessAllTenants === true,
     isSystemAdmin: u?.isSystemAdmin === true,
     preferences: u?.preferences,
-    createdAt: u?.created_at || new Date().toISOString(),
-    updatedAt: u?.updated_at || new Date().toISOString(),
+    createdAt: u?.createdAt || new Date().toISOString(),
+    updatedAt: u?.updatedAt || new Date().toISOString(),
   }
 }
 
@@ -402,8 +402,8 @@ export async function logout(): Promise<{ success: boolean; message?: string }> 
 }
 
 export interface ChangePasswordRequest {
-  old_password: string
-  new_password: string
+  oldPassword: string
+  newPassword: string
 }
 
 /** Map change-password API failures to localized UI strings. */
@@ -474,7 +474,7 @@ export interface InviteLookup {
   tenantId: number
   tenantName?: string
   role: string
-  expires_at: string
+  expiresAt: string
 }
 
 export interface InviteLookupResponse {

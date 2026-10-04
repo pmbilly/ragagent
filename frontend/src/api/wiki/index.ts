@@ -210,7 +210,7 @@ export interface WikiPageRevision {
   id: string;
   tenantId: number;
   knowledgeBaseId: string;
-  page_id: string;
+  pageId: string;
   slug: string;
   version: number;
   title: string;
@@ -219,9 +219,9 @@ export interface WikiPageRevision {
   content?: string;
   summary: string;
   aliases: string[];
-  edit_source: string;
-  editor_id: string;
-  edited_at: string;
+  editSource: string;
+  editorId: string;
+  editedAt: string;
   createdAt: string;
 }
 

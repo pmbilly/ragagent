@@ -252,18 +252,16 @@ const isLive = computed<boolean>(() => {
   return isPolling(props.parseStatus)
 })
 
-// Walk every node in the tree and return the freshest updated_at /
-// finishedAt timestamp we can see. Used by the quiescent grace
+// Walk every node in the tree and return the freshest finishedAt /
+// startedAt timestamp we can see. Used by the quiescent grace
 // window below to decide "did this trace finish recently, or is it
 // just an old completed one we shouldn't waste polls on?"
 function spanTreeLastActivity(node?: SpanNode): number {
   if (!node) return 0
   let max = 0
   const stamps: (string | null | undefined)[] = [
-    (node as any).updated_at,
     node.finishedAt,
     node.startedAt,
-    (node as any).created_at,
   ]
   for (const s of stamps) {
     const t = parseTime(s || undefined)

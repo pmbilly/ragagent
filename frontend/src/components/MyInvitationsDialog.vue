@@ -115,7 +115,7 @@ function roleTagTheme(role: TenantRole): 'primary' | 'warning' | 'success' | 'de
 }
 
 function inviterDisplay(row: TenantInvitation): string {
-  return row.inviter_name?.trim() || row.inviter_email?.trim() || row.invitedBy || '—'
+  return row.inviterName?.trim() || row.inviterEmail?.trim() || row.invitedBy || '—'
 }
 
 function formatDate(s: string): string {

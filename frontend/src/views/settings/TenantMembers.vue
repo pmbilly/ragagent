@@ -120,7 +120,7 @@
                   </template>
                   <template v-else>
                     <span class="member-name">{{ inviteePrimary(row) }}</span>
-                    <span v-if="row.invitee_email && row.invitee_name" class="member-email">{{ row.invitee_email
+                    <span v-if="row.inviteeEmail && row.inviteeName" class="member-email">{{ row.inviteeEmail
                       }}</span>
                   </template>
                 </div>
@@ -161,7 +161,7 @@
                   :content="row.isShareLink
                     ? $t('tenantInvitation.shareLink.revokeConfirm')
                     : $t('tenantInvitation.revoke.confirmBody', {
-                        email: row.invitee_email || row.inviteeUserId,
+                        email: row.inviteeEmail || row.inviteeUserId,
                       })"
                   :confirm-btn="{ content: $t('tenantInvitation.revoke.confirm'), theme: 'danger' }"
                   :cancel-btn="$t('common.cancel')" placement="left" @confirm="doRevokeInvitation(row)">
@@ -888,11 +888,11 @@ function invitationStatusTheme(s: TenantInvitation['status']): 'primary' | 'succ
 }
 
 function inviteePrimary(row: TenantInvitation): string {
-  return row.invitee_name?.trim() || row.invitee_email?.trim() || row.inviteeUserId
+  return row.inviteeName?.trim() || row.inviteeEmail?.trim() || row.inviteeUserId
 }
 
 function inviterPrimary(row: TenantInvitation): string {
-  return row.inviter_name?.trim() || row.inviter_email?.trim() || row.invitedBy || '—'
+  return row.inviterName?.trim() || row.inviterEmail?.trim() || row.invitedBy || '—'
 }
 
 // loadInvitations is called from the same trigger as loadMembers so

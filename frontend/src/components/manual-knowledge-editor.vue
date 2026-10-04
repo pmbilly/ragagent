@@ -487,7 +487,7 @@ const parseManualMetadata = (
       return {
         content: parsed.content || '',
         status,
-        updatedAt: parsed.updated_at || parsed.updatedAt,
+        updatedAt: parsed.updatedAt,
       }
     }
   } catch (error) {

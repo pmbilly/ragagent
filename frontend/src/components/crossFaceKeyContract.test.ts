@@ -20,6 +20,9 @@ import test from 'node:test'
  *    display_name / error_message 属内部映射层键（接口给的是 fileName/errorMessage），
  *    写读两套命名会静默失效 —— 其中 error_message 全仓无人读，失败原因因此在
  *    卡片上不可见。（2026-10-04 收口，见 §15.1.1）
+ * ④ api 面时间键 `*_at` 一律 camel：`api/auth` 曾读 user.created_at（接口给
+ *    createdAt）→ 兜底把「注册时间」写成当前时刻；邀请行的 responded_at、
+ *    wiki 修订的 edited_at 同源。冻结/直出载荷按面白名单登记（见用例）。
  */
 const SRC = fileURLToPath(new URL('..', import.meta.url))
 
@@ -168,4 +171,133 @@ test('知识面卡片视图模型：键一律 camel（防 snake 遗留回流）'
   // （紧凑模式时间线只渲染阶段点+耗时，不含 lastError）。
   const card = readFileSync(join(SRC, 'views/knowledge/components/DocumentCardView.vue'), 'utf8')
   assert.match(card, /\berrorMessage\b/, 'DocumentCardView: 需消费接口 errorMessage（否则失败原因不可见）')
+})
+
+test('api 面时间键：`*_at` 一律 camel（防 snake 读到 undefined）', () => {
+  // 2026-10-04 续：api 层是线格式面，写 snake 时间键 = 读恒 undefined。
+  // 实锤过的四处：api/auth 的 user.created_at（兜底把「注册时间」写成当前时刻）、
+  // 邀请行的 created_at/responded_at、wiki 修订的 edited_at、InviteLookup.expires_at。
+  // 现有 python 守卫（check-fe-contract-keys.py）抓不到这类：created_at 在 SQL/DB
+  // 列名里到处都是，被判成「后端仍认 snake」而跳过 —— 本用例是它的补位。
+  //
+  // 白名单是「按面」而不是漏检，每条都要写明理由：
+  const whitelist: Record<string, string> = {
+    'api/chat/index.ts': 'SSE 事件本地游标（data.created_at 是事件协议键，注释已声明）',
+    'api/chat/streame.ts': 'TTFB 调试日志字段（非契约键）',
+    'api/system/index.ts': '系统设置键 + 沙箱/任务引擎直出载荷（§15.2 纪律：不换）',
+    'api/initialization/index.ts': 'Ollama 第三方响应字段 modified_at（对端 API 契约）',
+  }
+  const SNAKE_AT = /(?<![A-Za-z0-9_])([a-z][a-z0-9]*(?:_[a-z0-9]+)*_at)(?![A-Za-z0-9_])/g
+  const targets = walk(join(SRC, 'api')).filter(
+    (f) => !f.endsWith('.test.ts') && !Object.keys(whitelist).some((w) => f.endsWith(w)),
+  )
+  assert.ok(targets.length > 0, '未扫到 api 面文件（守卫需同步更新）')
+  for (const file of targets) {
+    readFileSync(file, 'utf8').split('\n').forEach((line, idx) => {
+      const code = line.split('//')[0]
+      for (const m of code.matchAll(SNAKE_AT)) {
+        assert.fail(
+          `${file}:${idx + 1}: 时间键 ${m[1]} 应改 camel（接口下发 camel，snake 读到的恒为 undefined）。`
+            + '若确属冻结/直出载荷，请加入本用例白名单并写明理由。',
+        )
+      }
+    })
+  }
+
+  // 钉住用户可见的那处：个人资料页「注册时间」读的就是这个字段。
+  const auth = readFileSync(join(SRC, 'api/auth/index.ts'), 'utf8')
+  assert.match(auth, /createdAt:\s*u\?\.createdAt/,
+    'api/auth: userInfoFromApi 必须读 user.createdAt（camel），否则注册时间被兜底写成当前时刻')
+})
+
+test('api 面 snake 记号棘轮：只许减不许增', () => {
+  // 2026-10-04 扩面：由「`*_at` 全禁」升级为「api 面所有 snake 声明/读取一律登记」。
+  // 动因：同一天在 api 面发现并修掉 7 处 snake 契约键（auth 时间键 / 邀请 4 字段 +
+  // responded_at + created_at / wiki edited_at / 改密 old_password+new_password），
+  // 其中「修改密码」是实测恒失败的故障（snake body → newPassword/oldPassword: 不能为空）。
+  // 剩余 40 处存量（扫描日 2026-10-04）多为冻结/直出/查询参数面，但**未逐条对后端核实**，
+  // 因此先冻结成棘轮：新增一处即红；清理一处后从 BASELINE 删除（只许减）。
+  // 逐条核实（把「待核实」变成结论：改 camel，或改成具体理由）留给后续核查批。
+  const FACE_WHITELIST: Record<string, string> = {
+    'api/chat/': 'SSE/事件载荷与本地游标（事件协议面）',
+    'api/system/index.ts': '系统设置键 + 沙箱/任务引擎直出载荷（§15.2：不换）',
+    'api/initialization/index.ts': 'Ollama 第三方响应（对端键名）',
+    'api/retrieval.ts': '检索参数设置键（系统设置面）',
+    'api/model/modelUsage.ts': '后端 putObject 亲手构造的 snake 载荷（前后端一致）',
+  }
+  const BASELINE: Record<string, string> = {
+    'api/agent/index.ts:file_types': '解析引擎规则内部键（后端 ParserEngineRules 按 file_types 读，两侧一致）',
+    'api/agent/index.ts:any_of': '待核实：agent 类型过滤载荷',
+    'api/agent/index.ts:all_of': '待核实：agent 类型过滤载荷',
+    'api/agent/index.ts:none_of': '待核实：agent 类型过滤载荷',
+    'api/agent/index.ts:kb_filter': '待核实：agent 类型过滤载荷',
+    'api/agent/index.ts:reflection_enabled': '待核实：agent 配置载荷',
+    'api/agent/index.ts:sandbox_config_id': '待核实：agent 配置载荷',
+    'api/agent/index.ts:welcome_message': '待核实：agent 配置载荷（后端 agent 面无同名字面量，疑似只在前端往返）',
+    'api/agent/index.ts:knowledge_base_ids': '待核实：agent 绑定知识库列表',
+    'api/auth/index.ts:browser_search_instructions': '待核实：部署能力/开关（settings 直出形态）',
+    'api/auth/index.ts:oidc_only_login': '待核实：部署能力/开关（settings 直出形态）',
+    'api/auth/index.ts:owner_id': '待核实：空间知识库摘要',
+    'api/auth/index.ts:knowledge_bases': '待核实：空间知识库摘要',
+    'api/auth/index.ts:creator_id': '待核实：空间知识库摘要',
+    'api/auth/index.ts:creator_name': '待核实：空间知识库摘要',
+    'api/auth/index.ts:document_count': '待核实：空间知识库摘要',
+    'api/auth/index.ts:chunk_count': '待核实：空间知识库摘要',
+    'api/auth/index.ts:is_default': '待核实：空间知识库摘要',
+    'api/chat-history.ts:embedding_model_id': '会话历史知识库配置（后端 node.path 按 snake 读取，两侧一致）',
+    'api/chat-history.ts:knowledge_base_id': '会话历史知识库配置（同上）',
+    'api/embed/index.ts:channel_id': 'embed 宿主↔iframe 消息协议键（两侧同为 snake）',
+    'api/embed/index.ts:session_id': 'embed 宿主↔iframe 消息协议键（两侧同为 snake）',
+    'api/knowledge-base/index.ts:tag_ids': '列表筛选查询参数（后端按 snake 接收）',
+    'api/knowledge-base/index.ts:start_time': '列表筛选查询参数（同上）',
+    'api/knowledge-base/index.ts:end_time': '列表筛选查询参数（同上）',
+    'api/mcp-service.ts:require_approval': '待核实：MCP 工具审批字段',
+    'api/wiki/index.ts:page_count': '待核实：wiki 页面树载荷',
+    'api/wiki/index.ts:has_children': '待核实：wiki 页面树载荷',
+    'api/wiki/index.ts:familiar_count': '待核实：wiki 页面树载荷',
+    'api/wiki/index.ts:issue_type': '待核实：wiki 问题载荷',
+    'api/wiki/index.ts:suspected_knowledge_ids': '待核实：wiki 问题载荷',
+    'api/wiki/index.ts:reported_by': '待核实：wiki 问题载荷',
+  }
+  const stripStrings = (line: string): string => line.replace(/'[^']*'|"[^"]*"|`[^`]*`/g, '""')
+  // 不锚定行首：行内对象字面量（`{ some_key: 1 }`）也要抓（初版锚定行首，红态探针漏检）
+  const DECL = /(?<![\w$.])([a-z][a-z0-9]*_[a-z0-9_]+)\??\s*:/
+  const READ = /\.([a-z][a-z0-9]*_[a-z0-9_]+)\b/
+
+  const found = new Map<string, string>() // key → 首个位置
+  const root = SRC.endsWith('/') ? SRC : `${SRC}/`
+  const targets = walk(join(SRC, 'api')).filter(
+    (f) => f.endsWith('.ts') && !f.endsWith('.test.ts')
+      && !Object.keys(FACE_WHITELIST).some((w) => f.includes(w)),
+  )
+  assert.ok(targets.length > 0, '未扫到 api 面文件（守卫需同步更新）')
+  for (const file of targets) {
+    const rel = file.slice(root.length)
+    readFileSync(file, 'utf8').split('\n').forEach((line, idx) => {
+      const code = stripStrings(line.split('//')[0])
+      const tokens = [...code.matchAll(new RegExp(DECL, 'g')), ...code.matchAll(new RegExp(READ, 'g'))]
+      for (const m of tokens) {
+        const token = m[1]
+        if (token.includes('__')) continue
+        const key = `${rel}:${token}`
+        if (!found.has(key)) found.set(key, `${rel}:${idx + 1}`)
+      }
+    })
+  }
+
+  const unexpected = [...found.entries()].filter(([k]) => !(k in BASELINE))
+  if (unexpected.length) {
+    assert.fail(
+      'api 面出现未登记的 snake 记号（接口下发 camel 时读到的恒为 undefined）：\n'
+        + unexpected.map(([k, loc]) => `    ${k}（${loc}）`).join('\n')
+        + '\n  改 camel；若确属冻结/直出/查询参数面，请在 BASELINE 登记理由（或加入 FACE_WHITELIST）。',
+    )
+  }
+  const stale = Object.keys(BASELINE).filter((k) => !found.has(k))
+  if (stale.length) {
+    assert.fail(
+      'BASELINE 有过期条目（已不存在），请删除以保持「只许减」：\n'
+        + stale.map((k) => `    ${k}（原理由：${BASELINE[k]}）`).join('\n'),
+    )
+  }
 })

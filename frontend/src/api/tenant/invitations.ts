@@ -20,17 +20,17 @@ export interface TenantInvitation {
   tenantId: number
   tenantName?: string
   inviteeUserId: string
-  invitee_email?: string
-  invitee_name?: string
+  inviteeEmail?: string
+  inviteeName?: string
   invitedBy?: string | null
-  inviter_email?: string
-  inviter_name?: string
+  inviterEmail?: string
+  inviterName?: string
   role: TenantRole
   status: TenantInvitationStatus
   message?: string
   expiresAt: string
-  responded_at?: string | null
-  created_at: string
+  respondedAt?: string | null
+  createdAt: string
   // inviteUrl is set on share-link rows that are still pending. The
   // backend re-emits it on every list/get so Owners can copy the
   // link on demand without "copy now or revoke" pressure.

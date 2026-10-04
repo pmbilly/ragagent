@@ -644,3 +644,18 @@
 - **守卫（第 4 条 / 第三类形态）**：`components/crossFaceKeyContract.test.ts` 新增「知识面卡片视图模型：键一律 camel」——扫描 `views/knowledge/**` + `hooks/useKnowledgeBase.ts` 不得出现三个旧键名；同时钉住写侧必须提供 `originalFileName` / `displayName`、下载解析必须读 `originalFileName`、卡片必须消费 `errorMessage`（只删旧名不补新名同为断链）。**红态探针**：注入 `error_message` → 该用例红且报出文件与建议键名；还原 → 绿。
 - **验证**：前端全量 **704/704**（原 696 + 其间提交进来的 7 条守卫 + 本批 1 条）、`vue-tsc --build` 0 错误、`scripts/check-fe-contract-keys.py` ✓ 无新增（基线 42 条）。
 - **边界（未动）**：`types/tool-results.ts` + `views/chat/components/tool-results/*` 的 `error_message` / `summary_error_message` 属**工具结果载荷面**的另一套约定，需单独核实后再议，本批不碰。
+
+**✅ B54（2026-10-04，api 面 snake 键收口——12 处真断链 + 裁撤死参数收尾 + 守卫扩面棘轮）**
+- **触发**：B53 之后用户连续追问「前端还有哪些 snake 应该改 camel」→ 从「卡片视图模型」一路查到 **api 线格式面**。逐个定性（前端声明/读取 vs 后端真实键）后发现：api 面不仅有「死声明」，还有**成片的静默断链**。
+- **修复（12 处，全部为「接口下发 camel / 前端读或发 snake」）**：
+  - **改密（实测恒失败，用户可见）**：`api/auth` 的 `ChangePasswordRequest` + `views/settings/UserProfile.vue` 提交处送的是 `old_password/new_password`，后端 record 是 `oldPassword/newPassword` → 无损探针：snake body 恒 400 `newPassword/oldPassword: 不能为空`；camel body 正常报 `Current password is incorrect`。已改 camel。
+  - **auth 时间键**：`userInfoFromApi` 读 `user.created_at/updated_at`（接口只给 camel）→ 兜底 `|| new Date().toISOString()` 把「注册时间」写成**当前时刻**（用户可见）；`activeTenant` 类型两键；`InviteLookup.expires_at` → `expiresAt`。
+  - **邀请面 6 键**：`invitee_email/invitee_name/inviter_email/inviter_name` + `responded_at/created_at`（同接口 `invitedBy`/`expiresAt`/`isShareLink` 本就是 camel）。消费点 5 处（`TenantMembers.vue` 4 + `MyInvitationsDialog.vue` 1）：修前「邀请人」列回落显示**用户 ID**、成员表「被邀请人邮箱」行**恒不显示**、撤销确认弹窗显示 ID。实测响应键全 camel（`invitee_email` 不存在）。
+  - **wiki 修订**：类型 `edit_source/editor_id/edited_at/page_id` + `WikiRevisionDrawer.vue` 4 处消费点 —— 该消费点是**修完类型后 `vue-tsc` 报错抓出**的（修订列表的编辑来源/时间此前恒空），提醒：类型修正本身就是探测器。
+  - **KB 复制 / 标签排序**：`copyKnowledgeBase` 的 `source_id/target_id` → camel（探针：snake → 400 `sourceId: 不能为空`；camel → 404 正常解析；该函数目前无调用方，属待接线代码，键先对齐）；两个标签接口的 `sort_order` → `sortOrder`（调用方只传 `name`，暂未触发）。
+  - **清理（死读 + 兜底掩盖）**：`knowledge-processing-timeline.vue` 去掉 snake 时间戳读取（有 camel 兜底故无感）、`manual-knowledge-editor.vue` 去掉 `parsed.updated_at` 兜底。
+- **已核实为合法（不动，登记理由）**：`file_types`（后端 `ParserEngineRules` 按 snake 读规则 jsonb）；`tag_ids/start_time/end_time`（KB 列表筛选**查询参数**，后端按 snake 接收）；embed `channel_id/session_id`（宿主↔iframe 消息协议，两侧一致）；`chat-history` 的 `embedding_model_id/knowledge_base_id`（后端 `node.path(...)` 读 jsonb）；`modelUsage` snake 载荷（后端 `putObject` 构造）；SSE/事件面、系统设置与第三方（Ollama `modified_at`）。
+- **裁撤死参数收尾**：`api/knowledge-base` **5 个接口**（列表 / 按 id 取 / 详情 / 批量 / 搜索）透传的 `agent_id`/`agent_source_tenant_id` 全删；`WikiKbAccessGuard` 描述已裁撤共享 agent 的过期 javadoc 删除。**根因**：空间分享裁撤（`d4d63e09`）按「消费点清单」清理（视图层传递链 + 后端读取分支都清了），**漏了夹在中间的 API 封装层**；且调用方已不再传参 → 死代码静默存活 4 天（TS 可选参数不报错、守卫不管"没人用的参数"）。
+- **守卫（第 5、6 条）**：`crossFaceKeyContract.test.ts` —— ⑤ api 面 `*_at` 一律 camel（含 auth 映射钉住，防「注册时间」再退回）；⑥ **api 面 snake 记号棘轮**：32 键基线（8 键已核实合法 + 24 键标「待核实」）+ 5 个面级白名单（chat / system / initialization / retrieval / modelUsage）+ **只许减**（清理后不删基线行会报过期）+ 扫描前剥离字符串字面量（避免把枚举值 `'rbac.member_added'` 当键）。**红态探针两轮**：首版锚定行首 → 漏检行内对象字面量（`{ some_new_key: 1 }` 探针未红），收紧为 `(?<![\w$.])…` 后精确报出 `api/mcp-service.ts:some_new_key`。
+- **验证**：前端全量 **706/706**、`vue-tsc --build` 0 错误、`check-fe-contract-keys.py` 无新增（基线 42 条）、后端 `compileJava + spotlessCheck` 绿（javadoc 改动）；守卫红/绿态各验一次。
+- **遗留（B55 候选）**：棘轮基线里 24 处「待核实」需逐条对后端核实（agent 配置/类型过滤 8、auth 空间知识库摘要与部署开关 9、wiki 页面树/问题载荷 6、mcp `require_approval` 1）。本轮已证明该清单里**藏着真断链**（改密恒失败、KB 复制键错），建议下一批按「读/写方向 + 真实接口实测」逐条给出结论。
