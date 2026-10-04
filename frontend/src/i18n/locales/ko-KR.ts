@@ -1,9 +1,12 @@
 export default {
   skillManagement: {
     title: '스킬 관리',
-    description: '플랫폼 공용 스킬 라이브러리: 스킬 = SKILL.md 지시 문서. 에이전트가 선택하면 프롬프트에 주입되어 기존 도구로 실행합니다(설치 불필요, 삭제는 모든 공간에 적용).',
+    description: '이 공간의 스킬 라이브러리: 스킬 = SKILL.md 지시 문서. 에이전트가 선택하면 프롬프트에 주입되어 기존 도구로 실행합니다. 스킬은 이 공간에서만 보입니다(「내장」은 플랫폼 제공이며 읽기 전용).',
     create: '스킬 만들기',
     'edit': '편집',
+    'builtin': '내장',
+    'view': '보기',
+    'viewTitle': '스킬 내용 · {name}',
     'editTitle': '스킬 편집 · {name}',
     'saveSubmit': '저장',
     'saveSuccess': '스킬을 업데이트했습니다',

@@ -51,6 +51,9 @@
     >
       <template #name="{ row }">
         <span class="sm-name">{{ row.name }}</span>
+        <t-tag v-if="row.readOnly" size="small" variant="light-outline" class="sm-builtin-tag">
+          {{ t('skillManagement.builtin') }}
+        </t-tag>
       </template>
       <template #slug="{ row }">
         <code class="sm-slug">{{ row.slug }}</code>
@@ -66,12 +69,20 @@
       </template>
       <template #actions="{ row }">
         <div class="sm-row-actions">
-          <t-link theme="primary" hover="color" @click="openEdit(row)">
-            {{ t('skillManagement.edit') }}
-          </t-link>
-          <t-link theme="danger" hover="color" @click="askDelete(row)">
-            {{ t('skillManagement.delete') }}
-          </t-link>
+          <!-- 平台内置层只读（后端 403）：只给「查看」，不给编辑/删除 -->
+          <template v-if="row.readOnly">
+            <t-link theme="primary" hover="color" @click="openView(row)">
+              {{ t('skillManagement.view') }}
+            </t-link>
+          </template>
+          <template v-else>
+            <t-link theme="primary" hover="color" @click="openEdit(row)">
+              {{ t('skillManagement.edit') }}
+            </t-link>
+            <t-link theme="danger" hover="color" @click="askDelete(row)">
+              {{ t('skillManagement.delete') }}
+            </t-link>
+          </template>
         </div>
       </template>
     </t-table>
@@ -81,6 +92,7 @@
       v-model:visible="editorVisible"
       :header="editorHeader"
       width="720px"
+      :footer="editorMode !== 'view'"
       :confirm-btn="{
         content: editorMode === 'create' ? t('skillManagement.createSubmit') : t('skillManagement.saveSubmit'),
         loading: submitting,
@@ -98,12 +110,12 @@
           <t-input
             v-model="form.slug"
             :placeholder="t('skillManagement.slugPlaceholder')"
-            :disabled="editorMode === 'edit'"
+            :disabled="editorMode !== 'create'"
             :status="errors.slug ? 'error' : undefined"
           />
           <p v-if="errors.slug" class="sm-field-error">{{ t(`skillManagement.${errors.slug}`) }}</p>
           <p v-else class="sm-field-hint">
-            {{ editorMode === 'edit' ? t('skillManagement.slugImmutable') : t('skillManagement.slugHint') }}
+            {{ editorMode === 'create' ? t('skillManagement.slugHint') : t('skillManagement.slugImmutable') }}
           </p>
         </div>
 
@@ -112,6 +124,7 @@
           <t-input
             v-model="form.name"
             :placeholder="t('skillManagement.namePlaceholder')"
+            :disabled="editorMode === 'view'"
             :status="errors.name || renameBlock ? 'error' : undefined"
           />
           <p v-if="errors.name" class="sm-field-error">{{ t(`skillManagement.${errors.name}`) }}</p>
@@ -130,6 +143,7 @@
           <t-input
             v-model="form.description"
             :placeholder="t('skillManagement.descriptionPlaceholder')"
+            :disabled="editorMode === 'view'"
             :status="errors.description ? 'error' : undefined"
           />
           <p v-if="errors.description" class="sm-field-error">{{ t(`skillManagement.${errors.description}`) }}</p>
@@ -141,6 +155,7 @@
             v-model="form.content"
             :placeholder="t('skillManagement.contentPlaceholder')"
             :autosize="{ minRows: 6, maxRows: 14 }"
+            :disabled="editorMode === 'view'"
             :status="errors.content ? 'error' : undefined"
           />
           <p v-if="errors.content" class="sm-field-error">{{ t(`skillManagement.${errors.content}`) }}</p>
@@ -249,9 +264,12 @@ async function reload() {
 
 onMounted(reload)
 
-// ── 新建 / 编辑（同一弹窗两种模式）────────────────────────────────────
+// ── 新建 / 编辑 / 查看（同一弹窗三种模式）──────────────────────────────
+// view 只用于平台内置层（readOnly）：字段全禁用、隐藏页脚（后端也只读）。
+type EditorMode = SkillFormMode | 'view'
+
 const editorVisible = ref(false)
-const editorMode = ref<SkillFormMode>('create')
+const editorMode = ref<EditorMode>('create')
 const editorTarget = ref<SkillCatalogItem | null>(null)
 const editorRefs = ref<SkillReference[]>([])
 const loadingDraft = ref(false)
@@ -261,11 +279,12 @@ const errors = ref<SkillFormErrors>({})
 
 const preview = computed(() => buildSkillFilePreview(form.value))
 
-const editorHeader = computed(() => (
-  editorMode.value === 'create'
-    ? t('skillManagement.createTitle')
-    : t('skillManagement.editTitle', { name: editorTarget.value?.name || '' })
-))
+const editorHeader = computed(() => {
+  const name = editorTarget.value?.name || ''
+  if (editorMode.value === 'create') return t('skillManagement.createTitle')
+  if (editorMode.value === 'view') return t('skillManagement.viewTitle', { name })
+  return t('skillManagement.editTitle', { name })
+})
 
 /**
  * 改名拦截：name 是运行期身份（agent 的 selectedSkills 存的是它），被引用时改名会让那些
@@ -288,8 +307,17 @@ function openCreate() {
   editorVisible.value = true
 }
 
+/** 平台内置层：只读查看（后端 PUT/DELETE 也是 403）。 */
+async function openView(row: SkillCatalogItem) {
+  return openEditorWithDraft('view', row)
+}
+
 async function openEdit(row: SkillCatalogItem) {
-  editorMode.value = 'edit'
+  return openEditorWithDraft('edit', row)
+}
+
+async function openEditorWithDraft(mode: EditorMode, row: SkillCatalogItem) {
+  editorMode.value = mode
   editorTarget.value = row
   editorRefs.value = row.referencedBy || []
   // 先用列表里的字段占位，正文等草稿（GET /catalog/{id}）回来后再填
@@ -317,7 +345,8 @@ function closeEditor() {
 }
 
 async function submitEditor() {
-  const mode = editorMode.value
+  if (editorMode.value === 'view') return
+  const mode: SkillFormMode = editorMode.value
   const found = validateSkillForm(form.value, mode)
   errors.value = found
   if (hasErrors(found) || saveBlocked.value) {
@@ -459,6 +488,10 @@ function formatDateTime(value?: string) {
   font-family: var(--td-font-family-monospace, ui-monospace, SFMono-Regular, Menlo, monospace);
   font-size: 12px;
   color: var(--td-text-color-secondary);
+}
+
+.sm-builtin-tag {
+  margin-left: 6px;
 }
 
 // 描述列的次要色：挂在 td 上（列级 className），悬浮气泡里是纯文本，

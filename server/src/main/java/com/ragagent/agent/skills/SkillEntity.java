@@ -7,20 +7,23 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 /**
- * 平台级技能行（指令型技能入库，B57）。
+ * 技能行（指令型技能入库，B57 起；B60 起为**租户级 + 平台内置层**）。
  *
  * <p>{@code content} 是**组装好的 SKILL.md 原文**（frontmatter + 正文），
  * 运行期由 {@link DbSkillSource} 交给 {@link Skill#parseSkillFile(String)} 解析——
  * 与宿主目录时代的文件内容逐字同形，因此解析/校验逻辑零新增。</p>
  *
- * <p>平台级：不带 tenant_id。软删（{@code deletedAt}）保留行以便审计追溯；
- * 唯一性由部分索引只约束未删行。</p>
+ * <p>可见性：{@code tenantId == null} 是**平台内置层**（官方预置，全员可见、只读），
+ * 其余行只对本空间可见可写。软删（{@code deletedAt}）保留行以便审计追溯；
+ * slug 唯一性由部分索引按命名空间约束未删行。</p>
  */
 @TableName("skills")
 public class SkillEntity {
 
     @TableId(type = IdType.INPUT)
     private String id;
+    /** null = 平台内置（只读）；非空 = 所属空间。 */
+    private Long tenantId;
     private String slug;
     private String name;
     private String description;
@@ -33,6 +36,9 @@ public class SkillEntity {
 
     public String getId() { return id; }
     public void setId(String v) { id = v; }
+
+    public Long getTenantId() { return tenantId; }
+    public void setTenantId(Long v) { tenantId = v; }
 
     public String getSlug() { return slug; }
     public void setSlug(String v) { slug = v; }

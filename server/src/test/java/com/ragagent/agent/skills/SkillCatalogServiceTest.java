@@ -72,6 +72,55 @@ class SkillCatalogServiceTest {
     }
 
     @Test
+    void platformRowsAreReadOnlyAndTenantScoped() {
+        SkillCatalogService.SkillRow platform = row(null, "n");
+        SkillCatalogService.SkillRow tenantRow = row(7L, "n");
+        // 平台内置行：租户管理员只读
+        assertThrows(SkillCatalogService.PlatformSkillReadOnlyException.class,
+                () -> SkillCatalogService.requireTenantWritable(platform, 7L));
+        // 本空间行可写
+        SkillCatalogService.requireTenantWritable(tenantRow, 7L);
+        // 他空间行（读路径已过滤，这里是兜底）与无空间上下文都拒绝
+        assertThrows(SkillCatalogService.PlatformSkillReadOnlyException.class,
+                () -> SkillCatalogService.requireTenantWritable(tenantRow, 8L));
+        assertThrows(SkillCatalogService.PlatformSkillReadOnlyException.class,
+                () -> SkillCatalogService.requireTenantWritable(tenantRow, null));
+    }
+
+    @Test
+    void createRequiresTenantContext() {
+        // 缺空间上下文不能默默写成平台内置行（那等于越权造官方预置）
+        assertThrows(IllegalStateException.class, () -> SkillCatalogService.requireTenantScope(null));
+        SkillCatalogService.requireTenantScope(3L);
+    }
+
+    @Test
+    void nameMustBeFreeInVisibleScope() {
+        SkillCatalogService.requireNameFree("x", List.of());
+        SkillCatalogService.requireNameFree("x", null);
+
+        var platformHit = assertThrows(SkillCatalogService.SkillNameConflictException.class,
+                () -> SkillCatalogService.requireNameFree("x", List.of(row(null, "x"))));
+        assertTrue(platformHit.getMessage().contains("platform builtin"), platformHit.getMessage());
+
+        var tenantHit = assertThrows(SkillCatalogService.SkillNameConflictException.class,
+                () -> SkillCatalogService.requireNameFree("x", List.of(row(7L, "x"))));
+        assertTrue(tenantHit.getMessage().contains("workspace"), tenantHit.getMessage());
+    }
+
+    @Test
+    void slugMustBeFreeInSameNamespace() {
+        SkillCatalogService.requireSlugFree("s", List.of());
+        assertThrows(SkillCatalogService.DuplicateSlugException.class,
+                () -> SkillCatalogService.requireSlugFree("s", List.of(row(7L, "s"))));
+    }
+
+    private static SkillCatalogService.SkillRow row(Long tenantId, String name) {
+        return new SkillCatalogService.SkillRow("id-" + name, tenantId, name, name, "说明", "内容", 1, "tester",
+                java.time.OffsetDateTime.now(), java.time.OffsetDateTime.now());
+    }
+
+    @Test
     void slugRules() {
         assertEquals("kb-faq", SkillCatalogService.requireSlug("kb-faq"));
         assertThrows(Skill.SkillValidationException.class, () -> SkillCatalogService.requireSlug("KB_FAQ"));

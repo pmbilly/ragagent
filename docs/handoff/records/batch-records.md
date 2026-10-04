@@ -702,6 +702,19 @@
 - **闸门**：后端 **4,704 测试 0 失败 + spotlessCheck 绿**；前端 **720/720**、`vue-tsc` 0 错误、i18n 审计 11/11、契约键守卫无新增。
 - **观察（供后续判断）**：`kb-faq-curator` 现被内建 **Smart Reasoning** 引用（`selected` 模式点名，用户点检时在智能体编辑器勾选的）→ 该技能将无法改名、删除需 force；这正是保护的设计意图（否则该 agent 会静默失去技能）。若希望"改名时同步改写引用它的 agent 配置"，属另一批（需要动 agent config 迁移策略）。
 
+**✅ B60（2026-10-04，技能租户化：平台级 → 空间级 + 菜单并入「数据与扩展」）**
+- **触发**：用户提出「把技能调整配租户配置，菜单移到数据与拓展」。核实后确认这不只是"更合理"，而是**在修隔离缺陷**：`GET /api/v1/skills` 是 Viewer 级且 `listActive()` 读全表、零租户过滤 → 任何空间的普通成员都能看到**别家的技能名与描述**；且 `slug` 全局唯一 → A 空间建过的 slug，B 空间不能再用。
+- **方案（用户拍板"全做"）**：① 租户化（`tenant_id` 迁移 + 运行期按租户过滤 + RBAC 改空间 admin + 引用查询加租户条件）；② **保留平台内置层**（`tenant_id IS NULL`：全员可见、**只读**）；③ 存量归当前空间；④ 菜单挪到「数据与扩展」。
+- **数据层**：`V5__skills_tenant.sql` 加 `tenant_id INTEGER`（NULL = 平台内置）；旧全局 slug 唯一索引退场 → `(COALESCE(tenant_id, 0), slug) WHERE deleted_at IS NULL`（平台层折叠成伪空间 0，故平台内置与各租户可同名 slug）；另加 `tenant_id` 部分索引。
+- **服务层（`SkillCatalogService`）**：**可见范围单点表达** `visibleScope`（平台层 or 本空间；`tenantId == null` → **仅平台层**，fail closed —— 缺上下文绝不等于"看全部"）；读路径全部带租户（`listVisible` / `findVisibleById`，他空间 id 等同不存在 → 404）；写入 `requireTenantScope`（缺上下文不许建，否则等于造官方预置→越权）+ `requireTenantWritable`（平台行只读 → 403）；**命名冲突**：`name`（运行期身份）在可见范围内必须唯一（`SkillNameConflictException`，区分"与平台内置重名"/"本空间重名"话术），`slug` 同命名空间唯一。
+- **引用清单**：按空间过滤 **且把 `is_builtin` 也算入** —— 实测发现内建 agent 是**全局一行**（`builtin-smart-reasoning` 的 `tenant_id=11`，取自首个物化它的空间），只按 `tenant_id = ?` 过滤会**漏掉它**，导致改名/删除漏报真正受影响的 agent。调用点：`AgentEngineAssembler`（运行期注入）与 `SkillsCatalogController`（选择器）都改为按当前空间读。
+- **RBAC/审计**：catalog 规则由 `addSystemAdminRule` → `rbac.addRule(..., TenantRole.ADMIN)`（含新增的 `GET /{id}`、`PUT /{id}`）；审计 details 增 `tenantId`。
+- **前端**：`settingsAccess.ts` 把 `skill-management` 从 `SYSTEM_ADMIN_SETTINGS_SECTIONS` 移到 `SETTINGS_SECTION_MIN_ROLE = 'admin'`（+测试期望）；`Settings.vue` 从「系统管理」组挪到「数据与扩展」组（`settingsNavGroups.test.ts` 守卫同步校验）；页面：平台内置行显示「内置」标记并**只给「查看」**（弹窗三模式 create/edit/view，view 态字段全禁用、无页脚），租户行保持 编辑/删除；五语言 `description` 改空间级口径 + 新增 `builtin`/`view`/`viewTitle`。
+- **验证（跨租户隔离是核心验收，全部实测）**：① 迁移与归属：flyway v5 ✓，存量 4 行（含 2 条软删）归到空间 1，空间 1 目录 2 条、引用恢复 `Smart Reasoning`；② **第二空间**（`POST /auth/register` → 自动建租户 12）：目录与选择器**均为空**（此前会看到空间 1 的技能）；建**同名 slug** → **201**（此前 409）；跨空间按 id 直取 GET/PUT/DELETE **全 404**；两边的引用清单互相隔离；③ **平台内置层**（SQL 造 `citation-norm`）：两空间均可见且 `readOnly: true`，PUT/DELETE **403**，编辑草稿可读，选择器可勾选；④ **UI 浏览器实测**：「技能管理」位于**数据与扩展**组（该组：向量数据库引擎/解析引擎/存储引擎/网络搜索/MCP服务/技能管理）、内置行仅「查看」且查看态字段全禁用无页脚、**另一空间 owner（非系统管理员）同样可见**（证明 RBAC 已落到空间 admin）、控制台 0 报错。
+- **闸门**：后端 **4,708 测试 0 失败 + spotlessCheck 绿**；前端 **720/720**、`vue-tsc` 0 错误、i18n 审计 11/11、契约键守卫无新增。
+- **dev 数据留档**：平台内置示例 `citation-norm`（只读演示，可一行 SQL 删除）；隔离探针账号 `b60probe@test.local`（空间 12，owner）——保留用于后续隔离回归。
+- **遗留**：平台内置层目前**无 UI 入口**（预置 = SQL/发布动作），将来做"平台管理端技能页"再接；"改名时同步改写引用它的 agent 配置"仍未做（现为 409 硬拦）。
+
 **✅ B58（2026-10-04，旧信封读法清剿：Go `{success,data}` 残留 → Java 裸载荷）**
 - **触发**：用户点检 `?section=integration-api` 报「加载 API 集成设置失败」。
 - **根因**：`/auth/me` 是**裸信封**（`{user, tenant, memberships, tenantRequired, capabilities, preferenceDefaults}`，`tenant` 在顶层），而页面读 `userResp.data.tenant`（Go 时代 `{success,data}` 形状）→ 恒 undefined → 直接抛错。curl 实测坐实（200 + 顶层键清单里无 `data`）。

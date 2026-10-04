@@ -522,11 +522,15 @@ public class WebConfig implements WebMvcConfigurer {
         // 技能管理面（agent/management/SkillCatalogController，B57 入库版）：技能是**平台级资源**
         // （全库共享、影响所有空间的智能体），故仅系统管理员——租户角色再高也不放行。
         // 静态段 /catalog 与 /catalog/* 的 files 子路径逐条登记（AntPathMatcher 取首个命中）。
-        rbac.addSystemAdminRule("GET", "/api/v1/skills/catalog");
-        rbac.addSystemAdminRule("POST", "/api/v1/skills/catalog");
-        rbac.addSystemAdminRule("GET", "/api/v1/skills/catalog/*/files");
-        rbac.addSystemAdminRule("GET", "/api/v1/skills/catalog/*/files/content");
-        rbac.addSystemAdminRule("DELETE", "/api/v1/skills/catalog/*");
+        // B60：技能归属空间 → 管理面由「空间 admin」掌控（此前是平台 SystemAdmin）。
+        // 列出/编辑的对象是「平台内置层（只读）+ 当前空间」，写入只作用于当前空间。
+        rbac.addRule("GET", "/api/v1/skills/catalog", TenantRole.ADMIN, false);
+        rbac.addRule("POST", "/api/v1/skills/catalog", TenantRole.ADMIN, false);
+        rbac.addRule("GET", "/api/v1/skills/catalog/*", TenantRole.ADMIN, false);
+        rbac.addRule("PUT", "/api/v1/skills/catalog/*", TenantRole.ADMIN, false);
+        rbac.addRule("DELETE", "/api/v1/skills/catalog/*", TenantRole.ADMIN, false);
+        rbac.addRule("GET", "/api/v1/skills/catalog/*/files", TenantRole.ADMIN, false);
+        rbac.addRule("GET", "/api/v1/skills/catalog/*/files/content", TenantRole.ADMIN, false);
         // ── agents CRUD 家族 ──
         // 静态段先于 /agents/* 通配登记（AntPathMatcher 取首个命中）。
         // placeholders/type-presets/list/get：Viewer+；create/copy：Contributor+；

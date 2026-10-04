@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 class DbSkillSourceTest {
 
     private static SkillCatalogService.SkillRow row(String slug, String name, String desc, String body) {
-        return new SkillCatalogService.SkillRow("id-" + slug, slug, name, desc,
+        return new SkillCatalogService.SkillRow("id-" + slug, 1L, slug, name, desc,
                 SkillCatalogService.assembleSkillFile(name, slug, desc, body), 1, "tester",
                 OffsetDateTime.now(), OffsetDateTime.now());
     }
@@ -48,7 +48,7 @@ class DbSkillSourceTest {
     @Test
     void unparsableRowIsSkippedNotFatal() {
         SkillCatalogService.SkillRow broken = new SkillCatalogService.SkillRow(
-                "id-broken", "broken", "broken", "", "not a skill file", 1, "",
+                "id-broken", 1L, "broken", "broken", "", "not a skill file", 1, "",
                 OffsetDateTime.now(), OffsetDateTime.now());
         DbSkillSource source = new DbSkillSource(List.of(broken, row("ok", "ok", "说明", "正文")));
         assertEquals(1, source.discoverSkills().size());

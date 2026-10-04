@@ -6016,9 +6016,12 @@ export default {
   },
   skillManagement: {
     title: 'Skill management',
-    description: 'Platform-level skill library: a skill is a SKILL.md instruction document. Agents inject it into their prompt and follow it with existing tools — nothing to install, and deleting one affects every workspace.',
+    description: 'Workspace skill library: a skill is a SKILL.md instruction document. Agents inject it into their prompt and follow it with existing tools; skills are visible only in this workspace (items marked Built-in are platform presets and read-only).',
     create: 'New skill',
     'edit': 'Edit',
+    'builtin': 'Built-in',
+    'view': 'View',
+    'viewTitle': 'Skill content · {name}',
     'editTitle': 'Edit skill · {name}',
     'saveSubmit': 'Save',
     'saveSuccess': 'Skill updated',

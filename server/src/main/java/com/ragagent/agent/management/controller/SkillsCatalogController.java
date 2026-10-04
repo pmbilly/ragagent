@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ragagent.agent.skills.SkillCatalogService;
+import com.ragagent.common.context.TenantContext;
 
 /**
  * 指令型技能选择器的数据源（智能体编辑器 → 技能区）。
@@ -34,12 +35,17 @@ public class SkillsCatalogController {
     public record SkillInfoResponse(String name, String description) {
     }
 
-    /** 前端技能选择器的数据源：读 skills 表（未删行）。 */
+    /**
+     * 前端技能选择器的数据源：**可见范围 = 平台内置层 + 当前空间**（B60 起技能归属空间）。
+     *
+     * <p>此前读全表，任何 Viewer 都能看到别家技能（跨租户泄露）；现按 TenantContext 过滤，
+     * 且 {@code tenantId == null} 时只回平台层（fail closed）。</p>
+     */
     @GetMapping("/api/v1/skills")
     public ResponseEntity<Map<String, Object>> listSkills() {
         Map<String, Object> body = new TreeMap<>();
         List<SkillInfoResponse> response = new ArrayList<>();
-        for (SkillCatalogService.SkillRow row : catalog.listActive()) {
+        for (SkillCatalogService.SkillRow row : catalog.listVisible(TenantContext.currentTenantId())) {
             response.add(new SkillInfoResponse(row.name(), row.description()));
         }
         body.put("skills", response);

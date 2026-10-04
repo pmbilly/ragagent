@@ -98,11 +98,13 @@ final class AgentEngineAssembler {
         // 模型凭指令用现有工具执行；shell/文件注入与沙箱镜像源已随沙箱退役。
         // B57：内容来自 skills 表——每轮装配新建 DbSkillSource（读一次表），
         // 因此新建/删除技能对下一轮对话生效，无需缓存失效机制。
+        // B60：读的是「平台内置层 + 当前空间」，缺租户上下文时只读平台层（fail closed）。
         com.ragagent.agent.skills.Manager skillsManager = null;
         if (config.isSkillsEnabled()) {
             try {
                 com.ragagent.agent.skills.DbSkillSource skillSource =
-                        new com.ragagent.agent.skills.DbSkillSource(skillCatalogService.listActive());
+                        new com.ragagent.agent.skills.DbSkillSource(skillCatalogService
+                                .listVisible(com.ragagent.common.context.TenantContext.currentTenantId()));
                 skillsManager = new com.ragagent.agent.skills.Manager(
                         new com.ragagent.agent.skills.Manager.ManagerConfig(
                                 List.of(skillSource), config.getAllowedSkills(), true));

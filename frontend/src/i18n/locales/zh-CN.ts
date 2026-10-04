@@ -1,9 +1,12 @@
 export default {
   skillManagement: {
     title: '技能管理',
-    description: '平台级技能库：技能 = 一段 SKILL.md 指令。智能体勾选后注入提示词，模型凭指令用现有工具执行；无需安装，删除即对所有空间生效。',
+    description: '本空间技能库：技能 = 一段 SKILL.md 指令。智能体勾选后注入提示词，模型凭指令用现有工具执行；技能只在本空间可见（带「内置」标记的是平台预置、只读）。',
     create: '新建技能',
     'edit': '编辑',
+    'builtin': '内置',
+    'view': '查看',
+    'viewTitle': '技能内容 · {name}',
     'editTitle': '编辑技能 · {name}',
     'saveSubmit': '保存',
     'saveSuccess': '技能已更新',

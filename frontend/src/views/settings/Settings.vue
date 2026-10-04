@@ -418,6 +418,8 @@ const navGroups = computed<NavGroup[]>(() => {
         'storage',
         'websearch',
         'mcp',
+        // B60：技能归属空间（与 MCP 同为「扩展能力」）→ 空间 admin 可见
+        'skill-management',
       ]),
     },
     {
@@ -428,7 +430,6 @@ const navGroups = computed<NavGroup[]>(() => {
         'runtime-queues',
         'platform-api-keys',
         'system-audit-log',
-        'skill-management',
       ]),
     },
     {
