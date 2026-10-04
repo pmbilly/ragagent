@@ -77,8 +77,8 @@ public class SessionAgentQaService {
     private final com.ragagent.common.approval.Gate toolApprovalGate;
     /** 工具图片 VLM 描述器装配。 */
     private final VlmDescriberWiring vlmDescriberWiring;
-    /** 指令型技能的宿主目录（选项 B；weknora.skills.host-dirs，逗号分隔）。 */
-    private final List<String> hostSkillDirs;
+    /** 平台级技能目录（B57 入库版；宿主目录已退役）。 */
+    private final com.ragagent.agent.skills.SkillCatalogService skillCatalogService;
 
     public SessionAgentQaService(MessageService messageService,
             ModelService modelService,
@@ -98,10 +98,9 @@ public class SessionAgentQaService {
             com.ragagent.mcp.protocol.McpClientManager mcpClientManager,
             com.ragagent.common.approval.Gate toolApprovalGate,
             VlmDescriberWiring vlmDescriberWiring,
-            @org.springframework.beans.factory.annotation.Value(
-                    "${weknora.skills.host-dirs:}") String hostSkillDirs) {
+            com.ragagent.agent.skills.SkillCatalogService skillCatalogService) {
         this.vlmDescriberWiring = vlmDescriberWiring;
-        this.hostSkillDirs = parseHostSkillDirs(hostSkillDirs);
+        this.skillCatalogService = skillCatalogService;
         this.concurrencyGovernor = concurrencyGovernor;
         this.ollamaService = ollamaService;
         this.mcpServiceService = mcpServiceService;
@@ -119,7 +118,7 @@ public class SessionAgentQaService {
         this.artifactCollectorWiring = artifactCollectorWiring;
         this.knowledgeService = knowledgeService;
         this.faqService = faqService;
-        this.configAssembler = new AgentConfigAssembler(knowledgeQa, this.hostSkillDirs);
+        this.configAssembler = new AgentConfigAssembler(knowledgeQa);
         this.engineAssembler =
                 new AgentEngineAssembler(
                         memoryService,
@@ -134,7 +133,8 @@ public class SessionAgentQaService {
                         toolApprovalGate,
                         resourceCatalog,
                         dataSource,
-                        vlmDescriberWiring);
+                        vlmDescriberWiring,
+                        skillCatalogService);
     }
 
     // ==================================================================
@@ -318,19 +318,6 @@ public class SessionAgentQaService {
      * 未落地——经
      * {@link AgentWebPages} 的接缝落保存失败分支，见类 Javadoc。
      */
-    /** weknora.skills.host-dirs（逗号分隔）→ 目录列表；空白项丢弃。 */
-    private static List<String> parseHostSkillDirs(String raw) {
-        List<String> dirs = new ArrayList<>();
-        if (raw != null && !raw.isBlank()) {
-            for (String dir : raw.split(",")) {
-                String clean = dir == null ? "" : dir.strip();
-                if (!clean.isEmpty()) {
-                    dirs.add(clean);
-                }
-            }
-        }
-        return List.copyOf(dirs);
-    }
 
 
     private LlmChatClient chatModel(String modelId) {

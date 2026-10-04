@@ -85,12 +85,8 @@ export JWT_SECRET="${JWT_SECRET:-java-e2e-jwt-secret-key-0123456789abcdef}"
 # 严禁默认 /tmp：macOS 定期清 /tmp 会丢已入库文档的原始文件（preview 500、不可恢复，实测踩坑 2026-09-28）
 export LOCAL_STORAGE_BASE_DIR="${LOCAL_STORAGE_BASE_DIR:-$(env_value LOCAL_STORAGE_BASE_DIR)}"
 
-# 指令型技能的宿主目录（技能 = 目录下各子目录的 SKILL.md，逗号分隔多个目录）。
-# 变量名必须是复数 SKILLS：Spring 把属性 weknora.skills.host-dirs 映射为
-# WEKNORA_SKILLS_HOST_DIRS（'.'/'−' → '_' 后大写）；写成单数 SKILL 不生效，
-# 且接口只会返回 skillsAvailable=false，不报任何错（实测踩坑 2026-10-04）。
-# 未配置时 GET /api/v1/skills 返回 skillsAvailable=false、前端技能选择器隐藏。
-export WEKNORA_SKILLS_HOST_DIRS="${WEKNORA_SKILLS_HOST_DIRS:-$(env_value WEKNORA_SKILLS_HOST_DIRS)}"
+# 注：指令型技能自 B57 起**入库**（skills 表，平台级），宿主技能目录
+# （weknora.skills.host-dirs / WEKNORA_SKILLS_HOST_DIRS）已退役，不再注入。
 
 
 # 测试账号（阶段 1 建的专用租户 10002）

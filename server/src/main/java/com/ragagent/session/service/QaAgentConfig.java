@@ -33,7 +33,6 @@ public class QaAgentConfig extends AgentConfig {
     private List<String> allowedSkills;
     private List<String> pinnedSkillNames;
     private List<String> pinnedMcpServiceIds;
-    private List<String> skillDirs = new ArrayList<>();
 
     public int getWebSearchMaxResults() { return webSearchMaxResults; }
     public void setWebSearchMaxResults(int v) { webSearchMaxResults = v; }
@@ -71,6 +70,4 @@ public class QaAgentConfig extends AgentConfig {
     public void setPinnedSkillNames(List<String> v) { pinnedSkillNames = v; }
     public List<String> getPinnedMcpServiceIds() { return pinnedMcpServiceIds; }
     public void setPinnedMcpServiceIds(List<String> v) { pinnedMcpServiceIds = v; }
-    public List<String> getSkillDirs() { return skillDirs; }
-    public void setSkillDirs(List<String> v) { skillDirs = v == null ? new ArrayList<>() : v; }
 }

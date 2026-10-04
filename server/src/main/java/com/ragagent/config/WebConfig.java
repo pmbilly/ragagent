@@ -519,6 +519,14 @@ public class WebConfig implements WebMvcConfigurer {
         // GET /skills（指令型技能目录，agent/management/SkillsCatalogController）：选择器数据源，
         // Viewer+。
         rbac.addRule("GET", "/api/v1/skills", TenantRole.VIEWER, false);
+        // 技能管理面（agent/management/SkillCatalogController，B57 入库版）：技能是**平台级资源**
+        // （全库共享、影响所有空间的智能体），故仅系统管理员——租户角色再高也不放行。
+        // 静态段 /catalog 与 /catalog/* 的 files 子路径逐条登记（AntPathMatcher 取首个命中）。
+        rbac.addSystemAdminRule("GET", "/api/v1/skills/catalog");
+        rbac.addSystemAdminRule("POST", "/api/v1/skills/catalog");
+        rbac.addSystemAdminRule("GET", "/api/v1/skills/catalog/*/files");
+        rbac.addSystemAdminRule("GET", "/api/v1/skills/catalog/*/files/content");
+        rbac.addSystemAdminRule("DELETE", "/api/v1/skills/catalog/*");
         // ── agents CRUD 家族 ──
         // 静态段先于 /agents/* 通配登记（AntPathMatcher 取首个命中）。
         // placeholders/type-presets/list/get：Viewer+；create/copy：Contributor+；

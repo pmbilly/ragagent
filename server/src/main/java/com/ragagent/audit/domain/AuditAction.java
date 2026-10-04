@@ -36,6 +36,13 @@ public final class AuditAction {
     /** 惰性清扫把超期 pending 置为 expired；actor 为空（system）。 */
     public static final String INVITATION_EXPIRED = "rbac.invitation_expired";
 
+    // ── 平台级技能库（SkillCatalogController，B57 入库版） ────────────────
+
+    /** 新建技能：details 带 id/slug/name。 */
+    public static final String SKILL_CREATED = "skill.created";
+    /** 删除技能（软删）：details 带 id/slug/name 与引用它的智能体。 */
+    public static final String SKILL_DELETED = "skill.deleted";
+
     // ── VectorStore 生命周期（VectorStoreService 发出） ──────────────────
 
     public static final String VECTOR_STORE_CREATED = "vector_store.created";

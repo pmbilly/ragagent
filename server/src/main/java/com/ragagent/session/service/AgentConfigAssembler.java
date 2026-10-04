@@ -17,8 +17,8 @@ import com.ragagent.agent.tools.SearchTarget.SearchTargets;
  * 以及 skill 模板文件的读取（{@code templateContentByIdAndFile} + YAML 前置元数据）。
  *
  * <p>为什么单独一类：这一簇只管"把请求装配成引擎配置"，与引擎创建、工具注册、历史装配三簇无交集。
- * 两个共享项随构造器注入：{@code knowledgeQa}（KB 解析/检索面）与 {@code hostSkillDirs}（skill 模板
- * 目录）。边界按调用点定——{@code stringListOf} 与 {@code YAML_JSON} 虽在文件尾部，调用点全在
+ * 共享项随构造器注入：{@code knowledgeQa}（KB 解析/检索面）。边界按调用点定——
+ * {@code stringListOf} 与 {@code YAML_JSON} 虽在文件尾部，调用点全在
  * {@code buildAgentConfig}，故随本簇走。</p>
  */
 final class AgentConfigAssembler {
@@ -27,11 +27,8 @@ final class AgentConfigAssembler {
 
     private final SessionKnowledgeQaService knowledgeQa;
 
-    private final List<String> hostSkillDirs;
-
-    AgentConfigAssembler(SessionKnowledgeQaService knowledgeQa, List<String> hostSkillDirs) {
+    AgentConfigAssembler(SessionKnowledgeQaService knowledgeQa) {
         this.knowledgeQa = knowledgeQa;
-        this.hostSkillDirs = hostSkillDirs;
     }
 
     QaAgentConfig buildAgentConfig(QaSupport.QaRequest req, long agentTenantId) {
@@ -91,9 +88,8 @@ final class AgentConfigAssembler {
             }
         }
 
-        // 指令型技能（选项 B）：目录来自 weknora.skills.host-dirs，Loader 扫描
-        // SKILL.md；allowedSkills 即 selected_skills 过滤
-        ac.setSkillDirs(hostSkillDirs);
+        // 指令型技能（选项 B）：技能内容来自 skills 表（B57 入库），
+        // 装配期由 AgentEngineAssembler 建 DbSkillSource；allowedSkills 即 selectedSkills 过滤。
 
         // Resolve knowledge bases
         var kb = knowledgeQa.resolveKnowledgeBases(req);

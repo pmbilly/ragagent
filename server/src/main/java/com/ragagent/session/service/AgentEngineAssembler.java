@@ -47,8 +47,10 @@ final class AgentEngineAssembler {
     private final com.ragagent.storage.service.ResourceCatalogService resourceCatalog;
     private final javax.sql.DataSource dataSource;
     private final VlmDescriberWiring vlmDescriberWiring;
+    /** 平台级技能目录（B57 入库版）：装配期建 {@code DbSkillSource} 读 skills 表。 */
+    private final com.ragagent.agent.skills.SkillCatalogService skillCatalogService;
 
-    AgentEngineAssembler(MemoryService memoryService, SessionKnowledgeQaService knowledgeQa, AgentToolBackends toolBackends, ArtifactCollectorWiring artifactCollectorWiring, com.ragagent.knowledge.service.KnowledgeService knowledgeService, FaqEntryQueryService faqService, com.ragagent.mcp.service.McpServiceService mcpServiceService, com.ragagent.mcp.service.McpMetadataService mcpMetadataService, com.ragagent.mcp.protocol.McpClientManager mcpClientManager, com.ragagent.common.approval.Gate toolApprovalGate, com.ragagent.storage.service.ResourceCatalogService resourceCatalog, javax.sql.DataSource dataSource, VlmDescriberWiring vlmDescriberWiring) {
+    AgentEngineAssembler(MemoryService memoryService, SessionKnowledgeQaService knowledgeQa, AgentToolBackends toolBackends, ArtifactCollectorWiring artifactCollectorWiring, com.ragagent.knowledge.service.KnowledgeService knowledgeService, FaqEntryQueryService faqService, com.ragagent.mcp.service.McpServiceService mcpServiceService, com.ragagent.mcp.service.McpMetadataService mcpMetadataService, com.ragagent.mcp.protocol.McpClientManager mcpClientManager, com.ragagent.common.approval.Gate toolApprovalGate, com.ragagent.storage.service.ResourceCatalogService resourceCatalog, javax.sql.DataSource dataSource, VlmDescriberWiring vlmDescriberWiring, com.ragagent.agent.skills.SkillCatalogService skillCatalogService) {
         this.memoryService = memoryService;
         this.knowledgeQa = knowledgeQa;
         this.toolBackends = toolBackends;
@@ -62,6 +64,7 @@ final class AgentEngineAssembler {
         this.resourceCatalog = resourceCatalog;
         this.dataSource = dataSource;
         this.vlmDescriberWiring = vlmDescriberWiring;
+        this.skillCatalogService = skillCatalogService;
     }
 
     AgentEngine createAgentEngine(QaAgentConfig config, LlmChatClient chatModel, Reranker rerankModel,
@@ -93,19 +96,25 @@ final class AgentEngineAssembler {
 
         // 指令型技能（选项 B）：Manager 只做 SKILL.md 三级注入（元数据/正文/资源），
         // 模型凭指令用现有工具执行；shell/文件注入与沙箱镜像源已随沙箱退役。
+        // B57：内容来自 skills 表——每轮装配新建 DbSkillSource（读一次表），
+        // 因此新建/删除技能对下一轮对话生效，无需缓存失效机制。
         com.ragagent.agent.skills.Manager skillsManager = null;
         if (config.isSkillsEnabled()) {
-            skillsManager = new com.ragagent.agent.skills.Manager(
-                    new com.ragagent.agent.skills.Manager.ManagerConfig(
-                            config.getSkillDirs(), config.getAllowedSkills(), true));
             try {
+                com.ragagent.agent.skills.DbSkillSource skillSource =
+                        new com.ragagent.agent.skills.DbSkillSource(skillCatalogService.listActive());
+                skillsManager = new com.ragagent.agent.skills.Manager(
+                        new com.ragagent.agent.skills.Manager.ManagerConfig(
+                                List.of(skillSource), config.getAllowedSkills(), true));
                 skillsManager.initialize();
+                log.info("Instructional skills enabled: {} skill(s) from DB catalog",
+                        skillsManager.getAllMetadata() == null ? 0 : skillsManager.getAllMetadata().size());
             } catch (Exception e) {
-                throw new IllegalStateException("failed to initialize skills: " + e.getMessage(), e);
+                // 降级：技能读取失败不阻断本轮对话（与宿主目录时代「目录打错字不 500」同口径），
+                // 但用 error 级留痕，避免静默。
+                skillsManager = null;
+                log.error("skills disabled for this run: {}", e.getMessage());
             }
-            log.info("Instructional skills enabled: {} skill(s) from host dirs {}",
-                    skillsManager.getAllMetadata() == null ? 0 : skillsManager.getAllMetadata().size(),
-                    config.getSkillDirs());
         }
         registerWebPageFiles(toolRegistry, config, sessionId, assistantMessageId);
         toolRegistry.prepareMcpTools();
