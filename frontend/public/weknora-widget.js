@@ -2,7 +2,7 @@
  * WeKnora embed widget SDK — floating chat launcher.
  *
  * Programmatic:
- *   WeKnora.init({ channel, token, position, primaryColor, title, baseUrl })
+ *   WeKnora.init({ channel, token, position, primaryColor, title, baseUrl, locale })
  *   WeKnora.open() | close() | toggle() | destroy()
  *   WeKnora.on('ready', fn) | off('ready', fn)
  *
@@ -13,6 +13,9 @@
  *     Opens the panel (if closed) and sends the query when the iframe is ready.
  *   WeKnora.setLocale('en-US')
  *     Switch embed UI language (zh-CN | en-US | ko-KR | ja-JP | ru-RU).
+ *     Declarative alternative: `locale` option / `data-locale` attribute. It is
+ *     folded into the iframe URL, so the first paint is already in that language
+ *     and the channel's default locale won't override it.
  *
  * Secure mode (recommended): instead of `token`, pass `tokenEndpoint` — a URL on
  * your own backend that returns { token: "ems_...", expiresIn: 1800 }. Your
@@ -21,7 +24,8 @@
  * token then never reaches the browser; the widget auto-refreshes before expiry.
  *
  * Legacy script-tag auto-init via data-* attributes on the script element
- * (data-channel + data-token, or data-channel + data-token-endpoint).
+ * (data-channel + data-token, or data-channel + data-token-endpoint,
+ * optional data-locale / data-position / data-primary-color / data-title).
  */
 (function (global) {
   'use strict';
@@ -145,7 +149,13 @@
 
     var panelWidth = Number(opts.width) > 0 ? Number(opts.width) : DEFAULT_WIDTH;
     var panelHeight = Number(opts.height) > 0 ? Number(opts.height) : DEFAULT_HEIGHT;
+    // 宿主声明的语言（init({locale}) / data-locale）：拼进 URL，embed 页首屏即用对语言，
+    // 且被视为「宿主已 pin」——不会被渠道默认语言覆盖，也不写访客的持久值。
+    var hostLocale = String(opts.locale || opts.lang || '').trim();
     var embedUrl = baseUrl + '/embed/' + encodeURIComponent(channelId);
+    if (hostLocale) {
+      embedUrl += '?locale=' + encodeURIComponent(hostLocale);
+    }
     var embedOrigin = baseUrl;
     try {
       // Derive the exact origin (scheme + host + port) rather than trusting the
@@ -344,10 +354,17 @@
       });
     }
 
+    var pendingLocale = '';
+
     function setLocale(locale) {
       var loc = String(locale || '').trim();
       if (!loc) {
         console.warn('[WeKnora] setLocale requires a locale string');
+        return;
+      }
+      if (!iframeReady) {
+        // 面板打开前调用：记住，握手完成后再发（旧实现直接 post → 静默丢失）。
+        pendingLocale = loc;
         return;
       }
       postHostPayload('set_locale', { locale: loc });
@@ -371,6 +388,10 @@
         case 'ready':
           iframeReady = true;
           launcher.style.opacity = '1';
+          if (pendingLocale) {
+            postHostPayload('set_locale', { locale: pendingLocale });
+            pendingLocale = '';
+          }
           emit('ready', { channelId: channelId });
           break;
         case 'message_sent':
@@ -531,6 +552,7 @@
         position: legacyScript.getAttribute('data-position'),
         primaryColor: legacyScript.getAttribute('data-primary-color'),
         title: legacyScript.getAttribute('data-title'),
+        locale: legacyScript.getAttribute('data-locale'),
         baseUrl: legacyScript.getAttribute('data-base-url'),
         width: legacyScript.getAttribute('data-width'),
         height: legacyScript.getAttribute('data-height'),

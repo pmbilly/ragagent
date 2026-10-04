@@ -17,7 +17,14 @@ import {
   postEmbedReady,
   type EmbedChannelPublicConfig,
 } from '@/api/embed'
-import { applyEmbedLocale, readEmbedLocaleFromUrl, syncEmbedLocaleFromUrl } from '@/i18n/embed'
+import {
+  applyDerivedEmbedLocale,
+  applyEmbedLocale,
+  clearStoredEmbedLocale,
+  readEmbedLocaleFromUrl,
+  resolveBrowserEmbedLocale,
+  syncEmbedLocaleFromUrl,
+} from '@/i18n/embed'
 
 // Persist the chat session id per channel so a page refresh resumes the same
 // conversation (and its history) instead of silently starting a new session.
@@ -145,8 +152,18 @@ export function useEmbedBridge(channelId: Ref<string>) {
       }
       config.value = res
 
-      if (res.defaultLocale && !hostLocalePinned) {
-        applyEmbedLocale(res.defaultLocale, activeLocale)
+      // 语言优先级：宿主声明（URL ?locale= / set_locale）> 渠道默认语言 > 浏览器语言。
+      // 两条派生路径都**不写持久值**：渠道改了默认语言或被设回「跟随浏览器/宿主」时，
+      // 必须立刻对所有人生效；旧实现把渠道默认语言写进 localStorage，之后
+      // `resolveInitialEmbedLocale()` 永远先读它 → 「跟随」永久失效。
+      if (!hostLocalePinned) {
+        if (res.defaultLocale) {
+          applyDerivedEmbedLocale(res.defaultLocale, activeLocale)
+        } else {
+          // 跟随浏览器/宿主：清掉可能的历史持久值，再按浏览器语言渲染。
+          clearStoredEmbedLocale()
+          applyDerivedEmbedLocale(resolveBrowserEmbedLocale(), activeLocale)
+        }
       }
 
       // Resume a persisted session when still valid and still bound to the same

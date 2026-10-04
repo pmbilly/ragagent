@@ -733,6 +733,14 @@
 - **验证**：① 后端 **4,704 测试 0 失败 + spotlessCheck 绿**（`spotlessApply` 清掉删代码后遗留的未用 import）；② 前端 **720/720** + `vue-tsc` 0 错误 + i18n 审计 11/11 + 契约键守卫无新增；③ **运行时实测**：`GET /api/v1/models/weknoracloud/status` → **404**、`POST /api/v1/weknoracloud/credentials` → **404**、`/api/v1/models/providers` → **26 家、不含 weknoracloud**、`/api/v1/system/parser-engines` → **9 个引擎、不含 weknoracloud**；④ **浏览器点检**：设置导航「模型」组只剩「模型管理 / Ollama」，其余分组与项不变（技能管理仍在「数据与扩展」），控制台 0 报错。
 - **过程留痕（给后续裁撤参考）**：脚本化的"大括号配对删块"在**无花括号的语句**上会跑偏——本次在 `model/service/ProviderRegistry`（`new ProviderEntry(...)` 只有圆括号）与 `ParserEngineRegistry`（注释行 + `boolean cloud = …`）各误伤一次，**已从 HEAD 恢复并改用精确文本删除**；其余块删除（语句/方法/类含 `{`，模板用 `</template>` 配对）验证无误伤。教训：**删块前先确认锚点行自带花括号，否则用精确文本替换**。
 
+**✅ B63（2026-10-04，embed 语言「跟随浏览器/宿主」失效：派生语言被写进持久值）**
+- **触发**：用户点检 `http://localhost:5173/widget-test.html`——渠道默认语言设为「跟随浏览器 / 宿主」，但 widget 语言不是浏览器语言。
+- **根因（真机实验坐实）**：embed 的 `applyEmbedLocale()` 一律 `localStorage.setItem('weknora-embed-locale', …)`，而模块初始化 `resolveInitialEmbedLocale()` 的取值顺序是 **URL → localStorage → 浏览器**。于是**派生语言**（渠道默认语言、预览/宿主的 `?locale=`）一旦应用就被持久化，此后**永远压过浏览器语言** ⇒ 渠道改回「跟随」也不生效。实验（浏览器 ja-JP）：干净访客显示日语 ✓；预置陈旧 `en-US` → 英文 ✗；预置陈旧 `zh-CN` → 中文 ✗。用户那条渠道 `default_locale` 实测为空（跟随）✓，且该渠道此前很可能配过默认语言（或预览过）→ 访客浏览器里留下了旧值。
+- **修复（语义拆成"派生 / 显式"两条路）**：`applyEmbedLocale`（显式，宿主 `set_locale`）**才**写持久值；新增 `applyDerivedEmbedLocale`（渠道默认 / 浏览器 / URL `?locale=`）**只作用于本次加载**；新增 `clearStoredEmbedLocale()`；`syncEmbedLocaleFromUrl` 改走派生（预览不再污染访客存储）。`useEmbedBridge.bootstrap`：未 pin 时——渠道默认语言非空 → 派生应用；为空（跟随）→ **先清持久值再按浏览器语言渲染**。顺带把 `<html lang>` 与当前语言同步（原先恒为 `en`）。
+- **widget 脚本补"跟随宿主"半场**：① 新增 `locale` 选项 / `data-locale` 属性 → 拼进 iframe URL `?locale=`（首屏即对语言，且被视作宿主 pin，不被渠道默认覆盖）；② `setLocale()` 在 iframe 握手前调用不再静默丢失（排队，ready 后补发）——旧实现直接 `postHostPayload` → `iframeReady=false` 时丢弃。
+- **验证**：真机（Playwright，浏览器 locale=ja-JP）**6/6**——① 干净+跟随→ja；② 陈旧 en-US + 跟随→ja 且**存储被清**；③ 陈旧 zh-CN + 跟随→ja 且存储被清；④ `?locale=en-US`→en 且**不落存储**；⑤ `init({locale})` → iframe URL 带 `locale=ja-JP`；⑥ 握手前 `setLocale('ja-JP')` → 补发成功。另测渠道默认语言链路：DB 临时置 `en-US` → widget 显示 en 且不落存储，`?locale=zh-CN` 可覆盖（宿主优先），**验后已还原为空**。新增 2 条单测（持久化语义 + 2 条 URL/浏览器解析）+ 1 条源码守卫（**两个红态探针验过**：回退成 `applyEmbedLocale(res.defaultLocale…)` 或删掉 `clearStoredEmbedLocale()` 均点名报红）。前端 **723/723**、`vue-tsc` 0 错误、契约键守卫无新增。
+- **口径沉淀**：**"能重新推导的派生值，不要写持久存储"**——派生值一旦落盘就会盖住后续配置变更（本次是语言；同类风险：主题、尺寸、默认模型）。只有用户/宿主的**显式选择**才值得持久化。
+
 **✅ B58（2026-10-04，旧信封读法清剿：Go `{success,data}` 残留 → Java 裸载荷）**
 - **触发**：用户点检 `?section=integration-api` 报「加载 API 集成设置失败」。
 - **根因**：`/auth/me` 是**裸信封**（`{user, tenant, memberships, tenantRequired, capabilities, preferenceDefaults}`，`tenant` 在顶层），而页面读 `userResp.data.tenant`（Go 时代 `{success,data}` 形状）→ 恒 undefined → 直接抛错。curl 实测坐实（200 + 顶层键清单里无 `data`）。

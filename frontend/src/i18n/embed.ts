@@ -2073,9 +2073,27 @@ export function readEmbedLocaleFromUrl(): string {
   return new URLSearchParams(window.location.search).get('locale')?.trim() || ''
 }
 
-function resolveBrowserEmbedLocale(): EmbedLocale {
+/** 浏览器语言 → 受支持的 embed 语言（跟随浏览器时的取值来源）。 */
+export function resolveBrowserEmbedLocale(): EmbedLocale {
   const nav = typeof navigator !== 'undefined' ? navigator.language : ''
   return nav ? normalizeEmbedLocale(nav) : 'zh-CN'
+}
+
+/** 清掉持久值——渠道设为「跟随浏览器/宿主」时使用，避免旧值压过浏览器语言。 */
+export function clearStoredEmbedLocale() {
+  try {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem(EMBED_LOCALE_STORAGE_KEY)
+    }
+  } catch {
+    // localStorage may be unavailable in private mode.
+  }
+}
+
+/** <html lang> 跟随当前语言（读屏/宿主脚本按它判语言）。 */
+function syncDocumentLang(next: string) {
+  if (typeof document === 'undefined') return
+  document.documentElement.setAttribute('lang', next)
 }
 
 function resolveInitialEmbedLocale(): EmbedLocale {
@@ -2095,6 +2113,7 @@ function resolveInitialEmbedLocale(): EmbedLocale {
 }
 
 const locale = resolveInitialEmbedLocale()
+syncDocumentLang(locale)
 
 export const EMBED_MESSAGES = {
   'zh-CN': messages['zh-CN'],
@@ -2115,14 +2134,16 @@ const i18n = createI18n({
 
 type LocaleRef = { value: string }
 
-/** Apply locale for the embed surface (isolated storage + optional active vue-i18n ref). */
-export function applyEmbedLocale(raw: string, localeRef?: LocaleRef) {
+function setActiveEmbedLocale(raw: string, localeRef: LocaleRef | undefined, persist: boolean) {
   const next = normalizeEmbedLocale(raw)
-  try {
-    localStorage.setItem(EMBED_LOCALE_STORAGE_KEY, next)
-  } catch {
-    // localStorage may be unavailable in private mode.
+  if (persist) {
+    try {
+      localStorage.setItem(EMBED_LOCALE_STORAGE_KEY, next)
+    } catch {
+      // localStorage may be unavailable in private mode.
+    }
   }
+  syncDocumentLang(next)
   if (localeRef) {
     localeRef.value = next
   } else {
@@ -2130,11 +2151,30 @@ export function applyEmbedLocale(raw: string, localeRef?: LocaleRef) {
   }
 }
 
-/** Honor `?locale=` on the embed URL for the currently mounted vue-i18n instance. */
+/**
+ * 显式选择（宿主 `WeKnora.setLocale()`）：**写**持久值，访客下次打开沿用。
+ * 只有显式选择才该持久化——派生语言写持久值会让「跟随浏览器/宿主」永久失效。
+ */
+export function applyEmbedLocale(raw: string, localeRef?: LocaleRef) {
+  setActiveEmbedLocale(raw, localeRef, true)
+}
+
+/**
+ * 派生语言（渠道默认语言 / 浏览器语言 / URL `?locale=`）：只作用于**本次加载**，
+ * 不写持久值。这些值每次打开都能重新推导，写进存储反而会覆盖后续的渠道配置。
+ */
+export function applyDerivedEmbedLocale(raw: string, localeRef?: LocaleRef) {
+  setActiveEmbedLocale(raw, localeRef, false)
+}
+
+/**
+ * Honor `?locale=` on the embed URL（宿主/预览声明，每次加载都会重新给出）——
+ * 按派生语言处理，不落持久值，否则预览一次就把语言钉死在访客浏览器里。
+ */
 export function syncEmbedLocaleFromUrl(localeRef: LocaleRef): boolean {
   const fromUrl = readEmbedLocaleFromUrl()
   if (!fromUrl) return false
-  applyEmbedLocale(fromUrl, localeRef)
+  applyDerivedEmbedLocale(fromUrl, localeRef)
   return true
 }
 
