@@ -165,6 +165,25 @@ class AgentPromptsTest {
     // ------------------------------------------------------------------
 
     @Test
+    void pinnedSkillInstructionsSectionRendersBody() {
+        String out = com.ragagent.agent.AgentPrompts.formatPinnedSkillInstructions(
+                java.util.List.of(new com.ragagent.agent.AgentPrompts.PinnedSkillInstructions(
+                        "kb-faq-curator", "## 步骤\n1. 先检索")));
+        assertThat(out).contains("<skill_instructions source=\"selected_for_this_turn\">");
+        assertThat(out).contains("<skill name=\"kb-faq-curator\">");
+        assertThat(out).contains("## 步骤\n1. 先检索");
+        assertThat(out).endsWith("</skill_instructions>");
+
+        // 空列表 → 不产生段（调用方按非空才注册段）
+        assertThat(com.ragagent.agent.AgentPrompts.formatPinnedSkillInstructions(java.util.List.of())).isEmpty();
+        // 技能名里的 XML 字符必须被转义，越不出属性
+        String escaped = com.ragagent.agent.AgentPrompts.formatPinnedSkillInstructions(
+                java.util.List.of(new com.ragagent.agent.AgentPrompts.PinnedSkillInstructions("a<b>", "x")));
+        assertThat(escaped).doesNotContain("<skill name=\"a<b>\">");
+        assertThat(escaped).contains("a&lt;b&gt;");
+    }
+
+    @Test
     void renderPromptPlaceholdersMatchesGo() {
         // 录音 ph_none_bound / ph_bound / ph_absent：替换是全模板级
         assertThat(AgentPrompts.renderPromptPlaceholders("Base {{knowledge_bases}} end", List.of()))

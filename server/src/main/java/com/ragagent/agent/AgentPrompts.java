@@ -153,6 +153,10 @@ public final class AgentPrompts {
     public record PinnedSkillInfo(String name, String description) {
     }
 
+    /** 本轮 @ 指定的技能正文（B61）：随系统提示词注入，点名场景确定性优先于按需读取。 */
+    public record PinnedSkillInstructions(String name, String instructions) {
+    }
+
     /** agent 提示词用的知识库要点信息。 */
     public record KnowledgeBaseInfo(
             String id,
@@ -317,6 +321,30 @@ public final class AgentPrompts {
      * 技能元数据格式化进系统提示词（Level 1 渐进披露）。
      * 只含名称与描述的轻量表示。
      */
+    /**
+     * 本轮点名的技能正文块（B61）。与 Level 1 的 {@code Available skills} 目录区分：
+     * 目录是"有哪些技能"，这里是"这次要照做的指令"，因此明确写出 source 与用法。
+     */
+    public static String formatPinnedSkillInstructions(List<PinnedSkillInstructions> pinned) {
+        if (pinned == null || pinned.isEmpty()) {
+            return "";
+        }
+        StringBuilder b = new StringBuilder();
+        b.append("\n\n<skill_instructions source=\"selected_for_this_turn\">\n");
+        b.append("The user selected the skills below for this turn. Apply their instructions to the task; ")
+                .append("read a bundled resource with read_file(path=\"skill://<name>/<file>\") only when the ")
+                .append("instructions require it.\n");
+        for (PinnedSkillInstructions s : pinned) {
+            if (s == null || s.name() == null || s.name().isEmpty()) {
+                continue;
+            }
+            b.append("<skill name=\"").append(escapeXMLAttr(s.name())).append("\">\n")
+                    .append(s.instructions() == null ? "" : s.instructions().strip()).append("\n</skill>\n");
+        }
+        b.append("</skill_instructions>");
+        return b.toString();
+    }
+
     public static String formatSkillsMetadata(List<SkillMetadata> skillsMetadata) {
         if (skillsMetadata == null || skillsMetadata.isEmpty()) {
             return "";
@@ -380,6 +408,7 @@ public final class AgentPrompts {
         /** 本轮实际注册的工具（能力过滤之后）。 */
         private List<String> selectedTools;
         private List<SkillMetadata> skillsMetadata;
+        private List<PinnedSkillInstructions> pinnedSkillInstructions;
         /** {{language}} 占位符的用户语言名（如 "Chinese (Simplified)"）。 */
         private String language = "";
         /** 读模板用；null 时默认 base 为空。 */
@@ -391,6 +420,13 @@ public final class AgentPrompts {
         public BuildSystemPromptOptions setSelectedTools(List<String> v) { selectedTools = v; return this; }
         public List<SkillMetadata> getSkillsMetadata() { return skillsMetadata; }
         public BuildSystemPromptOptions setSkillsMetadata(List<SkillMetadata> v) { skillsMetadata = v; return this; }
+
+        public List<PinnedSkillInstructions> getPinnedSkillInstructions() { return pinnedSkillInstructions; }
+
+        public BuildSystemPromptOptions setPinnedSkillInstructions(List<PinnedSkillInstructions> v) {
+            pinnedSkillInstructions = v;
+            return this;
+        }
         public String getLanguage() { return language; }
         public BuildSystemPromptOptions setLanguage(String v) { language = v == null ? "" : v; return this; }
         public AgentPromptTemplates.TemplatesConfig getConfig() { return config; }
@@ -483,6 +519,10 @@ public final class AgentPrompts {
             if (options.getSkillsMetadata() != null && !options.getSkillsMetadata().isEmpty()) {
                 sections.add(new SystemPromptSection("skills",
                         formatSkillsMetadata(options.getSkillsMetadata())));
+            }
+            if (options.getPinnedSkillInstructions() != null && !options.getPinnedSkillInstructions().isEmpty()) {
+                sections.add(new SystemPromptSection("skill_instructions",
+                        formatPinnedSkillInstructions(options.getPinnedSkillInstructions())));
             }
             sections.add(new SystemPromptSection("memory", options.getMemoryPrompt()));
             sections.add(new SystemPromptSection("protocol", options.getProtocolPrompt()));

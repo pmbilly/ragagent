@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.ragagent.agent.skills.Manager;
 import com.ragagent.agent.skills.Skill;
 import com.ragagent.agent.tools.ToolDefinitions;
 import com.ragagent.llm.domain.ChatMessage;
@@ -24,6 +25,9 @@ final class PromptAssembly {
     private static final Logger log = LoggerFactory.getLogger(PromptAssembly.class);
 
     private final AgentEngine engine;
+
+    /** pinned 技能正文的每轮缓存（引擎每轮新建 → 天然每轮失效）。 */
+    private List<AgentPrompts.PinnedSkillInstructions> pinnedSkillInstructions;
 
     PromptAssembly(AgentEngine engine) {
         this.engine = engine;
@@ -43,7 +47,43 @@ final class PromptAssembly {
         } else {
             opts.setSkillsMetadata(toAgentSkillMetadata(allMetadata));
         }
+        opts.setPinnedSkillInstructions(pinnedSkillInstructions());
         return opts;
+    }
+
+    /**
+     * 本轮点名技能的正文（B61）：读不到就不注入（该技能改走 read_file 按需读取），
+     * 不让技能读取失败拖垮整轮对话。
+     */
+    private List<AgentPrompts.PinnedSkillInstructions> pinnedSkillInstructions() {
+        if (pinnedSkillInstructions == null) {
+            pinnedSkillInstructions = resolvePinnedSkillInstructions(engine.skillsManager, engine.pinnedSkills);
+        }
+        return pinnedSkillInstructions;
+    }
+
+    /**
+     * pinned 技能正文解析（静态便于单测）：技能关着或读不到就不注入该条
+     * （该技能改走 read_file 按需读取），不让技能读取失败拖垮整轮对话。
+     */
+    static List<AgentPrompts.PinnedSkillInstructions> resolvePinnedSkillInstructions(
+            Manager manager, List<AgentPrompts.PinnedSkillInfo> pinned) {
+        List<AgentPrompts.PinnedSkillInstructions> out = new ArrayList<>();
+        if (manager == null || !manager.isEnabled() || pinned == null) {
+            return out;
+        }
+        for (AgentPrompts.PinnedSkillInfo item : pinned) {
+            if (item == null || item.name() == null || item.name().isEmpty()) {
+                continue;
+            }
+            try {
+                Skill skill = manager.loadSkill(item.name());
+                out.add(new AgentPrompts.PinnedSkillInstructions(item.name(), skill.instructions));
+            } catch (Exception e) {
+                log.warn("[Agent][Prompt] pinned skill \"{}\" not injected: {}", item.name(), e.getMessage());
+            }
+        }
+        return out;
     }
 
     private static List<com.ragagent.agent.SkillMetadata> toAgentSkillMetadata(List<Skill.SkillMetadata> in) {
@@ -149,7 +189,7 @@ final class PromptAssembly {
 
     /** @mention 的短提示（工具名已在 schema 里，此处不列）。 */
     static String buildMustUseBlock(List<AgentPrompts.PinnedMCPServiceInfo> mcpServices,
-            List<AgentPrompts.PinnedSkillInfo> skills) {
+            List<AgentPrompts.PinnedSkillInfo> skills, List<String> injectedSkillNames) {
         List<String> lines = new ArrayList<>();
         if (mcpServices != null) {
             for (AgentPrompts.PinnedMCPServiceInfo svc : mcpServices) {
@@ -190,8 +230,15 @@ final class PromptAssembly {
                     continue;
                 }
                 String name = sanitizeMustUseField(skill.name());
-                lines.add("Must call read_file(path=\"skill://" + name + "/SKILL.md\") for @Skill \""
-                        + name + "\" before answering.");
+                if (injectedSkillNames != null && injectedSkillNames.contains(skill.name())) {
+                    // B61：正文已随系统提示词注入 → 直接照做即可，不必再去读一遍
+                    lines.add("Apply the instructions of @Skill \"" + name
+                            + "\" (provided in <skill_instructions>) to the task below.");
+                } else {
+                    // 正文未能注入（如技能在提问后被删/改名）→ 保留按需读取作为回退
+                    lines.add("Must call read_file(path=\"skill://" + name + "/SKILL.md\") for @Skill \""
+                            + name + "\" before answering.");
+                }
             }
         }
         if (lines.isEmpty()) {
@@ -259,7 +306,8 @@ final class PromptAssembly {
         registerRuntimeReferences();
         String runtimeCtx = buildRuntimeContextBlock(sessionId, engine.knowledgeBasesInfo, engine.selectedDocs);
         runtimeCtx = engine.modelContext.compactKnownText(runtimeCtx);
-        String mustUse = buildMustUseBlock(engine.pinnedMCPServices, engine.pinnedSkills);
+        String mustUse = buildMustUseBlock(engine.pinnedMCPServices, engine.pinnedSkills,
+                pinnedSkillInstructions().stream().map(AgentPrompts.PinnedSkillInstructions::name).toList());
         return composeUserTurnContent(List.of(runtimeCtx, mustUse, query));
     }
 

@@ -715,6 +715,15 @@
 - **dev 数据留档**：平台内置示例 `citation-norm`（只读演示，可一行 SQL 删除）；隔离探针账号 `b60probe@test.local`（空间 12，owner）——保留用于后续隔离回归。
 - **遗留**：平台内置层目前**无 UI 入口**（预置 = SQL/发布动作），将来做"平台管理端技能页"再接；"改名时同步改写引用它的 agent 配置"仍未做（现为 409 硬拦）。
 
+**✅ B61（2026-10-04，技能按需读取打通 + @点名注入正文：read_file 工具 + skill_instructions 段）**
+- **触发**：用户追问「Agent 是如何加载 skill 的？会先注入名称和描述、按需加载正文吗？」→ 核查发现**设计是三级渐进披露，但只有 Level 1 是通的**：① `skill://` 全后端只有 3 处提及，**全是"告诉模型去读"的提示词文案，没有任何解析器**；② `read_file` 是沙箱绑定工具（`AgentEngineAssembler` 里那条 case 是 `continue`，注释写明 dev 无沙箱恒跳过），而沙箱包已随裁剪退役 → **全仓无实现类**；③ `Manager.loadSkill/readSkillFile/listSkillFiles/getSkillInfo` **零调用者**（B57 建好读面后工具侧从未接上）。即"选项 B 指令型技能"里**注入正文这一半从没生效**。用户拍板 **A+B**。
+- **A：`SkillReadFileTool`（`read_file`）**：契约**以 Go 录像为准**（`GoRecording45C` 的 31 条 `read_file/*`）——schema 与描述逐字复用 `description_skills_noshell`；输出三段式（`=== File: … ===` / `size=…, returned=… bytes` / 围栏内容）；data 键 `path/file_path/root/skill_name/size/returned_bytes/start_line/end_line/total_lines/truncated[/next_offset]`；错误文案逐条对齐（越界 = `skill resource must have a canonical relative file path without traversal`、名单外 = `skill "x" is not available to this agent`、技能关 = `skills are not enabled for this reader`、形态错、`line_offset` 仅 web、空 path、无源）。**行数语义也对齐**（尾随换行不额外算一行 → 12 字节的 `run.py` 是 `total_lines=1`）。**本部署无沙箱**：非 `skill://` 路径按录像 `exec_no_source` 明确报错（不假装读到）。注册时机：技能启用时由装配器注册（沙箱回归时需与 workspace 版 `read_file` 合并，注释已写明）。
+- **B：@点名技能的正文注入**：新增系统提示词段 `skill_instructions`（`<skill_instructions source="selected_for_this_turn">` + 每个 `<skill name>正文</skill>`）；`PromptAssembly.resolvePinnedSkillInstructions` 从技能目录解析正文，**读不到就不注入**（该条回退按需读取，不让技能读取失败拖垮整轮）；`must_use` 措辞随之切换：注入成功 → `Apply the instructions of @Skill "X" (provided in <skill_instructions>)`，失败 → 保留 `Must call read_file(...)` 回退。顺带修：pinned 技能此前**描述传空串**（`PinnedSkillInfo(name, "")`）→ 现取元数据里的真描述。
+- **验证**：① 单测 12 条：`SkillReadFileToolTest`（8：schema/描述逐字、入口与附随文件（含嵌套）的输出与 data、四类越界、形态错、名单外、技能关、无源、分页与字节预算、URI 纯逻辑）；`SkillPinnedInstructionsTest`（3：解析/回退/措辞）；`AgentPromptsTest` +1（注入段渲染与 XML 转义）。② **真实回合端到端**（记录型桩替换 chat 模型 + 既有桩 rerank）：模型收到的**工具清单含 `read_file`**、系统提示词含 **Level 1 目录段 + `skill_instructions` 注入正文**；桩回 `read_file(skill://kb-faq-curator/SKILL.md)` → **真实工具执行**，第二次请求的 tool 结果 = `=== File: skill://kb-faq-curator/SKILL.md ===\n\nsize=559 bytes…```\n# 知识库 FAQ 整理…`（格式与录像一致）；must_use 显示 B 分支措辞；SSE 含 `tool_call`/`tool_result`/`answer`/`complete`。
+- **闸门**：后端 **4,720 测试 0 失败 + spotlessCheck 绿**；前端无改动（契约键守卫无新增）。
+- **探针清理与环境**：记录型桩（/tmp，已停本进程）；`b0-stub-chat` baseUrl **已还原**为 `127.0.0.1:18090`；3 个探针 agent 已删。**新增 dev 便利件 `dev-stub-rerank`**：租户 1 此前**没有 Rerank 模型**，agent 模式对话会直接报 `rerank model is not configured`（本次验证时临时补的桩模型，留着方便后续自测）。
+- **遗留**：`read_file` 的 workspace / `web://` 分支仍无实现（需沙箱或网页存储回归）；技能附随文件（Level 3）随 A 一起可用（`skill://<name>/<rel>` 已通）。
+
 **✅ B58（2026-10-04，旧信封读法清剿：Go `{success,data}` 残留 → Java 裸载荷）**
 - **触发**：用户点检 `?section=integration-api` 报「加载 API 集成设置失败」。
 - **根因**：`/auth/me` 是**裸信封**（`{user, tenant, memberships, tenantRequired, capabilities, preferenceDefaults}`，`tenant` 在顶层），而页面读 `userResp.data.tenant`（Go 时代 `{success,data}` 形状）→ 恒 undefined → 直接抛错。curl 实测坐实（200 + 顶层键清单里无 `data`）。

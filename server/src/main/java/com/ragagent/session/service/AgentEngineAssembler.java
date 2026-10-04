@@ -150,9 +150,18 @@ final class AgentEngineAssembler {
         }
         List<AgentPrompts.PinnedSkillInfo> pinnedSkills = new ArrayList<>();
         if (config.getPinnedSkillNames() != null) {
+            // 描述取自已装配的技能元数据（此前给空串 → @ 引用处拿不到任何展示信息）
+            java.util.Map<String, String> descByName = new java.util.HashMap<>();
+            if (skillsManager != null && skillsManager.getAllMetadata() != null) {
+                for (com.ragagent.agent.skills.Skill.SkillMetadata m : skillsManager.getAllMetadata()) {
+                    if (m != null && m.name() != null) {
+                        descByName.put(m.name(), m.description() == null ? "" : m.description());
+                    }
+                }
+            }
             for (String name : config.getPinnedSkillNames()) {
                 if (name != null && !name.isEmpty()) {
-                    pinnedSkills.add(new AgentPrompts.PinnedSkillInfo(name, ""));
+                    pinnedSkills.add(new AgentPrompts.PinnedSkillInfo(name, descByName.getOrDefault(name, "")));
                 }
             }
         }
@@ -161,6 +170,9 @@ final class AgentEngineAssembler {
         // 指令型技能注入（Level 1 元数据进系统提示词；Level 2/3 由引擎按需读取）
         if (skillsManager != null) {
             engine.setSkillsManager(skillsManager);
+            // Level 2/3 的按需读取通道：模型按提示词里的 skill://<name>/SKILL.md 调 read_file。
+            // 沙箱已退役，read_file 由本工具提供（不再等沙箱注册步骤）。
+            toolRegistry.registerTool(new com.ragagent.agent.tools.SkillReadFileTool(skillsManager));
         }
 
         // 工具图片 VLM 描述器：取到 VLM 模型则
