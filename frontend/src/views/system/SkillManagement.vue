@@ -55,9 +55,6 @@
       <template #slug="{ row }">
         <code class="sm-slug">{{ row.slug }}</code>
       </template>
-      <template #description="{ row }">
-        <span class="sm-desc">{{ row.description }}</span>
-      </template>
       <template #referencedBy="{ row }">
         <t-tag v-if="row.referencedBy?.length" size="small" variant="light-outline" theme="primary">
           {{ t('skillManagement.referencedByCount', { count: row.referencedBy.length }) }}
@@ -212,7 +209,15 @@ const error = ref('')
 const columns = computed(() => [
   { colKey: 'name', title: t('skillManagement.columns.name'), width: 180 },
   { colKey: 'slug', title: t('skillManagement.columns.slug'), width: 180 },
-  { colKey: 'description', title: t('skillManagement.columns.description'), ellipsis: true },
+  {
+    colKey: 'description',
+    title: t('skillManagement.columns.description'),
+    // 描述过长时 TDesign 的 ellipsis 气泡**直接复用单元格 VNode**（ellipsis.mjs：
+    // content: () => cellNode），所以次要色必须下放到列级 className（td 上），
+    // 不能再包一层带颜色的 span——否则灰字会被带进深色气泡里，看不清。
+    ellipsis: true,
+    className: 'sm-desc-cell',
+  },
   { colKey: 'referencedBy', title: t('skillManagement.columns.referencedBy'), width: 130 },
   { colKey: 'updatedAt', title: t('skillManagement.columns.updatedAt'), width: 170 },
   { colKey: 'actions', title: t('skillManagement.columns.actions'), width: 130, fixed: 'right' as const },
@@ -344,9 +349,26 @@ function formatDateTime(value?: string) {
   gap: 16px;
 }
 
-.sm-title-block h2 {
-  margin: 0 0 6px;
-  font-size: 18px;
+.sm-title-block {
+  h2 {
+    margin: 0 0 8px;
+    color: var(--td-text-color-primary);
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+
+  // 与系统管理组其它页（RuntimeQueues 等）同一份头部说明样式：
+  // 这类 .section-* 类没有全局定义，各页在自己的 scoped 块里自备。
+  .section-description {
+    max-width: 560px;
+    margin: 0;
+    color: var(--td-text-color-secondary);
+    font-size: 14px;
+    line-height: 1.6;
+    text-wrap: pretty;
+  }
 }
 
 .sm-actions {
@@ -393,7 +415,9 @@ function formatDateTime(value?: string) {
   color: var(--td-text-color-secondary);
 }
 
-.sm-desc {
+// 描述列的次要色：挂在 td 上（列级 className），悬浮气泡里是纯文本，
+// 因此气泡使用 tooltip 自身的文字色，不会变成灰字黑底。
+:deep(.sm-desc-cell) {
   color: var(--td-text-color-secondary);
 }
 
