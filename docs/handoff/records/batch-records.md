@@ -748,6 +748,16 @@
 - **验证**：真机 4/4——浏览器 en + 页面 zh-CN → **zh-CN**（原 ✗）；zh + zh → zh；页面 `de-DE`（不支持）→ 回落浏览器 `en-US`；显式 `init({locale:'ja-JP'})` → 压过页面声明。B63 六项回归全绿；新增/扩展单测 3 条 + 守卫补 2 条不变量（**两个红态探针**分别摘掉 widget 转发与 bridge 读取，均点名报红）。前端 **724/724**、`vue-tsc` 0 错误、i18n 审计 11/11、契约键守卫无新增。
 - **口径**：**"跟随"类设置要把信号分层**——宿主显式 > 站点（渠道）配置 > 页面声明 > 浏览器/平台默认；且只有**显式**选择才持久化。本次的坑是把"宿主"简化成了"浏览器"（宿主页声明既没被读取，也没有可携带它的通道）。
 
+**✅ B65（2026-10-04，嵌入渠道「保存后密钥丢失」：发布 Token 被列表刷新冲掉）**
+- **触发**：用户报 `?section=integration-embed&agentId=builtin-smart-reasoning`——嵌入代码原本正常，**点保存后**变成 `<!-- 加载渠道密钥失败，请关闭后重新打开该渠道。 -->`。
+- **根因（真机复现 + 三层契约实测）**：`publishToken` 只在**详情 / 创建 / 轮换**响应里返回（授权边界，见 `api/embed/index.ts` 顶部注释）；**列表行不带**，且**更新（PUT）响应也不带**（后端 `EmbedChannelMgmtController` 的 update 返回 `row(ch, false)`）。面板打开抽屉时靠详情响应 `mergeChannelDetail` 把 token 合进行里——但保存分支 `await load()` 会用**列表行整体重建** `allChannels` ⇒ 合并进来的 token 被冲掉 ⇒ `tokenFor()` 为空 ⇒ `drawerSnippet` 退化为 `<!-- ${t('embedPublish.tokenHint')} -->`。实测四层：创建带 token ✓ / 列表不带 ✓ / 详情带 ✓ / **更新不带 ✓**。
+- **复现与验证（Playwright，真点 5 步向导 + 保存）**：保存前 snippet 含 `em_…` → 保存后**正是**用户看到的那行提示（一字不差）；修复后保存前后都含 `em_…`。
+- **修复（前端，不动后端）**：新增 `components/embedChannelTokenRegistry.ts`——本会话按渠道 id 记住**已见过**的 token，`hydrate()` 在每次 `load()` 后贴回列表行，`forget()` 在删除渠道时清理；**只存内存、不落 localStorage/sessionStorage**（token 属敏感物，刷新后按既有提示重开抽屉再取）。面板三处接线：`mergeChannelDetail` → `remember`；`load()` → `hydrate`（替换裸赋值 `= res || []`）；`removeChannel` → `forget`。**刻意不改后端**：让 PUT 也返回 token 会扩大暴露面，而面板本就合法持有该 token。
+- **成因归属**：`mergeChannelDetail` 与保存分支的 `await load()` 都来自**初始建仓**（`git log -S` → `6b80270b`）⇒ 长期潜伏 bug、非近期回归；用户是在**改渠道语言（B63/B64 工作流）后点保存**时撞上的。
+- **同族扫查**：全仓 `publishToken` 消费点只有本面板（`IMChannelPanel` 不用它）✓；同族触发路径（启用/停用开关、新建、轮换）都走 `load()` ⇒ 同一处修复覆盖；轮换 `mergeChannelDetail(res)` 先写入**新值**再 `load()` ⇒ 新值生效 ✓。
+- **守卫与测试**：`embedChannelTokenContract.test.ts`（3 条不变量：hydrate 贴回 / remember 唯一取值来源 / forget 清理）+ `embedChannelTokenRegistry.test.ts`（3 条：跨刷新保留、轮换覆盖+删除清理、空值安全）；**两个红态探针**（把 `load()` 改回裸赋值、去掉 `remember`）均点名报红。前端 **728/728**、`vue-tsc` 0 错误、i18n 审计 11/11、契约键守卫无新增；临时探针渠道与 agent 已删除（204/204，无残留）。
+- **遗留**：非管理员视图（`hide-footer`）与卡片上的启用开关在自动化里不可达（元素被隐藏/拦截），该路径由单测语义覆盖，未做浏览器实测。
+
 **✅ B58（2026-10-04，旧信封读法清剿：Go `{success,data}` 残留 → Java 裸载荷）**
 - **触发**：用户点检 `?section=integration-api` 报「加载 API 集成设置失败」。
 - **根因**：`/auth/me` 是**裸信封**（`{user, tenant, memberships, tenantRequired, capabilities, preferenceDefaults}`，`tenant` 在顶层），而页面读 `userResp.data.tenant`（Go 时代 `{success,data}` 形状）→ 恒 undefined → 直接抛错。curl 实测坐实（200 + 顶层键清单里无 `data`）。

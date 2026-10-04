@@ -461,6 +461,7 @@ import {
 } from '@/utils/embedAllowedOrigins'
 import { listAgents, type CustomAgent } from '@/api/agent'
 import IntegrationsAgentFilter from '@/components/IntegrationsAgentFilter.vue'
+import { createEmbedChannelTokenRegistry } from './embedChannelTokenRegistry'
 
 const filterAgentId = defineModel<string>('filterAgentId', { default: '' })
 
@@ -731,7 +732,11 @@ function agentForChannel(ch: EmbedChannel): CustomAgent | undefined {
   return agents.value.find((agent) => agent.id === ch.agentId)
 }
 
+const channelTokens = createEmbedChannelTokenRegistry()
+
 function mergeChannelDetail(detail: EmbedChannel) {
+  // 详情/创建/轮换响应带 token：记进本会话（列表与 PUT 响应都不带，见 api/embed 注释）
+  channelTokens.remember(detail)
   const idx = allChannels.value.findIndex((ch) => ch.id === detail.id)
   if (idx >= 0) {
     allChannels.value[idx] = { ...allChannels.value[idx], ...detail }
@@ -745,7 +750,9 @@ const load = async () => {
       listAllEmbedChannels(),
       listAgents(),
     ])
-    allChannels.value = res || []
+    // 列表行不带 publishToken（授权边界）——把本会话见过的贴回去；否则保存、
+    // 启用/停用等任何触发 load() 的操作都会让嵌入代码退化成「加载渠道密钥失败」。
+    allChannels.value = channelTokens.hydrate(res)
     agents.value = agentRes?.agents || []
     await Promise.all(allChannels.value.map(async (ch) => {
       try {
@@ -1130,6 +1137,7 @@ const performRotate = async (id: string) => {
 
 const removeChannel = async (id: string) => {
   await deleteEmbedChannel(id)
+  channelTokens.forget(id)
   if (editingId.value === id) closeDrawer()
   await load()
   MessagePlugin.success(t('embedPublish.deleted'))
@@ -1516,6 +1524,7 @@ const toggleEnabled = async (ch: EmbedChannel, enabled: boolean) => {
   border-radius: 8px;
   background: var(--td-bg-color-secondarycontainer);
   overflow: hidden;
+  margin-top: 10px;
 
   &__toolbar {
     display: flex;
@@ -1586,6 +1595,7 @@ const toggleEnabled = async (ch: EmbedChannel, enabled: boolean) => {
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
   cursor: default;
   overflow: hidden;
+  padding: 0px;
 
   :deep(.t-icon) {
     display: flex;
