@@ -65,15 +65,12 @@ public final class AgentStreamBridge {
     private static final Logger log = LoggerFactory.getLogger(AgentStreamBridge.class);
 
     private final String sessionId;
-    /** Tenant that owns this session; used when persisting skill artifacts. */
-    private final long tenantId;
     private final String assistantMessageId;
     private final String requestId;
     /** Handler entry timestamp, used for TTFB logging */
     private final OffsetDateTime receivedAt;
     private boolean ttfbLogged;
     private final Message assistantMessage;
-    private final StreamManager streamManager;
 
     /** SSE 发射缝（各 handler 的"组装 + 试追加 + 日志"样板收拢处）。 */
     private final AgentStreamEmitter emitter;
@@ -120,44 +117,19 @@ public final class AgentStreamBridge {
 
     public AgentStreamBridge(
             String sessionId, String assistantMessageId, String requestId,
-            long tenantId, OffsetDateTime receivedAt, Message assistantMessage,
+            OffsetDateTime receivedAt, Message assistantMessage,
             StreamManager streamManager, EventBus eventBus) {
         this.sessionId = sessionId;
         this.assistantMessageId = assistantMessageId;
         this.requestId = requestId;
-        this.tenantId = tenantId;
         this.receivedAt = receivedAt;
         this.assistantMessage = assistantMessage;
-        this.streamManager = streamManager;
         this.emitter = new AgentStreamEmitter(sessionId, assistantMessageId, streamManager);
         this.eventBus = eventBus;
     }
 
     public Message getAssistantMessage() {
         return assistantMessage;
-    }
-
-    /**
-     * 告知活 UI
-     * 沙箱有文件正在上传。count ≤ 0 直接跳过。
-     */
-    private void emitArtifactsPending(int count) {
-        if (count <= 0) {
-            return;
-        }
-        StreamEvent event = new StreamEvent();
-        event.setId("artifacts-pending-" + System.currentTimeMillis());
-        event.setType(ResponseType.ARTIFACTS_PENDING);
-        event.setTimestamp(OffsetDateTime.now());
-        Map<String, Object> data = new LinkedHashMap<>();
-        data.put("count", count);
-        event.setData(data);
-        try {
-            streamManager.appendEvent(sessionId, assistantMessageId, event);
-        } catch (RuntimeException e) {
-            log.warn("append artifacts_pending failed session={} message={}: {}",
-                    sessionId, assistantMessageId, e.toString());
-        }
     }
 
     /** 对照 Subscribe：17 种事件订阅序逐字对齐（订阅序即回调序，Go 按此序 On）。 */

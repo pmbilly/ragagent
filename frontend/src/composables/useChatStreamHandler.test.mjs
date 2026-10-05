@@ -120,7 +120,7 @@ test('injected user messages fork a continuation assistant below the bubble', ()
 
 test('agent answer.done does not mark the session idle', () => {
   const chunkStart = source.indexOf("case 'answer':")
-  const chunkEnd = source.indexOf("case 'artifacts_pending'", chunkStart)
+  const chunkEnd = source.indexOf("case 'user_message_injected'", chunkStart)
   assert.notEqual(chunkStart, -1)
   assert.notEqual(chunkEnd, -1)
   const chunk = source.slice(chunkStart, chunkEnd)

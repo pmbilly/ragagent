@@ -942,14 +942,6 @@ export function useChatStreamHandler(options: UseChatStreamHandlerOptions) {
         }
         break
       }
-      case 'artifacts_pending': {
-        const pendingCount = Number((dataPayload as any)?.count)
-        message.artifactsCollecting = true
-        if (Number.isFinite(pendingCount) && pendingCount > 0) {
-          message.artifactsPendingCount = pendingCount
-        }
-        break
-      }
       case 'user_message_injected': {
         // A message the user queued mid-run was accepted into the running
         // turn. Place it under the work so far, then fork a continuation
@@ -1021,7 +1013,6 @@ export function useChatStreamHandler(options: UseChatStreamHandlerOptions) {
         if (Array.isArray(streamedArtifacts) && streamedArtifacts.length) {
           message.artifacts = streamedArtifacts
         }
-        message.artifactsCollecting = false
         const usage = (dataPayload as any)?.usage || (data as any).usage
         if (usage) {
           message.usage = usage
@@ -1049,7 +1040,6 @@ export function useChatStreamHandler(options: UseChatStreamHandlerOptions) {
         isReplying.value = false
         fullContent.value = ''
         currentAssistantMessageId.value = ''
-        message.artifactsCollecting = false
         break
       }
     }
@@ -1139,7 +1129,6 @@ export function useChatStreamHandler(options: UseChatStreamHandlerOptions) {
       data.response_type === 'tool_result' ||
       data.response_type === 'command_output' ||
       data.response_type === 'reflection' ||
-      data.response_type === 'artifacts_pending' ||
       data.response_type === 'context_compacted' ||
       data.response_type === 'user_message_injected'
 

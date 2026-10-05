@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.common.security.SsrfGuard;
 import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
 
@@ -61,7 +60,6 @@ public class WechatLongPollClient {
     private final String botToken;
     private final String ilinkBotId;
     private final String baseUrl;
-    private final SsrfGuard ssrfGuard;
     private final BiConsumer<IncomingMessage, String> msgHandler;
     private final String channelId;
     private final HttpClient http;
@@ -75,7 +73,7 @@ public class WechatLongPollClient {
     private volatile Thread loopThread;
 
     public WechatLongPollClient(String botToken, String ilinkBotId, String baseUrl,
-                                SsrfGuard ssrfGuard, String channelId,
+                                String channelId,
                                 BiConsumer<IncomingMessage, String> msgHandler) {
         this.botToken = botToken == null ? "" : botToken;
         this.ilinkBotId = ilinkBotId == null ? "" : ilinkBotId;
@@ -85,7 +83,6 @@ public class WechatLongPollClient {
             base = base.substring(0, base.length() - 1);
         }
         this.baseUrl = base;
-        this.ssrfGuard = ssrfGuard;
         this.channelId = channelId == null ? "" : channelId;
         this.msgHandler = msgHandler;
         this.http = HttpClient.newBuilder()

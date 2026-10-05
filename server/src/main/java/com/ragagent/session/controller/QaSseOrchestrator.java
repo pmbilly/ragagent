@@ -104,7 +104,7 @@ final class QaSseOrchestrator {
 
         // AgentStreamBridge 订阅（17 种事件）
         AgentStreamBridge bridge = new AgentStreamBridge(reqCtx.sessionId, reqCtx.assistantMessage.getId(),
-                reqCtx.requestId, sessionTenantId, OffsetDateTime.now(), reqCtx.assistantMessage,
+                reqCtx.requestId, OffsetDateTime.now(), reqCtx.assistantMessage,
                 streamManager, eventBus);
         bridge.subscribe();
 

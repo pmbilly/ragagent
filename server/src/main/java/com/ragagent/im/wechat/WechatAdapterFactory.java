@@ -47,7 +47,7 @@ public class WechatAdapterFactory implements ImService.AdapterFactory {
 
         WechatAdapter adapter = new WechatAdapter(botToken, ilinkBotId, baseUrl, ssrfGuard);
         WechatLongPollClient client = new WechatLongPollClient(botToken, ilinkBotId, baseUrl,
-                ssrfGuard, channel.getId(),
+                channel.getId(),
                 (msg, cid) -> msgHandler.accept(msg, cid));
         Thread thread = new Thread(client::start, "im-wechat-poll-" + channel.getId());
         thread.setDaemon(true);

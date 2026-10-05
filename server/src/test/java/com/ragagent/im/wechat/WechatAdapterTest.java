@@ -236,7 +236,7 @@ class WechatAdapterTest {
     void pollsUpdates() throws Exception {
         List<IncomingMessage> received = new CopyOnWriteArrayList<>();
         CountDownLatch latch = new CountDownLatch(1);
-        WechatLongPollClient client = new WechatLongPollClient("tk", "bot", apiBase, null, "ch-1",
+        WechatLongPollClient client = new WechatLongPollClient("tk", "bot", apiBase, "ch-1",
                 (msg, cid) -> {
                     received.add(msg);
                     latch.countDown();
@@ -268,7 +268,7 @@ class WechatAdapterTest {
         assertEquals(30_000L, WechatLongPollClient.pollReconnectDelayMs(7));
         assertEquals(30_000L, WechatLongPollClient.pollReconnectDelayMs(64));
 
-        WechatLongPollClient idle = new WechatLongPollClient("tk", "bot", apiBase, null, "ch",
+        WechatLongPollClient idle = new WechatLongPollClient("tk", "bot", apiBase, "ch",
                 (m, c) -> { });
         idle.stop();   // 未启动也可安全停
     }
@@ -276,7 +276,7 @@ class WechatAdapterTest {
     @Test
     @DisplayName("解析：text/voice/image/file 四型 + BOT 消息与空 item 丢弃；图片优先 aeskey，文件读 len")
     void parsesMessageItems() {
-        WechatLongPollClient c = new WechatLongPollClient("tk", "bot", apiBase, null, "ch",
+        WechatLongPollClient c = new WechatLongPollClient("tk", "bot", apiBase, "ch",
                 (m, cid) -> { });
 
         assertNull(c.parseMessage(json("{\"message_type\":2,\"item_list\":[{\"type\":1}]}")));
