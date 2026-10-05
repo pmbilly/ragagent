@@ -95,6 +95,11 @@ knowledge:
 memory:
   redis-enabled: ${MEMORY_REDIS_ENABLED:false}
 
+# datasource 同步队列：缺省进程内队列（多副本会各自触发一次同步）；true = Redis
+# 共享任务表 + 全局 TaskID 去重（cron 同分钟一起触发时只有第一个赢，启动时 ping 一次）。
+datasource:
+  redis-enabled: ${DATASOURCE_REDIS_ENABLED:false}
+
 # ---- 以下为 Go config.yaml 的业务配置键（翻译对应模块时逐个启用）----
 conversation:
   max-rounds: 5
