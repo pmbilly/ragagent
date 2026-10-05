@@ -229,10 +229,11 @@ class McpToolListingTest {
         @DisplayName("未 initialize 时读目录 → ErrNotConnected")
         void requiresInitialized() {
             FakeTransport transport = new FakeTransport(request -> ok("{\"tools\":[]}"));
-            DefaultMcpClient client = new DefaultMcpClient(new McpService(), transport, null);
-            McpException err = assertThrows(McpException.class, () -> client.listTools(McpContext.none()));
-            assertTrue(err.hasCode(McpErrorCode.NOT_CONNECTED));
-            assertEquals(0, transport.calls);
+            try (DefaultMcpClient client = new DefaultMcpClient(new McpService(), transport, null)) {
+                McpException err = assertThrows(McpException.class, () -> client.listTools(McpContext.none()));
+                assertTrue(err.hasCode(McpErrorCode.NOT_CONNECTED));
+                assertEquals(0, transport.calls);
+            }
         }
 
         @Test

@@ -1,8 +1,6 @@
 package com.ragagent.vectorstore.service;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -537,18 +535,6 @@ public class VectorStoreConfigService {
     }
 
     // ── 小工具 ─────────────────────────────────────────────────────────
-
-    private boolean dial(String host, int port) {
-        if (host == null || host.isEmpty()) {
-            return false;
-        }
-        try (Socket socket = new Socket()) {
-            socket.connect(new InetSocketAddress(host, port), (int) TEST_TIMEOUT.toMillis());
-            return true;
-        } catch (IOException e) {
-            return false;
-        }
-    }
 
     private static void require(String value, String message) {
         if (empty(value)) {

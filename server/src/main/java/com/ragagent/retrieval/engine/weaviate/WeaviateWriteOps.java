@@ -265,7 +265,7 @@ final class WeaviateWriteOps {
         while (true) {
             String query = WeaviateGql.copyPageQuery(collection, where, WeaviateRetrieveRepository.COPY_PAGE_SIZE, offset);
             JsonNode response = service.client.graphql(query);
-            JsonNode items = service.extractItems(response, collection);
+            JsonNode items = WeaviateRetrieveRepository.extractItems(response, collection);
             if (items == null || items.isEmpty()) {
                 break;
             }

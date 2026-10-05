@@ -26,8 +26,6 @@ import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import com.ragagent.knowledge.service.KnowledgeService;
 import com.ragagent.knowledge.task.KnowledgeProcessingQueue;
 import com.ragagent.knowledge.storage.LocalStorageService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import com.ragagent.common.error.ErrorCode;
 
@@ -69,14 +67,11 @@ import com.ragagent.common.error.ErrorCode;
 @Component
 public class MapperKnowledgeBridge implements KnowledgeBridge {
 
-    private static final Logger log = LoggerFactory.getLogger(MapperKnowledgeBridge.class);
-
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final KnowledgeMapper knowledgeMapper;
     private final KnowledgeBaseMapper kbMapper;
     private final ChunkMapper chunkMapper;
-    private final LocalStorageService storage;
     /** A3-3 尾批：租户感知文件存储（本地契约不变；云 provider 租户落对象存储）。 */
     private final com.ragagent.knowledge.storage.TenantFileStorage fileStorage;
     private final KnowledgeProcessingQueue worker;
@@ -85,14 +80,12 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
     public MapperKnowledgeBridge(KnowledgeMapper knowledgeMapper,
                                  KnowledgeBaseMapper kbMapper,
                                  ChunkMapper chunkMapper,
-                                 LocalStorageService storage,
                                  com.ragagent.knowledge.storage.TenantFileStorage fileStorage,
                                  KnowledgeProcessingQueue worker,
                                  DataSource dataSource) {
         this.knowledgeMapper = knowledgeMapper;
         this.kbMapper = kbMapper;
         this.chunkMapper = chunkMapper;
-        this.storage = storage;
         this.fileStorage = fileStorage;
         this.worker = worker;
         this.postgres = DatabaseDialects.isPostgres(dataSource);

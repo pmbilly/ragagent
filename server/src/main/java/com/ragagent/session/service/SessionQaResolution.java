@@ -20,8 +20,6 @@ final class SessionQaResolution {
 
     private static final ObjectMapper JSON = new ObjectMapper();
 
-    private final SessionKnowledgeQaService service;
-
     /** agent 覆盖簇。 */
     private final QaSearchTargets searchTargets;
 
@@ -108,11 +106,10 @@ final class SessionQaResolution {
     public record MentionScope(List<String> kbIds, List<String> knowledgeIds) {}
 
     SessionQaResolution(SessionKnowledgeQaService service) {
-        this.service = service;
             this.modelSelection = new QaModelSelection(service);
         this.kbScope = new QaKbScope(service);
         this.mentionTagScope = new QaMentionTagScope(service, this.kbScope);
-        this.chatOverrides = new QaChatManageOverrides(service);
+        this.chatOverrides = new QaChatManageOverrides();
         this.searchTargets = new QaSearchTargets(service, this.kbScope);
 }
 

@@ -169,10 +169,6 @@ class ChunkEditServiceTest {
         }
     }
 
-    private String metadataJson(String chunkId) {
-        return jdbc.queryForObject("SELECT metadata FROM chunks WHERE id = ?", String.class, chunkId);
-    }
-
     private String indexStatus(String chunkId) {
         return jdbc.queryForObject("SELECT index_status FROM chunks WHERE id = ?", String.class, chunkId);
     }

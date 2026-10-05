@@ -36,15 +36,11 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 final class EmbeddedRedis implements AutoCloseable {
 
     private final Process process;
-    private final String host;
-    private final int port;
     private final LettuceConnectionFactory connectionFactory;
     private final StringRedisTemplate template;
 
     private EmbeddedRedis(Process process, String host, int port) {
         this.process = process;
-        this.host = host;
-        this.port = port;
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
         this.connectionFactory = new LettuceConnectionFactory(config);
         this.connectionFactory.afterPropertiesSet();

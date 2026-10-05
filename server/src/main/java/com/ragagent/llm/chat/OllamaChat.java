@@ -142,7 +142,6 @@ public class OllamaChat implements LlmChatClient {
         log.info("发送流式聊天请求到模型 {}", modelName);
 
         BlockingQueue<StreamResponse> streamQueue = new LinkedBlockingQueue<>();
-        String model = modelName;
 
         Thread.ofVirtual().name("ollama-chat-stream").start(() -> {
             // thinking 的记账跨回调实例存活（"还欠一个 thinking-done"）

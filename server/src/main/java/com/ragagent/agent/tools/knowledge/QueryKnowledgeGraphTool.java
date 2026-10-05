@@ -170,7 +170,6 @@ public class QueryKnowledgeGraphTool extends BaseTool {
         Map<String, GraphQueryResult> kbResults = new LinkedHashMap<>();
         for (String kbID : knowledgeBaseIDs) {
             GraphQueryResult r = new GraphQueryResult();
-            r.kbID = kbID;
             KnowledgeBaseView kb;
             try {
                 kb = graphSearch.getKnowledgeBaseByIdOnly(kbID);
@@ -378,7 +377,6 @@ public class QueryKnowledgeGraphTool extends BaseTool {
     }
 
     private static final class GraphQueryResult {
-        String kbID;
         KnowledgeBaseView kb;
         List<SearchResultView> results;
         String err;

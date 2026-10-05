@@ -54,11 +54,6 @@ public class SystemAdminUserService {
     public static final String ERR_PASSWORD_POLICY = PasswordPolicy.ERR_PASSWORD_POLICY;
     public static final String ERR_COMPLEX_PASSWORD_POLICY = PasswordPolicy.ERR_COMPLEX_PASSWORD_POLICY;
 
-    /** email 正则（宽松域名校验）。 */
-    private static final java.util.regex.Pattern EMAIL = java.util.regex.Pattern.compile(
-            "^[a-zA-Z0-9!#$%&'*+/=?^_`{|}~.\\-]+@[a-zA-Z0-9](?:[a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])?"
-                    + "(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])?)*$");
-
     static final String PASSWORD_SPECIAL_CHARS = "!@#$%^&*()_+-=[]{}|;:,.<>?";
 
     private final UserMapper userMapper;

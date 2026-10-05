@@ -34,7 +34,11 @@ final class NotionTestSupport {
     private NotionTestSupport() {
     }
 
+    /** 进入本套件时的进程级白名单（SsrfGuard 是 static，改后必须按快照还原）。 */
+    private static SsrfGuard.Whitelist whitelistSnapshot;
+
     static void allowLoopback() {
+        whitelistSnapshot = SsrfGuard.snapshotWhitelist();
         SsrfGuard guard = new SsrfGuard();
         guard.reloadWhitelist(LOOPBACK_WHITELIST);
         ConnectorHttp.setSsrfGuard(guard);
@@ -42,7 +46,12 @@ final class NotionTestSupport {
 
     static void restoreSsrf() {
         ConnectorHttp.setSsrfGuard(new SsrfGuard());
-        ConnectorHttp.ssrfGuard().reloadWhitelist(envWhitelistRaw());
+        if (whitelistSnapshot != null) {
+            SsrfGuard.restoreWhitelist(whitelistSnapshot);
+        } else {
+            // 未配对调用（没走过 allowLoopback）时退回环境变量重建
+            ConnectorHttp.ssrfGuard().reloadWhitelist(envWhitelistRaw());
+        }
     }
 
     private static String envWhitelistRaw() {

@@ -33,7 +33,6 @@ public class FileAccessResolver {
     }
 
     private ResolvedFile resolveFile(String reference) {
-        FileAccess file = new FileAccess(0, reference, reference, "");
         ResourceCatalogService.ResolvedPath resolved = catalog.resolvePath(reference);
         if (resolved.error()) {
             throw FileAccessException.notFound();
@@ -214,32 +213,6 @@ public class FileAccessResolver {
             }
         }
         return new FileAccess(owner, file.path(), file.filename(), file.storageBackendId());
-    }
-
-    /** API-Key 的 KB 白名单判定（{@code TenantAPIKeyScope.authorizeKnowledgeBases} 抛异常 → false）。 */
-    private static boolean apiKeyAllowsKb(String kbId) {
-        try {
-            com.ragagent.auth.apikey.domain.TenantAPIKeyScope.authorizeKnowledgeBases(java.util.List.of(kbId));
-            return true;
-        } catch (RuntimeException e) {
-            return false;
-        }
-    }
-
-    /** 检查检索结果的 content / matched_content / image_info 三个字段。 */
-    private static boolean searchResultHasResourceHandle(
-            com.ragagent.common.retrieval.SearchResult ref, String handle) {
-        return textHasResourceHandle(ref.getContent(), handle)
-                || textHasResourceHandle(ref.getMatchedContent(), handle)
-                || textHasResourceHandle(ref.getImageInfo(), handle);
-    }
-
-    /** 整 token 相等才算命中。 */
-    private static boolean textHasResourceHandle(String text, String handle) {
-        if (text == null || text.isEmpty() || handle == null || handle.isEmpty()) {
-            return false;
-        }
-        return StoragePaths.containsStorageReference(text, StoragePaths.buildResourcePath(handle));
     }
 
 }

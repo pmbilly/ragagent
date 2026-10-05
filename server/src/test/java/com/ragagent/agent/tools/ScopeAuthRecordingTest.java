@@ -82,14 +82,12 @@ class ScopeAuthRecordingTest {
 
     private static final class Rec {
         final String id;
-        final String fn;
         final String error;
         final JsonNode result;
 
         Rec(String constant) {
             JsonNode r = GoRecording45B.rec(field(constant));
             this.id = r.get("id").asText();
-            this.fn = r.get("fn").asText();
             this.error = r.get("error").asText();
             this.result = r.get("result");
         }

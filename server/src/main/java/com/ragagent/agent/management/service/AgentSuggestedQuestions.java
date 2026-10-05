@@ -12,7 +12,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.agent.management.dto.CustomAgentResult;
 import com.ragagent.agent.management.mapper.AgentQuestionMapper;
-import com.ragagent.agent.management.mapper.CustomAgentMapper;
 import com.ragagent.auth.apikey.domain.TenantAPIKeyScope;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 
@@ -29,13 +28,10 @@ public final class AgentSuggestedQuestions {
 
 
     private final CustomAgentService agents;
-    private final CustomAgentMapper agentMapper;
     private final AgentQuestionMapper questionMapper;
 
-    AgentSuggestedQuestions(CustomAgentService agents, CustomAgentMapper agentMapper,
-            AgentQuestionMapper questionMapper) {
+    AgentSuggestedQuestions(CustomAgentService agents, AgentQuestionMapper questionMapper) {
         this.agents = agents;
-        this.agentMapper = agentMapper;
         this.questionMapper = questionMapper;
     }
 
@@ -107,12 +103,10 @@ public final class AgentSuggestedQuestions {
 
         // tag scopes 解析
         List<String> tagKnowledgeBaseIds = new ArrayList<>();
-        List<String> tagKnowledgeIds = new ArrayList<>();
         Map<Long, List<String>> tagIdsByTenant = new LinkedHashMap<>();
         if (!scopeTagIds.isEmpty()) {
             ResolvedTags resolved = resolveTagScopes(tagScopes);
             tagKnowledgeBaseIds = resolved.knowledgeBaseIds();
-            tagKnowledgeIds = resolved.knowledgeIds();
             tagIdsByTenant = resolved.tagIdsByTenant();
             knowledgeIds = mergeUnique(knowledgeIds, resolved.knowledgeIds());
             if ((knowledgeIds == null || knowledgeIds.isEmpty())

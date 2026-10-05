@@ -250,6 +250,7 @@ final class Engine46bStubSupport {
         boolean failPersist;
         final Map<String, Boolean> consumed = new java.util.HashMap<>();
 
+        @SafeVarargs
         FakeSteerSink(Map<String, Object>... entries) {
             queued.addAll(List.of(entries));
         }

@@ -37,7 +37,6 @@ public class CustomAgentService {
 
 
     private final CustomAgentMapper agentMapper;
-    private final AgentQuestionMapper questionMapper;
     private final com.ragagent.auth.service.UserService userService;
     private final KnowledgeBaseService kbService;
     private final BuiltinAgentRegistry registry;
@@ -59,12 +58,11 @@ public class CustomAgentService {
             org.springframework.beans.factory.ObjectProvider<
                     com.ragagent.im.service.ImService> imServiceProvider) {
         this.agentMapper = agentMapper;
-        this.questionMapper = questionMapper;
         this.userService = userService;
         this.kbService = kbService;
         this.registry = registry;
         this.imServiceProvider = imServiceProvider;
-        this.suggestedQuestions = new AgentSuggestedQuestions(this, agentMapper, questionMapper);
+        this.suggestedQuestions = new AgentSuggestedQuestions(this, questionMapper);
     }
 
     /** 包内协作者访问面。 */

@@ -95,7 +95,7 @@ class MergeRecordingTest {
     // ----- sequential（对照 recMergeSequential） -----
 
     private PluginMerge plugin() {
-        return new PluginMerge(new Rec46cSupport.StubChunkRepo(), null);
+        return new PluginMerge(new Rec46cSupport.StubChunkRepo());
     }
 
     @Test
@@ -189,7 +189,7 @@ class MergeRecordingTest {
         parent.setContent("手工插入的前缀\n\n![one](u1)\n\n父块正文\n\n![two](u2)");
         Rec46cSupport.StubChunkRepo repo = new Rec46cSupport.StubChunkRepo();
         repo.chunks.put("parent", parent);
-        PluginMerge p = new PluginMerge(repo, null);
+        PluginMerge p = new PluginMerge(repo);
         // 缺省租户走 chatManage.TenantID 兜底（Java 无 ctx 传值）
         ChatManage tenantCm = new ChatManage();
         tenantCm.setTenantId(1);
@@ -223,7 +223,7 @@ class MergeRecordingTest {
         Rec46cSupport.StubChunkRepo repo2 = new Rec46cSupport.StubChunkRepo();
         repo2.chunks.put("text", text);
         repo2.chunks.put("parent", grandparent);
-        PluginMerge p2 = new PluginMerge(repo2, null);
+        PluginMerge p2 = new PluginMerge(repo2);
         SearchResult res2 = sr("image", "matched image", 0);
         res2.setKnowledgeId("doc");
         res2.setChunkType("image_ocr");
@@ -245,7 +245,7 @@ class MergeRecordingTest {
         Rec46cSupport.StubChunkRepo repoBad = new Rec46cSupport.StubChunkRepo();
         repoBad.listErr = true;
         repoBad.chunks.put("parent", parent);
-        PluginMerge p5 = new PluginMerge(repoBad, null);
+        PluginMerge p5 = new PluginMerge(repoBad);
         // Go 探针复用了 text_to_parent 已就地改写的 res 指针
         List<SearchResult> got5 = p5.resolveParentChunks(tenantCm, new ArrayList<>(List.of(res)));
         assertRec("merge_parent", "repo_error", json(searchResultsShape(got5)));
@@ -262,7 +262,7 @@ class MergeRecordingTest {
         repo.chunks.put("next", chunk("next", "doc", "text", "后一块内容，包含下文展开", 0, "", "next2"));
         repo.chunks.put("next2", chunk("next2", "doc", "text", "更后一块，包含结尾与总结内容说明", 0, "", ""));
         repo.chunks.put("orphan", chunk("orphan", "other-doc", "text", "别的文档的块", 0, "", ""));
-        PluginMerge p = new PluginMerge(repo, null);
+        PluginMerge p = new PluginMerge(repo);
         ChatManage tenantCm = new ChatManage();
         tenantCm.setTenantId(1);
 
@@ -274,7 +274,7 @@ class MergeRecordingTest {
         assertRec("merge_expand", "chain", json(s1));
 
         Rec46cSupport.StubChunkRepo repo2 = new Rec46cSupport.StubChunkRepo();
-        PluginMerge p2 = new PluginMerge(repo2, null);
+        PluginMerge p2 = new PluginMerge(repo2);
         SearchResult res2 = sr("missing", "短", 0);
         res2.setKnowledgeId("doc");
         res2.setChunkType("text");
@@ -335,7 +335,7 @@ class MergeRecordingTest {
         repo.chunks.put("faq1", faq1);
         repo.chunks.put("faq2", faq2);
         repo.chunks.put("plain", plain);
-        PluginMerge p = new PluginMerge(repo, null);
+        PluginMerge p = new PluginMerge(repo);
         ChatManage tenantCm = new ChatManage();
         tenantCm.setTenantId(1);
 

@@ -422,6 +422,8 @@ public class ImChannelController {
         return tid == null ? 0L : tid;
     }
 
+    /** body 实际是 Map；返回类型泛型仅为调用点便利（未检查转换在本方法内是设计取舍）。 */
+    @SuppressWarnings("unchecked")
     private static <T> ResponseEntity<T> plain(int status, String message) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("error", message);

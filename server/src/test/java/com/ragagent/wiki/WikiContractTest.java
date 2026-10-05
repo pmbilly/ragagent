@@ -320,7 +320,6 @@ class WikiContractTest {
     private static String goldenChecked(String name, String actualBody) throws Exception {
         String masked = mask(actualBody);
         if (REFRESH_FIXTURES) {
-            var resource = new org.springframework.core.io.ClassPathResource("contracts/" + name);
             java.nio.file.Path file = java.nio.file.Path.of("src/test/resources/contracts", name);
             if (!java.nio.file.Files.exists(file)) {
                 file = java.nio.file.Path.of("server/src/test/resources/contracts", name);

@@ -579,7 +579,6 @@ class RemoteApiChatTest {
     // ------------------------------------------------------------------
 
     private HttpServer server;
-    private SsrfGuard previousGuard;
     private SsrfGuard.Whitelist whitelistSnapshot;
 
     @BeforeEach

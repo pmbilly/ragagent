@@ -40,7 +40,6 @@ public class WebSearchService {
 
     private final WebSearchProviderRegistry registry;
     private final WebSearchProviderRepository providerRepo;
-    private final int timeoutSeconds;
 
     @org.springframework.beans.factory.annotation.Autowired
     public WebSearchService(WebSearchProviderRegistry registry,
@@ -52,7 +51,6 @@ public class WebSearchService {
                             WebSearchProviderRepository providerRepo, int timeoutSeconds) {
         this.registry = registry;
         this.providerRepo = providerRepo;
-        this.timeoutSeconds = timeoutSeconds > 0 ? timeoutSeconds : 10;
     }
 
     /**

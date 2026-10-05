@@ -100,7 +100,6 @@ public class HybridSearchService {
     private final EmbeddingGateway embeddingGateway;
     final PgVectorRetrieveRepository pgRepository;
     final RetrieveEngineRegistry engineRegistry;
-    private final TenantStoreOwnership storeOwnership;
 
     final HybridFusionOps fusionOps;
     final HybridResultOps resultOps;
@@ -119,7 +118,6 @@ public class HybridSearchService {
         this.embeddingGateway = embeddingGateway;
         this.pgRepository = pgRepository;
         this.engineRegistry = engineRegistry;
-        this.storeOwnership = storeOwnership;
         this.fusionOps = new HybridFusionOps(this);
         this.storeGroupOps = new HybridStoreGroupOps(this, storeOwnership, driverProperties.driver());
         this.resultOps = new HybridResultOps(this);

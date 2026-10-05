@@ -26,11 +26,9 @@ final class WikiIngestFinalizePhase {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    private final WikiIngestRunSupport run;
     private final WikiIngestBatchHandler handler;
 
     WikiIngestFinalizePhase(WikiIngestRunSupport run) {
-        this.run = run;
         this.handler = run.handler;
     }
 

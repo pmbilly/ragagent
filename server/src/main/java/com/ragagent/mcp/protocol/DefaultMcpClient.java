@@ -41,7 +41,6 @@ public final class DefaultMcpClient implements McpClient {
     private final McpService service;
     private final McpTransport transport;
     private final McpOAuthRuntime oauthRuntime;
-    private final Duration timeout;
 
     private final AtomicBoolean connected = new AtomicBoolean();
     private final AtomicBoolean initialized = new AtomicBoolean();
@@ -54,7 +53,6 @@ public final class DefaultMcpClient implements McpClient {
         this.service = service;
         this.transport = transport;
         this.oauthRuntime = oauthRuntime;
-        this.timeout = resolveTimeout(service);
     }
 
     /** 超时解析：AdvancedConfig.timeout > 0 才覆盖，默认 30s。 */

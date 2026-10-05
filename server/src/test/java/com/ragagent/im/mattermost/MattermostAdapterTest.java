@@ -20,7 +20,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.runtime.AdapterInterfaces;
 import com.ragagent.im.runtime.CallbackExchange;
@@ -36,8 +35,6 @@ import com.sun.net.httpserver.HttpServer;
  * 工厂（默认 webhook + 模式报错 + 凭据校验）。
  */
 class MattermostAdapterTest {
-
-    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private record Captured(String method, String path, String body,
                             Map<String, List<String>> headers) {

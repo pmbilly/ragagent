@@ -33,9 +33,6 @@ public final class QaQueue {
     public static final int DEFAULT_WORKERS = 5;
     /** 请求在队列里最多等这么久。 */
     public static final long QUEUE_TIMEOUT_SECONDS = 60;
-    /** 指标日志间隔。 */
-    private static final long METRICS_LOG_INTERVAL_SECONDS = 30;
-
     /** 可选的 Redis 计数面（跨实例部署接入；单实例传 null）。 */
     public interface RedisPort {
         /** INCR+EXPIRE；返回自增后计数；Redis 故障返回 null（跳过全局检查）。 */
@@ -91,7 +88,6 @@ public final class QaQueue {
 
     private final ReentrantLock mu = new ReentrantLock();
     private final Condition notEmpty = mu.newCondition();
-@SuppressWarnings("unchecked")
     private final List<QaRequest> queue = new ArrayList<>();
     private final int maxSize;
     private final int maxPerUser;

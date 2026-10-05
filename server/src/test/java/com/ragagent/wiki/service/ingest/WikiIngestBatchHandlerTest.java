@@ -23,7 +23,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.ObjectProvider;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.knowledge.domain.KnowledgeBase;
@@ -119,7 +118,7 @@ class WikiIngestBatchHandlerTest {
         }
 
         private void stubKb(KnowledgeBase kb) {
-            when(kbMapper.selectOne(any(Wrapper.class))).thenReturn(kb);
+            when(kbMapper.selectOne(any())).thenReturn(kb);
         }
 
         /**
@@ -143,7 +142,7 @@ class WikiIngestBatchHandlerTest {
 
             verify(wikiService, never()).pruneEmptyFolderChains(anyString(), anyList());
             // 剪枝行必须留在通道里：trim 集合不含被延迟的那一行
-            ArgumentCaptor<List<Long>> trimmed = ArgumentCaptor.forClass(List.class);
+            ArgumentCaptor<List<Long>> trimmed = ArgumentCaptor.captor();
             verify(ingestService).trimPendingListDetached(trimmed.capture());
             assertThat(trimmed.getValue()).isEmpty();
             // 只有一个 finalize 触发（重试用），且不带稳定 TaskID
@@ -171,7 +170,7 @@ class WikiIngestBatchHandlerTest {
 
             handler().processWikiFinalize(payload());
 
-            ArgumentCaptor<List<String>> ids = ArgumentCaptor.forClass(List.class);
+            ArgumentCaptor<List<String>> ids = ArgumentCaptor.captor();
             verify(wikiService).pruneEmptyFolderChains(eq("kb-1"), ids.capture());
             assertThat(ids.getValue()).containsExactly("folder-a");
             verify(ingestService).trimPendingListDetached(List.of(11L));
@@ -196,7 +195,7 @@ class WikiIngestBatchHandlerTest {
             handler().processWikiFinalize(payload());
 
             verify(wikiService, never()).pruneEmptyFolderChains(anyString(), anyList());
-            ArgumentCaptor<List<Long>> trimmed = ArgumentCaptor.forClass(List.class);
+            ArgumentCaptor<List<Long>> trimmed = ArgumentCaptor.captor();
             verify(ingestService).trimPendingListDetached(trimmed.capture());
             assertThat(trimmed.getValue()).isEmpty();
             verify(ingestService, times(1)).scheduleFinalizeRetry(payload());
@@ -278,7 +277,7 @@ class WikiIngestBatchHandlerTest {
         @Test
         @DisplayName("ProcessWikiIngest：KB 已删除 → 排空队列并正常返回")
         void ingestDrainsDeletedKbQueue() {
-            when(kbMapper.selectOne(any(Wrapper.class))).thenReturn(null);
+            when(kbMapper.selectOne(any())).thenReturn(null);
 
             handler().processWikiIngest(new WikiIngestPayload(7L, "kb-deleted", null));
 
@@ -294,7 +293,7 @@ class WikiIngestBatchHandlerTest {
             row.setScopeId("kb-deleted");
             when(pendingRepo.peekBatch(eq(WikiIngestConstants.FINALIZE_TASK_TYPE), anyString(),
                     eq("kb-deleted"), anyInt())).thenReturn(List.of(row));
-            when(kbMapper.selectOne(any(Wrapper.class))).thenReturn(null);
+            when(kbMapper.selectOne(any())).thenReturn(null);
 
             handler().processWikiFinalize(new WikiIngestPayload(7L, "kb-deleted", null));
 
@@ -307,7 +306,7 @@ class WikiIngestBatchHandlerTest {
         @Test
         @DisplayName("清理失败必须重试（对照 Go TestWikiDeletedKnowledgeBaseCleanupFailureRetries）")
         void cleanupFailureRetries() {
-            when(kbMapper.selectOne(any(Wrapper.class))).thenReturn(null);
+            when(kbMapper.selectOne(any())).thenReturn(null);
             RuntimeException boom = new IllegalStateException("cleanup failed");
             org.mockito.Mockito.doThrow(boom)
                     .when(ingestService).clearDeletedKnowledgeBasePendingOps("kb-deleted");
@@ -325,7 +324,7 @@ class WikiIngestBatchHandlerTest {
             KnowledgeBaseIndexingStrategy s = new KnowledgeBaseIndexingStrategy();
             s.setWikiEnabled(false);
             kb.setIndexingStrategy(s);
-            when(kbMapper.selectOne(any(Wrapper.class))).thenReturn(kb);
+            when(kbMapper.selectOne(any())).thenReturn(kb);
 
             assertThatThrownBy(() -> handler().processWikiIngest(
                     new WikiIngestPayload(7L, "kb-1", null)))
@@ -336,7 +335,7 @@ class WikiIngestBatchHandlerTest {
         @Test
         @DisplayName("缺合成模型 → 抛错重试")
         void missingSynthesisModel() {
-            when(kbMapper.selectOne(any(Wrapper.class))).thenReturn(wikiKb());
+            when(kbMapper.selectOne(any())).thenReturn(wikiKb());
 
             assertThatThrownBy(() -> handler().processWikiIngest(
                     new WikiIngestPayload(7L, "kb-1", null)))
@@ -559,7 +558,7 @@ class WikiIngestBatchHandlerTest {
         assertThat(h.getKnowledgeBaseByIDOnly("")).isNull();
         assertThat(h.getKnowledgeBaseByIDOnly(null)).isNull();
         assertThat(h.getKnowledgeByIDOnly("")).isNull();
-        verify(kbMapper, never()).selectOne(any(Wrapper.class));
+        verify(kbMapper, never()).selectOne(any());
     }
 
     // ═══════════════════════════════════════════════════════════════

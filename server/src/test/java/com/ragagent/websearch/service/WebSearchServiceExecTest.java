@@ -27,16 +27,18 @@ import com.ragagent.websearch.provider.WebSearchProviderRegistry;
  */
 class WebSearchServiceExecTest {
 
-    private static String restore;
+    /** 进程级白名单快照（SsrfGuard 白名单是 static，改后不还原会踩同 JVM 的后续测试）。 */
+    private static SsrfGuard.Whitelist whitelistSnapshot;
 
     @BeforeAll
     static void whitelistOn() {
+        whitelistSnapshot = SsrfGuard.snapshotWhitelist();
         new SsrfGuard().reloadWhitelist("127.0.0.1");
     }
 
     @AfterAll
     static void whitelistOff() {
-        new SsrfGuard().reloadWhitelist("");
+        SsrfGuard.restoreWhitelist(whitelistSnapshot);
     }
 
     private static WebSearchProvider entity(String id, String type) {

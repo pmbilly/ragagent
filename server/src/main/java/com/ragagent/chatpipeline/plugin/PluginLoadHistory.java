@@ -9,7 +9,6 @@ import com.ragagent.chatpipeline.PipelineCommon;
 import com.ragagent.chatpipeline.PipelineEventType;
 import com.ragagent.chatpipeline.PipelineLog;
 import com.ragagent.chatpipeline.PipelinePorts;
-import com.ragagent.llm.extract.PipelineConfig;
 
 /**
  * LOAD_HISTORY 阶段插件：
@@ -18,11 +17,9 @@ import com.ragagent.llm.extract.PipelineConfig;
 public final class PluginLoadHistory implements Plugin {
 
     private final PipelinePorts.MessageService messageService;
-    private final PipelineConfig config;
 
-    public PluginLoadHistory(PipelinePorts.MessageService messageService, PipelineConfig config) {
+    public PluginLoadHistory(PipelinePorts.MessageService messageService) {
         this.messageService = messageService;
-        this.config = config;
     }
 
     @Override

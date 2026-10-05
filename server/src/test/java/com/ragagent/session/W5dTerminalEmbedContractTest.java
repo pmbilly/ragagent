@@ -24,7 +24,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.TestSchema;
 import com.ragagent.knowledge.storage.LocalStorageService;
 
@@ -90,19 +89,6 @@ class W5dTerminalEmbedContractTest {
     }
 
     // ── 辅助 ────────────────────────────────────────────────────────────────
-
-    private String login(String email) {
-        try {
-            MvcResult result = mockMvc.perform(post("/api/v1/auth/login")
-                            .contentType("application/json")
-                            .content("{\"email\":\"" + email + "\",\"password\":\"Passw0rd!\"}"))
-                    .andReturn();
-            return new ObjectMapper()
-                    .readTree(result.getResponse().getContentAsString()).get("token").asText();
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-    }
 
     /** X-Embed-Session 签名 = HMAC-SHA256(publish_token, "<cid>|<sid>") base64url 无填充。 */
     private static String sign(String key, String cid, String sid) {

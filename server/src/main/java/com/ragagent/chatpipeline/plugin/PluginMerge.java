@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.chatpipeline.ChatManage;
 import com.ragagent.chatpipeline.PipelineCommon;
 import com.ragagent.chatpipeline.PipelineEventType;
@@ -21,7 +20,6 @@ import com.ragagent.retrieval.support.ChunkSearchUtil;
 import com.ragagent.retrieval.support.ImageInfoMatchUtil;
 import com.ragagent.knowledge.support.SearchChunkMerge;
 import com.ragagent.retrieval.support.SearchTextUtil;
-import com.ragagent.common.web.JsonMappers;
 import com.ragagent.common.pipeline.ChunkTypes;
 import com.ragagent.retrieval.obs.RetrievalObs;
 
@@ -39,15 +37,11 @@ import com.ragagent.retrieval.obs.RetrievalObs;
  */
 public final class PluginMerge implements Plugin {
 
-    private static final ObjectMapper JSON = JsonMappers.lenient();
-
     final PipelinePorts.ChunkRepository chunkRepo;
     final MergeParentOps parentOps;
-    private final PipelinePorts.ChunkService chunkService; // 父块解析预留（当前未用）
 
-    public PluginMerge(PipelinePorts.ChunkRepository chunkRepo, PipelinePorts.ChunkService chunkService) {
+    public PluginMerge(PipelinePorts.ChunkRepository chunkRepo) {
         this.chunkRepo = chunkRepo;
-        this.chunkService = chunkService;
         this.parentOps = new MergeParentOps(this);
     }
 

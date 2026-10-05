@@ -23,8 +23,6 @@ import com.ragagent.retrieval.HybridSearchService.StoreGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ragagent.retrieval.HybridSearchService.StoreGroup;
-
 /**
  * HybridSearch 的融合与 FAQ 后处理簇：RRF 融合/按分去重、FAQ 迭代取回（只涨 TopK，
  * 引擎分组复用）、负向问题过滤。融合作业为纯静态，FAQ 侧经由门面扇出与 chunk 网关。
@@ -182,7 +180,6 @@ final class HybridFusionOps {
             if (iterationResults.isEmpty()) {
                 break;
             }
-            int totalRetrieved = iterationResults.size();
 
             List<String> newChunkIds = new ArrayList<>();
             for (PgVectorRetrieveRepository.IndexHit result : iterationResults) {

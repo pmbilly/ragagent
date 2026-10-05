@@ -16,7 +16,6 @@ import com.ragagent.chatpipeline.support.SearchSupport;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.event.TenantContextSnapshot;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.llm.extract.PipelineConfig;
 
 /**
  * CHUNK_SEARCH 阶段插件（含查询扩展与检索执行协作者）。
@@ -37,14 +36,8 @@ import com.ragagent.llm.extract.PipelineConfig;
 public final class PluginSearch implements Plugin {
 
     final PipelinePorts.KnowledgeBaseService knowledgeBaseService;
-    private final PipelinePorts.KnowledgeService knowledgeService;
-    private final PipelinePorts.ChunkService chunkService;
-    private final PipelineConfig config;
     final PipelinePorts.WebSearch webSearchService;
     final PipelinePorts.TenantService tenantService;
-    private final PipelinePorts.SessionService sessionService;
-    private final PipelinePorts.WebSearchStateService webSearchStateService;
-    private final PipelinePorts.WebSearchProviderRepository webSearchProviderRepo;
 
     /** 查询扩展协作者。 */
     final PluginExpansionOps expansionOps;
@@ -53,23 +46,11 @@ public final class PluginSearch implements Plugin {
     final PluginSearchOps searchOps;
 
     public PluginSearch(PipelinePorts.KnowledgeBaseService knowledgeBaseService,
-                        PipelinePorts.KnowledgeService knowledgeService,
-                        PipelinePorts.ChunkService chunkService,
-                        PipelineConfig config,
                         PipelinePorts.WebSearch webSearchService,
-                        PipelinePorts.TenantService tenantService,
-                        PipelinePorts.SessionService sessionService,
-                        PipelinePorts.WebSearchStateService webSearchStateService,
-                        PipelinePorts.WebSearchProviderRepository webSearchProviderRepo) {
+                        PipelinePorts.TenantService tenantService) {
         this.knowledgeBaseService = knowledgeBaseService;
-        this.knowledgeService = knowledgeService;
-        this.chunkService = chunkService;
-        this.config = config;
         this.webSearchService = webSearchService;
         this.tenantService = tenantService;
-        this.sessionService = sessionService;
-        this.webSearchStateService = webSearchStateService;
-        this.webSearchProviderRepo = webSearchProviderRepo;
         this.expansionOps = new PluginExpansionOps(this);
         this.searchOps = new PluginSearchOps(this);
     }

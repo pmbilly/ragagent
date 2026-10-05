@@ -138,14 +138,6 @@ class RerankRecordingTest {
                 new com.fasterxml.jackson.databind.ObjectMapper();
     }
 
-    private static String jsonOf(Object o) {
-        try {
-            return ObjectMapperHolder.JSON.writeValueAsString(o);
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
     private static SearchResult cand(String id, String content, String knowledgeId, double score) {
         SearchResult r = new SearchResult();
         r.setId(id);
@@ -407,7 +399,6 @@ class RerankRecordingTest {
     void memoryRecall() {
         Rec46cSupport.RecBus bus = new Rec46cSupport.RecBus();
         Rec46cSupport.StubMemoryService mem = new Rec46cSupport.StubMemoryService();
-        com.ragagent.session.domain.UsedMemory u1 = new com.ragagent.session.domain.UsedMemory();
         var item1 = new com.ragagent.memory.domain.MemoryItem();
         item1.setId("m1");
         item1.setKind("fact");

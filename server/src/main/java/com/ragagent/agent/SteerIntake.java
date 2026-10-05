@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.agent.domain.AgentState;
 import com.ragagent.event.Event;
 import com.ragagent.event.EventIds;
@@ -21,8 +20,6 @@ import com.ragagent.llm.domain.ChatMessage;
 final class SteerIntake {
 
     private static final Logger log = LoggerFactory.getLogger(SteerIntake.class);
-
-    private static final ObjectMapper JSON = new ObjectMapper();
 
     private final AgentEngine engine;
 

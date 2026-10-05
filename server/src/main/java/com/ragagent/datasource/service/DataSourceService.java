@@ -552,9 +552,10 @@ public class DataSourceService implements DataSourceSyncHandler {
                 syncLog.getId(), false, 0,
                 com.ragagent.tracing.langfuse.LangfuseTracing.inject());
 
-        DataSourceSyncTaskQueue.Outcome outcome;
         try {
-            outcome = taskQueue.enqueue(payload, taskId, Scheduler.MAX_RETRY, Scheduler.TASK_TIMEOUT);
+            // Outcome 在此路径未分支处理（重复任务 TASK_ID_CONFLICT 亦按已受理继续）——
+            // 如需区分请先对齐 DataSourceSyncTaskQueue.Outcome 的文档语义
+            taskQueue.enqueue(payload, taskId, Scheduler.MAX_RETRY, Scheduler.TASK_TIMEOUT);
         } catch (RuntimeException e) {
             log.error("[datasource] failed to enqueue sync task: {}", e.getMessage());
             syncLog.setStatus(DataSourceConstants.SYNC_LOG_STATUS_FAILED);

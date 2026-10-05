@@ -366,7 +366,6 @@ class DriveConnectorTest {
                 fileJson("fdoc2", "Doc2", "sheet", "folder1", "200")));
         // fdoc1 本身不是文件夹 → 列举返回 1061002
 
-        DriveConnector c = connector();
         com.ragagent.datasource.connector.feishu.core.FeishuClient client =
                 clientForTest();
         List<DriveFile> files = DriveConnector.listDriveFilesForResource(client, "folder1:fdoc1");

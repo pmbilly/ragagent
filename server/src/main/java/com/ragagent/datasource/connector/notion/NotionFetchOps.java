@@ -76,7 +76,7 @@ final class NotionFetchOps {
             return items;
         }
 
-        connector.resolveFileUploads(client, blocks);
+        NotionConnector.resolveFileUploads(client, blocks);
 
         NotionMarkdown.Result markdown = NotionMarkdown.blocksToMarkdown(blocks);
 
@@ -245,7 +245,7 @@ final class NotionFetchOps {
             recordEditTimes.put(record.id(), record.lastEditedTime);
 
             OffsetDateTime prevTime = prevEditTimes.get(record.id());
-            if (prevTime == null || !connector.equalInstants(record.lastEditedTime, prevTime)) {
+            if (prevTime == null || !NotionConnector.equalInstants(record.lastEditedTime, prevTime)) {
                 changedCount++;
             }
         }
@@ -347,7 +347,7 @@ final class NotionFetchOps {
                     record.id(), e.getMessage());
         }
         if (blocks != null && !blocks.isEmpty()) {
-            connector.resolveFileUploads(client, blocks);
+            NotionConnector.resolveFileUploads(client, blocks);
             NotionMarkdown.Result markdown = NotionMarkdown.blocksToMarkdown(blocks);
             if (!NotionValues.trimSpace(markdown.markdown).isEmpty()) {
                 content.append('\n').append(markdown.markdown);
@@ -455,7 +455,7 @@ final class NotionFetchOps {
                 blocks = null;
             }
             if (blocks != null && !blocks.isEmpty()) {
-                connector.resolveFileUploads(client, blocks);
+                NotionConnector.resolveFileUploads(client, blocks);
                 NotionMarkdown.Result markdown = NotionMarkdown.blocksToMarkdown(blocks);
                 if (!NotionValues.trimSpace(markdown.markdown).isEmpty()) {
                     extraContent.append("\n## ").append(recordTitle).append(" 内容\n\n")

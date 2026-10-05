@@ -1,6 +1,5 @@
 package com.ragagent.model.service;
 
-import com.ragagent.auth.service.TenantService;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.crypto.CryptoService;
 import com.ragagent.common.error.BizException;
@@ -44,17 +43,15 @@ public class ModelRuntimeFactory {
     private static final Logger log = LoggerFactory.getLogger(ModelRuntimeFactory.class);
 
     private final ModelService modelService;
-    private final TenantService tenantService;
     private final CryptoService cryptoService;
     private final ObjectProvider<OllamaService> ollamaService;
     private final ConcurrencyGovernor concurrencyGovernor;
     private final SsrfGuard ssrfGuard;
 
-    public ModelRuntimeFactory(ModelService modelService, TenantService tenantService,
+    public ModelRuntimeFactory(ModelService modelService,
                                CryptoService cryptoService, ObjectProvider<OllamaService> ollamaService,
                                ConcurrencyGovernor concurrencyGovernor, SsrfGuard ssrfGuard) {
         this.modelService = modelService;
-        this.tenantService = tenantService;
         this.cryptoService = cryptoService;
         this.ollamaService = ollamaService;
         this.concurrencyGovernor = concurrencyGovernor;

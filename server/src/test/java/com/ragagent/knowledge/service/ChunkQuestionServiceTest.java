@@ -15,8 +15,6 @@ import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.mapper.ChunkMapper;
-import com.ragagent.knowledge.repository.ChunkRepository;
-import com.ragagent.knowledge.mapper.ChunkRevisionMapper;
 import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import com.ragagent.model.domain.Model;
@@ -43,23 +41,17 @@ class ChunkQuestionServiceTest {
     private static final String DOC = "doc-1";
     private static final ObjectMapper M = new ObjectMapper();
     private static final OffsetDateTime PAST = OffsetDateTime.parse("2020-01-01T00:00:00Z");
-    private static final OffsetDateTime OLDER = OffsetDateTime.parse("2021-01-01T00:00:00Z");
-    private static final OffsetDateTime NEWER = OffsetDateTime.parse("2022-01-01T00:00:00Z");
 
     @Autowired
     private JdbcTemplate jdbc;
     @Autowired
     private ChunkMapper chunkMapper;
     @Autowired
-    private ChunkRevisionMapper revisionMapper;
-    @Autowired
     private KnowledgeMapper knowledgeMapper;
     @Autowired
     private KnowledgeBaseMapper kbMapper;
     @Autowired
     private ModelMapper modelMapper;
-    @Autowired
-    private ChunkRepository repo;
     @Autowired
     private ChunkQuestionService service;
     @Autowired
@@ -154,11 +146,6 @@ class ChunkQuestionServiceTest {
         return m;
     }
 
-    private void setParent(Chunk child, Chunk parent) {
-        jdbc.update("UPDATE chunks SET parent_chunk_id = ? WHERE id = ?", parent.getId(), child.getId());
-        child.setParentChunkId(parent.getId());
-    }
-
     private JsonNode json(String s) {
         try {
             return M.readTree(s);
@@ -169,14 +156,6 @@ class ChunkQuestionServiceTest {
 
     private String metadataJson(String chunkId) {
         return jdbc.queryForObject("SELECT metadata FROM chunks WHERE id = ?", String.class, chunkId);
-    }
-
-    private String indexStatus(String chunkId) {
-        return jdbc.queryForObject("SELECT index_status FROM chunks WHERE id = ?", String.class, chunkId);
-    }
-
-    private String sourceContent(String chunkId) {
-        return jdbc.queryForObject("SELECT source_content FROM chunks WHERE id = ?", String.class, chunkId);
     }
 
     // ── UpdateDocumentChunk 成功全链 ───────────────────────────────────────

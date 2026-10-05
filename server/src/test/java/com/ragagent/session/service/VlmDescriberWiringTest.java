@@ -15,7 +15,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import com.ragagent.auth.service.TenantService;
 import com.ragagent.common.crypto.CryptoService;
 import com.ragagent.common.security.SsrfGuard;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
@@ -32,7 +31,6 @@ import com.ragagent.retrieval.vlm.VlmClient;
 class VlmDescriberWiringTest {
 
     private final ModelService modelService = mock(ModelService.class);
-    private final TenantService tenantService = mock(TenantService.class);
     private final CryptoService cryptoService = mock(CryptoService.class);
     private final SsrfGuard ssrfGuard = mock(SsrfGuard.class);
     private final ConcurrencyGovernor governor = new ConcurrencyGovernor();
@@ -41,7 +39,7 @@ class VlmDescriberWiringTest {
 
     private ModelRuntimeFactory runtimeFactory() {
         // ollama provider 在 VLM 路径不触达；vlm 面不需要它
-        return new ModelRuntimeFactory(modelService, tenantService, cryptoService,
+        return new ModelRuntimeFactory(modelService, cryptoService,
                 null, governor, ssrfGuard);
     }
 

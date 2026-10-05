@@ -357,7 +357,6 @@ class WikiLintServiceTest {
      * </pre>
      */
     private void seedHealthyWiki(String kbId) {
-        OffsetDateTime now = OffsetDateTime.now();
         repo.create(page(kbId, "synthesis/notes", "Notes", WikiConstants.PAGE_TYPE_SYNTHESIS,
                 PADDING + " See [[entity/alpha]] and [[entity/beta]].",
                 List.of("entity/alpha", "entity/beta"), List.of("entity/alpha"), List.of()));

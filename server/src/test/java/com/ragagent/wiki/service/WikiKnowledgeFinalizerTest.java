@@ -37,17 +37,15 @@ class WikiKnowledgeFinalizerTest {
      */
     @Test
     @DisplayName("递减 + 带守卫晋升（对照 Go FinalizeSubtask）")
-    @SuppressWarnings("unchecked")
     void decrementThenPromote() {
-        when(knowledgeMapper.update(isNull(), any(Wrapper.class))).thenReturn(1);
+        when(knowledgeMapper.update(isNull(), any())).thenReturn(1);
 
         DefaultWikiKnowledgeFinalizer.Outcome outcome = finalizer.finalizeSubtask("kid-1");
 
         assertThat(outcome.decremented()).isTrue();
         assertThat(outcome.promoted()).isTrue();
 
-        ArgumentCaptor<Wrapper<Knowledge>> captor =
-                ArgumentCaptor.forClass(Wrapper.class);
+        ArgumentCaptor<Wrapper<Knowledge>> captor = ArgumentCaptor.captor();
         verify(knowledgeMapper, org.mockito.Mockito.times(2)).update(isNull(), captor.capture());
         String decrementSql = captor.getAllValues().get(0).getSqlSegment();
         assertThat(decrementSql)
@@ -74,7 +72,7 @@ class WikiKnowledgeFinalizerTest {
     @Test
     @DisplayName("晋升未命中不是错误")
     void promoteMissIsNotAnError() {
-        when(knowledgeMapper.update(isNull(), any(Wrapper.class)))
+        when(knowledgeMapper.update(isNull(), any()))
                 .thenReturn(1)   // 递减命中
                 .thenReturn(0);  // 晋升未命中
 
@@ -91,7 +89,7 @@ class WikiKnowledgeFinalizerTest {
     @Test
     @DisplayName("递减未命中仍无条件尝试晋升")
     void alwaysAttemptsPromote() {
-        when(knowledgeMapper.update(isNull(), any(Wrapper.class)))
+        when(knowledgeMapper.update(isNull(), any()))
                 .thenReturn(0)   // 递减未命中
                 .thenReturn(0);
 
@@ -99,20 +97,20 @@ class WikiKnowledgeFinalizerTest {
 
         assertThat(outcome.decremented()).isFalse();
         assertThat(outcome.promoted()).isFalse();
-        verify(knowledgeMapper, org.mockito.Mockito.times(2)).update(isNull(), any(Wrapper.class));
+        verify(knowledgeMapper, org.mockito.Mockito.times(2)).update(isNull(), any());
     }
 
     /** 递减报错时提前返回，不再尝试晋升 */
     @Test
     @DisplayName("递减报错时提前返回")
     void decrementFailureShortCircuits() {
-        when(knowledgeMapper.update(isNull(), any(Wrapper.class)))
+        when(knowledgeMapper.update(isNull(), any()))
                 .thenThrow(new IllegalStateException("db down"));
 
         DefaultWikiKnowledgeFinalizer.Outcome outcome = finalizer.finalizeSubtask("kid-1");
 
         assertThat(outcome.decremented()).isFalse();
-        verify(knowledgeMapper, org.mockito.Mockito.times(1)).update(isNull(), any(Wrapper.class));
+        verify(knowledgeMapper, org.mockito.Mockito.times(1)).update(isNull(), any());
     }
 
     /** 空 id 是安全 no-op（直接短路） */
@@ -121,14 +119,14 @@ class WikiKnowledgeFinalizerTest {
     void emptyIdShortCircuits() {
         assertThat(finalizer.finalizeSubtask("").decremented()).isFalse();
         assertThat(finalizer.finalizeSubtask(null).decremented()).isFalse();
-        verify(knowledgeMapper, never()).update(any(), any(Wrapper.class));
+        verify(knowledgeMapper, never()).update(any(), any());
     }
 
     /** 端口方法不抛异常（失败只记日志） */
     @Test
     @DisplayName("端口方法吞掉失败")
     void portMethodSwallowsFailures() {
-        when(knowledgeMapper.update(isNull(), any(Wrapper.class)))
+        when(knowledgeMapper.update(isNull(), any()))
                 .thenThrow(new IllegalStateException("db down"));
         finalizer.finalizeWikiSubtask("kid-1");
     }
@@ -136,13 +134,11 @@ class WikiKnowledgeFinalizerTest {
     /** 晋升成功后 {@code parse_status} 落到 completed（守卫条件里的常量取自领域类型） */
     @Test
     @DisplayName("晋升条件使用领域常量")
-    @SuppressWarnings("unchecked")
     void promoteUsesDomainConstants() {
-        when(knowledgeMapper.update(isNull(), any(Wrapper.class))).thenReturn(1);
+        when(knowledgeMapper.update(isNull(), any())).thenReturn(1);
         finalizer.finalizeSubtask("kid-1");
 
-        ArgumentCaptor<Wrapper<Knowledge>> captor =
-                ArgumentCaptor.forClass(Wrapper.class);
+        ArgumentCaptor<Wrapper<Knowledge>> captor = ArgumentCaptor.captor();
         verify(knowledgeMapper, org.mockito.Mockito.times(2)).update(isNull(), captor.capture());
         assertThat(Knowledge.PARSE_FINALIZING).isEqualTo("finalizing");
         assertThat(Knowledge.PARSE_COMPLETED).isEqualTo("completed");

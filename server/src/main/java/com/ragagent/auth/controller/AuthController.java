@@ -150,7 +150,7 @@ public class AuthController {
         this.oidcStateCodec = oidcStateCodec;
         this.oidcOps = new AuthOidcOps(this);
         this.sessionOps = new AuthSessionOps(this);
-        this.bindingSupport = new AuthBindingSupport(this);
+        this.bindingSupport = new AuthBindingSupport();
     }
 
     @PostMapping("/login")
@@ -167,7 +167,7 @@ public class AuthController {
             bindingErrors.add(bindingError("LoginRequest", "Password", "min"));
         }
         if (!bindingErrors.isEmpty()) {
-            throw bindingSupport.invalidParams("Invalid login parameters",
+            throw AuthBindingSupport.invalidParams("Invalid login parameters",
                     String.join("\n", bindingErrors));
         }
 
@@ -204,7 +204,7 @@ public class AuthController {
             bindingErrors.add(bindingError("RegisterRequest", "Password", "min"));
         }
         if (!bindingErrors.isEmpty()) {
-            throw bindingSupport.invalidParams("Invalid registration parameters",
+            throw AuthBindingSupport.invalidParams("Invalid registration parameters",
                     String.join("\n", bindingErrors));
         }
         // 3) 消毒（密码刻意不消毒：SanitizeForLog 会改写控制字符，导致注册成功却登录不上）
@@ -302,7 +302,7 @@ public class AuthController {
             bindingErrors.add(bindingError("registerByInviteRequest", "Password", "min"));
         }
         if (!bindingErrors.isEmpty()) {
-            throw bindingSupport.invalidParams("Invalid registration parameters",
+            throw AuthBindingSupport.invalidParams("Invalid registration parameters",
                     String.join("\n", bindingErrors));
         }
         String token = UserService.goTrimSpace(req.token());

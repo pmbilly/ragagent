@@ -19,7 +19,6 @@ import com.ragagent.auth.domain.UserPreferences;
 import com.ragagent.auth.mapper.TenantMapper;
 import com.ragagent.auth.mapper.TenantMemberMapper;
 import com.ragagent.auth.mapper.UserMapper;
-import com.ragagent.system.mapper.SystemSettingMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,9 +88,6 @@ class SystemContractTest {
     private TenantMapper tenantMapper;
     @Autowired
     private TenantMemberMapper memberMapper;
-    @Autowired
-    private SystemSettingMapper settingMapper;
-
     private String owner;
     private String viewer;
     private String sysAdmin;
@@ -175,7 +171,6 @@ class SystemContractTest {
     /** 从 golden 提取 map 键名（部署无关的结构对齐检查）。 */
     private static String subsetKeys(String golden) {
         StringBuilder sb = new StringBuilder();
-        Matcher m = Pattern.compile("\"([a-z.]+)\\\":\\{\"supported\"").matcher(golden.replace("\\", ""));
         // golden 是紧凑 JSON："agents":{"supported":true}
         Matcher km = Pattern.compile("\"([a-z.]+)\":\\{\"supported\"").matcher(golden);
         while (km.find()) {

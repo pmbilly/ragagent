@@ -147,11 +147,9 @@ public final class StreamDecoder {
 
     /** 不外泄跨分块句柄地还原 HandleTable 值（HandleStreamDecoder）。 */
     public static final class HandleStreamDecoder {
-        private final HandleTable table;
         private final StreamHold hold;
 
         HandleStreamDecoder(HandleTable table) {
-            this.table = table;
             String prefix = table.store().prefix();
             this.hold = new StreamHold(
                     combined -> {

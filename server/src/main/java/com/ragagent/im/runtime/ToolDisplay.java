@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -163,7 +164,7 @@ public final class ToolDisplay {
     private static Map<String, Object> asRecord(Object args) {
         if (args instanceof String s) {
             try {
-                return JSON.readValue(s, Map.class);
+                return JSON.readValue(s, new TypeReference<Map<String, Object>>() {});
             } catch (Exception e) {
                 return null;
             }

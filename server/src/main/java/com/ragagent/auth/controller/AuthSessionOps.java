@@ -141,7 +141,8 @@ final class AuthSessionOps {
         if (result.activeTenant() == null) {
             return null;
         }
-        String role = service.membershipRoleForTenant(result.memberships(), result.activeTenant().getId());
+        String role = AuthController.membershipRoleForTenant(result.memberships(),
+                result.activeTenant().getId());
         return TenantResponse.from(result.activeTenant(),
                 TenantRole.fromString(role).hasPermission(TenantRole.ADMIN));
     }

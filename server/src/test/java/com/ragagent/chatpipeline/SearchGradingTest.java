@@ -18,7 +18,6 @@ import com.ragagent.chatpipeline.plugin.PluginSearchParallel;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.common.error.ErrorCode;
-import com.ragagent.llm.extract.PipelineConfig;
 
 /**
  * 回归：KB 检索的 <b>"硬错 vs 降级" 分级</b>。
@@ -59,8 +58,7 @@ class SearchGradingTest {
 
     private static PluginSearchParallel parallel(Rec46cSupport.StubKBService kbSvc) {
         return new PluginSearchParallel(new EventManager(), kbSvc,
-                new Rec46cSupport.StubKnowledgeService(), new Rec46cSupport.StubChunkService(),
-                new PipelineConfig(), null, null, null, null, null,
+                null, null,
                 new Rec46cSupport.StubGraphRepo(), new Rec46cSupport.StubChunkRepo(),
                 new Rec46cSupport.StubKnowledgeRepo());
     }
@@ -72,7 +70,7 @@ class SearchGradingTest {
         kbSvc.hybridErr.put("kb-1", staleStoreBindingError());
 
         // ① 单插件：SEARCH.withError，且文案带 2200 前缀（供 SSE 终止帧使用）
-        PluginSearch p = new PluginSearch(kbSvc, null, null, null, null, null, null, null, null);
+        PluginSearch p = new PluginSearch(kbSvc, null, null);
         boolean[] next = {false};
         PluginError err = p.onEvent(PipelineEventType.CHUNK_SEARCH,
                 chatManageWithKb("grading-hard-1", "kb-1"), () -> {
@@ -99,7 +97,7 @@ class SearchGradingTest {
         kbSvc.kbs.put("kb-2", Rec46cSupport.kb("kb-2", "document", true, true, false));
         // 不注入任何错误：hybrid 未配置 ⇒ 空命中
 
-        PluginSearch p = new PluginSearch(kbSvc, null, null, null, null, null, null, null, null);
+        PluginSearch p = new PluginSearch(kbSvc, null, null);
         boolean[] next = {false};
         PluginError err = p.onEvent(PipelineEventType.CHUNK_SEARCH,
                 chatManageWithKb("grading-degrade-1", "kb-2"), () -> {

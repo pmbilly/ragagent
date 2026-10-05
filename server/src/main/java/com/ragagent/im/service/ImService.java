@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.agent.management.domain.CustomAgentEntity;
 import com.ragagent.agent.management.service.CustomAgentService;
-import com.ragagent.auth.service.TenantService;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.im.domain.ChannelSessionEntity;
 import com.ragagent.im.domain.ImChannelEntity;
@@ -63,16 +62,11 @@ public class ImService {
     final SessionService sessionService;
     final MessageService messageService;
     private final CustomAgentService agentService;
-    private final TenantService tenantService;
     final SessionKnowledgeQaService knowledgeQaService;
     final SessionAgentQaService agentQaService;
     final com.ragagent.storage.support.Resolver storageResolver;
-    private final com.ragagent.storage.support.FileService defaultFileSvc;
 
     // ── 调谐参数 ─────────────────────────────────────────────────────────
-    private final int workers;
-    private final int maxQueue;
-    private final int maxPerUser;
     private final int rateLimitWindowSec;
     private final int rateLimitMax;
 
@@ -111,10 +105,9 @@ public class ImService {
 
     public ImService(ImChannelMapper channels, ChannelSessionMapper channelSessions,
             SessionService sessionService, MessageService messageService,
-            CustomAgentService agentService, TenantService tenantService,
+            CustomAgentService agentService,
             SessionKnowledgeQaService knowledgeQaService, SessionAgentQaService agentQaService,
             java.util.Optional<com.ragagent.storage.support.Resolver> storageResolver,
-            java.util.Optional<com.ragagent.storage.support.FileService> defaultFileSvc,
             @Value("${im.workers:5}") int workers,
             @Value("${im.max-queue:50}") int maxQueue,
             @Value("${im.max-per-user:3}") int maxPerUser,
@@ -125,14 +118,9 @@ public class ImService {
         this.sessionService = sessionService;
         this.messageService = messageService;
         this.agentService = agentService;
-        this.tenantService = tenantService;
         this.knowledgeQaService = knowledgeQaService;
         this.agentQaService = agentQaService;
         this.storageResolver = storageResolver.orElse(null);
-        this.defaultFileSvc = defaultFileSvc.orElse(null);
-        this.workers = workers;
-        this.maxQueue = maxQueue;
-        this.maxPerUser = maxPerUser;
         this.rateLimitWindowSec = rateLimitWindowSec;
         this.rateLimitMax = rateLimitMax;
         this.streamPipeline = new ImStreamPipeline(this);

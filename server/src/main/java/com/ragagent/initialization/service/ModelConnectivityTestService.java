@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.auth.service.TenantService;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.crypto.CryptoService;
 import com.ragagent.common.error.AppError;
@@ -47,17 +46,15 @@ public final class ModelConnectivityTestService {
     private final SsrfGuard ssrfGuard;
     private final OllamaService ollamaService;
     private final ConcurrencyGovernor concurrencyGovernor;
-    private final TenantService tenantService;
     private final CryptoService cryptoService;
     private final AsrTranscriber asrTranscriber;
     private final com.ragagent.knowledge.client.DocReaderClient documentReader;
 
-    public ModelConnectivityTestService(ModelService modelService, SsrfGuard ssrfGuard, OllamaService ollamaService, ConcurrencyGovernor concurrencyGovernor, TenantService tenantService, CryptoService cryptoService, AsrTranscriber asrTranscriber, com.ragagent.knowledge.client.DocReaderClient documentReader) {
+    public ModelConnectivityTestService(ModelService modelService, SsrfGuard ssrfGuard, OllamaService ollamaService, ConcurrencyGovernor concurrencyGovernor, CryptoService cryptoService, AsrTranscriber asrTranscriber, com.ragagent.knowledge.client.DocReaderClient documentReader) {
         this.modelService = modelService;
         this.ssrfGuard = ssrfGuard;
         this.ollamaService = ollamaService;
         this.concurrencyGovernor = concurrencyGovernor;
-        this.tenantService = tenantService;
         this.cryptoService = cryptoService;
         this.asrTranscriber = asrTranscriber;
         this.documentReader = documentReader;
@@ -490,7 +487,6 @@ public final class ModelConnectivityTestService {
         var p = model.getParameters();
         String appID = p == null ? "" : orEmpty(p.getAppId());
         String appSecret = p == null ? "" : decryptModelAppSecret(p.getAppSecret());
-        String provider = p == null ? "" : orEmpty(p.getProvider());
         return LlmChatClients.create(ModelRuntimeConfigs.chatConfig(model, appID, appSecret),
                 ollamaService, concurrencyGovernor);
     }

@@ -9,7 +9,6 @@ import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.WikiPageNotFoundException;
 import com.ragagent.wiki.domain.WikiPageRevision;
 import com.ragagent.wiki.domain.WikiPageRevisionListResponse;
-import com.ragagent.wiki.mapper.WikiPageRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +25,6 @@ class WikiPageRevisionServiceTest {
 
     @Autowired
     private JdbcTemplate jdbc;
-    @Autowired
-    private WikiPageRepository repo;
     @Autowired
     private WikiPageService svc;
 

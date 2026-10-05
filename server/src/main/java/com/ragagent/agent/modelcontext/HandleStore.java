@@ -100,7 +100,6 @@ final class HandleStore<M> {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private void mergeMeta(String handle, M src, Merger<M> merge) {
         Entry<M> entry = entryByHandle.get(handle);
         // 元数据要么是不可变占位（null/Void），要么是可变对象（ChunkReference/WebMeta），

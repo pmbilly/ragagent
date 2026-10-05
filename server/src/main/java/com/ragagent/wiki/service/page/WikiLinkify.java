@@ -8,8 +8,6 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
-import com.ragagent.wiki.service.page.WikiCrossLinker.LinkifyResult;
-import com.ragagent.wiki.service.page.WikiCrossLinker.LinkRef;
 import com.ragagent.common.text.Whitespace;
 
 /**

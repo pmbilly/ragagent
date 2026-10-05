@@ -8,11 +8,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.llm.ResponseType;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import com.ragagent.mcp.service.Adapter;
@@ -26,6 +28,21 @@ import com.ragagent.mcp.service.Adapter;
 class GateTest {
 
     private static final ObjectMapper JSON = new ObjectMapper();
+
+    /** 生命周期登记：@AfterEach 统一 close（Gate 停止跨实例订阅线程；未配 Redis 时空操作）。 */
+    private final List<Gate> gatesToClose = new ArrayList<>();
+
+    private Gate track(Gate gate) {
+        gatesToClose.add(gate);
+        return gate;
+    }
+
+    @AfterEach
+    void closeGates() {
+        for (Gate gate : gatesToClose) {
+            gate.close();
+        }
+    }
 
     /** 从全局配置装 {@link GateOptions}（审批超时秒数） */
     private static GateOptions options(int timeoutSeconds) {
@@ -44,14 +61,6 @@ class GateTest {
         }
     }
 
-    /** 在 Required 事件回调里起虚拟线程调 Resolve */
-    private static void resolveOnRequired(RecordingEventBus bus, Gate gate, long tenantId, String userId, Decision d) {
-        bus.on(ResponseType.TOOL_APPROVAL_REQUIRED, evt -> {
-            String pendingId = ((ToolApprovalRequiredData) evt.data()).pendingId();
-            Thread.ofVirtual().start(() -> gate.resolve(tenantId, userId, pendingId, d));
-        });
-    }
-
     private static ApprovalException captureResolve(Gate gate, long tenantId, String userId, String pendingId, Decision d) {
         try {
             gate.resolve(tenantId, userId, pendingId, d);
@@ -67,7 +76,7 @@ class GateTest {
     @Test
     void requestAndWaitApprove() {
         RecordingEventBus bus = new RecordingEventBus();
-        Gate gate = new Gate(options(2), new StubChecker(true), null);
+        Gate gate = track(new Gate(options(2), new StubChecker(true), null));
 
         AtomicReference<String> seenPendingId = new AtomicReference<>();
         AtomicReference<Integer> seenTimeoutSeconds = new AtomicReference<>();
@@ -115,7 +124,7 @@ class GateTest {
     /** 无人 Resolve → 超时且不批准。 */
     @Test
     void requestAndWaitTimeout() {
-        Gate gate = new Gate(options(1).withTimeout(Duration.ofMillis(200)), new StubChecker(true), null);
+        Gate gate = track(new Gate(options(1).withTimeout(Duration.ofMillis(200)), new StubChecker(true), null));
         RecordingEventBus bus = new RecordingEventBus();
 
         Decision d = gate.requestAndWait(Cancellation.none(), PendingRequest.builder()
@@ -134,7 +143,7 @@ class GateTest {
     /** 补充用例：取消信号触发 → ContextCanceled 决策，且取消后 Resolve 不再生效。 */
     @Test
     void requestAndWaitCancelled() {
-        Gate gate = new Gate(options(30), new StubChecker(true), null);
+        Gate gate = track(new Gate(options(30), new StubChecker(true), null));
         RecordingEventBus bus = new RecordingEventBus();
         TestCancellation cancellation = new TestCancellation();
 
@@ -167,7 +176,7 @@ class GateTest {
     /** 无 checker：不进入审批门。 */
     @Test
     void needsApprovalNoChecker() {
-        Gate gate = new Gate((GateOptions) null, null, null);
+        Gate gate = track(new Gate((GateOptions) null, null, null));
         assertFalse(gate.needsApproval(Cancellation.none(), 1, "x", "y"));
     }
 
@@ -176,7 +185,7 @@ class GateTest {
     void needsApprovalFailCloseOnCheckerError() {
         StubChecker checker = new StubChecker();
         checker.requiredError = new IllegalStateException("db down");
-        Gate gate = new Gate(GateOptions.defaults().withFailClose(true), checker, null);
+        Gate gate = track(new Gate(GateOptions.defaults().withFailClose(true), checker, null));
         assertTrue(gate.needsApproval(Cancellation.none(), 1, "svc", "tool"));
     }
 
@@ -185,14 +194,14 @@ class GateTest {
     void needsApprovalFailOpenOnCheckerError() {
         StubChecker checker = new StubChecker();
         checker.requiredError = new IllegalStateException("db down");
-        Gate gate = new Gate(GateOptions.defaults().withFailClose(false), checker, null);
+        Gate gate = track(new Gate(GateOptions.defaults().withFailClose(false), checker, null));
         assertFalse(gate.needsApproval(Cancellation.none(), 1, "svc", "tool"));
     }
 
     /** 身份缺失（tenant 0 / serviceId 空 / toolName 空）不进入审批门。 */
     @Test
     void needsApprovalFalseOnMissingIdentity() {
-        Gate gate = new Gate(GateOptions.defaults(), new StubChecker(true), null);
+        Gate gate = track(new Gate(GateOptions.defaults(), new StubChecker(true), null));
         assertFalse(gate.needsApproval(Cancellation.none(), 0, "svc", "tool"));
         assertFalse(gate.needsApproval(Cancellation.none(), 1, "", "tool"));
         assertFalse(gate.needsApproval(Cancellation.none(), 1, "svc", ""));
@@ -201,7 +210,7 @@ class GateTest {
     /** 不存在的 pending → NotFound。 */
     @Test
     void resolveNotFound() {
-        Gate gate = new Gate(options(1), new StubChecker(true), null);
+        Gate gate = track(new Gate(options(1), new StubChecker(true), null));
         ApprovalException err = captureResolve(gate, 1, "", "no-such-id", Decision.allow());
         assertNotNull(err);
         assertTrue(err.is(ApprovalException.Kind.PENDING_NOT_FOUND));
@@ -211,7 +220,7 @@ class GateTest {
     @Test
     void resolveTenantMismatch() {
         RecordingEventBus bus = new RecordingEventBus();
-        Gate gate = new Gate(options(2), new StubChecker(true), null);
+        Gate gate = track(new Gate(options(2), new StubChecker(true), null));
 
         AtomicReference<ApprovalException> mismatch = new AtomicReference<>();
         bus.on(ResponseType.TOOL_APPROVAL_REQUIRED, evt -> {
@@ -235,7 +244,7 @@ class GateTest {
     @Test
     void resolveUserMismatch() {
         RecordingEventBus bus = new RecordingEventBus();
-        Gate gate = new Gate(options(2), new StubChecker(true), null);
+        Gate gate = track(new Gate(options(2), new StubChecker(true), null));
 
         AtomicReference<ApprovalException> mismatch = new AtomicReference<>();
         bus.on(ResponseType.TOOL_APPROVAL_REQUIRED, evt -> {
@@ -262,7 +271,7 @@ class GateTest {
     @Test
     void resolveEmptyUserIdRejectedWhenWaiterHasUser() {
         RecordingEventBus bus = new RecordingEventBus();
-        Gate gate = new Gate(options(2), new StubChecker(true), null);
+        Gate gate = track(new Gate(options(2), new StubChecker(true), null));
 
         AtomicReference<ApprovalException> mismatch = new AtomicReference<>();
         bus.on(ResponseType.TOOL_APPROVAL_REQUIRED, evt -> {
@@ -286,7 +295,7 @@ class GateTest {
     /** 超时返回后条目已删，再 Resolve 即 NotFound。 */
     @Test
     void resolveAlreadyResolvedAfterTimeout() throws Exception {
-        Gate gate = new Gate(options(1).withTimeout(Duration.ofMillis(200)), new StubChecker(true), null);
+        Gate gate = track(new Gate(options(1).withTimeout(Duration.ofMillis(200)), new StubChecker(true), null));
         RecordingEventBus bus = new RecordingEventBus();
 
         AtomicReference<String> pendingId = new AtomicReference<>();
@@ -319,7 +328,7 @@ class GateTest {
      */
     @Test
     void resolveRaceWinsAlreadyResolved() throws Exception {
-        Gate gate = new Gate(options(30), new StubChecker(true), null);
+        Gate gate = track(new Gate(options(30), new StubChecker(true), null));
         RecordingEventBus bus = new RecordingEventBus();
 
         AtomicReference<ApprovalException> first = new AtomicReference<>();
@@ -353,21 +362,21 @@ class GateTest {
     /** 无 checker：工具默认开启。 */
     @Test
     void isEnabledNoCheckerKeepsToolsOn() {
-        Gate gate = new Gate((GateOptions) null, null, null);
+        Gate gate = track(new Gate((GateOptions) null, null, null));
         assertTrue(gate.isEnabled(Cancellation.none(), 1, "svc", "tool"));
     }
 
     /** 租户缺失：fail-close。 */
     @Test
     void isEnabledMissingTenantFailClosed() {
-        Gate gate = new Gate((GateOptions) null, new StubChecker(), null);
+        Gate gate = track(new Gate((GateOptions) null, new StubChecker(), null));
         assertFalse(gate.isEnabled(Cancellation.none(), 0, "svc", "tool"));
     }
 
     /** 遵从 checker 的判定。 */
     @Test
     void isEnabledHonorsChecker() {
-        Gate gate = new Gate((GateOptions) null, StubChecker.enabled(false), null);
+        Gate gate = track(new Gate((GateOptions) null, StubChecker.enabled(false), null));
         assertFalse(gate.isEnabled(Cancellation.none(), 1, "svc", "tool"));
     }
 
@@ -376,7 +385,7 @@ class GateTest {
     void isEnabledCheckerErrorPropagates() {
         StubChecker checker = new StubChecker();
         checker.enabledError = new IllegalStateException("deadline exceeded");
-        Gate gate = new Gate((GateOptions) null, checker, null);
+        Gate gate = track(new Gate((GateOptions) null, checker, null));
         assertThrows(IllegalStateException.class, () -> gate.isEnabled(Cancellation.none(), 1, "svc", "tool"));
     }
 
@@ -394,7 +403,7 @@ class GateTest {
     /** 补充用例：checker 为 null 时 requestAndWait 直接放行。 */
     @Test
     void requestAndWaitWithoutCheckerApprovesImmediately() {
-        Gate gate = new Gate((GateOptions) null, null, null);
+        Gate gate = track(new Gate((GateOptions) null, null, null));
         Decision d = gate.requestAndWait(Cancellation.none(), PendingRequest.builder()
                 .tenantId(1).sessionId("s").serviceId("svc").mcpToolName("t").build());
         assertTrue(d.approved());
@@ -403,7 +412,7 @@ class GateTest {
     /** 补充用例：EventBus 缺失是内部错误（"EventBus is nil"）。 */
     @Test
     void requestAndWaitWithoutEventBusFails() {
-        Gate gate = new Gate(options(1), new StubChecker(true), null);
+        Gate gate = track(new Gate(options(1), new StubChecker(true), null));
         ApprovalException err = assertThrows(ApprovalException.class, () -> gate.requestAndWait(
                 Cancellation.none(),
                 PendingRequest.builder().tenantId(1).sessionId("s").serviceId("svc").mcpToolName("t").build()));
@@ -414,7 +423,7 @@ class GateTest {
     /** 补充用例：emit 失败必须上抛（包装为 "emit tool approval required: ..."）。 */
     @Test
     void requestAndWaitEmitFailurePropagates() {
-        Gate gate = new Gate(options(1), new StubChecker(true), null);
+        Gate gate = track(new Gate(options(1), new StubChecker(true), null));
         EventBus failing = event -> {
             throw new IllegalStateException("sse closed");
         };
@@ -429,7 +438,7 @@ class GateTest {
     @Test
     void requestOAuthAndWaitAuthorized() {
         RecordingEventBus bus = new RecordingEventBus();
-        Gate gate = new Gate(options(30), new StubChecker(false), null);
+        Gate gate = track(new Gate(options(30), new StubChecker(false), null));
 
         AtomicReference<McpOauthRequiredData> required = new AtomicReference<>();
         bus.on(ResponseType.MCP_OAUTH_REQUIRED, evt -> {
@@ -457,7 +466,7 @@ class GateTest {
     @Test
     void requestOAuthAndWaitTimeout() {
         RecordingEventBus bus = new RecordingEventBus();
-        Gate gate = new Gate(options(30), new StubChecker(false), null);
+        Gate gate = track(new Gate(options(30), new StubChecker(false), null));
 
         Decision d = gate.requestOAuthAndWait(Cancellation.none(), OAuthPendingRequest.builder()
                 .tenantId(1).userId("alice").sessionId("s").eventBus(bus)
@@ -472,7 +481,7 @@ class GateTest {
     /** 补充用例：未配 Redis 时，不存在的 pending 直接 NotFound（单实例/Lite 行为）。 */
     @Test
     void resolveWithoutRedisIsSingleInstance() {
-        Gate gate = new Gate(options(1), new StubChecker(true), null);
+        Gate gate = track(new Gate(options(1), new StubChecker(true), null));
         ApprovalException err = captureResolve(gate, 1, "", "missing", Decision.allow());
         assertTrue(err != null && err.is(ApprovalException.Kind.PENDING_NOT_FOUND));
     }

@@ -23,9 +23,9 @@ import com.ragagent.common.error.BizException;
 import com.ragagent.common.security.SsrfGuard;
 import com.ragagent.mcp.domain.McpAuthConfig;
 import com.ragagent.mcp.domain.McpService;
-import com.ragagent.mcp.mapper.McpOAuthRepository;
 import com.ragagent.mcp.mapper.McpServiceMapper;
 import com.ragagent.mcp.protocol.McpClientManager;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -49,24 +49,30 @@ class McpServiceServiceTest {
     @Autowired
     private McpServiceMapper mcpServiceMapper;
     @Autowired
-    private McpOAuthRepository oauthRepo;
-    @Autowired
     private McpMetadataService metadataService;
     @Autowired
     private SsrfGuard ssrfGuard;
 
     private McpClientManager clientManager;
     private McpServiceService svc;
+    /** 进入本方法时的进程级白名单（SsrfGuard 是 static，改后必须还原）。 */
+    private SsrfGuard.Whitelist whitelistSnapshot;
 
     @BeforeEach
     void setUp() {
         TestSchema.createTables(jdbc);
         TestSchema.resetData(jdbc);
         // 出站 URL 校验对测试域名放行
+        whitelistSnapshot = SsrfGuard.snapshotWhitelist();
         ssrfGuard.reloadWhitelist("example.com,127.0.0.1");
         clientManager = mock(McpClientManager.class);
-        svc = new McpServiceService(mcpServiceMapper, oauthRepo, metadataService, ssrfGuard,
+        svc = new McpServiceService(mcpServiceMapper, metadataService, ssrfGuard,
                 Optional.of(clientManager), Optional.empty());
+    }
+
+    @AfterEach
+    void restoreWhitelistSnapshot() {
+        SsrfGuard.restoreWhitelist(whitelistSnapshot);
     }
 
     private String seed(String apiKey, String token) {

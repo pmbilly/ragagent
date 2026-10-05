@@ -2,7 +2,6 @@ package com.ragagent.retrieval;
 
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -12,8 +11,6 @@ import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.knowledge.ChunkFacts;
-import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
-import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.retrieval.engine.PgVectorRetrieveRepository;

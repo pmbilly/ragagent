@@ -49,7 +49,6 @@ class OpenSearchRetrieveRepositoryTest {
     private final Map<String, String> bodyOverrides = new HashMap<>();
     private HttpServer server;
     private String base;
-    private OpenSearchRetrieveRepository repo;
 
     @BeforeEach
     void start() throws IOException {

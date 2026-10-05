@@ -138,10 +138,10 @@ public class WikiPageServiceImpl implements WikiPageService {
         }
         page.setLastEditSource(WikiEditContext.currentEditSource());
         page.setLastEditorId(WikiEditContext.currentEditorId());
-        linkOps.stripWikiPageInlineChunkCitations(page);
+        WikiPageLinkOps.stripWikiPageInlineChunkCitations(page);
 
         // 解析正文里的出链
-        page.setOutLinks(linkOps.parseOutLinks(page.getContent()));
+        page.setOutLinks(WikiPageLinkOps.parseOutLinks(page.getContent()));
         applyFolderToPage(page);
         normalizeWikiHierarchy(page);
 
@@ -166,7 +166,7 @@ public class WikiPageServiceImpl implements WikiPageService {
     @Override
     public WikiPage updatePage(WikiPage page) {
         WikiPage existing = repo.getBySlug(page.getKnowledgeBaseId(), page.getSlug());
-        linkOps.stripWikiPageInlineChunkCitations(page);
+        WikiPageLinkOps.stripWikiPageInlineChunkCitations(page);
 
         List<String> oldOutLinks = existing.getOutLinks();
 
@@ -200,7 +200,7 @@ public class WikiPageServiceImpl implements WikiPageService {
         applyFolderToPage(existing);
 
         // 出链是正文的纯导数，所以只随正文变。无条件重解析以与库中正文保持一致。
-        existing.setOutLinks(linkOps.parseOutLinks(existing.getContent()));
+        existing.setOutLinks(WikiPageLinkOps.parseOutLinks(existing.getContent()));
         normalizeWikiHierarchy(existing);
 
         if (contentChanged) {
@@ -245,8 +245,8 @@ public class WikiPageServiceImpl implements WikiPageService {
         WikiPage existing = repo.getBySlug(page.getKnowledgeBaseId(), page.getSlug());
         List<String> oldOutLinks = existing.getOutLinks();
 
-        existing.setContent(linkOps.stripWikiInlineChunkCitations(page.getContent()));
-        existing.setOutLinks(linkOps.parseOutLinks(existing.getContent()));
+        existing.setContent(WikiPageLinkOps.stripWikiInlineChunkCitations(page.getContent()));
+        existing.setOutLinks(WikiPageLinkOps.parseOutLinks(existing.getContent()));
         existing.setUpdatedAt(OffsetDateTime.now());
 
         repo.updateAutoLinkedContent(existing);
@@ -260,7 +260,7 @@ public class WikiPageServiceImpl implements WikiPageService {
     @Override
     public WikiPage getPageBySlug(String kbId, String slug) {
         WikiPage page = repo.getBySlug(kbId, slug);
-        linkOps.stripWikiPageInlineChunkCitations(page);
+        WikiPageLinkOps.stripWikiPageInlineChunkCitations(page);
         return page;
     }
 
@@ -277,7 +277,7 @@ public class WikiPageServiceImpl implements WikiPageService {
     @Override
     public WikiPage getPageByID(String id) {
         WikiPage page = repo.getByID(id);
-        linkOps.stripWikiPageInlineChunkCitations(page);
+        WikiPageLinkOps.stripWikiPageInlineChunkCitations(page);
         return page;
     }
 

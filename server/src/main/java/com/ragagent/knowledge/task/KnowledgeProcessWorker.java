@@ -53,7 +53,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import org.springframework.beans.factory.ObjectProvider;
-import com.ragagent.retrieval.graph.RetrieveGraphRepository;
 import com.ragagent.common.wiki.WikiFinalizePort;
 import com.ragagent.common.wiki.WikiIngestPort;
 

@@ -29,20 +29,17 @@ public final class PluginExtractEntity implements Plugin {
     private final PipelineConfig.PromptTemplateStructured template;
     private final PipelinePorts.KnowledgeBaseRepository knowledgeBaseRepo;
     private final PipelinePorts.KnowledgeService knowledgeService;
-    private final PipelinePorts.KnowledgeRepository knowledgeRepo;
     private final boolean neo4jEnabled;
 
     public PluginExtractEntity(PipelinePorts.ModelService modelService,
                                PipelineConfig.PromptTemplateStructured template,
                                PipelinePorts.KnowledgeBaseRepository knowledgeBaseRepo,
                                PipelinePorts.KnowledgeService knowledgeService,
-                               PipelinePorts.KnowledgeRepository knowledgeRepo,
                                boolean neo4jEnabled) {
         this.modelService = modelService;
         this.template = template;
         this.knowledgeBaseRepo = knowledgeBaseRepo;
         this.knowledgeService = knowledgeService;
-        this.knowledgeRepo = knowledgeRepo;
         // 环境开关 NEO4J_ENABLE 在装配期解析传入
         this.neo4jEnabled = neo4jEnabled;
     }

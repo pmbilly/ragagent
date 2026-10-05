@@ -344,7 +344,4 @@ public final class ProviderAdapters {
         return s.substring(0, end);
     }
 
-    private static boolean isBlank(String s) {
-        return s == null || s.isEmpty();
-    }
 }

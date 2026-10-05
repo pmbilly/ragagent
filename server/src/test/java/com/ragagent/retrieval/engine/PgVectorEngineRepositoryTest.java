@@ -33,10 +33,6 @@ class PgVectorEngineRepositoryTest {
     private JdbcTemplate jdbc;
     @Autowired
     private PgVectorEngineRepository adapter;
-    @Autowired
-    private PgVectorRetrieveRepository pgRepository;
-    @Autowired
-    private VectorStoreService vectorStoreService;
 
     @BeforeEach
     void seed() {

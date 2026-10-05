@@ -32,7 +32,6 @@ import com.ragagent.mcp.domain.McpPrincipal;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.domain.McpTool;
 import com.ragagent.mcp.mapper.McpMetadataRepository;
-import com.ragagent.mcp.mapper.McpOAuthRepository;
 import com.ragagent.mcp.mapper.McpServiceMapper;
 import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.AfterEach;
@@ -64,19 +63,20 @@ class McpMetadataServiceTest {
     @Autowired
     private McpMetadataRepository metadataRepo;
     @Autowired
-    private McpOAuthRepository oauthRepo;
-    @Autowired
     private SsrfGuard ssrfGuard;
 
     private McpServiceService svc;
     private McpMetadataService metadata;
+    /** 进入本方法时的进程级白名单（SsrfGuard 是 static，改后必须还原）。 */
+    private SsrfGuard.Whitelist whitelistSnapshot;
 
     @BeforeEach
     void setUp() {
         TestSchema.createTables(jdbc);
         TestSchema.resetData(jdbc);
+        whitelistSnapshot = SsrfGuard.snapshotWhitelist();
         ssrfGuard.reloadWhitelist("127.0.0.1,example.com");
-        svc = new McpServiceService(mcpServiceMapper, oauthRepo, null, ssrfGuard,
+        svc = new McpServiceService(mcpServiceMapper, null, ssrfGuard,
                 Optional.empty(), Optional.empty());
         metadata = new McpMetadataService(mcpServiceMapper, metadataRepo, Optional.empty());
     }
@@ -84,6 +84,7 @@ class McpMetadataServiceTest {
     @AfterEach
     void tearDown() {
         TenantContext.clear();
+        SsrfGuard.restoreWhitelist(whitelistSnapshot);
     }
 
     private void seedService(String id, String url, McpAuthType authType) {

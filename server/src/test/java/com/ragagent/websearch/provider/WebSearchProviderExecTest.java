@@ -28,14 +28,18 @@ import com.sun.net.httpserver.HttpServer;
  */
 class WebSearchProviderExecTest {
 
+    /** 进入本类时的进程级白名单（SsrfGuard 是 static，改后必须按快照还原）。 */
+    private static SsrfGuard.Whitelist whitelistSnapshot;
+
     @BeforeAll
     static void whitelistOn() {
+        whitelistSnapshot = SsrfGuard.snapshotWhitelist();
         new SsrfGuard().reloadWhitelist("127.0.0.1,localhost");
     }
 
     @AfterAll
     static void whitelistOff() {
-        new SsrfGuard().reloadWhitelist("");
+        SsrfGuard.restoreWhitelist(whitelistSnapshot);
     }
 
     // ── stub ─────────────────────────────────────────────────────────

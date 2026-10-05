@@ -3088,12 +3088,9 @@ const handleAddToKnowledge = (answerEvent: any) => {
 .event-item {
   position: relative;
   margin-bottom: 8px;
-
-  &.event-answer {
-    // answer 事件无特殊左侧装饰
-  }
 }
 
+// answer 事件（.event-answer）无特殊左侧装饰，故不设独立规则集
 // While streaming, the last timeline step is `tree-child-last` (margin-bottom: 0)
 // and the answer streams in directly beneath it. Give the answer breathing room
 // so it does not collide with the final tool row.
@@ -3174,10 +3171,7 @@ const handleAddToKnowledge = (answerEvent: any) => {
   }
 }
 
-.tree-child-content {
-  // child content area
-}
-
+// 注：.tree-child-content 为纯结构类（无独立样式），故不设规则集
 // Thinking detail content (inside action-details)
 .thinking-detail-content {
   padding: 7px 0 0 30px;

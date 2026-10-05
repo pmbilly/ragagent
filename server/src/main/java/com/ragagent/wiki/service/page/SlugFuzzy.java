@@ -189,7 +189,6 @@ public final class SlugFuzzy {
         boolean changed = false;
         int last = 0;
         while (m.find()) {
-            String match = m.group();
             String inner = m.group(1);
             String rawSlug = inner;
             String display = "";

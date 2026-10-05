@@ -79,8 +79,6 @@ class EmbedContractTest {
             "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})");
     private static final Pattern UUID_PATTERN = Pattern.compile(
             "\"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\"");
-    private static final Pattern BARE_UUID_PATTERN = Pattern.compile(
-            "\\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\b");
     private static final Pattern PUBLISH_TOKEN_PATTERN = Pattern.compile("em_[A-Za-z0-9_-]{20,}");
     private static final Pattern SESSION_TOKEN_PATTERN = Pattern.compile("ems_[A-Za-z0-9_-]{20,}");
     private static final Pattern SIG_PATTERN = Pattern.compile("(\"sig\":\")[A-Za-z0-9_-]{20,}\"");

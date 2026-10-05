@@ -50,10 +50,6 @@ class ImaClientTest {
         static Rs of(int status, String body) {
             return new Rs(status, body, Map.of());
         }
-
-        static Rs of(int status, String body, String header, String value) {
-            return new Rs(status, body, Map.of(header, value));
-        }
     }
 
     /** 按调用序号依次返回脚本里的响应，用尽后重复最后一条。 */

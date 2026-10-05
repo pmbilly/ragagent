@@ -10,7 +10,6 @@ import com.ragagent.common.tenant.TenantRole;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.service.TenantMemberService;
 import com.ragagent.auth.service.TenantService;
-import com.ragagent.auth.service.UserService;
 import com.ragagent.auth.service.ValidatedToken;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.tenant.TenantProperties;
@@ -37,16 +36,13 @@ public class WsAuthSupport {
 
     private static final Logger log = LoggerFactory.getLogger(WsAuthSupport.class);
 
-    private final UserService userService;
     private final TenantService tenantService;
     private final TenantMemberService memberService;
     private final TenantProperties tenantProperties;
 
-    public WsAuthSupport(UserService userService,
-                         TenantService tenantService,
+    public WsAuthSupport(TenantService tenantService,
                          TenantMemberService memberService,
                          TenantProperties tenantProperties) {
-        this.userService = userService;
         this.tenantService = tenantService;
         this.memberService = memberService;
         this.tenantProperties = tenantProperties;

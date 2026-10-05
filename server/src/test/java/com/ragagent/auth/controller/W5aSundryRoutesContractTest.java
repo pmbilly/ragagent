@@ -3,7 +3,6 @@ package com.ragagent.auth.controller;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.function.UnaryOperator;
@@ -359,12 +358,6 @@ class W5aSundryRoutesContractTest {
             b.header("Authorization", bearer);
         }
         return body == null ? b : b.content(body);
-    }
-
-    private static MockHttpServletRequestBuilder postJson(String url, String body) {
-        return org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-                .post(url).contentType(sanitizeContentType(body))
-                .content(body == null ? new byte[0] : body.getBytes(StandardCharsets.UTF_8));
     }
 
     private static MediaType sanitizeContentType(String body) {

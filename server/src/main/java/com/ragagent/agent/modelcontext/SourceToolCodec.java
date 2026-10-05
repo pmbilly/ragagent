@@ -381,7 +381,7 @@ final class SourceToolCodec {
         if (handle != null) {
             return handle;
         }
-        handle = reg.webs.handleForKey(reg.canonicalWebURL(real));
+        handle = reg.webs.handleForKey(SourceRegistry.canonicalWebURL(real));
         // 未命中必须返回空串而不是 null（调用方对返回值直接判空——MCP 工具参数
         // 经此路径时曾 NPE）。
         return handle == null ? "" : handle;

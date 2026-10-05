@@ -14,7 +14,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ScheduledFuture;
 
 import com.ragagent.TestSchema;
 import com.ragagent.audit.service.AuditLogService;
@@ -41,7 +40,6 @@ import com.ragagent.datasource.mapper.DataSourceRepository;
 import com.ragagent.datasource.mapper.SyncLogRepository;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,8 +85,6 @@ class DataSourceServiceTest {
     private TenantService tenantService;
     @Autowired
     private AuditLogService auditLogService;
-    @Autowired
-    private KnowledgeBaseMapper kbMapper;
     @Autowired
     private TenantMapper tenantMapper;
 
@@ -301,7 +297,7 @@ class DataSourceServiceTest {
 
         TaskScheduler cron = mock(TaskScheduler.class);
         when(cron.schedule(any(Runnable.class), any(Trigger.class)))
-                .thenReturn(mock(ScheduledFuture.class));
+                .thenReturn(mock());
         Scheduler scheduler = new Scheduler(dsRepo, syncLogRepo, queue, cron);
 
         service = new DataSourceService(dsRepo, syncLogRepo, bridge, queue, registry, scheduler,

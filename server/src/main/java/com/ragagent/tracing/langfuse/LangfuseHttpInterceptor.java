@@ -117,7 +117,6 @@ public class LangfuseHttpInterceptor implements HandlerInterceptor {
     }
 
     /** session 归属：session_id 路径参数 → （sessions 路由下的）id 路径参数 → ""。 */
-    @SuppressWarnings("unchecked")
     private static String extractSessionId(HttpServletRequest request, String pattern) {
         Object vars = request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
         if (!(vars instanceof Map<?, ?> map)) {

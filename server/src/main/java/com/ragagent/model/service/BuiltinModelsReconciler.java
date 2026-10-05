@@ -171,7 +171,6 @@ public class BuiltinModelsReconciler implements ApplicationRunner {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private static ModelParameters parseParameters(Object raw) {
         ModelParameters p = new ModelParameters();
         if (!(raw instanceof Map<?, ?> map)) {

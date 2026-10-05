@@ -3,10 +3,12 @@ package com.ragagent.common.approval;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import com.ragagent.mcp.service.Adapter;
@@ -21,6 +23,21 @@ import com.ragagent.mcp.service.Adapter;
 @Timeout(20)
 class ToolPolicyTest {
 
+    /** 生命周期登记：@AfterEach 统一 close（Gate 停止跨实例订阅线程；未配 Redis 时空操作）。 */
+    private final List<Gate> gatesToClose = new ArrayList<>();
+
+    private Gate track(Gate gate) {
+        gatesToClose.add(gate);
+        return gate;
+    }
+
+    @AfterEach
+    void closeGates() {
+        for (Gate gate : gatesToClose) {
+            gate.close();
+        }
+    }
+
     /**
      * {@code BatchPolicyService} 继承的 stubChecker 语义是 enabled == null → true，
      * 所以未被策略行覆盖的名字默认是启用。
@@ -33,7 +50,7 @@ class ToolPolicyTest {
                 StubChecker.row(8, "svc", "default", false),      // 别的租户：忽略
                 StubChecker.row(7, "other", "default", false),    // 别的服务：忽略
                 StubChecker.row(7, "svc", "not-requested", true)); // 未被请求：忽略
-        Gate gate = new Gate(null, new Adapter(svc), null);
+        Gate gate = track(new Gate(null, new Adapter(svc), null));
 
         Map<String, Boolean> result =
                 gate.enabledTools(Cancellation.none(), 7, "svc", List.of("default", "disabled"));
@@ -63,12 +80,12 @@ class ToolPolicyTest {
     @Test
     void gateBatchPolicyLegacyCheckerAndNoChecker() {
         // 只实现单工具契约的旧 checker → 逐个查
-        Gate gate = new Gate(null, new Adapter(StubChecker.enabled(false)), null);
+        Gate gate = track(new Gate(null, new Adapter(StubChecker.enabled(false)), null));
         Map<String, Boolean> result = gate.enabledTools(Cancellation.none(), 7, "svc", List.of("a", "b"));
         assertEquals(Map.of("a", false, "b", false), result);
 
         // 完全没有 checker → 全部保持启用
-        Gate noChecker = new Gate(null, null, null);
+        Gate noChecker = track(new Gate(null, null, null));
         Map<String, Boolean> result2 = noChecker.enabledTools(Cancellation.none(), 7, "svc", List.of("a", "b"));
         assertEquals(Map.of("a", true, "b", true), result2);
     }

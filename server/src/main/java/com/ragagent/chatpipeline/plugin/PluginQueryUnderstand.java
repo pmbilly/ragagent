@@ -119,7 +119,6 @@ public final class PluginQueryUnderstand implements Plugin {
         }
 
         int maxTokens = choice.useImages ? 500 : 150;
-        boolean thinking = false;
 
         // --- 调模型（失败降级） ---
         ChatOptions opt = new ChatOptions();

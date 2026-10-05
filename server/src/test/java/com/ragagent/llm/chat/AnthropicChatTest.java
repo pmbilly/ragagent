@@ -57,9 +57,12 @@ class AnthropicChatTest {
             }""";
 
     private final SsrfGuard guard = new SsrfGuard();
+    /** 进入本方法时的进程级白名单（SsrfGuard 是 static，改后必须还原）。 */
+    private SsrfGuard.Whitelist whitelistSnapshot;
 
     @BeforeEach
     void setUp() {
+        whitelistSnapshot = SsrfGuard.snapshotWhitelist();
         guard.reloadWhitelist("127.0.0.1");
         LlmTransport.setSsrfGuard(guard);
     }
@@ -67,6 +70,7 @@ class AnthropicChatTest {
     @AfterEach
     void tearDown() {
         LlmTransport.setSsrfGuard(new SsrfGuard());
+        SsrfGuard.restoreWhitelist(whitelistSnapshot);
     }
 
     // ------------------------------------------------------------------

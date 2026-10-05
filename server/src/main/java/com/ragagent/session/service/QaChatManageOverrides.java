@@ -20,10 +20,7 @@ final class QaChatManageOverrides {
     private static final org.slf4j.Logger log =
             org.slf4j.LoggerFactory.getLogger(QaChatManageOverrides.class);
 
-    private final SessionKnowledgeQaService service;
-
-    QaChatManageOverrides(SessionKnowledgeQaService service) {
-        this.service = service;
+    QaChatManageOverrides() {
     }
 
     void applyAgentOverridesToChatManage(QaSupport.QaRequest req, ChatManage cm) {

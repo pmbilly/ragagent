@@ -33,14 +33,18 @@ import com.ragagent.common.web.ProviderJson;
  */
 class RerankWireTest {
 
+    /** 进入本类时的进程级白名单（SsrfGuard 是 static，改后必须按快照还原）。 */
+    private static SsrfGuard.Whitelist whitelistSnapshot;
+
     @BeforeAll
     static void whitelistOn() {
+        whitelistSnapshot = SsrfGuard.snapshotWhitelist();
         new SsrfGuard().reloadWhitelist("127.0.0.1");
     }
 
     @AfterAll
     static void whitelistOff() {
-        new SsrfGuard().reloadWhitelist("");
+        SsrfGuard.restoreWhitelist(whitelistSnapshot);
     }
 
     // ── stub ─────────────────────────────────────────────────────────
@@ -397,7 +401,6 @@ class RerankWireTest {
             c.setApiKey("AKIDtest");
             c.setAppSecret("sk-test");
             c.setModelId("rr-l");
-            LkeapReranker r = new LkeapReranker(c);
             // Tc3Signer.post 直连固定域名；批式纯函数用本地数据验证，线格式用
             // 录制比对（stub 不参与 LKEAP 域名路由）
             List<LkeapReranker.Batch> batches = LkeapReranker.lkeapRerankBatches(
@@ -426,7 +429,6 @@ class RerankWireTest {
         RerankerConfig c = new RerankerConfig();
         c.setApiKey("AKIDtest");
         c.setAppSecret("sk-test");
-        LkeapReranker r = new LkeapReranker(c);
         List<String> documents = new java.util.ArrayList<>();
         for (int i = 0; i < 61; i++) {
             documents.add(i + ":document");

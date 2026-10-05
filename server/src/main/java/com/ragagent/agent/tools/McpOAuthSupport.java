@@ -168,7 +168,6 @@ public final class McpOAuthSupport {
             String mcpToolName,
             String toolCallId,
             CallerIdentity caller) {
-        com.ragagent.mcp.protocol.McpClient client;
         try {
             return manager.getOrCreateClient(com.ragagent.mcp.protocol.McpContext.none(), service);
         } catch (Exception connectErr) {

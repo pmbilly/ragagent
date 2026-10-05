@@ -160,8 +160,12 @@ final class FakeIma implements AutoCloseable {
 
     // ── SSRF 白名单 ────────────────────────────────────────────────────────
 
+    /** 进入本套件时的进程级白名单（SsrfGuard 是 static，改后必须按快照还原）。 */
+    private static SsrfGuard.Whitelist whitelistSnapshot;
+
     /** 放行 loopback：stub server 绑在 127.0.0.1 上。 */
     static void allowLoopback() {
+        whitelistSnapshot = SsrfGuard.snapshotWhitelist();
         SsrfGuard guard = new SsrfGuard();
         guard.reloadWhitelist("127.0.0.1,::1,localhost");
         ConnectorHttp.setSsrfGuard(guard);
@@ -170,13 +174,18 @@ final class FakeIma implements AutoCloseable {
     /**
      * 还原**进程级**白名单。
      *
-     * <p>{@code SsrfGuard.whitelist} 是静态字段，{@code new SsrfGuard()} 只是读 env
-     * 的默认实例、并不会把白名单恢复成 env 的值，所以这里显式按 env 重新合并一次
-     * （即 {@code SSRF_WHITELIST} 与 {@code SSRF_WHITELIST_EXTRA} 的合并语义）。</p>
+     * <p>{@code SsrfGuard.whitelist} 是静态字段，{@code new SsrfGuard()} 并不会把白名单
+     * 恢复原样，所以这里按 {@link #allowLoopback()} 进入时留存的快照还原；未配对调用时
+     * 退回 env 重建（即 {@code SSRF_WHITELIST} 与 {@code SSRF_WHITELIST_EXTRA} 的合并语义）。</p>
      */
     static void restoreSsrf() {
         ConnectorHttp.setSsrfGuard(new SsrfGuard());
-        ConnectorHttp.ssrfGuard().reloadWhitelist(envWhitelistRaw());
+        if (whitelistSnapshot != null) {
+            SsrfGuard.restoreWhitelist(whitelistSnapshot);
+        } else {
+            // 未配对调用（没走过 allowLoopback）时退回环境变量重建
+            ConnectorHttp.ssrfGuard().reloadWhitelist(envWhitelistRaw());
+        }
     }
 
     private static String envWhitelistRaw() {

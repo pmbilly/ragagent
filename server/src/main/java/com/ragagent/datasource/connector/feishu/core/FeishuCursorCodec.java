@@ -95,7 +95,6 @@ public final class FeishuCursorCodec {
         return cursor;
     }
 
-    @SuppressWarnings("unchecked")
     private static Map<String, Map<String, String>> decode(Map<String, Object> connectorCursor,
                                                            String timesKey) {
         if (connectorCursor == null) {

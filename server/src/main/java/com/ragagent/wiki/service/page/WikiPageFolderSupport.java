@@ -57,8 +57,8 @@ final class WikiPageFolderSupport {
         if (!types.isEmpty()) {
             allDirect = service.folderRepo.countPagesByFolder(kbId, null);
         }
-        Map<String, Long> recScoped = service.recursiveFolderCounts(all, scopedDirect);
-        Map<String, Long> recAll = service.recursiveFolderCounts(all, allDirect);
+        Map<String, Long> recScoped = WikiPageServiceImpl.recursiveFolderCounts(all, scopedDirect);
+        Map<String, Long> recAll = WikiPageServiceImpl.recursiveFolderCounts(all, allDirect);
         boolean showEmptyFolders = types.size() > 1;
         // 一个文件夹属于本视图，当且仅当它（递归地）含有请求类型的页面，
         // 或者——只在合并视图里——它是一个任何类型页面都没有的完全空容器。
@@ -90,7 +90,7 @@ final class WikiPageFolderSupport {
 
     /** 创建文件夹（校验名字、解析父路径、防同级重名）。 */
     public WikiFolder createFolder(String kbId, Long tenantID, String parentID, String name) {
-        String folderName = service.validateFolderName(name);
+        String folderName = WikiPageServiceImpl.validateFolderName(name);
         String parentPath = "";
         int depth = 1;
         if (!WikiConstants.FOLDER_ROOT_ID.equals(parentID)) {
@@ -179,7 +179,7 @@ final class WikiPageFolderSupport {
         page.setFolderId(folderID == null ? "" : folderID.trim());
         applyFolderToPage(page);
         page.setUpdatedAt(OffsetDateTime.now());
-        service.normalizeWikiHierarchy(page);
+        WikiPageServiceImpl.normalizeWikiHierarchy(page);
         service.repo.updateMeta(page);
         return page;
     }
@@ -194,7 +194,7 @@ final class WikiPageFolderSupport {
         WikiFolder folder = service.folderRepo.getFolderByID(kbId, id);
         String name = folder.getName();
         if (newName != null && !newName.trim().isEmpty()) {
-            name = service.validateFolderName(newName);
+            name = WikiPageServiceImpl.validateFolderName(newName);
         }
         String targetParent = folder.getParentId();
         if (moveParent) {
@@ -271,7 +271,7 @@ final class WikiPageFolderSupport {
         for (WikiPage page : pages) {
             applyFolderToPage(page);
             page.setUpdatedAt(OffsetDateTime.now());
-            service.normalizeWikiHierarchy(page);
+            WikiPageServiceImpl.normalizeWikiHierarchy(page);
             try {
                 service.repo.updateMeta(page);
             } catch (RuntimeException e) {

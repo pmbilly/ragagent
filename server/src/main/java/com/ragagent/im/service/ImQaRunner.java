@@ -217,7 +217,7 @@ final class ImQaRunner {
             // 同步执行（QA 服务内部为虚拟线程管线，事件经 eventBus 回流到上面的订阅）。
             Exception runErr;
             try {
-                if (agent != null && service.qaRequests.isAgentMode(agent)) {
+                if (agent != null && ImQaRequests.isAgentMode(agent)) {
                     service.agentQaService.agentQA(qaReq, eventBus);
                 } else {
                     service.knowledgeQaService.knowledgeQA(qaReq, eventBus);
@@ -236,7 +236,7 @@ final class ImQaRunner {
                     if (!done.await(10, java.util.concurrent.TimeUnit.MINUTES)) {
                         qaErr.compareAndSet(null, new java.util.concurrent.TimeoutException("IM QA wait"));
                     }
-                    if (service.qaRequests.isAgentMode(agent)) {
+                    if (ImQaRequests.isAgentMode(agent)) {
                         complete.await(10, java.util.concurrent.TimeUnit.SECONDS);
                     }
                 } catch (InterruptedException e) {

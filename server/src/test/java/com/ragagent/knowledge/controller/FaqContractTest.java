@@ -256,24 +256,6 @@ class FaqContractTest {
                 java.nio.charset.StandardCharsets.UTF_8);
     }
 
-    private int status(String method, String path, String auth, String body) throws Exception {
-        org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder builder =
-                switch (method) {
-                    case "GET" -> get(path);
-                    case "POST" -> post(path);
-                    case "PUT" -> put(path);
-                    case "DELETE" -> delete(path);
-                    default -> throw new IllegalArgumentException(method);
-                };
-        if (auth != null) {
-            builder.header("Authorization", auth);
-        }
-        if (body != null) {
-            builder.contentType("application/json").content(body);
-        }
-        return mockMvc.perform(builder).andReturn().getResponse().getStatus();
-    }
-
     private void compare(String golden, String actual) throws Exception {
         com.ragagent.support.GoldenContract.assertEquals("src/test/resources/contracts",
                 golden, FaqContractTest::mask, actual);

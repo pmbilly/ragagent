@@ -25,7 +25,6 @@ import com.ragagent.retrieval.domain.WebSearchResult;
 import com.ragagent.retrieval.support.SearchTextUtil;
 import com.ragagent.common.graph.GraphData;
 import com.ragagent.common.graph.GraphNode;
-import com.ragagent.llm.extract.PipelineConfig;
 
 /**
  * 录制回放：查询扩展 / 去重 / 部分重叠 / filter_top_k / search / search_by_targets /
@@ -59,7 +58,7 @@ class SearchRecordingTest {
 
     @Test
     void expansion() {
-        PluginSearch p = new PluginSearch(null, null, null, null, null, null, null, null, null);
+        PluginSearch p = new PluginSearch(null, null, null);
         for (int i = 0; i < EXPAND_QUERIES.length; i++) {
             ChatManage cm = new ChatManage();
             cm.setQuery(EXPAND_QUERIES[i]);
@@ -102,7 +101,7 @@ class SearchRecordingTest {
         hits.add(Rec46cSupport.sr("exp-1", "扩展命中一", "k1", 0.5));
         hits.add(Rec46cSupport.sr("exp-2", "扩展命中二", "k1", 0.4));
         kbSvc.hybrid.put("kb-1", hits);
-        PluginSearch p2 = new PluginSearch(kbSvc, null, null, null, null, null, null, null, null);
+        PluginSearch p2 = new PluginSearch(kbSvc, null, null);
         ChatManage cm = new ChatManage();
         cm.setRewriteQuery("知识库检索怎么配置");
         cm.setQuery("知识库检索怎么配置");
@@ -231,8 +230,8 @@ class SearchRecordingTest {
     // ----- search（对照 recSearchOnEvent） -----
 
     private PluginSearch mkSearch(Rec46cSupport.StubKBService kbSvc, Rec46cSupport.StubWebSearch web) {
-        return new PluginSearch(kbSvc, null, null, null, web,
-                new Rec46cSupport.StubTenantService(), null, null, null);
+        return new PluginSearch(kbSvc, web,
+                new Rec46cSupport.StubTenantService());
     }
 
     @Test
@@ -429,7 +428,7 @@ class SearchRecordingTest {
         kbSvc.embed.put("kb-b", new float[] {0.3f});
         kbSvc.hybrid.put("kb-a", new ArrayList<>(List.of(Rec46cSupport.sr("a-1", "A 文档命中", "ka", 0.7))));
         kbSvc.hybrid.put("kb-b", new ArrayList<>(List.of(Rec46cSupport.sr("b-1", "B 文档命中", "kb", 0.6))));
-        PluginSearch p = new PluginSearch(kbSvc, null, null, null, null, null, null, null, null);
+        PluginSearch p = new PluginSearch(kbSvc, null, null);
         ChatManage cm = new ChatManage();
         cm.setRewriteQuery("共享模型查询");
         cm.setEmbeddingTopK(3);
@@ -450,7 +449,7 @@ class SearchRecordingTest {
         kbSvc2.kbs.put("kb-c", Rec46cSupport.kb("kb-c", "document", true, true, false));
         kbSvc2.embed.put("kb-c", new float[] {0.9f});
         kbSvc2.hybrid.put("kb-c", new ArrayList<>(List.of(Rec46cSupport.sr("c-1", "C 命中", "kc", 0.55))));
-        PluginSearch p2 = new PluginSearch(kbSvc2, null, null, null, null, null, null, null, null);
+        PluginSearch p2 = new PluginSearch(kbSvc2, null, null);
         ChatManage cm2 = new ChatManage();
         cm2.setRewriteQuery("指定文档");
         cm2.setEmbeddingTopK(2);
@@ -484,7 +483,7 @@ class SearchRecordingTest {
         Rec46cSupport.StubKBService kbSvc = new Rec46cSupport.StubKBService();
         kbSvc.hybridNull.add("kb-1"); // 无可用检索管道 → hybridSearch 返回 null
         kbSvc.kbs.put("kb-1", Rec46cSupport.kb("kb-1", "document", true, true, false));
-        PluginSearch p = new PluginSearch(kbSvc, null, null, null, null, null, null, null, null);
+        PluginSearch p = new PluginSearch(kbSvc, null, null);
         ChatManage cm = new ChatManage();
         cm.setQuery("你好");
         cm.setRewriteQuery("你好");
@@ -519,9 +518,8 @@ class SearchRecordingTest {
         chunkRepo.chunks.put("ent-1", chunk("ent-1", "实体扩展内容一", 3));
         chunkRepo.chunks.put("ent-2", chunk("ent-2", "实体扩展内容二", 4));
         EventManager mgr = new EventManager();
-        PluginSearchParallel p = new PluginSearchParallel(mgr, kbSvc, new Rec46cSupport.StubKnowledgeService(),
-                new Rec46cSupport.StubChunkService(), new PipelineConfig(), null,
-                new Rec46cSupport.StubTenantService(), null, null, null, graph, chunkRepo, knowledgeRepo);
+        PluginSearchParallel p = new PluginSearchParallel(mgr, kbSvc,
+                null, new Rec46cSupport.StubTenantService(), graph, chunkRepo, knowledgeRepo);
         ChatManage cm = new ChatManage();
         cm.setSessionId("sp1");
         cm.setQuery("实体查询");
@@ -543,9 +541,8 @@ class SearchRecordingTest {
 
         // chunk only
         EventManager mgr2 = new EventManager();
-        PluginSearchParallel p2 = new PluginSearchParallel(mgr2, kbSvc, new Rec46cSupport.StubKnowledgeService(),
-                new Rec46cSupport.StubChunkService(), new PipelineConfig(), null, null, null, null, null,
-                graph, chunkRepo, knowledgeRepo);
+        PluginSearchParallel p2 = new PluginSearchParallel(mgr2, kbSvc,
+                null, null, graph, chunkRepo, knowledgeRepo);
         ChatManage cm2 = new ChatManage();
         cm2.setSessionId("sp2");
         cm2.setQuery("普通");
@@ -577,9 +574,8 @@ class SearchRecordingTest {
         Rec46cSupport.StubKBService emptyKB = new Rec46cSupport.StubKBService();
         emptyKB.kbs.put("kb-9", Rec46cSupport.kb("kb-9", "document", true, true, false));
         EventManager mgr4 = new EventManager();
-        PluginSearchParallel p4 = new PluginSearchParallel(mgr4, emptyKB, new Rec46cSupport.StubKnowledgeService(),
-                new Rec46cSupport.StubChunkService(), new PipelineConfig(), null, null, null, null, null,
-                new Rec46cSupport.StubGraphRepo(), new Rec46cSupport.StubChunkRepo(),
+        PluginSearchParallel p4 = new PluginSearchParallel(mgr4, emptyKB,
+                null, null, new Rec46cSupport.StubGraphRepo(), new Rec46cSupport.StubChunkRepo(),
                 new Rec46cSupport.StubKnowledgeRepo());
         ChatManage cm4 = new ChatManage();
         cm4.setSessionId("sp4");

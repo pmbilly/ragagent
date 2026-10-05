@@ -25,7 +25,6 @@ import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeTag;
 import com.ragagent.knowledge.mapper.ChunkMapper;
-import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import com.ragagent.knowledge.mapper.KnowledgeTagMapper;
 import com.ragagent.knowledge.task.KnowledgeProcessingQueue;
@@ -77,7 +76,6 @@ public class KnowledgeService implements KnowledgeDocumentGateway {
             List.of("docreader", "chunking", "embedding", "multimodal", "postprocess");
 
     private final KnowledgeMapper knowledgeMapper;
-    private final KnowledgeBaseMapper kbMapper;
     private final ChunkMapper chunkMapper;
     private final KnowledgeTagMapper tagMapper;
     /** A3-3 尾批：租户感知文件存储（本地契约不变；云 provider 租户真正落对象存储）。 */
@@ -98,7 +96,6 @@ public class KnowledgeService implements KnowledgeDocumentGateway {
     private final KnowledgeBatchOpsService batchOpsService;
 
     public KnowledgeService(KnowledgeMapper knowledgeMapper,
-                            KnowledgeBaseMapper kbMapper,
                             ChunkMapper chunkMapper,
                             KnowledgeTagMapper tagMapper,
                             TenantFileStorage fileStorage,
@@ -115,7 +112,6 @@ public class KnowledgeService implements KnowledgeDocumentGateway {
                             KnowledgeParseService knowledgeParseService,
                             KnowledgeBatchOpsService batchOpsService) {
         this.knowledgeMapper = knowledgeMapper;
-        this.kbMapper = kbMapper;
         this.chunkMapper = chunkMapper;
         this.tagMapper = tagMapper;
         this.fileStorage = fileStorage;

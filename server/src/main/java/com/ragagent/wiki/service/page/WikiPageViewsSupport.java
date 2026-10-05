@@ -36,7 +36,7 @@ final class WikiPageViewsSupport {
         List<WikiPage> pages = result.pages();
         for (WikiPage page : pages) {
             WikiPageLinkOps.stripWikiPageInlineChunkCitations(page);
-            service.normalizeWikiHierarchy(page);
+            WikiPageServiceImpl.normalizeWikiHierarchy(page);
         }
         int pageSize = req.getPageSize();
         if (pageSize < 1) {
@@ -110,7 +110,7 @@ final class WikiPageViewsSupport {
             }
             List<WikiIndexEntry> entries = listed.entries();
             for (WikiIndexEntry entry : entries) {
-                service.normalizeWikiIndexEntryHierarchy(entry, pt);
+                WikiPageServiceImpl.normalizeWikiIndexEntryHierarchy(entry, pt);
             }
             String next = "";
             // 只有返回了完整一页<b>且</b> offset+limit 之后还有行时才给 cursor。

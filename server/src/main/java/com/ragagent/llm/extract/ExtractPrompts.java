@@ -65,7 +65,6 @@ public final class ExtractPrompts {
     }
 
     /** 结构化模板解析（缺失字段取零值）。 */
-    @SuppressWarnings("unchecked")
     private static PromptTemplateStructured parseStructured(Map<String, Object> node) {
         PromptTemplateStructured tpl = new PromptTemplateStructured();
         if (node == null) {

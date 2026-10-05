@@ -412,11 +412,11 @@ public class QaWiring {
         var extractEntityTemplate = new PipelineConfig.PromptTemplateStructured();
 
         // 插件注册顺序即执行链顺序
-        mgr.register(new com.ragagent.chatpipeline.plugin.PluginSearch(knowledgeBaseService, knowledgeService,
-                null, config, webSearch, tenantService, null, null, null));
+        mgr.register(new com.ragagent.chatpipeline.plugin.PluginSearch(
+                knowledgeBaseService, webSearch, tenantService));
         mgr.register(new PluginRerank(modelService));
         mgr.register(new PluginWebFetch());
-        mgr.register(new PluginMerge(chunkRepository, null));
+        mgr.register(new PluginMerge(chunkRepository));
         mgr.register(new com.ragagent.chatpipeline.plugin.PluginDataAnalysis(modelService, knowledgeService,
                 new com.ragagent.chatpipeline.DataAnalysisSessionFactoryAdapter()));
         mgr.register(new PluginIntoChatMessage(messageService));
@@ -424,15 +424,14 @@ public class QaWiring {
         mgr.register(new PluginChatCompletionStream(modelService));
         mgr.register(new PluginFilterTopK());
         mgr.register(new PluginQueryUnderstand(modelService, messageService, memoryService, config));
-        mgr.register(new PluginLoadHistory(messageService, config));
+        mgr.register(new PluginLoadHistory(messageService));
         mgr.register(new PluginMemoryRecall(memoryService));
         mgr.register(new PluginExtractEntity(modelService, extractEntityTemplate,
-                knowledgeBaseRepository, knowledgeService, knowledgeRepository, neo4jEnabled));
+                knowledgeBaseRepository, knowledgeService, neo4jEnabled));
         mgr.register(new com.ragagent.chatpipeline.plugin.PluginSearchEntity(
                 retrieveGraphRepository, chunkRepository, knowledgeRepository));
-        mgr.register(new PluginSearchParallel(mgr, knowledgeBaseService, knowledgeService,
-                null, config,
-                webSearch, tenantService, null, null, null,
+        mgr.register(new PluginSearchParallel(mgr, knowledgeBaseService,
+                webSearch, tenantService,
                 retrieveGraphRepository,
                 chunkRepository, knowledgeRepository));
         mgr.register(new PluginWikiBoost(knowledgeBaseService));

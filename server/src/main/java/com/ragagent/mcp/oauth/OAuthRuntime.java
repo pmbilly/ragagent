@@ -61,8 +61,6 @@ public class OAuthRuntime implements McpOAuthRuntime {
     /** 释放租约时的收尾超时（5s）。 */
     static final long RELEASE_GRACE_MILLIS = 5000L;
 
-    private static final long REFRESH_SKEW_SECONDS = 30L;
-
     private final OAuthRepository repo;
     private final long tenantId;
     private final TenantContext.Principal principal;

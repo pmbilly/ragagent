@@ -18,17 +18,19 @@ import com.sun.net.httpserver.HttpServer;
  */
 class WebFetchTest {
 
-    private static String originalWhitelist = "unset";
+    /** 进程级白名单快照（SsrfGuard 白名单是 static，改后不还原会踩同 JVM 的后续测试）。 */
+    private static SsrfGuard.Whitelist whitelistSnapshot;
 
     @BeforeAll
     static void whitelistOn() {
+        whitelistSnapshot = SsrfGuard.snapshotWhitelist();
         new SsrfGuard().reloadWhitelist("127.0.0.1,localhost");
     }
 
-    /** §7.8：白名单 @AfterAll 还原。 */
+    /** §7.8：白名单 @AfterAll 还原（回到进入本类时的快照，而不是清空）。 */
     @AfterAll
     static void whitelistOff() {
-        new SsrfGuard().reloadWhitelist("");
+        SsrfGuard.restoreWhitelist(whitelistSnapshot);
     }
 
     static HttpServer start(com.sun.net.httpserver.HttpHandler handler) {

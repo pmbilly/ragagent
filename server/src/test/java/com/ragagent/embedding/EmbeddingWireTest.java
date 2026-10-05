@@ -38,19 +38,19 @@ import com.ragagent.model.service.ModelRuntimeConfigs;
  */
 class EmbeddingWireTest {
 
-    private static String whitelistBackupNote;
+    /** 进程级白名单快照（SsrfGuard 白名单是 static，改后不还原会踩同 JVM 的后续测试）。 */
+    private static SsrfGuard.Whitelist whitelistSnapshot;
 
     @BeforeAll
     static void whitelistOn() {
-        // SsrfGuard 白名单是进程级静态：先记一个"已改"标记，@AfterAll 还原（§7.8）
-        whitelistBackupNote = "modified-by-EmbeddingWireTest";
+        whitelistSnapshot = SsrfGuard.snapshotWhitelist();
         new SsrfGuard().reloadWhitelist("127.0.0.1");
     }
 
     @AfterAll
     static void whitelistOff() {
-        // 还原为空表（默认进程态），避免污染同 JVM 的其它套件
-        new SsrfGuard().reloadWhitelist("");
+        // 回到进入本类时的快照（而不是清空），避免污染同 JVM 的其它套件
+        SsrfGuard.restoreWhitelist(whitelistSnapshot);
     }
 
     // ── stub server ──────────────────────────────────────────────────
@@ -271,13 +271,12 @@ class EmbeddingWireTest {
                 NvidiaEmbedder e = new NvidiaEmbedder("sk-test", stub.url(),
                         "nvidia/nv-embedqa", 1024, "emb-6", null);
                 boolean query = name.endsWith("_query");
-                List<float[]> got;
                 if (query) {
                     try (EmbedQueryContext.Scope s = EmbedQueryContext.markQuery()) {
-                        got = embed(e, "hello");
+                        embed(e, "hello");
                     }
                 } else {
-                    got = embed(e, "hello");
+                    embed(e, "hello");
                 }
                 String body = stub.requests.get(0).body();
                 assertEquals(wireBody(name), body);
@@ -502,7 +501,7 @@ class EmbeddingWireTest {
                     throw new EmbeddingHttp.EmbeddingException("provider exploded");
                 }
                 List<float[]> out = new java.util.ArrayList<>();
-                for (String ignored : texts) {
+                for (int i = 0; i < texts.size(); i++) {
                     out.add(new float[] {1});
                 }
                 return out;

@@ -161,7 +161,6 @@ class TenantCatalogContractTest {
                 "{\"name\":\"ct-alpha\",\"description\":\"alpha workspace\"}")).andReturn();
         assertEquals(201, self.getResponse().getStatus(), raw(self));
         assertEquals(mask(golden("ct-create-self.json")), mask(raw(self)));
-        long alphaId = extractId(raw(self));
 
         assertGolden(jsonBody(post("/api/v1/tenants"), selfTok, "{}"),
                 400, "ct-create-binding-empty.json");

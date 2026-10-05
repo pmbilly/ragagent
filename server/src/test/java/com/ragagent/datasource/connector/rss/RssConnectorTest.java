@@ -52,9 +52,12 @@ import org.junit.jupiter.api.Test;
 class RssConnectorTest {
 
     private static SsrfGuard originalGuard;
+    /** 进入本类时的进程级白名单（SsrfGuard 是 static，改后必须按快照还原）。 */
+    private static SsrfGuard.Whitelist whitelistSnapshot;
 
     @BeforeAll
     static void allowLoopback() {
+        whitelistSnapshot = SsrfGuard.snapshotWhitelist();
         originalGuard = ConnectorHttp.ssrfGuard();
         SsrfGuard guard = new SsrfGuard();
         guard.reloadWhitelist("127.0.0.1,::1,localhost");
@@ -64,6 +67,7 @@ class RssConnectorTest {
     @AfterAll
     static void restoreGuard() {
         ConnectorHttp.setSsrfGuard(originalGuard == null ? new SsrfGuard() : originalGuard);
+        SsrfGuard.restoreWhitelist(whitelistSnapshot);
     }
 
     // ── stub server ───────────────────────────────────────────────────────
@@ -97,10 +101,6 @@ class RssConnectorTest {
 
         void failFeed(boolean value) {
             failFeed.set(value);
-        }
-
-        void articleNotFound(boolean value) {
-            articleNotFound.set(value);
         }
 
         void itemContent(String value) {

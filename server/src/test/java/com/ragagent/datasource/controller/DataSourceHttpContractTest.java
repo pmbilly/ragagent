@@ -124,6 +124,8 @@ class DataSourceHttpContractTest {
 
     private static HttpServer stubFeed;
     private static SsrfGuard originalGuard;
+    /** 进入本类时的进程级白名单（SsrfGuard 是 static，改后必须按快照还原）。 */
+    private static SsrfGuard.Whitelist whitelistSnapshot;
 
     @Autowired
     private MockMvc mockMvc;
@@ -166,6 +168,7 @@ class DataSourceHttpContractTest {
         stubFeed.start();
 
         // SSRF 白名单是**进程级静态**：放行 loopback、结束后还原（与 RssConnectorTest 同一处置）
+        whitelistSnapshot = SsrfGuard.snapshotWhitelist();
         originalGuard = ConnectorHttp.ssrfGuard();
         reloadLoopbackWhitelist();
     }
@@ -193,6 +196,7 @@ class DataSourceHttpContractTest {
             stubFeed.stop(0);
         }
         ConnectorHttp.setSsrfGuard(originalGuard == null ? new SsrfGuard() : originalGuard);
+        SsrfGuard.restoreWhitelist(whitelistSnapshot);
     }
 
     @BeforeEach

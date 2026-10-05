@@ -81,8 +81,6 @@ final class JiebaTokenizer implements TencentVectorDbBm25.Tokenizer {
 
     /** 状态序（B/M/E/S，与 jieba 约定一致）。 */
     private static final char[] STATES = {'B', 'M', 'E', 'S'};
-    private static final int I_B = 0;
-    private static final int I_M = 1;
     private static final int I_E = 2;
     private static final int I_S = 3;
 

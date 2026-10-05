@@ -68,11 +68,12 @@ class McpOAuthControllerTest {
     private McpServiceService svc;
     private McpService service;
     private OAuthManager manager;
-
-    private MockMvc mockMvc;
+    /** 进入本方法时的进程级白名单（SsrfGuard 是 static，改后必须还原）。 */
+    private SsrfGuard.Whitelist whitelistSnapshot;
 
     @BeforeEach
     void setUp() throws Exception {
+        whitelistSnapshot = SsrfGuard.snapshotWhitelist();
         SsrfGuard guard = new SsrfGuard();
         guard.reloadWhitelist("127.0.0.1");
         McpServiceUrls.setSsrfGuard(guard);
@@ -107,6 +108,7 @@ class McpOAuthControllerTest {
             server.close();
         }
         McpServiceUrls.setSsrfGuard(new SsrfGuard());
+        SsrfGuard.restoreWhitelist(whitelistSnapshot);
     }
 
     private MockMvc mvc(Gate gate, McpClientManager clientManager) {

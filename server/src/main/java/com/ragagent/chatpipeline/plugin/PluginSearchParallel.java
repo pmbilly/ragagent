@@ -14,7 +14,6 @@ import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.chatpipeline.support.SearchSupport;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.retrieval.graph.RetrieveGraphRepository;
-import com.ragagent.llm.extract.PipelineConfig;
 
 /**
  * CHUNK_SEARCH_PARALLEL 阶段插件：
@@ -28,41 +27,19 @@ import com.ragagent.llm.extract.PipelineConfig;
  */
 public final class PluginSearchParallel implements Plugin {
 
-    private final PipelinePorts.KnowledgeBaseService knowledgeBaseService;
-    private final PipelinePorts.KnowledgeService knowledgeService;
-    private final PipelineConfig config;
-    private final PipelinePorts.WebSearch webSearchService;
-    private final PipelinePorts.TenantService tenantService;
-    private final PipelinePorts.SessionService sessionService;
-
     private final PluginSearch searchPlugin;
     private final PluginSearchEntity searchEntityPlugin;
 
     public PluginSearchParallel(EventManager eventManager,
                                 PipelinePorts.KnowledgeBaseService knowledgeBaseService,
-                                PipelinePorts.KnowledgeService knowledgeService,
-                                PipelinePorts.ChunkService chunkService,
-                                PipelineConfig config,
                                 PipelinePorts.WebSearch webSearchService,
                                 PipelinePorts.TenantService tenantService,
-                                PipelinePorts.SessionService sessionService,
-                                PipelinePorts.WebSearchStateService webSearchStateService,
-                                PipelinePorts.WebSearchProviderRepository webSearchProviderRepo,
                                 RetrieveGraphRepository graphRepository,
                                 PipelinePorts.ChunkRepository chunkRepository,
                                 PipelinePorts.KnowledgeRepository knowledgeRepository) {
         // 内部插件不注册到 manager
-        this.searchPlugin = new PluginSearch(knowledgeBaseService, knowledgeService, chunkService,
-                config, webSearchService, tenantService, sessionService,
-                webSearchStateService, webSearchProviderRepo);
+        this.searchPlugin = new PluginSearch(knowledgeBaseService, webSearchService, tenantService);
         this.searchEntityPlugin = new PluginSearchEntity(graphRepository, chunkRepository, knowledgeRepository);
-
-        this.knowledgeBaseService = knowledgeBaseService;
-        this.knowledgeService = knowledgeService;
-        this.config = config;
-        this.webSearchService = webSearchService;
-        this.tenantService = tenantService;
-        this.sessionService = sessionService;
     }
 
     @Override

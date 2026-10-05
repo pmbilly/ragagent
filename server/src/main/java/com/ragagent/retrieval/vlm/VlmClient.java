@@ -165,11 +165,9 @@ public final class VlmClient {
     static String predictOllama(com.ragagent.llm.ollama.OllamaService service, VlmConfig config,
             byte[][] imgBytesList, String prompt) throws VlmException {
         List<byte[]> images = new ArrayList<>();
-        int totalImageSize = 0;
         for (byte[] img : imgBytesList) {
             if (img != null && img.length > 0) {
                 images.add(img);
-                totalImageSize += img.length;
             }
         }
         com.ragagent.llm.ollama.OllamaMessage message =

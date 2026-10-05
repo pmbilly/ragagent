@@ -343,7 +343,7 @@ public class FaqImportService {
                 progress.mergedCount(), progress.failedCount(), progress.partialFailedCount());
     }
     String buildImportResultMessage(String prefix, FaqImportProgress p) {
-        return batchOps.buildImportResultMessage(prefix, p);
+        return FaqBatchOps.buildImportResultMessage(prefix, p);
     }
 
 
@@ -563,19 +563,6 @@ public class FaqImportService {
     record ImportJob(long tenantId, String taskId, String kbId, String knowledgeId,
                      String mode, boolean dryRun, long enqueuedAt, String instanceId,
                      List<FaqEntryPayload> entries) {
-    }
-
-    private void executeImportBatches(ImportJob job, KnowledgeBase kb, Knowledge faqKnowledge,
-            Model embeddingModel, FaqImportProgress progress) {
-        batchOps.executeImportBatches(job, kb, faqKnowledge, embeddingModel, progress);
-    }
-
-    private String generateFailedEntriesCsv(long tenantId, String taskId, List<FaqFailedEntry> failedEntries) {
-        return batchOps.generateFailedEntriesCsv(tenantId, taskId, failedEntries);
-    }
-
-    private void saveImportResultToDatabase(ImportJob job, FaqImportProgress progress, int originalTotalEntries) {
-        batchOps.saveImportResultToDatabase(job, progress, originalTotalEntries);
     }
 
 }

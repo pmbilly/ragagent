@@ -68,20 +68,16 @@ public class AgentToolBackends {
     static final ObjectMapper JSON = new ObjectMapper();
 
 
-    private final KnowledgeBaseService kbService;
     private final KnowledgeService knowledgeService;
     private final ChunkRepository chunkRepository;
-    private final HybridSearchService hybridSearchService;
 
     /** 知识库检索簇：KB 检索/grep/图谱/chunk 列举等工具后端。 */
     private final AgentToolKbBackends kbBackends;
 
     /** wiki 工具簇：WikiPages 端口实现与视图转换。 */
     private final AgentToolWikiBackends wikiBackends;
-    private final ConversationProperties conversation;
     private final MessageService messageService;
     private final MemoryService memoryService;
-    private final WikiPageService wikiPageService;
     private final com.ragagent.websearch.service.WebSearchService webSearchService;
     private final com.ragagent.auth.service.TenantService tenantService;
     private final com.ragagent.knowledge.storage.TenantFileStorage fileStorage;
@@ -99,14 +95,10 @@ public class AgentToolBackends {
                              com.ragagent.auth.service.TenantService tenantService,
                              com.ragagent.knowledge.storage.TenantFileStorage fileStorage,
                              DataSource dataSource) {
-        this.kbService = kbService;
         this.knowledgeService = knowledgeService;
         this.chunkRepository = chunkRepository;
-        this.hybridSearchService = hybridSearchService;
-        this.conversation = conversation;
         this.messageService = messageService;
         this.memoryService = memoryService;
-        this.wikiPageService = wikiPageService;
         this.webSearchService = webSearchService;
         this.tenantService = tenantService;
         this.fileStorage = fileStorage;

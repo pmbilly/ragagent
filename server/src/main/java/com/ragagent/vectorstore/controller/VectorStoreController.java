@@ -80,7 +80,7 @@ public class VectorStoreController {
 
     @PostMapping("/test")
     public ResponseEntity<?> testStoreRaw(@RequestBody(required = false) String rawBody) {
-        long tenantId = requireTenant();
+        requireTenant(); // 调用即鉴权（未认证会抛 TenantMissing）；返回值本方法不用
         TestStoreRequest req = bind(rawBody, TestStoreRequest.class);
         if (req.engineType() == null || req.engineType().isEmpty()) {
             throw validator("TestStoreRequest", "EngineType");

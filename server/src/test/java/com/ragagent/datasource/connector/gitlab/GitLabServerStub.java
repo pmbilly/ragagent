@@ -65,8 +65,12 @@ final class GitLabServerStub implements AutoCloseable {
         server.start();
     }
 
+    /** 进入本套件时的进程级白名单（SsrfGuard 是 static，改后必须按快照还原）。 */
+    private static SsrfGuard.Whitelist whitelistSnapshot;
+
     /** 放行本机回环，让桩服务器可达。 */
     static void allowLocalServer() {
+        whitelistSnapshot = SsrfGuard.snapshotWhitelist();
         SsrfGuard guard = new SsrfGuard();
         guard.reloadWhitelist("127.0.0.1,::1,localhost");
         ConnectorHttp.setSsrfGuard(guard);
@@ -76,14 +80,19 @@ final class GitLabServerStub implements AutoCloseable {
      * 配对 {@link #allowLocalServer()}，在 {@code @AfterAll} 里调用。
      *
      * <p>白名单是<b>进程级静态状态</b>（{@code SsrfGuard.whitelist}），
-     * 换一个 guard 实例并不会把它还原——所以这里除了换回默认 guard，
-     * 还要把白名单重设成 env 推导出来的原文，否则同一个 JVM 里排在后面的测试类
-     * 会看到"本机回环被意外放行"。与 {@code NotionTestSupport.restoreSsrf} /
-     * {@code FeishuTestSupport} 的处置一致。</p>
+     * 换一个 guard 实例并不会把它还原——所以这里按进入时留存的快照还原，
+     * 否则同一个 JVM 里排在后面的测试类会看到"本机回环被意外放行"。
+     * 与 {@code NotionTestSupport.restoreSsrf} / {@code FeishuTestSupport}
+     * 的处置一致。</p>
      */
     static void restoreSsrfGuard() {
         SsrfGuard guard = new SsrfGuard();
-        guard.reloadWhitelist(envWhitelistRaw());
+        if (whitelistSnapshot != null) {
+            SsrfGuard.restoreWhitelist(whitelistSnapshot);
+        } else {
+            // 未配对调用（没走过 allowLocalServer）时退回环境变量重建
+            guard.reloadWhitelist(envWhitelistRaw());
+        }
         ConnectorHttp.setSsrfGuard(guard);
     }
 

@@ -55,7 +55,7 @@ final class ImStreamPipeline {
         java.util.concurrent.CountDownLatch complete = new java.util.concurrent.CountDownLatch(1);
 
         CustomAgentEntity agent = attach.agent();
-        boolean useAgent = service.qaRequests.isAgentMode(agent);
+        boolean useAgent = ImQaRequests.isAgentMode(agent);
 
         subscribeStreamEvents(eventBus, buf, done, complete, useAgent);
 
@@ -372,7 +372,6 @@ final class ImStreamPipeline {
         return null;
     }
 
-    @SuppressWarnings("unchecked")
     /** 工具步骤 upsert（有则更新、无则插入）。 */
     private static void upsert(List<ToolDisplay.IMToolStep> steps, Map<String, Integer> index,
             String id, java.util.function.Consumer<ToolDisplay.IMToolStep> update) {

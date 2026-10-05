@@ -507,6 +507,9 @@ class NotionConnectorTest {
             assertThat(deleted.getMetadata()).containsOnlyKeys("channel");
             assertThat(deleted.getMetadata()).containsEntry("channel", "notion");
 
+            // cursor 是 JSON 反序列化产物，嵌套 map 的键值类型只能就地收窄（结构由
+            // NotionCursorCodec 的写入侧保证，下方断言兜住形状）
+            @SuppressWarnings("unchecked")
             Map<String, Object> newTimes =
                     (Map<String, Object>) result.cursor().getConnectorCursor().get("page_edit_times");
             assertThat(newTimes).containsOnlyKeys("child", "ds1", "grand", "root");

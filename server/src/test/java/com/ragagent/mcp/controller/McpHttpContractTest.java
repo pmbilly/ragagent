@@ -22,6 +22,7 @@ import com.ragagent.auth.mapper.TenantMapper;
 import com.ragagent.auth.mapper.TenantMemberMapper;
 import com.ragagent.auth.mapper.UserMapper;
 import com.ragagent.common.security.SsrfGuard;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,10 +65,13 @@ class McpHttpContractTest {
     private TenantMemberMapper memberMapper;
     @Autowired
     private SsrfGuard ssrfGuard;
+    /** 进入本方法时的进程级白名单（SsrfGuard 是 static，改后必须还原）。 */
+    private SsrfGuard.Whitelist whitelistSnapshot;
 
     @BeforeEach
     void seed() {
         // 只放行 example.com：SSRF 用例仍会命中 127.0.0.1 的拒绝
+        whitelistSnapshot = SsrfGuard.snapshotWhitelist();
         ssrfGuard.reloadWhitelist("example.com");
         TestSchema.createTables(jdbc);
         TestSchema.resetData(jdbc);
@@ -82,6 +86,11 @@ class McpHttpContractTest {
         insertUser("11111111-2222-3333-4444-555555555504", "mcpviewer", "mcp-viewer@weknora.test");
         insertMember("11111111-2222-3333-4444-555555555501", "owner");
         insertMember("11111111-2222-3333-4444-555555555504", "viewer");
+    }
+
+    @AfterEach
+    void restoreWhitelistSnapshot() {
+        SsrfGuard.restoreWhitelist(whitelistSnapshot);
     }
 
     private void insertUser(String id, String username, String email) {

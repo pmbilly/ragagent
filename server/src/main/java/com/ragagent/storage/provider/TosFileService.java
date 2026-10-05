@@ -11,8 +11,8 @@ import com.volcengine.tos.TOSClientConfiguration;
 import com.volcengine.tos.TOSV2;
 import com.volcengine.tos.TOSV2ClientBuilder;
 import com.volcengine.tos.TosServerException;
-import com.volcengine.tos.auth.StaticCredentials;
 import com.volcengine.tos.comm.HttpMethod;
+import com.volcengine.tos.credential.StaticCredentialsProvider;
 import com.volcengine.tos.model.bucket.CreateBucketV2Input;
 import com.volcengine.tos.model.bucket.HeadBucketV2Input;
 import com.volcengine.tos.model.object.CopyObjectV2Input;
@@ -72,10 +72,12 @@ public class TosFileService implements FileService {
     private static TOSV2 buildClient(String endpoint, String region, String accessKey,
                                      String secretKey) {
         // Java SDK 的入口：TOSClientConfiguration.builder() + TOSV2ClientBuilder（照官方用法）
+        // 凭据走 credential.StaticCredentialsProvider：auth.StaticCredentials 与
+        // builder.credentials(...) 在 2.9.x 已废弃（本签名行为等价：每次返回同一组静态凭据）
         TOSClientConfiguration config = TOSClientConfiguration.builder()
                 .endpoint(endpoint)
                 .region(region)
-                .credentials(new StaticCredentials(accessKey, secretKey))
+                .credentialsProvider(new StaticCredentialsProvider(accessKey, secretKey))
                 .build();
         return new TOSV2ClientBuilder().build(config);
     }

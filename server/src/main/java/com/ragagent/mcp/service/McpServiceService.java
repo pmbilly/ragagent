@@ -27,7 +27,6 @@ import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.domain.McpTestResult;
 import com.ragagent.mcp.domain.McpTool;
 import com.ragagent.mcp.domain.McpTransportType;
-import com.ragagent.mcp.mapper.McpOAuthRepository;
 import com.ragagent.mcp.mapper.McpServiceMapper;
 import com.ragagent.mcp.protocol.InitializeResult;
 import com.ragagent.mcp.protocol.McpClient;
@@ -71,19 +70,16 @@ public class McpServiceService {
                     + "please use SSE or HTTP Streamable transport instead";
 
     private final McpServiceMapper mcpServiceMapper;
-    private final McpOAuthRepository oauthRepo;
     private final McpMetadataService metadataService;
     private final Optional<McpClientManager> clientManager;
     private final Optional<McpOAuthSupport> oauthSupport;
 
     public McpServiceService(McpServiceMapper mcpServiceMapper,
-                             McpOAuthRepository oauthRepo,
                              McpMetadataService metadataService,
                              SsrfGuard ssrfGuard,
                              Optional<McpClientManager> clientManager,
                              Optional<McpOAuthSupport> oauthSupport) {
         this.mcpServiceMapper = mcpServiceMapper;
-        this.oauthRepo = oauthRepo;
         this.metadataService = metadataService;
         this.clientManager = clientManager;
         this.oauthSupport = oauthSupport;

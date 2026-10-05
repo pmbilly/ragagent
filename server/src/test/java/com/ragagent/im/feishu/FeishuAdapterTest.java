@@ -27,7 +27,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.runtime.AdapterInterfaces;
 import com.ragagent.im.runtime.CallbackExchange;
@@ -48,7 +47,6 @@ import com.sun.net.httpserver.HttpServer;
  */
 class FeishuAdapterTest {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final String APP_ID = "cli_app";
     private static final String ENCRYPT_KEY = "test-encrypt-key";
     private static final String VERIFY_TOKEN = "vt-1";
@@ -62,11 +60,6 @@ class FeishuAdapterTest {
         static StubResponse json(String json) {
             return new StubResponse(200, "application/json",
                     json.getBytes(StandardCharsets.UTF_8), Map.of());
-        }
-
-        static StubResponse json(String json, Map<String, String> headers) {
-            return new StubResponse(200, "application/json",
-                    json.getBytes(StandardCharsets.UTF_8), headers);
         }
     }
 

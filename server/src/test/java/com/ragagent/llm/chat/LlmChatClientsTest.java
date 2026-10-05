@@ -22,9 +22,12 @@ import org.junit.jupiter.api.Test;
 class LlmChatClientsTest {
 
     private static SsrfGuard previous;
+    /** 进入本类时的进程级白名单（SsrfGuard 是 static，改后必须按快照还原）。 */
+    private static SsrfGuard.Whitelist whitelistSnapshot;
 
     @BeforeAll
     static void allowTestHosts() {
+        whitelistSnapshot = SsrfGuard.snapshotWhitelist();
         previous = new SsrfGuard();
         SsrfGuard guard = new SsrfGuard();
         guard.reloadWhitelist("api.openai.com,api.deepseek.com,api.anthropic.com");
@@ -34,6 +37,7 @@ class LlmChatClientsTest {
     @AfterAll
     static void restoreGuard() {
         LlmTransport.setSsrfGuard(previous);
+        SsrfGuard.restoreWhitelist(whitelistSnapshot);
     }
 
     private static ChatConfig remote(String baseUrl, String provider) {

@@ -70,7 +70,7 @@ final class WeaviateSearchOps {
             log.error("[Weaviate] Vector search failed: {}", e.getMessage());
             throw new IllegalStateException("failed to search: " + e.getMessage(), e);
         }
-        JsonNode items = service.extractItems(result, collection);
+        JsonNode items = WeaviateRetrieveRepository.extractItems(result, collection);
         if (items == null) {
             log.warn("[Weaviate] No vector matches found that meet threshold {}",
                     params.threshold);
@@ -109,7 +109,7 @@ final class WeaviateSearchOps {
                 log.error("[Weaviate] keywords search failed: {}", e.getMessage());
                 throw new IllegalStateException("failed to search: " + e.getMessage(), e);
             }
-            JsonNode items = service.extractItems(result, collection);
+            JsonNode items = WeaviateRetrieveRepository.extractItems(result, collection);
             if (items == null) {
                 log.warn("[Weaviate] No keywords matches found that meet threshold {}",
                         params.threshold);

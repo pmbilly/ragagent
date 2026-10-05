@@ -517,10 +517,6 @@ public final class JdkXmlFeedParser implements FeedParser {
     private static final java.util.regex.Pattern NAME_ONLY =
             java.util.regex.Pattern.compile("^([^@()]+)$");
 
-    /** 纯邮箱。 */
-    private static final java.util.regex.Pattern EMAIL_ONLY =
-            java.util.regex.Pattern.compile("^([^@()]+@[^@()]+)$");
-
     /**
      * 对照 gofeed 的 {@code shared.ParseNameAddress}，只返回<b>名字</b>那一半
      * （连接器只用 {@code item.Author.Name}）。

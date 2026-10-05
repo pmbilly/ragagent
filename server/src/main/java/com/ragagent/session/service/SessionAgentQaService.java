@@ -47,11 +47,9 @@ public class SessionAgentQaService {
     static final int AGENT_HISTORY_FETCH_MULTIPLIER = 2;
     static final int AGENT_HISTORY_FETCH_MIN = 20;
 
-    private final MessageService messageService;
     private final ModelService modelService;
     private final MemoryService memoryService;
     private final SessionKnowledgeQaService knowledgeQa;
-    private final AgentToolBackends toolBackends;
 
     /** 历史/消息装配簇。 */
     private final AgentHistoryAssembler historyAssembler;
@@ -61,24 +59,11 @@ public class SessionAgentQaService {
 
     /** 引擎/工具装配簇。 */
     private final AgentEngineAssembler engineAssembler;
-    private final com.ragagent.storage.service.ResourceCatalogService resourceCatalog;
-    private final javax.sql.DataSource dataSource;
-    private final ArtifactCollectorWiring artifactCollectorWiring;
-    private final com.ragagent.knowledge.service.KnowledgeService knowledgeService;
-    private final FaqEntryQueryService faqService;
+
     /** 并发闸门（chat 工厂注入；null 会让 ConcurrencyChatClient NPE）。 */
     private final com.ragagent.llm.limiter.ConcurrencyGovernor concurrencyGovernor;
     private final org.springframework.beans.factory.ObjectProvider<com.ragagent.llm.ollama.OllamaService>
             ollamaService;
-    /** MCP 服务面（mcpServiceService/mcpManager/toolApprovalGate）。 */
-    private final com.ragagent.mcp.service.McpServiceService mcpServiceService;
-    private final com.ragagent.mcp.service.McpMetadataService mcpMetadataService;
-    private final com.ragagent.mcp.protocol.McpClientManager mcpClientManager;
-    private final com.ragagent.common.approval.Gate toolApprovalGate;
-    /** 工具图片 VLM 描述器装配。 */
-    private final VlmDescriberWiring vlmDescriberWiring;
-    /** 平台级技能目录（B57 入库版；宿主目录已退役）。 */
-    private final com.ragagent.agent.skills.SkillCatalogService skillCatalogService;
 
     public SessionAgentQaService(MessageService messageService,
             ModelService modelService,
@@ -99,25 +84,12 @@ public class SessionAgentQaService {
             com.ragagent.common.approval.Gate toolApprovalGate,
             VlmDescriberWiring vlmDescriberWiring,
             com.ragagent.agent.skills.SkillCatalogService skillCatalogService) {
-        this.vlmDescriberWiring = vlmDescriberWiring;
-        this.skillCatalogService = skillCatalogService;
         this.concurrencyGovernor = concurrencyGovernor;
         this.ollamaService = ollamaService;
-        this.mcpServiceService = mcpServiceService;
-        this.mcpMetadataService = mcpMetadataService;
-        this.mcpClientManager = mcpClientManager;
-        this.toolApprovalGate = toolApprovalGate;
-        this.messageService = messageService;
         this.modelService = modelService;
         this.memoryService = memoryService;
         this.knowledgeQa = knowledgeQa;
-        this.toolBackends = toolBackends;
         this.historyAssembler = new AgentHistoryAssembler(messageService);
-        this.resourceCatalog = resourceCatalog;
-        this.dataSource = dataSource;
-        this.artifactCollectorWiring = artifactCollectorWiring;
-        this.knowledgeService = knowledgeService;
-        this.faqService = faqService;
         this.configAssembler = new AgentConfigAssembler(knowledgeQa);
         this.engineAssembler =
                 new AgentEngineAssembler(

@@ -7,8 +7,6 @@ import javax.sql.DataSource;
 import com.ragagent.common.jdbc.DatabaseDialects;
 import com.ragagent.mcp.domain.McpMetadata;
 import com.ragagent.mcp.domain.McpMetadataSummary;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
@@ -24,8 +22,6 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class McpMetadataRepository {
-
-    private static final Logger log = LoggerFactory.getLogger(McpMetadataRepository.class);
 
     private final McpMetadataMapper mapper;
     private final boolean postgres;

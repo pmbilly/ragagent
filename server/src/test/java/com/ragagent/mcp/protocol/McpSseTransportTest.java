@@ -40,9 +40,12 @@ class McpSseTransportTest {
     private final List<OutputStream> streams = new CopyOnWriteArrayList<>();
     private final CountDownLatch streamOpen = new CountDownLatch(1);
     private final AtomicInteger posts = new AtomicInteger();
+    /** 进入本方法时的进程级白名单（SsrfGuard 是 static，改后必须还原）。 */
+    private SsrfGuard.Whitelist whitelistSnapshot;
 
     @BeforeEach
     void start() throws IOException {
+        whitelistSnapshot = SsrfGuard.snapshotWhitelist();
         SsrfGuard guard = new SsrfGuard();
         guard.reloadWhitelist("127.0.0.1");
         McpServiceUrls.setSsrfGuard(guard);
@@ -123,6 +126,7 @@ class McpSseTransportTest {
     void stop() {
         server.stop(0);
         McpServiceUrls.setSsrfGuard(new SsrfGuard());
+        SsrfGuard.restoreWhitelist(whitelistSnapshot);
     }
 
     private String url() {

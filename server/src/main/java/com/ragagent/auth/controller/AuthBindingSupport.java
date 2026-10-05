@@ -17,18 +17,13 @@ import com.ragagent.common.tenant.TenantRole;
  */
 final class AuthBindingSupport {
 
-    private final AuthController service;
-
-    AuthBindingSupport(AuthController service) {
-        this.service = service;
-    }
-
     AuthLoginResponse buildAuthLoginResponse(User user, Tenant activeTenant,
                                              List<Membership> memberships,
                                              String token, String refreshToken) {
         TenantResponse tenantResp = null;
         if (activeTenant != null) {
-            String role = service.membershipRoleForTenant(memberships, activeTenant.getId());
+            String role = AuthController.membershipRoleForTenant(memberships,
+                    activeTenant.getId());
             tenantResp = TenantResponse.from(activeTenant,
                     TenantRole.fromString(role).hasPermission(TenantRole.ADMIN));
         }

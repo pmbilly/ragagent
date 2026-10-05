@@ -6,7 +6,6 @@ import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.PlainSelect;
-import net.sf.jsqlparser.statement.select.Select;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlCommandType;
@@ -164,7 +163,10 @@ public class TenantFilterGuard implements InnerInterceptor {
             "com.ragagent.wiki.mapper.TaskPendingOpMapper.selectList",
             "com.ragagent.wiki.mapper.TaskDeadLetterMapper.selectList");
 
+    /** raw {@code ResultHandler} 是父接口签名：参数化会因擦除相同而破坏覆盖（name clash），
+     *  MyBatis 侧未提供通配签名，故此处只能按 raw 覆写并就地抑制。 */
     @Override
+    @SuppressWarnings("rawtypes")
     public void beforeQuery(Executor executor, MappedStatement ms, Object parameter,
                             org.apache.ibatis.session.RowBounds rowBounds,
                             org.apache.ibatis.session.ResultHandler resultHandler,
@@ -179,8 +181,9 @@ public class TenantFilterGuard implements InnerInterceptor {
         } catch (Exception e) {
             return; // fail-open，理由同 FullTableWriteGuard
         }
-        if (!(statement instanceof Select select)
-                || !(select.getSelectBody() instanceof PlainSelect plain)) {
+        // JSqlParser 4.7+：普通 SELECT 的 parse 结果即 PlainSelect 本身
+        // （旧的 Select.getSelectBody() 已废弃）；UNION/SetOperation 不满足即不查
+        if (!(statement instanceof PlainSelect plain)) {
             return; // UNION/复合查询 v1 不查（边界见类注释）
         }
         if (!(plain.getFromItem() instanceof Table table)) {

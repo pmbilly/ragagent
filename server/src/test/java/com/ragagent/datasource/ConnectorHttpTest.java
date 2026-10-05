@@ -34,8 +34,8 @@ import org.junit.jupiter.api.Test;
  *
  * <h2>⚠️ 白名单是进程级静态状态</h2>
  * <p>{@code SsrfGuard.whitelist} 是 static（它的类注释解释了为什么）。
- * 本类在 {@link #setUp()} 里放行 loopback，在 {@link #tearDown()} 里还原成
- * "读 env 的默认值"，避免污染其它测试类。</p>
+ * 本类在 {@link #setUp()} 里放行 loopback，在 {@link #tearDown()} 里按
+ * 进入时的快照还原，避免污染其它测试类。</p>
  *
  * <h2>⚠️ JDK HttpServer 的两个坑（实测）</h2>
  * <ol>
@@ -59,9 +59,12 @@ class ConnectorHttpTest {
     }
 
     private static final List<Recorded> RECORDED = new ArrayList<>();
+    /** 进入本类时的进程级白名单（SsrfGuard 是 static，改后必须按快照还原）。 */
+    private static SsrfGuard.Whitelist whitelistSnapshot;
 
     @BeforeAll
     static void setUp() throws IOException {
+        whitelistSnapshot = SsrfGuard.snapshotWhitelist();
         SsrfGuard guard = new SsrfGuard();
         guard.reloadWhitelist("127.0.0.1,::1,localhost");
         ConnectorHttp.setSsrfGuard(guard);
@@ -92,22 +95,7 @@ class ConnectorHttpTest {
             other.stop(0);
         }
         ConnectorHttp.setSsrfGuard(new SsrfGuard());
-        new SsrfGuard().reloadWhitelist(mergeEnvWhitelist());
-    }
-
-    /** 还原成"env 里那一份"（{@code SsrfGuard} 的默认初始化逻辑）。 */
-    private static String mergeEnvWhitelist() {
-        String primary = System.getenv("SSRF_WHITELIST");
-        String extra = System.getenv("SSRF_WHITELIST_EXTRA");
-        primary = primary == null ? "" : primary.trim();
-        extra = extra == null ? "" : extra.trim();
-        if (primary.isEmpty()) {
-            return extra;
-        }
-        if (extra.isEmpty()) {
-            return primary;
-        }
-        return primary + "," + extra;
+        SsrfGuard.restoreWhitelist(whitelistSnapshot);
     }
 
     private static void dispatch(HttpExchange exchange) throws IOException {

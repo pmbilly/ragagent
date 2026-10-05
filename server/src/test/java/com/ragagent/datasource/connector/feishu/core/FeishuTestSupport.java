@@ -44,15 +44,19 @@ public final class FeishuTestSupport {
     private FeishuTestSupport() {
     }
 
+    /** 进入本套件时的进程级白名单（SsrfGuard 是 static，改后必须按快照还原）。 */
+    private static SsrfGuard.Whitelist whitelistSnapshot;
+
     /** 让 {@link ConnectorHttp} 放行 127.0.0.1 的桩服务器。 */
     public static void allowLoopback() {
+        whitelistSnapshot = SsrfGuard.snapshotWhitelist();
         SsrfGuard guard = new SsrfGuard();
         guard.reloadWhitelist(LOOPBACK_WHITELIST);
         ConnectorHttp.setSsrfGuard(guard);
     }
 
     /**
-     * 还原：既还原连接器持有的 guard 引用，也把**进程级静态白名单**放回 env 推导出来的那份。
+     * 还原：既还原连接器持有的 guard 引用，也把**进程级静态白名单**按进入时的快照还原。
      *
      * <p>只 {@code setSsrfGuard(new SsrfGuard())} 是不够的——{@code SsrfGuard} 的白名单字段是
      * {@code static volatile}（见其类注释），改过就会一直留着，影响同一 JVM 里后续
@@ -60,7 +64,12 @@ public final class FeishuTestSupport {
      */
     public static void restoreSsrf() {
         ConnectorHttp.setSsrfGuard(new SsrfGuard());
-        ConnectorHttp.ssrfGuard().reloadWhitelist(envWhitelistRaw());
+        if (whitelistSnapshot != null) {
+            SsrfGuard.restoreWhitelist(whitelistSnapshot);
+        } else {
+            // 未配对调用（没走过 allowLoopback）时退回环境变量重建
+            ConnectorHttp.ssrfGuard().reloadWhitelist(envWhitelistRaw());
+        }
     }
 
     /**
