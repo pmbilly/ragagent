@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
  * <p><b>响应形态（逐端点保持原样，不要"统一"它们）</b>：</p>
  * <ol>
  *   <li><b>实体直出</b>：直接序列化领域对象，
- *       键序 = 领域字段声明序（由各 domain 类的 {@code @JsonPropertyOrder} 固定），
+ *       键序 = 领域字段声明序（Jackson 默认序；B75 已摘键序注解，键序天然跟随声明），
  *       <b>没有</b> {@code {data,success}} 信封。wiki 层几乎所有端点都是这个形态。</li>
  *   <li><b>raw JSON map 直出</b>：{@code {"message":...}}（UpdateIssueStatus / RebuildLinks）、
  *       {@code {"fixed":N,"message":...}}（AutoFix）、{@code {"pages":[...]}}（SearchPages）、

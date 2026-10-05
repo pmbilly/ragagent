@@ -3,7 +3,6 @@ package com.ragagent.llm.ollama;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
@@ -16,7 +15,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  * <p>JSON 字段序 = 声明序：type / function 恒输出，description 空则省略，
  * parameters 恒输出（null 时为 JSON null）。</p>
  */
-@JsonPropertyOrder({"type", "items", "function"})
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OllamaTool {
 
@@ -44,7 +43,7 @@ public class OllamaTool {
     public void setFunction(Function v) { function = v == null ? new Function() : v; }
 
     /** function 子对象。 */
-    @JsonPropertyOrder({"name", "description", "parameters"})
+
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Function {
 

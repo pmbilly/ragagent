@@ -5,7 +5,6 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * Ollama 聊天消息（对齐 ollama v0.23.2 API）。
@@ -15,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * <p>{@code images} 是<b>原始字节</b>（{@code byte[][]}）：
  * 序列化为 base64 字符串数组（{@code byte[]} 的标准 JSON 编码）。</p>
  */
-@JsonPropertyOrder({"role", "content", "thinking", "images", "tool_calls", "tool_name", "tool_call_id"})
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OllamaMessage {
 

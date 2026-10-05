@@ -4,13 +4,11 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * 排序事件数据。
  */
-@JsonPropertyOrder({"query", "input_count", "output_count", "model_id", "threshold",
-        "results", "duration_ms", "extra"})
+
 public class RerankData {
 
     @JsonProperty("query")

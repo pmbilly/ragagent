@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * 抽取出的单个 entity / concept。
@@ -19,7 +18,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * <p><b>可变 POJO 而非 record</b>：去重合并、身份认领、id 重映射都会就地改写
  * {@code slug} 等字段。</p>
  */
-@JsonPropertyOrder({"name", "slug", "aliases", "description", "details", "source_chunks"})
+
 public class ExtractedItem {
 
     @JsonProperty("name")

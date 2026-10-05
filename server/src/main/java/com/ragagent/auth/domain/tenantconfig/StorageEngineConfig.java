@@ -2,7 +2,6 @@ package com.ragagent.auth.domain.tenantconfig;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * 存储引擎配置段（8 个 provider 子结构）。
@@ -11,9 +10,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * 为 null 时省略键。provider 子结构内部字段**全部恒输出**——
  * 对象一旦存在，所有键恒输出（含 "" 与 false），golden ct-kv-storage-* 钉住。</p>
  */
-@JsonPropertyOrder({
-        "default_provider", "local", "minio", "cos", "tos", "s3", "oss", "ks3", "obs"
-})
+
 public class StorageEngineConfig {
 
     @JsonProperty("default_provider")
@@ -71,7 +68,7 @@ public class StorageEngineConfig {
     public void setObs(ObsEngineConfig v) { obs = v; }
 
     /** 对照 LocalEngineConfig。 */
-    @JsonPropertyOrder({"path_prefix"})
+
     public static class LocalEngineConfig {
         @JsonProperty("path_prefix")
         private String pathPrefix = "";
@@ -81,8 +78,7 @@ public class StorageEngineConfig {
     }
 
     /** 对照 MinIOEngineConfig。 */
-    @JsonPropertyOrder({"mode", "endpoint", "access_key_id", "secret_access_key",
-            "bucket_name", "use_ssl", "path_prefix"})
+
     public static class MinioEngineConfig {
         @JsonProperty("mode")
         private String mode = "";
@@ -116,8 +112,7 @@ public class StorageEngineConfig {
     }
 
     /** 对照 COSEngineConfig。 */
-    @JsonPropertyOrder({"secret_id", "secret_key", "region", "bucket_name",
-            "app_id", "path_prefix", "temp_bucket_name", "temp_region"})
+
     public static class CosEngineConfig {
         @JsonProperty("secret_id")
         private String secretId = "";
@@ -155,8 +150,7 @@ public class StorageEngineConfig {
     }
 
     /** 对照 TOSEngineConfig。 */
-    @JsonPropertyOrder({"endpoint", "region", "access_key", "secret_key",
-            "bucket_name", "path_prefix", "temp_bucket_name", "temp_region"})
+
     public static class TosEngineConfig {
         @JsonProperty("endpoint")
         private String endpoint = "";
@@ -194,8 +188,7 @@ public class StorageEngineConfig {
     }
 
     /** 对照 S3EngineConfig。 */
-    @JsonPropertyOrder({"endpoint", "region", "access_key", "secret_key",
-            "bucket_name", "path_prefix", "use_ssl", "force_path_style"})
+
     public static class S3EngineConfig {
         @JsonProperty("endpoint")
         private String endpoint = "";
@@ -233,8 +226,7 @@ public class StorageEngineConfig {
     }
 
     /** 对照 OSSEngineConfig。 */
-    @JsonPropertyOrder({"endpoint", "region", "access_key", "secret_key",
-            "bucket_name", "path_prefix", "use_temp_bucket", "temp_bucket_name", "temp_region"})
+
     public static class OssEngineConfig {
         @JsonProperty("endpoint")
         private String endpoint = "";
@@ -276,8 +268,7 @@ public class StorageEngineConfig {
     }
 
     /** 对照 KS3EngineConfig。 */
-    @JsonPropertyOrder({"endpoint", "region", "access_key", "secret_key",
-            "bucket_name", "path_prefix"})
+
     public static class Ks3EngineConfig {
         @JsonProperty("endpoint")
         private String endpoint = "";
@@ -307,8 +298,7 @@ public class StorageEngineConfig {
     }
 
     /** 对照 OBSEngineConfig。 */
-    @JsonPropertyOrder({"endpoint", "region", "access_key", "secret_key",
-            "bucket_name", "path_prefix", "use_ssl"})
+
     public static class ObsEngineConfig {
         @JsonProperty("endpoint")
         private String endpoint = "";

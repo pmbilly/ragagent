@@ -4,7 +4,6 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * 检索事件数据。
@@ -13,8 +12,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * {@code {"query":"","knowledge_base_id":"","top_k":0,"threshold":0,"retrieval_type":"","result_count":0}}
  * （results/duration_ms/extra 空则省略）。</p>
  */
-@JsonPropertyOrder({"query", "knowledge_base_id", "top_k", "threshold", "retrieval_type",
-        "result_count", "results", "duration_ms", "extra"})
+
 public class RetrievalData {
 
     @JsonProperty("query")

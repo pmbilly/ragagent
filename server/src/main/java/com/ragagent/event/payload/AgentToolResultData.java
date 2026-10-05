@@ -4,7 +4,6 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * 工具执行结果数据。
@@ -14,8 +13,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * {@code {"tool_call_id":"","tool_name":"","output":"","success":false,"iteration":0}}；
  * {@code error}/{@code duration_ms}/{@code data} 空则省略。</p>
  */
-@JsonPropertyOrder({"tool_call_id", "tool_name", "output", "error", "success",
-        "duration_ms", "iteration", "data"})
+
 public class AgentToolResultData {
 
     /** 工具调用 ID（追踪用） */

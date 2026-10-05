@@ -2,7 +2,6 @@ package com.ragagent.llm.chat;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
@@ -17,7 +16,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  *   <li>{@code content}：仅 null 省略 → NON_NULL（<b>空串照发</b>）。</li>
  * </ul>
  */
-@JsonPropertyOrder({"type", "text", "cache_control", "id", "name", "input", "tool_use_id", "content"})
+
 public class AnthropicContentBlock {
 
     public static final String TYPE_TEXT = "text";

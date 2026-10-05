@@ -1,7 +1,6 @@
 package com.ragagent.event.payload;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * Agent 思考流式数据。
@@ -10,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * <p>三字段全部恒输出：零值输出 {@code {"content":"","iteration":0,"done":false}}。
  * 同一 id 的分片在客户端重组（思考流整段共用一个 generateEventID("thinking")）。</p>
  */
-@JsonPropertyOrder({"content", "iteration", "done"})
+
 public class AgentThoughtData {
 
     @JsonProperty("content")

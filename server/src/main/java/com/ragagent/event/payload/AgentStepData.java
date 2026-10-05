@@ -1,7 +1,6 @@
 package com.ragagent.event.payload;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * Agent 步骤事件数据。
@@ -9,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * <p>{@code tool_calls} 与 {@code duration_ms} 均恒输出——
  * 零值输出 {@code {"iteration":0,"thought":"","tool_calls":null,"duration_ms":0}}。</p>
  */
-@JsonPropertyOrder({"iteration", "thought", "tool_calls", "duration_ms"})
+
 public class AgentStepData {
 
     @JsonProperty("iteration")

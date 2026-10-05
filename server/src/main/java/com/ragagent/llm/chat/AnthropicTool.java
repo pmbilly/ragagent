@@ -1,7 +1,6 @@
 package com.ragagent.llm.chat;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
@@ -14,7 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  * {@code parameters}），且 <b>schema 原样透传</b>——{@code $defs} / {@code $ref} / {@code oneOf}
  * / {@code additionalProperties} 全部保留。</p>
  */
-@JsonPropertyOrder({"name", "description", "input_schema"})
+
 public class AnthropicTool {
 
     @JsonProperty("name")

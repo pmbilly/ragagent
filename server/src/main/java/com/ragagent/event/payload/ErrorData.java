@@ -4,13 +4,12 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * 错误事件数据。
  * agent 引擎唯一 emit 点：AgentEngine（stage="agent_execution"），见包注释 emit 表 #20。
  */
-@JsonPropertyOrder({"error", "error_code", "stage", "session_id", "query", "extra"})
+
 public class ErrorData {
 
     @JsonProperty("error")

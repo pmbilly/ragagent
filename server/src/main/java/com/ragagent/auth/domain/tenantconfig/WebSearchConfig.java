@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * 联网搜索配置段。
@@ -15,11 +14,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * <p>字符串字段默认 ""，blacklist 默认 null（json 输出 {@code null}；
  * 经 Effective 归一化后才变 []）。</p>
  */
-@JsonPropertyOrder({
-        "provider", "api_key", "max_results", "include_date", "compression_method",
-        "blacklist", "embedding_model_id", "embedding_dimension", "rerank_model_id",
-        "document_fragments", "proxy_url"
-})
+
 public class WebSearchConfig {
 
     /** max_results 的生效下限/缺省值。 */

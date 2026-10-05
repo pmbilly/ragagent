@@ -2,7 +2,6 @@ package com.ragagent.llm.chat;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * Anthropic 工具选择。
@@ -18,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * <p>{@code disable_parallel_tool_use} 是可空布尔：null 省略，false 也照发
  * （正好与 OpenAI 的 parallel_tool_calls 语义相反）。</p>
  */
-@JsonPropertyOrder({"type", "name", "disable_parallel_tool_use"})
+
 public class AnthropicToolChoice {
 
     @JsonProperty("type")

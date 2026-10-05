@@ -3,7 +3,6 @@ package com.ragagent.common.context;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
@@ -14,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * <p>五个键一律 {@code lf_} 前缀，空值**整键省略**，
  * 未启用 langfuse 时负载字节不变；旧负载（无这些键）也能反序列化。</p>
  */
-@JsonPropertyOrder({"lf_trace_id", "lf_parent_obs_id", "lf_traceparent", "lf_user_id", "lf_session_id"})
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record TracingContext(
         /** 发起该任务的根 trace id（兼容旧负载用；关联以 traceparent 为准）。 */

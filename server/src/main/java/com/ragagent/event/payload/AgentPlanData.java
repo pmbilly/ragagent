@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * Agent 计划事件数据。
@@ -12,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * <p>{@code plan} <b>恒输出</b>——null List 输出 {@code "plan":null}、
  * 空 List 输出 {@code "plan":[]}，别归一化。</p>
  */
-@JsonPropertyOrder({"query", "plan", "duration_ms"})
+
 public class AgentPlanData {
 
     @JsonProperty("query")

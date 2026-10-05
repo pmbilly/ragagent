@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * Anthropic Messages 请求体。
@@ -21,9 +20,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  *   <li>{@code temperature} / {@code top_p}：指针，nil 省略 → NON_NULL。</li>
  * </ul>
  */
-@JsonPropertyOrder({
-        "model", "max_tokens", "stream", "system", "messages", "temperature", "top_p", "tools", "tool_choice"
-})
+
 public class AnthropicRequest {
 
     @JsonProperty("model")

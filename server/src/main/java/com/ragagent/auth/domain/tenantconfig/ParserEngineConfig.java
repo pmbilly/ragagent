@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
@@ -17,18 +16,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  * 规则由 agent 侧配置，租户级只是透传保留（合并的 legacy 分支），
  * 用 JsonNode 带过，键序与原文一致。</p>
  */
-@JsonPropertyOrder({
-        "chat_parser_engine_rules", "mineru_endpoint", "mineru_api_key",
-        "mineru_model", "mineru_vlm_server_url", "mineru_enable_formula",
-        "mineru_enable_table", "mineru_parse_method", "mineru_enable_ocr",
-        "mineru_language", "mineru_cloud_model", "mineru_cloud_enable_formula",
-        "mineru_cloud_enable_table", "mineru_cloud_enable_ocr", "mineru_cloud_language",
-        "odl_hybrid", "odl_hybrid_url", "odl_hybrid_mode", "odl_hybrid_fallback",
-        "odl_markdown_with_html", "paddleocr_vl_endpoint",
-        "paddleocr_vl_use_seal_recognition", "paddleocr_vl_use_chart_recognition",
-        "paddleocr_vl_cloud_token", "paddleocr_vl_cloud_model",
-        "paddleocr_vl_cloud_use_seal_recognition", "paddleocr_vl_cloud_use_chart_recognition"
-})
+
 public class ParserEngineConfig {
 
     /** 列表空/缺失都省略键；元素透传 */

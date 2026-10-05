@@ -7,7 +7,6 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.web.ZeroTimeSerializer;
@@ -40,7 +39,7 @@ import com.ragagent.common.web.ZeroTimeSerializer;
  *       本类型不落表，只是 jsonb 载荷里的一块。</li>
  * </ol>
  */
-@JsonPropertyOrder({"last_sync_time", "feed_items", "feed_signals"})
+
 public class RssCursor {
 
     private static final ObjectMapper MAPPER = JsonMappers.lenient()

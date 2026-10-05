@@ -5,7 +5,6 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
@@ -14,11 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  * JSON 字段序 = 声明序。恒输出键包括 thinking——Boolean 为 null 时输出
  * "thinking":null，故用 ALWAYS 包含。
  */
-@JsonPropertyOrder({
-        "temperature", "top_p", "seed", "max_tokens", "max_completion_tokens",
-        "frequency_penalty", "presence_penalty", "thinking", "tools", "tool_choice",
-        "parallel_tool_calls", "format"
-})
+
 public class ChatOptions {
 
     @JsonProperty("temperature")

@@ -2,7 +2,6 @@ package com.ragagent.llm.domain;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * Token 用量。
@@ -21,11 +20,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  *
  * 持久化：jsonb 列，经 PgJsonTypeHandler。
  */
-@JsonPropertyOrder({
-        "prompt_tokens", "completion_tokens", "total_tokens",
-        "cached_tokens", "cache_read_tokens", "cache_write_tokens", "cache_miss_tokens",
-        "cache_reported", "cache_status"
-})
+
 public class TokenUsage {
 
     @JsonProperty("prompt_tokens")

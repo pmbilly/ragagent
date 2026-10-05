@@ -4,7 +4,6 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * 聊天生成事件数据。
@@ -12,8 +11,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * <p>零值输出 {@code {"query":"","model_id":"","is_stream":false}}——
  * {@code is_stream} 恒输出，false 也输出。</p>
  */
-@JsonPropertyOrder({"query", "model_id", "response", "stream_chunk", "token_count",
-        "duration_ms", "is_stream", "extra"})
+
 public class ChatData {
 
     @JsonProperty("query")

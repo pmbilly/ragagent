@@ -4,7 +4,6 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * 查询相关事件数据。
@@ -12,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * <p>字段按声明序输出；标 {@code NON_DEFAULT}/{@code NON_EMPTY} 的字段
  * （0/空/false/null）省略，其余恒输出（零值也输出）。</p>
  */
-@JsonPropertyOrder({"original_query", "rewritten_query", "session_id", "user_id", "extra"})
+
 public class QueryData {
 
     @JsonProperty("original_query")

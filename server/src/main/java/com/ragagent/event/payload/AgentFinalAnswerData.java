@@ -2,7 +2,6 @@ package com.ragagent.event.payload;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * 最终答案流式数据。
@@ -12,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * <p>零值输出 {@code {"content":"","done":false}}；{@code is_fallback}
  * 为 true 才输出（无知识库命中的兜底回答标记）。</p>
  */
-@JsonPropertyOrder({"content", "done", "is_fallback"})
+
 public class AgentFinalAnswerData {
 
     @JsonProperty("content")

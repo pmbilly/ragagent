@@ -4,7 +4,6 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * Agent 工具执行事件数据。
@@ -13,8 +12,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * <p>{@code tool_input} 恒输出——null map 也输出 {@code "tool_input":null}；
  * {@code error} 空串省略——成功路径整键不出现。</p>
  */
-@JsonPropertyOrder({"iteration", "tool_name", "tool_input", "tool_output", "success",
-        "error", "duration_ms"})
+
 public class AgentActionData {
 
     @JsonProperty("iteration")

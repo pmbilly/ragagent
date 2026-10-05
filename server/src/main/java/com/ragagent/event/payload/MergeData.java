@@ -4,12 +4,11 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * 合并事件数据。
  */
-@JsonPropertyOrder({"input_count", "output_count", "merge_type", "results", "duration_ms", "extra"})
+
 public class MergeData {
 
     @JsonProperty("input_count")

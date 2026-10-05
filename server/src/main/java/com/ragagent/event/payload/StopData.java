@@ -2,7 +2,6 @@ package com.ragagent.event.payload;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * 停止生成请求数据。
@@ -10,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * （handler/session 层发出，不在包注释 emit 表内）。
  * {@code reason} 空串省略。
  */
-@JsonPropertyOrder({"session_id", "message_id", "reason"})
+
 public class StopData {
 
     @JsonProperty("session_id")

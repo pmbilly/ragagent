@@ -3,7 +3,6 @@ package com.ragagent.llm.ollama;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -17,7 +16,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * <p>{@code arguments} 是<b>对象</b>（不是 OpenAI 那样的 JSON 字符串），
  * 且恒输出——空值时给 {@code {}}（字段永不为 null）。</p>
  */
-@JsonPropertyOrder({"id", "function"})
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OllamaToolCall {
 
@@ -36,7 +35,7 @@ public class OllamaToolCall {
     public void setFunction(Function v) { function = v == null ? new Function() : v; }
 
     /** function 子对象（index / name / arguments 三者都恒输出）。 */
-    @JsonPropertyOrder({"index", "name", "arguments"})
+
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Function {
 

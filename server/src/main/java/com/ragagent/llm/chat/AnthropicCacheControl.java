@@ -2,14 +2,13 @@ package com.ragagent.llm.chat;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * Anthropic content 断点标记。
  *
  * <p>{@code type} 恒输出，{@code ttl} 为空则省略。</p>
  */
-@JsonPropertyOrder({"type", "ttl"})
+
 public class AnthropicCacheControl {
 
     @JsonProperty("type")

@@ -5,7 +5,6 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
@@ -13,7 +12,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  *
  * JSON 字段序 = 声明序。provider_metadata 为空时省略。
  */
-@JsonPropertyOrder({"id", "type", "function", "provider_metadata"})
+
 public class ToolCall {
 
     @JsonProperty("id")

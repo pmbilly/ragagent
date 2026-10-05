@@ -39,7 +39,7 @@ import com.ragagent.common.web.PgJsonTypeHandler;
  *       page_metadata 是任意 JSON（{@link PgJsonTypeHandler}）。</li>
  * </ol>
  *
- * <p>JSON 输出（handler 直接序列化实体，字段序 = {@code @JsonPropertyOrder} 声明序）：
+ * <p>JSON 输出（handler 直接序列化实体，字段序 = 字段声明序）：
  * 省略语义由字段级 {@code @JsonInclude} 控制（string 空→省略用 NON_EMPTY，
  * int 0→省略用 NON_DEFAULT，列表空→省略用 NON_EMPTY）。</p>
  */

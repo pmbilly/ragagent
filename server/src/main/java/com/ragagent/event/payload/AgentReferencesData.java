@@ -1,7 +1,6 @@
 package com.ragagent.event.payload;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * 知识引用数据。
@@ -10,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * 为保持本包不依赖 retrieval 领域类型，元素以 Object 承载
  * （{@code retrieval.domain.SearchResult} 的列表）。</p>
  */
-@JsonPropertyOrder({"references", "iteration"})
+
 public class AgentReferencesData {
 
     /** null 也输出 null */

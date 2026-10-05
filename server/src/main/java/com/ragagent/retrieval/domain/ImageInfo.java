@@ -1,7 +1,6 @@
 package com.ragagent.retrieval.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * 图片富化信息。
@@ -10,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * snake_case，六个键恒输出（不做空值省略）。会落 jsonb（image_info 列经各 TypeHandler
  * 透传），故注解只管序列化形状。</p>
  */
-@JsonPropertyOrder({"url", "original_url", "start_pos", "end_pos", "caption", "ocr_text"})
+
 public class ImageInfo {
 
     @JsonProperty("url")

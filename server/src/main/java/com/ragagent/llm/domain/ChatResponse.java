@@ -5,7 +5,6 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * 非流式聊天响应。
@@ -13,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * JSON 字段序 = 声明序；usage 恒输出（对象/零值），
  * 其余为空时省略（NON_EMPTY）。
  */
-@JsonPropertyOrder({"content", "reasoning_content", "tool_calls", "finish_reason", "usage"})
+
 public class ChatResponse {
 
     @JsonProperty("content")

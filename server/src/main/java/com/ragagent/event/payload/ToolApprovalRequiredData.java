@@ -2,7 +2,6 @@ package com.ragagent.event.payload;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * 危险 MCP 工具即将执行时的"请求批准"事件体。
@@ -16,9 +15,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * <p>{@code args} 是解析后的 JSON 对象（给 UI 渲染表单），{@code args_json} 是原始
  * JSON 串（给回填），两者都提供。</p>
  */
-@JsonPropertyOrder({"pending_id", "tenant_id", "session_id", "assistant_message_id",
-        "service_id", "service_name", "mcp_tool_name", "registered_tool_name", "description",
-        "args", "args_json", "timeout_seconds", "requested_at", "tool_call_id", "request_id"})
+
 public class ToolApprovalRequiredData {
 
     @JsonProperty("pending_id")

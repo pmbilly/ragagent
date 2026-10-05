@@ -5,7 +5,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.llm.ToolResult;
@@ -28,7 +27,7 @@ public class TodoWriteTool extends BaseTool {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     /** 单个计划步骤（json 键序固定：id/description/status）。 */
-    @JsonPropertyOrder({"id", "description", "status"})
+
     public record PlanStep(String id, String description, String status) {
     }
 

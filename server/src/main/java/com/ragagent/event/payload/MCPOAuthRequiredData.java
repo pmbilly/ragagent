@@ -2,7 +2,6 @@ package com.ragagent.event.payload;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * 会话内 MCP OAuth 授权提示事件体。
@@ -14,9 +13,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * agent 暂停等待。仅 {@code request_id} 空串省略，其余恒输出
  * （noticeOnly 形态的 {@code timeout_seconds:0} 也输出）。</p>
  */
-@JsonPropertyOrder({"pending_id", "tenant_id", "session_id", "assistant_message_id",
-        "service_id", "service_name", "mcp_tool_name", "timeout_seconds", "requested_at",
-        "tool_call_id", "request_id"})
+
 public class MCPOAuthRequiredData {
 
     @JsonProperty("pending_id")

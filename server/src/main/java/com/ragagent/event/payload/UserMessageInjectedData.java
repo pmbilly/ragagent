@@ -2,7 +2,6 @@ package com.ragagent.event.payload;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * 运行中用户消息注入报告。
@@ -12,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * request ID 落库、文本已追加进 agent 的消息列表，下一次 LLM 调用即可见。
  * 前四字段恒输出，仅 {@code user_message_id} 空串省略。</p>
  */
-@JsonPropertyOrder({"steer_id", "content", "message_id", "user_message_id"})
+
 public class UserMessageInjectedData {
 
     /** 与排队的 steer 事件关联 */

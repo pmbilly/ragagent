@@ -5,7 +5,6 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.ragagent.common.web.SortedMapSerializer;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.common.llm.ResponseType;
@@ -18,10 +17,7 @@ import com.ragagent.common.llm.ResponseType;
  *
  * 线上契约：这是 SSE 事件体的核心结构，`response_type` 取值见 {@link ResponseType}。
  */
-@JsonPropertyOrder({
-        "id", "response_type", "content", "done", "knowledge_references",
-        "session_id", "assistant_message_id", "tool_calls", "data", "usage", "finish_reason"
-})
+
 public class StreamResponse {
 
     @JsonProperty("id")

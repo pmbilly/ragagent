@@ -5,7 +5,6 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * Agent 完成事件数据。
@@ -14,8 +13,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * <p>{@code knowledge_refs}/{@code agent_steps}/{@code usage} 空则整键省略
  * （空列表也省略）；{@code total_duration_ms} 恒输出。</p>
  */
-@JsonPropertyOrder({"session_id", "total_steps", "final_answer", "knowledge_refs",
-        "agent_steps", "usage", "total_duration_ms", "message_id", "request_id", "extra"})
+
 public class AgentCompleteData {
 
     @JsonProperty("session_id")

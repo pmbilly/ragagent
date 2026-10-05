@@ -2,7 +2,6 @@ package com.ragagent.event.payload;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * 上下文压缩报告。
@@ -12,8 +11,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * 否则与模型无视指令无法区分。{@code degraded}/{@code split_turn}
  * 为 false 省略，其余七个字段恒输出。</p>
  */
-@JsonPropertyOrder({"reason", "round", "tokens_before", "tokens_after", "messages_before",
-        "messages_after", "summary", "degraded", "split_turn"})
+
 public class ContextCompactedData {
 
     /** threshold | overflow */

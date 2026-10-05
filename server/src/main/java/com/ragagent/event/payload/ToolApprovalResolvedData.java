@@ -2,7 +2,6 @@ package com.ragagent.event.payload;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * 用户决定（或超时/取消）的确认事件体。
@@ -11,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * <p>零值输出 {@code {"pending_id":"","approved":false}}；
  * {@code reason}/{@code timed_out}/{@code canceled} 空则省略。</p>
  */
-@JsonPropertyOrder({"pending_id", "approved", "reason", "timed_out", "canceled"})
+
 public class ToolApprovalResolvedData {
 
     @JsonProperty("pending_id")

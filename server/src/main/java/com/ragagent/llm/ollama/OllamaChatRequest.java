@@ -7,7 +7,6 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
@@ -24,7 +23,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  * <p><b>{@code think}</b> 是 bool（或 "high"/"medium"/"low" 字符串）——Java 用 Object 承载。
  * 它是 Ollama 的"是否思考"开关，不是 OpenAI 的 reasoning_effort。</p>
  */
-@JsonPropertyOrder({"model", "messages", "stream", "format", "tools", "options", "think"})
+
 public class OllamaChatRequest {
 
     @JsonProperty("model")

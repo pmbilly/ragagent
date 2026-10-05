@@ -1,7 +1,6 @@
 package com.ragagent.rerank;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.web.ProviderJson;
 
@@ -12,12 +11,12 @@ import com.ragagent.common.web.ProviderJson;
  * {@code {"text":...}} 对象；分数字段先看 {@code relevance_score}，缺失回落
  * {@code score}；两者都没有时为 0。序列化形如
  * {@code {"index":N,"document":{"text":"..."},"relevance_score":X}}
- * （按 {@code @JsonPropertyOrder} 声明序，document 恒输出对象）。</p>
+ * （按字段声明序，document 恒输出对象）。</p>
  *
  * <p>Jackson 注解为 models/{id}/debug 的 raw_response 序列化而加（此前该类只走
  * {@link #marshal()} 内部路径，注解不改变任何既有行为）。</p>
  */
-@JsonPropertyOrder({"index", "document", "relevance_score"})
+
 public final class RankResult {
 
     private int index;
@@ -48,7 +47,7 @@ public final class RankResult {
     }
 
     /** 文档信息；自身按 {@code {"text":"..."}} 序列化。 */
-    @JsonPropertyOrder({"text"})
+
     public static final class DocumentInfo {
         private String text = "";
 

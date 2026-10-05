@@ -2,7 +2,6 @@ package com.ragagent.event.payload;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * 会话内 OAuth 提示结果（authorized / timeout / cancel）确认事件体。
@@ -11,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * <p>零值输出 {@code {"pending_id":"","service_id":"","authorized":false}}；
  * {@code reason}/{@code timed_out}/{@code canceled} 空则省略。</p>
  */
-@JsonPropertyOrder({"pending_id", "service_id", "authorized", "reason", "timed_out", "canceled"})
+
 public class MCPOAuthResolvedData {
 
     @JsonProperty("pending_id")

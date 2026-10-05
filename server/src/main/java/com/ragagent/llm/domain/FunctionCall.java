@@ -1,13 +1,12 @@
 package com.ragagent.llm.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * 函数调用详情。
  * JSON 字段序 = 声明序。
  */
-@JsonPropertyOrder({"name", "arguments"})
+
 public class FunctionCall {
 
     @JsonProperty("name")
