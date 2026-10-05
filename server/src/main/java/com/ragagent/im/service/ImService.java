@@ -37,6 +37,7 @@ import com.ragagent.im.runtime.ImRedisStore;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.QaQueue;
 import com.ragagent.im.runtime.ReplyMessage;
+import com.ragagent.knowledge.client.DocReaderClient;
 import com.ragagent.session.domain.Session;
 import com.ragagent.session.service.MessageService;
 import com.ragagent.session.service.SessionAgentQaService;
@@ -90,6 +91,7 @@ public class ImService {
     final ImOutboundFormatter outboundFormatter;
     final ImSessionResolver sessionResolver;
     final ImQaRequests qaRequests;
+    final ImAttachmentPreparer attachmentPreparer;
 
     private final CommandRegistry cmdRegistry = new CommandRegistry();
     private final QaQueue qaQueue;
@@ -127,6 +129,7 @@ public class ImService {
             SessionKnowledgeQaService knowledgeQaService, SessionAgentQaService agentQaService,
             java.util.Optional<com.ragagent.storage.support.Resolver> storageResolver,
             ObjectProvider<StringRedisTemplate> redisTemplates,
+            ObjectProvider<DocReaderClient> docReaders,
             @Value("${im.workers:5}") int workers,
             @Value("${im.max-queue:50}") int maxQueue,
             @Value("${im.max-per-user:3}") int maxPerUser,
@@ -149,6 +152,7 @@ public class ImService {
         this.sessionResolver = new ImSessionResolver(this);
         this.qaRequests = new ImQaRequests(this);
         this.qaRunner = new ImQaRunner(this);
+        this.attachmentPreparer = new ImAttachmentPreparer(docReaders);
         ImCommandSet.registerDefaults(this.cmdRegistry, kbLister(), knowledgeSearcher());
         ImRedisStore store = null;
         if (redisEnabled) {
@@ -734,8 +738,8 @@ public class ImService {
 
     /** QA 输入束（qaRequest 的业务字段 + 在途登记句柄）。 */
 
-    void runFallbackNonStream(QaAttach attach) {
-        qaRunner.runFallbackNonStream(attach);
+    void runFallbackNonStream(QaAttach attach, ImAttachmentPreparer.Prepared prepared) {
+        qaRunner.runFallbackNonStream(attach, prepared);
     }
     record QaAttach(IncomingMessage msg, Session session, CustomAgentEntity agent,
             Adapter adapter, ImChannelEntity channel, String channelId, String userKey,

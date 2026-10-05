@@ -39,13 +39,13 @@ final class ImStreamPipeline {
     }
 
     void handleMessageStream(IncomingMessage msg, QaAttach attach,
-            StreamSender streamer) throws Exception {
+            ImAttachmentPreparer.Prepared prepared, StreamSender streamer) throws Exception {
         String streamId;
         try {
             streamId = streamer.startStream(msg);
         } catch (Exception e) {
             log.warn("[IM] StartStream failed, falling back to non-streaming: {}", e.getMessage());
-            service.runFallbackNonStream(attach);
+            service.runFallbackNonStream(attach, prepared);
             return;
         }
 
@@ -61,7 +61,8 @@ final class ImStreamPipeline {
 
         Session session = attach.session();
         String requestId = UUID.randomUUID().toString();
-        Message userMsg = service.qaRequests.createUserMessage(session.getId(), msg.content, requestId);
+        Message userMsg = service.qaRequests.createUserMessage(session.getId(), msg.content,
+                requestId, prepared.attachments());
         Message assistantMsg = service.qaRequests.createAssistantMessage(session.getId(), requestId);
         buf.assistantMessage = assistantMsg;
         // 在途登记：跨实例 /stop 的 IDs 映射 + stop watcher（与 runQA 路径同款）
@@ -75,6 +76,7 @@ final class ImStreamPipeline {
         try {
             QaSupport.QaRequest qaReq = service.qaRequests.buildIMQARequest(session, msg.content,
                     assistantMsg.getId(), userMsg.getId(), agent, msg.quote, attach.inflight());
+            ImAttachmentPreparer.applyTo(qaReq, prepared);
             Exception runErr;
             try {
                 if (useAgent) {

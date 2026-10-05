@@ -1,6 +1,5 @@
 package com.ragagent.im.service;
 
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -64,15 +63,23 @@ final class ImQaRunner {
             }
             IncomingMessage msg = task.msg;
             QaAttach attach = task.attach(entry);
-            List<com.ragagent.session.domain.MessageAttachment> attachments = List.of();
-            List<String> imageUrls = List.of();
+            // 附件准备（下载 + 解析，对齐 Go prepareIMAttachments）；失败按固定文案回复并终止。
+            ImAttachmentPreparer.Prepared prepared;
+            try {
+                prepared = service.attachmentPreparer.prepare(msg, attach.adapter());
+            } catch (Exception e) {
+                log.warn("[IM] attachment preparation failed: {}", e.getMessage());
+                service.sendReplyQuiet(attach.adapter(), msg,
+                        new ReplyMessage("❌ 无法读取此附件，请重试或改用文字描述。", false, true));
+                return;
+            }
             boolean streamDisabled = "full".equals(attach.channel().getOutputMode());
 
             if (streamDisabled) {
                 if (attach.adapter() instanceof FullOutputProgressSender progress
                         && progress.supportsFullOutputProgress()) {
                     try {
-                        handleMessageFullOutput(msg, attach, progress);
+                        handleMessageFullOutput(msg, attach, prepared, progress);
                     } catch (Exception e) {
                         log.error("[IM] Full-output QA failed: {}", e.getMessage(), e);
                     }
@@ -80,7 +87,7 @@ final class ImQaRunner {
                 }
             } else if (attach.adapter() instanceof StreamSender streamer) {
                 try {
-                    service.streamPipeline.handleMessageStream(msg, attach, streamer);
+                    service.streamPipeline.handleMessageStream(msg, attach, prepared, streamer);
                 } catch (Exception e) {
                     log.error("[IM] Stream QA failed: {}", e.getMessage(), e);
                 }
@@ -88,7 +95,7 @@ final class ImQaRunner {
             }
 
             // 非流式兜底：收集完整答案再发。
-            QaOutcome outcome = runQA(attach);
+            QaOutcome outcome = runQA(attach, prepared);
             String answer = outcome.answer();
             if (outcome.error() != null) {
                 log.error("[IM] QA failed: {}, sending fallback reply", outcome.error());
@@ -109,16 +116,17 @@ final class ImQaRunner {
 
 
     void handleMessageFullOutput(IncomingMessage msg, QaAttach attach,
-            FullOutputProgressSender streamer) throws Exception {
+            ImAttachmentPreparer.Prepared prepared, FullOutputProgressSender streamer)
+            throws Exception {
         String streamId;
         try {
             streamId = streamer.startStream(msg);
         } catch (Exception e) {
             log.warn("[IM] StartStream failed for full output, falling back: {}", e.getMessage());
-            runFallbackNonStream(attach);
+            runFallbackNonStream(attach, prepared);
             return;
         }
-        QaOutcome outcome = runQA(attach);
+        QaOutcome outcome = runQA(attach, prepared);
         String answer = outcome.answer();
         if (outcome.error() != null) {
             log.error("[IM] Full-output QA failed: {}, sending fallback reply", outcome.error());
@@ -143,8 +151,8 @@ final class ImQaRunner {
     }
 
 
-    void runFallbackNonStream(QaAttach attach) {
-        QaOutcome outcome = runQA(attach);
+    void runFallbackNonStream(QaAttach attach, ImAttachmentPreparer.Prepared prepared) {
+        QaOutcome outcome = runQA(attach, prepared);
         String answer = outcome.answer();
         if (outcome.error() != null) {
             answer = ImFormat.imQAFailureReply(outcome.error());
@@ -155,7 +163,7 @@ final class ImQaRunner {
 
     // ── runQA：事件收集 + 消息落库 ────────────────────────────────────────
 
-    QaOutcome runQA(QaAttach attach) {
+    QaOutcome runQA(QaAttach attach, ImAttachmentPreparer.Prepared prepared) {
         EventBus eventBus = new EventBus();
         StringBuilder answerBuilder = new StringBuilder();
         AtomicReference<Exception> qaErr = new AtomicReference<>();
@@ -194,7 +202,8 @@ final class ImQaRunner {
         Session session = attach.session();
         String requestId = UUID.randomUUID().toString();
 
-        Message userMsg = service.qaRequests.createUserMessage(session.getId(), attach.msg().content, requestId);
+        Message userMsg = service.qaRequests.createUserMessage(session.getId(), attach.msg().content,
+                requestId, prepared.attachments());
         Message assistantMsg = service.qaRequests.createAssistantMessage(session.getId(), requestId);
         // 在途登记：跨实例 /stop 的 IDs 映射 + stop watcher
         service.bindInflight(attach, assistantMsg.getId());
@@ -224,6 +233,7 @@ final class ImQaRunner {
         try {
             QaSupport.QaRequest qaReq = service.qaRequests.buildIMQARequest(session, attach.msg().content,
                     assistantMsg.getId(), userMsg.getId(), agent, attach.msg().quote, attach.inflight());
+            ImAttachmentPreparer.applyTo(qaReq, prepared);
             // 同步执行（QA 服务内部为虚拟线程管线，事件经 eventBus 回流到上面的订阅）。
             Exception runErr;
             try {

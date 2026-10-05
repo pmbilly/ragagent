@@ -1,5 +1,7 @@
 package com.ragagent.im.service;
 
+import java.util.List;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agent.management.domain.CustomAgentEntity;
 import com.ragagent.agent.management.service.AgentConfigJson;
@@ -68,8 +70,9 @@ final class ImQaRequests {
         return req;
     }
 
-    /** 用户消息落库。 */
-    Message createUserMessage(String sessionId, String content, String requestId) {
+    /** 用户消息落库（带附件元数据；无附件传空表）。 */
+    Message createUserMessage(String sessionId, String content, String requestId,
+            List<com.ragagent.session.domain.MessageAttachment> attachments) {
         Message m = new Message();
         m.setSessionId(sessionId);
         m.setRole("user");
@@ -77,6 +80,9 @@ final class ImQaRequests {
         m.setRequestId(requestId);
         m.setCompleted(true);
         m.setChannel("im");
+        if (attachments != null && !attachments.isEmpty()) {
+            m.setAttachments(attachments);
+        }
         return service.messageService.createMessage(m);
     }
 
