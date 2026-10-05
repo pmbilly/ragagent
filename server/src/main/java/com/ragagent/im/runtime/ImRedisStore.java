@@ -67,6 +67,32 @@ public class ImRedisStore implements QaQueue.RedisPort {
     private final java.util.concurrent.atomic.AtomicLong rateLimitSeq =
             new java.util.concurrent.atomic.AtomicLong();
 
+    /**
+     * leader 续期（仅当仍持有）：KEYS[1]=锁键；ARGV[1]=instanceId；ARGV[2]=TTL 毫秒。
+     * 仍持有并续期成功返回 1，否则 0。
+     */
+    private static final String RENEW_LEADER_LUA = """
+            if redis.call('GET', KEYS[1]) == ARGV[1] then
+              redis.call('PEXPIRE', KEYS[1], ARGV[2])
+              return 1
+            end
+            return 0
+            """;
+
+    private static final RedisScript<Long> RENEW_LEADER =
+            new DefaultRedisScript<>(RENEW_LEADER_LUA, Long.class);
+
+    /** leader 释放（仅当持有，CAS DEL）。 */
+    private static final String RELEASE_LEADER_LUA = """
+            if redis.call('GET', KEYS[1]) == ARGV[1] then
+              return redis.call('DEL', KEYS[1])
+            end
+            return 0
+            """;
+
+    private static final RedisScript<Long> RELEASE_LEADER =
+            new DefaultRedisScript<>(RELEASE_LEADER_LUA, Long.class);
+
     public ImRedisStore(StringRedisTemplate template) {
         this.template = template;
     }
@@ -206,6 +232,44 @@ public class ImRedisStore implements QaQueue.RedisPort {
         } catch (DataAccessException e) {
             log.warn("[IM] Redis rate limit failed for {}: {}", key, e.getMessage());
             return null;
+        }
+    }
+
+    // ── WS 长连接选主（leader 锁） ──────────────────────────────────────────
+
+    /**
+     * 抢 leader 锁（SET NX EX）。拿到返回 true；已被别的实例持有返回 false；
+     * Redis 故障也返回 false（本轮不启动、等下一轮重试——对齐 Go 的失败语义）。
+     */
+    public boolean tryAcquireLeader(String key, String instanceId, int ttlSeconds) {
+        try {
+            Boolean ok = template.opsForValue()
+                    .setIfAbsent(key, instanceId, Duration.ofSeconds(ttlSeconds));
+            return Boolean.TRUE.equals(ok);
+        } catch (DataAccessException e) {
+            log.warn("[IM] Redis leader acquire failed for {}: {}", key, e.getMessage());
+            return false;
+        }
+    }
+
+    /** 续期（仅当仍持有，Lua GET+PEXPIRE）；仍持有返回 true，丢失或故障返回 false。 */
+    public boolean renewLeader(String key, String instanceId, int ttlSeconds) {
+        try {
+            Long result = template.execute(RENEW_LEADER, List.of(key),
+                    instanceId, String.valueOf(ttlSeconds * 1000L));
+            return result != null && result == 1L;
+        } catch (DataAccessException e) {
+            log.warn("[IM] Redis leader renew failed for {}: {}", key, e.getMessage());
+            return false;
+        }
+    }
+
+    /** 释放（仅当持有，Lua CAS DEL）。 */
+    public void releaseLeader(String key, String instanceId) {
+        try {
+            template.execute(RELEASE_LEADER, List.of(key), instanceId);
+        } catch (DataAccessException e) {
+            log.warn("[IM] Redis leader release failed for {}: {}", key, e.getMessage());
         }
     }
 }

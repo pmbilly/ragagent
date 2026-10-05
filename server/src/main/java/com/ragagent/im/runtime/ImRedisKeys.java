@@ -30,4 +30,10 @@ public final class ImRedisKeys {
 
     /** + 限流 key——滑动窗口计数（Go {@code RedisKeyRateLimit}）。 */
     public static final String RATE_LIMIT_PREFIX = "im:ratelimit:";
+
+    /** + channelID——WS 长连接渠道的跨实例选主锁（Go {@code RedisKeyLeader}）。 */
+    public static final String LEADER_PREFIX = "im:ws:leader:";
+
+    /** 渠道配置变更广播频道（Go {@code RedisChannelConfig}；载荷键为 channel_id/source_instance）。 */
+    public static final String CHANNEL_CONFIG_CHANNEL = "im:channel:config";
 }

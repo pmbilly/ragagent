@@ -4,6 +4,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -14,9 +15,10 @@ import com.ragagent.im.mapper.ImChannelMapper;
 /**
  * IM 渠道 service（CRUD + 渠道行钩子：兜底、session_mode 校验、bot_identity 计算）。
  *
- * <p><b>接缝（不实现，javadoc 声明）</b>：{@code StartChannel / StopChannel /
- * publishChannelConfigChange} —— 渠道运行时（adapter 长连接、Redis 配置变更广播）
- * 不在本 service。Java 侧为 no-op（渠道无法启动只记警告，不影响 HTTP 响应）。</p>
+ * <p><b>运行时同步</b>：写操作成功后调 {@code ImService.onChannelChanged}——
+ * 本实例按库重建运行时（删除/禁用停连接；启用的 WS 长连接重建）+ 跨实例广播
+ * （Redis 未接入时后者为空操作）。用 {@link ObjectProvider} 延迟取，
+ * 避免 service 层与运行时层的启动顺序耦合。</p>
  *
  * <p>错误族：duplicate_bot 前缀 → 409 + 去前缀原文；
  * 创建/保存钩子校验失败（session_mode）等 → 500 "failed to create/update channel"。</p>
@@ -34,13 +36,16 @@ public class ImChannelService {
     private final ImChannelMapper mapper;
     private final com.ragagent.agent.management.mapper.CustomAgentMapper agentMapper;
     private final com.ragagent.agent.management.service.BuiltinAgentRegistry registry;
+    private final ObjectProvider<ImService> imService;
 
     public ImChannelService(ImChannelMapper mapper,
                             com.ragagent.agent.management.mapper.CustomAgentMapper agentMapper,
-                            com.ragagent.agent.management.service.BuiltinAgentRegistry registry) {
+                            com.ragagent.agent.management.service.BuiltinAgentRegistry registry,
+                            ObjectProvider<ImService> imService) {
         this.mapper = mapper;
         this.agentMapper = agentMapper;
         this.registry = registry;
+        this.imService = imService;
     }
 
     // ═══════════════════ 钩子 ═══════════════════
@@ -206,7 +211,7 @@ public class ImChannelService {
 
     /**
      * 创建：重复 bot 检查在前（409），落库前过创建钩子（session_mode
-     * 校验失败 → 500），启动/广播为 no-op 接缝。
+     * 校验失败 → 500），成功后同步运行时（本实例重建 + 跨实例广播）。
      */
     public void createChannel(ImChannelEntity channel) {
         checkDuplicateBot(channel, "");
@@ -214,15 +219,16 @@ public class ImChannelService {
         channel.setCreatedAt(OffsetDateTime.now());
         channel.setUpdatedAt(OffsetDateTime.now());
         mapper.insertChannel(channel);
-        // StartChannel / publishChannelConfigChange：运行时接缝，no-op
+        notifyRuntime(channel.getId());
     }
 
-    /** 更新：重复 bot 检查（排除自身）→ 全量保存（过保存钩子）→ 重启接缝 no-op。 */
+    /** 更新：重复 bot 检查（排除自身）→ 全量保存（过保存钩子）→ 同步运行时。 */
     public void updateChannel(ImChannelEntity channel) {
         checkDuplicateBot(channel, channel.getId());
         beforeSave(channel);
         channel.setUpdatedAt(OffsetDateTime.now());
         mapper.saveChannel(channel);
+        notifyRuntime(channel.getId());
     }
 
     /** update 换绑 agent 的校验段。 */
@@ -253,16 +259,16 @@ public class ImChannelService {
         }
     }
 
-    /** 删除：0 行受影响 → ChannelNotFound（handler 落 500）。 */
+    /** 删除：0 行受影响 → ChannelNotFound（handler 落 500）；成功后同步运行时。 */
     public void deleteChannel(String channelId, long tenantId) {
         int rows = mapper.softDelete(channelId, tenantId, OffsetDateTime.now());
         if (rows == 0) {
             throw new ChannelNotFoundException();
         }
-        // StopChannel / publishChannelConfigChange：no-op 接缝
+        notifyRuntime(channelId);
     }
 
-    /** 切换启用：取一行（无行 → handler 500）→ 取反 → 保存。 */
+    /** 切换启用：取一行（无行 → handler 500）→ 取反 → 保存 → 同步运行时。 */
     public ImChannelEntity toggleChannel(String channelId, long tenantId) {
         ImChannelEntity ch = mapper.getByIdAndTenant(channelId, tenantId);
         if (ch == null) {
@@ -272,7 +278,16 @@ public class ImChannelService {
         beforeSave(ch);
         ch.setUpdatedAt(OffsetDateTime.now());
         mapper.saveChannel(ch);
+        notifyRuntime(channelId);
         return ch;
+    }
+
+    /** 通知运行时（本实例重建 + 广播）；ImService 缺席时跳过（不影响 HTTP 响应）。 */
+    private void notifyRuntime(String channelId) {
+        ImService runtime = imService.getIfAvailable();
+        if (runtime != null && channelId != null && !channelId.isEmpty()) {
+            runtime.onChannelChanged(channelId);
+        }
     }
 
     public List<ImChannelEntity> listChannelsByAgent(String agentId, long tenantId) {

@@ -92,6 +92,19 @@ class ImRedisStoreTest {
     }
 
     @Test
+    void leaderLockAcquireRenewReleaseWithOwnershipCas() {
+        String key = ImRedisKeys.LEADER_PREFIX + "ch-1";
+        assertTrue(store.tryAcquireLeader(key, "inst-a", 15), "首次抢锁");
+        assertFalse(store.tryAcquireLeader(key, "inst-b", 15), "他人持有抢不到");
+        assertTrue(store.renewLeader(key, "inst-a", 15), "持有者可续期");
+        assertFalse(store.renewLeader(key, "inst-b", 15), "非持有者续期失败");
+        store.releaseLeader(key, "inst-b");
+        assertFalse(store.tryAcquireLeader(key, "inst-b", 15), "非持有者释放无效（CAS）");
+        store.releaseLeader(key, "inst-a");
+        assertTrue(store.tryAcquireLeader(key, "inst-b", 15), "持有者释放后可易主");
+    }
+
+    @Test
     void inflightMappingRoundTrip() {
         String userKey = "ch-1:u1:chat-1:";
         assertNull(store.loadInflight(userKey), "无映射");
