@@ -90,6 +90,11 @@ embed:
 knowledge:
   redis-enabled: ${KNOWLEDGE_REDIS_ENABLED:false}
 
+# memory 蒸馏队列：缺省进程内队列（单实例语义）；true = Redis 共享任务表
+# （跨实例执行 + 崩溃回收重投；重复触发由租约保证不重复蒸馏，启动时 ping 一次）。
+memory:
+  redis-enabled: ${MEMORY_REDIS_ENABLED:false}
+
 # ---- 以下为 Go config.yaml 的业务配置键（翻译对应模块时逐个启用）----
 conversation:
   max-rounds: 5
