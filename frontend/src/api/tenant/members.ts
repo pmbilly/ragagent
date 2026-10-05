@@ -1,7 +1,7 @@
 import { get, post, put, del } from '@/utils/request'
 
-// TenantRole mirrors internal/types/tenant_member.go's four-role enum.
-// Keep the string values aligned with the Go constants.
+// TenantRole mirrors common/tenant/TenantRole's four-role enum.
+// Keep the string values aligned with the Java constants.
 export type TenantRole = 'owner' | 'admin' | 'contributor' | 'viewer'
 
 export type TenantMemberStatus = 'active' | 'invited' | 'suspended'

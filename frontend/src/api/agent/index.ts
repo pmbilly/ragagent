@@ -252,7 +252,7 @@ export function getPlaceholders(): Promise<{ data: PlaceholdersResponse }> {
 
 // ===== 智能体类型预设 =====
 
-// 后端 kb_filter 结构（见 internal/types/agent_type_preset.go）
+// 后端 kb_filter 结构（见 agent/management/service/AgentTypePresets）
 export interface AgentTypeKBFilter {
   any_of?: string[];   // KB 至少拥有其一
   all_of?: string[];   // KB 必须全部拥有

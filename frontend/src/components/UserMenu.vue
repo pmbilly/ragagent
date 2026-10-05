@@ -349,7 +349,7 @@ const onTenantCreated = async (newTenant: TenantInfo) => {
 // Same hover-driven submenu pattern; data comes from
 // authStore.memberships (refreshed from /auth/me when the submenu opens and
 // after membership-changing actions). PR 4 of #1303 relaxed the X-Tenant-ID
-// gate in middleware/auth.go to accept active membership rows, so flipping
+// gate (X-Tenant-ID parsing in WebConfig/AuthController) to accept active membership rows, so flipping
 // authStore.selectedTenantId here is enough — the next page reload re-issues
 // every request with the new header and the server resolves the role server-side.
 type Membership = {

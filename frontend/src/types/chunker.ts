@@ -1,5 +1,5 @@
 // Types for the /api/v1/chunker/preview endpoint. Mirrors the JSON shape
-// produced by internal/handler/chunker_debug.go. Used by the KB editor's
+// produced by the Go-era chunker debug handler. Used by the KB editor's
 // chunking debug panel to render tier-info / chunk-cards / size stats.
 
 export type StrategyTier = 'heading' | 'heuristic' | 'recursive' | 'legacy'

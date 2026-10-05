@@ -881,8 +881,8 @@
                   </div>
                 </div>
 
-                <!-- 多轮对话。Agent 模式下 historyTurns 同样生效（session_agent_qa.go
-                     经 LoadAgentHistory 读取），所以本组不再整体按模式隐藏；开关本身仍由
+                <!-- 多轮对话。Agent 模式下 historyTurns 同样生效（后端 agent 引擎按该键
+                     装载历史轮，AgentConfigJson 缺省补 5），所以本组不再整体按模式隐藏；开关本身仍由
                      EnsureDefaults 强制开启，故只在普通模式展示。 -->
                 <div v-show="currentSection === 'conversation'" class="section">
                   <div class="section-header">

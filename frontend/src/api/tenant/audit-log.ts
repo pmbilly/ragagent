@@ -1,10 +1,10 @@
 import { get } from '@/utils/request'
 
-// AuditAction mirrors internal/types/audit_log.go's namespaced action
+// AuditAction mirrors audit/domain/AuditAction's namespaced action
 // enum. The dot prefix (`rbac.`) is deliberate — future PRs will add
 // `kb.*` / `agent.*` namespaces without a schema change, and the
 // backend already treats this column as an opaque string. Keep this
-// list in sync with types/audit_log.go.
+// list in sync with audit/domain/AuditAction.
 export type AuditAction =
   | 'rbac.member_added'
   | 'rbac.member_removed'
@@ -15,7 +15,7 @@ export type AuditAction =
 
 export type AuditOutcome = 'accepted' | 'success' | 'failed' | 'partial' | 'canceled' | 'denied'
 
-// AuditLog mirrors internal/types/audit_log.go. `details` is the JSONB
+// AuditLog mirrors audit/domain/AuditLog. `details` is the JSONB
 // blob — for role changes it carries `{"old_role":..., "new_role":...}`,
 // for access_denied it carries `{"required_role":...}`. We keep it as
 // an opaque record so future detail shapes don't need a frontend

@@ -41,8 +41,8 @@ export function useRoleLabel() {
  * never mutated by /auth/switch-tenant.
  *
  * IMPORTANT: do NOT read `authStore.tenant?.id` here. That field is the
- * *active* tenant returned by /auth/me (see internal/handler/auth.go
- * GetCurrentUser — it deliberately reflects the X-Tenant-ID override).
+ * *active* tenant returned by /auth/me (see AuthController's /auth/me —
+ * it deliberately reflects the X-Tenant-ID override).
  * After a tenant switch, `authStore.tenant.id` becomes the peer tenant
  * id; treating it as "home" makes the home badge follow the user across
  * switches and incorrectly mark whichever tenant they're currently in.

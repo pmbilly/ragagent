@@ -243,7 +243,7 @@ export async function deleteTenantAPIKey(
  * 更新空间信息（目前暴露名称、描述两个字段的编辑入口）。
  * 后端 `PUT /tenants/:id` 用指针字段区分"未传"和"显式空串"，未传的列不会
  * 被改动；这里也按需选择性传 `name` / `description`，互不影响。
- * 权限：owner（与 router.go 中的 g.Owner() 守卫保持一致）。
+ * 权限：owner（与后端租户路由的 owner 守卫保持一致，见 config/WebConfig 的 rbac 规则）。
  */
 export async function updateTenant(
   tenantId: number,

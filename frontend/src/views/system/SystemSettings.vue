@@ -339,7 +339,7 @@ const { t, tm, te, locale } = useI18n()
 
 // Friendly labels per key live in i18n (system.globalSettings.keyLabels.*).
 // Adding a new entry there must accompany every new key registered in
-// service/system_setting.go on the backend; locales without an entry
+// common/settings/SystemSettingRegistry on the backend; locales without an entry
 // fall back to the raw key so a misconfigured deploy still renders.
 function keyLabel(k: string): string {
   const path = `system.globalSettings.keyLabels.${k}`

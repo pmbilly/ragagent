@@ -3,7 +3,7 @@ export type AllowedOriginsValidationError =
   | { code: 'wildcard_prod' }
   | { code: 'invalid'; origin: string }
 
-/** Mirrors backend validateAllowedOrigins in internal/handler/embed_channel.go */
+/** Mirrors backend EmbedChannelService#validateAllowedOrigins */
 export function parseAllowedOrigins(text: string): string[] {
   return text
     .split('\n')

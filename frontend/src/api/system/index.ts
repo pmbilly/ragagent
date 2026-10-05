@@ -428,7 +428,7 @@ export async function createSystemUser(req: CreateSystemUserRequest): Promise<Cr
  * as the JSON API serialises it (no `data: ...` wrapping; see
  * utils/request.ts:97 — the axios interceptor unwraps response.data
  * project-wide). New fields here MUST also be added to backend
- * types/system_setting.go.
+ * common/settings/SystemSettingRegistry.
  *
  * `value` is typed as `unknown` because the underlying JSONB column can
  * hold an int / string / bool depending on `valueType`. Callers narrow

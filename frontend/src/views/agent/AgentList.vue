@@ -784,7 +784,7 @@ const handleOpenAgentEditor = (event: CustomEvent) => {
 
 // Refetch when the creator filter flips so the server applies the
 // predicate uniformly (also keeps built-in agents always present, see
-// the matching block in custom_agent.go).
+// the matching block in agent/management BuiltinAgentRegistry).
 watch(creatorFilter, () => {
   fetchList(true)
 })

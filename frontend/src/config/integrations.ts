@@ -4,7 +4,7 @@ export type IntegrationTab = 'im' | 'embed' | 'api'
 
 export const INTEGRATION_TABS: IntegrationTab[] = ['im', 'embed', 'api']
 
-/** Aligns with Settings.vue SECTION_MIN_ROLE.api and router.go g.Owner() on /api-principal-config. */
+/** Aligns with Settings.vue SECTION_MIN_ROLE.api and the owner guard on /api-principal-config (auth/controller/TenantAPIPrincipalController). */
 export type IntegrationTabRole = 'viewer' | 'contributor' | 'admin' | 'owner'
 
 export const INTEGRATION_TAB_MIN_ROLE: Partial<Record<IntegrationTab, IntegrationTabRole>> = {

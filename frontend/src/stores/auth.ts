@@ -114,7 +114,7 @@ export const useAuthStore = defineStore('auth', () => {
   // from localStorage on reload and is therefore tamper-prone client-side.
   // Use it ONLY to gate UI visibility (menu entries, route guards). All
   // real authorisation lives in the server-side RequireSystemAdmin
-  // middleware (see internal/middleware/rbac.go). A user who flips this
+  // checks (config/WebConfig rbac rules). A user who flips this
   // bit in DevTools will get a 403 the moment they hit a guarded endpoint.
   const isSystemAdmin = computed(() => {
     return user.value?.isSystemAdmin === true
@@ -149,7 +149,7 @@ export const useAuthStore = defineStore('auth', () => {
     const match = memberships.value.find((m) => String(m.tenantId) === tid)
     if (match?.role) return match.role
     // Cross-tenant superuser visiting a tenant they're not a member of:
-    // backend auth.go resolveTenantRole step2 grants a temporary Admin
+    // backend /auth/me role resolution grants a temporary Admin
     // role without writing tenant_members. Mirror that here so mutation
     // UIs aren't hidden in tenants the superuser switched into. Never
     // surface Owner — the backend caps the temporary grant at Admin too
@@ -162,7 +162,7 @@ export const useAuthStore = defineStore('auth', () => {
   // hasRole answers "is the current tenant role at least <min>?", used by
   // role-aware UI gating across KB / Agent / settings views. The numeric
   // ordering (viewer < contributor < admin < owner) mirrors the server-side
-  // matrix in middleware/rbac.go so a v-if here lines up with the 403 the
+  // matrix in config/WebConfig's rbac rules so a v-if here lines up with the 403 the
   // backend would return.
   //
   // SECURITY: shares the same caveat as currentTenantRole — derived from
