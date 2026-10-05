@@ -73,6 +73,8 @@ final class ImQaRunner {
                         new ReplyMessage("❌ 无法读取此附件，请重试或改用文字描述。", false, true));
                 return;
             }
+            // 附件异步入渠道绑定的知识库（后台工作，无用户可见通知；对齐 Go）
+            service.ingestAttachmentToKnowledgeBase(attach.channel(), prepared);
             boolean streamDisabled = "full".equals(attach.channel().getOutputMode());
 
             if (streamDisabled) {

@@ -56,10 +56,14 @@ final class ImAttachmentPreparer {
         this.docReaders = docReaders;
     }
 
-    /** 解析产物：给 QA 管线的附件列表 + vision 图片 URL（data URI）。 */
-    record Prepared(List<MessageAttachment> attachments, List<String> imageUrls) {
+    /** 已下载的原始文件（渠道配了知识库时异步入库；非附件消息为 null）。 */
+    record RawFile(String fileName, byte[] content) {
+    }
+
+    /** 解析产物：给 QA 管线的附件列表 + vision 图片 URL（data URI）+ 原始字节（异步入库用）。 */
+    record Prepared(List<MessageAttachment> attachments, List<String> imageUrls, RawFile raw) {
         static Prepared empty() {
-            return new Prepared(List.of(), List.of());
+            return new Prepared(List.of(), List.of(), null);
         }
     }
 
@@ -142,7 +146,7 @@ final class ImAttachmentPreparer {
                         content.length, MAX_VISION_BYTES);
             }
         }
-        return new Prepared(List.of(attachment), imageUrls);
+        return new Prepared(List.of(attachment), imageUrls, new RawFile(fileName, content));
     }
 
     /** docreader 不可用或解析失败时返回 null（只 WARN，不阻断）。 */

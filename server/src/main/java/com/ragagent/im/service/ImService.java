@@ -45,6 +45,8 @@ import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.QaQueue;
 import com.ragagent.im.runtime.ReplyMessage;
 import com.ragagent.knowledge.client.DocReaderClient;
+import com.ragagent.knowledge.service.KnowledgeService;
+import com.ragagent.knowledge.service.KnowledgeService.DuplicateKnowledgeException;
 import com.ragagent.session.domain.Session;
 import com.ragagent.session.service.MessageService;
 import com.ragagent.session.service.SessionAgentQaService;
@@ -85,6 +87,10 @@ public class ImService {
     private static final long LEADER_RENEW_MILLIS = 5_000L;
     /** 非 leader 的抢锁重试间隔（Go {@code wsLeaderRetryInterval}）。 */
     private static final long LEADER_RETRY_MILLIS = 10_000L;
+    /** 附件异步入知识库的文件扩展名白名单（Go {@code supportedKBFileExts}）。 */
+    private static final java.util.Set<String> SUPPORTED_KB_FILE_EXTS = java.util.Set.of(
+            "pdf", "txt", "docx", "doc", "md", "markdown",
+            "png", "jpg", "jpeg", "gif", "csv", "xlsx", "xls", "pptx", "ppt");
 
     final ImChannelMapper channels;
     final ChannelSessionMapper channelSessions;
@@ -117,6 +123,8 @@ public class ImService {
     final ImSessionResolver sessionResolver;
     final ImQaRequests qaRequests;
     final ImAttachmentPreparer attachmentPreparer;
+    /** 知识库创建面（渠道配了 KB 时附件异步入库；组件缺席时跳过）。 */
+    private final ObjectProvider<KnowledgeService> knowledgeServices;
 
     private final CommandRegistry cmdRegistry = new CommandRegistry();
     private final QaQueue qaQueue;
@@ -155,6 +163,7 @@ public class ImService {
             java.util.Optional<com.ragagent.storage.support.Resolver> storageResolver,
             ObjectProvider<StringRedisTemplate> redisTemplates,
             ObjectProvider<DocReaderClient> docReaders,
+            ObjectProvider<KnowledgeService> knowledgeServices,
             @Value("${im.workers:5}") int workers,
             @Value("${im.max-queue:50}") int maxQueue,
             @Value("${im.max-per-user:3}") int maxPerUser,
@@ -178,6 +187,7 @@ public class ImService {
         this.qaRequests = new ImQaRequests(this);
         this.qaRunner = new ImQaRunner(this);
         this.attachmentPreparer = new ImAttachmentPreparer(docReaders);
+        this.knowledgeServices = knowledgeServices;
         ImCommandSet.registerDefaults(this.cmdRegistry, kbLister(), knowledgeSearcher());
         ImRedisStore store = null;
         RedisPubSub pubSub = null;
@@ -551,6 +561,70 @@ public class ImService {
         if (redisStore != null) {
             redisStore.releaseLeader(leaderKey(channelId), instanceId);
         }
+    }
+
+    // ── 附件异步入库 ────────────────────────────────────────────────────────
+
+    /**
+     * 附件异步入渠道绑定的知识库（对齐 Go processDownloadedFileToKnowledgeBase）：
+     * 无用户可见通知——原始文件消息照常收到 QA 回复，入库是后台工作；
+     * 渠道未配 KB / 知识服务缺席 / 类型不在白名单 → 直接跳过。
+     */
+    void ingestAttachmentToKnowledgeBase(ImChannelEntity channel,
+            ImAttachmentPreparer.Prepared prepared) {
+        String kbId = channel.getKnowledgeBaseId();
+        if (kbId == null || kbId.isEmpty() || prepared == null || prepared.raw() == null) {
+            return;
+        }
+        ImAttachmentPreparer.RawFile raw = prepared.raw();
+        long tenantId = channel.getTenantId();
+        Thread.ofVirtual().name("im-kb-ingest-" + channel.getId()).start(() -> {
+            // 后台线程无认证上下文：显式绑渠道租户（知识库写入要求租户在上下文）
+            TenantContext.set(tenantId, new TenantContext.Principal(
+                    TenantContext.PrincipalTypes.IM_USER, "system-" + tenantId), "viewer",
+                    false, "system-" + tenantId, false);
+            try {
+                ingestAttachmentInner(kbId, channel, raw);
+            } finally {
+                TenantContext.clear();
+            }
+        });
+    }
+
+    private void ingestAttachmentInner(String kbId, ImChannelEntity channel,
+            ImAttachmentPreparer.RawFile raw) {
+        String ext = ImAttachmentPreparer.extensionOf(raw.fileName());
+        if (!SUPPORTED_KB_FILE_EXTS.contains(ext)) {
+            log.info("[IM] Unsupported file type after download: {} (file={})", ext, raw.fileName());
+            return;
+        }
+        KnowledgeService service = knowledgeServices.getIfAvailable();
+        if (service == null) {
+            return;
+        }
+        try {
+            var knowledge = service.createFromFile(kbId, raw.content(), raw.fileName(),
+                    raw.fileName(), null, imPlatformToChannel(channel.getPlatform()));
+            log.info("[IM] File saved to knowledge base: kb={} knowledge={} file={}",
+                    kbId, knowledge.getId(), raw.fileName());
+        } catch (DuplicateKnowledgeException e) {
+            log.info("[IM] File already exists in knowledge base: {}", raw.fileName());
+        } catch (RuntimeException e) {
+            log.error("[IM] Failed to create knowledge from file: {}", e.getMessage());
+        }
+    }
+
+    /** IM 平台标识 → 知识库 channel 值（与 Go imPlatformToChannel 同表）。 */
+    static String imPlatformToChannel(String platform) {
+        String p = platform == null ? "" : platform.toLowerCase(java.util.Locale.ROOT);
+        return switch (p) {
+            case "wechat" -> "wechat";
+            case "wecom", "wxwork" -> "wecom";
+            case "feishu", "lark" -> "feishu";
+            case "dingtalk" -> "dingtalk";
+            case "slack" -> "slack";
+            default -> "im";
+        };
     }
 
     private long channelTenantIdOrThrow(String channelId) {

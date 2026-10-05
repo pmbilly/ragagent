@@ -161,6 +161,9 @@ class ImAttachmentPreparerTest {
         assertEquals(2, attachment.getLineCount());
         assertFalse(attachment.isTruncated());
         assertTrue(prepared.imageUrls().isEmpty());
+        // 原始字节随产物返回（渠道配了 KB 时异步入库用）
+        assertEquals("notes.txt", prepared.raw().fileName());
+        assertEquals(adapter.content.length, prepared.raw().content().length);
     }
 
     @Test
