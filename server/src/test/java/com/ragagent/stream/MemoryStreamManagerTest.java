@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -201,5 +202,36 @@ class MemoryStreamManagerTest {
     @Test
     void deleteSteerEventOnAMissingStreamIsFalse() {
         assertFalse(manager.deleteSteerEvent("nope", "nope", "s1"));
+    }
+
+    // ── 过期清扫（Redis 键 TTL 的内存等价物） ────────────────────────────────
+
+    @Test
+    void expiredStreamsAreSweptOnTheNextWrite() throws Exception {
+        // ttl=100ms → 节流下限 100ms：250ms 后的写入触发全扫，过期流被整体删除
+        MemoryStreamManager shortTtl = new MemoryStreamManager(Duration.ofMillis(100));
+        shortTtl.appendSteerEvents("stale", "run",
+                List.of(new StreamEvent("s1", ResponseType.STEER, "queued", true)));
+
+        Thread.sleep(250);
+        shortTtl.appendEvent("fresh", "run", new StreamEvent("e1", ResponseType.ANSWER, "a", false));
+
+        // 过期流已不存在（流缺失时更新返回 false；本场景若流还在，事件就在、会返回 true）
+        assertFalse(shortTtl.updateSteerEventData("stale", "run", "s1", Map.of("consumed", true)));
+        // 同一轮清扫不误伤新写入的流
+        assertEquals(1, shortTtl.getEvents("fresh", "run", 0).events().size());
+    }
+
+    @Test
+    void streamsWithinTtlSurviveTheSweep() throws Exception {
+        // ttl=300ms → 节流 150ms：200ms 后的写入触发全扫，但 live 仍在窗口内
+        MemoryStreamManager shortTtl = new MemoryStreamManager(Duration.ofMillis(300));
+        shortTtl.appendSteerEvents("live", "run",
+                List.of(new StreamEvent("s1", ResponseType.STEER, "queued", true)));
+
+        Thread.sleep(200);
+        shortTtl.appendEvent("other", "run", new StreamEvent("e1", ResponseType.ANSWER, "a", false));
+
+        assertTrue(shortTtl.updateSteerEventData("live", "run", "s1", Map.of("consumed", true)));
     }
 }

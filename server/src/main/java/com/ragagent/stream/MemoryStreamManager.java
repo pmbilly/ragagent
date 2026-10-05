@@ -1,5 +1,6 @@
 package com.ragagent.stream;
 
+import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -16,6 +18,12 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * <p><b>只适合单副本部署</b>：live-run 标记是本进程的 map，多副本下
  * {@code /steer} 会被路由到没有这一轮的副本。此时应经
  * {@code STREAM_MANAGER_TYPE=redis} 切到 {@link RedisStreamManager}。</p>
+ *
+ * <p><b>过期清理（Redis 键 TTL 的内存等价物）</b>：写入路径按 {@code ttl/2}
+ * （下限 100ms）节流触发一次全扫，删除 {@code lastUpdated} 超过 {@code ttl} 的流，
+ * 避免长期运行的实例无限累积；ttl 与 Redis 后端同源
+ * （{@code weknora.stream.ttl}，默认 1h）。live-run 标记是「当前生成中」的短命状态，
+ * 正常流程显式清除，不参与清扫。</p>
  *
  * <p>锁结构：外层一把读写锁护住两张表（streams / liveRuns），
  * 每条流自己一把读写锁护住事件列表。加锁顺序恒为「先外后内」。</p>
@@ -26,7 +34,7 @@ public class MemoryStreamManager implements StreamManager {
     private static final class StreamData {
         final List<StreamEvent> events = new ArrayList<>();
         final List<StreamEvent> steerEvents = new ArrayList<>();
-        /** 最后写入时刻。当前无人读取（留给将来的清理任务）。 */
+        /** 最后写入时刻；过期清扫据此判定（见类注释）。 */
         volatile OffsetDateTime lastUpdated = OffsetDateTime.now();
         final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     }
@@ -40,6 +48,27 @@ public class MemoryStreamManager implements StreamManager {
     /** sessionId -> 当前生成中的一轮 */
     private final Map<String, LiveRunMarker> liveRuns = new HashMap<>();
     private final ReentrantReadWriteLock mu = new ReentrantReadWriteLock();
+
+    /** 流的过期阈值（与 Redis 后端的键 TTL 同源）。 */
+    private final Duration ttl;
+    /** 两次全扫的最小间隔（写入路径节流）。 */
+    private final long sweepIntervalNanos;
+    /** 上次全扫时刻（{@link System#nanoTime()} 基准）。 */
+    private volatile long lastSweepNanos = System.nanoTime();
+    /** 同一时刻只允许一个线程执行全扫。 */
+    private final AtomicBoolean sweeping = new AtomicBoolean();
+
+    /** 默认 1h 过期（与 application.yml 的 {@code weknora.stream.ttl} 默认一致）。 */
+    public MemoryStreamManager() {
+        this(Duration.ofHours(1));
+    }
+
+    public MemoryStreamManager(Duration ttl) {
+        this.ttl = (ttl == null || ttl.isZero() || ttl.isNegative())
+                ? Duration.ofHours(1) : ttl;
+        this.sweepIntervalNanos = Math.max(this.ttl.dividedBy(2).toNanos(),
+                Duration.ofMillis(100).toNanos());
+    }
 
     // ── 内部取用 ────────────────────────────────────────────────────────────
 
@@ -63,10 +92,48 @@ public class MemoryStreamManager implements StreamManager {
         }
     }
 
+    // ── 过期清扫（Redis 键 TTL 的内存等价物） ────────────────────────────────
+
+    /** 节流触发全扫；间隔不足 {@code ttl/2} 或已有线程在扫时直接返回。 */
+    private void maybeSweep() {
+        long now = System.nanoTime();
+        if (now - lastSweepNanos < sweepIntervalNanos) {
+            return;
+        }
+        if (!sweeping.compareAndSet(false, true)) {
+            return;
+        }
+        try {
+            lastSweepNanos = now;
+            sweepExpired();
+        } finally {
+            sweeping.set(false);
+        }
+    }
+
+    /** 全扫：删除 {@code lastUpdated} 超过 ttl 的流（清空后的会话条目一并移除）。 */
+    private void sweepExpired() {
+        OffsetDateTime cutoff = OffsetDateTime.now().minus(ttl);
+        mu.writeLock().lock();
+        try {
+            var it = streams.entrySet().iterator();
+            while (it.hasNext()) {
+                Map<String, StreamData> sessionMap = it.next().getValue();
+                sessionMap.entrySet().removeIf(e -> e.getValue().lastUpdated.isBefore(cutoff));
+                if (sessionMap.isEmpty()) {
+                    it.remove();
+                }
+            }
+        } finally {
+            mu.writeLock().unlock();
+        }
+    }
+
     // ── 事件流 ──────────────────────────────────────────────────────────────
 
     @Override
     public void appendEvent(String sessionId, String messageId, StreamEvent event) {
+        maybeSweep();
         StreamData stream = getOrCreateStream(sessionId, messageId);
         stream.lock.writeLock().lock();
         try {
@@ -109,6 +176,7 @@ public class MemoryStreamManager implements StreamManager {
 
     @Override
     public void appendSteerEvents(String sessionId, String messageId, List<StreamEvent> events) {
+        maybeSweep();
         StreamData stream = getOrCreateStream(sessionId, messageId);
         stream.lock.writeLock().lock();
         try {

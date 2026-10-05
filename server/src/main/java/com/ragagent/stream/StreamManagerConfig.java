@@ -20,7 +20,8 @@ public class StreamManagerConfig {
     @Bean
     public StreamManager streamManager(StreamProperties props, ObjectProvider<StringRedisTemplate> templates) {
         if (!props.useRedis()) {
-            return new MemoryStreamManager();
+            // 过期清理的 ttl 与 Redis 后端同源（内存后端没有键 TTL，惰性清扫模拟它）
+            return new MemoryStreamManager(props.ttl());
         }
         StringRedisTemplate template = templates.getIfAvailable();
         if (template == null) {
