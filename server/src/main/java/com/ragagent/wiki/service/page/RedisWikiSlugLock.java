@@ -3,6 +3,7 @@ package com.ragagent.wiki.service.page;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +75,7 @@ public class RedisWikiSlugLock implements WikiSlugLock {
                 return true;
             }
             if (Boolean.TRUE.equals(ok)) {
-                tokens.set(token);
+                tokens.get().put(key, token);
                 return true;
             }
             if (System.currentTimeMillis() >= deadline) {
@@ -93,13 +94,13 @@ public class RedisWikiSlugLock implements WikiSlugLock {
 
     @Override
     public void unlock(String kbId, String slug) {
-        String token = tokens.get();
-        tokens.remove();
+        String key = WikiSlugLock.lockKey(kbId, slug);
+        String token = tokens.get().remove(key);
         if (token == null) {
             return;
         }
         try {
-            List<String> keys = Collections.singletonList(WikiSlugLock.lockKey(kbId, slug));
+            List<String> keys = Collections.singletonList(key);
             template.execute(UNLOCK_SCRIPT, keys, token);
         } catch (RuntimeException e) {
             // 释放失败只会让锁自然过期（最多 TTL），不需要让调用方感知
@@ -107,6 +108,10 @@ public class RedisWikiSlugLock implements WikiSlugLock {
         }
     }
 
-    /** 本次线程写入锁的 token（供解锁脚本比对，避免误删他人锁） */
-    private final ThreadLocal<String> tokens = new ThreadLocal<>();
+    /**
+     * 本线程写入锁的 token，<b>按锁键记账</b>（供解锁脚本比对，避免误删他人锁）。
+     * 按锁键而非单值：同一线程先后/交叉持有多把不同的锁时互不覆盖。
+     */
+    private final ThreadLocal<Map<String, String>> tokens =
+            ThreadLocal.withInitial(java.util.HashMap::new);
 }

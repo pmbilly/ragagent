@@ -68,6 +68,12 @@ weknora:
     prefix: ${REDIS_PREFIX:}              # 原样使用，不去尾冒号（.env 的 "stream:" 会拼出双冒号，与 Go 一致）
     ttl: 1h                               # Go 工厂硬编码 time.Hour
 
+# wiki 域 Redis 面（多实例部署打开；缺省 false = 四个协调端口全走进程内实现，
+# 单实例语义与接线前完全一致）。打开 = slug 锁 / finalize 锁 / 身份认领 /
+# 在途限流器 全部走 Redis；启动时 ping 一次，连不上则启动失败（不静默退化）。
+wiki:
+  redis-enabled: ${WIKI_REDIS_ENABLED:false}
+
 # ---- 以下为 Go config.yaml 的业务配置键（翻译对应模块时逐个启用）----
 conversation:
   max-rounds: 5

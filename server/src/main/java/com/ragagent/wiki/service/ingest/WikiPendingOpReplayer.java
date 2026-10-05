@@ -23,8 +23,8 @@ import org.springframework.stereotype.Component;
  * 与请求侧<b>完全相同</b>的 {@link WikiIngestService#enqueueWikiIngestTrigger} 触发
  * （自带 30 秒防抖与 TaskID 合并），批次随后按正常路径处理并结算这些 op。</p>
  *
- * <p><b>仅 Lite</b>：判据用 {@link WikiIngestService#isLiteMode()}（在途限流器是否为进程内实现）
- * ——有 Redis 级协调的部署里，队列自身会重投，重放反而是多余的重复触发。</p>
+ * <p><b>仅进程内队列</b>：判据用 {@link WikiIngestService#isQueueInProcess()}
+ * ——换成持久化队列后队列自带重投，重放反而是多余的重复触发。</p>
  *
  * <p>幂等性：op 未被删除前每轮启动都会再触发一次，但触发只是「让批次去看这个 KB」，
  * 批次按 op 行处理、处理后删除行——重复触发只会让后到者看到空队列而空转。</p>
@@ -44,8 +44,8 @@ public class WikiPendingOpReplayer {
 
     @EventListener(ApplicationReadyEvent.class)
     public void replayOrphanOps() {
-        if (!ingestService.isLiteMode()) {
-            log.debug("wiki orphan replay: skipped (distributed coordination in place)");
+        if (!ingestService.isQueueInProcess()) {
+            log.debug("wiki orphan replay: skipped (durable queue in place)");
             return;
         }
         List<String> kbIds;

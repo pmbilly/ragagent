@@ -239,10 +239,28 @@ public class WikiIngestService implements WikiIngestPort {
      * 是否处于 "Lite 模式"（没有跨进程协调）。
      *
      * <p>以"在途限流器是否为进程内实现"为判据——进程内实现意味着
-     * 没有 Redis 级别的共享协调。</p>
+     * 没有 Redis 级别的共享协调（判据等价于 {@code wiki.redis-enabled}
+     * 未打开：slug 锁 / finalize 锁 / 身份认领 / 在途限流器四面同开关，
+     * 见 {@code com.ragagent.wiki.WikiRedisWiring}）。</p>
+     *
+     * <p>本判据只影响批次入口的路径选择（Lite 锁 + peek vs
+     * Standard 认领，见 {@code WikiIngestRunSupport}）；
+     * <b>启动重放</b>的判据是 {@link #isQueueInProcess()}，不是本方法——
+     * 重放补偿的是"队列重启即丢"，与锁族是否 Redis 无关。</p>
      */
     public boolean isLiteMode() {
         return inflightLimiter instanceof InProcessWikiInflightLimiter;
+    }
+
+    /**
+     * 任务队列是否为「重启即丢」的进程内实现。
+     *
+     * <p>供 {@link WikiPendingOpReplayer} 作启动重放判据：只有队列不持久
+     * （{@link InProcessWikiIngestTaskQueue}）时才需要重放数据库里的孤儿 op；
+     * 换成持久化队列后队列自带重投，重放反而是多余的重复触发。</p>
+     */
+    public boolean isQueueInProcess() {
+        return taskQueue.getIfAvailable() instanceof InProcessWikiIngestTaskQueue;
     }
 
     /**
