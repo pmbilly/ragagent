@@ -24,4 +24,10 @@ public final class ImRedisKeys {
 
     /** + userKey——userKey → {@code sessionId:messageId} 的在途映射（Go {@code RedisKeyInflight}）。 */
     public static final String INFLIGHT_PREFIX = "im:inflight:";
+
+    /** + messageID——消息去重标记（Go {@code RedisKeyDedup}）。 */
+    public static final String DEDUP_PREFIX = "im:dedup:";
+
+    /** + 限流 key——滑动窗口计数（Go {@code RedisKeyRateLimit}）。 */
+    public static final String RATE_LIMIT_PREFIX = "im:ratelimit:";
 }

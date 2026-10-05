@@ -73,6 +73,25 @@ class ImRedisStoreTest {
     }
 
     @Test
+    void dedupSetIfAbsentIsOneShot() {
+        String key = ImRedisKeys.DEDUP_PREFIX + "m-1";
+        assertEquals(Boolean.TRUE, store.setIfAbsent(key, "1", 300), "首次写入");
+        assertEquals(Boolean.FALSE, store.setIfAbsent(key, "1", 300), "重复消息被拒");
+        Long ttl = redis.template().getExpire(key);
+        assertNotNull(ttl);
+        assertTrue(ttl > 0, "去重标记应带 TTL");
+    }
+
+    @Test
+    void slidingWindowRateLimitBlocksBeyondBudget() {
+        String key = ImRedisKeys.RATE_LIMIT_PREFIX + "rl:ch:u";
+        assertEquals(Boolean.TRUE, store.rateLimitAllow(key, 60, 2));
+        assertEquals(Boolean.TRUE, store.rateLimitAllow(key, 60, 2));
+        assertEquals(Boolean.FALSE, store.rateLimitAllow(key, 60, 2), "第三次超预算");
+        assertEquals(Boolean.TRUE, store.rateLimitAllow(key, 60, 3), "预算变化按新值判定");
+    }
+
+    @Test
     void inflightMappingRoundTrip() {
         String userKey = "ch-1:u1:chat-1:";
         assertNull(store.loadInflight(userKey), "无映射");

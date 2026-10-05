@@ -38,7 +38,34 @@ public class ImRedisStore implements QaQueue.RedisPort {
     private static final RedisScript<Long> GLOBAL_GATE =
             new DefaultRedisScript<>(GLOBAL_GATE_LUA, Long.class);
 
+    /**
+     * 滑动窗口限流（对齐 Go internal/ratelimit 的脚本）：清过期成员 → 判数量 →
+     * 未满则记录本次。KEYS[1]=计数键；ARGV[1]=now 毫秒；ARGV[2]=窗口毫秒；ARGV[3]=上限；
+     * ARGV[4]=成员。放行返回 1，超限返回 0。
+     */
+    private static final String RATE_LIMIT_LUA = """
+            local key = KEYS[1]
+            local now = tonumber(ARGV[1])
+            local window = tonumber(ARGV[2])
+            local maxReq = tonumber(ARGV[3])
+            local member = ARGV[4]
+            redis.call('ZREMRANGEBYSCORE', key, 0, now - window)
+            local count = redis.call('ZCARD', key)
+            if count < maxReq then
+              redis.call('ZADD', key, now, member)
+              redis.call('PEXPIRE', key, window + 1000)
+              return 1
+            end
+            return 0
+            """;
+
+    private static final RedisScript<Long> RATE_LIMIT =
+            new DefaultRedisScript<>(RATE_LIMIT_LUA, Long.class);
+
     private final StringRedisTemplate template;
+    /** 限流成员序号：防同一毫秒多次命中共用 ZSET 成员（Go 用 instanceID+毫秒）。 */
+    private final java.util.concurrent.atomic.AtomicLong rateLimitSeq =
+            new java.util.concurrent.atomic.AtomicLong();
 
     public ImRedisStore(StringRedisTemplate template) {
         this.template = template;
@@ -142,5 +169,43 @@ public class ImRedisStore implements QaQueue.RedisPort {
             return null;
         }
         return new String[]{val.substring(0, sep), val.substring(sep + 1)};
+    }
+
+    // ── 消息入口面（去重 / 限流） ────────────────────────────────────────────
+
+    /**
+     * 去重标记：SET NX EX。新写入返回 true，已存在返回 false；
+     * Redis 故障返回 null（调用方按 fail-closed 处理——宁可丢一条可重发的，也不重复跑 LLM）。
+     */
+    public Boolean setIfAbsent(String key, String value, int ttlSeconds) {
+        try {
+            return Boolean.TRUE.equals(template.opsForValue()
+                    .setIfAbsent(key, value, Duration.ofSeconds(ttlSeconds)));
+        } catch (DataAccessException e) {
+            log.warn("[IM] Redis SETNX failed for {}: {}", key, e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 滑动窗口限流：放行返回 true，超限返回 false，Redis 故障返回 null
+     * （调用方回落到进程内滑窗）。
+     */
+    public Boolean rateLimitAllow(String key, long windowSeconds, int maxRequests) {
+        if (maxRequests <= 0) {
+            return true;
+        }
+        long nowMs = System.currentTimeMillis();
+        long windowMs = Math.max(windowSeconds, 1) * 1000L;
+        String member = nowMs + "-" + rateLimitSeq.incrementAndGet();
+        try {
+            Long result = template.execute(RATE_LIMIT, List.of(key),
+                    String.valueOf(nowMs), String.valueOf(windowMs),
+                    String.valueOf(maxRequests), member);
+            return result == null || result == 1L;
+        } catch (DataAccessException e) {
+            log.warn("[IM] Redis rate limit failed for {}: {}", key, e.getMessage());
+            return null;
+        }
     }
 }

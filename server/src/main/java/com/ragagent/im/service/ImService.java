@@ -33,6 +33,7 @@ import com.ragagent.im.runtime.Commands.CommandRegistry;
 import com.ragagent.im.runtime.Commands.CommandResult;
 import com.ragagent.im.runtime.ImCommandSet;
 import com.ragagent.im.runtime.ImFormat;
+import com.ragagent.im.runtime.ImRedisKeys;
 import com.ragagent.im.runtime.ImRedisStore;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.QaQueue;
@@ -70,6 +71,8 @@ public class ImService {
     private static final int STOP_MARKER_TTL_SECONDS = 30;
     /** 跨实例在途映射的 TTL（Go 的 storeInflightMapping 硬编码 10 分钟）。 */
     private static final int INFLIGHT_TTL_SECONDS = 600;
+    /** 消息去重标记的 TTL（Go {@code dedupTTL}）。 */
+    private static final int DEDUP_TTL_SECONDS = 300;
 
     final ImChannelMapper channels;
     final ChannelSessionMapper channelSessions;
@@ -339,8 +342,20 @@ public class ImService {
 
     // ── 消息入口 ─────────────────────────────────────────────────────────
 
-    /** 同一 messageID 只处理一次（进程内 map）。 */
+    /**
+     * 同一 messageID 只处理一次：Redis 接入时走跨实例 SETNX（故障 fail-closed——
+     * 宁可丢一条可重发的，也不重复跑一轮 LLM）；未接入时回落到进程内 map。
+     */
     boolean isDuplicate(String messageId) {
+        if (redisStore != null) {
+            Boolean first = redisStore.setIfAbsent(ImRedisKeys.DEDUP_PREFIX + messageId, "1",
+                    DEDUP_TTL_SECONDS);
+            if (first == null) {
+                log.error("[IM] Redis dedup failed (fail-closed, message dropped): {}", messageId);
+                return true;
+            }
+            return !first;
+        }
         long now = System.currentTimeMillis();
         Long prev = processedMsgs.putIfAbsent(messageId, now);
         if (prev != null) {
@@ -480,10 +495,18 @@ public class ImService {
         }
     }
 
-    /** 限流的本地滑动窗口。 */
+    /** 限流的本地滑动窗口（Redis 故障时回落）。 */
     private final Map<String, List<Long>> rateWindows = new ConcurrentHashMap<>();
 
     private boolean rateLimitAllow(String key) {
+        if (redisStore != null) {
+            Boolean allowed = redisStore.rateLimitAllow(ImRedisKeys.RATE_LIMIT_PREFIX + key,
+                    rateLimitWindowSec, rateLimitMax);
+            if (allowed != null) {
+                return allowed;
+            }
+            // Redis 故障 → 回落本地滑窗（对齐 Go 的 local fallback）
+        }
         long now = System.currentTimeMillis();
         long windowMs = rateLimitWindowSec * 1000L;
         List<Long> hits = rateWindows.computeIfAbsent(key, k -> java.util.Collections.synchronizedList(new ArrayList<>()));
