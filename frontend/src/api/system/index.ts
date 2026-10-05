@@ -4,7 +4,7 @@ import type { CreatedTenantAPIKey, TenantAPIKey, TenantAPIKeyCapability } from '
 export interface CreatePlatformAPIKeyPayload {
   name: string
   capabilities: TenantAPIKeyCapability[]
-  expires_at_unix?: number
+  expiresAtUnix?: number
 }
 
 export async function listPlatformAPIKeys(): Promise<TenantAPIKey[]> {

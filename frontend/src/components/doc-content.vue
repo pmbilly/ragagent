@@ -550,7 +550,7 @@ const viewMode = ref<'chunks' | 'merged' | 'preview'>('merged');
 /**
  * 把已合并文本 acc 和下一个 chunk 内容 next 拼接，并去除两者的重叠部分。
  *
- * 不再依赖 start_at / end_at 做位置裁剪，而是用「文本重叠匹配」：在 next 的
+ * 不再依赖 startAt / endAt 做位置裁剪，而是用「文本重叠匹配」：在 next 的
  * 开头窗口里找 acc 后缀首次出现的位置，从该位置之后接上。这样能同时兼容：
  *  1. chunker 给拆分表格补写的表头（零宽 start/end，位置上不可见）——表头出现
  *     在重叠行之前，会被自然跳过；
@@ -587,12 +587,12 @@ const appendChunkContent = (acc: string, next: string, positionOverlap: number):
 };
 
 /**
- * 合并分块内容，还原完整文档。chunks 按 start_at 排序后逐段用文本重叠匹配拼接。
+ * 合并分块内容，还原完整文档。chunks 按 startAt 排序后逐段用文本重叠匹配拼接。
  */
 const mergeChunks = (chunks: any[]): string => {
   if (!chunks || chunks.length === 0) return '';
 
-  // 按 start_at 排序
+  // 按 startAt 排序
   const sortedChunks = [...chunks].sort((a, b) => {
     const startA = a.startAt ?? a.chunkIndex ?? 0;
     const startB = b.startAt ?? b.chunkIndex ?? 0;
@@ -600,12 +600,12 @@ const mergeChunks = (chunks: any[]): string => {
   });
 
   let merged = sortedChunks[0].content || '';
-  let mergedEnd = sortedChunks[0].end_at ?? 0;
+  let mergedEnd = sortedChunks[0].endAt ?? 0;
 
   for (let i = 1; i < sortedChunks.length; i++) {
     const currentChunk = sortedChunks[i];
-    const currentStartAt = currentChunk.start_at ?? 0;
-    const currentEndAt = currentChunk.end_at ?? 0;
+    const currentStartAt = currentChunk.startAt ?? 0;
+    const currentEndAt = currentChunk.endAt ?? 0;
     const currentContent = currentChunk.content || '';
 
     if (!currentContent) continue;
@@ -1058,7 +1058,7 @@ const getChunkMeta = (item: any) => {
 interface GeneratedQuestion {
   id: string;
   question: string;
-  content_revision?: number;
+  contentRevision?: number;
 }
 
 // 解析生成的问题
@@ -1087,7 +1087,7 @@ const hasStaleGeneratedQuestions = (item: any) => {
     const metadata = typeof item.metadata === 'string' ? JSON.parse(item.metadata || '{}') : (item.metadata || {});
     const fallbackRevision = metadata.generated_questions_revision || 0;
     const currentRevision = item.contentRevision || 0;
-    return questions.some((question) => (question.content_revision ?? fallbackRevision) !== currentRevision);
+    return questions.some((question) => (question.contentRevision ?? fallbackRevision) !== currentRevision);
   } catch {
     return false;
   }
@@ -1169,7 +1169,7 @@ const saveChunkEdit = async (item: any) => {
   try {
     const result: any = await updateDocumentChunk(props.details.id, item.id, {
       content: chunkDraft.value,
-      expected_revision: item.contentRevision || 0,
+      expectedRevision: item.contentRevision || 0,
     });
     editingChunkId.value = '';
     notifyChunkMutationOutcome(item, result, t('common.saveSuccess'));
@@ -1185,8 +1185,8 @@ const toggleChunkEnabled = async (item: any, isEnabled: boolean) => {
   chunkStatusLoading.value = item.id;
   try {
     const result: any = await updateDocumentChunk(props.details.id, item.id, {
-      is_enabled: isEnabled,
-      expected_revision: item.contentRevision || 0,
+      enabled: isEnabled,
+      expectedRevision: item.contentRevision || 0,
     });
     notifyChunkMutationOutcome(item, result);
     void refreshChunkHistoryAfterMutation(item);
@@ -1200,7 +1200,7 @@ const toggleChunkEnabled = async (item: any, isEnabled: boolean) => {
 const retryChunkIndex = async (item: any) => {
   try {
     const result: any = await updateDocumentChunk(props.details.id, item.id, {
-      expected_revision: item.contentRevision || 0,
+      expectedRevision: item.contentRevision || 0,
     });
     Object.assign(item, result.chunk);
     if (item.indexStatus === 'failed') throw new Error(t('knowledgeBase.indexFailed'));
@@ -2026,7 +2026,7 @@ const handleChunkPageChange = (pageInfo: { current: number }) => {
                                   <span>{{ $t('knowledgeBase.chunkHistory') }}</span>
                                 </div>
                                 <div class="chunk-history-current">
-                                  v{{ chunk.original.content_revision || 0 }} · {{ $t('knowledgeBase.currentVersion') }} ·
+                                  v{{ chunk.original.contentRevision || 0 }} · {{ $t('knowledgeBase.currentVersion') }} ·
                                   {{ chunk.original.enabled ? $t('knowledgeBase.enabledStatus') : $t('knowledgeBase.disabledStatus') }}
                                 </div>
                               </div>
@@ -2065,7 +2065,7 @@ const handleChunkPageChange = (pageInfo: { current: number }) => {
                                   <div class="chunk-history-diff-head">
                                     <span>{{ $t('knowledgeBase.compareRevisionWithCurrent', {
                                       revision: revision.revision,
-                                      current: chunk.original.content_revision || 0,
+                                      current: chunk.original.contentRevision || 0,
                                     }) }}</span>
                                     <t-popconfirm theme="warning"
                                       :content="$t('knowledgeBase.revertRevisionConfirm', { revision: revision.revision })"

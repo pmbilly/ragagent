@@ -501,7 +501,7 @@ const handleFabriText = async () => {
   try {
     const response = await fabriText({
       tags: localGraphExtract.value.tags,
-      model_id: props.modelId
+      modelId: props.modelId
     })
     localGraphExtract.value.text = response.text || ''
     handleTextChange()
@@ -531,7 +531,7 @@ const handleExtract = async () => {
     const response = await extractTextRelations({
       text: localGraphExtract.value.text,
       tags: localGraphExtract.value.tags,
-      model_id: props.modelId
+      modelId: props.modelId
     })
     localGraphExtract.value.nodes = response.nodes || []
     localGraphExtract.value.relations = response.relations || []

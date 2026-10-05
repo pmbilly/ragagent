@@ -1132,7 +1132,7 @@ function initFromKbInfo(kb: any) {
         attributes: node.attributes || [],
       })),
       relations: kb.extractConfig?.relations || [],
-      customInstructions: kb.extractConfig?.custom_instructions || '',
+      customInstructions: kb.extractConfig?.customInstructions || '',
     },
     graphEnabled: kb.indexingStrategy?.graphEnabled ?? false,
     pdfForceScanned: false,

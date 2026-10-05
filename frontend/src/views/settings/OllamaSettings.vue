@@ -163,7 +163,7 @@
             <div class="model-name">{{ model.name }}</div>
             <div class="model-meta">
               <span class="model-size">{{ formatSize(model.size) }}</span>
-              <span class="model-modified">{{ formatDate(model.modified_at) }}</span>
+              <span class="model-modified">{{ formatDate(model.modifiedAt) }}</span>
             </div>
           </div>
         </div>

@@ -182,10 +182,9 @@ test('api 面时间键：`*_at` 一律 camel（防 snake 读到 undefined）', (
   //
   // 白名单是「按面」而不是漏检，每条都要写明理由：
   const whitelist: Record<string, string> = {
-    'api/chat/index.ts': 'SSE 事件本地游标（data.created_at 是事件协议键，注释已声明）',
+    'api/chat/index.ts': '本地游标形参名（线上参数是 beforeTime，@RequestParam camel；注释已声明）',
     'api/chat/streame.ts': 'TTFB 调试日志字段（非契约键）',
     'api/system/index.ts': '系统设置键 + 沙箱/任务引擎直出载荷（§15.2 纪律：不换）',
-    'api/initialization/index.ts': 'Ollama 第三方响应字段 modified_at（对端 API 契约）',
   }
   const SNAKE_AT = /(?<![A-Za-z0-9_])([a-z][a-z0-9]*(?:_[a-z0-9]+)*_at)(?![A-Za-z0-9_])/g
   const targets = walk(join(SRC, 'api')).filter(
@@ -394,9 +393,8 @@ test('api 面 snake 记号棘轮：只许减不许增', () => {
   //   · 13 键保留为「已核实合法」（下方 BASELINE，每条写明判定依据）。
   // 口径：新增一处 snake 即红；清理一处后从 BASELINE 删除（只许减）；基线条目消失会报过期。
   const FACE_WHITELIST: Record<string, string> = {
-    'api/chat/': 'SSE/事件载荷与本地游标（事件协议面）',
-    'api/system/index.ts': '系统设置键 + 沙箱/任务引擎直出载荷（§15.2：不换）',
-    'api/initialization/index.ts': 'Ollama 第三方响应（对端键名）',
+    'api/chat/': 'SSE/事件载荷与本地游标（事件协议面；agent-chat 同时是对外文档化 API，见 B72 设计稿）',
+    'api/system/index.ts': '系统设置 KV + 沙箱/任务引擎直出载荷（§15.2 纪律：冻结面不换；expires_at_unix 已于 B72 修 camel）',
     'api/retrieval.ts': '检索参数设置键（系统设置面）',
     'api/model/modelUsage.ts': '后端 putObject 亲手构造的 snake 载荷（前后端一致）',
   }
@@ -414,6 +412,19 @@ test('api 面 snake 记号棘轮：只许减不许增', () => {
     'api/knowledge-base/index.ts:tag_ids': '已核实：列表筛选查询参数（后端按 snake 接收）',
     'api/knowledge-base/index.ts:start_time': '已核实：同上',
     'api/knowledge-base/index.ts:end_time': '已核实：同上',
+    // —— B72 收口：api/initialization 移出整面白名单，余量逐条登记（均为 testMultimodalFunction
+    //    的本地入参键，发送前逐一映射为 camel form 字段；InitializationController @RequestParam 全 camel）
+    'api/initialization/index.ts:vlm_model': '已核实：多模态联调本地入参键（映射 vlmModel form 字段）',
+    'api/initialization/index.ts:storage_type': '已核实：同上（映射 storageType）',
+    'api/initialization/index.ts:cos_secret_id': '已核实：同上（映射 cosSecretId）',
+    'api/initialization/index.ts:cos_secret_key': '已核实：同上（映射 cosSecretKey）',
+    'api/initialization/index.ts:cos_region': '已核实：同上（映射 cosRegion）',
+    'api/initialization/index.ts:cos_bucket_name': '已核实：同上（映射 cosBucketName）',
+    'api/initialization/index.ts:cos_app_id': '已核实：同上（映射 cosAppId）',
+    'api/initialization/index.ts:cos_path_prefix': '已核实：同上（映射 cosPathPrefix）',
+    'api/initialization/index.ts:minio_path_prefix': '已核实：同上（映射 minioPathPrefix）',
+    'api/initialization/index.ts:chunk_size': '已核实：同上（映射 chunkSize）',
+    'api/initialization/index.ts:chunk_overlap': '已核实：同上（映射 chunkOverlap）',
   }
   const stripStrings = (line: string): string => line.replace(/'[^']*'|"[^"]*"|`[^`]*`/g, '""')
   // 不锚定行首：行内对象字面量（`{ some_key: 1 }`）也要抓（初版锚定行首，红态探针漏检）
@@ -456,4 +467,47 @@ test('api 面 snake 记号棘轮：只许减不许增', () => {
         + stale.map((k) => `    ${k}（原理由：${BASELINE[k]}）`).join('\n'),
     )
   }
+})
+
+test('B72 回归钉：DRIFT 修复面不得回流 snake（chunk 编辑/FAQ 标签/上传回显/图谱提取/Ollama 列表）', () => {
+  // 2026-10-05 全量排查（B72）修掉的 9 条「前端读/写 snake、后端发/收 camel」失配。
+  // 后端 Jackson FAIL_ON_UNKNOWN=off，键名失配不报错、字段静默丢 —— 本用例钉住修复面防回流。
+  const forbid = (rel: string, re: RegExp, why: string) => {
+    assert.doesNotMatch(readFileSync(join(SRC, rel), 'utf8'), re, `${rel}: ${why}`)
+  }
+  const require = (rel: string, re: RegExp, why: string) => {
+    assert.match(readFileSync(join(SRC, rel), 'utf8'), re, `${rel}: ${why}`)
+  }
+
+  // ① chunk 编辑面：UpdateChunkRequest = record(content, enabled, expectedRevision)，camel 绑定零注解；
+  //    ChunkResponse 下发 startAt/endAt/contentRevision。is_enabled/expected_revision 曾把启用开关
+  //    和乐观锁静默打失效；start_at/end_at 曾让合并预览的间隙检测恒不触发。
+  forbid('components/doc-content.vue', /\b(expected_revision|is_enabled|content_revision|start_at|end_at)\b/,
+    'chunk 面一律 camel：expectedRevision/enabled/contentRevision/startAt/endAt')
+  // ② FAQ 标签：KnowledgeTagResponse.seqId（camel record；对照 KbTagManageDrawer.vue 的读法）
+  forbid('views/knowledge/components/FAQEntryManager.vue', /\bseq_id\b/,
+    '标签序号读 seqId（snake 曾让标签恒显「未分类」、选择器 value 变 undefined）')
+  // ③ 上传回显：KB 配置面内层键是 camel（ChunkExtractService 读 customInstructions）；
+  //    覆盖面写侧的 custom_instructions（buildProcessOverrides）是冻结面，不在本钉范围。
+  forbid('views/knowledge/components/UploadConfirmDialog.vue', /extractConfig\?\.\s*custom_instructions/,
+    'kb.extractConfig 是 KB 配置面（camel），只有覆盖面写侧才用 snake')
+  // ④ 图谱提取/Ollama 列表/联调计时：后端读 "modelId"（空即 400）、出站 modifiedAt/processingTime
+  forbid('api/initialization/index.ts', /\b(model_id|modified_at|processing_time)\b/,
+    'initialization 面契约键 camel：modelId/modifiedAt/processingTime')
+  forbid('views/knowledge/settings/GraphSettings.vue', /\bmodel_id\b/,
+    'fabriText/extractTextRelations 请求体用 modelId（snake 曾让两个按钮必 400）')
+  forbid('views/settings/OllamaSettings.vue', /\bmodified_at\b/,
+    'OllamaManageService 出站键已是 modifiedAt（snake 只存在于 Ollama→后端入站段）')
+  // ⑤ 平台 API Key 有效期：PlatformAPIKeyCreateRequest.expiresAtUnix（潜伏断链）
+  forbid('api/system/index.ts', /\bexpires_at_unix\b/, '平台 API Key 创建载荷用 expiresAtUnix')
+  // ⑥ SSE 死读：后端无任何事件发平名 created_at —— agent_query 的时间键是
+  //    user_created_at/assistant_created_at（QaSseOrchestrator，冻结协议键），
+  //    agent_query 的绑定走 bindServerTurnTimestamps；user_message_injected 无时间键。
+  forbid('composables/useChatStreamHandler.ts', /data\.created_at/,
+    'SSE 载荷无平名 created_at（读到的恒 undefined）')
+  require('utils/messageTimestamp.ts', /payload\.assistant_created_at/,
+    'assistant 时间读 assistant_created_at（冻结协议键，别顺手 camelCase）')
+  // ⑦ 集成页请求预览串必须与实发一致（后端 QaRequests 全 camel）
+  forbid('views/integrations/ApiIntegrationSettings.vue', /agent_enabled:/,
+    '预览串与实发一致：agentEnabled/agentId（照抄旧预览会写出 agent 模式失效的请求）')
 })

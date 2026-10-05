@@ -588,7 +588,6 @@ export function useChatStreamHandler(options: UseChatStreamHandlerOptions) {
     }
 
     ensureAgentMessageShell(message, dataId)
-    applyMessageCreatedAt(message, data.created_at)
 
     if (
       loading.value &&
@@ -980,10 +979,8 @@ export function useChatStreamHandler(options: UseChatStreamHandlerOptions) {
               channel: 'web',
               completed: true,
             }
-            if (data.created_at) applyMessageCreatedAt(injectedUser, data.created_at)
           }
           if (injectedId) injectedUser.id = injectedId
-          if (data.created_at) applyMessageCreatedAt(injectedUser, data.created_at)
         }
         if (injectedUser) {
           if (dataId && !injectedUser.requestId) injectedUser.requestId = dataId

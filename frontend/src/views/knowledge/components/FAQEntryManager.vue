@@ -1066,21 +1066,21 @@ const tagMap = computed<Record<string, any>>(() => {
   return map
 })
 
-// tagMapBySeqId uses seq_id as key for looking up by entry.tagId
+// tagMapBySeqId uses seqId as key for looking up by entry.tagId
 const tagMapBySeqId = computed<Record<number, any>>(() => {
   const map: Record<number, any> = {}
   tagList.value.forEach((tag) => {
-    map[tag.seq_id] = tag
+    map[tag.seqId] = tag
   })
   return map
 })
 
 const regularTags = computed(() => tagList.value)
 const tagDropdownOptions = computed(() =>
-  regularTags.value.map((tag: any) => ({ content: tag.name, value: String(tag.seq_id) })),
+  regularTags.value.map((tag: any) => ({ content: tag.name, value: String(tag.seqId) })),
 )
 const tagSelectOptions = computed(() =>
-  regularTags.value.map((tag: any) => ({ label: tag.name, value: tag.seq_id })),
+  regularTags.value.map((tag: any) => ({ label: tag.name, value: tag.seqId })),
 )
 
 const sidebarCategoryCount = computed(() => tagTotal.value || tagList.value.length)

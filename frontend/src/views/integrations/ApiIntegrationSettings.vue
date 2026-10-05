@@ -1022,8 +1022,8 @@ const externalUserHint = computed(() => {
 const playgroundRequestPreview = computed(() => {
   const body = {
     query: playground.query || '<query>',
-    agent_enabled: true,
-    agent_id: playground.agent_id || '<agent_id>',
+    agentEnabled: true,
+    agentId: playground.agent_id || '<agent_id>',
     channel: 'api',
   }
   const headers = buildPlaygroundHeaders(true)

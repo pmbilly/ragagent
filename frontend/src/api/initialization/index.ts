@@ -213,7 +213,7 @@ export interface OllamaModelInfo {
     name: string;
     size: number;
     digest: string;
-    modified_at: string;
+    modifiedAt: string;
 }
 
 // 列出已安装的 Ollama 模型（详细信息）
@@ -429,7 +429,7 @@ export function testMultimodalFunction(testData: {
     success: boolean;
     caption?: string;
     ocr?: string;
-    processing_time?: number;
+    processingTime?: number;
     message?: string;
 }> {
     return new Promise((resolve, reject) => {
@@ -503,7 +503,7 @@ export function testMultimodalFunction(testData: {
 export interface TextRelationExtractionRequest {
     text: string;
     tags: string[];
-    model_id: string;
+    modelId: string;
 }
 
 export interface Node {
@@ -538,7 +538,7 @@ export function extractTextRelations(request: TextRelationExtractionRequest): Pr
 
 export interface FabriTextRequest {
     tags: string[];
-    model_id: string;
+    modelId: string;
 }
 
 export interface FabriTextResponse {

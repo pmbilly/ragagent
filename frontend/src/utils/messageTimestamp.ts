@@ -41,7 +41,7 @@ export function bindServerTurnTimestamps(
   if (!payload) return
 
   if (assistant) {
-    applyMessageCreatedAt(assistant, payload.assistant_created_at ?? payload.created_at)
+    applyMessageCreatedAt(assistant, payload.assistant_created_at)
   }
 
   const userCreatedAt = payload.user_created_at
