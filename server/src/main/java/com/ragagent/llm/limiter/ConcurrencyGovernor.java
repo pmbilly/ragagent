@@ -15,8 +15,9 @@ import org.springframework.stereotype.Component;
  * 交互式 HTTP 路径直接 passthrough（返回 noop release）。
  *
  * <p>生命周期：启动时由 {@code config.ModelConcurrencyGovernorWiring} 装配。
- * 装配前 governor=null、limit=0 → 全部放行。本实现为进程内版本，
- * 多实例部署下不做跨进程协调。
+ * 装配前 governor=null、limit=0 → 全部放行。缺省后端是进程内
+ * {@link LocalLimiter}；多实例部署时装 {@link RedisLimiter}（跨实例信号量，
+ * 见装配类的 llm.limiter.redis-enabled 开关）。
  * 该类是无状态 Spring 组件，按构造器注入方式使用（不用 Lombok）。
  */
 @Component
@@ -88,14 +89,14 @@ public class ConcurrencyGovernor {
 
     /**
      * 返回本进程观测到的信号量（等待者始终是本实例内的）。
-     * 后端不支持观测时 enabled=false（当前仅本地后端，无错误通道）。
+     * 后端实现 {@link RuntimeInspectable} 时 enabled=true；不支持观测的后端为 false。
      */
     public GovernorStats runtimeStats() {
         ModelConcurrencyLimiter l = state.limiter();
-        if (!(l instanceof LocalLimiter local)) {
+        if (!(l instanceof RuntimeInspectable inspectable)) {
             return new GovernorStats(List.of(), false);
         }
-        return new GovernorStats(local.runtimeStats(), true);
+        return new GovernorStats(inspectable.runtimeStats(), true);
     }
 
     /** 观测结果：stats + 是否可观测（enabled） */

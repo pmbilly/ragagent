@@ -17,9 +17,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * 单进程部署下分布式信号量既不可用也不需要；
  * 但后台摄入仍可能用整个 worker 池冲击同一上游，故仍需本地限流。
  *
- * ⚠️ 本实现仅进程内生效：多实例部署下的并发上限不做跨进程协调。
+ * ⚠️ 本实现仅进程内生效：多实例部署下请装 {@link RedisLimiter}（跨实例信号量，
+ * 见 {@code config.ModelConcurrencyGovernorWiring} 的 llm.limiter.redis-enabled 开关）。
  */
-public class LocalLimiter implements ModelConcurrencyLimiter {
+public class LocalLimiter implements ModelConcurrencyLimiter, RuntimeInspectable {
 
     /**
      * 等待槽位时的轮询间隔（毫秒）。信号量没有"阻塞但可取消"的单步原语，
@@ -80,6 +81,7 @@ public class LocalLimiter implements ModelConcurrencyLimiter {
     }
 
     /** 按 model ID 升序返回各模型信号量的观测数据 */
+    @Override
     public List<RuntimeStat> runtimeStats() {
         List<RuntimeStat> stats;
         synchronized (lock) {

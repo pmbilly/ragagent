@@ -74,6 +74,17 @@ weknora:
 wiki:
   redis-enabled: ${WIKI_REDIS_ENABLED:false}
 
+# 后台模型并发闸门后端：缺省进程内信号量（单实例语义）；true = Redis 分布式
+# 信号量（跨实例协调，ZSET 租约+心跳，启动时 ping 一次，连不上则启动失败）。
+llm:
+  limiter:
+    redis-enabled: ${LLM_LIMITER_REDIS_ENABLED:false}
+
+# embed 公开面限流：缺省进程内滑窗（单实例语义）；true = Redis 滑窗
+# （跨实例共享预算，Redis 故障回落进程内滑窗，启动时 ping 一次）。
+embed:
+  redis-enabled: ${EMBED_REDIS_ENABLED:false}
+
 # ---- 以下为 Go config.yaml 的业务配置键（翻译对应模块时逐个启用）----
 conversation:
   max-rounds: 5

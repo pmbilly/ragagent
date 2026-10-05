@@ -2,21 +2,31 @@ package com.ragagent.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.limiter.LocalLimiter;
+import com.ragagent.llm.limiter.ModelConcurrencyLimiter;
+import com.ragagent.llm.limiter.RedisLimiter;
 import com.ragagent.system.service.SystemSettingService;
 
 import jakarta.annotation.PostConstruct;
 
 /**
  * 后台并发闸门的启动装配：limit = model.max_concurrency（DB → {@code WEKNORA_MODEL_MAX_CONCURRENCY}
- * env → 缺省 32），装 {@link LocalLimiter}（进程内信号量）。
+ * env → 缺省 32）。
  *
- * <h2>已知限制（详见 docs/known-issues/00-foundation.md #5）</h2>
- * <p>本仓只装进程内信号量，**恒走 Lite 分支**——多实例部署下不做跨进程协调
- * （Redis 分布式限流器未实现）。</p>
+ * <h2>后端选择</h2>
+ * <ul>
+ *   <li>缺省：{@link LocalLimiter}（进程内信号量，单实例语义）；</li>
+ *   <li>{@code llm.limiter.redis-enabled=true}：{@link RedisLimiter}
+ *       （跨实例分布式信号量：ZSET 租约 + 心跳 + fail-open，
+ *       对齐 Go internal/models/limiter）。开关打开但 Redis 连不上时
+ *       <b>启动失败</b>（不静默退化，与 im/wiki 的开关同口径）。</li>
+ * </ul>
  *
  * <p>limit ≤ 0 = 关闭治理（所有调用放行）。</p>
  */
@@ -30,11 +40,17 @@ public class ModelConcurrencyGovernorWiring {
 
     private final ConcurrencyGovernor governor;
     private final SystemSettingService systemSettingService;
+    private final ObjectProvider<StringRedisTemplate> redisTemplates;
+    private final boolean redisEnabled;
 
     public ModelConcurrencyGovernorWiring(ConcurrencyGovernor governor,
-            SystemSettingService systemSettingService) {
+            SystemSettingService systemSettingService,
+            ObjectProvider<StringRedisTemplate> redisTemplates,
+            @Value("${llm.limiter.redis-enabled:false}") boolean redisEnabled) {
         this.governor = governor;
         this.systemSettingService = systemSettingService;
+        this.redisTemplates = redisTemplates;
+        this.redisEnabled = redisEnabled;
     }
 
     @PostConstruct
@@ -50,13 +66,34 @@ public class ModelConcurrencyGovernorWiring {
                     + "governor left unwired (all calls pass): {}", e.toString());
             return;
         }
-        governor.setGovernor(new LocalLimiter(), (int) limit);
+
+        ModelConcurrencyLimiter limiter;
+        if (redisEnabled) {
+            StringRedisTemplate template = redisTemplates.getIfAvailable();
+            if (template == null) {
+                throw new IllegalStateException(
+                        "llm.limiter.redis-enabled=true but no Redis connection is configured");
+            }
+            // 启动即验：配置成 Redis 却连不上时不静默退化
+            try (var connection = template.getConnectionFactory().getConnection()) {
+                connection.ping();
+            } catch (RuntimeException e) {
+                throw new IllegalStateException(
+                        "llm.limiter.redis-enabled=true but Redis is not reachable: "
+                                + e.getMessage(), e);
+            }
+            limiter = new RedisLimiter(template);
+        } else {
+            limiter = new LocalLimiter();
+        }
+        governor.setGovernor(limiter, (int) limit);
+
         if (limit <= 0) {
             log.info("[ModelLimiter] background concurrency governor DISABLED "
                     + "(model.max_concurrency<=0)");
             return;
         }
-        log.info("[ModelLimiter] background model concurrency governed per-model, "
-                + "limit={} (in-process, lite mode)", limit);
+        log.info("[ModelLimiter] background model concurrency governed per-model, limit={} ({})",
+                limit, redisEnabled ? "redis, distributed" : "in-process, lite mode");
     }
 }
