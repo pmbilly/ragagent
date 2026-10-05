@@ -95,7 +95,6 @@ export interface ChunkDetailData {
 export interface RelatedChunksData {
     display_type: 'related_chunks';
     chunk_id: string;
-    relation_type: string;
     count: number;
     chunks: ChunkItem[];
 }
@@ -127,7 +126,6 @@ export interface DocumentInfoDocument {
     parse_status?: string;
     chunk_count?: number;
     metadata?: Record<string, any>;
-    type_icon?: string;
 }
 
 export interface DocumentInfoData {
@@ -157,7 +155,6 @@ export interface ThinkingData {
 export interface PlanStep {
     id: string;
     description: string;
-    tools_to_use?: string[]; // Changed from string to array
     status: 'pending' | 'in_progress' | 'completed' | 'skipped';
 }
 

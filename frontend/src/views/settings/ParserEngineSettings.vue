@@ -391,8 +391,6 @@ const ENGINE_DOC_LINKS: Record<string, string> = {
 
 /** 解析引擎配置默认值（与 DocReader/Python 侧一致） */
 const DEFAULT_PARSER_CONFIG: ParserEngineConfig = {
-  docreader_addr: '',
-  docreader_transport: 'grpc',
   mineru_endpoint: '',
   mineru_api_key: '',
   mineru_model: 'pipeline',
@@ -529,8 +527,6 @@ async function loadConfig() {
     const res = await getParserEngineConfig()
     const data = res?.data
     config.value = {
-      docreader_addr: data?.docreader_addr ?? DEFAULT_PARSER_CONFIG.docreader_addr ?? '',
-      docreader_transport: data?.docreader_transport ?? DEFAULT_PARSER_CONFIG.docreader_transport ?? 'grpc',
       mineru_endpoint: data?.mineru_endpoint ?? DEFAULT_PARSER_CONFIG.mineru_endpoint ?? '',
       mineru_api_key: data?.mineru_api_key ?? DEFAULT_PARSER_CONFIG.mineru_api_key ?? '',
       mineru_model: data?.mineru_model ?? DEFAULT_PARSER_CONFIG.mineru_model ?? '',
@@ -567,8 +563,6 @@ async function loadAll() {
 
 function buildConfigPayload(): ParserEngineConfig {
   return {
-    docreader_addr: config.value.docreader_addr?.trim() ?? '',
-    docreader_transport: (config.value.docreader_transport ?? 'grpc').trim() || 'grpc',
     mineru_endpoint: config.value.mineru_endpoint?.trim() ?? '',
     mineru_api_key: config.value.mineru_api_key?.trim() ?? '',
     mineru_model: config.value.mineru_model?.trim() ?? '',

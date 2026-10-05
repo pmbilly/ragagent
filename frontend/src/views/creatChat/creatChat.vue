@@ -190,24 +190,10 @@ const sendMsg = (value: string, modelId: string, mentionedItems: any[], imageFil
 }
 
 async function createNewSession(value: string, modelId: string, mentionedItems: any[] = [], imageFiles: any[] = [], attachmentFiles: any[] = []) {
-    const selectedKbs = settingsStore.settings.selectedKnowledgeBases || [];
-    const selectedFiles = settingsStore.settings.selectedFiles || [];
-
-    // 构建 session 数据，包含 Agent 配置
-    const sessionData: any = {};
-
-    // 添加 Agent 配置（知识库信息在 agent_config 中）
-    sessionData.agent_config = {
-        enabled: true,
-        maxIterations: settingsStore.agentConfig.maxIterations,
-        temperature: settingsStore.agentConfig.temperature,
-        knowledgeBases: selectedKbs,  // 所有选中的知识库
-        knowledge_ids: selectedFiles,  // 所有选中的普通知识/文件
-        allowedTools: settingsStore.agentConfig.allowedTools
-    };
-
+    // CreateSessionRequest 只收 title/description（B72 核实）；知识库选择随 QA 请求下发，
+    // 此处曾拼 agent_config 整键被后端静默丢弃（Session 的 agent_config 列已改服务端自管）
     try {
-        const res: any = await createSessions(sessionData);
+        const res: any = await createSessions({});
         // 裸对象：响应体即会话
         if (res && res.id) {
             await navigateToSession(res.id, value, modelId, mentionedItems, imageFiles, attachmentFiles);

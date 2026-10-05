@@ -482,7 +482,6 @@ import { useRouter, useRoute } from 'vue-router'
 import { MessagePlugin, Icon as TIcon } from 'tdesign-vue-next'
 import { deleteKnowledgeBase, duplicateKnowledgeBase, togglePinKnowledgeBase } from '@/api/knowledge-base'
 import { useChatResourcesStore } from '@/stores/chatResources'
-import { formatStringDate } from '@/utils/index'
 import { useUIStore } from '@/stores/ui'
 import { useAuthStore } from '@/stores/auth'
 import KnowledgeBaseEditorModal from './KnowledgeBaseEditorModal.vue'
@@ -757,10 +756,8 @@ interface UploadSummary {
 const applyKbListData = (data: any[]) => {
   kbs.value = data.map((kb: any) => ({
     ...kb,
-    updated_at: kb.updatedAt ? formatStringDate(new Date(kb.updatedAt)) : '',
     showMore: false,
-    isProcessing: kb.processing || false,
-    processing_count: kb.processingCount || 0
+    isProcessing: kb.processing || false
   }))
 }
 

@@ -112,8 +112,6 @@ export interface ParserEngineInfo {
 export type MinerUParseMethod = 'auto' | 'ocr' | 'txt'
 
 export interface ParserEngineConfig {
-  docreader_addr?: string
-  docreader_transport?: string
   mineru_endpoint?: string
   mineru_api_key?: string
   // MinerU 自建参数

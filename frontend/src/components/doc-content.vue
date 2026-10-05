@@ -733,7 +733,6 @@ const processedChunks = computed(() => {
       original: item,
       processedContent: processMarkdown(item.content),
       questions: getGeneratedQuestions(item),
-      meta: getChunkMeta(item),
       hasParent: hasParentChunk(item),
       chunkClass: getChunkClass(index)
     };
@@ -1041,18 +1040,7 @@ const getChunkClass = (index: number) => {
   return index % 2 !== 0 ? 'chunk-odd' : 'chunk-even';
 };
 
-// 获取Chunk元数据
-const getChunkMeta = (item: any) => {
-  if (!item) return '';
-  const parts = [];
-  if (item.char_count) {
-    parts.push(`${item.char_count} ${t('knowledgeBase.characters')}`);
-  }
-  if (item.token_count) {
-    parts.push(`${item.token_count} tokens`);
-  }
-  return parts.join(' · ');
-};
+// 获取Chunk元数据（char_count/token_count 曾是死读：ChunkResponse 无这两个字段，已删）
 
 // 生成的问题类型
 interface GeneratedQuestion {
@@ -1873,7 +1861,6 @@ const handleChunkPageChange = (pageInfo: { current: number }) => {
                 <div class="chunk-header">
                   <div class="chunk-heading">
                     <span class="chunk-index">{{ $t('knowledgeBase.segment') }} {{ (loadedChunkPage - 1) * CHUNK_PAGE_SIZE + index + 1 }}</span>
-                    <span class="chunk-meta">{{ chunk.meta }}</span>
                   </div>
                   <div class="chunk-header-right">
                     <t-tooltip v-if="chunk.original.indexStatus === 'failed' && canEditContent"
