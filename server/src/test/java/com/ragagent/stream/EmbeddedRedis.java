@@ -32,8 +32,11 @@ import org.springframework.data.redis.core.StringRedisTemplate;
  *   <li>都没有 → {@link org.junit.jupiter.api.Assumptions#assumeTrue} 跳过，测试不会红。</li>
  * </ol>
  * 只绑 {@code 127.0.0.1}、只走回环，不依赖外部网络。
+ *
+ * <p>跨包共享的测试基建：本包（StreamManager 的 Lua/TTL）与 IM 域 Redis 面
+ * （{@code im.runtime.ImRedisStore} 的闸门 CAS / marker / inflight）同用。</p>
  */
-final class EmbeddedRedis implements AutoCloseable {
+public final class EmbeddedRedis implements AutoCloseable {
 
     private final Process process;
     private final LettuceConnectionFactory connectionFactory;
@@ -54,7 +57,7 @@ final class EmbeddedRedis implements AutoCloseable {
      * <p>进程启动失败不抛异常——测试环境没有 redis-server 是常态，
      * 该跳过而不是让整个构建红掉。</p>
      */
-    static EmbeddedRedis tryStart() {
+    public static EmbeddedRedis tryStart() {
         String external = System.getenv("REDIS_TEST_ADDR");
         if (external != null && !external.isEmpty()) {
             int colon = external.lastIndexOf(':');
@@ -91,12 +94,12 @@ final class EmbeddedRedis implements AutoCloseable {
         return new EmbeddedRedis(process, "127.0.0.1", port);
     }
 
-    StringRedisTemplate template() {
+    public StringRedisTemplate template() {
         return template;
     }
 
     /** 清空本实例全部键——测试之间互不干扰。 */
-    void flushAll() {
+    public void flushAll() {
         try (var connection = connectionFactory.getConnection()) {
             connection.serverCommands().flushAll();
         }

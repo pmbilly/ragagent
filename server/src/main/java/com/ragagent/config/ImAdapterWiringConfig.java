@@ -27,7 +27,10 @@ public class ImAdapterWiringConfig {
                                  com.ragagent.im.qqbot.QqBotAdapterFactory qqBotAdapterFactory,
                                  com.ragagent.im.wecom.WecomAdapterFactory wecomAdapterFactory,
                                  org.springframework.beans.factory.ObjectProvider<
-                                         com.ragagent.common.security.SsrfGuard> ssrfGuard) {
+                                         com.ragagent.common.security.SsrfGuard> ssrfGuard,
+                                 com.ragagent.stream.StreamManager streamManager) {
+        // IM 的跨实例 /stop 要写 stop 事件到 StreamManager（延迟接：装配层注入）
+        imService.setStreamManager(streamManager);
         imService.registerAdapterFactory(ImTypes.PLATFORM_TELEGRAM, telegramAdapterFactory);
         imService.registerAdapterFactory(ImTypes.PLATFORM_SLACK, slackAdapterFactory);
         imService.registerAdapterFactory(ImTypes.PLATFORM_QQBOT, qqBotAdapterFactory);

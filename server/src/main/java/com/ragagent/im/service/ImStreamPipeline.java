@@ -64,6 +64,8 @@ final class ImStreamPipeline {
         Message userMsg = service.qaRequests.createUserMessage(session.getId(), msg.content, requestId);
         Message assistantMsg = service.qaRequests.createAssistantMessage(session.getId(), requestId);
         buf.assistantMessage = assistantMsg;
+        // 在途登记：跨实例 /stop 的 IDs 映射 + stop watcher（与 runQA 路径同款）
+        service.bindInflight(attach, assistantMsg.getId());
 
         // 租户上下文（同 runQA）。
         long tenantId = attach.channel().getTenantId();
@@ -72,7 +74,7 @@ final class ImStreamPipeline {
                 false, "system-" + tenantId, false);
         try {
             QaSupport.QaRequest qaReq = service.qaRequests.buildIMQARequest(session, msg.content,
-                    assistantMsg.getId(), userMsg.getId(), agent, msg.quote);
+                    assistantMsg.getId(), userMsg.getId(), agent, msg.quote, attach.inflight());
             Exception runErr;
             try {
                 if (useAgent) {

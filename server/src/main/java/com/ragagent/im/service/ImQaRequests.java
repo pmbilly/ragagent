@@ -5,6 +5,7 @@ import com.ragagent.agent.management.domain.CustomAgentEntity;
 import com.ragagent.agent.management.service.AgentConfigJson;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.ImFormat;
+import com.ragagent.im.service.ImService.InflightEntry;
 import com.ragagent.session.domain.Message;
 import com.ragagent.session.domain.Session;
 import com.ragagent.session.service.QaSupport;
@@ -35,10 +36,10 @@ final class ImQaRequests {
         }
     }
 
-    /** 构造 QA 请求（含 agent config 缺省补全）。 */
+    /** 构造 QA 请求（含 agent config 缺省补全与 /stop 取消探针）。 */
     QaSupport.QaRequest buildIMQARequest(Session session, String query,
             String assistantMessageId, String userMessageId, CustomAgentEntity agent,
-            IncomingMessage.QuotedMessage quote) {
+            IncomingMessage.QuotedMessage quote, InflightEntry inflight) {
         QaSupport.QaRequest req = new QaSupport.QaRequest();
         req.session = session;
         req.query = query;
@@ -57,6 +58,12 @@ final class ImQaRequests {
         req.webSearchEnabled = agent != null && req.agentConfig != null
                 && req.agentConfig.path("webSearchEnabled").asBoolean(false);
         req.quotedContext = ImFormat.formatQuotedContext(quote);
+        if (inflight != null) {
+            // IM /stop → 引擎取消：探针读队列层的取消标志（与 web 面 QaTurnExecutor 同契约，
+            // 贯穿 think/act/审批等待三条路）。
+            req.cancellationProbe = () -> inflight.queueReq.isCancelled()
+                    ? "context canceled" : null;
+        }
 
         return req;
     }

@@ -2,6 +2,7 @@ package com.ragagent.im.service;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.agent.management.domain.CustomAgentEntity;
 import com.ragagent.agent.management.service.CustomAgentService;
 import com.ragagent.common.context.TenantContext;
+import com.ragagent.common.llm.ResponseType;
 import com.ragagent.im.domain.ChannelSessionEntity;
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.mapper.ChannelSessionMapper;
@@ -40,6 +42,9 @@ import com.ragagent.session.service.MessageService;
 import com.ragagent.session.service.SessionAgentQaService;
 import com.ragagent.session.service.SessionKnowledgeQaService;
 import com.ragagent.session.service.SessionService;
+import com.ragagent.stream.StreamEvent;
+import com.ragagent.stream.StreamManager;
+import com.ragagent.stream.StreamStopWatcher;
 
 /**
  * IM 执行体核心。
@@ -60,6 +65,11 @@ public class ImService {
     private static final Logger log = LoggerFactory.getLogger(ImService.class);
     static final ObjectMapper JSON = new ObjectMapper();
 
+    /** 执行前 /stop 标记的 TTL（Go {@code stopMarkerTTL}）。 */
+    private static final int STOP_MARKER_TTL_SECONDS = 30;
+    /** 跨实例在途映射的 TTL（Go 的 storeInflightMapping 硬编码 10 分钟）。 */
+    private static final int INFLIGHT_TTL_SECONDS = 600;
+
     final ImChannelMapper channels;
     final ChannelSessionMapper channelSessions;
     final SessionService sessionService;
@@ -72,6 +82,8 @@ public class ImService {
     // ── 调谐参数 ─────────────────────────────────────────────────────────
     private final int rateLimitWindowSec;
     private final int rateLimitMax;
+    /** IM 的 Redis 面（stop marker / inflight 映射）；未启用为 null（单实例形态）。 */
+    private final ImRedisStore redisStore;
 
     final ImQaRunner qaRunner;
     final ImStreamPipeline streamPipeline;
@@ -97,11 +109,14 @@ public class ImService {
     }
 
     static final class InflightEntry {
+        /** 队列层请求（/stop 取消与引擎取消探针共享同一取消标志）。 */
+        final QaQueue.QaRequest queueReq;
         final java.util.function.BooleanSupplier cancel;
         volatile String sessionId = "";
         volatile String assistantMessageId = "";
 
-        InflightEntry(java.util.function.BooleanSupplier cancel) {
+        InflightEntry(QaQueue.QaRequest queueReq, java.util.function.BooleanSupplier cancel) {
+            this.queueReq = queueReq;
             this.cancel = cancel;
         }
     }
@@ -135,7 +150,7 @@ public class ImService {
         this.qaRequests = new ImQaRequests(this);
         this.qaRunner = new ImQaRunner(this);
         ImCommandSet.registerDefaults(this.cmdRegistry, kbLister(), knowledgeSearcher());
-        QaQueue.RedisPort redisPort = null;
+        ImRedisStore store = null;
         if (redisEnabled) {
             StringRedisTemplate template = redisTemplates.getIfAvailable();
             if (template == null) {
@@ -148,12 +163,13 @@ public class ImService {
             } catch (RuntimeException e) {
                 throw new IllegalStateException("failed to connect to Redis: " + e.getMessage(), e);
             }
-            redisPort = new ImRedisStore(template);
+            store = new ImRedisStore(template);
         }
+        this.redisStore = store;
         this.qaQueue = new QaQueue(workers, maxQueue, maxPerUser, task -> {
             QaTask t = (QaTask) task.attach();
             qaRunner.executeQARequest(t);
-        }, redisPort, globalMaxWorkers, null);
+        }, store, globalMaxWorkers, null);
         this.qaQueue.start();
     }
 
@@ -563,36 +579,112 @@ public class ImService {
                 ? msg.threadId : "";
         String inflightKey = ImFormat.makeUserKey(channel.getId(), msg.userId, msg.chatId,
                 stopThreadId);
-        // 1. 本地取消：出队或在途取消。
+        // 1. 本地取消：出队或在途取消（在途时同时拿到本实例已知的 session/message）。
         boolean localStopped = qaQueue.remove(inflightKey);
         InflightEntry entry = localStopped ? null : inflight.remove(inflightKey);
+        String sessionId = "";
+        String messageId = "";
         if (entry != null) {
             entry.cancel.getAsBoolean();
             localStopped = true;
+            sessionId = entry.sessionId;
+            messageId = entry.assistantMessageId;
         }
-        String sessionId = entry == null ? "" : entry.sessionId;
-        String messageId = entry == null ? "" : entry.assistantMessageId;
-        // 2. 命中在途映射：本地 cancel 已生效（qaCtx 取消）——跨实例的 StreamManager
-        //    stop 事件属 Redis 分支（内存形态下唯一实例就是本地）。见类注释的 Redis 面声明。
+        // 2. 跨实例：本地 inflight 没命中时，查 Redis 在途映射拿 IDs。
+        if ((sessionId.isEmpty() || messageId.isEmpty()) && redisStore != null) {
+            String[] pair = redisStore.loadInflight(inflightKey);
+            if (pair != null) {
+                sessionId = pair[0];
+                messageId = pair[1];
+            }
+        }
+        // 3. 写 stop 事件到 StreamManager（与本仓 web /stop 同契约）：
+        //    本轮的 stop watcher 与跨实例的引擎据此取消。
         if (!sessionId.isEmpty() && !messageId.isEmpty()) {
-            log.info("[IM] Cancelled in-flight QA: session={} message={}", sessionId, messageId);
+            writeStopEvent(sessionId, messageId);
+            log.info("[IM] Wrote stop event to StreamManager: session={} message={}",
+                    sessionId, messageId);
         }
-        // 3. 标记（未接 Redis 时的本地等价物）。
-        if (!localStopped && sessionId.isEmpty()) {
+        // 4. 标记兜底：给尚未创建 assistant message 的请求（执行前检查消费）。
+        if (redisStore != null) {
+            redisStore.setStopMarker(inflightKey, STOP_MARKER_TTL_SECONDS);
+        } else {
             stopMarkers.put(inflightKey, System.currentTimeMillis());
-            log.info("[IM] Set local stop marker (no inflight found): key={}", inflightKey);
+        }
+        if (!localStopped && sessionId.isEmpty()) {
+            log.info("[IM] Set stop marker (no inflight found): key={}", inflightKey);
         }
     }
 
-    private volatile com.ragagent.stream.StreamManager streamManagerRef;
+    /** 写 stop 事件到本轮次的流（形状与本仓 web /stop 一致，另带 {@code source=im}）。 */
+    private void writeStopEvent(String sessionId, String messageId) {
+        StreamManager sm = streamManagerRef;
+        if (sm == null) {
+            log.warn("[IM] StreamManager not wired; stop event skipped: session={} message={}",
+                    sessionId, messageId);
+            return;
+        }
+        StreamEvent stopEvent = new StreamEvent("stop-" + System.nanoTime(), ResponseType.STOP, "", true);
+        stopEvent.setTimestamp(OffsetDateTime.now());
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("session_id", sessionId);
+        data.put("message_id", messageId);
+        data.put("reason", "user_requested");
+        data.put("source", "im");
+        stopEvent.setData(data);
+        try {
+            sm.appendEvent(sessionId, messageId, stopEvent);
+        } catch (RuntimeException e) {
+            log.warn("[IM] Failed to write stop event to StreamManager: {}", e.getMessage());
+        }
+    }
+
+    /** 执行前 /stop 检查：本地标记（单实例）或 Redis 标记（跨实例）命中即清除并返回 true。 */
+    boolean checkAndClearStopMarker(String userKey) {
+        Long local = stopMarkers.remove(userKey);
+        boolean hit = local != null
+                && (System.currentTimeMillis() - local) < STOP_MARKER_TTL_SECONDS * 1000L;
+        if (redisStore != null && redisStore.checkAndClearStopMarker(userKey)) {
+            hit = true;
+        }
+        return hit;
+    }
+
+    /**
+     * 在途登记（assistant message 创建后调用）：绑定 entry 的 session/message、
+     * 写跨实例 inflight 映射，并启动 StreamManager stop watcher（跨实例 /stop 的消费侧）。
+     */
+    void bindInflight(QaAttach attach, String assistantMessageId) {
+        InflightEntry entry = attach.inflight();
+        if (entry == null) {
+            return;
+        }
+        String sessionId = attach.session().getId();
+        entry.sessionId = sessionId;
+        entry.assistantMessageId = assistantMessageId;
+        if (redisStore != null) {
+            redisStore.storeInflight(attach.userKey(), sessionId, assistantMessageId,
+                    INFLIGHT_TTL_SECONDS);
+        }
+        if (streamManagerRef != null && entry.queueReq != null) {
+            QaQueue.QaRequest req = entry.queueReq;
+            StreamStopWatcher.start(streamManagerRef, sessionId, assistantMessageId,
+                    () -> !req.isCancelled(), req::cancel);
+        }
+    }
+
+    /** 在途映射退场（QA 结束调用；Redis 未启用时空操作）。 */
+    void unbindInflight(String userKey) {
+        if (redisStore != null) {
+            redisStore.clearInflight(userKey);
+        }
+    }
+
+    private volatile StreamManager streamManagerRef;
 
     /** StreamManager 延迟接（避免与 stream 包的装配环；测试可注 stub）。 */
-    public void setStreamManager(com.ragagent.stream.StreamManager sm) {
+    public void setStreamManager(StreamManager sm) {
         this.streamManagerRef = sm;
-    }
-
-    private com.ragagent.stream.StreamManager streamManager() {
-        return streamManagerRef;
     }
 
     void sendStreamReply(IncomingMessage msg, StreamSender streamer, String content)
@@ -635,18 +727,19 @@ public class ImService {
             return channel.getTenantId();
         }
 
-        QaAttach attach() {
-            return new QaAttach(msg, session, agent, adapter, channel, channelId, userKey);
+        QaAttach attach(InflightEntry entry) {
+            return new QaAttach(msg, session, agent, adapter, channel, channelId, userKey, entry);
         }
     }
 
-    /** QA 输入束（qaRequest 的业务字段）。 */
+    /** QA 输入束（qaRequest 的业务字段 + 在途登记句柄）。 */
 
     void runFallbackNonStream(QaAttach attach) {
         qaRunner.runFallbackNonStream(attach);
     }
     record QaAttach(IncomingMessage msg, Session session, CustomAgentEntity agent,
-            Adapter adapter, ImChannelEntity channel, String channelId, String userKey) {
+            Adapter adapter, ImChannelEntity channel, String channelId, String userKey,
+            InflightEntry inflight) {
     }
 
     record QaOutcome(String answer, Exception error) {

@@ -47,18 +47,23 @@ final class ImQaRunner {
                 TenantContext.PrincipalTypes.IM_USER, "system-" + task.tenantId()),
                 "viewer", false, "system-" + task.tenantId(), false);
         QaQueue.QaRequest req = task.queueReq();
-        InflightEntry entry = new InflightEntry(() -> {
+        InflightEntry entry = new InflightEntry(req, () -> {
             req.cancel();
             return true;
         });
         service.inflight.put(task.userKey, entry);
         try {
+            // 执行前 /stop（排队期间由别的实例发起）直接跳过。
+            if (service.checkAndClearStopMarker(task.userKey)) {
+                log.info("[IM] Request cancelled by remote /stop before execution: {}", task.userKey);
+                return;
+            }
             // 排队期间被 /stop 的直接跳过。
             if (req.isCancelled()) {
                 return;
             }
             IncomingMessage msg = task.msg;
-            QaAttach attach = task.attach();
+            QaAttach attach = task.attach(entry);
             List<com.ragagent.session.domain.MessageAttachment> attachments = List.of();
             List<String> imageUrls = List.of();
             boolean streamDisabled = "full".equals(attach.channel().getOutputMode());
@@ -95,6 +100,9 @@ final class ImQaRunner {
                     attach.channelId(), msg.platform, msg.userId, answer.length());
         } finally {
             service.inflight.remove(task.userKey);
+            service.unbindInflight(task.userKey);
+            // 释放取消标志：让本轮的 stop watcher 退出（对齐 Go 的 defer req.cancel）
+            req.cancel();
             TenantContext.clear();
         }
     }
@@ -188,6 +196,8 @@ final class ImQaRunner {
 
         Message userMsg = service.qaRequests.createUserMessage(session.getId(), attach.msg().content, requestId);
         Message assistantMsg = service.qaRequests.createAssistantMessage(session.getId(), requestId);
+        // 在途登记：跨实例 /stop 的 IDs 映射 + stop watcher
+        service.bindInflight(attach, assistantMsg.getId());
 
         eventBus.on(EventType.EVENT_AGENT_COMPLETE, evt -> {
             if (!(evt.getData() instanceof com.ragagent.event.payload.AgentCompleteData data)) {
@@ -213,7 +223,7 @@ final class ImQaRunner {
                 false, "system-" + imTenant, false);
         try {
             QaSupport.QaRequest qaReq = service.qaRequests.buildIMQARequest(session, attach.msg().content,
-                    assistantMsg.getId(), userMsg.getId(), agent, attach.msg().quote);
+                    assistantMsg.getId(), userMsg.getId(), agent, attach.msg().quote, attach.inflight());
             // 同步执行（QA 服务内部为虚拟线程管线，事件经 eventBus 回流到上面的订阅）。
             Exception runErr;
             try {

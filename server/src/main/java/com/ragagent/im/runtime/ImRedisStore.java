@@ -83,4 +83,64 @@ public class ImRedisStore implements QaQueue.RedisPort {
     public void releaseGlobalGate(String key) {
         decr(key);
     }
+
+    // ── 跨实例 /stop（stop marker + inflight 映射） ──────────────────────────
+
+    /** 执行前 /stop 标记：写入（TTL 兜底；供尚未创建 assistant message 的请求）。 */
+    public void setStopMarker(String userKey, int ttlSeconds) {
+        try {
+            template.opsForValue().set(ImRedisKeys.STOP_PREFIX + userKey, "1",
+                    Duration.ofSeconds(ttlSeconds));
+        } catch (DataAccessException e) {
+            log.warn("[IM] Redis SET stop marker failed for {}: {}", userKey, e.getMessage());
+        }
+    }
+
+    /** 执行前检查并清除 stop 标记（一次性消费）；命中返回 true。 */
+    public boolean checkAndClearStopMarker(String userKey) {
+        try {
+            return Boolean.TRUE.equals(template.delete(ImRedisKeys.STOP_PREFIX + userKey));
+        } catch (DataAccessException e) {
+            log.warn("[IM] Redis DEL stop marker failed for {}: {}", userKey, e.getMessage());
+            return false;
+        }
+    }
+
+    /** 在途映射：userKey → {@code sessionId:messageId}（跨实例 /stop 查 IDs 用）。 */
+    public void storeInflight(String userKey, String sessionId, String messageId, int ttlSeconds) {
+        try {
+            template.opsForValue().set(ImRedisKeys.INFLIGHT_PREFIX + userKey,
+                    sessionId + ":" + messageId, Duration.ofSeconds(ttlSeconds));
+        } catch (DataAccessException e) {
+            log.warn("[IM] Redis SET inflight failed for {}: {}", userKey, e.getMessage());
+        }
+    }
+
+    /** 清除在途映射。 */
+    public void clearInflight(String userKey) {
+        try {
+            template.delete(ImRedisKeys.INFLIGHT_PREFIX + userKey);
+        } catch (DataAccessException e) {
+            log.warn("[IM] Redis DEL inflight failed for {}: {}", userKey, e.getMessage());
+        }
+    }
+
+    /** 读取在途映射（{@code [sessionId, messageId]}）；无则 null。 */
+    public String[] loadInflight(String userKey) {
+        String val;
+        try {
+            val = template.opsForValue().get(ImRedisKeys.INFLIGHT_PREFIX + userKey);
+        } catch (DataAccessException e) {
+            log.warn("[IM] Redis GET inflight failed for {}: {}", userKey, e.getMessage());
+            return null;
+        }
+        if (val == null) {
+            return null;
+        }
+        int sep = val.indexOf(':');
+        if (sep <= 0 || sep == val.length() - 1) {
+            return null;
+        }
+        return new String[]{val.substring(0, sep), val.substring(sep + 1)};
+    }
 }
