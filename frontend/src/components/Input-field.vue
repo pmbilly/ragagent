@@ -3324,7 +3324,7 @@ defineExpose({
   }
 
   &.disabled {
-    background-color: var(--td-success-color-light);
+    background-color: var(--td-brand-color-2);
   }
 
   img {
