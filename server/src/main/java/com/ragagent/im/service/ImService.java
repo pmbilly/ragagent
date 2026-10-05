@@ -9,7 +9,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,6 +31,7 @@ import com.ragagent.im.runtime.Commands.CommandRegistry;
 import com.ragagent.im.runtime.Commands.CommandResult;
 import com.ragagent.im.runtime.ImCommandSet;
 import com.ragagent.im.runtime.ImFormat;
+import com.ragagent.im.runtime.ImRedisStore;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.QaQueue;
 import com.ragagent.im.runtime.ReplyMessage;
@@ -108,9 +111,12 @@ public class ImService {
             CustomAgentService agentService,
             SessionKnowledgeQaService knowledgeQaService, SessionAgentQaService agentQaService,
             java.util.Optional<com.ragagent.storage.support.Resolver> storageResolver,
+            ObjectProvider<StringRedisTemplate> redisTemplates,
             @Value("${im.workers:5}") int workers,
             @Value("${im.max-queue:50}") int maxQueue,
             @Value("${im.max-per-user:3}") int maxPerUser,
+            @Value("${im.redis-enabled:false}") boolean redisEnabled,
+            @Value("${im.global-max-workers:0}") int globalMaxWorkers,
             @Value("${im.rate-limit-window-sec:60}") int rateLimitWindowSec,
             @Value("${im.rate-limit-max:10}") int rateLimitMax) {
         this.channels = channels;
@@ -129,10 +135,25 @@ public class ImService {
         this.qaRequests = new ImQaRequests(this);
         this.qaRunner = new ImQaRunner(this);
         ImCommandSet.registerDefaults(this.cmdRegistry, kbLister(), knowledgeSearcher());
+        QaQueue.RedisPort redisPort = null;
+        if (redisEnabled) {
+            StringRedisTemplate template = redisTemplates.getIfAvailable();
+            if (template == null) {
+                throw new IllegalStateException(
+                        "im.redis-enabled=true but no Redis connection is configured");
+            }
+            // 启动即验：配置成 Redis 却连不上时不静默退化（同 StreamManagerConfig 的口径）
+            try {
+                template.getConnectionFactory().getConnection().ping();
+            } catch (RuntimeException e) {
+                throw new IllegalStateException("failed to connect to Redis: " + e.getMessage(), e);
+            }
+            redisPort = new ImRedisStore(template);
+        }
         this.qaQueue = new QaQueue(workers, maxQueue, maxPerUser, task -> {
             QaTask t = (QaTask) task.attach();
             qaRunner.executeQARequest(t);
-        });
+        }, redisPort, globalMaxWorkers, null);
         this.qaQueue.start();
     }
 
