@@ -9,10 +9,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
+import com.ragagent.wiki.service.ingest.RedisWikiDeletedTombstoneStore;
 import com.ragagent.wiki.service.ingest.RedisWikiFinalizeLock;
 import com.ragagent.wiki.service.ingest.RedisWikiIdentityClaimStore;
 import com.ragagent.wiki.service.ingest.RedisWikiInflightLimiter;
 import com.ragagent.wiki.service.ingest.RedisWikiIngestTaskQueue;
+import com.ragagent.wiki.service.ingest.WikiDeletedTombstoneStore;
 import com.ragagent.wiki.service.ingest.WikiFinalizeLock;
 import com.ragagent.wiki.service.ingest.WikiIdentityClaimStore;
 import com.ragagent.wiki.service.ingest.WikiInflightLimiter;
@@ -25,7 +27,7 @@ import com.ragagent.wiki.service.page.WikiSlugLock;
 /**
  * wiki 域的 Redis 面装配（多实例部署）。
  *
- * <p><b>开关</b>：{@code wiki.redis-enabled=true} 时把 wiki 的五个协调端口
+ * <p><b>开关</b>：{@code wiki.redis-enabled=true} 时把 wiki 的六个协调端口
  * 切成跨实例实现（各接口注释里"多副本部署需要换 Redis 实现"的那几处）：</p>
  * <ul>
  *   <li>{@link WikiSlugLock} → {@link RedisWikiSlugLock}（同 slug 读-改-写互斥）；</li>
@@ -35,10 +37,12 @@ import com.ragagent.wiki.service.page.WikiSlugLock;
  *   <li>{@link WikiInflightLimiter} → {@link RedisWikiInflightLimiter}
  *       （按 KB 在途批次的全局上限）；</li>
  *   <li>{@link WikiIngestTaskQueue} → {@link RedisWikiIngestTaskQueue}
- *       （跨实例共享的任务表：TaskID 全局合并 + 崩溃回收重投）。</li>
+ *       （跨实例共享的任务表：TaskID 全局合并 + 崩溃回收重投）；</li>
+ *   <li>{@link WikiDeletedTombstoneStore} → {@link RedisWikiDeletedTombstoneStore}
+ *       （删除墓碑跨实例可见：删除后其它副本的在途任务也走快路径，少一次库查询）。</li>
  * </ul>
  *
- * <p><b>@Primary 必须</b>：五个 InProcess 实现都是无条件 {@code @Component}，
+ * <p><b>@Primary 必须</b>：六个 InProcess 实现都是无条件 {@code @Component}，
  * 共存时裸注入接口会 {@code NoUniqueBeanDefinitionException}——Redis 版以
  * {@code @Primary} 胜出。开关关闭时本类整体不生效，InProcess 实现是唯一实现。</p>
  *
@@ -110,5 +114,12 @@ public class WikiRedisWiring {
             ObjectProvider<WikiIngestService> ingestServiceProvider) {
         return new RedisWikiIngestTaskQueue(template, handlerProvider, deadLetterProvider,
                 ingestServiceProvider);
+    }
+
+    /** 跨实例可见的删除墓碑（快路径；正确性不依赖它，DB 回落仍在）。 */
+    @Bean
+    @Primary
+    public WikiDeletedTombstoneStore redisWikiDeletedTombstoneStore(StringRedisTemplate template) {
+        return new RedisWikiDeletedTombstoneStore(template);
     }
 }
