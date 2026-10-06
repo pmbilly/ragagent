@@ -1,5 +1,5 @@
 # RagAgent (Java) 服务端配置
-# 键名对照 Go 版 config/config.yaml + .env 环境变量（DB_HOST 等），保持同名以便对照翻译
+# 键名沿用既有环境变量约定（DB_HOST 等），部署时用环境变量覆盖各默认值
 server:
   port: ${SERVER_PORT:8080}
   # Spring Boot 的绑定地址属性是 server.address（server.host 是不存在的死键）
@@ -14,15 +14,14 @@ spring:
       fail-on-unknown-properties: false
   servlet:
     multipart:
-      # 对照 Go 的 MaxBytesReader（GetMaxFileSizeMB()*1MB + 1MB，默认 51MB）——
-      # 限值放宽到 60MB 让 service 层的大小校验（50MB）先触发；超 60MB 的请求
-      # 由 TemporaryDocumentController 的 MaxUploadSizeExceededException 处理器
-      # 仿 Go 的 "http: request body too large" 400 文案。
+      # 上传限值 60MB：让 service 层的大小校验（50MB）先触发、给出业务化错误；
+      # 超出 60MB 的请求由 TemporaryDocumentController 的
+      # MaxUploadSizeExceededException 处理器转成 400 "request body too large"。
       max-file-size: 60MB
       max-request-size: 60MB
   threads:
     virtual:
-      enabled: true          # JDK 21 虚拟线程，对照 Go goroutine 语义
+      enabled: true          # JDK 21 虚拟线程（一请求一虚拟线程的执行模型）
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:15432}/${DB_NAME:WeKnora}
@@ -34,22 +33,21 @@ spring:
       port: ${REDIS_PORT:16379}
       # dev Redis 开了 requirepass（.env 的 REDIS_PASSWORD）；未设时留空
       password: ${REDIS_PASSWORD:}
-      # 对照 Go stream 管理器建客户端时读的 REDIS_USERNAME / REDIS_DB
+      # 可选的 Redis ACL 用户名与库号
       username: ${REDIS_USERNAME:}
       database: ${REDIS_DB:0}
-      # 对照 common.RedisTLSConfig：REDIS_USE_TLS=true 才开 TLS（默认关）。
-      # Go 另有 REDIS_TLS_SERVER_NAME / REDIS_TLS_INSECURE_SKIP_VERIFY，Java 侧暂无
-      # 对应物——见 docs/translation-conventions.md §9 的已知差异。
+      # REDIS_USE_TLS=true 才开 TLS（默认关）；暂不支持自定义 TLS 服务器名与
+      # 跳过证书校验（有需求再接）。
       ssl:
         enabled: ${REDIS_USE_TLS:false}
   flyway:
     locations: classpath:db/migration,filesystem:./build/generated-migrations
-    baseline-on-migrate: true   # 已有 Go 版数据的库自动 baseline，不重复执行 98 个迁移
+    baseline-on-migrate: true   # 存量库自动 baseline，不重复执行历史迁移
     table: flyway_schema_history
 
 mybatis-plus:
   configuration:
-    map-underscore-to-camel-case: true   # GORM 默认行为对齐
+    map-underscore-to-camel-case: true   # 下划线列名 ↔ 驼峰属性自动映射
   global-config:
     banner: false
 
@@ -59,18 +57,18 @@ grpc:
       address: ${DOCREADER_ADDR:static://localhost:50051}
       negotiation-type: plaintext
 
-# 流管理器（对照 Go internal/stream/factory.go 读的那组环境变量）
+# 流管理器：memory（单实例，进程内）| redis（跨实例共享，多实例部署时用）
 weknora:
   persistence:
     tenant-filter-guard: ${WEKNORA_TENANT_FILTER_GUARD:enforce}   # off | alert | enforce：SELECT 缺失租户谓词探测（B71 定性后默认 enforce；降档排障用 alert/off）
   stream:
-    type: ${STREAM_MANAGER_TYPE:memory}   # memory | redis（Go 是精确匹配，其余一律 memory）
-    prefix: ${REDIS_PREFIX:}              # 原样使用，不去尾冒号（.env 的 "stream:" 会拼出双冒号，与 Go 一致）
-    ttl: 1h                               # Go 工厂硬编码 time.Hour
+    type: ${STREAM_MANAGER_TYPE:memory}   # memory | redis（精确匹配，其余值一律按 memory）
+    prefix: ${REDIS_PREFIX:}              # 原样拼接、不裁尾部冒号（"stream:" 会拼出双冒号；键名兼容性要求如此）
+    ttl: 1h                               # 流数据 TTL（1 小时）
 
-# wiki 域 Redis 面（多实例部署打开；缺省 false = 四个协调端口全走进程内实现，
-# 单实例语义与接线前完全一致）。打开 = slug 锁 / finalize 锁 / 身份认领 /
-# 在途限流器 全部走 Redis；启动时 ping 一次，连不上则启动失败（不静默退化）。
+# wiki 域 Redis 面（多实例部署打开；缺省 false = 全部走进程内实现，单实例语义
+# 与接线前完全一致）。打开 = slug 锁 / finalize 锁 / 身份认领 / 在途限流器 /
+# 任务队列 / 删除墓碑 全部走 Redis；启动时 ping 一次，连不上则启动失败（不静默退化）。
 wiki:
   redis-enabled: ${WIKI_REDIS_ENABLED:false}
 
@@ -108,7 +106,7 @@ im:
   redis-enabled: ${IM_REDIS_ENABLED:false}
   global-max-workers: ${IM_GLOBAL_MAX_WORKERS:0}
 
-# ---- 以下为 Go config.yaml 的业务配置键（翻译对应模块时逐个启用）----
+# ---- 业务配置（会话/检索等模块的默认值）----
 conversation:
   max-rounds: 5
   keyword-threshold: 0.3
