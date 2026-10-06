@@ -1,59 +1,35 @@
 package com.ragagent.knowledge.task;
 
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import com.ragagent.knowledge.dto.faq.FaqImportProgress;
-import org.springframework.stereotype.Component;
 
 /**
- * FAQ 导入任务进度与并发锁的进程内存储。
+ * FAQ 导入任务的进度与并发锁端口。
  *
- * <p>三个并发面：按 taskId 的进度快照、按 kbId 的 running 锁（含实例标识以便多实例部署时
- * 区分持有者）、按 key 的创建互斥。均为单实例语义——未启用分布式存储时，重启即清空；
- * 线程安全由 {@link ConcurrentHashMap} 与并发键集保证。</p>
+ * <p><b>三个并发面</b>：按 taskId 的进度快照、按 kbId 的 running 锁（含实例标识，
+ * 多实例部署时区分持有者）、按 key 的创建互斥。</p>
+ *
+ * <p><b>两种实现</b>：进程内（{@link InProcessFaqImportTaskStore}，缺省/单实例语义，
+ * 重启即清空）；Redis（{@link RedisFaqImportTaskStore}，
+ * {@code knowledge.redis-enabled=true} 时以 {@code @Primary} 生效——进度与 running 锁
+ * 跨实例共享，"同一知识库已有导入任务"的拦截在多副本下仍然成立）。</p>
  */
-@Component
-public class FaqImportTaskStore {
+public interface FaqImportTaskStore {
 
     /** running 锁的持有者信息；instanceId 为空表示不区分实例。 */
-    public record RunningInfo(String taskId, long enqueuedAt, String instanceId) {
+    record RunningInfo(String taskId, long enqueuedAt, String instanceId) {
     }
 
-    private final ConcurrentHashMap<String, FaqImportProgress> progress = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, RunningInfo> running = new ConcurrentHashMap<>();
-    private final Set<String> createGuards = ConcurrentHashMap.newKeySet();
+    FaqImportProgress getProgress(String taskId);
 
-    public FaqImportProgress getProgress(String taskId) {
-        return progress.get(taskId);
-    }
+    void saveProgress(FaqImportProgress p);
 
-    public void saveProgress(FaqImportProgress p) {
-        progress.put(p.taskId(), p);
-    }
+    String getRunningTaskId(String kbId);
 
-    public String getRunningTaskId(String kbId) {
-        RunningInfo info = running.get(kbId);
-        return info == null ? "" : info.taskId();
-    }
+    void setRunningInfo(String kbId, RunningInfo info);
 
-    public void setRunningInfo(String kbId, RunningInfo info) {
-        running.put(kbId, info);
-    }
+    void clearRunningInfoIfMatches(String kbId, String taskId, String instanceId, long enqueuedAt);
 
-    public void clearRunningInfoIfMatches(String kbId, String taskId, String instanceId, long enqueuedAt) {
-        RunningInfo info = running.get(kbId);
-        if (info != null && info.taskId().equals(taskId)
-                && (info.instanceId().isEmpty() || instanceId.isEmpty()
-                || info.instanceId().equals(instanceId))) {
-            running.remove(kbId);
-        }
-    }
+    boolean acquireCreateGuard(String key);
 
-    public boolean acquireCreateGuard(String key) {
-        return createGuards.add(key);
-    }
-
-    public void releaseCreateGuard(String key) {
-        createGuards.remove(key);
-    }
+    void releaseCreateGuard(String key);
 }

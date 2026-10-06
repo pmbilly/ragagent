@@ -8,7 +8,7 @@ import com.ragagent.knowledge.service.QuestionGenerationService;
 /**
  * {@link QuestionGenerationTaskQueue} 的 <b>Redis</b> 实现（跨实例共享任务表）。
  *
- * <p>{@code knowledge.redis-enabled=true} 时由 {@code KnowledgeTaskQueueWiring}
+ * <p>{@code knowledge.redis-enabled=true} 时由 {@code KnowledgeRedisWiring}
  * 装配（{@code @Primary} 覆盖 {@link InProcessQuestionGenerationTaskQueue}）。
  * 语义细则与取舍见 {@link AbstractRedisKnowledgeTaskQueue}。</p>
  */
