@@ -1,3 +1,5 @@
+// 根构建脚本：公共配置（坐标/仓库）与插件版本统一声明；插件此处不应用（apply false），
+// 由 server 模块应用。
 plugins {
     java
     id("org.springframework.boot") version "3.3.5" apply false

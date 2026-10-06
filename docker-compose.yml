@@ -32,7 +32,7 @@ services:
     restart: unless-stopped
 
   docreader:
-    # 跟随上游最新（文档解析独立演进）；2026-09-22 A/B 验收所用版本为
+    # 跟随上游 latest；固定版本参照：
     # wechatopenai/weknora-docreader@sha256:59e26f98f17c296c5f4bd216404558f51d31991b580cfef1d204903a01e4b46b
     image: wechatopenai/weknora-docreader:latest
     container_name: RagAgent-docreader-dev
