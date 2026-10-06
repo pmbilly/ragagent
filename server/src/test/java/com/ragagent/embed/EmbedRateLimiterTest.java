@@ -81,7 +81,8 @@ class EmbedRateLimiterTest {
     void redisFailureFallsBackToLocal() {
         StringRedisTemplate broken = mock(StringRedisTemplate.class);
         doThrow(new RuntimeException("boom")).when(broken)
-                .execute(any(RedisScript.class), anyList(), any(), any(), any(), any());
+                .execute(org.mockito.ArgumentMatchers.<RedisScript<Object>>any(), anyList(),
+                        any(), any(), any(), any());
         EmbedRateLimiter limiter = new EmbedRateLimiter(broken);
 
         assertThat(limiter.allow("k", EmbedRateLimiter.MINUTE_MILLIS, 1))

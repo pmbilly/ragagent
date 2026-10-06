@@ -135,7 +135,8 @@ class RedisLimiterTest {
     void redisErrorFailsOpen() {
         StringRedisTemplate broken = mock(StringRedisTemplate.class);
         doThrow(new RuntimeException("boom")).when(broken)
-                .execute(any(RedisScript.class), anyList(), any(), any(), any(), any());
+                .execute(org.mockito.ArgumentMatchers.<RedisScript<Object>>any(), anyList(),
+                        any(), any(), any(), any());
         RedisLimiter brokenLimiter = new RedisLimiter(broken);
         try {
             assertThat(brokenLimiter.acquire("m1", 5))
