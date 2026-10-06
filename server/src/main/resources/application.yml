@@ -100,6 +100,14 @@ memory:
 datasource:
   redis-enabled: ${DATASOURCE_REDIS_ENABLED:false}
 
+# IM（企业微信/飞书等）Redis 面：缺省进程内（单实例语义）；true = 一次性打开
+# 队列全局计数 / 消息去重 / 限流 / 跨实例 stop / 渠道配置广播 / WS 长连接选主
+# 六个面（启动时 ping 一次，连不上则启动失败）。global-max-workers=跨实例并发上限，0=不限。
+# （im.workers / im.max-queue / im.max-per-user / im.rate-limit-* 走代码缺省，见 ImService。）
+im:
+  redis-enabled: ${IM_REDIS_ENABLED:false}
+  global-max-workers: ${IM_GLOBAL_MAX_WORKERS:0}
+
 # ---- 以下为 Go config.yaml 的业务配置键（翻译对应模块时逐个启用）----
 conversation:
   max-rounds: 5
