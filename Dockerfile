@@ -1,4 +1,4 @@
-# ragagent-java 服务端镜像（对照 Go 仓 docker/Dockerfile.app 的角色）。
+# ragagent-java 服务端镜像。
 # 构建：docker build -t ragagent-server .
 # 运行：环境变量见 .env.example（DB_*/REDIS_*/SYSTEM_AES_KEY/DOCREADER_ADDR）。
 #
@@ -25,11 +25,10 @@ RUN --mount=type=cache,target=/root/.gradle \
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
-# 非 root 运行（-m 建 home，与 Go 镜像（useradd -m）同形，避免依赖 HOME 的子进程异常）
+# 非 root 运行（-m 建 home，避免依赖 HOME 的子进程异常）
 RUN useradd -m -s /bin/bash --uid 1001 ragagent
 
 COPY --from=builder /app.jar app.jar
-
 
 USER ragagent
 

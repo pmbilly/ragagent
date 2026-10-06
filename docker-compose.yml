@@ -1,6 +1,6 @@
-# WeKnora dev 环境（对齐 Go 仓 docker-compose.dev.yml 的端口习惯）
-# postgres 15432 / redis 16379 / docreader 50051——与 ~/WeKnora 的 dev 容器同端口，
-# 同时只能起一套；Java 版 bootRun 默认连 localhost 这些端口。
+# ragagent 本地 dev 环境（基础设施：postgres / redis / docreader）
+# 端口沿用既有约定：postgres 15432 / redis 16379 / docreader 50051——与并存的
+# 旧版工程（~/WeKnora）相同，两者同时只能起一套；应用缺省连 localhost 这些端口。
 
 services:
   postgres:
