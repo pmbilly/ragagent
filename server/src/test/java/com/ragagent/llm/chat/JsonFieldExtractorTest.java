@@ -144,7 +144,7 @@ class JsonFieldExtractorTest {
 
     /**
      * Java 侧补充：多字节（3/4 字节 UTF-8）字符跨分片时必须原样产出，不能被切开——
-     * 扫描按 rune 步进而不是按字节步进。
+     * 扫描按码点步进而不是按字节步进。
      */
     @Test
     void multibyteCharactersAcrossChunks() {

@@ -46,57 +46,51 @@ public class McpMetadataException extends BizException {
         return kind;
     }
 
-    // ── Go 原始哨兵文案（诊断/日志用，与 HTTP 文案不同） ──────────────
+    // ── 哨兵文案（诊断/日志用，与 HTTP 文案不同） ──────────────
 
-    /** 对照 ErrMCPServiceNotFound */
     public static final String MSG_SERVICE_NOT_FOUND = "MCP service not found";
-    /** 对照 ErrMCPOAuthPrincipalRequired */
     public static final String MSG_PRINCIPAL_REQUIRED =
             "OAuth metadata requires an authenticated principal";
-    /** 对照 ErrMCPMetadataStorage */
     public static final String MSG_STORAGE_UNAVAILABLE = "MCP metadata storage is unavailable";
-    /** 对照 ErrMCPMetadataConnectionChanged */
     public static final String MSG_CONNECTION_CHANGED = "MCP connection changed during refresh";
-    /** 对照 ErrMCPMetadataTooLarge */
     public static final String MSG_TOO_LARGE = "MCP metadata exceeds the 8 MiB storage limit";
-    /** 对照 ErrMCPMetadataInvalidTools */
     public static final String MSG_INVALID_TOOLS =
             "MCP directory contains empty or duplicate tool names";
 
     // ── 工厂：固定文案（与 HTTP 响应契约一致） ─────────────────────────
 
-    /** 对照 errors.NewNotFoundError("MCP service not found") */
+    /** 404 语义：「MCP service not found」。 */
     public static McpMetadataException serviceNotFound() {
         return new McpMetadataException(Kind.SERVICE_NOT_FOUND,
                 AppError.notFound("MCP service not found"));
     }
 
-    /** 对照 errors.NewUnauthorizedError("OAuth metadata requires an authenticated user") */
+    /** 401 语义：「OAuth metadata requires an authenticated user」。 */
     public static McpMetadataException principalRequired() {
         return new McpMetadataException(Kind.PRINCIPAL_REQUIRED,
                 AppError.unauthorized("OAuth metadata requires an authenticated user"));
     }
 
-    /** 对照 errors.NewServiceUnavailableError("MCP metadata storage is unavailable") */
+    /** 503 语义：「MCP metadata storage is unavailable」。 */
     public static McpMetadataException storageUnavailable() {
         return new McpMetadataException(Kind.STORAGE_UNAVAILABLE,
                 AppError.serviceUnavailable("MCP metadata storage is unavailable"));
     }
 
-    /** 对照 errors.NewConflictError("MCP connection changed during refresh; ...") */
+    /** 409 语义：「MCP connection changed during refresh; ...」。 */
     public static McpMetadataException connectionChanged() {
         return new McpMetadataException(Kind.CONNECTION_CHANGED,
                 AppError.conflict("MCP connection changed during refresh; "
                         + "save the configuration and sync again"));
     }
 
-    /** 对照 errors.NewBadRequestError("MCP directory is invalid or too large") */
+    /** 400 语义：「MCP directory is invalid or too large」。 */
     public static McpMetadataException invalidOrTooLarge(Kind kind) {
         return new McpMetadataException(kind,
                 AppError.badRequest("MCP directory is invalid or too large"));
     }
 
-    /** 对照 default 分支（refresh=false 时） */
+    /** refresh=false 时的兜底（读取失败）。 */
     public static McpMetadataException readFailed() {
         return new McpMetadataException(Kind.OTHER, AppError.internal("Failed to read MCP metadata"));
     }

@@ -9,6 +9,7 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import com.ragagent.agent.management.domain.CustomAgentEntity;
+import com.ragagent.common.web.ZeroTimeSerializer;
 
 /**
  * agents CRUD 家族的响应构造（JSON 是契约）。
@@ -19,9 +20,6 @@ import com.ragagent.agent.management.domain.CustomAgentEntity;
  * （jsonb→固定声明序重排；原 OrgResponses 实现，org 裁撤后内联至此）。</p>
  */
 public final class AgentResponses {
-
-    /** 无 DB 行时间时的占位零值时间戳（注册表内建 agent 无 DB 行）。 */
-    public static final String GO_ZERO_TIME = "0001-01-01T00:00:00Z";
 
     private AgentResponses() {}
 
@@ -39,8 +37,8 @@ public final class AgentResponses {
         m.put("tenantId", row.getTenantId() == null ? 0L : row.getTenantId());
         m.put("createdBy", nz(row.getCreatedBy()));
         m.put("config", agentConfigMap(asTree(config)));
-        m.put("createdAt", row.getCreatedAt() == null ? GO_ZERO_TIME : row.getCreatedAt());
-        m.put("updatedAt", row.getUpdatedAt() == null ? GO_ZERO_TIME : row.getUpdatedAt());
+        m.put("createdAt", row.getCreatedAt() == null ? ZeroTimeSerializer.ZERO_TIME_LITERAL : row.getCreatedAt());
+        m.put("updatedAt", row.getUpdatedAt() == null ? ZeroTimeSerializer.ZERO_TIME_LITERAL : row.getUpdatedAt());
         m.put("deletedAt", null);
         if (row.getCreatorName() != null && !row.getCreatorName().isEmpty()) {
             m.put("creatorName", row.getCreatorName());
@@ -86,7 +84,7 @@ public final class AgentResponses {
         ifStr(c, "contextTemplateId", m);
         m.put("modelId", text(c, "modelId"));
         m.put("rerankModelId", text(c, "rerankModelId"));
-        m.put("temperature", goNumber(c, "temperature"));
+        m.put("temperature", wireNumber(c, "temperature"));
         m.put("maxCompletionTokens", intOf(c, "maxCompletionTokens"));
         m.put("thinking", boolPtr(c, "thinking"));
         m.put("citationEnabled", boolPtr(c, "citationEnabled"));
@@ -114,8 +112,8 @@ public final class AgentResponses {
         ifIntNonZero(c, "attachmentParseWaitTimeoutSec", m);
         m.put("dataAnalysisEnabled", boolOf(c, "dataAnalysisEnabled"));
         m.put("faqPriorityEnabled", boolOf(c, "faqPriorityEnabled"));
-        m.put("faqDirectAnswerThreshold", goNumber(c, "faqDirectAnswerThreshold"));
-        m.put("faqScoreBoost", goNumber(c, "faqScoreBoost"));
+        m.put("faqDirectAnswerThreshold", wireNumber(c, "faqDirectAnswerThreshold"));
+        m.put("faqScoreBoost", wireNumber(c, "faqScoreBoost"));
         m.put("webSearchEnabled", boolOf(c, "webSearchEnabled"));
         m.put("webSearchMaxResults", intOf(c, "webSearchMaxResults"));
         ifStr(c, "webSearchProviderId", m);
@@ -125,10 +123,10 @@ public final class AgentResponses {
         m.put("historyTurns", intOf(c, "historyTurns"));
         ifBoolPtrNonNil(c, "memoryEnabled", m);
         m.put("embeddingTopK", intOf(c, "embeddingTopK"));
-        m.put("keywordThreshold", goNumber(c, "keywordThreshold"));
-        m.put("vectorThreshold", goNumber(c, "vectorThreshold"));
+        m.put("keywordThreshold", wireNumber(c, "keywordThreshold"));
+        m.put("vectorThreshold", wireNumber(c, "vectorThreshold"));
         m.put("rerankTopK", intOf(c, "rerankTopK"));
-        m.put("rerankThreshold", goNumber(c, "rerankThreshold"));
+        m.put("rerankThreshold", wireNumber(c, "rerankThreshold"));
         m.put("enableQueryExpansion", boolOf(c, "enableQueryExpansion"));
         m.put("enableRewrite", boolOf(c, "enableRewrite"));
         m.put("rewritePromptSystem", text(c, "rewritePromptSystem"));
@@ -154,7 +152,7 @@ public final class AgentResponses {
         }
     }
 
-    private static Object goNumber(JsonNode c, String field) {
+    private static Object wireNumber(JsonNode c, String field) {
         JsonNode n = c.get(field);
         if (n == null || n.isNull() || !n.isNumber()) {
             return 0;

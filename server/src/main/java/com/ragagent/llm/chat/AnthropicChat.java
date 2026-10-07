@@ -587,7 +587,7 @@ public class AnthropicChat implements LlmChatClient {
 
     /**
      * 缓存计数按 max() 合并，reported 取 OR
-     * （<b>任一</b>上报过就算上报过——nil 与 0 的区别在这里兑现）。
+     * （<b>任一</b>上报过就算上报过——null 与 0 的区别在这里兑现）。
      */
     static CacheCounters mergeAnthropicCacheCounters(int currentRead, int currentWrite, boolean currentReported,
                                                      Integer cacheRead, Integer cacheWrite) {

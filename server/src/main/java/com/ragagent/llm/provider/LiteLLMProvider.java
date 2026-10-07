@@ -30,7 +30,7 @@ public class LiteLLMProvider implements Provider {
 
     @Override
     public void validateConfig(Config config) {
-        // Go 原文只校验 API key
+        // 只校验 API key
         if (config.apiKey().isEmpty()) {
             throw BizException.badRequest("API key is required for LiteLLM provider");
         }

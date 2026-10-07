@@ -45,8 +45,8 @@ public class DeploymentCapabilitiesHolder {
                      boolean api, boolean mcp, boolean webSearch, boolean vectorStore,
                      boolean storage) {
         Map<String, SystemDtos.DeploymentCapability> caps = new LinkedHashMap<>();
-        // 构造顺序无语义——encoding/json 对 map 恒按字母序输出（Jackson 用 record 声明序
-        // 序列化字段、LinkedHashMap 保插入序，因此这里要按 Go 输出的字母序插入）。
+        // 插入顺序无语义——capabilities 的 JSON 输出须为键的字母序，而 LinkedHashMap
+        // 保插入序，因此这里按字母序插入。
         caps.put("agents", capability(agents));
         caps.put("integrations.api", capability(api));
         caps.put("integrations.embed", capability(embed));

@@ -72,7 +72,7 @@ public class MessageSuggestionService {
     private static final String MODE_GENERATED = "generated";
     static final String MODE_HYBRID = "hybrid";
 
-    /** 解析模型 JSON 信封（encoding/json 语义：忽略未知字段）。 */
+    /** 解析模型 JSON 信封（反序列化忽略未知字段）。 */
 
     private final MessageSuggestionRepository suggestionRepository;
     private final MessageService messageService;

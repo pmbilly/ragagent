@@ -386,7 +386,7 @@ public class FaqEntryCommandService {
 
     // ══════════════════ 批量字段 / 标签 ════════════════════════════════
 
-    /** nil tag = 0 = 移除标签。 */
+    /** null tag = 0 = 移除标签。 */
     public void updateEntryTagBatch(String kbId, Map<Long, Long> updates) {
         Map<Long, FaqEntryFieldsUpdate> byId = new LinkedHashMap<>();
         if (updates != null) {

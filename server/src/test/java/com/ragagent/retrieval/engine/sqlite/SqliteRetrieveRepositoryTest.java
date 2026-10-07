@@ -88,7 +88,7 @@ class SqliteRetrieveRepositoryTest {
             assertThat(tableExists(conn, "lite_embeddings")).isTrue();
             assertThat(tableExists(conn, "lite_embeddings_fts")).isTrue();
             assertThat(tableExists(conn, "vec_embeddings_3")).isTrue();
-            // contentless FTS 不存原文（查 content 恒 NULL，Go 同款）——用二元词元 MATCH 证明
+            // contentless FTS 不存原文（查 content 恒 NULL）——用二元词元 MATCH 证明
             // 走的是"重叠二元组"切分（unicode61 原样分词不会把"文检"当成词元）
             try (Statement st = conn.createStatement();
                     ResultSet rs = st.executeQuery("SELECT COUNT(*) FROM lite_embeddings_fts"

@@ -40,7 +40,6 @@ public final class QaRequests {
         public String skillName = "";
     }
 
-    /** 对照 ImageAttachment。 */
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ImageAttachment {
         /** base64 data URI from frontend (data:image/png;base64,...) */
@@ -49,7 +48,6 @@ public final class QaRequests {
         public String caption = "";
     }
 
-    /** 对照 AttachmentUpload。 */
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class AttachmentUpload {
         public String data = "";
@@ -57,7 +55,6 @@ public final class QaRequests {
         public long fileSize;
     }
 
-    /** 对照 CreateKnowledgeQARequest。 */
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class CreateKnowledgeQARequest {
         public String query = "";
@@ -116,7 +113,6 @@ public final class QaRequests {
         }
     }
 
-    /** 对照 SearchKnowledgeRequest。 */
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class SearchKnowledgeRequest {
         public String query = "";

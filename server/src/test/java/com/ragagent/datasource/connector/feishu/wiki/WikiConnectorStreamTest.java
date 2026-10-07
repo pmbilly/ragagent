@@ -372,7 +372,7 @@ class WikiConnectorStreamTest {
         assertThat(p.get("space1")).doesNotContainKey("nt2"); // 瞬时失败不得被记成已同步
         assertThat(p.get("space1")).doesNotContainKey("nt3"); // 被取消的也不得记
 
-        // Pass 2：asynq 重试；obj2 已恢复；从持久化游标续跑
+        // Pass 2：队列重试；obj2 已恢复；从持久化游标续跑
         failTokens.clear();
         FeishuTestSupport.RecordingHandler h2 = new FeishuTestSupport.RecordingHandler();
         SyncCursor next2 = connector().fetchStream(ds, persisted, h2);

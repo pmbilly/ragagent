@@ -16,7 +16,7 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 /**
- * 测试用的一次性 Redis（对应 Go 测试里的 {@code miniredis}）。
+ * 测试用的一次性 Redis。
  *
  * <h2>为什么不用 Spring 的自动配置</h2>
  * {@code RedisStreamManager} 的语义有一半在 <b>Lua 脚本与真实 TTL</b> 里：

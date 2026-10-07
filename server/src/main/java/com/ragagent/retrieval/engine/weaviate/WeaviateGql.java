@@ -306,9 +306,6 @@ public final class WeaviateGql {
 
     /**
      * 字符串引号：委托 {@link ToolJson#quoted}（标准 Jackson 转义）。
-     *
-     * <p><b>2026-10-03（B43）</b>：手写复刻已退役（Go 版下线）——原实现与
-     * {@code GoQuoting.quoteGo} 同源拷贝，属第 5 份重复；现收敛为 Java 原生做法。</p>
      */
     static String quoteGo(String s) {
         return ToolJson.quoted(s);

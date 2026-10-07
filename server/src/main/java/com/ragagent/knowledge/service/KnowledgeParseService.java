@@ -95,7 +95,7 @@ public class KnowledgeParseService {
         existing.setPendingSubtasksCount(0);
         existing.setUpdatedAt(now);
         // 取消时收口进度 span：LatestAttempt → AbortAttempt（平扫非终态子 span +
-        // 收口 root 为 cancelled；best-effort，nil/missing attempt no-op）
+        // 收口 root 为 cancelled；best-effort，attempt 为 null/缺失时 no-op）
         int spanAttempt = spanTracker.latestAttempt(existing.getId());
         if (spanAttempt > 0) {
             spanTracker.abortAttempt(existing.getId(), spanAttempt,

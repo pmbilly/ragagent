@@ -260,8 +260,8 @@ public class ToolRegistry {
             result.setError("tool returned no result");
         }
 
-        // 截断超限的工具输出，防止上下文窗口被灌爆。上限按 rune 数计（与 TruncateToolOutput
-        // 一致）；这里若按字节比较，CJK 输出实际等于没封顶。
+        // 截断超限的工具输出，防止上下文窗口被灌爆。上限按码点数计（与
+        // ToolOutput.truncateToolOutput 一致）；这里若按字节比较，CJK 输出实际等于没封顶。
         if (result.getOutput() != null
                 && result.getOutput().codePointCount(0, result.getOutput().length()) > maxOutput) {
             result.setOutput(ToolOutput.truncateToolOutput(result.getOutput(), maxOutput));

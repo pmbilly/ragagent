@@ -41,7 +41,7 @@ public class EvaluationController {
     @PostMapping
     public ResponseEntity<EvaluationDetail> evaluation(
             @Valid @RejectEmptyBody @RequestBody(required = false) EvaluationRequest request) {
-        // 字面量 null 体 = 零值请求（与 Go 绑定行为一致）
+        // 请求体缺省（null）= 空请求（各字段为 null）
         EvaluationRequest req = request == null ? EvaluationRequest.empty() : request;
         Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null) {

@@ -28,7 +28,7 @@ import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
  * <p>周期扫描"卡在处理态"的知识行并判死为 failed。这是最后一道兜底网——其它防线
  * （worker 重试预算、多模态收口回调）漏掉的情形由它接住：</p>
  * <ul>
- *   <li>worker 进程在 handler 中途被杀，defer 还没跑到；</li>
+ *   <li>worker 进程在 handler 中途被杀，清理逻辑还没跑到；</li>
  *   <li>DocReader 调用真的超过上限，而重试还没轮到；</li>
  *   <li>多模态计数器置为 N 但 N 个图片任务全部以绕过收口的方式失败。</li>
  * </ul>

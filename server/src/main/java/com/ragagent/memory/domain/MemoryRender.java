@@ -11,7 +11,7 @@ import java.util.Map;
  * 常驻块 / 情境召回的渲染，以及提示词信封。
  *
  * <p><b>这两段文本是喂给模型的</b>，分组顺序、表头、连字符、
- * 预算的算法（连"换行也算一个 rune"都算进去）都别"顺手优化"。</p>
+ * 预算的算法（连"换行也算一个码点"都算进去）都别"顺手优化"。</p>
  */
 public final class MemoryRender {
 
@@ -28,12 +28,12 @@ public final class MemoryRender {
             MemoryKinds.KIND_TASK, "Ongoing tasks",
             MemoryKinds.KIND_INTEREST, "Long-term focus");
 
-    /** 渲染常驻块（预算 900 rune）。 */
+    /** 渲染常驻块（预算 900 码点）。 */
     public static String renderMemoryBlock(List<MemoryItem> items) {
         return renderMemoryLines(items, MemoryKinds.BLOCK_RUNE_BUDGET);
     }
 
-    /** 渲染一轮的查询匹配情境条目（预算 600 rune）。 */
+    /** 渲染一轮的查询匹配情境条目（预算 600 码点）。 */
     public static String renderMemoryRecall(List<MemoryItem> items) {
         return renderMemoryLines(items, MemoryKinds.RECALL_RUNE_BUDGET);
     }
@@ -45,7 +45,7 @@ public final class MemoryRender {
      * <ul>
      *   <li>预算用尽时**外层也 break**（表头写不下就整组不写，不是跳过表头继续写下一组）；</li>
      *   <li>每组之间**没有空行**，只有行尾的 {@code \n}；</li>
-     *   <li>最后 {@code TrimRight(…, "\n")} 只去尾部换行。</li>
+     *   <li>最后只去尾部换行（{@code \n}）。</li>
      * </ul>
      */
     private static String renderMemoryLines(List<MemoryItem> items, int runeBudget) {

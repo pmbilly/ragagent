@@ -92,7 +92,7 @@ final class RssConfig {
      *
      * <p>四条分支：</p>
      * <ol>
-     *   <li>{@code config == nil} → {@link ConnectorException.InvalidConfig}{@code ("config is nil")}
+     *   <li>{@code config == null} → {@link ConnectorException.InvalidConfig}{@code ("config is nil")}
      *       （文本 = {@code "invalid configuration: config is nil"}）；</li>
      *   <li>Credentials 解不出 {@link RssConfig} → 普通 {@code ConnectorException}
      *       （前缀 {@code "parse rss credentials: "}，<b>不是</b>哨兵包装，
@@ -140,7 +140,7 @@ final class RssConfig {
         if (!(raw instanceof String s)) {
             return "";
         }
-        return RssUtil.goTrim(s);
+        return RssUtil.trimUnicodeWhitespace(s);
     }
 
     /**
@@ -172,7 +172,7 @@ final class RssConfig {
                 }
                 i++;
             }
-            String u = RssUtil.goTrim(feedUrls.substring(start, i));
+            String u = RssUtil.trimUnicodeWhitespace(feedUrls.substring(start, i));
             if (u.isEmpty()) {
                 continue;
             }
@@ -191,12 +191,12 @@ final class RssConfig {
      * 同名后者覆盖前者。最终 map 为空时返回 {@code null}。</p>
      */
     Map<String, String> parseHeaders() {
-        if (authHeaders == null || RssUtil.goTrim(authHeaders).isEmpty()) {
+        if (authHeaders == null || RssUtil.trimUnicodeWhitespace(authHeaders).isEmpty()) {
             return null;
         }
         Map<String, String> headers = new LinkedHashMap<>();
         for (String rawLine : authHeaders.split("\n", -1)) {
-            String line = RssUtil.goTrim(rawLine);
+            String line = RssUtil.trimUnicodeWhitespace(rawLine);
             if (line.isEmpty()) {
                 continue;
             }
@@ -204,8 +204,8 @@ final class RssConfig {
             if (idx <= 0) {
                 continue;
             }
-            String name = RssUtil.goTrim(line.substring(0, idx));
-            String value = RssUtil.goTrim(line.substring(idx + 1));
+            String name = RssUtil.trimUnicodeWhitespace(line.substring(0, idx));
+            String value = RssUtil.trimUnicodeWhitespace(line.substring(idx + 1));
             if (name.isEmpty()) {
                 continue;
             }

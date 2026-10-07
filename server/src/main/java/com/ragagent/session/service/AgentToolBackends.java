@@ -109,7 +109,7 @@ public class AgentToolBackends {
     }
 
     /**
-     * Go {@code registerTools} 的构造面（KB 检索族 5 件 + 会话/记忆/DB 3 件）——
+     * 工具名 → 工具实例的分发构造（KB 检索族 5 件 + 会话/记忆/DB 3 件）——
      * allowedTools 命中即构造。非本族名返回 {@code null}（调用方照旧记 "Unknown tool"）。
      *
      * @param ownerId   search_conversations 的 owner（引擎装配期从调用方身份捕获）
@@ -143,7 +143,7 @@ public class AgentToolBackends {
                         return t == null ? 0L : t;
                     });
             case com.ragagent.agent.tools.ToolDefinitions.TOOL_DATA_SCHEMA -> {
-                // 对照 NewDataSchemaTool(knowledgeService, chunkRepo) + WithSearchTargets
+                // data_schema 装配：knowledgeService + chunkRepo 两个取数 seam，外加检索范围授权
                 DataSchemaTool tool = new DataSchemaTool(dataSchemaKnowledgeLookup(),
                         dataSchemaChunkLister());
                 if (targets != null) {
@@ -390,10 +390,10 @@ public class AgentToolBackends {
     }
 
     // ==================================================================
-    // search_conversations / search_memory / database_query（切片 2a）
+    // search_conversations / search_memory / database_query
     // ==================================================================
 
-    /** 对照 NewSearchConversationsTool：messageService.SearchMessages（hybrid、owner 显式）。 */
+    /** search_conversations 取数：走 {@code messageService.searchMessages}（hybrid、owner 显式）。 */
     public SearchConversationsTool.ConversationSearch conversationSearch() {
         return (query, limit, ownerId) -> {
             MessageSearchResult r = messageService.searchMessages(
@@ -414,7 +414,7 @@ public class AgentToolBackends {
         };
     }
 
-    /** 对照 NewSearchMemoryTool(s.memoryService)。 */
+    /** search_memory 取数：走 {@code memoryService.searchMemory}。 */
     public SearchMemoryTool.MemorySearch memorySearch() {
         return (query, limit) -> {
             MemorySearchResult r = memoryService.searchMemory(query, limit);
@@ -436,10 +436,10 @@ public class AgentToolBackends {
     }
 
     // ==================================================================
-    // data_schema（切片 2b）
+    // data_schema
     // ==================================================================
 
-    /** 对照 data_schema 的 knowledgeService.GetKnowledgeByIDOnly（拿 tenant 用）。 */
+    /** data_schema 按 id 取 knowledge（拿 tenant 用）。 */
     public DataSchemaTool.KnowledgeLookup dataSchemaKnowledgeLookup() {
         return knowledgeId -> {
             Knowledge k = knowledgeService.getKnowledgeByIdOnly(knowledgeId);
@@ -468,7 +468,7 @@ public class AgentToolBackends {
         };
     }
 
-    /** 对照 authorizeKnowledgeInSearchTargets（scopeEnforced 时的授权器）。 */
+    /** scopeEnforced 时的授权器。 */
     public DataSchemaTool.ScopeAuthorizer dataSchemaScopeAuthorizer(
             SearchTarget.SearchTargets targets) {
         return knowledgeId -> {

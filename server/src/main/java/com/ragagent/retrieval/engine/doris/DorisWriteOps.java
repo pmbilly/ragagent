@@ -81,7 +81,7 @@ final class DorisWriteOps {
     }
 
     /**
-     * 对照 {@code insertRows}：按列序拼一条多 VALUES 的 INSERT；embedding 列以字面量
+     * 按列序拼一条多 VALUES 的 INSERT；embedding 列以字面量
      * 形式内联（MySQL 驱动不支持 ARRAY 占位符）。
      */
     void insertRows(String table, List<DorisVectorEmbedding> rows) throws SQLException {
@@ -108,7 +108,7 @@ final class DorisWriteOps {
         service.sql.execute(stmt, args);
     }
 
-    /** 对照 {@code replaceRows}：按 id 去重（后者胜）后 delete + insert。 */
+    /** 按 id 去重（后者胜）后 delete + insert。 */
     void replaceRows(String table, List<DorisVectorEmbedding> rows) throws SQLException {
         List<DorisVectorEmbedding> deduped = dedupeRowsById(rows);
         if (deduped.isEmpty()) {
@@ -133,7 +133,7 @@ final class DorisWriteOps {
         service.sql.execute(stmt, new ArrayList<>(ids));
     }
 
-    /** 对照 {@code dedupeRowsByID}：同 id 保留最后一条，且保留首次出现的位次。 */
+    /** 同 id 保留最后一条，且保留首次出现的位次。 */
     static List<DorisVectorEmbedding> dedupeRowsById(List<DorisVectorEmbedding> rows) {
         if (rows.size() < 2) {
             return rows;
@@ -169,7 +169,7 @@ final class DorisWriteOps {
         deleteByField(DorisSql.FIELD_SOURCE_ID, sourceIdList, dimension);
     }
 
-    /** 对照 {@code deleteByField}：DELETE FROM <table> WHERE <field> IN (?, ?, ...)。 */
+    /** DELETE FROM <table> WHERE <field> IN (?, ?, ...)。 */
     void deleteByField(String field, List<String> ids, int dimension) {
         if (ids == null || ids.isEmpty()) {
             return;
@@ -297,7 +297,7 @@ final class DorisWriteOps {
         }, "rewrite tag_id");
     }
 
-    /** 对照 {@code rewriteChunkRows}：跨表读整行 → 变更 → replaceRows 写回。 */
+    /** 跨表读整行 → 变更 → replaceRows 写回。 */
     void rewriteChunkRows(List<String> chunkIds, Predicate<DorisVectorEmbedding> mutate,
                                   String action) {
         if (chunkIds.isEmpty()) {
@@ -391,7 +391,7 @@ final class DorisWriteOps {
         }
     }
 
-    /** 对照 {@code loadRowsByChunkIDs}：按 chunk_id 读整行（含 embedding）。 */
+    /** 按 chunk_id 读整行（含 embedding）。 */
     List<DorisVectorEmbedding> loadRowsByChunkIds(String table, List<String> chunkIds)
             throws SQLException {
         if (chunkIds.isEmpty()) {
@@ -405,12 +405,11 @@ final class DorisWriteOps {
                 DorisRetrieveRepository::scanCopyRow);
     }
 
-    /** 对照 {@code rowLocation}。 */
     record RowLocation(String table, String id) {
     }
 
     /**
-     * 对照 {@code lookupChunkRowKeys}：查给定 chunkIDs 在所有 {@code <base>_<dim>} 表中的
+     * 查给定 chunkIDs 在所有 {@code <base>_<dim>} 表中的
      * 物理位置（同一 chunk 可能在多维度表里都有副本）。
      */
     Map<String, List<RowLocation>> lookupChunkRowKeys(List<String> chunkIds) {
@@ -451,7 +450,7 @@ final class DorisWriteOps {
     // ── 迁移 ────────────────────────────────────────────────────────────────
 
     /**
-     * 对照 {@code ValidateKnowledgeIndexMove}：ANN DUPLICATE KEY 表的"替换"是
+     * ANN DUPLICATE KEY 表的"替换"是
      * delete + insert，失败的 insert 会丢掉唯一的向量副本、且改物理 id 会破坏
      * 稳定的 source-ID 身份 → 内积副本模式不支持 reuse_vectors 搬移。
      */

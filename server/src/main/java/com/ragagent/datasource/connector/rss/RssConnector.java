@@ -104,8 +104,8 @@ public class RssConnector implements Connector {
      * 完整装配（测试与将来的"恢复某块能力"用）。
      *
      * @param feedParser      feed 解析器，不可为 null
-     * @param articleExtractor 正文抽取器，不可为 null（想保持 Go 行为就传
-     *                         {@link UnavailableArticleExtractor}）
+     * @param articleExtractor 正文抽取器，不可为 null（传 {@link UnavailableArticleExtractor}
+     *                         即不做正文抽取，resolveItem 会跳过文章页请求）
      * @param htmlToMarkdown  HTML→Markdown，不可为 null
      */
     public RssConnector(FeedParser feedParser, ArticleExtractor articleExtractor,
@@ -167,11 +167,11 @@ public class RssConnector implements Connector {
      *   <li>抓取失败 → {@code Description = "fetch failed: " + err}，<b>仍然列出</b>
      *       （用户可以把它取消勾选，而不是整个列表失败）；</li>
      *   <li>解析失败 → {@code Description = "parse failed: " + err}，同样列出；</li>
-     *   <li>成功 → {@code Name = TrimSpace(feed.Title)}（空则<b>保留 URL</b>）、
-     *       {@code Description = TrimSpace(feed.Description)}、
+     *   <li>成功 → {@code Name} = feed.Title 去首尾空白（空则<b>保留 URL</b>）、
+     *       {@code Description} = feed.Description 去首尾空白、
      *       {@code URL = feed.Link}（非空时）、
-     *       {@code ModifiedAt = feed.UpdatedParsed}（非 nil 时）、
-     *       {@code Metadata = {"item_count": len(feed.Items)}}。</li>
+     *       {@code ModifiedAt = feed.UpdatedParsed}（非 {@code null} 时）、
+     *       {@code metadata.put("item_count", feed.items().size())}。</li>
      * </ul>
      */
     @Override
@@ -209,11 +209,11 @@ public class RssConnector implements Connector {
                 out.add(res);
                 continue;
             }
-            String title = RssUtil.goTrim(feed.title());
+            String title = RssUtil.trimUnicodeWhitespace(feed.title());
             if (!title.isEmpty()) {
                 res.setName(title);
             }
-            res.setDescription(RssUtil.goTrim(feed.description()));
+            res.setDescription(RssUtil.trimUnicodeWhitespace(feed.description()));
             if (!RssUtil.nullToEmpty(feed.link()).isEmpty()) {
                 res.setUrl(feed.link());
             }
@@ -247,7 +247,7 @@ public class RssConnector implements Connector {
      * 只返回内容指纹变过的条目；<b>不发删除</b>。
      *
      * <p>返回的 {@link FetchIncrementalResult} 里 items 与 cursor 都可能为 {@code null}
-     * （"所有 feed 都失败"那条路径 items 为 nil、cursor 有值）。
+     * （"所有 feed 都失败"那条路径 items 为 {@code null}、cursor 有值）。
      * 部分失败时抛 {@link PartialFetchException}，items 与 cursor 在异常上
      * ——见 {@link RssFetchState}。</p>
      */
@@ -444,7 +444,7 @@ public class RssConnector implements Connector {
         // 抽取器不可用（UnavailableArticleExtractor 恒抛）时直接跳过文章页请求：
         // 抓回的字节必被丢弃，每个条目白付一次外网请求（2026-09-28 评审修正）。
         String contentHtml = feedContent;
-        if (!RssUtil.goTrim(item.link()).isEmpty() && fullTextAvailable) {
+        if (!RssUtil.trimUnicodeWhitespace(item.link()).isEmpty() && fullTextAvailable) {
             try {
                 ArticleExtractor.ExtractedArticle article = client.extractArticle(item.link());
                 contentHtml = article.contentHtml();
@@ -501,17 +501,17 @@ public class RssConnector implements Connector {
      */
     private String htmlToMarkdown(String html) {
         String raw = RssUtil.nullToEmpty(html);
-        if (RssUtil.goTrim(raw).isEmpty()) {
+        if (RssUtil.trimUnicodeWhitespace(raw).isEmpty()) {
             return "";
         }
         try {
             String md = markdownConverter.convert(raw);
-            if (md == null || RssUtil.goTrim(md).isEmpty()) {
-                return RssUtil.goTrim(raw);
+            if (md == null || RssUtil.trimUnicodeWhitespace(md).isEmpty()) {
+                return RssUtil.trimUnicodeWhitespace(raw);
             }
-            return RssUtil.goTrim(md);
+            return RssUtil.trimUnicodeWhitespace(md);
         } catch (RuntimeException e) {
-            return RssUtil.goTrim(raw);
+            return RssUtil.trimUnicodeWhitespace(raw);
         }
     }
 

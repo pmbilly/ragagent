@@ -142,7 +142,7 @@ class OpenSearchRetrieveRepositoryTest {
                 + "\"number\":\"3.3.2\"}}");
         assertThat(newRepo()).isNotNull();
 
-        // 双节点其中之一缺 k-NN → CONFIG_INVALID，缺失列表 [node-2]（Go %v 形态）
+        // 双节点其中之一缺 k-NN → CONFIG_INVALID，缺失列表 [node-2]
         bodyOverrides.put("GET /_cat/plugins", "[{\"name\":\"node-1\","
                 + "\"component\":\"opensearch-knn\"},{\"name\":\"node-2\","
                 + "\"component\":\"other\"}]");

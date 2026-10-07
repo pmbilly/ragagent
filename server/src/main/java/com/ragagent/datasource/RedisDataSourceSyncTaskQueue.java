@@ -47,8 +47,8 @@ import com.ragagent.datasource.domain.DataSourceSyncPayload;
  *   <li>执行中的任务带租约（默认 3 分钟，每 1 分钟续期）；取走任务的实例崩溃后
  *       租约过期即被其它实例回收重投——至少一次语义（同步本身在 sync_log 与
  *       第一层 {@code hasRunningSync} 之外还有幂等设计）；</li>
- *   <li>进程下线时（执行线程被中断）不清理、不重排：任务留在执行中集合等租约回收
- *       （对齐 asynq 的 in-flight 重投），而不是就地放弃。</li>
+ *   <li>进程下线时（执行线程被中断）不清理、不重排：任务留在执行中集合等租约回收，
+ *       而不是就地放弃。</li>
  * </ul>
  */
 public class RedisDataSourceSyncTaskQueue implements DataSourceSyncTaskQueue {
@@ -69,7 +69,7 @@ public class RedisDataSourceSyncTaskQueue implements DataSourceSyncTaskQueue {
     private final StringRedisTemplate template;
     private final ObjectProvider<DataSourceSyncHandler> handlerProvider;
 
-    /** 执行器：每个尝试一个虚拟线程（对照 asynq 的 worker 池）。 */
+    /** 执行器：每个尝试一个虚拟线程。 */
     private final ExecutorService worker = Executors.newVirtualThreadPerTaskExecutor();
 
     /** 续期调度器（长跑任务不被误回收）。 */
@@ -269,7 +269,7 @@ public class RedisDataSourceSyncTaskQueue implements DataSourceSyncTaskQueue {
 
     /**
      * 默认重试退避 {@code n^4 + 15 + rand(30)*(n+1)} 秒
-     * （对照 asynq 的默认退避；wiki / memory 两份实现用的是同一公式）。
+     * （wiki / memory 两份实现用的是同一公式）。
      */
     private long retryDelaySeconds(int attempt) {
         Long override = retryDelayOverrideSeconds;

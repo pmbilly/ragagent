@@ -12,7 +12,7 @@ import com.ragagent.agent.domain.AgentStep;
  * {@code List<AgentStep>} 退化成 {@code List<LinkedHashMap>}，一取元素就
  * {@code ClassCastException}——而 {@code agent_steps} 是会出现在消息响应体里的。</p>
  *
- * <p>写路径：nil 与空列表都写成 {@code []}，不写 SQL NULL。</p>
+ * <p>写路径：null 与空列表都写成 {@code []}，不写 SQL NULL。</p>
  */
 public class AgentStepListTypeHandler extends AbstractJsonListTypeHandler<AgentStep> {
 

@@ -76,7 +76,7 @@ class RerankRecordingTest {
 
     @Test
     void rerankPassage() throws Exception {
-        // Go json.Marshal 的 struct 序与零值字段（url/original_url/start_pos/end_pos/caption/ocr_text）
+        // 金片字节形态的键序与零值字段（url/original_url/start_pos/end_pos/caption/ocr_text）
         var q1 = ObjectMapperHolder.JSON.createObjectNode();
         q1.put("id", "q1").put("question", "生成的问题一");
         var q2 = ObjectMapperHolder.JSON.createObjectNode();
@@ -198,7 +198,7 @@ class RerankRecordingTest {
         s1.put("err", errOf(err));
         s1.put("rerank", searchResultsShape(cm.getRerankResult()));
         s1.put("model_calls", rr.calls);
-        // Go 探针的 ms 未挂 calls 指针 → model_lookup 录成 null（形状备案）
+        // 录制探针的 ms 未挂 calls 指针 → model_lookup 录成 null（形状备案）
         s1.put("model_lookup", null);
         s1.put("search_kept", searchResultsShape(cm.getSearchResult()));
         assertRec("rerank", "normal", json(s1));
@@ -308,7 +308,7 @@ class RerankRecordingTest {
         PluginError err9 = p9.onEvent(PipelineEventType.CHUNK_RERANK, cm9, () -> null);
         Map<String, Object> s9 = new LinkedHashMap<>();
         s9.put("err", errOf(err9));
-        // Go 探针 ms 无 calls 指针 → null（形状备案）
+        // 录制探针 ms 无 calls 指针 → null（形状备案）
         s9.put("lookup", null);
         assertRec("rerank", "model_missing", json(s9));
 

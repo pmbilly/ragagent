@@ -229,7 +229,7 @@ public class StorageFileResolver {
                         try {
                             dir = LocalFileContentService.safePathUnderBase(dir, joined);
                         } catch (Exception ignored) {
-                            // Go: SafeJoinUnderBase 失败 → 忽略，baseDir 原样
+                            // safePathUnderBase 失败 → 忽略，baseDir 原样
                         }
                     }
                 }

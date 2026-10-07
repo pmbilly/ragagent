@@ -280,29 +280,29 @@ public class WebSearchTool extends BaseTool {
         JsonNode content = args.path("content");
         // 缺失/null → 空串（不是类型错误；空串由后面的 query 校验拒绝）
         if (!query.isTextual() && !(query.isMissingNode() || query.isNull())) {
-            throw new IllegalArgumentException(goFieldTypeMessage("WebSearchInput.query",
+            throw new IllegalArgumentException(fieldTypeMessage("WebSearchInput.query",
                     jsonTypeOf(query), "string"));
         }
         Integer countValue = null;
         if (!(count.isMissingNode() || count.isNull())) {
             if (!count.isIntegralNumber()) {
-                throw new IllegalArgumentException(goFieldTypeMessage("WebSearchInput.count",
+                throw new IllegalArgumentException(fieldTypeMessage("WebSearchInput.count",
                         jsonTypeOf(count), "int"));
             }
             countValue = count.asInt();
         }
         if (!(country.isMissingNode() || country.isNull() || country.isTextual())) {
-            throw new IllegalArgumentException(goFieldTypeMessage("WebSearchInput.country",
+            throw new IllegalArgumentException(fieldTypeMessage("WebSearchInput.country",
                     jsonTypeOf(country), "string"));
         }
         if (!(freshness.isMissingNode() || freshness.isNull() || freshness.isTextual())) {
-            throw new IllegalArgumentException(goFieldTypeMessage("WebSearchInput.freshness",
+            throw new IllegalArgumentException(fieldTypeMessage("WebSearchInput.freshness",
                     jsonTypeOf(freshness), "string"));
         }
         boolean contentValue = false;
         if (!(content.isMissingNode() || content.isNull())) {
             if (!content.isBoolean()) {
-                throw new IllegalArgumentException(goFieldTypeMessage("WebSearchInput.content",
+                throw new IllegalArgumentException(fieldTypeMessage("WebSearchInput.content",
                         jsonTypeOf(content), "bool"));
             }
             contentValue = content.asBoolean();
@@ -328,9 +328,9 @@ public class WebSearchTool extends BaseTool {
         return "string";
     }
 
-    private static String goFieldTypeMessage(String field, String jsonType, String goType) {
+    private static String fieldTypeMessage(String field, String jsonType, String typeLabel) {
         return "json: cannot unmarshal " + jsonType + " into Go struct field " + field
-                + " of type " + goType;
+                + " of type " + typeLabel;
     }
 
     /**

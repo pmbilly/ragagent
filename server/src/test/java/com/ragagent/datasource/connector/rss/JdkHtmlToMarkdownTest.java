@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
  *   "&lt;p&gt;a&lt;br&gt;b&lt;/p&gt;"                                       -&gt; "a  \nb"
  *   "&lt;script&gt;bad()&lt;/script&gt;&lt;p&gt;safe&lt;/p&gt;&lt;style&gt;p{}&lt;/style&gt;" -&gt; "safe"
  *   "&lt;div&gt;&lt;p&gt;nested&lt;/p&gt;&lt;/div&gt;"                        -&gt; "nested"
- *   "&lt;p&gt;  spaced  &lt;/p&gt;"                                     -&gt; "spaced"（调用方还会 TrimSpace 一次）
+ *   "&lt;p&gt;  spaced  &lt;/p&gt;"                                     -&gt; "spaced"（调用方还会去首尾空白一次）
  *   "&lt;td&gt;cell&lt;/td&gt;"                                         -&gt; "cell"
  *   "&lt;table&gt;&lt;tr&gt;&lt;td&gt;c1&lt;/td&gt;&lt;td&gt;c2&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;"   -&gt; "c1c2"
  *   "&lt;p&gt;AT&amp;amp;T &amp;lt;b&amp;gt; &amp;nbsp; &amp;#169;&lt;/p&gt;"              -&gt; "AT&amp;T &amp;lt;b&amp;gt;   ©"  ← "&lt;" 会被转义成 "&amp;lt;"
@@ -55,7 +55,7 @@ class JdkHtmlToMarkdownTest {
     private final JdkHtmlToMarkdown converter = new JdkHtmlToMarkdown();
 
     private String md(String html) {
-        return RssUtil.goTrim(converter.convert(html));
+        return RssUtil.trimUnicodeWhitespace(converter.convert(html));
     }
 
     @Test
@@ -185,8 +185,8 @@ class JdkHtmlToMarkdownTest {
     @Test
     void htmlToMarkdownFallbackMatchesGo() {
         // 回落语义：空白输入 -> ""；
-        // 转换失败或结果为空 -> TrimSpace(html)。
-        assertThat(RssUtil.goTrim(converter.convert("   "))).isEmpty();
+        // 转换失败或结果为空 -> 返回原 html 去首尾空白。
+        assertThat(RssUtil.trimUnicodeWhitespace(converter.convert("   "))).isEmpty();
         // 一个"转换器总是抛错"的替身：走回落分支
         HtmlToMarkdown failing = html -> {
             throw new HtmlConversionException("boom");
@@ -196,17 +196,17 @@ class JdkHtmlToMarkdownTest {
 
     /** {@code RssConnector.htmlToMarkdown} 的三条分支（私有方法，就地重写以便单测）。 */
     private static String fallback(HtmlToMarkdown converter, String html) {
-        if (RssUtil.goTrim(html).isEmpty()) {
+        if (RssUtil.trimUnicodeWhitespace(html).isEmpty()) {
             return "";
         }
         try {
             String result = converter.convert(html);
-            if (result == null || RssUtil.goTrim(result).isEmpty()) {
-                return RssUtil.goTrim(html);
+            if (result == null || RssUtil.trimUnicodeWhitespace(result).isEmpty()) {
+                return RssUtil.trimUnicodeWhitespace(html);
             }
-            return RssUtil.goTrim(result);
+            return RssUtil.trimUnicodeWhitespace(result);
         } catch (RuntimeException e) {
-            return RssUtil.goTrim(html);
+            return RssUtil.trimUnicodeWhitespace(html);
         }
     }
 }

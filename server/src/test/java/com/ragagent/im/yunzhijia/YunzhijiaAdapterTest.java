@@ -167,7 +167,7 @@ class YunzhijiaAdapterTest {
                         + "\"operatorName\":\"张三\",\"time\":1727000000000,\"msgId\":\"msg-1\","
                         + "\"content\":\"你好，请帮我查一下\"}",
                 YunzhijiaTypes.CallbackMessage.class);
-        // 录自独立 Go 程序（crypto/hmac + sha1，基串 = 七字段逗号连接）
+        // 期望值录自独立探针程序（HMAC-SHA1，基串 = 七字段逗号连接）
         assertEquals("EGVf29MzZBaLN+EmUcSFqSOfWck=",
                 YunzhijiaSign.computeSignature(SECRET, msg));
 

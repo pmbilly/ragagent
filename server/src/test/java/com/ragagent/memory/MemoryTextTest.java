@@ -64,7 +64,7 @@ class MemoryTextTest {
     }
 
     /**
-     * 最长 200 个 **rune**（不是 UTF-16 码元）。
+     * 最长 200 个 **码点**（不是 UTF-16 码元）。
      *
      * <p>语料必须用**互不相同**的字：{@code "字".repeat(500)} 去重之后只剩一个字，
      * 长度断言会假绿（实测：那个输入的结果就是 {@code "字"}，长度 1）。</p>
@@ -79,7 +79,7 @@ class MemoryTextTest {
             sb.append((char) (0x4E00 + i));
         }
         String key = MemoryKeys.normalizeMemoryKey("", sb.toString());
-        // 未截断时是 250 个字 + 249 个连字符 = 499 rune
+        // 未截断时是 250 个字 + 249 个连字符 = 499 码点
         assertThat(MemoryKeys.runeLength(key)).isEqualTo(200);
     }
 
@@ -130,7 +130,7 @@ class MemoryTextTest {
         assertThat(MemoryKeys.normalizeTopicKey(null)).isEmpty();
     }
 
-    /** 最长 120 个 rune（实测：250 个互不相同的字 → 120）。 */
+    /** 最长 120 个码点（实测：250 个互不相同的字 → 120）。 */
     @Test
     void normalizeTopicKeyTruncatesAtOneHundredTwentyRunes() {
         StringBuilder sb = new StringBuilder();
@@ -167,12 +167,12 @@ class MemoryTextTest {
 
     @Test
     void topicLooksLikeOneQuestionAtTwentyFourRunes() {
-        // 实测：归一化后 6 rune → false
+        // 实测：归一化后 6 码点 → false
         assertThat(MemoryKeys.topicLooksLikeOneQuestion("门店排班管理")).isFalse();
-        // 实测：22 rune → false（**不到** 24 这条线，别想当然）
+        // 实测：22 码点 → false（**不到** 24 这条线，别想当然）
         assertThat(MemoryKeys.topicLooksLikeOneQuestion("v2.3版本orders接口分页参数默认值查询"))
                 .isFalse();
-        // 实测：26 rune → true
+        // 实测：26 码点 → true
         assertThat(MemoryKeys.topicLooksLikeOneQuestion("v2.3版本orders接口分页参数默认值查询逻辑梳理"))
                 .isTrue();
     }
@@ -195,7 +195,7 @@ class MemoryTextTest {
         // 与两个标签都毫无共享的"发明"：拒绝
         assertThat(MemoryKeys.topicLabelIsAnImprovement("排班管理", "门店排班", "数据库迁移优化"))
                 .isFalse();
-        // 长度超过 80 rune：拒绝
+        // 长度超过 80 码点：拒绝
         assertThat(MemoryKeys.topicLabelIsAnImprovement("排班管理", "门店排班",
                 "门店排班管理" + "很".repeat(80))).isFalse();
     }
@@ -229,7 +229,7 @@ class MemoryTextTest {
     /**
      * 空白判定**含**不换行空格 U+00A0，而
      * {@code Character.isWhitespace} 恰好把它排除在外——所以这里用的是
-     * {@code isSpaceChar || 六个 ASCII 空白}（见 {@code MemoryText.isGoSpace}）。
+     * {@code isSpaceChar || 六个 ASCII 空白}（见 {@code MemoryText.isUnicodeWhitespace}）。
      *
      * <p>实测：{@code sanitizeMemoryContent("a\u00A0b")} = {@code "a b"}（普通空格）。</p>
      */
@@ -387,7 +387,7 @@ class MemoryTextTest {
         assertThat(d.statement()).isEqualTo("I Use Postgres");
     }
 
-    /** 剥掉前缀之后剩下的必须至少 2 个 rune，否则回 not-detected（而不是空陈述）。 */
+    /** 剥掉前缀之后剩下的必须至少 2 个码点，否则回 not-detected（而不是空陈述）。 */
     @Test
     void detectExplicitMemoryRejectsOneRuneStatements() {
         assertThat(MemoryText.detectExplicitMemory("记住：好").detected()).isFalse();

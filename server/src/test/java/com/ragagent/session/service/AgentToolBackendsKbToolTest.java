@@ -30,7 +30,7 @@ import com.ragagent.session.domain.MessageSearchResult;
 import com.ragagent.wiki.service.page.WikiPageService;
 
 /**
- * 工具接线钉（2026-09-23 接线批：切片 1 KB 五件 + 切片 2a 会话/记忆/DB 三件）。
+ * 工具接线钉（2026-09-23 接线批：工作包 1 KB 五件 + 工作包 2a 会话/记忆/DB 三件）。
  *
  * <p>此前 {@code registerTools} 对这些名字只落 {@code default → "Unknown tool"}——
  * 工具类与执行面都已就位但从未构造。本测试钉住「可构造且名字一致」+ 关键映射。</p>
@@ -80,7 +80,7 @@ class AgentToolBackendsKbToolTest {
         assertThat(backends.createTool("not_a_tool", null, null, "o", "s")).isNull();
     }
 
-    /** 切片 2d：web 两件经 createWebTool 可构造且名字一致（Go L1071-1082）。 */
+    /** 工作包 2d：web 两件经 createWebTool 可构造且名字一致。 */
     @Test
     void webToolsAreConstructible() {
         for (String name : List.of("web_search", "web_fetch")) {

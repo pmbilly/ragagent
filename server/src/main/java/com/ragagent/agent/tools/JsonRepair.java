@@ -220,7 +220,7 @@ public final class JsonRepair {
     /** 从 start 起找下一个非空白码点的下标；没有返回 -1。 */
     private static int findNextNonSpace(int[] runes, int start) {
         for (int i = start; i < runes.length; i++) {
-            if (!isGoSpace(runes[i])) {
+            if (!isUnicodeWhitespace(runes[i])) {
                 return i;
             }
         }
@@ -228,7 +228,7 @@ public final class JsonRepair {
     }
 
     /** 空白判定（\t \n \v \f \r 空格 U+0085 U+00A0 及 Unicode 空白）。 */
-    private static boolean isGoSpace(int r) {
+    private static boolean isUnicodeWhitespace(int r) {
         switch (r) {
             case '\t', '\n', 0x0B, 0x0C, '\r', ' ', 0x85, 0xA0:
                 return true;

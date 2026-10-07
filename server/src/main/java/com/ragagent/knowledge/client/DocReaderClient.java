@@ -176,7 +176,7 @@ public class DocReaderClient {
                                boolean available, String unavailableReason) {}
 
     /**
-     * conn != nil。Java 的 ManagedChannel 惰性连接，
+     * 连接对象非 null 即已连接。Java 的 ManagedChannel 惰性连接，
      * "配置了地址即连接对象存在"的语义一致。
      */
     public boolean isConnected() {

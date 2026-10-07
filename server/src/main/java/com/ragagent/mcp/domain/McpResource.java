@@ -3,7 +3,7 @@ package com.ragagent.mcp.domain;
 
 /**
  * MCP 服务暴露的资源。
- * uri/name 恒输出；description/mimeType 带 omitempty（注意 mimeType 是驼峰——协议字段名）。
+ * uri/name 恒输出；description/mimeType 为空省略（注意 mimeType 是驼峰——协议字段名）。
  */
 public class McpResource {
 

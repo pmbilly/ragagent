@@ -124,12 +124,12 @@ public final class ParamValidator {
             double[] minVal = getFloat(prop, "minimum");
             if (minVal != null && numVal < minVal[0]) {
                 errs.add(new ValidationError(name,
-                        "parameter '" + name + "' must be >= " + goValue(minVal[0])));
+                        "parameter '" + name + "' must be >= " + floatText(minVal[0])));
             }
             double[] maxVal = getFloat(prop, "maximum");
             if (maxVal != null && numVal > maxVal[0]) {
                 errs.add(new ValidationError(name,
-                        "parameter '" + name + "' must be <= " + goValue(maxVal[0])));
+                        "parameter '" + name + "' must be <= " + floatText(maxVal[0])));
             }
         }
 
@@ -173,9 +173,9 @@ public final class ParamValidator {
 
     /** enum 成员判定：按节点文本形态字符串相等（1 == 1.0 == "1" 视为相同）。 */
     private static boolean isInEnum(JsonNode val, JsonNode enumList) {
-        String v = goValueOfNode(val);
+        String v = nodeText(val);
         for (JsonNode e : enumList) {
-            if (goValueOfNode(e).equals(v)) {
+            if (nodeText(e).equals(v)) {
                 return true;
             }
         }
@@ -186,7 +186,7 @@ public final class ParamValidator {
     private static String formatEnum(JsonNode enumList) {
         List<String> parts = new ArrayList<>(enumList.size());
         for (JsonNode e : enumList) {
-            parts.add(goValueOfNode(e));
+            parts.add(nodeText(e));
         }
         return String.join(", ", parts);
     }
@@ -206,9 +206,9 @@ public final class ParamValidator {
     }
 
     /** 节点文本形态（字符串原样、bool true/false、数字走最短浮点格式）。 */
-    private static String goValueOfNode(JsonNode n) {
+    private static String nodeText(JsonNode n) {
         if (n.isNumber()) {
-            return goValue(n.doubleValue());
+            return floatText(n.doubleValue());
         }
         if (n.isBoolean()) {
             return n.booleanValue() ? "true" : "false";
@@ -220,7 +220,7 @@ public final class ParamValidator {
     }
 
     /** 浮点文本（'g' 最短形态：1 → "1"、0.5 → "0.5"）。 */
-    private static String goValue(double d) {
+    private static String floatText(double d) {
         return Double.toString(d);
     }
 

@@ -51,7 +51,7 @@ import jakarta.servlet.http.HttpServletResponse;
  *       agent_query 事件写流；stop 处理器 + 独立 stop watcher + AgentStreamBridge 订阅；</li>
  *   <li>异步执行 QA 服务（虚拟线程），主线程 handleAgentEventsForSSE 100ms 轮询
  *       StreamManager 推帧，complete 后补 completion 事件；</li>
- *   <li>agent 模式 defer：completeAssistantMessage → follow-up 交接 → ClearLiveRun。</li>
+ *   <li>agent 模式清理时机：completeAssistantMessage → follow-up 交接 → clearLiveRun。</li>
  * </ol>
  *
  * <h2>已备案差异</h2>
@@ -215,7 +215,7 @@ public class KnowledgeQaController {
                 knowledgeBaseIds, request.knowledgeIds(), tagScopes, request.query);
 
         // 裸列表（无 {success,data} 信封）：检索结果直出。
-        // 引用形式（resource_urls）在检索面不带存储引用——Go 走 CopyReferences；
+        // 引用形式（resource_urls）在检索面不带存储引用（不经 Rewriter.copyReferences 改写）；
         // handle 模式为透传（public 模式的直链生成经 provider 级文件服务，A3-3 起已接线）。
         return searchResults;
     }
@@ -293,7 +293,7 @@ public class KnowledgeQaController {
     // ── 附件 / 完成 / 状态 ────────────────────────────────────────────────────
 
 
-    /** 对照 secutils.GetMaxFileSize 的 dev 缺省（100MB 上传闸门同形）。 */
+    /** dev 缺省（100MB 上传闸门同形）。 */
     static long maxFileBytes() {
         return 100L * 1024 * 1024;
     }

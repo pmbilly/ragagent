@@ -12,12 +12,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * <p><b>JSON 字段序 = 声明序</b>：model, max_tokens, stream, system, messages,
  * temperature, top_p, tools, tool_choice。</p>
  *
- * <p>omitempty 语义逐条对齐：</p>
+ * <p>「为空省略」语义逐条对齐：</p>
  * <ul>
- *   <li>{@code stream}：bool + omitempty，false 时省略（Java 用 NON_DEFAULT）；</li>
- *   <li>{@code system}：{@code any} + omitempty ⇒ <b>只有 nil 才省略</b>。空串是"非 nil 接口"，
+ *   <li>{@code stream}：布尔 + 缺席省略，false 时省略（Java 用 NON_DEFAULT）；</li>
+ *   <li>{@code system}：任意类型 + 缺席省略 ⇒ <b>只有 null 才省略</b>。空串是"非 null 对象"，
  *       会照发 {@code "system":""}（见 {@link AnthropicChat#buildRequest}）；</li>
- *   <li>{@code temperature} / {@code top_p}：指针，nil 省略 → NON_NULL。</li>
+ *   <li>{@code temperature} / {@code top_p}：指针，null 省略 → NON_NULL。</li>
  * </ul>
  */
 

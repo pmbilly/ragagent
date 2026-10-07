@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * 与中间的 Nginx 都按它们判断"这是不是一条不该被缓冲的事件流"。</p>
  *
  * <table border="1">
- *   <caption>Go {@code setSSEHeaders} 的逐条对照</caption>
+ *   <caption>四个 SSE 头的取值与理由</caption>
  *   <tr><th>头</th><th>值</th><th>为什么</th></tr>
  *   <tr><td>{@code Content-Type}</td><td>{@code text/event-stream}</td><td>SSE 的 MIME 类型</td></tr>
  *   <tr><td>{@code Cache-Control}</td><td>{@code no-cache}</td><td>事件流不可缓存</td></tr>

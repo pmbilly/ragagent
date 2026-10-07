@@ -149,7 +149,7 @@ public class SystemSettingService implements SystemSettingGateway {
         if (envName != null && !envName.isEmpty()) {
             String v = environment.getProperty(envName);
             if (v != null && !v.isEmpty()) {
-                Boolean parsed = goParseBool(v);
+                Boolean parsed = parseLegacyBool(v);
                 if (parsed != null) {
                     return parsed;
                 }
@@ -182,8 +182,8 @@ public class SystemSettingService implements SystemSettingGateway {
         return def == null ? new ArrayList<>() : def;
     }
 
-    /** Go strconv.ParseBool 的可接受集合。 */
-    private static Boolean goParseBool(String v) {
+    /** 可接受的布尔字面量集合（1/t/true 及大小写变体）。 */
+    private static Boolean parseLegacyBool(String v) {
         return switch (v) {
             case "1", "t", "T", "true", "TRUE", "True" -> Boolean.TRUE;
             case "0", "f", "F", "false", "FALSE", "False" -> Boolean.FALSE;
@@ -269,7 +269,7 @@ public class SystemSettingService implements SystemSettingGateway {
             String str = rawValue.isTextual() ? rawValue.asText() : null;
             if (str == null || !spec.enumOptions().contains(str)) {
                 throw new IllegalArgumentException("invalid value for \"" + key + "\": \""
-                        + (str == null ? "" : str) + "\" not in " + goStringList(spec.enumOptions()));
+                        + (str == null ? "" : str) + "\" not in " + formatBracketedList(spec.enumOptions()));
             }
         }
         validateRegistryEntry(key, rawValue);
@@ -404,7 +404,7 @@ public class SystemSettingService implements SystemSettingGateway {
         return jsonEquals(row.getValue(), def);
     }
 
-    /** Go json.Equal(Compact(a), Compact(b))——JSON 值等价比较。 */
+    /** JSON 值等价比较。 */
     private static boolean jsonEquals(JsonNode a, JsonNode b) {
         if (a == null || b == null) {
             return a == b;
@@ -514,8 +514,8 @@ public class SystemSettingService implements SystemSettingGateway {
         return uid == null ? "" : uid;
     }
 
-    /** Go fmt 的 %v 对 []string：[a b c]。 */
-    private static String goStringList(List<String> values) {
+    /** 格式化为 "[a b c]" 形态（方括号包裹、空格分隔）。 */
+    private static String formatBracketedList(List<String> values) {
         return "[" + String.join(" ", values) + "]";
     }
 
@@ -534,7 +534,7 @@ public class SystemSettingService implements SystemSettingGateway {
                     n = Long.parseLong(rawValue.asText());
                 } else {
                     throw new IllegalArgumentException(
-                            "expected integer, got " + SystemSettingRegistry.goTypeName(rawValue));
+                            "expected integer, got " + SystemSettingRegistry.jsonTypeLabel(rawValue));
                 }
             } catch (NumberFormatException e) {
                 throw new IllegalArgumentException(

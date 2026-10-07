@@ -47,7 +47,7 @@ class FileTransportTest {
         }
     }
 
-    // ── parseRange（Go net/http 语义 + 错误文案）────────────────────────────
+    // ── parseRange（标准 HTTP Range 语义 + 错误文案）──────────────────────────
 
     @Test
     void parseRangeAbsent() {

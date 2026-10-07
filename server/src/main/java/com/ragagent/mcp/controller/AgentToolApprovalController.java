@@ -45,7 +45,7 @@ public class AgentToolApprovalController {
         this.toolApprovalGate = toolApprovalGate;
     }
 
-    /** 对照 ResolveToolApproval — Viewer+ */
+    /** 权限 Viewer+。 */
     @PostMapping("/tool-approvals/{pending_id}")
     public ResponseEntity<Void> resolveToolApproval(@PathVariable("pending_id") String pendingId,
                                                     @RequestBody(required = false) ResolveToolApprovalRequest body) {

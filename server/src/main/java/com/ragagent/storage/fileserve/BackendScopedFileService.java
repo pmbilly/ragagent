@@ -55,7 +55,7 @@ public class BackendScopedFileService implements FileContentService {
         if (result.equals(p)) {
             return scoped;
         }
-        // inner 产出了预签名 URL → 用 scoped 路径重签（Go L83-93；本地存储的
+        // inner 产出了预签名 URL → 用 scoped 路径重签（本地存储的
         // 预签名 URL 场景，确保代理落到确切实例）
         try {
             URI u = URI.create(result);
@@ -80,7 +80,7 @@ public class BackendScopedFileService implements FileContentService {
                 }
             }
         } catch (Exception ignored) {
-            // Go: 解析失败/签名失败 → 原样返回 result
+            // 解析失败/签名失败 → 原样返回 result
         }
         return result;
     }

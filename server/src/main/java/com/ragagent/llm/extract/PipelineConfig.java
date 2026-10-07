@@ -16,9 +16,9 @@ public final class PipelineConfig {
 
     private String rewritePromptSystem = "";
     private String rewritePromptUser = "";
-    /** intent（如 greeting/chitchat）→ 系统提示词；nil 等价空表。 */
+    /** intent（如 greeting/chitchat）→ 系统提示词；null 等价空表。 */
     private Map<String, String> intentSystemPrompts;
-    /** 实体抽取模板（ExtractManager.ExtractEntity；nil = 未配置）。 */
+    /** 实体抽取模板（null = 未配置）。 */
     private PromptTemplateStructured extractEntity;
 
     public String getRewritePromptSystem() { return rewritePromptSystem; }
@@ -33,8 +33,8 @@ public final class PipelineConfig {
     public void setExtractEntity(PromptTemplateStructured v) { extractEntity = v; }
 
     /**
-     * 结构化抽取模板（对照 types.PromptTemplateStructured：Description/Tags/Examples，
-     * Examples 的元素是 GraphData 的 Text/Node/Relation）。
+     * 结构化抽取模板（Description/Tags/Examples，
+     * Examples 的元素是 Text/Node/Relation 三段）。
      */
     public static final class PromptTemplateStructured {
         private String description = "";
@@ -48,7 +48,7 @@ public final class PipelineConfig {
         public List<Example> getExamples() { return examples; }
         public void setExamples(List<Example> v) { examples = v; }
 
-        /** 对照 GraphData 例子的管线消费面（Text + Node/Relation 切片）。 */
+        /** 管线消费的例子形态（Text + Node/Relation 列表）。 */
         public static final class Example {
             private String text = "";
             private List<GraphNode> node;

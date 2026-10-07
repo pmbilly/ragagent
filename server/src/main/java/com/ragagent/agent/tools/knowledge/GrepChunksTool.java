@@ -67,11 +67,11 @@ public class GrepChunksTool extends BaseTool {
     static final int LIMIT = 30;
     /** knowledge 元信息查询的行数上限（硬编码常量）。 */
     private static final int MAX_KNOWLEDGE_ROWS = 20;
-    /** 命中摘要的上下文窗口（rune）。 */
+    /** 命中摘要的上下文窗口（码点）。 */
     static final int SNIPPET_CONTEXT_RUNES = 200;
-    /** 命中摘要的单个 match 上限（rune）。 */
+    /** 命中摘要的单个 match 上限（码点）。 */
     static final int SNIPPET_MAX_MATCH_RUNES = 200;
-    /** 命中摘要总长上限（rune）。 */
+    /** 命中摘要总长上限（码点）。 */
     static final int SNIPPET_MAX_TOTAL_RUNES = 800;
 
     /** DB 行视图（chunks 列 + knowledge_title + total_chunk_count）。 */
@@ -525,16 +525,16 @@ public class GrepChunksTool extends BaseTool {
     }
 
     /**
-     * 跨 pattern 取最早命中（按 rune 位置比较），
-     * 上下文各截 SNIPPET_CONTEXT_RUNES，match 超 200 runes 截+"..."，
-     * 换行转空格并折叠连续空格，总长超 800 runes 截+"..."，"... x ..." 包裹。
+     * 跨 pattern 取最早命中（按码点位置比较），
+     * 上下文各截 SNIPPET_CONTEXT_RUNES，match 超 200 码点截+"..."，
+     * 换行转空格并折叠连续空格，总长超 800 码点截+"..."，"... x ..." 包裹。
      */
     static String extractSnippetRegex(String content, List<Pattern> compiled) {
         if (content == null || content.isEmpty() || compiled == null || compiled.isEmpty()) {
             return "";
         }
 
-        // 记录最早命中的（rune 起点, 起点 char, 终点 char）。
+        // 记录最早命中的（码点起点, 起点 char, 终点 char）。
         int earliestRune = -1;
         int earliestStart = -1;
         int earliestEnd = -1;
@@ -580,7 +580,7 @@ public class GrepChunksTool extends BaseTool {
         return "... " + snippet + " ...";
     }
 
-    /** 取前 maxRunes 个 rune。 */
+    /** 取前 maxRunes 个码点。 */
     static String firstRunes(String s, int maxRunes) {
         if (s.codePointCount(0, s.length()) <= maxRunes) {
             return s;
@@ -588,7 +588,7 @@ public class GrepChunksTool extends BaseTool {
         return s.substring(0, s.offsetByCodePoints(0, maxRunes));
     }
 
-    /** 取后 maxRunes 个 rune。 */
+    /** 取后 maxRunes 个码点。 */
     static String lastRunes(String s, int maxRunes) {
         int total = s.codePointCount(0, s.length());
         if (total <= maxRunes) {

@@ -159,7 +159,7 @@ public final class Compactor {
                 lastErr = new IllegalStateException(err);
                 continue;
             }
-            return ConversationSerializer.goTrimSpace(ConversationSerializer.nvl(resp.getContent()));
+            return ConversationSerializer.trimUnicodeWhitespace(ConversationSerializer.nvl(resp.getContent()));
         }
 
         throw new IllegalStateException(

@@ -42,7 +42,7 @@ class ToolImagesTest {
         return step;
     }
 
-    /** 对照 appendToolResults：两个成功工具的 tool 消息（图片测试的前置形态）。 */
+    /** 两个成功工具的 tool 消息（图片测试的前置形态）。 */
     private static List<ChatMessage> toolMessages(AgentStep step) {
         List<ChatMessage> messages = new ArrayList<>();
         for (ToolCall call : step.getToolCalls()) {

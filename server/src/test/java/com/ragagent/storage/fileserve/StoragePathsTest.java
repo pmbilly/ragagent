@@ -92,7 +92,7 @@ class StoragePathsTest {
 
     @Test
     void verifySigRejectsGarbage() {
-        // SYSTEM_AES_KEY 在测试 JVM 可能未配——key 为 null 时 Go 恒 false；
+        // SYSTEM_AES_KEY 在测试 JVM 可能未配——key 为 null 时恒 false；
         // 这里只钉"非 key 依赖"的拒绝分支（过期 / 非整数）在 key 存在前提下的行为
         // 由 ContractTest 的真 env 场景覆盖。
         assertFalse(StoragePaths.verifyFileUrlSig("x", 1, "not-a-number", "ab"));

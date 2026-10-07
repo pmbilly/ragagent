@@ -36,7 +36,7 @@ final class AuthOidcOps {
     ResponseEntity<OidcConfigResponse> getOidcConfig() {
         boolean enabled = service.oidcConfig != null && service.oidcConfig.isEnable();
         String providerDisplayName = service.oidcConfig == null ? ""
-                : UserService.goTrimSpace(service.oidcConfig.getProviderDisplayName());
+                : UserService.trimUnicodeWhitespace(service.oidcConfig.getProviderDisplayName());
         return ResponseEntity.ok(new OidcConfigResponse(enabled, providerDisplayName));
     }
 
@@ -45,12 +45,12 @@ final class AuthOidcOps {
     ResponseEntity<OidcAuthUrlResponse> getOidcAuthorizationUrl(
             @RequestParam(value = "redirect_uri", required = false) String redirectUri,
             HttpServletRequest request, HttpServletResponse response) {
-        String trimmed = UserService.goTrimSpace(redirectUri == null ? "" : redirectUri);
+        String trimmed = UserService.trimUnicodeWhitespace(redirectUri == null ? "" : redirectUri);
         if (trimmed.isEmpty()) {
             throw new BizException(AppError.validation("redirect_uri is required"));
         }
         OidcService.AuthorizationUrl result = authorizationUrlOr403(trimmed);
-        // 绑定 state nonce 到浏览器，防授权码被重放到受害者回调（对照 setOIDCNonceCookie）
+        // 绑定 state nonce 到浏览器，防授权码被重放到受害者回调
         setOidcNonceCookie(request, response, result.nonce());
         return ResponseEntity.ok(new OidcAuthUrlResponse(result.providerDisplayName(),
                 result.authorizationUrl(), result.state()));
@@ -74,10 +74,10 @@ final class AuthOidcOps {
             HttpServletRequest request, HttpServletResponse response) {
         final String frontendRedirectUri = "/";
 
-        String err = UserService.goTrimSpace(providerError == null ? "" : providerError);
+        String err = UserService.trimUnicodeWhitespace(providerError == null ? "" : providerError);
         if (!err.isEmpty()) {
             String redirectUrl = frontendRedirectUri + "#oidc_error=" + AuthOidcOps.urlQueryEscape(err);
-            String desc = UserService.goTrimSpace(errorDescription == null ? "" : errorDescription);
+            String desc = UserService.trimUnicodeWhitespace(errorDescription == null ? "" : errorDescription);
             if (!desc.isEmpty()) {
                 redirectUrl += "&oidc_error_description=" + AuthOidcOps.urlQueryEscape(desc);
             }
@@ -85,20 +85,20 @@ final class AuthOidcOps {
         }
 
         OidcStateCodec.Payload decoded = decodeOidcState(
-                UserService.goTrimSpace(state == null ? "" : state), request);
+                UserService.trimUnicodeWhitespace(state == null ? "" : state), request);
         if (decoded == null) {
             return AuthOidcOps.redirectFound(frontendRedirectUri + "#oidc_error=" + AuthOidcOps.urlQueryEscape("invalid_state"));
         }
-        // 一次性：校验后立即清除绑定 cookie（对照 c.SetCookie(name, "", -1, ...) 的字节形态）
+        // 一次性：校验后立即清除绑定 cookie
         response.addHeader("Set-Cookie", AuthOidcOps.OIDC_NONCE_COOKIE_NAME + "=; Path=/; Max-Age=0; HttpOnly");
 
-        String trimmedCode = UserService.goTrimSpace(code == null ? "" : code);
+        String trimmedCode = UserService.trimUnicodeWhitespace(code == null ? "" : code);
         if (trimmedCode.isEmpty()) {
             return AuthOidcOps.redirectFound(frontendRedirectUri + "#oidc_error=" + AuthOidcOps.urlQueryEscape("missing_code"));
         }
 
         try {
-            service.oidcService.loginWithOidc(trimmedCode, UserService.goTrimSpace(decoded.redirectUri()),
+            service.oidcService.loginWithOidc(trimmedCode, UserService.trimUnicodeWhitespace(decoded.redirectUri()),
                     service.resolveDefaultTenantMode());
         } catch (OidcService.OidcException e) {
             return AuthOidcOps.redirectFound(frontendRedirectUri + "#oidc_error=" + AuthOidcOps.urlQueryEscape("login_failed")
@@ -164,7 +164,7 @@ final class AuthOidcOps {
                 }
             }
         }
-        if (cookieNonce == null || UserService.goTrimSpace(cookieNonce).isEmpty()) {
+        if (cookieNonce == null || UserService.trimUnicodeWhitespace(cookieNonce).isEmpty()) {
             return null;
         }
         if (!cookieNonce.equals(payload.nonce())) {

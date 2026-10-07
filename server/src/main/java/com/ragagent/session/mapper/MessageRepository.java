@@ -507,7 +507,7 @@ public class MessageRepository implements SessionMessagePort {
         return out;
     }
 
-    /** 补 session_title（等价于 Go 两条检索 SQL 里 JOIN 出的那一列）。 */
+    /** 补 session_title（等价于检索 SQL 里 JOIN 会话表取出的那一列）。 */
     private List<MessageWithSession> withSessionTitles(List<Message> rows) {
         if (rows.isEmpty()) {
             return List.of();

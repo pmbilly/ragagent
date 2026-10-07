@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
  *
  * <ul>
  *   <li><b>键名 = Java 字段名</b>（camelCase；防回退成 snake）；</li>
- *   <li><b>字段一律输出</b>：空值输出 {@code null}、{@code false}/{@code 0} 照常输出（不再 omitempty）；</li>
+ *   <li><b>字段一律输出</b>：空值输出 {@code null}、{@code false}/{@code 0} 照常输出（不再为空省略）；</li>
  *   <li><b>round-trip 不丢字段</b>：JSON → 对象 → JSON 必须完全一致；</li>
  *   <li><b>读取容错</b>：null / 空对象 / 未知键 → 默认值；旧 snake 键**按政策不再映射**（无别名）。</li>
  * </ul>

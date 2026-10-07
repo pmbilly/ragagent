@@ -14,7 +14,7 @@ public class McpException extends RuntimeException {
     private final McpErrorCode code;
 
     public McpException(McpErrorCode code) {
-        this(code, code.goMessage(), null);
+        this(code, code.wireMessage(), null);
     }
 
     public McpException(McpErrorCode code, String message) {

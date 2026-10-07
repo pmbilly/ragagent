@@ -18,7 +18,7 @@ import com.ragagent.knowledge.storage.LocalStorageService;
 /**
  * ③ local 双实现去重的语义验证（W5γ5.1）：单一份实现在 {@link StoragePathGuard}，
  * 两支各自委托它——{@code LocalFileContentService}（IOException 通道 → 404）与
- * {@code LocalStorageService}（BizException 信封通道）。本测试钉 Go 语义本身，
+ * {@code LocalStorageService}（BizException 信封通道）。本测试钉住这套语义本身，
  * 并验证**两支的接受/拒绝集合一致**（等价性）。
  */
 class StoragePathGuardTest {

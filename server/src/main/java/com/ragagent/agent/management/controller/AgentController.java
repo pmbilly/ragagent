@@ -141,7 +141,7 @@ public class AgentController {
             HttpServletRequest req) {
         requireNonEmpty(id);
         String locale = BuiltinAgentRegistry.localeFromRequest(req.getHeader("Accept-Language"));
-        // Go：先 GetAgentByID（404 路径），再对 source config 做 API-Key scope 校验
+        // 先 getAgentByID（404 路径），再对 source config 做 API-Key scope 校验
         var source = service.getAgentByID(id, locale);
         authorizeKnowledgeScope(source.config());
         var result = service.copyAgent(id, locale);
@@ -189,7 +189,7 @@ public class AgentController {
                     limit = parsed;
                 }
             } catch (NumberFormatException ignored) {
-                // Go：Atoi 失败 → limit 保持 0（"unspecified"）
+                // 解析失败 → limit 保持 0（"unspecified"）
             }
         }
         String locale = BuiltinAgentRegistry.localeFromRequest(req.getHeader("Accept-Language"));

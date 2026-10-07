@@ -33,7 +33,7 @@ import com.ragagent.vectorstore.domain.IndexConfig;
  *   <li><b>生命周期</b>：构造期验证连通 + 版本 + 每节点 k-NN 插件，
  *       <b>不建索引</b>——Save/Retrieve 首次见到某嵌入维度时惰性建（ensureReady，
  *       逐维索引命名）；瞬时错误（TRANSPORT/CIRCUIT_BREAKER）不持久化、下次重试，
- *       永久错误持久化到 initErr。注意：瞬时失败时 initErr 未写、当次调用也拿 nil，
+ *       永久错误持久化到 initErr。注意：瞬时失败时 initErr 未写、当次调用也拿 null，
  *       后续操作以 INDEX_NOT_FOUND 显形（注释与代码的历史分叉见 known-issues）</li>
  *   <li><b>索引命名</b>：base = ResolveIndexName(OPENSEARCH_INDEX, "weknora")；
  *       DB-store 折叠 storeID 前 12 hex（48 位碰撞空间），env-store（前缀 id）映射为

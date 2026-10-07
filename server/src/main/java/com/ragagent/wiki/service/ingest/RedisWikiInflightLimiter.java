@@ -18,8 +18,7 @@ import org.springframework.data.redis.core.script.DefaultRedisScript;
  *
  * <p>键 {@code wiki:inflight:{kbID}} 的 ZSET：每个运行中的批次占一个成员
  * （token），score 是<b>租约到期时刻</b>。预留脚本一次原子完成
- * 「清过期槽位 → 计数 → 未超限则登记」，与 Go 的
- * {@code wikiInflightReserveScript} 逐行同语义。</p>
+ * 「清过期槽位 → 计数 → 未超限则登记」。</p>
  *
  * <ul>
  *   <li><b>自愈</b>：崩溃 worker 的槽位随租约过期，被下一次预留清掉；</li>

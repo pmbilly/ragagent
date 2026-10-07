@@ -197,8 +197,8 @@ final class AgentEngineAssembler {
      *
      * <p>身份与装载参数说明（Java 无 ctx 的显式化，见 McpExposure/McpOAuthSupport 备案）：
      * {@code hasToolExecContext=false}——装配发生在引擎准备阶段，此处没有 per-turn 的
-     * ToolExecContext；OAuth 服务无快照时给出"先去授权"的方向，与 Go 无 ToolExecContext
-     * 的调用同形。失败只记警告，不影响引擎创建。</p>
+     * ToolExecContext；OAuth 服务无快照时给出"先去授权"的方向。
+     * 失败只记警告，不影响引擎创建。</p>
      */
     private void registerMcpTools(ToolRegistry toolRegistry, QaAgentConfig config) {
         long tenantId = TenantContext.currentTenantId() == null ? 0L : TenantContext.currentTenantId();
@@ -262,7 +262,7 @@ final class AgentEngineAssembler {
             log.warn("Failed to register MCP directory: {}", e.toString());
         }
     }
-    /** 对照 knowledgeBaseScopesForPrompt：KnowledgeBases 优先，否则 SearchTargets 全集。 */
+    /** KnowledgeBases 优先，否则 SearchTargets 全集。 */
     private record KbScopes(List<String> kbIds, Map<String, Long> kbTenantMap) {
     }
     private static KbScopes knowledgeBaseScopesForPrompt(QaAgentConfig config) {
@@ -275,7 +275,7 @@ final class AgentEngineAssembler {
                 ? List.of() : config.getSearchTargets().getAllKnowledgeBaseIds(), tenantMap);
     }
     /**
-     * 对照 getKnowledgeBaseInfos：真实 KB 元数据（名称/描述/类型/文档数/最近文档/
+     * 真实 KB 元数据（名称/描述/类型/文档数/最近文档/
      * capabilities）进 system prompt 与 runtime_context。单库失败回落 ID-only 占位；
      * 临时库（__chat_history__ 等）跳过。
      */
@@ -359,7 +359,7 @@ final class AgentEngineAssembler {
         }
         return kbInfos;
     }
-    /** 对照 kbRetrievalCapabilities：wiki / chunks（vector 或 keyword 开启）。 */
+    /** wiki / chunks（vector 或 keyword 开启）。 */
     private static List<String> kbRetrievalCapabilities(com.ragagent.knowledge.domain.KnowledgeBase kb) {
         List<String> caps = new ArrayList<>(2);
         if (kb.getIndexingStrategy() != null) {
@@ -372,7 +372,7 @@ final class AgentEngineAssembler {
         }
         return caps;
     }
-    /** 对照 getSelectedDocumentInfos：@ 提及文档的元数据（缺失逐条跳过）。 */
+    /** @ 提及文档的元数据（缺失逐条跳过）。 */
     private List<AgentPrompts.SelectedDocumentInfo> getSelectedDocumentInfos(QaAgentConfig config) {
         List<String> ids = config.getKnowledgeIds();
         if (ids == null || ids.isEmpty()) {
@@ -412,7 +412,7 @@ final class AgentEngineAssembler {
                 instanceof com.ragagent.agent.tools.web.WebSearchTool search) {
             search.withPageReader(fetch);
         }
-        // handler 已把会话存储钉到 owner 租户（对照 SandboxTenantIDFromContext）
+        // handler 已把会话存储钉到 owner 租户（租户取自 TenantContext）
         Long ctxTenant = com.ragagent.common.context.TenantContext.currentTenantId();
         long tenantId = ctxTenant == null ? 0L : ctxTenant;
         if (tenantId == 0 || sessionId == null || sessionId.isEmpty()
@@ -561,7 +561,7 @@ final class AgentEngineAssembler {
                         ToolDefinitions.TOOL_DATA_SCHEMA, ToolDefinitions.TOOL_DATA_ANALYSIS ->
                         toolToRegister = toolBackends.createTool(toolName,
                                 config.getSearchTargets(), rerankModel, toolOwnerId, sessionId);
-                // wiki 族 10 件（2026-09-23 接线批·切片 2c）
+                // wiki 族 10 件（2026-09-23 接线批）
                 case ToolDefinitions.TOOL_WIKI_READ_PAGE, ToolDefinitions.TOOL_WIKI_SEARCH,
                         ToolDefinitions.TOOL_WIKI_READ_SOURCE_DOC, ToolDefinitions.TOOL_WIKI_FLAG_ISSUE,
                         ToolDefinitions.TOOL_WIKI_WRITE_PAGE, ToolDefinitions.TOOL_WIKI_REPLACE_TEXT,
@@ -569,7 +569,7 @@ final class AgentEngineAssembler {
                         ToolDefinitions.TOOL_WIKI_READ_ISSUE, ToolDefinitions.TOOL_WIKI_UPDATE_ISSUE ->
                         toolToRegister = toolBackends.createWikiTool(toolName,
                                 config.getSearchTargets(), wikiScopes, wikiKbIds, wikiRoutes);
-                // web 两件（2026-09-23 接线批·切片 2d）
+                // web 两件（2026-09-23 接线批）
                 case ToolDefinitions.TOOL_WEB_SEARCH, ToolDefinitions.TOOL_WEB_FETCH ->
                         toolToRegister = toolBackends.createWebTool(toolName,
                                 config.getWebSearchMaxResults(), config.getWebSearchProviderId());

@@ -6,7 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * 生成类指标（BLEU/ROUGE）测试：Go 侧无对应测试文件，用例全部用<b>纯英文</b>输入
+ * 生成类指标（BLEU/ROUGE）测试：用例全部用<b>纯英文</b>输入
  * （分词确定：英文块按空白切 + 标点成 token），保证不依赖中文分词接缝的降级差异；
  * 期望值按源码公式手算（注释给出推导）。
  */

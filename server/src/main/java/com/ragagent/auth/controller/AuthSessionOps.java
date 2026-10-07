@@ -85,7 +85,7 @@ final class AuthSessionOps {
         }
         if (!root.isObject()) {
             throw service.invalidParams("Invalid refresh token request",
-                    "json: cannot unmarshal " + goJsonKind(root)
+                    "json: cannot unmarshal " + jsonKindName(root)
                             + " into Go value of type " + AuthController.SWITCH_ANON_STRUCT_TYPE);
         }
         com.fasterxml.jackson.databind.JsonNode node = root.get("refreshToken");
@@ -94,7 +94,7 @@ final class AuthSessionOps {
             return req;
         }
         throw service.invalidParams("Invalid refresh token request",
-                "json: cannot unmarshal " + goJsonKind(node)
+                "json: cannot unmarshal " + jsonKindName(node)
                         + " into Go struct field .refreshToken of type string");
     }
 
@@ -166,7 +166,7 @@ final class AuthSessionOps {
             }
             // 顶层非对象：报 legacy 绑定错误原文（含类型串，见 SWITCH_ANON_STRUCT_TYPE）
             throw service.invalidParams("Invalid workspace switch request",
-                    "json: cannot unmarshal " + goJsonKind(root) + " into Go value of type "
+                    "json: cannot unmarshal " + jsonKindName(root) + " into Go value of type "
                             + AuthController.SWITCH_ANON_STRUCT_TYPE);
         }
         com.fasterxml.jackson.databind.JsonNode idNode = root.get("tenantId");
@@ -176,7 +176,7 @@ final class AuthSessionOps {
         }
         if (!idNode.isNumber()) {
             throw service.invalidParams("Invalid workspace switch request",
-                    "json: cannot unmarshal " + goJsonKind(idNode)
+                    "json: cannot unmarshal " + jsonKindName(idNode)
                             + " into Go struct field .tenantId of type uint64");
         }
         // uint64：非负整数，0 也合法解析（validator required 才拒）
@@ -200,7 +200,7 @@ final class AuthSessionOps {
         return parsed;
     }
 
-    static String goJsonKind(com.fasterxml.jackson.databind.JsonNode node) {
+    static String jsonKindName(com.fasterxml.jackson.databind.JsonNode node) {
         if (node.isTextual()) {
             return "string";
         }

@@ -3,7 +3,7 @@ package com.ragagent.mcp.protocol;
 /**
  * MCP 协议层哨兵错误。
  *
- * <p>每个枚举值携带一条固定的对外错误文案（见 {@link #goMessage()}）——这些字符串会出现在
+ * <p>每个枚举值携带一条固定的对外错误文案（见 {@link #wireMessage()}）——这些字符串会出现在
  * 返回给调用方的错误消息里（异常包裹链），改字会改变对外可见文案。</p>
  */
 public enum McpErrorCode {
@@ -37,14 +37,14 @@ public enum McpErrorCode {
      */
     AUTHORIZATION_REQUIRED("authorization required");
 
-    private final String goMessage;
+    private final String wireMessage;
 
-    McpErrorCode(String goMessage) {
-        this.goMessage = goMessage;
+    McpErrorCode(String wireMessage) {
+        this.wireMessage = wireMessage;
     }
 
     /** 对外固定的错误文案。 */
-    public String goMessage() {
-        return goMessage;
+    public String wireMessage() {
+        return wireMessage;
     }
 }

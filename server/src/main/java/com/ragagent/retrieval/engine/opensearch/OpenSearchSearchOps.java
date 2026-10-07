@@ -76,7 +76,7 @@ final class OpenSearchSearchOps {
         }
     }
 
-    /** 对照 retrieveFilters + fromParams：类型化过滤（无 JSON 注入面）。 */
+    /** 类型化过滤（无 JSON 注入面）。 */
     static Map<String, Object> filtersOf(RetrieveParams p) {
         Map<String, Object> f = new TreeMap<>();
         f.put("kbIds", p.knowledgeBaseIds == null ? List.of() : p.knowledgeBaseIds);
@@ -88,7 +88,7 @@ final class OpenSearchSearchOps {
         return f;
     }
 
-    /** 对照 toBoolMust：terms IN → 嵌套 must_not → is_enabled=true 隐含子句。 */
+    /** terms IN → 嵌套 must_not → is_enabled=true 隐含子句。 */
     static List<Map<String, Object>> toBoolMust(Map<String, Object> f) {
         List<Map<String, Object>> must = new ArrayList<>();
         List<String> kbIds = cast(f.get("kbIds"));
@@ -147,7 +147,7 @@ final class OpenSearchSearchOps {
         return out;
     }
 
-    /** 对照 buildKNNQuery：min_score 直通（COSINESIMIL 已映射 [0,1]）。 */
+    /** min_score 直通（COSINESIMIL 已映射 [0,1]）。 */
     String knnQueryJson(float[] embedding, int topK, double threshold,
                                 Map<String, Object> f) throws Exception {
         Map<String, Object> bool = new TreeMap<>();
@@ -171,7 +171,7 @@ final class OpenSearchSearchOps {
         return OpenSearchRetrieveRepository.MAPPER.writeValueAsString(body);
     }
 
-    /** 对照 buildKeywordQuery：BM25 match + 过滤；min_score 语义同上。 */
+    /** BM25 match + 过滤；min_score 语义同上。 */
     String keywordQueryJson(String queryText, int topK, double threshold,
                                     Map<String, Object> f) throws Exception {
         List<Map<String, Object>> must = toBoolMust(f);
@@ -193,7 +193,7 @@ final class OpenSearchSearchOps {
         return OpenSearchRetrieveRepository.MAPPER.writeValueAsString(body);
     }
 
-    /** 对照 search：404 → INDEX_NOT_FOUND；响应 16MB cap。 */
+    /** 404 → INDEX_NOT_FOUND；响应 16MB cap。 */
     List<IndexWithScore> search(String indexPattern, String body) throws Exception {
         String response = service.send("POST", "/" + indexPattern + "/_search",
                 body.getBytes(StandardCharsets.UTF_8), "application/json", OpenSearchRetrieveRepository.SEARCH_BODY_CAP);
@@ -218,7 +218,7 @@ final class OpenSearchSearchOps {
             s.content = source.path("content").asText("");
             s.isEnabled = source.path("is_enabled").asBoolean(false);
             if (!s.id.equals(s.chunkId)) {
-                // 对照 wrapResults 的 D12 不变量告警（_id 恒 = chunk_id）
+                // D12 不变量告警（_id 恒 = chunk_id）
                 log.warn("[OpenSearch] hit._id=\"{}\" != _source.chunk_id=\"{}\""
                         + " (D12 invariant violation)", s.id, s.chunkId);
             }
@@ -227,7 +227,7 @@ final class OpenSearchSearchOps {
         return out;
     }
 
-    /** 对照 wrapResults：恒返回单包结果（服务层扇出的 one-bundle-per-driver 协议）。 */
+    /** 恒返回单包结果（服务层扇出的 one-bundle-per-driver 协议）。 */
     RetrieveResult wrapResults(List<IndexWithScore> hits, String retrieverType,
                                        int matchType) {
         for (IndexWithScore s : hits) {

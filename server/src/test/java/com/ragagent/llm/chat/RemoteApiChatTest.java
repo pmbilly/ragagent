@@ -79,7 +79,7 @@ class RemoteApiChatTest {
         RemoteApiChat chat = newTestRemoteChat();
         List<ChatMessage> messages = userMessage("hello");
 
-        // nil ParallelToolCalls 不写字段（go-openai 是 any 类型，nil → omitempty 省略）
+        // ParallelToolCalls 为 null 不写字段（go-openai 对应 any 类型，null → 省略输出）
         ChatOptions unset = new ChatOptions();
         unset.setTemperature(0.7);
         assertNull(body(chat, messages, unset, false).get("parallel_tool_calls"));
@@ -332,7 +332,7 @@ class RemoteApiChatTest {
         assertEquals("wiki_search", messages.get(1).path("name").asText());
     }
 
-    /** 补测：tools 的 parameters 无 omitempty——nil 时上线 null（对照 go-openai 的 struct tag）。 */
+    /** 补测：tools 的 parameters 无『为空省略』——null 时上线 null（对照 go-openai 的字段 tag）。 */
     @Test
     void toolParametersEmitNullWhenMissing() {
         RemoteApiChat chat = newTestRemoteChat();
@@ -349,7 +349,7 @@ class RemoteApiChatTest {
 
     /**
      * 出站体键序**分路径**：
-     * prompt-cache 改写路径 = 字母序（{@code goSorted}）；SDK 直出/thinking
+     * prompt-cache 改写路径 = 字母序（{@code byteOrderSorted}）；SDK 直出/thinking
      * 包装路径 = 结构体声明序（{@code structSorted}，包装字段尾随）。
      * 工具 parameters 子树两路径分别是「map 字母序」/「jsonschema 结构体序=录入序」。
      */
@@ -391,7 +391,7 @@ class RemoteApiChatTest {
         com.fasterxml.jackson.databind.JsonNode body = MAPPER.readTree(
                 "{\"model\":\"m\",\"messages\":[{\"role\":\"user\",\"content\":\"hi\"}],"
                         + "\"stream\":true}");
-        String json = RemoteApiChat.goSorted(body).toString();
+        String json = RemoteApiChat.byteOrderSorted(body).toString();
         // map 改写路径：每层对象按键字节序
         assertTrue(json.indexOf("\"messages\"") < json.indexOf("\"model\"")
                         && json.indexOf("\"model\"") < json.indexOf("\"stream\""),

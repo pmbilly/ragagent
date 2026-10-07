@@ -75,19 +75,19 @@ public class ImService {
     private static final Logger log = LoggerFactory.getLogger(ImService.class);
     static final ObjectMapper JSON = new ObjectMapper();
 
-    /** 执行前 /stop 标记的 TTL（Go {@code stopMarkerTTL}）。 */
+    /** 执行前 /stop 标记的 TTL。 */
     private static final int STOP_MARKER_TTL_SECONDS = 30;
-    /** 跨实例在途映射的 TTL（Go 的 storeInflightMapping 硬编码 10 分钟）。 */
+    /** 跨实例在途映射的 TTL（10 分钟）。 */
     private static final int INFLIGHT_TTL_SECONDS = 600;
-    /** 消息去重标记的 TTL（Go {@code dedupTTL}）。 */
+    /** 消息去重标记的 TTL。 */
     private static final int DEDUP_TTL_SECONDS = 300;
-    /** WS 长连接 leader 锁的 TTL（Go {@code wsLeaderTTL}）。 */
+    /** WS 长连接 leader 锁的 TTL。 */
     private static final int LEADER_TTL_SECONDS = 15;
-    /** leader 续期间隔（Go {@code wsLeaderRenewInterval}）。 */
+    /** leader 续期间隔。 */
     private static final long LEADER_RENEW_MILLIS = 5_000L;
-    /** 非 leader 的抢锁重试间隔（Go {@code wsLeaderRetryInterval}）。 */
+    /** 非 leader 的抢锁重试间隔。 */
     private static final long LEADER_RETRY_MILLIS = 10_000L;
-    /** 附件异步入知识库的文件扩展名白名单（Go {@code supportedKBFileExts}）。 */
+    /** 附件异步入知识库的文件扩展名白名单。 */
     private static final java.util.Set<String> SUPPORTED_KB_FILE_EXTS = java.util.Set.of(
             "pdf", "txt", "docx", "doc", "md", "markdown",
             "png", "jpg", "jpeg", "gif", "csv", "xlsx", "xls", "pptx", "ppt");
@@ -106,7 +106,7 @@ public class ImService {
     private final int rateLimitMax;
     /** IM 的 Redis 面（stop marker / inflight 映射）；未启用为 null（单实例形态）。 */
     private final ImRedisStore redisStore;
-    /** 实例标识：leader 锁的值 + 广播事件源过滤（对齐 Go 的 uuid instanceID）。 */
+    /** 实例标识：leader 锁的值 + 广播事件源过滤（随机 UUID）。 */
     private final String instanceId = UUID.randomUUID().toString();
     /** 渠道配置广播（Pub/Sub）；Redis 未启用为 null。 */
     private final RedisPubSub redisPubSub;
@@ -282,7 +282,7 @@ public class ImService {
                     channel.getPlatform(), channel.getId());
             return;
         }
-        // 独占长连接（websocket 模式）：多实例下只许一个实例持有连接（对齐 Go 的选主）
+        // 独占长连接（websocket 模式）：多实例下只许一个实例持有连接（跨实例选主）
         boolean leaderHeld = false;
         if (redisStore != null && isExclusiveChannel(channel)) {
             if (!redisStore.tryAcquireLeader(leaderKey(channel.getId()), instanceId,
@@ -304,7 +304,7 @@ public class ImService {
             log.warn("[IM] Channel start failed: id={} platform={} mode={} err={}",
                     channel.getId(), channel.getPlatform(), channel.getMode(), e.toString());
             if (leaderHeld) {
-                releaseLeader(channel.getId()); // 启动失败回滚选主（对齐 Go）
+                releaseLeader(channel.getId()); // 启动失败回滚选主
             }
             return;
         }
@@ -393,8 +393,8 @@ public class ImService {
     // ── 渠道配置广播 + WS 长连接选主（多实例面） ─────────────────────────────
 
     /**
-     * 渠道行变更后的运行时同步（本实例按库重建 + 跨实例广播）。对齐 Go 的
-     * reloadChannelFromDB + publishChannelConfigChange；由渠道 CRUD 与订阅回调共用。
+     * 渠道行变更后的运行时同步（本实例按库重建 + 跨实例广播）；
+     * 由渠道 CRUD 与订阅回调共用。
      */
     public void onChannelChanged(String channelId) {
         reloadChannelFromDb(channelId);
@@ -422,7 +422,7 @@ public class ImService {
         return "websocket".equals(channel.getMode());
     }
 
-    /** 广播渠道配置变更（载荷键与 Go 共用：channel_id/source_instance；未接入 Redis 时为空操作）。 */
+    /** 广播渠道配置变更（载荷键为部署面契约：channel_id/source_instance；未接入 Redis 时为空操作）。 */
     void publishChannelConfigChange(String channelId) {
         RedisPubSub pubSub = redisPubSub;
         if (pubSub == null || channelId == null || channelId.isEmpty()) {
@@ -434,7 +434,7 @@ public class ImService {
         try {
             pubSub.publish(ImRedisKeys.CHANNEL_CONFIG_CHANNEL, JSON.writeValueAsString(event));
         } catch (Exception e) {
-            // DB 是权威；事件只是加速（对齐 Go：发布失败只 WARN）
+            // DB 是权威；事件只是加速（发布失败只 WARN）
             log.warn("[IM] Publish channel config event failed for {}: {}", channelId, e.getMessage());
         }
     }
@@ -482,7 +482,7 @@ public class ImService {
         return ImRedisKeys.LEADER_PREFIX + channelId;
     }
 
-    /** 续期线程：失锁或渠道被删/禁用 → 停本实例运行时；失锁再进重试队列（对齐 Go）。 */
+    /** 续期线程：失锁或渠道被删/禁用 → 停本实例运行时；失锁再进重试队列。 */
     private void startLeaderRenewLoop(String channelId) {
         Thread old = leaderRenewThreads.remove(channelId);
         if (old != null) {
@@ -566,7 +566,7 @@ public class ImService {
     // ── 附件异步入库 ────────────────────────────────────────────────────────
 
     /**
-     * 附件异步入渠道绑定的知识库（对齐 Go processDownloadedFileToKnowledgeBase）：
+     * 附件异步入渠道绑定的知识库：
      * 无用户可见通知——原始文件消息照常收到 QA 回复，入库是后台工作；
      * 渠道未配 KB / 知识服务缺席 / 类型不在白名单 → 直接跳过。
      */
@@ -614,7 +614,7 @@ public class ImService {
         }
     }
 
-    /** IM 平台标识 → 知识库 channel 值（与 Go imPlatformToChannel 同表）。 */
+    /** IM 平台标识 → 知识库 channel 值。 */
     static String imPlatformToChannel(String platform) {
         String p = platform == null ? "" : platform.toLowerCase(java.util.Locale.ROOT);
         return switch (p) {
@@ -804,7 +804,7 @@ public class ImService {
             if (allowed != null) {
                 return allowed;
             }
-            // Redis 故障 → 回落本地滑窗（对齐 Go 的 local fallback）
+            // Redis 故障 → 回落本地滑窗
         }
         long now = System.currentTimeMillis();
         long windowMs = rateLimitWindowSec * 1000L;

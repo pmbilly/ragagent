@@ -122,7 +122,7 @@ public final class ConversationSerializer {
                         truncate(goMarshal(parsed.get(k)), TOOL_ARGS_MAX_CHARS)));
             }
             return String.join(", ", pairs);
-        } catch (GoMarshalException e) {
+        } catch (ArgsRenderException e) {
             // 数值超出 double 范围时按解析失败处理 → 回退到截断原文
             return truncate(arguments, TOOL_ARGS_MAX_CHARS);
         }
@@ -150,7 +150,7 @@ public final class ConversationSerializer {
         return ba.length - bb.length;
     }
 
-    private static final class GoMarshalException extends RuntimeException {
+    private static final class ArgsRenderException extends RuntimeException {
     }
 
     /**
@@ -201,7 +201,7 @@ public final class ConversationSerializer {
             double d = node.asDouble();
             if (Double.isInfinite(d) || Double.isNaN(d)) {
                 // 越界数字按解析失败处理
-                throw new GoMarshalException();
+                throw new ArgsRenderException();
             }
             sb.append(Double.toString(d));
             return;
@@ -246,10 +246,10 @@ public final class ConversationSerializer {
 
     /**
      * 按字符（code point）截断并加省略标记；先做含 NBSP/NEL 的全空格裁剪
-     * （Java 的 strip() 不含这些，见 {@link #goTrimSpace}）。
+     * （Java 的 strip() 不含这些，见 {@link #trimUnicodeWhitespace}）。
      */
     public static String truncate(String s, int maxChars) {
-        String t = goTrimSpace(s);
+        String t = trimUnicodeWhitespace(s);
         int[] runes = t.codePoints().toArray();
         if (runes.length <= maxChars) {
             return t;
@@ -264,18 +264,18 @@ public final class ConversationSerializer {
     }
 
     /** unicode 空白语义的全空格裁剪（含 NBSP/NEL，Java 的 strip() 不覆盖）。 */
-    public static String goTrimSpace(String s) {
+    public static String trimUnicodeWhitespace(String s) {
         if (s == null) {
             return "";
         }
         int start = 0;
         int end = s.length();
-        while (start < end && isGoSpace(s.codePointAt(start))) {
+        while (start < end && isUnicodeWhitespace(s.codePointAt(start))) {
             start += Character.charCount(s.codePointAt(start));
         }
         while (end > start) {
             int cp = s.codePointBefore(end);
-            if (!isGoSpace(cp)) {
+            if (!isUnicodeWhitespace(cp)) {
                 break;
             }
             end -= Character.charCount(cp);
@@ -283,7 +283,7 @@ public final class ConversationSerializer {
         return s.substring(start, end);
     }
 
-    public static boolean isGoSpace(int cp) {
+    public static boolean isUnicodeWhitespace(int cp) {
         return cp == '\t' || cp == '\n' || cp == 0x0B || cp == '\f' || cp == '\r'
                 || cp == ' ' || cp == 0x85 || cp == 0xA0
                 || Character.isSpaceChar(cp);

@@ -26,7 +26,7 @@ public class MoonshotProvider implements Provider {
 
     @Override
     public void validateConfig(Config config) {
-        // 校验顺序 = Go 原文：baseURL → API key → model name
+        // 校验顺序：baseURL → API key → model name
         if (config.baseUrl().isEmpty()) {
             throw BizException.badRequest("base URL is required for Moonshot provider");
         }
@@ -49,7 +49,7 @@ public class MoonshotProvider implements Provider {
      *
      * <p>kimi-k2 / kimi-k2-turbo / kimi-k2-thinking 接受完整 [0,1] 区间，不受影响。
      *
-     * <p>注意：先 TrimSpace 再 ToLower（Go 原文如此），故首尾空白不影响判定；
+     * <p>注意：先去首尾空白再小写化，故首尾空白不影响判定；
      * kimi 分支是**精确相等**而非前缀，kimi-k2.5-turbo 之类不命中。
      */
     public static boolean isMoonshotFixedTempModel(String modelName) {

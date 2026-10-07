@@ -529,7 +529,7 @@ public final class McpCatalog {
         described.put(mcpToolRef(tool), Boolean.TRUE);
     }
 
-    /** 描述截断：>200 runes 截到 197 + "..."。 */
+    /** 描述截断：>200 码点截到 197 + "..."。 */
     static String shortMcpDescription(String s) {
         if (s == null) {
             return "";
@@ -580,24 +580,15 @@ public final class McpCatalog {
     /**
      * struct 形态 JSON 编码器：**插入序**（字段声明序）——
      * 不能用 {@link ToolJson}.write（它按 map 语义排序键，struct 契约会乱序）。
-     * （2026-10-03 B39：不再复刻 Go 的 HTML 转义。）
+     * （不做 HTML 转义。）
      */
-    static final com.fasterxml.jackson.databind.ObjectMapper GO_ENCODER =
+    static final com.fasterxml.jackson.databind.ObjectMapper STRUCT_JSON =
             new com.fasterxml.jackson.databind.ObjectMapper();
-
-    /** GO_ENCODER 的受检异常收口（测试与包内共用）。 */
-    static String goEncoderJson(Object value) {
-        try {
-            return GO_ENCODER.writeValueAsString(value);
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-    }
 
     /** 结果 JSON（插入序键序；序列化失败走 error 页）。 */
     static ToolResult mcpJsonResult(Object value) {
         try {
-            return mcpJsonResult(GO_ENCODER.writeValueAsString(value));
+            return mcpJsonResult(STRUCT_JSON.writeValueAsString(value));
         } catch (Exception e) {
             return mcpDiscoveryFailure("MCP definition is not valid JSON", "error");
         }

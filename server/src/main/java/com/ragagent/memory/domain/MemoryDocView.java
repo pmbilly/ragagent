@@ -7,7 +7,7 @@ import com.ragagent.common.web.ZeroTimeSerializer;
 /**
  * 这个人反复从中取材的文档。
  *
- * <p>六个字段都无 omitempty，恒输出。</p>
+ * <p>六个字段都恒输出。</p>
  */
 public class MemoryDocView {
 

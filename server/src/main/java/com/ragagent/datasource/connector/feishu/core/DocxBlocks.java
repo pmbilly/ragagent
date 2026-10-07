@@ -687,7 +687,7 @@ public final class DocxBlocks {
     public static String bitableFieldCell(Object v, BitableColumn col, ZoneId loc) {
         if (col != null && col.fieldType() == BITABLE_FIELD_TYPE_DATE_TIME && v instanceof Number n) {
             double ms = n.doubleValue();
-            // 空日期单元格是 nil（→ 落到空白）；ms==0（epoch）也不是真实值——
+            // 空日期单元格是 null（→ 落到空白）；ms==0（epoch）也不是真实值——
             // 渲染成空白，而不是 "1970-01-01" 或 "0"。
             if (ms == 0) {
                 return "";

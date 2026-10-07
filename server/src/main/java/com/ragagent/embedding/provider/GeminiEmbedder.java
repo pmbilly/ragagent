@@ -40,7 +40,7 @@ public final class GeminiEmbedder extends BaseEmbedder {
         if (baseUrl == null || baseUrl.isEmpty()) {
             baseUrl = DEFAULT_BASE_URL;
         }
-        baseUrl = AliyunEmbedder.goTrimRight(baseUrl, '/');
+        baseUrl = AliyunEmbedder.trimTrailing(baseUrl, '/');
         if (baseUrl.endsWith("/openai")) {
             baseUrl = baseUrl.substring(0, baseUrl.length() - "/openai".length());
         }

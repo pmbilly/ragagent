@@ -73,7 +73,7 @@ class SystemContractTest {
     /** 数字 id（key 行 / 设置持久行——两侧取值都是部署态，统一掩码；虚拟行 id:0 也遮） */
     private static final Pattern KEY_ID = Pattern.compile("\"id\":(\\d+)");
     private static final Pattern API_KEY_TOKEN = Pattern.compile("\"token\":\"(sk-[^\"]+)\"");
-    /** api_key 字段是 Go maskManagedAPIKey 的输出（每次随机）→ 两侧同掩码 */
+    /** api_key 字段是掩码输出（每次随机）→ 两侧同掩码 */
     private static final Pattern API_KEY_FIELD = Pattern.compile("\"apiKey\":\"[^\"]*\"");
     private static final Pattern AFFECTED = Pattern.compile("\"affected\":\\d+");
     private static final Pattern QUEUE_TS = Pattern.compile("\"timestamp\":\\d+");
@@ -142,8 +142,8 @@ class SystemContractTest {
     // ════════════════ /system 组（读端） ════════════════
 
     /**
-     * capabilities：响应外壳 + 键集与 Go golden 一致；各能力**值**按 Java 部署断言
-     * （Go dev 的 agents/im/embed=true 是它的部署状态；organizations 随空间分享裁撤）。
+     * capabilities：响应外壳 + 键集与录制金片一致；各能力**值**按 Java 部署断言
+     * （金片里的 agents/im/embed=true 是录制期部署状态；organizations 随空间分享裁撤）。
      */
     @Test
     void capabilitiesMatchesDeployment() throws Exception {
@@ -165,7 +165,7 @@ class SystemContractTest {
         assertThat(java).contains("\"agents\":{\"reason\":null,\"supported\":true}");
         assertThat(java).contains("\"integrations.api\":{\"reason\":null,\"supported\":true}");
         assertThat(java).contains("\"settings.mcp\":{\"reason\":null,\"supported\":true}");
-        // settings.sandbox 两键随沙箱裁剪退役（对照 capabilities 键集同步收缩）
+        // settings.sandbox 两键随沙箱裁剪退役（capabilities 键集同步收缩）
     }
 
     /** 从 golden 提取 map 键名（部署无关的结构对齐检查）。 */
@@ -226,7 +226,7 @@ class SystemContractTest {
             assertThat(java).contains("\"name\":\"" + engine + "\"");
         }
         assertThat(java).doesNotContain("markitdown").doesNotContain("opendataloader");
-        // 未连接 → builtin 不可用；simple 恒可用；UnavailableReason 恒输出（Go 无 json tag）
+        // 未连接 → builtin 不可用；simple 恒可用；unavailableReason 恒输出（录制探针无 json tag）
         // PR4：相邻键子串在键序归一后不可靠 → 树断言
         {
             var root = new com.fasterxml.jackson.databind.ObjectMapper().readTree(java);
@@ -246,7 +246,7 @@ class SystemContractTest {
         }
     }
 
-    /** storage-engine-status：H2 干净租户 → 与 Go golden 字节一致（全确定性）。 */
+    /** storage-engine-status：H2 干净租户 → 与录制金片字节一致（全确定性）。 */
     @Test
     void storageStatusMatchesGo() throws Exception {
         MvcResult r = mockMvc.perform(get("/api/v1/system/storage-engine-status")
@@ -575,7 +575,7 @@ class SystemContractTest {
 
     @Test
     void settingsMatchGo() throws Exception {
-        // 空表 → 全虚拟行（id 0 + Go 零值时间）→ 字节一致
+        // 空表 → 全虚拟行（id 0 + 零值时间戳）→ 字节一致
         MvcResult list = mockMvc.perform(get("/api/v1/system/admin/settings")
                 .header("Authorization", sysAdmin)).andReturn();
         assertEquals(200, list.getResponse().getStatus(), raw(list));
@@ -664,7 +664,7 @@ class SystemContractTest {
         assertEquals(golden("adm-queues-purge-unknown.json"), raw(purgeUnknown));
     }
 
-    /** Lite 形态（Go noopTaskInspector 源码；dev Go 跑 asynq 模式录不到）：确定性内联断言。 */
+    /** Lite 形态（录制期探针走异步队列模式，录不到该形态）：确定性内联断言。 */
     @Test
     void runtimeQueuesLiteShapes() throws Exception {
         MvcResult queues = mockMvc.perform(get("/api/v1/system/admin/runtime/queues")
@@ -796,7 +796,7 @@ class SystemContractTest {
                 .matcher(out).replaceAll("\"generatedPassword\":\"<genpw>\"");
         out = UUID_VALUE.matcher(out).replaceAll("\"$1\":\"<uuid>\"");
         out = TS_VALUE.matcher(out).replaceAll("\"$1\":\"<ts>\"");
-        // Go 零值时间（虚拟设置行）：两侧字节一致，不需掩码——但要压成同一形态防时区漂移
+        // 零值时间戳（虚拟设置行）：两侧字节一致，不需掩码——但要压成同一形态防时区漂移
         out = out.replace("0001-01-01T00:00:00Z", "0001-01-01T00:00:00Z");
         out = KEY_ID.matcher(out).replaceAll("\"id\":\"<keyid>\"");
         return out;

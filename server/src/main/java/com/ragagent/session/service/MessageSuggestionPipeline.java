@@ -20,7 +20,7 @@ import com.ragagent.session.service.MessageSuggestionService.Evidence;
 import com.ragagent.session.service.MessageSuggestionService.GenerationContext;
 
 /**
- * {@code MessageSuggestionService} 的**无状态管道切片**：生成输入的上下文装配
+ * {@code MessageSuggestionService} 的**无状态管道子模块**：生成输入的上下文装配
  * （轮次分组 → 历史渲染 → 证据抽取）与输出的解析 / 合并 / 相关性排序 / 文本规范化。
  *
  * <p>为什么单独一类：这些成员全是静态纯函数（唯一读实例字段的 {@code buildGenerationContext}
@@ -228,7 +228,7 @@ final class MessageSuggestionPipeline {
     static void rankKnowledgeSuggestions(List<Object[]> candidates, String contextText) {
         Set<String> contextTokens = suggestionRelevanceTokens(contextText);
         String contextNormalized = SearchTextUtil.normalizeContent(contextText);
-        // Go sort.SliceStable：稳定排序（同 relevance 保持原序）——List.sort 即稳定
+        // 稳定排序：同 relevance 保持原序（List.sort 即稳定）
         candidates.sort((left, right) -> Double.compare(
                 knowledgeSuggestionRelevance((String) right[0], contextTokens, contextNormalized),
                 knowledgeSuggestionRelevance((String) left[0], contextTokens, contextNormalized)));
@@ -314,7 +314,7 @@ final class MessageSuggestionPipeline {
         return s.substring(0, s.offsetByCodePoints(0, limit));
     }
 
-    /** 对照 parseGeneratedSuggestions（L816-865）：剥 think → 抠 {} → 解析 →
+    /** 剥 think → 抠 {} → 解析 →
      *  200 码点上限 / 去重 / 类别白名单。 */
     static List<SuggestionItem> parseGeneratedSuggestions(String content,
             List<String> allowedCategories, int limit) {
@@ -383,7 +383,7 @@ final class MessageSuggestionPipeline {
         return result;
     }
 
-    /** 对照 mergeHybridSuggestionItems：knowledge 保留约 1/3 槽位，双方互填空位。 */
+    /** knowledge 保留约 1/3 槽位，双方互填空位。 */
     static List<SuggestionItem> mergeHybridSuggestionItems(List<SuggestionItem> model,
             List<SuggestionItem> knowledge, int limit) {
         if (limit <= 0) {
@@ -419,7 +419,7 @@ final class MessageSuggestionPipeline {
 
     static String modeVal(Map<String, Object> map) {
         String mode = MessageSuggestionService.strVal(map, "mode");
-        // 对照 QuestionSuggestionConfig.EnsureDefaults：缺省 = hybrid
+        // mode 缺省 = hybrid（与配置侧的缺省补齐一致）
         return mode.isEmpty() ? MessageSuggestionService.MODE_HYBRID : mode;
     }
 

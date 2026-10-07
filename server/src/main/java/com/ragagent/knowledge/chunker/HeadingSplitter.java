@@ -248,7 +248,7 @@ public final class HeadingSplitter {
     }
 
     /**
-     * rune 偏移与面包屑；返回序列以偏移 0 的种子面包屑开头。
+     * 码点偏移与面包屑；返回序列以偏移 0 的种子面包屑开头。
      */
     static List<SectionBreadcrumb> sectionBreadcrumbs(int[] sectionRunes, int primaryLevel,
             HeadingHierarchy seed) {

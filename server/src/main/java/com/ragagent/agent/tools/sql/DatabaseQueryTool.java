@@ -121,7 +121,7 @@ public class DatabaseQueryTool extends BaseTool {
         QueryResult query(String securedSQL);
     }
 
-    /** 列名（有序）+ 行切片。 */
+    /** 列名（有序）+ 行列表。 */
     public record QueryResult(List<String> columns, List<List<Object>> rows) {
     }
 

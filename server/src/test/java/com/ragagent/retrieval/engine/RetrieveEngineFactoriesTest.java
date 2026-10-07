@@ -278,7 +278,7 @@ class RetrieveEngineFactoriesTest {
 
     // ── 取消 —— 取消不是"对 store 的判定" ──────────────────────────────────
 
-    /** 对照 {@code cancellingRegistry}：查表仍 miss，但解析路径报"调用方放弃"。 */
+    /** 查表仍 miss，但解析路径报"调用方放弃"。 */
     static class CancellingRegistry extends EngineRegistry {
         CancellingRegistry() {
             super(null, null);

@@ -87,7 +87,7 @@ class WikiToolsRecordingTest {
             return view != null ? view : new IndexOverviewView("", List.of());
         }
 
-        // ---- 以下方法本测试族不用（对照 zzFakeWiki2 未覆盖即嵌入接口 panic） ----
+        // ---- 以下方法本测试族不用（一律抛 UnsupportedOperationException） ----
 
         @Override
         public PageView createPage(PageView page, String editSource) {

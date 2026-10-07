@@ -328,7 +328,7 @@ public class ChunkEditService {
      * 覆盖到不可变的父块原文上。按偏移<b>倒序</b>应用替换，即便编辑文本长度变化也保持
      * 解析器坐标系；互相重叠的替换无法共用同一段源区间——保留最新编辑，其余冲突的当前
      * 正文经 {@link ChunkSearchUtil#joinChunkContent} 追加（检索宁可少量重复也不静默丢内容）。
-     * 偏移按 rune（Unicode code point）计。
+     * 偏移按码点（Unicode code point）计。
      */
     private void rebuildParentContent(Chunk edited) {
         long tenantId = edited.getTenantId();

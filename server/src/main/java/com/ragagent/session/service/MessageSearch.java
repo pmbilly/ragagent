@@ -31,7 +31,7 @@ import com.ragagent.session.mapper.MessageRepository;
 
 
 /**
- * {@code MessageService} 的**聊天历史检索切片**：messages 表的关键词 / KB 向量 /
+ * {@code MessageService} 的**聊天历史检索子模块**：messages 表的关键词 / KB 向量 /
  * 混合检索 + RRF 融合 + 会话归属过滤 + 补对 + 按 request_id 分组。
  *
  * <p>对外入口仍是门面的 {@code searchMessages} 两个重载（薄委托都指向这里），返回类型与
@@ -152,7 +152,7 @@ final class MessageSearch {
         // Step 3：按模式合并
         List<SearchItem> items;
         if (MessageService.MODE_KEYWORD.equals(mode)) {
-            // ⚠️ keyword 分支不是直接透传：Go 走 convertKeywordResults 赋线性分值
+            // ⚠️ keyword 分支不是直接透传：经 convertKeywordResults 赋线性分值
             items = convertKeywordResults(keywordRows);
         } else if (MessageService.MODE_VECTOR.equals(mode)) {
             items = vectorResults;

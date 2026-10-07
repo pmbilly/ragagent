@@ -471,7 +471,7 @@ class McpHttpContractTest {
         assertTrue(body(r).contains("MCP service not found"), body(r));
     }
 
-    /** 静态鉴权目录写的是租户共享快照 → Viewer 必须被拦在 403（对照 mayWriteSharedMCPMetadata） */
+    /** 静态鉴权目录写的是租户共享快照 → Viewer 必须被拦在 403 */
     @Test
     void metadataRefreshForStaticAuthRequiresAdmin() throws Exception {
         String owner = loginOwner();

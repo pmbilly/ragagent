@@ -188,10 +188,10 @@ class AgentToolBackendsWikiTest {
         assertThat(issue.updatedAt()).isEqualTo("2026-09-02T08:00:00Z");
         assertThat(issue.deletedAtValid()).isFalse();
         // null 时间 → 0001-01-01T00:00:00Z（历史线格式的零值时间），不输出 null
-        assertThat(AgentToolWikiBackends.goTimeText(null))
+        assertThat(AgentToolWikiBackends.timeText(null))
                 .isEqualTo("0001-01-01T00:00:00Z");
-        // toGoJsonIndent 的字段序 = 历史线格式的固定声明序
-        assertThat(issue.toGoJsonIndent()).startsWith("{\n  \"id\": \"i1\",\n")
+        // indentedJson 的字段序 = 历史线格式的固定声明序
+        assertThat(issue.indentedJson()).startsWith("{\n  \"id\": \"i1\",\n")
                 .contains("\"deleted_at\": null\n}");
     }
 

@@ -281,7 +281,7 @@ class SessionRepositoryTest {
             repo.update(s, "u1");
         }
 
-        // page<1 → 1；pageSize<1 → 20（对照 types.Pagination）
+        // page<1 → 1；pageSize<1 → 20
         SessionRepository.PagedSessions all = repo.getPagedByTenantId(TENANT, "u1", 0, 0);
         assertThat(all.total()).isEqualTo(3);
         assertThat(all.sessions()).hasSize(3);

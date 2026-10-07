@@ -35,7 +35,7 @@ public class SearchConversationsTool extends BaseTool {
 
     /** 返回条数上限。 */
     static final int MAX_RESULTS = 8;
-    /** 摘要的 rune 上限。 */
+    /** 摘要的码点上限。 */
     static final int SNIPPET_RUNES = 400;
 
     /** schema 键按字母序：properties < required < type。 */
@@ -180,7 +180,7 @@ public class SearchConversationsTool extends BaseTool {
         return result;
     }
 
-    /** 摘要：trim 后按 rune 截断加 "…"（U+2026）。 */
+    /** 摘要：trim 后按码点截断加 "…"（U+2026）。 */
     static String snippet(String text, int maxRunes) {
         if (text == null) {
             return "";

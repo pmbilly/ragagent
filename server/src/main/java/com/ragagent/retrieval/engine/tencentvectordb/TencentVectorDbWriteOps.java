@@ -131,7 +131,7 @@ final class TencentVectorDbWriteOps {
         }
     }
 
-    // ── 批量更新（Update API，照 Go） ──────────────────────────────────────
+    // ── 批量更新（Update API） ──────────────────────────────────────
 
     void batchUpdateChunkEnabledStatus(Map<String, Boolean> chunkStatusMap)
             throws Exception {

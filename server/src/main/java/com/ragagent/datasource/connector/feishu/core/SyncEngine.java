@@ -112,7 +112,7 @@ public final class SyncEngine {
 
         /**
          * 从持久化的 {@code ConnectorCursor} 里抽出"每资源 → 每节点 → 编辑时间"的映射
-         * （nil 安全：缺席时返回 null）。
+         * （null 安全：缺席时返回 null）。
          */
         Map<String, Map<String, String>> decodeCursorTimes(Map<String, Object> connectorCursor);
 

@@ -171,7 +171,7 @@ public final class StorageProviderEnv {
         }
     }
 
-    /** {@code S3_*}：{@code use_ssl} 缺省为真（Go：{@code !EqualFold(env, "false")}）。 */
+    /** {@code S3_*}：{@code use_ssl} 缺省为真，仅当配置值（忽略大小写）为 "false" 时才关闭。 */
     @ConfigurationProperties(prefix = "s3")
     public record S3(
             String endpoint,

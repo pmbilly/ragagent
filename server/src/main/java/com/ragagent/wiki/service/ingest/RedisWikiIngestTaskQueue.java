@@ -17,8 +17,8 @@ import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
 
 /**
- * {@link WikiIngestTaskQueue} 的 <b>Redis</b> 实现：跨实例共享的任务表
- * （对齐 Go 端 asynq 队列的角色）。{@code wiki.redis-enabled=true} 时由
+ * {@link WikiIngestTaskQueue} 的 <b>Redis</b> 实现：跨实例共享的任务表。
+ * {@code wiki.redis-enabled=true} 时由
  * {@code WikiRedisWiring} 装配（{@code @Primary} 覆盖
  * {@link InProcessWikiIngestTaskQueue}）。
  *

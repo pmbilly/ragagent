@@ -199,7 +199,7 @@ public class WebFetchTool extends BaseTool {
             for (JsonNode element : itemsNode) {
                 WebFetchItem item = parseItemElement(element);
                 if (item == null) {
-                    return new ParsedItems(List.of(), goItemsTypeMessage(itemsNode));
+                    return new ParsedItems(List.of(), itemsTypeMessage(itemsNode));
                 }
                 items.add(item);
             }
@@ -223,7 +223,7 @@ public class WebFetchTool extends BaseTool {
                     for (JsonNode element : reparsed) {
                         WebFetchItem item = parseItemElement(element);
                         if (item == null) {
-                            return new ParsedItems(List.of(), goItemsTypeMessage(reparsed));
+                            return new ParsedItems(List.of(), itemsTypeMessage(reparsed));
                         }
                         items.add(item);
                     }
@@ -233,7 +233,7 @@ public class WebFetchTool extends BaseTool {
                 // 落到原始错误
             }
         }
-        return new ParsedItems(List.of(), goItemsTypeMessage(itemsNode));
+        return new ParsedItems(List.of(), itemsTypeMessage(itemsNode));
     }
 
     /** 单个 item 的字段解析（url 必为文本，offset/limit 必为整型）。 */
@@ -257,7 +257,7 @@ public class WebFetchTool extends BaseTool {
     }
 
     /** 解码器的类型错误文案（items 字段，文案为输出契约）。 */
-    private static String goItemsTypeMessage(JsonNode node) {
+    private static String itemsTypeMessage(JsonNode node) {
         String jsonType;
         if (node.isBoolean()) {
             jsonType = "bool";

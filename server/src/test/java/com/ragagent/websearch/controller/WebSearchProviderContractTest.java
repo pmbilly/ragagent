@@ -61,7 +61,7 @@ class WebSearchProviderContractTest {
             "\"([A-Za-z_]+)\":\"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\"");
     private static final Pattern UUID_BARE = Pattern.compile(
             "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
-    /** year-1（Go 零值字面量）不匹配本正则 → 在 golden 里保持原样（契约值） */
+    /** year-1（缺省时间戳字面量）不匹配本正则 → 在 golden 里保持原样（契约值） */
     private static final Pattern TS_VALUE = Pattern.compile(
             "\"[2-9]\\d{3}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})\"");
 

@@ -21,7 +21,7 @@ import java.nio.charset.StandardCharsets;
  *
  * <p>派发纪律（逐条对照）：</p>
  * <ol>
- *   <li>行尾只裁 {@code \r\n}（{@code TrimRight(line, "\r\n")}），不做左裁；</li>
+     *   <li>行尾只裁 {@code \r\n}，不做左裁；</li>
  *   <li>空行 = 事件结束：只有 {@code data} 非空才派发，且派发后 {@code event}/{@code data} 双清零；</li>
  *   <li>EOF 时若还有未派发的 {@code data}，同样派发一次（"process any pending event before exit"）；</li>
  *   <li>{@code event:} 缺席时默认事件名 {@code "message"}；</li>

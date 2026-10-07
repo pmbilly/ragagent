@@ -171,7 +171,7 @@ public final class ParamCaster {
                 }
                 if (val.isFloatingPointNumber()) {
                     // 最短 'f' 定点形态（123.5 → "123.5"、42.0 → "42"）
-                    return F.textNode(goFormatFloat(val.doubleValue()));
+                    return F.textNode(plainFloatText(val.doubleValue()));
                 }
                 if (val.isIntegralNumber()) {
                     return F.textNode(String.valueOf(val.longValue()));
@@ -184,19 +184,16 @@ public final class ParamCaster {
         return val;
     }
 
-    /** 最短 'f' 定点形态（绝无指数）。 */
-    private static String goFormatFloat(double v) {
+    /** 最短 'f' 定点形态（绝无指数、无尾随零）。 */
+    private static String plainFloatText(double v) {
         String s = Double.toString(v);
-        int e = s.indexOf('e');
-        if (e < 0) {
+        if (s.indexOf('e') < 0) {
             return s;
         }
-        // 指数形态（|v|<1e-6 或 ≥1e21）需展开为定点
-        // （先取最短往返十进制，再按定点排布）。
-        String mant = s.substring(0, e);
-        int exp = Integer.parseInt(s.substring(e + 1));
-        return new java.math.BigDecimal(mant).scaleByPowerOfTen(exp).toPlainString();
+        // 指数形态展开为定点：最短往返十进制去尾零。
+        return java.math.BigDecimal.valueOf(v).stripTrailingZeros().toPlainString();
     }
+
     private static final class ObjectMapperHolder {
         private static final com.fasterxml.jackson.databind.ObjectMapper MAPPER =
                 new com.fasterxml.jackson.databind.ObjectMapper();

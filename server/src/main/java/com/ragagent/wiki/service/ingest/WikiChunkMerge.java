@@ -16,7 +16,7 @@ import com.ragagent.knowledge.domain.Chunk;
  *
  * <h2>为什么按文本匹配而不是按坐标裁剪</h2>
  * <p>历史上各处都用「按位置」的公式裁剪重叠
- * （{@code offset = len(content) - (EndAt - lastEndAt)} 之类），它默认
+ * （{@code offset = content.length() - (EndAt - lastEndAt)} 之类），它默认
  * 「正文的字符数 == EndAt-StartAt」。但有两类数据会破坏这个不变式，
  * 导致拼接错位、丢字或重复：</p>
  * <ol>

@@ -56,14 +56,9 @@ class SessionStreamControllerTest {
     private StreamEventEmitter emitter;
     private SessionStreamController controller;
 
-    /**
-     * 与线上等价的 mapper：**必须**带上那套 HTML 转义表（线上由 {@code JacksonConfig} 全局装）。
-     * {@code SseFrameWriterTest} 用容器里的真 bean 覆盖这条；这里只是为了让控制器测试
-     * 不必启动整个 Spring 上下文。
-     */
-    private static ObjectMapper goEscapingMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper;
+    /** 控制器测试用的普通 mapper（帧字节形态由 {@code SseFrameWriterTest} 覆盖）。 */
+    private static ObjectMapper streamMapper() {
+        return new ObjectMapper();
     }
 
     @BeforeEach
@@ -71,7 +66,7 @@ class SessionStreamControllerTest {
         sessionService = mock(SessionService.class);
         messageService = mock(MessageService.class);
         streamManager = mock(StreamManager.class);
-        emitter = new StreamEventEmitter(new SseFrameWriter(goEscapingMapper()));
+        emitter = new StreamEventEmitter(new SseFrameWriter(streamMapper()));
         controller = new SessionStreamController(
                 sessionService, messageService, streamManager, emitter, absent(), absent(),
                 // 租户服务桩：上下文里有 tenantId 但库里没有该租户 → 解析器按"无租户"降级
@@ -204,7 +199,7 @@ class SessionStreamControllerTest {
                 .hasMessageContaining("session not found");
     }
 
-    // ── 事件为空 → 手写信封（gin.H 是 map，键**按字母序**） ───────────────────
+    // ── 事件为空 → 手写信封（对象键**按字母序**） ───────────────────
 
     @Test
     void emptyStreamIs404WithHandWrittenEnvelope() throws Exception {
@@ -281,7 +276,7 @@ class SessionStreamControllerTest {
         assertThat(SessionStreamController.sanitizeForLog("")).isEmpty();
     }
 
-    /** 手写信封的字节：gin.H 是 map → 键按字母序，所以 {@code error} 在前。 */
+    /** 手写信封的字节：对象体键按字母序，所以 {@code error} 在前。 */
     @Test
     void handWrittenEnvelopeIsKeySorted() throws Exception {
         MockHttpServletResponse response = new MockHttpServletResponse();

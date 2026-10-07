@@ -23,7 +23,7 @@ public class QiniuProvider implements Provider {
 
     @Override
     public void validateConfig(Config config) {
-        // 校验顺序 = Go 原文：baseURL → API key → model name
+        // 校验顺序：baseURL → API key → model name
         if (config.baseUrl().isEmpty()) {
             throw BizException.badRequest("base URL is required for Qiniu provider");
         }

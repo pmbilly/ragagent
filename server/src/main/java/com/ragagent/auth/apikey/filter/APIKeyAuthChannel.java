@@ -242,7 +242,7 @@ public class APIKeyAuthChannel {
                 String.valueOf(tenantId), null);
     }
 
-    /** 对照 validateExternalUserID（L645-657）：空 / >128 码点 / 控制字符拒绝。 */
+    /** 空 / >128 码点 / 控制字符拒绝。 */
     private static boolean isValidExternalUserId(String id) {
         if (id.isEmpty()) {
             return false;

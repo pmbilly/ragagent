@@ -42,7 +42,7 @@ public class YuqueConfig {
     @JsonProperty("api_token")
     private String apiToken = "";
 
-    /** 部署基地址；空 → {@link #DEFAULT_BASE_URL}。omitempty → 空时整键消失。 */
+    /** 部署基地址；空 → {@link #DEFAULT_BASE_URL}。为空省略 → 空时整键消失。 */
     @JsonProperty("base_url")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String baseUrl = "";
@@ -88,7 +88,7 @@ public class YuqueConfig {
     /**
      * 解析并校验语雀配置。
      *
-     * <p>顺序：nil config → {@link ConnectorException.InvalidConfig}；
+     * <p>顺序：config 为 {@code null} → {@link ConnectorException.InvalidConfig}；
      * 反序列化失败 → {@code "parse yuque credentials: ..."}；{@code api_token}
      * 空白 → {@link ConnectorException.InvalidCredentials}；最后过 SSRF 策略。</p>
      *

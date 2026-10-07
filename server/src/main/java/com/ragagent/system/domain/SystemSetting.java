@@ -18,8 +18,8 @@ import com.ragagent.common.web.PgJsonTypeHandler;
  * id, key, value（jsonb 原样内联）, valueType, category, description, isSecret,
  * requiresRestart, lastModifiedBy, createdAt, updatedAt, enumOptions, lastModifiedByName。</p>
  *
- * <p>⚠️ 虚拟行（registry 有、DB 无）的时间戳是 Go 零值 "0001-01-01T00:00:00Z"
- * ——字段默认值本身持有零值（null 序列化不走自定义序列化器的教训）。</p>
+ * <p>⚠️ 虚拟行（registry 有、DB 无）的时间戳固定为 "0001-01-01T00:00:00Z"
+ * ——字段默认值本身即持有该值（null 序列化不走自定义序列化器）。</p>
  */
 @TableName(value = "system_settings", autoResultMap = true)
 public class SystemSetting {
@@ -49,10 +49,10 @@ public class SystemSetting {
 
     private boolean requiresRestart;
 
-    /** Go 非指针 string：DB NULL → ""（getter 归一化，恒输出） */
+    /** DB NULL → ""（getter 归一化，恒输出） */
     private String lastModifiedBy;
 
-    /** 虚拟行 = Go 零值时间；持久行 = DB 值 */
+    /** 虚拟行 = 零值占位时间（0001-01-01T00:00:00Z）；持久行 = DB 值 */
     private OffsetDateTime createdAt = ZeroTimeSerializer.ZERO_DATE_TIME;
 
     private OffsetDateTime updatedAt = ZeroTimeSerializer.ZERO_DATE_TIME;

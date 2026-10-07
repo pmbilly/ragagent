@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 /**
  * Anthropic 工具定义。
  *
- * <p><b>三个字段都没有 omitempty</b>：description 为空串照发，input_schema 为 null 时输出
+ * <p><b>三个字段都恒输出</b>：description 为空串照发，input_schema 为 null 时输出
  * {@code "input_schema":null}。</p>
  *
  * <p>与 OpenAI 路径的关键差异：Anthropic 的 schema 字段名是 {@code input_schema}（不是

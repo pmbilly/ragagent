@@ -33,7 +33,7 @@ public final class VolcengineEmbedder extends BaseEmbedder {
         if (baseUrl == null || baseUrl.isEmpty()) {
             baseUrl = "https://ark.cn-beijing.volces.com";
         }
-        baseUrl = AliyunEmbedder.goTrimRight(baseUrl, '/');
+        baseUrl = AliyunEmbedder.trimTrailing(baseUrl, '/');
         if (baseUrl.contains("/embeddings/multimodal")) {
             int idx = baseUrl.indexOf("/api/");
             if (idx != -1) {

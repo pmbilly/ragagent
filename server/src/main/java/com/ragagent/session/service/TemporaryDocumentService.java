@@ -67,10 +67,10 @@ public class TemporaryDocumentService {
     private final TemporaryDocumentRepository repo;
     private final AttachmentFileStore fileStore;
     /** 共享 agent 的解析依赖（ASR 模型）与租户级引擎规则回落。 */
-    /** 解析/落盘管线切片（§14 步骤 2 第二刀）。 */
+    /** 解析/落盘管线子模块（§14 步骤 2 第二刀）。 */
     private final TemporaryDocumentProcessor processor;
 
-    /** 提示词渲染切片（§14 步骤 2：ResolveForPrompt 的选块与图片 URL 选取）。 */
+    /** 提示词渲染子模块（§14 步骤 2：resolveForPrompt 的选块与图片 URL 选取）。 */
     private final TemporaryDocumentPromptResolver promptResolver;
 
     /** 过期回收周期。 */
@@ -248,7 +248,7 @@ public class TemporaryDocumentService {
         String resourceRef = fileStore.saveBytes(data, tenantId, storageName);
 
         TemporaryDocument document = new TemporaryDocument();
-        document.setId(java.util.UUID.randomUUID().toString());  // Go BeforeCreate L53-55
+        document.setId(java.util.UUID.randomUUID().toString());  // 落库前生成 id
         document.setTenantId(tenantId);
         document.setSessionId(sessionId);
         document.setResourceRef(resourceRef);

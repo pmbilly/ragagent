@@ -65,7 +65,7 @@ import org.xml.sax.InputSource;
  * {@code yyyy-MM-dd[ HH:mm[:ss]]}、{@code MMM d, yyyy}、{@code d MMM yyyy}、
  * {@code d/M/yyyy}、{@code d.M.yyyy} 等。</p>
  * <p>解析不出来时 {@code *Parsed} 为 {@code null}——<b>与 gofeed 的行为一致</b>
- * （它也是解析失败就跳过、留下 nil），而不是报错。
+ * （它也是解析失败就跳过、留下 {@code null}），而不是报错。
  * 于是影响的只是"这条用 feed 内容、且更新时间回落到 {@code now()}"，
  * 不会让整次同步失败。<b>这是本实现刻意选择的失败模式</b>：宁可少一个时间戳，
  * 也不要把整条 feed 判为不可解析。</p>
@@ -152,7 +152,7 @@ public final class JdkXmlFeedParser implements FeedParser {
         }
         char c = source.charAt(first);
         if (c == '{') {
-            // Go 这边会按 JSON Feed 解析成功；Java 侧没有 JSON Feed 支持。
+            // "{" 开头是 JSON Feed：本实现不支持，直接判定失败。
             throw new FeedParseException(
                     FeedParseException.FAILED_TO_DETECT + " (JSON Feed is not supported by this build)");
         }
@@ -381,7 +381,7 @@ public final class JdkXmlFeedParser implements FeedParser {
     // ── DOM 工具（尽量贴近 goxpp 的 ParseText 语义） ──────────────────────
 
     /**
-     * 对照 goxpp 的 {@code ParseText}：拿元素的<b>内层 XML</b>，TrimSpace。
+     * 拿元素的<b>内层 XML</b>，并去首尾空白。
      *
      * <p>goxpp 取的是"原始源文本"再 {@code DecodeEntities}（或对 CDATA 走 {@code StripCDATA}）；
      * 而 DOM 已经替我们把实体解开了，所以这里直接把子节点的值拼起来即可——
@@ -389,7 +389,7 @@ public final class JdkXmlFeedParser implements FeedParser {
      * 这正是 gofeed 对 {@code <description><p>x</p></description>} 的行为。</p>
      */
     private static String parseText(Element element) {
-        return RssUtil.goTrim(innerXml(element));
+        return RssUtil.trimUnicodeWhitespace(innerXml(element));
     }
 
     /** 元素的内层 XML（文本节点已解码，CDATA 拆掉标记，嵌套元素还原成标签）。 */
@@ -553,10 +553,10 @@ public final class JdkXmlFeedParser implements FeedParser {
      * 对照 gofeed 的 {@code shared.ParseDate}（有界子集），并把结果<b>归一成 UTC</b>
      * ——gofeed 的解析器在赋 {@code *Parsed} 之前统一做了 {@code date.UTC()}。
      *
-     * @return 解析失败回 {@code null}（gofeed 也是"抛错就跳过、留下 nil"，不中断同步）
+     * @return 解析失败回 {@code null}（跳过该条、不中断同步）
      */
     static OffsetDateTime parseDate(String raw) {
-        String d = RssUtil.goTrim(raw);
+        String d = RssUtil.trimUnicodeWhitespace(raw);
         if (d.isEmpty()) {
             return null;
         }
@@ -582,7 +582,7 @@ public final class JdkXmlFeedParser implements FeedParser {
 
     /**
      * 把尾巴上的零时区记号换成 {@code +0000}（只在字符串里还<b>没有</b>数字偏移时做，
-     * 免得把 {@code "15:04:05 -0700 GMT"} 这种搞坏——那本来就是 Go 才认的布局）。
+     * 免得把 {@code "15:04:05 -0700 GMT"} 这类已带数字偏移的写法搞坏）。
      */
     private static String normalizeZeroZone(String d) {
         if (d.matches(".*[+-]\\d{2}:?\\d{2}$")) {

@@ -197,7 +197,7 @@ final class ThinkPhase {
 
         // 看门狗取消的是 provider 上下文，流只会冒出泛化取消——改述成停顿。
         if (stalled.get()) {
-            // B44：Go 时长形态退役——标准 ISO-8601（Duration.toString）
+            // 时长用标准 ISO-8601 形态（Duration.toString）
             result.streamError = "LLM stream stalled: no output for " + stallTimeout;
         }
 
@@ -288,14 +288,14 @@ final class ThinkPhase {
                     emittedEventTypes.merge("tool_call_pending", 1, Integer::sum);
                     engine.eventBus.emit(new Event(toolCallID + "-tool-call-pending",
                             EventType.EVENT_AGENT_TOOL_CALL, sessionId,
-                            new AgentToolCallData(toolCallID, toolName, ActPhase.deepSortedGoMap(args),
+                            new AgentToolCallData(toolCallID, toolName, ActPhase.deepSortedMap(args),
                                     iteration, ""), null, ""));
                 } else if (!toolCallID.isEmpty() && pendingToolCalls.containsKey(toolCallID)
                         && args != null) {
                     emittedEventTypes.merge("tool_call_progress", 1, Integer::sum);
                     engine.eventBus.emit(new Event(toolCallID + "-tool-call-progress",
                             EventType.EVENT_AGENT_TOOL_CALL, sessionId,
-                            new AgentToolCallData(toolCallID, toolName, ActPhase.deepSortedGoMap(args),
+                            new AgentToolCallData(toolCallID, toolName, ActPhase.deepSortedMap(args),
                                     iteration, ""), null, ""));
                 }
             }

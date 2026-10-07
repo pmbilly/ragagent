@@ -26,7 +26,7 @@ import com.ragagent.stream.StreamEvent;
  *   <tr><td>{@code content}</td><td>{@code evt.content}</td><td>恒输出</td></tr>
  *   <tr><td>{@code done}</td><td>{@code evt.done}</td><td>恒输出</td></tr>
  *   <tr><td>{@code data}</td><td>{@code evt.data}</td><td><b>同一引用</b>，不拷贝</td></tr>
- *   <tr><td>{@code usage}</td><td>{@code evt.usage}</td><td>omitempty</td></tr>
+ *   <tr><td>{@code usage}</td><td>{@code evt.usage}</td><td>为空省略</td></tr>
  *   <tr><td>{@code session_id}</td><td>{@code evt.data["session_id"]}</td>
  *       <td><b>仅</b> {@code response_type == agent_query} 时取，且必须是字符串类型</td></tr>
  *   <tr><td>{@code assistant_message_id}</td><td>{@code evt.data["assistant_message_id"]}</td>
@@ -39,7 +39,7 @@ import com.ragagent.stream.StreamEvent;
  *
  * <h2>{@code references} 事件的三态</h2>
  * <ol>
- *   <li>{@code data["references"]} 缺席 / {@code null} → <b>不设</b>该字段（omitempty → 整键省略）。</li>
+ *   <li>{@code data["references"]} 缺席 / {@code null} → <b>不设</b>该字段（为空即整键省略）。</li>
  *   <li>值是 {@code []*SearchResult}（活路径，本进程内刚构建）→ 原样赋上。</li>
  *   <li>值是 {@code []interface{}}（<b>从 Redis 回放</b>，元素已退化成 {@code map}）→
  *       逐个交给 {@link #searchResultFromMap} 重建；<b>非 map 的元素直接跳过</b>，不报错。</li>

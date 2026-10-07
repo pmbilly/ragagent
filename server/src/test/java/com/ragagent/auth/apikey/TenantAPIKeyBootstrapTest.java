@@ -72,7 +72,7 @@ class TenantAPIKeyBootstrapTest {
         assertThat(APIKeyAuthChannel.isPlatformTenantOptionalApi("/api/v1/system/admin", "GET")).isTrue();
         assertThat(APIKeyAuthChannel.isPlatformTenantOptionalApi("/api/v1/system/admin/settings", "GET")).isTrue();
         assertThat(APIKeyAuthChannel.isPlatformTenantOptionalApi("/api/v1/system/admin/", "GET")).isTrue();
-        // 裸 HasPrefix 会误放行同前缀路径——Go 特意用精确边界，这里钉住
+        // 裸前缀匹配会误放行同前缀路径——必须用精确边界，这里钉住
         assertThat(APIKeyAuthChannel.isPlatformTenantOptionalApi("/api/v1/system/admin-foo", "GET")).isFalse();
         assertThat(APIKeyAuthChannel.isPlatformTenantOptionalApi("/api/v1/system/settings", "GET")).isFalse();
     }

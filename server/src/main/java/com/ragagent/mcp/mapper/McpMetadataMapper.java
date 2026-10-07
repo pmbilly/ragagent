@@ -47,7 +47,7 @@ public interface McpMetadataMapper {
                             @Param("principal") String principal);
 
     /**
-     * 对照 metadataToolCountExpr(db) == "postgres" 分支：jsonb_array_length。
+     * postgres 分支：jsonb_array_length。
      * 计数摘要**不返回 payload**——只 SELECT 计数与卡片字段。
      */
     @Select("<script>SELECT service_id, principal, config_fingerprint, synced_at, server_name, "
@@ -60,8 +60,8 @@ public interface McpMetadataMapper {
 
     /**
      * 非 postgres 分支：json_array_length。
-     * （PostgreSQL 的 jsonb 列不能直接喂给 json_array_length，所以 Go 才按 db.Name() 分叉；
-     * Java 侧同样分叉，测试库 H2 由 TestSchema 注册同名 ALIAS 提供该函数。）
+     * （PostgreSQL 的 jsonb 列不能直接喂给 json_array_length，故按数据库分叉两个方法；
+     * 测试库 H2 由 TestSchema 注册同名 ALIAS 提供该函数。）
      */
     @Select("<script>SELECT service_id, principal, config_fingerprint, synced_at, server_name, "
             + "json_array_length(tools) AS tool_count FROM mcp_metadata "
@@ -71,7 +71,7 @@ public interface McpMetadataMapper {
     List<McpMetadataSummary> listSummariesDefault(@Param("tenant") long tenant,
                                                   @Param("principals") List<String> principals);
 
-    /** 对照 OnConflict DO UPDATE 的列集（不含主键列），带 synced_at 版本护栏 */
+    /** ON CONFLICT DO UPDATE 的列集（不含主键列），带 synced_at 版本护栏 */
     @Update("UPDATE mcp_metadata SET config_fingerprint = #{configFingerprint}, "
             + "tools = #{tools, typeHandler=com.ragagent.mcp.domain.McpToolListTypeHandler}, "
             + "instructions = #{instructions}, server_name = #{serverName}, "

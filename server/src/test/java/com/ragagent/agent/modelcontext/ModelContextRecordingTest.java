@@ -55,8 +55,8 @@ class ModelContextRecordingTest {
     }
 
     /** 解析录制里 []string 的文本形态 "[a b c]"。 */
-    private static String goSliceString(String goSlice, int index) {
-        String inner = goSlice.substring(1, goSlice.length() - 1);
+    private static String sliceText(String recordedSlice, int index) {
+        String inner = recordedSlice.substring(1, recordedSlice.length() - 1);
         return inner.split(" ")[index];
     }
 
@@ -208,10 +208,10 @@ class ModelContextRecordingTest {
                 + " plain 12345678-1234-1234-1234-123456789abc text");
         JsonNode labeled = rec(R_CITATIONS_LABELED_REFS).get("out");
         // 探针用 fmt.Sprintf("%v", []string{...}) 记录 → "[d1 d2]" 字符串
-        assertThat(goSliceString(labeled.get("docs").asText(), 0)).isEqualTo(rm.docsHandle("doc-elem-1"));
-        assertThat(goSliceString(labeled.get("docs").asText(), 1)).isEqualTo(rm.docsHandle("doc-elem-2"));
-        assertThat(goSliceString(labeled.get("kbs").asText(), 0)).isEqualTo(rm.kbsHandle("kb-elem-1"));
-        assertThat(goSliceString(labeled.get("kbs").asText(), 1)).isEqualTo(rm.kbsHandle("kb-elem-2"));
+        assertThat(sliceText(labeled.get("docs").asText(), 0)).isEqualTo(rm.docsHandle("doc-elem-1"));
+        assertThat(sliceText(labeled.get("docs").asText(), 1)).isEqualTo(rm.docsHandle("doc-elem-2"));
+        assertThat(sliceText(labeled.get("kbs").asText(), 0)).isEqualTo(rm.kbsHandle("kb-elem-1"));
+        assertThat(sliceText(labeled.get("kbs").asText(), 1)).isEqualTo(rm.kbsHandle("kb-elem-2"));
     }
 
     // ---- citation_stream ----
@@ -608,7 +608,7 @@ class ModelContextRecordingTest {
                         "{\"properties\":{\"server_id\":{\"enum\":[\"srv-uuid-1\",\"srv-uuid-2\"],\"type\":\"string\"},\"q\":{\"type\":\"string\"}},\"type\":\"object\"}"),
                 tool("call_mcp_tool", "Call",
                         "{\"properties\":{\"server_id\":{\"type\":\"string\"},\"tool_ref\":{\"enum\":[\"tool-uuid-9\"],\"type\":\"string\"}}}")));
-        assertThat(goToolsJson(enc)).isEqualTo(out(R_MCP_ENCODE_TOOLS_ENUM));
+        assertThat(toolsJson(enc)).isEqualTo(out(R_MCP_ENCODE_TOOLS_ENUM));
 
         ToolResult dir = new ToolResult();
         dir.setSuccess(true);
@@ -619,7 +619,7 @@ class ModelContextRecordingTest {
         List<ChatTool> encTools2 = r.encodeTools(List.of(
                 tool("discover_mcp_tools", "List tools",
                         "{\"properties\":{\"server_id\":{\"enum\":[\"srv-uuid-1\",\"srv-uuid-2\"],\"type\":\"string\"},\"q\":{\"type\":\"string\"}},\"type\":\"object\"}")));
-        assertThat(goToolsJson(encTools2)).isEqualTo(out(R_MCP_ENCODE_TOOLS_AFTER_REGISTER));
+        assertThat(toolsJson(encTools2)).isEqualTo(out(R_MCP_ENCODE_TOOLS_AFTER_REGISTER));
     }
 
     @Test
@@ -645,14 +645,14 @@ class ModelContextRecordingTest {
     }
 
     private static ChatTool tool(String name, String description, String parameters) {
-        ChatTool t = new ChatTool(name, description, GoJsonBridge.parseTree(parameters));
+        ChatTool t = new ChatTool(name, description, JsonBridge.parseTree(parameters));
         // 录制时的 Tool 字面量没设 Type → 空串 ""
         t.setType("");
         return t;
     }
 
     /** Tool 数组的 JSON 键序：type→function→(name,description,parameters)。 */
-    private static String goToolsJson(List<ChatTool> tools) {
+    private static String toolsJson(List<ChatTool> tools) {
         StringBuilder sb = new StringBuilder("[");
         for (int i = 0; i < tools.size(); i++) {
             if (i > 0) {
@@ -661,9 +661,9 @@ class ModelContextRecordingTest {
             ChatTool t = tools.get(i);
             String params = t.getFunction().getParameters() == null ? "null"
                     : ToolJson.write(t.getFunction().getParameters());
-            sb.append("{\"type\":\"").append(GoJsonBridge.goString(t.getType()))
-                    .append("\",\"function\":{\"name\":\"").append(GoJsonBridge.goString(t.getFunction().getName()))
-                    .append("\",\"description\":\"").append(GoJsonBridge.goString(t.getFunction().getDescription()))
+            sb.append("{\"type\":\"").append(JsonBridge.jsonString(t.getType()))
+                    .append("\",\"function\":{\"name\":\"").append(JsonBridge.jsonString(t.getFunction().getName()))
+                    .append("\",\"description\":\"").append(JsonBridge.jsonString(t.getFunction().getDescription()))
                     .append("\",\"parameters\":").append(params).append("}}");
         }
         return sb.append(']').toString();

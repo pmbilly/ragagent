@@ -69,7 +69,7 @@ public class TenantInvitation {
     public int getAcceptedCount() { return acceptedCount; }
     public void setAcceptedCount(int v) { acceptedCount = v; }
 
-    /** 对照 TenantInvitation.IsExpired：expires_at 零值视为未过期（NULL 同义） */
+    /** expires_at 零值视为未过期（NULL 同义） */
     public boolean isExpiredAt(OffsetDateTime at) {
         if (expiresAt == null) {
             return false;

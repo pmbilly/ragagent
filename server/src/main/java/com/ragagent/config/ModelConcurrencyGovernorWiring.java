@@ -23,8 +23,8 @@ import jakarta.annotation.PostConstruct;
  * <ul>
  *   <li>缺省：{@link LocalLimiter}（进程内信号量，单实例语义）；</li>
  *   <li>{@code llm.limiter.redis-enabled=true}：{@link RedisLimiter}
- *       （跨实例分布式信号量：ZSET 租约 + 心跳 + fail-open，
- *       对齐 Go internal/models/limiter）。开关打开但 Redis 连不上时
+ *       （跨实例分布式信号量：ZSET 租约 + 心跳 + fail-open）。
+ *       开关打开但 Redis 连不上时
  *       <b>启动失败</b>（不静默退化，与 im/wiki 的开关同口径）。</li>
  * </ul>
  *

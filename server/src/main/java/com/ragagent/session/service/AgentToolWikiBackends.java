@@ -167,7 +167,7 @@ final class AgentToolWikiBackends {
             }
         };
     }
-    /** 对照 types.WikiPage → 工具侧页视图。 */
+    /** WikiPage → 工具侧页视图。 */
     static PageView toPageView(WikiPage page) {
         PageView view = PageView.of(page.getKnowledgeBaseId(),
                 page.getSlug());
@@ -190,7 +190,7 @@ final class AgentToolWikiBackends {
                 || page.getPageMetadata().isNull() ? "" : page.getPageMetadata().toString());
         return view;
     }
-    /** 对照工具侧页视图 → types.WikiPage（service 就地补全 ID/Status/Version/OutLinks）。 */
+    /** 工具侧页视图 → WikiPage 实体（service 就地补全 ID/Status/Version/OutLinks）。 */
     static WikiPage toEntity(PageView view) {
         WikiPage entity = new WikiPage();
         entity.setId(view.id());
@@ -214,7 +214,7 @@ final class AgentToolWikiBackends {
         entity.setPageMetadata(metadata);
         return entity;
     }
-    /** 对照 types.WikiPageIssue → 工具侧 issue 视图（时间以 Go RFC3339 文本透传）。 */
+    /** WikiPageIssue → 工具侧 issue 视图（时间以 RFC3339 文本透传）。 */
     static IssueView toIssueView(WikiPageIssue issue) {
         IssueView view = new IssueView();
         view.setId(issue.getId());
@@ -226,10 +226,10 @@ final class AgentToolWikiBackends {
         view.setSuspectedKnowledgeIds(issue.getSuspectedKnowledgeIds());
         view.setStatus(issue.getStatus());
         view.setReportedBy(issue.getReportedBy());
-        view.setCreatedAt(goTimeText(issue.getCreatedAt()));
-        view.setUpdatedAt(goTimeText(issue.getUpdatedAt()));
+        view.setCreatedAt(timeText(issue.getCreatedAt()));
+        view.setUpdatedAt(timeText(issue.getUpdatedAt()));
         view.setDeletedAtValid(issue.getDeletedAt() != null);
-        view.setDeletedAt(goTimeText(issue.getDeletedAt()));
+        view.setDeletedAt(timeText(issue.getDeletedAt()));
         return view;
     }
     /** wiki 索引 → 工具侧 overview 视图。 */
@@ -253,7 +253,7 @@ final class AgentToolWikiBackends {
      * 去掉**（Java 的 ISO_OFFSET_DATE_TIME 会补齐到 3/6/9 位）；零值写
      * {@code 0001-01-01T00:00:00Z}。
      */
-    static String goTimeText(java.time.OffsetDateTime value) {
+    static String timeText(java.time.OffsetDateTime value) {
         if (ZeroTimeSerializer.isZeroValue(value)) {
             return ZeroTimeSerializer.ZERO_TIME_LITERAL;
         }

@@ -35,14 +35,14 @@ final class JsonValues {
      * 先把整型/大数/Decimal 节点归一成 DoubleNode，编码字节才稳定
      * （大整数超出 double 精度时按同样规则损失精度）。
      */
-    static JsonNode goFloatTree(JsonNode node) {
+    static JsonNode numbersAsDouble(JsonNode node) {
         if (node.isObject()) {
             ObjectNode obj = (ObjectNode) node;
             ObjectNode out = MAPPER.createObjectNode();
             var fields = obj.fields();
             while (fields.hasNext()) {
                 var e = fields.next();
-                out.set(e.getKey(), goFloatTree(e.getValue()));
+                out.set(e.getKey(), numbersAsDouble(e.getValue()));
             }
             return out;
         }
@@ -50,7 +50,7 @@ final class JsonValues {
             ArrayNode arr = (ArrayNode) node;
             ArrayNode out = MAPPER.createArrayNode();
             for (JsonNode item : arr) {
-                out.add(goFloatTree(item));
+                out.add(numbersAsDouble(item));
             }
             return out;
         }

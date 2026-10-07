@@ -10,15 +10,11 @@ package com.ragagent.llm.provider;
  */
 public enum ModelType {
 
-    /** 对照 types.ModelTypeEmbedding */
     EMBEDDING("Embedding"),
-    /** 对照 types.ModelTypeRerank */
     RERANK("Rerank"),
-    /** 对照 types.ModelTypeKnowledgeQA（Chat） */
+    /** 亦称 Chat。 */
     KNOWLEDGE_QA("KnowledgeQA"),
-    /** 对照 types.ModelTypeVLLM */
     VLLM("VLLM"),
-    /** 对照 types.ModelTypeASR */
     ASR("ASR");
 
     private final String value;

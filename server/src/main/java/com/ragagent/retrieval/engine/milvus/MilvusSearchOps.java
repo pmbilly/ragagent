@@ -41,7 +41,7 @@ final class MilvusSearchOps {
     }
 
     /**
-     * 对照 {@code VectorRetrieve}：判存 → 基础过滤 + 范围搜索（threshold>0 → radius）→
+     * 判存 → 基础过滤 + 范围搜索（threshold>0 → radius）→
      * distance 即分数；类不存在 → 空结果。
      */
     List<RetrieveResult> vectorRetrieve(RetrieveParams params) {
@@ -91,7 +91,7 @@ final class MilvusSearchOps {
     }
 
     /**
-     * 对照 {@code KeywordsRetrieve}：跨前缀集合 BM25 全文检索（文本进 data、
+     * 跨前缀集合 BM25 全文检索（文本进 data、
      * annsField=content_sparse）；单集合失败只跳过；score 恒 1.0；合并后截 TopK。
      */
     List<RetrieveResult> keywordsRetrieve(RetrieveParams params) {

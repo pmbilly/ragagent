@@ -45,13 +45,13 @@ public class RssCursor {
     private static final ObjectMapper MAPPER = JsonMappers.lenient()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-    /** 本次同步的时间（UTC）。无 omitempty → 恒输出。 */
+    /** 本次同步的时间（UTC）。恒输出。 */
     @JsonProperty("last_sync_time")
     private OffsetDateTime lastSyncTime = ZeroTimeSerializer.ZERO_DATE_TIME;
 
     /**
      * {@code feedURL → itemID → 内容指纹}（{@code "h:<sha256 前 16 位十六进制>"}）。
-     * omitempty → {@code null} 或空 map 时整个键消失。
+     * 为空省略：{@code null} 或空 map 时整个键消失。
      */
     @JsonProperty("feed_items")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)

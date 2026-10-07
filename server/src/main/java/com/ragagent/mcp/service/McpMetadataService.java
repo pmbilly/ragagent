@@ -78,7 +78,7 @@ public class McpMetadataService {
         return OffsetDateTime.now(ZoneOffset.UTC);
     }
 
-    /** 对照 metadataPrincipal：非 OAuth → ""；OAuth 但无 principal → ErrMCPOAuthPrincipalRequired */
+    /** 非 OAuth → ""；OAuth 但无 principal → 抛 principalRequired */
     static String metadataPrincipal(McpService service) {
         if (service.getAuthConfig() == null || !service.getAuthConfig().isOAuth()) {
             return "";
@@ -90,7 +90,7 @@ public class McpMetadataService {
         return storageId;
     }
 
-    /** 对照 loadServiceForMetadata：服务不存在或 tenant==0 一律 ErrMCPServiceNotFound */
+    /** 服务不存在或 tenant==0 一律 serviceNotFound */
     private McpService loadService(long tenant, String id) {
         McpService service = mcpServiceMapper.getByIdForTenant(tenant, id);
         if (service == null || tenant == 0) {
@@ -102,7 +102,7 @@ public class McpMetadataService {
     // ── 读 ───────────────────────────────────────────────────────────────
 
     /**
-     * 对照 GetMCPMetadata：只读已落库快照；null = 从未同步过。
+     * 只读已落库快照；null = 从未同步过。
      * Stale = 快照指纹 ≠ 当前服务配置指纹（文档编辑不影响上游身份，故不算陈旧）。
      */
     public McpMetadata getMCPMetadata(long tenant, String id) {
@@ -117,7 +117,7 @@ public class McpMetadataService {
     }
 
     /**
-     * 对照 ListMCPMetadataSummaries：只带计数的列表卡片。
+     * 只带计数的列表卡片。
      *
      * <p>principals 恒含 ""（非 OAuth 快照），若上下文里有 OAuth principal 再加入它——
      * 因此每个服务只会命中"自己该看的那一份"（OAuth 服务看自己的，
@@ -171,7 +171,7 @@ public class McpMetadataService {
     // ── 写 ───────────────────────────────────────────────────────────────
 
     /**
-     * 对照 commitMCPMetadata：校验 → 8 MiB 上限 → 连接未变校验 → 落库 → 回读。
+     * 校验 → 8 MiB 上限 → 连接未变校验 → 落库 → 回读。
      *
      * @param started 刷新**开始**的时间（不是提交时间），保证迟到但更旧的刷新不会覆盖
      */
@@ -241,7 +241,7 @@ public class McpMetadataService {
     }
 
     /**
-     * 对照 PersistMCPMetadata：把在**已授权连接**上列出的完整目录落库
+     * 把在**已授权连接**上列出的完整目录落库
      * （聊天中的 OAuth 用户据此存自己的快照，不需要管理员去设置页刷新）。
      */
     public void persistMCPMetadata(long tenant, String id, List<McpTool> listed, String instructions) {
@@ -251,7 +251,7 @@ public class McpMetadataService {
     }
 
     /**
-     * 对照 RefreshMCPMetadata：显式连接并**原子替换**整份快照。
+     * 显式连接并**原子替换**整份快照。
      *
      * <p>不做任何用户操作，也绝不发布部分的 tools/list。刷新失败保留上次快照；
      * 配置指纹把旧连接的快照挡在执行路径之外。</p>

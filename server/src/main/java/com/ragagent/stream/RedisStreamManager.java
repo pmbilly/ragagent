@@ -171,7 +171,7 @@ public class RedisStreamManager implements StreamManager {
         List<Object> args = new ArrayList<>(events.size() + 1);
         args.add(Long.toString(ttl.toSeconds()));
         for (StreamEvent event : events) {
-            // Go 就地改 events[i]（切片底层数组共享，调用方看得见）
+            // 就地补时间戳到入参事件上：调用方对自己对象的这一改动看得见
             if (event.getTimestamp() == null) {
                 event.setTimestamp(OffsetDateTime.now());
             }

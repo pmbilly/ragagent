@@ -45,8 +45,8 @@ import com.ragagent.common.web.ZeroTimeSerializer;
  * <ul>
  *   <li>{@code extractionState} 是 {@code @JsonIgnore} → 一个键都不出；</li>
  *   <li>{@code pendingSessions} 为 null 时输出 {@code null}
- *       （而**落库**时 nil 写 {@code []}，两件事不冲突，见类型处理器）；</li>
- *   <li>三个 {@code *time.Time} 指针字段输出 {@code null}；</li>
+ *       （而**落库**时 null 写 {@code []}，两件事不冲突，见类型处理器）；</li>
+ *   <li>三个可空时间戳字段输出 {@code null}；</li>
  *   <li>{@code createdAt}/{@code updatedAt} 是值类型，零值输出
  *       {@code "0001-01-01T00:00:00Z"}（见 {@code MemoryEntityJsonTest}）。</li>
  * </ul>

@@ -57,7 +57,7 @@ class ImAdapterVerifyTest {
 
     @Test
     void telegramConstantTimeCompare() {
-        // secret 空 → 免验（Go 原文）
+        // secret 空 → 免验
         assertTrue(ImAdapterVerify.telegramTokenMatches("", ""));
         assertTrue(ImAdapterVerify.telegramTokenMatches("anything", ""));
         assertTrue(ImAdapterVerify.telegramTokenMatches("w5g3-telegram-secret",

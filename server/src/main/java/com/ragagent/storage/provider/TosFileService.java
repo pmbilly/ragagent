@@ -63,7 +63,7 @@ public class TosFileService implements FileService {
         if (!this.tempBucketName.isEmpty()) {
             String effectiveTempRegion = tempRegion == null || tempRegion.trim().isEmpty()
                     ? region : tempRegion;
-            // 临时桶可能属于另一 region：用短命客户端探测（照 Go）
+            // 临时桶可能属于另一 region：用短命客户端探测
             TOSV2 tempProbe = buildClient(endpoint, effectiveTempRegion, accessKey, secretKey);
             ensureBucket(tempProbe, this.tempBucketName);
         }
@@ -82,7 +82,7 @@ public class TosFileService implements FileService {
         return new TOSV2ClientBuilder().build(config);
     }
 
-    /** 对照 {@code ensureTOSBucket}：HeadBucket 404 → 建桶；建桶 409 → 视为已存在。 */
+    /** HeadBucket 404 → 建桶；建桶 409 → 视为已存在。 */
     static void ensureBucket(TOSV2 client, String bucket) {
         try {
             client.headBucket(new HeadBucketV2Input().setBucket(bucket));
@@ -106,7 +106,7 @@ public class TosFileService implements FileService {
         }
     }
 
-    /** 对照 {@code joinTOSObjectKey}：各段 trim 斜杠、跳过空段、以 {@code /} 连接。 */
+    /** 各段 trim 斜杠、跳过空段、以 {@code /} 连接。 */
     static String joinObjectKey(String... parts) {
         StringBuilder sb = new StringBuilder();
         for (String part : parts) {
@@ -258,7 +258,7 @@ public class TosFileService implements FileService {
         return newPath;
     }
 
-    /** 对照 {@code parseTOSFilePath}：{@code tos://{bucket}/{key}}。 */
+    /** {@code tos://{bucket}/{key}}。 */
     static String[] parseFilePath(String filePath) {
         String p = filePath == null ? "" : filePath;
         if (!p.startsWith(SCHEME)) {

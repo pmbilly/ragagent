@@ -13,15 +13,13 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ragagent.common.web.ZeroTimeSerializer;
 
 /**
- * 事件 payload 进出 JSON 的唯一 ObjectMapper，集中定义三条序列化行为
- * （2026-10-03 B39/B40：原第 1 条「HTML 转义复刻 Go」已随 Go 版下线退役）。
+ * 事件 payload 进出 JSON 的唯一 ObjectMapper，集中定义三条序列化行为。
  *
  * <ol>
  *   <li><b>map 键按字母序</b>：{@code ORDER_MAP_ENTRIES_BY_KEYS}。payload 的
  *       {@code extra}/{@code arguments}/{@code data}/{@code args} 装的是任意 JSON，
  *       序列化时键恒按字母序输出。</li>
- *   <li><b>浮点走 Jackson 默认</b>（2026-10-03 B50：`GoDoubleSerializer` 退役）——
- *       整数值输出 {@code "n":2.0}（原 Go 形态为 {@code 2}）；JSON 数值语义相同。</li>
+ *   <li><b>浮点走 Jackson 默认</b>：整数值输出 {@code "n":2.0}；JSON 数值语义相同。</li>
  *   <li><b>时间 RFC3339Nano</b>：OffsetDateTime 转 JVM 默认时区后 ISO 输出（与
  *       {@code config.JacksonConfig} 一致）；零值时间输出
  *       {@code "0001-01-01T00:00:00Z"}（{@link ZeroTimeSerializer}，如 CommandOutputData
@@ -37,14 +35,14 @@ public final class EventJson {
     private static final ObjectMapper MAPPER = build();
 
     private static ObjectMapper build() {
-        SimpleModule goTime = new SimpleModule();
-        goTime.addSerializer(OffsetDateTime.class, new ZeroTimeSerializer());
+        SimpleModule zeroTimeModule = new SimpleModule();
+        zeroTimeModule.addSerializer(OffsetDateTime.class, new ZeroTimeSerializer());
 
         ObjectMapper mapper = JsonMapper.builder()
                 .addModule(new JavaTimeModule())
                 // ZeroTimeSerializer：常规时间转 JVM 默认时区 + RFC3339Nano，零值输出 year-1 字面量。
                 // 只此一份——若再叠一个普通 OffsetDateTime 序列化器会后注册者胜、丢掉零值分支。
-                .addModule(goTime)
+                .addModule(zeroTimeModule)
                 .enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS)
                 .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)

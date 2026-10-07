@@ -541,7 +541,7 @@ public class KnowledgeBaseService
         if (config.hasNonNull("autoTagConfig")) {
             kb.setAutoTagConfig(config.get("autoTagConfig"));
         }
-        // indexingStrategy：指针语义 nil=不变；HasAnyIndexing 为 false → 400
+        // indexingStrategy：引用语义 null=不变；hasAnyIndexing 为 false → 400
         if (config.has("indexingStrategy") && config.get("indexingStrategy") != null
                 && config.get("indexingStrategy").isObject()) {
             KnowledgeBaseIndexingStrategy strategy = KnowledgeBaseIndexingStrategy.from(config.get("indexingStrategy"));

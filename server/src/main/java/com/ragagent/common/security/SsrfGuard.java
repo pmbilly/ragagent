@@ -108,7 +108,6 @@ public class SsrfGuard {
         whitelist = snapshot == null ? parseWhitelistRaw("") : snapshot;
     }
 
-    /** 对照 mergeSSRFWhitelistRaws */
     static String mergeRaws(String primary, String extra) {
         primary = primary == null ? "" : primary.trim();
         extra = extra == null ? "" : extra.trim();
@@ -119,8 +118,8 @@ public class SsrfGuard {
     }
 
     /**
-     * 对照 ValidateURLForSSRF。空 URL 放行（由调用方决定必填）。
-     * @throws SsrfException 校验失败（消息 = Go error 原文）
+     * 空 URL 放行（由调用方决定必填）。
+     * @throws SsrfException 校验失败（消息 = 原错误文案）
      */
     public void validateURLForSSRF(String rawURL) {
         if (rawURL == null || rawURL.isEmpty()) {
@@ -152,7 +151,7 @@ public class SsrfGuard {
         }
     }
 
-    /** 对照 isSSRFSafeURL：受限主机名/后缀/直连 IP/IP 混淆/DNS 解析/端口 */
+    /** 受限主机名/后缀/直连 IP/IP 混淆/DNS 解析/端口 */
     private void isSafeURL(String rawURL, URI uri, String hostname) {
         if (rawURL.length() > 2048) {
             throw new SsrfException("URL exceeds maximum length");
@@ -196,7 +195,7 @@ public class SsrfGuard {
         }
     }
 
-    /** 对照 FormatSSRFError：中文运维提示文案逐字符一致 */
+    /** 中文运维提示文案逐字符一致 */
     public String formatSSRFError(String label, String rawURL, Exception err) {
         String host = rawURL;
         try {
@@ -214,7 +213,7 @@ public class SsrfGuard {
                 + "示例：SSRF_WHITELIST_EXTRA=" + host + ",*.example.com,10.0.0.0/8";
     }
 
-    /** 对照 IsSSRFWhitelisted：精确 / *.后缀 / CIDR（含解析后 CIDR 匹配） */
+    /** 精确 / *.后缀 / CIDR（含解析后 CIDR 匹配） */
     public boolean isWhitelisted(String hostname) {
         Whitelist wl = whitelist;
         if (wl == null) {
@@ -278,7 +277,7 @@ public class SsrfGuard {
         return false;
     }
 
-    /** 对照 parseSSRFWhitelistRaw：CIDR / *.通配 / 精确；非法条目丢弃并记日志 */
+    /** CIDR / *.通配 / 精确；非法条目丢弃并记日志 */
     static Whitelist parseWhitelistRaw(String raw) {
         if (raw == null || raw.isEmpty()) {
             return Whitelist.empty();

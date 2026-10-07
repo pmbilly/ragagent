@@ -136,7 +136,7 @@ class MemoryContractTest {
         assertThat(write(skipped)).contains("\"skipped\":\"too_soon\"");
     }
 
-    /** {@code aliases} 无 omitempty：nil 输出 {@code null}，空列表输出 {@code []}。 */
+    /** {@code aliases} 恒输出：null 输出 {@code null}，空列表输出 {@code []}。 */
     @Test
     void topicViewAliasesKeepTheNilEmptyDistinction() throws Exception {
         MemoryTopicView nilAliases = new MemoryTopicView();

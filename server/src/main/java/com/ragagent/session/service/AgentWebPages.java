@@ -26,7 +26,6 @@ import com.ragagent.storage.service.ResourceCatalogService;
  */
 public class AgentWebPages implements WebFetchTool.WebPageSource {
 
-    /** 对照 webPageRelation / maxSavedWebPageBytes。 */
     public static final String WEB_PAGE_RELATION = "web_page";
     public static final long MAX_SAVED_WEB_PAGE_BYTES = 8L << 20;
 
@@ -35,7 +34,7 @@ public class AgentWebPages implements WebFetchTool.WebPageSource {
      * 资源绑定面。二者任一为 null = 未装配存储写入面（dev 缺省）。
      */
     public interface Store {
-        /** 返回 resource:// 引用（对照 SaveBytes）。 */
+        /** 返回 resource:// 引用。 */
         String saveBytes(byte[] data, long tenantId, String name) throws Exception;
 
         byte[] readFile(String reference) throws Exception;
@@ -70,7 +69,7 @@ public class AgentWebPages implements WebFetchTool.WebPageSource {
         this.messageId = messageId;
     }
 
-    /** assistant 消息在位检查（对照 messages(ctx) + Count==1）。 */
+    /** assistant 消息在位检查。 */
     private boolean assistantMessageExists() {
         Long count = jdbc.queryForObject(
                 "SELECT COUNT(*) FROM messages JOIN sessions ON sessions.id = messages.session_id "
@@ -82,7 +81,7 @@ public class AgentWebPages implements WebFetchTool.WebPageSource {
         return count != null && count == 1;
     }
 
-    /** 对照 Save：尺寸守卫 → 消息在位 → 落存储 → resource 绑定 → web:// 地址。 */
+    /** 保存：尺寸守卫 → 消息在位 → 落存储 → resource 绑定 → web:// 地址。 */
     @Override
     public String save(String content) throws Exception {
         byte[] data = content.getBytes(StandardCharsets.UTF_8);
@@ -114,7 +113,7 @@ public class AgentWebPages implements WebFetchTool.WebPageSource {
         return "web://" + handle;
     }
 
-    /** 对照 Read：web:// → resource:// 解析 + 租户与绑定双重授权 + 8MB 读限。 */
+    /** 读取：web:// → resource:// 解析 + 租户与绑定双重授权 + 8MB 读限。 */
     @Override
     public byte[] read(String address) throws Exception {
         if (address == null || !address.startsWith("web://")) {
@@ -143,7 +142,7 @@ public class AgentWebPages implements WebFetchTool.WebPageSource {
         return data;
     }
 
-    /** 绑定在位检查（对照 messages ⨝ resource_bindings 的 Count 段）。 */
+    /** 绑定在位检查。 */
     private boolean bindingExists(String resourceId) {
         Long count = jdbc.queryForObject(
                 "SELECT COUNT(*) FROM messages "
@@ -161,7 +160,7 @@ public class AgentWebPages implements WebFetchTool.WebPageSource {
         return count != null && count > 0;
     }
 
-    /** 对照 types.ParseResourcePath：resource://<handle> → handle，不合式 → 不 ok。 */
+    /** resource://<handle> → handle，不合式 → 不 ok。 */
     static String parseResourceHandle(String reference) {
         if (reference == null || !reference.startsWith("resource://")) {
             return null;

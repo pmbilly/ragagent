@@ -32,7 +32,7 @@ final class NotionValues {
     }
 
     // ──────────────────────────────────────────────────────────────────────
-    // strings.TrimSpace
+    // 去首尾空白
     // ──────────────────────────────────────────────────────────────────────
 
     /**
@@ -41,7 +41,7 @@ final class NotionValues {
      * <p>实现为显式集合（先枚举 ASCII/Latin-1 的 8 个，再列 Latin-1 之外的成员），
      * 不去映射 {@code Character.isWhitespace}（那个不等价）。</p>
      */
-    static boolean isGoSpace(char c) {
+    static boolean isUnicodeWhitespace(char c) {
         switch (c) {
             case '\t':   // 0x09
             case '\n':   // 0x0A
@@ -72,10 +72,10 @@ final class NotionValues {
         }
         int start = 0;
         int end = s.length();
-        while (start < end && isGoSpace(s.charAt(start))) {
+        while (start < end && isUnicodeWhitespace(s.charAt(start))) {
             start++;
         }
-        while (end > start && isGoSpace(s.charAt(end - 1))) {
+        while (end > start && isUnicodeWhitespace(s.charAt(end - 1))) {
             end--;
         }
         return s.substring(start, end);
@@ -189,7 +189,7 @@ final class NotionValues {
     }
 
     // ──────────────────────────────────────────────────────────────────────
-    // time.Time.MarshalJSON
+    // 时间戳的 JSON 字面量（RFC3339Nano）
     // ──────────────────────────────────────────────────────────────────────
 
     /**

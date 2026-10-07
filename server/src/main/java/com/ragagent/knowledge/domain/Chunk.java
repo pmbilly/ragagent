@@ -14,10 +14,10 @@ import com.ragagent.common.web.PgJsonTypeHandler;
  * 仓储行为契约：
  * - 软删除 → 显式 isNull("deleted_at")
  *   等零值由写路径显式赋值
- * - start_at/end_at 以 **rune（Unicode code point）** 计，不是 byte（分块器保证）
+ * - start_at/end_at 以 **码点（Unicode code point）** 计，不是 byte（分块器保证）
  * - relation_chunks/indirect_relation_chunks/metadata 为 json 列
  * 声明序；{@code source_content} 与 {@code context_header} 是 {@code json:"-"}；
- * 其余字段全部无 omitempty → 恒输出（含 deleted_at 的 null、is_enabled 的 false）。
+ * 其余字段全部不带「为空省略」标记 → 恒输出（含 deleted_at 的 null、is_enabled 的 false）。
  * 索引同步处，实体上无此方法即无此坑。</p>
  */
 @TableName(value = "chunks", autoResultMap = true)
@@ -41,7 +41,7 @@ public class Chunk {
     private boolean isEnabled = true;
     private int flags = 1;
     private int status;
-    /** rune 偏移 */
+    /** 码点偏移 */
     private int startAt;
     private int endAt;
     private String preChunkId;

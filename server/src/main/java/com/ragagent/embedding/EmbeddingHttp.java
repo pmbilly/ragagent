@@ -107,12 +107,12 @@ public final class EmbeddingHttp {
         }
         HttpResponse<byte[]> resp = LlmTransport.send(builder.build(),
                 LlmTransport.DEFAULT_MAX_REDIRECTS, HttpResponse.BodyHandlers.ofByteArray());
-        return new Result(resp.statusCode(), goStatusLine(resp.statusCode()),
+        return new Result(resp.statusCode(), httpStatusLine(resp.statusCode()),
                 new String(resp.body(), StandardCharsets.UTF_8));
     }
 
-    /** Go {@code resp.Status} 形如 "200 OK"；JDK 只有 code，补常见短语。 */
-    static String goStatusLine(int code) {
+    /** 状态行形如 "200 OK"：JDK 响应只有状态码，这里补常见短语。 */
+    static String httpStatusLine(int code) {
         return code + " " + switch (code) {
             case 200 -> "OK";
             case 201 -> "Created";

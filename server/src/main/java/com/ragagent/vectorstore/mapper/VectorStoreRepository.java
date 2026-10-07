@@ -36,7 +36,7 @@ public interface VectorStoreRepository {
     })
     VectorStore getByID(@Param("tenantId") long tenantId, @Param("id") String id);
 
-    /** Go List：created_at DESC（newest first） */
+    /** 列表按 created_at DESC（newest first） */
     @Select("SELECT " + COLS + " FROM vector_stores "
             + "WHERE tenant_id = #{tenantId} AND deleted_at IS NULL ORDER BY created_at DESC")
     @Results(value = {
@@ -58,7 +58,7 @@ public interface VectorStoreRepository {
             + "WHERE id = #{s.id} AND tenant_id = #{s.tenantId}")
     int updateName(@Param("s") VectorStore store, @Param("now") OffsetDateTime now);
 
-    /** Go UpdateConnectionConfig：Select("connection_config") + autoUpdateTime 刷 updated_at */
+    /** 只更新 connection_config（updated_at 由 NOW() 一并刷新） */
     @Update("UPDATE vector_stores SET connection_config = #{s.connectionConfig,typeHandler=" + CC_TH + "}, "
             + "updated_at = NOW() "
             + "WHERE id = #{s.id} AND tenant_id = #{s.tenantId}")

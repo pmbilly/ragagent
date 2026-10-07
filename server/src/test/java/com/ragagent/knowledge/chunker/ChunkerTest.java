@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * chunker 单元测试，不依赖 Spring 上下文。
  *
- * <p>核心断言：chunk 数量、每块 content、start/end（rune 偏移，非 char/byte）。</p>
+ * <p>核心断言：chunk 数量、每块 content、start/end（码点偏移，非 char/byte）。</p>
  */
 class ChunkerTest {
 

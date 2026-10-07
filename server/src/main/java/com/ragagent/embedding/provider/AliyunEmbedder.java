@@ -36,7 +36,7 @@ public final class AliyunEmbedder extends BaseEmbedder {
             baseUrl = "https://dashscope.aliyuncs.com";
         }
         // 去尾斜杠；若含 /compatible-mode/v1 则剥掉（多模态 API 不走该路径）
-        baseUrl = goTrimRight(baseUrl, '/');
+        baseUrl = trimTrailing(baseUrl, '/');
         if (baseUrl.contains("/compatible-mode/v1")) {
             baseUrl = baseUrl.replaceFirst("(?s)/compatible-mode/v1", "");
         }
@@ -110,8 +110,8 @@ public final class AliyunEmbedder extends BaseEmbedder {
         return embeddings;
     }
 
-    /** Go strings.TrimRight(s, "/")：只剥尾部斜杠。 */
-    static String goTrimRight(String s, char c) {
+    /** 只剥尾部连续出现的 {@code c}（不动头部与其他位置）。 */
+    static String trimTrailing(String s, char c) {
         int end = s.length();
         while (end > 0 && s.charAt(end - 1) == c) {
             end--;

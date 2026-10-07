@@ -358,13 +358,13 @@ public class YuqueClient {
             if (sb.length() > 0) {
                 sb.append('&');
             }
-            sb.append(goQueryEscape(entry.getKey())).append('=').append(goQueryEscape(v));
+            sb.append(queryEscape(entry.getKey())).append('=').append(queryEscape(v));
         }
         return sb.length() == 0 ? "" : "?" + sb;
     }
 
     /** 查询串转义（保留 {@code -_.~}，空格转 {@code +}）。 */
-    private static String goQueryEscape(String s) {
+    private static String queryEscape(String s) {
         StringBuilder sb = new StringBuilder(s.length());
         for (byte raw : s.getBytes(StandardCharsets.UTF_8)) {
             char c = (char) (raw & 0xFF);

@@ -11,57 +11,31 @@ package com.ragagent.llm.provider;
 public enum ProviderName {
 
     // ---- 声明序即注册表与展示顺序（OpenAI 起，Azure OpenAI 止） ----
-    /** 对照 ProviderOpenAI */
     OPENAI("openai"),
-    /** 对照 ProviderAnthropic */
     ANTHROPIC("anthropic"),
-    /** 对照 ProviderAliyun */
     ALIYUN("aliyun"),
-    /** 对照 ProviderZhipu */
     ZHIPU("zhipu"),
-    /** 对照 ProviderOpenRouter */
     OPENROUTER("openrouter"),
-    /** 对照 ProviderLiteLLM */
     LITELLM("litellm"),
-    /** 对照 ProviderRequesty */
     REQUESTY("requesty"),
-    /** 对照 ProviderSiliconFlow */
     SILICONFLOW("siliconflow"),
-    /** 对照 ProviderJina */
     JINA("jina"),
-    /** 对照 ProviderGeneric */
     GENERIC("generic"),
-    /** 对照 ProviderDeepSeek */
     DEEPSEEK("deepseek"),
-    /** 对照 ProviderGemini */
     GEMINI("gemini"),
-    /** 对照 ProviderVolcengine */
     VOLCENGINE("volcengine"),
-    /** 对照 ProviderHunyuan */
     HUNYUAN("hunyuan"),
-    /** 对照 ProviderMiniMax */
     MINIMAX("minimax"),
-    /** 对照 ProviderMimo */
     MIMO("mimo"),
-    /** 对照 ProviderGPUStack */
     GPUSTACK("gpustack"),
-    /** 对照 ProviderMoonshot */
     MOONSHOT("moonshot"),
-    /** 对照 ProviderModelScope */
     MODELSCOPE("modelscope"),
-    /** 对照 ProviderQianfan */
     QIANFAN("qianfan"),
-    /** 对照 ProviderQiniu */
     QINIU("qiniu"),
-    /** 对照 ProviderLongCat */
     LONGCAT("longcat"),
-    /** 对照 ProviderLKEAP */
     LKEAP("lkeap"),
-    /** 对照 ProviderNvidia */
     NVIDIA("nvidia"),
-    /** 对照 ProviderNovita */
     NOVITA("novita"),
-    /** 对照 ProviderAzureOpenAI */
     AZURE_OPEN_AI("azure_openai");
 
     private final String value;

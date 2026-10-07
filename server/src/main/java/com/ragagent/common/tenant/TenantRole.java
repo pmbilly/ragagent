@@ -3,8 +3,7 @@ package com.ragagent.common.tenant;
 /**
  * 租户角色。
  *
- * 等级间距 10 以便未来插入新角色；未知角色 level=0（严格低于任何定义角色，
- * 对应 Go Level() 的 "Unknown roles return 0"）。
+ * 等级间距 10 以便未来插入新角色；未知角色 level=0（严格低于任何定义角色）。
  */
 public enum TenantRole {
     OWNER("owner", 40),
@@ -25,7 +24,7 @@ public enum TenantRole {
     public String value() { return value; }
     public int level() { return level; }
 
-    /** Go TenantRole.HasPermission：r.Level() >= required.Level() */
+    /** 权限判定：自身 level >= required 的 level。 */
     public boolean hasPermission(TenantRole required) {
         return this.level >= required.level;
     }

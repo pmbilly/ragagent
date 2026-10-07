@@ -12,7 +12,7 @@ import com.ragagent.knowledge.domain.Chunk;
  * 在 {@code retrieval.support.ChunkSearchUtil}（本类不重复）。
  *
  * <p>为什么按文本而非位置去重叠：按位置的裁剪公式默认
- * {@code len([]rune(Content)) == EndAt-StartAt}，两类数据会破坏它——
+ * Content 的码点数等于 EndAt-StartAt，两类数据会破坏它——
  * 父子分块器给拆开的表格补写零宽度表头；content 保留 HTML 实体导致字符数偏长。
  * 因此按<b>文本</b>匹配重叠，位置信息仅用于估算搜索窗口。</p>
  */
@@ -32,8 +32,7 @@ public final class SearchChunkMerge {
      *
      * <p>positionOverlap &lt;= 0 时直接拼接：此时进入文本匹配会因 headSlack 下限
      * 320 在 next 开头窗口内误命中 acc 后缀的真实内容重复，把 next 开头整段误判
-     * 为补写表头删掉（不可逆内容丢失——Go 回归测试
-     * TestAppendWithOverlap_ContiguousRealContentRepeat 钉住）。</p>
+     * 为补写表头删掉（不可逆内容丢失）。</p>
      */
     public static String appendWithOverlap(String acc, String next, int positionOverlap) {
         if (acc.isEmpty()) {
@@ -154,7 +153,7 @@ public final class SearchChunkMerge {
         return merged;
     }
 
-    /** 在 haystack 中查找 needle 首次出现的 rune 下标，起始位置不超过 maxStart；找不到 -1。 */
+    /** 在 haystack 中查找 needle 首次出现的码点下标，起始位置不超过 maxStart；找不到 -1。 */
     static int indexRunes(int[] haystack, int[] needle, int maxStart) {
         if (needle.length == 0 || needle.length > haystack.length) {
             return -1;

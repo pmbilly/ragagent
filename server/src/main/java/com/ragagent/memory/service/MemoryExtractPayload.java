@@ -45,7 +45,7 @@ public record MemoryExtractPayload(
          */
         @JsonProperty("chat_model_id")
         @JsonInclude(JsonInclude.Include.NON_DEFAULT) String chatModelId,
-        /** {@code language} 同样 omitempty。 */
+        /** {@code language} 同样为空省略。 */
         @JsonProperty("language")
         @JsonInclude(JsonInclude.Include.NON_DEFAULT) String language,
         /**

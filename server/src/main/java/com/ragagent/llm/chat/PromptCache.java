@@ -163,7 +163,7 @@ public final class PromptCache {
     }
 
     /**
-     * nil-safe 的原始取值（老调用方与聚焦测试用）。
+     * null 安全的原始取值（老调用方与聚焦测试用）。
      * 归一化发生在 {@link #tokenUsageFromOpenAI}。
      */
     public static int cachedTokens(JsonNode promptTokensDetails) {

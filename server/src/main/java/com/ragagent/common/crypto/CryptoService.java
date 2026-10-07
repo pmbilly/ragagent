@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
  * - encrypt：plaintext 为空 / 已带前缀 / key 为 null → 原样返回；
  *   输出 enc:v1: + base64.RawURLEncoding(nonce || ciphertext)
  * - decryptStored*：无前缀 = 历史明文原样返回；带前缀解密失败 →
- *   strict 抛异常 / lenient 返回 ("", false)（行级加载不拖垮整个列表，对照 Scan 语义）
+ *   strict 抛异常 / lenient 返回 ("", false)（行级加载不拖垮整个列表）
  */
 @Component
 public class CryptoService {
@@ -47,7 +47,7 @@ public class CryptoService {
         return configuredAesKey;
     }
 
-    /** 对照 GetAESKey：非 32 字节返回 null */
+    /** 非 32 字节返回 null */
     public byte[] getAESKey() {
         String key = configuredAesKey;
         if (key != null && key.getBytes(StandardCharsets.UTF_8).length == 32) {
@@ -56,7 +56,7 @@ public class CryptoService {
         return null;
     }
 
-    /** 对照 EncryptAESGCM（value 语义：不改传入对象，内部拷贝） */
+    /** value 语义：不改传入对象，内部拷贝 */
     public String encryptAESGCM(String plaintext, byte[] key) {
         if (plaintext == null || plaintext.isEmpty() || key == null) {
             return plaintext;
@@ -80,7 +80,7 @@ public class CryptoService {
         }
     }
 
-    /** 对照 DecryptAESGCM：无前缀按明文原样返回 */
+    /** 无前缀按明文原样返回 */
     public String decryptAESGCM(String encrypted, byte[] key) {
         if (encrypted == null || encrypted.isEmpty() || key == null) {
             return encrypted;
@@ -107,7 +107,7 @@ public class CryptoService {
     }
 
     /**
-     * 对照 DecryptStoredSecret：严格模式。
+     * 严格模式。
      * 带前缀但 key 缺失 → IllegalStateException（ErrEncryptedDataMissingKey 语义）；
      * 解密失败（密钥轮换/密文损坏）→ 异常原样上抛，调用方决定 loud fail。
      */
@@ -126,7 +126,7 @@ public class CryptoService {
         return decryptAESGCM(encrypted, key);
     }
 
-    /** 对照 DecryptStoredSecretLenient：行级加载路径，失败返回 ("", false) */
+    /** 行级加载路径，失败返回 ("", false) */
     public LenientResult decryptStoredSecretLenient(String encrypted) {
         try {
             return new LenientResult(decryptStoredSecret(encrypted), true);

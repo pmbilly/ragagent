@@ -33,7 +33,7 @@ public class YuqueCursor {
     @JsonProperty("last_sync_time")
     private OffsetDateTime lastSyncTime = ZeroTimeSerializer.ZERO_DATE_TIME;
 
-    /** {@code { book_id: { doc_id: content_updated_at } }}；omitempty → 空时整键消失。 */
+    /** {@code { book_id: { doc_id: content_updated_at } }}；为空省略 → 空时整键消失。 */
     @JsonProperty("book_doc_times")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, Map<String, String>> bookDocTimes;

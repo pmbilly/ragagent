@@ -73,7 +73,7 @@ public interface McpOAuthTokenMapper extends BaseMapper<McpOAuthToken> {
                            @Param("serviceId") String serviceId);
 
     /**
-     * 对照 TryAcquireTokenRefreshLease：CAS 抢占，返回受影响行数。
+     * CAS 抢占，返回受影响行数。
      * 调用方以 {@code == 1} 判成功（行不存在或未过期都是 0）。
      */
     @Update("UPDATE mcp_oauth_tokens SET refresh_lease_id = #{leaseId}, "
@@ -90,7 +90,7 @@ public interface McpOAuthTokenMapper extends BaseMapper<McpOAuthToken> {
                         @Param("now") java.time.OffsetDateTime now);
 
     /**
-     * 对照 ReleaseTokenRefreshLease：只有仍持有 leaseId 的调用者能释放
+     * 只有仍持有 leaseId 的调用者能释放
      * （release_lease_id 置回空串、until 置 NULL）。
      */
     @Update("UPDATE mcp_oauth_tokens SET refresh_lease_id = '', refresh_lease_until = NULL "

@@ -56,7 +56,7 @@ public class OpenAIProvider implements Provider {
      * <p>仅基于模型名做启发式匹配；对于 Azure OpenAI，因为模型名实际上是 deployment 名，
      * 用户若用了自定义部署名我们无法识别，此时仍会按普通模型处理（保持原行为）。
      *
-     * <p>保真要点：先 TrimSpace 再 ToLower；空串直接 false；gpt-5 用前缀匹配；
+     * <p>保真要点：先去首尾空白再小写化；空串直接 false；gpt-5 用前缀匹配；
      * o1/o3/o4 必须**精确相等或紧跟 "-"**，避免误命中 "openai-gpt-4"、"olympus-1"、"o3xtra"。
      */
     public static boolean isOpenAIReasoningOrGPT5Model(String modelName) {

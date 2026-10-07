@@ -15,8 +15,8 @@ import org.apache.ibatis.type.MappedTypes;
 /**
  * naive 时间列（TIMESTAMP WITHOUT TIME ZONE）的 OffsetDateTime 处理器。
  *
- * <p>写入：取原 offset 的墙钟时间存 naive（Go/pgx 语义——time.Time 写 naive 列
- * 保留本地墙钟）；读取：naive 值按 **UTC** 解释（pgx 扫描语义），序列化后是
+ * <p>写入：取原 offset 的墙钟时间存 naive（写 naive 列保留本地墙钟）；
+ * 读取：naive 值按 **UTC** 解释，序列化后是
  * {@code …Z} 形态。created_at 这类 DB 默认值（PG 服务器 UTC）与
  * 应用侧本地墙钟写入的值因此分别呈现 11:50Z / 19:50Z——golden 用例钉住的形态。</p>
  */

@@ -442,7 +442,7 @@ public class SessionKnowledgeQaService {
         PipelineLog.info("Pipeline", "all_stages_complete", f);
     }
 
-    /** 虚拟线程取消探测（对照 ctx.Err() != nil；stop 链路 4.6d 接线）。 */
+    /** 虚拟线程取消探测（检测中断标志；stop 链路 4.6d 接线）。 */
     private static boolean cancelled() {
         return Thread.currentThread().isInterrupted();
     }
@@ -489,7 +489,7 @@ public class SessionKnowledgeQaService {
         chatManage.setUserId(userId);
         // 插件从 ChatManage 取租户（无隐式上下文；与 QA 路径同源
         // retrievalTenantId 的同款赋值）——漏了它 Merge 阶段 faq_enrich/expand 全跳过，
-        // knowledge-search 响应的 content 就少了前后文扩块，与 Go 逐字节对不上。
+        // knowledge-search 响应的 content 就少了前后文扩块，与既定输出契约不符。
         chatManage.setTenantId(tenantId);
         chatManage.setKnowledgeBaseIds(knowledgeBaseIds);
         chatManage.setKnowledgeIds(knowledgeIds);
@@ -930,7 +930,7 @@ public class SessionKnowledgeQaService {
         return out;
     }
 
-    /** 对照 types.HasKnowledgeRetrievalScope（Java 侧以 target 视图判）。 */
+    /** 是否有知识检索范围（以 target 视图判）。 */
     public static boolean hasKnowledgeRetrievalScope(List<SearchTargetView> targets,
             List<String> kbIds, List<String> knowledgeIds) {
         if (!kbIds.isEmpty() || !knowledgeIds.isEmpty()) {
@@ -976,7 +976,7 @@ public class SessionKnowledgeQaService {
     /** resolveKnowledgeBases 的二元返回。 */
     public record KnowledgeResolution(List<String> kbIds, List<String> knowledgeIds) {}
 
-    /** SearchTarget 的 service 面视图（对照 types.SearchTarget；管线面经 toPipeline 转换）。 */
+    /** SearchTarget 的 service 面视图（管线面经 toPipeline 转换）。 */
     public static final class SearchTargetView {
         public String type = "";
         public String knowledgeBaseId = "";

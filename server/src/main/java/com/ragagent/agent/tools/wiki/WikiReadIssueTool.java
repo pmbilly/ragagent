@@ -66,7 +66,7 @@ public class WikiReadIssueTool extends BaseTool {
             }
             ToolResult r = new ToolResult();
             r.setSuccess(true);
-            r.setOutput(issue.toGoJsonIndent());
+            r.setOutput(issue.indentedJson());
             return r;
         }
 
@@ -102,7 +102,7 @@ public class WikiReadIssueTool extends BaseTool {
             if (i > 0) {
                 out.append(",\n");
             }
-            String item = issues.get(i) == null ? "null" : issues.get(i).toGoJsonIndent();
+            String item = issues.get(i) == null ? "null" : issues.get(i).indentedJson();
             out.append(indent(item));
         }
         out.append("\n]");

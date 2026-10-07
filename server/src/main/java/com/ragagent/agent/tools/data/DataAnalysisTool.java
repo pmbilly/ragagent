@@ -215,7 +215,7 @@ public class DataAnalysisTool extends BaseTool implements Cleanable {
             } catch (RuntimeException e) {
                 throw new RuntimeException(String.format(
                         "failed to create table from Excel file (sheets=%s): %s",
-                        goSliceString(sheetsOrEmpty(sheetNames)), e.getMessage()), e);
+                        sliceText(sheetsOrEmpty(sheetNames)), e.getMessage()), e);
             }
         }
         return loadFromTable(tableName);
@@ -336,7 +336,7 @@ public class DataAnalysisTool extends BaseTool implements Cleanable {
         SqlGuard.SqlValidationResult validation =
                 SqlGuard.validate(sql, SqlGuard.GuardConfig.dataAnalysis(schema.tableName()));
         if (!validation.isValid()) {
-            return failure("SQL validation failed: " + goFormatValidationErrors(validation.getErrors()));
+            return failure("SQL validation failed: " + validationErrorsText(validation.getErrors()));
         }
 
         List<Map<String, String>> results;
@@ -383,7 +383,7 @@ public class DataAnalysisTool extends BaseTool implements Cleanable {
         };
     }
 
-    /** 行扫描：byte[]→UTF-8 文本，其余按 {@link #goFormatV} 形态；null → "&lt;nil&gt;"。 */
+    /** 行扫描：byte[]→UTF-8 文本，其余按 {@link #duckValueText} 形态；null → "&lt;nil&gt;"。 */
     List<Map<String, String>> executeSingleQuery(String sqlQuery) {
         QueryResult qr;
         try {
@@ -397,7 +397,7 @@ public class DataAnalysisTool extends BaseTool implements Cleanable {
             Map<String, String> rowMap = new LinkedHashMap<>();
             for (int i = 0; i < columns.size(); i++) {
                 Object val = i < rowValues.size() ? rowValues.get(i) : null;
-                rowMap.put(columns.get(i), goFormatV(val));
+                rowMap.put(columns.get(i), duckValueText(val));
             }
             results.add(rowMap);
         }
@@ -405,7 +405,7 @@ public class DataAnalysisTool extends BaseTool implements Cleanable {
     }
 
     /** 值的输出形态：null→"&lt;nil&gt;"，byte[]→UTF-8 文本，浮点去尾零，其余 toString。 */
-    static String goFormatV(Object val) {
+    static String duckValueText(Object val) {
         if (val == null) {
             return "<nil>";
         }
@@ -552,12 +552,12 @@ public class DataAnalysisTool extends BaseTool implements Cleanable {
     }
 
     /** 列表的输出形态：[a b]。 */
-    private static String goSliceString(List<String> items) {
+    private static String sliceText(List<String> items) {
         return "[" + String.join(" ", items) + "]";
     }
 
     /** 校验错误列表的输出形态：[{type message details} …]（空 details 留尾空格）。 */
-    static String goFormatValidationErrors(List<SqlGuard.SqlValidationError> errors) {
+    static String validationErrorsText(List<SqlGuard.SqlValidationError> errors) {
         StringBuilder sb = new StringBuilder("[");
         for (int i = 0; i < errors.size(); i++) {
             if (i > 0) {

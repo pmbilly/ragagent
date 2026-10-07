@@ -177,7 +177,7 @@ public final class HeuristicSplitter {
     }
 
     /**
-     * （rune 偏移）保护 span 内的边界；span 起点/终点的边界保留。
+     * （码点偏移）保护 span 内的边界；span 起点/终点的边界保留。
      */
     static List<Boundary> dropBoundsInsideSpans(List<Boundary> bounds, List<LegacySplitter.RuneSpan> spans) {
         if (spans.isEmpty()) {
@@ -215,7 +215,7 @@ public final class HeuristicSplitter {
     }
 
     /**
-     * Content 是原始切片，Start/End rune 偏移必须与 content 的 rune 长度一致。
+     * content 是原文截取片段，start/end 码点偏移必须与 content 的码点长度一致。
      */
     private static List<ParsedChunk> appendChunk(List<ParsedChunk> out, int[] runes,
             int start, int end, int seq) {

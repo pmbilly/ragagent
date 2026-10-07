@@ -163,8 +163,8 @@ public class WikiIngestService implements WikiIngestPort {
         return llm.promptWarmupCount();
     }
 
-    static String goQuote(String s) {
-        return WikiIngestExtractDedup.goQuote(s);
+    static String quoted(String s) {
+        return WikiIngestExtractDedup.quoted(s);
     }
 
     public Runnable awaitWikiPromptWarmup(String key) throws InterruptedException {

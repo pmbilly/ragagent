@@ -217,9 +217,9 @@ public final class PluginRerank implements Plugin {
             }
             SearchResult sr = candidatesToRerank.get(rr.getIndex());
             double base = sr.getScore();
-            sr.getMetadata().put("base_score", RetrievalObs.goFmt4(base));
+            sr.getMetadata().put("base_score", RetrievalObs.formatScore4(base));
             double modelScore = rr.getRelevanceScore();
-            sr.getMetadata().put("model_score", RetrievalObs.goFmt4(modelScore));
+            sr.getMetadata().put("model_score", RetrievalObs.formatScore4(modelScore));
             sr.setScore(compositeScore(sr, modelScore, base));
 
             // FAQ 加成
@@ -228,11 +228,11 @@ public final class PluginRerank implements Plugin {
                 double originalScore = sr.getScore();
                 sr.setScore(Math.min(sr.getScore() * chatManage.getFaqScoreBoost(), 1.0));
                 sr.getMetadata().put("faq_boosted", "true");
-                sr.getMetadata().put("faq_original_score", RetrievalObs.goFmt4(originalScore));
+                sr.getMetadata().put("faq_original_score", RetrievalObs.formatScore4(originalScore));
                 Map<String, Object> f = new LinkedHashMap<>();
                 f.put("chunk_id", sr.getId());
-                f.put("original_score", RetrievalObs.goFmt4(originalScore));
-                f.put("boosted_score", RetrievalObs.goFmt4(sr.getScore()));
+                f.put("original_score", RetrievalObs.formatScore4(originalScore));
+                f.put("boosted_score", RetrievalObs.formatScore4(sr.getScore()));
                 f.put("boost_factor", chatManage.getFaqScoreBoost());
                 PipelineLog.info("Rerank", "faq_boost", f);
             }
@@ -250,7 +250,7 @@ public final class PluginRerank implements Plugin {
             f.put("rank", i + 1);
             f.put("chunk_id", reranked.get(i).getId());
             f.put("base_score", reranked.get(i).getMetadata().get("base_score"));
-            f.put("final_score", RetrievalObs.goFmt4(reranked.get(i).getScore()));
+            f.put("final_score", RetrievalObs.formatScore4(reranked.get(i).getScore()));
             PipelineLog.info("Rerank", "composite_top", f);
         }
 
@@ -513,7 +513,7 @@ public final class PluginRerank implements Plugin {
         }
         Map<String, Object> d = new LinkedHashMap<>();
         d.put("selected", selected.size());
-        d.put("avg_redundancy", RetrievalObs.goFmt4(avgRed));
+        d.put("avg_redundancy", RetrievalObs.formatScore4(avgRed));
         PipelineLog.info("Rerank", "mmr_done", d);
         return selected;
     }
@@ -667,7 +667,7 @@ public final class PluginRerank implements Plugin {
             Map<String, Object> f = new LinkedHashMap<>();
             f.put("index", i);
             f.put("chunk_id", sr.getId());
-            f.put("score", RetrievalObs.goFmt4(sr.getScore()));
+            f.put("score", RetrievalObs.formatScore4(sr.getScore()));
             f.put("match_type", sr.getMatchType());
             PipelineLog.info("Rerank", "input_score", f);
         }

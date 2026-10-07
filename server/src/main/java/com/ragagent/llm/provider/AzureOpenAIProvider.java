@@ -30,7 +30,7 @@ public class AzureOpenAIProvider implements Provider {
                         ModelType.RERANK, RESOURCE_ENDPOINT,
                         ModelType.VLLM, RESOURCE_ENDPOINT,
                         ModelType.ASR, RESOURCE_ENDPOINT),
-                // 注意：DefaultURLs 含 Rerank，但 ModelTypes 不含 Rerank（Go 原样如此）
+                // 注意：DefaultURLs 含 Rerank，但 ModelTypes 不含 Rerank
                 List.of(ModelType.KNOWLEDGE_QA, ModelType.EMBEDDING, ModelType.VLLM, ModelType.ASR),
                 true,
                 List.of(new ExtraFieldConfig(

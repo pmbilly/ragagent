@@ -50,7 +50,7 @@ public final class RecordingSupport {
     }
 
     /** JSON mapper（map 键序由类型上的 serializer 负责；2026-10-03 起标准转义）。 */
-    public static final ObjectMapper GO_MAPPER = new ObjectMapper();
+    public static final ObjectMapper JSON_MAPPER = new ObjectMapper();
 
     private RecordingSupport() {
     }
@@ -73,7 +73,7 @@ public final class RecordingSupport {
     }
 
     /** 用 ToolJson 把 data map 编成录制时的 JSON 字节形态（对照录制时的 mustJSON）。 */
-    public static String goJsonOfData(java.util.Map<String, Object> data) {
+    public static String jsonOfData(java.util.Map<String, Object> data) {
         return ToolJson.write(PLAIN.valueToTree(data));
     }
 

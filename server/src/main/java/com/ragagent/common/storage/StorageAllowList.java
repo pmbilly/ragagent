@@ -37,7 +37,7 @@ public class StorageAllowList {
         this.configuredRaw = properties.allowList();
     }
 
-    /** 对照 AllowedMap：分隔符 , ; | \n \t 空格；非法/未知条目丢弃 */
+    /** 分隔符 , ; | \n \t 空格；非法/未知条目丢弃 */
     public Set<String> allowedMap() {
         String raw = configuredRaw;
         Set<String> allowed = new HashSet<>();
@@ -60,7 +60,7 @@ public class StorageAllowList {
         return allowed;
     }
 
-    /** 对照 IsAllowed：空 provider 视为允许 */
+    /** 空 provider 视为允许 */
     public boolean isAllowed(String provider) {
         String p = provider == null ? "" : provider.trim().toLowerCase(Locale.ROOT);
         if (p.isEmpty()) {
@@ -69,7 +69,7 @@ public class StorageAllowList {
         return allowedMap().contains(p);
     }
 
-    /** 对照 AllowedList：canonical 顺序输出允许项 */
+    /** canonical 顺序输出允许项 */
     public List<String> allowedList() {
         Set<String> allowed = allowedMap();
         List<String> out = new ArrayList<>();
@@ -81,7 +81,7 @@ public class StorageAllowList {
         return out;
     }
 
-    /** 对照 isSupportedStorageBackendProvider（service 层第二道白名单） */
+    /** service 层第二道白名单 */
     public boolean isSupported(String provider) {
         return provider != null && SUPPORTED.contains(provider);
     }

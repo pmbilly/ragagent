@@ -352,8 +352,8 @@ public class MemoryController {
      * <p>固定一页曾经被当作够用（理由是"那正好是一个工作区能配的最大容量"），
      * 但那不成立：{@code max_items} 只封顶活跃记忆，被取代与被归档的行无上限堆积，
      * 所以一个长期的仓库持有很多倍于容量的行，导出会悄悄只给出它的前缀。
-     * 因此这里按 {@link #EXPORT_PAGE_SIZE} 走到 {@code len(page) < pageSize}
-     * 或 {@code len(items) >= total} 或触到 {@link #EXPORT_MAX_ITEMS} 安全上限为止。</p>
+     * 因此这里按 {@link #EXPORT_PAGE_SIZE} 走到 {@code pageItems.size() < EXPORT_PAGE_SIZE}
+     * 或 {@code itemCount(items) >= total} 或触到 {@link #EXPORT_MAX_ITEMS} 安全上限为止。</p>
      *
      * <h2>响应形态</h2>
      * <ol>
@@ -386,7 +386,7 @@ public class MemoryController {
             List<MemoryItem> pageItems = page.items();
             if (pageItems != null && !pageItems.isEmpty()) {
                 if (items == null) {
-                    // 只在真的有行时才建列表：nil → null 的形态必须保住（见方法注释）。
+                    // 只在真的有行时才建列表：null 与空列表的形态必须保住（见方法注释）。
                     items = new ArrayList<>(pageItems.size());
                 }
                 items.addAll(pageItems);

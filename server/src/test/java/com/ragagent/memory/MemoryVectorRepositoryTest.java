@@ -333,8 +333,7 @@ class MemoryVectorRepositoryTest {
 
     /**
      * H2 上没有安装 pgvector（{@code embedding} 列不存在），
-     * 所以 {@code SyncVectorColumn} 是**空操作**——与 Go 在 SQLite / 无 pgvector 的
-     * PostgreSQL 上的行为一致：功能不丢，只是每个向量都要过一遍网络。
+     * 所以 {@code SyncVectorColumn} 是**空操作**：功能不丢，只是每个向量都要过一遍网络。
      */
     @Test
     void syncVectorColumnIsANoOpWithoutThePgvectorColumn() {

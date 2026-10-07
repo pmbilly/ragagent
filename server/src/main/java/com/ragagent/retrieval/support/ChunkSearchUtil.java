@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * chunk 内容与图片 URL 的纯逻辑辅助：Markdown/HTML 图片链接扫描、内容拼接与包含判断、
- * 生成问题的 source id 编码、空白裁剪与码点切片。
+ * 生成问题的 source id 编码、空白裁剪与按码点截取。
  *
  * <p>无状态、零仓储依赖；知识库编辑链与聊天管线（search/merge）共用同一份实现，
  * 已知差异逐条标注在成员上。</p>
@@ -48,7 +48,7 @@ public final class ChunkSearchUtil {
     /**
      * content 里引用的
      * 图片 URL 集合，覆盖 Markdown 图片链接与带引号 src 的 HTML {@code <img>} 标签
-     * （HTML 的 src 值先 {@code strings.TrimSpace}，Markdown 的按原文精确匹配）。
+     * （HTML 的 src 值先去首尾空白，Markdown 的按原文精确匹配）。
      * LinkedHashSet 取"扫描序"是确定性的超集）。
      */
     public static Set<String> imageURLsInContent(String content) {
@@ -113,7 +113,7 @@ public final class ChunkSearchUtil {
      * 把两段当前 chunk 正文
      * 拼起来——完全包含则折叠、真实后缀/前缀重叠则去重、否则以 separator 相连。
      * 保守回退刻意宁可少量重复也不静默丢内容。重叠窗口上限
-     * {@code defaultSearchSpan}（400 rune），防止 200KB 级编辑把匹配变成平方级
+     * 400 码点，防止 200KB 级编辑把匹配变成平方级
      * （parser 重叠窗口通常远低于该上限）。
      */
     public static String joinChunkContent(String acc, String next, String separator) {
@@ -193,16 +193,16 @@ public final class ChunkSearchUtil {
         }
         int start = 0;
         int end = s.length();
-        while (start < end && isGoSpace(s.charAt(start))) {
+        while (start < end && isUnicodeWhitespace(s.charAt(start))) {
             start++;
         }
-        while (end > start && isGoSpace(s.charAt(end - 1))) {
+        while (end > start && isUnicodeWhitespace(s.charAt(end - 1))) {
             end--;
         }
         return s.substring(start, end);
     }
 
-    private static boolean isGoSpace(char c) {
+    private static boolean isUnicodeWhitespace(char c) {
         switch (c) {
             case '\t': case '\n': case '\u000B': case '\f': case '\r':
             case ' ': case '\u0085': case '\u00A0': case '\u1680':

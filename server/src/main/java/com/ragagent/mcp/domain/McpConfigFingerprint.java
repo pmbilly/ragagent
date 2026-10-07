@@ -16,7 +16,7 @@ import java.util.TreeMap;
  *
  * <p>⚠️ 规范化 JSON 的字节形态是稳定契约：顶层字段序固定为
  * {@code Transport, URL, Headers, Auth, Stdio, Env}，顶层键名原样保留、
- * 即使是 null 也输出 {@code null}（无 omitempty）；嵌套对象则按各自的 omitempty
+ * 即使是 null 也输出 {@code null}（恒输出）；嵌套对象则按各自的「为空省略」
  * 规则省略。摘要字节形态一旦变化，已有 mcp_metadata 行的 Stale 判定就会误报。</p>
  *
  * <p>字符串编码开启 HTML 转义（{@code < > &} 三字符转成 unicode 转义）
@@ -64,7 +64,7 @@ public final class McpConfigFingerprint {
         return sb.toString();
     }
 
-    /** 嵌套鉴权配置的规范化形态（snake_case 键名 + omitempty，含 custom_headers 的键排序） */
+    /** 嵌套鉴权配置的规范化形态（snake_case 键名 + 为空省略，含 custom_headers 的键排序） */
     private static String authConfig(McpAuthConfig c) {
         if (c == null) {
             return "null";
@@ -76,13 +76,13 @@ public final class McpConfigFingerprint {
         first = appendString(sb, first, "api_key", c.getApiKey());
         first = appendString(sb, first, "api_key_header", c.getApiKeyHeader());
         first = appendString(sb, first, "token", c.getToken());
-        // omitempty 对 map 的作用：nil 与空 map 都省略
+        // 为空省略对 map 的作用：null 与空 map 都省略
         if (c.getCustomHeaders() != null && !c.getCustomHeaders().isEmpty()) {
             appendName(sb, first, "custom_headers");
             first = false;
             sb.append(stringMap(c.getCustomHeaders()));
         }
-        // omitempty 对 slice 的作用：nil 与空 slice 都省略
+        // 为空省略对列表的作用：null 与空列表都省略
         if (c.getScopes() != null && !c.getScopes().isEmpty()) {
             appendName(sb, first, "scopes");
             first = false;
@@ -100,13 +100,13 @@ public final class McpConfigFingerprint {
         return sb.toString();
     }
 
-    /** stdio 配置的规范化形态：command / args **都无 omitempty**，null args → null */
+    /** stdio 配置的规范化形态：command / args **都恒输出**，null args → null */
     private static String stdioConfig(McpStdioConfig c) {
         if (c == null) {
             return "null";
         }
         StringBuilder sb = new StringBuilder();
-        // 未赋值时按空串处理（无 omitempty，恒输出）
+        // 未赋值时按空串处理（恒输出）
         sb.append("{\"command\":").append(quote(c.getCommand() == null ? "" : c.getCommand()));
         sb.append(",\"args\":");
         if (c.getArgs() == null) {

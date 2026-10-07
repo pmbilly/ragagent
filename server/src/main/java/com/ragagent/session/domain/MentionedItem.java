@@ -12,9 +12,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  * <p>⚠️ 它**落两处 jsonb**（{@code messages.mentioned_items} 与
  * {@code sessions.agent_config.mentioned_items}），换键名必须配存量迁移。</p>
  *
- * <p>与 {@code MapString} / {@code MentionedItemsFromRaw} 的关系：Go 把那两个函数用于
- * 从 steer 事件里 JSON 安全的 map 形态重建本结构（只认 string 类型的值，其余当空串）。
- * Java 侧对应 {@link #fromRawMap}。</p>
+ * <p>{@link #fromRawMap} 负责从 steer 事件里 JSON 安全的 map 形态重建本结构
+ * （只认 string 类型的值，其余当空串）。</p>
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MentionedItem {

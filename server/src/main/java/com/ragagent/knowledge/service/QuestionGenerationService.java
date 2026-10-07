@@ -66,7 +66,7 @@ public class QuestionGenerationService {
 
     /**
      * @param terminal 本次是否是该任务的**最后一次**尝试（队列侧按 {@code attempt > MAX_RETRY} 传入）。
-     *                 （{@code willDrain = retErr == nil || final}）——失败且还会重试时递减会让父知识
+     *                 失败且还会重试时递减会让父知识
      *                 在问题落库前就完成。
      */
     public void handleJson(String payloadJson, boolean terminal) {

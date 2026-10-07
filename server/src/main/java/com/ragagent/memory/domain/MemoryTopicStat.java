@@ -48,7 +48,7 @@ import com.ragagent.common.web.ZeroTimeSerializer;
  *    "hits":0,"last_seen_at":"0001-01-01T00:00:00Z","promoted_at":null,
  *    "created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}
  * </pre>
- * <p>{@code aliases} 无 omitempty → nil 输出 {@code null}（**落库**却是 {@code []}，
+ * <p>{@code aliases} 恒输出：null 原样输出 {@code null}（**落库**却是 {@code []}，
  * 见类型处理器）。</p>
  */
 @TableName(value = "memory_topic_stats", autoResultMap = true)

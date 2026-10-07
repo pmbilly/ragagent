@@ -6,7 +6,7 @@ import java.util.Map;
  * MCP 服务端能力声明。
  *
  * <p>三者的共同契约是：<b>不为 null 即代表
- * 服务端声明了该能力</b>，内部的 {@code listChanged} 是 omitempty 的布尔。</p>
+ * 服务端声明了该能力</b>，内部的 {@code listChanged} 是缺席省略的布尔。</p>
  *
  * <p>本类目前只用作 initialize 结果的载体（只透传、不做分支判断），
  * 保留字段是为了服务端能力探测的后续扩展。</p>

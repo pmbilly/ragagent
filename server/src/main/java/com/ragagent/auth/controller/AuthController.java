@@ -268,7 +268,7 @@ public class AuthController {
     public ResponseEntity<InvitationLookupResponse> lookupInvitation(
             @Valid @RejectEmptyBody @NonNullBody @RequestBody(required = false)
                     InvitationLookupRequest req) {
-        String token = UserService.goTrimSpace(req.token());
+        String token = UserService.trimUnicodeWhitespace(req.token());
         if (token.isEmpty()) {
             throw new BizException(AppError.validation("token is required"));
         }
@@ -305,9 +305,9 @@ public class AuthController {
             throw AuthBindingSupport.invalidParams("Invalid registration parameters",
                     String.join("\n", bindingErrors));
         }
-        String token = UserService.goTrimSpace(req.token());
-        String email = UserService.goTrimSpace(req.email()).toLowerCase(Locale.ROOT);
-        String username = UserService.goTrimSpace(req.username());
+        String token = UserService.trimUnicodeWhitespace(req.token());
+        String email = UserService.trimUnicodeWhitespace(req.email()).toLowerCase(Locale.ROOT);
+        String username = UserService.trimUnicodeWhitespace(req.username());
         if (token.isEmpty() || email.isEmpty() || username.isEmpty() || isBlank(req.password())) {
             throw new BizException(
                     AppError.validation("token, email, username and password are required"));

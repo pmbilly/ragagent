@@ -19,7 +19,7 @@ public final class LegacySplitter {
     record CharSpan(int start, int end) {
     }
 
-    /** rune 偏移的 span。 */
+    /** 码点偏移的 span。 */
     record RuneSpan(int start, int end) {
     }
 
@@ -385,7 +385,7 @@ public final class LegacySplitter {
     }
 
     /**
-     * 边界检测会额外回看 4 个 rune（最长分隔符 "\r\n\r\n"），使被窗口切断的分隔符仍可见。
+     * 边界检测会额外回看 4 个码点（最长分隔符 "\r\n\r\n"），使被窗口切断的分隔符仍可见。
      * 优先级：段落 > 行 > 句末；同级取最早边界。无有效语义边界则不留 overlap。
      */
     static OverlapResult computeOverlap(List<SplitUnit> current, int chunkOverlap, int chunkSize, int nextLen) {
@@ -410,7 +410,7 @@ public final class LegacySplitter {
 
         String windowText = unitsText(window);
         // originalWindowStart 之前是回看点；end-exclusive 语义下 boundaryEnd >= originalWindowStart
-        // 等价于分隔符最后一个 rune 位于 -1 或更后
+        // 等价于分隔符最后一个码点位于 -1 或更后
         int originalWindowStart = CodePoints.len(windowText) - maxOverlap;
         if (originalWindowStart < 0) {
             originalWindowStart = 0;
@@ -432,7 +432,7 @@ public final class LegacySplitter {
     }
 
     /**
-     * 有原文出处的 rune；必要时可在首个保留单元内部切片。零宽合成单元（如重复表头）是硬屏障。
+     * 有原文出处的码点；必要时可在首个保留单元内部切片。零宽合成单元（如重复表头）是硬屏障。
      */
     static List<SplitUnit> semanticOverlapWindow(List<SplitUnit> current, int maxLen) {
         if (maxLen <= 0 || current.isEmpty()) {
@@ -482,7 +482,7 @@ public final class LegacySplitter {
     }
 
     /**
-     * 仅对 end-exclusive rune 偏移 ≥ minEnd 的候选应用优先级与最早位置规则；
+     * 仅对 end-exclusive 码点偏移 ≥ minEnd 的候选应用优先级与最早位置规则；
      * 先过滤再比较，避免更早但不合格的回看分隔符遮蔽更晚的合格边界。
      */
     static BoundaryResult findSemanticOverlapBoundaryEndingAtOrAfter(String text, int minEnd) {
@@ -536,7 +536,7 @@ public final class LegacySplitter {
         }
         Consider consider = new Consider();
 
-        // 标记段落分隔 rune，其组成换行不再作为低优先级行分隔候选
+        // 标记段落分隔码点，其组成换行不再作为低优先级行分隔候选
         boolean[] paragraphRune = new boolean[runes.length];
         for (int i = 0; i < runes.length; i++) {
             if (i + 3 < runes.length && runes[i] == '\r' && runes[i + 1] == '\n'

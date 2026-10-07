@@ -17,9 +17,8 @@ import org.slf4j.LoggerFactory;
  * 有界、按用户限额的 QA 请求队列 + 固定 worker 池（虚拟线程 worker，锁/条件协调）。
  *
  * <p><b>Redis 面</b>：{@link RedisPort} 缺席时每用户限额与并发只在进程内生效
- * （单实例形态）；接入后启用跨实例全局 per-user 计数与全局并发闸门
- * （对齐 Go internal/im/qaqueue.go 的 redis 分支）。
- * 有 Redis 时本地计数不再维护/检查——全局计数已覆盖（Go 同一口径）。</p>
+ * （单实例形态）；接入后启用跨实例全局 per-user 计数与全局并发闸门。
+ * 有 Redis 时本地计数不再维护/检查——全局计数已覆盖。</p>
  */
 public final class QaQueue {
 
@@ -33,11 +32,11 @@ public final class QaQueue {
     public static final int DEFAULT_WORKERS = 5;
     /** 请求在队列里最多等这么久。 */
     public static final long QUEUE_TIMEOUT_SECONDS = 60;
-    /** 全局 per-user 计数的 TTL（Go {@code redisQueueUserTTL}）：实例崩溃后计数自愈。 */
+    /** 全局 per-user 计数的 TTL：实例崩溃后计数自愈。 */
     static final int REDIS_QUEUE_USER_TTL_SECONDS = 300;
-    /** 全局闸门计数器的 TTL（Go {@code globalGateTTL}）：全体实例崩溃后的安全网。 */
+    /** 全局闸门计数器的 TTL：全体实例崩溃后的安全网。 */
     static final int GLOBAL_GATE_TTL_SECONDS = 300;
-    /** 全局闸门满时的重试间隔（Go {@code globalGateRetryInterval}）。 */
+    /** 全局闸门满时的重试间隔。 */
     static final long GLOBAL_GATE_RETRY_MILLIS = 500;
 
     /** 可选的 Redis 面（跨实例部署接入；单实例传 null）。 */
@@ -175,7 +174,7 @@ public final class QaQueue {
      * 入队。返回 0 基位置；队满或超每用户限额抛 {@link RejectedException}。
      */
     public int enqueue(QaRequest req) {
-        // 有 Redis：先查全局 per-user 计数（在本地锁之前，对齐 Go），
+        // 有 Redis：先查全局 per-user 计数（在本地锁之前），
         // 超限即拒并回滚自增；Redis 故障（null）跳过检查、回落到本地限额。
         if (redis != null) {
             Long count = redis.incrWithTtl(ImRedisKeys.QUEUE_USER_PREFIX + req.userKey,
@@ -198,7 +197,7 @@ public final class QaQueue {
                 totalRejected.incrementAndGet();
                 throw new RejectedException("queue full (" + queue.size() + "/" + maxSize + ")");
             }
-            // 本地计数只在无 Redis 时维护/检查（有 Redis 时全局计数已覆盖，对齐 Go）
+            // 本地计数只在无 Redis 时维护/检查（有 Redis 时全局计数已覆盖）
             if (redis == null) {
                 int mine = perUser.getOrDefault(req.userKey, 0);
                 if (mine >= maxPerUser) {
@@ -251,7 +250,7 @@ public final class QaQueue {
                 totalProcessed.get(), totalRejected.get(), totalTimeout.get());
     }
 
-    /** 本地计数只在无 Redis 时维护（有 Redis 时全局计数接管，对齐 Go）。 */
+    /** 本地计数只在无 Redis 时维护（有 Redis 时全局计数接管）。 */
     private void decrementPerUser(String userKey) {
         if (redis != null) {
             return;
@@ -262,7 +261,7 @@ public final class QaQueue {
         }
     }
 
-    /** 释放全局 per-user 计数的一个槽位（Redis 缺席时为空操作，对齐 Go 的无条件调用）。 */
+    /** 释放全局 per-user 计数的一个槽位（Redis 缺席时为空操作）。 */
     private void redisDecrUser(String userKey) {
         if (redis != null) {
             redis.decr(ImRedisKeys.QUEUE_USER_PREFIX + userKey);

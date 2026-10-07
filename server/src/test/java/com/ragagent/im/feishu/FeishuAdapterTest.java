@@ -444,7 +444,7 @@ class FeishuAdapterTest {
         assertEquals(ImTypes.PLATFORM_FEISHU, reg.adapter().platform());
         assertNull(reg.stop());
 
-        // websocket（Go 默认）：长连接已落地 → 给 stop 句柄（api_base_url 指向不可达端口，
+        // websocket 长连接已落地 → 给 stop 句柄（api_base_url 指向不可达端口，
         // 长连接线程失败即退避，stop 后立刻退出）
         ImChannelEntity ws = new ImChannelEntity();
         ws.setId("ch-2");

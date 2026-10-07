@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
  *
  * <h2>三处刻意的口径（§9 记过的差异）</h2>
  * <ol>
- *   <li><b>rune 计数</b>：{@code MemoryContentMaxRunes} 是**码点**数，
+ *   <li><b>码点计数</b>：{@code MemoryContentMaxRunes} 是**码点**数，
  *       不是 {@code String.length()}（UTF-16 码元）。中文里后者会数对，
  *       但 emoji/增补平面就会算成两倍，所以统一走 {@link MemoryKeys#runeLength}。</li>
  *   <li><b>空白定义</b>：按 Unicode 的 White_Space 属性，等价于 Java 的
@@ -58,7 +58,7 @@ public final class MemoryText {
             }
             // 其余控制字符：丢弃
         }
-        String joined = joinGoFields(mapped.toString());
+        String joined = joinFields(mapped.toString());
         if (MemoryKeys.runeLength(joined) > MemoryKinds.CONTENT_MAX_RUNES) {
             joined = MemoryKeys.runeSlice(joined, MemoryKinds.CONTENT_MAX_RUNES).strip();
         }
@@ -80,12 +80,12 @@ public final class MemoryText {
      * <p>空白 = Unicode White_Space，等价于
      * {@code isSpaceChar} 加上六个 ASCII 制表/换行类字符（含 U+0085 NEL）。</p>
      */
-    private static String joinGoFields(String s) {
+    private static String joinFields(String s) {
         StringBuilder out = new StringBuilder(s.length());
         boolean pendingSpace = false;
         boolean wroteAny = false;
         for (int cp : s.codePoints().toArray()) {
-            if (isGoSpace(cp)) {
+            if (isUnicodeWhitespace(cp)) {
                 pendingSpace = true;
                 continue;
             }
@@ -100,7 +100,7 @@ public final class MemoryText {
     }
 
     /** Unicode White_Space 语义的空白判定。 */
-    static boolean isGoSpace(int cp) {
+    static boolean isUnicodeWhitespace(int cp) {
         if (Character.isSpaceChar(cp)) {
             return true;
         }

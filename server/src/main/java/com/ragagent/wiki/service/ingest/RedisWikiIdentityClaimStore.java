@@ -14,9 +14,9 @@ import org.springframework.data.redis.core.script.DefaultRedisScript;
  * 缺失/损坏/前缀不符的值被提议值替换。</p>
  *
  * <p><b>失败行为</b>：Redis 报错时<b>抛 RuntimeException</b>——调用方
- * {@code WikiIngestDedupService.claimWikiIdentitySlug} 已按 Go 的
- * 同款回落链 catch + warn + 退回批次局部 map（对齐 Go：Redis error →
- * "using batch-local claim"）。本类刻意不做静默 fail-open，否则"Redis 抖一下
+ * {@code WikiIngestDedupService.claimWikiIdentitySlug} 有既定回落链：
+ * catch + warn + 退回批次局部 map（Redis 异常时不阻断摄取）。
+ * 本类刻意不做静默 fail-open，否则"Redis 抖一下
  * 就悄悄放弃跨批次收敛"会无声地放大「同标题建两页」窗口。</p>
  *
  * <p><b>装配</b>：本类是普通类（<b>不是</b> {@code @Component}），由
@@ -59,13 +59,13 @@ public class RedisWikiIdentityClaimStore implements WikiIdentityClaimStore {
     public String claim(String kbId, String pageType, String identity,
                         String proposedSlug, boolean authoritative, String requiredPrefix) {
         String key = WikiIngestConstants.identityClaimKey(kbId, pageType, identity);
-        // Go 的防御：TTL 至少 1 秒（wikiIdentityClaimTTL / time.Second 的最小值钳位）
+        // 防御性钳位：TTL 至少 1 秒
         long ttlSeconds = Math.max(1, WikiIngestConstants.IDENTITY_CLAIM_TTL.toSeconds());
         String prefix = requiredPrefix == null ? "" : requiredPrefix;
         String result = template.execute(CLAIM_SCRIPT, Collections.singletonList(key),
                 proposedSlug, Long.toString(ttlSeconds), authoritative ? "1" : "0", prefix);
         // 脚本只会返回 proposed 或前缀匹配的 existing；null（键在脚本执行外被删的竞态）
-        // 按提议值处理，与 Go 的 identityClaimString 空串回落一致。
+        // 回落为提议值。
         return result == null ? proposedSlug : result;
     }
 

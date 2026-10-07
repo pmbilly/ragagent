@@ -208,7 +208,7 @@ public class GetDocumentInfoTool extends BaseTool {
         }
 
         if (successDocs.isEmpty()) {
-            return failure("Failed to retrieve any document info. Errors: " + goSliceString(errors));
+            return failure("Failed to retrieve any document info. Errors: " + sliceText(errors));
         }
 
         StringBuilder output = new StringBuilder();
@@ -258,7 +258,7 @@ public class GetDocumentInfoTool extends BaseTool {
                 output.append("  Metadata:\n");
                 for (Map.Entry<String, Object> e : k.metadata().entrySet()) {
                     output.append(String.format("    - %s: %s\n", e.getKey(),
-                            DocChunkSupport.goFmtV(e.getValue())));
+                            DocChunkSupport.valueText(e.getValue())));
                 }
             }
 
@@ -413,7 +413,7 @@ public class GetDocumentInfoTool extends BaseTool {
     }
 
     /** 列表的输出形态：" [a b c]"。 */
-    private static String goSliceString(List<String> items) {
+    private static String sliceText(List<String> items) {
         return "[" + String.join(" ", items) + "]";
     }
 

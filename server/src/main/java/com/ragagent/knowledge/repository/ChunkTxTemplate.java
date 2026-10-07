@@ -14,7 +14,6 @@ public class ChunkTxTemplate {
 
     /**
      * 在事务里执行 {@code work}。
-     *             {@code func(tx) error} 返回非 nil——如乐观锁冲突）
      */
     @Transactional
     public <T> T inTransaction(Supplier<T> work) {

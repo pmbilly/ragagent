@@ -28,8 +28,8 @@ final class ElasticsearchV8SearchOps {
     }
 
     /**
-     * 对照 {@code getBaseConds}：返回 {@code [{"bool":{"must":[...],"must_not":[...]}}]}；
-     * 空 must/must_not 不写出（照 typedapi 的 omitempty）。
+     * 返回 {@code [{"bool":{"must":[...],"must_not":[...]}}]}；
+     * 空 must/must_not 不写出。
      */
     List<ObjectNode> getBaseConds(RetrieveParams params) {
         ArrayNode must = ElasticsearchV8RetrieveRepository.MAPPER.createArrayNode();
@@ -68,7 +68,7 @@ final class ElasticsearchV8SearchOps {
         return List.of(wrapper);
     }
 
-    /** 对照 {@code Retrieve}：按检索类型分派。 */
+    /** 按检索类型分派。 */
     List<RetrieveResult> retrieve(RetrieveParams params) throws Exception {
         if (EngineTypes.RETRIEVER_VECTOR.equals(params.retrieverType)) {
             return vectorRetrieve(params);
@@ -79,7 +79,7 @@ final class ElasticsearchV8SearchOps {
         throw new IllegalArgumentException("invalid retriever type: " + params.retrieverType);
     }
 
-    /** 对照 {@code VectorRetrieve}：script_score + cosineSimilarity + min_score。 */
+    /** script_score + cosineSimilarity + min_score。 */
     List<RetrieveResult> vectorRetrieve(RetrieveParams params) throws Exception {
         List<ObjectNode> filter = getBaseConds(params);
 
@@ -113,7 +113,7 @@ final class ElasticsearchV8SearchOps {
         return List.of(parseSearchResponse(resp, "vector"));
     }
 
-    /** 对照 {@code KeywordsRetrieve}：bool{filter, must:[match content]}。 */
+    /** bool{filter, must:[match content]}。 */
     List<RetrieveResult> keywordsRetrieve(RetrieveParams params) throws Exception {
         List<ObjectNode> filter = getBaseConds(params);
 

@@ -366,17 +366,17 @@ public class WikiIngestCitePipeline {
 
     /**
      * {@code name} 与 {@code aliases}
-     * 用引号包裹（goQuote 语义），{@code slug}/{@code type}/{@code description} 是裸值。
+     * 用引号包裹（quoted 语义），{@code slug}/{@code type}/{@code description} 是裸值。
      * 格式保持稳定（prompt 前缀缓存命中率取决于此）。
      */
     private static void writeCandidate(StringBuilder sb, ExtractedItem item, String kind) {
         String aliases = "";
         if (!item.getAliases().isEmpty()) {
-            aliases = " aliases=" + WikiIngestExtractDedup.goQuote(String.join(", ", item.getAliases()));
+            aliases = " aliases=" + WikiIngestExtractDedup.quoted(String.join(", ", item.getAliases()));
         }
         sb.append("- slug: ").append(item.getSlug())
                 .append(", type: ").append(kind)
-                .append(", name: ").append(WikiIngestExtractDedup.goQuote(item.getName()))
+                .append(", name: ").append(WikiIngestExtractDedup.quoted(item.getName()))
                 .append(aliases)
                 .append(", description: ").append(item.getDescription())
                 .append('\n');
@@ -396,7 +396,7 @@ public class WikiIngestCitePipeline {
             if (handle == null) {
                 handle = "";
             }
-            sb.append("<c id=").append(WikiIngestExtractDedup.goQuote(handle))
+            sb.append("<c id=").append(WikiIngestExtractDedup.quoted(handle))
                     .append(" index=\"").append(c.getChunkIndex()).append("\">\n")
                     .append(c.getContent() == null ? "" : c.getContent())
                     .append("\n</c>\n");
@@ -637,7 +637,7 @@ public class WikiIngestCitePipeline {
     // 引用合并
     // ═══════════════════════════════════════════════════════════════
 
-    /** 合并结果：回填后的切片与未获引用计数 */
+    /** 合并结果：回填后的列表与未获引用计数 */
     public record MergedCitations(List<ExtractedItem> entities,
                                   List<ExtractedItem> concepts,
                                   int uncited) { }
@@ -645,7 +645,7 @@ public class WikiIngestCitePipeline {
     /**
      * 用引用映射回填每个
      * {@code extractedItem} 的 {@code SourceChunks}，并把引用遍发现的<b>真正新</b> slug
-     * 追加进对应切片。不在引用映射里的条目保持原样——Reduce 会回落到它们的
+     * 追加进对应列表。不在引用映射里的条目保持原样——Reduce 会回落到它们的
      * Description/Details。
      *
      * <p>返回值里的 {@code uncited} 是"最终一个引用都没有"的候选数（可观测性用）。</p>

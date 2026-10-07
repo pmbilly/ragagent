@@ -25,7 +25,7 @@ public class SessionLastRequestState {
 
     private String agentId;
 
-    /** 无 omitempty：恒输出（false 也要出现）。 */
+    /** 恒输出（false 也要出现）。 */
     private boolean agentEnabled;
 
     private String modelId;

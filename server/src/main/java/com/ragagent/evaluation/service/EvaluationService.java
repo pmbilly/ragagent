@@ -227,7 +227,7 @@ public class EvaluationService {
                 TenantContext.clear();
             }
         });
-        // 返回创建时刻的快照（见类注释「Go 竞态的确定性化」）
+        // 返回创建时刻的快照（见类注释「任务状态竞争的确定性化」）
         return snapshotOf(detail);
     }
 

@@ -106,7 +106,7 @@ public class TemporaryDocumentController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(document);
     }
 
-    /** 超过 multipart 上限：仿 Go MaxBytesReader 的 "http: request body too large"。 */
+    /** 超过 multipart 上限：错误文案固定为 "http: request body too large"。 */
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<Map<String, Object>> bodyTooLarge() {
         throw new BizException(AppError.badRequest(

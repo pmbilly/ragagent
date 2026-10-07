@@ -29,7 +29,7 @@ class AgentSuggestedQuestionsTest {
                 + "\"contentRevision\":0}],\"generatedQuestionsRevision\":0}";
         assertThat(AgentSuggestedQuestions.firstGeneratedQuestion(camel)).isEqualTo("camel 问题");
 
-        // Go 期存量行可能是 snake：仍要能读出来
+        // 历史存量行可能是 snake：仍要能读出来
         String snake = "{\"generated_questions\":[{\"question\":\"snake 问题\"}]}";
         assertThat(AgentSuggestedQuestions.firstGeneratedQuestion(snake)).isEqualTo("snake 问题");
 

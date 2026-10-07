@@ -470,7 +470,7 @@ public class GitLabConnector implements StreamingConnector {
 
     /** 取扩展名（小写）后查支持表。 */
     static boolean isSupportedFile(String file) {
-        return SUPPORTED_FILE_EXTENSIONS.contains(goPathExt(file).toLowerCase(java.util.Locale.ROOT));
+        return SUPPORTED_FILE_EXTENSIONS.contains(fileExtension(file).toLowerCase(java.util.Locale.ROOT));
     }
 
     /**
@@ -480,7 +480,7 @@ public class GitLabConnector implements StreamingConnector {
      * <p>注意它<b>不是</b>"最后一个点之后"，两点要区分：{@code ".hidden"} 会回
      * {@code ".hidden"}（不是 {@code ""}），而 {@code "a."} 会回 {@code "."}。</p>
      */
-    static String goPathExt(String path) {
+    static String fileExtension(String path) {
         for (int i = path.length() - 1; i >= 0 && path.charAt(i) != '/'; i--) {
             if (path.charAt(i) == '.') {
                 return path.substring(i);

@@ -106,7 +106,7 @@ public final class BatchEmbedder implements EmbedderPooler {
         }
     }
 
-    /** 按 chunkSize 切片，末片可短。 */
+    /** 按 chunkSize 分块，末块可短。 */
     static <T> List<List<T>> chunkSlice(List<T> list, int chunkSize) {
         List<List<T>> out = new ArrayList<>();
         for (int i = 0; i < list.size(); i += chunkSize) {

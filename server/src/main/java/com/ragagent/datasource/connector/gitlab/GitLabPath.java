@@ -136,7 +136,7 @@ final class GitLabPath {
 
         /**
          * 追加语义：<b>物化后是"改写"而不是"追加"</b>——
-         * 写入位置是逻辑游标 {@code w}，不是缓冲末尾（缓冲长度恒为 {@code len(s)}）。
+         * 写入位置是逻辑游标 {@code w}，不是缓冲末尾（缓冲长度恒为 {@code source.length()}）。
          * 用 {@code StringBuilder.append} 会让游标之后的陈旧内容留在前面，
          * {@code "a//b//../c"} 这种输入就会拼出 {@code "a/b"}（正确结果是 {@code "a/c"}）。
          */

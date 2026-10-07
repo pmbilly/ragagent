@@ -366,7 +366,7 @@ public class SqliteRetrieveRepository
         return List.of(EngineTypes.RETRIEVER_KEYWORDS, EngineTypes.RETRIEVER_VECTOR);
     }
 
-    /** 每条 {@code len(content)+200}（字节长度）。 */
+    /** 每条 {@code byteLength(content) + 200}（字节长度）。 */
     @Override
     public long estimateStorageSize(List<IndexInfo> indexInfoList, Map<String, Object> params) {
         if (indexInfoList == null) {

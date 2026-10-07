@@ -80,7 +80,7 @@ final class McpUsageInstructionsOps {
     // ── 使用说明生成 ─────────────────────────────────────────────────────
 
     /**
-     * 对照 GenerateMCPUsageInstructions — Admin+。
+     * 权限 Admin+。
      *
      * <p>只用调用者<b>已保存的目录快照</b>：不连接 MCP、不执行工具、不持久化生成的文本。
      * 整个生成过程有 60 秒上限。</p>

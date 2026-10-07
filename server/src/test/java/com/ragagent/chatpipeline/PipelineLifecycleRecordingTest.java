@@ -605,7 +605,7 @@ class PipelineLifecycleRecordingTest {
                 EntityExtraction.EntityGraph graph = f.parseGraph(cases.get(i));
                 rec.put("graph", Rec46cSupport.graphShape(new GraphData(graph.node, graph.relation)));
             } catch (RuntimeException e) {
-                // 备案：Go json.Unmarshal 的错误文案（"invalid character ..."）与 Jackson 不同，
+                // 备案：录制期错误文案（"invalid character ..."）与 Jackson 不同，
                 // 错误分支只锁 "failed to parse JSON content: " 前缀
                 String msg = e.getMessage();
                 if (msg != null && msg.startsWith("failed to parse JSON content: ")) {
@@ -616,7 +616,7 @@ class PipelineLifecycleRecordingTest {
             }
             String actual = json(rec);
             if (actual.contains("GO-JACKSON-DIFF")) {
-                // 备案：Go json.Unmarshal 错误文案与 Jackson 不同——掩去差异段后比较
+                // 备案：录制期错误文案与 Jackson 不同——掩去差异段后比较
                 String expected = GoRecording46C.constant("entity_parse", String.format("case%02d", i));
                 String expectedMasked = expected.replaceAll(
                         "failed to parse JSON content: [^\\x22]*", "failed to parse JSON content: ");
@@ -641,7 +641,7 @@ class PipelineLifecycleRecordingTest {
         ex.setRelation(new ArrayList<>(List.of(new GraphRelation("张三", "北京大学", "works_at"))));
         tpl.setExamples(new ArrayList<>(List.of(ex)));
         EntityExtraction.QAPromptGenerator qa = new EntityExtraction.QAPromptGenerator(f, tpl);
-        // B43：formatExtraction/toJsonArray 改标准 Jackson（Java 原生）——Go 缩进形态
+        // formatExtraction/toJsonArray 现用标准 Jackson 序列化——金片的缩进形态
         // （"entity": / 每元素独立行）不再是断言目标；期望锚定「本仓标准形态」基线（人工核验）。
         String sysExpected = "Extract entities and relations for [\"person\",\"org\"] from the text.\n"
                 + "# Examples\n"

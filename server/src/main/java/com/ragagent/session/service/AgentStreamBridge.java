@@ -48,7 +48,7 @@ import com.ragagent.stream.StreamManager;
  * <p>每个请求一条专属 EventBus（无 SessionID 过滤），事件按到达序 AppendEvent 进
  * StreamManager（不做累积——前端按 event id 累积）。</p>
  *
- * <h2>17 种事件订阅 + final_answer 分片重组（最高危）</h2>
+ * <h2>16 种事件订阅 + final_answer 分片重组（最高危）</h2>
  * <ul>
  *   <li><b>superseded preamble 剔除</b>：一次非终局轮可能在它自己的 answer event id
  *       下流出一段前导（"让我搜一下…"），随后该轮决定调工具 → 这些段被标 superseded，
@@ -132,7 +132,7 @@ public final class AgentStreamBridge {
         return assistantMessage;
     }
 
-    /** 对照 Subscribe：17 种事件订阅序逐字对齐（订阅序即回调序，Go 按此序 On）。 */
+    /** 按固定顺序订阅 16 种事件（订阅序即回调序）。 */
     public void subscribe() {
         eventBus.on(EventType.EVENT_AGENT_THOUGHT, this::handleThought);
         eventBus.on(EventType.EVENT_AGENT_TOOL_CALL, this::handleToolCall);
@@ -268,12 +268,12 @@ public final class AgentStreamBridge {
 
     // ── 审批 / OAuth ─────────────────────────────────────────────────────────
 
-    private static final com.fasterxml.jackson.databind.ObjectMapper GO_JSON =
+    private static final com.fasterxml.jackson.databind.ObjectMapper CAST_MAPPER =
             new com.fasterxml.jackson.databind.ObjectMapper();
 
     private static Map<String, Object> toolApprovalDataToMap(Object v) {
         try {
-            Map<String, Object> m = GO_JSON.convertValue(v,
+            Map<String, Object> m = CAST_MAPPER.convertValue(v,
                     new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {});
             return m == null ? new LinkedHashMap<>() : m;
         } catch (RuntimeException e) {

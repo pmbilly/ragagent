@@ -33,7 +33,7 @@ public class TemporaryDocument {
     public static final String STATUS_READY = "ready";
     public static final String STATUS_FAILED = "failed";
 
-    @TableId(type = IdType.INPUT)  // Go BeforeCreate：uuid.NewString() 带连字符
+    @TableId(type = IdType.INPUT)  // 落库前赋值：带连字符的 uuid
     private String id;
 
     private Long tenantId;
@@ -82,18 +82,18 @@ public class TemporaryDocument {
 
     private Integer chunkCount;
 
-    /** omitempty：空串省略。 */
+    /** 为空省略：空串不输出。 */
     private String errorMessage;
 
 
     @TableField(value = "expires_at", typeHandler = com.ragagent.common.web.NaiveOffsetDateTimeTypeHandler.class)
     private OffsetDateTime expiresAt;
 
-    /** omitempty：nil 省略。 */
+    /** 为空省略：null 不输出。 */
     @TableField(value = "started_at", typeHandler = com.ragagent.common.web.NaiveOffsetDateTimeTypeHandler.class)
     private OffsetDateTime startedAt;
 
-    /** omitempty：nil 省略。 */
+    /** 为空省略：null 不输出。 */
     @TableField(value = "ready_at", typeHandler = com.ragagent.common.web.NaiveOffsetDateTimeTypeHandler.class)
     private OffsetDateTime readyAt;
 

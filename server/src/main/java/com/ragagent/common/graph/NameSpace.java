@@ -11,7 +11,7 @@ import java.util.List;
  */
 public record NameSpace(String knowledgeBase, String knowledge) {
 
-    /** 对照 NameSpace.Labels()：非空部分按 KB → Knowledge 序（两端都空 → 空列表）。 */
+    /** 非空部分按 KB → Knowledge 序（两端都空 → 空列表）。 */
     public List<String> labels() {
         List<String> res = new ArrayList<>();
         if (knowledgeBase != null && !knowledgeBase.isEmpty()) {

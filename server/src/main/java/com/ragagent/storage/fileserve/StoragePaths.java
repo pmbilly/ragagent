@@ -314,7 +314,7 @@ public final class StoragePaths {
                     Object value = new com.fasterxml.jackson.databind.ObjectMapper().readValue(trimmed, Object.class);
                     return containsStorageReferenceValue(value, reference);
                 } catch (Exception ignored) {
-                    // Go: json.Unmarshal 失败 → 落回正则扫描
+                    // JSON 解码失败 → 落回正则扫描
                 }
             }
         }

@@ -111,7 +111,7 @@ public class MemoryItem {
      */
     private String replacesId = "";
 
-    /** 无 omitempty：未取代时输出 {@code ""}（不是 {@code null}）。 */
+    /** 恒输出：未取代时输出 {@code ""}（不是 {@code null}）。 */
     private String supersededBy = "";
 
     private OffsetDateTime lastUsedAt;

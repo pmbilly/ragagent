@@ -21,7 +21,7 @@ public final class WikiPageRendering {
 
     /**
      * 预算内渲染多个页面：返回 (拼接输出, 被截断 slug, 被省略 slug)。
-     * rune 计账按 code point 数。
+     * 计账按码点数。
      */
     public static RenderedWikiPages renderWikiPagesWithinBudget(List<PendingWikiPage> pages, int budget) {
         if (pages.isEmpty()) {
@@ -92,10 +92,10 @@ public final class WikiPageRendering {
     /** 链接摘要条数上限。 */
     public static final int WIKI_MAX_LINK_SUMMARIES = 20;
 
-    /** 单条链接摘要的 rune 上限。 */
+    /** 单条链接摘要的码点上限。 */
     public static final int WIKI_LINK_SUMMARY_MAX_RUNES = 150;
 
-    /** 单页正文的最小保留 rune 数。 */
+    /** 单页正文的最小保留码点数。 */
     public static final int WIKI_MIN_PAGE_BODY = 400;
 
     /** 预算预留（省略提示等）。 */

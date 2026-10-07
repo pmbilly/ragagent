@@ -108,9 +108,9 @@ class ToolRegistryRecordingTest {
         return reg;
     }
 
-    private static String goJson(Object v) {
+    private static String jsonText(Object v) {
         try {
-            return RecordingSupport.GO_MAPPER.writeValueAsString(v);
+            return RecordingSupport.JSON_MAPPER.writeValueAsString(v);
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
@@ -126,10 +126,10 @@ class ToolRegistryRecordingTest {
         assertThat(reg.listTools()).containsExactlyElementsOf(wantNames);
 
         JsonNode defs = RecordingSupport.rec(field("R_REGISTRY_DEFS"));
-        assertThat(goJson(reg.getFunctionDefinitions())).isEqualTo(defs.get("out").asText());
+        assertThat(jsonText(reg.getFunctionDefinitions())).isEqualTo(defs.get("out").asText());
 
         JsonNode modelDefs = RecordingSupport.rec(field("R_REGISTRY_MODEL_DEFS"));
-        assertThat(goJson(reg.getModelFunctionDefinitions())).isEqualTo(modelDefs.get("out").asText());
+        assertThat(jsonText(reg.getModelFunctionDefinitions())).isEqualTo(modelDefs.get("out").asText());
 
         JsonNode getMissing = RecordingSupport.rec(field("R_REGISTRY_GET_MISSING"));
         assertThatThrownBy(() -> reg.getTool("missing_tool"))
@@ -194,7 +194,7 @@ class ToolRegistryRecordingTest {
         JsonNode r = RecordingSupport.rec(field(constant));
         ToolResult got = reg.executeTool(name, args);
         // 两侧经 ContractJson.deep 归一（转义形态不再构成断言目标）。
-        assertThat(ContractJson.deep(RecordingSupport.normalizeNumberText(goJson(got))))
+        assertThat(ContractJson.deep(RecordingSupport.normalizeNumberText(jsonText(got))))
                 .as("executeTool %s (%s)", name, r.get("id").asText())
                 .isEqualTo(ContractJson.deep(RecordingSupport.normalizeNumberText(r.get("result").asText())));
     }

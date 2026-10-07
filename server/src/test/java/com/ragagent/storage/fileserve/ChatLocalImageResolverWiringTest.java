@@ -64,7 +64,7 @@ class ChatLocalImageResolverWiringTest {
 
     @AfterEach
     void tearDown() {
-        // 集成式断言装上的静态钩子必须复位（对照 ImageResolverTest 的同款纪律）
+        // 集成式断言装上的静态钩子必须复位（同 ImageResolverTest 的纪律）
         ImageResolver.setLocalImageResolver(null);
     }
 
@@ -171,7 +171,7 @@ class ChatLocalImageResolverWiringTest {
         assertThat(wiring.resolve(url)).isEqualTo(PNG_BYTES);
     }
 
-    /** resource 行带 StorageBackendID 时覆盖从路径解析出的 backendID（Go L515-517）。 */
+    /** resource 行带 StorageBackendID 时覆盖从路径解析出的 backendID。 */
     @Test
     void resourceBackendIdOverridesParsedBackendId() throws IOException {
         String url = "storage://bk1/local://7/x/img.png";

@@ -8,7 +8,7 @@ import java.util.List;
  *
  * <h2>它是响应体</h2>
  * <p>{@code GET /api/v1/datasource/types} 的响应是一个 {@code []ConnectorMetadata} 裸数组，
- * 没有 {@code data}/{@code success} 信封。所以下面的键序与 omitempty 是
+ * 没有 {@code data}/{@code success} 信封。所以下面的键序与为空省略是
  * <b>线上契约</b>（与 {@code Resource} 的同款处置）。</p>
  *
  * <h2>JSON 形状（键序 = 声明序）</h2>

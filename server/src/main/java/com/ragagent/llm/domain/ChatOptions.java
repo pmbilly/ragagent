@@ -36,7 +36,7 @@ public class ChatOptions {
     private double frequencyPenalty;
     @JsonProperty("presence_penalty")
     private double presencePenalty;
-    /** nil = 由模型默认决定 */
+    /** null = 由模型默认决定 */
     @JsonProperty("thinking")
     private Boolean thinking;
     @JsonProperty("tools")
@@ -46,7 +46,7 @@ public class ChatOptions {
     @JsonProperty("tool_choice")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String toolChoice;
-    /** nil = 由模型决定 */
+    /** null = 由模型决定 */
     @JsonProperty("parallel_tool_calls")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Boolean parallelToolCalls;

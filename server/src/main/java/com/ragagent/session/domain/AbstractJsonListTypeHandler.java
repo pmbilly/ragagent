@@ -21,13 +21,11 @@ import org.apache.ibatis.type.JdbcType;
  * 这与 wiki / apikey / mcp 各自手写 List 处理器的原因是同一个，只是这里用基类收口，
  * 子类只提供 {@link #typeReference()}。</p>
  *
- * <p><b>写路径对齐 Go</b>：Go 这几个类型的 {@code Value()} 对 nil 切片返回
- * {@code []}（唯独 {@code References} 例外，它直接 {@code json.Marshal} 一个 nil 切片
- * 会得到 JSON {@code null}）。所以这里空列表也写成 {@code []}——与 wiki 那边
- * 「空列表写 SQL NULL」的处置**相反**，别套用。</p>
+ * <p><b>写路径</b>：本族所有子类型的空列表一律写成 {@code []}（不是 SQL NULL）——
+ * 与 wiki 那边「空列表写 SQL NULL」的处置**相反**，别套用。</p>
  *
  * <p><b>读路径宽容</b>：SQL NULL 与 JSON {@code null} 都回 {@code null}
- * （响应侧：无 omitempty 的字段输出 {@code null}，有 omitempty 的直接省略）；
+ * （响应侧：无「为空省略」约定的字段输出 {@code null}，有约定的直接省略）；
  * 空数组回空列表。</p>
  */
 public abstract class AbstractJsonListTypeHandler<T> extends BaseTypeHandler<List<T>> {

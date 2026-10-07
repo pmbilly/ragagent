@@ -37,7 +37,7 @@ import com.ragagent.vectorstore.domain.IndexConfig;
  *
  * <h2>语义要点（别"顺手统一"）</h2>
  * <ul>
- *   <li>集合命名有<b>开关</b>：{@code indexCfg == nil || collectionName 为空} → 带维度后缀
+ *   <li>集合命名有<b>开关</b>：indexCfg 未配置或 collectionName 为空 → 带维度后缀
  *       {@code <base>_<dim>}（默认）；否则<b>单集合</b>（所有维度混存）；前缀匹配也随之变
  *       （带后缀 → {@code base_ 前缀}，单集合 → 精确名）；</li>
  *   <li>建集合一次带齐索引：vector(HNSW, COSINE, M=16, efConstruction=200) +

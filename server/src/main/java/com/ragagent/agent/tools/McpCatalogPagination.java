@@ -64,7 +64,7 @@ final class McpCatalogPagination {
         fingerprintSeed.put("Tools", toolSeeds);
         String fingerprint;
         try {
-            fingerprint = McpCatalog.hex(McpCatalog.sha256(McpCatalog.GO_ENCODER.writeValueAsBytes(fingerprintSeed)));
+            fingerprint = McpCatalog.hex(McpCatalog.sha256(McpCatalog.STRUCT_JSON.writeValueAsBytes(fingerprintSeed)));
         } catch (Exception e) {
             fingerprint = "";
         }
@@ -109,7 +109,7 @@ final class McpCatalogPagination {
                 cursor.put("f", fingerprint);
                 cursor.put("o", end);
                 try {
-                    resultPage.nextCursor = McpCatalog.b64UrlEncode(McpCatalog.GO_ENCODER.writeValueAsBytes(cursor));
+                    resultPage.nextCursor = McpCatalog.b64UrlEncode(McpCatalog.STRUCT_JSON.writeValueAsBytes(cursor));
                 } catch (Exception ignored) {
                     // 序列化不会失败；保形
                 }
@@ -180,7 +180,7 @@ final class McpCatalogPagination {
             row.usageInstructions = McpCatalog.shortMcpDescription(service.effectiveUsageInstructions());
             String encoded;
             try {
-                encoded = McpCatalog.GO_ENCODER.writeValueAsString(row.toMap());
+                encoded = McpCatalog.STRUCT_JSON.writeValueAsString(row.toMap());
             } catch (Exception e) {
                 continue;
             }

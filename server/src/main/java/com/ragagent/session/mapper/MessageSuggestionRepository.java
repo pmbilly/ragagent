@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
  *
  * <h2>落库隐式行为清单</h2>
  * <ol>
- *   <li><b>Create 钩子</b>：ID 为空时才生成 UUID、nil 的 questions 置空切片
+ *   <li><b>Create 钩子</b>：ID 为空时才生成 UUID、null 的 questions 置空列表
  *       → {@link #acquireGeneration} 里调 {@code normalizeForInsert()}。</li>
  *   <li><b>失败/抑制收尾的落库</b>：逐列写（绕开零值跳过），保证
  *       {@code suppression_reason}/{@code error_code} 会被**写成空串**、

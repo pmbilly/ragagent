@@ -144,7 +144,7 @@ class WikiIngestLanguageTest {
         return u;
     }
 
-    // ── TestWikiPromptsNeverRenderAnEmptyLanguage（Go L102-134） ──
+    // ── prompt 不渲染空语言 ──
 
     /**
      * 护栏针对的可观测症状：未解析的语言会把编辑指令渲染成 {@code "Write in ."}，
@@ -188,7 +188,7 @@ class WikiIngestLanguageTest {
 
     @Test
     @DisplayName("Whitespace.trimSpace 覆盖 Unicode White_Space（含 NBSP / 全角空格）")
-    void goTrimSpaceCoversGoWhitespace() {
+    void trimCoversGoWhitespace() {
         assertThat(Whitespace.trimSpace("  x  ")).isEqualTo("x");
         assertThat(Whitespace.trimSpace("　x　")).isEqualTo("x");
         assertThat(Whitespace.trimSpace("  x  ")).isEqualTo("x");

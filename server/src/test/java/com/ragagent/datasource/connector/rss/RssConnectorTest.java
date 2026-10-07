@@ -356,7 +356,7 @@ class RssConnectorTest {
                     + "</channel></rss>");
             Resource res = new RssConnector()
                     .listResources(makeConfig(feed.feedUrl(), null), "").get(0);
-            // Title 全是空白 → TrimSpace 后为空 → 保留 URL
+            // Title 全是空白 → 去首尾空白后为空 → 保留 URL
             assertThat(res.getName()).isEqualTo(feed.feedUrl());
             // Link 为空 → URL 也保留成 feedURL
             assertThat(res.getUrl()).isEqualTo(feed.feedUrl());

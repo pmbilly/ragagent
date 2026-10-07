@@ -169,7 +169,7 @@ public interface MemoryExtractionSessionMapper extends BaseMapper<MemoryExtracti
      * 检查点：只更新这一行的游标与 pending，
      * "转动未完成的工作而不重写主体的整个历史"。
      *
-     * <p>{@code failure_count}/{@code failure_code} 只在 {@code FailedAt == nil} 时才被重置
+     * <p>{@code failure_count}/{@code failure_code} 只在 {@code failedAt == null} 时才被重置
      * ——由调用方决定是否传这两个参数。</p>
      */
     @Update("<script>"

@@ -20,7 +20,7 @@ import com.ragagent.common.llm.ToolResult;
  * <p>Data map 的键序由序列化层排序，见
  * {@code TodoWriteToolTest} 的字节断言。</p>
  *
- * <p><b>2026-10-03（B39）</b>：Go 版已下线——不再复刻 Go 的 HTML 转义；键序仍固定。</p>
+ * <p>不做 HTML 转义；键序仍固定。</p>
  */
 public class TodoWriteTool extends BaseTool {
 

@@ -21,7 +21,7 @@ public final class TenantFileServiceResolver {
     public static final String ENV_STORAGE_TYPE = "STORAGE_TYPE";
     public static final String DEFAULT_STORAGE_TYPE = "local";
 
-    /** 租户解析接缝（对照 {@code interfaces.StorageBackendResolver.ResolveFileService}）。 */
+    /** 租户解析接缝。 */
     public interface TenantResolver {
         /**
          * @return 解析结果；失败抛异常

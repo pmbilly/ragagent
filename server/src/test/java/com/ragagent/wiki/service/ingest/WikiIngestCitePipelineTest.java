@@ -91,7 +91,7 @@ class WikiIngestCitePipelineTest {
     }
 
     /**
-     * Pass 0 漏掉的崭新 slug 要追加到正确的类型切片；同一 slug 在两个批次出现时要合并
+     * Pass 0 漏掉的崭新 slug 要追加到对应类型的列表；同一 slug 在两个批次出现时要合并
      * 引用 chunk 的并集；与既有候选重复的条目不产生重复项。
      */
     @Test

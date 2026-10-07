@@ -170,7 +170,7 @@ public class BuiltinAgentRegistry {
                     }
                 }
             } catch (Exception ignored) {
-                // Go：目录/文件缺失 → 跳过
+                // 目录/文件缺失 → 跳过
             }
         }
         return byId;

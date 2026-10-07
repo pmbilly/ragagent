@@ -143,7 +143,7 @@ public final class DuckDuckGoProvider implements WebSearchProvider {
 
     private static String stripTagsAndTrim(String html) {
         String text = html.replaceAll("(?is)<[^>]+>", "");
-        return SearchDecode.goTrimSpace(text);
+        return SearchDecode.trimUnicodeWhitespace(text);
     }
 
     private List<WebSearchResult> searchApi(String query, int maxResults) {
@@ -247,7 +247,7 @@ public final class DuckDuckGoProvider implements WebSearchProvider {
     /** 首行 trim，超 100 字节截断加 "..."。 */
     static String extractTitle(String text) {
         String[] lines = text.split("\n", -1);
-        String title = SearchDecode.goTrimSpace(lines[0]);
+        String title = SearchDecode.trimUnicodeWhitespace(lines[0]);
         if (title.length() > 100) {
             title = title.substring(0, 100) + "...";
         }

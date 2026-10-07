@@ -460,7 +460,7 @@ public class KnowledgeSummaryService {
         return validateSummaryOutput(response);
     }
 
-    /** nil / 空白输出 → errEmptySummaryOutput。 */
+    /** null / 空白输出 → errEmptySummaryOutput。 */
     private static String validateSummaryOutput(ChatResponse response) {
         if (response == null) {
             throw ERR_EMPTY_SUMMARY_OUTPUT;

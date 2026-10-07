@@ -164,8 +164,7 @@ class OAuthHandlerTest {
     // ── code 交换 ──────────────────────────────────────────────────────
 
     /**
-     * 对照 {@code ProcessAuthorizationResponse} 的 CSRF 校验：
-     * 期望值不匹配 / 期望值为空都必须被拒。
+     * CSRF 校验：期望值不匹配 / 期望值为空都必须被拒。
      */
     @Test
     void processesCodeExchangeAndEnforcesCsrf() {

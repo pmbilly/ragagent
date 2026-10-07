@@ -104,7 +104,6 @@ class AuditLogServiceTest {
 
     // ── Log ──────────────────────────────────────────────────────────────
 
-    /** 对照 {@code TestAuditLog_Log_FillsCreatedAtAndOutcome}。 */
     @Test
     void logFillsCreatedAtAndOutcome() {
         Fixture f = newFixture();
@@ -120,7 +119,7 @@ class AuditLogServiceTest {
         assertThat(entry.getOutcome()).isEqualTo(AuditOutcome.SUCCESS);
     }
 
-    /** 对照 {@code TestAuditLog_Log_RejectsEmptyAction}：schema 要求 action，服务先挡住。 */
+    /** schema 要求 action，服务先挡住。 */
     @Test
     void logRejectsEmptyAction() {
         Fixture f = newFixture();
@@ -142,7 +141,7 @@ class AuditLogServiceTest {
                 .hasMessageContaining("nil entry");
     }
 
-    /** 对照 {@code recordKBActivity} 的 best-effort 语义：仓储炸了也不影响调用方。 */
+    /** best-effort 语义：仓储炸了也不影响调用方。 */
     @Test
     void logBestEffortSwallowsRepositoryFailure() {
         Fixture f = newFixture();
@@ -186,7 +185,6 @@ class AuditLogServiceTest {
     }
 
     /**
-     * 对照 {@code TestAuditLog_LogDenied_WritesAgainAfterWindowExpires}：
      * 去重是滑动窗口而非一次性锁——窗口空掉后下一次拒绝必须记。
      */
     @Test
@@ -201,7 +199,6 @@ class AuditLogServiceTest {
     }
 
     /**
-     * 对照 {@code TestAuditLog_LogDenied_DedupIsPerActorAndPath}：
      * 两个不同 actor 打同一端点、或同一 actor 打两个不同端点，都必须各自留痕。
      * 去重键是 (tenant, actor, action, path)。
      */
@@ -217,7 +214,6 @@ class AuditLogServiceTest {
     }
 
     /**
-     * 对照 {@code TestAuditLog_LogDenied_DegradesGracefullyOnDedupLookupError}：
      * 去重 count 出错（DB 抖动）时<b>绝不能</b>静默跳过审计行——事件响应期间
      * 写一行重复远好过丢一次拒绝记录。
      */

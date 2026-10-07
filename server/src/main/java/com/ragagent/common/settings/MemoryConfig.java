@@ -91,7 +91,7 @@ public class MemoryConfig {
     public static final int DEFAULT_MAX_ITEMS = MemoryKinds.DEFAULT_MAX_ITEMS;
     /** {@code maxItems} 的上限；{@link #normalize()} 会把更大的值夹回来。 */
     public static final int MAX_ITEMS_CAP = 2000;
-    /** {@code extractInstructions} 的 rune 上限。 */
+    /** {@code extractInstructions} 的码点上限。 */
     public static final int MAX_EXTRACT_INSTRUCTIONS_RUNES = MemoryKinds.MAX_EXTRACT_INSTRUCTIONS_RUNES;
 
     // ── 蒸馏计时器的边界 ──────────────────────────────

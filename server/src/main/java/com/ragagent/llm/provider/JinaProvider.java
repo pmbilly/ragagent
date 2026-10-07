@@ -25,7 +25,7 @@ public class JinaProvider implements Provider {
 
     @Override
     public void validateConfig(Config config) {
-        // Go 原文只校验 API key（不校验 base URL / model name）
+        // 只校验 API key（不校验 base URL / model name）
         if (config.apiKey().isEmpty()) {
             throw BizException.badRequest("API key is required for Jina AI provider");
         }

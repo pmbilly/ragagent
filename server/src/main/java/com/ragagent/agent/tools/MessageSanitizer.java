@@ -65,8 +65,8 @@ public final class MessageSanitizer {
                     // （不改动调用方的消息对象）。
                     msg = shallowCopy(msg);
                     msg.setRole("user");
-                    msg.setContent("<untrusted_tool_result name=\"" + goHtmlEscape(orEmpty(msg.getName()))
-                            + "\">\n" + goHtmlEscape(orEmpty(msg.getContent())) + "\n</untrusted_tool_result>");
+                    msg.setContent("<untrusted_tool_result name=\"" + escapeHtml(orEmpty(msg.getName()))
+                            + "\">\n" + escapeHtml(orEmpty(msg.getContent())) + "\n</untrusted_tool_result>");
                     msg.setToolCallId("");
                     msg.setName("");
                 }
@@ -107,7 +107,7 @@ public final class MessageSanitizer {
     }
 
     /** 转义 < > & ' "（' → &#39;、" → &#34;）。 */
-    static String goHtmlEscape(String s) {
+    static String escapeHtml(String s) {
         StringBuilder sb = new StringBuilder(s.length());
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);

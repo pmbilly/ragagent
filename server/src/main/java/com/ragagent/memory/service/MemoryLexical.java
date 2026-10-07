@@ -201,7 +201,7 @@ public final class MemoryLexical {
     /**
      * 越过字面门槛的条目的**下标**，最优在前。
      *
-     * <p>用下标而不是 id，是因为一次排序只对产生它的那个切片有意义，
+     * <p>用下标而不是 id，是因为一次排序只对产生它的那个列表有意义，
      * 而且条目**不保证带 id**——按 id 索引会把所有无 id 的条目悄悄塌成同一条。</p>
      */
     public static List<Integer> lexicalRanking(String query, List<MemoryItem> items) {
@@ -230,7 +230,7 @@ public final class MemoryLexical {
 
     /**
      * 把一次排序兑现成条目，
-     * 在条数上限处停下，并**跳过**任何不再符合 rune 预算的条目。
+     * 在条数上限处停下，并**跳过**任何不再符合码点预算的条目。
      *
      * <p>超预算时跳过而不是停止是刻意的：一条长记忆不该把后面几条短的一起挡在门外。</p>
      */

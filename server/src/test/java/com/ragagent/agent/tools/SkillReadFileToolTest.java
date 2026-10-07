@@ -16,9 +16,9 @@ import com.ragagent.agent.skills.SkillSource;
 import com.ragagent.common.llm.ToolResult;
 
 /**
- * {@code read_file}（技能资源，B61）的行为契约。
+ * {@code read_file}（技能资源）的行为契约。
  *
- * <p>断言锚在 Go 录像（{@code GoRecording45C} 的 {@code read_file/*}）上：
+ * <p>断言锚在 45C 录像（{@code GoRecording45C} 的 {@code read_file/*}）上：
  * 输出三段式（{@code === File: … ===} / {@code size=…, returned=…} / 围栏内容）、
  * data 键集合、以及每条错误文案；本部署无沙箱，非 {@code skill://} 走
  * {@code exec_no_source} 文案。</p>

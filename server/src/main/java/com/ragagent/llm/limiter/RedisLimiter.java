@@ -23,7 +23,7 @@ import org.springframework.data.redis.core.script.RedisScript;
 /**
  * 分布式（Redis）并发信号量：按 key（通常 model ID）限制<b>跨实例</b>在途调用数。
  *
- * <p>实现是"自愈租约 ZSET"，逐行对齐 Go {@code internal/models/limiter/limiter.go}：</p>
+ * <p>实现是"自愈租约 ZSET"：</p>
  * <ul>
  *   <li>每个持槽 = ZSET 成员（唯一 token），score = 租约到期时刻；</li>
  *   <li>取槽脚本一次原子完成「清过期租约 → 计数 → 未满则登记并给键续 TTL」；</li>
@@ -34,7 +34,7 @@ import org.springframework.data.redis.core.script.RedisScript;
  * </ul>
  *
  * <p>等待者以 {@code pollInterval}（默认 200ms）轮询取槽；等待中被<b>线程中断</b>
- * 即 fail open（对齐 Go 的 ctx.Done → fail open，Java 的取消语义是中断）。</p>
+ * 即 fail open（Java 的取消语义是中断）。</p>
  *
  * <p><b>装配</b>：普通类（<b>不是</b> {@code @Component}），由
  * {@code config.ModelConcurrencyGovernorWiring} 在
@@ -50,7 +50,7 @@ public class RedisLimiter implements ModelConcurrencyLimiter, RuntimeInspectable
     /** 等待者重试间隔：够小保持灵敏，够大避免争用时打爆 Redis。 */
     static final long DEFAULT_POLL_MILLIS = 200L;
 
-    /** 信号量 ZSET 键前缀（与 Go 的 {@code keyPrefix} 同值）。 */
+    /** 信号量 ZSET 键前缀。 */
     static final String KEY_PREFIX = "weknora:modelsem:";
 
     /**
@@ -179,7 +179,7 @@ public class RedisLimiter implements ModelConcurrencyLimiter, RuntimeInspectable
             Tracked t = entry.getValue();
             Long active;
             try {
-                // 租约未过期的成员数 = 当前在途持槽（Go 用 ZCount(now+1, +inf)）
+                // 租约未过期的成员数 = 当前在途持槽（score > now）
                 active = template.opsForZSet().count(KEY_PREFIX + modelId,
                         (double) (now + 1), Double.POSITIVE_INFINITY);
             } catch (RuntimeException e) {

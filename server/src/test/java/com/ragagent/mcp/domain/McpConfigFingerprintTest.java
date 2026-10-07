@@ -28,7 +28,7 @@ class McpConfigFingerprintTest {
         return s;
     }
 
-    static Stream<Arguments> goGoldens() {
+    static Stream<Arguments> fingerprintGoldens() {
         McpService empty = new McpService();
 
         McpService bareSse = new McpService();
@@ -134,12 +134,13 @@ class McpConfigFingerprintTest {
                         "c2f44ce26be14c87bd3fba908ef33576e791866fb68d84c070227a0e7245b9d6"));
     }
 
-    @ParameterizedTest(name = "go golden: {0}")
-    @MethodSource("goGoldens")
-    void matchesGoJsonAndDigest(String name, McpService service, String goJson, String goSha) {
-        assertEquals(goJson, McpConfigFingerprint.canonicalJson(service),
-                "规范化 JSON 必须与 Go json.Marshal 逐字节一致");
-        assertEquals(goSha, McpConfigFingerprint.of(service), "SHA-256 必须与 Go 一致");
+    @ParameterizedTest(name = "指纹金片: {0}")
+    @MethodSource("fingerprintGoldens")
+    void matchesJsonAndDigestGoldens(String name, McpService service,
+            String expectedJson, String expectedSha) {
+        assertEquals(expectedJson, McpConfigFingerprint.canonicalJson(service),
+                "规范化 JSON 必须与金片逐字节一致");
+        assertEquals(expectedSha, McpConfigFingerprint.of(service), "SHA-256 必须与金片一致");
     }
 
     // ── 语义：什么进摘要、什么不进 ─────────────────────────────────────

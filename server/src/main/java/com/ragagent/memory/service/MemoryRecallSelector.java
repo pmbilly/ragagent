@@ -94,7 +94,7 @@ public class MemoryRecallSelector {
      * 向存储要多少条语义命中，相对于能返回多少条。
      *
      * <p>比输出宽，是因为融合需要有东西可融：只有向量一侧喜欢的条目必须能跟字面排序竞争，
-     * 而 rune 预算也可能跳过好几条长条目才找到放得下的。四倍输出加一个下限，
+     * 而码点预算也可能跳过好几条长条目才找到放得下的。四倍输出加一个下限，
      * 既留了余量，又不会把一次五条的召回变成一次上百行的读取。</p>
      */
     public static int vectorFanout(int maxItems) {
@@ -111,7 +111,7 @@ public class MemoryRecallSelector {
      * 并把池子**撑大**到装下它原先没有的那些匹配。
      *
      * <p>池子必须能长大，否则整个"查存储"的意义就丢了：融合要合成的两个排序必须
-     * 指向同一个切片，所以只有向量一侧找到的匹配需要在里面有个位置。</p>
+     * 指向同一个列表，所以只有向量一侧找到的匹配需要在里面有个位置。</p>
      *
      * <p>返回的第三个值只是为了让 trace 能显示"有多少条是池子外的"。</p>
      */
@@ -127,7 +127,7 @@ public class MemoryRecallSelector {
                 indexById.put(item.getId(), i);
             }
         }
-        // 复制之后再 append：调用方的切片可能与它被过滤出来的那个列表共享底层数组，
+        // 复制之后再追加：调用方的列表可能与它被过滤出来的那个列表共享底层数组，
         // 往那儿长会改写没人让我们碰的行。
         List<MemoryItem> pool = candidates;
         boolean copied = false;
@@ -210,7 +210,7 @@ public class MemoryRecallSelector {
         return new Outcome(matched, trace);
     }
 
-    /** 查询预览的 rune 上限。 */
+    /** 查询预览的码点上限。 */
     static int recallQueryPreviewRunes() {
         return 500;
     }

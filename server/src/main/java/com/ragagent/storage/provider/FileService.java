@@ -33,28 +33,27 @@ public interface FileService {
         }
     }
 
-    /** 对照 {@code CheckConnectivity}：后端可达且配置正确（目录存在 / bucket 可访问）。 */
+    /** 后端可达且配置正确（目录存在 / bucket 可访问）。 */
     void checkConnectivity();
 
-    /** 对照 {@code SaveFile}：存上传件，返回 {@code provider://} 路径。 */
+    /** 存上传件，返回 {@code provider://} 路径。 */
     String saveFile(UploadFile file, long tenantId, String knowledgeId);
 
     /**
-     * 对照 {@code SaveBytes}：存字节数据，返回 {@code provider://} 路径。
-     * {@code temp=true} 表示临时区（可能过期；本地后端忽略该参数——照 Go）。
+     * 存字节数据，返回 {@code provider://} 路径。
+     * {@code temp=true} 表示临时区（可能过期；本地后端忽略该参数）。
      */
     String saveBytes(byte[] data, long tenantId, String fileName, boolean temp);
 
-    /** 对照 {@code GetFile}：按路径取文件（调用方负责关闭）。 */
+    /** 按路径取文件（调用方负责关闭）。 */
     InputStream getFile(String filePath);
 
-    /** 对照 {@code GetFileURL}：可直接加载的 http(s) URL；不支持时返回 {@code provider://} 路径。 */
+    /** 可直接加载的 http(s) URL；不支持时返回 {@code provider://} 路径。 */
     String getFileURL(String filePath);
 
-    /** 对照 {@code DeleteFile}。 */
     void deleteFile(String filePath);
 
-    /** 对照 {@code CopyFile}：复制到 {@code (tenantId, knowledgeId)} 名下的<b>新对象</b>。 */
+    /** 复制到 {@code (tenantId, knowledgeId)} 名下的<b>新对象</b>。 */
     String copyFile(String srcPath, long tenantId, String knowledgeId);
 
     /** 源路径属于别的 provider。 */

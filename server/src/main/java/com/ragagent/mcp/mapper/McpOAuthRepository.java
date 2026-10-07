@@ -44,7 +44,7 @@ public class McpOAuthRepository {
         return clientMapper.find(tenantId, serviceId);
     }
 
-    /** 对照 SaveClient：upsert，恒刷新 updated_at */
+    /** upsert，恒刷新 updated_at */
     public void saveClient(McpOAuthClient client) {
         client.setUpdatedAt(now());
         if (client.getId() == null || client.getId().isEmpty()) {
@@ -69,13 +69,13 @@ public class McpOAuthRepository {
 
     // ── OAuth token（每 principal + 服务一个） ────────────────────────────
 
-    /** 对照 GetToken：历史 (tenant, user, service) 入口，等价于 web_user principal */
+    /** 历史 (tenant, user, service) 入口，等价于 web_user principal */
     public McpOAuthToken getToken(long tenantId, String userId, String serviceId) {
         return getTokenForPrincipal(tenantId,
                 new TenantContext.Principal(McpPrincipal.WEB_USER, userId), serviceId);
     }
 
-    /** 对照 GetTokenForPrincipal：principal 无效返回 null */
+    /** principal 无效返回 null */
     public McpOAuthToken getTokenForPrincipal(long tenantId, TenantContext.Principal principal,
                                               String serviceId) {
         TenantContext.Principal p = McpPrincipal.normalize(principal);
@@ -85,7 +85,7 @@ public class McpOAuthRepository {
         return tokenMapper.findForPrincipal(tenantId, p.type(), p.id(), serviceId);
     }
 
-    /** 对照 SaveToken：principal 缺省时回落为 (web_user, UserID) */
+    /** principal 缺省时回落为 (web_user, user_id) */
     public void saveToken(McpOAuthToken token) {
         if (isBlank(token.getPrincipalType()) || isBlank(token.getPrincipalId())) {
             token.setPrincipalType(McpPrincipal.WEB_USER);
@@ -95,7 +95,7 @@ public class McpOAuthRepository {
     }
 
     /**
-     * 对照 SaveTokenForPrincipal：principal 必填；user_id 为空时填 principal.StorageID()。
+     * principal 必填；user_id 为空时填 principal 的 storageId。
      *
      * @throws IllegalArgumentException principal 缺失
      */
@@ -128,7 +128,7 @@ public class McpOAuthRepository {
                 serviceId);
     }
 
-    /** 对照 DeleteTokenForPrincipal：principal 无效 → 静默 no-op */
+    /** principal 无效 → 静默 no-op */
     public void deleteTokenForPrincipal(long tenantId, TenantContext.Principal principal, String serviceId) {
         TenantContext.Principal p = McpPrincipal.normalize(principal);
         if (!McpPrincipal.valid(p)) {
@@ -138,8 +138,8 @@ public class McpOAuthRepository {
     }
 
     /**
-     * 对照 TryAcquireTokenRefreshLease：单条 UPDATE 的 CAS，
-     * {@code RowsAffected == 1} 才算抢到（0 = 行不存在 / 未过期 / principal 无效）。
+     * 单条 UPDATE 的 CAS，
+     * 受影响行数为 1 才算抢到（0 = 行不存在 / 未过期 / principal 无效）。
      */
     public boolean tryAcquireTokenRefreshLease(long tenantId, TenantContext.Principal principal,
                                                String serviceId, String leaseId,
@@ -152,7 +152,7 @@ public class McpOAuthRepository {
                 now()) == 1;
     }
 
-    /** 对照 ReleaseTokenRefreshLease：非持有者释放是 no-op */
+    /** 非持有者释放是 no-op */
     public void releaseTokenRefreshLease(long tenantId, TenantContext.Principal principal,
                                          String serviceId, String leaseId) {
         TenantContext.Principal p = McpPrincipal.normalize(principal);

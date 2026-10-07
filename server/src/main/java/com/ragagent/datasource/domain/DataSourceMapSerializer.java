@@ -19,12 +19,11 @@ import com.ragagent.common.web.SortedMapSerializer;
  * <p>{@code SortedMapSerializer} 只重排键序，值<b>原样</b>交给 Jackson。而本模块的 map 字段
  * （{@code DataSourceConfig.settings} / {@code Resource.metadata} /
  * {@code SyncCursor.connector_cursor}）装的是**外部系统给的任意 JSON**，里面必然有数字：
- * 分页偏移、条目上限、文档大小。两边的表示不同：</p>
+ * 分页偏移、条目上限、文档大小。嵌套数字的文本形态统一按 {@code Double.toString}
+ * 语义输出：</p>
  * <pre>
- *   Go    float64(1.0)   →  1                （专用编码器，整数值不补 .0）
- *   Java  Double(1.0)    →  1.0              （Jackson 走 Double.toString）
- *   Go    float64(1e21)  →  1e+21
- *   Java  Double(1e21)   →  1.0E21
+ *   Double(1.0)    →  1.0
+ *   Double(1e21)   →  1.0E21
  * </pre>
  * <p>{@code Resource.metadata} 是<b>响应体</b>、{@code connector_cursor} 会经
  * {@code last_sync_result} 原样透给前端——分叉看得见。</p>
@@ -56,7 +55,7 @@ public class DataSourceMapSerializer extends SortedMapSerializer {
         gen.writeObject(sortDeep(normalize(value)));
     }
 
-    /** 递归把数字包成 Go 形态；map / 集合的容器结构原样保留（排序交给 {@code sortDeep}）。 */
+    /** 递归把数字归一为 {@code Double.toString} 文本；map / 集合的容器结构原样保留（排序交给 {@code sortDeep}）。 */
     private static Object normalize(Object value) {
         if (value instanceof Double d) {
             return new RawNumber(Double.toString(d));

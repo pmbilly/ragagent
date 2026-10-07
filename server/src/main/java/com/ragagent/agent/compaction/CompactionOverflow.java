@@ -13,36 +13,36 @@ import com.ragagent.llm.domain.ChatResponse;
  */
 public final class CompactionOverflow {
 
-    private static Pattern goI(String regex) {
+    private static Pattern caseInsensitive(String regex) {
         // 需要的是 Unicode 大小写折叠，Java 里 CASE_INSENSITIVE 默认只做 ASCII 折叠，须显式加 UNICODE_CASE
         return Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
     }
 
     private static final Pattern[] OVERFLOW_PATTERNS = {
-        goI("prompt is too long"), // Anthropic
-        goI("request_too_large"), // Anthropic (HTTP 413)
-        goI("input is too long for requested model"), // Amazon Bedrock
-        goI("exceeds the context window"), // OpenAI
-        goI("exceeds (the )?(model'?s )?maximum context length"), // OpenAI-compatible proxies
-        goI("input token count.*exceeds the maximum"), // Google Gemini
-        goI("maximum prompt length is \\d+"), // xAI Grok
-        goI("reduce the length of the messages"), // Groq
-        goI("maximum context length is \\d+ tokens"), // OpenRouter
-        goI("exceeds (the )?maximum allowed input length"), // OpenRouter / Poolside
-        goI("is longer than the model'?s context length"), // Together AI
-        goI("exceeds the limit of \\d+"), // GitHub Copilot
-        goI("exceeds the available context size"), // llama.cpp
-        goI("greater than the context length"), // LM Studio
-        goI("context window exceeds limit"), // MiniMax
-        goI("exceeded model token limit"), // Kimi
-        goI("too large for model with \\d+ maximum context length"), // Mistral
-        goI("but the configured context size is"), // DS4
-        goI("model_context_window_exceeded"), // z.ai
-        goI("prompt too long; exceeded (max )?context length"), // Ollama
-        goI("range of input length should be"), // DashScope / Qwen
-        goI("context[_ ]length[_ ]exceeded"), // generic
-        goI("too many tokens"), // generic
-        goI("token limit exceeded"), // generic
+        caseInsensitive("prompt is too long"), // Anthropic
+        caseInsensitive("request_too_large"), // Anthropic (HTTP 413)
+        caseInsensitive("input is too long for requested model"), // Amazon Bedrock
+        caseInsensitive("exceeds the context window"), // OpenAI
+        caseInsensitive("exceeds (the )?(model'?s )?maximum context length"), // OpenAI-compatible proxies
+        caseInsensitive("input token count.*exceeds the maximum"), // Google Gemini
+        caseInsensitive("maximum prompt length is \\d+"), // xAI Grok
+        caseInsensitive("reduce the length of the messages"), // Groq
+        caseInsensitive("maximum context length is \\d+ tokens"), // OpenRouter
+        caseInsensitive("exceeds (the )?maximum allowed input length"), // OpenRouter / Poolside
+        caseInsensitive("is longer than the model'?s context length"), // Together AI
+        caseInsensitive("exceeds the limit of \\d+"), // GitHub Copilot
+        caseInsensitive("exceeds the available context size"), // llama.cpp
+        caseInsensitive("greater than the context length"), // LM Studio
+        caseInsensitive("context window exceeds limit"), // MiniMax
+        caseInsensitive("exceeded model token limit"), // Kimi
+        caseInsensitive("too large for model with \\d+ maximum context length"), // Mistral
+        caseInsensitive("but the configured context size is"), // DS4
+        caseInsensitive("model_context_window_exceeded"), // z.ai
+        caseInsensitive("prompt too long; exceeded (max )?context length"), // Ollama
+        caseInsensitive("range of input length should be"), // DashScope / Qwen
+        caseInsensitive("context[_ ]length[_ ]exceeded"), // generic
+        caseInsensitive("too many tokens"), // generic
+        caseInsensitive("token limit exceeded"), // generic
     };
 
     /**
@@ -52,10 +52,10 @@ public final class CompactionOverflow {
      * 原始供应商错误，不是预规范化的前缀。
      */
     private static final Pattern[] NON_OVERFLOW_PATTERNS = {
-        goI("throttling"),
-        goI("service unavailable"),
-        goI("rate limit"),
-        goI("too many requests"),
+        caseInsensitive("throttling"),
+        caseInsensitive("service unavailable"),
+        caseInsensitive("rate limit"),
+        caseInsensitive("too many requests"),
     };
 
     private CompactionOverflow() {

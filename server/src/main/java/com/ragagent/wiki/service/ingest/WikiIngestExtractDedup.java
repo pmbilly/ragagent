@@ -42,14 +42,14 @@ final class WikiIngestExtractDedup {
      * <p>这种逐条目分组正是把去重模型约束成"局部决策"的机制。候选页保留它们的
      * aliases，好让模型仍握有接受一次合法合并所需的缩写 / 翻译信号。</p>
      *
-     * <p>{@code slug} / {@code type} 属性值用 {@link #goQuote} 的带引号字符串语义——
+     * <p>{@code slug} / {@code type} 属性值用 {@link #quoted} 的带引号字符串语义——
      * 对 slug（纯 ASCII）而言就是加双引号并转义 {@code "} 与 {@code \}。
      * 不可打印字符用反斜杠转义（{@code \xNN} / {@code uXXXX} 形态）。</p>
      */
     static void writeDedupCandidateGroup(StringBuilder buf, ExtractedItem item,
                                          String itemType, List<WikiPageLite> candidates) {
-        buf.append("  <item slug=").append(goQuote(item.getSlug()))
-                .append(" type=").append(goQuote(itemType)).append(">\n");
+        buf.append("  <item slug=").append(quoted(item.getSlug()))
+                .append(" type=").append(quoted(itemType)).append(">\n");
         buf.append("    <name>").append(WikiTextUtils.xmlEscape(item.getName())).append("</name>\n");
         for (String alias : item.getAliases()) {
             if (alias == null || alias.isEmpty()) {
@@ -62,8 +62,8 @@ final class WikiIngestExtractDedup {
             if (p == null) {
                 continue;
             }
-            buf.append("      <page slug=").append(goQuote(p.getSlug()))
-                    .append(" type=").append(goQuote(p.getPageType())).append(">\n");
+            buf.append("      <page slug=").append(quoted(p.getSlug()))
+                    .append(" type=").append(quoted(p.getPageType())).append(">\n");
             buf.append("        <name>").append(WikiTextUtils.xmlEscape(p.getTitle())).append("</name>\n");
             for (String alias : p.getAliases()) {
                 if (alias == null || alias.isEmpty()) {
@@ -85,7 +85,7 @@ final class WikiIngestExtractDedup {
      * 这里把规则补全是为了将来有人把非 ASCII 内容塞进来时不至于产出非法 XML
      * （可打印 Unicode 保留原样，只转义不可打印字符）。</p>
      */
-    static String goQuote(String s) {
+    static String quoted(String s) {
         if (s == null) {
             return "\"\"";
         }

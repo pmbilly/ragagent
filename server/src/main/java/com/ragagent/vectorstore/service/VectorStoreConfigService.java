@@ -118,7 +118,7 @@ public class VectorStoreConfigService {
         if ("opensearch".equals(store.getEngineType())) {
             validateOpenSearchIndexConfig(store.getIndexConfig());
         }
-        // 3. DB 去重（应用层比较——JSONB 抽取语法因库而异，Go 原注释）
+        // 3. DB 去重（应用层比较——JSONB 抽取语法因库而异）
         String endpoint = store.getConnectionConfig().getEndpoint();
         String indexName = store.getIndexConfig().getIndexNameOrDefault(store.getEngineType());
         for (VectorStore s : repo.list(store.getTenantId())) {
@@ -445,7 +445,7 @@ public class VectorStoreConfigService {
                 // 文件型引擎，无连接配置
             }
             default -> {
-                // Go switch 无 default → 直接通过（引擎白名单在 Validate 已拦）
+                // 未知引擎在此直接通过（引擎白名单在 validate() 已拦）
             }
         }
     }

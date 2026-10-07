@@ -194,7 +194,6 @@ public class RbacInterceptor implements HandlerInterceptor {
         return null;
     }
 
-    /** 对照 RequireRole / RequireRoleOrSystemAdmin / RequireSystemAdmin 判定链 */
     private boolean check(Rule rule) {
         // API-key 主体由 APIKeyGate 全权判定（能力 + KB 白名单 + default-deny），
         // 角色阶梯不适用于机器主体——角色下限规则短路放行；

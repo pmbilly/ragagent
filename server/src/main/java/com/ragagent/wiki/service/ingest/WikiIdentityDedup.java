@@ -75,7 +75,7 @@ final class WikiIdentityDedup {
     /**
      * 返回 {@code allPages}
      * 中<b>至少与一个</b> {@code newItems} 貌似相关的子集。非 entity/concept 页面被
-     * 无条件丢弃。返回的切片<b>保留输入顺序</b>，让下游 prompt 跨运行稳定。
+     * 无条件丢弃。返回列表<b>保留输入顺序</b>，让下游 prompt 跨运行稳定。
      *
      * <p>小语料（{@code <= DEDUP_SMALL_CORPUS_BYPASS}）上，除了页面类型过滤之外
      * 本方法是 no-op。</p>

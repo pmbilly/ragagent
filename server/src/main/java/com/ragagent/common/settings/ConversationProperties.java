@@ -72,7 +72,7 @@ public class ConversationProperties {
     private String summaryPrompt = "";
     private String summaryContextTemplate = "";
 
-    /** 启动回填（对照 backfillConversationDefaults）。 */
+    /** 启动回填。 */
     @jakarta.annotation.PostConstruct
     public void backfillFromTemplates() {
         Map<String, String[]> byId = loadTemplates();

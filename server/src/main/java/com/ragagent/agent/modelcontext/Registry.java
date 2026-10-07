@@ -516,35 +516,10 @@ public final class Registry {
     String encodeMCPRoutingText(String text) {
         for (HandleStore.Pair<Void> pair : mcpServers.store().pairs()) {
             text = text.replace(
-                    "server_id=" + goQuote(pair.value),
-                    "server_id=" + goQuote(pair.handle));
+                    "server_id=" + ToolJson.quoted(pair.value),
+                    "server_id=" + ToolJson.quoted(pair.handle));
         }
         return text;
-    }
-
-    /** 字符串字面量加引号与转义（路由文本替换用；服务 ID 是简单 ASCII）。 */
-    static String goQuote(String s) {
-        StringBuilder sb = new StringBuilder(s.length() + 2);
-        sb.append('"');
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            switch (c) {
-                case '"' -> sb.append("\\\"");
-                case '\\' -> sb.append("\\\\");
-                case '\n' -> sb.append("\\n");
-                case '\t' -> sb.append("\\t");
-                case '\r' -> sb.append("\\r");
-                default -> {
-                    if (c < 0x20 || c == 0x7f) {
-                        sb.append(String.format("\\x%02x", (int) c));
-                    } else {
-                        sb.append(c);
-                    }
-                }
-            }
-        }
-        sb.append('"');
-        return sb.toString();
     }
 
     // ---- MCP 结果来源发现 ----

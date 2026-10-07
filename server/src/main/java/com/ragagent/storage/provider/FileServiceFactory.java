@@ -169,7 +169,7 @@ public final class FileServiceFactory {
                         || trim(c.getBucketName()).isEmpty() || trim(c.getRegion()).isEmpty()) {
                     throw new IllegalArgumentException("incomplete cos config");
                 }
-                // 照 Go：COS 的 prefix 默认 "weknora"（不带斜杠，服务内自行拼接）
+                // COS 的 prefix 默认 "weknora"（不带斜杠，服务内自行拼接）
                 String prefix = trim(c.getPathPrefix()).isEmpty() ? "weknora"
                         : trim(c.getPathPrefix());
                 return new Created(new CosFileService(trim(c.getBucketName()), trim(c.getRegion()),
@@ -183,7 +183,7 @@ public final class FileServiceFactory {
                         || trim(c.getBucketName()).isEmpty()) {
                     throw new IllegalArgumentException("incomplete tos config");
                 }
-                // 照 Go：TOS 的 pathPrefix 原样传入（不设默认，服务内 trim 斜杠）
+                // TOS 的 pathPrefix 原样传入（不设默认，服务内 trim 斜杠）
                 return new Created(new TosFileService(trim(c.getEndpoint()), trim(c.getRegion()),
                         trim(c.getAccessKey()), trim(c.getSecretKey()), trim(c.getBucketName()),
                         c.getPathPrefix(), trim(c.getTempBucketName()), trim(c.getTempRegion()),
@@ -199,7 +199,7 @@ public final class FileServiceFactory {
         }
     }
 
-    /** 对照 {@code SafeJoinUnderBase}：越界返回 null（调用方保留原 base）。 */
+    /** 越界返回 null（调用方保留原 base）。 */
     static String safeJoinUnderBase(String base, String prefix) {
         try {
             Path b = Paths.get(base).toAbsolutePath().normalize();

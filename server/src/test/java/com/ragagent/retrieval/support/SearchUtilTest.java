@@ -392,7 +392,7 @@ class SearchUtilTest {
     void tokenizeSimpleFiltersSingleRunesAndPunctuation() {
         Set<String> tokens = SearchTextUtil.tokenizeSimple("Hello, world! Hello");
         // "Hello," 归一后 "hello," 分词（whitespace 路径）：逗号尾随不剥离——
-        // 只按空白切分；单 rune/纯标点 token 被过滤
+        // 只按空白切分；单码点/纯标点 token 被过滤
         assertTrue(tokens.contains("hello,"));
         assertTrue(tokens.contains("world!"));
         assertFalse(tokens.contains("x"));
@@ -423,7 +423,7 @@ class SearchUtilTest {
 
     @Test
     void tokenizeSimpleChineseUsesSegmenterSeam() {
-        // 降级接缝：二字滑窗（非 jieba）——分词边界与 Go 分叉，但集合语义保留
+        // 降级接缝：二字滑窗（非 jieba）——分词边界与 jieba 分叉，但集合语义保留
         Set<String> tokens = SearchTextUtil.tokenizeSimple("知识库检索");
         assertFalse(tokens.isEmpty());
         tokens.forEach(t -> assertTrue(t.codePointCount(0, t.length()) > 1));
@@ -464,7 +464,7 @@ class SearchUtilTest {
         assertEquals(1, first.getSeq());
         // 空 URL → web_search_%d（用原始下标）
         assertEquals("web_search_2", results.get(1).getId());
-        // EndAt = content 的 rune 数
+        // EndAt = content 的码点数
         assertEquals(first.getContent().codePointCount(0, first.getContent().length()), first.getEndAt());
 
         // seq 覆盖（service 层传 idx）

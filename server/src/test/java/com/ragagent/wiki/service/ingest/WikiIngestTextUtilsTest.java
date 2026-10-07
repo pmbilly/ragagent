@@ -65,7 +65,7 @@ class WikiIngestTextUtilsTest {
         assertThat(WikiTextUtils.truncateString("", 10)).isEmpty();
         assertThat(WikiTextUtils.truncateString("abc", 3)).isEqualTo("abc");
         assertThat(WikiTextUtils.truncateString("abcd", 3)).isEqualTo("abc...");
-        // CJK 按 rune 计，不按字节也不按 char
+        // CJK 按码点计，不按字节也不按 char
         assertThat(WikiTextUtils.truncateString("中文测试", 2)).isEqualTo("中文...");
     }
 

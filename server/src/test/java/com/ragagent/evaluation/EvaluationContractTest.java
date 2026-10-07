@@ -181,7 +181,7 @@ class EvaluationContractTest {
                 .andReturn();
         assertEquals(200, r.getResponse().getStatus(), raw(r));
         assertEquals(mask(golden("ev-post.json")), mask(raw(r)));
-        // status=0（创建快照；后台 goroutine 竞态下 0/1 都可能出现）
+        // status=0（创建快照；后台线程竞态下 0/1 都可能出现）
         JsonNode node = MAPPER.readTree(raw(r));
         assertEquals(0, node.path("task").path("status").asInt());
     }

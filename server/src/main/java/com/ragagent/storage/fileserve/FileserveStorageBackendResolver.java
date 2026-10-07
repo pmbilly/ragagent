@@ -62,7 +62,7 @@ public class FileserveStorageBackendResolver implements StorageBackendResolver {
             try {
                 return inner.getFileURL(filePath);
             } catch (IOException e) {
-                // 对照 storageurl.FileService 的契约：失败抛 RuntimeException，
+                // 失败抛 RuntimeException，
                 // Rewriter 会捕获、WARN、把引用原样留下
                 throw new IllegalStateException(
                         e.getMessage() == null ? e.toString() : e.getMessage(), e);

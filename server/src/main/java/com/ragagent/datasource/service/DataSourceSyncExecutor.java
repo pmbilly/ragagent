@@ -343,7 +343,7 @@ final class DataSourceSyncExecutor {
         }
         if (config == null) {
             // ⚠️ 该路径经 HTTP 不可达：CreateDataSource 会先把空配置交给连接器校验，
-            // 而各连接器的 Validate 都拒绝 nil 配置（错误文案正是 "invalid configuration"）。
+            // 而各连接器的 Validate 都拒绝 null 配置（错误文案正是 "invalid configuration"）。
             // 折叠成普通失败分支，避免在虚拟线程里抛 NPE。
             log.error("[datasource] failed to parse config: config is empty");
             syncLog.setStatus(DataSourceConstants.SYNC_LOG_STATUS_FAILED);

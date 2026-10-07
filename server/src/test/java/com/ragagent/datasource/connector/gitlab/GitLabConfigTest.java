@@ -251,7 +251,7 @@ class GitLabConfigTest {
      * 这里会立刻红——而不是等到某个用户的 {@code paths} 被悄悄放行。</p>
      */
     @Test
-    void goPathCleanMatchesGo() {
+    void pathCleanMatchesGo() {
         assertThat(GitLabPath.clean("")).isEqualTo(".");
         assertThat(GitLabPath.clean(".")).isEqualTo(".");
         assertThat(GitLabPath.clean("a/..")).isEqualTo(".");
@@ -273,7 +273,7 @@ class GitLabConfigTest {
      * （写成后者会多留一个斜杠）。这一组是那个缺陷的回归保护。
      */
     @Test
-    void goPathCleanBacktrackingMatchesGo() {
+    void pathCleanBacktrackingMatchesGo() {
         assertThat(GitLabPath.clean("docs-main/a/../b.md")).isEqualTo("docs-main/b.md");
         assertThat(GitLabPath.clean("a/b/../../c")).isEqualTo("c");
         assertThat(GitLabPath.clean("/a/b/../c")).isEqualTo("/a/c");
@@ -289,7 +289,7 @@ class GitLabConfigTest {
     }
 
     @Test
-    void goPathJoinMatchesGo() {
+    void pathJoinMatchesGo() {
         assertThat(GitLabPath.join("docs-main", "README.md")).isEqualTo("docs-main/README.md");
         assertThat(GitLabPath.join("docs-main")).isEqualTo("docs-main");
         assertThat(GitLabPath.join("", "")).isEmpty();

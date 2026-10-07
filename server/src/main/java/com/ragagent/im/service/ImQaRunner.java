@@ -63,7 +63,7 @@ final class ImQaRunner {
             }
             IncomingMessage msg = task.msg;
             QaAttach attach = task.attach(entry);
-            // 附件准备（下载 + 解析，对齐 Go prepareIMAttachments）；失败按固定文案回复并终止。
+            // 附件准备（下载 + 解析）；失败按固定文案回复并终止。
             ImAttachmentPreparer.Prepared prepared;
             try {
                 prepared = service.attachmentPreparer.prepare(msg, attach.adapter());
@@ -73,7 +73,7 @@ final class ImQaRunner {
                         new ReplyMessage("❌ 无法读取此附件，请重试或改用文字描述。", false, true));
                 return;
             }
-            // 附件异步入渠道绑定的知识库（后台工作，无用户可见通知；对齐 Go）
+            // 附件异步入渠道绑定的知识库（后台工作，无用户可见通知）
             service.ingestAttachmentToKnowledgeBase(attach.channel(), prepared);
             boolean streamDisabled = "full".equals(attach.channel().getOutputMode());
 
@@ -110,7 +110,7 @@ final class ImQaRunner {
         } finally {
             service.inflight.remove(task.userKey);
             service.unbindInflight(task.userKey);
-            // 释放取消标志：让本轮的 stop watcher 退出（对齐 Go 的 defer req.cancel）
+            // 释放取消标志：让本轮的 stop watcher 退出
             req.cancel();
             TenantContext.clear();
         }

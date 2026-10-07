@@ -19,7 +19,7 @@ import com.ragagent.llm.chat.LlmTransport;
  *   <li>超时：{@code VLM_HTTP_TIMEOUT_SECONDS}（正整数秒）缺省 180s；</li>
  *   <li>鉴权：{@code Authorization: Bearer <apiKey>}；</li>
  *   <li>非 2xx 错误文案走 OpenAI 错误报文仿真
- *       （{@link AsrTranscriber.OpenAiAsrTranscriber#goOpenAiError}）——
+ *       （{@link AsrTranscriber.OpenAiAsrTranscriber#openAiErrorText}）——
  *       与 ASR 共用同一套字节契约；</li>
  *   <li>网络层错误：{@code Post "<url>": <cause>} 形态。</li>
  * </ul>
@@ -53,7 +53,7 @@ public class VlmHttpTransport implements VlmClient.Transport {
         }
         if (resp.statusCode() != 200) {
             throw new RuntimeException(
-                    AsrTranscriber.OpenAiAsrTranscriber.goOpenAiError(resp.statusCode(), respBody));
+                    AsrTranscriber.OpenAiAsrTranscriber.openAiErrorText(resp.statusCode(), respBody));
         }
         return new String(respBody, StandardCharsets.UTF_8);
     }

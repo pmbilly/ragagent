@@ -23,7 +23,7 @@ public final class ImageInfoMatchUtil {
     }
 
     /**
-     * 取 content 中文档级 rune 偏移落在
+     * 取 content 中文档级码点偏移落在
      * [rangeStart, rangeEnd) 的子串。contentStartAt 是 content 起点的文档偏移。
      */
     public static String sliceContentByDocumentRange(String content, int contentStartAt,
@@ -103,7 +103,7 @@ public final class ImageInfoMatchUtil {
 
     /**
      * 父内容为扩上下文而展开时，只保留图片引用
-     * 落在文档 rune 区间 [matchStart, matchEnd) 内的 image_info 条目。
+     * 落在文档码点区间 [matchStart, matchEnd) 内的 image_info 条目。
      */
     public static String filterImageInfoByMatchRange(String parentContent, int parentStartAt,
                                                      int matchStart, int matchEnd,
@@ -130,7 +130,7 @@ public final class ImageInfoMatchUtil {
     }
 
     /**
-     * 删除文档级 rune 偏移落在
+     * 删除文档级码点偏移落在
      * [matchStart, matchEnd) 之外的 Markdown 图片；非图片文本全保留
      * （父子展开仍提供完整文字上下文，只丢无关页缩略图）。
      */

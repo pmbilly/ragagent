@@ -13,14 +13,13 @@ import com.ragagent.llm.domain.TokenUsage;
 import org.junit.jupiter.api.Test;
 
 /**
- * 流事件的 JSON 字节形状——**期望值全部是实测 Go 出来的**，不是照直觉写的。
+ * 流事件的 JSON 字节形状——**期望值全部来自录制实测**，不是照直觉写的。
  *
- * <p>录制方式：把 {@code interfaces.StreamEvent} / {@code liveRunPayload} 的定义抄进一个
- * 独立 Go 程序跑 {@code json.Marshal}。之所以不直接调仓库里的类型，是因为 Go 仓在本项目里
- * 是只读对照。</p>
+ * <p>录制方式：把事件结构的定义抄进一个独立程序，跑录制期序列化产出期望字节——
+ * 期望值不取自本仓代码，基准独立于实现。</p>
  *
- * <p>为什么值得逐字节钉死：这些 JSON 落的是 Go 与 Java <b>共用</b>的 Redis 键，且
- * {@code ClearLiveRun} / {@code UpdateSteerEventData} 都在原始字节上做 CAS 比对。</p>
+ * <p>为什么值得逐字节钉死：这些 JSON 落在 Redis 键里，且 {@code clearLiveRun} /
+ * {@code updateSteerEventData} 都在原始字节上做 CAS 比对。</p>
  */
 class StreamJsonTest {
 

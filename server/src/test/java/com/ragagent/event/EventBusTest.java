@@ -123,7 +123,7 @@ class EventBusTest {
 
     @Test
     void asyncEmitReturnsImmediatelyAndRunsAllHandlers() throws Exception {
-        // 录制期望：asyncEmitReturnsNil => <nil>；handler 在 goroutine 里完成
+        // 录制期望：异步 emit 返回 <nil>；handler 在后台线程里完成
         EventBus bus = new EventBus(true);
         CountDownLatch done = new CountDownLatch(1);
         AtomicBoolean panicked = new AtomicBoolean(false);
@@ -179,7 +179,7 @@ class EventBusTest {
 
     @Test
     void emitAndWaitRunsHandlersConcurrently() {
-        // 录制期望：emitAndWaitConcurrent => err=nil, allRan=true——barrier 证明三个 handler
+        // 录制期望：EmitAndWait 并发 => err=nil, allRan=true——barrier 证明三个 handler
         // 是并发执行（顺序执行会在 barrier 上死锁超时）
         EventBus bus = new EventBus();
         CyclicBarrier barrier = new CyclicBarrier(3);

@@ -25,12 +25,12 @@ public record McpAuthConfigResponse( String authType, String apiKeyHeader, Map<S
         if (c == null) {
             return null;
         }
-        // Go omitempty：零值 MCPAuthNone（""）不输出
+        // 缺省值 MCPAuthNone（""）不输出
         McpAuthType authType = c.getAuthType() == null ? McpAuthType.NONE : c.getAuthType();
         return new McpAuthConfigResponse(
                 emptyToNull(authType.value()),
                 emptyToNull(c.getApiKeyHeader()),
-                // Go omitempty 对 map：nil 与空 map 都省略
+                // null 与空 map 都省略
                 includeDetail && c.getCustomHeaders() != null && !c.getCustomHeaders().isEmpty()
                         ? new LinkedHashMap<>(c.getCustomHeaders()) : null,
                 c.getScopes() == null || c.getScopes().isEmpty() ? null : List.copyOf(c.getScopes()),

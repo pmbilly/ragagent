@@ -59,7 +59,6 @@ class AuditLogRetentionTest {
     // ── Purge ────────────────────────────────────────────────────────────
 
     /**
-     * 对照 {@code TestAuditLog_Purge_NoOpWhenRetentionDisabled}：
      * retention_days &lt;= 0 必须在碰仓储<b>之前</b>短路。否则"关掉"的配置仍会每天
      * 发一条 {@code created_at < cutoff} 的 DELETE，而 cutoff = now() 会静默清空全表。
      */
@@ -76,7 +75,6 @@ class AuditLogRetentionTest {
     }
 
     /**
-     * 对照 {@code TestAuditLog_Purge_UsesClockMinusRetention}：
      * 喂给仓储的 cutoff 必须<b>恰好</b>是时钟减去 retention_days × 24h。
      * 差一天会静默留下太多（表涨）或删掉太多（丢数据）。
      */
@@ -95,7 +93,7 @@ class AuditLogRetentionTest {
     }
 
     /**
-     * 对照 {@code TestAuditLog_Purge_PropagatesRepoError}：保留期失败必须冒到 runner
+     * 保留期失败必须冒到 runner
      * （那里按 WARN 记）。静默吞掉错误会让降级的 DB 被掩盖好几天——下次清扫在 24h 后。
      */
     @Test
@@ -129,7 +127,6 @@ class AuditLogRetentionTest {
     }
 
     /**
-     * 对照 {@code TestAuditLogRetentionRunner_StartIsNoOpWhenDisabled}：
      * retention_days &lt;= 0 让循环保持休眠，且不能为它起线程。
      */
     @Test
@@ -144,7 +141,7 @@ class AuditLogRetentionTest {
         assertThat(repo.purges).hasValue(0);
     }
 
-    /** 对照 {@code TestAuditLogRetentionRunner_StopIsIdempotent}：二次 Stop 不能炸。 */
+    /** 二次 Stop 不能炸。 */
     @Test
     void stopIsIdempotent() {
         CountingRepo repo = new CountingRepo();
@@ -156,7 +153,7 @@ class AuditLogRetentionTest {
         runner.stop();
     }
 
-    /** 对照 {@code TestAuditLogRetentionRunner_StartIsIdempotent}：误调两次不能双跑。 */
+    /** 误调两次不能双跑。 */
     @Test
     void startIsIdempotent() {
         CountingRepo repo = new CountingRepo();
@@ -184,7 +181,6 @@ class AuditLogRetentionTest {
     }
 
     /**
-     * 对照 {@code TestAuditLogRetentionRunner_StopBeforeStart}：
      * 容器关停顺序可能让 Stop 早于 Start（早期初始化失败、测试清理）——
      * 必须当作 no-op 而不是阻塞在 done 上。
      */
@@ -199,9 +195,8 @@ class AuditLogRetentionTest {
     }
 
     /**
-     * 对照 {@code TestAuditLogRetentionRunner_PurgesOnTickerCadence}：
      * 把启动延迟塌成 0、间隔缩到 30ms，100ms 窗口内至少应有 2 次 Purge。
-     * 钉住"协程确实会随时间触发 Purge"这个头号行为，而<b>不</b>耦合具体次数
+     * 钉住"后台调度确实会随时间触发 Purge"这个头号行为，而<b>不</b>耦合具体次数
      * （那在慢 CI 上会 flaky）。
      */
     @Test
@@ -218,7 +213,6 @@ class AuditLogRetentionTest {
     }
 
     /**
-     * 对照 {@code TestAuditLogRetentionRunner_RunOnceLogsButDoesNotPanicOnError}：
      * runOnce 必须吞掉 Purge 错误——卡住的 DB 不该把异常冒出循环、拖垮应用。
      * 行为是"WARN 记一条，下个 tick 再试"。
      */
@@ -237,8 +231,7 @@ class AuditLogRetentionTest {
     }
 
     /**
-     * 对照 {@code TestAuditLogModel_HasCreatedAtField} 的等价保护：
-     * 保留期路径依赖 CreatedAt 存在（少了它 cutoff 过滤就会静默失效）。
+     * 等价保护：保留期路径依赖 CreatedAt 存在（少了它 cutoff 过滤就会静默失效）。
      */
     @Test
     void auditLogModelKeepsCreatedAtForRetentionPath() {

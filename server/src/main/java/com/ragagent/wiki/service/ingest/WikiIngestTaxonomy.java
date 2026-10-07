@@ -37,7 +37,7 @@ import com.ragagent.common.text.CodePointOrder;
  *   <li>{@link #resolvePlannedFolders} 把这些路径<b>顺序地</b>（在并行 reduce 之前）
  *       落实成 {@code wiki_folders} 行，返回 slug → folder id。</li>
  * </ol>
- * <p>这样并行的 reduce 阶段只"写入已解析好的 id"，永远不会有两个协程抢着创建
+ * <p>这样并行的 reduce 阶段只"写入已解析好的 id"，永远不会有两个线程抢着创建
  * 同一个目录。</p>
  */
 @Service
@@ -157,7 +157,7 @@ public class WikiIngestTaxonomy {
      * 逐 slug 路径落实成真实的 {@code wiki_folders} 行，返回 slug → folder id。
      *
      * <p>目录创建在这里、在并行 reduce 阶段<b>之前</b>、顺序完成，所以 reduce 只分配
-     * 已解析好的 id，永远不会有两个协程抢着创建同一个目录。不同路径只解析一次并缓存。
+     * 已解析好的 id，永远不会有两个线程抢着创建同一个目录。不同路径只解析一次并缓存。
      * 空路径（以及任何解析失败）映射到根目录，直接省略。</p>
      */
     public Map<String, String> resolvePlannedFolders(KnowledgeBase kb,

@@ -73,7 +73,7 @@ public class OidcService {
 
     /** 端点 SSRF 校验 */
     private void validateEndpoint(String label, String endpoint, boolean required) {
-        String ep = endpoint == null ? "" : UserService.goTrimSpace(endpoint);
+        String ep = endpoint == null ? "" : UserService.trimUnicodeWhitespace(endpoint);
         if (ep.isEmpty()) {
             if (required) {
                 throw new OidcException("OIDC " + label + " endpoint is required");
@@ -98,7 +98,7 @@ public class OidcService {
         RANDOM.nextBytes(nonceBytes);
         String nonce = Base64.getUrlEncoder().withoutPadding().encodeToString(nonceBytes);
 
-        String state = stateCodec.sign(nonce, UserService.goTrimSpace(redirectUri), 0);
+        String state = stateCodec.sign(nonce, UserService.trimUnicodeWhitespace(redirectUri), 0);
 
         // query 键按字母序
         StringBuilder query = new StringBuilder();
@@ -134,14 +134,14 @@ public class OidcService {
         if (sb.length() > 0) {
             sb.append('&');
         }
-        sb.append(goQueryEscape(key)).append('=').append(goQueryEscape(value));
+        sb.append(queryEscape(key)).append('=').append(queryEscape(value));
     }
 
     /**
      * Query 值转义：alnum 与 - _ . ~ 原样，空格 → +，
      * 其余按 UTF-8 字节 %XX（大写 hex）。注意 Java URLEncoder 会把 ~ 编成 %7E，不可用。
      */
-    static String goQueryEscape(String value) {
+    static String queryEscape(String value) {
         StringBuilder sb = new StringBuilder(value.length());
         for (byte b : value.getBytes(StandardCharsets.UTF_8)) {
             int c = b & 0xFF;
@@ -161,6 +161,6 @@ public class OidcService {
     private static final char[] HEX = "0123456789ABCDEF".toCharArray();
 
     private static boolean isBlank(String s) {
-        return s == null || UserService.goTrimSpace(s).isEmpty();
+        return s == null || UserService.trimUnicodeWhitespace(s).isEmpty();
     }
 }

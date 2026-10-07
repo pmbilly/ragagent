@@ -70,16 +70,16 @@ public class OidcStateCodec {
      * public 供契约测试签 state（测试需与录制脚本等价的入口）。
      */
     public String sign(String nonce, String redirectUri, long issuedAt) {
-        if (nonce == null || UserService.goTrimSpace(nonce).isEmpty()) {
+        if (nonce == null || UserService.trimUnicodeWhitespace(nonce).isEmpty()) {
             throw new IllegalArgumentException("oidc state nonce is required");
         }
-        if (redirectUri == null || UserService.goTrimSpace(redirectUri).isEmpty()) {
+        if (redirectUri == null || UserService.trimUnicodeWhitespace(redirectUri).isEmpty()) {
             throw new IllegalArgumentException("oidc state redirect_uri is required");
         }
         long iat = issuedAt == 0 ? Instant.now().getEpochSecond() : issuedAt;
         // 字段序 nonce, redirect_uri, iat（与既有签发方一致；redirect_uri 必填恒输出）
-        String raw = "{\"nonce\":" + goJsonString(nonce)
-                + ",\"redirect_uri\":" + goJsonString(redirectUri)
+        String raw = "{\"nonce\":" + jsonString(nonce)
+                + ",\"redirect_uri\":" + jsonString(redirectUri)
                 + ",\"iat\":" + iat + "}";
         byte[] rawBytes = raw.getBytes(StandardCharsets.UTF_8);
         return base64Url(rawBytes) + "." + base64Url(hmac(rawBytes));
@@ -87,7 +87,7 @@ public class OidcStateCodec {
 
     /** 校验并解码 state。 */
     public Payload verify(String rawState) {
-        String raw = rawState == null ? "" : UserService.goTrimSpace(rawState);
+        String raw = rawState == null ? "" : UserService.trimUnicodeWhitespace(rawState);
         String[] parts = raw.split("\\.", -1); // 全切（保留尾空段）
         if (parts.length != 2) {
             throw new StateException("invalid oidc state format");
@@ -116,7 +116,7 @@ public class OidcStateCodec {
         String nonce = node.path("nonce").isTextual() ? node.path("nonce").asText() : "";
         String redirectUri = node.path("redirect_uri").isTextual() ? node.path("redirect_uri").asText() : "";
         long iat = node.path("iat").isIntegralNumber() ? node.path("iat").asLong() : 0;
-        if (UserService.goTrimSpace(redirectUri).isEmpty()) {
+        if (UserService.trimUnicodeWhitespace(redirectUri).isEmpty()) {
             throw new StateException("state.redirect_uri is required");
         }
         if (iat == 0) {
@@ -148,7 +148,7 @@ public class OidcStateCodec {
      * 双引号/反斜杠与 0x20 以下控制字符转义（LF CR TAB 有短形式，其余为四位小写 hex 形式），
      * 另 & < > 与 U+2028/U+2029 也转义为各自的 hex 形式。
      */
-    static String goJsonString(String s) {
+    static String jsonString(String s) {
         StringBuilder sb = new StringBuilder(s.length() + 2);
         sb.append('"');
         for (int i = 0; i < s.length(); i++) {

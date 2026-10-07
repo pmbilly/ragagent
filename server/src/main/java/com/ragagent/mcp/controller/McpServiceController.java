@@ -146,14 +146,14 @@ public class McpServiceController {
 
     // ── 目录快照 ─────────────────────────────────────────────────────────
 
-    /** 对照 GetMCPMetadata — Viewer+；只读数据库，不连接上游 */
+    /** 权限 Viewer+；只读数据库，不连接上游 */
     @GetMapping("/{id}/metadata")
     public ResponseEntity<?> getMCPMetadata(@PathVariable("id") String id) {
         return mcpMetadata(id, false);
     }
 
     /**
-     * 对照 RefreshMCPMetadata — Viewer+（静态鉴权在 handler 内升到 Admin+）。
+     * 权限 Viewer+（静态鉴权在 handler 内升到 Admin+）。
      *
      * <p>路由保持 Viewer+ 是为了让 OAuth 用户在聊天里授权后能存自己的快照；
      * 静态鉴权写的是租户共享快照，故额外要求管理员。</p>
@@ -259,7 +259,7 @@ public class McpServiceController {
 
     // ── 工具审批策略 ─────────────────────────────────────────────────────
 
-    /** 对照 ListMCPToolApprovals — Viewer+ */
+    /** 权限 Viewer+。 */
     @GetMapping("/{id}/tool-approvals")
     public ResponseEntity<?> listMCPToolApprovals(@PathVariable("id") String id) {
         long tenantId = requireTenant();
@@ -280,7 +280,7 @@ public class McpServiceController {
     }
 
     /**
-     * 对照 SetMCPToolApproval — Admin+。
+     * 权限 Admin+。
      *
      * <p>路由名沿用历史上"只设审批"的端点；现在同时支持 enabled。
      * 两个字段至少提供一个，省略的字段保持原值。</p>

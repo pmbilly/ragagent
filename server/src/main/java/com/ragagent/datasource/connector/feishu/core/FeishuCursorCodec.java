@@ -23,9 +23,9 @@ import com.ragagent.datasource.domain.SyncCursor;
  *   drive  : {"last_sync_time":"2026-09-18T10:00:00+08:00",
  *             "file_times":{"folder1":{"fdoc1":"100"}}}
  * </pre>
- * <p>{@code space_node_times} / {@code file_times} 带 {@code omitempty}：
- * <b>空/缺席时该键整个消失</b>；非空时才是嵌套对象。{@code last_sync_time} 没有
- * omitempty，恒输出（零值写成 year-1 字面量）。</p>
+ * <p>{@code space_node_times} / {@code file_times} 为空省略：
+ * <b>空/缺席时该键整个消失</b>；非空时才是嵌套对象。{@code last_sync_time}
+ * 恒输出（零值写成 year-1 字面量）。</p>
  *
  * <h2>为什么不是 DTO + Jackson</h2>
  * <p>净效果就是"把游标摊成一张 map"，而 {@link SyncCursor#getConnectorCursor()} 要的正是
@@ -78,8 +78,8 @@ public final class FeishuCursorCodec {
     private static SyncCursor encode(Map<String, Map<String, String>> times, OffsetDateTime lastSync,
                                      String timesKey) {
         Map<String, Object> m = new LinkedHashMap<>();
-        m.put("last_sync_time", formatGoTime(lastSync));
-        // omitempty 语义：times 为空时整个键消失
+        m.put("last_sync_time", formatCursorTimestamp(lastSync));
+        // 为空省略：times 为空时整个键消失
         if (times != null && !times.isEmpty()) {
             Map<String, Object> nested = new LinkedHashMap<>();
             for (Map.Entry<String, Map<String, String>> e : times.entrySet()) {
@@ -128,7 +128,7 @@ public final class FeishuCursorCodec {
      * <p>与 {@link ZeroTimeSerializer#serialize} 的两行完全一致——见类注释里那条
      * "改动必须同步"的提醒。</p>
      */
-    static String formatGoTime(OffsetDateTime value) {
+    static String formatCursorTimestamp(OffsetDateTime value) {
         if (ZeroTimeSerializer.isZeroValue(value)) {
             return ZeroTimeSerializer.ZERO_TIME_LITERAL;
         }

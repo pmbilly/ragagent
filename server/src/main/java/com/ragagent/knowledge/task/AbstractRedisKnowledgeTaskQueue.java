@@ -22,7 +22,7 @@ import com.ragagent.common.taskqueue.RedisTaskQueueCore;
  * Redis 版把任务表放到跨实例共享的 ready/proc 双 ZSET
  * （见 {@link RedisTaskQueueCore}）：任何实例都可执行，取走任务的实例崩溃后
  * 租约过期即被回收重投（至少一次语义——重复执行由下游的 finalizing 槽与
- * Housekeeping 判死兜底，与 Go asynq 队列的取舍一致）。</p>
+ * Housekeeping 判死兜底）。</p>
  */
 abstract class AbstractRedisKnowledgeTaskQueue {
 

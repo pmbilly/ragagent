@@ -53,7 +53,7 @@ final class UserSessionOps {
             throw new UserService.LogoutException("invalid token");
         }
         Object raw = claims.get("user_id");
-        if (!(raw instanceof String userId) || UserService.goTrimSpace(userId).isEmpty()) {
+        if (!(raw instanceof String userId) || UserService.trimUnicodeWhitespace(userId).isEmpty()) {
             throw new UserService.LogoutException("invalid user ID in token");
         }
         return userId;

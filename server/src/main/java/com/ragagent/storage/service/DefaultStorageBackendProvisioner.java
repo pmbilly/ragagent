@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 /**
  * {@link StorageBackendProvisioner} 的实现——「env 快照 → 存储后端实体/config JSON → 落库」。
  *
- * <p>本类整体由 {@code auth/service/TenantService} 搬来（含 Java↔Go 对照注释与键序契约），
+ * <p>本类整体由 {@code auth/service/TenantService} 搬来，
  * 只做了一处形态变化：原先私有的 {@code createDefaultStorageBackend} 被拆成
  * "端口方法 {@link #provisionForTenant} + 事务编排留在 auth"——编排里的租户行回写
  * 不是存储域的职责。</p>

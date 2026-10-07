@@ -196,7 +196,7 @@ final class GrepChunksScoring {
         Map<String, Boolean> set = new LinkedHashMap<>();
         for (String w : t.split("\\s+")) {
             w = w.trim();
-            // 保留 rune 数 > 1 且非全标点的词
+            // 保留码点数 > 1 且非全标点的词
             if (w.codePointCount(0, w.length()) > 1 && !isAllPunct(w)) {
                 set.put(w, Boolean.TRUE);
             }

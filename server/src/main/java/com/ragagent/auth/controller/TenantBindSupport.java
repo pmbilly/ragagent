@@ -21,7 +21,7 @@ final class TenantBindSupport {
             .configure(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
     /** JSON 值种别（legacy 绑定错误文案用）。 */
-    static String goJsonKind(com.fasterxml.jackson.databind.JsonNode node) {
+    static String jsonKindName(com.fasterxml.jackson.databind.JsonNode node) {
         if (node.isTextual()) return "string";
         if (node.isBoolean()) return "bool";
         if (node.isArray()) return "array";
@@ -30,12 +30,12 @@ final class TenantBindSupport {
     }
 
     /** string 字段类型检查；违规返回 legacy 绑定错误原文，否则 null。 */
-    static String goStringField(com.fasterxml.jackson.databind.JsonNode root, String field) {
+    static String stringFieldValue(com.fasterxml.jackson.databind.JsonNode root, String field) {
         com.fasterxml.jackson.databind.JsonNode node = root.get(field);
         if (node == null || node.isNull() || node.isTextual()) {
             return null;
         }
-        return "json: cannot unmarshal " + goJsonKind(node)
+        return "json: cannot unmarshal " + jsonKindName(node)
                 + " into Go struct field updateTenantRequest." + field + " of type string";
     }
     // ── 绑定与错误形态（对照 AuthController 的既有模式） ─────────────────────

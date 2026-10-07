@@ -49,7 +49,7 @@ public final class StorageObjects {
         return base;
     }
 
-    /** 近似 Go {@code filepath.Clean} 的词法折叠：去空段与 {@code .}、解析 {@code ..}。 */
+    /** 路径词法规范化（近似语义，非完整实现）：去空段与 {@code .}、解析 {@code ..}。 */
     private static String cleanPath(String path) {
         boolean absolute = path.startsWith("/");
         java.util.ArrayDeque<String> out = new java.util.ArrayDeque<>();
@@ -70,7 +70,7 @@ public final class StorageObjects {
         return (absolute ? "/" : "") + String.join("/", out);
     }
 
-    /** 对照 {@code SafeObjectKey}：路径遍历一律拒绝（S3 的 key 允许 {@code /}）。 */
+    /** 路径遍历一律拒绝（S3 的 key 允许 {@code /}）。 */
     public static void safeObjectKey(String objectKey) {
         if (objectKey == null || objectKey.isEmpty()) {
             throw new IllegalArgumentException("object key cannot be empty");
@@ -80,12 +80,12 @@ public final class StorageObjects {
         }
     }
 
-    /** 对照 {@code IsActiveBrowserContentExt}。 */
+    /** 主动内容扩展名判定（见 {@link #ACTIVE_EXTS}）。 */
     public static boolean isActiveBrowserContentExt(String ext) {
         return ACTIVE_EXTS.contains(ext == null ? "" : ext.toLowerCase(Locale.ROOT));
     }
 
-    /** 对照 {@code GetContentTypeByExt}：主动内容 → octet-stream，其余按扩展名表。 */
+    /** 扩展名 → Content-Type：主动内容 → octet-stream，其余按扩展名表。 */
     public static String contentTypeByExt(String ext) {
         String e = ext == null ? "" : ext.toLowerCase(Locale.ROOT);
         if (isActiveBrowserContentExt(e)) {
@@ -124,7 +124,7 @@ public final class StorageObjects {
         };
     }
 
-    /** 对照 {@code filepath.Ext}：最后一个点之后（含点）；点在同级分隔符之前则视为无扩展名。 */
+    /** 含点扩展名：最后一个点之后（含点）；点在同级分隔符之前则视为无扩展名。 */
     public static String extensionOf(String name) {
         if (name == null) {
             return "";

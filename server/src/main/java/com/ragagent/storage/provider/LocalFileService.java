@@ -36,7 +36,7 @@ public class LocalFileService implements FileService {
     /** {@code local://} 前缀。 */
     public static final String LOCAL_SCHEME = "local://";
 
-    /** 预签名接缝（对照 {@code utils.SignFileURL}）：未注入 = 未接线，返回 provider 路径。 */
+    /** 预签名接缝：未注入 = 未接线，返回 provider 路径。 */
     public interface UrlSigner {
         String sign(String baseUrl, String filePath, long tenantId, long ttlSeconds);
     }
@@ -175,9 +175,9 @@ public class LocalFileService implements FileService {
         return normalized;
     }
 
-    // ── 内部：路径处理（对照 normalizePathForBase / SafePathUnderBase / SafeFileName） ──
+    // ── 内部：路径处理 ──
 
-    /** 对照 {@code normalizePathForBase}：provider scheme / 绝对路径 / base 下相对 / 遗留带前缀。 */
+    /** provider scheme / 绝对路径 / base 下相对 / 遗留带前缀。 */
     Path normalizePathForBase(String filePath) {
         String p = filePath == null ? "" : filePath.trim();
         if (p.startsWith(LOCAL_SCHEME)) {
@@ -200,7 +200,7 @@ public class LocalFileService implements FileService {
         return baseDir.resolve(rel);
     }
 
-    /** 对照 {@code SafePathUnderBase}：解析结果必须落在 baseDir 之内。 */
+    /** 解析结果必须落在 baseDir 之内。 */
     private Path safeUnderBase(Path candidate) {
         Path resolved = candidate.toAbsolutePath().normalize();
         if (!resolved.startsWith(baseDir)) {
@@ -209,12 +209,12 @@ public class LocalFileService implements FileService {
         return resolved;
     }
 
-    /** 对照 {@code SafeFileName}（取 basename；见 {@link StorageObjects#safeFileName}）。 */
+    /** 取 basename；见 {@link StorageObjects#safeFileName}。 */
     static String safeFileName(String fileName) {
         return StorageObjects.safeFileName(fileName);
     }
 
-    /** 对照 {@code ParseTenantIDFromStoragePath}：从 {@code local://{tenant}/{...}} 取租户 id。 */
+    /** 从 {@code local://{tenant}/{...}} 取租户 id。 */
     static long parseTenantIdFromStoragePath(String path) {
         String p = path == null ? "" : path;
         if (p.startsWith(LOCAL_SCHEME)) {

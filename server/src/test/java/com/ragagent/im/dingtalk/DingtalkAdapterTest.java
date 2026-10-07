@@ -409,7 +409,7 @@ class DingtalkAdapterTest {
         assertEquals(ImTypes.PLATFORM_DINGTALK, reg.adapter().platform());
         assertNull(reg.stop());
 
-        // websocket（Go 默认模式）：HTTP 适配器照建 + WS 长连接 + stop 句柄
+        // websocket 模式：HTTP 适配器照建 + WS 长连接 + stop 句柄
         ImChannelEntity ws = new ImChannelEntity();
         ws.setId("ch-2");
         ws.setMode("websocket");

@@ -298,7 +298,7 @@ public class TenantInvitationController {
             member = invitationService.acceptByToken(token, caller);
         } catch (TenantRbacException e) {
             if (e.kind() == TenantRbacException.Kind.INVITATION_TOKEN_INVALID) {
-                // 无效/过期/撤销统一 410 Gone（对照 LookupInvitationByToken）
+                // 无效/过期/撤销统一 410 Gone
                 throw new BizException(new AppError(
                         com.ragagent.common.error.ErrorCode.NOT_FOUND.value(),
                         "invitation link is invalid or has been revoked", null, 410));
@@ -334,7 +334,7 @@ public class TenantInvitationController {
     }
 
     /**
-     * 对照 autoAcceptInvitationAndRespond：直加成员 → 对账 stale pending 行 →
+     * 直加成员 → 对账 stale pending 行 →
      * 无空间用户采纳默认空间（失败 → 500 "member added but default workspace update failed"，
      * 成员行**已**写入）→ 201 成员结构。
      */
@@ -356,7 +356,7 @@ public class TenantInvitationController {
     }
 
     /**
-     * 对照 Accept/AcceptByToken 的尾部：tenantless 账户把首个接受的空间设为默认
+     * tenantless 账户把首个接受的空间设为默认
      * （成员关系才是授权来源；TenantID 只供登录/导航缺省）。更新失败 → 500。
      */
     private void adoptHomeTenantIfTenantless(String caller, TenantMember member) {
@@ -373,7 +373,7 @@ public class TenantInvitationController {
         }
     }
 
-    /** 对照 projectInvitation：inviter/invitee/tenant 字段尽力 hydrate，缺失降级为 id */
+    /** inviter/invitee/tenant 字段尽力 hydrate，缺失降级为 id */
     static TenantInvitationResponse projectInvitation(TenantInvitation inv,
                                                       Map<String, User> usersById,
                                                       Map<Long, Tenant> tenantsById) {
@@ -404,7 +404,7 @@ public class TenantInvitationController {
     }
 
     /**
-     * 对照 projectInvitationWithLink：仍处 pending 的 share-link 行附 invite_url
+     * 仍处 pending 的 share-link 行附 invite_url
      * （FrontendBaseURL 缺省 → 宿主相对 "/register?token=…"，SPA 自行解析 origin）。
      * 收件箱路径**不**走这里（per-user 邀请没有可复制的 token）。
      */
@@ -425,7 +425,7 @@ public class TenantInvitationController {
     }
 
     /**
-     * 对照 frontendBaseURLFor：配置属性 → 请求时 env（运维免重启滚动）→ 空串；
+     * 配置属性 → 请求时 env（运维免重启滚动）→ 空串；
      * 去尾斜杠。Java 侧 Environment.getProperty 同时覆盖 yaml 属性与
      * FRONTEND_BASE_URL 环境变量（viper 绑定 + 运行时 env 的净效果一致）。
      */
@@ -438,7 +438,7 @@ public class TenantInvitationController {
         return out;
     }
 
-    /** 对照 hydrateUsers：invitee + inviter 的并集批量查；失败降级空 map */
+    /** invitee + inviter 的并集批量查；失败降级空 map */
     private Map<String, User> hydrateUsers(List<TenantInvitation> invs) {
         Map<String, User> out = new HashMap<>();
         if (invs == null || invs.isEmpty()) {
@@ -460,7 +460,7 @@ public class TenantInvitationController {
         }
     }
 
-    /** 对照 hydrateTenants：/me 视图跨空间，需要租户名 */
+    /** /me 视图跨空间，需要租户名 */
     private Map<Long, Tenant> hydrateTenants(List<TenantInvitation> invs) {
         Map<Long, Tenant> out = new HashMap<>();
         if (invs == null || invs.isEmpty()) {
@@ -477,12 +477,12 @@ public class TenantInvitationController {
         }
     }
 
-    /** 对照 ListTenantInvitations 的 showShareLinks：调用方角色 ≥ Owner */
+    /** showShareLinks：调用方角色 ≥ Owner */
     private boolean currentRoleHasOwner() {
         return TenantRole.fromString(TenantContext.currentRole()).hasPermission(TenantRole.OWNER);
     }
 
-    /** 对照 accept-by-token 的绑定：token required（validator 原文进 details） */
+    /** token required（validator 原文进 details） */
     private static void requireToken(JsonNode body) {
         JsonNode n = body.get("token");
         boolean missing = n == null || n.isNull() || (n.isTextual() && n.asText().isEmpty());

@@ -21,7 +21,7 @@ import com.ragagent.session.domain.MessageAttachment;
 import com.ragagent.session.service.QaSupport;
 
 /**
- * IM 文件/图片附件的下载与解析（对齐 Go internal/im 的 prepareIMAttachments）。
+ * IM 文件/图片附件的下载与解析。
  *
  * <ul>
  *   <li>附件上限 32 MiB（平台上报大小与实际字节各拦一次）；图片直发 vision 上限 8 MiB；</li>
@@ -35,13 +35,13 @@ final class ImAttachmentPreparer {
 
     private static final Logger log = LoggerFactory.getLogger(ImAttachmentPreparer.class);
 
-    /** 附件上限（Go {@code maxIMAttachmentBytes}）。 */
+    /** 附件上限。 */
     static final long MAX_ATTACHMENT_BYTES = 32L << 20;
-    /** 图片直发 vision 的上限（Go {@code maxIMVisionAttachmentBytes}）。 */
+    /** 图片直发 vision 的上限。 */
     static final long MAX_VISION_BYTES = 8L << 20;
-    /** 解析文本的行数上限（Go {@code maxIMAttachmentLines}）。 */
+    /** 解析文本的行数上限。 */
     static final int MAX_CONTENT_LINES = 500;
-    /** 解析文本的字节上限（Go {@code maxIMAttachmentContentBytes}）。 */
+    /** 解析文本的字节上限。 */
     static final int MAX_CONTENT_BYTES = 32 << 10;
     /** 文本类扩展名（不带点；直接 UTF-8 读，不经 docreader）。 */
     private static final Set<String> TEXT_EXTENSIONS = Set.of(
@@ -165,7 +165,7 @@ final class ImAttachmentPreparer {
         }
     }
 
-    /** 解析文本按 32 KiB / 500 行截断（对齐 Go applyIMAttachmentTruncation）。 */
+    /** 解析文本按 32 KiB / 500 行截断。 */
     static void applyTruncation(String content, MessageAttachment attachment) {
         attachment.setLineCount((int) content.chars().filter(c -> c == '\n').count() + 1);
         String limited = truncateUtf8ByBytes(content, MAX_CONTENT_BYTES);
@@ -177,7 +177,7 @@ final class ImAttachmentPreparer {
         attachment.setTruncated(limited.length() < content.length());
     }
 
-    /** 按字节截断到 UTF-8 字符边界（对齐 Go truncateUTF8ByBytes）。 */
+    /** 按字节截断到 UTF-8 字符边界。 */
     static String truncateUtf8ByBytes(String content, int maxBytes) {
         byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
         if (bytes.length <= maxBytes) {
@@ -203,7 +203,7 @@ final class ImAttachmentPreparer {
     }
 
     /**
-     * 按魔数识别内容类型（对齐 Go {@code http.DetectContentType} 的图片子集；
+     * 按魔数识别内容类型（图片子集；
      * 认不出按 {@code application/octet-stream} 兜底，供错误文案使用）。
      */
     static String detectContentType(byte[] d) {

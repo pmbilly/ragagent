@@ -20,12 +20,12 @@ public final class PromptInstructions {
      * （系统规则在前、声明只在无冲突时适用）。
      */
     public static String appendCustomPromptInstructions(String prompt, String instructions, String label) {
-        String trimmedInstructions = goTrimSpace(instructions == null ? "" : instructions);
+        String trimmedInstructions = trimUnicodeWhitespace(instructions == null ? "" : instructions);
         if (trimmedInstructions.isEmpty()) {
             return prompt;
         }
         String effectiveLabel = (label == null || label.isEmpty()) ? "custom" : label;
-        return goTrimSpace(prompt == null ? "" : prompt)
+        return trimUnicodeWhitespace(prompt == null ? "" : prompt)
                 + "\n\n<" + effectiveLabel + "_business_instructions>\n"
                 + trimmedInstructions
                 + "\n</" + effectiveLabel + "_business_instructions>\n"
@@ -34,22 +34,22 @@ public final class PromptInstructions {
     }
 
     /** 按 unicode 空白全集 trim（比 {@code String.trim} 覆盖更广）。 */
-    static String goTrimSpace(String s) {
+    static String trimUnicodeWhitespace(String s) {
         if (s == null) {
             return "";
         }
         int start = 0;
         int end = s.length();
-        while (start < end && isGoSpace(s.charAt(start))) {
+        while (start < end && isUnicodeWhitespace(s.charAt(start))) {
             start++;
         }
-        while (end > start && isGoSpace(s.charAt(end - 1))) {
+        while (end > start && isUnicodeWhitespace(s.charAt(end - 1))) {
             end--;
         }
         return s.substring(start, end);
     }
 
-    private static boolean isGoSpace(char c) {
+    private static boolean isUnicodeWhitespace(char c) {
         switch (c) {
             case '\t': case '\n': case '\u000B': case '\f': case '\r':
             case ' ': case '\u0085': case '\u00A0': case '\u1680':

@@ -287,7 +287,7 @@ final class ToolPolicy {
         if (value == null) {
             return raw;
         }
-        value = JsonValues.goFloatTree(value);
+        value = JsonValues.numbersAsDouble(value);
         value = walkJSONValue("", value, rewrite);
         return ToolJson.write(value);
     }

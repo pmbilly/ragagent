@@ -63,7 +63,7 @@ public class MessageSuggestionSet {
 
     private String suppressionReason = "";
 
-    /** **无 omitempty**：恒输出（nil 时 Go 输出 {@code []}，见 BeforeCreate）。 */
+    /** **恒输出**：序列化不省略该字段；null 在落库前经 {@link #normalizeForInsert()} 兜底成 {@code []}。 */
     @TableField(value = "questions", typeHandler = SuggestionItemListTypeHandler.class)
     private List<SuggestionItem> questions;
 

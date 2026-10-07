@@ -270,7 +270,6 @@ public final class SteerSinkBridge implements SteerSink {
         }
     }
 
-    /** 对照 rawToMentionedItems / types.MentionedItemsFromRaw。 */
     static List<MentionedItem> toMentionedItems(Object raw) {
         return MentionedItem.fromRawList(raw);
     }

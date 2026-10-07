@@ -119,8 +119,8 @@ class StorageWriteFaceContractTest {
                 .isInstanceOf(java.io.IOException.class);
         assertThatThrownBy(() -> LocalFileContentService.safeFileName(null))
                 .isInstanceOf(java.io.IOException.class);
-        // Go 语义：Base(Clean("../escape.md")) = "escape.md" 合法（写死在 exports 下，
-        // 穿越不成立）；Base 含 ".." 才拒
+        // "../escape.md" → 取基名 "escape.md" 合法（文件写死在 exports 下，
+        // 穿越不成立）；基名含 ".." 才拒
         assertThat(LocalFileContentService.safeFileName("../escape.md")).isEqualTo("escape.md");
         assertThat(LocalFileContentService.safeFileName("sub/dir.md")).isEqualTo("dir.md");
         assertThatThrownBy(() -> LocalFileContentService.safeFileName("a..b.md"))

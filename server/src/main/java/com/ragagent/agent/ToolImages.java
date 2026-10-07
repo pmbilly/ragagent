@@ -58,7 +58,7 @@ public final class ToolImages {
                 List<String> descriptions = new java.util.ArrayList<>();
                 if (raw != null) {
                     for (String d : raw) {
-                        String t = d == null ? "" : com.ragagent.agent.compaction.ConversationSerializer.goTrimSpace(d);
+                        String t = d == null ? "" : com.ragagent.agent.compaction.ConversationSerializer.trimUnicodeWhitespace(d);
                         if (!t.isEmpty()) {
                             descriptions.add(t);
                         }

@@ -115,7 +115,7 @@ class ChunkerPreviewContractTest {
                 "not-json"), 400, "cprev-bad-body.json");
         assertGolden(json(post("/api/v1/chunker/preview").header("Authorization", owner),
                 "{\"text\":\"   \"}"), 400, "cprev-empty-text.json");
-        // 70000 个 'x'（> 64k rune 上限）→ 413 三键裸错误体
+        // 70000 个 'x'（> 64k 码点上限）→ 413 三键裸错误体
         String oversize = "{\"text\":\"" + "x".repeat(70000) + "\"}";
         assertGolden(json(post("/api/v1/chunker/preview").header("Authorization", owner), oversize),
                 413, "cprev-oversize.json");

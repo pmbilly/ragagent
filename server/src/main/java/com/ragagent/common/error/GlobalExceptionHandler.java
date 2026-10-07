@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Go handler 直写的纯字符串错误形态（{@code c.JSON(status, gin.H{"error": msg})}），
+     * handler 直写的纯字符串错误形态（{@code {"error": msg}}），
      * 状态码随异常携带——system admin 组的 promote/revoke/reset-password 等大量使用。
      * 与 {@link #handleGuardForbidden(GuardForbiddenException)} 同族（那边恒 403 且
      * 消息带 "Forbidden: " 前缀），这边按消息原文原样输出。

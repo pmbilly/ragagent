@@ -164,7 +164,7 @@ class EngineRegistryTest {
     @DisplayName("GetOrLoadByStoreID（按需重建）")
     class Rehydrate {
 
-        /** 对照 {@code blockingFactory}：构建会阻塞（模拟拨号），可被逐个观测。 */
+        /** 构建会阻塞（模拟拨号），可被逐个观测。 */
         private static final class BlockingFactory implements StoreEngineFactory {
             final CountDownLatch entered = new CountDownLatch(1);
             final CountDownLatch release = new CountDownLatch(1);

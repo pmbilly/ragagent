@@ -52,7 +52,7 @@ import org.springframework.stereotype.Service;
  *   <li>凭据写入后**必须**关闭该服务的活动连接，否则下一次上游调用仍带旧凭据。</li>
  * </ol>
  *
- * <p>协议客户端（{@code com.ragagent.mcp.protocol}，对照 internal/mcp/*）由协议模块提供；
+ * <p>协议客户端（{@code com.ragagent.mcp.protocol}）由协议模块提供；
  * 本层只通过 {@link McpClientFactory} / {@link McpClientManager} 使用它。
  * 两者都可缺省装配（{@code Optional}）：协议模块未接线时服务仍能启动，
  * 只有真的去连 MCP 服务时才会报"not available"。</p>
@@ -95,7 +95,7 @@ public class McpServiceService {
     // ── 创建 / 读取 ──────────────────────────────────────────────────────
 
     /**
-     * 对照 CreateMCPService：stdio 硬拒绝 → 出站 URL SSRF 校验 → 默认高级配置 → 落库。
+     * stdio 硬拒绝 → 出站 URL SSRF 校验 → 默认高级配置 → 落库。
      *
      * <p>SSRF 校验在 service 层与 handler 层各做一次：handler 负责给用户
      * 友好的 400 文案，service 层保证"无论谁调用都过不了"。此处的失败按
@@ -122,7 +122,7 @@ public class McpServiceService {
         mcpServiceMapper.insert(service);
     }
 
-    /** 对照 GetMCPServiceByID：**返回未脱敏实体**；不存在 → "MCP service not found" */
+    /** **返回未脱敏实体**；不存在 → "MCP service not found" */
     public McpService getMCPServiceByID(long tenantId, String id) {
         McpService service = mcpServiceMapper.getByIdForTenant(tenantId, id);
         if (service == null) {
@@ -131,17 +131,17 @@ public class McpServiceService {
         return service;
     }
 
-    /** 对照 repo.GetByID 的裸查询：不存在返回 null（内部/可选场景用） */
+    /** 裸查询：不存在返回 null（内部/可选场景用） */
     public McpService findByID(long tenantId, String id) {
         return mcpServiceMapper.getByIdForTenant(tenantId, id);
     }
 
-    /** 对照 ListMCPServices：同样返回未脱敏实体 */
+    /** 同样返回未脱敏实体 */
     public List<McpService> listMCPServices(long tenantId) {
         return mcpServiceMapper.listForTenant(tenantId);
     }
 
-    /** 对照 ListMCPServicesByIDs：空 ids 直接返回空列表（不查库） */
+    /** 空 ids 直接返回空列表（不查库） */
     public List<McpService> listMCPServicesByIDs(long tenantId, List<String> ids) {
         if (ids == null || ids.isEmpty()) {
             return List.of();
@@ -149,7 +149,7 @@ public class McpServiceService {
         return mcpServiceMapper.listByIdsForTenant(tenantId, ids);
     }
 
-    /** 对照 ListMCPMetadataSummaries（实现在 McpMetadataService，此处转发以对齐接口形状） */
+    /** 实现在 McpMetadataService，此处转发以对齐接口形状 */
     public Map<String, McpMetadataSummary> listMCPMetadataSummaries(long tenantId,
                                                                     List<McpService> services) {
         return metadataService.listMCPMetadataSummaries(tenantId, services);
@@ -218,7 +218,7 @@ public class McpServiceService {
         String preApiKeyHeader = existing.getAuthConfig() == null
                 ? "" : nullToEmpty(existing.getAuthConfig().getApiKeyHeader());
 
-        // CustomHeaders 走主 PUT（结构性、非秘密）：nil 保持、非 nil 替换。
+        // CustomHeaders 走主 PUT（结构性、非秘密）：null 保持、非 null 替换。
         // auth_type / scopes / auth_server_metadata_url 也是非秘密配置，同样在此合并。
         if (service.getAuthConfig() != null) {
             if (existing.getAuthConfig() == null) {
@@ -339,7 +339,7 @@ public class McpServiceService {
 
     // ── 删除 ─────────────────────────────────────────────────────────────
 
-    /** 对照 DeleteMCPService：builtin 拒绝；先关连接再软删 */
+    /** builtin 拒绝；先关连接再软删 */
     public void deleteMCPService(long tenantId, String id) {
         McpService existing = mcpServiceMapper.getByIdForTenant(tenantId, id);
         if (existing == null) {
@@ -356,7 +356,7 @@ public class McpServiceService {
     // ── 连接测试 / 工具 / 资源 ────────────────────────────────────────────
 
     /**
-     * 对照 mcpTestFailure：把普通连接错误升级为显式的 "OAuth required" 信号
+     * 把普通连接错误升级为显式的 "OAuth required" 信号
      * （服务端回了 RFC 9728 挑战），让 UI 引导用户改用 OAuth 策略。
      */
     static McpTestResult mcpTestFailure(RuntimeException err, String prefix) {
@@ -369,7 +369,7 @@ public class McpServiceService {
         return McpTestResult.fail(prefix + ": " + err.getMessage());
     }
 
-    /** 对照 TestMCPService：临时客户端；OAuth 服务接上按 principal 的 token 存储 */
+    /** 临时客户端；OAuth 服务接上按 principal 的 token 存储 */
     public McpTestResult testMCPService(long tenantId, String id) {
         McpService service = getMCPServiceByID(tenantId, id);
 
@@ -433,7 +433,7 @@ public class McpServiceService {
         }
     }
 
-    /** 对照 GetMCPServiceTools：走缓存连接（manager 负责 connect + initialize） */
+    /** 走缓存连接（manager 负责 connect + initialize） */
     public List<McpTool> getMCPServiceTools(long tenantId, String id) {
         McpService service = getMCPServiceByID(tenantId, id);
         McpClient client;
@@ -449,7 +449,6 @@ public class McpServiceService {
         }
     }
 
-    /** 对照 GetMCPServiceResources */
     public List<McpResource> getMCPServiceResources(long tenantId, String id) {
         McpService service = getMCPServiceByID(tenantId, id);
         McpClient client;
@@ -468,8 +467,6 @@ public class McpServiceService {
     // ── 凭据子资源 ───────────────────────────────────────────────────────
 
     /**
-     * 对照 UpdateMCPCredentials。
-     *
      * <ul>
      *   <li>{@code apiKey == null && token == null} → 空操作，返回当前状态</li>
      *   <li>{@code apiKey == ""}（显式空串）→ **空操作**：清空是 ClearMCPCredential 的职责</li>
@@ -514,7 +511,7 @@ public class McpServiceService {
     }
 
     /**
-     * 对照 ClearMCPCredential：幂等——清一个本来为空的字段不写库、不重连。
+     * 幂等——清一个本来为空的字段不写库、不重连。
      *
      * @param field 只接受 "apiKey" / "token"，其它值报 unknown credential field
      */

@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 
 /**
- * IM 平台标识 → 知识库 channel 值映射（与 Go {@code imPlatformToChannel} 同表；
- * 附件异步入库时写入）。
+ * IM 平台标识 → 知识库 channel 值映射
+ * （附件异步入库时写入）。
  */
 class ImServicePlatformChannelTest {
 

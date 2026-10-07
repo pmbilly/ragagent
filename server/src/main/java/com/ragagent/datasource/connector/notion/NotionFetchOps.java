@@ -390,7 +390,7 @@ final class NotionFetchOps {
      * ③ 每个附加小节前面是 {@code "\n## X 内容\n\n"}、markdown 之后再一个
      * {@code "\n"}，最后整体再前置一个 {@code "\n"}；④ {@code updated_at} 取
      * <b>第一条记录</b>的编辑时间（不是 Now——那个只在 records 为空时兜底，
-     * 而 records 为空早就 return nil 了）。</p>
+     * 而 records 为空早就返回 {@code null} 了）。</p>
      */
     FetchedItem buildDatabaseItem(NotionClient client, String id, String dbTitle,
                                   List<NotionPage> records) {

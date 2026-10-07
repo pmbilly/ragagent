@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  *
  * <p>两个键都恒输出（§1.6）：没有说明时 {@code caption} 写 {@code null}。</p>
  *
- * <p><b>落库时的空值语义</b>：nil 列表写成 {@code []}（不是 SQL NULL），
+ * <p><b>落库时的空值语义</b>：null 列表写成 {@code []}（不是 SQL NULL），
  * 所以 Java 实体上的这个列表字段**默认是空列表**，
  * 由类型处理器写成 {@code []}。</p>
  */

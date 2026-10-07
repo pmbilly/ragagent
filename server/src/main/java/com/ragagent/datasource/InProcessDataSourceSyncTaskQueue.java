@@ -20,14 +20,14 @@ import org.springframework.stereotype.Component;
 import com.ragagent.datasource.domain.DataSourceSyncPayload;
 
 /**
- * {@link DataSourceSyncTaskQueue} 的<b>进程内</b>实现：asynq → 虚拟线程队列
+ * {@link DataSourceSyncTaskQueue} 的<b>进程内</b>实现：基于虚拟线程的队列
  * （与 {@code wiki.service.InProcessWikiIngestTaskQueue}、
  * {@code memory.service.InProcessMemoryExtractTaskQueue} 同一模式）。
  *
- * <p>保留 asynq 在调度器这条路径上真正被依赖的三条语义：</p>
+ * <p>保留在调度器这条路径上真正被依赖的三条语义：</p>
  * <ol>
  *   <li><b>TaskID 去重</b>（{@link #enqueue} 的返回值）——这是调度器第 2 层去重的全部；</li>
- *   <li><b>重试预算 + 退避</b>（{@code MaxRetry}，asynq 的默认退避公式）；</li>
+ *   <li><b>重试预算 + 退避</b>（{@code maxRetry}，默认退避公式）；</li>
  *   <li><b>任务超时</b>（{@code Timeout}）→ 中断执行线程（见 {@link Connector#sleep}）。</li>
  * </ol>
  *
@@ -39,8 +39,8 @@ import com.ragagent.datasource.domain.DataSourceSyncPayload;
  * 要恢复跨实例语义，换一个 Redis/MQ 实现即可——端口就是为此留的。</p>
  *
  * <h2>去重窗口</h2>
- * <p>任务 ID 在"入队到执行结束"期间被占用，结束后释放。asynq 的实际窗口略有不同
- * （它在任务完成一段时间后才彻底释放 unique 锁），但在调度器的用法下
+ * <p>任务 ID 在"入队到执行结束"期间被占用，结束后释放。原队列实现的实际窗口略有不同
+ * （任务完成一段时间后才彻底释放 ID 锁），但在调度器的用法下
  * （每分钟一个新 ID）两者不可区分。</p>
  *
  * <h2>为什么 handler 用 {@link ObjectProvider} 而不是直接注入</h2>
@@ -57,16 +57,16 @@ public class InProcessDataSourceSyncTaskQueue implements DataSourceSyncTaskQueue
 
     private final ObjectProvider<DataSourceSyncHandler> handlerProvider;
 
-    /** 在途 / 待跑的 TaskID。对照 asynq 的 unique-task 锁。 */
+    /** 在途 / 待跑的 TaskID（占用期间唯一，防重复入队）。 */
     private final Set<String> inflightTaskIds = ConcurrentHashMap.newKeySet();
 
-    /** 执行器：每个尝试一个虚拟线程（对照 asynq 的 worker 池）。 */
+    /** 执行器：每个尝试一个虚拟线程。 */
     private final ExecutorService worker = Executors.newVirtualThreadPerTaskExecutor();
 
     /**
-     * 测试钩子：覆盖重试退避（秒）。{@code null} = 用 asynq 的默认公式。
+     * 测试钩子：覆盖重试退避（秒）。{@code null} = 用默认公式。
      *
-     * <p>存在的理由与 wiki/memory 那两份完全一样：asynq 的默认退避是
+     * <p>存在的理由与 wiki/memory 那两份完全一样：默认退避是
      * {@code n^4 + 15 + rand(30)*(n+1)} 秒，第一次重试就要等 15–45 秒，
      * 不覆盖的话重试路径在单测里根本跑不动。</p>
      */
@@ -191,7 +191,7 @@ public class InProcessDataSourceSyncTaskQueue implements DataSourceSyncTaskQueue
     }
 
     /**
-     * 对照 asynq 的默认重试退避 {@code n^4 + 15 + rand(30)*(n+1)} 秒
+     * 默认重试退避：{@code n^4 + 15 + rand(30)*(n+1)} 秒
      * （wiki / memory 两份实现用的是同一公式）。
      */
     private long retryDelaySeconds(int attempt) {

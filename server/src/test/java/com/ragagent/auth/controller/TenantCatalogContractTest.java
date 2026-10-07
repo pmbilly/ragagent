@@ -224,7 +224,7 @@ class TenantCatalogContractTest {
         assertGolden(get("/api/v1/tenants/kv/bogus-key")
                         .header("Authorization", selfTok).header("X-Tenant-ID", alpha),
                 400, "ct-kv-unsupported.json");
-        // PUT prompt-templates：Go 分发器本来就没有它 → 两侧都 400
+        // PUT prompt-templates：录制分发器本来就没有它 → 同为 400
         assertGolden(jsonBody(put("/api/v1/tenants/kv/prompt-templates"), selfTok, "{}")
                         .header("X-Tenant-ID", alpha),
                 400, "ct-kv-put-prompt-templates.json");

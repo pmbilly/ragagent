@@ -28,11 +28,11 @@ public final class SearchTextUtil {
      * 空内容返回 ""。
      */
     public static String buildContentSignature(String content) {
-        String c = goTrimSpace(content == null ? "" : content.toLowerCase(java.util.Locale.ROOT));
+        String c = trimUnicodeWhitespace(content == null ? "" : content.toLowerCase(java.util.Locale.ROOT));
         if (c.isEmpty()) {
             return "";
         }
-        c = String.join(" ", goFields(c));
+        c = String.join(" ", splitFields(c));
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             byte[] digest = md.digest(c.getBytes(StandardCharsets.UTF_8));
@@ -132,16 +132,16 @@ public final class SearchTextUtil {
      * 过滤单字符与纯标点/空白 token，返回唯一 token 集。空文本返回空集。
      */
     public static Set<String> tokenizeSimple(String text) {
-        String t = goTrimSpace((text == null ? "" : text).toLowerCase(java.util.Locale.ROOT));
+        String t = trimUnicodeWhitespace((text == null ? "" : text).toLowerCase(java.util.Locale.ROOT));
         if (t.isEmpty()) {
             return new LinkedHashSet<>();
         }
         java.util.List<String> words = containsChinese(t)
                 ? jieba.cutForSearch(t)
-                : goFields(t);
+                : splitFields(t);
         Set<String> set = new LinkedHashSet<>();
         for (String w : words) {
-            w = goTrimSpace(w);
+            w = trimUnicodeWhitespace(w);
             if (w.codePointCount(0, w.length()) > 1 && !isAllPunct(w)) {
                 set.add(w);
             }
@@ -201,11 +201,11 @@ public final class SearchTextUtil {
     }
 
     private static String buildContentSignaturePrefix(String s) {
-        String c = goTrimSpace((s == null ? "" : s).toLowerCase(java.util.Locale.ROOT));
+        String c = trimUnicodeWhitespace((s == null ? "" : s).toLowerCase(java.util.Locale.ROOT));
         if (c.isEmpty()) {
             return "";
         }
-        return String.join(" ", goFields(c));
+        return String.join(" ", splitFields(c));
     }
 
     /**
@@ -255,16 +255,16 @@ public final class SearchTextUtil {
     }
 
     /** 按 Unicode 空白切分。 */
-    static java.util.List<String> goFields(String s) {
+    static java.util.List<String> splitFields(String s) {
         java.util.List<String> out = new java.util.ArrayList<>();
         int i = 0;
         int n = s.length();
         while (i < n) {
-            while (i < n && isGoSpace(s.charAt(i))) {
+            while (i < n && isUnicodeWhitespace(s.charAt(i))) {
                 i++;
             }
             int start = i;
-            while (i < n && !isGoSpace(s.charAt(i))) {
+            while (i < n && !isUnicodeWhitespace(s.charAt(i))) {
                 i++;
             }
             if (start < i) {
@@ -274,7 +274,7 @@ public final class SearchTextUtil {
         return out;
     }
 
-    private static boolean isGoSpace(char c) {
+    private static boolean isUnicodeWhitespace(char c) {
         switch (c) {
             case '\t': case '\n': case '\u000B': case '\f': case '\r':
             case ' ': case '\u0085': case '\u00A0': case '\u1680':
@@ -285,16 +285,16 @@ public final class SearchTextUtil {
         }
     }
 
-    static String goTrimSpace(String s) {
+    static String trimUnicodeWhitespace(String s) {
         if (s == null) {
             return "";
         }
         int start = 0;
         int end = s.length();
-        while (start < end && isGoSpace(s.charAt(start))) {
+        while (start < end && isUnicodeWhitespace(s.charAt(start))) {
             start++;
         }
-        while (end > start && isGoSpace(s.charAt(end - 1))) {
+        while (end > start && isUnicodeWhitespace(s.charAt(end - 1))) {
             end--;
         }
         return s.substring(start, end);

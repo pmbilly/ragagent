@@ -136,7 +136,7 @@ public interface AsrTranscriber {
             if (status != 200) {
                 // 错误文案逐字节钉死（见类注释）
                 throw new AsrTranscribeException(
-                        "ASR transcription request failed: " + goOpenAiError(status, respBody));
+                        "ASR transcription request failed: " + openAiErrorText(status, respBody));
             }
             JsonNode node;
             try {
@@ -211,7 +211,7 @@ public interface AsrTranscriber {
          * 字面量中间坏掉 → "invalid character 'x' in literal ... (expecting 'y')"。
          * 深结构坏掉时回落占位文案（golden 未覆盖，备案）。
          */
-        private static String goJsonErrorText(byte[] body) {
+        private static String jsonErrorText(byte[] body) {
             String text = new String(body, StandardCharsets.UTF_8);
             int i = 0;
             while (i < text.length() && Character.isWhitespace(text.charAt(i))) {
@@ -266,7 +266,7 @@ public interface AsrTranscriber {
             }
         }
 
-        public static String goOpenAiError(int statusCode, byte[] body) {
+        public static String openAiErrorText(int statusCode, byte[] body) {
             String statusLine = statusCode + " " + reasonPhrase(statusCode);
             String errText = null;
             String message = null;
@@ -290,7 +290,7 @@ public interface AsrTranscriber {
                         }
                     }
                 } catch (IOException e) {
-                    errText = goJsonErrorText(body);
+                    errText = jsonErrorText(body);
                 }
             }
             if (apiError) {

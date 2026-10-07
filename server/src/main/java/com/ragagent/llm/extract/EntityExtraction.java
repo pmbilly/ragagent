@@ -36,7 +36,7 @@ public final class EntityExtraction {
     // Extractor
     // ------------------------------------------------------------------
 
-    /** 抽取器（对照 Extractor）。 */
+    /** 抽取器。 */
     public static final class Extractor {
         private final LlmChatClient chat;
         private final Formater formater;
@@ -53,7 +53,7 @@ public final class EntityExtraction {
             this.chatOpt.setThinking(Boolean.FALSE);
         }
 
-        /** 对照 Extract：LLM 调用 + ParseGraph。失败抛异常。 */
+        /** LLM 调用 + 图谱解析。失败抛异常。 */
         public EntityGraph extract(String content) {
             QAPromptGenerator generator = new QAPromptGenerator(this.formater, this.template);
             List<ChatMessage> messages = generator.render(content);
@@ -62,7 +62,7 @@ public final class EntityExtraction {
         }
     }
 
-    /** 对照 types.GraphData 的抽取形态（nodes + relations，可变）。 */
+    /** 抽取形态（nodes + relations，可变）。 */
     public static final class EntityGraph {
         public List<GraphNode> node = new ArrayList<>();
         public List<GraphRelation> relation = new ArrayList<>();
@@ -72,7 +72,7 @@ public final class EntityExtraction {
     // QAPromptGenerator
     // ------------------------------------------------------------------
 
-    /** QA 提示词生成器（对照 QAPromptGenerator）。 */
+    /** QA 提示词生成器。 */
     public static final class QAPromptGenerator {
         private final Formater formater;
         private final PromptTemplateStructured template;
@@ -86,7 +86,7 @@ public final class EntityExtraction {
             this.template = template;
         }
 
-        /** 对照 System：模板 description（带 %s 占位时以 tags JSON 填充）+ 示例。 */
+        /** 模板 description（带 %s 占位时以 tags JSON 填充）+ 示例。 */
         public String system() {
             List<String> promptLines = new ArrayList<>();
 
@@ -113,7 +113,6 @@ public final class EntityExtraction {
             return String.join("\n", promptLines);
         }
 
-        /** 对照 User。 */
         public String user(String question) {
             List<String> promptLines = new ArrayList<>();
             promptLines.add(questionHeading);
@@ -122,7 +121,6 @@ public final class EntityExtraction {
             return String.join("\n", promptLines);
         }
 
-        /** 对照 Render。 */
         public List<ChatMessage> render(String question) {
             List<ChatMessage> messages = new ArrayList<>();
             messages.add(new ChatMessage("system", system()));
@@ -147,7 +145,7 @@ public final class EntityExtraction {
     // Formater
     // ------------------------------------------------------------------
 
-    /** 格式化/解析器（对照 Formater，json + 围栏形态）。 */
+    /** 格式化/解析器（json + 围栏形态）。 */
     public static final class Formater {
         private final String attributeSuffix = "_attributes";
         private final String nodePrefix = "entity";
@@ -155,7 +153,7 @@ public final class EntityExtraction {
         private final String relationTarget = "entity2";
         private final String relationPrefix = "relation";
 
-        /** 对照 formatExtraction：nodes+relations → 带围栏的缩进 JSON。 */
+        /** nodes+relations → 带围栏的缩进 JSON。 */
         public String formatExtraction(List<GraphNode> nodes, List<GraphRelation> relations) {
             List<Map<String, Object>> items = new ArrayList<>();
             if (nodes != null) {
@@ -183,7 +181,7 @@ public final class EntityExtraction {
         }
 
         /**
-         * 对照 parseOutput：抽体 + JSON 解析 + 形状校验。失败抛 IllegalArgumentException。
+         * 抽体 + JSON 解析 + 形状校验。失败抛 IllegalArgumentException。
          * 值保持 JsonNode（null 值键视为不存在）。
          */
         List<Map<String, JsonNode>> parseOutput(String text) {
@@ -249,7 +247,6 @@ public final class EntityExtraction {
             return "interface {}";
         }
 
-        /** 对照 ParseGraph。 */
         public EntityGraph parseGraph(String text) {
             List<Map<String, JsonNode>> matchData = parseOutput(text);
             if (matchData.isEmpty()) {
@@ -264,7 +261,7 @@ public final class EntityExtraction {
                 JsonNode srcVal = group.get(relationSource);
                 JsonNode tgtVal = group.get(relationTarget);
                 if (nodeVal != null) {
-                    // 对照 group[attributesKey].([]interface{})：必须是数组才收
+                    // 属性段必须是数组才收
                     List<String> attributes = new ArrayList<>();
                     String attributesKey = nodePrefix + attributeSuffix;
                     JsonNode attrs = group.get(attributesKey);
@@ -275,7 +272,7 @@ public final class EntityExtraction {
                     }
                     nodes.add(new GraphNode(valueStr(nodeVal), null, attributes));
                 } else if (srcVal != null && tgtVal != null) {
-                    // 键缺失 → "null"（Java 原生形态；B43 前为 Go 的 "<nil>"）
+                    // 键缺失 → "null"
                     JsonNode relType = group.get(relationPrefix);
                     relations.add(new GraphRelation(valueStr(srcVal),
                             valueStr(tgtVal),
@@ -290,7 +287,7 @@ public final class EntityExtraction {
             return graph;
         }
 
-        /** 对照 rebuildGraph：重名合并/自环丢弃/未知端点补节点。 */
+        /** 重名合并/自环丢弃/未知端点补节点。 */
         private void rebuildGraph(EntityGraph graph) {
             Map<String, GraphNode> nodeMap = new LinkedHashMap<>();
             List<GraphNode> nodes = new ArrayList<>(graph.node.size());
@@ -330,7 +327,7 @@ public final class EntityExtraction {
             graph.relation = relations;
         }
 
-        /** 对照 extractContent：围栏候选筛选 + 回退提取。 */
+        /** 围栏候选筛选 + 回退提取。 */
         String extractContent(String text) {
             List<String> matches = findAllFences(text);
             List<String> candidates = new ArrayList<>();
@@ -366,7 +363,7 @@ public final class EntityExtraction {
             return text.trim();
         }
 
-        /** 对照 stripFencesAndExtract：三种失配形态的恢复。 */
+        /** 三种失配形态的恢复。 */
         static String stripFencesAndExtract(String text) {
             String trimmed = text == null ? "" : text.trim();
             if (trimmed.isEmpty()) {
@@ -412,7 +409,6 @@ public final class EntityExtraction {
             return s.substring(start, end);
         }
 
-        /** 对照 isLikelyLanguageTag。 */
         static boolean isLikelyLanguageTag(String s) {
             if (s == null || s.isEmpty() || s.length() > 16) {
                 return false;
@@ -428,7 +424,7 @@ public final class EntityExtraction {
             return true;
         }
 
-        /** 对照 extractJSONLike：最外层 {...} / [...]（字符串感知）。 */
+        /** 最外层 {...} / [...]（字符串感知）。 */
         static String extractJSONLike(String s) {
             int objStart = s.indexOf('{');
             int arrStart = s.indexOf('[');
@@ -500,11 +496,11 @@ public final class EntityExtraction {
         }
     }
 
-    // 围栏正则（对照 _FENCE_RE：```(lang)?(\s*\n)?(body)```，DOTALL 由 (?s) 等价承担）
+    // 围栏正则（```(lang)?(\s*\n)?(body)```，DOTALL 由 (?s) 等价承担）
     private static final Pattern FENCE_RE = Pattern.compile(
             "```(?<lang>[A-Za-z0-9_+-]+)?(?:\\s*\\n)?(?<body>[\\s\\S]*?)```");
 
-    /** 围栏全文扫描（对照 FindAllStringSubmatch 的调用点形态）。 */
+    /** 围栏全文扫描。 */
     private static List<String> findAllFences(String text) {
         List<String> out = new ArrayList<>();
         Matcher m = FENCE_RE.matcher(text);

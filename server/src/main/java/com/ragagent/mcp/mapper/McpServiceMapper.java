@@ -57,21 +57,20 @@ public interface McpServiceMapper extends BaseMapper<McpService> {
             + "AND deleted_at IS NULL LIMIT 1")
     McpService getByIdForTenant(@Param("tenantId") long tenantId, @Param("id") String id);
 
-    /** 对照 repository List：租户自有 + 全部内置，created_at DESC */
+    /** 租户自有 + 全部内置，created_at DESC */
     @ResultMap("mcpServiceResult")
     @Select("SELECT * FROM mcp_services "
             + "WHERE (tenant_id = #{tenantId} OR is_builtin = TRUE) AND deleted_at IS NULL "
             + "ORDER BY created_at DESC")
     List<McpService> listForTenant(@Param("tenantId") long tenantId);
 
-    /** 对照 repository ListEnabled */
     @ResultMap("mcpServiceResult")
     @Select("SELECT * FROM mcp_services "
             + "WHERE (tenant_id = #{tenantId} OR is_builtin = TRUE) AND enabled = TRUE "
             + "AND deleted_at IS NULL ORDER BY created_at DESC")
     List<McpService> listEnabledForTenant(@Param("tenantId") long tenantId);
 
-    /** 对照 repository ListByIDs：ids 为空时由 service 层短路，这里不做空 IN */
+    /** ids 为空时由 service 层短路，这里不做空 IN */
     @ResultMap("mcpServiceResult")
     @Select("<script>SELECT * FROM mcp_services "
             + "WHERE (tenant_id = #{tenantId} OR is_builtin = TRUE) AND deleted_at IS NULL "
@@ -86,11 +85,11 @@ public interface McpServiceMapper extends BaseMapper<McpService> {
      * <ul>
      *   <li>恒写：updated_at（调用方赋值）、enabled、description、usage_instructions</li>
      *   <li>非空才写：name、transport_type</li>
-     *   <li>非 nil 才写：url、stdio_config、env_vars、headers、auth_config、advanced_config</li>
+     *   <li>非 null 才写：url、stdio_config、env_vars、headers、auth_config、advanced_config</li>
      * </ul>
      * 因此 <b>无法通过本方法把 url 置为 NULL</b>（置空只能写空串）。
      *
-     * <p>密钥语义：本方法会写 auth_config（若非 nil），但 **service 层保证
+     * <p>密钥语义：本方法会写 auth_config（若非 null），但 **service 层保证
      * main PUT 路径不会把 apiKey/token 合进来**——见 {@code McpServiceService#updateMCPService}。</p>
      */
     @Update("<script>"
@@ -115,7 +114,7 @@ public interface McpServiceMapper extends BaseMapper<McpService> {
             + "</script>")
     int updatePartial(McpService service);
 
-    /** 对照 repository Delete：软删除（写 deleted_at），非物理删除 */
+    /** 软删除（写 deleted_at），非物理删除 */
     @Update("UPDATE mcp_services SET deleted_at = #{deletedAt} "
             + "WHERE id = #{id} AND tenant_id = #{tenantId} AND deleted_at IS NULL")
     int softDelete(@Param("tenantId") long tenantId, @Param("id") String id,

@@ -35,8 +35,8 @@ public class KnowledgeSpanService {
      * attempt 选择（显式 ?attempt=N 优先，
      * 否则 spans 表的 latestAttempt）→ ListByAttempt → buildSpanTree（真实行建树 +
      * 缺失 canonical stage 合成）→ last_error（span 失败行优先）。
-     * 2026-09-23 起 span 写入侧已接线（此前 spanRepo==nil 分支的备案差异作废）。
-     * @return data 信封内层（gin.H 键按字母序：attempt/current_attempt/current_stage/
+     * 2026-09-23 起 span 写入侧已接线（此前 spanRepo==null 分支的备案差异作废）。
+     * @return data 信封内层（JSON 对象体键按字母序：attempt/current_attempt/current_stage/
      *         knowledge_id/[last_error]/latest_attempt/parse_status/trace）
      */
     public ObjectNode knowledgeSpans(Knowledge knowledge, int requestedAttempt) {
@@ -73,7 +73,7 @@ public class KnowledgeSpanService {
      * 真实行按 span_id 建索引
      * （保 rows 序）→ root（首个 kind=root）/首个 running stage（current_stage）/
      * 末个 failed 行（lastFailure）→ children 按 rows 序链接（无父/孤儿挂 root）→
-     * 缺失 canonical stage 合成占位（AllStages 序）。rows 为空时与旧实现逐字节一致
+     * 缺失 canonical stage 合成占位（AllStages 序）。rows 为空时与历史行为逐字节一致
      * （全合成，status 由 parse_status 推导：completed→done、failed→failed、其余 pending）。
      */
     private static SpanTree buildSpanTree(
@@ -150,8 +150,8 @@ public class KnowledgeSpanService {
     }
 
     /**
-     * omitempty 字段（parent_span_id/input/output/metadata/error_code/error_message/
-     * started_at/finished_at/duration_ms）缺席即省略；error_detail 是 {@code json:"-"} 不输出；
+     * 缺席即省略的字段（parent_span_id/input/output/metadata/error_code/error_message/
+     * started_at/finished_at/duration_ms）；error_detail 恒不输出；
      * created_at/updated_at 恒输出。
      */
     private static ObjectNode spanNodeFromRow(
@@ -249,7 +249,7 @@ public class KnowledgeSpanService {
                 .equalsIgnoreCase(message.trim())) {
             errorCode = "SERVER_RESTART";
         }
-        // gin.H → encoding/json 键按字母序输出（code < error_code < error_message <
+        // JSON 对象体经序列化后键按字母序输出（code < error_code < error_message <
         // finished_at < message < name < stage），契约样例锁定
         ObjectNode e = MAPPER.createObjectNode();
         e.put("code", errorCode);

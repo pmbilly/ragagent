@@ -78,7 +78,7 @@ public class MessageService {
     private final KnowledgeService knowledgeService;
     private final TenantService tenantService;
     private final com.ragagent.knowledge.service.KnowledgeBaseService knowledgeBaseService;
-    /** 聊天历史检索切片（关键词/向量/混合 + RRF + 归属过滤 + 分组）。 */
+    /** 聊天历史检索子模块（关键词/向量/混合 + RRF + 归属过滤 + 分组）。 */
     private final MessageSearch messageSearch;
 
     public MessageService(SessionRepository sessionRepository,

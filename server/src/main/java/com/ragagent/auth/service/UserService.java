@@ -160,7 +160,7 @@ public class UserService {
 
     // ── 查询 ─────────────────────────────────────────────────────────────
 
-    /** 对照 GetUserByEmail：软删除过滤；找不到返回 null */
+    /** 软删除过滤；找不到返回 null */
     public User getUserByEmail(String email) {
         return userMapper.selectOne(new LambdaQueryWrapper<User>()
                 .eq(User::getEmail, email)
@@ -183,7 +183,7 @@ public class UserService {
                 .last("LIMIT 1"));
     }
 
-    /** 对照 GetUserByID：软删除过滤；找不到返回 null */
+    /** 软删除过滤；找不到返回 null */
     public User getUserById(String id) {
         return userMapper.selectOne(new LambdaQueryWrapper<User>()
                 .eq(User::getId, id)
@@ -226,7 +226,7 @@ public class UserService {
                 .set(User::getUpdatedAt, user.getUpdatedAt()));
     }
 
-    /** 对照 DeleteUser（register-by-invite 修复失败时的半建号清理）。 */
+    /** register-by-invite 修复失败时的半建号清理。 */
     public void deleteUser(String id) {
         userMapper.deleteById(id);
     }
@@ -546,7 +546,7 @@ public class UserService {
         return user;
     }
 
-    /** 对照 GetUserByUsername：软删除过滤；找不到返回 null */
+    /** 软删除过滤；找不到返回 null */
     public User getUserByUsername(String username) {
         return userMapper.selectOne(new LambdaQueryWrapper<User>()
                 .eq(User::getUsername, username)
@@ -726,19 +726,19 @@ public class UserService {
      * 全 Unicode 空白 trim：String 的 trim/strip 都不含 U+00A0，
      * 这里按完整空白字符集显式处理（正则 `\s` 同样不含这些）。
      */
-    public static String goTrimSpace(String s) {
+    public static String trimUnicodeWhitespace(String s) {
         int start = 0;
         int end = s.length();
-        while (start < end && isGoSpace(s.charAt(start))) {
+        while (start < end && isUnicodeWhitespace(s.charAt(start))) {
             start++;
         }
-        while (end > start && isGoSpace(s.charAt(end - 1))) {
+        while (end > start && isUnicodeWhitespace(s.charAt(end - 1))) {
             end--;
         }
         return s.substring(start, end);
     }
 
-    private static boolean isGoSpace(char c) {
+    private static boolean isUnicodeWhitespace(char c) {
         // 空白全集：'\t' '\n' '\v' '\f' '\r' ' ' U+0085 U+00A0 + 其他 Unicode 空白
         return Character.isWhitespace(c) || Character.isSpaceChar(c) || c == '\u0085' || c == '\u00A0';
     }

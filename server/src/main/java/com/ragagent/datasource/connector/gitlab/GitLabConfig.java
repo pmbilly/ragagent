@@ -112,7 +112,7 @@ public final class GitLabConfig {
     /**
      * 把用户填的仓库路径归一成"干净的相对目录"。
      *
-     * <p>第一步是 {@code Trim(TrimSpace(value), "/")}——<b>根路径 {@code "/"} 归一成空串</b>，
+     * <p>第一步是去首尾空白、再去掉全部首尾斜杠——<b>根路径 {@code "/"} 归一成空串</b>，
      * 空串随后被 {@link #collapsePaths} 视作"含空元素 → 整个 paths 置 null"，
      * 于是 {@code paths: ["/"]} 的语义变成"同步整个项目"。这条链路是一个整体，别拆开看。</p>
      */
@@ -136,7 +136,7 @@ public final class GitLabConfig {
      *
      * <p>两个关键细节：</p>
      * <ul>
-     *   <li><b>含空元素时整个返回 nil</b>（不是"跳过空元素"）——这就是
+     *   <li><b>含空元素时整个返回 {@code null}</b>（不是"跳过空元素"）——这就是
      *       {@code paths: ["/"]} → 整个项目的那一步；</li>
      *   <li>判据是"等于上一项，或以 {@code 上一项+"/"} 开头"，
      *       所以 {@code ["docs/guide","docs"]} → {@code ["docs"]}，

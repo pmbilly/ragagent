@@ -37,7 +37,7 @@ public class EmbedWiring {
      */
     @org.springframework.context.annotation.Bean
     public org.springframework.boot.web.server.WebServerFactoryCustomizer<org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory>
-            goStyleErrorReportValveCustomizer() {
+            plainTextErrorReportValveCustomizer() {
         return factory -> factory.addContextCustomizers(sc -> {
             if (sc.getParent() instanceof org.apache.catalina.core.StandardHost host) {
                 // 换掉 Tomcat 默认的 HTML 错误页阀（协议层错误用纯文本）

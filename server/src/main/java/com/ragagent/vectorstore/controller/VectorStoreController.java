@@ -121,7 +121,7 @@ public class VectorStoreController {
         try {
             service.create(store);
         } catch (RuntimeException e) {
-            throw e; // Go c.Error(err)：AppError 原样进信封
+            throw e; // AppError 原样进信封
         }
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(VectorStoreResponse.of(store, "user", false));
@@ -316,7 +316,6 @@ public class VectorStoreController {
         return new PureNotFound();
     }
 
-    /** {"success":true,"version":"..."}（gin.H 字母序 success < version） */
     /** 连通性测试成功体：{version}（探测不到为空串照写）。 */
     private static Map<String, Object> versionBody(String version) {
         Map<String, Object> body = new LinkedHashMap<>();
@@ -333,7 +332,7 @@ public class VectorStoreController {
 
     // ── 本控制器私有的错误形态 ─────────────────────────────────────────
 
-    /** getOwned 的 404：纯字符串（c.JSON 直写） */
+    /** 404 场景：纯字符串体直写 */
     public static class PureNotFound extends RuntimeException {}
 
     /** env store 只读：400 纯字符串 */

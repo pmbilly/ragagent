@@ -30,15 +30,14 @@ import jakarta.servlet.http.HttpServletResponse;
  *   <li>{@code servePresignedPreview} 的 handler 体 → {@link #presignedPreview}
  *       （Admin 诊断；API-Key 主体在控制器里先行拒绝）；</li>
  *   <li>{@code serveResourceGrants} 的 handler 体 → {@link #serveResourceGrant}
- *       （GET+HEAD /r/{token}，无鉴权——路由注册在 Go Auth 中间件之前，
- *       Java 侧由 AuthFilter 的 /r/ 前缀让路对齐）；</li>
+ *       （GET+HEAD /r/{token}，无鉴权——AuthFilter 对 /r/ 前缀放行）；</li>
  *   <li>{@code serveAuthorizedFile} → {@link #serveAuthorizedFile}（KB/消息 scoped
  *       共用的落盘出口，Cache-Control private, no-store）。</li>
  * </ul>
  *
- * <p>无 body 的 {@code c.Status(4xx)} 用 {@link #plainStatus}；错误信封
- * {@code gin.H{"error": msg}} 用 {@link #writeErrorJson}（单键，无键序问题）；
- * presigned-preview 的多键 gin.H 按 encoding/json 的<b>字母序</b>插入 LinkedHashMap。</p>
+ * <p>无 body 的 4xx 状态响应用 {@link #plainStatus}；错误信封
+ * {@code {"error": msg}} 用 {@link #writeErrorJson}（单键，无键序问题）；
+ * presigned-preview 的多键 JSON 对象体按<b>字母序</b>插入 LinkedHashMap。</p>
  */
 @Service
 public class FileProxyService {
@@ -120,7 +119,7 @@ public class FileProxyService {
         }
 
         // resolveCatalogResource：resource:// 引用的租户是权威（物理 provider 路径
-        // 不要求编码访问控制元数据——Go 注释原文）
+        // 不要求编码访问控制元数据）
         String resolved = filePath;
         boolean resourceResolved = false;
         ResourceCatalogService.ResolvedPath catalogHit = catalog.resolvePath(filePath);
@@ -251,7 +250,7 @@ public class FileProxyService {
         StorageFileResolver.Resolution resolution = resolver.resolveFileService(tenant,
                 target.backendId(), target.provider(), absDir);
         if (!resolution.ok()) {
-            // gin.H 字母序：error < hint < provider
+            // JSON 键按字母序：error < hint < provider
             Map<String, Object> body = new LinkedHashMap<>();
             body.put("error", resolution.error());
             body.put("hint", "workspace storage config is missing or incomplete for this provider");
@@ -276,7 +275,7 @@ public class FileProxyService {
             hint = "URL unchanged; for local storage set APP_EXTERNAL_URL to enable presigned HTTP URLs";
         }
         Map<String, Object> body = new LinkedHashMap<>();
-        // gin.H 是 map → encoding/json 按字母序输出：file_path < hint < provider
+        // JSON 对象键按字母序输出：file_path < hint < provider
         // < rewritten < url
         body.put("file_path", filePath);
         body.put("hint", hint);
@@ -307,7 +306,7 @@ public class FileProxyService {
             plainStatus(response, HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-        // grant 行自带 backend ID；只有 provider scheme 来自物理路径（Go 注释原文）
+        // grant 行自带 backend ID；只有 provider scheme 来自物理路径
         StoragePaths.StorageTarget target = StoragePaths.parseStorageTarget(resource.getPhysicalPath());
         StorageFileResolver.Resolution resolution = resolver.resolveFileService(tenant,
                 resource.getStorageBackendId(), target.provider(), localBaseDir);
@@ -420,8 +419,8 @@ public class FileProxyService {
     }
 
     /**
-     * gin 的 c.JSON：Content-Type {@code application/json; charset=utf-8}（带空格，
-     * setHeader 原样写——同既有的容器经验），gin.H 键按字母序
+     * 响应写出：Content-Type {@code application/json; charset=utf-8}（带空格，
+     * setHeader 原样写——同既有的容器经验），JSON 键按字母序
      * （调用方保证）。体走 UTF-8 字节（getWriter 会受容器默认编码影响）。
      */
     public static void writeJson(HttpServletResponse response, int status, Object body)

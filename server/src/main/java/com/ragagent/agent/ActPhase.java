@@ -295,14 +295,14 @@ final class ActPhase {
                 new AgentToolResultData(toolCall.getId(), toolCall.getExecutionName(),
                         result.getOutput(), result.getError(), result.isSuccess(),
                         toolCall.getDuration(), iteration,
-                        deepSortedGoMap(sanitizeToolDataForPersist(toolCall.getName(),
+                        deepSortedMap(sanitizeToolDataForPersist(toolCall.getName(),
                                 result.getData()))),
                 null, ""));
 
         engine.eventBus.emit(new Event(toolCall.getId() + "-tool-exec",
                 EventType.EVENT_AGENT_TOOL, sessionId,
                 new AgentActionData(iteration, toolCall.getExecutionName(),
-                        deepSortedGoMap(toolCall.getExecutionArgs()), result.getOutput(),
+                        deepSortedMap(toolCall.getExecutionArgs()), result.getOutput(),
                         result.isSuccess(), result.getError(), toolCall.getDuration()),
                 null, ""));
     }
@@ -617,7 +617,7 @@ final class ActPhase {
     }
 
     /** 键序按 UTF-8 字节序比较（事件 payload 与既有 jsonb 记录逐字节一致）。 */
-    static final Comparator<String> GO_KEY_ORDER = (a, b) -> {
+    static final Comparator<String> KEY_BYTE_ORDER = (a, b) -> {
         byte[] x = a.getBytes(java.nio.charset.StandardCharsets.UTF_8);
         byte[] y = b.getBytes(java.nio.charset.StandardCharsets.UTF_8);
         int n = Math.min(x.length, y.length);
@@ -631,16 +631,16 @@ final class ActPhase {
 
     private static List<String> sortedKeys(Map<String, Object> data) {
         List<String> keys = new ArrayList<>(data.keySet());
-        keys.sort(GO_KEY_ORDER);
+        keys.sort(KEY_BYTE_ORDER);
         return keys;
     }
 
     /** 递归按 UTF-8 字节序排序键（事件 payload 的 map 契约）；null 原样返回。 */
-    static Map<String, Object> deepSortedGoMap(Map<String, Object> in) {
+    static Map<String, Object> deepSortedMap(Map<String, Object> in) {
         if (in == null) {
             return null;
         }
-        Map<String, Object> out = new TreeMap<>(GO_KEY_ORDER);
+        Map<String, Object> out = new TreeMap<>(KEY_BYTE_ORDER);
         for (Map.Entry<String, Object> e : in.entrySet()) {
             out.put(e.getKey(), deepSortValue(e.getValue()));
         }
@@ -649,7 +649,7 @@ final class ActPhase {
 
     private static Object deepSortValue(Object v) {
         if (v instanceof Map<?, ?> m) {
-            Map<String, Object> out = new TreeMap<>(GO_KEY_ORDER);
+            Map<String, Object> out = new TreeMap<>(KEY_BYTE_ORDER);
             for (Map.Entry<?, ?> e : m.entrySet()) {
                 out.put(String.valueOf(e.getKey()), deepSortValue(e.getValue()));
             }
@@ -684,7 +684,7 @@ final class ActPhase {
                 for (Object k : m.keySet()) {
                     modelArgKeys.add(String.valueOf(k));
                 }
-                modelArgKeys.sort(GO_KEY_ORDER);
+                modelArgKeys.sort(KEY_BYTE_ORDER);
             }
             Map<String, Object> out = new LinkedHashMap<>();
             out.put("tool_call_id", tc.getId());
@@ -699,7 +699,7 @@ final class ActPhase {
         Map<String, Object> out = new LinkedHashMap<>();
         out.put("tool_call_id", tc.getId());
         out.put("model_arguments", traceArgumentValue(modelArguments));
-        out.put("resolved_arguments", deepSortedGoMap(resolvedArgs));
+        out.put("resolved_arguments", deepSortedMap(resolvedArgs));
         out.put("argument_resolution", resolution);
         out.put("unresolved_handles", tc.getUnresolvedHandles());
         return out;

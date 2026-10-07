@@ -210,7 +210,7 @@ public final class FaqSnippet {
         return formatFaqMatchSnippet(question, meta.answers);
     }
 
-    /** "Q: … | A: …" 渲染（总长 800 rune 上限）。 */
+    /** "Q: … | A: …" 渲染（总长 800 码点上限）。 */
     static String formatFaqMatchSnippet(String question, List<String> answers) {
         question = question == null ? "" : question.strip();
         if (question.isEmpty()) {
@@ -268,7 +268,7 @@ public final class FaqSnippet {
         return meta.standardQuestion;
     }
 
-    /** 答案拼接（空白答案跳过，" | " 连接，600 rune 上限）。 */
+    /** 答案拼接（空白答案跳过，" | " 连接，600 码点上限）。 */
     static String faqAnswersForSnippet(List<String> answers) {
         if (answers == null || answers.isEmpty()) {
             return "";
@@ -312,7 +312,7 @@ public final class FaqSnippet {
     }
 
     /**
-     * 查询分词：按空白与标点切、小写、去重、丢弃 &lt;2 rune 的碎片
+     * 查询分词：按空白与标点切、小写、去重、丢弃 &lt;2 码点的碎片
      * （切分字符表见实现内注释）。
      */
     public static List<String> searchQueryTokens(List<String> queries) {
@@ -378,7 +378,7 @@ public final class FaqSnippet {
         return replaced;
     }
 
-    /** rune 截断 + "..."。 */
+    /** 码点截断 + "..."。 */
     public static String truncateRunes(String s, int maxRunes) {
         int runeCount = s.codePointCount(0, s.length());
         if (runeCount <= maxRunes) {

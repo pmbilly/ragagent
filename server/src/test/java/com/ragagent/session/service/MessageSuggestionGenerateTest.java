@@ -27,8 +27,7 @@ class MessageSuggestionGenerateTest {
         return i;
     }
 
-    /** 对照 parseGeneratedSuggestions：剥 think / 抠最外层 {} / 200 码点上限 /
-     *  去重 / 类别白名单外置空。 */
+    /** 剥 think / 抠最外层 {} / 200 码点上限 / 去重 / 类别白名单外置空。 */
     @Test
     void parseGeneratedSuggestionsFiltersAndValidates() {
         String content = "<think>\n思考过程</think>\nHere are some:\n"
@@ -61,7 +60,7 @@ class MessageSuggestionGenerateTest {
                 .hasMessageContaining("invalid suggestion JSON");
     }
 
-    /** 对照 mergeSuggestionItems：primary 优先、normalize 去重、limit 截断。 */
+    /** primary 优先、normalize 去重、limit 截断。 */
     @Test
     void mergeDedupesAndLimits() {
         SuggestionItem a = item("What is RAG?");
@@ -72,7 +71,7 @@ class MessageSuggestionGenerateTest {
         assertThat(merged).containsExactly(a, c);
     }
 
-    /** 对照 mergeHybridSuggestionItems：knowledge 槽 = ⌈limit/3⌉，双方互填。 */
+    /** knowledge 槽 = ⌈limit/3⌉，双方互填。 */
     @Test
     void hybridReservesKnowledgeSlots() {
         List<SuggestionItem> model = new java.util.ArrayList<>();
@@ -91,7 +90,7 @@ class MessageSuggestionGenerateTest {
         assertThat(merged.subList(4, 6)).allMatch(i -> i.getText().startsWith("kb-q-"));
     }
 
-    /** 对照 buildSuggestionGenerationContext：轮次分组 + 当前轮定位 + 历史渲染。 */
+    /** 轮次分组 + 当前轮定位 + 历史渲染。 */
     @Test
     void generationContextGroupsTurnsAndLocatesCurrent() {
         Message u1 = msg("user", "问题一", "req-1");
@@ -127,7 +126,7 @@ class MessageSuggestionGenerateTest {
         assertThat(ctx.currentQuery()).isEqualTo("老问题");
     }
 
-    /** 对照 truncateRunes：码点截断不切断多字节字符。 */
+    /** 码点截断不切断多字节字符。 */
     @Test
     void truncateRunesByCodePoint() {
         String s = "aé𐍈b"; // 4 码点（𐍈 是增补平面）
@@ -135,7 +134,7 @@ class MessageSuggestionGenerateTest {
         assertThat(MessageSuggestionPipeline.truncateRunes(s, 10)).isEqualTo(s);
     }
 
-    /** 对照 suggestionRelevanceTokens：去标点、滤单 rune、小写。 */
+    /** 去标点、滤单码点、小写。 */
     @Test
     void relevanceTokensCleanAndFilter() {
         Set<String> tokens = MessageSuggestionPipeline.suggestionRelevanceTokens(
@@ -155,7 +154,7 @@ class MessageSuggestionGenerateTest {
         assertThat((String) candidates.get(0)[0]).isEqualTo("RAG 检索增强生成是什么");
     }
 
-    /** 对照 buildSuggestionEvidence：按分排序 + 去重 + 截 5 条 + knowledgeIDs 收集。 */
+    /** 按分排序 + 去重 + 截 5 条 + knowledgeIDs 收集。 */
     @Test
     void evidenceSortedDedupedAndCapped() {
         Message current = new Message();

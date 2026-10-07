@@ -43,7 +43,7 @@ public class StorageBackendService {
         return repo.list(tenantId);
     }
 
-    /** 控制器读面：租户默认后端 id（Go：TenantInfoFromContext 拿不到租户时控制器传 null 分支）。 */
+    /** 控制器读面：租户默认后端 id（控制器拿不到租户时传 null）。 */
     public String tenantDefaultBackendId(long tenantId) {
         return repo.tenantDefaultBackendId(tenantId);
     }
@@ -55,7 +55,7 @@ public class StorageBackendService {
 
     private static final ObjectMapper MAPPER = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    /** Go path.Clean 的近似：用于 path_prefix 规范化比较（../ 与 .. 收敛） */
+    /** 路径规范化：收敛 ../ 与 ..（近似语义，非完整实现），用于 path_prefix 规范化比较 */
 
     private final StorageBackendRepository repo;
     private final StorageAllowList allowList;
@@ -78,9 +78,9 @@ public class StorageBackendService {
         this.localStorageBaseDir = localStorageBaseDir;
     }
 
-    // ── 校验（对照 StorageBackend.Validate / Config.ValidateForProvider） ──
+    // ── 校验 ──────────────────────────────────────────────────────────────
 
-    /** Validate：**会就地修改** name（trim）/provider（小写）/status（缺省 active）——Go 同款 */
+    /** 校验：**会就地修改** name（trim）/provider（小写）/status（缺省 active） */
     public void validate(StorageBackend b) {
         if (b.getTenantId() == null || b.getTenantId() == 0) {
             throw validation("tenant_id is required");
@@ -143,7 +143,7 @@ public class StorageBackendService {
         }
     }
 
-    /** 对照 validateStorageBackendEndpoint：SSRF（code 1000 + details=原文） */
+    /** SSRF（code 1000 + details=原文） */
     public void validateEndpoint(StorageBackend b) {
         StorageConfig c = configOf(b);
         if ("local".equals(b.getProvider()) || ("minio".equals(b.getProvider()) && "docker".equals(c.mode))) {
@@ -168,7 +168,7 @@ public class StorageBackendService {
         }
     }
 
-    // ── 连通性测试（对照 Test：local 全对齐，远端以拨号替代 SDK） ──────
+    // ── 连通性测试（local 全对齐，远端以拨号替代 SDK） ────────────────────
 
     public void test(StorageBackend b) {
         validate(b);
@@ -220,9 +220,9 @@ public class StorageBackendService {
         }
     }
 
-    /** Go Create：validate → endpoint → test → 时间戳 → 落库（唯一冲突 → 409） */
+    /** 创建：校验 → endpoint → 连通性测试 → 时间戳 → 落库（唯一冲突 → 409） */
     public void create(StorageBackend b) {
-        // Go BeforeCreate：id 为空生成 UUID、source 缺省 user、status 缺省 active
+        // 落库前默认值：id 为空生成 UUID、source 缺省 user、status 缺省 active
         if (b.getId() == null || b.getId().isEmpty()) {
             b.setId(java.util.UUID.randomUUID().toString());
         }
@@ -257,7 +257,7 @@ public class StorageBackendService {
         }
     }
 
-    /** Go Update：守卫顺序 get → env → merge → immutable → disable-guard → validate → test → 落库 */
+    /** 更新：守卫顺序 get → env → merge → immutable → disable-guard → 校验 → 连通性测试 → 落库 */
     public void update(StorageBackend incoming) {
         StorageBackend existing = repo.getByID(tenant(incoming), incoming.getId()).orElse(null);
         if (existing == null) {
@@ -279,7 +279,7 @@ public class StorageBackendService {
             incomingConfig.secretAccessKey = existingConfig.secretAccessKey;
         }
         incoming.setConfig(jsonNodeOf(incomingConfig));
-        // LocationKey（provider 固定为 existing.provider——Go 两边都传 existing.Provider）
+        // LocationKey：provider 固定为 existing.provider（两边比较用同一 provider）
         if (!locationKey(incomingConfig, existing.getProvider())
                 .equals(locationKey(existingConfig, existing.getProvider()))) {
             throw BizException.badRequest(
@@ -317,7 +317,7 @@ public class StorageBackendService {
                 incoming.getStatus(), incoming.getUpdatedAt());
     }
 
-    /** Go Delete：事务内 get → env → default → KB → 资源 → legacy → 软删 */
+    /** 删除：事务内 get → env → default → KB → 资源 → legacy → 软删 */
     public void delete(long tenantId, String id) {
         tx.executeWithoutResult(status -> {
             StorageBackend backend = repo.getByID(tenantId, id).orElse(null);
@@ -348,7 +348,7 @@ public class StorageBackendService {
         });
     }
 
-    /** Go SetDefault：事务内 get → 仅 active → 更新租户默认 */
+    /** 设默认：事务内 get → 仅 active → 更新租户默认 */
     public void setDefault(long tenantId, String id) {
         tx.executeWithoutResult(status -> {
             StorageBackend backend = repo.getByID(tenantId, id).orElse(null);
@@ -364,7 +364,7 @@ public class StorageBackendService {
 
     // ── 辅助 ───────────────────────────────────────────────────────────
 
-    /** 对照 StorageBackendConfig.LocationKey（mode 的 minio remote 缺省语义） */
+    /** mode 的 minio remote 缺省语义 */
     public static String locationKey(StorageConfig c, String provider) {
         String mode = c.mode == null ? "" : c.mode.trim();
         if ("minio".equals(provider) && mode.isEmpty()) {
@@ -389,7 +389,7 @@ public class StorageBackendService {
         return codec.encode(b.getConfig());
     }
 
-    /** 对照 MaskSensitiveFields：非空密钥 → "***"（掩码只作用于响应） */
+    /** 非空密钥 → "***"（掩码只作用于响应） */
     public com.fasterxml.jackson.databind.JsonNode maskedConfig(StorageBackend b) {
         try {
             StorageConfig c = configOf(b);
@@ -405,7 +405,7 @@ public class StorageBackendService {
         }
     }
 
-    /** 对照 SanitizeStorageConnectivityError：驱动错误 → 中文运维提示 */
+    /** 驱动错误 → 中文运维提示 */
     public static String sanitizeConnectivity(String msg) {
         if (msg == null) {
             return "";
@@ -437,7 +437,7 @@ public class StorageBackendService {
         return "连接失败，请检查配置参数是否正确";
     }
 
-    /** 对照 storageTestErrorMessage：AppError 取 Message，其余清洗（controller 用） */
+    /** AppError 取 Message，其余清洗（controller 用） */
     public String testErrorMessage(RuntimeException e) {
         if (e instanceof BizException biz) {
             return biz.appError().message();
@@ -476,7 +476,7 @@ public class StorageBackendService {
         }
     }
 
-    /** 对照 secutils.SafeJoinUnderBase：越界即拒 */
+    /** 越界即拒 */
     private static Path safeJoinUnderBase(Path base, String prefix) {
         Path result = base;
         if (prefix != null && !prefix.trim().isEmpty()) {
@@ -520,7 +520,7 @@ public class StorageBackendService {
         return out;
     }
 
-    /** path.Clean 近似（Go：Clean("..")=".."、Clean("a/../..")=".."） */
+    /** 路径规范化（近似语义）：{@code ..} 与 {@code a/../..} 均收敛为 {@code ..} */
     private static String clean(String path) {
         if (path.isEmpty()) {
             return ".";

@@ -25,7 +25,7 @@ import com.ragagent.rerank.RerankerConfig;
  * {@code X-TC-Action: RunRerank / X-TC-Version: 2024-05-22 / Authorization: TC3-HMAC-SHA256 ...}。</p>
  *
  * <p><b>批式语义</b>（有测试钉住）：空 documents 直接返回空；每请求最多
- * 60 条文档、Query+Docs 合计最多 2000 字符（rune 计）；超限的单条文档报错；
+ * 60 条文档、Query+Docs 合计最多 2000 字符（码点计）；超限的单条文档报错；
  * 超批的分片各自请求后按批起点平移 index 合并。</p>
  */
 public final class LkeapReranker implements Reranker {

@@ -183,7 +183,7 @@ class MemoryExtractionServiceTest {
             verify(queue).enqueue(any(), delay.capture());
             // 重投延迟 = RetryAt 距今 + 1 秒
             assertThat(delay.getValue()).isBetween(Duration.ofSeconds(59), Duration.ofSeconds(62));
-            // 重投分支在 defer 之前返回 → 绝不释放当前这个 worker 的租约
+            // 重投分支在 finally 之前返回 → 绝不释放当前这个 worker 的租约
             verify(repo, never()).releaseExtractionSlot(any(), anyString());
         }
 
@@ -197,7 +197,7 @@ class MemoryExtractionServiceTest {
             assertThatThrownBy(() -> service.handle(payloadHolder().build()))
                     .isInstanceOf(IllegalStateException.class)
                     .hasMessageContaining("leased until");
-            // 这个分支在 defer 之前 return（Go 也是），且租约属于**别人**——不释放。
+            // 此分支提前 return（不经释放路径），且租约属于**别人**——不释放。
             verify(repo, never()).releaseExtractionSlot(any(), anyString());
         }
 

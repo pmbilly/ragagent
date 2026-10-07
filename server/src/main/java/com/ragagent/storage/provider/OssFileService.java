@@ -47,11 +47,11 @@ public class OssFileService implements FileService {
     /** 预签名有效期：24h。 */
     static final long PRESIGN_TTL_MILLIS = 24L * 3600 * 1000;
 
-    /** 分片阈值（照 Go {@code multipartThreshold = 10 * 1024 * 1024}）。 */
+    /** 分片阈值。 */
     static final long MULTIPART_THRESHOLD = 10L * 1024 * 1024;
-    /** 每片大小（照 Go {@code uo.PartSize = 10 * 1024 * 1024}）。 */
+    /** 每片大小。 */
     static final long PART_SIZE = 10L * 1024 * 1024;
-    /** 分片并发度（照 Go {@code uo.ParallelNum = 3}）。 */
+    /** 分片并发度。 */
     static final int PARALLEL_NUM = 3;
 
     private final OSS client;
@@ -59,7 +59,7 @@ public class OssFileService implements FileService {
     private final String bucketName;
     private final String tempBucketName;
     private final String pathPrefix;
-    /** 分片参数（测试可注入小值；生产即上面的 Go 常量）。 */
+    /** 分片参数（测试可注入小值；生产即上面常量）。 */
     private final long partSize;
     private final long multipartThreshold;
 
@@ -118,7 +118,7 @@ public class OssFileService implements FileService {
         return new OSSClientBuilder().build(normalized, accessKey, secretKey);
     }
 
-    /** 对照 {@code ossEnsureBucket}：不存在则建；409（并发建/已存在）视为成功。 */
+    /** 不存在则建；409（并发建/已存在）视为成功。 */
     static void ensureBucket(OSS client, String bucket) {
         try {
             if (Boolean.TRUE.equals(client.doesBucketExist(bucket))) {
@@ -161,7 +161,7 @@ public class OssFileService implements FileService {
                 ? StorageObjects.contentTypeByExt(ext) : file.contentType();
         try (InputStream in = file.opener().get()) {
             if (file.size() > multipartThreshold) {
-                // 照 Go：>10MB 走 Uploader（10MB/片、3 并发）
+                // 超过阈值走分片上传（10MB/片、3 并发）
                 uploadMultipart(objectName, contentType, in);
             } else {
                 ObjectMetadata metadata = new ObjectMetadata();
@@ -251,7 +251,7 @@ public class OssFileService implements FileService {
         }
     }
 
-    /** best-effort 清理（失败只记日志——照 Go SDK Uploader 的 abort 收尾姿态）。 */
+    /** best-effort 清理（失败只记日志）。 */
     private void abortQuietly(String objectName, String uploadId) {
         try {
             client.abortMultipartUpload(
@@ -372,7 +372,7 @@ public class OssFileService implements FileService {
         return tempClient != null && tempBucketName.equals(bucket) ? tempClient : client;
     }
 
-    /** 对照 {@code parseOssFilePath}：{@code oss://{bucket}/{key}}（不含 bucket 一致性校验）。 */
+    /** {@code oss://{bucket}/{key}}（不含 bucket 一致性校验）。 */
     static String[] parseFilePath(String filePath) {
         String p = filePath == null ? "" : filePath;
         if (!p.startsWith(SCHEME)) {

@@ -275,7 +275,7 @@ public final class MemoryKeys {
         return runeLength(normalizeTopicKey(topic)) > 24;
     }
 
-    // ── rune / 字节序工具（本模块内部共用） ────────────────────────────────
+    // ── 码点 / 字节序工具（本模块内部共用） ────────────────────────────────
 
     /** 字符串的**码点数**，不是 UTF-16 码元数。 */
     public static int runeLength(String s) {

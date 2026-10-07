@@ -43,7 +43,7 @@ import com.ragagent.stream.StreamManager;
  * <p>路由：{@code GET /api/v1/sessions/continue-stream/:session_id?message_id=…}，
  * Viewer 角色 + API-Key 的 chat 能力（full-access）。</p>
  *
- * <h2>流程（顺序有意义，逐条对应 Go）</h2>
+ * <h2>流程（顺序有意义，步骤先后不可调换）</h2>
  * <ol>
  *   <li>取 session_id（路径）与 message_id（查询），各自做日志消毒；</li>
  *   <li><b>先解析 {@code resource_urls}</b>——必须在写任何 SSE 头之前，
@@ -128,9 +128,8 @@ public class SessionStreamController {
      * 当前租户的实体，供 {@link com.ragagent.storage.support.FileServiceResolver} 读
      * {@code storage_engine_config.default_provider}。
      *
-     * <p><b>A3-3 接线</b>：Go 从 ctx 里取已加载好的 {@code *types.Tenant}（认证中间件放进去的），
-     * Java 的 {@code TenantContext} 只存 tenantId、不存实体，故此处按 id 取实体
-     * （与 {@code SystemController} / {@code HybridSearchService} 同一写法）。
+     * <p><b>A3-3 接线</b>：{@code TenantContext} 只存 tenantId、不存租户实体，
+     * 故此处按 id 取实体（与 {@code SystemController} / {@code HybridSearchService} 同一写法）。
      * 取不到时返回 null（调用方按无租户降级）。</p>
      */
     private Tenant currentTenant() {

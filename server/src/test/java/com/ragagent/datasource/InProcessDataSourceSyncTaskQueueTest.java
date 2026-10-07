@@ -141,7 +141,7 @@ class InProcessDataSourceSyncTaskQueueTest {
 
     // ── 重试预算 ─────────────────────────────────────────────────────────
 
-    /** 对照 {@code asynq.MaxRetry(5)}：失败后最多再试 5 次，共 6 次尝试。 */
+    /** 失败后最多再试 5 次，共 6 次尝试。 */
     @Test
     void retriesUpToMaxRetry() throws Exception {
         AtomicInteger attempts = new AtomicInteger();

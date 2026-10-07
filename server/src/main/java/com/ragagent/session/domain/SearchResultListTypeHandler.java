@@ -13,7 +13,7 @@ import com.ragagent.common.retrieval.SearchResult;
  * 而 {@code knowledge_references} 直接出现在消息响应体里，
  * 元素一旦退化成 map，键序就变成 PG jsonb 的规范化序。</p>
  *
- * <p><b>写路径</b>：nil 列表由实体的落库前兜底置成空列表，
+ * <p><b>写路径</b>：null 列表由实体的落库前兜底置成空列表，
  * 落库的实际是 {@code []}。基类的「空列表写 {@code []}」与此一致。</p>
  */
 public class SearchResultListTypeHandler extends AbstractJsonListTypeHandler<SearchResult> {

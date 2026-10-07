@@ -67,7 +67,7 @@ class AuthRegisterContractTest {
     private static final String INVITE_EMAIL = "reg-invite@weknora.test";
     private static final String INVITE_USER = "reginvite-user";
     private static final String INVITE_TOKEN = "reggoldenfixedtoken0123456789abcdef";
-    /** 4001 字符（限 4000，rune 计） */
+    /** 4001 字符（限 4000，码点计） */
 
     private static final Pattern TS_PATTERN = Pattern.compile(
             "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})");

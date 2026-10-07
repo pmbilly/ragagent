@@ -85,7 +85,7 @@ public class ParserEngineRegistry {
                 docreaderConnected ? "" : "DocReader service not connected",
                 result);
 
-        // simple — Go 原生文本/图片，恒可用。
+        // simple — 内置文本/图片解析（无需外部服务），恒可用。
         engine(SIMPLE, "Simple format & image parsing (no external service required)",
                 List.of("md", "markdown", "txt", "csv", "json",
                         "jpg", "jpeg", "png", "gif", "bmp", "tiff", "webp",
@@ -102,7 +102,7 @@ public class ParserEngineRegistry {
                 result);
 
         // mineru / mineru_cloud / paddleocr_vl / paddleocr_vl_cloud — override 未配置即不可用
-        // （Ping 分支需真实网络，配置后才触达——与 Go 相同的短路顺序）。
+        // （Ping 分支需真实网络，配置后才触达——未配置即短路为不可用）。
         String mineruEndpoint = overrides == null ? "" : overrides.getOrDefault("mineru_endpoint", "").trim();
         engine(MINERU, "MinerU self-hosted service",
                 List.of("pdf", "jpg", "jpeg", "png", "bmp", "tiff", "doc", "docx", "ppt", "pptx"),

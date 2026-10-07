@@ -34,7 +34,7 @@ import com.ragagent.im.runtime.ReplyMessage;
  * 企业微信自建应用 webhook 适配器。
  *
  * <p>行为要点：<b>验签</b>走 {@link FeishuWecomCrypt#wecomVerifySignature}（SHA1 排序串接 + 常时比较）；
- * <b>解密</b>自持（AES-CBC + PKCS#7 + 信封 {@code random(16)+len(4)+msg+corpId}，且校 corp_id——
+ * <b>解密</b>自持（AES-CBC + PKCS#7 + 信封 {@code random(16)+长度(4)+msg+corpId}，且校 corp_id——
  * 共享的 {@code wecomDecryptMessage} 只解信封不校 corp_id）；URL 验证（GET + echostr 解密回显）；
  * 解析（群聊剥 {@code @} 提及、text/image 两型、其它忽略）；发送（群先试
  * {@code appchat/send} 失败回落 {@code message/send} 直发用户，markdown + agentid）；

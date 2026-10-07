@@ -110,7 +110,7 @@ class EventMiddlewareTest {
 
     @Test
     void chainEqualsApplyMiddleware() throws Exception {
-        // ApplyMiddleware(handler, mws...) 等价于 Chain(mws...)(handler)
+        // applyMiddleware 逐个包裹与 chain 一次性组合整条链，两者等价
         List<String> order = new ArrayList<>();
         EventMiddleware mw = next -> event -> {
             order.add("mw");

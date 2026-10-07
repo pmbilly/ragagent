@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  * <p>JSON 字段序 = 声明序（KeepAlive 本模块不设置，故略）。省略规则：</p>
  * <ul>
  *   <li>{@code messages} / {@code options} 恒输出；{@code options} 是
- *       "非 nil map"，所以哪怕只有 temperature 也会发 {@code {"temperature":0}}；</li>
+ *       "非 null map"，所以哪怕只有 temperature 也会发 {@code {"temperature":0}}；</li>
  *   <li>{@code stream}：可空布尔，null 省略 → NON_NULL；</li>
  *   <li>{@code format} / {@code tools} / {@code think}：空则省略。</li>
  * </ul>

@@ -244,12 +244,12 @@ public class RemoteApiChat implements LlmChatClient {
             try {
                 // 序列化分路径：
                 // ① prompt-cache 改写路径：每层对象按键字节序
-                //    （goSorted）；
+                //    （byteOrderSorted）；
                 // ② 其余（SDK 结构体直出 / thinking 包装结构体）：openai-go 结构体字段序
                 //    （structSorted），未知键（包装字段如 enable_thinking）尾随。
                 // ③ 两路径同样做 HTML 转义（< > & 转小写十六进制反斜杠 u 形式）。
-                return RemoteApiBodyCodec.GO_MARSHAL.writeValueAsBytes(
-                        cacheRewritten ? RemoteApiBodyCodec.goSorted(body) : RemoteApiBodyCodec.structSorted(body));
+                return RemoteApiBodyCodec.REQUEST_BODY_JSON.writeValueAsBytes(
+                        cacheRewritten ? RemoteApiBodyCodec.byteOrderSorted(body) : RemoteApiBodyCodec.structSorted(body));
             } catch (IOException e) {
                 throw BizException.internal("marshal request: " + e.getMessage());
             }
@@ -257,8 +257,8 @@ public class RemoteApiChat implements LlmChatClient {
     }
 
     /** 薄委托：键序归一路线见 {@link RemoteApiBodyCodec}。 */
-    static JsonNode goSorted(JsonNode node) {
-        return RemoteApiBodyCodec.goSorted(node);
+    static JsonNode byteOrderSorted(JsonNode node) {
+        return RemoteApiBodyCodec.byteOrderSorted(node);
     }
 
     /** 薄委托：传输细节见 {@link RemoteHttpOps}。 */
@@ -412,7 +412,7 @@ public class RemoteApiChat implements LlmChatClient {
     // 日志与访问器
     // ------------------------------------------------------------------
 
-    /** nil 安全的标准用量日志行。 */
+    /** null 安全的标准用量日志行。 */
     void logUsage(TokenUsage usage) {
         if (usage == null) {
             return;

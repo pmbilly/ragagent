@@ -325,7 +325,7 @@ final class SourceToolCodec {
         if (value == null) {
             return raw;
         }
-        value = JsonValues.goFloatTree(value);
+        value = JsonValues.numbersAsDouble(value);
         value = walkJSON("", value, encode, allowed);
         return ToolJson.write(value);
     }

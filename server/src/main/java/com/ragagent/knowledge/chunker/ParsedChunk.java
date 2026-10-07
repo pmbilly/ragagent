@@ -2,7 +2,7 @@ package com.ragagent.knowledge.chunker;
 
 /**
  * 切分输出块。
- * <p>start / end 为原文的 rune（Unicode code point）偏移，恒有
+ * <p>start / end 为原文的码点（Unicode code point）偏移，恒有
  * {@code end - start == runeLen(content)}；该不变式被文档重建代码依赖
  * 面包屑）是单独追踪的上下文串，仅在 embedding 时前置，不属于 content。</p>
  */
@@ -11,9 +11,9 @@ public class ParsedChunk {
     private String content = "";
     private String contextHeader = "";
     private int seq;
-    /** rune 偏移。 */
+    /** 码点偏移。 */
     private int start;
-    /** rune 偏移，end-exclusive。 */
+    /** 码点偏移，end-exclusive。 */
     private int end;
     /** parent-child 分块时指向父块下标；-1 表示无父块。 */
     private int parentIndex;
@@ -103,12 +103,12 @@ public class ParsedChunk {
         return seq;
     }
 
-    /** rune 偏移（别名 {@link #getStart()}）。 */
+    /** 码点偏移（别名 {@link #getStart()}）。 */
     public int startAt() {
         return start;
     }
 
-    /** rune 偏移，end-exclusive（别名 {@link #getEnd()}）。 */
+    /** 码点偏移，end-exclusive（别名 {@link #getEnd()}）。 */
     public int endAt() {
         return end;
     }

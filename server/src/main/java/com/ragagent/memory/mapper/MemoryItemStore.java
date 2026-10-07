@@ -413,7 +413,7 @@ final class MemoryItemStore {
      * 修剪墓碑，让这张表保持有界。很久以前的一次拒绝，
      * 没有这张表无上限长大重要。
      *
-     * <p>⚠️ 那个 {@code len(keep) < Max} 就返回的判断不能省——它保证"还没到上限时不删"，
+     * <p>⚠️ 那个 {@code keep.size() < MAX_TOMBSTONES} 就返回的判断不能省——它保证"还没到上限时不删"，
      * 而且顺带避开了 {@code id NOT IN ()} 这种非法 SQL。</p>
      */
     private void trimTombstones(MemoryScope scope) {

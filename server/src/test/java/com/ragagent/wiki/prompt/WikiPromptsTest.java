@@ -131,7 +131,6 @@ class WikiPromptsTest {
     }
 
     /**
-     * TestWikiChunkCitationPrompt_StablePrefixAcrossBatches（Go L89-115）：
      * 同一文档内候选 slug 与静态规则不变，只有逐批的 {@code <chunks>} 块变化，
      * 因此 {@code <chunks>} 之前的全部内容必须逐字节相同。若静态规则排在
      * {@code <chunks>} 之后，它们会每一批都被重新计费，而这个前缀也会发散。
@@ -164,7 +163,6 @@ class WikiPromptsTest {
     }
 
     /**
-     * TestWikiChunkCitationPrompt_PreservesPlaceholders（Go L119-125）：
      * 防止未来重排时误丢模板字段。
      */
     @Test
@@ -176,7 +174,6 @@ class WikiPromptsTest {
     }
 
     /**
-     * TestWikiPageModifyUserPrompt_HidesInternalChunkHandles（Go L127-144）：
      * 页面上绝不能出现内联 chunk 句柄。
      */
     @Test
@@ -212,7 +209,6 @@ class WikiPromptsTest {
     }
 
     /**
-     * TestWikiPageModifyUserPrompt_SharedSourceContextPrecedesPageVariables（Go L168-183）：
      * 共享源上下文必须在 {@code <page_metadata>} 之前，才能成为可缓存前缀。
      */
     @Test

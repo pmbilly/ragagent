@@ -140,7 +140,7 @@ public class WikiReadPageTool extends BaseTool {
             if (hitPages.isEmpty()) {
                 List<String> kbs = filteredOut.get(slug);
                 if (kbs != null && !kbs.isEmpty()) {
-                    errs.add("Wiki page '" + slug + "' exists in " + goSliceString(kbs)
+                    errs.add("Wiki page '" + slug + "' exists in " + sliceText(kbs)
                             + " but none of its source documents are within the scope pinned by the user");
                 } else if (!lookupFailed.contains(slug)) {
                     errs.add("Wiki page '" + slug + "' not found");
@@ -300,7 +300,7 @@ public class WikiReadPageTool extends BaseTool {
     }
 
     /** 列表的输出形态：" [a b c]"。 */
-    private static String goSliceString(List<String> items) {
+    private static String sliceText(List<String> items) {
         return "[" + String.join(" ", items) + "]";
     }
 

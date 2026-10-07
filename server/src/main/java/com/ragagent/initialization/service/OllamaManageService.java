@@ -80,9 +80,9 @@ public final class OllamaManageService {
             n.put("name", m.name());
             n.put("size", m.size());
             n.put("digest", m.digest());
-            // Go：time.Time 经 json 反序列化保留 UTC location → marshal 仍是 Z，
-            // 不做服务器本地时区转换（与 startTime 的 time.Now() 本地时区路径刻意不同）
-            n.put("modifiedAt", ModelConnectivityTestService.goTimeAsIs(m.modifiedAt()));
+            // modifiedAt 保持 UTC 输出（Z 后缀），不做服务器本地时区转换
+            // （与 startTime 的本地时区路径刻意不同）
+            n.put("modifiedAt", ModelConnectivityTestService.timeAsIs(m.modifiedAt()));
         }
         return ModelConnectivityTestService.ok(data);
     }
@@ -188,9 +188,9 @@ public final class OllamaManageService {
         n.put("status", task.status);
         n.putRawValue("progress", new com.fasterxml.jackson.databind.util.RawValue(Double.toString(task.progress)));
         n.put("message", task.message);
-        n.put("startTime", ModelConnectivityTestService.goTime(task.startTime));
+        n.put("startTime", ModelConnectivityTestService.isoTimeText(task.startTime));
         if (task.endTime != null) {
-            n.put("endTime", ModelConnectivityTestService.goTime(task.endTime));
+            n.put("endTime", ModelConnectivityTestService.isoTimeText(task.endTime));
         }
         return n;
     }
@@ -272,7 +272,7 @@ public final class OllamaManageService {
             throw new BizException(AppError.badRequest(e.getMessage()));
         }
         if (n == null) {
-            // Go：body "null" → 零值绑定不报错，等价空对象
+            // body 为字面 "null" → 等价空对象绑定，不报错
             n = MAPPER.createObjectNode();
         }
         if (!n.isObject()) {

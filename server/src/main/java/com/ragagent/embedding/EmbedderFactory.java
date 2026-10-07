@@ -134,7 +134,7 @@ public final class EmbedderFactory {
         }
     }
 
-    /** Go aliyun 分支：多模态检测 + compatible-mode URL 修正。 */
+    /** aliyun 分支：多模态检测 + compatible-mode URL 修正。 */
     private static Embedder newAliyun(EmbedderConfig config, EmbedderPooler pooler) {
         String nameLower = config.getModelName() == null ? "" : config.getModelName().toLowerCase(Locale.ROOT);
         boolean isMultimodalModel = nameLower.contains("vision") || nameLower.contains("multimodal");
@@ -163,7 +163,7 @@ public final class EmbedderFactory {
         return oe;
     }
 
-    /** Go default 分支的 URL/构造逻辑已内联进 switch（含 custom headers 注入）。 */
+    /** 其余 provider（default 分支）的 URL/构造逻辑已内联进上方 switch（含 custom headers 注入）。 */
     static Embedder wrapEmbeddingConcurrency(Embedder e, int limit, ConcurrencyGovernor governor) {
         if (e == null) {
             return e;

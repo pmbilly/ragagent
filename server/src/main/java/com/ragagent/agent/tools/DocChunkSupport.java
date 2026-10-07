@@ -250,13 +250,13 @@ public final class DocChunkSupport {
         }
         Map<String, String> out = new LinkedHashMap<>();
         for (Map.Entry<String, Object> e : metadata.entrySet()) {
-            out.put(e.getKey(), goFmtV(e.getValue()));
+            out.put(e.getKey(), valueText(e.getValue()));
         }
         return out;
     }
 
     /** 常见标量的输出形态（metadata 值用；嵌套容器的序不保证）。 */
-    public static String goFmtV(Object v) {
+    public static String valueText(Object v) {
         if (v == null) {
             return "<nil>";
         }

@@ -54,16 +54,16 @@ import com.ragagent.common.web.ToolJson;
          * 两空格缩进的 JSON 字节形态。
          * deletedAt 时间戳无效时序列化为 null。
          */
-        public String toGoJsonIndent() {
+        public String indentedJson() {
             // 嵌套数组非空时逐元素换行缩进
             StringBuilder b = new StringBuilder();
             b.append("{\n");
-            b.append("  \"id\": ").append(goJsonString(id)).append(",\n");
+            b.append("  \"id\": ").append(jsonString(id)).append(",\n");
             b.append("  \"tenant_id\": ").append(tenantId).append(",\n");
-            b.append("  \"knowledge_base_id\": ").append(goJsonString(knowledgeBaseId)).append(",\n");
-            b.append("  \"slug\": ").append(goJsonString(slug)).append(",\n");
-            b.append("  \"issue_type\": ").append(goJsonString(issueType)).append(",\n");
-            b.append("  \"description\": ").append(goJsonString(description)).append(",\n");
+            b.append("  \"knowledge_base_id\": ").append(jsonString(knowledgeBaseId)).append(",\n");
+            b.append("  \"slug\": ").append(jsonString(slug)).append(",\n");
+            b.append("  \"issue_type\": ").append(jsonString(issueType)).append(",\n");
+            b.append("  \"description\": ").append(jsonString(description)).append(",\n");
             b.append("  \"suspected_knowledge_ids\": ");
             if (suspectedKnowledgeIds == null || suspectedKnowledgeIds.isEmpty()) {
                 b.append("[]");
@@ -73,21 +73,21 @@ import com.ragagent.common.web.ToolJson;
                     if (i > 0) {
                         b.append(",\n");
                     }
-                    b.append("    ").append(goJsonString(suspectedKnowledgeIds.get(i)));
+                    b.append("    ").append(jsonString(suspectedKnowledgeIds.get(i)));
                 }
                 b.append("\n  ]");
             }
             b.append(",\n");
-            b.append("  \"status\": ").append(goJsonString(status)).append(",\n");
-            b.append("  \"reported_by\": ").append(goJsonString(reportedBy)).append(",\n");
-            b.append("  \"created_at\": ").append(goJsonString(createdAt)).append(",\n");
-            b.append("  \"updated_at\": ").append(goJsonString(updatedAt)).append(",\n");
-            b.append("  \"deleted_at\": ").append(deletedAtValid ? goJsonString(deletedAt) : "null").append("\n");
+            b.append("  \"status\": ").append(jsonString(status)).append(",\n");
+            b.append("  \"reported_by\": ").append(jsonString(reportedBy)).append(",\n");
+            b.append("  \"created_at\": ").append(jsonString(createdAt)).append(",\n");
+            b.append("  \"updated_at\": ").append(jsonString(updatedAt)).append(",\n");
+            b.append("  \"deleted_at\": ").append(deletedAtValid ? jsonString(deletedAt) : "null").append("\n");
             b.append('}');
             return b.toString();
         }
 
-        private static String goJsonString(String s) {
+        private static String jsonString(String s) {
             return ToolJson.quoted(s == null ? "" : s);
         }
     }

@@ -644,7 +644,7 @@ public class DataSourceService implements DataSourceSyncHandler {
 
     // ── 同步执行：实现随协作者（DataSourceSyncExecutor） ──
 
-    /** 同步任务入口（asynq handler 的等价物）：实现见 {@link DataSourceSyncExecutor}。 */
+    /** 同步任务入口：实现见 {@link DataSourceSyncExecutor}。 */
     @Override
     public void handle(DataSourceSyncPayload payload) {
         executor.handle(payload);

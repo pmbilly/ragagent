@@ -32,7 +32,7 @@ import com.ragagent.common.retrieval.SearchResult;
  * <p>可并发使用：{@code mu} 同时保护 memo 与 resolver（后者自身是单线程的）。
  * 解析因此跨线程串行化——这正是想要的：两个分片提到同一张图不该各付一次签名钱。</p>
  *
- * <h2>日志策略（照搬 Go）</h2>
+ * <h2>日志策略</h2>
  * <ul>
  *   <li>重写成功记源引用于 INFO；**签名后的 URL 只记 DEBUG**，免得日志聚合系统
  *       把匿名可读的链接发出去。运维验证可达性时把日志级别调高即可。</li>
@@ -272,14 +272,14 @@ public class Rewriter {
             return out.equals(text) ? new Converted(value, false) : new Converted(out, true);
         }
         if (value instanceof List<?> list) {
-            // references 事件把检索结果带了两遍：一次在 StreamResponse.KnowledgeReferences，
-            // 一次在 Data。内存流管理器下它们到达时是**有类型的切片**（而不是 Redis
-            // 往返后解码出的 []interface{}），所以两种形态都要处理，
+            // references 事件把检索结果带了两遍：一次在 StreamResponse 的 knowledgeReferences，
+            // 一次在 Data。内存流管理器下它们到达时是**有类型的列表**（而不是 Redis
+            // 往返后解码出的无类型列表），所以两种形态都要处理，
             // 否则 Data 那份会漏出调用方要求解析掉的手柄。
             if (isReferenceList(list)) {
                 @SuppressWarnings("unchecked")
                 List<SearchResult> typed = (List<SearchResult>) list;
-                // Go 这一支恒返回 changed = true（副本总归是新建的）。
+                // 该分支恒返回 changed = true（副本总归是新建的）。
                 return new Converted(copyReferences(typed), true);
             }
             List<Object> out = new ArrayList<>(list.size());

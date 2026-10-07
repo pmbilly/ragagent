@@ -118,7 +118,7 @@ public final class AgentMarkdown {
         }
         String raw = m.group(1);
         String text = Fetcher.HtmlStrip.stripTags(raw);
-        return Fetcher.HtmlStrip.goTrimSpace(text);
+        return Fetcher.HtmlStrip.trimUnicodeWhitespace(text);
     }
 
     private static String removeBlocks(String html, Pattern[] blocks) {
@@ -146,7 +146,7 @@ public final class AgentMarkdown {
         Matcher m = p.matcher(html);
         while (m.find()) {
             String quote = m.group(2);
-            String raw = Fetcher.HtmlStrip.goTrimSpace(m.group(3));
+            String raw = Fetcher.HtmlStrip.trimUnicodeWhitespace(m.group(3));
             String replacement = m.group();
             try {
                 URI target = pageUrl.resolve(URI.create(raw));

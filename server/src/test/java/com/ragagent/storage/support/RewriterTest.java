@@ -239,7 +239,7 @@ class RewriterTest {
 
     /**
      * references 事件把检索结果带了两遍：{@code StreamResponse.KnowledgeReferences} 与
-     * {@code Data}。内存流管理器下 {@code Data} 里保留的是**有类型的切片**，
+     * {@code Data}。内存流管理器下 {@code Data} 里保留的是**有类型的列表**，
      * 所以 {@code copyData} 必须能走进去，否则 {@code Data} 那份会漏出句柄。
      */
     @Test
@@ -309,9 +309,9 @@ class RewriterTest {
     }
 
     /**
-     * 有进程级默认服务时，provider 引用**会**走它——这是 Go {@code BuildFileServiceForProvider}
-     * 的回落分支（{@code NewFileServiceFromStorageConfig} 建不出来就回落到 {@code defaultSvc}），
-     * 不是 Java 的自作主张。注意 {@code resource://} 手柄也走同一个默认服务。
+     * 有进程级默认服务时，provider 引用**会**走它——provider 级服务缺位
+     * （或建不出来）时回落到进程级默认的既定分支。
+     * 注意 {@code resource://} 手柄也走同一个默认服务。
      */
     @Test
     void providerReferenceFallsBackToProcessDefaultService() {

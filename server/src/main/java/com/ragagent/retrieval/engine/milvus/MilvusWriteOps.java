@@ -141,7 +141,7 @@ final class MilvusWriteOps {
         log.info("[Milvus] Successfully deleted documents by {}", field);
     }
 
-    // ── 批量更新（查整行 → 改字段 → Upsert 回写，照 Go） ──────────────────
+    // ── 批量更新（查整行 → 改字段 → Upsert 回写） ──────────────────
 
     void batchUpdateChunkEnabledStatus(Map<String, Boolean> chunkStatusMap)
             throws Exception {
@@ -248,7 +248,7 @@ final class MilvusWriteOps {
         log.info("[Milvus] Batch update chunk tag ID completed");
     }
 
-    /** 对照 {@code searchByFilter}：Query（无分数的整行读取，供更新/拷贝/move 用）。 */
+    /** Query（无分数的整行读取，供更新/拷贝/move 用）。 */
     List<MilvusVectorEmbedding> searchByFilter(String collection,
                                                MilvusFilter.Condition condition) {
         String filter;
@@ -267,7 +267,7 @@ final class MilvusWriteOps {
         return out;
     }
 
-    // ── CopyIndices（照 Go：offset 分页 + 三态 SourceID + isEnabled 沿用源值） ──
+    // ── CopyIndices（offset 分页 + 三态 SourceID + isEnabled 沿用源值） ──
 
     void copyIndices(String sourceKnowledgeBaseId, Map<String, String> sourceToTargetKbIdMap,
                             Map<String, String> sourceToTargetChunkIdMap,

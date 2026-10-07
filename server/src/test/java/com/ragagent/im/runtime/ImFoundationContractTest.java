@@ -344,7 +344,7 @@ class ImFoundationContractTest {
 
     @Test
     void userKeyTrailingSeparator() {
-        // Go Sprintf 语义：chatID 为空仍占第三段（"a:b:"）
+        // chatID 为空仍占第三段（"a:b:"）
         assertEquals("a:b:", ImFormat.makeUserKey("a", "b", "", ""));
     }
 }

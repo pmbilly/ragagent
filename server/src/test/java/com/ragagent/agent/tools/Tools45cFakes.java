@@ -15,11 +15,6 @@ public final class Tools45cFakes {
         return new RuntimeException(msg);
     }
 
-    /** 任意对象 → 录制侧同款 JSON 字节形态（对 Map<String,String> 等的便捷入口）。 */
-    public static String goJson(Object o) {
-        return com.ragagent.common.web.ToolJson.write(RecordingSupport.PLAIN.valueToTree(o));
-    }
-
     /** 按 group+id 取录制常量（R_<GROUP>_<ID>，id 大写化）。 */
     public static com.fasterxml.jackson.databind.JsonNode rec45c(String group, String id) {
         String name = "R_" + group.toUpperCase().replace('-', '_')

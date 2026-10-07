@@ -41,7 +41,7 @@ public class SearchMemoryTool extends BaseTool {
     static final int MEMORY_SEARCH_DEFAULT_ITEMS = 10;
     /** 返回条数硬上限。 */
     static final int MEMORY_SEARCH_MAX_ITEMS = 20;
-    /** 单条记忆内容的 rune 上限。 */
+    /** 单条记忆内容的码点上限。 */
     static final int MEMORY_CONTENT_MAX_RUNES = 300;
 
     private static final String SCHEMA_JSON = """
@@ -185,7 +185,7 @@ public class SearchMemoryTool extends BaseTool {
         return result;
     }
 
-    /** 内容消毒：换行/控制字符折叠 → 空白压缩 → 300 rune 截断。 */
+    /** 内容消毒：换行/控制字符折叠 → 空白压缩 → 300 码点截断。 */
     static String sanitizeMemoryContent(String content) {
         if (content == null) {
             return "";

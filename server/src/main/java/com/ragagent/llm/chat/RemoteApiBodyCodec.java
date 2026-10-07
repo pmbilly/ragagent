@@ -12,18 +12,18 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * 出站请求体键序/序列化协作者（自 {@link RemoteApiChat} 拆出，全静态）：
- * 请求体序列化器（{@code GO_MARSHAL}）与两条键序归一路线——
- * map 字节序（{@code goSorted}，prompt-cache 改写路径）与 openai-go 结构体声明序
+ * 请求体序列化器（{@code REQUEST_BODY_JSON}）与两条键序归一路线——
+ * map 字节序（{@code byteOrderSorted}，prompt-cache 改写路径）与 openai-go 结构体声明序
  * （{@code structSorted}，SDK 直出/thinking 包装路径）。门面 {@code Outbound.bodyBytes()}
- * 与测试直调的 {@code RemoteApiChat.goSorted} 委托至此。
+ * 与测试直调的 {@code RemoteApiChat.byteOrderSorted} 委托至此。
  *
- * <p><b>2026-10-03（B38）</b>：Go 版已下线——序列化器不再复刻 Go 的 HTML 转义；
- * 键序归一保留（prompt-cache 与结构体声明序是请求体自身的形态约束）。</p>
+ * <p>序列化器用标准 JSON 转义（不做 HTML 转义）；键序归一保留
+ * （prompt-cache 与结构体声明序是请求体自身的形态约束）。</p>
  */
 final class RemoteApiBodyCodec {
 
     /** 出站请求体序列化器（标准 JSON 转义）。 */
-    static final com.fasterxml.jackson.databind.json.JsonMapper GO_MARSHAL =
+    static final com.fasterxml.jackson.databind.json.JsonMapper REQUEST_BODY_JSON =
             com.fasterxml.jackson.databind.json.JsonMapper.builder().build();
 
     /**
@@ -35,7 +35,7 @@ final class RemoteApiBodyCodec {
      *
      * <p>键序比较用 UTF-8 字节序，而非 Java 字符串的 UTF-16 码元序。</p>
      */
-    static JsonNode goSorted(JsonNode node) {
+    static JsonNode byteOrderSorted(JsonNode node) {
         if (node == null || node.isNull()) {
             return node;
         }
@@ -47,14 +47,14 @@ final class RemoteApiBodyCodec {
                     b.getBytes(java.nio.charset.StandardCharsets.UTF_8)));
             ObjectNode sorted = JsonNodeFactory.instance.objectNode();
             for (String name : names) {
-                sorted.set(name, goSorted(node.get(name)));
+                sorted.set(name, byteOrderSorted(node.get(name)));
             }
             return sorted;
         }
         if (node.isArray()) {
             ArrayNode sorted = JsonNodeFactory.instance.arrayNode();
             for (JsonNode item : node) {
-                sorted.add(goSorted(item));
+                sorted.add(byteOrderSorted(item));
             }
             return sorted;
         }

@@ -90,7 +90,7 @@ public class FileAccessResolver {
     /**
      * 只查<b>持久化的渲染/输出字段</b>（content / artifacts[].url / knowledge_references /
      * images / agent_steps[].tool_calls[].result）——工具参数与请求元数据不算证据。
-     * Go 对 List 字段整体 json.Marshal 后跑整 token 匹配；Java 用 Jackson 等价序列化
+     * 列表字段整体经 Jackson 序列化为 JSON 后跑整 token 匹配
      * （引用 token 本身不含 HTML 特殊字符，转义差异不影响匹配）。
      */
     public boolean messageReferencesFile(MessageFileFacts facts, String reference) {
@@ -114,7 +114,7 @@ public class FileAccessResolver {
                     return true;
                 }
             } catch (Exception ignored) {
-                // Go: json.Marshal 失败被吞（data 为空串 → 匹配不上）
+                // 序列化失败被吞（data 为空串 → 匹配不上）
             }
         }
         for (Object result : facts.toolResults()) {
@@ -127,7 +127,7 @@ public class FileAccessResolver {
                     return true;
                 }
             } catch (Exception ignored) {
-                // Go: json.Marshal 失败被吞（data 为空串 → 匹配不上）
+                // 序列化失败被吞（data 为空串 → 匹配不上）
             }
         }
         return false;
@@ -169,7 +169,7 @@ public class FileAccessResolver {
         try {
             facts = messages.getMessage(sessionId, messageId);
         } catch (RuntimeException e) {
-            // Go: messages.GetMessage 的任何 error → ErrNotFound（fileAccessError 折 404 无体）
+            // 消息加载的任何异常 → 404（无响应体）
             throw FileAccessException.notFound();
         }
         if (facts == null) {

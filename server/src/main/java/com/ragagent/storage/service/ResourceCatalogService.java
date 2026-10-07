@@ -177,10 +177,10 @@ public class ResourceCatalogService {
             return null;
         }
         long windowSeconds = window.toSeconds();
-        long goZeroToEpoch = 62135596800L;
-        long sinceZero = OffsetDateTime.now(ZoneOffset.UTC).toEpochSecond() + goZeroToEpoch;
+        long year1ToEpochSeconds = 62135596800L;
+        long sinceZero = OffsetDateTime.now(ZoneOffset.UTC).toEpochSecond() + year1ToEpochSeconds;
         long truncated = sinceZero - (sinceZero % windowSeconds);
-        long windowStartEpoch = truncated - goZeroToEpoch;
+        long windowStartEpoch = truncated - year1ToEpochSeconds;
         OffsetDateTime windowStart = OffsetDateTime.ofInstant(java.time.Instant.ofEpochSecond(windowStartEpoch), ZoneOffset.UTC);
         String payload = "resource_grant:v1:" + resourceId + ":" + windowStartEpoch;
         try {
@@ -257,11 +257,10 @@ public class ResourceCatalogService {
             long size, String contentHash, boolean temporary) {
     }
 
-    /** storage://<backendID>/<providerPath> 的拆分（对照 types.ParseStorageBackendPath）。 */
+    /** storage://<backendID>/<providerPath> 的拆分。 */
     record BackendScopedPath(String backendId, String providerPath) {
     }
 
-    /** 对照 types.ParseStorageBackendPath。 */
     static BackendScopedPath parseStorageBackendPath(String path) {
         final String scheme = "storage://";
         if (path == null || !path.startsWith(scheme)) {
@@ -275,7 +274,7 @@ public class ResourceCatalogService {
         return new BackendScopedPath(rest.substring(0, slash), rest.substring(slash + 1));
     }
 
-    /** 对照 types.ParseProviderScheme：provider:// 前缀提取，未知 → ""。 */
+    /** provider:// 前缀提取，未知 → ""。 */
     static String parseProviderScheme(String filePath) {
         BackendScopedPath scoped = parseStorageBackendPath(filePath);
         if (scoped != null) {

@@ -45,11 +45,11 @@ final class McpServiceCrudOps {
 
     // ── 创建 ─────────────────────────────────────────────────────────────
 
-    /** 对照 CreateMCPService — Admin+ */
+    /** 权限 Admin+。 */
     public ResponseEntity<?> createMCPService(
             @RequestBody(required = false) McpServiceCreateRequest req) {
         if (req == null) {
-            // 对照 gin ShouldBindJSON 空 body → "No content to map due to end-of-input"
+            // 空 body → "No content to map due to end-of-input"
             throw BizException.badRequest("No content to map due to end-of-input");
         }
         long tenantId = McpServiceController.requireTenant();
@@ -61,7 +61,7 @@ final class McpServiceCrudOps {
         // 不补这一步行为就会漂移；这里显式对齐该效果。
         service.setEnabled(true);
 
-        // 出站 URL 的 SSRF 校验（对照 handler L93-105）
+        // 出站 URL 的 SSRF 校验
         validateServiceUrlForSsrf(service.getUrl());
         try {
             McpServiceUrls.validateServiceOutboundUrls(service);
@@ -86,7 +86,7 @@ final class McpServiceCrudOps {
 
     // ── 列表 / 详情 ──────────────────────────────────────────────────────
 
-    /** 对照 ListMCPServices — Viewer+ */
+    /** 权限 Viewer+。 */
     public ResponseEntity<?> listMCPServices() {
         long tenantId = McpServiceController.requireTenant();
         List<McpService> services;
@@ -99,7 +99,7 @@ final class McpServiceCrudOps {
         return McpServiceController.ok(mcpServiceResponses(tenantId, services));
     }
 
-    /** 对照 GetMCPService — Viewer+ */
+    /** 权限 Viewer+。 */
     public ResponseEntity<?> getMCPService(@PathVariable("id") String id) {
         long tenantId = McpServiceController.requireTenant();
         McpService service;
@@ -115,7 +115,7 @@ final class McpServiceCrudOps {
     // ── 更新（handler 210 行单函数：存在性语义 + 凭据保护 + 连接失效 + DTO 组装） ──
 
     /**
-     * 对照 UpdateMCPService — Admin+。
+     * 权限 Admin+。
      *
      * <p>标量字段用<b>存在性映射</b>（updateFields），因为零值无法区分
      * "没传"与"显式清空"；非标量字段按类型判断，类型不符即静默跳过。
@@ -294,7 +294,7 @@ final class McpServiceCrudOps {
 
     // ── 删除 ─────────────────────────────────────────────────────────────
 
-    /** 对照 DeleteMCPService — Admin+ */
+    /** 权限 Admin+。 */
     public ResponseEntity<?> deleteMCPService(@PathVariable("id") String id) {
         long tenantId = McpServiceController.requireTenant();
         String serviceId = McpServiceController.sanitize(id);
@@ -312,7 +312,7 @@ final class McpServiceCrudOps {
     // ── 连接测试 / 工具 / 资源 ────────────────────────────────────────────
 
     /**
-     * 对照 TestMCPService — Admin+（会主动探测外部基础设施）。
+     * 权限 Admin+（会主动探测外部基础设施）。
      *
      * <p>与其它端点不同：连接失败也返回 <b>200</b>，把失败装进
      * {@code data.success=false} 的业务结果里，前端据此渲染测试面板。</p>
@@ -333,7 +333,7 @@ final class McpServiceCrudOps {
         return McpServiceController.ok(result);
     }
 
-    /** 对照 GetMCPServiceTools — Viewer+（不落库） */
+    /** 权限 Viewer+（不落库）。 */
     public ResponseEntity<?> getMCPServiceTools(@PathVariable("id") String id) {
         long tenantId = McpServiceController.requireTenant();
         String serviceId = McpServiceController.sanitize(id);
@@ -347,7 +347,7 @@ final class McpServiceCrudOps {
         return McpServiceController.ok(tools);
     }
 
-    /** 对照 GetMCPServiceResources — Viewer+ */
+    /** 权限 Viewer+。 */
     public ResponseEntity<?> getMCPServiceResources(@PathVariable("id") String id) {
         long tenantId = McpServiceController.requireTenant();
         String serviceId = McpServiceController.sanitize(id);
@@ -375,7 +375,7 @@ final class McpServiceCrudOps {
         McpServiceResponse.attachCatalogs(resp, services, summaries);
         return resp;
     }
-    /** SSH 校验：出站 URL 必须在白名单/公网范围内（对照 handler L94-100） */
+    /** SSH 校验：出站 URL 必须在白名单/公网范围内 */
     private void validateServiceUrlForSsrf(String url) {
         if (url == null || url.isEmpty()) {
             return;

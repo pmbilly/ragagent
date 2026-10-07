@@ -75,7 +75,7 @@ public class SyncLog {
     @TableField("started_at")
     private OffsetDateTime startedAt = ZeroTimeSerializer.ZERO_DATE_TIME;
 
-    /** 同步完成时间。指针 → nil 输出 {@code null}。 */
+    /** 同步完成时间。指针字段，{@code null} 原样输出。 */
     @TableField("finished_at")
     private OffsetDateTime finishedAt;
 

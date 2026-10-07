@@ -26,7 +26,7 @@ public final class McpLog {
      * <ul>
      *   <li>{@code maxRunes <= 0} → 返回空串；</li>
      *   <li>长度不足 → 原样返回（<b>不加</b>省略号）；</li>
-     *   <li>刚好等于上限 → 不截断（{@code len(runes) <= maxRunes}）。</li>
+     *   <li>刚好等于上限 → 不截断（{@code codePoints.length <= maxRunes}）。</li>
      * </ul>
      */
     public static String preview(String s, int maxRunes) {

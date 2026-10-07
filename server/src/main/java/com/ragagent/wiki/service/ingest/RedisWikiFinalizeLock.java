@@ -46,7 +46,7 @@ public class RedisWikiFinalizeLock implements WikiFinalizeLock {
     private final Duration renew;
 
     /**
-     * 续期协程池。守护线程，单个 finalize 的续期任务极轻（每 20 秒一次 EXPIRE），
+     * 续期线程池。守护线程，单个 finalize 的续期任务极轻（每 20 秒一次 EXPIRE），
      * 因此进程内一个共享调度器足够。
      */
     private final ScheduledExecutorService renewer =

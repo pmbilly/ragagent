@@ -17,8 +17,8 @@ import com.ragagent.rerank.RerankerConfig;
  *
  * <p>POST 到 base URL 本身（默认
  * {@code https://open.bigmodel.cn/api/paas/v4/rerank}）；请求体
- * {@code top_n:0}（omitempty 省略）、{@code return_documents:true}
- * （omitempty 但 true 非零恒输出）、{@code return_raw_scores:false}（省略）。
+ * {@code top_n:0}（零值省略）、{@code return_documents:true}
+ * （true 非零恒输出）、{@code return_raw_scores:false}（零值省略）。
  * 响应 {@code results[].document} 是<b>字符串</b>。</p>
  */
 public final class ZhipuReranker implements Reranker {
@@ -50,7 +50,7 @@ public final class ZhipuReranker implements Reranker {
         requestBody.put("model", modelName);
         requestBody.put("query", query == null ? "" : query);
         requestBody.set("documents", ProviderJson.arrayOfStrings(documents));
-        // TopN=0 → omitempty 省略；ReturnDocuments=true → 输出；ReturnRawScores=false → 省略
+        // top_n 零值省略；return_documents=true → 输出；return_raw_scores 零值省略
         requestBody.put("return_documents", true);
         byte[] jsonData = ProviderJson.marshal(requestBody);
 

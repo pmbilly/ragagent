@@ -61,7 +61,7 @@ public final class InputSanitizer {
         return input;
     }
 
-    /** 对照 CleanMarkdown：命中 XSS 模式的子串整体移除（不转义）。 */
+    /** 命中 XSS 模式的子串整体移除（不转义）。 */
     public static String cleanMarkdown(String input) {
         if (input == null || input.isEmpty()) {
             return input == null ? "" : input;

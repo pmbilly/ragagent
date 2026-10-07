@@ -103,7 +103,7 @@ class FaqSnippetRecordingTest {
         Map<String, Object> data = new java.util.LinkedHashMap<>();
         data.put("content", "x");
         FaqSnippet.appendFaqChunkData(data, faqChunk());
-        assertThat(RecordingSupport.goJsonOfData(data)).isEqualTo(r.get("out").asText());
+        assertThat(RecordingSupport.jsonOfData(data)).isEqualTo(r.get("out").asText());
     }
 
     /** 对照探针的 chunkFaq（metadata 由 FaqChunkMetadata.toJsonNode 落进 chunk.metadata）。 */

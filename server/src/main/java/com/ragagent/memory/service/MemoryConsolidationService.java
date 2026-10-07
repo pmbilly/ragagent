@@ -307,7 +307,7 @@ public class MemoryConsolidationService {
     /**
      * 把一组组近重复的记忆折成一条陈述。
      *
-     * <p>{@code candidates} 是找到的组数，不是封顶之后的 {@code len(clusters)}——
+     * <p>{@code candidates} 是找到的组数，不是封顶之后的 {@code clusters.size()}——
      * 它是用来告诉调用方"空结果意味着没有任何东西看起来相似"还是"模型说了不"的。</p>
      */
     private MergeOutcome mergeRedundant(MemoryScope scope, MemoryConfig cfg, String modelId,

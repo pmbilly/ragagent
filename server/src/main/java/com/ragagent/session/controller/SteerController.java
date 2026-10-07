@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 交接在 SteerRunCoordinator / SteerSinkBridge。
  *
  * 关键契约：delivery 缺省 after（注入是显式 opt-in）；队列深度按未消费条数计
- * （max 10）；query 上限 10000 rune；live run 指向的消息已完成时清理并视为无 run；
+ * （max 10）；query 上限 10000 码点；live run 指向的消息已完成时清理并视为无 run；
  * consumed 标记在事件 data 上（跨副本一致）；503=活 turn 查询失败（可重试），
  * 409=活轮已切换/steer_id 被占用。
  */

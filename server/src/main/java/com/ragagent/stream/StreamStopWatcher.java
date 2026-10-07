@@ -12,8 +12,7 @@ import com.ragagent.common.llm.ResponseType;
  * 发现 {@link ResponseType#STOP} 即触发取消信号后退出；{@code alive} 转 false
  * （轮次结束）亦退出。
  *
- * <p>IM 侧用它实现跨实例停止检测（对齐 Go internal/im 的
- * {@code watchStreamManagerStop}，间隔 500ms 同 Go 的 stopPollInterval）；
+ * <p>IM 侧用它实现跨实例停止检测（500ms 轮询）；
  * web 侧的 SSE 检测循环有其专用实现（{@code QaSseOrchestrator.startStopWatcher}），
  * 暂未合并——两者的事件消费语义不同（web 版还要发 EVENT_STOP 并收流）。</p>
  */
@@ -21,7 +20,7 @@ public final class StreamStopWatcher {
 
     private static final Logger log = LoggerFactory.getLogger(StreamStopWatcher.class);
 
-    /** 轮询间隔（Go IM 侧的 {@code stopPollInterval}）。 */
+    /** 轮询间隔。 */
     static final long POLL_INTERVAL_MILLIS = 500;
 
     private StreamStopWatcher() {
@@ -42,7 +41,7 @@ public final class StreamStopWatcher {
                 try {
                     batch = streamManager.getEvents(sessionId, messageId, offset);
                 } catch (RuntimeException e) {
-                    // 瞬态读错误：跳过本轮（对齐 Go 的 err → continue）
+                    // 瞬态读错误：跳过本轮
                     log.warn("stop watcher poll failed: session={} message={}: {}",
                             sessionId, messageId, e.getMessage());
                     if (!sleepQuietly()) {

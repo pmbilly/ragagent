@@ -64,7 +64,7 @@ public final class GitLabClient {
      * <p><b>归一顺序有语义</b>（顺序错了会在"带不带 scheme / 带不带
      * {@code /api/v4}"的六种组合上给出不同结果）：</p>
      * <ol>
-     *   <li>{@code TrimSpace} → {@code TrimRight "/"}（去掉<b>全部</b>尾部斜杠）；</li>
+     *   <li>先去首尾空白，再去掉<b>全部</b>尾部斜杠；</li>
      *   <li>baseURL 为空、或 token 去空白后为空 → {@code "GitLab platform configuration is missing"}；</li>
      *   <li>{@link ConnectorHttp#validateConnectorBaseUrl}——<b>此时可能还没补 scheme</b>：
      *       校验函数内部对无 scheme 的串会自己

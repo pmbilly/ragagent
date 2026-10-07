@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
 /**
- * 落 jsonb / 作响应体的 {@code time.Time} 字段的序列化器。
+ * 落 jsonb / 作响应体的时间戳字段的序列化器。
  *
  * <p>常规规则与 {@link com.ragagent.config.JacksonConfig} 完全一致（转 JVM 默认时区后按
  * {@code ISO_OFFSET_DATE_TIME} 输出，纳秒尾部零裁剪与 RFC3339Nano 字节相同）。
@@ -37,7 +37,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 public class ZeroTimeSerializer extends JsonSerializer<OffsetDateTime> {
 
     /** 零值时间的瞬时（year 1 元旦 UTC）。 */
-    public static final Instant GO_ZERO_TIME = Instant.parse("0001-01-01T00:00:00Z");
+    public static final Instant ZERO_TIME_INSTANT = Instant.parse("0001-01-01T00:00:00Z");
 
     /** 零值的字面输出。 */
     public static final String ZERO_TIME_LITERAL = "0001-01-01T00:00:00Z";
@@ -51,11 +51,11 @@ public class ZeroTimeSerializer extends JsonSerializer<OffsetDateTime> {
      * 必须让字段本身就持有零值时间（贴合"时间非空"的既定语义）。</p>
      */
     public static final OffsetDateTime ZERO_DATE_TIME =
-            OffsetDateTime.ofInstant(GO_ZERO_TIME, java.time.ZoneOffset.UTC);
+            OffsetDateTime.ofInstant(ZERO_TIME_INSTANT, java.time.ZoneOffset.UTC);
 
     /** 该值是否就是零值时间。 */
     public static boolean isZeroValue(OffsetDateTime value) {
-        return value == null || GO_ZERO_TIME.equals(value.toInstant());
+        return value == null || ZERO_TIME_INSTANT.equals(value.toInstant());
     }
 
     @Override

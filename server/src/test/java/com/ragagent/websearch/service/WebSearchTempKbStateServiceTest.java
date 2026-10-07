@@ -58,7 +58,7 @@ class WebSearchTempKbStateServiceTest {
         assertThat(corrupt.seenUrls()).isEmpty();
     }
 
-    /** save 落键的 JSON 形态：键序与 Go 匿名 struct 一致。 */
+    /** save 落键的 JSON 形态：键序与录制金片一致。 */
     @Test
     void saveWritesCamelJson() {
         service.saveTempKbState("s1", "kb-1", Map.of("http://a", true), List.of("k1", "k2"));
@@ -113,7 +113,7 @@ class WebSearchTempKbStateServiceTest {
         verify(redis).delete("tempkb:s1");
     }
 
-    /** Delete 唯一上抛点：最后的 Redis 删除失败（Go "failed to delete Redis key: %w"）。 */
+    /** Delete 唯一上抛点：最后的 Redis 删除失败（录制原文：failed to delete Redis key）。 */
     @Test
     void deleteKeyFailurePropagates() {
         when(valueOps.get("tempkb:s1")).thenReturn(

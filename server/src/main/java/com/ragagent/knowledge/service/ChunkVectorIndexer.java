@@ -309,7 +309,7 @@ public class ChunkVectorIndexer {
     }
 
     /**
-     * <b>repo 层</b>判定——Scan(nil) 返回 Default（NULL 列 → vector+keyword 开）；
+     * <b>repo 层</b>判定——索引策略为 null 时返回 Default（NULL 列 → vector+keyword 开）；
      * 显式全 false / 空 JSON 保持全 false（IsZero 不翻）。{@link #syncChunkIndex} 走这里
      * （2026-09-22 走查批实证：套钩子会让全 false 策略的 KB 误走进真实出站，13 测试红）。
      */

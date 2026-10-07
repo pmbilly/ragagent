@@ -412,7 +412,7 @@ public class SystemController {
      * 真实连通性检测：复用 {@code StorageBackendService.test}（同一套 SDK 探测）。
      * 失败文案按异常消息子串分派（403 / 404|NoSuchBucket|NotFound / AccessDenied）；
      * 各 SDK 错误串不完全一致 → 失败文案是已知差异
-     * （golden 只覆盖 nil-config / SSRF / 禁用 provider 等确定性分支）。
+     * （golden 只覆盖缺配置 / SSRF / 禁用 provider 等确定性分支）。
      */
     private ResponseEntity<SystemDtos.StorageCheckResponse> connectivityFallback(
             String provider, JsonNode cfg, String endpoint, String bucketName) {

@@ -333,8 +333,7 @@ public class SystemAdminController {
         auditService.logBestEffort(entry);
     }
 
-    /** Go NewValidationError → code 1010（信封形态，message 固定 "Invalid request data"？——
-     *  golden 实测 message=原文，details=null：validation 工厂即原文形态）。 */
+    /** validation 工厂：code 1010 信封；message 取传入原文、details 为 null。 */
     private static BizException validation(String message) {
         return new BizException(AppError.validation(message));
     }
@@ -424,7 +423,7 @@ public class SystemAdminController {
                 new SystemDtos.RuntimeWorkerPool("maintenance", maintenance, 2, 0, 0, 0, 0),
                 new SystemDtos.RuntimeWorkerPool("shared", shared, 7, 0, 0, 0, 0),
                 new SystemDtos.RuntimeWorkerPool("wiki", wiki, 1, 0, 0, 0, 0));
-        // Lite：QueueStats → (nil,false,nil) → available=false + queues=[]；
+        // Lite：无上游队列统计 → available=false + queues=[]；
         // 本地限流器 RuntimeStats 恒可用（available=true）且进程内无已获取信号量 → []
         return ResponseEntity.ok(new SystemDtos.RuntimeQueuesResponse(
                 false, upstreamTotal, upstreamTotal, wiki, pools,

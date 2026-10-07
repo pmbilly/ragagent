@@ -246,7 +246,7 @@ class MergeRecordingTest {
         repoBad.listErr = true;
         repoBad.chunks.put("parent", parent);
         PluginMerge p5 = new PluginMerge(repoBad);
-        // Go 探针复用了 text_to_parent 已就地改写的 res 指针
+        // 录制探针复用了 text_to_parent 已就地改写的 res 指针
         List<SearchResult> got5 = p5.resolveParentChunks(tenantCm, new ArrayList<>(List.of(res)));
         assertRec("merge_parent", "repo_error", json(searchResultsShape(got5)));
     }

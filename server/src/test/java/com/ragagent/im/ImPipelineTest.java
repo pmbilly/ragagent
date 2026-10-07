@@ -29,7 +29,7 @@ import com.ragagent.im.service.ImService;
 /**
  * W5γ2：IM 管线端到端（回调 → ACK → 去重/命令/会话解析 → QA → 回复送达）。
  * 平台侧用内存 fake 适配器（γ3 之前即可全链路验证 γ2 的编排）；QA 管线在测试
- * 环境无模型 → 回复落在失败兜底文案——这本身就是 Go imErrorFallback 路径的
+ * 环境无模型 → 回复落在失败兜底文案——这本身就是失败兜底路径的
  * 行为等价锚。
  */
 @SpringBootTest
@@ -144,7 +144,7 @@ class ImPipelineTest {
                 String.class);
         String title = jdbc.queryForObject("SELECT title FROM sessions WHERE id=?", String.class,
                 sessionId);
-        // 有文本 → 起始标题为空（等首条消息后按内容起标题，Go imInitialSessionTitle）。
+        // 有文本 → 起始标题为空（等首条消息后按内容起标题）。
         assertEquals("", title == null ? "" : title);
         String description = jdbc.queryForObject(
                 "SELECT description FROM sessions WHERE id=?", String.class, sessionId);

@@ -48,7 +48,7 @@ public class LocalFileContentService implements WritableFileContentService {
     public String getFileURL(String filePath) throws IOException {
         String normalized = filePath == null ? "" : filePath;
         if (!normalized.startsWith(FileContentService.LOCAL_SCHEME)) {
-            String rel = goRel(baseDir, normalized);
+            String rel = relativizePath(baseDir, normalized);
             if (rel == null) {
                 normalized = filePath;
             } else {
@@ -56,11 +56,11 @@ public class LocalFileContentService implements WritableFileContentService {
             }
         }
         if (!externalURL.isEmpty()) {
-            // 租户 ID 从存储路径解析（资源属主租户，不是调用者租户——Go 注释原文）
+            // 租户 ID 从存储路径解析（资源属主租户，不是调用者租户）
             long tenantId = StoragePaths.parseTenantIdFromStoragePath(normalized);
             byte[] key = StoragePaths.systemHmacKey();
             if (key == null) {
-                return normalized; // Go: 签名失败 → WARN → 返回 local:// 路径
+                return normalized; // 签名失败 → 记 WARN → 返回 local:// 路径
             }
             long expires = java.time.Instant.now().getEpochSecond() + 7200; // presignDefaultTTL
             String sig = StoragePaths.signPayload(key, normalized, tenantId, expires);
@@ -117,7 +117,7 @@ public class LocalFileContentService implements WritableFileContentService {
         String baseName = safeName.substring(0, safeName.length() - ext.length());
         Path filePath = dir.resolve(baseName + "_" + System.nanoTime() + ext);
         Files.write(filePath, data);
-        String relPath = goRel(baseDir, filePath.toString());
+        String relPath = relativizePath(baseDir, filePath.toString());
         return FileContentService.LOCAL_SCHEME + relPath;
     }
 
@@ -148,7 +148,7 @@ public class LocalFileContentService implements WritableFileContentService {
         return base;
     }
 
-    /** 含点扩展名（filepath.Ext 语义）：最后一个 '.' 起（不含目录分隔）。 */
+    /** 含点扩展名：最后一个 '.' 起（不含目录分隔）。 */
     private static String extOf(String name) {
         int dot = name.lastIndexOf('.');
         if (dot < 0) {
@@ -229,10 +229,10 @@ public class LocalFileContentService implements WritableFileContentService {
     }
 
     /**
-     * unix 相对化（Rel 语义）：同源相对化；根性不同 / base 含 ".."
+     * unix 相对化（POSIX 相对化语义）：同源相对化；根性不同 / base 含 ".."
      * 时返回 null（调用方按失败分支处理）。
      */
-    static String goRel(String basePath, String targPath) {
+    static String relativizePath(String basePath, String targPath) {
         String base = cleanPath(basePath);
         String targ = cleanPath(targPath);
         if (base.equals(targ)) {
@@ -244,7 +244,7 @@ public class LocalFileContentService implements WritableFileContentService {
         boolean baseSlashed = !base.isEmpty() && base.charAt(0) == '/';
         boolean targSlashed = !targ.isEmpty() && targ.charAt(0) == '/';
         if (baseSlashed != targSlashed) {
-            return null; // Rel: can't make <targ> relative to <base>
+            return null; // 根性不同：无法把 targ 相对化到 base
         }
         int bl = base.length();
         int tl = targ.length();

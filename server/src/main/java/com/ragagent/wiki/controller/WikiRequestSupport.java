@@ -31,7 +31,7 @@ final class WikiRequestSupport {
 
     /**
      * catch-all 路径参数捕获值带前导 "/"，
-     * 先剥掉再 TrimSpace。
+     * 先剥掉再去首尾空白。
      */
     static String getSlugParam(String raw) {
         if (raw == null) {
@@ -42,7 +42,7 @@ final class WikiRequestSupport {
     }
 
     /**
-     * 按 "/" 切分、逐段 TrimSpace、
+     * 按 "/" 切分、逐段去首尾空白、
      * 丢掉空段；整串为空时返回空列表（服务层同样视为"不过滤"）。
      */
     static List<String> parseWikiCategoryPath(String raw) {
@@ -108,14 +108,14 @@ final class WikiRequestSupport {
         int end = s.length();
         while (start < end) {
             int cp = s.codePointAt(start);
-            if (!isGoSpace(cp)) {
+            if (!isUnicodeWhitespace(cp)) {
                 break;
             }
             start += Character.charCount(cp);
         }
         while (end > start) {
             int cp = s.codePointBefore(end);
-            if (!isGoSpace(cp)) {
+            if (!isUnicodeWhitespace(cp)) {
                 break;
             }
             end -= Character.charCount(cp);
@@ -124,7 +124,7 @@ final class WikiRequestSupport {
     }
 
     /** 空白判定（两个判定取并集才覆盖完整 Unicode 空白集合）。 */
-    private static boolean isGoSpace(int cp) {
+    private static boolean isUnicodeWhitespace(int cp) {
         return Character.isWhitespace(cp) || Character.isSpaceChar(cp);
     }
 
@@ -260,12 +260,12 @@ final class WikiRequestSupport {
     }
 
     /** 字段名 → JSON 键（本模块涉及的字段都是单驼峰转蛇形，逐字列出避免猜错）。 */
-    private static String toJsonName(String goField) {
-        return switch (goField) {
+    private static String toJsonName(String fieldName) {
+        return switch (fieldName) {
             case "Slug" -> "slug";
             case "Version" -> "version";
             case "Status" -> "status";
-            default -> goField;
+            default -> fieldName;
         };
     }
 

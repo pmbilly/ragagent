@@ -293,7 +293,7 @@ class MemoryEntityJsonTest {
         MemoryExtractionState back = JSONB.readValue("{}", MemoryExtractionState.class);
         assertThat(back.getLeaseId()).isEmpty();
         assertThat(back.getLeaseUntil().toInstant())
-                .isEqualTo(com.ragagent.common.web.ZeroTimeSerializer.GO_ZERO_TIME);
+                .isEqualTo(com.ragagent.common.web.ZeroTimeSerializer.ZERO_TIME_INSTANT);
     }
 
     // ── 键序 + 键数（§9：带 is 前缀字段/派生访问器的响应体必须额外钉一条） ──

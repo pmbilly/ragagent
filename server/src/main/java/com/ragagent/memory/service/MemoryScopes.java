@@ -74,17 +74,17 @@ public final class MemoryScopes {
         }
         int start = 0;
         int end = s.length();
-        while (start < end && isGoSpace(s.codePointAt(start))) {
+        while (start < end && isUnicodeWhitespace(s.codePointAt(start))) {
             start += Character.charCount(s.codePointAt(start));
         }
-        while (end > start && isGoSpace(s.codePointBefore(end))) {
+        while (end > start && isUnicodeWhitespace(s.codePointBefore(end))) {
             end -= Character.charCount(s.codePointBefore(end));
         }
         return s.substring(start, end);
     }
 
     /** Unicode White_Space 语义的空白判定。 */
-    private static boolean isGoSpace(int cp) {
+    private static boolean isUnicodeWhitespace(int cp) {
         if (Character.isSpaceChar(cp)) {
             return true;
         }

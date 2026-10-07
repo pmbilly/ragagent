@@ -65,7 +65,7 @@ public class StorageBackendRepository {
         }
     }
 
-    /** Go GetByID：NotFound → (nil, nil)（不是错误） */
+    /** 按 ID 查：不存在返回 empty（不算错误） */
     public Optional<StorageBackend> getByID(long tenantId, String id) {
         return jdbc.sql("SELECT " + COLS + " FROM storage_backends "
                         + "WHERE tenant_id = ? AND id = ? AND deleted_at IS NULL")
@@ -88,7 +88,7 @@ public class StorageBackendRepository {
                 .orElse(null);
     }
 
-    /** Go List：created_at DESC */
+    /** 列表：按 created_at 倒序 */
     public List<StorageBackend> list(long tenantId) {
         return jdbc.sql("SELECT " + COLS + " FROM storage_backends "
                         + "WHERE tenant_id = ? AND deleted_at IS NULL ORDER BY created_at DESC")
@@ -108,7 +108,7 @@ public class StorageBackendRepository {
                 .update();
     }
 
-    /** Go Update：Select("name","config","status","updated_at") */
+    /** 更新：仅更新 name/config/status/updated_at 四列 */
     public void update(long tenantId, String id, String name, String configJson,
             String status, OffsetDateTime now) {
         String cast = postgres ? "?::jsonb" : "?";
@@ -118,7 +118,7 @@ public class StorageBackendRepository {
                 .update();
     }
 
-    /** Go Delete：软删 */
+    /** 删除：软删（置 deleted_at） */
     public void delete(long tenantId, String id) {
         jdbc.sql("UPDATE storage_backends SET deleted_at = NOW() "
                         + "WHERE tenant_id = ? AND id = ? AND deleted_at IS NULL")

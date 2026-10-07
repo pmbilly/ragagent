@@ -145,7 +145,7 @@ public class ModelDebugController {
 
         Map<String, Object> requestPreview =
                 requestPreview(model, input, documents, opts, fileName, fileSize);
-        Map<String, Object> observations = new TreeMap<>(); // Go gin.H 按键排序输出
+        Map<String, Object> observations = new TreeMap<>(); // 按键排序输出
 
         return switch (model.getType() == null ? "" : model.getType()) {
             case "KnowledgeQA" -> debugChat(model, input, opts, startedNanos, requestPreview, observations);
@@ -455,7 +455,7 @@ public class ModelDebugController {
         if (config == null || config.isEmpty()) {
             return null;
         }
-        Map<String, String> out = new TreeMap<>(); // Go map 序列化按键排序
+        Map<String, String> out = new TreeMap<>(); // 序列化按键排序
         for (Map.Entry<String, String> e : config.entrySet()) {
             String lower = e.getKey().toLowerCase(java.util.Locale.ROOT);
             if (lower.contains("secret") || lower.contains("token") || lower.contains("password")

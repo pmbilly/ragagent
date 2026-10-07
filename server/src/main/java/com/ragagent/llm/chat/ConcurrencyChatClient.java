@@ -34,8 +34,8 @@ public class ConcurrencyChatClient implements LlmChatClient {
     private static final Logger log = LoggerFactory.getLogger(ConcurrencyChatClient.class);
 
     /**
-     * 消费者放弃读取的判定阈值（秒）。Go 靠 ctx.Done() 退出阻塞的发送；Java 没有 ctx，
-     * 改用"发送阻塞超过该阈值"作为等价的放弃信号（见 chatStream 注释）。
+     * 消费者放弃读取的判定阈值（秒）：发送阻塞超过该阈值，
+     * 即视为消费者已放弃（见 chatStream 注释）。
      */
     private static final long DEFAULT_ABANDON_TIMEOUT_SECONDS = 120;
 

@@ -163,7 +163,7 @@ public class SearchResult {
             metadata = null;
             return;
         }
-        TreeMap<String, String> sorted = new TreeMap<>(SortedMapSerializer.GO_KEY_ORDER);
+        TreeMap<String, String> sorted = new TreeMap<>(SortedMapSerializer.KEY_BYTE_ORDER);
         sorted.putAll(v);
         metadata = sorted;
     }

@@ -182,7 +182,7 @@ public class SessionController {
     }
 
     /**
-     * 分页参数的门槛（换锚后文案是标准中文，不再是 Go validator 的 tag 文案）：
+     * 分页参数的门槛（错误文案是标准中文）：
      * <ul>
      *   <li>参数缺席/为空 → 0（服务层再归一化）；<b>显式 {@code 0} 同样跳过</b>
      *       （历史行为：{@code page=0} → 200 且归一化）；</li>
@@ -538,8 +538,8 @@ public class SessionController {
     // ══════════════════════════ 停止生成 ══════════════════════════
 
     /**
-     * <p>⚠️ 错误形态与组内其他端点不同：Go 直接 {@code c.JSON(code, gin.H{"error": "..."})}
-     * ——纯字符串信封（**不是** AppError 信封），状态码有 400/401/403/404 五种。
+     * <p>⚠️ 错误形态与组内其他端点不同：错误体是 {@code {"error": "…"}} 纯字符串信封
+     * （**不是** AppError 信封），状态码有 400/401/403/404 四种。
      * 停止事件经 StreamManager 落存储（跨语言键空间），事件 type 是
      * {@code types.ResponseType(event.EventStop)} 的字符串强转 "stop"。</p>
      */

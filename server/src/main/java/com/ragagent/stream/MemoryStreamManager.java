@@ -137,7 +137,7 @@ public class MemoryStreamManager implements StreamManager {
         StreamData stream = getOrCreateStream(sessionId, messageId);
         stream.lock.writeLock().lock();
         try {
-            // 拷贝：Go 收的是值，补时间戳不会写回调用方的对象。
+            // 存入前拷贝：这里补时间戳不会写回调用方的对象。
             StreamEvent stored = event.copy();
             if (stored.getTimestamp() == null) {
                 stored.setTimestamp(OffsetDateTime.now());
@@ -189,8 +189,7 @@ public class MemoryStreamManager implements StreamManager {
                     continue;
                 }
                 seen.add(event.getId());
-                // Go 在这里直接改 events[i]：切片底层数组与调用方共享，所以补上的
-                // 时间戳调用方**看得见**。Java 侧同样就地改入参，保持这一可见性。
+                // 就地补时间戳到入参对象上：调用方对自己对象的这一改动**看得见**。
                 if (event.getTimestamp() == null) {
                     event.setTimestamp(OffsetDateTime.now());
                 }

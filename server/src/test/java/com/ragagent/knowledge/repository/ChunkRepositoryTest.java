@@ -195,7 +195,7 @@ class ChunkRepositoryTest {
         List<Chunk> out = repo.listChunkByParentId(TENANT, parent.getId());
         assertThat(out).extracting(Chunk::getId)
                 .containsExactlyInAnyOrder(child1.getId(), child2.getId());
-        // Find 非 nil 语义：查不到也是空列表
+        // Find 非 null 语义：查不到也是空列表
         assertThat(repo.listChunkByParentId(TENANT, "missing-parent")).isEmpty();
     }
 
@@ -417,7 +417,7 @@ class ChunkRepositoryTest {
 
         List<ChunkRevision> out = repo.listChunkRevisions(TENANT, c.getId());
         assertThat(out).extracting(ChunkRevision::getRevision).containsExactly(3, 2, 1);
-        // Find 非 nil 语义：查不到也是空列表，不是 null
+        // Find 非 null 语义：查不到也是空列表，不是 null
         assertThat(repo.listChunkRevisions(TENANT, "missing")).isEmpty();
     }
 

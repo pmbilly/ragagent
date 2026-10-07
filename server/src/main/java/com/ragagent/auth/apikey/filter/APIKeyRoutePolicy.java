@@ -145,27 +145,27 @@ public record APIKeyRoutePolicy(boolean platformOnly, boolean requireFullAccess,
         return base.withCapability(APIKeyCapability.MANAGE_STORAGE_BACKENDS);
     }
 
-    /** 对照 {@code apiKeyManageWebSearch(base)}。 */
+    /** 在 base 上叠加 manage_web_search 能力。 */
     public static APIKeyRoutePolicy manageWebSearch(APIKeyRoutePolicy base) {
         return base.withCapability(APIKeyCapability.MANAGE_WEB_SEARCH);
     }
 
-    /** 对照 {@code apiKeyRunEvaluations(base)}。 */
+    /** 在 base 上叠加 run_evaluations 能力。 */
     public static APIKeyRoutePolicy runEvaluations(APIKeyRoutePolicy base) {
         return base.withCapability(APIKeyCapability.RUN_EVALUATIONS);
     }
 
-    /** 对照 {@code apiKeyManageMembers(base)}。 */
+    /** 在 base 上叠加 manage_members 能力。 */
     public static APIKeyRoutePolicy manageMembers(APIKeyRoutePolicy base) {
         return base.withCapability(APIKeyCapability.MANAGE_MEMBERS);
     }
 
-    /** 对照 {@code apiKeyManageSpaces(base)}。 */
+    /** 在 base 上叠加 manage_spaces 能力。 */
     public static APIKeyRoutePolicy manageSpaces(APIKeyRoutePolicy base) {
         return base.withCapability(APIKeyCapability.MANAGE_SPACES);
     }
 
-    /** 对照 {@code apiKeyManageTenantSettings(base)}。 */
+    /** 在 base 上叠加 manage_tenant_settings 能力。 */
     public static APIKeyRoutePolicy manageTenantSettings(APIKeyRoutePolicy base) {
         return base.withCapability(APIKeyCapability.MANAGE_TENANT_SETTINGS);
     }

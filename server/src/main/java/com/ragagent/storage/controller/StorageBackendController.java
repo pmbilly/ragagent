@@ -117,7 +117,7 @@ public class StorageBackendController {
     public ResponseEntity<?> update(@PathVariable("id") String id,
             @RequestBody(required = false) String rawBody) {
         long tenantId = tenantId();
-        // Go：先 ShouldBindJSON 再进 service（未知 id + 坏 body → 400，非 404）
+        // 先绑定请求体再进 service（未知 id + 坏 body → 400，非 404）
         StorageBackendRequest req = bind(rawBody);
         StorageBackend backend = carrier(tenantId, req);
         backend.setId(id);
@@ -193,7 +193,7 @@ public class StorageBackendController {
         return r;
     }
 
-    /** 对照 storageTestErrorMessage：AppError 取 message，其余清洗（HTTP 状态保持 200） */
+    /** AppError 取 message，其余清洗（HTTP 状态保持 200） */
     private static Map<String, Object> failureBody(RuntimeException e) {
         String message;
         if (e instanceof BizException biz) {

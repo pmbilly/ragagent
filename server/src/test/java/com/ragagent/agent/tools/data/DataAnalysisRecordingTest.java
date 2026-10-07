@@ -308,7 +308,7 @@ class DataAnalysisRecordingTest {
         }
     }
 
-    /** 对照 materializeKnowledgeFile：复制到带扩展名的临时文件。 */
+    /** 复制到带扩展名的临时文件。 */
     static final class CopyMaterializer implements KnowledgeFileMaterializer {
         @Override
         public Path materialize(KnowledgeData k) {

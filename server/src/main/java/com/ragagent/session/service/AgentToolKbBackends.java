@@ -150,12 +150,12 @@ final class AgentToolKbBackends {
 
             @Override
             public long totalChunks(long tenantId, String knowledgeId) {
-                // 对照 ListPagedChunksByKnowledgeID(text+faq, enabled) 的 Count 段
+                // 对应 {@code listPagedChunksByKnowledgeId}（text+faq、enabled）的 Count 段
                 return pagedChunkCount(tenantId, knowledgeId);
             }
         };
     }
-    /** 对照 searchutil.EnrichSearchResultsImageInfo（工具侧 enrich 回调）。 */
+    /** 补全搜索结果图片信息（工具侧 enrich 回调）。 */
     public KnowledgeSearchTool.ImageEnricher imageEnricher() {
         return (tenantId, results) -> {
             if (results == null || results.isEmpty()) {
@@ -191,7 +191,7 @@ final class AgentToolKbBackends {
             }
         };
     }
-    /** 对照 rerank.Reranker.Rerank → tool 的 RankResult（失败上抛，工具侧回落原序）。 */
+    /** Reranker.rerank → tool 的 RankResult（失败上抛，工具侧回落原序）。 */
     public static KnowledgeSearchTool.RerankerModel rerankerModel(Reranker reranker) {
         if (reranker == null) {
             return null;
@@ -306,7 +306,7 @@ final class AgentToolKbBackends {
         }
         return String.join(" OR ", clauses);
     }
-    /** 对照 count 回填：knowledge_id → 该 knowledge 的 enabled chunk 数。 */
+    /** count 回填：knowledge_id → 该 knowledge 的 enabled chunk 数。 */
     private void backfillTotalChunkCounts(List<GrepChunksTool.GrepChunkView> results) {
         Map<String, Boolean> seen = new LinkedHashMap<>();
         for (GrepChunksTool.GrepChunkView r : results) {
@@ -336,7 +336,7 @@ final class AgentToolKbBackends {
         }
     }
     /**
-     * 对照 regexOperatorForDialect：PostgreSQL {@code ~*}，其余 {@code REGEXP}；
+     * PostgreSQL {@code ~*}，其余 {@code REGEXP}；
      * H2（仅测试内存库）用 {@code REGEXP_LIKE(...,'i')} 等价表达大小写不敏感。
      */
     private RegexDialect regexDialect() {
@@ -418,7 +418,7 @@ final class AgentToolKbBackends {
                 if (knowledgeIds == null || knowledgeIds.isEmpty()) {
                     return out;
                 }
-                // 对照 GetKnowledgeTags：knowledge_tag_relations 按 knowledge 聚合
+                // knowledge_tag_relations 按 knowledge 聚合出各知识的标签
                 jdbc.query("SELECT knowledge_id, tag_id FROM knowledge_tag_relations "
                                 + "WHERE knowledge_id IN (" + placeholders(knowledgeIds.size()) + ") "
                                 + "ORDER BY knowledge_id, tag_id",
@@ -431,7 +431,7 @@ final class AgentToolKbBackends {
             }
         };
     }
-    /** 对照 chunkService.GetChunkByID（工具侧的 chunkById 回调）。 */
+    /** 工具侧的 chunkById 回调。 */
     public java.util.function.Function<String, com.ragagent.knowledge.domain.Chunk> chunkById() {
         return chunkRepository::getChunkByIdOnly;
     }
@@ -444,7 +444,7 @@ final class AgentToolKbBackends {
             return new DocChunkSupport.ChunkPage(page1.items(), page1.total());
         };
     }
-    /** 对照 ListPagedChunksByKnowledgeID 的 text+faq + enabled 过滤（count 段）。 */
+    /** text+faq + enabled 过滤的 count 段（{@code listPagedChunksByKnowledgeId}）。 */
     private long pagedChunkCount(long tenantId, String knowledgeId) {
         return chunkRepository.listPagedChunksByKnowledgeId(
                 tenantId, knowledgeId, 0, 1, TEXT_FAQ_TYPES, null, "", "", "", "",
@@ -486,7 +486,7 @@ final class AgentToolKbBackends {
             }
         };
     }
-    /** 对照 ExtractConfig 的 nodes[].name / relations[].type。 */
+    /** 解析抽取配置（extractConfig）的 nodes[].name / relations[].type。 */
     private static QueryKnowledgeGraphTool.ExtractConfigView extractConfigView(JsonNode cfg) {
         if (cfg == null || cfg.isNull()) {
             return null;

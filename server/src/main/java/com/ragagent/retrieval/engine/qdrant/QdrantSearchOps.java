@@ -41,7 +41,7 @@ final class QdrantSearchOps {
     }
 
     /**
-     * 对照 {@code VectorRetrieve}：集合不存在 → 空结果；否则
+     * 集合不存在 → 空结果；否则
      * {@code /points/search}（filter + limit=TopK + score_threshold + with_payload）；
      * 失败包 {@code <collection>: <err>}。
      */
@@ -94,7 +94,7 @@ final class QdrantSearchOps {
     }
 
     /**
-     * 对照 {@code KeywordsRetrieve}：跨集合 {@code /points/scroll}，filter 的 Should 装
+     * 跨集合 {@code /points/scroll}，filter 的 Should 装
      * 每个 token 的 content 全文匹配（OR）；无 token 时回落 must 里塞原 query；跨集合合并后
      * 截 TopK；score 恒 1.0；单集合失败只 WARN 继续。
      */
@@ -156,7 +156,7 @@ final class QdrantSearchOps {
         return buildRetrieveResult(allResults, EngineTypes.RETRIEVER_KEYWORDS);
     }
 
-    /** 对照 {@code getBaseFilter}：is_enabled=true 隐含 + KB/知识/标签过滤 + 排除项。 */
+    /** is_enabled=true 隐含 + KB/知识/标签过滤 + 排除项。 */
     static ObjectNode baseFilter(RetrieveParams params) {
         ObjectNode filter = QdrantRestClient.object();
         ArrayNode must = filter.putArray("must");
@@ -182,7 +182,7 @@ final class QdrantSearchOps {
         return filter;
     }
 
-    /** 对照 {@code fromQdrantVectorEmbedding}：payload + score → IndexWithScore（IsEnabled 不回填，照 Go）。 */
+    /** payload + score → IndexWithScore（IsEnabled 不回填）。 */
     static IndexWithScore fromPoint(JsonNode point, int matchType, double score) {
         JsonNode payload = point.path("payload");
         IndexWithScore out = new IndexWithScore();

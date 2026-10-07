@@ -409,7 +409,7 @@ public class SessionService {
     }
 
     /**
-     * Go DeleteSession / BatchDeleteSessions 共用的「每会话清理」三件套
+     * 单个删除 / 批量删除会话共用的「每会话清理」三件套
      * （知识 / 临时 KB / sandbox；建议删除在软删之后）。
      *
      * <p><b>已知差异</b>：知识清理是同步尽力而为——删除请求会等
@@ -505,7 +505,7 @@ public class SessionService {
                 conversationProps.getGenerateSessionTitlePrompt(),
                 Map.of("language", WikiLanguageSupport.languageNameFromContext()));
         ChatOptions options = new ChatOptions();
-        options.setTemperature(0.3); // Go 硬编码 0.3
+        options.setTemperature(0.3); // 固定 0.3
         options.setThinking(Boolean.FALSE);
         ChatResponse response;
         try {
@@ -548,29 +548,29 @@ public class SessionService {
         if (text.startsWith("<think>\n\n</think>")) {
             text = text.substring("<think>\n\n</think>".length());
         }
-        String title = goTrimSpace(text);
+        String title = trimUnicodeWhitespace(text);
         int count = title.codePointCount(0, title.length());
         if (count <= MAX_SESSION_TITLE_RUNES) {
             return new GeneratedTitle(title, false);
         }
-        return new GeneratedTitle(goTrimSpace(
+        return new GeneratedTitle(trimUnicodeWhitespace(
                 title.substring(0, title.offsetByCodePoints(0, MAX_SESSION_TITLE_RUNES))), true);
     }
 
     /** 按完整 Unicode 空白集 trim（Java strip() 缺 U+0085/U+00A0）。 */
-    private static String goTrimSpace(String s) {
+    private static String trimUnicodeWhitespace(String s) {
         int start = 0;
         int end = s.length();
-        while (start < end && isGoSpace(s.codePointAt(start))) {
+        while (start < end && isUnicodeWhitespace(s.codePointAt(start))) {
             start += Character.charCount(s.codePointAt(start));
         }
-        while (end > start && isGoSpace(s.codePointBefore(end))) {
+        while (end > start && isUnicodeWhitespace(s.codePointBefore(end))) {
             end -= Character.charCount(s.codePointBefore(end));
         }
         return s.substring(start, end);
     }
 
-    private static boolean isGoSpace(int cp) {
+    private static boolean isUnicodeWhitespace(int cp) {
         return switch (cp) {
             case '\t', '\n', '\u000B', '\f', '\r', ' ', '\u0085', '\u00A0' -> true;
             default -> Character.getType(cp) == Character.SPACE_SEPARATOR

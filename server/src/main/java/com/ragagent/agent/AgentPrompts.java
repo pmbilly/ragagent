@@ -48,7 +48,7 @@ public final class AgentPrompts {
             return "-";
         }
         cleaned = cleaned.replace("\n", " ").replace("\r", " ");
-        cleaned = goFieldsJoin(cleaned);
+        cleaned = fieldsJoin(cleaned);
 
         int[] runes = cleaned.codePoints().toArray();
         if (runes.length <= maxLen) {
@@ -58,13 +58,13 @@ public final class AgentPrompts {
     }
 
     /** 按 unicode 空白切字段、单空格连接。 */
-    private static String goFieldsJoin(String s) {
+    private static String fieldsJoin(String s) {
         StringBuilder out = new StringBuilder();
         boolean inField = false;
         int i = 0;
         while (i < s.length()) {
             int cp = s.codePointAt(i);
-            if (ConversationSerializer.isGoSpace(cp)) {
+            if (ConversationSerializer.isUnicodeWhitespace(cp)) {
                 inField = false;
             } else {
                 if (inField) {
@@ -85,7 +85,7 @@ public final class AgentPrompts {
     /** unicode 空白 trim 语义（供包内复用）。 */
     static final class ConversationTrimSpace {
         static String trim(String s) {
-            return ConversationSerializer.goTrimSpace(s);
+            return ConversationSerializer.trimUnicodeWhitespace(s);
         }
 
         private ConversationTrimSpace() {

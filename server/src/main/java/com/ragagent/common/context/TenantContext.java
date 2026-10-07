@@ -50,7 +50,7 @@ public final class TenantContext {
         return principal.get();
     }
 
-    /** 对照 TenantRoleFromContext：未附加时返回 null（调用方 fail-closed） */
+    /** 未附加时返回 null（调用方 fail-closed） */
     public static String currentRole() {
         return role.get();
     }
@@ -71,12 +71,12 @@ public final class TenantContext {
         return Boolean.TRUE.equals(systemAdmin.get());
     }
 
-    /** 对照 User.CanAccessAllTenants（跨空间超管判定的另一半，需配合 EnableCrossTenantAccess） */
+    /** 跨空间超管判定的另一半，需配合 {@code enableCrossTenantAccess} */
     public static boolean canAccessAllTenants() {
         return Boolean.TRUE.equals(canAccessAllTenants.get());
     }
 
-    /** 对照 applyAuthSession 的常规会话（tenantId/role 允许 null = tenantless） */
+    /** 常规会话（tenantId/role 允许 null = tenantless） */
     public static void set(Long tid, Principal p, String r, boolean sysAdmin, String uid,
                            boolean accessAllTenants) {
         tenantId.set(tid);

@@ -13,9 +13,9 @@ import org.springframework.data.redis.core.script.RedisScript;
 /**
  * IM 域 Redis 面的 Spring 实现（{@link QaQueue.RedisPort}）。
  *
- * <p>故障语义与 Go 版一致：任何 Redis 异常都不阻塞主流程——
+ * <p>故障语义：任何 Redis 异常都不阻塞主流程——
  * 计数面按「跳过全局检查」处理（{@code null} / {@code true}），
- * 由键 TTL 自愈；键名见 {@link ImRedisKeys}（与 Go 版共用字面量）。</p>
+ * 由键 TTL 自愈；键名见 {@link ImRedisKeys}（键字面量为部署面契约，不随版本改名）。</p>
  */
 public class ImRedisStore implements QaQueue.RedisPort {
 
@@ -39,7 +39,7 @@ public class ImRedisStore implements QaQueue.RedisPort {
             new DefaultRedisScript<>(GLOBAL_GATE_LUA, Long.class);
 
     /**
-     * 滑动窗口限流（对齐 Go internal/ratelimit 的脚本）：清过期成员 → 判数量 →
+     * 滑动窗口限流：清过期成员 → 判数量 →
      * 未满则记录本次。KEYS[1]=计数键；ARGV[1]=now 毫秒；ARGV[2]=窗口毫秒；ARGV[3]=上限；
      * ARGV[4]=成员。放行返回 1，超限返回 0。
      */
@@ -63,7 +63,7 @@ public class ImRedisStore implements QaQueue.RedisPort {
             new DefaultRedisScript<>(RATE_LIMIT_LUA, Long.class);
 
     private final StringRedisTemplate template;
-    /** 限流成员序号：防同一毫秒多次命中共用 ZSET 成员（Go 用 instanceID+毫秒）。 */
+    /** 限流成员序号：防同一毫秒多次命中共用 ZSET 成员。 */
     private final java.util.concurrent.atomic.AtomicLong rateLimitSeq =
             new java.util.concurrent.atomic.AtomicLong();
 
@@ -104,7 +104,7 @@ public class ImRedisStore implements QaQueue.RedisPort {
             template.expire(key, Duration.ofSeconds(ttlSeconds));
             return count;
         } catch (DataAccessException e) {
-            // 故障：跳过全局检查，回落到本地限额（对齐 Go 的 err → nil）
+            // 故障：跳过全局检查，回落到本地限额
             log.warn("[IM] Redis INCR failed for {}: {}", key, e.getMessage());
             return null;
         }
@@ -126,7 +126,7 @@ public class ImRedisStore implements QaQueue.RedisPort {
                     String.valueOf(maxWorkers), String.valueOf(ttlSeconds * 1000L));
             return result == null || result == 1L;
         } catch (DataAccessException e) {
-            // 故障：跳过全局限制，避免阻塞 worker（对齐 Go）
+            // 故障：跳过全局限制，避免阻塞 worker
             log.warn("[IM] Redis global gate failed (proceeding without limit): {}", e.getMessage());
             return true;
         }
@@ -239,7 +239,7 @@ public class ImRedisStore implements QaQueue.RedisPort {
 
     /**
      * 抢 leader 锁（SET NX EX）。拿到返回 true；已被别的实例持有返回 false；
-     * Redis 故障也返回 false（本轮不启动、等下一轮重试——对齐 Go 的失败语义）。
+     * Redis 故障也返回 false（本轮不启动、等下一轮重试）。
      */
     public boolean tryAcquireLeader(String key, String instanceId, int ttlSeconds) {
         try {

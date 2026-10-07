@@ -148,7 +148,7 @@ class RssPureFunctionsTest {
         //   250 个 "a"                     -> 200 字节
         //   66 个 "中" + "abcdef"          -> 200 字节（66*3=198，再取 "ab"）
         //   199 个 "x" + "中" + "yyyy"      -> 199 字节（200 字节处落在 "中" 的中间）
-        //   198 个 "x" + "中" + "zz"        -> 198 字节（同上，回退到完整 rune 边界）
+        //   198 个 "x" + "中" + "zz"        -> 198 字节（同上，回退到完整码点边界）
         String cjk100 = RssUtil.sanitizeFileName("中".repeat(100));
         assertThat(cjk100.getBytes(java.nio.charset.StandardCharsets.UTF_8)).hasSize(198);
 
@@ -166,16 +166,16 @@ class RssPureFunctionsTest {
         assertThat(splitAt198.getBytes(java.nio.charset.StandardCharsets.UTF_8)).hasSize(198);
     }
 
-    // ── goTrim ────────────────────────────────────────────────────────────
+    // ── trimUnicodeWhitespace ────────────────────────────────────────────────────────────
 
     @Test
-    void goTrimCoversUnicodeSpacesJavaWouldMiss() {
+    void trimCoversUnicodeSpacesJavaWouldMiss() {
         // 这里的空白判定含 U+00A0 / U+2007 / U+202F，Java 的 strip() 与 trim() 都不管它们。
-        assertThat(RssUtil.goTrim(" a ")).isEqualTo("a");
-        assertThat(RssUtil.goTrim(" b ")).isEqualTo("b");
-        assertThat(RssUtil.goTrim("\t\nc\r ")).isEqualTo("c");
-        assertThat(RssUtil.goTrim(null)).isEmpty();
-        assertThat(RssUtil.goTrim("   ")).isEmpty();
+        assertThat(RssUtil.trimUnicodeWhitespace(" a ")).isEqualTo("a");
+        assertThat(RssUtil.trimUnicodeWhitespace(" b ")).isEqualTo("b");
+        assertThat(RssUtil.trimUnicodeWhitespace("\t\nc\r ")).isEqualTo("c");
+        assertThat(RssUtil.trimUnicodeWhitespace(null)).isEmpty();
+        assertThat(RssUtil.trimUnicodeWhitespace("   ")).isEmpty();
     }
 
     // ── Config.feedURLList ────────────────────────────────────────────────

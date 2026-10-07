@@ -115,7 +115,7 @@ final class WikiFixtures {
 
     /**
      * 层级节点路由：顶层节点 + 按 parent_node_token 分组的子节点，
-     * 并可指定某个父节点的列举<b>失败</b>（对照 {@code fakeFeishuHierarchy}）。
+     * 并可指定某个父节点的列举<b>失败</b>。
      */
     static void hierarchyRoute(FeishuTestServer server, List<Node> topNodes,
                                Map<String, List<Node>> childNodes, String failingParentToken) {

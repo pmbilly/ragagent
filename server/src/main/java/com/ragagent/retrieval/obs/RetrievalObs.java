@@ -65,7 +65,7 @@ public final class RetrievalObs {
             item.put("chunk_id", sr.getId());
             item.put("knowledge_id", sr.getKnowledgeId());
             item.put("knowledge_title", sr.getKnowledgeTitle());
-            item.put("composite_score", goFmt4(sr.getScore()));
+            item.put("composite_score", formatScore4(sr.getScore()));
             item.put("match_type", sr.getMatchType());
             item.put("chunk_type", sr.getChunkType());
             item.put("preview", truncateRunes(sr.getContent(), 160));
@@ -124,7 +124,7 @@ public final class RetrievalObs {
             row.put("chunk_id", sr.getId());
             row.put("knowledge_id", sr.getKnowledgeId());
             row.put("knowledge_title", sr.getKnowledgeTitle());
-            row.put("retrieval_score", goFmt4(sr.getScore()));
+            row.put("retrieval_score", formatScore4(sr.getScore()));
             row.put("match_type", sr.getMatchType());
             row.put("preview", truncateRunes(passages.get(i), 160));
             out.add(row);
@@ -133,7 +133,7 @@ public final class RetrievalObs {
     }
 
     /** 四舍五入到 4 位小数（toFixed 语义）。 */
-    public static String goFmt4(double v) {
+    public static String formatScore4(double v) {
         return String.format(java.util.Locale.ROOT, "%.4f", v);
     }
 
@@ -207,7 +207,7 @@ public final class RetrievalObs {
             row.put("chunk_id", hit.chunkId);
             row.put("knowledge_id", hit.knowledgeId);
             row.put("knowledge_base_id", hit.knowledgeBaseId);
-            row.put("score", goFmt4(hit.score));
+            row.put("score", formatScore4(hit.score));
             row.put("match_type", hit.matchType);
             row.put("preview", truncateRunes(hit.content, 160));
             out.add(row);

@@ -24,13 +24,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *
  * <h2>SDK 侧到底跑了什么（实测结论，反直觉但已被实证）</h2>
  *
- * <p>SDK 的默认构造是 {@code NewJiebaTokenizer(nil)}，
+ * <p>SDK 的默认构造以空词典入参初始化，
  * 它做的三件事是：{@code seg.LoadNoFreq = true}、{@code seg.LoadStop(default_stopwords.txt)}、
  * {@code seg.LoadDict("")}。</p>
  *
- * <p><b>而 {@code LoadDict("")} 什么词典都不加载</b>：SDK 传的是<b>非空 varargs</b>
- * （{@code files = [""]}）→ 走 {@code len(files) > 0} 分支 → {@code DictPaths(dictDir, "")} 返回 nil
- * → 日志打出 {@code Warning: dict files is nil.}，且 {@code len(files) == 0} 的兜底分支也不会走。
+ * <p><b>而 {@code LoadDict("")} 什么词典都不加载</b>：SDK 收到的是含一个空串的非空
+ * 文件列表（{@code [""]}）→ 不走"无文件"兜底分支，解析出的词典路径列表为空
+ * → 日志打出 {@code Warning: dict files is nil.}，词典保持为空。
  * 实证：{@code seg.Dict.TotalFreq() == 0 && NumTokens() == 0}，
  * {@code Find("向量")} → {@code (0, "", false)}（基准见 {@code jieba_baseline.json} 的 {@code dict} 字段）。</p>
  *
@@ -42,14 +42,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * <h2>对齐的三段</h2>
  *
  * <ol>
- *   <li><b>小写化</b>：SDK 侧 {@code ToLower = true} 恒开 ⇒ {@code cutDAG}
+ *   <li><b>小写化</b>：SDK 侧小写化恒开 ⇒ 切分
  *       入口整串小写化。Java 用逐码点 {@link Character#toLowerCase(int)}（简单映射，
  *       与 jieba 的逐字符小写化语义一致）。</li>
  *   <li><b>HMM 切分</b>：{@code \p{Han}+} 的每段连字
  *       走 Viterbi 定 B/M/E/S；非连字段用
  *       {@code (\d+\.\d+|[a-zA-Z0-9]+)} 整段直出；两者之间的填充文本按"就近切"整块吐。</li>
  *   <li><b>停用词过滤</b>：SDK {@code Tokenize} 尾部——
- *       {@code len(word)==0 || word==" " || IsStop(word)} 丢弃；{@code IsStop} 只读停用词表
+ *       {@code word.isEmpty() || word.equals(" ") || IsStop(word)} 丢弃；{@code IsStop} 只读停用词表
  *       （文件行原样入表、不 trim）。</li>
  * </ol>
  *
@@ -114,7 +114,7 @@ final class JiebaTokenizer implements TencentVectorDbBm25.Tokenizer {
         if (text == null || text.isEmpty()) {
             return List.of();
         }
-        String lowered = goToLower(text);
+        String lowered = lowerCaseCodePoints(text);
         int[] codePoints = lowered.codePoints().toArray();
         // 空词典时 cutDAG 的两个出口：单字符直接原样，多字符整串进 HMM
         if (codePoints.length <= 1) {
@@ -123,8 +123,8 @@ final class JiebaTokenizer implements TencentVectorDbBm25.Tokenizer {
         return hmmCut(lowered);
     }
 
-    /** 逐码点小写化（简单映射；与 SDK 的 ToLower 恒开一致）。 */
-    private static String goToLower(String s) {
+    /** 逐码点小写化（简单映射；与 SDK 恒开的小写化一致）。 */
+    private static String lowerCaseCodePoints(String s) {
         StringBuilder sb = new StringBuilder(s.length());
         for (int i = 0; i < s.length(); ) {
             int cp = s.codePointAt(i);

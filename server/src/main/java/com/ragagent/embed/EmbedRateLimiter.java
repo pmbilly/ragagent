@@ -23,18 +23,17 @@ import org.springframework.stereotype.Component;
  * <p><b>两条路径</b>：</p>
  * <ul>
  *   <li>{@code embed.redis-enabled=true}（多副本部署）→ 判定走 Redis ZSET 滑窗
- *       （Lua 原子：清过期 → 计数 → 未满登记），预算跨实例共享
- *       （对齐 Go internal/ratelimit + embed_auth 的三段限流）；Redis 故障时
- *       <b>回落</b>进程内滑窗（对齐 Go 的 local fallback）；</li>
+ *       （Lua 原子：清过期 → 计数 → 未满登记），预算跨实例共享；Redis 故障时
+ *       <b>回落</b>进程内滑窗；</li>
  *   <li>缺省（单实例）→ 只有进程内滑窗，判定与接线前完全一致。</li>
  * </ul>
  *
  * <p><b>窗口维度</b>：Redis 键与本地桶键都带窗口长度
  * （{@code embed:ratelimit:{windowMs}:{key}}）——同 key 的 1 分钟窗与 24 小时窗
- * 互不污染（Go 用两个不同前缀的限流器实例达成同一隔离）。</p>
+ * 互不污染。</p>
  *
- * <p><b>成员唯一性</b>：ZSET 成员为 {@code nowMs-序号}——防同一毫秒多次命中共用
- * 成员互相覆盖（Go 用 instanceID+毫秒，同毫秒连击会少计一次）。</p>
+ * <p><b>成员唯一性</b>：ZSET 成员为 {@code nowMs-序号}——防同一毫秒多次命中时
+ * 共用成员互相覆盖、同毫秒连击少计一次。</p>
  */
 @Component
 public class EmbedRateLimiter {
@@ -43,11 +42,11 @@ public class EmbedRateLimiter {
 
     private static final long CLEANUP_EVERY_CALLS = 4096;
 
-    /** Redis 键前缀（对齐 Go 的 {@code embed:ratelimit:} / {@code embed:ratelimit:day:}）。 */
+    /** Redis 键前缀（其后拼窗口毫秒与 key）。 */
     static final String REDIS_KEY_PREFIX = "embed:ratelimit:";
 
     /**
-     * 滑窗判定脚本（对齐 Go internal/ratelimit 的 rateLimitScript）：
+     * 滑窗判定脚本：
      * 清过期成员 → 计数 → 未满则登记。
      * KEYS[1]=键；ARGV[1]=now 毫秒；ARGV[2]=窗口毫秒；ARGV[3]=max；ARGV[4]=member。
      */
@@ -109,7 +108,7 @@ public class EmbedRateLimiter {
             if (viaRedis != null) {
                 return viaRedis;
             }
-            // Redis 故障 → 回落进程内滑窗（对齐 Go 的 local fallback）
+            // Redis 故障 → 回落进程内滑窗
         }
         return allowLocal(windowKey, windowMillis, max);
     }

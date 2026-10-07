@@ -1,8 +1,8 @@
 package com.ragagent.common.error;
 
 /**
- * Go handler 里 {@code c.JSON(status, gin.H{"error": "消息"})} 的直写形态——
- * **纯字符串**错误体（不是 AppError 信封），状态码任意（400/404/409/500…）。
+ * handler 直写的**纯字符串**错误体 {@code {"error": "消息"}}（不是 AppError 信封），
+ * 状态码任意（400/404/409/500…）。
  *
  * <p>与 {@link GuardForbiddenException}（恒 403 + "Forbidden: " 前缀）同族但更通用：
  * system admin 组的 promote/revoke/reset-password 等端点大量使用该形态

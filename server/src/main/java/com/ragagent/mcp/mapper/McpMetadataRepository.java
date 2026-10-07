@@ -36,7 +36,7 @@ public class McpMetadataRepository {
         return postgres;
     }
 
-    /** 对照 GetMetadata：不存在返回 null */
+    /** 不存在返回 null */
     public McpMetadata getMetadata(long tenant, String service, String principal) {
         return mapper.getMetadata(tenant, service, principal == null ? "" : principal);
     }
@@ -53,7 +53,7 @@ public class McpMetadataRepository {
                 : mapper.listSummariesDefault(tenant, principals);
     }
 
-    /** 对照 SaveMetadata：upsert + 版本护栏；陈旧写入静默丢弃（不报错） */
+    /** upsert + 版本护栏；陈旧写入静默丢弃（不报错） */
     public void saveMetadata(McpMetadata snapshot) {
         if (snapshot.getPrincipal() == null) {
             snapshot.setPrincipal("");

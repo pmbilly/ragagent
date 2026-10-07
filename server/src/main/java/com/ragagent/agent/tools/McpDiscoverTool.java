@@ -253,7 +253,7 @@ public class McpDiscoverTool extends BaseTool {
         for (String id : ids) {
             String row;
             try {
-                row = McpCatalog.GO_ENCODER.writeValueAsString(catalog.servers.get(id).summary(id).toMap());
+                row = McpCatalog.STRUCT_JSON.writeValueAsString(catalog.servers.get(id).summary(id).toMap());
             } catch (Exception e) {
                 continue;
             }

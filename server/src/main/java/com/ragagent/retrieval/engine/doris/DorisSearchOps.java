@@ -37,7 +37,7 @@ final class DorisSearchOps {
     }
 
     /**
-     * 对照 {@code VectorRetrieve}：查询向量先单位化（非 legacy），再走
+     * 查询向量先单位化（非 legacy），再走
      * {@code inner_product_approximate}（legacy 用 {@code 1 - cosine_distance_approximate}）；
      * score 越大越相似，{@code HAVING score >= ?} 过滤（score 是列别名，WHERE 阶段不可见）。
      */
@@ -92,7 +92,7 @@ final class DorisSearchOps {
     }
 
     /**
-     * 对照 {@code KeywordsRetrieve}：倒排索引 + MATCH_ANY（中文分词由建表 DDL 的
+     * 倒排索引 + MATCH_ANY（中文分词由建表 DDL 的
      * chinese parser 承担，不需要客户端分词）；跨维度表合并取 topK，score 恒 1.0。
      */
     List<RetrieveResult> keywordsRetrieve(RetrieveParams params) {
@@ -134,8 +134,8 @@ final class DorisSearchOps {
     }
 
     /**
-     * 对照 {@code scanRetrieveRows}：列数 == {@code columnsForRetrieve}（9）时 score 恒 1.0
-     * （关键词路径）；带 score 的第 10 列（向量路径）。IsEnabled 不回填（Go 同）。
+     * 列数 == {@code columnsForRetrieve}（9）时 score 恒 1.0
+     * （关键词路径）；带 score 的第 10 列（向量路径）。IsEnabled 不回填。
      */
     static IndexWithScore scanRetrieveRow(DorisSqlExecutor.Row row, int matchType,
                                           boolean withScore) throws SQLException {
@@ -153,13 +153,13 @@ final class DorisSearchOps {
         return out;
     }
 
-    /** 对照 {@code buildRetrieveResult}：单元素结果壳（Error 恒 null）。 */
+    /** 单元素结果壳（Error 恒 null）。 */
     static List<RetrieveResult> buildRetrieveResult(List<IndexWithScore> results,
                                                     String retrieverType) {
         return List.of(new RetrieveResult(results, EngineTypes.ENGINE_DORIS, retrieverType));
     }
 
-    /** 对照 {@code wrapVectorRetrieveError}：legacy 失败时附带模式切换指引。 */
+    /** legacy 失败时附带模式切换指引。 */
     IllegalStateException wrapVectorRetrieveError(String table, DorisCompatMode compatMode,
                                                           Exception err) {
         if (compatMode == DorisCompatMode.LEGACY) {

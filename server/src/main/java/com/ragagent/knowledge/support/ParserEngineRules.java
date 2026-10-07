@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 /**
  * chat 解析引擎的规则解析。
  * <p>两份规则来源语义一致：agent 配置（上传时回落）与租户配置（parse 时最终回落）。
- * {@code TrimSpace(engine)}；都不命中或无规则 → 类型默认（仅 ppt/pptx → markitdown，
+ * 对 {@code engine} 去首尾空白；都不命中或无规则 → 类型默认（仅 ppt/pptx → markitdown，
  * Java 侧不设该钩子。</p>
  */
 public final class ParserEngineRules {
@@ -14,7 +14,7 @@ public final class ParserEngineRules {
     private ParserEngineRules() {
     }
 
-    /** TrimSpace + 小写 + 去前导点。 */
+    /** 去首尾空白 + 小写 + 去前导点。 */
     public static String normalize(String fileType) {
         String s = fileType == null ? "" : trimSpace(fileType).toLowerCase(Locale.ROOT);
         return s.startsWith(".") ? s.substring(1) : s;
@@ -55,16 +55,16 @@ public final class ParserEngineRules {
         }
         int start = 0;
         int end = s.length();
-        while (start < end && isGoSpace(s.codePointAt(start))) {
+        while (start < end && isUnicodeWhitespace(s.codePointAt(start))) {
             start += Character.charCount(s.codePointAt(start));
         }
-        while (end > start && isGoSpace(s.codePointBefore(end))) {
+        while (end > start && isUnicodeWhitespace(s.codePointBefore(end))) {
             end -= Character.charCount(s.codePointBefore(end));
         }
         return s.substring(start, end);
     }
 
-    private static boolean isGoSpace(int c) {
+    private static boolean isUnicodeWhitespace(int c) {
         return c == ' ' || c == '\t' || c == '\n' || c == 0x0B || c == '\f' || c == '\r'
                 || c == 0x85 || c == 0xA0
                 || Character.isSpaceChar(c)

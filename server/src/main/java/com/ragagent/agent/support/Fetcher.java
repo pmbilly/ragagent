@@ -412,7 +412,7 @@ public final class Fetcher {
         }
         List<String> cleanedLines = new ArrayList<>();
         for (String line : text.split("\n", -1)) {
-            line = HtmlStrip.goTrimSpace(line);
+            line = HtmlStrip.trimUnicodeWhitespace(line);
             if (!line.isEmpty()) {
                 cleanedLines.add(line);
             }
@@ -514,7 +514,7 @@ public final class Fetcher {
                     b.append(c);
                 }
             }
-            return goTrimSpace(decodeEntities(b.toString()));
+            return trimUnicodeWhitespace(decodeEntities(b.toString()));
         }
 
         /** 常见命名实体 + 数字实体（有界；HtmlEntities 在 datasource 包内不可见）。 */
@@ -559,19 +559,19 @@ public final class Fetcher {
             return out.toString();
         }
 
-        static String goTrimSpace(String s) {
+        static String trimUnicodeWhitespace(String s) {
             int start = 0;
             int end = s.length();
-            while (start < end && isGoSpace(s.charAt(start))) {
+            while (start < end && isUnicodeWhitespace(s.charAt(start))) {
                 start++;
             }
-            while (end > start && isGoSpace(s.charAt(end - 1))) {
+            while (end > start && isUnicodeWhitespace(s.charAt(end - 1))) {
                 end--;
             }
             return s.substring(start, end);
         }
 
-        private static boolean isGoSpace(char c) {
+        private static boolean isUnicodeWhitespace(char c) {
             switch (c) {
                 case '\t': case '\n': case '\u000B': case '\f': case '\r':
                 case ' ': case '\u0085': case '\u00A0': case '\u1680':

@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * chunker 只读预览端点（分块配置预览：文本进、分块结果出）。无状态：不落库、不生成 embedding、不打日志正文。
  * <h2>响应形态：struct 声明序 + map 字母序的混合（契约样例 cprev-*.json 全钉）</h2>
- * <p>顶层 {@code gin.H} 字母序 {@code {"data":…,"success":true}}；data 是
+ * <p>顶层 JSON 对象体键按字母序 {@code {"data":…,"success":true}}；data 是
  * PreviewChunkingResponse struct——按<b>声明序</b>输出
  * {@code selected_tier, tier_chain, rejected, profile, chunks, stats}。
  * {@code chunks} 用 make 初始化恒 {@code []}。</p>
@@ -44,15 +44,15 @@ import org.springframework.web.bind.annotation.RestController;
  * diag.profile 为 null 由 handler 调 ProfileDocument 物化；未知 strategy 落
  * default 分支走 auto 画像。tier_chain 在响应里恒非 null（文本非空时）。</p>
  * <h2>超时与截断</h2>
- * <p>文本上限 64k rune（超限 413）、分块上限 500（stats 按全集算，
- * truncated_to 记原始数量，omitempty）、5s 超时 504。切分是 CPU 密集且不接受
+ * <p>文本上限 64k 码点（超限 413）、分块上限 500（stats 按全集算，
+ * truncated_to 记原始数量，为空省略）、5s 超时 504。切分是 CPU 密集且不接受
  * context——Java 用虚拟线程 + Future.get(5s) 仿真，<b>超时不 cancel</b>
  * 。</p>
  */
 @RestController
 public class ChunkerPreviewController {
 
-    /** 64k rune 上限（防 goroutine 堆积的主缓解）。 */
+    /** 64k 码点上限（防任务堆积的主缓解）。 */
     static final int PREVIEW_MAX_CHARS = 64 * 1024;
 
     /** 响应截断上限（stats 不受影响）。 */
@@ -143,7 +143,7 @@ public class ChunkerPreviewController {
             throw new BizException(AppError.badRequest(
                     "text is empty — paste a sample to preview chunking"));
         }
-        // rune 计数（非 char 计）
+        // 码点计数（非 char 计）
         if (text.codePointCount(0, text.length()) > PREVIEW_MAX_CHARS) {
             throw new BizException(new AppError(ErrorCode.KNOWLEDGE_PREVIEW_TOO_LARGE.value(),
                     "text exceeds preview limit", "limit: " + PREVIEW_MAX_CHARS, 413));
@@ -198,7 +198,7 @@ public class ChunkerPreviewController {
             lang = profile.detectedLangs.get(0);
         }
 
-        // 每个 chunk 的 rune 长度算一次，stats 与结果负载共用
+        // 每个 chunk 的码点长度算一次，stats 与结果负载共用
         List<Integer> runeLens = new ArrayList<>(chunks.size());
         for (ParsedChunk ch : chunks) {
             runeLens.add(ch.getContent().codePointCount(0, ch.getContent().length()));
@@ -331,7 +331,7 @@ public class ChunkerPreviewController {
         };
     }
 
-    /** preview 的错误体是裸 gin.H（非 AppError 信封）：键字母序。 */
+    /** preview 的错误体是裸 JSON 对象体（非 AppError 信封）：键字母序。 */
 
     private static int orZero(Integer v) {
         return v == null ? 0 : v;

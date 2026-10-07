@@ -86,15 +86,15 @@ public final class MemoryKinds {
 
     // ── 预算 ─────────────────────────────────────────────────────────────
 
-    /** 常驻块的 rune 预算。 */
+    /** 常驻块的码点预算。 */
     public static final int BLOCK_RUNE_BUDGET = 900;
-    /** 情境召回（每轮）的 rune 预算。 */
+    /** 情境召回（每轮）的码点预算。 */
     public static final int RECALL_RUNE_BUDGET = 600;
-    /** 一轮最多拉进多少条情境条目，与 rune 预算彼此独立。 */
+    /** 一轮最多拉进多少条情境条目，与码点预算彼此独立。 */
     public static final int RECALL_MAX_ITEMS = 5;
     /** 一次按需查找的上限。比召回宽松得多，因为两者付费方式不同。 */
     public static final int SEARCH_MAX_ITEMS = 20;
-    /** 一次按需查找的 rune 预算。 */
+    /** 一次按需查找的码点预算。 */
     public static final int SEARCH_RUNE_BUDGET = 2000;
     /** 调用方没写 limit 时给的条数。 */
     public static final int SEARCH_DEFAULT_ITEMS = 10;
@@ -106,7 +106,7 @@ public final class MemoryKinds {
      * 罗列它们的地方，所以上限存在、由相关性决定谁留下。</p>
      */
     public static final int RESIDENT_INTEREST_MAX_ITEMS = 5;
-    /** 单条记忆的 rune 上限。记忆应当是一句话，更长的属于聊天历史知识库。 */
+    /** 单条记忆的码点上限。记忆应当是一句话，更长的属于聊天历史知识库。 */
     public static final int CONTENT_MAX_RUNES = 300;
     /** 单个主体可持有的活跃条目上限；超出后按排名归档——这是系统里唯一的自动遗忘。 */
     public static final int DEFAULT_MAX_ITEMS = 200;

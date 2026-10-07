@@ -22,7 +22,7 @@ import org.yaml.snakeyaml.Yaml;
 
 /**
  * 声明式内置模型（config/builtin_models.yaml，env BUILTIN_MODELS_CONFIG 可覆盖）与
- * models 表的 YAML 托管切片（managed_by='yaml'）对账。
+ * models 表中由 YAML 托管的行集（managed_by='yaml'）对账。
  *
  * 生命周期契约：
  * - 只写 managed_by='yaml' 行；UI/API/SQL 创建的同名行（managed_by=''）保留不动

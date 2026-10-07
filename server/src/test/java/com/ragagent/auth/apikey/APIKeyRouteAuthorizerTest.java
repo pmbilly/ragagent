@@ -106,7 +106,7 @@ class APIKeyRouteAuthorizerTest {
                 .withCapability(APIKeyCapability.CHAT);
         assertThat(p.capabilities()).containsExactly(APIKeyCapability.CHAT, APIKeyCapability.MANAGE_AGENTS);
         assertThat(p.requireFullAccess()).isTrue();
-        // 原始策略不被修改（Go 显式拷贝切片）
+        // 原始策略不被修改（防御性拷贝）
         APIKeyRoutePolicy base = APIKeyRoutePolicy.fullAccess();
         assertThat(base.withCapability("chat").capabilities()).containsExactly("chat");
         assertThat(base.capabilities()).isEmpty();

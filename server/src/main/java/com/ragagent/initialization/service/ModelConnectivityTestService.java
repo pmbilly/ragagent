@@ -542,7 +542,7 @@ public final class ModelConnectivityTestService {
     }
 
     /** 时间保持原 offset 输出（JSON 反序列化来的时间不改时区）。 */
-    static String goTimeAsIs(OffsetDateTime value) {
+    static String timeAsIs(OffsetDateTime value) {
         return value == null ? "0001-01-01T00:00:00Z"
                 : value.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
     }
@@ -556,7 +556,7 @@ public final class ModelConnectivityTestService {
         return s == null ? "" : s;
     }
 
-    static String goTime(OffsetDateTime value) {
+    static String isoTimeText(OffsetDateTime value) {
         if (value == null) {
             return "0001-01-01T00:00:00Z";
         }

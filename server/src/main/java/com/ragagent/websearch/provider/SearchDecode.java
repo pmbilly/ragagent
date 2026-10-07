@@ -6,22 +6,22 @@ final class SearchDecode {
     private SearchDecode() {
     }
 
-    static String goTrimSpace(String s) {
+    static String trimUnicodeWhitespace(String s) {
         if (s == null) {
             return "";
         }
         int start = 0;
         int end = s.length();
-        while (start < end && isGoSpace(s.charAt(start))) {
+        while (start < end && isUnicodeWhitespace(s.charAt(start))) {
             start++;
         }
-        while (end > start && isGoSpace(s.charAt(end - 1))) {
+        while (end > start && isUnicodeWhitespace(s.charAt(end - 1))) {
             end--;
         }
         return s.substring(start, end);
     }
 
-    private static boolean isGoSpace(char c) {
+    private static boolean isUnicodeWhitespace(char c) {
         switch (c) {
             case '\t': case '\n': case '\u000B': case '\f': case '\r':
             case ' ': case '\u0085': case '\u00A0': case '\u1680':

@@ -33,7 +33,7 @@ public final class MemoryVectors {
      * 解开 {@link #encodeEmbedding} 写出的字节串。
      *
      * <p>长度不足 4 字节回 {@code null}；
-     * 尾部不足 4 字节的部分**被丢弃**（{@code len(raw)/4} 向下取整）。</p>
+     * 尾部不足 4 字节的部分**被丢弃**（{@code raw.length / 4} 向下取整）。</p>
      */
     public static float[] decodeEmbedding(byte[] raw) {
         if (raw == null || raw.length < 4) {

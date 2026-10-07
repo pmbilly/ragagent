@@ -38,7 +38,7 @@ final class FileOps {
 
     /** 原地追加去重（不改传入列表）。 */
     static void appendUnique(List<String> list, String path) {
-        String p = ConversationSerializer.goTrimSpace(path);
+        String p = ConversationSerializer.trimUnicodeWhitespace(path);
         if (p.isEmpty() || list.size() >= MAX_TRACKED_FILE_PATHS) {
             return;
         }
@@ -153,7 +153,7 @@ final class FileOps {
                 return "";
             }
             String p = node.get("path").asText("");
-            return p == null ? "" : ConversationSerializer.goTrimSpace(p);
+            return p == null ? "" : ConversationSerializer.trimUnicodeWhitespace(p);
         } catch (Exception e) {
             return "";
         }

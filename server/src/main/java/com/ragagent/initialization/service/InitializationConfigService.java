@@ -75,7 +75,7 @@ public final class InitializationConfigService {
                     models.add(m);
                 }
             } catch (Exception ignored) {
-                // Go：Warn 后 continue
+                // 单个模型查询失败 → 跳过，继续处理其余模型
             }
         }
         return ResponseEntity.ok(configResponse(models, kb, hasFiles(kbId)));
@@ -164,7 +164,7 @@ public final class InitializationConfigService {
                     vlm.setModelId(vlmModelId);
                 }
             } catch (Exception ignored) {
-                // Go：Warn "VLM model not found"
+                // 查询失败 → 视为模型不存在，VLM 保持禁用
             }
         }
         if (!vlm.isEnabled()) {
@@ -182,7 +182,7 @@ public final class InitializationConfigService {
                     asr.setLanguage(asrReq.path("language").asText(""));
                 }
             } catch (Exception ignored) {
-                // Go：Warn
+                // 查询失败 → 忽略，ASR 保持未启用
             }
         }
 

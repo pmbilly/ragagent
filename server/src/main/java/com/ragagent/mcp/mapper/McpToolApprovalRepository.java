@@ -38,24 +38,23 @@ public class McpToolApprovalRepository {
         this.mapper = mapper;
     }
 
-    /** 对照 ListByService：按 tool_name 升序；可为空列表 */
+    /** 按 tool_name 升序；可为空列表 */
     public List<McpToolApproval> listByService(long tenantId, String serviceId) {
         return mapper.listByService(tenantId, serviceId);
     }
 
-    /** 对照 IsRequired：缺行 → false */
+    /** 缺行 → false */
     public boolean isRequired(long tenantId, String serviceId, String toolName) {
         Boolean v = mapper.selectRequireApproval(tenantId, serviceId, toolName);
         return v != null && v;
     }
 
-    /** 对照 IsEnabled：<b>缺行 → true</b>（保留逐工具设置之前的历史行为） */
+    /** <b>缺行 → true</b>（保留逐工具设置之前的历史行为） */
     public boolean isEnabled(long tenantId, String serviceId, String toolName) {
         Boolean v = mapper.selectEnabled(tenantId, serviceId, toolName);
         return v == null || v;
     }
 
-    /** 对照 UpsertPolicy */
     public void upsertPolicy(long tenantId, String serviceId, String toolName, McpToolPolicyPatch patch) {
         if (serviceId == null || serviceId.isEmpty() || toolName == null || toolName.isEmpty()) {
             throw BizException.badRequest("service_id and tool_name are required");

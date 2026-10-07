@@ -57,11 +57,10 @@ public interface SessionMapper extends BaseMapper<Session> {
      * 走的是无名参数，类型处理器不会生效，PG 会以 "column is of type jsonb but expression is of
      * type character varying" 拒绝。</p>
      *
-     * <p>{@code state} 为 null 时 Go 写的是 SQL NULL（{@code state.Value()} 返回 nil），
-     * 所以这里也用 {@code jdbcType=OTHER} 让 PG 接受 jsonb 列的 NULL。</p>
+     * <p>{@code state} 为 null 时写 SQL NULL，
+     * 故用 {@code jdbcType=OTHER} 让 PG 接受 jsonb 列的 NULL。</p>
      *
-     * <p>{@code userScoped} 是 Go {@code applySessionUserScope} 在这个方法里的那一份
-     * （L355-357）：userID 非空时才加
+     * <p>{@code userScoped}：按人裁剪开关——{@code userId} 非空时才加
      * {@code (user_id = ? OR user_id IS NULL OR user_id = '')}。</p>
      */
     @Update("<script>"

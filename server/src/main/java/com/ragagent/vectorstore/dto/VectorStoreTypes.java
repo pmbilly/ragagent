@@ -188,7 +188,7 @@ public final class VectorStoreTypes {
         f.required = required;
         f.sensitive = sensitive != null && sensitive;
         f.description = description == null || description.isEmpty() ? null : description;
-        // Go Default 是 interface{}：nil（省略）与持零值（输出，如 "default":false）并存
+        // defaultValue 是可空引用：null（省略）与显式缺省值（照常输出，如 "default":false）并存
         f.defaultValue = defaultValue;
         return f;
     }

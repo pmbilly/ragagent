@@ -119,13 +119,13 @@ final class TenantCrudOps {
                 return new UpdateTenantRequest();
             }
             throw TenantBindSupport.invalidParams("Invalid request data",
-                    "json: cannot unmarshal " + TenantBindSupport.goJsonKind(root) + " into Go value of type "
+                    "json: cannot unmarshal " + TenantBindSupport.jsonKindName(root) + " into Go value of type "
                             + "struct { Name *string \"json:\\\"name\\\" binding:\\\"omitempty,min=1,max=128\\\"\"; "
                             + "Description *string \"json:\\\"description\\\" binding:\\\"omitempty,max=512\\\"\" }");
         }
-        String typeError = TenantBindSupport.goStringField(root, "name");
+        String typeError = TenantBindSupport.stringFieldValue(root, "name");
         if (typeError == null) {
-            typeError = TenantBindSupport.goStringField(root, "description");
+            typeError = TenantBindSupport.stringFieldValue(root, "description");
         }
         if (typeError != null) {
             throw TenantBindSupport.invalidParams("Invalid request data", typeError);

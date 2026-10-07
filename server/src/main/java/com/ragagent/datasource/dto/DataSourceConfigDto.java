@@ -12,11 +12,11 @@ import com.ragagent.datasource.domain.DataSourceMapSerializer;
  * <p><b>按构造剥离</b>：本类上压根没有 credentials 字段，所以密钥值不可能漏出去
  * ——与 MCP 的"结构体上就没有 api_key"是同一条不变式。</p>
  *
- * <h2>omitempty 逐字段</h2>
+ * <h2>为空省略（逐字段）</h2>
  * <ul>
- *   <li>{@code type}：<b>没有</b> omitempty → 空串照输出
+ *   <li>{@code type}：<b>没有</b>为空省略 → 空串照输出
  *       （本对象只在 config 解析成功时才构造，{@code type} 仍可能是空串）；</li>
- *   <li>{@code resource_ids} / {@code settings}：带 omitempty → null 与空都省略
+ *   <li>{@code resource_ids} / {@code settings}：带为空省略 → null 与空都省略
  *       （Java 用 {@code NON_EMPTY}）。</li>
  * </ul>
  *

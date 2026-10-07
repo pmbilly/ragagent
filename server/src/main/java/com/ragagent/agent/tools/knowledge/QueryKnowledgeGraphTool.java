@@ -258,7 +258,7 @@ public class QueryKnowledgeGraphTool extends BaseTool {
         StringBuilder output = new StringBuilder();
         output.append("=== Knowledge Graph Query ===\n\n");
         output.append(String.format("📊 Query: %s\n", query));
-        output.append(String.format("🎯 Target Knowledge Bases: %s\n", goSliceString(knowledgeBaseIDs)));
+        output.append(String.format("🎯 Target Knowledge Bases: %s\n", sliceText(knowledgeBaseIDs)));
         output.append(String.format("✓ Found %d relevant results (deduplicated)\n\n", allResults.size()));
 
         if (!errors.isEmpty()) {
@@ -277,13 +277,13 @@ public class QueryKnowledgeGraphTool extends BaseTool {
             output.append(String.format("Knowledge Base [%s]:\n", e.getKey()));
             if (!config.nodes().isEmpty()) {
                 output.append(String.format("  ✓ Entity Types (%d): %s\n",
-                        config.nodes().size(), goSliceString(config.nodes())));
+                        config.nodes().size(), sliceText(config.nodes())));
             } else {
                 output.append("  ⚠️ No entity types configured\n");
             }
             if (!config.relations().isEmpty()) {
                 output.append(String.format("  ✓ Relationship Types (%d): %s\n",
-                        config.relations().size(), goSliceString(config.relations())));
+                        config.relations().size(), sliceText(config.relations())));
             } else {
                 output.append("  ⚠️ No relationship types configured\n");
             }
@@ -493,7 +493,7 @@ public class QueryKnowledgeGraphTool extends BaseTool {
     }
 
     /** 列表的输出形态：" [a b c]"。 */
-    private static String goSliceString(List<String> items) {
+    private static String sliceText(List<String> items) {
         return "[" + String.join(" ", items) + "]";
     }
 

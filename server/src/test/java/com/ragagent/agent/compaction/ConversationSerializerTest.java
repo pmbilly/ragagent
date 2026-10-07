@@ -41,7 +41,7 @@ import com.ragagent.llm.domain.ToolCall;
 
 /**
  * 摘要序列化的录制常量断言。
- * 覆盖：对话转写（system 跳过/正文与工具结果截断/reasoning/空消息省略/中文按 rune
+ * 覆盖：对话转写（system 跳过/正文与工具结果截断/reasoning/空消息省略/中文按码点
  * 截断）、truncate 七态、rawArchive、renderToolArgs 16 态（键字节序、float64 语义、
  * HTML 转义、非法 JSON 回退、非对象回退、截断参数）、serializeToolCalls。
  */
@@ -160,12 +160,12 @@ class ConversationSerializerTest {
     }
 
     @Test
-    void goTrimSpaceMatchesUnicodeSpaceSemantics() {
-        assertThat(ConversationSerializer.goTrimSpace("  x  ")).isEqualTo("x");
-        assertThat(ConversationSerializer.goTrimSpace("\u00A0x")).isEqualTo("x");
-        assertThat(ConversationSerializer.goTrimSpace("x\u2028")).isEqualTo("x");
-        assertThat(ConversationSerializer.goTrimSpace("")).isEmpty();
-        assertThat(ConversationSerializer.goTrimSpace(null)).isEmpty();
+    void trimMatchesUnicodeSpaceSemantics() {
+        assertThat(ConversationSerializer.trimUnicodeWhitespace("  x  ")).isEqualTo("x");
+        assertThat(ConversationSerializer.trimUnicodeWhitespace("\u00A0x")).isEqualTo("x");
+        assertThat(ConversationSerializer.trimUnicodeWhitespace("x\u2028")).isEqualTo("x");
+        assertThat(ConversationSerializer.trimUnicodeWhitespace("")).isEmpty();
+        assertThat(ConversationSerializer.trimUnicodeWhitespace(null)).isEmpty();
         // 该辅助被 AgentPrompts.formatDocSummary 复用，录制断言见 AgentPromptsTest
         assertThat(GoRecording.STR_DSUM5).isEqualTo("spaced out text");
     }

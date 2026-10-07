@@ -159,7 +159,7 @@ public final class SearchSupport {
             Map<String, Object> fields = new LinkedHashMap<>();
             fields.put("index", i);
             fields.put("chunk_id", r.getId());
-            fields.put("score", RetrievalObs.goFmt4(r.getScore()));
+            fields.put("score", RetrievalObs.formatScore4(r.getScore()));
             fields.put("match_type", r.getMatchType());
             PipelineLog.info("Search", action, fields);
         }

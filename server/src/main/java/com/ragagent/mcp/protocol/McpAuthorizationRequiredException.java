@@ -21,7 +21,7 @@ public class McpAuthorizationRequiredException extends McpException {
     private final String resourceMetadataUrl;
 
     public McpAuthorizationRequiredException(String resourceMetadataUrl) {
-        super(McpErrorCode.AUTHORIZATION_REQUIRED, McpErrorCode.AUTHORIZATION_REQUIRED.goMessage());
+        super(McpErrorCode.AUTHORIZATION_REQUIRED, McpErrorCode.AUTHORIZATION_REQUIRED.wireMessage());
         this.resourceMetadataUrl = resourceMetadataUrl == null ? "" : resourceMetadataUrl;
     }
 

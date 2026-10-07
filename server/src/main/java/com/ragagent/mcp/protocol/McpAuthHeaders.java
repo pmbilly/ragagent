@@ -50,7 +50,7 @@ public final class McpAuthHeaders {
             case NONE -> {
                 // 向后兼容早于 AuthType 字段的历史行：从"恰好被设了值"的那个静态凭据推断，
                 // 保留升级前的历史行为，让既有服务在升级后照常鉴权。
-                // ⚠️ 这条分支是唯一允许两个头同时出现的地方——Go 就是这么写的。
+                // ⚠️ 这条分支是唯一允许两个头同时出现的地方。
                 if (nonEmpty(ac.getApiKey())) {
                     headers.put(DEFAULT_API_KEY_HEADER, ac.getApiKey());
                 }

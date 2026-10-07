@@ -137,7 +137,7 @@ final class Engine46bStubSupport {
         final List<String> callJson = new ArrayList<>();
         final List<ChatOptions> opts = new ArrayList<>();
         int callCount;
-        /** 非流式响应（对照 summarizerChat.Chat 的覆写；null = 报 not implemented）。 */
+        /** 非流式响应（null = 报 not implemented）。 */
         private ChatResponse nonStreamResponse;
         int nonStreamCalls;
 
@@ -331,7 +331,7 @@ final class Engine46bStubSupport {
         return r;
     }
 
-    /** 错误块（对照 stream error 分片）。 */
+    /** 错误块（流式分片）。 */
     static StreamResponse errorChunk(String content, String finish) {
         StreamResponse r = new StreamResponse();
         r.setResponseType(ResponseType.ERROR);
@@ -341,7 +341,7 @@ final class Engine46bStubSupport {
         return r;
     }
 
-    /** 思考通道分片（对照 reasoning_content 通道）。 */
+    /** 思考通道分片（reasoning_content 通道）。 */
     static StreamResponse thinkingChunk(String content, boolean done) {
         StreamResponse r = new StreamResponse();
         r.setResponseType(ResponseType.THINKING);
@@ -362,7 +362,7 @@ final class Engine46bStubSupport {
     }
 
     // ------------------------------------------------------------------
-    // 引擎构造（对照 newRec46bEngine：Custom 模板 + registry）与计数工具
+    // 引擎构造（Custom 模板 + registry）与计数工具
     // ------------------------------------------------------------------
 
     static AgentEngine newEngine(StubChat chat) {
@@ -387,7 +387,7 @@ final class Engine46bStubSupport {
                 "CUSTOM_AGENT_TEMPLATE");
     }
 
-    /** 计数工具（对照 countingTool）。 */
+    /** 计数工具。 */
     static final class StubTool extends BaseTool {
         int calls;
 

@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  *   <li>{@code id} 恒输出（支持数字与字符串两种形态，
  *       数字 ID 与 SDK 客户端自增 ID 对应，字符串 ID 用于 raw 调用——见
  *       {@code DefaultMcpClient#listRawTools} 的 {@code "weknora-tools-<uuid>"}）；</li>
- *   <li>{@code params} 为 null 时整个键省略（omitempty 语义）。</li>
+ *   <li>{@code params} 为 null 时整个键省略。</li>
  * </ul>
  */
 public final class JsonRpcRequest {

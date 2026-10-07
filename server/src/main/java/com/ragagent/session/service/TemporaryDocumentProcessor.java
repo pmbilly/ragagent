@@ -29,13 +29,13 @@ import com.ragagent.session.mapper.TemporaryDocumentRepository;
 import com.ragagent.session.service.TemporaryDocumentService.CreateOptions;
 
 /**
- * {@code TemporaryDocumentService} 的**解析 / 落盘管线切片**（§14 步骤 2）：异步投递与重试、
+ * {@code TemporaryDocumentService} 的**解析 / 落盘管线子模块**（§14 步骤 2）：异步投递与重试、
  * docreader → chunker（auto/1600/160）→ ApproxTokenCount → MarkReady、音频转写、
  * 文本与图片落盘（chunks jsonb / image_refs jsonb / markdown 内联图替换）。
  *
  * <p>为什么单独一类：这条管线自成一条单向流（投递 → 取行 → 解析 → 落库 → 标记 ready），
  * 与门面的 HTTP 面（create/get/list/delete/openFile）、生命周期（cleanup ticker）与
- * 提示词渲染切片互不依赖。门面保留 {@code processNow} 薄委托（流程契约测试的驱动口）。</p>
+ * 提示词渲染子模块互不依赖。门面保留 {@code processNow} 薄委托（流程契约测试的驱动口）。</p>
  *
  * <p>共享项处置（§11.17 口径）：{@code MAPPER}/{@code readJsonArray}/{@code extOf}/
  * {@code isImageFormat} 门面也在用（删除/入 KB/附件提示词路径）→ 留门面，本类按类名引用；
@@ -75,7 +75,7 @@ final class TemporaryDocumentProcessor {
     /** 图标过滤阈值（最小边长 / 最小字节数）。 */
     static final int MIN_IMAGE_DIMENSION = 64;
     static final int MIN_IMAGE_BYTES = 512;
-    /** 解析任务的单线程 executor（对照 asynq worker 的串行消费语义）。 */
+    /** 解析任务的单线程 executor（任务串行消费）。 */
     private final ExecutorService executor = Executors.newSingleThreadExecutor(r -> {
         Thread t = new Thread(r, "temporary-document-worker");
         t.setDaemon(true);
@@ -84,7 +84,7 @@ final class TemporaryDocumentProcessor {
     /** 音频扩展名（无点，不含 aac）。 */
     private static final Set<String> AUDIO_FORMAT_EXTENSIONS =
             Set.of("mp3", "wav", "m4a", "flac", "ogg");
-    /** 对照 asynq.Enqueue：进程内 executor 投递，失败直接 MarkFailed。 */
+    /** 任务入队：进程内 executor 投递，失败直接 {@code markFailed}。 */
     void enqueueProcess(long tenantId, String documentId) {
         try {
             executor.submit(() -> processWithRetry(tenantId, documentId));
@@ -93,7 +93,7 @@ final class TemporaryDocumentProcessor {
             repo.markFailed(tenantId, documentId, "failed to schedule document parsing");
         }
     }
-    /** 对照 asynq 的 MaxRetry 2：解析异常最多重试 2 次，仍失败落终态 failed。 */
+    /** 解析异常最多重试 2 次，仍失败落终态 failed。 */
     private void processWithRetry(long tenantId, String documentId) {
         for (int attempt = 0; attempt < 3; attempt++) {
             try {
@@ -222,7 +222,7 @@ final class TemporaryDocumentProcessor {
                 throw new RuntimeException("load ASR model: " + e.getMessage(), e);
             }
             var p = model.getParameters();
-            // 对照 asr.ConfigFromModel：language 不从模型来（恒空），customHeaders 透传
+            // language 不从模型来（恒空），customHeaders 透传
             var config = new AsrTranscriber.AsrConfig(p == null ? "" : p.getBaseUrl(),
                     model.getName(), p == null ? "" : p.getApiKey(), model.getId(), "",
                     p == null ? null : p.getCustomHeaders());

@@ -20,7 +20,7 @@ import java.util.List;
  */
 public final class StoragePathGuard {
 
-    /** provider 原生本地引用前缀（Go local provider 的 {@code local://}）。 */
+    /** provider 原生本地引用前缀（{@code local://}）。 */
     public static final String LOCAL_SCHEME = "local://";
 
     /** 知识布局引用前缀（Java 侧约定，golden 锁定）。 */

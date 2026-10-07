@@ -12,8 +12,8 @@ import com.ragagent.common.web.ZeroTimeSerializer;
  * <p><b>租户与 subject 刻意不上线</b>：这一行本来就只属于调用方，
  * 那些 id 不是 UI 该去忽略的东西。</p>
  *
- * <p>{@code aliases} 无 omitempty：nil 输出 {@code null}（不是 {@code []}）。
- * 投影函数 {@code MemoryTopicViewFromStat} 会在 nil 时补空列表——
+ * <p>{@code aliases} 恒输出：null 输出 {@code null}（不是 {@code []}）。
+ * 投影函数会在 null 时补空列表——
  * 也就是说**存量行的 null 与投影后的空列表在线上是两种形态**，别统一。</p>
  */
 public class MemoryTopicView {
@@ -22,7 +22,7 @@ public class MemoryTopicView {
 
     private String topic = "";
 
-    /** 无 omitempty：nil → {@code null}。 */
+    /** 恒输出：null 不省略。 */
     private List<String> aliases;
 
     private int hits;

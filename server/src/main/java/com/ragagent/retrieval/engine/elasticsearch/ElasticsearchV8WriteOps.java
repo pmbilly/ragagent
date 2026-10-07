@@ -34,7 +34,6 @@ final class ElasticsearchV8WriteOps {
 
     // ── 写入 ────────────────────────────────────────────────────────────────
 
-    /** 对照 {@code Save}。 */
     void save(IndexInfo embedding, Map<String, Object> additionalParams) throws Exception {
         VectorEmbedding doc = ElasticsearchV8RetrieveRepository.toDbVectorEmbedding(embedding, additionalParams);
         if (doc.embedding == null || doc.embedding.length == 0) {
@@ -48,7 +47,7 @@ final class ElasticsearchV8WriteOps {
         }
     }
 
-    /** 对照 {@code BatchSave}：bulk NDJSON，create 语义。 */
+    /** bulk NDJSON，create 语义。 */
     void batchSave(List<IndexInfo> embeddingList, Map<String, Object> additionalParams)
             throws Exception {
         if (embeddingList == null || embeddingList.isEmpty()) {
@@ -116,7 +115,6 @@ final class ElasticsearchV8WriteOps {
                 + total + " items failed, first 5: " + String.join("; ", msgs) + ")");
     }
 
-    /** 对照 {@code DeleteByChunkIDList}。 */
     void deleteByChunkIdList(List<String> chunkIdList, int dimension, String knowledgeType)
             throws Exception {
         deleteByTerms("chunk_id", chunkIdList);
@@ -124,13 +122,11 @@ final class ElasticsearchV8WriteOps {
 
     // ── 删除 ────────────────────────────────────────────────────────────────
 
-    /** 对照 {@code DeleteBySourceIDList}。 */
     void deleteBySourceIdList(List<String> sourceIdList, int dimension, String knowledgeType)
             throws Exception {
         deleteByTerms("source_id", sourceIdList);
     }
 
-    /** 对照 {@code DeleteByKnowledgeIDList}。 */
     void deleteByKnowledgeIdList(List<String> knowledgeIdList, int dimension,
                                         String knowledgeType) throws Exception {
         deleteByTerms("knowledge_id", knowledgeIdList);
@@ -152,7 +148,7 @@ final class ElasticsearchV8WriteOps {
         }
     }
 
-    /** 对照 {@code CopyIndices}（分页 + 映射改名 + SourceID 三态 + 目标向量回填）。 */
+    /** 分页 + 映射改名 + SourceID 三态 + 目标向量回填。 */
     void copyIndices(String sourceKnowledgeBaseId,
                             Map<String, String> sourceToTargetKbIdMap,
                             Map<String, String> sourceToTargetChunkIdMap,
@@ -217,7 +213,7 @@ final class ElasticsearchV8WriteOps {
                     targetSourceId = UUID.randomUUID().toString();
                 }
                 if (sourceDoc.embedding != null && sourceDoc.embedding.length > 0) {
-                    // 修复（有意偏离 Go v8）：Go 以"目标 chunkID"为键、而查表用的是 SourceID →
+                    // 修复：若以"目标 chunkID"为键、而查表用的是 SourceID →
                     // 生成问题（<chunk>-<qid> 形态）取不到向量、同 chunk 多文档互相覆盖；
                     // 这里改键为目标 SourceID（逐文档唯一），toDbVectorEmbedding 按 SourceID 查表即命中
                     embeddingMap.put(targetSourceId, sourceDoc.embedding);
@@ -250,7 +246,7 @@ final class ElasticsearchV8WriteOps {
 
     // ── CopyIndices / 批量改状态 / 标签 ────────────────────────────────────
 
-    /** 对照 {@code BatchUpdateChunkEnabledStatus}：按值分两组 update_by_query。 */
+    /** 按值分两组 update_by_query。 */
     void batchUpdateChunkEnabledStatus(Map<String, Boolean> chunkStatusMap) throws Exception {
         if (chunkStatusMap == null || chunkStatusMap.isEmpty()) {
             log.warn("[Elasticsearch] Chunk status map is empty, skipping update");
@@ -273,7 +269,7 @@ final class ElasticsearchV8WriteOps {
         }
     }
 
-    /** 对照 {@code BatchUpdateChunkTagID}：按 tagID 分组逐组 update_by_query。 */
+    /** 按 tagID 分组逐组 update_by_query。 */
     void batchUpdateChunkTagID(Map<String, String> chunkTagMap) throws Exception {
         if (chunkTagMap == null || chunkTagMap.isEmpty()) {
             log.warn("[Elasticsearch] Chunk tag map is empty, skipping update");

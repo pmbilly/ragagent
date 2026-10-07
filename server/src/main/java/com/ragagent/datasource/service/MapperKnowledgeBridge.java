@@ -223,7 +223,7 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
                 fileTypeOf(name), channel);
         k.setSource(url);
         k.setFileName(name);
-        // URL 型文档先不落 Storage：真正的下载/解析由处理队列做（Go 交给 asynq 的 docreader）
+        // URL 型文档先不落 Storage：真正的下载/解析由处理队列异步做（见下方 enqueue）
         k.setFilePath("");
         knowledgeMapper.insert(k);
         worker.enqueue(k.getId());

@@ -70,7 +70,7 @@ public class FaqChunkMetadata {
 
     public String source = "";
 
-    /** TrimSpace + 列表去空去重，version 兜底 1。 */
+    /** 去首尾空白 + 列表去空去重，version 兜底 1。 */
     public void sanitize() {
         standardQuestion = trimSpace(standardQuestion);
         similarQuestions = sanitizeStrings(similarQuestions);
@@ -96,7 +96,7 @@ public class FaqChunkMetadata {
 
     // ── 纯函数 ─────────────────────────────
 
-    /** TrimSpace + 去空 + 去重；空输入/全空 → null。 */
+    /** 去首尾空白 + 去空 + 去重；空输入/全空 → null。 */
     public static List<String> sanitizeStrings(List<String> values) {
         if (values == null || values.isEmpty()) {
             return null;
@@ -269,16 +269,16 @@ public class FaqChunkMetadata {
         }
         int start = 0;
         int end = s.length();
-        while (start < end && isGoSpace(s.charAt(start))) {
+        while (start < end && isUnicodeWhitespace(s.charAt(start))) {
             start++;
         }
-        while (end > start && isGoSpace(s.charAt(end - 1))) {
+        while (end > start && isUnicodeWhitespace(s.charAt(end - 1))) {
             end--;
         }
         return s.substring(start, end);
     }
 
-    private static boolean isGoSpace(char c) {
+    private static boolean isUnicodeWhitespace(char c) {
         switch (c) {
             case '\t': case '\n': case '\u000B': case '\f': case '\r':
             case ' ': case '\u0085': case '\u00A0': case '\u1680':

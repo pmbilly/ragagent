@@ -182,7 +182,7 @@ class WikiIngestServiceTest {
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // TestGenerateWithTemplateMasksImageURLsBeforeLLM（Go L304-335）
+    // 出站 prompt 掩码图片 URL，返回时还原真 URL
     // ═══════════════════════════════════════════════════════════════
 
     @Test
@@ -206,7 +206,7 @@ class WikiIngestServiceTest {
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // TestGenerateWikiPageModifyUsesCacheableMessageLayout（Go L373-404）
+    // WikiPageModify 的 system+user 消息布局（前缀可缓存）
     // ═══════════════════════════════════════════════════════════════
 
     @Test
@@ -373,7 +373,7 @@ class WikiIngestServiceTest {
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // TestGenerateWithTemplateSetsMaxTokens（Go L615-636，#2604 回归）
+    // 每次调用带 32768 补全预算与 thinking=false（回归锚点）
     // ═══════════════════════════════════════════════════════════════
 
     @Test
@@ -392,7 +392,7 @@ class WikiIngestServiceTest {
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // TestWikiIngestCleanupContextDetachedFromCancelledParent（Go L485-504）
+    // 脱钩清理：父作用域取消后清理仍执行
     // ═══════════════════════════════════════════════════════════════
 
     @Test
@@ -643,16 +643,16 @@ class WikiIngestServiceTest {
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // goQuote / xmlEscape（%q 风格引号与 XML 转义）
+    // quoted / xmlEscape（双引号字面量与 XML 转义）
     // ═══════════════════════════════════════════════════════════════
 
     @Test
-    @DisplayName("goQuote 对 slug 产出 Go %q 的形态")
-    void goQuoteMatchesGoVerb() {
-        assertThat(WikiIngestService.goQuote("entity/acme-corp")).isEqualTo("\"entity/acme-corp\"");
-        assertThat(WikiIngestService.goQuote("a\"b")).isEqualTo("\"a\\\"b\"");
-        assertThat(WikiIngestService.goQuote("")).isEqualTo("\"\"");
-        assertThat(WikiIngestService.goQuote(null)).isEqualTo("\"\"");
+    @DisplayName("quoted 对 slug 产出双引号字面量")
+    void quotedWrapsSlugs() {
+        assertThat(WikiIngestService.quoted("entity/acme-corp")).isEqualTo("\"entity/acme-corp\"");
+        assertThat(WikiIngestService.quoted("a\"b")).isEqualTo("\"a\\\"b\"");
+        assertThat(WikiIngestService.quoted("")).isEqualTo("\"\"");
+        assertThat(WikiIngestService.quoted(null)).isEqualTo("\"\"");
     }
 
     @Test

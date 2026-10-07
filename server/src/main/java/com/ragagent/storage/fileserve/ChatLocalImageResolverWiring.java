@@ -81,7 +81,7 @@ public class ChatLocalImageResolverWiring implements InitializingBean, Disposabl
      */
     byte[] resolve(String storageUrl) {
         try {
-            // L498-501: resourceCatalog.ResolvePath——resource:// 换物理路径，失败即 false
+            // catalog.resolvePath——resource:// 换物理路径，失败即 false
             ResourceCatalogService.ResolvedPath resolved = catalog.resolvePath(storageUrl);
             if (resolved.error()) {
                 return null;
@@ -89,7 +89,7 @@ public class ChatLocalImageResolverWiring implements InitializingBean, Disposabl
             String physicalPath = resolved.physicalPath();
             StoredResource resource = resolved.resource();
 
-            // L502-506: 路径租户段 + resource 命中时以 resource.TenantID 覆盖
+            // 路径租户段 + resource 命中时以 resource 的 tenantId 覆盖
             long tenantId = StoragePaths.parseTenantIdFromStoragePath(physicalPath);
             if (resource != null) {
                 tenantId = resource.getTenantId();
@@ -98,7 +98,7 @@ public class ChatLocalImageResolverWiring implements InitializingBean, Disposabl
                 return null;
             }
 
-            // L508-511: tenantRepo.GetTenantByID——查不到（Go: err/nil）→ false
+            // 租户查不到（不存在）→ 返回 null
             Tenant tenant = tenantService.getTenantById(tenantId);
             if (tenant == null) {
                 return null;
@@ -107,7 +107,7 @@ public class ChatLocalImageResolverWiring implements InitializingBean, Disposabl
             // baseDir：缺省归并到 StoragePaths.localStorageBaseDir 的 /data/files 兜底
             String baseDir = StoragePaths.localStorageBaseDir();
 
-            // L514-521: 剥 storage://<backendID>/ 包装；resource 行带 backendID 时覆盖；
+            // 剥 storage://<backendID>/ 包装；resource 行带 backendID 时覆盖；
             //   provider 从（scoped 时剥包装后的）路径前缀解析
             StoragePaths.ParsedBackendPath parsed = StoragePaths.parseStorageBackendPath(physicalPath);
             String backendId = parsed.backendId();
@@ -126,19 +126,19 @@ public class ChatLocalImageResolverWiring implements InitializingBean, Disposabl
                 provider = "local";
             }
 
-            // L526-529: storageResolver.ResolveFileService——按归属租户配置重建 FileService
+            // storageResolver.resolveFileService——按归属租户配置重建 FileService
             StorageFileResolver.Resolution resolution =
                     storageResolver.resolveFileService(tenant, backendId, provider, baseDir);
             if (resolution.error() != null || resolution.service() == null) {
                 return null;
             }
 
-            // L530-539: fileSvc.GetFile(物理路径) + io.ReadAll
+            // 按物理路径打开文件并读全量字节
             FileTransport.OpenedFile opened = resolution.service().getFile(physicalPath);
             // 三形态通吃（seekable / stream / bytes），此处读全量（多模态 base64 用）
             return opened.readAllBytes();
         } catch (RuntimeException | IOException e) {
-            // Go: 任何 err → (nil, false)，调用侧回落 LOCAL_STORAGE_BASE_DIR 兜底
+            // 任何异常 → 返回 null，调用侧回落 LOCAL_STORAGE_BASE_DIR 兜底
             log.debug("[image-resolve] application resolver failed for {}: {}", storageUrl, e.toString());
             return null;
         }

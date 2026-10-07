@@ -266,7 +266,7 @@ final class WikiIngestRunSupport {
                     // finalizing 槽位在 reduce + publish 之后的 docResults 循环里才排空，
                     // 因此 "completed" 只在 wiki 完整写出之后才到达。
                 } else {
-                    // err == nil && result == nil：mapOneDocument 在某个终态、不可重试的
+                    // 无错误且 result 为 null：mapOneDocument 在某个终态、不可重试的
                     // 状态（知识已删 / 无 chunk / 文本不足）跳过了该文档。它既不产出
                     // docResult 也不是 failedOp，因此成功与死信两条排空路径都不会触发。
                     // 在这里释放 finalizing 槽位，免得该行一直挂在 "finalizing" 直到

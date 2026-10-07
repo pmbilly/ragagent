@@ -160,14 +160,14 @@ public final class CompactionPreparation {
         String c = content == null ? "" : content;
         int start = c.indexOf("<summary>");
         if (start < 0) {
-            return ConversationSerializer.goTrimSpace(c);
+            return ConversationSerializer.trimUnicodeWhitespace(c);
         }
         start += "<summary>".length();
         int end = c.lastIndexOf("</summary>");
         if (end < start) {
-            return ConversationSerializer.goTrimSpace(c.substring(start));
+            return ConversationSerializer.trimUnicodeWhitespace(c.substring(start));
         }
-        return ConversationSerializer.goTrimSpace(c.substring(start, end));
+        return ConversationSerializer.trimUnicodeWhitespace(c.substring(start, end));
     }
 
     private static List<ChatMessage> cloneRange(List<ChatMessage> messages, int start, int end) {

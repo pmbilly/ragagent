@@ -31,7 +31,7 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
  * S3 协议族后端（<b>s3 / minio / obs / ks3</b>），一次实现覆盖四条 provider 路线：
  *
  * <table border="1">
- *   <tr><th>provider</th><th>Go 实现</th><th>本类</th></tr>
+ *   <tr><th>provider</th><th>参照 SDK</th><th>本类</th></tr>
  *   <tr><td>s3</td><td>aws-sdk-go-v2（endpoint + path-style 推断）</td>
  *       <td>同款语义：{@code endpointOverride} 时按 {@code forcePathStyle ||
  *       !endpoint.contains("amazonaws.com")} 决定 path-style；非 AWS 端点放宽
@@ -229,9 +229,8 @@ public class S3CompatibleFileService implements SeekableFileService {
     }
 
     /**
-     * 照 Go：只有 minio 形态走 ServeContent（minio-go 的 {@code *minio.Object} 是
-     * {@code io.ReadSeeker}）；s3/cos/tos/obs/ks3 的 aws-sdk body 是 {@code io.ReadCloser}
-     * → Go 走流式 + {@code Accept-Ranges: none}，本仓同。
+     * 仅 minio 形态返回可随机读（seek）的流；s3/cos/tos/obs/ks3 的
+     * S3 协议响应体只能顺序读 → 流式返回 + {@code Accept-Ranges: none}。
      */
     @Override
     public boolean seekableReads() {

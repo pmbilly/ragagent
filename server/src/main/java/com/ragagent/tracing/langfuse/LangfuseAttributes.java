@@ -68,7 +68,7 @@ public final class LangfuseAttributes {
     private static final DateTimeFormatter ISO_MILLIS =
             DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(ZoneOffset.UTC);
 
-    /** 紧凑 JSON 编码器（map 键序 + 整数型 double 直写；2026-10-03 B38 起不再复刻 Go 转义）。 */
+    /** 紧凑 JSON 编码器（map 键序 + 整数型 double 直写）。 */
     private static final ObjectMapper JSON = buildJson();
 
     private static ObjectMapper buildJson() {

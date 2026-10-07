@@ -439,7 +439,7 @@ public final class PluginMerge implements Plugin {
                 r.setMetadata(new LinkedHashMap<>());
             }
             r.getMetadata().put("history_similarity",
-                    trimTrailingZeros(RetrievalObs.goFmt4(sim)));
+                    trimTrailingZeros(RetrievalObs.formatScore4(sim)));
             filtered.add(r);
 
             Map<String, Object> f = new LinkedHashMap<>();

@@ -140,7 +140,7 @@ public class DataSource {
     @TableField("sync_deletions")
     private boolean syncDeletions;
 
-    /** 上次成功同步的时间。指针 → nil 输出 {@code null}。 */
+    /** 上次成功同步的时间。指针字段，{@code null} 原样输出。 */
     @TableField("last_sync_at")
     private OffsetDateTime lastSyncAt;
 

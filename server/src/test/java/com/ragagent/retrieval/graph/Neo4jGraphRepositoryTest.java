@@ -32,7 +32,7 @@ class Neo4jGraphRepositoryTest {
         assertEquals(List.of("ENTITYkb_1", "ENTITYkn_2"), repo.labels(ns("kb-1", "kn-2")));
         assertEquals("ENTITYkb_1:ENTITYkn_2", repo.label(ns("kb-1", "kn-2")));
 
-        // 空段被跳过（对照 NameSpace.Labels 的非空判断）
+        // 空段被跳过（labels() 的非空判断）
         assertEquals(List.of("ENTITYkb"), repo.labels(ns("kb", "")));
         assertEquals("", repo.label(ns("", "")));
         assertEquals(List.of(), repo.labels(null));

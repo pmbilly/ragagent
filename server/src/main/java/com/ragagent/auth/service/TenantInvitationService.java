@@ -248,7 +248,7 @@ public class TenantInvitationService {
     }
 
     /**
-     * 对照 CreateShareLink：服务端生成 32B 明文 token；per-user 约束
+     * 服务端生成 32B 明文 token；per-user 约束
      * （already-member / duplicate-pending）**不适用**——share-link 行无特定 invitee、
      * 可并存、消费不毁行。
      */
@@ -305,7 +305,7 @@ public class TenantInvitationService {
         return addMemberIdempotent(inv);
     }
 
-    /** 对照 Decline：仅被邀请人，pending → declined，不建成员行 */
+    /** 仅被邀请人，pending → declined，不建成员行 */
     public void decline(long invId, String callerUserId) {
         sweep();
         TenantInvitation inv = getById(invId);
@@ -327,7 +327,7 @@ public class TenantInvitationService {
     }
 
     /**
-     * 对照 Revoke：Owner 路由层把关后调用（这里不复查角色），
+     * Owner 路由层把关后调用（这里不复查角色），
      * pending → revoked。跨租户的"以 A 撤 B 的邀请"由 controller 的
      * inv.TenantID != tenantID 检查兜住（404 不泄漏存在性）。
      */
@@ -346,10 +346,9 @@ public class TenantInvitationService {
     }
 
     /**
-     * 对照 MarkPendingAcceptedIfExists：auto-accept / share-link 消费后
-     * 对账同 (tenant, invitee) 的 stale pending 行。Go 两个调用点对返回 error 的
-     * 处理都是 log-warn，故这里同样**不外抛**（bookkeeping 失败不能把已成功的
-     * 加入变成失败）。
+     * auto-accept / share-link 消费后
+     * 对账同 (tenant, invitee) 的 stale pending 行。失败只 log-warn、
+     * **不外抛**（bookkeeping 失败不能把已成功的加入变成失败）。
      */
     public void markPendingAcceptedIfExists(long tenantId, String inviteeUserId) {
         try {
@@ -368,7 +367,7 @@ public class TenantInvitationService {
     // ── token 路径 ─────────────────────────────────────────────────────────
 
     /**
-     * 对照 LookupByToken：sweep 后按明文 token 找 pending 行；空/未知/已过期
+     * sweep 后按明文 token 找 pending 行；空/未知/已过期
      * 统一折叠成 TOKEN_INVALID（不泄漏"曾经存在"）。
      */
     public TenantInvitation lookupByToken(String plainToken) {
@@ -392,7 +391,7 @@ public class TenantInvitationService {
     }
 
     /**
-     * 对照 AcceptByToken：多-use——邀请行**不**翻转，accepted_count 尽力 +1；
+     * 多-use——邀请行**不**翻转，accepted_count 尽力 +1；
      * 已是成员返回既有行（幂等，不让"重复点链接"看起来像角色变更）并对账
      * 同租户的 stale per-user pending 行。
      */
@@ -421,7 +420,7 @@ public class TenantInvitationService {
         }
     }
 
-    /** 对照 reconcilePendingInvitation：对账失败只记日志（bookkeeping 不反悔已成功的加入） */
+    /** 对账失败只记日志（bookkeeping 不反悔已成功的加入） */
     private void reconcilePendingInvitation(long tenantId, String inviteeUserId) {
         try {
             markPendingAcceptedIfExists(tenantId, inviteeUserId);
@@ -459,7 +458,7 @@ public class TenantInvitationService {
     }
 
     /**
-     * 对照 MarkStatusIfPending：WHERE status='pending' 的原子翻转；
+     * WHERE status='pending' 的原子翻转；
      * 影响 0 行 = 并发点击输掉了竞态 → ErrInvitationNotPending。
      */
     private void markStatusIfPending(long id, String status) {
@@ -517,7 +516,7 @@ public class TenantInvitationService {
         }
     }
 
-    /** 对照 detailsFor + emitAudit：invitation_id / role 进 Details（map 字母序） */
+    /** invitation_id / role 进 Details（map 字母序） */
     private void emitAudit(long tenantId, String action, String invId, String targetUserId, String role) {
         ObjectNode details = MAPPER.createObjectNode();
         details.put("invitation_id", Long.parseLong(invId));

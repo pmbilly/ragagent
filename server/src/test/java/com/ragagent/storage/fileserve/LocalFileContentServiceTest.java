@@ -35,17 +35,17 @@ class LocalFileContentServiceTest {
     }
 
     @Test
-    void goRelMatchesFilepathRel() {
+    void relativizeMatchesFilepathRel() {
         // 全部为探针录制语料
-        assertEquals("b/c", LocalFileContentService.goRel("/a", "/a/b/c"));
-        assertEquals("../b/c", LocalFileContentService.goRel("/a/x", "/a/b/c"));
-        assertNull(LocalFileContentService.goRel("/a/b", "b/c")); // 根性不同 → error
-        assertNull(LocalFileContentService.goRel("data", "/data/x"));
-        assertEquals(".", LocalFileContentService.goRel("/a/b", "/a/b"));
-        assertEquals("../x/cgi-bin", LocalFileContentService.goRel("/a/b", "/a/x/y/../cgi-bin"));
-        assertEquals("10002/x.png", LocalFileContentService.goRel("/data/files", "/data/files/10002/x.png"));
+        assertEquals("b/c", LocalFileContentService.relativizePath("/a", "/a/b/c"));
+        assertEquals("../b/c", LocalFileContentService.relativizePath("/a/x", "/a/b/c"));
+        assertNull(LocalFileContentService.relativizePath("/a/b", "b/c")); // 根性不同 → error
+        assertNull(LocalFileContentService.relativizePath("data", "/data/x"));
+        assertEquals(".", LocalFileContentService.relativizePath("/a/b", "/a/b"));
+        assertEquals("../x/cgi-bin", LocalFileContentService.relativizePath("/a/b", "/a/x/y/../cgi-bin"));
+        assertEquals("10002/x.png", LocalFileContentService.relativizePath("/data/files", "/data/files/10002/x.png"));
         // 相对 target 配绝对 base → error（GetFileURL 的"原样返回"分支）
-        assertNull(LocalFileContentService.goRel("/data/files", "10002/exports/a.png"));
+        assertNull(LocalFileContentService.relativizePath("/data/files", "10002/exports/a.png"));
     }
 
     @Test

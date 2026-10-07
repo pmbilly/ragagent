@@ -30,7 +30,7 @@ import com.ragagent.datasource.domain.SyncLog;
  * <p>按字段声明序输出（不是字母序）——{@code config} 夹在 {@code type} 与
  * {@code sync_schedule} 之间、{@code credentials} 在最后。</p>
  *
- * <h2>omitempty 逐字段</h2>
+ * <h2>为空省略（逐字段）</h2>
  * <ul>
  *   <li>{@code config}：解析失败时为 {@code null} 并<b>省略整个键</b>；</li>
  *   <li>{@code last_sync_cursor} / {@code last_sync_result}：{@code NON_EMPTY}
@@ -38,10 +38,10 @@ import com.ragagent.datasource.domain.SyncLog;
  *   <li>{@code error_message}：空串省略（注意这与实体自身
  *       "恒输出空串"的形态**不同**，只有 DTO 这一层省略）；</li>
  *   <li>{@code latest_sync_log}：{@code null} 省略；</li>
- *   <li>{@code credentials}：map + omitempty → 空 map 省略。但工厂方法**恒**塞一个
+ *   <li>{@code credentials}：map + 为空省略 → 空 map 省略。但工厂方法**恒**塞一个
  *       {@code credentials} 键进去，所以线上永远出现；</li>
  *   <li>{@code last_sync_at} / {@code created_at} / {@code updated_at} / {@code total_items_synced}
- *       / {@code sync_deletions} / 四个字符串字段：<b>没有</b> omitempty → 恒输出（null 照输出）。</li>
+ *       / {@code sync_deletions} / 四个字符串字段：<b>没有</b>为空省略 → 恒输出（null 照输出）。</li>
  * </ul>
  *
  * <h2>持久化语义</h2>

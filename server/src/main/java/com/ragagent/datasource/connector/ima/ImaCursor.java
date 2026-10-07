@@ -51,7 +51,7 @@ public class ImaCursor {
     @JsonProperty("last_sync_time")
     private OffsetDateTime lastSyncTime = ZeroTimeSerializer.ZERO_DATE_TIME;
 
-    /** {@code { kb_id: { logical_key: media_id } }}；omitempty → 空时整个键消失。 */
+    /** {@code { kb_id: { logical_key: media_id } }}；为空省略 → 空时整个键消失。 */
     @JsonProperty("kb_logical")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, Map<String, String>> kbLogical;

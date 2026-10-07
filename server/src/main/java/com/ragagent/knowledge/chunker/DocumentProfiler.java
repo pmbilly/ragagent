@@ -9,7 +9,7 @@ import java.util.regex.Matcher;
 /**
  * 文档画像与策略选择。
  * <p>对文档单次扫描收集结构信号，驱动 chunking 层级选择（heading 感知 /
- * heuristic 边界 / recursive）。profiling 成本低（几次正则扫描 + rune 计数）。</p>
+ * heuristic 边界 / recursive）。profiling 成本低（几次正则扫描 + 码点计数）。</p>
  */
 public final class DocumentProfiler {
 

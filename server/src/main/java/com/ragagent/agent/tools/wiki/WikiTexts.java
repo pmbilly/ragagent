@@ -38,7 +38,7 @@ public final class WikiTexts {
     }
 
 
-    /** 摘要截断：首段（去 #/## 前缀），超长按 rune 截 + "..."。 */
+    /** 摘要截断：首段（去 #/## 前缀），超长按码点截 + "..."。 */
     public static String truncateForSummary(String content, int maxLen) {
         String first = content == null ? "" : content;
         int para = first.indexOf("\n\n");

@@ -67,8 +67,6 @@ public class StorageEngineConfig {
     public ObsEngineConfig getObs() { return obs; }
     public void setObs(ObsEngineConfig v) { obs = v; }
 
-    /** 对照 LocalEngineConfig。 */
-
     public static class LocalEngineConfig {
         @JsonProperty("path_prefix")
         private String pathPrefix = "";
@@ -76,8 +74,6 @@ public class StorageEngineConfig {
         public String getPathPrefix() { return pathPrefix; }
         public void setPathPrefix(String v) { pathPrefix = v == null ? "" : v; }
     }
-
-    /** 对照 MinIOEngineConfig。 */
 
     public static class MinioEngineConfig {
         @JsonProperty("mode")
@@ -110,8 +106,6 @@ public class StorageEngineConfig {
         public String getPathPrefix() { return pathPrefix; }
         public void setPathPrefix(String v) { pathPrefix = v == null ? "" : v; }
     }
-
-    /** 对照 COSEngineConfig。 */
 
     public static class CosEngineConfig {
         @JsonProperty("secret_id")
@@ -149,8 +143,6 @@ public class StorageEngineConfig {
         public void setTempRegion(String v) { tempRegion = v == null ? "" : v; }
     }
 
-    /** 对照 TOSEngineConfig。 */
-
     public static class TosEngineConfig {
         @JsonProperty("endpoint")
         private String endpoint = "";
@@ -187,8 +179,6 @@ public class StorageEngineConfig {
         public void setTempRegion(String v) { tempRegion = v == null ? "" : v; }
     }
 
-    /** 对照 S3EngineConfig。 */
-
     public static class S3EngineConfig {
         @JsonProperty("endpoint")
         private String endpoint = "";
@@ -224,8 +214,6 @@ public class StorageEngineConfig {
         public boolean isForcePathStyle() { return forcePathStyle; }
         public void setForcePathStyle(boolean v) { forcePathStyle = v; }
     }
-
-    /** 对照 OSSEngineConfig。 */
 
     public static class OssEngineConfig {
         @JsonProperty("endpoint")
@@ -267,8 +255,6 @@ public class StorageEngineConfig {
         public void setTempRegion(String v) { tempRegion = v == null ? "" : v; }
     }
 
-    /** 对照 KS3EngineConfig。 */
-
     public static class Ks3EngineConfig {
         @JsonProperty("endpoint")
         private String endpoint = "";
@@ -296,8 +282,6 @@ public class StorageEngineConfig {
         public String getPathPrefix() { return pathPrefix; }
         public void setPathPrefix(String v) { pathPrefix = v == null ? "" : v; }
     }
-
-    /** 对照 OBSEngineConfig。 */
 
     public static class ObsEngineConfig {
         @JsonProperty("endpoint")

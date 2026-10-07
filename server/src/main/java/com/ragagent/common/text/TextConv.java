@@ -16,11 +16,11 @@ import java.util.Map;
  * {@code resources/textconv/TSPhrases.txt} + {@code TSCharacters.txt}，SHA-256 与
  * 每张表内<b>最长匹配</b>（窗口上限 min(10, maxRunes)）、取<b>第一个候选值</b>——
  * <pre>
- * for pos := 0; pos &lt; len(runes); {
- *     for _, d := range c {                     // phrases 先于 characters
- *         limit := min(10, d.maxRunes, len(runes)-pos)
- *         for size := limit; size &gt; 0; size-- { // 表内最长匹配
- *             if replacement, ok := d.values[...]; ok { ... }
+ * for (int pos = 0; pos &lt; runes.length; ) {
+ *     for (Dictionary d : DICTIONARIES) {           // phrases 先于 characters
+ *         int limit = min(10, d.maxRunes, runes.length - pos);
+ *         for (int size = limit; size &gt; 0; size--) { // 表内最长匹配
+ *             if ((replacement = d.values.get(...)) != null) { ... }
  *         }
  *     }
  * }

@@ -3,7 +3,7 @@ package com.ragagent.llm.limiter;
 import java.util.List;
 
 /**
- * 限流后端的可选观测能力（对齐 Go 的 {@code runtimeInspectable} 接口探测）。
+ * 限流后端的可选观测能力。
  *
  * <p>{@link ConcurrencyGovernor#runtimeStats()} 用它把"后端是否支持观测"与
  * 具体实现类型解耦：本地信号量与 Redis 信号量都实现本接口，将来新增后端

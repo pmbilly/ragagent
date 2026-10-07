@@ -277,7 +277,7 @@ public class SessionRepository {
      * （含"渠道来源筛选需要 Admin+，且要丢掉按人裁剪"那段判定）。
      *
      * <p>方言差异只在两处，都由 {@code postgres} 开关切换：{@code ILIKE} 与 {@code NULLS LAST}
-     * （H2 两个都不支持）。Go 每次查询都问 {@code db.Dialector.Name()}，同一进程内结果不变，
+     * （H2 两个都不支持）。方言在进程生命周期内不变，
      * 故与 wiki 一样在构造期探测一次。</p>
      */
     public SessionPage queryPaged(SessionListQuery q) {

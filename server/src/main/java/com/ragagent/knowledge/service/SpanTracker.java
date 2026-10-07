@@ -81,7 +81,7 @@ public class SpanTracker {
 
     /**
      * 超 255 码点时截断并追加
-     * {@code ~<sha256 前 4 字节 hex>} 后缀（rune 感知，对齐 PG VARCHAR 字符语义）。
+     * {@code ~<sha256 前 4 字节 hex>} 后缀（码点感知，对齐 PG VARCHAR 字符语义）。
      */
     public static String fitSpanName(String name) {
         int count = name.codePointCount(0, name.length());

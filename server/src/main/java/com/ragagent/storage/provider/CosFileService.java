@@ -215,7 +215,7 @@ public class CosFileService implements FileService {
     }
 
     /**
-     * 对照 {@code parseCosObjectName}：其它 provider scheme → 明确拒绝；
+     * 其它 provider scheme → 明确拒绝；
      * {@code cos://{bucket}/{region}/{key}}（三段）取第三段；否则按遗留桶 URL 去前缀。
      */
     String parseObjectName(String filePath) {

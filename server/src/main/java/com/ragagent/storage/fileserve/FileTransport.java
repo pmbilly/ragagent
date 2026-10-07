@@ -78,7 +78,7 @@ public final class FileTransport {
             return new OpenedFile(null, null, stream, size);
         }
 
-        /** 读全量字节（三形态通吃；流形态读完即关）——Go {@code io.ReadAll} 的对应物。 */
+        /** 读全量字节（三形态通吃；流形态读完即关）。 */
         public byte[] readAllBytes() throws IOException {
             if (bytes != null) {
                 return bytes;
@@ -216,7 +216,7 @@ public final class FileTransport {
         ParseRange parsed = parseRange(rangeReq, size);
         if (parsed.error() != null) {
             if (parsed.noOverlap() && size == 0) {
-                // 客户端总带 Range 头时对空文件的宽容（Go 注释原文）→ 200 全量
+                // 客户端总带 Range 头时对空文件的宽容 → 200 全量
             } else if (parsed.noOverlap()) {
                 // errNoOverlap：先写 Content-Range: bytes *//size 再 416
                 response.setHeader("Content-Type", contentType);
@@ -245,7 +245,7 @@ public final class FileTransport {
         boolean multipart = false;
         byte[] multipartBody = null;
         if (ranges != null && sumRangesSize(ranges) > size) {
-            // 各段总长超过文件本体——多半是攻击或呆客户端：忽略 Range（Go 注释原文）
+            // 各段总长超过文件本体——多半是攻击或呆客户端：忽略 Range
             ranges = null;
         }
         if (ranges != null && ranges.size() == 1) {
@@ -480,7 +480,7 @@ public final class FileTransport {
             b.append('/');
             b.append(minor.toLowerCase(java.util.Locale.ROOT));
         }
-        // 单属性 filename；Go 按 map 键排序，这里只有一个
+        // 单属性 filename；无多属性键序问题
         String attribute = "filename";
         String value = filenameValue == null ? "" : filenameValue;
         b.append(';').append(' ');

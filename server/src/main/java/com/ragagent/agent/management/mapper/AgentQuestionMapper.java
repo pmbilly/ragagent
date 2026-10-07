@@ -51,7 +51,7 @@ public interface AgentQuestionMapper {
      * <p>键名是 **camelCase** `generatedQuestions`：写入侧是 Java 域类型
      * {@code DocumentChunkMetadata.generatedQuestions}（Jackson 默认 camel），
      * 从未有过改名迁移、全库实测也全是 camel。这里仍 OR 上 snake 变体，
-     * 只为容忍可能的 Go 期存量行（读取侧 {@code firstGeneratedQuestion} 同样兼容）。</p>
+     * 只为容忍可能的历史存量行（读取侧 {@code firstGeneratedQuestion} 同样兼容）。</p>
      */
     @Select("<script>"
             + "SELECT id, knowledge_id AS \"knowledgeId\", knowledge_base_id AS \"knowledgeBaseId\", "

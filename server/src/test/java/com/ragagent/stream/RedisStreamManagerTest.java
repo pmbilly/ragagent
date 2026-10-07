@@ -97,7 +97,7 @@ class RedisStreamManagerTest {
         assertEquals("stream::sess-1:msg-1:steer", m.buildSteerKey("sess-1", "msg-1"));
         assertEquals("stream::sess-1:live-run", m.buildLiveRunKey("sess-1"));
 
-        // 空 prefix 回落 "stream:events"（对照 NewRedisStreamManager 的默认值）
+        // 空 prefix 回落 "stream:events"（默认值）
         RedisStreamManager def = new RedisStreamManager(template, "", Duration.ofHours(1));
         assertEquals("stream:events:sess-1:msg-1", def.buildKey("sess-1", "msg-1"));
 
@@ -214,7 +214,7 @@ class RedisStreamManagerTest {
         m.appendEvent("s", "m", new StreamEvent("e1", ResponseType.ANSWER, "hi <b>&</b>", false));
 
         // 直接读原文断言字节形态（只掩掉随本机时区变的 timestamp）。
-        // B38：Go 版已下线——不再与 Go 逐字节对齐；本断言钉住「稳定字节 + 键序」，
+        // 本断言钉住「稳定字节 + 键序」，
         // 它们是内部 CAS（读原文比对槽位）的前提。
         String raw = template.opsForList().index(m.buildKey("s", "m"), 0);
         String expected = "{\"id\":\"e1\",\"type\":\"answer\","
@@ -231,7 +231,7 @@ class RedisStreamManagerTest {
 
     @Test
     void getEventsSkipsUndecodableRowsButStillAdvancesTheOffset() {
-        // Go 对解码失败的行 `continue`，但 nextOffset 用的是 Redis 的原始条数——
+        // 解码失败的行跳过，但 nextOffset 用的是 Redis 的原始条数——
         // 否则每次轮询都会把同一条坏数据再拉一遍
         RedisStreamManager m = manager(Duration.ofHours(1));
         String key = m.buildKey("s", "m");

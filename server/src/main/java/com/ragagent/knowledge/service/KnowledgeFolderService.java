@@ -103,7 +103,6 @@ public class KnowledgeFolderService {
             node.put("totalCount", total);
         }
         // 空 children 整键缺席
-        //（KnowledgeFolderNode.Children omitempty）
         for (Map.Entry<String, List<ObjectNode>> e : children.entrySet()) {
             List<ObjectNode> list = e.getValue();
             list.sort(byNameLower);

@@ -32,13 +32,13 @@ public class McpToolApprovalService {
         this.mcpServiceMapper = mcpServiceMapper;
     }
 
-    /** 对照 ListByService：先校验服务可见，再列策略（可为空列表） */
+    /** 先校验服务可见，再列策略（可为空列表） */
     public List<McpToolApproval> listByService(long tenantId, String serviceId) {
         requireService(tenantId, serviceId);
         return repo.listByService(tenantId, serviceId);
     }
 
-    /** 对照 SetPolicy：工具名必填、补丁非空、服务存在 */
+    /** 工具名必填、补丁非空、服务存在 */
     public void setPolicy(long tenantId, String serviceId, String toolName,
                           Boolean requireApproval, Boolean enabled) {
         if (toolName == null || toolName.isEmpty()) {
@@ -52,22 +52,22 @@ public class McpToolApprovalService {
                 new McpToolPolicyPatch(requireApproval, enabled));
     }
 
-    /** 对照 SetRequireApproval：只动 require_approval，enabled 保持不变 */
+    /** 只动 require_approval，enabled 保持不变 */
     public void setRequireApproval(long tenantId, String serviceId, String toolName, boolean require) {
         setPolicy(tenantId, serviceId, toolName, require, null);
     }
 
-    /** 对照 SetEnabled：只动 enabled，require_approval 保持不变 */
+    /** 只动 enabled，require_approval 保持不变 */
     public void setEnabled(long tenantId, String serviceId, String toolName, boolean enabled) {
         setPolicy(tenantId, serviceId, toolName, null, enabled);
     }
 
-    /** 对照 IsRequired：缺行 → false */
+    /** 缺行 → false */
     public boolean isRequired(long tenantId, String serviceId, String toolName) {
         return repo.isRequired(tenantId, serviceId, toolName);
     }
 
-    /** 对照 IsEnabled：<b>缺行 → true</b> */
+    /** <b>缺行 → true</b> */
     public boolean isEnabled(long tenantId, String serviceId, String toolName) {
         return repo.isEnabled(tenantId, serviceId, toolName);
     }

@@ -142,7 +142,7 @@ final class TenantConfigOps {
         return new BizException(AppError.internal(message).withDetails(e.getMessage()));
     }
 
-    // ── web-search-config（对照 L1398-1472） ────────────────────────────────
+    // ── web-search-config ──────────────────────────────────────────────────
 
     private WebSearchConfig getWebSearch() {
         Tenant tenant = requireContextTenant();
@@ -170,7 +170,7 @@ final class TenantConfigOps {
         return TenantConfigRedaction.webSearchForResponse(merged);
     }
 
-    // ── parser-engine-config（对照 L1474-1533） ─────────────────────────────
+    // ── parser-engine-config ───────────────────────────────────────────────
 
     private ParserEngineConfig getParserEngine() {
         Tenant tenant = requireContextTenant();
@@ -197,7 +197,7 @@ final class TenantConfigOps {
         return TenantConfigRedaction.parserEngineForResponse(merged);
     }
 
-    /** 对照 validateParserEngineOutboundURLs（L1904-1930）：四处 URL 过 SSRF */
+    /** 四处 URL 过 SSRF */
     private void validateParserEngineOutboundUrls(ParserEngineConfig cfg) {
         if (cfg == null) {
             return;
@@ -225,7 +225,7 @@ final class TenantConfigOps {
         }
     }
 
-    // ── storage-engine-config（对照 L1536-1598） ────────────────────────────
+    // ── storage-engine-config ──────────────────────────────────────────────
 
     private StorageEngineConfig getStorageEngine() {
         Tenant tenant = requireContextTenant();
@@ -239,7 +239,7 @@ final class TenantConfigOps {
         if (cfg == null) {
             cfg = new StorageEngineConfig();
         }
-        // 对照 L1556-1570：provider 归一 → 缺省取 firstAllowed → 白名单校验（在租户检查之前）
+        // provider 归一 → 缺省取 firstAllowed → 白名单校验（在租户检查之前）
         String provider = cfg.getDefaultProvider().trim().toLowerCase(java.util.Locale.ROOT);
         if (provider.isEmpty()) {
             provider = firstAllowedStorageProvider();
@@ -265,13 +265,13 @@ final class TenantConfigOps {
         return TenantConfigRedaction.storageEngineForResponse(merged);
     }
 
-    /** 对照 firstAllowedStorageProvider：白名单序的第一个允许项（全允许时为 local） */
+    /** 白名单序的第一个允许项（全允许时为 local） */
     private String firstAllowedStorageProvider() {
         List<String> allowed = service.storageAllowList.allowedList();
         return allowed.isEmpty() ? "" : allowed.get(0);
     }
 
-    // ── chat-history-config（对照 L1634-1729） ──────────────────────────────
+    // ── chat-history-config ────────────────────────────────────────────────
 
     private ChatHistoryConfig getChatHistory() {
         Tenant tenant = requireContextTenant();
@@ -287,7 +287,7 @@ final class TenantConfigOps {
         Tenant tenant = requireContextTenant();
         ChatHistoryConfig existing = parseConfig(tenant.getChatHistoryConfig(), ChatHistoryConfig.class);
 
-        // 对照 L1680-1693：重建对象（knowledge_base_id 不受客户端控制），
+        // 重建对象（knowledge_base_id 不受客户端控制），
         // 嵌入模型未变时沿用存量 KB
         ChatHistoryConfig cfg = new ChatHistoryConfig();
         cfg.setEnabled(req.isEnabled());
@@ -297,7 +297,7 @@ final class TenantConfigOps {
             cfg.setKnowledgeBaseId(existing.getKnowledgeBaseId());
         }
 
-        // 对照 L1696-1716：enabled + 有模型 + 无 KB → 自动建隐藏 KB
+        // enabled + 有模型 + 无 KB → 自动建隐藏 KB
         if (cfg.isEnabled() && !cfg.getEmbeddingModelId().isEmpty()
                 && cfg.getKnowledgeBaseId().isEmpty()) {
             // 实体语义（名字/类型/临时标记/描述）归知识域，本域只传模型 id、只消费 id
@@ -320,7 +320,7 @@ final class TenantConfigOps {
         return cfg;
     }
 
-    // ── retrieval-config（对照 L1731-1806） ─────────────────────────────────
+    // ── retrieval-config ───────────────────────────────────────────────────
 
     private RetrievalConfig getRetrieval() {
         Tenant tenant = requireContextTenant();
@@ -333,7 +333,7 @@ final class TenantConfigOps {
         if (cfg == null) {
             cfg = new RetrievalConfig();
         }
-        // 对照 L1759-1784：五段范围校验（在租户检查之前）
+        // 五段范围校验（在租户检查之前）
         if (cfg.getVectorThreshold() < 0 || cfg.getVectorThreshold() > 1) {
             throw new BizException(AppError.badRequest("vector_threshold must be between 0 and 1"));
         }
@@ -359,7 +359,7 @@ final class TenantConfigOps {
         return cfg;
     }
 
-    // ── memory-config（对照 L1808-1901；MemoryConfig 本体在 memory 模块） ────
+    // ── memory-config（MemoryConfig 本体在 memory 模块） ────────────────────
 
     private MemoryConfig getMemory() {
         Tenant tenant = requireContextTenant();
@@ -376,7 +376,7 @@ final class TenantConfigOps {
         if (cfg == null) {
             cfg = new MemoryConfig();
         }
-        // 对照 L1839-1879：七段校验（在 Normalize 与租户检查之前）
+        // 七段校验（在 Normalize 与租户检查之前）
         String writeMode = cfg.getWriteMode();
         if (!writeMode.isEmpty()
                 && !MemoryConfig.WRITE_MODE_EXPLICIT_ONLY.equals(writeMode)

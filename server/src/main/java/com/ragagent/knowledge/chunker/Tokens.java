@@ -43,7 +43,7 @@ public final class Tokens {
     }
 
     /**
-     * 粗语言检测：数 CJK rune vs 拉丁 rune。
+     * 粗语言检测：数 CJK 码点 vs 拉丁码点。
      * 仅供启发式分派，不是正经语言识别。
      */
     public static String detectLanguage(String s) {

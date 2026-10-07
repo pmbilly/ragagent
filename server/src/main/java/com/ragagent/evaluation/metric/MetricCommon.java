@@ -55,7 +55,7 @@ final class MetricCommon {
      * 非空才成句（Unicode 空白语义）。
      */
     static List<String> splitSentences(String text) {
-        // 仿真 Go re.Split 的「捕获组随切分返回」：段/分隔符交替
+        // 切分保留捕获组：parts 里段与分隔符交替出现
         Matcher m = SENTENCE_DELIM.matcher(text);
         List<String> parts = new ArrayList<>();
         int last = 0;
@@ -144,7 +144,7 @@ final class MetricCommon {
         if (x == 0) {
             return Double.NEGATIVE_INFINITY;
         }
-        // Java: x = m × 2^e（m ∈ [1,2)）；Go Frexp: x = frac × 2^exp（frac ∈ [0.5,1)）
+        // 先按 Java 语义 x = m × 2^e（m ∈ [1,2)），再折半成 x = frac × 2^exp（frac ∈ [0.5,1)）
         int e = Math.getExponent(x);
         double m = Math.scalb(x, -e);
         double frac = m / 2.0;

@@ -171,7 +171,7 @@ class W5aSundryRoutesContractTest {
         assertGolden(putJson("/api/v1/tenants/10002", viewer,
                 "{\"name\":\"nope\"}"), 403, "w5a-tenant-put-nonowner.json");
         // 自助创建 → 删除。URL 里的新租户 id ≠ 活动租户 → PathTenantMatch 403
-        //（Go 录制同形：self-serve 后 ctx 租户仍是 10002，DELETE 必走 403）
+        //（录制同形：self-serve 后 ctx 租户仍是 10002，DELETE 必走 403）
         assertGolden(postJson("/api/v1/tenants", owner,
                 "{\"name\":\"w5a-tmp-租户\"}"), 201, "w5a-tenant-create.json",
                 s -> NUMERIC_ID_PATTERN.matcher(s).replaceAll("\"id\":<id>"));
@@ -226,7 +226,7 @@ class W5aSundryRoutesContractTest {
                 "w5a-tag-list-page.json");
         assertGolden(get("/api/v1/knowledge-bases/" + kb + "/tags?page=abc", owner), 400,
                 "w5a-tag-list-badpage.json");
-        // page=0 被 omitempty 视为空 → 归一到 1（200，非 400——golden 纠正直觉）
+        // page=0 视为未提供 → 归一到 1（200，非 400——golden 纠正直觉）
         assertGolden(get("/api/v1/knowledge-bases/" + kb + "/tags?page=0", owner), 200,
                 "w5a-tag-list-zeropage.json");
 

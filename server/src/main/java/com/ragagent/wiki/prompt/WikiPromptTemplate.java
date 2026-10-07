@@ -20,7 +20,7 @@ import java.util.Map;
  *       值为 null 时同样按空串处理，避免把
  *       JavaScript 意义上的 {@code null} 写进 prompt。</li>
  *   <li><b>{@code {{if .X}}body{{end}}}</b> → {@code X} 非空串时渲染 body，
- *       否则渲染空串。真值判定就是 {@code len(s) > 0}；
+ *       否则渲染空串。真值判定就是非空串；
  *       缺失键 → 空串 → 假。这正是 {@code WikiPageModifyUserPrompt} 用来
  *       开关 {@code <shared_source_contexts>} / {@code <new_information>} /
  *       {@code <deleted_documents>} 三块的机制。</li>

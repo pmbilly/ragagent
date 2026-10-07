@@ -268,7 +268,7 @@ public final class ImageInfoEnricher {
         return content;
     }
 
-    /** Go strings.Replace(s, old, new, 1)：只替换第一次出现。 */
+    /** 只替换第一次出现。 */
     private static String replaceFirst(String s, String oldStr, String newStr) {
         int idx = s.indexOf(oldStr);
         if (idx < 0) {
@@ -320,7 +320,7 @@ public final class ImageInfoEnricher {
         }
         String key = content.substring(keyStart, keyEnd);
         if (trim) {
-            key = goTrimSpace(key);
+            key = trimUnicodeWhitespace(key);
         }
         ImageInfo imgInfo = infoMap.get(key);
         if (imgInfo == null) {
@@ -344,11 +344,11 @@ public final class ImageInfoEnricher {
             return "";
         }
         List<String> lines = new ArrayList<>();
-        String caption = goTrimSpace(img.getCaption());
+        String caption = trimUnicodeWhitespace(img.getCaption());
         if (!caption.isEmpty()) {
             lines.add("**Image caption:** " + caption);
         }
-        String ocr = goTrimSpace(img.getOcrText());
+        String ocr = trimUnicodeWhitespace(img.getOcrText());
         if (!ocr.isEmpty()) {
             lines.add("**Image text (OCR):** " + ocr);
         }
@@ -367,7 +367,7 @@ public final class ImageInfoEnricher {
         if (img == null) {
             return "";
         }
-        url = goTrimSpace(url == null ? "" : url);
+        url = trimUnicodeWhitespace(url == null ? "" : url);
         String metadata = buildImageInfoMarkdownMetadata(img);
         if (url.isEmpty()) {
             return metadata;
@@ -531,7 +531,7 @@ public final class ImageInfoEnricher {
         return map;
     }
 
-    /** Go strings.Fields：按空白切（含 unicode 空白），空串列表为空。 */
+    /** 按空白切分（含 unicode 空白），空串输入返回空列表。 */
     static List<String> foldFields(String s) {
         List<String> out = new ArrayList<>();
         if (s == null || s.isEmpty()) {
@@ -545,23 +545,23 @@ public final class ImageInfoEnricher {
         return out;
     }
 
-    /** Go strings.TrimSpace（unicode.IsSpace 全集，与 ChunkSearchUtil.trimSpace 同表）。 */
-    static String goTrimSpace(String s) {
+    /** 去除首尾空白（Unicode 空白全集，与 ChunkSearchUtil.trimSpace 同表）。 */
+    static String trimUnicodeWhitespace(String s) {
         if (s == null) {
             return "";
         }
         int start = 0;
         int end = s.length();
-        while (start < end && isGoSpace(s.charAt(start))) {
+        while (start < end && isUnicodeWhitespace(s.charAt(start))) {
             start++;
         }
-        while (end > start && isGoSpace(s.charAt(end - 1))) {
+        while (end > start && isUnicodeWhitespace(s.charAt(end - 1))) {
             end--;
         }
         return s.substring(start, end);
     }
 
-    private static boolean isGoSpace(char c) {
+    private static boolean isUnicodeWhitespace(char c) {
         switch (c) {
             case '\t': case '\n': case '\u000B': case '\f': case '\r':
             case ' ': case '\u0085': case '\u00A0': case '\u1680':

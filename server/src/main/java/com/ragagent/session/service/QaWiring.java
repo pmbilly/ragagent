@@ -74,7 +74,7 @@ import com.ragagent.chatpipeline.PipelinePorts;
  *       外部向量店（ES/milvus/…）绑定仍按 2201 unavailable 同形拒绝（provider 批）。</li>
  *   <li><b>RetrieveGraphRepository（已接线）</b>：注入 {@code Neo4jGraphConfig} 提供的
  *       {@code Neo4jGraphRepository}——NEO4J_ENABLE 未启用时其 driver 为 null，检索返回
- *       null（nil driver 分支；ExtractEntity/SearchEntity 同样有 neo4jEnabled 闸门）。</li>
+ *       null（driver 为 null 的分支；ExtractEntity/SearchEntity 同样有 neo4jEnabled 闸门）。</li>
  *   <li><b>WebSearchStateService / WebSearchProviderRepository</b>：存而不读，
  *       传 null。</li>
  * </ul>
@@ -96,7 +96,7 @@ public class QaWiring {
 
     // ── 11 seam 的生产 adapter ────────────────────────────────────────────────
 
-    /** 对照 interfaces.ModelService：GetChatModel/GetRerankModel 的运行时工厂。 */
+    /** {@link PipelinePorts.ModelService}：getChatModel/getRerankModel 的运行时工厂。 */
     @Bean
     public PipelinePorts.ModelService qaPipelineModelService(
             ModelService modelService,
@@ -132,7 +132,7 @@ public class QaWiring {
     }
 
     /**
-     * 对照 ctx TenantInfo 的 chat_pipeline 子集（2026-09-25 评审批接线）：
+     * chat_pipeline 所需租户信息的子集：
      * PluginSearch 的租户 web 配置读取——TenantContext 实时值 + 租户行合并。
      */
     @Bean
@@ -160,7 +160,7 @@ public class QaWiring {
         };
     }
 
-    /** 对照 interfaces.KnowledgeBaseService 的 chat_pipeline 子集。 */
+    /** {@link PipelinePorts.KnowledgeBaseService} 的 chat_pipeline 子集。 */
     @Bean
     public PipelinePorts.KnowledgeBaseService qaPipelineKnowledgeBaseService(
             KnowledgeBaseService kbService, HybridSearchService hybridSearchService) {
@@ -217,7 +217,7 @@ public class QaWiring {
         };
     }
 
-    /** 对照 interfaces.KnowledgeService 的 chat_pipeline 子集。 */
+    /** {@link PipelinePorts.KnowledgeService} 的 chat_pipeline 子集。 */
     @Bean
     public PipelinePorts.KnowledgeService qaPipelineKnowledgeService(KnowledgeService knowledgeService) {
         return new PipelinePorts.KnowledgeService() {
@@ -239,7 +239,7 @@ public class QaWiring {
         };
     }
 
-    /** 对照 interfaces.ChunkRepository 的 chat_pipeline 子集。 */
+    /** {@link PipelinePorts.ChunkRepository} 的 chat_pipeline 子集。 */
     @Bean
     public PipelinePorts.ChunkRepository qaPipelineChunkRepository(ChunkRepository chunkRepository) {
         return new PipelinePorts.ChunkRepository() {
@@ -259,7 +259,7 @@ public class QaWiring {
         };
     }
 
-    /** 对照 interfaces.KnowledgeRepository（GetKnowledgeBatch）。 */
+    /** {@link PipelinePorts.KnowledgeRepository}（getKnowledgeBatch）。 */
     @Bean
     public PipelinePorts.KnowledgeRepository qaPipelineKnowledgeRepository(KnowledgeService knowledgeService) {
         return new PipelinePorts.KnowledgeRepository() {
@@ -270,7 +270,7 @@ public class QaWiring {
         };
     }
 
-    /** 对照 interfaces.KnowledgeBaseRepository（GetKnowledgeBaseByIDs）。 */
+    /** {@link PipelinePorts.KnowledgeBaseRepository}（getKnowledgeBaseByIDs）。 */
     @Bean
     public PipelinePorts.KnowledgeBaseRepository qaPipelineKnowledgeBaseRepository(
             KnowledgeBaseService kbService) {
@@ -283,7 +283,7 @@ public class QaWiring {
         };
     }
 
-    /** 对照 interfaces.MessageService 的 chat_pipeline 子集。 */
+    /** {@link PipelinePorts.MessageService} 的 chat_pipeline 子集。 */
     @Bean
     public PipelinePorts.MessageService qaPipelineMessageService(MessageService messageService) {
         return new PipelinePorts.MessageService() {
@@ -312,7 +312,7 @@ public class QaWiring {
         };
     }
 
-    /** 对照 interfaces.MemoryService：签名与 memory.service.MemoryService 已对齐，直接委托。 */
+    /** {@link PipelinePorts.MemoryService}：签名与 {@link MemoryService} 已对齐，直接委托。 */
     @Bean
     public PipelinePorts.MemoryService qaPipelineMemoryService(MemoryService memoryService) {
         return new PipelinePorts.MemoryService() {
@@ -333,7 +333,7 @@ public class QaWiring {
         };
     }
 
-    /** 对照 interfaces.WebSearchService.Search。 */
+    /** {@link PipelinePorts.WebSearch}：委托 {@link WebSearchService#search}。 */
     @Bean
     public PipelinePorts.WebSearch qaPipelineWebSearch(WebSearchService webSearchService) {
         return new PipelinePorts.WebSearch() {

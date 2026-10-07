@@ -86,7 +86,7 @@ public final class RerankHttp {
         }
     }
 
-    /** 与 embedding 包共用的 Go resp.Status 短语表（包内小副本）。 */
+    /** 与 embedding 包共用的 HTTP 状态短语表（包内小副本）。 */
     static final class EmbeddingStatusLine {
         private EmbeddingStatusLine() {
         }

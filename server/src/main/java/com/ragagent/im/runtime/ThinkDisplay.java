@@ -76,7 +76,7 @@ public final class ThinkDisplay {
                 ToolDisplay::formatIMRagPipelineLine);
     }
 
-    /** 对照 Web RagPipelineProgress 的思考行样式（agent.think）。 */
+    /** 思考行样式（agent.think）。 */
     public static final ThinkBlockStyle RAG_THINKING_STYLE = new ThinkBlockStyle(
             "> 💭 **思考中...**\n", "> 💭 **思考**\n", "> ", "", "\n---\n\n");
 
@@ -101,7 +101,7 @@ public final class ThinkDisplay {
         return thinkTagged + "\n\n" + parts.answer;
     }
 
-    /** 对照 Web AgentStreamDisplay：答案先行；工具运行时收回进"思考过程"。 */
+    /** 答案先行；工具运行时收回进"思考过程"。 */
     private static String formatIMAgentIntermediate(IMStreamParts parts) {
         String think = agentThinkContent(parts).strip();
         String live = parts.liveAnswer.strip();
@@ -116,7 +116,7 @@ public final class ThinkDisplay {
         return String.join(ThinkBlockStyle.MARKDOWN_SEPARATOR, sections);
     }
 
-    /** 对照 Web RagPipelineProgress：管线步是普通行，推理在独立"思考"块。 */
+    /** 管线步是普通行，推理在独立"思考"块。 */
     private static String formatIMQuickQAIntermediate(IMStreamParts parts) {
         String answer = parts.answer.strip();
         if (!answer.isEmpty()) {

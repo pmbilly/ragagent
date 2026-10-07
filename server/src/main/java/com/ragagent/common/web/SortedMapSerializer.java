@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
  * <p>键序比较按<b>逐字节</b>（UTF-8）进行。Java 的 {@code String.compareTo} 比的是
  * UTF-16 code unit，两者只在「BMP 的 U+E000–U+FFFF」与「增补平面（U+10000 起）」
  * 混排时不同。JSON 键基本都是 ASCII，但为了键序跨语言稳定，用
- * {@link #GO_KEY_ORDER} 直接比 UTF-8 字节——ASCII 下与自然序完全相同。</p>
+ * {@link #KEY_BYTE_ORDER} 直接比 UTF-8 字节——ASCII 下与自然序完全相同。</p>
  *
  * <h2>使用方式与边界</h2>
  * <ul>
@@ -46,7 +46,7 @@ public class SortedMapSerializer extends JsonSerializer<Map<String, Object>> {
     /**
      * 字符串序：逐 UTF-8 字节比较，短者在前。
      */
-    public static final Comparator<String> GO_KEY_ORDER = (a, b) -> {
+    public static final Comparator<String> KEY_BYTE_ORDER = (a, b) -> {
         byte[] x = a.getBytes(StandardCharsets.UTF_8);
         byte[] y = b.getBytes(StandardCharsets.UTF_8);
         int shared = Math.min(x.length, y.length);
@@ -85,12 +85,12 @@ public class SortedMapSerializer extends JsonSerializer<Map<String, Object>> {
     /**
      * 递归重排：{@code Map} → 按键序的 {@link TreeMap}，集合 → 逐元素重排的列表，其余原样。
      *
-     * <p>集合必须逐元素走一遍：Go 排序的是 map 本身，而 map 可以出现在数组里
+     * <p>集合必须逐元素走一遍：排序只作用于 map 键，而 map 可以出现在数组里
      * （例如 {@code references: [...]} 每个元素的 {@code metadata}）。</p>
      */
     public static Object sortDeep(Object value) {
         if (value instanceof Map<?, ?> map) {
-            TreeMap<String, Object> sorted = new TreeMap<>(GO_KEY_ORDER);
+            TreeMap<String, Object> sorted = new TreeMap<>(KEY_BYTE_ORDER);
             for (Map.Entry<?, ?> entry : map.entrySet()) {
                 // 键必然是字符串（非字符串键不是合法输入）。
                 sorted.put(String.valueOf(entry.getKey()), sortDeep(entry.getValue()));

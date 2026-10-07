@@ -372,7 +372,7 @@ class DataSourceHttpContractTest {
 
     /**
      * 没有 config 的 RSS：连接器校验把它拒了，文案是
-     * {@code "invalid configuration: config is nil"}（RSS 的 parseConfig 对 nil 配置的原文）。
+     * {@code "invalid configuration: config is nil"}（RSS 的 parseConfig 对 null 配置的原文）。
      *
      * <p>这条顺带钉住一件事：service 的 {@code validateDataSourceConfig} 必须把
      * {@code null} 配置<b>原样递给连接器</b>，而不是提前折叠成
@@ -433,7 +433,7 @@ class DataSourceHttpContractTest {
      *
      * <p>同时钉住"凭据永不从这条端点流入"：body 里带的 {@code api_token} 不会出现，
      * 原来在 credentials 里的 {@code feed_urls} 也会被整块换成库里的旧值
-     * （旧值是 nil）——所以响应里根本没有 credentials 键。</p>
+     * （旧值是 null）——所以响应里根本没有 credentials 键。</p>
      */
     @Test
     void updateEchoesRequestObjectAndIgnoresCredentials() throws Exception {
@@ -454,7 +454,7 @@ class DataSourceHttpContractTest {
         assertThat(body).contains("\"type\":\"\"");
         assertThat(body).contains("\"status\":\"\"");
         assertThat(body).doesNotContain("should-be-ignored");
-        // config 里只剩 settings：credentials 被库里那份（nil）整块替换掉了
+        // config 里只剩 settings：credentials 被库里那份（null）整块替换掉了
         {
             var root = new com.fasterxml.jackson.databind.ObjectMapper().readTree(body);
             var cfg = root.path("config");
@@ -666,7 +666,7 @@ class DataSourceHttpContractTest {
                 .header("Authorization", bearer));
         assertEquals(200, r.getResponse().getStatus(), raw(r));
         assertGoldenBody("ds-sync.json", raw(r));
-        // 计数器恒输出（无 omitempty），空串 errorMessage 也照输出
+        // 计数器恒输出（空值不省略），空串 errorMessage 也照输出
         assertThat(raw(r)).contains("\"finishedAt\":null").contains("\"errorMessage\":\"\"")
                 .contains("\"itemsTotal\":0").contains("\"result\":null");
     }

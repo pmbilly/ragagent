@@ -69,7 +69,7 @@ public final class PluginIntoChatMessage implements Plugin {
                         hasHighConfidenceFAQ = true;
                         Map<String, Object> f = new LinkedHashMap<>();
                         f.put("chunk_id", result.getId());
-                        f.put("score", RetrievalObs.goFmt4(result.getScore()));
+                        f.put("score", RetrievalObs.formatScore4(result.getScore()));
                         f.put("threshold", chatManage.getFaqDirectAnswerThreshold());
                         PipelineLog.info("IntoChatMessage", "high_confidence_faq", f);
                     }

@@ -3,9 +3,9 @@ package com.ragagent.agent.modelcontext;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /** 测试辅助：把测试里的 JSON 文本解析成树 + Go 风格字符串转义（encoding/json 语义）。 */
-final class GoJsonBridge {
+final class JsonBridge {
 
-    private GoJsonBridge() {
+    private JsonBridge() {
     }
 
     static JsonNode parseTree(String json) {
@@ -13,7 +13,7 @@ final class GoJsonBridge {
     }
 
     /** Go encoding/json 的字符串体转义（HTML 恒开 + 控制字符小写十六进制 + U+2028/29）。 */
-    static String goString(String s) {
+    static String jsonString(String s) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);

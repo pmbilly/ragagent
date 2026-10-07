@@ -160,7 +160,7 @@ class TenantMemberContractTest {
         assertEquals(mask(golden("mb-member-list.json")), mask(raw(r)));
     }
 
-    /** Viewer 可读名册（Go g.Viewer()）。 */
+    /** Viewer 可读名册。 */
     @Test
     void listViewerAllowed() throws Exception {
         MvcResult r = mockMvc.perform(get("/api/v1/tenants/10002/members")
@@ -691,7 +691,7 @@ class TenantMemberContractTest {
         assertEquals(golden("mb-apc-get-viewer.json"), raw(v));
     }
 
-    /** PUT 校验：非法 mode / signed_token 缺密钥 / 非法 JSON（details=Go 解析器原文）。 */
+    /** PUT 校验：非法 mode / signed_token 缺密钥 / 非法 JSON（details 为录制原文）。 */
     @Test
     void apcPutValidationMatchesGo() throws Exception {
         MvcResult bm = mockMvc.perform(jsonBody(put("/api/v1/tenants/10002/api-principal-config"), owner,
@@ -730,7 +730,7 @@ class TenantMemberContractTest {
         assertEquals(200, p.getResponse().getStatus(), raw(p));
         assertEquals(golden("mb-apc-put-placeholder.json"), raw(p));
 
-        // 显式 null：Go 反序列化成 nil → 未提供 → 保留存量
+        // 显式 null：视为未提供 → 保留存量
         MvcResult n = mockMvc.perform(jsonBody(put(putUrl), owner,
                 "{\"mode\":\"signed_token\",\"hmacSecret\":null}")).andReturn();
         assertEquals(200, n.getResponse().getStatus(), raw(n));

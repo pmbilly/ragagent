@@ -21,7 +21,7 @@ import com.ragagent.im.runtime.ReplyMessage;
 import com.ragagent.knowledge.client.DocReaderClient;
 
 /**
- * IM 附件解析（对齐 Go prepareIMAttachments 的语义面）：
+ * IM 附件解析：
  * 类型/大小/扩展名门禁、文本直读与截断、图片按实际 MIME 出 data URI、
  * docreader 可用时的解析路径。
  */
@@ -192,7 +192,7 @@ class ImAttachmentPreparerTest {
     void imageUsesDetectedMimeRegardlessOfExtension() throws Exception {
         ImAttachmentPreparer preparer = new ImAttachmentPreparer(providerOf(null));
         DownloadingAdapter adapter = new DownloadingAdapter();
-        // 平台把 JPEG 命名为 .png：data URI 必须用实际内容类型（对齐 Go 的用例）
+        // 平台把 JPEG 命名为 .png：data URI 必须用实际内容类型
         adapter.fileName = "platform-image.png";
         adapter.content = new byte[]{(byte) 0xFF, (byte) 0xD8, (byte) 0xFF, (byte) 0xE0,
                 0x00, 0x10, 'J', 'F', 'I', 'F', 0x00, 0x01};

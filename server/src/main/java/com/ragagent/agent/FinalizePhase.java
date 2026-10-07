@@ -146,7 +146,7 @@ final class FinalizePhase {
         // complete 事件的 SessionID 恒为 ""（既有消费者的线格式约定）。
         engine.eventBus.emit(new Event(EventIds.generateEventID("complete"), EventType.EVENT_AGENT_COMPLETE,
                 sessionId, new AgentCompleteData("", state.getRoundSteps().size(),
-                        state.getFinalAnswer(), knowledgeRefsInterface, goSliceAlwaysPresent(steps),
+                        state.getFinalAnswer(), knowledgeRefsInterface, alwaysPresentList(steps),
                         turnUsageOf(state),
                         Duration.between(startTime, Instant.now()).toMillis(), messageId, "", null),
                 null, ""));
@@ -170,7 +170,7 @@ final class FinalizePhase {
      * {@code "agent_steps":[]}。event 包不可改：空列表用 {@link RawValue}
      * 原文过 NON_EMPTY（非空列表走 List 序列化器，形状一致）。
      */
-    private static Object goSliceAlwaysPresent(List<?> value) {
+    private static Object alwaysPresentList(List<?> value) {
         return value.isEmpty()
                 ? new com.fasterxml.jackson.databind.util.RawValue("[]")
                 : value;

@@ -14,7 +14,7 @@ import com.ragagent.agent.tools.ToolRequest;
  * data_schema 工具。
  *
  * <p>读 DuckDB 已载入表格文件的元信息：表摘要 chunk + 列 chunk 拼接返回。依赖两个
- * 知识域切片，用两个函数式接口表达（知识工具装配时接真实实现）：</p>
+ * 知识域列表，用两个函数式接口表达（知识工具装配时接真实实现）：</p>
  * <ul>
  *   <li>{@link KnowledgeLookup}：按 ID 取知识（含租户语义）；</li>
  *   <li>{@link ChunkLister}：按知识 ID + chunk 类型列分页 chunk。</li>
@@ -42,7 +42,7 @@ public class DataSchemaTool extends BaseTool {
     public record KnowledgeView(String knowledgeId, long tenantId) {
     }
 
-    /** 按知识 ID 分页列 chunk 的切片。 */
+    /** 按知识 ID 分页列出的 chunk 列表。 */
     public interface ChunkLister {
         List<ChunkView> listPaged(String knowledgeId, int page, int pageSize,
                                   List<String> chunkTypes, boolean enabled);

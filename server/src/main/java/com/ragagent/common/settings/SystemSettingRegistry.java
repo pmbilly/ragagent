@@ -171,17 +171,17 @@ public final class SystemSettingRegistry {
                                 "expected integer, got \"" + rawValue.asText() + "\"");
                     }
                 }
-                throw new IllegalArgumentException("expected integer, got " + goTypeName(rawValue));
+                throw new IllegalArgumentException("expected integer, got " + jsonTypeLabel(rawValue));
             }
             case "string": {
                 if (!rawValue.isTextual()) {
-                    throw new IllegalArgumentException("expected string, got " + goTypeName(rawValue));
+                    throw new IllegalArgumentException("expected string, got " + jsonTypeLabel(rawValue));
                 }
                 return MAPPER.valueToTree(rawValue.asText());
             }
             case "bool": {
                 if (!rawValue.isBoolean()) {
-                    throw new IllegalArgumentException("expected bool, got " + goTypeName(rawValue));
+                    throw new IllegalArgumentException("expected bool, got " + jsonTypeLabel(rawValue));
                 }
                 return MAPPER.valueToTree(rawValue.asBoolean());
             }
@@ -192,7 +192,7 @@ public final class SystemSettingRegistry {
                         if (!item.isTextual()) {
                             throw new IllegalArgumentException(
                                     "expected string at index " + indexOf(rawValue, item)
-                                            + ", got " + goTypeName(item));
+                                            + ", got " + jsonTypeLabel(item));
                         }
                         String s = item.asText().trim();
                         if (!s.isEmpty()) {
@@ -207,7 +207,7 @@ public final class SystemSettingRegistry {
                         }
                     }
                 } else {
-                    throw new IllegalArgumentException("expected string array, got " + goTypeName(rawValue));
+                    throw new IllegalArgumentException("expected string array, got " + jsonTypeLabel(rawValue));
                 }
                 return out;
             }
@@ -225,8 +225,8 @@ public final class SystemSettingRegistry {
         return -1;
     }
 
-    /** Go %T 的 JSON 值TypeName 对应（错误消息里出现，golden 钉住 string/int 形态）。 */
-    public static String goTypeName(JsonNode node) {
+    /** JSON 值的 Go 风格类型名（错误消息里出现，golden 钉住 string/int 形态）。 */
+    public static String jsonTypeLabel(JsonNode node) {
         if (node == null || node.isNull()) {
             return "<nil>";
         }
