@@ -923,3 +923,15 @@
 - **语义判别改造**：`AgentController.bindAgentRequest(rawBody, structName)` 的 `structName` 是真区分器（只有 Create 要求 name）→ 改 `boolean requireName`，调用点 `true`/`false`，字符串比较与 Go 式请求名退场。
 - **复查**：全仓 `structName` 出现 **0 处**；`RequestFields.message` 仍是唯一文案出口。
 - **闸门**：全量 **4,836**/0 失败（6 跳过）+ `spotlessCheck` + 包结构守卫绿。
+
+**✅ B88（2026-10-08，工具面 schema 按 Java 标准 camel 化）**
+- **决策**：用户拍板「只动 30 输入键 + 107 输出键、整体一批」；工具名（36 个）与 schema enum 值保留 snake（§2.4 只管字段名；enum 值有 `mixed_entities` 等实录先例）。
+- **键集补全（口径三修）**：① 初口径只认 `"key":` 字面键 → 漏 `put("key"` 写侧（工具输出主产生方式），实际键数从 137 涨到 **142**；② 漏字符串拼接形态（`IssueView` 的 `tenant_id`/`created_at`/`updated_at`/`deleted_at`/`reported_by`）；③ 漏**复合键**形态 `<tool>|<arg>`（`GoRecording46A` 的 `arg_allowed` 表键，14 处）。
+- **执行**：后端 41 文件 / 445 处（白名单：`agent/tools/**`、`agent/modelcontext/{ToolPolicy,Registry,ModelOutput}`、`ActPhase`、`AgentTool*Backends`、`im/runtime/ToolDisplay`、`ReferencesSupport`、`QaAttachmentResolver`）；实录 **3,037 处**（仅 45A/45B/45C/46A；46B/46C/`GoRecording` 装 SSE 与检索载荷，保持 snake）；测试夹具同步（agent 域 + `AgentToolBackendsWikiTest` + `ImFoundationContractTest`）；前端 **32 文件**改名。
+- **真 bug（本批暴露，全是隐藏耦合）**：① `ToolPolicy.sourceArgumentAllowed` 用 `key.toLowerCase()` 与小写键集比对 —— snake 时代是恒等操作，camel 后**全部失配**（句柄解析、检索目标、MCP 路由连锁挂）；② `SourceToolCodec` 同类 **5 处**（`key.toLowerCase()` 查 `sourceKeySpaces`、`allowed.test(lowerKey)`）→ 加 `hasSourceKeySpace`/`sourceKeySpaceOf` 与归一化索引（剥下划线+小写，第三方/历史 snake 拼写仍可识别），并借机删掉键空间表里的 `chunk_ids`/`kb_ids` 两条 snake 别名；③ `ReferencesSupport`（引用载荷）与 `QaAttachmentResolver`（附件卡）**必须与工具面同批**：`ModelOutput` 是两者共用的渲染器，不同批会让检索消息整条消失（已实测复现）。
+- **误伤回退 4 类**：常量**值**（`SearchTarget.TYPE_KNOWLEDGE_BASE = "knowledge_base"`，被 chatpipeline 与 `QaSearchTargets` 按值比较）、JDBC 列标签（`AgentToolKbBackends` 的 `rs.getString("chunk_index")`）、外部载荷读侧（`ocr_text`/`original_url`，docreader image_info）、websearch metadata `published_at`（`WebResultConverter` 写的第三方面键）。
+- **跨面同名不跟随**：SSE/agent_steps 族的 `session_id`/`tool_name`/`total_steps`、事件桩 `Engine46bStubSupport`、citation markup 属性 `chunk_id`（协议提示词定义的标签语法）——按 B67 口径「同概念不同面可不同键名」登记。
+- **前端双读**：`mcpToolDisplay` 加历史载荷归一化（snake→camel 补缺，覆盖「including old history」用例）；引用载荷族保留 `?? snake` 兜底（`referenceSources`/`citationMarkdown`/`rag-pipeline-history`）；`AgentStreamDisplay` 的 grep 分组引用 `chunkIds: …(chunk) => chunk.chunkId ?? chunk.chunk_id`，并同步源码扫描守卫 `chatLinksNewTab.test.mjs` 的正则。
+- **过程事故**：批量改名把「双拼读」文件改成自比较（`raw.knowledgeId ?? raw.knowledgeId`）×3 文件、把 `attrs.chunk_id || attrs.chunkId` 改成自比较；用 `X ?? X` / `obj.p ?? obj.p` 探测脚本修复时又误伤两处 `||` 复合条件（`kb.summaryModelId === ''`）→ `git checkout` 回退。教训：**双拼读点必须按 `?? snake` 结构识别，不能按标识符自比较粗暴改写**。
+- **保留（登记）**：工具名 36 个（`ToolCapabilities` 基线）、enum 值、外部/第三方键；XML 形态字段名（`<chunk chunk_id="…">` 等属性/标签名）与剩余工具描述正文提及**未做**（登记后续）。
+- **闸门**：后端全量 **4,836**/0（Redis 竞态单测隔离重跑绿）+ 前端 **734**/734 + `vue-tsc` 0 错 + `spotlessCheck` + `check-json-key-case.py --strict` 绿（已摘除 `agent/tools/` 冻结豁免，基线 343 条）。

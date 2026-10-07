@@ -1,5 +1,16 @@
 # 工具面 snake_case 键清单（B88 决策输入，2026-10-08）
 
+> **执行结果（B88，2026-10-08 完成）**：本清单 30 输入键 + 107 输出键**已全量 camel 化**，工具名与 enum 值按用户决策保留 snake。
+> 实际执行键集 **142 个**（清单外另有 5 个字符串拼接键：`tenant_id`/`created_at`/`updated_at`/`deleted_at`/`reported_by`，
+> 以及复合键形态 `<tool>|<arg>`，如 `data_analysis|knowledge_id`）。
+> - 后端主源码 41 文件 / 445 处；实录 3,037 处（仅工具面 45A/45B/45C/46A）；前端 84 文件涉及、32 文件改名。
+> - 跨面同批：`ReferencesSupport`（引用载荷）与 `QaAttachmentResolver`（附件卡）的键必须与工具面同批改，否则 `ModelOutput` 渲染器读不到（实测复现）。
+> - 保留 snake（非遗留）：工具名 36 个、schema enum 值（`list_servers`/`list_tools`…）、外部载荷读侧（`ocr_text`/`original_url`）、
+>   websearch metadata `published_at`、JDBC 列名、SSE/事件面同名键（`session_id`/`tool_name`）、citation markup 属性 `chunk_id`。
+> - 闸门：后端 4,836/0；前端 734/734 + `vue-tsc` 0 错；`scripts/check-json-key-case.py --strict` 绿（已摘除 `agent/tools/` 冻结豁免）。
+> - 过程发现（真问题）：`ToolPolicy.sourceArgumentAllowed` 与 `SourceToolCodec` 共 6 处 `key.toLowerCase()` 键比较在 snake 时代是恒等操作，
+>   改 camel 后全失配（句柄解析/检索目标/MCP 路由连锁挂）——已改大小写不敏感；详见 B88 记录。
+
 口径：`server/src/main/java/com/ragagent/agent/tools/**` 中对**模型 / 前端 / 实录**三方可见的 snake_case **JSON 键**与**工具名**。
 数据源：主源码定义点；`server/src/test/java/**/GoRecording*.java`（逐字夹具，禁手改）；`frontend/src`。
 列义：`实录args / 实录out` = 命中该键的实录条数（输入参数侧 / 输出与 data 侧）；`前端` = 命中文件数。
