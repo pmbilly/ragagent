@@ -135,7 +135,7 @@ public final class WikiIngestConstants {
      * <p>合并式 wiki 抽取会吐出<b>一整个大 JSON</b>（entities + concepts + details）。
      * MaxTokens 留 0 时，OpenAI 兼容客户端会省略 max_tokens，DeepSeek 这类供应商
      * 便套用 8192 默认值——长抽取会在 JSON 中途被截断，{@code finish_reason=length}，
-     * 解析报 "unexpected end of JSON input"（EXTRACT_FAILED）。提到 32768 与
+     * 解析报截断错误（EXTRACT_FAILED）。提到 32768 与
      * 大型中文政策文档实测完整的输出相符；短回复仍靠 {@code finish_reason=stop} 提前结束。</p>
      */
     public static final int LLM_MAX_TOKENS = 32768;

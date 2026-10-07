@@ -11,6 +11,8 @@ import com.ragagent.auth.service.UserService;
 import com.ragagent.common.tenant.TenantRole;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
+import com.ragagent.common.web.ToolJson;
+import com.ragagent.common.web.RequestFields;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -85,8 +87,7 @@ final class AuthSessionOps {
         }
         if (!root.isObject()) {
             throw service.invalidParams("Invalid refresh token request",
-                    "json: cannot unmarshal " + jsonKindName(root)
-                            + " into Go value of type " + AuthController.SWITCH_ANON_STRUCT_TYPE);
+                    ToolJson.expectedObjectMessage(root));
         }
         com.fasterxml.jackson.databind.JsonNode node = root.get("refreshToken");
         if (node == null || node.isNull() || node.isTextual()) {
@@ -94,8 +95,7 @@ final class AuthSessionOps {
             return req;
         }
         throw service.invalidParams("Invalid refresh token request",
-                "json: cannot unmarshal " + jsonKindName(node)
-                        + " into Go struct field .refreshToken of type string");
+                RequestFields.wrongType("RefreshToken", "string", ToolJson.nodeTypeLabel(node)));
     }
 
     static String extractSwitchRefreshToken(String rawBody) {
@@ -164,10 +164,8 @@ final class AuthSessionOps {
                 throw service.invalidParams("Invalid workspace switch request",
                         service.bindingError(null, "TenantID", "required"));
             }
-            // 顶层非对象：报 legacy 绑定错误原文（含类型串，见 SWITCH_ANON_STRUCT_TYPE）
             throw service.invalidParams("Invalid workspace switch request",
-                    "json: cannot unmarshal " + jsonKindName(root) + " into Go value of type "
-                            + AuthController.SWITCH_ANON_STRUCT_TYPE);
+                    ToolJson.expectedObjectMessage(root));
         }
         com.fasterxml.jackson.databind.JsonNode idNode = root.get("tenantId");
         if (idNode == null || idNode.isNull()) {
@@ -176,20 +174,17 @@ final class AuthSessionOps {
         }
         if (!idNode.isNumber()) {
             throw service.invalidParams("Invalid workspace switch request",
-                    "json: cannot unmarshal " + jsonKindName(idNode)
-                            + " into Go struct field .tenantId of type uint64");
+                    RequestFields.wrongType("TenantID", "integer", ToolJson.nodeTypeLabel(idNode)));
         }
         // uint64：非负整数，0 也合法解析（validator required 才拒）
         java.math.BigDecimal value = idNode.decimalValue();
         if (value.scale() > 0 && value.stripTrailingZeros().scale() > 0) {
             throw service.invalidParams("Invalid workspace switch request",
-                    "json: cannot unmarshal number " + idNode.asText()
-                            + " into Go struct field .tenantId of type uint64");
+                    RequestFields.mustBeInteger("TenantID"));
         }
         if (value.signum() < 0 || value.compareTo(new java.math.BigDecimal("18446744073709551615")) > 0) {
             throw service.invalidParams("Invalid workspace switch request",
-                    "json: cannot unmarshal number " + idNode.asText()
-                            + " into Go struct field .tenantId of type uint64");
+                    RequestFields.outOfRange("TenantID"));
         }
         long parsed = value.longValue();
         if (parsed == 0) {
@@ -200,21 +195,6 @@ final class AuthSessionOps {
         return parsed;
     }
 
-    static String jsonKindName(com.fasterxml.jackson.databind.JsonNode node) {
-        if (node.isTextual()) {
-            return "string";
-        }
-        if (node.isBoolean()) {
-            return "bool";
-        }
-        if (node.isArray()) {
-            return "array";
-        }
-        if (node.isObject()) {
-            return "object";
-        }
-        return "number";
-    }
 
     static final class RefreshTokenRequest {
         @JsonProperty("refreshToken")

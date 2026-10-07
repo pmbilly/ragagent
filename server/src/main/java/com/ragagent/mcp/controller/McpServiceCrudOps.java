@@ -129,7 +129,7 @@ final class McpServiceCrudOps {
         }
         if (!updateData.isObject() && !updateData.isNull()) {
             throw BizException.badRequest(
-                    "expected JSON object, got " + ToolJson.nodeTypeLabel(updateData));
+                    ToolJson.expectedObjectMessage(updateData));
         }
         long tenantId = McpServiceController.requireTenant();
         String serviceId = McpServiceController.sanitize(id);

@@ -10,6 +10,7 @@ import com.ragagent.auth.dto.TenantResponse;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
+import com.ragagent.common.web.ToolJson;
 import com.ragagent.common.tenant.TenantRole;
 
 import org.springframework.web.bind.annotation.PathVariable;
@@ -119,13 +120,11 @@ final class TenantCrudOps {
                 return new UpdateTenantRequest();
             }
             throw TenantBindSupport.invalidParams("Invalid request data",
-                    "json: cannot unmarshal " + TenantBindSupport.jsonKindName(root) + " into Go value of type "
-                            + "struct { Name *string \"json:\\\"name\\\" binding:\\\"omitempty,min=1,max=128\\\"\"; "
-                            + "Description *string \"json:\\\"description\\\" binding:\\\"omitempty,max=512\\\"\" }");
+                    ToolJson.expectedObjectMessage(root));
         }
-        String typeError = TenantBindSupport.stringFieldValue(root, "name");
+        String typeError = TenantBindSupport.stringFieldTypeError(root, "name");
         if (typeError == null) {
-            typeError = TenantBindSupport.stringFieldValue(root, "description");
+            typeError = TenantBindSupport.stringFieldTypeError(root, "description");
         }
         if (typeError != null) {
             throw TenantBindSupport.invalidParams("Invalid request data", typeError);

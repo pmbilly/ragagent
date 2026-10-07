@@ -36,10 +36,8 @@ import com.ragagent.llm.chat.LlmTransport;
  *   <li>multipart POST {baseURL}/audio/transcriptions，字段序
  *       file → model → response_format=verbose_json → language；
  *       300s 超时；</li>
- *   <li>非 2xx 错误文案<b>逐字节</b>钉死：
- *       body 可解析且带合法 message → {@code error, status code: %d, status: %s, message: %s}；
- *       否则 → {@code error, status code: %d, status: %s, message: %s, body: %s}
- *       （message 段为 json 解析错误原文；无错误对象时是 {@code %!s(<nil>)}）；</li>
+ *   <li>非 2xx 错误文案：{@code HTTP <状态行>: <详情>}——详情取错误体的
+ *       {@code error.message}（字符串或数组），取不到时退回 body 原文；</li>
  *   <li>200 响应 {text, segments}：text 去首尾空白。</li>
  * </ul>
  */
@@ -203,106 +201,38 @@ public interface AsrTranscriber {
         }
 
         /**
-         * 非 2xx 错误文案的分派：body JSON 且 error.message 可解走
-         * {@code error, status code: ..., message: ...} 形态，其余走带 body 段的形态。
-         * JSON 顶层解析错误文案按逐字符扫描规则仿真钉死形态：
-         * 空体 → "unexpected end of JSON input"；
-         * 非 JSON 起始字符 → "invalid character 'x' looking for beginning of value"；
-         * 字面量中间坏掉 → "invalid character 'x' in literal ... (expecting 'y')"。
-         * 深结构坏掉时回落占位文案（golden 未覆盖，备案）。
+         * 非 2xx 错误文案：{@code HTTP <状态行>: <详情>}。
+         * 详情优先取正规错误体里的 {@code error.message}（字符串或数组）；
+         * 取不到（解析失败 / 无该字段 / 空体）时退回 body 原文。
          */
-        private static String jsonErrorText(byte[] body) {
-            String text = new String(body, StandardCharsets.UTF_8);
-            int i = 0;
-            while (i < text.length() && Character.isWhitespace(text.charAt(i))) {
-                i++;
-            }
-            if (i >= text.length()) {
-                return "unexpected end of JSON input";
-            }
-            char c = text.charAt(i);
-            switch (c) {
-                case 'n':
-                case 't':
-                case 'f': {
-                    String literal = c == 'n' ? "null" : c == 't' ? "true" : "false";
-                    for (int k = 1; k < literal.length(); k++) {
-                        int idx = i + k;
-                        char expected = literal.charAt(k);
-                        if (idx >= text.length()) {
-                            return "unexpected end of JSON input";
-                        }
-                        char got = text.charAt(idx);
-                        if (got != expected) {
-                            return "invalid character '" + got + "' in literal " + literal
-                                    + " (expecting '" + expected + "')";
-                        }
-                    }
-                    int after = i + literal.length();
-                    if (after < text.length()) {
-                        return "invalid character '" + text.charAt(after)
-                                + "' after top-level value";
-                    }
-                    return "unexpected end of JSON input";
-                }
-                case '{':
-                case '[':
-                case '"':
-                case '-':
-                case '0':
-                case '1':
-                case '2':
-                case '3':
-                case '4':
-                case '5':
-                case '6':
-                case '7':
-                case '8':
-                case '9':
-                    // 深结构错误：原文无法还原，回落占位
-                    return "unparsable JSON body";
-                default:
-                    return "invalid character '" + c + "' looking for beginning of value";
-            }
-        }
-
         public static String openAiErrorText(int statusCode, byte[] body) {
             String statusLine = statusCode + " " + reasonPhrase(statusCode);
-            String errText = null;
-            String message = null;
-            boolean apiError = false;
+            String rawBody = new String(body, StandardCharsets.UTF_8);
+            String detail = null;
             if (body.length > 0) {
                 try {
                     JsonNode root = MAPPER.readTree(body);
                     JsonNode err = root == null ? null : root.get("error");
-                    if (root != null && err != null && err.isObject()) {
+                    if (err != null && err.isObject()) {
                         JsonNode msg = err.get("message");
                         if (msg != null && !msg.isNull()) {
                             if (msg.isTextual()) {
-                                message = msg.asText();
-                                apiError = true;
+                                detail = msg.asText();
                             } else if (msg.isArray()) {
                                 List<String> parts = new ArrayList<>();
                                 msg.forEach(m -> parts.add(m.asText()));
-                                message = String.join(", ", parts);
-                                apiError = true;
+                                detail = String.join(", ", parts);
                             }
                         }
                     }
-                } catch (IOException e) {
-                    errText = jsonErrorText(body);
+                } catch (IOException ignored) {
+                    detail = null;
                 }
             }
-            if (apiError) {
-                return "error, status code: " + statusCode + ", status: " + statusLine
-                        + ", message: " + message;
+            if (detail == null || detail.isEmpty()) {
+                detail = rawBody;
             }
-            if (errText != null) {
-                return "error, status code: " + statusCode + ", status: " + statusLine
-                        + ", message: " + errText + ", body: " + new String(body, StandardCharsets.UTF_8);
-            }
-            return "error, status code: " + statusCode + ", status: " + statusLine
-                    + ", message: %!s(<nil>), body: " + new String(body, StandardCharsets.UTF_8);
+            return "HTTP " + statusLine + ": " + detail;
         }
 
         /** status 行短语表（"status: 200 OK" 段用）。 */

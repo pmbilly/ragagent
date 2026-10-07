@@ -602,13 +602,6 @@ public class AuthController {
      * service 失败 401 "Token refresh failed"+details。成功体见 AuthLoginResponse。
      */
     /**
-     * 顶层非对象时绑定错误文案用的类型串字面量（golden 录制钉住，勿改动）。
-     */
-    static final String SWITCH_ANON_STRUCT_TYPE =
-            "struct { TenantID uint64 \"json:\\\"tenantId\\\" binding:\\\"required\\\"\"; "
-                    + "RefreshToken string \"json:\\\"refresh_token\\\"\" }";
-
-    /**
      * POST /auth/switch-tenant。tenant-optional
      * （tenantless 主体可调用，切换成功即有空间）。绑定失败 400
      * "Invalid workspace switch request"+details；未认证 401 "not authenticated"；

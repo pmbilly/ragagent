@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
+import com.ragagent.common.web.ToolJson;
 import com.ragagent.common.web.RequestFields;
 
 /**
@@ -21,23 +22,13 @@ final class TenantBindSupport {
             .registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule())
             .configure(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
-    /** JSON 值种别（legacy 绑定错误文案用）。 */
-    static String jsonKindName(com.fasterxml.jackson.databind.JsonNode node) {
-        if (node.isTextual()) return "string";
-        if (node.isBoolean()) return "bool";
-        if (node.isArray()) return "array";
-        if (node.isObject()) return "object";
-        return "number";
-    }
-
-    /** string 字段类型检查；违规返回 legacy 绑定错误原文，否则 null。 */
-    static String stringFieldValue(com.fasterxml.jackson.databind.JsonNode root, String field) {
+    /** string 字段类型检查；违规返回字段级类型文案，否则 null。 */
+    static String stringFieldTypeError(com.fasterxml.jackson.databind.JsonNode root, String field) {
         com.fasterxml.jackson.databind.JsonNode node = root.get(field);
         if (node == null || node.isNull() || node.isTextual()) {
             return null;
         }
-        return "json: cannot unmarshal " + jsonKindName(node)
-                + " into Go struct field updateTenantRequest." + field + " of type string";
+        return RequestFields.wrongType(field, "string", ToolJson.nodeTypeLabel(node));
     }
     // ── 绑定与错误形态（对照 AuthController 的既有模式） ─────────────────────
 

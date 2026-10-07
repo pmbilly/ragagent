@@ -59,6 +59,11 @@ public final class ToolJson {
         return node == null ? "null" : node.getNodeType().name().toLowerCase(java.util.Locale.ROOT);
     }
 
+    /** 非对象请求体的 400 文案：{@code expected JSON object, got <类型名>}。 */
+    public static String expectedObjectMessage(JsonNode node) {
+        return "expected JSON object, got " + nodeTypeLabel(node);
+    }
+
     /** 工具参数编码：递归键排序（确定性）+ 标准 Jackson 紧凑输出。 */
     public static String write(JsonNode node) {
         return compactJson(sorted(node));

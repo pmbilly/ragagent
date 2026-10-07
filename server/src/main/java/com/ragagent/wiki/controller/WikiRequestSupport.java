@@ -204,7 +204,7 @@ final class WikiRequestSupport {
             }
             if (!node.isObject()) {
                 throw new RawJsonError(HttpStatus.BAD_REQUEST.value(),
-                        "Invalid request body: expected JSON object, got " + ToolJson.nodeTypeLabel(node));
+                        "Invalid request body: " + ToolJson.expectedObjectMessage(node));
             }
             return node;
         } catch (RawJsonError e) {

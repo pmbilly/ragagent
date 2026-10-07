@@ -29,6 +29,23 @@ public final class RequestFields {
         };
     }
 
+    /** 类型不符：{@code field 'name' must be a string, got number} / {@code … an integer …}。 */
+    public static String wrongType(String field, String expected, String actual) {
+        boolean vowel = !expected.isEmpty() && "aeiou".indexOf(Character.toLowerCase(expected.charAt(0))) >= 0;
+        return "field '" + fieldName(field) + "' must be " + (vowel ? "an " : "a ")
+                + expected + ", got " + actual;
+    }
+
+    /** 必须是整数（小数形态）。 */
+    public static String mustBeInteger(String field) {
+        return "field '" + fieldName(field) + "' must be an integer";
+    }
+
+    /** 数值越界。 */
+    public static String outOfRange(String field) {
+        return "field '" + fieldName(field) + "' is out of range";
+    }
+
     /** PascalCase / 缩写 → camelCase（{@code TenantID → tenantId}、{@code LLMModelID → llmModelId}）。 */
     static String fieldName(String field) {
         if (field == null || field.isEmpty()) {

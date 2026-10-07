@@ -279,7 +279,7 @@ public final class OllamaManageService {
         }
         if (!n.isObject()) {
             throw new BizException(AppError.badRequest(
-                    "expected JSON object, got " + ToolJson.nodeTypeLabel(n)));
+                    ToolJson.expectedObjectMessage(n)));
         }
         return n;
     }

@@ -16,6 +16,10 @@ class RequestFieldsTest {
         assertThat(RequestFields.message("Username", "max"))
                 .isEqualTo("field 'username' is above the maximum");
         assertThat(RequestFields.message("Query", "oneof")).isEqualTo("field 'query' failed validation: oneof");
+        assertThat(RequestFields.wrongType("name", "string", "number"))
+                .isEqualTo("field 'name' must be a string, got number");
+        assertThat(RequestFields.wrongType("TenantID", "integer", "string"))
+                .isEqualTo("field 'tenantId' must be an integer, got string");
     }
 
     @Test

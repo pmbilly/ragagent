@@ -897,3 +897,11 @@
 - **过程事故**：首版文案用双引号（`field "name" is required`）——写入 JSON 夹具需 `"`、写入 Java 字面量也需转义，`compileTestJava` 立即 9 错；改单引号后一次通过。教训：**换锚批的文案字符集先过「夹具/字面量是否需转义」这一关**。
 - **登记（后续小批）**：① `structName` 形参保留签名不再渲染（~40 调用点清理）；② 原生错误体解析面（`datasource/connector/notion` 的 `cannot unmarshal non-array` 两处）属第三方连接器，随 connector 批处置。
 - **闸门**：全量 **4,831**/0 失败（6 跳过）+ `spotlessCheck` 绿；主源码/金片/测试侧 `Error:Field validation` 残留 **0**。
+**✅ B83（2026-10-07，auth 类型错文案 + ASR/VLM 错误文本换锚）**
+- **auth（`json: cannot unmarshal …` 族退役）**：`TenantBindSupport.stringFieldValue`→`stringFieldTypeError` 用 `RequestFields.wrongType`；`TenantCrudOps` 非对象 → `ToolJson.expectedObjectMessage`；`AuthSessionOps` 六处（refresh 非对象 / refreshToken 类型 / switch 非对象 / tenantId 非数值 / 小数 / 越界）→ 字段级文案（`field 'tenantId' must be an integer, got string`、`… must be an integer`、`… is out of range`）；顺删三个 Go 面 helper：`AuthSessionOps.jsonKindName`、`TenantBindSupport.jsonKindName`、`AuthController.SWITCH_ANON_STRUCT_TYPE`。
+- **ASR/VLM**：`openAiErrorText` 重写为 `HTTP <状态行>: <详情>`（详情优先 `error.message`（字符串/数组），取不到退回 body 原文）；**`jsonErrorText`（Go 逐字符 JSON 报错仿真：空体/非 JSON 起始/literal 中间）整体删除**；传参不变（VLM 侧 `VlmHttpTransport` 共用）。
+- **金片**：2 个 auth + 6 个 ASR/VLM（w5b-asr-401/404/500text/modelmissing/storedkey、md-asr-401）按同规则转换，测试自证与实现一致。
+- **过程事故**：`wrongType` 首版固定用 "a" → 产出 `must be a integer`，被 `w5a-auth-switch-badtype` 金片当场抓出；改为按首字母判冠词（an/a）后通过。
+- **顺修陈旧注释**：`AsrTranscriber` 类 javadoc 的旧文案形态描述与 `%!s(<nil>)` 表述；`WikiIngestConstants` 的截断报错引文。
+- **剩余（登记 B84）**：web 工具面 3 处（`WebSearchTool`/`WebFetchTool` 的 `json: cannot unmarshal … into Go struct field …`，LLM 可见、**0 金片**）、`SkillFrontmatter` 2 处（`yaml: unmarshal errors:…`）、Notion 连接器 4 处（`unexpected end of JSON input`/`cannot unmarshal non-array`）；三处均无钉，**先补钉再换**。
+- **闸门**：全量 **4,831**/0 失败（6 跳过）+ `spotlessCheck` 绿。
