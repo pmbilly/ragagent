@@ -871,3 +871,8 @@
 - **可见变化（送进压缩提示词的历史参数文本）**：HTML 实体不再转义（`\u003c` → `<`）、U+2028/9 原样输出；结构与键序不变；数字文本归一口径不变（测试 `fold` 覆盖）。
 - **测试收编（不碰实录）**：`ConversationSerializerTest.fold` 增加 `RecordingSupport.normalizeEscapes`（与 B40 同口径：转义形态不再构成断言目标，键序/结构/数字仍被钉住）；测试名去 Go：`renderToolArgsMatchesGoByteForByte`→`renderToolArgsKeepsKeyOrderAndShape`、`serializeToolCallsMatchesGo`→`serializeToolCallsShape`。
 - **闸门**：全量 **4,823**/0 失败（6 跳过）+ `spotlessCheck` + 包结构守卫 + 注释棘轮全绿。
+**✅ B79（2026-10-07，Notion 数字形态换 Java 标准：goFormatG 族退役）**
+- **动作**：`NotionValues.goFormatG` + `shortestRoundTrip`（~80 行手写 `%g`）删除；`jsonNumberToString` 整数分支保留、其余走 Java 标准 `Double.toString`；类 javadoc 的「%g ≠ Double.toString」条目改写为「数字先归一到 double」。
+- **可见变化（Notion 条目正文文本，落库 → 检索/LLM）**：`1e+20 → 1.0E20`、`1.2345675e+06 → 1234567.5`、`1e-05 → 1.0E-5`；整数值形态不变（`1000000`）。已入库旧数据文本不变；含数字列的 Notion 源下次同步会产生一次性内容 diff（用户 2026-10-07 已拍板接受）。
+- **测试收编**：`numbersFollowGoFormatting`→`numbersFollowJavaFormatting`、`goFormatGMatchesStrconv`→`jsonNumberToStringUsesJavaStandardForm`（断言按 Java 形态重写）。
+- **闸门**：全量 **4,823**/0 失败（6 跳过）+ `spotlessCheck` 绿；**主源码 `go*`/`GO_*` 标识符归零**（类级 2026-10-03 清零 + 方法级 B76~B79 清零；其余仅 `GoRecording*` 实录与测试侧局部名）。

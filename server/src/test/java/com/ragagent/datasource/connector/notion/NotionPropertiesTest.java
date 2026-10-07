@@ -46,29 +46,27 @@ class NotionPropertiesTest {
     }
 
     /**
-     * 数字的三种形态：整数值、普通小数（'f' 形态）、
-     * 以及指数形态（指数至少两位）。这一组是把 {@code extractValue}
-     * 与 {@code GoDoubleSerializer} 的差异钉死的地方。
+     * 数字的三种形态：整数值、普通小数、以及指数形态
+     * （指数按 Java 惯例，如 {@code 1.0E20}）。
      */
     @Test
-    void numbersFollowGoFormatting() {
+    void numbersFollowJavaFormatting() {
         assertThat(toStr("{\"type\":\"number\",\"number\":42}")).isEqualTo("42");
         assertThat(toStr("{\"type\":\"number\",\"number\":42.5}")).isEqualTo("42.5");
         assertThat(toStr("{\"type\":\"number\",\"number\":-3}")).isEqualTo("-3");
         assertThat(toStr("{\"type\":\"number\",\"number\":-0.5}")).isEqualTo("-0.5");
         assertThat(toStr("{\"type\":\"number\",\"number\":0}")).isEqualTo("0");
         assertThat(toStr("{\"type\":\"number\",\"number\":null}")).isEmpty();
-        // %d 分支：整数值
+        // 整数分支
         assertThat(toStr("{\"type\":\"number\",\"number\":1000000}")).isEqualTo("1000000");
         assertThat(toStr("{\"type\":\"number\",\"number\":1000001}")).isEqualTo("1000001");
-        // %g 的 'e' 分界是 exp >= 6（不是 GoDoubleSerializer 的 1e21）
-        assertThat(toStr("{\"type\":\"number\",\"number\":1234567.5}")).isEqualTo("1.2345675e+06");
-        // %g 的 'f'/'e' 下界是 exp < -4
-        assertThat(toStr("{\"type\":\"number\",\"number\":0.0001}")).isEqualTo("0.0001");
-        assertThat(toStr("{\"type\":\"number\",\"number\":0.00001}")).isEqualTo("1e-05");
-        // 超出 int64 的整数值 → 饱和后比较失败 → 走 %g
-        assertThat(toStr("{\"type\":\"number\",\"number\":1e20}")).isEqualTo("1e+20");
-        assertThat(toStr("{\"type\":\"number\",\"number\":1e21}")).isEqualTo("1e+21");
+        // Java 标准：Double.toString 的小数/指数分界（1e-3 ~ 1e7 走平记）
+        assertThat(toStr("{\"type\":\"number\",\"number\":1234567.5}")).isEqualTo("1234567.5");
+        assertThat(toStr("{\"type\":\"number\",\"number\":0.0001}")).isEqualTo("1.0E-4");
+        assertThat(toStr("{\"type\":\"number\",\"number\":0.00001}")).isEqualTo("1.0E-5");
+        // 超出 int64 的整数值 → 饱和后比较失败 → 走 Double.toString
+        assertThat(toStr("{\"type\":\"number\",\"number\":1e20}")).isEqualTo("1.0E20");
+        assertThat(toStr("{\"type\":\"number\",\"number\":1e21}")).isEqualTo("1.0E21");
     }
 
     @Test
@@ -230,20 +228,20 @@ class NotionPropertiesTest {
     // ── 数字格式化（NotionValues） ────────────────────────────────────────
 
     @Test
-    void goFormatGMatchesStrconv() {
+    void jsonNumberToStringUsesJavaStandardForm() {
         assertThat(NotionValues.jsonNumberToString(42)).isEqualTo("42");
         assertThat(NotionValues.jsonNumberToString(42.5)).isEqualTo("42.5");
-        assertThat(NotionValues.jsonNumberToString(0.0001)).isEqualTo("0.0001");
-        assertThat(NotionValues.jsonNumberToString(0.00001)).isEqualTo("1e-05");
-        assertThat(NotionValues.jsonNumberToString(1234567.5)).isEqualTo("1.2345675e+06");
-        assertThat(NotionValues.jsonNumberToString(1e20)).isEqualTo("1e+20");
-        assertThat(NotionValues.jsonNumberToString(1e21)).isEqualTo("1e+21");
+        assertThat(NotionValues.jsonNumberToString(0.0001)).isEqualTo("1.0E-4");
+        assertThat(NotionValues.jsonNumberToString(0.00001)).isEqualTo("1.0E-5");
+        assertThat(NotionValues.jsonNumberToString(1234567.5)).isEqualTo("1234567.5");
+        assertThat(NotionValues.jsonNumberToString(1e20)).isEqualTo("1.0E20");
+        assertThat(NotionValues.jsonNumberToString(1e21)).isEqualTo("1.0E21");
         assertThat(NotionValues.jsonNumberToString(-0.5)).isEqualTo("-0.5");
         assertThat(NotionValues.jsonNumberToString(0)).isEqualTo("0");
         assertThat(NotionValues.jsonNumberToString(-0.0)).isEqualTo("0");
-        assertThat(NotionValues.goFormatG(1e-7)).isEqualTo("1e-07");
-        assertThat(NotionValues.goFormatG(1e100)).isEqualTo("1e+100");
-        assertThat(NotionValues.goFormatG(-1234567.5)).isEqualTo("-1.2345675e+06");
+        assertThat(NotionValues.jsonNumberToString(1e-7)).isEqualTo("1.0E-7");
+        assertThat(NotionValues.jsonNumberToString(1e100)).isEqualTo("1.0E100");
+        assertThat(NotionValues.jsonNumberToString(-1234567.5)).isEqualTo("-1234567.5");
     }
 
     @Test
