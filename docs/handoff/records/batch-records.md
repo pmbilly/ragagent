@@ -876,3 +876,12 @@
 - **可见变化（Notion 条目正文文本，落库 → 检索/LLM）**：`1e+20 → 1.0E20`、`1.2345675e+06 → 1234567.5`、`1e-05 → 1.0E-5`；整数值形态不变（`1000000`）。已入库旧数据文本不变；含数字列的 Notion 源下次同步会产生一次性内容 diff（用户 2026-10-07 已拍板接受）。
 - **测试收编**：`numbersFollowGoFormatting`→`numbersFollowJavaFormatting`、`goFormatGMatchesStrconv`→`jsonNumberToStringUsesJavaStandardForm`（断言按 Java 形态重写）。
 - **闸门**：全量 **4,823**/0 失败（6 跳过）+ `spotlessCheck` 绿；**主源码 `go*`/`GO_*` 标识符归零**（类级 2026-10-03 清零 + 方法级 B76~B79 清零；其余仅 `GoRecording*` 实录与测试侧局部名）。
+**🚧 B80（2026-10-07，契约文案换锚·第一部分：系统设置类型名 → JSON 类型名）**
+- **本批只做无金片面**：`SystemSettingRegistry.jsonTypeLabel` 词表换 Java/JSON 标准——`<nil>→null`、`bool→boolean`、`float64→number`、`[]interface {}→array`、`map[string]interface {}→object`；`expected bool` → `expected boolean`（消息模板 `expected integer, got <类型名>` 等六条不变）。
+- **原盲区补钉**：新增 `SystemSettingRegistryTest`（6 类型名 + 5 消息 + 索引分支，12 条断言）；**红态探针已验**（词表临时改回旧值 → 两条测试红；恢复后全绿）。金片零变化：已核实 0 个 contracts 夹具钉类型名分支；string 分支 `expected integer, got "abc"`（`adm-settings-put-badtype`）未动。
+- **未完成部分与阻塞点（已查实）**：
+  ① auth 类型错文案（`json: cannot unmarshal … into Go struct field …`，2 金片 `w5a-auth-switch-badtype` / `w5a-tenant-put-badjson`）：w5a 夹具由 `scripts/record-w5a-golden.sh` 录制（脚本缺省指向 Go `:8080`，可用 `W5A_TARGET_PORT` 指向 Java），**不支持 `-Dcontract.refresh`** ⇒ 需起本地 Java 服务（8083）+ dev 库重录（Postgres/Redis 当前已在跑）。
+  ② ASR/VLM 错误文本（`error, status code: %d, status: %s, message: %s, body: %s`，约 7 金片 `w5b-asr-*` / `md-asr-401`）：同理由 `record-w5b-golden.sh` / `record-modeldebug-golden.sh` 录制，需服务 + 模型桩。
+  ③ **新发现（超出原批准清单，待拍板）**：gin 校验文案 `Key: '…' Error:Field validation for '…' failed on the '…' tag` 仍钉在 **32 个金片、跨 8 域**（agent/member/reg/init/session/KB 等）——不在「auth/ASR/类型名」清单内，是否另立批换锚。
+  ④ 同类非 go 名孪生（`WikiRequestSupport:205` / `McpServiceCrudOps:131` / `OllamaManageService:280` 的 `non-object into Go value …`）：**0 金片钉住**（盲区），改前建议先补钉。
+- **闸门**：全量 **4,825**/0 失败（6 跳过）+ `spotlessCheck` 绿。

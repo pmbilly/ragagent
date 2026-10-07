@@ -181,7 +181,7 @@ public final class SystemSettingRegistry {
             }
             case "bool": {
                 if (!rawValue.isBoolean()) {
-                    throw new IllegalArgumentException("expected bool, got " + jsonTypeLabel(rawValue));
+                    throw new IllegalArgumentException("expected boolean, got " + jsonTypeLabel(rawValue));
                 }
                 return MAPPER.valueToTree(rawValue.asBoolean());
             }
@@ -225,24 +225,24 @@ public final class SystemSettingRegistry {
         return -1;
     }
 
-    /** JSON 值的 Go 风格类型名（错误消息里出现，golden 钉住 string/int 形态）。 */
+    /** JSON 类型名（错误消息里出现）：null / boolean / number / string / array / object。 */
     public static String jsonTypeLabel(JsonNode node) {
         if (node == null || node.isNull()) {
-            return "<nil>";
+            return "null";
         }
         if (node.isBoolean()) {
-            return "bool";
+            return "boolean";
         }
         if (node.isNumber()) {
-            return "float64";
+            return "number";
         }
         if (node.isTextual()) {
             return "string";
         }
         if (node.isArray()) {
-            return "[]interface {}";
+            return "array";
         }
-        return "map[string]interface {}";
+        return "object";
     }
 
     private SystemSettingRegistry() {
