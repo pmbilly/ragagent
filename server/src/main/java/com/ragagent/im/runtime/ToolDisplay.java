@@ -497,14 +497,14 @@ public final class ToolDisplay {
                 break;
             case "list_knowledge_chunks":
                 if (data != null) {
-                    if (data.get("faq_question") instanceof String question && !question.strip().isEmpty()) {
+                    if (data.get("faqQuestion") instanceof String question && !question.strip().isEmpty()) {
                         return "查看 FAQ：" + question.strip();
                     }
-                    if (data.containsKey("fetched_chunks")) {
+                    if (data.containsKey("fetchedChunks")) {
                         String title = "文档";
-                        if (data.get("knowledge_title") instanceof String t && !t.strip().isEmpty()) {
+                        if (data.get("knowledgeTitle") instanceof String t && !t.strip().isEmpty()) {
                             title = t.strip();
-                        } else if (data.get("knowledge_id") instanceof String id && !id.strip().isEmpty()) {
+                        } else if (data.get("knowledgeId") instanceof String id && !id.strip().isEmpty()) {
                             title = id.strip();
                         }
                         return "查看 " + title;
@@ -605,7 +605,7 @@ public final class ToolDisplay {
         if (source.equals(RETRIEVAL_SOURCE_WEB) || (webCount > 0 && docCount == 0)) {
             return "找到 " + count + " 条网页";
         }
-        if (data.get("kb_counts") instanceof Map<?, ?> kbCounts && !kbCounts.isEmpty()) {
+        if (data.get("kbCounts") instanceof Map<?, ?> kbCounts && !kbCounts.isEmpty()) {
             return "找到 " + count + " 个结果，来自 " + kbCounts.size() + " 个文件";
         }
         if (source.equals(RETRIEVAL_SOURCE_MIXED) && docCount > 0 && webCount > 0) {
@@ -630,7 +630,7 @@ public final class ToolDisplay {
             return "";
         }
         int totalChunks = 0;
-        if (data.get("total_matches") instanceof Number n) {
+        if (data.get("totalMatches") instanceof Number n) {
             totalChunks = n.intValue();
         }
         if (totalChunks == 0) {
@@ -641,13 +641,13 @@ public final class ToolDisplay {
     }
 
     private static int imGrepDocumentCount(Map<String, Object> data) {
-        if (data.get("document_count") instanceof Number n && n.doubleValue() >= 0) {
+        if (data.get("documentCount") instanceof Number n && n.doubleValue() >= 0) {
             return n.intValue();
         }
-        if (data.get("knowledge_results") instanceof List<?> kr && !kr.isEmpty()) {
+        if (data.get("knowledgeResults") instanceof List<?> kr && !kr.isEmpty()) {
             return kr.size();
         }
-        if (data.get("chunk_results") instanceof List<?> cr && !cr.isEmpty()) {
+        if (data.get("chunkResults") instanceof List<?> cr && !cr.isEmpty()) {
             return cr.size();
         }
         return 0;
@@ -657,13 +657,13 @@ public final class ToolDisplay {
         if (data == null) {
             return "";
         }
-        if (!data.containsKey("fetched_chunks")) {
+        if (!data.containsKey("fetchedChunks")) {
             return "";
         }
-        int fetchedN = imNumericValue(data.get("fetched_chunks"));
-        int totalN = imNumericValue(data.get("total_chunks"));
-        String summary = "已加载 " + fetchedN + " / " + formatIMOptionalInt(totalN, data.get("total_chunks")) + " 个分块";
-        int pageSize = imNumericValue(data.get("page_size"));
+        int fetchedN = imNumericValue(data.get("fetchedChunks"));
+        int totalN = imNumericValue(data.get("totalChunks"));
+        String summary = "已加载 " + fetchedN + " / " + formatIMOptionalInt(totalN, data.get("totalChunks")) + " 个分块";
+        int pageSize = imNumericValue(data.get("pageSize"));
         if (totalN > pageSize && pageSize > 0) {
             int page = imNumericValue(data.get("page"));
             if (page <= 0) {

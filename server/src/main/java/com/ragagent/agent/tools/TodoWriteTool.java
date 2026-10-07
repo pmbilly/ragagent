@@ -189,10 +189,10 @@ public class TodoWriteTool extends BaseTool {
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("task", task);
         data.put("steps", steps);
-        data.put("steps_json", stepsJson);
-        data.put("total_steps", steps == null ? 0 : steps.size());
-        data.put("plan_created", true);
-        data.put("display_type", "plan");
+        data.put("stepsJson", stepsJson);
+        data.put("totalSteps", steps == null ? 0 : steps.size());
+        data.put("planCreated", true);
+        data.put("displayType", "plan");
 
         ToolResult result = new ToolResult();
         result.setSuccess(true);

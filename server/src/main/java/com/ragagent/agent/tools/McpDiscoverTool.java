@@ -87,17 +87,17 @@ public class McpDiscoverTool extends BaseTool {
             case "list_tools", "search", "describe" -> {
                 if (args.serverId().isEmpty()) {
                     return mcpDiscoveryFailure(
-                            "server_id is required; copy it from this tool's source summaries or list_servers",
+                            "serverId is required; copy it from this tool's source summaries or list_servers",
                             "error");
                 }
                 if ("describe".equals(args.mode())
                         && (args.toolName().isEmpty() || !args.cursor().isEmpty() || !args.query().isEmpty())) {
                     return mcpDiscoveryFailure(
-                            "describe requires an exact tool_name, without cursor or query",
+                            "describe requires an exact toolName, without cursor or query",
                             "error");
                 }
                 if (!"describe".equals(args.mode()) && !args.toolName().isEmpty()) {
-                    return mcpDiscoveryFailure("tool_name is only accepted by describe", "error");
+                    return mcpDiscoveryFailure("toolName is only accepted by describe", "error");
                 }
                 if ("search".equals(args.mode()) && args.query().strip().isEmpty()) {
                     return mcpDiscoveryFailure(
@@ -137,7 +137,7 @@ public class McpDiscoverTool extends BaseTool {
                             java.util.Map<String, Object> out = new java.util.LinkedHashMap<>();
                             out.put("notice", McpCatalog.MCP_EXTERNAL_DATA_NOTICE);
                             if (!tool.serverInstructions.isEmpty()) {
-                                out.put("server_instructions", tool.serverInstructions);
+                                out.put("serverInstructions", tool.serverInstructions);
                             }
                             McpCatalog.McpToolSummary summary = new McpCatalog.McpToolSummary();
                             summary.toolRef = McpCatalog.mcpToolRef(tool);
@@ -147,13 +147,13 @@ public class McpDiscoverTool extends BaseTool {
                             summary.description = tool.mcpTool.getDescription();
                             out.putAll(summary.toMap(true));
                             if (advertiseSources) {
-                                out.put("function_name", McpCatalog.mcpRegisteredName(tool));
+                                out.put("functionName", McpCatalog.mcpRegisteredName(tool));
                             }
                             String usage = tool.service.effectiveUsageInstructions();
                             if (!usage.isEmpty()) {
-                                out.put("usage_instructions", usage);
+                                out.put("usageInstructions", usage);
                             }
-                            out.put("input_schema", tool.getParameters());
+                            out.put("inputSchema", tool.getParameters());
                             ToolResult result = McpCatalog.mcpJsonResult(out);
                             if (result.getOutput().codePointCount(0, result.getOutput().length())
                                     > McpCatalog.MAX_MCP_DEFINITION_CHARS) {
@@ -197,8 +197,8 @@ public class McpDiscoverTool extends BaseTool {
         }
         return new McpCatalog.McpDiscoveryArgs(
                 raw.path("mode").asText(""),
-                raw.path("server_id").asText(""),
-                raw.path("tool_name").asText(""),
+                raw.path("serverId").asText(""),
+                raw.path("toolName").asText(""),
                 raw.path("query").asText(""),
                 raw.path("cursor").asText(""),
                 raw.path("limit").asInt(0),
@@ -244,7 +244,7 @@ public class McpDiscoverTool extends BaseTool {
                     + "summaries, not individual tool definitions. Inspect/search a relevant server, then "
                     + "describe an exact tool to load its complete function for the next model request. Use "
                     + "the loaded function directly with its schema. The call_mcp_tool proxy becomes available "
-                    + "after a callable definition is loaded; it accepts only the returned tool_ref. A "
+                    + "after a callable definition is loaded; it accepts only the returned toolRef. A "
                     + "missing or stale saved directory must be refreshed in Settings > MCP management. ");
         }
         b.append(McpCatalog.MCP_DISCOVERY_DESCRIPTION);

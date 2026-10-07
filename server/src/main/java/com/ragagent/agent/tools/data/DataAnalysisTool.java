@@ -42,7 +42,7 @@ public class DataAnalysisTool extends BaseTool implements Cleanable {
 
     /** schema 字节即契约：以探针 _schema 语料钉死的字节形态为准。 */
     private static final String SCHEMA_JSON = """
-            {"type":"object","properties":{"knowledge_id":{"type":"string","description":"short dN document ID to query"},"sql":{"type":"string","description":"SQL to be executed on knowledge"}},"required":["knowledge_id","sql"],"additionalProperties":false}""";
+            {"type":"object","properties":{"knowledgeId":{"type":"string","description":"short dN document ID to query"},"sql":{"type":"string","description":"SQL to be executed on knowledge"}},"required":["knowledgeId","sql"],"additionalProperties":false}""";
 
     private static final String DESCRIPTION = "Use this tool when the knowledge is CSV or Excel files. It loads the data into memory and executes SQL for data analysis. "
             + "For Excel files with multiple sheets, every sheet is loaded into the same table and the source sheet name is exposed as a '__sheet_name' column so you can filter/aggregate per sheet. "
@@ -295,7 +295,7 @@ public class DataAnalysisTool extends BaseTool implements Cleanable {
     @Override
     public ToolResult execute(ToolRequest request) {
         JsonNode args = request.args();
-        String knowledgeID = args == null ? "" : args.path("knowledge_id").asText("");
+        String knowledgeID = args == null ? "" : args.path("knowledgeId").asText("");
         String sql = args == null ? "" : args.path("sql").asText("");
 
         if (scopeEnforced) {
@@ -356,10 +356,10 @@ public class DataAnalysisTool extends BaseTool implements Cleanable {
         result.setOutput(queryOutput);
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("rows", results);
-        data.put("row_count", results.size());
+        data.put("rowCount", results.size());
         data.put("query", sql);
-        data.put("display_type", ToolDefinitions.TOOL_DATA_ANALYSIS);
-        data.put("session_id", sessionID);
+        data.put("displayType", ToolDefinitions.TOOL_DATA_ANALYSIS);
+        data.put("sessionId", sessionID);
         result.setData(data);
         return result;
     }

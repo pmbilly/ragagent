@@ -35,22 +35,22 @@ type GrepRow = {
   title: string;
   meta: string;
   snippet: string;
-  chunks: { content: string; chunk_id: string; knowledge_id: string }[];
+  chunks: { content: string; chunkId: string; knowledgeId: string }[];
   chunkId?: string;
   knowledgeId?: string;
 };
 
 const formatKnowledgeMeta = (result: GrepKnowledgeResult): string => {
   const parts: string[] = [];
-  const chunks = result.chunk_hit_count ?? 0;
+  const chunks = result.chunkHitCount ?? 0;
   if (chunks > 0) {
     parts.push(t('agentStream.grepResults.chunkHits', { count: chunks }));
   }
-  const hits = result.total_pattern_hits ?? 0;
+  const hits = result.totalPatternHits ?? 0;
   if (hits > 0 && hits !== chunks) {
     parts.push(t('agentStream.grepResults.keywordHits', { count: hits }));
   }
-  if (result.title_match) {
+  if (result.titleMatch) {
     parts.push(t('agentStream.grepResults.titleMatch'));
   }
   return parts.join(' · ');
@@ -58,54 +58,54 @@ const formatKnowledgeMeta = (result: GrepKnowledgeResult): string => {
 
 const rowFromGroupedChunk = (group: ReturnType<typeof groupGrepChunkResults>[number]): GrepRow => {
   const title = group.title || t('knowledge.untitledDocument');
-  const meta = group.is_faq
+  const meta = group.isFaq
     ? t('agentStream.grepResults.faqEntry')
     : formatKnowledgeMeta({
-      knowledge_id: group.knowledge_id,
-      knowledge_base_id: '',
-      knowledge_title: title,
-      chunk_hit_count: group.chunk_hit_count,
-      total_pattern_hits: group.chunk_hit_count,
-      distinct_patterns: 1,
-      pattern_counts: {},
-      title_match: group.title_match,
+      knowledgeId: group.knowledgeId,
+      knowledgeBaseId: '',
+      knowledgeTitle: title,
+      chunkHitCount: group.chunkHitCount,
+      totalPatternHits: group.chunkHitCount,
+      distinctPatterns: 1,
+      patternCounts: {},
+      titleMatch: group.titleMatch,
     });
   return {
     key: group.key,
     title,
     meta,
-    snippet: cleanSnippet(group.match_snippet),
+    snippet: cleanSnippet(group.matchSnippet),
     chunks: group.chunks.map((chunk) => ({
       content: cleanSnippet(chunk.content),
-      chunk_id: chunk.chunk_id,
-      knowledge_id: chunk.knowledge_id,
+      chunkId: chunk.chunkId,
+      knowledgeId: chunk.knowledgeId,
     })),
-    chunkId: group.chunks.length === 1 ? group.chunks[0].chunk_id : undefined,
-    knowledgeId: group.knowledge_id,
+    chunkId: group.chunks.length === 1 ? group.chunks[0].chunkId : undefined,
+    knowledgeId: group.knowledgeId,
   };
 };
 
 const rowFromKnowledge = (result: GrepKnowledgeResult): GrepRow => ({
-  key: result.knowledge_id,
-  title: result.faq_question || result.knowledge_title || t('knowledge.untitledDocument'),
+  key: result.knowledgeId,
+  title: result.faqQuestion || result.knowledgeTitle || t('knowledge.untitledDocument'),
   meta: formatKnowledgeMeta(result),
-  snippet: cleanSnippet(result.match_snippet ?? ''),
-  chunks: result.match_snippet
+  snippet: cleanSnippet(result.matchSnippet ?? ''),
+  chunks: result.matchSnippet
     ? [{
-      content: cleanSnippet(result.match_snippet ?? ''),
-      chunk_id: '',
-      knowledge_id: result.knowledge_id,
+      content: cleanSnippet(result.matchSnippet ?? ''),
+      chunkId: '',
+      knowledgeId: result.knowledgeId,
     }]
     : [],
-  knowledgeId: result.knowledge_id,
+  knowledgeId: result.knowledgeId,
 });
 
 const rows = computed((): GrepRow[] => {
-  const chunkRows = props.data.chunk_results;
+  const chunkRows = props.data.chunkResults;
   if (chunkRows?.length) {
     return groupGrepChunkResults(chunkRows).map(rowFromGroupedChunk);
   }
-  return (props.data.knowledge_results ?? []).map(rowFromKnowledge);
+  return (props.data.knowledgeResults ?? []).map(rowFromKnowledge);
 });
 </script>
 

@@ -26,21 +26,21 @@ public class WikiReplaceTextTool extends BaseTool {
             			"type": "string",
             			"description": "The slug of the Wiki page"
             		},
-            		"old_text": {
+            		"oldText": {
             			"type": "string",
             			"description": "The exact text to find and replace"
             		},
-            		"new_text": {
+            		"newText": {
             			"type": "string",
             			"description": "The new text to insert"
             		},
-            		"source_refs": {
+            		"sourceRefs": {
             			"type": "array",
             			"items": {"type": "string"},
             			"description": "An optional list of short dN source document IDs that justify this change. If provided, these will COMPLETELY REPLACE the existing source_refs of the page."
             		}
             	},
-            	"required": ["slug", "old_text", "new_text"]
+            	"required": ["slug", "oldText", "newText"]
             }""";
 
     private static final String DESCRIPTION =
@@ -75,7 +75,7 @@ public class WikiReplaceTextTool extends BaseTool {
         if (kbIds == null || kbIds.isEmpty()) {
             return failure("No knowledge bases available for editing");
         }
-        String oldText = args.path("old_text").asText("");
+        String oldText = args.path("oldText").asText("");
         if (oldText.isEmpty()) {
             return failure("old_text is required");
         }
@@ -100,11 +100,11 @@ public class WikiReplaceTextTool extends BaseTool {
             return failure("old_text not found in the current page content. Ensure you copy it exactly as it appears.");
         }
 
-        String newText = args.path("new_text").asText("");
+        String newText = args.path("newText").asText("");
         existingPage.setContent(existingPage.content().replace(oldText, newText));
 
-        if (args.has("source_refs")) {
-            List<String> sourceRefs = WikiFlagIssueTool.stringList(args.get("source_refs"));
+        if (args.has("sourceRefs")) {
+            List<String> sourceRefs = WikiFlagIssueTool.stringList(args.get("sourceRefs"));
             if (sourceRefs == null) {
                 sourceRefs = List.of();
             }
@@ -138,12 +138,12 @@ public class WikiReplaceTextTool extends BaseTool {
         r.setSuccess(true);
         r.setOutput(output);
         java.util.Map<String, Object> data = new java.util.LinkedHashMap<>();
-        data.put("display_type", "wiki_replace_text");
+        data.put("displayType", "wiki_replace_text");
         data.put("slug", slug);
         data.put("title", existingPage.title());
-        data.put("old_text", oldPreview);
-        data.put("new_text", newPreview);
-        data.put("replacement_count", replacementCount);
+        data.put("oldText", oldPreview);
+        data.put("newText", newPreview);
+        data.put("replacementCount", replacementCount);
         r.setData(data);
         return r;
     }

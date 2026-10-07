@@ -164,7 +164,7 @@ class ImFoundationContractTest {
         assertFx("toolline_g1", ToolDisplay.formatIMToolLine(
                 new ToolDisplay.IMToolStep("g1", "grep_chunks").success()
                         .args(Map.of("patterns", List.of("-alpha", "-beta", "-gamma", "-delta")))
-                        .data(Map.of("total_matches", 12d, "document_count", 3d))));
+                        .data(Map.of("totalMatches", 12d, "documentCount", 3d))));
         assertFx("toolline_wk1", ToolDisplay.formatIMToolLine(
                 new ToolDisplay.IMToolStep("wk1", "wiki_read_page").success()
                         .args(Map.of("slug", "home")).data(Map.of("title", "首页"))));
@@ -186,7 +186,7 @@ class ImFoundationContractTest {
         assertFx("toolline_l1", ToolDisplay.formatIMToolLine(
                 new ToolDisplay.IMToolStep("l1", "list_knowledge_chunks").success()
                         .data(new java.util.LinkedHashMap<>(Map.of(
-                                "fetched_chunks", 5d, "page_size", 10d, "page", 2d)))));
+                                "fetchedChunks", 5d, "pageSize", 10d, "page", 2d)))));
         assertFx("toolline_d1", ToolDisplay.formatIMToolLine(
                 new ToolDisplay.IMToolStep("d1", "get_document_info").success()
                         .data(Map.of("title", "年度报告"))));
@@ -220,14 +220,14 @@ class ImFoundationContractTest {
                 "count", 7d, "search_source", "mixed", "web_count", 2d, "doc_count", 5d,
                 "results", List.of(1))));
         assertFx("ksm_kbcounts", ToolDisplay.imKnowledgeSearchSummary(Map.of(
-                "count", 3d, "kb_counts", Map.of("a", 1, "b", 2), "results", List.of(1))));
+                "count", 3d, "kbCounts", Map.of("a", 1, "b", 2), "results", List.of(1))));
         assertFx("ksm_zero", ToolDisplay.imKnowledgeSearchSummary(Map.of("count", 0d)));
-        assertFx("gsm_zero", ToolDisplay.imGrepSearchSummary(Map.of("total_matches", 0d)));
+        assertFx("gsm_zero", ToolDisplay.imGrepSearchSummary(Map.of("totalMatches", 0d)));
         assertFx("chunks_nil_total", ToolDisplay.imKnowledgeChunksSummary(
                 new java.util.LinkedHashMap<>(Map.of(
-                        "fetched_chunks", 5d, "page_size", 10d, "page", 2d))));
+                        "fetchedChunks", 5d, "pageSize", 10d, "page", 2d))));
         assertFx("chunks_total", ToolDisplay.imKnowledgeChunksSummary(Map.of(
-                "fetched_chunks", 5d, "total_chunks", 23d, "page_size", 10d, "page", 2d)));
+                "fetchedChunks", 5d, "totalChunks", 23d, "pageSize", 10d, "page", 2d)));
     }
 
     @Test

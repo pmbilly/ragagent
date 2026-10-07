@@ -68,8 +68,7 @@ final class SourceToolCodec {
 
     private void collectUnresolvedToolHandles(String key, JsonNode value, Set<String> seen, java.util.function.Predicate<String> allowed) {
         if (value.isTextual()) {
-            String lowerKey = key.toLowerCase();
-            if (!ToolPolicy.sourceKeySpaces.containsKey(lowerKey) || !allowed.test(lowerKey)) {
+            if (!ToolPolicy.hasSourceKeySpace(key) || !allowed.test(key)) {
                 return;
             }
             String handle = value.asText().strip();
@@ -253,7 +252,7 @@ final class SourceToolCodec {
 
     private void registerToolArgumentValue(String key, JsonNode value, java.util.function.Predicate<String> allowed) {
         if (value.isTextual()) {
-            if (allowed.test(key.toLowerCase())) {
+            if (allowed.test(key)) {
                 registerSourceIDByKey(key, value.asText(), false);
             }
         } else if (value.isArray()) {
@@ -278,7 +277,7 @@ final class SourceToolCodec {
         if (value.isEmpty() || SourceRegistry.SHORT_SOURCE_HANDLE.matcher(value).matches()) {
             return;
         }
-        ToolPolicy.SourceKeySpace space = ToolPolicy.sourceKeySpaces.get(key.toLowerCase());
+        ToolPolicy.SourceKeySpace space = ToolPolicy.sourceKeySpaceOf(key);
         if (space == null) {
             return;
         }
@@ -333,7 +332,7 @@ final class SourceToolCodec {
     private JsonNode walkJSON(String key, JsonNode value, boolean encode, java.util.function.Predicate<String> allowed) {
         if (value.isTextual()) {
             String typed = value.asText();
-            if (!allowed.test(key.toLowerCase())) {
+            if (!allowed.test(key)) {
                 return value;
             }
             if (encode) {
@@ -342,7 +341,7 @@ final class SourceToolCodec {
                 return handle.isEmpty() ? value : TextNode.valueOf(handle);
             }
             // 解码只针对 ID 键，且值是 handle 形状时才替换
-            if (!ToolPolicy.sourceKeySpaces.containsKey(key.toLowerCase())) {
+            if (!ToolPolicy.hasSourceKeySpace(key)) {
                 return value;
             }
             if (!SourceRegistry.SHORT_SOURCE_HANDLE.matcher(typed.strip()).matches()) {

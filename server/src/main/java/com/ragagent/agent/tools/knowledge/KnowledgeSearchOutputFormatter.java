@@ -86,7 +86,7 @@ final class KnowledgeSearchOutputFormatter {
     ToolResult formatOutput(List<ResultWithMeta> results, List<String> kbsToSearch, List<String> queries) {
         if (results.isEmpty()) {
             Map<String, Object> data = new LinkedHashMap<>();
-            data.put("knowledge_base_ids", kbsToSearch);
+            data.put("knowledgeBaseIds", kbsToSearch);
             data.put("results", List.of());
             data.put("count", 0);
             if (!queries.isEmpty()) {
@@ -224,16 +224,16 @@ final class KnowledgeSearchOutputFormatter {
             }
 
             Map<String, Object> formatted = new LinkedHashMap<>();
-            formatted.put("result_index", i + 1);
+            formatted.put("resultIndex", i + 1);
             formatted.put("content", nz(result.sr.content));
-            formatted.put("knowledge_id", nz(result.sr.knowledgeId));
-            formatted.put("knowledge_base_id", nz(result.sr.knowledgeBaseId));
-            formatted.put("knowledge_title", nz(result.sr.knowledgeTitle));
-            formatted.put("knowledge_metadata", nz(result.sr.knowledgeCustomMetadata));
-            formatted.put("match_type", result.sr.matchType);
-            formatted.put("source_query", sourceQuery);
-            formatted.put("query_type", nz(result.queryType));
-            formatted.put("knowledge_base_type", nz(result.knowledgeBaseType));
+            formatted.put("knowledgeId", nz(result.sr.knowledgeId));
+            formatted.put("knowledgeBaseId", nz(result.sr.knowledgeBaseId));
+            formatted.put("knowledgeTitle", nz(result.sr.knowledgeTitle));
+            formatted.put("knowledgeMetadata", nz(result.sr.knowledgeCustomMetadata));
+            formatted.put("matchType", result.sr.matchType);
+            formatted.put("sourceQuery", sourceQuery);
+            formatted.put("queryType", nz(result.queryType));
+            formatted.put("knowledgeBaseType", nz(result.knowledgeBaseType));
             formattedResults.add(formatted);
 
             Map<String, Object> last = formatted;
@@ -249,7 +249,7 @@ final class KnowledgeSearchOutputFormatter {
                         imgData.put("caption", img.caption());
                     }
                     if (!nz(img.ocrText()).isEmpty()) {
-                        imgData.put("ocr_text", img.ocrText());
+                        imgData.put("ocrText", img.ocrText());
                     }
                     if (!imgData.isEmpty()) {
                         imageList.add(imgData);
@@ -261,18 +261,18 @@ final class KnowledgeSearchOutputFormatter {
             }
 
             if (faqMeta != null) {
-                last.put("faq_id", nz(result.sr.id));
+                last.put("faqId", nz(result.sr.id));
                 last.put("index", result.sr.chunkIndex);
                 if (!nz(faqMeta.standardQuestion).isEmpty()) {
-                    last.put("faq_standard_question", faqMeta.standardQuestion);
+                    last.put("faqStandardQuestion", faqMeta.standardQuestion);
                 }
                 FaqSnippet.appendSimilarQuestionsToChunkData(last, faqMeta.similarQuestions);
                 if (faqMeta.answers != null && !faqMeta.answers.isEmpty()) {
-                    last.put("faq_answers", faqMeta.answers);
+                    last.put("faqAnswers", faqMeta.answers);
                 }
             } else {
-                last.put("chunk_id", nz(result.sr.id));
-                last.put("chunk_index", result.sr.chunkIndex);
+                last.put("chunkId", nz(result.sr.id));
+                last.put("chunkIndex", result.sr.chunkIndex);
             }
         }
 
@@ -295,11 +295,11 @@ final class KnowledgeSearchOutputFormatter {
         ob.append("</search_results>");
 
         Map<String, Object> data = new LinkedHashMap<>();
-        data.put("knowledge_base_ids", kbsToSearch);
+        data.put("knowledgeBaseIds", kbsToSearch);
         data.put("results", formattedResults);
         data.put("count", formattedResults.size());
-        data.put("kb_counts", kbCounts);
-        data.put("display_type", "search_results");
+        data.put("kbCounts", kbCounts);
+        data.put("displayType", "search_results");
         if (!queries.isEmpty()) {
             data.put("queries", queries);
         }

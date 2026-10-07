@@ -21,6 +21,12 @@ Map / MyBatis 列名等非 JSON 键**（如 `*Repository` 的 `deleted_at`），
 清单**而非违规清单；棘轮模式（默认）只有在基线外**新增**命中时才失败，不会因为既有噪音而红。
 判定某键是真债还是冻结/数据值时，**必须看消费者**（FE 读？夹具断言？第三方 API？）。
 
+**2026-10-08（B88）**：工具面（`agent/tools/**` 及 agent 管线消费侧）已全量 camel 化，
+原先整目录的 `agent/tools/` 冻结豁免已摘除；该目录残留的 snake 仅限三类并逐条登记在本脚本 BASELINE：
+① 外部载荷读侧（docreader image_info 的 `original_url`/`ocr_text` 等，键名由对方服务决定）、
+② MyBatis/JDBC 列名与 SQL 参数、③ 第三方面（websearch metadata `published_at` 等）。
+工具**名**（`wiki_write_page` 等 36 个）与工具 schema 的 **enum 值**（`list_servers`/`list_tools`…）按 §2.4「字段名 camel、值按各自语义」保留 snake。
+
 **BASELINE 条目是文件级**：某文件登记后，将来在其中**新增**的 snake 键不会被点名——
 在已登记文件里加新键时，请先看该文件是否在基线（或按族核查）。
 """
@@ -42,7 +48,7 @@ FROZEN_PREFIXES = (
     'common/wiki/ExtractedItem', 'chatpipeline/plugin', 'agent/AgentEngine',
     'agent/ReActIteration', 'retrieval/HybridSearchService', 'retrieval/vlm/VlmClient',
     'knowledge/service/ChunkExtractService', 'knowledge/task/KnowledgeProcessWorker',
-    'memory/mapper', 'agent/tools/', 'knowledge/domain/KnowledgeBase', 'mcp/domain/McpService',
+    'memory/mapper', 'knowledge/domain/KnowledgeBase', 'mcp/domain/McpService',
     # 上游 API 载荷的适配器族（embedding/im/websearch/rerank/asr/vlm 的 provider 与客户端：
     # 键名由对方 API 定，冻结）
     'embedding/provider', 'im/', 'websearch/provider', 'rerank/', 'asr/', 'vlm/',
@@ -61,6 +67,8 @@ BASELINE: dict[str, set[str]] = {
     'agent/ActPhase.java': {'args_redacted', 'argument_resolution', 'data_keys', 'duration_ms', 'image_count', 'mcp_service', 'mcp_tool', 'model_arg_keys', 'model_arguments', 'output_len', 'resolved_arg_keys', 'resolved_arguments', 'session_id', 'tool_call_id', 'tool_index', 'unresolved_handle_count', 'unresolved_handles'},
     # 模板令牌（数据值，非 JSON 键）
     'agent/AgentPrompts.java': {'current_time', 'web_search_status'},
+    # 工具名（模型可见的函数名；§2.4 只管字段名，B88 决策：工具名与 enum 值保留 snake）
+    'agent/tools/ToolCapabilities.java': {'data_analysis', 'data_schema', 'database_query', 'get_document_info', 'grep_chunks', 'knowledge_search', 'list_knowledge_chunks', 'query_knowledge_graph', 'todo_write', 'wiki_delete_page', 'wiki_flag_issue', 'wiki_read_issue', 'wiki_read_page', 'wiki_read_source_doc', 'wiki_rename_page', 'wiki_replace_text', 'wiki_search', 'wiki_update_issue', 'wiki_write_page'},
     # 审计 details jsonb（存量 + 回放）
     'audit/service/AuditLogService.java': {'raw_path', 'required_role'},
     # MyBatis 列名/参数（非 JSON 键）

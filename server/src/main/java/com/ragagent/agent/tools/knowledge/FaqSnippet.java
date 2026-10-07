@@ -65,9 +65,9 @@ public final class FaqSnippet {
         if (d.display().isEmpty()) {
             return;
         }
-        chunkData.put("faq_similar_questions", d.display());
+        chunkData.put("faqSimilarQuestions", d.display());
         if (d.omitted() > 0) {
-            chunkData.put("faq_similar_questions_omitted", d.omitted());
+            chunkData.put("faqSimilarQuestionsOmitted", d.omitted());
         }
     }
 
@@ -148,10 +148,10 @@ public final class FaqSnippet {
         if (c == null || !isFaqChunk(c) || chunkData == null) {
             return;
         }
-        chunkData.put("faq_id", c.getId());
+        chunkData.put("faqId", c.getId());
         chunkData.put("index", c.getChunkIndex());
-        chunkData.remove("chunk_id");
-        chunkData.remove("chunk_index");
+        chunkData.remove("chunkId");
+        chunkData.remove("chunkIndex");
     }
 
     /** FAQ 元数据附加进结构化结果 map。 */
@@ -165,11 +165,11 @@ public final class FaqSnippet {
         }
         String q = meta.standardQuestion == null ? "" : meta.standardQuestion.strip();
         if (!q.isEmpty()) {
-            chunkData.put("faq_question", q);
+            chunkData.put("faqQuestion", q);
         }
         appendSimilarQuestionsToChunkData(chunkData, meta.similarQuestions);
         if (meta.answers != null && !meta.answers.isEmpty()) {
-            chunkData.put("faq_answers", meta.answers);
+            chunkData.put("faqAnswers", meta.answers);
         }
     }
 

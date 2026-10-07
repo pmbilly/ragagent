@@ -93,8 +93,8 @@ export function groupPostprocessGraphSpans(
     startedAt: start === null ? null : new Date(start).toISOString(),
     finishedAt: end === null ? null : new Date(end).toISOString(),
     durationMs: start !== null && end !== null ? Math.max(0, end - start) : undefined,
-    input: { chunk_count: graphChildren.length },
-    output: { chunk_count: graphChildren.length, status_counts: counts },
+    input: { chunkCount: graphChildren.length },
+    output: { chunkCount: graphChildren.length, status_counts: counts },
     children: graphChildren,
   }
 

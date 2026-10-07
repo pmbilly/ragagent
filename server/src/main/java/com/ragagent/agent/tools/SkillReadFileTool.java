@@ -32,7 +32,7 @@ public class SkillReadFileTool extends BaseTool {
 
     /** 录像 read_file/schema 逐字。 */
     private static final String SCHEMA_JSON = """
-            {"type":"object","properties":{"path":{"type":"string","description":"Workspace path, skill:// resource, or saved web:// page"},"line_offset":{"type":"integer","description":"Web only: character offset within a long line"},"offset":{"type":"integer","description":"1-based line number; continue at next_offset"},"limit":{"type":"integer","description":"Maximum lines to return; defaults to 2000."},"max_bytes":{"type":"integer","description":"Text byte budget; at most 65536 (web: 51200)"}},"required":["path"],"additionalProperties":false}""";
+            {"type":"object","properties":{"path":{"type":"string","description":"Workspace path, skill:// resource, or saved web:// page"},"lineOffset":{"type":"integer","description":"Web only: character offset within a long line"},"offset":{"type":"integer","description":"1-based line number; continue at next_offset"},"limit":{"type":"integer","description":"Maximum lines to return; defaults to 2000."},"maxBytes":{"type":"integer","description":"Text byte budget; at most 65536 (web: 51200)"}},"required":["path"],"additionalProperties":false}""";
 
     /** 录像 read_file/description_skills_noshell 逐字。 */
     private static final String TOOL_DESCRIPTION = """
@@ -67,7 +67,7 @@ public class SkillReadFileTool extends BaseTool {
     public ToolResult execute(ToolRequest request) {
         JsonNode args = request.args();
         String path = args == null ? "" : args.path("path").asText("");
-        if (args != null && args.path("line_offset").asInt(0) != 0) {
+        if (args != null && args.path("lineOffset").asInt(0) != 0) {
             // 录像：line_offset 只对保存的 web:// 页面有意义
             return fail(ERR_LINE_OFFSET);
         }
@@ -113,7 +113,7 @@ public class SkillReadFileTool extends BaseTool {
     private ToolResult readResult(String skillName, String uri, String relative, String content, JsonNode args) {
         int offset = args == null ? 1 : Math.max(1, args.path("offset").asInt(1));
         int limit = args == null ? DEFAULT_LIMIT : args.path("limit").asInt(DEFAULT_LIMIT);
-        int maxBytes = args == null ? MAX_BYTES : args.path("max_bytes").asInt(MAX_BYTES);
+        int maxBytes = args == null ? MAX_BYTES : args.path("maxBytes").asInt(MAX_BYTES);
         if (limit <= 0) {
             limit = DEFAULT_LIMIT;
         }
@@ -126,19 +126,19 @@ public class SkillReadFileTool extends BaseTool {
 
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("binary", false);
-        data.put("end_line", slice.endLine());
-        data.put("file_path", relative);
+        data.put("endLine", slice.endLine());
+        data.put("filePath", relative);
         data.put("path", uri);
-        data.put("returned_bytes", slice.returnedBytes());
+        data.put("returnedBytes", slice.returnedBytes());
         data.put("root", "skill://" + skillName);
-        data.put("session_id", "");
+        data.put("sessionId", "");
         data.put("size", size);
-        data.put("skill_name", skillName);
-        data.put("start_line", slice.startLine());
-        data.put("total_lines", slice.totalLines());
+        data.put("skillName", skillName);
+        data.put("startLine", slice.startLine());
+        data.put("totalLines", slice.totalLines());
         data.put("truncated", slice.truncated());
         if (slice.truncated()) {
-            data.put("next_offset", slice.nextOffset());
+            data.put("nextOffset", slice.nextOffset());
         }
 
         ToolResult result = new ToolResult();

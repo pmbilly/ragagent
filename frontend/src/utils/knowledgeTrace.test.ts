@@ -46,7 +46,7 @@ test('groups graph chunks and reports their wall-clock duration', () => {
   assert.equal(graph?.durationMs, 3000)
   assert.equal(graph?.children?.length, 2)
   assert.deepEqual(graph?.output, {
-    chunk_count: 2,
+    chunkCount: 2,
     status_counts: { done: 2 },
   })
 })

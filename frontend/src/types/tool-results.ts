@@ -31,30 +31,30 @@ export type DisplayType =
 
 // Search result item
 export interface SearchResultItem {
-    result_index: number;
-    chunk_id: string;
+    resultIndex: number;
+    chunkId: string;
     content: string;
     score: number;
-    relevance_level: RelevanceLevel;
-    knowledge_id: string;
-    knowledge_base_id?: string;
-    knowledge_title: string;
-    match_type: string;
-    knowledge_base_type?: string;
+    relevanceLevel: RelevanceLevel;
+    knowledgeId: string;
+    knowledgeBaseId?: string;
+    knowledgeTitle: string;
+    matchType: string;
+    knowledgeBaseType?: string;
     // FAQ entries share the owning document's title; the standard question
     // gives each entry a distinct, human-readable label.
-    faq_standard_question?: string;
-    faq_similar_questions?: string[];
-    faq_answers?: string[];
+    faqStandardQuestion?: string;
+    faqSimilarQuestions?: string[];
+    faqAnswers?: string[];
 }
 
 // Chunk item
 export interface ChunkItem {
     index: number;
-    chunk_id: string;
-    chunk_index: number;
+    chunkId: string;
+    chunkIndex: number;
     content: string;
-    knowledge_id: string;
+    knowledgeId: string;
 }
 
 // Knowledge base item
@@ -73,65 +73,65 @@ export interface GraphConfig {
 
 // Search results data
 export interface SearchResultsData {
-    display_type: 'search_results';
+    displayType: 'search_results';
     results?: SearchResultItem[];
     count?: number;
-    kb_counts?: Record<string, number>;
+    kbCounts?: Record<string, number>;
     query?: string;
-    knowledge_base_id?: string;
+    knowledgeBaseId?: string;
 }
 
 // Chunk detail data
 export interface ChunkDetailData {
-    display_type: 'chunk_detail';
-    chunk_id: string;
+    displayType: 'chunk_detail';
+    chunkId: string;
     content: string;
-    chunk_index: number;
-    knowledge_id: string;
+    chunkIndex: number;
+    knowledgeId: string;
     content_length?: number;
 }
 
 // Related chunks data
 export interface RelatedChunksData {
-    display_type: 'related_chunks';
-    chunk_id: string;
+    displayType: 'related_chunks';
+    chunkId: string;
     count: number;
     chunks: ChunkItem[];
 }
 
 // Knowledge base list data
 export interface KnowledgeBaseListData {
-    display_type: 'knowledge_base_list';
+    displayType: 'knowledge_base_list';
     knowledge_bases: KnowledgeBaseItem[];
     count: number;
 }
 
 // Document info data
 export interface DocumentInfoDocument {
-    knowledge_id?: string;
-    faq_id?: string;
-    chunk_id?: string;
+    knowledgeId?: string;
+    faqId?: string;
+    chunkId?: string;
     title: string;
-    faq_question?: string;
-    faq_answers?: string[];
-    faq_similar_questions?: string[];
-    is_faq?: boolean;
+    faqQuestion?: string;
+    faqAnswers?: string[];
+    faqSimilarQuestions?: string[];
+    isFaq?: boolean;
     description?: string;
     type?: string;
     source?: string;
     channel?: string;
-    file_name?: string;
-    file_type?: string;
-    file_size?: number;
-    parse_status?: string;
-    chunk_count?: number;
+    fileName?: string;
+    fileType?: string;
+    fileSize?: number;
+    parseStatus?: string;
+    chunkCount?: number;
     metadata?: Record<string, any>;
 }
 
 export interface DocumentInfoData {
-    display_type: 'document_info';
+    displayType: 'document_info';
     documents?: DocumentInfoDocument[];
-    total_docs: number;
+    totalDocs: number;
     requested: number;
     errors?: string[];
     title?: string;
@@ -139,15 +139,15 @@ export interface DocumentInfoData {
 
 // Graph query results data
 export interface GraphQueryResultsData {
-    display_type: 'graph_query_results';
+    displayType: 'graph_query_results';
     results: SearchResultItem[];
     count: number;
-    graph_config: GraphConfig;
+    graphConfig: GraphConfig;
 }
 
 // Thinking data
 export interface ThinkingData {
-    display_type: 'thinking';
+    displayType: 'thinking';
     thought: string;
 }
 
@@ -160,42 +160,42 @@ export interface PlanStep {
 
 // Plan data
 export interface PlanData {
-    display_type: 'plan';
+    displayType: 'plan';
     task: string;
     steps: PlanStep[];
-    total_steps: number;
+    totalSteps: number;
 }
 
 // Database query data
 export interface DatabaseQueryData {
-    display_type: 'database_query';
+    displayType: 'database_query';
     columns: string[];
     rows: Array<Record<string, any>>;
-    row_count: number;
+    rowCount: number;
 }
 
 // Web search result item
 export interface WebSearchResultItem {
-    result_index: number;
+    resultIndex: number;
     title: string;
     url: string;
     snippet?: string;
     content?: string;
     source?: string;
-    published_at?: string;
+    publishedAt?: string;
     age?: string;
-    page_status?: 'success' | 'failed';
-    page_verified?: boolean;
-    page_content?: string;
-    page_error?: string;
-    page_truncated?: boolean;
-    full_output_path?: string;
-    storage_error?: string;
+    pageStatus?: 'success' | 'failed';
+    pageVerified?: boolean;
+    pageContent?: string;
+    pageError?: string;
+    pageTruncated?: boolean;
+    fullOutputPath?: string;
+    storageError?: string;
 }
 
 // Web search results data
 export interface WebSearchResultsData {
-    display_type: 'web_search_results';
+    displayType: 'web_search_results';
     query: string;
     results: WebSearchResultItem[];
     count: number;
@@ -206,20 +206,20 @@ export interface WebFetchResultItem {
     url: string;
     status?: 'success' | 'failed' | 'skipped';
     retryable?: boolean;
-    error_code?: string;
+    errorCode?: string;
     error_message?: string;
     summary?: string;
     summary_status?: string;
     summary_error_code?: string;
     summary_error_message?: string;
-    full_output_path?: string;
-    storage_error?: string;
-    raw_content?: string;
+    fullOutputPath?: string;
+    storageError?: string;
+    rawContent?: string;
     content_length?: number;
     offset?: number;
-    returned_chars?: number;
+    returnedChars?: number;
     truncated?: boolean;
-    next_offset?: number;
+    nextOffset?: number;
     method?: string;
     /** @deprecated use error_message */
     error?: string;
@@ -227,110 +227,110 @@ export interface WebFetchResultItem {
 
 // Web fetch results data
 export interface WebFetchResultsData {
-    display_type: 'web_fetch_results';
+    displayType: 'web_fetch_results';
     results: WebFetchResultItem[];
     count?: number;
-    successful_count?: number;
-    failed_count?: number;
-    skipped_count?: number;
-    all_failed?: boolean;
+    successfulCount?: number;
+    failedCount?: number;
+    skippedCount?: number;
+    allFailed?: boolean;
 }
 
-// Grep knowledge aggregation item (legacy, grouped by knowledge_id)
+// Grep knowledge aggregation item (legacy, grouped by knowledgeId)
 export interface GrepKnowledgeResult {
-    knowledge_id: string;
-    knowledge_base_id: string;
-    knowledge_title: string;
-    faq_question?: string;
-    title_match?: boolean;
-    chunk_hit_count: number;
-    match_snippet?: string;
-    pattern_counts: Record<string, number>;
-    total_pattern_hits: number;
-    distinct_patterns: number;
+    knowledgeId: string;
+    knowledgeBaseId: string;
+    knowledgeTitle: string;
+    faqQuestion?: string;
+    titleMatch?: boolean;
+    chunkHitCount: number;
+    matchSnippet?: string;
+    patternCounts: Record<string, number>;
+    totalPatternHits: number;
+    distinctPatterns: number;
 }
 
 // Per-chunk grep hit (preferred for UI — one row per FAQ entry or chunk)
 export interface GrepChunkResult {
-    chunk_id: string;
-    faq_id?: string;
-    knowledge_id: string;
-    knowledge_base_id: string;
-    knowledge_title: string;
-    chunk_type?: string;
+    chunkId: string;
+    faqId?: string;
+    knowledgeId: string;
+    knowledgeBaseId: string;
+    knowledgeTitle: string;
+    chunkType?: string;
     index?: number;
-    chunk_index?: number;
-    faq_question?: string;
-    title_match?: boolean;
-    match_snippet?: string;
+    chunkIndex?: number;
+    faqQuestion?: string;
+    titleMatch?: boolean;
+    matchSnippet?: string;
     score?: number;
 }
 
 // Grep results data
 export interface GrepResultsData {
-    display_type: 'grep_results';
+    displayType: 'grep_results';
     query?: string;
     patterns: string[];
-    chunk_results?: GrepChunkResult[];
-    knowledge_results: GrepKnowledgeResult[];
-    result_count: number;
-    document_count?: number;
-    total_matches: number;
-    knowledge_base_ids?: string[];
+    chunkResults?: GrepChunkResult[];
+    knowledgeResults: GrepKnowledgeResult[];
+    resultCount: number;
+    documentCount?: number;
+    totalMatches: number;
+    knowledgeBaseIds?: string[];
     limit?: number;
-    max_results: number;
+    maxResults: number;
 }
 
 // Knowledge chunks list data (list_knowledge_chunks tool)
 export interface KnowledgeChunksListData {
-    display_type: 'knowledge_chunks_list';
-    knowledge_id?: string;
-    knowledge_title?: string;
-    total_chunks?: number;
-    fetched_chunks?: number;
+    displayType: 'knowledge_chunks_list';
+    knowledgeId?: string;
+    knowledgeTitle?: string;
+    totalChunks?: number;
+    fetchedChunks?: number;
     page?: number;
-    page_size?: number;
-    faq_question?: string;
-    faq_id?: string;
-    single_chunk?: boolean;
+    pageSize?: number;
+    faqQuestion?: string;
+    faqId?: string;
+    singleChunk?: boolean;
 }
 
 // Wiki write page data
 export interface WikiWritePageData {
-    display_type: 'wiki_write_page';
+    displayType: 'wiki_write_page';
     action: 'created' | 'updated';
     slug: string;
     title: string;
-    page_type: string;
+    pageType: string;
     summary: string;
 }
 
 // Wiki replace text data
 export interface WikiReplaceTextData {
-    display_type: 'wiki_replace_text';
+    displayType: 'wiki_replace_text';
     slug: string;
     title: string;
-    old_text: string;
-    new_text: string;
+    oldText: string;
+    newText: string;
 }
 
 // Wiki rename page data
 export interface WikiRenamePageData {
-    display_type: 'wiki_rename_page';
-    old_slug: string;
-    new_slug: string;
+    displayType: 'wiki_rename_page';
+    oldSlug: string;
+    newSlug: string;
     title: string;
-    updated_count: number;
-    affected_pages?: string[];
+    updatedCount: number;
+    affectedPages?: string[];
 }
 
 // Wiki delete page data
 export interface WikiDeletePageData {
-    display_type: 'wiki_delete_page';
+    displayType: 'wiki_delete_page';
     slug: string;
     title: string;
-    updated_count: number;
-    affected_pages?: string[];
+    updatedCount: number;
+    affectedPages?: string[];
 }
 
 // Union type for all wiki edit data
@@ -365,6 +365,6 @@ export interface ActionData {
     output?: string;
     error?: string;
     details?: boolean;
-    display_type?: DisplayType;
+    displayType?: DisplayType;
     tool_data?: Record<string, any>;
 }

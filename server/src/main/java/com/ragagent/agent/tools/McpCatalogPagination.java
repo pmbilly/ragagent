@@ -33,8 +33,8 @@ final class McpCatalogPagination {
         if (!"list_servers".equals(args.mode())) {
             page.notice = McpCatalog.MCP_EXTERNAL_DATA_NOTICE;
             page.nextStep = "Choose a tool, then use discover_mcp_tools(mode=\"describe\", "
-                    + "server_id=<its server_id>, tool_name=<its name>) to read the full input_schema and obtain "
-                    + "a callable tool_ref. Do not call from this summary.";
+                    + "serverId=<its serverId>, toolName=<its name>) to read the full inputSchema and obtain "
+                    + "a callable toolRef. Do not call from this summary.";
         }
         // 服务顺序按 ID。运行状态与可编辑的展示元数据不改变成员资格，不得使进行中的遍历失效。
         List<String> serverIds = new ArrayList<>();
@@ -53,9 +53,9 @@ final class McpCatalogPagination {
         if (page.tools != null) {
             for (McpToolSummary t : page.tools) {
                 Map<String, Object> ts = new LinkedHashMap<>();
-                ts.put("tool_ref", t.toolRef);
-                ts.put("server_id", t.serverId);
-                ts.put("server_name", t.serverName);
+                ts.put("toolRef", t.toolRef);
+                ts.put("serverId", t.serverId);
+                ts.put("serverName", t.serverName);
                 ts.put("name", t.name);
                 ts.put("description", t.description);
                 toolSeeds.add(ts);
@@ -195,13 +195,13 @@ final class McpCatalogPagination {
                 ids.size()) + preview;
         // ID 对这个受限定目录是稳定的。把它们枚举进 schema，模型就会选授权的标识符
         // 而不是从散文里复现自由格式的 UUID。空目录省掉 enum，list_servers 仍是合法调用。
-        String discoveryParameters = McpCatalog.mcpSchemaWithEnum(McpCatalog.MCP_DISCOVERY_SCHEMA, "server_id", ids);
+        String discoveryParameters = McpCatalog.mcpSchemaWithEnum(McpCatalog.MCP_DISCOVERY_SCHEMA, "serverId", ids);
         registry.registerTool(new McpDiscoverTool(
                 ToolDefinitions.TOOL_DISCOVER_MCP_TOOLS, description, discoveryParameters, c));
         registry.registerTool(new McpCallTool(
                 ToolDefinitions.TOOL_CALL_MCP_TOOL,
-                "Call an authorized MCP tool using tool_ref returned by discover_mcp_tools. Read its "
-                        + "full input_schema with describe before calling; listing does not enable execution. "
+                "Call an authorized MCP tool using toolRef returned by discover_mcp_tools. Read its "
+                        + "full inputSchema with describe before calling; listing does not enable execution. "
                         + "Pass the original tool arguments in arguments as a JSON object, never a JSON-encoded string. "
                         + "Discovery does not bypass approval or permissions.",
                 McpCatalog.MCP_CALL_SCHEMA, c, registry));

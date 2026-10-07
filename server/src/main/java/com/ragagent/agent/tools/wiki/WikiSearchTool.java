@@ -33,7 +33,7 @@ public class WikiSearchTool extends BaseTool {
                   "type": "integer",
                   "description": "Max results to return per query (default 10)"
                 },
-                "knowledge_base_id": {
+                "knowledgeBaseId": {
                   "type": "string",
                   "description": "Optional: restrict search to a single short bN knowledge base ID in scope."
                 }
@@ -91,7 +91,7 @@ public class WikiSearchTool extends BaseTool {
         }
 
         // knowledge_base_id 参数限制 scope
-        String restrictKb = args.path("knowledge_base_id").asText("");
+        String restrictKb = args.path("knowledgeBaseId").asText("");
         List<WikiScope> effectiveScopes = scopes;
         if (!restrictKb.isEmpty()) {
             List<WikiScope> filtered = new ArrayList<>();
@@ -207,7 +207,7 @@ public class WikiSearchTool extends BaseTool {
         result.setSuccess(true);
         result.setOutput(output.toString());
         Map<String, Object> data = new LinkedHashMap<>();
-        data.put("found_kbs", foundKBs);
+        data.put("foundKbs", foundKBs);
         result.setData(data);
         return result;
     }

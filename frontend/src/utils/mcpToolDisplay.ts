@@ -1,14 +1,34 @@
 import type { ComposerTranslation } from 'vue-i18n'
 
 const discoveryFields = [
-  'mode', 'servers', 'tools', 'total', 'has_more', 'next_cursor', 'next_step',
-  'notice', 'status', 'name', 'description', 'input_schema', 'tool_ref', 'server_id',
-  'server_name',
+  'mode', 'servers', 'tools', 'total', 'hasMore', 'nextCursor', 'nextStep',
+  'notice', 'status', 'name', 'description', 'inputSchema', 'toolRef', 'serverId',
+  'serverName',
 ] as const
+
+/** 历史载荷（工具面改名前的 snake 键）→ 现行 camel：只补缺，不覆盖新载荷。 */
+const legacyDiscoveryKeys: Record<string, string> = {
+  has_more: 'hasMore',
+  next_cursor: 'nextCursor',
+  next_step: 'nextStep',
+  input_schema: 'inputSchema',
+  tool_ref: 'toolRef',
+  server_id: 'serverId',
+  server_name: 'serverName',
+  usage_instructions: 'usageInstructions',
+}
+
+function withLegacyKeys(source: Record<string, unknown>): Record<string, unknown> {
+  const out: Record<string, unknown> = { ...source }
+  for (const [snake, camel] of Object.entries(legacyDiscoveryKeys)) {
+    if (out[camel] === undefined && out[snake] !== undefined) out[camel] = out[snake]
+  }
+  return out
+}
 
 function record(value: unknown): Record<string, unknown> {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
-    ? value as Record<string, unknown> : {}
+    ? withLegacyKeys(value as Record<string, unknown>) : {}
 }
 
 function discoveryOverlay(data?: unknown): Record<string, unknown> {
@@ -25,7 +45,7 @@ function discoveryOverlay(data?: unknown): Record<string, unknown> {
 export function parseMcpDiscovery(output?: string, data?: unknown): Record<string, unknown> {
   let parsed = {}
   try { parsed = record(JSON.parse(output || '')) } catch { /* Error or truncated historical output. */ }
-  return { ...parsed, ...discoveryOverlay(data) }
+  return withLegacyKeys({ ...parsed, ...discoveryOverlay(data) })
 }
 
 export function mcpDescriptionLead(text: string): string {
@@ -52,10 +72,10 @@ export function mcpDiscoveryRows(data: Record<string, unknown>) {
     if (typeof row.name !== 'string') return []
     return [{
       name: row.name,
-      description: typeof row.usage_instructions === 'string' && row.usage_instructions
-        ? row.usage_instructions : typeof row.description === 'string' ? row.description : '',
+      description: typeof row.usageInstructions === 'string' && row.usageInstructions
+        ? row.usageInstructions : typeof row.description === 'string' ? row.description : '',
       status: typeof row.status === 'string' ? row.status : '',
-      serverName: typeof row.server_name === 'string' ? row.server_name : '',
+      serverName: typeof row.serverName === 'string' ? row.serverName : '',
     }]
   })
 }
@@ -97,7 +117,7 @@ export function getMcpToolTitle(t: ComposerTranslation, event: {
   if (!getMcpToolDisplayType(event.tool_name)) return ''
   const data = parseMcpDiscovery(event.output, event.tool_data)
   const args = typeof event.arguments === 'string' ? parseMcpDiscovery(event.arguments) : record(event.arguments)
-  const mode = data.mode || args.mode || ('input_schema' in data ? 'describe' : '')
+  const mode = data.mode || args.mode || ('inputSchema' in data ? 'describe' : '')
   const keys: Record<string, string> = {
     list_servers: 'agentStream.mcp.listServers',
     list_tools: 'agentStream.mcp.listTools',
@@ -106,7 +126,7 @@ export function getMcpToolTitle(t: ComposerTranslation, event: {
   }
   const label = t(event.tool_name === 'call_mcp_tool' ? 'agentStream.mcp.callTool' : keys[String(mode)] || 'agentStream.mcp.discoverTools')
   const describeName = mode === 'describe' ? data.name || args.tool_name : ''
-  const serverName = typeof data.server_name === 'string' ? data.server_name : ''
+  const serverName = typeof data.serverName === 'string' ? data.serverName : ''
   const suffix = describeName || ((mode === 'list_tools' || mode === 'search') ? serverName : '')
   const title = suffix && typeof suffix === 'string' ? `${label}：${suffix}` : label
   if (event.pending) return t('agentStream.toolStatus.calling', { name: title })

@@ -40,12 +40,12 @@ export function normalizeKnowledgeReference(raw: Record<string, any> | null | un
   return {
     id: raw.id,
     chunk_ids: raw.chunkIds ?? raw.chunk_ids,
-    knowledge_id: raw.knowledgeId ?? raw.knowledge_id,
-    knowledge_title: raw.knowledgeTitle ?? raw.knowledge_title,
+    knowledgeId: raw.knowledgeId ?? raw.knowledge_id,
+    knowledgeTitle: raw.knowledgeTitle ?? raw.knowledge_title,
     knowledge_filename: raw.knowledgeFilename ?? raw.knowledge_filename,
-    knowledge_base_id: raw.knowledgeBaseId ?? raw.knowledge_base_id,
-    chunk_index: raw.chunkIndex ?? raw.chunk_index,
-    chunk_type: raw.chunkType ?? raw.chunk_type,
+    knowledgeBaseId: raw.knowledgeBaseId ?? raw.knowledge_base_id,
+    chunkIndex: raw.chunkIndex ?? raw.chunk_index,
+    chunkType: raw.chunkType ?? raw.chunk_type,
     content: raw.content,
     metadata: raw.metadata,
   }
@@ -135,11 +135,11 @@ export function formatReferenceSnippet(text: string | undefined): string {
 }
 
 function isWebReference(item: KnowledgeReferenceLike): boolean {
-  return item.chunk_type === 'web_search'
+  return item.chunkType === 'web_search'
 }
 
 function isToolReference(item: KnowledgeReferenceLike): boolean {
-  return item.chunk_type === 'tool_result'
+  return item.chunkType === 'tool_result'
 }
 
 function isLikelyUrl(text: string): boolean {
@@ -160,7 +160,7 @@ function resolveWebTitle(item: KnowledgeReferenceLike, url: string, domain: stri
   const metaTitle = item.metadata?.title?.trim()
   if (metaTitle && !isLikelyUrl(metaTitle)) return metaTitle
 
-  const knowledgeTitle = item.knowledge_title?.trim()
+  const knowledgeTitle = item.knowledgeTitle?.trim()
   if (
     knowledgeTitle &&
     !isLikelyUrl(knowledgeTitle) &&
@@ -197,11 +197,11 @@ function buildWebItem(item: KnowledgeReferenceLike, index: number): ReferenceLis
 }
 
 function buildDocumentItem(item: KnowledgeReferenceLike, index: number): ReferenceListItem {
-  const chunkId = item.id || `${item.knowledge_id || 'doc'}-${item.chunk_index ?? index}`
-  const title = item.knowledge_title || item.knowledge_filename || item.knowledge_id || 'Document'
+  const chunkId = item.id || `${item.knowledgeId || 'doc'}-${item.chunkIndex ?? index}`
+  const title = item.knowledgeTitle || item.knowledge_filename || item.knowledgeId || 'Document'
   const documentKey =
-    item.knowledge_id ||
-    [item.knowledge_base_id, item.knowledge_title || item.knowledge_filename].filter(Boolean).join(':') ||
+    item.knowledgeId ||
+    [item.knowledgeBaseId, item.knowledgeTitle || item.knowledge_filename].filter(Boolean).join(':') ||
     chunkId
   return {
     key: `doc:${documentKey}`,
@@ -210,8 +210,8 @@ function buildDocumentItem(item: KnowledgeReferenceLike, index: number): Referen
     title,
     chunkId,
     chunkIds: item.chunk_ids,
-    knowledgeId: item.knowledge_id,
-    knowledgeBaseId: item.knowledge_base_id,
+    knowledgeId: item.knowledgeId,
+    knowledgeBaseId: item.knowledgeBaseId,
     snippet: truncateText(item.content || '', 220) || undefined,
     content: item.content,
   }
@@ -223,7 +223,7 @@ function buildToolItem(item: KnowledgeReferenceLike, index: number): ReferenceLi
     key: `tool:${id}`,
     kind: 'tool',
     index,
-    title: item.knowledge_title || item.metadata?.title || 'Tool result',
+    title: item.knowledgeTitle || item.metadata?.title || 'Tool result',
     domain: item.metadata?.source || item.metadata?.tool || undefined,
     snippet: truncateText(item.content || '', 220) || undefined,
     chunkId: id,
@@ -232,9 +232,9 @@ function buildToolItem(item: KnowledgeReferenceLike, index: number): ReferenceLi
 }
 
 function getDocumentGroupKey(item: KnowledgeReferenceLike, index: number): string {
-  if (item.knowledge_id) return item.knowledge_id
-  const title = item.knowledge_title || item.knowledge_filename
-  if (title) return [item.knowledge_base_id, title].filter(Boolean).join(':')
+  if (item.knowledgeId) return item.knowledgeId
+  const title = item.knowledgeTitle || item.knowledge_filename
+  if (title) return [item.knowledgeBaseId, title].filter(Boolean).join(':')
   return (
     item.id ||
     `doc-${index}`
@@ -260,10 +260,10 @@ function mergeDocumentReferences(refs: KnowledgeReferenceLike[]): KnowledgeRefer
       return
     }
 
-    if (!existing.knowledge_id && item.knowledge_id) existing.knowledge_id = item.knowledge_id
-    if (!existing.knowledge_title && item.knowledge_title) existing.knowledge_title = item.knowledge_title
+    if (!existing.knowledgeId && item.knowledgeId) existing.knowledgeId = item.knowledgeId
+    if (!existing.knowledgeTitle && item.knowledgeTitle) existing.knowledgeTitle = item.knowledgeTitle
     if (!existing.knowledge_filename && item.knowledge_filename) existing.knowledge_filename = item.knowledge_filename
-    if (!existing.knowledge_base_id && item.knowledge_base_id) existing.knowledge_base_id = item.knowledge_base_id
+    if (!existing.knowledgeBaseId && item.knowledgeBaseId) existing.knowledgeBaseId = item.knowledgeBaseId
     for (const chunkId of chunkIds) {
       if (!existing.chunk_ids?.includes(chunkId)) {
         existing.chunk_ids = [...(existing.chunk_ids || []), chunkId]

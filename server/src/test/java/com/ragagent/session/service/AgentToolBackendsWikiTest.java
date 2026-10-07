@@ -192,7 +192,7 @@ class AgentToolBackendsWikiTest {
                 .isEqualTo("0001-01-01T00:00:00Z");
         // indentedJson 的字段序 = 历史线格式的固定声明序
         assertThat(issue.indentedJson()).startsWith("{\n  \"id\": \"i1\",\n")
-                .contains("\"deleted_at\": null\n}");
+                .contains("\"deletedAt\": null\n}");
     }
 
     /** createIssue：工具侧视图的字段（含 page 带出的 tenant）落库。 */

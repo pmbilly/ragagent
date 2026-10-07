@@ -353,25 +353,25 @@ public class WebFetchTool extends BaseTool {
         data.put("url", displayUrl);
         data.put("status", "success");
         data.put("retryable", false);
-        data.put("raw_content", page);
-        data.put("content_length", runeCount);
-        data.put("returned_chars", page.codePointCount(0, page.length()));
+        data.put("rawContent", page);
+        data.put("contentLength", runeCount);
+        data.put("returnedChars", page.codePointCount(0, page.length()));
         data.put("offset", item.offset());
         data.put("truncated", end < runeCount);
-        data.put("evidence_type", "fetched_page");
+        data.put("evidenceType", "fetched_page");
         String output = "URL: " + displayUrl + "\nStatus: success\nCharacters: " + item.offset()
                 + "-" + end + " of " + runeCount + "\nContent (untrusted evidence):\n" + page + "\n";
         if (!snapshot.path().isEmpty()) {
-            data.put("full_output_path", snapshot.path());
+            data.put("fullOutputPath", snapshot.path());
             output += "Full page: " + snapshot.path()
                     + ". Read with read_file using 1-based line offsets.\n";
         }
         if (!snapshot.storageError().isEmpty()) {
-            data.put("storage_error", snapshot.storageError());
+            data.put("storageError", snapshot.storageError());
             output += snapshot.storageError() + "\n";
         }
         if (end < runeCount) {
-            data.put("next_offset", end);
+            data.put("nextOffset", end);
             output += "Truncated; continue with the same url and offset=" + end + ".\n";
         }
         return new WebFetchItemResult(output, data, "success");
@@ -396,8 +396,8 @@ public class WebFetchTool extends BaseTool {
         data.put("url", rawUrl);
         data.put("status", "failed");
         data.put("retryable", retryable);
-        data.put("error_code", code);
-        data.put("error_message", message);
+        data.put("errorCode", code);
+        data.put("errorMessage", message);
         return new WebFetchItemResult(
                 "URL: " + rawUrl + "\nStatus: failed\nRetryable: " + retryable
                         + "\nError code: " + code + "\nError: " + message + "\n",
@@ -412,8 +412,8 @@ public class WebFetchTool extends BaseTool {
         data.put("url", url);
         data.put("status", "skipped");
         data.put("retryable", false);
-        data.put("error_code", "duplicate_url");
-        data.put("error_message", message);
+        data.put("errorCode", "duplicate_url");
+        data.put("errorMessage", message);
         return new WebFetchItemResult(
                 "URL: " + url + "\nStatus: skipped\nRetryable: false\nReason: " + message + "\n",
                 data, "skipped");
@@ -463,11 +463,11 @@ public class WebFetchTool extends BaseTool {
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("results", aggregated);
         data.put("count", aggregated.size());
-        data.put("successful_count", successCount);
-        data.put("failed_count", failedCount);
-        data.put("skipped_count", skippedCount);
-        data.put("all_failed", allFailed);
-        data.put("display_type", "web_fetch_results");
+        data.put("successfulCount", successCount);
+        data.put("failedCount", failedCount);
+        data.put("skippedCount", skippedCount);
+        data.put("allFailed", allFailed);
+        data.put("displayType", "web_fetch_results");
         result.setData(data);
         if (allFailed) {
             result.setError("all page fetches failed");

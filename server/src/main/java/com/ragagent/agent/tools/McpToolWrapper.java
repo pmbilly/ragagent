@@ -305,7 +305,7 @@ public class McpToolWrapper implements AgentTool {
 
         // 结构化 data 由结果构建；图片 base64 打码避免内存双存与日志/SSE 泄露。
         Map<String, Object> data = new LinkedHashMap<>();
-        data.put("content_items", redactImageData(result.content()));
+        data.put("contentItems", redactImageData(result.content()));
 
         ToolResult r = new ToolResult();
         r.setSuccess(true);

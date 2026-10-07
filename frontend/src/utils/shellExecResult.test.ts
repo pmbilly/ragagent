@@ -52,7 +52,7 @@ test('previewShellCommand collapses whitespace and truncates', () => {
 test('buildShellExecView parses skill-script markdown and command fallback', () => {
   const view = buildShellExecView(
     {
-      skill_name: 'smart-charts',
+      skillName: 'smart-charts',
       script_path: 'scripts/cli.py',
       args: ['--x-axis', '工作项目'],
       exit_code: 1,

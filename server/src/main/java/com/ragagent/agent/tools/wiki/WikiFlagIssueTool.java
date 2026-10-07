@@ -27,7 +27,7 @@ public class WikiFlagIssueTool extends BaseTool {
                   "type": "string",
                   "description": "The slug of the wiki page that has an issue (e.g. 'entity/hunyuan-damoxing')"
                 },
-                "issue_type": {
+                "issueType": {
                   "type": "string",
                   "enum": ["mixed_entities", "contradictory_facts", "out_of_date", "other"],
                   "description": "The category of the issue"
@@ -36,13 +36,13 @@ public class WikiFlagIssueTool extends BaseTool {
                   "type": "string",
                   "description": "A detailed explanation of what is wrong with the page and what should be fixed."
                 },
-                "suspected_knowledge_ids": {
+                "suspectedKnowledgeIds": {
                   "type": "array",
                   "items": { "type": "string" },
                   "description": "Optional list of short dN document IDs from the <sources> block that you suspect are causing the pollution or error."
                 }
               },
-              "required": ["slug", "issue_type", "description"]
+              "required": ["slug", "issueType", "description"]
             }""";
 
     private static final String DESCRIPTION = """
@@ -96,7 +96,7 @@ public class WikiFlagIssueTool extends BaseTool {
         }
         String kbId = resolved.kbId();
 
-        List<String> suspectedKnowledgeIds = stringList(args.get("suspected_knowledge_ids"));
+        List<String> suspectedKnowledgeIds = stringList(args.get("suspectedKnowledgeIds"));
         if (scopeEnforced && suspectedKnowledgeIds != null && !suspectedKnowledgeIds.isEmpty()) {
             List<String> resolvedRefs;
             try {
@@ -114,7 +114,7 @@ public class WikiFlagIssueTool extends BaseTool {
         issue.setTenantId(resolved.page().tenantId());
         issue.setKnowledgeBaseId(kbId);
         issue.setSlug(slug);
-        issue.setIssueType(args.path("issue_type").asText(""));
+        issue.setIssueType(args.path("issueType").asText(""));
         issue.setDescription(args.path("description").asText(""));
         issue.setSuspectedKnowledgeIds(suspectedKnowledgeIds);
         issue.setReportedBy("wiki-researcher-agent");

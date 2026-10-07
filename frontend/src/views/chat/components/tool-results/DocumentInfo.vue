@@ -4,7 +4,7 @@
     <div v-if="documents.length" class="documents-list">
       <div
         v-for="(doc, index) in documents"
-        :key="doc.faq_id || doc.knowledge_id || index"
+        :key="doc.faqId || doc.knowledgeId || index"
         class="result-card document-card"
       >
         <div class="result-header document-header">
@@ -13,28 +13,28 @@
             <span class="doc-title">{{ doc.title || $t('chat.notProvided') }}</span>
           </div>
           <div class="result-meta">
-            <span class="meta-chip" v-if="doc.chunk_count">
-              {{ $t('chat.chunkCountValue', { count: doc.chunk_count }) }}
+            <span class="meta-chip" v-if="doc.chunkCount">
+              {{ $t('chat.chunkCountValue', { count: doc.chunkCount }) }}
             </span>
           </div>
         </div>
         <div class="result-content expanded">
           <div class="info-section">
-            <div class="info-field" v-if="doc.is_faq && doc.faq_id">
+            <div class="info-field" v-if="doc.isFaq && doc.faqId">
               <span class="field-label">{{ $t('chat.faqIdLabel') }}</span>
-              <span class="field-value"><code>{{ doc.faq_id }}</code></span>
+              <span class="field-value"><code>{{ doc.faqId }}</code></span>
             </div>
-            <div class="info-field" v-if="doc.knowledge_id">
-              <span class="field-label">{{ doc.is_faq ? $t('chat.faqContainerIdLabel') : $t('chat.documentIdLabel') }}</span>
-              <span class="field-value"><code>{{ doc.knowledge_id }}</code></span>
+            <div class="info-field" v-if="doc.knowledgeId">
+              <span class="field-label">{{ doc.isFaq ? $t('chat.faqContainerIdLabel') : $t('chat.documentIdLabel') }}</span>
+              <span class="field-value"><code>{{ doc.knowledgeId }}</code></span>
             </div>
             <div
-              v-if="doc.is_faq && doc.faq_answers?.length"
+              v-if="doc.isFaq && doc.faqAnswers?.length"
               class="info-field info-field--block"
             >
               <span class="field-label">{{ $t('chat.faqAnswersLabel') }}</span>
               <ul class="faq-answers-list">
-                <li v-for="(ans, aIdx) in doc.faq_answers" :key="aIdx">{{ ans }}</li>
+                <li v-for="(ans, aIdx) in doc.faqAnswers" :key="aIdx">{{ ans }}</li>
               </ul>
             </div>
             <div class="info-field" v-if="doc.description">
@@ -49,12 +49,12 @@
               <span class="field-label">{{ $t('knowledgeBase.channelLabel') }}</span>
               <span class="field-value">{{ getChannelLabel(doc.channel) }}</span>
             </div>
-            <div class="info-field" v-if="doc.file_name || doc.file_type || doc.file_size">
+            <div class="info-field" v-if="doc.fileName || doc.fileType || doc.fileSize">
               <span class="field-label">{{ $t('chat.documentFileLabel') }}</span>
               <span class="field-value">
-                <span v-if="doc.file_name">{{ doc.file_name }}</span>
-                <template v-if="doc.file_type">&nbsp;({{ doc.file_type }})</template>
-                <template v-if="doc.file_size">&nbsp;· {{ formatFileSize(doc.file_size) }}</template>
+                <span v-if="doc.fileName">{{ doc.fileName }}</span>
+                <template v-if="doc.fileType">&nbsp;({{ doc.fileType }})</template>
+                <template v-if="doc.fileSize">&nbsp;· {{ formatFileSize(doc.fileSize) }}</template>
               </span>
             </div>
           </div>
@@ -67,7 +67,7 @@
             <ul class="metadata-list">
               <li
                 v-for="(value, key) in doc.metadata"
-                :key="`${doc.knowledge_id}-${key}`"
+                :key="`${doc.knowledgeId}-${key}`"
               >
                 <span class="metadata-key">{{ key }}:</span>
                 <span class="metadata-value">{{ formatMetadataValue(value) }}</span>
@@ -98,7 +98,7 @@ const { t } = useI18n();
 const documents = computed(() => props.data?.documents ?? []);
 const errors = computed(() => props.data?.errors?.filter(Boolean) ?? []);
 const totalChunkCount = computed(() =>
-  documents.value.reduce((sum, doc) => sum + (doc.chunk_count || 0), 0),
+  documents.value.reduce((sum, doc) => sum + (doc.chunkCount || 0), 0),
 );
 
 const channelLabelMap: Record<string, string> = {

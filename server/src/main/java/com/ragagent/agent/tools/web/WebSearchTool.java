@@ -236,14 +236,14 @@ public class WebSearchTool extends BaseTool {
             output.append('\n');
 
             Map<String, Object> resultData = new LinkedHashMap<>();
-            resultData.put("result_index", i + 1);
+            resultData.put("resultIndex", i + 1);
             resultData.put("title", row.getTitle());
             resultData.put("url", row.getUrl());
             resultData.put("snippet", row.getSnippet());
             resultData.put("content", row.getContent());
             resultData.put("source", row.getSource());
-            resultData.put("evidence_type", "search_summary");
-            resultData.put("page_verified", false);
+            resultData.put("evidenceType", "search_summary");
+            resultData.put("pageVerified", false);
             if (!row.getAge().isEmpty()) {
                 resultData.put("age", row.getAge());
             }
@@ -251,7 +251,7 @@ public class WebSearchTool extends BaseTool {
                 applySearchPageFetch(resultData, output, i, pageResults);
             }
             if (row.getPublishedAt() != null) {
-                resultData.put("published_at", rfc3339(row.getPublishedAt()));
+                resultData.put("publishedAt", rfc3339(row.getPublishedAt()));
             }
             formattedResults.add(resultData);
         }
@@ -268,7 +268,7 @@ public class WebSearchTool extends BaseTool {
         data.put("query", query);
         data.put("results", formattedResults);
         data.put("count", filtered.size());
-        data.put("display_type", "web_search_results");
+        data.put("displayType", "web_search_results");
         result.setData(data);
         return result;
     }
@@ -404,36 +404,36 @@ public class WebSearchTool extends BaseTool {
     private static void applySearchPageFetch(Map<String, Object> resultData,
             StringBuilder output, int index, WebFetchTool.WebFetchItemResult[] pages) {
         if (index >= CONTENT_MAX_PAGES) {
-            resultData.put("page_status", "skipped");
-            resultData.put("page_error",
+            resultData.put("pageStatus", "skipped");
+            resultData.put("pageError",
                     "content fetch is limited to the first 3 results; use web_fetch for more");
             output.append("Page fetch skipped: use web_fetch for this result.\n");
             return;
         }
         if (index >= pages.length || pages[index] == null) {
-            resultData.put("page_status", "failed");
-            resultData.put("page_error", "page fetch returned no result");
+            resultData.put("pageStatus", "failed");
+            resultData.put("pageError", "page fetch returned no result");
             output.append("Page fetch failed: page fetch returned no result\n");
             return;
         }
         WebFetchTool.WebFetchItemResult page = pages[index];
-        resultData.put("page_status", page.status);
+        resultData.put("pageStatus", page.status);
         if ("success".equals(page.status)) {
-            resultData.put("page_verified", true);
-            resultData.put("page_content", page.data.get("raw_content"));
-            resultData.put("page_truncated", page.data.get("truncated"));
-            resultData.put("full_output_path", page.data.get("full_output_path"));
-            resultData.put("page_next_offset", page.data.get("next_offset"));
-            Object storageError = page.data.get("storage_error");
+            resultData.put("pageVerified", true);
+            resultData.put("pageContent", page.data.get("rawContent"));
+            resultData.put("pageTruncated", page.data.get("truncated"));
+            resultData.put("fullOutputPath", page.data.get("fullOutputPath"));
+            resultData.put("pageNextOffset", page.data.get("nextOffset"));
+            Object storageError = page.data.get("storageError");
             if (storageError instanceof String s && !s.isEmpty()) {
-                resultData.put("storage_error", s);
+                resultData.put("storageError", s);
                 output.append(s).append('\n');
             }
-            output.append("Fetched content (untrusted): ").append(page.data.get("raw_content")).append('\n');
+            output.append("Fetched content (untrusted): ").append(page.data.get("rawContent")).append('\n');
             return;
         }
-        resultData.put("page_error", page.data.get("error_message"));
-        output.append("Page fetch failed: ").append(page.data.get("error_message")).append('\n');
+        resultData.put("pageError", page.data.get("errorMessage"));
+        output.append("Page fetch failed: ").append(page.data.get("errorMessage")).append('\n');
     }
 
     /** 发布时间按 RFC3339 渲染：秒精度 + Z/±hh:mm 偏移。 */

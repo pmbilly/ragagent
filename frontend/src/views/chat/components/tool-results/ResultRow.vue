@@ -36,8 +36,8 @@ import ContentPopup from './ContentPopup.vue';
 
 interface ChunkContent {
   content: string;
-  chunk_id?: string;
-  knowledge_id?: string;
+  chunkId?: string;
+  knowledgeId?: string;
 }
 
 withDefaults(

@@ -36,7 +36,7 @@ public class KnowledgeSearchTool extends BaseTool {
     private static final String SCHEMA_JSON = """
             {
               "properties": {
-                "knowledge_base_ids": {
+                "knowledgeBaseIds": {
                   "description": "Optional: bound knowledge-base IDs (the short bN values shown in runtime context)",
                   "items": {
                     "type": "string"
@@ -273,7 +273,7 @@ public class KnowledgeSearchTool extends BaseTool {
         JsonNode args = request.args();
 
         List<String> userSpecifiedKBs = new ArrayList<>();
-        JsonNode kbNode = args.get("knowledge_base_ids");
+        JsonNode kbNode = args.get("knowledgeBaseIds");
         if (kbNode != null && kbNode.isArray()) {
             for (JsonNode item : kbNode) {
                 if (item.isTextual()) {

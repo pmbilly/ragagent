@@ -41,7 +41,7 @@ test('agent citations recover drawer references from retrieval tool events', () 
   )
   assert.match(
     agentStream,
-    /chunk_ids: group\.chunks\.map\(\(chunk\) => chunk\.chunk_id\)\.filter\(Boolean\)/,
+    /chunkIds: group\.chunks\.map\(\(chunk\) => chunk\.chunkId \?\? chunk\.chunk_id\)\.filter\(Boolean\)/,
   )
   assert.equal(
     agentStream.match(/knowledgeReferences: getReferencesForDrawer\(\)|getReferencesForDrawer\(\),/g)?.length,

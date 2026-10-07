@@ -311,8 +311,8 @@ public final class Registry {
 
     private McpArgumentTable mcpArgumentTable(String toolName) {
         return switch (ToolPolicy.mcpRoutingKeyOf(toolName)) {
-            case "server_id" -> new McpArgumentTable("server_id", mcpServers);
-            case "tool_ref" -> new McpArgumentTable("tool_ref", mcpTools);
+            case "serverId" -> new McpArgumentTable("serverId", mcpServers);
+            case "toolRef" -> new McpArgumentTable("toolRef", mcpTools);
             default -> null;
         };
     }
@@ -381,9 +381,9 @@ public final class Registry {
     }
 
     String encodeMCPDirectory(String output) {
-        java.util.function.UnaryOperator<String> encodeRow = raw -> rewriteMCPField(raw, "server_id",
+        java.util.function.UnaryOperator<String> encodeRow = raw -> rewriteMCPField(raw, "serverId",
                 value -> registerMCPIdentity(mcpServers, value));
-        java.util.function.UnaryOperator<String> encodeRowBoth = raw -> rewriteMCPField(encodeRow.apply(raw), "tool_ref",
+        java.util.function.UnaryOperator<String> encodeRowBoth = raw -> rewriteMCPField(encodeRow.apply(raw), "toolRef",
                 value -> registerMCPIdentity(mcpTools, value));
         Map<String, String> object = ToolPolicy.RawJson.scanTopLevelObject(output);
         if (object == null || object.isEmpty()) {
@@ -478,7 +478,7 @@ public final class Registry {
             if ("discover_mcp_tools".equals(def.getName())) {
                 String[] lines = def.getDescription().split("\n", -1);
                 for (int j = 0; j < lines.length; j++) {
-                    lines[j] = rewriteMCPField(lines[j], "server_id",
+                    lines[j] = rewriteMCPField(lines[j], "serverId",
                             value -> registerMCPIdentity(mcpServers, value));
                 }
                 def.setDescription(String.join("\n", lines));
@@ -516,8 +516,8 @@ public final class Registry {
     String encodeMCPRoutingText(String text) {
         for (HandleStore.Pair<Void> pair : mcpServers.store().pairs()) {
             text = text.replace(
-                    "server_id=" + ToolJson.quoted(pair.value),
-                    "server_id=" + ToolJson.quoted(pair.handle));
+                    "serverId=" + ToolJson.quoted(pair.value),
+                    "serverId=" + ToolJson.quoted(pair.handle));
         }
         return text;
     }

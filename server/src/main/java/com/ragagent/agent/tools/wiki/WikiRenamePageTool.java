@@ -23,12 +23,12 @@ public class WikiRenamePageTool extends BaseTool {
             			"type": "string",
             			"description": "The current slug of the Wiki page"
             		},
-            		"new_slug": {
+            		"newSlug": {
             			"type": "string",
             			"description": "The new slug for the page"
             		}
             	},
-            	"required": ["slug", "new_slug"]
+            	"required": ["slug", "newSlug"]
             }""";
 
     private static final String DESCRIPTION =
@@ -51,14 +51,14 @@ public class WikiRenamePageTool extends BaseTool {
         if (kbIds == null || kbIds.isEmpty()) {
             return failure("No knowledge bases available for editing");
         }
-        if (args.path("new_slug").asText("").isEmpty()) {
+        if (args.path("newSlug").asText("").isEmpty()) {
             return failure("new_slug is required");
         }
         String slug;
         String newSlug;
         try {
             slug = WikiSlugs.normalizeAndValidateWikiSlug(args.path("slug").asText(""));
-            newSlug = WikiSlugs.normalizeAndValidateWikiSlug(args.path("new_slug").asText(""));
+            newSlug = WikiSlugs.normalizeAndValidateWikiSlug(args.path("newSlug").asText(""));
         } catch (IllegalArgumentException e) {
             return failure(e.getMessage());
         }
@@ -159,12 +159,12 @@ public class WikiRenamePageTool extends BaseTool {
         r.setSuccess(true);
         r.setOutput(outputMsg);
         java.util.Map<String, Object> data = new java.util.LinkedHashMap<>();
-        data.put("display_type", "wiki_rename_page");
-        data.put("old_slug", slug);
-        data.put("new_slug", newSlug);
+        data.put("displayType", "wiki_rename_page");
+        data.put("oldSlug", slug);
+        data.put("newSlug", newSlug);
         data.put("title", existingPage.title());
-        data.put("updated_count", updatedCount);
-        data.put("affected_pages", updatedSlugs);
+        data.put("updatedCount", updatedCount);
+        data.put("affectedPages", updatedSlugs);
         r.setData(data);
         return r;
     }

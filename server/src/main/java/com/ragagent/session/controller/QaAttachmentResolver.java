@@ -106,9 +106,9 @@ final class QaAttachmentResolver {
             data.setDurationMs(System.currentTimeMillis() - start);
             data.setIteration(0);
             Map<String, Object> d = new LinkedHashMap<>();
-            d.put("display_type", "attachment_parsing");
-            d.put("parsed_count", readyIds.size());
-            d.put("skipped_count", skipped);
+            d.put("displayType", "attachment_parsing");
+            d.put("parsedCount", readyIds.size());
+            d.put("skippedCount", skipped);
             data.setData(d);
             evt.setData(data);
             streamCtx.eventBus.emit(evt);

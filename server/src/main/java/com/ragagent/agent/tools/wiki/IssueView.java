@@ -59,12 +59,12 @@ import com.ragagent.common.web.ToolJson;
             StringBuilder b = new StringBuilder();
             b.append("{\n");
             b.append("  \"id\": ").append(jsonString(id)).append(",\n");
-            b.append("  \"tenant_id\": ").append(tenantId).append(",\n");
-            b.append("  \"knowledge_base_id\": ").append(jsonString(knowledgeBaseId)).append(",\n");
+            b.append("  \"tenantId\": ").append(tenantId).append(",\n");
+            b.append("  \"knowledgeBaseId\": ").append(jsonString(knowledgeBaseId)).append(",\n");
             b.append("  \"slug\": ").append(jsonString(slug)).append(",\n");
-            b.append("  \"issue_type\": ").append(jsonString(issueType)).append(",\n");
+            b.append("  \"issueType\": ").append(jsonString(issueType)).append(",\n");
             b.append("  \"description\": ").append(jsonString(description)).append(",\n");
-            b.append("  \"suspected_knowledge_ids\": ");
+            b.append("  \"suspectedKnowledgeIds\": ");
             if (suspectedKnowledgeIds == null || suspectedKnowledgeIds.isEmpty()) {
                 b.append("[]");
             } else {
@@ -79,10 +79,10 @@ import com.ragagent.common.web.ToolJson;
             }
             b.append(",\n");
             b.append("  \"status\": ").append(jsonString(status)).append(",\n");
-            b.append("  \"reported_by\": ").append(jsonString(reportedBy)).append(",\n");
-            b.append("  \"created_at\": ").append(jsonString(createdAt)).append(",\n");
-            b.append("  \"updated_at\": ").append(jsonString(updatedAt)).append(",\n");
-            b.append("  \"deleted_at\": ").append(deletedAtValid ? jsonString(deletedAt) : "null").append("\n");
+            b.append("  \"reportedBy\": ").append(jsonString(reportedBy)).append(",\n");
+            b.append("  \"createdAt\": ").append(jsonString(createdAt)).append(",\n");
+            b.append("  \"updatedAt\": ").append(jsonString(updatedAt)).append(",\n");
+            b.append("  \"deletedAt\": ").append(deletedAtValid ? jsonString(deletedAt) : "null").append("\n");
             b.append('}');
             return b.toString();
         }

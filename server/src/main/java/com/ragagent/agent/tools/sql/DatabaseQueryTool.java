@@ -195,8 +195,8 @@ public class DatabaseQueryTool extends BaseTool {
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("columns", columns);
         data.put("rows", results);
-        data.put("row_count", results.size());
-        data.put("display_type", "database_query");
+        data.put("rowCount", results.size());
+        data.put("displayType", "database_query");
         result.setData(data);
         return result;
     }

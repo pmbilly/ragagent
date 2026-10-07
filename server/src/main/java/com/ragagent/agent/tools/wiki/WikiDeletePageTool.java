@@ -124,11 +124,11 @@ public class WikiDeletePageTool extends BaseTool {
         r.setSuccess(true);
         r.setOutput(outputMsg);
         java.util.Map<String, Object> data = new java.util.LinkedHashMap<>();
-        data.put("display_type", "wiki_delete_page");
+        data.put("displayType", "wiki_delete_page");
         data.put("slug", slug);
         data.put("title", existingPage.title());
-        data.put("updated_count", updatedCount);
-        data.put("affected_pages", updatedSlugs);
+        data.put("updatedCount", updatedCount);
+        data.put("affectedPages", updatedSlugs);
         r.setData(data);
         return r;
     }

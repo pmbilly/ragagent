@@ -20,7 +20,7 @@ public final class ToolResultPersist {
     /** SSE 回放 / DB 存储前丢弃的大块 Data 键。 */
     private static final Map<String, List<String>> PERSIST_STRIP_FIELDS = Map.of(
             "knowledge_chunks_list", List.of("chunks"),
-            "grep_results", List.of("chunk_results"));
+            "grep_results", List.of("chunkResults"));
 
     /**
      * 按工具丢二进制/重复大块。stdout/stderr 保留
@@ -46,7 +46,7 @@ public final class ToolResultPersist {
         if (data == null) {
             return false;
         }
-        Object displayType = data.get("display_type");
+        Object displayType = data.get("displayType");
         return displayType instanceof String s && !s.isEmpty();
     }
 
@@ -69,7 +69,7 @@ public final class ToolResultPersist {
             return null;
         }
         Map<String, Object> out = new LinkedHashMap<>(data);
-        String displayType = stringField(data, "display_type");
+        String displayType = stringField(data, "displayType");
         List<String> strip = PERSIST_STRIP_FIELDS.get(displayType);
         if (strip != null) {
             for (String key : strip) {
@@ -321,15 +321,15 @@ public final class ToolResultPersist {
         if (!success) {
             return errMsg == null || errMsg.isEmpty() ? "Error: tool call failed" : "Error: " + errMsg;
         }
-        switch (stringField(data, "display_type")) {
+        switch (stringField(data, "displayType")) {
             case "knowledge_chunks_list" -> {
-                String title = stringField(data, "knowledge_title");
+                String title = stringField(data, "knowledgeTitle");
                 if (title.isEmpty()) {
-                    title = stringField(data, "knowledge_id");
+                    title = stringField(data, "knowledgeId");
                 }
-                int fetched = intField(data, "fetched_chunks");
-                int total = intField(data, "total_chunks");
-                String q = stringField(data, "faq_question");
+                int fetched = intField(data, "fetchedChunks");
+                int total = intField(data, "totalChunks");
+                String q = stringField(data, "faqQuestion");
                 if (!q.isEmpty()) {
                     return String.format("Loaded FAQ entry: %s (content omitted from history)", q);
                 }
@@ -342,10 +342,10 @@ public final class ToolResultPersist {
                 }
             }
             case "grep_results" -> {
-                int chunks = intField(data, "total_matches");
-                int docs = intField(data, "document_count");
+                int chunks = intField(data, "totalMatches");
+                int docs = intField(data, "documentCount");
                 if (docs == 0) {
-                    docs = intField(data, "result_count");
+                    docs = intField(data, "resultCount");
                 }
                 if (chunks > 0) {
                     return String.format(
@@ -354,7 +354,7 @@ public final class ToolResultPersist {
                 }
             }
             case "search_results" -> {
-                int count = intField(data, "result_count");
+                int count = intField(data, "resultCount");
                 if (count == 0) {
                     count = intField(data, "count");
                 }
@@ -386,7 +386,7 @@ public final class ToolResultPersist {
             }
             case "attachment_parsing" -> {
                 int parsed = intField(data, "parsed_count");
-                int skipped = intField(data, "skipped_count");
+                int skipped = intField(data, "skippedCount");
                 if (skipped > 0) {
                     return String.format("Parsed %d attachment(s), %d skipped (still processing)", parsed, skipped);
                 }
@@ -396,7 +396,7 @@ public final class ToolResultPersist {
             }
             default -> {}
         }
-        String displayType = stringField(data, "display_type");
+        String displayType = stringField(data, "displayType");
         if (!displayType.isEmpty()) {
             return String.format("Tool completed (%s; payload omitted from history)", displayType);
         }

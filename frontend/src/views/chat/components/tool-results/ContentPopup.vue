@@ -6,7 +6,7 @@
 
       <!-- Merged chunks from the same document -->
       <template v-else-if="blocks.length > 1">
-        <div v-for="(block, idx) in blocks" :key="block.chunk_id || idx" class="chunk-block">
+        <div v-for="(block, idx) in blocks" :key="block.chunkId || idx" class="chunk-block">
           <div class="chunk-block__label">{{ $t('chat.chunkOrdinal', { index: idx + 1 }) }}</div>
           <div class="full-content" v-html="block.html"></div>
         </div>
@@ -35,8 +35,8 @@ import { cleanContent } from './contentClean';
 
 interface ChunkContent {
   content: string;
-  chunk_id?: string;
-  knowledge_id?: string;
+  chunkId?: string;
+  knowledgeId?: string;
 }
 
 interface Props {
@@ -70,10 +70,10 @@ const blocks = computed(() => {
   const source: ChunkContent[] = props.chunks?.length
     ? props.chunks
     : props.content
-      ? [{ content: props.content, chunk_id: props.chunkId, knowledge_id: props.knowledgeId }]
+      ? [{ content: props.content, chunkId: props.chunkId, knowledgeId: props.knowledgeId }]
       : [];
   return source
-    .map((c) => ({ chunk_id: c.chunk_id, html: renderBlock(c.content) }))
+    .map((c) => ({ chunkId: c.chunkId, html: renderBlock(c.content) }))
     .filter((b) => b.html.trim() !== '');
 });
 </script>

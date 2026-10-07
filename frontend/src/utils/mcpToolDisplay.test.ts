@@ -8,7 +8,7 @@ const t = ((key: string, params?: Record<string, unknown>) => `${key}${params?.n
 
 test('server rows prefer usage instructions and retain legacy descriptions', () => {
   const rows = mcpDiscoveryRows({ mode: 'list_servers', servers: [
-    { name: 'new', usage_instructions: 'Query logs', description: 'Old description' },
+    { name: 'new', usageInstructions: 'Query logs', description: 'Old description' },
     { name: 'legacy', description: 'Legacy instructions' },
   ] })
   assert.equal(rows[0]?.description, 'Query logs')
@@ -24,9 +24,9 @@ test('MCP proxies have dedicated renderers and icons', () => {
 })
 
 test('old output-only discovery and schema records remain readable', () => {
-  const data = parseMcpDiscovery(JSON.stringify({ mode: 'list_tools', tools: [{ name: 'get_log', tool_ref: 'legacy', description: 'Logs' }], total: 2, has_more: true }))
+  const data = parseMcpDiscovery(JSON.stringify({ mode: 'list_tools', tools: [{ name: 'get_log', toolRef: 'legacy', description: 'Logs' }], total: 2, hasMore: true }))
   assert.deepEqual(mcpDiscoveryRows(data), [{ name: 'get_log', description: 'Logs', status: '', serverName: '' }])
-  const output = JSON.stringify({ name: 'get_log', input_schema: { type: 'object' } })
+  const output = JSON.stringify({ name: 'get_log', inputSchema: { type: 'object' } })
   assert.equal(getMcpToolTitle(t, { tool_name: 'discover_mcp_tools', output }), 'agentStream.mcp.describeTool：get_log')
   assert.deepEqual(parseMcpDiscovery('Parameter validation failed'), {})
   assert.deepEqual(mcpDiscoveryRows({ tools: [null, 'broken', { name: 'valid' }] }), [{ name: 'valid', description: '', status: '', serverName: '' }])
@@ -36,7 +36,7 @@ test('old output-only discovery and schema records remain readable', () => {
   assert.equal(getMcpToolTitle(t, { tool_name: 'discover_mcp_tools', output: listed, tool_data: liveEnvelope }), 'agentStream.mcp.listTools')
   assert.equal(getMcpToolTitle(t, {
     tool_name: 'discover_mcp_tools',
-    output: JSON.stringify({ mode: 'list_tools', server_name: 'Svrlog Mcp Server', tools: [{ name: 'get_log' }], total: 1 }),
+    output: JSON.stringify({ mode: 'list_tools', serverName: 'Svrlog Mcp Server', tools: [{ name: 'get_log' }], total: 1 }),
   }), 'agentStream.mcp.listTools：Svrlog Mcp Server')
 })
 

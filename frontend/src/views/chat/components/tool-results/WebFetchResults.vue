@@ -54,9 +54,9 @@
 
           <div v-if="itemError(item)" class="info-section">
             <div class="info-section-title error">{{ $t('chat.errorMessageLabel') }}</div>
-            <div v-if="item.error_code" class="info-field">
+            <div v-if="item.errorCode" class="info-field">
               <span class="field-label">{{ $t('chat.webFetchErrorCode') }}</span>
-              <span class="field-value">{{ item.error_code }}</span>
+              <span class="field-value">{{ item.errorCode }}</span>
             </div>
             <div v-if="item.retryable !== undefined" class="info-field">
               <span class="field-label">{{ $t('chat.webFetchRetryable') }}</span>
@@ -82,7 +82,7 @@
               </div>
             </div>
 
-            <div v-if="item.raw_content" class="info-section">
+            <div v-if="item.rawContent" class="info-section">
               <div class="info-section-title">
                 {{ $t('chat.rawTextLabel') }}
                 <span class="raw-length" v-if="item.content_length">
@@ -90,14 +90,14 @@
                 </span>
               </div>
               <div v-if="item.offset !== undefined" class="info-field">
-                {{ $t('chat.webFetchContentRange', { start: item.offset, end: item.offset + (item.returned_chars ?? 0), total: item.content_length }) }}
+                {{ $t('chat.webFetchContentRange', { start: item.offset, end: item.offset + (item.returnedChars ?? 0), total: item.content_length }) }}
                 <span v-if="item.truncated"> · {{ $t('chat.webFetchPartialContent') }}</span>
               </div>
               <div v-if="isRawExpanded(index)" class="full-content">
-                {{ item.raw_content }}
+                {{ item.rawContent }}
               </div>
               <div v-else class="content-preview">
-                {{ truncate(item.raw_content) }}
+                {{ truncate(item.rawContent) }}
               </div>
               <button class="action-button" @click.stop="toggleRaw(index)">
                 {{ isRawExpanded(index) ? $t('chat.collapseRaw') : $t('chat.expandRaw') }}

@@ -56,7 +56,7 @@ test('getWikiPageText supports persisted slugs arrays', () => {
 test('getKnowledgeSearchSummaryHtml includes file count when present', () => {
   const html = getKnowledgeSearchSummaryHtml(t, {
     results: [{}, {}],
-    kb_counts: { a: 1, b: 2 },
+    kbCounts: { a: 1, b: 2 },
   })
   assert.match(html, /found <strong>2<\/strong> from <strong>2<\/strong> files/)
 })

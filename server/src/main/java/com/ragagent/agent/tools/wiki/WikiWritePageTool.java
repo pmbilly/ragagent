@@ -39,7 +39,7 @@ public class WikiWritePageTool extends BaseTool {
             			"type": "string",
             			"description": "The FULL, complete Markdown content of the page. Do NOT use placeholders."
             		},
-            		"page_type": {
+            		"pageType": {
             			"type": "string",
             			"description": "The page type, e.g., 'summary', 'entity', 'concept', 'synthesis', 'comparison'"
             		},
@@ -48,13 +48,13 @@ public class WikiWritePageTool extends BaseTool {
             			"items": {"type": "string"},
             			"description": "A list of aliases for the page (optional). If provided, these will COMPLETELY REPLACE the existing aliases of the page."
             		},
-            		"source_refs": {
+            		"sourceRefs": {
             			"type": "array",
             			"items": {"type": "string"},
             			"description": "A list of short dN source document IDs that contributed to this page. If provided, these will COMPLETELY REPLACE the existing source_refs of the page."
             		}
             	},
-            	"required": ["slug", "title", "summary", "content", "page_type"]
+            	"required": ["slug", "title", "summary", "content", "pageType"]
             }""";
 
     private static final String DESCRIPTION =
@@ -90,7 +90,7 @@ public class WikiWritePageTool extends BaseTool {
             return failure("No knowledge bases available for editing");
         }
         String title = args.path("title").asText("");
-        String pageType = args.path("page_type").asText("");
+        String pageType = args.path("pageType").asText("");
         String content = args.path("content").asText("");
         String summary = args.path("summary").asText("");
         if (title.isEmpty() || pageType.isEmpty() || content.isEmpty() || summary.isEmpty()) {
@@ -106,7 +106,7 @@ public class WikiWritePageTool extends BaseTool {
 
         // 解析并授权 provenance（scopeEnforced 时）；否则纯富化
         List<String> resolvedRefs = null;
-        JsonNode sourceRefsNode = args.get("source_refs");
+        JsonNode sourceRefsNode = args.get("sourceRefs");
         if (sourceRefsNode != null) {
             List<String> sourceRefs = WikiFlagIssueTool.stringList(sourceRefsNode);
             if (sourceRefs == null) {
@@ -226,11 +226,11 @@ public class WikiWritePageTool extends BaseTool {
         r.setSuccess(true);
         r.setOutput(output.toString());
         java.util.Map<String, Object> data = new java.util.LinkedHashMap<>();
-        data.put("display_type", "wiki_write_page");
+        data.put("displayType", "wiki_write_page");
         data.put("action", action);
         data.put("slug", slug);
         data.put("title", title);
-        data.put("page_type", pageType);
+        data.put("pageType", pageType);
         data.put("summary", summary);
         r.setData(data);
         return r;

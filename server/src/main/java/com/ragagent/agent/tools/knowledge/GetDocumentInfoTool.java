@@ -34,12 +34,12 @@ public class GetDocumentInfoTool extends BaseTool {
     private static final String SCHEMA_JSON = """
             {
               "properties": {
-                "faq_ids": {
+                "faqIds": {
                   "description": "Short cN FAQ chunk IDs from retrieval results. Use instead of knowledge_ids for a single FAQ Q&A.",
                   "items": { "type": "string" },
                   "type": "array"
                 },
-                "knowledge_ids": {
+                "knowledgeIds": {
                   "description": "Short dN document IDs for regular documents",
                   "items": { "type": "string" },
                   "type": "array"
@@ -108,8 +108,8 @@ public class GetDocumentInfoTool extends BaseTool {
     public ToolResult execute(ToolRequest request) {
         JsonNode args = request.args();
 
-        List<String> knowledgeIDs = jsonStringList(args.get("knowledge_ids"));
-        List<String> faqIDs = jsonStringList(args.get("faq_ids"));
+        List<String> knowledgeIDs = jsonStringList(args.get("knowledgeIds"));
+        List<String> faqIDs = jsonStringList(args.get("faqIds"));
         if (knowledgeIDs.isEmpty() && faqIDs.isEmpty()) {
             return failure("knowledge_ids or faq_ids is required (non-empty array)");
         }
@@ -265,18 +265,18 @@ public class GetDocumentInfoTool extends BaseTool {
             output.append('\n');
 
             Map<String, Object> formatted = new LinkedHashMap<>();
-            formatted.put("knowledge_id", k.id());
+            formatted.put("knowledgeId", k.id());
             formatted.put("title", k.title());
             formatted.put("description", k.description());
             formatted.put("type", k.type());
             formatted.put("source", k.source());
-            formatted.put("file_name", k.fileName());
-            formatted.put("file_type", k.fileType());
-            formatted.put("file_size", k.fileSize());
-            formatted.put("parse_status", k.parseStatus());
-            formatted.put("chunk_count", doc.chunkCount);
+            formatted.put("fileName", k.fileName());
+            formatted.put("fileType", k.fileType());
+            formatted.put("fileSize", k.fileSize());
+            formatted.put("parseStatus", k.parseStatus());
+            formatted.put("chunkCount", doc.chunkCount);
             formatted.put("metadata", DocChunkSupport.knowledgeMetadataMap(k.metadata()));
-            formatted.put("is_faq", false);
+            formatted.put("isFaq", false);
             formattedDocs.add(formatted);
         }
 
@@ -293,10 +293,10 @@ public class GetDocumentInfoTool extends BaseTool {
         toolResult.setOutput(output.toString());
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("documents", formattedDocs);
-        data.put("total_docs", successDocs.size());
+        data.put("totalDocs", successDocs.size());
         data.put("requested", requested);
         data.put("errors", errors.isEmpty() ? null : errors);
-        data.put("display_type", "document_info");
+        data.put("displayType", "document_info");
         data.put("title", firstTitle);
         toolResult.setData(data);
         return toolResult;
@@ -337,16 +337,16 @@ public class GetDocumentInfoTool extends BaseTool {
         output.append('\n');
 
         Map<String, Object> entry = new LinkedHashMap<>();
-        entry.put("faq_id", chunk.getId());
-        entry.put("knowledge_id", chunk.getKnowledgeId());
+        entry.put("faqId", chunk.getId());
+        entry.put("knowledgeId", chunk.getKnowledgeId());
         entry.put("title", title);
-        entry.put("faq_question", title);
+        entry.put("faqQuestion", title);
         entry.put("type", "faq");
-        entry.put("is_faq", true);
-        entry.put("chunk_count", 1);
+        entry.put("isFaq", true);
+        entry.put("chunkCount", 1);
         if (meta != null) {
             if (meta.answers != null && !meta.answers.isEmpty()) {
-                entry.put("faq_answers", meta.answers);
+                entry.put("faqAnswers", meta.answers);
             }
             FaqSnippet.appendSimilarQuestionsToChunkData(entry, meta.similarQuestions);
         }

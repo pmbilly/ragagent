@@ -56,7 +56,7 @@ test('ensureRagPipelineHistoryStream does not invent retrieval for attachment-on
         tool_call_id: 'attach-1',
         pending: false,
         success: true,
-        tool_data: { parsed_count: 1, skipped_count: 0 },
+        tool_data: { parsed_count: 1, skippedCount: 0 },
       },
     ],
   }

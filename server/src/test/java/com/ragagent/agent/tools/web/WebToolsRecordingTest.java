@@ -102,17 +102,17 @@ class WebToolsRecordingTest {
         assertThat(r1.getOutput()).contains("Characters: 0-10 of 30\n");
         assertThat(r1.getOutput()).contains("Truncated; continue with the same url and offset=10.\n");
         Map<String, Object> item = dataItem(r1, 0);
-        assertThat(item.get("next_offset")).isEqualTo(10);
+        assertThat(item.get("nextOffset")).isEqualTo(10);
         assertThat(item.get("truncated")).isEqualTo(true);
-        assertThat(item.get("content_length")).isEqualTo(30);
-        assertThat(item.get("returned_chars")).isEqualTo(10);
-        assertThat(item.get("evidence_type")).isEqualTo("fetched_page");
-        assertThat(item.get("page_verified")).isNull();
+        assertThat(item.get("contentLength")).isEqualTo(30);
+        assertThat(item.get("returnedChars")).isEqualTo(10);
+        assertThat(item.get("evidenceType")).isEqualTo("fetched_page");
+        assertThat(item.get("pageVerified")).isNull();
 
         ToolResult r2 = tool.execute(ToolRequest.of(json(
                 "{\"items\":[{\"url\":\"https://e.com/a\",\"offset\":10,\"limit\":10}]}")));
         assertThat(r2.getOutput()).contains("Characters: 10-20 of 30\n");
-        assertThat(dataItem(r2, 0).get("next_offset")).isEqualTo(20);
+        assertThat(dataItem(r2, 0).get("nextOffset")).isEqualTo(20);
     }
 
     @Test
@@ -129,20 +129,20 @@ class WebToolsRecordingTest {
         assertThat(bad.isSuccess()).isFalse();
         Map<String, Object> item = dataItem(bad, 0);
         assertThat(item.get("status")).isEqualTo("failed");
-        assertThat(item.get("error_code")).isEqualTo("invalid_url");
-        assertThat(item.get("error_message"))
+        assertThat(item.get("errorCode")).isEqualTo("invalid_url");
+        assertThat(item.get("errorMessage"))
                 .isEqualTo("url must be a known wN page ID or an absolute HTTP(S) URL");
         // 非法 limit
         ToolResult badLimit = tool.execute(ToolRequest.of(json(
                 "{\"items\":[{\"url\":\"https://e.com/a\",\"limit\":8001}]}")));
-        assertThat(dataItem(badLimit, 0).get("error_code")).isEqualTo("invalid_arguments");
+        assertThat(dataItem(badLimit, 0).get("errorCode")).isEqualTo("invalid_arguments");
         // offset 越界（先 offset-0 热缓存——读页先于 content_length 校验，
         // 未缓存续读会先报 snapshot_expired）
         WebFetchTool small = fetchTool(url -> "abc");
         small.execute(ToolRequest.of(json("{\"items\":[{\"url\":\"https://e.com/a\"}]}")));
         ToolResult over = small.execute(ToolRequest.of(json(
                 "{\"items\":[{\"url\":\"https://e.com/a\",\"offset\":5}]}")));
-        assertThat(dataItem(over, 0).get("error_message"))
+        assertThat(dataItem(over, 0).get("errorMessage"))
                 .isEqualTo("offset must be less than content_length 3");
         // 预算不足
         ToolResult poor = tool.execute(new ToolRequest(json(
@@ -165,7 +165,7 @@ class WebToolsRecordingTest {
         assertThat(dataItem(r, 0).get("status")).isEqualTo("success");
         Map<String, Object> skipped = dataItem(r, 1);
         assertThat(skipped.get("status")).isEqualTo("skipped");
-        assertThat(skipped.get("error_code")).isEqualTo("duplicate_url");
+        assertThat(skipped.get("errorCode")).isEqualTo("duplicate_url");
         assertThat(r.getOutput()).contains("Reason: duplicate URL skipped in this batch");
     }
 
@@ -185,8 +185,8 @@ class WebToolsRecordingTest {
         ToolResult r = tool.execute(ToolRequest.of(json(
                 "{\"items\":[{\"url\":\"https://e.com/a\"}]}")));
         Map<String, Object> item = dataItem(r, 0);
-        assertThat(item.get("error_code")).isEqualTo("empty_content");
-        assertThat(item.get("error_message")).isEqualTo("page contains no readable content");
+        assertThat(item.get("errorCode")).isEqualTo("empty_content");
+        assertThat(item.get("errorMessage")).isEqualTo("page contains no readable content");
         assertThat(r.isSuccess()).isFalse();
         assertThat(r.getError()).isEqualTo("all page fetches failed");
     }
@@ -224,9 +224,9 @@ class WebToolsRecordingTest {
         ToolResult r = tool.execute(ToolRequest.of(json(
                 "{\"items\":[{\"url\":\"https://e.com/a\",\"offset\":10}]}")));
         Map<String, Object> item = dataItem(r, 0);
-        assertThat(item.get("error_code")).isEqualTo("snapshot_expired");
+        assertThat(item.get("errorCode")).isEqualTo("snapshot_expired");
         assertThat(item.get("retryable")).isEqualTo(true);
-        assertThat(item.get("error_message")).isEqualTo(
+        assertThat(item.get("errorMessage")).isEqualTo(
                 "snapshot unavailable; use read_file on full_output_path or restart at offset 0");
     }
 
@@ -247,9 +247,9 @@ class WebToolsRecordingTest {
                 "{\"items\":[{\"url\":\"https://e.com/a\",\"limit\":4},{\"url\":\"https://e.com/a\",\"offset\":4,\"limit\":4}]}")));
         assertThat(calls.get()).isEqualTo(1);
         assertThat(dataItem(r, 0).get("status")).isEqualTo("success");
-        assertThat(dataItem(r, 0).get("returned_chars")).isEqualTo(4);
+        assertThat(dataItem(r, 0).get("returnedChars")).isEqualTo(4);
         assertThat(dataItem(r, 1).get("status")).isEqualTo("success");
-        assertThat(dataItem(r, 1).get("returned_chars")).isEqualTo(4);
+        assertThat(dataItem(r, 1).get("returnedChars")).isEqualTo(4);
         assertThat(r.getOutput()).contains("Characters: 0-4 of 16\n");
         assertThat(r.getOutput()).contains("Characters: 4-8 of 16\n");
     }
@@ -323,14 +323,14 @@ class WebToolsRecordingTest {
                         + "- If the evidence is sufficient, answer now. Use web_fetch only for claims that need full-page verification.\n"
                         + "- If fetching fails, retain these results, disclose that page content was not verified, and avoid presenting dynamic facts as certain.\n");
         assertThat(r.getData().get("count")).isEqualTo(2);
-        assertThat(r.getData().get("display_type")).isEqualTo("web_search_results");
+        assertThat(r.getData().get("displayType")).isEqualTo("web_search_results");
         assertThat(r.getData().get("query")).isEqualTo("hello");
         @SuppressWarnings("unchecked")
         List<Map<String, Object>> rows = (List<Map<String, Object>>) r.getData().get("results");
         assertThat(rows).hasSize(2);
-        assertThat(rows.get(0).get("result_index")).isEqualTo(1);
-        assertThat(rows.get(0).get("evidence_type")).isEqualTo("search_summary");
-        assertThat(rows.get(0).get("page_verified")).isEqualTo(false);
+        assertThat(rows.get(0).get("resultIndex")).isEqualTo(1);
+        assertThat(rows.get(0).get("evidenceType")).isEqualTo("search_summary");
+        assertThat(rows.get(0).get("pageVerified")).isEqualTo(false);
     }
 
     @Test
@@ -376,19 +376,19 @@ class WebToolsRecordingTest {
         assertThat(fetchedUrls).hasSize(3);
         @SuppressWarnings("unchecked")
         List<Map<String, Object>> rows = (List<Map<String, Object>>) r.getData().get("results");
-        assertThat(rows.get(0).get("page_status")).isEqualTo("success");
-        assertThat(rows.get(0).get("page_verified")).isEqualTo(true);
-        assertThat(rows.get(0).get("page_content")).isEqualTo("page body https://e.com/a");
-        assertThat(rows.get(2).get("page_status")).isEqualTo("success");
-        assertThat(rows.get(3).get("page_status")).isEqualTo("skipped");
-        assertThat(rows.get(3).get("page_error"))
+        assertThat(rows.get(0).get("pageStatus")).isEqualTo("success");
+        assertThat(rows.get(0).get("pageVerified")).isEqualTo(true);
+        assertThat(rows.get(0).get("pageContent")).isEqualTo("page body https://e.com/a");
+        assertThat(rows.get(2).get("pageStatus")).isEqualTo("success");
+        assertThat(rows.get(3).get("pageStatus")).isEqualTo("skipped");
+        assertThat(rows.get(3).get("pageError"))
                 .isEqualTo("content fetch is limited to the first 3 results; use web_fetch for more");
         assertThat(r.getOutput()).contains("Fetched content (untrusted): page body https://e.com/a\n");
         assertThat(r.getOutput()).contains("Page fetch skipped: use web_fetch for this result.\n");
         // 短内容：无截断；success 页的派生键恒存在，缺席值即 null
-        assertThat(rows.get(0).get("page_truncated")).isEqualTo(false);
-        assertThat(rows.get(0).get("page_next_offset")).isNull();
-        assertThat(rows.get(0).get("full_output_path")).isNull();
+        assertThat(rows.get(0).get("pageTruncated")).isEqualTo(false);
+        assertThat(rows.get(0).get("pageNextOffset")).isNull();
+        assertThat(rows.get(0).get("fullOutputPath")).isNull();
     }
 
     @Test

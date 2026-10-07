@@ -18,7 +18,7 @@ public class WikiUpdateIssueTool extends BaseTool {
             {
               "type": "object",
               "properties": {
-                "issue_id": {
+                "issueId": {
                   "type": "string",
                   "description": "The short iN issue ID from wiki_read_issue."
                 },
@@ -28,7 +28,7 @@ public class WikiUpdateIssueTool extends BaseTool {
                   "description": "The new status for the issue."
                 }
               },
-              "required": ["issue_id", "status"]
+              "required": ["issueId", "status"]
             }""";
 
     private static final String DESCRIPTION =
@@ -46,7 +46,7 @@ public class WikiUpdateIssueTool extends BaseTool {
     @Override
     public ToolResult execute(ToolRequest request) {
         JsonNode args = request.args();
-        String issueId = args.path("issue_id").asText("");
+        String issueId = args.path("issueId").asText("");
         String status = args.path("status").asText("");
 
         if (issueId.isEmpty()) {

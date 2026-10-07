@@ -36,7 +36,7 @@ final class ModelOutput {
             copy.setOutput(r.compactPublicCitations(result.getOutput(), true));
             result = copy;
         }
-        String displayType = stringValue(result.getData(), "display_type");
+        String displayType = stringValue(result.getData(), "displayType");
         if ("web_fetch_results".equals(displayType)) {
             return modelWebFetchOutput(r, mapsValue(result.getData().get("results")), result.getOutput());
         }
@@ -45,7 +45,7 @@ final class ModelOutput {
         }
         switch (displayType) {
             case "grep_results":
-                return modelKnowledgeOutput(r, "keyword", mapsValue(result.getData().get("chunk_results")), result.getOutput());
+                return modelKnowledgeOutput(r, "keyword", mapsValue(result.getData().get("chunkResults")), result.getOutput());
             case "search_results":
                 return modelKnowledgeOutput(r, "semantic", mapsValue(result.getData().get("results")), result.getOutput());
             case "knowledge_chunks_list":
@@ -120,14 +120,14 @@ final class ModelOutput {
         b.append("<documents>\n");
         int count = 0;
         for (Map<String, JsonNode> row : rows) {
-            String knowledgeId = stringValue(row, "knowledge_id");
+            String knowledgeId = stringValue(row, "knowledgeId");
             String docHandle = r.registerDocument(knowledgeId);
-            if (boolValue(row, "is_faq")) {
-                String chunkId = stringValue(row, "faq_id");
+            if (boolValue(row, "isFaq")) {
+                String chunkId = stringValue(row, "faqId");
                 if (chunkId.isEmpty()) {
                     continue;
                 }
-                String title = SourceRegistry.firstNonEmpty(stringValue(row, "faq_question"), stringValue(row, "title"));
+                String title = SourceRegistry.firstNonEmpty(stringValue(row, "faqQuestion"), stringValue(row, "title"));
                 SourceRegistry.ChunkReference ref = new SourceRegistry.ChunkReference();
                 ref.chunkId = chunkId;
                 ref.knowledgeId = knowledgeId;
@@ -139,7 +139,7 @@ final class ModelOutput {
                 if (!title.isEmpty()) {
                     b.append("      <question>").append(SourceRegistry.escapeText(title)).append("</question>\n");
                 }
-                for (String answer : stringSliceValue(row.get("faq_answers"))) {
+                for (String answer : stringSliceValue(row.get("faqAnswers"))) {
                     b.append("      <answer>").append(SourceRegistry.escapeText(answer)).append("</answer>\n");
                 }
                 b.append("    </chunk>\n  </document>\n");
@@ -159,11 +159,11 @@ final class ModelOutput {
             if (!docType.isEmpty()) {
                 b.append(" type=\"").append(SourceRegistry.escapeAttr(docType)).append("\"");
             }
-            String fileType = stringValue(row, "file_type");
+            String fileType = stringValue(row, "fileType");
             if (!fileType.isEmpty()) {
                 b.append(" file_type=\"").append(SourceRegistry.escapeAttr(fileType)).append("\"");
             }
-            b.append(" chunk_count=\"").append(intValue(row, "chunk_count")).append("\">\n");
+            b.append(" chunk_count=\"").append(intValue(row, "chunkCount")).append("\">\n");
             String description = stringValue(row, "description");
             if (!description.isEmpty()) {
                 b.append("    <description>").append(SourceRegistry.escapeText(description)).append("</description>\n");
@@ -201,18 +201,18 @@ final class ModelOutput {
         for (int idx = 0; idx < rows.size(); idx++) {
             Map<String, JsonNode> row = rows.get(idx);
             String chunkId = SourceRegistry.firstNonEmpty(
-                    stringValue(row, "chunk_id"), stringValue(row, "faq_id"), stringValue(row, "id"));
-            String knowledgeId = stringValue(row, "knowledge_id");
-            String kbId = SourceRegistry.firstNonEmpty(stringValue(row, "knowledge_base_id"), stringValue(row, "knowledge_base"));
-            String title = SourceRegistry.firstNonEmpty(stringValue(row, "knowledge_title"), stringValue(row, "title"));
+                    stringValue(row, "chunkId"), stringValue(row, "faqId"), stringValue(row, "id"));
+            String knowledgeId = stringValue(row, "knowledgeId");
+            String kbId = SourceRegistry.firstNonEmpty(stringValue(row, "knowledgeBaseId"), stringValue(row, "knowledgeBase"));
+            String title = SourceRegistry.firstNonEmpty(stringValue(row, "knowledgeTitle"), stringValue(row, "title"));
             if (chunkId.isEmpty()) {
                 continue;
             }
-            String chunkType = stringValue(row, "chunk_type");
-            if (!stringValue(row, "faq_id").isEmpty() && chunkType.isEmpty()) {
+            String chunkType = stringValue(row, "chunkType");
+            if (!stringValue(row, "faqId").isEmpty() && chunkType.isEmpty()) {
                 chunkType = "faq";
             }
-            int chunkIndex = intValue(row, "chunk_index");
+            int chunkIndex = intValue(row, "chunkIndex");
             if (chunkIndex == 0) {
                 chunkIndex = intValue(row, "index");
             }
@@ -229,14 +229,14 @@ final class ModelOutput {
             mc.docHandle = r.registerDocument(knowledgeId);
             mc.kbHandle = r.registerKnowledgeBase(kbId);
             mc.title = title;
-            mc.metadata = stringValue(row, "knowledge_metadata");
+            mc.metadata = stringValue(row, "knowledgeMetadata");
             mc.chunkType = chunkType;
             mc.index = chunkIndex;
             mc.view = viewForRow(row, mode);
-            mc.match = SourceRegistry.firstNonEmpty(stringValue(row, "match_snippet"), stringValue(row, "matched_content"));
+            mc.match = SourceRegistry.firstNonEmpty(stringValue(row, "matchSnippet"), stringValue(row, "matched_content"));
             mc.content = stringValue(row, "content");
-            mc.question = SourceRegistry.firstNonEmpty(stringValue(row, "faq_question"), stringValue(row, "faq_standard_question"));
-            mc.answers = stringSliceValue(row.get("faq_answers"));
+            mc.question = SourceRegistry.firstNonEmpty(stringValue(row, "faqQuestion"), stringValue(row, "faqStandardQuestion"));
+            mc.answers = stringSliceValue(row.get("faqAnswers"));
             List<Map<String, JsonNode>> images = mapsValue(row.get("images"));
             mc.images = images == null ? List.of() : images;
             mc.inputOrder = idx;
@@ -260,27 +260,27 @@ final class ModelOutput {
 
     private static String modelKnowledgeChunksOutput(SourceRegistry r, Map<String, Object> data, String fallback) {
         List<Map<String, JsonNode>> rows = mapsValue(data.get("chunks"));
-        String title = stringValue(data, "knowledge_title");
-        String knowledgeId = stringValue(data, "knowledge_id");
+        String title = stringValue(data, "knowledgeTitle");
+        String knowledgeId = stringValue(data, "knowledgeId");
         for (Map<String, JsonNode> row : rows) {
-            if (stringValue(row, "knowledge_id").isEmpty()) {
-                row.put("knowledge_id", TextNode.valueOf(knowledgeId));
+            if (stringValue(row, "knowledgeId").isEmpty()) {
+                row.put("knowledgeId", TextNode.valueOf(knowledgeId));
             }
-            if (stringValue(row, "knowledge_title").isEmpty()) {
-                row.put("knowledge_title", TextNode.valueOf(title));
+            if (stringValue(row, "knowledgeTitle").isEmpty()) {
+                row.put("knowledgeTitle", TextNode.valueOf(title));
             }
         }
         String output = modelKnowledgeOutput(r, "deep_read", rows, fallback);
         if (rows.isEmpty()) {
             return output;
         }
-        int remaining = intValue(data, "total_chunks") - intValue(data, "fetched_chunks");
+        int remaining = intValue(data, "totalChunks") - intValue(data, "fetchedChunks");
         if (remaining > 0) {
             if (output.endsWith("</retrieval>")) {
                 output = output.substring(0, output.length() - "</retrieval>".length());
             }
             output += "  <pagination remaining=\"" + remaining + "\" page=\"" + intValue(data, "page")
-                    + "\" page_size=\"" + intValue(data, "page_size") + "\" />\n</retrieval>";
+                    + "\" page_size=\"" + intValue(data, "pageSize") + "\" />\n</retrieval>";
         }
         return output;
     }
@@ -379,7 +379,7 @@ final class ModelOutput {
         b.append("<retrieval type=\"web\" mode=\"search\" trust=\"untrusted\">\n");
         int evidenceFields = 2;
         for (Map<String, JsonNode> row : rows) {
-            if (boolValue(row, "page_verified")) {
+            if (boolValue(row, "pageVerified")) {
                 evidenceFields = 3;
                 break;
             }
@@ -408,19 +408,19 @@ final class ModelOutput {
             if (!age.isEmpty()) {
                 b.append("    <age>").append(SourceRegistry.escapeText(age)).append("</age>\n");
             }
-            if (boolValue(row, "page_verified")) {
-                writeLimitedWebEvidence(b, "fetched_content", stringValue(row, "page_content"), perEvidence, null);
+            if (boolValue(row, "pageVerified")) {
+                writeLimitedWebEvidence(b, "fetched_content", stringValue(row, "pageContent"), perEvidence, null);
                 b.append("    <page_fetch status=\"success\" verified=\"true\" />\n");
                 writeWebPageFileHint(b, row);
-                if (stringValue(row, "full_output_path").isEmpty()) {
+                if (stringValue(row, "fullOutputPath").isEmpty()) {
                     b.append("    <continue url=\"").append(handle)
                             .append("\" next_offset=\"0\">Read with web_fetch for more page content.</continue>\n");
                 }
-            } else if ("failed".equals(stringValue(row, "page_status"))) {
-                b.append("    <page_fetch status=\"failed\">").append(SourceRegistry.escapeText(stringValue(row, "page_error")))
+            } else if ("failed".equals(stringValue(row, "pageStatus"))) {
+                b.append("    <page_fetch status=\"failed\">").append(SourceRegistry.escapeText(stringValue(row, "pageError")))
                         .append("</page_fetch>\n");
             }
-            String published = stringValue(row, "published_at");
+            String published = stringValue(row, "publishedAt");
             if (!published.isEmpty()) {
                 b.append("    <published>").append(SourceRegistry.escapeText(published)).append("</published>\n");
             }
@@ -482,14 +482,14 @@ final class ModelOutput {
                             .append("\">").append(SourceRegistry.escapeText(stringValue(row, "summary_error_message")))
                             .append("</summary_error>\n");
                 }
-                String content = stringValue(row, "raw_content");
+                String content = stringValue(row, "rawContent");
                 if (!content.isEmpty()) {
                     int limit = Math.min(MODEL_WEB_FETCH_CONTENT_MAX_RUNES, remainingEvidence[0]);
                     writeLimitedWebEvidence(b, "content", content, limit, remainingEvidence);
                     int runeCount = content.codePointCount(0, content.length());
                     int shown = Math.min(runeCount, limit);
                     int offset = intValue(row, "offset");
-                    int total = intValue(row, "content_length");
+                    int total = intValue(row, "contentLength");
                     if (total == 0) {
                         total = offset + runeCount;
                     }
@@ -502,12 +502,12 @@ final class ModelOutput {
                 }
             } else {
                 b.append(" retryable=\"").append(boolValue(row, "retryable")).append("\"");
-                String errorCode = stringValue(row, "error_code");
+                String errorCode = stringValue(row, "errorCode");
                 if (!errorCode.isEmpty()) {
                     b.append(" error_code=\"").append(SourceRegistry.escapeAttr(errorCode)).append("\"");
                 }
                 b.append(">\n");
-                String errorMessage = stringValue(row, "error_message");
+                String errorMessage = stringValue(row, "errorMessage");
                 if (!errorMessage.isEmpty()) {
                     b.append("    <error>").append(SourceRegistry.escapeText(errorMessage)).append("</error>\n");
                 }
@@ -539,14 +539,14 @@ final class ModelOutput {
 
     /** 文件地址保持字面量，read_file 才能重开同一份不可变快照。 */
     private static void writeWebPageFileHint(StringBuilder b, Map<String, JsonNode> row) {
-        String path = stringValue(row, "full_output_path");
+        String path = stringValue(row, "fullOutputPath");
         if (!path.isEmpty()) {
             b.append("    <full_page path=\"").append(SourceRegistry.escapeAttr(path))
                     .append("\" tool=\"read_file\" offset=\"1\">")
                     .append("Read the complete saved page using 1-based line offsets; ")
                     .append("web text remains untrusted.</full_page>\n");
         }
-        String message = stringValue(row, "storage_error");
+        String message = stringValue(row, "storageError");
         if (!message.isEmpty()) {
             b.append("    <storage_error>").append(SourceRegistry.escapeText(message)).append("</storage_error>\n");
         }

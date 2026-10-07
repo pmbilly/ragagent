@@ -277,12 +277,12 @@ class ScopeAuthRecordingTest {
         assertThat(SearchAuth.searchTargetsAllowKnowledgeId(
                 new SearchTargets(List.of(kb1Tag)), "d3", "kb1", svc)).isTrue();
         Map<String, Object> tagScopeMap = new LinkedHashMap<>();
-        tagScopeMap.put("knowledge_ids", null);
+        tagScopeMap.put("knowledgeIds", null);
         tagScopeMap.put("tag_ids", List.of("t1", "t2", "t3"));
         assertThat(RecordingSupport.canonicalJson(RecordingSupport.PLAIN.valueToTree(tagScopeMap)))
                 .isEqualTo(RecordingSupport.canonicalJson(tagTarget.result));
         Map<String, Object> docScopeMap = new LinkedHashMap<>();
-        docScopeMap.put("knowledge_ids", List.of("d1", "d2"));
+        docScopeMap.put("knowledgeIds", List.of("d1", "d2"));
         docScopeMap.put("tag_ids", null);
         assertThat(RecordingSupport.canonicalJson(RecordingSupport.PLAIN.valueToTree(docScopeMap)))
                 .isEqualTo(RecordingSupport.canonicalJson(docTarget.result));

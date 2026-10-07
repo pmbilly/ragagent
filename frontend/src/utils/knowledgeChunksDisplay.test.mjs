@@ -15,11 +15,11 @@ const t = (key, params) => {
 
 test('getKnowledgeChunksSummaryHtml joins chunk range and page', () => {
   const html = getKnowledgeChunksSummaryHtml(t, {
-    display_type: 'knowledge_chunks_list',
-    fetched_chunks: 20,
-    total_chunks: 282,
+    displayType: 'knowledge_chunks_list',
+    fetchedChunks: 20,
+    totalChunks: 282,
     page: 3,
-    page_size: 20,
+    pageSize: 20,
   })
   assert.match(html, /loaded <strong>20<\/strong>\/<strong>282<\/strong>/)
   assert.match(html, /page 3\/20/)

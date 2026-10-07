@@ -35,7 +35,7 @@ public class WikiReadSourceDocTool extends BaseTool {
             {
               "type": "object",
               "properties": {
-                "knowledge_id": {
+                "knowledgeId": {
                   "type": "string",
                   "description": "The short dN source document ID from the <sources> block"
                 },
@@ -43,16 +43,16 @@ public class WikiReadSourceDocTool extends BaseTool {
                   "type": "string",
                   "description": "Optional: A regex query to filter the document chunks. Use this to find specific quotes or details efficiently. Remember to double-escape backslashes for JSON: write \\"C\\\\\\\\+\\\\\\\\+\\" (NOT \\"C\\\\+\\\\+\\") and \\"\\\\\\\\d+\\" (NOT \\"\\\\d+\\")."
                 },
-                "start_chunk_index": {
+                "startChunkIndex": {
                   "type": "integer",
                   "description": "Optional: The starting chunk index (1-based) to read a specific range."
                 },
-                "end_chunk_index": {
+                "endChunkIndex": {
                   "type": "integer",
                   "description": "Optional: The ending chunk index (1-based) to read a specific range. Must be >= start_chunk_index."
                 }
               },
-              "required": ["knowledge_id"]
+              "required": ["knowledgeId"]
             }""";
 
     private static final String DESCRIPTION =
@@ -80,13 +80,13 @@ public class WikiReadSourceDocTool extends BaseTool {
     public ToolResult execute(ToolRequest request) {
         JsonNode args = request.args();
 
-        String knowledgeID = args.path("knowledge_id").asText("").trim();
+        String knowledgeID = args.path("knowledgeId").asText("").trim();
         if (knowledgeID.isEmpty()) {
             return failure("knowledge_id is required");
         }
         String query = args.path("query").asText("");
-        int startChunkIndex = args.path("start_chunk_index").asInt(0);
-        int endChunkIndex = args.path("end_chunk_index").asInt(0);
+        int startChunkIndex = args.path("startChunkIndex").asInt(0);
+        int endChunkIndex = args.path("endChunkIndex").asInt(0);
 
         KnowledgeInfoView knowledge;
         if (searchTargets != null) {
@@ -160,13 +160,13 @@ public class WikiReadSourceDocTool extends BaseTool {
                 return;
             }
             Map<String, Object> m = new LinkedHashMap<>();
-            m.put("chunk_id", chunk.getId());
-            m.put("chunk_index", chunk.getChunkIndex());
-            m.put("chunk_type", chunk.getChunkType());
+            m.put("chunkId", chunk.getId());
+            m.put("chunkIndex", chunk.getChunkIndex());
+            m.put("chunkType", chunk.getChunkType());
             m.put("content", content);
-            m.put("knowledge_id", knowledgeID);
-            m.put("knowledge_base", knowledgeBaseId);
-            m.put("knowledge_title", knowledgeTitle);
+            m.put("knowledgeId", knowledgeID);
+            m.put("knowledgeBase", knowledgeBaseId);
+            m.put("knowledgeTitle", knowledgeTitle);
             formattedChunks.add(m);
         };
 
@@ -314,11 +314,11 @@ public class WikiReadSourceDocTool extends BaseTool {
         toolResult.setSuccess(true);
         toolResult.setOutput(sb.toString());
         Map<String, Object> data = new LinkedHashMap<>();
-        data.put("display_type", "knowledge_chunks_list");
-        data.put("knowledge_id", knowledgeID);
-        data.put("knowledge_title", knowledgeTitle);
-        data.put("total_chunks", totalChunks);
-        data.put("fetched_chunks", formattedChunks.size());
+        data.put("displayType", "knowledge_chunks_list");
+        data.put("knowledgeId", knowledgeID);
+        data.put("knowledgeTitle", knowledgeTitle);
+        data.put("totalChunks", totalChunks);
+        data.put("fetchedChunks", formattedChunks.size());
         data.put("chunks", formattedChunks);
         toolResult.setData(data);
         return toolResult;

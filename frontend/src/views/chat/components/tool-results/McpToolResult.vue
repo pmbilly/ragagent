@@ -9,7 +9,7 @@
         <div class="mcp-summary">
           <span v-if="serverName" class="mcp-server">{{ serverName }}</span>
           <span>{{ $t('agentStream.mcp.showing', { count: rows.length, total: total }) }}</span>
-          <span v-if="data.has_more === true"> · {{ $t('agentStream.mcp.moreAvailable') }}</span>
+          <span v-if="data.hasMore === true"> · {{ $t('agentStream.mcp.moreAvailable') }}</span>
         </div>
         <p v-if="!rows.length" class="mcp-empty">{{ $t('agentStream.mcp.empty') }}</p>
         <div v-else class="mcp-list">
@@ -66,9 +66,9 @@
               <p v-if="parameter.description">{{ parameter.description }}</p>
             </div>
           </div>
-          <details v-if="data.input_schema !== undefined" class="mcp-definition">
+          <details v-if="data.inputSchema !== undefined" class="mcp-definition">
             <summary>{{ $t('agentStream.mcp.fullSchema') }}</summary>
-            <pre>{{ JSON.stringify(data.input_schema, null, 2) }}</pre>
+            <pre>{{ JSON.stringify(data.inputSchema, null, 2) }}</pre>
           </details>
         </div>
       </template>
@@ -100,16 +100,16 @@ const props = withDefaults(defineProps<{
 }>(), { success: undefined })
 const { t, te } = useI18n()
 const data = computed(() => parseMcpDiscovery(props.output, props.data))
-const mode = computed(() => data.value.mode || props.arguments?.mode || ('input_schema' in data.value ? 'describe' : ''))
+const mode = computed(() => data.value.mode || props.arguments?.mode || ('inputSchema' in data.value ? 'describe' : ''))
 const isDiscoveryResult = computed(() => Array.isArray(data.value.servers) || Array.isArray(data.value.tools) ||
-  typeof data.value.total === 'number' || 'input_schema' in data.value)
+  typeof data.value.total === 'number' || 'inputSchema' in data.value)
 const rows = computed(() => mcpDiscoveryRows({ ...data.value, mode: mode.value }))
 const serverName = computed(() => {
-  if (typeof data.value.server_name === 'string' && data.value.server_name) return data.value.server_name
+  if (typeof data.value.serverName === 'string' && data.value.serverName) return data.value.serverName
   return rows.value.find(row => row.serverName)?.serverName || ''
 })
 const total = computed(() => typeof data.value.total === 'number' ? data.value.total : rows.value.length)
-const parameters = computed(() => mcpSchemaParameters(data.value.input_schema))
+const parameters = computed(() => mcpSchemaParameters(data.value.inputSchema))
 const description = computed(() => typeof data.value.description === 'string' ? data.value.description : '')
 const descriptionLong = computed(() => mcpDescriptionNeedsExpand(description.value))
 const openIndex = ref(-1)

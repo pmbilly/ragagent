@@ -1,15 +1,15 @@
 <template>
   <div class="graph-query-results">
     <!-- Graph Configuration Card -->
-    <div v-if="data.graph_config" class="stats-card">
+    <div v-if="data.graphConfig" class="stats-card">
       <div class="stats-title">{{ $t('chat.graphConfigTitle') }}</div>
       <div class="info-field">
         <span class="field-label">{{ $t('chat.entityTypesLabel') }}</span>
-        <span class="field-value">{{ data.graph_config.nodes.join(', ') }}</span>
+        <span class="field-value">{{ data.graphConfig.nodes.join(', ') }}</span>
       </div>
       <div class="info-field">
         <span class="field-label">{{ $t('chat.relationTypesLabel') }}</span>
-        <span class="field-value">{{ data.graph_config.relations.join(', ') }}</span>
+        <span class="field-value">{{ data.graphConfig.relations.join(', ') }}</span>
       </div>
     </div>
 
@@ -21,26 +21,26 @@
       
       <div 
         v-for="result in data.results" 
-        :key="result.chunk_id"
+        :key="result.chunkId"
         class="result-card"
       >
-        <div class="result-header" @click="toggleResult(result.chunk_id)">
+        <div class="result-header" @click="toggleResult(result.chunkId)">
           <div class="result-title">
-            <span class="result-index">#{{ result.result_index }}</span>
-            <span class="relevance-badge" :class="getRelevanceClass(result.relevance_level)">
-              {{ getRelevanceLabel(result.relevance_level) }}
+            <span class="result-index">#{{ result.resultIndex }}</span>
+            <span class="relevance-badge" :class="getRelevanceClass(result.relevanceLevel)">
+              {{ getRelevanceLabel(result.relevanceLevel) }}
             </span>
-            <span class="knowledge-title">{{ result.knowledge_title }}</span>
+            <span class="knowledge-title">{{ result.knowledgeTitle }}</span>
           </div>
           <div class="result-meta">
             <span class="score">{{ (result.score * 100).toFixed(0) }}%</span>
-            <span class="expand-icon" :class="{ expanded: expandedResults.includes(result.chunk_id) }">
+            <span class="expand-icon" :class="{ expanded: expandedResults.includes(result.chunkId) }">
               ▶
             </span>
           </div>
         </div>
         
-        <div class="result-content" :class="{ expanded: expandedResults.includes(result.chunk_id) }">
+        <div class="result-content" :class="{ expanded: expandedResults.includes(result.chunkId) }">
           <div class="full-content">{{ result.content }}</div>
         </div>
       </div>

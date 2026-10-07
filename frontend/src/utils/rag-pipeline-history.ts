@@ -105,7 +105,7 @@ export function synthesizeRagPipelineToolEvents(
         doc_count: docCount,
         web_count: webCount,
         search_source: searchSource,
-        kb_counts: kbCounts,
+        kbCounts: kbCounts,
         results: refs,
       },
     },

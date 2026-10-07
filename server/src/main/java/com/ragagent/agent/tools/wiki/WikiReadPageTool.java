@@ -183,10 +183,10 @@ public class WikiReadPageTool extends BaseTool {
         result.setSuccess(true);
         result.setOutput(finalOutput.toString());
         Map<String, Object> data = new LinkedHashMap<>();
-        data.put("found_kbs", foundKBs);
-        data.put("ambiguous_slugs", ambiguous);
-        data.put("truncated_slugs", rendered.truncatedSlugs().isEmpty() ? null : rendered.truncatedSlugs());
-        data.put("omitted_slugs", rendered.omittedSlugs().isEmpty() ? null : rendered.omittedSlugs());
+        data.put("foundKbs", foundKBs);
+        data.put("ambiguousSlugs", ambiguous);
+        data.put("truncatedSlugs", rendered.truncatedSlugs().isEmpty() ? null : rendered.truncatedSlugs());
+        data.put("omittedSlugs", rendered.omittedSlugs().isEmpty() ? null : rendered.omittedSlugs());
         result.setData(data);
         return result;
     }

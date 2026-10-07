@@ -227,17 +227,17 @@ public class GrepChunksTool extends BaseTool {
         data.put("queries", queries); // legacy alias for older frontends
         data.put("patterns", queries); // legacy alias for older frontends
         // 空表/无 scope 时这些键序列化为 null，不是 []（输出契约）。
-        data.put("chunk_results", chunkResults == null ? null : chunkResults);
-        data.put("knowledge_results", knowledgeResultsForUI == null ? null
+        data.put("chunkResults", chunkResults == null ? null : chunkResults);
+        data.put("knowledgeResults", knowledgeResultsForUI == null ? null
                 : knowledgeAggregationMaps(knowledgeResultsForUI));
-        data.put("result_count", chunkResults == null ? 0 : chunkResults.size());
-        data.put("document_count", documentCount);
-        data.put("total_matches", finalResults.size());
-        data.put("knowledge_base_ids",
+        data.put("resultCount", chunkResults == null ? 0 : chunkResults.size());
+        data.put("documentCount", documentCount);
+        data.put("totalMatches", finalResults.size());
+        data.put("knowledgeBaseIds",
                 kbIDsForMeta == null || kbIDsForMeta.isEmpty() ? null : kbIDsForMeta);
         data.put("limit", LIMIT);
-        data.put("max_results", LIMIT); // legacy alias
-        data.put("display_type", "grep_results");
+        data.put("maxResults", LIMIT); // legacy alias
+        data.put("displayType", "grep_results");
         result.setData(data);
         return result;
     }
@@ -430,35 +430,35 @@ public class GrepChunksTool extends BaseTool {
         for (GrepChunkView r : results) {
             Map<String, Object> item = new LinkedHashMap<>();
             String chunkType = GrepChunkView.nz(r.chunkType);
-            item.put("knowledge_id", GrepChunkView.nz(r.knowledgeId));
-            item.put("knowledge_base_id", GrepChunkView.nz(r.knowledgeBaseId));
-            item.put("knowledge_title", GrepChunkView.nz(r.knowledgeTitle));
-            item.put("chunk_type", chunkType);
+            item.put("knowledgeId", GrepChunkView.nz(r.knowledgeId));
+            item.put("knowledgeBaseId", GrepChunkView.nz(r.knowledgeBaseId));
+            item.put("knowledgeTitle", GrepChunkView.nz(r.knowledgeTitle));
+            item.put("chunkType", chunkType);
             if (r.titleMatch) {
-                item.put("title_match", true);
+                item.put("titleMatch", true);
             }
             String snippet = extractChunkMatchSnippet(r, compiled);
             if (!snippet.isEmpty()) {
-                item.put("match_snippet", snippet);
+                item.put("matchSnippet", snippet);
             }
             item.put("score", r.matchScore);
             if ("faq".equals(chunkType)) {
                 if (!GrepChunkView.nz(r.id).isEmpty()) {
-                    item.put("faq_id", GrepChunkView.nz(r.id));
+                    item.put("faqId", GrepChunkView.nz(r.id));
                 }
                 if (r.chunkIndex != 0) {
                     item.put("index", r.chunkIndex);
                 }
                 String q = FaqSnippet.faqStandardQuestion(r.toChunk());
                 if (!q.isEmpty()) {
-                    item.put("faq_question", q);
+                    item.put("faqQuestion", q);
                 }
             } else {
                 if (!GrepChunkView.nz(r.id).isEmpty()) {
-                    item.put("chunk_id", GrepChunkView.nz(r.id));
+                    item.put("chunkId", GrepChunkView.nz(r.id));
                 }
                 if (r.chunkIndex != 0) {
-                    item.put("chunk_index", r.chunkIndex);
+                    item.put("chunkIndex", r.chunkIndex);
                 }
             }
             out.add(item);
@@ -471,20 +471,20 @@ public class GrepChunksTool extends BaseTool {
         List<Map<String, Object>> out = new ArrayList<>(entries.size());
         for (KnowledgeAggregation e : entries) {
             Map<String, Object> m = new LinkedHashMap<>();
-            m.put("knowledge_id", e.knowledgeID);
-            m.put("knowledge_base_id", e.knowledgeBaseID);
-            m.put("knowledge_title", e.knowledgeTitle);
+            m.put("knowledgeId", e.knowledgeID);
+            m.put("knowledgeBaseId", e.knowledgeBaseID);
+            m.put("knowledgeTitle", e.knowledgeTitle);
             if (!e.faqQuestion.isEmpty()) {
-                m.put("faq_question", e.faqQuestion);
+                m.put("faqQuestion", e.faqQuestion);
             }
-            m.put("title_match", e.titleMatch);
-            m.put("chunk_hit_count", e.chunkHitCount);
-            m.put("total_chunk_count", e.totalChunkCount);
-            m.put("pattern_counts", e.patternCounts);
-            m.put("total_pattern_hits", e.totalPatternHits);
-            m.put("distinct_patterns", e.distinctPatterns);
+            m.put("titleMatch", e.titleMatch);
+            m.put("chunkHitCount", e.chunkHitCount);
+            m.put("totalChunkCount", e.totalChunkCount);
+            m.put("patternCounts", e.patternCounts);
+            m.put("totalPatternHits", e.totalPatternHits);
+            m.put("distinctPatterns", e.distinctPatterns);
             if (!e.matchSnippet.isEmpty()) {
-                m.put("match_snippet", e.matchSnippet);
+                m.put("matchSnippet", e.matchSnippet);
             }
             out.add(m);
         }

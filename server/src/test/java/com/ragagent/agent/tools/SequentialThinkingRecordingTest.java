@@ -66,7 +66,7 @@ class SequentialThinkingRecordingTest {
         if (args.contains("\"thought\":\"\"")) {
             return "invalid thought: must be a non-empty string";
         }
-        if (args.contains("\"thought_number\":0")) {
+        if (args.contains("\"thoughtNumber\":0")) {
             return "invalid thoughtNumber: must be >= 1";
         }
         return "invalid totalThoughts: must be >= 1";

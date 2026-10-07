@@ -14,11 +14,11 @@
         <div class="results-list">
           <div 
             v-for="result in group.items" 
-            :key="result.result_index"
+            :key="result.resultIndex"
             class="result-item"
           >
             <div class="result-header">
-              <div class="result-index">#{{ result.result_index }}</div>
+              <div class="result-index">#{{ result.resultIndex }}</div>
               <a 
                 v-if="result.url"
                 :href="result.url" 
@@ -34,10 +34,10 @@
               </div>
             </div>
             
-            <div v-if="result.published_at || result.age" class="result-meta">
+            <div v-if="result.publishedAt || result.age" class="result-meta">
               <span class="meta-item">
                 <t-icon name="time" class="meta-icon" />
-                {{ result.published_at ? formatDate(result.published_at) : result.age }}
+                {{ result.publishedAt ? formatDate(result.publishedAt) : result.age }}
               </span>
             </div>
           </div>

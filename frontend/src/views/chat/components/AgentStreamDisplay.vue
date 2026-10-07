@@ -97,8 +97,8 @@
                       <span class="action-title-icon icon-mask" :style="maskIconStyle(thinkingIcon)"
                         aria-hidden="true" />
                       <span class="action-name">{{ $t('agent.think') }}</span>
-                      <span v-if="event.tool_data?.thought_number" class="action-badge">{{
-                        event.tool_data.thought_number }}/{{ event.tool_data.total_thoughts }}</span>
+                      <span v-if="event.tool_data?.thoughtNumber" class="action-badge">{{
+                        event.tool_data.thoughtNumber }}/{{ event.tool_data.totalThoughts }}</span>
                       <span v-if="getThinkingSummary(event) && !isEventExpanded(event.tool_call_id)"
                         class="action-summary">{{ getThinkingSummary(event) }}</span>
                     </div>
@@ -343,8 +343,8 @@
                   <div class="action-title">
                     <span class="action-title-icon icon-mask" :style="maskIconStyle(thinkingIcon)" aria-hidden="true" />
                     <span class="action-name">{{ $t('agent.think') }}</span>
-                    <span v-if="event.tool_data?.thought_number" class="action-badge">{{ event.tool_data.thought_number
-                    }}/{{ event.tool_data.total_thoughts }}</span>
+                    <span v-if="event.tool_data?.thoughtNumber" class="action-badge">{{ event.tool_data.thoughtNumber
+                    }}/{{ event.tool_data.totalThoughts }}</span>
                     <span v-if="getThinkingSummary(event) && !isEventExpanded(event.tool_call_id)"
                       class="action-summary">{{ getThinkingSummary(event) }}</span>
                   </div>
@@ -713,7 +713,7 @@ const formatMCPToolName = (rawName: string): string => {
 };
 
 const UUID_RE = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi;
-const ID_LABEL_RE = /\b(knowledgeBaseId|knowledge_id|chunk_id|knowledge_base_ids)\s*[:=]\s*/gi;
+const ID_LABEL_RE = /\b(knowledgeBaseId|knowledgeId|chunkId|knowledgeBaseIds)\s*[:=]\s*/gi;
 
 const sanitizeForDisplay = (text: string): string => {
   if (!text) return text;
@@ -1049,8 +1049,8 @@ const mergeDocumentReferences = (refs: KnowledgeReferenceLike[]): KnowledgeRefer
   const merged = new Map<string, KnowledgeReferenceLike & { contentParts?: string[] }>();
 
   for (const ref of refs) {
-    if (ref.chunk_type === 'web_search') continue;
-    const key = ref.knowledge_id || ref.knowledge_title || ref.id;
+    if (ref.chunkType === 'web_search') continue;
+    const key = ref.knowledgeId || ref.knowledgeTitle || ref.id;
     if (!key) continue;
 
     const existing = merged.get(key);
@@ -1058,7 +1058,7 @@ const mergeDocumentReferences = (refs: KnowledgeReferenceLike[]): KnowledgeRefer
     if (!existing) {
       merged.set(key, {
         ...ref,
-        id: ref.knowledge_id || ref.id || key,
+        id: ref.knowledgeId || ref.id || key,
         content,
         contentParts: content ? [content] : [],
       });
@@ -1083,10 +1083,10 @@ const cleanToolOutputContent = (output: unknown): string => {
 };
 
 const getToolKnowledgeBaseId = (toolData: any): string | undefined => {
-  if (typeof toolData?.knowledge_base_id === 'string' && toolData.knowledge_base_id) {
-    return toolData.knowledge_base_id;
+  if (typeof toolData?.knowledgeBaseId === 'string' && toolData.knowledgeBaseId) {
+    return toolData.knowledgeBaseId;
   }
-  const kbIds = Array.isArray(toolData?.knowledge_base_ids) ? toolData.knowledge_base_ids : [];
+  const kbIds = Array.isArray(toolData?.knowledgeBaseIds) ? toolData.knowledgeBaseIds : [];
   if (kbIds.length === 1 && typeof kbIds[0] === 'string' && kbIds[0]) {
     return kbIds[0];
   }
@@ -1108,7 +1108,7 @@ const isMcpTool = (toolName?: string | null): boolean => String(toolName || '').
 const resolveToolDisplayType = (event: any): DisplayType | undefined => {
   const mcpType = getMcpToolDisplayType(event?.tool_name)
   if (mcpType) return mcpType
-  if (event?.display_type) return event.display_type as DisplayType
+  if (event?.displayType) return event.displayType as DisplayType
   return undefined
 };
 
@@ -1127,12 +1127,12 @@ const WIKI_ISSUE_TOOL_NAMES = new Set([
 
 const formatWikiEditResultContent = (toolData: any): string => {
   const rows: Array<[string, unknown]> = [];
-  switch (toolData?.display_type) {
+  switch (toolData?.displayType) {
     case 'wiki_write_page':
       rows.push(
         [t('chat.wikiFieldSlug'), toolData.slug],
         [t('chat.wikiFieldTitle'), toolData.title],
-        [t('chat.wikiFieldPageType'), toolData.page_type],
+        [t('chat.wikiFieldPageType'), toolData.pageType],
         [t('chat.wikiFieldSummary'), toolData.summary],
       );
       break;
@@ -1140,27 +1140,27 @@ const formatWikiEditResultContent = (toolData: any): string => {
       rows.push(
         [t('chat.wikiFieldSlug'), toolData.slug],
         [t('chat.wikiFieldTitle'), toolData.title],
-        [t('chat.wikiFieldOldText'), toolData.old_text],
-        [t('chat.wikiFieldNewText'), toolData.new_text],
+        [t('chat.wikiFieldOldText'), toolData.oldText],
+        [t('chat.wikiFieldNewText'), toolData.newText],
       );
       break;
     case 'wiki_rename_page':
       rows.push(
-        [t('chat.wikiFieldOldSlug'), toolData.old_slug],
-        [t('chat.wikiFieldNewSlug'), toolData.new_slug],
+        [t('chat.wikiFieldOldSlug'), toolData.oldSlug],
+        [t('chat.wikiFieldNewSlug'), toolData.newSlug],
         [t('chat.wikiFieldTitle'), toolData.title],
-        [t('chat.wikiFieldAffectedPages'), Array.isArray(toolData.affected_pages)
-          ? toolData.affected_pages.join(', ')
-          : toolData.affected_pages],
+        [t('chat.wikiFieldAffectedPages'), Array.isArray(toolData.affectedPages)
+          ? toolData.affectedPages.join(', ')
+          : toolData.affectedPages],
       );
       break;
     case 'wiki_delete_page':
       rows.push(
         [t('chat.wikiFieldSlug'), toolData.slug],
         [t('chat.wikiFieldTitle'), toolData.title],
-        [t('chat.wikiFieldAffectedPages'), Array.isArray(toolData.affected_pages)
-          ? toolData.affected_pages.join(', ')
-          : toolData.affected_pages],
+        [t('chat.wikiFieldAffectedPages'), Array.isArray(toolData.affectedPages)
+          ? toolData.affectedPages.join(', ')
+          : toolData.affectedPages],
       );
       break;
   }
@@ -1179,8 +1179,8 @@ const buildToolResultReference = (
   const title = getToolTitle(event);
   return [{
     id: event.tool_call_id || toolName,
-    chunk_type: 'tool_result',
-    knowledge_title: title,
+    chunkType: 'tool_result',
+    knowledgeTitle: title,
     content,
     metadata: {
       title,
@@ -1210,8 +1210,8 @@ function getToolReferenceItems(event: any): KnowledgeReferenceLike[] {
     return parseWikiToolReferences(toolName, event.output, event.tool_call_id || toolName)
       .map((item) => ({
         id: item.id,
-        chunk_type: 'tool_result',
-        knowledge_title: item.title,
+        chunkType: 'tool_result',
+        knowledgeTitle: item.title,
         content: item.content,
         metadata: {
           title: item.title,
@@ -1236,15 +1236,15 @@ function getToolReferenceItems(event: any): KnowledgeReferenceLike[] {
       .filter((item: any) => item?.url)
       .map((item: any, index: number) => ({
         id: item.url,
-        chunk_type: 'web_search',
-        knowledge_title: item.title || item.source || item.url,
+        chunkType: 'web_search',
+        knowledgeTitle: item.title || item.source || item.url,
         content: item.snippet || item.content || '',
         metadata: {
           url: item.url,
           title: item.title || '',
           snippet: item.snippet || item.content || '',
         },
-        chunk_index: item.result_index ?? index + 1,
+        chunkIndex: item.resultIndex ?? index + 1,
       }));
   }
 
@@ -1254,15 +1254,15 @@ function getToolReferenceItems(event: any): KnowledgeReferenceLike[] {
       .filter((item: any) => item?.url && (!item.status || item.status === 'success'))
       .map((item: any, index: number) => ({
         id: item.url,
-        chunk_type: 'web_search',
-        knowledge_title: item.url,
-        content: item.summary || item.raw_content || '',
+        chunkType: 'web_search',
+        knowledgeTitle: item.url,
+        content: item.summary || item.rawContent || '',
         metadata: {
           url: item.url,
           title: item.url,
-          snippet: item.summary || item.raw_content || '',
+          snippet: item.summary || item.rawContent || '',
         },
-        chunk_index: index + 1,
+        chunkIndex: index + 1,
       }));
   }
 
@@ -1270,45 +1270,45 @@ function getToolReferenceItems(event: any): KnowledgeReferenceLike[] {
     const results = Array.isArray(toolData.results) ? toolData.results : [];
     const fallbackKnowledgeBaseId = getToolKnowledgeBaseId(toolData);
     return mergeDocumentReferences(results
-      .filter((item: any) => item?.chunk_id || item?.knowledge_id)
+      .filter((item: any) => item?.chunkId || item?.knowledgeId)
       .map((item: any, index: number) => ({
-        id: item.chunk_id || `${item.knowledge_id}-${item.result_index ?? index + 1}`,
-        knowledge_id: item.knowledge_id,
-        knowledge_title: item.faq_standard_question || item.knowledge_title,
-        knowledgeBaseId: item.knowledge_base_id || fallbackKnowledgeBaseId,
-        chunk_index: item.result_index ?? index + 1,
-        chunk_type: item.chunk_type,
+        id: item.chunkId || `${item.knowledgeId}-${item.resultIndex ?? index + 1}`,
+        knowledgeId: item.knowledgeId,
+        knowledgeTitle: item.faqStandardQuestion || item.knowledgeTitle,
+        knowledgeBaseId: item.knowledgeBaseId || fallbackKnowledgeBaseId,
+        chunkIndex: item.resultIndex ?? index + 1,
+        chunkType: item.chunkType,
         content: item.content || '',
       })));
   }
 
   if (toolName === 'grep_chunks') {
-    const chunkResults = Array.isArray(toolData.chunk_results) ? toolData.chunk_results : [];
+    const chunkResults = Array.isArray(toolData.chunkResults) ? toolData.chunkResults : [];
     if (chunkResults.length) {
       return groupGrepChunkResults(chunkResults)
-        .filter((group) => group.knowledge_id || group.title)
+        .filter((group) => group.knowledgeId || group.title)
         .map((group, index) => ({
-          id: group.knowledge_id || group.key,
-          chunk_ids: group.chunks.map((chunk) => chunk.chunk_id).filter(Boolean),
-          knowledge_id: group.knowledge_id,
-          knowledge_title: group.title,
-          knowledgeBaseId: group.knowledge_base_id,
-          chunk_index: index + 1,
-          chunk_type: group.is_faq ? 'faq' : undefined,
-          content: group.chunks.map((chunk) => chunk.content).filter(Boolean).slice(0, 3).join('\n\n') || group.match_snippet || '',
+          id: group.knowledgeId || group.key,
+          chunkIds: group.chunks.map((chunk) => chunk.chunkId ?? chunk.chunk_id).filter(Boolean),
+          knowledgeId: group.knowledgeId,
+          knowledgeTitle: group.title,
+          knowledgeBaseId: group.knowledgeBaseId,
+          chunkIndex: index + 1,
+          chunkType: group.isFaq ? 'faq' : undefined,
+          content: group.chunks.map((chunk) => chunk.content).filter(Boolean).slice(0, 3).join('\n\n') || group.matchSnippet || '',
         }));
     }
 
-    const knowledgeResults = Array.isArray(toolData.knowledge_results) ? toolData.knowledge_results : [];
+    const knowledgeResults = Array.isArray(toolData.knowledgeResults) ? toolData.knowledgeResults : [];
     return mergeDocumentReferences(knowledgeResults
-      .filter((item: any) => item?.knowledge_id)
+      .filter((item: any) => item?.knowledgeId)
       .map((item: any, index: number) => ({
-        id: item.knowledge_id,
-        knowledge_id: item.knowledge_id,
-        knowledge_title: item.faq_question || item.knowledge_title,
-        knowledgeBaseId: item.knowledge_base_id,
-        chunk_index: index + 1,
-        content: item.match_snippet || '',
+        id: item.knowledgeId,
+        knowledgeId: item.knowledgeId,
+        knowledgeTitle: item.faqQuestion || item.knowledgeTitle,
+        knowledgeBaseId: item.knowledgeBaseId,
+        chunkIndex: index + 1,
+        content: item.matchSnippet || '',
       })));
   }
 
@@ -1318,12 +1318,12 @@ function getToolReferenceItems(event: any): KnowledgeReferenceLike[] {
       return mergeDocumentReferences(chunks
         .filter((item: any) => item?.content)
         .map((item: any, index: number) => ({
-          id: item.chunk_id || item.id || `${toolData.knowledge_id || 'doc'}-${index + 1}`,
-          knowledge_id: item.knowledge_id || toolData.knowledge_id,
-          knowledge_title: toolData.faq_question || toolData.knowledge_title || toolData.knowledge_id,
-          knowledgeBaseId: item.knowledge_base_id || toolData.knowledge_base_id,
-          chunk_index: item.chunk_index ?? item.index ?? index + 1,
-          chunk_type: item.chunk_type || (toolData.faq_question ? 'faq' : undefined),
+          id: item.chunkId || item.id || `${toolData.knowledgeId || 'doc'}-${index + 1}`,
+          knowledgeId: item.knowledgeId || toolData.knowledgeId,
+          knowledgeTitle: toolData.faqQuestion || toolData.knowledgeTitle || toolData.knowledgeId,
+          knowledgeBaseId: item.knowledgeBaseId || toolData.knowledgeBaseId,
+          chunkIndex: item.chunkIndex ?? item.index ?? index + 1,
+          chunkType: item.chunkType || (toolData.faqQuestion ? 'faq' : undefined),
           content: item.content || '',
         })));
     }
@@ -1331,11 +1331,11 @@ function getToolReferenceItems(event: any): KnowledgeReferenceLike[] {
     const output = cleanToolOutputContent(event.output);
     if (!output) return [];
     return [{
-      id: toolData.faq_id || toolData.knowledge_id || event.tool_call_id,
-      knowledge_id: toolData.knowledge_id,
-      knowledge_title: toolData.faq_question || toolData.knowledge_title || toolData.knowledge_id || getToolDescription(event),
-      knowledge_base_id: toolData.knowledge_base_id,
-      chunk_type: toolData.faq_question ? 'faq' : undefined,
+      id: toolData.faqId || toolData.knowledgeId || event.tool_call_id,
+      knowledgeId: toolData.knowledgeId,
+      knowledgeTitle: toolData.faqQuestion || toolData.knowledgeTitle || toolData.knowledgeId || getToolDescription(event),
+      knowledgeBaseId: toolData.knowledgeBaseId,
+      chunkType: toolData.faqQuestion ? 'faq' : undefined,
       content: output,
     }];
   }
@@ -2158,8 +2158,8 @@ const hasResults = (event: any): boolean => {
 
   // For grep tools
   if (toolName === 'grep_chunks') {
-    const totalMatches = event.tool_data.total_matches || 0;
-    const resultCount = event.tool_data.result_count || 0;
+    const totalMatches = event.tool_data.totalMatches || 0;
+    const resultCount = event.tool_data.resultCount || 0;
     return totalMatches > 0 || resultCount > 0;
   }
 
@@ -2203,7 +2203,7 @@ const handleCitationActivate = (el: HTMLElement) => {
 const getKbIdForWiki = (slug: string): string => {
   if (route.params.kbId) return route.params.kbId as string;
 
-  // The backend ships `found_kbs` as a map<slug, string[]> — a single slug can
+  // The backend ships `foundKbs` as a map<slug, string[]> — a single slug can
   // legitimately resolve to more than one KB when multiple wiki KBs are in
   // scope. For navigation we just pick the first one; cross-KB disambiguation
   // (if ever needed) can layer on top. We also defensively handle the legacy
@@ -2224,7 +2224,7 @@ const getKbIdForWiki = (slug: string): string => {
   if (props.session?.agentEventStream) {
     for (let i = props.session.agentEventStream.length - 1; i >= 0; i--) {
       const event = props.session.agentEventStream[i];
-      const foundKbs = event?.tool_data?.found_kbs;
+      const foundKbs = event?.tool_data?.foundKbs;
       if (event.type === 'tool_call' && foundKbs) {
         const hit = pickKbId(foundKbs[slug]);
         if (hit) return hit;
@@ -2557,12 +2557,12 @@ const getToolSummary = (event: any): string => {
       return t('agentStream.toolSummary.getDocument', { title: toolData.title });
     }
   } else if (toolName === 'list_knowledge_chunks') {
-    if (toolData?.faq_question) {
-      return t('agentStream.toolSummary.listFaqEntry', { question: toolData.faq_question });
+    if (toolData?.faqQuestion) {
+      return t('agentStream.toolSummary.listFaqEntry', { question: toolData.faqQuestion });
     }
-    if (toolData?.fetched_chunks !== undefined) {
-      const title = toolData?.knowledge_title || toolData?.knowledge_id || t('agentStream.toolSummary.document');
-      return t('agentStream.toolSummary.listChunks', { title, fetched: toolData.fetched_chunks, total: toolData.total_chunks ?? '?' });
+    if (toolData?.fetchedChunks !== undefined) {
+      const title = toolData?.knowledgeTitle || toolData?.knowledgeId || t('agentStream.toolSummary.document');
+      return t('agentStream.toolSummary.listChunks', { title, fetched: toolData.fetchedChunks, total: toolData.totalChunks ?? '?' });
     }
   } else if (toolName === 'todo_write') {
     // Extract steps from tool data
@@ -2693,7 +2693,7 @@ const getSearchResultsSummary = (event: any): string => {
 
   // Build summary text
   let summary = '';
-  const kbCount = toolData.kb_counts ? Object.keys(toolData.kb_counts).length : 0;
+  const kbCount = toolData.kbCounts ? Object.keys(toolData.kbCounts).length : 0;
   if (kbCount > 0) {
     summary = t('agentStream.search.foundResultsFromFiles', { count: `<strong>${count}</strong>`, files: `<strong>${kbCount}</strong>` });
   } else {
@@ -2722,7 +2722,7 @@ const getResultsCount = (toolData: any): number => {
 const getGrepResultsSummary = (toolData: any): string => {
   if (!toolData) return '';
 
-  const totalChunks = Number(toolData.total_matches ?? 0) || 0;
+  const totalChunks = Number(toolData.totalMatches ?? 0) || 0;
   const docCount = countGrepDocuments(toolData);
 
   if (totalChunks === 0) {
@@ -2860,7 +2860,7 @@ const getToolTitle = (event: any): string => {
 const skillScriptCommandLabel = (event: any): string => {
   const fromData = String(event?.tool_data?.command || event?.arguments?.command || '').trim()
   if (fromData) return fromData
-  const skill = String(event?.tool_data?.skill_name || event?.arguments?.skill_name || '').trim()
+  const skill = String(event?.tool_data?.skillName || event?.arguments?.skillName || '').trim()
   const script = String(event?.tool_data?.script_path || event?.arguments?.script_path || '').trim()
   const path = [skill, script].filter(Boolean).join('/')
   const args = event?.tool_data?.args || event?.arguments?.args

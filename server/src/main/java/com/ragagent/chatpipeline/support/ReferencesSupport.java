@@ -63,19 +63,19 @@ public final class ReferencesSupport {
                 row.put("url", result.getId());
                 row.put("title", firstPipelineTitle(result));
                 row.put("snippet", result.getContent());
-                row.put("published_at", result.getMetadata() == null
+                row.put("publishedAt", result.getMetadata() == null
                         ? null : result.getMetadata().get("published_at"));
                 webRows.add(row);
                 continue;
             }
             knowledgeResults.add(result);
             Map<String, Object> row = new LinkedHashMap<>();
-            row.put("chunk_id", result.getId());
-            row.put("knowledge_id", result.getKnowledgeId());
-            row.put("knowledge_base_id", result.getKnowledgeBaseId());
-            row.put("knowledge_title", firstPipelineTitle(result));
-            row.put("chunk_index", result.getChunkIndex());
-            row.put("chunk_type", result.getChunkType());
+            row.put("chunkId", result.getId());
+            row.put("knowledgeId", result.getKnowledgeId());
+            row.put("knowledgeBaseId", result.getKnowledgeBaseId());
+            row.put("knowledgeTitle", firstPipelineTitle(result));
+            row.put("chunkIndex", result.getChunkIndex());
+            row.put("chunkType", result.getChunkType());
             row.put("content", getEnrichedPassageForChat(result));
             knowledgeRows.add(row);
         }
@@ -91,7 +91,7 @@ public final class ReferencesSupport {
             ToolResult result = new ToolResult();
             result.setSuccess(true);
             Map<String, Object> data = new LinkedHashMap<>();
-            data.put("display_type", "search_results");
+            data.put("displayType", "search_results");
             data.put("results", knowledgeRows);
             result.setData(data);
             contextParts.add(registry.modelToolResult(result));
@@ -100,7 +100,7 @@ public final class ReferencesSupport {
             ToolResult result = new ToolResult();
             result.setSuccess(true);
             Map<String, Object> data = new LinkedHashMap<>();
-            data.put("display_type", "web_search_results");
+            data.put("displayType", "web_search_results");
             data.put("results", webRows);
             result.setData(data);
             contextParts.add(registry.modelToolResult(result));

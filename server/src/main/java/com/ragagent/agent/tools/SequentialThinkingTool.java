@@ -46,44 +46,44 @@ public class SequentialThinkingTool extends BaseTool {
                   "type": "string",
                   "description": "Your current thinking step. Write in natural, user-friendly language. NEVER mention tool names (like \\"grep_chunks\\", \\"knowledge_search\\", \\"web_search\\", etc.). Instead, describe actions in plain language (e.g., \\"I'll search for key terms\\" instead of \\"I'll use grep_chunks\\"). Focus on WHAT you're trying to find and WHY, not HOW (which tools you'll use)."
                 },
-                "next_thought_needed": {
+                "nextThoughtNeeded": {
                   "type": "boolean",
                   "description": "Whether another thought step is needed"
                 },
-                "thought_number": {
+                "thoughtNumber": {
                   "type": "integer",
                   "description": "Current thought number (numeric value, e.g., 1, 2, 3)",
                   "minimum": 1
                 },
-                "total_thoughts": {
+                "totalThoughts": {
                   "type": "integer",
                   "description": "Estimated total thoughts needed (numeric value, e.g., 5, 10)",
                   "minimum": 1
                 },
-                "is_revision": {
+                "revision": {
                   "type": "boolean",
                   "description": "Whether this revises previous thinking"
                 },
-                "revises_thought": {
+                "revisesThought": {
                   "type": "integer",
                   "description": "Which thought is being reconsidered",
                   "minimum": 1
                 },
-                "branch_from_thought": {
+                "branchFromThought": {
                   "type": "integer",
                   "description": "Branching point thought number",
                   "minimum": 1
                 },
-                "branch_id": {
+                "branchId": {
                   "type": "string",
                   "description": "Branch identifier"
                 },
-                "needs_more_thoughts": {
+                "needsMoreThoughts": {
                   "type": "boolean",
                   "description": "If more thoughts are needed"
                 }
               },
-              "required": ["thought", "next_thought_needed", "thought_number", "total_thoughts"]
+              "required": ["thought", "nextThoughtNeeded", "thoughtNumber", "totalThoughts"]
             }""";
 
     public SequentialThinkingTool() {
@@ -169,14 +169,14 @@ public class SequentialThinkingTool extends BaseTool {
         try {
             input = new SequentialThinkingInput(
                     args.path("thought").asText(""),
-                    args.path("next_thought_needed").asBoolean(false),
-                    args.path("thought_number").asInt(0),
-                    args.path("total_thoughts").asInt(0),
-                    args.path("is_revision").asBoolean(false),
-                    args.hasNonNull("revises_thought") ? args.get("revises_thought").asInt() : null,
-                    args.hasNonNull("branch_from_thought") ? args.get("branch_from_thought").asInt() : null,
-                    args.path("branch_id").asText(""),
-                    args.path("needs_more_thoughts").asBoolean(false));
+                    args.path("nextThoughtNeeded").asBoolean(false),
+                    args.path("thoughtNumber").asInt(0),
+                    args.path("totalThoughts").asInt(0),
+                    args.path("revision").asBoolean(false),
+                    args.hasNonNull("revisesThought") ? args.get("revisesThought").asInt() : null,
+                    args.hasNonNull("branchFromThought") ? args.get("branchFromThought").asInt() : null,
+                    args.path("branchId").asText(""),
+                    args.path("needsMoreThoughts").asBoolean(false));
         } catch (RuntimeException e) {
             // 解析失败文案固定 "Failed to parse args: "（内层消息因解析器而异——已知差异）
             return failure("Failed to parse args: " + e.getMessage());
@@ -211,14 +211,14 @@ public class SequentialThinkingTool extends BaseTool {
                 || adjusted.thoughtNumber() < totalThoughts;
 
         Map<String, Object> responseData = new LinkedHashMap<>();
-        responseData.put("thought_number", thoughtNumber);
-        responseData.put("total_thoughts", totalThoughts);
-        responseData.put("next_thought_needed", adjusted.nextThoughtNeeded());
+        responseData.put("thoughtNumber", thoughtNumber);
+        responseData.put("totalThoughts", totalThoughts);
+        responseData.put("nextThoughtNeeded", adjusted.nextThoughtNeeded());
         responseData.put("branches", branchKeys);
-        responseData.put("thought_history_length", thoughtHistory.size());
-        responseData.put("display_type", "thinking");
+        responseData.put("thoughtHistoryLength", thoughtHistory.size());
+        responseData.put("displayType", "thinking");
         responseData.put("thought", adjusted.thought());
-        responseData.put("incomplete_steps", incomplete);
+        responseData.put("incompleteSteps", incomplete);
 
         String outputMsg = "Thought process recorded";
         if (incomplete) {

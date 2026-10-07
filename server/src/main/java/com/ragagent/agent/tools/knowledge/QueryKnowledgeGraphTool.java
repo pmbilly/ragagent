@@ -34,7 +34,7 @@ public class QueryKnowledgeGraphTool extends BaseTool {
             {
               "additionalProperties": false,
               "properties": {
-                "knowledge_base_ids": {
+                "knowledgeBaseIds": {
                   "description": "Array of short bN knowledge base IDs to query",
                   "items": { "type": "string" },
                   "type": ["null", "array"]
@@ -44,7 +44,7 @@ public class QueryKnowledgeGraphTool extends BaseTool {
                   "type": "string"
                 }
               },
-              "required": ["knowledge_base_ids", "query"],
+              "required": ["knowledgeBaseIds", "query"],
               "type": "object"
             }""";
 
@@ -139,7 +139,7 @@ public class QueryKnowledgeGraphTool extends BaseTool {
         JsonNode args = request.args();
 
         List<String> knowledgeBaseIDs = new ArrayList<>();
-        JsonNode kbNode = args.get("knowledge_base_ids");
+        JsonNode kbNode = args.get("knowledgeBaseIds");
         if (kbNode != null && kbNode.isArray()) {
             for (JsonNode item : kbNode) {
                 if (item.isTextual()) {
@@ -245,11 +245,11 @@ public class QueryKnowledgeGraphTool extends BaseTool {
             toolResult.setSuccess(true);
             toolResult.setOutput("No relevant graph information found.");
             Map<String, Object> data = new LinkedHashMap<>();
-            data.put("knowledge_base_ids", knowledgeBaseIDs);
+            data.put("knowledgeBaseIds", knowledgeBaseIDs);
             data.put("query", query);
             data.put("results", List.of());
-            data.put("graph_configs", graphConfigsToData(graphConfigs));
-            data.put("graph_config", aggregateGraphConfig(graphConfigs));
+            data.put("graphConfigs", graphConfigsToData(graphConfigs));
+            data.put("graphConfig", aggregateGraphConfig(graphConfigs));
             data.put("errors", errors.isEmpty() ? null : errors);
             toolResult.setData(data);
             return toolResult;
@@ -332,17 +332,17 @@ public class QueryKnowledgeGraphTool extends BaseTool {
             output.append(String.format("  🆔 chunk_id: %s\n\n", result.id()));
 
             Map<String, Object> formatted = new LinkedHashMap<>();
-            formatted.put("result_index", i + 1);
-            formatted.put("chunk_id", result.id());
-            formatted.put("chunk_index", result.chunkIndex());
-            formatted.put("chunk_type", result.chunkType());
+            formatted.put("resultIndex", i + 1);
+            formatted.put("chunkId", result.id());
+            formatted.put("chunkIndex", result.chunkIndex());
+            formatted.put("chunkType", result.chunkType());
             formatted.put("content", result.content());
             formatted.put("score", result.score());
-            formatted.put("relevance_level", relevanceLevel);
-            formatted.put("knowledge_id", result.knowledgeId());
-            formatted.put("knowledge_base_id", result.knowledgeBaseId());
-            formatted.put("knowledge_title", result.knowledgeTitle());
-            formatted.put("match_type", BaseTool.formatMatchType(result.matchType()));
+            formatted.put("relevanceLevel", relevanceLevel);
+            formatted.put("knowledgeId", result.knowledgeId());
+            formatted.put("knowledgeBaseId", result.knowledgeBaseId());
+            formatted.put("knowledgeTitle", result.knowledgeTitle());
+            formatted.put("matchType", BaseTool.formatMatchType(result.matchType()));
             formattedResults.add(formatted);
         }
 
@@ -361,17 +361,17 @@ public class QueryKnowledgeGraphTool extends BaseTool {
         toolResult.setSuccess(true);
         toolResult.setOutput(output.toString());
         Map<String, Object> data = new LinkedHashMap<>();
-        data.put("knowledge_base_ids", knowledgeBaseIDs);
+        data.put("knowledgeBaseIds", knowledgeBaseIDs);
         data.put("query", query);
         data.put("results", formattedResults);
         data.put("count", allResults.size());
-        data.put("kb_counts", kbCounts);
-        data.put("graph_configs", graphConfigsToData(graphConfigs));
-        data.put("graph_config", aggregateGraphConfig(graphConfigs));
-        data.put("graph_data", graphData);
-        data.put("has_graph_config", hasGraphConfig);
+        data.put("kbCounts", kbCounts);
+        data.put("graphConfigs", graphConfigsToData(graphConfigs));
+        data.put("graphConfig", aggregateGraphConfig(graphConfigs));
+        data.put("graphData", graphData);
+        data.put("hasGraphConfig", hasGraphConfig);
         data.put("errors", errors.isEmpty() ? null : errors);
-        data.put("display_type", "graph_query_results");
+        data.put("displayType", "graph_query_results");
         toolResult.setData(data);
         return toolResult;
     }
@@ -477,8 +477,8 @@ public class QueryKnowledgeGraphTool extends BaseTool {
                 node.put("id", result.id());
                 node.put("label", String.format("Chunk %d", i + 1));
                 node.put("content", result.content());
-                node.put("kb_id", result.knowledgeId());
-                node.put("kb_title", result.knowledgeTitle());
+                node.put("kbId", result.knowledgeId());
+                node.put("kbTitle", result.knowledgeTitle());
                 node.put("score", result.score());
                 node.put("type", "chunk");
                 nodes.add(node);
@@ -487,8 +487,8 @@ public class QueryKnowledgeGraphTool extends BaseTool {
         Map<String, Object> graphData = new LinkedHashMap<>();
         graphData.put("nodes", nodes);
         graphData.put("edges", edges);
-        graphData.put("total_nodes", nodes.size());
-        graphData.put("total_edges", edges.size());
+        graphData.put("totalNodes", nodes.size());
+        graphData.put("totalEdges", edges.size());
         return graphData;
     }
 

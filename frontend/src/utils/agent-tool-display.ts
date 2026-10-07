@@ -141,7 +141,7 @@ export function getKnowledgeSearchSummaryHtml(
     return t('agentStream.search.webResults', { count: `<strong>${count}</strong>` })
   }
 
-  const kbCounts = toolData.kb_counts
+  const kbCounts = toolData.kbCounts
   const kbCount = kbCounts && typeof kbCounts === 'object' ? Object.keys(kbCounts).length : 0
   if (kbCount > 0) {
     return t('agentStream.search.foundResultsFromFiles', {

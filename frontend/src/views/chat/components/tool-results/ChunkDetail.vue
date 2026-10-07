@@ -3,15 +3,15 @@
     <div class="info-section">
       <div class="info-field">
         <span class="field-label">{{ $t('chat.chunkIdLabel') }}</span>
-        <span class="field-value"><code>{{ data.chunk_id }}</code></span>
+        <span class="field-value"><code>{{ data.chunkId }}</code></span>
       </div>
       <div class="info-field">
         <span class="field-label">{{ $t('chat.documentIdLabel') }}</span>
-        <span class="field-value"><code>{{ data.knowledge_id }}</code></span>
+        <span class="field-value"><code>{{ data.knowledgeId }}</code></span>
       </div>
       <div class="info-field">
         <span class="field-label">{{ $t('chat.positionLabel') }}</span>
-        <span class="field-value">{{ $t('chat.chunkPositionValue', { index: data.chunk_index }) }}</span>
+        <span class="field-value">{{ $t('chat.chunkPositionValue', { index: data.chunkIndex }) }}</span>
       </div>
       <div v-if="data.content_length" class="info-field">
         <span class="field-label">{{ $t('chat.contentLengthLabelSimple') }}</span>

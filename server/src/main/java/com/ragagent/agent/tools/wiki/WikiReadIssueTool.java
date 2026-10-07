@@ -20,7 +20,7 @@ public class WikiReadIssueTool extends BaseTool {
             {
               "type": "object",
               "properties": {
-                "issue_id": {
+                "issueId": {
                   "type": "string",
                   "description": "Optional: The short iN ID of a specific issue from an earlier wiki_read_issue result."
                 },
@@ -47,7 +47,7 @@ public class WikiReadIssueTool extends BaseTool {
     @Override
     public ToolResult execute(ToolRequest request) {
         JsonNode args = request.args();
-        String issueId = args.path("issue_id").asText("").trim();
+        String issueId = args.path("issueId").asText("").trim();
         String slug = args.path("slug").asText("").trim();
 
         if (issueId.isEmpty() && slug.isEmpty()) {

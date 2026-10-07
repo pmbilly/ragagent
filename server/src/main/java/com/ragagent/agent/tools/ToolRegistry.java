@@ -47,9 +47,9 @@ public class ToolRegistry {
 
     // ---- 校验失败的追加提示（文本属于各工具文件，registry 拼接点先就位）----
     static final String MCP_CALL_ARGUMENTS_HINT = " Pass arguments as a JSON object, not a JSON-encoded string. "
-            + "For a tool with no parameters use {\"tool_ref\":\"<describe reference>\",\"arguments\":{}}; "
-            + "otherwise match its input_schema. If the definition is unavailable, use "
-            + "discover_mcp_tools(mode=\"describe\", server_id=..., tool_name=...).";
+            + "For a tool with no parameters use {\"toolRef\":\"<describe reference>\",\"arguments\":{}}; "
+            + "otherwise match its inputSchema. If the definition is unavailable, use "
+            + "discover_mcp_tools(mode=\"describe\", serverId=..., toolName=...).";
     static final String WRITE_SANDBOX_MISSING_FIELD_HINT =
             "\nIf the previous call was truncated, retry with a complete JSON object: "
                     + "put `path` first (e.g. /workspace/output/script.py), then `content`. Split large files.";
@@ -514,7 +514,7 @@ public class ToolRegistry {
                 if (ToolDefinitions.TOOL_CALL_MCP_TOOL.equals(name)) {
                     try {
                         JsonNode args = PLAIN_READER.readTree(call.getFunction().getArguments());
-                        String ref = args.path("tool_ref").asText("");
+                        String ref = args.path("toolRef").asText("");
                         if (!ref.isEmpty()) {
                             c.historyRefs.put(ref, Boolean.TRUE);
                         }

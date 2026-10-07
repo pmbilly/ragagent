@@ -54,9 +54,9 @@ public class DataSchemaTool extends BaseTool {
 
     /** schema 键按字母序：additionalProperties < properties < required < type。 */
     private static final String SCHEMA_JSON =
-            "{\"additionalProperties\":false,\"properties\":{\"knowledge_id\":"
+            "{\"additionalProperties\":false,\"properties\":{\"knowledgeId\":"
                     + "{\"description\":\"short dN document ID to query\",\"type\":\"string\"}},"
-                    + "\"required\":[\"knowledge_id\"],\"type\":\"object\"}";
+                    + "\"required\":[\"knowledgeId\"],\"type\":\"object\"}";
 
     private static final String DESCRIPTION =
             "Use this tool to get the schema information of a CSV or Excel file loaded into DuckDB. "
@@ -85,7 +85,7 @@ public class DataSchemaTool extends BaseTool {
     @Override
     public ToolResult execute(ToolRequest request) {
         JsonNode args = request.args();
-        String knowledgeId = args.path("knowledge_id").asText("");
+        String knowledgeId = args.path("knowledgeId").asText("");
 
         // 取知识以拿租户（IDOnly 以支持跨租户共享 KB；设置了授权器则走授权）
         KnowledgeView knowledge;

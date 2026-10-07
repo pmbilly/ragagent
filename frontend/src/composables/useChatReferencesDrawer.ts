@@ -36,7 +36,7 @@ export function provideChatReferencesDrawer(): ChatReferencesDrawerContext {
     if (options.sourceKey) return options.sourceKey
     if (options.messageId) return `message:${options.messageId}`
     return options.references
-      .map((item) => item.id || item.knowledge_id || item.knowledge_title || item.metadata?.url || '')
+      .map((item) => item.id || item.knowledgeId || item.knowledgeTitle || item.metadata?.url || '')
       .filter(Boolean)
       .join('|')
   }

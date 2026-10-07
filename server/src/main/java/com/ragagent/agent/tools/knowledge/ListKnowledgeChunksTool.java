@@ -33,15 +33,15 @@ public class ListKnowledgeChunksTool extends BaseTool {
     private static final String SCHEMA_JSON = """
             {
               "properties": {
-                "chunk_id": {
+                "chunkId": {
                   "description": "Short cN ID for one non-FAQ chunk",
                   "type": "string"
                 },
-                "faq_id": {
+                "faqId": {
                   "description": "Short cN FAQ chunk ID. Use for FAQ hits instead of the parent dN document ID.",
                   "type": "string"
                 },
-                "knowledge_id": {
+                "knowledgeId": {
                   "description": "Short dN document ID to list all chunks",
                   "type": "string"
                 },
@@ -99,15 +99,15 @@ public class ListKnowledgeChunksTool extends BaseTool {
     public ToolResult execute(ToolRequest request) {
         JsonNode args = request.args();
 
-        String chunkID = args.path("faq_id").asText("").trim();
+        String chunkID = args.path("faqId").asText("").trim();
         if (chunkID.isEmpty()) {
-            chunkID = args.path("chunk_id").asText("").trim();
+            chunkID = args.path("chunkId").asText("").trim();
         }
         if (!chunkID.isEmpty()) {
             return executeByChunkID(chunkID);
         }
 
-        String knowledgeID = args.path("knowledge_id").asText("").trim();
+        String knowledgeID = args.path("knowledgeId").asText("").trim();
         if (knowledgeID.isEmpty()) {
             return failure("one of faq_id, chunk_id, or knowledge_id is required");
         }
@@ -168,11 +168,11 @@ public class ListKnowledgeChunksTool extends BaseTool {
                             + " Retry with offset=%d (or any value < %d).",
                     offset, totalChunks, totalChunks - 1, suggestedOffset, totalChunks));
             Map<String, Object> data = new LinkedHashMap<>();
-            data.put("knowledge_id", knowledgeID);
-            data.put("total_chunks", totalChunks);
-            data.put("requested_offset", offset);
-            data.put("requested_limit", chunkLimit);
-            data.put("suggested_offset", suggestedOffset);
+            data.put("knowledgeId", knowledgeID);
+            data.put("totalChunks", totalChunks);
+            data.put("requestedOffset", offset);
+            data.put("requestedLimit", chunkLimit);
+            data.put("suggestedOffset", suggestedOffset);
             r.setData(data);
             return r;
         }
@@ -190,15 +190,15 @@ public class ListKnowledgeChunksTool extends BaseTool {
             Chunk c = chunks.get(idx);
             Map<String, Object> chunkData = new LinkedHashMap<>();
             chunkData.put("seq", idx + 1);
-            chunkData.put("chunk_id", c.getId());
-            chunkData.put("chunk_index", c.getChunkIndex());
+            chunkData.put("chunkId", c.getId());
+            chunkData.put("chunkIndex", c.getChunkIndex());
             chunkData.put("content", nz(c.getContent()));
-            chunkData.put("chunk_type", c.getChunkType());
-            chunkData.put("knowledge_id", nz(c.getKnowledgeId()));
-            chunkData.put("knowledge_base", nz(c.getKnowledgeBaseId()));
-            chunkData.put("start_at", c.getStartAt());
-            chunkData.put("end_at", c.getEndAt());
-            chunkData.put("parent_chunk_id", nz(c.getParentChunkId()));
+            chunkData.put("chunkType", c.getChunkType());
+            chunkData.put("knowledgeId", nz(c.getKnowledgeId()));
+            chunkData.put("knowledgeBase", nz(c.getKnowledgeBaseId()));
+            chunkData.put("startAt", c.getStartAt());
+            chunkData.put("endAt", c.getEndAt());
+            chunkData.put("parentChunkId", nz(c.getParentChunkId()));
 
             FaqSnippet.appendFaqChunkData(chunkData, c);
             FaqSnippet.normalizeFaqChunkDataMap(chunkData, c);
@@ -217,7 +217,7 @@ public class ListKnowledgeChunksTool extends BaseTool {
                             imgData.put("caption", img.caption());
                         }
                         if (img.ocrText() != null && !img.ocrText().isEmpty()) {
-                            imgData.put("ocr_text", img.ocrText());
+                            imgData.put("ocrText", img.ocrText());
                         }
                         if (!imgData.isEmpty()) {
                             imageList.add(imgData);
@@ -236,13 +236,13 @@ public class ListKnowledgeChunksTool extends BaseTool {
         toolResult.setSuccess(true);
         toolResult.setOutput(output);
         Map<String, Object> data = new LinkedHashMap<>();
-        data.put("display_type", "knowledge_chunks_list");
-        data.put("knowledge_id", knowledgeID);
-        data.put("knowledge_title", knowledgeTitle);
-        data.put("total_chunks", totalChunks);
-        data.put("fetched_chunks", fetched);
+        data.put("displayType", "knowledge_chunks_list");
+        data.put("knowledgeId", knowledgeID);
+        data.put("knowledgeTitle", knowledgeTitle);
+        data.put("totalChunks", totalChunks);
+        data.put("fetchedChunks", fetched);
         data.put("page", page);
-        data.put("page_size", pageSize);
+        data.put("pageSize", pageSize);
         data.put("chunks", formattedChunks);
         toolResult.setData(data);
         return toolResult;
@@ -283,30 +283,30 @@ public class ListKnowledgeChunksTool extends BaseTool {
 
         Map<String, Object> chunkData = new LinkedHashMap<>();
         chunkData.put("seq", 1);
-        chunkData.put("chunk_id", chunk.getId());
-        chunkData.put("chunk_index", chunk.getChunkIndex());
+        chunkData.put("chunkId", chunk.getId());
+        chunkData.put("chunkIndex", chunk.getChunkIndex());
         chunkData.put("content", nz(chunk.getContent()));
-        chunkData.put("chunk_type", chunk.getChunkType());
-        chunkData.put("knowledge_id", nz(chunk.getKnowledgeId()));
-        chunkData.put("knowledge_base", nz(chunk.getKnowledgeBaseId()));
+        chunkData.put("chunkType", chunk.getChunkType());
+        chunkData.put("knowledgeId", nz(chunk.getKnowledgeId()));
+        chunkData.put("knowledgeBase", nz(chunk.getKnowledgeBaseId()));
         FaqSnippet.appendFaqChunkData(chunkData, chunk);
         FaqSnippet.normalizeFaqChunkDataMap(chunkData, chunk);
         List<Map<String, Object>> formattedChunks = List.of(chunkData);
 
         Map<String, Object> data = new LinkedHashMap<>();
-        data.put("display_type", "knowledge_chunks_list");
-        data.put("knowledge_id", chunk.getKnowledgeId());
-        data.put("knowledge_title", knowledgeTitle);
-        data.put("total_chunks", 1L);
-        data.put("fetched_chunks", 1);
+        data.put("displayType", "knowledge_chunks_list");
+        data.put("knowledgeId", chunk.getKnowledgeId());
+        data.put("knowledgeTitle", knowledgeTitle);
+        data.put("totalChunks", 1L);
+        data.put("fetchedChunks", 1);
         data.put("page", 1);
-        data.put("page_size", 1);
+        data.put("pageSize", 1);
         data.put("chunks", formattedChunks);
-        data.put("faq_id", chunk.getId());
-        data.put("single_chunk", true);
+        data.put("faqId", chunk.getId());
+        data.put("singleChunk", true);
         String q = FaqSnippet.faqStandardQuestion(chunk);
         if (q != null && !q.isEmpty()) {
-            data.put("faq_question", q);
+            data.put("faqQuestion", q);
         }
 
         ToolResult toolResult = new ToolResult();

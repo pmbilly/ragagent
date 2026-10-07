@@ -32,7 +32,7 @@ public class McpCallTool extends BaseTool {
             }
         }
         refs.sort(String::compareTo);
-        String schema = McpCatalog.mcpSchemaWithEnum(McpCatalog.MCP_CALL_SCHEMA, "tool_ref", refs);
+        String schema = McpCatalog.mcpSchemaWithEnum(McpCatalog.MCP_CALL_SCHEMA, "toolRef", refs);
         return parseTree(schema);
     }
 
@@ -91,7 +91,7 @@ public class McpCallTool extends BaseTool {
                     if (!catalog.knownCallableRef(ref)) {
                         return new ResolveResult(null, null, String.format(
                                 "tool schema has not been described; use discover_mcp_tools(mode=\"describe\", "
-                                        + "server_id=%s, tool_name=%s) before calling",
+                                        + "serverId=%s, tool_name=%s) before calling",
                                 ToolRegistry.quotedGo(tool.service.getId()),
                                 ToolRegistry.quotedGo(tool.mcpTool.getName())));
                     }

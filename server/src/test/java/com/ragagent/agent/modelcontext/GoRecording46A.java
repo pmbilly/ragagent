@@ -127,7 +127,7 @@ public final class GoRecording46A {
             "{\"group\":\"decode_output\",\"id\":\"unknown_issue_stays\",\"out\":\"item ISSUE-42 stays\"}";
 
     public static final String R_TOOL_POLICY_ARG_ALLOWED =
-            "{\"group\":\"tool_policy\",\"id\":\"arg_allowed\",\"out\":{\"call_mcp_tool|tool_ref\":false,\"data_analysis|knowledge_id\":true,\"data_schema|knowledge_id\":true,\"database_query|sql\":false,\"get_document_info|knowledge_ids\":true,\"grep_chunks|chunk_id\":false,\"knowledge_search|knowledge_base_ids\":true,\"knowledge_search|url\":false,\"list_knowledge_chunks|faq_id\":true,\"no_such_tool|chunk_id\":false,\"web_fetch|knowledge_id\":false,\"web_fetch|url\":true,\"web_fetch|urls\":true,\"wiki_flag_issue|suspected_knowledge_ids\":true,\"wiki_read_source_doc|knowledge_id\":true,\"wiki_search|knowledge_base_id\":true,\"wiki_write_page|source_refs\":true,\"|chunk_id\":false}}";
+            "{\"group\":\"tool_policy\",\"id\":\"arg_allowed\",\"out\":{\"call_mcp_tool|toolRef\":false,\"data_analysis|knowledgeId\":true,\"data_schema|knowledgeId\":true,\"database_query|sql\":false,\"get_document_info|knowledgeIds\":true,\"grep_chunks|chunkId\":false,\"knowledge_search|knowledgeBaseIds\":true,\"knowledge_search|url\":false,\"list_knowledge_chunks|faqId\":true,\"no_such_tool|chunkId\":false,\"web_fetch|knowledgeId\":false,\"web_fetch|url\":true,\"web_fetch|urls\":true,\"wiki_flag_issue|suspectedKnowledgeIds\":true,\"wiki_read_source_doc|knowledgeId\":true,\"wiki_search|knowledgeBaseId\":true,\"wiki_write_page|sourceRefs\":true,\"|chunkId\":false}}";
 
     public static final String R_TOOL_POLICY_OUTPUT_ALLOWED =
             "{\"group\":\"tool_policy\",\"id\":\"output_allowed\",\"out\":{\"\":true,\"call_mcp_tool\":false,\"data_analysis\":false,\"database_query\":true,\"discover_mcp_tools\":false,\"execute_skill_script\":false,\"grep_chunks\":true,\"knowledge_search\":true,\"list_sandbox_files\":false,\"read_file\":false,\"read_skill\":false,\"search_conversations\":false,\"search_memory\":false,\"shell_exec\":false,\"thinking\":false,\"todo_write\":false,\"web_fetch\":true,\"web_search\":true,\"wiki_delete_page\":true,\"wiki_read_page\":true,\"wiki_rename_page\":true,\"write_skill_file\":false}}";
@@ -139,19 +139,19 @@ public final class GoRecording46A {
             "{\"group\":\"tool_policy\",\"id\":\"has_policy\",\"out\":{\"call_mcp_tool\":true,\"knowledge_search\":true,\"no_such\":false,\"todo_write\":true}}";
 
     public static final String R_TOOL_POLICY_DECODE_STATES =
-            "{\"group\":\"tool_policy\",\"id\":\"decode_states\",\"out\":[{\"args\":\"{\\\"knowledge_base_ids\\\":[\\\"c1\\\"],\\\"query\\\":\\\"q\\\"}\",\"modelarg\":\"{\\\"query\\\":\\\"q\\\",\\\"knowledge_base_ids\\\":[\\\"c1\\\"]}\",\"res\":\"unresolved\",\"unres\":[\"c1\"]},{\"args\":\"{\\\"knowledge_base_ids\\\":[\\\"c77\\\"],\\\"query\\\":\\\"q\\\"}\",\"modelarg\":\"{\\\"query\\\":\\\"q\\\",\\\"knowledge_base_ids\\\":[\\\"c77\\\"]}\",\"res\":\"unresolved\",\"unres\":[\"c77\"]},{\"args\":\"{\\\"knowledge_base_ids\\\":[\\\"c1\\\",\\\"c77\\\"],\\\"query\\\":\\\"q\\\"}\",\"modelarg\":\"{\\\"query\\\":\\\"q\\\",\\\"knowledge_base_ids\\\":[\\\"c1\\\",\\\"c77\\\"]}\",\"res\":\"unresolved\",\"unres\":[\"c1\",\"c77\"]},{\"args\":\"{\\\"knowledge_base_ids\\\":[\\\"kb-real-uuid-1\\\"],\\\"query\\\":\\\"q\\\"}\",\"modelarg\":\"{\\\"query\\\":\\\"q\\\",\\\"knowledge_base_ids\\\":[\\\"kb-real-uuid-1\\\"]}\",\"res\":\"unchanged\",\"unres\":[]}]}";
+            "{\"group\":\"tool_policy\",\"id\":\"decode_states\",\"out\":[{\"args\":\"{\\\"knowledgeBaseIds\\\":[\\\"c1\\\"],\\\"query\\\":\\\"q\\\"}\",\"modelarg\":\"{\\\"query\\\":\\\"q\\\",\\\"knowledgeBaseIds\\\":[\\\"c1\\\"]}\",\"res\":\"unresolved\",\"unres\":[\"c1\"]},{\"args\":\"{\\\"knowledgeBaseIds\\\":[\\\"c77\\\"],\\\"query\\\":\\\"q\\\"}\",\"modelarg\":\"{\\\"query\\\":\\\"q\\\",\\\"knowledgeBaseIds\\\":[\\\"c77\\\"]}\",\"res\":\"unresolved\",\"unres\":[\"c77\"]},{\"args\":\"{\\\"knowledgeBaseIds\\\":[\\\"c1\\\",\\\"c77\\\"],\\\"query\\\":\\\"q\\\"}\",\"modelarg\":\"{\\\"query\\\":\\\"q\\\",\\\"knowledgeBaseIds\\\":[\\\"c1\\\",\\\"c77\\\"]}\",\"res\":\"unresolved\",\"unres\":[\"c1\",\"c77\"]},{\"args\":\"{\\\"knowledgeBaseIds\\\":[\\\"kb-real-uuid-1\\\"],\\\"query\\\":\\\"q\\\"}\",\"modelarg\":\"{\\\"query\\\":\\\"q\\\",\\\"knowledgeBaseIds\\\":[\\\"kb-real-uuid-1\\\"]}\",\"res\":\"unchanged\",\"unres\":[]}]}";
 
     public static final String R_TOOL_POLICY_WEBFETCH_ITEMS =
             "{\"group\":\"tool_policy\",\"id\":\"webfetch_items\",\"out\":\"{\\\"items\\\":[{\\\"url\\\":\\\"w1\\\",\\\"id\\\":\\\"w1\\\"}]}\"}";
 
     public static final String R_TOOL_POLICY_MCP_NORMALIZE =
-            "{\"group\":\"tool_policy\",\"id\":\"mcp_normalize\",\"out\":\"{\\\"arguments\\\":{\\\"limit\\\":1.0,\\\"q\\\":\\\"x\\\",\\\"big\\\":12345678901234567890},\\\"name\\\":\\\"n\\\",\\\"server_id\\\":\\\"srv\\\"}\"}";
+            "{\"group\":\"tool_policy\",\"id\":\"mcp_normalize\",\"out\":\"{\\\"arguments\\\":{\\\"limit\\\":1.0,\\\"q\\\":\\\"x\\\",\\\"big\\\":12345678901234567890},\\\"name\\\":\\\"n\\\",\\\"serverId\\\":\\\"srv\\\"}\"}";
 
     public static final String R_TOOL_POLICY_SQL_QUOTED =
             "{\"group\":\"tool_policy\",\"id\":\"sql_quoted\",\"out\":\"{\\\"sql\\\":\\\"SELECT * FROM d1 WHERE c='doc-sql-uuid' AND t=\\\\\\\"doc-sql-uuid\\\\\\\" OR z=d1\\\"}\"}";
 
     public static final String R_TOOL_POLICY_ISSUE_DECODE =
-            "{\"group\":\"tool_policy\",\"id\":\"issue_decode\",\"out\":{\"encoded\":\"{\\\"id\\\":\\\"i1\\\"}\",\"miss_args\":\"{\\\"issue_id\\\":\\\"i9\\\"}\",\"miss_res\":\"unresolved\",\"miss_unres\":[\"i9\"],\"ok_args\":\"{\\\"issue_id\\\":\\\"PROJ-7\\\"}\",\"ok_res\":\"resolved\"}}";
+            "{\"group\":\"tool_policy\",\"id\":\"issue_decode\",\"out\":{\"encoded\":\"{\\\"id\\\":\\\"i1\\\"}\",\"miss_args\":\"{\\\"issueId\\\":\\\"i9\\\"}\",\"miss_res\":\"unresolved\",\"miss_unres\":[\"i9\"],\"ok_args\":\"{\\\"issueId\\\":\\\"PROJ-7\\\"}\",\"ok_res\":\"resolved\"}}";
 
     public static final String R_TOOL_POLICY_UNRESOLVED_PRIVATE =
             "{\"group\":\"tool_policy\",\"id\":\"unresolved_private\",\"out\":{\"none\":null,\"sql\":[\"d9\"]}}";
@@ -166,19 +166,19 @@ public final class GoRecording46A {
             "{\"group\":\"mcp\",\"id\":\"candidates_nonjson\",\"out\":\"\\n\\n<external_source_candidates>\\nSystem-indexed links from this MCP result. Cite the matching wN only when the result supports the claim; a link alone does not mean the linked page was read. Do not use KB cN handles for this external content.\\n<source id=\\\"w5\\\" url=\\\"https://p.example/q\\\"/>\\n</external_source_candidates>\"}";
 
     public static final String R_MCP_ENCODE_TOOLS_ENUM =
-            "{\"group\":\"mcp\",\"id\":\"encode_tools_enum\",\"out\":\"[{\\\"type\\\":\\\"\\\",\\\"function\\\":{\\\"name\\\":\\\"discover_mcp_tools\\\",\\\"description\\\":\\\"List tools\\\",\\\"parameters\\\":{\\\"properties\\\":{\\\"q\\\":{\\\"type\\\":\\\"string\\\"},\\\"server_id\\\":{\\\"enum\\\":[\\\"ms1\\\",\\\"ms2\\\"],\\\"type\\\":\\\"string\\\"}},\\\"type\\\":\\\"object\\\"}}},{\\\"type\\\":\\\"\\\",\\\"function\\\":{\\\"name\\\":\\\"call_mcp_tool\\\",\\\"description\\\":\\\"Call\\\",\\\"parameters\\\":{\\\"properties\\\":{\\\"server_id\\\":{\\\"type\\\":\\\"string\\\"},\\\"tool_ref\\\":{\\\"enum\\\":[\\\"mt1\\\"],\\\"type\\\":\\\"string\\\"}}}}}]\"}";
+            "{\"group\":\"mcp\",\"id\":\"encode_tools_enum\",\"out\":\"[{\\\"type\\\":\\\"\\\",\\\"function\\\":{\\\"name\\\":\\\"discover_mcp_tools\\\",\\\"description\\\":\\\"List tools\\\",\\\"parameters\\\":{\\\"properties\\\":{\\\"q\\\":{\\\"type\\\":\\\"string\\\"},\\\"serverId\\\":{\\\"enum\\\":[\\\"ms1\\\",\\\"ms2\\\"],\\\"type\\\":\\\"string\\\"}},\\\"type\\\":\\\"object\\\"}}},{\\\"type\\\":\\\"\\\",\\\"function\\\":{\\\"name\\\":\\\"call_mcp_tool\\\",\\\"description\\\":\\\"Call\\\",\\\"parameters\\\":{\\\"properties\\\":{\\\"serverId\\\":{\\\"type\\\":\\\"string\\\"},\\\"toolRef\\\":{\\\"enum\\\":[\\\"mt1\\\"],\\\"type\\\":\\\"string\\\"}}}}}]\"}";
 
     public static final String R_MCP_DIRECTORY_ENCODED =
-            "{\"group\":\"mcp\",\"id\":\"directory_encoded\",\"out\":\"{\\\"servers\\\":[{\\\"name\\\":\\\"S1\\\",\\\"server_id\\\":\\\"ms1\\\"}],\\\"tools\\\":[{\\\"server_id\\\":\\\"ms1\\\",\\\"tool_ref\\\":\\\"mt1\\\"}]}\"}";
+            "{\"group\":\"mcp\",\"id\":\"directory_encoded\",\"out\":\"{\\\"servers\\\":[{\\\"name\\\":\\\"S1\\\",\\\"serverId\\\":\\\"ms1\\\"}],\\\"tools\\\":[{\\\"serverId\\\":\\\"ms1\\\",\\\"toolRef\\\":\\\"mt1\\\"}]}\"}";
 
     public static final String R_MCP_ENCODE_TOOLS_AFTER_REGISTER =
-            "{\"group\":\"mcp\",\"id\":\"encode_tools_after_register\",\"out\":\"[{\\\"type\\\":\\\"\\\",\\\"function\\\":{\\\"name\\\":\\\"discover_mcp_tools\\\",\\\"description\\\":\\\"List tools\\\",\\\"parameters\\\":{\\\"properties\\\":{\\\"q\\\":{\\\"type\\\":\\\"string\\\"},\\\"server_id\\\":{\\\"enum\\\":[\\\"ms1\\\",\\\"ms2\\\"],\\\"type\\\":\\\"string\\\"}},\\\"type\\\":\\\"object\\\"}}}]\"}";
+            "{\"group\":\"mcp\",\"id\":\"encode_tools_after_register\",\"out\":\"[{\\\"type\\\":\\\"\\\",\\\"function\\\":{\\\"name\\\":\\\"discover_mcp_tools\\\",\\\"description\\\":\\\"List tools\\\",\\\"parameters\\\":{\\\"properties\\\":{\\\"q\\\":{\\\"type\\\":\\\"string\\\"},\\\"serverId\\\":{\\\"enum\\\":[\\\"ms1\\\",\\\"ms2\\\"],\\\"type\\\":\\\"string\\\"}},\\\"type\\\":\\\"object\\\"}}}]\"}";
 
     public static final String R_MCP_DESC_EXTERNAL_REWRITE =
-            "{\"group\":\"mcp\",\"id\":\"desc_external_rewrite\",\"out\":{\"desc\":\"[MCP service srv-uuid-7 (external)] does things\",\"registered\":\"{\\\"servers\\\":[{\\\"server_id\\\":\\\"ms1\\\"}]}\"}}";
+            "{\"group\":\"mcp\",\"id\":\"desc_external_rewrite\",\"out\":{\"desc\":\"[MCP service srv-uuid-7 (external)] does things\",\"registered\":\"{\\\"servers\\\":[{\\\"serverId\\\":\\\"ms1\\\"}]}\"}}";
 
     public static final String R_MCP_ROUTING_TEXT =
-            "{\"group\":\"mcp\",\"id\":\"routing_text\",\"out\":\"pick server_id=\\\"ms1\\\" not server_id=\\\"other-uuid\\\"\"}";
+            "{\"group\":\"mcp\",\"id\":\"routing_text\",\"out\":\"pick serverId=\\\"ms1\\\" not serverId=\\\"other-uuid\\\"\"}";
 
     public static final String R_STREAM_RESOURCE_SPLIT =
             "{\"group\":\"stream\",\"id\":\"resource_split\",\"out\":\"see minio://b/k/f.pdf done\"}";
@@ -214,7 +214,7 @@ public final class GoRecording46A {
             "{\"group\":\"sources\",\"id\":\"quoted\",\"out\":\"a 'X''Y' \\\"Z\\\\\\\"W\\\" `T` plain 'UN\"}";
 
     public static final String R_SOURCES_ENCODE_MESSAGES =
-            "{\"group\":\"sources\",\"id\":\"encode_messages\",\"out\":{\"args\":\"{\\\"knowledge_base_ids\\\":[\\\"b1\\\"]}\",\"asst\":\"cites <ref id=\\\"c1\\\"/> here\",\"tool\":\"hit doc-msg-uuid content\",\"tool_expand\":\"hit doc-msg-uuid content\"}}";
+            "{\"group\":\"sources\",\"id\":\"encode_messages\",\"out\":{\"args\":\"{\\\"knowledgeBaseIds\\\":[\\\"b1\\\"]}\",\"asst\":\"cites <ref id=\\\"c1\\\"/> here\",\"tool\":\"hit doc-msg-uuid content\",\"tool_expand\":\"hit doc-msg-uuid content\"}}";
 
     public static final String R_REGISTRY_CONTEXT_VS_EVIDENCE =
             "{\"group\":\"registry\",\"id\":\"context_vs_evidence\",\"out\":{\"h\":\"c1\",\"hev\":\"c1\",\"text\":\"<kb doc=\\\"\\\" chunk_id=\\\"ctx-chunk-1\\\" /> <kb doc=\\\"\\\" chunk_id=\\\"ctx-chunk-1\\\" />\"}}";
@@ -253,7 +253,7 @@ public final class GoRecording46A {
             "{\"group\":\"model_output\",\"id\":\"db_query_expanded\",\"out\":\"d1 c1\"}";
 
     public static final String R_MODEL_OUTPUT_DEFAULT_BRANCH =
-            "{\"group\":\"model_output\",\"id\":\"default_branch\",\"out\":\"{\\\"knowledge_id\\\":\\\"def-doc-1\\\",\\\"kb\\\":\\\"b1\\\"} meta knowledge_id=\\\"d1\\\" tail\"}";
+            "{\"group\":\"model_output\",\"id\":\"default_branch\",\"out\":\"{\\\"knowledgeId\\\":\\\"def-doc-1\\\",\\\"kb\\\":\\\"b1\\\"} meta knowledge_id=\\\"d1\\\" tail\"}";
 
     public static final String R_MODEL_OUTPUT_DEFAULT_EXPANDED =
             "{\"group\":\"model_output\",\"id\":\"default_expanded\",\"out\":\"\"}";

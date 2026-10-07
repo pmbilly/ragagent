@@ -8,10 +8,10 @@
         :index="idx + 1"
         :title="group.title"
         :meta="$t('agentStream.grepResults.chunkHits', { count: group.chunks.length })"
-        :popup-key="group.knowledge_id"
+        :popup-key="group.knowledgeId"
         :chunks="group.chunks"
-        :chunk-id="group.chunks.length === 1 ? group.chunks[0].chunk_id : undefined"
-        :knowledge-id="group.knowledge_id"
+        :chunk-id="group.chunks.length === 1 ? group.chunks[0].chunkId : undefined"
+        :knowledge-id="group.knowledgeId"
         :highlight="highlightQuery"
       />
     </div>
@@ -38,13 +38,13 @@ const props = defineProps<{
 const { t } = useI18n();
 
 const results = computed(() => props.data.results || []);
-const kbCounts = computed(() => props.data.kb_counts);
+const kbCounts = computed(() => props.data.kbCounts);
 
 interface GroupedResult {
   key: string;
-  knowledge_id: string;
+  knowledgeId: string;
   title: string;
-  chunks: { content: string; chunk_id: string; knowledge_id: string }[];
+  chunks: { content: string; chunkId: string; knowledgeId: string }[];
 }
 
 // Hybrid retrieval can return several chunks from the same document; collapse
@@ -55,22 +55,22 @@ const groupedResults = computed<GroupedResult[]>(() => {
   const map = new Map<string, GroupedResult>();
   const order: string[] = [];
   for (const r of results.value) {
-    const faqQuestion = r.faq_standard_question?.trim();
+    const faqQuestion = r.faqStandardQuestion?.trim();
     const isFaq = !!faqQuestion;
-    const key = isFaq ? r.chunk_id : r.knowledge_id || r.chunk_id;
+    const key = isFaq ? r.chunkId : r.knowledgeId || r.chunkId;
     if (!map.has(key)) {
       map.set(key, {
         key,
-        knowledge_id: r.knowledge_id,
-        title: (isFaq ? faqQuestion : r.knowledge_title) || r.knowledge_title,
+        knowledgeId: r.knowledgeId,
+        title: (isFaq ? faqQuestion : r.knowledgeTitle) || r.knowledgeTitle,
         chunks: [],
       });
       order.push(key);
     }
     map.get(key)!.chunks.push({
       content: r.content,
-      chunk_id: r.chunk_id,
-      knowledge_id: r.knowledge_id,
+      chunkId: r.chunkId,
+      knowledgeId: r.knowledgeId,
     });
   }
   return order.map((k) => map.get(k)!);
@@ -120,7 +120,7 @@ const hasSearchParams = computed(() => {
   if (!args || typeof args !== 'object') return false;
   
   return !!(
-    (Array.isArray(args.knowledge_base_ids) && args.knowledge_base_ids.length > 0) ||
+    (Array.isArray(args.knowledgeBaseIds) && args.knowledgeBaseIds.length > 0) ||
     args.top_k || args.vector_threshold || args.keyword_threshold || args.min_score);
 });
 

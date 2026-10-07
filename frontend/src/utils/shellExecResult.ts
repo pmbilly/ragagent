@@ -80,7 +80,7 @@ function skillScriptCommand(
   data: Record<string, unknown>,
   args: Record<string, unknown>,
 ): string {
-  const skill = asString(data.skill_name) || asString(args.skill_name)
+  const skill = asString(data.skillName) || asString(args.skillName)
   const script = asString(data.script_path) || asString(args.script_path)
   if (!skill && !script) return ''
   const path = [skill, script].filter(Boolean).join('/')

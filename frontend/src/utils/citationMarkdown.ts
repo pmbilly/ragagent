@@ -101,7 +101,7 @@ export function resolveCitationChunkId(
   // 归一：refs 可能来自 SSE 重建段（camelCase）或历史库存（snake）
   const list = (refs || [])
     .map((r) => (r ? normalizeKnowledgeReference(r as Record<string, any>) : null))
-    .filter((r): r is NonNullable<typeof r> => !!r && r.chunk_type !== 'web_search')
+    .filter((r): r is NonNullable<typeof r> => !!r && r.chunkType !== 'web_search')
   if (!list.length) return raw
 
   const doc = (attrs.doc || '').trim()
@@ -110,7 +110,7 @@ export function resolveCitationChunkId(
   if (doc) {
     const byDoc = list.find(
       (r) =>
-        docTitlesMatch(doc, r.knowledge_title || '') ||
+        docTitlesMatch(doc, r.knowledgeTitle || '') ||
         docTitlesMatch(doc, r.knowledge_filename || ''),
     )
     if (byDoc?.id) return byDoc.id
@@ -118,14 +118,14 @@ export function resolveCitationChunkId(
 
   const faqMatch = raw.match(/^FAQ-(\d+)$/i)
   if (faqMatch) {
-    const faqRefs = list.filter((r) => r.chunk_type === 'faq')
+    const faqRefs = list.filter((r) => r.chunkType === 'faq')
     const hit = faqRefs[parseInt(faqMatch[1], 10) - 1]
     if (hit?.id) return hit.id
   }
 
   const docMatch = raw.match(/^DOC-(\d+)$/i)
   if (docMatch) {
-    const docRefs = list.filter((r) => r.chunk_type !== 'faq')
+    const docRefs = list.filter((r) => r.chunkType !== 'faq')
     const hit = docRefs[parseInt(docMatch[1], 10) - 1]
     if (hit?.id) return hit.id
   }
@@ -134,16 +134,16 @@ export function resolveCitationChunkId(
   if (!Number.isNaN(num) && String(num) === raw) {
     const byPos = list[num - 1]
     if (byPos?.id) return byPos.id
-    const byChunkIndex = list.find((r) => r.chunk_index === num || r.chunk_index === num - 1)
+    const byChunkIndex = list.find((r) => r.chunkIndex === num || r.chunkIndex === num - 1)
     if (byChunkIndex?.id) return byChunkIndex.id
   }
 
   if (kbId) {
-    const scoped = list.filter((r) => r.knowledge_base_id === kbId)
+    const scoped = list.filter((r) => r.knowledgeBaseId === kbId)
     if (doc) {
       const byDoc = scoped.find(
         (r) =>
-          docTitlesMatch(doc, r.knowledge_title || '') ||
+          docTitlesMatch(doc, r.knowledgeTitle || '') ||
           docTitlesMatch(doc, r.knowledge_filename || ''),
       )
       if (byDoc?.id) return byDoc.id
@@ -184,7 +184,7 @@ export function preprocessCitationTags(
     .replace(KB_TAG_ATTR_RE, (_m, attrString: string) => {
       const attrs = parseTagAttributes(attrString)
       const doc = attrs.doc || ''
-      const rawChunkId = attrs.chunk_id || attrs.chunkId || ''
+      const rawChunkId = attrs.chunkId || attrs.chunk_id || ''
       const kbId = attrs.kb_id || attrs.kbId || ''
       const chunkId = resolveCitationChunkId(rawChunkId, { doc, kbId }, refs)
       if (!doc || !chunkId) return ''

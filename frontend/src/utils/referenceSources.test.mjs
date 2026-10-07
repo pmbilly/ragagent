@@ -14,15 +14,15 @@ test('buildReferenceList separates web and document references', () => {
   const items = buildReferenceList([
     {
       id: 'https://example.com/a',
-      chunk_type: 'web_search',
-      knowledge_title: 'Example A',
+      chunkType: 'web_search',
+      knowledgeTitle: 'Example A',
       metadata: { url: 'https://example.com/a', snippet: 'snippet a' },
       content: 'Example A\n\nsnippet a',
     },
     {
       id: 'chunk-1',
-      knowledge_id: 'doc-1',
-      knowledge_title: 'Policy',
+      knowledgeId: 'doc-1',
+      knowledgeTitle: 'Policy',
       content: 'refund rules',
     },
   ])
@@ -37,14 +37,14 @@ test('buildReferenceList aggregates chunks from the same document', () => {
   const items = buildReferenceList([
     {
       id: 'chunk-1',
-      knowledge_id: 'doc-1',
-      knowledge_title: 'Policy',
+      knowledgeId: 'doc-1',
+      knowledgeTitle: 'Policy',
       content: 'refund rules',
     },
     {
       id: 'chunk-2',
-      knowledge_id: 'doc-1',
-      knowledge_title: 'Policy',
+      knowledgeId: 'doc-1',
+      knowledgeTitle: 'Policy',
       content: 'shipping rules',
     },
   ])
@@ -60,8 +60,8 @@ test('buildReferenceSections keeps tool results in their own section', () => {
   const sections = buildReferenceSections([
     {
       id: 'mcp-result-1',
-      chunk_type: 'tool_result',
-      knowledge_title: 'MCP Search',
+      chunkType: 'tool_result',
+      knowledgeTitle: 'MCP Search',
       content: 'tool output',
       metadata: { source: 'MCP service' },
     },
@@ -77,7 +77,7 @@ test('resolveReferenceHighlightKey matches web url', () => {
   const refs = [
     {
       id: 'https://news.example.com/post',
-      chunk_type: 'web_search',
+      chunkType: 'web_search',
       metadata: { url: 'https://news.example.com/post/' },
     },
   ]
@@ -92,8 +92,8 @@ test('resolveReferenceHighlightKey matches any chunk merged into a document item
     {
       id: 'chunk-1',
       chunk_ids: ['chunk-1', 'chunk-2'],
-      knowledge_id: 'doc-1',
-      knowledge_title: 'Policy',
+      knowledgeId: 'doc-1',
+      knowledgeTitle: 'Policy',
     },
   ]
 
@@ -107,9 +107,9 @@ test('resolveReferenceHighlightKey falls back to document title and knowledge ba
   const refs = [
     {
       id: 'available-chunk',
-      knowledge_id: 'doc-1',
-      knowledge_title: 'Claude Sonnet 5.md',
-      knowledge_base_id: 'kb-1',
+      knowledgeId: 'doc-1',
+      knowledgeTitle: 'Claude Sonnet 5.md',
+      knowledgeBaseId: 'kb-1',
     },
   ]
 
@@ -134,8 +134,8 @@ test('buildReferenceList uses domain instead of raw url title', () => {
   const items = buildReferenceList([
     {
       id: 'http://bj.bendibao.com/xiuxian/202671/384250.shtm',
-      chunk_type: 'web_search',
-      knowledge_title: 'http://bj.bendibao.com/xiuxian/202671/384250.shtm',
+      chunkType: 'web_search',
+      knowledgeTitle: 'http://bj.bendibao.com/xiuxian/202671/384250.shtm',
       metadata: {
         url: 'http://bj.bendibao.com/xiuxian/202671/384250.shtm',
         snippet: '根据提供的网页内容...',
@@ -152,8 +152,8 @@ test('buildReferenceList prefers metadata title for web references', () => {
   const items = buildReferenceList([
     {
       id: 'https://example.com/post',
-      chunk_type: 'web_search',
-      knowledge_title: 'https://example.com/post',
+      chunkType: 'web_search',
+      knowledgeTitle: 'https://example.com/post',
       metadata: {
         url: 'https://example.com/post',
         title: 'Example headline',
@@ -197,21 +197,21 @@ const CAMEL_REF = {
 
 const SNAKE_REF = {
   id: 'chunk-1',
-  knowledge_id: 'doc-1',
-  knowledge_title: '手册.pdf',
+  knowledgeId: 'doc-1',
+  knowledgeTitle: '手册.pdf',
   knowledge_filename: 'manual.pdf',
-  knowledge_base_id: 'kb-1',
-  chunk_index: 3,
-  chunk_type: 'text',
+  knowledgeBaseId: 'kb-1',
+  chunkIndex: 3,
+  chunkType: 'text',
   content: '正文',
   metadata: { url: 'https://example.com/a' },
 }
 
 test('normalizeKnowledgeReference accepts both spellings', () => {
   assert.deepEqual(normalizeKnowledgeReference(CAMEL_REF), normalizeKnowledgeReference(SNAKE_REF))
-  assert.equal(normalizeKnowledgeReference(CAMEL_REF).knowledge_title, '手册.pdf')
-  assert.equal(normalizeKnowledgeReference(CAMEL_REF).knowledge_base_id, 'kb-1')
-  assert.equal(normalizeKnowledgeReference(CAMEL_REF).chunk_index, 3)
+  assert.equal(normalizeKnowledgeReference(CAMEL_REF).knowledgeTitle, '手册.pdf')
+  assert.equal(normalizeKnowledgeReference(CAMEL_REF).knowledgeBaseId, 'kb-1')
+  assert.equal(normalizeKnowledgeReference(CAMEL_REF).chunkIndex, 3)
 })
 
 test('normalizeKnowledgeReference tolerates empty input', () => {
@@ -229,7 +229,7 @@ test('buildReferenceList yields identical items for both spellings', () => {
 
 test('buildReferenceSections aggregates equally for both spellings', () => {
   const camel = buildReferenceSections([CAMEL_REF, { id: 'chunk-2', chunkType: 'faq', knowledgeTitle: 'Q' }])
-  const snake = buildReferenceSections([SNAKE_REF, { id: 'chunk-2', chunk_type: 'faq', knowledge_title: 'Q' }])
+  const snake = buildReferenceSections([SNAKE_REF, { id: 'chunk-2', chunkType: 'faq', knowledgeTitle: 'Q' }])
   assert.deepEqual(camel, snake)
 })
 

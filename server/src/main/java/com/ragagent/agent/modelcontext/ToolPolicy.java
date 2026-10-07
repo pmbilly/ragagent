@@ -38,18 +38,36 @@ final class ToolPolicy {
      * 与 handle 形状值的解码闸。
      */
     static final Map<String, SourceKeySpace> SOURCE_KEY_SPACES = Map.ofEntries(
-            Map.entry("chunk_id", SourceKeySpace.CHUNK), Map.entry("faq_id", SourceKeySpace.CHUNK),
-            Map.entry("chunk_ids", SourceKeySpace.CHUNK), Map.entry("faq_ids", SourceKeySpace.CHUNK),
-            Map.entry("knowledge_id", SourceKeySpace.DOCUMENT), Map.entry("knowledge_ids", SourceKeySpace.DOCUMENT),
-            Map.entry("suspected_knowledge_ids", SourceKeySpace.DOCUMENT),
-            Map.entry("source_refs", SourceKeySpace.DOCUMENT_REF),
-            Map.entry("knowledge_base", SourceKeySpace.KNOWLEDGE_BASE), Map.entry("knowledge_base_id", SourceKeySpace.KNOWLEDGE_BASE),
-            Map.entry("knowledge_base_ids", SourceKeySpace.KNOWLEDGE_BASE), Map.entry("kb_id", SourceKeySpace.KNOWLEDGE_BASE),
-            Map.entry("kb_ids", SourceKeySpace.KNOWLEDGE_BASE),
+            Map.entry("chunkId", SourceKeySpace.CHUNK), Map.entry("faqId", SourceKeySpace.CHUNK),
+            Map.entry("faqIds", SourceKeySpace.CHUNK),
+            Map.entry("knowledgeId", SourceKeySpace.DOCUMENT), Map.entry("knowledgeIds", SourceKeySpace.DOCUMENT),
+            Map.entry("suspectedKnowledgeIds", SourceKeySpace.DOCUMENT),
+            Map.entry("sourceRefs", SourceKeySpace.DOCUMENT_REF),
+            Map.entry("knowledgeBase", SourceKeySpace.KNOWLEDGE_BASE), Map.entry("knowledgeBaseId", SourceKeySpace.KNOWLEDGE_BASE),
+            Map.entry("knowledgeBaseIds", SourceKeySpace.KNOWLEDGE_BASE), Map.entry("kbId", SourceKeySpace.KNOWLEDGE_BASE),
             Map.entry("url", SourceKeySpace.WEB), Map.entry("urls", SourceKeySpace.WEB));
 
     /** 包内访问别名（SourceToolCodec 用）。 */
     static final Map<String, SourceKeySpace> sourceKeySpaces = SOURCE_KEY_SPACES;
+
+    /** 归一化索引：剥下划线 + 小写，使第三方/历史载荷的 snake 拼写仍可识别。 */
+    private static final Map<String, SourceKeySpace> SOURCE_KEY_SPACES_NORMALIZED = SOURCE_KEY_SPACES.entrySet()
+            .stream()
+            .collect(java.util.stream.Collectors.toUnmodifiableMap(
+                    e -> normalizeSourceKey(e.getKey()), Map.Entry::getValue));
+
+    private static String normalizeSourceKey(String key) {
+        return key == null ? "" : key.replace("_", "").toLowerCase(java.util.Locale.ROOT);
+    }
+
+    /** 键空间查找（键集为 camel；识别时忽略大小写与下划线）。 */
+    static boolean hasSourceKeySpace(String key) {
+        return key != null && SOURCE_KEY_SPACES_NORMALIZED.containsKey(normalizeSourceKey(key));
+    }
+
+    static SourceKeySpace sourceKeySpaceOf(String key) {
+        return key == null ? null : SOURCE_KEY_SPACES_NORMALIZED.get(normalizeSourceKey(key));
+    }
 
     private static Set<String> keys(String... names) {
         return Set.of(names);
@@ -85,29 +103,29 @@ final class ToolPolicy {
 
     /** 字段句柄策略表（键集与每个字段逐条对应）。 */
     private static final Map<String, ToolHandlePolicy> TOOL_HANDLE_POLICIES = Map.ofEntries(
-            Map.entry("discover_mcp_tools", policy("server_id", true, true, null, null, false, null, null, false)),
-            Map.entry("call_mcp_tool", policy("tool_ref", false, true, null, null, false, null, null, false)),
+            Map.entry("discover_mcp_tools", policy("serverId", true, true, null, null, false, null, null, false)),
+            Map.entry("call_mcp_tool", policy("toolRef", false, true, null, null, false, null, null, false)),
             Map.entry("read_file", ToolHandlePolicy.EMPTY),
-            Map.entry("knowledge_search", policy("", false, false, keys("knowledge_base_ids"), null, true, null, null, false)),
+            Map.entry("knowledge_search", policy("", false, false, keys("knowledgeBaseIds"), null, true, null, null, false)),
             Map.entry("grep_chunks", policy("", false, false, null, null, true, null, null, false)),
-            Map.entry("list_knowledge_chunks", policy("", false, false, keys("knowledge_id", "faq_id", "chunk_id"), null, true, null, null, false)),
-            Map.entry("get_document_info", policy("", false, false, keys("knowledge_ids", "faq_ids"), null, true, null, null, false)),
+            Map.entry("list_knowledge_chunks", policy("", false, false, keys("knowledgeId", "faqId", "chunkId"), null, true, null, null, false)),
+            Map.entry("get_document_info", policy("", false, false, keys("knowledgeIds", "faqIds"), null, true, null, null, false)),
             Map.entry("search_conversations", ToolHandlePolicy.EMPTY),
             Map.entry("search_memory", ToolHandlePolicy.EMPTY),
-            Map.entry("query_knowledge_graph", policy("", false, false, keys("knowledge_base_ids"), null, true, null, null, false)),
+            Map.entry("query_knowledge_graph", policy("", false, false, keys("knowledgeBaseIds"), null, true, null, null, false)),
             Map.entry(TOOL_DATABASE_QUERY, policy("", false, false, null, keys("sql"), true, null, null, false)),
-            Map.entry(TOOL_DATA_ANALYSIS, policy("", false, false, keys("knowledge_id"), keys("sql"), false, null, null, false)),
-            Map.entry("data_schema", policy("", false, false, keys("knowledge_id"), null, false, null, null, false)),
+            Map.entry(TOOL_DATA_ANALYSIS, policy("", false, false, keys("knowledgeId"), keys("sql"), false, null, null, false)),
+            Map.entry("data_schema", policy("", false, false, keys("knowledgeId"), null, false, null, null, false)),
             Map.entry("web_fetch", policy("", false, false, keys("url", "urls"), null, true, null, null, false)),
             Map.entry("web_search", policy("", false, false, null, null, true, null, null, false)),
             Map.entry("wiki_read_page", policy("", false, false, null, null, true, null, null, false)),
-            Map.entry("wiki_read_source_doc", policy("", false, false, keys("knowledge_id"), null, true, null, null, false)),
-            Map.entry("wiki_write_page", policy("", false, false, keys("source_refs"), null, false, null, null, false)),
-            Map.entry("wiki_replace_text", policy("", false, false, keys("source_refs"), null, false, null, null, false)),
-            Map.entry("wiki_flag_issue", policy("", false, false, keys("suspected_knowledge_ids"), null, false, null, null, false)),
-            Map.entry("wiki_search", policy("", false, false, keys("knowledge_base_id"), null, true, null, null, false)),
-            Map.entry(TOOL_WIKI_READ_ISSUE, policy("", false, false, null, null, true, keys("issue_id"), keys("id"), true)),
-            Map.entry(TOOL_WIKI_UPDATE_ISSUE, policy("", false, false, null, null, false, keys("issue_id"), null, true)),
+            Map.entry("wiki_read_source_doc", policy("", false, false, keys("knowledgeId"), null, true, null, null, false)),
+            Map.entry("wiki_write_page", policy("", false, false, keys("sourceRefs"), null, false, null, null, false)),
+            Map.entry("wiki_replace_text", policy("", false, false, keys("sourceRefs"), null, false, null, null, false)),
+            Map.entry("wiki_flag_issue", policy("", false, false, keys("suspectedKnowledgeIds"), null, false, null, null, false)),
+            Map.entry("wiki_search", policy("", false, false, keys("knowledgeBaseId"), null, true, null, null, false)),
+            Map.entry(TOOL_WIKI_READ_ISSUE, policy("", false, false, null, null, true, keys("issueId"), keys("id"), true)),
+            Map.entry(TOOL_WIKI_UPDATE_ISSUE, policy("", false, false, null, null, false, keys("issueId"), null, true)),
             Map.entry("wiki_rename_page", policy("", false, false, null, null, true, null, null, false)),
             Map.entry("wiki_delete_page", policy("", false, false, null, null, true, null, null, false)),
             Map.entry("thinking", ToolHandlePolicy.EMPTY),
@@ -132,7 +150,7 @@ final class ToolPolicy {
         if (policy == null) {
             return false;
         }
-        return policy.sourceIDKeys().contains(key.toLowerCase());
+        return policy.sourceIDKeys().stream().anyMatch(k -> k.equalsIgnoreCase(key));
     }
 
     static boolean sourceOutputAllowed(String toolName) {
@@ -294,7 +312,7 @@ final class ToolPolicy {
 
     private static JsonNode walkJSONValue(String key, JsonNode value, java.util.function.BinaryOperator<String> rewrite) {
         if (value.isTextual()) {
-            return TextNode.valueOf(rewrite.apply(key.toLowerCase(), value.asText()));
+            return TextNode.valueOf(rewrite.apply(key, value.asText()));
         }
         if (value.isArray()) {
             ArrayNode array = (ArrayNode) value;

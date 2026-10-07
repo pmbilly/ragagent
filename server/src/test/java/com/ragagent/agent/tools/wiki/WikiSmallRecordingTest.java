@@ -329,7 +329,7 @@ class WikiSmallRecordingTest {
 
         IssueView hit = WikiRouteResolver.resolveWikiIssue(wiki, "i2", List.of("kb1", "kb3"));
         JsonNode r = rec("wiki_support_resolve_issue_hit");
-        assertThat(hit.id()).isEqualTo(r.get("issue_id").asText());
+        assertThat(hit.id()).isEqualTo(r.get("issueId").asText());
         assertThat(hit.slug()).isEqualTo(r.get("slug").asText());
 
         JsonNode ambiguous = rec("wiki_support_resolve_issue_ambiguous");

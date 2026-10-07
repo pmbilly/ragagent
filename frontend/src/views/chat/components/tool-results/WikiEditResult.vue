@@ -13,7 +13,7 @@
       <div class="result-content expanded">
         <div class="info-section">
           <!-- wiki_write_page -->
-          <template v-if="data.display_type === 'wiki_write_page'">
+          <template v-if="data.displayType === 'wiki_write_page'">
             <div class="info-field">
               <span class="field-label">{{ $t('chat.wikiFieldSlug') }}</span>
               <span class="field-value"><code>{{ data.slug }}</code></span>
@@ -24,7 +24,7 @@
             </div>
             <div class="info-field">
               <span class="field-label">{{ $t('chat.wikiFieldPageType') }}</span>
-              <span class="field-value"><code>{{ data.page_type }}</code></span>
+              <span class="field-value"><code>{{ data.pageType }}</code></span>
             </div>
             <div class="info-field">
               <span class="field-label">{{ $t('chat.wikiFieldSummary') }}</span>
@@ -33,7 +33,7 @@
           </template>
 
           <!-- wiki_replace_text -->
-          <template v-else-if="data.display_type === 'wiki_replace_text'">
+          <template v-else-if="data.displayType === 'wiki_replace_text'">
             <div class="info-field">
               <span class="field-label">{{ $t('chat.wikiFieldSlug') }}</span>
               <span class="field-value"><code>{{ data.slug }}</code></span>
@@ -45,37 +45,37 @@
             <div class="diff-block">
               <div class="diff-line diff-old">
                 <span class="diff-marker">-</span>
-                <span class="diff-text">{{ data.old_text }}</span>
+                <span class="diff-text">{{ data.oldText }}</span>
               </div>
               <div class="diff-line diff-new">
                 <span class="diff-marker">+</span>
-                <span class="diff-text">{{ data.new_text }}</span>
+                <span class="diff-text">{{ data.newText }}</span>
               </div>
             </div>
           </template>
 
           <!-- wiki_rename_page -->
-          <template v-else-if="data.display_type === 'wiki_rename_page'">
+          <template v-else-if="data.displayType === 'wiki_rename_page'">
             <div class="info-field" v-if="data.title">
               <span class="field-label">{{ $t('chat.wikiFieldTitle') }}</span>
               <span class="field-value">{{ data.title }}</span>
             </div>
             <div class="rename-visual">
-              <code class="slug-old">{{ data.old_slug }}</code>
+              <code class="slug-old">{{ data.oldSlug }}</code>
               <span class="rename-arrow">→</span>
-              <code class="slug-new">{{ data.new_slug }}</code>
+              <code class="slug-new">{{ data.newSlug }}</code>
             </div>
-            <div class="info-field" v-if="data.updated_count > 0">
+            <div class="info-field" v-if="data.updatedCount > 0">
               <span class="field-label">{{ $t('chat.wikiFieldAffectedPages') }}</span>
-              <span class="field-value">{{ $t('chat.wikiAffectedCount', { count: data.updated_count }) }}</span>
+              <span class="field-value">{{ $t('chat.wikiAffectedCount', { count: data.updatedCount }) }}</span>
             </div>
-            <div class="affected-list" v-if="data.affected_pages?.length">
-              <code v-for="slug in data.affected_pages" :key="slug" class="affected-slug">{{ slug }}</code>
+            <div class="affected-list" v-if="data.affectedPages?.length">
+              <code v-for="slug in data.affectedPages" :key="slug" class="affected-slug">{{ slug }}</code>
             </div>
           </template>
 
           <!-- wiki_delete_page -->
-          <template v-else-if="data.display_type === 'wiki_delete_page'">
+          <template v-else-if="data.displayType === 'wiki_delete_page'">
             <div class="info-field">
               <span class="field-label">{{ $t('chat.wikiFieldSlug') }}</span>
               <span class="field-value"><code>{{ data.slug }}</code></span>
@@ -84,12 +84,12 @@
               <span class="field-label">{{ $t('chat.wikiFieldTitle') }}</span>
               <span class="field-value">{{ data.title }}</span>
             </div>
-            <div class="info-field" v-if="data.updated_count > 0">
+            <div class="info-field" v-if="data.updatedCount > 0">
               <span class="field-label">{{ $t('chat.wikiFieldAffectedPages') }}</span>
-              <span class="field-value">{{ $t('chat.wikiAffectedCount', { count: data.updated_count }) }}</span>
+              <span class="field-value">{{ $t('chat.wikiAffectedCount', { count: data.updatedCount }) }}</span>
             </div>
-            <div class="affected-list" v-if="data.affected_pages?.length">
-              <code v-for="slug in data.affected_pages" :key="slug" class="affected-slug">{{ slug }}</code>
+            <div class="affected-list" v-if="data.affectedPages?.length">
+              <code v-for="slug in data.affectedPages" :key="slug" class="affected-slug">{{ slug }}</code>
             </div>
           </template>
         </div>
@@ -110,7 +110,7 @@ const props = defineProps<{
 const { t } = useI18n();
 
 const actionIcon = computed(() => {
-  switch (props.data.display_type) {
+  switch (props.data.displayType) {
     case 'wiki_write_page': return (props.data as any).action === 'created' ? '✦' : '✎';
     case 'wiki_replace_text': return '⇄';
     case 'wiki_rename_page': return '↻';
@@ -120,7 +120,7 @@ const actionIcon = computed(() => {
 });
 
 const actionClass = computed(() => {
-  switch (props.data.display_type) {
+  switch (props.data.displayType) {
     case 'wiki_write_page':
       return (props.data as any).action === 'created' ? 'created' : 'updated';
     case 'wiki_replace_text': return 'updated';
@@ -131,7 +131,7 @@ const actionClass = computed(() => {
 });
 
 const actionLabel = computed(() => {
-  switch (props.data.display_type) {
+  switch (props.data.displayType) {
     case 'wiki_write_page':
       return (props.data as any).action === 'created'
         ? t('chat.wikiActionCreated')
@@ -144,7 +144,7 @@ const actionLabel = computed(() => {
 });
 
 const headerTitle = computed(() => {
-  switch (props.data.display_type) {
+  switch (props.data.displayType) {
     case 'wiki_write_page': return t('chat.wikiWritePageTitle');
     case 'wiki_replace_text': return t('chat.wikiReplaceTextTitle');
     case 'wiki_rename_page': return t('chat.wikiRenamePageTitle');

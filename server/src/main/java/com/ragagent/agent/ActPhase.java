@@ -733,7 +733,7 @@ final class ActPhase {
     /** display_type 携带的批量字段剥离表。 */
     private static final Map<String, List<String>> PERSIST_STRIP_FIELDS = Map.of(
             "knowledge_chunks_list", List.of("chunks"),
-            "grep_results", List.of("chunk_results"));
+            "grep_results", List.of("chunkResults"));
 
     /** 返回一份 DB / SSE 回放安全的 Data 副本。 */
     static Map<String, Object> sanitizeToolDataForPersist(String toolName, Map<String, Object> data) {
@@ -741,7 +741,7 @@ final class ActPhase {
             return null;
         }
         Map<String, Object> out = new LinkedHashMap<>(data);
-        Object displayTypeValue = data.get("display_type");
+        Object displayTypeValue = data.get("displayType");
         String displayType = displayTypeValue instanceof String s ? s.trim() : "";
         List<String> extraOmit = PERSIST_STRIP_FIELDS_BY_TOOL.get(toolName);
         if (extraOmit != null) {

@@ -120,10 +120,10 @@ class SkillReadFileToolTest {
         assertThat(tool.getParameters().toString())
                 .isEqualTo("{\"type\":\"object\",\"properties\":{\"path\":{\"type\":\"string\","
                         + "\"description\":\"Workspace path, skill:// resource, or saved web:// page\"},"
-                        + "\"line_offset\":{\"type\":\"integer\",\"description\":\"Web only: character offset within a long line\"},"
+                        + "\"lineOffset\":{\"type\":\"integer\",\"description\":\"Web only: character offset within a long line\"},"
                         + "\"offset\":{\"type\":\"integer\",\"description\":\"1-based line number; continue at next_offset\"},"
                         + "\"limit\":{\"type\":\"integer\",\"description\":\"Maximum lines to return; defaults to 2000.\"},"
-                        + "\"max_bytes\":{\"type\":\"integer\",\"description\":\"Text byte budget; at most 65536 (web: 51200)\"}},"
+                        + "\"maxBytes\":{\"type\":\"integer\",\"description\":\"Text byte budget; at most 65536 (web: 51200)\"}},"
                         + "\"required\":[\"path\"],\"additionalProperties\":false}");
         assertThat(tool.getDescription()).contains("skill://<name>/SKILL.md loads the allowed skill's instructions");
     }
@@ -140,15 +140,15 @@ class SkillReadFileToolTest {
                 .endsWith("```\n");
         assertThat(result.getData())
                 .containsEntry("binary", false)
-                .containsEntry("file_path", "SKILL.md")
+                .containsEntry("filePath", "SKILL.md")
                 .containsEntry("path", "skill://allowed/SKILL.md")
                 .containsEntry("root", "skill://allowed")
-                .containsEntry("skill_name", "allowed")
-                .containsEntry("session_id", "")
+                .containsEntry("skillName", "allowed")
+                .containsEntry("sessionId", "")
                 .containsEntry("truncated", false)
-                .containsEntry("start_line", 1);
+                .containsEntry("startLine", 1);
         assertThat((Integer) result.getData().get("size"))
-                .isEqualTo((Integer) result.getData().get("returned_bytes"));
+                .isEqualTo((Integer) result.getData().get("returnedBytes"));
     }
 
     @Test
@@ -160,11 +160,11 @@ class SkillReadFileToolTest {
         // 录像逐字：三段式输出 + 围栏
         assertThat(guide.getOutput()).isEqualTo(
                 "=== File: skill://allowed/guide.txt ===\n\nsize=14 bytes, returned=14 bytes\n\n```\nbundled guide\n```\n");
-        assertThat(guide.getData()).containsEntry("file_path", "guide.txt");
+        assertThat(guide.getData()).containsEntry("filePath", "guide.txt");
 
         ToolResult nested = run(tool, "{\"path\":\"skill://allowed/scripts/run.py\"}");
         assertThat(nested.isSuccess()).isTrue();
-        assertThat(nested.getData()).containsEntry("file_path", "scripts/run.py");
+        assertThat(nested.getData()).containsEntry("filePath", "scripts/run.py");
         assertThat(nested.getOutput()).contains("print('hi')");
     }
 
@@ -213,7 +213,7 @@ class SkillReadFileToolTest {
                 .isEqualTo("workspace file access is unavailable; only listed skill resources can be read");
         assertThat(run(tool, "{}").getError())
                 .isEqualTo("path is required; use a known workspace path or a skill resource from the available skills");
-        assertThat(run(tool, "{\"path\":\"skill://allowed/SKILL.md\",\"line_offset\":5}").getError())
+        assertThat(run(tool, "{\"path\":\"skill://allowed/SKILL.md\",\"lineOffset\":5}").getError())
                 .isEqualTo("line_offset is supported only for saved web:// pages");
     }
 
@@ -224,15 +224,15 @@ class SkillReadFileToolTest {
         ToolResult page = run(tool, "{\"path\":\"skill://allowed/SKILL.md\",\"offset\":2,\"limit\":1}");
         assertThat(page.isSuccess()).isTrue();
         assertThat(page.getData())
-                .containsEntry("start_line", 2)
-                .containsEntry("end_line", 2)
+                .containsEntry("startLine", 2)
+                .containsEntry("endLine", 2)
                 .containsEntry("truncated", true)
-                .containsEntry("next_offset", 3);
+                .containsEntry("nextOffset", 3);
 
-        ToolResult tiny = run(tool, "{\"path\":\"skill://allowed/SKILL.md\",\"max_bytes\":10}");
+        ToolResult tiny = run(tool, "{\"path\":\"skill://allowed/SKILL.md\",\"maxBytes\":10}");
         assertThat(tiny.isSuccess()).isTrue();
         assertThat(tiny.getData()).containsEntry("truncated", true);
-        assertThat((Integer) tiny.getData().get("returned_bytes")).isLessThanOrEqualTo(10);
+        assertThat((Integer) tiny.getData().get("returnedBytes")).isLessThanOrEqualTo(10);
     }
 
     @Test

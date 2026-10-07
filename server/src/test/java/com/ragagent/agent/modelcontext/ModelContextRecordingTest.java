@@ -303,10 +303,10 @@ class ModelContextRecordingTest {
         r.registerKnowledgeBase("kb-real-uuid-1");
         r.registerDocument("doc-real-uuid-1");
         List<ToolCall> calls = new ArrayList<>();
-        calls.add(call("knowledge_search", "{\"query\":\"q\",\"knowledge_base_ids\":[\"c1\"]}"));
-        calls.add(call("knowledge_search", "{\"query\":\"q\",\"knowledge_base_ids\":[\"c77\"]}"));
-        calls.add(call("knowledge_search", "{\"query\":\"q\",\"knowledge_base_ids\":[\"c1\",\"c77\"]}"));
-        calls.add(call("knowledge_search", "{\"query\":\"q\",\"knowledge_base_ids\":[\"kb-real-uuid-1\"]}"));
+        calls.add(call("knowledge_search", "{\"query\":\"q\",\"knowledgeBaseIds\":[\"c1\"]}"));
+        calls.add(call("knowledge_search", "{\"query\":\"q\",\"knowledgeBaseIds\":[\"c77\"]}"));
+        calls.add(call("knowledge_search", "{\"query\":\"q\",\"knowledgeBaseIds\":[\"c1\",\"c77\"]}"));
+        calls.add(call("knowledge_search", "{\"query\":\"q\",\"knowledgeBaseIds\":[\"kb-real-uuid-1\"]}"));
         r.decodeToolCalls(calls);
         JsonNode expected = rec(R_TOOL_POLICY_DECODE_STATES).get("out");
         for (int i = 0; i < calls.size(); i++) {
@@ -330,7 +330,7 @@ class ModelContextRecordingTest {
 
         List<ToolCall> c3 = new ArrayList<>();
         c3.add(call("call_mcp_tool",
-                "{\"server_id\":\"srv\",\"name\":\"n\",\"arguments\":\"{\\\"limit\\\":1.0,\\\"q\\\":\\\"x\\\",\\\"big\\\":12345678901234567890}\"}"));
+                "{\"serverId\":\"srv\",\"name\":\"n\",\"arguments\":\"{\\\"limit\\\":1.0,\\\"q\\\":\\\"x\\\",\\\"big\\\":12345678901234567890}\"}"));
         ToolPolicy.normalizeMCPCallArguments(c3);
         assertThat(c3.get(0).getFunction().getArguments()).isEqualTo(out(R_TOOL_POLICY_MCP_NORMALIZE));
     }
@@ -347,10 +347,10 @@ class ModelContextRecordingTest {
         Registry r4 = new Registry(true);
         String ih = r4.encodeToolPrivateResult("wiki_read_issue", "{\"id\":\"PROJ-7\"}");
         List<ToolCall> c5 = new ArrayList<>();
-        c5.add(call("wiki_update_issue", "{\"issue_id\":\"i1\"}"));
+        c5.add(call("wiki_update_issue", "{\"issueId\":\"i1\"}"));
         r4.decodeToolCalls(c5);
         List<ToolCall> c5b = new ArrayList<>();
-        c5b.add(call("wiki_update_issue", "{\"issue_id\":\"i9\"}"));
+        c5b.add(call("wiki_update_issue", "{\"issueId\":\"i9\"}"));
         r4.decodeToolCalls(c5b);
         JsonNode expected = rec(R_TOOL_POLICY_ISSUE_DECODE).get("out");
         assertThat(ih).isEqualTo(expected.get("encoded").asText());
@@ -380,14 +380,14 @@ class ModelContextRecordingTest {
         search.setSuccess(true);
         search.setOutput("rows fallback");
         Map<String, Object> searchData = new HashMap<>();
-        searchData.put("display_type", "search_results");
+        searchData.put("displayType", "search_results");
         searchData.put("results", List.of(
-                Map.of("chunk_id", "s-chunk-1", "knowledge_id", "s-doc-1", "knowledge_base_id", "s-kb-1",
-                        "knowledge_title", "Search Doc", "content", "full content 中文", "score", 0.42, "chunk_index", 1),
-                Map.of("faq_id", "f-chunk-1", "knowledge_id", "s-doc-1", "knowledge_title", "Search Doc",
-                        "faq_question", "Q?", "faq_answers", List.of("A1", "A2"), "chunk_type", ""),
+                Map.of("chunkId", "s-chunk-1", "knowledgeId", "s-doc-1", "knowledgeBaseId", "s-kb-1",
+                        "knowledgeTitle", "Search Doc", "content", "full content 中文", "score", 0.42, "chunkIndex", 1),
+                Map.of("faqId", "f-chunk-1", "knowledgeId", "s-doc-1", "knowledgeTitle", "Search Doc",
+                        "faqQuestion", "Q?", "faqAnswers", List.of("A1", "A2"), "chunkType", ""),
                 Map.of("id", "only-id", "title", "T", "content", ""),
-                Map.of("chunk_id", "m-chunk", "knowledge_title", "Match Doc", "matched_content", "snippet only")));
+                Map.of("chunkId", "m-chunk", "knowledgeTitle", "Match Doc", "matched_content", "snippet only")));
         search.setData(searchData);
         assertThat(ModelOutput.modelOutput(r, search)).isEqualTo(out(R_MODEL_OUTPUT_SEARCH));
 
@@ -396,11 +396,11 @@ class ModelContextRecordingTest {
         grep.setSuccess(true);
         grep.setOutput("fallback");
         grep.setData(Map.of(
-                "display_type", "grep_results",
-                "chunk_results", List.of(
-                        Map.of("chunk_id", "g-chunk-1", "knowledge_id", "g-doc-1", "knowledge_base_id", "g-kb-1",
-                                "knowledge_title", "Grep Doc", "matched_content", "匹配 snippet & <tag>",
-                                "chunk_index", 3, "chunk_type", "text"))));
+                "displayType", "grep_results",
+                "chunkResults", List.of(
+                        Map.of("chunkId", "g-chunk-1", "knowledgeId", "g-doc-1", "knowledgeBaseId", "g-kb-1",
+                                "knowledgeTitle", "Grep Doc", "matched_content", "匹配 snippet & <tag>",
+                                "chunkIndex", 3, "chunkType", "text"))));
         assertThat(ModelOutput.modelOutput(r, grep)).isEqualTo(out(R_MODEL_OUTPUT_GREP));
 
         // graph
@@ -408,8 +408,8 @@ class ModelContextRecordingTest {
         graph.setSuccess(true);
         graph.setOutput("fallback");
         graph.setData(Map.of(
-                "display_type", "graph_query_results",
-                "results", List.of(Map.of("chunk_id", "gr-chunk", "knowledge_id", "gr-doc", "knowledge_title", "Graph Doc"))));
+                "displayType", "graph_query_results",
+                "results", List.of(Map.of("chunkId", "gr-chunk", "knowledgeId", "gr-doc", "knowledgeTitle", "Graph Doc"))));
         assertThat(ModelOutput.modelOutput(r, graph)).isEqualTo(out(R_MODEL_OUTPUT_GRAPH));
 
         // chunks_list
@@ -417,16 +417,16 @@ class ModelContextRecordingTest {
         chunks.setSuccess(true);
         chunks.setOutput("fallback");
         Map<String, Object> chunksData = new HashMap<>();
-        chunksData.put("display_type", "knowledge_chunks_list");
+        chunksData.put("displayType", "knowledge_chunks_list");
         chunksData.put("chunks", List.of(
-                Map.of("chunk_id", "kc-1", "content", "body", "chunk_index", 1),
-                Map.of("chunk_id", "kc-2", "chunk_index", 2)));
-        chunksData.put("knowledge_id", "kc-doc");
-        chunksData.put("knowledge_title", "KC Title");
-        chunksData.put("total_chunks", 25);
-        chunksData.put("fetched_chunks", 10);
+                Map.of("chunkId", "kc-1", "content", "body", "chunkIndex", 1),
+                Map.of("chunkId", "kc-2", "chunkIndex", 2)));
+        chunksData.put("knowledgeId", "kc-doc");
+        chunksData.put("knowledgeTitle", "KC Title");
+        chunksData.put("totalChunks", 25);
+        chunksData.put("fetchedChunks", 10);
         chunksData.put("page", 2);
-        chunksData.put("page_size", 10);
+        chunksData.put("pageSize", 10);
         chunks.setData(chunksData);
         assertThat(ModelOutput.modelOutput(r, chunks)).isEqualTo(out(R_MODEL_OUTPUT_CHUNKS_LIST));
 
@@ -435,20 +435,20 @@ class ModelContextRecordingTest {
         docInfo.setSuccess(true);
         docInfo.setOutput("fallback");
         docInfo.setData(Map.of(
-                "display_type", "document_info",
+                "displayType", "document_info",
                 "documents", List.of(
-                        Map.of("knowledge_id", "di-doc-1", "is_faq", true, "faq_id", "di-faq-1", "faq_question", "FAQ Q",
-                                "faq_answers", List.of("ans1"), "title", "ignored"),
-                        Map.of("knowledge_id", "di-doc-2", "is_faq", false, "title", "Doc Two", "type", "docx",
-                                "file_type", ".docx", "chunk_count", 7, "description", "desc & <b>"),
-                        Map.of("knowledge_id", "di-doc-3", "is_faq", true, "faq_id", ""))));
+                        Map.of("knowledgeId", "di-doc-1", "isFaq", true, "faqId", "di-faq-1", "faqQuestion", "FAQ Q",
+                                "faqAnswers", List.of("ans1"), "title", "ignored"),
+                        Map.of("knowledgeId", "di-doc-2", "isFaq", false, "title", "Doc Two", "type", "docx",
+                                "fileType", ".docx", "chunkCount", 7, "description", "desc & <b>"),
+                        Map.of("knowledgeId", "di-doc-3", "isFaq", true, "faqId", ""))));
         assertThat(ModelOutput.modelOutput(r, docInfo)).isEqualTo(out(R_MODEL_OUTPUT_DOC_INFO));
 
         // doc_info_empty
         ToolResult docInfoEmpty = new ToolResult();
         docInfoEmpty.setSuccess(true);
         docInfoEmpty.setOutput("no docs");
-        docInfoEmpty.setData(Map.of("display_type", "document_info", "documents", List.of()));
+        docInfoEmpty.setData(Map.of("displayType", "document_info", "documents", List.of()));
         assertThat(ModelOutput.modelOutput(r, docInfoEmpty)).isEqualTo(out(R_MODEL_OUTPUT_DOC_INFO_EMPTY));
 
         // failed_registry（同一个 r）
@@ -463,16 +463,16 @@ class ModelContextRecordingTest {
         ws.setSuccess(true);
         ws.setOutput("fallback");
         ws.setData(Map.of(
-                "display_type", "web_search_results",
+                "displayType", "web_search_results",
                 "results", List.of(
                         Map.of("url", "https://s.example/one", "title", "One", "snippet", "snip one",
                                 "content", "content one differs", "age", "2 days ago"),
                         Map.of("url", "https://s.example/two", "title", "Two", "snippet", "snip two"),
                         Map.of("url", "https://s.example/three", "title", "Three", "snippet", "s3",
-                                "page_verified", true, "page_content", "verified page body", "full_output_path", ""),
-                        Map.of("url", "https://s.example/four", "title", "Four", "page_status", "failed",
-                                "page_error", "fetch refused"),
-                        Map.of("url", "", "title", "NoURL", "snippet", "x", "published_at", "2026-01-01"))));
+                                "pageVerified", true, "pageContent", "verified page body", "fullOutputPath", ""),
+                        Map.of("url", "https://s.example/four", "title", "Four", "pageStatus", "failed",
+                                "pageError", "fetch refused"),
+                        Map.of("url", "", "title", "NoURL", "snippet", "x", "publishedAt", "2026-01-01"))));
         assertThat(ModelOutput.modelOutput(r, ws)).isEqualTo(out(R_MODEL_OUTPUT_WEB_SEARCH));
 
         // web_fetch（同一个 r：f.example/* → w5..）
@@ -480,14 +480,14 @@ class ModelContextRecordingTest {
         wf.setSuccess(true);
         wf.setOutput("fallback");
         wf.setData(Map.of(
-                "display_type", "web_fetch_results",
+                "displayType", "web_fetch_results",
                 "results", List.of(
                         Map.of("url", "https://f.example/a", "title", "A", "status", "success", "summary", "sum a",
-                                "raw_content", "x".repeat(12000), "offset", 0, "content_length", 12000, "truncated", false),
+                                "rawContent", "x".repeat(12000), "offset", 0, "contentLength", 12000, "truncated", false),
                         Map.of("url", "https://f.example/b", "status", "failed", "retryable", false,
-                                "error_code", "dns", "error_message", "no such host"),
-                        Map.of("url", "https://f.example/c", "raw_content", "legacy body",
-                                "full_output_path", "/workspace/output/c.md", "storage_error", "store down"),
+                                "errorCode", "dns", "errorMessage", "no such host"),
+                        Map.of("url", "https://f.example/c", "rawContent", "legacy body",
+                                "fullOutputPath", "/workspace/output/c.md", "storageError", "store down"),
                         Map.of("url", "https://f.example/d", "title", "D", "status", "success", "summary", "",
                                 "summary_status", "failed", "summary_error_code", "timeout",
                                 "summary_error_message", "sum timed out"))));
@@ -498,9 +498,9 @@ class ModelContextRecordingTest {
         big.setSuccess(true);
         big.setOutput("fallback");
         big.setData(Map.of(
-                "display_type", "web_fetch_results",
+                "displayType", "web_fetch_results",
                 "results", List.of(Map.of("url", "https://f.example/big", "status", "success",
-                        "raw_content", "字".repeat(9000), "offset", 0, "content_length", 0))));
+                        "rawContent", "字".repeat(9000), "offset", 0, "contentLength", 0))));
         assertThat(ModelOutput.modelOutput(r, big)).isEqualTo(out(R_MODEL_OUTPUT_WEB_FETCH_BIG));
     }
 
@@ -511,8 +511,8 @@ class ModelContextRecordingTest {
         db.setSuccess(true);
         db.setOutput("row: db-doc-uuid / db-chunk-uuid");
         db.setData(Map.of(
-                "display_type", "database_query",
-                "rows", List.of(Map.of("knowledge_id", "db-doc-uuid", "n", 5, "chunk_id", "db-chunk-uuid"))));
+                "displayType", "database_query",
+                "rows", List.of(Map.of("knowledgeId", "db-doc-uuid", "n", 5, "chunkId", "db-chunk-uuid"))));
         assertThat(ModelOutput.modelOutput(rdb, db)).isEqualTo(out(R_MODEL_OUTPUT_DB_QUERY));
         assertThat(rdb.expandText("d1 c1")).isEqualTo(out(R_MODEL_OUTPUT_DB_QUERY_EXPANDED));
     }
@@ -522,7 +522,7 @@ class ModelContextRecordingTest {
         SourceRegistry rdef = new SourceRegistry(true);
         ToolResult def = new ToolResult();
         def.setSuccess(true);
-        def.setOutput("{\"knowledge_id\":\"def-doc-1\",\"kb\":\"b1\"} meta knowledge_id=\"def-doc-2\" tail");
+        def.setOutput("{\"knowledgeId\":\"def-doc-1\",\"kb\":\"b1\"} meta knowledge_id=\"def-doc-2\" tail");
         assertThat(ModelOutput.modelOutput(rdef, def)).isEqualTo(out(R_MODEL_OUTPUT_DEFAULT_BRANCH));
         // 探针的四个 ref：def-doc-1 与 b1 未注册（整串不是 JSON，结构化注册早退；
         // labeled 只认 attr 形态的 def-doc-2 → d1），后者不在 citable → 全部丢弃
@@ -605,20 +605,20 @@ class ModelContextRecordingTest {
         Registry r = new Registry(true);
         List<ChatTool> enc = r.encodeTools(List.of(
                 tool("discover_mcp_tools", "List tools",
-                        "{\"properties\":{\"server_id\":{\"enum\":[\"srv-uuid-1\",\"srv-uuid-2\"],\"type\":\"string\"},\"q\":{\"type\":\"string\"}},\"type\":\"object\"}"),
+                        "{\"properties\":{\"serverId\":{\"enum\":[\"srv-uuid-1\",\"srv-uuid-2\"],\"type\":\"string\"},\"q\":{\"type\":\"string\"}},\"type\":\"object\"}"),
                 tool("call_mcp_tool", "Call",
-                        "{\"properties\":{\"server_id\":{\"type\":\"string\"},\"tool_ref\":{\"enum\":[\"tool-uuid-9\"],\"type\":\"string\"}}}")));
+                        "{\"properties\":{\"serverId\":{\"type\":\"string\"},\"toolRef\":{\"enum\":[\"tool-uuid-9\"],\"type\":\"string\"}}}")));
         assertThat(toolsJson(enc)).isEqualTo(out(R_MCP_ENCODE_TOOLS_ENUM));
 
         ToolResult dir = new ToolResult();
         dir.setSuccess(true);
-        dir.setOutput("{\"servers\":[{\"name\":\"S1\",\"server_id\":\"srv-uuid-1\"}],\"tools\":[{\"server_id\":\"srv-uuid-1\",\"tool_ref\":\"tool-uuid-9\"}]}");
+        dir.setOutput("{\"servers\":[{\"name\":\"S1\",\"serverId\":\"srv-uuid-1\"}],\"tools\":[{\"serverId\":\"srv-uuid-1\",\"toolRef\":\"tool-uuid-9\"}]}");
         String dir1 = r.modelToolResultForTool("discover_mcp_tools", dir);
         assertThat(dir1).isEqualTo(out(R_MCP_DIRECTORY_ENCODED));
 
         List<ChatTool> encTools2 = r.encodeTools(List.of(
                 tool("discover_mcp_tools", "List tools",
-                        "{\"properties\":{\"server_id\":{\"enum\":[\"srv-uuid-1\",\"srv-uuid-2\"],\"type\":\"string\"},\"q\":{\"type\":\"string\"}},\"type\":\"object\"}")));
+                        "{\"properties\":{\"serverId\":{\"enum\":[\"srv-uuid-1\",\"srv-uuid-2\"],\"type\":\"string\"},\"q\":{\"type\":\"string\"}},\"type\":\"object\"}")));
         assertThat(toolsJson(encTools2)).isEqualTo(out(R_MCP_ENCODE_TOOLS_AFTER_REGISTER));
     }
 
@@ -627,7 +627,7 @@ class ModelContextRecordingTest {
         Registry r2 = new Registry(true);
         ToolResult reg = new ToolResult();
         reg.setSuccess(true);
-        reg.setOutput("{\"servers\":[{\"server_id\":\"srv-uuid-7\"}]}");
+        reg.setOutput("{\"servers\":[{\"serverId\":\"srv-uuid-7\"}]}");
         String registered = r2.modelToolResultForTool("discover_mcp_tools", reg);
         List<ChatTool> enc2 = r2.encodeTools(List.of(
                 tool("mcp_custom", "[MCP service srv-uuid-7 (external)] does things", "{}")));
@@ -638,9 +638,9 @@ class ModelContextRecordingTest {
         Registry r3 = new Registry(true);
         ToolResult reg8 = new ToolResult();
         reg8.setSuccess(true);
-        reg8.setOutput("{\"servers\":[{\"server_id\":\"srv-uuid-8\"}]}");
+        reg8.setOutput("{\"servers\":[{\"serverId\":\"srv-uuid-8\"}]}");
         r3.modelToolResultForTool("discover_mcp_tools", reg8);
-        assertThat(r3.encodeMCPRoutingText("pick server_id=\"srv-uuid-8\" not server_id=\"other-uuid\""))
+        assertThat(r3.encodeMCPRoutingText("pick serverId=\"srv-uuid-8\" not serverId=\"other-uuid\""))
                 .isEqualTo(out(R_MCP_ROUTING_TEXT));
     }
 
@@ -747,10 +747,10 @@ class ModelContextRecordingTest {
                 .containsExactlyElementsOf(listOfStrings(rec(R_SOURCES_WEB_DEDUP).get("out")));
 
         SourceRegistry r3 = new SourceRegistry(true);
-        r3.registerSourceIDByKey("source_refs", "doc-ref-uuid|Some Title", true);
+        r3.registerSourceIDByKey("sourceRefs", "doc-ref-uuid|Some Title", true);
         r3.registerSourceIDByKey("url", "res://0001", true);
         r3.registerSourceIDByKey("url", "https://ok.example/x", true);
-        r3.registerSourceIDByKey("chunk_id", "  ", true);
+        r3.registerSourceIDByKey("chunkId", "  ", true);
         JsonNode keySpaces = rec(R_SOURCES_KEY_SPACES).get("out");
         assertThat(r3.docsHandle("doc-ref-uuid")).isEqualTo(keySpaces.get("doc").asText());
         assertThat(r3.websHandle("https://ok.example/x")).isEqualTo(keySpaces.get("web").asText());
@@ -781,7 +781,7 @@ class ModelContextRecordingTest {
         ChatMessage asst = new ChatMessage("assistant",
                 "cites <kb doc=\"doc-msg-uuid\" chunk_id=\"chunk-msg-uuid\"> here");
         asst.setToolCalls(new ArrayList<>(List.of(
-                call("knowledge_search", "{\"knowledge_base_ids\":[\"kb-msg-uuid\"]}"))));
+                call("knowledge_search", "{\"knowledgeBaseIds\":[\"kb-msg-uuid\"]}"))));
         msgs.add(asst);
         List<ChatMessage> out = r5.encodeMessagesWithPolicies(
                 msgs, ToolPolicy::sourceArgumentAllowed, ToolPolicy::sourceOutputAllowed);

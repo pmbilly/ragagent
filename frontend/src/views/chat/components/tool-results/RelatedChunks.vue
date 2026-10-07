@@ -3,11 +3,11 @@
     <div v-if="data.chunks && data.chunks.length > 0" class="chunks-list">
       <div 
         v-for="chunk in data.chunks" 
-        :key="chunk.chunk_id"
+        :key="chunk.chunkId"
         class="result-item"
       >
         <t-popup 
-          :overlayClassName="`chunk-popup-${chunk.chunk_id}`"
+          :overlayClassName="`chunk-popup-${chunk.chunkId}`"
           placement="bottom-left"
           width="400"
           :showArrow="false"
@@ -17,13 +17,13 @@
           <template #content>
             <ContentPopup 
               :content="chunk.content"
-              :chunk-id="chunk.chunk_id"
+              :chunk-id="chunk.chunkId"
             />
           </template>
           <div class="result-header">
             <div class="result-title">
               <span class="chunk-index">{{ $t('chat.chunkIndexLabel', { index: chunk.index }) }}</span>
-              <span class="chunk-position">{{ $t('chat.chunkPositionLabel', { position: chunk.chunk_index }) }}</span>
+              <span class="chunk-position">{{ $t('chat.chunkPositionLabel', { position: chunk.chunkIndex }) }}</span>
             </div>
           </div>
         </t-popup>
