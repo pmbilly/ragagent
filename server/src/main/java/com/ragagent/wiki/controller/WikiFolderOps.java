@@ -143,7 +143,7 @@ final class WikiFolderOps {
         kbGuard.requireWikiKB(kbId, true);
 
         JsonNode node = WikiRequestSupport.readJsonBody(json, rawBody);
-        String bindingErrors = requiredFieldErrors(node, "WikiPageMoveRequest", "Slug");
+        String bindingErrors = requiredFieldErrors(node, "Slug");
         if (bindingErrors != null) {
             throw new RawJsonError(HttpStatus.BAD_REQUEST.value(),
                     "Invalid request body: " + bindingErrors);

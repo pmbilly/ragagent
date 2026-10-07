@@ -84,9 +84,9 @@ public class WebSearchProviderController {
 
     @PostMapping("/test")
     public ResponseEntity<?> testProviderRaw(@RequestBody(required = false) String rawBody) {
-        TestProviderRequest req = bind(rawBody, TestProviderRequest.class, "TestProviderRequest");
+        TestProviderRequest req = bind(rawBody, TestProviderRequest.class);
         if (req.provider() == null || req.provider().isEmpty()) {
-            throw validatorError("TestProviderRequest", "Provider");
+            throw validatorError("Provider");
         }
         doTestSearch(req.provider(), req.parameters());
         return ResponseEntity.ok(connectedBody());
@@ -109,7 +109,7 @@ public class WebSearchProviderController {
             missing.add("Provider");
         }
         if (!missing.isEmpty()) {
-            throw validatorError("CreateProviderRequest", missing.toArray(new String[0]));
+            throw validatorError(missing.toArray(new String[0]));
         }
         WebSearchProvider providerEntity = new WebSearchProvider();
         providerEntity.setId(UUID.randomUUID().toString());
@@ -158,7 +158,7 @@ public class WebSearchProviderController {
         long tenantId = requireTenant();
         // ownership 检查先于 body 反序列化（未知 id + 坏 body 都是 404）
         WebSearchProvider existing = owned(tenantId, id);
-        UpdateProviderRequest req = bind(rawBody, UpdateProviderRequest.class, "UpdateProviderRequest");
+        UpdateProviderRequest req = bind(rawBody, UpdateProviderRequest.class);
 
         // api_key 绝不从本端点流动：强制保留存量（deprecated 告警仅日志）
         WebSearchProviderParams merged = req.parameters() == null ? new WebSearchProviderParams() : req.parameters();
@@ -367,7 +367,7 @@ public class WebSearchProviderController {
     }
 
     /** 校验错误形态：多失败字段按字段声明序用 \n 连接（message 内） */
-    static BizException validatorError(String structName, String... fields) {
+    static BizException validatorError(String... fields) {
         StringBuilder sb = new StringBuilder();
         for (String field : fields) {
             if (sb.length() > 0) {
@@ -379,7 +379,7 @@ public class WebSearchProviderController {
     }
 
     /** 绑定 JSON：EOF / 解析器原文 → 400 code 1000 */
-    static <T> T bind(String rawBody, Class<T> type, String structName) {
+    static <T> T bind(String rawBody, Class<T> type) {
         if (rawBody == null || rawBody.isEmpty()) {
             throw BizException.badRequest("No content to map due to end-of-input");
         }

@@ -102,7 +102,7 @@ public class TenantMemberController {
             @PathVariable String id, HttpServletRequest request) {
         long tenantId = parseTenantId(id);
         JsonNode body = bindJson(rawBody(request));
-        requireFields(body, "addMemberRequest", "email", "role");
+        requireFields(body, "email", "role");
         String email = body.path("email").asText();
         if (!isValidEmailFormat(email)) {
             throw new BizException(AppError.validation("invalid request body")
@@ -137,7 +137,7 @@ public class TenantMemberController {
             throw new BizException(AppError.validation("user_id is required"));
         }
         JsonNode body = bindJson(rawBody(request));
-        requireFields(body, "updateMemberRoleRequest", "role");
+        requireFields(body, "role");
         TenantRole role = TenantRole.fromString(body.path("role").asText());
         if (!role.isValid()) {
             throw new BizException(AppError.validation("role must be one of owner/admin/contributor/viewer"));
@@ -345,7 +345,7 @@ public class TenantMemberController {
      * required 校验：string 是"非零值"（空串失败、
      * 纯空白通过）。多失败字段按声明序 \n 连接进 details。
      */
-    static void requireFields(JsonNode body, String structName, String... jsonFields) {
+    static void requireFields(JsonNode body, String... jsonFields) {
         List<String> lines = new ArrayList<>();
         for (String field : jsonFields) {
             JsonNode n = body.get(field);

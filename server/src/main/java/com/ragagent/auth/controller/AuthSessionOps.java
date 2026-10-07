@@ -59,7 +59,7 @@ final class AuthSessionOps {
         RefreshTokenRequest req = bindRefreshBody(rawBody);
         if (req == null || req.refreshToken() == null || req.refreshToken().isEmpty()) {
             throw service.invalidParams("Invalid refresh token request",
-                    service.bindingError(null, "RefreshToken", "required"));
+                    service.bindingError("RefreshToken", "required"));
         }
         String[] tokens;
         try {
@@ -162,7 +162,7 @@ final class AuthSessionOps {
             if (root == null || root.isNull()) {
                 // body=null → 绑定为缺省对象 → TenantID 为 0 触发 required
                 throw service.invalidParams("Invalid workspace switch request",
-                        service.bindingError(null, "TenantID", "required"));
+                        service.bindingError("TenantID", "required"));
             }
             throw service.invalidParams("Invalid workspace switch request",
                     ToolJson.expectedObjectMessage(root));
@@ -170,7 +170,7 @@ final class AuthSessionOps {
         com.fasterxml.jackson.databind.JsonNode idNode = root.get("tenantId");
         if (idNode == null || idNode.isNull()) {
             throw service.invalidParams("Invalid workspace switch request",
-                    service.bindingError(null, "TenantID", "required"));
+                    service.bindingError("TenantID", "required"));
         }
         if (!idNode.isNumber()) {
             throw service.invalidParams("Invalid workspace switch request",
@@ -190,7 +190,7 @@ final class AuthSessionOps {
         if (parsed == 0) {
             // uint64 零值 → validator required
             throw service.invalidParams("Invalid workspace switch request",
-                    service.bindingError(null, "TenantID", "required"));
+                    service.bindingError("TenantID", "required"));
         }
         return parsed;
     }

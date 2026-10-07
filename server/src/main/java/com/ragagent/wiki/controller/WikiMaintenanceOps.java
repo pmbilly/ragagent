@@ -118,7 +118,7 @@ final class WikiMaintenanceOps {
         }
 
         JsonNode node = WikiRequestSupport.readJsonBody(json, rawBody);
-        String bindingErrors = requiredFieldErrors(node, null, "Status");
+        String bindingErrors = requiredFieldErrors(node, "Status");
         if (bindingErrors != null) {
             throw new RawJsonError(HttpStatus.BAD_REQUEST.value(),
                     "Invalid request body: " + bindingErrors);

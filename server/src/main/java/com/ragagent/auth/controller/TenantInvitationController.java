@@ -107,7 +107,7 @@ public class TenantInvitationController {
                                                                 HttpServletRequest request) {
         long tenantId = TenantMemberController.parseTenantId(id);
         JsonNode body = TenantMemberController.bindJson(TenantMemberController.rawBody(request));
-        TenantMemberController.requireFields(body, "createInvitationRequest", "email", "role");
+        TenantMemberController.requireFields(body, "email", "role");
         String email = body.path("email").asText();
         if (!TenantMemberController.isValidEmailFormat(email)) {
             throw new BizException(AppError.validation("invalid request body")
@@ -193,7 +193,7 @@ public class TenantInvitationController {
                                                                 HttpServletRequest request) {
         long tenantId = TenantMemberController.parseTenantId(id);
         JsonNode body = TenantMemberController.bindJson(TenantMemberController.rawBody(request));
-        TenantMemberController.requireFields(body, "createInviteLinkRequest", "role");
+        TenantMemberController.requireFields(body, "role");
         TenantRole role = TenantRole.fromString(body.path("role").asText());
         if (!role.isValid()) {
             throw new BizException(AppError.validation("role must be one of owner/admin/contributor/viewer"));

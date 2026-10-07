@@ -48,7 +48,7 @@ final class TenantBindSupport {
         }
     }
 
-    static String bindingError(String structName, String field, String tag) {
+    static String bindingError(String field, String tag) {
         return RequestFields.message(field, tag);
     }
 

@@ -84,7 +84,7 @@ public class VectorStoreController {
         requireTenant(); // 调用即鉴权（未认证会抛 TenantMissing）；返回值本方法不用
         TestStoreRequest req = bind(rawBody, TestStoreRequest.class);
         if (req.engineType() == null || req.engineType().isEmpty()) {
-            throw validator("TestStoreRequest", "EngineType");
+            throw validator("EngineType");
         }
         // ConnectionConfig 的必填校验不在这里做（嵌套结构校验行为不触发），
         // 直接落到引擎必填校验。
@@ -99,7 +99,7 @@ public class VectorStoreController {
     @PostMapping
     public ResponseEntity<?> createStore(@RequestBody(required = false) String rawBody) {
         long tenantId = requireTenant();
-        JsonNode body = parseOrValidator(rawBody, "CreateStoreRequest");
+        JsonNode body = parseOrValidator(rawBody);
         String name = textOrNull(body, "name");
         String engineType = textOrNull(body, "engineType");
         List<String> missing = new ArrayList<>();
@@ -110,7 +110,7 @@ public class VectorStoreController {
             missing.add("EngineType");
         }
         if (!missing.isEmpty()) {
-            throw validator("CreateStoreRequest", missing.toArray(new String[0]));
+            throw validator(missing.toArray(new String[0]));
         }
         VectorStore store = new VectorStore();
         store.setId(UUID.randomUUID().toString());
@@ -166,7 +166,7 @@ public class VectorStoreController {
         owned(tenantId, id);
         UpdateStoreRequest req = bind(rawBody, UpdateStoreRequest.class);
         if (req.name() == null || req.name().isEmpty()) {
-            throw validator("UpdateStoreRequest", "Name");
+            throw validator("Name");
         }
         VectorStore updated = new VectorStore();
         updated.setId(id);
@@ -270,7 +270,7 @@ public class VectorStoreController {
         return n == null || n.isNull() ? null : n.asText();
     }
 
-    private static JsonNode parseOrValidator(String rawBody, String structName) {
+    private static JsonNode parseOrValidator(String rawBody) {
         if (rawBody == null || rawBody.isEmpty()) {
             throw BizException.badRequest("No content to map due to end-of-input");
         }
@@ -289,7 +289,7 @@ public class VectorStoreController {
         return tenantId;
     }
 
-    private static BizException validator(String structName, String... fields) {
+    private static BizException validator(String... fields) {
         StringBuilder sb = new StringBuilder();
         for (String field : fields) {
             if (sb.length() > 0) {

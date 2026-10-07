@@ -26,14 +26,14 @@ final class QaRequestBinder {
     static CreateKnowledgeQARequest bindQaRequest(String rawBody) {
         CreateKnowledgeQARequest r = parseOrBindError(rawBody, CreateKnowledgeQARequest.class);
         if (r.query == null || r.query.isEmpty()) {
-            throw BizException.badRequest(bindingError("CreateKnowledgeQARequest", "Query", "required"));
+            throw BizException.badRequest(bindingError("Query", "required"));
         }
         return r;
     }
     static SearchKnowledgeRequest bindSearchRequest(String rawBody) {
         SearchKnowledgeRequest r = parseOrBindError(rawBody, SearchKnowledgeRequest.class);
         if (r.query == null || r.query.isEmpty()) {
-            throw BizException.badRequest(bindingError("SearchKnowledgeRequest", "Query", "required"));
+            throw BizException.badRequest(bindingError("Query", "required"));
         }
         return r;
     }
@@ -50,7 +50,7 @@ final class QaRequestBinder {
             throw BizException.badRequest(e.getMessage());
         }
     }
-    static String bindingError(String structName, String field, String tag) {
+    static String bindingError(String field, String tag) {
         return RequestFields.message(field, tag);
     }
     static List<String> appendAll(List<String> base, List<String> extra) {

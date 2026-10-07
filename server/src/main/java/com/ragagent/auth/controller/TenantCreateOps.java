@@ -237,18 +237,18 @@ final class TenantCreateOps {
         List<String> errors = new ArrayList<>();
         String name = req == null ? null : req.name();
         if (name == null || name.isEmpty()) {
-            errors.add(TenantBindSupport.bindingError("createTenantRequest", "Name", "required"));
+            errors.add(TenantBindSupport.bindingError("Name", "required"));
         } else {
             int len = name.codePointCount(0, name.length());
             if (len < 1) {
-                errors.add(TenantBindSupport.bindingError("createTenantRequest", "Name", "min"));
+                errors.add(TenantBindSupport.bindingError("Name", "min"));
             } else if (len > 128) {
-                errors.add(TenantBindSupport.bindingError("createTenantRequest", "Name", "max"));
+                errors.add(TenantBindSupport.bindingError("Name", "max"));
             }
         }
         String description = req == null ? null : req.description();
         if (description != null && description.codePointCount(0, description.length()) > 512) {
-            errors.add(TenantBindSupport.bindingError("createTenantRequest", "Description", "max"));
+            errors.add(TenantBindSupport.bindingError("Description", "max"));
         }
         return errors;
     }

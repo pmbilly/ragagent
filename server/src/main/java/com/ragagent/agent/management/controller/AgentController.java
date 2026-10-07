@@ -94,7 +94,7 @@ public class AgentController {
     @PostMapping("/api/v1/agents")
     public ResponseEntity<Map<String, Object>> create(
             @RequestBody(required = false) String rawBody) {
-        AgentRequest parsed = bindAgentRequest(rawBody, "CreateAgentRequest");
+        AgentRequest parsed = bindAgentRequest(rawBody, true);
         ObjectNode cfg = configNode(parsed);
         authorizeKnowledgeScope(cfg);
         var result = service.createAgent(parsed.name(), parsed.description(), parsed.avatar(), cfg);
@@ -116,7 +116,7 @@ public class AgentController {
     public ResponseEntity<Map<String, Object>> update(@PathVariable("id") String id,
             @RequestBody(required = false) String rawBody, HttpServletRequest req) {
         requireNonEmpty(id);
-        AgentRequest parsed = bindAgentRequest(rawBody, "UpdateAgentRequest");
+        AgentRequest parsed = bindAgentRequest(rawBody, false);
         checkAgentOwnership(id, req);
         ObjectNode cfg = configNode(parsed);
         authorizeKnowledgeScope(cfg);
@@ -209,10 +209,10 @@ public class AgentController {
 
     /**
      * 请求体绑定：name 必填（Create）→ 固定校验文案；
-     * JSON 语法错误 → 标准 Jackson 消息 的钉死消息。两个请求体都把它拼进
+     * JSON 语法错误 → 标准 Jackson 消息。两个请求体都把它拼进
      * "Invalid request parameters" 的 details。
      */
-    private static AgentRequest bindAgentRequest(String rawBody, String structName) {
+    private static AgentRequest bindAgentRequest(String rawBody, boolean requireName) {
         if (rawBody == null || rawBody.isEmpty()) {
             throw invalidParams("No content to map due to end-of-input");
         }
@@ -224,7 +224,7 @@ public class AgentController {
         }
         String name = node == null || node.get("name") == null || node.get("name").isNull()
                 ? "" : node.get("name").asText("");
-        if ("CreateAgentRequest".equals(structName) && name.isEmpty()) {
+        if (requireName && name.isEmpty()) {
             throw invalidParams(RequestFields.message("Name", "required"));
         }
         String description = node != null && node.get("description") != null

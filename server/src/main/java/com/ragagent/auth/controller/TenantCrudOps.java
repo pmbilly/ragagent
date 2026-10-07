@@ -137,13 +137,13 @@ final class TenantCrudOps {
         if (req.name != null) {
             int len = req.name.codePointCount(0, req.name.length());
             if (len < 1) {
-                errors.add(TenantBindSupport.bindingError("updateTenantRequest", "Name", "min"));
+                errors.add(TenantBindSupport.bindingError("Name", "min"));
             } else if (len > 128) {
-                errors.add(TenantBindSupport.bindingError("updateTenantRequest", "Name", "max"));
+                errors.add(TenantBindSupport.bindingError("Name", "max"));
             }
         }
         if (req.description != null && req.description.codePointCount(0, req.description.length()) > 512) {
-            errors.add(TenantBindSupport.bindingError("updateTenantRequest", "Description", "max"));
+            errors.add(TenantBindSupport.bindingError("Description", "max"));
         }
         if (!errors.isEmpty()) {
             throw TenantBindSupport.invalidParams("Invalid request data", String.join("\n", errors));

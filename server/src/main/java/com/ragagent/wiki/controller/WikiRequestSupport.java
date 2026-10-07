@@ -236,11 +236,10 @@ final class WikiRequestSupport {
      * <p>报错文案见 {@link RequestFields#message}（字段级、camelCase 字段名），
      * 多个字段同时失败时用换行连接。</p>
      *
-     * @param structName 已不再渲染（保留签名）；null / 空与具名等价
      * @param fields     字段的<b>声明序</b>（决定报错顺序）
      * @return 校验错误串；全部通过时返回 null
      */
-    static String requiredFieldErrors(JsonNode node, String structName, String... fields) {
+    static String requiredFieldErrors(JsonNode node, String... fields) {
         StringBuilder sb = new StringBuilder();
         for (String field : fields) {
             if (!isZeroValue(node.get(toJsonName(field)))) {

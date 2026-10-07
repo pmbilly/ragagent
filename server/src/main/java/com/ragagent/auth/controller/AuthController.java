@@ -161,10 +161,10 @@ public class AuthController {
         // 空值由 @NotBlank 拦截；格式与长度沿用 gin binding 语义（正则 + 按码点计数，逐条收集）
         List<String> bindingErrors = new ArrayList<>();
         if (!GIN_EMAIL.matcher(req.email()).matches()) {
-            bindingErrors.add(bindingError("LoginRequest", "Email", "email"));
+            bindingErrors.add(bindingError("Email", "email"));
         }
         if (req.password().codePointCount(0, req.password().length()) < 6) {
-            bindingErrors.add(bindingError("LoginRequest", "Password", "min"));
+            bindingErrors.add(bindingError("Password", "min"));
         }
         if (!bindingErrors.isEmpty()) {
             throw AuthBindingSupport.invalidParams("Invalid login parameters",
@@ -193,15 +193,15 @@ public class AuthController {
         List<String> bindingErrors = new ArrayList<>();
         int usernameLen = req.username().codePointCount(0, req.username().length());
         if (usernameLen < 2) {
-            bindingErrors.add(bindingError("RegisterRequest", "Username", "min"));
+            bindingErrors.add(bindingError("Username", "min"));
         } else if (usernameLen > 50) {
-            bindingErrors.add(bindingError("RegisterRequest", "Username", "max"));
+            bindingErrors.add(bindingError("Username", "max"));
         }
         if (!GIN_EMAIL.matcher(req.email()).matches()) {
-            bindingErrors.add(bindingError("RegisterRequest", "Email", "email"));
+            bindingErrors.add(bindingError("Email", "email"));
         }
         if (req.password().codePointCount(0, req.password().length()) < 6) {
-            bindingErrors.add(bindingError("RegisterRequest", "Password", "min"));
+            bindingErrors.add(bindingError("Password", "min"));
         }
         if (!bindingErrors.isEmpty()) {
             throw AuthBindingSupport.invalidParams("Invalid registration parameters",
@@ -296,10 +296,10 @@ public class AuthController {
                     RegisterByInviteRequest req) {
         List<String> bindingErrors = new ArrayList<>();
         if (!GIN_EMAIL.matcher(req.email()).matches()) {
-            bindingErrors.add(bindingError("registerByInviteRequest", "Email", "email"));
+            bindingErrors.add(bindingError("Email", "email"));
         }
         if (req.password().codePointCount(0, req.password().length()) < 6) {
-            bindingErrors.add(bindingError("registerByInviteRequest", "Password", "min"));
+            bindingErrors.add(bindingError("Password", "min"));
         }
         if (!bindingErrors.isEmpty()) {
             throw AuthBindingSupport.invalidParams("Invalid registration parameters",
@@ -654,8 +654,8 @@ public class AuthController {
                 memberships, token, refreshToken);
     }
 
-    String bindingError(String structName, String field, String tag) {
-        return AuthBindingSupport.bindingError(structName, field, tag);
+    String bindingError(String field, String tag) {
+        return AuthBindingSupport.bindingError(field, tag);
     }
 
     BizException invalidParams(String message, String details) {

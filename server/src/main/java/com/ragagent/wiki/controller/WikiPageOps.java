@@ -371,7 +371,7 @@ final class WikiPageOps {
         kbGuard.requireWikiKB(kbId, true);
 
         JsonNode node = WikiRequestSupport.readJsonBody(json, rawBody);
-        String bindingErrors = requiredFieldErrors(node, "WikiPageRevertRequest", "Slug", "Version");
+        String bindingErrors = requiredFieldErrors(node, "Slug", "Version");
         if (bindingErrors != null) {
             throw new RawJsonError(HttpStatus.BAD_REQUEST.value(),
                     "Invalid request body: " + bindingErrors);
