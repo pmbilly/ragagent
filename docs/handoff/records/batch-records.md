@@ -912,3 +912,14 @@
 - **补钉（原全盲区）**：新增 `WebSearchToolTest`（4 断言）/`WebFetchToolTest`（2 断言）/`SkillFrontmatterTest`（2 断言）+ `NotionClientTest.parseErrorsUseNeutralWording`（3 断言，并更新其原有的旧文案断言）；**四处红态探针逐一验过**（临时改坏 → 5 红；还原 → 绿）。
 - **闸门**：全量 **4,836**/0 失败（6 跳过）+ `spotlessCheck` 绿；**主源码 Go 味文案残留归零**（`cannot unmarshal` / `Go value` / `Go struct` / `Error:Field validation` / `%!s(` / `unexpected end of JSON input` / `yaml: unmarshal` 全 0）。
 - **长尾（登记，非文案面）**：① `structName` 死形参（~40 调用点）；② `MessageSanitizer.escapeHtml` 与 `HtmlEntities.escape` 重复实现；③ 测试侧剩余 `go*` 局部名（避开 `GoRecording*` 实录）；④ `IssueView.indentedJson` 手写 writer（换 Jackson 需自定义 printer，已评估保留）。
+**✅ B85（2026-10-08，escapeHtml 四副本收敛 + 测试侧 go* 局部名清理）**
+- **escapeHtml 收敛（真动作：收敛副本）**：盘点出 **4 份同表实现**——`agent/tools/MessageSanitizer.escapeHtml`、`common/prompt/MessageAttachmentsPrompt.escapeHtml`（公开）、`memory/domain/MemoryRender.escapeHtml`（被 `MemoryTextTest` 钉）、`agent/modelcontext/HtmlEntities.escape`（包内）；五字符表（`& ' < > "` → `&amp; &#39; &lt; &gt; &#34;`）逐字一致。新增 `common/web/HtmlText.escape`（**null → 空串**、单趟替换、不二次转义）作为单一实现，四份全部改为委托（后两者保留原签名，调用点零改动），顺带统一原先不一致的 null 行为（两处 NPE / 两处空串）。
+- **测试侧 go* 局部名清理（避开实录）**：`RssPureFunctionsTest.goZero→zeroTime`、`StreamJsonTest.goRow→recordedRow`、`McpStubABTest` 八个 `go{Init,Notify,List,Call}Body?` → `recorded*`、`OssMultipartUploadTest.goSpecConstants→specConstantsAreStable`、`JiebaTokenizerDiffTest.goSideDictionaryIsEmpty→emptyDictionaryYieldsNoTokens`、`WikiIngestLanguageTest` 注释去 `goSpace`、`MemoryTextTest.escapeHtmlMatchesGoHtmlPackage→escapeHtmlEscapesFiveChars`。
+- **刻意不动**：`GoRecording*` 实录全族；实录字段名字符串（`"goErr"` 等，作为录制 JSON 的键参与比对）；`datasource/connector/rss/HtmlEntities`（同名不同类的 XML 实体表）。
+- **过程事故**：`McpStubABTest` 首轮用「只替换首个匹配」的方式改名，前缀重叠（`goInit` ⊂ `goInitBody`）导致声明改了、引用没改（compileTestJava 11 错）；改按「长名优先 + 全量词边界替换」后通过。教训：**改名批一律词边界 + 全量替换，不要 replace-first**。
+- **闸门**：全量 **4,836**/0 失败（6 跳过）+ `spotlessCheck` + 包结构守卫绿。
+**✅ B86（2026-10-08，structName 死形参清理）**
+- **去参 8 处（15 文件）**：`TenantBindSupport.bindingError`、`AuthBindingSupport.bindingError`、`AuthController.bindingError`（含委托调用）、`QaRequestBinder.bindingError`、`TenantMemberController.requireFields`、`WikiRequestSupport.requiredFieldErrors`、`WebSearchProviderController.validatorError`/`bind`、`VectorStoreController.validator`/`parseOrValidator`——`structName` 在 B82 换锚后已无用途；调用点字面量首参（`"createTenantRequest"`/`"WikiPageMoveRequest"`/`null` 等，~31 处）同步摘除。
+- **语义判别改造**：`AgentController.bindAgentRequest(rawBody, structName)` 的 `structName` 是真区分器（只有 Create 要求 name）→ 改 `boolean requireName`，调用点 `true`/`false`，字符串比较与 Go 式请求名退场。
+- **复查**：全仓 `structName` 出现 **0 处**；`RequestFields.message` 仍是唯一文案出口。
+- **闸门**：全量 **4,836**/0 失败（6 跳过）+ `spotlessCheck` + 包结构守卫绿。
