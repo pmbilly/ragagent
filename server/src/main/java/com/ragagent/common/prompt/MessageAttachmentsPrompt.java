@@ -1,5 +1,6 @@
 package com.ragagent.common.prompt;
 
+import com.ragagent.common.web.HtmlText;
 import java.util.List;
 
 import com.ragagent.common.session.PipelineMessageAttachmentView;
@@ -16,22 +17,9 @@ public final class MessageAttachmentsPrompt {
 
     private MessageAttachmentsPrompt() {}
 
-    /** 五字符 HTML 转义。 */
+    /** 五字符 HTML 转义（单一实现见 {@link HtmlText}）。 */
     public static String escapeHtml(String s) {
-        String v = s == null ? "" : s;
-        StringBuilder sb = new StringBuilder(v.length());
-        for (int i = 0; i < v.length(); i++) {
-            char c = v.charAt(i);
-            switch (c) {
-                case '&' -> sb.append("&amp;");
-                case '\'' -> sb.append("&#39;");
-                case '<' -> sb.append("&lt;");
-                case '>' -> sb.append("&gt;");
-                case '"' -> sb.append("&#34;");
-                default -> sb.append(c);
-            }
-        }
-        return sb.toString();
+        return HtmlText.escape(s);
     }
 
     public static String build(List<PipelineMessageAttachmentView> attachments) {

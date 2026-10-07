@@ -1,5 +1,6 @@
 package com.ragagent.agent.tools;
 
+import com.ragagent.common.web.HtmlText;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -106,21 +107,9 @@ public final class MessageSanitizer {
         return false;
     }
 
-    /** 转义 < > & ' "（' → &#39;、" → &#34;）。 */
+    /** 转义 & ' < > "（单一实现见 {@link HtmlText}）。 */
     static String escapeHtml(String s) {
-        StringBuilder sb = new StringBuilder(s.length());
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            switch (c) {
-                case '&' -> sb.append("&amp;");
-                case '\'' -> sb.append("&#39;");
-                case '<' -> sb.append("&lt;");
-                case '>' -> sb.append("&gt;");
-                case '"' -> sb.append("&#34;");
-                default -> sb.append(c);
-            }
-        }
-        return sb.toString();
+        return HtmlText.escape(s);
     }
 
     private static String orEmpty(String s) {

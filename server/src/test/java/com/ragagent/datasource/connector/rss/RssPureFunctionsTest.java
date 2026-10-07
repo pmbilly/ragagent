@@ -88,8 +88,8 @@ class RssPureFunctionsTest {
                 .isEqualTo("s:31567da82d89663c");
 
         // 0001-01-01 零值时间与 null 都输出空段，所以指纹相同
-        OffsetDateTime goZero = OffsetDateTime.of(1, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
-        assertThat(RssUtil.feedSignalFingerprint(item("", "", "", goZero, null), ""))
+        OffsetDateTime zeroTime = OffsetDateTime.of(1, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
+        assertThat(RssUtil.feedSignalFingerprint(item("", "", "", zeroTime, null), ""))
                 .isEqualTo("s:7c370d9536d7d0d6");
         assertThat(RssUtil.feedSignalFingerprint(item("", "", "", null, null), ""))
                 .isEqualTo("s:7c370d9536d7d0d6");

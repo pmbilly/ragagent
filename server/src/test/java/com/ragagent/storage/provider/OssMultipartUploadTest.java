@@ -62,7 +62,7 @@ class OssMultipartUploadTest {
 
     @Test
     @DisplayName("Go 常量钉住：阈值 10MB、片大小 10MB、并发 3")
-    void goSpecConstants() {
+    void specConstantsAreStable() {
         assertThat(OssFileService.MULTIPART_THRESHOLD).isEqualTo(10L * 1024 * 1024);
         assertThat(OssFileService.PART_SIZE).isEqualTo(10L * 1024 * 1024);
         assertThat(OssFileService.PARALLEL_NUM).isEqualTo(3);

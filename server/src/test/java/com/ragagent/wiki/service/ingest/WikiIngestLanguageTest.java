@@ -174,7 +174,7 @@ class WikiIngestLanguageTest {
         }
     }
 
-    // ── Java 侧补充：解析链与 goSpace 语义 ──
+    // ── Java 侧补充：解析链与空白语义 ──
 
     @Test
     @DisplayName("resolveLanguage：显式 locale 优先于上下文，上下文优先于默认")

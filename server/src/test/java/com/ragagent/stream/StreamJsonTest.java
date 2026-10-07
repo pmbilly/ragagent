@@ -125,10 +125,10 @@ class StreamJsonTest {
     @Test
     void readsGoWrittenJsonIncludingUnknownKeys() {
         // 线上行可能带尚未建模的键；反序列化默认忽略未知字段，必须同样宽容
-        String goRow = "{\"id\":\"e-9\",\"type\":\"answer\",\"content\":\"c\",\"done\":false,"
+        String recordedRow = "{\"id\":\"e-9\",\"type\":\"answer\",\"content\":\"c\",\"done\":false,"
                 + "\"timestamp\":\"2026-09-18T10:30:00+08:00\",\"some_future_key\":42}";
 
-        StreamEvent event = StreamJson.read(goRow, StreamEvent.class);
+        StreamEvent event = StreamJson.read(recordedRow, StreamEvent.class);
         assertEquals("e-9", event.getId());
         assertEquals(ResponseType.ANSWER, event.getType());
         assertEquals("c", event.getContent());

@@ -184,35 +184,35 @@ class McpStubABTest {
 
         // 录制常量的请求序列：req_00 initialize, req_01 notifications/initialized,
         // req_02 initialize, req_03 notifications/initialized, req_04 tools/list, req_05 tools/call
-        JsonNode goInit = Tools45cFakes.rec45c("mcp_stub", "req_00");
-        JsonNode goNotify = Tools45cFakes.rec45c("mcp_stub", "req_01");
-        JsonNode goList = Tools45cFakes.rec45c("mcp_stub", "req_04");
-        JsonNode goCall = Tools45cFakes.rec45c("mcp_stub", "req_05");
+        JsonNode recordedInit = Tools45cFakes.rec45c("mcp_stub", "req_00");
+        JsonNode recordedNotify = Tools45cFakes.rec45c("mcp_stub", "req_01");
+        JsonNode recordedList = Tools45cFakes.rec45c("mcp_stub", "req_04");
+        JsonNode recordedCall = Tools45cFakes.rec45c("mcp_stub", "req_05");
 
         // tools/list：method/params 一致（掩码 id——两端各自生成 uuid）
         JsonNode javaList = M.readTree(javaBodies.get(javaBodies.size() - 2));
-        JsonNode goListBody = M.readTree(goList.get("body").asText());
-        assertThat(javaList.path("method").asText()).isEqualTo(goListBody.path("method").asText());
-        assertThat(javaList.path("params").toString()).isEqualTo(goListBody.path("params").toString());
+        JsonNode recordedListBody = M.readTree(recordedList.get("body").asText());
+        assertThat(javaList.path("method").asText()).isEqualTo(recordedListBody.path("method").asText());
+        assertThat(javaList.path("params").toString()).isEqualTo(recordedListBody.path("params").toString());
 
         // tools/call：body 逐字节一致（数值 id 两端都从 1 起步 → 可直接比）
         JsonNode javaCall = M.readTree(javaBodies.get(javaBodies.size() - 1));
-        JsonNode goCallBody = M.readTree(goCall.get("body").asText());
-        assertThat(javaCall.path("method").asText()).isEqualTo(goCallBody.path("method").asText());
+        JsonNode recordedCallBody = M.readTree(recordedCall.get("body").asText());
+        assertThat(javaCall.path("method").asText()).isEqualTo(recordedCallBody.path("method").asText());
         assertThat(javaCall.path("params").get("name").asText())
-                .isEqualTo(goCallBody.path("params").get("name").asText());
+                .isEqualTo(recordedCallBody.path("params").get("name").asText());
         assertThat(javaCall.path("params").get("arguments").toString())
-                .isEqualTo(goCallBody.path("params").get("arguments").toString());
+                .isEqualTo(recordedCallBody.path("params").get("arguments").toString());
         // arguments 顺序：{"message":"hi from recorder"} 单键一致；键序=原始 JSON
 
         // notifications/initialized：逐字节一致（无 id）
         JsonNode javaNotify = M.readTree(javaBodies.get(1));
-        JsonNode goNotifyBody = M.readTree(goNotify.get("body").asText());
-        assertThat(javaNotify.path("method").asText()).isEqualTo(goNotifyBody.path("method").asText());
+        JsonNode recordedNotifyBody = M.readTree(recordedNotify.get("body").asText());
+        assertThat(javaNotify.path("method").asText()).isEqualTo(recordedNotifyBody.path("method").asText());
 
         // initialize：整串逐字节一致（含协议版本与 params 键序；两端数值 id 都从 1 起步）
         JsonNode javaInit = M.readTree(javaBodies.get(0));
-        JsonNode goInitBody = M.readTree(goInit.get("body").asText());
-        assertThat(javaInit.toString()).isEqualTo(goInitBody.toString());
+        JsonNode recordedInitBody = M.readTree(recordedInit.get("body").asText());
+        assertThat(javaInit.toString()).isEqualTo(recordedInitBody.toString());
     }
 }

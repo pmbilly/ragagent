@@ -2,6 +2,7 @@ package com.ragagent.memory.domain;
 
 import com.ragagent.common.settings.MemoryKinds;
 import com.ragagent.common.settings.MemoryKeys;
+import com.ragagent.common.web.HtmlText;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -138,18 +139,6 @@ public final class MemoryRender {
      * {@code > → &gt;}、{@code " → &#34;}。</p>
      */
     public static String escapeHtml(String s) {
-        StringBuilder out = new StringBuilder(s.length() + 16);
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            switch (c) {
-                case '&' -> out.append("&amp;");
-                case '\'' -> out.append("&#39;");
-                case '<' -> out.append("&lt;");
-                case '>' -> out.append("&gt;");
-                case '"' -> out.append("&#34;");
-                default -> out.append(c);
-            }
-        }
-        return out.toString();
+        return HtmlText.escape(s);
     }
 }

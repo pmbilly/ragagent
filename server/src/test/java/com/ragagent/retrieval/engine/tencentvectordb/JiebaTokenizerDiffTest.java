@@ -53,7 +53,7 @@ class JiebaTokenizerDiffTest {
 
     @Test
     @DisplayName("前提守卫：基准里 Go 侧词典为空（LoadDict(\"\") 不加载任何词典 → 纯 HMM）")
-    void goSideDictionaryIsEmpty() throws Exception {
+    void emptyDictionaryYieldsNoTokens() throws Exception {
         JsonNode dict = baseline().path("dict");
         assertThat(dict.path("totalFreq").asDouble())
                 .as("若不为 0，说明 Go 侧行为变了（不再是 LoadDict(\"\") 的空词典路径），"

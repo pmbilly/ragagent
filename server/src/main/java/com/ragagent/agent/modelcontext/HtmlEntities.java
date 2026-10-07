@@ -16,22 +16,7 @@ final class HtmlEntities {
     }
 
     static String escape(String s) {
-        if (s == null) {
-            return "";
-        }
-        StringBuilder sb = new StringBuilder(s.length());
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            switch (c) {
-                case '"' -> sb.append("&#34;");
-                case '\'' -> sb.append("&#39;");
-                case '&' -> sb.append("&amp;");
-                case '<' -> sb.append("&lt;");
-                case '>' -> sb.append("&gt;");
-                default -> sb.append(c);
-            }
-        }
-        return sb.toString();
+        return com.ragagent.common.web.HtmlText.escape(s);
     }
 
     static String unescape(String s) {

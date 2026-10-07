@@ -351,7 +351,7 @@ class MemoryTextTest {
 
     /** 五个转义映射逐字断言（含 {@code &#39;} / {@code &#34;}）。 */
     @Test
-    void escapeHtmlMatchesGoHtmlPackage() {
+    void escapeHtmlEscapesFiveChars() {
         assertThat(MemoryRender.escapeHtml("a&b'c<d>e\"f")).isEqualTo("a&amp;b&#39;c&lt;d&gt;e&#34;f");
         // 单趟替换：& 不会在后续被二次转义
         assertThat(MemoryRender.escapeHtml("<")).isEqualTo("&lt;");
