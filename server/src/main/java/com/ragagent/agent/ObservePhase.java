@@ -360,7 +360,7 @@ final class ObservePhase {
                     c.setType("function");
                     c.setProviderMetadata(tc.getProviderMetadata());
                     c.setFunction(new com.ragagent.llm.domain.FunctionCall(tc.getName(),
-                            goMarshal(tc.getArgs())));
+                            argsJson(tc.getArgs())));
                     llmCalls.add(c);
                 }
                 assistantMsg.setToolCalls(llmCalls);
@@ -378,8 +378,8 @@ final class ObservePhase {
         return messages;
     }
 
-    /** map 序列化的字节形态：键序 + HTML 转义 + float 语义（经 ToolJson，与既有事件 payload 逐字节一致）。 */
-    private static String goMarshal(Map<String, Object> args) {
+    /** 工具参数 JSON：键按字节序归一 + 标准 Jackson 输出。 */
+    private static String argsJson(Map<String, Object> args) {
         if (args == null) {
             return "null";
         }

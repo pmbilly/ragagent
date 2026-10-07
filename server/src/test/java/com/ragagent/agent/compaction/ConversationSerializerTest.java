@@ -42,8 +42,8 @@ import com.ragagent.llm.domain.ToolCall;
 /**
  * 摘要序列化的录制常量断言。
  * 覆盖：对话转写（system 跳过/正文与工具结果截断/reasoning/空消息省略/中文按码点
- * 截断）、truncate 七态、rawArchive、renderToolArgs 16 态（键字节序、float64 语义、
- * HTML 转义、非法 JSON 回退、非对象回退、截断参数）、serializeToolCalls。
+ * 截断）、truncate 七态、rawArchive、renderToolArgs 16 态（键字节序、数字文本归一、
+ * 转义形态归一、非法 JSON 回退、非对象回退、截断参数）、serializeToolCalls。
  */
 class ConversationSerializerTest {
 
@@ -111,14 +111,16 @@ class ConversationSerializerTest {
     }
 
     /**
-     * 数字文本归一（{@code limit=5} ↔ {@code limit=5.0} 两种写法）——两侧同归一后比较。
+     * 两侧同归一后比较：数字文本（{@code limit=5} ↔ {@code limit=5.0}）与
+     * HTML 转义形态（{@code \u003c} ↔ {@code <}）不再构成断言目标。
      */
     private static String fold(String s) {
-        return com.ragagent.agent.tools.RecordingSupport.normalizeNumberText(s);
+        return com.ragagent.agent.tools.RecordingSupport.normalizeEscapes(
+                com.ragagent.agent.tools.RecordingSupport.normalizeNumberText(s));
     }
 
     @Test
-    void renderToolArgsMatchesGoByteForByte() {
+    void renderToolArgsKeepsKeyOrderAndShape() {
         String[] cases = {
             "{\"query\":\"coral reef facts\",\"limit\":5}",
             "{\"b\":2,\"a\":1,\"c\":{\"z\":true,\"y\":null}}",
@@ -149,7 +151,7 @@ class ConversationSerializerTest {
     }
 
     @Test
-    void serializeToolCallsMatchesGo() {
+    void serializeToolCallsShape() {
         List<ToolCall> calls = List.of(
                 call("c1", "write_sandbox_file", "{\"path\":\"/w/a.html\",\"content\":\"body\"}"),
                 call("c2", "knowledge_search", "{\"query\":\"x\"}"));

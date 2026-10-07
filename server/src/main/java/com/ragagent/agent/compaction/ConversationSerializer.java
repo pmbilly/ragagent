@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.common.web.ToolJson;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ToolCall;
 
@@ -99,11 +100,8 @@ public final class ConversationSerializer {
 
     /**
      * 把参数 JSON 渲染成 {@code key=value} 对，丢弃超长值。
-     * 键排序保证同一调用渲染结果恒定——跨压缩比较文字记录时用得上。
-     *
-     * <p><b>数值语义</b>：数值节点统一转 double 再按 {@code Double.toString} 语义编码
-     * （最短往返 + 科学计数切换）；大整数会丢精度、1e21 记成 1e+21，
-     * 保证渲染结果确定。</p>
+     * 键排序保证同一调用渲染结果恒定——跨压缩比较文字记录时用得上；
+     * 值走标准 Jackson 紧凑输出（{@link ToolJson#write}，递归键排序保确定性）。
      */
     public static String renderToolArgs(String arguments) {
         JsonNode parsed;
@@ -112,20 +110,16 @@ public final class ConversationSerializer {
         } catch (Exception e) {
             return truncate(arguments, TOOL_ARGS_MAX_CHARS);
         }
-        if (parsed == null || !parsed.isObject()) {
+        if (parsed == null || !parsed.isObject() || hasNonFiniteNumber(parsed)) {
+            // 非对象、或含非有限数（无标准 JSON 形态）→ 回退到截断原文
             return truncate(arguments, TOOL_ARGS_MAX_CHARS);
         }
-        try {
-            List<String> pairs = new ArrayList<>();
-            for (String k : sortedKeys(parsed)) {
-                pairs.add("%s=%s".formatted(k,
-                        truncate(goMarshal(parsed.get(k)), TOOL_ARGS_MAX_CHARS)));
-            }
-            return String.join(", ", pairs);
-        } catch (ArgsRenderException e) {
-            // 数值超出 double 范围时按解析失败处理 → 回退到截断原文
-            return truncate(arguments, TOOL_ARGS_MAX_CHARS);
+        List<String> pairs = new ArrayList<>();
+        for (String k : sortedKeys(parsed)) {
+            pairs.add("%s=%s".formatted(k,
+                    truncate(ToolJson.write(parsed.get(k)), TOOL_ARGS_MAX_CHARS)));
         }
+        return String.join(", ", pairs);
     }
 
     /** 按 UTF-8 字节序排键，保证同一参数渲染结果恒定（String.compareTo 是 UTF-16 序，不等于字节序）。 */
@@ -150,98 +144,18 @@ public final class ConversationSerializer {
         return ba.length - bb.length;
     }
 
-    private static final class ArgsRenderException extends RuntimeException {
-    }
-
-    /**
-     * 值编码规则：HTML 转义 + 键按字节序排序 + 数字按 64 位浮点（double）语义。
-     * 递归遍历 JsonNode 而不是用 Jackson mapper：树里的 DoubleNode 走不到
-     * DoubleSerializer，且先把一切数字归一成 double。
-     */
-    private static String goMarshal(JsonNode node) {
-        StringBuilder sb = new StringBuilder();
-        goMarshalInto(node, sb);
-        return sb.toString();
-    }
-
-    private static void goMarshalInto(JsonNode node, StringBuilder sb) {
-        if (node == null || node.isNull() || node.isMissingNode()) {
-            sb.append("null");
-            return;
-        }
-        if (node.isObject()) {
-            sb.append('{');
-            boolean first = true;
-            for (String k : sortedKeys(node)) {
-                if (!first) {
-                    sb.append(',');
-                }
-                first = false;
-                goEscapeString(k, sb);
-                sb.append(':');
-                goMarshalInto(node.get(k), sb);
-            }
-            sb.append('}');
-            return;
-        }
-        if (node.isArray()) {
-            sb.append('[');
-            boolean first = true;
-            for (JsonNode item : node) {
-                if (!first) {
-                    sb.append(',');
-                }
-                first = false;
-                goMarshalInto(item, sb);
-            }
-            sb.append(']');
-            return;
-        }
+    /** 含非有限数（NaN/Infinity 无标准 JSON 形态）时为真。 */
+    private static boolean hasNonFiniteNumber(JsonNode node) {
         if (node.isNumber()) {
             double d = node.asDouble();
-            if (Double.isInfinite(d) || Double.isNaN(d)) {
-                // 越界数字按解析失败处理
-                throw new ArgsRenderException();
-            }
-            sb.append(Double.toString(d));
-            return;
+            return Double.isInfinite(d) || Double.isNaN(d);
         }
-        if (node.isBoolean()) {
-            sb.append(node.booleanValue());
-            return;
-        }
-        goEscapeString(node.asText(), sb);
-    }
-
-    /**
-     * 字符串编码规则：短转义 + 控制字符小写十六进制 +
-     * HTML 转义（{@code < > &}）+ U+2028/9。
-     */
-    private static void goEscapeString(String s, StringBuilder sb) {
-        sb.append('"');
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            switch (c) {
-                case '"' -> sb.append("\\\"");
-                case '\\' -> sb.append("\\\\");
-                case '\n' -> sb.append("\\n");
-                case '\r' -> sb.append("\\r");
-                case '\t' -> sb.append("\\t");
-                case '<' -> sb.append("\\u003c");
-                case '>' -> sb.append("\\u003e");
-                case '&' -> sb.append("\\u0026");
-                case '\u2028' -> sb.append("\\u2028");
-                case '\u2029' -> sb.append("\\u2029");
-                default -> {
-                    if (c < 0x20) {
-                        sb.append(String.format("\\u%04x", (int) c));
-                    } else {
-                        sb.append(c);
-                    }
-                }
+        for (JsonNode child : node) {
+            if (hasNonFiniteNumber(child)) {
+                return true;
             }
         }
-        sb.append('"');
+        return false;
     }
 
     /**
