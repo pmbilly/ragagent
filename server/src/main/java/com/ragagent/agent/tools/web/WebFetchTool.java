@@ -1,5 +1,6 @@
 package com.ragagent.agent.tools.web;
 
+import com.ragagent.common.web.ToolJson;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -256,20 +257,10 @@ public class WebFetchTool extends BaseTool {
         return new WebFetchItem(url.asText(), offset.asInt(0), limit.asInt(0));
     }
 
-    /** 解码器的类型错误文案（items 字段，文案为输出契约）。 */
-    private static String itemsTypeMessage(JsonNode node) {
-        String jsonType;
-        if (node.isBoolean()) {
-            jsonType = "bool";
-        } else if (node.isNumber()) {
-            jsonType = "number";
-        } else if (node.isObject()) {
-            jsonType = "object";
-        } else {
-            jsonType = "string";
-        }
-        return "json: cannot unmarshal " + jsonType
-                + " into Go struct field WebFetchInput.items of type []tools.WebFetchItem";
+    /** items 参数的类型错误文案（LLM 可见）。 */
+    static String itemsTypeMessage(JsonNode node) {
+        return "invalid argument 'items': expected an array of {url, offset?, limit?}, got "
+                + ToolJson.nodeTypeLabel(node);
     }
 
     /** 一批下标并行抓取（虚拟线程 + join）。 */

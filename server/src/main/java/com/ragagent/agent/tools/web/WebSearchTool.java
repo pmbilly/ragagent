@@ -1,5 +1,7 @@
 package com.ragagent.agent.tools.web;
 
+import com.ragagent.common.web.RequestFields;
+import com.ragagent.common.web.ToolJson;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -272,7 +274,7 @@ public class WebSearchTool extends BaseTool {
     }
 
     /** 入参解析（query 必文本；count 可空整型；content 可空布尔）。 */
-    private static SearchInput parseInput(JsonNode args) {
+    static SearchInput parseInput(JsonNode args) {
         JsonNode query = args.path("query");
         JsonNode count = args.path("count");
         JsonNode country = args.path("country");
@@ -280,57 +282,36 @@ public class WebSearchTool extends BaseTool {
         JsonNode content = args.path("content");
         // 缺失/null → 空串（不是类型错误；空串由后面的 query 校验拒绝）
         if (!query.isTextual() && !(query.isMissingNode() || query.isNull())) {
-            throw new IllegalArgumentException(fieldTypeMessage("WebSearchInput.query",
-                    jsonTypeOf(query), "string"));
+            throw new IllegalArgumentException(RequestFields.wrongType("query", "string",
+                    ToolJson.nodeTypeLabel(query)));
         }
         Integer countValue = null;
         if (!(count.isMissingNode() || count.isNull())) {
             if (!count.isIntegralNumber()) {
-                throw new IllegalArgumentException(fieldTypeMessage("WebSearchInput.count",
-                        jsonTypeOf(count), "int"));
+                throw new IllegalArgumentException(RequestFields.wrongType("count", "integer",
+                        ToolJson.nodeTypeLabel(count)));
             }
             countValue = count.asInt();
         }
         if (!(country.isMissingNode() || country.isNull() || country.isTextual())) {
-            throw new IllegalArgumentException(fieldTypeMessage("WebSearchInput.country",
-                    jsonTypeOf(country), "string"));
+            throw new IllegalArgumentException(RequestFields.wrongType("country", "string",
+                    ToolJson.nodeTypeLabel(country)));
         }
         if (!(freshness.isMissingNode() || freshness.isNull() || freshness.isTextual())) {
-            throw new IllegalArgumentException(fieldTypeMessage("WebSearchInput.freshness",
-                    jsonTypeOf(freshness), "string"));
+            throw new IllegalArgumentException(RequestFields.wrongType("freshness", "string",
+                    ToolJson.nodeTypeLabel(freshness)));
         }
         boolean contentValue = false;
         if (!(content.isMissingNode() || content.isNull())) {
             if (!content.isBoolean()) {
-                throw new IllegalArgumentException(fieldTypeMessage("WebSearchInput.content",
-                        jsonTypeOf(content), "bool"));
+                throw new IllegalArgumentException(RequestFields.wrongType("content", "boolean",
+                        ToolJson.nodeTypeLabel(content)));
             }
             contentValue = content.asBoolean();
         }
         return new SearchInput(query.isTextual() ? query.asText() : "", countValue,
                 country.isTextual() ? country.asText() : "",
                 freshness.isTextual() ? freshness.asText() : "", contentValue);
-    }
-
-    private static String jsonTypeOf(JsonNode node) {
-        if (node.isBoolean()) {
-            return "bool";
-        }
-        if (node.isNumber()) {
-            return "number";
-        }
-        if (node.isArray()) {
-            return "array";
-        }
-        if (node.isObject()) {
-            return "object";
-        }
-        return "string";
-    }
-
-    private static String fieldTypeMessage(String field, String jsonType, String typeLabel) {
-        return "json: cannot unmarshal " + jsonType + " into Go struct field " + field
-                + " of type " + typeLabel;
     }
 
     /**

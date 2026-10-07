@@ -1,5 +1,6 @@
 package com.ragagent.datasource.connector.notion;
 
+import com.ragagent.common.web.ToolJson;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -295,7 +296,7 @@ public final class NotionClient {
                         "get block children for " + blockId + ": " + e.getMessage(), e);
             }
             NotionPaginatedResponse resp = unmarshalPage(respBody);
-            allBlocks.addAll(parseBlocks(resp, "unmarshal blocks"));
+            allBlocks.addAll(parseBlocks(resp, "invalid Notion blocks response"));
             if (!resp.hasMore || resp.nextCursor().isEmpty()) {
                 break;
             }
@@ -551,16 +552,17 @@ public final class NotionClient {
      * <p>{@code results} **缺席** → 报错；
      * 字面量 {@code null} → 空列表。见 {@link NotionPaginatedResponse}。</p>
      */
-    private List<NotionPage> parsePages(NotionPaginatedResponse resp) {
+    static List<NotionPage> parsePages(NotionPaginatedResponse resp) {
         if (resp.results == null) {
             throw new ConnectorException(
-                    "unmarshal page results: unexpected end of JSON input");
+                    "invalid Notion response: 'results' is missing");
         }
         if (resp.results.isNull()) {
             return new ArrayList<>();
         }
         if (!resp.results.isArray()) {
-            throw new ConnectorException("unmarshal page results: cannot unmarshal non-array");
+            throw new ConnectorException("invalid Notion response: 'results' must be an array, got "
+                    + ToolJson.nodeTypeLabel(resp.results));
         }
         List<NotionPage> out = new ArrayList<>();
         for (JsonNode node : resp.results) {
@@ -573,15 +575,16 @@ public final class NotionClient {
      * 解析 {@code results} 为块列表
      * （自定义反序列化在 {@link NotionBlock.Deserializer}）。
      */
-    private List<NotionBlock> parseBlocks(NotionPaginatedResponse resp, String errorPrefix) {
+    static List<NotionBlock> parseBlocks(NotionPaginatedResponse resp, String errorPrefix) {
         if (resp.results == null) {
-            throw new ConnectorException(errorPrefix + ": unexpected end of JSON input");
+            throw new ConnectorException(errorPrefix + ": 'results' is missing");
         }
         if (resp.results.isNull()) {
             return new ArrayList<>();
         }
         if (!resp.results.isArray()) {
-            throw new ConnectorException(errorPrefix + ": cannot unmarshal non-array");
+            throw new ConnectorException(errorPrefix + ": 'results' must be an array, got "
+                    + ToolJson.nodeTypeLabel(resp.results));
         }
         List<NotionBlock> out = new ArrayList<>();
         for (JsonNode node : resp.results) {

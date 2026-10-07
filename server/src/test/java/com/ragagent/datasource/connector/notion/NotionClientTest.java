@@ -253,7 +253,7 @@ class NotionClientTest {
             NotionClient client = NotionTestSupport.fastClient(server.baseUrl());
             assertThatThrownBy(client::searchPages)
                     .isInstanceOf(ConnectorException.class)
-                    .hasMessage("unmarshal page results: unexpected end of JSON input");
+                    .hasMessage("invalid Notion response: 'results' is missing");
         }
     }
 
@@ -623,5 +623,19 @@ class NotionClientTest {
         assertThat(NotionClient.retryAfterMillis("-1")).isEqualTo(1000L);
         // 数值解析不接受首尾空白
         assertThat(NotionClient.retryAfterMillis(" 2 ")).isEqualTo(1000L);
+    }
+
+    @Test
+    void parseErrorsUseNeutralWording() throws Exception {
+        NotionPaginatedResponse missing = new NotionPaginatedResponse();
+        assertThatThrownBy(() -> NotionClient.parsePages(missing))
+                .isInstanceOf(ConnectorException.class)
+                .hasMessage("invalid Notion response: 'results' is missing");
+        NotionPaginatedResponse nonArray = new NotionPaginatedResponse();
+        nonArray.results = new com.fasterxml.jackson.databind.ObjectMapper().readTree("{\"a\":1}");
+        assertThatThrownBy(() -> NotionClient.parsePages(nonArray))
+                .hasMessage("invalid Notion response: 'results' must be an array, got object");
+        assertThatThrownBy(() -> NotionClient.parseBlocks(missing, "invalid Notion blocks response"))
+                .hasMessage("invalid Notion blocks response: 'results' is missing");
     }
 }

@@ -57,7 +57,7 @@ final class SkillFrontmatter {
             return;
         }
         if (!(parsed instanceof Map<?, ?> map)) {
-            throw new IllegalArgumentException("yaml: unmarshal errors:\n  cannot unmarshal into frontmatter fields");
+            throw new IllegalArgumentException("invalid frontmatter: expected a mapping of fields");
         }
         String name = stringField(map, "name");
         String slug = stringField(map, "slug");
@@ -82,7 +82,7 @@ final class SkillFrontmatter {
         if (v instanceof String s) {
             return s;
         }
-        throw new IllegalArgumentException("yaml: unmarshal errors:\n  cannot unmarshal into string field " + key);
+        throw new IllegalArgumentException("invalid frontmatter: field '" + key + "' must be a string");
     }
 
     private static Object yamlLoad(String src) {

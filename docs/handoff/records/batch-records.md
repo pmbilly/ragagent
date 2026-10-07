@@ -905,3 +905,10 @@
 - **顺修陈旧注释**：`AsrTranscriber` 类 javadoc 的旧文案形态描述与 `%!s(<nil>)` 表述；`WikiIngestConstants` 的截断报错引文。
 - **剩余（登记 B84）**：web 工具面 3 处（`WebSearchTool`/`WebFetchTool` 的 `json: cannot unmarshal … into Go struct field …`，LLM 可见、**0 金片**）、`SkillFrontmatter` 2 处（`yaml: unmarshal errors:…`）、Notion 连接器 4 处（`unexpected end of JSON input`/`cannot unmarshal non-array`）；三处均无钉，**先补钉再换**。
 - **闸门**：全量 **4,831**/0 失败（6 跳过）+ `spotlessCheck` 绿。
+**✅ B84（2026-10-08，最后三处盲区文案换锚 + 补钉）**
+- **web 工具面（LLM 可见）**：`WebSearchTool` 五处类型错 → `RequestFields.wrongType`（字段 camelCase：`query`/`count`/`country`/`freshness`/`content`；`count` 期望 integer、`content` 期望 boolean），删本地 `jsonTypeOf`/`fieldTypeMessage`；`WebFetchTool.itemsTypeMessage` → `invalid argument 'items': expected an array of {url, offset?, limit?}, got <类型名>`（删本地类型映射，改用 `ToolJson.nodeTypeLabel`）。
+- **技能面**：`SkillFrontmatter` 两处 Go yaml 文案 → `invalid frontmatter: expected a mapping of fields` / `invalid frontmatter: field '<key>' must be a string`。
+- **Notion 连接器**：`parsePages`/`parseBlocks` 四处 → `invalid Notion response: 'results' is missing` / `… 'results' must be an array, got <类型名>`；块面前缀 `unmarshal blocks` → `invalid Notion blocks response`；两个 parse 方法改 **static**（纯函数，便于钉）。
+- **补钉（原全盲区）**：新增 `WebSearchToolTest`（4 断言）/`WebFetchToolTest`（2 断言）/`SkillFrontmatterTest`（2 断言）+ `NotionClientTest.parseErrorsUseNeutralWording`（3 断言，并更新其原有的旧文案断言）；**四处红态探针逐一验过**（临时改坏 → 5 红；还原 → 绿）。
+- **闸门**：全量 **4,836**/0 失败（6 跳过）+ `spotlessCheck` 绿；**主源码 Go 味文案残留归零**（`cannot unmarshal` / `Go value` / `Go struct` / `Error:Field validation` / `%!s(` / `unexpected end of JSON input` / `yaml: unmarshal` 全 0）。
+- **长尾（登记，非文案面）**：① `structName` 死形参（~40 调用点）；② `MessageSanitizer.escapeHtml` 与 `HtmlEntities.escape` 重复实现；③ 测试侧剩余 `go*` 局部名（避开 `GoRecording*` 实录）；④ `IssueView.indentedJson` 手写 writer（换 Jackson 需自定义 printer，已评估保留）。
