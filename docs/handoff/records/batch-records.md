@@ -933,5 +933,6 @@
 - **跨面同名不跟随**：SSE/agent_steps 族的 `session_id`/`tool_name`/`total_steps`、事件桩 `Engine46bStubSupport`、citation markup 属性 `chunk_id`（协议提示词定义的标签语法）——按 B67 口径「同概念不同面可不同键名」登记。
 - **前端双读**：`mcpToolDisplay` 加历史载荷归一化（snake→camel 补缺，覆盖「including old history」用例）；引用载荷族保留 `?? snake` 兜底（`referenceSources`/`citationMarkdown`/`rag-pipeline-history`）；`AgentStreamDisplay` 的 grep 分组引用 `chunkIds: …(chunk) => chunk.chunkId ?? chunk.chunk_id`，并同步源码扫描守卫 `chatLinksNewTab.test.mjs` 的正则。
 - **过程事故**：批量改名把「双拼读」文件改成自比较（`raw.knowledgeId ?? raw.knowledgeId`）×3 文件、把 `attrs.chunk_id || attrs.chunkId` 改成自比较；用 `X ?? X` / `obj.p ?? obj.p` 探测脚本修复时又误伤两处 `||` 复合条件（`kb.summaryModelId === ''`）→ `git checkout` 回退。教训：**双拼读点必须按 `?? snake` 结构识别，不能按标识符自比较粗暴改写**。
-- **保留（登记）**：工具名 36 个（`ToolCapabilities` 基线）、enum 值、外部/第三方键；XML 形态字段名（`<chunk chunk_id="…">` 等属性/标签名）与剩余工具描述正文提及**未做**（登记后续）。
+- **保留（登记）**：工具名 36 个（`ToolCapabilities` 基线）、enum 值、外部/第三方键。
+- **登记后续（B89，待拍板）**：XML 形态字段名与提示词正文提及——实测 23 键 / 约 80 处，其中 `AgentPrompts:242` 一处即 23 处**提示词正文**（告诉模型输出 `<knowledge_id>` 等标签）。属 §14.6 已登记的「模型输出契约 / wiki LLM 输出解析面」：改 Java 侧必须连 prompt 正文 + 解析器 + 实录同批，是**行为面**（可能影响模型输出行为），故不与 JSON 键同批。
 - **闸门**：后端全量 **4,836**/0（Redis 竞态单测隔离重跑绿）+ 前端 **734**/734 + `vue-tsc` 0 错 + `spotlessCheck` + `check-json-key-case.py --strict` 绿（已摘除 `agent/tools/` 冻结豁免，基线 343 条）。
