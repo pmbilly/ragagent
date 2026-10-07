@@ -1,5 +1,6 @@
 package com.ragagent.session.controller;
 
+import com.ragagent.common.web.RequestFields;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -80,9 +81,7 @@ public class SteerController {
         // ⚠️ 顺序有语义：required 校验先于 trim——空串/缺失落绑定校验原文，
         // 只有纯空白才走到 handler 里的 "query must not be empty"
         if (req.query() == null || req.query().isEmpty()) {
-            throw new BizException(AppError.badRequest(
-                    "Key: 'SteerMessageRequest.Query' Error:Field validation for 'Query' "
-                            + "failed on the 'required' tag"));
+            throw new BizException(AppError.badRequest(RequestFields.message("Query", "required")));
         }
         String query = req.query().trim();
         if (query.isEmpty()) {

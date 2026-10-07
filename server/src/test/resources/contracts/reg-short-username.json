@@ -1,1 +1,1 @@
-{"error":{"code":1010,"message":"Invalid registration parameters","details":"Key: 'RegisterRequest.Username' Error:Field validation for 'Username' failed on the 'min' tag"}}
+{"error":{"code":1010,"message":"Invalid registration parameters","details":"field 'username' is below the minimum"}}

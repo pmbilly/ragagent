@@ -1,1 +1,1 @@
-{"error":{"code":1010,"message":"invalid request body","details":"Key: 'addMemberRequest.Email' Error:Field validation for 'Email' failed on the 'required' tag\nKey: 'addMemberRequest.Role' Error:Field validation for 'Role' failed on the 'required' tag"}}
+{"error":{"code":1010,"message":"invalid request body","details":"field 'email' is required\nfield 'role' is required"}}

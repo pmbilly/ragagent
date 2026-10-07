@@ -1,5 +1,6 @@
 package com.ragagent.initialization.service;
 
+import com.ragagent.common.web.RequestFields;
 import java.util.ArrayList;
 import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -41,8 +42,7 @@ public final class InitializationRequests {
         String llmModelId = ModelConnectivityTestService.text(n, "llmModelId");
         if (llmModelId.isEmpty()) {
             throw new BizException(AppError.badRequest(
-                    "Key: 'KBModelConfigRequest.LLMModelID' Error:Field validation for "
-                            + "'LLMModelID' failed on the 'required' tag"));
+                    RequestFields.message("LLMModelID", "required")));
         }
         JsonNode ds = n.get("documentSplitting");
         JsonNode ne = n.get("nodeExtract");
@@ -133,8 +133,7 @@ public final class InitializationRequests {
         List<String> seps = new ArrayList<>();
         if (ds == null) {
             throw new BizException(AppError.badRequest(
-                    "Key: 'InitializationRequest.DocumentSplitting' Error:Field validation for "
-                            + "'DocumentSplitting' failed on the 'required' tag"));
+                    RequestFields.message("DocumentSplitting", "required")));
         }
         chunkSize = ds.path("chunkSize").asInt(0);
         chunkOverlap = ds.path("chunkOverlap").asInt(0);
@@ -143,18 +142,15 @@ public final class InitializationRequests {
         }
         if (chunkSize < 100) {
             throw new BizException(AppError.badRequest(
-                    "Key: 'InitializationRequest.DocumentSplitting.ChunkSize' "
-                            + "Error:Field validation for 'ChunkSize' failed on the 'min' tag"));
+                    RequestFields.message("ChunkSize", "min")));
         }
         if (chunkSize > 10000) {
             throw new BizException(AppError.badRequest(
-                    "Key: 'InitializationRequest.DocumentSplitting.ChunkSize' "
-                            + "Error:Field validation for 'ChunkSize' failed on the 'max' tag"));
+                    RequestFields.message("ChunkSize", "max")));
         }
         if (seps.isEmpty()) {
             throw new BizException(AppError.badRequest(
-                    "Key: 'InitializationRequest.DocumentSplitting.Separators' "
-                            + "Error:Field validation for 'Separators' failed on the 'min' tag"));
+                    RequestFields.message("Separators", "min")));
         }
         JsonNode mm = n.get("multimodal");
         JsonNode ne = n.get("nodeExtract");
@@ -178,8 +174,7 @@ public final class InitializationRequests {
                 ne != null && ne.get("relations") != null ? toList(ne.get("relations")) : List.of());
     }
     static BizException required(String structField, String field) {
-        return new BizException(AppError.badRequest("Key: '" + structField
-                + "' Error:Field validation for '" + field + "' failed on the 'required' tag"));
+        return new BizException(AppError.badRequest(RequestFields.message(field, "required")));
     }
 
     static List<String> toStringList(JsonNode n) {

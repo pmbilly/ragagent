@@ -1,5 +1,6 @@
 package com.ragagent.agent.management.controller;
 
+import com.ragagent.common.web.RequestFields;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -224,8 +225,7 @@ public class AgentController {
         String name = node == null || node.get("name") == null || node.get("name").isNull()
                 ? "" : node.get("name").asText("");
         if ("CreateAgentRequest".equals(structName) && name.isEmpty()) {
-            throw invalidParams("Key: 'CreateAgentRequest.Name' "
-                    + "Error:Field validation for 'Name' failed on the 'required' tag");
+            throw invalidParams(RequestFields.message("Name", "required"));
         }
         String description = node != null && node.get("description") != null
                 && !node.get("description").isNull() ? node.get("description").asText("") : "";

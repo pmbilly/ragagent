@@ -1,5 +1,6 @@
 package com.ragagent.storage.controller;
 
+import com.ragagent.common.web.RequestFields;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -239,9 +240,7 @@ public class StorageBackendController {
                 if (sb.length() > 0) {
                     sb.append('\n');
                 }
-                sb.append("Key: 'storageBackendRequest.").append(field)
-                        .append("' Error:Field validation for '").append(field)
-                        .append("' failed on the 'required' tag");
+                sb.append(RequestFields.message(field, "required"));
             }
             throw BizException.badRequest(sb.toString());
         }

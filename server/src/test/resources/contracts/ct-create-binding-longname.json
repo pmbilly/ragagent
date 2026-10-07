@@ -1,1 +1,1 @@
-{"error":{"code":1010,"message":"Invalid request parameters","details":"Key: 'createTenantRequest.Name' Error:Field validation for 'Name' failed on the 'max' tag"}}
+{"error":{"code":1010,"message":"Invalid request parameters","details":"field 'name' is above the maximum"}}

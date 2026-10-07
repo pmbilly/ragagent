@@ -1,5 +1,6 @@
 package com.ragagent.initialization.service;
 
+import com.ragagent.common.web.RequestFields;
 import java.time.OffsetDateTime;
 import com.ragagent.common.deployment.AppEnvLookup;
 import java.time.ZoneId;
@@ -373,8 +374,7 @@ public final class ModelConnectivityTestService {
         String modelName = text(n, "modelName");
         if (modelName.isEmpty()) {
             throw new BizException(AppError.badRequest(
-                    "Key: 'ModelTestRequest.ModelName' Error:Field validation for 'ModelName' "
-                            + "failed on the 'required' tag"));
+                    RequestFields.message("ModelName", "required")));
         }
         return new ModelTestRequest(
                 text(n, "source"),

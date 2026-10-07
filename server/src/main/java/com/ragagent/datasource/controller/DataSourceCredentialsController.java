@@ -1,6 +1,7 @@
 package com.ragagent.datasource.controller;
 
 import com.ragagent.common.web.JsonMappers;
+import com.ragagent.common.web.RequestFields;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -190,8 +191,7 @@ public class DataSourceCredentialsController {
      * <p>它<b>会出现在线上</b>——契约测试逐字节比对时不能整条掩码掉。</p>
      */
     static String requiredFieldMessage() {
-        return "Key: '" + REQUEST_TYPE_NAME + ".Credentials' Error:Field validation for "
-                + "'Credentials' failed on the 'required' tag";
+        return RequestFields.message("Credentials", "required");
     }
 
     /** PUT 请求体。 */

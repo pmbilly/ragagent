@@ -1,5 +1,6 @@
 package com.ragagent.websearch.controller;
 
+import com.ragagent.common.web.RequestFields;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -372,9 +373,7 @@ public class WebSearchProviderController {
             if (sb.length() > 0) {
                 sb.append('\n');
             }
-            sb.append("Key: '").append(structName).append('.').append(field)
-                    .append("' Error:Field validation for '").append(field)
-                    .append("' failed on the 'required' tag");
+            sb.append(RequestFields.message(field, "required"));
         }
         return BizException.badRequest(sb.toString());
     }

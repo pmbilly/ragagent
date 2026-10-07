@@ -1,5 +1,6 @@
 package com.ragagent.initialization.service;
 
+import com.ragagent.common.web.RequestFields;
 import java.time.OffsetDateTime;
 import com.ragagent.common.deployment.AppEnvLookup;
 import java.util.ArrayList;
@@ -246,7 +247,7 @@ public final class OllamaManageService {
         }
         if (models == null || !models.isArray() || out.isEmpty()) {
             throw new BizException(AppError.badRequest(
-                    "Key: 'Models' Error:Field validation for 'Models' failed on the 'required' tag"));
+                    RequestFields.message("Models", "required")));
         }
         return out;
     }
@@ -256,7 +257,7 @@ public final class OllamaManageService {
         String modelName = ModelConnectivityTestService.text(n, "modelName");
         if (modelName.isEmpty()) {
             throw new BizException(AppError.badRequest(
-                    "Key: 'ModelName' Error:Field validation for 'ModelName' failed on the 'required' tag"));
+                    RequestFields.message("ModelName", "required")));
         }
         return modelName;
     }

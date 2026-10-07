@@ -1,5 +1,6 @@
 package com.ragagent.auth.controller;
 
+import com.ragagent.common.web.RequestFields;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -110,8 +111,7 @@ public class TenantInvitationController {
         String email = body.path("email").asText();
         if (!TenantMemberController.isValidEmailFormat(email)) {
             throw new BizException(AppError.validation("invalid request body")
-                    .withDetails("Key: 'createInvitationRequest.Email' Error:Field validation for 'Email'"
-                            + " failed on the 'email' tag"));
+                    .withDetails(RequestFields.message("Email", "email")));
         }
         TenantRole role = TenantRole.fromString(body.path("role").asText());
         if (!role.isValid()) {
@@ -488,8 +488,7 @@ public class TenantInvitationController {
         boolean missing = n == null || n.isNull() || (n.isTextual() && n.asText().isEmpty());
         if (missing) {
             throw new BizException(AppError.validation("token is required")
-                    .withDetails("Key: 'acceptInvitationByTokenRequest.Token' Error:Field validation for "
-                            + "'Token' failed on the 'required' tag"));
+                    .withDetails(RequestFields.message("Token", "required")));
         }
     }
 

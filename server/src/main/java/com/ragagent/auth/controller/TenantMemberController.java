@@ -1,5 +1,6 @@
 package com.ragagent.auth.controller;
 
+import com.ragagent.common.web.RequestFields;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -105,8 +106,7 @@ public class TenantMemberController {
         String email = body.path("email").asText();
         if (!isValidEmailFormat(email)) {
             throw new BizException(AppError.validation("invalid request body")
-                    .withDetails("Key: 'addMemberRequest.Email' Error:Field validation for 'Email'"
-                            + " failed on the 'email' tag"));
+                    .withDetails(RequestFields.message("Email", "email")));
         }
         TenantRole role = TenantRole.fromString(body.path("role").asText());
         if (!role.isValid()) {
@@ -352,8 +352,7 @@ public class TenantMemberController {
             boolean missing = n == null || n.isNull() || (n.isTextual() && n.asText().isEmpty());
             if (missing) {
                 String cap = Character.toUpperCase(field.charAt(0)) + field.substring(1);
-                lines.add("Key: '" + structName + "." + cap + "' Error:Field validation for '"
-                        + cap + "' failed on the 'required' tag");
+                lines.add(RequestFields.message(cap, "required"));
             }
         }
         if (!lines.isEmpty()) {

@@ -66,7 +66,7 @@ class KnowledgeQaContractTest {
     @Test
     void searchKnowledgeBindingErrors() throws Exception {
         assertEnvelope("kse-empty-query", 1000,
-                "Key: 'SearchKnowledgeRequest.Query' Error:Field validation for 'Query' failed on the 'required' tag");
+                "field 'query' is required");
         // GoJsonBindError 已退役——用 Jackson 原生消息（与 golden 逐字一致）
         assertEnvelope("kse-bad-json", 1000,
                 "Unrecognized token 'not': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')\n"
@@ -83,7 +83,7 @@ class KnowledgeQaContractTest {
     @Test
     void knowledgeChatBindingAndNotFound() throws Exception {
         assertEnvelope("kch-empty-query", 1000,
-                "Key: 'CreateKnowledgeQARequest.Query' Error:Field validation for 'Query' failed on the 'required' tag");
+                "field 'query' is required");
         assertEnvelope("kch-missing-session", 1003, "Session not found");
     }
 

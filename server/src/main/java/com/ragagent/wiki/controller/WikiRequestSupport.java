@@ -1,5 +1,6 @@
 package com.ragagent.wiki.controller;
 
+import com.ragagent.common.web.RequestFields;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -232,13 +233,10 @@ final class WikiRequestSupport {
     /**
      * 必填字段校验。
      *
-     * <p>报错文案是
-     * {@code Key: '<Struct>.<Field>' Error:Field validation for '<Field>' failed on the 'required' tag}
-     * （这条文案对客户端可见，必须逐字一致），
-     * 多个字段同时失败时用换行连接。
-     * 匿名结构（无结构体名）的 Key 不带前缀（{@code Key: 'Status'}）。</p>
+     * <p>报错文案见 {@link RequestFields#message}（字段级、camelCase 字段名），
+     * 多个字段同时失败时用换行连接。</p>
      *
-     * @param structName 具名结构的名字；null / 空表示匿名结构
+     * @param structName 已不再渲染（保留签名）；null / 空与具名等价
      * @param fields     字段的<b>声明序</b>（决定报错顺序）
      * @return 校验错误串；全部通过时返回 null
      */
@@ -251,11 +249,7 @@ final class WikiRequestSupport {
             if (sb.length() > 0) {
                 sb.append('\n');
             }
-            String key = (structName == null || structName.isEmpty())
-                    ? field : structName + "." + field;
-            sb.append("Key: '").append(key)
-                    .append("' Error:Field validation for '").append(field)
-                    .append("' failed on the 'required' tag");
+            sb.append(RequestFields.message(field, "required"));
         }
         return sb.length() == 0 ? null : sb.toString();
     }

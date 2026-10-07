@@ -1,5 +1,6 @@
 package com.ragagent.auth.controller;
 
+import com.ragagent.common.web.RequestFields;
 import java.util.List;
 
 import com.ragagent.auth.domain.Tenant;
@@ -45,9 +46,7 @@ final class AuthBindingSupport {
 
 
     static String bindingError(String structName, String field, String tag) {
-        String key = structName == null || structName.isEmpty() ? field : structName + "." + field;
-        return "Key: '" + key + "' Error:Field validation for '" + field
-                + "' failed on the '" + tag + "' tag";
+        return RequestFields.message(field, tag);
     }
 
 

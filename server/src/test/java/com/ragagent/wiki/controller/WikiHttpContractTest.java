@@ -552,15 +552,15 @@ class WikiHttpContractTest {
 
         assertEquals(400, r.getResponse().getStatus(), body(r));
         assertEquals("{\"error\":\"Invalid request body: "
-                + "Key: 'WikiPageRevertRequest.Slug' Error:Field validation for 'Slug' failed on the 'required' tag\\n"
-                + "Key: 'WikiPageRevertRequest.Version' Error:Field validation for 'Version' failed on the 'required' tag\"}",
+                + "field 'slug' is required\\n"
+                + "field 'version' is required\"}",
                 body(r));
     }
 
     // ══════════════════════════════ 移动 / 文件夹 ══════════════════════════════
 
     @Test
-    void movePageWithoutSlugReturnsGoBindingText() throws Exception {
+    void movePageWithoutSlugReturnsFieldBindingText() throws Exception {
         String token = loginOwner();
         MvcResult r = perform(put("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/move-page")
                 .header("Authorization", "Bearer " + token)
@@ -568,8 +568,7 @@ class WikiHttpContractTest {
                 .content("{}"));
 
         assertEquals(400, r.getResponse().getStatus(), body(r));
-        assertEquals("{\"error\":\"Invalid request body: Key: 'WikiPageMoveRequest.Slug' "
-                + "Error:Field validation for 'Slug' failed on the 'required' tag\"}", body(r));
+        assertEquals("{\"error\":\"Invalid request body: field 'slug' is required\"}", body(r));
     }
 
     @Test
@@ -837,8 +836,7 @@ class WikiHttpContractTest {
                 .contentType("application/json")
                 .content("{}"));
         assertEquals(400, missing.getResponse().getStatus(), body(missing));
-        assertEquals("{\"error\":\"Invalid request body: Key: 'Status' Error:Field validation for "
-                + "'Status' failed on the 'required' tag\"}", body(missing));
+        assertEquals("{\"error\":\"Invalid request body: field 'status' is required\"}", body(missing));
 
         MvcResult ok = perform(put("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/issues/i-1/status")
                 .header("Authorization", "Bearer " + token)

@@ -1,5 +1,6 @@
 package com.ragagent.im.controller;
 
+import com.ragagent.common.web.RequestFields;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -82,9 +83,7 @@ public class ImChannelController {
         }
         CreateRequest req = bindCreate(rawBody);
         if (req.platform() == null || req.platform().isEmpty()) {
-            // 400 文案为字段级校验格式（字段名 Platform，非 json 键名）
-            return plain(400, "Key: 'Platform' Error:Field validation for 'Platform' "
-                    + "failed on the 'required' tag");
+            return plain(400, RequestFields.message("Platform", "required"));
         }
         if (!isValidPlatform(req.platform())) {
             return plain(400, ImChannelService.INVALID_PLATFORM_ERROR);

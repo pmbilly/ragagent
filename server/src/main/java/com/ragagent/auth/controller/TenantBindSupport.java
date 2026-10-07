@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
+import com.ragagent.common.web.RequestFields;
 
 /**
  * 租户目录的绑定错误形态助手（全静态）：
@@ -57,9 +58,7 @@ final class TenantBindSupport {
     }
 
     static String bindingError(String structName, String field, String tag) {
-        String key = structName == null || structName.isEmpty() ? field : structName + "." + field;
-        return "Key: '" + key + "' Error:Field validation for '" + field
-                + "' failed on the '" + tag + "' tag";
+        return RequestFields.message(field, tag);
     }
 
     /** 校验失败：400 + details 原文。 */

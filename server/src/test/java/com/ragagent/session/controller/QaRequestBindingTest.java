@@ -113,16 +113,15 @@ class QaRequestBindingTest {
         assertThat(req.suggestionAttribution).isNull();
     }
 
-    /** 必填校验文案仍是历史措辞（`Key: '<结构体>.<字段>' … on the 'required' tag`）。 */
+    /** 必填校验文案：字段级、camelCase（见 {@code RequestFields#message}）。 */
     @Test
-    void requiredErrorKeepsGoWording() {
+    void requiredErrorUsesFieldWording() {
         assertThatThrownBy(() -> QaRequestBinder.bindQaRequest("{\"query\":\"\"}"))
                 .isInstanceOf(BizException.class)
-                .hasMessageContaining("Key: 'CreateKnowledgeQARequest.Query' Error:Field validation"
-                        + " for 'Query' failed on the 'required' tag");
+                .hasMessageContaining("field 'query' is required");
         assertThatThrownBy(() -> QaRequestBinder.bindSearchRequest("{}"))
                 .isInstanceOf(BizException.class)
-                .hasMessageContaining("Key: 'SearchKnowledgeRequest.Query'");
+                .hasMessageContaining("field 'query' is required");
     }
 
     /** 字段级类型错误用 Jackson 原生消息，json 名仍是 camelCase（B51：GoJsonBindError 退役）。 */

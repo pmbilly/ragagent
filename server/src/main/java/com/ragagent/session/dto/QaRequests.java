@@ -15,8 +15,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  * {@code QaSupport.QaRequest} 内部模型），注解对入参没有语义，留着只会让下一个读者
  * 以为响应面也受影响。</p>
  *
- * <p>绑定错误文案保持既有措辞：{@code QaRequestBinder} 按
- * {@code Key: 'CreateKnowledgeQARequest.Query' Error:Field validation …} 抛错。</p>
+ * <p>绑定错误文案由 {@code RequestFields} 统一产出（字段级、camelCase 字段名）。</p>
  *
  * <p>未登记的键一律被忽略（{@code @JsonIgnoreProperties}）——**旧 snake 键因此不会报错，只会静默失效**，
  * 客户端须同批改造（前端、embed 访客页、集成文档页已同批）。</p>

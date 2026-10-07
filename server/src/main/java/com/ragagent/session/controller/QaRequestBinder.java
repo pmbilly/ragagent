@@ -1,5 +1,6 @@
 package com.ragagent.session.controller;
 
+import com.ragagent.common.web.RequestFields;
 import java.util.ArrayList;
 import java.util.List;
 import com.ragagent.common.error.BizException;
@@ -50,9 +51,7 @@ final class QaRequestBinder {
         }
     }
     static String bindingError(String structName, String field, String tag) {
-        String key = structName == null || structName.isEmpty() ? field : structName + "." + field;
-        return "Key: '" + key + "' Error:Field validation for '" + field
-                + "' failed on the '" + tag + "' tag";
+        return RequestFields.message(field, tag);
     }
     static List<String> appendAll(List<String> base, List<String> extra) {
         List<String> out = new ArrayList<>(base == null ? List.of() : base);

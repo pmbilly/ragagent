@@ -890,3 +890,10 @@
 - **原盲区补钉（原先 0 金片覆盖）**：新增 `WikiRequestSupportTest`（非对象 array/string + EOF 保持）、`McpServiceCrudOpsBindingTest`（`BizException.appError().message()` 精确断言）、`OllamaBindJsonObjectTest`（array/boolean）；**三处红态探针逐一验过**（临时改坏文案 → 三红；还原后绿）。
 - **金片零变化**：已核实 0 个 contracts 夹具钉这三处文案。
 - **闸门**：全量 **4,829**/0 失败（6 跳过）+ `spotlessCheck` 绿。
+**✅ B82（2026-10-07，gin 校验文案面换锚：17 文件生成点收敛 + 32 金片重锚）**
+- **背景**：`Key: '<Struct>.<Field>' Error:Field validation for '<Field>' failed on the '<tag>' tag` 是 gin 校验器文案，散布 **17 个文件**（7 份 helper 副本 + 10+ 内联字面量），钉在 32 个金片 / 8 域（agent/member/reg/init/session/KB/datasource/vectorstore/storage/websearch/im/embed）。
+- **新文案（单一实现 `common/web/RequestFields`）**：`field '<camelCase 字段名>' is required` / `is not a valid email address` / `is below the minimum` / `is above the maximum`；其余 tag 兜底 `field 'x' failed validation: <tag>`。字段名 PascalCase→camelCase（`TenantID→tenantId`、`LLMModelID→llmModelId`）；单引号形态（免 JSON/Java 转义）。
+- **动作**：① 新增 `RequestFields` + `RequestFieldsTest`（文案 5 条 + 转写 6 条）；② 7 份 helper（`TenantBindSupport`/`AuthBindingSupport`/`QaRequestBinder`/`WikiRequestSupport`/`WebSearchProviderController`/`StorageBackendController`/`VectorStoreController`）与 10+ 处内联字面量（`TenantMemberController`/`TenantInvitationController`/`DataSourceCredentialsController`/`AgentController`/`OllamaManageService`/`InitializationRequests`/`ModelConnectivityTestService`/`ImChannelController`/`SteerController`）全部改调 `RequestFields.message(...)`；③ 32 个金片 + 3 个测试文件内联断言按同一规则转换（含两处跨行拼接断言的重写 + 两个测试名去 Go）。
+- **过程事故**：首版文案用双引号（`field "name" is required`）——写入 JSON 夹具需 `"`、写入 Java 字面量也需转义，`compileTestJava` 立即 9 错；改单引号后一次通过。教训：**换锚批的文案字符集先过「夹具/字面量是否需转义」这一关**。
+- **登记（后续小批）**：① `structName` 形参保留签名不再渲染（~40 调用点清理）；② 原生错误体解析面（`datasource/connector/notion` 的 `cannot unmarshal non-array` 两处）属第三方连接器，随 connector 批处置。
+- **闸门**：全量 **4,831**/0 失败（6 跳过）+ `spotlessCheck` 绿；主源码/金片/测试侧 `Error:Field validation` 残留 **0**。
