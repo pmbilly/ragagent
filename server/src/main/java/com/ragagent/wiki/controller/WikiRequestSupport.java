@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.security.LogSanitizer;
+import com.ragagent.common.web.ToolJson;
 import com.ragagent.wiki.domain.WikiFolderConflictException;
 import com.ragagent.wiki.domain.WikiFolderNotEmptyException;
 import com.ragagent.wiki.domain.WikiFolderNotFoundException;
@@ -202,7 +203,7 @@ final class WikiRequestSupport {
             }
             if (!node.isObject()) {
                 throw new RawJsonError(HttpStatus.BAD_REQUEST.value(),
-                        "Invalid request body: json: cannot unmarshal non-object into Go value");
+                        "Invalid request body: expected JSON object, got " + ToolJson.nodeTypeLabel(node));
             }
             return node;
         } catch (RawJsonError e) {

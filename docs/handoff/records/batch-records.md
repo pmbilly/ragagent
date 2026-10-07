@@ -885,3 +885,8 @@
   ③ **新发现（超出原批准清单，待拍板）**：gin 校验文案 `Key: '…' Error:Field validation for '…' failed on the '…' tag` 仍钉在 **32 个金片、跨 8 域**（agent/member/reg/init/session/KB 等）——不在「auth/ASR/类型名」清单内，是否另立批换锚。
   ④ 同类非 go 名孪生（`WikiRequestSupport:205` / `McpServiceCrudOps:131` / `OllamaManageService:280` 的 `non-object into Go value …`）：**0 金片钉住**（盲区），改前建议先补钉。
 - **闸门**：全量 **4,825**/0 失败（6 跳过）+ `spotlessCheck` 绿。
+**✅ B81（2026-10-07，盲区孪生文案换 Java 标准 + 补钉）**
+- **动作**：① 新增共享 `ToolJson.nodeTypeLabel(JsonNode)`——Jackson 节点类型名小写（null/boolean/number/string/array/object）；`SystemSettingRegistry.jsonTypeLabel` 收敛为委托（去掉第二份映射，B80 钉子仍绿）；② 三处「非 go 名孪生」换文案（对照 B80 的分析表 ④）：`WikiRequestSupport.readJsonBody` → `Invalid request body: expected JSON object, got …`；`McpServiceCrudOps.updateMCPService` → `expected JSON object, got …`；`OllamaManageService.bindJsonObject` → `expected JSON object, got …`（顺删本地 `jsonKindName`，其 `bool` 词表不合标准）。
+- **原盲区补钉（原先 0 金片覆盖）**：新增 `WikiRequestSupportTest`（非对象 array/string + EOF 保持）、`McpServiceCrudOpsBindingTest`（`BizException.appError().message()` 精确断言）、`OllamaBindJsonObjectTest`（array/boolean）；**三处红态探针逐一验过**（临时改坏文案 → 三红；还原后绿）。
+- **金片零变化**：已核实 0 个 contracts 夹具钉这三处文案。
+- **闸门**：全量 **4,829**/0 失败（6 跳过）+ `spotlessCheck` 绿。

@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.error.BizException;
 import com.ragagent.common.security.LogSanitizer;
 import com.ragagent.common.security.SsrfGuard;
+import com.ragagent.common.web.ToolJson;
 import com.ragagent.mcp.domain.McpAdvancedConfig;
 import com.ragagent.mcp.domain.McpAuthConfig;
 import com.ragagent.mcp.domain.McpAuthType;
@@ -127,8 +128,8 @@ final class McpServiceCrudOps {
             throw BizException.badRequest("No content to map due to end-of-input");
         }
         if (!updateData.isObject() && !updateData.isNull()) {
-            // 非 JSON 对象 → 400；错误文案是契约的一部分，保持原样
-            throw BizException.badRequest("json: cannot unmarshal non-object into Go value of type map[string]interface {}");
+            throw BizException.badRequest(
+                    "expected JSON object, got " + ToolJson.nodeTypeLabel(updateData));
         }
         long tenantId = McpServiceController.requireTenant();
         String serviceId = McpServiceController.sanitize(id);

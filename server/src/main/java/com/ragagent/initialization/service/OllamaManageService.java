@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
+import com.ragagent.common.web.ToolJson;
 import com.ragagent.llm.ollama.OllamaService;
 
 /**
@@ -277,25 +278,9 @@ public final class OllamaManageService {
         }
         if (!n.isObject()) {
             throw new BizException(AppError.badRequest(
-                    "json: cannot unmarshal " + jsonKindName(n) + " into Go value of type struct"));
+                    "expected JSON object, got " + ToolJson.nodeTypeLabel(n)));
         }
         return n;
-    }
-
-    static String jsonKindName(JsonNode n) {
-        if (n.isArray()) {
-            return "array";
-        }
-        if (n.isTextual()) {
-            return "string";
-        }
-        if (n.isNumber()) {
-            return "number";
-        }
-        if (n.isBoolean()) {
-            return "bool";
-        }
-        return "object";
     }
 
 }

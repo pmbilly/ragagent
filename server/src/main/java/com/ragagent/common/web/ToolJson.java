@@ -54,6 +54,11 @@ public final class ToolJson {
         }
     }
 
+    /** JSON 类型名（错误文案用）：null / boolean / number / string / array / object。 */
+    public static String nodeTypeLabel(JsonNode node) {
+        return node == null ? "null" : node.getNodeType().name().toLowerCase(java.util.Locale.ROOT);
+    }
+
     /** 工具参数编码：递归键排序（确定性）+ 标准 Jackson 紧凑输出。 */
     public static String write(JsonNode node) {
         return compactJson(sorted(node));

@@ -8,6 +8,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
+import com.ragagent.common.web.ToolJson;
+
 /**
  * system_settings 的 in-code 注册表（17 条）。
  *
@@ -225,24 +227,9 @@ public final class SystemSettingRegistry {
         return -1;
     }
 
-    /** JSON 类型名（错误消息里出现）：null / boolean / number / string / array / object。 */
+    /** JSON 类型名（错误消息里出现）：见 {@link ToolJson#nodeTypeLabel}。 */
     public static String jsonTypeLabel(JsonNode node) {
-        if (node == null || node.isNull()) {
-            return "null";
-        }
-        if (node.isBoolean()) {
-            return "boolean";
-        }
-        if (node.isNumber()) {
-            return "number";
-        }
-        if (node.isTextual()) {
-            return "string";
-        }
-        if (node.isArray()) {
-            return "array";
-        }
-        return "object";
+        return ToolJson.nodeTypeLabel(node);
     }
 
     private SystemSettingRegistry() {
