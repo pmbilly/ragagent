@@ -934,5 +934,15 @@
 - **前端双读**：`mcpToolDisplay` 加历史载荷归一化（snake→camel 补缺，覆盖「including old history」用例）；引用载荷族保留 `?? snake` 兜底（`referenceSources`/`citationMarkdown`/`rag-pipeline-history`）；`AgentStreamDisplay` 的 grep 分组引用 `chunkIds: …(chunk) => chunk.chunkId ?? chunk.chunk_id`，并同步源码扫描守卫 `chatLinksNewTab.test.mjs` 的正则。
 - **过程事故**：批量改名把「双拼读」文件改成自比较（`raw.knowledgeId ?? raw.knowledgeId`）×3 文件、把 `attrs.chunk_id || attrs.chunkId` 改成自比较；用 `X ?? X` / `obj.p ?? obj.p` 探测脚本修复时又误伤两处 `||` 复合条件（`kb.summaryModelId === ''`）→ `git checkout` 回退。教训：**双拼读点必须按 `?? snake` 结构识别，不能按标识符自比较粗暴改写**。
 - **保留（登记）**：工具名 36 个（`ToolCapabilities` 基线）、enum 值、外部/第三方键。
-- **登记后续（B89，待拍板）**：XML 形态字段名与提示词正文提及——实测 23 键 / 约 80 处，其中 `AgentPrompts:242` 一处即 23 处**提示词正文**（告诉模型输出 `<knowledge_id>` 等标签）。属 §14.6 已登记的「模型输出契约 / wiki LLM 输出解析面」：改 Java 侧必须连 prompt 正文 + 解析器 + 实录同批，是**行为面**（可能影响模型输出行为），故不与 JSON 键同批。
+- **后续（B89，2026-10-08 已执行）**：XML 形态字段名（自有序列化标记）见 B89 记录；引用协议标记保留。
 - **闸门**：后端全量 **4,836**/0（Redis 竞态单测隔离重跑绿）+ 前端 **734**/734 + `vue-tsc` 0 错 + `spotlessCheck` + `check-json-key-case.py --strict` 绿（已摘除 `agent/tools/` 冻结豁免，基线 343 条）。
+
+**✅ B89（2026-10-08，模型输出契约 XML 面 camel 化）**
+- **口径**：区分两类 XML——① **自有序列化标记**（工具输出 + `runtime_context`，字段名就是我们的键）→ 本批改；② **引用协议标记**（`<kb>`/`<web>`/`<ref>` + `doc`/`chunk_id`/`kb_id`/`url`/`title`，由提示词定义、模型产出、前端解析）→ 保留（协议方言）。
+- **产出侧 12 文件 / 56 处**：属性位 + 元素位（`<knowledge_id>`→`<knowledgeId>`、`<storage_error>`→`<storageError>`、`<knowledge_base>`→`<knowledgeBase>` 等）；含 `ToolDefinitions` 的 `read_file(path="skill://<name>/<filePath or SKILL.md>")` 文案与 `ListKnowledgeChunksTool` 的 `list_knowledge_chunks(faqId="cN")` 提示。
+- **解析侧双拼容忍**：`SourceRegistry` 7 条正则（`CHUNK_ATTR`/`FAQ_ATTR`/`KNOWLEDGE_TITLE_ATTR`/`DOCUMENT_ATTR`/`DOCUMENT_ELEMENT`/`KB_ATTR`/`KB_ELEMENT`）改为 `(?:camel|snake)` 交替 —— 历史载荷与旧模型引用仍可解析，新输出用 camel。
+- **实录同步**：45B 260 处 + 46B 1 处；执行前先**屏蔽协议标记**（`<kb`/`<web`/`<ref` 及其 `<` 转义形），避免误改引用方言。
+- **截断快照重算**：属性名长度变化使 `wiki_read_page` 的输出预算截断点位移 → `R_WIKI_READ_PAGE_READ_BUDGET` 1065→1069 字符。做法：临时确定性探针（复刻夹具 + 打印实测 output，跑完即删）取真值后重写常量；`READ_BUDGET_TINY` 无变化。教训：**凡有「按预算截断」的快照，改名批必须重算，不能只看 diff 猜**。
+- **前端**：`wikiToolReferences` 元素读取双拼（`firstTag(page, 'matchSnippet', 'match_snippet')`）+ 新增 camel 形态用例（原 snake 用例保留，作为历史兼容钉子）。
+- **误伤回退**：测试夹具批处理越界打到 15 个非 agent 域文件（`file_path=`/`knowledge_id=`/`updated_at=` 等**非工具面**属性，如 multipart 参数、外部契约夹具）→ `git checkout` 全退，只保留 agent 域一处。
+- **闸门**：后端全量 **4,836**/0（一次跑绿）+ 前端 **735**/735 + `vue-tsc` 0 错 + `spotlessCheck` + `check-json-key-case.py --strict` 绿。
