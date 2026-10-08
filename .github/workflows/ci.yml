@@ -31,6 +31,8 @@ jobs:
         run: python3 scripts/check-json-key-case.py --strict
       - name: 事件面/路由面命名口径（B93b：载荷注解/事件名与响应类型值/路径变量/查询参数一律 camel）
         run: python3 scripts/check-event-face-case.py
+      - name: 大文件棘轮（B121：不得新增 >600 行的主源码文件；拆小后 --write 收紧基线）
+        run: python3 scripts/check-file-size.py
 
   backend:
     name: 后端 build + test + spotless

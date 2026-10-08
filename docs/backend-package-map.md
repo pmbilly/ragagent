@@ -103,6 +103,34 @@ B33 已归位：`AppEnvLookup` → `common/deployment`、`StorageRuntimeEnv` →
       根（框架 + 跨族共享 + 通用单件 + MCP 族） + `wiki/knowledge/sql/data/web` 五个能力子包。
       判据：有天然族才拆，别为扁平而扁平；MCP 族因与 `ToolRegistry` 同包紧耦合暂留根（已登记）。
 
+### P2b 超大文件（> 600 行；棘轮 `scripts/check-file-size.py`，B121 上线）
+
+**现状**（2026-10-08 B121 盘点）：主源码 1,888 个文件里 **> 600 行有 68 个**、400~600 行 120 个。
+最大的 12 个（**就是后续拆分的待办清单**）：
+
+| 行数 | 文件 | | 行数 | 文件 |
+|---|---|---|---|---|
+| 1091 | `im/service/ImService` | | 772 | `retrieval/HybridSearchService` |
+| 1041 | `session/service/SessionKnowledgeQaService` | | 765 | `memory/service/MemoryService` |
+| 919 | `memory/mapper/MemoryIndexStore` | | 763 | `agent/ActPhase` |
+| 847 | `knowledge/task/KnowledgeProcessWorker` | | 761 | `im/runtime/ToolDisplay` |
+| 827 | `knowledge/service/KnowledgeService` | | 760 | `llm/chat/AnthropicChat` |
+| 789 | `storage/fileserve/StorageFileResolver` | | 759 | `wiki/service/ingest/WikiIngestCitePipeline` |
+| 780 | `knowledge/service/FaqEntryCommandService` | | 757 | `auth/service/UserService` |
+
+**棘轮口径（为什么只对新文件设硬门）**：行数是**粗指标**——一个有内聚的 650 行类不该被阻止，
+而 68 个既有大文件都在被持续改动；若对既有文件也执行"只许减"，日常功能开发会被反复卡住
+（与 R3b"处数只减"的语义不同：那里一处是**违例**，这里一行只是**体量**）。
+⇒ **不得新增 > 600 行的主源码文件**（硬门）；既有文件的增量在输出里报 Δ（提示，不阻塞）；
+拆小后用 `--write` 收紧基线。**真正的膨胀源是新增大文件**，这条把它刹住。
+
+**拆分范式（项目既有，见 `wiki/controller` + `*Ops`）**：把一组内聚方法提到同包的 `*Ops`
+**普通类**（**不加** `@Component`），由门面构造持有（`this.pageOps = new WikiPageOps(...)`）
+⇒ **零 Spring 装配改动、零调用点改写**，门面退化为薄转发。四例的可切性已侦察：
+`MemoryIndexStore`（1 字段 `repo`，四簇：topic / affinity / embedding+vector / extraction 队列）、
+`ImService`（Leader 选主簇字段自成一体）、`SessionKnowledgeQaService`（0 字段，WebSearch 参数
+解析与小工具簇无状态）、`StorageFileResolver`（3 字段）。
+
 ### P3 命名与文档
 
 - [x] **顶层 `package-info` 全覆盖 31/31**（2026-09-30；28 个见 `809115c`，`session` 由批 P3 补：该域批次已交付，
