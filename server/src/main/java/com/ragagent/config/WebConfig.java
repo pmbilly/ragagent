@@ -18,6 +18,18 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import com.ragagent.auth.apikey.filter.APIKeyAuthChannel;
+import com.ragagent.auth.apikey.filter.APIKeyGateInterceptor;
+import com.ragagent.auth.apikey.filter.APIKeyRouteAuthorizer;
+import com.ragagent.auth.apikey.filter.APIKeyRoutePolicies;
+import com.ragagent.auth.apikey.filter.APIKeyScopeCleanupFilter;
+import com.ragagent.auth.apikey.filter.AllowFileServeAPIKeyInterceptor;
+import com.ragagent.auth.apikey.filter.DenyAPIKeyPrincipalInterceptor;
+import com.ragagent.auth.apikey.service.TenantAPIKeyService;
+import com.ragagent.auth.filter.WsAuthSupport;
+import com.ragagent.common.deployment.DeploymentProperties;
+import com.ragagent.system.service.DeploymentCapabilitiesHolder;
+import com.ragagent.tracing.langfuse.LangfuseHttpInterceptor;
 
 /**
  * 全局装配顺序：CORS → RequestID → Auth（认证走 servlet filter）。
@@ -71,8 +83,8 @@ public class WebConfig implements WebMvcConfigurer {
      *  本过滤器只组装三通道分派。 */
     @Bean
     public FilterRegistrationBean<AuthFilter> authFilter(UserService userService,
-                                                         com.ragagent.auth.filter.WsAuthSupport wsAuthSupport,
-                                                         com.ragagent.auth.apikey.filter.APIKeyAuthChannel apiKeyAuthChannel) {
+                                                         WsAuthSupport wsAuthSupport,
+                                                         APIKeyAuthChannel apiKeyAuthChannel) {
         FilterRegistrationBean<AuthFilter> bean =
                 new FilterRegistrationBean<>(new AuthFilter(userService, wsAuthSupport,
                         apiKeyAuthChannel));
@@ -86,9 +98,9 @@ public class WebConfig implements WebMvcConfigurer {
      * 不清理会让后续的 JWT 请求被误判成 API Key 主体。
      */
     @Bean
-    public FilterRegistrationBean<com.ragagent.auth.apikey.filter.APIKeyScopeCleanupFilter> apiKeyScopeCleanupFilter() {
-        FilterRegistrationBean<com.ragagent.auth.apikey.filter.APIKeyScopeCleanupFilter> bean =
-                new FilterRegistrationBean<>(new com.ragagent.auth.apikey.filter.APIKeyScopeCleanupFilter());
+    public FilterRegistrationBean<APIKeyScopeCleanupFilter> apiKeyScopeCleanupFilter() {
+        FilterRegistrationBean<APIKeyScopeCleanupFilter> bean =
+                new FilterRegistrationBean<>(new APIKeyScopeCleanupFilter());
         bean.setOrder(Ordered.HIGHEST_PRECEDENCE + 15);
         bean.addUrlPatterns("/*");
         return bean;
@@ -105,10 +117,10 @@ public class WebConfig implements WebMvcConfigurer {
         // API Key 能力维度的门禁。
         // 必须**排在角色维度的 RbacInterceptor 之前**：能力判定先于角色判定，
         // 且 RbacInterceptor 对 API Key 主体短路（见其 apiKeyShortCircuit）。
-        com.ragagent.auth.apikey.filter.APIKeyRouteAuthorizer apiKeyAuthorizer =
-                new com.ragagent.auth.apikey.filter.APIKeyRouteAuthorizer();
-        com.ragagent.auth.apikey.filter.APIKeyRoutePolicies.registerAll(apiKeyAuthorizer);
-        registry.addInterceptor(new com.ragagent.auth.apikey.filter.APIKeyGateInterceptor(apiKeyAuthorizer))
+        APIKeyRouteAuthorizer apiKeyAuthorizer =
+                new APIKeyRouteAuthorizer();
+        APIKeyRoutePolicies.registerAll(apiKeyAuthorizer);
+        registry.addInterceptor(new APIKeyGateInterceptor(apiKeyAuthorizer))
                 .addPathPatterns("/api/v1/**")
                 // /api/v1/files/presigned 与 presigned-preview 不走组级 APIKeyGate——
                 // presigned 靠 HMAC 自证、preview 显式
@@ -593,11 +605,11 @@ public class WebConfig implements WebMvcConfigurer {
         // /files 与 KB 图片代理的 API-Key 自带守卫——这两个路由不在 /api/v1 组的门禁下，
         // KB 受限 Key 拒绝、full-access 与 retrieve 放行，JWT 直通。
         // 注册先于 rbac（守卫链序：API-Key 守卫 → Viewer）。
-        registry.addInterceptor(new com.ragagent.auth.apikey.filter.AllowFileServeAPIKeyInterceptor())
+        registry.addInterceptor(new AllowFileServeAPIKeyInterceptor())
                 .addPathPatterns("/files", "/api/v1/knowledge-bases/*/files")
                 .order(0);
         // presigned-preview 的 DenyAPIKeyPrincipal（角色门禁对 Key 短路，须显式拒绝 Key）。
-        registry.addInterceptor(new com.ragagent.auth.apikey.filter.DenyAPIKeyPrincipalInterceptor())
+        registry.addInterceptor(new DenyAPIKeyPrincipalInterceptor())
                 .addPathPatterns("/api/v1/files/presigned-preview")
                 .order(0);
 
@@ -629,7 +641,7 @@ public class WebConfig implements WebMvcConfigurer {
 
         // langfuse 请求级 trace。链序 Auth → langfuse → Audit。order=10 排在门禁之后：
         // 被 RBAC/API-Key 拒绝的请求不产生 trace（langfuse 在 Auth 的下游）。
-        registry.addInterceptor(new com.ragagent.tracing.langfuse.LangfuseHttpInterceptor())
+        registry.addInterceptor(new LangfuseHttpInterceptor())
                 .addPathPatterns("/api/v1/**")
                 .order(10);
     }
@@ -639,10 +651,10 @@ public class WebConfig implements WebMvcConfigurer {
      * organizations 随空间分享裁撤；这是**部署状态**而非代码契约，各部署按各自状态断言。
      */
     @org.springframework.context.annotation.Bean
-    public com.ragagent.system.service.DeploymentCapabilitiesHolder deploymentCapabilitiesHolder(
-            com.ragagent.auth.apikey.service.TenantAPIKeyService apiKeyService,
-            com.ragagent.common.deployment.DeploymentProperties deploymentProperties) {
-        var holder = new com.ragagent.system.service.DeploymentCapabilitiesHolder(deploymentProperties);
+    public DeploymentCapabilitiesHolder deploymentCapabilitiesHolder(
+            TenantAPIKeyService apiKeyService,
+            DeploymentProperties deploymentProperties) {
+        var holder = new DeploymentCapabilitiesHolder(deploymentProperties);
         holder.bind(
                 /* agents */ true, // agents 家族路由已登记
                 /* im */ true, // im 渠道 CRUD 面已登记

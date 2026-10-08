@@ -20,6 +20,7 @@ import com.ragagent.llm.domain.ChatTool;
 import com.ragagent.llm.domain.FunctionCall;
 import com.ragagent.llm.domain.ToolCall;
 import com.ragagent.common.retrieval.SearchResult;
+import com.ragagent.llm.domain.ChatResponse;
 
 /**
  * 4.6a modelcontext 包的录制回放（常量见 {@link GoRecording46A}——字节断言为准）。
@@ -824,7 +825,7 @@ class ModelContextRecordingTest {
     void registryDecodeResponseAndOrphans() {
         Registry r3 = new Registry(true);
         r3.registerWeb("https://resp.example/1", "R");
-        com.ragagent.llm.domain.ChatResponse resp = new com.ragagent.llm.domain.ChatResponse();
+        ChatResponse resp = new ChatResponse();
         resp.setContent("answer res://0000");
         resp.setToolCalls(new ArrayList<>(List.of(call("web_fetch", "{\"urls\":[\"w1\"]}"))));
         r3.decodeResponse(resp);

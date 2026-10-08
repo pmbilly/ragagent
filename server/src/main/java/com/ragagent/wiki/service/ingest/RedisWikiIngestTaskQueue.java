@@ -15,6 +15,7 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
+import com.ragagent.wiki.mapper.TaskDeadLetterRepository;
 
 /**
  * {@link WikiIngestTaskQueue} 的 <b>Redis</b> 实现：跨实例共享的任务表。
@@ -155,7 +156,7 @@ public class RedisWikiIngestTaskQueue implements WikiIngestTaskQueue {
 
     public RedisWikiIngestTaskQueue(StringRedisTemplate template,
             ObjectProvider<WikiIngestTaskHandler> handlerProvider,
-            ObjectProvider<com.ragagent.wiki.mapper.TaskDeadLetterRepository> deadLetterProvider,
+            ObjectProvider<TaskDeadLetterRepository> deadLetterProvider,
             ObjectProvider<WikiIngestService> ingestServiceProvider) {
         this.template = template;
         this.runner = new WikiIngestTaskRunner(handlerProvider, deadLetterProvider, ingestServiceProvider);

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import com.ragagent.support.ContractJson;
 
 /**
  * chat 三入口的契约测试（golden 回放）。
@@ -50,7 +51,7 @@ class KnowledgeQaContractTest {
         // PR4 语义比较：键序/HTML 转义归一后返回（非 JSON 文本原样），断言侧不变
         var resource = new org.springframework.core.io.ClassPathResource("contracts/qa46d-" + name + ".json");
         String text = new String(resource.getInputStream().readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
-        return com.ragagent.support.ContractJson.semantic(GOLDEN_SEMANTIC_MAPPER, text);
+        return ContractJson.semantic(GOLDEN_SEMANTIC_MAPPER, text);
     }
 
     /** 错误体契约：code/message/details 语义断言（键序已归一，PR4；success 键已退役）。 */

@@ -14,6 +14,7 @@ import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.retrieval.engine.PgVectorRetrieveRepository;
+import com.ragagent.common.context.TenantContext;
 
 /**
  * HybridSearch 的结果装配簇：命中 → SearchResult（chunk 元数据补全 + FAQ 问题回填）。
@@ -34,7 +35,7 @@ final class HybridResultOps {
         if (chunks.isEmpty()) {
             return null;
         }
-        Long tenantId = com.ragagent.common.context.TenantContext.currentTenantId();
+        Long tenantId = TenantContext.currentTenantId();
 
         Set<String> knowledgeIds = new LinkedHashSet<>();
         List<String> chunkIds = new ArrayList<>();

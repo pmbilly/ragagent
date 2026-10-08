@@ -31,6 +31,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import com.ragagent.wiki.domain.WikiFolderNotFoundException;
 
 /**
  * Wiki 页面服务的测试。
@@ -433,7 +434,7 @@ class WikiPageServiceTest {
     @Test
     void createFolderRejectsUnknownParent() {
         assertThatThrownBy(() -> svc.createFolder("kb-f", 1L, "no-such-parent", "AI"))
-                .isInstanceOf(com.ragagent.wiki.domain.WikiFolderNotFoundException.class);
+                .isInstanceOf(WikiFolderNotFoundException.class);
     }
 
     /** CreateFolder：空名 / 含分隔符 → {@code WikiException} */
@@ -461,7 +462,7 @@ class WikiPageServiceTest {
         svc.deleteFolder(kbId, child.getId());
         svc.deleteFolder(kbId, parent.getId());
         assertThatThrownBy(() -> folderRepo.getFolderByID(kbId, parent.getId()))
-                .isInstanceOf(com.ragagent.wiki.domain.WikiFolderNotFoundException.class);
+                .isInstanceOf(WikiFolderNotFoundException.class);
     }
 
     /** RenameOrMoveFolder：移进自己的后代 → 拒绝（防成环） */

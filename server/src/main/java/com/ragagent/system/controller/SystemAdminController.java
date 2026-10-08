@@ -38,6 +38,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.ragagent.system.domain.SystemSetting;
+import com.ragagent.system.service.SystemSettingService;
 
 /**
  * /api/v1/system/admin 组：用户管理 / 平台 API Key / 系统设置 / 运行时队列 / 配额批量应用。
@@ -59,13 +61,13 @@ public class SystemAdminController {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final SystemAdminUserService users;
-    private final com.ragagent.system.service.SystemSettingService settings;
+    private final SystemSettingService settings;
     private final TenantAPIKeyService apiKeyService;
     private final TenantMapper tenantMapper;
     private final AuditLogService auditService;
 
     public SystemAdminController(SystemAdminUserService users,
-                                 com.ragagent.system.service.SystemSettingService settings,
+                                 SystemSettingService settings,
                                  TenantAPIKeyService apiKeyService,
                                  TenantMapper tenantMapper,
                                  AuditLogService auditService) {
@@ -350,7 +352,7 @@ public class SystemAdminController {
     }
 
     @GetMapping("/settings/{key}")
-    public ResponseEntity<com.ragagent.system.domain.SystemSetting> getSetting(
+    public ResponseEntity<SystemSetting> getSetting(
             @PathVariable("key") String key) {
         try {
             return ResponseEntity.ok(normalizeRow(settings.get(key)));
@@ -364,7 +366,7 @@ public class SystemAdminController {
     }
 
     @PutMapping("/settings/{key}")
-    public ResponseEntity<com.ragagent.system.domain.SystemSetting> updateSetting(
+    public ResponseEntity<SystemSetting> updateSetting(
             @PathVariable("key") String key,
             @Valid @RejectEmptyBody @NonNullBody @RequestBody(required = false)
                     UpdateSettingRequest req) {
@@ -387,8 +389,8 @@ public class SystemAdminController {
     }
 
     /** 虚拟行的 id 归一为 0（零值输出 0，不是 null）。 */
-    private static com.ragagent.system.domain.SystemSetting normalizeRow(
-            com.ragagent.system.domain.SystemSetting row) {
+    private static SystemSetting normalizeRow(
+            SystemSetting row) {
         if (row.getId() == null) {
             row.setId(0L);
         }

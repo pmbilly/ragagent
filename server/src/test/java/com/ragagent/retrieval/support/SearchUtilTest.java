@@ -13,6 +13,8 @@ import com.ragagent.common.knowledge.ChunkView;
 import com.ragagent.knowledge.support.ImageInfoEnricher;
 import com.ragagent.common.retrieval.SearchChunkMerge;
 import com.ragagent.retrieval.domain.ImageInfo;
+import com.ragagent.common.retrieval.SearchResult;
+import com.ragagent.retrieval.domain.WebSearchResult;
 
 /**
  * searchutil 纯函数测试（chunkmerge / imageinfo_html /
@@ -433,9 +435,9 @@ class SearchUtilTest {
 
     @Test
     void convertWebSearchResultsDefaultsAndSeqOverride() {
-        List<com.ragagent.retrieval.domain.WebSearchResult> web = new ArrayList<>();
-        com.ragagent.retrieval.domain.WebSearchResult r1 =
-                new com.ragagent.retrieval.domain.WebSearchResult();
+        List<WebSearchResult> web = new ArrayList<>();
+        WebSearchResult r1 =
+                new WebSearchResult();
         r1.setTitle("Title");
         r1.setUrl("https://e/1");
         r1.setSnippet("Snip");
@@ -443,13 +445,13 @@ class SearchUtilTest {
         r1.setSource("exa");
         web.add(r1);
         web.add(null);
-        com.ragagent.retrieval.domain.WebSearchResult r2 =
-                new com.ragagent.retrieval.domain.WebSearchResult();
+        WebSearchResult r2 =
+                new WebSearchResult();
         r2.setTitle("NoURL");
         web.add(r2);
 
         // 缺省 seqFunc 恒 1
-        List<com.ragagent.common.retrieval.SearchResult> results =
+        List<SearchResult> results =
                 WebResultConverter.convert(web);
         assertEquals(2, results.size());
         var first = results.get(0);
@@ -468,15 +470,15 @@ class SearchUtilTest {
         assertEquals(first.getContent().codePointCount(0, first.getContent().length()), first.getEndAt());
 
         // seq 覆盖（service 层传 idx）
-        List<com.ragagent.common.retrieval.SearchResult> withSeq =
+        List<SearchResult> withSeq =
                 WebResultConverter.convert(web, idx -> idx);
         assertEquals(0, withSeq.get(0).getSeq());
     }
 
     @Test
     void convertWebSearchResultsPublishedAtRfc3339() {
-        com.ragagent.retrieval.domain.WebSearchResult r =
-                new com.ragagent.retrieval.domain.WebSearchResult();
+        WebSearchResult r =
+                new WebSearchResult();
         r.setTitle("t");
         r.setUrl("u");
         r.setPublishedAt(java.time.OffsetDateTime.parse("2026-08-09T16:18:30+08:00"));

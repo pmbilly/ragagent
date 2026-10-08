@@ -27,6 +27,11 @@ import com.ragagent.session.domain.MessageSearchResult;
 import com.ragagent.session.mapper.MessageRepository;
 import com.ragagent.session.mapper.MessageSuggestionRepository;
 import com.ragagent.session.mapper.SessionRepository;
+import com.ragagent.common.wiki.WikiLanguageSupport;
+import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.service.KnowledgeBaseService;
+import com.ragagent.session.domain.ArtifactVersions;
+import com.ragagent.session.domain.MessageArtifact;
 
 /**
  * 消息服务。
@@ -77,7 +82,7 @@ public class MessageService {
     private final MessageSuggestionRepository suggestionRepository;
     private final KnowledgeService knowledgeService;
     private final TenantService tenantService;
-    private final com.ragagent.knowledge.service.KnowledgeBaseService knowledgeBaseService;
+    private final KnowledgeBaseService knowledgeBaseService;
     /** 聊天历史检索子模块（关键词/向量/混合 + RRF + 归属过滤 + 分组）。 */
     private final MessageSearch messageSearch;
 
@@ -86,7 +91,7 @@ public class MessageService {
                           MessageSuggestionRepository suggestionRepository,
                           KnowledgeService knowledgeService,
                           TenantService tenantService,
-                          com.ragagent.knowledge.service.KnowledgeBaseService knowledgeBaseService,
+                          KnowledgeBaseService knowledgeBaseService,
                           HybridSearchService hybridSearchService,
                           ModelRuntimeFactory modelRuntimeFactory) {
         this.sessionRepository = sessionRepository;
@@ -188,9 +193,9 @@ public class MessageService {
                     referenced.add(artifact);
                 }
             }
-            message.setContent(com.ragagent.session.domain.ArtifactVersions.clarifyArtifactVersions(
+            message.setContent(ArtifactVersions.clarifyArtifactVersions(
                     message.getContent(), message.getArtifacts(), referenced,
-                    com.ragagent.common.wiki.WikiLanguageSupport.languageFromContextOrDefault()));
+                    WikiLanguageSupport.languageFromContextOrDefault()));
         }
         return messages;
     }
@@ -199,11 +204,11 @@ public class MessageService {
      * 会话全部 assistant
      * 消息的产物，按创建序扁平化（空会话 id 返回空列表）。
      */
-    public List<com.ragagent.session.domain.MessageArtifact> getSessionArtifacts(String sessionId) {
+    public List<MessageArtifact> getSessionArtifacts(String sessionId) {
         if (sessionId == null || sessionId.isEmpty()) {
             return List.of();
         }
-        List<com.ragagent.session.domain.MessageArtifact> artifacts =
+        List<MessageArtifact> artifacts =
                 messageRepository.getSessionArtifacts(sessionId);
         return artifacts == null ? List.of() : artifacts;
     }
@@ -434,7 +439,7 @@ public class MessageService {
         }
 
         try {
-            com.ragagent.knowledge.domain.KnowledgeBase kb =
+            KnowledgeBase kb =
                     knowledgeBaseService.getKnowledgeBase(kbId);
             stats.setKnowledgeBaseName(kb.getName() == null ? "" : kb.getName());
             long count = kb.getKnowledgeCount();

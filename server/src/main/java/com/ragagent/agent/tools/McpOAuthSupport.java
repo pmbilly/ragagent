@@ -15,6 +15,9 @@ import com.ragagent.mcp.oauth.OAuthReauthorizationRequiredException;
 import com.ragagent.mcp.protocol.McpAuthorizationRequiredException;
 import com.ragagent.mcp.protocol.McpOAuthRequiredException;
 import com.ragagent.common.web.ToolJson;
+import com.ragagent.mcp.protocol.McpClient;
+import com.ragagent.mcp.protocol.McpClientManager;
+import com.ragagent.mcp.protocol.McpContext;
 
 /**
  * MCP OAuth 的会话挂载与重试。
@@ -160,8 +163,8 @@ public final class McpOAuthSupport {
      * 连接 MCP 服务；需要 OAuth 时挂起等会话内提示后重试一次
      * （getOrCreateMCPClientWithOAuthRetry 语义）。失败抛运行时异常。
      */
-    public static com.ragagent.mcp.protocol.McpClient getOrCreateMcpClientWithOAuthRetry(
-            com.ragagent.mcp.protocol.McpClientManager manager,
+    public static McpClient getOrCreateMcpClientWithOAuthRetry(
+            McpClientManager manager,
             McpService service,
             OAuthWaiter waiter,
             McpOAuthSession oauthSess,
@@ -169,7 +172,7 @@ public final class McpOAuthSupport {
             String toolCallId,
             CallerIdentity caller) {
         try {
-            return manager.getOrCreateClient(com.ragagent.mcp.protocol.McpContext.none(), service);
+            return manager.getOrCreateClient(McpContext.none(), service);
         } catch (Exception connectErr) {
             if (oauthSess == null) {
                 throw asRuntime(connectErr);
@@ -180,7 +183,7 @@ public final class McpOAuthSupport {
                 throw asRuntime(connectErr);
             }
             manager.closeClient(service.getId());
-            return manager.getOrCreateClient(com.ragagent.mcp.protocol.McpContext.none(), service);
+            return manager.getOrCreateClient(McpContext.none(), service);
         }
     }
 

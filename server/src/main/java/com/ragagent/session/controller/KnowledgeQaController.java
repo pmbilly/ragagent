@@ -31,6 +31,17 @@ import com.ragagent.session.sse.StreamEventEmitter;
 import com.ragagent.stream.StreamManager;
 
 import jakarta.servlet.http.HttpServletResponse;
+import com.ragagent.auth.service.TenantService;
+import com.ragagent.common.context.TenantContext;
+import com.ragagent.common.security.TenantAPIKeyScope;
+import com.ragagent.memory.service.MemoryExtractionService;
+import com.ragagent.session.service.MessageSuggestionService;
+import com.ragagent.session.service.SteerRunCoordinator;
+import com.ragagent.session.sse.SseFrameWriter;
+import com.ragagent.storage.support.FileService;
+import com.ragagent.storage.support.Mode;
+import com.ragagent.storage.support.StorageBackendResolver;
+import com.ragagent.tenant.Tenant;
 
 
 /**
@@ -77,7 +88,7 @@ public class KnowledgeQaController {
     private final QaTurnExecutor executor;
 
     /** 租户服务（A3-3 接线；原 @Autowired 字段，改构造注入保持可选语义）。 */
-    private final com.ragagent.auth.service.TenantService tenantService;
+    private final TenantService tenantService;
 
     /** 附件解析簇。 */
     private final QaAttachmentResolver attachmentResolver;
@@ -96,27 +107,27 @@ public class KnowledgeQaController {
     private final SessionAgentQaService agentQaService;
     private final MessageSuggestionService suggestionService;
     private final TemporaryDocumentService temporaryDocuments;
-    private final com.ragagent.session.service.SteerRunCoordinator steerCoordinator;
+    private final SteerRunCoordinator steerCoordinator;
     private final StreamEventEmitter emitter;
-    private final com.ragagent.session.sse.SseFrameWriter sseFrameWriter;
-    private final com.ragagent.storage.support.FileService fileService;
-    private final com.ragagent.storage.support.StorageBackendResolver storageBackendResolver;
-    private final com.ragagent.memory.service.MemoryExtractionService memoryExtraction;
+    private final SseFrameWriter sseFrameWriter;
+    private final FileService fileService;
+    private final StorageBackendResolver storageBackendResolver;
+    private final MemoryExtractionService memoryExtraction;
 
     public KnowledgeQaController(SessionService sessionService,
             MessageService messageService,
             StreamManager streamManager,
             SessionKnowledgeQaService knowledgeQaService,
             SessionAgentQaService agentQaService,
-            com.ragagent.session.service.MessageSuggestionService suggestionService,
+            MessageSuggestionService suggestionService,
             TemporaryDocumentService temporaryDocuments,
-            com.ragagent.session.service.SteerRunCoordinator steerCoordinator,
+            SteerRunCoordinator steerCoordinator,
             StreamEventEmitter emitter,
-            com.ragagent.session.sse.SseFrameWriter sseFrameWriter,
-            org.springframework.beans.factory.ObjectProvider<com.ragagent.storage.support.FileService> fileService,
-            org.springframework.beans.factory.ObjectProvider<com.ragagent.storage.support.StorageBackendResolver> storageBackendResolver,
-            org.springframework.beans.factory.ObjectProvider<com.ragagent.memory.service.MemoryExtractionService> memoryExtraction,
-            org.springframework.beans.factory.ObjectProvider<com.ragagent.auth.service.TenantService> tenantServiceProvider) {
+            SseFrameWriter sseFrameWriter,
+            org.springframework.beans.factory.ObjectProvider<FileService> fileService,
+            org.springframework.beans.factory.ObjectProvider<StorageBackendResolver> storageBackendResolver,
+            org.springframework.beans.factory.ObjectProvider<MemoryExtractionService> memoryExtraction,
+            org.springframework.beans.factory.ObjectProvider<TenantService> tenantServiceProvider) {
         this.sessionService = sessionService;
         this.messageService = messageService;
         this.streamManager = streamManager;
@@ -147,7 +158,7 @@ public class KnowledgeQaController {
     @PostMapping("/api/v1/knowledge-chat/{sessionId}")
     public void knowledgeQA(@PathVariable("sessionId") String rawSessionId,
             @RequestBody(required = false) String rawBody,
-            @RequestParam(value = com.ragagent.storage.support.Mode.QUERY_PARAM, required = false) String resourceUrls,
+            @RequestParam(value = Mode.QUERY_PARAM, required = false) String resourceUrls,
             HttpServletResponse response) throws IOException {
         CreateKnowledgeQARequest request = QaRequestBinder.bindQaRequest(rawBody);
         ParsedRequest parsed = qaRequestParser.parseQARequest(rawSessionId, request, resourceUrls, "KnowledgeQA", agentResolverField, currentTenant());
@@ -157,7 +168,7 @@ public class KnowledgeQaController {
     @PostMapping("/api/v1/agent-chat/{sessionId}")
     public void agentQA(@PathVariable("sessionId") String rawSessionId,
             @RequestBody(required = false) String rawBody,
-            @RequestParam(value = com.ragagent.storage.support.Mode.QUERY_PARAM, required = false) String resourceUrls,
+            @RequestParam(value = Mode.QUERY_PARAM, required = false) String resourceUrls,
             HttpServletResponse response) throws IOException {
         CreateKnowledgeQARequest request = QaRequestBinder.bindQaRequest(rawBody);
         ParsedRequest parsed = qaRequestParser.parseQARequest(rawSessionId, request, resourceUrls, "AgentQA", agentResolverField, currentTenant());
@@ -208,7 +219,7 @@ public class KnowledgeQaController {
             throw BizException.badRequest(
                     "At least one knowledge_base_id, knowledge_base_ids, knowledge_ids, or scoped tag must be provided");
         }
-        com.ragagent.common.security.TenantAPIKeyScope.authorizeKnowledgeTargets(
+        TenantAPIKeyScope.authorizeKnowledgeTargets(
                 knowledgeBaseIds, request.knowledgeIds());
 
         List<SearchResult> searchResults = knowledgeQaService.searchKnowledge(
@@ -238,8 +249,8 @@ public class KnowledgeQaController {
      * 现在按 TenantContext 的 id 取实体，与 {@code SystemController} /
      * {@code HybridSearchService} 同一写法。
      */
-    private com.ragagent.tenant.Tenant currentTenant() {
-        Long tid = com.ragagent.common.context.TenantContext.currentTenantId();
+    private Tenant currentTenant() {
+        Long tid = TenantContext.currentTenantId();
         try {
             return tid == null || tid <= 0 || tenantService == null
                     ? null : tenantService.getTenantById(tid);

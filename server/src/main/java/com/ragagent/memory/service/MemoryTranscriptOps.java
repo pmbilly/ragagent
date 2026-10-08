@@ -10,6 +10,7 @@ import com.ragagent.common.web.ZeroTimeSerializer;
 import com.ragagent.memory.domain.MemoryExtractionSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.ragagent.common.memory.MemoryKeys;
 
 /**
  * 会话片段的收集：按水位线取消息、切片段、补前文上下文，以及转录行的取值工具。
@@ -152,8 +153,8 @@ final class MemoryTranscriptOps {
 
     /** 按码点截断字符串。 */
     static String runeSlice(String s, int maxRunes) {
-        return com.ragagent.common.memory.MemoryKeys.runeLength(s) > maxRunes
-                ? com.ragagent.common.memory.MemoryKeys.runeSlice(s, maxRunes)
+        return MemoryKeys.runeLength(s) > maxRunes
+                ? MemoryKeys.runeSlice(s, maxRunes)
                 : s;
     }
 }

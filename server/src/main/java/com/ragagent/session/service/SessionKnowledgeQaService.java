@@ -47,6 +47,18 @@ import com.ragagent.common.retrieval.SearchResult;
 import static com.ragagent.session.service.QaSupport.TagScope;
 import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.session.support.PipelineViews;
+import com.ragagent.agent.management.domain.CustomAgentEntity;
+import com.ragagent.auth.service.TenantService;
+import com.ragagent.common.context.TenantContext;
+import com.ragagent.common.prompt.AgentPromptPlaceholders;
+import com.ragagent.common.retrieval.SearchTarget;
+import com.ragagent.common.tenant.WebSearchConfig;
+import com.ragagent.event.EventIds;
+import com.ragagent.llm.domain.ChatResponse;
+import com.ragagent.tenant.Tenant;
+import com.ragagent.tracing.langfuse.LangfuseManager;
+import com.ragagent.tracing.langfuse.Span;
+import com.ragagent.websearch.mapper.WebSearchProviderRepository;
 
 /**
  * 知识问答 service 面（chat_pipeline 的调用方）。
@@ -71,8 +83,8 @@ public class SessionKnowledgeQaService {
     final KnowledgeService knowledgeService;
     final KnowledgeBaseService knowledgeBaseService;
     final PipelinePorts.ModelService pipelineModelService;
-    final com.ragagent.auth.service.TenantService tenantService;
-    final com.ragagent.websearch.mapper.WebSearchProviderRepository webSearchProviderRepository;
+    final TenantService tenantService;
+    final WebSearchProviderRepository webSearchProviderRepository;
     final javax.sql.DataSource dataSource;
 
     /** 解析/降级协作者(构造期装配)。 */
@@ -85,8 +97,8 @@ public class SessionKnowledgeQaService {
             KnowledgeService knowledgeService,
             KnowledgeBaseService knowledgeBaseService,
             PipelinePorts.ModelService pipelineModelService,
-            com.ragagent.auth.service.TenantService tenantService,
-            com.ragagent.websearch.mapper.WebSearchProviderRepository webSearchProviderRepository,
+            TenantService tenantService,
+            WebSearchProviderRepository webSearchProviderRepository,
             javax.sql.DataSource dataSource) {
         this.eventManager = eventManager;
         this.cfg = cfg;
@@ -117,7 +129,7 @@ public class SessionKnowledgeQaService {
     }
 
     public SessionQaResolution.MentionScope restrictMentionsToAgentScope(
-            com.ragagent.agent.management.domain.CustomAgentEntity agent, ObjectNode agentCfg,
+            CustomAgentEntity agent, ObjectNode agentCfg,
             long sessionTenantId, List<String> kbIds, List<String> knowledgeIds) {
         return resolution.restrictMentionsToAgentScope(agent, agentCfg, sessionTenantId, kbIds, knowledgeIds);
     }
@@ -178,9 +190,9 @@ public class SessionKnowledgeQaService {
 
         // qa.setup span 包住请求装配段（KB/模型解析、检索目标构建、
         // agent 覆盖应用）——补上 trace 开始到首个阶段观测之间的可见空档
-        com.ragagent.tracing.langfuse.Span setupSpan =
-                com.ragagent.tracing.langfuse.LangfuseManager.get().startSpan(
-                        new com.ragagent.tracing.langfuse.LangfuseManager.SpanOptions(
+        Span setupSpan =
+                LangfuseManager.get().startSpan(
+                        new LangfuseManager.SpanOptions(
                                 "qa.setup", null,
                                 java.util.Map.of("sessionId", sessionId == null ? "" : sessionId)));
 
@@ -363,10 +375,10 @@ public class SessionKnowledgeQaService {
             // 阶段 span 包住本阶段；CHAT_COMPLETION_STREAM 跳过——
             // 该阶段的 chat.completion.stream generation 已覆盖完整时长，再套一层
             // 会产出"视觉上超出父节点"的子观测
-            com.ragagent.tracing.langfuse.Span stageSpan = null;
+            Span stageSpan = null;
             if (!PipelineEventType.CHAT_COMPLETION_STREAM.equals(eventType)) {
-                stageSpan = com.ragagent.tracing.langfuse.LangfuseManager.get().startSpan(
-                        new com.ragagent.tracing.langfuse.LangfuseManager.SpanOptions(
+                stageSpan = LangfuseManager.get().startSpan(
+                        new LangfuseManager.SpanOptions(
                                 "pipeline." + eventType, null,
                                 java.util.Map.of("event_type", eventType,
                                         "session_id", chatManage.getSessionId() == null
@@ -533,9 +545,9 @@ public class SessionKnowledgeQaService {
         for (String event : searchEvents) {
             log.info("Starting to trigger search event: {}", event);
             // search_knowledge 流的阶段 span（恒开，含 SEARCH_NOTHING）
-            com.ragagent.tracing.langfuse.Span stageSpan =
-                    com.ragagent.tracing.langfuse.LangfuseManager.get().startSpan(
-                            new com.ragagent.tracing.langfuse.LangfuseManager.SpanOptions(
+            Span stageSpan =
+                    LangfuseManager.get().startSpan(
+                            new LangfuseManager.SpanOptions(
                                     "pipeline." + event, null,
                                     java.util.Map.of("event_type", event,
                                             "flow", "search_knowledge")));
@@ -610,7 +622,7 @@ public class SessionKnowledgeQaService {
             query = rq;
         }
         String kbDocuments = buildKbDocumentListing(chatManage);
-        String result = com.ragagent.common.prompt.AgentPromptPlaceholders.renderPromptPlaceholders(chatManage.getFallbackPrompt(), Map.of(
+        String result = AgentPromptPlaceholders.renderPromptPlaceholders(chatManage.getFallbackPrompt(), Map.of(
                 "query", query,
                 "language", chatManage.getLanguage(),
                 "kb_documents", kbDocuments));
@@ -701,7 +713,7 @@ public class SessionKnowledgeQaService {
     /** 消费 fallback 流。 */
     void consumeFallbackStream(ChatManage chatManage,
             java.util.concurrent.BlockingQueue<StreamResponse> responseChan, Registry modelContext) {
-        String fallbackId = com.ragagent.event.EventIds.generateEventID("fallback");
+        String fallbackId = EventIds.generateEventID("fallback");
         EventBusInterface eventBus = chatManage.getEventBus();
         StringBuilder finalContent = new StringBuilder();
         boolean streamCompleted = false;
@@ -746,7 +758,7 @@ public class SessionKnowledgeQaService {
                     log.error("Failed to emit fallback answer chunk event: {}", e.toString());
                 }
                 if (response.isDone()) {
-                    com.ragagent.llm.domain.ChatResponse cr = new com.ragagent.llm.domain.ChatResponse();
+                    ChatResponse cr = new ChatResponse();
                     cr.setContent(finalContent.toString());
                     chatManage.setChatResponse(cr);
                     streamCompleted = true;
@@ -769,7 +781,7 @@ public class SessionKnowledgeQaService {
         }
         log.info("Emitting references event with {} results (pre-answer)", chatManage.getMergeResult().size());
         Event evt = new Event();
-        evt.setId(com.ragagent.event.EventIds.generateEventID("references"));
+        evt.setId(EventIds.generateEventID("references"));
         evt.setType(EventType.EVENT_AGENT_REFERENCES);
         evt.setSessionId(chatManage.getSessionId());
         evt.setData(new AgentReferencesData(chatManage.getMergeResult(), 0));
@@ -790,7 +802,7 @@ public class SessionKnowledgeQaService {
             Registry registry = new Registry(false);
             content = registry.decodeOutputText(content);
         }
-        String fallbackId = com.ragagent.event.EventIds.generateEventID("fallback");
+        String fallbackId = EventIds.generateEventID("fallback");
         Event evt = new Event();
         evt.setId(fallbackId);
         evt.setType(EventType.EVENT_AGENT_FINAL_ANSWER);
@@ -853,15 +865,15 @@ public class SessionKnowledgeQaService {
             }
         }
         // 租户缺省分支：读租户 WebSearchConfig 的 maxResults
-        Long tid = com.ragagent.common.context.TenantContext.currentTenantId();
+        Long tid = TenantContext.currentTenantId();
         if (tid != null) {
             try {
-                com.ragagent.tenant.Tenant tenant = tenantService.getTenantById(tid);
+                Tenant tenant = tenantService.getTenantById(tid);
                 if (tenant != null && tenant.getWebSearchConfig() != null
                         && !tenant.getWebSearchConfig().isNull()) {
-                    com.ragagent.common.tenant.WebSearchConfig cfg =
+                    WebSearchConfig cfg =
                             JSON.treeToValue(tenant.getWebSearchConfig(),
-                                    com.ragagent.common.tenant.WebSearchConfig.class);
+                                    WebSearchConfig.class);
                     int max = cfg.getMaxResults();
                     if (max > 0) {
                         return max;
@@ -986,23 +998,23 @@ public class SessionKnowledgeQaService {
         public List<String> scopeTagIds = new ArrayList<>();
         public boolean disableRecallThresholds;
 
-        public List<com.ragagent.common.retrieval.SearchTarget> toPipeline() {
+        public List<SearchTarget> toPipeline() {
             return toPipelineList();
         }
 
-        public List<com.ragagent.common.retrieval.SearchTarget> toPipelineList() {
-            List<com.ragagent.common.retrieval.SearchTarget> out = new ArrayList<>();
+        public List<SearchTarget> toPipelineList() {
+            List<SearchTarget> out = new ArrayList<>();
             out.add(asPipelineTarget());
             return out;
         }
 
-        public com.ragagent.common.retrieval.SearchTarget asPipelineTarget() {
-            return new com.ragagent.common.retrieval.SearchTarget(type, knowledgeBaseId, tenantId,
+        public SearchTarget asPipelineTarget() {
+            return new SearchTarget(type, knowledgeBaseId, tenantId,
                     knowledgeIds, tagIds, scopeTagIds, disableRecallThresholds);
         }
 
-        public static List<com.ragagent.common.retrieval.SearchTarget> toPipeline(List<SearchTargetView> views) {
-            List<com.ragagent.common.retrieval.SearchTarget> out = new ArrayList<>();
+        public static List<SearchTarget> toPipeline(List<SearchTargetView> views) {
+            List<SearchTarget> out = new ArrayList<>();
             if (views == null) {
                 return out;
             }

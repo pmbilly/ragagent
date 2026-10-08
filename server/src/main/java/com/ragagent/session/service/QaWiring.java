@@ -58,6 +58,18 @@ import com.ragagent.session.support.PipelineViews;
 import com.ragagent.websearch.service.WebSearchService;
 import com.ragagent.model.service.ModelRuntimeConfigs;
 import com.ragagent.chatpipeline.PipelinePorts;
+import com.ragagent.agent.tools.data.DataAnalysisSessionFactoryAdapter;
+import com.ragagent.auth.service.TenantService;
+import com.ragagent.chatpipeline.plugin.PluginDataAnalysis;
+import com.ragagent.chatpipeline.plugin.PluginSearch;
+import com.ragagent.chatpipeline.plugin.PluginSearchEntity;
+import com.ragagent.common.context.TenantContext;
+import com.ragagent.common.memory.MemoryRecall;
+import com.ragagent.common.memory.MemoryRetrievalContext;
+import com.ragagent.common.pipeline.SearchParams;
+import com.ragagent.common.tenant.WebSearchConfig;
+import com.ragagent.retrieval.domain.WebSearchResult;
+import com.ragagent.tenant.Tenant;
 
 /**
  * chat 管线 + QA 面装配（docs/known-issues/05-wave-4.md 的 11 seam 清单）。
@@ -137,22 +149,22 @@ public class QaWiring {
      */
     @Bean
     public PipelinePorts.TenantService qaPipelineTenantService(
-            com.ragagent.auth.service.TenantService tenantService) {
+            TenantService tenantService) {
         return new PipelinePorts.TenantService() {
             @Override
-            public com.ragagent.common.tenant.WebSearchConfig currentWebSearchConfig() {
-                Long tid = com.ragagent.common.context.TenantContext.currentTenantId();
+            public WebSearchConfig currentWebSearchConfig() {
+                Long tid = TenantContext.currentTenantId();
                 if (tid == null) {
                     return null;
                 }
                 try {
-                    com.ragagent.tenant.Tenant tenant = tenantService.getTenantById(tid);
+                    Tenant tenant = tenantService.getTenantById(tid);
                     if (tenant == null || tenant.getWebSearchConfig() == null
                             || tenant.getWebSearchConfig().isNull()) {
                         return null;
                     }
                     return new ObjectMapper().treeToValue(tenant.getWebSearchConfig(),
-                            com.ragagent.common.tenant.WebSearchConfig.class);
+                            WebSearchConfig.class);
                 } catch (RuntimeException | JsonProcessingException e) {
                     return null;
                 }
@@ -183,14 +195,14 @@ public class QaWiring {
             }
 
             @Override
-            public List<SearchResult> hybridSearch(String knowledgeBaseId, com.ragagent.common.pipeline.SearchParams params) {
+            public List<SearchResult> hybridSearch(String knowledgeBaseId, SearchParams params) {
                 // KB 元数据缺失时保持既定的 1003 错误（A/B 场景 kse-unknown-kb 依赖）。
                 if (kbService.getAllTenantById(knowledgeBaseId) == null) {
                     throw new PipelinePorts.PipelinePortException(
                             "error code: 1003, error message: knowledge base not found");
                 }
                 // 入参是值拷贝（归一化不回传调用方）——显式浅拷贝。
-                com.ragagent.common.pipeline.SearchParams local = new com.ragagent.common.pipeline.SearchParams();
+                SearchParams local = new SearchParams();
                 local.setQueryText(params.getQueryText());
                 local.setQueryEmbedding(params.getQueryEmbedding());
                 local.setVectorThreshold(params.getVectorThreshold());
@@ -317,12 +329,12 @@ public class QaWiring {
     public PipelinePorts.MemoryService qaPipelineMemoryService(MemoryService memoryService) {
         return new PipelinePorts.MemoryService() {
             @Override
-            public com.ragagent.common.memory.MemoryRecall recall(String query) {
+            public MemoryRecall recall(String query) {
                 return memoryService.recall(query);
             }
 
             @Override
-            public com.ragagent.common.memory.MemoryRetrievalContext retrievalContextFor() {
+            public MemoryRetrievalContext retrievalContextFor() {
                 return memoryService.retrievalContextFor();
             }
 
@@ -338,11 +350,11 @@ public class QaWiring {
     public PipelinePorts.WebSearch qaPipelineWebSearch(WebSearchService webSearchService) {
         return new PipelinePorts.WebSearch() {
             @Override
-            public List<com.ragagent.retrieval.domain.WebSearchResult> search(
-                    String providerId, com.ragagent.common.tenant.WebSearchConfig config, String query) {
+            public List<WebSearchResult> search(
+                    String providerId, WebSearchConfig config, String query) {
                 // L1 租户配置 → 执行面配置的转换留在域侧（管线不接触 WebSearchService.WebSearchConfig）
                 WebSearchService.WebSearchConfig exec = WebSearchService.WebSearchConfig.from(config);
-                Long tenantId = com.ragagent.common.context.TenantContext.currentTenantId();
+                Long tenantId = TenantContext.currentTenantId();
                 return webSearchService.search(tenantId == null ? 0L : tenantId, providerId, exec, query);
             }
         };
@@ -414,13 +426,13 @@ public class QaWiring {
         var extractEntityTemplate = new PipelineConfig.PromptTemplateStructured();
 
         // 插件注册顺序即执行链顺序
-        mgr.register(new com.ragagent.chatpipeline.plugin.PluginSearch(
+        mgr.register(new PluginSearch(
                 knowledgeBaseService, webSearch, tenantService));
         mgr.register(new PluginRerank(modelService));
         mgr.register(new PluginWebFetch());
         mgr.register(new PluginMerge(chunkRepository));
-        mgr.register(new com.ragagent.chatpipeline.plugin.PluginDataAnalysis(modelService, knowledgeService,
-                new com.ragagent.agent.tools.data.DataAnalysisSessionFactoryAdapter()));
+        mgr.register(new PluginDataAnalysis(modelService, knowledgeService,
+                new DataAnalysisSessionFactoryAdapter()));
         mgr.register(new PluginIntoChatMessage(messageService));
         mgr.register(new PluginChatCompletion(modelService));
         mgr.register(new PluginChatCompletionStream(modelService));
@@ -430,7 +442,7 @@ public class QaWiring {
         mgr.register(new PluginMemoryRecall(memoryService));
         mgr.register(new PluginExtractEntity(modelService, extractEntityTemplate,
                 knowledgeBaseRepository, knowledgeService, neo4jEnabled));
-        mgr.register(new com.ragagent.chatpipeline.plugin.PluginSearchEntity(
+        mgr.register(new PluginSearchEntity(
                 retrieveGraphRepository, chunkRepository, knowledgeRepository));
         mgr.register(new PluginSearchParallel(mgr, knowledgeBaseService,
                 webSearch, tenantService,

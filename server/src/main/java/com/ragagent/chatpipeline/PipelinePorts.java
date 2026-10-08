@@ -14,6 +14,12 @@ import com.ragagent.retrieval.domain.WebSearchResult;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.retrieval.graph.RetrieveGraphRepository;
 import com.ragagent.common.pipeline.SearchParams;
+import com.ragagent.common.llm.ToolResult;
+import com.ragagent.common.tenant.WebSearchConfig;
+import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.rerank.Reranker;
 
 /**
  * chat 管线消费面的窄 seam 接口集合，只收管线实际调用的方法子集。
@@ -53,16 +59,16 @@ public final class PipelinePorts {
     /** 模型面：chat 管线所需的方法子集。 */
     public interface ModelService {
         LlmChatClient getChatModel(String modelId);
-        com.ragagent.rerank.Reranker getRerankModel(String modelId);
+        Reranker getRerankModel(String modelId);
     }
 
     /** 知识库面：chat 管线所需的方法子集。 */
     public interface KnowledgeBaseService {
         /** 按 ID 直取（无租户过滤）。 */
-        com.ragagent.knowledge.domain.KnowledgeBase getKnowledgeBaseByIdOnly(String id);
+        KnowledgeBase getKnowledgeBaseByIdOnly(String id);
 
         /** 批量直取（无租户过滤；缺失 ID 跳过）。 */
-        List<com.ragagent.knowledge.domain.KnowledgeBase> getKnowledgeBasesByIdsOnly(List<String> ids);
+        List<KnowledgeBase> getKnowledgeBasesByIdsOnly(List<String> ids);
 
         List<SearchResult> hybridSearch(String knowledgeBaseId, SearchParams params);
 
@@ -75,29 +81,29 @@ public final class PipelinePorts {
     /** 知识面：chat 管线所需的方法子集。 */
     public interface KnowledgeService {
         /** 按租户过滤取单条（adapter 从 TenantContext 取租户）。 */
-        com.ragagent.knowledge.domain.Knowledge getKnowledgeById(String id);
+        Knowledge getKnowledgeById(String id);
 
-        List<com.ragagent.knowledge.domain.Knowledge> getKnowledgeBatch(long tenantId, List<String> ids);
+        List<Knowledge> getKnowledgeBatch(long tenantId, List<String> ids);
 
-        List<com.ragagent.knowledge.domain.Knowledge> getKnowledgeBatchWithSharedAccess(long tenantId, List<String> ids);
+        List<Knowledge> getKnowledgeBatchWithSharedAccess(long tenantId, List<String> ids);
     }
 
     /** chunk 面：chat 管线所需的方法子集。 */
     public interface ChunkRepository {
-        List<com.ragagent.knowledge.domain.Chunk> listChunksById(long tenantId, List<String> ids);
+        List<Chunk> listChunksById(long tenantId, List<String> ids);
 
         /** image_info 聚合用。 */
-        List<com.ragagent.knowledge.domain.Chunk> listChunksByParentIds(long tenantId, List<String> parentIds);
+        List<Chunk> listChunksByParentIds(long tenantId, List<String> parentIds);
     }
 
     /** 知识批量取仓储。 */
     public interface KnowledgeRepository {
-        List<com.ragagent.knowledge.domain.Knowledge> getKnowledgeBatch(long tenantId, List<String> ids);
+        List<Knowledge> getKnowledgeBatch(long tenantId, List<String> ids);
     }
 
     /** 知识库批量取仓储。 */
     public interface KnowledgeBaseRepository {
-        List<com.ragagent.knowledge.domain.KnowledgeBase> getKnowledgeBaseByIDs(List<String> ids);
+        List<KnowledgeBase> getKnowledgeBaseByIDs(List<String> ids);
     }
 
     /** 消息面：chat 管线所需的方法子集。 */
@@ -124,7 +130,7 @@ public final class PipelinePorts {
 
     /** web 搜索执行（providerID + 执行面配置）。 */
     public interface WebSearch {
-        List<WebSearchResult> search(String providerId, com.ragagent.common.tenant.WebSearchConfig config,
+        List<WebSearchResult> search(String providerId, WebSearchConfig config,
                                       String query);
     }
     // ----- 占位接口（管线只判空、从不调用方法） -----
@@ -136,7 +142,7 @@ public final class PipelinePorts {
          * 当前租户的 web 搜索配置（TenantContext 实时读取）；无租户上下文 → null
          * （调用方按空配置走缺省合并分支）。default null 保持未装配 port 时的恒空行为。
          */
-        default com.ragagent.common.tenant.WebSearchConfig currentWebSearchConfig() {
+        default WebSearchConfig currentWebSearchConfig() {
             return null;
         }
     }
@@ -175,7 +181,7 @@ public final class PipelinePorts {
     public interface DataAnalysisSession {
         TableSchema loadFromKnowledge(KnowledgeData knowledge);
 
-        com.ragagent.common.llm.ToolResult execute(JsonNode args);
+        ToolResult execute(JsonNode args);
 
         void cleanup();
     }

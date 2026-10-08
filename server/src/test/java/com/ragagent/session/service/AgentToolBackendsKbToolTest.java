@@ -28,6 +28,9 @@ import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.session.domain.MessageSearchGroupItem;
 import com.ragagent.session.domain.MessageSearchResult;
 import com.ragagent.wiki.service.page.WikiPageService;
+import com.ragagent.auth.service.TenantService;
+import com.ragagent.knowledge.storage.TenantFileStorage;
+import com.ragagent.websearch.service.WebSearchService;
 
 /**
  * 工具接线钉（2026-09-23 接线批：工作包 1 KB 五件 + 工作包 2a 会话/记忆/DB 三件）。
@@ -54,9 +57,9 @@ class AgentToolBackendsKbToolTest {
                 messageService,
                 memoryService,
                 mock(WikiPageService.class),
-                mock(com.ragagent.websearch.service.WebSearchService.class),
-                mock(com.ragagent.auth.service.TenantService.class),
-                mock(com.ragagent.knowledge.storage.TenantFileStorage.class),
+                mock(WebSearchService.class),
+                mock(TenantService.class),
+                mock(TenantFileStorage.class),
                 mock(DataSource.class));
     }
 

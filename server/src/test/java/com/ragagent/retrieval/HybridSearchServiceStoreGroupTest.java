@@ -35,6 +35,8 @@ import com.ragagent.common.retrieval.RetrievalDriverProperties;
 import com.ragagent.retrieval.engine.RetrieveEngineRegistry;
 import com.ragagent.retrieval.engine.RetrieverEngineParams;
 import com.ragagent.retrieval.engine.TenantStoreOwnership;
+import com.ragagent.retrieval.engine.RetrieveEngineRepository;
+import com.ragagent.retrieval.engine.RetrieveEngineService;
 
 /**
  * store-group 面钉子：工厂哨兵 → 2200/2201 的分类映射、多 KB 嵌入模型一致性闸门、
@@ -259,38 +261,38 @@ class HybridSearchServiceStoreGroupTest {
 
     /** 按引擎类型直查的小注册表（绕开 ofSingle 的包内可见性）。 */
     private static CompositeRetrieveEngine compositeOf(
-            com.ragagent.retrieval.engine.RetrieveEngineService engine) {
+            RetrieveEngineService engine) {
         return CompositeRetrieveEngine.create(new RetrieveEngineRegistry() {
             @Override
-            public void register(com.ragagent.retrieval.engine.RetrieveEngineService service) {
+            public void register(RetrieveEngineService service) {
             }
 
             @Override
-            public com.ragagent.retrieval.engine.RetrieveEngineService getRetrieveEngineService(
+            public RetrieveEngineService getRetrieveEngineService(
                     String engineType) {
                 return engine;
             }
 
             @Override
-            public List<com.ragagent.retrieval.engine.RetrieveEngineService>
+            public List<RetrieveEngineService>
                     getAllRetrieveEngineServices() {
                 return List.of(engine);
             }
 
             @Override
             public void registerWithStoreId(String storeId,
-                                            com.ragagent.retrieval.engine.RetrieveEngineService
+                                            RetrieveEngineService
                                                     service) {
             }
 
             @Override
-            public com.ragagent.retrieval.engine.RetrieveEngineService getByStoreId(
+            public RetrieveEngineService getByStoreId(
                     String storeId) {
                 return engine;
             }
 
             @Override
-            public com.ragagent.retrieval.engine.RetrieveEngineService getOrLoadByStoreId(
+            public RetrieveEngineService getOrLoadByStoreId(
                     long tenantId, String storeId) {
                 return engine;
             }
@@ -321,7 +323,7 @@ class HybridSearchServiceStoreGroupTest {
 
     /** 记录 topK / 可注入失败的假仓库。 */
     static final class RecordingRepo
-            implements com.ragagent.retrieval.engine.RetrieveEngineRepository {
+            implements RetrieveEngineRepository {
         final AtomicReference<Integer> seenTopK;
         RuntimeException failureOnRetrieve;
 

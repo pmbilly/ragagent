@@ -29,6 +29,7 @@ import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.session.mapper.MessageRepository;
 import com.ragagent.session.mapper.MessageSuggestionRepository;
 import com.ragagent.session.mapper.SessionRepository;
+import com.ragagent.knowledge.service.KnowledgeBaseService;
 
 /**
  * 聊天历史 KB 索引的验收：
@@ -56,7 +57,7 @@ class MessageServiceChatHistoryIndexTest {
                 mock(MessageSuggestionRepository.class),
                 knowledgeService,
                 tenantService,
-                mock(com.ragagent.knowledge.service.KnowledgeBaseService.class),
+                mock(KnowledgeBaseService.class),
                 mock(HybridSearchService.class),
                 mock(ModelRuntimeFactory.class));
         TenantContext.set(TENANT, null, null, false, "u-1", false);

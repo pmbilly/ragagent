@@ -20,6 +20,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
+import com.ragagent.tracing.langfuse.LangfuseChatClient;
+import com.ragagent.tracing.langfuse.LangfuseEmbedder;
+import com.ragagent.tracing.langfuse.LangfuseReranker;
 
 /**
  * 模型运行时工厂（chat / embedding / rerank / vlm / asr 五类运行时客户端的装配归口，
@@ -65,7 +68,7 @@ public class ModelRuntimeFactory {
         String[] creds = modelCredentials(model.getParameters());
         try {
             // langfuse generation 装饰（未启用时原样返回，零成本）
-            return com.ragagent.tracing.langfuse.LangfuseChatClient.wrap(
+            return LangfuseChatClient.wrap(
                     LlmChatClients.create(ModelRuntimeConfigs.chatConfig(model, creds[0], creds[1]),
                             ollamaService.getIfAvailable(), concurrencyGovernor));
         } catch (BizException e) {
@@ -81,7 +84,7 @@ public class ModelRuntimeFactory {
         try {
             // pooler 只服务批量向量化；debug 只走单文本 embed，传 null
             // langfuse generation 装饰
-            return com.ragagent.tracing.langfuse.LangfuseEmbedder.wrap(
+            return LangfuseEmbedder.wrap(
                     EmbedderFactory.newEmbedder(
                             ModelRuntimeConfigs.embedderConfig(model, creds[0], creds[1]),
                             null, ollamaService.getIfAvailable(), concurrencyGovernor));
@@ -97,7 +100,7 @@ public class ModelRuntimeFactory {
         String[] creds = modelCredentials(model.getParameters());
         try {
             // langfuse generation 装饰
-            return com.ragagent.tracing.langfuse.LangfuseReranker.wrap(
+            return LangfuseReranker.wrap(
                     RerankerFactory.newReranker(
                             ModelRuntimeConfigs.rerankerConfig(model, creds[0], creds[1])));
         } catch (BizException e) {

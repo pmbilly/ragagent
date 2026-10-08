@@ -23,6 +23,7 @@ import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
 import com.ragagent.retrieval.engine.RetrieveEngineRepository;
 import com.ragagent.retrieval.engine.weaviate.WeaviateRestClient.Json;
 import com.ragagent.common.vectorstore.IndexConfig;
+import com.ragagent.retrieval.config.RetrievalEnvLookup;
 
 /**
  * Weaviate 检索引擎仓储。
@@ -128,7 +129,7 @@ public class WeaviateRetrieveRepository
                 return indexCfg.collectionName;
             }
         }
-        String env = com.ragagent.retrieval.config.RetrievalEnvLookup.get(ENV_WEAVIATE_COLLECTION);
+        String env = RetrievalEnvLookup.get(ENV_WEAVIATE_COLLECTION);
         if (env != null && !env.isEmpty()) {
             return env;
         }

@@ -8,6 +8,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.ragagent.common.vectorstore.ConnectionConfig;
 import com.ragagent.common.vectorstore.IndexConfig;
+import com.ragagent.common.error.AppError;
+import com.ragagent.common.error.BizException;
 
 /**
  * vector_stores 表实体（迁移 000032）。
@@ -62,8 +64,8 @@ public class VectorStore {
         }
     }
 
-    static com.ragagent.common.error.BizException validation(String message) {
-        return new com.ragagent.common.error.BizException(
-                com.ragagent.common.error.AppError.validation(message));
+    static BizException validation(String message) {
+        return new BizException(
+                AppError.validation(message));
     }
 }

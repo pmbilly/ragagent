@@ -16,6 +16,9 @@ import com.ragagent.llm.domain.ChatResponse;
 import com.ragagent.llm.domain.StreamResponse;
 import com.ragagent.llm.domain.TokenUsage;
 import com.ragagent.support.ContractJson;
+import com.ragagent.agent.compaction.CompactionSettings;
+import com.ragagent.llm.domain.ChatTool;
+import com.ragagent.llm.domain.FunctionCall;
 
 /**
  * 引擎录制回放：Java 引擎用同一脚本驱动，事件序列 / AgentState 快照 /
@@ -444,7 +447,7 @@ class EngineRecordingTest {
 
     @Test
     void trimToolResults() {
-        com.ragagent.agent.TokenEstimator est = new com.ragagent.agent.TokenEstimator();
+        TokenEstimator est = new TokenEstimator();
         String big = "tool output content ".repeat(300);
         List<ChatMessage> messages = List.of(
                 new ChatMessage("system", "sys"),
@@ -469,7 +472,7 @@ class EngineRecordingTest {
         com.ragagent.llm.domain.ToolCall call = new com.ragagent.llm.domain.ToolCall();
         call.setId(id);
         call.setType("function");
-        call.setFunction(new com.ragagent.llm.domain.FunctionCall(toolName, args));
+        call.setFunction(new FunctionCall(toolName, args));
         m.setToolCalls(new ArrayList<>(List.of(call)));
         return m;
     }
@@ -533,7 +536,7 @@ class EngineRecordingTest {
     }
 
     /** 历史线格式的 settings JSON（键为旧字段名）。 */
-    private static String settingsJson(com.ragagent.agent.compaction.CompactionSettings s) {
+    private static String settingsJson(CompactionSettings s) {
         return "{\"Enabled\":" + s.enabled()
                 + ",\"MaxContextTokens\":" + s.maxContextTokens()
                 + ",\"ReserveTokens\":" + s.reserveTokens()
@@ -582,7 +585,7 @@ class EngineRecordingTest {
         Engine46bStubSupport.StubChat chat = new Engine46bStubSupport.StubChat(List.of());
         AgentEngine engine = Engine46bStubSupport.newEngine(chat);
         engine.getRegistryForTest().registerTool(new Engine46bStubSupport.StubTool("knowledge_search"));
-        List<com.ragagent.llm.domain.ChatTool> tools = engine.buildToolsForLLM();
+        List<ChatTool> tools = engine.buildToolsForLLM();
         StringBuilder sb = new StringBuilder("[");
         for (int i = 0; i < tools.size(); i++) {
             if (i > 0) {

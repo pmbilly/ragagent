@@ -18,6 +18,8 @@ import com.ragagent.mcp.protocol.McpClient;
 import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.protocol.McpContext;
 import com.ragagent.common.web.ToolJson;
+import com.ragagent.approval.Decision;
+import com.ragagent.approval.PendingRequest;
 
 /**
  * MCP 工具的动态包装。
@@ -207,9 +209,9 @@ public class McpToolWrapper implements AgentTool {
         // 人工审批门（issue #1173）
         if (gate != null && meta != null && meta.eventBus() != null) {
             if (gate.needsApproval(ApprovalBridge.toCancellation(request.cancellation()), tenantId, service.getId(), mcpTool.getName())) {
-                com.ragagent.approval.Decision decision = gate.requestAndWait(
+                Decision decision = gate.requestAndWait(
                         ApprovalBridge.toCancellation(request.cancellation()),
-                        com.ragagent.approval.PendingRequest.builder()
+                        PendingRequest.builder()
                                 .tenantId(tenantId)
                                 .userId(meta.userId())
                                 .sessionId(meta.sessionId())

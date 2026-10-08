@@ -29,6 +29,7 @@ import com.ragagent.datasource.domain.SyncLog;
 import com.ragagent.datasource.domain.SyncResult;
 import com.ragagent.datasource.domain.TaskInitiator;
 import org.junit.jupiter.api.Test;
+import com.ragagent.support.ContractJson;
 
 /**
  * datasource 领域类型的**逐字节 JSON 契约**测试。
@@ -657,9 +658,9 @@ class DataSourceJsonTest {
     private static <T> void assertRoundTripsNaked(T value, Class<T> type) throws Exception {
         String first = JSONB.writeValueAsString(value);
         T back = JSONB.readValue(first, type);
-        assertThat(com.ragagent.support.ContractJson.deep(JSONB.writeValueAsString(back)))
+        assertThat(ContractJson.deep(JSONB.writeValueAsString(back)))
                 .as("%s 经统一工厂往返必须幂等", type.getSimpleName())
-                .isEqualTo(com.ragagent.support.ContractJson.deep(first));
+                .isEqualTo(ContractJson.deep(first));
     }
 
     // ── 键序 + 键数（§9：正则必须驼峰感知） ────────────────────────────────

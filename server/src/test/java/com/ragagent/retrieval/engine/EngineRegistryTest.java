@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 
 import com.ragagent.retrieval.engine.RetrievalEngineTestSupport.FakeEngineService;
 import com.ragagent.retrieval.engine.RetrievalEngineTestSupport.FakeStoreRepo;
+import com.ragagent.common.vectorstore.VectorStoreView;
 
 /**
  * 注册表：两张表、双表隔离、并发安全，
@@ -171,7 +172,7 @@ class EngineRegistryTest {
             final AtomicInteger calls = new AtomicInteger();
 
             @Override
-            public RetrieveEngineService build(com.ragagent.common.vectorstore.VectorStoreView store) {
+            public RetrieveEngineService build(VectorStoreView store) {
                 calls.incrementAndGet();
                 entered.countDown();
                 try {

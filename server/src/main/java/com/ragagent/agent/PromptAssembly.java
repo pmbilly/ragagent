@@ -86,13 +86,13 @@ final class PromptAssembly {
         return out;
     }
 
-    private static List<com.ragagent.agent.SkillMetadata> toAgentSkillMetadata(List<Skill.SkillMetadata> in) {
+    private static List<SkillMetadata> toAgentSkillMetadata(List<Skill.SkillMetadata> in) {
         if (in == null) {
             return null;
         }
-        List<com.ragagent.agent.SkillMetadata> out = new ArrayList<>(in.size());
+        List<SkillMetadata> out = new ArrayList<>(in.size());
         for (Skill.SkillMetadata m : in) {
-            out.add(new com.ragagent.agent.SkillMetadata(m.name(), m.description(), m.basePath()));
+            out.add(new SkillMetadata(m.name(), m.description(), m.basePath()));
         }
         return out;
     }

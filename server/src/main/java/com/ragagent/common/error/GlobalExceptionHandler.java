@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import com.ragagent.common.web.PageParams;
 
 /**
  * 统一错误形态：
@@ -75,7 +76,7 @@ public class GlobalExceptionHandler {
     /** 请求体约束校验失败（@Valid DTO）与 @ModelAttribute 绑定失败。 */
     @ExceptionHandler(org.springframework.validation.BindException.class)
     public ResponseEntity<Map<String, Object>> handleBind(org.springframework.validation.BindException ex) {
-        boolean pagination = ex.getTarget() instanceof com.ragagent.common.web.PageParams
+        boolean pagination = ex.getTarget() instanceof PageParams
                 || ex.getBindingResult().getFieldErrors().stream()
                         .allMatch(fe -> "page".equals(fe.getField()) || "pageSize".equals(fe.getField())
                                 || "page_size".equals(fe.getField()));

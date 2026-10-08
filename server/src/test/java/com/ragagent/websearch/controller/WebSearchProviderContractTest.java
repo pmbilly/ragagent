@@ -31,6 +31,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import com.ragagent.websearch.provider.WebSearchProvider;
 
 /**
  * web-search-providers 11 条 + 旧版 /web-search/providers 的契约测试。
@@ -369,7 +370,7 @@ class WebSearchProviderContractTest {
 
     /** registry 注入用 stub；mode = 结果条目 / null（空结果）/ "explode"（抛错）。 */
     private static final class StubProvider
-            implements com.ragagent.websearch.provider.WebSearchProvider {
+            implements WebSearchProvider {
         private final String name;
         private final Object mode;
 

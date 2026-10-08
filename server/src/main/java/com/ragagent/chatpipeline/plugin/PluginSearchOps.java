@@ -19,6 +19,7 @@ import com.ragagent.tracing.langfuse.LangfuseManager;
 import com.ragagent.tracing.langfuse.Span;
 import com.ragagent.retrieval.domain.WebSearchResult;
 import com.ragagent.retrieval.support.WebResultConverter;
+import com.ragagent.common.tenant.WebSearchConfig;
 
 /**
  * 检索执行协作者（自 {@link PluginSearch} 拆出）：
@@ -322,9 +323,9 @@ final class PluginSearchOps {
         }
 
         // 租户级 web 配置（ctx 里的租户信息；Java 侧从 TenantContext 取，探针/装配期可注入）
-        com.ragagent.common.tenant.WebSearchConfig tenantCfg = currentTenantWebSearchConfig();
+        WebSearchConfig tenantCfg = currentTenantWebSearchConfig();
         // 先 copy：agent 级覆写绝不能改到租户配置缓存里的同一个对象（B106）
-        com.ragagent.common.tenant.WebSearchConfig webConfig = tenantCfg == null ? null : tenantCfg.copy();
+        WebSearchConfig webConfig = tenantCfg == null ? null : tenantCfg.copy();
 
         // agent 级覆写
         if (webConfig != null && chatManage.getWebSearchMaxResults() > 0) {
@@ -365,7 +366,7 @@ final class PluginSearchOps {
      * 租户 web 配置：按 TenantContext 实时读取，
      * 无租户上下文 → null，由域侧适配器按空配置走缺省分支。
      */
-    private com.ragagent.common.tenant.WebSearchConfig currentTenantWebSearchConfig() {
+    private WebSearchConfig currentTenantWebSearchConfig() {
         if (service.tenantService == null) {
             return null;
         }

@@ -15,6 +15,8 @@ import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ToolCall;
 
 import com.ragagent.common.web.ToolJson;
+import com.ragagent.llm.domain.MessageContentPart;
+import com.ragagent.llm.domain.ToolCall;
 
 /**
  * source 句柄的<b>工具参数编解码</b>（自 {@code SourceRegistry} 的同名段外提）。
@@ -107,7 +109,7 @@ final class SourceToolCodec {
                 m.setReasoningContent(reg.compactPublicCitations(m.getReasoningContent(), false));
             }
             if (m.getMultiContent() != null && !m.getMultiContent().isEmpty()) {
-                List<com.ragagent.llm.domain.MessageContentPart> parts =
+                List<MessageContentPart> parts =
                         new ArrayList<>(m.getMultiContent());
                 m.setMultiContent(parts);
                 for (int j = 0; j < parts.size(); j++) {
@@ -117,9 +119,9 @@ final class SourceToolCodec {
                 }
             }
             if (m.getToolCalls() != null && !m.getToolCalls().isEmpty()) {
-                List<com.ragagent.llm.domain.ToolCall> calls = new ArrayList<>(m.getToolCalls());
+                List<ToolCall> calls = new ArrayList<>(m.getToolCalls());
                 m.setToolCalls(calls);
-                for (com.ragagent.llm.domain.ToolCall call : calls) {
+                for (ToolCall call : calls) {
                     String toolName = call.getFunction().getName();
                     registerToolArguments(call.getFunction().getArguments(),
                             key -> argumentPolicy == null || argumentPolicy.allowed(toolName, key));
@@ -133,7 +135,7 @@ final class SourceToolCodec {
                 m.setContent(compactKnownText(m.getContent()));
             }
             if (m.getToolCalls() != null) {
-                for (com.ragagent.llm.domain.ToolCall call : m.getToolCalls()) {
+                for (ToolCall call : m.getToolCalls()) {
                     String toolName = call.getFunction().getName();
                     call.getFunction().setArguments(decodeJSONWithPolicy(
                             call.getFunction().getArguments(), true,

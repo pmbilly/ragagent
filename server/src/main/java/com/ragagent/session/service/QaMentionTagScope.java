@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Set;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.agent.management.domain.CustomAgentEntity;
+import com.ragagent.common.security.TenantAPIKeyScope;
 
 /**
  * {@code SessionQaResolution} 的**mention/tag 收敛簇**：把请求里 @ 提及的知识库/知识范围与
@@ -58,12 +60,12 @@ final class QaMentionTagScope {
                     req.session.getTenantId());
         }
         // API-Key KB 白名单校验 + 过滤；拒绝形态是 BizException。
-        com.ragagent.common.security.TenantAPIKeyScope.authorizeKnowledgeTargets(requestedKbIds, req.knowledgeIds);
-        kbIds = com.ragagent.common.security.TenantAPIKeyScope.filterKnowledgeBases(requestedKbIds, kbIds);
+        TenantAPIKeyScope.authorizeKnowledgeTargets(requestedKbIds, req.knowledgeIds);
+        kbIds = TenantAPIKeyScope.filterKnowledgeBases(requestedKbIds, kbIds);
         return new SessionKnowledgeQaService.KnowledgeResolution(kbIds, knowledgeIds);
     }
     public SessionQaResolution.MentionScope restrictMentionsToAgentScope(
-            com.ragagent.agent.management.domain.CustomAgentEntity agent, ObjectNode agentCfg,
+            CustomAgentEntity agent, ObjectNode agentCfg,
             long sessionTenantId, List<String> kbIds, List<String> knowledgeIds) {
         List<String> allowed = kbScope.resolveKnowledgeBasesFromAgent(agent, agentCfg, sessionTenantId);
         if (allowed.isEmpty()) {
@@ -104,7 +106,7 @@ final class QaMentionTagScope {
         return new SessionQaResolution.MentionScope(filteredKbs, filteredKnowledge);
     }
     public List<QaSupport.TagScope> restrictTagScopesToAgentScope(
-            com.ragagent.agent.management.domain.CustomAgentEntity agent, ObjectNode agentCfg,
+            CustomAgentEntity agent, ObjectNode agentCfg,
             long sessionTenantId, List<QaSupport.TagScope> tagScopes) {
         if (tagScopes == null || tagScopes.isEmpty()) {
             return new ArrayList<>();

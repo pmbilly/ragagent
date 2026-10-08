@@ -15,6 +15,13 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import com.ragagent.approval.McpOauthRequiredData;
+import com.ragagent.approval.McpOauthResolvedData;
+import com.ragagent.approval.ToolApprovalRequiredData;
+import com.ragagent.approval.ToolApprovalResolvedData;
+import com.ragagent.common.llm.ResponseType;
+import com.ragagent.event.payload.MCPOAuthRequiredData;
+import com.ragagent.event.payload.MCPOAuthResolvedData;
 
 /**
  * ApprovalBridge 的总线桥：gate 发出的 approval 域 DTO 必须以
@@ -31,7 +38,7 @@ class ApprovalBridgeTest {
         com.ragagent.approval.EventBus bridged = ApprovalBridge.toEventBus(bus);
         bridged.emit(new com.ragagent.approval.Event(
                 "pending-1-approval-required",
-                com.ragagent.common.llm.ResponseType.TOOL_APPROVAL_REQUIRED,
+                ResponseType.TOOL_APPROVAL_REQUIRED,
                 "sess-1",
                 data,
                 Map.of("assistant_message_id", "am-1"),
@@ -42,7 +49,7 @@ class ApprovalBridgeTest {
     @Test
     void toolApprovalRequiredArrivesAsPayloadShape() {
         Object args = Map.of("path", "/etc");
-        Event evt = emitViaBridge(new com.ragagent.approval.ToolApprovalRequiredData(
+        Event evt = emitViaBridge(new ToolApprovalRequiredData(
                 "pending-1", 7L, "sess-1", "am-1", "svc-1", "Service", "tool_a", "reg_tool",
                 "does dangerous things", args, "{\"path\":\"/etc\"}", 600,
                 1759500000L, "call-1", "req-1"));
@@ -69,9 +76,9 @@ class ApprovalBridgeTest {
         bus.on(EventType.EVENT_TOOL_APPROVAL_RESOLVED, resolved::set);
         ApprovalBridge.toEventBus(bus).emit(new com.ragagent.approval.Event(
                 "pending-1-approval-resolved",
-                com.ragagent.common.llm.ResponseType.TOOL_APPROVAL_RESOLVED,
+                ResponseType.TOOL_APPROVAL_RESOLVED,
                 "sess-1",
-                new com.ragagent.approval.ToolApprovalResolvedData(
+                new ToolApprovalResolvedData(
                         "pending-1", true, "ok", false, false),
                 Map.of(),
                 "req-2"));
@@ -85,29 +92,29 @@ class ApprovalBridgeTest {
         bus.on(EventType.EVENT_MCP_OAUTH_REQUIRED, oauth::set);
         ApprovalBridge.toEventBus(bus).emit(new com.ragagent.approval.Event(
                 "pending-2-mcp-oauth",
-                com.ragagent.common.llm.ResponseType.MCP_OAUTH_REQUIRED,
+                ResponseType.MCP_OAUTH_REQUIRED,
                 "sess-1",
-                new com.ragagent.approval.McpOauthRequiredData(
+                new McpOauthRequiredData(
                         "pending-2", 7L, "sess-1", "am-1", "svc-1", "Service", "tool_a",
                         0, 1759500000L, "call-2", "req-3"),
                 Map.of(),
                 "req-3"));
         assertInstanceOf(
-                com.ragagent.event.payload.MCPOAuthRequiredData.class, oauth.get().getData());
+                MCPOAuthRequiredData.class, oauth.get().getData());
 
         // oauth resolved（approval 侧叫 approved，payload 侧叫 authorized）
         AtomicReference<Event> oauthResolved = new AtomicReference<>();
         bus.on(EventType.EVENT_MCP_OAUTH_RESOLVED, oauthResolved::set);
         ApprovalBridge.toEventBus(bus).emit(new com.ragagent.approval.Event(
                 "pending-2-mcp-oauth-resolved",
-                com.ragagent.common.llm.ResponseType.MCP_OAUTH_RESOLVED,
+                ResponseType.MCP_OAUTH_RESOLVED,
                 "sess-1",
-                new com.ragagent.approval.McpOauthResolvedData(
+                new McpOauthResolvedData(
                         "pending-2", "svc-1", true, "", false, false),
                 Map.of(),
                 "req-4"));
         var oauthResolvedData = assertInstanceOf(
-                com.ragagent.event.payload.MCPOAuthResolvedData.class, oauthResolved.get().getData());
+                MCPOAuthResolvedData.class, oauthResolved.get().getData());
         assertTrue(oauthResolvedData.isAuthorized());
     }
 
@@ -118,7 +125,7 @@ class ApprovalBridgeTest {
         bus.on(EventType.EVENT_TOOL_APPROVAL_REQUIRED, received::set);
         Object unknown = List.of("raw");
         ApprovalBridge.toEventBus(bus).emit(new com.ragagent.approval.Event(
-                "id", com.ragagent.common.llm.ResponseType.TOOL_APPROVAL_REQUIRED,
+                "id", ResponseType.TOOL_APPROVAL_REQUIRED,
                 "sess-1", unknown, Map.of(), "req-5"));
         assertSame(unknown, received.get().getData());
     }

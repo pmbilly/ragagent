@@ -8,6 +8,7 @@ import java.util.Set;
 import com.ragagent.tenant.StorageEngineConfig;
 import com.ragagent.storage.fileserve.StoragePaths;
 import com.ragagent.common.security.SsrfGuard;
+import com.ragagent.storage.config.StorageEnvLookup;
 
 /**
  * 按租户存储配置造 provider 专属 {@link FileService}。
@@ -220,7 +221,7 @@ public final class FileServiceFactory {
 
     /** provider 家族键读取（统一查找面）；未配置/空白 → {@code fallback}。 */
     private static String envOr(String name, String fallback) {
-        String v = com.ragagent.storage.config.StorageEnvLookup.get(name);
+        String v = StorageEnvLookup.get(name);
         return v == null || v.trim().isEmpty() ? fallback : v.trim();
     }
 }

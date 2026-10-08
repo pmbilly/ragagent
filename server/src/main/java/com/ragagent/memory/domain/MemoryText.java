@@ -8,6 +8,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
+import com.ragagent.common.text.ListMerges;
 
 /**
  * 记忆文本的清洗、脱敏、指纹与显式指令识别。
@@ -304,6 +305,6 @@ public final class MemoryText {
     public static <T> List<T> mergeUsedMemories(List<T> existing, List<T> additional,
                                                 java.util.function.Function<T, String> idOf) {
         // B106：实现下沉到 common.text.ListMerges（L2 管线也要用同一份去重语义）
-        return com.ragagent.common.text.ListMerges.mergeDistinctByKey(existing, additional, idOf);
+        return ListMerges.mergeDistinctByKey(existing, additional, idOf);
     }
 }

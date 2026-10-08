@@ -17,6 +17,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.HandlerMapping;
+import com.ragagent.common.security.APIKeyScopeContext;
 
 /**
  * API-Key 门禁的行为测试。
@@ -29,7 +30,7 @@ class APIKeyGateTest {
 
     @AfterEach
     void clearScope() {
-        com.ragagent.common.security.APIKeyScopeContext.clear();
+        APIKeyScopeContext.clear();
     }
 
     private static APIKeyRouteAuthorizer newTestAuthorizer() {
@@ -52,7 +53,7 @@ class APIKeyGateTest {
     private static boolean runGate(APIKeyRouteAuthorizer authorizer, TenantAPIKeyScope scope,
                                    String method, String pattern) throws Exception {
         if (scope != null) {
-            com.ragagent.common.security.APIKeyScopeContext.set(scope);
+            APIKeyScopeContext.set(scope);
         }
         MockHttpServletRequest request = new MockHttpServletRequest(method, concretePath(pattern));
         request.setAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE, pattern);
@@ -80,7 +81,7 @@ class APIKeyGateTest {
     void gateDefaultDeny() throws Exception {
         // 未声明的路由对 full-access Key 也 default-deny
         APIKeyRouteAuthorizer a = newTestAuthorizer();
-        com.ragagent.common.security.APIKeyScopeContext.set(
+        APIKeyScopeContext.set(
                 new TenantAPIKeyScope(0L, "tenant", true, null, null));
         MockHttpServletRequest request = new MockHttpServletRequest("POST", "/api/v1/agents");
         request.setAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE, "/api/v1/agents");
@@ -180,7 +181,7 @@ class APIKeyGateTest {
 
     private static boolean runDenyAPIKey(TenantAPIKeyScope scope) throws Exception {
         if (scope != null) {
-            com.ragagent.common.security.APIKeyScopeContext.set(scope);
+            APIKeyScopeContext.set(scope);
         }
         MockHttpServletRequest request =
                 new MockHttpServletRequest("GET", "/api/v1/files/presigned-preview");
@@ -204,7 +205,7 @@ class APIKeyGateTest {
 
     private static boolean runAllowFileServe(TenantAPIKeyScope scope) throws Exception {
         if (scope != null) {
-            com.ragagent.common.security.APIKeyScopeContext.set(scope);
+            APIKeyScopeContext.set(scope);
         }
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/files");
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -231,7 +232,7 @@ class APIKeyGateTest {
 
     @Test
     void allowFileServeDenialBodyMatchesGo() throws Exception {
-        com.ragagent.common.security.APIKeyScopeContext.set(
+        APIKeyScopeContext.set(
                 new TenantAPIKeyScope(0L, "tenant", false, List.of("kb-1"), null));
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/files");
         MockHttpServletResponse response = new MockHttpServletResponse();

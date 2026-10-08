@@ -23,6 +23,7 @@ import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.domain.McpStdioConfig;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import com.ragagent.mcp.domain.McpAdvancedConfig;
 
 /**
  * DTO 层的核心保证是**结构性的**：序列化后的响应体在任何情况下都不得出现
@@ -128,7 +129,7 @@ class McpServiceResponseTest {
         stdio.setCommand("npx");
         stdio.setArgs(List.of("-y", "mcp-server"));
         svc.setStdioConfig(stdio);
-        svc.setAdvancedConfig(com.ragagent.mcp.domain.McpAdvancedConfig.defaults());
+        svc.setAdvancedConfig(McpAdvancedConfig.defaults());
         McpAuthConfig auth = new McpAuthConfig();
         auth.setCustomHeaders(new LinkedHashMap<>(Map.of("X-Auth", "secret")));
         svc.setAuthConfig(auth);
@@ -151,7 +152,7 @@ class McpServiceResponseTest {
         McpService svc = new McpService();
         svc.setId("svc-3");
         svc.setUrl("https://tenant-private.example.com");
-        svc.setAdvancedConfig(com.ragagent.mcp.domain.McpAdvancedConfig.defaults());
+        svc.setAdvancedConfig(McpAdvancedConfig.defaults());
         McpAuthConfig auth = new McpAuthConfig();
         auth.setCustomHeaders(new LinkedHashMap<>(Map.of("X-Auth", "abc")));
         svc.setAuthConfig(auth);
@@ -170,7 +171,7 @@ class McpServiceResponseTest {
         McpService svc = new McpService();
         svc.setId("builtin-2");
         svc.setIsBuiltin(true);
-        svc.setAdvancedConfig(com.ragagent.mcp.domain.McpAdvancedConfig.defaults());
+        svc.setAdvancedConfig(McpAdvancedConfig.defaults());
 
         McpServiceResponse resp = McpServiceResponse.from(svc, true);
 

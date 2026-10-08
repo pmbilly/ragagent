@@ -10,6 +10,7 @@ import com.ragagent.agent.management.service.AgentConfigJson;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.common.retrieval.SearchTarget.SearchTargets;
+import com.ragagent.agent.tools.ToolDefinitions;
 
 /**
  * {@code SessionAgentQaService} 的**配置装配簇**：从请求 + 知识库/文档信息构造
@@ -99,7 +100,7 @@ final class AgentConfigAssembler {
         // Allowed tools
         List<String> allowed = stringListOf(c.get("allowedTools"));
         ac.setAllowedTools(allowed.isEmpty()
-                ? new ArrayList<>(com.ragagent.agent.tools.ToolDefinitions.defaultAllowedTools())
+                ? new ArrayList<>(ToolDefinitions.defaultAllowedTools())
                 : allowed);
 
         // Per-request skill/MCP scope

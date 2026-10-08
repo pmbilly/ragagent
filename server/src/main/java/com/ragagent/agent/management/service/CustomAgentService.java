@@ -21,6 +21,9 @@ import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.knowledge.service.KnowledgeBaseService;
+import com.ragagent.auth.domain.User;
+import com.ragagent.auth.service.UserService;
+import com.ragagent.im.service.ImService;
 
 /**
  * agents CRUD 家族 service。
@@ -37,7 +40,7 @@ public class CustomAgentService {
 
 
     private final CustomAgentMapper agentMapper;
-    private final com.ragagent.auth.service.UserService userService;
+    private final UserService userService;
     private final KnowledgeBaseService kbService;
     private final BuiltinAgentRegistry registry;
     /**
@@ -45,18 +48,18 @@ public class CustomAgentService {
      * 构造期硬注入会成环。
      */
     private final org.springframework.beans.factory.ObjectProvider<
-            com.ragagent.im.service.ImService> imServiceProvider;
+            ImService> imServiceProvider;
 
     /** 推荐问题流协作者。 */
     private final AgentSuggestedQuestions suggestedQuestions;
 
     public CustomAgentService(CustomAgentMapper agentMapper,
             AgentQuestionMapper questionMapper,
-            com.ragagent.auth.service.UserService userService,
+            UserService userService,
             KnowledgeBaseService kbService,
             BuiltinAgentRegistry registry,
             org.springframework.beans.factory.ObjectProvider<
-                    com.ragagent.im.service.ImService> imServiceProvider) {
+                    ImService> imServiceProvider) {
         this.agentMapper = agentMapper;
         this.userService = userService;
         this.kbService = kbService;
@@ -211,7 +214,7 @@ public class CustomAgentService {
         if (ids.isEmpty()) {
             return;
         }
-        Map<String, com.ragagent.auth.domain.User> users;
+        Map<String, User> users;
         try {
             users = userService.getUsersByIds(new ArrayList<>(ids));
         } catch (Exception e) {
@@ -222,7 +225,7 @@ public class CustomAgentService {
                     || r.row().getCreatedBy().isEmpty()) {
                 continue;
             }
-            com.ragagent.auth.domain.User u = users.get(r.row().getCreatedBy());
+            User u = users.get(r.row().getCreatedBy());
             if (u == null) {
                 continue;
             }
@@ -361,7 +364,7 @@ public class CustomAgentService {
 
         // 软删该 agent 的全部 IM 渠道并停止运行中的适配器，
         // 避免概览列表与运行中的适配器比 agent 活得更久。
-        com.ragagent.im.service.ImService imService = imServiceProvider.getIfAvailable();
+        ImService imService = imServiceProvider.getIfAvailable();
         if (imService != null) {
             imService.deleteChannelsByAgent(id, tenant);
         }

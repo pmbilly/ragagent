@@ -21,6 +21,8 @@ import com.ragagent.common.session.PipelineMessageImageView;
 import com.ragagent.common.session.PipelineMessageView;
 import com.ragagent.common.web.JsonMappers;
 import com.ragagent.llm.extract.PipelineConfig;
+import com.ragagent.common.prompt.AgentPromptPlaceholders;
+import com.ragagent.llm.domain.ChatResponse;
 
 /**
  * QUERY_UNDERSTAND 阶段插件：
@@ -128,7 +130,7 @@ public final class PluginQueryUnderstand implements Plugin {
         List<ChatMessage> callMessages = new ArrayList<>();
         callMessages.add(new ChatMessage("system", systemContent));
         callMessages.add(userMsg);
-        com.ragagent.llm.domain.ChatResponse response;
+        ChatResponse response;
         try {
             response = choice.model.chat(callMessages, opt);
         } catch (RuntimeException e) {
@@ -326,8 +328,8 @@ public final class PluginQueryUnderstand implements Plugin {
         vals.put("language", chatManage.getLanguage());
 
         return new String[] {
-                com.ragagent.common.prompt.AgentPromptPlaceholders.renderPromptPlaceholders(systemPrompt, vals),
-                com.ragagent.common.prompt.AgentPromptPlaceholders.renderPromptPlaceholders(userPrompt, vals),
+                AgentPromptPlaceholders.renderPromptPlaceholders(systemPrompt, vals),
+                AgentPromptPlaceholders.renderPromptPlaceholders(userPrompt, vals),
         };
     }
 

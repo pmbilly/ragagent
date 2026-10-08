@@ -28,6 +28,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import com.ragagent.support.ContractJson;
 
 /**
  * 契约测试：chunker/preview 1 端点（对照 golden 逐字节比对）。
@@ -208,7 +209,7 @@ class ChunkerPreviewContractTest {
     /** 响应体按 UTF-8 字节解码（getContentAsString 缺 charset 时按 ISO-8859-1，中文/全角破折号会花）。 */
     private static String raw(MvcResult r) {
         // PR4 语义比较：与 golden 同侧归一
-        return com.ragagent.support.ContractJson.semantic(
+        return ContractJson.semantic(
                 new String(r.getResponse().getContentAsByteArray(), StandardCharsets.UTF_8));
     }
 
@@ -222,6 +223,6 @@ class ChunkerPreviewContractTest {
             resource = new org.springframework.core.io.ClassPathResource("contracts/" + name + ".json");
         }
         String text = new String(resource.getInputStream().readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
-        return com.ragagent.support.ContractJson.semantic(GOLDEN_SEMANTIC_MAPPER, text);
+        return ContractJson.semantic(GOLDEN_SEMANTIC_MAPPER, text);
     }
 }

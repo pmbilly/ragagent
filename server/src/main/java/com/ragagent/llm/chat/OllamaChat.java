@@ -28,6 +28,7 @@ import com.ragagent.llm.ollama.OllamaToolCall;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.ragagent.llm.domain.ChatTool;
 
 /**
  * 本地 Ollama 聊天客户端。
@@ -307,12 +308,12 @@ public class OllamaChat implements LlmChatClient {
      * schema 直接透传（不做强类型结构的丢字段往返，
      * 见 {@link OllamaTool} 的类注释）。
      */
-    List<OllamaTool> toolFrom(List<com.ragagent.llm.domain.ChatTool> tools) {
+    List<OllamaTool> toolFrom(List<ChatTool> tools) {
         if (tools == null || tools.isEmpty()) {
             return null;
         }
         List<OllamaTool> ollamaTools = new ArrayList<>(tools.size());
-        for (com.ragagent.llm.domain.ChatTool tool : tools) {
+        for (ChatTool tool : tools) {
             var function = tool.getFunction();
             OllamaTool.Function fn = new OllamaTool.Function(
                     function == null ? "" : function.getName(),

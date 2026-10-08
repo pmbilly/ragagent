@@ -2,6 +2,8 @@ package com.ragagent.im.runtime;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.ragagent.agent.management.domain.CustomAgentEntity;
+import com.ragagent.im.domain.ChannelSessionEntity;
 
 /**
  * IM 斜杠命令基建。命令声明意图（Action 枚举），副作用由 Service 执行——
@@ -41,12 +43,12 @@ public final class Commands {
     public static final class CommandContext {
         public IncomingMessage incoming;
         /** IM 渠道会话（user×chat 组合）。命令测试可留空。 */
-        public com.ragagent.im.domain.ChannelSessionEntity session;
+        public ChannelSessionEntity session;
         public long tenantId;
         /** 绑定 agent 的显示名（未绑定为空）。 */
         public String agentName = "";
         /** 绑定的 agent 配置（可为 null；/search 读 KBSelectionMode）。 */
-        public com.ragagent.agent.management.domain.CustomAgentEntity customAgent;
+        public CustomAgentEntity customAgent;
         /** 渠道级输出模式（"stream"/"full"）。 */
         public String channelOutputMode = "";
     }

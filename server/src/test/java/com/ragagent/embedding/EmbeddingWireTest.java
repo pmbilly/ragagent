@@ -30,6 +30,8 @@ import com.ragagent.model.domain.ModelParameters;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import com.ragagent.model.service.ModelRuntimeConfigs;
+import com.ragagent.llm.limiter.BackgroundTaskContext;
+import com.ragagent.llm.limiter.LocalLimiter;
 
 /**
  * embedding 客户端的 stub server A/B：请求体/路径/头部与录制
@@ -420,7 +422,7 @@ class EmbeddingWireTest {
     @Test
     void concurrencyGovernorGatesBackgroundCallsOnly() throws Exception {
         ConcurrencyGovernor governor = new ConcurrencyGovernor();
-        com.ragagent.llm.limiter.LocalLimiter limiter = new com.ragagent.llm.limiter.LocalLimiter();
+        LocalLimiter limiter = new LocalLimiter();
         governor.setGovernor(limiter, 1);
 
         AtomicInteger inFlight = new AtomicInteger();
@@ -464,7 +466,7 @@ class EmbeddingWireTest {
         Thread[] threads = new Thread[3];
         for (int i = 0; i < 3; i++) {
             threads[i] = Thread.ofVirtual().start(() -> {
-                try (var ignored = com.ragagent.llm.limiter.BackgroundTaskContext.mark()) {
+                try (var ignored = BackgroundTaskContext.mark()) {
                     gated.batchEmbed(List.of("x"));
                 }
             });

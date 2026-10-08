@@ -24,6 +24,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import com.ragagent.support.GoldenContract;
 
 /**
  * FAQ 模块契约测试（12+1 条路由）。golden：
@@ -257,7 +258,7 @@ class FaqContractTest {
     }
 
     private void compare(String golden, String actual) throws Exception {
-        com.ragagent.support.GoldenContract.assertEquals("src/test/resources/contracts",
+        GoldenContract.assertEquals("src/test/resources/contracts",
                 golden, FaqContractTest::mask, actual);
     }
 

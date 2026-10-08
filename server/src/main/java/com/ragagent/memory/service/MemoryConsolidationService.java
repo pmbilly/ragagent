@@ -26,6 +26,7 @@ import com.ragagent.memory.mapper.MemoryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import com.ragagent.llm.LlmChatClient;
 
 /**
  * 整仓回顾：把同一个主体近重复的记忆折成一条，并把搁置太久的任务降级。
@@ -471,7 +472,7 @@ public class MemoryConsolidationService {
         if (modelId == null || modelId.isEmpty()) {
             return new ConsolidationCall("", true);
         }
-        com.ragagent.llm.LlmChatClient chatModel;
+        LlmChatClient chatModel;
         try {
             chatModel = modelResolver.getChatModel(modelId);
         } catch (RuntimeException e) {

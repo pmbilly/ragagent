@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import com.ragagent.session.domain.Message;
+import com.ragagent.session.dto.StopSessionRequest;
 
 /**
  * embed 委托协作者（自 {@link EmbedChannelController} 拆出的
@@ -124,7 +126,7 @@ final class EmbedChannelDelegateOps {
     }
 
     /** 先 ensureSession，再委托 MessageController.loadMessages。 */
-    public ResponseEntity<List<com.ragagent.session.domain.Message>> load(@PathVariable("sessionId") String sessionId,
+    public ResponseEntity<List<Message>> load(@PathVariable("sessionId") String sessionId,
                                                     @RequestParam(name = "limit", required = false) String limit,
                                                     @RequestParam(name = "before_time", required = false) String beforeTime,
                                                     @RequestParam(name = "resource_urls", required = false) String resourceUrls) {
@@ -141,7 +143,7 @@ final class EmbedChannelDelegateOps {
      */
     public ResponseEntity<?> stop(@PathVariable("sessionId") String sessionId,
                                   @RequestBody(required = false)
-                                  com.ragagent.session.dto.StopSessionRequest body) {
+                                  StopSessionRequest body) {
         ctrl.ensureSession(LogSanitizer.sanitize(sessionId));
         return ctrl.sessionController.stopSession(LogSanitizer.sanitize(sessionId), body);
     }

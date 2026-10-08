@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.ragagent.agent.domain.AgentStep;
 import com.ragagent.llm.domain.ChatMessage;
+import com.ragagent.agent.compaction.ConversationSerializer;
 
 /**
  * 工具回传图片的注入。
@@ -58,7 +59,7 @@ public final class ToolImages {
                 List<String> descriptions = new java.util.ArrayList<>();
                 if (raw != null) {
                     for (String d : raw) {
-                        String t = d == null ? "" : com.ragagent.agent.compaction.ConversationSerializer.trimUnicodeWhitespace(d);
+                        String t = d == null ? "" : ConversationSerializer.trimUnicodeWhitespace(d);
                         if (!t.isEmpty()) {
                             descriptions.add(t);
                         }

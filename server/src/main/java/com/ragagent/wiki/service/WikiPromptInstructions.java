@@ -1,5 +1,7 @@
 package com.ragagent.wiki.service;
 
+import com.ragagent.common.prompt.PromptInstructions;
+
 /**
  * 把 KB 级业务指引追加到系统自有 prompt 上。
  *
@@ -12,11 +14,11 @@ public final class WikiPromptInstructions {
 
     /** 业务指引的最大长度 */
     public static final int MAX_CUSTOM_PROMPT_INSTRUCTIONS_LENGTH =
-            com.ragagent.common.prompt.PromptInstructions.MAX_CUSTOM_PROMPT_INSTRUCTIONS_LENGTH;
+            PromptInstructions.MAX_CUSTOM_PROMPT_INSTRUCTIONS_LENGTH;
 
     /** 委托公共实现（见类注释）。 */
     public static String appendCustomPromptInstructions(String prompt, String instructions, String label) {
-        return com.ragagent.common.prompt.PromptInstructions
+        return PromptInstructions
                 .appendCustomPromptInstructions(prompt, instructions, label);
     }
 }

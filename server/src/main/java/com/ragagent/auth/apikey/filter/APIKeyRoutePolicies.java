@@ -1,5 +1,7 @@
 package com.ragagent.auth.apikey.filter;
 
+import com.ragagent.common.security.APIKeyCapability;
+
 /**
  * API-Key 策略表（集中登记所有带 API-Key 策略的路由声明）。
  *
@@ -172,20 +174,20 @@ public final class APIKeyRoutePolicies {
         a.registerGin("GET", base + "/capabilities", APIKeyRoutePolicy.any());
 
         APIKeyRoutePolicy settingsRead = APIKeyRoutePolicy.platform(
-                com.ragagent.common.security.APIKeyCapability.SYSTEM_SETTINGS_READ,
-                com.ragagent.common.security.APIKeyCapability.SYSTEM_SETTINGS_MANAGE);
+                APIKeyCapability.SYSTEM_SETTINGS_READ,
+                APIKeyCapability.SYSTEM_SETTINGS_MANAGE);
         APIKeyRoutePolicy settingsManage = APIKeyRoutePolicy.platform(
-                com.ragagent.common.security.APIKeyCapability.SYSTEM_SETTINGS_MANAGE);
+                APIKeyCapability.SYSTEM_SETTINGS_MANAGE);
         a.registerGin("GET", "/api/v1/system/admin/settings", settingsRead);
         a.registerGin("GET", "/api/v1/system/admin/settings/:key", settingsRead);
         a.registerGin("PUT", "/api/v1/system/admin/settings/:key", settingsManage);
         a.registerGin("DELETE", "/api/v1/system/admin/settings/:key", settingsManage);
 
         APIKeyRoutePolicy runtimeRead = APIKeyRoutePolicy.platform(
-                com.ragagent.common.security.APIKeyCapability.SYSTEM_RUNTIME_READ,
-                com.ragagent.common.security.APIKeyCapability.SYSTEM_RUNTIME_MANAGE);
+                APIKeyCapability.SYSTEM_RUNTIME_READ,
+                APIKeyCapability.SYSTEM_RUNTIME_MANAGE);
         APIKeyRoutePolicy runtimeManage = APIKeyRoutePolicy.platform(
-                com.ragagent.common.security.APIKeyCapability.SYSTEM_RUNTIME_MANAGE);
+                APIKeyCapability.SYSTEM_RUNTIME_MANAGE);
         a.registerGin("GET", "/api/v1/system/admin/runtime/queues", runtimeRead);
         a.registerGin("GET", "/api/v1/system/admin/runtime/queues/:queue/tasks", runtimeRead);
         a.registerGin("POST", "/api/v1/system/admin/runtime/queues/:queue/tasks/:task_id/actions/:action",
@@ -194,12 +196,12 @@ public final class APIKeyRoutePolicies {
 
         a.registerGin("POST", "/api/v1/system/admin/tenants/apply-default-storage-quota",
                 APIKeyRoutePolicy.platform(
-                        com.ragagent.common.security.APIKeyCapability.SYSTEM_TENANTS_MANAGE));
+                        APIKeyCapability.SYSTEM_TENANTS_MANAGE));
 
         // /system/admin/audit-log——platform 审计读能力
         a.registerGin("GET", "/api/v1/system/admin/audit-log",
                 APIKeyRoutePolicy.platform(
-                        com.ragagent.common.security.APIKeyCapability.SYSTEM_AUDIT_READ));
+                        APIKeyCapability.SYSTEM_AUDIT_READ));
     }
 
     /**
@@ -245,14 +247,14 @@ public final class APIKeyRoutePolicies {
         // platform 租户读/管理能力（SYSTEM_TENANTS_READ / SYSTEM_TENANTS_MANAGE）
         a.registerGin("GET", "/api/v1/tenants/:id/api-principal-config",
                 APIKeyRoutePolicy.platform(
-                        com.ragagent.common.security.APIKeyCapability.SYSTEM_TENANTS_READ,
-                        com.ragagent.common.security.APIKeyCapability.SYSTEM_TENANTS_MANAGE));
+                        APIKeyCapability.SYSTEM_TENANTS_READ,
+                        APIKeyCapability.SYSTEM_TENANTS_MANAGE));
         a.registerGin("PUT", "/api/v1/tenants/:id/api-principal-config",
                 APIKeyRoutePolicy.platform(
-                        com.ragagent.common.security.APIKeyCapability.SYSTEM_TENANTS_MANAGE));
+                        APIKeyCapability.SYSTEM_TENANTS_MANAGE));
         a.registerGin("POST", "/api/v1/tenants/:id/api-principal-test-token",
                 APIKeyRoutePolicy.platform(
-                        com.ragagent.common.security.APIKeyCapability.SYSTEM_TENANTS_MANAGE));
+                        APIKeyCapability.SYSTEM_TENANTS_MANAGE));
 
         // 跨空间租户目录 + KV 分发器：
         // - all/search ＝ platform(system_tenants_read | system_tenants_manage)；
@@ -260,11 +262,11 @@ public final class APIKeyRoutePolicies {
         //   对租户目录操作 default-deny）；
         // - kv 两条 ＝ manage_tenant_settings 叠加 full-access（租户级配置面）。
         APIKeyRoutePolicy catalogRead = APIKeyRoutePolicy.platform(
-                com.ragagent.common.security.APIKeyCapability.SYSTEM_TENANTS_READ,
-                com.ragagent.common.security.APIKeyCapability.SYSTEM_TENANTS_MANAGE);
+                APIKeyCapability.SYSTEM_TENANTS_READ,
+                APIKeyCapability.SYSTEM_TENANTS_MANAGE);
         a.registerGin("POST", "/api/v1/tenants",
                 APIKeyRoutePolicy.platform(
-                        com.ragagent.common.security.APIKeyCapability.SYSTEM_TENANTS_MANAGE));
+                        APIKeyCapability.SYSTEM_TENANTS_MANAGE));
         APIKeyRoutePolicy kv = APIKeyRoutePolicy.manageTenantSettings(APIKeyRoutePolicy.fullAccess());
         a.registerGin("GET", "/api/v1/tenants/kv/:key", kv);
         a.registerGin("PUT", "/api/v1/tenants/kv/:key", kv);
@@ -279,10 +281,10 @@ public final class APIKeyRoutePolicies {
         a.registerGin("GET", "/api/v1/tenants/:id", catalogRead);
         a.registerGin("PUT", "/api/v1/tenants/:id",
                 APIKeyRoutePolicy.platform(
-                        com.ragagent.common.security.APIKeyCapability.SYSTEM_TENANTS_MANAGE));
+                        APIKeyCapability.SYSTEM_TENANTS_MANAGE));
         a.registerGin("DELETE", "/api/v1/tenants/:id",
                 APIKeyRoutePolicy.platform(
-                        com.ragagent.common.security.APIKeyCapability.SYSTEM_TENANTS_MANAGE));
+                        APIKeyCapability.SYSTEM_TENANTS_MANAGE));
     }
 
     /**
@@ -692,8 +694,8 @@ public final class APIKeyRoutePolicies {
     /** 平台控制面（system/admin 组同款策略）。 */
     public static APIKeyRoutePolicy platformTenantsReadPolicy() {
         return APIKeyRoutePolicy.platform(
-                com.ragagent.common.security.APIKeyCapability.SYSTEM_TENANTS_READ,
-                com.ragagent.common.security.APIKeyCapability.SYSTEM_TENANTS_MANAGE);
+                APIKeyCapability.SYSTEM_TENANTS_READ,
+                APIKeyCapability.SYSTEM_TENANTS_MANAGE);
     }
 
     /** 会话类路由的 chat 策略。 */

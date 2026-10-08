@@ -22,6 +22,7 @@ import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.ragagent.common.web.ZeroTimeSerializer;
 
 /**
  * 数据源支撑件：配置的校验/解析/深比较、知识库归属校验、身份与"零值时间"等判据、
@@ -163,7 +164,7 @@ final class DataSourceSupport {
 
     /** 零值时间判定（本模块只用来判"连接器有没有给时间"）。 */
     static boolean isZeroTime(OffsetDateTime t) {
-        return t == null || com.ragagent.common.web.ZeroTimeSerializer.isZeroValue(t);
+        return t == null || ZeroTimeSerializer.isZeroValue(t);
     }
 
     static String readMetadataValue(Knowledge k, String key) {

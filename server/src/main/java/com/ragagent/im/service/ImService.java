@@ -55,6 +55,8 @@ import com.ragagent.session.service.SessionService;
 import com.ragagent.stream.StreamEvent;
 import com.ragagent.stream.StreamManager;
 import com.ragagent.stream.StreamStopWatcher;
+import com.ragagent.event.TenantContextSnapshot;
+import com.ragagent.storage.support.Resolver;
 
 /**
  * IM 执行体核心。
@@ -99,7 +101,7 @@ public class ImService {
     private final CustomAgentService agentService;
     final SessionKnowledgeQaService knowledgeQaService;
     final SessionAgentQaService agentQaService;
-    final com.ragagent.storage.support.Resolver storageResolver;
+    final Resolver storageResolver;
 
     // ── 调谐参数 ─────────────────────────────────────────────────────────
     private final int rateLimitWindowSec;
@@ -160,7 +162,7 @@ public class ImService {
             SessionService sessionService, MessageService messageService,
             CustomAgentService agentService,
             SessionKnowledgeQaService knowledgeQaService, SessionAgentQaService agentQaService,
-            java.util.Optional<com.ragagent.storage.support.Resolver> storageResolver,
+            java.util.Optional<Resolver> storageResolver,
             ObjectProvider<StringRedisTemplate> redisTemplates,
             ObjectProvider<DocReaderClient> docReaders,
             ObjectProvider<KnowledgeService> knowledgeServices,
@@ -673,8 +675,8 @@ public class ImService {
      * 组织共享 KB 的解析要求非空 UserID）。
      */
     public void handleMessage(IncomingMessage msg, String channelId) {
-        com.ragagent.event.TenantContextSnapshot previous =
-                com.ragagent.event.TenantContextSnapshot.capture();
+        TenantContextSnapshot previous =
+                TenantContextSnapshot.capture();
         try {
             runHandleMessage(msg, channelId);
         } finally {

@@ -23,6 +23,7 @@ import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
 import com.ragagent.retrieval.engine.RetrieveEngineRepository;
 import com.ragagent.retrieval.support.SearchTextUtil;
 import com.ragagent.common.vectorstore.IndexConfig;
+import com.ragagent.retrieval.config.RetrievalEnvLookup;
 
 /**
  * Qdrant 检索引擎仓储。
@@ -130,7 +131,7 @@ public class QdrantRetrieveRepository
                 return indexCfg.collectionName;
             }
         }
-        String env = com.ragagent.retrieval.config.RetrievalEnvLookup.get(ENV_QDRANT_COLLECTION);
+        String env = RetrievalEnvLookup.get(ENV_QDRANT_COLLECTION);
         if (env != null && !env.isEmpty()) {
             return env;
         }

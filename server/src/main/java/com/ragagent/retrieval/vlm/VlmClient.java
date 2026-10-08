@@ -5,6 +5,9 @@ import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import com.ragagent.llm.ollama.OllamaChatRequest;
+import com.ragagent.llm.ollama.OllamaMessage;
+import com.ragagent.llm.ollama.OllamaService;
 
 /**
  * VLM（视觉语言模型）Predict 客户端。
@@ -93,7 +96,7 @@ public final class VlmClient {
     public static String predict(VlmConfig config, Transport transport, byte[][] imgBytesList,
             String prompt) throws VlmException {
         if (config != null && config.isOllama()) {
-            return predictOllama(com.ragagent.llm.ollama.OllamaService.getOllamaService(), config,
+            return predictOllama(OllamaService.getOllamaService(), config,
                     imgBytesList, prompt);
         }
         // 请求体构建（chat.completions 标准字段）
@@ -162,7 +165,7 @@ public final class VlmClient {
      * {@code options.temperature=0.1}，回调里取最后一次响应的 {@code message.content}。
      * 错误文案：{@code Ollama VLM request: …}。
      */
-    static String predictOllama(com.ragagent.llm.ollama.OllamaService service, VlmConfig config,
+    static String predictOllama(OllamaService service, VlmConfig config,
             byte[][] imgBytesList, String prompt) throws VlmException {
         List<byte[]> images = new ArrayList<>();
         for (byte[] img : imgBytesList) {
@@ -170,12 +173,12 @@ public final class VlmClient {
                 images.add(img);
             }
         }
-        com.ragagent.llm.ollama.OllamaMessage message =
-                new com.ragagent.llm.ollama.OllamaMessage("user", prompt);
+        OllamaMessage message =
+                new OllamaMessage("user", prompt);
         message.setImages(images);
 
-        com.ragagent.llm.ollama.OllamaChatRequest request =
-                new com.ragagent.llm.ollama.OllamaChatRequest();
+        OllamaChatRequest request =
+                new OllamaChatRequest();
         request.setModel(config.modelName());
         request.setMessages(new ArrayList<>(List.of(message)));
         request.setStream(false);

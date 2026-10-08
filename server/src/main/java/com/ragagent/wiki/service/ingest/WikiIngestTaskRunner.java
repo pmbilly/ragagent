@@ -10,6 +10,7 @@ import org.springframework.beans.factory.ObjectProvider;
 
 import com.ragagent.wiki.domain.TaskDeadLetter;
 import com.ragagent.wiki.mapper.TaskDeadLetterRepository;
+import com.ragagent.tracing.langfuse.LangfuseTaskScope;
 
 /**
  * wiki 任务的<b>执行与归档公共逻辑</b>（{@link InProcessWikiIngestTaskQueue} 与
@@ -66,12 +67,12 @@ final class WikiIngestTaskRunner {
             WikiIngestPayload payload = parsePayload(task);
             // 任务侧观测——负载带 traceparent 就续接上游
             // trace，否则以任务类型开独立根；处理体包在 asynq.<type> span 内，收尾记 outcome。
-            try (com.ragagent.tracing.langfuse.LangfuseTaskScope scope =
-                         com.ragagent.tracing.langfuse.LangfuseTaskScope.start(
+            try (LangfuseTaskScope scope =
+                         LangfuseTaskScope.start(
                                  task.type(), payload.tracing(),
                                  java.util.Map.of("knowledge_base_id",
                                          payload.knowledgeBaseId() == null ? "" : payload.knowledgeBaseId()),
-                                 com.ragagent.tracing.langfuse.LangfuseTaskScope.previewPayload(task.payload()))) {
+                                 LangfuseTaskScope.previewPayload(task.payload()))) {
                 if (WikiIngestTask.TYPE_WIKI_FINALIZE.equals(task.type())) {
                     handler.processWikiFinalize(payload);
                 } else {

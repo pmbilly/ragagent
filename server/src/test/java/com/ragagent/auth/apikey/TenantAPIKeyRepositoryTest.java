@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import com.ragagent.auth.apikey.service.TenantAPIKeyService;
 
 /**
  * 仓储语义测试（H2）。
@@ -210,7 +211,7 @@ class TenantAPIKeyRepositoryTest {
         // 关键：这条读路径**不能** SkipHooks —— 调用方需要明文来重算摘要
         assertThat(pending.get(0).getApiKey()).isEqualTo("sk-legacy");
 
-        String realHash = com.ragagent.auth.apikey.service.TenantAPIKeyService.hashToken("sk-legacy");
+        String realHash = TenantAPIKeyService.hashToken("sk-legacy");
         repo.updateKeyHash(legacy.getId(), realHash);
         assertThat(repo.hasKeysWithPlaceholderHash()).isFalse();
         // 回填后可按真实摘要认证（getByHash 命中，且不解密）

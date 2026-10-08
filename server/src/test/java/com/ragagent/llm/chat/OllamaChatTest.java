@@ -29,6 +29,7 @@ import com.ragagent.llm.ollama.OllamaService;
 import com.ragagent.llm.ollama.OllamaToolCall;
 
 import org.junit.jupiter.api.Test;
+import com.ragagent.llm.ollama.OllamaMessage;
 
 /**
  * Ollama chat 路径的语义测试（按代码逐条建契约，覆盖最容易出错的几处）。
@@ -192,7 +193,7 @@ class OllamaChatTest {
         ChatMessage assistantImages = new ChatMessage("assistant", "x");
         assistantImages.setImages(List.of(dataUri));
 
-        List<com.ragagent.llm.ollama.OllamaMessage> converted =
+        List<OllamaMessage> converted =
                 chat(service).convertMessages(List.of(user, tool, assistantImages));
 
         assertEquals(1, converted.get(0).getImages().size(), "解析不出的图片直接跳过");

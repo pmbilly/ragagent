@@ -8,6 +8,7 @@ import java.util.function.Function;
 
 import com.ragagent.common.retrieval.SearchTarget;
 import com.ragagent.common.retrieval.SearchTarget.SearchTargets;
+import com.ragagent.knowledge.domain.Chunk;
 
 /**
  * scope 授权。
@@ -197,17 +198,17 @@ public final class SearchAuth {
      * chunk 授权（knowledge 域 Chunk 重载；FAQ 元数据等
      * 需要完整 chunk 的工具用）。chunkById 返回 null = 未找到（empty result）。
      */
-    public static com.ragagent.knowledge.domain.Chunk authorizeDomainChunkInSearchTargets(
+    public static Chunk authorizeDomainChunkInSearchTargets(
             SearchTargets searchTargets, String chunkId,
-            java.util.function.Function<String, com.ragagent.knowledge.domain.Chunk> chunkById,
+            java.util.function.Function<String, Chunk> chunkById,
             KnowledgeScopeReader knowledgeService) {
-        com.ragagent.knowledge.domain.Chunk[] holder = new com.ragagent.knowledge.domain.Chunk[1];
+        Chunk[] holder = new Chunk[1];
         authorizeChunkIdentity(searchTargets, chunkId,
                 () -> {
                     if (chunkById == null) {
                         return null;
                     }
-                    com.ragagent.knowledge.domain.Chunk c = chunkById.apply(chunkId);
+                    Chunk c = chunkById.apply(chunkId);
                     if (c == null) {
                         return null;
                     }

@@ -228,7 +228,7 @@ public class WikiIngestCitePipeline {
         List<ExtractedItem> concepts = result.getConcepts() == null
                 ? new ArrayList<>() : new ArrayList<>(result.getConcepts());
 
-        com.ragagent.wiki.service.ingest.WikiIngestExtractDedup.ExtractedProjection projection =
+        WikiIngestExtractDedup.ExtractedProjection projection =
                 ingestService.extractDedup.deduplicateExtractedBatch(chatModel, kbId, entities, concepts, batchCtx);
         entities = projection.entities();
         concepts = projection.concepts();

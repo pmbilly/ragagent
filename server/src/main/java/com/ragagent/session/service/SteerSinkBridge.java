@@ -15,6 +15,7 @@ import com.ragagent.session.domain.MentionedItem;
 import com.ragagent.stream.StreamBatch;
 import com.ragagent.stream.StreamEvent;
 import com.ragagent.stream.StreamManager;
+import com.ragagent.event.TenantContextSnapshot;
 
 /**
  * steer 的 handler 侧后半段：每轮 QA 在建立 SSE 流时构造一个实例，
@@ -35,7 +36,7 @@ public final class SteerSinkBridge implements SteerSink {
     private final String requestId;
     private final MessageService messageService;
     private final StreamManager streamManager;
-    private final com.ragagent.event.TenantContextSnapshot tenant;
+    private final TenantContextSnapshot tenant;
 
     private final Object mu = new Object();
     private String lastUserMessageID = "";
@@ -45,7 +46,7 @@ public final class SteerSinkBridge implements SteerSink {
     public SteerSinkBridge(
             String sessionId, String requestId,
             MessageService messageService, StreamManager streamManager,
-            com.ragagent.event.TenantContextSnapshot tenant) {
+            TenantContextSnapshot tenant) {
         this.sessionId = sessionId;
         this.requestId = requestId;
         this.messageService = messageService;
@@ -61,8 +62,8 @@ public final class SteerSinkBridge implements SteerSink {
         // 该线程已有租户/身份上下文）——必须保存-恢复，不能 clear，否则引擎后续
         // 轮次的模型/KB/工具解析全部丢租户（knowledge_search 检索恒空即此因）。
         // 调用方无上下文时 prev 全空，恢复等价于 clear（跨线程借用场景行为不变）。
-        com.ragagent.event.TenantContextSnapshot prev =
-                com.ragagent.event.TenantContextSnapshot.capture();
+        TenantContextSnapshot prev =
+                TenantContextSnapshot.capture();
         tenant.replay();
         try {
             return pollSteerInner(messageId, lastOffset);
@@ -168,8 +169,8 @@ public final class SteerSinkBridge implements SteerSink {
     public String persistSteerMessage(String sid, String messageId, String steerId,
             String content, Object mentionedItems, String channel) {
         // 同 pollSteer：保存-恢复调用方上下文（引擎线程调用时不得清空租户）。
-        com.ragagent.event.TenantContextSnapshot prev =
-                com.ragagent.event.TenantContextSnapshot.capture();
+        TenantContextSnapshot prev =
+                TenantContextSnapshot.capture();
         tenant.replay();
         try {
             return persistSteerInner(messageId, steerId, content, mentionedItems, channel);

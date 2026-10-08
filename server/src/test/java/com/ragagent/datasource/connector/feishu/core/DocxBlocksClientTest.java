@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import com.ragagent.datasource.ConnectorHttp;
 import com.ragagent.datasource.connector.feishu.core.DocxBlocks.DocxBlock;
+import com.ragagent.datasource.ConnectorException;
 
 /**
  * docx blocks / sheets-v2 / bitable-v1 的读取、分页、截断与防御性 break。
@@ -142,7 +143,7 @@ class DocxBlocksClientTest {
     void readSheetRangeRejectsTokenWithoutUnderscore() {
         assertThat(org.assertj.core.api.Assertions
                 .catchThrowable(() -> client().readSheetRange("nosep")))
-                .isInstanceOf(com.ragagent.datasource.ConnectorException.class)
+                .isInstanceOf(ConnectorException.class)
                 .hasMessageContaining("invalid sheet embed token");
     }
 
@@ -323,7 +324,7 @@ class DocxBlocksClientTest {
     void readBitableRecordsRejectsTokenWithoutUnderscore() {
         assertThat(org.assertj.core.api.Assertions
                 .catchThrowable(() -> client().readBitableRecords("nosep")))
-                .isInstanceOf(com.ragagent.datasource.ConnectorException.class)
+                .isInstanceOf(ConnectorException.class)
                 .hasMessageContaining("invalid bitable embed token");
     }
 

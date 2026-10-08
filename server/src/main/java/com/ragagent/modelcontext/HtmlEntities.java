@@ -1,5 +1,7 @@
 package com.ragagent.modelcontext;
 
+import com.ragagent.common.web.HtmlText;
+
 /**
  * HTML 实体转义/反转义两个函数（本包引用的全部面）。
  *
@@ -16,7 +18,7 @@ final class HtmlEntities {
     }
 
     static String escape(String s) {
-        return com.ragagent.common.web.HtmlText.escape(s);
+        return HtmlText.escape(s);
     }
 
     static String unescape(String s) {

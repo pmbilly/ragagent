@@ -25,6 +25,7 @@ import com.ragagent.datasource.connector.ima.ImaApiTypes.SearchKnowledgeBaseResp
 import com.ragagent.datasource.connector.ima.ImaApiTypes.UrlInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.ragagent.common.security.SsrfGuard;
 
 /**
  * IMA OpenAPI 客户端。
@@ -216,7 +217,7 @@ public class ImaClient {
         }
         try {
             ConnectorHttp.ssrfGuard().validateURLForSSRF(url);
-        } catch (com.ragagent.common.security.SsrfGuard.SsrfException e) {
+        } catch (SsrfGuard.SsrfException e) {
             throw new ConnectorException("media URL rejected: " + e.getMessage(), e);
         }
 

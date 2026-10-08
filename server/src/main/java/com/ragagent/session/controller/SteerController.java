@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import com.ragagent.common.llm.ResponseType;
 
 /**
  * 运行中轮次的中途消息（steer）HTTP 层。
@@ -365,7 +366,7 @@ public class SteerController {
     static StreamEvent steerEvent(String id, String query, List<MentionedItem> mentionedItems,
                                   String channel) {
         StreamEvent evt = new StreamEvent(id,
-                com.ragagent.common.llm.ResponseType.STEER, query, true);
+                ResponseType.STEER, query, true);
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("steer_id", id);
         data.put("channel", channel == null ? "" : channel);

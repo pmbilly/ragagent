@@ -16,6 +16,13 @@ import com.ragagent.common.context.TenantContext;
 import com.ragagent.session.domain.Session;
 import com.ragagent.session.domain.SessionNotFoundException;
 import com.ragagent.session.mapper.SessionRepository;
+import com.ragagent.knowledge.service.KnowledgeService;
+import com.ragagent.model.service.ModelRuntimeFactory;
+import com.ragagent.model.service.ModelService;
+import com.ragagent.session.mapper.MessageRepository;
+import com.ragagent.session.mapper.MessageSuggestionRepository;
+import com.ragagent.settings.ConversationProperties;
+import com.ragagent.websearch.service.WebSearchTempKbStateService;
 
 /**
  * 会话读路径的可见性判定（{@code loadSessionForRead} /
@@ -37,14 +44,14 @@ class SessionServiceReadTest {
         repo = mock(SessionRepository.class);
         // 构造器含写路径依赖（知识清理/建议删除）；读路径用例用 mock 隔离
         service = new SessionService(repo,
-                org.mockito.Mockito.mock(com.ragagent.session.mapper.MessageRepository.class),
-                org.mockito.Mockito.mock(com.ragagent.session.mapper.MessageSuggestionRepository.class),
-                org.mockito.Mockito.mock(com.ragagent.knowledge.service.KnowledgeService.class),
-                org.mockito.Mockito.mock(com.ragagent.model.service.ModelService.class),
-                org.mockito.Mockito.mock(com.ragagent.model.service.ModelRuntimeFactory.class),
-                org.mockito.Mockito.mock(com.ragagent.settings.ConversationProperties.class),
+                org.mockito.Mockito.mock(MessageRepository.class),
+                org.mockito.Mockito.mock(MessageSuggestionRepository.class),
+                org.mockito.Mockito.mock(KnowledgeService.class),
+                org.mockito.Mockito.mock(ModelService.class),
+                org.mockito.Mockito.mock(ModelRuntimeFactory.class),
+                org.mockito.Mockito.mock(ConversationProperties.class),
                 org.mockito.Mockito.mock(
-                        com.ragagent.websearch.service.WebSearchTempKbStateService.class));
+                        WebSearchTempKbStateService.class));
         TenantContext.set(TENANT, null, null, false, "u-1", false);
     }
 

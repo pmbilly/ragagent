@@ -26,6 +26,7 @@ import com.ragagent.session.domain.Session;
 import com.ragagent.session.domain.SessionListQuery;
 import com.ragagent.session.domain.SessionPage;
 import com.ragagent.session.mapper.SessionRepository;
+import com.ragagent.agent.management.service.BuiltinAgentRegistry;
 
 /**
  * embed 渠道 service（含 session token/签名段）。
@@ -236,7 +237,7 @@ public class EmbedChannelService {
         } catch (RuntimeException e) {
             throw EmbedError.operationFailed();
         }
-        if (row == null && com.ragagent.agent.management.service.BuiltinAgentRegistry.isBuiltinAgentID(id)) {
+        if (row == null && BuiltinAgentRegistry.isBuiltinAgentID(id)) {
             // 内建注册表兜底：内建 agent 视为存在（租户内）
             return virtualBuiltin(id, tenantId);
         }

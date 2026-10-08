@@ -34,6 +34,9 @@ import com.ragagent.llm.domain.ChatResponse;
 import com.ragagent.modelcontext.Registry;
 import com.ragagent.tracing.langfuse.LangfuseManager;
 import com.ragagent.tracing.langfuse.Span;
+import com.ragagent.common.context.TenantContext;
+import com.ragagent.common.error.BizException;
+import com.ragagent.llm.domain.FunctionCall;
 
 /**
  * ReAct「Act」段的协作者：工具调用编排——串行/并行执行、截断参数拒执、
@@ -245,7 +248,7 @@ final class ActPhase {
                         // 线程死亡、results[idx] 保持 null，收集循环直接 NPE 炸掉整轮。兜底落失败结果。
                         log.warn("[Agent][Round-{}] tool call crashed: {}", round, fatal.toString());
                         results[idx] = crashedToolCall(calls.get(idx),
-                                com.ragagent.common.error.BizException.wireText(fatal));
+                                BizException.wireText(fatal));
                     } finally {
                         permits.release();
                         TenantContext.clear();
@@ -339,7 +342,7 @@ final class ActPhase {
     private ToolCall runToolCallInner(com.ragagent.llm.domain.ToolCall tc, int i, int iteration,
             int round, String sessionId, String assistantMessageID) {
         log.info("[Agent][Round-{}][Tool {}] tenantId={}", round, tc.getFunction().getName(),
-                com.ragagent.common.context.TenantContext.currentTenantId());
+                TenantContext.currentTenantId());
         tc.setId(NormalizeToolCallId.normalize(tc.getId(), tc.getFunction().getName(), i));
         String total = "?"; // 孤立时未知；调用方记批量大小
         String toolTag = String.format("[Agent][Round-%d][Tool %s (%d/%s)]",
@@ -405,7 +408,7 @@ final class ActPhase {
             decoded.setId(tc.getId());
             decoded.setType(tc.getType());
             decoded.setModelArguments("");
-            decoded.setFunction(new com.ragagent.llm.domain.FunctionCall(tc.getFunction().getName(),
+            decoded.setFunction(new FunctionCall(tc.getFunction().getName(),
                     repaired.repaired()));
             decoded.setProviderMetadata(tc.getProviderMetadata());
             engine.modelContext.decodeToolCalls(List.of(decoded));
@@ -525,7 +528,7 @@ final class ActPhase {
         if (execError != null) {
             // 错误文本要**带着 `error code: N, error message: ` 前缀**（BizException.wireText）。
             // 取 getMessage() 会把前缀丢掉，SSE 终止错误帧的 content 就与既有线格式不一致。
-            String execText = com.ragagent.common.error.BizException.wireText(execError);
+            String execText = BizException.wireText(execError);
             log.error("{} Failed in {}ms: {}", toolTag, duration, execText);
             ToolResult r = new ToolResult();
             r.setSuccess(false);

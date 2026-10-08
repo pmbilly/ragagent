@@ -8,6 +8,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonRawValue;
+import com.ragagent.common.web.NaiveOffsetDateTimeTypeHandler;
+import com.ragagent.common.web.PgJsonTypeHandler;
 
 /**
  * 会话附件（临时文档）。
@@ -59,22 +61,22 @@ public class TemporaryDocument {
     private String content;
 
     /** 不进响应。 */
-    @TableField(value = "chunks", typeHandler = com.ragagent.common.web.PgJsonTypeHandler.class)
+    @TableField(value = "chunks", typeHandler = PgJsonTypeHandler.class)
     @JsonIgnore
     private String chunks;
 
     /** image_refs（jsonb）：@JsonRawValue 原样输出（不转义、不重排）。 */
-    @TableField(value = "image_refs", typeHandler = com.ragagent.common.web.PgJsonTypeHandler.class)
+    @TableField(value = "image_refs", typeHandler = PgJsonTypeHandler.class)
     @JsonRawValue
     private String imageRefs;
 
     /** metadata（jsonb）：同上，raw 输出。 */
-    @TableField(value = "metadata", typeHandler = com.ragagent.common.web.PgJsonTypeHandler.class)
+    @TableField(value = "metadata", typeHandler = PgJsonTypeHandler.class)
     @JsonRawValue
     private String metadata;
 
     /** 不进响应。 */
-    @TableField(value = "processing_options", typeHandler = com.ragagent.common.web.PgJsonTypeHandler.class)
+    @TableField(value = "processing_options", typeHandler = PgJsonTypeHandler.class)
     @JsonIgnore
     private String processingOptions;
 
@@ -86,23 +88,23 @@ public class TemporaryDocument {
     private String errorMessage;
 
 
-    @TableField(value = "expires_at", typeHandler = com.ragagent.common.web.NaiveOffsetDateTimeTypeHandler.class)
+    @TableField(value = "expires_at", typeHandler = NaiveOffsetDateTimeTypeHandler.class)
     private OffsetDateTime expiresAt;
 
     /** 为空省略：null 不输出。 */
-    @TableField(value = "started_at", typeHandler = com.ragagent.common.web.NaiveOffsetDateTimeTypeHandler.class)
+    @TableField(value = "started_at", typeHandler = NaiveOffsetDateTimeTypeHandler.class)
     private OffsetDateTime startedAt;
 
     /** 为空省略：null 不输出。 */
-    @TableField(value = "ready_at", typeHandler = com.ragagent.common.web.NaiveOffsetDateTimeTypeHandler.class)
+    @TableField(value = "ready_at", typeHandler = NaiveOffsetDateTimeTypeHandler.class)
     private OffsetDateTime readyAt;
 
 
-    @TableField(value = "created_at", typeHandler = com.ragagent.common.web.NaiveOffsetDateTimeTypeHandler.class)
+    @TableField(value = "created_at", typeHandler = NaiveOffsetDateTimeTypeHandler.class)
     private OffsetDateTime createdAt;
 
 
-    @TableField(value = "updated_at", typeHandler = com.ragagent.common.web.NaiveOffsetDateTimeTypeHandler.class)
+    @TableField(value = "updated_at", typeHandler = NaiveOffsetDateTimeTypeHandler.class)
     private OffsetDateTime updatedAt;
 
     /** 软删除时间，不进响应。 */

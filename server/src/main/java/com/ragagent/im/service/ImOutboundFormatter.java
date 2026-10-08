@@ -8,6 +8,7 @@ import com.ragagent.im.runtime.ReplyMessage;
 import com.ragagent.im.runtime.ThinkDisplay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.ragagent.storage.support.Rewriter;
 
 /**
  * IM 出站内容整形与发送：XML/引用标签清洗、存储链接重写、最终答案兜底、
@@ -38,7 +39,7 @@ final class ImOutboundFormatter {
         content = ImFormat.stripImageXMLTags(content);
         content = ImFormat.stripImCitationTags(content);
         if (service.storageResolver != null) {
-            content = new com.ragagent.storage.support.Rewriter(service.storageResolver, "IM")
+            content = new Rewriter(service.storageResolver, "IM")
                     .rewrite(content);
         }
         return content;

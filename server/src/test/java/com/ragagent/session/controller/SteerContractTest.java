@@ -30,6 +30,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import com.ragagent.common.llm.ResponseType;
+import com.ragagent.support.ContractJson;
 
 /**
  * steer 的契约测试。
@@ -283,7 +285,7 @@ class SteerContractTest {
     void deleteConsumedEventReportsAlreadyInjected() throws Exception {
         seedLiveRun();
         StreamEvent evt = new StreamEvent("steer-1",
-                com.ragagent.common.llm.ResponseType.STEER, "已被注入", true);
+                ResponseType.STEER, "已被注入", true);
         Map<String, Object> data = new java.util.LinkedHashMap<>();
         data.put("consumed", true);
         evt.setData(data);
@@ -336,7 +338,7 @@ class SteerContractTest {
 
     private static String raw(MvcResult r) throws Exception {
         // PR4 语义比较：与 golden 同侧归一（非 JSON 文本原样）
-        return com.ragagent.support.ContractJson.semantic(RAW_SEMANTIC_MAPPER,
+        return ContractJson.semantic(RAW_SEMANTIC_MAPPER,
                 r.getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8));
     }
 
@@ -350,6 +352,6 @@ class SteerContractTest {
             resource = new org.springframework.core.io.ClassPathResource("contracts/" + name + ".json");
         }
         String text = new String(resource.getInputStream().readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
-        return com.ragagent.support.ContractJson.semantic(GOLDEN_SEMANTIC_MAPPER, text);
+        return ContractJson.semantic(GOLDEN_SEMANTIC_MAPPER, text);
     }
 }

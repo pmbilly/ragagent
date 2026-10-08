@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.web.ZeroTimeSerializer;
 import com.ragagent.common.web.PgJsonTypeHandler;
+import com.ragagent.common.crypto.CryptoService;
 
 /**
  * 一个配置好的外部数据源（表 {@code data_sources}）。
@@ -268,13 +269,13 @@ public class DataSource {
         if (creds == null || creds.isEmpty()) {
             return parsed;
         }
-        com.ragagent.common.crypto.CryptoService crypto = new com.ragagent.common.crypto.CryptoService();
+        CryptoService crypto = new CryptoService();
         for (java.util.Map.Entry<String, Object> entry : creds.entrySet()) {
             Object v = entry.getValue();
             if (!(v instanceof String s) || s.isEmpty()) {
                 continue;
             }
-            com.ragagent.common.crypto.CryptoService.LenientResult r =
+            CryptoService.LenientResult r =
                     crypto.decryptStoredSecretLenient(s);
             if (r.ok()) {
                 entry.setValue(r.plaintext());

@@ -6,6 +6,16 @@ import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.service.ImService;
 import com.ragagent.im.slack.SlackAdapterFactory;
 import com.ragagent.im.telegram.TelegramAdapterFactory;
+import com.ragagent.common.security.SsrfGuard;
+import com.ragagent.im.dingtalk.DingtalkAdapterFactory;
+import com.ragagent.im.feishu.FeishuAdapterFactory;
+import com.ragagent.im.feishu.FeishuRegion;
+import com.ragagent.im.mattermost.MattermostAdapterFactory;
+import com.ragagent.im.qqbot.QqBotAdapterFactory;
+import com.ragagent.im.wechat.WechatAdapterFactory;
+import com.ragagent.im.wecom.WecomAdapterFactory;
+import com.ragagent.im.yunzhijia.YunzhijiaAdapterFactory;
+import com.ragagent.stream.StreamManager;
 
 /**
  * IM 适配器工厂的装配。
@@ -24,11 +34,11 @@ public class ImAdapterWiringConfig {
     public ImAdapterWiringConfig(ImService imService,
                                  TelegramAdapterFactory telegramAdapterFactory,
                                  SlackAdapterFactory slackAdapterFactory,
-                                 com.ragagent.im.qqbot.QqBotAdapterFactory qqBotAdapterFactory,
-                                 com.ragagent.im.wecom.WecomAdapterFactory wecomAdapterFactory,
+                                 QqBotAdapterFactory qqBotAdapterFactory,
+                                 WecomAdapterFactory wecomAdapterFactory,
                                  org.springframework.beans.factory.ObjectProvider<
-                                         com.ragagent.common.security.SsrfGuard> ssrfGuard,
-                                 com.ragagent.stream.StreamManager streamManager) {
+                                         SsrfGuard> ssrfGuard,
+                                 StreamManager streamManager) {
         // IM 的跨实例 /stop 要写 stop 事件到 StreamManager（延迟接：装配层注入）
         imService.setStreamManager(streamManager);
         imService.registerAdapterFactory(ImTypes.PLATFORM_TELEGRAM, telegramAdapterFactory);
@@ -36,20 +46,20 @@ public class ImAdapterWiringConfig {
         imService.registerAdapterFactory(ImTypes.PLATFORM_QQBOT, qqBotAdapterFactory);
         imService.registerAdapterFactory(ImTypes.PLATFORM_WECOM, wecomAdapterFactory);
         // 飞书与 Lark 是同一产品两朵隔离云：同一实现、两个平台名
-        com.ragagent.common.security.SsrfGuard guard = ssrfGuard.getIfAvailable();
+        SsrfGuard guard = ssrfGuard.getIfAvailable();
         imService.registerAdapterFactory(ImTypes.PLATFORM_FEISHU,
-                new com.ragagent.im.feishu.FeishuAdapterFactory(
-                        com.ragagent.im.feishu.FeishuRegion.FEISHU, guard));
+                new FeishuAdapterFactory(
+                        FeishuRegion.FEISHU, guard));
         imService.registerAdapterFactory(ImTypes.PLATFORM_LARK,
-                new com.ragagent.im.feishu.FeishuAdapterFactory(
-                        com.ragagent.im.feishu.FeishuRegion.LARK, guard));
+                new FeishuAdapterFactory(
+                        FeishuRegion.LARK, guard));
         imService.registerAdapterFactory(ImTypes.PLATFORM_DINGTALK,
-                new com.ragagent.im.dingtalk.DingtalkAdapterFactory(guard));
+                new DingtalkAdapterFactory(guard));
         imService.registerAdapterFactory(ImTypes.PLATFORM_WECHAT,
-                new com.ragagent.im.wechat.WechatAdapterFactory(guard));
+                new WechatAdapterFactory(guard));
         imService.registerAdapterFactory(ImTypes.PLATFORM_MATTERMOST,
-                new com.ragagent.im.mattermost.MattermostAdapterFactory(guard));
+                new MattermostAdapterFactory(guard));
         imService.registerAdapterFactory(ImTypes.PLATFORM_YUNZHIJIA,
-                new com.ragagent.im.yunzhijia.YunzhijiaAdapterFactory(guard));
+                new YunzhijiaAdapterFactory(guard));
     }
 }

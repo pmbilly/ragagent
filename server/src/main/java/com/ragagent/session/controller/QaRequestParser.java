@@ -20,6 +20,15 @@ import com.ragagent.storage.support.ResourceModeException;
 import com.ragagent.storage.support.StreamRewriter;
 import static com.ragagent.session.service.QaSupport.KnowledgeTargets;
 import com.ragagent.session.controller.KnowledgeQaController.Base64Support;
+import com.ragagent.common.security.TenantAPIKeyScope;
+import com.ragagent.session.domain.MessageExecutionContext;
+import com.ragagent.session.domain.SessionNotFoundException;
+import com.ragagent.storage.support.FileService;
+import com.ragagent.storage.support.Mode;
+import com.ragagent.storage.support.PublicModeForbiddenException;
+import com.ragagent.storage.support.Rewriter;
+import com.ragagent.storage.support.StorageBackendResolver;
+import com.ragagent.tenant.Tenant;
 
 /**
  * {@code KnowledgeQaController} 的**请求解析主体**：把 HTTP 请求（会话 id、
@@ -37,10 +46,10 @@ final class QaRequestParser {
 
     private final SessionService sessionService;
     private final TemporaryDocumentService temporaryDocuments;
-    private final com.ragagent.storage.support.FileService fileService;
-    private final com.ragagent.storage.support.StorageBackendResolver storageBackendResolver;
+    private final FileService fileService;
+    private final StorageBackendResolver storageBackendResolver;
 
-    QaRequestParser(SessionService sessionService, TemporaryDocumentService temporaryDocuments, com.ragagent.storage.support.FileService fileService, com.ragagent.storage.support.StorageBackendResolver storageBackendResolver) {
+    QaRequestParser(SessionService sessionService, TemporaryDocumentService temporaryDocuments, FileService fileService, StorageBackendResolver storageBackendResolver) {
         this.sessionService = sessionService;
         this.temporaryDocuments = temporaryDocuments;
         this.fileService = fileService;
@@ -50,7 +59,7 @@ final class QaRequestParser {
     KnowledgeQaController.ParsedRequest parseQARequest(String rawSessionId, CreateKnowledgeQARequest request,
             String resourceUrls, String logPrefix,
             AgentResolver agentResolver,
-            com.ragagent.tenant.Tenant readerTenant) {
+            Tenant readerTenant) {
         QaRequestContext rc = new QaRequestContext();
 
         String sessionId = SessionStreamController.sanitizeForLog(rawSessionId);
@@ -67,11 +76,11 @@ final class QaRequestParser {
 
         // 先解析存储引用形态：SSE 起流后非法值不能再落 400
         try {
-            com.ragagent.storage.support.Mode mode = com.ragagent.storage.support.Mode.resolve(resourceUrls);
-            com.ragagent.storage.support.Rewriter rw = com.ragagent.storage.support.Rewriter.forRequest(
+            Mode mode = Mode.resolve(resourceUrls);
+            Rewriter rw = Rewriter.forRequest(
                     mode, readerTenant, fileService, storageBackendResolver);
             rc.resourceRewriter = new StreamRewriter(rw);
-        } catch (com.ragagent.storage.support.PublicModeForbiddenException e) {
+        } catch (PublicModeForbiddenException e) {
             log.warn("Rejected resource URL mode: {}", e.getMessage());
             throw BizException.forbidden(e.getMessage());
         } catch (ResourceModeException e) {
@@ -98,7 +107,7 @@ final class QaRequestParser {
         // 严格 owner 范围取会话（QA 写消息，不复用 Admin 读回退）
         try {
             rc.session = sessionService.getOwnedSession(sessionId);
-        } catch (com.ragagent.session.domain.SessionNotFoundException e) {
+        } catch (SessionNotFoundException e) {
             throw BizException.notFound("Session not found");
         }
 
@@ -121,7 +130,7 @@ final class QaRequestParser {
         // @mention 合并
         KnowledgeTargets merged = QaSupport.mergeKnowledgeTargets(
                 request.knowledgeBaseIds(), request.knowledgeIds(), request.mentionedItems());
-        com.ragagent.common.security.TenantAPIKeyScope.authorizeKnowledgeTargets(
+        TenantAPIKeyScope.authorizeKnowledgeTargets(
                 merged.kbIds(), merged.knowledgeIds());
 
         // wiki fixer 的租户作用域：内建 agent id 不匹配即跳过（同款守卫）
@@ -266,7 +275,7 @@ final class QaRequestParser {
         assistant.setAgentId(agentId);
         assistant.setAgentTenantId(agentTenantId);
         assistant.setModelId(modelId);
-        assistant.setExecutionContext(new com.ragagent.session.domain.MessageExecutionContext());
+        assistant.setExecutionContext(new MessageExecutionContext());
         rc.assistantMessage = assistant;
 
         rc.knowledgeBaseIds = merged.kbIds();

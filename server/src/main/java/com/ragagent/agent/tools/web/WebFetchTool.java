@@ -20,6 +20,7 @@ import com.ragagent.agent.tools.ToolCancellation;
 import com.ragagent.agent.tools.ToolDefinitions;
 import com.ragagent.agent.tools.ToolOutput;
 import com.ragagent.agent.tools.ToolRequest;
+import com.ragagent.webfetch.Fetcher;
 
 /**
  * web_fetch 工具。
@@ -128,7 +129,7 @@ public class WebFetchTool extends BaseTool {
 
     /** 生产 fetcher（markdown、2MB、60s、浏览器兜底）。 */
     public WebFetchTool() {
-        this(com.ragagent.webfetch.Fetcher.newFetcher()::fetch);
+        this(Fetcher.newFetcher()::fetch);
     }
 
     /** 测试注入口。 */

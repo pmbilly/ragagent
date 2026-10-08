@@ -22,6 +22,7 @@ import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
 import com.ragagent.retrieval.engine.RetrieveEngineRepository;
 import com.ragagent.retrieval.engine.milvus.MilvusRestClient.Json;
 import com.ragagent.common.vectorstore.IndexConfig;
+import com.ragagent.retrieval.config.RetrievalEnvLookup;
 
 /**
  * Milvus 检索引擎仓储。
@@ -124,7 +125,7 @@ public class MilvusRetrieveRepository
                                                   SsrfGuard guard) {
         log.info("[Milvus] Initializing Milvus retriever engine repository");
         String baseName = resolveCollectionName(indexCfg);
-        String metric = resolveMetricType(com.ragagent.retrieval.config.RetrievalEnvLookup.get(ENV_MILVUS_METRIC_TYPE));
+        String metric = resolveMetricType(RetrievalEnvLookup.get(ENV_MILVUS_METRIC_TYPE));
         MilvusRestClient client = new MilvusRestClient(addr, username, password, dbName, guard);
         MilvusRetrieveRepository repo = new MilvusRetrieveRepository(client, baseName, metric,
                 indexCfg == null ? 0 : indexCfg.shardsNum,
@@ -144,7 +145,7 @@ public class MilvusRetrieveRepository
                 return indexCfg.collectionName;
             }
         }
-        String env = com.ragagent.retrieval.config.RetrievalEnvLookup.get(ENV_MILVUS_COLLECTION);
+        String env = RetrievalEnvLookup.get(ENV_MILVUS_COLLECTION);
         if (env != null && !env.isEmpty()) {
             return env;
         }

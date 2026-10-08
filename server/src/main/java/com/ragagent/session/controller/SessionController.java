@@ -39,6 +39,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.ragagent.common.llm.ResponseType;
+import com.ragagent.session.domain.MessageArtifact;
+import com.ragagent.session.domain.MessageNotFoundException;
+import com.ragagent.session.service.MessageService;
+import com.ragagent.stream.StreamEvent;
+import com.ragagent.stream.StreamManager;
 
 /**
  * 会话 HTTP 层。
@@ -78,12 +84,12 @@ public class SessionController {
     private static final Logger log = LoggerFactory.getLogger(SessionController.class);
 
     private final SessionService sessionService;
-    private final com.ragagent.session.service.MessageService messageService;
-    private final com.ragagent.stream.StreamManager streamManager;
+    private final MessageService messageService;
+    private final StreamManager streamManager;
 
     public SessionController(SessionService sessionService,
-                             com.ragagent.session.service.MessageService messageService,
-                             com.ragagent.stream.StreamManager streamManager) {
+                             MessageService messageService,
+                             StreamManager streamManager) {
         this.sessionService = sessionService;
         this.messageService = messageService;
         this.streamManager = streamManager;
@@ -403,7 +409,7 @@ public class SessionController {
         } catch (RuntimeException e) {
             throw toInternal(e);
         }
-        List<com.ragagent.session.domain.MessageArtifact> artifacts;
+        List<MessageArtifact> artifacts;
         try {
             artifacts = messageService.getSessionArtifacts(sessionId);
         } catch (RuntimeException e) {
@@ -432,7 +438,7 @@ public class SessionController {
         Message message;
         try {
             message = messageService.getMessage(sessionId, mid);
-        } catch (com.ragagent.session.domain.MessageNotFoundException e) {
+        } catch (MessageNotFoundException e) {
             // 不存在 → 404 "message not found"（固定文案）
             throw BizException.notFound("message not found");
         } catch (RuntimeException e) {
@@ -479,12 +485,12 @@ public class SessionController {
         } catch (RuntimeException e) {
             throw BizException.notFound("message not found");
         }
-        List<com.ragagent.session.domain.MessageArtifact> artifacts =
+        List<MessageArtifact> artifacts =
                 message.getArtifacts() == null ? List.of() : message.getArtifacts();
         if (index >= artifacts.size()) {
             throw BizException.notFound("artifact index out of range");
         }
-        com.ragagent.session.domain.MessageArtifact artifact = artifacts.get(index);
+        MessageArtifact artifact = artifacts.get(index);
         if (artifact.getUrl() == null || artifact.getUrl().isEmpty()) {
             throw BizException.notFound("artifact storage path missing");
         }
@@ -494,7 +500,7 @@ public class SessionController {
 
     /** {@code index} 是列表下标，其余字段取自产物本体。 */
     private static List<ArtifactView> artifactListItems(
-            List<com.ragagent.session.domain.MessageArtifact> artifacts) {
+            List<MessageArtifact> artifacts) {
         List<ArtifactView> items = new ArrayList<>(artifacts.size());
         for (int i = 0; i < artifacts.size(); i++) {
             items.add(ArtifactView.of(i, artifacts.get(i)));
@@ -587,8 +593,8 @@ public class SessionController {
             return ResponseEntity.noContent().build();
         }
 
-        com.ragagent.stream.StreamEvent stopEvent = new com.ragagent.stream.StreamEvent(
-                "stop-" + System.nanoTime(), com.ragagent.common.llm.ResponseType.STOP,
+        StreamEvent stopEvent = new StreamEvent(
+                "stop-" + System.nanoTime(), ResponseType.STOP,
                 "", true);
         stopEvent.setTimestamp(OffsetDateTime.now());
         Map<String, Object> data = new LinkedHashMap<>();

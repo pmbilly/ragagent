@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.ragagent.common.error.ErrorCode;
 
 /**
  * 邀请相关的 9 条路由：租户侧 GET/POST /tenants/{id}/invitations、
@@ -300,7 +301,7 @@ public class TenantInvitationController {
             if (e.kind() == TenantRbacException.Kind.INVITATION_TOKEN_INVALID) {
                 // 无效/过期/撤销统一 410 Gone
                 throw new BizException(new AppError(
-                        com.ragagent.common.error.ErrorCode.NOT_FOUND.value(),
+                        ErrorCode.NOT_FOUND.value(),
                         "invitation link is invalid or has been revoked", null, 410));
             }
             throw new BizException(AppError.internal("failed to accept invitation").withDetails(e.getMessage()));

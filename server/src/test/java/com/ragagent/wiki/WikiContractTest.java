@@ -31,6 +31,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
+import com.ragagent.support.ContractJson;
+import com.ragagent.support.GoldenContract;
 
 /**
  * Wiki 契约测试。
@@ -100,8 +103,8 @@ class WikiContractTest {
         kb.setType("document");
         kb.setTenantId(10002L);
         kb.setCreatorId("11111111-2222-3333-4444-555555555501");
-        com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy idx =
-                com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy.defaultStrategy();
+        KnowledgeBaseIndexingStrategy idx =
+                KnowledgeBaseIndexingStrategy.defaultStrategy();
         idx.setWikiEnabled(true);
         idx.setGraphEnabled(false);
         kb.setIndexingStrategy(idx);
@@ -337,7 +340,7 @@ class WikiContractTest {
             resource = new org.springframework.core.io.ClassPathResource("contracts/" + name + ".json");
         }
         String text = new String(resource.getInputStream().readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
-        return com.ragagent.support.ContractJson.semantic(GOLDEN_SEMANTIC_MAPPER, text);
+        return ContractJson.semantic(GOLDEN_SEMANTIC_MAPPER, text);
     }
 
 
@@ -346,14 +349,14 @@ class WikiContractTest {
 
     private static void assertGolden(org.springframework.test.web.servlet.MvcResult r,
             String name) throws Exception {
-        com.ragagent.support.GoldenContract.assertEquals("src/test/resources/contracts",
+        GoldenContract.assertEquals("src/test/resources/contracts",
                 name, WikiContractTest::mask,
                 r.getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8));
     }
 
     private static String mask(String s) {
         // PR4 语义比较入口：键序/转义归一后再掩码
-        s = com.ragagent.support.ContractJson.semantic(s);
+        s = ContractJson.semantic(s);
         String out = UUID_KEY_PATTERN.matcher(s).replaceAll("\"$1\":\"<id>\"");
         out = TS_PATTERN.matcher(out).replaceAll("\"<ts>\"");
         return UUID_ANY_PATTERN.matcher(out).replaceAll("<uuid>");

@@ -23,6 +23,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import com.ragagent.mcp.domain.McpTool;
+import com.ragagent.mcp.protocol.McpContext;
+import com.ragagent.mcp.protocol.McpServiceUrls;
 
 /**
  * MCP stub A/B：双端同打同一形态的 stub MCP server（JSON-RPC over streamable HTTP），
@@ -109,7 +112,7 @@ class McpStubABTest {
         ssrfSnapshot = SsrfGuard.snapshotWhitelist();
         SsrfGuard guard = new SsrfGuard();
         guard.reloadWhitelist("127.0.0.1");
-        com.ragagent.mcp.protocol.McpServiceUrls.setSsrfGuard(guard);
+        McpServiceUrls.setSsrfGuard(guard);
         server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
         // 必须设 executor，否则并发请求会挂死（§9 坑）
         server.setExecutor(java.util.concurrent.Executors.newVirtualThreadPerTaskExecutor());
@@ -141,7 +144,7 @@ class McpStubABTest {
         if (server != null) {
             server.stop(0);
         }
-        com.ragagent.mcp.protocol.McpServiceUrls.setSsrfGuard(new SsrfGuard());
+        McpServiceUrls.setSsrfGuard(new SsrfGuard());
         SsrfGuard.restoreWhitelist(ssrfSnapshot);
     }
 
@@ -156,11 +159,11 @@ class McpStubABTest {
 
         McpClientManager manager = new McpClientManager(null);
         McpClient client = manager.getOrCreateClient(
-                com.ragagent.mcp.protocol.McpContext.none(), service);
+                McpContext.none(), service);
         // initialize + notifications/initialized
-        client.initialize(com.ragagent.mcp.protocol.McpContext.none());
-        List<com.ragagent.mcp.domain.McpTool> tools = client.listTools(
-                com.ragagent.mcp.protocol.McpContext.none());
+        client.initialize(McpContext.none());
+        List<McpTool> tools = client.listTools(
+                McpContext.none());
         assertThat(tools).hasSize(1);
         assertThat(tools.get(0).getName()).isEqualTo("echo");
 

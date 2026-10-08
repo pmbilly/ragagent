@@ -40,6 +40,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import com.ragagent.common.error.BizException;
+import com.ragagent.mcp.domain.McpMetadataSummary;
 
 /**
  * MCP 元数据刷新的服务层契约。
@@ -282,7 +284,7 @@ class McpMetadataServiceTest {
         metadataRepo.saveMetadata(personal);
 
         List<McpService> services = mcpServiceMapper.listForTenant(1L);
-        Map<String, com.ragagent.mcp.domain.McpMetadataSummary> summaries =
+        Map<String, McpMetadataSummary> summaries =
                 metadata.listMCPMetadataSummaries(1L, services);
 
         assertEquals(2, summaries.get("plain").getToolCount());
@@ -292,7 +294,7 @@ class McpMetadataServiceTest {
 
         // 没有 principal 时 OAuth 服务被跳过，非 OAuth 服务照常
         TenantContext.clear();
-        Map<String, com.ragagent.mcp.domain.McpMetadataSummary> anonymous =
+        Map<String, McpMetadataSummary> anonymous =
                 metadata.listMCPMetadataSummaries(1L, services);
         assertNotNull(anonymous.get("plain"));
         assertNull(anonymous.get("oauth"));
@@ -325,7 +327,7 @@ class McpMetadataServiceTest {
         }
 
         // 上游已关闭：刷新必须失败，且保留上一次快照
-        assertThrows(com.ragagent.common.error.BizException.class,
+        assertThrows(BizException.class,
                 () -> metadata.refreshMCPMetadata(1, "svc"));
         McpMetadata got = metadata.getMCPMetadata(1, "svc");
         assertNotNull(got);

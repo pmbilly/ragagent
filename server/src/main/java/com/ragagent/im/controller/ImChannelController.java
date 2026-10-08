@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import com.ragagent.im.wechat.WechatQRCodeService;
 
 /**
  * IM 渠道 CRUD + 微信扫码状态面。
@@ -265,7 +266,7 @@ public class ImChannelController {
      * （不阻塞装配）；有 bean 则真调。
      */
     @org.springframework.beans.factory.annotation.Autowired(required = false)
-    private com.ragagent.im.wechat.WechatQRCodeService wechatQRCodeService;
+    private WechatQRCodeService wechatQRCodeService;
 
     /** 微信扫码出站：200 裸对象 {qrcode, qrcodeUrl}。 */
     @PostMapping("/api/v1/wechat/qrcode")
@@ -274,7 +275,7 @@ public class ImChannelController {
             throw new PlainErrorException(500,
                     "failed to generate QR code: wechat iLink integration is not wired");
         }
-        com.ragagent.im.wechat.WechatQRCodeService.QRCodeResult result;
+        WechatQRCodeService.QRCodeResult result;
         try {
             result = wechatQRCodeService.getLoginQRCode();
         } catch (Exception e) {
@@ -307,7 +308,7 @@ public class ImChannelController {
         if (wechatQRCodeService == null) {
             return plain(500, "failed to check QR code status");
         }
-        com.ragagent.im.wechat.WechatQRCodeService.LoginResult result;
+        WechatQRCodeService.LoginResult result;
         try {
             result = wechatQRCodeService.pollQRCodeStatus(req.qrcode());
         } catch (Exception e) {
@@ -330,7 +331,7 @@ public class ImChannelController {
     }
 
     /** 供测试注入扫码服务（生产走 Spring 字段注入）。 */
-    void wechatQRCodeService(com.ragagent.im.wechat.WechatQRCodeService service) {
+    void wechatQRCodeService(WechatQRCodeService service) {
         this.wechatQRCodeService = service;
     }
 

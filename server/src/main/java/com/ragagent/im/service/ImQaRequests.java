@@ -11,6 +11,7 @@ import com.ragagent.im.service.ImService.InflightEntry;
 import com.ragagent.session.domain.Message;
 import com.ragagent.session.domain.Session;
 import com.ragagent.session.service.QaSupport;
+import com.ragagent.session.domain.MessageAttachment;
 
 /**
  * QA 管线的共享底座：agent 模式判定、IM 请求构造（含 agent config 缺省补全）、
@@ -72,7 +73,7 @@ final class ImQaRequests {
 
     /** 用户消息落库（带附件元数据；无附件传空表）。 */
     Message createUserMessage(String sessionId, String content, String requestId,
-            List<com.ragagent.session.domain.MessageAttachment> attachments) {
+            List<MessageAttachment> attachments) {
         Message m = new Message();
         m.setSessionId(sessionId);
         m.setRole("user");

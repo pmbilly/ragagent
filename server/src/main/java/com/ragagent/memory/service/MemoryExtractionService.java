@@ -31,6 +31,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 import com.ragagent.common.session.SessionMessagePort;
+import com.ragagent.common.memory.MemoryKeys;
+import com.ragagent.memory.domain.MemoryConflictException;
+import com.ragagent.tracing.langfuse.LangfuseTracing;
 
 /**
  * 后台蒸馏：把一段对话变成记忆。
@@ -223,7 +226,7 @@ public class MemoryExtractionService {
         MemoryExtractPayload payload = MemoryExtractPayload.withTracing(
                 scope.tenantId(), scope.subjectId(),
                 sessionId, messageId, chatModelId, "",
-                com.ragagent.tracing.langfuse.LangfuseTracing.inject());
+                LangfuseTracing.inject());
         try {
             queue.enqueue(payload, delay);
         } catch (RuntimeException e) {
@@ -652,7 +655,7 @@ public class MemoryExtractionService {
                     target = existing.get(decision.target);
                 } else {
                     target = repo.findActiveByKey(scope,
-                            com.ragagent.common.memory.MemoryKeys.itemKey(topic, decision.content));
+                            MemoryKeys.itemKey(topic, decision.content));
                     if (target == null) {
                         continue;
                     }
@@ -660,7 +663,7 @@ public class MemoryExtractionService {
                 topic = target.getTopic();
             }
 
-            String key = com.ragagent.common.memory.MemoryKeys.itemKey(topic, decision.content);
+            String key = MemoryKeys.itemKey(topic, decision.content);
             if (!key.isEmpty() && seenTopics.contains(key)) {
                 continue;
             }
@@ -698,7 +701,7 @@ public class MemoryExtractionService {
                     continue;
                 } catch (MemoryScopeExceptions.SensitiveContent e) {
                     continue;
-                } catch (com.ragagent.memory.domain.MemoryConflictException e) {
+                } catch (MemoryConflictException e) {
                     continue;
                 } catch (RuntimeException e) {
                     throw new IllegalStateException("apply memory decision: " + e.getMessage(), e);

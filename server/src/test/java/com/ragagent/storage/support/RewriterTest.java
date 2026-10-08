@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 
 import com.ragagent.common.retrieval.SearchResult;
+import com.ragagent.tenant.Tenant;
 
 /**
  * {@link Rewriter} / {@link FileServiceResolver} 的对等测试。
@@ -371,7 +372,7 @@ class RewriterTest {
             resolved.incrementAndGet();
             return new StorageBackendResolver.Resolved(new StubFileService());
         };
-        com.ragagent.tenant.Tenant tenant = new com.ragagent.tenant.Tenant();
+        Tenant tenant = new Tenant();
         tenant.setId(10002L);
 
         FileServiceResolver resolver = new FileServiceResolver(tenant, null, backendResolver);

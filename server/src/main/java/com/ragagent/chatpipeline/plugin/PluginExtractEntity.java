@@ -13,6 +13,7 @@ import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.llm.extract.EntityExtraction;
 import com.ragagent.llm.extract.PipelineConfig;
+import com.ragagent.llm.LlmChatClient;
 
 /**
  * QUERY_UNDERSTAND 附加插件：
@@ -57,7 +58,7 @@ public final class PluginExtractEntity implements Plugin {
 
         String query = chatManage.getQuery();
 
-        com.ragagent.llm.LlmChatClient model;
+        LlmChatClient model;
         try {
             model = modelService.getChatModel(chatManage.getChatModelId());
         } catch (RuntimeException e) {

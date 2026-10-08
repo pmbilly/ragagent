@@ -48,6 +48,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
+import com.ragagent.datasource.DataSourceSyncEnqueueException;
 
 /**
  * {@link DataSourceService} 的语义测试。
@@ -650,7 +651,7 @@ class DataSourceServiceTest {
     @Test
     void manualSyncMarksBothSidesFailedOnEnqueueError() {
         DataSource ds = newDataSource(DataSourceConstants.CONNECTOR_TYPE_RSS, null, null);
-        enqueueFailure = new com.ragagent.datasource.DataSourceSyncEnqueueException("queue down");
+        enqueueFailure = new DataSourceSyncEnqueueException("queue down");
 
         assertThatThrownBy(() -> service.manualSync(ds.getId())).hasMessage("queue down");
 
@@ -670,7 +671,7 @@ class DataSourceServiceTest {
     void manualSyncKeepsPausedStatusOnEnqueueError() {
         DataSource ds = newDataSource(DataSourceConstants.CONNECTOR_TYPE_RSS,
                 DataSourceConstants.DATA_SOURCE_STATUS_PAUSED, null);
-        enqueueFailure = new com.ragagent.datasource.DataSourceSyncEnqueueException("queue down");
+        enqueueFailure = new DataSourceSyncEnqueueException("queue down");
 
         assertThatThrownBy(() -> service.manualSync(ds.getId()));
 

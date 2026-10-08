@@ -22,6 +22,8 @@ import com.ragagent.common.session.PipelineMessageAttachmentView;
 import com.ragagent.session.domain.Message;
 import com.ragagent.session.domain.MessageAttachment;
 import com.ragagent.llm.extract.PipelineConfig;
+import com.ragagent.llm.domain.ChatMessage;
+import com.ragagent.session.domain.MessageImage;
 
 /**
  * 录制回放：query_understand 族 + load_history + history_messages
@@ -436,10 +438,10 @@ class QueryUnderstandRecordingTest {
 
     private Message historyUserWithImages() {
         Message m = message("r1", "user", "第一问", Instant.parse("2024-01-01T00:00:00Z"));
-        var img1 = new com.ragagent.session.domain.MessageImage();
+        var img1 = new MessageImage();
         img1.setUrl("u1");
         img1.setCaption("图一");
-        var img2 = new com.ragagent.session.domain.MessageImage();
+        var img2 = new MessageImage();
         img2.setUrl("u2");
         m.setImages(new ArrayList<>(List.of(img1, img2)));
         return m;
@@ -502,8 +504,8 @@ class QueryUnderstandRecordingTest {
         var msgs4 = PipelineCommon.prepareMessagesWithHistory(cm4);
         assertRec("history_messages", "no_vision", json(msgsJSON(msgs4)));
 
-        List<com.ragagent.llm.domain.ChatMessage> base =
-                new ArrayList<>(List.of(new com.ragagent.llm.domain.ChatMessage("system", "S")));
+        List<ChatMessage> base =
+                new ArrayList<>(List.of(new ChatMessage("system", "S")));
         PipelineCommon.appendHistoryMessages(base, List.of(hist("Q", "A")));
         assertRec("history_messages", "append", json(msgsJSON(base)));
     }

@@ -40,6 +40,13 @@ import com.ragagent.retrieval.engine.PgVectorRetrieveRepository;
 import com.ragagent.retrieval.engine.RetrieveEngineFactories;
 import com.ragagent.retrieval.engine.RetrieveEngineRegistry;
 import com.ragagent.retrieval.engine.TenantStoreOwnership;
+import com.ragagent.common.context.TenantContext;
+import com.ragagent.common.security.LogSanitizer;
+import com.ragagent.event.TenantContextSnapshot;
+import com.ragagent.retrieval.config.RetrievalEnvLookup;
+import com.ragagent.retrieval.obs.RetrievalObs;
+import com.ragagent.tracing.langfuse.LangfuseManager;
+import com.ragagent.tracing.langfuse.Span;
 
 /**
  * HybridSearch 执行面：多 KB 检索的 store-group 路由、扇出执行、RRF 融合
@@ -238,9 +245,9 @@ public class HybridSearchService {
         retrieveMeta.put("embedding_model_id", primary.embeddingModelId());
         retrieveMeta.put("has_query_embedding",
                 params.getQueryEmbedding() != null && params.getQueryEmbedding().length > 0);
-        com.ragagent.tracing.langfuse.Span retrieveSpan =
-                com.ragagent.tracing.langfuse.LangfuseManager.get().startSpan(
-                        new com.ragagent.tracing.langfuse.LangfuseManager.SpanOptions(
+        Span retrieveSpan =
+                LangfuseManager.get().startSpan(
+                        new LangfuseManager.SpanOptions(
                                 "retrieve", retrieveInput, retrieveMeta));
         List<PgVectorRetrieveRepository.RetrieveResult> results;
         try {
@@ -251,7 +258,7 @@ public class HybridSearchService {
             retrieveSpan.finish(null, null, retrieveErr.toString());
             throw retrieveErr;
         }
-        retrieveSpan.finish(com.ragagent.retrieval.obs.RetrievalObs.summarizeRetrieveOutput(results),
+        retrieveSpan.finish(RetrievalObs.summarizeRetrieveOutput(results),
                 null, null);
 
         if (results.isEmpty() || results.stream().allMatch(r -> r.results().isEmpty())) {
@@ -350,7 +357,7 @@ public class HybridSearchService {
 
     /** 单个 (modelID, tenantId) 的身份键解析（属主租户上下文；失败回落 modelID）。 */
     private String resolveModelIdentity(ModelRef ref) {
-        com.ragagent.event.TenantContextSnapshot prev = com.ragagent.event.TenantContextSnapshot.capture();
+        TenantContextSnapshot prev = TenantContextSnapshot.capture();
         try {
             if (ref.tenantId() != null) {
                 prev.withTenantId(ref.tenantId()).replay();
@@ -389,7 +396,7 @@ public class HybridSearchService {
             }
             if (!k.equals(seen)) {
                 log.warn("multi-KB search rejected: embedding models differ, kb_id={}",
-                        com.ragagent.common.security.LogSanitizer.sanitize(kb.id()));
+                        LogSanitizer.sanitize(kb.id()));
                 throw new BizException(AppError.badRequest(
                         "selected knowledge bases use different embedding models; "
                                 + "multi-KB search requires every knowledge base to share a single "
@@ -575,7 +582,7 @@ public class HybridSearchService {
                 if (!isKnownEngineType(rr.retrieverEngineType())
                         && seenUnknown.add(rr.retrieverEngineType())) {
                     log.warn("score normalizer: unknown engine type, applying clamp01 fallback: "
-                            + "engine_type={}", com.ragagent.common.security.LogSanitizer.sanitize(
+                            + "engine_type={}", LogSanitizer.sanitize(
                                     rr.retrieverEngineType()));
                 }
             }
@@ -645,7 +652,7 @@ public class HybridSearchService {
      * 失败/非正值一律回落 30s。
      */
     static long multiStoreRetrieveTimeout() {
-        String raw = com.ragagent.retrieval.config.RetrievalEnvLookup.get("MULTI_STORE_RETRIEVE_TIMEOUT_SEC");
+        String raw = RetrievalEnvLookup.get("MULTI_STORE_RETRIEVE_TIMEOUT_SEC");
         if (raw == null || raw.isEmpty()) {
             return MULTI_STORE_RETRIEVE_TIMEOUT_SEC_DEFAULT;
         }
@@ -699,7 +706,7 @@ public class HybridSearchService {
     }
 
     JsonNode currentRetrieverEngines() {
-        Long tid = com.ragagent.common.context.TenantContext.currentTenantId();
+        Long tid = TenantContext.currentTenantId();
         try {
             return tid == null ? null : tenantConfigLookup.retrieverEngines(tid);
         } catch (Exception e) {
@@ -709,7 +716,7 @@ public class HybridSearchService {
 
     private RetrievalConfigView currentRetrievalConfig() {
         try {
-            Long tid = com.ragagent.common.context.TenantContext.currentTenantId();
+            Long tid = TenantContext.currentTenantId();
             JsonNode node = tid == null ? null : tenantConfigLookup.retrievalConfig(tid);
             if (node == null) {
                 return RetrievalConfigView.DEFAULTS;

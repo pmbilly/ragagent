@@ -18,6 +18,7 @@ import com.ragagent.chatpipeline.plugin.PluginSearchParallel;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.common.error.ErrorCode;
+import com.ragagent.common.retrieval.SearchTarget;
 
 /**
  * 回归：KB 检索的 <b>"硬错 vs 降级" 分级</b>。
@@ -52,7 +53,7 @@ class SearchGradingTest {
         cm.setEmbeddingTopK(5);
         cm.setTenantId(1);
         cm.setSearchTargets(new ArrayList<>(List.of(
-                new com.ragagent.common.retrieval.SearchTarget("knowledge_base", kbId, 1, null, null, null, false))));
+                new SearchTarget("knowledge_base", kbId, 1, null, null, null, false))));
         return cm;
     }
 

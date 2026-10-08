@@ -17,6 +17,10 @@ import com.ragagent.knowledge.client.DocReaderClient;
 import com.ragagent.session.domain.MessageAttachment;
 import com.ragagent.session.domain.TemporaryDocument;
 import com.ragagent.session.mapper.TemporaryDocumentRepository;
+import com.ragagent.auth.service.TenantService;
+import com.ragagent.llm.asr.AsrTranscriber;
+import com.ragagent.llm.chat.ImageResolver;
+import com.ragagent.model.service.ModelRuntimeFactory;
 
 /**
  * ResolveForPrompt + 图片落地（含 docreader 图片分支）的行为验收。
@@ -45,9 +49,9 @@ class TemporaryDocumentResolveForPromptTest {
         if (service == null) {
             fileStore = new AttachmentFileStore(tempDir.toString());
             service = new TemporaryDocumentService(repo, fileStore, docReader,
-                    mock(com.ragagent.model.service.ModelRuntimeFactory.class),
-                    mock(com.ragagent.llm.asr.AsrTranscriber.class),
-                    mock(com.ragagent.auth.service.TenantService.class));
+                    mock(ModelRuntimeFactory.class),
+                    mock(AsrTranscriber.class),
+                    mock(TenantService.class));
         }
         return service;
     }
@@ -56,9 +60,9 @@ class TemporaryDocumentResolveForPromptTest {
     private TemporaryDocumentProcessor processor() {
         service(); // 确保 fileStore（真实落盘目录）已建
         return new TemporaryDocumentProcessor(repo, fileStore, docReader,
-                mock(com.ragagent.model.service.ModelRuntimeFactory.class),
-                mock(com.ragagent.llm.asr.AsrTranscriber.class),
-                mock(com.ragagent.auth.service.TenantService.class));
+                mock(ModelRuntimeFactory.class),
+                mock(AsrTranscriber.class),
+                mock(TenantService.class));
     }
 
     // ── fixtures ─────────────────────────────────────────────────────────
@@ -344,12 +348,12 @@ class TemporaryDocumentResolveForPromptTest {
         service();
         byte[] png = pngBytes(64, 64);
         String url = fileStore.saveBytes(png, TENANT, "probe.png");
-        com.ragagent.llm.chat.ImageResolver.setLocalImageResolver(fileStore::getFile);
+        ImageResolver.setLocalImageResolver(fileStore::getFile);
         try {
-            String resolved = com.ragagent.llm.chat.ImageResolver.resolveImageUrlForLlm(url);
+            String resolved = ImageResolver.resolveImageUrlForLlm(url);
             assertThat(resolved).startsWith("data:image/png;base64,");
         } finally {
-            com.ragagent.llm.chat.ImageResolver.setLocalImageResolver(null);
+            ImageResolver.setLocalImageResolver(null);
         }
     }
 

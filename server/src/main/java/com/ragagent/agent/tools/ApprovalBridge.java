@@ -2,6 +2,13 @@ package com.ragagent.agent.tools;
 
 import com.ragagent.event.Event;
 import com.ragagent.event.EventBus;
+import com.ragagent.approval.Cancellation;
+import com.ragagent.approval.McpOauthRequiredData;
+import com.ragagent.approval.McpOauthResolvedData;
+import com.ragagent.approval.ToolApprovalRequiredData;
+import com.ragagent.approval.ToolApprovalResolvedData;
+import com.ragagent.event.payload.MCPOAuthRequiredData;
+import com.ragagent.event.payload.MCPOAuthResolvedData;
 
 /**
  * tools 包 ↔ approval 域的类型桥（两个包面之间的显式适配）。
@@ -19,11 +26,11 @@ public final class ApprovalBridge {
     private ApprovalBridge() {
     }
 
-    public static com.ragagent.approval.Cancellation toCancellation(ToolCancellation cancellation) {
+    public static Cancellation toCancellation(ToolCancellation cancellation) {
         if (cancellation == null) {
-            return com.ragagent.approval.Cancellation.none();
+            return Cancellation.none();
         }
-        return new com.ragagent.approval.Cancellation() {
+        return new Cancellation() {
             @Override
             public boolean isCancelled() {
                 return cancellation.cancellationError() != null;
@@ -88,25 +95,25 @@ public final class ApprovalBridge {
      * 未知形态原样透传（向后兼容）。
      */
     private static Object toPayloadData(Object data) {
-        if (data instanceof com.ragagent.approval.ToolApprovalRequiredData d) {
+        if (data instanceof ToolApprovalRequiredData d) {
             return new com.ragagent.event.payload.ToolApprovalRequiredData(
                     d.pendingId(), d.tenantId(), d.sessionId(), d.assistantMessageId(),
                     d.serviceId(), d.serviceName(), d.mcpToolName(), d.registeredToolName(),
                     d.description(), d.args(), d.argsJson(), d.timeoutSeconds(),
                     d.requestedAtUnix(), d.toolCallId(), d.requestId());
         }
-        if (data instanceof com.ragagent.approval.ToolApprovalResolvedData d) {
+        if (data instanceof ToolApprovalResolvedData d) {
             return new com.ragagent.event.payload.ToolApprovalResolvedData(
                     d.pendingId(), d.approved(), d.reason(), d.timedOut(), d.canceled());
         }
-        if (data instanceof com.ragagent.approval.McpOauthRequiredData d) {
-            return new com.ragagent.event.payload.MCPOAuthRequiredData(
+        if (data instanceof McpOauthRequiredData d) {
+            return new MCPOAuthRequiredData(
                     d.pendingId(), d.tenantId(), d.sessionId(), d.assistantMessageId(),
                     d.serviceId(), d.serviceName(), d.mcpToolName(), d.timeoutSeconds(),
                     d.requestedAtUnix(), d.toolCallId(), d.requestId());
         }
-        if (data instanceof com.ragagent.approval.McpOauthResolvedData d) {
-            return new com.ragagent.event.payload.MCPOAuthResolvedData(
+        if (data instanceof McpOauthResolvedData d) {
+            return new MCPOAuthResolvedData(
                     d.pendingId(), d.serviceId(), d.authorized(), d.reason(),
                     d.timedOut(), d.canceled());
         }

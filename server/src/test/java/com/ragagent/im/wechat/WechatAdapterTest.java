@@ -33,6 +33,7 @@ import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.ReplyMessage;
 import com.sun.net.httpserver.HttpServer;
+import com.ragagent.common.security.SsrfGuard;
 
 /**
  * 微信 iLink 机器人行为测试：
@@ -215,7 +216,7 @@ class WechatAdapterTest {
         assertThrows(IllegalArgumentException.class, () -> a.downloadFile(noUrl));
 
         WechatAdapter guarded = new WechatAdapter("tk", "bot", apiBase,
-                new com.ragagent.common.security.SsrfGuard() {
+                new SsrfGuard() {
                     @Override
                     public void validateURLForSSRF(String url) {
                         throw new IllegalArgumentException("blocked: " + url);

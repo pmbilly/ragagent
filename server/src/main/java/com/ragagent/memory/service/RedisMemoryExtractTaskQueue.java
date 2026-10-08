@@ -15,6 +15,7 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 import com.ragagent.common.taskqueue.RedisTaskQueueCore;
+import com.ragagent.tracing.langfuse.LangfuseTaskScope;
 
 /**
  * {@link MemoryExtractTaskQueue} 的 <b>Redis</b> 实现（跨实例共享任务表）。
@@ -126,12 +127,12 @@ public class RedisMemoryExtractTaskQueue implements MemoryExtractTaskQueue {
             MemoryExtractPayload payload = MemoryExtractPayload.fromJson(queued.body());
             // 任务侧观测——负载带 traceparent 就续接
             // 上游 trace，否则以任务类型开独立根；处理体包在同名 span 内。
-            try (com.ragagent.tracing.langfuse.LangfuseTaskScope scope =
-                         com.ragagent.tracing.langfuse.LangfuseTaskScope.start(
+            try (LangfuseTaskScope scope =
+                         LangfuseTaskScope.start(
                                  TASK_TYPE_MEMORY_EXTRACT, payload.tracing(),
                                  java.util.Map.of("subject_id", payload.subjectId(),
                                          "message_id", payload.messageId()),
-                                 com.ragagent.tracing.langfuse.LangfuseTaskScope
+                                 LangfuseTaskScope
                                          .previewPayload(queued.body()))) {
                 handler.handle(payload);
             }

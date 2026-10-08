@@ -26,6 +26,12 @@ import com.ragagent.session.service.SessionAgentQaService;
 import com.ragagent.session.service.SessionKnowledgeQaService;
 import com.ragagent.stream.StreamManager;
 import jakarta.servlet.http.HttpServletResponse;
+import com.ragagent.auth.service.TenantService;
+import com.ragagent.common.error.BizException;
+import com.ragagent.event.TenantContextSnapshot;
+import com.ragagent.session.domain.MessageExecutionContext;
+import com.ragagent.session.service.SessionLookupScope;
+import com.ragagent.session.service.SteerRunCoordinator;
 
 /**
  * {@code KnowledgeQaController} 的**执行/落库簇**：一整轮 QA 的编排（模式分派、
@@ -43,13 +49,13 @@ final class QaTurnExecutor {
     private final StreamManager streamManager;
     private final SessionKnowledgeQaService knowledgeQaService;
     private final SessionAgentQaService agentQaService;
-    private final com.ragagent.session.service.SteerRunCoordinator steerCoordinator;
+    private final SteerRunCoordinator steerCoordinator;
     private final QaSseOrchestrator sseOrchestrator;
     private final QaTurnFinalizer turnFinalizer;
     private final QaAttachmentResolver attachmentResolver;
-    private final com.ragagent.auth.service.TenantService tenantService;
+    private final TenantService tenantService;
 
-    QaTurnExecutor(MessageService messageService, StreamManager streamManager, SessionKnowledgeQaService knowledgeQaService, SessionAgentQaService agentQaService, com.ragagent.session.service.SteerRunCoordinator steerCoordinator, QaSseOrchestrator sseOrchestrator, QaTurnFinalizer turnFinalizer, QaAttachmentResolver attachmentResolver, com.ragagent.auth.service.TenantService tenantService) {
+    QaTurnExecutor(MessageService messageService, StreamManager streamManager, SessionKnowledgeQaService knowledgeQaService, SessionAgentQaService agentQaService, SteerRunCoordinator steerCoordinator, QaSseOrchestrator sseOrchestrator, QaTurnFinalizer turnFinalizer, QaAttachmentResolver attachmentResolver, TenantService tenantService) {
         this.messageService = messageService;
         this.streamManager = streamManager;
         this.knowledgeQaService = knowledgeQaService;
@@ -76,17 +82,17 @@ final class QaTurnExecutor {
         // 输入条状态（纯 UI memo）异步写：新虚拟线程没有 ThreadLocal——纪律 #1
         // 要求显式捕获-重放。旧实现直接 start，租户读到 0、owner 为空，
         // updateSessionLastRequestState 按 (tenant, owner) 过滤后静默 0 行。
-        final com.ragagent.event.TenantContextSnapshot memoTenant =
-                com.ragagent.event.TenantContextSnapshot.capture();
+        final TenantContextSnapshot memoTenant =
+                TenantContextSnapshot.capture();
         Thread.ofVirtual().start(() -> {
             memoTenant.replay();
             // 派生线程同样按会话属主租户查
-            com.ragagent.session.service.SessionLookupScope.mark();
+            SessionLookupScope.mark();
             try {
                 turnFinalizer.persistLastRequestState(reqCtx, mode);
             } finally {
                 TenantContext.clear();
-                com.ragagent.session.service.SessionLookupScope.clear();
+                SessionLookupScope.clear();
             }
         });
 
@@ -177,12 +183,12 @@ final class QaTurnExecutor {
         // 纪律 #1：TenantContext 是 ThreadLocal，跨虚拟线程必须显式 capture/replay。
         // 共享 agent → 异步段以源租户为
         // 执行租户（模型/KB/MCP 解析范围；身份不变）；租户不存在则不切换。
-        final com.ragagent.event.TenantContextSnapshot requestTenant =
+        final TenantContextSnapshot requestTenant =
                 reqCtx.effectiveTenantId != 0
                         && tenantService.getTenantById(reqCtx.effectiveTenantId) != null
-                ? com.ragagent.event.TenantContextSnapshot.capture()
+                ? TenantContextSnapshot.capture()
                         .withTenantId(reqCtx.effectiveTenantId)
-                : com.ragagent.event.TenantContextSnapshot.capture();
+                : TenantContextSnapshot.capture();
         if (reqCtx.effectiveTenantId == requestTenant.tenantId() && reqCtx.effectiveTenantId != 0) {
             log.info("Using effective tenant {} for shared agent (model/KB/MCP)",
                     reqCtx.effectiveTenantId);
@@ -194,7 +200,7 @@ final class QaTurnExecutor {
                 // 本线程上的会话/消息查询按会话属主
                 // 租户范围——共享 agent 场景下当前主体不是属主，带 user 范围会查不到。
                 // 线程收尾处清理（见下方 finally 的 TenantContext.clear() 旁）。
-                com.ragagent.session.service.SessionLookupScope.mark();
+                SessionLookupScope.mark();
                 attachmentResolver.resolveTemporaryAttachments(streamCtx, reqCtx);
                 QaSupport.QaRequest qaReq = reqCtx.buildQaRequest();
                 // 用户停止 → 引擎取消（取消探针贯穿 think/act/审批等待三条路）：
@@ -214,7 +220,7 @@ final class QaTurnExecutor {
                 // 错误文案取 wireText：**带** "error code: N, error message: M" 前缀，
                 // 前缀本身是契约（见 docs/known-issues/09-e2e-observations.md 的记录），
                 // 不要剥成裸 message；只需保证不吐 Java 异常类名。
-                errData.setError(com.ragagent.common.error.BizException.wireText(serviceErr));
+                errData.setError(BizException.wireText(serviceErr));
                 errData.setStage(mode == QaMode.NORMAL ? "knowledge_qa_execution" : "agent_execution");
                 errData.setSessionId(sessionId);
                 errEvt.setData(errData);
@@ -258,7 +264,7 @@ final class QaTurnExecutor {
                 }
                 // 收尾（含身份相关的库写）完成后再清线程上下文
                 TenantContext.clear();
-                com.ragagent.session.service.SessionLookupScope.clear();
+                SessionLookupScope.clear();
                 if (asyncDone != null) {
                     asyncDone.complete(null);
                 }
@@ -370,8 +376,8 @@ final class QaTurnExecutor {
         m.setAttachments(attachments);
         m.setChannel(reqCtx.channel);
         if (reqCtx.suggestionAttribution != null) {
-            com.ragagent.session.domain.MessageExecutionContext ctx =
-                    new com.ragagent.session.domain.MessageExecutionContext();
+            MessageExecutionContext ctx =
+                    new MessageExecutionContext();
             ctx.setSuggestionAttribution(reqCtx.suggestionAttribution);
             m.setExecutionContext(ctx);
         }

@@ -25,6 +25,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import com.ragagent.common.memory.MemoryRetrievalContext;
+import com.ragagent.common.memory.MemoryKeys;
 
 /**
  * service 层的编排逻辑，跑在**真实 H2 仓储**上（照 §7.5 与
@@ -445,7 +446,7 @@ class MemoryServiceOrchestrationTest {
         void promotedTopicsAppearInTheManagerList() {
             // 手工造一条已计数但未提升的主题（observeTopics 要模型，这里只验投影）
             var stat = repo.bumpTopic(scope, "门店排班管理",
-                    com.ragagent.common.memory.MemoryKeys.normalizeTopicKey("门店排班管理"),
+                    MemoryKeys.normalizeTopicKey("门店排班管理"),
                     "店员班次安排");
 
             var page = memoryService.listTopics(50, 0);
@@ -465,7 +466,7 @@ class MemoryServiceOrchestrationTest {
         @Test
         void deleteTopicRemembersTheRefusal() {
             var stat = repo.bumpTopic(scope, "门店排班管理",
-                    com.ragagent.common.memory.MemoryKeys.normalizeTopicKey("门店排班管理"), "");
+                    MemoryKeys.normalizeTopicKey("门店排班管理"), "");
             memoryService.deleteTopic(stat.getId());
 
             assertThat(repo.topicById(scope, stat.getId())).isNull();

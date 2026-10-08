@@ -38,6 +38,8 @@ import org.junit.jupiter.api.Test;
 import com.ragagent.agent.GoRecording;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ToolCall;
+import com.ragagent.agent.tools.RecordingSupport;
+import com.ragagent.llm.domain.FunctionCall;
 
 /**
  * 摘要序列化的录制常量断言。
@@ -57,7 +59,7 @@ class ConversationSerializerTest {
     private ToolCall call(String id, String name, String arguments) {
         ToolCall tc = new ToolCall();
         tc.setId(id);
-        tc.setFunction(new com.ragagent.llm.domain.FunctionCall(name, arguments));
+        tc.setFunction(new FunctionCall(name, arguments));
         return tc;
     }
 
@@ -115,8 +117,8 @@ class ConversationSerializerTest {
      * HTML 转义形态（{@code \u003c} ↔ {@code <}）不再构成断言目标。
      */
     private static String fold(String s) {
-        return com.ragagent.agent.tools.RecordingSupport.normalizeEscapes(
-                com.ragagent.agent.tools.RecordingSupport.normalizeNumberText(s));
+        return RecordingSupport.normalizeEscapes(
+                RecordingSupport.normalizeNumberText(s));
     }
 
     @Test

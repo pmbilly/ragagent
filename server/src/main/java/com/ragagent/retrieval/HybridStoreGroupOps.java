@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ragagent.retrieval.HybridSearchService.StoreGroup;
+import com.ragagent.common.security.LogSanitizer;
 
 /**
  * HybridSearch 的 store-group 解析簇：KB 按 (vectorStoreId, 属主租户) 分桶、逐组经工厂
@@ -92,7 +93,7 @@ final class HybridStoreGroupOps {
     static BizException classifyFactoryError(RuntimeException err, long tenantId,
                                                      String storeId) {
         log.warn("resolve store engine failed: tenant_id={} store_id={} reason={} err={}",
-                tenantId, com.ragagent.common.security.LogSanitizer.sanitize(storeId),
+                tenantId, LogSanitizer.sanitize(storeId),
                 "resolve store engine", err.toString());
         if (err instanceof RetrieveEngineException e) {
             switch (e.kind()) {

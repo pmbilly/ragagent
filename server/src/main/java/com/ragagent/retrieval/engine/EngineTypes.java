@@ -2,6 +2,7 @@ package com.ragagent.retrieval.engine;
 
 import java.util.List;
 import java.util.Map;
+import com.ragagent.retrieval.config.RetrievalEnvLookup;
 
 /**
  * 检索引擎共享类型（IndexInfo/MatchType/RetrieveParams/IndexWithScore/RetrieveResult）。
@@ -47,7 +48,7 @@ public final class EngineTypes {
         if (indexName != null && !indexName.isEmpty()) {
             return indexName;
         }
-        String env = envKey == null ? null : com.ragagent.retrieval.config.RetrievalEnvLookup.get(envKey);
+        String env = envKey == null ? null : RetrievalEnvLookup.get(envKey);
         if (env != null && !env.isEmpty()) {
             return env;
         }

@@ -33,6 +33,10 @@ import com.ragagent.embedding.Embedder;
 import com.ragagent.embedding.EmbedderConfig;
 import com.ragagent.embedding.EmbedderFactory;
 import com.ragagent.model.service.ModelRuntimeConfigs;
+import com.ragagent.knowledge.client.DocReaderClient;
+import com.ragagent.knowledge.storage.LocalStorageService;
+import com.ragagent.llm.provider.ProviderName;
+import com.ragagent.llm.provider.ProviderRegistry;
 
 /**
  * 模型连通性测试端点用例（remote/embedding/rerank/asr/multimodal）与测试模型装配、SSRF 校验、密钥解密机制。
@@ -49,9 +53,9 @@ public final class ModelConnectivityTestService {
     private final ConcurrencyGovernor concurrencyGovernor;
     private final CryptoService cryptoService;
     private final AsrTranscriber asrTranscriber;
-    private final com.ragagent.knowledge.client.DocReaderClient documentReader;
+    private final DocReaderClient documentReader;
 
-    public ModelConnectivityTestService(ModelService modelService, SsrfGuard ssrfGuard, OllamaService ollamaService, ConcurrencyGovernor concurrencyGovernor, CryptoService cryptoService, AsrTranscriber asrTranscriber, com.ragagent.knowledge.client.DocReaderClient documentReader) {
+    public ModelConnectivityTestService(ModelService modelService, SsrfGuard ssrfGuard, OllamaService ollamaService, ConcurrencyGovernor concurrencyGovernor, CryptoService cryptoService, AsrTranscriber asrTranscriber, DocReaderClient documentReader) {
         this.modelService = modelService;
         this.ssrfGuard = ssrfGuard;
         this.ollamaService = ollamaService;
@@ -263,7 +267,7 @@ public final class ModelConnectivityTestService {
             }
             default -> throw new BizException(AppError.badRequest("无效的存储类型"));
         }
-        long maxSizeMB = com.ragagent.knowledge.storage.LocalStorageService.maxFileSizeMb();
+        long maxSizeMB = LocalStorageService.maxFileSizeMb();
         long maxSize = maxSizeMB * 1024 * 1024;
         if (image == null) {
             throw new BizException(AppError.badRequest("获取上传图片失败"));
@@ -506,9 +510,9 @@ public final class ModelConnectivityTestService {
     private static String providerValue(Model model) {
         var p = model.getParameters();
         String value = p == null ? "" : orEmpty(p.getProvider());
-        var name = com.ragagent.llm.provider.ProviderName.fromValue(value);
+        var name = ProviderName.fromValue(value);
         if (name == null) {
-            name = com.ragagent.llm.provider.ProviderRegistry.detectProvider(
+            name = ProviderRegistry.detectProvider(
                     p == null ? "" : orEmpty(p.getBaseUrl()));
         }
         return name == null ? "" : name.value();

@@ -18,6 +18,7 @@ import com.ragagent.storage.service.ResourceCatalogService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import com.ragagent.common.web.ContentTypeByFilename;
 
 /**
  * 文件代理面共享处理器：
@@ -165,7 +166,7 @@ public class FileProxyService {
             plainStatus(response, HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-        var safe = com.ragagent.common.web.ContentTypeByFilename.safe(resolved);
+        var safe = ContentTypeByFilename.safe(resolved);
         streamStoredFile(response, request, opened, resolved, safe.contentType(), safe.inline(),
                 "public, max-age=86400");
     }
@@ -226,7 +227,7 @@ public class FileProxyService {
             plainStatus(response, HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-        var safe = com.ragagent.common.web.ContentTypeByFilename.safe(filePath);
+        var safe = ContentTypeByFilename.safe(filePath);
         // ⚠️ 此处不带 filename——Content-Type 从路径派生，Content-Disposition 落成
         // 裸 "inline"/"attachment"。
         streamStoredFile(response, request, opened, "", safe.contentType(), safe.inline(),
@@ -325,7 +326,7 @@ public class FileProxyService {
         }
         String fileName = resource.getOriginalName() == null || resource.getOriginalName().isEmpty()
                 ? resource.getPhysicalPath() : resource.getOriginalName();
-        var safe = com.ragagent.common.web.ContentTypeByFilename.safe(fileName);
+        var safe = ContentTypeByFilename.safe(fileName);
         streamStoredFile(response, request, opened, fileName, safe.contentType(), safe.inline(),
                 "private, max-age=300");
     }

@@ -25,6 +25,18 @@ import com.ragagent.rerank.Reranker;
 
 import com.ragagent.model.service.ModelRuntimeConfigs;
 import com.ragagent.session.support.PipelineViews;
+import com.ragagent.agent.AgentBudgets;
+import com.ragagent.agent.skills.SkillCatalogService;
+import com.ragagent.approval.Gate;
+import com.ragagent.knowledge.service.KnowledgeService;
+import com.ragagent.llm.chat.LlmChatClients;
+import com.ragagent.llm.limiter.ConcurrencyGovernor;
+import com.ragagent.llm.ollama.OllamaService;
+import com.ragagent.mcp.protocol.McpClientManager;
+import com.ragagent.mcp.service.McpMetadataService;
+import com.ragagent.mcp.service.McpServiceService;
+import com.ragagent.rerank.RerankerFactory;
+import com.ragagent.storage.service.ResourceCatalogService;
 
 /**
  * agent 问答 service 面。
@@ -61,8 +73,8 @@ public class SessionAgentQaService {
     private final AgentEngineAssembler engineAssembler;
 
     /** 并发闸门（chat 工厂注入；null 会让 ConcurrencyChatClient NPE）。 */
-    private final com.ragagent.llm.limiter.ConcurrencyGovernor concurrencyGovernor;
-    private final org.springframework.beans.factory.ObjectProvider<com.ragagent.llm.ollama.OllamaService>
+    private final ConcurrencyGovernor concurrencyGovernor;
+    private final org.springframework.beans.factory.ObjectProvider<OllamaService>
             ollamaService;
 
     public SessionAgentQaService(MessageService messageService,
@@ -70,20 +82,20 @@ public class SessionAgentQaService {
             MemoryService memoryService,
             SessionKnowledgeQaService knowledgeQa,
             AgentToolBackends toolBackends,
-            com.ragagent.storage.service.ResourceCatalogService resourceCatalog,
+            ResourceCatalogService resourceCatalog,
             javax.sql.DataSource dataSource,
             ArtifactCollectorWiring artifactCollectorWiring,
-            com.ragagent.knowledge.service.KnowledgeService knowledgeService,
+            KnowledgeService knowledgeService,
             FaqEntryQueryService faqService,
-            com.ragagent.llm.limiter.ConcurrencyGovernor concurrencyGovernor,
-            org.springframework.beans.factory.ObjectProvider<com.ragagent.llm.ollama.OllamaService>
+            ConcurrencyGovernor concurrencyGovernor,
+            org.springframework.beans.factory.ObjectProvider<OllamaService>
                     ollamaService,
-            com.ragagent.mcp.service.McpServiceService mcpServiceService,
-            com.ragagent.mcp.service.McpMetadataService mcpMetadataService,
-            com.ragagent.mcp.protocol.McpClientManager mcpClientManager,
-            com.ragagent.approval.Gate toolApprovalGate,
+            McpServiceService mcpServiceService,
+            McpMetadataService mcpMetadataService,
+            McpClientManager mcpClientManager,
+            Gate toolApprovalGate,
             VlmDescriberWiring vlmDescriberWiring,
-            com.ragagent.agent.skills.SkillCatalogService skillCatalogService) {
+            SkillCatalogService skillCatalogService) {
         this.concurrencyGovernor = concurrencyGovernor;
         this.ollamaService = ollamaService;
         this.modelService = modelService;
@@ -161,7 +173,7 @@ public class SessionAgentQaService {
             agentConfig.setMaxContextTokens(agentConfig.getMaxContextTokens() > 0
                     ? agentConfig.getMaxContextTokens()
                     : (modelContextWindow > 0 ? modelContextWindow
-                            : com.ragagent.agent.AgentBudgets.DEFAULT_MAX_CONTEXT_TOKENS));
+                            : AgentBudgets.DEFAULT_MAX_CONTEXT_TOKENS));
             log.info("Agent context window: {} tokens (model {} declares {})",
                     agentConfig.getMaxContextTokens(), effectiveModelId, modelContextWindow);
 
@@ -302,7 +314,7 @@ public class SessionAgentQaService {
                 p == null ? null : p.getAppId(), p == null ? null : p.getAppSecret());
         // ⚠️ 2026-09-23 修复：governor/ollama 曾传 null——并发闸门装配（95a49c4）后
         // ConcurrencyChatClient 必调 gateNamedN，agent 路径任何 LLM 调用都会 NPE。
-        return com.ragagent.llm.chat.LlmChatClients.create(config,
+        return LlmChatClients.create(config,
                 ollamaService.getIfAvailable(), concurrencyGovernor);
     }
 
@@ -311,7 +323,7 @@ public class SessionAgentQaService {
         var p = model == null ? null : model.getParameters();
         var config = ModelRuntimeConfigs.rerankerConfig(model,
                 p == null ? null : p.getAppId(), p == null ? null : p.getAppSecret());
-        return com.ragagent.rerank.RerankerFactory.newReranker(config);
+        return RerankerFactory.newReranker(config);
     }
 
     // ==================================================================

@@ -33,8 +33,9 @@ ArchUnit 1.3.0 **已是测试依赖**（`server/build.gradle.kts:111`），可�
 
 ### 1.3 环：既有守卫只覆盖"两两双向"，真实环是间接的
 
-`scripts/check-package-cycles.py` 的 R1 只查 `A→B 且 B→A`（**当前 0 组**），
-但按"包级强连通分量"（SCC）实测存在 **2 个间接环**：
+`scripts/check-package-cycles.py` 的 R1 只查 `A→B 且 B→A`，但按"包级强连通分量"（SCC）实测曾存在 **2 个间接环**（下表均已解）：
+
+> ⚠️ **B111 修正**：下表"已解 / 包图 DAG"的结论建立在**只解析 import 行**的读数上。清掉 1,331 行内联全限定名后，依赖图第一次完整，实测 **R1 = 2 组（`agent⇄auth`、`agent⇄im`）、R1b = 1 组（8 域）**——这些边一直都在，只是此前不可见。详见 **§3**。
 
 | SCC | 成员 | 状态（2026-10-08 B91） |
 |---|---|---|
@@ -112,4 +113,67 @@ ArchUnit 1.3.0 **已是测试依赖**（`server/build.gradle.kts:111`），可�
 | `chatpipeline → websearch` | ✅ B106（1 处） | 端口签名改收 **L1 配置**（`common.tenant.WebSearchConfig`）；执行面配置的转换搬进域侧 `WebSearchService.WebSearchConfig.from(...)`，适配仍在 `session/QaWiring` |
 | `chatpipeline → memory` | ✅ B106（5 处） | `MemoryRecall`/`MemoryRetrievalContext` 下沉 `common.memory`（条目改 `MemoryItemView` ✓ 实体不越层）；`MemoryText.mergeUsedMemories` 的通用去重下沉 `common.text.ListMerges`（记忆侧保留薄委托）；`QaWiring` 变成纯委托 |
 | `retrieval → vectorstore` | ✅ B107（14 处 + 1 处全限定遗漏） | **性质判定**：`vectorstore` 有 `domain`(7)/`mapper`/`controller`/`service` ⇒ 是**业务域**（驱动在 `retrieval/engine/*`），不能靠"重分类"绕过 ⇒ 处置：① **值对象下沉**——`IndexConfig`/`ConnectionConfig`（公开字段 JSON DTO，域与 L2 共用）→ `common.vectorstore`；② **实体/mapper 端口化**——`VectorStoreView`（id/tenantId/name/engineType + 两个配置）+ `VectorStoreLookup.byId(tenantId, storeId)`，实现留 `vectorstore/service/VectorStoreLookupAdapter`（直接委托 `VectorStoreRepository#getByID`）；③ 纯谓词也下沉——`EnvStoreIds.isEnvStoreId`（`__env_` 前缀，`vectorstore.domain.EnvVectorStores` 保留同名委托）；④ 装配层 `config/RetrievalEngineWiringConfig` 改注入端口；测试替身 `FakeStoreRepo` 从"实现整个 mapper"收窄为"实现 1 个方法的端口"（净删 4 个多余重写）|
-| `chatpipeline → knowledge` | ◐ B110（17 → **12 处**） | **B110 清掉 5 处**：① **元数据载荷下沉**——`FaqChunkMetadata`/`DocumentChunkMetadata`/`GeneratedQuestion`（三者的 `com.ragagent.*` import 实测为 0，纯 JSON 载荷）→ `common.knowledge`；② **算法下沉**——`SearchChunkMerge`（187 行，`mergeTextChunks` 只读 `getStartAt/getChunkIndex/getContent/getEndAt`，**正好落在 6 字段 `ChunkView` 里**）→ `common.retrieval` 并改收 `ChunkView`（`KnowledgeSummaryService` 用 `ChunkPortAdapter.viewAll` 投影，投影方法转 public 作域内公用）。**剩余 12 处**：9 处**实体**（`Chunk`×3/`Knowledge`×3/`KnowledgeBase`×3）+ 3 处 `ImageInfoEnricher`（用的是 `collectImageInfoByChunkIds`/`enrichContentWithImageInfoForChat`/`clearImageInfoTextMatchingBody` **三个不同的静态方法**，其中 collector 的形参是 `BiFunction<…, List<Chunk>>` ⇒ 要么给 `ChunkView` 补回 `imageInfo` 字段、要么按 C2 的做法扩端口；三个方法本体是纯文本函数，可单独下沉）|
+| `chatpipeline → knowledge` | ◐ B110+B111（17 → **15 处**，B111 盲区修正 +3） | **B110 清掉 5 处**：① **元数据载荷下沉**——`FaqChunkMetadata`/`DocumentChunkMetadata`/`GeneratedQuestion`（三者的 `com.ragagent.*` import 实测为 0，纯 JSON 载荷）→ `common.knowledge`；② **算法下沉**——`SearchChunkMerge`（187 行，`mergeTextChunks` 只读 `getStartAt/getChunkIndex/getContent/getEndAt`，**正好落在 6 字段 `ChunkView` 里**）→ `common.retrieval` 并改收 `ChunkView`（`KnowledgeSummaryService` 用 `ChunkPortAdapter.viewAll` 投影，投影方法转 public 作域内公用）。**剩余 12 处**：9 处**实体**（`Chunk`×3/`Knowledge`×3/`KnowledgeBase`×3）+ 3 处 `ImageInfoEnricher`（用的是 `collectImageInfoByChunkIds`/`enrichContentWithImageInfoForChat`/`clearImageInfoTextMatchingBody` **三个不同的静态方法**，其中 collector 的形参是 `BiFunction<…, List<Chunk>>` ⇒ 要么给 `ChunkView` 补回 `imageInfo` 字段、要么按 C2 的做法扩端口；三个方法本体是纯文本函数，可单独下沉）|
+| `webfetch → datasource` | 🆕 **B111 新暴露（2 处）** | `webfetch/AgentMarkdown` 静态复用 `datasource.connector.rss` 的 `HtmlToMarkdown`/`JdkHtmlToMarkdown`（此前整条边在图里不存在）⇒ 候选修法：两个实现若是纯文本函数（实测域依赖为 0）则下沉 `common.text`/`common.web`，否则给 webfetch 立窄端口。**待 B112+ 侦察** |
+
+## 3. B111 发现：内联全限定名是依赖图的盲区（已上 R8 守卫）
+
+### 3.1 问题
+
+`check-package-cycles.py` 的 R1/R1b/R3/R3b **只解析 `import` 行**
+（`^import com\.ragagent\.(\w+)\.`）。代码里写成 `com.ragagent.x.y.Z` 的内联全限定名
+**不产生 import 行**，于是：编译期/字节码层面的依赖**真实存在**，但守卫的图里**没有这条边**
+⇒ "环 0 组 / L2→L3 1 条" 一直是**代理指标**的读数。
+
+B107 已踩过一次局部（"14 处 + 1 处全限定遗漏"），B111 把它系统性清算。
+
+### 3.2 清算结果（2026-10-08 B111）
+
+| 项 | 处数 |
+|---|---|
+| 清点（改前，含内联 FQ 的行） | **1,331 行 / 312 文件**（主源码 842/186、测试 489/126） |
+| 转为 `import` + 简单名 | **1,343 处**（主源码 838 + 测试 505） |
+| 保留：必要消歧 | **49 处**（主 31 + 测试 18） |
+| 保留：不可解析（非类型引用） | 2 处 |
+
+转换**只替换类型前缀**、保留 `.MEMBER` 尾巴——`case ToolDefinitions.TOOL_KNOWLEDGE_SEARCH ->`
+（枚举常量）与 `ContractJson.semantic`（静态调用）两类均抽样验证；全量编译 0 错误、
+后端全量测试绿。
+
+**转换后守卫第一次说出真实读数**（对照旧基线，全部是**暴露**而非新增）：
+
+| 指标 | 转换前（盲读数） | 转换后（真读数） | 来源 |
+|---|---|---|---|
+| R1 两两环 | 0 组 | **2 组** | `agent⇄auth`（各 1 文件 2 处）、`agent⇄im`（1 处 + 14 处 / 9 文件） |
+| R1b 间接环 | 0 组 | **1 组（8 域）** | `{agent,auth,chatpipeline,datasource,im,memory,session,webfetch}` |
+| R3 L2→L3 直连 | 1 条 | **2 条** | 新增 `webfetch→datasource`（2 处）；`chatpipeline→knowledge` 处数 12 → **15** |
+
+基线已按真读数重刷（脚本 docstring 记明"不是新增违例，而是原先看不见"）。
+
+### 3.3 新增守卫 R8（禁内联全限定名）
+
+规则：代码内（非注释 / 非字符串 / 非 `package`·`import` 声明行）不得出现 `com.ragagent.*` 内联引用；
+**唯一例外是"必要消歧"**——简单名在本文件作用域内已被占用（已导入其它包的类型 / 本文件已声明 /
+同包有顶层同名类型）。此时内联 FQ 不产生隐形依赖（依赖已被其它途径表达），且换成 import 根本无法编译。
+
+- 当前读数：**必要消歧 31 处（允许）/ 违规 0 处**
+- 红态探针：往 `agent/AgentConsts.java` 注入 `com.ragagent.event.EventIds.class.hashCode()`
+  → 报 `违规 1 处` 并置守卫为失败 ✓（探针已删）
+- **真正价值**：内联 FQ 归零后，`import` 成为唯一的跨域引用方式 ⇒ R1/R1b/R3/R3b
+  从"代理测量"升级为"真测量"，图再无旁路。
+
+### 3.4 顺延与修正
+
+- 原计划的 **B111（L2→L3 剩余清零）顺延为 B112**，目标数由 **12 修正为 15 处**
+  （那 3 处本来就是依赖，只是此前不计数）。
+- **新增切割项 C9/C10**（两两环，规模都不大）：
+
+| # | 边 | 处数 | 站点 | 修法建议 |
+|---|---|---|---|---|
+| C9 | `agent → auth` | 2（1 文件） | `agent/management/service/CustomAgentService` | 待侦察 |
+| C9b | `auth → agent` | 2（1 文件） | `auth/controller/TenantConfigOps`（`PromptTemplateCatalog.toJson`/`load`、`BuiltinAgentRegistry`） | `agent` 的只读目录端口化 |
+| C10 | `agent → im` | 1（1 文件） | `agent/management/service/CustomAgentService`（与 C9 同文件 ⇒ 该文件是环枢纽） | 待侦察 |
+| C10b | `im → agent` | 14（9 文件） | `im/domain/*Entity`、`im/runtime/*`、`im/service/*` | 待侦察（大头在 im 侧） |
+
+> 注：本节编号属**包图守卫脚本**的编号空间（R1~R8），与 `ArchitectureRulesTest`
+> 的代码级规则编号（R6~R10）相互独立。

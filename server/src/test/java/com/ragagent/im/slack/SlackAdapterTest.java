@@ -29,6 +29,7 @@ import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.ReplyMessage;
 import com.sun.net.httpserver.HttpServer;
+import com.ragagent.im.service.ImService;
 
 /**
  * Slack 出站客户端行为测试：验签（v0 签名 + 5 分钟窗）、
@@ -213,7 +214,7 @@ class SlackAdapterTest {
         webhook.setId("ch-1");
         webhook.setMode("webhook");
         webhook.setCredentials("{\"bot_token\":\"TOK\",\"signing_secret\":\"sec\"}");
-        com.ragagent.im.service.ImService.AdapterRegistration reg =
+        ImService.AdapterRegistration reg =
                 factory.create(webhook, (msg, chId) -> { });
         assertNotNull(reg.adapter());
         assertEquals(ImTypes.PLATFORM_SLACK, reg.adapter().platform());

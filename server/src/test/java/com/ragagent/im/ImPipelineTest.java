@@ -25,6 +25,8 @@ import com.ragagent.im.runtime.AdapterInterfaces.Adapter;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.ReplyMessage;
 import com.ragagent.im.service.ImService;
+import com.ragagent.im.runtime.CallbackExchange;
+import com.ragagent.im.service.ImService;
 
 /**
  * W5γ2：IM 管线端到端（回调 → ACK → 去重/命令/会话解析 → QA → 回复送达）。
@@ -82,12 +84,12 @@ class ImPipelineTest {
                 }
 
                 @Override
-                public Exception verifyCallback(com.ragagent.im.runtime.CallbackExchange exchange) {
+                public Exception verifyCallback(CallbackExchange exchange) {
                     return null;
                 }
 
                 @Override
-                public IncomingMessage parseCallback(com.ragagent.im.runtime.CallbackExchange exchange) {
+                public IncomingMessage parseCallback(CallbackExchange exchange) {
                     String body = new String(exchange.body(), StandardCharsets.UTF_8);
                     String text = body.replaceAll(".*\"text\":\"", "")
                             .replaceAll("\".*", "");
@@ -106,11 +108,11 @@ class ImPipelineTest {
                 }
 
                 @Override
-                public boolean handleURLVerification(com.ragagent.im.runtime.CallbackExchange exchange) {
+                public boolean handleURLVerification(CallbackExchange exchange) {
                     return false;
                 }
             };
-            return new com.ragagent.im.service.ImService.AdapterRegistration(fake, null);
+            return new ImService.AdapterRegistration(fake, null);
         });
     }
 

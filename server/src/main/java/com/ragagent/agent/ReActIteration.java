@@ -18,6 +18,7 @@ import com.ragagent.llm.domain.ChatResponse;
 import com.ragagent.llm.domain.ChatTool;
 import com.ragagent.tracing.langfuse.LangfuseManager;
 import com.ragagent.tracing.langfuse.Span;
+import com.ragagent.common.context.TenantContext;
 
 /**
  * 单个 ReAct 迭代（think → analyze → act → observe）的编排协作者：轮 span 生命周期、
@@ -125,7 +126,7 @@ final class ReActIteration {
 
         log.info("[Agent][Round-{}/{}] Starting: {} messages, {} tools, est_tokens={}, tenantId={}",
                 round, engine.maxIterationsDisplay(), messagesRef.items.size(), tools.size(), currentTokens,
-                com.ragagent.common.context.TenantContext.currentTenantId());
+                TenantContext.currentTenantId());
         engine.contextDebug.logContextPrediction(round, messagesRef.items, tools, currentTokens);
         log.info("[PIPELINE] stage=Agent action=round_start iteration={} round={} message_count={} pending_tools={} max_iterations={}",
                 state.getCurrentRound(), round, messagesRef.items.size(), tools.size(),

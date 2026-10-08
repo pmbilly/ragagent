@@ -19,6 +19,7 @@ import com.ragagent.datasource.domain.SyncCursor;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import com.ragagent.common.web.ZeroTimeSerializer;
 
 /**
  * IMA 连接器的语义测试。
@@ -542,7 +543,7 @@ class ImaConnectorTest {
             assertThat(resources.get(0).getUrl()).isEqualTo(f.baseUrl());
             // 零值时间 → 恒输出的 year-1 字面量（见 Resource 的类注释）
             assertThat(resources.get(0).getModifiedAt())
-                    .isEqualTo(com.ragagent.common.web.ZeroTimeSerializer.ZERO_DATE_TIME);
+                    .isEqualTo(ZeroTimeSerializer.ZERO_DATE_TIME);
         }
     }
 

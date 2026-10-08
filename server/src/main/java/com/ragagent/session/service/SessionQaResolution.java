@@ -8,6 +8,7 @@ import com.ragagent.chatpipeline.ChatManage;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.model.domain.Model;
 import com.ragagent.session.domain.Session;
+import com.ragagent.agent.management.domain.CustomAgentEntity;
 
 /**
  * 知识库/模型/租户解析协作者:mention 与 tag 范围收敛到 agent 授权面、chat 模型选择、
@@ -34,7 +35,7 @@ final class SessionQaResolution {
         chatOverrides.applyAgentOverridesToChatManage(req, cm);
     }
 
-    Prompts resolveCustomAgentPrompts(com.ragagent.agent.management.domain.CustomAgentEntity agent, ObjectNode c) {
+    Prompts resolveCustomAgentPrompts(CustomAgentEntity agent, ObjectNode c) {
         return chatOverrides.resolveCustomAgentPrompts(agent, c);
     }
 
@@ -49,12 +50,12 @@ final class SessionQaResolution {
      * 把 @mention 的 KB/知识收窄到共享 agent 的允许范围——允许集为空则**全部拦下**；
      * 知识按其所属 KB 是否在允许集内判定（批量取按 **agent 的租户**查）。
      */
-    public MentionScope restrictMentionsToAgentScope(com.ragagent.agent.management.domain.CustomAgentEntity agent, ObjectNode agentCfg, long sessionTenantId, List<String> kbIds, List<String> knowledgeIds) {
+    public MentionScope restrictMentionsToAgentScope(CustomAgentEntity agent, ObjectNode agentCfg, long sessionTenantId, List<String> kbIds, List<String> knowledgeIds) {
         return mentionTagScope.restrictMentionsToAgentScope(agent, agentCfg, sessionTenantId, kbIds, knowledgeIds);
     }
 
     /** 按允许 KB 集过滤 tag 范围；空输入返回空列表。 */
-    public List<QaSupport.TagScope> restrictTagScopesToAgentScope(com.ragagent.agent.management.domain.CustomAgentEntity agent, ObjectNode agentCfg, long sessionTenantId, List<QaSupport.TagScope> tagScopes) {
+    public List<QaSupport.TagScope> restrictTagScopesToAgentScope(CustomAgentEntity agent, ObjectNode agentCfg, long sessionTenantId, List<QaSupport.TagScope> tagScopes) {
         return mentionTagScope.restrictTagScopesToAgentScope(agent, agentCfg, sessionTenantId, tagScopes);
     }
 
@@ -62,7 +63,7 @@ final class SessionQaResolution {
     private final QaKbScope kbScope;
 
     /** 按 agent 配置的 kbSelectionMode 解析允许 KB 集（all 模式做工具能力过滤）。 */
-    public List<String> resolveKnowledgeBasesFromAgent(com.ragagent.agent.management.domain.CustomAgentEntity agent, ObjectNode agentCfg, long sessionTenantId) {
+    public List<String> resolveKnowledgeBasesFromAgent(CustomAgentEntity agent, ObjectNode agentCfg, long sessionTenantId) {
         return kbScope.resolveKnowledgeBasesFromAgent(agent, agentCfg, sessionTenantId);
     }
 

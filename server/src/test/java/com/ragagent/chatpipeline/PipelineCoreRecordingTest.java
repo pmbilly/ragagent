@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import com.ragagent.chatpipeline.plugin.PluginError;
 import com.ragagent.common.session.PipelineMessageAttachmentView;
 import com.ragagent.common.session.PipelineUsedMemoryView;
+import com.ragagent.common.retrieval.SearchTarget;
 
 /**
  * 录制回放：event_manager / builder / plugin_error / chat_manage 组
@@ -150,7 +151,7 @@ class PipelineCoreRecordingTest {
         assertRec("chat_manage", "clone", json(shape));
 
         // 就地改 clone 的 targets/kb 不影响原对象
-        clone.getSearchTargets().set(0, new com.ragagent.common.retrieval.SearchTarget(
+        clone.getSearchTargets().set(0, new SearchTarget(
                 clone.getSearchTargets().get(0).type(),
                 clone.getSearchTargets().get(0).knowledgeBaseId(),
                 clone.getSearchTargets().get(0).tenantId(),
@@ -174,7 +175,7 @@ class PipelineCoreRecordingTest {
         cm.setKnowledgeBaseIds(new ArrayList<>(List.of("kb1")));
         cm.setKnowledgeIds(new ArrayList<>(List.of("k1")));
         cm.setSearchTargets(new ArrayList<>(java.util.Arrays.asList(
-                new com.ragagent.common.retrieval.SearchTarget("knowledge_base", "kb1", 1,
+                new SearchTarget("knowledge_base", "kb1", 1,
                         List.of("kk"), List.of("t1"), List.of("st1"), false),
                 null)));
         cm.setVectorThreshold(0.5);

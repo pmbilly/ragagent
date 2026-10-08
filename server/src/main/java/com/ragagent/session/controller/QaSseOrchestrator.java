@@ -29,6 +29,13 @@ import com.ragagent.stream.StreamBatch;
 import com.ragagent.stream.StreamEvent;
 import com.ragagent.stream.StreamManager;
 import jakarta.servlet.http.HttpServletResponse;
+import com.ragagent.agent.domain.ToolCall;
+import com.ragagent.common.llm.ToolResult;
+import com.ragagent.event.TenantContextSnapshot;
+import com.ragagent.event.payload.StopData;
+import com.ragagent.llm.domain.StreamResponse;
+import com.ragagent.session.sse.SseFrameWriter;
+import com.ragagent.stream.LiveRunExistsException;
 
 /**
  * {@code KnowledgeQaController} 的**SSE 编排簇**：建立 SSE 流上下文、写
@@ -48,10 +55,10 @@ final class QaSseOrchestrator {
     private final StreamEventEmitter emitter;
     private final SessionService sessionService;
     private final MessageService messageService;
-    private final com.ragagent.session.sse.SseFrameWriter sseFrameWriter;
+    private final SseFrameWriter sseFrameWriter;
     private final QaTurnFinalizer turnFinalizer;
 
-    QaSseOrchestrator(StreamManager streamManager, StreamEventEmitter emitter, SessionService sessionService, MessageService messageService, com.ragagent.session.sse.SseFrameWriter sseFrameWriter, QaTurnFinalizer turnFinalizer) {
+    QaSseOrchestrator(StreamManager streamManager, StreamEventEmitter emitter, SessionService sessionService, MessageService messageService, SseFrameWriter sseFrameWriter, QaTurnFinalizer turnFinalizer) {
         this.streamManager = streamManager;
         this.emitter = emitter;
         this.sessionService = sessionService;
@@ -63,7 +70,7 @@ final class QaSseOrchestrator {
     SseStreamContext setupSSEStream(QaRequestContext reqCtx, boolean generateTitle, QaMode mode) {
         SseStreamContext streamCtx = new SseStreamContext();
         streamCtx.assistantMessage = reqCtx.assistantMessage;
-        streamCtx.tenantSnapshot = com.ragagent.event.TenantContextSnapshot.capture();
+        streamCtx.tenantSnapshot = TenantContextSnapshot.capture();
 
         EventBus eventBus = new EventBus();
         streamCtx.eventBus = eventBus;
@@ -72,7 +79,7 @@ final class QaSseOrchestrator {
         if (mode == QaMode.AGENT && reqCtx.agentConfig != null) {
             SteerSinkBridge sink = new SteerSinkBridge(reqCtx.sessionId, reqCtx.requestId,
                     messageService, streamManager,
-                    com.ragagent.event.TenantContextSnapshot.capture());
+                    TenantContextSnapshot.capture());
             streamCtx.steerSink = sink;
             reqCtx.steerSink = sink;
             try {
@@ -81,7 +88,7 @@ final class QaSseOrchestrator {
                 log.error("SetLiveRun failed for session {}: {}", reqCtx.sessionId, e.toString());
                 streamCtx.liveRunFailed = true;
                 streamCtx.liveRunErr = e.getMessage();
-                streamCtx.liveRunExists = e instanceof com.ragagent.stream.LiveRunExistsException;
+                streamCtx.liveRunExists = e instanceof LiveRunExistsException;
                 return streamCtx;
             }
         }
@@ -173,7 +180,7 @@ final class QaSseOrchestrator {
                         Event stopEvt = new Event();
                         stopEvt.setType(EventType.EVENT_STOP);
                         stopEvt.setSessionId(sessionId);
-                        com.ragagent.event.payload.StopData data = new com.ragagent.event.payload.StopData();
+                        StopData data = new StopData();
                         data.setSessionId(sessionId);
                         data.setMessageId(assistantMessageId);
                         data.setReason("user_requested");
@@ -224,7 +231,7 @@ final class QaSseOrchestrator {
                         Event stopEvt = new Event();
                         stopEvt.setType(EventType.EVENT_STOP);
                         stopEvt.setSessionId(sessionId);
-                        com.ragagent.event.payload.StopData data = new com.ragagent.event.payload.StopData();
+                        StopData data = new StopData();
                         data.setSessionId(sessionId);
                         data.setMessageId(assistantMessageId);
                         data.setReason("user_requested");
@@ -237,7 +244,7 @@ final class QaSseOrchestrator {
                         // 客户端已断开
                     }
                     // 写出 stop 事件帧
-                    com.ragagent.llm.domain.StreamResponse stopResp = new com.ragagent.llm.domain.StreamResponse();
+                    StreamResponse stopResp = new StreamResponse();
                     stopResp.setId(requestId);
                     stopResp.setResponseType(ResponseType.STOP);
                     stopResp.setContent("Generation stopped by user");
@@ -322,11 +329,11 @@ final class QaSseOrchestrator {
                     if (duration == 0 && started != null) {
                         duration = System.currentTimeMillis() - started;
                     }
-                    com.ragagent.agent.domain.ToolCall call = new com.ragagent.agent.domain.ToolCall();
+                    ToolCall call = new ToolCall();
                     call.setId("pipeline:" + data.getToolCallId());
                     call.setName(data.getToolName());
                     call.setArgs(args);
-                    com.ragagent.common.llm.ToolResult result = new com.ragagent.common.llm.ToolResult();
+                    ToolResult result = new ToolResult();
                     result.setSuccess(data.isSuccess());
                     result.setOutput(data.getOutput());
                     result.setError(data.getError());
@@ -338,7 +345,7 @@ final class QaSseOrchestrator {
             }
         });
     }
-    private static void appendQuickAnswerToolCall(Message msg, com.ragagent.agent.domain.ToolCall call) {
+    private static void appendQuickAnswerToolCall(Message msg, ToolCall call) {
         AgentStep step = KnowledgeQaController.ensureQuickAnswerStep(msg);
         if (step.getToolCalls() != null) {
             for (int i = 0; i < step.getToolCalls().size(); i++) {

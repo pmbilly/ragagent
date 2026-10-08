@@ -15,6 +15,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.llm.ToolResult;
 import com.ragagent.llm.domain.FunctionDef;
 import com.ragagent.common.web.ToolJson;
+import com.ragagent.agent.domain.ToolCallTarget;
+import com.ragagent.common.error.BizException;
+import com.ragagent.llm.domain.ChatMessage;
+import com.ragagent.llm.domain.ToolCall;
+import com.ragagent.mcp.domain.McpService;
 
 /**
  * 工具注册表。
@@ -246,7 +251,7 @@ public class ToolRegistry {
             // 工具抛了运行时异常时折进 error 文案：
             // BizException（AppError）要带 `error code: N, error message: `
             // 前缀；裸 getMessage() 会丢前缀（见 known-issues/09 第三节）。
-            String text = com.ragagent.common.error.BizException.wireText(e);
+            String text = BizException.wireText(e);
             ToolResult r = new ToolResult();
             r.setSuccess(false);
             r.setError(text.isEmpty() ? "tool returned no result" : text);
@@ -455,7 +460,7 @@ public class ToolRegistry {
         for (String id : ids) {
             McpCatalog.McpCatalogServer entry = c.servers.get(id);
             entry.mu.lock();
-            com.ragagent.mcp.domain.McpService service = entry.service;
+            McpService service = entry.service;
             List<McpToolWrapper> cached = entry.tools;
             String status = entry.status;
             entry.mu.unlock();
@@ -463,7 +468,7 @@ public class ToolRegistry {
                 continue;
             }
             if (c.lookup != null) {
-                com.ragagent.mcp.domain.McpService current;
+                McpService current;
                 try {
                     current = c.lookup.lookup(c.tenantId, id);
                 } catch (Exception err) {
@@ -500,16 +505,16 @@ public class ToolRegistry {
     /**
      * 把本会话已 describe 或调用过的工具重新发布，新引擎无需再 describe 一轮。
      */
-    public void rememberMcpHistory(List<com.ragagent.llm.domain.ChatMessage> messages) {
+    public void rememberMcpHistory(List<ChatMessage> messages) {
         McpCatalog c = mcpCatalog();
         if (c == null || messages == null) {
             return;
         }
-        for (com.ragagent.llm.domain.ChatMessage msg : messages) {
+        for (ChatMessage msg : messages) {
             if (msg == null || msg.getToolCalls() == null) {
                 continue;
             }
-            for (com.ragagent.llm.domain.ToolCall call : msg.getToolCalls()) {
+            for (ToolCall call : msg.getToolCalls()) {
                 String name = call.getFunction() == null ? "" : call.getFunction().getName();
                 if (ToolDefinitions.TOOL_CALL_MCP_TOOL.equals(name)) {
                     try {
@@ -537,7 +542,7 @@ public class ToolRegistry {
      * UI/审计身份与模型的代理调用分离。原始调用名、参数、ID 与
      * provider 元数据保持可回放。
      */
-    public synchronized com.ragagent.agent.domain.ToolCallTarget mcpCallTarget(String name, JsonNode raw) {
+    public synchronized ToolCallTarget mcpCallTarget(String name, JsonNode raw) {
         AgentTool registered;
         try {
             registered = getTool(name);
@@ -555,7 +560,7 @@ public class ToolRegistry {
             } catch (Exception e) {
                 return null;
             }
-            com.ragagent.agent.domain.ToolCallTarget target = new com.ragagent.agent.domain.ToolCallTarget();
+            ToolCallTarget target = new ToolCallTarget();
             target.setName(name);
             target.setArgs(args);
             target.setServiceName(direct.service.getName());
@@ -587,7 +592,7 @@ public class ToolRegistry {
         } catch (Exception e) {
             return null;
         }
-        com.ragagent.agent.domain.ToolCallTarget target = new com.ragagent.agent.domain.ToolCallTarget();
+        ToolCallTarget target = new ToolCallTarget();
         target.setName(tool.getName());
         target.setArgs(input);
         target.setServiceName(tool.service.getName());

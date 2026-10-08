@@ -19,6 +19,9 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import com.ragagent.common.tenant.TenantRole;
+import com.ragagent.storage.support.StorageUrlContext;
+import com.ragagent.tenant.Tenant;
 
 /**
  * embed 公开面的认证过滤器（publish token 门）。
@@ -120,7 +123,7 @@ public class EmbedAuthFilter extends OncePerRequestFilter {
         }
 
         try {
-            com.ragagent.tenant.Tenant tenant =
+            Tenant tenant =
                     tenantService.getTenantById(ch.getTenantId() == null ? 0 : ch.getTenantId());
             if (tenant == null) {
                 writePlain(response, 500, "workspace unavailable");
@@ -135,7 +138,7 @@ public class EmbedAuthFilter extends OncePerRequestFilter {
         TenantContext.set(ch.getTenantId(),
                 new TenantContext.Principal(TenantContext.PrincipalTypes.EMBED_CHANNEL,
                         ch.getTenantId() + ":" + channelId),
-                com.ragagent.common.tenant.TenantRole.VIEWER.value(),
+                TenantRole.VIEWER.value(),
                 false, syntheticUser, false);
         request.setAttribute(CHANNEL_ATTRIBUTE, ch);
         try {
@@ -145,7 +148,7 @@ public class EmbedAuthFilter extends OncePerRequestFilter {
             // StorageUrlContext 的 forced-handle 同样在此收口——它的 javadoc 明确
             // "生命周期由设置方负责"，漏清会把 handle 钉死泄漏到线程的下个请求。
             TenantContext.clear();
-            com.ragagent.storage.support.StorageUrlContext.clear();
+            StorageUrlContext.clear();
         }
     }
 

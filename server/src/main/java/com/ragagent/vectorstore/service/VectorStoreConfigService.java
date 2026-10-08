@@ -28,6 +28,12 @@ import com.ragagent.common.retrieval.RetrievalDriverProperties;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
+import com.ragagent.retrieval.engine.doris.DorisRetrieveRepository;
+import com.ragagent.retrieval.engine.milvus.MilvusRetrieveRepository;
+import com.ragagent.retrieval.engine.opensearch.OpenSearchRetrieveRepository;
+import com.ragagent.retrieval.engine.qdrant.QdrantRetrieveRepository;
+import com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbRestClient;
+import com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbRetrieveRepository;
 
 /**
  * 向量库配置服务（CRUD + 连通性探测 + 健康检查）。命名带 Config 以区别
@@ -296,7 +302,7 @@ public class VectorStoreConfigService {
     private String testQdrant(ConnectionConfig config) {
         int port = config.port == 0 ? 6334 : config.port;
         try {
-            return com.ragagent.retrieval.engine.qdrant.QdrantRetrieveRepository.testConnection(
+            return QdrantRetrieveRepository.testConnection(
                     config.host, port, config.apiKey, config.useTls, ssrfGuard);
         } catch (RuntimeException e) {
             log.warn("Qdrant connection test failed: {}", e.getMessage());
@@ -312,7 +318,7 @@ public class VectorStoreConfigService {
      */
     private String testMilvus(ConnectionConfig config) {
         try {
-            return com.ragagent.retrieval.engine.milvus.MilvusRetrieveRepository.testConnection(
+            return MilvusRetrieveRepository.testConnection(
                     config.addr, config.username, config.password, config.database, ssrfGuard);
         } catch (RuntimeException e) {
             log.warn("Milvus connection test failed: {}", e.getMessage());
@@ -328,9 +334,9 @@ public class VectorStoreConfigService {
      */
     private String testTencentVectorDB(ConnectionConfig config) {
         try {
-            return com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbRetrieveRepository
+            return TencentVectorDbRetrieveRepository
                     .testConnection(config.addr, config.username, config.apiKey, ssrfGuard);
-        } catch (com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbRestClient
+        } catch (TencentVectorDbRestClient
                 .TencentVectorDbApiException e) {
             log.warn("Tencent VectorDB list database failed: {}", e.getMessage());
             throw new ConnectorFailure(
@@ -384,7 +390,7 @@ public class VectorStoreConfigService {
             throw new ConnectorFailure("failed to create doris connection: addr is required");
         }
         try {
-            return com.ragagent.retrieval.engine.doris.DorisRetrieveRepository.testConnection(
+            return DorisRetrieveRepository.testConnection(
                     config.addr, config.database, config.username, config.password);
         } catch (java.sql.SQLException e) {
             log.warn("Doris connection test failed: {}", e.getMessage());
@@ -406,7 +412,7 @@ public class VectorStoreConfigService {
             throw new ConnectorFailure("failed to create opensearch connection: addr is required");
         }
         try {
-            com.ragagent.retrieval.engine.opensearch.OpenSearchRetrieveRepository.testConnection(
+            OpenSearchRetrieveRepository.testConnection(
                     config.addr, config.username, config.password, config.insecureSkipVerify,
                     ssrfGuard);
         } catch (RuntimeException e) {

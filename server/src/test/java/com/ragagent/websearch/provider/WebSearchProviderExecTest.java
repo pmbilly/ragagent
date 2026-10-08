@@ -21,6 +21,7 @@ import com.ragagent.retrieval.domain.WebSearchResult;
 import com.ragagent.websearch.domain.WebSearchProviderParams;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
+import com.ragagent.websearch.service.WebSearchService;
 
 /**
  * web_search 执行面的 stub server A/B：请求体/URL 与录制（wire/ws_*.json）
@@ -782,7 +783,7 @@ class WebSearchProviderExecTest {
         dropRegex.setUrl("https://spam.example.net/y");
 
         List<String> rules = List.of("*://*.bad.example.com/*", "/example\\.(net|org)/");
-        List<WebSearchResult> filtered = com.ragagent.websearch.service.WebSearchService
+        List<WebSearchResult> filtered = WebSearchService
                 .filterBlacklist(List.of(keep, dropPattern, dropRegex), rules);
         assertEquals(1, filtered.size());
         assertEquals("https://good.example.com/a", filtered.get(0).getUrl());
@@ -793,10 +794,10 @@ class WebSearchProviderExecTest {
         // extractSourceURLFromContent / stripMarker / 轮选 / 合并
         String content = "[sourceUrl]: https://e/1\nbody line";
         assertEquals("https://e/1",
-                com.ragagent.websearch.service.WebSearchService.extractSourceUrlFromContent(content));
+                WebSearchService.extractSourceUrlFromContent(content));
         assertEquals("body line",
-                com.ragagent.websearch.service.WebSearchService.stripMarker(content));
-        assertEquals("", com.ragagent.websearch.service.WebSearchService
+                WebSearchService.stripMarker(content));
+        assertEquals("", WebSearchService
                 .extractSourceUrlFromContent("no marker"));
 
         WebSearchResult r1 = new WebSearchResult();
@@ -816,14 +817,14 @@ class WebSearchProviderExecTest {
         SearchResult ref3 = new SearchResult();
         ref3.setContent("[sourceUrl]: https://e/2\nref c");
 
-        var selected = com.ragagent.websearch.service.WebSearchService
+        var selected = WebSearchService
                 .selectReferencesRoundRobin(List.of(r1, r2), List.of(ref1, ref2, ref3), 2);
         assertEquals(2, selected.size());
         // 轮选：第一轮 e/1 → ref-a、e/2 → ref-c
         assertTrue(selected.get(0).getContent().endsWith("ref a"));
         assertTrue(selected.get(1).getContent().endsWith("ref c"));
 
-        var consolidated = com.ragagent.websearch.service.WebSearchService
+        var consolidated = WebSearchService
                 .consolidateReferencesByURL(List.of(r1, r2), List.of(ref1, ref2));
         assertEquals(2, consolidated.size());
         assertEquals("ref a\n---\nref b", consolidated.get(0).getContent());

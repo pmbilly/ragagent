@@ -19,6 +19,7 @@ import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import com.ragagent.common.mybatis.FullTableWriteGuard;
 
 /**
  * {@link TenantFilterGuard} 行为测试：探针 SQL 直接打拦截器。
@@ -138,7 +139,7 @@ class TenantFilterGuardTest {
                 TenantFilterGuard.Mode.ALERT).getInterceptors();
         assertThat(chain).hasSize(3);
         assertThat(chain.get(0)).isInstanceOf(com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor.class);
-        assertThat(chain.get(1)).isInstanceOf(com.ragagent.common.mybatis.FullTableWriteGuard.class);
+        assertThat(chain.get(1)).isInstanceOf(FullTableWriteGuard.class);
         assertThat(chain.get(2)).isInstanceOf(TenantFilterGuard.class);
     }
 }

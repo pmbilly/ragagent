@@ -14,6 +14,7 @@ import com.ragagent.knowledge.support.ImageInfoEnricher;
 import org.junit.jupiter.api.Test;
 import com.ragagent.retrieval.support.ChunkSearchUtil;
 import com.ragagent.knowledge.support.KnowledgeIndexContent;
+import com.ragagent.retrieval.support.ImageInfoMatchUtil;
 
 /**
  * 摘要管线与向量索引的确定性纯逻辑。
@@ -82,7 +83,7 @@ class SummaryPipelineLogicTest {
         info.setUrl(url);
         info.setCaption(caption);
         info.setOcrText(ocr);
-        return com.ragagent.retrieval.support.ImageInfoMatchUtil.marshalImageInfos(List.of(info));
+        return ImageInfoMatchUtil.marshalImageInfos(List.of(info));
     }
 
     @Test

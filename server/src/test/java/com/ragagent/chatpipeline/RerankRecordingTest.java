@@ -25,6 +25,7 @@ import com.ragagent.chatpipeline.support.ReferencesSupport;
 import com.ragagent.common.memory.MemoryItemView;
 import com.ragagent.common.memory.MemoryRecall;
 import com.ragagent.common.retrieval.SearchResult;
+import com.ragagent.common.retrieval.SearchTarget;
 
 /**
  * 录制回放：rerank（清洗/段落/编排）+ wiki_boost + memory_recall/affinity + progress
@@ -165,7 +166,7 @@ class RerankRecordingTest {
         cm.setRerankTopK(3);
         cm.setIntent(QueryIntent.KB_SEARCH);
         cm.setSearchTargets(new ArrayList<>(List.of(
-                new com.ragagent.common.retrieval.SearchTarget("knowledge_base", "kb-1", 1, null, null, null, false))));
+                new SearchTarget("knowledge_base", "kb-1", 1, null, null, null, false))));
         List<SearchResult> sr = new ArrayList<>(List.of(
                 cand("c1", "第一段候选内容，语义相关", "k1", 0.8),
                 cand("c2", "第二段候选内容，语义稍弱", "k2", 0.6),
@@ -266,7 +267,7 @@ class RerankRecordingTest {
         ChatManage cm6 = rerankCm();
         cm6.setRerankThreshold(0.5);
         cm6.setSearchTargets(new ArrayList<>(List.of(
-                new com.ragagent.common.retrieval.SearchTarget("knowledge_base", "kb-1", 1, null, null, null, true))));
+                new SearchTarget("knowledge_base", "kb-1", 1, null, null, null, true))));
         PluginError err6 = p6.onEvent(PipelineEventType.CHUNK_RERANK, cm6, () -> null);
         Map<String, Object> s6 = new LinkedHashMap<>();
         s6.put("err", errOf(err6));
@@ -347,7 +348,7 @@ class RerankRecordingTest {
         assertRec("rerank", "rerank_fallback_min", json(List.of(
                 PluginRerank.rerankFallbackMinScore(new ArrayList<>()),
                 PluginRerank.rerankFallbackMinScore(new ArrayList<>(List.of(
-                        new com.ragagent.common.retrieval.SearchTarget("knowledge_base", "kb", 1, null, null, null, true)))))));
+                        new SearchTarget("knowledge_base", "kb", 1, null, null, null, true)))))));
     }
 
     // ----- wiki_boost（对照 recWikiBoost） -----
@@ -359,7 +360,7 @@ class RerankRecordingTest {
         PluginWikiBoost p = new PluginWikiBoost(kbSvc);
         ChatManage cm = new ChatManage();
         cm.setSearchTargets(new ArrayList<>(List.of(
-                new com.ragagent.common.retrieval.SearchTarget("knowledge_base", "wkb", 1, null, null, null, false))));
+                new SearchTarget("knowledge_base", "wkb", 1, null, null, null, false))));
         List<SearchResult> rr = new ArrayList<>(List.of(
                 cand("doc-1", "x", "k", 0.9),
                 cand("wiki-1", "x", "k", 0.6, r -> r.setChunkType("wiki_page"))));
@@ -387,7 +388,7 @@ class RerankRecordingTest {
         PluginWikiBoost p3 = new PluginWikiBoost(kbSvc2);
         ChatManage cm3 = new ChatManage();
         cm3.setSearchTargets(new ArrayList<>(List.of(
-                new com.ragagent.common.retrieval.SearchTarget("knowledge_base", "dkb", 1, null, null, null, false))));
+                new SearchTarget("knowledge_base", "dkb", 1, null, null, null, false))));
         cm3.setRerankResult(new ArrayList<>(List.of(
                 cand("w", "x", "k", 0.5, r -> r.setChunkType("wiki_page")))));
         p3.onEvent(PipelineEventType.CHUNK_RERANK, cm3, () -> null);

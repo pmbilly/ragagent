@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
+import com.ragagent.im.domain.ImChannelEntity;
 
 /**
  * 钉钉 Stream 模式（W5γ3.8）协议级测试：接入点请求/响应校验、三类订阅、帧分流
@@ -205,7 +206,7 @@ class DingtalkStreamClientTest {
     @Test
     @DisplayName("工厂：websocket（Go 默认）建长连接 + 给 stop；webhook 无 stop；未知模式报错")
     void factoryWiresStreamMode() throws Exception {
-        com.ragagent.im.domain.ImChannelEntity ws = new com.ragagent.im.domain.ImChannelEntity();
+        ImChannelEntity ws = new ImChannelEntity();
         ws.setId("ch-ws");
         ws.setMode("websocket");
         ws.setCredentials("{\"client_id\":\"cli\",\"client_secret\":\"sec\"}");
@@ -216,7 +217,7 @@ class DingtalkStreamClientTest {
         assertNotNull(reg.stop());
         reg.stop();
 
-        com.ragagent.im.domain.ImChannelEntity hook = new com.ragagent.im.domain.ImChannelEntity();
+        ImChannelEntity hook = new ImChannelEntity();
         hook.setId("ch-hook");
         hook.setMode("webhook");
         hook.setCredentials("{\"client_id\":\"cli\",\"client_secret\":\"sec\"}");
@@ -225,7 +226,7 @@ class DingtalkStreamClientTest {
         assertNotNull(hookReg.adapter());
         org.junit.jupiter.api.Assertions.assertNull(hookReg.stop());
 
-        com.ragagent.im.domain.ImChannelEntity bad = new com.ragagent.im.domain.ImChannelEntity();
+        ImChannelEntity bad = new ImChannelEntity();
         bad.setId("ch-bad");
         bad.setMode("pigeon");
         bad.setCredentials("{}");

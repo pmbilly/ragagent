@@ -26,6 +26,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import com.ragagent.support.ContractJson;
 
 /**
  * 契约测试：auth 登录 + AuthFilter 全链，对照 golden 逐字节比对。
@@ -249,13 +250,13 @@ class AuthContractTest {
             resource = new org.springframework.core.io.ClassPathResource("contracts/" + name + ".json");
         }
         String text = new String(resource.getInputStream().readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
-        return com.ragagent.support.ContractJson.semantic(GOLDEN_SEMANTIC_MAPPER, text);
+        return ContractJson.semantic(GOLDEN_SEMANTIC_MAPPER, text);
     }
 
     /** 与 golden 比对前对动态字段做同一种掩码 */
     private static String mask(String s) {
         // PR4 语义比较入口：键序/转义归一后再掩码
-        s = com.ragagent.support.ContractJson.semantic(s);
+        s = ContractJson.semantic(s);
         String out = s.replaceAll("\"token\":\"[^\"]*\"", "\"token\":\"<masked>\"");
         out = out.replaceAll("\"refreshToken\":\"[^\"]*\"", "\"refreshToken\":\"<masked>\"");
         out = TS_PATTERN.matcher(out).replaceAll("\"<ts>\"");

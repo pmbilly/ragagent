@@ -12,6 +12,7 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import com.ragagent.mcp.domain.McpToolListTypeHandler;
 
 /**
  * mcp_metadata 仓储语句。
@@ -32,7 +33,7 @@ public interface McpMetadataMapper {
             @Result(column = "principal", property = "principal"),
             @Result(column = "config_fingerprint", property = "configFingerprint"),
             @Result(column = "tools", property = "tools",
-                    typeHandler = com.ragagent.mcp.domain.McpToolListTypeHandler.class),
+                    typeHandler = McpToolListTypeHandler.class),
             @Result(column = "instructions", property = "instructions"),
             @Result(column = "server_name", property = "serverName"),
             @Result(column = "server_version", property = "serverVersion"),

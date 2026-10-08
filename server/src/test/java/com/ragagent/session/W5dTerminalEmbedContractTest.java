@@ -26,6 +26,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import com.ragagent.TestSchema;
 import com.ragagent.knowledge.storage.LocalStorageService;
+import com.ragagent.support.GoldenContract;
 
 /**
  * embed QA 委托 / 文件代理（w5d-emb-*）的契约测试。golden 来源：dev server
@@ -152,7 +153,7 @@ class W5dTerminalEmbedContractTest {
         String actual = mask == null ? raw(r) : mask.apply(raw(r));
         java.util.function.UnaryOperator<String> effective =
                 mask == null ? java.util.function.UnaryOperator.identity() : mask;
-        com.ragagent.support.GoldenContract.assertEquals("src/test/resources/contracts",
+        GoldenContract.assertEquals("src/test/resources/contracts",
                 goldenName, effective, actual);
     }
 

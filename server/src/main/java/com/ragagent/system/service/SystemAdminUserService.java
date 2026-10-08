@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.ragagent.common.security.APIKeyScopeContext;
 
 /**
  * 系统管理员 P0 用户管理（注册 / 建管理员 / 重置密码 / 列管理员 / 撤管理员）。
@@ -332,7 +333,7 @@ public class SystemAdminUserService {
 
     /** 主体角色：平台 API-Key 主体 → "platform_api_key"。 */
     public static String systemAuditActorRole() {
-        var scope = com.ragagent.common.security.APIKeyScopeContext.current();
+        var scope = APIKeyScopeContext.current();
         if (scope != null && scope.isPlatform()) {
             return "platform_api_key";
         }

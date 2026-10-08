@@ -28,6 +28,12 @@ import com.ragagent.session.domain.SessionOwnerIds;
 import com.ragagent.session.domain.SuggestionItem;
 import com.ragagent.session.mapper.MessageSuggestionRepository;
 import com.ragagent.common.wiki.WikiLanguageSupport;
+import com.ragagent.common.security.APIKeyScopeContext;
+import com.ragagent.common.security.TenantAPIKeyScope;
+import com.ragagent.event.TenantContextSnapshot;
+import com.ragagent.tracing.langfuse.LangfuseManager;
+import com.ragagent.tracing.langfuse.LangfuseTracing;
+import com.ragagent.tracing.langfuse.Span;
 
 /**
  * 追问建议服务。
@@ -102,7 +108,7 @@ public class MessageSuggestionService {
         var spanEc = message.getExecutionContext();
         // 派生请求先按 ExecutionContext 里存的 traceparent 续接**原对话**的 trace，再开
         // follow_up.suggestions span——否则下游 generation 会自动开一个孤儿根
-        com.ragagent.tracing.langfuse.LangfuseTracing.attachTraceparent(
+        LangfuseTracing.attachTraceparent(
                 spanEc == null ? null : spanEc.getLangfuseTraceparent());
         Map<String, Object> spanConfig = followUps(
                 spanEc == null ? null : spanEc.getQuestionSuggestions());
@@ -113,9 +119,9 @@ public class MessageSuggestionService {
         Map<String, Object> spanMeta = new LinkedHashMap<>();
         spanMeta.put("count", spanConfig == null ? null : spanConfig.get("count"));
         spanMeta.put("modelId", strVal(spanConfig, "modelId"));
-        com.ragagent.tracing.langfuse.Span followUpSpan =
-                com.ragagent.tracing.langfuse.LangfuseManager.get().startSpan(
-                        new com.ragagent.tracing.langfuse.LangfuseManager.SpanOptions(
+        Span followUpSpan =
+                LangfuseManager.get().startSpan(
+                        new LangfuseManager.SpanOptions(
                                 "follow_up.suggestions", spanInput, spanMeta));
         MessageSuggestionSet result;
         try {
@@ -412,8 +418,8 @@ public class MessageSuggestionService {
      * 本方法可被 HTTP 线程直达，MessageSuggestionController.ensure）。</p>
      */
     private <T> T withAgentTenant(long agentTenantId, java.util.function.Supplier<T> body) {
-        com.ragagent.event.TenantContextSnapshot prev =
-                com.ragagent.event.TenantContextSnapshot.capture();
+        TenantContextSnapshot prev =
+                TenantContextSnapshot.capture();
         if (agentTenantId == 0 || (prev.tenantId() != null && prev.tenantId() == agentTenantId)) {
             return body.get();
         }
@@ -459,8 +465,8 @@ public class MessageSuggestionService {
                 ? List.of() : ec.getKnowledgeIds();
         boolean preferActualEvidence = context.actualKnowledgeIds() != null
                 && !context.actualKnowledgeIds().isEmpty();
-        com.ragagent.common.security.TenantAPIKeyScope apiKeyScope =
-                com.ragagent.common.security.APIKeyScopeContext.current();
+        TenantAPIKeyScope apiKeyScope =
+                APIKeyScopeContext.current();
         if (apiKeyScope != null && apiKeyScope.isKnowledgeBaseRestricted()) {
             // 受限 API key 不能把 document id 走通用建议面（无法校验每条的 KB 绑定）
             preferActualEvidence = false;

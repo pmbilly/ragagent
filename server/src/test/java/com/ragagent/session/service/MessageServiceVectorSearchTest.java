@@ -41,6 +41,8 @@ import com.ragagent.session.domain.MessageWithSession;
 import com.ragagent.session.mapper.MessageRepository;
 import com.ragagent.session.mapper.MessageSuggestionRepository;
 import com.ragagent.session.mapper.SessionRepository;
+import com.ragagent.knowledge.service.KnowledgeBaseService;
+import com.ragagent.knowledge.service.KnowledgeService;
 
 /**
  * 消息搜索的**向量路径**。
@@ -70,9 +72,9 @@ class MessageServiceVectorSearchTest {
                 mock(SessionRepository.class),
                 messageRepository,
                 mock(MessageSuggestionRepository.class),
-                mock(com.ragagent.knowledge.service.KnowledgeService.class),
+                mock(KnowledgeService.class),
                 tenantService,
-                mock(com.ragagent.knowledge.service.KnowledgeBaseService.class),
+                mock(KnowledgeBaseService.class),
                 hybridSearchService,
                 modelRuntimeFactory);
         TenantContext.set(TENANT, null, null, false, "u-1", false);

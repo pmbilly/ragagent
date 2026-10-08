@@ -24,6 +24,8 @@ import com.ragagent.memory.domain.MemorySubject;
 import com.ragagent.memory.domain.MemoryTombstone;
 import com.ragagent.memory.domain.MemoryTopicStat;
 import org.junit.jupiter.api.Test;
+import com.ragagent.common.web.ZeroTimeSerializer;
+import com.ragagent.support.ContractJson;
 
 /**
  * memory 实体 / jsonb 值的**逐字节 JSON 契约**测试。
@@ -259,7 +261,7 @@ class MemoryEntityJsonTest {
      */
     @Test
     void memoryExtractionStateZeroWritesBothKeys() throws Exception {
-        assertThat(com.ragagent.support.ContractJson.deep(JSONB.writeValueAsString(new MemoryExtractionState())))
+        assertThat(ContractJson.deep(JSONB.writeValueAsString(new MemoryExtractionState())))
                 .isEqualTo("{\"leaseId\":\"\",\"leaseUntil\":\"0001-01-01T00:00:00Z\"}");
     }
 
@@ -269,7 +271,7 @@ class MemoryEntityJsonTest {
         s.setLeaseId("L");
         s.setLeaseUntil(ten());
 
-        assertThat(com.ragagent.support.ContractJson.deep(JSONB.writeValueAsString(s)))
+        assertThat(ContractJson.deep(JSONB.writeValueAsString(s)))
                 .isEqualTo("{\"leaseId\":\"L\",\"leaseUntil\":\"2026-09-18T02:00:00Z\"}");
         // 读回来（走的是同一个裸映射器，没有 JavaTimeModule）必须自足
         MemoryExtractionState back = JSONB.readValue(
@@ -293,7 +295,7 @@ class MemoryEntityJsonTest {
         MemoryExtractionState back = JSONB.readValue("{}", MemoryExtractionState.class);
         assertThat(back.getLeaseId()).isEmpty();
         assertThat(back.getLeaseUntil().toInstant())
-                .isEqualTo(com.ragagent.common.web.ZeroTimeSerializer.ZERO_TIME_INSTANT);
+                .isEqualTo(ZeroTimeSerializer.ZERO_TIME_INSTANT);
     }
 
     // ── 键序 + 键数（§9：带 is 前缀字段/派生访问器的响应体必须额外钉一条） ──
@@ -451,11 +453,11 @@ class MemoryEntityJsonTest {
         state.setLeaseUntil(ten());
         String first = JSONB.writeValueAsString(state);
         MemoryExtractionState back = JSONB.readValue(first, MemoryExtractionState.class);
-        assertThat(com.ragagent.support.ContractJson.deep(JSONB.writeValueAsString(back)))
-                .isEqualTo(com.ragagent.support.ContractJson.deep(first));
+        assertThat(ContractJson.deep(JSONB.writeValueAsString(back)))
+                .isEqualTo(ContractJson.deep(first));
 
         String zero = JSONB.writeValueAsString(new MemoryExtractionState());
-        assertThat(com.ragagent.support.ContractJson.deep(JSONB.writeValueAsString(JSONB.readValue(zero, MemoryExtractionState.class))))
+        assertThat(ContractJson.deep(JSONB.writeValueAsString(JSONB.readValue(zero, MemoryExtractionState.class))))
                 .isEqualTo(zero);
     }
 

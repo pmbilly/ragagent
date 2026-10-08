@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.Duration;
 
 import org.junit.jupiter.api.Test;
+import com.ragagent.event.EventIds;
 
 /**
  * 常量与预算族纯逻辑的录制断言（{@code AgentConsts}）。
@@ -96,7 +97,7 @@ class AgentConstsTest {
     @Test
     void generateEventIDIsBridgedNotDuplicated() {
         // 已收编到 event 包：格式 <uuid前8位>-<suffix>（EventIdsTest 有录制断言）
-        String id = com.ragagent.event.EventIds.generateEventID("thinking");
+        String id = EventIds.generateEventID("thinking");
         assertThat(id).endsWith("-thinking");
         assertThat(id.split("-")[0]).hasSize(8).matches("[0-9a-f]{8}");
     }

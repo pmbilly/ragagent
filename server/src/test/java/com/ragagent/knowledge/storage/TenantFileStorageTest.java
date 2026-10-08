@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.tenant.Tenant;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.storage.fileserve.StorageFileResolver;
+import com.ragagent.common.error.BizException;
 
 /**
  * A3-3 尾批：租户感知文件存储门面（{@link TenantFileStorage}）与写面 provider 解析。
@@ -151,8 +152,8 @@ class TenantFileStorageTest {
         tenant.setStorageEngineConfig(sec); // cos 段缺失 → 解析失败
 
         TenantFileStorage storage = facade(dir, tenant);
-        com.ragagent.common.error.BizException err =
-                assertThrows(com.ragagent.common.error.BizException.class,
+        BizException err =
+                assertThrows(BizException.class,
                         () -> storage.readChecked(11L, "cos://bk/ap-guangzhou/a/b.png"));
         assertTrue(String.valueOf(err.getMessage()).contains("Failed to retrieve file"),
                 String.valueOf(err.getMessage()));

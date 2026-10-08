@@ -32,6 +32,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import com.ragagent.support.ContractJson;
+import com.ragagent.support.GoldenContract;
 
 /**
  * 模型配置模块契约测试（CRUD + providers + credentials 子资源）。
@@ -294,7 +296,7 @@ class ModelContractTest {
             resource = new org.springframework.core.io.ClassPathResource("contracts/" + name + ".json");
         }
         String text = new String(resource.getInputStream().readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
-        return com.ragagent.support.ContractJson.semantic(GOLDEN_SEMANTIC_MAPPER, text);
+        return ContractJson.semantic(GOLDEN_SEMANTIC_MAPPER, text);
     }
 
 
@@ -310,14 +312,14 @@ class ModelContractTest {
 
     private static void assertGolden(org.springframework.test.web.servlet.MvcResult r,
             String name) throws Exception {
-        com.ragagent.support.GoldenContract.assertEquals("src/test/resources/contracts",
+        GoldenContract.assertEquals("src/test/resources/contracts",
                 name, ModelContractTest::mask,
                 r.getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8));
     }
 
     private static String mask(String s) {
         // PR4 语义比较入口：键序/转义归一后再掩码
-        s = com.ragagent.support.ContractJson.semantic(s);
+        s = ContractJson.semantic(s);
         String out = MODEL_ID_PATTERN.matcher(s).replaceAll("\"id\":\"<id>\"");
         out = TS_PATTERN.matcher(out).replaceAll("\"<ts>\"");
         return out;

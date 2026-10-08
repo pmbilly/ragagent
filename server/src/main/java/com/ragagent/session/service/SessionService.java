@@ -36,6 +36,10 @@ import com.ragagent.session.domain.SessionPage;
 import com.ragagent.session.mapper.MessageRepository;
 import com.ragagent.session.mapper.MessageSuggestionRepository;
 import com.ragagent.session.mapper.SessionRepository;
+import com.ragagent.common.security.LogSanitizer;
+import com.ragagent.model.domain.Model;
+import com.ragagent.session.domain.SessionLastRequestState;
+import com.ragagent.websearch.service.WebSearchTempKbStateService;
 
 /**
  * 会话 service：读路径（{@link #getSession(String)} / {@link #getOwnedSession(String)} /
@@ -64,7 +68,7 @@ public class SessionService {
     private final ModelService modelService;
     private final ModelRuntimeFactory modelRuntimeFactory;
     private final ConversationProperties conversationProps;
-    private final com.ragagent.websearch.service.WebSearchTempKbStateService webSearchTempKbState;
+    private final WebSearchTempKbStateService webSearchTempKbState;
 
     public SessionService(SessionRepository sessionRepository,
                           MessageRepository messageRepository,
@@ -73,7 +77,7 @@ public class SessionService {
                           ModelService modelService,
                           ModelRuntimeFactory modelRuntimeFactory,
                           ConversationProperties conversationProps,
-                          com.ragagent.websearch.service.WebSearchTempKbStateService webSearchTempKbState) {
+                          WebSearchTempKbStateService webSearchTempKbState) {
         this.sessionRepository = sessionRepository;
         this.messageRepository = messageRepository;
         this.suggestionRepository = suggestionRepository;
@@ -147,7 +151,7 @@ public class SessionService {
                 // （诊断留痕：owner 推导错/上下文丢失时这里是唯一线索，见
                 //  2026-09-24 embed follow-up 的 SessionNotFound 排查）
                 log.info("[session-read-miss] tenant={}, owner={}, session={}, principalType={}, principalId={}",
-                        tenantId, ownerId, com.ragagent.common.security.LogSanitizer.sanitize(sessionId),
+                        tenantId, ownerId, LogSanitizer.sanitize(sessionId),
                         TenantContext.currentPrincipal() == null ? "" : TenantContext.currentPrincipal().type(),
                         TenantContext.currentPrincipal() == null ? "" : TenantContext.currentPrincipal().id());
                 throw notFound;
@@ -177,7 +181,7 @@ public class SessionService {
             // 刻意复用"不存在"：未授权者不该能区分这两种情况
             // （诊断留痕：渠道托管会话的运行时放行判定失败时，打印实际上下文）
             log.info("[session-read-forbidden] tenant={}, owner={}, session={}, principalType={}, principalId={}, role={}",
-                    tenantId, ownerId, com.ragagent.common.security.LogSanitizer.sanitize(sessionId),
+                    tenantId, ownerId, LogSanitizer.sanitize(sessionId),
                     TenantContext.currentPrincipal() == null ? "" : TenantContext.currentPrincipal().type(),
                     TenantContext.currentPrincipal() == null ? "" : TenantContext.currentPrincipal().id(),
                     TenantContext.currentRole());
@@ -292,7 +296,7 @@ public class SessionService {
     }
 
     /** 更新输入条状态（KnowledgeQaController 的异步 UI memo 用）。 */
-    public void updateSessionLastRequestState(String sessionId, com.ragagent.session.domain.SessionLastRequestState state) {
+    public void updateSessionLastRequestState(String sessionId, SessionLastRequestState state) {
         long tenantId = TenantContext.currentTenantId() == null ? 0 : TenantContext.currentTenantId();
         sessionRepository.updateLastRequestState(tenantId, sessionUserIDForLookup(), sessionId, state);
     }
@@ -474,8 +478,8 @@ public class SessionService {
         }
 
         if (modelId == null || modelId.isEmpty()) {
-            List<com.ragagent.model.domain.Model> models = modelService.listModels();
-            for (com.ragagent.model.domain.Model model : models) {
+            List<Model> models = modelService.listModels();
+            for (Model model : models) {
                 if (model == null) {
                     continue;
                 }

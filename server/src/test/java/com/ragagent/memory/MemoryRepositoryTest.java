@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import com.ragagent.memory.domain.MemoryTombstone;
 
 /**
  * 记忆仓储在 H2 上的语义。
@@ -575,7 +576,7 @@ class MemoryRepositoryTest {
         repo.addTombstone(scope, "新", "fp-new", "");
 
         assertThat(repo.listTombstones(scope, 0))
-                .extracting(com.ragagent.memory.domain.MemoryTombstone::getTopic)
+                .extracting(MemoryTombstone::getTopic)
                 .containsExactly("新", "旧");
     }
 

@@ -3,6 +3,7 @@ package com.ragagent.auth.dto;
 import java.time.OffsetDateTime;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.tenant.Tenant;
 
 /**
  * Tenant 的 API 投影。
@@ -44,7 +45,7 @@ public record TenantResponse(
      * 从实体构造。includeSecrets=false 时四个秘密字段置 null（省略输出）。
      * 标量列非空语义：NULL 归一为零值（"" / 0），保证响应字节一致。
      */
-    public static TenantResponse from(com.ragagent.tenant.Tenant t, boolean includeSecrets) {
+    public static TenantResponse from(Tenant t, boolean includeSecrets) {
         return new TenantResponse(
                 t.getId() == null ? 0 : t.getId(),
                 t.getName() == null ? "" : t.getName(),

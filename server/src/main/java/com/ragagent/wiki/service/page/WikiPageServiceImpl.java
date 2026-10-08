@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
+import com.ragagent.wiki.domain.WikiPageNotFoundException;
 
 /**
  * wiki 页面服务实现。
@@ -268,7 +269,7 @@ public class WikiPageServiceImpl implements WikiPageService {
     public WikiPage findPageBySlug(String kbId, String slug) {
         try {
             return getPageBySlug(kbId, slug);
-        } catch (com.ragagent.wiki.domain.WikiPageNotFoundException e) {
+        } catch (WikiPageNotFoundException e) {
             return null;
         }
     }

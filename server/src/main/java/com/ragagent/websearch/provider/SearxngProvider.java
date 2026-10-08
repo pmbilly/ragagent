@@ -32,7 +32,7 @@ public final class SearxngProvider implements WebSearchProvider {
 
     public SearxngProvider(WebSearchProviderParams params) {
         String base = params.getBaseUrl() == null ? "" : params.getBaseUrl().trim();
-        com.ragagent.websearch.provider.SearxngValidation.validateSearxngBaseUrl(base);
+        SearxngValidation.validateSearxngBaseUrl(base);
         this.baseUrl = base.replaceAll("/+$", "");
     }
 

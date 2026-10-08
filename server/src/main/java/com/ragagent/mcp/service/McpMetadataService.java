@@ -34,6 +34,7 @@ import com.ragagent.mcp.protocol.McpOAuthSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import com.ragagent.common.security.LogSanitizer;
 
 /**
  * MCP 目录快照应用层（依赖方向单向：{@link McpServiceService} → 本类）。
@@ -369,6 +370,6 @@ public class McpMetadataService {
 
     /** 日志脱敏（工具名来自上游，可能带控制字符） */
     private static String sanitizeForLog(String s) {
-        return com.ragagent.common.security.LogSanitizer.sanitize(s);
+        return LogSanitizer.sanitize(s);
     }
 }

@@ -21,6 +21,7 @@ import com.ragagent.agent.tools.DocChunkSupport;
 import com.ragagent.agent.tools.SearchAuth;
 import com.ragagent.agent.tools.ToolDefinitions;
 import com.ragagent.agent.tools.ToolRequest;
+import com.ragagent.common.retrieval.SearchTarget;
 
 /**
  * wiki_read_source_doc 工具。
@@ -64,11 +65,11 @@ public class WikiReadSourceDocTool extends BaseTool {
     private final KnowledgeInfoReader knowledgeReader;
     private final PagedChunks pagedChunks;
     private final ImageInfoCollector imageCollector;
-    private final com.ragagent.common.retrieval.SearchTarget.SearchTargets searchTargets;
+    private final SearchTarget.SearchTargets searchTargets;
 
     public WikiReadSourceDocTool(KnowledgeInfoReader knowledgeReader, PagedChunks pagedChunks,
             ImageInfoCollector imageCollector,
-            com.ragagent.common.retrieval.SearchTarget.SearchTargets searchTargets) {
+            SearchTarget.SearchTargets searchTargets) {
         super(ToolDefinitions.TOOL_WIKI_READ_SOURCE_DOC, DESCRIPTION, SCHEMA_JSON);
         this.knowledgeReader = knowledgeReader;
         this.pagedChunks = pagedChunks;

@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.ragagent.TestSchema;
+import com.ragagent.storage.service.ResourceCatalogService;
 
 /**
  * AgentWebPages 生产存储接缝。
@@ -31,7 +32,7 @@ class AgentWebPagesStoreTest {
     @Autowired
     private JdbcTemplate jdbc;
     @Autowired
-    private com.ragagent.storage.service.ResourceCatalogService catalog;
+    private ResourceCatalogService catalog;
     @Autowired
     private ArtifactCollectorWiring wiring;
 

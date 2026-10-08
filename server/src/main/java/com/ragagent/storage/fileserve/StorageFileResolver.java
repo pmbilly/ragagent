@@ -19,6 +19,10 @@ import com.ragagent.storage.config.StorageProviderEnv;
 import com.ragagent.storage.domain.StorageBackend;
 import com.ragagent.storage.mapper.StorageBackendRepository;
 import com.ragagent.storage.service.ResourceCatalogService;
+import com.ragagent.storage.config.StorageEnvLookup;
+import com.ragagent.storage.provider.FileService;
+import com.ragagent.storage.provider.FileServiceFactory;
+import com.ragagent.tenant.StorageEngineConfig;
 
 /**
  * 运行时存储解析器，三个职责：
@@ -349,7 +353,7 @@ public class StorageFileResolver {
     // ── 写面（A3-3 尾批）：知识上传/读取用的**原始** provider 服务 ──────────────
 
     /** provider 服务的原始解析结果（未经 resource catalog 装饰——写面用）。 */
-    public record ProviderResolution(com.ragagent.storage.provider.FileService service,
+    public record ProviderResolution(FileService service,
                                      String provider, String error) {
         public boolean ok() {
             return error == null && service != null;
@@ -409,12 +413,12 @@ public class StorageFileResolver {
         String dir = baseDir == null || baseDir.isEmpty()
                 ? StoragePaths.localStorageBaseDir() : baseDir;
         try {
-            com.ragagent.tenant.StorageEngineConfig typed = sec == null
-                    ? new com.ragagent.tenant.StorageEngineConfig()
+            StorageEngineConfig typed = sec == null
+                    ? new StorageEngineConfig()
                     : CONFIG_MAPPER.convertValue(sec,
-                            com.ragagent.tenant.StorageEngineConfig.class);
-            com.ragagent.storage.provider.FileServiceFactory.Created created =
-                    com.ragagent.storage.provider.FileServiceFactory.fromStorageConfig(p, typed, dir);
+                            StorageEngineConfig.class);
+            FileServiceFactory.Created created =
+                    FileServiceFactory.fromStorageConfig(p, typed, dir);
             if (created == null || created.service() == null) {
                 return new ProviderResolution(null, p, "unsupported provider \"" + p + "\"");
             }
@@ -444,7 +448,7 @@ public class StorageFileResolver {
      * 走存储域统一查找面；未配置 → 空串。
      */
     private static String env(String key) {
-        String v = com.ragagent.storage.config.StorageEnvLookup.get(key);
+        String v = StorageEnvLookup.get(key);
         return v == null ? "" : v.trim();
     }
 

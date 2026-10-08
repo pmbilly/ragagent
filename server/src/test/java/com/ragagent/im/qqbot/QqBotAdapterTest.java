@@ -25,6 +25,7 @@ import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.ReplyMessage;
 import com.sun.net.httpserver.HttpServer;
+import com.ragagent.common.security.SsrfGuard;
 
 /**
  * QQ 机器人出站客户端行为测试：
@@ -180,7 +181,7 @@ class QqBotAdapterTest {
         channel.setMode("webhook");
         channel.setCredentials("{\"app_id\":\"APP\",\"client_secret\":\"S\"}");
         assertThrows(IllegalArgumentException.class,
-                () -> new QqBotAdapterFactory((com.ragagent.common.security.SsrfGuard) null)
+                () -> new QqBotAdapterFactory((SsrfGuard) null)
                         .create(channel, (m, c) -> { }));
 
         assertEquals("qqbot app_id is required", assertThrows(IllegalArgumentException.class,

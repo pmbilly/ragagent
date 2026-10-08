@@ -23,6 +23,7 @@ import com.ragagent.wiki.service.ingest.WikiIngestTaskHandler;
 import com.ragagent.wiki.service.ingest.WikiIngestTaskQueue;
 import com.ragagent.wiki.service.page.RedisWikiSlugLock;
 import com.ragagent.wiki.service.page.WikiSlugLock;
+import com.ragagent.wiki.mapper.TaskDeadLetterRepository;
 
 /**
  * wiki 域的 Redis 面装配（多实例部署）。
@@ -110,7 +111,7 @@ public class WikiRedisWiring {
     @Primary
     public WikiIngestTaskQueue redisWikiIngestTaskQueue(StringRedisTemplate template,
             ObjectProvider<WikiIngestTaskHandler> handlerProvider,
-            ObjectProvider<com.ragagent.wiki.mapper.TaskDeadLetterRepository> deadLetterProvider,
+            ObjectProvider<TaskDeadLetterRepository> deadLetterProvider,
             ObjectProvider<WikiIngestService> ingestServiceProvider) {
         return new RedisWikiIngestTaskQueue(template, handlerProvider, deadLetterProvider,
                 ingestServiceProvider);

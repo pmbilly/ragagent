@@ -14,6 +14,7 @@ import com.ragagent.llm.domain.ChatResponse;
 import com.ragagent.common.llm.ResponseType;
 import com.ragagent.llm.domain.StreamResponse;
 import com.ragagent.llm.domain.ToolCall;
+import com.ragagent.llm.domain.ChatTool;
 
 /**
  * chat 客户端的 langfuse 装饰器：
@@ -213,7 +214,7 @@ public final class LangfuseChatClient implements LlmChatClient {
             return meta;
         }
         List<String> names = new ArrayList<>(options.getTools().size());
-        for (com.ragagent.llm.domain.ChatTool tool : options.getTools()) {
+        for (ChatTool tool : options.getTools()) {
             String name = tool.getFunction() == null ? "" : tool.getFunction().getName();
             names.add(name);
             if ("discover_mcp_tools".equals(name) && tool.getFunction() != null

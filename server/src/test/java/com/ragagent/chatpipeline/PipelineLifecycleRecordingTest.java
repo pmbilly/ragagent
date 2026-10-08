@@ -29,6 +29,7 @@ import com.ragagent.common.graph.GraphNode;
 import com.ragagent.common.graph.GraphRelation;
 import com.ragagent.llm.extract.EntityExtraction;
 import com.ragagent.llm.extract.PipelineConfig;
+import com.ragagent.llm.domain.StreamResponse;
 
 /**
  * 录制回放：progress / into_chat / references / completion / stream / entity / web_fetch
@@ -450,7 +451,7 @@ class PipelineLifecycleRecordingTest {
     @Test
     void completionStream() throws Exception {
         // 1) thinking + answer
-        List<com.ragagent.llm.domain.StreamResponse> script1 = List.of(
+        List<StreamResponse> script1 = List.of(
                 Rec46cSupport.streamResponse(ResponseType.THINKING, "让我想想。", false),
                 Rec46cSupport.streamResponse(ResponseType.THINKING, "再想想", true),
                 Rec46cSupport.streamResponse(ResponseType.ANSWER, "答案第一段。", false),

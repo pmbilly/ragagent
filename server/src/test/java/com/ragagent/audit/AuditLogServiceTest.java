@@ -27,6 +27,7 @@ import com.ragagent.audit.domain.AuditOutcome;
 import com.ragagent.audit.mapper.AuditLogRepository;
 import com.ragagent.audit.service.AuditLogService;
 import org.junit.jupiter.api.Test;
+import com.ragagent.audit.domain.AuditLogQuery;
 
 /**
  * 审计服务语义测试。
@@ -275,6 +276,6 @@ class AuditLogServiceTest {
         List<AuditLog> rows = List.of(new AuditLog());
         when(f.repo().list(eq(7L), any())).thenReturn(rows);
 
-        assertThat(f.svc().list(7L, com.ragagent.audit.domain.AuditLogQuery.empty())).isSameAs(rows);
+        assertThat(f.svc().list(7L, AuditLogQuery.empty())).isSameAs(rows);
     }
 }

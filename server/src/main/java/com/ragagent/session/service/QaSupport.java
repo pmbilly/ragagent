@@ -15,6 +15,11 @@ import com.ragagent.storage.support.StreamRewriter;
 import com.ragagent.stream.StreamEvent;
 import com.ragagent.event.EventBus;
 import com.ragagent.agent.SteerSink;
+import com.ragagent.agent.management.domain.CustomAgentEntity;
+import com.ragagent.common.llm.ResponseType;
+import com.ragagent.event.TenantContextSnapshot;
+import com.ragagent.session.domain.MessageAttachment;
+import com.ragagent.session.domain.SuggestionAttribution;
 
 /**
  * QA 请求上下文与共享辅助。
@@ -46,7 +51,7 @@ public final class QaSupport {
         public String query = "";
         public Session session;
         /** 已解析的 agent（id/config 树）；null = 未指定或未解析到 */
-        public com.ragagent.agent.management.domain.CustomAgentEntity agentRow;
+        public CustomAgentEntity agentRow;
         /** agent 的 config 树（ensureDefaults 后的 ObjectNode） */
         public com.fasterxml.jackson.databind.node.ObjectNode agentConfig;
         public Message assistantMessage;
@@ -71,12 +76,12 @@ public final class QaSupport {
         /** Source channel: "web", "api", "im", etc. */
         public String channel = "";
         /** Processed base64 file attachments (legacy inline uploads) */
-        public List<com.ragagent.session.domain.MessageAttachment> attachments = new ArrayList<>();
+        public List<MessageAttachment> attachments = new ArrayList<>();
         /** Pre-uploaded session-scoped document IDs, resolved after SSE starts */
         public List<String> attachmentIDs = new ArrayList<>();
         /** Metadata-only view of attachmentIDs for the persisted user message */
-        public List<com.ragagent.session.domain.MessageAttachment> attachmentMetas = new ArrayList<>();
-        public com.ragagent.session.domain.SuggestionAttribution suggestionAttribution;
+        public List<MessageAttachment> attachmentMetas = new ArrayList<>();
+        public SuggestionAttribution suggestionAttribution;
         /**
          * turns internal storage references in the outbound stream into directly
          * loadable URLs when the caller asks for {@code resource_urls=public}.
@@ -157,7 +162,7 @@ public final class QaSupport {
     public static final class SseStreamContext {
         public EventBus eventBus;
         /** 虚拟线程上显式传租户的快照 */
-        public com.ragagent.event.TenantContextSnapshot tenantSnapshot;
+        public TenantContextSnapshot tenantSnapshot;
         public volatile boolean cancelled;
         public Message assistantMessage;
         public SteerSinkBridge steerSink;
@@ -450,7 +455,7 @@ public final class QaSupport {
     public static StreamEvent steerEvent(String id, String query, List<MentionedItem> mentionedItems, String channel) {
         StreamEvent evt = new StreamEvent();
         evt.setId(id);
-        evt.setType(com.ragagent.common.llm.ResponseType.STEER);
+        evt.setType(ResponseType.STEER);
         evt.setContent(query);
         evt.setDone(true);
         Map<String, Object> data = new LinkedHashMap<>();
@@ -507,7 +512,7 @@ public final class QaSupport {
         public String query = "";
         public String assistantMessageId = "";
         public String summaryModelId = "";
-        public com.ragagent.agent.management.domain.CustomAgentEntity agentRow;
+        public CustomAgentEntity agentRow;
         public com.fasterxml.jackson.databind.node.ObjectNode agentConfig;
         public boolean sharedAgentReadOnly;
         public List<String> knowledgeBaseIds = new ArrayList<>();
@@ -520,7 +525,7 @@ public final class QaSupport {
         public String userMessageId = "";
         public boolean webSearchEnabled;
         public String quotedContext = "";
-        public List<com.ragagent.session.domain.MessageAttachment> attachments = new ArrayList<>();
+        public List<MessageAttachment> attachments = new ArrayList<>();
         public SteerSink steerSink;
         /**
          * 用户停止（stop）的取消探针（贯穿 think/act/审批等待）：null=存活；

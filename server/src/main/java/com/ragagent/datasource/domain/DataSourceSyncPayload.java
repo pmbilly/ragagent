@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.common.context.TracingContext;
 
 /**
  * 一次数据源同步任务的载荷。
@@ -92,16 +93,16 @@ public record DataSourceSyncPayload(
     public static DataSourceSyncPayload withTracing(TaskInitiator initiator, String trigger,
                                                     String dataSourceId, long tenantId,
                                                     String syncLogId, boolean forceFull, int maxItems,
-                                                    com.ragagent.common.context.TracingContext tracing) {
-        com.ragagent.common.context.TracingContext tc = tracing == null
-                ? com.ragagent.common.context.TracingContext.EMPTY : tracing;
+                                                    TracingContext tracing) {
+        TracingContext tc = tracing == null
+                ? TracingContext.EMPTY : tracing;
         return new DataSourceSyncPayload(initiator, trigger, dataSourceId, tenantId, syncLogId,
                 forceFull, maxItems, tc.isEmpty() ? null : tc);
     }
 
     /** 追踪载体的结构视图（worker 侧续接用）。 */
-    public com.ragagent.common.context.TracingContext tracing() {
-        return tracing == null ? com.ragagent.common.context.TracingContext.EMPTY : tracing;
+    public TracingContext tracing() {
+        return tracing == null ? TracingContext.EMPTY : tracing;
     }
 
     /** 序列化：载荷以 JSON 形态进队列。 */

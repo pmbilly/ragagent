@@ -26,6 +26,8 @@ import com.ragagent.rerank.provider.OpenAiReranker;
 import com.ragagent.rerank.provider.VolcengineReranker;
 import com.ragagent.rerank.provider.ZhipuReranker;
 import com.ragagent.common.web.ProviderJson;
+import com.ragagent.model.domain.Model;
+import com.ragagent.model.domain.ModelParameters;
 
 /**
  * rerank 客户端的 stub server A/B：请求体与录制（wire/*.json）逐字节比对 +
@@ -594,12 +596,12 @@ class RerankWireTest {
 
     @Test
     void configFromModelMapsFields() {
-        com.ragagent.model.domain.Model m = new com.ragagent.model.domain.Model();
+        Model m = new Model();
         m.setId("rr-9");
         m.setName("rerank-model");
         m.setSource("remote");
-        com.ragagent.model.domain.ModelParameters p =
-                new com.ragagent.model.domain.ModelParameters();
+        ModelParameters p =
+                new ModelParameters();
         p.setBaseUrl("https://api.example.com/v1");
         p.setApiKey("sk-xxx");
         p.setProvider("jina");

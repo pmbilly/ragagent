@@ -31,6 +31,8 @@ import com.ragagent.agent.tools.ThinkStreamSplitter;
 import com.ragagent.modelcontext.StreamDecoder;
 import com.ragagent.llm.domain.StreamResponse;
 import com.ragagent.llm.domain.TokenUsage;
+import com.ragagent.common.context.TenantContext;
+import com.ragagent.llm.domain.ToolCall;
 
 /**
  * ReAct「Think」段的协作者：LLM 流式调用与事件直播——流消费与停顿看门狗、
@@ -53,7 +55,7 @@ final class ThinkPhase {
     static final class StreamLLMResult {
         String content = "";
         String reasoningContent = "";
-        List<com.ragagent.llm.domain.ToolCall> toolCalls;
+        List<ToolCall> toolCalls;
         TokenUsage usage;
         String finishReason = "";
         String streamError = "";
@@ -181,7 +183,7 @@ final class ThinkPhase {
         // 跨 provider 分片的句柄就不会漏进工具执行。
         if (result.toolCalls != null) {
             engine.modelContext.decodeToolCalls(result.toolCalls);
-            for (com.ragagent.llm.domain.ToolCall toolCall : result.toolCalls) {
+            for (ToolCall toolCall : result.toolCalls) {
                 if (toolCall.getUnresolvedHandles() == null || toolCall.getUnresolvedHandles().isEmpty()) {
                     continue;
                 }
@@ -425,7 +427,7 @@ final class ThinkPhase {
 
         final int maxDetailMsgs = 4;
         log.info("[Agent][Round-{}] Calling LLM: {} messages, {} tools, tenantId={}", round, messages.size(),
-                tools.size(), com.ragagent.common.context.TenantContext.currentTenantId());
+                tools.size(), TenantContext.currentTenantId());
         int startIdx = 0;
         if (messages.size() > maxDetailMsgs) {
             startIdx = messages.size() - maxDetailMsgs;
@@ -439,7 +441,7 @@ final class ThinkPhase {
                         round, i, msg.getName(), msg.getContent().length());
             } else if (msg.getToolCalls() != null && !msg.getToolCalls().isEmpty()) {
                 List<String> tcNames = new ArrayList<>();
-                for (com.ragagent.llm.domain.ToolCall tc : msg.getToolCalls()) {
+                for (ToolCall tc : msg.getToolCalls()) {
                     tcNames.add(tc.getFunction().getName());
                 }
                 log.debug("[Agent][Round-{}] msg[{}]: role={}, len={}, tool_calls={}",
@@ -545,7 +547,7 @@ final class ThinkPhase {
 
         if (response.getToolCalls() != null && !response.getToolCalls().isEmpty()) {
             List<String> tcNames = new ArrayList<>();
-            for (com.ragagent.llm.domain.ToolCall tc : response.getToolCalls()) {
+            for (ToolCall tc : response.getToolCalls()) {
                 tcNames.add(tc.getFunction().getName());
             }
             log.info("[Agent][Round-{}] LLM responded: finish={}, content={} chars, tools={}",

@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
+import com.ragagent.tracing.langfuse.LangfuseTaskScope;
 
 /**
  * {@link MemoryExtractTaskQueue} 的<b>进程内</b>实现：虚拟线程队列
@@ -115,12 +116,12 @@ public class InProcessMemoryExtractTaskQueue implements MemoryExtractTaskQueue {
             MemoryExtractPayload payload = MemoryExtractPayload.fromJson(body);
             // 任务侧观测——负载带 traceparent 就续接
             // 上游 trace，否则以任务类型开独立根；处理体包在同名 span 内。
-            try (com.ragagent.tracing.langfuse.LangfuseTaskScope scope =
-                         com.ragagent.tracing.langfuse.LangfuseTaskScope.start(
+            try (LangfuseTaskScope scope =
+                         LangfuseTaskScope.start(
                                  TASK_TYPE_MEMORY_EXTRACT, payload.tracing(),
                                  java.util.Map.of("subject_id", payload.subjectId(),
                                          "message_id", payload.messageId()),
-                                 com.ragagent.tracing.langfuse.LangfuseTaskScope
+                                 LangfuseTaskScope
                                          .previewPayload(body))) {
                 handler.handle(payload);
             }

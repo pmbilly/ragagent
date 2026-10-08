@@ -24,6 +24,7 @@ import com.ragagent.common.retrieval.SearchTarget;
 import com.ragagent.agent.tools.ToolRequest;
 import com.ragagent.agent.tools.GoRecording45B;
 import com.ragagent.agent.tools.RecordingSupport;
+import com.ragagent.support.ContractJson;
 
 /**
  * 4.5b 回放：grep_chunks 的录制回放。
@@ -310,8 +311,8 @@ class GrepChunksRecordingTest {
     private static void assertToolResult(String label, ToolResult result, JsonNode r) {
         assertThat(result.isSuccess()).as("%s success", label).isEqualTo(r.get("success").asBoolean());
         // 输出数字形态与录制侧不同（1 vs 1.0）——语义比较吸收
-        assertThat(com.ragagent.support.ContractJson.deep(result.getOutput())).as("%s output", label)
-                .isEqualTo(com.ragagent.support.ContractJson.deep(r.get("output").asText()));
+        assertThat(ContractJson.deep(result.getOutput())).as("%s output", label)
+                .isEqualTo(ContractJson.deep(r.get("output").asText()));
         String wantError = r.hasNonNull("error") ? r.get("error").asText() : "";
         if (!wantError.isEmpty()) {
             assertThat(result.getError()).as("%s error", label).isEqualTo(wantError);
@@ -320,10 +321,10 @@ class GrepChunksRecordingTest {
         if (wantData == null || wantData.isNull()) {
             assertThat(result.getData()).as("%s data", label).isNull();
         } else {
-            assertThat(com.ragagent.support.ContractJson.deep(
+            assertThat(ContractJson.deep(
                     RecordingSupport.PLAIN.valueToTree(result.getData()).toString()))
                     .as("%s data", label)
-                    .isEqualTo(com.ragagent.support.ContractJson.deep(wantData.toString()));
+                    .isEqualTo(ContractJson.deep(wantData.toString()));
         }
     }
 

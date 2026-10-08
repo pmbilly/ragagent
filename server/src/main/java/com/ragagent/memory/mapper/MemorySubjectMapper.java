@@ -12,6 +12,8 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import com.ragagent.memory.domain.MemoryExtractionStateTypeHandler;
+import com.ragagent.memory.domain.MemoryStringListTypeHandler;
 
 /**
  * {@code memory_subjects} 的基础仓储。
@@ -46,9 +48,9 @@ public interface MemorySubjectMapper extends BaseMapper<MemorySubject> {
      */
     @Results({
             @Result(column = "extraction_state", property = "extractionState",
-                    typeHandler = com.ragagent.memory.domain.MemoryExtractionStateTypeHandler.class),
+                    typeHandler = MemoryExtractionStateTypeHandler.class),
             @Result(column = "pending_sessions", property = "pendingSessions",
-                    typeHandler = com.ragagent.memory.domain.MemoryStringListTypeHandler.class),
+                    typeHandler = MemoryStringListTypeHandler.class),
     })
     @Select("SELECT * FROM memory_subjects WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId}")
     MemorySubject selectByScope(@Param("tenantId") long tenantId, @Param("subjectId") String subjectId);
@@ -63,9 +65,9 @@ public interface MemorySubjectMapper extends BaseMapper<MemorySubject> {
      */
     @Results({
             @Result(column = "extraction_state", property = "extractionState",
-                    typeHandler = com.ragagent.memory.domain.MemoryExtractionStateTypeHandler.class),
+                    typeHandler = MemoryExtractionStateTypeHandler.class),
             @Result(column = "pending_sessions", property = "pendingSessions",
-                    typeHandler = com.ragagent.memory.domain.MemoryStringListTypeHandler.class),
+                    typeHandler = MemoryStringListTypeHandler.class),
     })
     @Select("SELECT * FROM memory_subjects WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId} FOR UPDATE")
     MemorySubject selectByScopeForUpdate(@Param("tenantId") long tenantId,

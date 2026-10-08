@@ -23,6 +23,12 @@ import com.ragagent.retrieval.engine.RetrieveEngineService;
 import com.ragagent.retrieval.engine.TenantStoreOwnership;
 import com.ragagent.retrieval.engine.VectorStoreRepoOwnership;
 import com.ragagent.common.vectorstore.VectorStoreLookup;
+import com.ragagent.retrieval.engine.doris.DorisRetrieveRepository;
+import com.ragagent.retrieval.engine.milvus.MilvusRetrieveRepository;
+import com.ragagent.retrieval.engine.qdrant.QdrantRetrieveRepository;
+import com.ragagent.retrieval.engine.sqlite.SqliteRetrieveRepository;
+import com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbRetrieveRepository;
+import com.ragagent.retrieval.engine.weaviate.WeaviateRetrieveRepository;
 
 /**
  * 检索引擎层的生产装配。
@@ -193,11 +199,11 @@ public class RetrievalEngineWiringConfig {
             }
         }
         String httpBase = "http://"
-                + com.ragagent.retrieval.engine.doris.DorisRetrieveRepository.hostFromAddr(addr)
+                + DorisRetrieveRepository.hostFromAddr(addr)
                 + ":" + httpPort;
         try {
-            com.ragagent.retrieval.engine.doris.DorisRetrieveRepository repo =
-                    com.ragagent.retrieval.engine.doris.DorisRetrieveRepository.create(
+            DorisRetrieveRepository repo =
+                    DorisRetrieveRepository.create(
                             addr, httpBase, username, password, database, null, guard);
             register(registry, new KeywordsVectorHybridRetrieveEngineService(repo,
                     EngineTypes.ENGINE_DORIS), label);
@@ -234,8 +240,8 @@ public class RetrievalEngineWiringConfig {
             useTls = !"false".equals(lower) && !"0".equals(lower);
         }
         try {
-            com.ragagent.retrieval.engine.qdrant.QdrantRetrieveRepository repo =
-                    com.ragagent.retrieval.engine.qdrant.QdrantRetrieveRepository.create(host,
+            QdrantRetrieveRepository repo =
+                    QdrantRetrieveRepository.create(host,
                             port, env("QDRANT_API_KEY"), useTls, null, guard);
             register(registry, new KeywordsVectorHybridRetrieveEngineService(repo,
                     EngineTypes.ENGINE_QDRANT), label);
@@ -266,8 +272,8 @@ public class RetrievalEngineWiringConfig {
             apiKey = env("WEAVIATE_API_KEY").trim();
         }
         try {
-            com.ragagent.retrieval.engine.weaviate.WeaviateRetrieveRepository repo =
-                    com.ragagent.retrieval.engine.weaviate.WeaviateRetrieveRepository.create(host,
+            WeaviateRetrieveRepository repo =
+                    WeaviateRetrieveRepository.create(host,
                             scheme, apiKey, null, guard);
             register(registry, new KeywordsVectorHybridRetrieveEngineService(repo,
                     EngineTypes.ENGINE_WEAVIATE), label);
@@ -288,8 +294,8 @@ public class RetrievalEngineWiringConfig {
             addr = "localhost:19530";
         }
         try {
-            com.ragagent.retrieval.engine.milvus.MilvusRetrieveRepository repo =
-                    com.ragagent.retrieval.engine.milvus.MilvusRetrieveRepository.create(addr,
+            MilvusRetrieveRepository repo =
+                    MilvusRetrieveRepository.create(addr,
                             env("MILVUS_USERNAME"), env("MILVUS_PASSWORD"), env("MILVUS_DB_NAME"),
                             null, guard);
             register(registry, new KeywordsVectorHybridRetrieveEngineService(repo,
@@ -315,8 +321,8 @@ public class RetrievalEngineWiringConfig {
             return;
         }
         try {
-            com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbRetrieveRepository repo =
-                    com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbRetrieveRepository
+            TencentVectorDbRetrieveRepository repo =
+                    TencentVectorDbRetrieveRepository
                             .create(addr, username, apiKey, env("TENCENT_VECTORDB_DATABASE"),
                                     null, guard);
             register(registry, new KeywordsVectorHybridRetrieveEngineService(repo,
@@ -333,9 +339,9 @@ public class RetrievalEngineWiringConfig {
      */
     private static void envSqlite(EngineRegistry registry) {
         try {
-            com.ragagent.retrieval.engine.sqlite.SqliteRetrieveRepository repo =
-                    com.ragagent.retrieval.engine.sqlite.SqliteRetrieveRepository.create(
-                            com.ragagent.retrieval.engine.sqlite.SqliteRetrieveRepository
+            SqliteRetrieveRepository repo =
+                    SqliteRetrieveRepository.create(
+                            SqliteRetrieveRepository
                                     .resolvePath(null));
             register(registry, new KeywordsVectorHybridRetrieveEngineService(repo,
                     EngineTypes.ENGINE_SQLITE), "sqlite");

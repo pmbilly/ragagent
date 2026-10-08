@@ -13,6 +13,10 @@ import com.ragagent.session.service.QaSupport.QaRequestContext;
 import com.ragagent.session.service.SessionKnowledgeQaService;
 import com.ragagent.session.service.SessionService;
 import com.ragagent.session.service.TemporaryDocumentService;
+import com.ragagent.event.TenantContextSnapshot;
+import com.ragagent.memory.service.MemoryExtractionService;
+import com.ragagent.session.domain.SessionLastRequestState;
+import com.ragagent.session.service.SessionLookupScope;
 
 /**
  * {@code KnowledgeQaController} 的**收尾簇**：轮次状态落库、待处理附件判定、
@@ -30,9 +34,9 @@ final class QaTurnFinalizer {
     private final MessageService messageService;
     private final MessageSuggestionService suggestionService;
     private final TemporaryDocumentService temporaryDocuments;
-    private final com.ragagent.memory.service.MemoryExtractionService memoryExtraction;
+    private final MemoryExtractionService memoryExtraction;
 
-    QaTurnFinalizer(SessionService sessionService, MessageService messageService, MessageSuggestionService suggestionService, TemporaryDocumentService temporaryDocuments, com.ragagent.memory.service.MemoryExtractionService memoryExtraction) {
+    QaTurnFinalizer(SessionService sessionService, MessageService messageService, MessageSuggestionService suggestionService, TemporaryDocumentService temporaryDocuments, MemoryExtractionService memoryExtraction) {
         this.sessionService = sessionService;
         this.messageService = messageService;
         this.suggestionService = suggestionService;
@@ -51,8 +55,8 @@ final class QaTurnFinalizer {
      * 线程上，身份被抹后同线程后续的 owner/权限判定全部失真。</p>
      */
     void runWithTenant(Long tenantId, Runnable body) {
-        com.ragagent.event.TenantContextSnapshot prev =
-                com.ragagent.event.TenantContextSnapshot.capture();
+        TenantContextSnapshot prev =
+                TenantContextSnapshot.capture();
         try {
             if (tenantId != null) {
                 prev.withTenantId(tenantId).replay();
@@ -83,8 +87,8 @@ final class QaTurnFinalizer {
             agentEnabled = SessionKnowledgeQaService.isAgentMode(reqCtx.agentConfig);
         }
         try {
-            com.ragagent.session.domain.SessionLastRequestState state =
-                    new com.ragagent.session.domain.SessionLastRequestState();
+            SessionLastRequestState state =
+                    new SessionLastRequestState();
             state.setAgentId(QaSupport.orEmpty(reqCtx.reqAgentID));
             state.setAgentEnabled(agentEnabled);
             state.setModelId(reqCtx.summaryModelId);
@@ -117,31 +121,31 @@ final class QaTurnFinalizer {
         // 再重放。历史上这里只带 tenantId，principal/userId 丢失后
         // sessionUserIDForLookup() 推导出 owner=""，embed（owner=embed_session:…）与
         // 平台（owner=<userId>）会话的索引与 follow-up 全部 SessionNotFoundException。
-        final com.ragagent.event.TenantContextSnapshot asyncTenant =
-                com.ragagent.event.TenantContextSnapshot.capture();
+        final TenantContextSnapshot asyncTenant =
+                TenantContextSnapshot.capture();
         Thread.ofVirtual().start(() -> {
             asyncTenant.replay();
-            com.ragagent.session.service.SessionLookupScope.mark();
+            SessionLookupScope.mark();
             try {
                 messageService.indexMessageToKb(userQuery, content, amId, sessionId);
             } catch (RuntimeException e) {
                 log.warn("index message to KB failed for message {}: {}", amId, e.toString());
             } finally {
                 TenantContext.clear();
-                com.ragagent.session.service.SessionLookupScope.clear();
+                SessionLookupScope.clear();
             }
         });
         if (userQuery != null && !userQuery.isEmpty() && suggestionService != null) {
             Thread.ofVirtual().start(() -> {
                 asyncTenant.replay();
-                com.ragagent.session.service.SessionLookupScope.mark();
+                SessionLookupScope.mark();
                 try {
                     suggestionService.ensureFollowUps(sessionId, amId, false);
                 } catch (RuntimeException e) {
                     log.warn("follow-up suggestion generation failed for message {}: {}", amId, e.toString());
                 } finally {
                     TenantContext.clear();
-                    com.ragagent.session.service.SessionLookupScope.clear();
+                    SessionLookupScope.clear();
                 }
             });
         }

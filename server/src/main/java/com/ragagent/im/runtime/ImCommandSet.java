@@ -10,6 +10,7 @@ import com.ragagent.im.runtime.Commands.CommandContext;
 import com.ragagent.im.runtime.Commands.CommandRegistry;
 import com.ragagent.im.runtime.Commands.CommandResult;
 import com.ragagent.im.runtime.Commands.ImCommand;
+import com.ragagent.agent.management.domain.CustomAgentEntity;
 
 /**
  * 五个斜杠命令。注册序固定：help → info → search → stop → clear。
@@ -59,7 +60,7 @@ public final class ImCommandSet {
     public static final class AgentCfgView {
         private final JsonNode cfg;
 
-        public AgentCfgView(com.ragagent.agent.management.domain.CustomAgentEntity agent) {
+        public AgentCfgView(CustomAgentEntity agent) {
             JsonNode parsed = null;
             if (agent != null && agent.getConfig() != null && !agent.getConfig().isEmpty()) {
                 try {

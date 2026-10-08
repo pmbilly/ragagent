@@ -14,6 +14,7 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import com.ragagent.common.web.ZeroTimeSerializer;
 
 /**
  * {@code agent_steps}（{@code AgentSteps} jsonb 载荷）的逐字节契约测试。
@@ -225,7 +226,7 @@ class AgentStepsJsonTest {
                 + "\"timestamp\":\"0001-01-01T00:00:00Z\"}]";
         List<AgentStep> steps = MAPPER.readValue(raw,
                 new com.fasterxml.jackson.core.type.TypeReference<List<AgentStep>>() {});
-        assertThat(com.ragagent.common.web.ZeroTimeSerializer.isZeroValue(steps.get(0).getTimestamp()))
+        assertThat(ZeroTimeSerializer.isZeroValue(steps.get(0).getTimestamp()))
                 .as("零值时间读回仍是零值（isZeroValue 判定）")
                 .isTrue();
         assertThat(write(steps)).isEqualTo(raw);

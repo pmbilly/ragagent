@@ -20,6 +20,7 @@ import com.ragagent.memory.mapper.MemoryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import com.ragagent.llm.LlmChatClient;
 
 /**
  * 把一次抽取产出的标签映射到这个人**已经有**的主体上。
@@ -325,7 +326,7 @@ public class MemoryTopicResolver {
             log.warn("memory: no model available to resolve {} new topics", unresolved.size());
             return;
         }
-        com.ragagent.llm.LlmChatClient chatModel;
+        LlmChatClient chatModel;
         try {
             chatModel = modelResolver.getChatModel(modelId);
         } catch (RuntimeException e) {

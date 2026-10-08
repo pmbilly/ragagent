@@ -20,6 +20,7 @@ import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
 import com.ragagent.retrieval.engine.RetrieveEngineRepository;
 import com.ragagent.common.vectorstore.IndexConfig;
+import com.ragagent.retrieval.config.RetrievalEnvLookup;
 
 /**
  * Apache Doris 检索引擎仓储。
@@ -110,7 +111,7 @@ public class DorisRetrieveRepository
     public static DorisRetrieveRepository create(String addr, String httpBase, String username,
                                                  String password, String database,
                                                  IndexConfig indexCfg, SsrfGuard guard) {
-        String compatRaw = com.ragagent.retrieval.config.RetrievalEnvLookup.get(DorisCompatMode.ENV_KEY);
+        String compatRaw = RetrievalEnvLookup.get(DorisCompatMode.ENV_KEY);
         DorisCompatMode.Configured configured = DorisCompatMode.configured(compatRaw);
         String tableBaseName = resolveCollectionName(indexCfg);
         if (!configured.invalidRaw().isEmpty()) {
@@ -155,7 +156,7 @@ public class DorisRetrieveRepository
                 return indexCfg.collectionName;
             }
         }
-        String env = com.ragagent.retrieval.config.RetrievalEnvLookup.get(ENV_DORIS_TABLE_PREFIX);
+        String env = RetrievalEnvLookup.get(ENV_DORIS_TABLE_PREFIX);
         if (env != null && !env.isEmpty()) {
             return env;
         }

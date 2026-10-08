@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import com.ragagent.tenant.Tenant;
 
 /**
  * 跨空间租户目录 + KV 配置分发器（五条路由）：
@@ -120,7 +121,7 @@ public class TenantCatalogController {
 
     /** GET /tenants/all —— 全量目录（跨空间访问权由守卫组承担；无分页）。 */
     @GetMapping("/api/v1/tenants/all")
-    public List<com.ragagent.tenant.Tenant> listAllTenants() {
+    public List<Tenant> listAllTenants() {
         return tenantService.searchTenants("", 0, 0, 0).tenants();
     }
 

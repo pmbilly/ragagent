@@ -32,6 +32,12 @@ import com.ragagent.datasource.domain.SyncCursor;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import com.ragagent.common.web.ZeroTimeSerializer;
+import com.ragagent.datasource.Connector;
+import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes;
+import com.ragagent.datasource.connector.feishu.core.FeishuClient;
+import com.ragagent.datasource.connector.feishu.core.FeishuConfig;
+import com.ragagent.datasource.connector.feishu.core.FeishuCursorCodec;
 
 /**
  * wiki 连接器的语义测试。
@@ -257,15 +263,15 @@ class WikiConnectorTest {
         @Test
         @DisplayName("时间回落到 node_*（对照 TestContentTimes_FallBackToNodeTimes）")
         void contentTimesFallBackToNodeTimes() {
-            com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.WikiNode n =
-                    new com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.WikiNode();
+            FeishuApiTypes.WikiNode n =
+                    new FeishuApiTypes.WikiNode();
             n.setNodeCreateTime("1700000001");
             n.setNodeEditTime("1711468800");
             assertThat(WikiConnector.contentEditTime(n).toEpochSecond()).isEqualTo(1711468800L);
             assertThat(WikiConnector.contentCreateTime(n).toEpochSecond()).isEqualTo(1700000001L);
 
-            com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.WikiNode empty =
-                    new com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.WikiNode();
+            FeishuApiTypes.WikiNode empty =
+                    new FeishuApiTypes.WikiNode();
             // 缺失的时间保持零值字面量，而不是 epoch
             assertThat(WikiConnector.contentEditTime(empty).toInstant())
                     .isEqualTo(java.time.Instant.parse("0001-01-01T00:00:00Z"));
@@ -460,12 +466,12 @@ class WikiConnectorTest {
             WikiFixtures.driveFileDownloadRoute(server, "fake-pdf-binary");
 
             DataSourceConfig ds = config(List.of("space1"));
-            com.ragagent.datasource.Connector.FetchIncrementalResult result =
+            Connector.FetchIncrementalResult result =
                     connector().fetchIncremental(ds, null);
             assertThat(result.items()).hasSize(2);
             assertThat(result.cursor()).isNotNull();
             assertThat(result.cursor().getLastSyncTime()).isNotEqualTo(
-                    com.ragagent.common.web.ZeroTimeSerializer.ZERO_DATE_TIME);
+                    ZeroTimeSerializer.ZERO_DATE_TIME);
         }
 
         @Test
@@ -475,7 +481,7 @@ class WikiConnectorTest {
 
             DataSourceConfig ds = config(List.of("space1"));
             SyncCursor cursor = connector().fetchIncremental(ds, null).cursor();
-            com.ragagent.datasource.Connector.FetchIncrementalResult second =
+            Connector.FetchIncrementalResult second =
                     connector().fetchIncremental(ds, cursor);
             assertThat(second.items()).isEmpty();
         }
@@ -503,7 +509,7 @@ class WikiConnectorTest {
             WikiFixtures.exportTrio(server, "fake-docx-content");
 
             DataSourceConfig ds2 = config(List.of("space1"));
-            com.ragagent.datasource.Connector.FetchIncrementalResult result =
+            Connector.FetchIncrementalResult result =
                     connector().fetchIncremental(ds2, cursor);
 
             int deleted = 0;
@@ -544,7 +550,7 @@ class WikiConnectorTest {
             WikiFixtures.hierarchyRoute(server, List.of(parent, peer), Map.of(), "nt-parent");
             WikiFixtures.driveFileDownloadRoute(server, "fake-file-content");
 
-            com.ragagent.datasource.Connector.FetchIncrementalResult result =
+            Connector.FetchIncrementalResult result =
                     connector().fetchIncremental(config(List.of("space1")), null);
             assertThat(result.cursor()).isNotNull();
             assertThat(result.items()).hasSize(3);
@@ -571,7 +577,7 @@ class WikiConnectorTest {
             WikiFixtures.hierarchyRoute(server, List.of(parent), firstChildren);
             WikiFixtures.driveFileDownloadRoute(server, "fake-file-content");
 
-            com.ragagent.datasource.Connector.FetchIncrementalResult first =
+            Connector.FetchIncrementalResult first =
                     connector().fetchIncremental(config(List.of("space1")), null);
             assertThat(first.items()).hasSize(2);
 
@@ -586,7 +592,7 @@ class WikiConnectorTest {
             WikiFixtures.hierarchyRoute(server, List.of(parent), Map.of(), "nt-parent");
             WikiFixtures.driveFileDownloadRoute(server, "fake-file-content");
 
-            com.ragagent.datasource.Connector.FetchIncrementalResult second =
+            Connector.FetchIncrementalResult second =
                     connector().fetchIncremental(config(List.of("space1")), first.cursor());
             for (FetchedItem it : second.items()) {
                 assertThat(it.isDeleted())
@@ -594,7 +600,7 @@ class WikiConnectorTest {
                         .isFalse();
             }
             Map<String, Map<String, String>> times =
-                    com.ragagent.datasource.connector.feishu.core.FeishuCursorCodec
+                    FeishuCursorCodec
                             .decodeSpaceNodeTimes(second.cursor().getConnectorCursor());
             assertThat(times.get("space1")).containsEntry("nt-child", "150");
         }
@@ -935,7 +941,7 @@ class WikiConnectorTest {
     void feishuCursorRoundTrip() {
         Map<String, Map<String, String>> times = Map.of("space1", Map.of("nt1", "100", "nt2", "200"));
         OffsetDateTime lastSync = OffsetDateTime.now();
-        SyncCursor cursor = com.ragagent.datasource.connector.feishu.core.FeishuCursorCodec
+        SyncCursor cursor = FeishuCursorCodec
                 .encodeSpaceNodeTimes(times, lastSync);
 
         assertThat(cursor.getConnectorCursor()).containsKey("last_sync_time");
@@ -945,7 +951,7 @@ class WikiConnectorTest {
         // 模拟一次 jsonb 落库再读回
         Map<String, Object> snapshot = FeishuTestSupport.deepCopy(cursor.getConnectorCursor());
         Map<String, Map<String, String>> restored =
-                com.ragagent.datasource.connector.feishu.core.FeishuCursorCodec
+                FeishuCursorCodec
                         .decodeSpaceNodeTimes(snapshot);
         assertThat(restored.get("space1")).containsEntry("nt1", "100").containsEntry("nt2", "200");
     }
@@ -953,12 +959,12 @@ class WikiConnectorTest {
     @Test
     @DisplayName("游标 omitempty：times 为空时 space_node_times 键整个消失（对照 Go 的 omitempty）")
     void cursorOmitsEmptyTimes() {
-        SyncCursor cursor = com.ragagent.datasource.connector.feishu.core.FeishuCursorCodec
+        SyncCursor cursor = FeishuCursorCodec
                 .encodeSpaceNodeTimes(Map.of(), OffsetDateTime.now());
         assertThat(cursor.getConnectorCursor()).doesNotContainKey("space_node_times");
         assertThat(cursor.getConnectorCursor()).containsKey("last_sync_time");
 
-        assertThat(com.ragagent.datasource.connector.feishu.core.FeishuCursorCodec
+        assertThat(FeishuCursorCodec
                 .decodeSpaceNodeTimes(Map.of())).isNull();
     }
 
@@ -1020,8 +1026,8 @@ class WikiConnectorTest {
     @Test
     @DisplayName("unsupported obj_type 走导出 API 时立刻失败（对照 ExportAndDownload 的两道 map 查询）")
     void unsupportedObjTypeForExport() {
-        assertThatThrownBy(() -> new com.ragagent.datasource.connector.feishu.core.FeishuClient(
-                new com.ragagent.datasource.connector.feishu.core.FeishuConfig())
+        assertThatThrownBy(() -> new FeishuClient(
+                new FeishuConfig())
                 .exportAndDownload("obj-token-1", "mindnote"))
                 .isInstanceOf(ConnectorException.class)
                 .hasMessage("unsupported obj_type for export: mindnote");

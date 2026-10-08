@@ -29,6 +29,7 @@ import com.ragagent.knowledge.service.KnowledgeBaseService;
 import com.ragagent.model.domain.Model;
 import com.ragagent.model.domain.ModelParameters;
 import com.ragagent.model.service.ModelService;
+import com.ragagent.initialization.dto.InitResponses;
 
 /**
  * initialization config/initialize 端点用例：KB 初始化配置读写、初始化装配与请求绑定。
@@ -119,7 +120,7 @@ public final class InitializationConfigService {
         Map<String, Object> data = new TreeMap<>();
         data.put("knowledgeBase", KnowledgeBaseResponse.from(kb, kbService.retrieveDriver()));
         // 自有契约：api_key 留在 parameters、无 credentials 键
-        data.put("models", processed.stream().map(com.ragagent.initialization.dto.InitResponses::rawModel).toList());
+        data.put("models", processed.stream().map(InitResponses::rawModel).toList());
         data.put("message", "知识库配置更新成功");
         return ResponseEntity.ok(data);
     }

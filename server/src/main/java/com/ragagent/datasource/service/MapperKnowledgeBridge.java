@@ -28,6 +28,10 @@ import com.ragagent.knowledge.task.KnowledgeProcessingQueue;
 import com.ragagent.knowledge.storage.LocalStorageService;
 import org.springframework.stereotype.Component;
 import com.ragagent.common.error.ErrorCode;
+import com.ragagent.common.error.AppError;
+import com.ragagent.common.error.BizException;
+import com.ragagent.common.web.PgJsonTypeHandler;
+import com.ragagent.knowledge.storage.TenantFileStorage;
 
 /**
  * {@link KnowledgeBridge} 的生产实现：直接用 knowledge 模块的
@@ -73,14 +77,14 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
     private final KnowledgeBaseMapper kbMapper;
     private final ChunkMapper chunkMapper;
     /** A3-3 尾批：租户感知文件存储（本地契约不变；云 provider 租户落对象存储）。 */
-    private final com.ragagent.knowledge.storage.TenantFileStorage fileStorage;
+    private final TenantFileStorage fileStorage;
     private final KnowledgeProcessingQueue worker;
     private final boolean postgres;
 
     public MapperKnowledgeBridge(KnowledgeMapper knowledgeMapper,
                                  KnowledgeBaseMapper kbMapper,
                                  ChunkMapper chunkMapper,
-                                 com.ragagent.knowledge.storage.TenantFileStorage fileStorage,
+                                 TenantFileStorage fileStorage,
                                  KnowledgeProcessingQueue worker,
                                  DataSource dataSource) {
         this.knowledgeMapper = knowledgeMapper;
@@ -172,8 +176,8 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
                                     Map<String, String> metadata, List<String> tagIds, String channel) {
         KnowledgeBase kb = findKnowledgeBase(kbId);
         if (kb == null) {
-            throw new com.ragagent.common.error.BizException(
-                    com.ragagent.common.error.AppError.notFound("knowledge base not found"));
+            throw new BizException(
+                    AppError.notFound("knowledge base not found"));
         }
         String safeName = fileName == null || fileName.isEmpty() ? "untitled" : fileName;
         String fileType = fileTypeOf(safeName);
@@ -213,8 +217,8 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
                                    String title, List<String> tagIds, String channel) {
         KnowledgeBase kb = findKnowledgeBase(kbId);
         if (kb == null) {
-            throw new com.ragagent.common.error.BizException(
-                    com.ragagent.common.error.AppError.notFound("knowledge base not found"));
+            throw new BizException(
+                    AppError.notFound("knowledge base not found"));
         }
         String name = fileName != null && !fileName.isEmpty()
                 ? fileName
@@ -236,7 +240,7 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
                 .eq(Knowledge::getId, knowledge.getId())
                 .eq(Knowledge::getTenantId, knowledge.getTenantId())
                 .set(Knowledge::getMetadata, metadataNode(metadata), "typeHandler="
-                        + com.ragagent.common.web.PgJsonTypeHandler.class.getName())
+                        + PgJsonTypeHandler.class.getName())
                 .set(Knowledge::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC));
         knowledgeMapper.update(null, uw);
         knowledge.setMetadata(metadataNode(metadata));

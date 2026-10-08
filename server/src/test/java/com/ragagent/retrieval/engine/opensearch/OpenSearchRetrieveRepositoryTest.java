@@ -24,6 +24,7 @@ import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
+import com.ragagent.retrieval.engine.EngineTypes;
 
 /**
  * OpenSearch k-NN 驱动：
@@ -338,7 +339,7 @@ class OpenSearchRetrieveRepositoryTest {
         assertThat(out).hasSize(1);
         assertThat(out.get(0).retrieverEngineType()).isEqualTo("opensearch");
         assertThat(out.get(0).results().get(0).matchType)
-                .isEqualTo(com.ragagent.retrieval.engine.EngineTypes.MATCH_EMBEDDING);
+                .isEqualTo(EngineTypes.MATCH_EMBEDDING);
         assertThat(out.get(0).results().get(0).score).isEqualTo(0.87);
     }
 
@@ -366,7 +367,7 @@ class OpenSearchRetrieveRepositoryTest {
         assertThat(body.path("query").path("bool").path("must").get(1).path("match")
                 .path("content").asText()).isEqualTo("退款");
         assertThat(out.get(0).results().get(0).matchType)
-                .isEqualTo(com.ragagent.retrieval.engine.EngineTypes.MATCH_KEYWORDS);
+                .isEqualTo(EngineTypes.MATCH_KEYWORDS);
     }
 
     // ── 删除 / 移动 / 批量更新 ──────────────────────────────────────────────
@@ -549,7 +550,7 @@ class OpenSearchRetrieveRepositoryTest {
     }
 
     private static final String EngineTypes_RETREIVER_VECTOR =
-            com.ragagent.retrieval.engine.EngineTypes.RETRIEVER_VECTOR;
+            EngineTypes.RETRIEVER_VECTOR;
     private static final String EngineTypes_RETREIVER_KEYWORDS =
-            com.ragagent.retrieval.engine.EngineTypes.RETRIEVER_KEYWORDS;
+            EngineTypes.RETRIEVER_KEYWORDS;
 }

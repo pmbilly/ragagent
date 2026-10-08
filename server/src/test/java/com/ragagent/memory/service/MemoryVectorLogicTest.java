@@ -9,6 +9,8 @@ import com.ragagent.memory.domain.MemoryItem;
 import com.ragagent.common.memory.MemoryKinds;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import com.ragagent.common.memory.MemoryConfig;
+import com.ragagent.memory.mapper.MemoryRepository;
 
 /**
  * {@link MemoryVectorService} 的纯函数部分
@@ -82,27 +84,27 @@ class MemoryVectorLogicTest {
     @DisplayName("embedder：三层前置短路（未启用 / 未配模型 / 没配就关）")
     void embedderShortCircuits() {
         MemoryVectorService svc = new MemoryVectorService(
-                org.mockito.Mockito.mock(com.ragagent.memory.mapper.MemoryRepository.class),
+                org.mockito.Mockito.mock(MemoryRepository.class),
                 org.mockito.Mockito.mock(MemoryModelResolver.class));
         assertThat(svc.embedder(null)).isNull();
 
-        com.ragagent.common.memory.MemoryConfig off = new com.ragagent.common.memory.MemoryConfig();
+        MemoryConfig off = new MemoryConfig();
         assertThat(svc.embedder(off)).isNull();
 
-        com.ragagent.common.memory.MemoryConfig onButBlank = new com.ragagent.common.memory.MemoryConfig();
+        MemoryConfig onButBlank = new MemoryConfig();
         onButBlank.setEnabled(true);
         onButBlank.setEmbeddingModelId("");
         onButBlank.setVectorRecall(true);
         assertThat(svc.embedder(onButBlank)).isNull();
 
-        com.ragagent.common.memory.MemoryConfig on = new com.ragagent.common.memory.MemoryConfig();
+        MemoryConfig on = new MemoryConfig();
         on.setEnabled(true);
         on.setEmbeddingModelId("emb-1");
         on.setVectorRecall(true);
         assertThat(svc.embedder(on)).isEqualTo("emb-1");
 
         // vector_recall 显式 false → 关（null 才是"有模型就开"）
-        com.ragagent.common.memory.MemoryConfig explicitlyOff = new com.ragagent.common.memory.MemoryConfig();
+        MemoryConfig explicitlyOff = new MemoryConfig();
         explicitlyOff.setEnabled(true);
         explicitlyOff.setEmbeddingModelId("emb-1");
         explicitlyOff.setVectorRecall(false);

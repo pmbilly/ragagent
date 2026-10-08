@@ -20,6 +20,7 @@ import com.ragagent.common.wiki.ExtractedItem;
 import com.ragagent.common.wiki.SlugUpdate;
 import com.ragagent.wiki.service.WikiModelResolver;
 import com.ragagent.wiki.service.page.WikiPageService;
+import com.ragagent.llm.LlmChatClient;
 
 /**
  * {@link WikiIngestTaxonomy} 的测试，另含
@@ -340,9 +341,9 @@ class WikiIngestTaxonomyTest {
     @Test
     @DisplayName("规划短路：kb 为空 / 无条目")
     void planShortCircuits() {
-        assertThat(taxonomy.planBatchTaxonomy(mock(com.ragagent.llm.LlmChatClient.class), null,
+        assertThat(taxonomy.planBatchTaxonomy(mock(LlmChatClient.class), null,
                 Map.of(), "zh", null)).isNull();
-        assertThat(taxonomy.planBatchTaxonomy(mock(com.ragagent.llm.LlmChatClient.class), kb(""),
+        assertThat(taxonomy.planBatchTaxonomy(mock(LlmChatClient.class), kb(""),
                 Map.of(), "zh", null)).isNull();
     }
 

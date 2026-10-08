@@ -14,6 +14,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.ragagent.llm.chat.LlmTransport;
+import com.ragagent.common.security.IpClass;
+import com.ragagent.common.security.SsrfGuard;
 
 /**
  * 公网页面抓取器。
@@ -238,10 +240,10 @@ public final class Fetcher {
         }
         String host = parsedUrl.getHost();
         try {
-            if (!new com.ragagent.common.security.SsrfGuard().isWhitelisted(host)) {
+            if (!new SsrfGuard().isWhitelisted(host)) {
                 for (InetAddress ip : InetAddress.getAllByName(host)) {
-                    if (!com.ragagent.common.security.IpClass.classify(ip).classification()
-                            .equals(com.ragagent.common.security.IpClass.Class.PUBLIC)) {
+                    if (!IpClass.classify(ip).classification()
+                            .equals(IpClass.Class.PUBLIC)) {
                         throw new FetchException(Code0.SSRF_REJECTED, false,
                                 "host resolves to restricted IP " + ip.getHostAddress());
                     }

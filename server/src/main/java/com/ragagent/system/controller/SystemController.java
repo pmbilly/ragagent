@@ -26,6 +26,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.ragagent.knowledge.config.DocReaderProperties;
+import com.ragagent.storage.domain.StorageBackend;
+import com.ragagent.storage.service.StorageBackendService;
+import com.ragagent.system.service.DeploymentCapabilitiesHolder;
 
 /**
  * /api/v1/system 组：读端（capabilities/info/parser-engines/storage-engine-status）Viewer+；
@@ -54,22 +58,22 @@ public class SystemController {
     private final TenantService tenantService;
     private final DocReaderClient docReader;
     private final SsrfGuard ssrfGuard;
-    private final com.ragagent.system.service.DeploymentCapabilitiesHolder capabilitiesHolder;
-    private final com.ragagent.storage.service.StorageBackendService storageBackendService;
+    private final DeploymentCapabilitiesHolder capabilitiesHolder;
+    private final StorageBackendService storageBackendService;
     /** env 读取面（不读裸 System.getenv；含 DOCREADER_* 与存储 env 可用性探测）。 */
     private final Environment environment;
     /** DocReader 连接信息（走属性绑定，不直读 DOCREADER_* env）。 */
-    private final com.ragagent.knowledge.config.DocReaderProperties docReaderProperties;
+    private final DocReaderProperties docReaderProperties;
 
     public SystemController(SystemInfoService infoService,
                             ParserEngineRegistry parserEngines,
                             TenantService tenantService,
                             DocReaderClient docReader,
                             SsrfGuard ssrfGuard,
-                            com.ragagent.system.service.DeploymentCapabilitiesHolder capabilitiesHolder,
-                            com.ragagent.storage.service.StorageBackendService storageBackendService,
+                            DeploymentCapabilitiesHolder capabilitiesHolder,
+                            StorageBackendService storageBackendService,
                             Environment environment,
-                            com.ragagent.knowledge.config.DocReaderProperties docReaderProperties) {
+                            DocReaderProperties docReaderProperties) {
         this.infoService = infoService;
         this.parserEngines = parserEngines;
         this.tenantService = tenantService;
@@ -416,8 +420,8 @@ public class SystemController {
      */
     private ResponseEntity<SystemDtos.StorageCheckResponse> connectivityFallback(
             String provider, JsonNode cfg, String endpoint, String bucketName) {
-        com.ragagent.storage.domain.StorageBackend backend =
-                new com.ragagent.storage.domain.StorageBackend();
+        StorageBackend backend =
+                new StorageBackend();
         backend.setTenantId(currentTenantId());
         backend.setProvider(provider);
         ObjectNode config = MAPPER.createObjectNode();
@@ -439,7 +443,7 @@ public class SystemController {
             if (msg.contains("404") || msg.contains("NoSuchBucket") || msg.contains("NotFound")) {
                 return checkResponse(false, "Bucket「" + bucketName + "」不存在，请检查名称和 Region");
             }
-            return checkResponse(false, com.ragagent.storage.service.StorageBackendService.sanitizeConnectivity(msg));
+            return checkResponse(false, StorageBackendService.sanitizeConnectivity(msg));
         }
         String message = "连接成功，Bucket「" + bucketName + "」已确认存在";
         if ("minio".equals(provider) && bucketName.isEmpty()) {

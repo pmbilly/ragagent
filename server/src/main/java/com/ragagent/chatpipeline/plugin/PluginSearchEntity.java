@@ -20,6 +20,7 @@ import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.common.graph.GraphRelation;
 import com.ragagent.retrieval.graph.RetrieveGraphRepository;
+import com.ragagent.common.context.TenantContext;
 
 /**
  * ENTITY_SEARCH 阶段插件：
@@ -160,7 +161,7 @@ public final class PluginSearchEntity implements Plugin {
 
     /** 上下文无租户时回落 chatManage 携带的租户 ID。 */
     private long currentTenantId(ChatManage chatManage) {
-        Long tid = com.ragagent.common.context.TenantContext.currentTenantId();
+        Long tid = TenantContext.currentTenantId();
         if (tid != null && tid != 0) {
             return tid;
         }

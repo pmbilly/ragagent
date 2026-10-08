@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.web.ToolJson;
+import com.ragagent.support.ContractJson;
 
 /**
  * ParamCaster 的录制判定表（29 条）。
@@ -59,10 +60,10 @@ class ParamCasterRecordingTest {
             JsonNode schemaNode = schemaJson.isEmpty() ? null : RecordingSupport.readTree(schemaJson);
             JsonNode got = ParamCaster.castParams(argsNode, schemaNode);
             // ToolJson 的数字形态与录制侧不同（1 vs 1.0）——语义比较吸收形态差异
-            assertThat(com.ragagent.support.ContractJson.deep(
+            assertThat(ContractJson.deep(
                     RecordingSupport.normalizeNumberText(ToolJson.write(got))))
                     .as("castParams %s", r.get("id").asText())
-                    .isEqualTo(com.ragagent.support.ContractJson.deep(
+                    .isEqualTo(ContractJson.deep(
                             RecordingSupport.normalizeNumberText(want)));
         }
     }

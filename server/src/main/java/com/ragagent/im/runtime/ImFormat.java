@@ -3,6 +3,7 @@ package com.ragagent.im.runtime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
+import com.ragagent.storage.support.StreamRewriter;
 
 
 /**
@@ -79,7 +80,7 @@ public final class ImFormat {
 
     /** chunk 尾部最早的不完整模式偏移；等于 len 表示整段可冲。 */
     public static int holdbackCutoff(String chunk) {
-        int cutoff = com.ragagent.storage.support.StreamRewriter.holdbackCutoff(chunk);
+        int cutoff = StreamRewriter.holdbackCutoff(chunk);
         int idx = findIncompleteXMLTag(chunk);
         if (idx >= 0 && idx < cutoff) {
             cutoff = idx;

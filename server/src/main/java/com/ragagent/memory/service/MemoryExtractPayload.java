@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.memory.domain.MemoryScope;
+import com.ragagent.common.context.TracingContext;
 
 /**
  * 一次蒸馏任务的全部输入。
@@ -76,16 +77,16 @@ public record MemoryExtractPayload(
     /** 带追踪载体的构造（入队侧用；载体为空时与兼容构造等价）。 */
     public static MemoryExtractPayload withTracing(long tenantId, String subjectId, String sessionId,
                                                    String messageId, String chatModelId, String language,
-                                                   com.ragagent.common.context.TracingContext tracing) {
-        com.ragagent.common.context.TracingContext tc = tracing == null
-                ? com.ragagent.common.context.TracingContext.EMPTY : tracing;
+                                                   TracingContext tracing) {
+        TracingContext tc = tracing == null
+                ? TracingContext.EMPTY : tracing;
         return new MemoryExtractPayload(tenantId, subjectId, sessionId, messageId, chatModelId,
                 language, tc.isEmpty() ? null : tc);
     }
 
     /** 追踪载体的结构视图（worker 侧续接用）。 */
-    public com.ragagent.common.context.TracingContext tracing() {
-        return tracing == null ? com.ragagent.common.context.TracingContext.EMPTY : tracing;
+    public TracingContext tracing() {
+        return tracing == null ? TracingContext.EMPTY : tracing;
     }
 
     /** 全零值负载，供"没有触发轮次"的调用点。 */

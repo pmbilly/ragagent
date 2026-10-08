@@ -13,6 +13,7 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import com.ragagent.memory.domain.MemoryStringListTypeHandler;
 
 /**
  * {@code memory_topic_stats} 的仓储。
@@ -116,7 +117,7 @@ public interface MemoryTopicStatMapper extends BaseMapper<MemoryTopicStat> {
      */
     @Results({
             @Result(column = "aliases", property = "aliases",
-                    typeHandler = com.ragagent.memory.domain.MemoryStringListTypeHandler.class),
+                    typeHandler = MemoryStringListTypeHandler.class),
     })
     @Select("SELECT * FROM memory_topic_stats WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId} "
             + "AND normalized_key = #{normalizedKey}")
@@ -139,7 +140,7 @@ public interface MemoryTopicStatMapper extends BaseMapper<MemoryTopicStat> {
      */
     @Results({
             @Result(column = "aliases", property = "aliases",
-                    typeHandler = com.ragagent.memory.domain.MemoryStringListTypeHandler.class),
+                    typeHandler = MemoryStringListTypeHandler.class),
     })
     @Select("SELECT * FROM memory_topic_stats WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId} "
             + "AND id = #{id}")
@@ -157,7 +158,7 @@ public interface MemoryTopicStatMapper extends BaseMapper<MemoryTopicStat> {
      */
     @Results({
             @Result(column = "aliases", property = "aliases",
-                    typeHandler = com.ragagent.memory.domain.MemoryStringListTypeHandler.class),
+                    typeHandler = MemoryStringListTypeHandler.class),
     })
     @Select("<script>"
             + "SELECT * FROM memory_topic_stats WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId} "
@@ -186,7 +187,7 @@ public interface MemoryTopicStatMapper extends BaseMapper<MemoryTopicStat> {
      */
     @Results({
             @Result(column = "aliases", property = "aliases",
-                    typeHandler = com.ragagent.memory.domain.MemoryStringListTypeHandler.class),
+                    typeHandler = MemoryStringListTypeHandler.class),
     })
     @Select("SELECT * FROM memory_topic_stats WHERE tenant_id = #{tenantId} AND subject_id = #{subjectId} "
             + "AND promoted_at IS NULL ORDER BY hits DESC, last_seen_at DESC LIMIT #{limit} OFFSET #{offset}")

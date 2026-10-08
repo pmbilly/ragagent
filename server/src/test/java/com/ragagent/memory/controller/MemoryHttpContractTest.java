@@ -36,6 +36,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.servlet.HandlerMapping;
+import com.ragagent.common.security.APIKeyScopeContext;
+import com.ragagent.support.ContractJson;
 
 /**
  * 长期记忆 HTTP 层的契约测试（16 个端点）。
@@ -582,7 +584,7 @@ class MemoryHttpContractTest {
 
         MvcResult r = perform(get("/api/v1/memory/settings").header("X-API-Key", scoped));
         assertEquals(403, r.getResponse().getStatus(), raw(r));
-        assertEquals(com.ragagent.support.ContractJson.semantic("{\"error\":\"Forbidden: API key scope does not allow this operation\"}"), raw(r));
+        assertEquals(ContractJson.semantic("{\"error\":\"Forbidden: API key scope does not allow this operation\"}"), raw(r));
 
         String full = createApiKey("{\"name\":\"mem-full\",\"fullAccess\":true}");
         MvcResult ok = perform(get("/api/v1/memory/settings").header("X-API-Key", full));
@@ -647,7 +649,7 @@ class MemoryHttpContractTest {
     /** 行为验证：直接驱动 {@link APIKeyGateInterceptor}。 */
     private static boolean gateAllows(APIKeyRouteAuthorizer authorizer, TenantAPIKeyScope scope,
                                       String method, String pattern) throws Exception {
-        com.ragagent.common.security.APIKeyScopeContext.set(scope);
+        APIKeyScopeContext.set(scope);
         try {
             MockHttpServletRequest request = new MockHttpServletRequest(method, pattern);
             request.setAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE, pattern);
@@ -656,7 +658,7 @@ class MemoryHttpContractTest {
                     new APIKeyGateInterceptor(authorizer).preHandle(request, response, new Object());
             return allowed && response.getStatus() == 200;
         } finally {
-            com.ragagent.common.security.APIKeyScopeContext.clear();
+            APIKeyScopeContext.clear();
         }
     }
 
@@ -737,7 +739,7 @@ class MemoryHttpContractTest {
 
     private static String raw(MvcResult r) throws Exception {
         // PR4 语义比较：与 golden 同侧归一（非 JSON 文本原样）
-        return com.ragagent.support.ContractJson.semantic(RAW_SEMANTIC_MAPPER,
+        return ContractJson.semantic(RAW_SEMANTIC_MAPPER,
                 r.getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8));
     }
 
@@ -751,7 +753,7 @@ class MemoryHttpContractTest {
             resource = new org.springframework.core.io.ClassPathResource("contracts/" + name + ".json");
         }
         String text = new String(resource.getInputStream().readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
-        return com.ragagent.support.ContractJson.semantic(GOLDEN_SEMANTIC_MAPPER, text);
+        return ContractJson.semantic(GOLDEN_SEMANTIC_MAPPER, text);
     }
 
     private static String goldenMasked(String name) throws Exception {
@@ -761,7 +763,7 @@ class MemoryHttpContractTest {
     /** 两侧同掩码：UUID 值、时间戳。 */
     private static String mask(String s) {
         // PR4 语义比较入口：键序/转义归一后再掩码
-        s = com.ragagent.support.ContractJson.semantic(s);
+        s = ContractJson.semantic(s);
         String out = UUID_PATTERN.matcher(s).replaceAll("\"<uuid>\"");
         return TS_PATTERN.matcher(out).replaceAll("\"<ts>\"");
     }

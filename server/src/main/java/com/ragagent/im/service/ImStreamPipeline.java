@@ -24,6 +24,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ragagent.im.service.ImService.QaAttach;
+import com.ragagent.event.payload.AgentCompleteData;
+import com.ragagent.event.payload.AgentFinalAnswerData;
+import com.ragagent.event.payload.AgentThoughtData;
+import com.ragagent.event.payload.AgentToolCallData;
+import com.ragagent.event.payload.AgentToolResultData;
+import com.ragagent.event.payload.ErrorData;
 
 /**
  * IM 流式回复管线：事件订阅组、流缓冲袋、300ms 冲刷循环与 finalize/收尾落库。
@@ -225,7 +231,7 @@ final class ImStreamPipeline {
             java.util.concurrent.CountDownLatch done,
             java.util.concurrent.CountDownLatch complete, boolean useAgent) {
         eventBus.on(EventType.EVENT_AGENT_FINAL_ANSWER, evt -> {
-            if (!(evt.getData() instanceof com.ragagent.event.payload.AgentFinalAnswerData data)) {
+            if (!(evt.getData() instanceof AgentFinalAnswerData data)) {
                 return;
             }
             String content = data.getContent();
@@ -246,7 +252,7 @@ final class ImStreamPipeline {
             }
         });
         eventBus.on(EventType.EVENT_ERROR, evt -> {
-            String text = evt.getData() instanceof com.ragagent.event.payload.ErrorData d
+            String text = evt.getData() instanceof ErrorData d
                     ? d.getError() : String.valueOf(evt.getData());
             synchronized (buf) {
                 buf.qaErr = new RuntimeException("QA pipeline error: " + text);
@@ -255,7 +261,7 @@ final class ImStreamPipeline {
             complete.countDown();
         });
         eventBus.on(EventType.EVENT_AGENT_COMPLETE, evt -> {
-            if (!(evt.getData() instanceof com.ragagent.event.payload.AgentCompleteData data)) {
+            if (!(evt.getData() instanceof AgentCompleteData data)) {
                 return;
             }
             synchronized (buf) {
@@ -272,7 +278,7 @@ final class ImStreamPipeline {
             // 引用进 assistant 消息（web 端的交互 UI 在 IM 无意义，不入最终文本）。
         });
         eventBus.on(EventType.EVENT_AGENT_THOUGHT, evt -> {
-            String content = evt.getData() instanceof com.ragagent.event.payload.AgentThoughtData d
+            String content = evt.getData() instanceof AgentThoughtData d
                     && d.getContent() != null ? d.getContent() : "";
             synchronized (buf) {
                 if (content.isEmpty()) {
@@ -365,11 +371,11 @@ final class ImStreamPipeline {
 
     private static ToolEvent toolOf(Event evt) {
         Object d = evt.getData();
-        if (d instanceof com.ragagent.event.payload.AgentToolCallData c) {
+        if (d instanceof AgentToolCallData c) {
             return new ToolEvent(c.getToolCallId(), c.getToolName(), false,
                     c.getArguments(), null, "");
         }
-        if (d instanceof com.ragagent.event.payload.AgentToolResultData r) {
+        if (d instanceof AgentToolResultData r) {
             return new ToolEvent(r.getToolCallId(), r.getToolName(), r.isSuccess(),
                     null, r.getData(), r.getOutput() == null ? "" : r.getOutput());
         }

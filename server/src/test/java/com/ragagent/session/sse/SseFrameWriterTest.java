@@ -12,6 +12,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 import com.ragagent.common.llm.ResponseType;
 import com.ragagent.llm.domain.StreamResponse;
+import com.ragagent.support.ContractJson;
 
 /**
  * SSE 帧的**逐字节**契约测试——这是整套 A/B 的落点，字节错了前面全白做。
@@ -61,7 +62,7 @@ class SseFrameWriterTest {
         int end = rest.indexOf("\n\n");
         String payload = end < 0 ? rest : rest.substring(0, end);
         String tail = end < 0 ? "" : rest.substring(end);
-        return head + com.ragagent.support.ContractJson.deep(payload) + tail;
+        return head + ContractJson.deep(payload) + tail;
     }
 
     private static String body(MockHttpServletResponse response) throws Exception {

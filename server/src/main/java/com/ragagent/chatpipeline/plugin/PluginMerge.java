@@ -22,6 +22,7 @@ import com.ragagent.common.retrieval.SearchChunkMerge;
 import com.ragagent.retrieval.support.SearchTextUtil;
 import com.ragagent.common.pipeline.ChunkTypes;
 import com.ragagent.retrieval.obs.RetrievalObs;
+import com.ragagent.retrieval.domain.ImageInfo;
 
 /**
  * CHUNK_MERGE 阶段插件。
@@ -605,7 +606,7 @@ public final class PluginMerge implements Plugin {
             return;
         }
 
-        List<com.ragagent.retrieval.domain.ImageInfo> sourceImageInfos;
+        List<ImageInfo> sourceImageInfos;
         try {
             sourceImageInfos = ImageInfoMatchUtil.parseInfos(source.getImageInfo());
             if (sourceImageInfos == null) {
@@ -621,10 +622,10 @@ public final class PluginMerge implements Plugin {
             return;
         }
 
-        List<com.ragagent.retrieval.domain.ImageInfo> targetImageInfos = new ArrayList<>();
+        List<ImageInfo> targetImageInfos = new ArrayList<>();
         if (!target.getImageInfo().isEmpty()) {
             try {
-                List<com.ragagent.retrieval.domain.ImageInfo> parsed =
+                List<ImageInfo> parsed =
                         ImageInfoMatchUtil.parseInfos(target.getImageInfo());
                 if (parsed != null) {
                     targetImageInfos.addAll(parsed);
@@ -641,9 +642,9 @@ public final class PluginMerge implements Plugin {
         targetImageInfos.addAll(sourceImageInfos);
 
         Map<String, Boolean> uniqueMap = new LinkedHashMap<>();
-        List<com.ragagent.retrieval.domain.ImageInfo> uniqueImageInfos =
+        List<ImageInfo> uniqueImageInfos =
                 new ArrayList<>(targetImageInfos.size());
-        for (com.ragagent.retrieval.domain.ImageInfo imgInfo : targetImageInfos) {
+        for (ImageInfo imgInfo : targetImageInfos) {
             if (!imgInfo.getUrl().isEmpty() && !uniqueMap.containsKey(imgInfo.getUrl())) {
                 uniqueMap.put(imgInfo.getUrl(), Boolean.TRUE);
                 uniqueImageInfos.add(imgInfo);

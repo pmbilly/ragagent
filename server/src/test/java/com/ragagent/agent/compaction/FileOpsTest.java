@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ToolCall;
+import com.ragagent.llm.domain.FunctionCall;
 
 /**
  * fileops 的录制常量断言（场景 =
@@ -24,7 +25,7 @@ class FileOpsTest {
     private static ChatMessage toolCallMsg(String name, String arguments) {
         ToolCall tc = new ToolCall();
         tc.setId("call-1");
-        tc.setFunction(new com.ragagent.llm.domain.FunctionCall(name, arguments));
+        tc.setFunction(new FunctionCall(name, arguments));
         ChatMessage m = new ChatMessage("assistant", "");
         m.setToolCalls(List.of(tc));
         return m;

@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.ragagent.common.security.UserNameLookup;
 
 /**
  * 用户 service。
@@ -39,7 +40,7 @@ import org.springframework.stereotype.Service;
  * bcrypt：BCryptPasswordEncoder 默认 cost=10。
  */
 @Service
-public class UserService implements com.ragagent.common.security.UserNameLookup {
+public class UserService implements UserNameLookup {
 
     static final Logger log = LoggerFactory.getLogger(UserService.class);
     private static final String TOKEN_TYPE_ACCESS = "access_token";

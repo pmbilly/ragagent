@@ -14,6 +14,7 @@ import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.stream.StreamEvent;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletResponse;
+import com.ragagent.support.ContractJson;
 
 /**
  * {@link StreamResponseBuilder} 的逐字节契约测试。
@@ -102,7 +103,7 @@ class StreamResponseBuilderTest {
         data.put("sessionId", "sess-1");
         evt.setData(data);
 
-        assertThat(com.ragagent.support.ContractJson.deep(write(StreamResponseBuilder.build(evt, "req-2")))).isEqualTo(com.ragagent.support.ContractJson.deep(
+        assertThat(ContractJson.deep(write(StreamResponseBuilder.build(evt, "req-2")))).isEqualTo(ContractJson.deep(
                 "{\"id\":\"req-2\",\"responseType\":\"agentQuery\",\"content\":\"\",\"done\":true,"
                         + "\"sessionId\":\"sess-1\",\"assistantMessageId\":\"msg-1\","
                         + "\"data\":{\"assistantMessageId\":\"msg-1\",\"sessionId\":\"sess-1\"}}"));
@@ -118,7 +119,7 @@ class StreamResponseBuilderTest {
         data.put("eventId", "e1");
         evt.setData(data);
 
-        assertThat(com.ragagent.support.ContractJson.deep(write(StreamResponseBuilder.build(evt, "req-6")))).isEqualTo(com.ragagent.support.ContractJson.deep(
+        assertThat(ContractJson.deep(write(StreamResponseBuilder.build(evt, "req-6")))).isEqualTo(ContractJson.deep(
                 "{\"id\":\"req-6\",\"responseType\":\"answer\",\"content\":\"hi\",\"done\":false,"
                         + "\"data\":{\"assistantMessageId\":\"m9\",\"eventId\":\"e1\","
                         + "\"sessionId\":\"sess-9\"}}"));
@@ -132,7 +133,7 @@ class StreamResponseBuilderTest {
         StreamEvent evt = new StreamEvent("evt-3", ResponseType.REFERENCES, "", false);
         evt.setData(Map.of("foo", "bar"));
 
-        assertThat(com.ragagent.support.ContractJson.deep(write(StreamResponseBuilder.build(evt, "req-3")))).isEqualTo(com.ragagent.support.ContractJson.deep(
+        assertThat(ContractJson.deep(write(StreamResponseBuilder.build(evt, "req-3")))).isEqualTo(ContractJson.deep(
                 "{\"id\":\"req-3\",\"responseType\":\"references\",\"content\":\"\",\"done\":false,"
                         + "\"data\":{\"foo\":\"bar\"}}"));
     }
@@ -146,7 +147,7 @@ class StreamResponseBuilderTest {
         StreamEvent evt = new StreamEvent("evt-4", ResponseType.REFERENCES, "", false);
         evt.setData(Map.of("references", List.of("not-a-map", 42)));
 
-        assertThat(com.ragagent.support.ContractJson.deep(write(StreamResponseBuilder.build(evt, "req-4")))).isEqualTo(com.ragagent.support.ContractJson.deep(
+        assertThat(ContractJson.deep(write(StreamResponseBuilder.build(evt, "req-4")))).isEqualTo(ContractJson.deep(
                 "{\"id\":\"req-4\",\"responseType\":\"references\",\"content\":\"\",\"done\":false,"
                         + "\"data\":{\"references\":[\"not-a-map\",42]}}"));
     }
@@ -157,7 +158,7 @@ class StreamResponseBuilderTest {
         StreamEvent evt = new StreamEvent("evt-5", ResponseType.REFERENCES, "", false);
         evt.setData(Map.of("references", "oops"));
 
-        assertThat(com.ragagent.support.ContractJson.deep(write(StreamResponseBuilder.build(evt, "req-5")))).isEqualTo(com.ragagent.support.ContractJson.deep(
+        assertThat(ContractJson.deep(write(StreamResponseBuilder.build(evt, "req-5")))).isEqualTo(ContractJson.deep(
                 "{\"id\":\"req-5\",\"responseType\":\"references\",\"content\":\"\",\"done\":false,"
                         + "\"data\":{\"references\":\"oops\"}}"));
     }
@@ -202,7 +203,7 @@ class StreamResponseBuilderTest {
         StreamEvent evt = new StreamEvent("evt-8", ResponseType.ANSWER, "x", true);
         evt.setData(Map.of());
 
-        assertThat(com.ragagent.support.ContractJson.deep(write(StreamResponseBuilder.build(evt, "req-8")))).isEqualTo(com.ragagent.support.ContractJson.deep(
+        assertThat(ContractJson.deep(write(StreamResponseBuilder.build(evt, "req-8")))).isEqualTo(ContractJson.deep(
                 "{\"id\":\"req-8\",\"responseType\":\"answer\",\"content\":\"x\",\"done\":true}"));
     }
 

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import com.ragagent.agent.TokenEstimator;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ToolCall;
+import com.ragagent.llm.domain.FunctionCall;
 
 /**
  * 切点选择的录制常量断言。
@@ -32,7 +33,7 @@ class CutPointTest {
         for (int i = 0; i < rounds; i++) {
             ToolCall tc = new ToolCall();
             tc.setId("call-" + (char) ('a' + i % 26));
-            tc.setFunction(new com.ragagent.llm.domain.FunctionCall("write_sandbox_file",
+            tc.setFunction(new FunctionCall("write_sandbox_file",
                     "{\"path\":\"/workspace/out.html\",\"content\":\"" + filler(40) + "\"}"));
             ChatMessage assistant = new ChatMessage("assistant", filler(20));
             assistant.setToolCalls(List.of(tc));

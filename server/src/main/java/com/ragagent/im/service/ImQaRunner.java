@@ -23,6 +23,9 @@ import com.ragagent.im.service.ImService.InflightEntry;
 import com.ragagent.im.service.ImService.QaAttach;
 import com.ragagent.im.service.ImService.QaOutcome;
 import com.ragagent.im.service.ImService.QaTask;
+import com.ragagent.event.payload.AgentCompleteData;
+import com.ragagent.event.payload.AgentFinalAnswerData;
+import com.ragagent.event.payload.ErrorData;
 
 /**
  * IM QA 执行编排：队列 worker 的租户上下文绑定与在途登记、full-output / 流式 /
@@ -173,7 +176,7 @@ final class ImQaRunner {
         java.util.concurrent.CountDownLatch complete = new java.util.concurrent.CountDownLatch(1);
 
         eventBus.on(EventType.EVENT_AGENT_FINAL_ANSWER, evt -> {
-            if (!(evt.getData() instanceof com.ragagent.event.payload.AgentFinalAnswerData data)) {
+            if (!(evt.getData() instanceof AgentFinalAnswerData data)) {
                 return;
             }
             String content = data.getContent();
@@ -187,7 +190,7 @@ final class ImQaRunner {
             }
         });
         eventBus.on(EventType.EVENT_ERROR, evt -> {
-            if (!(evt.getData() instanceof com.ragagent.event.payload.ErrorData data)) {
+            if (!(evt.getData() instanceof ErrorData data)) {
                 return;
             }
             log.error("[IM] QA error: {}", data.getError());
@@ -211,7 +214,7 @@ final class ImQaRunner {
         service.bindInflight(attach, assistantMsg.getId());
 
         eventBus.on(EventType.EVENT_AGENT_COMPLETE, evt -> {
-            if (!(evt.getData() instanceof com.ragagent.event.payload.AgentCompleteData data)) {
+            if (!(evt.getData() instanceof AgentCompleteData data)) {
                 return;
             }
             String finalAnswer = data.getFinalAnswer();

@@ -24,6 +24,7 @@ import com.ragagent.datasource.domain.SyncResult;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.ragagent.datasource.connector.rss.RssFetchState;
 
 /**
  * 同步执行器：{@code datasource:sync} 任务的真正实现——一次性抓取与流式抓取两条路径、
@@ -156,14 +157,14 @@ final class DataSourceSyncExecutor {
         } catch (ConnectorException.PartialFetch partial) {
             // 部分成功：error 置 null、details 记成 warning
             warnings.addAll(partial.getDetails());
-            if (partial instanceof com.ragagent.datasource.connector.rss.RssFetchState state) {
+            if (partial instanceof RssFetchState state) {
                 return new FetchOutcome(state.items(), state.cursor(), null, warnings);
             }
             return new FetchOutcome(null, null, null, warnings);
         } catch (RuntimeException e) {
             // 「全部失败」也是 RssFetchState（items 恒 null、cursor 可能有值）——
             // 失败分支上照样先把 cursor 带回去，由调用方落库后再记失败。
-            SyncCursor next = e instanceof com.ragagent.datasource.connector.rss.RssFetchState state
+            SyncCursor next = e instanceof RssFetchState state
                     ? state.cursor() : null;
             return new FetchOutcome(null, next, e, warnings);
         }

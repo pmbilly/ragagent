@@ -39,6 +39,7 @@ import com.ragagent.llm.domain.TokenUsage;
 import com.ragagent.modelcontext.Registry;
 import com.ragagent.tracing.langfuse.LangfuseManager;
 import com.ragagent.tracing.langfuse.Span;
+import com.ragagent.common.context.TenantContext;
 
 /**
  * ReAct agent 引擎。
@@ -101,7 +102,7 @@ public class AgentEngine {
     AgentPromptTemplates.TemplatesConfig appConfig;
     /** 工具结果图片的 VLM 描述函数（可选）。 */
     ImageDescriberFunc imageDescriber;
-    final com.ragagent.agent.TokenEstimator tokenEstimator = new com.ragagent.agent.TokenEstimator();
+    final TokenEstimator tokenEstimator = new TokenEstimator();
     Compactor compactor;
     /** 最近一次 LLM 调用的用量（usage 基线）。 */
     TokenUsage lastUsage = new TokenUsage();
@@ -251,7 +252,7 @@ public class AgentEngine {
         this.selectedDocs = v;
     }
 
-    com.ragagent.agent.TokenEstimator tokenEstimatorForTest() {
+    TokenEstimator tokenEstimatorForTest() {
         return tokenEstimator;
     }
 
@@ -381,10 +382,10 @@ public class AgentEngine {
         List<ChatMessage> context = llmContext == null ? List.of() : llmContext;
         log.info("[Agent] Starting execution: session={}, message={}, query_len={}, context_msgs={}, tenantId={}, principal={}, userId={}",
                 sessionId, messageId, query.length(), context.size(),
-                com.ragagent.common.context.TenantContext.currentTenantId(),
-                com.ragagent.common.context.TenantContext.currentPrincipal() == null ? "<null>"
-                        : com.ragagent.common.context.TenantContext.currentPrincipal().type(),
-                com.ragagent.common.context.TenantContext.currentUserId());
+                TenantContext.currentTenantId(),
+                TenantContext.currentPrincipal() == null ? "<null>"
+                        : TenantContext.currentPrincipal().type(),
+                TenantContext.currentUserId());
         try {
             return executeInner(sessionId, messageId, query, context, imageURLs);
         } finally {
@@ -599,7 +600,7 @@ public class AgentEngine {
      * 全部是"近期"的，需要裁的那个大结果在头在尾都可能。
      */
     static TrimOutcome trimToolResultsToBudget(List<ChatMessage> messages,
-            com.ragagent.agent.TokenEstimator estimator, int budget) {
+            TokenEstimator estimator, int budget) {
         if (estimator == null || budget <= 0 || messages.isEmpty()) {
             return new TrimOutcome(messages, false);
         }

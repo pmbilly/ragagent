@@ -19,6 +19,7 @@ import com.ragagent.storage.fileserve.FileAccessResolver.MessageFileLookup;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import com.ragagent.session.service.MessageService;
 
 /**
  * 消息作用域的资源代理。
@@ -38,11 +39,11 @@ import jakarta.servlet.http.HttpServletResponse;
 @RestController
 public class MessageFileProxyController {
 
-    private final com.ragagent.session.service.MessageService messageService;
+    private final MessageService messageService;
     private final FileAccessResolver accessResolver;
     private final FileProxyService proxy;
 
-    public MessageFileProxyController(com.ragagent.session.service.MessageService messageService,
+    public MessageFileProxyController(MessageService messageService,
             FileAccessResolver accessResolver, FileProxyService proxy) {
         this.messageService = messageService;
         this.accessResolver = accessResolver;

@@ -18,6 +18,10 @@ import com.ragagent.approval.ToolPolicy;
 import com.ragagent.common.web.ToolJson;
 import com.ragagent.common.llm.ToolResult;
 import com.ragagent.mcp.domain.McpService;
+import com.ragagent.approval.Cancellation;
+import com.ragagent.mcp.oauth.OAuthReauthorizationRequiredException;
+import com.ragagent.mcp.protocol.McpAuthorizationRequiredException;
+import com.ragagent.mcp.protocol.McpOAuthRequiredException;
 
 /**
  * MCP 目录：一个 Agent 引擎、一个授权主体独有。只有 server 快照可变；可执行的
@@ -412,9 +416,9 @@ public final class McpCatalog {
                     fresh = load.load(service, live);
                 } catch (Exception e) {
                     String errStatus = "error";
-                    if (e instanceof com.ragagent.mcp.protocol.McpOAuthRequiredException
-                            || e instanceof com.ragagent.mcp.protocol.McpAuthorizationRequiredException
-                            || e instanceof com.ragagent.mcp.oauth.OAuthReauthorizationRequiredException
+                    if (e instanceof McpOAuthRequiredException
+                            || e instanceof McpAuthorizationRequiredException
+                            || e instanceof OAuthReauthorizationRequiredException
                             || McpOAuthSupport.isAuthorizationRequired(e)) {
                         errStatus = "needs_auth";
                     }
@@ -460,7 +464,7 @@ public final class McpCatalog {
         EnabledChecker checker = gate == null ? null
                 : (ctx, t, s, n) -> gate.isEnabled(ctx, t, s, n);
         try {
-            policies = ToolPolicy.enabledTools(com.ragagent.approval.Cancellation.none(),
+            policies = ToolPolicy.enabledTools(Cancellation.none(),
                     checker, tenantId, id, names);
         } catch (Exception e) {
             throw new IllegalStateException("MCP tool permissions are temporarily unavailable");
@@ -481,7 +485,7 @@ public final class McpCatalog {
         }
         boolean enabled;
         try {
-            enabled = gate.isEnabled(com.ragagent.approval.Cancellation.none(),
+            enabled = gate.isEnabled(Cancellation.none(),
                     tenantId, tool.service.getId(), tool.mcpTool.getName());
         } catch (Exception e) {
             return "MCP tool permissions are temporarily unavailable";

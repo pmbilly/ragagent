@@ -111,6 +111,20 @@ import com.ragagent.knowledge.dto.faq.FaqImportProgress;
 import com.ragagent.knowledge.dto.faq.FaqImportResult;
 import com.ragagent.knowledge.dto.faq.FaqMergeDetail;
 import com.ragagent.knowledge.dto.faq.FaqSuccessEntry;
+import com.ragagent.auth.domain.User;
+import com.ragagent.auth.domain.UserPreferences;
+import com.ragagent.auth.dto.InvitationLookupResponse;
+import com.ragagent.auth.dto.OidcAuthUrlResponse;
+import com.ragagent.auth.dto.OidcConfigResponse;
+import com.ragagent.auth.dto.UserInfo;
+import com.ragagent.common.tenant.WebSearchConfig;
+import com.ragagent.evaluation.dto.EvaluationDtos;
+import com.ragagent.system.domain.SystemSetting;
+import com.ragagent.tenant.ChatHistoryConfig;
+import com.ragagent.tenant.ParserEngineConfig;
+import com.ragagent.tenant.RetrievalConfig;
+import com.ragagent.tenant.StorageEngineConfig;
+import com.ragagent.websearch.domain.WebSearchProviderParams;
 
 /**
  * 契约实体的 JSON 往返体检——覆盖所有**会落 jsonb 或直接作响应体**的类型。
@@ -1150,7 +1164,7 @@ class JsonContractRoundTripTest {
     @Test
     void infraConfigRoundTrips() {
         // 基础设施配置三组的 jsonb/响应体类型
-        var wspParams = new com.ragagent.websearch.domain.WebSearchProviderParams();
+        var wspParams = new WebSearchProviderParams();
         wspParams.setApiKey("sk-1");
         wspParams.setEngineId("eng-1");
         wspParams.setBaseUrl("http://searxng.example.internal:8080");
@@ -1222,7 +1236,7 @@ class JsonContractRoundTripTest {
     void systemSettingRoundTrips() {
         // system_settings 行直接作响应体（裸行，无信封）+ value 落 jsonb。
         // enum/lastModifiedByName 不落库（@TableField(exist = false)）且空值省略。
-        var row = new com.ragagent.system.domain.SystemSetting();
+        var row = new SystemSetting();
         row.setId(1L);
         row.setKey("tenant.max_owned_per_user");
         row.setValue(MAPPER.valueToTree(12));
@@ -1234,7 +1248,7 @@ class JsonContractRoundTripTest {
         row.setLastModifiedBy("11111111-2222-3333-4444-555555555701");
         row.setEnumOptions(java.util.List.of("a", "b"));
         row.setLastModifiedByName("javasysadmin");
-        assertRoundTrips(row, com.ragagent.system.domain.SystemSetting.class,
+        assertRoundTrips(row, SystemSetting.class,
                 "types.SystemSetting ← system.domain.SystemSetting（value jsonb + enum/name omitempty）");
     }
 
@@ -1242,12 +1256,12 @@ class JsonContractRoundTripTest {
     void evaluationDetailRoundTrips() {
         // EvaluationDetail（task+params）直接作响应体；可空字段显式 null
         // （metric 未产出、summaryConfig.thinking 未设置时均为 null）。
-        var task = new com.ragagent.evaluation.dto.EvaluationDtos.EvaluationTask();
+        var task = new EvaluationDtos.EvaluationTask();
         task.id = "evaluation_10002_1789790586130_89a7491e_default";
         task.tenantId = 10002L;
         task.datasetId = "default";
         task.status = 0;
-        var params = new com.ragagent.evaluation.dto.EvaluationDtos.PipelineParams();
+        var params = new EvaluationDtos.PipelineParams();
         params.maxRounds = 5;
         params.vectorThreshold = 0.2;
         params.keywordThreshold = 0.3;
@@ -1255,15 +1269,15 @@ class JsonContractRoundTripTest {
         params.rerankTopK = 30;
         params.rerankThreshold = 0.3;
         params.chatModelId = "fake-chat-model-id";
-        var summary = new com.ragagent.evaluation.dto.EvaluationDtos.SummaryConfigParams();
+        var summary = new EvaluationDtos.SummaryConfigParams();
         summary.repeatPenalty = 1.0;
         summary.temperature = 0.3;
         summary.maxCompletionTokens = 2048;
         params.summaryConfig = summary;
-        var detail = new com.ragagent.evaluation.dto.EvaluationDtos.EvaluationDetail();
+        var detail = new EvaluationDtos.EvaluationDetail();
         detail.task = task;
         detail.params = params;
-        assertRoundTrips(detail, com.ragagent.evaluation.dto.EvaluationDtos.EvaluationDetail.class,
+        assertRoundTrips(detail, EvaluationDtos.EvaluationDetail.class,
                 "evaluation.dto.EvaluationDetail（metric 显式 null + thinking null）");
     }
 
@@ -1274,35 +1288,35 @@ class JsonContractRoundTripTest {
         // UserInfo：/auth/validate 与 /auth/me 的 user 投影——**没有 deleted_at**
         // （与 User 实体序列化的差别）；avatar/tenant_id/preferences 恒输出。
         // 时间字段留空：本工具用的是裸 ObjectMapper（未注册 JSR-310）。
-        var prefs = new com.ragagent.auth.domain.UserPreferences();
+        var prefs = new UserPreferences();
         prefs.setLastActiveTenantId(10002L);
-        var info = new com.ragagent.auth.dto.UserInfo(
+        var info = new UserInfo(
                 "u-1", "probe", "probe@weknora.test", "", 10002L,
                 true, false, false, prefs, null, null);
-        assertRoundTrips(info, com.ragagent.auth.dto.UserInfo.class,
+        assertRoundTrips(info, UserInfo.class,
                 "types.UserInfo ← auth.dto.UserInfo（无 deleted_at，preferences 恒输出）");
 
         // 注册 201 直接返回 **User 实体**（含 "deletedAt":null），与 UserInfo 投影的差异
-        var user = new com.ragagent.auth.domain.User();
+        var user = new User();
         user.setId("u-1");
         user.setUsername("reg-probe");
         user.setEmail("reg@weknora.test");
         user.setTenantId(10002L);
         user.setIsActive(true);
-        user.setPreferences(new com.ragagent.auth.domain.UserPreferences());
-        assertRoundTrips(user, com.ragagent.auth.domain.User.class,
+        user.setPreferences(new UserPreferences());
+        assertRoundTrips(user, User.class,
                 "auth.domain.User（注册响应体，deletedAt 显式 null）");
 
         // InvitationLookupResponse：tenantName 可空，两种形态各钉一条
         assertRoundTrips(
-                new com.ragagent.auth.dto.InvitationLookupResponse(
+                new InvitationLookupResponse(
                         10002L, "Acme", "viewer", "2026-09-20T14:00:00Z"),
-                com.ragagent.auth.dto.InvitationLookupResponse.class,
+                InvitationLookupResponse.class,
                 "auth.dto.InvitationLookupResponse");
         assertRoundTrips(
-                new com.ragagent.auth.dto.InvitationLookupResponse(
+                new InvitationLookupResponse(
                         10002L, null, "viewer", "2026-09-20T14:00:00Z"),
-                com.ragagent.auth.dto.InvitationLookupResponse.class,
+                InvitationLookupResponse.class,
                 "auth.dto.InvitationLookupResponse（tenantName 显式 null）");
     }
 
@@ -1312,23 +1326,23 @@ class JsonContractRoundTripTest {
     void authOidcContractsRoundTrip() {
         // OidcConfigResponse：providerDisplayName 未配置时显式 null
         assertRoundTrips(
-                new com.ragagent.auth.dto.OidcConfigResponse(false, "OIDC"),
-                com.ragagent.auth.dto.OidcConfigResponse.class,
+                new OidcConfigResponse(false, "OIDC"),
+                OidcConfigResponse.class,
                 "auth.dto.OidcConfigResponse");
         assertRoundTrips(
-                new com.ragagent.auth.dto.OidcConfigResponse(true, null),
-                com.ragagent.auth.dto.OidcConfigResponse.class,
+                new OidcConfigResponse(true, null),
+                OidcConfigResponse.class,
                 "auth.dto.OidcConfigResponse（display name 显式 null）");
 
         // OidcAuthUrlResponse：可空字段显式 null；nonce 只进 cookie 不建模
         assertRoundTrips(
-                new com.ragagent.auth.dto.OidcAuthUrlResponse("OIDC",
+                new OidcAuthUrlResponse("OIDC",
                         "https://idp.example.com/authorize?client_id=c", "st.ate"),
-                com.ragagent.auth.dto.OidcAuthUrlResponse.class,
+                OidcAuthUrlResponse.class,
                 "auth.dto.OidcAuthUrlResponse");
         assertRoundTrips(
-                new com.ragagent.auth.dto.OidcAuthUrlResponse(null, null, null),
-                com.ragagent.auth.dto.OidcAuthUrlResponse.class,
+                new OidcAuthUrlResponse(null, null, null),
+                OidcAuthUrlResponse.class,
                 "auth.dto.OidcAuthUrlResponse（全 null）");
     }
 
@@ -1338,8 +1352,8 @@ class JsonContractRoundTripTest {
     void tenantKvConfigsRoundTrip() {
         // WebSearchConfig：空值省略家族（空串/0/false 全省略）；api_key 序列化抑制
         // （write-only：响应与回读都见不到，黑名单保留）
-        com.ragagent.common.tenant.WebSearchConfig ws =
-                new com.ragagent.common.tenant.WebSearchConfig();
+        WebSearchConfig ws =
+                new WebSearchConfig();
         ws.setProvider("tavily");
         ws.setApiKey("ak-secret");
         ws.setMaxResults(5);
@@ -1347,12 +1361,12 @@ class JsonContractRoundTripTest {
         ws.setCompressionMethod("summary");
         ws.setBlacklist(java.util.List.of("bad.com"));
         ws.setProxyUrl("http://proxy.local:8080");
-        assertRoundTrips(ws, com.ragagent.common.tenant.WebSearchConfig.class,
+        assertRoundTrips(ws, WebSearchConfig.class,
                 "types.WebSearchConfig ← WebSearchConfig");
 
         // ParserEngineConfig：rules 是 List<JsonNode> 透传；布尔三态指针
-        com.ragagent.tenant.ParserEngineConfig parser =
-                new com.ragagent.tenant.ParserEngineConfig();
+        ParserEngineConfig parser =
+                new ParserEngineConfig();
         parser.setMineruEndpoint("http://mineru.example.com");
         parser.setMineruApiKey("mk-secret");
         parser.setMineruModel("pipeline");
@@ -1360,15 +1374,15 @@ class JsonContractRoundTripTest {
         parser.setMineruEnableTable(Boolean.FALSE);
         parser.setChatParserEngineRules(java.util.List.of(
                 MAPPER.createObjectNode().put("engine", "mineru").put("priority", 1)));
-        assertRoundTrips(parser, com.ragagent.tenant.ParserEngineConfig.class,
+        assertRoundTrips(parser, ParserEngineConfig.class,
                 "types.ParserEngineConfig ← ParserEngineConfig");
 
         // StorageEngineConfig：8 个 provider 嵌套块（null 块省略）
-        com.ragagent.tenant.StorageEngineConfig storage =
-                new com.ragagent.tenant.StorageEngineConfig();
+        StorageEngineConfig storage =
+                new StorageEngineConfig();
         storage.setDefaultProvider("minio");
-        com.ragagent.tenant.StorageEngineConfig.MinioEngineConfig minio =
-                new com.ragagent.tenant.StorageEngineConfig.MinioEngineConfig();
+        StorageEngineConfig.MinioEngineConfig minio =
+                new StorageEngineConfig.MinioEngineConfig();
         minio.setMode("remote");
         minio.setEndpoint("http://minio.example.com");
         minio.setAccessKeyId("AK");
@@ -1377,22 +1391,22 @@ class JsonContractRoundTripTest {
         minio.setUseSsl(false);
         minio.setPathPrefix("p");
         storage.setMinio(minio);
-        assertRoundTrips(storage, com.ragagent.tenant.StorageEngineConfig.class,
+        assertRoundTrips(storage, StorageEngineConfig.class,
                 "types.StorageEngineConfig ← StorageEngineConfig");
 
         // ChatHistoryConfig：三字段全输出形态
-        com.ragagent.tenant.ChatHistoryConfig chat =
-                new com.ragagent.tenant.ChatHistoryConfig();
+        ChatHistoryConfig chat =
+                new ChatHistoryConfig();
         chat.setEnabled(true);
         chat.setEmbeddingModelId("emb-1");
         chat.setKnowledgeBaseId("kb-1");
-        assertRoundTrips(chat, com.ragagent.tenant.ChatHistoryConfig.class,
+        assertRoundTrips(chat, ChatHistoryConfig.class,
                 "types.ChatHistoryConfig ← ChatHistoryConfig");
 
         // RetrievalConfig：double 用默认 Jackson 输出（0.5 → 0.5、0 → 0.0）；
         // rrf_* 零值 NON_DEFAULT 省略
-        com.ragagent.tenant.RetrievalConfig ret =
-                new com.ragagent.tenant.RetrievalConfig();
+        RetrievalConfig ret =
+                new RetrievalConfig();
         ret.setEmbeddingTopK(20);
         ret.setVectorThreshold(0.5);
         ret.setKeywordThreshold(0.4);
@@ -1402,7 +1416,7 @@ class JsonContractRoundTripTest {
         ret.setRrfK(60);
         ret.setRrfVectorWeight(0.7);
         ret.setRrfKeywordWeight(0.3);
-        assertRoundTrips(ret, com.ragagent.tenant.RetrievalConfig.class,
+        assertRoundTrips(ret, RetrievalConfig.class,
                 "types.RetrievalConfig ← RetrievalConfig");
     }
 

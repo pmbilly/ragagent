@@ -16,6 +16,7 @@ import com.ragagent.event.payload.MemoryRecalledData;
 import com.ragagent.common.memory.MemoryItemView;
 import com.ragagent.common.session.PipelineUsedMemoryView;
 import com.ragagent.retrieval.obs.RetrievalObs;
+import com.ragagent.event.EventBusInterface;
 
 /**
  * MEMORY_RECALL 阶段插件：
@@ -90,7 +91,7 @@ public final class PluginMemoryRecall implements Plugin {
      * 尽力而为的事件（emit 失败只告警不断流）。
      * EventMemoryRecalled 的 Data = MemoryRecalledData{Memories}。
      */
-    static void emitMemoryRecalled(com.ragagent.event.EventBusInterface bus, String sessionID,
+    static void emitMemoryRecalled(EventBusInterface bus, String sessionID,
                                    List<PipelineUsedMemoryView> used) {
         if (bus == null || used == null || used.isEmpty()) {
             return;

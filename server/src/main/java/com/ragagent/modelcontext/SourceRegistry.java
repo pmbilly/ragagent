@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ToolCall;
+import com.ragagent.common.retrieval.SearchResult;
 
 /**
  * model-context registry 的 source-reference 半边：chunk/document/knowledge base/web page 的
@@ -258,11 +259,11 @@ final class SourceRegistry {
         return raw.substring(0, schemeEnd + 3 + hash);
     }
 
-    void registerSearchResults(List<com.ragagent.common.retrieval.SearchResult> results) {
+    void registerSearchResults(List<SearchResult> results) {
         if (results == null) {
             return;
         }
-        for (com.ragagent.common.retrieval.SearchResult result : results) {
+        for (SearchResult result : results) {
             if (result == null) {
                 continue;
             }

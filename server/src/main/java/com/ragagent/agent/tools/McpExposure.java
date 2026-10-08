@@ -8,6 +8,12 @@ import java.util.Map;
 
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.domain.McpTool;
+import com.ragagent.approval.McpApproval;
+import com.ragagent.common.llm.ToolResult;
+import com.ragagent.mcp.domain.McpMetadata;
+import com.ragagent.mcp.protocol.McpClient;
+import com.ragagent.mcp.protocol.McpClientManager;
+import com.ragagent.mcp.protocol.McpContext;
 
 /**
  * MCP 目录装载与注册入口（持久化元数据读写、目录加载、工具注册、
@@ -35,7 +41,7 @@ public final class McpExposure {
 
         @FunctionalInterface
         public interface DirectoryGetter {
-            com.ragagent.mcp.domain.McpMetadata get(long tenantId, String serviceId) throws Exception;
+            McpMetadata get(long tenantId, String serviceId) throws Exception;
         }
 
         @FunctionalInterface
@@ -63,8 +69,8 @@ public final class McpExposure {
 
     public static LoadedDirectory loadMcpDirectory(
             McpService service,
-            com.ragagent.mcp.protocol.McpClientManager mcpManager,
-            com.ragagent.approval.McpApproval gate,
+            McpClientManager mcpManager,
+            McpApproval gate,
             McpOAuthSupport.McpOAuthSession oauthSess,
             McpMetadataIO metadata,
             boolean live,
@@ -76,7 +82,7 @@ public final class McpExposure {
                     waiter, caller), "");
         }
         if (!live) {
-            com.ragagent.mcp.domain.McpMetadata snapshot = metadata.get.get(caller.tenantId(), service.getId());
+            McpMetadata snapshot = metadata.get.get(caller.tenantId(), service.getId());
             if (snapshot != null && snapshot.isStale()) {
                 throw new IllegalStateException("MCP directory is stale; refresh Tools in Settings > MCP management");
             }
@@ -106,15 +112,15 @@ public final class McpExposure {
      */
     public static List<McpTool> loadMcpServiceTools(
             McpService service,
-            com.ragagent.mcp.protocol.McpClientManager mcpManager,
-            com.ragagent.approval.McpApproval gate,
+            McpClientManager mcpManager,
+            McpApproval gate,
             McpOAuthSupport.McpOAuthSession oauthSess,
             McpOAuthSupport.OAuthWaiter waiter,
             McpOAuthSupport.CallerIdentity caller) throws Exception {
         String serviceId = service.getId();
         String toolCallId = "mcp-discover-" + serviceId;
         boolean isStdio = "stdio".equals(service.getTransportType());
-        com.ragagent.mcp.protocol.McpClient client;
+        McpClient client;
         try {
             client = McpOAuthSupport.getOrCreateMcpClientWithOAuthRetry(
                     mcpManager, service, waiter, oauthSess, "", toolCallId, caller);
@@ -123,7 +129,7 @@ public final class McpExposure {
         }
         if (isStdio) {
             try {
-                List<McpTool> tools = client.listTools(com.ragagent.mcp.protocol.McpContext.deadline(
+                List<McpTool> tools = client.listTools(McpContext.deadline(
                         java.time.Instant.now().plus(LIST_TOOLS_TIMEOUT)));
                 return tools;
             } finally {
@@ -135,7 +141,7 @@ public final class McpExposure {
             }
         }
         try {
-            return client.listTools(com.ragagent.mcp.protocol.McpContext.deadline(
+            return client.listTools(McpContext.deadline(
                     java.time.Instant.now().plus(LIST_TOOLS_TIMEOUT)));
         } catch (Exception err) {
             // 缓存连接可能已 stale：断开、重建、重列一次。
@@ -145,19 +151,19 @@ public final class McpExposure {
                 // 显式忽略
             }
             McpClientRetry retry = new McpClientRetry(mcpManager, service, waiter, oauthSess, toolCallId, caller);
-            return retry.fresh().listTools(com.ragagent.mcp.protocol.McpContext.deadline(
+            return retry.fresh().listTools(McpContext.deadline(
                     java.time.Instant.now().plus(LIST_TOOLS_TIMEOUT)));
         }
     }
 
     private record McpClientRetry(
-            com.ragagent.mcp.protocol.McpClientManager manager,
+            McpClientManager manager,
             McpService service,
             McpOAuthSupport.OAuthWaiter waiter,
             McpOAuthSupport.McpOAuthSession oauthSess,
             String toolCallId,
             McpOAuthSupport.CallerIdentity caller) {
-        com.ragagent.mcp.protocol.McpClient fresh() {
+        McpClient fresh() {
             return McpOAuthSupport.getOrCreateMcpClientWithOAuthRetry(
                     manager, service, waiter, oauthSess, "", toolCallId(), caller);
         }
@@ -170,8 +176,8 @@ public final class McpExposure {
     public static int registerMcpTools(
             ToolRegistry registry,
             List<McpService> services,
-            com.ragagent.mcp.protocol.McpClientManager mcpManager,
-            com.ragagent.approval.McpApproval gate,
+            McpClientManager mcpManager,
+            McpApproval gate,
             int authWaitTimeoutSeconds,
             long tenantId,
             McpCatalog.McpServiceLookup lookup,
@@ -259,7 +265,7 @@ public final class McpExposure {
     /** 可用 MCP 工具的信息（15 秒预算按服务尽力而为）。 */
     public static Map<String, List<String>> getMcpToolsInfo(
             List<McpService> services,
-            com.ragagent.mcp.protocol.McpClientManager mcpManager) {
+            McpClientManager mcpManager) {
         Map<String, List<String>> result = new LinkedHashMap<>();
         if (services == null) {
             return result;
@@ -270,9 +276,9 @@ public final class McpExposure {
                 continue;
             }
             try {
-                com.ragagent.mcp.protocol.McpClient client =
-                        mcpManager.getOrCreateClient(com.ragagent.mcp.protocol.McpContext.deadline(deadline), service);
-                List<McpTool> tools = client.listTools(com.ragagent.mcp.protocol.McpContext.deadline(deadline));
+                McpClient client =
+                        mcpManager.getOrCreateClient(McpContext.deadline(deadline), service);
+                List<McpTool> tools = client.listTools(McpContext.deadline(deadline));
                 List<String> toolNames = new ArrayList<>(tools.size());
                 for (McpTool tool : tools) {
                     toolNames.add(tool.getName());
@@ -286,7 +292,7 @@ public final class McpExposure {
     }
 
     /** 为展示序列化 MCP 工具结果。 */
-    public static String serializeMcpToolResult(com.ragagent.common.llm.ToolResult result) throws Exception {
+    public static String serializeMcpToolResult(ToolResult result) throws Exception {
         if (result == null) {
             throw new IllegalArgumentException("result is nil");
         }

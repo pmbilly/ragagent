@@ -19,6 +19,7 @@ import com.ragagent.agent.tools.BaseTool;
 import com.ragagent.agent.tools.ToolDefinitions;
 import com.ragagent.agent.tools.ToolOutput;
 import com.ragagent.agent.tools.ToolRequest;
+import com.ragagent.websearch.service.WebSearchService;
 
 /**
  * web_search 工具。
@@ -89,7 +90,7 @@ public class WebSearchTool extends BaseTool {
     public interface WebSearchBackend {
         /** 失败抛 RuntimeException（工具折叠为 success=false + "web search failed: …"）。 */
         List<WebSearchResult> search(long tenantId, String providerId,
-                com.ragagent.websearch.service.WebSearchService.WebSearchConfig config,
+                WebSearchService.WebSearchConfig config,
                 String query);
     }
 
@@ -97,12 +98,12 @@ public class WebSearchTool extends BaseTool {
     private final int maxResults;
     private final String providerId;
     private final LongSupplier tenantId;
-    private final com.ragagent.websearch.service.WebSearchService.WebSearchConfig tenantConfig;
+    private final WebSearchService.WebSearchConfig tenantConfig;
     private WebFetchTool pages;
 
     public WebSearchTool(WebSearchBackend webSearchService, int maxResults, String providerId,
             LongSupplier tenantId,
-            com.ragagent.websearch.service.WebSearchService.WebSearchConfig tenantConfig) {
+            WebSearchService.WebSearchConfig tenantConfig) {
         super(ToolDefinitions.TOOL_WEB_SEARCH,
                 formatDescription(maxResults), SCHEMA_JSON);
         int effective = maxResults <= 0 ? DEFAULT_MAX_RESULTS : maxResults;
@@ -112,7 +113,7 @@ public class WebSearchTool extends BaseTool {
         this.providerId = providerId == null ? "" : providerId;
         this.tenantId = tenantId;
         this.tenantConfig = tenantConfig == null
-                ? new com.ragagent.websearch.service.WebSearchService.WebSearchConfig()
+                ? new WebSearchService.WebSearchConfig()
                 : tenantConfig;
         // 构造内嵌的页面抓取器（可用 withPageReader 共享 web_fetch 的实例）
         this.pages = new WebFetchTool();
@@ -174,8 +175,8 @@ public class WebSearchTool extends BaseTool {
         // 生效配置：EffectiveWebSearchConfig 拷贝（租户为 null → 缺省），再覆写
         // maxResults/filters；压缩强制 none——agent 显式读页，RAG 压缩属快答管线
         // （CompressionMethod 在 search 执行路径不被消费，仅声明）。
-        com.ragagent.websearch.service.WebSearchService.WebSearchConfig searchConfig =
-                new com.ragagent.websearch.service.WebSearchService.WebSearchConfig();
+        WebSearchService.WebSearchConfig searchConfig =
+                new WebSearchService.WebSearchConfig();
         searchConfig.provider = tenantConfig.provider;
         searchConfig.apiKey = tenantConfig.apiKey;
         searchConfig.includeDate = tenantConfig.includeDate;

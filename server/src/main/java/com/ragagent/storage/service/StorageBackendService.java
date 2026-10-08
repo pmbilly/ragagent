@@ -18,6 +18,7 @@ import com.ragagent.common.storage.StorageAllowList;
 import com.ragagent.storage.dto.StorageConfig;
 import com.ragagent.storage.mapper.StorageBackendRepository;
 import org.springframework.stereotype.Service;
+import com.ragagent.storage.config.StorageEnvLookup;
 
 /**
  * 存储后端管理的 HTTP 面方法：Create / Update / Delete / SetDefault / Test + Validate 链。
@@ -491,7 +492,7 @@ public class StorageBackendService {
 
     /** provider 家族键读取（统一查找面）；未配置 → 空串。 */
     private static String env(String key) {
-        String v = com.ragagent.storage.config.StorageEnvLookup.get(key);
+        String v = StorageEnvLookup.get(key);
         return v == null ? "" : v;
     }
 

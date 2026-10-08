@@ -51,6 +51,18 @@ import com.ragagent.knowledge.service.KnowledgeService;
 import com.ragagent.rerank.Reranker;
 import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.wiki.service.page.WikiPageService;
+import com.ragagent.agent.tools.AgentTool;
+import com.ragagent.agent.tools.ToolDefinitions;
+import com.ragagent.agent.tools.data.AnalysisDuckDbJdbc;
+import com.ragagent.agent.tools.data.DataAnalysisTool;
+import com.ragagent.agent.tools.knowledge.GetDocumentInfoTool;
+import com.ragagent.agent.tools.knowledge.ListKnowledgeChunksTool;
+import com.ragagent.auth.service.TenantService;
+import com.ragagent.common.tenant.WebSearchConfig;
+import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.knowledge.storage.TenantFileStorage;
+import com.ragagent.tenant.Tenant;
+import com.ragagent.websearch.service.WebSearchService;
 
 /**
  * agent 引擎检索工具族的接缝适配（2026-09-23 接线批）。
@@ -78,9 +90,9 @@ public class AgentToolBackends {
     private final AgentToolWikiBackends wikiBackends;
     private final MessageService messageService;
     private final MemoryService memoryService;
-    private final com.ragagent.websearch.service.WebSearchService webSearchService;
-    private final com.ragagent.auth.service.TenantService tenantService;
-    private final com.ragagent.knowledge.storage.TenantFileStorage fileStorage;
+    private final WebSearchService webSearchService;
+    private final TenantService tenantService;
+    private final TenantFileStorage fileStorage;
     private final JdbcTemplate jdbc;
 
     public AgentToolBackends(KnowledgeBaseService kbService,
@@ -91,9 +103,9 @@ public class AgentToolBackends {
                              MessageService messageService,
                              MemoryService memoryService,
                              WikiPageService wikiPageService,
-                             com.ragagent.websearch.service.WebSearchService webSearchService,
-                             com.ragagent.auth.service.TenantService tenantService,
-                             com.ragagent.knowledge.storage.TenantFileStorage fileStorage,
+                             WebSearchService webSearchService,
+                             TenantService tenantService,
+                             TenantFileStorage fileStorage,
                              DataSource dataSource) {
         this.knowledgeService = knowledgeService;
         this.chunkRepository = chunkRepository;
@@ -115,34 +127,34 @@ public class AgentToolBackends {
      * @param ownerId   search_conversations 的 owner（引擎装配期从调用方身份捕获）
      * @param sessionId 当前会话（工具用于剔除本轮会话自身）
      */
-    public com.ragagent.agent.tools.AgentTool createTool(String toolName,
+    public AgentTool createTool(String toolName,
             SearchTarget.SearchTargets targets, Reranker rerankModel,
             String ownerId, String sessionId) {
         return switch (toolName) {
-            case com.ragagent.agent.tools.ToolDefinitions.TOOL_KNOWLEDGE_SEARCH ->
+            case ToolDefinitions.TOOL_KNOWLEDGE_SEARCH ->
                     new KnowledgeSearchTool(knowledgeSearchBackend(), chunkInfoBackend(),
                             imageEnricher(), rerankerModel(rerankModel), targets, searchConfig());
-            case com.ragagent.agent.tools.ToolDefinitions.TOOL_GREP_CHUNKS ->
+            case ToolDefinitions.TOOL_GREP_CHUNKS ->
                     new GrepChunksTool(grepChunkSearch(), targets);
-            case com.ragagent.agent.tools.ToolDefinitions.TOOL_LIST_KNOWLEDGE_CHUNKS ->
-                    new com.ragagent.agent.tools.knowledge.ListKnowledgeChunksTool(knowledgeInfoReader(),
+            case ToolDefinitions.TOOL_LIST_KNOWLEDGE_CHUNKS ->
+                    new ListKnowledgeChunksTool(knowledgeInfoReader(),
                             chunkById(), pagedChunks(), imageInfoCollector(), targets);
-            case com.ragagent.agent.tools.ToolDefinitions.TOOL_QUERY_KNOWLEDGE_GRAPH ->
+            case ToolDefinitions.TOOL_QUERY_KNOWLEDGE_GRAPH ->
                     new QueryKnowledgeGraphTool(graphSearch(), targets,
                             DocChunkSupport.asScopeReader(knowledgeInfoReader()));
-            case com.ragagent.agent.tools.ToolDefinitions.TOOL_GET_DOCUMENT_INFO ->
-                    new com.ragagent.agent.tools.knowledge.GetDocumentInfoTool(knowledgeInfoReader(),
+            case ToolDefinitions.TOOL_GET_DOCUMENT_INFO ->
+                    new GetDocumentInfoTool(knowledgeInfoReader(),
                             chunkById(), pagedChunks(), targets);
-            case com.ragagent.agent.tools.ToolDefinitions.TOOL_SEARCH_CONVERSATIONS ->
+            case ToolDefinitions.TOOL_SEARCH_CONVERSATIONS ->
                     new SearchConversationsTool(conversationSearch(), ownerId, sessionId);
-            case com.ragagent.agent.tools.ToolDefinitions.TOOL_SEARCH_MEMORY ->
+            case ToolDefinitions.TOOL_SEARCH_MEMORY ->
                     new SearchMemoryTool(memorySearch());
-            case com.ragagent.agent.tools.ToolDefinitions.TOOL_DATABASE_QUERY ->
+            case ToolDefinitions.TOOL_DATABASE_QUERY ->
                     new DatabaseQueryTool(sqlQueryExecutor(), targets, () -> {
                         Long t = TenantContext.currentTenantId();
                         return t == null ? 0L : t;
                     });
-            case com.ragagent.agent.tools.ToolDefinitions.TOOL_DATA_SCHEMA -> {
+            case ToolDefinitions.TOOL_DATA_SCHEMA -> {
                 // data_schema 装配：knowledgeService + chunkRepo 两个取数 seam，外加检索范围授权
                 DataSchemaTool tool = new DataSchemaTool(dataSchemaKnowledgeLookup(),
                         dataSchemaChunkLister());
@@ -151,7 +163,7 @@ public class AgentToolBackends {
                 }
                 yield tool;
             }
-            case com.ragagent.agent.tools.ToolDefinitions.TOOL_DATA_ANALYSIS ->
+            case ToolDefinitions.TOOL_DATA_ANALYSIS ->
                 // data_analysis 工具构造：三个 seam 的生产实现
                 createDataAnalysisTool(targets, sessionId);
             default -> null;
@@ -164,22 +176,22 @@ public class AgentToolBackends {
      * 把守）；Materializer = FileService.GetFile + 临时文件（扩展名取 file_path）；
      * DuckDB = 进程内共享内存连接。
      */
-    private com.ragagent.agent.tools.AgentTool createDataAnalysisTool(
+    private AgentTool createDataAnalysisTool(
             SearchTarget.SearchTargets targets, String sessionId) {
-        com.ragagent.agent.tools.data.DataAnalysisTool tool =
-                new com.ragagent.agent.tools.data.DataAnalysisTool(
+        DataAnalysisTool tool =
+                new DataAnalysisTool(
                         knowledgeId -> {
                             Knowledge k = knowledgeService.getKnowledgeByIdOnly(knowledgeId);
                             if (k == null) {
                                 return null;
                             }
-                            return new com.ragagent.agent.tools.data.DataAnalysisTool.KnowledgeData(
+                            return new DataAnalysisTool.KnowledgeData(
                                     k.getId(), k.getKnowledgeBaseId(),
                                     k.getTenantId() == null ? 0L : k.getTenantId(),
                                     k.getFileType(), k.getFilePath());
                         },
                         knowledge -> materializeKnowledgeFile(knowledge),
-                        com.ragagent.agent.tools.data.AnalysisDuckDbJdbc.get(),
+                        AnalysisDuckDbJdbc.get(),
                         sessionId);
         if (targets != null) {
             tool.withSearchTargets(targets);
@@ -189,7 +201,7 @@ public class AgentToolBackends {
 
     /** 知识文件 → 带正确扩展名的本地临时文件（用后即删）。 */
     private java.nio.file.Path materializeKnowledgeFile(
-            com.ragagent.agent.tools.data.DataAnalysisTool.KnowledgeData knowledge) {
+            DataAnalysisTool.KnowledgeData knowledge) {
         if (knowledge == null || knowledge.filePath() == null || knowledge.filePath().isEmpty()) {
             throw new IllegalArgumentException("knowledge file path is empty");
         }
@@ -273,37 +285,37 @@ public class AgentToolBackends {
      *
      * @param routes 请求级共享的 slug→KB 路由记忆（一个引擎一个实例）
      */
-    public com.ragagent.agent.tools.AgentTool createWikiTool(String toolName,
+    public AgentTool createWikiTool(String toolName,
             SearchTarget.SearchTargets targets, List<WikiScope> scopes,
             List<String> wikiKbIds, WikiRouteResolver routes) {
         WikiPages pages = wikiBackends.wikiPages();
         SearchAuth.KnowledgeScopeReader scopeReader =
                 DocChunkSupport.asScopeReader(knowledgeInfoReader());
         return switch (toolName) {
-            case com.ragagent.agent.tools.ToolDefinitions.TOOL_WIKI_READ_PAGE ->
+            case ToolDefinitions.TOOL_WIKI_READ_PAGE ->
                     new WikiReadPageTool(pages, scopeReader, scopes, routes);
-            case com.ragagent.agent.tools.ToolDefinitions.TOOL_WIKI_SEARCH ->
+            case ToolDefinitions.TOOL_WIKI_SEARCH ->
                     new WikiSearchTool(pages, scopeReader, scopes, routes);
-            case com.ragagent.agent.tools.ToolDefinitions.TOOL_WIKI_READ_SOURCE_DOC ->
+            case ToolDefinitions.TOOL_WIKI_READ_SOURCE_DOC ->
                     // 不碰 wiki 服务，只用 chunk 面
                     new WikiReadSourceDocTool(knowledgeInfoReader(), pagedChunks(),
                             imageInfoCollector(), targets);
-            case com.ragagent.agent.tools.ToolDefinitions.TOOL_WIKI_FLAG_ISSUE ->
+            case ToolDefinitions.TOOL_WIKI_FLAG_ISSUE ->
                     new WikiFlagIssueTool(pages, wikiKbIds, routes)
                             .withKnowledgeScope(scopeReader, targets);
-            case com.ragagent.agent.tools.ToolDefinitions.TOOL_WIKI_READ_ISSUE ->
+            case ToolDefinitions.TOOL_WIKI_READ_ISSUE ->
                     new WikiReadIssueTool(pages, wikiKbIds);
-            case com.ragagent.agent.tools.ToolDefinitions.TOOL_WIKI_UPDATE_ISSUE ->
+            case ToolDefinitions.TOOL_WIKI_UPDATE_ISSUE ->
                     new WikiUpdateIssueTool(pages, wikiKbIds);
-            case com.ragagent.agent.tools.ToolDefinitions.TOOL_WIKI_WRITE_PAGE ->
+            case ToolDefinitions.TOOL_WIKI_WRITE_PAGE ->
                     new WikiWritePageTool(pages, wikiKbIds, scopeReader, routes)
                             .withSearchTargets(targets);
-            case com.ragagent.agent.tools.ToolDefinitions.TOOL_WIKI_REPLACE_TEXT ->
+            case ToolDefinitions.TOOL_WIKI_REPLACE_TEXT ->
                     new WikiReplaceTextTool(pages, wikiKbIds, scopeReader, routes)
                             .withSearchTargets(targets);
-            case com.ragagent.agent.tools.ToolDefinitions.TOOL_WIKI_RENAME_PAGE ->
+            case ToolDefinitions.TOOL_WIKI_RENAME_PAGE ->
                     new WikiRenamePageTool(pages, wikiKbIds, routes);
-            case com.ragagent.agent.tools.ToolDefinitions.TOOL_WIKI_DELETE_PAGE ->
+            case ToolDefinitions.TOOL_WIKI_DELETE_PAGE ->
                     new WikiDeletePageTool(pages, wikiKbIds, routes);
             default -> null;
         };
@@ -325,13 +337,13 @@ public class AgentToolBackends {
      * 租户的 WebSearchConfig 在装配期捕获——执行期从上下文取租户 id，
      * 同一回合内取值等价；tenantID 留在执行期读（==0 拒绝）。
      */
-    public com.ragagent.agent.tools.AgentTool createWebTool(String toolName,
+    public AgentTool createWebTool(String toolName,
             int webSearchMaxResults, String webSearchProviderId) {
         return switch (toolName) {
-            case com.ragagent.agent.tools.ToolDefinitions.TOOL_WEB_SEARCH -> new WebSearchTool(
+            case ToolDefinitions.TOOL_WEB_SEARCH -> new WebSearchTool(
                     webSearchBackend(), webSearchMaxResults, webSearchProviderId,
                     currentTenantId(), loadTenantWebSearchConfig());
-            case com.ragagent.agent.tools.ToolDefinitions.TOOL_WEB_FETCH -> new WebFetchTool();
+            case ToolDefinitions.TOOL_WEB_FETCH -> new WebFetchTool();
             default -> null;
         };
     }
@@ -356,23 +368,23 @@ public class AgentToolBackends {
      * 归一化（applyEffective）：maxResults≤0→10、
      * blacklist null→[]。
      */
-    private com.ragagent.websearch.service.WebSearchService.WebSearchConfig loadTenantWebSearchConfig() {
+    private WebSearchService.WebSearchConfig loadTenantWebSearchConfig() {
         Long tid = TenantContext.currentTenantId();
         if (tid == null || tid == 0) {
             return null;
         }
         try {
-            com.ragagent.tenant.Tenant tenant = tenantService.getTenantById(tid);
+            Tenant tenant = tenantService.getTenantById(tid);
             if (tenant == null || tenant.getWebSearchConfig() == null
                     || tenant.getWebSearchConfig().isNull()) {
                 return null;
             }
-            com.ragagent.common.tenant.WebSearchConfig cfg = JSON.treeToValue(
+            WebSearchConfig cfg = JSON.treeToValue(
                     tenant.getWebSearchConfig(),
-                    com.ragagent.common.tenant.WebSearchConfig.class);
+                    WebSearchConfig.class);
             cfg.applyEffective();
-            com.ragagent.websearch.service.WebSearchService.WebSearchConfig out =
-                    new com.ragagent.websearch.service.WebSearchService.WebSearchConfig();
+            WebSearchService.WebSearchConfig out =
+                    new WebSearchService.WebSearchConfig();
             out.provider = cfg.getProvider();
             out.apiKey = cfg.getApiKey();
             out.maxResults = cfg.getMaxResults();
@@ -461,7 +473,7 @@ public class AgentToolBackends {
                     tenant, knowledgeId, offset, pageSize, chunkTypes, null,
                     "", "", "", "", enabled);
             List<DataSchemaTool.ChunkView> out = new ArrayList<>();
-            for (com.ragagent.knowledge.domain.Chunk c : p.items()) {
+            for (Chunk c : p.items()) {
                 out.add(new DataSchemaTool.ChunkView(nz(c.getChunkType()), c.getContent()));
             }
             return out;

@@ -18,6 +18,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import com.ragagent.common.context.TenantContext;
+import com.ragagent.support.ContractJson;
 
 /**
  * agents 契约测试：agents CRUD 家族（8 条路由）+ initialization 三条
@@ -123,7 +125,7 @@ class AgentContractTest {
      */
     @Test
     void virtualBuiltinAgentCarriesConfigOnRow() {
-        com.ragagent.common.context.TenantContext.set(10005L, null, "owner", false, AGU, false);
+        TenantContext.set(10005L, null, "owner", false, AGU, false);
         try {
             var result = customAgentService.getAgentByID("builtin-smart-reasoning", null);
             assertTrue(result.row().getConfig() != null
@@ -131,7 +133,7 @@ class AgentContractTest {
                     "虚拟内建行的 config 字符串必须落上（运行时消费面重新 parse row.getConfig()）");
             assertEquals("smart-reasoning", result.config().path("agentMode").asText());
         } finally {
-            com.ragagent.common.context.TenantContext.clear();
+            TenantContext.clear();
         }
     }
 
@@ -429,7 +431,7 @@ class AgentContractTest {
 
     private static String raw(MvcResult r) throws Exception {
         // PR4 语义比较：与 golden 同侧归一（非 JSON 文本原样）
-        return com.ragagent.support.ContractJson.semantic(RAW_SEMANTIC_MAPPER,
+        return ContractJson.semantic(RAW_SEMANTIC_MAPPER,
                 r.getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8));
     }
 
@@ -443,6 +445,6 @@ class AgentContractTest {
             resource = new org.springframework.core.io.ClassPathResource("contracts/" + name + ".json");
         }
         String text = new String(resource.getInputStream().readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
-        return com.ragagent.support.ContractJson.semantic(GOLDEN_SEMANTIC_MAPPER, text);
+        return ContractJson.semantic(GOLDEN_SEMANTIC_MAPPER, text);
     }
 }

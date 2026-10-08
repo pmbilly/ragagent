@@ -34,6 +34,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import com.ragagent.support.ContractJson;
+import com.ragagent.support.GoldenContract;
 
 /**
  * 契约测试：KB CRUD + 文档 CRUD，对照 golden 逐字节比对。
@@ -397,7 +399,7 @@ class KnowledgeContractTest {
             resource = new org.springframework.core.io.ClassPathResource("contracts/" + name + ".json");
         }
         String text = new String(resource.getInputStream().readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
-        return com.ragagent.support.ContractJson.semantic(GOLDEN_SEMANTIC_MAPPER, text);
+        return ContractJson.semantic(GOLDEN_SEMANTIC_MAPPER, text);
     }
 
 
@@ -414,14 +416,14 @@ class KnowledgeContractTest {
 
     private static void assertGolden(org.springframework.test.web.servlet.MvcResult r,
             String name) throws Exception {
-        com.ragagent.support.GoldenContract.assertEquals("src/test/resources/contracts",
+        GoldenContract.assertEquals("src/test/resources/contracts",
                 name, KnowledgeContractTest::mask,
                 r.getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8));
     }
 
     private static String mask(String s) {
         // PR4 语义比较入口：键序/转义归一后再掩码
-        s = com.ragagent.support.ContractJson.semantic(s);
+        s = ContractJson.semantic(s);
         String out = UUID_KEY_PATTERN.matcher(s).replaceAll("\"$1\":\"<id>\"");
         out = TS_PATTERN.matcher(out).replaceAll("\"<ts>\"");
         out = FILE_PATH_PATTERN.matcher(out).replaceAll("\"filePath\":\"<path>\"");

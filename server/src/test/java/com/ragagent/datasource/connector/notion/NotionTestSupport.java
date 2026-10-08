@@ -11,6 +11,7 @@ import com.ragagent.datasource.ConnectorException;
 import com.ragagent.datasource.ConnectorHttp;
 import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.domain.DataSourceConstants;
+import com.ragagent.datasource.domain.FetchedItem;
 
 /**
  * Notion 测试的公共夹具。
@@ -143,7 +144,7 @@ final class NotionTestSupport {
         }
     }
 
-    static String contentOf(com.ragagent.datasource.domain.FetchedItem item) {
+    static String contentOf(FetchedItem item) {
         return item.getContent() == null
                 ? ""
                 : new String(item.getContent(), java.nio.charset.StandardCharsets.UTF_8);

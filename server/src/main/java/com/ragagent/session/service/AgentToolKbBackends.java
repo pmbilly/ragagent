@@ -25,6 +25,8 @@ import com.ragagent.knowledge.support.ImageInfoEnricher;
 import com.ragagent.rerank.RankResult;
 import com.ragagent.rerank.Reranker;
 import com.ragagent.retrieval.HybridSearchService;
+import com.ragagent.common.pipeline.ChunkTypes;
+import com.ragagent.knowledge.domain.Chunk;
 
 /**
  * {@code AgentToolBackends} 的**知识库检索簇**：知识库检索 / chunk 列举 /
@@ -39,7 +41,7 @@ final class AgentToolKbBackends {
 
     /** chunk 列举的 text+faq 类型过滤。 */
     private static final List<String> TEXT_FAQ_TYPES = List.of(
-            com.ragagent.common.pipeline.ChunkTypes.TEXT, com.ragagent.common.pipeline.ChunkTypes.FAQ);
+            ChunkTypes.TEXT, ChunkTypes.FAQ);
 
     private final KnowledgeBaseService kbService;
     private final KnowledgeService knowledgeService;
@@ -144,7 +146,7 @@ final class AgentToolKbBackends {
     public KnowledgeSearchTool.ChunkInfoBackend chunkInfoBackend() {
         return new KnowledgeSearchTool.ChunkInfoBackend() {
             @Override
-            public com.ragagent.knowledge.domain.Chunk faqChunkById(String chunkId) {
+            public Chunk faqChunkById(String chunkId) {
                 return chunkRepository.getChunkByIdOnly(chunkId);
             }
 
@@ -432,7 +434,7 @@ final class AgentToolKbBackends {
         };
     }
     /** 工具侧的 chunkById 回调。 */
-    public java.util.function.Function<String, com.ragagent.knowledge.domain.Chunk> chunkById() {
+    public java.util.function.Function<String, Chunk> chunkById() {
         return chunkRepository::getChunkByIdOnly;
     }
     public DocChunkSupport.PagedChunks pagedChunks() {

@@ -10,6 +10,8 @@ import java.util.regex.Pattern;
 
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ToolCall;
+import com.ragagent.llm.domain.MessageContentPart;
+import com.ragagent.llm.domain.ToolCall;
 
 /**
  * model-context registry 的持久资源半边：为存储资源引用分配请求局部 res://NNNN 句柄，
@@ -92,14 +94,14 @@ final class ResourceRegistry {
             c.setImages(m.getImages());
             c.setKind(m.getKind());
             if (m.getMultiContent() != null && !m.getMultiContent().isEmpty()) {
-                List<com.ragagent.llm.domain.MessageContentPart> parts = new ArrayList<>(m.getMultiContent());
+                List<MessageContentPart> parts = new ArrayList<>(m.getMultiContent());
                 c.setMultiContent(parts);
                 for (int j = 0; j < parts.size(); j++) {
                     parts.get(j).setText(encodeText(parts.get(j).getText()));
                 }
             }
             if (m.getToolCalls() != null && !m.getToolCalls().isEmpty()) {
-                List<com.ragagent.llm.domain.ToolCall> calls = new ArrayList<>(m.getToolCalls());
+                List<ToolCall> calls = new ArrayList<>(m.getToolCalls());
                 c.setToolCalls(calls);
                 for (int j = 0; j < calls.size(); j++) {
                     calls.get(j).getFunction().setArguments(encodeText(calls.get(j).getFunction().getArguments()));

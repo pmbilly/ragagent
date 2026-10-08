@@ -30,6 +30,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import com.ragagent.knowledge.domain.ChunkRevisionConflictException;
+import com.ragagent.common.security.SsrfGuard;
+import com.ragagent.model.domain.ModelParameters;
 
 /**
  * chunk 编辑链路语义（H2）：乐观锁冲突（409 面）、校验的 500 面文案、source_content
@@ -67,7 +69,7 @@ class ChunkEditServiceTest {
     @Autowired
     private ChunkEditService service;
     @Autowired
-    private com.ragagent.common.security.SsrfGuard ssrfGuard;
+    private SsrfGuard ssrfGuard;
 
     @BeforeEach
     void seed() {
@@ -76,15 +78,15 @@ class ChunkEditServiceTest {
         TenantContext.set(TENANT, TenantContext.webUserPrincipal("user-1"), "owner", false, "user-1", false);
         // 2026-09-25 接线批：deleteGeneratedQuestion 经 ModelRuntimeFactory.getEmbeddingModel
         // 建真实 embedder——构造期做 base URL SSRF 校验，桩 URL（127.0.0.1:1）需注白名单
-        whitelistSnapshot = com.ragagent.common.security.SsrfGuard.snapshotWhitelist();
+        whitelistSnapshot = SsrfGuard.snapshotWhitelist();
         ssrfGuard.reloadWhitelist("127.0.0.1,::1,localhost");
     }
 
-    private com.ragagent.common.security.SsrfGuard.Whitelist whitelistSnapshot;
+    private SsrfGuard.Whitelist whitelistSnapshot;
 
     @AfterEach
     void cleanup() {
-        com.ragagent.common.security.SsrfGuard.restoreWhitelist(whitelistSnapshot);
+        SsrfGuard.restoreWhitelist(whitelistSnapshot);
         TenantContext.clear();
     }
 
@@ -149,7 +151,7 @@ class ChunkEditServiceTest {
         m.setStatus("active");
         // 2026-09-22 接线后 syncChunkIndex / regenerateChunkQuestions 会真实出站：
         // baseUrl 指向 127.0.0.1:1 的不可达端口，让出站快速确定性地失败（测试禁真实网络）。
-        com.ragagent.model.domain.ModelParameters p = new com.ragagent.model.domain.ModelParameters();
+        ModelParameters p = new ModelParameters();
         p.setBaseUrl("http://127.0.0.1:1/v1");
         m.setParameters(p);
         modelMapper.insert(m);

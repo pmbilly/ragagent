@@ -26,6 +26,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import com.ragagent.wiki.domain.WikiPageIssue;
+import com.ragagent.wiki.domain.WikiPageLite;
 
 /**
  * Wiki 页面仓储测试（H2 内存库，见 {@code src/test/resources/application.yml}），
@@ -769,7 +771,7 @@ class WikiPageRepositoryTest {
         repo.create(a);
         repo.create(makeWikiPage("kb-lite", "entity/b", "entity", "draft"));
 
-        Map<String, com.ragagent.wiki.domain.WikiPageLite> got =
+        Map<String, WikiPageLite> got =
                 repo.listBySlugs("kb-lite", List.of("entity/a", "entity/missing"));
         assertThat(got).containsOnlyKeys("entity/a");
         assertThat(got.get("entity/a").getAliases()).containsExactly("A 别名");
@@ -904,7 +906,7 @@ class WikiPageRepositoryTest {
     /** 页面问题：创建 / 按 slug+status 过滤 / 改状态 */
     @Test
     void pageIssuesCrud() {
-        com.ragagent.wiki.domain.WikiPageIssue issue = new com.ragagent.wiki.domain.WikiPageIssue();
+        WikiPageIssue issue = new WikiPageIssue();
         issue.setId(UUID.randomUUID().toString());
         issue.setTenantId(1L);
         issue.setKnowledgeBaseId("kb-i");
@@ -916,7 +918,7 @@ class WikiPageRepositoryTest {
         issue.setReportedBy("agent");
         repo.createIssue(issue);
 
-        com.ragagent.wiki.domain.WikiPageIssue done = new com.ragagent.wiki.domain.WikiPageIssue();
+        WikiPageIssue done = new WikiPageIssue();
         done.setId(UUID.randomUUID().toString());
         done.setTenantId(1L);
         done.setKnowledgeBaseId("kb-i");

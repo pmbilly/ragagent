@@ -145,7 +145,7 @@ public class WikiIngestService implements WikiIngestPort {
         pageOps.injectCrossLinks(kbId, affectedSlugs, freshRefs, batchCtx);
     }
 
-    public com.ragagent.wiki.service.ingest.WikiIngestExtractDedup.ExtractedProjection deduplicateExtractedBatch(
+    public WikiIngestExtractDedup.ExtractedProjection deduplicateExtractedBatch(
             LlmChatClient chatModel, String kbId, java.util.List<ExtractedItem> entities,
             java.util.List<ExtractedItem> concepts, WikiBatchContext batchCtx) {
         return extractDedup.deduplicateExtractedBatch(chatModel, kbId, entities, concepts, batchCtx);

@@ -28,6 +28,7 @@ import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
 import com.ragagent.retrieval.engine.weaviate.WeaviateRestClient.Json;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
+import com.ragagent.common.vectorstore.IndexConfig;
 
 /**
  * Weaviate 驱动：惰性建类
@@ -474,14 +475,14 @@ class WeaviateRetrieveRepositoryTest {
     @Test
     @DisplayName("类名解析：prefix > name > 缺省（Go 原文拼写 Weknora_embeddings）")
     void resolveCollectionName() {
-        com.ragagent.common.vectorstore.IndexConfig withPrefix =
-                new com.ragagent.common.vectorstore.IndexConfig();
+        IndexConfig withPrefix =
+                new IndexConfig();
         withPrefix.collectionPrefix = "pref";
         withPrefix.collectionName = "name";
         assertThat(WeaviateRetrieveRepository.resolveCollectionName(withPrefix)).isEqualTo("pref");
 
-        com.ragagent.common.vectorstore.IndexConfig withName =
-                new com.ragagent.common.vectorstore.IndexConfig();
+        IndexConfig withName =
+                new IndexConfig();
         withName.collectionName = "name";
         assertThat(WeaviateRetrieveRepository.resolveCollectionName(withName)).isEqualTo("name");
         assertThat(WeaviateRetrieveRepository.resolveCollectionName(null))

@@ -36,6 +36,8 @@ import com.ragagent.storage.support.StreamRewriter;
 import com.ragagent.stream.StreamBatch;
 import com.ragagent.stream.StreamEvent;
 import com.ragagent.stream.StreamManager;
+import com.ragagent.auth.service.TenantService;
+import com.ragagent.common.context.TenantContext;
 
 /**
  * 继续接收活跃流。
@@ -82,7 +84,7 @@ public class SessionStreamController {
     private final StreamEventEmitter emitter;
     private final FileService fileService;
     private final StorageBackendResolver storageBackendResolver;
-    private final com.ragagent.auth.service.TenantService tenantService;
+    private final TenantService tenantService;
 
     public SessionStreamController(
             SessionService sessionService,
@@ -91,7 +93,7 @@ public class SessionStreamController {
             StreamEventEmitter emitter,
             ObjectProvider<FileService> fileService,
             ObjectProvider<StorageBackendResolver> storageBackendResolver,
-            com.ragagent.auth.service.TenantService tenantService) {
+            TenantService tenantService) {
         this.sessionService = sessionService;
         this.messageService = messageService;
         this.streamManager = streamManager;
@@ -133,7 +135,7 @@ public class SessionStreamController {
      * 取不到时返回 null（调用方按无租户降级）。</p>
      */
     private Tenant currentTenant() {
-        Long tid = com.ragagent.common.context.TenantContext.currentTenantId();
+        Long tid = TenantContext.currentTenantId();
         try {
             return tid == null || tid <= 0 ? null : tenantService.getTenantById(tid);
         } catch (RuntimeException e) {

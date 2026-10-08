@@ -30,6 +30,7 @@ import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.domain.FetchedItem;
 import com.ragagent.datasource.domain.Resource;
 import com.ragagent.datasource.domain.SyncCursor;
+import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes;
 
 /**
  * 飞书 wiki 连接器。
@@ -98,7 +99,7 @@ public class WikiConnector implements StreamingConnector {
         String parent = parentId == null ? "" : parentId;
 
         if (parent.isEmpty()) {
-            List<com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.WikiSpace> spaces;
+            List<FeishuApiTypes.WikiSpace> spaces;
             try {
                 spaces = client.listWikiSpaces();
             } catch (RuntimeException e) {

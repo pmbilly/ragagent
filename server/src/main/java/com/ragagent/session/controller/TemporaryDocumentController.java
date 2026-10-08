@@ -24,6 +24,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartFile;
+import com.ragagent.agent.management.domain.CustomAgentEntity;
+import com.ragagent.common.web.ContentTypeByFilename;
+import com.ragagent.knowledge.support.ParserEngineRules;
+import com.ragagent.session.service.AgentResolver;
 
 /**
  * 会话附件（临时文档）HTTP 层。
@@ -44,11 +48,11 @@ public class TemporaryDocumentController {
     private final SessionService sessionService;
     private final TemporaryDocumentService temporaryDocuments;
     /** agent 解析（共享优先、source==0 才回落 own）。 */
-    private final com.ragagent.session.service.AgentResolver agentResolver;
+    private final AgentResolver agentResolver;
 
     public TemporaryDocumentController(SessionService sessionService,
                                        TemporaryDocumentService temporaryDocuments,
-                                       com.ragagent.session.service.AgentResolver agentResolver) {
+                                       AgentResolver agentResolver) {
         this.sessionService = sessionService;
         this.temporaryDocuments = temporaryDocuments;
         this.agentResolver = agentResolver;
@@ -198,8 +202,8 @@ public class TemporaryDocumentController {
         // filetransport.Serve 语义：头用 servlet setHeader 原样写——
         // Spring/Tomcat 的 Content-Type 处理会规范化 "charset=" 前的空格（golden 实测差异）
         String fileName = opened.fileName();
-        com.ragagent.common.web.ContentTypeByFilename.Record safe =
-                com.ragagent.common.web.ContentTypeByFilename.safe(fileName);
+        ContentTypeByFilename.Record safe =
+                ContentTypeByFilename.safe(fileName);
         response.setStatus(jakarta.servlet.http.HttpServletResponse.SC_OK);
         response.setHeader("Content-Type", safe.contentType());
         response.setHeader("X-Content-Type-Options", "nosniff");
@@ -241,7 +245,7 @@ public class TemporaryDocumentController {
      * 为空或 auto 时）/ VLM 图片理解选项。租户级 parser 规则由 parse worker 兜底。
      */
     private static TemporaryDocumentService.CreateOptions agentOptions(
-            com.ragagent.agent.management.domain.CustomAgentEntity agent,
+            CustomAgentEntity agent,
             String ext, String parserEngine) {
         TemporaryDocumentService.CreateOptions options = TemporaryDocumentService.CreateOptions
                 .empty().withParserEngine(parserEngine == null ? "" : parserEngine.strip());
@@ -249,7 +253,7 @@ public class TemporaryDocumentController {
             return options;
         }
         com.fasterxml.jackson.databind.node.ObjectNode cfg =
-                com.ragagent.session.service.AgentResolver.parseAgentConfig(agent);
+                AgentResolver.parseAgentConfig(agent);
         List<String> supported = stringListOf(cfg.get("supportedFileTypes"));
         if (!supported.isEmpty() && !containsFileType(supported, ext)) {
             throw new BizException(AppError.badRequest("file type is not supported by this agent"));
@@ -263,7 +267,7 @@ public class TemporaryDocumentController {
             options = options.withAsrModelId(cfg.path("asrModelId").asText(""));
         }
         if (options.parserEngine().isEmpty() || "auto".equals(options.parserEngine())) {
-            String engine = com.ragagent.knowledge.support.ParserEngineRules.resolve(
+            String engine = ParserEngineRules.resolve(
                     cfg.get("chatParserEngineRules"), ext);
             if (!engine.isEmpty()) {
                 options = options.withParserEngine(engine);

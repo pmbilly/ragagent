@@ -13,6 +13,7 @@ import com.ragagent.wiki.domain.TaskPendingOp;
 import com.ragagent.common.text.Whitespace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.ragagent.tracing.langfuse.LangfuseTracing;
 
 /**
  * wiki 摄取的写面：待办 op 持久化（task_pending_ops）、ingest/retract 投递、
@@ -122,7 +123,7 @@ final class WikiIngestEnqueueOps {
         // 请求的 traceparent 打进负载，worker 侧续接同一棵树
         WikiIngestPayload trigger = WikiIngestPayload.withTracing(
                 tenantId, kbId, WikiLanguageSupport.languageFromContextOrDefault(),
-                com.ragagent.tracing.langfuse.LangfuseTracing.inject());
+                LangfuseTracing.inject());
         WikiIngestTaskQueue queue = service.taskQueue.getIfAvailable();
         if (queue == null) {
             throw new IllegalStateException("enqueue wiki ingest trigger: task queue is not wired");
@@ -181,7 +182,7 @@ final class WikiIngestEnqueueOps {
 
         WikiIngestPayload trigger = WikiIngestPayload.withTracing(
                 payload.tenantId(), payload.knowledgeBaseId(), payload.language(),
-                com.ragagent.tracing.langfuse.LangfuseTracing.inject());
+                LangfuseTracing.inject());
         WikiIngestTaskQueue queue = service.taskQueue.getIfAvailable();
         if (queue == null) {
             throw new IllegalStateException("wiki retract: task queue is not wired");

@@ -18,6 +18,7 @@ import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.common.web.ToolJson;
 import com.ragagent.llm.ollama.OllamaService;
+import com.ragagent.llm.ollama.OllamaModelInfo;
 
 /**
  * ollama 管理端点用例：status/models/check/download/progress 与拉取任务机制。
@@ -69,7 +70,7 @@ public final class OllamaManageService {
     /** GET /initialization/ollama/models——ListModelsDetailed（name/size/digest/modified_at）。 */
     public ResponseEntity<Object> ollamaModels() {
         ensureOllamaStarted();
-        List<com.ragagent.llm.ollama.OllamaModelInfo> models;
+        List<OllamaModelInfo> models;
         try {
             models = ollamaService.listModelsDetailed();
         } catch (RuntimeException e) {

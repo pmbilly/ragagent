@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import com.ragagent.datasource.connector.rss.HtmlToMarkdown;
+import com.ragagent.datasource.connector.rss.JdkHtmlToMarkdown;
 
 /**
  * agent 用 HTML → Markdown 抽取。
@@ -29,8 +31,8 @@ public final class AgentMarkdown {
     private AgentMarkdown() {
     }
 
-    private static final com.ragagent.datasource.connector.rss.HtmlToMarkdown CONVERTER =
-            new com.ragagent.datasource.connector.rss.JdkHtmlToMarkdown();
+    private static final HtmlToMarkdown CONVERTER =
+            new JdkHtmlToMarkdown();
 
     /** 块级清理（extractedArticle=false 的 fallback 清理 + 恒清理集的并集）。 */
     private static final Pattern[] REMOVE_ALWAYS = {

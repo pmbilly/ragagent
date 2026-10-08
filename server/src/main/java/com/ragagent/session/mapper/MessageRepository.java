@@ -24,6 +24,9 @@ import com.ragagent.session.domain.Session;
 import com.ragagent.session.domain.MessageWithSession;
 import org.springframework.stereotype.Component;
 import com.ragagent.common.session.SessionMessagePort;
+import com.ragagent.common.session.SessionMessagePort;
+import com.ragagent.memory.domain.MemoryMessageCursor;
+import com.ragagent.session.domain.Message;
 
 /**
  * 消息仓储。
@@ -531,23 +534,23 @@ public class MessageRepository implements SessionMessagePort {
     // ── SessionMessagePort 实现（memory 蒸馏用；复用上面既有查询后映射为视图）──
 
     @Override
-    public List<com.ragagent.common.session.SessionMessagePort.SessionMessageView> listAfterCursor(
+    public List<SessionMessagePort.SessionMessageView> listAfterCursor(
             String sessionId, java.time.OffsetDateTime afterCreatedAt, String afterId, int limit) {
         return listMessagesBySessionAfterCursor(
-                        sessionId, new com.ragagent.memory.domain.MemoryMessageCursor(afterCreatedAt, afterId), limit)
+                        sessionId, new MemoryMessageCursor(afterCreatedAt, afterId), limit)
                 .stream().map(MessageRepository::toSessionMessageView).toList();
     }
 
     @Override
-    public List<com.ragagent.common.session.SessionMessagePort.SessionMessageView> listBeforeTime(
+    public List<SessionMessagePort.SessionMessageView> listBeforeTime(
             String sessionId, java.time.OffsetDateTime beforeTime, int limit) {
         return getMessagesBySessionBeforeTime(sessionId, beforeTime, limit)
                 .stream().map(MessageRepository::toSessionMessageView).toList();
     }
 
-    private static com.ragagent.common.session.SessionMessagePort.SessionMessageView toSessionMessageView(
-            com.ragagent.session.domain.Message message) {
-        return new com.ragagent.common.session.SessionMessagePort.SessionMessageView(
+    private static SessionMessagePort.SessionMessageView toSessionMessageView(
+            Message message) {
+        return new SessionMessagePort.SessionMessageView(
                 message.getId(), message.getRole(), message.getContent(), message.getCreatedAt());
     }
 }

@@ -19,6 +19,8 @@ import com.ragagent.mcp.protocol.McpServiceUrls;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import com.ragagent.common.context.TenantContext;
+import com.ragagent.mcp.domain.McpPrincipal;
 
 /**
  * OAuth handler 的协议行为测试。
@@ -313,8 +315,8 @@ class OAuthHandlerTest {
     @Test
     void authorizationHeaderUsesStoredToken() {
         FakeOAuthRepository repo = new FakeOAuthRepository();
-        var principal = new com.ragagent.common.context.TenantContext.Principal(
-                com.ragagent.mcp.domain.McpPrincipal.WEB_USER, "u1");
+        var principal = new TenantContext.Principal(
+                McpPrincipal.WEB_USER, "u1");
         DbTokenStore store = new DbTokenStore(repo, 1, principal, "svc");
         store.saveToken(McpContext.none(), new OAuthToken("tok", "", "bearer", null));
 
@@ -333,8 +335,8 @@ class OAuthHandlerTest {
                 .authServerMetadataUrl(server.url("/metadata"))
                 .tokenStore((OAuthTokenStore) overrides.getOrDefault("tokenStore",
                         new DbTokenStore(new FakeOAuthRepository(), 1,
-                                new com.ragagent.common.context.TenantContext.Principal(
-                                        com.ragagent.mcp.domain.McpPrincipal.WEB_USER, "u1"),
+                                new TenantContext.Principal(
+                                        McpPrincipal.WEB_USER, "u1"),
                                 "svc")));
         OAuthHandler handler = new OAuthHandler(cfg);
         handler.setBaseUrl(server.url());

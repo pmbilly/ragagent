@@ -40,6 +40,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.ObjectProvider;
 import com.ragagent.common.session.SessionMessagePort;
+import com.ragagent.memory.domain.MemoryConflictException;
 
 /**
  * 蒸馏编排的对等测试（{@code handle} /
@@ -585,7 +586,7 @@ class MemoryExtractionServiceTest {
             when(memoryService.writeReplacing(any(), any(), any(), anyString()))
                     .thenThrow(new MemoryScopeExceptions.PreviouslyForgotten())
                     .thenThrow(new MemoryScopeExceptions.SensitiveContent())
-                    .thenThrow(new com.ragagent.memory.domain.MemoryConflictException())
+                    .thenThrow(new MemoryConflictException())
                     .thenReturn(new MemoryItem());
 
             service.applyDecisions(SCOPE, autoCfg(), segmentWith(1), List.of(),

@@ -26,6 +26,8 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import com.ragagent.initialization.service.OllamaDownloadTaskStore;
+import com.ragagent.support.ContractJson;
 
 /**
  * W5b 契约测试：initialization 系统级 14 条（ollama 管理 6 + 模型测试 5 +
@@ -90,7 +92,7 @@ class W5bInitializationContractTest {
         guardHolder = ssrfGuard;
         TestSchema.createTables(jdbc);
         TestSchema.resetData(jdbc);
-        com.ragagent.initialization.service.OllamaDownloadTaskStore.resetAll();
+        OllamaDownloadTaskStore.resetAll();
         jdbc.execute("INSERT INTO tenants (id, name, description, business, status) VALUES "
                 + "(10005, 'ag-batch-tenant', '', '', 'active')");
         jdbc.update("INSERT INTO users (id, username, email, password_hash, tenant_id, is_active) VALUES "
@@ -385,8 +387,8 @@ class W5bInitializationContractTest {
 
     private void compareGolden(String actual, int status, String golden) throws Exception {
         // PR4 语义比较：双侧归一
-        actual = com.ragagent.support.ContractJson.semantic(actual);
-        String expected = com.ragagent.support.ContractJson.semantic(
+        actual = ContractJson.semantic(actual);
+        String expected = ContractJson.semantic(
                 new String(new ClassPathResource("contracts/" + golden)
                         .getInputStream().readAllBytes(), StandardCharsets.UTF_8));
         // golden 是 dev server 原始录制（uuid/时间戳/ollama 错误内文为动态值）→ 两侧同掩码
@@ -419,7 +421,7 @@ class W5bInitializationContractTest {
 
     private static String raw(MvcResult r) throws Exception {
         // PR4 语义比较：与 golden 同侧归一（非 JSON 文本原样）
-        return com.ragagent.support.ContractJson.semantic(RAW_SEMANTIC_MAPPER,
+        return ContractJson.semantic(RAW_SEMANTIC_MAPPER,
                 r.getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8));
     }
 

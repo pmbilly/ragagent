@@ -36,6 +36,8 @@ import com.ragagent.session.service.SessionService;
 import com.ragagent.stream.StreamBatch;
 import com.ragagent.stream.StreamEvent;
 import com.ragagent.stream.StreamManager;
+import com.ragagent.auth.service.TenantService;
+import com.ragagent.tenant.Tenant;
 
 /**
  * {@code continue-stream} 端点的行为契约。
@@ -71,9 +73,9 @@ class SessionStreamControllerTest {
                 sessionService, messageService, streamManager, emitter, absent(), absent(),
                 // 租户服务桩：上下文里有 tenantId 但库里没有该租户 → 解析器按"无租户"降级
                 // （与 A3-3 接线前传 null 的可见行为一致）
-                new com.ragagent.auth.service.TenantService(null, null, null) {
+                new TenantService(null, null, null) {
                     @Override
-                    public com.ragagent.tenant.Tenant getTenantById(long id) {
+                    public Tenant getTenantById(long id) {
                         return null;
                     }
                 });

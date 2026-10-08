@@ -21,6 +21,10 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.auth.domain.TenantMember;
+import com.ragagent.auth.mapper.TenantMemberMapper;
+import com.ragagent.common.error.AppError;
+import com.ragagent.common.error.BizException;
 
 /**
  * 租户 service。
@@ -36,11 +40,11 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final TenantMapper tenantMapper;
-    private final com.ragagent.auth.mapper.TenantMemberMapper memberMapper;
+    private final TenantMemberMapper memberMapper;
     private final StorageBackendProvisioner storageProvisioner;
 
     public TenantService(TenantMapper tenantMapper,
-                         com.ragagent.auth.mapper.TenantMemberMapper memberMapper,
+                         TenantMemberMapper memberMapper,
                          StorageBackendProvisioner storageProvisioner) {
         this.tenantMapper = tenantMapper;
         this.memberMapper = memberMapper;
@@ -215,8 +219,8 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
             if (!e.getValue().equals(oldB)) {
                 java.util.Set<String> used = usedByOthers.get(e.getKey());
                 if (used != null && used.contains(e.getValue())) {
-                    throw new com.ragagent.common.error.BizException(
-                            com.ragagent.common.error.AppError.badRequest(
+                    throw new BizException(
+                            AppError.badRequest(
                                     "存储桶名称「" + e.getValue() + "」已被其他空间使用，为保证数据隔离，请使用其他名称"));
                 }
             }
@@ -326,10 +330,10 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
      */
     public void deleteTenant(long id) {
         java.time.OffsetDateTime now = java.time.OffsetDateTime.now(java.time.ZoneOffset.UTC);
-        memberMapper.update(null, new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<com.ragagent.auth.domain.TenantMember>()
-                .eq(com.ragagent.auth.domain.TenantMember::getTenantId, id)
-                .isNull(com.ragagent.auth.domain.TenantMember::getDeletedAt)
-                .set(com.ragagent.auth.domain.TenantMember::getDeletedAt, now));
+        memberMapper.update(null, new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<TenantMember>()
+                .eq(TenantMember::getTenantId, id)
+                .isNull(TenantMember::getDeletedAt)
+                .set(TenantMember::getDeletedAt, now));
         tenantMapper.update(null, new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<Tenant>()
                 .eq(Tenant::getId, id)
                 .isNull(Tenant::getDeletedAt)

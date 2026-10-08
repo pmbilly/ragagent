@@ -1,6 +1,7 @@
 package com.ragagent.im.runtime;
 
 import java.util.Map;
+import com.ragagent.im.domain.ImChannelEntity;
 
 /**
  * 渠道凭据/模式小助手。
@@ -60,7 +61,7 @@ public final class ImCredentials {
     }
 
     /** channel.Mode 为空回落 def。 */
-    public static String resolveMode(com.ragagent.im.domain.ImChannelEntity channel, String def) {
+    public static String resolveMode(ImChannelEntity channel, String def) {
         if (channel.getMode() == null || channel.getMode().isEmpty()) {
             return def;
         }

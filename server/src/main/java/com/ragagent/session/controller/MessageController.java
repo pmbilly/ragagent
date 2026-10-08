@@ -32,6 +32,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.ragagent.auth.service.TenantService;
+import com.ragagent.common.context.TenantContext;
+import com.ragagent.session.domain.ChatHistoryKbStats;
+import com.ragagent.tenant.Tenant;
 
 /**
  * 消息 HTTP 层。
@@ -64,12 +68,12 @@ public class MessageController {
     private final MessageService messageService;
     private final FileService fileService;
     private final StorageBackendResolver storageBackendResolver;
-    private final com.ragagent.auth.service.TenantService tenantService;
+    private final TenantService tenantService;
 
     public MessageController(MessageService messageService,
                              ObjectProvider<FileService> fileService,
                              ObjectProvider<StorageBackendResolver> storageBackendResolver,
-                             com.ragagent.auth.service.TenantService tenantService) {
+                             TenantService tenantService) {
         this.messageService = messageService;
         // 两个端口按 ObjectProvider 取（A3-3 起 StorageBackendResolver 有生产实现；
         // FileService 的进程级实现仍属装配项），缺 bean 时按未装配分支降级。
@@ -206,8 +210,8 @@ public class MessageController {
     // ══════════════════════════ 聊天历史统计 ══════════════════════════
 
     @GetMapping("/api/v1/messages/chat-history-stats")
-    public ResponseEntity<com.ragagent.session.domain.ChatHistoryKbStats> getChatHistoryKbStats() {
-        com.ragagent.session.domain.ChatHistoryKbStats stats;
+    public ResponseEntity<ChatHistoryKbStats> getChatHistoryKbStats() {
+        ChatHistoryKbStats stats;
         try {
             stats = messageService.getChatHistoryKbStats();
         } catch (RuntimeException e) {
@@ -240,8 +244,8 @@ public class MessageController {
      * 读者租户实体（A3-3 接线；此前恒 null）——Rewriter 用它解析"引用不带 provider
      * scheme 时的租户默认 provider"。
      */
-    private com.ragagent.tenant.Tenant currentTenant() {
-        Long tid = com.ragagent.common.context.TenantContext.currentTenantId();
+    private Tenant currentTenant() {
+        Long tid = TenantContext.currentTenantId();
         try {
             return tid == null || tid <= 0 ? null : tenantService.getTenantById(tid);
         } catch (RuntimeException e) {

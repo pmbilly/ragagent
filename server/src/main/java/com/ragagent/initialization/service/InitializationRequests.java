@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
+import com.ragagent.knowledge.domain.KnowledgeBaseChunkingConfig;
 
 /** initialization 端点的原始请求体绑定器（record + 手写绑定,契约换锚时一并 DTO 化）。 */
 public final class InitializationRequests {
@@ -17,7 +18,7 @@ public final class InitializationRequests {
     }
     record KBModelConfigRequest(String llmModelId, String embeddingModelId,
             JsonNode vlmConfig, JsonNode asrConfig, int chunkSize, int chunkOverlap,
-            List<String> separators, List<com.ragagent.knowledge.domain.KnowledgeBaseChunkingConfig.ParserEngineRule>
+            List<String> separators, List<KnowledgeBaseChunkingConfig.ParserEngineRule>
             parserEngineRules, boolean enableParentChild, Integer parentChunkSize,
             Integer childChunkSize, String strategy, Integer tokenLimit, List<String> languages,
             String tableMetadataInstructions, boolean multimodalEnabled, String storageProvider,
@@ -51,11 +52,11 @@ public final class InitializationRequests {
         if (ds != null && ds.get("separators") != null && ds.get("separators").isArray()) {
             ds.get("separators").forEach(s -> seps.add(s.asText()));
         }
-        List<com.ragagent.knowledge.domain.KnowledgeBaseChunkingConfig.ParserEngineRule> rules = new ArrayList<>();
+        List<KnowledgeBaseChunkingConfig.ParserEngineRule> rules = new ArrayList<>();
         if (ds != null && ds.get("parserEngineRules") != null && ds.get("parserEngineRules").isArray()) {
             for (JsonNode r : ds.get("parserEngineRules")) {
-                com.ragagent.knowledge.domain.KnowledgeBaseChunkingConfig.ParserEngineRule rule =
-                        new com.ragagent.knowledge.domain.KnowledgeBaseChunkingConfig.ParserEngineRule();
+                KnowledgeBaseChunkingConfig.ParserEngineRule rule =
+                        new KnowledgeBaseChunkingConfig.ParserEngineRule();
                 rule.setFileTypes(toStringList(r.get("fileTypes")));
                 rule.setEngine(r.path("engine").asText(""));
                 rule.setXlsxFirstRowAsHeader(r.path("xlsxFirstRowAsHeader").asBoolean(false));

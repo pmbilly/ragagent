@@ -31,6 +31,9 @@ import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.domain.FetchedItem;
 import com.ragagent.datasource.domain.Resource;
 import com.ragagent.datasource.domain.SyncCursor;
+import com.ragagent.datasource.ConnectorHttp;
+import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes;
+import com.ragagent.datasource.connector.feishu.core.FeishuClient;
 
 /**
  * 云盘连接器的对等测试（含 {@code listDriveFilesForResource} 的 {@code 1061002}
@@ -366,7 +369,7 @@ class DriveConnectorTest {
                 fileJson("fdoc2", "Doc2", "sheet", "folder1", "200")));
         // fdoc1 本身不是文件夹 → 列举返回 1061002
 
-        com.ragagent.datasource.connector.feishu.core.FeishuClient client =
+        FeishuClient client =
                 clientForTest();
         List<DriveFile> files = DriveConnector.listDriveFilesForResource(client, "folder1:fdoc1");
         assertThat(files).hasSize(1);
@@ -401,10 +404,10 @@ class DriveConnectorTest {
                 .isFalse();
     }
 
-    private com.ragagent.datasource.connector.feishu.core.FeishuClient clientForTest() {
-        return new com.ragagent.datasource.connector.feishu.core.FeishuClient(
+    private FeishuClient clientForTest() {
+        return new FeishuClient(
                 server.baseUrl(), "a", "s", null,
-                com.ragagent.datasource.ConnectorHttp.newConnectorHttpClient(
+                ConnectorHttp.newConnectorHttpClient(
                         java.time.Duration.ofSeconds(10)));
     }
 
@@ -595,7 +598,7 @@ class DriveConnectorTest {
         DriveConnector c = connector();
         var client = clientForTest();
         assertThatThrownBy(() -> DriveConnector.listDriveFilesForResource(client, "folder1"))
-                .isInstanceOf(com.ragagent.datasource.connector.feishu.core.FeishuApiTypes
+                .isInstanceOf(FeishuApiTypes
                         .PartialDriveFileListException.class);
         assertThat(c.type()).isEqualTo("feishu_drive");
     }

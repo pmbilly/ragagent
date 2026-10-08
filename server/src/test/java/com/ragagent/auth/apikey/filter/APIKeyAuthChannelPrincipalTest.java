@@ -25,6 +25,8 @@ import com.ragagent.common.context.TenantContext;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import com.ragagent.auth.apikey.domain.TenantAPIKey;
+import com.ragagent.tenant.Tenant;
 
 /**
  * API 主体解析：tenant/direct_header/signed_token 三模式、
@@ -64,8 +66,8 @@ class APIKeyAuthChannelPrincipalTest {
     }
 
     private void authenticateWith(APIPrincipalConfig config) throws Exception {
-        com.ragagent.auth.apikey.domain.TenantAPIKey key =
-                new com.ragagent.auth.apikey.domain.TenantAPIKey();
+        TenantAPIKey key =
+                new TenantAPIKey();
         key.setId(7L);
         key.setTenantId(TENANT);
         key.setScopeType("tenant");
@@ -81,7 +83,7 @@ class APIKeyAuthChannelPrincipalTest {
         request.addHeader("X-Tenant-ID", String.valueOf(TENANT));
         request.setRequestURI("/api/v1/agents");
         if (config != null) {
-            com.ragagent.tenant.Tenant bound = tenantService.getTenantById(TENANT);
+            Tenant bound = tenantService.getTenantById(TENANT);
             bound.setApiPrincipalConfig(config);
         }
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -204,8 +206,8 @@ class APIKeyAuthChannelPrincipalTest {
 
     private MockHttpServletResponse authenticateExpecting(APIPrincipalConfig config,
             String externalUserId, String token) throws Exception {
-        com.ragagent.auth.apikey.domain.TenantAPIKey key =
-                new com.ragagent.auth.apikey.domain.TenantAPIKey();
+        TenantAPIKey key =
+                new TenantAPIKey();
         key.setId(7L);
         key.setTenantId(TENANT);
         key.setScopeType("tenant");

@@ -13,6 +13,7 @@ import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatTool;
 import com.ragagent.llm.domain.MessageContentPart;
 import com.ragagent.llm.domain.ToolCall;
+import com.ragagent.llm.domain.FunctionCall;
 
 /**
  * token 估算的录制常量断言（期望值由录制程序对旧分词器跑出真值后逐字节抄入）。
@@ -100,7 +101,7 @@ class TokenEstimatorTest {
         ChatMessage toolCall = msg("assistant", "thinking...");
         ToolCall tc = new ToolCall();
         tc.setId("c1");
-        tc.setFunction(new com.ragagent.llm.domain.FunctionCall("knowledge_search", "{\"query\": \"test\"}"));
+        tc.setFunction(new FunctionCall("knowledge_search", "{\"query\": \"test\"}"));
         toolCall.setToolCalls(List.of(tc));
         // id/type 取零值时与空消息同构
         assertThat(e.estimateMessage(toolCall)).isEqualTo(18);

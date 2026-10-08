@@ -21,6 +21,7 @@ import com.ragagent.llm.domain.ChatResponse;
 import com.ragagent.common.llm.ResponseType;
 import com.ragagent.llm.domain.StreamResponse;
 import com.ragagent.llm.domain.ToolCall;
+import com.ragagent.llm.domain.FunctionCall;
 
 /**
  * 引擎录制回放的替身与掩码工具（脚本化 chat / 计数工具 / steer sink 与掩码）。
@@ -326,7 +327,7 @@ final class Engine46bStubSupport {
         ToolCall call = new ToolCall();
         call.setId(id);
         call.setType("function");
-        call.setFunction(new com.ragagent.llm.domain.FunctionCall(name, argsJSON));
+        call.setFunction(new FunctionCall(name, argsJSON));
         r.setToolCalls(new ArrayList<>(List.of(call)));
         return r;
     }

@@ -7,6 +7,7 @@ import com.ragagent.knowledge.repository.KnowledgeTagRepository;
 import com.ragagent.knowledge.service.KnowledgeBaseService;
 import com.ragagent.knowledge.service.KnowledgeTagService;
 import org.springframework.stereotype.Component;
+import com.ragagent.common.error.AppError;
 
 /**
  * 自动标签的生产实现：同名标签存在 → 直接用；否则走 {@link KnowledgeTagService#createTag}
@@ -34,7 +35,7 @@ public class KnowledgeTagAutoTagProvider implements AutoTagProvider {
         String trimmed = name == null ? "" : name.strip();
         if (kbId == null || kbId.isEmpty() || trimmed.isEmpty()) {
             // 入参校验：kbId 与标签名都必填
-            throw new BizException(com.ragagent.common.error.AppError.badRequest(
+            throw new BizException(AppError.badRequest(
                     "知识库ID和标签名称不能为空"));
         }
         // 先按 id 读 KB（无租户过滤）

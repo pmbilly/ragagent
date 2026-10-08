@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import com.ragagent.wiki.service.page.WikiCrossLinker.LinkRef;
+import com.ragagent.wiki.domain.WikiConstants;
+import com.ragagent.wiki.domain.WikiPage;
 
 /**
  * {@link WikiLinkify} 的表驱动测试。
@@ -280,16 +282,16 @@ class WikiLinkifyTest {
         @Test
         @DisplayName("collectRefs 摊平 title + aliases 并跳过 index 页")
         void collectRefsFlattensTitlesAndAliases() {
-            com.ragagent.wiki.domain.WikiPage p = new com.ragagent.wiki.domain.WikiPage();
+            WikiPage p = new WikiPage();
             p.setSlug("entity/beijing");
             p.setTitle("北京");
-            p.setPageType(com.ragagent.wiki.domain.WikiConstants.PAGE_TYPE_ENTITY);
+            p.setPageType(WikiConstants.PAGE_TYPE_ENTITY);
             p.setAliases(List.of("京师", ""));
 
-            com.ragagent.wiki.domain.WikiPage idx = new com.ragagent.wiki.domain.WikiPage();
+            WikiPage idx = new WikiPage();
             idx.setSlug("index");
             idx.setTitle("Index");
-            idx.setPageType(com.ragagent.wiki.domain.WikiConstants.PAGE_TYPE_INDEX);
+            idx.setPageType(WikiConstants.PAGE_TYPE_INDEX);
 
             List<LinkRef> refs = WikiCrossLinker.collectRefs(List.of(p, idx));
             assertThat(refs).containsExactly(

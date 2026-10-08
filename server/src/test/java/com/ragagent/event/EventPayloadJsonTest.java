@@ -35,6 +35,7 @@ import com.ragagent.event.payload.StopData;
 import com.ragagent.event.payload.ToolApprovalRequiredData;
 import com.ragagent.event.payload.ToolApprovalResolvedData;
 import com.ragagent.event.payload.UserMessageInjectedData;
+import com.ragagent.support.ContractJson;
 
 /**
  * 事件 payload 的 JSON 字节形状——<b>期望值全部是固定录制真值</b>，
@@ -63,8 +64,8 @@ class EventPayloadJsonTest {
      * 期望值里的旧录制形态（{@code 2} / {@code 1e+21}）经语义归一后比较，形态差异不构成断言目标。
      */
     private static void assertSemantic(String expected, String actual) {
-        assertEquals(com.ragagent.support.ContractJson.deep(expected),
-                com.ragagent.support.ContractJson.deep(actual));
+        assertEquals(ContractJson.deep(expected),
+                ContractJson.deep(actual));
     }
 
     private static Map<String, Object> mapOf(Object... kv) {

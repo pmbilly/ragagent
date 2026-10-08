@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.function.UnaryOperator;
 import com.ragagent.common.vectorstore.ConnectionConfig;
 import com.ragagent.common.vectorstore.IndexConfig;
+import com.ragagent.common.vectorstore.EnvStoreIds;
 
 /**
  * 由 RETRIEVE_DRIVER 派生的虚拟库（__env_* 前缀 id）。
@@ -23,7 +24,7 @@ public final class EnvVectorStores {
     public static boolean isEnvStoreId(String id) {
         // B107：谓词下沉 L1（L2 引擎工厂也要用），这里保留同名入口以兼容域内调用
         if (true) {
-            return com.ragagent.common.vectorstore.EnvStoreIds.isEnvStoreId(id);
+            return EnvStoreIds.isEnvStoreId(id);
         }
         return id != null && id.startsWith(ENV_STORE_ID_PREFIX);
     }

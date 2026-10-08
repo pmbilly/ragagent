@@ -22,6 +22,7 @@ import com.ragagent.model.service.ModelRuntimeFactory;
 import com.ragagent.session.domain.MessageAttachment;
 import com.ragagent.session.domain.TemporaryDocument;
 import com.ragagent.session.mapper.TemporaryDocumentRepository;
+import com.ragagent.knowledge.storage.LocalStorageService;
 
 /**
  * 会话附件服务。
@@ -235,8 +236,8 @@ public class TemporaryDocumentService {
         if (!supportsExtension(ext)) {
             throw new IllegalArgumentException("unsupported file type: " + ext);
         }
-        long maxSize = com.ragagent.knowledge.storage.LocalStorageService.maxFileSizeBytes();
-        long maxMb = com.ragagent.knowledge.storage.LocalStorageService.maxFileSizeMb();
+        long maxSize = LocalStorageService.maxFileSizeBytes();
+        long maxMb = LocalStorageService.maxFileSizeMb();
         if (fileSize <= 0 || fileSize > maxSize) {
             throw new IllegalArgumentException(
                     "file size must be between 1 byte and " + maxMb + "MB");

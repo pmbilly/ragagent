@@ -8,6 +8,9 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import com.ragagent.common.web.PgJsonTypeHandler;
+import com.ragagent.session.domain.SessionListItem;
+import com.ragagent.session.domain.SessionListQuery;
 
 /**
  * sessions 的 MyBatis-Plus 基础仓储。
@@ -146,7 +149,7 @@ public interface SessionMapper extends BaseMapper<Session> {
      * 扇出（当前不会发生；一旦"重映射已有会话"就需要加一行一会话的守卫）。</p>
      */
     @Select("<script>SELECT COUNT(DISTINCT s.id) " + PAGED_FROM_WHERE + "</script>")
-    long countPaged(@Param("q") com.ragagent.session.domain.SessionListQuery q,
+    long countPaged(@Param("q") SessionListQuery q,
                     @Param("postgres") boolean postgres,
                     @Param("keywordLike") String keywordLike,
                     @Param("src") String src,
@@ -187,10 +190,10 @@ public interface SessionMapper extends BaseMapper<Session> {
             @Result(column = "is_pinned", property = "pinned"),
             // jsonb 列要显式挂类型处理器（见方法注释）
             @Result(column = "agent_config", property = "lastRequestState",
-                    typeHandler = com.ragagent.common.web.PgJsonTypeHandler.class)
+                    typeHandler = PgJsonTypeHandler.class)
     })
-    java.util.List<com.ragagent.session.domain.SessionListItem> queryPaged(
-            @Param("q") com.ragagent.session.domain.SessionListQuery q,
+    java.util.List<SessionListItem> queryPaged(
+            @Param("q") SessionListQuery q,
             @Param("postgres") boolean postgres,
             @Param("keywordLike") String keywordLike,
             @Param("src") String src,

@@ -27,6 +27,8 @@ import com.ragagent.model.service.ModelRuntimeFactory;
 import com.ragagent.session.domain.TemporaryDocument;
 import com.ragagent.session.mapper.TemporaryDocumentRepository;
 import com.ragagent.session.service.TemporaryDocumentService.CreateOptions;
+import com.ragagent.common.context.TenantContext;
+import com.ragagent.model.domain.Model;
 
 /**
  * {@code TemporaryDocumentService} 的**解析 / 落盘管线子模块**（§14 步骤 2）：异步投递与重试、
@@ -215,7 +217,7 @@ final class TemporaryDocumentProcessor {
             throw new RuntimeException("audio transcription model is not configured");
         }
         return withResourceTenant(resourceTenantId, () -> {
-            com.ragagent.model.domain.Model model;
+            Model model;
             try {
                 model = modelRuntimeFactory.getAsrModel(asrModelId);
             } catch (RuntimeException e) {
@@ -238,25 +240,25 @@ final class TemporaryDocumentProcessor {
      * 可见性按共享来源空间解析，调用后恢复原值。
      */
     private <T> T withResourceTenant(long resourceTenantId, java.util.function.Supplier<T> body) {
-        Long previous = com.ragagent.common.context.TenantContext.currentTenantId();
+        Long previous = TenantContext.currentTenantId();
         if (previous != null && previous == resourceTenantId) {
             return body.get();
         }
-        com.ragagent.common.context.TenantContext.set(resourceTenantId,
-                com.ragagent.common.context.TenantContext.currentPrincipal(),
-                com.ragagent.common.context.TenantContext.currentRole(),
-                com.ragagent.common.context.TenantContext.isSystemAdmin(),
-                com.ragagent.common.context.TenantContext.currentUserId(),
-                com.ragagent.common.context.TenantContext.canAccessAllTenants());
+        TenantContext.set(resourceTenantId,
+                TenantContext.currentPrincipal(),
+                TenantContext.currentRole(),
+                TenantContext.isSystemAdmin(),
+                TenantContext.currentUserId(),
+                TenantContext.canAccessAllTenants());
         try {
             return body.get();
         } finally {
-            com.ragagent.common.context.TenantContext.set(previous,
-                    com.ragagent.common.context.TenantContext.currentPrincipal(),
-                    com.ragagent.common.context.TenantContext.currentRole(),
-                    com.ragagent.common.context.TenantContext.isSystemAdmin(),
-                    com.ragagent.common.context.TenantContext.currentUserId(),
-                    com.ragagent.common.context.TenantContext.canAccessAllTenants());
+            TenantContext.set(previous,
+                    TenantContext.currentPrincipal(),
+                    TenantContext.currentRole(),
+                    TenantContext.isSystemAdmin(),
+                    TenantContext.currentUserId(),
+                    TenantContext.canAccessAllTenants());
         }
     }
     /** {@link #storeDocumentImages} 的结果：重写引用后的 markdown + image_refs jsonb。 */

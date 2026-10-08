@@ -37,6 +37,13 @@ import com.ragagent.common.graph.NameSpace;
 import com.ragagent.retrieval.graph.RetrieveGraphRepository;
 import com.ragagent.common.pipeline.SearchParams;
 import com.ragagent.session.support.PipelineViews;
+import com.ragagent.common.tenant.WebSearchConfig;
+import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
+import com.ragagent.retrieval.domain.WebSearchResult;
+import com.ragagent.support.ContractJson;
 
 /**
  * 4.6c 录制回放的替身与掩码工具。
@@ -79,9 +86,9 @@ final class Rec46cSupport {
     /** 解析 GoRecording46C 常量并断言相等（带上下文 diff）。 */
     static void assertRec(String group, String key, String actual) {
         String expected = GoRecording46C.constant(group, key);
-        org.assertj.core.api.Assertions.assertThat(com.ragagent.support.ContractJson.deep(actual))
+        org.assertj.core.api.Assertions.assertThat(ContractJson.deep(actual))
                 .as("recording %s/%s", group, key)
-                .isEqualTo(com.ragagent.support.ContractJson.deep(expected));
+                .isEqualTo(ContractJson.deep(expected));
     }
 
     /** 常量查找（GoRecording46C 生成的常量名按组/键）。 */
@@ -542,8 +549,8 @@ final class Rec46cSupport {
     /** 对照 zzKnowledgeService。 */
     static final class StubKnowledgeService implements PipelinePorts.KnowledgeService {
         @Override
-        public com.ragagent.knowledge.domain.Knowledge getKnowledgeById(String id) {
-            com.ragagent.knowledge.domain.Knowledge k = new com.ragagent.knowledge.domain.Knowledge();
+        public Knowledge getKnowledgeById(String id) {
+            Knowledge k = new Knowledge();
             k.setId(id);
             k.setTitle("标题-" + id);
             k.setFileName(id + ".csv");
@@ -552,13 +559,13 @@ final class Rec46cSupport {
         }
 
         @Override
-        public List<com.ragagent.knowledge.domain.Knowledge> getKnowledgeBatch(long tenantId,
+        public List<Knowledge> getKnowledgeBatch(long tenantId,
                                                                                List<String> ids) {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public List<com.ragagent.knowledge.domain.Knowledge> getKnowledgeBatchWithSharedAccess(
+        public List<Knowledge> getKnowledgeBatchWithSharedAccess(
                 long tenantId, List<String> ids) {
             throw new UnsupportedOperationException();
         }
@@ -569,12 +576,12 @@ final class Rec46cSupport {
 
     /** 对照 zzKnowledgeRepo。 */
     static final class StubKnowledgeRepo implements PipelinePorts.KnowledgeRepository {
-        final Map<String, com.ragagent.knowledge.domain.Knowledge> items = new LinkedHashMap<>();
+        final Map<String, Knowledge> items = new LinkedHashMap<>();
 
         @Override
-        public List<com.ragagent.knowledge.domain.Knowledge> getKnowledgeBatch(long tenantId,
+        public List<Knowledge> getKnowledgeBatch(long tenantId,
                                                                                List<String> ids) {
-            List<com.ragagent.knowledge.domain.Knowledge> out = new ArrayList<>();
+            List<Knowledge> out = new ArrayList<>();
             for (String id : ids) {
                 var k = items.get(id);
                 if (k != null) {
@@ -630,12 +637,12 @@ final class Rec46cSupport {
 
     /** 对照 zzWebSearchService。 */
     static final class StubWebSearch implements PipelinePorts.WebSearch {
-        final List<com.ragagent.retrieval.domain.WebSearchResult> results = new ArrayList<>();
+        final List<WebSearchResult> results = new ArrayList<>();
         RuntimeException err;
 
         @Override
-        public List<com.ragagent.retrieval.domain.WebSearchResult> search(String providerId,
-                                                                          com.ragagent.common.tenant.WebSearchConfig config,
+        public List<WebSearchResult> search(String providerId,
+                                                                          WebSearchConfig config,
                                                                           String query) {
             if (err != null) {
                 throw err;
@@ -646,17 +653,17 @@ final class Rec46cSupport {
 
     /** 对照 zzChunkRepo。 */
     static final class StubChunkRepo implements PipelinePorts.ChunkRepository {
-        final Map<String, com.ragagent.knowledge.domain.Chunk> chunks = new LinkedHashMap<>();
+        final Map<String, Chunk> chunks = new LinkedHashMap<>();
         boolean listErr;
         final List<String> calls = new ArrayList<>();
 
         @Override
-        public List<com.ragagent.knowledge.domain.Chunk> listChunksById(long tenantId, List<String> ids) {
+        public List<Chunk> listChunksById(long tenantId, List<String> ids) {
             calls.add(String.join(",", ids));
             if (listErr) {
                 throw new RuntimeException("db unavailable");
             }
-            List<com.ragagent.knowledge.domain.Chunk> out = new ArrayList<>();
+            List<Chunk> out = new ArrayList<>();
             for (String id : ids) {
                 var chunk = chunks.get(id);
                 if (chunk != null) {
@@ -667,9 +674,9 @@ final class Rec46cSupport {
         }
 
         @Override
-        public List<com.ragagent.knowledge.domain.Chunk> listChunksByParentIds(long tenantId,
+        public List<Chunk> listChunksByParentIds(long tenantId,
                                                                                List<String> parentIds) {
-            List<com.ragagent.knowledge.domain.Chunk> out = new ArrayList<>();
+            List<Chunk> out = new ArrayList<>();
             for (var c : chunks.values()) {
                 if (c != null && parentIds.contains(c.getParentChunkId())) {
                     out.add(c);
@@ -681,7 +688,7 @@ final class Rec46cSupport {
 
     /** 对照 zzKBService。 */
     static final class StubKBService implements PipelinePorts.KnowledgeBaseService {
-        final Map<String, com.ragagent.knowledge.domain.KnowledgeBase> kbs = new LinkedHashMap<>();
+        final Map<String, KnowledgeBase> kbs = new LinkedHashMap<>();
         RuntimeException kbErr;
         final Map<String, float[]> embed = new LinkedHashMap<>();
         final Map<String, RuntimeException> embedErr = new LinkedHashMap<>();
@@ -696,7 +703,7 @@ final class Rec46cSupport {
         private final Object lock = new Object();
 
         @Override
-        public com.ragagent.knowledge.domain.KnowledgeBase getKnowledgeBaseByIdOnly(String id) {
+        public KnowledgeBase getKnowledgeBaseByIdOnly(String id) {
             byIDOnlyCalls++;
             if (kbErr != null) {
                 throw kbErr;
@@ -709,11 +716,11 @@ final class Rec46cSupport {
         }
 
         @Override
-        public List<com.ragagent.knowledge.domain.KnowledgeBase> getKnowledgeBasesByIdsOnly(List<String> ids) {
+        public List<KnowledgeBase> getKnowledgeBasesByIdsOnly(List<String> ids) {
             if (kbErr != null) {
                 throw kbErr;
             }
-            List<com.ragagent.knowledge.domain.KnowledgeBase> out = new ArrayList<>();
+            List<KnowledgeBase> out = new ArrayList<>();
             for (String id : ids) {
                 var kb = kbs.get(id);
                 if (kb != null) {
@@ -771,13 +778,13 @@ final class Rec46cSupport {
         }
     }
 
-    static com.ragagent.knowledge.domain.KnowledgeBase kb(String id, String type, boolean vec,
+    static KnowledgeBase kb(String id, String type, boolean vec,
                                                           boolean kw, boolean wiki) {
-        com.ragagent.knowledge.domain.KnowledgeBase k = new com.ragagent.knowledge.domain.KnowledgeBase();
+        KnowledgeBase k = new KnowledgeBase();
         k.setId(id);
         k.setType(type);
         k.setEmbeddingModelId("embedding-" + id);
-        var strategy = new com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy();
+        var strategy = new KnowledgeBaseIndexingStrategy();
         strategy.setVectorEnabled(vec);
         strategy.setKeywordEnabled(kw);
         strategy.setWikiEnabled(wiki);

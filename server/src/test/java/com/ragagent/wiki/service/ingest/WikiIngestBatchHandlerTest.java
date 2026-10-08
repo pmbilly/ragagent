@@ -38,6 +38,9 @@ import com.ragagent.common.wiki.ExtractedItem;
 import com.ragagent.common.wiki.SlugUpdate;
 import com.ragagent.wiki.service.WikiModelResolver;
 import com.ragagent.wiki.service.page.WikiPageService;
+import com.ragagent.wiki.domain.WikiConfig;
+import com.ragagent.wiki.domain.WikiExtractionGranularity;
+import com.ragagent.wiki.domain.WikiPage;
 
 /**
  * {@link WikiIngestBatchHandler} 的行为测试，外加批次主干里几个可独立验证的纯函数
@@ -361,13 +364,13 @@ class WikiIngestBatchHandlerTest {
     @DisplayName("粒度映射：未知值回落 standard")
     void granularityMapping() {
         assertThat(WikiIngestBatchHandler.granularityFrom("focused"))
-                .isEqualTo(com.ragagent.wiki.domain.WikiExtractionGranularity.FOCUSED);
+                .isEqualTo(WikiExtractionGranularity.FOCUSED);
         assertThat(WikiIngestBatchHandler.granularityFrom("exhaustive"))
-                .isEqualTo(com.ragagent.wiki.domain.WikiExtractionGranularity.EXHAUSTIVE);
+                .isEqualTo(WikiExtractionGranularity.EXHAUSTIVE);
         assertThat(WikiIngestBatchHandler.granularityFrom(""))
-                .isEqualTo(com.ragagent.wiki.domain.WikiExtractionGranularity.STANDARD);
+                .isEqualTo(WikiExtractionGranularity.STANDARD);
         assertThat(WikiIngestBatchHandler.granularityFrom("STANDARD"))
-                .isEqualTo(com.ragagent.wiki.domain.WikiExtractionGranularity.STANDARD);
+                .isEqualTo(WikiExtractionGranularity.STANDARD);
     }
 
     /**
@@ -447,7 +450,7 @@ class WikiIngestBatchHandlerTest {
 
             WikiBatchContext ctx = h.newWikiBatchContext("kb-1", null);
             assertThat(ctx.getExtractionGranularity())
-                    .isEqualTo(com.ragagent.wiki.domain.WikiExtractionGranularity.STANDARD);
+                    .isEqualTo(WikiExtractionGranularity.STANDARD);
 
             // 批量入口一次打库覆盖全部 slug（含负缓存）
             Map<String, String> many = ctx.slugTitleMany(
@@ -482,22 +485,22 @@ class WikiIngestBatchHandlerTest {
         @Test
         @DisplayName("WikiConfig 解析粒度与指令")
         void wikiConfigResolved() {
-            com.ragagent.wiki.domain.WikiConfig cfg = new com.ragagent.wiki.domain.WikiConfig();
+            WikiConfig cfg = new WikiConfig();
             cfg.setExtractionGranularity("exhaustive");
             cfg.setContentInstructions("content-instr");
             cfg.setExtractionInstructions("extract-instr");
 
             WikiBatchContext ctx = handler().newWikiBatchContext("kb-1", cfg);
             assertThat(ctx.getExtractionGranularity())
-                    .isEqualTo(com.ragagent.wiki.domain.WikiExtractionGranularity.EXHAUSTIVE);
+                    .isEqualTo(WikiExtractionGranularity.EXHAUSTIVE);
             assertThat(ctx.getContentInstructions()).isEqualTo("content-instr");
             assertThat(ctx.getExtractionInstructions()).isEqualTo("extract-instr");
 
             // 历史行里的非法值 → standard
-            com.ragagent.wiki.domain.WikiConfig bad = new com.ragagent.wiki.domain.WikiConfig();
+            WikiConfig bad = new WikiConfig();
             bad.setExtractionGranularity("bogus");
             assertThat(handler().newWikiBatchContext("kb-1", bad).getExtractionGranularity())
-                    .isEqualTo(com.ragagent.wiki.domain.WikiExtractionGranularity.STANDARD);
+                    .isEqualTo(WikiExtractionGranularity.STANDARD);
         }
     }
 
@@ -610,8 +613,8 @@ class WikiIngestBatchHandlerTest {
             assertThat(got.changed()).isTrue();
             assertThat(got.affectedType()).isEqualTo("ingest");
             assertThat(got.additionFailed()).isFalse();
-            ArgumentCaptor<com.ragagent.wiki.domain.WikiPage> created =
-                    ArgumentCaptor.forClass(com.ragagent.wiki.domain.WikiPage.class);
+            ArgumentCaptor<WikiPage> created =
+                    ArgumentCaptor.forClass(WikiPage.class);
             verify(wikiService).createPage(created.capture());
             assertThat(created.getValue().getTitle()).isEqualTo("Doc - Summary");
             assertThat(created.getValue().getContent()).isEqualTo("body");
@@ -644,10 +647,10 @@ class WikiIngestBatchHandlerTest {
                     7L, batchCtx, Map.of());
 
             assertThat(got.changed()).isTrue();
-            ArgumentCaptor<com.ragagent.wiki.domain.WikiPage> created =
-                    ArgumentCaptor.forClass(com.ragagent.wiki.domain.WikiPage.class);
+            ArgumentCaptor<WikiPage> created =
+                    ArgumentCaptor.forClass(WikiPage.class);
             verify(wikiService).createPage(created.capture());
-            com.ragagent.wiki.domain.WikiPage page = created.getValue();
+            WikiPage page = created.getValue();
             assertThat(page.getTitle()).isEqualTo("Acme");
             assertThat(page.getPageType()).isEqualTo(WikiConstants.PAGE_TYPE_ENTITY);
             assertThat(page.getContent()).isEqualTo("改写后的正文 [ref-1]");

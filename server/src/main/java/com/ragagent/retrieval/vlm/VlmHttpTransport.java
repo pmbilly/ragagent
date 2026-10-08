@@ -11,6 +11,7 @@ import java.time.Duration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.llm.asr.AsrTranscriber;
 import com.ragagent.llm.chat.LlmTransport;
+import com.ragagent.retrieval.config.RetrievalEnvLookup;
 
 /**
  * {@link VlmClient.Transport} 的生产实现。
@@ -60,7 +61,7 @@ public class VlmHttpTransport implements VlmClient.Transport {
 
     /** 超时：env 正整数秒生效，否则 180s。 */
     static Duration timeout() {
-        String raw = com.ragagent.retrieval.config.RetrievalEnvLookup.get("VLM_HTTP_TIMEOUT_SECONDS");
+        String raw = RetrievalEnvLookup.get("VLM_HTTP_TIMEOUT_SECONDS");
         if (raw != null && !raw.isBlank()) {
             try {
                 int secs = Integer.parseInt(raw.trim());

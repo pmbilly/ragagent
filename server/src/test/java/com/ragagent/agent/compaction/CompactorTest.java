@@ -20,6 +20,7 @@ import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
 import com.ragagent.llm.domain.StreamResponse;
+import com.ragagent.llm.domain.CacheRetention;
 
 /**
  * 压缩器端到端的录制常量断言。
@@ -273,6 +274,6 @@ class CompactorTest {
         assertThat(llm.lastOptions.getTemperature()).isEqualTo(0.3);
         assertThat(llm.lastOptions.getMaxTokens()).isEqualTo(1000);
         assertThat(llm.lastOptions.getCacheRetention())
-                .isEqualTo(com.ragagent.llm.domain.CacheRetention.NONE);
+                .isEqualTo(CacheRetention.NONE);
     }
 }

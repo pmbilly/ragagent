@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.web.ToolJson;
+import com.ragagent.support.ContractJson;
 
 /**
  * ToolJson 的录制语料（9 条：把 JSON 解析成树再重编码）。
@@ -33,9 +34,9 @@ class ToolJsonRecordingTest {
         for (String name : CASES) {
             JsonNode r = RecordingSupport.rec(field(name));
             JsonNode tree = RecordingSupport.readTree(r.get("in").asText());
-            assertThat(com.ragagent.support.ContractJson.deep(ToolJson.write(tree)))
+            assertThat(ContractJson.deep(ToolJson.write(tree)))
                     .as("codec %s", r.get("id").asText())
-                    .isEqualTo(com.ragagent.support.ContractJson.deep(r.get("out").asText()));
+                    .isEqualTo(ContractJson.deep(r.get("out").asText()));
         }
     }
 

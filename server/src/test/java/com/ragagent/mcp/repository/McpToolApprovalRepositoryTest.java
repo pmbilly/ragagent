@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import com.ragagent.mcp.domain.McpToolApproval;
 
 /**
  * MCP 工具审批仓储语义。
@@ -101,7 +102,7 @@ class McpToolApprovalRepositoryTest {
         repo.upsertPolicy(1, "svc", "a", new McpToolPolicyPatch(null, false));
         repo.upsertPolicy(2, "svc", "c", new McpToolPolicyPatch(true, null));
 
-        List<com.ragagent.mcp.domain.McpToolApproval> rows = repo.listByService(1, "svc");
+        List<McpToolApproval> rows = repo.listByService(1, "svc");
         org.junit.jupiter.api.Assertions.assertEquals(2, rows.size());
         org.junit.jupiter.api.Assertions.assertEquals("a", rows.get(0).getToolName());
         org.junit.jupiter.api.Assertions.assertEquals("b", rows.get(1).getToolName());

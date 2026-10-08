@@ -22,6 +22,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
+import com.ragagent.common.security.SsrfGuard;
+import com.ragagent.im.domain.ImChannelEntity;
+import com.ragagent.im.runtime.ReplyMessage;
+import com.ragagent.im.service.ImService;
 
 /**
  * 企业微信长连接的
@@ -203,7 +207,7 @@ class WecomLongConnTest {
         IncomingMessage noReqId = new IncomingMessage();
         noReqId.platform = ImTypes.PLATFORM_WECOM;
         assertThrows(IllegalStateException.class,
-                () -> adapter.sendReply(noReqId, new com.ragagent.im.runtime.ReplyMessage("x")));
+                () -> adapter.sendReply(noReqId, new ReplyMessage("x")));
     }
 
     // ── 工厂 ────────────────────────────────────────────────────────────────
@@ -211,26 +215,26 @@ class WecomLongConnTest {
     @Test
     @DisplayName("工厂：websocket（Go 默认）建长连接适配器并给 stop；ws_endpoint 非 wss 照 Go 报错")
     void factoryModes() {
-        com.ragagent.im.domain.ImChannelEntity channel = new com.ragagent.im.domain.ImChannelEntity();
+        ImChannelEntity channel = new ImChannelEntity();
         channel.setId("ch-ws");
         channel.setMode("websocket");
         channel.setCredentials("{\"bot_id\":\"B1\",\"bot_secret\":\"S1\","
                 + "\"ws_endpoint\":\"wss://127.0.0.1:1/\",\"bot_name\":\"WeKnora Bot\"}");
 
-        com.ragagent.im.service.ImService.AdapterRegistration reg =
-                new WecomAdapterFactory((com.ragagent.common.security.SsrfGuard) null)
+        ImService.AdapterRegistration reg =
+                new WecomAdapterFactory((SsrfGuard) null)
                         .create(channel, (m, c) -> { });
         assertNotNull(reg.adapter());
         assertEquals(ImTypes.PLATFORM_WECOM, reg.adapter().platform());
         assertNotNull(reg.stop());
         reg.stop().run(); // 停掉后台重连线程（端点不可达，只会在退避里打转）
 
-        com.ragagent.im.domain.ImChannelEntity bad = new com.ragagent.im.domain.ImChannelEntity();
+        ImChannelEntity bad = new ImChannelEntity();
         bad.setId("ch-bad");
         bad.setMode("websocket");
         bad.setCredentials("{\"bot_id\":\"B\",\"bot_secret\":\"S\",\"ws_endpoint\":\"https://x/\"}");
         assertThrows(IllegalArgumentException.class,
-                () -> new WecomAdapterFactory((com.ragagent.common.security.SsrfGuard) null)
+                () -> new WecomAdapterFactory((SsrfGuard) null)
                         .create(bad, (m, c) -> { }));
     }
 

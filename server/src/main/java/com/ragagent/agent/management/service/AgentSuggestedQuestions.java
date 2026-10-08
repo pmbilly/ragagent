@@ -14,6 +14,7 @@ import com.ragagent.agent.management.dto.CustomAgentResult;
 import com.ragagent.agent.management.mapper.AgentQuestionMapper;
 import com.ragagent.common.security.TenantAPIKeyScope;
 import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.common.wiki.WikiLanguageSupport;
 
 /**
  * 智能体推荐问题流：按知识库/FAQ 桶轮询取问题、混合模式归并、tag 范围解析与
@@ -513,6 +514,6 @@ public final class AgentSuggestedQuestions {
     }
 
     public static String currentLocale() {
-        return com.ragagent.common.wiki.WikiLanguageSupport.defaultLanguage();
+        return WikiLanguageSupport.defaultLanguage();
     }
 }

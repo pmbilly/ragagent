@@ -33,6 +33,7 @@ import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.common.error.GuardForbiddenException;
+import com.ragagent.agent.management.mapper.CustomAgentMapper;
 
 /**
  * agents CRUD 家族路由。
@@ -49,11 +50,11 @@ public class AgentController {
     private final CustomAgentService service;
     private final AgentPlaceholders placeholders;
     private final AgentTypePresets typePresets;
-    private final com.ragagent.agent.management.mapper.CustomAgentMapper agentMapper;
+    private final CustomAgentMapper agentMapper;
 
     public AgentController(CustomAgentService service, AgentPlaceholders placeholders,
             AgentTypePresets typePresets,
-            com.ragagent.agent.management.mapper.CustomAgentMapper agentMapper) {
+            CustomAgentMapper agentMapper) {
         this.service = service;
         this.placeholders = placeholders;
         this.typePresets = typePresets;

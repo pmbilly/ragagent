@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.filter.OncePerRequestFilter;
+import com.ragagent.auth.apikey.filter.APIKeyAuthChannel;
 
 /**
  * 全局认证过滤器：三通道认证链。
@@ -57,11 +58,11 @@ public class AuthFilter extends OncePerRequestFilter {
 
     private final UserService userService;
     private final WsAuthSupport wsAuthSupport;
-    private final com.ragagent.auth.apikey.filter.APIKeyAuthChannel apiKeyAuthChannel;
+    private final APIKeyAuthChannel apiKeyAuthChannel;
 
     public AuthFilter(UserService userService,
                       WsAuthSupport wsAuthSupport,
-                      com.ragagent.auth.apikey.filter.APIKeyAuthChannel apiKeyAuthChannel) {
+                      APIKeyAuthChannel apiKeyAuthChannel) {
         this.userService = userService;
         this.wsAuthSupport = wsAuthSupport;
         this.apiKeyAuthChannel = apiKeyAuthChannel;

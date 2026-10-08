@@ -17,6 +17,7 @@ import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.common.web.JsonMappers;
 import com.ragagent.common.web.ToolJson;
+import com.ragagent.llm.domain.ChatResponse;
 
 /**
  * 实体抽取的提示词生成与 LLM 输出解析。
@@ -57,7 +58,7 @@ public final class EntityExtraction {
         public EntityGraph extract(String content) {
             QAPromptGenerator generator = new QAPromptGenerator(this.formater, this.template);
             List<ChatMessage> messages = generator.render(content);
-            com.ragagent.llm.domain.ChatResponse chatResponse = chat.chat(messages, chatOpt);
+            ChatResponse chatResponse = chat.chat(messages, chatOpt);
             return formater.parseGraph(chatResponse.getContent());
         }
     }

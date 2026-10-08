@@ -11,6 +11,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.mapper.ImChannelMapper;
+import com.ragagent.agent.management.domain.CustomAgentEntity;
+import com.ragagent.agent.management.mapper.CustomAgentMapper;
+import com.ragagent.agent.management.service.BuiltinAgentRegistry;
 
 /**
  * IM 渠道 service（CRUD + 渠道行钩子：兜底、session_mode 校验、bot_identity 计算）。
@@ -34,13 +37,13 @@ public class ImChannelService {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final ImChannelMapper mapper;
-    private final com.ragagent.agent.management.mapper.CustomAgentMapper agentMapper;
-    private final com.ragagent.agent.management.service.BuiltinAgentRegistry registry;
+    private final CustomAgentMapper agentMapper;
+    private final BuiltinAgentRegistry registry;
     private final ObjectProvider<ImService> imService;
 
     public ImChannelService(ImChannelMapper mapper,
-                            com.ragagent.agent.management.mapper.CustomAgentMapper agentMapper,
-                            com.ragagent.agent.management.service.BuiltinAgentRegistry registry,
+                            CustomAgentMapper agentMapper,
+                            BuiltinAgentRegistry registry,
                             ObjectProvider<ImService> imService) {
         this.mapper = mapper;
         this.agentMapper = agentMapper;
@@ -238,7 +241,7 @@ public class ImChannelService {
             throw new IllegalArgumentException("agent_id is required");
         }
         // agent 不存在或 tenant 不匹配 → "agent not found"
-        com.ragagent.agent.management.domain.CustomAgentEntity agent;
+        CustomAgentEntity agent;
         try {
             agent = agentMapper.getByIDAndTenant(trimmed, channel.getTenantId() == null
                     ? 0 : channel.getTenantId());

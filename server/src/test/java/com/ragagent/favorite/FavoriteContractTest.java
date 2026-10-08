@@ -29,6 +29,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import com.ragagent.support.ContractJson;
 
 /**
  * 用户收藏 3 端点契约测试（对照 golden 逐字节比对）。
@@ -232,7 +233,7 @@ class FavoriteContractTest {
 
     private static String raw(MvcResult r) throws Exception {
         // PR4 语义比较：与 golden 同侧归一（非 JSON 文本原样）
-        return com.ragagent.support.ContractJson.semantic(RAW_SEMANTIC_MAPPER,
+        return ContractJson.semantic(RAW_SEMANTIC_MAPPER,
                 r.getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8));
     }
 
@@ -246,6 +247,6 @@ class FavoriteContractTest {
             resource = new org.springframework.core.io.ClassPathResource("contracts/" + name + ".json");
         }
         String text = new String(resource.getInputStream().readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
-        return com.ragagent.support.ContractJson.semantic(GOLDEN_SEMANTIC_MAPPER, text);
+        return ContractJson.semantic(GOLDEN_SEMANTIC_MAPPER, text);
     }
 }

@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import com.ragagent.evaluation.dto.EvaluationDtos;
 
 /**
  * 评估服务（评估任务 + 结果；内存任务存储）。
@@ -194,7 +195,7 @@ public class EvaluationService {
         task.id = KnowledgeTaskIdCodec.generateTaskId("evaluation", tenantId, dsId);
         task.tenantId = tenantId;
         task.datasetId = dsId;
-        task.status = com.ragagent.evaluation.dto.EvaluationDtos.STATUS_PENDING;
+        task.status = EvaluationDtos.STATUS_PENDING;
         task.startTime = OffsetDateTime.now(ZoneOffset.UTC);
         detail.task = task;
         detail.params = buildParams(chatModelId, rerankModelId);
@@ -211,18 +212,18 @@ public class EvaluationService {
                 if (stored == null) {
                     return;
                 }
-                stored.task.status = com.ragagent.evaluation.dto.EvaluationDtos.STATUS_RUNNING;
+                stored.task.status = EvaluationDtos.STATUS_RUNNING;
                 log.info("Background evaluation started for task ID: {}", task.id);
                 try {
                     evalDataset(stored, evalKbId);
                 } catch (RuntimeException e) {
-                    stored.task.status = com.ragagent.evaluation.dto.EvaluationDtos.STATUS_FAILED;
+                    stored.task.status = EvaluationDtos.STATUS_FAILED;
                     stored.task.errMsg = errorText(e);
                     log.error("Evaluation task failed: {}, task ID: {}", stored.task.errMsg, task.id);
                     return;
                 }
                 log.info("Evaluation task completed successfully, task ID: {}", task.id);
-                stored.task.status = com.ragagent.evaluation.dto.EvaluationDtos.STATUS_SUCCESS;
+                stored.task.status = EvaluationDtos.STATUS_SUCCESS;
             } finally {
                 TenantContext.clear();
             }

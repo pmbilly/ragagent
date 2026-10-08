@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import com.ragagent.session.domain.Message;
 import com.ragagent.session.domain.SuggestionItem;
+import com.ragagent.common.retrieval.SearchResult;
 
 /**
  * 追问建议生成的纯函数面（parseGeneratedSuggestions / merge / rank /
@@ -158,22 +159,22 @@ class MessageSuggestionGenerateTest {
     @Test
     void evidenceSortedDedupedAndCapped() {
         Message current = new Message();
-        com.ragagent.common.retrieval.SearchResult low =
-                new com.ragagent.common.retrieval.SearchResult();
+        SearchResult low =
+                new SearchResult();
         low.setId("r1");
         low.setScore(0.2);
         low.setKnowledgeId("k-1");
         low.setKnowledgeTitle("文档一");
         low.setContent("低分证据内容");
-        com.ragagent.common.retrieval.SearchResult high =
-                new com.ragagent.common.retrieval.SearchResult();
+        SearchResult high =
+                new SearchResult();
         high.setId("r2");
         high.setScore(0.9);
         high.setKnowledgeId("k-2");
         high.setKnowledgeTitle("文档二");
         high.setContent("高分证据内容");
-        com.ragagent.common.retrieval.SearchResult dup =
-                new com.ragagent.common.retrieval.SearchResult();
+        SearchResult dup =
+                new SearchResult();
         dup.setId("r1"); // 与 low 同 id（0.8 分）→ 先于 low(0.2) 处理，low 被去重
         dup.setScore(0.8);
         dup.setKnowledgeId("k-1");

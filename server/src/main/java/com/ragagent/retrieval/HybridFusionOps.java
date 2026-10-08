@@ -22,6 +22,7 @@ import com.ragagent.retrieval.HybridSearchService.RetrievalConfigView;
 import com.ragagent.retrieval.HybridSearchService.StoreGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.ragagent.common.context.TenantContext;
 
 /**
  * HybridSearch 的融合与 FAQ 后处理簇：RRF 融合/按分去重、FAQ 迭代取回（只涨 TopK，
@@ -157,7 +158,7 @@ final class HybridFusionOps {
         Map<String, ChunkFacts> chunkDataCache = new HashMap<>();
         Set<String> filteredOutChunks = new HashSet<>();
         String queryTextLower = queryText == null ? "" : queryText.strip().toLowerCase();
-        Long tenantId = com.ragagent.common.context.TenantContext.currentTenantId();
+        Long tenantId = TenantContext.currentTenantId();
 
         for (int i = 0; i < maxIterations; i++) {
             for (StoreGroup grp : groups) {
@@ -263,7 +264,7 @@ final class HybridFusionOps {
             return chunks;
         }
         String queryTextLower = queryText == null ? "" : queryText.strip().toLowerCase();
-        Long tenantId = com.ragagent.common.context.TenantContext.currentTenantId();
+        Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null) {
             return chunks;
         }

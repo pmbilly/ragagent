@@ -23,6 +23,8 @@ import org.springframework.boot.info.BuildProperties;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.stereotype.Service;
+import com.ragagent.retrieval.graph.Neo4jGraphRepository;
+import com.ragagent.retrieval.graph.RetrieveGraphRepository;
 
 /**
  * /system 组读端点的计算逻辑。
@@ -51,7 +53,7 @@ public class SystemInfoService {
     /** 构建期生成的 META-INF/build-info.properties；缺失（如纯 IDE 运行）时回退 "unknown"。 */
     private final ObjectProvider<BuildProperties> buildProperties;
     /** 图库仓储：引擎名按**真实驱动**报告。 */
-    private final com.ragagent.retrieval.graph.RetrieveGraphRepository graphRepository;
+    private final RetrieveGraphRepository graphRepository;
     /** RETRIEVE_DRIVER（属性绑定，不读裸 env；未配置 → 页面显示「未配置」）。 */
     private final RetrievalDriverProperties driverProperties;
     /** env 读取面（存储 env 可用性探测等按名读取）。 */
@@ -73,7 +75,7 @@ public class SystemInfoService {
                              StorageBackendRepository backendRepository,
                              DataSource dataSource,
                              ObjectProvider<BuildProperties> buildProperties,
-                             com.ragagent.retrieval.graph.RetrieveGraphRepository graphRepository,
+                             RetrieveGraphRepository graphRepository,
                              RetrievalDriverProperties driverProperties,
                              Environment environment) {
         this.allowList = allowList;
@@ -178,7 +180,7 @@ public class SystemInfoService {
      * （NEO4J_ENABLE=true 且连上才是 Neo4j；配了但没连上属于启动失败，不会走到这里）。
      */
     public String graphDatabaseEngine() {
-        if (graphRepository instanceof com.ragagent.retrieval.graph.Neo4jGraphRepository repo
+        if (graphRepository instanceof Neo4jGraphRepository repo
                 && repo.enabled()) {
             return "Neo4j";
         }

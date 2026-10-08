@@ -11,6 +11,9 @@ import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.StreamResponse;
 import com.ragagent.modelcontext.Registry;
+import com.ragagent.chatpipeline.PipelineCommon;
+import com.ragagent.common.prompt.PromptConstants;
+import com.ragagent.llm.domain.ChatResponse;
 
 /**
  * 知识问答降级协作者:固定文案兜底与模型兜底的消息准备与响应。
@@ -37,7 +40,7 @@ final class SessionQaFallback {
 
     void handleFixedFallback(ChatManage chatManage) {
         String fallbackContent = chatManage.getFallbackResponse();
-        com.ragagent.llm.domain.ChatResponse response = new com.ragagent.llm.domain.ChatResponse();
+        ChatResponse response = new ChatResponse();
         response.setContent(fallbackContent);
         chatManage.setChatResponse(response);
         service.emitFallbackAnswer(chatManage, fallbackContent);
@@ -93,11 +96,11 @@ final class SessionQaFallback {
         if (!promptContent.trim().isEmpty()) {
             ChatMessage system = new ChatMessage();
             system.setRole("system");
-            system.setContent(promptContent + "\n\n" + com.ragagent.common.prompt.PromptConstants.SOURCE_DATA_BOUNDARY_PROMPT
-                    + "\n\n" + com.ragagent.common.prompt.PromptConstants.SOURCED_ANSWER_OUTPUT_PROMPT);
+            system.setContent(promptContent + "\n\n" + PromptConstants.SOURCE_DATA_BOUNDARY_PROMPT
+                    + "\n\n" + PromptConstants.SOURCED_ANSWER_OUTPUT_PROMPT);
             messages.add(system);
         }
-        com.ragagent.chatpipeline.PipelineCommon.appendHistoryMessages(messages, chatManage.getHistory());
+        PipelineCommon.appendHistoryMessages(messages, chatManage.getHistory());
         String query = chatManage.getQuery();
         String rq = chatManage.getRewriteQuery() == null ? "" : chatManage.getRewriteQuery().trim();
         if (!rq.isEmpty()) {

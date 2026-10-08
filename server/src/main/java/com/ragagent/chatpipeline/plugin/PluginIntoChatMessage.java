@@ -15,6 +15,7 @@ import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.common.pipeline.ChunkTypes;
 import com.ragagent.retrieval.obs.RetrievalObs;
 import com.ragagent.common.prompt.MessageAttachmentsPrompt;
+import com.ragagent.common.prompt.AgentPromptPlaceholders;
 
 /**
  * INTO_CHAT_MESSAGE 阶段插件：
@@ -125,7 +126,7 @@ public final class PluginIntoChatMessage implements Plugin {
                 vals.put("contexts", "");
                 vals.put("language", chatManage.getLanguage());
                 chatManage.setUserContent(
-                        com.ragagent.common.prompt.AgentPromptPlaceholders.renderPromptPlaceholders(tpl, vals));
+                        AgentPromptPlaceholders.renderPromptPlaceholders(tpl, vals));
             } else {
                 chatManage.setUserContent(userContent);
             }
@@ -194,7 +195,7 @@ public final class PluginIntoChatMessage implements Plugin {
         vals.put("query", safeQuery);
         vals.put("contexts", chatManage.getRenderedContexts());
         vals.put("language", chatManage.getLanguage());
-        String userContent = com.ragagent.common.prompt.AgentPromptPlaceholders.renderPromptPlaceholders(
+        String userContent = AgentPromptPlaceholders.renderPromptPlaceholders(
                 chatManage.getSummaryConfig().getContextTemplate(), vals);
 
         if (!chatManage.getImageDescription().isEmpty() && !chatManage.isChatModelSupportsVision()) {

@@ -39,6 +39,7 @@ import com.ragagent.wiki.service.WikiLlmCallMetadata;
 import com.ragagent.common.knowledge.ChunkView;
 import com.ragagent.wiki.service.page.WikiPageService;
 import com.ragagent.wiki.service.page.WikiTextUtils;
+import com.ragagent.common.knowledge.KnowledgeBaseLookup;
 
 /**
  * {@link WikiIngestService} 核心行为的测试（prompt 脱敏 / 消息布局缓存 /
@@ -55,8 +56,8 @@ class WikiIngestServiceTest {
      * 端口缺位替身：{@code knowledgeGone} 默认返回 false（不判死），
      * 等价于迁移前 {@code ObjectProvider<KnowledgeMapper>} 缺位时的保守语义。
      */
-    private static final com.ragagent.common.knowledge.KnowledgeBaseLookup ABSENT_KB_LOOKUP =
-            org.mockito.Mockito.mock(com.ragagent.common.knowledge.KnowledgeBaseLookup.class);
+    private static final KnowledgeBaseLookup ABSENT_KB_LOOKUP =
+            org.mockito.Mockito.mock(KnowledgeBaseLookup.class);
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 

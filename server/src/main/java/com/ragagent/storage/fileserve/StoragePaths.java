@@ -10,6 +10,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import com.ragagent.common.storage.StorageRuntimeEnv;
+import com.ragagent.common.crypto.CryptoService;
 
 /**
  * 存储 provider:// 路径的解析与校验工具：
@@ -236,7 +237,7 @@ public final class StoragePaths {
      * "本部署不能签名"（返回 null，不是空 key）。
      */
     public static byte[] systemHmacKey() {
-        String key = com.ragagent.common.crypto.CryptoService.rawAesKey();
+        String key = CryptoService.rawAesKey();
         if (key == null || key.length() < 16) {
             return null;
         }

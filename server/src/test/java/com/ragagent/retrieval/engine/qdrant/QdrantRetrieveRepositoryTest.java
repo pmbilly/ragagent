@@ -27,6 +27,7 @@ import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
 import com.ragagent.retrieval.support.SearchTextUtil;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
+import com.ragagent.common.vectorstore.IndexConfig;
 
 /**
  * Qdrant 驱动：惰性建集合
@@ -501,14 +502,14 @@ class QdrantRetrieveRepositoryTest {
     @Test
     @DisplayName("集合名解析：prefix > name > 缺省（env 由进程环境决定）")
     void resolveCollectionName() {
-        com.ragagent.common.vectorstore.IndexConfig withPrefix =
-                new com.ragagent.common.vectorstore.IndexConfig();
+        IndexConfig withPrefix =
+                new IndexConfig();
         withPrefix.collectionPrefix = "pref";
         withPrefix.collectionName = "name";
         assertThat(QdrantRetrieveRepository.resolveCollectionName(withPrefix)).isEqualTo("pref");
 
-        com.ragagent.common.vectorstore.IndexConfig withName =
-                new com.ragagent.common.vectorstore.IndexConfig();
+        IndexConfig withName =
+                new IndexConfig();
         withName.collectionName = "name";
         assertThat(QdrantRetrieveRepository.resolveCollectionName(withName)).isEqualTo("name");
         assertThat(QdrantRetrieveRepository.resolveCollectionName(null))

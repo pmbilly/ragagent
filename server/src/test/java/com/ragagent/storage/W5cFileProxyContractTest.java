@@ -30,6 +30,7 @@ import com.ragagent.tenant.mapper.TenantMapper;
 import com.ragagent.auth.mapper.TenantMemberMapper;
 import com.ragagent.auth.mapper.UserMapper;
 import com.ragagent.knowledge.storage.LocalStorageService;
+import com.ragagent.support.GoldenContract;
 
 /**
  * 文件代理面 8 条路由的契约测试。golden：w5c-*（76 个，
@@ -279,7 +280,7 @@ class W5cFileProxyContractTest {
         MvcResult r = call(method, path, auth, extraHeaders);
         assertEquals(expectedStatus, r.getResponse().getStatus(),
                 () -> goldenName + " status, body=" + raw(r));
-        com.ragagent.support.GoldenContract.assertEquals("src/test/resources/contracts",
+        GoldenContract.assertEquals("src/test/resources/contracts",
                 goldenName, java.util.function.UnaryOperator.identity(), raw(r));
     }
 

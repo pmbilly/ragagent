@@ -37,6 +37,7 @@ import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.ReplyMessage;
 import com.sun.net.httpserver.HttpServer;
+import com.ragagent.common.security.SsrfGuard;
 
 /**
  * 企业微信 webhook 适配器行为测试：
@@ -271,7 +272,7 @@ class WecomWebhookAdapterTest {
         webhook.setMode("webhook");
         webhook.setCredentials("{\"corp_id\":\"ww\",\"agent_secret\":\"s\",\"token\":\"t\","
                 + "\"encoding_aes_key\":\"" + AES_KEY + "\",\"corp_agent_id\":1000002}");
-        var reg = new WecomAdapterFactory((com.ragagent.common.security.SsrfGuard) null)
+        var reg = new WecomAdapterFactory((SsrfGuard) null)
                 .create(webhook, (m, c) -> { });
         assertNotNull(reg.adapter());
         assertEquals(ImTypes.PLATFORM_WECOM, reg.adapter().platform());
@@ -283,7 +284,7 @@ class WecomWebhookAdapterTest {
         ws.setMode("websocket");
         ws.setCredentials("{\"bot_id\":\"B1\",\"bot_secret\":\"S1\","
                 + "\"ws_endpoint\":\"wss://127.0.0.1:1/\"}");
-        var wsReg = new WecomAdapterFactory((com.ragagent.common.security.SsrfGuard) null)
+        var wsReg = new WecomAdapterFactory((SsrfGuard) null)
                 .create(ws, (m, c) -> { });
         assertNotNull(wsReg.adapter());
         assertNotNull(wsReg.stop());
@@ -294,7 +295,7 @@ class WecomWebhookAdapterTest {
         unknown.setMode("pigeon");
         unknown.setCredentials("{}");
         assertThrows(IllegalArgumentException.class,
-                () -> new WecomAdapterFactory((com.ragagent.common.security.SsrfGuard) null)
+                () -> new WecomAdapterFactory((SsrfGuard) null)
                         .create(unknown, (m, c) -> { }));
     }
 

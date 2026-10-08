@@ -3,6 +3,7 @@ package com.ragagent.wiki.service.ingest;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ragagent.common.context.TracingContext;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ragagent.common.context.TracingContext;
 
 /**
  * wiki ingest 批次触发任务的载荷。
@@ -43,15 +44,15 @@ public record WikiIngestPayload(
     /** 带追踪载体的构造（入队侧用；载体为空时与兼容构造等价）。 */
     public static WikiIngestPayload withTracing(long tenantId, String knowledgeBaseId,
                                                 String language,
-                                                com.ragagent.common.context.TracingContext tracing) {
-        com.ragagent.common.context.TracingContext tc = tracing == null
-                ? com.ragagent.common.context.TracingContext.EMPTY : tracing;
+                                                TracingContext tracing) {
+        TracingContext tc = tracing == null
+                ? TracingContext.EMPTY : tracing;
         return new WikiIngestPayload(tenantId, knowledgeBaseId, language, tc.isEmpty() ? null : tc);
     }
 
     /** 追踪载体的结构视图（worker 侧续接用）。 */
-    public com.ragagent.common.context.TracingContext tracing() {
-        return tracing == null ? com.ragagent.common.context.TracingContext.EMPTY : tracing;
+    public TracingContext tracing() {
+        return tracing == null ? TracingContext.EMPTY : tracing;
     }
 
     /** 零值载荷（测试与"仅知 KB"的调度路径用）。 */

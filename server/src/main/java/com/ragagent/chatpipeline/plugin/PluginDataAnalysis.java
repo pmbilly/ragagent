@@ -20,6 +20,8 @@ import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.common.web.JsonMappers;
 import com.ragagent.common.pipeline.ChunkTypes;
+import com.ragagent.llm.LlmChatClient;
+import com.ragagent.llm.domain.ChatResponse;
 
 /**
  * DATA_ANALYSIS 阶段插件：
@@ -105,7 +107,7 @@ public final class PluginDataAnalysis implements Plugin {
                 return next.next();
             }
 
-            com.ragagent.llm.LlmChatClient chatModel;
+            LlmChatClient chatModel;
             try {
                 chatModel = modelService.getChatModel(chatManage.getChatModelId());
             } catch (RuntimeException e) {
@@ -128,7 +130,7 @@ public final class PluginDataAnalysis implements Plugin {
                 throw new IllegalStateException(e);
             }
 
-            com.ragagent.llm.domain.ChatResponse response;
+            ChatResponse response;
             try {
                 response = chatModel.chat(List.of(new ChatMessage("user", analysisPrompt)), opt);
             } catch (RuntimeException e) {

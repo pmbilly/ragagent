@@ -14,6 +14,7 @@ import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.mapper.McpServiceMapper;
 import com.ragagent.mcp.protocol.McpContext;
 import com.ragagent.mcp.protocol.McpServiceUrls;
+import com.ragagent.mcp.domain.McpOAuthToken;
 
 /**
  * MCP OAuth2 授权码流程编排：发现 → 动态客户端注册 → 授权跳转 → 回调 code 交换。
@@ -326,7 +327,7 @@ public class OAuthManager {
 
     // ── 工具 ───────────────────────────────────────────────────────────
 
-    private static OAuthToken toOAuthToken(com.ragagent.mcp.domain.McpOAuthToken row) {
+    private static OAuthToken toOAuthToken(McpOAuthToken row) {
         return new OAuthToken(row.getAccessToken(), row.getRefreshToken(), row.getTokenType(),
                 row.getExpiresAt());
     }

@@ -65,6 +65,8 @@
 **更新（2026-10-02，B33）**：B6 批 10 一度把两处工具放错层——`config/AppEnvLookup` 被 11 包引用、`llm/chat/ImageResolver` 直连 `storage/StoragePaths`，守卫红灯（环 5 组 / 依赖 config 11 包）。
 B33 已归位：`AppEnvLookup` → `common/deployment`、`StorageRuntimeEnv` → `common/storage`（+ `ImageResolver` 脱开 storage），守卫回绿至上述基线（环 0 / 依赖 config 1 包 / L2→L3 6 条）。
 
+**修正（2026-10-08，B111）**：上述读数均为"**只解析 import 行**"的代理值。清掉 1,331 行内联全限定名后，依赖图第一次完整，真读数为 **环（两两）2 组 / 间接环 1 组（8 域）/ L2→L3 2 条**——那些边一直存在，只是此前不计数。脚本已新增 **R8 禁内联 FQ** 并重刷基线；详见 `docs/phase4-module-boundaries-plan.md` §3。
+
 ### P1 扁平包（原 10 个 → 余 5 个）
 
 **已拆**（2026-09-30 批 P1，纯移动 + 引用改写 + 全绿；`storageurl`/`searchutil`/`webfetch` 三个早先批次已合并掉）：

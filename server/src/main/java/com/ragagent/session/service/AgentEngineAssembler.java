@@ -20,6 +20,29 @@ import com.ragagent.llm.LlmChatClient;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.memory.service.MemoryService;
 import com.ragagent.rerank.Reranker;
+import com.ragagent.agent.AgentPromptTemplates;
+import com.ragagent.agent.skills.DbSkillSource;
+import com.ragagent.agent.skills.Manager;
+import com.ragagent.agent.skills.Skill;
+import com.ragagent.agent.skills.SkillCatalogService;
+import com.ragagent.agent.tools.AgentTool;
+import com.ragagent.agent.tools.SequentialThinkingTool;
+import com.ragagent.agent.tools.SkillReadFileTool;
+import com.ragagent.agent.tools.TodoWriteTool;
+import com.ragagent.agent.tools.ToolDefinitions;
+import com.ragagent.agent.tools.web.WebFetchTool;
+import com.ragagent.agent.tools.web.WebSearchTool;
+import com.ragagent.approval.Gate;
+import com.ragagent.common.context.TenantContext;
+import com.ragagent.common.retrieval.SearchTarget;
+import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.service.KnowledgeService;
+import com.ragagent.mcp.protocol.McpClientManager;
+import com.ragagent.mcp.service.McpMetadataService;
+import com.ragagent.mcp.service.McpServiceService;
+import com.ragagent.session.domain.SessionOwnerIds;
+import com.ragagent.storage.service.ResourceCatalogService;
 
 /**
  * {@code SessionAgentQaService} 的**引擎/工具装配簇**（§14.9c 刀 3）：创建 agent 引擎（LLM/记忆/审批门/
@@ -38,19 +61,19 @@ final class AgentEngineAssembler {
     private final SessionKnowledgeQaService knowledgeQa;
     private final AgentToolBackends toolBackends;
     private final ArtifactCollectorWiring artifactCollectorWiring;
-    private final com.ragagent.knowledge.service.KnowledgeService knowledgeService;
+    private final KnowledgeService knowledgeService;
     private final FaqEntryQueryService faqService;
-    private final com.ragagent.mcp.service.McpServiceService mcpServiceService;
-    private final com.ragagent.mcp.service.McpMetadataService mcpMetadataService;
-    private final com.ragagent.mcp.protocol.McpClientManager mcpClientManager;
-    private final com.ragagent.approval.Gate toolApprovalGate;
-    private final com.ragagent.storage.service.ResourceCatalogService resourceCatalog;
+    private final McpServiceService mcpServiceService;
+    private final McpMetadataService mcpMetadataService;
+    private final McpClientManager mcpClientManager;
+    private final Gate toolApprovalGate;
+    private final ResourceCatalogService resourceCatalog;
     private final javax.sql.DataSource dataSource;
     private final VlmDescriberWiring vlmDescriberWiring;
     /** 平台级技能目录（B57 入库版）：装配期建 {@code DbSkillSource} 读 skills 表。 */
-    private final com.ragagent.agent.skills.SkillCatalogService skillCatalogService;
+    private final SkillCatalogService skillCatalogService;
 
-    AgentEngineAssembler(MemoryService memoryService, SessionKnowledgeQaService knowledgeQa, AgentToolBackends toolBackends, ArtifactCollectorWiring artifactCollectorWiring, com.ragagent.knowledge.service.KnowledgeService knowledgeService, FaqEntryQueryService faqService, com.ragagent.mcp.service.McpServiceService mcpServiceService, com.ragagent.mcp.service.McpMetadataService mcpMetadataService, com.ragagent.mcp.protocol.McpClientManager mcpClientManager, com.ragagent.approval.Gate toolApprovalGate, com.ragagent.storage.service.ResourceCatalogService resourceCatalog, javax.sql.DataSource dataSource, VlmDescriberWiring vlmDescriberWiring, com.ragagent.agent.skills.SkillCatalogService skillCatalogService) {
+    AgentEngineAssembler(MemoryService memoryService, SessionKnowledgeQaService knowledgeQa, AgentToolBackends toolBackends, ArtifactCollectorWiring artifactCollectorWiring, KnowledgeService knowledgeService, FaqEntryQueryService faqService, McpServiceService mcpServiceService, McpMetadataService mcpMetadataService, McpClientManager mcpClientManager, Gate toolApprovalGate, ResourceCatalogService resourceCatalog, javax.sql.DataSource dataSource, VlmDescriberWiring vlmDescriberWiring, SkillCatalogService skillCatalogService) {
         this.memoryService = memoryService;
         this.knowledgeQa = knowledgeQa;
         this.toolBackends = toolBackends;
@@ -99,14 +122,14 @@ final class AgentEngineAssembler {
         // B57：内容来自 skills 表——每轮装配新建 DbSkillSource（读一次表），
         // 因此新建/删除技能对下一轮对话生效，无需缓存失效机制。
         // B60：读的是「平台内置层 + 当前空间」，缺租户上下文时只读平台层（fail closed）。
-        com.ragagent.agent.skills.Manager skillsManager = null;
+        Manager skillsManager = null;
         if (config.isSkillsEnabled()) {
             try {
-                com.ragagent.agent.skills.DbSkillSource skillSource =
-                        new com.ragagent.agent.skills.DbSkillSource(skillCatalogService
-                                .listVisible(com.ragagent.common.context.TenantContext.currentTenantId()));
-                skillsManager = new com.ragagent.agent.skills.Manager(
-                        new com.ragagent.agent.skills.Manager.ManagerConfig(
+                DbSkillSource skillSource =
+                        new DbSkillSource(skillCatalogService
+                                .listVisible(TenantContext.currentTenantId()));
+                skillsManager = new Manager(
+                        new Manager.ManagerConfig(
                                 List.of(skillSource), config.getAllowedSkills(), true));
                 skillsManager.initialize();
                 log.info("Instructional skills enabled: {} skill(s) from DB catalog",
@@ -137,8 +160,8 @@ final class AgentEngineAssembler {
                 kbInfos, selectedDocs, sessionId, systemPromptTemplate);
         // 启动时装载内置 yaml 模板——RAG/pure 两个 base
         // 模板由此区分（塞空配置会让带 KB 的 agent 缺 RAG 开头段 ≈860 字符）。
-        engine.setAppConfig(new com.ragagent.agent.AgentPromptTemplates.TemplatesConfig(
-                com.ragagent.agent.AgentPromptTemplates.loadAgentSystemPromptTemplates()));
+        engine.setAppConfig(new AgentPromptTemplates.TemplatesConfig(
+                AgentPromptTemplates.loadAgentSystemPromptTemplates()));
         // pinned mentions（resolvePinnedMCPServiceInfos / resolvePinnedSkillInfos）
         List<AgentPrompts.PinnedMCPServiceInfo> pinnedMcp = new ArrayList<>();
         if (config.getPinnedMcpServiceIds() != null) {
@@ -153,7 +176,7 @@ final class AgentEngineAssembler {
             // 描述取自已装配的技能元数据（此前给空串 → @ 引用处拿不到任何展示信息）
             java.util.Map<String, String> descByName = new java.util.HashMap<>();
             if (skillsManager != null && skillsManager.getAllMetadata() != null) {
-                for (com.ragagent.agent.skills.Skill.SkillMetadata m : skillsManager.getAllMetadata()) {
+                for (Skill.SkillMetadata m : skillsManager.getAllMetadata()) {
                     if (m != null && m.name() != null) {
                         descByName.put(m.name(), m.description() == null ? "" : m.description());
                     }
@@ -172,7 +195,7 @@ final class AgentEngineAssembler {
             engine.setSkillsManager(skillsManager);
             // Level 2/3 的按需读取通道：模型按提示词里的 skill://<name>/SKILL.md 调 read_file。
             // 沙箱已退役，read_file 由本工具提供（不再等沙箱注册步骤）。
-            toolRegistry.registerTool(new com.ragagent.agent.tools.SkillReadFileTool(skillsManager));
+            toolRegistry.registerTool(new SkillReadFileTool(skillsManager));
         }
 
         // 工具图片 VLM 描述器：取到 VLM 模型则
@@ -286,7 +309,7 @@ final class AgentEngineAssembler {
         }
         List<AgentPrompts.KnowledgeBaseInfo> kbInfos = new ArrayList<>();
         for (String kbId : scopes.kbIds()) {
-            com.ragagent.knowledge.domain.KnowledgeBase kb;
+            KnowledgeBase kb;
             try {
                 kb = knowledgeQa.findKnowledgeBase(kbId);
             } catch (RuntimeException e) {
@@ -336,7 +359,7 @@ final class AgentEngineAssembler {
                             null, null, false);
                     docCount = (int) Math.max(page.getTotal(), 0);
                     if (page.getRecords() != null) {
-                        for (com.ragagent.knowledge.domain.Knowledge k : page.getRecords()) {
+                        for (Knowledge k : page.getRecords()) {
                             if (k == null || recentDocs.size() >= 10) {
                                 break;
                             }
@@ -360,7 +383,7 @@ final class AgentEngineAssembler {
         return kbInfos;
     }
     /** wiki / chunks（vector 或 keyword 开启）。 */
-    private static List<String> kbRetrievalCapabilities(com.ragagent.knowledge.domain.KnowledgeBase kb) {
+    private static List<String> kbRetrievalCapabilities(KnowledgeBase kb) {
         List<String> caps = new ArrayList<>(2);
         if (kb.getIndexingStrategy() != null) {
             if (kb.getIndexingStrategy().isWikiEnabled()) {
@@ -380,7 +403,7 @@ final class AgentEngineAssembler {
         }
         List<AgentPrompts.SelectedDocumentInfo> selectedDocs = new ArrayList<>();
         for (String kid : ids) {
-            com.ragagent.knowledge.domain.Knowledge k;
+            Knowledge k;
             try {
                 k = knowledgeService.getKnowledgeByIdOnly(kid);
             } catch (RuntimeException e) {
@@ -403,17 +426,17 @@ final class AgentEngineAssembler {
         if (config == null || !config.isWebSearchEnabled()) {
             return;
         }
-        com.ragagent.agent.tools.AgentTool raw = registry.getTool(ToolDefinitions.TOOL_WEB_FETCH);
-        if (!(raw instanceof com.ragagent.agent.tools.web.WebFetchTool fetch)) {
+        AgentTool raw = registry.getTool(ToolDefinitions.TOOL_WEB_FETCH);
+        if (!(raw instanceof WebFetchTool fetch)) {
             return;
         }
         // web_search 是**另一次**工具查找，与 fetch 是两个实例
         if (registry.getTool(ToolDefinitions.TOOL_WEB_SEARCH)
-                instanceof com.ragagent.agent.tools.web.WebSearchTool search) {
+                instanceof WebSearchTool search) {
             search.withPageReader(fetch);
         }
         // handler 已把会话存储钉到 owner 租户（租户取自 TenantContext）
-        Long ctxTenant = com.ragagent.common.context.TenantContext.currentTenantId();
+        Long ctxTenant = TenantContext.currentTenantId();
         long tenantId = ctxTenant == null ? 0L : ctxTenant;
         if (tenantId == 0 || sessionId == null || sessionId.isEmpty()
                 || assistantMessageId == null || assistantMessageId.isEmpty()) {
@@ -422,7 +445,7 @@ final class AgentEngineAssembler {
         // 生产存储接缝（web 抓取页快照的存取 + 资源目录绑定）
         AgentWebPages pages = new AgentWebPages(dataSource, resourceCatalog,
                 artifactCollectorWiring.webPageStore(), artifactCollectorWiring.webPageBinding(),
-                tenantId, com.ragagent.session.domain.SessionOwnerIds.currentSessionOwnerId(),
+                tenantId, SessionOwnerIds.currentSessionOwnerId(),
                 sessionId, assistantMessageId);
         fetch.withPageSource(pages);
     }
@@ -430,7 +453,7 @@ final class AgentEngineAssembler {
     private void registerTools(ToolRegistry registry, QaAgentConfig config, Reranker rerankModel,
             String sessionId) {
         List<String> allowedTools = new ArrayList<>(config.getAllowedTools().isEmpty()
-                ? com.ragagent.agent.tools.ToolDefinitions.defaultAllowedTools()
+                ? ToolDefinitions.defaultAllowedTools()
                 : config.getAllowedTools());
         if (config.isSharedAgentReadOnly()) {
             allowedTools = filterSharedAgentWriteTools(allowedTools);
@@ -476,7 +499,7 @@ final class AgentEngineAssembler {
         WikiRouteResolver wikiRoutes = new WikiRouteResolver();
         boolean hasKnowledge = !config.getKnowledgeBases().isEmpty() || !config.getKnowledgeIds().isEmpty()
                 || (config.getSearchTargets() != null
-                        && com.ragagent.common.retrieval.SearchTarget.SearchTargets
+                        && SearchTarget.SearchTargets
                                 .hasKnowledgeRetrievalScope(config.getSearchTargets(), List.of(), List.of()));
 
         // KB 工具过滤
@@ -543,14 +566,14 @@ final class AgentEngineAssembler {
         allowedTools = new ArrayList<>(new java.util.LinkedHashSet<>(allowedTools));
 
         // Register each allowed tool
-        String toolOwnerId = com.ragagent.session.domain.SessionOwnerIds.currentSessionOwnerId();
+        String toolOwnerId = SessionOwnerIds.currentSessionOwnerId();
         for (String toolName : allowedTools) {
-            com.ragagent.agent.tools.AgentTool toolToRegister = null;
+            AgentTool toolToRegister = null;
             switch (toolName) {
                 case ToolDefinitions.TOOL_THINKING ->
-                        toolToRegister = new com.ragagent.agent.tools.SequentialThinkingTool();
+                        toolToRegister = new SequentialThinkingTool();
                 case ToolDefinitions.TOOL_TODO_WRITE ->
-                        toolToRegister = new com.ragagent.agent.tools.TodoWriteTool();
+                        toolToRegister = new TodoWriteTool();
                 // 检索/会话/记忆/DB 族（2026-09-23 接线批）：seam → 真实服务经 AgentToolBackends
                 case ToolDefinitions.TOOL_KNOWLEDGE_SEARCH, ToolDefinitions.TOOL_GREP_CHUNKS,
                         ToolDefinitions.TOOL_LIST_KNOWLEDGE_CHUNKS,

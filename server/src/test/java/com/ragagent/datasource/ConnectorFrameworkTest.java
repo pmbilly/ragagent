@@ -12,6 +12,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.JsonRoundTrip;
 import com.ragagent.datasource.domain.DataSourceConstants;
 import org.junit.jupiter.api.Test;
+import com.ragagent.datasource.domain.DataSourceConfig;
+import com.ragagent.datasource.domain.FetchedItem;
+import com.ragagent.datasource.domain.Resource;
+import com.ragagent.datasource.domain.SyncCursor;
 
 /**
  * 连接器框架层（{@code ConnectorException} / {@code ConnectorRegistry} /
@@ -116,32 +120,32 @@ class ConnectorFrameworkTest {
             }
 
             @Override
-            public void validate(com.ragagent.datasource.domain.DataSourceConfig config) {
+            public void validate(DataSourceConfig config) {
                 throw new UnsupportedOperationException();
             }
 
             @Override
-            public List<com.ragagent.datasource.domain.Resource> listResources(
-                    com.ragagent.datasource.domain.DataSourceConfig config, String parentId) {
+            public List<Resource> listResources(
+                    DataSourceConfig config, String parentId) {
                 throw new UnsupportedOperationException();
             }
 
             @Override
             public List<String> resolveResourceAncestors(
-                    com.ragagent.datasource.domain.DataSourceConfig config, List<String> ids) {
+                    DataSourceConfig config, List<String> ids) {
                 throw new UnsupportedOperationException();
             }
 
             @Override
-            public List<com.ragagent.datasource.domain.FetchedItem> fetchAll(
-                    com.ragagent.datasource.domain.DataSourceConfig config, List<String> ids) {
+            public List<FetchedItem> fetchAll(
+                    DataSourceConfig config, List<String> ids) {
                 throw new UnsupportedOperationException();
             }
 
             @Override
             public FetchIncrementalResult fetchIncremental(
-                    com.ragagent.datasource.domain.DataSourceConfig config,
-                    com.ragagent.datasource.domain.SyncCursor cursor) {
+                    DataSourceConfig config,
+                    SyncCursor cursor) {
                 throw new UnsupportedOperationException();
             }
         };

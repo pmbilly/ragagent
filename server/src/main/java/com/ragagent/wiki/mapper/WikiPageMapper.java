@@ -17,6 +17,7 @@ import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import com.ragagent.wiki.domain.WikiPageListRequest;
 
 /**
  * wiki_pages 仓储语句（{@link WikiPageRepository} 的配套 SQL）。
@@ -213,7 +214,7 @@ public interface WikiPageMapper extends BaseMapper<WikiPage> {
             + "<if test='wikiPathSort'>, sort_order ASC, title ASC</if>"
             + " LIMIT #{limit} OFFSET #{offset}"
             + "</script>")
-    List<WikiPage> list(@Param("req") com.ragagent.wiki.domain.WikiPageListRequest req,
+    List<WikiPage> list(@Param("req") WikiPageListRequest req,
                         @Param("pageTypes") List<String> pageTypes,
                         @Param("categoryPathEncoded") String categoryPathEncoded,
                         @Param("queryLike") String queryLike,
@@ -254,7 +255,7 @@ public interface WikiPageMapper extends BaseMapper<WikiPage> {
             + "  </choose>"
             + "</if>"
             + "</script>")
-    long countList(@Param("req") com.ragagent.wiki.domain.WikiPageListRequest req,
+    long countList(@Param("req") WikiPageListRequest req,
                    @Param("pageTypes") List<String> pageTypes,
                    @Param("categoryPathEncoded") String categoryPathEncoded,
                    @Param("queryLike") String queryLike,

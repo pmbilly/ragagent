@@ -2,6 +2,8 @@ package com.ragagent.model.dto;
 
 import java.time.OffsetDateTime;
 import java.util.Map;
+import com.ragagent.model.domain.Model;
+import com.ragagent.model.domain.ModelParameters;
 
 /**
  * 模型响应（HTTP 视图；JSON 字段名即 Java 字段名，输出序 = 组件声明序）。
@@ -30,10 +32,10 @@ public record ModelResponse(
      * @param canViewIntegrationSecrets Admin+ 可见完整参数
      * @param canManageBuiltin 系统管理员可管内置模型
      */
-    public static ModelResponse from(com.ragagent.model.domain.Model m,
+    public static ModelResponse from(Model m,
                                      boolean canViewIntegrationSecrets,
                                      boolean canManageBuiltin) {
-        com.ragagent.model.domain.ModelParameters p = m.getParameters();
+        ModelParameters p = m.getParameters();
         // 0 / 空串 = 未设置 → null（"用后端默认值"的显式语义）
         Integer contextWindow = p.getContextWindow() == 0 ? null : p.getContextWindow();
         Integer maxOutputTokens = p.getMaxOutputTokens() == 0 ? null : p.getMaxOutputTokens();

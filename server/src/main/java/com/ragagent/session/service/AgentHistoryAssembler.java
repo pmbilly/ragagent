@@ -12,6 +12,8 @@ import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ToolCall;
 import com.ragagent.session.domain.Message;
 import com.ragagent.session.support.PipelineViews;
+import com.ragagent.agent.tools.ToolResultPersist;
+import com.ragagent.llm.domain.FunctionCall;
 
 /**
  * {@code SessionAgentQaService} 的**历史/消息装配簇**：把落库的 {@code Message}
@@ -192,7 +194,7 @@ final class AgentHistoryAssembler {
             ToolCall c = new ToolCall();
             c.setId(tc.getId());
             c.setType("function");
-            c.setFunction(new com.ragagent.llm.domain.FunctionCall(
+            c.setFunction(new FunctionCall(
                     tc.getName(), toJsonString(tc.getArgs())));
             c.setProviderMetadata(tc.getProviderMetadata());
             chatCalls.add(c);
@@ -203,7 +205,7 @@ final class AgentHistoryAssembler {
         for (var tc : nonTerminalCalls) {
             ChatMessage toolMsg = new ChatMessage();
             toolMsg.setRole("tool");
-            toolMsg.setContent(com.ragagent.agent.tools.ToolResultPersist.compactToolOutputForHistory(
+            toolMsg.setContent(ToolResultPersist.compactToolOutputForHistory(
                     tc.getName(), tc.getResult()));
             toolMsg.setToolCallId(tc.getId());
             toolMsg.setName(tc.getName());

@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.ragagent.datasource.service.KnowledgeBridge;
 
 /**
  * 数据源管理端点。
@@ -563,9 +564,9 @@ public class DataSourceController {
     @org.springframework.stereotype.Component
     public static class KnowledgeBaseOwnerGuard {
 
-        private final com.ragagent.datasource.service.KnowledgeBridge knowledge;
+        private final KnowledgeBridge knowledge;
 
-        public KnowledgeBaseOwnerGuard(com.ragagent.datasource.service.KnowledgeBridge knowledge) {
+        public KnowledgeBaseOwnerGuard(KnowledgeBridge knowledge) {
             this.knowledge = knowledge;
         }
 

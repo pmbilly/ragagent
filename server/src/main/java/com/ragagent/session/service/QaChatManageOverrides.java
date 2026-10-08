@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.agent.management.service.AgentConfigJson;
 import com.ragagent.chatpipeline.ChatManage;
+import com.ragagent.agent.management.domain.CustomAgentEntity;
 
 /**
  * {@code SessionQaResolution} 的**agent 覆盖簇**：把 custom agent 的配置
@@ -120,7 +121,7 @@ final class QaChatManageOverrides {
         }
     }
     SessionQaResolution.Prompts resolveCustomAgentPrompts(
-            com.ragagent.agent.management.domain.CustomAgentEntity agent, ObjectNode c) {
+            CustomAgentEntity agent, ObjectNode c) {
         if (c == null) {
             return new SessionQaResolution.Prompts("", "");
         }

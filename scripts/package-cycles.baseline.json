@@ -1,15 +1,40 @@
 {
-  "cycles": [],
-  "sccs": [],
+  "cycles": [
+    [
+      "agent",
+      "auth"
+    ],
+    [
+      "agent",
+      "im"
+    ]
+  ],
+  "sccs": [
+    [
+      "agent",
+      "auth",
+      "chatpipeline",
+      "datasource",
+      "im",
+      "memory",
+      "session",
+      "webfetch"
+    ]
+  ],
   "depend_on_config": [],
   "l2_to_l3": [
     [
       "chatpipeline",
       "knowledge"
+    ],
+    [
+      "webfetch",
+      "datasource"
     ]
   ],
   "l2_to_l3_sites": {
-    "chatpipeline->knowledge": 12
+    "chatpipeline->knowledge": 15,
+    "webfetch->datasource": 2
   },
   "common_beans": {
     "crypto": 1,

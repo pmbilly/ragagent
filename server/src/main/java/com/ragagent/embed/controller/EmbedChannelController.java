@@ -36,6 +36,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.ragagent.common.context.TenantContext;
+import com.ragagent.common.tenant.TenantRole;
+import com.ragagent.session.controller.KnowledgeQaController;
+import com.ragagent.session.domain.Message;
+import com.ragagent.session.dto.StopSessionRequest;
+import com.ragagent.storage.fileserve.FileProxyService;
 
 /**
  * embed 渠道 HTTP 层（管理面/公开面路由）。
@@ -77,8 +83,8 @@ static final ObjectMapper MAPPER = new ObjectMapper()
     final MessageSuggestionController suggestionController;
     final McpOAuthController mcpOAuthController;
     final AgentToolApprovalController toolApprovalController;
-final com.ragagent.session.controller.KnowledgeQaController knowledgeQaController;
-final com.ragagent.storage.fileserve.FileProxyService fileProxyService;
+final KnowledgeQaController knowledgeQaController;
+final FileProxyService fileProxyService;
 
     /** 管理面协作者。 */
     final EmbedChannelMgmtOps mgmtOps;
@@ -97,8 +103,8 @@ final com.ragagent.storage.fileserve.FileProxyService fileProxyService;
                                   MessageSuggestionController suggestionController,
                                   McpOAuthController mcpOAuthController,
                                   AgentToolApprovalController toolApprovalController,
-                                  com.ragagent.session.controller.KnowledgeQaController knowledgeQaController,
-                                  com.ragagent.storage.fileserve.FileProxyService fileProxyService) {
+                                  KnowledgeQaController knowledgeQaController,
+                                  FileProxyService fileProxyService) {
         this.service = service;
         this.sessionService = sessionService;
         this.sessionRepository = sessionRepository;
@@ -220,7 +226,7 @@ final com.ragagent.storage.fileserve.FileProxyService fileProxyService;
     }
 
     @GetMapping("/api/v1/embed/{channelId}/messages/{sessionId}/load")
-    public ResponseEntity<List<com.ragagent.session.domain.Message>> load(@PathVariable("sessionId") String sessionId,
+    public ResponseEntity<List<Message>> load(@PathVariable("sessionId") String sessionId,
                                                     @RequestParam(name = "limit", required = false) String limit,
                                                     @RequestParam(name = "before_time", required = false) String beforeTime,
                                                     @RequestParam(name = "resource_urls", required = false) String resourceUrls) {
@@ -230,7 +236,7 @@ final com.ragagent.storage.fileserve.FileProxyService fileProxyService;
     @PostMapping("/api/v1/embed/{channelId}/sessions/{sessionId}/stop")
     public ResponseEntity<?> stop(@PathVariable("sessionId") String sessionId,
                                   @RequestBody(required = false)
-                                  com.ragagent.session.dto.StopSessionRequest body) {
+                                  StopSessionRequest body) {
         return delegateOps.stop(sessionId, body);
     }
 
@@ -345,10 +351,10 @@ void ensureSession(String sessionId) {
         TenantContext.set(tenantId,
                 new TenantContext.Principal(TenantContext.PrincipalTypes.EMBED_SESSION,
                         tenantId + ":" + ch.getId() + ":" + sessionId),
-                com.ragagent.common.tenant.TenantRole.VIEWER.value(),
+                TenantRole.VIEWER.value(),
                 false, "embed-" + ch.getId(), false);
         if (!visitor.isEmpty()) {
-            com.ragagent.common.context.TenantContext.setEmbedVisitorId(visitor);
+            TenantContext.setEmbedVisitorId(visitor);
         }
         // embed 访客恒收 resource:// 句柄
         StorageUrlContext.force();
@@ -469,7 +475,7 @@ void ensureSession(String sessionId) {
     // ═══════════════════ 工具 ═══════════════════
 
     static long currentTenant() {
-        Long tid = com.ragagent.common.context.TenantContext.currentTenantId();
+        Long tid = TenantContext.currentTenantId();
         return tid == null ? 0L : tid;
     }
 

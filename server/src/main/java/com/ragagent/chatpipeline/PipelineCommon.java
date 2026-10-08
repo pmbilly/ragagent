@@ -20,6 +20,9 @@ import com.ragagent.common.session.PipelineMessageAttachmentView;
 import com.ragagent.common.session.PipelineMessageImageView;
 import com.ragagent.common.session.PipelineMessageView;
 import com.ragagent.common.prompt.PromptConstants;
+import com.ragagent.common.context.TenantContext;
+import com.ragagent.common.prompt.AgentPromptPlaceholders;
+import com.ragagent.event.TenantContextSnapshot;
 
 /**
  * 管线共享工具。
@@ -224,8 +227,8 @@ public final class PipelineCommon {
         if (tasks.length == 0) {
             return errs;
         }
-        com.ragagent.event.TenantContextSnapshot tenantSnap =
-                com.ragagent.event.TenantContextSnapshot.capture();
+        TenantContextSnapshot tenantSnap =
+                TenantContextSnapshot.capture();
         try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
             List<java.util.concurrent.Future<?>> futures = new ArrayList<>(tasks.length);
             for (ParallelTask task : tasks) {
@@ -240,7 +243,7 @@ public final class PipelineCommon {
                         }
                         return null;
                     } finally {
-                        com.ragagent.common.context.TenantContext.clear();
+                        TenantContext.clear();
                     }
                 }));
             }
@@ -272,8 +275,8 @@ public final class PipelineCommon {
         }
         int workers = maxWorkers <= 0 || maxWorkers > n ? n : maxWorkers;
         Semaphore sem = new Semaphore(workers);
-        com.ragagent.event.TenantContextSnapshot tenantSnap =
-                com.ragagent.event.TenantContextSnapshot.capture();
+        TenantContextSnapshot tenantSnap =
+                TenantContextSnapshot.capture();
         try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
             List<java.util.concurrent.Future<?>> futures = new ArrayList<>(n);
             for (int i = 0; i < n; i++) {
@@ -290,7 +293,7 @@ public final class PipelineCommon {
                         }
                         return null;
                     } finally {
-                        com.ragagent.common.context.TenantContext.clear();
+                        TenantContext.clear();
                     }
                 }));
             }
@@ -308,7 +311,7 @@ public final class PipelineCommon {
     /** AgentPromptPlaceholders 是 agent 包的 public 类，直接静态引用（避免每次写全名）。 */
     private static final class AgentPromptPlaceholdersHolder {
         static String render(String template, Map<String, String> vals) {
-            return com.ragagent.common.prompt.AgentPromptPlaceholders.renderPromptPlaceholders(template, vals);
+            return AgentPromptPlaceholders.renderPromptPlaceholders(template, vals);
         }
     }
 

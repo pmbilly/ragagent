@@ -13,6 +13,7 @@ import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatTool;
 import com.ragagent.llm.domain.MessageContentPart;
 import com.ragagent.llm.domain.ToolCall;
+import com.ragagent.llm.domain.FunctionCall;
 
 /**
  * 上下文诊断的录制常量断言。
@@ -28,7 +29,7 @@ class ContextDiagnosticsTest {
         reasoning.setReasoningContent("step by step thinking about the deck structure");
         ToolCall tc = new ToolCall();
         tc.setId("call-a");
-        tc.setFunction(new com.ragagent.llm.domain.FunctionCall("knowledge_search", "{\"query\":\"coral\"}"));
+        tc.setFunction(new FunctionCall("knowledge_search", "{\"query\":\"coral\"}"));
         ChatMessage calls = new ChatMessage("assistant", "");
         calls.setToolCalls(List.of(tc));
         ChatMessage summary = new ChatMessage("user", "summary of older history");

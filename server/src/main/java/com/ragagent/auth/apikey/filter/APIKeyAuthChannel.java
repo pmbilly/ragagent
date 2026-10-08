@@ -15,6 +15,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import com.ragagent.auth.domain.User;
+import com.ragagent.auth.service.UserService;
+import com.ragagent.tenant.APIPrincipalConfig;
 
 /**
  * X-API-Key 认证通道（认证链的第 3 条通道）。
@@ -55,10 +58,10 @@ public class APIKeyAuthChannel {
     private final TenantAPIKeyService apiKeyService;
     private final TenantService tenantService;
 
-    private final com.ragagent.auth.service.UserService userService;
+    private final UserService userService;
 
     public APIKeyAuthChannel(TenantAPIKeyService apiKeyService, TenantService tenantService,
-            com.ragagent.auth.service.UserService userService) {
+            UserService userService) {
         this.apiKeyService = apiKeyService;
         this.tenantService = tenantService;
         this.userService = userService;
@@ -155,7 +158,7 @@ public class APIKeyAuthChannel {
 
         // 租户首位用户（created_at 最早），查不到走合成用户兜底
         // system-<tenantId>（查询错误一律吞掉走兜底）。
-        com.ragagent.auth.domain.User user = userService.getUserByTenantIdFirst(tenantId);
+        User user = userService.getUserByTenantIdFirst(tenantId);
         String userId = user != null ? user.getId() : "system-" + tenantId;
 
         String principalType;
@@ -195,14 +198,14 @@ public class APIKeyAuthChannel {
             String error) {}
 
     private ApiPrincipalResolutionOut resolveApiPrincipal(long tenantId,
-            com.ragagent.tenant.APIPrincipalConfig cfg, HttpServletRequest request) {
+            APIPrincipalConfig cfg, HttpServletRequest request) {
         // fallback = api_tenant/<tenantId>；cfg 缺失/mode 空/tenant 模式 → 回落
         if (cfg == null || cfg.mode == null || cfg.mode.isEmpty()
-                || com.ragagent.tenant.APIPrincipalConfig.MODE_TENANT.equals(cfg.mode)) {
+                || APIPrincipalConfig.MODE_TENANT.equals(cfg.mode)) {
             return fallbackTenant(tenantId);
         }
         switch (cfg.mode) {
-            case com.ragagent.tenant.APIPrincipalConfig.MODE_DIRECT_HEADER -> {
+            case APIPrincipalConfig.MODE_DIRECT_HEADER -> {
                 // 用常量头名 X-External-User-ID（刻意不读 cfg.directHeaderName）
                 String externalUserId = trimToEmpty(
                         request.getHeader(EXTERNAL_USER_ID_HEADER));
@@ -220,7 +223,7 @@ public class APIKeyAuthChannel {
                 return new ApiPrincipalResolutionOut(TenantContext.PrincipalTypes.API_EXTERNAL_USER,
                         tenantId + ":" + externalUserId, null);
             }
-            case com.ragagent.tenant.APIPrincipalConfig.MODE_SIGNED_TOKEN -> {
+            case APIPrincipalConfig.MODE_SIGNED_TOKEN -> {
                 String token = trimToEmpty(request.getHeader(EXTERNAL_USER_TOKEN_HEADER));
                 String sub = verifyExternalUserJwt(token, tenantId,
                         cfg.hmacSecret == null ? "" : cfg.hmacSecret);

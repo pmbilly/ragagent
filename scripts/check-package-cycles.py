@@ -13,6 +13,17 @@
   R2 组合根单向：任何域不得 import `config`（config 是 Spring 装配层，应只出不进）；
   R3 能力层不依赖业务层：L2 = llm/retrieval/embedding/rerank/chatpipeline/modelcontext/searchutil/
      storageurl/webfetch，不得 import L3 业务域（基线计数只减不增）——这是阶段 4 模块化的前置。
+  R8 禁内联全限定名（依赖图完整性）：R1/R1b/R3 只解析 import 行，代码里写成
+     `com.ragagent.x.y.Z` 的引用是图盲区——字节码依赖早已存在，图里却没有边。
+     唯一允许形态是「必要消歧」（简单名已被已导入类型 / 本文件声明 / 同包顶层类型占用）。
+
+2026-10-08（B100）R8 上线时的基线重刷说明 —— **下面这些不是新增违例，而是"原先看不见"**：
+  清掉 1331 处内联 FQ 后，依赖图第一次完整暴露真实形态：
+    · 两两环 0 → 2 组：agent⇄auth、agent⇄im
+    · 间接环 0 → 1 组（8 域）：{agent,auth,chatpipeline,datasource,im,memory,session,webfetch}
+    · L2→L3 1 → 2 条：chatpipeline→knowledge 处数 12→15；webfetch→datasource 2 处（此前 0 边）
+  即：此前"环 0 / L2→L3 1 条"是**代理指标**的读数。基线已改用真实读数，之后只许减。
+  解环与 webfetch→datasource 端口化另立批次（阶段 4 前置）。
 """
 import json
 import pathlib
@@ -68,6 +79,112 @@ for _root in ("main/java", "test/java"):
         if _m and _m.group(1) != _exp:
             miss_decl.append(f"{_p}（声明 {_m.group(1)}，应为 {_exp}）")
 miss_decl = sorted(miss_decl)
+
+# R8：内联全限定名（依赖图完整性）——上面 R1/R1b/R3 都只解析 import 行，写成
+#     `com.ragagent.x.y.Z` 的引用是**图盲区**：字节码依赖早就存在，图里却没有边。
+#     2026-10-08 清理 1331 处后实测暴露：agent⇄auth、agent⇄im 两组环与一组 8 域
+#     间接环此前完全不可见（守卫一直报"环 0"）。
+#     允许的唯一形态是「必要消歧」：简单名在本文件作用域内已被占用——已导入其它包 /
+#     本文件已声明 / 同包有顶层同名类型。此时内联 FQ 不产生隐形依赖（依赖已被其它
+#     途径表达），且换成 import 根本无法编译。
+_R8_FQ = re.compile(r"(?<![.\w])com\.ragagent\.[A-Za-z][\w.]*")
+_R8_PKG = re.compile(r"^package\s+([\w.]+);", re.M)
+_R8_IMP = re.compile(r"^import\s+(?:static\s+)?([\w.]+);", re.M)
+_R8_TOP = re.compile(r"^(?:(?:public|final|abstract|sealed|non-sealed|strictfp)\s+)*"
+                     r"(?:class|interface|enum|record|@interface)\s+(\w+)", re.M)
+_R8_DECL = re.compile(r"^\s*(?:(?:public|protected|private|static|final|abstract|sealed|"
+                      r"non-sealed|strictfp)\s+)*(?:class|interface|enum|record|@interface)\s+(\w+)",
+                      re.M)
+
+
+def _r8_spans(line, in_block):
+    """切出非注释、非字符串片段（跨行块注释用状态机跟踪）。"""
+    spans, i, n, start = [], 0, len(line), 0
+    while i < n:
+        if in_block:
+            j = line.find("*/", i)
+            if j < 0:
+                return spans, True
+            i = j + 2
+            start, in_block = i, False
+            continue
+        c = line[i]
+        if c in "\"'":
+            if start < i:
+                spans.append((start, i))
+            q, i = c, i + 1
+            while i < n:
+                if line[i] == "\\":
+                    i += 2
+                    continue
+                if line[i] == q:
+                    i += 1
+                    break
+                i += 1
+            start = i
+        elif c == "/" and i + 1 < n and line[i + 1] == "/":
+            if start < i:
+                spans.append((start, i))
+            return spans, False
+        elif c == "/" and i + 1 < n and line[i + 1] == "*":
+            if start < i:
+                spans.append((start, i))
+            in_block, i = True, i + 2
+            start = i
+        else:
+            i += 1
+    if start < n:
+        spans.append((start, n))
+    return spans, in_block
+
+
+_r8_types, _r8_pkg_types = set(), defaultdict(set)
+for _p in ROOT.rglob("*.java"):
+    _t = _p.read_text(encoding="utf-8")
+    _pm = _R8_PKG.search(_t)
+    if not _pm:
+        continue
+    _pk = _pm.group(1)
+    _r8_types |= {f"{_pk}.{x}" for x in _R8_TOP.findall(_t)}
+    _r8_types.add(f"{_pk}.{_p.stem}")
+    _r8_pkg_types[_pk] |= set(_R8_TOP.findall(_t))
+
+r8_allowed, r8_violations = 0, []
+for _p in sorted(ROOT.rglob("*.java")):
+    _t = _p.read_text(encoding="utf-8")
+    _pm = _R8_PKG.search(_t)
+    if not _pm:
+        continue
+    _pk = _pm.group(1)
+    _imp = {x.rsplit(".", 1)[-1]: x for x in _R8_IMP.findall(_t)}
+    _decl = set(_R8_DECL.findall(_t)) | {_p.stem}
+    _in_blk = False
+    for _no, _line in enumerate(_t.splitlines(), 1):
+        if _in_blk:
+            _sp, _in_blk = _r8_spans(_line, _in_blk)
+            continue
+        _st = _line.strip()
+        if _st.startswith(("package ", "import ")):
+            continue
+        _sp, _in_blk = _r8_spans(_line, False)
+        for _a, _b in _sp:
+            _seg = _line[_a:_b]
+            if "com.ragagent." not in _seg:
+                continue
+            for _m in _R8_FQ.finditer(_seg):
+                _parts = _m.group(0).split(".")
+                _tf = next((".".join(_parts[:k]) for k in range(4, len(_parts) + 1)
+                            if ".".join(_parts[:k]) in _r8_types), None)
+                if _tf is None:
+                    continue
+                _simple, _tp = _tf.rsplit(".", 1)[-1], _tf.rsplit(".", 1)[0]
+                if ((_simple in _imp and _imp[_simple] != _tf)
+                        or (_simple in _decl and _tp != _pk)
+                        or (_tp != _pk and _simple in _r8_pkg_types.get(_pk, ()))):
+                    r8_allowed += 1
+                else:
+                    r8_violations.append(f"{_p.relative_to(ROOT)}:{_no} → {_m.group(0)}")
+r8_violations = sorted(r8_violations)
 
 common_beans, common_persistence = {}, {}
 common_persistence["(mapper/repository 子包)"] = sum(
@@ -174,9 +291,11 @@ print(f"common 实现痕迹（R6）：bean {sum(common_beans.values())} 个 / �
       f"{sum(old.get('common_beans', {}).values())}/{sum(old.get('common_persistence', {}).values())}）"
       + ("" if not (new_beans or new_persist) else
          f"；✗ 新增：bean {new_beans} / 持久层 {new_persist}"))
+print(f"内联全限定名（R8）：必要消歧 {r8_allowed} 处（允许）；违规 {len(r8_violations)} 处"
+      + ("" if not r8_violations else "；✗ " + " | ".join(r8_violations[:3])))
 
 if (new_cycles or new_cfg or new_l23 or new_scc_members or relapsed or l1_to_l3 or new_beans
-        or new_persist or miss_decl or grew_sites):
+        or new_persist or miss_decl or grew_sites or r8_violations):
     print("\n✗ 守卫失败：出现新的环（含间接环）、新的分层违例，或已解耦包对回流（见上）。")
     sys.exit(1)
 print("\n✓ 守卫通过：环与分层违例均未增加。")

@@ -33,6 +33,7 @@ import com.ragagent.datasource.mapper.SyncLogRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import com.ragagent.tracing.langfuse.LangfuseTracing;
 
 /**
  * 数据源的应用服务。
@@ -550,7 +551,7 @@ public class DataSourceService implements DataSourceSyncHandler {
         DataSourceSyncPayload payload = DataSourceSyncPayload.withTracing(
                 DataSourceSupport.taskInitiatorFromContext(), "manual", dsId, ds.getTenantId(),
                 syncLog.getId(), false, 0,
-                com.ragagent.tracing.langfuse.LangfuseTracing.inject());
+                LangfuseTracing.inject());
 
         try {
             // Outcome 在此路径未分支处理（重复任务 TASK_ID_CONFLICT 亦按已受理继续）——

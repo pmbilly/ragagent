@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import com.ragagent.common.memory.MemoryRecall;
 import com.ragagent.common.memory.MemoryRetrievalContext;
+import com.ragagent.model.domain.Model;
 
 /**
  * 跨会话长期记忆的写入、召回与记忆管理器。
@@ -714,7 +715,7 @@ public class MemoryService {
      * 这个工作区希望后台工作用哪个模型，而**悄悄**挑一个只有在事后可见时才可接受。</p>
      */
     String workspaceChatModelId() {
-        List<com.ragagent.model.domain.Model> models;
+        List<Model> models;
         try {
             models = modelResolver.listModels();
         } catch (RuntimeException e) {
@@ -724,7 +725,7 @@ public class MemoryService {
         if (models == null) {
             return "";
         }
-        for (com.ragagent.model.domain.Model model : models) {
+        for (Model model : models) {
             if (model == null || !"KnowledgeQA".equals(model.getType())) {
                 continue;
             }

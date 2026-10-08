@@ -26,6 +26,7 @@ import com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbBm25.SparseV
 import com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbRestClient.Json;
 import com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbRestClient.TencentVectorDbApiException;
 import com.ragagent.common.vectorstore.IndexConfig;
+import com.ragagent.retrieval.config.RetrievalEnvLookup;
 
 /**
  * 腾讯 VectorDB 检索引擎仓储。
@@ -134,7 +135,7 @@ public class TencentVectorDbRetrieveRepository
         if (database != null && !database.isEmpty()) {
             return database;
         }
-        String env = com.ragagent.retrieval.config.RetrievalEnvLookup.get(ENV_DATABASE);
+        String env = RetrievalEnvLookup.get(ENV_DATABASE);
         if (env != null && !env.isEmpty()) {
             return env;
         }
@@ -151,7 +152,7 @@ public class TencentVectorDbRetrieveRepository
                 return indexCfg.collectionPrefix;
             }
         }
-        String env = com.ragagent.retrieval.config.RetrievalEnvLookup.get(ENV_COLLECTION);
+        String env = RetrievalEnvLookup.get(ENV_COLLECTION);
         if (env != null && !env.isEmpty()) {
             return env;
         }
@@ -169,7 +170,7 @@ public class TencentVectorDbRetrieveRepository
         if (indexCfg != null && indexCfg.replicaNumber > 0) {
             return indexCfg.replicaNumber;
         }
-        String raw = com.ragagent.retrieval.config.RetrievalEnvLookup.get(ENV_REPLICA_NUMBER);
+        String raw = RetrievalEnvLookup.get(ENV_REPLICA_NUMBER);
         if (raw != null && !raw.trim().isEmpty()) {
             try {
                 int replicas = Integer.parseInt(raw.trim());

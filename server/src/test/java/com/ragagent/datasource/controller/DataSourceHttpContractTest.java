@@ -41,6 +41,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import com.ragagent.auth.apikey.filter.APIKeyGateInterceptor;
+import com.ragagent.common.security.APIKeyScopeContext;
+import com.ragagent.common.security.TenantAPIKeyScope;
+import com.ragagent.support.ContractJson;
 
 /**
  * 数据源 HTTP 层的契约测试（覆盖 17 个端点）。
@@ -827,14 +831,14 @@ class DataSourceHttpContractTest {
         APIKeyRouteAuthorizer a = new APIKeyRouteAuthorizer();
         APIKeyRoutePolicies.registerAll(a);
 
-        com.ragagent.common.security.TenantAPIKeyScope scoped =
-                new com.ragagent.common.security.TenantAPIKeyScope(
+        TenantAPIKeyScope scoped =
+                new TenantAPIKeyScope(
                         0L, "tenant", false, null, List.of("chat"));
         assertThat(gateAllows(a, scoped, "GET", "/api/v1/datasource/types")).isFalse();
         assertThat(gateAllows(a, scoped, "POST", "/api/v1/datasource/{id}/sync")).isFalse();
 
-        com.ragagent.common.security.TenantAPIKeyScope full =
-                new com.ragagent.common.security.TenantAPIKeyScope(0L, "tenant", true, null, null);
+        TenantAPIKeyScope full =
+                new TenantAPIKeyScope(0L, "tenant", true, null, null);
         assertThat(gateAllows(a, full, "GET", "/api/v1/datasource/types")).isTrue();
 
         // 行为层：scoped Key 打真实请求 → 403（纯字符串形态，不是 AppError 信封）
@@ -846,9 +850,9 @@ class DataSourceHttpContractTest {
     }
 
     private static boolean gateAllows(APIKeyRouteAuthorizer authorizer,
-                                      com.ragagent.common.security.TenantAPIKeyScope scope,
+                                      TenantAPIKeyScope scope,
                                       String method, String pattern) throws Exception {
-        com.ragagent.common.security.APIKeyScopeContext.set(scope);
+        APIKeyScopeContext.set(scope);
         try {
             org.springframework.mock.web.MockHttpServletRequest request =
                     new org.springframework.mock.web.MockHttpServletRequest(method, pattern);
@@ -856,11 +860,11 @@ class DataSourceHttpContractTest {
                     .BEST_MATCHING_PATTERN_ATTRIBUTE, pattern);
             org.springframework.mock.web.MockHttpServletResponse response =
                     new org.springframework.mock.web.MockHttpServletResponse();
-            boolean allowed = new com.ragagent.auth.apikey.filter.APIKeyGateInterceptor(authorizer)
+            boolean allowed = new APIKeyGateInterceptor(authorizer)
                     .preHandle(request, response, new Object());
             return allowed && response.getStatus() == 200;
         } finally {
-            com.ragagent.common.security.APIKeyScopeContext.clear();
+            APIKeyScopeContext.clear();
         }
     }
 
@@ -928,7 +932,7 @@ class DataSourceHttpContractTest {
 
     private static String raw(MvcResult r) throws Exception {
         // PR4 语义比较：与 golden 同侧归一（非 JSON 文本原样）
-        return com.ragagent.support.ContractJson.semantic(RAW_SEMANTIC_MAPPER,
+        return ContractJson.semantic(RAW_SEMANTIC_MAPPER,
                 r.getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8));
     }
 
@@ -942,7 +946,7 @@ class DataSourceHttpContractTest {
             resource = new org.springframework.core.io.ClassPathResource("contracts/" + name + ".json");
         }
         String text = new String(resource.getInputStream().readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
-        return com.ragagent.support.ContractJson.semantic(GOLDEN_SEMANTIC_MAPPER, text);
+        return ContractJson.semantic(GOLDEN_SEMANTIC_MAPPER, text);
     }
 
     /**
@@ -971,7 +975,7 @@ class DataSourceHttpContractTest {
 
     private static String mask(String s) {
         // PR4 语义比较入口：键序/转义归一后再掩码
-        s = com.ragagent.support.ContractJson.semantic(s);
+        s = ContractJson.semantic(s);
         // 先把运行时那个临时端口的 feed 地址换回录制时的 18099，再掩 UUID 与时间戳
         String out = normalizeFeed(s);
         out = UUID_VALUE.matcher(out).replaceAll("\"$1\":\"<uuid>\"");

@@ -25,6 +25,8 @@ import com.ragagent.event.EventType;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatResponse;
 import com.ragagent.llm.domain.TokenUsage;
+import com.ragagent.common.web.ToolJson;
+import com.ragagent.llm.domain.FunctionCall;
 
 /**
  * ReAct「Observe」段的协作者：上下文窗口管理与响应分析——上下文预算估算与
@@ -216,7 +218,7 @@ final class ObservePhase {
 
     /** 单条工具消息压到 maxTokens 内（keep 值二分）。 */
     static ChatMessage compactToolMessage(ChatMessage msg, int maxTokens,
-            com.ragagent.agent.TokenEstimator estimator) {
+            TokenEstimator estimator) {
         String content = msg.getContent();
         int runeCount = content.codePointCount(0, content.length());
         ChatMessage base = shallowCopy(msg);
@@ -359,7 +361,7 @@ final class ObservePhase {
                     c.setId(tc.getId());
                     c.setType("function");
                     c.setProviderMetadata(tc.getProviderMetadata());
-                    c.setFunction(new com.ragagent.llm.domain.FunctionCall(tc.getName(),
+                    c.setFunction(new FunctionCall(tc.getName(),
                             argsJson(tc.getArgs())));
                     llmCalls.add(c);
                 }
@@ -383,7 +385,7 @@ final class ObservePhase {
         if (args == null) {
             return "null";
         }
-        return com.ragagent.common.web.ToolJson.write(JSON.valueToTree(ActPhase.deepSortedMap(args)));
+        return ToolJson.write(JSON.valueToTree(ActPhase.deepSortedMap(args)));
     }
 
     /** 工具图片随结果消息走（工具结果图片的 VLM 描述内联在图片富化回调里）。 */

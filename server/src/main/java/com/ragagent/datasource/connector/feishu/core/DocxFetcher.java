@@ -18,6 +18,7 @@ import com.ragagent.datasource.connector.feishu.core.DocxMarkdown.MarkdownResult
 import com.ragagent.datasource.connector.feishu.core.DocxMarkdown.PendingAttachment;
 import com.ragagent.datasource.domain.FetchedItem;
 import com.ragagent.datasource.domain.SubtreeChildIds;
+import com.ragagent.datasource.ConnectorException;
 
 /**
  * docx 抓取（{@code DocxFetchInput} / {@code FetchDocxWithBlocks} /
@@ -131,7 +132,7 @@ public final class DocxFetcher {
         try {
             md = DocxMarkdown.blocksToMarkdown(client, blocks);
         } catch (RuntimeException e) {
-            throw new com.ragagent.datasource.ConnectorException(
+            throw new ConnectorException(
                     "convert blocks " + in.title + ": " + e.getMessage(), e);
         }
 
@@ -285,7 +286,7 @@ public final class DocxFetcher {
         try {
             exported = client.exportAndDownload(in.objToken, "docx");
         } catch (RuntimeException e) {
-            throw new com.ragagent.datasource.ConnectorException(
+            throw new ConnectorException(
                     "export " + in.title + " (docx): " + e.getMessage(), e);
         }
 

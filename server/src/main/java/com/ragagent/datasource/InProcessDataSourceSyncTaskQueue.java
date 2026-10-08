@@ -18,6 +18,7 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
 import com.ragagent.datasource.domain.DataSourceSyncPayload;
+import com.ragagent.tracing.langfuse.LangfuseTaskScope;
 
 /**
  * {@link DataSourceSyncTaskQueue} 的<b>进程内</b>实现：基于虚拟线程的队列
@@ -153,12 +154,12 @@ public class InProcessDataSourceSyncTaskQueue implements DataSourceSyncTaskQueue
             // 任务侧观测：在 worker 线程上续接上游
             // trace（无则开独立根），处理体包在 asynq.<type> span 内
             future = worker.submit(() -> {
-                try (com.ragagent.tracing.langfuse.LangfuseTaskScope scope =
-                             com.ragagent.tracing.langfuse.LangfuseTaskScope.start(
+                try (LangfuseTaskScope scope =
+                             LangfuseTaskScope.start(
                                      TASK_TYPE_DATASOURCE_SYNC, payload.tracing(),
                                      java.util.Map.of("data_source_id", payload.dataSourceId(),
                                              "sync_log_id", payload.syncLogId()),
-                                     com.ragagent.tracing.langfuse.LangfuseTaskScope
+                                     LangfuseTaskScope
                                              .previewPayload(body))) {
                     handler.handle(payload);
                 }

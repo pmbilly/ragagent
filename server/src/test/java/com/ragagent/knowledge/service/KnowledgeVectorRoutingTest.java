@@ -18,6 +18,7 @@ import com.ragagent.common.context.TenantContext;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
+import com.ragagent.knowledge.domain.Knowledge;
 
 /**
  * 写链改道的 H2 钉子：move 的 reuse_vectors 模式把 embeddings 行
@@ -58,7 +59,7 @@ class KnowledgeVectorRoutingTest {
     }
 
     private String knowledge(String id, String kbId, String embeddingModelId) {
-        com.ragagent.knowledge.domain.Knowledge k = new com.ragagent.knowledge.domain.Knowledge();
+        Knowledge k = new Knowledge();
         k.setId(id);
         k.setTenantId(TENANT);
         k.setKnowledgeBaseId(kbId);
