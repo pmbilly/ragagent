@@ -27,6 +27,7 @@ import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import com.ragagent.common.web.JdkHtmlToMarkdown;
 
 /**
  * {@link RssConnector} 的端到端对等测试（stub server，**不碰真实网络**）。

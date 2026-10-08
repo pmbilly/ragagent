@@ -1,4 +1,4 @@
-package com.ragagent.datasource.connector.rss;
+package com.ragagent.common.web;
 
 import java.util.ArrayDeque;
 import java.util.Deque;

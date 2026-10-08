@@ -1,9 +1,10 @@
-package com.ragagent.datasource.connector.rss;
+package com.ragagent.common.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.Test;
+import com.ragagent.common.text.Whitespace;
 
 /**
  * {@link JdkHtmlToMarkdown} 的**语料级**对等测试。
@@ -55,7 +56,7 @@ class JdkHtmlToMarkdownTest {
     private final JdkHtmlToMarkdown converter = new JdkHtmlToMarkdown();
 
     private String md(String html) {
-        return RssUtil.trimUnicodeWhitespace(converter.convert(html));
+        return Whitespace.trimSpace(converter.convert(html));
     }
 
     @Test
@@ -186,7 +187,7 @@ class JdkHtmlToMarkdownTest {
     void htmlToMarkdownFallbackMatchesGo() {
         // 回落语义：空白输入 -> ""；
         // 转换失败或结果为空 -> 返回原 html 去首尾空白。
-        assertThat(RssUtil.trimUnicodeWhitespace(converter.convert("   "))).isEmpty();
+        assertThat(Whitespace.trimSpace(converter.convert("   "))).isEmpty();
         // 一个"转换器总是抛错"的替身：走回落分支
         HtmlToMarkdown failing = html -> {
             throw new HtmlConversionException("boom");
@@ -196,17 +197,17 @@ class JdkHtmlToMarkdownTest {
 
     /** {@code RssConnector.htmlToMarkdown} 的三条分支（私有方法，就地重写以便单测）。 */
     private static String fallback(HtmlToMarkdown converter, String html) {
-        if (RssUtil.trimUnicodeWhitespace(html).isEmpty()) {
+        if (Whitespace.trimSpace(html).isEmpty()) {
             return "";
         }
         try {
             String result = converter.convert(html);
-            if (result == null || RssUtil.trimUnicodeWhitespace(result).isEmpty()) {
-                return RssUtil.trimUnicodeWhitespace(html);
+            if (result == null || Whitespace.trimSpace(result).isEmpty()) {
+                return Whitespace.trimSpace(html);
             }
-            return RssUtil.trimUnicodeWhitespace(result);
+            return Whitespace.trimSpace(result);
         } catch (RuntimeException e) {
-            return RssUtil.trimUnicodeWhitespace(html);
+            return Whitespace.trimSpace(html);
         }
     }
 }

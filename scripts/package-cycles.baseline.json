@@ -6,15 +6,10 @@
     [
       "chatpipeline",
       "knowledge"
-    ],
-    [
-      "webfetch",
-      "datasource"
     ]
   ],
   "l2_to_l3_sites": {
-    "chatpipeline->knowledge": 15,
-    "webfetch->datasource": 2
+    "chatpipeline->knowledge": 15
   },
   "common_beans": {
     "crypto": 1,

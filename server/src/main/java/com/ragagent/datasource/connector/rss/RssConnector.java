@@ -17,6 +17,8 @@ import com.ragagent.datasource.domain.DataSourceConstants;
 import com.ragagent.datasource.domain.FetchedItem;
 import com.ragagent.datasource.domain.Resource;
 import com.ragagent.datasource.domain.SyncCursor;
+import com.ragagent.common.web.HtmlToMarkdown;
+import com.ragagent.common.web.JdkHtmlToMarkdown;
 
 /**
  * RSS / Atom 数据源连接器。

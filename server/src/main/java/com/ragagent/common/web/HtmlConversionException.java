@@ -1,4 +1,4 @@
-package com.ragagent.datasource.connector.rss;
+package com.ragagent.common.web;
 
 /**
  * HTML → Markdown 转换失败。

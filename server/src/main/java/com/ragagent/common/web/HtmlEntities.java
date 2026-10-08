@@ -1,4 +1,4 @@
-package com.ragagent.datasource.connector.rss;
+package com.ragagent.common.web;
 
 import java.util.Map;
 
@@ -10,7 +10,7 @@ import java.util.Map;
  *   <li>{@link #decode(String)}：给 {@link JdkHtmlToMarkdown} 用——它拿到的是<b>裸 HTML</b>
  *       （不经 DOM），文本节点与属性值里的 {@code &amp;} / {@code &nbsp;} / {@code &#169;}
  *       都要自己解。</li>
- *   <li>{@link #makeXmlSafe(String)}：给 {@link JdkXmlFeedParser} 用——JDK 的 DOM 解析器是
+ *   <li>{@link #makeXmlSafe(String)}：给 RSS 的 XML 预处理器用——JDK 的 DOM 解析器是
  *       <b>严格</b>的，{@code &nbsp;} 这种未在 DTD 里声明的实体是<b>致命错误</b>；
  *       而参照解析器 gofeed 的 goxpp 是宽松的 pull parser，连裸 {@code &} 都放行。
  *       这个预处理把"未声明的命名实体"改写成数字实体，把裸 {@code &} 转义，
@@ -30,7 +30,14 @@ import java.util.Map;
  * <p>对表里没有的名字，本实现原样返回（与参照实现的 {@code UnescapeString("&foo;")} 行为一致）
  * ——分叉只发生在"参照认识、本表没有"的那部分。</p>
  */
-final class HtmlEntities {
+/**
+ * <p>B113 由 {@code datasource.connector.rss} 迁入 L1：本类与
+ * {@link JdkHtmlToMarkdown} 同为零域依赖的 HTML 工具，被 RSS 连接器与
+ * {@code webfetch} 两侧共用；留在 {@code datasource} 会让 {@code webfetch}
+ * 为了一个实体表而依赖整个 datasource 业务域（B113 实测：该边本来就在，
+ * 只是写成了内联全限定名，图里看不见）。</p>
+ */
+public final class HtmlEntities {
 
     /** 名字 → 码点。覆盖 Latin-1、常见标点、常见符号。 */
     private static final Map<String, Integer> NAMED = Map.ofEntries(
@@ -85,7 +92,7 @@ final class HtmlEntities {
      * <p>{@code &} 后面没有合法实体形状时原样保留
      * （{@code "AT&T"} 还是 {@code "AT&T"}）。</p>
      */
-    static String decode(String s) {
+    public static String decode(String s) {
         if (s == null || s.indexOf('&') < 0) {
             return s;
         }
@@ -157,7 +164,7 @@ final class HtmlEntities {
      * feed（{@code encoding="gb2312"} 之类）也能原样透给解析器，
      * 由解析器按 XML 声明里的编码去解。</p>
      */
-    static String makeXmlSafe(String source) {
+    public static String makeXmlSafe(String source) {
         if (source == null || source.indexOf('&') < 0) {
             return source;
         }

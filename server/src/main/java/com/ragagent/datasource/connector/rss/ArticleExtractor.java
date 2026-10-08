@@ -7,7 +7,7 @@ package com.ragagent.datasource.connector.rss;
  * <p>目标语义是 {@code codeberg.org/readeck/go-readability/v2}
  * （正文抽取 + 渲染 + 标题）：
  * 把文章页的导航、广告、页脚剥掉，只留下正文 HTML，再交给
- * {@link HtmlToMarkdown} 转 Markdown。</p>
+ * {@link com.ragagent.common.web.HtmlToMarkdown} 转 Markdown。</p>
  * <p><b>当前构建没有等价实现</b>。所以这里做成接缝，
  * 默认实现是 {@link UnavailableArticleExtractor}——它<b>永远抛错</b>。
  * {@code resolveItem} 检测到抽取器不可用（{@code fullTextAvailable}）
@@ -29,13 +29,13 @@ package com.ragagent.datasource.connector.rss;
  *   <li><b>指纹依赖内容</b>：{@code contentFingerprint} 算的是最终 Markdown，
  *       内容不同 → 指纹不同（换抽取实现会使既有游标指纹失配，第一次增量会重灌一轮）。</li>
  * </ol>
- * <p>三块的清单见 {@link HtmlToMarkdown} 与 {@link FeedParser} 的类注释。</p>
+ * <p>三块的清单见 {@link com.ragagent.common.web.HtmlToMarkdown} 与 {@link FeedParser} 的类注释。</p>
  *
  * <h2>接缝在这里，怎么恢复</h2>
  * <p>{@link RssConnector} 的构造器可注入任意实现；恢复全文抓取只需提供一个
  * "读 HTML → 抽正文 → 回 HTML 字符串 + 标题"的实现，
  * 连接器与 {@code resolveItem} 一行都不用改。返回的 HTML 会被
- * {@link HtmlToMarkdown} 转成 Markdown。</p>
+ * {@link com.ragagent.common.web.HtmlToMarkdown} 转成 Markdown。</p>
  */
 public interface ArticleExtractor {
 
@@ -54,7 +54,7 @@ public interface ArticleExtractor {
     /**
      * 抽取结果。
      *
-     * @param contentHtml 正文 HTML（会经 {@link HtmlToMarkdown} 转成 Markdown）
+     * @param contentHtml 正文 HTML（会经 {@link com.ragagent.common.web.HtmlToMarkdown} 转成 Markdown）
      * @param title       页面 {@code <title>}；空表示没抽到
      */
     record ExtractedArticle(String contentHtml, String title) {

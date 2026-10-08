@@ -22,6 +22,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+import com.ragagent.common.web.HtmlEntities;
 
 /**
  * {@link FeedParser} 的默认实现：<b>只用 JDK 自带的 DOM 解析器</b>，实现 gofeed 的

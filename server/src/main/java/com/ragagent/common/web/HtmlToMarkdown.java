@@ -1,4 +1,4 @@
-package com.ragagent.datasource.connector.rss;
+package com.ragagent.common.web;
 
 /**
  * <b>接缝（seam）</b>：HTML → Markdown。
