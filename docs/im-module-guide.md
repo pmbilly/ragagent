@@ -37,7 +37,7 @@ graph TB
 
     subgraph im_模块
         CTRL["controller/（2 个，10 个端点）<br/>渠道 CRUD + 回调面"]
-        SVC["service/（8 个）<br/>ImService 门面 + QA/会话/出站/附件协作者"]
+        SVC["service/（12 个）<br/>ImService 门面 + QA/会话/出站/附件协作者<br/>+ 4 个 Ops（停止/闸门/知识桥/渠道运行时）"]
         RT["runtime/（19 个）<br/>适配器接口、命令、队列、Redis 面、工具显示"]
         CH9["九个渠道子包（42 个）<br/>feishu/wechat/wecom/dingtalk/slack/<br/>mattermost/telegram/qqbot/yunzhijia"]
         DOM["domain/（2 实体）+ mapper/（2 接口）"]
@@ -61,7 +61,7 @@ graph TB
     CH9 -. 实现接口 .-> RT
 ```
 
-**三个必须知道的数字**：最大类 `ImService` **1,086 行**——**全仓现存最大类**（2026-10-06/07 五个 feat 批把它从 664 行顶回去的，HANDOFF §14.3 "im ≥800 清零"的结论已过时，见 §9）；`runtime/` 19 文件 3,645 行（占本模块 21%，九渠道共享的底座）；包外消费方**只有 1 个文件**（`config/ImAdapterWiringConfig`，注册 10 个平台工厂）。
+**三个必须知道的数字**：最大类 `ImService` **554 行**（B123~B127 四刀 **1,091→554 已出榜**：停止链路 / 入口闸门 / 知识桥 / 渠道运行时四个 Ops 外提；"10-06/07 回涨到 1,086、全仓最大"的记录与 §6-E 的复切建议均已由这四刀结清）；`runtime/` 19 文件 3,645 行（占本模块 21%，九渠道共享的底座）；包外消费方**只有 1 个文件**（`config/ImAdapterWiringConfig`，注册 10 个平台工厂）。
 
 ---
 
@@ -72,7 +72,7 @@ graph TB
 | 子包 | 文件/行数 | 放什么 | **不放什么** |
 |---|---|---|---|
 | `controller/` | 2 / 643 | `ImChannelController`（CRUD + 微信扫码）、`ImCallbackController`（回调面） | 业务逻辑、平台协议细节（→ 各渠道子包） |
-| `service/` | 8 / 2,701 | 门面 `ImService` + 6 个协作者（QA 请求底座 / 会话解析 / 出站整形 / 流式管线 / QA 执行 / 附件）+ `ImChannelService`（CRUD 钩子） | 平台协议、队列与 Redis 实现（→ `runtime/`） |
+| `service/` | 12 / 2,961 | 门面 `ImService` + 6 个协作者（QA 请求底座 / 会话解析 / 出站整形 / 流式管线 / QA 执行 / 附件）+ **4 个 Ops**（`ImStopOps` 停止链路 / `ImInboundGuardOps` 入口闸门 / `ImKnowledgeBridgeOps` 知识桥 / `ImChannelRuntimeOps` 渠道运行时；B123~B127 逐刀外提）+ `ImChannelService`（CRUD 钩子） | 平台协议、队列与 Redis 实现（→ `runtime/`） |
 | `runtime/` | 19 / 3,645 | 渠道无关底座：`AdapterInterfaces`（Adapter/StreamSender/FileDownloader）、`IncomingMessage`/`ReplyMessage`、`Commands`+`ImCommandSet`（斜杠命令）、`QaQueue`+`ImRedisStore`+`ImRedisKeys`、`ImSupervisor`（长连接守护）、`ToolDisplay`/`ThinkDisplay`/`StreamSection`（工具显示，字节契约见 §8）、`FeishuWecomCrypt`/`ImAdapterVerify`（验签）、`CallbackExchange`（servlet 窄抽象） | 某渠道专有逻辑（→ 该渠道子包） |
 | `feishu/` | 10 / 2,210 | 门面 `FeishuAdapter` 331 + 4 协作者（Callback/Send/CardStream/Media Ops）+ `FeishuLongConnClient` + `FeishuRegion`（feishu/lark 两朵云）+ `LarkEventConverter`/`LarkFrame` | — |
 | `wecom/` | 5 / 1,615 | **两个适配器**（`WecomWSAdapter` 长连接 + `WecomWebhookAdapter` 回调）+ `WecomLongConnClient` + `WecomSupport` | — |
@@ -111,7 +111,7 @@ graph LR
 | 谁消费 im | **1 个文件**：`config/ImAdapterWiringConfig` | 注册 10 个平台工厂（telegram/slack/qqbot/wecom/feishu/lark/dingtalk/wechat/mattermost/yunzhijia）+ 延迟注入 `StreamManager`；**未注册的平台 `startChannel` 只打 WARN，渠道保持未启动，绝不静默假装成功**（该类 javadoc 原文） |
 | im 消费谁（import 条数） | common 29 / session 17 / agent 9 / event 5 / knowledge 4 / stream 3 | session 的消费集中在 `service/` 的 **6 个文件**（ImService、ImQaRunner、ImQaRequests、ImSessionResolver、ImStreamPipeline、ImAttachmentPreparer）；agent 的 9 条里有 2 条是 domain 实体借 `JsonbRawStringTypeHandler`（§2.2） |
 
-**门面是本模块的枢纽**：`ImService` 保留渠道生命周期、消息入口、命令执行三块公共面，五个 QA/管线协作者经包内可见字段回引门面（§14.7.4 拆分先例）。**注意**：2026-10-06 起的五个 feat 批又往门面里加了 Redis 面（去重/限流/选主/广播/跨实例 /stop）与附件入库段——现在它 again 是全仓最大类，动它前先看 §6-E。
+**门面是本模块的枢纽**：`ImService` 保留消息入口、命令执行、附件入口与装配面，9 个协作者经包内可见字段回引门面（§14.7.4 拆分先例）。**B123~B127 四刀后的分工**：`ImStopOps` 跨实例 /stop 全链路、`ImInboundGuardOps` 去重与限流、`ImKnowledgeBridgeOps` 知识库接面（命令 KB/检索 + 附件入库）、`ImChannelRuntimeOps` 渠道生命周期 + 选主 + 配置广播。**注意**：`ImChannelRuntimeOps` 里的 `startChannelsOnReady`（重启后按库启动全部渠道）**全仓无调用者**——疑似未接线，登记在案（详见 HANDOFF B127）；`ImKnowledgeBridgeOps` 的 KB/检索两桩同理。
 
 ---
 
@@ -315,9 +315,9 @@ flowchart LR
 | 改流式卡片 / 工具步骤显示 | `feishu/FeishuCardStreamOps` + `runtime/StreamSection` / `ToolDisplay` / `ThinkDisplay` | `ToolDisplay` 是**字节契约**（`w5g1-im-foundation.tsv`），文案与 Web 端 agentStream 对齐 |
 | 改会话映射粒度 / 自愈 | `service/ImSessionResolver` + `domain/ChannelSessionEntity` | `session_mode` 校验在 `ImChannelService`，PG CHECK 在 baseline SQL 兜底 |
 | 改斜杠命令 | `runtime/Commands`（意图声明）+ `runtime/ImCommandSet`（注册序 help→info→search→stop→clear）+ `ImService.handleCommand`（副作用） | 命令本身不碰 DB/服务（`Commands` javadoc 约定）；`isAgentMode` = `agent_mode == "smart-reasoning"` |
-| 改去重 / 限流 / 队列限额 | `ImService`（isDuplicate/rateLimitAllow）+ `runtime/QaQueue` + `ImRedisStore` + `ImRedisKeys` | 故障语义三分：去重 fail-closed、限流回落本地、Redis 异常不阻塞主流程；**键名不随版本改名** |
+| 改去重 / 限流 / 队列限额 | `service/ImInboundGuardOps`（isDuplicate/rateLimitAllow）+ `runtime/QaQueue` + `ImRedisStore` + `ImRedisKeys` | 故障语义三分：去重 fail-closed、限流回落本地、Redis 异常不阻塞主流程；**键名不随版本改名** |
 | 改 QA 编排 | full → `service/ImQaRunner`；stream → `service/ImStreamPipeline` | `output_mode` 在 `ImQaRunner` 判（`"full".equals(...)`）；两支共享 `ImQaRequests` 底座 |
-| 改附件下载 / 异步入库 | `service/ImAttachmentPreparer` + `ImService` 附件异步入库段 | 扩展名白名单 `SUPPORTED_KB_FILE_EXTS`（15 种）在 `ImService` 常量区；入库走 `KnowledgeService` |
+| 改附件下载 / 异步入库 | `service/ImAttachmentPreparer` + `service/ImKnowledgeBridgeOps` 附件异步入库段 | 扩展名白名单 `SUPPORTED_KB_FILE_EXTS`（15 种）在 `ImKnowledgeBridgeOps` 常量区；入库走 `KnowledgeService` |
 | 改渠道 CRUD / 校验钩子 | `controller/ImChannelController` + `service/ImChannelService`（beforeCreate/beforeSave/bot_identity） | mode/outputMode/sessionMode 缺省值在控制器与钩子**两处**各一份 |
 | 给渠道表加字段 | `domain/` 实体 + `mapper/` 显式 SQL | **schema 两处同改**：`migrations/versioned/V1__baseline.sql` + `server/src/test/java/com/ragagent/TestSchema.java`（否则 H2 报 Column not found） |
 | 改长连接守护策略 | `runtime/ImSupervisor` + 各渠道 Client | 周期重建决定"僵尸连接最坏中断时长"，动前看 `ImSupervisor` javadoc |
@@ -342,11 +342,11 @@ cd frontend && npx vue-tsc --build --force && npm test
 
 **B. 加渠道字段**：domain 实体 → baseline SQL + `TestSchema` → 控制器响应行（**三套键序**里对应那套）→ `imc-*` 金片重录 → 全绿。凭据类字段只进资源行，**列表行永远只出 `credentialsConfigured`**。
 
-**C. 改消息管线（去重/限流/命令/会话）**：`ImService` 对应段 → 语义三分的故障路径各补一条用例（Redis 在/不在）→ `ImPipelineTest` 三场景绿 → 全绿。
+**C. 改消息管线（去重/限流/命令/会话）**：`ImInboundGuardOps`（去重/限流）+ `ImService`（消息入口与命令）→ 语义三分的故障路径各补一条用例（Redis 在/不在）→ `ImPipelineTest` 三场景绿 → 全绿。
 
 **D. 动 Redis 面**：`ImRedisKeys` 键名**不改名**（部署面契约）；新增键先在 javadoc 登记用途；故障分支写"跳过全局检查"语义并配用例（`ImRedisStoreTest` 形态）。
 
-**E. 切 `ImService`（1,086 行，迟早要做）**：沿类内 `// ── X 段 ──` 注释边界（调谐参数 / 渠道生命周期 / 广播+选主 / 附件入库 / 消息入口 / 命令执行）→ 按 HANDOFF §14.7.4 的 I1~I5 刀序先抽"被依赖方"→ 协作者经包内可见字段回引门面 → 每刀忠实性逐字比对（§13.5）→ `scripts/refactor-harness.sh` 流水线 → 全绿 + 环守卫。
+**E. `ImService` 已切完（B123~B127 四刀，1,091→554，出榜）**：刀序与簇边界（可直接复用到别的大类）——①**停止链路**（`ImStopOps`；与门面共享 `inflight` 表 ⇒ 传引用 + 留薄转发）→ ②**入口闸门**（`ImInboundGuardOps`；两张回落表本簇独占 ⇒ **随迁**、无需转发）→ ③**知识桥**（`ImKnowledgeBridgeOps`；顺带删掉与 `ImFormat` 重复的 `imPlatformToChannel`）→ ④**渠道运行时**（`ImChannelRuntimeOps`；整块 313 行连续，唯一出向依赖是消息回调 ⇒ 注入 `BiConsumer`）。四刀共同纪律：字段尽量**随迁**（能搬就搬）、必须共享的**传引用**、外部调用方**留同名薄转发**、每刀脚本化**逐字保真核对**（§13.5）。
 
 ---
 
@@ -360,7 +360,7 @@ cd frontend && npx vue-tsc --build --force && npm test
 6. **未注册平台工厂 = 静默不启动**：`startChannel` 只打 WARN，回调 503 "channel not available"（`ImAdapterWiringConfig` javadoc）。排查"渠道配了但没反应"第一件事看启动日志有没有这行 WARN。
 7. **jsonb 是 raw 直通，typeHandler 借住 `agent/management/mapper`**（§2.2）：credentials/metadata 没有 Java 值类型契约，改动读写方前先确认对端（前端渠道设置页）期望的键序与键名。
 8. **Redis 故障语义三分**（`ImService`/`ImRedisStore`/`QaQueue` javadoc）：去重 fail-closed（丢消息）、限流回落本地滑窗、全局并发检查跳过。写测试时三分支都要覆盖，别只测"Redis 正常"。
-9. **切 `ImService` 前重读 §14.7.4**：五个协作者（ImQaRequests/ImSessionResolver/ImOutboundFormatter/ImStreamPipeline/ImQaRunner）已就位，但 2026-10-06/07 的 feat 批又往门面加了多实例与附件段——**现在的 1,086 行与当年 1,445 行的簇边界不同**，重新侦察再落刀。
+9. **动 `ImService` 前先看它的协作者分区**：B123~B127 后门面只剩消息入口/命令/附件入口/装配面，四块运行时分居 4 个 Ops；改多实例面（去重/限流/选主/广播/跨实例 /stop）去对应 Ops，别往门面里加。
 
 ---
 
@@ -384,7 +384,7 @@ cd frontend && npx vue-tsc --build --force && npm test
 
 | 项 | 性质 | 建议 |
 |---|---|---|
-| **`ImService` 1,086 行——重新越过 800 阈值，且是全仓现存最大类**（2026-10-01 拆分至 664 后，10-06/07 五个 feat 批回填：附件面、Redis 去重/限流、广播+选主、跨实例 /stop） | 结构债（HANDOFF §14.3 "im ≥800 清零"的结论已过时） | 按 §6-E 再走一轮切片；消息入口段与渠道生命周期段的注释边界已成形，§14.7.4 刀序可直接复制，但簇边界要重新侦察 |
+| ~~**`ImService` 1,086 行——重新越过 800 阈值，且是全仓现存最大类**~~ **已解决（2026-10-08 B123~B127）**：四刀 1,091→554，随刀收紧体量棘轮，豁免登记已被守卫自动清理 ⇒ 出榜 | —（结清） | — |
 | HTTP 契约仍是 Go 期形态（字符串 error、三套键序、无 AppError 结构） | 契约债 | 已按 §14.9s 换掉 17 处 `@JsonProperty`，剩余是**信封形态**问题；换锚按 §2-4 + 同 PR 带前端 + `imc-*` 重录，勿与结构批混（§3 红线） |
 | wechat iLink 扫码出站是接缝（本仓不实现外呼） | 产品缺口 | 真接入时补 `WechatQRCodeService` bean 即接线（控制器已留绑定分支与错误形态，`@Autowired(required=false)`） |
 | `wechat` 长轮询 / 独占长连接渠道在多实例下的 leader 行为依赖 Redis 接入 | 部署面 | 单实例恒 leader（进程内）；上多实例前核对 `im.redis-enabled` 开关与 `ImRedisKeys` 键面 |
