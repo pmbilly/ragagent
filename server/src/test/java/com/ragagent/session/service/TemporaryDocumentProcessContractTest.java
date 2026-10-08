@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import com.ragagent.llm.asr.AsrTranscriber;
-import com.ragagent.common.tenant.Tenant;
+import com.ragagent.tenant.Tenant;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.knowledge.client.DocReaderClient;

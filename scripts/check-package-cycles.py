@@ -52,6 +52,9 @@ l1_to_l3 = sorted((a, b) for a in L1_CORE for b in edge.get(a, ()) if b in L3)
 BEAN_RE = re.compile(r"^\s*@(Component|Service|Repository|Configuration)\b", re.M)
 PERSIST_RE = re.compile(r"^import com\.ragagent\.[\w.]+\.(mapper|repository)\.", re.M)
 common_beans, common_persistence = {}, {}
+common_persistence["(mapper/repository 子包)"] = sum(
+    1 for _d in (ROOT / "common").rglob("*")
+    if _d.is_dir() and _d.name in ("mapper", "repository") and any(_d.glob("*.java")))
 for _p in sorted((ROOT / "common").rglob("*.java")):
     _pkg = str(_p.parent.relative_to(ROOT / "common")) if _p.parent != ROOT / "common" else "."
     _txt = _p.read_text(encoding="utf-8")

@@ -7,8 +7,8 @@ import java.util.Date;
 import javax.crypto.spec.SecretKeySpec;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.tenant.APIPrincipalConfig;
-import com.ragagent.common.tenant.Tenant;
+import com.ragagent.tenant.APIPrincipalConfig;
+import com.ragagent.tenant.Tenant;
 import com.ragagent.auth.dto.APIPrincipalDtos.APIPrincipalConfigRequest;
 import com.ragagent.auth.dto.APIPrincipalDtos.APIPrincipalConfigResponse;
 import com.ragagent.auth.dto.APIPrincipalDtos.APIPrincipalTestTokenRequest;

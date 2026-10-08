@@ -35,6 +35,8 @@ class AgentConfigKeyUsageTest {
     /** 合法 snake 面（按路径前缀/片段排除）。 */
     private static final List<String> ALLOWED_PREFIXES = List.of(
             "common/tenant/",            // B96：原 auth/domain/tenantconfig（租户配置视图，键名由 jsonb 决定）
+            "tenant/",                   // B104：租户域由 common/tenant 搬出（RetrievalConfig/ParserEngineConfig
+                                         //       的 snake 字面量是 tenants 表 jsonb 列键，由 Go 侧与迁移决定）
             "event/payload", "llm/", "common/pipeline/SearchParams",
             "tracing/langfuse", "datasource/connector", "stream/", "mcp/oauth", "mcp/domain/McpService",
             "retrieval/engine/doris", "retrieval/domain/ImageInfo", "rerank/RankResult",

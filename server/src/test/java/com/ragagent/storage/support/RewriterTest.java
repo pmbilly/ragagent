@@ -371,7 +371,7 @@ class RewriterTest {
             resolved.incrementAndGet();
             return new StorageBackendResolver.Resolved(new StubFileService());
         };
-        com.ragagent.common.tenant.Tenant tenant = new com.ragagent.common.tenant.Tenant();
+        com.ragagent.tenant.Tenant tenant = new com.ragagent.tenant.Tenant();
         tenant.setId(10002L);
 
         FileServiceResolver resolver = new FileServiceResolver(tenant, null, backendResolver);

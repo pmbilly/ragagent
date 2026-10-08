@@ -29,5 +29,7 @@
     "security": 1,
     "storage": 1
   },
-  "common_persistence": {}
+  "common_persistence": {
+    "(mapper/repository 子包)": 0
+  }
 }

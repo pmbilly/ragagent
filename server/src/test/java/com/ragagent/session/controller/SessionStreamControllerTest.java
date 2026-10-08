@@ -73,7 +73,7 @@ class SessionStreamControllerTest {
                 // （与 A3-3 接线前传 null 的可见行为一致）
                 new com.ragagent.auth.service.TenantService(null, null, null) {
                     @Override
-                    public com.ragagent.common.tenant.Tenant getTenantById(long id) {
+                    public com.ragagent.tenant.Tenant getTenantById(long id) {
                         return null;
                     }
                 });

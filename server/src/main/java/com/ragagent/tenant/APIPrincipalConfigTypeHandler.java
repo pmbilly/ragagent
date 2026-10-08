@@ -1,4 +1,4 @@
-package com.ragagent.common.tenant;
+package com.ragagent.tenant;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;

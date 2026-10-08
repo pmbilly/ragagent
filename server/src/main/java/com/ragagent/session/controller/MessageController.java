@@ -240,7 +240,7 @@ public class MessageController {
      * 读者租户实体（A3-3 接线；此前恒 null）——Rewriter 用它解析"引用不带 provider
      * scheme 时的租户默认 provider"。
      */
-    private com.ragagent.common.tenant.Tenant currentTenant() {
+    private com.ragagent.tenant.Tenant currentTenant() {
         Long tid = com.ragagent.common.context.TenantContext.currentTenantId();
         try {
             return tid == null || tid <= 0 ? null : tenantService.getTenantById(tid);

@@ -8,8 +8,8 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
-import com.ragagent.common.tenant.Tenant;
-import com.ragagent.common.tenant.TenantConfigLookup;
+import com.ragagent.tenant.Tenant;
+import com.ragagent.tenant.TenantLookup;
 import com.ragagent.llm.chat.ImageResolver;
 import com.ragagent.storage.domain.StoredResource;
 import com.ragagent.storage.service.ResourceCatalogService;
@@ -52,11 +52,11 @@ public class ChatLocalImageResolverWiring implements InitializingBean, Disposabl
     private static final Logger log = LoggerFactory.getLogger(ChatLocalImageResolverWiring.class);
 
     private final ResourceCatalogService catalog;
-    private final TenantConfigLookup tenantConfigLookup;
+    private final TenantLookup tenantConfigLookup;
     private final StorageFileResolver storageResolver;
 
     public ChatLocalImageResolverWiring(ResourceCatalogService catalog,
-                                        TenantConfigLookup tenantConfigLookup,
+                                        TenantLookup tenantConfigLookup,
                                         StorageFileResolver storageResolver) {
         this.catalog = catalog;
         this.tenantConfigLookup = tenantConfigLookup;

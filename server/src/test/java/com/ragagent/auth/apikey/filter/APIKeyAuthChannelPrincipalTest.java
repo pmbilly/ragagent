@@ -17,8 +17,8 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 import com.ragagent.common.security.APIKeyScopeContext;
 import com.ragagent.auth.apikey.service.TenantAPIKeyService;
-import com.ragagent.common.tenant.Tenant;
-import com.ragagent.common.tenant.APIPrincipalConfig;
+import com.ragagent.tenant.Tenant;
+import com.ragagent.tenant.APIPrincipalConfig;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.auth.service.UserService;
 import com.ragagent.common.context.TenantContext;
@@ -81,7 +81,7 @@ class APIKeyAuthChannelPrincipalTest {
         request.addHeader("X-Tenant-ID", String.valueOf(TENANT));
         request.setRequestURI("/api/v1/agents");
         if (config != null) {
-            com.ragagent.common.tenant.Tenant bound = tenantService.getTenantById(TENANT);
+            com.ragagent.tenant.Tenant bound = tenantService.getTenantById(TENANT);
             bound.setApiPrincipalConfig(config);
         }
         MockHttpServletResponse response = new MockHttpServletResponse();

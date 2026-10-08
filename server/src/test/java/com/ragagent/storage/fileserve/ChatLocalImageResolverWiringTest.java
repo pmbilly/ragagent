@@ -19,7 +19,7 @@ import java.util.Base64;
 import java.util.Optional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.tenant.Tenant;
+import com.ragagent.tenant.Tenant;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.storage.domain.StorageBackend;
 import com.ragagent.llm.chat.ImageResolver;

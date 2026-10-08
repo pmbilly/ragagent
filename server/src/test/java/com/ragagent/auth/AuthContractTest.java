@@ -10,11 +10,11 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.regex.Pattern;
 
-import com.ragagent.common.tenant.Tenant;
+import com.ragagent.tenant.Tenant;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.domain.UserPreferences;
-import com.ragagent.common.tenant.mapper.TenantMapper;
+import com.ragagent.tenant.mapper.TenantMapper;
 import com.ragagent.auth.mapper.TenantMemberMapper;
 import com.ragagent.TestSchema;
 import com.ragagent.auth.mapper.UserMapper;

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.tenant.Tenant;
+import com.ragagent.tenant.Tenant;
 import com.ragagent.auth.domain.TenantInvitation;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.common.tenant.TenantRole;

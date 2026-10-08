@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.tenant.Tenant;
+import com.ragagent.tenant.Tenant;
 import com.ragagent.common.crypto.CryptoService;
 import com.ragagent.common.storage.StorageRuntimeEnv;
 import com.ragagent.storage.config.StorageProviderEnv;
@@ -409,10 +409,10 @@ public class StorageFileResolver {
         String dir = baseDir == null || baseDir.isEmpty()
                 ? StoragePaths.localStorageBaseDir() : baseDir;
         try {
-            com.ragagent.common.tenant.StorageEngineConfig typed = sec == null
-                    ? new com.ragagent.common.tenant.StorageEngineConfig()
+            com.ragagent.tenant.StorageEngineConfig typed = sec == null
+                    ? new com.ragagent.tenant.StorageEngineConfig()
                     : CONFIG_MAPPER.convertValue(sec,
-                            com.ragagent.common.tenant.StorageEngineConfig.class);
+                            com.ragagent.tenant.StorageEngineConfig.class);
             com.ragagent.storage.provider.FileServiceFactory.Created created =
                     com.ragagent.storage.provider.FileServiceFactory.fromStorageConfig(p, typed, dir);
             if (created == null || created.service() == null) {

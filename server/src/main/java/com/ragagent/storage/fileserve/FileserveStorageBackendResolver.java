@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import org.springframework.stereotype.Component;
 
-import com.ragagent.common.tenant.Tenant;
-import com.ragagent.common.tenant.TenantConfigLookup;
+import com.ragagent.tenant.Tenant;
+import com.ragagent.tenant.TenantLookup;
 import com.ragagent.storage.support.FileService;
 import com.ragagent.storage.support.StorageBackendResolver;
 
@@ -27,10 +27,10 @@ import com.ragagent.storage.support.StorageBackendResolver;
 public class FileserveStorageBackendResolver implements StorageBackendResolver {
 
     private final StorageFileResolver storageFileResolver;
-    private final TenantConfigLookup tenantConfigLookup;
+    private final TenantLookup tenantConfigLookup;
 
     public FileserveStorageBackendResolver(StorageFileResolver storageFileResolver,
-                                           TenantConfigLookup tenantConfigLookup) {
+                                           TenantLookup tenantConfigLookup) {
         this.storageFileResolver = storageFileResolver;
         this.tenantConfigLookup = tenantConfigLookup;
     }

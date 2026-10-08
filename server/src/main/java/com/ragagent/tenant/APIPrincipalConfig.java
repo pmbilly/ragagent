@@ -1,4 +1,4 @@
-package com.ragagent.common.tenant;
+package com.ragagent.tenant;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

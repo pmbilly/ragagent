@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ragagent.common.tenant.Tenant;
-import com.ragagent.common.tenant.TenantConfigLookup;
+import com.ragagent.tenant.Tenant;
+import com.ragagent.tenant.TenantLookup;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.storage.fileserve.FileProxyService;
 
@@ -44,9 +44,9 @@ import jakarta.servlet.http.HttpServletResponse;
 public class FileProxyController {
 
     private final FileProxyService proxy;
-    private final TenantConfigLookup tenantConfigLookup;
+    private final TenantLookup tenantConfigLookup;
 
-    public FileProxyController(FileProxyService proxy, TenantConfigLookup tenantConfigLookup) {
+    public FileProxyController(FileProxyService proxy, TenantLookup tenantConfigLookup) {
         this.proxy = proxy;
         this.tenantConfigLookup = tenantConfigLookup;
     }

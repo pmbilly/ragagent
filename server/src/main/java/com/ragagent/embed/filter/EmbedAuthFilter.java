@@ -120,7 +120,7 @@ public class EmbedAuthFilter extends OncePerRequestFilter {
         }
 
         try {
-            com.ragagent.common.tenant.Tenant tenant =
+            com.ragagent.tenant.Tenant tenant =
                     tenantService.getTenantById(ch.getTenantId() == null ? 0 : ch.getTenantId());
             if (tenant == null) {
                 writePlain(response, 500, "workspace unavailable");

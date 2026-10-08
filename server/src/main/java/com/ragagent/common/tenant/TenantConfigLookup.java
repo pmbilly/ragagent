@@ -29,7 +29,6 @@ public interface TenantConfigLookup {
      * 完全一致：软删过滤 + 检索/上下文配置归一（B97b：实体已属 {@code common.tenant}，
      * 因此非 auth 域经此端口取实体不再产生对 auth 的依赖）。
      */
-    Tenant tenantById(long tenantId);
 
     /**
      * 存储域只读视图（id + 默认后端 + 存储引擎配置）。租户不存在返回 {@code null}

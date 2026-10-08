@@ -146,7 +146,7 @@ public class QaWiring {
                     return null;
                 }
                 try {
-                    com.ragagent.common.tenant.Tenant tenant = tenantService.getTenantById(tid);
+                    com.ragagent.tenant.Tenant tenant = tenantService.getTenantById(tid);
                     if (tenant == null || tenant.getWebSearchConfig() == null
                             || tenant.getWebSearchConfig().isNull()) {
                         return null;

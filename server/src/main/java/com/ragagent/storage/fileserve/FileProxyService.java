@@ -10,8 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.tenant.Tenant;
-import com.ragagent.common.tenant.TenantConfigLookup;
+import com.ragagent.tenant.Tenant;
+import com.ragagent.tenant.TenantLookup;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.storage.domain.StoredResource;
 import com.ragagent.storage.service.ResourceCatalogService;
@@ -45,7 +45,7 @@ public class FileProxyService {
     private static final Logger log = LoggerFactory.getLogger(FileProxyService.class);
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    private final TenantConfigLookup tenantConfigLookup;
+    private final TenantLookup tenantConfigLookup;
     private final StorageFileResolver resolver;
     private final ResourceCatalogService catalog;
     private final FileContentService globalFileService;
@@ -54,7 +54,7 @@ public class FileProxyService {
     private final String localBaseDir;
     private final String absDir;
 
-    public FileProxyService(TenantConfigLookup tenantConfigLookup, StorageFileResolver resolver,
+    public FileProxyService(TenantLookup tenantConfigLookup, StorageFileResolver resolver,
             ResourceCatalogService catalog,
             @org.springframework.beans.factory.annotation.Value(
                     "${weknora.storage.local-base-dir:${LOCAL_STORAGE_BASE_DIR:/data/files}}")

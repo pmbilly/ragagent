@@ -1,14 +1,14 @@
-package com.ragagent.common.tenant;
+package com.ragagent.tenant;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.ragagent.common.tenant.StorageEngineConfig.S3EngineConfig;
-import com.ragagent.common.tenant.StorageEngineConfig.MinioEngineConfig;
-import com.ragagent.common.tenant.StorageEngineConfig.ObsEngineConfig;
-import com.ragagent.common.tenant.StorageEngineConfig.Ks3EngineConfig;
-import com.ragagent.common.tenant.StorageEngineConfig.OssEngineConfig;
-import com.ragagent.common.tenant.StorageEngineConfig.CosEngineConfig;
-import com.ragagent.common.tenant.StorageEngineConfig.TosEngineConfig;
+import com.ragagent.tenant.StorageEngineConfig.S3EngineConfig;
+import com.ragagent.tenant.StorageEngineConfig.MinioEngineConfig;
+import com.ragagent.tenant.StorageEngineConfig.ObsEngineConfig;
+import com.ragagent.tenant.StorageEngineConfig.Ks3EngineConfig;
+import com.ragagent.tenant.StorageEngineConfig.OssEngineConfig;
+import com.ragagent.tenant.StorageEngineConfig.CosEngineConfig;
+import com.ragagent.tenant.StorageEngineConfig.TosEngineConfig;
 
 /**
  * 存储引擎配置段（8 个 provider 子结构）。

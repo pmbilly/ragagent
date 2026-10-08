@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.ragagent.common.tenant.StorageEngineConfig;
+import com.ragagent.tenant.StorageEngineConfig;
 import com.ragagent.common.security.SsrfGuard;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

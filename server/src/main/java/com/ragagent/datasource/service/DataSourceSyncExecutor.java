@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import com.ragagent.common.tenant.Tenant;
+import com.ragagent.tenant.Tenant;
 import com.ragagent.datasource.Connector;
 import com.ragagent.datasource.ConnectorException;
 import com.ragagent.datasource.StreamHandler;

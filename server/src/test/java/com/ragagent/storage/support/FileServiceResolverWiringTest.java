@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.common.tenant.Tenant;
+import com.ragagent.tenant.Tenant;
 
 /**
  * 接线：{@code storageurl.FileServiceResolver} 的 provider 级文件服务解析顺序：

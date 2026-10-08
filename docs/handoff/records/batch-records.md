@@ -1186,3 +1186,19 @@
   | `common/tenant`（1,371 行，**是域**） | 被 `common/web/RbacInterceptor → TenantRole/TenantProperties` 反向使用 | 搬前须先解：把 RBAC 词汇留 common，或把 `RbacInterceptor` 移出 common/web |
 - **闸门**：后端全量 BUILD SUCCESSFUL + `spotlessCheck` + 四守卫（键名 / 包环含 SCC·R4·R5·R6 / Go 锚点 / 跨面键）绿。
 - **下一步**：`common/tenant` 拆分（需先做上面的解阻）或直接转阶段 4：L2→L3 剩余 5 条清零 → R13（controller→mapper 6 处）→ M1 模块化（软约束变硬约束）。
+
+**✅ B104（2026-10-08，common 减重③：`tenant` 拆分 + R6 第三条）**
+- **决策依据（回答"方案 b 是否更好"）**：实测 `TenantRole` 被 **13 个包**消费（auth 13 / knowledge 4 / mcp 2 / embed 2 / wiki / websearch / session / model / initialization / datasource / config / audit / agent + `common/web`），
+  是**跨域词汇** ⇒ 无论是否把 `RbacInterceptor` 移出 common/web（方案 b），它都必须留 common ⇒ **方案 b 不解阻**，且 `RbacInterceptor` 还受约束（`audit/RbacDeniedAuditorRegistrar` 要设其静态钩子 ⇒ 若放 `config` 会踩 R2「域不得 import config」）⇒ 选**方案 a**。
+- **先量后动的三条量**：① `TenantRole`/`TenantProperties` 对 `Tenant` 实体**零引用** ⇒ 边界可切干净；② 待搬类型对 **L2 零消费**（唯一例外 `TenantConfigLookup` 被 `retrieval` 消费 ⇒ 触发端口拆分）；③ `WebSearchConfig` 被 **L2 `chatpipeline`** 消费 ⇒ 必须留 L1。
+- **搬迁**：`Tenant` + `mapper/TenantMapper` + `APIPrincipalConfig` + `APIPrincipalConfigTypeHandler` + `ChatHistoryConfig` + `ParserEngineConfig` + `RetrievalConfig` + `StorageEngineConfig` + `TenantConfigRedaction` → `com.ragagent.tenant`（10 文件；出向仅 `common`（`PgJsonTypeHandler`/`WebSearchConfig`/…）⇒ 无环，守卫 SCC 0 ✓）。
+  留 `common/tenant`：`TenantRole`（13 包）、`TenantProperties`、`TenantConfigLookup`、`WebSearchConfig`（L2 依赖）。
+- **端口按消费方分层拆开（本批的设计点）**：`TenantConfigLookup.tenantById(long) → Tenant`（实体）拆成域侧 `tenant.TenantLookup`，只给 L3（storage 7 处 + knowledge 1 处换注入）；
+  `common.tenant.TenantConfigLookup` 只留 `retrieverEngines`/`retrievalConfig`/`memoryConfig`（JsonNode）+ `storageView`（已有视图）⇒ **L2 `retrieval` 只见 L1 安全的半面**。
+  · 若不做这一步：实体留 common（等于没搬）或 common 反向依赖 tenant 域（R5 红）——二选一都会失败。
+- **R6 追加第三条**：`common/**/mapper/**`、`common/**/repository/**` 不得存在（实体+mapper 归域）；探针（`common/probe/mapper/ProbeMapper.java`）→ 报 `✗ 新增：持久层 ['(mapper/repository 子包)']` ✓（探针已删）。
+- **测试随路径更新**：`AgentConfigKeyUsageTest` 的 `ALLOWED_PREFIXES` 补 `tenant/`（租户配置的 snake 字面量是 `tenants` 表 jsonb 列键，由 Go 侧与迁移决定）——该测试是"按路径豁免"式守卫，搬家必须同步豁免面。
+- **两个包的注释都重写**：`common/tenant/package-info`（留下的是什么、为什么）与新建 `tenant/package-info`（搬出理由 + 与 common 的分工 + 后续可选"`TenantLookup` 视图化"）。
+- **效果**：`common` 8,175 → **7,812 行 / 114 文件**；四批累计 11,183 → 7,812（**-30%**）。
+- **闸门**：后端全量 BUILD SUCCESSFUL + `spotlessCheck` + 四守卫（键名 / 包环含 SCC·R4·R5·R6 三条 / Go 锚点 / 跨面键）绿。
+- **剩余 common 包判定**：`security`（1,107 / 24 消费方）、`web`（1,135 / 26 消费方）为横切基础设施 ⇒ 留；`common/web` 内的 `RbacInterceptor` 若想纯化可单开一批（注意不得放 `config`）。

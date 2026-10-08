@@ -120,7 +120,7 @@ public class TenantCatalogController {
 
     /** GET /tenants/all —— 全量目录（跨空间访问权由守卫组承担；无分页）。 */
     @GetMapping("/api/v1/tenants/all")
-    public List<com.ragagent.common.tenant.Tenant> listAllTenants() {
+    public List<com.ragagent.tenant.Tenant> listAllTenants() {
         return tenantService.searchTenants("", 0, 0, 0).tenants();
     }
 

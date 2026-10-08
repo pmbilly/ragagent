@@ -99,7 +99,9 @@ ArchUnit 1.3.0 **已是测试依赖**（`server/build.gradle.kts:111`），可�
 | **`common/settings` 归位** | ✅ B103：`ConversationProperties`/`SystemSettingGateway`/`SystemSettingRegistry` → 顶层 `com.ragagent.settings`（461 行；`@ConfigurationPropertiesScan` 条目随迁）；`MemoryConfig`/`MemoryKeys`/`MemoryKinds` **判定为跨域词汇** ⇒ 留 common（新建 `common/memory`，见下） |
 | **B103 的关键教训** | 曾把 `Memory*` 一并搬进 `memory/domain` ⇒ **SCC 守卫立刻抓出 `auth ↔ memory` 新环**（新边 `auth/controller/TenantConfigOps → memory.domain.MemoryConfig`；旧边 `memory/service/MemoryService → auth.service.TenantService`）⇒ 判定它们是 **auth 租户配置 + memory 域 + datasource 共享的词汇**，回退到 `common/memory/`（新包 + package-info 写明原因） |
 | 剩余减重候选与判定 | `common/security`（1,107 行 / 24 消费方）与 `common/web`（1,135 / 26 消费方）= **横切基础设施**（非域）⇒ 应留；`common/tenant`（1,371，**是域**）但被 `common/web/RbacInterceptor → TenantRole/TenantProperties` 反向使用 ⇒ 搬前须先解（把 RBAC 词汇留 common，或把 `RbacInterceptor` 移出 common/web）|
-| common 体量轨迹 | 11,183（B101 前）→ **9,374**（B102 approval 归位）→ **8,175 行 / 119 文件**（B103 settings 归位 + memory 词汇留驻），两批共 **-27%** |
+| **`common/tenant` 拆分（方案 a）** | ✅ B104：租户域实现（`Tenant` 实体 + `TenantMapper` + 6 个租户配置 VO + `TenantConfigRedaction`）→ 顶层 `com.ragagent.tenant`；**`TenantRole`（13 包用）/`TenantProperties`/`TenantConfigLookup`/`WebSearchConfig` 留 common**；`TenantConfigLookup.tenantById`（返回实体）拆成域侧端口 `tenant.TenantLookup`（仅 L3 用：storage 7 处 / knowledge 1 处）⇒ `retrieval`（L2）只见 L1 安全的 JsonNode/视图方法 |
+| **R6 追加第三条** | ✅ B104：`common/**/mapper/**`、`common/**/repository/**` **不得存在**（实体+mapper 归域）；探针（common 下建 mapper 子包）验证会红 |
+| common 体量轨迹 | 11,183（B101 前）→ 9,374（B102 approval）→ 8,175（B103 settings + memory 词汇）→ **7,812 行 / 114 文件**（B104 tenant 拆分），四批共 **-30%** |
 
 ## 3. 目标模块图（**6 个模块，不是 30 个**）
 

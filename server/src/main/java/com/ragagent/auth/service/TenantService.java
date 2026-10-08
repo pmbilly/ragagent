@@ -11,8 +11,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.common.mybatis.PageRequests;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.common.tenant.Tenant;
-import com.ragagent.common.tenant.mapper.TenantMapper;
+import com.ragagent.tenant.Tenant;
+import com.ragagent.tenant.TenantLookup;
+import com.ragagent.tenant.mapper.TenantMapper;
 import com.ragagent.common.storage.StorageBackendProvisioner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,7 @@ import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
  * 响应恒为包装格式 → 读取后归一化。
  */
 @Service
-public class TenantService implements TenantConfigLookup {
+public class TenantService implements TenantConfigLookup, TenantLookup {
 
     private static final Logger log = LoggerFactory.getLogger(TenantService.class);
     private static final ObjectMapper MAPPER = new ObjectMapper();

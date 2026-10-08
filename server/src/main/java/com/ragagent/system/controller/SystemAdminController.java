@@ -16,7 +16,7 @@ import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.audit.domain.AuditOutcome;
 import com.ragagent.audit.service.AuditLogService;
 import com.ragagent.auth.domain.User;
-import com.ragagent.common.tenant.mapper.TenantMapper;
+import com.ragagent.tenant.mapper.TenantMapper;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;

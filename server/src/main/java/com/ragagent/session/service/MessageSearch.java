@@ -12,9 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.tenant.Tenant;
-import com.ragagent.common.tenant.ChatHistoryConfig;
-import com.ragagent.common.tenant.RetrievalConfig;
+import com.ragagent.tenant.Tenant;
+import com.ragagent.tenant.ChatHistoryConfig;
+import com.ragagent.tenant.RetrievalConfig;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.pipeline.SearchParams;

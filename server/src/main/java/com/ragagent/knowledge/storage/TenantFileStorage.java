@@ -7,8 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import com.ragagent.common.tenant.Tenant;
-import com.ragagent.common.tenant.TenantConfigLookup;
+import com.ragagent.tenant.Tenant;
+import com.ragagent.tenant.TenantLookup;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.storage.fileserve.StorageFileResolver;
@@ -45,12 +45,12 @@ public class TenantFileStorage {
 
     private final LocalStorageService local;
     private final StorageFileResolver resolver;
-    private final TenantConfigLookup tenantConfigLookup;
+    private final TenantLookup tenantConfigLookup;
     private final String localBaseDir;
 
     public TenantFileStorage(LocalStorageService local,
                              StorageFileResolver resolver,
-                             TenantConfigLookup tenantConfigLookup,
+                             TenantLookup tenantConfigLookup,
                              @Value("${weknora.storage.local-base-dir:${LOCAL_STORAGE_BASE_DIR:/data/files}}")
                                      String localBaseDir) {
         this.local = local;
