@@ -65,7 +65,7 @@ ArchUnit 1.3.0 **已是测试依赖**（`server/build.gradle.kts:111`），可�
 - 既有守卫：`check-package-cycles.py`（环/分层棘轮）、`pkg-audit.py`（分包体检）、
   `check-json-key-case.py`（JSON 键名 camel 棘轮 260 条）、`check-go-anchors.py`（Go 锚点棘轮）、
   `check-fe-contract-keys.py`（前后端跨面键名），外加 ~25 个 `ab-*.sh` 验收脚本。
-- 构建：**多模块**（B116 起 `settings.gradle.kts` include `server` + `contracts`；契约层 `common`/`event` 在 `:contracts`，其余在 `:server`），产物 Spring Boot jar；
+- 构建：**多模块**（B116 起 `settings.gradle.kts` include `server` + `common`；共享内核 `common`/`event` 在 `:common`，其余在 `:server`；B117 定名），产物 Spring Boot jar；
   其它目录 `docreader/`（Go 容器）、`frontend/`、`mcp-server/`、`otlp-proto/` 不在 Gradle 内。
 
 ## 2. 必须先解的环（切割清单，按性价比排序）
@@ -299,14 +299,14 @@ B111 暴露的 8 域间接环看着吓人（`agent`/`auth`/`chatpipeline`/`datas
 
 | 模块 | 成员域 | 文件 | LOC | 对外暴露类型 |
 |---|---|---|---|---|
-| **`:contracts`** | `common`、`event` | 175 | 13.8k | **0**（自身零依赖 ⇒ build 文件无任何 `project()`）|
+| **`:common`** | `common`、`event` | 175 | 13.8k | **0**（自身零依赖 ⇒ build 文件无任何 `project()`）|
 | **`:engine`** | `llm`、`retrieval`、`embedding`、`rerank`、`chatpipeline`、`modelcontext`、`webfetch`、`stream`、`tracing`、`model`、`vectorstore` | 368 | 58.3k | 79 → contracts |
 | **`:app`** | `agent`、`auth`、`knowledge`、`session`、`wiki`、`im`、`mcp`、`memory`、`storage`、`system`、`tenant`、`websearch`、`settings`、`audit`、`approval` | 1151 | 177.9k | 102 → engine、129 → contracts |
 | **`:datasource`** | `datasource`（**入度 0**，无人依赖） | 125 | 26.9k | 2 → engine、20 → app |
 | **`:misc`** | `embed`、`initialization`、`evaluation`、`favorite` | 56 | 7.7k | 25 → engine、41 → app |
 | **`:boot`** | `config` + `RagAgentApplication` + `application.yml` + `spring.factories` | 12 | 1.7k | 25 → engine、35 → app |
 
-已核验：**无下层→上层引用，模块图为 DAG** ✓；`:engine → :contracts` 仅 **79 类型**
+已核验：**无下层→上层引用，模块图为 DAG** ✓；`:engine → :common` 仅 **79 类型**
 （非常干净，是 R3=0 的直接红利）。
 
 ### 5.2 风险清单
@@ -333,14 +333,14 @@ B111 暴露的 8 域间接环看着吓人（`agent`/`auth`/`chatpipeline`/`datas
 | 边界强制力 | 脚本级（可被改白名单绕过） | **编译器级，绕不过** |
 | 已有覆盖 | R1/R1b/R3/R5/R6/R7/R8 已覆盖同一批规则 | 同规则硬化 |
 | 一次成本 | — | 搬 1,887 + 419 文件、6 个 build 文件、6 处守卫脚本改造、资源/装配/proto/迁移路径模块化 |
-| 增量收益 | — | 主要来自 **`:contracts` 与 `:engine` 两条硬边界**（`:app` 内部 15 域仍是软的，因为中部无缝） |
+| 增量收益 | — | 主要来自 **`:common` 与 `:engine` 两条硬边界**（`:app` 内部 15 域仍是软的，因为中部无缝） |
 
-⇒ **不做一次性 6 模块拆分。第一步只做 `:contracts`**：它是**零成本切点**
-（自身零依赖、175 文件；界外→界内的 1,409 处引用全部只变成一行 `project(":contracts")`），
+⇒ **不做一次性 6 模块拆分。第一步只做 `:common`**：它是**零成本切点**
+（自身零依赖、175 文件；界外→界内的 1,409 处引用全部只变成一行 `project(":common")`），
 却能把"底座不得依赖任何域"从**脚本规则升格为编译规则**——整个 M1 里性价比最高的一刀。
 
 
-## 6. B116：`:contracts` 抽取落地（M1 第一步）
+## 6. B116：`:common` 抽取落地（M1 第一步）
 
 按 §5.3 的策略只做**零成本切点**：把 `common` + `event`（175 文件 / LOC 13.8k）抽成
 **唯一一个没有任何 `project(...)` 依赖的模块**，把"底座不得反向依赖任何域"从守卫脚本规则
@@ -350,8 +350,8 @@ B111 暴露的 8 域间接环看着吓人（`agent`/`auth`/`chatpipeline`/`datas
 
 | 项 | 内容 |
 |---|---|
-| 模块 | 新增 `:contracts`（`java-library` + `io.spring.dependency-management` + spotless）|
-| 依赖 | `:contracts` **零 project 依赖**；`:server` 声明 `implementation(project(":contracts"))` |
+| 模块 | 新增 `:common`（`java-library` + `io.spring.dependency-management` + spotless）|
+| 依赖 | `:common` **零 project 依赖**；`:server` 声明 `implementation(project(":common"))` |
 | 依赖声明 | 按 `common`/`event` 的**实际 import 面**声明（jackson / spring-context·web·webmvc·jdbc / spring-boot·autoconfigure / spring-data-redis / slf4j / mybatis-plus 3.5.7 / jakarta servlet·validation），**不用 starter**，避免把自动配置漏进库 |
 | 搬迁 | `git mv` `common/`、`event/`（主源码）+ `resources/common/text/*.txt`（被 `/common/text/…` 绝对路径读）+ **9 个纯底座测试**（2 个 `@SpringBootTest` 与引用其它域的 5 个留在 `:server`）|
 | 资源 | 13 处 classpath 资源读法**逐个核实全是 classloader 绝对路径** ✓（不会因搬家解析失败）；但**缺资源静默 null** 的性质未变 ⇒ "资源存在性断言"仍待补（§5.2-2）|
@@ -371,7 +371,7 @@ B111 暴露的 8 域间接环看着吓人（`agent`/`auth`/`chatpipeline`/`datas
 
 1. **`ArchitectureRulesTest.MAIN` 的导入过滤器必须用 `Location.contains`，不能用 `location.asURI()`**：
    ArchUnit 对 **jar 内的类**求 `asURI` 会抛异常，而"抛异常的导入选项"被当作**排除** ⇒
-   `:contracts`（在 `:server` 类路径上以 **jar 形态**出现）被整段排除，R7 基线条目随即报
+   `:common`（在 `:server` 类路径上以 **jar 形态**出现）被整段排除，R7 基线条目随即报
    "已不再违例"。探针四变体定位：`asURI` 版命中 0 / `Location.contains` 版命中 1。
    过滤器改为 `!location.contains("/classes/java/test/")`。
 2. **源码遍历类规则**（R5 裸 NUL、R9 `.last` 拼接）原先固定 `Path.of("src/main/java")`，
@@ -382,9 +382,49 @@ B111 暴露的 8 域间接环看着吓人（`agent`/`auth`/`chatpipeline`/`datas
 
 | 指标 | 值 |
 |---|---|
-| 模块数 | 2（`:contracts` 零 project 依赖 / `:server` → `:contracts`）|
-| 编译期硬约束 | ✅ **探针验证**：往 `:contracts` 注入 `import com.ragagent.knowledge.domain.Chunk` ⇒ `:contracts:compileJava` **FAILED**（`package com.ragagent.knowledge does not exist`）——底座反向依赖从此**改不动** |
+| 模块数 | 2（`:common` 零 project 依赖 / `:server` → `:common`）|
+| 编译期硬约束 | ✅ **探针验证**：往 `:common` 注入 `import com.ragagent.knowledge.domain.Chunk` ⇒ `:common:compileJava` **FAILED**（`package com.ragagent.knowledge does not exist`）——底座反向依赖从此**改不动** |
 | 闸门 | `./gradlew spotlessCheck build` = **BUILD SUCCESSFUL**（4,778 测试）+ 五守卫绿 |
 
-**下一步（未做）**：`:engine`（L2 能力层，11 域 / 58.3k LOC，对 `:contracts` 只暴露 79 类型）
+**下一步（未做）**：`:engine`（L2 能力层，11 域 / 58.3k LOC，对 `:common` 只暴露 79 类型）
 ——它是第二条硬边界；再做则是 `:app` / `:datasource` / `:misc` / `:boot`（§5.1-③）。
+
+
+### 6.5 B117：模块定名 `:common`（原 `:contracts`）
+
+抽取当天即改名，理由是**本仓 `contracts` 一词已被占用**，不是风格偏好：
+
+| 既有用法 | 规模 |
+|---|---|
+| `server/src/test/resources/contracts/**`（golden HTTP 契约夹具） | **1,426 个文件** |
+| 读它的测试类 | 18 个 |
+| 类名含 `Contract` 的测试类 | **49 个** |
+
+⇒ 在这仓里看到 "contracts" 的第一反应是"契约测试夹具"，模块再叫 `contracts` 是语义撞车。
+另外两条支持：② **名实相符** —— 模块 27 个子包里既有端口/视图/facts，也有实现与 bean
+（`CryptoService`/`SsrfGuard`/`StorageAllowList`/`HealthController`/`GlobalExceptionHandler`/`RbacInterceptor`
++ 6 个 `*Properties` + mybatis handler），是 **shared kernel** 而非纯契约层；
+③ **与顶层包 1:1** —— 135/175 文件在 `com.ragagent.common`，模块名＝顶层包名最常规（且包名不动 ⇒ import 零改动）。
+
+**评估过的其它候选**（结论：`:common` > `:kernel` ≫ `:core` / `:foundation`）：
+
+| 名称 | 判定 |
+|---|---|
+| `:common` | ✅ 采用：与包名一致、Java 最常规、仓库已用该词（包名 + 守卫 `L1` 集合 + R6 基线键）|
+| `:kernel` | ◐ 次选：语义最准（含 `event` 基底也说得通）且名字自带"最小内核"约束；但 Java 里不如 common 常见、且与包名不一致（路径读作 `kernel/…/com/ragagent/common/…`），本仓此前无此词汇 |
+| `:core` | ❌ 误导：DDD 里 `core` = 核心**业务**领域，而本模块零业务逻辑（业务在 knowledge/session/agent…）|
+| `:foundation` | ❌ Java 里几乎不用（多见于 JS/Android），语感偏"平台层"，且名字长 |
+
+> 因名字不再承担约束，**门槛改写在 `common/build.gradle.kts` 头部注释里**：
+> "这里只应有跨域词汇 / 不可变载荷 / 端口契约；带 `@Component`/`@Service` 的实现应各归其域
+> —— 现存 3 个 bean 是 R6 棘轮基线，只许减不许增。"
+
+**改名改动面（7 处，一次全闸门通过）**：`git mv contracts common`；`settings.gradle.kts`；
+`server/build.gradle.kts` 的 `project(":common")`；`scripts/_source_roots.py` 的 `MODULE_DIRS`；
+`ArchitectureRulesTest.backendSourceRoots()` 的 2 处字面量；`common/build.gradle.kts` 头注释；
+本文档。**无影响**：包名、`import`（0 行改动）、Dockerfile（只取 `server/build/libs` 的 bootJar）、
+jar 名（`common-*.jar`，无人依赖）。
+
+**复验**：`./gradlew projects` → `:common` + `:server` ✓；
+编译期硬约束探针（往 `:common` 注入 `knowledge.domain.Chunk`）⇒ `:common:compileJava` **FAILED** ✓；
+`./gradlew spotlessCheck build` = BUILD SUCCESSFUL + 五守卫绿。

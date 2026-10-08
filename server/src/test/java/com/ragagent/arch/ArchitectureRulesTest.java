@@ -90,7 +90,7 @@ class ArchitectureRulesTest {
      */
     private static final JavaClasses MAIN = new ClassFileImporter()
             // B116 多模块：**不能用 location.asURI()** —— ArchUnit 对 jar 内的类求 asURI
-            // 会抛异常，而"抛异常的导入选项"被当作**排除**，于是 :contracts（在 :server 的
+            // 会抛异常，而"抛异常的导入选项"被当作**排除**，于是 :common（在 :server 的
             // 类路径上以 jar 形态出现）被整段排除，R7 基线条目随即报"已不再违例"（实测踩到，
             // 探针四变体定位：asURI 版命中 0、Location.contains 版命中 1）。
             // 改用 Location.contains 排除测试类。
@@ -403,12 +403,12 @@ class ArchitectureRulesTest {
 
     /**
      * 后端源码根（B116 多模块）：本类在 {@code :server} 里运行，工作目录是 {@code server/}，
-     * 故契约层（{@code common}/{@code event}，已抽到 {@code :contracts}）用相对路径指过去。
+     * 故共享内核（{@code common}/{@code event}，已抽到 {@code :common}）用相对路径指过去。
      * 不存在的根由调用方跳过 ⇒ 单模块布局下仍然可用。
      */
     private static java.util.List<java.nio.file.Path> backendSourceRoots(String sourceSet) {
         return java.util.List.of(java.nio.file.Path.of("src/" + sourceSet),          // server 自己
-                java.nio.file.Path.of("../contracts/src/" + sourceSet));             // 契约层
+                java.nio.file.Path.of("../common/src/" + sourceSet));                // 共享内核
     }
 
     @Test
