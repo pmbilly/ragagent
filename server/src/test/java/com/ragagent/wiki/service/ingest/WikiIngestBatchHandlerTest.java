@@ -114,7 +114,7 @@ class WikiIngestBatchHandlerTest {
         }
 
         private void stubKb(KnowledgeBaseView kb) {
-            when(kbLookup.kbById(any())).thenReturn(kb);
+            when(kbLookup.knowledgeBaseById(any())).thenReturn(kb);
         }
 
         /**
@@ -271,7 +271,7 @@ class WikiIngestBatchHandlerTest {
         @Test
         @DisplayName("ProcessWikiIngest：KB 已删除 → 排空队列并正常返回")
         void ingestDrainsDeletedKbQueue() {
-            when(kbLookup.kbById(any())).thenReturn(null);
+            when(kbLookup.knowledgeBaseById(any())).thenReturn(null);
 
             handler().processWikiIngest(new WikiIngestPayload(7L, "kb-deleted", null));
 
@@ -287,7 +287,7 @@ class WikiIngestBatchHandlerTest {
             row.setScopeId("kb-deleted");
             when(pendingRepo.peekBatch(eq(WikiIngestConstants.FINALIZE_TASK_TYPE), anyString(),
                     eq("kb-deleted"), anyInt())).thenReturn(List.of(row));
-            when(kbLookup.kbById(any())).thenReturn(null);
+            when(kbLookup.knowledgeBaseById(any())).thenReturn(null);
 
             handler().processWikiFinalize(new WikiIngestPayload(7L, "kb-deleted", null));
 
@@ -300,7 +300,7 @@ class WikiIngestBatchHandlerTest {
         @Test
         @DisplayName("清理失败必须重试（对照 Go TestWikiDeletedKnowledgeBaseCleanupFailureRetries）")
         void cleanupFailureRetries() {
-            when(kbLookup.kbById(any())).thenReturn(null);
+            when(kbLookup.knowledgeBaseById(any())).thenReturn(null);
             RuntimeException boom = new IllegalStateException("cleanup failed");
             org.mockito.Mockito.doThrow(boom)
                     .when(ingestService).clearDeletedKnowledgeBasePendingOps("kb-deleted");
@@ -316,7 +316,7 @@ class WikiIngestBatchHandlerTest {
         void kbNotWikiEnabled() {
             KnowledgeBaseView kb = wikiKb();
             kb.setWikiEnabled(false);
-            when(kbLookup.kbById(any())).thenReturn(kb);
+            when(kbLookup.knowledgeBaseById(any())).thenReturn(kb);
 
             assertThatThrownBy(() -> handler().processWikiIngest(
                     new WikiIngestPayload(7L, "kb-1", null)))
@@ -327,7 +327,7 @@ class WikiIngestBatchHandlerTest {
         @Test
         @DisplayName("缺合成模型 → 抛错重试")
         void missingSynthesisModel() {
-            when(kbLookup.kbById(any())).thenReturn(wikiKb());
+            when(kbLookup.knowledgeBaseById(any())).thenReturn(wikiKb());
 
             assertThatThrownBy(() -> handler().processWikiIngest(
                     new WikiIngestPayload(7L, "kb-1", null)))
@@ -550,7 +550,7 @@ class WikiIngestBatchHandlerTest {
         assertThat(h.getKnowledgeBaseByIDOnly("")).isNull();
         assertThat(h.getKnowledgeBaseByIDOnly(null)).isNull();
         assertThat(h.getKnowledgeByIDOnly("")).isNull();
-        verify(kbLookup, never()).kbById(any());
+        verify(kbLookup, never()).knowledgeBaseById(any());
     }
 
     // ═══════════════════════════════════════════════════════════════

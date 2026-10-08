@@ -21,7 +21,7 @@ public interface KnowledgeBaseLookup {
      *
      * @return 视图；不存在返回 {@code null}
      */
-    KnowledgeBaseView kbById(String kbId);
+    KnowledgeBaseView knowledgeBaseById(String kbId);
 
     /**
      * 按 id 取知识库（<b>不过滤软删</b>，{@code LIMIT 1}）——给健康检查类调用方用，
@@ -29,7 +29,7 @@ public interface KnowledgeBaseLookup {
      *
      * @return 视图；不存在返回 {@code null}
      */
-    KnowledgeBaseView kbByIdIncludingDeleted(String kbId);
+    KnowledgeBaseView knowledgeBaseByIdIncludingDeleted(String kbId);
 
     /**
      * 按 id 取知识条目（软删过滤：{@code deleted_at IS NULL}，{@code LIMIT 1}）。

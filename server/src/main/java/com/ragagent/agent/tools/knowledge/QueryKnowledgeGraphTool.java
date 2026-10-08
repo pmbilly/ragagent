@@ -111,7 +111,7 @@ public class QueryKnowledgeGraphTool extends BaseTool {
 
     /** 图检索接缝。hybridSearch 失败抛 RuntimeException。 */
     public interface GraphSearch {
-        KnowledgeBaseView getKnowledgeBaseByIdOnly(String kbId);
+        KnowledgeBaseView getKnowledgeBaseByIdUnscoped(String kbId);
 
         List<SearchResultView> hybridSearch(String kbId, String queryText, int matchCount);
     }
@@ -172,7 +172,7 @@ public class QueryKnowledgeGraphTool extends BaseTool {
             GraphQueryResult r = new GraphQueryResult();
             KnowledgeBaseView kb;
             try {
-                kb = graphSearch.getKnowledgeBaseByIdOnly(kbID);
+                kb = graphSearch.getKnowledgeBaseByIdUnscoped(kbID);
             } catch (RuntimeException e) {
                 r.err = "failed to get knowledge base: " + e.getMessage();
                 kbResults.put(kbID, r);

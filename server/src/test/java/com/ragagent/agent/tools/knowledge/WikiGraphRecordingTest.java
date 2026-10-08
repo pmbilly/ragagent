@@ -41,7 +41,7 @@ class WikiGraphRecordingTest {
         final Map<String, String> gotQuery = new LinkedHashMap<>();
 
         @Override
-        public KnowledgeBaseView getKnowledgeBaseByIdOnly(String kbId) {
+        public KnowledgeBaseView getKnowledgeBaseByIdUnscoped(String kbId) {
             RuntimeException err = kbErr.get(kbId);
             if (err != null) {
                 throw err;

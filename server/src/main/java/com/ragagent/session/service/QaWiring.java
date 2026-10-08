@@ -182,7 +182,7 @@ public class QaWiring {
             KnowledgeBaseService kbService, HybridSearchService hybridSearchService) {
         return new PipelinePorts.KnowledgeBaseService() {
             @Override
-            public KnowledgeBaseView getKnowledgeBaseByIdOnly(String id) {
+            public KnowledgeBaseView getKnowledgeBaseByIdUnscoped(String id) {
                 // 语义保持：仍走 getAllTenantById（含 ensureDefaults 的"索引策略零值 →
                 // vector+keyword 默认"回填），投影在回填**之后**取值。
                 KnowledgeBase kb = kbService.getAllTenantById(id);
@@ -195,7 +195,7 @@ public class QaWiring {
             }
 
             @Override
-            public List<KnowledgeBaseView> getKnowledgeBasesByIdsOnly(List<String> ids) {
+            public List<KnowledgeBaseView> getKnowledgeBasesByIdsUnscoped(List<String> ids) {
                 return ids.stream().map(kbService::getAllTenantById)
                         .filter(kb -> kb != null).map(KnowledgeBaseLookupAdapter::view)
                         .collect(java.util.stream.Collectors.toList());
@@ -292,13 +292,13 @@ public class QaWiring {
         };
     }
 
-    /** {@link PipelinePorts.KnowledgeBaseRepository}（getKnowledgeBaseByIDs）。 */
+    /** {@link PipelinePorts.KnowledgeBaseRepository}（getKnowledgeBaseByIds）。 */
     @Bean
     public PipelinePorts.KnowledgeBaseRepository qaPipelineKnowledgeBaseRepository(
             KnowledgeBaseService kbService) {
         return new PipelinePorts.KnowledgeBaseRepository() {
             @Override
-            public List<KnowledgeBaseView> getKnowledgeBaseByIDs(List<String> ids) {
+            public List<KnowledgeBaseView> getKnowledgeBaseByIds(List<String> ids) {
                 return ids.stream().map(kbService::getAllTenantById)
                         .filter(kb -> kb != null).map(KnowledgeBaseLookupAdapter::view)
                         .collect(java.util.stream.Collectors.toList());

@@ -67,7 +67,7 @@ final class WikiKbAccessGuard {
 
         // 必须先按 id 找到（查询不带空间过滤），
         // 才能把"库里没有"（404）与"不是你的"（403）区分开。
-        KnowledgeBaseView kb = kbLookup.kbById(kbId);
+        KnowledgeBaseView kb = kbLookup.knowledgeBaseById(kbId);
         if (kb == null) {
             throw BizException.notFound("knowledge base not found");
         }

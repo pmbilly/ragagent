@@ -441,7 +441,7 @@ public class WikiPageServiceImpl implements WikiPageService {
 
     final WikiPage createDefaultPage(String kbId, String slug, String title, String pageType,
                                        String content) {
-        KnowledgeBaseView kb = kbLookup.kbByIdIncludingDeleted(kbId);
+        KnowledgeBaseView kb = kbLookup.knowledgeBaseByIdIncludingDeleted(kbId);
         if (kb == null) {
             throw new WikiException("get knowledge base: knowledge base not found");
         }

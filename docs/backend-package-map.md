@@ -131,6 +131,30 @@ L2  能力层                       llm retrieval embedding rerank chatpipeline
 L1  平台                         common event stream tracing
 ```
 
+### 契约层命名规范（2026-10-08 B120 定）
+
+跨域端口/网关（`common/<domain>` 下的接口）是**全仓共享词汇**，命名分歧的代价最高
+（读的人要在脑内维护"谁叫 kb、谁叫 knowledge"）。B120 盘点了 26 个契约接口后定下五条：
+
+| # | 规则 | 反例（B120 已改） | 正例 |
+|---|---|---|---|
+| 1 | **用领域类型名做前缀，不用缩写** | `kbById`（`kb` 不是领域词，且与 `knowledge` 混用） | `knowledgeBaseById` |
+| 2 | **单条 `…ById(id)`；批量 `…ByIds(ids)`**（`Id`/`Ids` 大小写统一） | `getKnowledgeBaseByIDs` | `getKnowledgeBaseByIds` |
+| 3 | **不用无信息量的后缀**；语义写进 javadoc | `getKnowledgeBaseByIdOnly`（`Only` 指代不明，实为"不做调用方作用域过滤"） | `getKnowledgeBaseByIdUnscoped` |
+| 4 | **仓储返回列表用 `list*`；服务返回实体用 `get*`**（现状已达标的约定，写下来防回退） | — | `listChunksById` / `getKnowledgeById` |
+| 5 | **同名方法跨接口必须同义**（工具侧自带的窄视图接口与端口同名时，签名与语义一致） | — | `KnowledgeSearchTool.KBView#getKnowledgeBasesByIdsUnscoped` |
+
+> 规范本身不靠人记：**B119 的 javadoc 守卫（`-Xdoclint:reference`，已接进 `check`）**
+> 会把指向已改名方法/类型的注释在构建期变红；`{@code}` 里的旧名不会被捕获，
+> 所以改名时仍需全仓 `grep` 一次（B120 的做法：改完立刻复跑残留检查 + 全量测试）。
+
+**B120 落地范围**（5 组符号 / 20 文件，纯改名、零语义变更）：`kbById`、`kbByIdIncludingDeleted`
+（L1 端口 `KnowledgeBaseLookup`）+ `getKnowledgeBaseByIDs`、`getKnowledgeBaseByIdOnly`、
+`getKnowledgeBasesByIdsOnly`（chatpipeline 端口 + 两个工具侧接口及其实现/调用点）。
+刻意未动：`VectorStoreLookup.byId`（通用词、124 处命中里多为同名局部变量，分辨成本大于收益）、
+`QaSearchTargets` 的局部 `Map kbById`（局部变量，非契约面）。
+
+### 顶层包 34 → 约 29（并入/改名 5 处 + 1 处待定）
 ### 顶层包 34 → 约 29（并入/改名 5 处 + 1 处待定）
 
 | 现在 | 重组后 | 理由 |

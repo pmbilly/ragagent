@@ -61,7 +61,7 @@ public final class PluginWikiBoost implements Plugin {
             }
             KnowledgeBaseView kb;
             try {
-                kb = kbService.getKnowledgeBaseByIdOnly(target.knowledgeBaseId());
+                kb = kbService.getKnowledgeBaseByIdUnscoped(target.knowledgeBaseId());
             } catch (RuntimeException e) {
                 kb = null;
             }

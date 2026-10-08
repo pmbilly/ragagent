@@ -63,7 +63,7 @@ public class WikiLintService {
      */
     public WikiLintReport runLint(String kbId) {
         // 校验 KB
-        KnowledgeBaseView kb = kbLookup.kbByIdIncludingDeleted(kbId);
+        KnowledgeBaseView kb = kbLookup.knowledgeBaseByIdIncludingDeleted(kbId);
         if (kb == null) {
             throw new WikiException("get KB: knowledge base not found");
         }

@@ -162,7 +162,7 @@ public class WikiIngestBatchHandler implements WikiIngestTaskHandler {
         if (kbId == null || kbId.isEmpty()) {
             return null;
         }
-        return kbLookup.kbById(kbId);
+        return kbLookup.knowledgeBaseById(kbId);
     }
 
     /**

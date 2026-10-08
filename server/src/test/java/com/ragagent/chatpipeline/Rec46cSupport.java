@@ -710,7 +710,7 @@ final class Rec46cSupport {
         private final Object lock = new Object();
 
         @Override
-        public KnowledgeBaseView getKnowledgeBaseByIdOnly(String id) {
+        public KnowledgeBaseView getKnowledgeBaseByIdUnscoped(String id) {
             byIDOnlyCalls++;
             if (kbErr != null) {
                 throw kbErr;
@@ -723,7 +723,7 @@ final class Rec46cSupport {
         }
 
         @Override
-        public List<KnowledgeBaseView> getKnowledgeBasesByIdsOnly(List<String> ids) {
+        public List<KnowledgeBaseView> getKnowledgeBasesByIdsUnscoped(List<String> ids) {
             if (kbErr != null) {
                 throw kbErr;
             }

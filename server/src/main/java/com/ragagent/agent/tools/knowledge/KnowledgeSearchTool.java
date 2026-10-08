@@ -186,7 +186,7 @@ public class KnowledgeSearchTool extends BaseTool {
         KBView getKnowledgeBaseById(String kbId);
 
         /** 批量取知识库；异常返回空表。 */
-        List<KBView> getKnowledgeBasesByIdsOnly(List<String> ids);
+        List<KBView> getKnowledgeBasesByIdsUnscoped(List<String> ids);
 
         /** kbID → 向量模型键。 */
         Map<String, String> resolveEmbeddingModelKeys(List<KBView> kbs);
@@ -443,7 +443,7 @@ public class KnowledgeSearchTool extends BaseTool {
 
         List<KBView> kbList;
         try {
-            kbList = backend.getKnowledgeBasesByIdsOnly(kbIDs);
+            kbList = backend.getKnowledgeBasesByIdsUnscoped(kbIDs);
         } catch (RuntimeException e) {
             kbList = List.of();
         }

@@ -85,7 +85,7 @@ final class AgentToolKbBackends {
             }
 
             @Override
-            public List<KnowledgeSearchTool.KBView> getKnowledgeBasesByIdsOnly(List<String> ids) {
+            public List<KnowledgeSearchTool.KBView> getKnowledgeBasesByIdsUnscoped(List<String> ids) {
                 List<KnowledgeSearchTool.KBView> out = new ArrayList<>();
                 if (ids == null) {
                     return out;
@@ -462,7 +462,7 @@ final class AgentToolKbBackends {
     public QueryKnowledgeGraphTool.GraphSearch graphSearch() {
         return new QueryKnowledgeGraphTool.GraphSearch() {
             @Override
-            public QueryKnowledgeGraphTool.KnowledgeBaseView getKnowledgeBaseByIdOnly(String kbId) {
+            public QueryKnowledgeGraphTool.KnowledgeBaseView getKnowledgeBaseByIdUnscoped(String kbId) {
                 KnowledgeBase kb = kbService.getAllTenantById(kbId);
                 if (kb == null) {
                     return null;

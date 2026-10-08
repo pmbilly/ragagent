@@ -57,7 +57,7 @@ final class PluginSearchOps {
         List<KnowledgeBaseView> kbList = new ArrayList<>();
         Map<String, KnowledgeBaseView> kbMap = new LinkedHashMap<>();
         try {
-            List<KnowledgeBaseView> kbs = service.knowledgeBaseService.getKnowledgeBasesByIdsOnly(kbIds);
+            List<KnowledgeBaseView> kbs = service.knowledgeBaseService.getKnowledgeBasesByIdsUnscoped(kbIds);
             if (kbs != null) {
                 kbList = kbs;
                 for (KnowledgeBaseView kb : kbs) {

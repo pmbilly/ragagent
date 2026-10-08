@@ -57,7 +57,7 @@ class KnowledgeSearchRecordingTest {
         }
 
         @Override
-        public List<KBView> getKnowledgeBasesByIdsOnly(List<String> ids) {
+        public List<KBView> getKnowledgeBasesByIdsUnscoped(List<String> ids) {
             return kbList;
         }
 

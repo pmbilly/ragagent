@@ -65,10 +65,10 @@ public final class PipelinePorts {
     /** 知识库面：chat 管线所需的方法子集。 */
     public interface KnowledgeBaseService {
         /** 按 ID 直取（无租户过滤）。 */
-        KnowledgeBaseView getKnowledgeBaseByIdOnly(String id);
+        KnowledgeBaseView getKnowledgeBaseByIdUnscoped(String id);
 
         /** 批量直取（无租户过滤；缺失 ID 跳过）。 */
-        List<KnowledgeBaseView> getKnowledgeBasesByIdsOnly(List<String> ids);
+        List<KnowledgeBaseView> getKnowledgeBasesByIdsUnscoped(List<String> ids);
 
         List<SearchResult> hybridSearch(String knowledgeBaseId, SearchParams params);
 
@@ -104,7 +104,7 @@ public final class PipelinePorts {
 
     /** 知识库批量取仓储。 */
     public interface KnowledgeBaseRepository {
-        List<KnowledgeBaseView> getKnowledgeBaseByIDs(List<String> ids);
+        List<KnowledgeBaseView> getKnowledgeBaseByIds(List<String> ids);
     }
 
     /** 消息面：chat 管线所需的方法子集。 */

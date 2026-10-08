@@ -31,7 +31,7 @@ public class KnowledgeBaseLookupAdapter implements KnowledgeBaseLookup {
     }
 
     @Override
-    public KnowledgeBaseView kbById(String kbId) {
+    public KnowledgeBaseView knowledgeBaseById(String kbId) {
         KnowledgeBase kb = kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
                 .eq(KnowledgeBase::getId, kbId)
                 .isNull(KnowledgeBase::getDeletedAt)
@@ -40,7 +40,7 @@ public class KnowledgeBaseLookupAdapter implements KnowledgeBaseLookup {
     }
 
     @Override
-    public KnowledgeBaseView kbByIdIncludingDeleted(String kbId) {
+    public KnowledgeBaseView knowledgeBaseByIdIncludingDeleted(String kbId) {
         KnowledgeBase kb = kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
                 .eq(KnowledgeBase::getId, kbId)
                 .last("LIMIT 1"));

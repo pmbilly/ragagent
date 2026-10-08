@@ -88,7 +88,7 @@ public final class PluginExtractEntity implements Plugin {
 
         List<KnowledgeBaseView> kbs;
         try {
-            kbs = knowledgeBaseRepo.getKnowledgeBaseByIDs(new ArrayList<>(kbIDSet.keySet()));
+            kbs = knowledgeBaseRepo.getKnowledgeBaseByIds(new ArrayList<>(kbIDSet.keySet()));
         } catch (RuntimeException e) {
             return next.next();
         }

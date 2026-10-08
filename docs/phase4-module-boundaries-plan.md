@@ -509,3 +509,14 @@ B116 搬家时已经搬过一批资源（`common/text/*.txt`），这类风险�
 | 往 `AgentConsts` 注入 `{@link com.ragagent.does.NotExist}` | `:server:javadoc` FAILED（`AgentConsts.java:10: error: reference not found`）✓；因 `check` 连带 javadoc，**`:server:check` 退出码 1** ⇒ `build`/CI 会红 ✓ |
 
 **闸门**：`./gradlew spotlessCheck build` = BUILD SUCCESSFUL（含两模块 javadoc，**0 error / 0 warning**）+ 五守卫绿。
+
+
+### 8.5 B120：契约层命名规范（与 M1 命名讨论同源）
+
+盘点 26 个契约接口后定下五条（全表见 `docs/backend-package-map.md` §3.5 与
+`common/package-info.java`）：用领域类型名前缀（`knowledgeBaseById` 而非 `kbById`）、
+单条 `…ById`／批量 `…ByIds`、不用无信息量后缀（`…Unscoped` 而非 `…Only`）、
+仓储 `list*`／服务 `get*`、同名方法跨接口必须同义。改名 5 组 / 20 文件（纯改名零语义）。
+
+> 与 M1 的关系：模块化会**放大**命名分歧的代价（跨模块引用要选 `api`/`implementation`、
+> 读代码要跨模块跳转）⇒ 先把共享词汇理干净，M1 的边界才划得动（§5.3 的推进顺序同理）。
