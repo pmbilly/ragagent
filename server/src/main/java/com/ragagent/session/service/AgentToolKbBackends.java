@@ -15,7 +15,7 @@ import com.ragagent.agent.tools.SearchAuth;
 import com.ragagent.agent.tools.SearchTarget;
 import com.ragagent.common.pipeline.SearchParams;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.common.settings.ConversationProperties;
+import com.ragagent.settings.ConversationProperties;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.repository.ChunkRepository;

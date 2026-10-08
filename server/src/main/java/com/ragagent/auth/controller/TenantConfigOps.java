@@ -16,7 +16,7 @@ import com.ragagent.common.tenant.WebSearchConfig;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.settings.MemoryConfig;
+import com.ragagent.common.memory.MemoryConfig;
 import com.ragagent.common.tenant.TenantRole;
 
 import org.springframework.web.bind.annotation.PathVariable;

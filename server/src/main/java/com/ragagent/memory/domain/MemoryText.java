@@ -1,7 +1,7 @@
 package com.ragagent.memory.domain;
 
-import com.ragagent.common.settings.MemoryKinds;
-import com.ragagent.common.settings.MemoryKeys;
+import com.ragagent.common.memory.MemoryKinds;
+import com.ragagent.common.memory.MemoryKeys;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

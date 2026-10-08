@@ -12,9 +12,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
-import com.ragagent.common.settings.MemoryConfig;
-import com.ragagent.common.settings.MemoryKeys;
-import com.ragagent.common.settings.MemoryKinds;
+import com.ragagent.common.memory.MemoryConfig;
+import com.ragagent.common.memory.MemoryKeys;
+import com.ragagent.common.memory.MemoryKinds;
 import com.ragagent.common.web.ZeroTimeSerializer;
 import com.ragagent.memory.domain.MemoryDocAffinity;
 import com.ragagent.memory.domain.MemoryExtractionBatch;

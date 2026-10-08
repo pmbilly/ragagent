@@ -13,12 +13,12 @@ import java.util.UUID;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.web.ZeroTimeSerializer;
-import com.ragagent.common.settings.MemoryConfig;
+import com.ragagent.common.memory.MemoryConfig;
 import com.ragagent.memory.domain.MemoryExtractionBatch;
 import com.ragagent.memory.domain.MemoryExtractionFailure;
 import com.ragagent.memory.domain.MemoryExtractionSession;
 import com.ragagent.memory.domain.MemoryItem;
-import com.ragagent.common.settings.MemoryKinds;
+import com.ragagent.common.memory.MemoryKinds;
 import com.ragagent.memory.domain.MemoryMessageCursor;
 import com.ragagent.memory.domain.MemoryScope;
 import com.ragagent.memory.domain.MemorySubject;
@@ -652,7 +652,7 @@ public class MemoryExtractionService {
                     target = existing.get(decision.target);
                 } else {
                     target = repo.findActiveByKey(scope,
-                            com.ragagent.common.settings.MemoryKeys.itemKey(topic, decision.content));
+                            com.ragagent.common.memory.MemoryKeys.itemKey(topic, decision.content));
                     if (target == null) {
                         continue;
                     }
@@ -660,7 +660,7 @@ public class MemoryExtractionService {
                 topic = target.getTopic();
             }
 
-            String key = com.ragagent.common.settings.MemoryKeys.itemKey(topic, decision.content);
+            String key = com.ragagent.common.memory.MemoryKeys.itemKey(topic, decision.content);
             if (!key.isEmpty() && seenTopics.contains(key)) {
                 continue;
             }

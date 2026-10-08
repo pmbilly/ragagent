@@ -1,4 +1,4 @@
-package com.ragagent.common.settings;
+package com.ragagent.common.memory;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;

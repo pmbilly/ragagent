@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.ragagent.common.settings.MemoryConfig;
+import com.ragagent.common.memory.MemoryConfig;
 import com.ragagent.memory.domain.MemoryItem;
-import com.ragagent.common.settings.MemoryKinds;
+import com.ragagent.common.memory.MemoryKinds;
 import com.ragagent.memory.domain.MemoryScope;
 import com.ragagent.memory.domain.MemoryVectorHit;
 import org.springframework.stereotype.Component;

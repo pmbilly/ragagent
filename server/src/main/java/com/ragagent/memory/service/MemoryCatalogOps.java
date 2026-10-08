@@ -5,9 +5,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.ragagent.common.settings.MemoryConfig;
-import com.ragagent.common.settings.MemoryKeys;
-import com.ragagent.common.settings.MemoryKinds;
+import com.ragagent.common.memory.MemoryConfig;
+import com.ragagent.common.memory.MemoryKeys;
+import com.ragagent.common.memory.MemoryKinds;
 import com.ragagent.memory.domain.MemoryDocAffinity;
 import com.ragagent.memory.domain.MemoryDocView;
 import com.ragagent.memory.domain.MemoryItem;

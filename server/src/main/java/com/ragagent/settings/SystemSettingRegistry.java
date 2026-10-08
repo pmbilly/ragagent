@@ -1,4 +1,4 @@
-package com.ragagent.common.settings;
+package com.ragagent.settings;
 
 import java.util.List;
 import java.util.Map;

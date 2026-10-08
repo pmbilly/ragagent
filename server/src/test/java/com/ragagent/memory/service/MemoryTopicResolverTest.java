@@ -14,7 +14,7 @@ import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
 import com.ragagent.llm.domain.StreamResponse;
-import com.ragagent.common.settings.MemoryKeys;
+import com.ragagent.common.memory.MemoryKeys;
 import com.ragagent.memory.domain.MemoryTopicStat;
 import com.ragagent.memory.mapper.MemoryRepository;
 import org.junit.jupiter.api.DisplayName;

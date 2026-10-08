@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.ragagent.common.settings.MemoryKinds;
+import com.ragagent.common.memory.MemoryKinds;
 import com.ragagent.common.web.ZeroTimeSerializer;
 import com.ragagent.memory.domain.MemoryConflictException;
 import com.ragagent.memory.domain.MemoryItem;

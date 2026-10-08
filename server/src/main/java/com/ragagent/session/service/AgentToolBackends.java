@@ -42,7 +42,7 @@ import com.ragagent.memory.service.MemorySearchResult;
 import com.ragagent.memory.service.MemoryService;
 import com.ragagent.session.domain.MessageSearchGroupItem;
 import com.ragagent.session.domain.MessageSearchResult;
-import com.ragagent.common.settings.ConversationProperties;
+import com.ragagent.settings.ConversationProperties;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.domain.Chunk;

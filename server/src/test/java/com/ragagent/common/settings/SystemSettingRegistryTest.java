@@ -1,4 +1,4 @@
-package com.ragagent.common.settings;
+package com.ragagent.settings;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

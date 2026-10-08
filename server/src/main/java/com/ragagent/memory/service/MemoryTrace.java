@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.ragagent.memory.domain.MemoryItem;
-import com.ragagent.common.settings.MemoryKeys;
+import com.ragagent.common.memory.MemoryKeys;
 
 /**
  * 长期记忆模块的 langfuse 观测门面。

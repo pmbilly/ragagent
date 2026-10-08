@@ -1,4 +1,4 @@
-package com.ragagent.common.settings;
+package com.ragagent.settings;
 
 import java.io.InputStream;
 import java.util.LinkedHashMap;

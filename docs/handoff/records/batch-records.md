@@ -1166,3 +1166,23 @@
 - **闸门**：后端全量 BUILD SUCCESSFUL + `spotlessCheck` + 四守卫（键名 / 包环含 SCC·R4·R5·R6 / Go 锚点 / 跨面键）绿。
 - **下一步（common 继续减重，按性价比）**：`common/security`（1,107 行 / 8 类 / 1 bean：`SsrfGuard` 等 —— 评估独立成 `security` 域）→ `common/tenant`（1,351 / 10）→ `common/web`（1,135 / 15）→ `common/settings`（1,199 / 6）；
   之后回到阶段 4：L2→L3 剩余 5 条清零、R13（controller→mapper 6 处）、M1 模块化（把软约束变硬约束）。
+
+**✅ B103（2026-10-08，common 减重②：`settings` 归位 + `Memory*` 词汇判定）**
+- **先量后动**：`common/settings` 无内部反向依赖（无 other-common 包 import 它）、出向只有 `common.web.ToolJson`（域→L1 ✓ 允许）⇒ 可安全独立成域；消费方 auth/knowledge/session/system。
+- **搬迁一（成功）**：`ConversationProperties` / `SystemSettingGateway` / `SystemSettingRegistry` → 顶层 `com.ragagent.settings`（461 行）。
+  `@ConfigurationPropertiesScan` 条目随引用改写（`com.ragagent.common.settings` → `com.ragagent.settings`）；实测该包**无任何 `@ConfigurationProperties`**（条目为历史遗留，保留无害且 R2 只要求"注解 ⊆ 名单"）。
+- **搬迁二（被守卫拦下，回退）**：把 `MemoryConfig`/`MemoryKeys`/`MemoryKinds` 搬进 `memory/domain` 后，**SCC 守卫当场报「间接环 1 组；新增成员 [auth, memory]」**：
+  - 新边：`auth/controller/TenantConfigOps → memory.domain.MemoryConfig`（租户配置里的 `MemoryConfig` 字段）
+  - 旧边：`memory/service/MemoryService → auth.service.TenantService`
+  ⇒ 判定：这三个类型是 **auth + memory + datasource 共享的词汇**，放进 memory 域必然造环 ⇒ 回退到新建的 **`common/memory/`**（package-info 写明"为什么不放 memory 域"与依赖方向"消费域 → common.memory ← memory 域"）；守卫回绿。
+  · **方法论收获**：R1b（SCC 棘轮）在"跨域词汇错位"这类搬迁上**是有效的第一道报警**——本次是它第一次拦下一个真实的新环。
+- **顺带发现（登记待查）**：`ConversationProperties` 全仓无业务引用（疑似死代码；未删，因删代码需单独论证）。
+- **体量轨迹**：`common` 11,183 → 9,374（B102）→ **8,175 行 / 119 文件**（B103），两批 **-27%**；`settings` 域 461 行 + `common/memory` 738 行（词汇）。
+- **剩余候选与判定（已量，未搬）**：
+  | 包 | 判定 | 结论 |
+  |---|---|---|
+  | `common/security`（1,107 行，24 消费方） | 横切基础设施（SSRF/净化/API-Key 白名单词汇），**不是域** | 留 common |
+  | `common/web`（1,135 行，26 消费方） | HTTP/MyBatis 基础设施 + `HealthController` | 留 common（可选微调：类型处理器归 `common/mybatis`） |
+  | `common/tenant`（1,371 行，**是域**） | 被 `common/web/RbacInterceptor → TenantRole/TenantProperties` 反向使用 | 搬前须先解：把 RBAC 词汇留 common，或把 `RbacInterceptor` 移出 common/web |
+- **闸门**：后端全量 BUILD SUCCESSFUL + `spotlessCheck` + 四守卫（键名 / 包环含 SCC·R4·R5·R6 / Go 锚点 / 跨面键）绿。
+- **下一步**：`common/tenant` 拆分（需先做上面的解阻）或直接转阶段 4：L2→L3 剩余 5 条清零 → R13（controller→mapper 6 处）→ M1 模块化（软约束变硬约束）。

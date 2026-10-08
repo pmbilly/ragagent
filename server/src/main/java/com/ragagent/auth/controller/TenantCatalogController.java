@@ -12,7 +12,7 @@ import com.ragagent.common.security.SsrfGuard;
 import com.ragagent.common.tenant.TenantProperties;
 import com.ragagent.common.knowledge.KnowledgeBaseProvisioner;
 import com.ragagent.common.storage.StorageAllowList;
-import com.ragagent.common.settings.SystemSettingGateway;
+import com.ragagent.settings.SystemSettingGateway;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;

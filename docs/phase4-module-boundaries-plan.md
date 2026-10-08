@@ -96,7 +96,10 @@ ArchUnit 1.3.0 **已是测试依赖**（`server/build.gradle.kts:111`），可�
 | **R5** 底座不得依赖业务域 | ✅ B101：`common`/`event`/`stream`/`tracing` → 业务域 = **0 条**（绝对禁止；红态探针验过，退出码 1） |
 | **R6** common 实现痕迹棘轮 | ✅ B101：bean = `crypto`/`security`/`storage` 各 1、域持久层引用 0；按子包只许减不许增 |
 | **`common/approval` 归位** | ✅ B102：1,758 行 / 24 文件搬到顶层 `com.ragagent.approval`（审批门 Gate + Redis pub/sub + 待审请求/决议）；出向依赖**只有 common** ⇒ 不引入环；`common` 11,183 → **9,374 行**（-16%） |
-| 剩余减重候选 | `common/tenant`（1,351 行 / 10 类）、`common/settings`（1,199 / 6）、`common/web`（1,135 / 15）、`common/security`（1,107 / 8，含 1 个 `@Component`）——这批是"子系统/工具住在 common"，逐个评估独立成域/并入某域 |
+| **`common/settings` 归位** | ✅ B103：`ConversationProperties`/`SystemSettingGateway`/`SystemSettingRegistry` → 顶层 `com.ragagent.settings`（461 行；`@ConfigurationPropertiesScan` 条目随迁）；`MemoryConfig`/`MemoryKeys`/`MemoryKinds` **判定为跨域词汇** ⇒ 留 common（新建 `common/memory`，见下） |
+| **B103 的关键教训** | 曾把 `Memory*` 一并搬进 `memory/domain` ⇒ **SCC 守卫立刻抓出 `auth ↔ memory` 新环**（新边 `auth/controller/TenantConfigOps → memory.domain.MemoryConfig`；旧边 `memory/service/MemoryService → auth.service.TenantService`）⇒ 判定它们是 **auth 租户配置 + memory 域 + datasource 共享的词汇**，回退到 `common/memory/`（新包 + package-info 写明原因） |
+| 剩余减重候选与判定 | `common/security`（1,107 行 / 24 消费方）与 `common/web`（1,135 / 26 消费方）= **横切基础设施**（非域）⇒ 应留；`common/tenant`（1,371，**是域**）但被 `common/web/RbacInterceptor → TenantRole/TenantProperties` 反向使用 ⇒ 搬前须先解（把 RBAC 词汇留 common，或把 `RbacInterceptor` 移出 common/web）|
+| common 体量轨迹 | 11,183（B101 前）→ **9,374**（B102 approval 归位）→ **8,175 行 / 119 文件**（B103 settings 归位 + memory 词汇留驻），两批共 **-27%** |
 
 ## 3. 目标模块图（**6 个模块，不是 30 个**）
 

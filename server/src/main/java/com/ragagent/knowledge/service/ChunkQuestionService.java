@@ -15,7 +15,7 @@ import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.BizException;
 import com.ragagent.common.retrieval.RetrievalDriverProperties;
 import com.ragagent.common.prompt.PromptInstructions;
-import com.ragagent.common.settings.ConversationProperties;
+import com.ragagent.settings.ConversationProperties;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.DocumentChunkMetadata;
 import com.ragagent.knowledge.domain.GeneratedQuestion;

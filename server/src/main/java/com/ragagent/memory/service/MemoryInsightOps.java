@@ -5,9 +5,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.ragagent.common.settings.MemoryConfig;
-import com.ragagent.common.settings.MemoryKeys;
-import com.ragagent.common.settings.MemoryKinds;
+import com.ragagent.common.memory.MemoryConfig;
+import com.ragagent.common.memory.MemoryKeys;
+import com.ragagent.common.memory.MemoryKinds;
 import com.ragagent.memory.domain.MemoryDocAffinity;
 import com.ragagent.memory.domain.MemoryItem;
 import com.ragagent.memory.domain.MemoryScope;

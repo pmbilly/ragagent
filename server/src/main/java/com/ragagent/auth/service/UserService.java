@@ -18,7 +18,7 @@ import com.ragagent.auth.dto.Membership;
 import com.ragagent.auth.mapper.AuthTokenMapper;
 import com.ragagent.auth.mapper.UserMapper;
 import com.ragagent.common.context.TenantContext;
-import com.ragagent.common.settings.SystemSettingGateway;
+import com.ragagent.settings.SystemSettingGateway;
 import io.jsonwebtoken.Claims;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
