@@ -33,7 +33,7 @@
     "server/src/main/java/com/ragagent/embedchannel/service/EmbedChannelService.java": 773,
     "server/src/main/java/com/ragagent/im/dingtalk/DingtalkAdapter.java": 756,
     "server/src/main/java/com/ragagent/im/runtime/ToolDisplay.java": 761,
-    "server/src/main/java/com/ragagent/im/service/ImService.java": 995,
+    "server/src/main/java/com/ragagent/im/service/ImService.java": 936,
     "server/src/main/java/com/ragagent/im/wecom/WecomLongConnClient.java": 662,
     "server/src/main/java/com/ragagent/im/yunzhijia/YunzhijiaAdapter.java": 644,
     "server/src/main/java/com/ragagent/initialization/service/InitializationConfigService.java": 709,
@@ -76,7 +76,7 @@
     "server/src/main/java/com/ragagent/im/service/ImService.java": {
       "status": "pending",
       "since": "2026-10-08",
-      "reason": "回涨欠债：2026-10-01 切片至 664 行「出榜」后，7 天内被 im 域功能批次（Redis 面 / 跨实例 stop / 附件面 / 选主广播 / 附件异步入库）加到 1,091 行（+427）——两套机制当时都看不见（§14.5 只在 ≥800 时登记、B121 只管新文件）。B122 起由本守卫冻结增长，拆分另立批次（B123 起）；**B123 第一刀已落（1091→995，停止链路外提 `ImStopOps`）**，出榜还需 2~3 刀"
+      "reason": "回涨欠债：2026-10-01 切片至 664 行「出榜」后，7 天内被 im 域功能批次（Redis 面 / 跨实例 stop / 附件面 / 选主广播 / 附件异步入库）加到 1,091 行（+427）——两套机制当时都看不见（§14.5 只在 ≥800 时登记、B121 只管新文件）。B122 起由本守卫冻结增长，拆分另立批次（B123 起）；**B123 第一刀（1091→995，停止链路外提 `ImStopOps`）+ B125 第二刀（995→936，入口闸门外提 `ImInboundGuardOps`）**，出榜还需 1~2 刀"
     },
     "server/src/main/java/com/ragagent/knowledge/service/KnowledgeService.java": {
       "status": "accepted",

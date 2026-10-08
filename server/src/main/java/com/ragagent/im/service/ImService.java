@@ -2,7 +2,6 @@ package com.ragagent.im.service;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,8 +75,6 @@ public class ImService implements AgentChannelCleaner {
     private static final Logger log = LoggerFactory.getLogger(ImService.class);
     static final ObjectMapper JSON = new ObjectMapper();
 
-    /** 消息去重标记的 TTL。 */
-    private static final int DEDUP_TTL_SECONDS = 300;
     /** WS 长连接 leader 锁的 TTL。 */
     private static final int LEADER_TTL_SECONDS = 15;
     /** leader 续期间隔。 */
@@ -99,8 +96,6 @@ public class ImService implements AgentChannelCleaner {
     final Resolver storageResolver;
 
     // ── 调谐参数 ─────────────────────────────────────────────────────────
-    private final int rateLimitWindowSec;
-    private final int rateLimitMax;
     /** IM 的 Redis 面（stop marker / inflight 映射）；未启用为 null（单实例形态）。 */
     private final ImRedisStore redisStore;
     /** 实例标识：leader 锁的值 + 广播事件源过滤（随机 UUID）。 */
@@ -122,6 +117,8 @@ public class ImService implements AgentChannelCleaner {
     final ImAttachmentPreparer attachmentPreparer;
     /** 跨实例 /stop 全链路（B123 自本类外提；与门面共享 inflight 表）。 */
     final ImStopOps stopOps;
+    /** 消息入口闸门：去重与限流（B125 自本类外提；两张进程内回落表随之搬家）。 */
+    final ImInboundGuardOps inboundGuard;
     /** 知识库创建面（渠道配了 KB 时附件异步入库；组件缺席时跳过）。 */
     private final ObjectProvider<KnowledgeService> knowledgeServices;
 
@@ -130,8 +127,6 @@ public class ImService implements AgentChannelCleaner {
 
     /** 运行中的渠道（channelID → 状态）。 */
     private final Map<String, ChannelState> channelStates = new ConcurrentHashMap<>();
-    /** 去重（进程内分支）：messageID → epoch 秒。 */
-    private final Map<String, Long> processedMsgs = new ConcurrentHashMap<>();
     /** 在途请求（/stop 的本地取消面）。 */
     final Map<String, InflightEntry> inflight = new ConcurrentHashMap<>();
 
@@ -176,8 +171,6 @@ public class ImService implements AgentChannelCleaner {
         this.knowledgeQaService = knowledgeQaService;
         this.agentQaService = agentQaService;
         this.storageResolver = storageResolver.orElse(null);
-        this.rateLimitWindowSec = rateLimitWindowSec;
-        this.rateLimitMax = rateLimitMax;
         this.streamPipeline = new ImStreamPipeline(this);
         this.outboundFormatter = new ImOutboundFormatter(this);
         this.sessionResolver = new ImSessionResolver(this);
@@ -211,6 +204,7 @@ public class ImService implements AgentChannelCleaner {
         }, store, globalMaxWorkers, null);
         this.qaQueue.start();
         this.stopOps = new ImStopOps(store, qaQueue, inflight, () -> streamManagerRef);
+        this.inboundGuard = new ImInboundGuardOps(redisStore, rateLimitWindowSec, rateLimitMax);
         if (pubSub != null) {
             startChannelConfigSubscriber();
         }
@@ -641,31 +635,6 @@ public class ImService implements AgentChannelCleaner {
     // ── 消息入口 ─────────────────────────────────────────────────────────
 
     /**
-     * 同一 messageID 只处理一次：Redis 接入时走跨实例 SETNX（故障 fail-closed——
-     * 宁可丢一条可重发的，也不重复跑一轮 LLM）；未接入时回落到进程内 map。
-     */
-    boolean isDuplicate(String messageId) {
-        if (redisStore != null) {
-            Boolean first = redisStore.setIfAbsent(ImRedisKeys.DEDUP_PREFIX + messageId, "1",
-                    DEDUP_TTL_SECONDS);
-            if (first == null) {
-                log.error("[IM] Redis dedup failed (fail-closed, message dropped): {}", messageId);
-                return true;
-            }
-            return !first;
-        }
-        long now = System.currentTimeMillis();
-        Long prev = processedMsgs.putIfAbsent(messageId, now);
-        if (prev != null) {
-            return true;
-        }
-        if (processedMsgs.size() > 10_000) {
-            processedMsgs.entrySet().removeIf(e -> now - e.getValue() > 300_000);
-        }
-        return false;
-    }
-
-    /**
      * IM 消息总入口：去重 → 限长 → 适配器解析 → 限流 → 空消息提示 → 会话解析 →
      * 命令分派 → QA 排队。全程绑定渠道租户的合成身份
      * （"system-<tenantID>" 合成用户 + viewer 最小权限——
@@ -690,7 +659,7 @@ public class ImService implements AgentChannelCleaner {
                     TenantContext.PrincipalTypes.IM_USER, "system-" + tid),
                     "viewer", false, "system-" + tid, false);
         }
-        if (msg.messageId != null && !msg.messageId.isEmpty() && isDuplicate(msg.messageId)) {
+        if (msg.messageId != null && !msg.messageId.isEmpty() && inboundGuard.isDuplicate(msg.messageId)) {
             log.info("[IM] Skipping duplicate message: {}", msg.messageId);
             return;
         }
@@ -722,7 +691,7 @@ public class ImService implements AgentChannelCleaner {
                 ? msg.threadId : "";
 
         boolean isCommand = cmdRegistry.isRegistered(msg.content);
-        if (!isCommand && !rateLimitAllow(makeRateKey(channelId, msg.userId, msg.chatId, threadId))) {
+        if (!isCommand && !inboundGuard.rateLimitAllow(ImInboundGuardOps.makeRateKey(channelId, msg.userId, msg.chatId, threadId))) {
             log.warn("[IM] Rate limited: channel={} user={} chat={}", channelId, msg.userId, msg.chatId);
             sendReplyQuiet(adapter, msg, new ReplyMessage("您的消息发送过于频繁，请稍后再试。", false, true));
             return;
@@ -793,34 +762,6 @@ public class ImService implements AgentChannelCleaner {
         }
     }
 
-    /** 限流的本地滑动窗口（Redis 故障时回落）。 */
-    private final Map<String, List<Long>> rateWindows = new ConcurrentHashMap<>();
-
-    private boolean rateLimitAllow(String key) {
-        if (redisStore != null) {
-            Boolean allowed = redisStore.rateLimitAllow(ImRedisKeys.RATE_LIMIT_PREFIX + key,
-                    rateLimitWindowSec, rateLimitMax);
-            if (allowed != null) {
-                return allowed;
-            }
-            // Redis 故障 → 回落本地滑窗
-        }
-        long now = System.currentTimeMillis();
-        long windowMs = rateLimitWindowSec * 1000L;
-        List<Long> hits = rateWindows.computeIfAbsent(key, k -> java.util.Collections.synchronizedList(new ArrayList<>()));
-        synchronized (hits) {
-            hits.removeIf(t -> now - t > windowMs);
-            if (hits.size() >= rateLimitMax) {
-                return false;
-            }
-            hits.add(now);
-            return true;
-        }
-    }
-
-    private static String makeRateKey(String channelId, String userId, String chatId, String threadId) {
-        return "rl:" + ImFormat.makeUserKey(channelId, userId, chatId, threadId);
-    }
 
     /** 空消息的提示语（按原始消息类型给出指引）。 */
     record EmptyHint(String hint, boolean present) {

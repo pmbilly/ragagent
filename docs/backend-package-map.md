@@ -103,6 +103,23 @@ B33 已归位：`AppEnvLookup` → `common/deployment`、`StorageRuntimeEnv` →
       根（框架 + 跨族共享 + 通用单件 + MCP 族） + `wiki/knowledge/sql/data/web` 五个能力子包。
       判据：有天然族才拆，别为扁平而扁平；MCP 族因与 `ToolRegistry` 同包紧耦合暂留根（已登记）。
 
+### 端口归属判据（2026-10-08 B125 补：修正一次误判）
+
+仓库里有两种端口形态——**不是"两套解法"，而是两种场景的正解**：
+
+| 场景 | 端口放哪 | 例子 | 为什么 |
+|---|---|---|---|
+| **L3 ↔ L3**（域间互调）| `:common` 的 `common.<domain>` 包 | `common.knowledge.ChunkPort`、`common.session.SessionMessagePort` | 域之间不许互相依赖 ⇒ 契约只能下沉 L1；由**编译器**（模块边界）强制 |
+| **L2 ↔ L3**（能力层用业务域）| **消费侧拥有**（留在 L2 包内）| `chatpipeline.PipelinePorts`（16 个内嵌接口 + 异常 + 3 个载荷 record）| 依赖方向本就合法（L3→L2 允许）⇒ 消费侧拥有接口正是依赖倒置；载荷用 L2 类型（`LlmChatClient`/`Reranker`）也合法 |
+
+**判据一句话**：接口两边**都在 L3** ⇒ 进 `common.<domain>`；**有一边是 L2** ⇒ 留在 L2 消费侧。
+
+> **修正记录（B124 → B125）**：B124 的架构评述把「`PipelinePorts` 没进 `common`」列为"第 1 号不一致"，
+> 侦察后**修正**：它引用了 4 个 L2 类型（`llm.LlmChatClient`、`rerank.Reranker`、
+> `retrieval.domain.WebSearchResult`、`retrieval.graph.RetrieveGraphRepository`），
+> **整体搬进 `:common` 会造成 L1→L2 反向依赖**——那是错的。它该留，判据补在此处，
+> 免得以后有人反过来搬（或把 L2 端口硬塞进 L1）。
+
 ### 守卫编号地图（2026-10-08 B124 定：两套体系互不重号）
 
 | 前缀 | 出处 | 条数 | 主题 | 在哪看 |
@@ -123,7 +140,7 @@ B33 已归位：`AppEnvLookup` → `common/deployment`、`StorageRuntimeEnv` →
 
 | 行数 | 文件 | | 行数 | 文件 |
 |---|---|---|---|---|
-| 995 | `im/service/ImService`（B123 首刀 1091→995） | | 772 | `retrieval/HybridSearchService` |
+| 936 | `im/service/ImService`（B123 首刀 1091→995；B125 二刀 →936） | | 772 | `retrieval/HybridSearchService` |
 | 1041 | `session/service/SessionKnowledgeQaService` | | 765 | `memory/service/MemoryService` |
 | 919 | `memory/mapper/MemoryIndexStore` | | 763 | `agent/ActPhase` |
 | 847 | `knowledge/task/KnowledgeProcessWorker` | | 761 | `im/runtime/ToolDisplay` |
