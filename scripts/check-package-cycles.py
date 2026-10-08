@@ -51,6 +51,17 @@ l1_to_l3 = sorted((a, b) for a in L1_CORE for b in edge.get(a, ()) if b in L3)
 # common 实现痕迹（R6）：按子包登记，只许减不许增
 BEAN_RE = re.compile(r"^\s*@(Component|Service|Repository|Configuration)\b", re.M)
 PERSIST_RE = re.compile(r"^import com\.ragagent\.[\w.]+\.(mapper|repository)\.", re.M)
+# package 声明 ↔ 路径（R7）
+miss_decl = []
+for _root in ("main/java", "test/java"):
+    _base = pathlib.Path("server/src") / _root
+    for _p in _base.rglob("*.java"):
+        _m = re.search(r"^package\s+([\w.]+);", _p.read_text(encoding="utf-8"), re.M)
+        _exp = str(_p.parent.relative_to(_base)).replace("/", ".")
+        if _m and _m.group(1) != _exp:
+            miss_decl.append(f"{_p}（声明 {_m.group(1)}，应为 {_exp}）")
+miss_decl = sorted(miss_decl)
+
 common_beans, common_persistence = {}, {}
 common_persistence["(mapper/repository 子包)"] = sum(
     1 for _d in (ROOT / "common").rglob("*")
@@ -142,6 +153,8 @@ print(f"L2 → L3 直连：{len(l2_to_l3)} 条（基线 {len(old.get('l2_to_l3',
 print(f"已解耦包对（R4）：{len(DECOUPLED)} 对" + ("" if not relapsed
       else "；✗ 回流：" + ", ".join(f"{a}→{b}" for a, b in relapsed)))
 
+print(f"package 声明↔路径（R7）：{len(miss_decl)} 处不一致"
+      + ("" if not miss_decl else "；✗ " + " | ".join(miss_decl[:3])))
 print(f"L1 底座（common/event/stream/tracing）→ 业务域：{len(l1_to_l3)} 条"
       + ("" if not l1_to_l3 else "；✗ " + ", ".join(f"{a}→{b}" for a, b in l1_to_l3)))
 print(f"common 实现痕迹（R6）：bean {sum(common_beans.values())} 个 / 域持久层引用 "
@@ -150,7 +163,7 @@ print(f"common 实现痕迹（R6）：bean {sum(common_beans.values())} 个 / �
       + ("" if not (new_beans or new_persist) else
          f"；✗ 新增：bean {new_beans} / 持久层 {new_persist}"))
 
-if new_cycles or new_cfg or new_l23 or new_scc_members or relapsed or l1_to_l3 or new_beans or new_persist:
+if new_cycles or new_cfg or new_l23 or new_scc_members or relapsed or l1_to_l3 or new_beans or new_persist or miss_decl:
     print("\n✗ 守卫失败：出现新的环（含间接环）、新的分层违例，或已解耦包对回流（见上）。")
     sys.exit(1)
 print("\n✓ 守卫通过：环与分层违例均未增加。")

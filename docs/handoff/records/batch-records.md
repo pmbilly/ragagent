@@ -1202,3 +1202,16 @@
 - **效果**：`common` 8,175 → **7,812 行 / 114 文件**；四批累计 11,183 → 7,812（**-30%**）。
 - **闸门**：后端全量 BUILD SUCCESSFUL + `spotlessCheck` + 四守卫（键名 / 包环含 SCC·R4·R5·R6 三条 / Go 锚点 / 跨面键）绿。
 - **剩余 common 包判定**：`security`（1,107 / 24 消费方）、`web`（1,135 / 26 消费方）为横切基础设施 ⇒ 留；`common/web` 内的 `RbacInterceptor` 若想纯化可单开一批（注意不得放 `config`）。
+
+**✅ B105（2026-10-08，搬家副作用修复 + R7 守卫）**
+- **问题（IDE 报错，构建全绿）**：`server/src/test/java/com/ragagent/common/approval/**`（9 文件）与 `common/settings/SystemSettingRegistryTest.java` 的
+  `package` 声明已被 B102/B103 的全仓替换改成 `com.ragagent.approval` / `com.ragagent.settings`，但**测试目录没跟着搬** ⇒ JDT 报
+  「declared package does not match the expected package」并连带一片 "cannot be resolved"。
+- **为什么构建没红**：javac 按源集全量编译**不看目录**；spotless 也只管格式 ⇒ 声明↔路径不一致是"构建盲区"（只有 IDE 抓）。
+- **修复**：`git mv` 两个测试目录到与新包一致的路径（`src/test/java/com/ragagent/approval/`、`.../settings/`）；复查 main+test 全域 0 处不一致。
+- **根因与纪律**：全仓字符串改名（`server/src/**`）会连 **`package` 声明**一起改，而 `git mv` 只做了**主源码目录** ⇒
+  **规则：改名批要么同时搬目录，要么把 `package` 声明行排除在替换之外**；本次已把这条固化成守卫。
+- **新增守卫 R7（绝对禁止）**：`package X;` 必须等于文件路径推导包名（main / test 都查）。
+  探针（`src/test/java/com/ragagent/probe/ProbeDecl.java` 声明 `com.ragagent.wrong`）→ 报
+  「package 声明↔路径（R7）：1 处不一致；✗ …（声明 com.ragagent.wrong，应为 com.ragagent.probe）」✓（探针已删）。
+- **闸门**：后端全量 BUILD SUCCESSFUL + `spotlessCheck` + 四守卫（含 R7）绿。
