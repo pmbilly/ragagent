@@ -90,39 +90,27 @@ BASELINE: dict[str, set[str]] = {
     # datasource 配置 jsonb（存量面）
     'datasource/dto/DataSourceResponse.java': {'feed_urls'},
     # MyBatis 列名/参数（非 JSON 键）
-    'datasource/mapper/DataSourceRepository.java': {'conflict_strategy', 'created_at', 'deleted_at', 'error_message', 'knowledge_base_id', 'last_sync_at', 'sync_log_retention_days', 'sync_mode', 'sync_schedule', 'tenant_id', 'updated_at'},
     # MyBatis 列名/参数（非 JSON 键）
-    'datasource/mapper/SyncLogRepository.java': {'created_at', 'data_source_id', 'error_message', 'finished_at', 'items_created', 'items_deleted', 'items_failed', 'items_skipped', 'items_total', 'items_updated', 'started_at', 'tenant_id', 'updated_at'},
     # MyBatis 列名/参数（非 JSON 键）
     'datasource/service/DataSourceItemOps.java': {'datasource_id', 'external_id', 'source_created_at', 'source_resource_id', 'source_updated_at'},
     # MyBatis 列名/参数（非 JSON 键）
     'datasource/service/DataSourceSupport.java': {'processing_status', 'resource_ids', 'task_id'},
     # MyBatis 列名/参数（非 JSON 键）
-    'datasource/service/MapperKnowledgeBridge.java': {'deleted_at', 'updated_at'},
     # MyBatis 列名/参数（非 JSON 键）
-    'knowledge/repository/ChunkRepository.java': {'content_revision', 'deleted_at', 'index_status', 'is_enabled', 'last_editor_id', 'source_content', 'updated_at'},
     # MyBatis 列名/参数（非 JSON 键）
-    'knowledge/repository/FaqChunkRepository.java': {'is_enabled', 'tag_id', 'updated_at'},
     # MyBatis 列名/参数（非 JSON 键）
     'knowledge/service/FaqEntryCommandService.java': {'source_type'},
     # MyBatis 列名/参数（非 JSON 键）
-    'knowledge/service/KnowledgeBaseService.java': {'deleted_at'},
     # MyBatis 列名/参数（非 JSON 键）
-    'knowledge/service/KnowledgeBatchOpsService.java': {'deleted_at', 'enable_status', 'error_message', 'parse_status', 'processed_at', 'updated_at'},
     # MyBatis 列名/参数（非 JSON 键）
-    'knowledge/service/KnowledgeCloneService.java': {'deleted_at'},
     # MyBatis 列名写入点（非 JSON 键）
     'knowledge/service/KnowledgeFileService.java': {'content_revision', 'embedding_model_id', 'enable_status', 'error_message', 'file_hash', 'file_name', 'file_path', 'file_size', 'file_type', 'parse_status', 'processed_at', 'summary_status', 'updated_at'},
     # MyBatis 列名/参数（非 JSON 键）
-    'knowledge/service/KnowledgeFolderService.java': {'folder_path', 'updated_at'},
     # MyBatis 列名/参数（非 JSON 键）
-    'knowledge/service/KnowledgeMoveService.java': {'embedding_model_id', 'enable_status', 'error_message', 'knowledge_base_id', 'parse_status', 'processed_at', 'storage_size', 'updated_at'},
     # MyBatis 列名/参数（非 JSON 键）
-    'knowledge/service/KnowledgeParseService.java': {'error_message', 'parse_status', 'pending_subtasks_count', 'updated_at'},
     # MyBatis 列名/参数（非 JSON 键）
     'knowledge/service/KnowledgeService.java': {'deleted_at', 'updated_at'},
     # MyBatis 列名/参数（非 JSON 键）
-    'knowledge/service/KnowledgeSummaryService.java': {'summary_status'},
     # langfuse 面
     'knowledge/service/SpanTracker.java': {'langfuse_trace_id', 'updated_at'},
     # 提示词模板变量（数据值，模板里是 {{server_name}} 等）
@@ -139,13 +127,10 @@ BASELINE: dict[str, set[str]] = {
     'memory/service/MemoryTrace.java': {'conditioned_items', 'document_count', 'interest_count', 'recalled_items', 'recalled_items_truncated'},
     # model 凭据面（两端自洽，统一另立批）
     # MyBatis 列名/参数（非 JSON 键）
-    'model/service/BuiltinModelsReconciler.java': {'deleted_at', 'is_default'},
     # MyBatis 列名/统计查询（非 JSON 键）
     'model/service/ModelService.java': {'agent_total', 'deleted_at', 'knowledge_base_total'},
     # WeKnora Cloud 第三方 API
-    'model/service/WeKnoraCloudService.java': {'app_id', 'app_secret'},
     # 读取 SQL/检索行键（存量面）
-    'modelcontext/ModelOutput.java': {'knowledge_id', 'knowledge_title'},
     # Cypher 字段
     'retrieval/graph/Neo4jGraphRepository.java': {'knowledge_id', 'source_labels', 'target_labels'},
     # ImageInfo 面（§15.3 冻结族）
@@ -153,7 +138,6 @@ BASELINE: dict[str, set[str]] = {
     # web 引用载荷（同 ReferencesSupport 存量面）
     'retrieval/support/WebResultConverter.java': {'published_at'},
     # 工具结果/附件载荷（存量面，同 tool-results）
-    'session/controller/QaAttachmentResolver.java': {'display_type', 'parsed_count', 'skipped_count'},
     # SSE/消息载荷（与 agent_steps 同族，改则直播与回放脱节）
     'session/controller/QaSseOrchestrator.java': {'assistant_created_at', 'assistant_message_id', 'session_id', 'user_created_at', 'user_message_id'},
     # 同上（SSE/消息载荷）
@@ -163,7 +147,6 @@ BASELINE: dict[str, set[str]] = {
     # MyBatis 列名写入点（非 JSON 键）
     'session/mapper/MessageRepository.java': {'agent_duration_ms', 'agent_id', 'agent_tenant_id', 'is_completed', 'is_fallback', 'knowledge_id', 'model_id', 'rendered_content', 'request_id', 'updated_at'},
     # MyBatis 列名写入点（非 JSON 键）
-    'session/mapper/MessageSuggestionRepository.java': {'allow_regenerate', 'completion_tokens', 'error_code', 'generated_at', 'latency_ms', 'lease_until', 'model_id', 'prompt_tokens', 'suppression_reason', 'updated_at'},
     # agent_steps 落库列 + 历史回放
     'session/service/AgentStreamBridge.java': {'completed_at', 'duration_ms', 'event_id', 'final_content', 'is_fallback', 'message_id', 'messages_after', 'messages_before', 'pending_id', 'session_id', 'split_turn', 'steer_id', 'tokens_after', 'tokens_before', 'tool_call_id', 'tool_name', 'total_duration_ms', 'total_steps', 'user_message_id'},
     # agent_steps/推荐面落库 + 回放
@@ -183,11 +166,9 @@ BASELINE: dict[str, set[str]] = {
     # 存储引擎配置面（snake，同上）
     'system/controller/SystemController.java': {'access_key_id', 'bucket_name', 'mineru_parse_method', 'secret_access_key', 'use_ssl', 'weknoracloud_app_id'},
     # MyBatis 列名/参数（非 JSON 键）
-    'system/service/SystemAdminUserService.java': {'is_revoked'},
     # 平台审计 details jsonb（存量 + 回放）
     'system/service/SystemSettingService.java': {'new_value', 'old_value', 'value_type'},
     # MyBatis 列名写入点（非 JSON 键）
-    'wiki/service/DefaultWikiKnowledgeFinalizer.java': {'error_message', 'parse_status', 'processed_at', 'updated_at'},
     # 模型输出契约（提示词里就是 new_slugs；只解析入站）
     'wiki/service/ingest/WikiIngestCitePipeline.java': {'new_slugs'},
     # wiki 摄取内部 jsonb 状态（存量）
