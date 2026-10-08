@@ -1122,3 +1122,24 @@
 - **本批实做**：`WikiPageServiceImpl:444` 换 `kbLookup.kbByIdIncludingDeleted`（无测试直构 ⇒ 零涟漪）⇒ `wiki → knowledge` **36 → 34**；`spotlessApply` 清 4 个失用 import。
 - **闸门**：wiki 面测试全绿 + `spotlessCheck` + 四守卫绿。
 - **下一步**：C2-b 实施建议顺序——① `common` 定 `ChunkView` + `SpanHandle`；② `WikiIngestBatchHandler` 端口化（含测试替身）；③ cite/cleaner/imageEnricher/finalizer；④ embedder；⑤ C2-c 的 22 个 `requireWikiKB` 调用点。
+
+**✅ B100（2026-10-08，C2 归零：`wiki → knowledge` 完全端口化）**
+- **目标达成**：`wiki` 主源码对 `knowledge` 的 import **43 → 0**（B91 时登记的最大工程项，三条断点之一）。
+- **端口与视图（`common/knowledge/`）**
+  | 文件 | 内容 |
+  |---|---|
+  | `ChunkPort` | `textChunks`（tenant+kid+type=text，index 升序）/ `chunksByIds` / `deleteChunk` / `enrichContentWithImageInfo` |
+  | `KnowledgeSpanPort` | `beginWikiSubspan` / `beginSubSpan` / `endSpan` / `failSpan` / `skipSpan` + 不透明 `SpanHandle` |
+  | `KnowledgeFinalizePort` | `finalizeSubtask(kid, now) → Result(decremented, promoted)` |
+  | `EmbeddingModelPort` | `embedderFor(modelId) → Embedder`（函数式，`batchEmbed`） |
+  | `ChunkView` / `KnowledgeBaseView` / `KnowledgeView` | 投影视图（`KnowledgeBaseView` 提升为顶层 + setter，22 个调用点与测试夹具零改写） |
+  | `KnowledgeBaseLookup` | 补 `knowledgeById(kid) → KnowledgeView` |
+- **适配器（`knowledge/service/`）**：`ChunkPortAdapter`（含 `ImageInfoEnricher` 三方法 + `ChunkRepository::listChunksByParentIDs`）、`KnowledgeSpanAdapter`（整体搬 `WikiBatchSupport.WikiSpans` 的三步与 best-effort）、
+  `KnowledgeFinalizeAdapter`（搬两条 `LambdaUpdateWrapper` + try/catch + 告警日志）、`EmbeddingModelAdapter`（搬 embedding 类型闸门 + `EmbedderClient.configFrom`）。
+  **口径**：所有过滤条件、降级姿态（仓储缺位/异常/空值）与迁移前**逐字一致**——C2 只换依赖方向，不改行为。
+- **wiki 侧**：`WikiIngestBatchHandler` 7 引入 → 0；删 `WikiBatchSupport.WikiSpans`；13 个文件换端口/视图；`DocIngestResult` 的 span 句柄换成端口类型。
+- **测试**：新增 `KnowledgeFinalizeAdapterTest`（承接原 wiki 测试的 **SQL 形状断言**：钳零守卫、`parse_status`+计数双守、SET 含 completed/error_message/processed_at）；`WikiKnowledgeFinalizerTest` 收窄为薄壳（Result→Outcome、空 id 短路、不抛）；7 个 wiki 测试改替身（`ChunkPort`/`KnowledgeBaseLookup`/`KnowledgeSpanPort` 替身 + `wikiKb()` 改视图）。
+  `WikiIngestServiceTest` 的"端口缺位"用 mock 端口（`knowledgeGone` 默认 false）保持旧语义。
+- **守卫**：`check-package-cycles.py` 新增 **R4 解耦对棘轮**（`DECOUPLED = [("wiki","knowledge")]`，绝对禁止回流）；红态探针（在 wiki 建类 import `SpanTracker`）→ 报 `✗ 回流：wiki→knowledge` 并非零退出 ✓（探针已删）。
+- **闸门**：后端全量 BUILD SUCCESSFUL（4,843/0）+ `spotlessCheck` + 四守卫（键名/包环含 SCC 与 R4/Go 锚点/跨面键）绿。
+- **下一步**：阶段 4 剩余断点为 **C3~C8**（`auth` 依赖下沉、`audit`/`model`/`retrieval`/`storage` 各自断点）；SCC-A 现为 7 包环，C2 归零后 wiki 侧已不再参与该环的 knowledge 边。

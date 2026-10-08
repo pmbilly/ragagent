@@ -26,6 +26,8 @@ L2 = {"llm", "retrieval", "embedding", "rerank", "chatpipeline", "modelcontext",
       "searchutil", "storageurl", "webfetch"}
 L1 = {"common", "event", "stream", "tracing", "config"}
 L3 = sorted({d.name for d in ROOT.iterdir() if d.is_dir()} - L2 - L1)
+# 已完成端口化、禁止回流的包对（R4）
+DECOUPLED = [("wiki", "knowledge")]
 
 IMP = re.compile(r"^import com\.ragagent\.(\w+)\.", re.M)
 edge = defaultdict(set)
@@ -40,6 +42,7 @@ for p in sorted(ROOT.iterdir()):
 cycles = sorted({tuple(sorted((a, b))) for a, t in edge.items() for b in t if a in edge.get(b, ())})
 to_config = sorted(a for a in edge if "config" in edge[a])
 l2_to_l3 = sorted((a, b) for a in L2 for b in edge[a] if b in L3)
+relapsed = sorted((a, b) for a, b in DECOUPLED if b in edge.get(a, ()))
 
 # 强连通分量（Tarjan）：三包以上的环
 import sys as _sys
@@ -112,7 +115,10 @@ if fixed_sccs:
 print(f"L2 → L3 直连：{len(l2_to_l3)} 条（基线 {len(old.get('l2_to_l3', []))}）"
       + ("" if not new_l23 else "；新增：" + ", ".join(f"{a}→{b}" for a, b in new_l23)))
 
-if new_cycles or new_cfg or new_l23 or new_scc_members:
-    print("\n✗ 守卫失败：出现新的环（含间接环）或新的分层违例（见上）。")
+print(f"已解耦包对（R4）：{len(DECOUPLED)} 对" + ("" if not relapsed
+      else "；✗ 回流：" + ", ".join(f"{a}→{b}" for a, b in relapsed)))
+
+if new_cycles or new_cfg or new_l23 or new_scc_members or relapsed:
+    print("\n✗ 守卫失败：出现新的环（含间接环）、新的分层违例，或已解耦包对回流（见上）。")
     sys.exit(1)
 print("\n✓ 守卫通过：环与分层违例均未增加。")

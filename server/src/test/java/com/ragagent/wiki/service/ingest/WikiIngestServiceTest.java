@@ -36,6 +36,7 @@ import com.ragagent.wiki.prompt.WikiPrompts;
 import com.ragagent.common.wiki.SlugUpdate;
 import com.ragagent.common.wiki.WikiLanguageSupport;
 import com.ragagent.wiki.service.WikiLlmCallMetadata;
+import com.ragagent.common.knowledge.ChunkView;
 import com.ragagent.wiki.service.page.WikiPageService;
 import com.ragagent.wiki.service.page.WikiTextUtils;
 
@@ -49,6 +50,13 @@ import com.ragagent.wiki.service.page.WikiTextUtils;
  * 需要"有租户"的用例显式 set，{@link #clearTenant()} 在每个用例后清掉。</p>
  */
 class WikiIngestServiceTest {
+
+    /**
+     * 端口缺位替身：{@code knowledgeGone} 默认返回 false（不判死），
+     * 等价于迁移前 {@code ObjectProvider<KnowledgeMapper>} 缺位时的保守语义。
+     */
+    private static final com.ragagent.common.knowledge.KnowledgeBaseLookup ABSENT_KB_LOOKUP =
+            org.mockito.Mockito.mock(com.ragagent.common.knowledge.KnowledgeBaseLookup.class);
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -162,7 +170,7 @@ class WikiIngestServiceTest {
     private static WikiIngestService serviceWith(Object wikiService, TaskPendingOpsRepository repo,
                                                  WikiDeletedTombstoneStore tombstones) {
         return new WikiIngestService((WikiPageService) wikiService, repo,
-                emptyProvider(), emptyProvider(), null, null,
+                emptyProvider(), ABSENT_KB_LOOKUP, null, null,
                 tombstones == null ? emptyProvider() : providerOf(tombstones),
                 emptyProvider(), emptyProvider(), emptyProvider(), emptyProvider(),
                 emptyProvider(), emptyProvider());
@@ -709,7 +717,7 @@ class WikiIngestServiceTest {
     @DisplayName("reconstructEnrichedContent 在 enrich 未接线时等价于纯文本重建（= Go 的空图片信息分支）")
     void enrichedContentDegradesToPlainReconstruction() {
         WikiIngestService service = bareService();
-        List<com.ragagent.knowledge.domain.Chunk> chunks = List.of();
+        List<ChunkView> chunks = List.of();
         assertThat(service.reconstructEnrichedContent(chunks, 1L)).isEmpty();
         assertThat(service.reconstructEnrichedContent(null, 1L)).isEmpty();
     }

@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.ragagent.common.knowledge.KnowledgeBaseLookup;
+import com.ragagent.common.knowledge.KnowledgeBaseView;
 import com.ragagent.wiki.domain.WikiCategoryPaths;
 import com.ragagent.wiki.domain.WikiConstants;
 import com.ragagent.wiki.domain.WikiException;
@@ -439,7 +440,7 @@ public class WikiPageServiceImpl implements WikiPageService {
 
     final WikiPage createDefaultPage(String kbId, String slug, String title, String pageType,
                                        String content) {
-        KnowledgeBaseLookup.KnowledgeBaseView kb = kbLookup.kbByIdIncludingDeleted(kbId);
+        KnowledgeBaseView kb = kbLookup.kbByIdIncludingDeleted(kbId);
         if (kb == null) {
             throw new WikiException("get knowledge base: knowledge base not found");
         }

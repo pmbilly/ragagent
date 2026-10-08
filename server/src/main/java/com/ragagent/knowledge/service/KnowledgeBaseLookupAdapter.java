@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.common.knowledge.KnowledgeBaseLookup;
+import com.ragagent.common.knowledge.KnowledgeBaseView;
+import com.ragagent.common.knowledge.KnowledgeView;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
@@ -46,6 +48,19 @@ public class KnowledgeBaseLookupAdapter implements KnowledgeBaseLookup {
     }
 
     @Override
+    public KnowledgeView knowledgeById(String knowledgeId) {
+        KnowledgeMapper mapper = knowledgeMapper.getIfAvailable();
+        if (mapper == null || knowledgeId == null || knowledgeId.isEmpty()) {
+            return null;
+        }
+        Knowledge kn = mapper.selectOne(new LambdaQueryWrapper<Knowledge>()
+                .eq(Knowledge::getId, knowledgeId)
+                .isNull(Knowledge::getDeletedAt)
+                .last("LIMIT 1"));
+        return kn == null ? null : new KnowledgeView(kn.getId(), kn.getTitle());
+    }
+
+    @Override
     public boolean knowledgeGone(String knowledgeId) {
         KnowledgeMapper mapper = knowledgeMapper.getIfAvailable();
         if (mapper == null) {
@@ -84,14 +99,19 @@ public class KnowledgeBaseLookupAdapter implements KnowledgeBaseLookup {
         if (kb == null) {
             return null;
         }
-        boolean wikiEnabled = kb.getIndexingStrategy() != null && kb.getIndexingStrategy().isWikiEnabled();
-        return new KnowledgeBaseView(
-                kb.getId(),
-                kb.getTenantId() == null ? 0L : kb.getTenantId(),
-                kb.getCreatorId(),
-                kb.getSummaryModelId(),
-                kb.getEmbeddingModelId(),
-                wikiEnabled,
-                kb.getWikiConfig());
+        KnowledgeBaseView v = new KnowledgeBaseView();
+        v.setId(kb.getId());
+        v.setTenantId(kb.getTenantId() == null ? 0L : kb.getTenantId());
+        v.setName(kb.getName());
+        v.setType(kb.getType());
+        v.setDescription(kb.getDescription());
+        v.setCreatorId(kb.getCreatorId());
+        v.setSummaryModelId(kb.getSummaryModelId());
+        v.setEmbeddingModelId(kb.getEmbeddingModelId());
+        v.setWikiEnabled(kb.getIndexingStrategy() != null && kb.getIndexingStrategy().isWikiEnabled());
+        v.setWikiConfig(kb.getWikiConfig());
+        v.setCreatedAt(kb.getCreatedAt());
+        v.setUpdatedAt(kb.getUpdatedAt());
+        return v;
     }
 }

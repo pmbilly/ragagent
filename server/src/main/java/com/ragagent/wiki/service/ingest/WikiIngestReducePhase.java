@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import com.ragagent.knowledge.service.SpanTracker;
+import com.ragagent.common.knowledge.KnowledgeSpanPort;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.wiki.domain.WikiConstants;
 import com.ragagent.wiki.domain.WikiPage;
@@ -65,7 +65,7 @@ final class WikiIngestReducePhase {
                                            List<SlugUpdate> updates,
                                            long tenantId,
                                            WikiBatchContext batchCtx,
-                                           Map<String, SpanTracker.SpanHandle> kidToWikiMap) {
+                                           Map<String, KnowledgeSpanPort.SpanHandle> kidToWikiMap) {
         // ingest/delete 竞争的最终安全网：Map（已查过 isKnowledgeGone）与 Reduce 之间有一次
         // 很长的 LLM 调用，源文档可能在此期间被删。丢弃源知识已不存在的新增/摘要更新，
         // 免得复活一个幽灵 source_ref。retract 更新被保留——它们主动移除引用，正是文档消失
@@ -90,7 +90,7 @@ final class WikiIngestReducePhase {
         // 页级 span：
         // 挂在 updates 里第一个有 wikiSpan 的贡献文档下——span 树只允许一个父节点；
         // 完整 contributors 进 output，供追溯聚合页的多来源归属。
-        SpanTracker.SpanHandle pageSpan = beginPageSpan(slug, updates, contributors, kidToWikiMap);
+        KnowledgeSpanPort.SpanHandle pageSpan = beginPageSpan(slug, updates, contributors, kidToWikiMap);
         WikiPage[] pageHolder = { null };
         WikiIngestBatchHandler.ReduceOutcome outcome;
         try {
@@ -108,14 +108,14 @@ final class WikiIngestReducePhase {
      * 开页级 span：
      * 父 = updates 里首个有 wikiSpan 的贡献文档；都没有 → null（no-op）。
      */
-    SpanTracker.SpanHandle beginPageSpan(String slug, List<SlugUpdate> updates,
+    KnowledgeSpanPort.SpanHandle beginPageSpan(String slug, List<SlugUpdate> updates,
                                                  List<String> contributors,
-                                                 Map<String, SpanTracker.SpanHandle> kidToWikiMap) {
+                                                 Map<String, KnowledgeSpanPort.SpanHandle> kidToWikiMap) {
         if (kidToWikiMap == null || kidToWikiMap.isEmpty()) {
             return null;
         }
         for (String kid : contributors) {
-            SpanTracker.SpanHandle parent = kidToWikiMap.get(kid);
+            KnowledgeSpanPort.SpanHandle parent = kidToWikiMap.get(kid);
             if (parent == null) {
                 continue;
             }
@@ -133,7 +133,7 @@ final class WikiIngestReducePhase {
      * 无变化 → SkipSpan；正常 → EndSpan，output 捕获<b>合并后</b>的页面状态
      * （title / page_type / summary / content 预览 / refs 计数 / aliases）。
      */
-    void finishPageSpan(SpanTracker.SpanHandle pageSpan, WikiIngestBatchHandler.ReduceOutcome outcome,
+    void finishPageSpan(KnowledgeSpanPort.SpanHandle pageSpan, WikiIngestBatchHandler.ReduceOutcome outcome,
                                 List<String> contributors, WikiPage page) {
         if (pageSpan == null) {
             return;

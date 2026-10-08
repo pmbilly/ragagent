@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.ChunkView;
 
 /**
  * 按位置 + 文本匹配重建文档正文。
@@ -51,20 +51,20 @@ final class WikiChunkMerge {
      *
      * <p>调用方负责先做类型过滤（例如只保留文本 chunk）；<b>本函数不感知 ChunkType</b>。
      */
-    static String mergeTextChunks(List<Chunk> chunks, String gapSep) {
+    static String mergeTextChunks(List<ChunkView> chunks, String gapSep) {
         if (chunks == null || chunks.isEmpty()) {
             return "";
         }
 
         // 复制后**稳定**排序（不修改入参）
-        List<Chunk> sorted = new ArrayList<>(chunks);
+        List<ChunkView> sorted = new ArrayList<>(chunks);
         sorted.sort(Comparator
-                .comparingInt(Chunk::getStartAt)
-                .thenComparingInt(Chunk::getChunkIndex));
+                .comparingInt(ChunkView::getStartAt)
+                .thenComparingInt(ChunkView::getChunkIndex));
 
         String merged = "";
         int mergedEnd = -1;
-        for (Chunk c : sorted) {
+        for (ChunkView c : sorted) {
             if (c == null || c.getContent() == null || c.getContent().isEmpty()) {
                 continue;
             }

@@ -1,7 +1,7 @@
 package com.ragagent.wiki.service;
 
 
-import com.ragagent.knowledge.client.EmbedderClient;
+import com.ragagent.common.knowledge.EmbeddingModelPort;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.chat.LlmChatClients;
 import com.ragagent.llm.domain.ChatConfig;
@@ -32,22 +32,19 @@ public class DefaultWikiModelResolver implements WikiModelResolver {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultWikiModelResolver.class);
 
-    /** model.parameters.type 里表示 embedding 模型的取值 */
-    static final String MODEL_TYPE_EMBEDDING = "Embedding";
-
     private final ModelService modelService;
     private final ObjectProvider<OllamaService> ollamaService;
     private final ConcurrencyGovernor concurrencyGovernor;
-    private final EmbedderClient embedderClient;
+    private final EmbeddingModelPort embeddingPort;
 
     public DefaultWikiModelResolver(ModelService modelService,
                                     ObjectProvider<OllamaService> ollamaService,
                                     ConcurrencyGovernor concurrencyGovernor,
-                                    EmbedderClient embedderClient) {
+                                    EmbeddingModelPort embeddingPort) {
         this.modelService = modelService;
         this.ollamaService = ollamaService;
         this.concurrencyGovernor = concurrencyGovernor;
-        this.embedderClient = embedderClient;
+        this.embeddingPort = embeddingPort;
     }
 
     @Override
@@ -62,16 +59,9 @@ public class DefaultWikiModelResolver implements WikiModelResolver {
 
     @Override
     public WikiEmbeddingModel getEmbeddingModel(String modelId) {
-        Model model = modelService.getModelByID(modelId);
-        String type = model.getType();
-        if (!MODEL_TYPE_EMBEDDING.equals(type)) {
-            // 类型闸门：非 embedding 模型直接报错，
-            // 让调用方回落到"喂全部目录"的降级路径，而不是发一次注定失败的请求。
-            throw new IllegalStateException(
-                    "model " + modelId + " is not an embedding model (type=" + type + ")");
-        }
-        EmbedderClient.EmbedConfig config = EmbedderClient.configFrom(model);
-        log.debug("wiki ingest: resolved embedding model {} (base={})", modelId, config.baseUrl());
-        return texts -> embedderClient.embedBatch(config, texts);
+        // embedding 类型闸门（非 embedding 模型抛 IllegalStateException）与
+        // EmbedderClient 配置解析在 knowledge 侧端口内完成；wiki 只拿函数式客户端。
+        EmbeddingModelPort.Embedder embedder = embeddingPort.embedderFor(modelId);
+        return embedder::batchEmbed;
     }
 }

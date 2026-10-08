@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.ragagent.common.knowledge.KnowledgeBaseLookup;
+import com.ragagent.common.knowledge.KnowledgeBaseView;
 import com.ragagent.wiki.domain.WikiConstants;
 import com.ragagent.wiki.domain.WikiException;
 import com.ragagent.wiki.domain.WikiLintIssue;
@@ -62,7 +63,7 @@ public class WikiLintService {
      */
     public WikiLintReport runLint(String kbId) {
         // 校验 KB
-        KnowledgeBaseLookup.KnowledgeBaseView kb = kbLookup.kbByIdIncludingDeleted(kbId);
+        KnowledgeBaseView kb = kbLookup.kbByIdIncludingDeleted(kbId);
         if (kb == null) {
             throw new WikiException("get KB: knowledge base not found");
         }

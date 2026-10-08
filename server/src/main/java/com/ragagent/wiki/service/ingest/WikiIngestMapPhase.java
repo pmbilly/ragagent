@@ -6,9 +6,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.service.SpanTracker;
+import com.ragagent.common.knowledge.ChunkView;
+import com.ragagent.common.knowledge.KnowledgeView;
+import com.ragagent.common.knowledge.KnowledgeSpanPort;
+import com.ragagent.common.knowledge.KnowledgeView;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.wiki.prompt.WikiPrompts;
 import org.slf4j.Logger;
@@ -59,7 +60,7 @@ final class WikiIngestMapPhase {
         // 页级 span：沿 LatestAttempt →
         // postprocess stage 找父 span，在其下开 postprocess.wiki。找不到父 → null，
         // 后续 helper 全部 no-op（best-effort，追踪绝不阻断批次）。
-        SpanTracker.SpanHandle wikiSpan = handler.spans.beginWikiSubspan(knowledgeID,
+        KnowledgeSpanPort.SpanHandle wikiSpan = handler.spans.beginWikiSubspan(knowledgeID,
                 Map.of("language", lang, "knowledge_base_id", kbId));
 
         // 守卫 ingest/delete 竞争：用户在任务排队期间（wikiIngestDelay = 30 秒）或更早
@@ -71,7 +72,7 @@ final class WikiIngestMapPhase {
             return new WikiIngestBatchHandler.MapResult(null, null);
         }
 
-        List<Chunk> chunks;
+        List<ChunkView> chunks;
         try {
             chunks = handler.listTextChunksByKnowledgeID(payload.tenantId(), knowledgeID);
         } catch (Exception e) {
@@ -119,7 +120,7 @@ final class WikiIngestMapPhase {
         Map<String, Object> extractInput = new LinkedHashMap<>();
         extractInput.put("content_chars", content.codePointCount(0, content.length()));
         extractInput.put("old_pages", oldPageSlugs == null ? 0 : oldPageSlugs.size());
-        SpanTracker.SpanHandle extractSpan = handler.spans.beginSubSpan(wikiSpan,
+        KnowledgeSpanPort.SpanHandle extractSpan = handler.spans.beginSubSpan(wikiSpan,
                 "postprocess.wiki.extract", extractInput);
         try {
             WikiIngestCitePipeline.CandidateSlugs candidates = handler.citePipeline.extractCandidateSlugs(
@@ -188,14 +189,14 @@ final class WikiIngestMapPhase {
         Map<String, Object> summaryInput = new LinkedHashMap<>();
         summaryInput.put("content_chars", content.codePointCount(0, content.length()));
         summaryInput.put("extracted_slugs", summaryExtractedPages.size());
-        SpanTracker.SpanHandle summarySpan = handler.spans.beginSubSpan(wikiSpan,
+        KnowledgeSpanPort.SpanHandle summarySpan = handler.spans.beginSubSpan(wikiSpan,
                 "postprocess.wiki.summary", summaryInput);
         Map<String, Object> classifyInput = new LinkedHashMap<>();
         classifyInput.put("chunks", chunks.size());
         classifyInput.put("candidates", extractedEntities.size() + extractedConcepts.size());
         // 两条调用在同一个 wikiSpan 父节点下并行跑——它们的子 span 在 trace 视图里会视觉
         // 重叠，这正确反映了它们的墙钟并发。
-        SpanTracker.SpanHandle classifySpan = pass0Failed
+        KnowledgeSpanPort.SpanHandle classifySpan = pass0Failed
                 ? null
                 : handler.spans.beginSubSpan(wikiSpan, "postprocess.wiki.classify", classifyInput);
 
@@ -461,12 +462,12 @@ final class WikiIngestMapPhase {
      * 文档标题优先取知识行，取不到就回落到
      * 第一个非空 chunk 的首行（短于 200 字节时），并裁掉 markdown 的 {@code "# "} 前缀。
      */
-    String resolveDocTitle(String knowledgeID, List<Chunk> chunks) {
-        Knowledge kn = handler.getKnowledgeByIDOnly(knowledgeID);
-        if (kn != null && !kn.getTitle().isEmpty()) {
-            return kn.getTitle();
+    String resolveDocTitle(String knowledgeID, List<ChunkView> chunks) {
+        KnowledgeView kn = handler.getKnowledgeByIDOnly(knowledgeID);
+        if (kn != null && kn.title() != null && !kn.title().isEmpty()) {
+            return kn.title();
         }
-        for (Chunk ch : chunks) {
+        for (ChunkView ch : chunks) {
             if (ch.getContent() == null || ch.getContent().isEmpty()) {
                 continue;
             }

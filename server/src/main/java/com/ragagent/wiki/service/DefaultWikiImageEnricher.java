@@ -2,11 +2,9 @@ package com.ragagent.wiki.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.repository.ChunkRepository;
-import com.ragagent.knowledge.support.ImageInfoEnricher;
+import com.ragagent.common.knowledge.ChunkPort;
+import com.ragagent.common.knowledge.ChunkView;
 import org.springframework.stereotype.Component;
 
 /**
@@ -27,34 +25,25 @@ import org.springframework.stereotype.Component;
 @Component
 public class DefaultWikiImageEnricher implements WikiImageEnricher {
 
-    private final ChunkRepository chunkRepository;
+    private final ChunkPort chunkPort;
 
-    public DefaultWikiImageEnricher(ChunkRepository chunkRepository) {
-        this.chunkRepository = chunkRepository;
+    public DefaultWikiImageEnricher(ChunkPort chunkPort) {
+        this.chunkPort = chunkPort;
     }
 
     @Override
-    public String enrich(String content, List<Chunk> textChunks, long tenantId) {
+    public String enrich(String content, List<ChunkView> textChunks, long tenantId) {
         if (textChunks == null || textChunks.isEmpty()) {
             return content;
         }
         List<String> textChunkIds = new ArrayList<>(textChunks.size());
-        for (Chunk c : textChunks) {
+        for (ChunkView c : textChunks) {
             if (c != null && c.getId() != null && !c.getId().isEmpty()) {
                 textChunkIds.add(c.getId());
             }
         }
-        if (textChunkIds.isEmpty()) {
-            // 没有任何有效文本 chunk ID → 原样返回
-            return content;
-        }
-        Map<String, String> imageInfoMap = ImageInfoEnricher.collectImageInfoByChunkIds(
-                chunkRepository::listChunksByParentIDs, tenantId, textChunkIds);
-        String mergedImageInfo = ImageInfoEnricher.mergeImageInfoJson(imageInfoMap);
-        if (mergedImageInfo == null || mergedImageInfo.isEmpty()) {
-            // 合并后没有图片信息 → 原样返回
-            return content;
-        }
-        return ImageInfoEnricher.enrichContentWithImageInfo(content, mergedImageInfo);
+        // 收集图片信息（父 chunk id → 子块 image_info）、合并、内联：整体在 knowledge 侧端口内完成，
+        // 无有效 id / 无图片信息时由端口原样返回 content。
+        return chunkPort.enrichContentWithImageInfo(content, tenantId, textChunkIds);
     }
 }

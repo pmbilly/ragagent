@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.service.SpanTracker;
+import com.ragagent.common.knowledge.KnowledgeBaseView;
+import com.ragagent.common.knowledge.KnowledgeSpanPort;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.common.audit.WikiActivityAudit;
 import com.ragagent.wiki.domain.WikiConfig;
@@ -67,13 +67,13 @@ final class WikiIngestRunSupport {
     void runIngestBody(WikiIngestPayload payload, WikiIngestBatchHandler.Stats stats) {
         String kbId = payload.knowledgeBaseId();
 
-        KnowledgeBase kb = handler.getKnowledgeBaseByIDOnly(kbId);
+        KnowledgeBaseView kb = handler.getKnowledgeBaseByIDOnly(kbId);
         if (kb == null) {
             stats.exitStatus = "kb_deleted";
             handler.ingestService.clearDeletedKnowledgeBasePendingOps(kbId);
             return;
         }
-        if (!kb.getIndexingStrategy().isWikiEnabled()) {
+        if (!kb.isWikiEnabled()) {
             stats.exitStatus = "kb_not_wiki_enabled";
             throw new IllegalStateException("wiki ingest: KB " + kb.getId() + " is not wiki type");
         }
@@ -126,7 +126,7 @@ final class WikiIngestRunSupport {
 
     /** 认领 + 崩溃安全网 */
     void runIngestClaimed(WikiIngestPayload payload,
-                                  KnowledgeBase kb,
+                                  KnowledgeBaseView kb,
                                   WikiConfig wikiConfig,
                                   LlmChatClient chatModel,
                                   WikiIngestBatchHandler.Stats stats) {
@@ -183,7 +183,7 @@ final class WikiIngestRunSupport {
 
     /** Map → 目录规划 → Reduce → 收尾结算 */
     void runIngestPhases(WikiIngestPayload payload,
-                                 KnowledgeBase kb,
+                                 KnowledgeBaseView kb,
                                  WikiConfig wikiConfig,
                                  LlmChatClient chatModel,
                                  List<WikiPendingOp> pendingOps,
@@ -304,7 +304,7 @@ final class WikiIngestRunSupport {
         Set<String> unappliedSlugKIDs = new LinkedHashSet<>();
 
         // reduce 的页级 span 归属映射：kid → 该文档的 wikiSpan
-        Map<String, SpanTracker.SpanHandle> kidToWikiMap = new LinkedHashMap<>();
+        Map<String, KnowledgeSpanPort.SpanHandle> kidToWikiMap = new LinkedHashMap<>();
         for (DocIngestResult r : docResults) {
             if (r != null && r.getWikiSpan() != null) {
                 kidToWikiMap.put(r.getKnowledgeId(), r.getWikiSpan());

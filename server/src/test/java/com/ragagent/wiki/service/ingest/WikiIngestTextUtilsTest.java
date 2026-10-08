@@ -10,7 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.ChunkView;
 import com.ragagent.common.wiki.ExtractedItem;
 import com.ragagent.common.wiki.WikiImageMarkup;
 import com.ragagent.wiki.service.page.WikiTextUtils;
@@ -87,8 +87,8 @@ class WikiIngestTextUtilsTest {
     // 内容重建
     // ═══════════════════════════════════════════════════════════════
 
-    private static Chunk chunk(int index, String type, String content) {
-        Chunk c = new Chunk();
+    private static ChunkView chunk(int index, String type, String content) {
+        ChunkView c = new ChunkView();
         c.setChunkIndex(index);
         c.setChunkType(type);
         c.setContent(content);
@@ -98,7 +98,7 @@ class WikiIngestTextUtilsTest {
     @Test
     @DisplayName("TestReconstructContent：按 ChunkIndex 排序、排除非文本 chunk（此用例是位置为空的分支）")
     void reconstructContent() {
-        List<Chunk> chunks = List.of(
+        List<ChunkView> chunks = List.of(
                 chunk(2, "text", "Third paragraph."),
                 chunk(0, "text", "First paragraph."),
                 chunk(1, "text", "Second paragraph."),
@@ -123,10 +123,10 @@ class WikiIngestTextUtilsTest {
     @DisplayName("reconstructContent 的重叠裁剪：按文本匹配去掉真实重叠")
     void reconstructContentTrimsOverlap() {
         // 两个 chunk 位置相接：EndAt=20 与 StartAt=20 的重叠窗口
-        Chunk a = chunk(0, "text", "The quick brown fox jumps over the lazy dog");
+        ChunkView a = chunk(0, "text", "The quick brown fox jumps over the lazy dog");
         a.setStartAt(0);
         a.setEndAt(44);
-        Chunk b = chunk(1, "text", "over the lazy dog and runs away");
+        ChunkView b = chunk(1, "text", "over the lazy dog and runs away");
         b.setStartAt(20);
         b.setEndAt(53);
 

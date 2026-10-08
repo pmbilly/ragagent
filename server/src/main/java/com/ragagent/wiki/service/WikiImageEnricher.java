@@ -2,7 +2,7 @@ package com.ragagent.wiki.service;
 
 import java.util.List;
 
-import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.ChunkView;
 import com.ragagent.wiki.service.ingest.WikiIngestService;
 
 /**
@@ -39,7 +39,7 @@ public interface WikiImageEnricher {
      * @param tenantId     租户 id（chunk 查询的租户隔离）
      * @return 富化后的正文；无图片信息时应当原样返回 {@code content}
      */
-    String enrich(String content, List<Chunk> textChunks, long tenantId);
+    String enrich(String content, List<ChunkView> textChunks, long tenantId);
 
     /** 未接线时的等价实现：等价于"空图片信息"分支。 */
     static WikiImageEnricher identity() {

@@ -9,7 +9,7 @@ import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.common.knowledge.KnowledgeBaseView;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.wiki.domain.WikiCategoryPaths;
 import com.ragagent.wiki.prompt.WikiPrompts;
@@ -72,7 +72,7 @@ public class WikiIngestTaxonomy {
      * Reduce 只会把这些应用到<b>尚无目录</b>的页面上。
      */
     public Map<String, List<String>> planBatchTaxonomy(LlmChatClient chatModel,
-                                                       KnowledgeBase kb,
+                                                       KnowledgeBaseView kb,
                                                        Map<String, List<SlugUpdate>> slugUpdates,
                                                        String lang,
                                                        WikiIngestService ingestService) {
@@ -160,7 +160,7 @@ public class WikiIngestTaxonomy {
      * 已解析好的 id，永远不会有两个线程抢着创建同一个目录。不同路径只解析一次并缓存。
      * 空路径（以及任何解析失败）映射到根目录，直接省略。</p>
      */
-    public Map<String, String> resolvePlannedFolders(KnowledgeBase kb,
+    public Map<String, String> resolvePlannedFolders(KnowledgeBaseView kb,
                                                      Map<String, List<String>> planned) {
         if (kb == null || planned == null || planned.isEmpty() || wikiService == null) {
             return null;
@@ -205,7 +205,7 @@ public class WikiIngestTaxonomy {
      * 所有一级目录作为粗锚点<b>永远保留</b>，每个条目再按 embedding 相似度拉进
      * 它最近的深层目录。没有 embedding 模型的 KB（纯 wiki）回落到"限量喂全部"。
      */
-    public List<List<String>> selectRelevantFolders(KnowledgeBase kb,
+    public List<List<String>> selectRelevantFolders(KnowledgeBaseView kb,
                                                     List<TaxonomyItem> items,
                                                     List<List<String>> pool) {
         if (pool == null || pool.size() <= WikiBatchConstants.TAXONOMY_FEED_ALL_MAX_FOLDERS) {

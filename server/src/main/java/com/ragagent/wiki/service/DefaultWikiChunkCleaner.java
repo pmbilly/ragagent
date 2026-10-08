@@ -1,8 +1,6 @@
 package com.ragagent.wiki.service;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.mapper.ChunkMapper;
+import com.ragagent.common.knowledge.ChunkPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -20,10 +18,10 @@ public class DefaultWikiChunkCleaner implements WikiChunkCleaner {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultWikiChunkCleaner.class);
 
-    private final ChunkMapper chunkMapper;
+    private final ChunkPort chunkPort;
 
-    public DefaultWikiChunkCleaner(ChunkMapper chunkMapper) {
-        this.chunkMapper = chunkMapper;
+    public DefaultWikiChunkCleaner(ChunkPort chunkPort) {
+        this.chunkPort = chunkPort;
     }
 
     @Override
@@ -32,9 +30,7 @@ public class DefaultWikiChunkCleaner implements WikiChunkCleaner {
             return;
         }
         try {
-            chunkMapper.delete(new LambdaQueryWrapper<Chunk>()
-                    .eq(Chunk::getTenantId, tenantId)
-                    .eq(Chunk::getId, chunkId));
+            chunkPort.deleteChunk(tenantId, chunkId);
         } catch (RuntimeException e) {
             // 清理失败仅记 WARN：不阻断页面删除流程
             log.warn("wiki: failed to delete chunk {} for tenant {}: {}",

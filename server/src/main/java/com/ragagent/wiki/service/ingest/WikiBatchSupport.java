@@ -2,13 +2,10 @@ package com.ragagent.wiki.service.ingest;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Semaphore;
 import java.util.regex.Pattern;
 
 import com.ragagent.common.context.TenantContext;
-import com.ragagent.knowledge.domain.KnowledgeProcessingSpan;
-import com.ragagent.knowledge.service.SpanTracker;
 import com.ragagent.common.wiki.WikiLanguageSupport;
 
 /**
@@ -234,111 +231,6 @@ public final class WikiBatchSupport {
                     || prevUser != null || prevSysAdmin || prevAccessAll) {
                 TenantContext.set(prevTenant, prevPrincipal, prevRole, prevSysAdmin,
                         prevUser, prevAccessAll);
-            }
-        }
-    }
-
-    // ═══════════════════════════════════════════════════════════════
-    // span 门面
-    // ═══════════════════════════════════════════════════════════════
-
-    /**
-     * span 追踪门面。
-     *
-     * <p>接入 {@link SpanTracker} 后，wiki 批次在父 attempt 的 postprocess 阶段下挂出
-     * {@code postprocess.wiki}（及其 {@code .extract}/{@code .summary}/{@code .classify}/
-     * {@code .page[slug]} 子 span），trace 视图因此可见逐文档的 wiki 处理。
-     * {@link #NOOP}（未注入追踪器）保留纯 no-op 语义——追踪绝不阻断业务。</p>
-     */
-    public static final class WikiSpans {
-
-        /** 未接线追踪器时的 no-op 形态。 */
-        public static final WikiSpans NOOP = new WikiSpans(null);
-
-        private final SpanTracker tracker;
-
-        public WikiSpans(SpanTracker tracker) {
-            this.tracker = tracker;
-        }
-
-        /**
-         * {@code LatestAttempt} → {@code LookupStage(postprocess)} 找父 span，
-         * 在其下开 {@code postprocess.wiki}。任一步缺失 → null（best-effort：
-         * 追踪绝不阻断业务）。
-         *
-         * <p>跨线程说明：wiki 批次跑在独立调度线程，没有引擎的 attempt 上下文；
-         * 这里用 knowledgeId 从 {@link SpanTracker} 反查，不依赖调用线程携带 attempt。</p>
-         */
-        public SpanTracker.SpanHandle beginWikiSubspan(String knowledgeId,
-                                                       Map<String, Object> input) {
-            if (tracker == null || knowledgeId == null || knowledgeId.isEmpty()) {
-                return null;
-            }
-            try {
-                int attempt = tracker.latestAttempt(knowledgeId);
-                if (attempt <= 0) {
-                    return null;
-                }
-                SpanTracker.SpanHandle parent = tracker.lookupStage(knowledgeId, attempt,
-                        KnowledgeProcessingSpan.STAGE_POST_PROCESS);
-                if (parent == null) {
-                    return null;
-                }
-                return tracker.beginSubSpan(parent, "postprocess.wiki",
-                        KnowledgeProcessingSpan.KIND_SUB_SPAN, input);
-            } catch (RuntimeException e) {
-                return null;
-            }
-        }
-
-        /** 在父 span 下开子 span；父缺席 → null。 */
-        public SpanTracker.SpanHandle beginSubSpan(SpanTracker.SpanHandle parent, String name,
-                                                   Map<String, Object> input) {
-            if (tracker == null || parent == null || name == null || name.isEmpty()) {
-                return null;
-            }
-            try {
-                return tracker.beginSubSpan(parent, name,
-                        KnowledgeProcessingSpan.KIND_SUB_SPAN, input);
-            } catch (RuntimeException e) {
-                return null;
-            }
-        }
-
-        /** 结束 span（best-effort）。 */
-        public void endSpan(SpanTracker.SpanHandle span, Map<String, Object> output) {
-            if (tracker == null || span == null) {
-                return;
-            }
-            try {
-                tracker.endSpan(span, output);
-            } catch (RuntimeException e) {
-                // best-effort：追踪失败不阻断批次
-            }
-        }
-
-        /** 标记 span 失败（best-effort）。 */
-        public void failSpan(SpanTracker.SpanHandle span, String code, String message,
-                             Throwable err) {
-            if (tracker == null || span == null) {
-                return;
-            }
-            try {
-                tracker.failSpan(span, code, message, err);
-            } catch (RuntimeException e) {
-                // best-effort
-            }
-        }
-
-        /** 标记 span 跳过（best-effort）。 */
-        public void skipSpan(SpanTracker.SpanHandle span, String reason) {
-            if (tracker == null || span == null) {
-                return;
-            }
-            try {
-                tracker.skipSpan(span, reason);
-            } catch (RuntimeException e) {
-                // best-effort
             }
         }
     }

@@ -14,7 +14,7 @@ import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.common.knowledge.KnowledgeBaseView;
 import com.ragagent.wiki.domain.WikiConstants;
 import com.ragagent.common.wiki.ExtractedItem;
 import com.ragagent.common.wiki.SlugUpdate;
@@ -265,7 +265,7 @@ class WikiIngestTaxonomyTest {
         for (int i = 0; i < WikiBatchConstants.TAXONOMY_PROMPT_MAX_PATHS + 50; i++) {
             pool.add(List.of("cat-" + i, "sub-" + i));
         }
-        KnowledgeBase kb = kb("");
+        KnowledgeBaseView kb = kb("");
         List<List<String>> got = taxonomy.selectRelevantFolders(
                 kb, List.of(new WikiIngestTaxonomy.TaxonomyItem("entity/a", "A", "entity", "")), pool);
         assertThat(got).hasSize(WikiBatchConstants.TAXONOMY_PROMPT_MAX_PATHS);
@@ -391,8 +391,8 @@ class WikiIngestTaxonomyTest {
         assertThat(taxonomy.resolvePlannedFolders(kb(""), Map.of())).isNull();
     }
 
-    private static KnowledgeBase kb(String embeddingModelId) {
-        KnowledgeBase kb = new KnowledgeBase();
+    private static KnowledgeBaseView kb(String embeddingModelId) {
+        KnowledgeBaseView kb = new KnowledgeBaseView();
         kb.setId("kb-1");
         kb.setTenantId(1L);
         kb.setEmbeddingModelId(embeddingModelId);

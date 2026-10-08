@@ -4,11 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.common.wiki.SlugUpdate;
-import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.mapper.KnowledgeMapper;
+import com.ragagent.common.knowledge.ChunkView;
 import com.ragagent.wiki.service.WikiImageEnricher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,24 +39,9 @@ final class WikiIngestContentSupport {
         if (tombstones != null && tombstones.exists(kbId, knowledgeId)) {
             return true;
         }
-        KnowledgeMapper mapper = service.knowledgeMapper.getIfAvailable();
-        if (mapper == null) {
-            // 无知识仓储可查（装配裁剪）—— 无法判定，保守地当作"还在"
-            return false;
-        }
-        Knowledge kn;
-        try {
-            kn = mapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                    .eq(Knowledge::getId, knowledgeId)
-                    .isNull(Knowledge::getDeletedAt));
-        } catch (Exception e) {
-            return true;
-        }
-        if (kn == null) {
-            return true;
-        }
-        return Knowledge.PARSE_DELETING.equals(kn.getParseStatus())
-                || Knowledge.PARSE_CANCELLED.equals(kn.getParseStatus());
+        // 不存在 / 软删 / 解析中取消或删除中 → 判定"已消失"；仓储缺位时保守地当作"还在"。
+        // 判定细节（含异常姿态）整体在 knowledge 侧端口内，与迁移前逐字一致。
+        return service.kbLookup.knowledgeGone(knowledgeId);
     }
 
     /**
@@ -107,12 +89,12 @@ final class WikiIngestContentSupport {
      * <p>重叠去重与排序统一交给 {@link WikiChunkMerge}（按文本匹配，
      * 兼容补写表头 / HTML 实体）。</p>
      */
-    static String reconstructContent(List<Chunk> chunks) {
+    static String reconstructContent(List<ChunkView> chunks) {
         if (chunks == null || chunks.isEmpty()) {
             return "";
         }
-        List<Chunk> textChunks = new ArrayList<>(chunks.size());
-        for (Chunk c : chunks) {
+        List<ChunkView> textChunks = new ArrayList<>(chunks.size());
+        for (ChunkView c : chunks) {
             if (c == null) {
                 continue;
             }
@@ -130,13 +112,13 @@ final class WikiIngestContentSupport {
      *
      * <p>没有图片信息时返回纯文本重建结果——与富化器缺席时的退化路径一致。</p>
      */
-    String reconstructEnrichedContent(List<Chunk> chunks, long tenantId) {
+    String reconstructEnrichedContent(List<ChunkView> chunks, long tenantId) {
         String content = reconstructContent(chunks);
         if (chunks == null || chunks.isEmpty() || content.isEmpty()) {
             return content;
         }
-        List<Chunk> textChunks = new ArrayList<>(chunks.size());
-        for (Chunk c : chunks) {
+        List<ChunkView> textChunks = new ArrayList<>(chunks.size());
+        for (ChunkView c : chunks) {
             if (c == null) {
                 continue;
             }

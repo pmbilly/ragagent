@@ -24,11 +24,10 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.ObjectProvider;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
-import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.mapper.ChunkMapper;
-import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
-import com.ragagent.knowledge.mapper.KnowledgeMapper;
+import com.ragagent.common.knowledge.KnowledgeBaseView;
+import com.ragagent.common.knowledge.KnowledgeSpanPort;
+import com.ragagent.common.knowledge.ChunkPort;
+import com.ragagent.common.knowledge.KnowledgeBaseLookup;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.common.audit.WikiActivityAudit;
 import com.ragagent.wiki.domain.TaskPendingOp;
@@ -60,9 +59,8 @@ class WikiIngestBatchHandlerTest {
     private final WikiIngestDedupService dedupService = mock(WikiIngestDedupService.class);
     private final WikiModelResolver modelResolver = mock(WikiModelResolver.class);
     private final InProcessWikiFinalizeLock finalizeLock = new InProcessWikiFinalizeLock();
-    private final ChunkMapper chunkMapper = mock(ChunkMapper.class);
-    private final KnowledgeBaseMapper kbMapper = mock(KnowledgeBaseMapper.class);
-    private final KnowledgeMapper knowledgeMapper = mock(KnowledgeMapper.class);
+    private final ChunkPort chunkPort = mock(ChunkPort.class);
+    private final KnowledgeBaseLookup kbLookup = mock(KnowledgeBaseLookup.class);
     private final WikiActivityAudit audit = mock(WikiActivityAudit.class);
 
     @SuppressWarnings("unchecked")
@@ -70,26 +68,21 @@ class WikiIngestBatchHandlerTest {
     @SuppressWarnings("unchecked")
     private final ObjectProvider<WikiIngestTaskQueue> queueProvider = mock(ObjectProvider.class);
     /** 测试不接线追踪器 → 门面走 NOOP 语义。 */
-    @SuppressWarnings("unchecked")
-    private final ObjectProvider<com.ragagent.knowledge.service.SpanTracker> spanTrackerProvider =
-            mock(ObjectProvider.class);
+    private final KnowledgeSpanPort spanTrackerPort = mock(KnowledgeSpanPort.class);
 
     private WikiIngestBatchHandler handler() {
         when(auditProvider.getIfAvailable()).thenReturn(audit);
         when(queueProvider.getIfAvailable()).thenReturn(null);
-        when(spanTrackerProvider.getIfAvailable()).thenReturn(null);
         return new WikiIngestBatchHandler(ingestService, wikiService, pendingRepo, citePipeline,
-                taxonomy, dedupService, modelResolver, finalizeLock, chunkMapper, kbMapper,
-                knowledgeMapper, auditProvider, queueProvider, spanTrackerProvider);
+                taxonomy, dedupService, modelResolver, finalizeLock, chunkPort, kbLookup,
+                auditProvider, queueProvider, spanTrackerPort);
     }
 
-    private static KnowledgeBase wikiKb() {
-        KnowledgeBase kb = new KnowledgeBase();
+    private static KnowledgeBaseView wikiKb() {
+        KnowledgeBaseView kb = new KnowledgeBaseView();
         kb.setId("kb-1");
         kb.setTenantId(1L);
-        KnowledgeBaseIndexingStrategy s = new KnowledgeBaseIndexingStrategy();
-        s.setWikiEnabled(true);
-        kb.setIndexingStrategy(s);
+        kb.setWikiEnabled(true);
         return kb;
     }
 
@@ -117,8 +110,8 @@ class WikiIngestBatchHandlerTest {
             return new WikiIngestPayload(1L, "kb-1", null);
         }
 
-        private void stubKb(KnowledgeBase kb) {
-            when(kbMapper.selectOne(any())).thenReturn(kb);
+        private void stubKb(KnowledgeBaseView kb) {
+            when(kbLookup.kbById(any())).thenReturn(kb);
         }
 
         /**
@@ -224,10 +217,8 @@ class WikiIngestBatchHandlerTest {
                     WikiFinalizeRow.slug("entity/a", "A"));
             when(pendingRepo.peekBatch(eq(WikiIngestConstants.FINALIZE_TASK_TYPE), anyString(),
                     eq("kb-1"), anyInt())).thenReturn(List.of(row));
-            KnowledgeBase kb = wikiKb();
-            KnowledgeBaseIndexingStrategy s = new KnowledgeBaseIndexingStrategy();
-            s.setWikiEnabled(false);
-            kb.setIndexingStrategy(s);
+            KnowledgeBaseView kb = wikiKb();
+            kb.setWikiEnabled(false);
             stubKb(kb);
 
             handler().processWikiFinalize(payload());
@@ -277,7 +268,7 @@ class WikiIngestBatchHandlerTest {
         @Test
         @DisplayName("ProcessWikiIngest：KB 已删除 → 排空队列并正常返回")
         void ingestDrainsDeletedKbQueue() {
-            when(kbMapper.selectOne(any())).thenReturn(null);
+            when(kbLookup.kbById(any())).thenReturn(null);
 
             handler().processWikiIngest(new WikiIngestPayload(7L, "kb-deleted", null));
 
@@ -293,7 +284,7 @@ class WikiIngestBatchHandlerTest {
             row.setScopeId("kb-deleted");
             when(pendingRepo.peekBatch(eq(WikiIngestConstants.FINALIZE_TASK_TYPE), anyString(),
                     eq("kb-deleted"), anyInt())).thenReturn(List.of(row));
-            when(kbMapper.selectOne(any())).thenReturn(null);
+            when(kbLookup.kbById(any())).thenReturn(null);
 
             handler().processWikiFinalize(new WikiIngestPayload(7L, "kb-deleted", null));
 
@@ -306,7 +297,7 @@ class WikiIngestBatchHandlerTest {
         @Test
         @DisplayName("清理失败必须重试（对照 Go TestWikiDeletedKnowledgeBaseCleanupFailureRetries）")
         void cleanupFailureRetries() {
-            when(kbMapper.selectOne(any())).thenReturn(null);
+            when(kbLookup.kbById(any())).thenReturn(null);
             RuntimeException boom = new IllegalStateException("cleanup failed");
             org.mockito.Mockito.doThrow(boom)
                     .when(ingestService).clearDeletedKnowledgeBasePendingOps("kb-deleted");
@@ -320,11 +311,9 @@ class WikiIngestBatchHandlerTest {
         @Test
         @DisplayName("KB 未启用 wiki → 抛错重试")
         void kbNotWikiEnabled() {
-            KnowledgeBase kb = wikiKb();
-            KnowledgeBaseIndexingStrategy s = new KnowledgeBaseIndexingStrategy();
-            s.setWikiEnabled(false);
-            kb.setIndexingStrategy(s);
-            when(kbMapper.selectOne(any())).thenReturn(kb);
+            KnowledgeBaseView kb = wikiKb();
+            kb.setWikiEnabled(false);
+            when(kbLookup.kbById(any())).thenReturn(kb);
 
             assertThatThrownBy(() -> handler().processWikiIngest(
                     new WikiIngestPayload(7L, "kb-1", null)))
@@ -335,7 +324,7 @@ class WikiIngestBatchHandlerTest {
         @Test
         @DisplayName("缺合成模型 → 抛错重试")
         void missingSynthesisModel() {
-            when(kbMapper.selectOne(any())).thenReturn(wikiKb());
+            when(kbLookup.kbById(any())).thenReturn(wikiKb());
 
             assertThatThrownBy(() -> handler().processWikiIngest(
                     new WikiIngestPayload(7L, "kb-1", null)))
@@ -545,7 +534,7 @@ class WikiIngestBatchHandlerTest {
     @DisplayName("wikiConfigOf 的零值容忍")
     void wikiConfigOfNullTolerance() {
         assertThat(WikiIngestBatchHandler.wikiConfigOf(null)).isNull();
-        KnowledgeBase kb = new KnowledgeBase();
+        KnowledgeBaseView kb = new KnowledgeBaseView();
         kb.setWikiConfig(null);
         assertThat(WikiIngestBatchHandler.wikiConfigOf(kb)).isNull();
     }
@@ -558,7 +547,7 @@ class WikiIngestBatchHandlerTest {
         assertThat(h.getKnowledgeBaseByIDOnly("")).isNull();
         assertThat(h.getKnowledgeBaseByIDOnly(null)).isNull();
         assertThat(h.getKnowledgeByIDOnly("")).isNull();
-        verify(kbMapper, never()).selectOne(any());
+        verify(kbLookup, never()).kbById(any());
     }
 
     // ═══════════════════════════════════════════════════════════════

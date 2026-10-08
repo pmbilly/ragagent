@@ -8,12 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.mapper.ChunkMapper;
+import com.ragagent.common.knowledge.ChunkView;
+import com.ragagent.common.knowledge.ChunkPort;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.wiki.domain.WikiExtractionGranularity;
 import com.ragagent.wiki.prompt.WikiPrompts;
@@ -52,11 +51,11 @@ public class WikiIngestCitePipeline {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final WikiIngestService ingestService;
-    private final ChunkMapper chunkMapper;
+    private final ChunkPort chunkPort;
 
-    public WikiIngestCitePipeline(WikiIngestService ingestService, ChunkMapper chunkMapper) {
+    public WikiIngestCitePipeline(WikiIngestService ingestService, ChunkPort chunkPort) {
         this.ingestService = ingestService;
-        this.chunkMapper = chunkMapper;
+        this.chunkPort = chunkPort;
     }
 
     // ═══════════════════════════════════════════════════════════════
@@ -101,7 +100,7 @@ public class WikiIngestCitePipeline {
      * <p>{@code totalRuneLen} 在分桶过程中累加，因此是<b>可变</b>字段。</p>
      */
     public static final class ChunkBatch {
-        final List<Chunk> chunks = new ArrayList<>();
+        final List<ChunkView> chunks = new ArrayList<>();
         final WikiChunkHandleTable handles = new WikiChunkHandleTable();
         int totalRuneLen;
 
@@ -110,7 +109,7 @@ public class WikiIngestCitePipeline {
             return handles.size();
         }
 
-        public List<Chunk> chunks() {
+        public List<ChunkView> chunks() {
             return chunks;
         }
 
@@ -290,12 +289,12 @@ public class WikiIngestCitePipeline {
      * prompt 用它代替原始 UUID；调用局部的句柄表在任何结果进入应用状态<b>之前</b>
      * 把模型输出翻回稳定的 chunk ID。</p>
      */
-    public static List<ChunkBatch> splitChunksIntoCitationBatches(List<Chunk> chunks) {
+    public static List<ChunkBatch> splitChunksIntoCitationBatches(List<ChunkView> chunks) {
         // 只引用文本 chunk —— image/ocr chunk 已经由 reconstructEnrichedContent
         // 合并进文本正文，LLM 不会把它们当成独立的单元。
-        List<Chunk> filtered = new ArrayList<>();
+        List<ChunkView> filtered = new ArrayList<>();
         if (chunks != null) {
-            for (Chunk c : chunks) {
+            for (ChunkView c : chunks) {
                 if (c == null || c.getContent() == null || c.getContent().isEmpty()) {
                     continue;
                 }
@@ -313,12 +312,12 @@ public class WikiIngestCitePipeline {
         // 保留文档顺序，让引用对人类可读。稳定排序：ChunkIndex 并列时按 StartAt
         // 破平（真实数据里 chunk ID 唯一，不会触发进一步歧义）。
         filtered.sort(Comparator
-                .comparingInt(Chunk::getChunkIndex)
-                .thenComparingInt(Chunk::getStartAt));
+                .comparingInt(ChunkView::getChunkIndex)
+                .thenComparingInt(ChunkView::getStartAt));
 
         List<ChunkBatch> batches = new ArrayList<>();
         ChunkBatch current = new ChunkBatch();
-        for (Chunk c : filtered) {
+        for (ChunkView c : filtered) {
             int runeLen = c.getContent().codePointCount(0, c.getContent().length());
             // 若加入该 chunk 会超预算且当前批次非空，先冲刷，免得超大的 chunk
             // 与已排队的合并。超大的 chunk 仍然照发——只是独占一个批次。
@@ -391,7 +390,7 @@ public class WikiIngestCitePipeline {
      */
     public static String renderChunksXML(ChunkBatch batch) {
         StringBuilder sb = new StringBuilder();
-        for (Chunk c : batch.chunks) {
+        for (ChunkView c : batch.chunks) {
             String handle = batch.handles.handleForKey(c.getId());
             if (handle == null) {
                 handle = "";
@@ -427,7 +426,7 @@ public class WikiIngestCitePipeline {
      */
     public CitationResult classifyChunkCitations(LlmChatClient chatModel,
                                                  String candidatesXml,
-                                                 List<Chunk> chunks,
+                                                 List<ChunkView> chunks,
                                                  String lang,
                                                  WikiBatchContext batchCtx) {
         List<ChunkBatch> batches = splitChunksIntoCitationBatches(chunks);
@@ -484,7 +483,7 @@ public class WikiIngestCitePipeline {
         // 建立稳定的 chunk 顺序，让最终引用按文档序输出。
         Map<String, Integer> chunkOrder = new LinkedHashMap<>();
         if (chunks != null) {
-            for (Chunk c : chunks) {
+            for (ChunkView c : chunks) {
                 if (c != null) {
                     chunkOrder.put(c.getId(), c.getChunkIndex());
                 }
@@ -590,16 +589,14 @@ public class WikiIngestCitePipeline {
             if (ids.isEmpty()) {
                 continue;
             }
-            List<Chunk> chunks;
+            List<ChunkView> chunks;
             try {
-                chunks = chunkMapper.selectList(new LambdaQueryWrapper<Chunk>()
-                        .eq(Chunk::getTenantId, tenantId)
-                        .in(Chunk::getId, ids));
+                chunks = chunkPort.chunksByIds(tenantId, ids);
             } catch (Exception e) {
                 log.warn("wiki ingest: failed to resolve cited chunks: {}", e.getMessage());
                 continue;
             }
-            for (Chunk c : chunks) {
+            for (ChunkView c : chunks) {
                 if (c == null || c.getContent() == null || c.getContent().isEmpty()) {
                     continue;
                 }

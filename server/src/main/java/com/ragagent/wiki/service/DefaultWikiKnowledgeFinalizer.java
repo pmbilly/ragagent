@@ -3,9 +3,7 @@ package com.ragagent.wiki.service;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.mapper.KnowledgeMapper;
+import com.ragagent.common.knowledge.KnowledgeFinalizePort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -40,10 +38,10 @@ public class DefaultWikiKnowledgeFinalizer implements WikiFinalizePort, WikiKnow
 
     private static final Logger log = LoggerFactory.getLogger(DefaultWikiKnowledgeFinalizer.class);
 
-    private final KnowledgeMapper knowledgeMapper;
+    private final KnowledgeFinalizePort finalizePort;
 
-    public DefaultWikiKnowledgeFinalizer(KnowledgeMapper knowledgeMapper) {
-        this.knowledgeMapper = knowledgeMapper;
+    public DefaultWikiKnowledgeFinalizer(KnowledgeFinalizePort finalizePort) {
+        this.finalizePort = finalizePort;
     }
 
     /** 供测试/可观测：本次调用是否真正发生了"计数归零后的晋升" */
@@ -67,40 +65,9 @@ public class DefaultWikiKnowledgeFinalizer implements WikiFinalizePort, WikiKnow
         if (knowledgeId == null || knowledgeId.isEmpty()) {
             return new Outcome(false, false);
         }
-        OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
-
-        // 1) 原子递减、钳在零
-        boolean decremented;
-        try {
-            int rows = knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
-                    .eq(Knowledge::getId, knowledgeId)
-                    .gt(Knowledge::getPendingSubtasksCount, 0)
-                    .setSql("pending_subtasks_count = pending_subtasks_count - 1")
-                    .set(Knowledge::getUpdatedAt, now));
-            decremented = rows > 0;
-        } catch (RuntimeException e) {
-            log.warn("finalize subtask decrement failed source=wiki knowledge={} err={}",
-                    knowledgeId, e.getMessage());
-            return new Outcome(false, false);
-        }
-
-        // 2) 带守卫的晋升（无条件尝试，见类注释）
-        boolean promoted;
-        try {
-            int rows = knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
-                    .eq(Knowledge::getId, knowledgeId)
-                    .eq(Knowledge::getParseStatus, Knowledge.PARSE_FINALIZING)
-                    .eq(Knowledge::getPendingSubtasksCount, 0)
-                    .set(Knowledge::getParseStatus, Knowledge.PARSE_COMPLETED)
-                    .set(Knowledge::getErrorMessage, "")
-                    .set(Knowledge::getProcessedAt, now)
-                    .set(Knowledge::getUpdatedAt, now));
-            promoted = rows > 0;
-        } catch (RuntimeException e) {
-            log.warn("finalize subtask promote failed source=wiki knowledge={} err={}",
-                    knowledgeId, e.getMessage());
-            return new Outcome(decremented, false);
-        }
-        return new Outcome(decremented, promoted);
+        // 递减 + 带守卫的晋升（含 try/catch 与告警日志）在 knowledge 侧端口内完成，语义不变。
+        KnowledgeFinalizePort.Result r = finalizePort.finalizeSubtask(
+                knowledgeId, OffsetDateTime.now(ZoneOffset.UTC));
+        return new Outcome(r.decremented(), r.promoted());
     }
 }

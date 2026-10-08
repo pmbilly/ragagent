@@ -14,8 +14,8 @@ import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.mapper.ChunkMapper;
+import com.ragagent.common.knowledge.ChunkView;
+import com.ragagent.common.knowledge.ChunkPort;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.wiki.prompt.WikiPrompts;
 import com.ragagent.common.wiki.ExtractedItem;
@@ -28,8 +28,8 @@ import com.ragagent.wiki.service.page.NewSlugFromCitation;
  */
 class WikiIngestCitePipelineTest {
 
-    private static Chunk textChunk(int idx, int runes, String id) {
-        Chunk c = new Chunk();
+    private static ChunkView textChunk(int idx, int runes, String id) {
+        ChunkView c = new ChunkView();
         c.setId(id);
         c.setChunkIndex(idx);
         c.setContent("a".repeat(runes));
@@ -132,7 +132,7 @@ class WikiIngestCitePipelineTest {
     @DisplayName("分桶遵守预算与顺序（对照 Go TestSplitChunksIntoCitationBatches_RespectsBudgetAndOrder）")
     void splitChunksIntoCitationBatchesRespectsBudgetAndOrder() {
         // 每个小 chunk 5000 码点 → 3 个放不进一个批次（15k > 12k 上限），会溢出到第二个批次。
-        List<Chunk> chunks = List.of(
+        List<ChunkView> chunks = List.of(
                 textChunk(0, 5000, "id-0"),
                 textChunk(1, 5000, "id-1"),
                 textChunk(2, 5000, "id-2"),
@@ -146,7 +146,7 @@ class WikiIngestCitePipelineTest {
 
         List<String> seen = new ArrayList<>();
         for (WikiIngestCitePipeline.ChunkBatch b : batches) {
-            for (Chunk c : b.chunks()) {
+            for (ChunkView c : b.chunks()) {
                 seen.add(c.getId());
             }
         }
@@ -164,13 +164,13 @@ class WikiIngestCitePipelineTest {
     @Test
     @DisplayName("分桶只引用 text chunk")
     void splitChunksFiltersNonTextAndEmpty() {
-        Chunk img = new Chunk();
+        ChunkView img = new ChunkView();
         img.setId("img-1");
         img.setChunkIndex(0);
         img.setContent("image ocr text");
         img.setChunkType(WikiIngestService.CHUNK_TYPE_IMAGE_OCR);
 
-        Chunk blank = textChunk(1, 0, "blank-1");
+        ChunkView blank = textChunk(1, 0, "blank-1");
         blank.setContent("");
 
         assertThat(WikiIngestCitePipeline.splitChunksIntoCitationBatches(
@@ -265,7 +265,7 @@ class WikiIngestCitePipelineTest {
     @DisplayName("分类遍把 cNNN 句柄翻回真实 chunk UUID（未知句柄丢弃）")
     void classifyChunkCitationsTranslatesHandles() {
         WikiIngestService svc = mock(WikiIngestService.class);
-        ChunkMapper chunkMapper = mock(ChunkMapper.class);
+        ChunkPort chunkPort = mock(ChunkPort.class);
 
         // 两个批次：每个批次各自从 c000 起编号，因此同一个句柄在两个批次里指向不同 chunk。
         // 这正是"句柄必须按批次翻译"的原因——把它当成全局编号就会串页。
@@ -292,12 +292,12 @@ class WikiIngestCitePipelineTest {
                 });
 
         // 第一个批次：uuid-0/uuid-1；第二个批次：uuid-big
-        List<Chunk> chunks = List.of(
+        List<ChunkView> chunks = List.of(
                 textChunk(0, 100, "uuid-0"),
                 textChunk(1, 100, "uuid-1"),
                 textChunk(2, 20000, "uuid-big"));
 
-        WikiIngestCitePipeline pipeline = new WikiIngestCitePipeline(svc, chunkMapper);
+        WikiIngestCitePipeline pipeline = new WikiIngestCitePipeline(svc, chunkPort);
         WikiIngestCitePipeline.CitationResult result = pipeline.classifyChunkCitations(
                 mock(LlmChatClient.class), "- slug: entity/acme\n", chunks, "Chinese", null);
 
@@ -319,7 +319,7 @@ class WikiIngestCitePipelineTest {
     @DisplayName("无候选或无分块时分类遍短路")
     void classifyShortCircuits() {
         WikiIngestService svc = mock(WikiIngestService.class);
-        WikiIngestCitePipeline pipeline = new WikiIngestCitePipeline(svc, mock(ChunkMapper.class));
+        WikiIngestCitePipeline pipeline = new WikiIngestCitePipeline(svc, mock(ChunkPort.class));
 
         WikiIngestCitePipeline.CitationResult r1 = pipeline.classifyChunkCitations(
                 mock(LlmChatClient.class), "  ", List.of(textChunk(0, 5, "x")), "zh", null);

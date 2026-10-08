@@ -40,7 +40,7 @@ public class DocIngestResult {
      * 子 span（已接 {@link com.ragagent.knowledge.service.SpanTracker}）。
      * 可能为 null（没找到父 attempt）——为 null 时所有 tracker 辅助方法均为 no-op。
      */
-    private com.ragagent.knowledge.service.SpanTracker.SpanHandle wikiSpan;
+    private com.ragagent.common.knowledge.KnowledgeSpanPort.SpanHandle wikiSpan;
 
     public DocIngestResult() {}
 
@@ -63,8 +63,8 @@ public class DocIngestResult {
     public Map<String, Object> getMapStats() { return mapStats; }
     public void setMapStats(Map<String, Object> v) { mapStats = v; }
 
-    public com.ragagent.knowledge.service.SpanTracker.SpanHandle getWikiSpan() { return wikiSpan; }
-    public void setWikiSpan(com.ragagent.knowledge.service.SpanTracker.SpanHandle v) {
+    public com.ragagent.common.knowledge.KnowledgeSpanPort.SpanHandle getWikiSpan() { return wikiSpan; }
+    public void setWikiSpan(com.ragagent.common.knowledge.KnowledgeSpanPort.SpanHandle v) {
         wikiSpan = v;
     }
 }

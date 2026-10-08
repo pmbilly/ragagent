@@ -6,16 +6,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.common.knowledge.ChunkPort;
+import com.ragagent.common.knowledge.ChunkView;
+import com.ragagent.common.knowledge.KnowledgeBaseLookup;
+import com.ragagent.common.knowledge.KnowledgeBaseView;
+import com.ragagent.common.knowledge.KnowledgeSpanPort;
+import com.ragagent.common.knowledge.KnowledgeView;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.mapper.ChunkMapper;
-import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
-import com.ragagent.knowledge.mapper.KnowledgeMapper;
-import com.ragagent.knowledge.service.SpanTracker;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.common.audit.WikiActivityAudit;
 import com.ragagent.wiki.domain.WikiConfig;
@@ -76,14 +74,13 @@ public class WikiIngestBatchHandler implements WikiIngestTaskHandler {
     final WikiIngestDedupService dedupService;
     final WikiModelResolver modelResolver;
     final WikiFinalizeLock finalizeLock;
-    final ChunkMapper chunkMapper;
-    final KnowledgeBaseMapper kbMapper;
-    final KnowledgeMapper knowledgeMapper;
+    final ChunkPort chunkPort;
+    final KnowledgeBaseLookup kbLookup;
     final ObjectProvider<WikiActivityAudit> auditProvider;
     final ObjectProvider<WikiIngestTaskQueue> taskQueueProvider;
 
-    /** wiki 批次 span 门面（接 SpanTracker 后真实上报，缺席时 no-op）。 */
-    final WikiBatchSupport.WikiSpans spans;
+    /** wiki 批次 span 门面（knowledge 侧适配真实上报，追踪器缺席时 no-op）。 */
+    final KnowledgeSpanPort spans;
 
     /** 摄取阶段协作者(构造期装配;只存 handler 引用,调用期才解引)。 */
     final WikiIngestRunSupport run;
@@ -98,13 +95,11 @@ public class WikiIngestBatchHandler implements WikiIngestTaskHandler {
                                   WikiIngestDedupService dedupService,
                                   WikiModelResolver modelResolver,
                                   WikiFinalizeLock finalizeLock,
-                                  ChunkMapper chunkMapper,
-                                  KnowledgeBaseMapper kbMapper,
-                                  KnowledgeMapper knowledgeMapper,
+                                  ChunkPort chunkPort,
+                                  KnowledgeBaseLookup kbLookup,
                                   ObjectProvider<WikiActivityAudit> auditProvider,
                                   ObjectProvider<WikiIngestTaskQueue> taskQueueProvider,
-                                  ObjectProvider<com.ragagent.knowledge.service.SpanTracker>
-                                          spanTrackerProvider) {
+                                  KnowledgeSpanPort spanTrackerPort) {
         this.ingestService = ingestService;
         this.wikiService = wikiService;
         this.pendingRepo = pendingRepo;
@@ -113,13 +108,12 @@ public class WikiIngestBatchHandler implements WikiIngestTaskHandler {
         this.dedupService = dedupService;
         this.modelResolver = modelResolver;
         this.finalizeLock = finalizeLock;
-        this.chunkMapper = chunkMapper;
-        this.kbMapper = kbMapper;
-        this.knowledgeMapper = knowledgeMapper;
+        this.chunkPort = chunkPort;
+        this.kbLookup = kbLookup;
         this.auditProvider = auditProvider;
         this.taskQueueProvider = taskQueueProvider;
-        // tracker 缺席（测试/裁剪装配）→ no-op 门面
-        this.spans = new WikiBatchSupport.WikiSpans(spanTrackerProvider.getIfAvailable());
+        // 端口实现内部处理"追踪器缺席（测试/裁剪装配）→ no-op"的降级
+        this.spans = spanTrackerPort;
         this.run = new WikiIngestRunSupport(this);
         this.map = new WikiIngestMapPhase(this);
         this.reduce = new WikiIngestReducePhase(this);
@@ -164,27 +158,21 @@ public class WikiIngestBatchHandler implements WikiIngestTaskHandler {
      * <p>软删过滤显式写 {@code deleted_at IS NULL}（soft delete 不用
      * {@code @TableLogic}）。此处<b>不</b>按租户过滤（沿用既有查询语义）。</p>
      */
-    KnowledgeBase getKnowledgeBaseByIDOnly(String kbId) {
+    KnowledgeBaseView getKnowledgeBaseByIDOnly(String kbId) {
         if (kbId == null || kbId.isEmpty()) {
             return null;
         }
-        return kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getId, kbId)
-                .isNull(KnowledgeBase::getDeletedAt)
-                .last("LIMIT 1"));
+        return kbLookup.kbById(kbId);
     }
 
     /**
      * 按 id 取知识文档，未找到返回 {@code null}。
      */
-    Knowledge getKnowledgeByIDOnly(String knowledgeId) {
+    KnowledgeView getKnowledgeByIDOnly(String knowledgeId) {
         if (knowledgeId == null || knowledgeId.isEmpty()) {
             return null;
         }
-        return knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getId, knowledgeId)
-                .isNull(Knowledge::getDeletedAt)
-                .last("LIMIT 1"));
+        return kbLookup.knowledgeById(knowledgeId);
     }
 
     /**
@@ -193,16 +181,12 @@ public class WikiIngestBatchHandler implements WikiIngestTaskHandler {
      * <p>本方法按设计只取 text；需要 summary / parent_text /
      * image 的调用方走 {@code ChunkRepository#listChunksByKnowledgeIDAndTypes}。</p>
      */
-    List<Chunk> listTextChunksByKnowledgeID(long tenantId, String knowledgeId) {
-        return chunkMapper.selectList(new LambdaQueryWrapper<Chunk>()
-                .eq(Chunk::getTenantId, tenantId)
-                .eq(Chunk::getKnowledgeId, knowledgeId)
-                .eq(Chunk::getChunkType, WikiIngestService.CHUNK_TYPE_TEXT)
-                .orderByAsc(Chunk::getChunkIndex));
+    List<ChunkView> listTextChunksByKnowledgeID(long tenantId, String knowledgeId) {
+        return chunkPort.textChunks(tenantId, knowledgeId);
     }
 
     /** 解析 KB 行的 wiki_config 列（jsonb）为 {@link WikiConfig} */
-    static WikiConfig wikiConfigOf(KnowledgeBase kb) {
+    static WikiConfig wikiConfigOf(KnowledgeBaseView kb) {
         if (kb == null || kb.getWikiConfig() == null || kb.getWikiConfig().isNull()) {
             return null;
         }
@@ -487,7 +471,7 @@ public class WikiIngestBatchHandler implements WikiIngestTaskHandler {
     /** 包内 seam:Reduce 阶段委托(测试直调)。 */
     ReduceOutcome reduceSlugUpdates(LlmChatClient chatModel, String kbId,
             String slug, List<SlugUpdate> updates, long tenantId, WikiBatchContext batchCtx,
-            Map<String, SpanTracker.SpanHandle> pageSpans) {
+            Map<String, KnowledgeSpanPort.SpanHandle> pageSpans) {
         return reduce.reduceSlugUpdates(chatModel, kbId, slug, updates, tenantId, batchCtx, pageSpans);
     }
 

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.common.knowledge.KnowledgeBaseView;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.wiki.domain.TaskPendingOp;
 import com.ragagent.wiki.domain.WikiConfig;
@@ -83,7 +83,7 @@ final class WikiIngestFinalizePhase {
             return;
         }
 
-        KnowledgeBase kb = handler.getKnowledgeBaseByIDOnly(kbId);
+        KnowledgeBaseView kb = handler.getKnowledgeBaseByIDOnly(kbId);
         if (kb == null) {
             handler.ingestService.clearDeletedKnowledgeBasePendingOps(kbId);
             return;
@@ -152,7 +152,7 @@ final class WikiIngestFinalizePhase {
         }
 
         // KB 已不再是 wiki（被删 / 改类型）——排空通道，避免行堆积，然后停下。
-        if (!kb.getIndexingStrategy().isWikiEnabled()) {
+        if (!kb.isWikiEnabled()) {
             handler.ingestService.trimPendingListDetached(ids);
             return;
         }

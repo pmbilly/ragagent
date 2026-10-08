@@ -8,8 +8,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.mapper.KnowledgeMapper;
+import com.ragagent.common.knowledge.ChunkView;
+import com.ragagent.common.knowledge.KnowledgeBaseLookup;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.wiki.domain.TaskPendingOp;
 import com.ragagent.wiki.mapper.TaskDeadLetterRepository;
@@ -78,7 +78,7 @@ public class WikiIngestService implements WikiIngestPort {
     final WikiPageService wikiService;
     final TaskPendingOpsRepository pendingRepo;
     final ObjectProvider<TaskDeadLetterRepository> deadLetterRepo;
-    final ObjectProvider<KnowledgeMapper> knowledgeMapper;
+    final KnowledgeBaseLookup kbLookup;
     final WikiSlugLock slugLock;
     final WikiInflightLimiter inflightLimiter;
     final ObjectProvider<WikiDeletedTombstoneStore> tombstoneStore;
@@ -198,7 +198,7 @@ public class WikiIngestService implements WikiIngestPort {
     public WikiIngestService(WikiPageService wikiService,
                              TaskPendingOpsRepository pendingRepo,
                              ObjectProvider<TaskDeadLetterRepository> deadLetterRepo,
-                             ObjectProvider<KnowledgeMapper> knowledgeMapper,
+                             KnowledgeBaseLookup kbLookup,
                              WikiSlugLock slugLock,
                              WikiInflightLimiter inflightLimiter,
                              ObjectProvider<WikiDeletedTombstoneStore> tombstoneStore,
@@ -211,7 +211,7 @@ public class WikiIngestService implements WikiIngestPort {
         this.wikiService = wikiService;
         this.pendingRepo = pendingRepo;
         this.deadLetterRepo = deadLetterRepo;
-        this.knowledgeMapper = knowledgeMapper;
+        this.kbLookup = kbLookup;
         this.slugLock = slugLock;
         this.inflightLimiter = inflightLimiter;
         this.tombstoneStore = tombstoneStore;
@@ -457,11 +457,11 @@ public class WikiIngestService implements WikiIngestPort {
         return contentOps.filterLiveUpdates(kbId, updates);
     }
 
-    public static String reconstructContent(List<Chunk> chunks) {
+    public static String reconstructContent(List<ChunkView> chunks) {
         return WikiIngestContentSupport.reconstructContent(chunks);
     }
 
-    public String reconstructEnrichedContent(List<Chunk> chunks, long tenantId) {
+    public String reconstructEnrichedContent(List<ChunkView> chunks, long tenantId) {
         return contentOps.reconstructEnrichedContent(chunks, tenantId);
     }
 
