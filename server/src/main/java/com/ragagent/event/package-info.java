@@ -62,7 +62,7 @@
  *
  * <h2>对接点（本包不实现、不 import）</h2>
  * <ul>
- *   <li>{@code common.approval}：{@code com.ragagent.common.approval.EventBus}
+ *   <li>{@code approval} 域：{@code com.ragagent.approval.EventBus}
  *       最小面（{@code void emit(Event)}）由接线层（agent/tools/ApprovalBridge）适配到本包的
  *       {@link com.ragagent.event.EventBus}。</li>
  *   <li>{@code session.sse.StreamEventEmitter} / {@code StreamManager.appendEvent}：

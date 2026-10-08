@@ -1,4 +1,4 @@
-package com.ragagent.common.approval;
+package com.ragagent.approval;
 
 import java.util.HashMap;
 import java.util.List;

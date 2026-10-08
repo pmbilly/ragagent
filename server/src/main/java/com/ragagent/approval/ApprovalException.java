@@ -1,4 +1,4 @@
-package com.ragagent.common.approval;
+package com.ragagent.approval;
 
 /**
  * 审批门的错误哨兵（四种可判别的失败 + 一种内部错误）。

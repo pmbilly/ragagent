@@ -43,14 +43,14 @@ final class AgentEngineAssembler {
     private final com.ragagent.mcp.service.McpServiceService mcpServiceService;
     private final com.ragagent.mcp.service.McpMetadataService mcpMetadataService;
     private final com.ragagent.mcp.protocol.McpClientManager mcpClientManager;
-    private final com.ragagent.common.approval.Gate toolApprovalGate;
+    private final com.ragagent.approval.Gate toolApprovalGate;
     private final com.ragagent.storage.service.ResourceCatalogService resourceCatalog;
     private final javax.sql.DataSource dataSource;
     private final VlmDescriberWiring vlmDescriberWiring;
     /** 平台级技能目录（B57 入库版）：装配期建 {@code DbSkillSource} 读 skills 表。 */
     private final com.ragagent.agent.skills.SkillCatalogService skillCatalogService;
 
-    AgentEngineAssembler(MemoryService memoryService, SessionKnowledgeQaService knowledgeQa, AgentToolBackends toolBackends, ArtifactCollectorWiring artifactCollectorWiring, com.ragagent.knowledge.service.KnowledgeService knowledgeService, FaqEntryQueryService faqService, com.ragagent.mcp.service.McpServiceService mcpServiceService, com.ragagent.mcp.service.McpMetadataService mcpMetadataService, com.ragagent.mcp.protocol.McpClientManager mcpClientManager, com.ragagent.common.approval.Gate toolApprovalGate, com.ragagent.storage.service.ResourceCatalogService resourceCatalog, javax.sql.DataSource dataSource, VlmDescriberWiring vlmDescriberWiring, com.ragagent.agent.skills.SkillCatalogService skillCatalogService) {
+    AgentEngineAssembler(MemoryService memoryService, SessionKnowledgeQaService knowledgeQa, AgentToolBackends toolBackends, ArtifactCollectorWiring artifactCollectorWiring, com.ragagent.knowledge.service.KnowledgeService knowledgeService, FaqEntryQueryService faqService, com.ragagent.mcp.service.McpServiceService mcpServiceService, com.ragagent.mcp.service.McpMetadataService mcpMetadataService, com.ragagent.mcp.protocol.McpClientManager mcpClientManager, com.ragagent.approval.Gate toolApprovalGate, com.ragagent.storage.service.ResourceCatalogService resourceCatalog, javax.sql.DataSource dataSource, VlmDescriberWiring vlmDescriberWiring, com.ragagent.agent.skills.SkillCatalogService skillCatalogService) {
         this.memoryService = memoryService;
         this.knowledgeQa = knowledgeQa;
         this.toolBackends = toolBackends;

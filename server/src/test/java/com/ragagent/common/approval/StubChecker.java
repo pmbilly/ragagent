@@ -1,4 +1,4 @@
-package com.ragagent.common.approval;
+package com.ragagent.approval;
 
 import java.util.ArrayList;
 import java.util.List;

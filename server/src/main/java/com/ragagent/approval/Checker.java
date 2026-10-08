@@ -1,4 +1,4 @@
-package com.ragagent.common.approval;
+package com.ragagent.approval;
 
 /**
  * 逐工具的 MCP 策略查询口。

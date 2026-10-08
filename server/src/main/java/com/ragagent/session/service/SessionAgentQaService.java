@@ -81,7 +81,7 @@ public class SessionAgentQaService {
             com.ragagent.mcp.service.McpServiceService mcpServiceService,
             com.ragagent.mcp.service.McpMetadataService mcpMetadataService,
             com.ragagent.mcp.protocol.McpClientManager mcpClientManager,
-            com.ragagent.common.approval.Gate toolApprovalGate,
+            com.ragagent.approval.Gate toolApprovalGate,
             VlmDescriberWiring vlmDescriberWiring,
             com.ragagent.agent.skills.SkillCatalogService skillCatalogService) {
         this.concurrencyGovernor = concurrencyGovernor;

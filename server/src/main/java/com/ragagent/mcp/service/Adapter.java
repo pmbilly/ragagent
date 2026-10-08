@@ -5,11 +5,11 @@ import java.util.Map;
 import java.util.concurrent.CancellationException;
 
 import com.ragagent.mcp.domain.McpToolApproval;
-import com.ragagent.common.approval.ApprovalException;
-import com.ragagent.common.approval.BulkEnabledChecker;
-import com.ragagent.common.approval.Cancellation;
-import com.ragagent.common.approval.Checker;
-import com.ragagent.common.approval.ToolPolicy;
+import com.ragagent.approval.ApprovalException;
+import com.ragagent.approval.BulkEnabledChecker;
+import com.ragagent.approval.Cancellation;
+import com.ragagent.approval.Checker;
+import com.ragagent.approval.ToolPolicy;
 
 /**
  * 把 MCP 工具策略服务适配成 {@link Checker}，使 gate 不必 import 服务层包。

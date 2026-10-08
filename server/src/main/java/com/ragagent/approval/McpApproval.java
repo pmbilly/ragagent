@@ -1,4 +1,4 @@
-package com.ragagent.common.approval;
+package com.ragagent.approval;
 
 /**
  * MCPTool 侧使用的审批面。

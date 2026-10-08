@@ -1,11 +1,11 @@
 package com.ragagent.mcp;
 
 import com.ragagent.mcp.service.Adapter;
-import com.ragagent.common.approval.Cancellation;
-import com.ragagent.common.approval.Checker;
-import com.ragagent.common.approval.Gate;
-import com.ragagent.common.approval.GateOptions;
-import com.ragagent.common.approval.RedisPubSub;
+import com.ragagent.approval.Cancellation;
+import com.ragagent.approval.Checker;
+import com.ragagent.approval.Gate;
+import com.ragagent.approval.GateOptions;
+import com.ragagent.approval.RedisPubSub;
 import com.ragagent.mcp.oauth.McpOAuthSupportImpl;
 import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.protocol.McpOAuthSupport;

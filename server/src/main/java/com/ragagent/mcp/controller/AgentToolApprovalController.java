@@ -4,9 +4,9 @@ import java.util.Optional;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.approval.ApprovalException;
-import com.ragagent.common.approval.Decision;
-import com.ragagent.common.approval.Gate;
+import com.ragagent.approval.ApprovalException;
+import com.ragagent.approval.Decision;
+import com.ragagent.approval.Gate;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.BizException;
 import com.ragagent.mcp.domain.McpPrincipal;

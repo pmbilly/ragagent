@@ -1,4 +1,4 @@
-package com.ragagent.common.approval;
+package com.ragagent.approval;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;

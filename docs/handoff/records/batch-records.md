@@ -1155,3 +1155,14 @@
   `tenantId`/`knowledgeId`/`knowledgeBaseId`/`parentChunkId`/`imageInfo`/`metadata` 无消费点 ⇒ 删）。`ChunkPortAdapter.view()` 同步；零编译错误即证明收窄安全 ✓。
 - **闸门**：后端全量 BUILD SUCCESSFUL + `spotlessCheck` + 四守卫（键名 / 包环含 SCC·R4·R5·R6 / Go 锚点 / 跨面键）绿。
 - **下一步（"common 减重"正解）**：`common/approval` 域归位（1,755 行 / 8 类：`Gate`/`EventBus`/`SpringRedisPubSub`/`ToolPolicy`/`McpApproval`）——评估独立成 `approval` 域或并入 `mcp`/`agent`；随后 L2→L3 剩余 5 条清零 + R13。
+
+**✅ B102（2026-10-08，common 减重：`approval` 域归位）**
+- **先量后动（判定四问）**：① 出向依赖？→ **只有 `common`**（零业务域，独立成域不引入环）；② 消费方几何？→ `mcp` 5 / `agent` 3 / `im` 1（多消费方 ⇒ 并入任一域都会让另两个反向依赖它 ✗）；
+  ③ 是契约还是实现？→ **实现**（`Gate` 655 行决策机 + `RedisPubSub`/`SpringRedisPubSub` + `PendingRequest`/`OAuthPendingRequest` + `ToolPolicy`，有状态、有外部 I/O）；④ 有无搬家陷阱？→ 无 `@ConfigurationProperties`（`@ConfigurationPropertiesScan` 名单无需改）、组件扫描是根包默认（`com.ragagent.approval` 自动覆盖）、脚本/前端无路径引用、无反射/字符串引用。
+- **执行**：`git mv common/approval → approval`（24 文件）+ 24 个包声明改写 + 全仓 **26 文件**引用改写（含 `ImService` 直接 `new SpringRedisPubSub(...)`、`agent/tools/ApprovalBridge`、`mcp` 侧、`event/package-info`）；零编译错误。
+- **包注释重写**：`approval/package-info.java` 记下"为什么是独立域而不是 common"——保留历史（当年因 mcp 的工具审批要用、mcp 曾反向依赖 agent 才搬进 `common.approval`），
+  并指出新理由：它是**有行为有 I/O 的子系统**，放 common 会让共享内核长实现（B101 的 R6 就是为盯这类痕迹）；独立成域**同样解环**（`mcp/agent/im → approval ← common`）。
+- **效果**：`common` **11,183 → 9,374 行**（-16%；126 文件）；`approval` 域 1,758 行 / 24 文件；包图守卫全绿（环 0 / SCC 0 / 依赖 config 0 / L2→L3 5 / R4 / R5 / R6 bean 3）。
+- **闸门**：后端全量 BUILD SUCCESSFUL + `spotlessCheck` + 四守卫（键名 / 包环含 SCC·R4·R5·R6 / Go 锚点 / 跨面键）绿。
+- **下一步（common 继续减重，按性价比）**：`common/security`（1,107 行 / 8 类 / 1 bean：`SsrfGuard` 等 —— 评估独立成 `security` 域）→ `common/tenant`（1,351 / 10）→ `common/web`（1,135 / 15）→ `common/settings`（1,199 / 6）；
+  之后回到阶段 4：L2→L3 剩余 5 条清零、R13（controller→mapper 6 处）、M1 模块化（把软约束变硬约束）。

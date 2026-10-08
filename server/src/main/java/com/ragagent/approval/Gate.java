@@ -1,4 +1,4 @@
-package com.ragagent.common.approval;
+package com.ragagent.approval;
 
 import java.time.Duration;
 import com.ragagent.common.deployment.AppEnvLookup;

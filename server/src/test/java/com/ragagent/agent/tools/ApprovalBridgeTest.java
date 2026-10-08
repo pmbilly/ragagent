@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * ApprovalBridge 的总线桥：gate 发出的 common.approval DTO 必须以
+ * ApprovalBridge 的总线桥：gate 发出的 approval 域 DTO 必须以
  * event.payload 线格式形态到达真实总线——SSE 转发层（AgentStreamBridge）
  * 只认后者，失配即审批卡在聊天流里静默消失（曾实测断链）。
  */
@@ -28,8 +28,8 @@ class ApprovalBridgeTest {
         EventBus bus = new EventBus();
         AtomicReference<Event> received = new AtomicReference<>();
         bus.on(EventType.EVENT_TOOL_APPROVAL_REQUIRED, received::set);
-        com.ragagent.common.approval.EventBus bridged = ApprovalBridge.toEventBus(bus);
-        bridged.emit(new com.ragagent.common.approval.Event(
+        com.ragagent.approval.EventBus bridged = ApprovalBridge.toEventBus(bus);
+        bridged.emit(new com.ragagent.approval.Event(
                 "pending-1-approval-required",
                 com.ragagent.common.llm.ResponseType.TOOL_APPROVAL_REQUIRED,
                 "sess-1",
@@ -42,7 +42,7 @@ class ApprovalBridgeTest {
     @Test
     void toolApprovalRequiredArrivesAsPayloadShape() {
         Object args = Map.of("path", "/etc");
-        Event evt = emitViaBridge(new com.ragagent.common.approval.ToolApprovalRequiredData(
+        Event evt = emitViaBridge(new com.ragagent.approval.ToolApprovalRequiredData(
                 "pending-1", 7L, "sess-1", "am-1", "svc-1", "Service", "tool_a", "reg_tool",
                 "does dangerous things", args, "{\"path\":\"/etc\"}", 600,
                 1759500000L, "call-1", "req-1"));
@@ -67,11 +67,11 @@ class ApprovalBridgeTest {
         EventBus bus = new EventBus();
         AtomicReference<Event> resolved = new AtomicReference<>();
         bus.on(EventType.EVENT_TOOL_APPROVAL_RESOLVED, resolved::set);
-        ApprovalBridge.toEventBus(bus).emit(new com.ragagent.common.approval.Event(
+        ApprovalBridge.toEventBus(bus).emit(new com.ragagent.approval.Event(
                 "pending-1-approval-resolved",
                 com.ragagent.common.llm.ResponseType.TOOL_APPROVAL_RESOLVED,
                 "sess-1",
-                new com.ragagent.common.approval.ToolApprovalResolvedData(
+                new com.ragagent.approval.ToolApprovalResolvedData(
                         "pending-1", true, "ok", false, false),
                 Map.of(),
                 "req-2"));
@@ -83,11 +83,11 @@ class ApprovalBridgeTest {
         // oauth required
         AtomicReference<Event> oauth = new AtomicReference<>();
         bus.on(EventType.EVENT_MCP_OAUTH_REQUIRED, oauth::set);
-        ApprovalBridge.toEventBus(bus).emit(new com.ragagent.common.approval.Event(
+        ApprovalBridge.toEventBus(bus).emit(new com.ragagent.approval.Event(
                 "pending-2-mcp-oauth",
                 com.ragagent.common.llm.ResponseType.MCP_OAUTH_REQUIRED,
                 "sess-1",
-                new com.ragagent.common.approval.McpOauthRequiredData(
+                new com.ragagent.approval.McpOauthRequiredData(
                         "pending-2", 7L, "sess-1", "am-1", "svc-1", "Service", "tool_a",
                         0, 1759500000L, "call-2", "req-3"),
                 Map.of(),
@@ -98,11 +98,11 @@ class ApprovalBridgeTest {
         // oauth resolved（approval 侧叫 approved，payload 侧叫 authorized）
         AtomicReference<Event> oauthResolved = new AtomicReference<>();
         bus.on(EventType.EVENT_MCP_OAUTH_RESOLVED, oauthResolved::set);
-        ApprovalBridge.toEventBus(bus).emit(new com.ragagent.common.approval.Event(
+        ApprovalBridge.toEventBus(bus).emit(new com.ragagent.approval.Event(
                 "pending-2-mcp-oauth-resolved",
                 com.ragagent.common.llm.ResponseType.MCP_OAUTH_RESOLVED,
                 "sess-1",
-                new com.ragagent.common.approval.McpOauthResolvedData(
+                new com.ragagent.approval.McpOauthResolvedData(
                         "pending-2", "svc-1", true, "", false, false),
                 Map.of(),
                 "req-4"));
@@ -117,7 +117,7 @@ class ApprovalBridgeTest {
         AtomicReference<Event> received = new AtomicReference<>();
         bus.on(EventType.EVENT_TOOL_APPROVAL_REQUIRED, received::set);
         Object unknown = List.of("raw");
-        ApprovalBridge.toEventBus(bus).emit(new com.ragagent.common.approval.Event(
+        ApprovalBridge.toEventBus(bus).emit(new com.ragagent.approval.Event(
                 "id", com.ragagent.common.llm.ResponseType.TOOL_APPROVAL_REQUIRED,
                 "sess-1", unknown, Map.of(), "req-5"));
         assertSame(unknown, received.get().getData());

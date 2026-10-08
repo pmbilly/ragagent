@@ -12,9 +12,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.approval.EnabledChecker;
-import com.ragagent.common.approval.McpApproval;
-import com.ragagent.common.approval.ToolPolicy;
+import com.ragagent.approval.EnabledChecker;
+import com.ragagent.approval.McpApproval;
+import com.ragagent.approval.ToolPolicy;
 import com.ragagent.common.web.ToolJson;
 import com.ragagent.common.llm.ToolResult;
 import com.ragagent.mcp.domain.McpService;
@@ -460,7 +460,7 @@ public final class McpCatalog {
         EnabledChecker checker = gate == null ? null
                 : (ctx, t, s, n) -> gate.isEnabled(ctx, t, s, n);
         try {
-            policies = ToolPolicy.enabledTools(com.ragagent.common.approval.Cancellation.none(),
+            policies = ToolPolicy.enabledTools(com.ragagent.approval.Cancellation.none(),
                     checker, tenantId, id, names);
         } catch (Exception e) {
             throw new IllegalStateException("MCP tool permissions are temporarily unavailable");
@@ -481,7 +481,7 @@ public final class McpCatalog {
         }
         boolean enabled;
         try {
-            enabled = gate.isEnabled(com.ragagent.common.approval.Cancellation.none(),
+            enabled = gate.isEnabled(com.ragagent.approval.Cancellation.none(),
                     tenantId, tool.service.getId(), tool.mcpTool.getName());
         } catch (Exception e) {
             return "MCP tool permissions are temporarily unavailable";

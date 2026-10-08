@@ -1,4 +1,4 @@
-package com.ragagent.common.approval;
+package com.ragagent.approval;
 
 /**
  * 审批流程内用到的**取消面**（只保留“是否已取消 + 取消回调”语义）。

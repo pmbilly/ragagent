@@ -4,7 +4,7 @@ import com.ragagent.event.Event;
 import com.ragagent.event.EventBus;
 
 /**
- * tools 包 ↔ common.approval 包的类型桥（两个包面之间的显式适配）。
+ * tools 包 ↔ approval 域的类型桥（两个包面之间的显式适配）。
  *
  * <ul>
  *   <li>{@code ToolCancellation}（ctx.Err() 语义）→ {@code approval.Cancellation}
@@ -19,11 +19,11 @@ public final class ApprovalBridge {
     private ApprovalBridge() {
     }
 
-    public static com.ragagent.common.approval.Cancellation toCancellation(ToolCancellation cancellation) {
+    public static com.ragagent.approval.Cancellation toCancellation(ToolCancellation cancellation) {
         if (cancellation == null) {
-            return com.ragagent.common.approval.Cancellation.none();
+            return com.ragagent.approval.Cancellation.none();
         }
-        return new com.ragagent.common.approval.Cancellation() {
+        return new com.ragagent.approval.Cancellation() {
             @Override
             public boolean isCancelled() {
                 return cancellation.cancellationError() != null;
@@ -68,7 +68,7 @@ public final class ApprovalBridge {
         };
     }
 
-    static com.ragagent.common.approval.EventBus toEventBus(EventBus bus) {
+    static com.ragagent.approval.EventBus toEventBus(EventBus bus) {
         if (bus == null) {
             return null;
         }
@@ -82,30 +82,30 @@ public final class ApprovalBridge {
     }
 
     /**
-     * common.approval 的门内 DTO → event.payload 的线格式 DTO。
+     * approval 域的门内 DTO → event.payload 的线格式 DTO。
      * SSE 转发层（AgentStreamBridge）只认 event.payload 形态——缺了这层映射，
      * 审批请求/决议事件会因 instanceof 失配被静默丢弃，聊天流里永远不出现审批卡。
      * 未知形态原样透传（向后兼容）。
      */
     private static Object toPayloadData(Object data) {
-        if (data instanceof com.ragagent.common.approval.ToolApprovalRequiredData d) {
+        if (data instanceof com.ragagent.approval.ToolApprovalRequiredData d) {
             return new com.ragagent.event.payload.ToolApprovalRequiredData(
                     d.pendingId(), d.tenantId(), d.sessionId(), d.assistantMessageId(),
                     d.serviceId(), d.serviceName(), d.mcpToolName(), d.registeredToolName(),
                     d.description(), d.args(), d.argsJson(), d.timeoutSeconds(),
                     d.requestedAtUnix(), d.toolCallId(), d.requestId());
         }
-        if (data instanceof com.ragagent.common.approval.ToolApprovalResolvedData d) {
+        if (data instanceof com.ragagent.approval.ToolApprovalResolvedData d) {
             return new com.ragagent.event.payload.ToolApprovalResolvedData(
                     d.pendingId(), d.approved(), d.reason(), d.timedOut(), d.canceled());
         }
-        if (data instanceof com.ragagent.common.approval.McpOauthRequiredData d) {
+        if (data instanceof com.ragagent.approval.McpOauthRequiredData d) {
             return new com.ragagent.event.payload.MCPOAuthRequiredData(
                     d.pendingId(), d.tenantId(), d.sessionId(), d.assistantMessageId(),
                     d.serviceId(), d.serviceName(), d.mcpToolName(), d.timeoutSeconds(),
                     d.requestedAtUnix(), d.toolCallId(), d.requestId());
         }
-        if (data instanceof com.ragagent.common.approval.McpOauthResolvedData d) {
+        if (data instanceof com.ragagent.approval.McpOauthResolvedData d) {
             return new com.ragagent.event.payload.MCPOAuthResolvedData(
                     d.pendingId(), d.serviceId(), d.authorized(), d.reason(),
                     d.timedOut(), d.canceled());

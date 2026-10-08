@@ -88,6 +88,16 @@ ArchUnit 1.3.0 **已是测试依赖**（`server/build.gradle.kts:111`），可�
 
 > C2~C8 全部做完后，SCC-A 消失，包图成为 DAG，`audit`/`common`/`llm` 在底，业务域在顶。
 
+### 2.3 common 纪律与减重（B101/B102）
+
+| 项 | 状态 |
+|---|---|
+| 契约层 vs 实现 | `common.<domain>` 只放**跨域端口与载荷**（例：`common/knowledge` 18 文件 = 15 接口/record + 2 个零方法体 DTO + package-info，纪律写在包注释里："载荷只带消费方真正读取的字段，别把实体漏出去"） |
+| **R5** 底座不得依赖业务域 | ✅ B101：`common`/`event`/`stream`/`tracing` → 业务域 = **0 条**（绝对禁止；红态探针验过，退出码 1） |
+| **R6** common 实现痕迹棘轮 | ✅ B101：bean = `crypto`/`security`/`storage` 各 1、域持久层引用 0；按子包只许减不许增 |
+| **`common/approval` 归位** | ✅ B102：1,758 行 / 24 文件搬到顶层 `com.ragagent.approval`（审批门 Gate + Redis pub/sub + 待审请求/决议）；出向依赖**只有 common** ⇒ 不引入环；`common` 11,183 → **9,374 行**（-16%） |
+| 剩余减重候选 | `common/tenant`（1,351 行 / 10 类）、`common/settings`（1,199 / 6）、`common/web`（1,135 / 15）、`common/security`（1,107 / 8，含 1 个 `@Component`）——这批是"子系统/工具住在 common"，逐个评估独立成域/并入某域 |
+
 ## 3. 目标模块图（**6 个模块，不是 30 个**）
 
 分档推进，每档独立可验收；最终仍产出**单个 Boot jar**（部署形态不变）。
