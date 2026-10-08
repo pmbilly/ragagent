@@ -152,7 +152,6 @@ BASELINE: dict[str, set[str]] = {
     # agent_steps 落库列 + 历史回放
     'session/service/AgentStreamBridge.java': {'completed_at', 'duration_ms', 'event_id', 'final_content', 'is_fallback', 'message_id', 'messages_after', 'messages_before', 'pending_id', 'session_id', 'split_turn', 'steer_id', 'tokens_after', 'tokens_before', 'tool_call_id', 'tool_name', 'total_duration_ms', 'total_steps', 'user_message_id'},
     # agent_steps/推荐面落库 + 回放
-    'session/service/MessageSuggestionService.java': {'assistant_message_id', 'session_id'},
     # agent_steps 落库列 + 回放
     'session/service/QaSupport.java': {'kb_id', 'kb_name', 'kb_type', 'mentioned_items', 'service_id', 'skill_name', 'steer_id'},
     # agent_steps 落库列 + 回放

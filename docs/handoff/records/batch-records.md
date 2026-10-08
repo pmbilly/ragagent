@@ -1030,3 +1030,11 @@
 - **一致性自检**：SSE references 面两侧同为 camel（写 `ReferencesSupport` ↔ 读 `ModelOutput`/`ToolResultPersist`/`ToolDisplay`/`StreamResponseBuilder`）；rerank 行与 references 行是**不同结构**（前者进 obs，后者进事件），未互相污染。
 - **闸门**：后端 4,838/0；前端 736/0 + `vue-tsc` 0；`spotlessCheck`；五守卫绿（换锚守卫 260 条基线逐条复核）。
 - **附带发现**：`EmbedRateLimiterTest.redisPathSharesBudgetAcrossInstances` **偶发 flaky**（Redis 跨实例限流时序，复跑即过）——记录在案，未做处理。
+
+**✅ B93c（2026-10-08，落库 jsonb 键收尾）**
+- **侦察结论（面比预期小得多）**：jsonb 内层键的换锚**已在数据层完成**——`migrations/versioned/V2__kb_config_keys_camel.sql`（KB 配置 45 条映射，含 `chunk_size→chunkSize`、`parser_engine_rules→parserEngineRules`）与 `V3__agent_config_keys_camel.sql`（agent 配置 ~70 条映射）；代码侧读写全為 camel，`KnowledgeBaseConfigJsonContractTest` 还反向钉住「旧键被忽略」（`{"chunk_size":999}` 解出 0）。
+- **实测残留（全库 87 个 jsonb 列逐个扫 DEFAULT）**：仅 2 列 —— `knowledge_bases.chunking_config`（`chunk_size`/`chunk_overlap`/`split_markers`/`keep_separator`）与 `image_processing_config`（`model_id`/`enable_multimodal`）。危害：未显式给配置的插入会落回旧键 ⇒ 与读侧静默失配。
+- **处置**：新增 `V6__kb_default_config_keys_camel.sql` —— 两列 `ALTER COLUMN … SET DEFAULT`（camel 值，幂等）；**有意不做**：① 不 UPDATE 存量行（V2 已覆盖这些键）② 不动列名与 SQL（SQL 惯例，§2.4 的适用面是 JSON 键）。
+- **顺带**：清理 `check-json-key-case.py` 的 1 条过期基线条目（`session/service/MessageSuggestionService.java` 已无命中）。
+- **闸门**：后端 4,838/0（唯一红条 = 已记录 flaky `EmbedRateLimiterTest`，复跑即过）；前端 736/0；五守卫绿。
+- **规划文档同步**：阶段 4 的 C2~C8 端口化（`wiki→knowledge` 门面、`auth` 依赖下沉、SCC-A 七包解环）仍是余下的结构性大活。
