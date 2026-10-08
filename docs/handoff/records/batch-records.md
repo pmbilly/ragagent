@@ -1096,3 +1096,13 @@
   ② 测试桩方法名要随端口方法改，且 **`verify(x).m(...)` 与 `when(x.m(...))` 是两种形态**（首轮正则只覆盖了后者，漏了 `verify` 形态）。
 - **闸门**：后端 4,838/0 + `spotlessCheck` + 五守卫绿。
 - **下一步 C2**（`wiki → knowledge`，43 处）：引入 `KnowledgeBaseLookup` 只读门面（暴露 `id/name/type` 视图），wiki 只依赖端口 —— 阶段 4 最大工程。
+
+**✅ B98（2026-10-08，C2-a：`wiki → knowledge` 只读门面）**
+- **端口**：`common/knowledge/KnowledgeBaseLookup` —— 四方法：`kbById`（软删过滤 + `LIMIT 1`）、`kbByIdIncludingDeleted`（健康检查用，无软删过滤）、`knowledgeGone`（不存在/软删/解析状态 deleting|cancelled）、`knowledgeExists`（纯存在性）；视图 `KnowledgeBaseView` 用 **getter 风格**（`getId/getTenantId/.../isWikiEnabled`），因此 `requireWikiKB` 的调用点零改写。
+  · 端口方法刻意区分两种"不在"：`knowledgeGone`（ingest 用）vs `knowledgeExists`（lint 用）——语义不同，合并会改行为，注释已写明。
+- **实现**：`knowledge/service/KnowledgeBaseLookupAdapter`（`KnowledgeBaseMapper` + `ObjectProvider<KnowledgeMapper>`）；过滤条件与迁移前 wiki 直查**逐字一致**（含"仓储缺位保守返回 false"与异常姿态）。
+- **换端口三处**：`WikiLintService`（4→0）、`WikiKbAccessGuard`（2→0）、`WikiPageController`（1→0）⇒ `wiki → knowledge` **43 → 36**；守卫环 0 / L2→L3 5 不变。
+- **侦察修正（重要）**：方案把 C2 估为"引入只读门面即可收口的 43 处"，实测**不是**——wiki 的 ingest 会**写** knowledge 域：
+  `knowledge.domain.{Chunk,Knowledge,KnowledgeBase,KnowledgeProcessingSpan}`、`mapper.{KnowledgeMapper,KnowledgeBaseMapper,ChunkMapper}`、`repository.ChunkRepository`、`service.SpanTracker`、`support.ImageInfoEnricher`、`client.EmbedderClient.configFrom`。
+  且 `requireWikiKB` 有 **22 个调用点**。⇒ C2 拆三批：**C2-a ✅**（本批，读侧）/ **C2-b ingest 门面**（真正大头：提交/落库/span/图片富化/嵌入配置）/ **C2-c 调用点收尾**。
+- **闸门**：后端 4,838/0（唯一红条 = 已知 flaky `EmbedRateLimiterTest`，复跑即过）；五守卫绿（环 0、L2→L3 5）。

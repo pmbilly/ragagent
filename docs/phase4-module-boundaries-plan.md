@@ -68,7 +68,7 @@ ArchUnit 1.3.0 **已是测试依赖**（`server/build.gradle.kts:111`），可�
 
 | # | 边 | 处数 | 样例 | 修法（端口/门面化） |
 |---|---|---|---|---|
-| C2 | `wiki → knowledge` | **43** | `wiki/controller/WikiPageController → mapper.KnowledgeBaseMapper`、`WikiKbAccessGuard → domain.KnowledgeBase` | 引入 `knowledge` 的只读门面（`KnowledgeBaseLookup` 端口，暴露 `id/name/type` 视图），wiki 只依赖端口 —— **本条是最大工程**，也是模块化的关键收益点 |
+| ◐ C2 | `wiki → knowledge` | **43 → 36** | `wiki/controller/WikiPageController → mapper.KnowledgeBaseMapper`、`WikiKbAccessGuard → domain.KnowledgeBase` | **分批进行（B98 起步）**：① **C2-a 只读门面**（✅ 本批）：`common.knowledge.KnowledgeBaseLookup` 端口（`kbById`/`kbByIdIncludingDeleted`/`knowledgeGone`/`knowledgeExists` + `KnowledgeBaseView` 视图），实现留 knowledge；`WikiLintService`/`WikiKbAccessGuard`/`WikiPageController` 三处换端口（43 → 36）。② **C2-b ingest 写面**（待做，实测是本条真正的大头）：wiki 的 ingest 会**写** knowledge 域（`Chunk`/`Knowledge` 实体、`KnowledgeMapper`/`ChunkMapper`/`ChunkRepository`、`SpanTracker`、`ImageInfoEnricher`、`EmbedderClient.configFrom`）⇒ 需要一个 **ingest 门面**（提交/落库/span/图片富化/嵌入配置），不是只读端口能覆盖的。③ **C2-c 调用点收尾**：`requireWikiKB` 有 **22 个调用点**（返回视图后逐点核对），与 ② 一起做才能归零 |
 | C3 | `knowledge → retrieval` | **47** | `KnowledgeBaseController → HybridSearchService`、`ImageInfoEnricher → retrieval.domain.ImageInfo` | 方向本身合法（业务域 → 能力层）；环来自 `retrieval → auth`（C6）⇒ 修 C6 即断环，本边**保持**（模块图中体现为 `domain-* → engine`） |
 | ✅ C4 | `knowledge → auth` | 17 | `knowledge/security/KnowledgeRouteGuards → apikey.domain.TenantAPIKeyScope` | 把「API key scope / 路由守卫」下沉为共享端口（`common.security` 下只读接口 + auth 实现） |
 | ✅ C5 | `storage → auth` | 16 | `storage/provider/FileServiceFactory → domain.tenantconfig.StorageEngineConfig` | 租户配置（`tenantconfig`）是**跨域共享配置 jsonb**：下沉到 `common.tenant`（与 `TenantProperties` 同址），auth 只负责读写端点 |

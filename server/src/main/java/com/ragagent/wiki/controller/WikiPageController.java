@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.error.BizException;
-import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
+import com.ragagent.common.knowledge.KnowledgeBaseLookup;
 import com.ragagent.common.audit.WikiActivityAudit;
 import com.ragagent.wiki.service.page.WikiLintService;
 import com.ragagent.wiki.service.page.WikiPageService;
@@ -88,10 +88,10 @@ public class WikiPageController {
 
     public WikiPageController(WikiPageService wikiService,
                               WikiLintService lintService,
-                              KnowledgeBaseMapper kbMapper,
+                              KnowledgeBaseLookup kbLookup,
                               ObjectMapper json,
                               ObjectProvider<WikiActivityAudit> activityAudit) {
-        this.kbGuard = new WikiKbAccessGuard(kbMapper);
+        this.kbGuard = new WikiKbAccessGuard(kbLookup);
         this.pageOps = new WikiPageOps(wikiService, kbGuard,
                 new WikiActivityRecorder(activityAudit), json);
         this.folderOps = new WikiFolderOps(wikiService, kbGuard, json);

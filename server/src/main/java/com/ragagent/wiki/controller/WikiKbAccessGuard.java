@@ -8,8 +8,7 @@ import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.BizException;
 import com.ragagent.common.error.GuardForbiddenException;
 import com.ragagent.common.tenant.TenantRole;
-import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
+import com.ragagent.common.knowledge.KnowledgeBaseLookup;
 import org.springframework.http.HttpStatus;
 
 import com.ragagent.wiki.controller.WikiPageController.RawJsonError;
@@ -21,10 +20,10 @@ import com.ragagent.wiki.controller.WikiPageController.RawJsonError;
  */
 final class WikiKbAccessGuard {
 
-    private final KnowledgeBaseMapper kbMapper;
+    private final KnowledgeBaseLookup kbLookup;
 
-    WikiKbAccessGuard(KnowledgeBaseMapper kbMapper) {
-        this.kbMapper = kbMapper;
+    WikiKbAccessGuard(KnowledgeBaseLookup kbLookup) {
+        this.kbLookup = kbLookup;
     }
 
     /**
@@ -50,7 +49,7 @@ final class WikiKbAccessGuard {
      *
      * @param write 该端点是否属于写一侧
      */
-    KnowledgeBase requireWikiKB(String kbId, boolean write) {
+    KnowledgeBaseLookup.KnowledgeBaseView requireWikiKB(String kbId, boolean write) {
         if (kbId == null || kbId.isEmpty()) {
             throw new RawJsonError(HttpStatus.BAD_REQUEST.value(),
                     WikiRequestSupport.appErrorText(400, "Knowledge base ID is required"));
@@ -68,10 +67,7 @@ final class WikiKbAccessGuard {
 
         // 必须先按 id 找到（查询不带空间过滤），
         // 才能把"库里没有"（404）与"不是你的"（403）区分开。
-        KnowledgeBase kb = kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getId, kbId)
-                .isNull(KnowledgeBase::getDeletedAt)
-                .last("LIMIT 1"));
+        KnowledgeBaseLookup.KnowledgeBaseView kb = kbLookup.kbById(kbId);
         if (kb == null) {
             throw BizException.notFound("knowledge base not found");
         }
@@ -85,7 +81,7 @@ final class WikiKbAccessGuard {
             checkOwnership(kb);
         }
 
-        if (!kb.getIndexingStrategy().isWikiEnabled()) {
+        if (!kb.isWikiEnabled()) {
             throw new RawJsonError(HttpStatus.BAD_REQUEST.value(),
                     WikiRequestSupport.appErrorText(400, "Wiki feature is not enabled for this knowledge base"));
         }
@@ -93,7 +89,7 @@ final class WikiKbAccessGuard {
     }
 
     /** 所有权判定：创建者本人或 Admin+，否则 403（同 KnowledgeBaseController 的检查语义）。 */
-    private static void checkOwnership(KnowledgeBase kb) {
+    private static void checkOwnership(KnowledgeBaseLookup.KnowledgeBaseView kb) {
         String role = TenantContext.currentRole();
         String uid = TenantContext.currentUserId();
         boolean admin = TenantRole.fromString(role).hasPermission(TenantRole.ADMIN);

@@ -10,10 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
-import com.ragagent.knowledge.mapper.KnowledgeMapper;
+import com.ragagent.common.knowledge.KnowledgeBaseLookup;
 import com.ragagent.wiki.domain.WikiConstants;
 import com.ragagent.wiki.domain.WikiException;
 import com.ragagent.wiki.domain.WikiLintIssue;
@@ -54,15 +51,11 @@ public class WikiLintService {
     static final int EMPTY_CONTENT_THRESHOLD_BYTES = 50;
 
     private final WikiPageService wikiService;
-    private final KnowledgeBaseMapper kbMapper;
-    private final KnowledgeMapper knowledgeMapper;
+    private final KnowledgeBaseLookup kbLookup;
 
-    public WikiLintService(WikiPageService wikiService,
-                           KnowledgeBaseMapper kbMapper,
-                           KnowledgeMapper knowledgeMapper) {
+    public WikiLintService(WikiPageService wikiService, KnowledgeBaseLookup kbLookup) {
         this.wikiService = wikiService;
-        this.kbMapper = kbMapper;
-        this.knowledgeMapper = knowledgeMapper;
+        this.kbLookup = kbLookup;
     }
 
     /**
@@ -70,13 +63,11 @@ public class WikiLintService {
      */
     public WikiLintReport runLint(String kbId) {
         // 校验 KB
-        KnowledgeBase kb = kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getId, kbId)
-                .last("LIMIT 1"));
+        KnowledgeBaseLookup.KnowledgeBaseView kb = kbLookup.kbByIdIncludingDeleted(kbId);
         if (kb == null) {
             throw new WikiException("get KB: knowledge base not found");
         }
-        if (!kb.getIndexingStrategy().isWikiEnabled()) {
+        if (!kb.isWikiEnabled()) {
             throw new WikiException("KB " + kbId + " is not a wiki type");
         }
 
@@ -466,11 +457,7 @@ public class WikiLintService {
      * @return 该文档是否仍存活
      */
     private boolean knowledgeExistsByIdOnly(String kid) {
-        Knowledge k = knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getId, kid)
-                .isNull(Knowledge::getDeletedAt)
-                .last("LIMIT 1"));
-        return k != null;
+        return kbLookup.knowledgeExists(kid);
     }
 
     /** issues 延迟分配：保持"零问题 = null"的出口契约 */

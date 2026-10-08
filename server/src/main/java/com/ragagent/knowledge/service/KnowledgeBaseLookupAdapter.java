@@ -1,0 +1,97 @@
+package com.ragagent.knowledge.service;
+
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.stereotype.Component;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.ragagent.common.knowledge.KnowledgeBaseLookup;
+import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
+import com.ragagent.knowledge.mapper.KnowledgeMapper;
+
+/**
+ * {@link KnowledgeBaseLookup} 的 knowledge 侧实现（B98/C2）。
+ *
+ * <p>过滤条件与迁移前的 wiki 侧直查<b>逐字一致</b>（软删过滤、{@code LIMIT 1}、
+ * 解析状态判定、仓储缺位保守返回），保证 C2 只是"换依赖方向"而非改行为。</p>
+ */
+@Component
+public class KnowledgeBaseLookupAdapter implements KnowledgeBaseLookup {
+
+    private final KnowledgeBaseMapper kbMapper;
+    private final ObjectProvider<KnowledgeMapper> knowledgeMapper;
+
+    public KnowledgeBaseLookupAdapter(KnowledgeBaseMapper kbMapper,
+                                      ObjectProvider<KnowledgeMapper> knowledgeMapper) {
+        this.kbMapper = kbMapper;
+        this.knowledgeMapper = knowledgeMapper;
+    }
+
+    @Override
+    public KnowledgeBaseView kbById(String kbId) {
+        KnowledgeBase kb = kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
+                .eq(KnowledgeBase::getId, kbId)
+                .isNull(KnowledgeBase::getDeletedAt)
+                .last("LIMIT 1"));
+        return view(kb);
+    }
+
+    @Override
+    public KnowledgeBaseView kbByIdIncludingDeleted(String kbId) {
+        KnowledgeBase kb = kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
+                .eq(KnowledgeBase::getId, kbId)
+                .last("LIMIT 1"));
+        return view(kb);
+    }
+
+    @Override
+    public boolean knowledgeGone(String knowledgeId) {
+        KnowledgeMapper mapper = knowledgeMapper.getIfAvailable();
+        if (mapper == null) {
+            // 无知识仓储可查（装配裁剪）—— 无法判定，保守地当作"还在"（与迁移前一致）。
+            return false;
+        }
+        Knowledge kn;
+        try {
+            kn = mapper.selectOne(new LambdaQueryWrapper<Knowledge>()
+                    .eq(Knowledge::getId, knowledgeId)
+                    .isNull(Knowledge::getDeletedAt));
+        } catch (Exception e) {
+            return true;
+        }
+        if (kn == null) {
+            return true;
+        }
+        return Knowledge.PARSE_DELETING.equals(kn.getParseStatus())
+                || Knowledge.PARSE_CANCELLED.equals(kn.getParseStatus());
+    }
+
+    @Override
+    public boolean knowledgeExists(String knowledgeId) {
+        KnowledgeMapper mapper = knowledgeMapper.getIfAvailable();
+        if (mapper == null) {
+            return false;
+        }
+        Knowledge k = mapper.selectOne(new LambdaQueryWrapper<Knowledge>()
+                .eq(Knowledge::getId, knowledgeId)
+                .isNull(Knowledge::getDeletedAt)
+                .last("LIMIT 1"));
+        return k != null;
+    }
+
+    private static KnowledgeBaseView view(KnowledgeBase kb) {
+        if (kb == null) {
+            return null;
+        }
+        boolean wikiEnabled = kb.getIndexingStrategy() != null && kb.getIndexingStrategy().isWikiEnabled();
+        return new KnowledgeBaseView(
+                kb.getId(),
+                kb.getTenantId() == null ? 0L : kb.getTenantId(),
+                kb.getCreatorId(),
+                kb.getSummaryModelId(),
+                kb.getEmbeddingModelId(),
+                wikiEnabled,
+                kb.getWikiConfig());
+    }
+}
