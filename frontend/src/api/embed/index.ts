@@ -417,7 +417,7 @@ export async function getEmbedMCPOAuthStatus(
   authorizationAttempt?: string,
 ): Promise<boolean> {
   const query = authorizationAttempt
-    ? `?authorization_attempt=${encodeURIComponent(authorizationAttempt)}`
+    ? `?authorizationAttempt=${encodeURIComponent(authorizationAttempt)}`
     : ''
   const response: any = await get(
     `/api/v1/embed/${channelId}/sessions/${encodeURIComponent(sessionId)}/mcp-services/${encodeURIComponent(serviceId)}/oauth/status${query}`,

@@ -46,8 +46,8 @@ public class AgentToolApprovalController {
     }
 
     /** 权限 Viewer+。 */
-    @PostMapping("/tool-approvals/{pending_id}")
-    public ResponseEntity<Void> resolveToolApproval(@PathVariable("pending_id") String pendingId,
+    @PostMapping("/tool-approvals/{pendingId}")
+    public ResponseEntity<Void> resolveToolApproval(@PathVariable("pendingId") String pendingId,
                                                     @RequestBody(required = false) ResolveToolApprovalRequest body) {
         Long tenantId = TenantContext.currentTenantId();
         long tenant = tenantId == null ? 0L : tenantId;

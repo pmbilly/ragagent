@@ -136,164 +136,164 @@ final com.ragagent.storage.fileserve.FileProxyService fileProxyService;
         return mgmtOps.listAll();
     }
 
-    @GetMapping("/api/v1/embed-channels/{channel_id}")
-    public ResponseEntity<Map<String, Object>> get(@PathVariable("channel_id") String channelId) {
+    @GetMapping("/api/v1/embed-channels/{channelId}")
+    public ResponseEntity<Map<String, Object>> get(@PathVariable("channelId") String channelId) {
         return mgmtOps.get(channelId);
     }
 
-    @PutMapping("/api/v1/embed-channels/{channel_id}")
-    public ResponseEntity<Map<String, Object>> update(@PathVariable("channel_id") String channelId,
+    @PutMapping("/api/v1/embed-channels/{channelId}")
+    public ResponseEntity<Map<String, Object>> update(@PathVariable("channelId") String channelId,
                                                       @RequestBody(required = false) String rawBody) {
         return mgmtOps.update(channelId, rawBody);
     }
 
-    @DeleteMapping("/api/v1/embed-channels/{channel_id}")
-    public ResponseEntity<Void> delete(@PathVariable("channel_id") String channelId) {
+    @DeleteMapping("/api/v1/embed-channels/{channelId}")
+    public ResponseEntity<Void> delete(@PathVariable("channelId") String channelId) {
         return mgmtOps.delete(channelId);
     }
 
-    @PostMapping("/api/v1/embed-channels/{channel_id}/rotate-token")
-    public ResponseEntity<Map<String, Object>> rotate(@PathVariable("channel_id") String channelId) {
+    @PostMapping("/api/v1/embed-channels/{channelId}/rotate-token")
+    public ResponseEntity<Map<String, Object>> rotate(@PathVariable("channelId") String channelId) {
         return mgmtOps.rotate(channelId);
     }
 
-    @PostMapping("/api/v1/embed-channels/{channel_id}/preview-session")
-    public ResponseEntity<Map<String, Object>> preview(@PathVariable("channel_id") String channelId) {
+    @PostMapping("/api/v1/embed-channels/{channelId}/preview-session")
+    public ResponseEntity<Map<String, Object>> preview(@PathVariable("channelId") String channelId) {
         return mgmtOps.preview(channelId);
     }
 
-    @GetMapping("/api/v1/embed-channels/{channel_id}/stats")
-    public ResponseEntity<Map<String, Object>> stats(@PathVariable("channel_id") String channelId) {
+    @GetMapping("/api/v1/embed-channels/{channelId}/stats")
+    public ResponseEntity<Map<String, Object>> stats(@PathVariable("channelId") String channelId) {
         return mgmtOps.stats(channelId);
     }
 
 
-    @PostMapping("/api/v1/embed/{channel_id}/exchange")
-    public ResponseEntity<Map<String, Object>> exchange(@PathVariable("channel_id") String channelId) {
+    @PostMapping("/api/v1/embed/{channelId}/exchange")
+    public ResponseEntity<Map<String, Object>> exchange(@PathVariable("channelId") String channelId) {
         return publicOps.exchange(channelId);
     }
 
-    @GetMapping("/api/v1/embed/{channel_id}/config")
-    public ResponseEntity<com.fasterxml.jackson.databind.node.ObjectNode> config(@PathVariable("channel_id") String channelId) {
+    @GetMapping("/api/v1/embed/{channelId}/config")
+    public ResponseEntity<com.fasterxml.jackson.databind.node.ObjectNode> config(@PathVariable("channelId") String channelId) {
         return publicOps.config(channelId);
     }
 
-    @GetMapping("/api/v1/embed/{channel_id}/suggested-questions")
+    @GetMapping("/api/v1/embed/{channelId}/suggested-questions")
     public ResponseEntity<Map<String, Object>> suggestedQuestions(
-            @PathVariable("channel_id") String channelId,
+            @PathVariable("channelId") String channelId,
             @RequestParam(name = "limit", required = false) String limit) {
         return publicOps.suggestedQuestions(channelId, limit);
     }
 
-    @GetMapping("/api/v1/embed/{channel_id}/chunks/{chunk_id}")
-    public ResponseEntity<?> chunk(@PathVariable("chunk_id") String chunkId) {
+    @GetMapping("/api/v1/embed/{channelId}/chunks/{chunkId}")
+    public ResponseEntity<?> chunk(@PathVariable("chunkId") String chunkId) {
         return publicOps.chunk(chunkId);
     }
 
-    @PostMapping("/api/v1/embed/{channel_id}/sessions")
+    @PostMapping("/api/v1/embed/{channelId}/sessions")
     public ResponseEntity<Map<String, Object>> createSession(
-            @PathVariable("channel_id") String channelId) {
+            @PathVariable("channelId") String channelId) {
         return publicOps.createSession(channelId);
     }
 
 
-    @PostMapping("/api/v1/embed/{channel_id}/knowledge-chat/{session_id}")
-    public void knowledgeChat(@PathVariable("session_id") String sessionId,
+    @PostMapping("/api/v1/embed/{channelId}/knowledge-chat/{sessionId}")
+    public void knowledgeChat(@PathVariable("sessionId") String sessionId,
                               @RequestBody(required = false) String rawBody,
                               @RequestParam(name = "resource_urls", required = false) String resourceUrls,
                               jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
         delegateOps.knowledgeChat(sessionId, rawBody, resourceUrls, response);
     }
 
-    @PostMapping("/api/v1/embed/{channel_id}/agent-chat/{session_id}")
-    public void agentChat(@PathVariable("session_id") String sessionId,
+    @PostMapping("/api/v1/embed/{channelId}/agent-chat/{sessionId}")
+    public void agentChat(@PathVariable("sessionId") String sessionId,
                           @RequestBody(required = false) String rawBody,
                           @RequestParam(name = "resource_urls", required = false) String resourceUrls,
                           jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
         delegateOps.agentChat(sessionId, rawBody, resourceUrls, response);
     }
 
-    @GetMapping("/api/v1/embed/{channel_id}/files")
+    @GetMapping("/api/v1/embed/{channelId}/files")
     public void embedFiles(jakarta.servlet.http.HttpServletRequest request,
                            jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
         delegateOps.embedFiles(request, response);
     }
 
-    @GetMapping("/api/v1/embed/{channel_id}/messages/{session_id}/load")
-    public ResponseEntity<List<com.ragagent.session.domain.Message>> load(@PathVariable("session_id") String sessionId,
+    @GetMapping("/api/v1/embed/{channelId}/messages/{sessionId}/load")
+    public ResponseEntity<List<com.ragagent.session.domain.Message>> load(@PathVariable("sessionId") String sessionId,
                                                     @RequestParam(name = "limit", required = false) String limit,
                                                     @RequestParam(name = "before_time", required = false) String beforeTime,
                                                     @RequestParam(name = "resource_urls", required = false) String resourceUrls) {
         return delegateOps.load(sessionId, limit, beforeTime, resourceUrls);
     }
 
-    @PostMapping("/api/v1/embed/{channel_id}/sessions/{session_id}/stop")
-    public ResponseEntity<?> stop(@PathVariable("session_id") String sessionId,
+    @PostMapping("/api/v1/embed/{channelId}/sessions/{sessionId}/stop")
+    public ResponseEntity<?> stop(@PathVariable("sessionId") String sessionId,
                                   @RequestBody(required = false)
                                   com.ragagent.session.dto.StopSessionRequest body) {
         return delegateOps.stop(sessionId, body);
     }
 
-    @GetMapping("/api/v1/embed/{channel_id}/sessions/{session_id}/messages/{message_id}/suggestions")
+    @GetMapping("/api/v1/embed/{channelId}/sessions/{sessionId}/messages/{messageId}/suggestions")
     public ResponseEntity<?> suggestionsGet(
-            @PathVariable("session_id") String sessionId,
-            @PathVariable("message_id") String messageId) {
+            @PathVariable("sessionId") String sessionId,
+            @PathVariable("messageId") String messageId) {
         return delegateOps.suggestionsGet(sessionId, messageId);
     }
 
-    @PostMapping("/api/v1/embed/{channel_id}/sessions/{session_id}/messages/{message_id}/suggestions")
+    @PostMapping("/api/v1/embed/{channelId}/sessions/{sessionId}/messages/{messageId}/suggestions")
     public ResponseEntity<?> suggestionsEnsure(
-            @PathVariable("session_id") String sessionId,
-            @PathVariable("message_id") String messageId,
+            @PathVariable("sessionId") String sessionId,
+            @PathVariable("messageId") String messageId,
             @RequestBody(required = false) String rawBody) {
         return delegateOps.suggestionsEnsure(sessionId, messageId, rawBody);
     }
 
-    @PostMapping("/api/v1/embed/{channel_id}/sessions/{session_id}/suggestion-events")
-    public ResponseEntity<?> suggestionEvents(@PathVariable("session_id") String sessionId,
+    @PostMapping("/api/v1/embed/{channelId}/sessions/{sessionId}/suggestion-events")
+    public ResponseEntity<?> suggestionEvents(@PathVariable("sessionId") String sessionId,
                                               @RequestBody(required = false) String rawBody) {
         return delegateOps.suggestionEvents(sessionId, rawBody);
     }
 
-    @PostMapping("/api/v1/embed/{channel_id}/sessions/{session_id}/events")
-    public ResponseEntity<?> events(@PathVariable("session_id") String sessionId,
+    @PostMapping("/api/v1/embed/{channelId}/sessions/{sessionId}/events")
+    public ResponseEntity<?> events(@PathVariable("sessionId") String sessionId,
                                     @RequestBody(required = false) String rawBody) {
         return delegateOps.events(sessionId, rawBody);
     }
 
-    @PostMapping("/api/v1/embed/{channel_id}/sessions/{session_id}/mcp-services/{svc_id}/oauth/authorize-url")
+    @PostMapping("/api/v1/embed/{channelId}/sessions/{sessionId}/mcp-services/{svcId}/oauth/authorize-url")
     public ResponseEntity<Map<String, Object>> mcpAuthorize(
-            @PathVariable("session_id") String sessionId,
-            @PathVariable("svc_id") String serviceId,
+            @PathVariable("sessionId") String sessionId,
+            @PathVariable("svcId") String serviceId,
             @RequestBody(required = false) String rawBody) {
         return delegateOps.mcpAuthorize(sessionId, serviceId, rawBody);
     }
 
-    @GetMapping("/api/v1/embed/{channel_id}/sessions/{session_id}/mcp-services/{svc_id}/oauth/status")
+    @GetMapping("/api/v1/embed/{channelId}/sessions/{sessionId}/mcp-services/{svcId}/oauth/status")
     public ResponseEntity<?> mcpStatus(
-            @PathVariable("session_id") String sessionId,
-            @PathVariable("svc_id") String serviceId) {
+            @PathVariable("sessionId") String sessionId,
+            @PathVariable("svcId") String serviceId) {
         return delegateOps.mcpStatus(sessionId, serviceId);
     }
 
-    @PostMapping("/api/v1/embed/{channel_id}/sessions/{session_id}/mcp-oauth-resolutions/{pending_id}")
+    @PostMapping("/api/v1/embed/{channelId}/sessions/{sessionId}/mcp-oauth-resolutions/{pendingId}")
     public ResponseEntity<Void> mcpResolve(
-            @PathVariable("session_id") String sessionId,
-            @PathVariable("pending_id") String pendingId,
+            @PathVariable("sessionId") String sessionId,
+            @PathVariable("pendingId") String pendingId,
             @RequestBody(required = false) String rawBody) {
         return delegateOps.mcpResolve(sessionId, pendingId, rawBody);
     }
 
-    @PostMapping("/api/v1/embed/{channel_id}/sessions/{session_id}/mcp-oauth-resolutions/{pending_id}/cancel")
+    @PostMapping("/api/v1/embed/{channelId}/sessions/{sessionId}/mcp-oauth-resolutions/{pendingId}/cancel")
     public ResponseEntity<Void> mcpResolveCancel(
-            @PathVariable("session_id") String sessionId,
-            @PathVariable("pending_id") String pendingId) {
+            @PathVariable("sessionId") String sessionId,
+            @PathVariable("pendingId") String pendingId) {
         return delegateOps.mcpResolveCancel(sessionId, pendingId);
     }
 
-    @PostMapping("/api/v1/embed/{channel_id}/sessions/{session_id}/tool-approvals/{pending_id}")
-    public ResponseEntity<?> toolApprovals(@PathVariable("session_id") String sessionId,
-                                           @PathVariable("pending_id") String pendingId,
+    @PostMapping("/api/v1/embed/{channelId}/sessions/{sessionId}/tool-approvals/{pendingId}")
+    public ResponseEntity<?> toolApprovals(@PathVariable("sessionId") String sessionId,
+                                           @PathVariable("pendingId") String pendingId,
                                            @RequestBody(required = false) String rawBody) {
         return delegateOps.toolApprovals(sessionId, pendingId, rawBody);
     }

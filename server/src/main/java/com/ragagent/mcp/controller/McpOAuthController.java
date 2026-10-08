@@ -40,15 +40,15 @@ import org.springframework.web.bind.annotation.RestController;
  *   <li>{@code POST /mcp-services/{id}/oauth/authorize-url} —— 发起授权，返回浏览器应打开的
  *       授权地址与本次尝试 ID（RBAC：<b>Viewer+</b>）；</li>
  *   <li>{@code GET /mcp-services/{id}/oauth/status} —— 查询授权状态；带
- *       {@code authorization_attempt} 时只认本次流程（RBAC：<b>Viewer+</b>）；</li>
+ *       {@code authorizationAttempt} 时只认本次流程（RBAC：<b>Viewer+</b>）；</li>
  *   <li>{@code DELETE /mcp-services/{id}/oauth/token} —— 撤销当前用户的 token，返回 204
  *       （RBAC：<b>Viewer+</b>）；</li>
  *   <li>{@code GET /mcp-oauth/callback} —— <b>公开、无鉴权</b>（授权服务器回跳不带 WeKnora
  *       bearer；靠一次性 state 自证）。该路径已在
  *       {@code AuthFilter.NO_AUTH_API} 中放行，<b>不得</b>加 RBAC 规则；</li>
- *   <li>{@code POST /agent/mcp-oauth-resolutions/{pending_id}} —— 对话内 OAuth 授权完成后恢复
+ *   <li>{@code POST /agent/mcp-oauth-resolutions/{pendingId}} —— 对话内 OAuth 授权完成后恢复
  *       被暂停的 Agent 工具调用（RBAC：<b>Viewer+</b>）；</li>
- *   <li>{@code POST /agent/mcp-oauth-resolutions/{pending_id}/cancel} —— 用户跳过授权，
+ *   <li>{@code POST /agent/mcp-oauth-resolutions/{pendingId}/cancel} —— 用户跳过授权，
  *       解除 Agent 阻塞（RBAC：<b>Viewer+</b>）。</li>
  * </ol>
  *
@@ -193,13 +193,13 @@ public class McpOAuthController {
     // ── 3. 授权状态 ────────────────────────────────────────────────────
 
     /**
-     * 不带 {@code authorization_attempt} 时返回 token 生命周期状态；
+     * 不带 {@code authorizationAttempt} 时返回 token 生命周期状态；
      * 带的时候<b>只</b>回答"这一次尝试是否完成"（历史 token 不算数）。
      */
     @GetMapping("/mcp-services/{id}/oauth/status")
     public ResponseEntity<?> status(
             @PathVariable("id") String serviceId,
-            @RequestParam(value = "authorization_attempt", required = false) String attemptIdRaw) {
+            @RequestParam(value = "authorizationAttempt", required = false) String attemptIdRaw) {
         long tenantId = tenantIdOrZero();
         TenantContext.Principal principal = McpPrincipal.oauthPrincipalFromContext();
         if (tenantId == 0 || !McpPrincipal.valid(principal)) {
@@ -258,9 +258,9 @@ public class McpOAuthController {
      * 前端在弹窗授权完成后调用；后端<b>先确认 token
      * 真的存在</b>再放行，免得过早/失败的授权把工具调用放回火坑再失败一次。
      */
-    @PostMapping("/agent/mcp-oauth-resolutions/{pending_id}")
+    @PostMapping("/agent/mcp-oauth-resolutions/{pendingId}")
     public ResponseEntity<Void> resolveMcpOAuth(
-            @PathVariable("pending_id") String pendingId,
+            @PathVariable("pendingId") String pendingId,
             @RequestBody(required = false) ResolveRequest body) {
         long tenantId = tenantIdOrZero();
         TenantContext.Principal principal = McpPrincipal.oauthPrincipalFromContext();
@@ -315,8 +315,8 @@ public class McpOAuthController {
     /**
      * 用户主动跳过授权，以"拒绝"解除 Agent 阻塞。
      */
-    @PostMapping("/agent/mcp-oauth-resolutions/{pending_id}/cancel")
-    public ResponseEntity<Void> cancelMcpOAuth(@PathVariable("pending_id") String pendingId) {
+    @PostMapping("/agent/mcp-oauth-resolutions/{pendingId}/cancel")
+    public ResponseEntity<Void> cancelMcpOAuth(@PathVariable("pendingId") String pendingId) {
         long tenantId = tenantIdOrZero();
         String gateUserId = gateUserId();
         if (tenantId == 0 || gateUserId.isEmpty()) {

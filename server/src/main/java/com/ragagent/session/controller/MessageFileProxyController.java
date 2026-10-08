@@ -50,17 +50,17 @@ public class MessageFileProxyController {
     }
 
     /** 只有 GET 注册了真实处理：HEAD 落 NoRoute 响应（见 FileProxyController 类注释）。 */
-    @RequestMapping(value = "/api/v1/sessions/{id}/messages/{message_id}/files",
+    @RequestMapping(value = "/api/v1/sessions/{id}/messages/{messageId}/files",
             method = RequestMethod.HEAD)
     public void filesHead(@PathVariable("id") String id,
-            @PathVariable("message_id") String messageId, jakarta.servlet.http.HttpServletResponse response)
+            @PathVariable("messageId") String messageId, jakarta.servlet.http.HttpServletResponse response)
             throws IOException {
         FileProxyController.writeGinNoRoute(response);
     }
 
-    @GetMapping("/api/v1/sessions/{id}/messages/{message_id}/files")
+    @GetMapping("/api/v1/sessions/{id}/messages/{messageId}/files")
     public void files(@PathVariable("id") String id,
-            @PathVariable("message_id") String messageId, HttpServletRequest request,
+            @PathVariable("messageId") String messageId, HttpServletRequest request,
             HttpServletResponse response) throws IOException {
         String reference = FileProxyService.requireFilePathQuery(request, response);
         if (reference == null) {

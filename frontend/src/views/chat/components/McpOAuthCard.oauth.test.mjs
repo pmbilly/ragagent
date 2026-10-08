@@ -38,7 +38,7 @@ test('in-chat OAuth success refreshes the caller MCP directory', () => {
 })
 
 test('OAuth status API sends the attempt id to the backend', () => {
-  assert.match(apiSource, /authorization_attempt=\$\{encodeURIComponent\(authorizationAttempt\)\}/)
+  assert.match(apiSource, /authorizationAttempt=\$\{encodeURIComponent\(authorizationAttempt\)\}/)
 })
 
 test('settings distinguishes refreshable tokens from usable authorization', () => {

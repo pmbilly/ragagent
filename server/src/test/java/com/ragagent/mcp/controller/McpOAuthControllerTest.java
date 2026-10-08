@@ -237,7 +237,7 @@ class McpOAuthControllerTest {
                 "https://app.example.com/api/v1/mcp-oauth/callback", "/");
 
         mvc(null, null).perform(get("/api/v1/mcp-services/" + SERVICE_ID + "/oauth/status")
-                        .param("authorization_attempt", start.attemptId()))
+                        .param("authorizationAttempt", start.attemptId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.authorized").value(false))
                 .andExpect(jsonPath("$.state").value("pending"));
@@ -251,7 +251,7 @@ class McpOAuthControllerTest {
         manager.completeAuthorization(start.attemptId(), "the-code");
 
         mvc(null, null).perform(get("/api/v1/mcp-services/" + SERVICE_ID + "/oauth/status")
-                        .param("authorization_attempt", start.attemptId()))
+                        .param("authorizationAttempt", start.attemptId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.authorized").value(true))
                 .andExpect(jsonPath("$.state").value("authorized"));

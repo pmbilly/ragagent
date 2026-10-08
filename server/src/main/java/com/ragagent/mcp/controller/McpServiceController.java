@@ -52,9 +52,9 @@ import org.springframework.web.bind.annotation.RestController;
  * POST   /api/v1/mcp-services/{id}/metadata/refresh        Viewer+（静态鉴权在 handler 内升到 Admin+）
  * POST   /api/v1/mcp-services/{id}/usage-instructions/generate  Admin+
  * GET    /api/v1/mcp-services/{id}/tool-approvals           Viewer+
- * PUT    /api/v1/mcp-services/{id}/tool-approvals/{tool_name}  Admin+
+ * PUT    /api/v1/mcp-services/{id}/tool-approvals/{toolName}  Admin+
  * </pre>
- * <p>凭据子资源见 {@link McpCredentialsController}；{@code /agent/tool-approvals/{pending_id}}
+ * <p>凭据子资源见 {@link McpCredentialsController}；{@code /agent/tool-approvals/{pendingId}}
  * 见 {@link AgentToolApprovalController}（挂在 /agent 组）。</p>
  *
  * <p><b>响应形态</b>：服务资源面（create/list/get/update/delete/test/
@@ -285,9 +285,9 @@ public class McpServiceController {
      * <p>路由名沿用历史上"只设审批"的端点；现在同时支持 enabled。
      * 两个字段至少提供一个，省略的字段保持原值。</p>
      */
-    @PutMapping("/{id}/tool-approvals/{tool_name}")
+    @PutMapping("/{id}/tool-approvals/{toolName}")
     public ResponseEntity<?> setMCPToolApproval(@PathVariable("id") String id,
-                                                @PathVariable("tool_name") String toolName,
+                                                @PathVariable("toolName") String toolName,
                                                 @RequestBody(required = false) McpToolApprovalPolicyRequest body) {
         long tenantId = requireTenant();
         String serviceId = sanitize(id);

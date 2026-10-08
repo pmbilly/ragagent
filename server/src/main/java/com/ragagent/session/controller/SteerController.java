@@ -69,9 +69,9 @@ public class SteerController {
         this.streamManager = streamManager;
     }
 
-    @PostMapping("/api/v1/sessions/{session_id}/steer")
+    @PostMapping("/api/v1/sessions/{sessionId}/steer")
     public ResponseEntity<Map<String, Object>> steerMessage(
-            @PathVariable("session_id") String sessionId,
+            @PathVariable("sessionId") String sessionId,
             @RequestBody(required = false) String rawBody) {
         String sid = LogSanitizer.sanitize(sessionId);
         if (sid.isEmpty()) {
@@ -172,10 +172,10 @@ public class SteerController {
         return ResponseEntity.ok(body);
     }
 
-    @PostMapping("/api/v1/sessions/{session_id}/steer/{steer_id}/inject")
+    @PostMapping("/api/v1/sessions/{sessionId}/steer/{steerId}/inject")
     public ResponseEntity<Map<String, Object>> promoteSteerMessage(
-            @PathVariable("session_id") String sessionId,
-            @PathVariable("steer_id") String steerId) {
+            @PathVariable("sessionId") String sessionId,
+            @PathVariable("steerId") String steerId) {
         String sid = LogSanitizer.sanitize(sessionId);
         if (sid.isEmpty() || steerId == null || steerId.isEmpty()) {
             throw new BizException(AppError.badRequest("invalid session id"));
@@ -216,10 +216,10 @@ public class SteerController {
         return ResponseEntity.ok(body);
     }
 
-    @GetMapping({"/api/v1/sessions/{id}/steer", "/api/v1/sessions/{session_id}/steer"})
+    @GetMapping({"/api/v1/sessions/{id}/steer", "/api/v1/sessions/{sessionId}/steer"})
     public ResponseEntity<Map<String, Object>> listSteerMessages(
             @PathVariable(value = "id", required = false) String id,
-            @PathVariable(value = "session_id", required = false) String sessionIdFallback) {
+            @PathVariable(value = "sessionId", required = false) String sessionIdFallback) {
         String sid = LogSanitizer.sanitize(id != null && !id.isEmpty() ? id : sessionIdFallback);
         if (sid.isEmpty()) {
             throw new BizException(AppError.badRequest("invalid session id"));
@@ -244,12 +244,12 @@ public class SteerController {
         return ResponseEntity.ok(body);
     }
 
-    @DeleteMapping({"/api/v1/sessions/{id}/steer/{steer_id}",
-            "/api/v1/sessions/{session_id}/steer/{steer_id}"})
+    @DeleteMapping({"/api/v1/sessions/{id}/steer/{steerId}",
+            "/api/v1/sessions/{sessionId}/steer/{steerId}"})
     public ResponseEntity<Map<String, Object>> deleteSteerMessage(
             @PathVariable(value = "id", required = false) String id,
-            @PathVariable(value = "session_id", required = false) String sessionIdFallback,
-            @PathVariable("steer_id") String steerId) {
+            @PathVariable(value = "sessionId", required = false) String sessionIdFallback,
+            @PathVariable("steerId") String steerId) {
         String sid = LogSanitizer.sanitize(id != null && !id.isEmpty() ? id : sessionIdFallback);
         if (sid.isEmpty() || steerId == null || steerId.isEmpty()) {
             throw new BizException(AppError.badRequest("invalid session id"));

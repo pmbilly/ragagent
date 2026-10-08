@@ -55,9 +55,9 @@ public class TemporaryDocumentController {
     }
 
     /** 上传附件（202 受理，解析异步）。 */
-    @PostMapping("/api/v1/sessions/{session_id}/attachments")
+    @PostMapping("/api/v1/sessions/{sessionId}/attachments")
     public ResponseEntity<TemporaryDocument> upload(
-            @PathVariable("session_id") String sessionId,
+            @PathVariable("sessionId") String sessionId,
             @RequestParam(value = "file", required = false) MultipartFile file,
             @RequestParam(value = "agentId", required = false) String agentId,
             @RequestParam(value = "parserEngine", required = false) String parserEngine,
@@ -113,10 +113,10 @@ public class TemporaryDocumentController {
                 "invalid attachment upload: http: request body too large"));
     }
 
-    @GetMapping({"/api/v1/sessions/{id}/attachments", "/api/v1/sessions/{session_id}/attachments"})
+    @GetMapping({"/api/v1/sessions/{id}/attachments", "/api/v1/sessions/{sessionId}/attachments"})
     public ResponseEntity<List<TemporaryDocument>> list(
             @PathVariable(value = "id", required = false) String id,
-            @PathVariable(value = "session_id", required = false) String sessionIdFallback) {
+            @PathVariable(value = "sessionId", required = false) String sessionIdFallback) {
         String sid = sessionParam(id, sessionIdFallback);
         try {
             sessionService.getSession(sid);
@@ -134,12 +134,12 @@ public class TemporaryDocumentController {
         return ResponseEntity.ok(documents);
     }
 
-    @GetMapping({"/api/v1/sessions/{id}/attachments/{attachment_id}",
-            "/api/v1/sessions/{session_id}/attachments/{attachment_id}"})
+    @GetMapping({"/api/v1/sessions/{id}/attachments/{attachmentId}",
+            "/api/v1/sessions/{sessionId}/attachments/{attachmentId}"})
     public ResponseEntity<TemporaryDocument> get(
             @PathVariable(value = "id", required = false) String id,
-            @PathVariable(value = "session_id", required = false) String sessionIdFallback,
-            @PathVariable("attachment_id") String attachmentId) {
+            @PathVariable(value = "sessionId", required = false) String sessionIdFallback,
+            @PathVariable("attachmentId") String attachmentId) {
         String sid = sessionParam(id, sessionIdFallback);
         try {
             sessionService.getSession(sid);
@@ -163,12 +163,12 @@ public class TemporaryDocumentController {
     /**
      * 错误分支文案固定；成功路径的响应头按 filetransport 语义拼装。
      */
-    @GetMapping({"/api/v1/sessions/{id}/attachments/{attachment_id}/preview",
-            "/api/v1/sessions/{session_id}/attachments/{attachment_id}/preview"})
+    @GetMapping({"/api/v1/sessions/{id}/attachments/{attachmentId}/preview",
+            "/api/v1/sessions/{sessionId}/attachments/{attachmentId}/preview"})
     public void preview(
             @PathVariable(value = "id", required = false) String id,
-            @PathVariable(value = "session_id", required = false) String sessionIdFallback,
-            @PathVariable("attachment_id") String attachmentId,
+            @PathVariable(value = "sessionId", required = false) String sessionIdFallback,
+            @PathVariable("attachmentId") String attachmentId,
             jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
         String sid = sessionParam(id, sessionIdFallback);
         try {
@@ -211,12 +211,12 @@ public class TemporaryDocumentController {
     }
 
     /** 删除附件：204，幂等。 */
-    @DeleteMapping({"/api/v1/sessions/{id}/attachments/{attachment_id}",
-            "/api/v1/sessions/{session_id}/attachments/{attachment_id}"})
+    @DeleteMapping({"/api/v1/sessions/{id}/attachments/{attachmentId}",
+            "/api/v1/sessions/{sessionId}/attachments/{attachmentId}"})
     public ResponseEntity<Void> delete(
             @PathVariable(value = "id", required = false) String id,
-            @PathVariable(value = "session_id", required = false) String sessionIdFallback,
-            @PathVariable("attachment_id") String attachmentId) {
+            @PathVariable(value = "sessionId", required = false) String sessionIdFallback,
+            @PathVariable("attachmentId") String attachmentId) {
         String sid = sessionParam(id, sessionIdFallback);
         try {
             sessionService.getOwnedSession(sid);

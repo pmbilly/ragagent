@@ -32,7 +32,7 @@ final class EmbedChannelDelegateOps {
     // ═══════════════════ QA / 文件代理委托 ═══════════════════
 
     /** patch 后委托 KnowledgeQA。 */
-    public void knowledgeChat(@PathVariable("session_id") String sessionId,
+    public void knowledgeChat(@PathVariable("sessionId") String sessionId,
                               @RequestBody(required = false) String rawBody,
                               @RequestParam(name = "resource_urls", required = false) String resourceUrls,
                               jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
@@ -40,7 +40,7 @@ final class EmbedChannelDelegateOps {
     }
 
     /** patch 后按渠道 agent 分派 AgentQA/KnowledgeQA。 */
-    public void agentChat(@PathVariable("session_id") String sessionId,
+    public void agentChat(@PathVariable("sessionId") String sessionId,
                           @RequestBody(required = false) String rawBody,
                           @RequestParam(name = "resource_urls", required = false) String resourceUrls,
                           jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
@@ -124,7 +124,7 @@ final class EmbedChannelDelegateOps {
     }
 
     /** 先 ensureSession，再委托 MessageController.loadMessages。 */
-    public ResponseEntity<List<com.ragagent.session.domain.Message>> load(@PathVariable("session_id") String sessionId,
+    public ResponseEntity<List<com.ragagent.session.domain.Message>> load(@PathVariable("sessionId") String sessionId,
                                                     @RequestParam(name = "limit", required = false) String limit,
                                                     @RequestParam(name = "before_time", required = false) String beforeTime,
                                                     @RequestParam(name = "resource_urls", required = false) String resourceUrls) {
@@ -139,7 +139,7 @@ final class EmbedChannelDelegateOps {
      * <p>请求体键名从 {@code message_id} 变成 {@code messageId}
      * ——embed 的其余键仍是下划线。</p>
      */
-    public ResponseEntity<?> stop(@PathVariable("session_id") String sessionId,
+    public ResponseEntity<?> stop(@PathVariable("sessionId") String sessionId,
                                   @RequestBody(required = false)
                                   com.ragagent.session.dto.StopSessionRequest body) {
         ctrl.ensureSession(LogSanitizer.sanitize(sessionId));
@@ -148,8 +148,8 @@ final class EmbedChannelDelegateOps {
 
     /** 建议读取：channel 级 suppressed 分支优先于委托。 */
     public ResponseEntity<?> suggestionsGet(
-            @PathVariable("session_id") String sessionId,
-            @PathVariable("message_id") String messageId) {
+            @PathVariable("sessionId") String sessionId,
+            @PathVariable("messageId") String messageId) {
         ctrl.ensureSession(LogSanitizer.sanitize(sessionId));
         ResponseEntity<Object> suppressed = ctrl.suppressedIfChannelOff();
         if (suppressed != null) {
@@ -161,8 +161,8 @@ final class EmbedChannelDelegateOps {
 
     /** 建议生成（ensure 语义）。 */
     public ResponseEntity<?> suggestionsEnsure(
-            @PathVariable("session_id") String sessionId,
-            @PathVariable("message_id") String messageId,
+            @PathVariable("sessionId") String sessionId,
+            @PathVariable("messageId") String messageId,
             @RequestBody(required = false) String rawBody) {
         ctrl.ensureSession(LogSanitizer.sanitize(sessionId));
         ResponseEntity<Object> suppressed = ctrl.suppressedIfChannelOff();
@@ -174,7 +174,7 @@ final class EmbedChannelDelegateOps {
     }
 
     /** 建议事件上报：成功 204 无响应体。 */
-    public ResponseEntity<?> suggestionEvents(@PathVariable("session_id") String sessionId,
+    public ResponseEntity<?> suggestionEvents(@PathVariable("sessionId") String sessionId,
                                               @RequestBody(required = false) String rawBody) {
         ctrl.ensureSession(LogSanitizer.sanitize(sessionId));
         return ctrl.suggestionController.recordEvent(LogSanitizer.sanitize(sessionId), rawBody);
@@ -184,7 +184,7 @@ final class EmbedChannelDelegateOps {
      * webhook 事件转发：message_sent / message_received 之外全拒；
      * 下发是 best-effort 异步（渠道 webhook 为空 → no-op），响应恒 200。
      */
-    public ResponseEntity<?> events(@PathVariable("session_id") String sessionId,
+    public ResponseEntity<?> events(@PathVariable("sessionId") String sessionId,
                                     @RequestBody(required = false) String rawBody) {
         // 调用即鉴权（取不到渠道会抛 unauthorized）；返回值本方法不用
         EmbedChannelController.channel(EmbedChannelController.request0());
@@ -215,8 +215,8 @@ final class EmbedChannelDelegateOps {
 
     /** MCP OAuth 授权 URL（委托 McpOAuthController）。 */
     public ResponseEntity<Map<String, Object>> mcpAuthorize(
-            @PathVariable("session_id") String sessionId,
-            @PathVariable("svc_id") String serviceId,
+            @PathVariable("sessionId") String sessionId,
+            @PathVariable("svcId") String serviceId,
             @RequestBody(required = false) String rawBody) {
         ctrl.ensureSession(LogSanitizer.sanitize(sessionId));
         McpOAuthController.AuthorizeRequest req = null;
@@ -233,16 +233,16 @@ final class EmbedChannelDelegateOps {
 
     /** MCP OAuth 状态查询（委托 McpOAuthController）。 */
     public ResponseEntity<?> mcpStatus(
-            @PathVariable("session_id") String sessionId,
-            @PathVariable("svc_id") String serviceId) {
+            @PathVariable("sessionId") String sessionId,
+            @PathVariable("svcId") String serviceId) {
         ctrl.ensureSession(LogSanitizer.sanitize(sessionId));
         return ctrl.mcpOAuthController.status(serviceId, null);
     }
 
     /** MCP OAuth 解析（gate 依赖分支；Gate 未接线时 500——已知差异）。 */
     public ResponseEntity<Void> mcpResolve(
-            @PathVariable("session_id") String sessionId,
-            @PathVariable("pending_id") String pendingId,
+            @PathVariable("sessionId") String sessionId,
+            @PathVariable("pendingId") String pendingId,
             @RequestBody(required = false) String rawBody) {
         ctrl.ensureSession(LogSanitizer.sanitize(sessionId));
         McpOAuthController.ResolveRequest req = null;
@@ -259,15 +259,15 @@ final class EmbedChannelDelegateOps {
 
     /** 取消待决的 MCP OAuth 工具授权。 */
     public ResponseEntity<Void> mcpResolveCancel(
-            @PathVariable("session_id") String sessionId,
-            @PathVariable("pending_id") String pendingId) {
+            @PathVariable("sessionId") String sessionId,
+            @PathVariable("pendingId") String pendingId) {
         ctrl.ensureSession(LogSanitizer.sanitize(sessionId));
         return ctrl.mcpOAuthController.cancelMcpOAuth(pendingId);
     }
 
     /** 工具审批受理（gate 依赖分支；Gate 未接线时 500 = 已知差异）。 */
-    public ResponseEntity<?> toolApprovals(@PathVariable("session_id") String sessionId,
-                                           @PathVariable("pending_id") String pendingId,
+    public ResponseEntity<?> toolApprovals(@PathVariable("sessionId") String sessionId,
+                                           @PathVariable("pendingId") String pendingId,
                                            @RequestBody(required = false) String rawBody) {
         ctrl.ensureSession(LogSanitizer.sanitize(sessionId));
         ResolveToolApprovalRequest req = null;

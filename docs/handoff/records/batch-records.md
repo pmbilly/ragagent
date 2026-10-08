@@ -1008,3 +1008,11 @@
 - **守卫修正**：`check-json-key-case` 与 `crossFaceKeyContract` 里存在 `forbid(file, /\b(modelId|...)/)` 的**正则笔误**（列的是 camel 形）⇒ 该规则一直**空转**；改为 snake 形后立即生效（并发现 `api/embed/index.ts`、`api/chat-history.ts` 两处**冻结面**被我的批量改名误伤 → 回退）。
 - **闸门**：后端 **4,838**/0；前端 **736**/0 + `vue-tsc` 0；`spotlessCheck`；四守卫绿。
 - **余项（后续批次）**：路径/查询参数名（15 复合路径变量 73 处 + `message_id`/`authorization_attempt`；OIDC 的 `redirect_uri`/`error_description` 保留）、references 行键（逐站点区分 wire/obs/DB）、两条防回流守卫。
+
+**✅ B93b-2（2026-10-08，路径/查询参数名 camel 化 + 事件面守卫）**
+- **路径变量**：15 个复合名共 73 处 ① `@*Mapping` 模板 ② 多路径注解（`{"…/{id}/attachments/{attachment_id}", "…/{sessionId}/…"}` 形态，首轮正则漏掉 → 补 6 处）③ `@PathVariable` 名；`{id}`/`{key}`/`{type}` 等单词名不动。
+  **关键事实**：路径变量名**不进具体 URL**（Spring 按位置匹配）⇒ 第三方平台配置的回调 URL（IM 回调、embed 站点）**零影响**，前端拼的 URL 形状也不变；统一到 `{sessionId}` 这一既有惯例（`MessageController` 早已如此）是收敛而非引入新风格。
+- **查询参数**：`authorization_attempt`/`message_id` → camel（后端注解 + `McpOAuthController` 文档 + 前端 `mcp-service.ts`/`embed/index.ts` 拼串 + `McpOAuthCard.oauth.test.mjs` 断言 + `McpOAuthControllerTest` 共 7 处）。**OIDC 的 `redirect_uri`/`error_description` 保留**（外部协议）。
+- **新守卫 `scripts/check-event-face-case.py`**（已接入 CI guards 作业）：四类口径——① 事件载荷类不得有 snake `@JsonProperty`（camel 显式注解允许，因其承载 include/顺序语义）；② `EventType`/`ResponseType` 值不得含 `_`/`.`；③ 路径变量不得含 `_`；④ `@RequestParam` 显式名不得含 `_`（OIDC 白名单登记理由）。
+  **红态探针**：临时建 `ProbeController`（snake 路径变量 + snake 查询参数）+ `ProbeData`（snake 载荷注解）→ 四类违例全部报出、非零退出；删除后转绿 ✓。
+- **闸门**：后端 4,838/0；前端 736/0 + `vue-tsc` 0；`spotlessCheck`；五守卫绿。

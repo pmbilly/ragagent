@@ -226,7 +226,7 @@ public class ChunkQuestionService {
             throw BizException.badRequest("failed to get knowledge base: knowledge base not found");
         }
 
-        // 5. 删除该问题的向量索引。source_id 形如 {chunk_id}-q{hash24}（短 ID 直拼）。
+        // 5. 删除该问题的向量索引。source_id 形如 {chunkId}-q{hash24}（短 ID 直拼）。
         String sourceId = ChunkSearchUtil.generatedQuestionSourceId(chunkId, questionId);
         //     无绑定回落租户有效引擎（RETRIEVE_DRIVER 驱动），绑定 store 走归属校验 +
         //     注册表解析。失败 → "failed to create retrieve engine: %w"（handler 包 400）。

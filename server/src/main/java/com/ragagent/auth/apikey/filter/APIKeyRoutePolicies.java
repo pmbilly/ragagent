@@ -22,7 +22,7 @@ package com.ragagent.auth.apikey.filter;
  *   <li>{@code /api/v1/tenants/{id}/api-keys}（四个端点，本模块自己的）——
  *       不走 apiKeyRoute 包装，API Key 一律 403：Key 管理端点连 full-access Key
  *       都进不去（否则一把 Key 可以给自己续命/扩权）；</li>
- *   <li>{@code /api/v1/agent/tool-approvals/{pending_id}} 与
+ *   <li>{@code /api/v1/agent/tool-approvals/{pendingId}} 与
  *       {@code /api/v1/agent/mcp-oauth-resolutions/**} —— 同为 default-deny。</li>
  * </ul>
  */

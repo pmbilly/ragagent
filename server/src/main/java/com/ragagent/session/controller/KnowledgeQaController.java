@@ -38,8 +38,8 @@ import jakarta.servlet.http.HttpServletResponse;
  *
  * <h2>三个端点</h2>
  * <ul>
- *   <li>POST /api/v1/knowledge-chat/{session_id} — KnowledgeQA（RAG/纯聊天管线）</li>
- *   <li>POST /api/v1/agent-chat/{session_id} — AgentQA（agent 引擎）</li>
+ *   <li>POST /api/v1/knowledge-chat/{sessionId} — KnowledgeQA（RAG/纯聊天管线）</li>
+ *   <li>POST /api/v1/agent-chat/{sessionId} — AgentQA（agent 引擎）</li>
  *   <li>POST /api/v1/knowledge-search — SearchKnowledge（无 LLM 总结检索）</li>
  * </ul>
  *
@@ -144,8 +144,8 @@ public class KnowledgeQaController {
 
     // ── 端点 ──────────────────────────────────────────────────────────────────
 
-    @PostMapping("/api/v1/knowledge-chat/{session_id}")
-    public void knowledgeQA(@PathVariable("session_id") String rawSessionId,
+    @PostMapping("/api/v1/knowledge-chat/{sessionId}")
+    public void knowledgeQA(@PathVariable("sessionId") String rawSessionId,
             @RequestBody(required = false) String rawBody,
             @RequestParam(value = com.ragagent.storage.support.Mode.QUERY_PARAM, required = false) String resourceUrls,
             HttpServletResponse response) throws IOException {
@@ -154,8 +154,8 @@ public class KnowledgeQaController {
         executor.executeQA(parsed.reqCtx(), QaMode.NORMAL, !request.disableTitle, response);
     }
 
-    @PostMapping("/api/v1/agent-chat/{session_id}")
-    public void agentQA(@PathVariable("session_id") String rawSessionId,
+    @PostMapping("/api/v1/agent-chat/{sessionId}")
+    public void agentQA(@PathVariable("sessionId") String rawSessionId,
             @RequestBody(required = false) String rawBody,
             @RequestParam(value = com.ragagent.storage.support.Mode.QUERY_PARAM, required = false) String resourceUrls,
             HttpServletResponse response) throws IOException {

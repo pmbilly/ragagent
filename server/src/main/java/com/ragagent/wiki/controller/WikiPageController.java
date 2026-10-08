@@ -77,7 +77,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  */
 @RestController
-@RequestMapping("/api/v1/knowledgebase/{kb_id}/wiki")
+@RequestMapping("/api/v1/knowledgebase/{kbId}/wiki")
 public class WikiPageController {
 
     private final WikiKbAccessGuard kbGuard;
@@ -102,31 +102,31 @@ public class WikiPageController {
     // ════════════════════════════ 页面 CRUD ════════════════════════════
 
     @GetMapping("/pages")
-    public ResponseEntity<?> listPages(@PathVariable("kb_id") String kbId, HttpServletRequest request) {
+    public ResponseEntity<?> listPages(@PathVariable("kbId") String kbId, HttpServletRequest request) {
         return pageOps.listPages(kbId, request);
     }
 
     @PostMapping("/pages")
-    public ResponseEntity<?> createPage(@PathVariable("kb_id") String kbId,
+    public ResponseEntity<?> createPage(@PathVariable("kbId") String kbId,
                                         @RequestBody(required = false) String rawBody) {
         return pageOps.createPage(kbId, rawBody);
     }
 
     @GetMapping("/pages/{*slug}")
-    public ResponseEntity<?> getPage(@PathVariable("kb_id") String kbId,
+    public ResponseEntity<?> getPage(@PathVariable("kbId") String kbId,
                                      @PathVariable(value = "slug", required = false) String slugParam) {
         return pageOps.getPage(kbId, slugParam);
     }
 
     @PutMapping("/pages/{*slug}")
-    public ResponseEntity<?> updatePage(@PathVariable("kb_id") String kbId,
+    public ResponseEntity<?> updatePage(@PathVariable("kbId") String kbId,
                                         @PathVariable(value = "slug", required = false) String slugParam,
                                         @RequestBody(required = false) String rawBody) {
         return pageOps.updatePage(kbId, slugParam, rawBody);
     }
 
     @DeleteMapping("/pages/{*slug}")
-    public ResponseEntity<?> deletePage(@PathVariable("kb_id") String kbId,
+    public ResponseEntity<?> deletePage(@PathVariable("kbId") String kbId,
                                         @PathVariable(value = "slug", required = false) String slugParam) {
         return pageOps.deletePage(kbId, slugParam);
     }
@@ -134,14 +134,14 @@ public class WikiPageController {
     // ════════════════════════════ 修订历史 ════════════════════════════
 
     @GetMapping("/revisions/{*slug}")
-    public ResponseEntity<?> listRevisions(@PathVariable("kb_id") String kbId,
+    public ResponseEntity<?> listRevisions(@PathVariable("kbId") String kbId,
                                            @PathVariable(value = "slug", required = false) String slugParam,
                                            HttpServletRequest request) {
         return pageOps.listRevisions(kbId, slugParam, request);
     }
 
     @PostMapping("/revert")
-    public ResponseEntity<?> revertPage(@PathVariable("kb_id") String kbId,
+    public ResponseEntity<?> revertPage(@PathVariable("kbId") String kbId,
                                         @RequestBody(required = false) String rawBody) {
         return pageOps.revertPage(kbId, rawBody);
     }
@@ -149,31 +149,31 @@ public class WikiPageController {
     // ════════════════════════════ 文件夹树 ════════════════════════════
 
     @GetMapping("/folders")
-    public ResponseEntity<?> listFolders(@PathVariable("kb_id") String kbId, HttpServletRequest request) {
+    public ResponseEntity<?> listFolders(@PathVariable("kbId") String kbId, HttpServletRequest request) {
         return folderOps.listFolders(kbId, request);
     }
 
     @PostMapping("/folders")
-    public ResponseEntity<?> createFolder(@PathVariable("kb_id") String kbId,
+    public ResponseEntity<?> createFolder(@PathVariable("kbId") String kbId,
                                           @RequestBody(required = false) String rawBody) {
         return folderOps.createFolder(kbId, rawBody);
     }
 
-    @PutMapping("/folders/{folder_id}")
-    public ResponseEntity<?> updateFolder(@PathVariable("kb_id") String kbId,
-                                          @PathVariable("folder_id") String folderIdParam,
+    @PutMapping("/folders/{folderId}")
+    public ResponseEntity<?> updateFolder(@PathVariable("kbId") String kbId,
+                                          @PathVariable("folderId") String folderIdParam,
                                           @RequestBody(required = false) String rawBody) {
         return folderOps.updateFolder(kbId, folderIdParam, rawBody);
     }
 
-    @DeleteMapping("/folders/{folder_id}")
-    public ResponseEntity<?> deleteFolder(@PathVariable("kb_id") String kbId,
-                                          @PathVariable("folder_id") String folderIdParam) {
+    @DeleteMapping("/folders/{folderId}")
+    public ResponseEntity<?> deleteFolder(@PathVariable("kbId") String kbId,
+                                          @PathVariable("folderId") String folderIdParam) {
         return folderOps.deleteFolder(kbId, folderIdParam);
     }
 
     @PutMapping("/move-page")
-    public ResponseEntity<?> movePage(@PathVariable("kb_id") String kbId,
+    public ResponseEntity<?> movePage(@PathVariable("kbId") String kbId,
                                       @RequestBody(required = false) String rawBody) {
         return folderOps.movePage(kbId, rawBody);
     }
@@ -181,54 +181,54 @@ public class WikiPageController {
     // ══════════════════════════════ 特殊页 ══════════════════════════════
 
     @GetMapping("/index")
-    public ResponseEntity<?> getIndex(@PathVariable("kb_id") String kbId, HttpServletRequest request) {
+    public ResponseEntity<?> getIndex(@PathVariable("kbId") String kbId, HttpServletRequest request) {
         return statsOps.getIndex(kbId, request);
     }
 
     // ════════════════════════════ 图谱 / 统计 ════════════════════════════
 
     @GetMapping("/graph")
-    public ResponseEntity<?> getGraph(@PathVariable("kb_id") String kbId, HttpServletRequest request) {
+    public ResponseEntity<?> getGraph(@PathVariable("kbId") String kbId, HttpServletRequest request) {
         return statsOps.getGraph(kbId, request);
     }
 
     @GetMapping("/stats")
-    public ResponseEntity<?> getStats(@PathVariable("kb_id") String kbId) {
+    public ResponseEntity<?> getStats(@PathVariable("kbId") String kbId) {
         return statsOps.getStats(kbId);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?> searchPages(@PathVariable("kb_id") String kbId, HttpServletRequest request) {
+    public ResponseEntity<?> searchPages(@PathVariable("kbId") String kbId, HttpServletRequest request) {
         return statsOps.searchPages(kbId, request);
     }
 
     // ════════════════════════════ 检索 / 维护 ════════════════════════════
 
     @PostMapping("/rebuild-links")
-    public ResponseEntity<?> rebuildLinks(@PathVariable("kb_id") String kbId) {
+    public ResponseEntity<?> rebuildLinks(@PathVariable("kbId") String kbId) {
         return maintenanceOps.rebuildLinks(kbId);
     }
 
     @GetMapping("/lint")
-    public ResponseEntity<?> lint(@PathVariable("kb_id") String kbId) {
+    public ResponseEntity<?> lint(@PathVariable("kbId") String kbId) {
         return maintenanceOps.lint(kbId);
     }
 
     @PostMapping("/auto-fix")
-    public ResponseEntity<?> autoFix(@PathVariable("kb_id") String kbId) {
+    public ResponseEntity<?> autoFix(@PathVariable("kbId") String kbId) {
         return maintenanceOps.autoFix(kbId);
     }
 
     // ══════════════════════════════ 问题 ══════════════════════════════
 
     @GetMapping("/issues")
-    public ResponseEntity<?> listIssues(@PathVariable("kb_id") String kbId, HttpServletRequest request) {
+    public ResponseEntity<?> listIssues(@PathVariable("kbId") String kbId, HttpServletRequest request) {
         return maintenanceOps.listIssues(kbId, request);
     }
 
-    @PutMapping("/issues/{issue_id}/status")
-    public ResponseEntity<?> updateIssueStatus(@PathVariable("kb_id") String kbId,
-                                               @PathVariable("issue_id") String issueIdParam,
+    @PutMapping("/issues/{issueId}/status")
+    public ResponseEntity<?> updateIssueStatus(@PathVariable("kbId") String kbId,
+                                               @PathVariable("issueId") String issueIdParam,
                                                @RequestBody(required = false) String rawBody) {
         return maintenanceOps.updateIssueStatus(kbId, issueIdParam, rawBody);
     }

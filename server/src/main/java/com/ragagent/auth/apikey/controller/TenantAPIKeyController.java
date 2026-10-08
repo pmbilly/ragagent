@@ -37,8 +37,8 @@ import org.springframework.web.bind.annotation.RestController;
  * <ul>
  *   <li>{@code GET    /api/v1/tenants/{id}/api-keys} — Owner+</li>
  *   <li>{@code POST   /api/v1/tenants/{id}/api-keys} — Owner+</li>
- *   <li>{@code PUT    /api/v1/tenants/{id}/api-keys/{key_id}} — Owner+</li>
- *   <li>{@code DELETE /api/v1/tenants/{id}/api-keys/{key_id}} — Owner+</li>
+ *   <li>{@code PUT    /api/v1/tenants/{id}/api-keys/{keyId}} — Owner+</li>
+ *   <li>{@code DELETE /api/v1/tenants/{id}/api-keys/{keyId}} — Owner+</li>
  * </ul>
  *
  * <p>另有两道路由守卫（本模块不注册，由框架侧承担）：</p>
@@ -139,9 +139,9 @@ public class TenantAPIKeyController {
      *       包括"name is required"这类校验错。</li>
      * </ol>
      */
-    @PutMapping("/{key_id}")
+    @PutMapping("/{keyId}")
     public ResponseEntity<TenantAPIKeyResponse> update(@PathVariable("id") String rawId,
-                                                      @PathVariable("key_id") String rawKeyId,
+                                                      @PathVariable("keyId") String rawKeyId,
                                                       @RequestBody(required = false) String rawBody) {
         long tenantId = parseWorkspaceIdOrBadRequest(rawId);
         long keyId = parseKeyIdOrBadRequest(rawKeyId);
@@ -168,9 +168,9 @@ public class TenantAPIKeyController {
     // ── 删除（软撤销） ──
 
     /** 删除：204，无响应体。 */
-    @DeleteMapping("/{key_id}")
+    @DeleteMapping("/{keyId}")
     public ResponseEntity<Void> delete(@PathVariable("id") String rawId,
-                                       @PathVariable("key_id") String rawKeyId) {
+                                       @PathVariable("keyId") String rawKeyId) {
         long tenantId = parseWorkspaceIdOrBadRequest(rawId);
         long keyId = parseKeyIdOrBadRequest(rawKeyId);
         try {

@@ -238,7 +238,7 @@ export async function getMCPOAuthStatus(
   authorizationAttempt?: string,
 ): Promise<boolean> {
   const query = authorizationAttempt
-    ? `?authorization_attempt=${encodeURIComponent(authorizationAttempt)}`
+    ? `?authorizationAttempt=${encodeURIComponent(authorizationAttempt)}`
     : ''
   const response: any = await get(`/api/v1/mcp-services/${serviceId}/oauth/status${query}`)
   return Boolean(response?.authorized)

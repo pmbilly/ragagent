@@ -89,7 +89,7 @@ final class EmbedChannelMgmtOps {
     }
 
     /** 管理详情（**含** publish token）。 */
-    public ResponseEntity<Map<String, Object>> get(@PathVariable("channel_id") String channelId) {
+    public ResponseEntity<Map<String, Object>> get(@PathVariable("channelId") String channelId) {
         try {
             EmbedChannelEntity ch = ctrl.service.getOwnedChannel(EmbedChannelController.currentTenant(), EmbedChannelController.trim(channelId));
             return ResponseEntity.ok(EmbedChannelController.row(ch, true));
@@ -99,7 +99,7 @@ final class EmbedChannelMgmtOps {
     }
 
     /** 更新渠道：200 + 行视图（不含 publish token）。 */
-    public ResponseEntity<Map<String, Object>> update(@PathVariable("channel_id") String channelId,
+    public ResponseEntity<Map<String, Object>> update(@PathVariable("channelId") String channelId,
                                                       @RequestBody(required = false) String rawBody) {
         EmbedChannelController.EmbedChannelRequest req = EmbedChannelController.bind(rawBody);
         try {
@@ -146,7 +146,7 @@ final class EmbedChannelMgmtOps {
     }
 
     /** 删除渠道 → **204**（同步完成的删除无响应体，不回 {"success":true}）。 */
-    public ResponseEntity<Void> delete(@PathVariable("channel_id") String channelId) {
+    public ResponseEntity<Void> delete(@PathVariable("channelId") String channelId) {
         try {
             ctrl.service.delete(EmbedChannelController.currentTenant(), EmbedChannelController.trim(channelId));
         } catch (EmbedError e) {
@@ -156,7 +156,7 @@ final class EmbedChannelMgmtOps {
     }
 
     /** 轮换发布令牌：200 + 含新 token 的行。 */
-    public ResponseEntity<Map<String, Object>> rotate(@PathVariable("channel_id") String channelId) {
+    public ResponseEntity<Map<String, Object>> rotate(@PathVariable("channelId") String channelId) {
         try {
             var result = ctrl.service.rotateToken(EmbedChannelController.currentTenant(), EmbedChannelController.trim(channelId));
             return ResponseEntity.ok(EmbedChannelController.row(result.channel(), result.token()));
@@ -166,7 +166,7 @@ final class EmbedChannelMgmtOps {
     }
 
     /** 预览会话签发：禁用渠道 → 403 "embed channel is disabled"（专用分支）。 */
-    public ResponseEntity<Map<String, Object>> preview(@PathVariable("channel_id") String channelId) {
+    public ResponseEntity<Map<String, Object>> preview(@PathVariable("channelId") String channelId) {
         EmbedChannelService.IssueResult result;
         try {
             result = ctrl.service.issuePreviewSession(EmbedChannelController.currentTenant(), EmbedChannelController.trim(channelId));
@@ -183,7 +183,7 @@ final class EmbedChannelMgmtOps {
     }
 
     /** 渠道统计：{session_count:N}。 */
-    public ResponseEntity<Map<String, Object>> stats(@PathVariable("channel_id") String channelId) {
+    public ResponseEntity<Map<String, Object>> stats(@PathVariable("channelId") String channelId) {
         try {
             ctrl.service.getOwnedChannel(EmbedChannelController.currentTenant(), EmbedChannelController.trim(channelId));
         } catch (EmbedError e) {

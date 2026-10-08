@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 租户成员管理的 5 条路由：
- * GET/POST /tenants/{id}/members、PUT/DELETE /tenants/{id}/members/{user_id}、
+ * GET/POST /tenants/{id}/members、PUT/DELETE /tenants/{id}/members/{userId}、
  * POST /tenants/{id}/leave。
  *
  * <p>角色门禁与 PathTenantMatch 在 RbacInterceptor，controller 不复查角色。
@@ -126,10 +126,10 @@ public class TenantMemberController {
         return org.springframework.http.ResponseEntity.status(r.status()).body(r.body());
     }
 
-    /** PUT /tenants/{id}/members/{user_id}（Owner+，改角色；ErrLastOwner → 409） */
-    @PutMapping("/api/v1/tenants/{id}/members/{user_id}")
+    /** PUT /tenants/{id}/members/{userId}（Owner+，改角色；ErrLastOwner → 409） */
+    @PutMapping("/api/v1/tenants/{id}/members/{userId}")
     public ResponseEntity<Void> updateMemberRole(@PathVariable String id,
-                                                @PathVariable("user_id") String userId,
+                                                @PathVariable("userId") String userId,
                                                 HttpServletRequest request) {
         long tenantId = parseTenantId(id);
         String targetUserId = trimToEmpty(userId);
@@ -161,10 +161,10 @@ public class TenantMemberController {
         return ResponseEntity.noContent().build();
     }
 
-    /** DELETE /tenants/{id}/members/{user_id}（Owner+，软删；ErrLastOwner → 409） */
-    @DeleteMapping("/api/v1/tenants/{id}/members/{user_id}")
+    /** DELETE /tenants/{id}/members/{userId}（Owner+，软删；ErrLastOwner → 409） */
+    @DeleteMapping("/api/v1/tenants/{id}/members/{userId}")
     public ResponseEntity<Void> removeMember(@PathVariable String id,
-                                            @PathVariable("user_id") String userId) {
+                                            @PathVariable("userId") String userId) {
         long tenantId = parseTenantId(id);
         String targetUserId = trimToEmpty(userId);
         if (targetUserId.isEmpty()) {

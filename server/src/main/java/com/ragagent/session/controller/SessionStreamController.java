@@ -143,10 +143,10 @@ public class SessionStreamController {
 
     // ── 端点 ───────────────────────────────────────────────────────────────
 
-    @GetMapping("/api/v1/sessions/continue-stream/{session_id}")
+    @GetMapping("/api/v1/sessions/continue-stream/{sessionId}")
     public void continueStream(
-            @PathVariable("session_id") String rawSessionId,
-            @RequestParam(value = "message_id", required = false) String rawMessageId,
+            @PathVariable("sessionId") String rawSessionId,
+            @RequestParam(value = "messageId", required = false) String rawMessageId,
             @RequestParam(value = Mode.QUERY_PARAM, required = false) String resourceUrls,
             HttpServletResponse response) throws IOException {
 

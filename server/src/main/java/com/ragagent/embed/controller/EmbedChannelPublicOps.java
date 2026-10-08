@@ -34,7 +34,7 @@ final class EmbedChannelPublicOps {
     // ═══════════════════ 公开面（EmbedAuthFilter 已跑） ═══════════════════
 
     /** 只有 publish token 能换 session token。 */
-    public ResponseEntity<Map<String, Object>> exchange(@PathVariable("channel_id") String channelId) {
+    public ResponseEntity<Map<String, Object>> exchange(@PathVariable("channelId") String channelId) {
         EmbedChannelEntity ch = EmbedChannelController.channel(EmbedChannelController.request0());
         String auth = EmbedChannelController.trim(EmbedChannelController.request0().getHeader("Authorization"));
         boolean publishToken = auth.startsWith("Embed ")
@@ -58,14 +58,14 @@ final class EmbedChannelPublicOps {
     }
 
     /** 公开配置视图。 */
-    public ResponseEntity<com.fasterxml.jackson.databind.node.ObjectNode> config(@PathVariable("channel_id") String channelId) {
+    public ResponseEntity<com.fasterxml.jackson.databind.node.ObjectNode> config(@PathVariable("channelId") String channelId) {
         EmbedChannelEntity ch = EmbedChannelController.channel(EmbedChannelController.request0());
         return ResponseEntity.ok(ctrl.service.publicConfig(ch));
     }
 
     /** 公开建议问题（开关关闭或失败时返回空列表）。 */
     public ResponseEntity<Map<String, Object>> suggestedQuestions(
-            @PathVariable("channel_id") String channelId,
+            @PathVariable("channelId") String channelId,
             @RequestParam(name = "limit", required = false) String limit) {
         EmbedChannelEntity ch = EmbedChannelController.channel(EmbedChannelController.request0());
         if (!ch.isShowSuggestedQuestions()) {
@@ -96,7 +96,7 @@ final class EmbedChannelPublicOps {
     }
 
     /** 公开分块读取（白名单校验 + 404/403 分支）。 */
-    public ResponseEntity<?> chunk(@PathVariable("chunk_id") String chunkId) {
+    public ResponseEntity<?> chunk(@PathVariable("chunkId") String chunkId) {
         EmbedChannelEntity ch = EmbedChannelController.channel(EmbedChannelController.request0());
         String cid = LogSanitizer.sanitize(chunkId);
         if (cid.isEmpty()) {
@@ -114,7 +114,7 @@ final class EmbedChannelPublicOps {
 
     /** 创建访客会话：201 {id, sig}。 */
     public ResponseEntity<Map<String, Object>> createSession(
-            @PathVariable("channel_id") String channelId) {
+            @PathVariable("channelId") String channelId) {
         EmbedChannelEntity ch = EmbedChannelController.channel(EmbedChannelController.request0());
         long tenantId = EmbedChannelController.currentTenant();
         Session created;

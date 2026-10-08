@@ -21,7 +21,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
- * IM 平台回调面（路由 GET/POST /api/v1/im/callback/{channel_id}）。
+ * IM 平台回调面（路由 GET/POST /api/v1/im/callback/{channelId}）。
  *
  * <h2>鉴权（平台自带验签）</h2>
  * 这两条路由注册在 Auth 中间件之前——无 JWT、无 API Key；AuthFilter 对本前缀
@@ -52,14 +52,14 @@ public class ImCallbackController {
         this.imService = imService;
     }
 
-    @GetMapping("/api/v1/im/callback/{channel_id}")
-    public void callbackGet(@PathVariable("channel_id") String channelId,
+    @GetMapping("/api/v1/im/callback/{channelId}")
+    public void callbackGet(@PathVariable("channelId") String channelId,
             HttpServletRequest request, HttpServletResponse response) {
         handle(channelId, request, response);
     }
 
-    @PostMapping("/api/v1/im/callback/{channel_id}")
-    public void callbackPost(@PathVariable("channel_id") String channelId,
+    @PostMapping("/api/v1/im/callback/{channelId}")
+    public void callbackPost(@PathVariable("channelId") String channelId,
             HttpServletRequest request, HttpServletResponse response) {
         handle(channelId, request, response);
     }

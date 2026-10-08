@@ -86,7 +86,7 @@ export function useStream() {
       let url =
         params.method == "POST"
           ? `${apiUrl}${params.url}/${params.sessionId}`
-          : `${apiUrl}${params.url}/${params.sessionId}?message_id=${params.query}`;
+          : `${apiUrl}${params.url}/${params.sessionId}?messageId=${params.query}`;
       console.log(`[TTFB] request:start requestId=${requestID} url=${url} sent_at=${Date.now()}`);
       
       // Prepare POST body with required fields for agent-chat

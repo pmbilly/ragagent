@@ -29,6 +29,8 @@ jobs:
         run: python3 scripts/check-fe-contract-keys.py
       - name: 换锚棘轮（非冻结面不许新增 snake JSON 键；基线含逐条理由）
         run: python3 scripts/check-json-key-case.py --strict
+      - name: 事件面/路由面命名口径（B93b：载荷注解/事件名与响应类型值/路径变量/查询参数一律 camel）
+        run: python3 scripts/check-event-face-case.py
 
   backend:
     name: 后端 build + test + spotless

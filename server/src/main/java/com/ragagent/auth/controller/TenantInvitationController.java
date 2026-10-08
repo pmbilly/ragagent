@@ -33,9 +33,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 邀请相关的 9 条路由：租户侧 GET/POST /tenants/{id}/invitations、
- * DELETE /tenants/{id}/invitations/{inv_id}、POST /tenants/{id}/invite-links；
+ * DELETE /tenants/{id}/invitations/{invId}、POST /tenants/{id}/invite-links；
  * 收件箱 GET /me/invitations、GET /me/invitations/pending-count、
- * POST /me/invitations/{inv_id}/accept、POST /me/invitations/{inv_id}/decline、
+ * POST /me/invitations/{invId}/accept、POST /me/invitations/{invId}/decline、
  * POST /me/invitations/accept-by-token。
  *
  * <p><b>角色语义</b>：租户侧读 Viewer+、写 Owner+（RbacInterceptor）；/me 收件箱
@@ -159,10 +159,10 @@ public class TenantInvitationController {
         }
     }
 
-    /** DELETE /tenants/{id}/invitations/{inv_id}（Owner+，撤销 pending） */
-    @DeleteMapping("/api/v1/tenants/{id}/invitations/{inv_id}")
+    /** DELETE /tenants/{id}/invitations/{invId}（Owner+，撤销 pending） */
+    @DeleteMapping("/api/v1/tenants/{id}/invitations/{invId}")
     public ResponseEntity<Void> revokeInvitation(@PathVariable String id,
-            @PathVariable("inv_id") String invId) {
+            @PathVariable("invId") String invId) {
         long tenantId = TenantMemberController.parseTenantId(id);
         long invIdNum = TenantMemberController.parseInvitationId(invId);
 
@@ -253,9 +253,9 @@ public class TenantInvitationController {
         return data;
     }
 
-    /** POST /me/invitations/{inv_id}/accept（接受 + 写成员行 + 首空间采纳） */
-    @PostMapping("/api/v1/me/invitations/{inv_id}/accept")
-    public Map<String, Object> acceptMyInvitation(@PathVariable("inv_id") String invId) {
+    /** POST /me/invitations/{invId}/accept（接受 + 写成员行 + 首空间采纳） */
+    @PostMapping("/api/v1/me/invitations/{invId}/accept")
+    public Map<String, Object> acceptMyInvitation(@PathVariable("invId") String invId) {
         String caller = TenantMemberController.requireCaller();
         long invIdNum = TenantMemberController.parseInvitationId(invId);
         TenantMember member;
@@ -268,9 +268,9 @@ public class TenantInvitationController {
         return membershipResponse(member, "");
     }
 
-    /** POST /me/invitations/{inv_id}/decline（拒绝；不建成员行） */
-    @PostMapping("/api/v1/me/invitations/{inv_id}/decline")
-    public ResponseEntity<Void> declineMyInvitation(@PathVariable("inv_id") String invId) {
+    /** POST /me/invitations/{invId}/decline（拒绝；不建成员行） */
+    @PostMapping("/api/v1/me/invitations/{invId}/decline")
+    public ResponseEntity<Void> declineMyInvitation(@PathVariable("invId") String invId) {
         String caller = TenantMemberController.requireCaller();
         long invIdNum = TenantMemberController.parseInvitationId(invId);
         try {

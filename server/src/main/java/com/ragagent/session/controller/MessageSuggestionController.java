@@ -59,10 +59,10 @@ public class MessageSuggestionController {
      * （regenerate=false），但畸形 JSON → 400 固定文案 "invalid request body"
      * （不是解析器原文，与其他端点不同）。
      */
-    @PostMapping("/api/v1/sessions/{session_id}/messages/{message_id}/suggestions")
+    @PostMapping("/api/v1/sessions/{sessionId}/messages/{messageId}/suggestions")
     public ResponseEntity<MessageSuggestionSet> ensure(
-            @PathVariable("session_id") String sessionId,
-            @PathVariable("message_id") String messageId,
+            @PathVariable("sessionId") String sessionId,
+            @PathVariable("messageId") String messageId,
             @RequestBody(required = false) String rawBody) {
         boolean regenerate = false;
         if (rawBody != null && !rawBody.isEmpty()) {
@@ -94,12 +94,12 @@ public class MessageSuggestionController {
      * GET 同时注册在 :session_id 与 :id 两个通配下
      * （router 两种写法并存），Spring 用双 pattern 表达同一件事。
      */
-    @GetMapping({"/api/v1/sessions/{session_id}/messages/{message_id}/suggestions",
-            "/api/v1/sessions/{id}/messages/{message_id}/suggestions"})
+    @GetMapping({"/api/v1/sessions/{sessionId}/messages/{messageId}/suggestions",
+            "/api/v1/sessions/{id}/messages/{messageId}/suggestions"})
     public ResponseEntity<MessageSuggestionSet> get(
-            @PathVariable(value = "session_id", required = false) String sessionId,
+            @PathVariable(value = "sessionId", required = false) String sessionId,
             @PathVariable(value = "id", required = false) String idFallback,
-            @PathVariable("message_id") String messageId) {
+            @PathVariable("messageId") String messageId) {
         String sid = sessionId == null || sessionId.isEmpty()
                 ? LogSanitizer.sanitize(idFallback) : LogSanitizer.sanitize(sessionId);
         MessageSuggestionSet set;
@@ -115,9 +115,9 @@ public class MessageSuggestionController {
      * 成功是 <b>204 无响应体</b>；
      * 解析失败（含空 body、required 字段缺失）→ 400 固定文案 "invalid request body"。
      */
-    @PostMapping("/api/v1/sessions/{session_id}/suggestion-events")
+    @PostMapping("/api/v1/sessions/{sessionId}/suggestion-events")
     public ResponseEntity<Void> recordEvent(
-            @PathVariable("session_id") String sessionId,
+            @PathVariable("sessionId") String sessionId,
             @RequestBody(required = false) String rawBody) {
         EventRequest request = null;
         if (rawBody != null && !rawBody.isBlank()) {

@@ -466,8 +466,8 @@ public class DataSourceController {
      * "日志不存在"与"日志属于别人"的文案不同——后者走 {@code getOwnedDataSource}，
      * 它回的是 {@code data source not found}。</p>
      */
-    @GetMapping("/api/v1/datasource/logs/{log_id}")
-    public ResponseEntity<?> getSyncLog(@PathVariable("log_id") String logId) {
+    @GetMapping("/api/v1/datasource/logs/{logId}")
+    public ResponseEntity<?> getSyncLog(@PathVariable("logId") String logId) {
         Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null || tenantId == 0L) {
             return error(401, "unauthorized");
