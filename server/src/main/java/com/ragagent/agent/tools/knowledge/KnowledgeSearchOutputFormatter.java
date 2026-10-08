@@ -112,7 +112,7 @@ final class KnowledgeSearchOutputFormatter {
         }
 
         StringBuilder ob = new StringBuilder();
-        ob.append(String.format(Locale.ROOT, "<search_results count=\"%d\">\n", results.size()));
+        ob.append(String.format(Locale.ROOT, "<searchResults count=\"%d\">\n", results.size()));
         for (String q : queries) {
             ob.append(String.format(Locale.ROOT, "<query>%s</query>\n", FaqSnippet.xmlEscape(q)));
         }
@@ -276,7 +276,7 @@ final class KnowledgeSearchOutputFormatter {
             }
         }
 
-        ob.append("<retrieval_statistics>\n");
+        ob.append("<retrievalStatistics>\n");
         for (Map.Entry<String, Set<Integer>> e : knowledgeChunkMap.entrySet()) {
             String knowledgeID = e.getKey();
             long totalChunks = knowledgeTotalMap.getOrDefault(knowledgeID, 0L);
@@ -286,13 +286,13 @@ final class KnowledgeSearchOutputFormatter {
                 long remaining = totalChunks - retrievedCount;
                 double percentage = retrievedCount / (double) totalChunks * 100;
                 ob.append(String.format(Locale.ROOT,
-                        "<document_stat knowledgeId=\"%s\" title=\"%s\" totalChunks=\"%d\" retrieved=\"%d\" remaining=\"%d\" coverage=\"%.1f%%\" />\n",
+                        "<documentStat knowledgeId=\"%s\" title=\"%s\" totalChunks=\"%d\" retrieved=\"%d\" remaining=\"%d\" coverage=\"%.1f%%\" />\n",
                         FaqSnippet.xmlEscape(knowledgeID), FaqSnippet.xmlEscape(title), totalChunks,
                         retrievedCount, remaining, percentage));
             }
         }
-        ob.append("</retrieval_statistics>\n");
-        ob.append("</search_results>");
+        ob.append("</retrievalStatistics>\n");
+        ob.append("</searchResults>");
 
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("knowledgeBaseIds", kbsToSearch);

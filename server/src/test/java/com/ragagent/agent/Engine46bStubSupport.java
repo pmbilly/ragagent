@@ -28,7 +28,7 @@ import com.ragagent.llm.domain.ToolCall;
  *
  * <p>掩码约定（探针在录制侧做了同款替换，两侧掩码后逐字节可比）：事件 id 的 uuid
  * 前缀 → {@code xxxxxxxx-}；duration/duration_ms/total_duration_ms → 0；
- * {@code "timestamp":"..."} → {@code "TS"}；{@code <current_time>} 日期段 → DATE。</p>
+ * {@code "timestamp":"..."} → {@code "TS"}；{@code <currentTime>} 日期段 → DATE。</p>
  */
 final class Engine46bStubSupport {
 
@@ -37,15 +37,15 @@ final class Engine46bStubSupport {
 
     private static final Pattern DUR = Pattern.compile(",\"(duration_ms|duration|total_duration_ms)\":\\d+");
     private static final Pattern TS = Pattern.compile("\"timestamp\":\"[^\"]*\"");
-    private static final Pattern DATE = Pattern.compile("<current_time>[^<]*</current_time>");
+    private static final Pattern DATE = Pattern.compile("<currentTime>[^<]*</currentTime>");
     private static final Pattern DATE_ESC = Pattern.compile(
-            "(\\\\u003ccurrent_time\\\\u003e)[0-9-]{10}(\\\\u003c/current_time\\\\u003e)");
+            "(\\\\u003ccurrentTime\\\\u003e)[0-9-]{10}(\\\\u003c/currentTime\\\\u003e)");
     private static final Pattern EVENT_ID = Pattern.compile("^[0-9a-f]{8}-");
 
     static String mask(String s) {
         s = DUR.matcher(s).replaceAll("");
         s = TS.matcher(s).replaceAll("\"timestamp\":\"TS\"");
-        s = DATE.matcher(s).replaceAll("<current_time>DATE</current_time>");
+        s = DATE.matcher(s).replaceAll("<currentTime>DATE</currentTime>");
         s = DATE_ESC.matcher(s).replaceAll("$1DATE$2");
         return s;
     }

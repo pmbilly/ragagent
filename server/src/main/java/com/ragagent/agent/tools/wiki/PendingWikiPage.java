@@ -27,7 +27,7 @@ import java.util.List;
         /** XML 渲染模板（字节级契约）。 */
         public String render(String body) {
             StringBuilder b = new StringBuilder();
-            b.append("<wiki_page>\n");
+            b.append("<wikiPage>\n");
             b.append("<metadata>\n");
             b.append("<knowledgeBaseId>").append(kbId).append("</knowledgeBaseId>\n");
             b.append("<link>[[").append(page.slug()).append('|').append(page.title()).append("]]</link>\n");
@@ -35,8 +35,8 @@ import java.util.List;
             b.append("<aliases>").append(String.join(", ", page.aliases())).append("</aliases>\n");
             b.append("</metadata>\n");
             b.append("<relationships>\n");
-            b.append("<links_to>").append(String.join(", ", outLinks)).append("</links_to>\n");
-            b.append("<linked_from>").append(String.join(", ", inLinks)).append("</linked_from>\n");
+            b.append("<linksTo>").append(String.join(", ", outLinks)).append("</linksTo>\n");
+            b.append("<linkedFrom>").append(String.join(", ", inLinks)).append("</linkedFrom>\n");
             b.append("</relationships>\n");
             b.append("<sources>\n");
             b.append(String.join("\n", sources)).append('\n');
@@ -47,7 +47,7 @@ import java.util.List;
             b.append("<content>\n");
             b.append(body).append('\n');
             b.append("</content>\n");
-            b.append("</wiki_page>");
+            b.append("</wikiPage>");
             return b.toString();
         }
     }

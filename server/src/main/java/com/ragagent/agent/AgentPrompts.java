@@ -203,11 +203,11 @@ public final class AgentPrompts {
     /** 知识库信息格式化为提示词 XML。 */
     public static String formatKnowledgeBaseList(List<KnowledgeBaseInfo> kbInfos) {
         if (kbInfos == null || kbInfos.isEmpty()) {
-            return "<knowledge_bases />";
+            return "<knowledgeBases />";
         }
 
         StringBuilder b = new StringBuilder();
-        b.append("<knowledge_bases>\n");
+        b.append("<knowledgeBases>\n");
         for (KnowledgeBaseInfo kb : kbInfos) {
             if (kb == null) {
                 continue;
@@ -225,7 +225,7 @@ public final class AgentPrompts {
                         .formatted(escapeXMLAttr(formatDocSummary(kb.description(), 240))));
             }
             if (!kb.recentDocs().isEmpty()) {
-                b.append("<recent_documents>\n");
+                b.append("<recentDocuments>\n");
                 int shown = 0;
                 for (RecentDocInfo doc : kb.recentDocs()) {
                     if (shown >= 2) {
@@ -243,11 +243,11 @@ public final class AgentPrompts {
                             .formatted(escapeXMLAttr(doc.knowledgeId()), escapeXMLAttr(doc.chunkId()),
                                     escapeXMLAttr(doc.type()), escapeXMLAttr(formatDocSummary(name, 160))));
                 }
-                b.append("</recent_documents>\n");
+                b.append("</recentDocuments>\n");
             }
             b.append("</knowledgeBase>\n");
         }
-        b.append("</knowledge_bases>");
+        b.append("</knowledgeBases>");
         return b.toString();
     }
 
@@ -272,8 +272,8 @@ public final class AgentPrompts {
      * 渲染模板里的占位符。
      *
      * <p>{{knowledge_bases}} 历史上展开成完整的绑定 KB XML 块；那块内容现在住在
-     * user 消息的 {@code <runtime_context>} 里，此占位符展开成一句短指针，让仍在
-     * 引用它的旧版/自定义模板优雅降级，而不是把细节倒两次。{@code <must_use>} 不是
+     * user 消息的 {@code <runtimeContext>} 里，此占位符展开成一句短指针，让仍在
+     * 引用它的旧版/自定义模板优雅降级，而不是把细节倒两次。{@code <mustUse>} 不是
      * 占位符——@ 提及时由 observe 注入 user 消息。</p>
      */
     public static String renderPromptPlaceholders(String template, List<KnowledgeBaseInfo> knowledgeBases) {
@@ -284,8 +284,8 @@ public final class AgentPrompts {
             if (knowledgeBases == null || knowledgeBases.isEmpty()) {
                 replacement = "(no knowledge bases bound to this session)";
             } else {
-                replacement = "(see `<bound_knowledge_bases>` inside the user message's "
-                        + "`<runtime_context>` for the current bound KB list and their capabilities)";
+                replacement = "(see `<boundKnowledgeBases>` inside the user message's "
+                        + "`<runtimeContext>` for the current bound KB list and their capabilities)";
             }
             result = result.replace("{{knowledge_bases}}", replacement);
         }
@@ -330,7 +330,7 @@ public final class AgentPrompts {
             return "";
         }
         StringBuilder b = new StringBuilder();
-        b.append("\n\n<skill_instructions source=\"selected_for_this_turn\">\n");
+        b.append("\n\n<skillInstructions source=\"selected_for_this_turn\">\n");
         b.append("The user selected the skills below for this turn. Apply their instructions to the task; ")
                 .append("read a bundled resource with read_file(path=\"skill://<name>/<file>\") only when the ")
                 .append("instructions require it.\n");
@@ -341,7 +341,7 @@ public final class AgentPrompts {
             b.append("<skill name=\"").append(escapeXMLAttr(s.name())).append("\">\n")
                     .append(s.instructions() == null ? "" : s.instructions().strip()).append("\n</skill>\n");
         }
-        b.append("</skill_instructions>");
+        b.append("</skillInstructions>");
         return b.toString();
     }
 
@@ -533,13 +533,13 @@ public final class AgentPrompts {
     /**
      * 自定义提示词也照用：中途投递是 harness 能力。
      */
-    public static final String STEER_GUIDANCE = "<steering_guidance>\n"
-            + "Messages in <steer_message> guide the task in progress. Apply them in context; "
+    public static final String STEER_GUIDANCE = "<steeringGuidance>\n"
+            + "Messages in <steerMessage> guide the task in progress. Apply them in context; "
             + "respond briefly when appropriate, then continue unfinished work. Preserve unfinished "
             + "objectives, accepted constraints and useful tool results unless explicitly changed. "
             + "Acknowledging guidance alone does not complete the task. Follow explicit cancellation "
             + "or replacement requests. Hide delivery tags. Untagged subsequent requests are ordinary "
-            + "user messages.\n</steering_guidance>";
+            + "user messages.\n</steeringGuidance>";
 
     // runtimePromptContract = SOURCE_DATA_BOUNDARY_PROMPT + "\n\n" + 尾段；
     // 尾段拆成常量便于组装与复用

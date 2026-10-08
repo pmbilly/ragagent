@@ -162,9 +162,9 @@ public class WikiReadPageTool extends BaseTool {
                 WikiPageRendering.renderWikiPagesWithinBudget(pending, request.outputBudget());
         StringBuilder finalOutput = new StringBuilder(rendered.output());
         if (!rendered.omittedSlugs().isEmpty()) {
-            finalOutput.append("\n\n<omitted_pages reason=\"output budget exceeded\">\n")
+            finalOutput.append("\n\n<omittedPages reason=\"output budget exceeded\">\n")
                     .append(String.join("\n", rendered.omittedSlugs()))
-                    .append("\n</omitted_pages>")
+                    .append("\n</omittedPages>")
                     .append("\n<hint>These pages were resolved but not rendered. "
                             + "Call wiki_read_page again with fewer slugs to read them.</hint>");
         }

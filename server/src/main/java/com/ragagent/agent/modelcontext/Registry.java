@@ -576,10 +576,10 @@ public final class Registry {
         if (rows.length() == 0) {
             return "";
         }
-        return "\n\n<external_source_candidates>\n"
+        return "\n\n<externalSourceCandidates>\n"
                 + "System-indexed links from this MCP result. Cite the matching wN only when the result supports the claim; "
                 + "a link alone does not mean the linked page was read. Do not use KB cN handles for this external content.\n"
-                + rows + "</external_source_candidates>";
+                + rows + "</externalSourceCandidates>";
     }
 
     /**

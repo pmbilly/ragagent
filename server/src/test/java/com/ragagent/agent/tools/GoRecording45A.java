@@ -577,16 +577,16 @@ public final class GoRecording45A {
             "{\"agentFilter\":[\"keyword\",\"vector\"],\"consume\":true,\"filter\":[\"keyword\",\"vector\"],\"group\":\"caps\",\"id\":\"file_tool_consume_files\",\"mode\":\"\",\"satAgent\":false,\"satTools\":false,\"tools\":[\"knowledge_search\"]}";
 
     public static final String R_FAQ_METADATA_XML =
-            "{\"group\":\"faq\",\"id\":\"metadata_xml\",\"out\":\"<faq>\\n<question>如何创建知识库？</question>\\n<similar_question>怎么创建知识库？</similar_question>\\n<answer>在控制台点击新建知识库。</answer>\\n</faq>\\n\"}";
+            "{\"group\":\"faq\",\"id\":\"metadata_xml\",\"out\":\"<faq>\\n<question>如何创建知识库？</question>\\n<similarQuestion>怎么创建知识库？</similarQuestion>\\n<answer>在控制台点击新建知识库。</answer>\\n</faq>\\n\"}";
 
     public static final String R_FAQ_SIMILAR_8 =
-            "{\"group\":\"faq\",\"id\":\"similar_8\",\"out\":\"<similar_question>相似问1</similar_question>\\n<similar_question>相似问2</similar_question>\\n<similar_question>相似问3</similar_question>\\n<similar_question>相似问4</similar_question>\\n<similar_question>相似问5</similar_question>\\n<similar_questions_omitted count=\\\"3\\\" />\\n\"}";
+            "{\"group\":\"faq\",\"id\":\"similar_8\",\"out\":\"<similarQuestion>相似问1</similarQuestion>\\n<similarQuestion>相似问2</similarQuestion>\\n<similarQuestion>相似问3</similarQuestion>\\n<similarQuestion>相似问4</similarQuestion>\\n<similarQuestion>相似问5</similarQuestion>\\n<similarQuestionsOmitted count=\\\"3\\\" />\\n\"}";
 
     public static final String R_FAQ_SIMILAR_NIL =
             "{\"group\":\"faq\",\"id\":\"similar_nil\",\"out\":\"\"}";
 
     public static final String R_FAQ_ENTRY_XML =
-            "{\"group\":\"faq\",\"id\":\"entry_xml\",\"out\":\"<faq faqId=\\\"faq-chunk-1\\\" index=\\\"0\\\" question=\\\"如何创建知识库？\\\">\\n<question>如何创建知识库？</question>\\n<similar_question>怎么创建知识库？</similar_question>\\n<answer>在控制台点击新建知识库。</answer>\\n</faq>\\n\"}";
+            "{\"group\":\"faq\",\"id\":\"entry_xml\",\"out\":\"<faq faqId=\\\"faq-chunk-1\\\" index=\\\"0\\\" question=\\\"如何创建知识库？\\\">\\n<question>如何创建知识库？</question>\\n<similarQuestion>怎么创建知识库？</similarQuestion>\\n<answer>在控制台点击新建知识库。</answer>\\n</faq>\\n\"}";
 
     public static final String R_FAQ_MATCH_SNIPPET_QUERIES =
             "{\"group\":\"faq\",\"id\":\"match_snippet_queries\",\"out\":\"Q: 如何创建知识库？ | A: 在控制台点击新建知识库。\"}";

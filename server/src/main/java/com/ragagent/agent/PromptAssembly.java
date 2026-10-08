@@ -146,19 +146,19 @@ final class PromptAssembly {
     static String buildRuntimeContextBlock(String sessionId, List<AgentPrompts.KnowledgeBaseInfo> kbs,
             List<AgentPrompts.SelectedDocumentInfo> docs) {
         StringBuilder sb = new StringBuilder();
-        sb.append("<runtime_context scope=\"this_turn\">\n");
-        sb.append("  <current_time>").append(LocalDate.now().toString()).append("</current_time>\n");
+        sb.append("<runtimeContext scope=\"this_turn\">\n");
+        sb.append("  <currentTime>").append(LocalDate.now().toString()).append("</currentTime>\n");
         sb.append("  <session>").append(escapeXMLAttr(sessionId)).append("</session>\n");
 
         if (kbs != null && !kbs.isEmpty()) {
             // 完整绑定 KB 详情（能力 + 近期文档），模型在一处完成检索路由。
-            sb.append("  <bound_knowledge_bases>\n");
+            sb.append("  <boundKnowledgeBases>\n");
             sb.append(indentLines(AgentPrompts.formatKnowledgeBaseList(kbs), "    "));
-            sb.append("\n  </bound_knowledge_bases>\n");
+            sb.append("\n  </boundKnowledgeBases>\n");
         }
 
         if (docs != null && !docs.isEmpty()) {
-            sb.append("  <pinned_documents scope=\"authoritative_for_this_turn\">\n");
+            sb.append("  <pinnedDocuments scope=\"authoritative_for_this_turn\">\n");
             for (AgentPrompts.SelectedDocumentInfo d : docs) {
                 if (d == null) {
                     continue;
@@ -180,10 +180,10 @@ final class PromptAssembly {
                             .append("\" title=\"").append(escapeXMLAttr(title)).append("\" />\n");
                 }
             }
-            sb.append("  </pinned_documents>\n");
+            sb.append("  </pinnedDocuments>\n");
         }
 
-        sb.append("</runtime_context>");
+        sb.append("</runtimeContext>");
         return sb.toString();
     }
 
@@ -233,7 +233,7 @@ final class PromptAssembly {
                 if (injectedSkillNames != null && injectedSkillNames.contains(skill.name())) {
                     // B61：正文已随系统提示词注入 → 直接照做即可，不必再去读一遍
                     lines.add("Apply the instructions of @Skill \"" + name
-                            + "\" (provided in <skill_instructions>) to the task below.");
+                            + "\" (provided in <skillInstructions>) to the task below.");
                 } else {
                     // 正文未能注入（如技能在提问后被删/改名）→ 保留按需读取作为回退
                     lines.add("Must call read_file(path=\"skill://" + name + "/SKILL.md\") for @Skill \""
@@ -244,11 +244,11 @@ final class PromptAssembly {
         if (lines.isEmpty()) {
             return "";
         }
-        return "<must_use>\n" + String.join("\n", lines)
+        return "<mustUse>\n" + String.join("\n", lines)
                 + "\nThese selections do not replace research into the task's factual content or exclude other "
                 + "relevant available sources unless the user explicitly restricts them. Apply selections to the "
                 + "relevant parts of the task; an @mention does not authorize unrelated actions. Follow the "
-                + "user's current explicit restrictions if they narrow or cancel a selection.\n</must_use>";
+                + "user's current explicit restrictions if they narrow or cancel a selection.\n</mustUse>";
     }
 
     /** 去换行与尖括号，名字越不出 must_use 块。 */

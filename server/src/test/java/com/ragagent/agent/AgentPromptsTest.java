@@ -169,10 +169,10 @@ class AgentPromptsTest {
         String out = com.ragagent.agent.AgentPrompts.formatPinnedSkillInstructions(
                 java.util.List.of(new com.ragagent.agent.AgentPrompts.PinnedSkillInstructions(
                         "kb-faq-curator", "## 步骤\n1. 先检索")));
-        assertThat(out).contains("<skill_instructions source=\"selected_for_this_turn\">");
+        assertThat(out).contains("<skillInstructions source=\"selected_for_this_turn\">");
         assertThat(out).contains("<skill name=\"kb-faq-curator\">");
         assertThat(out).contains("## 步骤\n1. 先检索");
-        assertThat(out).endsWith("</skill_instructions>");
+        assertThat(out).endsWith("</skillInstructions>");
 
         // 空列表 → 不产生段（调用方按非空才注册段）
         assertThat(com.ragagent.agent.AgentPrompts.formatPinnedSkillInstructions(java.util.List.of())).isEmpty();
@@ -190,8 +190,8 @@ class AgentPromptsTest {
                 .isEqualTo("Base (no knowledge bases bound to this session) end");
         assertThat(AgentPrompts.renderPromptPlaceholders("Base {{knowledge_bases}} end",
                 List.of(AgentPrompts.KnowledgeBaseInfo.minimal("kb"))))
-                .isEqualTo("Base (see `<bound_knowledge_bases>` inside the user message's "
-                        + "`<runtime_context>` for the current bound KB list and their capabilities) end");
+                .isEqualTo("Base (see `<boundKnowledgeBases>` inside the user message's "
+                        + "`<runtimeContext>` for the current bound KB list and their capabilities) end");
         assertThat(AgentPrompts.renderPromptPlaceholders("No placeholder",
                 List.of(AgentPrompts.KnowledgeBaseInfo.minimal("kb")))).isEqualTo("No placeholder");
     }
@@ -365,8 +365,8 @@ class AgentPromptsTest {
                 AgentPrompts.buildSystemPromptSections(
                         List.of(AgentPrompts.KnowledgeBaseInfo.minimal("kb")), false, ragOpts, TODAY);
         assertThat(secsRag.get(0).content()).isEqualTo(
-                "RAG TEMPLATE KB=(see `<bound_knowledge_bases>` inside the user message's "
-                + "`<runtime_context>` for the current bound KB list and their capabilities)");
+                "RAG TEMPLATE KB=(see `<boundKnowledgeBases>` inside the user message's "
+                + "`<runtimeContext>` for the current bound KB list and their capabilities)");
     }
 
     @Test

@@ -74,7 +74,10 @@ export function parseWikiToolReferences(
   }
 
   if (toolName === 'wiki_read_page') {
-    return extractBlocks(output, 'wiki_page').flatMap((page, index) => {
+    // 块标签双读：新载荷 wikiPage，历史载荷 wiki_page。
+    const pages = extractBlocks(output, 'wikiPage')
+    const blocks = pages.length ? pages : extractBlocks(output, 'wiki_page')
+    return blocks.flatMap((page, index) => {
       const { slug, title } = parseWikiLink(extractTag(page, 'link'))
       // The page body commonly begins with the same introduction stored in
       // summary. Showing both makes the drawer look as if its first paragraph

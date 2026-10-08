@@ -91,3 +91,20 @@ test('parses the renamed camel element names emitted by the tools', () => {
   assert.equal(refs[0].knowledgeBaseId, 'kb-9')
   assert.equal(refs[0].content, 'Grounds answers in retrieved evidence.\n\nRAG combines retrieval and generation.')
 })
+
+test('parses the renamed camel wiki page block tag', () => {
+  const refs = parseWikiToolReferences('wiki_read_page', `
+    <wikiPage>
+      <metadata>
+        <knowledgeBaseId>kb-7</knowledgeBaseId>
+        <link>[[entity/acme|Acme]]</link>
+      </metadata>
+      <summary>Acme summary.</summary>
+      <content>Acme body.</content>
+    </wikiPage>
+  `, 'call-3')
+
+  assert.equal(refs.length, 1)
+  assert.equal(refs[0].knowledgeBaseId, 'kb-7')
+  assert.equal(refs[0].content, 'Acme body.')
+})

@@ -161,12 +161,12 @@ public class WikiSearchTool extends BaseTool {
             }
 
             if (allHitPages.isEmpty()) {
-                allOutputs.add("<search_results count=\"0\" query=\"" + query + "\" />");
+                allOutputs.add("<searchResults count=\"0\" query=\"" + query + "\" />");
                 continue;
             }
 
             StringBuilder sb = new StringBuilder();
-            sb.append("<search_results count=\"").append(allHitPages.size())
+            sb.append("<searchResults count=\"").append(allHitPages.size())
                     .append("\" query=\"").append(query).append("\">\n");
             for (int i = 0; i < allHitPages.size(); i++) {
                 PageView p = allHitPages.get(i);
@@ -192,7 +192,7 @@ public class WikiSearchTool extends BaseTool {
                 sb.append("<summary>").append(summary).append("</summary>").append(snippetTag).append('\n');
                 sb.append("</page>\n");
             }
-            sb.append("</search_results>");
+            sb.append("</searchResults>");
             allOutputs.add(sb.toString());
         }
 

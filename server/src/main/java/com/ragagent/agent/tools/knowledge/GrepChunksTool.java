@@ -601,13 +601,13 @@ public class GrepChunksTool extends BaseTool {
     String formatOutput(List<GrepChunkView> results, List<String> queries, List<Pattern> compiled) {
         StringBuilder b = new StringBuilder();
 
-        b.append(String.format(Locale.ROOT, "<grep_results chunkCount=\"%d\">\n", results.size()));
+        b.append(String.format(Locale.ROOT, "<grepResults chunkCount=\"%d\">\n", results.size()));
         for (String q : queries) {
             b.append(String.format(Locale.ROOT, "<query>%s</query>\n", FaqSnippet.xmlEscape(q)));
         }
 
         if (results.isEmpty()) {
-            b.append("</grep_results>");
+            b.append("</grepResults>");
             return b.toString();
         }
 
@@ -656,7 +656,7 @@ public class GrepChunksTool extends BaseTool {
             for (String q : queries) {
                 int c = counts.getOrDefault(q, 0);
                 if (c > 0) {
-                    b.append(String.format(Locale.ROOT, "<query_hit query=\"%s\" count=\"%d\" />\n",
+                    b.append(String.format(Locale.ROOT, "<queryHit query=\"%s\" count=\"%d\" />\n",
                             FaqSnippet.xmlEscape(q), c));
                 }
             }
@@ -673,7 +673,7 @@ public class GrepChunksTool extends BaseTool {
             }
         }
 
-        b.append("</grep_results>");
+        b.append("</grepResults>");
         return b.toString();
     }
 }

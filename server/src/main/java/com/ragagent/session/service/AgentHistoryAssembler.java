@@ -255,8 +255,8 @@ final class AgentHistoryAssembler {
     }
     /** 只给模型输入加投递上下文（types.SteerMessageContent；引擎包内静态的同款实现）。 */
     private static String steerMessageContent(String content) {
-        return "<steer_message>\n" + content + "\n</steer_message>\n<continue_task>\n"
+        return "<steerMessage>\n" + content + "\n</steerMessage>\n<continueTask>\n"
                 + "This is guidance for the task in progress. Apply it and continue unfinished work "
-                + "unless the user explicitly changes or cancels the task.\n</continue_task>";
+                + "unless the user explicitly changes or cancels the task.\n</continueTask>";
     }
 }

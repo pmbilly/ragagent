@@ -110,7 +110,7 @@ public class WikiReadSourceDocTool extends BaseTool {
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("<source_document>\n<metadata>\n");
+        sb.append("<sourceDocument>\n<metadata>\n");
         sb.append("<title>").append(knowledge.title()).append("</title>\n");
         sb.append("<knowledgeId>").append(knowledgeID).append("</knowledgeId>\n");
 
@@ -124,7 +124,7 @@ public class WikiReadSourceDocTool extends BaseTool {
             if (endChunkIndex - startChunkIndex > 50) {
                 endChunkIndex = startChunkIndex + 50; // 最多 50 块
             }
-            sb.append("<chunk_range start=\"").append(startChunkIndex).append("\" end=\"")
+            sb.append("<chunkRange start=\"").append(startChunkIndex).append("\" end=\"")
                     .append(endChunkIndex).append("\"/>\n");
         } else if (!query.isEmpty()) {
             try {
@@ -308,7 +308,7 @@ public class WikiReadSourceDocTool extends BaseTool {
             sb.append("<message>No query or range provided. Showing the first 10 chunks as a preview.</message>\n");
         }
 
-        sb.append("</source_document>");
+        sb.append("</sourceDocument>");
 
         ToolResult toolResult = new ToolResult();
         toolResult.setSuccess(true);

@@ -12,7 +12,7 @@ import com.ragagent.llm.domain.ChatMessage;
  * <ul>
  *   <li>连续同角色消息（部分 provider 直接拒绝）→ 合并；</li>
  *   <li>tool 结果消息在前面的 assistant 消息里找不到对应 tool_call → 降级为
- *       {@code <untrusted_tool_result>} 包裹的 user 消息（外部输出永不能升格为策略）；</li>
+ *       {@code <untrustedToolResult>} 包裹的 user 消息（外部输出永不能升格为策略）；</li>
  *   <li>空内容消息（会引发 API 错误）→ 丢弃（system 除外）。</li>
  * </ul>
  *
@@ -66,8 +66,8 @@ public final class MessageSanitizer {
                     // （不改动调用方的消息对象）。
                     msg = shallowCopy(msg);
                     msg.setRole("user");
-                    msg.setContent("<untrusted_tool_result name=\"" + escapeHtml(orEmpty(msg.getName()))
-                            + "\">\n" + escapeHtml(orEmpty(msg.getContent())) + "\n</untrusted_tool_result>");
+                    msg.setContent("<untrustedToolResult name=\"" + escapeHtml(orEmpty(msg.getName()))
+                            + "\">\n" + escapeHtml(orEmpty(msg.getContent())) + "\n</untrustedToolResult>");
                     msg.setToolCallId("");
                     msg.setName("");
                 }

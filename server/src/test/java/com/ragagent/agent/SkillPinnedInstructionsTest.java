@@ -86,7 +86,7 @@ class SkillPinnedInstructionsTest {
 
         // 注入段渲染出正文
         String section = AgentPrompts.formatPinnedSkillInstructions(resolved);
-        assertThat(section).contains("<skill_instructions source=\"selected_for_this_turn\">");
+        assertThat(section).contains("<skillInstructions source=\"selected_for_this_turn\">");
         assertThat(section).contains("<skill name=\"kb-faq-curator\">");
         assertThat(section).contains("一个问答只覆盖一个事实点");
     }
@@ -105,7 +105,7 @@ class SkillPinnedInstructionsTest {
     void mustUseWordingFollowsInjectionResult() {
         String injected = PromptAssembly.buildMustUseBlock(List.of(), pinned(), List.of("kb-faq-curator"));
         assertThat(injected)
-                .contains("Apply the instructions of @Skill \"kb-faq-curator\" (provided in <skill_instructions>)")
+                .contains("Apply the instructions of @Skill \"kb-faq-curator\" (provided in <skillInstructions>)")
                 .doesNotContain("Must call read_file");
 
         String fallback = PromptAssembly.buildMustUseBlock(List.of(), pinned(), List.of());

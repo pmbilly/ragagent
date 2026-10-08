@@ -16,7 +16,7 @@ import com.ragagent.knowledge.domain.FaqChunkMetadata;
  * （{@link #appendFaqChunkData}/{@link #normalizeFaqChunkDataMap}）；检索命中摘要
  * "Q: … | A: …"（{@link #faqMatchSnippet} / {@link #faqMatchSnippetFromQueries}）。</p>
  *
- * <p>相似问展示上限 5 条，超出追加 {@code <similar_questions_omitted count="N" />}；
+ * <p>相似问展示上限 5 条，超出追加 {@code <similarQuestionsOmitted count="N" />}；
  * 空白答案跳过；XML 转义五字符（& ' " < > 的最小转义——输出由 LLM
  * 宽容解析，不是严格 XML 处理器）。</p>
  */
@@ -47,14 +47,14 @@ public final class FaqSnippet {
                 questions.size() - FAQ_MAX_SIMILAR_QUESTIONS_DISPLAY);
     }
 
-    /** 相似问 XML（每行一个 <similar_question> + 省略标记）。 */
+    /** 相似问 XML（每行一个 <similarQuestion> + 省略标记）。 */
     public static void writeSimilarQuestionsXml(StringBuilder b, List<String> questions) {
         SimilarQuestionsDisplay d = truncateSimilarQuestionsForDisplay(questions);
         for (String sq : d.display()) {
-            b.append("<similar_question>").append(xmlEscape(sq)).append("</similar_question>\n");
+            b.append("<similarQuestion>").append(xmlEscape(sq)).append("</similarQuestion>\n");
         }
         if (d.omitted() > 0) {
-            b.append("<similar_questions_omitted count=\"").append(d.omitted()).append("\" />\n");
+            b.append("<similarQuestionsOmitted count=\"").append(d.omitted()).append("\" />\n");
         }
     }
 

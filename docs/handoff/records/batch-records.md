@@ -946,3 +946,12 @@
 - **前端**：`wikiToolReferences` 元素读取双拼（`firstTag(page, 'matchSnippet', 'match_snippet')`）+ 新增 camel 形态用例（原 snake 用例保留，作为历史兼容钉子）。
 - **误伤回退**：测试夹具批处理越界打到 15 个非 agent 域文件（`file_path=`/`knowledge_id=`/`updated_at=` 等**非工具面**属性，如 multipart 参数、外部契约夹具）→ `git checkout` 全退，只保留 agent 域一处。
 - **闸门**：后端全量 **4,836**/0（一次跑绿）+ 前端 **735**/735 + `vue-tsc` 0 错 + `spotlessCheck` + `check-json-key-case.py --strict` 绿。
+
+**✅ B90（2026-10-08，自有标记的多词标签名 camel 化）**
+- **动机**：B89 的后半程——`<knowledge_id>` 这类「与 JSON 键同名」的元素已改，但**标签名**（`wiki_page`/`links_to`/`linked_from`/`search_results`/`knowledge_chunks`/`source_document`/`retrieval_statistics`/`document_stat`/`runtime_context`/`knowledge_bases`/`bound_knowledge_bases`/`must_use`/`skill_instructions`/`untrusted_tool_result`/`page_fetch`/`grep_results`/`similar_question`/`similar_questions_omitted`/`past_conversations`/`steer_message`/`continue_task`/`steering_guidance`/`recent_documents`/`pinned_documents`/`omitted_pages`/`summary_error`/`full_page`/`external_source_candidates`/`chunk_range`/`query_hit`/`user_memory`/`user_memory_search`/`current_time`（标签））仍是 snake。
+- **生产侧 18 文件 / 87 处**：agent 面 16 文件 81 处；域外 2 处（`AgentHistoryAssembler` 的 `<steerMessage>`/`<continueTask>`、`MemoryRender` 的 `<userMemory>`）。
+- **消费侧**：测试/实录 9 文件 457 处（含 `GoRecording45B` 279、`46B` 103）；前端 `wikiToolReferences` 块标签双读（`wikiPage` 优先 + `wiki_page` 兜底，覆盖历史回放）+ 新增 camel 用例（原 snake 用例保留作历史钉子）。
+- **截断快照**：`R_WIKI_READ_PAGE_READ_BUDGET` 再位移 1061→1067（标签名变短）→ 探针复算。**规律**：凡按输出预算截断的快照，每次改动输出文本长度都必须重算。
+- **保留（登记）**：① 引用协议标记 `<kb>`/`<web>`/`<ref>` + `doc`/`chunk_id`/`kb_id`/`url`/`title`（模型输出方言）；② wiki 摄取模型输出契约标签（`new_information`/`candidate_slugs`/`previous_slugs`/`shared_source_contexts`/`deleted_documents`/`document_summaries`/`existing_folders`/`page_metadata`/`remaining_source_documents`/`valid_wiki_links`/`available_wiki_pages`/`existing_page_content`/`current_introduction` 等，提示词钉住 + 解析器 + 金片同批）；③ 图片标记 `<image_caption>`/`<image_ocr>`/`<image_original>`（wiki 内容面：与 docreader 富化、存量页面正文、前端 markdown 渲染共用）；④ chatpipeline/evaluation 提示词模板标签（`asker_background`/`images_uploaded`/`no_image_attached`/`no_document_attached`）；⑤ i18n 键、im/tracing/datasource 域标签、SSE/事件键、DB 列名、第三方线格式（另有冻结清单）。
+- **教训（复现两次）**：**消费面改名范围必须与生产面一致** —— 首次在 B89（测试夹具越界到 15 个域外文件），本批是反向（测试已改、`MemoryRender`/`AgentHistoryAssembler` 产出未改 → 3 条假红）。定式：先钉生产面文件清单，再同步消费面。
+- **闸门**：后端全量 **4,836**/0（一次 Redis 竞态隔离重跑绿）+ 前端 **736**/736 + `vue-tsc` 0 错 + `spotlessCheck` + 键名守卫 strict 绿。

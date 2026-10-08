@@ -87,9 +87,9 @@ final class SteerIntake {
 
     /** 只给模型输入加投递上下文；持久化行与 UI 保留原文。 */
     static String steerMessageContent(String content) {
-        return "<steer_message>\n" + content + "\n</steer_message>\n<continue_task>\n"
+        return "<steerMessage>\n" + content + "\n</steerMessage>\n<continueTask>\n"
                 + "This is guidance for the task in progress. Apply it and continue unfinished work "
-                + "unless the user explicitly changes or cancels the task.\n</continue_task>";
+                + "unless the user explicitly changes or cancels the task.\n</continueTask>";
     }
 
     /** JSON-decoded map 读字符串；缺键/非字符串返回空串。 */

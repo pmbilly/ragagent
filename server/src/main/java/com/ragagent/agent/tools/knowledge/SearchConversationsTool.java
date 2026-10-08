@@ -122,7 +122,7 @@ public class SearchConversationsTool extends BaseTool {
         }
 
         StringBuilder b = new StringBuilder();
-        b.append("<past_conversations>\n");
+        b.append("<pastConversations>\n");
         int found = 0;
         for (ExchangeView item : items) {
             if (item == null || found >= effectiveLimit) {
@@ -147,12 +147,12 @@ public class SearchConversationsTool extends BaseTool {
             }
             b.append("</exchange>\n");
         }
-        b.append("</past_conversations>");
+        b.append("</pastConversations>");
 
         if (found == 0) {
             ToolResult r = new ToolResult();
             r.setSuccess(true);
-            r.setOutput("<past_conversations />\n"
+            r.setOutput("<pastConversations />\n"
                     + "Nothing in this user's past conversations matches. "
                     + "Do not assume it was discussed before.");
             Map<String, Object> data = new LinkedHashMap<>();

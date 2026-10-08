@@ -342,11 +342,11 @@ public class ListKnowledgeChunksTool extends BaseTool {
         if (knowledgeTitle != null && !knowledgeTitle.isEmpty()) {
             titleAttr = String.format(" title=\"%s\"", knowledgeTitle);
         }
-        b.append(String.format("<knowledge_chunks knowledgeId=\"%s\"%s total=\"%d\" fetched=\"%d\">\n",
+        b.append(String.format("<knowledgeChunks knowledgeId=\"%s\"%s total=\"%d\" fetched=\"%d\">\n",
                 knowledgeID, titleAttr, total, fetched));
 
         if (fetched == 0) {
-            b.append("</knowledge_chunks>");
+            b.append("</knowledgeChunks>");
             return b.toString();
         }
 
@@ -374,7 +374,7 @@ public class ListKnowledgeChunksTool extends BaseTool {
             b.append(String.format("<pagination remaining=\"%d\" />\n", total - fetched));
         }
 
-        b.append("</knowledge_chunks>");
+        b.append("</knowledgeChunks>");
         return b.toString();
     }
 
