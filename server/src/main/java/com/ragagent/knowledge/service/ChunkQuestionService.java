@@ -34,8 +34,7 @@ import com.ragagent.common.wiki.WikiLanguageSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import com.ragagent.auth.domain.Tenant;
-import com.ragagent.auth.service.TenantService;
+import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.embedding.Embedder;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.retrieval.engine.RetrieveEngineRegistry;
@@ -62,7 +61,7 @@ public class ChunkQuestionService {
     private final ModelRuntimeFactory modelRuntimeFactory;
     private final RetrieveEngineRegistry retrieveEngineRegistry;
     private final TenantStoreOwnership storeOwnership;
-    private final TenantService tenantService;
+    private final TenantConfigLookup tenantConfigLookup;
     private final ConversationProperties conversationProps;
     private final ChunkAccessGuard guard;
     /** RETRIEVE_DRIVER（属性绑定）。 */
@@ -74,7 +73,7 @@ public class ChunkQuestionService {
                                 ModelRuntimeFactory modelRuntimeFactory,
                                 RetrieveEngineRegistry retrieveEngineRegistry,
                                 TenantStoreOwnership storeOwnership,
-                                TenantService tenantService,
+                                TenantConfigLookup tenantConfigLookup,
                                 ConversationProperties conversationProps,
                                 ChunkAccessGuard guard,
                                 RetrievalDriverProperties driverProperties) {
@@ -84,7 +83,7 @@ public class ChunkQuestionService {
         this.modelRuntimeFactory = modelRuntimeFactory;
         this.retrieveEngineRegistry = retrieveEngineRegistry;
         this.storeOwnership = storeOwnership;
-        this.tenantService = tenantService;
+        this.tenantConfigLookup = tenantConfigLookup;
         this.conversationProps = conversationProps;
         this.guard = guard;
         this.driverProperties = driverProperties;
@@ -556,13 +555,13 @@ public class ChunkQuestionService {
 
 
     private List<RetrieverEngineParams> tenantEngines(long tenantId) {
-        Tenant tenant;
+        JsonNode engines;
         try {
-            tenant = tenantService.getTenantById(tenantId);
+            engines = tenantConfigLookup.retrieverEngines(tenantId);
         } catch (RuntimeException e) {
-            tenant = null;
+            engines = null;
         }
-        return EffectiveEngines.of(tenant == null ? null : tenant.getRetrieverEngines(), driverProperties.driver());
+        return EffectiveEngines.of(engines, driverProperties.driver());
     }
 
     /**

@@ -23,4 +23,14 @@ public interface TenantConfigLookup {
 
     /** 记忆配置（{@code tenants.memory_config}：embeddingModelId / extractModelId 等）。 */
     JsonNode memoryConfig(long tenantId);
+
+    /**
+     * 存储域只读视图（id + 默认后端 + 存储引擎配置）。租户不存在返回 {@code null}
+     * （与 {@code getTenantById} 的语义一致；调用方据此回 401/400）。
+     */
+    TenantStorageView storageView(long tenantId);
+
+    /** 存储域只读视图（三字段，够解析 provider 链）。 */
+    record TenantStorageView(long tenantId, String defaultStorageBackendId, JsonNode storageEngineConfig) {
+    }
 }

@@ -9,7 +9,6 @@ import java.util.Map;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.common.mybatis.PageRequests;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.auth.domain.Tenant;
@@ -18,6 +17,9 @@ import com.ragagent.common.storage.StorageBackendProvisioner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.common.tenant.TenantConfigLookup;
+import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
 
 /**
  * 租户 service。
@@ -27,7 +29,7 @@ import org.springframework.stereotype.Service;
  * 响应恒为包装格式 → 读取后归一化。
  */
 @Service
-public class TenantService implements com.ragagent.common.tenant.TenantConfigLookup {
+public class TenantService implements TenantConfigLookup {
 
     private static final Logger log = LoggerFactory.getLogger(TenantService.class);
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -60,21 +62,31 @@ public class TenantService implements com.ragagent.common.tenant.TenantConfigLoo
     // ── TenantConfigLookup（检索/模型域的只读端口实现，B95/C6+C7）─────────
 
     @Override
-    public com.fasterxml.jackson.databind.JsonNode retrieverEngines(long tenantId) {
+    public JsonNode retrieverEngines(long tenantId) {
         Tenant t = getTenantById(tenantId);
         return t == null ? null : t.getRetrieverEngines();
     }
 
     @Override
-    public com.fasterxml.jackson.databind.JsonNode retrievalConfig(long tenantId) {
+    public JsonNode retrievalConfig(long tenantId) {
         Tenant t = getTenantById(tenantId);
         return t == null ? null : t.getRetrievalConfig();
     }
 
     @Override
-    public com.fasterxml.jackson.databind.JsonNode memoryConfig(long tenantId) {
+    public JsonNode memoryConfig(long tenantId) {
         Tenant t = getTenantById(tenantId);
         return t == null ? null : t.getMemoryConfig();
+    }
+
+    @Override
+    public TenantStorageView storageView(long tenantId) {
+        Tenant t = getTenantById(tenantId);
+        if (t == null) {
+            return null;
+        }
+        return new TenantStorageView(
+                t.getId() == null ? tenantId : t.getId(), t.getDefaultStorageBackendId(), t.getStorageEngineConfig());
     }
 
     /** 批量按 id 查（map 形态，供 memberships 组装） */

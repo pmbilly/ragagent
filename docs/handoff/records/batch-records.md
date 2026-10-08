@@ -1069,3 +1069,16 @@
 - **效果**：`knowledge` + `storage` 对 `auth` 的 import **33 → 19**（余：`Tenant`×12、`TenantService`×7、`UserService`×1、`TenantMapper`×1 —— 全是租户查询面）。
 - **闸门**：后端 4,838/0 + `spotlessCheck` + 五守卫绿。
 - **下一步 B97**：用 B95 的 `TenantConfigLookup` 端口 + 少量视图扩展（如 `TenantRef(id,name,type)`）收掉那 19 处 ⇒ C4/C5 归零；随后 C2（43，`wiki→knowledge` 门面）。
+
+**✅ B97a（2026-10-08，C4/C5 收口：可转换子集）**
+- **端口扩展**：`common/tenant/TenantConfigLookup` 增
+  `TenantStorageView storageView(long)` —— 记录 `(tenantId, defaultStorageBackendId, storageEngineConfig)`；**租户不存在返回 null**（与 `getTenantById` 一致，调用方据此回 401/400），由 `TenantService` 实现。
+- **转换（零签名涟漪的两处）**：
+  · `knowledge/service/ChunkQuestionService.tenantEngines()`：原来是「取 Tenant → 读 `getRetrieverEngines()`」⇒ 直接换端口 `retrieverEngines(tenantId)`（保留原 try/catch 姿态）。
+  · `knowledge/service/KnowledgeBaseService`：① 存储 provider 解析读 `getStorageEngineConfig()` ② 默认后端校验读 `getDefaultStorageBackendId()` + 「租户缺失 → 400」⇒ 均换 `storageView`。
+- **效果**：`knowledge → auth` 的 import **10 → 6**；`storage → auth` 仍 **11**（属解析器链）。
+- **两条过程教训**：① `KnowledgeCodeConventionsTest`（禁内联全限定名）抓到一处 FQN 写法 ⇒ 一律 import；② **替换 FQN 时不要把自己的 import 行当目标**（本次把 `import com.fasterxml.jackson.databind.JsonNode;` 改成 `import JsonNode;` 直接编译失败；用"按行删除 + 补齐"修回）。
+- **余下 17 处（需策略决定，两条路）**：
+  · **路 A（端口化到底，方案原意）**：storage 解析器链 11 处 + `TenantFileStorage` ⇒ 把 `Tenant` 参数换成 `TenantStorageView`（涟漪：main ~10 + 测试 ~28 文件）；`FaqIndexWriter`/`TenantStorageService`（`TenantMapper`）与 `KnowledgeBaseService`（`UserService`）各补小端口。
+  · **路 B（把 `Tenant` 实体下沉 `common.tenant`）**：一次搬迁清零两条边（同 B94/B96 手法），但等于把"租户实体"的所有权从 `auth` 移到 `common`，改变模块语义 —— 需用户确认（方案 §2 只明确批准了 **tenantconfig** 下沉，未含实体）。
+- **闸门**：后端 4,838/0 + `spotlessCheck` + 五守卫绿。

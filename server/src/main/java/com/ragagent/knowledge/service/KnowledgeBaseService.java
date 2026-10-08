@@ -14,8 +14,7 @@ import java.util.List;
 import java.util.UUID;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.ragagent.auth.domain.Tenant;
-import com.ragagent.auth.service.TenantService;
+import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.auth.service.UserService;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.AppError;
@@ -63,7 +62,7 @@ public class KnowledgeBaseService
     private final ChunkMapper chunkMapper;
     private final UserKbPinMapper pinMapper;
     private final StorageBackendMapper storageBackendMapper;
-    private final TenantService tenantService;
+    private final TenantConfigLookup tenantConfigLookup;
     private final UserService userService;
     private final String retrieveDriver;
     private final RetrieveEngineRegistry retrieveEngineRegistry;
@@ -74,7 +73,7 @@ public class KnowledgeBaseService
                                 ChunkMapper chunkMapper,
                                 UserKbPinMapper pinMapper,
                                 StorageBackendMapper storageBackendMapper,
-                                TenantService tenantService,
+                                TenantConfigLookup tenantConfigLookup,
                                 UserService userService,
                                 RetrieveEngineRegistry retrieveEngineRegistry,
                                 TenantStoreOwnership storeOwnership,
@@ -84,7 +83,7 @@ public class KnowledgeBaseService
         this.chunkMapper = chunkMapper;
         this.pinMapper = pinMapper;
         this.storageBackendMapper = storageBackendMapper;
-        this.tenantService = tenantService;
+        this.tenantConfigLookup = tenantConfigLookup;
         this.userService = userService;
         this.retrieveEngineRegistry = retrieveEngineRegistry;
         this.storeOwnership = storeOwnership;
@@ -207,10 +206,10 @@ public class KnowledgeBaseService
             return;
         }
         String provider = "";
-        Tenant tenant = tenantService.getTenantById(tenantId());
-        if (tenant != null && tenant.getStorageEngineConfig() != null
-                && tenant.getStorageEngineConfig().path("default_provider").isTextual()) {
-            provider = tenant.getStorageEngineConfig().path("default_provider").asText().toLowerCase().trim();
+        var storageView = tenantConfigLookup.storageView(tenantId());
+        if (storageView != null && storageView.storageEngineConfig() != null
+                && storageView.storageEngineConfig().path("default_provider").isTextual()) {
+            provider = storageView.storageEngineConfig().path("default_provider").asText().toLowerCase().trim();
         }
         if (provider.isEmpty() || !isStorageAllowed(provider)) {
             provider = firstAllowedStorage();
@@ -252,14 +251,14 @@ public class KnowledgeBaseService
      * * 显式 id → 租户默认 → provider legacy alias；命中则写回 storageBackendId+provider。
      */
     private void applyAndValidateStorageBackend(KnowledgeBase kb) {
-        Tenant tenant = tenantService.getTenantById(tenantId());
-        if (tenant == null) {
+        var storageView = tenantConfigLookup.storageView(tenantId());
+        if (storageView == null) {
             throw new BizException(AppError.badRequest("workspace context missing"));
         }
         String id = kb.getStorageBackendId() == null ? "" : kb.getStorageBackendId().trim();
-        if (id.isEmpty() && tenant.getDefaultStorageBackendId() != null
-                && !tenant.getDefaultStorageBackendId().trim().isEmpty()) {
-            id = tenant.getDefaultStorageBackendId().trim();
+        if (id.isEmpty() && storageView.defaultStorageBackendId() != null
+                && !storageView.defaultStorageBackendId().trim().isEmpty()) {
+            id = storageView.defaultStorageBackendId().trim();
         }
         StorageBackend backend = null;
         if (!id.isEmpty()) {
