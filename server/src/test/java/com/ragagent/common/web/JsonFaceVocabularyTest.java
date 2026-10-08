@@ -9,7 +9,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import com.ragagent.auth.domain.APIPrincipalConfig;
+import com.ragagent.common.tenant.APIPrincipalConfig;
 import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.mcp.domain.McpAuthConfig;
 import com.ragagent.memory.domain.MemoryExtractionState;

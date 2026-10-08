@@ -50,7 +50,7 @@ final class QaRequestParser {
     KnowledgeQaController.ParsedRequest parseQARequest(String rawSessionId, CreateKnowledgeQARequest request,
             String resourceUrls, String logPrefix,
             AgentResolver agentResolver,
-            com.ragagent.auth.domain.Tenant readerTenant) {
+            com.ragagent.common.tenant.Tenant readerTenant) {
         QaRequestContext rc = new QaRequestContext();
 
         String sessionId = SessionStreamController.sanitizeForLog(rawSessionId);

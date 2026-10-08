@@ -11,7 +11,7 @@ import java.util.UUID;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.auth.domain.Tenant;
+import com.ragagent.common.tenant.Tenant;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.common.web.ZeroTimeSerializer;
 import com.ragagent.memory.MemoryContext;

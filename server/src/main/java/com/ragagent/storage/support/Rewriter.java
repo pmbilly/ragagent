@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ragagent.auth.domain.Tenant;
+import com.ragagent.common.tenant.Tenant;
 import com.ragagent.common.retrieval.SearchResult;
 
 /**

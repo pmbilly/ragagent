@@ -10,8 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.auth.domain.Tenant;
-import com.ragagent.auth.service.TenantService;
+import com.ragagent.common.tenant.Tenant;
+import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.storage.domain.StoredResource;
 import com.ragagent.storage.service.ResourceCatalogService;
@@ -45,7 +45,7 @@ public class FileProxyService {
     private static final Logger log = LoggerFactory.getLogger(FileProxyService.class);
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    private final TenantService tenantService;
+    private final TenantConfigLookup tenantConfigLookup;
     private final StorageFileResolver resolver;
     private final ResourceCatalogService catalog;
     private final FileContentService globalFileService;
@@ -54,12 +54,12 @@ public class FileProxyService {
     private final String localBaseDir;
     private final String absDir;
 
-    public FileProxyService(TenantService tenantService, StorageFileResolver resolver,
+    public FileProxyService(TenantConfigLookup tenantConfigLookup, StorageFileResolver resolver,
             ResourceCatalogService catalog,
             @org.springframework.beans.factory.annotation.Value(
                     "${weknora.storage.local-base-dir:${LOCAL_STORAGE_BASE_DIR:/data/files}}")
             String localBaseDir) {
-        this.tenantService = tenantService;
+        this.tenantConfigLookup = tenantConfigLookup;
         this.resolver = resolver;
         this.catalog = catalog;
         this.localBaseDir = localBaseDir;
@@ -111,7 +111,7 @@ public class FileProxyService {
                     "unauthorized: workspace context missing");
             return;
         }
-        Tenant tenant = tenantService.getTenantById(ctxTenantId);
+        Tenant tenant = tenantConfigLookup.tenantById(ctxTenantId);
         if (tenant == null) {
             writeErrorJson(response, HttpServletResponse.SC_UNAUTHORIZED,
                     "unauthorized: workspace context missing");
@@ -203,7 +203,7 @@ public class FileProxyService {
         }
         Tenant tenant;
         try {
-            tenant = tenantService.getTenantById(tenantId);
+            tenant = tenantConfigLookup.tenantById(tenantId);
         } catch (RuntimeException e) {
             plainStatus(response, HttpServletResponse.SC_NOT_FOUND);
             return;
@@ -297,7 +297,7 @@ public class FileProxyService {
         }
         Tenant tenant;
         try {
-            tenant = tenantService.getTenantById(resource.getTenantId());
+            tenant = tenantConfigLookup.tenantById(resource.getTenantId());
         } catch (RuntimeException e) {
             plainStatus(response, HttpServletResponse.SC_NOT_FOUND);
             return;
@@ -341,7 +341,7 @@ public class FileProxyService {
             FileAccess file, String tag) throws IOException {
         Tenant tenant;
         try {
-            tenant = tenantService.getTenantById(file.ownerTenantId());
+            tenant = tenantConfigLookup.tenantById(file.ownerTenantId());
         } catch (RuntimeException e) {
             plainStatus(response, HttpServletResponse.SC_NOT_FOUND);
             return;

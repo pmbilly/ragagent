@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ragagent.auth.domain.Tenant;
-import com.ragagent.auth.service.TenantService;
+import com.ragagent.common.tenant.Tenant;
+import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.storage.fileserve.FileProxyService;
 
@@ -44,11 +44,11 @@ import jakarta.servlet.http.HttpServletResponse;
 public class FileProxyController {
 
     private final FileProxyService proxy;
-    private final TenantService tenantService;
+    private final TenantConfigLookup tenantConfigLookup;
 
-    public FileProxyController(FileProxyService proxy, TenantService tenantService) {
+    public FileProxyController(FileProxyService proxy, TenantConfigLookup tenantConfigLookup) {
         this.proxy = proxy;
-        this.tenantService = tenantService;
+        this.tenantConfigLookup = tenantConfigLookup;
     }
 
     // ── GET /files（租户级存储代理）─────────────────────────────────────────
@@ -86,7 +86,7 @@ public class FileProxyController {
             FileProxyService.writeErrorJson(response, 401, "unauthorized: workspace context missing");
             return;
         }
-        Tenant tenant = tenantService.getTenantById(tenantId);
+        Tenant tenant = tenantConfigLookup.tenantById(tenantId);
         if (tenant == null) {
             FileProxyService.writeErrorJson(response, 401, "unauthorized: workspace context missing");
             return;

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.ragagent.auth.domain.Tenant;
+import com.ragagent.common.tenant.Tenant;
 import com.ragagent.auth.dto.TenantResponse;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.AppError;

@@ -8,8 +8,8 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
-import com.ragagent.auth.domain.Tenant;
-import com.ragagent.auth.service.TenantService;
+import com.ragagent.common.tenant.Tenant;
+import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.llm.chat.ImageResolver;
 import com.ragagent.storage.domain.StoredResource;
 import com.ragagent.storage.service.ResourceCatalogService;
@@ -52,14 +52,14 @@ public class ChatLocalImageResolverWiring implements InitializingBean, Disposabl
     private static final Logger log = LoggerFactory.getLogger(ChatLocalImageResolverWiring.class);
 
     private final ResourceCatalogService catalog;
-    private final TenantService tenantService;
+    private final TenantConfigLookup tenantConfigLookup;
     private final StorageFileResolver storageResolver;
 
     public ChatLocalImageResolverWiring(ResourceCatalogService catalog,
-                                        TenantService tenantService,
+                                        TenantConfigLookup tenantConfigLookup,
                                         StorageFileResolver storageResolver) {
         this.catalog = catalog;
-        this.tenantService = tenantService;
+        this.tenantConfigLookup = tenantConfigLookup;
         this.storageResolver = storageResolver;
     }
 
@@ -99,7 +99,7 @@ public class ChatLocalImageResolverWiring implements InitializingBean, Disposabl
             }
 
             // 租户查不到（不存在）→ 返回 null
-            Tenant tenant = tenantService.getTenantById(tenantId);
+            Tenant tenant = tenantConfigLookup.tenantById(tenantId);
             if (tenant == null) {
                 return null;
             }

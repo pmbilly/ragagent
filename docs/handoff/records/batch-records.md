@@ -1082,3 +1082,17 @@
   · **路 A（端口化到底，方案原意）**：storage 解析器链 11 处 + `TenantFileStorage` ⇒ 把 `Tenant` 参数换成 `TenantStorageView`（涟漪：main ~10 + 测试 ~28 文件）；`FaqIndexWriter`/`TenantStorageService`（`TenantMapper`）与 `KnowledgeBaseService`（`UserService`）各补小端口。
   · **路 B（把 `Tenant` 实体下沉 `common.tenant`）**：一次搬迁清零两条边（同 B94/B96 手法），但等于把"租户实体"的所有权从 `auth` 移到 `common`，改变模块语义 —— 需用户确认（方案 §2 只明确批准了 **tenantconfig** 下沉，未含实体）。
 - **闸门**：后端 4,838/0 + `spotlessCheck` + 五守卫绿。
+
+**✅ B97b（2026-10-08，C4/C5 归零：实体下沉 + 端口补全）**
+- **用户拍板走路 B**（实体下沉；路 A 是"端口化到底"，涟漪 ~38 文件、语义更"纯"）。理由：`tenants` 是平台级共享表，"auth 私有实体"不符实际；端口仍作为非 auth 域的读接口保留。
+- **搬移清单**：`auth/domain/Tenant` → `common/tenant/Tenant`；`auth/mapper/TenantMapper` → **`common/tenant/mapper/`**（关键：必须落 `**.mapper` 才被 `@MapperScan("com.ragagent.**.mapper")` 扫到）；`APIPrincipalConfig` + `APIPrincipalConfigTypeHandler` 随实体走（同包隐式依赖，首轮 4 个编译错误暴露）。全仓引用替换 90 文件。
+- **端口补全**：
+  · `TenantConfigLookup.tenantById(long)` —— 关键侦察结论：`getTenantById` **不是裸 `selectById`**（含 `deletedAt IS NULL` 过滤 + `normalizeRetrieverEngines`/`normalizeContextConfig` 归一）⇒ **不能**用 mapper 直查替代，必须走端口（否则静默丢软删过滤）。
+  · `common/security/UserNameLookup`（`UserService` 实现 `usernameOf`）取代 KB 创建者取名对 `UserService` 的依赖。
+- **6 站点换端口**：storage（`FileProxyService` 4 处调用、`FileProxyController`、`FileserveStorageBackendResolver`、`ChatLocalImageResolverWiring`）、knowledge（`TenantFileStorage`、`KnowledgeBaseService`）。
+- **结果**：`knowledge → auth` **17 → 0**、`storage → auth` **16 → 0** ⇒ **C4/C5 完成**；环 0（仍 DAG）、L2→L3 5。
+- **过程教训**：
+  ① **`git checkout` 回退测试文件会连带撤掉之前的包路径更新**（编译期才暴露）⇒ 回退后要么重放路径替换、要么按文件精确编辑。
+  ② 测试桩方法名要随端口方法改，且 **`verify(x).m(...)` 与 `when(x.m(...))` 是两种形态**（首轮正则只覆盖了后者，漏了 `verify` 形态）。
+- **闸门**：后端 4,838/0 + `spotlessCheck` + 五守卫绿。
+- **下一步 C2**（`wiki → knowledge`，43 处）：引入 `KnowledgeBaseLookup` 只读门面（暴露 `id/name/type` 视图），wiki 只依赖端口 —— 阶段 4 最大工程。

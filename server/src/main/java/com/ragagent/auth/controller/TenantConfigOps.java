@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.security.APIKeyCapability;
 import com.ragagent.common.security.APIKeyScopeContext;
 import com.ragagent.common.security.TenantAPIKeyScope;
-import com.ragagent.auth.domain.Tenant;
+import com.ragagent.common.tenant.Tenant;
 import com.ragagent.common.tenant.ChatHistoryConfig;
 import com.ragagent.common.tenant.ParserEngineConfig;
 import com.ragagent.common.tenant.RetrievalConfig;

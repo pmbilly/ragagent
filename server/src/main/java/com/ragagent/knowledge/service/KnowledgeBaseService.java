@@ -15,7 +15,7 @@ import java.util.UUID;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.common.tenant.TenantConfigLookup;
-import com.ragagent.auth.service.UserService;
+import com.ragagent.common.security.UserNameLookup;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
@@ -63,7 +63,7 @@ public class KnowledgeBaseService
     private final UserKbPinMapper pinMapper;
     private final StorageBackendMapper storageBackendMapper;
     private final TenantConfigLookup tenantConfigLookup;
-    private final UserService userService;
+    private final UserNameLookup userNameLookup;
     private final String retrieveDriver;
     private final RetrieveEngineRegistry retrieveEngineRegistry;
     private final TenantStoreOwnership storeOwnership;
@@ -74,7 +74,7 @@ public class KnowledgeBaseService
                                 UserKbPinMapper pinMapper,
                                 StorageBackendMapper storageBackendMapper,
                                 TenantConfigLookup tenantConfigLookup,
-                                UserService userService,
+                                UserNameLookup userNameLookup,
                                 RetrieveEngineRegistry retrieveEngineRegistry,
                                 TenantStoreOwnership storeOwnership,
                                 RetrievalDriverProperties driverProperties) {
@@ -84,7 +84,7 @@ public class KnowledgeBaseService
         this.pinMapper = pinMapper;
         this.storageBackendMapper = storageBackendMapper;
         this.tenantConfigLookup = tenantConfigLookup;
-        this.userService = userService;
+        this.userNameLookup = userNameLookup;
         this.retrieveEngineRegistry = retrieveEngineRegistry;
         this.storeOwnership = storeOwnership;
         String env = driverProperties.driver();
@@ -453,9 +453,9 @@ public class KnowledgeBaseService
                 }
             }
             if (!kb.getCreatorId().isEmpty()) {
-                var user = userService.getUserById(kb.getCreatorId());
-                if (user != null) {
-                    kb.setCreatorName(user.getUsername());
+                String creatorName = userNameLookup.usernameOf(kb.getCreatorId());
+                if (creatorName != null) {
+                    kb.setCreatorName(creatorName);
                 }
             }
             out.add(kb);

@@ -2,7 +2,7 @@ package com.ragagent.auth.service;
 
 import java.util.List;
 
-import com.ragagent.auth.domain.Tenant;
+import com.ragagent.common.tenant.Tenant;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.dto.Membership;
 

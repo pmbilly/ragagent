@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import com.ragagent.auth.domain.Tenant;
+import com.ragagent.common.tenant.Tenant;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.common.tenant.TenantRole;
 import com.ragagent.auth.domain.User;

@@ -17,8 +17,8 @@ import java.util.UUID;
 
 import com.ragagent.TestSchema;
 import com.ragagent.audit.service.AuditLogService;
-import com.ragagent.auth.domain.Tenant;
-import com.ragagent.auth.mapper.TenantMapper;
+import com.ragagent.common.tenant.Tenant;
+import com.ragagent.common.tenant.mapper.TenantMapper;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.datasource.Connector;
 import com.ragagent.datasource.ConnectorException;

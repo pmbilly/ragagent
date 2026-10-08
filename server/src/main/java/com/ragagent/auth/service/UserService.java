@@ -8,7 +8,7 @@ import java.util.UUID;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.auth.domain.AuthToken;
-import com.ragagent.auth.domain.Tenant;
+import com.ragagent.common.tenant.Tenant;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.common.tenant.TenantRole;
 import com.ragagent.auth.domain.User;
@@ -39,7 +39,7 @@ import org.springframework.stereotype.Service;
  * bcrypt：BCryptPasswordEncoder 默认 cost=10。
  */
 @Service
-public class UserService {
+public class UserService implements com.ragagent.common.security.UserNameLookup {
 
     static final Logger log = LoggerFactory.getLogger(UserService.class);
     private static final String TOKEN_TYPE_ACCESS = "access_token";
@@ -741,5 +741,16 @@ public class UserService {
     private static boolean isUnicodeWhitespace(char c) {
         // 空白全集：'\t' '\n' '\v' '\f' '\r' ' ' U+0085 U+00A0 + 其他 Unicode 空白
         return Character.isWhitespace(c) || Character.isSpaceChar(c) || c == '\u0085' || c == '\u00A0';
+    }
+
+    // ── UserNameLookup（B97b：非 auth 域经端口取名，不再依赖本类）─────
+
+    @Override
+    public String usernameOf(String userId) {
+        if (userId == null || userId.isEmpty()) {
+            return null;
+        }
+        var user = getUserById(userId);
+        return user == null ? null : user.getUsername();
     }
 }

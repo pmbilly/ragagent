@@ -11,8 +11,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.common.mybatis.PageRequests;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.auth.domain.Tenant;
-import com.ragagent.auth.mapper.TenantMapper;
+import com.ragagent.common.tenant.Tenant;
+import com.ragagent.common.tenant.mapper.TenantMapper;
 import com.ragagent.common.storage.StorageBackendProvisioner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,6 +77,11 @@ public class TenantService implements TenantConfigLookup {
     public JsonNode memoryConfig(long tenantId) {
         Tenant t = getTenantById(tenantId);
         return t == null ? null : t.getMemoryConfig();
+    }
+
+    @Override
+    public Tenant tenantById(long tenantId) {
+        return getTenantById(tenantId);
     }
 
     @Override

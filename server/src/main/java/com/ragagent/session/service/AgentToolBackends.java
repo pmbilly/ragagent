@@ -362,7 +362,7 @@ public class AgentToolBackends {
             return null;
         }
         try {
-            com.ragagent.auth.domain.Tenant tenant = tenantService.getTenantById(tid);
+            com.ragagent.common.tenant.Tenant tenant = tenantService.getTenantById(tid);
             if (tenant == null || tenant.getWebSearchConfig() == null
                     || tenant.getWebSearchConfig().isNull()) {
                 return null;

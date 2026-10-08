@@ -238,7 +238,7 @@ public class KnowledgeQaController {
      * 现在按 TenantContext 的 id 取实体，与 {@code SystemController} /
      * {@code HybridSearchService} 同一写法。
      */
-    private com.ragagent.auth.domain.Tenant currentTenant() {
+    private com.ragagent.common.tenant.Tenant currentTenant() {
         Long tid = com.ragagent.common.context.TenantContext.currentTenantId();
         try {
             return tid == null || tid <= 0 || tenantService == null

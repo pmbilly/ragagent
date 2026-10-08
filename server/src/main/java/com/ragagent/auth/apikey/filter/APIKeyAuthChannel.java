@@ -8,7 +8,7 @@ import com.ragagent.auth.apikey.domain.TenantAPIKey;
 import com.ragagent.common.security.TenantAPIKeyScope;
 import com.ragagent.auth.apikey.mapper.TenantAPIKeyNotFoundException;
 import com.ragagent.auth.apikey.service.TenantAPIKeyService;
-import com.ragagent.auth.domain.Tenant;
+import com.ragagent.common.tenant.Tenant;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.common.context.TenantContext;
 import jakarta.servlet.http.HttpServletRequest;
@@ -195,14 +195,14 @@ public class APIKeyAuthChannel {
             String error) {}
 
     private ApiPrincipalResolutionOut resolveApiPrincipal(long tenantId,
-            com.ragagent.auth.domain.APIPrincipalConfig cfg, HttpServletRequest request) {
+            com.ragagent.common.tenant.APIPrincipalConfig cfg, HttpServletRequest request) {
         // fallback = api_tenant/<tenantId>；cfg 缺失/mode 空/tenant 模式 → 回落
         if (cfg == null || cfg.mode == null || cfg.mode.isEmpty()
-                || com.ragagent.auth.domain.APIPrincipalConfig.MODE_TENANT.equals(cfg.mode)) {
+                || com.ragagent.common.tenant.APIPrincipalConfig.MODE_TENANT.equals(cfg.mode)) {
             return fallbackTenant(tenantId);
         }
         switch (cfg.mode) {
-            case com.ragagent.auth.domain.APIPrincipalConfig.MODE_DIRECT_HEADER -> {
+            case com.ragagent.common.tenant.APIPrincipalConfig.MODE_DIRECT_HEADER -> {
                 // 用常量头名 X-External-User-ID（刻意不读 cfg.directHeaderName）
                 String externalUserId = trimToEmpty(
                         request.getHeader(EXTERNAL_USER_ID_HEADER));
@@ -220,7 +220,7 @@ public class APIKeyAuthChannel {
                 return new ApiPrincipalResolutionOut(TenantContext.PrincipalTypes.API_EXTERNAL_USER,
                         tenantId + ":" + externalUserId, null);
             }
-            case com.ragagent.auth.domain.APIPrincipalConfig.MODE_SIGNED_TOKEN -> {
+            case com.ragagent.common.tenant.APIPrincipalConfig.MODE_SIGNED_TOKEN -> {
                 String token = trimToEmpty(request.getHeader(EXTERNAL_USER_TOKEN_HEADER));
                 String sub = verifyExternalUserJwt(token, tenantId,
                         cfg.hmacSecret == null ? "" : cfg.hmacSecret);

@@ -84,7 +84,7 @@ class FullTableWriteGuardTest {
     @DisplayName("FULL_TABLE_ALLOWED 登记过的具名全表写放行")
     void allowsRegisteredFullTableStatements() {
         assertThatCode(() -> update(ms(
-                "com.ragagent.auth.mapper.TenantMapper.applyDefaultStorageQuota",
+                "com.ragagent.common.tenant.mapper.TenantMapper.applyDefaultStorageQuota",
                 SqlCommandType.UPDATE, "UPDATE tenants SET storage_quota = ?")))
                 .doesNotThrowAnyException();
         // 未登记的同类语句仍被拦——放行以语句 id 为界，不外溢

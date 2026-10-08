@@ -70,8 +70,8 @@ ArchUnit 1.3.0 **已是测试依赖**（`server/build.gradle.kts:111`），可�
 |---|---|---|---|---|
 | C2 | `wiki → knowledge` | **43** | `wiki/controller/WikiPageController → mapper.KnowledgeBaseMapper`、`WikiKbAccessGuard → domain.KnowledgeBase` | 引入 `knowledge` 的只读门面（`KnowledgeBaseLookup` 端口，暴露 `id/name/type` 视图），wiki 只依赖端口 —— **本条是最大工程**，也是模块化的关键收益点 |
 | C3 | `knowledge → retrieval` | **47** | `KnowledgeBaseController → HybridSearchService`、`ImageInfoEnricher → retrieval.domain.ImageInfo` | 方向本身合法（业务域 → 能力层）；环来自 `retrieval → auth`（C6）⇒ 修 C6 即断环，本边**保持**（模块图中体现为 `domain-* → engine`） |
-| C4 | `knowledge → auth` | 17 | `knowledge/security/KnowledgeRouteGuards → apikey.domain.TenantAPIKeyScope` | 把「API key scope / 路由守卫」下沉为共享端口（`common.security` 下只读接口 + auth 实现） |
-| C5 | `storage → auth` | 16 | `storage/provider/FileServiceFactory → domain.tenantconfig.StorageEngineConfig` | 租户配置（`tenantconfig`）是**跨域共享配置 jsonb**：下沉到 `common.tenant`（与 `TenantProperties` 同址），auth 只负责读写端点 |
+| ✅ C4 | `knowledge → auth` | 17 | `knowledge/security/KnowledgeRouteGuards → apikey.domain.TenantAPIKeyScope` | 把「API key scope / 路由守卫」下沉为共享端口（`common.security` 下只读接口 + auth 实现） |
+| ✅ C5 | `storage → auth` | 16 | `storage/provider/FileServiceFactory → domain.tenantconfig.StorageEngineConfig` | 租户配置（`tenantconfig`）是**跨域共享配置 jsonb**：下沉到 `common.tenant`（与 `TenantProperties` 同址），auth 只负责读写端点 |
 | ✅ C6 | `retrieval → auth` | 3 | `retrieval/HybridSearchService → domain.Tenant` | 改为参数/端口传入（租户 ID 与隔离策略由调用方给）⇒ 断 `knowledge → retrieval → auth` 链 |
 | ✅ C7 | `model → auth` | 1 | `model/service/ModelService → service.TenantService` | 同上端口化（租户查询） |
 | ✅ C8 | `audit → wiki` | 1 | `audit/service/WikiActivityAuditRecorder → domain.WikiActivityAudit` | **已完成（B94）**：**搬端口而非搬实现**——接口移到 `common.audit`（实现仍在 audit，`wiki`/`audit` 同时只依赖中性包）⇒ `audit` 成为纯叶子，且 SCC-A 整体消失 |

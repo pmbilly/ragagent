@@ -29,7 +29,7 @@ public class FullTableWriteGuard implements InnerInterceptor {
 
     /** 登记过的全表写语句（语句 id → 业务理由）。新增须 PR 论证。 */
     private static final java.util.Map<String, String> FULL_TABLE_ALLOWED = java.util.Map.of(
-            "com.ragagent.auth.mapper.TenantMapper.applyDefaultStorageQuota",
+            "com.ragagent.common.tenant.mapper.TenantMapper.applyDefaultStorageQuota",
             "默认存储配额统一应用到全部租户（管理员运维操作）");
 
     @Override

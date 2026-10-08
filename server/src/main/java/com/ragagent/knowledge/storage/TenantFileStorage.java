@@ -7,8 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import com.ragagent.auth.domain.Tenant;
-import com.ragagent.auth.service.TenantService;
+import com.ragagent.common.tenant.Tenant;
+import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.storage.fileserve.StorageFileResolver;
@@ -45,17 +45,17 @@ public class TenantFileStorage {
 
     private final LocalStorageService local;
     private final StorageFileResolver resolver;
-    private final TenantService tenantService;
+    private final TenantConfigLookup tenantConfigLookup;
     private final String localBaseDir;
 
     public TenantFileStorage(LocalStorageService local,
                              StorageFileResolver resolver,
-                             TenantService tenantService,
+                             TenantConfigLookup tenantConfigLookup,
                              @Value("${weknora.storage.local-base-dir:${LOCAL_STORAGE_BASE_DIR:/data/files}}")
                                      String localBaseDir) {
         this.local = local;
         this.resolver = resolver;
-        this.tenantService = tenantService;
+        this.tenantConfigLookup = tenantConfigLookup;
         this.localBaseDir = localBaseDir;
     }
 
@@ -227,7 +227,7 @@ public class TenantFileStorage {
      * 后者不能静默退回本地。</p>
      */
     private StorageFileResolver.ProviderResolution resolveProvider(long tenantId, String provider) {
-        Tenant tenant = tenantId <= 0 ? null : tenantService.getTenantById(tenantId);
+        Tenant tenant = tenantId <= 0 ? null : tenantConfigLookup.tenantById(tenantId);
         if (tenant == null) {
             return new StorageFileResolver.ProviderResolution(null, "", null);
         }

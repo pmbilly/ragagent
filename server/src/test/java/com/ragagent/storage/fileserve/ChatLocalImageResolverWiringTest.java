@@ -19,7 +19,7 @@ import java.util.Base64;
 import java.util.Optional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.auth.domain.Tenant;
+import com.ragagent.common.tenant.Tenant;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.storage.domain.StorageBackend;
 import com.ragagent.llm.chat.ImageResolver;
@@ -83,7 +83,7 @@ class ChatLocalImageResolverWiringTest {
 
         Tenant tenant = new Tenant();
         tenant.setId(42L);
-        when(tenantService.getTenantById(42L)).thenReturn(tenant);
+        when(tenantService.tenantById(42L)).thenReturn(tenant);
 
         FileContentService fileSvc = mock(FileContentService.class);
         when(fileSvc.getFile("local://kb-assets/img.png"))
@@ -92,7 +92,7 @@ class ChatLocalImageResolverWiringTest {
                 .thenReturn(new StorageFileResolver.Resolution(fileSvc, "local", null));
 
         assertThat(wiring.resolve(url)).isEqualTo(PNG_BYTES);
-        verify(tenantService).getTenantById(42L);
+        verify(tenantService).tenantById(42L);
     }
 
     /** resource:// 解析失败（缺行/非法引用）→ null，且后续步骤一步都不走。 */
@@ -116,7 +116,7 @@ class ChatLocalImageResolverWiringTest {
         resource.setStorageBackendId("");
         when(catalog.resolvePath(url)).thenReturn(
                 new ResourceCatalogService.ResolvedPath("local://kb-assets/img.png", resource, false));
-        when(tenantService.getTenantById(42L)).thenReturn(null);
+        when(tenantService.tenantById(42L)).thenReturn(null);
 
         assertThat(wiring.resolve(url)).isNull();
         verify(storageResolver, never()).resolveFileService(any(), anyString(), anyString(), anyString());
@@ -145,7 +145,7 @@ class ChatLocalImageResolverWiringTest {
                 new ResourceCatalogService.ResolvedPath("local://kb-assets/img.png", resource, false));
         Tenant tenant = new Tenant();
         tenant.setId(42L);
-        when(tenantService.getTenantById(42L)).thenReturn(tenant);
+        when(tenantService.tenantById(42L)).thenReturn(tenant);
         when(storageResolver.resolveFileService(eq(tenant), eq(""), eq("local"), anyString()))
                 .thenReturn(new StorageFileResolver.Resolution(null, "", "storage backend not found"));
 
@@ -161,7 +161,7 @@ class ChatLocalImageResolverWiringTest {
         when(catalog.resolvePath(url)).thenReturn(new ResourceCatalogService.ResolvedPath(url, null, false));
         Tenant tenant = new Tenant();
         tenant.setId(7L);
-        when(tenantService.getTenantById(7L)).thenReturn(tenant);
+        when(tenantService.tenantById(7L)).thenReturn(tenant);
 
         FileContentService fileSvc = mock(FileContentService.class);
         when(fileSvc.getFile(url)).thenReturn(FileTransport.OpenedFile.ofSeekable(img, PNG_BYTES.length));
@@ -182,7 +182,7 @@ class ChatLocalImageResolverWiringTest {
         when(catalog.resolvePath(url)).thenReturn(new ResourceCatalogService.ResolvedPath(url, resource, false));
         Tenant tenant = new Tenant();
         tenant.setId(7L);
-        when(tenantService.getTenantById(7L)).thenReturn(tenant);
+        when(tenantService.tenantById(7L)).thenReturn(tenant);
 
         FileContentService fileSvc = mock(FileContentService.class);
         when(fileSvc.getFile(url)).thenReturn(FileTransport.OpenedFile.ofBytes(PNG_BYTES));
@@ -206,7 +206,7 @@ class ChatLocalImageResolverWiringTest {
         Tenant tenant = new Tenant();
         tenant.setId(7L);
         TenantService tenants = mock(TenantService.class);
-        when(tenants.getTenantById(7L)).thenReturn(tenant);
+        when(tenants.tenantById(7L)).thenReturn(tenant);
 
         StorageBackendRepository backendRepo = mock(StorageBackendRepository.class);
         when(backendRepo.tenantDefaultBackendId(7L)).thenReturn(null);
@@ -244,7 +244,7 @@ class ChatLocalImageResolverWiringTest {
         Tenant tenant = new Tenant();
         tenant.setId(7L);
         TenantService tenants = mock(TenantService.class);
-        when(tenants.getTenantById(7L)).thenReturn(tenant);
+        when(tenants.tenantById(7L)).thenReturn(tenant);
 
         StorageBackendRepository backendRepo = mock(StorageBackendRepository.class);
         when(backendRepo.tenantDefaultBackendId(7L)).thenReturn(null);
