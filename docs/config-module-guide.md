@@ -122,8 +122,8 @@ graph LR
 | 该进 | 不该进 |
 |---|---|
 | Bean 定义与跨域接线（`@Configuration`） | 业务规则 / 用例编排（→ 各域 `service/`） |
-| 启动期快照安装（**`install*` 只许装配层调用**——ArchUnit R4 红条） | 运行期可变的值（那是状态，另行设计——`RuntimeSnapshotWiring` javadoc 原文） |
-| 横切属性绑定类（如 `StreamProperties`） | 域内业务属性类（放各域；**必须**被 `RagAgentApplication` 的 `@ConfigurationPropertiesScan` 名单覆盖——R2，漏 = 静默取默认值） |
+| 启动期快照安装（**`install*` 只许装配层调用**——ArchUnit A4 红条） | 运行期可变的值（那是状态，另行设计——`RuntimeSnapshotWiring` javadoc 原文） |
+| 横切属性绑定类（如 `StreamProperties`） | 域内业务属性类（放各域；**必须**被 `RagAgentApplication` 的 `@ConfigurationPropertiesScan` 名单覆盖——A2，漏 = 静默取默认值） |
 | 生命周期钩子（`ApplicationReadyEvent` 启动恢复） | 可复用工具 / 查找面（→ `common`；B33 教训，见 §7 坑 3） |
 | 领域零件的注册（引擎 / IM 工厂 / MyBatis 插件） | HTTP 端点、实体、mapper（装配层没有这些） |
 
@@ -198,7 +198,7 @@ sequenceDiagram
 | 给新端点加角色门 | `WebConfig.addInterceptors` 里 `rbac.addRule`（域规则）或 `addSystemAdminRule`（平台级） | 静态段先于通配登记；拦截器 pattern 清单要覆盖该前缀；API-Key 需可达时去 `auth/apikey/filter/APIKeyRoutePolicies` 同批登记（不登记 = default deny） |
 | 新增一个 IM 渠道 | `im/` 落 adapter + `ImAdapterWiringConfig` 构造器 `registerAdapterFactory` 一行 | 未注册平台 `startChannel` 只打 WARN、渠道不启动——绝不静默假装成功（javadoc 原文） |
 | 接一家新检索引擎店（env-path） | `RetrievalEngineWiringConfig`：`envXxx` 私有方法 + `registerEnvStores` switch 分支 | 与 retrieval 域五处同批（retrieval 手册 §5"接一家新引擎店"行）；地址构造期过 SSRF 校验；失败只记 error 不炸装配 |
-| 加一个 `@ConfigurationProperties` 属性类 | record + `@ConfigurationProperties`（横切断面放本包，域内放各域） | **核对 `RagAgentApplication` 的 `@ConfigurationPropertiesScan` 名单**（漏扫描 = 静默取默认值，ArchUnit R2） |
+| 加一个 `@ConfigurationProperties` 属性类 | record + `@ConfigurationProperties`（横切断面放本包，域内放各域） | **核对 `RagAgentApplication` 的 `@ConfigurationPropertiesScan` 名单**（漏扫描 = 静默取默认值，ArchUnit A2） |
 | 改模型并发上限/后端 | `ModelConcurrencyGovernorWiring`（缺省 32）+ system 设置键 `model.max_concurrency` + `llm.limiter.redis-enabled` | 两种失败语义相反：Redis 连不上=**启动失败**；设置面不可用=**不装配放行**+WARN。别"顺手统一" |
 | 改 MyBatis 插件 / 租户探测档位 | `MybatisPlusConfig` | 插件链顺序按 MP 官方建议：改写 SQL 的（分页）在前、防护殿后；档位 env `weknora.persistence.tenant-filter-guard` 现默认 **enforce**（B71 已切档，别按旧文档写 alert） |
 | 加启动期快照值 | 对应 `*Properties` + `RuntimeSnapshotWiring` 构造器加一行 install | 只限部署期确定值；要运行期改的那是状态，别在这加写入口（javadoc 原文） |
@@ -223,9 +223,9 @@ python3 scripts/check-package-cycles.py   # 依赖 config 的包必须保持 =1�
 
 **A. 加 RBAC 规则**：`WebConfig.addRule`（对照 §7 坑 4 的顺序三连）→ 若 API-Key 需可达，`APIKeyRoutePolicies` 同批 → 跑对应域的契约测试（403 场景 fixture）→ 全绿 → 提交。本包自身没有 `WebConfig` 测试，域 golden 就是它的测试。
 
-**B. 加装配类 / wiring**：新 `@Configuration`（R3：不得再挂 `@Component/@Service` 双注解）→ `install*` 调用只许写在这里（R4 红条）→ 需要测试就用 `registerEnvStores` 的先例：**抽 static 包内可见方法、传参不读进程环境** → `com.ragagent.config.*` 单测绿 → 提交。
+**B. 加装配类 / wiring**：新 `@Configuration`（A3：不得再挂 `@Component/@Service` 双注解）→ `install*` 调用只许写在这里（A4 红条）→ 需要测试就用 `registerEnvStores` 的先例：**抽 static 包内可见方法、传参不读进程环境** → `com.ragagent.config.*` 单测绿 → 提交。
 
-**C. 加属性类**：record + `@ConfigurationProperties` → `@ConfigurationPropertiesScan` 名单确认（R2）→ `application.yml` 里登记键与缺省值 → 属性语义测试（`AppEnvLookupWiringTest` 是范本：原样键命中 + 属性风格回落 + 未配置为 null）→ 全绿 → 提交。
+**C. 加属性类**：record + `@ConfigurationProperties` → `@ConfigurationPropertiesScan` 名单确认（A2）→ `application.yml` 里登记键与缺省值 → 属性语义测试（`AppEnvLookupWiringTest` 是范本：原样键命中 + 属性风格回落 + 未配置为 null）→ 全绿 → 提交。
 
 **D. 改启动时序相关**：先画清楚"我的安装点必须在谁之前"（§4.3）——早了拿不到配置数据、晚了静默读不到值（两种错都不报错）→ 对应单测（`StartupTaskRecoveryTest` 直传 `distributed` 绕开进程环境的写法可照抄）→ 全绿 → 提交。
 
@@ -237,7 +237,7 @@ python3 scripts/check-package-cycles.py   # 依赖 config 的包必须保持 =1�
 2. **`AppEnvLookupEnvironmentPostProcessor` 必须走 `META-INF/spring.factories`**：Spring Boot 3.3 的 EPP 仍由它装载；写进 `.imports` 会被**静默忽略**（不报错、不执行、读点回落"未配置"）——出处：`server/src/main/resources/META-INF/spring.factories` 注释（实测结论原文）。
 3. **历史教训：什么不该留在这里**——① `AppEnvLookup` 曾放本包、被 11 个包引用，守卫红灯（环 5 组），B33（2026-10-02）下沉 `common/deployment` 回基线；② `TenantProperties` 曾造成 `common ⇄ config` 包环，归位 `common/tenant` 后消解（backend-package-map §P0）。结论：本包只留**装配**，可复用值/工具一律下沉 common。
 4. **RBAC 顺序三连**（`WebConfig` 注册处注释 + auth 手册 §7 第 7 条）：① `APIKeyGateInterceptor`（order=-1）必须先于 `RbacInterceptor`——能力判定先于角色判定，且 RBAC 对 API-Key 主体短路；② 静态段规则先于 `/{id}` 通配登记（AntPathMatcher 取**首个**命中，顺序错 = 规则被通配遮蔽）；③ 拦截器 pattern 清单与规则成对维护——W5a 漂移实录：chunks/faq 等 6 个前缀的 addRule 早已存在，但拦截器 pattern 没覆盖 → 规则空转。
-5. **ArchUnit 四条代码级红线**（B10，`com.ragagent.arch.ArchitectureRulesTest`）：R1 禁裸 `System.getenv`；R2 属性类必须被扫描名单覆盖；R3 配置类不得双注解（双装配）；R4 `install*` 只许 `*.config` 装配层调用。本包是 R4 唯一合法调用地。
+5. **ArchUnit 四条代码级红线**（B10，`com.ragagent.arch.ArchitectureRulesTest`）：A1 禁裸 `System.getenv`；A2 属性类必须被扫描名单覆盖；A3 配置类不得双注解（双装配）；A4 `install*` 只许 `*.config` 装配层调用。本包是 A4 唯一合法调用地。
 6. **`ImAdapterWiringConfig` 在构造器注册工厂、不是 `@Bean` 方法**：工厂是 `@Component`，若由本类定义 `@Bean` 会触发"配置类构造器依赖自己 bean"的 `BeanCurrentlyInCreation`——出处：该类 javadoc 原文。
 7. **`ModelConcurrencyGovernorWiring` 的两种失败语义相反**：`llm.limiter.redis-enabled=true` 但 Redis 连不上 → **启动失败**（不静默退化，与 im/wiki 开关同口径）；设置面不可用 → **闸门不装配（全部放行）** + WARN（不阻断启动）——出处：该类 javadoc。改错误处理前先读懂这组对照。
 8. **`StartupTaskRecovery` 是直写 SQL 的启动钩子**：`JdbcTemplate` 不经 MyBatis 拦截器链（全表写防护/租户探测对它不生效），列名硬编码（`knowledges`/`sync_logs`/`task_pending_ops`）；分布式模式**刻意**不复位知识/摘要行（持久化队列里分不清孤儿与积压）。出处：类 javadoc 全文。knowledge 域改列名/状态枚举时 grep 这里。
@@ -273,7 +273,7 @@ python3 scripts/check-package-cycles.py   # 依赖 config 的包必须保持 =1�
 | `StartupTaskRecovery` 三段 SQL 硬编码列名且绕过 MyBatis 防护链 | 耦合 | knowledge 域动 `parse_status` 族列或 `sync_logs` 时 grep 这里；评审按裸 SQL 标准看 |
 | 整功能裁撤必碰本包（B62 实录：`WebConfig` 删 2 条 RBAC + pathPatterns、`APIKeyRoutePolicies` 删 2 条） | 流程 | 裁撤域时本包登记面与域代码**同批**清，别留空转规则 |
 | "保持扁平"判定已登记（backend-package-map §P1；判定时 9 文件 → 现 13） | 已决策 | 别为扁平而扁平；新装配件继续放根，出现天然族再议 |
-| 本包裸 `System.getenv` = 0（B6 十批收口后的状态） | 防回流 | 新读点走 `@ConfigurationProperties` / 查找面（R1 红条在）；别把裸 getenv 写回来 |
+| 本包裸 `System.getenv` = 0（B6 十批收口后的状态） | 防回流 | 新读点走 `@ConfigurationProperties` / 查找面（A1 红条在）；别把裸 getenv 写回来 |
 
 ---
 
@@ -290,4 +290,4 @@ python3 scripts/check-package-cycles.py   # 依赖 config 的包必须保持 =1�
 | MyBatis 防护链怎么排 | `MybatisPlusConfig`（分页 → 全表写防护 → 租户探测末位） |
 | 启动期快照（AES/SSRF/上传限额/存储） | `RuntimeSnapshotWiring` 构造器（§4.3 时序） |
 | 谁 import 了我 | 只有 `stream/StreamManagerConfig` → `StreamProperties`；守卫 `python3 scripts/check-package-cycles.py` |
-| 本包的行为被谁钉住 | `server/src/test/java/com/ragagent/config/`（6 类 35 用例）+ `com.ragagent.arch.ArchitectureRulesTest`（R1–R4） |
+| 本包的行为被谁钉住 | `server/src/test/java/com/ragagent/config/`（6 类 35 用例）+ `com.ragagent.arch.ArchitectureRulesTest`（A1–A4） |

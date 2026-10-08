@@ -1,14 +1,14 @@
-package com.ragagent.embed.controller;
+package com.ragagent.embedchannel.controller;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.ragagent.common.security.LogSanitizer;
-import com.ragagent.embed.EmbedTokens;
-import com.ragagent.embed.EmbedError;
-import com.ragagent.embed.domain.EmbedChannelEntity;
-import com.ragagent.embed.service.EmbedChannelService;
+import com.ragagent.embedchannel.EmbedTokens;
+import com.ragagent.embedchannel.EmbedError;
+import com.ragagent.embedchannel.domain.EmbedChannelEntity;
+import com.ragagent.embedchannel.service.EmbedChannelService;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.session.domain.Session;
 import com.ragagent.session.domain.SessionOwnerIds;

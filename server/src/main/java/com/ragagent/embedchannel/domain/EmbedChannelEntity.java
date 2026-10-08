@@ -1,4 +1,4 @@
-package com.ragagent.embed.domain;
+package com.ragagent.embedchannel.domain;
 
 import java.time.OffsetDateTime;
 

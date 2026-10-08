@@ -1,4 +1,4 @@
-package com.ragagent.embed.filter;
+package com.ragagent.embedchannel.filter;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -9,11 +9,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.common.context.TenantContext;
-import com.ragagent.embed.EmbedError;
-import com.ragagent.embed.EmbedRateLimiter;
-import com.ragagent.embed.EmbedTokens;
-import com.ragagent.embed.domain.EmbedChannelEntity;
-import com.ragagent.embed.service.EmbedChannelService;
+import com.ragagent.embedchannel.EmbedError;
+import com.ragagent.embedchannel.EmbedRateLimiter;
+import com.ragagent.embedchannel.EmbedTokens;
+import com.ragagent.embedchannel.domain.EmbedChannelEntity;
+import com.ragagent.embedchannel.service.EmbedChannelService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

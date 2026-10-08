@@ -1,4 +1,4 @@
-package com.ragagent.embed.service;
+package com.ragagent.embedchannel.service;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -16,10 +16,10 @@ import com.ragagent.agent.management.mapper.CustomAgentMapper;
 import com.ragagent.agent.management.service.CustomAgentService;
 import com.ragagent.agent.management.domain.CustomAgentEntity;
 import com.ragagent.common.context.TenantContext;
-import com.ragagent.embed.EmbedError;
-import com.ragagent.embed.EmbedTokens;
-import com.ragagent.embed.domain.EmbedChannelEntity;
-import com.ragagent.embed.mapper.EmbedChannelMapper;
+import com.ragagent.embedchannel.EmbedError;
+import com.ragagent.embedchannel.EmbedTokens;
+import com.ragagent.embedchannel.domain.EmbedChannelEntity;
+import com.ragagent.embedchannel.mapper.EmbedChannelMapper;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.session.domain.Session;

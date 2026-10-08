@@ -103,6 +103,19 @@ B33 已归位：`AppEnvLookup` → `common/deployment`、`StorageRuntimeEnv` →
       根（框架 + 跨族共享 + 通用单件 + MCP 族） + `wiki/knowledge/sql/data/web` 五个能力子包。
       判据：有天然族才拆，别为扁平而扁平；MCP 族因与 `ToolRegistry` 同包紧耦合暂留根（已登记）。
 
+### 守卫编号地图（2026-10-08 B124 定：两套体系互不重号）
+
+| 前缀 | 出处 | 条数 | 主题 | 在哪看 |
+|---|---|---|---|---|
+| **`R*`** | `scripts/check-package-cycles.py` | 10（R1/R1b/R2/R3/R3b/R4~R8）| **依赖与结构**：包间环、间接环（SCC）、依赖 `config`、L2→L3 条数与处数、`common` 纪律、`package`↔路径一致、**禁内联全限定名** | 脚本 docstring + 运行输出 |
+| **`A*`** | `com.ragagent.arch.ArchitectureRulesTest` / `ClasspathResourcesTest` | 14（A1~A12b）| **代码规范**：裸 `getenv`、属性类扫描覆盖、双装配、`install*` 调用面、裸 NUL、`@Lazy`、裸 JDBC、字符串列名 wrapper、`.last(` 拼接、分层倒挂、`*Mapper` 包约定、classpath 资源存在性 | 测试 `@DisplayName` |
+| **`S*`** | `scripts/check-stray-dirs.py` | 2（S1/S2）| **目录卫生**：游离目录（对 git 不可见的空目录）、死包目录（整棵子树无 `.java`）| 脚本 docstring |
+| 其余脚本 | `check-json-key-case` / `check-go-anchors` / `check-fe-contract-keys` / `check-event-face-case` / `check-file-size` | — | 换锚命名、注释锚点、前后端契约键、事件面命名、文件体量棘轮 | 各自 docstring |
+
+> **为什么改**：B124 之前，脚本侧与 ArchUnit 侧**都用 `R*` 且互不对应**——例如 `R7`：脚本里是「`package` 声明 ↔ 路径一致」，ArchUnit 里是「裸 JDBC 白名单」。提交信息或文档里说「R7 复核」时，读者无法判断指哪一条。
+> **改法**：脚本侧保持 `R*`（HANDOFF/phase4 里 ~165 处历史与计划引用无需改写），**ArchUnit 侧改为 `A*`**（14 条；引用它的只有 4 份活的手册，已同批同步）。
+> **读历史文档时**：HANDOFF / phase4 里的 `R*` 一律指脚本侧；若上下文是 `getenv` / JDBC / wrapper / `.last(` / `@Lazy` / `*Mapper` 包等**代码规范**，应读作对应 `A*`。
+
 ### P2b 超大文件（> 600 行；棘轮 `scripts/check-file-size.py`，B121 上线）
 
 **现状**（2026-10-08 B121 盘点）：主源码 1,888 个文件里 **> 600 行有 68 个**、400~600 行 120 个。

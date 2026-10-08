@@ -122,7 +122,7 @@ public class TenantFilterGuard implements InnerInterceptor {
             "com.ragagent.datasource.mapper.SyncLogMapper.selectByDataSource",
             "com.ragagent.datasource.mapper.SyncLogMapper.selectByIdOrNull",
             "com.ragagent.im.mapper.ImChannelMapper.getById",
-            "com.ragagent.embed.mapper.EmbedChannelMapper.getById",
+            "com.ragagent.embedchannel.mapper.EmbedChannelMapper.getById",
             "com.ragagent.wiki.mapper.WikiPageMapper.countByType",
             "com.ragagent.wiki.mapper.WikiPageMapper.countByTypeLight",
             "com.ragagent.wiki.mapper.WikiPageMapper.countList",

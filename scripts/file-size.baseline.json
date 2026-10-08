@@ -30,7 +30,7 @@
     "server/src/main/java/com/ragagent/datasource/connector/yuque/YuqueApiTypes.java": 697,
     "server/src/main/java/com/ragagent/datasource/controller/DataSourceController.java": 601,
     "server/src/main/java/com/ragagent/datasource/service/DataSourceService.java": 653,
-    "server/src/main/java/com/ragagent/embed/service/EmbedChannelService.java": 773,
+    "server/src/main/java/com/ragagent/embedchannel/service/EmbedChannelService.java": 773,
     "server/src/main/java/com/ragagent/im/dingtalk/DingtalkAdapter.java": 756,
     "server/src/main/java/com/ragagent/im/runtime/ToolDisplay.java": 761,
     "server/src/main/java/com/ragagent/im/service/ImService.java": 995,

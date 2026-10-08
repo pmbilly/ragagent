@@ -1,11 +1,11 @@
-package com.ragagent.embed.service;
+package com.ragagent.embedchannel.service;
 
 import java.time.Duration;
 
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
-import com.ragagent.embed.EmbedTokens;
+import com.ragagent.embedchannel.EmbedTokens;
 
 /**
  * Redis 版 token store。键空间：{@code embed:session:<token>} → channelID，

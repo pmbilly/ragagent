@@ -77,7 +77,7 @@ class ClasspathResourcesTest {
     private static final Pattern LITERAL_ARG = Pattern.compile("getResourceAsStream\\(\\s*\"([^\"]+)\"");
 
     @Test
-    @DisplayName("R12a：清单里的每个 classpath 资源都必须真实存在且非空")
+    @DisplayName("A12a：清单里的每个 classpath 资源都必须真实存在且非空")
     void resourcesExistAndAreNotEmpty() {
         ClassLoader cl = ClasspathResourcesTest.class.getClassLoader();
         List<String> problems = new ArrayList<>();
@@ -97,7 +97,7 @@ class ClasspathResourcesTest {
     }
 
     @Test
-    @DisplayName("R12b：源码里的 getResourceAsStream 字面量必须在清单里登记")
+    @DisplayName("A12b：源码里的 getResourceAsStream 字面量必须在清单里登记")
     void literalsAreInventoried() throws Exception {
         List<String> unregistered = new ArrayList<>();
         for (Path root : ArchitectureRulesTest.backendSourceRoots("main/java")) {
@@ -120,7 +120,7 @@ class ClasspathResourcesTest {
             }
         }
         assertThat(unregistered)
-                .as("新增/改动的资源路径未登记进 ClasspathResourcesTest.RESOURCES（登记后 R12a 会自动校验存在性）")
+                .as("新增/改动的资源路径未登记进 ClasspathResourcesTest.RESOURCES（登记后 A12a 会自动校验存在性）")
                 .isEmpty();
     }
 }

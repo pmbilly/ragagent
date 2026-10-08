@@ -19,7 +19,7 @@
 | websearch | [websearch-module-guide](websearch-module-guide.md) | 32 / 0.44 万 | 网页搜索 provider 族（13 家）与凭据管理 |
 | model | [model-module-guide](model-module-guide.md) | 26 / 0.28 万 | 模型域：models 表 CRUD + 运行时配置值出口（⚠️ 既是域名又是层名） |
 | evaluation | [evaluation-module-guide](evaluation-module-guide.md) | 21 / 0.21 万 | 评测域：rag 预设重放 + 指标族；零外部引用、待排期可选项 |
-| embed | [embed-module-guide](embed-module-guide.md) | 16 / 0.29 万 | 嵌入**渠道**域（HTTP 叶子，0 包引用；与 embedding 易混，改名 embedchannel 后议） |
+| embed | [embedchannel-module-guide](embedchannel-module-guide.md) | 16 / 0.29 万 | 嵌入**渠道**域（HTTP 叶子，0 包引用；与 embedding 易混，改名 embedchannel 后议） |
 | initialization | [initialization-module-guide](initialization-module-guide.md) | 14 / 0.24 万 | 初始化域：KB 配置第二路径（`PUT /initialization/config/{kbId}`）+ 连通性测试 + Ollama 管理 |
 | audit | [audit-module-guide](audit-module-guide.md) | 14 / 0.15 万 | 审计域：三条游标流（空间/KB/平台），只追加表 |
 | vectorstore | [vectorstore-module-guide](vectorstore-module-guide.md) | 13 / 0.18 万 | 向量库**配置面**（vector_stores 表 CRUD/探测/凭据）；运行时在 retrieval/engine |

@@ -1,14 +1,14 @@
-package com.ragagent.embed.controller;
+package com.ragagent.embedchannel.controller;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.ragagent.common.security.LogSanitizer;
-import com.ragagent.embed.domain.EmbedChannelEntity;
-import com.ragagent.embed.service.EmbedChannelService;
-import com.ragagent.embed.service.EmbedChannelService.UpdateCommand;
-import com.ragagent.embed.EmbedError;
+import com.ragagent.embedchannel.domain.EmbedChannelEntity;
+import com.ragagent.embedchannel.service.EmbedChannelService;
+import com.ragagent.embedchannel.service.EmbedChannelService.UpdateCommand;
+import com.ragagent.embedchannel.EmbedError;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;

@@ -1,4 +1,4 @@
-package com.ragagent.embed.controller;
+package com.ragagent.embedchannel.controller;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -11,11 +11,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.BizException;
 import com.ragagent.common.error.PlainErrorException;
-import com.ragagent.embed.EmbedError;
-import com.ragagent.embed.EmbedTokens;
-import com.ragagent.embed.domain.EmbedChannelEntity;
-import com.ragagent.embed.filter.EmbedAuthFilter;
-import com.ragagent.embed.service.EmbedChannelService;
+import com.ragagent.embedchannel.EmbedError;
+import com.ragagent.embedchannel.EmbedTokens;
+import com.ragagent.embedchannel.domain.EmbedChannelEntity;
+import com.ragagent.embedchannel.filter.EmbedAuthFilter;
+import com.ragagent.embedchannel.service.EmbedChannelService;
 import com.ragagent.mcp.controller.AgentToolApprovalController;
 import com.ragagent.mcp.controller.McpOAuthController;
 import com.ragagent.session.controller.MessageController;

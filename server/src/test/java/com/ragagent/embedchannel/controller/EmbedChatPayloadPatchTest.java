@@ -1,4 +1,4 @@
-package com.ragagent.embed.controller;
+package com.ragagent.embedchannel.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.embed.domain.EmbedChannelEntity;
+import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 import com.ragagent.session.dto.QaRequests.CreateKnowledgeQARequest;
 
 /**

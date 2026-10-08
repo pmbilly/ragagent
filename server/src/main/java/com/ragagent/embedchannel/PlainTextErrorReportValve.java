@@ -1,4 +1,4 @@
-package com.ragagent.embed;
+package com.ragagent.embedchannel;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

@@ -1,4 +1,4 @@
-package com.ragagent.embed;
+package com.ragagent.embedchannel;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -24,8 +24,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import com.ragagent.embed.domain.EmbedChannelEntity;
-import com.ragagent.embed.service.EmbedTokenStore;
+import com.ragagent.embedchannel.domain.EmbedChannelEntity;
+import com.ragagent.embedchannel.service.EmbedTokenStore;
 import com.ragagent.support.ContractJson;
 
 /**

@@ -1,4 +1,4 @@
-package com.ragagent.embed.mapper;
+package com.ragagent.embedchannel.mapper;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ragagent.embed.domain.EmbedChannelEntity;
+import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 
 /**
  * embed_channels 仓储。

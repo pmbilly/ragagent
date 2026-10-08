@@ -33,6 +33,8 @@ jobs:
         run: python3 scripts/check-event-face-case.py
       - name: 大文件棘轮（B121：不得新增 >600 行的主源码文件；拆小后 --write 收紧基线）
         run: python3 scripts/check-file-size.py
+      - name: 目录卫生（B124：游离目录 S1 / 死包目录 S2 —— 对 git 不可见的残留）
+        run: python3 scripts/check-stray-dirs.py
 
   backend:
     name: 后端 build + test + spotless

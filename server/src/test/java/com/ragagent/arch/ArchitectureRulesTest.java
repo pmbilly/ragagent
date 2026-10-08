@@ -58,24 +58,24 @@ import org.springframework.stereotype.Service;
  *       双装配，语义含糊。</li>
  *   <li><b>{@code install*} 只许装配层调用</b>：查找面/快照类的 {@code install} 是启动期
  *       一次性写入，运行期调用即「把配置当状态改」（各 holder 注释均写明此约束）。</li>
- *   <li><b>禁 {@code @Lazy} 注入</b>（R6）：循环依赖要拆（下沉/接口反转），不许懒加载
+ *   <li><b>禁 {@code @Lazy} 注入</b>（A6）：循环依赖要拆（下沉/接口反转），不许懒加载
  *       掩盖设计缺陷；knowledge 域门面环在棘轮基线，解环专项落地后清空。</li>
- *   <li><b>裸 JDBC 白名单</b>（R7）：业务单表 CRUD 走 MyBatis-Plus；方言探测 / PG 专有
+ *   <li><b>裸 JDBC 白名单</b>（A7）：业务单表 CRUD 走 MyBatis-Plus；方言探测 / PG 专有
  *       SQL / 非业务库引擎 / 启动修复四类 MP 能力边界场景登记放行，新类须在 PR 论证。</li>
- *   <li><b>禁字符串列名 wrapper</b>（R8）：条件构造器一律 Lambda 方法引用，硬编码列名
+ *   <li><b>禁字符串列名 wrapper</b>（A8）：条件构造器一律 Lambda 方法引用，硬编码列名
  *       无编译期保护；存量在基线，随逐域 Lambda 化清空。</li>
- *   <li><b>{@code .last(} 只许纯字符串字面量</b>（R9）：拼接既是注入面也是方言漂移点；
+ *   <li><b>{@code .last(} 只许纯字符串字面量</b>（A9）：拼接既是注入面也是方言漂移点；
  *       动态行数走分页插件或注解 SQL {@code #{}} 参数化。</li>
- *   <li><b>分层倒挂</b>（R10）：{@code service} 不得依赖 {@code controller}（方向必须
+ *   <li><b>分层倒挂</b>（A10）：{@code service} 不得依赖 {@code controller}（方向必须
  *       controller → service → repository/mapper），{@code domain} 不得依赖
  *       {@code service}/{@code controller}（领域模型保持纯净）。</li>
- *   <li><b>Mapper 接口包约定</b>（R11）：命名以 {@code Mapper} 结尾的<b>顶层</b>接口必须落在
+ *   <li><b>Mapper 接口包约定</b>（A11）：命名以 {@code Mapper} 结尾的<b>顶层</b>接口必须落在
  *       {@code ..mapper..} 包——{@code @MapperScan("com.ragagent.**.mapper")} 只扫这些包，
  *       放错包的表现是启动期缺 Bean 或该 mapper <b>静默不注册</b>。</li>
  * </ol>
  *
  * <p>新加规则请只加<b>当前零违例</b>的规则，否则等于把存量违例变成噪声；确有存量违例要
- * 棘轮化的，走 R6-R9 的代码内基线模式——Set/Map 逐条登记（附理由）+ {@link #ratchet}
+ * 棘轮化的，走 A6-A9 的代码内基线模式——Set/Map 逐条登记（附理由）+ {@link #ratchet}
  * 双断言：基线外新增违例即红（拦增量），基线条目不再违例也红（防规则空转，强制随清理
  * 收紧）。不引入 FreezingArchRule 的存储文件；包级棘轮仍在脚本里。</p>
  */
@@ -91,7 +91,7 @@ class ArchitectureRulesTest {
     private static final JavaClasses MAIN = new ClassFileImporter()
             // B116 多模块：**不能用 location.asURI()** —— ArchUnit 对 jar 内的类求 asURI
             // 会抛异常，而"抛异常的导入选项"被当作**排除**，于是 :common（在 :server 的
-            // 类路径上以 jar 形态出现）被整段排除，R7 基线条目随即报"已不再违例"（实测踩到，
+            // 类路径上以 jar 形态出现）被整段排除，A7 基线条目随即报"已不再违例"（实测踩到，
             // 探针四变体定位：asURI 版命中 0、Location.contains 版命中 1）。
             // 改用 Location.contains 排除测试类。
             .withImportOption(location -> !location.contains("/classes/java/test/"))
@@ -114,10 +114,10 @@ class ArchitectureRulesTest {
             RetrievalEnvLookup.class.getName() + "#install",
             AppEnvLookup.class.getName() + "#install");
 
-    // ── R1 禁裸读环境变量 ──────────────────────────────────────────────────
+    // ── A1 禁裸读环境变量 ──────────────────────────────────────────────────
 
     @Test
-    @DisplayName("R1：主代码不得调用 System.getenv（走四类已登记落点）")
+    @DisplayName("A1：主代码不得调用 System.getenv（走四类已登记落点）")
     void noRawEnvReads() {
         // 过滤失败会静默「零类可查」→ 规则永远绿；先自证导入面正常
         assertThat(MAIN.size()).as("主源集导入为空或过少：检查 ImportOption 的输出目录过滤").isGreaterThan(500);
@@ -133,10 +133,10 @@ class ArchitectureRulesTest {
                 .check(MAIN);
     }
 
-    // ── R2/R3 属性类必须被扫描覆盖、且不双装配 ──────────────────────────────
+    // ── A2/A3 属性类必须被扫描覆盖、且不双装配 ──────────────────────────────
 
     @Test
-    @DisplayName("R2：@ConfigurationProperties 类必须落在 @ConfigurationPropertiesScan 名单覆盖的包内")
+    @DisplayName("A2：@ConfigurationProperties 类必须落在 @ConfigurationPropertiesScan 名单覆盖的包内")
     void propertiesClassesAreScanned() {
         Set<String> scanned = scannedPackages();
         assertThat(scanned).as("RagAgentApplication 的 @ConfigurationPropertiesScan 名单不应为空").isNotEmpty();
@@ -159,7 +159,7 @@ class ArchitectureRulesTest {
     }
 
     @Test
-    @DisplayName("R3：@ConfigurationProperties 类不得同时是 @Component/@Service（避免双装配）")
+    @DisplayName("A3：@ConfigurationProperties 类不得同时是 @Component/@Service（避免双装配）")
     void propertiesClassesAreNotComponents() {
         noClasses()
                 .that().areAnnotatedWith(ConfigurationProperties.class)
@@ -169,10 +169,10 @@ class ArchitectureRulesTest {
                 .check(MAIN);
     }
 
-    // ── R4 install* 只许装配层调用 ─────────────────────────────────────────
+    // ── A4 install* 只许装配层调用 ─────────────────────────────────────────
 
     @Test
-    @DisplayName("R4：install*（启动期写入查找面/快照）只许装配层（*.config 包）调用")
+    @DisplayName("A4：install*（启动期写入查找面/快照）只许装配层（*.config 包）调用")
     void installOnlyFromWiring() {
         // 注意：这里必须是 classes().should(customCondition)，不能用 noClasses().should(...)
         // ——后者会把条件取反，自定义条件里手写的 violation 会被反转成通过（B10 实测踩坑：
@@ -197,10 +197,10 @@ class ArchitectureRulesTest {
                 .check(MAIN);
     }
 
-    // ── R5 源码不得含裸 NUL 字节 ────────────────────────────────────────────
+    // ── A5 源码不得含裸 NUL 字节 ────────────────────────────────────────────
 
     @Test
-    @DisplayName("R5：源文件不得含裸 NUL 字节（会让 grep/ripgrep 判为二进制并静默跳过该文件）")
+    @DisplayName("A5：源文件不得含裸 NUL 字节（会让 grep/ripgrep 判为二进制并静默跳过该文件）")
     void noRawNulBytesInSources() throws java.io.IOException {
         java.util.List<String> offenders = new java.util.ArrayList<>();
         for (java.nio.file.Path root : java.util.stream.Stream.of(
@@ -228,7 +228,7 @@ class ArchitectureRulesTest {
                 .isEmpty();
     }
 
-    // ── R6 禁 @Lazy 注入 ────────────────────────────────────────────────────
+    // ── A6 禁 @Lazy 注入 ────────────────────────────────────────────────────
 
     /**
      * 棘轮基线：已清空（2026-10-05，M2 解环专项落地）。拆法：
@@ -240,9 +240,9 @@ class ArchitectureRulesTest {
     private static final Set<String> LAZY_BASELINE = Set.of();
 
     @Test
-    @DisplayName("R6：构造器参数/字段不得标 @Lazy（循环依赖要拆，不许懒加载掩盖）")
+    @DisplayName("A6：构造器参数/字段不得标 @Lazy（循环依赖要拆，不许懒加载掩盖）")
     void noLazyInjection() {
-        ratchet("R6 @Lazy", LAZY_BASELINE, violatingClasses(ArchitectureRulesTest::hasLazyInjectionPoint));
+        ratchet("A6 @Lazy", LAZY_BASELINE, violatingClasses(ArchitectureRulesTest::hasLazyInjectionPoint));
     }
 
     private static boolean hasLazyInjectionPoint(JavaClass clazz) {
@@ -263,7 +263,7 @@ class ArchitectureRulesTest {
         return false;
     }
 
-    // ── R7 裸 JDBC 白名单 ───────────────────────────────────────────────────
+    // ── A7 裸 JDBC 白名单 ───────────────────────────────────────────────────
 
     /** 命中即算裸 JDBC 的目标类型（按声明类型判定，含子类）。 */
     private static final List<Class<?>> JDBC_TARGET_TYPES = List.of(
@@ -314,7 +314,7 @@ class ArchitectureRulesTest {
             Map.entry("com.ragagent.storage.mapper.StorageBackendRepository", "PG 专有 SQL（存储后端元数据，JdbcClient）"));
 
     @Test
-    @DisplayName("R7：裸 JDBC（JdbcTemplate/java.sql 连接与语句/DataSource）只许白名单类")
+    @DisplayName("A7：裸 JDBC（JdbcTemplate/java.sql 连接与语句/DataSource）只许白名单类")
     void rawJdbcOnlyFromWhitelist() {
         Set<String> actual = new TreeSet<>();
         for (JavaClass clazz : MAIN) {
@@ -322,7 +322,7 @@ class ArchitectureRulesTest {
                 actual.add(topLevel(clazz).getName());
             }
         }
-        ratchet("R7 裸 JDBC", JDBC_BASELINE.keySet(), actual);
+        ratchet("A7 裸 JDBC", JDBC_BASELINE.keySet(), actual);
     }
 
     /**
@@ -351,7 +351,7 @@ class ArchitectureRulesTest {
         return cur;
     }
 
-    // ── R8 禁字符串列名 wrapper ─────────────────────────────────────────────
+    // ── A8 禁字符串列名 wrapper ─────────────────────────────────────────────
 
     /** 字符串列名 wrapper 的类型（应改用 LambdaQueryWrapper / LambdaUpdateWrapper）。 */
     private static final Set<String> STRING_WRAPPER_TYPES = Set.of(
@@ -373,9 +373,9 @@ class ArchitectureRulesTest {
             "com.ragagent.session.mapper.MessageRepository");
 
     @Test
-    @DisplayName("R8：禁字符串列名 wrapper（new QueryWrapper/UpdateWrapper、Wrappers.query/update/emptyWrapper）")
+    @DisplayName("A8：禁字符串列名 wrapper（new QueryWrapper/UpdateWrapper、Wrappers.query/update/emptyWrapper）")
     void noStringColumnWrappers() {
-        ratchet("R8 字符串 wrapper", STRING_WRAPPER_BASELINE, violatingClasses(clazz -> {
+        ratchet("A8 字符串 wrapper", STRING_WRAPPER_BASELINE, violatingClasses(clazz -> {
             for (JavaConstructorCall call : clazz.getConstructorCallsFromSelf()) {
                 if (STRING_WRAPPER_TYPES.contains(call.getTarget().getOwner().getName())) {
                     return true;
@@ -392,7 +392,7 @@ class ArchitectureRulesTest {
         }));
     }
 
-    // ── R9 .last( 只许纯字符串字面量 ────────────────────────────────────────
+    // ── A9 .last( 只许纯字符串字面量 ────────────────────────────────────────
 
     /**
      * 棘轮基线：已清空（2026-10-05）——13 文件 23 处拼接全部迁 {@code PageRequests}：
@@ -413,7 +413,7 @@ class ArchitectureRulesTest {
     }
 
     @Test
-    @DisplayName("R9：.last(...) 参数必须是纯字符串字面量（拼接=注入面+方言漂移）")
+    @DisplayName("A9：.last(...) 参数必须是纯字符串字面量（拼接=注入面+方言漂移）")
     void lastOnlyConstantStrings() throws java.io.IOException {
         Set<String> actual = new TreeSet<>();
         for (java.nio.file.Path root : backendSourceRoots("main/java")) {
@@ -433,7 +433,7 @@ class ArchitectureRulesTest {
                 }
             }
         }
-        ratchet("R9 .last 拼接", LAST_CONCAT_BASELINE.keySet(), actual);
+        ratchet("A9 .last 拼接", LAST_CONCAT_BASELINE.keySet(), actual);
     }
 
     /** 剥掉块注释/行注释（保留字符串字面量），注释里的 {@code .last(} 样例不算违例。 */
@@ -501,7 +501,7 @@ class ArchitectureRulesTest {
 
     /**
      * 棘轮双断言：基线外新增违例=拦增量；基线条目不再违例=基线过期（也红——若检测逻辑
-     * 空转，所有条目同时过期，规则不可能静默变绿）。与 R4 的 INSTALL_TARGETS、包级棘轮
+     * 空转，所有条目同时过期，规则不可能静默变绿）。与 A4 的 INSTALL_TARGETS、包级棘轮
      * 脚本同一套哲学。
      */
     private static void ratchet(String rule, Set<String> baseline, Set<String> actual) {
@@ -534,10 +534,10 @@ class ArchitectureRulesTest {
     }
 
 
-    // ── R10 分层倒挂 / R11 Mapper 包约定（2026-10-08 B91 补，当前零违例）─────────
+    // ── A10 分层倒挂 / A11 Mapper 包约定（2026-10-08 B91 补，当前零违例）─────────
 
     @Test
-    @DisplayName("R10：service 不得依赖 controller；domain 不得依赖 service/controller")
+    @DisplayName("A10：service 不得依赖 controller；domain 不得依赖 service/controller")
     void noLayerInversions() {
         assertThat(MAIN.size()).as("主源集导入为空或过少：检查 ImportOption 的输出目录过滤").isGreaterThan(500);
         noClasses().that().resideInAPackage("..service..")
@@ -552,7 +552,7 @@ class ArchitectureRulesTest {
     }
 
     @Test
-    @DisplayName("R11：*Mapper 接口必须落在 ..mapper.. 包（@MapperScan 范围）")
+    @DisplayName("A11：*Mapper 接口必须落在 ..mapper.. 包（@MapperScan 范围）")
     void mapperInterfacesLiveInMapperPackages() {
         // 只约束顶层接口：@MapperScan 注册的是顶层接口，嵌套的 helper 接口（如
         // DorisSqlExecutor$RowMapper，JDBC 行映射用）不在其语义内。

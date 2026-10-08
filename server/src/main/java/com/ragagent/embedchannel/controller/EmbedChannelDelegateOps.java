@@ -1,4 +1,4 @@
-package com.ragagent.embed.controller;
+package com.ragagent.embedchannel.controller;
 
 import java.util.List;
 import java.util.Map;
@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.error.BizException;
 import com.ragagent.common.error.PlainErrorException;
 import com.ragagent.common.security.LogSanitizer;
-import com.ragagent.embed.domain.EmbedChannelEntity;
+import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 import com.ragagent.mcp.controller.McpOAuthController;
 import com.ragagent.mcp.dto.ResolveToolApprovalRequest;
 import org.springframework.http.ResponseEntity;

@@ -399,7 +399,7 @@ cd frontend && npx vue-tsc --build --force && npm test
 3. **`recall` 永不失败**（`MemoryRecallOps` 类注释）：记忆是增强，任何失败必须退化成普通回答。往召回链上加"会抛异常"的步骤前先想清楚退化路径。
 4. **喂给模型的文本不是给人看的，别"顺手优化"**：`MemoryRender` 的分组顺序 / 英文表头 / 连字符 / 码点预算算法（换行也算码点）都是已钉住的输出契约；`MemoryText` 的四处口径（码点计数、Unicode White_Space 而非 `isWhitespace`、`Locale.ROOT`、CJK 正则不写 `\b`）同理。
 5. **仓储住在 `mapper/` 包**（含 `MemoryRepository` / `MemoryItemStore` / `MemoryIndexStore` / `MemoryTxTemplate`）：HANDOFF §12 注明"历史约定，其批次跟随 `repository/` 分层"。别按 knowledge 的骨架想当然去找 `repository/`，也别在功能批里顺手搬家（结构搬迁批闸门 ≈3m25s，要单独立批）。
-6. **`MemoryIndexStore` 919 行是登记例外**（HANDOFF §14.3；六段同属"索引侧读写"一个关注点，用户 2026-10-01 定调不硬切；B70 后 R7 白名单理由收窄为"列存在性探测"）。复核它先读类注释，别按"神类"惯性开刀。
+6. **`MemoryIndexStore` 919 行是登记例外**（HANDOFF §14.3；六段同属"索引侧读写"一个关注点，用户 2026-10-01 定调不硬切；B70 后 A7 白名单理由收窄为"列存在性探测"）。复核它先读类注释，别按"神类"惯性开刀。
 7. **空列表写 `[]` 不写 SQL NULL**（`MemoryStringListTypeHandler` 类注释）：与 wiki 那套"空列表写 NULL"**刻意相反**，别跨域套用。
 8. **`UpdateWrapper.set()` 不套实体 typeHandler**（`MemorySubjectMapper` 类注释）：jsonb 列的 `@Update` 注解 SQL 必须手写 `typeHandler=...`，漏了"写得进、读出来是零值"。
 9. **导出与列表的空值形态刻意不同**（`MemoryController` 注释）：`GET /items` 空仓是 `"items":[]`，`GET /export` 空仓是 `"items":null`——契约未要求统一，别"修"它。同理 `Content-Type` 必须手写字符串 `application/json; charset=utf-8`（带空格；`MediaType.toString()` 会把空格吃掉，而本项目验收是 diff 字节）。
@@ -428,7 +428,7 @@ cd frontend && npx vue-tsc --build --force && npm test
 | 项 | 性质 | 建议 |
 |---|---|---|
 | 仓储门面（`MemoryRepository` / `MemoryItemStore` / `MemoryIndexStore` / `MemoryTxTemplate`）仍在 `mapper/`，无 `repository/` 子包 | 结构欠账（已登记） | HANDOFF §12 注明"批次跟随 `repository/` 分层"；属结构搬迁批（全仓闸门 ≈3m25s），**别混进功能批**；`session`/`datasource` 同款欠账，届时同批对齐 |
-| `MemoryIndexStore` 919 行 | 登记例外（非待办） | 六段同属索引侧读写，用户定调不硬切；复核判据与 R7 白名单理由见类注释 + HANDOFF §14.3 |
+| `MemoryIndexStore` 919 行 | 登记例外（非待办） | 六段同属索引侧读写，用户定调不硬切；复核判据与 A7 白名单理由见类注释 + HANDOFF §14.3 |
 | 抽取的语言上下文未接入 | 功能缺口 | `MemoryExtractionService` 类注释"三处形状差异"第 1 条：租户/语言不再从上下文重建（约束是"后台不许读 ThreadLocal"）；做多语言蒸馏时从 `MemoryExtractPayload` 补，别在 worker 里读上下文 |
 | `EmptyContent` / `PreviouslyForgotten` 落 500 而非 400 | 契约瑕疵（刻意保留） | `MemoryController` 类注释"刻意不在 switch"，已实测钉住（2026-09-18）；要改先改契约标准（§1.13）再动代码，否则契约测试全红 |
 | `vectorRecall` / `retrievalConditioning` 三态 `Boolean` | 兼容风险 | `null`=走默认 ≠ `false`=显式关；压平成 `boolean` 等于替工作区管理员做决定（`MemoryConfig` 类注释）。任何"简化配置类型"的提议都死在这 |

@@ -1,4 +1,4 @@
-package com.ragagent.embed.service;
+package com.ragagent.embedchannel.service;
 
 import java.time.Duration;
 

@@ -346,7 +346,7 @@ cd frontend && npx vue-tsc --build --force && npm test
 9. **jsonb 双配置已在位，别动**：`autoResultMap = true` + `PgJsonTypeHandler`（出处：`AuditLog` 注解）。knowledge 手册 §2.2 的"写得进、查出来是 null"坑在这里靠这两行防住。
 10. **`RbacInterceptor` 不是 Spring bean**（`WebConfig` 手 new），审计钩子靠 `RbacDeniedAuditorRegistrar` 进程级注册、关停复位 null——多 Spring 上下文并存的测试环境里，陈旧钩子会指向已关闭的上下文（出处：registrar javadoc）。
 11. **审计失败语义两档，选错档出事故**：`log` 抛异常（能拖垮业务）、`logBestEffort` 吞掉（会静默丢审计）——埋点类一律 best-effort，取证类才用强语义（出处：`AuditLogService` 两个方法的 javadoc）。
-12. **字符串字面量里别嵌裸 NUL 字节**（写 `"\0"` 转义）：会让 git 把文件当二进制、diff/blame 全废；本仓曾因此留下"裸 NUL 审计盲区"（B12 R5，2026-10-02 修复）。出处：`HANDOFF.md` §13.8.2。
+12. **字符串字面量里别嵌裸 NUL 字节**（写 `"\0"` 转义）：会让 git 把文件当二进制、diff/blame 全废；本仓曾因此留下"裸 NUL 审计盲区"（B12 A5，2026-10-02 修复）。出处：`HANDOFF.md` §13.8.2。
 
 ---
 

@@ -1,8 +1,9 @@
-# embed 模块手册
+# embedchannel 模块手册
 
-> **面向读者**：第一次接手 `com.ragagent.embed` 的架构师 / 高级开发者。
+> **面向读者**：第一次接手 `com.ragagent.embedchannel` 的架构师 / 高级开发者。
 > **目标**：30 分钟建立全局观 → 能定位改动点 → 能安全迭代（本域有 61 个 golden 契约夹具兜底，改错会立刻红；全量后端用例按 HANDOFF 批次验收口径 4,700+）。
 > **数据口径**：2026-10-08 实测（`wc -l` 口径）：**16 个 java 文件 / 约 2,900 行 / 5 个子包 + 根包**。
+> **包名沿革**：B124 由 `com.ragagent.embed` 改名为 `com.ragagent.embedchannel`——域内 14 类有 11 类本就叫 `EmbedChannel*`，且与 L2 能力层的 `com.ragagent.embedding`仅差三个字母，是仓库里最容易引错的一对包名。
 > **本文档的地位**：模块级导览；仓库级作业规范见仓库根 `HANDOFF.md`（§12 结构地图、§13 踩坑清单、§14 逐包重构范式）。
 
 ---
@@ -350,10 +351,10 @@ cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Cont
   ./gradlew :server:test :server:spotlessCheck
 
 # 只跑本域（快路径）
-./gradlew :server:test --tests "com.ragagent.embed.*"
+./gradlew :server:test --tests "com.ragagent.embedchannel.*"
 
 # 契约夹具批量重录（HANDOFF §13.12；本域是全仓第一个接入该开关的测试）
-./gradlew :server:test --tests "com.ragagent.embed.EmbedContractTest" -Dcontract.refresh=true
+./gradlew :server:test --tests "com.ragagent.embedchannel.EmbedContractTest" -Dcontract.refresh=true
 ```
 
 **A. 加端点**：按 §5 选 Ops 面 → 路由 + 方法 → golden（录或手写，掩码沿用 `EmbedContractTest` 的 `em_<token>`/`ems_<token>`/`<uuid>`/`<ts>` 四件套）→ 三绿 → 提交。

@@ -1,12 +1,12 @@
-package com.ragagent.embed;
+package com.ragagent.embedchannel;
 
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 
-import com.ragagent.embed.filter.EmbedAuthFilter;
-import com.ragagent.embed.service.EmbedChannelService;
+import com.ragagent.embedchannel.filter.EmbedAuthFilter;
+import com.ragagent.embedchannel.service.EmbedChannelService;
 import com.ragagent.auth.service.TenantService;
 
 /**

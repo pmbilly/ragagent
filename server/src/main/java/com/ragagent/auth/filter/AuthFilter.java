@@ -102,7 +102,7 @@ public class AuthFilter extends OncePerRequestFilter {
         }
 
         // 通道 1.5：embed 公开面（embed 路由组不经全局 Auth，
-        // 由 com.ragagent.embed 的 EmbedAuthFilter 自行鉴权，本过滤器整体让路）。
+        // 由 com.ragagent.embedchannel 的 EmbedAuthFilter 自行鉴权，本过滤器整体让路）。
         if (request.getRequestURI().startsWith("/api/v1/embed/")) {
             chain.doFilter(request, response);
             return;

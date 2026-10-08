@@ -1,4 +1,4 @@
-package com.ragagent.embed;
+package com.ragagent.embedchannel;
 
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
@@ -9,7 +9,7 @@ import java.util.Base64;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-import com.ragagent.embed.domain.EmbedChannelEntity;
+import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 
 /**
  * embed 令牌族。
