@@ -68,7 +68,7 @@ ArchUnit 1.3.0 **已是测试依赖**（`server/build.gradle.kts:111`），可�
 
 | # | 边 | 处数 | 样例 | 修法（端口/门面化） |
 |---|---|---|---|---|
-| ✅ C2 | `wiki → knowledge` | **43 → 0** | `wiki/controller/WikiPageController → mapper.KnowledgeBaseMapper`、`WikiKbAccessGuard → domain.KnowledgeBase` | **分批进行（B98 起步）**：① **C2-a 只读门面**（✅ 本批）：`common.knowledge.KnowledgeBaseLookup` 端口（`kbById`/`kbByIdIncludingDeleted`/`knowledgeGone`/`knowledgeExists` + `KnowledgeBaseView` 视图），实现留 knowledge；`WikiLintService`/`WikiKbAccessGuard`/`WikiPageController` 三处换端口（43 → 34）。② **C2-b ingest 写面**（待做，实测是本条真正的大头）：wiki 的 ingest 会**写** knowledge 域（`Chunk`/`Knowledge` 实体、`KnowledgeMapper`/`ChunkMapper`/`ChunkRepository`、`SpanTracker`、`ImageInfoEnricher`、`EmbedderClient.configFrom`）⇒ 需要一个 **ingest 门面**（提交/落库/span/图片富化/嵌入配置），不是只读端口能覆盖的。③ **C2-c 调用点收尾**：`requireWikiKB` 有 **22 个调用点**（返回视图后逐点核对），与 ② 一起做才能归零。
+| ✅ C2 | `wiki → knowledge` | **43 → 0** | `wiki/controller/WikiPageController → mapper.KnowledgeBaseMapper`、`WikiKbAccessGuard → domain.KnowledgeBase` | **已完成（B98/B99/B100）**：wiki 只依赖 `common.knowledge` 的七个类型（`ChunkPort`/`KnowledgeSpanPort`/`KnowledgeFinalizePort`/`EmbeddingModelPort`/`KnowledgeBaseLookup` + `ChunkView`/`KnowledgeBaseView`/`KnowledgeView`），实现全在 knowledge 侧适配器；守卫新增 **R4 解耦对棘轮**禁止回流。详见下方侦察表 |
 
 **C2-b 侦察结论（B99，17 文件 / 36 处的能力分组——定端口签名的依据）**
 
@@ -180,8 +180,8 @@ ArchUnit 1.3.0 **已是测试依赖**（`server/build.gradle.kts:111`），可�
 | 批次 | 内容 | 规模 | 前置 |
 |---|---|---|---|
 | **B91** ✅ 完成（2026-10-08） | 解 C1（`StreamProperties` 搬家，SCC-B 破环）+ 守卫补 SCC 棘轮 + ArchUnit R10/R11（含红态探针） | 小 | 无 |
-| **B92** | 端口化 C4/C5/C7（`auth` 依赖下沉：apikey scope、tenantconfig、TenantService） | 中 | 无 |
-| **B93** | 端口化 C6 + C8（`retrieval→auth`、`audit→wiki`）⇒ SCC-A 消失 | 小 | B92 |
+| **B92** ✅ 已落地（由 B95/B96/B97a/B97b 完成） | 端口化 C4/C5/C7（`auth` 依赖下沉：apikey scope、tenantconfig、TenantService） | 中 | 无 |
+| **B93** ✅ 已落地（C8 由 B94、C6 由 B95 完成） | 端口化 C6 + C8（`retrieval→auth`、`audit→wiki`）⇒ SCC-A 消失 | 小 | B92 |
 | **B94** | 门面化 C2（`wiki→knowledge` 43 处，引入 `KnowledgeBaseLookup`） | 大 | 无（可与 B92/93 并行） |
 | **B95** | 档 A 模块化（`:platform` + `:infra`） | 中 | B91 |
 | **B96** | 档 B 模块化（`:engine`，清 R3 残项 6 条） | 中 | B93/B95 |
