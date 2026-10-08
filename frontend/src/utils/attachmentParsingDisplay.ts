@@ -12,10 +12,10 @@ export function resolveAttachmentParsingCounts(event: AttachmentParsingEvent): {
   skipped: number
 } {
   const toolData = event.tool_data
-  if (toolData && toolData.parsed_count !== undefined) {
+  if (toolData && toolData.parsedCount !== undefined) {
     return {
-      parsed: Number(toolData.parsed_count) || 0,
-      skipped: Number(toolData.skipped_count) || 0,
+      parsed: Number(toolData.parsedCount) || 0,
+      skipped: Number(toolData.skippedCount) || 0,
     }
   }
 

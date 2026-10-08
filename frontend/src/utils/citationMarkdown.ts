@@ -33,7 +33,7 @@ export function stripIncompleteCitationTag(content: string): string {
   return isCitationPrefix ? content.slice(0, start) : content
 }
 
-/** 同 `KnowledgeReferenceLike`：两种来源两种拼写（消息面 camelCase / 直通载荷 snake）。 */
+/** 同 `KnowledgeReferenceLike`：引用载荷一律 camelCase（工具面 2026-10-08 换锚）。 */
 export type CitationKnowledgeRef = {
   id?: string
   knowledgeId?: string
@@ -42,12 +42,6 @@ export type CitationKnowledgeRef = {
   chunkIndex?: number
   chunkType?: string
   knowledgeBaseId?: string
-  knowledge_id?: string
-  knowledge_title?: string
-  knowledge_filename?: string
-  chunk_index?: number
-  chunk_type?: string
-  knowledge_base_id?: string
 }
 
 function parseTagAttributes(attrString: string): Record<string, string> {
@@ -111,7 +105,7 @@ export function resolveCitationChunkId(
     const byDoc = list.find(
       (r) =>
         docTitlesMatch(doc, r.knowledgeTitle || '') ||
-        docTitlesMatch(doc, r.knowledge_filename || ''),
+        docTitlesMatch(doc, r.knowledgeFilename || ''),
     )
     if (byDoc?.id) return byDoc.id
   }
@@ -144,7 +138,7 @@ export function resolveCitationChunkId(
       const byDoc = scoped.find(
         (r) =>
           docTitlesMatch(doc, r.knowledgeTitle || '') ||
-          docTitlesMatch(doc, r.knowledge_filename || ''),
+          docTitlesMatch(doc, r.knowledgeFilename || ''),
       )
       if (byDoc?.id) return byDoc.id
     }

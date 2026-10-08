@@ -1289,7 +1289,7 @@ function getToolReferenceItems(event: any): KnowledgeReferenceLike[] {
         .filter((group) => group.knowledgeId || group.title)
         .map((group, index) => ({
           id: group.knowledgeId || group.key,
-          chunkIds: group.chunks.map((chunk) => chunk.chunkId ?? chunk.chunk_id).filter(Boolean),
+          chunkIds: group.chunks.map((chunk) => chunk.chunkId).filter(Boolean),
           knowledgeId: group.knowledgeId,
           knowledgeTitle: group.title,
           knowledgeBaseId: group.knowledgeBaseId,

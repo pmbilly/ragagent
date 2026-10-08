@@ -6,29 +6,9 @@ const discoveryFields = [
   'serverName',
 ] as const
 
-/** 历史载荷（工具面改名前的 snake 键）→ 现行 camel：只补缺，不覆盖新载荷。 */
-const legacyDiscoveryKeys: Record<string, string> = {
-  has_more: 'hasMore',
-  next_cursor: 'nextCursor',
-  next_step: 'nextStep',
-  input_schema: 'inputSchema',
-  tool_ref: 'toolRef',
-  server_id: 'serverId',
-  server_name: 'serverName',
-  usage_instructions: 'usageInstructions',
-}
-
-function withLegacyKeys(source: Record<string, unknown>): Record<string, unknown> {
-  const out: Record<string, unknown> = { ...source }
-  for (const [snake, camel] of Object.entries(legacyDiscoveryKeys)) {
-    if (out[camel] === undefined && out[snake] !== undefined) out[camel] = out[snake]
-  }
-  return out
-}
-
 function record(value: unknown): Record<string, unknown> {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
-    ? withLegacyKeys(value as Record<string, unknown>) : {}
+    ? value as Record<string, unknown> : {}
 }
 
 function discoveryOverlay(data?: unknown): Record<string, unknown> {
@@ -45,7 +25,7 @@ function discoveryOverlay(data?: unknown): Record<string, unknown> {
 export function parseMcpDiscovery(output?: string, data?: unknown): Record<string, unknown> {
   let parsed = {}
   try { parsed = record(JSON.parse(output || '')) } catch { /* Error or truncated historical output. */ }
-  return withLegacyKeys({ ...parsed, ...discoveryOverlay(data) })
+  return { ...parsed, ...discoveryOverlay(data) }
 }
 
 export function mcpDescriptionLead(text: string): string {

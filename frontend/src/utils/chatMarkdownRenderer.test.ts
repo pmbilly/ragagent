@@ -416,8 +416,8 @@ test('renderChatMarkdown preserves citations, math, and sanitized output through
 
 test('resolveCitationChunkId maps context index to retrieval chunk UUID', () => {
   const refs = [
-    { id: 'uuid-chunk-1', knowledge_title: 'Doc A', chunk_type: 'faq' },
-    { id: 'uuid-chunk-2', knowledge_title: 'FAQ TEST - FAQ', chunk_type: 'faq' },
+    { id: 'uuid-chunk-1', knowledgeTitle: 'Doc A', chunkType: 'faq' },
+    { id: 'uuid-chunk-2', knowledgeTitle: 'FAQ TEST - FAQ', chunkType: 'faq' },
   ]
 
   assert.equal(
@@ -471,8 +471,8 @@ test('renderChatMarkdown resolves indexed chunk_id when knowledge references are
       escapeMarkdown: (text) => text,
       sanitizeHtml: (html) => html,
       knowledgeReferences: [
-        { id: 'resolved-chunk-id', knowledge_title: 'Sample FAQ', chunk_type: 'faq' },
-        { id: 'other-chunk', knowledge_title: 'Other FAQ', chunk_type: 'faq' },
+        { id: 'resolved-chunk-id', knowledgeTitle: 'Sample FAQ', chunkType: 'faq' },
+        { id: 'other-chunk', knowledgeTitle: 'Other FAQ', chunkType: 'faq' },
       ],
     },
   )

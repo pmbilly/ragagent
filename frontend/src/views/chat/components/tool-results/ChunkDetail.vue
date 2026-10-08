@@ -13,9 +13,9 @@
         <span class="field-label">{{ $t('chat.positionLabel') }}</span>
         <span class="field-value">{{ $t('chat.chunkPositionValue', { index: data.chunkIndex }) }}</span>
       </div>
-      <div v-if="data.content_length" class="info-field">
+      <div v-if="data.contentLength" class="info-field">
         <span class="field-label">{{ $t('chat.contentLengthLabelSimple') }}</span>
-        <span class="field-value">{{ $t('chat.lengthChars', { value: data.content_length }) }}</span>
+        <span class="field-value">{{ $t('chat.lengthChars', { value: data.contentLength }) }}</span>
       </div>
     </div>
 

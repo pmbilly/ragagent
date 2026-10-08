@@ -5,8 +5,7 @@ export interface SessionExportAttachment {
 }
 
 /**
- * 引用元素是检索域的 `SearchResult`：线上是 camelCase；历史 jsonb 行里可能仍是
- * Go 时代的库内键名，故两种拼写都收（camelCase 优先），见 `referenceSources.ts` 的同类说明。
+ * 引用元素是检索域的 `SearchResult`：字段一律 camelCase（工具面 2026-10-08 换锚）。
  */
 export interface SessionExportReference {
   knowledgeTitle?: string
@@ -14,9 +13,6 @@ export interface SessionExportReference {
   knowledgeSource?: string
   chunkType?: string
   metadata?: Record<string, string>
-  knowledge_title?: string
-  knowledge_filename?: string
-  knowledge_source?: string
 }
 
 export interface SessionExportMessage {
@@ -98,18 +94,18 @@ function isHttpUrl(value: string): boolean {
 
 function referenceLine(reference: SessionExportReference): string {
   const title = reference.knowledgeTitle
-    || reference.knowledge_title
+    || reference.knowledgeTitle
     || reference.knowledgeFilename
-    || reference.knowledge_filename
+    || reference.knowledgeFilename
     || reference.metadata?.title
     || reference.knowledgeSource
-    || reference.knowledge_source
+    || reference.knowledgeSource
     || ''
   if (!title) return ''
 
   const source = reference.metadata?.url
     || reference.knowledgeSource
-    || reference.knowledge_source
+    || reference.knowledgeSource
     || ''
   const safeTitle = markdownListText(title)
   return isHttpUrl(source) ? `- [${safeTitle}](${source})` : `- ${safeTitle}`

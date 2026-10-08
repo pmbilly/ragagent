@@ -7,14 +7,14 @@ test('parses wiki search hits into individual drawer references', () => {
   const refs = parseWikiToolReferences('wiki_search', `
     <search_results count="2" query="RAG">
       <page>
-        <knowledge_base_id>kb-1</knowledge_base_id>
+        <knowledgeBaseId>kb-1</knowledgeBaseId>
         <link>[[concept/rag|Retrieval-Augmented Generation]]</link>
         <type>concept</type>
         <summary>Grounds answers in retrieved evidence.</summary>
-        <match_snippet>RAG combines retrieval and generation.</match_snippet>
+        <matchSnippet>RAG combines retrieval and generation.</matchSnippet>
       </page>
       <page>
-        <knowledge_base_id>kb-2</knowledge_base_id>
+        <knowledgeBaseId>kb-2</knowledgeBaseId>
         <link>[[summary/search]]</link>
         <summary>Search overview.</summary>
       </page>
@@ -41,14 +41,14 @@ test('parses wiki search hits into individual drawer references', () => {
 
 test('parses wiki page reads and keeps markdown content', () => {
   const refs = parseWikiToolReferences('wiki_read_page', `
-    <wiki_page>
+    <wikiPage>
       <metadata>
-        <knowledge_base_id>kb-1</knowledge_base_id>
+        <knowledgeBaseId>kb-1</knowledgeBaseId>
         <link>[[concept/rag|RAG]]</link>
       </metadata>
       <summary>Short summary.</summary>
       <content># RAG\n\nFull **Markdown** body.</content>
-    </wiki_page>
+    </wikiPage>
   `, 'call-2')
 
   assert.equal(refs.length, 1)
@@ -60,11 +60,11 @@ test('parses wiki page reads and keeps markdown content', () => {
 
 test('uses the wiki summary only when a page has no body', () => {
   const refs = parseWikiToolReferences('wiki_read_page', `
-    <wiki_page>
+    <wikiPage>
       <metadata><link>[[summary/empty|Empty page]]</link></metadata>
       <summary>Summary fallback.</summary>
       <content></content>
-    </wiki_page>
+    </wikiPage>
   `, 'call-3')
 
   assert.equal(refs[0]?.content, 'Summary fallback.')

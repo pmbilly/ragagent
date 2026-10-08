@@ -88,7 +88,7 @@ export interface ChunkDetailData {
     content: string;
     chunkIndex: number;
     knowledgeId: string;
-    content_length?: number;
+    contentLength?: number;
 }
 
 // Related chunks data
@@ -215,7 +215,7 @@ export interface WebFetchResultItem {
     fullOutputPath?: string;
     storageError?: string;
     rawContent?: string;
-    content_length?: number;
+    contentLength?: number;
     offset?: number;
     returnedChars?: number;
     truncated?: boolean;

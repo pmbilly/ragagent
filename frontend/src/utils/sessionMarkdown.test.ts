@@ -46,7 +46,7 @@ test('buildSessionMarkdown exports visible conversation content without internal
         knowledgeReferences: [
           { knowledgeTitle: 'Notes', knowledgeSource: 'https://example.com/notes' },
           // 历史 jsonb 行里的库内键名（过渡期兼容读取）——与上一条去重后只留一行
-          { knowledge_title: 'Notes', knowledge_source: 'https://example.com/notes' },
+          { knowledgeTitle: 'Notes', knowledgeSource: 'https://example.com/notes' },
         ],
       },
       { role: 'system', content: 'hidden system prompt' },

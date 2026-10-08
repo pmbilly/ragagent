@@ -91,7 +91,7 @@ test('resolveReferenceHighlightKey matches any chunk merged into a document item
   const refs = [
     {
       id: 'chunk-1',
-      chunk_ids: ['chunk-1', 'chunk-2'],
+      chunkIds: ['chunk-1', 'chunk-2'],
       knowledgeId: 'doc-1',
       knowledgeTitle: 'Policy',
     },
@@ -195,20 +195,7 @@ const CAMEL_REF = {
   metadata: { url: 'https://example.com/a' },
 }
 
-const SNAKE_REF = {
-  id: 'chunk-1',
-  knowledgeId: 'doc-1',
-  knowledgeTitle: '手册.pdf',
-  knowledge_filename: 'manual.pdf',
-  knowledgeBaseId: 'kb-1',
-  chunkIndex: 3,
-  chunkType: 'text',
-  content: '正文',
-  metadata: { url: 'https://example.com/a' },
-}
-
-test('normalizeKnowledgeReference accepts both spellings', () => {
-  assert.deepEqual(normalizeKnowledgeReference(CAMEL_REF), normalizeKnowledgeReference(SNAKE_REF))
+test('normalizeKnowledgeReference maps the camelCase payload', () => {
   assert.equal(normalizeKnowledgeReference(CAMEL_REF).knowledgeTitle, '手册.pdf')
   assert.equal(normalizeKnowledgeReference(CAMEL_REF).knowledgeBaseId, 'kb-1')
   assert.equal(normalizeKnowledgeReference(CAMEL_REF).chunkIndex, 3)
@@ -219,24 +206,19 @@ test('normalizeKnowledgeReference tolerates empty input', () => {
   assert.deepEqual(normalizeKnowledgeReference(undefined), {})
 })
 
-test('buildReferenceList yields identical items for both spellings', () => {
+test('buildReferenceList yields one item per document', () => {
   const camel = buildReferenceList([CAMEL_REF])
-  const snake = buildReferenceList([SNAKE_REF])
   assert.equal(camel.length, 1)
-  assert.deepEqual(camel, snake)
   assert.equal(camel[0].knowledgeId, 'doc-1')
 })
 
-test('buildReferenceSections aggregates equally for both spellings', () => {
-  const camel = buildReferenceSections([CAMEL_REF, { id: 'chunk-2', chunkType: 'faq', knowledgeTitle: 'Q' }])
-  const snake = buildReferenceSections([SNAKE_REF, { id: 'chunk-2', chunkType: 'faq', knowledgeTitle: 'Q' }])
-  assert.deepEqual(camel, snake)
+test('buildReferenceSections aggregates camelCase refs into one document section', () => {
+  const sections = buildReferenceSections([CAMEL_REF, { id: 'chunk-2', chunkType: 'faq', knowledgeTitle: 'Q' }])
+  assert.equal(sections.length, 1)
+  assert.equal(sections[0].items.length, 2)
+  assert.equal(sections[0].items[0].knowledgeId, 'doc-1')
 })
 
-test('resolveCitationChunkId resolves camelCase refs too', () => {
+test('resolveCitationChunkId resolves camelCase refs', () => {
   assert.equal(resolveCitationChunkId('DOC-1', { doc: '手册.pdf' }, [CAMEL_REF]), 'chunk-1')
-  assert.equal(
-    resolveCitationChunkId('DOC-1', { doc: '手册.pdf' }, [SNAKE_REF]),
-    resolveCitationChunkId('DOC-1', { doc: '手册.pdf' }, [CAMEL_REF]),
-  )
 })

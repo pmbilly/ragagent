@@ -38,15 +38,6 @@ function joinDistinct(parts: string[]): string {
  * individual drawer cards. The payload is intentionally parsed leniently:
  * page content is Markdown and is not guaranteed to be valid XML.
  */
-/** 元素名双拼读取：新载荷 camel 优先，历史载荷 snake 兜底。 */
-function firstTag(block: string, ...names: string[]): string {
-  for (const name of names) {
-    const value = extractTag(block, name)
-    if (value) return value
-  }
-  return ''
-}
-
 export function parseWikiToolReferences(
   toolName: string,
   output: unknown,
@@ -59,10 +50,10 @@ export function parseWikiToolReferences(
       const { slug, title } = parseWikiLink(extractTag(page, 'link'))
       const content = joinDistinct([
         extractTag(page, 'summary'),
-        firstTag(page, 'matchSnippet', 'match_snippet'),
+        extractTag(page, 'matchSnippet'),
       ])
       if (!slug && !title && !content) return []
-      const knowledgeBaseId = firstTag(page, 'knowledgeBaseId', 'knowledge_base_id') || undefined
+      const knowledgeBaseId = extractTag(page, 'knowledgeBaseId') || undefined
       return [{
         id: `${toolCallId}:${knowledgeBaseId || 'wiki'}:${slug || index + 1}`,
         title: title || slug || `Wiki ${index + 1}`,
@@ -74,17 +65,14 @@ export function parseWikiToolReferences(
   }
 
   if (toolName === 'wiki_read_page') {
-    // 块标签双读：新载荷 wikiPage，历史载荷 wiki_page。
-    const pages = extractBlocks(output, 'wikiPage')
-    const blocks = pages.length ? pages : extractBlocks(output, 'wiki_page')
-    return blocks.flatMap((page, index) => {
+    return extractBlocks(output, 'wikiPage').flatMap((page, index) => {
       const { slug, title } = parseWikiLink(extractTag(page, 'link'))
       // The page body commonly begins with the same introduction stored in
       // summary. Showing both makes the drawer look as if its first paragraph
       // was duplicated, so summary is only a fallback for body-less pages.
       const content = extractTag(page, 'content') || extractTag(page, 'summary')
       if (!slug && !title && !content) return []
-      const knowledgeBaseId = firstTag(page, 'knowledgeBaseId', 'knowledge_base_id') || undefined
+      const knowledgeBaseId = extractTag(page, 'knowledgeBaseId') || undefined
       return [{
         id: `${toolCallId}:${knowledgeBaseId || 'wiki'}:${slug || index + 1}`,
         title: title || slug || `Wiki ${index + 1}`,

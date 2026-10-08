@@ -955,3 +955,20 @@
 - **保留（登记）**：① 引用协议标记 `<kb>`/`<web>`/`<ref>` + `doc`/`chunk_id`/`kb_id`/`url`/`title`（模型输出方言）；② wiki 摄取模型输出契约标签（`new_information`/`candidate_slugs`/`previous_slugs`/`shared_source_contexts`/`deleted_documents`/`document_summaries`/`existing_folders`/`page_metadata`/`remaining_source_documents`/`valid_wiki_links`/`available_wiki_pages`/`existing_page_content`/`current_introduction` 等，提示词钉住 + 解析器 + 金片同批）；③ 图片标记 `<image_caption>`/`<image_ocr>`/`<image_original>`（wiki 内容面：与 docreader 富化、存量页面正文、前端 markdown 渲染共用）；④ chatpipeline/evaluation 提示词模板标签（`asker_background`/`images_uploaded`/`no_image_attached`/`no_document_attached`）；⑤ i18n 键、im/tracing/datasource 域标签、SSE/事件键、DB 列名、第三方线格式（另有冻结清单）。
 - **教训（复现两次）**：**消费面改名范围必须与生产面一致** —— 首次在 B89（测试夹具越界到 15 个域外文件），本批是反向（测试已改、`MemoryRender`/`AgentHistoryAssembler` 产出未改 → 3 条假红）。定式：先钉生产面文件清单，再同步消费面。
 - **闸门**：后端全量 **4,836**/0（一次 Redis 竞态隔离重跑绿）+ 前端 **736**/736 + `vue-tsc` 0 错 + `spotlessCheck` + 键名守卫 strict 绿。
+
+**✅ B92（2026-10-08，双读清除 + 冻结清单按理由重排）**
+- **前提**：用户确认「不再考虑历史数据」（产品未上线、开发库可清、测试实录属证据链不属历史数据）⇒ 兼容分支全部转为可删项。
+- **双读全清（删，不新增）**：
+  - 前端 `wikiToolReferences.ts`：删 `firstTag(...)` 兜底与 `wiki_page` 分支 ⇒ 单读 `wikiPage`/`matchSnippet`/`knowledgeBaseId`；
+  - 前端 `mcpToolDisplay.ts`：删 `legacyDiscoveryKeys` + `withLegacyKeys`（8 键归一化）⇒ `parseMcpDiscovery` 直接返回合并结果；
+  - 前端 `referenceSources.ts`：删 `camel ?? snake` 与 legacy 类型字段，归一化输出字段统一 camel（`chunk_ids`→`chunkIds`、`knowledge_filename`→`knowledgeFilename`，消费点仅本文件 + `citationMarkdown`/`sessionMarkdown`）；
+  - 前端 `citationMarkdown.ts`/`sessionMarkdown.ts`/`rag-pipeline-history.ts`：删 legacy 字段与兜底；
+  - 前端 `grepResultsGroup.ts` + `AgentStreamDisplay.vue`：删 `chunk.chunk_id` 兜底；同步源码扫描守卫 `chatLinksNewTab.test.mjs` 的正则；
+  - 后端 `SourceRegistry`：7 条正则复原（`knowledgeId`/`knowledgeTitle`/`faqId`/`chunkId`/`knowledgeBaseId`(+`kbId` 现行 camel)/对应元素位）；**引用协议属性拆出独立 `PUBLIC_CHUNK_ATTR`（`chunk_id`）**——它是提示词定义的模型输出方言，不随历史数据清算；
+  - 后端 `ToolPolicy` 键空间归一化**保留**（服务第三方 MCP 载荷的 snake 拼写，与历史无关），注释已改写澄清。
+- **前端旧键修正（跨面守卫 `check-fe-contract-keys.py` 当场抓出 4 处，均为真债）**：`content_length`×7（`ChunkDetail.vue`/`WebFetchResults.vue`/`useChatStreamHandler`）→ `contentLength`；`display_type`×2 → `displayType`；`parsed_count`/`skipped_count`×3 → camel（后端 `QaAttachmentResolver`/`ReferencesSupport` 已是 camel）。
+- **守卫基线收紧**：`fe-snake-contracts.baseline.json` 43 条（新增两条经复核的**误报**：`chunk_count` 出现在 `KBInfoPopover.vue` 注释里、`row__count` 是 CSS 类名 `kb-folder-row__count`）。
+- **冻结清单重排**：§15.3 → ① 外部决定（connector/provider/websearch metadata/image_info/rerank/OAuth/langfuse/IM/i18n）；② 协议行为面（引用标记、wiki 摄取 13 标签、chatpipeline 模板 4 标签、工具名与 enum 值）；③ 落库·DDL 形态；单列**「已解除」**表（工具面标记 ✅ B88/B89/B90、引用载荷 ✅、SSE 事件载荷键 ⬜、wiki 图片标记 ⬜、落库 jsonb 存量键 ⬜）。§14.6 的陈旧清单换为指针 + 「改前先核对理由」纪律。
+- **用例改写**：`McpToolResult.test` 去 "including old history" 命名并夹具 camel；`referenceSources.test` 三条「双拼等价」用例改为 camel-only（并修一处断言为真实形状：1 section / 2 items）；`wikiToolReferences.test`/`chatMarkdownRenderer.test`/`attachmentParsingDisplay.test`/`rag-pipeline-history.test` 夹具 camel。
+- **闸门**：后端全量 **4,836**/0 + 前端 **736**/736 + `vue-tsc` 0 错 + `spotlessCheck` + 四守卫（JSON 键名 260 条 / 包环 / Go 锚点 / 跨面键 43 条）全绿。
+- **下一步候选**：§15.3「已解除」里三项（SSE 事件载荷键、wiki 图片标记、落库 jsonb 存量键）现已是普通改造；阶段 4 起步（B91：`StreamProperties` 搬家 + ArchUnit R9+ 观察模式）。

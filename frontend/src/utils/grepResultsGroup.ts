@@ -9,7 +9,7 @@ export type GrepGroupedRow = {
   chunkHitCount: number
   titleMatch: boolean
   matchSnippet: string
-  chunks: { content: string; chunkId: string; knowledgeId: string; chunk_id?: string }[]
+  chunks: { content: string; chunkId: string; knowledgeId: string }[]
 }
 
 /** Collapse per-chunk grep hits into one row per document; FAQ entries stay separate. */

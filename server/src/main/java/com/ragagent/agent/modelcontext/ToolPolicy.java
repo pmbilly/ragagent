@@ -50,7 +50,7 @@ final class ToolPolicy {
     /** 包内访问别名（SourceToolCodec 用）。 */
     static final Map<String, SourceKeySpace> sourceKeySpaces = SOURCE_KEY_SPACES;
 
-    /** 归一化索引：剥下划线 + 小写，使第三方/历史载荷的 snake 拼写仍可识别。 */
+    /** 归一化索引：剥下划线 + 小写，使**第三方（MCP）载荷**的 snake 拼写仍可识别（与历史数据无关）。 */
     private static final Map<String, SourceKeySpace> SOURCE_KEY_SPACES_NORMALIZED = SOURCE_KEY_SPACES.entrySet()
             .stream()
             .collect(java.util.stream.Collectors.toUnmodifiableMap(

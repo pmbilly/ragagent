@@ -120,18 +120,26 @@ ArchUnit 1.3.0 **已是测试依赖**（`server/build.gradle.kts:111`），可�
 `config/` 与 `RagAgentApplication` 归 `:app`；`@ConfigurationPropertiesScan` 白名单逐模块覆核；
 `settings.gradle.kts` 模块清单与 `docs/backend-package-map.md` 同步。
 
-## 4. ArchUnit 规则清单（可直接落地；依赖已有 `archunit:1.3.0`）
+## 4. ArchUnit 规则清单（**扩展既有 `com.ragagent.arch.ArchitectureRulesTest`**，勿另起一套）
+
+现状：该测试已有 **R1~R8**（`System.getenv` 落点、`@ConfigurationProperties` 扫描名单、双装配、
+`install*` 只许装配层、源文件裸 NUL、构造器/字段禁 `@Lazy`、裸 JDBC 白名单、禁字符串列名 wrapper），
+并明确**不引入 `FreezingArchRule` 存储文件**——包级棘轮走脚本（`check-package-cycles.py`）。
+⇒ 本阶段新增规则**续号 R9+**，风格与既有保持一致：能硬断言的直接断言，需渐进收紧的走"脚本棘轮 + 白名单"。
+
+| 编号 | 规则 | 断言 | 现状预期 |
+|---|---|---|---|
 
 | 规则 | 断言 | 现状预期 |
 |---|---|---|
-| R-A1 模块方向 | `noClasses().that().resideInAPackage("com.ragagent.platform..").should().dependOnClassesThat().resideInAnyPackage("com.ragagent.(knowledge|wiki|session|agent|…)..")` | 需先解 C5（`storage→auth` 等不在 platform 内）——platform 只放 `common` 时可直接绿 |
-| R-A2 无环（顶层包） | `slices().matching("com.ragagent.(*)..").should().beFreeOfCycles()` | **当前红（2 SCC）** ⇒ 作为目标规则，解 C1~C8 后开启 |
-| R-A3 L2 不依赖 L3 | `noClasses().that().resideInAPackage("..(llm\|retrieval\|embedding\|rerank\|chatpipeline)..").should().dependOnClassesThat().resideInAnyPackage("..(knowledge\|wiki\|session\|agent\|…)..")` | 基线 6 条，逐条降 |
-| R-A4 controller 不经 mapper | `noClasses().that().resideInAPackage("..controller..").should().dependOnClassesThat().resideInAPackage("..mapper..")` | **2026-10-08 实测 6 处**：`embed/EmbedChannelController`、`auth/apikey/TenantAPIKeyController`、`wiki/WikiPageController`、`wiki/WikiKbAccessGuard`、`initialization/InitializationController`、`system/SystemAdminController`（其中 wiki 两处正是 C2 的同一批，门面化后一并消失） |
-| R-A5 分层倒挂 | `noClasses().that().resideInAPackage("..service..").should().dependOnClassesThat().resideInAPackage("..controller..")`；`..domain..` 不依赖 `..service..` | **2026-10-08 实测均为 0 处** ⇒ 可直接开启为防回归规则 |
-| R-B1 装配层单向 | `noClasses().that().resideOutsideOfPackage("com.ragagent.config..").should().dependOnClassesThat().resideInAPackage("com.ragagent.config..")` | 对应守卫 R2（基线 1：`stream→config`，即 C1） |
-| R-B2 Mapper 包约定 | `classes().that().areInterfaces().and().haveSimpleNameEndingWith("Mapper").should().resideInAPackage("..mapper..")` | 保护 `@MapperScan("com.ragagent.**.mapper")` |
-| R-B3 事件/主题类 | `noClasses().that().resideInAPackage("..domain..").should().dependOnClassesThat().haveSimpleNameEndingWith("Controller")` | 低风险加固 |
+| R9 模块方向 | `noClasses().that().resideInAPackage("com.ragagent.platform..").should().dependOnClassesThat().resideInAnyPackage("com.ragagent.(knowledge|wiki|session|agent|…)..")` | 需先解 C5（`storage→auth` 等不在 platform 内）——platform 只放 `common` 时可直接绿 |
+| R10 无环（顶层包） | `slices().matching("com.ragagent.(*)..").should().beFreeOfCycles()` | **当前红（2 SCC）** ⇒ 作为目标规则，解 C1~C8 后开启 |
+| R11 L2 不依赖 L3 | `noClasses().that().resideInAPackage("..(llm\|retrieval\|embedding\|rerank\|chatpipeline)..").should().dependOnClassesThat().resideInAnyPackage("..(knowledge\|wiki\|session\|agent\|…)..")` | 基线 6 条，逐条降 |
+| R12 controller 不经 mapper | `noClasses().that().resideInAPackage("..controller..").should().dependOnClassesThat().resideInAPackage("..mapper..")` | **2026-10-08 实测 6 处**：`embed/EmbedChannelController`、`auth/apikey/TenantAPIKeyController`、`wiki/WikiPageController`、`wiki/WikiKbAccessGuard`、`initialization/InitializationController`、`system/SystemAdminController`（其中 wiki 两处正是 C2 的同一批，门面化后一并消失） |
+| R13 分层倒挂 | `noClasses().that().resideInAPackage("..service..").should().dependOnClassesThat().resideInAPackage("..controller..")`；`..domain..` 不依赖 `..service..` | **2026-10-08 实测均为 0 处** ⇒ 可直接开启为防回归规则 |
+| R14 装配层单向 | `noClasses().that().resideOutsideOfPackage("com.ragagent.config..").should().dependOnClassesThat().resideInAPackage("com.ragagent.config..")` | 对应守卫 R2（基线 1：`stream→config`，即 C1） |
+| R15 Mapper 包约定 | `classes().that().areInterfaces().and().haveSimpleNameEndingWith("Mapper").should().resideInAPackage("..mapper..")` | 保护 `@MapperScan("com.ragagent.**.mapper")` |
+| R16 domain 不依赖 Controller | `noClasses().that().resideInAPackage("..domain..").should().dependOnClassesThat().haveSimpleNameEndingWith("Controller")` | 低风险加固 |
 
 > 落地节奏：**每次只开一条**，先跑成"当前违规清单"（`archunit` 的 `FreezingArchRule` 或自写白名单），
 > 再随批次降数——与仓库既有的"棘轮"风格一致（`check-json-key-case.py` / `check-package-cycles.py` 同款）。

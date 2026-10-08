@@ -28,7 +28,7 @@
               :class="statusClass(item)"
             >{{ statusLabel(item) }}</span>
             <span v-if="item.method" class="meta-pill method">{{ formatMethod(item.method) }}</span>
-            <span v-if="item.content_length" class="meta-text">{{ $t('chat.contentLengthLabel', { value: formatLength(item.content_length) }) }}</span>
+            <span v-if="item.contentLength" class="meta-text">{{ $t('chat.contentLengthLabel', { value: formatLength(item.contentLength) }) }}</span>
             <t-icon
               :name="isExpanded(index) ? 'chevron-up' : 'chevron-down'"
               class="expand-icon"
@@ -85,12 +85,12 @@
             <div v-if="item.rawContent" class="info-section">
               <div class="info-section-title">
                 {{ $t('chat.rawTextLabel') }}
-                <span class="raw-length" v-if="item.content_length">
-                  （{{ formatLength(item.content_length) }}）
+                <span class="raw-length" v-if="item.contentLength">
+                  （{{ formatLength(item.contentLength) }}）
                 </span>
               </div>
               <div v-if="item.offset !== undefined" class="info-field">
-                {{ $t('chat.webFetchContentRange', { start: item.offset, end: item.offset + (item.returnedChars ?? 0), total: item.content_length }) }}
+                {{ $t('chat.webFetchContentRange', { start: item.offset, end: item.offset + (item.returnedChars ?? 0), total: item.contentLength }) }}
                 <span v-if="item.truncated"> · {{ $t('chat.webFetchPartialContent') }}</span>
               </div>
               <div v-if="isRawExpanded(index)" class="full-content">

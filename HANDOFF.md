@@ -580,18 +580,9 @@ git grep -nE '@RequestBody\s+(String|Map<|JsonNode|Object)' -- 'server/src/main/
 
 - **别把"Go 序列化层删除"拆到各域**：409 处引用 / 94 文件的那一刀按 §3 红线必须**一次性全仓完成**。
   按域先换锚（同 PR 带前端）是允许的，删序列化器本体不是。
-- **别动 §11 的边界清单**：租户配置 jsonb（`chat_parser_engine_rules` 等）、auth 域、agent 域 fixture（`ag-*`）、**Go 工具面 5 类**（`GoDoubleSerializer`/`GoTimeSerializer`/`GoMapSerializer`/`GoJsonEscapes`/`GoJson`——线上注解已清零，但手搓载荷/provider 请求体仍依赖其字节）、chat/工具域手搓载荷与**工具输出自有 schema**、检索引擎索引文档、**`lf_*` 平铺追踪载具**（§14.9q D3：`TracingContext` 平铺进 4 个队列载荷，前缀是防撞名的命名空间；要清理应改为嵌套 `tracing` 键，不是去前缀）、**connector 第三方线格式**（`datasource/connector/**` 350 处，字段名由对方 API 决定）、**wiki LLM 输出解析面**（§14.9r：`CombinedExtraction`/`NewSlugFromCitation`/`CitationBatchResult`/`common/wiki/ExtractedItem` 约 17 处，键名由 `WikiPrompts` 三条 prompt 的正文钉住——要改 Java 侧键名必须连 prompt 一起改，属行为面，另批处理）、
-**image_info 面**（§14.9s：`chunks.image_info` 列与 `retrieval.domain.ImageInfo`，入站是 **docreader Go 容器**
-`PUT /knowledge/image/{id}/{chunkId}` 体的内层 JSON——键 `original_url/ocr_text/start_pos…` 由对方服务决定，
-存储列透传同形，管线读侧 `.path("original_url")` 等不得"顺手 camel 化"）、
-**chat span/log 载荷的 SearchParams**（§14.9s：`common.pipeline.SearchParams` 序列化进 PipelineLog params 载荷，
-SearchRecordingTest 金片钉住 snake——死注判定必须扫"参数对象被泛型序列化"的路径）、
-**Go 零值时间哨兵**（`0001-01-01T00:00:00Z`：AgentStep 时间戳、agentm/init 的 GO_ZERO_TIME 与 goTime 系——
-涉冻结事件面与既有前端，登记保留；换 null 属另批形状变更）、
-**rerank RankResult**（`index/document/relevance_score`，Jina/Aliyun/Lkeap 的第三方 rerank API 响应面）——
-  这些"仍是 snake"是**对的**。**注意该清单会随各域推进而变动**：`wiki 域实体` 条目已作废
-  （`b407769` C 波把 `wiki/domain` 换锚为 camelCase），`wiki/service` 残留的 `@JsonProperty` 载荷随其批次处理；
-  **引用前先看 §14.3 该域的进度栏，别照抄旧结论**。
+- **别动冻结面，但先核对理由**：现行口径见 **§15.3**（2026-10-08 重排为「外部决定 / 协议行为面 / 落库·DDL」三类，并单列「已解除」）。
+  以旧结论（"工具输出自有 schema""存量回放面"）为由拒绝改造前，先看 §15.3 的理由栏是否仍成立——
+  「兼容历史数据」已整体作废；「协议/行为面」要连提示词与解析器同批且需拍板；「外部决定」才是真不能动。
 - **别为数字写注释**：getter/POJO 访问器保持 0 javadoc（§13.8 第 3 条）。
 - **别做全仓文本替换**：先用单文件验证再决定扩大（§13.2 的两次翻车）。
 - **别跳过闸门**：只跑 `:server:test` 会漏掉 Spotless（§13.9）。
@@ -744,6 +735,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | **B88 工具面 schema 按 Java 标准 camel 化** | 142 键（30 输入 + 107 输出 + 5 字符串拼接键）跨后端/实录/前端全量换锚 | P1 | 大 | ✅ **完成（2026-10-08）**——用户拍板「只动键、整体一批」。① 键集口径补全（JSON 键位 + `put(` 写侧 + 转义/深层转义 + 复合键 `tool|arg`）；② 后端 41 文件 / 445 处（工具面白名单 + `ModelOutput`/`ActPhase`/`AgentTool*Backends`/`ToolDisplay` 消费侧）；③ 实录 3,037 处（仅 45A/45B/45C/46A 工具面；46B/46C/`GoRecording` 装 SSE/检索载荷，保持 snake）；④ 前端 32 文件改名 + 双读容错（`mcpToolDisplay` 历史载荷归一化、引用载荷 `?? snake` 兜底、守卫正则同步）；⑤ 守卫 `check-json-key-case.py` 摘除 `agent/tools/` 整目录豁免 + 登记工具名基线。⚠️ **过程发现 3 类真 bug**：`ToolPolicy.sourceArgumentAllowed` 与 `SourceToolCodec` 6 处 `key.toLowerCase()` 键比较在 snake 时代是恒等操作、改 camel 后全失配（句柄解析/检索目标/MCP 路由连锁挂）；`ReferencesSupport` 引用载荷不同批会让检索消息整个消失（`ModelOutput` 渲染器读不到）；误伤 4 类（常量值 `TYPE_KNOWLEDGE_BASE`、JDBC 列标签、外部载荷读侧、websearch metadata `published_at`）。保留项：工具名 36 个 + enum 值 + 外部/第三方面键（见清单文档）。闸门：后端 **4,836**/0 + 前端 **734**/734 + `vue-tsc` 0 + spotlessCheck + 键名守卫 strict 绿。详见 15.1.1 |
 | **B89 模型输出契约 XML 面** | 自有序列化标记（工具输出 + runtime_context）的属性/元素名 → camel | P2 | 中 | ✅ **完成（2026-10-08）**——B88 的延续：JSON 键之外，「我们自己的 XML 形态字段名」也换 camel。① 产出侧 12 文件 / 56 处（`AgentPrompts`、`PromptAssembly`、`ModelOutput`、`KnowledgeSearchOutputFormatter`、`GrepChunksTool`、`ListKnowledgeChunksTool`、`WikiSearchTool`、`WikiReadPageTool`、`WikiReadSourceDocTool`、`PendingWikiPage`、`FaqSnippet`、`ToolDefinitions` 文案）：属性位（`knowledge_id=`→`knowledgeId=` 等）与元素位（`<knowledge_id>`→`<knowledgeId>`、`<storage_error>`→`<storageError>`）；② 解析侧 `SourceRegistry` 7 条正则改双拼容忍（camel 优先 + 历史 snake 仍可解析，含 `<k>` 元素位与 `kb_id/kbId` 族）；③ 实录同步（45B 260 处 + 46B 1 处，协议标记 `<kb>`/`<web>`/`<ref>` 先行屏蔽不动）；④ **截断快照重算**：`R_WIKI_READ_PAGE_READ_BUDGET` 因属性名长度变化位移（1065→1069 字符），用确定性探针取实测输出后重写；⑤ 前端 `wikiToolReferences` 元素读取双拼容忍 + 补 camel 用例。**边界（保留）**：引用协议标记 `<kb>`/`<web>`/`<ref>` 及其属性（`doc`/`chunk_id`/`kb_id`/`url`/`title`）= 模型输出方言（提示词定义 + 前端解析 + 协议语义），不随本批改；解析侧已双拼，将来要动只需改提示词一处。⚠️ 误伤一则：测试夹具批处理越界打到 15 个非 agent 域文件（`file_path=`/`knowledge_id=` 等非工具面属性）→ 已 `git checkout` 回退。闸门：后端 **4,836**/0 + 前端 **735**/735 + `vue-tsc` 0 + spotlessCheck + 键名守卫 strict 绿。详见 15.1.1 |
 | **B90 自有标记的多词标签名 camel 化** | 工具输出/提示词标记里的 snake 标签名（33 个）→ camel | P2 | 中 | ✅ **完成（2026-10-08）**——B89 只覆盖「与 JSON 键同名的属性/元素」，多词 snake **标签名**（`<wiki_page>`/`<links_to>`/`<linked_from>`/`<search_results>`/`<knowledge_chunks>`/`<source_document>`/`<runtime_context>`/`<bound_knowledge_bases>` 等）仍留 snake。本批：① 生产侧 **18 文件 / 87 处**（agent 面 16 文件 81 处 + 域外 2 处：`session/service/AgentHistoryAssembler` 的 `<steer_message>`/`<continue_task>`、`memory/domain/MemoryRender` 的 `<user_memory>`）；② 测试/实录同步 9 文件 457 处（`GoRecording45B` 279 / `46B` 103 / `GoRecording` 27 / `45A` 15 / `46A` 11 + 测试断言）；③ **截断快照再重算**：`R_WIKI_READ_PAGE_READ_BUDGET` 再次位移（1061→1067，标签变短）——探针取真值；④ 前端 `wikiToolReferences` 块标签双读（`wikiPage` 优先 + `wiki_page` 兜底）+ 补 camel 用例；⑤ agent 面 snake 标签残留 **0**（含 `\u003c` 转义形）。⚠️ 教训复现：**消费面（测试/前端）改名范围必须与生产面一致**，否则像 `MemoryTextTest`/`AgentHistoryAssembler` 那样出现「测试已改、产出未改」的假红（本批已补齐域外两处）。闸门：后端 **4,836**/0 + 前端 **736**/736 + `vue-tsc` 0 + `spotlessCheck` + 键名守卫 strict 绿。详见 15.1.1 |
+| **B92 双读清除 + 冻结清单按理由重排** | 用户确认「不再考虑历史数据」后的兼容分支清算 | P2 | 中 | ✅ **完成（2026-10-08）**——① **双读全清**：前端 `wikiToolReferences`（`firstTag` 兜底/`wiki_page` 分支）、`mcpToolDisplay`（`legacyDiscoveryKeys`+`withLegacyKeys` 整块）、`referenceSources`/`citationMarkdown`/`sessionMarkdown`/`rag-pipeline-history`（`camel ?? snake` 与 legacy 字段）、`grepResultsGroup`+`AgentStreamDisplay`（`chunk.chunk_id` 兜底 + 守卫正则同步）；归一化输出字段一并 camel（`chunk_ids→chunkIds`、`knowledge_filename→knowledgeFilename`）。后端 `SourceRegistry` 7 条正则复原为**自有输出单 camel**，引用协议属性拆出独立命名 `PUBLIC_CHUNK_ATTR`（`chunk_id` 保留——协议方言，非历史）；`ToolPolicy` 归一化**保留**并注明只服务第三方 MCP 载荷。② **前端 4 处旧键读取修正**（跨面守卫抓出）：`content_length`×7 → `contentLength`、`display_type`×2 → `displayType`、`parsed_count`/`skipped_count`×3 → camel；`chunkCount` 命中经复核是**注释**、`row__count` 是 **CSS 类名**（两处误报）→ 守卫基线收紧为 43 条。③ **冻结清单重排**：§15.3 改为按理由三类（外部决定 / 协议行为面 / 落库·DDL）+「已解除」表（SSE 事件载荷键、wiki 图片标记、落库 jsonb 存量键）；§14.6 陈旧清单换为指针 + 理由核对纪律。④ 历史形态用例改写：`McpToolResult.test`（去 "including old history"）、`referenceSources.test`（三条双拼用例改 camel-only）、`wikiToolReferences.test`/`chatMarkdownRenderer.test` 夹具 camel。闸门：后端 **4,836**/0 + 前端 **736**/736 + `vue-tsc` 0 + `spotlessCheck` + 四守卫（键名/包环/Go 锚点/跨面键 43 条）绿。详见 15.1.1 |
 | **B35 modelcontext 并入 agent** | 顶层包 31 → 30（用户 2026-10-02 拍板） | P2 | 小 | ✅ **完成（2026-10-02）**——13 文件 → `agent/modelcontext/`（test 3 同移），23 文件改包路径零残留；守卫绿、全量 4713 + spotlessCheck 绿。详见 15.1.1 |
 | **B36 agentm 并入 agent** | 顶层包 30 → 29（用户 2026-10-03 拍板） | P2 | 小 | ✅ **完成（2026-10-03）**——`agentm`（20 文件）→ `agent/management/`（先例 `auth/apikey/`），含资源目录改名 + 61 文件包路径 + 10 处 loader 路径 + 12 处文案 + 3 处脚本；顺手修正 AsrTestAudio 的过时错误文案；守卫绿、全量 4713 + spotlessCheck 绿。详见 15.1.1 |
 | **B37 档 3 第一刀（provider 请求面）** | Go 字节兼容层退役起步：三份 provider GoJson 去 HTML 转义复刻 | P2 | 小 | 🚧 **完成第一刀（2026-10-03）**——字节流向盘点（四类）+ 三份副本退役（探针先行：embedding 单跑绿后同批改 rerank/websearch）；`GoJsonEscapes` 类保留（stream/langfuse/MCP 仍用）。⚠️ **待决**：stream 面涉「与 Go 版共用 Redis 的 CAS」需确认 Go 版是否在跑；`GoTimeSerializer.isGoZero`（业务语义）与 `GoMapSerializer`（被继承）需单独方案。详见 15.1.1 |
@@ -881,8 +873,35 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 
 ### 15.3 非目标（冻结面，见 §14.6，勿列入修复）
 
-租户配置 jsonb（`auth/domain/tenantconfig`）、connector 第三方线格式（datasource 345 处等）、
-SSE/Redis 事件载荷（event/stream）、provider 请求体（llm/ollama/anthropic）、LLM 输出解析面
-（wiki/mcp/memory）、image_info（docreader 第三方载荷）、
-Go 工具面 5 类、IM 平台 ACK、chat span 载荷（SearchParams）、rerank RankResult、
-i18n 键与系统设置键（`tenant.default_storage_quota_gb` 等——DB/文案字符串）。
+**2026-10-08 重排（B92）**：冻结项按**理由**分三类——改前先核对理由是哪种、是否仍成立；
+「因为要兼容历史数据」这一理由已**整体作废**（产品未上线、不保留历史数据），原先按它冻结的项移入文末「已解除」。
+
+**① 外部决定（字段名由对方 API / 协议定）**
+connector 第三方线格式（`datasource/connector/**`）、provider 请求体（`llm/**`：anthropic/openai/ollama）、
+websearch metadata（`published_at`，`WebResultConverter` 写、ProviderJson 出站）、
+image_info（docreader 容器：`original_url`/`ocr_text`/`start_pos`…）、rerank `RankResult`（`index`/`document`/`relevance_score`）、
+MCP OAuth 载荷、langfuse（`lf_*`）、IM 平台 ACK、i18n 键与系统设置键（`tenant.default_storage_quota_gb` 等，文案/DB 字符串）。
+
+**② 协议 / 行为面（模型输出契约与提示词方言；改 = 提示词正文 + 解析器 + 实录金片同批，需拍板）**
+引用协议标记 `<kb>`/`<web>`/`<ref>` + `doc`/`chunk_id`/`kb_id`/`url`/`title`；
+wiki 摄取契约标签 13 个（`new_information`/`candidate_slugs`/`previous_slugs`/`shared_source_contexts`/`deleted_documents`/
+`document_summaries`/`existing_folders`/`page_metadata`/`remaining_source_documents`/`valid_wiki_links`/`available_wiki_pages`/
+`existing_page_content`/`current_introduction`）；
+chatpipeline/evaluation 模板标签 4 个（`asker_background`/`images_uploaded`/`no_image_attached`/`no_document_attached`）；
+工具名 36 个与 schema enum 值（`list_servers`/`list_tools`…——值是各自语义，不是字段名）。
+
+**③ 落库 / DDL 形态（与"历史数据"无关：改列名是 schema 迁移）**
+MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages` 等列名、检索引擎索引文档字段（ES/OpenSearch/Milvus/Qdrant DSL）。
+
+**Go 零值时间哨兵**（`0001-01-01T00:00:00Z`）：属**形状**变更（前端既有依赖），与命名无关，另批。
+
+**已解除（2026-10-08）——原先按"存量回放/历史数据"冻结，现按普通改造处理**
+
+| 面 | 状态 |
+|---|---|
+| 工具输出/提示词标记（JSON 键、XML 属性/元素名、多词标签名） | ✅ 已完成（B88/B89/B90） |
+| 引用载荷（`knowledge_references` / `data.references`） | ✅ 已 camel（B88），双读分支已清（B92） |
+| SSE/Redis 事件载荷键（`session_id`/`tool_name`/`total_steps`…） | ⬜ 可改造（前后端同批，无需双读） |
+| wiki 内容图片标记（`<image_caption>`/`<image_ocr>`/`<image_original>`） | ⬜ 可改造（存量正文不再兼容） |
+| 落库 jsonb 存量键（agent_steps payload、memory 抽取状态、租户配置内容） | ⬜ 可改造（开发库可清，不写迁移脚本） |
+

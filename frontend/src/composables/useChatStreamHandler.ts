@@ -386,7 +386,7 @@ export function useChatStreamHandler(options: UseChatStreamHandlerOptions) {
               timestamp: stepTimestamp || undefined,
               duration: toolCall.duration,
               duration_ms: toolCall.duration,
-              display_type: resultData?.display_type,
+              displayType: resultData?.displayType,
               tool_data: result?.data,
             })
           })
@@ -609,7 +609,7 @@ export function useChatStreamHandler(options: UseChatStreamHandlerOptions) {
         log('[Thinking Event]', {
           event_id: eventId,
           done: data.done,
-          content_length: (data.content as string | undefined)?.length || 0,
+          contentLength: (data.content as string | undefined)?.length || 0,
         })
         if (!message.agentEventStream) message.agentEventStream = []
         if (!message._eventMap) message._eventMap = new Map()
@@ -865,7 +865,7 @@ export function useChatStreamHandler(options: UseChatStreamHandlerOptions) {
               dataPayload.duration_ms !== undefined ? dataPayload.duration_ms : dataPayload.duration
             toolCallEvent.duration = duration
             toolCallEvent.duration_ms = duration
-            toolCallEvent.display_type = dataPayload.display_type
+            toolCallEvent.displayType = dataPayload.displayType
             toolCallEvent.tool_data = dataPayload
             log('[Tool Result] Updated event in stream')
           } else {
@@ -1052,7 +1052,7 @@ export function useChatStreamHandler(options: UseChatStreamHandlerOptions) {
       response_type: data.response_type,
       id: data.id,
       done: data.done,
-      content_length: (data.content as string | undefined)?.length || 0,
+      contentLength: (data.content as string | undefined)?.length || 0,
       content_preview: data.content ? String(data.content).substring(0, 50) : '',
       data: data.data,
       session_id: data.session_id,

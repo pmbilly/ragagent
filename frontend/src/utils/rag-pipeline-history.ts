@@ -18,13 +18,10 @@ type RagHistoryReference = {
   chunkType?: string
   knowledgeId?: string
   knowledgeTitle?: string
-  chunk_type?: string
-  knowledge_id?: string
-  knowledge_title?: string
 }
 
 function referenceChunkType(ref: RagHistoryReference): string {
-  return ref.chunkType ?? ref.chunk_type ?? ''
+  return ref.chunkType ?? ''
 }
 
 function inferRetrievalSearchSource(refs: RagHistoryReference[]): 'knowledge' | 'web' | 'mixed' {
@@ -79,7 +76,7 @@ export function synthesizeRagPipelineToolEvents(
       continue
     }
     docCount++
-    const key = ref.knowledgeId || ref.knowledge_id || ref.knowledgeTitle || ref.knowledge_title || 'document'
+    const key = ref.knowledgeId || ref.knowledgeTitle || 'document'
     kbCounts[key] = (kbCounts[key] || 0) + 1
   }
 

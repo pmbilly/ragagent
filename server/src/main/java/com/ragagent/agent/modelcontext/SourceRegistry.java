@@ -55,23 +55,24 @@ final class SourceRegistry {
     private static final Pattern PUBLIC_KB_TAG = Pattern.compile("<kb\\b[^>]*>", CASE_INSENSITIVE | DOTALL);
     private static final Pattern PUBLIC_WEB_TAG = Pattern.compile("<web\\b[^>]*>", CASE_INSENSITIVE | DOTALL);
     private static final Pattern DOC_ATTR = Pattern.compile("\\bdoc\\s*=\\s*\"([^\"]*)\"", CASE_INSENSITIVE);
-    private static final Pattern CHUNK_ATTR = Pattern.compile("\\b(?:chunkId|chunk_id)\\s*=\\s*\"([^\"]+)\"", CASE_INSENSITIVE);
+    private static final Pattern CHUNK_ATTR = Pattern.compile("\\bchunkId\\s*=\\s*\"([^\"]+)\"", CASE_INSENSITIVE);
+    private static final Pattern PUBLIC_CHUNK_ATTR = Pattern.compile("\\bchunk_id\\s*=\\s*\"([^\"]+)\"", CASE_INSENSITIVE);
     private static final Pattern PUBLIC_KB_ATTR = Pattern.compile("\\bkb_id\\s*=\\s*\"([^\"]*)\"", CASE_INSENSITIVE);
     private static final Pattern URL_ATTR = Pattern.compile("\\burl\\s*=\\s*\"([^\"]+)\"", CASE_INSENSITIVE);
     private static final Pattern TITLE_ATTR = Pattern.compile("\\btitle\\s*=\\s*\"([^\"]*)\"", CASE_INSENSITIVE);
     private static final Pattern LEGACY_CHUNK_TAG = Pattern.compile("<(?:chunk|faq)\\b[^>]*>", CASE_INSENSITIVE | DOTALL);
-    private static final Pattern FAQ_ATTR = Pattern.compile("\\b(?:faqId|faq_id)\\s*=\\s*\"([^\"]+)\"", CASE_INSENSITIVE);
-    private static final Pattern KNOWLEDGE_TITLE_ATTR = Pattern.compile("\\b(?:knowledgeTitle|knowledge_title)\\s*=\\s*\"([^\"]*)\"", CASE_INSENSITIVE);
+    private static final Pattern FAQ_ATTR = Pattern.compile("\\bfaqId\\s*=\\s*\"([^\"]+)\"", CASE_INSENSITIVE);
+    private static final Pattern KNOWLEDGE_TITLE_ATTR = Pattern.compile("\\bknowledgeTitle\\s*=\\s*\"([^\"]*)\"", CASE_INSENSITIVE);
 
     private static final Pattern REF_TAG = Pattern.compile("<ref\\s+id\\s*=\\s*\"([^\"]+)\"\\s*/?>", CASE_INSENSITIVE);
     private static final Pattern REF_CANDIDATE = Pattern.compile("<ref(?:\\s|\\z)[^>]*(?:>|\\z)", CASE_INSENSITIVE | DOTALL);
     private static final Pattern MODEL_KB_TAG = Pattern.compile("<kb(?:\\s|\\z)[^>]*(?:>|\\z)", CASE_INSENSITIVE | DOTALL);
     private static final Pattern MODEL_WEB_TAG = Pattern.compile("<web(?:\\s|\\z)[^>]*(?:>|\\z)", CASE_INSENSITIVE | DOTALL);
 
-    private static final Pattern DOCUMENT_ATTR = Pattern.compile("\\b(?:knowledgeId|knowledge_id)\\s*=\\s*\"([^\"]+)\"", CASE_INSENSITIVE);
-    private static final Pattern DOCUMENT_ELEMENT = Pattern.compile("<(?:knowledgeId|knowledge_id)>\\s*([^<]+?)\\s*</(?:knowledgeId|knowledge_id)>", CASE_INSENSITIVE | DOTALL);
-    private static final Pattern KB_ATTR = Pattern.compile("\\b(?:knowledgeBaseId|knowledge_base_id|kbId|kb_id)\\s*=\\s*\"([^\"]+)\"", CASE_INSENSITIVE);
-    private static final Pattern KB_ELEMENT = Pattern.compile("<(?:knowledgeBaseId|knowledge_base_id|kbId|kb_id)>\\s*([^<]+?)\\s*</(?:knowledgeBaseId|knowledge_base_id|kbId|kb_id)>", CASE_INSENSITIVE | DOTALL);
+    private static final Pattern DOCUMENT_ATTR = Pattern.compile("\\bknowledgeId\\s*=\\s*\"([^\"]+)\"", CASE_INSENSITIVE);
+    private static final Pattern DOCUMENT_ELEMENT = Pattern.compile("<knowledgeId>\\s*([^<]+?)\\s*</knowledgeId>", CASE_INSENSITIVE | DOTALL);
+    private static final Pattern KB_ATTR = Pattern.compile("\\b(?:knowledgeBaseId|kbId)\\s*=\\s*\"([^\"]+)\"", CASE_INSENSITIVE);
+    private static final Pattern KB_ELEMENT = Pattern.compile("<(?:knowledgeBaseId|kbId)>\\s*([^<]+?)\\s*</(?:knowledgeBaseId|kbId)>", CASE_INSENSITIVE | DOTALL);
 
     static final Pattern SHORT_SOURCE_HANDLE = Pattern.compile("^[cdbw][1-9][0-9]*$", CASE_INSENSITIVE);
     static final Pattern SHORT_SOURCE_HANDLE_IN_TEXT = Pattern.compile("\\b[cdbw][1-9][0-9]*\\b", CASE_INSENSITIVE);
@@ -392,7 +393,7 @@ final class SourceRegistry {
             return text;
         }
         text = replaceAllFunc(PUBLIC_KB_TAG, text, tag -> {
-            String chunkID = publicAttr(CHUNK_ATTR, tag);
+            String chunkID = publicAttr(PUBLIC_CHUNK_ATTR, tag);
             if (chunkID.isEmpty()) {
                 return tag;
             }

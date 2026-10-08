@@ -41,11 +41,11 @@ async function render(props: Record<string, unknown>) {
   return renderToString(app)
 }
 
-test('discovery renders tool rows instead of raw metadata, including old history', async () => {
+test('discovery renders tool rows instead of raw metadata', async () => {
   const html = await render({ displayType: 'mcp_discovery', success: true, output: JSON.stringify({
-    mode: 'list_tools', server_name: 'Svrlog Mcp Server',
-    tools: [{ name: 'get_log', description: '<script>alert(1)</script>', tool_ref: 'mcpt_old' }],
-    total: 3, has_more: true, notice: 'external',
+    mode: 'list_tools', serverName: 'Svrlog Mcp Server',
+    tools: [{ name: 'get_log', description: '<script>alert(1)</script>', toolRef: 'mcpt_old' }],
+    total: 3, hasMore: true, notice: 'external',
   }) })
   assert.match(html, /get_log/)
   assert.match(html, /Svrlog Mcp Server/)
@@ -57,8 +57,8 @@ test('discovery renders tool rows instead of raw metadata, including old history
 
 test('definition renders parameters and expandable complete schema', async () => {
   const html = await render({ displayType: 'mcp_discovery', output: JSON.stringify({
-    name: 'get_log', server_name: 'Svrlog Mcp Server',
-    input_schema: { type: 'object', required: ['start_time'], properties: { start_time: { type: 'string' } } },
+    name: 'get_log', serverName: 'Svrlog Mcp Server',
+    inputSchema: { type: 'object', required: ['start_time'], properties: { start_time: { type: 'string' } } },
   }) })
   assert.match(html, /start_time/)
   assert.match(html, /Svrlog Mcp Server/)

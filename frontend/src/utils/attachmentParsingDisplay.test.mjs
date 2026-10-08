@@ -22,7 +22,7 @@ const t = (key, params) => {
 test('resolveAttachmentParsingCounts prefers structured tool_data', () => {
   assert.deepEqual(
     resolveAttachmentParsingCounts({
-      tool_data: { parsed_count: 2, skipped_count: 1 },
+      tool_data: { parsedCount: 2, skippedCount: 1 },
     }),
     { parsed: 2, skipped: 1 },
   )
@@ -40,7 +40,7 @@ test('resolveAttachmentParsingCounts falls back to legacy output text', () => {
 test('getAttachmentParsingSummaryHtml renders parsed count', () => {
   const html = getAttachmentParsingSummaryHtml(t, {
     success: true,
-    tool_data: { parsed_count: 1, skipped_count: 0 },
+    tool_data: { parsedCount: 1, skippedCount: 0 },
   })
   assert.equal(html, '已解析 <strong>1</strong> 个附件')
 })
@@ -48,7 +48,7 @@ test('getAttachmentParsingSummaryHtml renders parsed count', () => {
 test('getAttachmentParsingSummaryHtml renders skipped count', () => {
   const html = getAttachmentParsingSummaryHtml(t, {
     success: true,
-    tool_data: { parsed_count: 2, skipped_count: 1 },
+    tool_data: { parsedCount: 2, skippedCount: 1 },
   })
   assert.equal(html, '已解析 <strong>2</strong> 个附件，<strong>1</strong> 个未完成已跳过')
 })

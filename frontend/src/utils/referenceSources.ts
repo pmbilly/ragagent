@@ -15,13 +15,6 @@ export type KnowledgeReferenceLike = {
   knowledgeBaseId?: string
   chunkIndex?: number
   chunkType?: string
-  chunk_ids?: string[]
-  knowledge_id?: string
-  knowledge_title?: string
-  knowledge_filename?: string
-  knowledge_base_id?: string
-  chunk_index?: number
-  chunk_type?: string
   content?: string
   metadata?: Record<string, string>
 }
@@ -29,23 +22,20 @@ export type KnowledgeReferenceLike = {
 /**
  * 归一单条引用，供 UI 侧统一消费。
  *
- * SSE `references` 事件的同一个数组有两处来源、两种键名：
- * - `knowledge_references`（服务端重建的检索结果视图）→ camelCase
- * - `data.references`（缓存映射直通，保留库内键名；agent 工具结果载荷同形）→ snake_case
- * 因此这里同时接受两种拼写（camelCase 优先）。聊天/工具域载荷转为 camelCase 后，
- * snake 分支即可收掉。
+ * SSE `references` 事件的引用载荷（`data.references` 与 `knowledge_references`）
+ * 一律 camelCase（工具面 2026-10-08 换锚；不再保留 snake 兼容分支）。
  */
 export function normalizeKnowledgeReference(raw: Record<string, any> | null | undefined): KnowledgeReferenceLike {
   if (!raw) return {}
   return {
     id: raw.id,
-    chunk_ids: raw.chunkIds ?? raw.chunk_ids,
-    knowledgeId: raw.knowledgeId ?? raw.knowledge_id,
-    knowledgeTitle: raw.knowledgeTitle ?? raw.knowledge_title,
-    knowledge_filename: raw.knowledgeFilename ?? raw.knowledge_filename,
-    knowledgeBaseId: raw.knowledgeBaseId ?? raw.knowledge_base_id,
-    chunkIndex: raw.chunkIndex ?? raw.chunk_index,
-    chunkType: raw.chunkType ?? raw.chunk_type,
+    chunkIds: raw.chunkIds,
+    knowledgeId: raw.knowledgeId,
+    knowledgeTitle: raw.knowledgeTitle,
+    knowledgeFilename: raw.knowledgeFilename,
+    knowledgeBaseId: raw.knowledgeBaseId,
+    chunkIndex: raw.chunkIndex,
+    chunkType: raw.chunkType,
     content: raw.content,
     metadata: raw.metadata,
   }
@@ -198,10 +188,10 @@ function buildWebItem(item: KnowledgeReferenceLike, index: number): ReferenceLis
 
 function buildDocumentItem(item: KnowledgeReferenceLike, index: number): ReferenceListItem {
   const chunkId = item.id || `${item.knowledgeId || 'doc'}-${item.chunkIndex ?? index}`
-  const title = item.knowledgeTitle || item.knowledge_filename || item.knowledgeId || 'Document'
+  const title = item.knowledgeTitle || item.knowledgeFilename || item.knowledgeId || 'Document'
   const documentKey =
     item.knowledgeId ||
-    [item.knowledgeBaseId, item.knowledgeTitle || item.knowledge_filename].filter(Boolean).join(':') ||
+    [item.knowledgeBaseId, item.knowledgeTitle || item.knowledgeFilename].filter(Boolean).join(':') ||
     chunkId
   return {
     key: `doc:${documentKey}`,
@@ -209,7 +199,7 @@ function buildDocumentItem(item: KnowledgeReferenceLike, index: number): Referen
     index,
     title,
     chunkId,
-    chunkIds: item.chunk_ids,
+    chunkIds: item.chunkIds,
     knowledgeId: item.knowledgeId,
     knowledgeBaseId: item.knowledgeBaseId,
     snippet: truncateText(item.content || '', 220) || undefined,
@@ -233,7 +223,7 @@ function buildToolItem(item: KnowledgeReferenceLike, index: number): ReferenceLi
 
 function getDocumentGroupKey(item: KnowledgeReferenceLike, index: number): string {
   if (item.knowledgeId) return item.knowledgeId
-  const title = item.knowledgeTitle || item.knowledge_filename
+  const title = item.knowledgeTitle || item.knowledgeFilename
   if (title) return [item.knowledgeBaseId, title].filter(Boolean).join(':')
   return (
     item.id ||
@@ -247,7 +237,7 @@ function mergeDocumentReferences(refs: KnowledgeReferenceLike[]): KnowledgeRefer
   refs.forEach((item, index) => {
     const key = getDocumentGroupKey(item, index)
     const content = String(item.content || '').trim()
-    const chunkIds = Array.from(new Set([...(item.chunk_ids || []), ...(item.id ? [item.id] : [])]))
+    const chunkIds = Array.from(new Set([...(item.chunkIds || []), ...(item.id ? [item.id] : [])]))
     const existing = groups.get(key)
 
     if (!existing) {
@@ -255,18 +245,18 @@ function mergeDocumentReferences(refs: KnowledgeReferenceLike[]): KnowledgeRefer
         ...item,
         id: item.id || key,
         content_parts: content ? [content] : [],
-        chunk_ids: chunkIds,
+        chunkIds,
       })
       return
     }
 
     if (!existing.knowledgeId && item.knowledgeId) existing.knowledgeId = item.knowledgeId
     if (!existing.knowledgeTitle && item.knowledgeTitle) existing.knowledgeTitle = item.knowledgeTitle
-    if (!existing.knowledge_filename && item.knowledge_filename) existing.knowledge_filename = item.knowledge_filename
+    if (!existing.knowledgeFilename && item.knowledgeFilename) existing.knowledgeFilename = item.knowledgeFilename
     if (!existing.knowledgeBaseId && item.knowledgeBaseId) existing.knowledgeBaseId = item.knowledgeBaseId
     for (const chunkId of chunkIds) {
-      if (!existing.chunk_ids?.includes(chunkId)) {
-        existing.chunk_ids = [...(existing.chunk_ids || []), chunkId]
+      if (!existing.chunkIds?.includes(chunkId)) {
+        existing.chunkIds = [...(existing.chunkIds || []), chunkId]
       }
     }
     if (content && !existing.content_parts?.includes(content)) {
@@ -300,7 +290,7 @@ function mergeWebReferences(refs: KnowledgeReferenceLike[]): KnowledgeReferenceL
 export function buildReferenceSections(
   refs: KnowledgeReferenceLike[] | null | undefined,
 ): ReferenceDrawerSection[] {
-  // 归一：调用方可能给到 SSE 重建段（camelCase）或缓存直通/历史库存（snake）
+  // 归一：SSE 重建段与缓存直通载荷均为 camelCase（工具面 2026-10-08 换锚）
   const list = Array.isArray(refs)
     ? refs.map((r) => normalizeKnowledgeReference(r as Record<string, any>)).filter(Boolean)
     : []
