@@ -66,6 +66,12 @@ import org.springframework.stereotype.Service;
  *       无编译期保护；存量在基线，随逐域 Lambda 化清空。</li>
  *   <li><b>{@code .last(} 只许纯字符串字面量</b>（R9）：拼接既是注入面也是方言漂移点；
  *       动态行数走分页插件或注解 SQL {@code #{}} 参数化。</li>
+ *   <li><b>分层倒挂</b>（R10）：{@code service} 不得依赖 {@code controller}（方向必须
+ *       controller → service → repository/mapper），{@code domain} 不得依赖
+ *       {@code service}/{@code controller}（领域模型保持纯净）。</li>
+ *   <li><b>Mapper 接口包约定</b>（R11）：命名以 {@code Mapper} 结尾的<b>顶层</b>接口必须落在
+ *       {@code ..mapper..} 包——{@code @MapperScan("com.ragagent.**.mapper")} 只扫这些包，
+ *       放错包的表现是启动期缺 Bean 或该 mapper <b>静默不注册</b>。</li>
  * </ol>
  *
  * <p>新加规则请只加<b>当前零违例</b>的规则，否则等于把存量违例变成噪声；确有存量违例要
@@ -503,5 +509,35 @@ class ArchitectureRulesTest {
         packages.addAll(List.of(scan.value()));
         packages.addAll(List.of(scan.basePackages()));
         return packages;
+    }
+
+
+    // ── R10 分层倒挂 / R11 Mapper 包约定（2026-10-08 B91 补，当前零违例）─────────
+
+    @Test
+    @DisplayName("R10：service 不得依赖 controller；domain 不得依赖 service/controller")
+    void noLayerInversions() {
+        assertThat(MAIN.size()).as("主源集导入为空或过少：检查 ImportOption 的输出目录过滤").isGreaterThan(500);
+        noClasses().that().resideInAPackage("..service..")
+                .should().dependOnClassesThat().resideInAPackage("..controller..")
+                .because("依赖方向必须 controller → service → repository/mapper；"
+                        + "service 回头引用 controller 即分层倒挂（B91 实测为 0，保持住）")
+                .check(MAIN);
+        noClasses().that().resideInAPackage("..domain..")
+                .should().dependOnClassesThat().resideInAnyPackage("..service..", "..controller..")
+                .because("domain 是数据/领域模型，不得反向依赖 service/controller")
+                .check(MAIN);
+    }
+
+    @Test
+    @DisplayName("R11：*Mapper 接口必须落在 ..mapper.. 包（@MapperScan 范围）")
+    void mapperInterfacesLiveInMapperPackages() {
+        // 只约束顶层接口：@MapperScan 注册的是顶层接口，嵌套的 helper 接口（如
+        // DorisSqlExecutor$RowMapper，JDBC 行映射用）不在其语义内。
+        classes().that().areInterfaces().and().areNotNestedClasses().and().haveSimpleNameEndingWith("Mapper")
+                .should().resideInAPackage("..mapper..")
+                .because("@MapperScan(\"com.ragagent.**.mapper\") 只扫 mapper 包；"
+                        + "放错包 = 启动期缺 Bean 或该 mapper 静默不注册")
+                .check(MAIN);
     }
 }

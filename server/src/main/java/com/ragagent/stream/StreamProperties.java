@@ -1,11 +1,11 @@
-package com.ragagent.config;
+package com.ragagent.stream;
 
 import java.time.Duration;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * 流管理器配置。
+ * 流管理器配置（2026-10-08 B91：由 `config` 搬入 `stream`，切断 `stream → config` 反向依赖）。
  *
  * <p>对应的来源环境变量：{@code STREAM_MANAGER_TYPE} / {@code REDIS_ADDR} /
  * {@code REDIS_USERNAME} / {@code REDIS_PASSWORD} / {@code REDIS_DB} /

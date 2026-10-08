@@ -972,3 +972,15 @@
 - **用例改写**：`McpToolResult.test` 去 "including old history" 命名并夹具 camel；`referenceSources.test` 三条「双拼等价」用例改为 camel-only（并修一处断言为真实形状：1 section / 2 items）；`wikiToolReferences.test`/`chatMarkdownRenderer.test`/`attachmentParsingDisplay.test`/`rag-pipeline-history.test` 夹具 camel。
 - **闸门**：后端全量 **4,836**/0 + 前端 **736**/736 + `vue-tsc` 0 错 + `spotlessCheck` + 四守卫（JSON 键名 260 条 / 包环 / Go 锚点 / 跨面键 43 条）全绿。
 - **下一步候选**：§15.3「已解除」里三项（SSE 事件载荷键、wiki 图片标记、落库 jsonb 存量键）现已是普通改造；阶段 4 起步（B91：`StreamProperties` 搬家 + ArchUnit R9+ 观察模式）。
+
+**✅ B91（2026-10-08，阶段 4 起步：C1 破环 + 架构规则）**
+- **C1（一行级搬家）**：`config/StreamProperties` → `com.ragagent.stream`；`@ConfigurationPropertiesScan` 名单加 `com.ragagent.stream`（**不能漏**：漏了属性绑定静默失效，ArchUnit R2 会红）；`StreamManagerConfig` 去掉跨包 import。
+  效果：`stream → config` 边消失 ⇒ SCC 从 2 组降到 **1 组**（只剩 `{audit,auth,knowledge,model,retrieval,storage,wiki}`），守卫「依赖 config 的包」1 → 0。
+- **守卫补 SCC 棘轮（R1b）**：`check-package-cycles.py` 原先 R1 只查「两两双向」（实测 0 组，漏掉真实存在的三包以上环）。现补 Tarjan 强连通分量 + 基线 `sccs` 字段，**成员只许减不许增**，消除后提示刷新基线。
+  **红态探针**：临时在 `stream` 建类 import `config` → 守卫报「间接环（SCC）：2 组（基线 1）；新增成员：['config','im','session','stream']」+ 非零退出 ✓（探针已删）。
+- **ArchUnit R10/R11**（续既有 R1~R9，遵守类注释「只加当前零违例的规则」）：
+  - R10 分层倒挂：`service` 不依赖 `controller`、`domain` 不依赖 `service`/`controller` —— 实测 0 违例 ⇒ 直接断言；两条探针**都验红**。
+  - R11 Mapper 包约定：`*Mapper` 顶层接口必须在 `..mapper..` —— 首版被 `DorisSqlExecutor$RowMapper`（嵌套 helper）误报 ⇒ 收窄为 `areNotNestedClasses()`（`@MapperScan` 语义即顶层接口）；探针验红。
+- **机制（为什么包环不写进 ArchUnit）**：类注释写明分工——**包级结构（包间环/分层/config 依赖）归脚本棘轮，代码级规则归本测试**；「顶层包无环」落在脚本 R1b（SCC）。
+- **闸门**：后端全量 **4,836**/0 + `spotlessCheck` + 四守卫（JSON 键名 / 包环含 SCC / Go 锚点 / 跨面键）全绿。
+- **下一步候选**：§15.3「已解除」三面（SSE 事件载荷键 / wiki 图片标记 / 落库 jsonb 存量键），或阶段 4 续做 C2~C8 端口化（`auth` 依赖下沉、`wiki→knowledge` 门面 43 处）。

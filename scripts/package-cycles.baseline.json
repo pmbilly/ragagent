@@ -1,8 +1,17 @@
 {
   "cycles": [],
-  "depend_on_config": [
-    "stream"
+  "sccs": [
+    [
+      "audit",
+      "auth",
+      "knowledge",
+      "model",
+      "retrieval",
+      "storage",
+      "wiki"
+    ]
   ],
+  "depend_on_config": [],
   "l2_to_l3": [
     [
       "chatpipeline",

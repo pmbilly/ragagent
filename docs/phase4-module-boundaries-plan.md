@@ -36,10 +36,10 @@ ArchUnit 1.3.0 **已是测试依赖**（`server/build.gradle.kts:111`），可�
 `scripts/check-package-cycles.py` 的 R1 只查 `A→B 且 B→A`（**当前 0 组**），
 但按"包级强连通分量"（SCC）实测存在 **2 个间接环**：
 
-| SCC | 成员（11 包） | 环路径样例 |
+| SCC | 成员 | 状态（2026-10-08 B91） |
 |---|---|---|
-| **SCC-A（7）** | `audit`、`auth`、`knowledge`、`model`、`retrieval`、`storage`、`wiki` | `wiki → auth → audit → wiki`；`knowledge → retrieval → auth → audit → wiki → knowledge` |
-| **SCC-B（4）** | `config`、`im`、`session`、`stream` | `stream → config → im → session → stream` |
+| **SCC-A（7）** | `audit`、`auth`、`knowledge`、`model`、`retrieval`、`storage`、`wiki` | ⬜ 待解（C2~C8） |
+| **SCC-B（4）** | ~~`config`、`im`、`session`、`stream`~~ | ✅ **已解**（C1：`StreamProperties` 由 `config` 搬入 `stream`；脚本已补 SCC 棘轮 `R1b` 防回归，探针验过） |
 
 **这就是阶段 4 的真正前置**：模块化 = 把包图变成 DAG，间接环不解决，模块无法切。
 
@@ -60,7 +60,7 @@ ArchUnit 1.3.0 **已是测试依赖**（`server/build.gradle.kts:111`），可�
 
 | # | 边 | 处数 | 位置 | 修法 |
 |---|---|---|---|---|
-| C1 | `stream → config` | 1 | `stream/StreamManagerConfig` 用 `config.StreamProperties` | 把 `StreamProperties` 搬进 `stream`（或 `stream/config`），`config` 只做装配 ⇒ **SCC-B 立刻破环** |
+| ✅ C1 | `stream → config` | 1 | `stream/StreamManagerConfig` 用 `config.StreamProperties` | **已完成（B91）**：`StreamProperties` 搬入 `com.ragagent.stream`（扫描名单同步加 `com.ragagent.stream`）；守卫 `依赖 config 的包` 1→0，SCC 2→1 组 |
 
 破环后 SCC-B 变成 `config → {im → session → stream}`（单向，装配层允许 →域），模块化可直接按 §3 落。
 
@@ -120,29 +120,31 @@ ArchUnit 1.3.0 **已是测试依赖**（`server/build.gradle.kts:111`），可�
 `config/` 与 `RagAgentApplication` 归 `:app`；`@ConfigurationPropertiesScan` 白名单逐模块覆核；
 `settings.gradle.kts` 模块清单与 `docs/backend-package-map.md` 同步。
 
-## 4. ArchUnit 规则清单（**扩展既有 `com.ragagent.arch.ArchitectureRulesTest`**，勿另起一套）
+## 4. 架构规则（**已有基座**，本阶段续号落地）
 
-现状：该测试已有 **R1~R8**（`System.getenv` 落点、`@ConfigurationProperties` 扫描名单、双装配、
-`install*` 只许装配层、源文件裸 NUL、构造器/字段禁 `@Lazy`、裸 JDBC 白名单、禁字符串列名 wrapper），
-并明确**不引入 `FreezingArchRule` 存储文件**——包级棘轮走脚本（`check-package-cycles.py`）。
-⇒ 本阶段新增规则**续号 R9+**，风格与既有保持一致：能硬断言的直接断言，需渐进收紧的走"脚本棘轮 + 白名单"。
+**已存在的两层基座**（不要另起一套）：
 
-| 编号 | 规则 | 断言 | 现状预期 |
-|---|---|---|---|
-
-| 规则 | 断言 | 现状预期 |
+| 层 | 载体 | 现有内容 |
 |---|---|---|
-| R9 模块方向 | `noClasses().that().resideInAPackage("com.ragagent.platform..").should().dependOnClassesThat().resideInAnyPackage("com.ragagent.(knowledge|wiki|session|agent|…)..")` | 需先解 C5（`storage→auth` 等不在 platform 内）——platform 只放 `common` 时可直接绿 |
-| R10 无环（顶层包） | `slices().matching("com.ragagent.(*)..").should().beFreeOfCycles()` | **当前红（2 SCC）** ⇒ 作为目标规则，解 C1~C8 后开启 |
-| R11 L2 不依赖 L3 | `noClasses().that().resideInAPackage("..(llm\|retrieval\|embedding\|rerank\|chatpipeline)..").should().dependOnClassesThat().resideInAnyPackage("..(knowledge\|wiki\|session\|agent\|…)..")` | 基线 6 条，逐条降 |
-| R12 controller 不经 mapper | `noClasses().that().resideInAPackage("..controller..").should().dependOnClassesThat().resideInAPackage("..mapper..")` | **2026-10-08 实测 6 处**：`embed/EmbedChannelController`、`auth/apikey/TenantAPIKeyController`、`wiki/WikiPageController`、`wiki/WikiKbAccessGuard`、`initialization/InitializationController`、`system/SystemAdminController`（其中 wiki 两处正是 C2 的同一批，门面化后一并消失） |
-| R13 分层倒挂 | `noClasses().that().resideInAPackage("..service..").should().dependOnClassesThat().resideInAPackage("..controller..")`；`..domain..` 不依赖 `..service..` | **2026-10-08 实测均为 0 处** ⇒ 可直接开启为防回归规则 |
-| R14 装配层单向 | `noClasses().that().resideOutsideOfPackage("com.ragagent.config..").should().dependOnClassesThat().resideInAPackage("com.ragagent.config..")` | 对应守卫 R2（基线 1：`stream→config`，即 C1） |
-| R15 Mapper 包约定 | `classes().that().areInterfaces().and().haveSimpleNameEndingWith("Mapper").should().resideInAPackage("..mapper..")` | 保护 `@MapperScan("com.ragagent.**.mapper")` |
-| R16 domain 不依赖 Controller | `noClasses().that().resideInAPackage("..domain..").should().dependOnClassesThat().haveSimpleNameEndingWith("Controller")` | 低风险加固 |
+| 代码级 | `com.ragagent.arch.ArchitectureRulesTest` | **R1~R9**：禁裸 `System.getenv` / `@ConfigurationProperties` 必须在扫描名单 / 禁双装配 / `install*` 只许装配层 / 禁裸 NUL / 禁 `@Lazy` / 裸 JDBC 白名单 / 禁字符串列名 wrapper / `.last(` 只许字面量。风格：能硬断言就断言，有存量违例走"代码内基线 + ratchet 双断言"；**不引入 FreezingArchRule 存储文件** |
+| 包级 | `scripts/check-package-cycles.py`（CI guards） | 两两环棘轮（R1）/ **间接环 SCC 棘轮（R1b，B91 新增）** / 装配层单向（R2：域不得 import `config`）/ L2 不依赖 L3（R3） |
 
-> 落地节奏：**每次只开一条**，先跑成"当前违规清单"（`archunit` 的 `FreezingArchRule` 或自写白名单），
-> 再随批次降数——与仓库既有的"棘轮"风格一致（`check-json-key-case.py` / `check-package-cycles.py` 同款）。
+**本阶段已落地（B91，2026-10-08，含红态探针）**
+
+| 编号 | 规则 | 现状 |
+|---|---|---|
+| **R10** | `service` 不得依赖 `controller`；`domain` 不得依赖 `service`/`controller`（分层倒挂） | 实测 **0 违例** ⇒ 直接断言；两条探针均验红 |
+| **R11** | 以 `Mapper` 结尾的**顶层接口**必须落在 `..mapper..` 包（护 `@MapperScan("com.ragagent.**.mapper")`） | 实测 0 违例；收窄为顶层接口（排除嵌套 helper `DorisSqlExecutor$RowMapper`），探针验红 |
+| **脚本 R1b** | 顶层包**间接环**（SCC）棘轮（基线 1 组：SCC-A） | 探针（重建 `stream → config`）验证报"新增成员"并非零退出 |
+
+**其余候选（按需续号；每条落地前先量当前违例数）**
+
+| 候选 | 断言 | 现状 |
+|---|---|---|
+| R12 模块方向 | `platform`（`common`）不依赖业务域；`engine` 不依赖域 | 待档 A/B 模块化落地（L2→L3 已有脚本棘轮，基线 6 条） |
+| R13 controller 不经 mapper | `..controller..` 不依赖 `..mapper..` | 实测 **6 处**（`embed`/`auth/apikey`/`wiki`×2/`initialization`/`system`）；wiki 两处随 C2 门面化消失 ⇒ 届时按 R6-R9 基线模式棘轮化 |
+| R14 装配层单向 | 域不得依赖 `config` | 已由脚本 R2 覆盖（当前 0 包） |
+| R15 顶层包无环 | `slices(...).beFreeOfCycles()` | 已由脚本 R1b 覆盖；ArchUnit 版留待模块化后 |
 
 ## 5. 风险与缓解
 
@@ -167,7 +169,7 @@ ArchUnit 1.3.0 **已是测试依赖**（`server/build.gradle.kts:111`），可�
 
 | 批次 | 内容 | 规模 | 前置 |
 |---|---|---|---|
-| **B91** | 解 C1（`StreamProperties` 搬家）+ 开 ArchUnit **R-A2 观察模式**（先输出违规清单，不拦） | 小 | 无 |
+| **B91** ✅ 完成（2026-10-08） | 解 C1（`StreamProperties` 搬家，SCC-B 破环）+ 守卫补 SCC 棘轮 + ArchUnit R10/R11（含红态探针） | 小 | 无 |
 | **B92** | 端口化 C4/C5/C7（`auth` 依赖下沉：apikey scope、tenantconfig、TenantService） | 中 | 无 |
 | **B93** | 端口化 C6 + C8（`retrieval→auth`、`audit→wiki`）⇒ SCC-A 消失 | 小 | B92 |
 | **B94** | 门面化 C2（`wiki→knowledge` 43 处，引入 `KnowledgeBaseLookup`） | 大 | 无（可与 B92/93 并行） |

@@ -5,8 +5,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
-import com.ragagent.config.StreamProperties;
-
 /**
  * 选择流管理器实现。
  *
