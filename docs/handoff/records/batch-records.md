@@ -1106,3 +1106,19 @@
   `knowledge.domain.{Chunk,Knowledge,KnowledgeBase,KnowledgeProcessingSpan}`、`mapper.{KnowledgeMapper,KnowledgeBaseMapper,ChunkMapper}`、`repository.ChunkRepository`、`service.SpanTracker`、`support.ImageInfoEnricher`、`client.EmbedderClient.configFrom`。
   且 `requireWikiKB` 有 **22 个调用点**。⇒ C2 拆三批：**C2-a ✅**（本批，读侧）/ **C2-b ingest 门面**（真正大头：提交/落库/span/图片富化/嵌入配置）/ **C2-c 调用点收尾**。
 - **闸门**：后端 4,838/0（唯一红条 = 已知 flaky `EmbedRateLimiterTest`，复跑即过）；五守卫绿（环 0、L2→L3 5）。
+
+**✅ B99（2026-10-08，C2-b 侦察 + KB 读再收口）**
+- **方法级侦察**（把"36 处"变成"7 组能力"）：
+  | 能力组 | 站点 | 端口建议 |
+  |---|---|---|
+  | KB 读 | `WikiIngestBatchHandler.getKnowledgeBaseByIDOnly`、`WikiPageServiceImpl:444` | ✅ 已有 |
+  | Knowledge 读 | `getKnowledgeByIDOnly`、`isKnowledgeGone`、finalizer（parseStatus/title） | `knowledgeById` 视图 |
+  | Knowledge 写 | `DefaultWikiKnowledgeFinalizer:75,90` | `updateKnowledge` |
+  | **Chunk 读写** | batchHandler/citePipeline/cleaner/imageEnricher | `textChunks`/`deleteChunks`/`chunksByTypes`（**`Chunk` 实体被 7 文件传递 ⇒ 需先定 `ChunkView`**） |
+  | Span 生命周期 | `WikiBatchSupport:278-339` 等 6 方法 | 句柄式 `SpanHandle` |
+  | 图片富化 | `DefaultWikiImageEnricher` 3 方法 | 直搬 |
+  | 嵌入 | `EmbedderClient.configFrom`/`embedBatch` | 2 方法 |
+- **两类"贵"点**（下批要连测试一起改）：`WikiIngestBatchHandler`（7 引入；`WikiIngestBatchHandlerTest` 用位置参数构造 + `wikiKb()` 夹具 stub mapper ⇒ 端口化要同步重写替身）；`Chunk` 实体传递（7 文件）。
+- **本批实做**：`WikiPageServiceImpl:444` 换 `kbLookup.kbByIdIncludingDeleted`（无测试直构 ⇒ 零涟漪）⇒ `wiki → knowledge` **36 → 34**；`spotlessApply` 清 4 个失用 import。
+- **闸门**：wiki 面测试全绿 + `spotlessCheck` + 四守卫绿。
+- **下一步**：C2-b 实施建议顺序——① `common` 定 `ChunkView` + `SpanHandle`；② `WikiIngestBatchHandler` 端口化（含测试替身）；③ cite/cleaner/imageEnricher/finalizer；④ embedder；⑤ C2-c 的 22 个 `requireWikiKB` 调用点。

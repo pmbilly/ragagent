@@ -7,9 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
+import com.ragagent.common.knowledge.KnowledgeBaseLookup;
 import com.ragagent.wiki.domain.WikiCategoryPaths;
 import com.ragagent.wiki.domain.WikiConstants;
 import com.ragagent.wiki.domain.WikiException;
@@ -81,7 +79,7 @@ public class WikiPageServiceImpl implements WikiPageService {
 
     final WikiPageRepository repo;
     final WikiFolderRepository folderRepo;
-    final KnowledgeBaseMapper kbMapper;
+    final KnowledgeBaseLookup kbLookup;
     final ObjectProvider<WikiChunkCleaner> chunkCleaner;
     final ObjectProvider<WikiCrossLinker> crossLinker;
     final ObjectProvider<WikiPendingOpsCounter> pendingOps;
@@ -100,14 +98,14 @@ public class WikiPageServiceImpl implements WikiPageService {
 
     public WikiPageServiceImpl(WikiPageRepository repo,
                                WikiFolderRepository folderRepo,
-                               KnowledgeBaseMapper kbMapper,
+                               KnowledgeBaseLookup kbLookup,
                                ObjectProvider<WikiChunkCleaner> chunkCleaner,
                                ObjectProvider<WikiCrossLinker> crossLinker,
                                ObjectProvider<WikiPendingOpsCounter> pendingOps,
                                ObjectProvider<WikiActiveFlag> activeFlag) {
         this.repo = repo;
         this.folderRepo = folderRepo;
-        this.kbMapper = kbMapper;
+        this.kbLookup = kbLookup;
         this.chunkCleaner = chunkCleaner;
         this.crossLinker = crossLinker;
         this.pendingOps = pendingOps;
@@ -441,9 +439,7 @@ public class WikiPageServiceImpl implements WikiPageService {
 
     final WikiPage createDefaultPage(String kbId, String slug, String title, String pageType,
                                        String content) {
-        KnowledgeBase kb = kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getId, kbId)
-                .last("LIMIT 1"));
+        KnowledgeBaseLookup.KnowledgeBaseView kb = kbLookup.kbByIdIncludingDeleted(kbId);
         if (kb == null) {
             throw new WikiException("get knowledge base: knowledge base not found");
         }
