@@ -1038,3 +1038,13 @@
 - **顺带**：清理 `check-json-key-case.py` 的 1 条过期基线条目（`session/service/MessageSuggestionService.java` 已无命中）。
 - **闸门**：后端 4,838/0（唯一红条 = 已记录 flaky `EmbedRateLimiterTest`，复跑即过）；前端 736/0；五守卫绿。
 - **规划文档同步**：阶段 4 的 C2~C8 端口化（`wiki→knowledge` 门面、`auth` 依赖下沉、SCC-A 七包解环）仍是余下的结构性大活。
+
+**✅ B94（2026-10-08，阶段 4 解环收口：C8 ⇒ 包图成 DAG）**
+- **做法：搬端口，不搬实现**。`wiki/domain/WikiActivityAudit` → `common/audit/WikiActivityAudit`（接口在中性包；实现 `audit/service/WikiActivityAuditRecorder` 不动，`@Component` 装配不变 ⇒ 无 wiring 变更）。改 6 文件：1 搬移 + 5 处 import（含 1 个测试）。
+- **效果超预期**：`audit → wiki` 是 SCC-A 里 `audit` 的**唯一出边** —— 这条边断掉后，7 包间接环（`audit`/`auth`/`knowledge`/`model`/`retrieval`/`storage`/`wiki`）**整体瓦解**；守卫输出 `间接环（SCC）：1 → 0 组`、基线刷新（两两环 0 / 间接环 **0** / 依赖 config 0 / L2→L3 6）⇒ **包图现为 DAG，模块化的前置条件达成**（原计划里 C2~C7 才算完成前置）。
+- **为什么有效**：SCC 的存在只需要"每条环上有多条边"，而 `audit` 在环里只出不进（它只依赖 `wiki` 这一条）⇒ 移走该出边即把它变成叶子，环自然断。
+- **剩余结构性项**（下一批 B95）：**C6** `retrieval → auth`（3 处 import：`HybridSearchService` 的 `TenantService` + `auth.domain.Tenant`、`EffectiveEngines.of(Tenant,…)`）+ **C7** `model → auth`（1 处，`ModelService` 的 `TenantService`）。
+  **端口设计已定**（侦察结论：三处对 `Tenant` 的用法只是读三个 jsonb 配置）：
+  `common/tenant/TenantConfigLookup { JsonNode retrieverEngines(long); JsonNode retrievalConfig(long); JsonNode memoryConfig(long); }`，
+  让 `auth.service.TenantService implements TenantConfigLookup`（已有 `getTenantById`，无新 wiring）；`EffectiveEngines.of(Tenant,…)` → `of(JsonNode,…)`（调用点 2 个：`HybridStoreGroupOps`、`ChunkQuestionService`，两者都持有 Tenant 或端口）。
+- **闸门**：后端 4,838/0 + `spotlessCheck` + 五守卫绿。

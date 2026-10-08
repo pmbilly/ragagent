@@ -38,7 +38,7 @@ ArchUnit 1.3.0 **已是测试依赖**（`server/build.gradle.kts:111`），可�
 
 | SCC | 成员 | 状态（2026-10-08 B91） |
 |---|---|---|
-| **SCC-A（7）** | `audit`、`auth`、`knowledge`、`model`、`retrieval`、`storage`、`wiki` | ⬜ 待解（C2~C8） |
+| **SCC-A（7）** | ~~`audit`、`auth`、`knowledge`、`model`、`retrieval`、`storage`、`wiki`~~ | ✅ **已解**（B94/C8：把 `WikiActivityAudit` 端口由 `wiki.domain` 搬入 **`common.audit`** ⇒ `audit → wiki` 这条边消失，**整个 7 包环随之瓦解**——它在环中只依赖这一条出边；守卫 `间接环 1 → 0 组`，**包图现为 DAG**） |
 | **SCC-B（4）** | ~~`config`、`im`、`session`、`stream`~~ | ✅ **已解**（C1：`StreamProperties` 由 `config` 搬入 `stream`；脚本已补 SCC 棘轮 `R1b` 防回归，探针验过） |
 
 **这就是阶段 4 的真正前置**：模块化 = 把包图变成 DAG，间接环不解决，模块无法切。
@@ -74,7 +74,7 @@ ArchUnit 1.3.0 **已是测试依赖**（`server/build.gradle.kts:111`），可�
 | C5 | `storage → auth` | 16 | `storage/provider/FileServiceFactory → domain.tenantconfig.StorageEngineConfig` | 租户配置（`tenantconfig`）是**跨域共享配置 jsonb**：下沉到 `common.tenant`（与 `TenantProperties` 同址），auth 只负责读写端点 |
 | C6 | `retrieval → auth` | 3 | `retrieval/HybridSearchService → domain.Tenant` | 改为参数/端口传入（租户 ID 与隔离策略由调用方给）⇒ 断 `knowledge → retrieval → auth` 链 |
 | C7 | `model → auth` | 1 | `model/service/ModelService → service.TenantService` | 同上端口化（租户查询） |
-| C8 | `audit → wiki` | 1 | `audit/service/WikiActivityAuditRecorder → domain.WikiActivityAudit` | 把该 recorder 移到 `wiki`（由 wiki 调 audit 端口），使 `audit` 成为**纯叶子** |
+| ✅ C8 | `audit → wiki` | 1 | `audit/service/WikiActivityAuditRecorder → domain.WikiActivityAudit` | **已完成（B94）**：**搬端口而非搬实现**——接口移到 `common.audit`（实现仍在 audit，`wiki`/`audit` 同时只依赖中性包）⇒ `audit` 成为纯叶子，且 SCC-A 整体消失 |
 
 > C2~C8 全部做完后，SCC-A 消失，包图成为 DAG，`audit`/`common`/`llm` 在底，业务域在顶。
 

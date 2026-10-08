@@ -5,7 +5,7 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.error.BizException;
 import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
-import com.ragagent.wiki.domain.WikiActivityAudit;
+import com.ragagent.common.audit.WikiActivityAudit;
 import com.ragagent.wiki.service.page.WikiLintService;
 import com.ragagent.wiki.service.page.WikiPageService;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,9 +1,10 @@
-package com.ragagent.wiki.domain;
+package com.ragagent.common.audit;
 
 import java.util.Map;
 
 /**
- * 知识库活动流的 wiki 变更投影接缝。
+ * 知识库活动流的 wiki 变更投影接缝（**端口**：定义在中性包 `common.audit`，
+ * 实现由审计模块提供；B94/C8 把它从 `wiki.domain` 搬来，使 `audit` 不再依赖 `wiki`）。
  *
  * <p>HTTP 层把人工页面变更写成一条 {@code wiki_content_changed} 审计事件。
  * 净效果是一条 {@code AuditLog}：Action={@code wiki_content_changed}、Scope={@code knowledgebase}、
