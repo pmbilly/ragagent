@@ -1,9 +1,12 @@
-package com.ragagent.agent;
+package com.ragagent.common.prompt;
 
 /**
  * 共享提示词常量（文案逐字稳定，勿随意改动）。
+ *
+ * <p>B108：原在 {@code agent.PromptInstructions}，因 L2 {@code chatpipeline} 与 L3 {@code agent}/{@code session}
+ * 都要用同一份措辞而下沉 L1；与 {@link PromptInstructions}（KB 业务指引追加）同名不同职，故改名。</p>
  */
-public final class PromptInstructions {
+public final class PromptConstants {
 
     /**
      * Agent、普通 QA 与模型回退共享。
@@ -33,6 +36,6 @@ public final class PromptInstructions {
             + "its factual claims, and accurately distinguishes completed actions from remaining work. "
             + "Source citation formatting is controlled by the runtime protocol.";
 
-    private PromptInstructions() {
+    private PromptConstants() {
     }
 }

@@ -14,7 +14,7 @@ import com.ragagent.common.llm.ToolResult;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.agent.tools.BaseTool;
 import com.ragagent.agent.tools.SearchAuth;
-import com.ragagent.agent.tools.SearchTarget;
+import com.ragagent.common.retrieval.SearchTarget;
 import com.ragagent.agent.tools.ToolDefinitions;
 import com.ragagent.agent.tools.ToolRequest;
 

@@ -21,7 +21,7 @@ import com.ragagent.retrieval.domain.ImageInfo;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.retrieval.support.ImageInfoMatchUtil;
 import com.ragagent.retrieval.support.SearchTextUtil;
-import com.ragagent.agent.tools.SearchTarget;
+import com.ragagent.common.retrieval.SearchTarget;
 import com.ragagent.knowledge.domain.DocumentChunkMetadata;
 import com.ragagent.knowledge.domain.GeneratedQuestion;
 import com.ragagent.tracing.langfuse.LangfuseManager;

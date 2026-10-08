@@ -12,7 +12,7 @@ import com.ragagent.agent.tools.knowledge.GrepChunksTool;
 import com.ragagent.agent.tools.knowledge.KnowledgeSearchTool;
 import com.ragagent.agent.tools.knowledge.QueryKnowledgeGraphTool;
 import com.ragagent.agent.tools.SearchAuth;
-import com.ragagent.agent.tools.SearchTarget;
+import com.ragagent.common.retrieval.SearchTarget;
 import com.ragagent.common.pipeline.SearchParams;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.settings.ConversationProperties;

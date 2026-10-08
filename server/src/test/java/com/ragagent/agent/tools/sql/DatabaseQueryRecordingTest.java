@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.llm.ToolResult;
 import com.ragagent.agent.tools.sql.DatabaseQueryTool.QueryResult;
 import com.ragagent.agent.tools.sql.DatabaseQueryTool.SqlQueryExecutor;
-import com.ragagent.agent.tools.SearchTarget;
+import com.ragagent.common.retrieval.SearchTarget;
 import com.ragagent.agent.tools.ToolRequest;
 import com.ragagent.agent.tools.GoRecording45B;
 import com.ragagent.agent.tools.RecordingSupport;

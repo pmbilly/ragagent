@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ragagent.agent.compaction.ConversationSerializer;
+import com.ragagent.common.prompt.PromptConstants;
 
 /**
  * agent 系统提示词合成。
@@ -502,7 +503,7 @@ public final class AgentPrompts {
         sections.add(new SystemPromptSection("base",
                 renderPromptPlaceholdersWithStatus(template, knowledgeBases, webSearchEnabled, currentTime, language)));
         sections.add(new SystemPromptSection("steering", STEER_GUIDANCE));
-        String runtime = PromptInstructions.SOURCE_DATA_BOUNDARY_PROMPT + "\n\n" + RUNTIME_PROMPT_CONTRACT_TAIL;
+        String runtime = PromptConstants.SOURCE_DATA_BOUNDARY_PROMPT + "\n\n" + RUNTIME_PROMPT_CONTRACT_TAIL;
         if (!language.isEmpty()) {
             runtime += "\nUse " + language
                     + " by default; follow the user's explicit language and output-format requests.";
@@ -514,7 +515,7 @@ public final class AgentPrompts {
         String sources = GroundingPrompt.formatGroundingGuidance(safeNames);
         sections.add(new SystemPromptSection("sources", sources));
         sections.add(new SystemPromptSection("tools", formatToolGuidance(safeNames)));
-        sections.add(new SystemPromptSection("output", PromptInstructions.SOURCED_ANSWER_OUTPUT_PROMPT));
+        sections.add(new SystemPromptSection("output", PromptConstants.SOURCED_ANSWER_OUTPUT_PROMPT));
         if (options != null) {
             if (options.getSkillsMetadata() != null && !options.getSkillsMetadata().isEmpty()) {
                 sections.add(new SystemPromptSection("skills",
@@ -559,7 +560,7 @@ public final class AgentPrompts {
 
     /** 完整 runtime 契约（前缀常量 + 尾段常量的运行时组装形态）。 */
     public static String runtimePromptContract() {
-        return PromptInstructions.SOURCE_DATA_BOUNDARY_PROMPT + "\n\n" + RUNTIME_PROMPT_CONTRACT_TAIL;
+        return PromptConstants.SOURCE_DATA_BOUNDARY_PROMPT + "\n\n" + RUNTIME_PROMPT_CONTRACT_TAIL;
     }
 
     /** pure 模式的默认系统提示词；无配置/无模板 → ""。 */

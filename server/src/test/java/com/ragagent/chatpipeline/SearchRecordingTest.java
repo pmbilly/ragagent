@@ -110,7 +110,7 @@ class SearchRecordingTest {
         cm.setVectorThreshold(0.5);
         cm.setKeywordThreshold(0.6);
         cm.setSearchTargets(new ArrayList<>(List.of(
-                new com.ragagent.agent.tools.SearchTarget("knowledge_base", "kb-1", 1, null, null, null, false))));
+                new com.ragagent.common.retrieval.SearchTarget("knowledge_base", "kb-1", 1, null, null, null, false))));
         List<SearchResult> first = new ArrayList<>();
         first.add(Rec46cSupport.sr("hit-0", "原命中", "k0", 0.9));
         cm.setSearchResult(first);
@@ -261,7 +261,7 @@ class SearchRecordingTest {
         cm2.setVectorThreshold(0.4);
         cm2.setKeywordThreshold(0.5);
         cm2.setSearchTargets(new ArrayList<>(List.of(
-                new com.ragagent.agent.tools.SearchTarget("knowledge_base", "kb-1", 1, null, null, null, false))));
+                new com.ragagent.common.retrieval.SearchTarget("knowledge_base", "kb-1", 1, null, null, null, false))));
         cm2.setTenantId(1);
         boolean[] next = {false};
         PluginError err2 = p2.onEvent(PipelineEventType.CHUNK_SEARCH, cm2, () -> { next[0] = true; return null; });
@@ -286,7 +286,7 @@ class SearchRecordingTest {
         cm3.setRerankTopK(2);
         cm3.setEnableQueryExpansion(true);
         cm3.setSearchTargets(new ArrayList<>(List.of(
-                new com.ragagent.agent.tools.SearchTarget("knowledge_base", "kb-1", 1, null, null, null, false))));
+                new com.ragagent.common.retrieval.SearchTarget("knowledge_base", "kb-1", 1, null, null, null, false))));
         cm3.setTenantId(1);
         boolean[] next3 = {false};
         PluginError err3 = p3.onEvent(PipelineEventType.CHUNK_SEARCH, cm3, () -> { next3[0] = true; return null; });
@@ -333,7 +333,7 @@ class SearchRecordingTest {
         cm5.setRewriteQuery("并发检索");
         cm5.setEmbeddingTopK(10);
         cm5.setSearchTargets(new ArrayList<>(List.of(
-                new com.ragagent.agent.tools.SearchTarget("knowledge_base", "kb-1", 1, null, null, null, false))));
+                new com.ragagent.common.retrieval.SearchTarget("knowledge_base", "kb-1", 1, null, null, null, false))));
         cm5.setWebSearchEnabled(true);
         cm5.setWebSearchProviderId("prov-1");
         cm5.setTenantId(1);
@@ -356,7 +356,7 @@ class SearchRecordingTest {
         cm6.setRewriteQuery("树状筛选器 新建入口");
         cm6.setEmbeddingTopK(10);
         cm6.setSearchTargets(new ArrayList<>(List.of(
-                new com.ragagent.agent.tools.SearchTarget("knowledge_base", "kb-1", 1, null, null, null, false))));
+                new com.ragagent.common.retrieval.SearchTarget("knowledge_base", "kb-1", 1, null, null, null, false))));
         cm6.setTenantId(1);
         boolean[] next6 = {false};
         PluginError err6 = p6.onEvent(PipelineEventType.CHUNK_SEARCH, cm6, () -> { next6[0] = true; return null; });
@@ -377,7 +377,7 @@ class SearchRecordingTest {
         cm7.setRewriteQuery("退款规则");
         cm7.setEmbeddingTopK(10);
         cm7.setSearchTargets(new ArrayList<>(List.of(
-                new com.ragagent.agent.tools.SearchTarget("knowledge_base", "faq-1", 1, null, null, null, false))));
+                new com.ragagent.common.retrieval.SearchTarget("knowledge_base", "faq-1", 1, null, null, null, false))));
         cm7.setTenantId(1);
         PluginError err7 = p7.onEvent(PipelineEventType.CHUNK_SEARCH, cm7, () -> null);
         Map<String, Object> s7 = new LinkedHashMap<>();
@@ -394,7 +394,7 @@ class SearchRecordingTest {
         cm8.setRewriteQuery("wiki only");
         cm8.setEmbeddingTopK(10);
         cm8.setSearchTargets(new ArrayList<>(List.of(
-                new com.ragagent.agent.tools.SearchTarget("knowledge_base", "wiki-1", 1, null, null, null, false))));
+                new com.ragagent.common.retrieval.SearchTarget("knowledge_base", "wiki-1", 1, null, null, null, false))));
         cm8.setTenantId(1);
         PluginError err8 = p8.onEvent(PipelineEventType.CHUNK_SEARCH, cm8, () -> null);
         Map<String, Object> s8 = new LinkedHashMap<>();
@@ -410,7 +410,7 @@ class SearchRecordingTest {
         cm9.setRewriteQuery("没有结果的查询");
         cm9.setEmbeddingTopK(5);
         cm9.setSearchTargets(new ArrayList<>(List.of(
-                new com.ragagent.agent.tools.SearchTarget("knowledge_base", "kb-1", 1, null, null, null, false))));
+                new com.ragagent.common.retrieval.SearchTarget("knowledge_base", "kb-1", 1, null, null, null, false))));
         cm9.setTenantId(1);
         PluginError err9 = p9.onEvent(PipelineEventType.CHUNK_SEARCH, cm9, () -> null);
         Map<String, Object> s9 = new LinkedHashMap<>();
@@ -435,8 +435,8 @@ class SearchRecordingTest {
         cm.setVectorThreshold(0.35);
         cm.setKeywordThreshold(0.45);
         cm.setSearchTargets(new ArrayList<>(List.of(
-                new com.ragagent.agent.tools.SearchTarget("knowledge_base", "kb-a", 1, null, null, null, false),
-                new com.ragagent.agent.tools.SearchTarget("knowledge_base", "kb-b", 1, null, null, null, false))));
+                new com.ragagent.common.retrieval.SearchTarget("knowledge_base", "kb-a", 1, null, null, null, false),
+                new com.ragagent.common.retrieval.SearchTarget("knowledge_base", "kb-b", 1, null, null, null, false))));
         cm.setTenantId(1);
         List<SearchResult> res = p.searchByTargets(cm);
         Map<String, Object> s1 = new LinkedHashMap<>();
@@ -454,7 +454,7 @@ class SearchRecordingTest {
         cm2.setRewriteQuery("指定文档");
         cm2.setEmbeddingTopK(2);
         cm2.setSearchTargets(new ArrayList<>(List.of(
-                new com.ragagent.agent.tools.SearchTarget("knowledge", "kb-c", 1,
+                new com.ragagent.common.retrieval.SearchTarget("knowledge", "kb-c", 1,
                         List.of("doc-1"), List.of("tag-1"), List.of("scope-1"), false))));
         cm2.setTenantId(1);
         List<SearchResult> res2 = p2.searchByTargets(cm2);
@@ -492,7 +492,7 @@ class SearchRecordingTest {
         cm.setKeywordThreshold(0.6);
         cm.setTenantId(1);
         cm.setSearchTargets(new ArrayList<>(List.of(
-                new com.ragagent.agent.tools.SearchTarget("knowledge_base", "kb-1", 1,
+                new com.ragagent.common.retrieval.SearchTarget("knowledge_base", "kb-1", 1,
                         null, null, null, false))));
         List<SearchResult> res = p.searchByTargets(cm); // 修复前这里抛 NPE
         org.junit.jupiter.api.Assertions.assertTrue(res == null || res.isEmpty(),
@@ -527,7 +527,7 @@ class SearchRecordingTest {
         cm.setEmbeddingTopK(5);
         cm.setTenantId(1);
         cm.setSearchTargets(new ArrayList<>(List.of(
-                new com.ragagent.agent.tools.SearchTarget("knowledge_base", "kb-1", 1, null, null, null, false))));
+                new com.ragagent.common.retrieval.SearchTarget("knowledge_base", "kb-1", 1, null, null, null, false))));
         cm.setEntity(new ArrayList<>(List.of("实体A", "实体B")));
         boolean[] next = {false};
         PluginError err = p.onEvent(PipelineEventType.CHUNK_SEARCH_PARALLEL, cm,
@@ -550,7 +550,7 @@ class SearchRecordingTest {
         cm2.setEmbeddingTopK(5);
         cm2.setTenantId(1);
         cm2.setSearchTargets(new ArrayList<>(List.of(
-                new com.ragagent.agent.tools.SearchTarget("knowledge_base", "kb-1", 1, null, null, null, false))));
+                new com.ragagent.common.retrieval.SearchTarget("knowledge_base", "kb-1", 1, null, null, null, false))));
         boolean[] next2 = {false};
         PluginError err2 = p2.onEvent(PipelineEventType.CHUNK_SEARCH_PARALLEL, cm2,
                 () -> { next2[0] = true; return null; });
@@ -584,7 +584,7 @@ class SearchRecordingTest {
         cm4.setEmbeddingTopK(5);
         cm4.setTenantId(1);
         cm4.setSearchTargets(new ArrayList<>(List.of(
-                new com.ragagent.agent.tools.SearchTarget("knowledge_base", "kb-9", 1, null, null, null, false))));
+                new com.ragagent.common.retrieval.SearchTarget("knowledge_base", "kb-9", 1, null, null, null, false))));
         PluginError err4 = p4.onEvent(PipelineEventType.CHUNK_SEARCH_PARALLEL, cm4, () -> null);
         Map<String, Object> s4 = new LinkedHashMap<>();
         s4.put("err", errOf(err4));

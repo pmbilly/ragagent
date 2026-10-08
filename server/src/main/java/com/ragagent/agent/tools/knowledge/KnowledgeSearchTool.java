@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ragagent.agent.tools.BaseTool;
 import com.ragagent.agent.tools.SearchAuth;
-import com.ragagent.agent.tools.SearchTarget;
+import com.ragagent.common.retrieval.SearchTarget;
 import com.ragagent.agent.tools.ToolDefinitions;
 import com.ragagent.agent.tools.ToolRequest;
 

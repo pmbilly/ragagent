@@ -52,7 +52,7 @@ class SearchGradingTest {
         cm.setEmbeddingTopK(5);
         cm.setTenantId(1);
         cm.setSearchTargets(new ArrayList<>(List.of(
-                new com.ragagent.agent.tools.SearchTarget("knowledge_base", kbId, 1, null, null, null, false))));
+                new com.ragagent.common.retrieval.SearchTarget("knowledge_base", kbId, 1, null, null, null, false))));
         return cm;
     }
 

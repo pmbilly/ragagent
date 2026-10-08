@@ -1,4 +1,4 @@
-package com.ragagent.agent.modelcontext;
+package com.ragagent.modelcontext;
 
 /**
  * HTML 实体转义/反转义两个函数（本包引用的全部面）。

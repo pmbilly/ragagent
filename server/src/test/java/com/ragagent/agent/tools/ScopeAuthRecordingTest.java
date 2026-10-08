@@ -16,7 +16,8 @@ import com.ragagent.agent.tools.SearchAuth.ChunkView;
 import com.ragagent.agent.tools.SearchAuth.KnowledgeView;
 import com.ragagent.agent.tools.SearchAuth.ScopeAuthException;
 import com.ragagent.agent.tools.SearchAuth.TagView;
-import com.ragagent.agent.tools.SearchTarget.SearchTargets;
+import com.ragagent.common.retrieval.SearchTarget.SearchTargets;
+import com.ragagent.common.retrieval.SearchTarget;
 
 /**
  * SearchAuth/SearchTargets 的录制回放（26 条）。错误文案逐字比对；

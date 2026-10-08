@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import com.ragagent.agent.tools.SearchTarget.SearchTargets;
+import com.ragagent.common.retrieval.SearchTarget;
+import com.ragagent.common.retrieval.SearchTarget.SearchTargets;
 
 /**
  * scope 授权。

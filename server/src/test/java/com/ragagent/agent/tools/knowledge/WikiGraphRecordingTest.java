@@ -19,7 +19,7 @@ import com.ragagent.agent.tools.knowledge.QueryKnowledgeGraphTool.KnowledgeBaseV
 import com.ragagent.agent.tools.knowledge.QueryKnowledgeGraphTool.SearchResultView;
 import com.ragagent.agent.tools.SearchAuth.KnowledgeTagsFetcher;
 import com.ragagent.agent.tools.SearchAuth.TagView;
-import com.ragagent.agent.tools.SearchTarget;
+import com.ragagent.common.retrieval.SearchTarget;
 import com.ragagent.agent.tools.ToolRequest;
 import com.ragagent.agent.tools.GoRecording45B;
 import com.ragagent.agent.tools.RecordingSupport;

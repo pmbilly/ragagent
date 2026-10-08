@@ -1,4 +1,4 @@
-package com.ragagent.agent.modelcontext;
+package com.ragagent.modelcontext;
 
 /**
  * 流式安全的句柄解码：共享的后缀扣留原语、建在其上的每空间解码器，以及按唯一安全顺序应用

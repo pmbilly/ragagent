@@ -5,9 +5,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import com.ragagent.agent.tools.SearchTarget.SearchTargets;
+import com.ragagent.common.retrieval.SearchTarget.SearchTargets;
 import com.ragagent.agent.tools.SearchAuth;
-import com.ragagent.agent.tools.SearchTarget;
+import com.ragagent.common.retrieval.SearchTarget;
 
 /** wiki 检索范围（@选择/KB 集合）工厂与页面-范围匹配谓词。 */
     public record WikiScope(String knowledgeBaseId, List<String> knowledgeIds, List<String> tagIds) {

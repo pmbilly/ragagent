@@ -1241,3 +1241,18 @@
 - **纪律事故（第 5 次同类）**：按前缀替换 `com.ragagent.vectorstore.domain.ConnectionConfig` 时吃掉了 `…ConnectionConfigTypeHandler`（后者的前缀 == 前者）⇒ **这次是编译器立刻抓到**（B105 的 package 声明问题是构建盲区，只有 IDE 能抓）⇒ 已回滚 + 全仓复核 `common.vectorstore.*` 无其它被吃掉的长名。
   · 规则补一条：**当被移动/改包的类型名是其它类型名的"前缀"时（`X` 前缀 `XTypeHandler`），必须按词边界替换或用整行 import 替换**。
 - **闸门**：后端全量 BUILD SUCCESSFUL + `spotlessCheck` + 五守卫绿；基线刷新 `L2 → L3 直连 3 → 2 条`（剩 `chatpipeline→knowledge`、`chatpipeline→agent`）。
+
+**✅ B108（2026-10-08，L2→L3 清零③：`chatpipeline → agent` 词汇/子系统归位；15 → 4 处）**
+- **先分类**：把 15 处按类型性质分三类——① **子系统**（`agent.modelcontext.**`，13 文件：`Registry`/`StreamDecoder`/`SourceRegistry`/`SourceToolCodec`/`HandleStore`/`HandleTable`/`ResourceRegistry`/`CitationStreamExpander`/`HtmlEntities`/`JsonValues`/`ModelOutput`/`ToolPolicy`）；
+  ② **跨域词汇**（`tools.SearchTarget`，agent/chatpipeline/evaluation/session 共用）；③ **共享文案常量**（`PromptInstructions`，agent/session/chatpipeline 共用）。
+- **处置**：
+  1. `agent/modelcontext/**` → 顶层 **`com.ragagent.modelcontext`** —— 关键发现：脚本 `L2` 名单里**早就列了 `modelcontext` 与 `webfetch`**（"预留未落地"）⇒ 这两块本来就是计划中的能力层，搬过去后 L2→L2 与 L3→L2 都合法，且 `modelcontext` 出向只依赖 `common.llm`/`llm.domain`（L1/L2）✓；
+  2. `agent.tools.SearchTarget` → `common.retrieval.SearchTarget`（L1，自洽无域依赖）；
+  3. `agent.PromptInstructions` → `common.prompt.PromptConstants`（**改名**：`common/prompt` 已有 `PromptInstructions`（KB 业务指引追加）——同名不同职，并存会误导；文案逐字未改）。
+- **测试**：录制测试所在的 `src/test/java/com/ragagent/agent/modelcontext/**` 随类型搬到 `src/test/java/com/ragagent/modelcontext/`（包声明同步）；`DocToolsRecordingTest`/`ScopeAuthRecordingTest` 补 `SearchTarget` import（它们原先靠同包访问，无 import）。
+- **操作事故**：`git mv <src-dir> <dest-dir>` 在 `dest` 已被 `mkdir -p` 创建时，会把 `<src-dir>` **搬进** `<dest-dir>/<src-dir>`（本次出现 `modelcontext/modelcontext/`）⇒ 已纠正。
+  **纪律：`git mv` 目录前不要预先创建目标目录**（`mkdir -p`）——这属于"git mv 语义"坑，与 B105/B107 的替换精度坑不同类。
+- **剩余 4 处（B109 方案已定）**：
+  - `DataAnalysisTool`（573 行）+ `DataAnalysisSessionBridge`（3 处：`DataAnalysisSessionFactoryAdapter`、`PluginDataAnalysis`、`PipelinePorts` 的两处嵌套类型引用）⇒ 管线侧定义端口（数据分析执行 + 表结构加载），适配器从 `chatpipeline` 搬回 `agent` 侧；
+  - `agent.support.Fetcher`（1 处：`PluginWebFetch`）⇒ 把 `Fetcher` + `FetchException` + `BrowserRenderer` + `AgentMarkdown` 一起搬进预留的 L2 包 `webfetch`（需先核这 4 个文件是否自洽）。
+- **闸门**：后端全量 BUILD SUCCESSFUL + `spotlessCheck` + 五守卫（含 R7：0 处声明↔路径不一致）绿。

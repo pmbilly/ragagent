@@ -23,7 +23,7 @@ import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.common.llm.ResponseType;
 import com.ragagent.llm.domain.StreamResponse;
-import com.ragagent.agent.modelcontext.StreamDecoder;
+import com.ragagent.modelcontext.StreamDecoder;
 
 /**
  * CHAT_COMPLETION_STREAM 阶段插件：
@@ -126,7 +126,7 @@ public final class PluginChatCompletionStream implements Plugin {
         // 消费线程（虚拟线程）
         final ChatManage cm = chatManage;
         final BlockingQueue<StreamResponse> queue = responseQueue;
-        final com.ragagent.agent.modelcontext.Registry modelContext = assembly.registry();
+        final com.ragagent.modelcontext.Registry modelContext = assembly.registry();
         Thread.ofVirtual().start(() -> consumeStream(cm, eventBus, modelContext, queue));
 
         return next.next();
@@ -134,7 +134,7 @@ public final class PluginChatCompletionStream implements Plugin {
 
     /** 流消费循环（独立虚拟线程上执行）。 */
     private static void consumeStream(ChatManage chatManage, EventBusInterface eventBus,
-                                      com.ragagent.agent.modelcontext.Registry modelContext,
+                                      com.ragagent.modelcontext.Registry modelContext,
                                       BlockingQueue<StreamResponse> responseQueue) {
         StreamDecoder answerDecoder = modelContext.streamDecoder();
         StreamDecoder thinkingDecoder = modelContext.streamDecoder();

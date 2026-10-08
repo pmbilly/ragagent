@@ -47,6 +47,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import com.ragagent.common.prompt.PromptConstants;
 
 /**
  * 提示词合成的录制常量断言（时间参数化为固定日期 2026-09-20）。
@@ -275,8 +276,8 @@ class AgentPromptsTest {
         // 静态常量逐字节
         assertThat(AgentPrompts.STEER_GUIDANCE).isEqualTo(STR_STEER_GUIDANCE);
         assertThat(AgentPrompts.runtimePromptContract()).isEqualTo(STR_RUNTIME_CONTRACT);
-        assertThat(PromptInstructions.SOURCED_ANSWER_OUTPUT_PROMPT).isEqualTo(STR_OUTPUT_PROMPT);
-        assertThat(PromptInstructions.SOURCE_DATA_BOUNDARY_PROMPT).isEqualTo(STR_BOUNDARY_PROMPT);
+        assertThat(PromptConstants.SOURCED_ANSWER_OUTPUT_PROMPT).isEqualTo(STR_OUTPUT_PROMPT);
+        assertThat(PromptConstants.SOURCE_DATA_BOUNDARY_PROMPT).isEqualTo(STR_BOUNDARY_PROMPT);
         assertThat(GoRecordingGround.values().length).isEqualTo(6);
     }
 

@@ -1,4 +1,4 @@
-package com.ragagent.agent.modelcontext;
+package com.ragagent.modelcontext;
 
 import java.util.List;
 import java.util.Set;

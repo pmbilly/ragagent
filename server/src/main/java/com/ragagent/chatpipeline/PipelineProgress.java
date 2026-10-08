@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.ragagent.agent.tools.SearchTarget;
+import com.ragagent.common.retrieval.SearchTarget;
 import com.ragagent.chatpipeline.plugin.PluginError;
 import com.ragagent.event.Event;
 import com.ragagent.event.EventBusInterface;

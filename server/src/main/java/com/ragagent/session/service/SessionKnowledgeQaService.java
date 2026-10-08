@@ -41,7 +41,7 @@ import com.ragagent.common.llm.ResponseType;
 import com.ragagent.llm.domain.StreamResponse;
 import com.ragagent.model.domain.Model;
 import com.ragagent.model.service.ModelService;
-import com.ragagent.agent.modelcontext.Registry;
+import com.ragagent.modelcontext.Registry;
 import com.ragagent.common.retrieval.SearchResult;
 
 import static com.ragagent.session.service.QaSupport.TagScope;
@@ -986,23 +986,23 @@ public class SessionKnowledgeQaService {
         public List<String> scopeTagIds = new ArrayList<>();
         public boolean disableRecallThresholds;
 
-        public List<com.ragagent.agent.tools.SearchTarget> toPipeline() {
+        public List<com.ragagent.common.retrieval.SearchTarget> toPipeline() {
             return toPipelineList();
         }
 
-        public List<com.ragagent.agent.tools.SearchTarget> toPipelineList() {
-            List<com.ragagent.agent.tools.SearchTarget> out = new ArrayList<>();
+        public List<com.ragagent.common.retrieval.SearchTarget> toPipelineList() {
+            List<com.ragagent.common.retrieval.SearchTarget> out = new ArrayList<>();
             out.add(asPipelineTarget());
             return out;
         }
 
-        public com.ragagent.agent.tools.SearchTarget asPipelineTarget() {
-            return new com.ragagent.agent.tools.SearchTarget(type, knowledgeBaseId, tenantId,
+        public com.ragagent.common.retrieval.SearchTarget asPipelineTarget() {
+            return new com.ragagent.common.retrieval.SearchTarget(type, knowledgeBaseId, tenantId,
                     knowledgeIds, tagIds, scopeTagIds, disableRecallThresholds);
         }
 
-        public static List<com.ragagent.agent.tools.SearchTarget> toPipeline(List<SearchTargetView> views) {
-            List<com.ragagent.agent.tools.SearchTarget> out = new ArrayList<>();
+        public static List<com.ragagent.common.retrieval.SearchTarget> toPipeline(List<SearchTargetView> views) {
+            List<com.ragagent.common.retrieval.SearchTarget> out = new ArrayList<>();
             if (views == null) {
                 return out;
             }

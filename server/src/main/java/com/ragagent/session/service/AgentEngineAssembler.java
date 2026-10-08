@@ -476,7 +476,7 @@ final class AgentEngineAssembler {
         WikiRouteResolver wikiRoutes = new WikiRouteResolver();
         boolean hasKnowledge = !config.getKnowledgeBases().isEmpty() || !config.getKnowledgeIds().isEmpty()
                 || (config.getSearchTargets() != null
-                        && com.ragagent.agent.tools.SearchTarget.SearchTargets
+                        && com.ragagent.common.retrieval.SearchTarget.SearchTargets
                                 .hasKnowledgeRetrievalScope(config.getSearchTargets(), List.of(), List.of()));
 
         // KB 工具过滤

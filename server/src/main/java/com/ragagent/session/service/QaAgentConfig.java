@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ragagent.agent.AgentConfig;
-import com.ragagent.agent.tools.SearchTarget.SearchTargets;
+import com.ragagent.common.retrieval.SearchTarget.SearchTargets;
 
 /**
  * 装配期 AgentConfig 扩展。

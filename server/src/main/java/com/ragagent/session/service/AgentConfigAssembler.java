@@ -9,7 +9,7 @@ import com.ragagent.agent.management.service.AgentConfigJson;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.agent.tools.SearchTarget.SearchTargets;
+import com.ragagent.common.retrieval.SearchTarget.SearchTargets;
 
 /**
  * {@code SessionAgentQaService} 的**配置装配簇**：从请求 + 知识库/文档信息构造

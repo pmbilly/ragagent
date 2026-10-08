@@ -20,7 +20,7 @@ import com.ragagent.agent.tools.knowledge.QueryKnowledgeGraphTool;
 import com.ragagent.agent.tools.SearchAuth;
 import com.ragagent.agent.tools.knowledge.SearchConversationsTool;
 import com.ragagent.agent.tools.knowledge.SearchMemoryTool;
-import com.ragagent.agent.tools.SearchTarget;
+import com.ragagent.common.retrieval.SearchTarget;
 import com.ragagent.agent.tools.web.WebFetchTool;
 import com.ragagent.agent.tools.web.WebSearchTool;
 import com.ragagent.agent.tools.wiki.WikiDeletePageTool;

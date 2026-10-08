@@ -6,7 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.ragagent.agent.tools.SearchTarget;
+import com.ragagent.common.retrieval.SearchTarget;
 import com.ragagent.event.EventBusInterface;
 import com.ragagent.llm.domain.ChatResponse;
 import com.ragagent.common.retrieval.SearchResult;

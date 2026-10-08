@@ -19,7 +19,7 @@ import com.ragagent.agent.tools.knowledge.KnowledgeSearchTool.RankResult;
 import com.ragagent.agent.tools.knowledge.KnowledgeSearchTool.RerankerModel;
 import com.ragagent.agent.tools.knowledge.KnowledgeSearchTool.SearchResultView;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.agent.tools.SearchTarget;
+import com.ragagent.common.retrieval.SearchTarget;
 import com.ragagent.agent.tools.ToolRequest;
 import com.ragagent.agent.tools.GoRecording45B;
 import com.ragagent.agent.tools.RecordingSupport;

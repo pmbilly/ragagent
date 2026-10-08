@@ -10,8 +10,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.function.BiFunction;
 
-import com.ragagent.agent.PromptInstructions;
-import com.ragagent.agent.tools.SearchTarget;
+import com.ragagent.common.retrieval.SearchTarget;
 import com.ragagent.chatpipeline.plugin.PluginError;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
@@ -20,6 +19,7 @@ import com.ragagent.common.prompt.MessageAttachmentsPrompt;
 import com.ragagent.common.session.PipelineMessageAttachmentView;
 import com.ragagent.common.session.PipelineMessageImageView;
 import com.ragagent.common.session.PipelineMessageView;
+import com.ragagent.common.prompt.PromptConstants;
 
 /**
  * 管线共享工具。
@@ -101,8 +101,8 @@ public final class PipelineCommon {
         vals.put("language", chatManage.getLanguage());
         vals.put("contexts", chatManage.getRenderedContexts());
         String systemPrompt = AgentPromptPlaceholdersHolder.render(base, vals);
-        systemPrompt += "\n\n" + PromptInstructions.SOURCE_DATA_BOUNDARY_PROMPT
-                + "\n\n" + PromptInstructions.SOURCED_ANSWER_OUTPUT_PROMPT;
+        systemPrompt += "\n\n" + PromptConstants.SOURCE_DATA_BOUNDARY_PROMPT
+                + "\n\n" + PromptConstants.SOURCED_ANSWER_OUTPUT_PROMPT;
         systemPrompt += chatManage.getMemoryPrompt();
 
         List<ChatMessage> chatMessages = new ArrayList<>();
