@@ -36,6 +36,8 @@ ArchUnit 1.3.0 **已是测试依赖**（`server/build.gradle.kts:111`），可�
 `scripts/check-package-cycles.py` 的 R1 只查 `A→B 且 B→A`，但按"包级强连通分量"（SCC）实测曾存在 **2 个间接环**（下表均已解）：
 
 > ⚠️ **B111 修正**：下表"已解 / 包图 DAG"的结论建立在**只解析 import 行**的读数上。清掉 1,331 行内联全限定名后，依赖图第一次完整，实测 **R1 = 2 组（`agent⇄auth`、`agent⇄im`）、R1b = 1 组（8 域）**——这些边一直都在，只是此前不可见。详见 **§3**。
+>
+> ✅ **B112 已解**：整张图的最小反馈边集只有 **2 条边 / 3 处**（`auth → agent` 2 处、`agent → im` 1 处）——两处都是小改动，却同时消掉两组两两环与 8 域间接环 ⇒ **R1 = 0 组、R1b = 0 组，包图现为 DAG**。详见 **§4**。
 
 | SCC | 成员 | 状态（2026-10-08 B91） |
 |---|---|---|
@@ -164,16 +166,71 @@ B107 已踩过一次局部（"14 处 + 1 处全限定遗漏"），B111 把它系
 
 ### 3.4 顺延与修正
 
-- 原计划的 **B111（L2→L3 剩余清零）顺延为 B112**，目标数由 **12 修正为 15 处**
-  （那 3 处本来就是依赖，只是此前不计数）。
+- 原计划的 **B111（L2→L3 剩余清零）顺延为 B113**（B112 先插入了 C9/C10 解环），目标数由 **12 修正为 15 处**（那 3 处本来就是依赖，只是此前不计数）。
 - **新增切割项 C9/C10**（两两环，规模都不大）：
 
 | # | 边 | 处数 | 站点 | 修法建议 |
 |---|---|---|---|---|
-| C9 | `agent → auth` | 2（1 文件） | `agent/management/service/CustomAgentService` | 待侦察 |
-| C9b | `auth → agent` | 2（1 文件） | `auth/controller/TenantConfigOps`（`PromptTemplateCatalog.toJson`/`load`、`BuiltinAgentRegistry`） | `agent` 的只读目录端口化 |
-| C10 | `agent → im` | 1（1 文件） | `agent/management/service/CustomAgentService`（与 C9 同文件 ⇒ 该文件是环枢纽） | 待侦察 |
-| C10b | `im → agent` | 14（9 文件） | `im/domain/*Entity`、`im/runtime/*`、`im/service/*` | 待侦察（大头在 im 侧） |
+| ✅ C9 | `agent → auth` | 2（1 文件） | `agent/management/service/CustomAgentService` | **B112 保留**：拓扑序里 `agent < auth`，这条边合法 ⇒ 不动 |
+| ✅ C9b | `auth → agent` | 2（1 文件） | `auth/controller/TenantConfigOps`（`PromptTemplateCatalog.toJson`/`load`、`BuiltinAgentRegistry.localeFromRequest`） | **B112 已解**：`PromptTemplateCatalog` → `common.prompt`（实测域依赖 = 0，纯 classpath 装载器）；`localeFromRequest` → `common.wiki.WikiLanguageSupport`（agent 侧留薄委托，9 处调用点零改写） |
+| ✅ C10 | `agent → im` | 1（1 文件） | `agent/management/service/CustomAgentService`（与 C9 同文件） | **B112 已解**：新增端口 `common.agent.AgentChannelCleaner`（`ImService implements` 之，签名逐字一致）；consumers 侧 `ObjectProvider` 由 `ImService` 改为端口，破 Spring 级环语义不变 |
+| ✅ C10b | `im → agent` | 14（9 文件） | `im/domain/*Entity`、`im/runtime/*`、`im/service/*` | **B112 保留**：拓扑序里 `im < agent`（im 在底、agent 在上），合法 ⇒ 不动 |
 
 > 注：本节编号属**包图守卫脚本**的编号空间（R1~R8），与 `ArchitectureRulesTest`
 > 的代码级规则编号（R6~R10）相互独立。
+
+
+## 4. B112：解环收官——包图成为 DAG
+
+### 4.1 反直觉的结论：最小反馈边集只有 3 处
+
+B111 暴露的 8 域间接环看着吓人（`agent`/`auth`/`chatpipeline`/`datasource`/`im`/`memory`/
+`session`/`webfetch`），子图内部 **15 条边**。但按"删边条数最少"求最小反馈边集
+（8 节点暴力枚举全排列拓扑序）后：
+
+| 割边 | 处数 | 站点 |
+|---|---|---|
+| ✂ `auth → agent` | 2 | `auth/controller/TenantConfigOps` |
+| ✂ `agent → im` | 1 | `agent/management/service/CustomAgentService` |
+
+删这两条边后拓扑序 `im < session < agent < chatpipeline < memory < webfetch < datasource < auth`
+成立 ⇒ **整个 8 域 SCC 瓦解，且两组两两环同时消失**。
+
+> 方法论：环的"体积"要看**割**而不是看**成员数**。8 域看着比之前解掉的 7 域环（SCC-A）大，
+> 但割集只有 3 处——SCC-A 当年也是靠 1 条 `audit → wiki` 边瓦解的。
+
+### 4.2 两处改动
+
+**C9b `auth → agent`（2 处）**
+
+| 符号 | 处置 | 依据 |
+|---|---|---|
+| `agent.PromptTemplateCatalog`（233 行） | → **`common.prompt`** | `com.ragagent.*` import **实测为 0**（纯 classpath YAML 装载器 + Jackson 序列化），且**只被 auth 消费**（agent 域自己不用）⇒ 放在 agent 域纯属历史摆放 |
+| `BuiltinAgentRegistry.localeFromRequest` | → **`common.wiki.WikiLanguageSupport.localeFromRequest`** | "env + Accept-Language → locale" 纯解析，与既有 `envLanguage()`/`FALLBACK_LANGUAGE` 同一语义族；agent 侧留**薄委托** ⇒ `AgentController` 的 9 处调用点零改写 |
+
+**C10 `agent → im`（1 处）**
+
+新增端口 `common/agent/AgentChannelCleaner`（单方法 `deleteChannelsByAgent(agentId, tenantId)`）：
+- `im` 侧：`ImService implements AgentChannelCleaner`（方法签名逐字一致，零改写）
+- `agent` 侧：`CustomAgentService` 的 `ObjectProvider<ImService>` → `ObjectProvider<AgentChannelCleaner>`
+  ——**保留原有的"破 Spring 级构造环 + 容器缺实现时静默跳过"语义**（`ImService` 的字段反向依赖
+  `CustomAgentService`）
+
+> 两处都**不动**合法边：`agent → auth`（拓扑序里 agent 在前）与 `im → agent`（im 在底）。
+
+### 4.3 结果
+
+| 指标 | B111 后 | B112 后 |
+|---|---|---|
+| R1 两两环 | 2 组 | **0 组** |
+| R1b 间接环（SCC） | 1 组（8 域） | **0 组** |
+| 依赖 `config` 的包 | 0 | 0 |
+| L1 底座 → 业务域 | 0 | 0 |
+| L2 → L3 直连 | 2 条 | 2 条（B113 处理） |
+
+**⇒ 全仓包图层级成为 DAG，阶段 4（Gradle 多模块）的前置条件达成。**
+
+- 红态探针：往 `agent` 注入 `import com.ragagent.im.service.ImService` →
+  报 `新增环：1 agent⇄im` + `间接环新增成员 ['agent','im','session']` ✓（探针已删）
+- 基线已归零（`两两环 0 组 / 间接环 0 组`）⇒ 之后任何回流都会立即变红
+- 顺延：原 B112 计划（L2→L3 剩余清零）→ **B113**

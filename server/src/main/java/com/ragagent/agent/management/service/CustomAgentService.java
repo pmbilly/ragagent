@@ -23,7 +23,7 @@ import com.ragagent.common.error.BizException;
 import com.ragagent.knowledge.service.KnowledgeBaseService;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.service.UserService;
-import com.ragagent.im.service.ImService;
+import com.ragagent.common.agent.AgentChannelCleaner;
 
 /**
  * agents CRUD 家族 service。
@@ -44,11 +44,14 @@ public class CustomAgentService {
     private final KnowledgeBaseService kbService;
     private final BuiltinAgentRegistry registry;
     /**
-     * IM 渠道清理。ObjectProvider 延迟解析：ImService 直接依赖本类（其字段 agentService），
-     * 构造期硬注入会成环。
+     * IM 渠道清理。ObjectProvider 延迟解析：实现方（{@code ImService}）直接依赖本类
+     * （其字段 agentService），构造期硬注入会成环。
+     *
+     * <p>B111 起收的是 {@link AgentChannelCleaner} 端口而非 {@code im.service.ImService}
+     * ——agent 在拓扑序上位于 im 之前，直连即成回边。</p>
      */
     private final org.springframework.beans.factory.ObjectProvider<
-            ImService> imServiceProvider;
+            AgentChannelCleaner> agentChannelCleanerProvider;
 
     /** 推荐问题流协作者。 */
     private final AgentSuggestedQuestions suggestedQuestions;
@@ -59,12 +62,12 @@ public class CustomAgentService {
             KnowledgeBaseService kbService,
             BuiltinAgentRegistry registry,
             org.springframework.beans.factory.ObjectProvider<
-                    ImService> imServiceProvider) {
+                    AgentChannelCleaner> agentChannelCleanerProvider) {
         this.agentMapper = agentMapper;
         this.userService = userService;
         this.kbService = kbService;
         this.registry = registry;
-        this.imServiceProvider = imServiceProvider;
+        this.agentChannelCleanerProvider = agentChannelCleanerProvider;
         this.suggestedQuestions = new AgentSuggestedQuestions(this, questionMapper);
     }
 
@@ -344,7 +347,7 @@ public class CustomAgentService {
         return new CustomAgentResult(entity, config);
     }
 
-    /** 删除 agent（软删；im 渠道清理随后执行，容器缺 ImService 时跳过）。 */
+    /** 删除 agent（软删；im 渠道清理随后执行，容器缺端口实现时跳过）。 */
     public void deleteAgent(String id) {
         if (id == null || id.isEmpty()) {
             throw new BizException(AppError.badRequest("agent ID cannot be empty"));
@@ -364,9 +367,9 @@ public class CustomAgentService {
 
         // 软删该 agent 的全部 IM 渠道并停止运行中的适配器，
         // 避免概览列表与运行中的适配器比 agent 活得更久。
-        ImService imService = imServiceProvider.getIfAvailable();
-        if (imService != null) {
-            imService.deleteChannelsByAgent(id, tenant);
+        AgentChannelCleaner cleaner = agentChannelCleanerProvider.getIfAvailable();
+        if (cleaner != null) {
+            cleaner.deleteChannelsByAgent(id, tenant);
         }
     }
 

@@ -21,8 +21,8 @@ import com.ragagent.common.tenant.TenantRole;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import com.ragagent.agent.PromptTemplateCatalog;
-import com.ragagent.agent.management.service.BuiltinAgentRegistry;
+import com.ragagent.common.prompt.PromptTemplateCatalog;
+import com.ragagent.common.wiki.WikiLanguageSupport;
 
 /**
  * KV 配置分发协作者（自 {@link TenantCatalogController} 拆出）：6 个 DB-backed key 的
@@ -54,7 +54,7 @@ final class TenantConfigOps {
             case "prompt-templates" ->
                     PromptTemplateCatalog.toJson(
                             PromptTemplateCatalog.load(),
-                            BuiltinAgentRegistry
+                            WikiLanguageSupport
                                     .localeFromRequest(request.getHeader("Accept-Language")));
             case "parser-engine-config" -> getParserEngine();
             case "storage-engine-config" -> getStorageEngine();

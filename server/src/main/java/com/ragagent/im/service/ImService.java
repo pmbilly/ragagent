@@ -18,6 +18,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import com.ragagent.common.agent.AgentChannelCleaner;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.agent.management.domain.CustomAgentEntity;
@@ -72,7 +74,7 @@ import com.ragagent.storage.support.Resolver;
  * </ul>
  */
 @Service
-public class ImService {
+public class ImService implements AgentChannelCleaner {
 
     private static final Logger log = LoggerFactory.getLogger(ImService.class);
     static final ObjectMapper JSON = new ObjectMapper();
@@ -336,6 +338,7 @@ public class ImService {
      *
      * <p>逐条广播给其他实例（{@code publishChannelConfigChange}）。</p>
      */
+    @Override
     public void deleteChannelsByAgent(String agentId, long tenantId) {
         java.util.List<ImChannelEntity> found = channels.listByAgent(agentId, tenantId);
         if (found.isEmpty()) {

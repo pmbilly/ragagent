@@ -1,26 +1,6 @@
 {
-  "cycles": [
-    [
-      "agent",
-      "auth"
-    ],
-    [
-      "agent",
-      "im"
-    ]
-  ],
-  "sccs": [
-    [
-      "agent",
-      "auth",
-      "chatpipeline",
-      "datasource",
-      "im",
-      "memory",
-      "session",
-      "webfetch"
-    ]
-  ],
+  "cycles": [],
+  "sccs": [],
   "depend_on_config": [],
   "l2_to_l3": [
     [

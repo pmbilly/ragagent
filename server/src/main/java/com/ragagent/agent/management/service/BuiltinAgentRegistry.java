@@ -250,18 +250,13 @@ public class BuiltinAgentRegistry {
         return entries.get(id);
     }
 
-    /** env → Accept-Language 首个 tag → zh-CN。 */
+    /**
+     * env → Accept-Language 首个 tag → zh-CN。
+     * B111 起实现上移 L1（{@link WikiLanguageSupport#localeFromRequest}），此处保留薄委托
+     * 以避免 {@code AgentController} 的 9 处调用点无谓改写。
+     */
     public static String localeFromRequest(String acceptLanguage) {
-        String env = WikiLanguageSupport.envLanguage();
-        if (!env.isEmpty()) {
-            return env;
-        }
-        String lang = "";
-        if (acceptLanguage != null && !acceptLanguage.isEmpty()) {
-            String first = acceptLanguage.split(",", 2)[0].trim();
-            lang = first.split(";", 2)[0].trim();
-        }
-        return lang.isEmpty() ? "zh-CN" : lang;
+        return WikiLanguageSupport.localeFromRequest(acceptLanguage);
     }
 
     /** 供测试清理用（entries 是进程级单例，一次装载）。 */
