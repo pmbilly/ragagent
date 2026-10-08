@@ -16,8 +16,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.auth.domain.Tenant;
-import com.ragagent.auth.service.TenantService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.common.pipeline.SearchParams;
 import com.ragagent.common.retrieval.RetrievalDriverProperties;
 import com.ragagent.common.error.AppError;
@@ -96,7 +96,7 @@ public class HybridSearchService {
     final KnowledgeDocumentGateway documentGateway;
     final ChunkSearchGateway chunkGateway;
     private final ModelGateway modelGateway;
-    private final TenantService tenantService;
+    private final TenantConfigLookup tenantConfigLookup;
     private final EmbeddingGateway embeddingGateway;
     final PgVectorRetrieveRepository pgRepository;
     final RetrieveEngineRegistry engineRegistry;
@@ -107,14 +107,14 @@ public class HybridSearchService {
 
     public HybridSearchService(KnowledgeBaseSearchGateway kbGateway,
             KnowledgeDocumentGateway documentGateway, ChunkSearchGateway chunkGateway,
-            ModelGateway modelGateway, TenantService tenantService, EmbeddingGateway embeddingGateway,
+            ModelGateway modelGateway, TenantConfigLookup tenantConfigLookup, EmbeddingGateway embeddingGateway,
             PgVectorRetrieveRepository pgRepository, RetrieveEngineRegistry engineRegistry,
             TenantStoreOwnership storeOwnership, RetrievalDriverProperties driverProperties) {
         this.kbGateway = kbGateway;
         this.documentGateway = documentGateway;
         this.chunkGateway = chunkGateway;
         this.modelGateway = modelGateway;
-        this.tenantService = tenantService;
+        this.tenantConfigLookup = tenantConfigLookup;
         this.embeddingGateway = embeddingGateway;
         this.pgRepository = pgRepository;
         this.engineRegistry = engineRegistry;
@@ -698,10 +698,10 @@ public class HybridSearchService {
         return null;
     }
 
-    Tenant currentTenant() {
+    JsonNode currentRetrieverEngines() {
         Long tid = com.ragagent.common.context.TenantContext.currentTenantId();
         try {
-            return tid == null ? null : tenantService.getTenantById(tid);
+            return tid == null ? null : tenantConfigLookup.retrieverEngines(tid);
         } catch (Exception e) {
             return null;
         }
@@ -709,11 +709,11 @@ public class HybridSearchService {
 
     private RetrievalConfigView currentRetrievalConfig() {
         try {
-            Tenant tenant = currentTenant();
-            if (tenant == null || tenant.getRetrievalConfig() == null) {
+            Long tid = com.ragagent.common.context.TenantContext.currentTenantId();
+            JsonNode node = tid == null ? null : tenantConfigLookup.retrievalConfig(tid);
+            if (node == null) {
                 return RetrievalConfigView.DEFAULTS;
             }
-            JsonNode node = tenant.getRetrievalConfig();
             return new RetrievalConfigView(
                     node.path("rrf_k").asInt(0),
                     node.path("rrf_vector_weight").asDouble(0),

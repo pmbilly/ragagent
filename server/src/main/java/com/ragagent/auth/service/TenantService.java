@@ -27,7 +27,7 @@ import org.springframework.stereotype.Service;
  * 响应恒为包装格式 → 读取后归一化。
  */
 @Service
-public class TenantService {
+public class TenantService implements com.ragagent.common.tenant.TenantConfigLookup {
 
     private static final Logger log = LoggerFactory.getLogger(TenantService.class);
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -55,6 +55,26 @@ public class TenantService {
             normalizeContextConfig(t);
         }
         return t;
+    }
+
+    // ── TenantConfigLookup（检索/模型域的只读端口实现，B95/C6+C7）─────────
+
+    @Override
+    public com.fasterxml.jackson.databind.JsonNode retrieverEngines(long tenantId) {
+        Tenant t = getTenantById(tenantId);
+        return t == null ? null : t.getRetrieverEngines();
+    }
+
+    @Override
+    public com.fasterxml.jackson.databind.JsonNode retrievalConfig(long tenantId) {
+        Tenant t = getTenantById(tenantId);
+        return t == null ? null : t.getRetrievalConfig();
+    }
+
+    @Override
+    public com.fasterxml.jackson.databind.JsonNode memoryConfig(long tenantId) {
+        Tenant t = getTenantById(tenantId);
+        return t == null ? null : t.getMemoryConfig();
     }
 
     /** 批量按 id 查（map 形态，供 memberships 组装） */

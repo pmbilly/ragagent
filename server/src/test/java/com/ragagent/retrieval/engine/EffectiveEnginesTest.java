@@ -42,7 +42,7 @@ class EffectiveEnginesTest {
         Tenant tenant = new Tenant();
         tenant.setRetrieverEngines(root);
 
-        List<RetrieverEngineParams> engines = EffectiveEngines.of(tenant, DRIVER);
+        List<RetrieverEngineParams> engines = EffectiveEngines.of(tenant.getRetrieverEngines(), DRIVER);
         assertEquals(2, engines.size());
         assertEquals(new RetrieverEngineParams("vector", "elasticsearch"), engines.get(0));
         assertEquals(new RetrieverEngineParams("keywords", "elasticsearch"), engines.get(1));
@@ -58,14 +58,14 @@ class EffectiveEnginesTest {
         Tenant tenant = new Tenant();
         tenant.setRetrieverEngines(root);
 
-        assertEquals(EffectiveEngines.defaults(DRIVER), EffectiveEngines.of(tenant, DRIVER));
+        assertEquals(EffectiveEngines.defaults(DRIVER), EffectiveEngines.of(tenant.getRetrieverEngines(), DRIVER));
     }
 
     @Test
     @DisplayName("tenant 为 null / 无 retriever_engines → 同样回落默认")
     void missingTenantFallsBackToDefaults() {
         assertEquals(EffectiveEngines.defaults(DRIVER), EffectiveEngines.of(null, DRIVER));
-        assertEquals(EffectiveEngines.defaults(DRIVER), EffectiveEngines.of(new Tenant(), DRIVER));
+        assertEquals(EffectiveEngines.defaults(DRIVER), EffectiveEngines.of(new Tenant().getRetrieverEngines(), DRIVER));
     }
 
     @Test

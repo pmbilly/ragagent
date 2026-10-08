@@ -562,7 +562,7 @@ public class ChunkQuestionService {
         } catch (RuntimeException e) {
             tenant = null;
         }
-        return EffectiveEngines.of(tenant, driverProperties.driver());
+        return EffectiveEngines.of(tenant == null ? null : tenant.getRetrieverEngines(), driverProperties.driver());
     }
 
     /**

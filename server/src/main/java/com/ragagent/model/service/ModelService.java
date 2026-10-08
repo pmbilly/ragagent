@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.auth.service.TenantService;
+import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
@@ -70,12 +70,12 @@ public class ModelService implements ModelGateway  {
 
     private final ModelMapper modelMapper;
     private final ModelUsageMapper usageMapper;
-    private final TenantService tenantService;
+    private final TenantConfigLookup tenantConfigLookup;
 
-    public ModelService(ModelMapper modelMapper, ModelUsageMapper usageMapper, TenantService tenantService) {
+    public ModelService(ModelMapper modelMapper, ModelUsageMapper usageMapper, TenantConfigLookup tenantConfigLookup) {
         this.modelMapper = modelMapper;
         this.usageMapper = usageMapper;
-        this.tenantService = tenantService;
+        this.tenantConfigLookup = tenantConfigLookup;
     }
 
     private static long tenantId() {
@@ -335,9 +335,8 @@ public class ModelService implements ModelGateway  {
             }
         }
 
-        var tenant = tenantService.getTenantById(tid);
-        if (tenant != null && tenant.getMemoryConfig() != null) {
-            JsonNode memoryConfig = tenant.getMemoryConfig();
+        JsonNode memoryConfig = tenantConfigLookup.memoryConfig(tid);
+        if (memoryConfig != null) {
             // 两个记忆模型钉都要查：删任一会让空间指向不存在的模型
             if (modelId.equals(text(memoryConfig.get("embeddingModelId")))) {
                 memoryBindings.add("embedding_model");

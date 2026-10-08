@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.auth.domain.Tenant;
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * 有效引擎解析——租户显式配置与 RETRIEVE_DRIVER 派生默认共用的映射表与派发规则。
@@ -63,13 +63,13 @@ public final class EffectiveEngines {
      * 租户显式配置优先，否则按
      * {@code RETRIEVE_DRIVER} 派生默认（驱动串由调用方注入，不读进程环境）。
      */
-    public static List<RetrieverEngineParams> of(Tenant tenant, String retrieveDriver) {
-        if (tenant != null && tenant.getRetrieverEngines() != null
-                && tenant.getRetrieverEngines().has("engines")
-                && tenant.getRetrieverEngines().get("engines").isArray()
-                && !tenant.getRetrieverEngines().get("engines").isEmpty()) {
+    public static List<RetrieverEngineParams> of(JsonNode retrieverEngines, String retrieveDriver) {
+        if (retrieverEngines != null
+                && retrieverEngines.has("engines")
+                && retrieverEngines.get("engines").isArray()
+                && !retrieverEngines.get("engines").isEmpty()) {
             List<RetrieverEngineParams> out = new ArrayList<>();
-            for (JsonNode n : tenant.getRetrieverEngines().get("engines")) {
+            for (JsonNode n : retrieverEngines.get("engines")) {
                 out.add(new RetrieverEngineParams(
                         n.path("retriever_type").asText(""),
                         n.path("retriever_engine_type").asText("")));

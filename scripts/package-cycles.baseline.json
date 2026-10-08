@@ -21,10 +21,6 @@
     ],
     [
       "retrieval",
-      "auth"
-    ],
-    [
-      "retrieval",
       "vectorstore"
     ]
   ]

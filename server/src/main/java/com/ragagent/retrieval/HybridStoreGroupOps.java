@@ -60,7 +60,7 @@ final class HybridStoreGroupOps {
         // env-store 组的租户有效引擎：按当前租户解析；引擎列表为空 =
         // RETRIEVE_DRIVER 未配置 = 检索全关。
         List<RetrieverEngineParams> tenantEngines =
-                EffectiveEngines.of(service.currentTenant(), retrieveDriver);
+                EffectiveEngines.of(service.currentRetrieverEngines(), retrieveDriver);
 
         List<StoreGroup> groups = new ArrayList<>(buckets.size());
         for (List<KnowledgeBaseSearchFacts> groupKbs : buckets.values()) {

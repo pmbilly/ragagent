@@ -1048,3 +1048,11 @@
   `common/tenant/TenantConfigLookup { JsonNode retrieverEngines(long); JsonNode retrievalConfig(long); JsonNode memoryConfig(long); }`，
   让 `auth.service.TenantService implements TenantConfigLookup`（已有 `getTenantById`，无新 wiring）；`EffectiveEngines.of(Tenant,…)` → `of(JsonNode,…)`（调用点 2 个：`HybridStoreGroupOps`、`ChunkQuestionService`，两者都持有 Tenant 或端口）。
 - **闸门**：后端 4,838/0 + `spotlessCheck` + 五守卫绿。
+
+**✅ B95（2026-10-08，阶段 4 端口化：C6 + C7）**
+- **端口**：`common/tenant/TenantConfigLookup`（`JsonNode retrieverEngines(long)` / `retrievalConfig(long)` / `memoryConfig(long)`）——只暴露检索域与模型域真正需要的三个 jsonb 配置视图。
+- **关键手法：让实现类直接实现端口**（`TenantService implements TenantConfigLookup`，三个方法取 `getTenantById` 后取 node、租户不存在返回 null）⇒ **零新 wiring**（Spring 注入的仍是同一个 bean），且 **Mockito 对 `TenantService` 的 mock 自动满足端口类型** ⇒ 13 个 mock 该服务的测试（`SearchRecordingTest`/`Rec46cSupport`/`MessageServiceVectorSearchTest`…）**一处都不用改**（测试涟漪只落在 1 处参数类型上）。
+- **改造点**：`EffectiveEngines.of(Tenant,…)` → `of(JsonNode,…)`（调用点 2：`HybridStoreGroupOps`、`ChunkQuestionService`）；`HybridSearchService` 去掉 `Tenant`/`TenantService`，新增 `currentRetrieverEngines()` 并让 `currentRetrievalConfig()` 直读端口；`ModelService` 直读 `memoryConfig(tid)`。
+- **效果**：`retrieval`/`model` 对 `auth` 的 import **清零**；守卫 `L2→L3 直连 6 → 5`（基线已刷新），环/分层违例保持 0（包图仍是 DAG）。
+- **闸门**：后端 4,838/0 + `spotlessCheck` + 五守卫绿。
+- **余项**：C4（17，API key scope → `common.security`）、C5（16，`tenantconfig` → `common.tenant`）、C2（43，`wiki→knowledge` 只读门面）。
