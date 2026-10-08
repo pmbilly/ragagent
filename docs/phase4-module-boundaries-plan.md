@@ -316,7 +316,8 @@ B111 暴露的 8 域间接环看着吓人（`agent`/`auth`/`chatpipeline`/`datas
    ⇒ 包一动，入口类与 ArchUnit R2/R3/R11 守卫必须同步。
 2. **13 处 classpath 资源是"静默 null"**（`if (in == null) return/continue`）：`agent/management/**`、
    `initialization/**`、`/jieba/**`、`common/text/**`、`/dataset/**`。已逐个核实**读法都是 classloader
-   绝对路径 ✓**（不会因搬家解析失败），但**缺资源不报错** ⇒ 必须补一条"资源存在性断言测试"。
+   绝对路径 ✓**（不会因搬家解析失败），但**缺资源不报错** ⇒ 必须补一条"资源存在性断言测试"
+   ——✅ **B118 已补**（见 §7）。
 3. **路径硬编码**：proto srcDir 来自 `../docreader` + `$rootDir/otlp-proto`；迁移来自
    `$rootDir/migrations/versioned` 且运行时读 `filesystem:./build/generated-migrations`
    （绑定模块目录 + 工作目录）；**5 个守卫脚本 + `GoldenContract` 都硬编码 `server/src/...`**。
@@ -354,7 +355,7 @@ B111 暴露的 8 域间接环看着吓人（`agent`/`auth`/`chatpipeline`/`datas
 | 依赖 | `:common` **零 project 依赖**；`:server` 声明 `implementation(project(":common"))` |
 | 依赖声明 | 按 `common`/`event` 的**实际 import 面**声明（jackson / spring-context·web·webmvc·jdbc / spring-boot·autoconfigure / spring-data-redis / slf4j / mybatis-plus 3.5.7 / jakarta servlet·validation），**不用 starter**，避免把自动配置漏进库 |
 | 搬迁 | `git mv` `common/`、`event/`（主源码）+ `resources/common/text/*.txt`（被 `/common/text/…` 绝对路径读）+ **9 个纯底座测试**（2 个 `@SpringBootTest` 与引用其它域的 5 个留在 `:server`）|
-| 资源 | 13 处 classpath 资源读法**逐个核实全是 classloader 绝对路径** ✓（不会因搬家解析失败）；但**缺资源静默 null** 的性质未变 ⇒ "资源存在性断言"仍待补（§5.2-2）|
+| 资源 | 13 处 classpath 资源读法**逐个核实全是 classloader 绝对路径** ✓（不会因搬家解析失败）；**缺资源静默 null** 已由 ✅ **B118** 的 R12a/R12b 断言兜住（见 §7）|
 
 ### 6.2 守卫与规则的多模块化（否则会**静默失覆盖**）
 
@@ -428,3 +429,38 @@ jar 名（`common-*.jar`，无人依赖）。
 **复验**：`./gradlew projects` → `:common` + `:server` ✓；
 编译期硬约束探针（往 `:common` 注入 `knowledge.domain.Chunk`）⇒ `:common:compileJava` **FAILED** ✓；
 `./gradlew spotlessCheck build` = BUILD SUCCESSFUL + 五守卫绿。
+
+
+## 7. B118：classpath 资源存在性断言（R12a / R12b）
+
+对应 §5.2 风险 #2：主源码 15 处资源读取里 **13 处是"缺资源不报错"**
+（`if (in == null) return/continue`），症状不是异常而是**功能悄悄降级**——模板为空、
+内置 agent 列表为空、jieba 分词退化、甚至 `spring.factories` 的 EPP 不注册。
+B116 搬家时已经搬过一批资源（`common/text/*.txt`），这类风险从此刻起是真实的。
+
+**落地**：`server/src/test/java/com/ragagent/arch/ClasspathResourcesTest.java`（`com.ragagent.arch` 守卫族），
+两条断言：
+
+| 断言 | 内容 | 覆盖的故障 |
+|---|---|---|
+| **R12a** | `RESOURCES` 清单（20 条，每条注明消费方）里每个路径都必须能从 classpath 读到，且**不能是 0 字节** | 资源没跟着模块走 / 被重命名 / 空文件 |
+| **R12b** | 源码里每个 `getResourceAsStream("字面量")` 必须是清单里的精确路径，或清单某条路径的**目录前缀** | 新增/改动资源没登记（防止清单本身腐化）|
+
+- **清单构成**：11 个提示词模板（三处文件列表共读同一目录）＋ `builtin_agents.yaml`／`agent_type_presets.yaml`
+  ＋ `initialization/extract_config.yaml`／`asr_test.wav` ＋ `dataset/samples.json` ＋ `jieba/hmm_model.json`
+  ＋ `common/text/TSPhrases.txt`／`TSCharacters.txt` ＋ `META-INF/spring.factories`
+  （fail-fast 的两个也纳入——语义上它们"自守"，但纳入后连"文件被搬走"也一起覆盖）
+- **R12b 的巧妙点**：只看 `getResourceAsStream("字面量")` 单实参形式，
+  拼接形式（`DIR + fileName`）天然不命中 ⇒ **零误报**，且不必解析常量表
+- **多模块复用**：扫描根复用 `ArchitectureRulesTest.backendSourceRoots("main/java")`
+  （该函数 B118 起放开为包级可见），因此同时覆盖 `server/src/main/java` 与 `../common/src/main/java`
+- **维护**：新增 classpath 资源时在 `RESOURCES` 加一行（写清消费方），两条断言自动覆盖
+
+**红态探针（两条各验一次）**：
+
+| 探针 | 结果 |
+|---|---|
+| 把 `dataset/samples.json` 改名挪走 | R12a 失败：`dataset/samples.json（evaluation.DatasetService）：不在 classpath 上` ✓ |
+| 往 `common` 主源码加 `getResourceAsStream("probe/missing.yaml")` | R12b 失败：`../common/src/main/java/…/TenantContext.java → "probe/missing.yaml"` ✓（顺带证明跨模块扫描生效）|
+
+**闸门**：`./gradlew spotlessCheck build` = BUILD SUCCESSFUL + 五守卫绿。
