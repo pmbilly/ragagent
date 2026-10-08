@@ -37,7 +37,7 @@ import org.junit.jupiter.api.Test;
  * </ul>
  *
  * <p><b>登记范围</b>：已换锚到 camel 的<b>我方</b>载体面（DB jsonb / 内部载荷）。冻结面（第三方线格式、
- * 事件载荷、LLM 载荷、{@code auth/domain/tenantconfig} 租户配置 jsonb 等，见 HANDOFF §15.3）
+ * 事件载荷、LLM 载荷、{@code common/tenant} 租户配置 jsonb 等，见 HANDOFF §15.3）
  * 不在内——它们<b>有意</b>保留各自的键名。</p>
  *
  * <p><b>已知未登记（属换锚欠账，不在此钉）</b>：{@code agent/AgentConfig}（14 处 snake，逐字段注解）、

@@ -58,8 +58,8 @@ final class QaMentionTagScope {
                     req.session.getTenantId());
         }
         // API-Key KB 白名单校验 + 过滤；拒绝形态是 BizException。
-        com.ragagent.auth.apikey.domain.TenantAPIKeyScope.authorizeKnowledgeTargets(requestedKbIds, req.knowledgeIds);
-        kbIds = com.ragagent.auth.apikey.domain.TenantAPIKeyScope.filterKnowledgeBases(requestedKbIds, kbIds);
+        com.ragagent.common.security.TenantAPIKeyScope.authorizeKnowledgeTargets(requestedKbIds, req.knowledgeIds);
+        kbIds = com.ragagent.common.security.TenantAPIKeyScope.filterKnowledgeBases(requestedKbIds, kbIds);
         return new SessionKnowledgeQaService.KnowledgeResolution(kbIds, knowledgeIds);
     }
     public SessionQaResolution.MentionScope restrictMentionsToAgentScope(

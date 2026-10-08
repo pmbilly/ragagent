@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.ragagent.auth.apikey.domain.APIKeyCapability;
-import com.ragagent.auth.apikey.domain.APIKeyScopeType;
+import com.ragagent.common.security.APIKeyCapability;
+import com.ragagent.common.security.APIKeyScopeType;
 import com.ragagent.auth.apikey.domain.TenantAPIKey;
 import com.ragagent.auth.apikey.mapper.TenantAPIKeyNotFoundException;
 import com.ragagent.auth.apikey.mapper.TenantAPIKeyRepository;

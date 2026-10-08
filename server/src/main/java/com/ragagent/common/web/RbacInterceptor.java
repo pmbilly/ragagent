@@ -125,7 +125,7 @@ public class RbacInterceptor implements HandlerInterceptor {
         }
         // API-Key 主体直接放行——能力维度由 APIKeyGate 全权判定，
         // 否则 full-access Key 会被这里的角色下限拦住
-        if (com.ragagent.auth.apikey.domain.APIKeyScopeContext.present()) {
+        if (com.ragagent.common.security.APIKeyScopeContext.present()) {
             return true;
         }
 
@@ -198,8 +198,8 @@ public class RbacInterceptor implements HandlerInterceptor {
         // API-key 主体由 APIKeyGate 全权判定（能力 + KB 白名单 + default-deny），
         // 角色阶梯不适用于机器主体——角色下限规则短路放行；
         // sysAdminOnly 规则只放行平台 Key、拒绝租户 Key。
-        com.ragagent.auth.apikey.domain.TenantAPIKeyScope apiKeyScope =
-                com.ragagent.auth.apikey.domain.APIKeyScopeContext.current();
+        com.ragagent.common.security.TenantAPIKeyScope apiKeyScope =
+                com.ragagent.common.security.APIKeyScopeContext.current();
         if (apiKeyScope != null) {
             if (rule.sysAdminOnly()) {
                 if (apiKeyScope.isPlatform()) {
@@ -290,8 +290,8 @@ public class RbacInterceptor implements HandlerInterceptor {
             return true;
         }
         // 平台 Key 等价跨租户超管，放行
-        com.ragagent.auth.apikey.domain.TenantAPIKeyScope keyScope =
-                com.ragagent.auth.apikey.domain.APIKeyScopeContext.current();
+        com.ragagent.common.security.TenantAPIKeyScope keyScope =
+                com.ragagent.common.security.APIKeyScopeContext.current();
         if (keyScope != null && keyScope.isPlatform()) {
             return true;
         }

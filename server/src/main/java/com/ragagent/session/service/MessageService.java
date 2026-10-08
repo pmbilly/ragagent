@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.auth.domain.Tenant;
-import com.ragagent.auth.domain.tenantconfig.ChatHistoryConfig;
+import com.ragagent.common.tenant.ChatHistoryConfig;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.agent.tools.ThinkBlocks;
 import com.ragagent.common.context.TenantContext;

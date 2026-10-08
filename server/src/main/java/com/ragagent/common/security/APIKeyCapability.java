@@ -1,4 +1,4 @@
-package com.ragagent.auth.apikey.domain;
+package com.ragagent.common.security;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;

@@ -859,9 +859,9 @@ public class SessionKnowledgeQaService {
                 com.ragagent.auth.domain.Tenant tenant = tenantService.getTenantById(tid);
                 if (tenant != null && tenant.getWebSearchConfig() != null
                         && !tenant.getWebSearchConfig().isNull()) {
-                    com.ragagent.auth.domain.tenantconfig.WebSearchConfig cfg =
+                    com.ragagent.common.tenant.WebSearchConfig cfg =
                             JSON.treeToValue(tenant.getWebSearchConfig(),
-                                    com.ragagent.auth.domain.tenantconfig.WebSearchConfig.class);
+                                    com.ragagent.common.tenant.WebSearchConfig.class);
                     int max = cfg.getMaxResults();
                     if (max > 0) {
                         return max;

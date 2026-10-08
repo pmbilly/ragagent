@@ -1056,3 +1056,16 @@
 - **效果**：`retrieval`/`model` 对 `auth` 的 import **清零**；守卫 `L2→L3 直连 6 → 5`（基线已刷新），环/分层违例保持 0（包图仍是 DAG）。
 - **闸门**：后端 4,838/0 + `spotlessCheck` + 五守卫绿。
 - **余项**：C4（17，API key scope → `common.security`）、C5（16，`tenantconfig` → `common.tenant`）、C2（43，`wiki→knowledge` 只读门面）。
+
+**✅ B96（2026-10-08，共享词汇下沉：C4/C5 前置）**
+- **搬什么**（B94 同法：搬共享词汇到中性包，实现留在 auth）：
+  · `auth/domain/tenantconfig/**` 6 类 → `common/tenant/`（与 `TenantProperties` 同址；方案 §2 对 C5 的既定下沉目标是 `common.tenant`）。
+  · `auth/apikey/domain/{TenantAPIKeyScope,APIKeyScopeContext,APIKeyScopeType,APIKeyCapability}` → `common/security/`。
+- **引用更新 68 文件**（主源码 + 测试）；另改 3 处**路径前缀型**引用：`AgentConfigKeyUsageTest` 的豁免清单、`check-json-key-case.py` 的 `FROZEN_PREFIXES`、`JsonFaceVocabularyTest`。
+- **过程教训（可复用）**：
+  ① 搬迁类与旧包其它类常有**同包隐式引用**（无 import）⇒ 我的"同包 import 清理"会误删嵌套类 import、漏搬依赖类；正解是**靠编译错误逐个发现**（首轮 8 个报错：`APIKeyScopeType`/`APIKeyCapability` 需一并搬；`StorageEngineConfig.*EngineConfig` 嵌套 import 需补回）。
+  ② 守卫/测试里的**路径前缀**（豁免清单、冻结前缀）必须随搬迁同步——否则守卫扫描面变化造成假红（本次两处踩到：`auth/domain/tenantconfig/` → `common/tenant/`）。
+  ③ 字符串替换插入 `//` 注释时要检查是否**吞掉同一行的后续元素**（本次把 `"event/payload", "llm/"` 三个豁免项吞进注释，导致 `llm/**` 文件假红）。
+- **效果**：`knowledge` + `storage` 对 `auth` 的 import **33 → 19**（余：`Tenant`×12、`TenantService`×7、`UserService`×1、`TenantMapper`×1 —— 全是租户查询面）。
+- **闸门**：后端 4,838/0 + `spotlessCheck` + 五守卫绿。
+- **下一步 B97**：用 B95 的 `TenantConfigLookup` 端口 + 少量视图扩展（如 `TenantRef(id,name,type)`）收掉那 19 处 ⇒ C4/C5 归零；随后 C2（43，`wiki→knowledge` 门面）。

@@ -208,7 +208,7 @@ public class KnowledgeQaController {
             throw BizException.badRequest(
                     "At least one knowledge_base_id, knowledge_base_ids, knowledge_ids, or scoped tag must be provided");
         }
-        com.ragagent.auth.apikey.domain.TenantAPIKeyScope.authorizeKnowledgeTargets(
+        com.ragagent.common.security.TenantAPIKeyScope.authorizeKnowledgeTargets(
                 knowledgeBaseIds, request.knowledgeIds());
 
         List<SearchResult> searchResults = knowledgeQaService.searchKnowledge(

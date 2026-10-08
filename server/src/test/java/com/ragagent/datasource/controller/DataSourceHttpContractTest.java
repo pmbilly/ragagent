@@ -827,14 +827,14 @@ class DataSourceHttpContractTest {
         APIKeyRouteAuthorizer a = new APIKeyRouteAuthorizer();
         APIKeyRoutePolicies.registerAll(a);
 
-        com.ragagent.auth.apikey.domain.TenantAPIKeyScope scoped =
-                new com.ragagent.auth.apikey.domain.TenantAPIKeyScope(
+        com.ragagent.common.security.TenantAPIKeyScope scoped =
+                new com.ragagent.common.security.TenantAPIKeyScope(
                         0L, "tenant", false, null, List.of("chat"));
         assertThat(gateAllows(a, scoped, "GET", "/api/v1/datasource/types")).isFalse();
         assertThat(gateAllows(a, scoped, "POST", "/api/v1/datasource/{id}/sync")).isFalse();
 
-        com.ragagent.auth.apikey.domain.TenantAPIKeyScope full =
-                new com.ragagent.auth.apikey.domain.TenantAPIKeyScope(0L, "tenant", true, null, null);
+        com.ragagent.common.security.TenantAPIKeyScope full =
+                new com.ragagent.common.security.TenantAPIKeyScope(0L, "tenant", true, null, null);
         assertThat(gateAllows(a, full, "GET", "/api/v1/datasource/types")).isTrue();
 
         // 行为层：scoped Key 打真实请求 → 403（纯字符串形态，不是 AppError 信封）
@@ -846,9 +846,9 @@ class DataSourceHttpContractTest {
     }
 
     private static boolean gateAllows(APIKeyRouteAuthorizer authorizer,
-                                      com.ragagent.auth.apikey.domain.TenantAPIKeyScope scope,
+                                      com.ragagent.common.security.TenantAPIKeyScope scope,
                                       String method, String pattern) throws Exception {
-        com.ragagent.auth.apikey.domain.APIKeyScopeContext.set(scope);
+        com.ragagent.common.security.APIKeyScopeContext.set(scope);
         try {
             org.springframework.mock.web.MockHttpServletRequest request =
                     new org.springframework.mock.web.MockHttpServletRequest(method, pattern);
@@ -860,7 +860,7 @@ class DataSourceHttpContractTest {
                     .preHandle(request, response, new Object());
             return allowed && response.getStatus() == 200;
         } finally {
-            com.ragagent.auth.apikey.domain.APIKeyScopeContext.clear();
+            com.ragagent.common.security.APIKeyScopeContext.clear();
         }
     }
 

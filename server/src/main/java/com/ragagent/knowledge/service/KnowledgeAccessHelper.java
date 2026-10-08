@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.ragagent.auth.apikey.domain.TenantAPIKeyScope;
+import com.ragagent.common.security.TenantAPIKeyScope;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.knowledge.domain.Knowledge;

@@ -34,7 +34,8 @@ class AgentConfigKeyUsageTest {
 
     /** 合法 snake 面（按路径前缀/片段排除）。 */
     private static final List<String> ALLOWED_PREFIXES = List.of(
-            "auth/domain/tenantconfig/", "event/payload", "llm/", "common/pipeline/SearchParams",
+            "common/tenant/",            // B96：原 auth/domain/tenantconfig（租户配置视图，键名由 jsonb 决定）
+            "event/payload", "llm/", "common/pipeline/SearchParams",
             "tracing/langfuse", "datasource/connector", "stream/", "mcp/oauth", "mcp/domain/McpService",
             "retrieval/engine/doris", "retrieval/domain/ImageInfo", "rerank/RankResult",
             "common/wiki/ExtractedItem", "chatpipeline/plugin", "agent/AgentEngine", "agent/ReActIteration",

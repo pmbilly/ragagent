@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import com.ragagent.auth.apikey.domain.APIKeyCapability;
-import com.ragagent.auth.apikey.domain.TenantAPIKeyScope;
+import com.ragagent.common.security.APIKeyCapability;
+import com.ragagent.common.security.TenantAPIKeyScope;
 import com.ragagent.auth.apikey.filter.APIKeyRouteAuthorizer;
 import com.ragagent.auth.apikey.filter.APIKeyRoutePolicies;
 import com.ragagent.auth.apikey.filter.APIKeyRoutePolicy;

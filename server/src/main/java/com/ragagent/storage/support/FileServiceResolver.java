@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.auth.domain.Tenant;
-import com.ragagent.auth.domain.tenantconfig.StorageEngineConfig;
+import com.ragagent.common.tenant.StorageEngineConfig;
 import com.ragagent.common.storage.StorageRuntimeEnv;
 import com.ragagent.storage.provider.FileServiceFactory;
 

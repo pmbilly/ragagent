@@ -19,8 +19,8 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-import com.ragagent.auth.apikey.domain.APIKeyScopeContext;
-import com.ragagent.auth.apikey.domain.TenantAPIKeyScope;
+import com.ragagent.common.security.APIKeyScopeContext;
+import com.ragagent.common.security.TenantAPIKeyScope;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.BizException;
 import com.ragagent.common.llm.ResponseType;

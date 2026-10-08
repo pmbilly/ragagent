@@ -8,6 +8,8 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ragagent.common.security.APIKeyScopeType;
+import com.ragagent.common.security.APIKeyCapability;
 
 /**
  * tenant_api_keys 表实体。

@@ -3,7 +3,7 @@ package com.ragagent.storage.provider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ragagent.auth.domain.tenantconfig.StorageEngineConfig;
+import com.ragagent.common.tenant.StorageEngineConfig;
 import com.ragagent.common.storage.StorageRuntimeEnv;
 
 /**

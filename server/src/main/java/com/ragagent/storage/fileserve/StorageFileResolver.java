@@ -409,10 +409,10 @@ public class StorageFileResolver {
         String dir = baseDir == null || baseDir.isEmpty()
                 ? StoragePaths.localStorageBaseDir() : baseDir;
         try {
-            com.ragagent.auth.domain.tenantconfig.StorageEngineConfig typed = sec == null
-                    ? new com.ragagent.auth.domain.tenantconfig.StorageEngineConfig()
+            com.ragagent.common.tenant.StorageEngineConfig typed = sec == null
+                    ? new com.ragagent.common.tenant.StorageEngineConfig()
                     : CONFIG_MAPPER.convertValue(sec,
-                            com.ragagent.auth.domain.tenantconfig.StorageEngineConfig.class);
+                            com.ragagent.common.tenant.StorageEngineConfig.class);
             com.ragagent.storage.provider.FileServiceFactory.Created created =
                     com.ragagent.storage.provider.FileServiceFactory.fromStorageConfig(p, typed, dir);
             if (created == null || created.service() == null) {

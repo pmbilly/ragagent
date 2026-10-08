@@ -121,7 +121,7 @@ final class QaRequestParser {
         // @mention 合并
         KnowledgeTargets merged = QaSupport.mergeKnowledgeTargets(
                 request.knowledgeBaseIds(), request.knowledgeIds(), request.mentionedItems());
-        com.ragagent.auth.apikey.domain.TenantAPIKeyScope.authorizeKnowledgeTargets(
+        com.ragagent.common.security.TenantAPIKeyScope.authorizeKnowledgeTargets(
                 merged.kbIds(), merged.knowledgeIds());
 
         // wiki fixer 的租户作用域：内建 agent id 不匹配即跳过（同款守卫）

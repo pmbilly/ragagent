@@ -2,7 +2,7 @@ package com.ragagent.auth.apikey.service;
 
 import java.util.List;
 
-import com.ragagent.auth.apikey.domain.APIKeyCapability;
+import com.ragagent.common.security.APIKeyCapability;
 import com.ragagent.auth.apikey.domain.TenantAPIKeyRequest;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;

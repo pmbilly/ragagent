@@ -15,8 +15,8 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ragagent.auth.apikey.domain.APIKeyScopeContext;
-import com.ragagent.auth.apikey.domain.TenantAPIKeyScope;
+import com.ragagent.common.security.APIKeyScopeContext;
+import com.ragagent.common.security.TenantAPIKeyScope;
 import com.ragagent.audit.domain.AuditAction;
 import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.audit.domain.AuditOutcome;

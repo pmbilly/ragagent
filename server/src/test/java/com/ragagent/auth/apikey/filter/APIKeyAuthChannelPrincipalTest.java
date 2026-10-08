@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-import com.ragagent.auth.apikey.domain.APIKeyScopeContext;
+import com.ragagent.common.security.APIKeyScopeContext;
 import com.ragagent.auth.apikey.service.TenantAPIKeyService;
 import com.ragagent.auth.domain.Tenant;
 import com.ragagent.auth.domain.APIPrincipalConfig;

@@ -140,7 +140,7 @@ public class QaWiring {
             com.ragagent.auth.service.TenantService tenantService) {
         return new PipelinePorts.TenantService() {
             @Override
-            public com.ragagent.auth.domain.tenantconfig.WebSearchConfig currentWebSearchConfig() {
+            public com.ragagent.common.tenant.WebSearchConfig currentWebSearchConfig() {
                 Long tid = com.ragagent.common.context.TenantContext.currentTenantId();
                 if (tid == null) {
                     return null;
@@ -152,7 +152,7 @@ public class QaWiring {
                         return null;
                     }
                     return new ObjectMapper().treeToValue(tenant.getWebSearchConfig(),
-                            com.ragagent.auth.domain.tenantconfig.WebSearchConfig.class);
+                            com.ragagent.common.tenant.WebSearchConfig.class);
                 } catch (RuntimeException | JsonProcessingException e) {
                     return null;
                 }

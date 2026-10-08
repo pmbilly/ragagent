@@ -1,7 +1,7 @@
 package com.ragagent.session.domain;
 
-import com.ragagent.auth.apikey.domain.APIKeyScopeContext;
-import com.ragagent.auth.apikey.domain.TenantAPIKeyScope;
+import com.ragagent.common.security.APIKeyScopeContext;
+import com.ragagent.common.security.TenantAPIKeyScope;
 import com.ragagent.common.context.TenantContext;
 
 /**

@@ -12,7 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.ragagent.TestSchema;
-import com.ragagent.auth.apikey.domain.TenantAPIKeyScope;
+import com.ragagent.common.security.TenantAPIKeyScope;
 import com.ragagent.auth.apikey.filter.APIKeyGateInterceptor;
 import com.ragagent.auth.apikey.filter.APIKeyRouteAuthorizer;
 import com.ragagent.auth.apikey.filter.APIKeyRoutePolicies;
@@ -647,7 +647,7 @@ class MemoryHttpContractTest {
     /** 行为验证：直接驱动 {@link APIKeyGateInterceptor}。 */
     private static boolean gateAllows(APIKeyRouteAuthorizer authorizer, TenantAPIKeyScope scope,
                                       String method, String pattern) throws Exception {
-        com.ragagent.auth.apikey.domain.APIKeyScopeContext.set(scope);
+        com.ragagent.common.security.APIKeyScopeContext.set(scope);
         try {
             MockHttpServletRequest request = new MockHttpServletRequest(method, pattern);
             request.setAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE, pattern);
@@ -656,7 +656,7 @@ class MemoryHttpContractTest {
                     new APIKeyGateInterceptor(authorizer).preHandle(request, response, new Object());
             return allowed && response.getStatus() == 200;
         } finally {
-            com.ragagent.auth.apikey.domain.APIKeyScopeContext.clear();
+            com.ragagent.common.security.APIKeyScopeContext.clear();
         }
     }
 

@@ -136,7 +136,7 @@ public final class PipelinePorts {
          * 当前租户的 web 搜索配置（TenantContext 实时读取）；无租户上下文 → null
          * （调用方按空配置走缺省合并分支）。default null 保持未装配 port 时的恒空行为。
          */
-        default com.ragagent.auth.domain.tenantconfig.WebSearchConfig currentWebSearchConfig() {
+        default com.ragagent.common.tenant.WebSearchConfig currentWebSearchConfig() {
             return null;
         }
     }

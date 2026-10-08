@@ -43,7 +43,7 @@ MAIN = ROOT / 'server/src/main/java/com/ragagent'
 FROZEN_PREFIXES = (
     # 2026-10-08 B93b：`event/` 与 `stream/` 已 camel 化（事件面），从冻结名单摘除；
     # 事件面口径另由 scripts/check-event-face-case.py 守（载荷注解/事件名/响应类型值）。
-    'datasource/connector', 'llm/', 'auth/domain/tenantconfig',
+    'datasource/connector', 'llm/', 'common/tenant',
     'common/pipeline/SearchParams', 'mcp/oauth', 'memory/service/MemoryExtractionLlm',
     'memory/service/MemoryExtractPayload', 'docreader', 'rerank/RankResult',
     'tracing/langfuse', 'retrieval/engine/doris', 'retrieval/domain/ImageInfo',

@@ -367,9 +367,9 @@ public class AgentToolBackends {
                     || tenant.getWebSearchConfig().isNull()) {
                 return null;
             }
-            com.ragagent.auth.domain.tenantconfig.WebSearchConfig cfg = JSON.treeToValue(
+            com.ragagent.common.tenant.WebSearchConfig cfg = JSON.treeToValue(
                     tenant.getWebSearchConfig(),
-                    com.ragagent.auth.domain.tenantconfig.WebSearchConfig.class);
+                    com.ragagent.common.tenant.WebSearchConfig.class);
             cfg.applyEffective();
             com.ragagent.websearch.service.WebSearchService.WebSearchConfig out =
                     new com.ragagent.websearch.service.WebSearchService.WebSearchConfig();

@@ -459,8 +459,8 @@ public class MessageSuggestionService {
                 ? List.of() : ec.getKnowledgeIds();
         boolean preferActualEvidence = context.actualKnowledgeIds() != null
                 && !context.actualKnowledgeIds().isEmpty();
-        com.ragagent.auth.apikey.domain.TenantAPIKeyScope apiKeyScope =
-                com.ragagent.auth.apikey.domain.APIKeyScopeContext.current();
+        com.ragagent.common.security.TenantAPIKeyScope apiKeyScope =
+                com.ragagent.common.security.APIKeyScopeContext.current();
         if (apiKeyScope != null && apiKeyScope.isKnowledgeBaseRestricted()) {
             // 受限 API key 不能把 document id 走通用建议面（无法校验每条的 KB 绑定）
             preferActualEvidence = false;

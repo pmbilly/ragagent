@@ -1,12 +1,12 @@
-package com.ragagent.auth.domain.tenantconfig;
+package com.ragagent.common.tenant;
 
-import com.ragagent.auth.domain.tenantconfig.StorageEngineConfig.CosEngineConfig;
-import com.ragagent.auth.domain.tenantconfig.StorageEngineConfig.Ks3EngineConfig;
-import com.ragagent.auth.domain.tenantconfig.StorageEngineConfig.MinioEngineConfig;
-import com.ragagent.auth.domain.tenantconfig.StorageEngineConfig.ObsEngineConfig;
-import com.ragagent.auth.domain.tenantconfig.StorageEngineConfig.OssEngineConfig;
-import com.ragagent.auth.domain.tenantconfig.StorageEngineConfig.S3EngineConfig;
-import com.ragagent.auth.domain.tenantconfig.StorageEngineConfig.TosEngineConfig;
+import com.ragagent.common.tenant.StorageEngineConfig.Ks3EngineConfig;
+import com.ragagent.common.tenant.StorageEngineConfig.S3EngineConfig;
+import com.ragagent.common.tenant.StorageEngineConfig.MinioEngineConfig;
+import com.ragagent.common.tenant.StorageEngineConfig.ObsEngineConfig;
+import com.ragagent.common.tenant.StorageEngineConfig.OssEngineConfig;
+import com.ragagent.common.tenant.StorageEngineConfig.CosEngineConfig;
+import com.ragagent.common.tenant.StorageEngineConfig.TosEngineConfig;
 
 /**
  * 租户配置密钥的打码与合并（响应面打码 / 更新面保留旧值）三族：

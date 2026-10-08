@@ -2,6 +2,8 @@ package com.ragagent.auth.apikey.domain;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import com.ragagent.common.security.APIKeyScopeType;
+import com.ragagent.common.security.APIKeyCapability;
 
 /**
  * API Key 的响应投影。

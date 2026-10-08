@@ -1,4 +1,4 @@
-package com.ragagent.auth.apikey.domain;
+package com.ragagent.common.security;
 
 /**
  * API Key 的作用域类型。

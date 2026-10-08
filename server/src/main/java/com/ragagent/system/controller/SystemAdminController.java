@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.auth.apikey.domain.APIKeyCapability;
-import com.ragagent.auth.apikey.domain.APIKeyScopeType;
+import com.ragagent.common.security.APIKeyCapability;
+import com.ragagent.common.security.APIKeyScopeType;
 import com.ragagent.auth.apikey.domain.TenantAPIKeyCreateResponse;
 import com.ragagent.auth.apikey.domain.TenantAPIKeyResponse;
 import com.ragagent.auth.apikey.service.TenantAPIKeyService;

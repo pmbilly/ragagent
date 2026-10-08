@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import com.ragagent.auth.apikey.domain.APIKeyCapability;
-import com.ragagent.auth.apikey.domain.TenantAPIKeyScope;
+import com.ragagent.common.security.APIKeyCapability;
+import com.ragagent.common.security.TenantAPIKeyScope;
 import com.ragagent.auth.apikey.filter.APIKeyGateInterceptor;
 import com.ragagent.auth.apikey.filter.APIKeyRouteAuthorizer;
 import com.ragagent.auth.apikey.filter.APIKeyRoutePolicy;
@@ -29,7 +29,7 @@ class APIKeyGateTest {
 
     @AfterEach
     void clearScope() {
-        com.ragagent.auth.apikey.domain.APIKeyScopeContext.clear();
+        com.ragagent.common.security.APIKeyScopeContext.clear();
     }
 
     private static APIKeyRouteAuthorizer newTestAuthorizer() {
@@ -52,7 +52,7 @@ class APIKeyGateTest {
     private static boolean runGate(APIKeyRouteAuthorizer authorizer, TenantAPIKeyScope scope,
                                    String method, String pattern) throws Exception {
         if (scope != null) {
-            com.ragagent.auth.apikey.domain.APIKeyScopeContext.set(scope);
+            com.ragagent.common.security.APIKeyScopeContext.set(scope);
         }
         MockHttpServletRequest request = new MockHttpServletRequest(method, concretePath(pattern));
         request.setAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE, pattern);
@@ -80,7 +80,7 @@ class APIKeyGateTest {
     void gateDefaultDeny() throws Exception {
         // 未声明的路由对 full-access Key 也 default-deny
         APIKeyRouteAuthorizer a = newTestAuthorizer();
-        com.ragagent.auth.apikey.domain.APIKeyScopeContext.set(
+        com.ragagent.common.security.APIKeyScopeContext.set(
                 new TenantAPIKeyScope(0L, "tenant", true, null, null));
         MockHttpServletRequest request = new MockHttpServletRequest("POST", "/api/v1/agents");
         request.setAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE, "/api/v1/agents");
@@ -180,7 +180,7 @@ class APIKeyGateTest {
 
     private static boolean runDenyAPIKey(TenantAPIKeyScope scope) throws Exception {
         if (scope != null) {
-            com.ragagent.auth.apikey.domain.APIKeyScopeContext.set(scope);
+            com.ragagent.common.security.APIKeyScopeContext.set(scope);
         }
         MockHttpServletRequest request =
                 new MockHttpServletRequest("GET", "/api/v1/files/presigned-preview");
@@ -204,7 +204,7 @@ class APIKeyGateTest {
 
     private static boolean runAllowFileServe(TenantAPIKeyScope scope) throws Exception {
         if (scope != null) {
-            com.ragagent.auth.apikey.domain.APIKeyScopeContext.set(scope);
+            com.ragagent.common.security.APIKeyScopeContext.set(scope);
         }
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/files");
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -231,7 +231,7 @@ class APIKeyGateTest {
 
     @Test
     void allowFileServeDenialBodyMatchesGo() throws Exception {
-        com.ragagent.auth.apikey.domain.APIKeyScopeContext.set(
+        com.ragagent.common.security.APIKeyScopeContext.set(
                 new TenantAPIKeyScope(0L, "tenant", false, List.of("kb-1"), null));
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/files");
         MockHttpServletResponse response = new MockHttpServletResponse();

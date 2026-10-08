@@ -6,8 +6,8 @@ import java.util.TreeMap;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.ragagent.auth.apikey.domain.APIKeyScopeContext;
-import com.ragagent.auth.apikey.domain.TenantAPIKeyScope;
+import com.ragagent.common.security.APIKeyScopeContext;
+import com.ragagent.common.security.TenantAPIKeyScope;
 import com.ragagent.auth.apikey.service.TenantAPIKeyService;
 import com.ragagent.auth.domain.Tenant;
 import com.ragagent.auth.domain.TenantMember;

@@ -1,4 +1,4 @@
-package com.ragagent.auth.apikey.domain;
+package com.ragagent.common.security;
 
 /**
  * 当前请求的 {@link TenantAPIKeyScope} 持有者。

@@ -332,7 +332,7 @@ public class SystemAdminUserService {
 
     /** 主体角色：平台 API-Key 主体 → "platform_api_key"。 */
     public static String systemAuditActorRole() {
-        var scope = com.ragagent.auth.apikey.domain.APIKeyScopeContext.current();
+        var scope = com.ragagent.common.security.APIKeyScopeContext.current();
         if (scope != null && scope.isPlatform()) {
             return "platform_api_key";
         }

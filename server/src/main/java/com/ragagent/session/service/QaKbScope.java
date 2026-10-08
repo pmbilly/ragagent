@@ -94,8 +94,8 @@ final class QaKbScope {
     }
     boolean callerCanReadKb(String kbId, long ownerTenantId, long retrievalTenantId) {
         // ① API-key 作用域——**拒绝**路径：KB 受限的 Key 指向白名单外 ⇒ 不可读。
-        com.ragagent.auth.apikey.domain.TenantAPIKeyScope scope =
-                com.ragagent.auth.apikey.domain.APIKeyScopeContext.current();
+        com.ragagent.common.security.TenantAPIKeyScope scope =
+                com.ragagent.common.security.APIKeyScopeContext.current();
         if (scope != null && scope.isKnowledgeBaseRestricted()
                 && !scope.allowsKnowledgeBases(java.util.List.of(kbId))) {
             return false;

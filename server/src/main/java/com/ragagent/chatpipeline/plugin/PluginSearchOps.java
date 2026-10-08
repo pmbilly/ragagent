@@ -322,7 +322,7 @@ final class PluginSearchOps {
         }
 
         // 租户级 web 配置（ctx 里的租户信息；Java 侧从 TenantContext 取，探针/装配期可注入）
-        com.ragagent.auth.domain.tenantconfig.WebSearchConfig tenantCfg = currentTenantWebSearchConfig();
+        com.ragagent.common.tenant.WebSearchConfig tenantCfg = currentTenantWebSearchConfig();
         com.ragagent.websearch.service.WebSearchService.WebSearchConfig webConfig =
                 effectiveWebSearchConfig(tenantCfg);
 
@@ -365,7 +365,7 @@ final class PluginSearchOps {
      * 租户 web 配置：按 TenantContext 实时读取，
      * 无租户上下文 → null，走 {@link #effectiveWebSearchConfig} 的缺省分支。
      */
-    private com.ragagent.auth.domain.tenantconfig.WebSearchConfig currentTenantWebSearchConfig() {
+    private com.ragagent.common.tenant.WebSearchConfig currentTenantWebSearchConfig() {
         if (service.tenantService == null) {
             return null;
         }
@@ -374,7 +374,7 @@ final class PluginSearchOps {
 
     /** 执行面配置的生效值合并（缺省补齐）。 */
     static com.ragagent.websearch.service.WebSearchService.WebSearchConfig effectiveWebSearchConfig(
-            com.ragagent.auth.domain.tenantconfig.WebSearchConfig cfg) {
+            com.ragagent.common.tenant.WebSearchConfig cfg) {
         com.ragagent.websearch.service.WebSearchService.WebSearchConfig out =
                 new com.ragagent.websearch.service.WebSearchService.WebSearchConfig();
         if (cfg == null) {

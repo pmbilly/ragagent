@@ -1,4 +1,4 @@
-package com.ragagent.auth.domain.tenantconfig;
+package com.ragagent.common.tenant;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

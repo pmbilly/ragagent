@@ -3,9 +3,9 @@ package com.ragagent.auth.apikey.filter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-import com.ragagent.auth.apikey.domain.APIKeyScopeContext;
+import com.ragagent.common.security.APIKeyScopeContext;
 import com.ragagent.auth.apikey.domain.TenantAPIKey;
-import com.ragagent.auth.apikey.domain.TenantAPIKeyScope;
+import com.ragagent.common.security.TenantAPIKeyScope;
 import com.ragagent.auth.apikey.mapper.TenantAPIKeyNotFoundException;
 import com.ragagent.auth.apikey.service.TenantAPIKeyService;
 import com.ragagent.auth.domain.Tenant;
