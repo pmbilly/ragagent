@@ -222,7 +222,7 @@ public final class ImFormat {
 
     /** IM 平台标识 → Knowledge.Channel 常量。 */
     public static String imPlatformToChannel(String platform) {
-        switch (platform == null ? "" : platform.toLowerCase()) {
+        switch (platform == null ? "" : platform.toLowerCase(java.util.Locale.ROOT)) {
             case "wechat":
                 return ImTypes.CHANNEL_WECHAT;
             case "wecom", "wxwork":

@@ -46,7 +46,6 @@ import com.ragagent.im.runtime.QaQueue;
 import com.ragagent.im.runtime.ReplyMessage;
 import com.ragagent.knowledge.client.DocReaderClient;
 import com.ragagent.knowledge.service.KnowledgeService;
-import com.ragagent.knowledge.service.KnowledgeService.DuplicateKnowledgeException;
 import com.ragagent.session.domain.Session;
 import com.ragagent.session.service.MessageService;
 import com.ragagent.session.service.SessionAgentQaService;
@@ -81,10 +80,6 @@ public class ImService implements AgentChannelCleaner {
     private static final long LEADER_RENEW_MILLIS = 5_000L;
     /** 非 leader 的抢锁重试间隔。 */
     private static final long LEADER_RETRY_MILLIS = 10_000L;
-    /** 附件异步入知识库的文件扩展名白名单。 */
-    private static final java.util.Set<String> SUPPORTED_KB_FILE_EXTS = java.util.Set.of(
-            "pdf", "txt", "docx", "doc", "md", "markdown",
-            "png", "jpg", "jpeg", "gif", "csv", "xlsx", "xls", "pptx", "ppt");
 
     final ImChannelMapper channels;
     final ChannelSessionMapper channelSessions;
@@ -119,8 +114,8 @@ public class ImService implements AgentChannelCleaner {
     final ImStopOps stopOps;
     /** 消息入口闸门：去重与限流（B125 自本类外提；两张进程内回落表随之搬家）。 */
     final ImInboundGuardOps inboundGuard;
-    /** 知识库创建面（渠道配了 KB 时附件异步入库；组件缺席时跳过）。 */
-    private final ObjectProvider<KnowledgeService> knowledgeServices;
+    /** IM ↔ 知识库域接面：命令的 KB/检索读取 + 附件异步入库（B126 自本类外提）。 */
+    final ImKnowledgeBridgeOps knowledgeBridge;
 
     private final CommandRegistry cmdRegistry = new CommandRegistry();
     private final QaQueue qaQueue;
@@ -177,8 +172,6 @@ public class ImService implements AgentChannelCleaner {
         this.qaRequests = new ImQaRequests(this);
         this.qaRunner = new ImQaRunner(this);
         this.attachmentPreparer = new ImAttachmentPreparer(docReaders);
-        this.knowledgeServices = knowledgeServices;
-        ImCommandSet.registerDefaults(this.cmdRegistry, kbLister(), knowledgeSearcher());
         ImRedisStore store = null;
         RedisPubSub pubSub = null;
         if (redisEnabled) {
@@ -205,29 +198,12 @@ public class ImService implements AgentChannelCleaner {
         this.qaQueue.start();
         this.stopOps = new ImStopOps(store, qaQueue, inflight, () -> streamManagerRef);
         this.inboundGuard = new ImInboundGuardOps(redisStore, rateLimitWindowSec, rateLimitMax);
+        this.knowledgeBridge = new ImKnowledgeBridgeOps(knowledgeServices);
+        ImCommandSet.registerDefaults(this.cmdRegistry,
+                knowledgeBridge.kbLister(), knowledgeBridge.knowledgeSearcher());
         if (pubSub != null) {
             startChannelConfigSubscriber();
         }
-    }
-
-    // ── 命令的依赖面（cmd_info/cmd_search 的 KB/检索读取） ────────────────
-
-    private ImCommandSet.KnowledgeBaseLister kbLister() {
-        return new ImCommandSet.KnowledgeBaseLister() {
-            @Override
-            public List<KbView> listKnowledgeBases() {
-                return List.of();
-            }
-
-            @Override
-            public List<KbView> listKnowledgeBasesByTenantId(long tenantId) {
-                return List.of();
-            }
-        };
-    }
-
-    private ImCommandSet.KnowledgeSearcher knowledgeSearcher() {
-        return (kbIds, knowledgeIds, documentIds, query) -> List.of();
     }
 
     // ── 渠道生命周期（adapter 注册表） ─────────────────────────────────────
@@ -558,68 +534,6 @@ public class ImService implements AgentChannelCleaner {
 
     // ── 附件异步入库 ────────────────────────────────────────────────────────
 
-    /**
-     * 附件异步入渠道绑定的知识库：
-     * 无用户可见通知——原始文件消息照常收到 QA 回复，入库是后台工作；
-     * 渠道未配 KB / 知识服务缺席 / 类型不在白名单 → 直接跳过。
-     */
-    void ingestAttachmentToKnowledgeBase(ImChannelEntity channel,
-            ImAttachmentPreparer.Prepared prepared) {
-        String kbId = channel.getKnowledgeBaseId();
-        if (kbId == null || kbId.isEmpty() || prepared == null || prepared.raw() == null) {
-            return;
-        }
-        ImAttachmentPreparer.RawFile raw = prepared.raw();
-        long tenantId = channel.getTenantId();
-        Thread.ofVirtual().name("im-kb-ingest-" + channel.getId()).start(() -> {
-            // 后台线程无认证上下文：显式绑渠道租户（知识库写入要求租户在上下文）
-            TenantContext.set(tenantId, new TenantContext.Principal(
-                    TenantContext.PrincipalTypes.IM_USER, "system-" + tenantId), "viewer",
-                    false, "system-" + tenantId, false);
-            try {
-                ingestAttachmentInner(kbId, channel, raw);
-            } finally {
-                TenantContext.clear();
-            }
-        });
-    }
-
-    private void ingestAttachmentInner(String kbId, ImChannelEntity channel,
-            ImAttachmentPreparer.RawFile raw) {
-        String ext = ImAttachmentPreparer.extensionOf(raw.fileName());
-        if (!SUPPORTED_KB_FILE_EXTS.contains(ext)) {
-            log.info("[IM] Unsupported file type after download: {} (file={})", ext, raw.fileName());
-            return;
-        }
-        KnowledgeService service = knowledgeServices.getIfAvailable();
-        if (service == null) {
-            return;
-        }
-        try {
-            var knowledge = service.createFromFile(kbId, raw.content(), raw.fileName(),
-                    raw.fileName(), null, imPlatformToChannel(channel.getPlatform()));
-            log.info("[IM] File saved to knowledge base: kb={} knowledge={} file={}",
-                    kbId, knowledge.getId(), raw.fileName());
-        } catch (DuplicateKnowledgeException e) {
-            log.info("[IM] File already exists in knowledge base: {}", raw.fileName());
-        } catch (RuntimeException e) {
-            log.error("[IM] Failed to create knowledge from file: {}", e.getMessage());
-        }
-    }
-
-    /** IM 平台标识 → 知识库 channel 值。 */
-    static String imPlatformToChannel(String platform) {
-        String p = platform == null ? "" : platform.toLowerCase(java.util.Locale.ROOT);
-        return switch (p) {
-            case "wechat" -> "wechat";
-            case "wecom", "wxwork" -> "wecom";
-            case "feishu", "lark" -> "feishu";
-            case "dingtalk" -> "dingtalk";
-            case "slack" -> "slack";
-            default -> "im";
-        };
-    }
-
     private long channelTenantIdOrThrow(String channelId) {
         ChannelState st = channelStates.get(channelId);
         if (st != null) {
@@ -854,6 +768,12 @@ public class ImService implements AgentChannelCleaner {
     /** 在途映射退场（QA 结束调用）。实现见 {@link ImStopOps#unbindInflight}。 */
     void unbindInflight(String userKey) {
         stopOps.unbindInflight(userKey);
+    }
+
+    /** 附件异步入库。实现见 {@link ImKnowledgeBridgeOps#ingestAttachmentToKnowledgeBase}。 */
+    void ingestAttachmentToKnowledgeBase(ImChannelEntity channel,
+            ImAttachmentPreparer.Prepared prepared) {
+        knowledgeBridge.ingestAttachmentToKnowledgeBase(channel, prepared);
     }
 
     private volatile StreamManager streamManagerRef;
