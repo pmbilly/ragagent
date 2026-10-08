@@ -22,14 +22,14 @@ import com.ragagent.retrieval.engine.PgVectorRetrieveRepository;
 import com.ragagent.retrieval.engine.RetrieveEngineService;
 import com.ragagent.retrieval.engine.TenantStoreOwnership;
 import com.ragagent.retrieval.engine.VectorStoreRepoOwnership;
-import com.ragagent.vectorstore.mapper.VectorStoreRepository;
+import com.ragagent.common.vectorstore.VectorStoreLookup;
 
 /**
  * 检索引擎层的生产装配。
  *
  * <h2>装配三件</h2>
  * <ul>
- *   <li>{@link EngineRegistry}：挂 storeRepo + 引擎工厂（含 SSRF 地址策略），
+ *   <li>{@link EngineRegistry}：挂存储查找端口 + 引擎工厂（含 SSRF 地址策略），
  *       让 DB-store（vector_stores 表绑定）能按需重建；</li>
  *   <li><b>env-store 注册</b>：按 {@code RETRIEVE_DRIVER} 逐段注册进程级引擎——
  *       postgres 由 {@link PgVectorEngineRepository} 承担（既有 JDBC 件的引擎口适配）；
@@ -68,12 +68,12 @@ public class RetrievalEngineWiringConfig {
     }
 
     @Bean
-    public EngineRegistry retrievalEngineRegistry(VectorStoreRepository storeRepo, SsrfGuard guard,
+    public EngineRegistry retrievalEngineRegistry(VectorStoreLookup storeLookup, SsrfGuard guard,
                                                   PgVectorEngineRepository pgAdapter,
                                                   OpenSearchAuditSinkAdapter osAuditSink,
                                                   RetrievalDriverProperties driverProperties) {
         // DB-store 工厂带 OpenSearch 的 audit sink；其它引擎忽略 sink
-        EngineRegistry registry = new EngineRegistry(storeRepo,
+        EngineRegistry registry = new EngineRegistry(storeLookup,
                 store -> EngineFactory.createFromStore(store, guard, osAuditSink));
         // RETRIEVE_DRIVER 按逗号分段——不 trim，精确匹配
         String driver = driverProperties.driver();
@@ -345,8 +345,8 @@ public class RetrievalEngineWiringConfig {
     }
 
     @Bean
-    public TenantStoreOwnership tenantStoreOwnership(VectorStoreRepository storeRepo) {
-        return new VectorStoreRepoOwnership(storeRepo);
+    public TenantStoreOwnership tenantStoreOwnership(VectorStoreLookup storeLookup) {
+        return new VectorStoreRepoOwnership(storeLookup);
     }
 
     private static void register(EngineRegistry registry, RetrieveEngineService service,

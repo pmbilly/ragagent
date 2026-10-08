@@ -1228,3 +1228,16 @@
 - **测试随类型更新**：`Rec46cSupport.StubWebSearch` 的签名、`StubMemoryService` 的两个常量、`RerankRecordingTest.memoryRecall`（用 `MemoryItemView` 替掉实体构造）、`MemoryServiceOrchestrationTest` 补 import。
 - **基线刷新**：`L2 → L3 直连 5 → 3 条`；剩余三条与处置思路登记在方案文档 §2.4（`retrieval→vectorstore` 先判性质；`chatpipeline→knowledge`/`→agent` 需"管线数据模型"级设计）。
 - **闸门**：后端全量 BUILD SUCCESSFUL + `spotlessCheck` + 五守卫（键名 / 包环含 R1~R7 / Go 锚点 / 跨面键）绿。
+
+**✅ B107（2026-10-08，L2→L3 清零②：`retrieval → vectorstore`；3 → 2 条）**
+- **性质判定（先判再动）**：`vectorstore` = `domain`(7 文件：`VectorStore` 实体 + `IndexConfig`/`ConnectionConfig` + 两个 TypeHandler) + `mapper`/`controller`/`service`/`dto` ⇒ **业务域**（向量库驱动其实在 `retrieval/engine/*`，如 milvus/qdrant/opensearch/weaviate/doris/tencent ✓）
+  ⇒ 不能靠"把 vectorstore 重分类成 L2"绕过 ⇒ 走端口化。出向依赖只有 `common`(9) + 自身(19) ⇒ 无环风险。
+- **三类处置**：
+  1. **值对象下沉**：`IndexConfig`、`ConnectionConfig` → `common.vectorstore`（公开字段的 JSON DTO，`@JsonIgnoreProperties`；域内 TypeHandler 与 6 个引擎仓库共用）；
+  2. **实体/mapper 端口化**：新增 `common.vectorstore.VectorStoreView`（id/tenantId/name/engineType + 两个配置对象）+ `VectorStoreLookup.byId(long, String)`；实现 `vectorstore/service/VectorStoreLookupAdapter` **直接委托** `VectorStoreRepository#getByID`（含其租户过滤与解密 TypeHandler），不复制查询；
+  3. **纯谓词下沉**：`EnvStoreIds.isEnvStoreId`（`__env_` 前缀；原先 `EngineFactory` 用**全限定名**调用 `vectorstore.domain.EnvVectorStores`，是全限定遗漏的 1 处）——域内 `EnvVectorStores.isEnvStoreId` 保留同名委托。
+- **消费方改造**：`EngineRegistry`（`repo` → `storeLookup`，`VectorStore` → `VectorStoreView`）、`StoreEngineFactory.build(...)`、`EngineFactory`（`createFromStore`/`validateRuntimeVectorStoreAddresses` 参数类型）、`VectorStoreRepoOwnership`（`repo.getByID(...) != null` → `storeLookup.byId(...) != null`）、装配层 `config/RetrievalEngineWiringConfig` 改注入端口。
+- **测试**：`RetrievalEngineTestSupport.FakeStoreRepo` 从"实现整个 mapper"收窄为"实现 1 方法的端口"（删 4 个 `UnsupportedOperationException` 重写）；`store(id)` 夹具改 `VectorStoreView`；`EngineFactoryTest.store(...)` 夹具改视图并把 **id 保持 null**（维持 env-store 判定为 false 的既有行为）。
+- **纪律事故（第 5 次同类）**：按前缀替换 `com.ragagent.vectorstore.domain.ConnectionConfig` 时吃掉了 `…ConnectionConfigTypeHandler`（后者的前缀 == 前者）⇒ **这次是编译器立刻抓到**（B105 的 package 声明问题是构建盲区，只有 IDE 能抓）⇒ 已回滚 + 全仓复核 `common.vectorstore.*` 无其它被吃掉的长名。
+  · 规则补一条：**当被移动/改包的类型名是其它类型名的"前缀"时（`X` 前缀 `XTypeHandler`），必须按词边界替换或用整行 import 替换**。
+- **闸门**：后端全量 BUILD SUCCESSFUL + `spotlessCheck` + 五守卫绿；基线刷新 `L2 → L3 直连 3 → 2 条`（剩 `chatpipeline→knowledge`、`chatpipeline→agent`）。

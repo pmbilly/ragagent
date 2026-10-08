@@ -23,8 +23,8 @@ import java.util.function.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ragagent.vectorstore.domain.VectorStore;
-import com.ragagent.vectorstore.mapper.VectorStoreRepository;
+import com.ragagent.common.vectorstore.VectorStoreLookup;
+import com.ragagent.common.vectorstore.VectorStoreView;
 
 /**
  * 检索引擎注册表——两张表 + 按需重建。
@@ -78,7 +78,7 @@ public class EngineRegistry implements RetrieveEngineRegistry {
     private final ReadWriteLock mu = new ReentrantReadWriteLock();
 
     /** 两者任一为空即"不能重建"（按需加载退化为普通查表）。 */
-    private final VectorStoreRepository repo;
+    private final VectorStoreLookup storeLookup;
     private final StoreEngineFactory factory;
     private final SingleFlight sf = new SingleFlight();
     private final Duration buildTimeout;
@@ -98,14 +98,14 @@ public class EngineRegistry implements RetrieveEngineRegistry {
      */
     volatile Consumer<Boolean> flightObserver;
 
-    public EngineRegistry(VectorStoreRepository repo, StoreEngineFactory factory) {
-        this(repo, factory, ENGINE_BUILD_TIMEOUT, REBUILD_COOLDOWN);
+    public EngineRegistry(VectorStoreLookup storeLookup, StoreEngineFactory factory) {
+        this(storeLookup, factory, ENGINE_BUILD_TIMEOUT, REBUILD_COOLDOWN);
     }
 
     /** 供测试注入超时/冷却（默认值同生产常量）。 */
-    EngineRegistry(VectorStoreRepository repo, StoreEngineFactory factory, Duration buildTimeout,
+    EngineRegistry(VectorStoreLookup storeLookup, StoreEngineFactory factory, Duration buildTimeout,
                    Duration rebuildCooldown) {
-        this.repo = repo;
+        this.storeLookup = storeLookup;
         this.factory = factory;
         this.buildTimeout = buildTimeout;
         this.rebuildCooldown = rebuildCooldown;
@@ -204,7 +204,7 @@ public class EngineRegistry implements RetrieveEngineRegistry {
 
     @Override
     public boolean canRebuildStores() {
-        return repo != null && factory != null;
+        return storeLookup != null && factory != null;
     }
 
     // ── 按需重建 ────────────────────────────────────────────────────────────
@@ -215,7 +215,7 @@ public class EngineRegistry implements RetrieveEngineRegistry {
         if (cached != null) {
             return cached;
         }
-        if (repo == null || factory == null) {
+        if (storeLookup == null || factory == null) {
             throw RetrieveEngineException.VECTOR_STORE_NOT_FOUND;
         }
         if (inFailureCooldown(storeId)) {
@@ -270,9 +270,9 @@ public class EngineRegistry implements RetrieveEngineRegistry {
             if (published != null) {
                 return published;
             }
-            VectorStore store;
+            VectorStoreView store;
             try {
-                store = repo.getByID(tenantId, storeId);
+                store = storeLookup.byId(tenantId, storeId);
             } catch (RuntimeException e) {
                 // store 很可能存在，只是元数据库答不上来。这里说"not found"会让异步 worker
                 // 因为一次短暂故障丢掉任务。

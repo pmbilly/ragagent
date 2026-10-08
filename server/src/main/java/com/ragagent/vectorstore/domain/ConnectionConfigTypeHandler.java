@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.crypto.CryptoService;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
+import com.ragagent.common.vectorstore.ConnectionConfig;
 
 /**
  * vector_stores.connection_config jsonb 列的 TypeHandler。

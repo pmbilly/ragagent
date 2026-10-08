@@ -171,7 +171,7 @@ class EngineRegistryTest {
             final AtomicInteger calls = new AtomicInteger();
 
             @Override
-            public RetrieveEngineService build(com.ragagent.vectorstore.domain.VectorStore store) {
+            public RetrieveEngineService build(com.ragagent.common.vectorstore.VectorStoreView store) {
                 calls.incrementAndGet();
                 entered.countDown();
                 try {

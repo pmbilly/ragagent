@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
+import com.ragagent.common.vectorstore.IndexConfig;
 
 /**
  * vector_stores.index_config jsonb 列的 TypeHandler（无加密，仅 JSON 往返；未知键容忍）。

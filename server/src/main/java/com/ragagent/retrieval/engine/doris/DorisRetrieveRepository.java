@@ -19,7 +19,7 @@ import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
 import com.ragagent.retrieval.engine.RetrieveEngineRepository;
-import com.ragagent.vectorstore.domain.IndexConfig;
+import com.ragagent.common.vectorstore.IndexConfig;
 
 /**
  * Apache Doris 检索引擎仓储。

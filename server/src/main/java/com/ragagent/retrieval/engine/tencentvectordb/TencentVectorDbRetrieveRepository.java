@@ -25,7 +25,7 @@ import com.ragagent.retrieval.engine.RetrieveEngineRepository;
 import com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbBm25.SparseVecItem;
 import com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbRestClient.Json;
 import com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbRestClient.TencentVectorDbApiException;
-import com.ragagent.vectorstore.domain.IndexConfig;
+import com.ragagent.common.vectorstore.IndexConfig;
 
 /**
  * 腾讯 VectorDB 检索引擎仓储。

@@ -22,7 +22,7 @@ import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
 import com.ragagent.retrieval.engine.RetrieveEngineRepository;
 import com.ragagent.retrieval.engine.weaviate.WeaviateRestClient.Json;
-import com.ragagent.vectorstore.domain.IndexConfig;
+import com.ragagent.common.vectorstore.IndexConfig;
 
 /**
  * Weaviate 检索引擎仓储。

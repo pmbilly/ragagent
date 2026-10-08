@@ -474,14 +474,14 @@ class WeaviateRetrieveRepositoryTest {
     @Test
     @DisplayName("类名解析：prefix > name > 缺省（Go 原文拼写 Weknora_embeddings）")
     void resolveCollectionName() {
-        com.ragagent.vectorstore.domain.IndexConfig withPrefix =
-                new com.ragagent.vectorstore.domain.IndexConfig();
+        com.ragagent.common.vectorstore.IndexConfig withPrefix =
+                new com.ragagent.common.vectorstore.IndexConfig();
         withPrefix.collectionPrefix = "pref";
         withPrefix.collectionName = "name";
         assertThat(WeaviateRetrieveRepository.resolveCollectionName(withPrefix)).isEqualTo("pref");
 
-        com.ragagent.vectorstore.domain.IndexConfig withName =
-                new com.ragagent.vectorstore.domain.IndexConfig();
+        com.ragagent.common.vectorstore.IndexConfig withName =
+                new com.ragagent.common.vectorstore.IndexConfig();
         withName.collectionName = "name";
         assertThat(WeaviateRetrieveRepository.resolveCollectionName(withName)).isEqualTo("name");
         assertThat(WeaviateRetrieveRepository.resolveCollectionName(null))

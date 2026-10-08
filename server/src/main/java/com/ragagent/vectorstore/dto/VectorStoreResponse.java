@@ -2,8 +2,8 @@ package com.ragagent.vectorstore.dto;
 
 import java.time.OffsetDateTime;
 
-import com.ragagent.vectorstore.domain.ConnectionConfig;
-import com.ragagent.vectorstore.domain.IndexConfig;
+import com.ragagent.common.vectorstore.ConnectionConfig;
+import com.ragagent.common.vectorstore.IndexConfig;
 import com.ragagent.vectorstore.domain.VectorStore;
 
 /**

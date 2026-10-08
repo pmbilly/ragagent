@@ -25,7 +25,7 @@ import com.ragagent.retrieval.engine.EngineTypes;
 import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
-import com.ragagent.vectorstore.domain.IndexConfig;
+import com.ragagent.common.vectorstore.IndexConfig;
 
 /**
  * Milvus 驱动对<b>真实服务端</b>的端到端验证（env 门控，默认跳过）：起 compose 口径的

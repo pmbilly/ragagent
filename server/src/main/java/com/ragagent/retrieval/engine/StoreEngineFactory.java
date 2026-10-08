@@ -1,7 +1,7 @@
 package com.ragagent.retrieval.engine;
 
 import com.ragagent.common.security.SsrfGuard;
-import com.ragagent.vectorstore.domain.VectorStore;
+import com.ragagent.common.vectorstore.VectorStoreView;
 
 /**
  * 从 {@code VectorStore} 配置建引擎的函数口。
@@ -19,7 +19,7 @@ public interface StoreEngineFactory {
      * 建一条引擎服务。失败直接抛——注册表会把失败折成
      * {@link RetrieveEngineException#VECTOR_STORE_UNAVAILABLE} 并进入重建冷却。
      */
-    RetrieveEngineService build(VectorStore store);
+    RetrieveEngineService build(VectorStoreView store);
 
     /**
      * 生产装配：把 {@link EngineFactory} 的静态工厂（含 SSRF 地址策略）适配成本口。

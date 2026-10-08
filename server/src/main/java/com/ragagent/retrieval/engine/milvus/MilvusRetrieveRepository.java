@@ -21,7 +21,7 @@ import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
 import com.ragagent.retrieval.engine.RetrieveEngineRepository;
 import com.ragagent.retrieval.engine.milvus.MilvusRestClient.Json;
-import com.ragagent.vectorstore.domain.IndexConfig;
+import com.ragagent.common.vectorstore.IndexConfig;
 
 /**
  * Milvus 检索引擎仓储。

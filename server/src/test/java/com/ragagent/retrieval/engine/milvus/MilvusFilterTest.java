@@ -9,7 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
-import com.ragagent.vectorstore.domain.IndexConfig;
+import com.ragagent.common.vectorstore.IndexConfig;
 
 /**
  * Milvus 纯函数面——过滤器表达式（算子/括号/转义形态，

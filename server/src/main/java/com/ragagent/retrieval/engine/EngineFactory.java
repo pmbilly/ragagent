@@ -11,9 +11,10 @@ import com.ragagent.retrieval.engine.qdrant.QdrantRetrieveRepository;
 import com.ragagent.retrieval.engine.sqlite.SqliteRetrieveRepository;
 import com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbRetrieveRepository;
 import com.ragagent.retrieval.engine.weaviate.WeaviateRetrieveRepository;
-import com.ragagent.vectorstore.domain.ConnectionConfig;
-import com.ragagent.vectorstore.domain.IndexConfig;
-import com.ragagent.vectorstore.domain.VectorStore;
+import com.ragagent.common.vectorstore.ConnectionConfig;
+import com.ragagent.common.vectorstore.IndexConfig;
+import com.ragagent.common.vectorstore.EnvStoreIds;
+import com.ragagent.common.vectorstore.VectorStoreView;
 
 /**
  * 检索引擎工厂——从 {@link VectorStore} 配置按引擎类型构建检索引擎服务，
@@ -72,7 +73,7 @@ public final class EngineFactory {
      * 先做地址策略校验，再按引擎类型建服务。
      * {@code guard} 为空 = 测试口（跳过地址校验）。
      */
-    public static KeywordsVectorHybridRetrieveEngineService createFromStore(VectorStore store,
+    public static KeywordsVectorHybridRetrieveEngineService createFromStore(VectorStoreView store,
                                                                             SsrfGuard guard) {
         return createFromStore(store, guard, null);
     }
@@ -82,7 +83,7 @@ public final class EngineFactory {
      * {@code WithAuditSink}（索引创建/重索引事件）；其它引擎忽略。
      * {@code sink} 为 null = no-op（测试口）。
      */
-    public static KeywordsVectorHybridRetrieveEngineService createFromStore(VectorStore store,
+    public static KeywordsVectorHybridRetrieveEngineService createFromStore(VectorStoreView store,
                                                                             SsrfGuard guard,
                                                                             OpenSearchRetrieveRepository.AuditSink auditSink) {
         validateRuntimeVectorStoreAddresses(store, guard);
@@ -132,8 +133,7 @@ public final class EngineFactory {
                 ConnectionConfig ccOs = store.getConnectionConfig() == null
                         ? new ConnectionConfig() : store.getConnectionConfig();
                 IndexConfig idxOs = store.getIndexConfig();
-                String storeId = com.ragagent.vectorstore.domain.EnvVectorStores
-                        .isEnvStoreId(store.getId()) ? "" : store.getId();
+                String storeId = EnvStoreIds.isEnvStoreId(store.getId()) ? "" : store.getId();
                 OpenSearchRetrieveRepository repo = new OpenSearchRetrieveRepository(
                         ccOs.addr, storeId, idxOs, ccOs.username, ccOs.password,
                         ccOs.insecureSkipVerify, guard);
@@ -222,7 +222,7 @@ public final class EngineFactory {
     }
 
     /** 逐引擎的地址策略 + SSRF 校验。 */
-    static void validateRuntimeVectorStoreAddresses(VectorStore store, SsrfGuard guard) {
+    static void validateRuntimeVectorStoreAddresses(VectorStoreView store, SsrfGuard guard) {
         ConnectionConfig cc = store.getConnectionConfig() == null ? new ConnectionConfig()
                 : store.getConnectionConfig();
         String engineType = store.getEngineType() == null ? "" : store.getEngineType();

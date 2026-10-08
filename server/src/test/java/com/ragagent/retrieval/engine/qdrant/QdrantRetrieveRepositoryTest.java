@@ -501,14 +501,14 @@ class QdrantRetrieveRepositoryTest {
     @Test
     @DisplayName("集合名解析：prefix > name > 缺省（env 由进程环境决定）")
     void resolveCollectionName() {
-        com.ragagent.vectorstore.domain.IndexConfig withPrefix =
-                new com.ragagent.vectorstore.domain.IndexConfig();
+        com.ragagent.common.vectorstore.IndexConfig withPrefix =
+                new com.ragagent.common.vectorstore.IndexConfig();
         withPrefix.collectionPrefix = "pref";
         withPrefix.collectionName = "name";
         assertThat(QdrantRetrieveRepository.resolveCollectionName(withPrefix)).isEqualTo("pref");
 
-        com.ragagent.vectorstore.domain.IndexConfig withName =
-                new com.ragagent.vectorstore.domain.IndexConfig();
+        com.ragagent.common.vectorstore.IndexConfig withName =
+                new com.ragagent.common.vectorstore.IndexConfig();
         withName.collectionName = "name";
         assertThat(QdrantRetrieveRepository.resolveCollectionName(withName)).isEqualTo("name");
         assertThat(QdrantRetrieveRepository.resolveCollectionName(null))

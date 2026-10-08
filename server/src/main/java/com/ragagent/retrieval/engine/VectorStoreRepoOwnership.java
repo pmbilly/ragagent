@@ -1,7 +1,6 @@
 package com.ragagent.retrieval.engine;
 
-import com.ragagent.vectorstore.domain.VectorStore;
-import com.ragagent.vectorstore.mapper.VectorStoreRepository;
+import com.ragagent.common.vectorstore.VectorStoreLookup;
 
 /**
  * {@link TenantStoreOwnership} 的生产实现。
@@ -11,10 +10,10 @@ import com.ragagent.vectorstore.mapper.VectorStoreRepository;
  */
 public class VectorStoreRepoOwnership implements TenantStoreOwnership {
 
-    private final VectorStoreRepository repo;
+    private final VectorStoreLookup storeLookup;
 
-    public VectorStoreRepoOwnership(VectorStoreRepository repo) {
-        this.repo = repo;
+    public VectorStoreRepoOwnership(VectorStoreLookup storeLookup) {
+        this.storeLookup = storeLookup;
     }
 
     /**
@@ -22,7 +21,6 @@ public class VectorStoreRepoOwnership implements TenantStoreOwnership {
      */
     @Override
     public boolean storeOwnedBy(String storeId, long tenantId) {
-        VectorStore store = repo.getByID(tenantId, storeId);
-        return store != null;
+        return storeLookup.byId(tenantId, storeId) != null;
     }
 }

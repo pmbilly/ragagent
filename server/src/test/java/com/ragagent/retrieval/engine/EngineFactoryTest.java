@@ -18,9 +18,9 @@ import org.junit.jupiter.api.Test;
 import com.ragagent.common.security.SsrfGuard;
 import com.ragagent.retrieval.engine.EngineFactory.EngineNotSupportedException;
 import com.ragagent.retrieval.engine.sqlite.SqliteRetrieveRepository;
-import com.ragagent.vectorstore.domain.ConnectionConfig;
-import com.ragagent.vectorstore.domain.IndexConfig;
-import com.ragagent.vectorstore.domain.VectorStore;
+import com.ragagent.common.vectorstore.ConnectionConfig;
+import com.ragagent.common.vectorstore.IndexConfig;
+import com.ragagent.common.vectorstore.VectorStoreView;
 import com.sun.net.httpserver.HttpServer;
 
 /**
@@ -75,11 +75,9 @@ class EngineFactoryTest {
         server.stop(0);
     }
 
-    private VectorStore store(String engineType, ConnectionConfig cc, IndexConfig idx) {
-        VectorStore store = new VectorStore();
-        store.setEngineType(engineType);
-        store.setConnectionConfig(cc);
-        store.setIndexConfig(idx);
+    private VectorStoreView store(String engineType, ConnectionConfig cc, IndexConfig idx) {
+        // B107：引擎工厂改收 L1 视图；id 保持 null（env-store 判定 → false，与迁移前一致）
+        VectorStoreView store = new VectorStoreView(null, 0L, null, engineType, cc, idx);
         return store;
     }
 

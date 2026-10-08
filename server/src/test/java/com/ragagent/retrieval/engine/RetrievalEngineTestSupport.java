@@ -10,8 +10,8 @@ import com.ragagent.embedding.Embedder;
 import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
-import com.ragagent.vectorstore.domain.VectorStore;
-import com.ragagent.vectorstore.mapper.VectorStoreRepository;
+import com.ragagent.common.vectorstore.VectorStoreLookup;
+import com.ragagent.common.vectorstore.VectorStoreView;
 
 /**
  * 检索引擎测试共用的假件：假引擎服务、假租户归属、假 store 仓库。
@@ -177,55 +177,27 @@ final class RetrievalEngineTestSupport {
     }
 
     /** 只服务一个 store 的假仓库；其余方法大声报错。 */
-    static class FakeStoreRepo implements VectorStoreRepository {
+    static class FakeStoreRepo implements VectorStoreLookup {
 
-        VectorStore store;
+        VectorStoreView store;
         RuntimeException error;
 
-        FakeStoreRepo(VectorStore store) {
+        FakeStoreRepo(VectorStoreView store) {
             this.store = store;
         }
 
         @Override
-        public VectorStore getByID(long tenantId, String id) {
+        public VectorStoreView byId(long tenantId, String id) {
             if (error != null) {
                 throw error;
             }
             return store;
         }
-
-        @Override
-        public List<VectorStore> list(long tenantId) {
-            throw new UnsupportedOperationException("list: not used in these tests");
-        }
-
-        @Override
-        public int create(VectorStore s, java.time.OffsetDateTime now) {
-            throw new UnsupportedOperationException("create: not used in these tests");
-        }
-
-        @Override
-        public int updateName(VectorStore s, java.time.OffsetDateTime now) {
-            throw new UnsupportedOperationException("updateName: not used in these tests");
-        }
-
-        @Override
-        public int updateConnectionConfig(VectorStore s) {
-            throw new UnsupportedOperationException("updateConnectionConfig: not used in these tests");
-        }
-
-        @Override
-        public int delete(long tenantId, String id) {
-            throw new UnsupportedOperationException("delete: not used in these tests");
-        }
     }
 
     /** 造一个只有 id 的 store 行（重建路径只需要它非空）。 */
-    static VectorStore store(String id) {
-        VectorStore s = new VectorStore();
-        s.setId(id);
-        s.setEngineType(EngineTypes.ENGINE_ELASTICSEARCH);
-        return s;
+    static VectorStoreView store(String id) {
+        return new VectorStoreView(id, 0L, null, EngineTypes.ENGINE_ELASTICSEARCH, null, null);
     }
 
     static IndexInfo indexInfo(String id, String sourceId, String content) {

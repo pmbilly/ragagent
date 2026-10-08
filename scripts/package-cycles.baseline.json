@@ -10,10 +10,6 @@
     [
       "chatpipeline",
       "knowledge"
-    ],
-    [
-      "retrieval",
-      "vectorstore"
     ]
   ],
   "common_beans": {
