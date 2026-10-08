@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * {@code WikiChunkCitationPrompt} 的 {@code "new_slugs"} 数组里的一项。
  *
- * <p>与 {@link ExtractedItem} 镜像，但多一个 {@code type} 标签——因为该 prompt
+ * <p>与 {@link com.ragagent.common.wiki.ExtractedItem} 镜像，但多一个 {@code type} 标签——因为该 prompt
  * 把 entities 与 concepts 放在同一个数组里输出。</p>
  */
 

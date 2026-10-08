@@ -58,7 +58,7 @@ public enum CompletionBudget {
         };
     }
 
-    /** 把预算写进请求体；budget<=0 时不动。 */
+    /** 把预算写进请求体；{@code budget <= 0} 时不动。 */
     public void apply(ObjectNode body, int budget) {
         if (body == null || budget <= 0) {
             return;

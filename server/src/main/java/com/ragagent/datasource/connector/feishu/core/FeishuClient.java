@@ -35,7 +35,7 @@ import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.WikiSpace;
  *   <li>429 → 尊重 {@code Retry-After}，最多 1+3 次；</li>
  *   <li>5xx → 只重试<b>一次</b>（{@link #MAX_5XX_RETRIES}）；</li>
  *   <li>其它非 2xx（4xx）→ 立刻失败，重试没有意义；</li>
- *   <li>传输层错误 → 按 {@link #RETRY_BACKOFF} 退避。</li>
+ *   <li>传输层错误 → 按 {@code RETRY_BACKOFF} 退避。</li>
  * </ul>
  *
  * <h2>超时与取消</h2>

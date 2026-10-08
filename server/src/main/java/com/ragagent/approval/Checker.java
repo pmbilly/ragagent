@@ -3,7 +3,7 @@ package com.ragagent.approval;
 /**
  * 逐工具的 MCP 策略查询口。
  *
- * <p>实现方通常经 {@link Adapter} 适配进来；
+ * <p>实现方通常经 {@code Adapter} 适配进来；
  * 注册与执行两个路径都会问它“这个工具需要人工批准吗 / 还启用着吗”。</p>
  *
  * <p>查询失败用异常表达（{@link Gate#needsApproval} 会按 fail-close/fail-open 处理，

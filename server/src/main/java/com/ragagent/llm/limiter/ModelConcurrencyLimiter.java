@@ -18,7 +18,7 @@ public interface ModelConcurrencyLimiter {
      * 返回 {@link Release#NOOP}，调用方无需持槽继续执行，绝不抛异常。
      *
      * @param key   限流键（通常是 model ID）；空串 fail open
-     * @param limit 并发上限；<=0 fail open
+     * @param limit 并发上限；{@code <= 0} fail open
      * @return 释放句柄，永不 null
      */
     Release acquire(String key, int limit);

@@ -5,7 +5,7 @@ import java.util.Map;
 /**
  * 聊天实例配置。
  *
- * 构造入口统一走 {@link #fromModel}：
+ * 构造入口统一走 {@link com.ragagent.model.service.ModelRuntimeConfigs}：
  * 生产路径（service 层按 DB 模型配置拉起实例）与测试路径（handler 层按前端表单
  * 临时拉起实例）必须走完全相同的字段映射，避免重复样板。
  */

@@ -16,7 +16,7 @@ import com.ragagent.common.web.ProviderJson;
  *
  * <p>线格式与官方 customsearch SDK 一致：GET {@code https://www.googleapis.com/customsearch/v1}
  * {@code ?cx=&q=&num=&hl=ch-zh&key=}。<b>hl 的 "ch-zh" 是既有笔误（应为
- * zh-CN），保持不修</b>。num 缺省 5（maxResults<=0 时）。</p>
+ * zh-CN），保持不修</b>。num 缺省 5（{@code maxResults <= 0} 时）。</p>
  */
 public final class GoogleProvider implements WebSearchProvider {
 

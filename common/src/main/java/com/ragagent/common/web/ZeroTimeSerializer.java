@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 /**
  * 落 jsonb / 作响应体的时间戳字段的序列化器。
  *
- * <p>常规规则与 {@link com.ragagent.config.JacksonConfig} 完全一致（转 JVM 默认时区后按
+ * <p>常规规则与 {@code JacksonConfig}（装配层的 ObjectMapper 配置） 完全一致（转 JVM 默认时区后按
  * {@code ISO_OFFSET_DATE_TIME} 输出，纳秒尾部零裁剪与 RFC3339Nano 字节相同）。
  * 本类只多加一条：<b>零值时间输出 {@code "0001-01-01T00:00:00Z"}，
  * 而不是 {@code null}</b>。</p>

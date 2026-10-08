@@ -72,7 +72,7 @@ import com.ragagent.websearch.service.WebSearchService;
  * {@code PagedChunks} / {@code ImageInfoCollector} / {@code ImageEnricher}），
  * 本类把这些 seam 桥到真实服务——每个方法对应一个工具的构造点。</p>
  *
- * <p>装配入口：{@link SessionAgentQaService#registerTools}（allowedTools 命中即构造）。</p>
+ * <p>装配入口：{@code registerTools}（allowedTools 命中即构造）。</p>
  */
 @Component
 public class AgentToolBackends {

@@ -301,7 +301,8 @@ public final class StoragePaths {
 
     /**
      * 整 token 相等才算命中；text 以
-     * {@code [ {"} 开头时先按 JSON 解码再递归（防嵌套 JSON 字符串的转义掩护）。
+     * 以 JSON 的方括号（数组）或花括号（对象）起头时先按 JSON 解码再递归
+     * （防嵌套 JSON 字符串的转义掩护）。
      */
     public static boolean containsStorageReference(String text, String reference) {
         if (reference == null || reference.isEmpty()) {

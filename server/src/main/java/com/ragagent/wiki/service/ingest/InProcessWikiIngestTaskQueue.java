@@ -28,7 +28,7 @@ import com.ragagent.wiki.mapper.TaskDeadLetterRepository;
  *   <li><b>重试</b>：失败后按 {@link WikiIngestTaskRunner#retryDelaySeconds} 重排，直到
  *       {@code maxRetry} 次用尽；耗尽后写入死信档案。</li>
  *   <li><b>超时</b>：到点<b>中断执行线程</b>；中止与脱钩清理对应
- *       {@link WikiIngestService#cleanupContext}。</li>
+ *       {@link com.ragagent.wiki.service.ingest.WikiCleanupScope}。</li>
  * </ul>
  *
  * <p><b>⚠️ 多实例差异（必须知道）</b>：任务表、TaskID 合并、重试全部只在<b>单个 JVM</b>

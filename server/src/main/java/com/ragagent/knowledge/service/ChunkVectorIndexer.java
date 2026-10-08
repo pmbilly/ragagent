@@ -44,7 +44,7 @@ import com.ragagent.knowledge.support.KnowledgeIndexContent;
  *       （chunk）：单 chunk 版（chunk 编辑链路；disabled 块删旧不重建）。</li>
  * </ul>
  * <p><b>source_id 契约</b>：chunk 行 = chunkID（无前缀）；生成问题行 =
- * {@link #generatedQuestionSourceId}（chunkID-qID；超 64 字节折叠
+ * {@code generatedQuestionSourceId}（chunkID-qID；超 64 字节折叠
  * {@code chunkID-q<sha256 前 12 字节 hex>}）。索引文本 =
  * {@code title + "\n" + EmbeddingContent}（KnowledgeIndexContent.build）。</p>
  */

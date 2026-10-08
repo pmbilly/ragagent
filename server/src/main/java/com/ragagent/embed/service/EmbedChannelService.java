@@ -325,8 +325,8 @@ public class EmbedChannelService {
     /**
      * 更新渠道。update 字段用 Boolean/String 包装表达可缺省。
      *
-     * @param allowedOriginsColumn 请求体里 allowed_origins 的 raw JSON 文本（**缺键 = "null"**，
-     *                             整列覆写为 "null" 文本即清空 allowlist；null 表示不改动）
+     * @param cmd 更新命令；其中 {@code allowedOriginsColumn} 是请求体里 allowed_origins 的
+     *            raw JSON 文本（**缺键 = "null"**，整列覆写为 "null" 文本即清空 allowlist；null 表示不改动）
      */
     public EmbedChannelEntity update(long tenantId, String id, UpdateCommand cmd) {
         EmbedChannelEntity ch = getOwned(tenantId, id);

@@ -44,7 +44,7 @@ public final class QuestionBatchPlanner {
     public record Batch(int index, List<String> chunkIds, String prevChunkId, String nextChunkId) {
     }
 
-    /** = 0; start < total; start += batchSize} 与边界 id 取法。 */
+    /** {@code for (int start = 0; start < total; start += batchSize)} 与边界 id 取法。 */
     public static List<Batch> planBatches(List<Chunk> selected) {
         return planBatches(selected, BATCH_SIZE);
     }

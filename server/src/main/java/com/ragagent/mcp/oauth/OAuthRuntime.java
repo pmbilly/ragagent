@@ -22,7 +22,7 @@ import com.ragagent.mcp.protocol.McpOAuthRuntime;
  * <h3>保鲜判定（{@code ensureFresh}）</h3>
  * <ol>
  *   <li>先查库：没有行 / access token 为空 → 要重新授权；</li>
- *   <li>{@code force=false} 且 token 距过期还超过 {@value #REFRESH_SKEW_SECONDS}s → 直接用；</li>
+ *   <li>{@code force=false} 且 token 距过期还超过 {@link #REFRESH_SKEW}（30s） → 直接用；</li>
  *   <li><b>没有 refresh token 的行不能被 skew 提前判死</b>：它的寿命就是真实过期时刻，
  *       {@code expiresAt > now} 就仍可用（刷新 skew 不得缩短其寿命）；</li>
  *   <li>确实要刷新却没有 refresh token → <b>删掉这行</b>再报要重新授权

@@ -22,7 +22,7 @@ import com.ragagent.retrieval.engine.weaviate.WeaviateRestClient.Json;
  * </pre>
  * 要点：参数按 where → （bm25/nearVector）→ limit → offset → after 的固定序、逗号+空格分隔；
  * where 内部的段用<b>单空格</b>连接、operands 用<b>逗号无空格</b>、`operands:`/`nearVector:`/
- * `bm25:`/`where:` 后<b>无空格</b>；字符串一律双引号 + 转义（见 {@link #quote}）；数组在
+ * `bm25:`/`where:` 后<b>无空格</b>；字符串一律双引号 + 转义（见 {@code quote}）；数组在
  * {@code len>1 || operator∈{ContainsAny,ContainsAll,ContainsNone}} 时加方括号。
  */
 public final class WeaviateGql {

@@ -11,9 +11,9 @@ import com.ragagent.common.error.BizException;
  * 请求上下文里的 API Key 授权投影。
  *
  * <p>它是认证阶段（{@code APIKeyAuthChannel}）从
- * {@link TenantAPIKey} 快照出来的**不可变**视图，之后由
+ * {@code TenantAPIKey}（auth 域）快照出来的**不可变**视图，之后由
  * {@link APIKeyScopeContext} 挂在请求线程上，供
- * {@link com.ragagent.auth.apikey.filter.APIKeyRouteAuthorizer} 与下游 KB 白名单判定读取。</p>
+ * {@code APIKeyRouteAuthorizer} 等下游消费方与 KB 白名单判定读取。</p>
  *
  * <p>所有判定方法都先 {@link #normalize()}——"输入永远先规范化一遍"，
  * 所以在构造后直接调用也是安全的。</p>

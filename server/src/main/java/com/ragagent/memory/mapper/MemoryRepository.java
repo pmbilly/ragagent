@@ -58,7 +58,7 @@ import org.springframework.stereotype.Component;
  *       会用默认值**替换并回写实体**——
  *       对 {@code memory_items} 就是 {@code importance=0→3}、{@code origin=""→"extracted"}、
  *       {@code status=""→"active"}，对 {@code memory_subjects} 是
- *       {@code enabled=false→true}。{@link #applyInsertDefaults} 显式实现这条。
+ *       {@code enabled=false→true}。{@code applyInsertDefaults} 显式实现这条。
  *       (b) {@code created_at} **零值才补 now**，而
  *       {@code updated_at} **无论传什么都被覆盖成 now**。
  *       {@code stampForCreate} 显式实现这条。</li>

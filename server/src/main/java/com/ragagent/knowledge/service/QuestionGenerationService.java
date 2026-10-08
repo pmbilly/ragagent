@@ -27,8 +27,8 @@ import com.ragagent.common.wiki.WikiFinalizePort;
  * metadata 并重建向量索引——这是"导入文档后，新建提问能看到推荐问题"的**数据来源**。
  * 本仓此前只有手动路径（{@code POST /chunks/by-id/{id}/questions/regenerate}），
  * 自动路径在 {@code KnowledgeService} 里备案为"未翻" ⇒ 刚导入的 KB 推荐问题恒为空。</p>
- * {@link ChunkQuestionService#generateAndStoreQuestionsForWorker}）→ 终态递减 finalizing 槽
- * （{@code finalizeSubtaskDetached} 的等价物 {@link DefaultWikiKnowledgeFinalizer#finalizeSubtask}）。</p>
+ * {@code generateAndStoreQuestionsForWorker}）→ 终态递减 finalizing 槽
+ * （{@code finalizeSubtaskDetached} 的等价物 {@link com.ragagent.wiki.service.DefaultWikiKnowledgeFinalizer#finalizeSubtask}）。</p>
  */
 @Service
 public class QuestionGenerationService {

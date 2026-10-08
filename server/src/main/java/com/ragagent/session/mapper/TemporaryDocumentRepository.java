@@ -95,7 +95,7 @@ public class TemporaryDocumentRepository {
                 .set(TemporaryDocument::getErrorMessage, message));
     }
 
-    /** expires_at <= before，按时间升序。 */
+    /** {@code expires_at <= before}，按时间升序。 */
     public List<TemporaryDocument> listExpired(OffsetDateTime before, int limit) {
         return mapper.selectList(PageRequests.cap(limit), new LambdaQueryWrapper<TemporaryDocument>()
                 .le(TemporaryDocument::getExpiresAt, before)

@@ -708,7 +708,7 @@ public class UserService implements UserNameLookup {
                 "auth.complex_password_enabled", "WEKNORA_AUTH_COMPLEX_PASSWORD_ENABLED", false);
     }
 
-    /** 日志消毒：\n \r \t → 空格，其余控制字符（<32）剔除。 */
+    /** 日志消毒：\n \r \t → 空格，其余控制字符（{@code <32}）剔除。 */
     public static String sanitizeForLog(String input) {
         if (input == null || input.isEmpty()) {
             return "";

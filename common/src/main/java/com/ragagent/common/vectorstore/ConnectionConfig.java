@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 /**
  * 向量库连接配置。
  * 空字段整键省略（@JsonInclude(NON_DEFAULT)/NON_NULL）；未知键容忍（jsonb 演进）。
- * password / api_key 落库加密由 {@link ConnectionConfigTypeHandler} 处理。
+ * password / api_key 落库加密由 {@code ConnectionConfigTypeHandler}（vectorstore 域） 处理。
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 /**

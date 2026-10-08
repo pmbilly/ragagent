@@ -254,7 +254,7 @@ public class DataSourceService implements DataSourceSyncHandler {
      *
      * <p>⚠️ {@code configActuallyChanged} 判"整块配置是否
      * 逐字段相同"：用<b>规范化 JSON 树相等</b>表达（字段集为
-     * type / credentials / resource_ids / settings），见 {@link #configDeepEquals}。</p>
+     * type / credentials / resource_ids / settings），见 {@code configDeepEquals}。</p>
      */
     public DataSource updateDataSource(DataSource ds) {
         if (ds == null || ds.getId() == null || ds.getId().isEmpty()) {

@@ -35,9 +35,12 @@ public final class ThinkingStrategies {
     /**
      * Qwen 的顶层 `enable_thinking` 布尔。
      *
-     * @param alwaysSend         即使 opts.thinking 为 null 也固定该字段
-     *                           （阿里云 Qwen thinking 模型要求每次请求都带，默认 false）
-     * @param disableOnNonStream 非流式请求强制 enable_thinking=false（Qwen3 非流式拒绝 thinking）
+     * <ul>
+     *   <li>{@code alwaysSend} — 即使 {@code opts.thinking} 为 null 也固定该字段
+     *       （阿里云 Qwen thinking 模型要求每次请求都带，默认 false）；</li>
+     *   <li>{@code disableOnNonStream} — 非流式请求强制 {@code enable_thinking=false}
+     *       （Qwen3 非流式拒绝 thinking）。</li>
+     * </ul>
      */
     public static final class EnableThinking implements ThinkingStrategy {
         private final boolean alwaysSend;

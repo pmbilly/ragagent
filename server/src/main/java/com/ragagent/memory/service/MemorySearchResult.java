@@ -7,7 +7,7 @@ import com.ragagent.memory.domain.MemoryItem;
 /**
  * 一次按需查找记忆库的返回。
  *
- * <p><b>为什么与 {@link MemoryRecall} 是两个类型</b>：两者的消费者不同。
+ * <p><b>为什么与 {@link com.ragagent.common.memory.MemoryRecall} 是两个类型</b>：两者的消费者不同。
  * 召回为某一轮产出提示词信封；查找为工具产出条目，而那个工具必须告诉模型
  * <b>为什么</b>它一无所获。"这个用户把记忆关掉了"与"没存过匹配的东西"
  * 需要不同的回答，把两者都塌成一个空列表，会让 agent 对一个只是禁用了记忆的人

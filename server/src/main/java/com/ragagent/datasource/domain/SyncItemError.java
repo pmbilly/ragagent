@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
  * 一条面向用户的失败样本。
  *
  * <p>老同步日志里每个 error 是一个裸 JSON 字符串，所以反序列化时裸字符串解成
- * {@code Message}（由 {@link SyncItemErrorDeserializer} 同款分支处理，让老日志仍可读）。</p>
+ * {@code Message}（由 {@code SyncItemErrorDeserializer} 同款分支处理，让老日志仍可读）。</p>
  *
  * <h2>JSON 形状（{@code DataSourceJsonTest} 逐字节钉住）</h2>
  * <pre>

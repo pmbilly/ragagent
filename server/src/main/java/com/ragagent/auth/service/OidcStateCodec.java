@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
  * now-iat ≤ 10min 且 iat-now ≤ 1min。所有失败抛 {@link StateException}，
  * 由 controller 层坍缩成 invalid_state 302（错误消息不外泄）。
  *
- * sign 的 JSON 序列化带 HTML 转义（& < > 与控制字符都转 hex 形式），
+ * sign 的 JSON 序列化带 HTML 转义（{@code & < >} 与控制字符都转 hex 形式），
  * 与既有签发方字节一致。
  */
 @Component

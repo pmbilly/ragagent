@@ -13,7 +13,7 @@ import com.ragagent.common.security.TenantAPIKeyScope;
  * 逐路由 API-Key 策略注册表 + 授权判定。
  *
  * <p>注册发生在**应用启动期（单线程）**，请求期只读——天然无锁。
- * Java 侧再叠加一层不可变快照（{@link #freeze()}）供运行期只读查询。</p>
+ * Java 侧再叠加一层不可变快照（{@code freeze()}）供运行期只读查询。</p>
  *
  * <h2>路由键的形态：gin 模板 → Spring 模板</h2>
  * <p>gin 形态的路由键，例如

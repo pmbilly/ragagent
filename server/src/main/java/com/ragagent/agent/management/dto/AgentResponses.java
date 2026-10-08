@@ -46,7 +46,7 @@ public final class AgentResponses {
         return m;
     }
 
-    /** 列表信封（键按字母序：data < disabled_own_agent_ids < success）。 */
+    /** 列表信封（键按字母序：{@code data < disabled_own_agent_ids < success}）。 */
     public static Map<String, Object> listEnvelope(List<?> agents,
             List<String> disabledOwnIds) {
         Map<String, Object> m = new LinkedHashMap<>();

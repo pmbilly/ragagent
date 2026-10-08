@@ -24,9 +24,9 @@ import com.ragagent.common.web.ContentTypeByFilename;
  * 文件代理面共享处理器：
  *
  * <ul>
- *   <li>{@code newFileServeHandler} → {@link #serveTenantFiles}（GET /files，
- *       租户级存储代理，API-Key 守卫在路由自带——{@link #allowFileServeApiKey}）；</li>
- *   <li>{@code presignedFileHandler} → {@link #servePresigned}
+ *   <li>{@code newFileServeHandler} → {@code serveTenantFiles}（GET /files，
+ *       租户级存储代理，API-Key 守卫在路由自带——{@code allowFileServeApiKey}）；</li>
+ *   <li>{@code presignedFileHandler} → {@code servePresigned}
  *       （GET+HEAD /api/v1/files/presigned，HMAC 免鉴权，AuthFilter noAuthAPI 放行）；</li>
  *   <li>{@code servePresignedPreview} 的 handler 体 → {@link #presignedPreview}
  *       （Admin 诊断；API-Key 主体在控制器里先行拒绝）；</li>

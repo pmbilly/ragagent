@@ -35,7 +35,7 @@ public class KnowledgeBaseVlmConfig {
     public String getInterfaceType() { return interfaceType; }
     public void setInterfaceType(String v) { interfaceType = v == null ? "" : v; }
 
-    /** 新版本 Enabled&&ModelID!=""，老版本 ModelName&&BaseURL。
+    /** 新版本 {@code Enabled && ModelID != ""}，老版本 {@code ModelName && BaseURL}。
      *  否则写入 jsonb 后回读触发 UnrecognizedPropertyException） */
     @JsonIgnore
     public boolean isMultimodalEnabled() {

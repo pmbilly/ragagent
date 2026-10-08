@@ -9,7 +9,7 @@ import com.ragagent.common.web.JsonMappers;
 /**
  * 问题生成**批**任务的载荷。
  * <p>只带 chunk id（普通键 + 边界邻块 id），<b>不带 chunk 内容</b>——worker 运行时读新内容，
- * 与 {@link ExtractChunkPayload} 同法；批大小固定 {@link QuestionBatchPlanner#BATCH_SIZE}=20
+ * 与 {@link ExtractChunkPayload} 同法；批大小固定 {@link com.ragagent.knowledge.support.QuestionBatchPlanner#BATCH_SIZE}=20
  * <p><b>追踪载体</b>：与 {@link ExtractChunkPayload} 同形（嵌套键 {@code tracing}），
  * worker 侧续接同一棵树。</p>
  */

@@ -35,7 +35,7 @@ import org.springframework.beans.factory.ObjectProvider;
 /**
  * <h2>路由链与 Java 落地</h2>
  * GET = g.Viewer() + KBAccessRead；POST/PUT/DELETE = g.OwnedKBOrAdmin +
- * KBAccessWrite（**无角色门**）。路由级守卫在 {@link ChunkAccessGuard}
+ * KBAccessWrite（**无角色门**）。路由级守卫在 {@link com.ragagent.knowledge.security.ChunkAccessGuard}
  * （{@code requireKbAccess} / {@code requireOwnedKbInCallerSpace}，控制器调用）；
  * 本类只承担 service 层语义。
  * <ul>

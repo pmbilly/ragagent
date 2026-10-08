@@ -18,8 +18,8 @@ import org.springframework.stereotype.Component;
  * </ol>
  *
  * <p>没有实现 bean 时 {@code WikiIngestService} 恒走
- * {@link WikiImageEnricher#identity}，图片 /
- * 扫描件密集文档的 wiki 抽取会为空。底层能力（{@link ImageInfoEnricher}）
+ * {@code identity()}，图片 /
+ * 扫描件密集文档的 wiki 抽取会为空。底层能力（{@link com.ragagent.retrieval.support.ImageInfoEnricher}）
  * 已被 chatpipeline 与 KnowledgeService 使用，本类只补齐桥接，调用方零改动。</p>
  */
 @Component

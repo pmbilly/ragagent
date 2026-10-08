@@ -37,7 +37,7 @@ public class ConcurrencyGovernor {
 
     /**
      * 装配进程级后台并发闸门与默认 per-model 上限。
-     * limiter 为 null 或 limit <= 0 即关闭治理（所有调用放行）。
+     * limiter 为 null 或 {@code limit <= 0} 即关闭治理（所有调用放行）。
      */
     public void setGovernor(ModelConcurrencyLimiter limiter, int limit) {
         state = new State(limiter, limit);
@@ -58,7 +58,7 @@ public class ConcurrencyGovernor {
         return gateN(modelId, 0);
     }
 
-    /** modelLimit <= 0 时回退到进程级默认上限 */
+    /** {@code modelLimit <= 0} 时回退到进程级默认上限 */
     public Release gateN(String modelId, int modelLimit) {
         return gateNamedN(modelId, "", modelLimit);
     }

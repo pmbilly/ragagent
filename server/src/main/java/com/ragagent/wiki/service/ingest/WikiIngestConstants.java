@@ -220,7 +220,7 @@ public final class WikiIngestConstants {
      * 任务被取消或
      * 超时之后，脱钩的收尾清理的时间上限。
      *
-     * <p>见 {@link WikiIngestService#cleanupContext}——等价物是
+     * <p>见 {@link com.ragagent.wiki.service.ingest.WikiCleanupScope}（{@link com.ragagent.wiki.service.ingest.WikiIngestService#cleanupScope}）——等价物是
      * "不受调用方中断影响的独立执行路径"。</p>
      */
     public static final Duration INGEST_CLEANUP_TIMEOUT = Duration.ofSeconds(10);

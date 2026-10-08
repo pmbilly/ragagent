@@ -11,7 +11,7 @@ import com.ragagent.mcp.domain.McpAuthType;
  * MCP 鉴权配置的响应形态。
  *
  * <p><b>本结构里刻意没有 api_key / token 字段</b>——不是运行时脱敏，而是"编译期就写不出来"。
- * 密钥是否存在由 {@link McpServiceResponse#credentials()} 的布尔值表达。
+ * 密钥是否存在由 {@link com.ragagent.mcp.dto.McpServiceResponse#getCredentials()} 的布尔值表达。
  * AuthType / Scopes / AuthServerMetadataURL 是非秘密的 OAuth 配置，可以安全回显。</p>
  */
 public record McpAuthConfigResponse( String authType, String apiKeyHeader, Map<String, String> customHeaders, List<String> scopes, String authServerMetadataUrl) {

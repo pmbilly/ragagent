@@ -26,7 +26,7 @@ import com.ragagent.common.security.TenantAPIKeyScope;
  *
  * 判定顺序：
  *  1. 角色达标（TenantRole level 比较）→ 放行
- *  2. 跨空间超管（EnableCrossTenantAccess && CanAccessAllTenants）→ 放行
+ *  2. 跨空间超管（{@code EnableCrossTenantAccess && CanAccessAllTenants}）→ 放行
  *  3. EnableRBAC=false（滚动窗口）→ 记日志放行
  *  4. 否则 403 {"error":"Forbidden: insufficient workspace role"}
  *

@@ -61,7 +61,7 @@ import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
  *       换 chunk/knowledge id → **SourceID 三态变换**（=chunkID 的普通块用目标 chunkID；
  *       {@code <chunkID>-<questionID>} 的生成问题保留 questionID 段；其余生成新 UUID）→
  *       收集目标 chunk → 源向量的映射 → 交 {@code BatchSave}（additionalParams.embedding）；
- *       取回页数 < 批大小即结束</li>
+ *       取回页数小于批大小即结束</li>
  * </ul>
  *
  * <h2>实现说明</h2>

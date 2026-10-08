@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * - MarkPromptCacheUnsupported：先按未上报归零，再置 "unsupported"
  * - Accumulate：各计数独立累加（缓存计数是 prompt 的子集，绝不折进 prompt），
  *   reported 取 OR，status 由合并后的计数重算 → 任一次命中即整体为 hit
- * - PromptCacheHitRate：CacheReadTokens/PromptTokens*100，prompt<=0 时 0
+ * - PromptCacheHitRate：CacheReadTokens/PromptTokens*100，{@code prompt <= 0} 时 0
  *
  * 持久化：jsonb 列，经 PgJsonTypeHandler。
  */

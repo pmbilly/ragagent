@@ -31,7 +31,7 @@ import com.ragagent.websearch.provider.WebSearchProviderRegistry;
  *   <li>过滤分支：filters 的 country/freshness 非空时先校验再要求 provider 支持
  *       （不支持 = {@code provider %s does not support country/freshness filters;
  *       omit them or select Brave}）。</li>
- *   <li>{@link #compressWithRag}：kbSvc/knowSvc 依赖用端口接口注入
+ *   <li>{@code compressWithRag}：kbSvc/knowSvc 依赖用端口接口注入
  *       （hybrid 检索与段落摄入由检索引擎接线）。</li>
  * </ul>
  */

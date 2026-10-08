@@ -12,12 +12,12 @@ import com.ragagent.common.web.SortedMapSerializer;
 /**
  * 检索结果条目。
  *
- * <p>本类是共享契约：{@link com.ragagent.llm.domain.StreamResponse#getKnowledgeReferences()} 与
+ * <p>本类是共享契约：{@code StreamResponse#getKnowledgeReferences()} 与
  * {@code Message.knowledge_references} 的载荷都是它，
  * SSE 的 {@code references} 事件要按它的字段序逐字节输出。</p>
  *
  * <h2>字段序</h2>
- * <p>响应按 {@link JsonPropertyOrder} 声明序输出，必须与下方字段声明一致。</p>
+ * <p>响应按 {@code @JsonPropertyOrder} 声明序输出，必须与下方字段声明一致。</p>
  *
  * <h2>零值语义（逐字段）</h2>
  * <ul>

@@ -6,9 +6,11 @@ package com.ragagent.wiki.domain;
  * <p>刻意写成带 getter 的 POJO 而不是 record：MyBatis 的 {@code #{n.exactLike}}
  * 走 Reflection/MetaObject 取属性，POJO getter 是各版本都稳的形态。</p>
  *
- * @param needle     PG jsonb 包含分支的操作数，形如 {@code ["doc-1"]}
- * @param exactLike  非 PG 方言下"数组里恰好含该 id"的 LIKE 模式，形如 {@code %"doc-1"%}
- * @param prefixLike 历史 {@code "id|title"} 形态的 LIKE 模式，形如 {@code %"doc-1|%}（两种方言共用）
+ * <ul>
+ *   <li>{@code needle} — PG jsonb 包含分支的操作数，形如 {@code ["doc-1"]}；</li>
+ *   <li>{@code exactLike} — 非 PG 方言下"数组里恰好含该 id"的 LIKE 模式，形如 {@code %"doc-1"%}；</li>
+ *   <li>{@code prefixLike} — 历史 {@code "id|title"} 形态的 LIKE 模式，形如 {@code %"doc-1|%}（两种方言共用）。</li>
+ * </ul>
  */
 public class SourceRefNeedle {
 

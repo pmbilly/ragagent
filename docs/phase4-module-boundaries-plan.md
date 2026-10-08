@@ -464,3 +464,48 @@ B116 搬家时已经搬过一批资源（`common/text/*.txt`），这类风险�
 | 往 `common` 主源码加 `getResourceAsStream("probe/missing.yaml")` | R12b 失败：`../common/src/main/java/…/TenantContext.java → "probe/missing.yaml"` ✓（顺带证明跨模块扫描生效）|
 
 **闸门**：`./gradlew spotlessCheck build` = BUILD SUCCESSFUL + 五守卫绿。
+
+
+## 8. B119：javadoc 引用漂移守卫（把 `-Xdoclint:reference` 接进 check）
+
+对应本会话反复人工修的同一问题：改名/搬家/神类切片之后，注释里的 `{@link}`/`{@value}`
+还指着**已不存在或已搬走**的类型与成员（本会话人工修过 ≥5 次）。
+
+### 8.1 设计：用 javadoc 自己的解析器，零维护
+
+| 决策 | 理由 |
+|---|---|
+| **接 `-Xdoclint:reference`** | 只启用 doclint 的「引用」检查组（`{@link}`/`{@see}`/`@param`/`@value` 的**目标是否存在**）；HTML 风格与 `@param` 完整性刻意不纳入（本仓实测 100+ 条噪声、价值低）|
+| **接进 `check`** | `tasks.named("check") { dependsOn(tasks.named("javadoc")) }`（root `subprojects` + `plugins.withId("java")`，因为 root 的 `subprojects{}` 在子项目应用插件**之前**求值，直接 `tasks.named("check")` 会报 "Task with name 'check' not found"——实测）⇒ `./gradlew build`（CI backend job 跑的就是它）连带执行 javadoc |
+| 不写自定义脚本 | 手写"简单名→类型"匹配远弱于 javadoc 的解析器（会漏 `#成员`、`@value`、跨包解析）；现在零维护 |
+
+### 8.2 修了什么（首轮清算：44 error + 19 warning 行）
+
+| 类别 | 处理 |
+|---|---|
+| **`#成员` 已搬走（神类切片遗留）** | 降级 `{@code}`（`canViewIntegrationSecrets`/`freeze`/`applyInsertDefaults`/`compressWithRag`/`getSlugParam`/`configDeepEquals`/`serveTenantFiles` 等 11 处）|
+| **跨包类型未用全限定名** | 补 FQN（`MemoryRecall`/`ExtractedItem`/`ChunkRepository`/`ChunkAccessGuard`/`FaqChunkCodec#…` 等 12 处）|
+| **指向 private/包级成员**（javadoc 只能链接可访问成员） | 降级 `{@code}`（`RETRY_BACKOFF`、`identity()`、`generateAndStoreQuestionsForWorker`）|
+| **目标类型已不存在** | 降级 `{@code}`（`SyncItemErrorDeserializer`、`SessionAgentQaService#registerTools`、`WikiIngestService#cleanupContext`→改指 `WikiCleanupScope`）|
+| **`@param` 写在类型上**（签名里没有这些参数） | 改写为字段列表（`SourceRefNeedle` 3 条、`ThinkingStrategies` 2 条、`EmbedChannelService` 1 条）|
+| **`{@value}` 引用非编译期常量** | `OAuthRuntime`：`REFRESH_SKEW` 是 `Duration` ⇒ 改 `{@link #REFRESH_SKEW}` |
+| **未转义的 `<`/`&`**（19 行） | 包 `{@code}` 或改散文（`<pre>` 块内用 `&lt;`） |
+
+### 8.3 守卫顺手抓出的 4 处**真缺陷**（人眼没看到的）
+
+1. **注释已被改坏**：`QuestionBatchPlanner:47` 的 `/** = 0; start < total; start += batchSize} …`
+   ——原本应是 `{@code for (int start = 0; …)}`，某次编辑把 `{@code for (int start` 吞掉了
+2. **javadoc 挂错对象**：`SearchChunkMerge` 的（含 `@return` 的）方法注释被误挂到 `record ExactResult` 上（B110 搬迁错位）
+3. **包路径写错**：`GuardForbiddenException` 指向 `com.ragagent.web.RbacInterceptor`（应为 `com.ragagent.common.web.*`）
+4. **`:common` 有 6 处注释反向引用上层类型**（`TenantAPIKey`、`APIKeyRouteAuthorizer`、`config.JacksonConfig`、`llm.domain.StreamResponse`、`ConnectionConfigTypeHandler`）
+   ——它们是 **javadoc**、不产生编译依赖（守卫只看 import），但方向上是味道；`:common` 编译期看不到这些类型 ⇒
+   现在 doclint 直接报错 ⇒ 全部**去链接降级 `{@code}`**（顺带把方向理正）。
+   **这等于给"底座注释不得指向上层"补了一条免费的编译期约束。**
+
+### 8.4 红态探针
+
+| 探针 | 结果 |
+|---|---|
+| 往 `AgentConsts` 注入 `{@link com.ragagent.does.NotExist}` | `:server:javadoc` FAILED（`AgentConsts.java:10: error: reference not found`）✓；因 `check` 连带 javadoc，**`:server:check` 退出码 1** ⇒ `build`/CI 会红 ✓ |
+
+**闸门**：`./gradlew spotlessCheck build` = BUILD SUCCESSFUL（含两模块 javadoc，**0 error / 0 warning**）+ 五守卫绿。

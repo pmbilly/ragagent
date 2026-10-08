@@ -60,7 +60,7 @@ import org.springframework.web.bind.annotation.RestController;
  * {@code AgentShareService} / {@code SharedAgentKBScope}）。</p>
  *
  * <p><b>⚠️ 通配 slug</b>：catch-all 路径参数捕获值<b>带前导 "/"</b>，
- * 取用前要先剥掉再去首尾空白清洗，见 {@link #getSlugParam}。</p>
+ * 取用前要先剥掉再去首尾空白清洗，见 {@code getSlugParam}。</p>
  *
  * <p><b>已知差异</b>：</p>
  * <ul>

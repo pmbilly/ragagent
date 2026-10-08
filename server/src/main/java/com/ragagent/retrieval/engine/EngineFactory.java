@@ -17,7 +17,7 @@ import com.ragagent.common.vectorstore.EnvStoreIds;
 import com.ragagent.common.vectorstore.VectorStoreView;
 
 /**
- * 检索引擎工厂——从 {@link VectorStore} 配置按引擎类型构建检索引擎服务，
+ * 检索引擎工厂——从 {@link com.ragagent.common.vectorstore.VectorStoreView} 配置按引擎类型构建检索引擎服务，
  * 并承担运行时地址的 SSRF 校验。
  *
  * <h2>各引擎落地形态</h2>
