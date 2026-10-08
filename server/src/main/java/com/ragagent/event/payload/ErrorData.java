@@ -16,7 +16,7 @@ public class ErrorData {
     private String error = "";
 
     /** 空串省略 */
-    @JsonProperty("error_code")
+    @JsonProperty("errorCode")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private String errorCode = "";
 
@@ -24,7 +24,7 @@ public class ErrorData {
     @JsonProperty("stage")
     private String stage = "";
 
-    @JsonProperty("session_id")
+    @JsonProperty("sessionId")
     private String sessionId = "";
 
     /** 空串省略 */
@@ -58,6 +58,7 @@ public class ErrorData {
         this.error = QueryData.orEmpty(v);
     }
 
+    @JsonProperty("errorCode")
     public String getErrorCode() {
         return errorCode;
     }
@@ -66,6 +67,7 @@ public class ErrorData {
         this.errorCode = QueryData.orEmpty(v);
     }
 
+    @JsonProperty("stage")
     public String getStage() {
         return stage;
     }
@@ -82,6 +84,7 @@ public class ErrorData {
         this.sessionId = QueryData.orEmpty(v);
     }
 
+    @JsonProperty("query")
     public String getQuery() {
         return query;
     }
@@ -90,6 +93,7 @@ public class ErrorData {
         this.query = QueryData.orEmpty(v);
     }
 
+    @JsonProperty("extra")
     public Map<String, Object> getExtra() {
         return extra;
     }

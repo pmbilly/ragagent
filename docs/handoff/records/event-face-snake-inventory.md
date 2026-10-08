@@ -1,5 +1,7 @@
 # 事件面（SSE / Redis 流）snake_case 清单（B93b 侦察，2026-10-08）
 
+> **状态：已实施**（B93b 完成，见 §15.1 与 batch-records）。本清单保留为口径与三方消费面的事实依据。
+
 口径：`server/src/main/java/com/ragagent/event/**`（26 个载荷类）+ `stream/**`（流条目）+ `session/sse/**`（SSE 帧）。
 数据源：主源码定义点；`server/src/test/**`（实录，逐字夹具）；`frontend/src`（逐站点点算，**词边界**口径）。
 

@@ -500,9 +500,9 @@ test('B72 回归钉：DRIFT 修复面不得回流 snake（chunk 编辑/FAQ 标�
     'OllamaManageService 出站键已是 modifiedAt（snake 只存在于 Ollama→后端入站段）')
   // ⑤ 平台 API Key 有效期：PlatformAPIKeyCreateRequest.expiresAtUnix（潜伏断链）
   forbid('api/system/index.ts', /\bexpires_at_unix\b/, '平台 API Key 创建载荷用 expiresAtUnix')
-  // ⑥ SSE 死读：后端无任何事件发平名 created_at —— agent_query 的时间键是
+  // ⑥ SSE 死读：后端无任何事件发平名 created_at —— agentQuery 的时间键是
   //    user_created_at/assistant_created_at（QaSseOrchestrator，冻结协议键），
-  //    agent_query 的绑定走 bindServerTurnTimestamps；user_message_injected 无时间键。
+  //    agentQuery 的绑定走 bindServerTurnTimestamps；userMessageInjected 无时间键。
   forbid('composables/useChatStreamHandler.ts', /data\.created_at/,
     'SSE 载荷无平名 created_at（读到的恒 undefined）')
   require('utils/messageTimestamp.ts', /payload\.assistant_created_at/,

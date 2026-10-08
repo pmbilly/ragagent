@@ -5,7 +5,7 @@
 // Background: the agent ends a turn by writing its answer as plain assistant
 // text. Many models — especially smaller ones or those SFT'd on different
 // conventions — wrap that answer inside <answer>…</answer>,
-// <final_answer>…</final_answer>, or prefix it with "Final Answer:" /
+// <finalAnswer>…</finalAnswer>, or prefix it with "Final Answer:" /
 // "最终答案：". When the agent loop accepts such a natural-stop response as the
 // final answer, those wrappers leak into the rendered output. This module
 // provides a single helper to strip them before the markdown renderer sees
@@ -17,10 +17,10 @@
 // XML-style tag in the middle of a sentence.
 
 const ANSWER_TAG_RE =
-  /^\s*<(answer|final_answer|final-answer)\b[^>]*>([\s\S]*?)<\/\1>\s*$/i;
+  /^\s*<(answer|finalAnswer|final-answer)\b[^>]*>([\s\S]*?)<\/\1>\s*$/i;
 
 const FENCED_ANSWER_RE =
-  /^\s*```(?:final_answer|answer)\s*\n?([\s\S]*?)\n?```\s*$/i;
+  /^\s*```(?:finalAnswer|answer)\s*\n?([\s\S]*?)\n?```\s*$/i;
 
 const ANSWER_PREFIX_RE =
   /^\s*(?:final\s*answer|最终答案|答案|答)\s*[:：]\s*/i;
@@ -31,8 +31,8 @@ const ANSWER_PREFIX_RE =
  * (trimmed only when stripping happens) when no wrapper is detected.
  *
  * Recognised wrappers (must cover the entire trimmed content):
- *  - `<answer>…</answer>` / `<final_answer>…</final_answer>` (case-insensitive)
- *  - ```` ```final_answer\n…\n``` ```` fenced code block
+ *  - `<answer>…</answer>` / `<finalAnswer>…</finalAnswer>` (case-insensitive)
+ *  - ```` ```finalAnswer\n…\n``` ```` fenced code block
  *  - Leading `Final Answer:` / `最终答案：` / `答：` prefix
  */
 export function unwrapFinalAnswerWrappers(content: string): string {
@@ -44,7 +44,7 @@ export function unwrapFinalAnswerWrappers(content: string): string {
   let changed = false;
 
   // Strip outer XML-style answer tags. Loop in case the model nested them
-  // (e.g. <final_answer><answer>…</answer></final_answer>), but cap iterations
+  // (e.g. <finalAnswer><answer>…</answer></finalAnswer>), but cap iterations
   // to avoid pathological inputs.
   for (let i = 0; i < 3; i++) {
     const tagMatch = result.match(ANSWER_TAG_RE);
@@ -53,7 +53,7 @@ export function unwrapFinalAnswerWrappers(content: string): string {
     changed = true;
   }
 
-  // Strip fenced "```final_answer" code block wrappers.
+  // Strip fenced "```finalAnswer" code block wrappers.
   const fencedMatch = result.match(FENCED_ANSWER_RE);
   if (fencedMatch) {
     result = fencedMatch[1];

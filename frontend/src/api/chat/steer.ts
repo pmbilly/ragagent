@@ -37,14 +37,14 @@ export type SteerMutationResponse = {
  * as idle would start a second turn on top of the one still generating.
  */
 export async function steerSession(
-  session_id: string,
+  sessionId: string,
   query: string,
   mentionedItems: MentionedItem[] = [],
   delivery: SteerDelivery = 'after',
   expectedAssistantMessageId?: string,
   steerId?: string,
 ): Promise<SteerMutationResponse> {
-  return post(`/api/v1/sessions/${session_id}/steer`, {
+  return post(`/api/v1/sessions/${sessionId}/steer`, {
     query,
     expectedAssistantMessageId,
     steerId,
@@ -55,18 +55,18 @@ export async function steerSession(
 }
 
 /** Flip a queued after-message to inject so the running turn reads it next. */
-export async function promoteSteerSession(session_id: string, steer_id: string) {
-  return post<SteerMutationResponse>(`/api/v1/sessions/${session_id}/steer/${steer_id}/inject`, {});
+export async function promoteSteerSession(sessionId: string, steerId: string) {
+  return post<SteerMutationResponse>(`/api/v1/sessions/${sessionId}/steer/${steerId}/inject`, {});
 }
 
 /** Pending overlay items for the live run. Empty when nothing is generating. */
-export async function listSteerSession(session_id: string) {
+export async function listSteerSession(sessionId: string) {
   return get<{ assistantMessageId?: string; items: SteerQueueItem[] }>(
-    `/api/v1/sessions/${session_id}/steer`,
+    `/api/v1/sessions/${sessionId}/steer`,
   );
 }
 
 /** Drop a queued overlay item so it is neither injected nor sent as a follow-up. */
-export async function removeSteerSession(session_id: string, steer_id: string) {
-  return del<SteerMutationResponse>(`/api/v1/sessions/${session_id}/steer/${steer_id}`);
+export async function removeSteerSession(sessionId: string, steerId: string) {
+  return del<SteerMutationResponse>(`/api/v1/sessions/${sessionId}/steer/${steerId}`);
 }

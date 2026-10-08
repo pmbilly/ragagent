@@ -47,8 +47,8 @@ class StreamResponseBuilderTest {
         // 键序不属契约（不再字节序钉死）：knowledge_references 是 SearchResult 的序列化
         // （Java 字段名即键名）；data 是缓存映射直通，保持库内键名与未知键。
         String json = write(StreamResponseBuilder.build(evt, "req-1"));
-        assertThat(json).contains("\"id\":\"req-1\",\"response_type\":\"references\"");
-        assertThat(json).contains("\"knowledge_references\":[{\"id\":\"chunk-1\",\"content\":\"hello\"");
+        assertThat(json).contains("\"id\":\"req-1\",\"responseType\":\"references\"");
+        assertThat(json).contains("\"knowledgeReferences\":[{\"id\":\"chunk-1\",\"content\":\"hello\"");
         assertThat(json).contains("\"knowledgeId\":\"kb-1\"");
         assertThat(json).contains("\"chunkIndex\":3");
         assertThat(json).contains("\"knowledgeTitle\":\"t\"");
@@ -86,7 +86,7 @@ class StreamResponseBuilderTest {
         ref.put("knowledge_filename", "a.md");
         ref.put("knowledge_source", "file");
         ref.put("knowledge_description", "");
-        ref.put("knowledge_base_id", "kb-1");
+        ref.put("knowledgeBaseId", "kb-1");
         ref.put("metadata", Map.of("lang", "zh"));
         ref.put("extra_unknown_key", "ignored");
         return ref;
@@ -98,14 +98,14 @@ class StreamResponseBuilderTest {
     void extractsSessionAndAssistantMessageIdForAgentQuery() throws Exception {
         StreamEvent evt = new StreamEvent("evt-2", ResponseType.AGENT_QUERY, "", true);
         Map<String, Object> data = new LinkedHashMap<>();
-        data.put("assistant_message_id", "msg-1");
-        data.put("session_id", "sess-1");
+        data.put("assistantMessageId", "msg-1");
+        data.put("sessionId", "sess-1");
         evt.setData(data);
 
         assertThat(com.ragagent.support.ContractJson.deep(write(StreamResponseBuilder.build(evt, "req-2")))).isEqualTo(com.ragagent.support.ContractJson.deep(
-                "{\"id\":\"req-2\",\"response_type\":\"agent_query\",\"content\":\"\",\"done\":true,"
-                        + "\"session_id\":\"sess-1\",\"assistant_message_id\":\"msg-1\","
-                        + "\"data\":{\"assistant_message_id\":\"msg-1\",\"session_id\":\"sess-1\"}}"));
+                "{\"id\":\"req-2\",\"responseType\":\"agentQuery\",\"content\":\"\",\"done\":true,"
+                        + "\"sessionId\":\"sess-1\",\"assistantMessageId\":\"msg-1\","
+                        + "\"data\":{\"assistantMessageId\":\"msg-1\",\"sessionId\":\"sess-1\"}}"));
     }
 
     /** 非 agent_query 事件即便带了这两个键也<b>不</b>提取（只在 agent_query 分支里取）。 */
@@ -113,15 +113,15 @@ class StreamResponseBuilderTest {
     void doesNotExtractIdsForOtherResponseTypes() throws Exception {
         StreamEvent evt = new StreamEvent("evt-6", ResponseType.ANSWER, "hi", false);
         Map<String, Object> data = new LinkedHashMap<>();
-        data.put("session_id", "sess-9");
-        data.put("assistant_message_id", "m9");
-        data.put("event_id", "e1");
+        data.put("sessionId", "sess-9");
+        data.put("assistantMessageId", "m9");
+        data.put("eventId", "e1");
         evt.setData(data);
 
         assertThat(com.ragagent.support.ContractJson.deep(write(StreamResponseBuilder.build(evt, "req-6")))).isEqualTo(com.ragagent.support.ContractJson.deep(
-                "{\"id\":\"req-6\",\"response_type\":\"answer\",\"content\":\"hi\",\"done\":false,"
-                        + "\"data\":{\"assistant_message_id\":\"m9\",\"event_id\":\"e1\","
-                        + "\"session_id\":\"sess-9\"}}"));
+                "{\"id\":\"req-6\",\"responseType\":\"answer\",\"content\":\"hi\",\"done\":false,"
+                        + "\"data\":{\"assistantMessageId\":\"m9\",\"eventId\":\"e1\","
+                        + "\"sessionId\":\"sess-9\"}}"));
     }
 
     // ── 场景 C/D/E：references 数据不成立时的三种退路 ───────────────────────
@@ -133,7 +133,7 @@ class StreamResponseBuilderTest {
         evt.setData(Map.of("foo", "bar"));
 
         assertThat(com.ragagent.support.ContractJson.deep(write(StreamResponseBuilder.build(evt, "req-3")))).isEqualTo(com.ragagent.support.ContractJson.deep(
-                "{\"id\":\"req-3\",\"response_type\":\"references\",\"content\":\"\",\"done\":false,"
+                "{\"id\":\"req-3\",\"responseType\":\"references\",\"content\":\"\",\"done\":false,"
                         + "\"data\":{\"foo\":\"bar\"}}"));
     }
 
@@ -147,7 +147,7 @@ class StreamResponseBuilderTest {
         evt.setData(Map.of("references", List.of("not-a-map", 42)));
 
         assertThat(com.ragagent.support.ContractJson.deep(write(StreamResponseBuilder.build(evt, "req-4")))).isEqualTo(com.ragagent.support.ContractJson.deep(
-                "{\"id\":\"req-4\",\"response_type\":\"references\",\"content\":\"\",\"done\":false,"
+                "{\"id\":\"req-4\",\"responseType\":\"references\",\"content\":\"\",\"done\":false,"
                         + "\"data\":{\"references\":[\"not-a-map\",42]}}"));
     }
 
@@ -158,7 +158,7 @@ class StreamResponseBuilderTest {
         evt.setData(Map.of("references", "oops"));
 
         assertThat(com.ragagent.support.ContractJson.deep(write(StreamResponseBuilder.build(evt, "req-5")))).isEqualTo(com.ragagent.support.ContractJson.deep(
-                "{\"id\":\"req-5\",\"response_type\":\"references\",\"content\":\"\",\"done\":false,"
+                "{\"id\":\"req-5\",\"responseType\":\"references\",\"content\":\"\",\"done\":false,"
                         + "\"data\":{\"references\":\"oops\"}}"));
     }
 
@@ -185,7 +185,7 @@ class StreamResponseBuilderTest {
 
         // 活对象直通：两侧都按 SearchResult 序列化（camelCase）
         String json = write(StreamResponseBuilder.build(evt, "req-7"));
-        assertThat(json).contains("\"knowledge_references\":[{\"id\":\"chunk-2\",\"content\":\"world\"");
+        assertThat(json).contains("\"knowledgeReferences\":[{\"id\":\"chunk-2\",\"content\":\"world\"");
         assertThat(json).contains("\"knowledgeId\":\"kb-2\"");
         assertThat(json).contains("\"matchType\":3");
         assertThat(json).contains("\"subChunkId\":[\"sub-1\"]");
@@ -203,7 +203,7 @@ class StreamResponseBuilderTest {
         evt.setData(Map.of());
 
         assertThat(com.ragagent.support.ContractJson.deep(write(StreamResponseBuilder.build(evt, "req-8")))).isEqualTo(com.ragagent.support.ContractJson.deep(
-                "{\"id\":\"req-8\",\"response_type\":\"answer\",\"content\":\"x\",\"done\":true}"));
+                "{\"id\":\"req-8\",\"responseType\":\"answer\",\"content\":\"x\",\"done\":true}"));
     }
 
     // ── "不拷贝"语义 ─────────────────────────────────────────────────────────

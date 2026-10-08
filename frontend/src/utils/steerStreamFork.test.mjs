@@ -9,14 +9,14 @@ test('inject forks later events onto a new assistant below the user bubble', () 
     role: 'assistant',
     completed: false,
     isAgentMode: true,
-    agentEventStream: [{ type: 'thinking', event_id: 't1', thinking: true, done: false }],
+    agentEventStream: [{ type: 'thinking', eventId: 't1', thinking: true, done: false }],
   }
   const queued = {
     id: 'user-2',
     role: 'user',
     content: 'wait, search the other doc',
     requestId: 'req-1',
-    steer_id: 'steer-1',
+    steerId: 'steer-1',
   }
   const list = [
     { id: 'user-1', role: 'user', content: 'original', requestId: 'req-1' },
@@ -36,7 +36,7 @@ test('inject forks later events onto a new assistant below the user bubble', () 
   assert.equal(continuation.role, 'assistant')
   assert.equal(continuation.completed, false)
   assert.equal(continuation.requestId, 'req-1')
-  assert.equal(continuation.assistant_message_id, 'assist-1')
+  assert.equal(continuation.assistantMessageId, 'assist-1')
   assert.notEqual(continuation.id, assistant.id)
 })
 
@@ -48,7 +48,7 @@ test('inject moves a queued user that is not already under the source assistant'
     completed: false,
     agentEventStream: [],
   }
-  const queued = { id: 'user-2', role: 'user', content: 'nudge', steer_id: 's2' }
+  const queued = { id: 'user-2', role: 'user', content: 'nudge', steerId: 's2' }
   const list = [queued, assistant]
 
   forkAfterInjectedUser(list, assistant, queued, 's2')
@@ -74,7 +74,7 @@ test('replaying an injection onto an already split turn is a no-op', () => {
   const injected = { id: 'u1', role: 'user', requestId: 'req-1', content: 'also check B' }
   const live = {
     id: 'a0:steer:1',
-    assistant_message_id: 'a0',
+    assistantMessageId: 'a0',
     role: 'assistant',
     requestId: 'req-1',
     completed: false,
@@ -121,7 +121,7 @@ test('an in-flight turn stays in-flight after being split', () => {
   assert.equal(tail.role, 'assistant')
   assert.equal(tail.completed, false, 'the live segment must not be marked completed')
   assert.ok(!tail.steerForked, 'the live segment is not a sealed fork prefix')
-  assert.equal(tail.assistant_message_id, 'a0', 'must still address the persisted row')
+  assert.equal(tail.assistantMessageId, 'a0', 'must still address the persisted row')
 
   // The sealed prefix keeps its own flags.
   assert.equal(expanded[1].completed, true)
@@ -165,7 +165,7 @@ test('history reload splits one assistant around later same-request user rows', 
       completed: true,
       agentEventStream: [
         { type: 'thinking', timestamp: 1000, content: 'before' },
-        { type: 'tool_call', timestamp: 1100, tool_name: 'knowledge_search' },
+        { type: 'toolCall', timestamp: 1100, toolName: 'knowledge_search' },
         { type: 'thinking', timestamp: 3000, content: 'after inject' },
         { type: 'answer', content: 'final', done: true },
       ],
@@ -181,11 +181,11 @@ test('history reload splits one assistant around later same-request user rows', 
   assert.equal(expanded[1].content, '')
   assert.deepEqual(
     expanded[1].agentEventStream.map((e) => e.type),
-    ['thinking', 'tool_call'],
+    ['thinking', 'toolCall'],
   )
   assert.equal(expanded[2].id, 'u1')
   assert.equal(expanded[3].role, 'assistant')
-  assert.equal(expanded[3].assistant_message_id, 'a0')
+  assert.equal(expanded[3].assistantMessageId, 'a0')
   assert.equal(expanded[3].completed, true)
   assert.equal(expanded[3].content, 'final')
   assert.deepEqual(
@@ -216,7 +216,7 @@ test('expanding an already split transcript is a no-op', () => {
   const twice = expandSteerForksInHistory(once)
   assert.equal(twice.length, once.length)
   assert.equal(twice[1].steerForked, true)
-  assert.equal(twice[3].assistant_message_id, 'a0')
+  assert.equal(twice[3].assistantMessageId, 'a0')
   assert.equal(twice[3].id, once[3].id)
 })
 
@@ -225,9 +225,9 @@ test('explicit boundaries preserve drafts, repeated inputs and delivery order de
   const assistant = { id: 'a', role: 'assistant', requestId: 'r', content: 'final', completed: true,
     usedMemories: [{ id: 'memory' }], agentEventStream: [
       { type: 'answer', content: 'first draft', done: true, intermediate_answer: true },
-      { type: 'user_message_injected', user_message_id: 'u1' },
+      { type: 'userMessageInjected', userMessageId: 'u1' },
       { type: 'answer', content: 'second draft', done: true, intermediate_answer: true },
-      { type: 'user_message_injected', user_message_id: 'u2' },
+      { type: 'userMessageInjected', userMessageId: 'u2' },
       { type: 'answer', content: 'final', done: true },
     ] }
   const out = expandSteerForksInHistory([assistant, ...users])
@@ -271,13 +271,13 @@ test('replay walks successive existing segments rather than duplicating earlier 
 })
 
 test('step boundary events retain the server delivery order', () => {
-  assert.deepEqual(steerStepEvents({ userMessagesBefore: ['u2', 'u1'] }).map(e => e.user_message_id), ['u2', 'u1'])
+  assert.deepEqual(steerStepEvents({ userMessagesBefore: ['u2', 'u1'] }).map(e => e.userMessageId), ['u2', 'u1'])
 })
 
 test('only run completion ends the task; draft completion and sealed prefixes do not', () => {
   assert.equal(isAssistantTurnComplete({ completed: false, agentEventStream: [{ type: 'answer', done: true }] }), false)
   assert.equal(isAssistantTurnComplete({ completed: true, steerForked: true }), false)
-  assert.equal(isAssistantTurnComplete({ agentEventStream: [{ type: 'agent_complete' }] }), true)
+  assert.equal(isAssistantTurnComplete({ agentEventStream: [{ type: 'agentComplete' }] }), true)
   assert.equal(isAssistantTurnComplete({ agentEventStream: [{ type: 'stop' }] }), true)
   assert.equal(isAssistantTurnComplete({ completed: true }), true)
 })

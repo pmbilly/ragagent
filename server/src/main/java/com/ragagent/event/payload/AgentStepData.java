@@ -1,12 +1,12 @@
 package com.ragagent.event.payload;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 
 /**
  * Agent 步骤事件数据。
  *
  * <p>{@code tool_calls} 与 {@code duration_ms} 均恒输出——
- * 零值输出 {@code {"iteration":0,"thought":"","tool_calls":null,"duration_ms":0}}。</p>
+ * 零值输出 {@code {"iteration":0,"thought":"","tool_calls":null,"durationMs":0}}。</p>
  */
 
 public class AgentStepData {
@@ -18,11 +18,11 @@ public class AgentStepData {
     private String thought = "";
 
     /** null 也输出 null */
-    @JsonProperty("tool_calls")
+    @JsonProperty("toolCalls")
     private Object toolCalls;
 
     /** 0 恒输出 */
-    @JsonProperty("duration_ms")
+    @JsonProperty("durationMs")
     private long durationMs;
 
     public AgentStepData() {

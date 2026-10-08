@@ -28,8 +28,8 @@ public final class PluginFilterTopK implements Plugin {
             return next.next();
         }
         Map<String, Object> in = new LinkedHashMap<>();
-        in.put("session_id", chatManage.getSessionId());
-        in.put("top_k", chatManage.getRerankTopK());
+        in.put("sessionId", chatManage.getSessionId());
+        in.put("topK", chatManage.getRerankTopK());
         in.put("merge_cnt", chatManage.getMergeResult() == null ? 0 : chatManage.getMergeResult().size());
         in.put("rerank_cnt", chatManage.getRerankResult() == null ? 0 : chatManage.getRerankResult().size());
         in.put("search_cnt", chatManage.getSearchResult() == null ? 0 : chatManage.getSearchResult().size());

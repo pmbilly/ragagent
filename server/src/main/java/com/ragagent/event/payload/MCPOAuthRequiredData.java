@@ -16,41 +16,41 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class MCPOAuthRequiredData {
 
-    @JsonProperty("pending_id")
+    @JsonProperty("pendingId")
     private String pendingId = "";
 
     /** 0 恒输出 */
-    @JsonProperty("tenant_id")
+    @JsonProperty("tenantId")
     private long tenantId;
 
-    @JsonProperty("session_id")
+    @JsonProperty("sessionId")
     private String sessionId = "";
 
-    @JsonProperty("assistant_message_id")
+    @JsonProperty("assistantMessageId")
     private String assistantMessageId = "";
 
-    @JsonProperty("service_id")
+    @JsonProperty("serviceId")
     private String serviceId = "";
 
-    @JsonProperty("service_name")
+    @JsonProperty("serviceName")
     private String serviceName = "";
 
-    @JsonProperty("mcp_tool_name")
+    @JsonProperty("mcpToolName")
     private String mcpToolName = "";
 
     /** 0（仅提示形态）也输出 */
-    @JsonProperty("timeout_seconds")
+    @JsonProperty("timeoutSeconds")
     private int timeoutSeconds;
 
     /** 请求发出时间（unix 秒）；恒输出 */
-    @JsonProperty("requested_at")
+    @JsonProperty("requestedAtUnix")
     private long requestedAtUnix;
 
-    @JsonProperty("tool_call_id")
+    @JsonProperty("toolCallId")
     private String toolCallId = "";
 
     /** 空串省略 */
-    @JsonProperty("request_id")
+    @JsonProperty("requestId")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private String requestId = "";
 
@@ -154,6 +154,7 @@ public class MCPOAuthRequiredData {
         this.toolCallId = QueryData.orEmpty(v);
     }
 
+    @JsonProperty("requestId")
     public String getRequestId() {
         return requestId;
     }

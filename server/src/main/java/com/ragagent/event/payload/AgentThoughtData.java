@@ -1,6 +1,6 @@
 package com.ragagent.event.payload;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 
 /**
  * Agent 思考流式数据。

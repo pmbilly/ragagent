@@ -9,13 +9,13 @@ export type ChatMessage = Record<string, unknown>
  *
  * `item.mentionedItems`（S3 后与消息元素、请求元素同形）直接挂到消息上——它会被
  * REST 加载的同名消息替换，形状一致才不会有"刷新前后渲染不同"的偏差。
- * 消息上的 `steer_id` 是 SSE 载荷值的镜像（跟随冻结的线协议，刻意保留下划线）。
+ * 消息上的 `steerId` 是 SSE 载荷值的镜像（跟随冻结的线协议，刻意保留下划线）。
  */
 export function previewSteerMessage(list: ChatMessage[], item: { steerId: string; content: string; mentionedItems?: MentionedItem[] }): ChatMessage {
-  const existing = list.find(m => m.role === 'user' && m.steer_id === item.steerId)
+  const existing = list.find(m => m.role === 'user' && m.steerId === item.steerId)
   if (existing) return existing
   const message: ChatMessage = {
-    id: `steer-user-${item.steerId}`, steer_id: item.steerId,
+    id: `steer-user-${item.steerId}`, steerId: item.steerId,
     role: 'user', content: item.content,
     mentionedItems: [...(item.mentionedItems || [])],
     isSteer: true, completed: true, _steerPending: true,
@@ -25,14 +25,14 @@ export function previewSteerMessage(list: ChatMessage[], item: { steerId: string
 }
 
 export function discardSteerPreview(list: ChatMessage[], steerId: string): void {
-  const index = list.findIndex(m => m.steer_id === steerId && m._steerPending)
+  const index = list.findIndex(m => m.steerId === steerId && m._steerPending)
   if (index >= 0) list.splice(index, 1)
 }
 
 /** Reconcile older servers that assign their own ID instead of echoing the client UUID. */
 export function reconcileSteerMessageId(list: ChatMessage[], clientId: string, serverId: string): ChatMessage | undefined {
-  const preview = list.find(m => m.role === 'user' && m.steer_id === clientId)
-  const received = list.find(m => m.role === 'user' && m.steer_id === serverId)
+  const preview = list.find(m => m.role === 'user' && m.steerId === clientId)
+  const received = list.find(m => m.role === 'user' && m.steerId === serverId)
   if (preview && received && preview !== received && preview._steerPending) {
     // SSE may have already inserted the persisted row. Keep its position and
     // server metadata while preserving mentions from the optimistic message.
@@ -42,7 +42,7 @@ export function reconcileSteerMessageId(list: ChatMessage[], clientId: string, s
     list.splice(list.indexOf(preview), 1)
     return received
   }
-  if (preview) preview.steer_id = serverId
+  if (preview) preview.steerId = serverId
   return received || preview
 }
 
@@ -57,8 +57,8 @@ export function reconcileSteerMessageId(list: ChatMessage[], clientId: string, s
  */
 export function persistedAssistantId(message: ChatMessage | undefined): string {
   if (!message) return ''
-  if (typeof message.assistant_message_id === 'string' && message.assistant_message_id) {
-    return message.assistant_message_id
+  if (typeof message.assistantMessageId === 'string' && message.assistantMessageId) {
+    return message.assistantMessageId
   }
   return typeof message.id === 'string' ? message.id : ''
 }
@@ -140,11 +140,11 @@ export function forkAfterInjectedUser(
   }
 
   const persistedId =
-    (typeof sourceAssistant.assistant_message_id === 'string' && sourceAssistant.assistant_message_id) ||
+    (typeof sourceAssistant.assistantMessageId === 'string' && sourceAssistant.assistantMessageId) ||
     (typeof sourceAssistant.id === 'string' ? sourceAssistant.id : '')
   const continuation: ChatMessage = {
     id: `steer-cont-${steerId || String(Date.now())}`,
-    assistant_message_id: persistedId,
+    assistantMessageId: persistedId,
     requestId: sourceAssistant.requestId,
     role: 'assistant',
     content: '',
@@ -173,7 +173,7 @@ function eventTime(event: ChatMessage): number {
 }
 
 function isTrailingTurnEvent(event: ChatMessage): boolean {
-  if (event.type === 'agent_complete' || event.type === 'stop') return true
+  if (event.type === 'agentComplete' || event.type === 'stop') return true
   return event.type === 'answer' && event.done === true && !event.superseded && !event.intermediate_answer
 }
 
@@ -211,7 +211,7 @@ export function expandSteerForksInHistory(messages: ChatMessage[]): ChatMessage[
     }
 
     const stream = Array.isArray(item.agentEventStream) ? (item.agentEventStream as ChatMessage[]) : []
-    const boundaryIDs = stream.filter(e => e.type === 'user_message_injected').map(e => e.user_message_id)
+    const boundaryIDs = stream.filter(e => e.type === 'userMessageInjected').map(e => e.userMessageId)
     const hasBoundaries = boundaryIDs.length > 0
     if (hasBoundaries) {
       forks.sort((a, b) => {
@@ -227,8 +227,8 @@ export function expandSteerForksInHistory(messages: ChatMessage[]): ChatMessage[
     const trailing: ChatMessage[] = []
     let segmentIndex = 0
     for (const event of stream) {
-      if (event.type === 'user_message_injected') {
-        const index = forks.findIndex(user => user.id === event.user_message_id)
+      if (event.type === 'userMessageInjected') {
+        const index = forks.findIndex(user => user.id === event.userMessageId)
         if (index >= 0) segmentIndex = index + 1
         continue
       }
@@ -244,7 +244,7 @@ export function expandSteerForksInHistory(messages: ChatMessage[]): ChatMessage[
     buckets[buckets.length - 1].push(...trailing)
 
     const persistedId =
-      (typeof item.assistant_message_id === 'string' && item.assistant_message_id) ||
+      (typeof item.assistantMessageId === 'string' && item.assistantMessageId) ||
       (typeof item.id === 'string' ? item.id : '')
     // Segment 0 reuses the original object, and sealing it overwrites fields
     // the later segments still need. Snapshot first so every segment is built
@@ -260,7 +260,7 @@ export function expandSteerForksInHistory(messages: ChatMessage[]): ChatMessage[
         : {
             ...original,
             id: `${persistedId}:steer:${s}`,
-            assistant_message_id: persistedId,
+            assistantMessageId: persistedId,
           }
       segment.agentEventStream = markRaw(buckets[s])
       if (s > 0) segment.usedMemories = undefined
@@ -294,7 +294,7 @@ export function steerStepEvents(step: ChatMessage): ChatMessage[] {
   const events: ChatMessage[] = []
   if (Array.isArray(step.userMessagesBefore)) {
     for (const id of step.userMessagesBefore) {
-      events.push({ type: 'user_message_injected', user_message_id: id })
+      events.push({ type: 'userMessageInjected', userMessageId: id })
     }
   }
   return events
@@ -323,5 +323,5 @@ export function resetSteerTurnForReplay(list: ChatMessage[], requestId: string):
 export function isAssistantTurnComplete(message: ChatMessage | undefined): boolean {
   if (!message || message.steerForked) return false
   return Boolean(message.completed) || (Array.isArray(message.agentEventStream) &&
-    message.agentEventStream.some(e => e.type === 'agent_complete' || e.type === 'stop'))
+    message.agentEventStream.some(e => e.type === 'agentComplete' || e.type === 'stop'))
 }

@@ -39,14 +39,14 @@ public final class PluginMemoryRecall implements Plugin {
     public PluginError onEvent(String eventType, ChatManage chatManage, Plugin.Chain next) {
         if (memoryService == null) {
             Map<String, Object> f = new LinkedHashMap<>();
-            f.put("session_id", chatManage.getSessionId());
+            f.put("sessionId", chatManage.getSessionId());
             f.put("reason", "no_service");
             PipelineLog.info("MemoryRecall", "skip", f);
             return next.next();
         }
 
         Map<String, Object> in = new LinkedHashMap<>();
-        in.put("session_id", chatManage.getSessionId());
+        in.put("sessionId", chatManage.getSessionId());
         in.put("query_len", chatManage.getQuery().length());
         in.put("query_preview", RetrievalObs.truncateRunes(chatManage.getQuery(), 200));
         PipelineLog.info("MemoryRecall", "input", in);
@@ -55,7 +55,7 @@ public final class PluginMemoryRecall implements Plugin {
         String prompt = recall == null ? "" : recall.prompt();
         if (prompt.isEmpty()) {
             Map<String, Object> f = new LinkedHashMap<>();
-            f.put("session_id", chatManage.getSessionId());
+            f.put("sessionId", chatManage.getSessionId());
             f.put("items", 0);
             f.put("injected", false);
             f.put("note", "interest memories apply in query_understand, not here");
@@ -76,7 +76,7 @@ public final class PluginMemoryRecall implements Plugin {
             }
         }
         Map<String, Object> out = new LinkedHashMap<>();
-        out.put("session_id", chatManage.getSessionId());
+        out.put("sessionId", chatManage.getSessionId());
         out.put("items", chatManage.getUsedMemories().size());
         out.put("injected", true);
         out.put("prompt_runes", PipelineLog.runeLength(prompt));

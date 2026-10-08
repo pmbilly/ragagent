@@ -947,7 +947,7 @@ async function loadAdmins() {
     const emails: string[] = []
     for (const u of resp.admins ?? []) {
       // Empty emails would collapse to a single tag "" that can't be
-      // round-tripped to a user_id; skip them. Same defensive stance
+      // round-tripped to a userId; skip them. Same defensive stance
       // as resolveMaxOwnedTenantsPerUser on the backend.
       if (!u.email) continue
       map[u.email] = u.id

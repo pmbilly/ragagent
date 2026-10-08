@@ -540,7 +540,7 @@ export async function applyDefaultStorageQuotaToAllTenants(): Promise<ApplyDefau
 
 // We reuse the AuditLog / ListAuditLogParams types from the tenant
 // audit-log module — the row shape is identical, only the route
-// differs (tenant_id=0 rows aren't visible via the per-tenant endpoint).
+// differs (tenantId=0 rows aren't visible via the per-tenant endpoint).
 // Re-exported here so SystemSettings.vue doesn't need to cross-import
 // from a tenant-specific module to consume system-scope feeds.
 export type {
@@ -554,7 +554,7 @@ export type {
 import type { ListAuditLogParams, ListAuditLogResponse } from '@/api/tenant/audit-log'
 
 /**
- * List the platform-wide audit log (system-scope, tenant_id=0).
+ * List the platform-wide audit log (system-scope, tenantId=0).
  *
  * Backend: GET /api/v1/system/admin/audit-log (SystemAdmin only).
  * Covers system.setting_changed / system.admin_promoted /
@@ -1246,7 +1246,7 @@ export function getConfigSkillGuidance(configId: string, skillId: string) {
 }
 
 export function steerConfigSkill(configId: string, skillId: string, payload: {
-  expected_message_id: string; steer_id: string; content: string
+  expected_message_id: string; steerId: string; content: string
 }) {
   return post(`/api/v1/sandbox-configs/${configId}/skills/${skillId}/guidance`, payload)
 }

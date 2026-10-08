@@ -77,7 +77,7 @@ test('getKnowledgeSearchSummaryHtml distinguishes filtered candidates from an em
 
 test('getRagPipelineStepTitle uses query-aware search labels', () => {
   const title = getRagPipelineStepTitle(t, {
-    tool_name: 'knowledge_search',
+    toolName: 'knowledge_search',
     pending: true,
     arguments: { query: '讯飞开放平台' },
   })
@@ -86,7 +86,7 @@ test('getRagPipelineStepTitle uses query-aware search labels', () => {
 
 test('getRagPipelineStepTitle uses web labels when search_source is web', () => {
   const title = getRagPipelineStepTitle(t, {
-    tool_name: 'knowledge_search',
+    toolName: 'knowledge_search',
     pending: false,
     success: true,
     arguments: { search_source: 'web' },
@@ -96,11 +96,11 @@ test('getRagPipelineStepTitle uses web labels when search_source is web', () => 
 
 test('getRagPipelineStepTitle uses attachment parsing labels', () => {
   assert.equal(
-    getRagPipelineStepTitle(t, { tool_name: 'attachment_parsing', pending: true }),
+    getRagPipelineStepTitle(t, { toolName: 'attachment_parsing', pending: true }),
     'agentStream.toolStatus.attachmentParsing',
   )
   assert.equal(
-    getRagPipelineStepTitle(t, { tool_name: 'attachment_parsing', pending: false, success: true }),
+    getRagPipelineStepTitle(t, { toolName: 'attachment_parsing', pending: false, success: true }),
     'agentStream.toolStatus.attachmentParsingDone',
   )
 })

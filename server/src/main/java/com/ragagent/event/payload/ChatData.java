@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * 聊天生成事件数据。
  *
- * <p>零值输出 {@code {"query":"","model_id":"","is_stream":false}}——
+ * <p>零值输出 {@code {"query":"","modelId":"","isStream":false}}——
  * {@code is_stream} 恒输出，false 也输出。</p>
  */
 
@@ -17,7 +17,7 @@ public class ChatData {
     @JsonProperty("query")
     private String query = "";
 
-    @JsonProperty("model_id")
+    @JsonProperty("modelId")
     private String modelId = "";
 
     /** 空串省略 */
@@ -26,22 +26,22 @@ public class ChatData {
     private String response = "";
 
     /** 空串省略 */
-    @JsonProperty("stream_chunk")
+    @JsonProperty("streamChunk")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private String streamChunk = "";
 
     /** 0 省略 */
-    @JsonProperty("token_count")
+    @JsonProperty("tokenCount")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private int tokenCount;
 
     /** 0 省略 */
-    @JsonProperty("duration_ms")
+    @JsonProperty("durationMs")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private long durationMs;
 
     /** false 恒输出 */
-    @JsonProperty("is_stream")
+    @JsonProperty("isStream")
     private boolean isStream;
 
     /** null 或空省略 */
@@ -80,6 +80,7 @@ public class ChatData {
         this.modelId = QueryData.orEmpty(v);
     }
 
+    @JsonProperty("response")
     public String getResponse() {
         return response;
     }
@@ -88,6 +89,7 @@ public class ChatData {
         this.response = QueryData.orEmpty(v);
     }
 
+    @JsonProperty("streamChunk")
     public String getStreamChunk() {
         return streamChunk;
     }
@@ -96,6 +98,7 @@ public class ChatData {
         this.streamChunk = QueryData.orEmpty(v);
     }
 
+    @JsonProperty("tokenCount")
     public int getTokenCount() {
         return tokenCount;
     }
@@ -104,6 +107,7 @@ public class ChatData {
         this.tokenCount = v;
     }
 
+    @JsonProperty("durationMs")
     public long getDurationMs() {
         return durationMs;
     }
@@ -113,16 +117,17 @@ public class ChatData {
     }
 
     /** getter 也标注同名列：否则 Jackson 会把 isStream() 拆成多余的 "stream" 属性（实测踩过） */
-    @JsonProperty("is_stream")
+    @JsonProperty("isStream")
     public boolean isStream() {
         return isStream;
     }
 
-    @JsonProperty("is_stream")
+    @JsonProperty("isStream")
     public void setStream(boolean v) {
         this.isStream = v;
     }
 
+    @JsonProperty("extra")
     public Map<String, Object> getExtra() {
         return extra;
     }

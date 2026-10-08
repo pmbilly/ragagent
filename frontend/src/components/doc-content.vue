@@ -1040,7 +1040,7 @@ const getChunkClass = (index: number) => {
   return index % 2 !== 0 ? 'chunk-odd' : 'chunk-even';
 };
 
-// 获取Chunk元数据（char_count/token_count 曾是死读：ChunkResponse 无这两个字段，已删）
+// 获取Chunk元数据（char_count/tokenCount 曾是死读：ChunkResponse 无这两个字段，已删）
 
 // 生成的问题类型
 interface GeneratedQuestion {

@@ -1,15 +1,15 @@
 package com.ragagent.event.payload;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 
 /**
  * 会话标题更新数据。
- * 两字段全部恒输出：零值输出 {@code {"session_id":"","title":""}}。
+ * 两字段全部恒输出：零值输出 {@code {"sessionId":"","title":""}}。
  */
 
 public class SessionTitleData {
 
-    @JsonProperty("session_id")
+    @JsonProperty("sessionId")
     private String sessionId = "";
 
     @JsonProperty("title")

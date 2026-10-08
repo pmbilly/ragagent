@@ -448,11 +448,11 @@
             <pre>{{ playground.stream_output || '-' }}</pre>
           </div>
 
-          <div v-if="playground.final_answer" class="playground-step">
+          <div v-if="playground.finalAnswer" class="playground-step">
             <div class="playground-step__header">
               <span>{{ $t('integrations.api.playgroundFinalAnswer') }}</span>
             </div>
-            <pre>{{ playground.final_answer }}</pre>
+            <pre>{{ playground.finalAnswer }}</pre>
           </div>
         </div>
         <p v-else class="playground-empty">{{ $t('integrations.api.playgroundEmptyResult') }}</p>
@@ -929,7 +929,7 @@ const playground = reactive({
   chat_status: '' as PlaygroundStatus,
   session_response: '',
   stream_output: '',
-  final_answer: '',
+  finalAnswer: '',
   error: '',
 })
 
@@ -1031,7 +1031,7 @@ const playgroundRequestPreview = computed(() => {
     'POST /api/v1/sessions',
     JSON.stringify({ headers: headers.sessionHeaders, body: {} }, null, 2),
     '',
-    'POST /api/v1/agent-chat/<session_id>',
+    'POST /api/v1/agent-chat/<sessionId>',
     JSON.stringify({ headers: headers.chatHeaders, body }, null, 2),
   ].join('\n')
 })
@@ -1050,7 +1050,7 @@ const playgroundDisabledReason = computed(() => {
 const canRunPlayground = computed(() => !playground.running && !playgroundDisabledReason.value)
 
 const hasPlaygroundResult = computed(() => Boolean(
-  playground.signed_token || playground.session_response || playground.stream_output || playground.final_answer,
+  playground.signed_token || playground.session_response || playground.stream_output || playground.finalAnswer,
 ))
 
 const tokenSignExample = computed(() => {
@@ -1065,7 +1065,7 @@ const tokenSignExample = computed(() => {
 func signExternalUserToken(hmacSecret, externalUserID string, tenantID uint64) (string, error) {
 	claims := jwt.MapClaims{
 		"sub":       externalUserID, // e.g. "user_123"
-		"tenant_id": float64(tenantID),
+		"tenantId": float64(tenantID),
 		"aud":       "weknora",
 		"exp":       time.Now().Add(time.Hour).Unix(),
 	}
@@ -1094,7 +1094,7 @@ const requestExample = computed(() => {
   const lines: string[] = []
   if (form.mode === 'signed_token') {
     lines.push(
-      t('integrations.api.signedRequestStep0', { tenantId: tenantId.value || '<tenant_id>' }),
+      t('integrations.api.signedRequestStep0', { tenantId: tenantId.value || '<tenantId>' }),
       t('integrations.api.signedRequestStep0Hint', { headerName: tokenHeaderName.value }),
       '',
     )
@@ -1106,7 +1106,7 @@ const requestExample = computed(() => {
     `  -d '{}'`,
     '',
     t('integrations.api.requestExampleAgentChat'),
-    `curl -N -X POST ${apiBaseUrl.value}/agent-chat/<session_id> \\`,
+    `curl -N -X POST ${apiBaseUrl.value}/agent-chat/<sessionId> \\`,
     commonHeaders,
     `  -d '{"query":"hello","agentEnabled":true,"agentId":"${agentID}","channel":"api"}'`,
   )
@@ -1638,7 +1638,7 @@ async function runPlayground() {
   playground.chat_status = ''
   playground.session_response = ''
   playground.stream_output = ''
-  playground.final_answer = ''
+  playground.finalAnswer = ''
   playground.signed_token = ''
 
   const startedAt = performance.now()
@@ -1696,10 +1696,10 @@ async function runPlayground() {
 
     const result = await consumeApiPlaygroundSSE(chatResp.body, ({ raw, answer }) => {
       playground.stream_output = compactText(raw)
-      playground.final_answer = answer
+      playground.finalAnswer = answer
     })
     playground.stream_output = compactText(result.raw)
-    playground.final_answer = result.answer
+    playground.finalAnswer = result.answer
     if (result.status === 'failed') {
       playground.chat_status = 'failed'
       throw new Error(result.error || t('integrations.api.playgroundFailed'))

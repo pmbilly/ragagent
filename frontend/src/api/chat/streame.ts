@@ -42,8 +42,8 @@ export function useStream() {
 
   // 启动流式请求
   // QA 请求体键＝服务端字段名（§14.9l S4）：全部 camelCase，含提及项元素与
-  // SuggestionAttribution 的内部键（S3 已收口）。session_id/url 是前端路由参数，不属请求体。
-  const startStream = async (params: { session_id: any; query: any; knowledgeBaseIds?: string[]; knowledgeIds?: string[]; tagIds?: string[]; agentEnabled?: boolean; agentId?: string; agentSourceTenantId?: string | number; webSearchEnabled?: boolean; summaryModelId?: string; mcpServiceIds?: string[]; skillNames?: string[]; mentionedItems?: MentionedItem[]; images?: Array<{data: string}>; attachmentUploads?: Array<{data: string; fileName: string; fileSize: number}>; attachmentIds?: string[]; suggestionAttribution?: { suggestionSetId: string; questionId: string }; method: string; url: string; embed_token?: string; embed_session_sig?: string; embed_visitor_id?: string }) => {
+  // SuggestionAttribution 的内部键（S3 已收口）。sessionId/url 是前端路由参数，不属请求体。
+  const startStream = async (params: { sessionId: any; query: any; knowledgeBaseIds?: string[]; knowledgeIds?: string[]; tagIds?: string[]; agentEnabled?: boolean; agentId?: string; agentSourceTenantId?: string | number; webSearchEnabled?: boolean; summaryModelId?: string; mcpServiceIds?: string[]; skillNames?: string[]; mentionedItems?: MentionedItem[]; images?: Array<{data: string}>; attachmentUploads?: Array<{data: string; fileName: string; fileSize: number}>; attachmentIds?: string[]; suggestionAttribution?: { suggestionSetId: string; questionId: string }; method: string; url: string; embed_token?: string; embed_session_sig?: string; embed_visitor_id?: string }) => {
     const myGeneration = ++streamGeneration
     const streamAbort = controller
     // 重置状态
@@ -85,9 +85,9 @@ export function useStream() {
     try {
       let url =
         params.method == "POST"
-          ? `${apiUrl}${params.url}/${params.session_id}`
-          : `${apiUrl}${params.url}/${params.session_id}?message_id=${params.query}`;
-      console.log(`[TTFB] request:start request_id=${requestID} url=${url} sent_at=${Date.now()}`);
+          ? `${apiUrl}${params.url}/${params.sessionId}`
+          : `${apiUrl}${params.url}/${params.sessionId}?message_id=${params.query}`;
+      console.log(`[TTFB] request:start requestId=${requestID} url=${url} sent_at=${Date.now()}`);
       
       // Prepare POST body with required fields for agent-chat
       // knowledgeBaseIds array and agentEnabled can update Session's SessionAgentConfig
@@ -181,7 +181,7 @@ export function useStream() {
           // 401 is recoverable (refresh + replay); everything else is not.
           if (res.status === 401) throw new StreamAuthError(res.status);
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          console.log(`[TTFB] response:headers request_id=${requestID} elapsed_ms=${(performance.now() - sentAt).toFixed(1)}`);
+          console.log(`[TTFB] response:headers requestId=${requestID} elapsed_ms=${(performance.now() - sentAt).toFixed(1)}`);
           isLoading.value = false;
         },
 
@@ -191,9 +191,9 @@ export function useStream() {
           // Log first answer chunk for end-to-end TTFB measurement.
           // Filter by event type so non-answer events (references, tool
           // calls, etc.) don't count as the "first token" arrival.
-          if (!firstAnswerLogged && (parsed?.response_type === 'answer' || parsed?.type === 'answer')) {
+          if (!firstAnswerLogged && (parsed?.responseType === 'answer' || parsed?.type === 'answer')) {
             firstAnswerLogged = true;
-            console.log(`[TTFB] response:first_answer request_id=${requestID} elapsed_ms=${(performance.now() - sentAt).toFixed(1)}`);
+            console.log(`[TTFB] response:first_answer requestId=${requestID} elapsed_ms=${(performance.now() - sentAt).toFixed(1)}`);
           }
           buffer.push(parsed); // 数据存入缓冲
           // 执行自定义处理

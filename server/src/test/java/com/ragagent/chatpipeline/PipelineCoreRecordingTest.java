@@ -89,8 +89,8 @@ class PipelineCoreRecordingTest {
 
         Map<String, Object> shape = new LinkedHashMap<>();
         shape.put("query", clone.getQuery());
-        shape.put("session_id", clone.getSessionId());
-        shape.put("user_id", clone.getUserId());
+        shape.put("sessionId", clone.getSessionId());
+        shape.put("userId", clone.getUserId());
         shape.put("max_rounds", clone.getMaxRounds());
         shape.put("kb_ids", clone.getKnowledgeBaseIds());
         shape.put("knowledge_ids", clone.getKnowledgeIds());
@@ -143,8 +143,8 @@ class PipelineCoreRecordingTest {
         shape.put("user_content", "");
         shape.put("chat_response", null);
         shape.put("event_bus", false);
-        shape.put("message_id", "");
-        shape.put("user_message_id", "");
+        shape.put("messageId", "");
+        shape.put("userMessageId", "");
         shape.put("summary_prompt", clone.getSummaryConfig().getPrompt());
         shape.put("summary_think", clone.getSummaryConfig().getThinking());
         assertRec("chat_manage", "clone", json(shape));

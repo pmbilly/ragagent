@@ -996,3 +996,15 @@
   - **教训固化**：改名批的"任意转义深度"扫描必须把 `\b`（词边界）与转义斜杠 `\\/` 一并纳入模式；`<tag\b` 形态在 Java 正则里普遍存在。
 - **闸门**：后端全量 **4,836**/0 + 前端 **736**/736 + `vue-tsc` 0 错 + `spotlessCheck` + 四守卫（JSON 键名 / 包环含 SCC / Go 锚点 / 跨面键）全绿。
 - **B93 余项**：SSE/Redis 事件载荷键（`session_id`/`tool_name`/`total_steps`…）、落库 jsonb 存量键（agent_steps payload / memory 抽取状态 / 租户配置内容）。
+
+**✅ B93b（2026-10-08，事件面 camel 化：SSE / Redis 流 / 事件名）**
+- **面与量**：载荷类 26（删 149 注解 + 改 2）；`llm/domain/StreamResponse` 11 键；`session/sse/**`+`AgentStreamBridge` 键位 38 处；`EventType` 38 值 + `ResponseType` 23 值（camel、去点号）；事件产出侧 18 文件 93 处；前端 43 文件（469 键 + 87 值 + 本地词表 17 处）；测试/实录/golden 800+ 处。
+- **机制一（最隐蔽）：删掉「值 == 字段 snake 形」的 `@JsonProperty` 会改变 Jackson 的成员显式性与 include 归属** —— 字段不再主成员 ⇒ `@JsonInclude(NON_DEFAULT)` 失效、属性顺序变化 ⇒ `isFallback:false`、`durationMs:0`、`totalDurationMs:N` 全部恒输出（与 Go 快照逐字不符）。
+  修法：**恢复全部字段注解（值 = camel 字段名）110 处** + 对带 `@JsonInclude` 的字段同步 getter 注解 57 处。教训：载荷类的注解**不是冗余**，它同时承载 include/顺序语义。
+- **机制二（真 bug，静默）：helper 二参形态的读侧漏改** —— `SteerIntake.mapString(chunk.getData(), "tool_call_id")`（键在**第二个参数**）未被任何键位模式覆盖 ⇒ 我改了写侧（供应商适配器 + 测试桩）而读侧仍读旧键 ⇒ **工具调用 pending 拍永不发射**（`EngineRecordingTest` 2 例红：事件流缺 pending/内容拍提前）。
+  修法：新增「helper 二参形态」扫描（正则须容忍第一个参数内有嵌套括号）→ 修 3 处。教训：键位扫描必须同时覆盖 `put/get/path/containsKey` **与 helper 第二参数**、`\b` 词边界、`<\/tag>` 转义斜杠、任意转义深度（本批四种形态全部踩过）。
+- **供应商词表**：`tool_calls`/`finish_reason`/`tool_call_id`（OpenAI/Anthropic 线格式）**不得**按本仓规则改名；批量替换须按邻近键判别（`role`/`name`/`content` = 供应商；`thought`/`timestamp`/`data` = 本仓）。
+- **外部载荷回退**：飞书 `LarkEventConverter` 的 `message.path("message_id")`（平台事件体）被误改 → `git checkout` 回退；复查 53 个改动文件确认无其它连接器/IM 面。
+- **守卫修正**：`check-json-key-case` 与 `crossFaceKeyContract` 里存在 `forbid(file, /\b(modelId|...)/)` 的**正则笔误**（列的是 camel 形）⇒ 该规则一直**空转**；改为 snake 形后立即生效（并发现 `api/embed/index.ts`、`api/chat-history.ts` 两处**冻结面**被我的批量改名误伤 → 回退）。
+- **闸门**：后端 **4,838**/0；前端 **736**/0 + `vue-tsc` 0；`spotlessCheck`；四守卫绿。
+- **余项（后续批次）**：路径/查询参数名（15 复合路径变量 73 处 + `message_id`/`authorization_attempt`；OIDC 的 `redirect_uri`/`error_description` 保留）、references 行键（逐站点区分 wire/obs/DB）、两条防回流守卫。

@@ -18,14 +18,14 @@ public class AgentActionData {
     @JsonProperty("iteration")
     private int iteration;
 
-    @JsonProperty("tool_name")
+    @JsonProperty("toolName")
     private String toolName = "";
 
     /** null map 也输出 null */
-    @JsonProperty("tool_input")
+    @JsonProperty("toolInput")
     private Map<String, Object> toolInput;
 
-    @JsonProperty("tool_output")
+    @JsonProperty("toolOutput")
     private String toolOutput = "";
 
     /** false 恒输出 */
@@ -38,7 +38,7 @@ public class AgentActionData {
     private String error = "";
 
     /** 0 恒输出 */
-    @JsonProperty("duration_ms")
+    @JsonProperty("durationMs")
     private long durationMs;
 
     public AgentActionData() {
@@ -95,6 +95,7 @@ public class AgentActionData {
         this.success = v;
     }
 
+    @JsonProperty("error")
     public String getError() {
         return error;
     }
@@ -103,6 +104,7 @@ public class AgentActionData {
         this.error = QueryData.orEmpty(v);
     }
 
+    @JsonProperty("durationMs")
     public long getDurationMs() {
         return durationMs;
     }

@@ -523,8 +523,8 @@ public class AnthropicChat implements LlmChatClient {
                 StreamResponse chunk = StreamResponse.of(ResponseType.TOOL_CALL, "", false);
                 // data 是 map 时按键字母序序列化，故这里用有序 map 且按序插入
                 Map<String, Object> data = new java.util.LinkedHashMap<>();
-                data.put("tool_call_id", nullSafe(block.getId()));
-                data.put("tool_name", nullSafe(block.getName()));
+                data.put("toolCallId", nullSafe(block.getId()));
+                data.put("toolName", nullSafe(block.getName()));
                 chunk.setData(data);
                 if (!put(streamQueue, chunk)) {
                     return;

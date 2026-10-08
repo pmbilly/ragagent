@@ -7,7 +7,7 @@ import { del, get, post, put } from '@/utils/request'
  * 模型凭指令用现有工具执行——无脚本执行面、无安装。B57 起技能**入库**
  * （skills 表），宿主目录扫描已退役。
  *
- * 可见范围 = **平台内置层**（`tenant_id IS NULL`，官方预置，全员可见只读）
+ * 可见范围 = **平台内置层**（`tenantId IS NULL`，官方预置，全员可见只读）
  * + 当前空间；写入只作用于当前空间。选择器（智能体编辑器）读
  * `GET /api/v1/skills`（Viewer）；管理面 `GET/POST/PUT/DELETE /api/v1/skills/catalog**`
  * 由**空间 admin** 掌控（此前是平台 SystemAdmin）。

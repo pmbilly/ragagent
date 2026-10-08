@@ -721,7 +721,7 @@
     <!-- Fix Chat Drawer -->
     <t-drawer v-model:visible="showFixDrawer" :header="$t('knowledgeEditor.wikiBrowser.fixAssistantTitle')" size="700px"
       :footer="false" class="wiki-fix-drawer">
-      <ChatView v-if="showFixDrawer" :session_id="currentFixSessionId" agentId="builtin-wiki-fixer"
+      <ChatView v-if="showFixDrawer" :sessionId="currentFixSessionId" agentId="builtin-wiki-fixer"
         :kbIds="[props.knowledgeBaseId]" :embeddedMode="true" />
     </t-drawer>
 

@@ -148,7 +148,7 @@ export function useEmbedChatSession(options: {
     if (scrollTop <= 0) {
       getmsgList(
         {
-          session_id: options.sessionId.value,
+          sessionId: options.sessionId.value,
           created_at: created_at.value,
           limit: limit.value,
         },
@@ -180,7 +180,7 @@ export function useEmbedChatSession(options: {
   }
 
   const getmsgList = (
-    data: { session_id: string; created_at?: string; limit: number },
+    data: { sessionId: string; created_at?: string; limit: number },
     isScrollType = false,
     scrollHeight?: number,
   ) => {
@@ -192,7 +192,7 @@ export function useEmbedChatSession(options: {
     getEmbedMessageList(
       options.channelId,
       options.token,
-      data.session_id,
+      data.sessionId,
       data.limit,
       data.created_at || undefined,
       options.sessionSig.value,
@@ -310,7 +310,7 @@ export function useEmbedChatSession(options: {
     const suggestionAttribution = pendingSuggestionAttribution
     pendingSuggestionAttribution = null
     await startStream({
-      session_id: options.sessionId.value,
+      sessionId: options.sessionId.value,
       knowledgeBaseIds: options.kbIds,
       knowledgeIds: [],
       agentEnabled: agentEnabled,
@@ -341,7 +341,7 @@ export function useEmbedChatSession(options: {
   })
 
   onChunk((data) => {
-    if (data.response_type === 'session_title') {
+    if (data.responseType === 'sessionTitle') {
       const title = String(data.content || (data.data as { title?: string })?.title || '').trim()
       if (title) {
         options.onSessionTitle?.(title)
@@ -367,7 +367,7 @@ export function useEmbedChatSession(options: {
       historyLoading.value = false
       return
     }
-    getmsgList({ session_id: sid, created_at: '', limit: limit.value })
+    getmsgList({ sessionId: sid, created_at: '', limit: limit.value })
   }
 
   watch(

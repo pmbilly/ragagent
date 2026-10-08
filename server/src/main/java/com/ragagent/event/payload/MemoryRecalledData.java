@@ -1,6 +1,6 @@
 package com.ragagent.event.payload;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 
 /**
  * 本轮注入的长期记忆。

@@ -22,7 +22,7 @@ public class AgentFinalAnswerData {
     private boolean done;
 
     /** 兜底回答（无知识库命中）标记；false 省略 */
-    @JsonProperty("is_fallback")
+    @JsonProperty("isFallback")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private boolean isFallback;
 
@@ -52,12 +52,12 @@ public class AgentFinalAnswerData {
     }
 
     /** getter 也标注同名列：否则 Jackson 会把 isFallback() 拆成多余的 "fallback" 属性（实测踩过） */
-    @JsonProperty("is_fallback")
+    @JsonProperty("isFallback")
     public boolean isFallback() {
         return isFallback;
     }
 
-    @JsonProperty("is_fallback")
+    @JsonProperty("isFallback")
     public void setIsFallback(boolean v) {
         this.isFallback = v;
     }

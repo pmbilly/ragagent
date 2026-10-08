@@ -27,7 +27,7 @@ export interface CmdkChunk {
   id: string
   chunk_index: number
   knowledge_id: string
-  knowledge_base_id: string
+  knowledgeBaseId: string
   knowledge_title: string
   kb_name: string
   content: string
@@ -270,7 +270,7 @@ export function useCmdkSearch(options: {
         id: item.id,
         chunk_index: item.chunkIndex,
         knowledge_id: kid,
-        knowledge_base_id: item.knowledgeBaseId || '',
+        knowledgeBaseId: item.knowledgeBaseId || '',
         knowledge_title: item.knowledgeTitle || '',
         kb_name: getKbName(item.knowledgeBaseId),
         content: item.content || '',
@@ -282,7 +282,7 @@ export function useCmdkSearch(options: {
     fileGroups.value = Array.from(fmap.values())
     totalChunks.value = (chunks as any[]).length
 
-    // Group messages by session_id.
+    // Group messages by sessionId.
     const mmap = new Map<string, CmdkMsgGroup>()
     const items: MessageSearchGroupItem[] = (msgRes as any).items || []
     for (const m of items) {

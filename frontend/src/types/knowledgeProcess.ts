@@ -22,14 +22,14 @@ export interface ChunkingConfigOverride {
 
 export interface VLMConfigOverride {
   enabled?: boolean
-  model_id?: string
+  modelId?: string
   description_language?: string
   custom_instructions?: string
 }
 
 export interface ASRConfigOverride {
   enabled?: boolean
-  model_id?: string
+  modelId?: string
   language?: string
 }
 

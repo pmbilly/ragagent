@@ -56,7 +56,7 @@ public final class PluginMerge implements Plugin {
             return next.next();
         }
         Map<String, Object> in = new LinkedHashMap<>();
-        in.put("session_id", chatManage.getSessionId());
+        in.put("sessionId", chatManage.getSessionId());
         in.put("candidate_cnt", chatManage.getRerankResult() == null ? 0 : chatManage.getRerankResult().size());
         PipelineLog.info("Merge", "input", in);
 
@@ -141,7 +141,7 @@ public final class PluginMerge implements Plugin {
             return current;
         }
         Map<String, Object> f = new LinkedHashMap<>();
-        f.put("session_id", chatManage.getSessionId());
+        f.put("sessionId", chatManage.getSessionId());
         f.put("history_hits", historyResults.size());
         PipelineLog.info("Merge", "history_inject", f);
         List<SearchResult> combined = new ArrayList<>(current);

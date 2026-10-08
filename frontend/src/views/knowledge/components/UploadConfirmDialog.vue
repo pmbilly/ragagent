@@ -1161,13 +1161,13 @@ function buildProcessOverrides(): KnowledgeProcessOverrides {
     enable_multimodel: state.multimodalConfig.enabled,
     vlm_config: {
       enabled: state.multimodalConfig.enabled,
-      model_id: state.multimodalConfig.vllmModelId,
+      modelId: state.multimodalConfig.vllmModelId,
       description_language: state.multimodalConfig.descriptionLanguage,
       custom_instructions: state.multimodalConfig.customInstructions,
     },
     asr_config: {
       enabled: state.asrConfig.enabled,
-      model_id: state.asrConfig.modelId,
+      modelId: state.asrConfig.modelId,
       language: state.asrConfig.language,
     },
     question_generation_config: {
@@ -1216,13 +1216,13 @@ function applyOverridesToState(o?: KnowledgeProcessOverrides | null) {
   if (o.enable_multimodel != null) s.multimodalConfig.enabled = o.enable_multimodel
   if (o.vlm_config) {
     if (o.vlm_config.enabled != null) s.multimodalConfig.enabled = o.vlm_config.enabled
-    if (o.vlm_config.model_id != null) s.multimodalConfig.vllmModelId = o.vlm_config.model_id
+    if (o.vlm_config.modelId != null) s.multimodalConfig.vllmModelId = o.vlm_config.modelId
     if (o.vlm_config.description_language != null) s.multimodalConfig.descriptionLanguage = o.vlm_config.description_language
     if (o.vlm_config.custom_instructions != null) s.multimodalConfig.customInstructions = o.vlm_config.custom_instructions
   }
   if (o.asr_config) {
     if (o.asr_config.enabled != null) s.asrConfig.enabled = o.asr_config.enabled
-    if (o.asr_config.model_id != null) s.asrConfig.modelId = o.asr_config.model_id
+    if (o.asr_config.modelId != null) s.asrConfig.modelId = o.asr_config.modelId
     if (o.asr_config.language != null) s.asrConfig.language = o.asr_config.language
   }
   const qg = o.question_generation_config

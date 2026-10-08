@@ -7,16 +7,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * 会话内 OAuth 提示结果（authorized / timeout / cancel）确认事件体。
  * emit 点：common/approval/Gate（{@code <pendingID>-mcp-oauth-resolved}），见包注释 emit 表 #13。
  *
- * <p>零值输出 {@code {"pending_id":"","service_id":"","authorized":false}}；
+ * <p>零值输出 {@code {"pendingId":"","serviceId":"","authorized":false}}；
  * {@code reason}/{@code timed_out}/{@code canceled} 空则省略。</p>
  */
 
 public class MCPOAuthResolvedData {
 
-    @JsonProperty("pending_id")
+    @JsonProperty("pendingId")
     private String pendingId = "";
 
-    @JsonProperty("service_id")
+    @JsonProperty("serviceId")
     private String serviceId = "";
 
     /** false 恒输出 */
@@ -29,7 +29,7 @@ public class MCPOAuthResolvedData {
     private String reason = "";
 
     /** false 省略 */
-    @JsonProperty("timed_out")
+    @JsonProperty("timedOut")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private boolean timedOut;
 
@@ -75,6 +75,7 @@ public class MCPOAuthResolvedData {
         this.authorized = v;
     }
 
+    @JsonProperty("reason")
     public String getReason() {
         return reason;
     }
@@ -83,6 +84,7 @@ public class MCPOAuthResolvedData {
         this.reason = QueryData.orEmpty(v);
     }
 
+    @JsonProperty("timedOut")
     public boolean isTimedOut() {
         return timedOut;
     }
@@ -91,6 +93,7 @@ public class MCPOAuthResolvedData {
         this.timedOut = v;
     }
 
+    @JsonProperty("canceled")
     public boolean isCanceled() {
         return canceled;
     }

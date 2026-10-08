@@ -684,7 +684,7 @@ class EngineRecordingTest {
                 AgentEngine.isNaturalStopFinishReason("stop"),
                 AgentEngine.isNaturalStopFinishReason(" End_Turn "),
                 AgentEngine.isNaturalStopFinishReason("stop_sequence"),
-                AgentEngine.isNaturalStopFinishReason("tool_calls"),
+                AgentEngine.isNaturalStopFinishReason("toolCalls"),
                 AgentEngine.isNaturalStopFinishReason("")))), GoRecording46B.R_FINISH_REASON_CLASSES_NATURAL);
         assertRecording(mask(EventJson.write(List.of(
                 AgentEngine.isLengthFinishReason("length"),

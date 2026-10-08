@@ -25,7 +25,7 @@ function streamFromChunks(chunks: string[], keepOpen = false) {
 
 test('fails on a terminal error without waiting for the connection to close', async () => {
   const fixture = streamFromChunks([
-    'event: message\ndata: {"response_type":"error","content":"synthetic provider failure","done":true}\n\n',
+    'event: message\ndata: {"responseType":"error","content":"synthetic provider failure","done":true}\n\n',
   ], true)
 
   const result = await Promise.race([
@@ -42,17 +42,17 @@ test('accepts current, legacy, and sentinel completion events', async (t) => {
   const cases = [
     {
       name: 'complete event',
-      sse: 'data: {"response_type":"answer","content":"current","done":false}\n\ndata: {"response_type":"complete","content":"","done":true}\n\n',
+      sse: 'data: {"responseType":"answer","content":"current","done":false}\n\ndata: {"responseType":"complete","content":"","done":true}\n\n',
       answer: 'current',
     },
     {
       name: 'legacy done event',
-      sse: 'data: {"response_type":"answer","content":"legacy","done":true}\n\n',
+      sse: 'data: {"responseType":"answer","content":"legacy","done":true}\n\n',
       answer: 'legacy',
     },
     {
       name: 'DONE sentinel',
-      sse: 'data: {"response_type":"answer","content":"sentinel","done":false}\n\ndata: [DONE]\n\n',
+      sse: 'data: {"responseType":"answer","content":"sentinel","done":false}\n\ndata: [DONE]\n\n',
       answer: 'sentinel',
     },
   ]
@@ -68,9 +68,9 @@ test('accepts current, legacy, and sentinel completion events', async (t) => {
 
 test('does not treat another event type done marker as stream completion', async () => {
   const result = await consumeApiPlaygroundSSE(streamFromChunks([
-    'data: {"response_type":"thinking","content":"thought","done":true}\n\n'
-      + 'data: {"response_type":"answer","content":"answer","done":false}\n\n'
-      + 'data: {"response_type":"complete","content":"","done":true}\n\n',
+    'data: {"responseType":"thinking","content":"thought","done":true}\n\n'
+      + 'data: {"responseType":"answer","content":"answer","done":false}\n\n'
+      + 'data: {"responseType":"complete","content":"","done":true}\n\n',
   ]).stream)
 
   assert.equal(result.status, 'success')
@@ -79,9 +79,9 @@ test('does not treat another event type done marker as stream completion', async
 
 test('ignores frames after a terminal event', async () => {
   const fixture = streamFromChunks([
-    'data: {"response_type":"answer","content":"before","done":false}\n\n'
-      + 'data: {"response_type":"complete","content":"","done":true}\n\n',
-    'data: {"response_type":"answer","content":"after","done":false}\n\n',
+    'data: {"responseType":"answer","content":"before","done":false}\n\n'
+      + 'data: {"responseType":"complete","content":"","done":true}\n\n',
+    'data: {"responseType":"answer","content":"after","done":false}\n\n',
   ], true)
   const result = await consumeApiPlaygroundSSE(fixture.stream)
 
@@ -92,7 +92,7 @@ test('ignores frames after a terminal event', async () => {
 
 test('reports EOF without a business terminal event as failure', async () => {
   const result = await consumeApiPlaygroundSSE(streamFromChunks([
-    'data: {"response_type":"answer","content":"partial","done":false}\n\n',
+    'data: {"responseType":"answer","content":"partial","done":false}\n\n',
   ]).stream)
 
   assert.equal(result.status, 'failed')
@@ -102,7 +102,7 @@ test('reports EOF without a business terminal event as failure', async () => {
 
 test('keeps valid non-object JSON visible without crashing the parser', async () => {
   const result = await consumeApiPlaygroundSSE(streamFromChunks([
-    'data: null\n\ndata: {"response_type":"complete","content":"","done":true}\n\n',
+    'data: null\n\ndata: {"responseType":"complete","content":"","done":true}\n\n',
   ]).stream)
 
   assert.equal(result.status, 'success')
@@ -111,9 +111,9 @@ test('keeps valid non-object JSON visible without crashing the parser', async ()
 
 test('reassembles an SSE frame split across network chunks', async () => {
   const result = await consumeApiPlaygroundSSE(streamFromChunks([
-    'event: message\ndata: {"response_type":"ans',
+    'event: message\ndata: {"responseType":"ans',
     'wer","content":"split","done":false}\n',
-    '\ndata: {"response_type":"complete","content":"","done":tr',
+    '\ndata: {"responseType":"complete","content":"","done":tr',
     'ue}\n\n',
   ]).stream)
 
@@ -123,9 +123,9 @@ test('reassembles an SSE frame split across network chunks', async () => {
 
 test('supports CRLF frames and joins multiple data lines', async () => {
   const result = await consumeApiPlaygroundSSE(streamFromChunks([
-    'event: message\r\ndata: {"response_type":"answer",\r\n'
+    'event: message\r\ndata: {"responseType":"answer",\r\n'
       + 'data: "content":"multiline","done":false}\r\n\r\n'
-      + 'data: {"response_type":"complete","content":"","done":true}\r\n\r\n',
+      + 'data: {"responseType":"complete","content":"","done":true}\r\n\r\n',
   ]).stream)
 
   assert.equal(result.status, 'success')

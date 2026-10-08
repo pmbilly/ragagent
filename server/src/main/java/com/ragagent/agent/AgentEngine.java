@@ -413,8 +413,8 @@ public class AgentEngine {
         spanInput.put("context_msgs", llmContext.size());
         spanInput.put("image_count", imgCount);
         Map<String, Object> spanMeta = new LinkedHashMap<>();
-        spanMeta.put("session_id", sessionId);
-        spanMeta.put("message_id", messageId);
+        spanMeta.put("sessionId", sessionId);
+        spanMeta.put("messageId", messageId);
         spanMeta.put("max_iterations", config.getMaxIterations());
         spanMeta.put("parallel_tool_calls", config.isParallelToolCalls());
         spanMeta.put("web_search", config.isWebSearchEnabled());
@@ -474,14 +474,14 @@ public class AgentEngine {
         Map<String, Object> output = new LinkedHashMap<>();
         output.put("rounds", state.getCurrentRound());
         output.put("steps", state.getRoundSteps().size());
-        output.put("tool_calls", totalToolCalls);
+        output.put("toolCalls", totalToolCalls);
         output.put("complete", state.isComplete());
         output.put("final_answer_len", state.getFinalAnswer().length());
-        output.put("final_answer", truncateRunes(state.getFinalAnswer(), LANGFUSE_QUERY_PREVIEW));
+        output.put("finalAnswer", truncateRunes(state.getFinalAnswer(), LANGFUSE_QUERY_PREVIEW));
         Map<String, Object> meta = new LinkedHashMap<>();
         meta.put("rounds", state.getCurrentRound());
         meta.put("steps", state.getRoundSteps().size());
-        meta.put("tool_calls", totalToolCalls);
+        meta.put("toolCalls", totalToolCalls);
         meta.put("complete", state.isComplete());
         span.finish(output, meta, err);
     }

@@ -86,15 +86,15 @@ export function getMcpToolDisplayType(toolName?: string): 'mcp_discovery' | 'mcp
   return undefined
 }
 
-export function mcpToolResultOutput(event: { tool_name?: string; output?: string; error?: string }): string | undefined {
-  if (!getMcpToolDisplayType(event.tool_name)) return event.output
+export function mcpToolResultOutput(event: { toolName?: string; output?: string; error?: string }): string | undefined {
+  if (!getMcpToolDisplayType(event.toolName)) return event.output
   return event.output || event.error
 }
 
 export function getMcpToolTitle(t: ComposerTranslation, event: {
-  tool_name?: string; arguments?: unknown; output?: string; tool_data?: unknown; pending?: boolean; success?: boolean
+  toolName?: string; arguments?: unknown; output?: string; tool_data?: unknown; pending?: boolean; success?: boolean
 }): string {
-  if (!getMcpToolDisplayType(event.tool_name)) return ''
+  if (!getMcpToolDisplayType(event.toolName)) return ''
   const data = parseMcpDiscovery(event.output, event.tool_data)
   const args = typeof event.arguments === 'string' ? parseMcpDiscovery(event.arguments) : record(event.arguments)
   const mode = data.mode || args.mode || ('inputSchema' in data ? 'describe' : '')
@@ -104,8 +104,8 @@ export function getMcpToolTitle(t: ComposerTranslation, event: {
     search: 'agentStream.mcp.searchTools',
     describe: 'agentStream.mcp.describeTool',
   }
-  const label = t(event.tool_name === 'call_mcp_tool' ? 'agentStream.mcp.callTool' : keys[String(mode)] || 'agentStream.mcp.discoverTools')
-  const describeName = mode === 'describe' ? data.name || args.tool_name : ''
+  const label = t(event.toolName === 'call_mcp_tool' ? 'agentStream.mcp.callTool' : keys[String(mode)] || 'agentStream.mcp.discoverTools')
+  const describeName = mode === 'describe' ? data.name || args.toolName : ''
   const serverName = typeof data.serverName === 'string' ? data.serverName : ''
   const suffix = describeName || ((mode === 'list_tools' || mode === 'search') ? serverName : '')
   const title = suffix && typeof suffix === 'string' ? `${label}：${suffix}` : label

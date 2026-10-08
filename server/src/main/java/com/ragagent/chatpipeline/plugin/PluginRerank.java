@@ -64,7 +64,7 @@ public final class PluginRerank implements Plugin {
             return next.next();
         }
         Map<String, Object> in = new LinkedHashMap<>();
-        in.put("session_id", chatManage.getSessionId());
+        in.put("sessionId", chatManage.getSessionId());
         in.put("candidate_cnt", chatManage.getSearchResult() == null ? 0 : chatManage.getSearchResult().size());
         in.put("rerank_model", chatManage.getRerankModelId());
         in.put("rerank_thresh", chatManage.getRerankThreshold());
@@ -89,7 +89,7 @@ public final class PluginRerank implements Plugin {
             rerankModel = modelService.getRerankModel(chatManage.getRerankModelId());
         } catch (RuntimeException e) {
             Map<String, Object> f = new LinkedHashMap<>();
-            f.put("model_id", chatManage.getRerankModelId());
+            f.put("modelId", chatManage.getRerankModelId());
             f.put("error", e.getMessage());
             PipelineLog.error("Rerank", "get_model", f);
             return PluginError.GET_RERANK_MODEL.withError(e);
@@ -121,7 +121,7 @@ public final class PluginRerank implements Plugin {
         spanInput.put("faq_score_boost", chatManage.getFaqScoreBoost());
         spanInput.put("passages_preview", passagesPreview);
         Map<String, Object> spanMeta = new LinkedHashMap<>();
-        spanMeta.put("session_id", chatManage.getSessionId());
+        spanMeta.put("sessionId", chatManage.getSessionId());
         var rerankSpan = LangfuseManager.get().startSpan(
                 new LangfuseManager.SpanOptions("rerank", spanInput, spanMeta));
 

@@ -45,7 +45,7 @@ test('SSE HTTP body preserves web search selection alongside other tools', async
   await renderToString(createSSRApp({ setup() { stream = useStream(); return () => null } }))
   try {
     await stream.startStream({
-      session_id: 'new-session', query: '查一下腾讯股价', method: 'POST', url: '/api/v1/agent-chat',
+      sessionId: 'new-session', query: '查一下腾讯股价', method: 'POST', url: '/api/v1/agent-chat',
       agentEnabled: true, webSearchEnabled: true,
       mcpServiceIds: ['mcp-1'], skillNames: ['report'],
     })

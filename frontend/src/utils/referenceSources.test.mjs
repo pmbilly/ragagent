@@ -60,7 +60,7 @@ test('buildReferenceSections keeps tool results in their own section', () => {
   const sections = buildReferenceSections([
     {
       id: 'mcp-result-1',
-      chunkType: 'tool_result',
+      chunkType: 'toolResult',
       knowledgeTitle: 'MCP Search',
       content: 'tool output',
       metadata: { source: 'MCP service' },

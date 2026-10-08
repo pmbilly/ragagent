@@ -424,7 +424,7 @@ class PipelineLifecycleRecordingTest {
         s1.put("next", next[0]);
         s1.put("err", errOf(err));
         s1.put("answer", cm.getChatResponse().getContent());
-        s1.put("finish_reason", cm.getChatResponse().getFinishReason());
+        s1.put("finishReason", cm.getChatResponse().getFinishReason());
         s1.put("llm_calls", c.calls);
         assertRec("completion", "normal", mask(json(s1)));
 

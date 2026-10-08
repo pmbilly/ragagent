@@ -15,14 +15,14 @@ public class RerankData {
     private String query = "";
 
     /** 输入的候选数量 */
-    @JsonProperty("input_count")
+    @JsonProperty("inputCount")
     private int inputCount;
 
     /** 输出的结果数量 */
-    @JsonProperty("output_count")
+    @JsonProperty("outputCount")
     private int outputCount;
 
-    @JsonProperty("model_id")
+    @JsonProperty("modelId")
     private String modelId = "";
 
     /** 同 RetrievalData.threshold：包装类型防 Jackson 原生 primitive 序列化器绕过 EventJson 的浮点格式 */
@@ -35,7 +35,7 @@ public class RerankData {
     private Object results;
 
     /** 排序耗时（毫秒）；0 省略 */
-    @JsonProperty("duration_ms")
+    @JsonProperty("durationMs")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private long durationMs;
 
@@ -99,6 +99,7 @@ public class RerankData {
         this.threshold = v == null ? 0.0 : v;
     }
 
+    @JsonProperty("results")
     public Object getResults() {
         return results;
     }
@@ -107,6 +108,7 @@ public class RerankData {
         this.results = v;
     }
 
+    @JsonProperty("durationMs")
     public long getDurationMs() {
         return durationMs;
     }
@@ -115,6 +117,7 @@ public class RerankData {
         this.durationMs = v;
     }
 
+    @JsonProperty("extra")
     public Map<String, Object> getExtra() {
         return extra;
     }

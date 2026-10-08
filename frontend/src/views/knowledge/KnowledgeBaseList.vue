@@ -540,7 +540,7 @@ interface KB {
   summaryModelId?: string;
   type?: 'document' | 'faq';
   showMore?: boolean;
-  vlmConfig?: { enabled?: boolean; model_id?: string };
+  vlmConfig?: { enabled?: boolean; modelId?: string };
   extractConfig?: { enabled?: boolean };
   // 存储提供方名（local/cos/oss…）：只下发名字，凭据配置不下发（契约 §3 #12）
   storageProvider?: string;

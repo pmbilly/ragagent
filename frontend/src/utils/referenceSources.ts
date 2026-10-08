@@ -22,7 +22,7 @@ export type KnowledgeReferenceLike = {
 /**
  * 归一单条引用，供 UI 侧统一消费。
  *
- * SSE `references` 事件的引用载荷（`data.references` 与 `knowledge_references`）
+ * SSE `references` 事件的引用载荷（`data.references` 与 `knowledgeReferences`）
  * 一律 camelCase（工具面 2026-10-08 换锚；不再保留 snake 兼容分支）。
  */
 export function normalizeKnowledgeReference(raw: Record<string, any> | null | undefined): KnowledgeReferenceLike {
@@ -129,7 +129,7 @@ function isWebReference(item: KnowledgeReferenceLike): boolean {
 }
 
 function isToolReference(item: KnowledgeReferenceLike): boolean {
-  return item.chunkType === 'tool_result'
+  return item.chunkType === 'toolResult'
 }
 
 function isLikelyUrl(text: string): boolean {

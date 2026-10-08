@@ -11,6 +11,6 @@ export function applyFinalArtifactContent(message: any, content: unknown): void 
     last.content = content;
     last.done = true;
   } else if (content) {
-    message.agentEventStream.push({ type: 'answer', event_id: 'completed-answer', content, done: true });
+    message.agentEventStream.push({ type: 'answer', eventId: 'completed-answer', content, done: true });
   }
 }

@@ -234,11 +234,11 @@ class SessionStreamControllerTest {
 
         assertThat(response.getHeader("Content-Type")).isEqualTo("text/event-stream;charset=utf-8");
         assertThat(response.getHeader("X-Accel-Buffering")).isEqualTo("no");
-        assertThat(body).contains("\"response_type\":\"agent_query\"");
-        assertThat(body).contains("\"response_type\":\"answer\"");
-        assertThat(body).contains("\"response_type\":\"complete\"");
+        assertThat(body).contains("\"responseType\":\"agentQuery\"");
+        assertThat(body).contains("\"responseType\":\"answer\"");
+        assertThat(body).contains("\"responseType\":\"complete\"");
         // 回放顺序 = 存储顺序
-        assertThat(body.indexOf("agent_query")).isLessThan(body.indexOf("\"answer\""));
+        assertThat(body.indexOf("agentQuery")).isLessThan(body.indexOf("\"answer\""));
         assertThat(body.indexOf("\"answer\"")).isLessThan(body.indexOf("\"complete\""));
     }
 

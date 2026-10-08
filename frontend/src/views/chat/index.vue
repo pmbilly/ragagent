@@ -91,15 +91,15 @@
                             :class="{ 'is-minimap-target': session.id && session.id === minimapTargetId }">
                             <usermsg :content="session.content" :mentionedItems="session.mentionedItems"
                                 :images="session.images" :attachments="session.attachments" :embeddedMode="embeddedMode"
-                                :session-id="session_id"
+                                :session-id="sessionId"
                                 :steer-failed="Boolean(session._steerFailed)"
-                                @retry-steer="handleRetrySteer(session.steer_id)"
-                                @remove-steer="handleRemoveSteer(session.steer_id)">
+                                @retry-steer="handleRetrySteer(session.steerId)"
+                                @remove-steer="handleRemoveSteer(session.steerId)">
                             </usermsg>
                         </div>
                         <div v-if="session.role == 'assistant' && shouldRenderAssistantMessage(session)"
                             class="message-row">
-                            <botmsg :content="session.content" :session="session" :session-id="session_id"
+                            <botmsg :content="session.content" :session="session" :session-id="sessionId"
                                 :user-query="getUserQuery(index)" @scroll-bottom="scrollToBottom"
                                 :isFirstEnter="isFirstEnter" :embeddedMode="embeddedMode"
                                 :follow-up-loading="Boolean(session.suggestionLoading && !session.suggestionSet?.questions?.length)"
@@ -138,7 +138,7 @@
                 @retry-steer="handleRetrySteer"
                 @stop-generation="handleStopGeneration"
                 @stop-confirmed="handleStopConfirmed"
-                @stop-failed="handleStopFailed" :isReplying="isReplying" :sessionId="session_id"
+                @stop-failed="handleStopFailed" :isReplying="isReplying" :sessionId="sessionId"
                 :assistantMessageId="currentAssistantMessageId" :embeddedMode="embeddedMode"
                 :queuedSteers="steerQueue.filter(item => item.delivery === 'after')" :canSteer="isAgentStreamSession()"></InputField>
         </div>
@@ -198,7 +198,7 @@ provideChatAttachmentPreviewDrawer();
 const { visible: referencesDrawerVisible } = referencesDrawer;
 
 const props = defineProps({
-    session_id: { type: String, default: '' },
+    sessionId: { type: String, default: '' },
     agentId: { type: String, default: '' },
     kbIds: { type: Array, default: () => [] },
     embeddedMode: { type: Boolean, default: false },
@@ -234,7 +234,7 @@ const buildStreamDebugPayload = () => {
         method: meta.method,
         body: meta.body,
         sentAt: meta.sentAt,
-        sessionId: session_id.value,
+        sessionId: sessionId.value,
     };
 };
 
@@ -248,7 +248,7 @@ const attachStreamDebugToMessage = (message) => {
     message.debugRequest = payload;
 };
 const route = useRoute();
-const session_id = ref(props.session_id || route.params.chatid);
+const sessionId = ref(props.sessionId || route.params.chatid);
 const currentSession = ref(null);
 
 // 拉 session 详情，并按其 last_request_state 把输入栏状态恢复到当时的发起态。
@@ -262,7 +262,7 @@ const loadSessionAndHydrate = async (sid) => {
     try {
         const sessionRes = await getSession(sid);
         // 裸对象：响应体即会话
-        if (sessionRes && sid === session_id.value) {
+        if (sessionRes && sid === sessionId.value) {
             currentSession.value = sessionRes;
             const lastState = sessionRes.lastRequestState;
             useSettingsStoreInstance.hydrateSessionInputState(lastState, preserveDraft);
@@ -411,7 +411,7 @@ const handleSuggestedQuestionClick = (question) => {
     }
 };
 
-const resolveAssistantMessageId = (message) => message?.assistant_message_id || message?.id;
+const resolveAssistantMessageId = (message) => message?.assistantMessageId || message?.id;
 
 const handleAnswerRenderComplete = (message, ready) => {
     message.answerFullyRendered = Boolean(ready);
@@ -419,7 +419,7 @@ const handleAnswerRenderComplete = (message, ready) => {
 
 const loadFollowUpSuggestions = async (message, ensure = false, regenerate = false) => {
     const messageId = resolveAssistantMessageId(message);
-    const targetSessionId = session_id.value;
+    const targetSessionId = sessionId.value;
     if (!messageId || !targetSessionId || message.suggestionsDismissed) return;
     message.suggestionLoading = true;
     try {
@@ -429,7 +429,7 @@ const loadFollowUpSuggestions = async (message, ensure = false, regenerate = fal
         let set = response;  // 裸资源：响应体即建议集
         for (let attempt = 0; set?.status === 'generating' && attempt < 120; attempt++) {
             await new Promise((resolve) => setTimeout(resolve, 1000));
-            if (session_id.value !== targetSessionId || message.suggestionsDismissed) return;
+            if (sessionId.value !== targetSessionId || message.suggestionsDismissed) return;
             response = await getMessageSuggestions(targetSessionId, messageId);
             set = response;
         }
@@ -444,7 +444,7 @@ const loadFollowUpSuggestions = async (message, ensure = false, regenerate = fal
 
 const recordSuggestionEvent = (message, set, eventType, questionId = '') => {
     if (!set?.id) return;
-    void recordMessageSuggestionEvent(session_id.value, set.id, eventType, questionId).catch(() => undefined);
+    void recordMessageSuggestionEvent(sessionId.value, set.id, eventType, questionId).catch(() => undefined);
 };
 
 const handleFollowUpSelect = (message, item) => {
@@ -515,7 +515,7 @@ watch([() => route.params], async (newvalue) => {
         }
         messagesList.splice(0);
         steerQueue.value = [];
-        session_id.value = newvalue[0].chatid;
+        sessionId.value = newvalue[0].chatid;
         currentSession.value = null;
         clearCitationChunkCache();
 
@@ -533,9 +533,9 @@ watch([() => route.params], async (newvalue) => {
         // 并应用自己的 last_request_state（在 loadSessionAndHydrate 内部完成）。
         useSettingsStoreInstance.restoreDefaultsIfSnapshotted();
 
-        await loadSessionAndHydrate(session_id.value);
+        await loadSessionAndHydrate(sessionId.value);
         let data = {
-            session_id: session_id.value,
+            sessionId: sessionId.value,
             created_at: '',
             limit: limit.value
         }
@@ -574,7 +574,7 @@ const onChatScrollTop = () => {
     isFirstEnter.value = false
     if (scrollTop <= 0) {
         let data = {
-            session_id: session_id.value,
+            sessionId: sessionId.value,
             created_at: created_at.value,
             limit: limit.value
         }
@@ -608,9 +608,9 @@ const fetchMessageList = (data) => getMessageList(data);
 // its carried-over queue is readable, and treating that gap as "queue is
 // empty" would wipe messages the user can still see.
 const hydrateSteerQueue = async ({ onlyWhenLive = false } = {}) => {
-    if (!session_id.value) return;
+    if (!sessionId.value) return;
     try {
-        const res = await listSteerSession(session_id.value);
+        const res = await listSteerSession(sessionId.value);
         if (onlyWhenLive && !res?.assistantMessageId) return;
         const items = Array.isArray(res?.items) ? res.items : [];
         steerQueue.value = items.map((item) => ({
@@ -650,7 +650,7 @@ const {
     scrollContainer,
     debug: import.meta.env.DEV,
     onAfterMsgList: async () => {
-        activitySessionId.value = String(session_id.value);
+        activitySessionId.value = String(sessionId.value);
         for (const message of messagesList) {
             if (message.role === 'assistant' && message.completed && message.suggestionSet === undefined) {
                 void loadFollowUpSuggestions(message, false);
@@ -690,7 +690,7 @@ const {
             // resume the stream still surfaces as an error) — we don't touch them.
             isAttachingImStream.value = lastMessage.channel === 'im';
             await startStream({
-                session_id: session_id.value,
+                sessionId: sessionId.value,
                 query: resumeId,
                 method: 'GET',
                 url: '/api/v1/sessions/continue-stream',
@@ -807,14 +807,14 @@ const findSteerQueueItem = (steerId) =>
 
 // Enter queues a follow-up; an explicit inject appears in the transcript immediately.
 const handleSteerMsg = async (value, mentionedItems = [], delivery = 'after', retryId = '') => {
-    if (!session_id.value || !value?.trim()) return;
+    if (!sessionId.value || !value?.trim()) return;
     if (!isReplying.value && !retryId) {
         // 空闲时没有运行中的 turn 可排队：直接走正常发送，而不是把
         // steering（服务端为 handleSteer/指定事务）当隐形 sendMsg 用。
         await sendMsg(value, '', mentionedItems);
         return;
     }
-    const requestSessionId = session_id.value;
+    const requestSessionId = sessionId.value;
     const clientId = retryId || makeSteerClientId();
     const retryItem = retryId ? findSteerQueueItem(retryId) : null;
     const expectedId = retryItem?.expectedAssistantMessageId || currentAssistantMessageId.value;
@@ -835,7 +835,7 @@ const handleSteerMsg = async (value, mentionedItems = [], delivery = 'after', re
     }
     try {
         const res = await steerSession(requestSessionId, value, mentionedItems, delivery, expectedId, clientId);
-        if (session_id.value !== requestSessionId) return;
+        if (sessionId.value !== requestSessionId) return;
         const serverId = res?.steerId || clientId;
         const received = reconcileSteerMessageId(messagesList, clientId, serverId);
         const queued = findSteerQueueItem(clientId);
@@ -848,7 +848,7 @@ const handleSteerMsg = async (value, mentionedItems = [], delivery = 'after', re
         }
         if (res?.status === 'already_injected') {
             dropSteerQueueItem(serverId);
-            const preview = messagesList.find(m => m.steer_id === serverId);
+            const preview = messagesList.find(m => m.steerId === serverId);
             if (preview) delete preview._steerPending;
             MessagePlugin.info(t('input.messages.steerAlreadyInjected'));
             return;
@@ -876,12 +876,12 @@ const handleSteerMsg = async (value, mentionedItems = [], delivery = 'after', re
         }
     } catch (e) {
         console.error('[Steer] Failed to queue message:', e);
-        if (session_id.value !== requestSessionId) return;
+        if (sessionId.value !== requestSessionId) return;
         const item = findSteerQueueItem(clientId);
         if (!item) return; // The delivery receipt may have already consumed it.
         item.pending = false;
         item.failed = true;
-        const preview = messagesList.find(m => m.steer_id === clientId && m._steerPending);
+        const preview = messagesList.find(m => m.steerId === clientId && m._steerPending);
         if (preview) preview._steerFailed = true;
         if (e?.status === 409) item.expectedAssistantMessageId = currentAssistantMessageId.value;
         MessagePlugin.error(e?.message || t('input.messages.steerFailed'));
@@ -895,21 +895,21 @@ const handleRetrySteer = async (steerId) => {
 };
 
 const handlePromoteSteer = async (steerId) => {
-    if (!session_id.value || !steerId) return;
+    if (!sessionId.value || !steerId) return;
     const item = findSteerQueueItem(steerId) || steerQueue.value.find((entry) => entry.clientId === steerId);
     if (!item || item.delivery === 'inject') return;
     if (item.pending || item.promoting || item.failed) return;
-    const requestSessionId = session_id.value;
+    const requestSessionId = sessionId.value;
     item.promoting = true;
     item.delivery = 'inject';
     previewSteerMessage(messagesList, item);
     scrollToBottom(true);
     try {
         const res = await promoteSteerSession(requestSessionId, item.steerId);
-        if (session_id.value !== requestSessionId) return;
+        if (sessionId.value !== requestSessionId) return;
         if (res?.status === 'already_injected') {
             dropSteerQueueItem(item.steerId);
-            const preview = messagesList.find(m => m.steer_id === item.steerId);
+            const preview = messagesList.find(m => m.steerId === item.steerId);
             if (preview) delete preview._steerPending;
             MessagePlugin.info(t('input.messages.steerAlreadyInjected'));
             return;
@@ -929,7 +929,7 @@ const handlePromoteSteer = async (steerId) => {
         item.delivery = 'inject';
     } catch (e) {
         console.error('[Steer] Failed to promote queued message:', e);
-        if (session_id.value !== requestSessionId) return;
+        if (sessionId.value !== requestSessionId) return;
         if (!findSteerQueueItem(steerId)) return;
         item.delivery = 'after';
         discardSteerPreview(messagesList, steerId);
@@ -946,8 +946,8 @@ const handleRemoveSteer = async (steerId) => {
     if (item.pending) return;
     item.promoting = true;
     try {
-        if (session_id.value) {
-            const res = await removeSteerSession(session_id.value, item.steerId);
+        if (sessionId.value) {
+            const res = await removeSteerSession(sessionId.value, item.steerId);
             if (res?.status === 'already_injected') {
                 MessagePlugin.info(t('input.messages.steerAlreadyInjected'));
                 dropSteerQueueItem(steerId);
@@ -993,18 +993,18 @@ const flushSteerAfterTurn = async (completedAssistantId) => {
 
 const attachSteerFollowUp = async (completedAssistantId) => {
     const queued = steerQueue.value.filter(item => !item.failed);
-    if (!queued.length || attachingSteerFollowUp || !session_id.value) return;
-    const sessionId = session_id.value;
+    if (!queued.length || attachingSteerFollowUp || !sessionId.value) return;
+    const sessionId = sessionId.value;
     attachingSteerFollowUp = true;
     isReplying.value = true;
     loading.value = true;
     let attached = false;
     let attachedAssistantId = '';
-    const sessionChanged = () => session_id.value !== sessionId;
+    const sessionChanged = () => sessionId.value !== sessionId;
     try {
         for (let attempt = 0; attempt < 40; attempt++) {
             if (sessionChanged()) return;
-            const res = await getMessageList({ session_id: sessionId, limit: 30, created_at: '' });
+            const res = await getMessageList({ sessionId: sessionId, limit: 30, created_at: '' });
             if (sessionChanged()) return;
             const batch = Array.isArray(res) ? res : [];
             const newAssistant = [...batch].reverse().find((m) =>
@@ -1030,7 +1030,7 @@ const attachSteerFollowUp = async (completedAssistantId) => {
                             ? queuedMatch.mentionedItems
                             : persisted.mentionedItems,
                     };
-                    const preview = queuedMatch && messagesList.find(m => m.steer_id === queuedMatch.steerId && m._steerPending);
+                    const preview = queuedMatch && messagesList.find(m => m.steerId === queuedMatch.steerId && m._steerPending);
                     if (preview) {
                         delete preview._steerPending;
                         delete preview._steerFailed;
@@ -1049,7 +1049,7 @@ const attachSteerFollowUp = async (completedAssistantId) => {
                 currentAssistantMessageId.value = newAssistant.id;
                 attachedAssistantId = newAssistant.id;
                 await startStream({
-                    session_id: sessionId,
+                    sessionId: sessionId,
                     query: newAssistant.id,
                     method: 'GET',
                     url: '/api/v1/sessions/continue-stream',
@@ -1082,7 +1082,7 @@ const attachSteerFollowUp = async (completedAssistantId) => {
 const sendMsg = async (value, modelId = '', mentionedItems = [], imageFiles = [], attachmentFiles = []) => {
     stopStream();
     prepareForNewOutgoingMessage();
-    activitySessionId.value = String(session_id.value);
+    activitySessionId.value = String(sessionId.value);
     isReplying.value = true;
     loading.value = true;
     const selectedAgentId = props.embeddedMode ? props.agentId : (useSettingsStoreInstance.selectedAgentId || '');
@@ -1113,7 +1113,7 @@ const sendMsg = async (value, modelId = '', mentionedItems = [], imageFiles = []
             }
             try {
                 const upload = await uploadTemporaryAttachment(
-                    session_id.value, file, selectedAgentId, 'auto'
+                    sessionId.value, file, selectedAgentId, 'auto'
                 );
                 imageAttachmentIds.push(upload.id);
             } catch (e) {
@@ -1134,7 +1134,7 @@ const sendMsg = async (value, modelId = '', mentionedItems = [], imageFiles = []
             await Promise.all(localAttachments.map(async (attachment) => {
                 attachment.status = 'uploading';
                 const upload = await uploadTemporaryAttachment(
-                    session_id.value, attachment.file, selectedAgentId, 'auto'
+                    sessionId.value, attachment.file, selectedAgentId, 'auto'
                 );
                 attachment.documentId = upload.id;
                 attachment.status = upload.status;
@@ -1143,7 +1143,7 @@ const sendMsg = async (value, modelId = '', mentionedItems = [], imageFiles = []
             console.error('[Attachment] Temporary document upload failed:', error);
             await Promise.all(localAttachments
                 .filter(attachment => attachment.documentId)
-                .map(attachment => deleteTemporaryAttachment(session_id.value, attachment.documentId).catch(() => undefined)));
+                .map(attachment => deleteTemporaryAttachment(sessionId.value, attachment.documentId).catch(() => undefined)));
             MessagePlugin.error(error?.message || t('chat.attachmentParseFailed'));
             loading.value = false;
             isReplying.value = false;
@@ -1237,7 +1237,7 @@ const sendMsg = async (value, modelId = '', mentionedItems = [], imageFiles = []
     pendingSuggestionAttribution = null;
     pendingSuggestionKnowledgeBaseIds = [];
     await startStream({
-        session_id: session_id.value,
+        sessionId: sessionId.value,
         knowledgeBaseIds: kbIds,
         knowledgeIds: knowledgeIds,
         agentEnabled: agentEnabled,
@@ -1266,7 +1266,7 @@ const sendMsg = async (value, modelId = '', mentionedItems = [], imageFiles = []
 const RECOVER_POLL_INTERVAL = 2500;
 const RECOVER_POLL_MAX_ATTEMPTS = 48; // ~2 min
 const recoverIncompleteMessage = () => {
-    const targetSession = session_id.value;
+    const targetSession = sessionId.value;
     const targetMessageId = currentAssistantMessageId.value;
     if (recoverPollTimer) { clearTimeout(recoverPollTimer); recoverPollTimer = null; }
     if (!targetMessageId) { isReplying.value = false; isImRecovering.value = false; return; }
@@ -1274,15 +1274,15 @@ const recoverIncompleteMessage = () => {
     let attempts = 0;
     const poll = async () => {
         recoverPollTimer = null;
-        if (session_id.value !== targetSession) { isReplying.value = false; isImRecovering.value = false; return; } // navigated away
+        if (sessionId.value !== targetSession) { isReplying.value = false; isImRecovering.value = false; return; } // navigated away
         attempts++;
         try {
-            const res = await getMessageList({ session_id: targetSession, limit: limit.value, created_at: '' });
+            const res = await getMessageList({ sessionId: targetSession, limit: limit.value, created_at: '' });
             const target = (Array.isArray(res) ? res : []).find((m) => m.id === targetMessageId);
             if (target && target.completed) {
                 created_at.value = '';
                 messagesList.splice(0);
-                getmsgList({ session_id: targetSession, limit: limit.value, created_at: '' });
+                getmsgList({ sessionId: targetSession, limit: limit.value, created_at: '' });
                 isReplying.value = false;
                 isImRecovering.value = false;
                 currentAssistantMessageId.value = '';
@@ -1325,17 +1325,17 @@ watch(error, (newError) => {
 });
 
 onChunk((data) => {
-    if (data.response_type === 'session_title') {
+    if (data.responseType === 'sessionTitle') {
         const title = data.content || data.data?.title;
-        if (title && data.data?.session_id) {
+        if (title && data.data?.sessionId) {
             console.log('[Session Title Update]', {
-                session_id: data.data.session_id,
+                sessionId: data.data.sessionId,
                 title: title,
             });
-            usemenuStore.updatasessionTitle(data.data.session_id, title);
+            usemenuStore.updatasessionTitle(data.data.sessionId, title);
             usemenuStore.changeIsFirstSession(false);
             notifySessionMutation({
-                sessionId: data.data.session_id,
+                sessionId: data.data.sessionId,
                 patch: { title },
             });
         }
@@ -1346,11 +1346,11 @@ onChunk((data) => {
 
 const handleSessionMutation = (event) => {
     const detail = event.detail;
-    if (detail?.sessionId !== session_id.value) return;
+    if (detail?.sessionId !== sessionId.value) return;
 
     if (detail.patch) {
         currentSession.value = {
-            ...(currentSession.value || { id: session_id.value }),
+            ...(currentSession.value || { id: sessionId.value }),
             ...detail.patch,
         };
     }
@@ -1377,7 +1377,7 @@ onBeforeMount(async () => {
     }
 
     // 必须在 Input-field onMounted 之前完成：按 session.lastRequestState 恢复输入栏
-    await loadSessionAndHydrate(session_id.value);
+    await loadSessionAndHydrate(sessionId.value);
 });
 
 onMounted(async () => {
@@ -1406,7 +1406,7 @@ onMounted(async () => {
         hasMoreHistory.value = true;
         historyLoadingMore.value = false;
         let data = {
-            session_id: session_id.value,
+            sessionId: sessionId.value,
             created_at: '',
             limit: limit.value
         }

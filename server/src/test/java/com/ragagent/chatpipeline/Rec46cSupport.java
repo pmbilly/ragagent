@@ -43,7 +43,7 @@ import com.ragagent.session.support.PipelineViews;
  * 期望值全部是 {@link GoRecording46C} 的录制常量；掩码后逐字节可比。
  *
  * <p>掩码约定（本类 {@link #mask}）：完整 uuid → MASKED-UUID；
- * 事件 id 的 8-hex 前缀 → xxxxxxxx-；"duration_ms":N 连键带值删除；日期 → DATE；
+ * 事件 id 的 8-hex 前缀 → xxxxxxxx-；"durationMs":N 连键带值删除；日期 → DATE；
  * 英文星期名 → WEEKDAY；127.0.0.1:PORT。</p>
  */
 final class Rec46cSupport {
@@ -54,7 +54,7 @@ final class Rec46cSupport {
             "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
     private static final Pattern SHORT_ID = Pattern.compile("[0-9a-f]{8}-(thinking|answer|error)");
     private static final Pattern UUID_PREFIX = Pattern.compile("^[0-9a-f]{8}-");
-    private static final Pattern DUR_JSON = Pattern.compile(",?\"duration_ms\":\\d+");
+    private static final Pattern DUR_JSON = Pattern.compile(",?\"durationMs\":\\d+");
     private static final Pattern WEEK = Pattern.compile(
             "(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday)");
     private static final Pattern DATE = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
@@ -334,7 +334,7 @@ final class Rec46cSupport {
                 var row = com.fasterxml.jackson.databind.node.JsonNodeFactory.instance.objectNode();
                 row.put("id", mask(e.getId()));
                 row.put("type", e.getType());
-                row.put("session_id", e.getSessionId());
+                row.put("sessionId", e.getSessionId());
                 row.set("data", EventJson.mapper().valueToTree(e.getData()));
                 arr.add(row);
             }

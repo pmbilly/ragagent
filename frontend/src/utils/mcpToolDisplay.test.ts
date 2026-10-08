@@ -27,15 +27,15 @@ test('old output-only discovery and schema records remain readable', () => {
   const data = parseMcpDiscovery(JSON.stringify({ mode: 'list_tools', tools: [{ name: 'get_log', toolRef: 'legacy', description: 'Logs' }], total: 2, hasMore: true }))
   assert.deepEqual(mcpDiscoveryRows(data), [{ name: 'get_log', description: 'Logs', status: '', serverName: '' }])
   const output = JSON.stringify({ name: 'get_log', inputSchema: { type: 'object' } })
-  assert.equal(getMcpToolTitle(t, { tool_name: 'discover_mcp_tools', output }), 'agentStream.mcp.describeTool：get_log')
+  assert.equal(getMcpToolTitle(t, { toolName: 'discover_mcp_tools', output }), 'agentStream.mcp.describeTool：get_log')
   assert.deepEqual(parseMcpDiscovery('Parameter validation failed'), {})
   assert.deepEqual(mcpDiscoveryRows({ tools: [null, 'broken', { name: 'valid' }] }), [{ name: 'valid', description: '', status: '', serverName: '' }])
   const listed = JSON.stringify({ mode: 'list_tools', tools: [{ name: 'get_log' }], total: 1 })
-  const liveEnvelope = { tool_name: 'discover_mcp_tools', success: true, output: listed, error: '', duration_ms: 12, tool_call_id: 'x' }
+  const liveEnvelope = { toolName: 'discover_mcp_tools', success: true, output: listed, error: '', durationMs: 12, toolCallId: 'x' }
   assert.deepEqual(mcpDiscoveryRows(parseMcpDiscovery(listed, liveEnvelope)), [{ name: 'get_log', description: '', status: '', serverName: '' }])
-  assert.equal(getMcpToolTitle(t, { tool_name: 'discover_mcp_tools', output: listed, tool_data: liveEnvelope }), 'agentStream.mcp.listTools')
+  assert.equal(getMcpToolTitle(t, { toolName: 'discover_mcp_tools', output: listed, tool_data: liveEnvelope }), 'agentStream.mcp.listTools')
   assert.equal(getMcpToolTitle(t, {
-    tool_name: 'discover_mcp_tools',
+    toolName: 'discover_mcp_tools',
     output: JSON.stringify({ mode: 'list_tools', serverName: 'Svrlog Mcp Server', tools: [{ name: 'get_log' }], total: 1 }),
   }), 'agentStream.mcp.listTools：Svrlog Mcp Server')
 })
@@ -55,14 +55,14 @@ test('schema preview preserves required and union types without inferring undocu
 
 test('mode-aware titles handle pending and failed proxy events', () => {
   for (const [mode, suffix] of Object.entries({ list_servers: 'listServers', list_tools: 'listTools', search: 'searchTools', describe: 'describeTool' })) {
-    const event = { tool_name: 'discover_mcp_tools', arguments: { mode } }
+    const event = { toolName: 'discover_mcp_tools', arguments: { mode } }
     assert.equal(getMcpToolTitle(t, event), `agentStream.mcp.${suffix}`)
     assert.match(getMcpToolTitle(t, { ...event, pending: true }), /^agentStream.toolStatus.calling /)
   }
-  assert.equal(getMcpToolTitle(t, { tool_name: 'call_mcp_tool', success: false }), 'agentStream.toolStatus.calledFailed agentStream.mcp.callTool')
-  assert.equal(mcpToolResultOutput({ tool_name: 'call_mcp_tool', error: 'arguments must be an object' }), 'arguments must be an object')
-  assert.equal(mcpToolResultOutput({ tool_name: 'shell_exec', error: 'exited 1' }), undefined)
-  assert.equal(mcpToolResultOutput({ tool_name: 'shell_exec', output: 'ok', error: 'exited 1' }), 'ok')
+  assert.equal(getMcpToolTitle(t, { toolName: 'call_mcp_tool', success: false }), 'agentStream.toolStatus.calledFailed agentStream.mcp.callTool')
+  assert.equal(mcpToolResultOutput({ toolName: 'call_mcp_tool', error: 'arguments must be an object' }), 'arguments must be an object')
+  assert.equal(mcpToolResultOutput({ toolName: 'shell_exec', error: 'exited 1' }), undefined)
+  assert.equal(mcpToolResultOutput({ toolName: 'shell_exec', output: 'ok', error: 'exited 1' }), 'ok')
 })
 
 test('list and define views keep a one-line lead instead of dumping markdown', () => {

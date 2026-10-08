@@ -96,7 +96,7 @@ test('bindServerTurnTimestamps replaces local fallbacks with persisted server ti
   bindServerTurnTimestamps(
     [user, assistant],
     {
-      user_message_id: 'user-1',
+      userMessageId: 'user-1',
       user_created_at: '2026-01-02T03:05:00.000Z',
       assistant_created_at: '2026-01-02T03:05:01.000Z',
     },
@@ -115,7 +115,7 @@ test('bindServerTurnTimestamps ignores junk and keeps existing user ids', () => 
   bindServerTurnTimestamps(
     [user, assistant],
     {
-      user_message_id: 'user-1',
+      userMessageId: 'user-1',
       user_created_at: 'not-a-date',
       assistant_created_at: '',
     },

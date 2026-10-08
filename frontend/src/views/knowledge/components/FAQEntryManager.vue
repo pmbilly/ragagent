@@ -937,7 +937,7 @@ const authStore = useAuthStore()
 
 // Permission control: check if current user owns this KB or is tenant Admin+.
 //
-// isOwner used to compare kbInfo.tenant_id against the user's effective tenant id,
+// isOwner used to compare kbInfo.tenantId against the user's effective tenant id,
 // which silently treated "any KB visible to me in my current tenant" as "I created
 // it" — Viewer / Contributor in their home tenant ended up showing every FAQ
 // CRUD entry on every KB and 403'ing when they clicked. Mirror the rule we settled

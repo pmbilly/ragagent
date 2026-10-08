@@ -34,7 +34,7 @@ test('isThinkingInProgress: agent mode scans thinking events', () => {
     isThinkingInProgress({
       isAgentMode: true,
       completed: false,
-      agentEventStream: [{ type: 'tool_call', thinking: false }],
+      agentEventStream: [{ type: 'toolCall', thinking: false }],
     }),
     true,
   )

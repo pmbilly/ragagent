@@ -18,10 +18,10 @@ public class RetrievalData {
     @JsonProperty("query")
     private String query = "";
 
-    @JsonProperty("knowledge_base_id")
+    @JsonProperty("knowledgeBaseId")
     private String knowledgeBaseId = "";
 
-    @JsonProperty("top_k")
+    @JsonProperty("topK")
     private int topK;
 
     /** 0 也输出。用包装类型 Double：primitive double 走 Jackson 内置
@@ -30,10 +30,10 @@ public class RetrievalData {
     private Double threshold = 0.0;
 
     /** vector, keyword, entity */
-    @JsonProperty("retrieval_type")
+    @JsonProperty("retrievalType")
     private String retrievalType = "";
 
-    @JsonProperty("result_count")
+    @JsonProperty("resultCount")
     private int resultCount;
 
     /** null 或空省略 */
@@ -42,7 +42,7 @@ public class RetrievalData {
     private Object results;
 
     /** 检索耗时（毫秒）；0 省略 */
-    @JsonProperty("duration_ms")
+    @JsonProperty("durationMs")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private long durationMs;
 
@@ -116,6 +116,7 @@ public class RetrievalData {
         this.resultCount = v;
     }
 
+    @JsonProperty("results")
     public Object getResults() {
         return results;
     }
@@ -124,6 +125,7 @@ public class RetrievalData {
         this.results = v;
     }
 
+    @JsonProperty("durationMs")
     public long getDurationMs() {
         return durationMs;
     }
@@ -132,6 +134,7 @@ public class RetrievalData {
         this.durationMs = v;
     }
 
+    @JsonProperty("extra")
     public Map<String, Object> getExtra() {
         return extra;
     }

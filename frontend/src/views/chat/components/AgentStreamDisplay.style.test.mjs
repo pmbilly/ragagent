@@ -54,7 +54,7 @@ test('streaming log renders reasoning alongside tool calls', () => {
 test('expanded model reasoning stays inline without a separate thinking title', () => {
   assert.match(source, /class="thinking-inline-content markdown-content"/)
   assert.match(source, /class="thinking-inline-markdown" v-html="renderMarkdownContent\(event\.content\)"/)
-  assert.match(source, /event\.title && event\.content && isEventExpanded\(event\.event_id\)/)
+  assert.match(source, /event\.title && event\.content && isEventExpanded\(event\.eventId\)/)
   assert.match(source, /\.thinking-inline-title\s*\{[\s\S]*align-items:\s*flex-start/)
   assert.match(source, /\.thinking-inline-content\s*\{[\s\S]*margin-top:\s*0/)
   assert.doesNotMatch(source, /\.thinking-inline-title > \.action-title-icon/)
@@ -100,8 +100,8 @@ test('rag mode keeps model thinking out of the answer stream component', () => {
 test('only the collapsed root summary shows an expand chevron', () => {
   assert.match(source, /tree-root-summary[\s\S]*class="action-show-icon"/)
   assert.match(source, /showIntermediateSteps \? 'chevron-down' : 'chevron-right'/)
-  assert.doesNotMatch(source, /isEventExpanded\(event\.tool_call_id\) \? 'chevron/)
-  assert.doesNotMatch(source, /isEventExpanded\(event\.event_id\) \? 'chevron/)
+  assert.doesNotMatch(source, /isEventExpanded\(event\.toolCallId\) \? 'chevron/)
+  assert.doesNotMatch(source, /isEventExpanded\(event\.eventId\) \? 'chevron/)
 })
 
 // Recalled memory is one more thing the turn did before answering, so it rides
@@ -128,8 +128,8 @@ test('agent mode shows a native placeholder before answer whenever nothing is pe
   assert.match(source, /if \(isSegmentDone\.value\) return false/)
   assert.match(source, /return !hasPendingStreamingActivity\.value/)
   assert.match(source, /const hasPendingStreamingActivity = computed/)
-  assert.match(source, /event\.thinking === true \|\| isThinkingActive\(event\.event_id\)/)
-  assert.match(source, /event\.type === 'tool_approval_required' \|\| event\.type === 'mcp_oauth_required'/)
+  assert.match(source, /event\.thinking === true \|\| isThinkingActive\(event\.eventId\)/)
+  assert.match(source, /event\.type === 'toolApprovalRequired' \|\| event\.type === 'mcpOauthRequired'/)
   assert.match(source, /class="action-card action-pending"/)
   assert.match(source, /t\('chat\.thinkingAlt'\)/)
   assert.match(source, /chat-timeline-loading\.less/)

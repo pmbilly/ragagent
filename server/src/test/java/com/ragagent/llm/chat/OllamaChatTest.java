@@ -317,7 +317,7 @@ class OllamaChatTest {
         assertEquals(ResponseType.THINKING, chunks.get(4).getResponseType());
         assertEquals("deep thought", chunks.get(4).getContent());
         assertEquals("thinking_tool", chunks.get(4).getData().get("source"));
-        assertEquals("0", chunks.get(4).getData().get("tool_call_id"));
+        assertEquals("0", chunks.get(4).getData().get("toolCallId"));
 
         // 终态：流式补全量直接用 eval_count（与非流式口径不同）
         StreamResponse last = chunks.get(5);

@@ -36,7 +36,7 @@ public final class PluginChatCompletion implements Plugin {
     @Override
     public PluginError onEvent(String eventType, ChatManage chatManage, Plugin.Chain next) {
         Map<String, Object> in = new LinkedHashMap<>();
-        in.put("session_id", chatManage.getSessionId());
+        in.put("sessionId", chatManage.getSessionId());
         in.put("user_question", chatManage.getUserContent());
         in.put("history_rounds", chatManage.getHistory() == null ? 0 : chatManage.getHistory().size());
         in.put("chat_model", chatManage.getChatModelId());
@@ -79,7 +79,7 @@ public final class PluginChatCompletion implements Plugin {
         var orphans = assembly.registry().orphanResourceHandles(chatResponse.getContent());
         if (orphans != null && !orphans.isEmpty()) {
             Map<String, Object> f = new LinkedHashMap<>();
-            f.put("session_id", chatManage.getSessionId());
+            f.put("sessionId", chatManage.getSessionId());
             f.put("handles", orphans);
             PipelineLog.warn("Completion", "orphan_resource_handles", f);
         }

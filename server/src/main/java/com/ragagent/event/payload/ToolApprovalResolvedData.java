@@ -7,13 +7,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * 用户决定（或超时/取消）的确认事件体。
  * emit 点：common/approval/Gate（{@code <pendingID>-approval-resolved}），见包注释 emit 表 #11。
  *
- * <p>零值输出 {@code {"pending_id":"","approved":false}}；
+ * <p>零值输出 {@code {"pendingId":"","approved":false}}；
  * {@code reason}/{@code timed_out}/{@code canceled} 空则省略。</p>
  */
 
 public class ToolApprovalResolvedData {
 
-    @JsonProperty("pending_id")
+    @JsonProperty("pendingId")
     private String pendingId = "";
 
     /** false 恒输出 */
@@ -26,7 +26,7 @@ public class ToolApprovalResolvedData {
     private String reason = "";
 
     /** false 省略 */
-    @JsonProperty("timed_out")
+    @JsonProperty("timedOut")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private boolean timedOut;
 
@@ -63,6 +63,7 @@ public class ToolApprovalResolvedData {
         this.approved = v;
     }
 
+    @JsonProperty("reason")
     public String getReason() {
         return reason;
     }
@@ -71,6 +72,7 @@ public class ToolApprovalResolvedData {
         this.reason = QueryData.orEmpty(v);
     }
 
+    @JsonProperty("timedOut")
     public boolean isTimedOut() {
         return timedOut;
     }
@@ -79,6 +81,7 @@ public class ToolApprovalResolvedData {
         this.timedOut = v;
     }
 
+    @JsonProperty("canceled")
     public boolean isCanceled() {
         return canceled;
     }

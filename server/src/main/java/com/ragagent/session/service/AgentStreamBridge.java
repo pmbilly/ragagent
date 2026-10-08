@@ -165,13 +165,13 @@ public final class AgentStreamBridge {
                 long startTime = eventStartTimes.getOrDefault(evt.getId(), System.currentTimeMillis());
                 long duration = System.currentTimeMillis() - startTime;
                 metadata = new LinkedHashMap<>();
-                metadata.put("event_id", evt.getId());
-                metadata.put("duration_ms", duration);
-                metadata.put("completed_at", System.currentTimeMillis() / 1000L);
+                metadata.put("eventId", evt.getId());
+                metadata.put("durationMs", duration);
+                metadata.put("completedAt", System.currentTimeMillis() / 1000L);
                 eventStartTimes.remove(evt.getId());
             } else {
                 metadata = new LinkedHashMap<>();
-                metadata.put("event_id", evt.getId());
+                metadata.put("eventId", evt.getId());
             }
         }
         emitter.emit(evt.getId(), ResponseType.THINKING, orEmpty(data.getContent()), data.isDone(), metadata,
@@ -205,9 +205,9 @@ public final class AgentStreamBridge {
             }
         }
         Map<String, Object> metadata = new LinkedHashMap<>();
-        metadata.put("tool_name", data.getToolName());
+        metadata.put("toolName", data.getToolName());
         metadata.put("arguments", data.getArguments());
-        metadata.put("tool_call_id", data.getToolCallId());
+        metadata.put("toolCallId", data.getToolCallId());
 
         emitter.emit(evt.getId(), ResponseType.TOOL_CALL, "Calling tool: " + data.getToolName(), false,
                 metadata, "Append tool call event to stream failed");
@@ -248,11 +248,11 @@ public final class AgentStreamBridge {
 
         // Build metadata including tool result data for rich frontend rendering
         Map<String, Object> metadata = new LinkedHashMap<>();
-        metadata.put("tool_name", data.getToolName());
+        metadata.put("toolName", data.getToolName());
         metadata.put("success", data.isSuccess());
         metadata.put("error", data.getError());
-        metadata.put("duration_ms", durationMs);
-        metadata.put("tool_call_id", data.getToolCallId());
+        metadata.put("durationMs", durationMs);
+        metadata.put("toolCallId", data.getToolCallId());
 
         ToolResult tr = new ToolResult();
         tr.setSuccess(data.isSuccess());
@@ -286,7 +286,7 @@ public final class AgentStreamBridge {
             return null;
         }
         Map<String, Object> meta = toolApprovalDataToMap(data);
-        meta.put("pending_id", data.getPendingId());
+        meta.put("pendingId", data.getPendingId());
         emitter.emit(evt.getId(), ResponseType.TOOL_APPROVAL_REQUIRED, "MCP tool requires human approval",
                 true, meta, "Append tool approval required event failed");
         return null;
@@ -297,7 +297,7 @@ public final class AgentStreamBridge {
             return null;
         }
         Map<String, Object> meta = toolApprovalDataToMap(data);
-        meta.put("pending_id", data.getPendingId());
+        meta.put("pendingId", data.getPendingId());
         emitter.emit(evt.getId(), ResponseType.TOOL_APPROVAL_RESOLVED, "MCP tool approval resolved", true,
                 meta, "Append tool approval resolved event failed");
         return null;
@@ -308,7 +308,7 @@ public final class AgentStreamBridge {
             return null;
         }
         Map<String, Object> meta = toolApprovalDataToMap(data);
-        meta.put("pending_id", data.getPendingId());
+        meta.put("pendingId", data.getPendingId());
         emitter.emit(evt.getId(), ResponseType.MCP_OAUTH_REQUIRED, "MCP service requires OAuth authorization",
                 true, meta, "Append mcp oauth required event failed");
         return null;
@@ -319,7 +319,7 @@ public final class AgentStreamBridge {
             return null;
         }
         Map<String, Object> meta = toolApprovalDataToMap(data);
-        meta.put("pending_id", data.getPendingId());
+        meta.put("pendingId", data.getPendingId());
         emitter.emit(evt.getId(), ResponseType.MCP_OAUTH_RESOLVED, "MCP OAuth authorization resolved", true,
                 meta, "Append mcp oauth resolved event failed");
         return null;
@@ -385,13 +385,13 @@ public final class AgentStreamBridge {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("reason", data.getReason());
         payload.put("round", data.getRound());
-        payload.put("tokens_before", data.getTokensBefore());
-        payload.put("tokens_after", data.getTokensAfter());
-        payload.put("messages_before", data.getMessagesBefore());
-        payload.put("messages_after", data.getMessagesAfter());
+        payload.put("tokensBefore", data.getTokensBefore());
+        payload.put("tokensAfter", data.getTokensAfter());
+        payload.put("messagesBefore", data.getMessagesBefore());
+        payload.put("messagesAfter", data.getMessagesAfter());
         payload.put("summary", data.getSummary());
         payload.put("degraded", data.isDegraded());
-        payload.put("split_turn", data.isSplitTurn());
+        payload.put("splitTurn", data.isSplitTurn());
         emitter.emit(evt.getId(), ResponseType.CONTEXT_COMPACTED, "", true, payload,
                 "Append context compacted event to stream failed");
         return null;
@@ -433,16 +433,16 @@ public final class AgentStreamBridge {
                 long startTime = eventStartTimes.getOrDefault(evt.getId(), System.currentTimeMillis());
                 long duration = System.currentTimeMillis() - startTime;
                 metadata = new LinkedHashMap<>();
-                metadata.put("event_id", evt.getId());
-                metadata.put("duration_ms", duration);
-                metadata.put("completed_at", System.currentTimeMillis() / 1000L);
+                metadata.put("eventId", evt.getId());
+                metadata.put("durationMs", duration);
+                metadata.put("completedAt", System.currentTimeMillis() / 1000L);
                 eventStartTimes.remove(evt.getId());
             } else {
                 metadata = new LinkedHashMap<>();
-                metadata.put("event_id", evt.getId());
+                metadata.put("eventId", evt.getId());
             }
             if (data.isFallback()) {
-                metadata.put("is_fallback", true);
+                metadata.put("isFallback", true);
             }
         }
         emitter.emit(evt.getId(), ResponseType.ANSWER, orEmpty(data.getContent()), data.isDone(), metadata,
@@ -482,7 +482,7 @@ public final class AgentStreamBridge {
             return null;
         }
         Map<String, Object> payload = new LinkedHashMap<>();
-        payload.put("session_id", data.getSessionId());
+        payload.put("sessionId", data.getSessionId());
         payload.put("title", data.getTitle());
         emitter.emitTolerant(evt.getId(), ResponseType.SESSION_TITLE, data.getTitle(), true, payload,
                 "Append session title event to stream failed (stream may have ended)");
@@ -496,10 +496,10 @@ public final class AgentStreamBridge {
             return null;
         }
         Map<String, Object> payload = new LinkedHashMap<>();
-        payload.put("steer_id", data.getSteerId());
-        payload.put("message_id", data.getMessageId());
+        payload.put("steerId", data.getSteerId());
+        payload.put("messageId", data.getMessageId());
         payload.put("content", data.getContent());
-        payload.put("user_message_id", data.getUserMessageId());
+        payload.put("userMessageId", data.getUserMessageId());
         emitter.emit(evt.getId(), ResponseType.USER_MESSAGE_INJECTED, "", true, payload,
                 "Append user message injected event to stream failed");
         return null;
@@ -561,8 +561,8 @@ public final class AgentStreamBridge {
                 first.setDone(false);
                 first.setTimestamp(OffsetDateTime.now());
                 Map<String, Object> d1 = new LinkedHashMap<>();
-                d1.put("event_id", fallbackId);
-                d1.put("is_fallback", true);
+                d1.put("eventId", fallbackId);
+                d1.put("isFallback", true);
                 first.setData(d1);
                 StreamEvent second = new StreamEvent();
                 second.setId(fallbackId);
@@ -577,8 +577,8 @@ public final class AgentStreamBridge {
 
         // Completion event for the stream manager（SSE 据此收流）
         Map<String, Object> completeData = new LinkedHashMap<>();
-        completeData.put("total_steps", data.getTotalSteps());
-        completeData.put("total_duration_ms", data.getTotalDurationMs());
+        completeData.put("totalSteps", data.getTotalSteps());
+        completeData.put("totalDurationMs", data.getTotalDurationMs());
         completeData.put("final_content", assistantMessage.getContent());
         TokenUsage turnUsage = data.getUsage() instanceof TokenUsage u ? u : null;
         if (turnUsage != null) {
@@ -609,7 +609,7 @@ public final class AgentStreamBridge {
         sr.setKnowledgeFilename(getString(refMap, "knowledge_filename"));
         sr.setKnowledgeSource(getString(refMap, "knowledge_source"));
         sr.setKnowledgeDescription(getString(refMap, "knowledge_description"));
-        sr.setKnowledgeBaseId(getString(refMap, "knowledge_base_id"));
+        sr.setKnowledgeBaseId(getString(refMap, "knowledgeBaseId"));
         if (refMap.get("metadata") instanceof Map<?, ?> meta) {
             Map<String, String> metadata = new LinkedHashMap<>();
             for (Map.Entry<?, ?> entry : meta.entrySet()) {

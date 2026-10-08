@@ -162,7 +162,7 @@ export function getKnowledgeSearchSummaryHtml(
 }
 
 type RagPipelineEvent = {
-  tool_name?: string
+  toolName?: string
   pending?: boolean
   success?: boolean
   arguments?: unknown
@@ -170,7 +170,7 @@ type RagPipelineEvent = {
 }
 
 export function getRagPipelineStepTitle(t: ComposerTranslation, event: RagPipelineEvent): string {
-  const toolName = String(event.tool_name || '')
+  const toolName = String(event.toolName || '')
   const pending = event.pending === true
   const query =
     getQueryText(event.arguments) ||

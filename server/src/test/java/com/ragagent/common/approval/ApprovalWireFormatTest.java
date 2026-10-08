@@ -158,10 +158,10 @@ class ApprovalWireFormatTest {
      */
     @Test
     void eventEnvelopeUsesContractResponseTypes() {
-        assertEquals("tool_approval_required", ResponseType.TOOL_APPROVAL_REQUIRED.value());
-        assertEquals("tool_approval_resolved", ResponseType.TOOL_APPROVAL_RESOLVED.value());
-        assertEquals("mcp_oauth_required", ResponseType.MCP_OAUTH_REQUIRED.value());
-        assertEquals("mcp_oauth_resolved", ResponseType.MCP_OAUTH_RESOLVED.value());
+        assertEquals("toolApprovalRequired", ResponseType.TOOL_APPROVAL_REQUIRED.value());
+        assertEquals("toolApprovalResolved", ResponseType.TOOL_APPROVAL_RESOLVED.value());
+        assertEquals("mcpOauthRequired", ResponseType.MCP_OAUTH_REQUIRED.value());
+        assertEquals("mcpOauthResolved", ResponseType.MCP_OAUTH_RESOLVED.value());
 
         Event evt = Event.of("id-1", ResponseType.TOOL_APPROVAL_REQUIRED, "s1",
                 new ToolApprovalResolvedData("p1", true, "", false, false),

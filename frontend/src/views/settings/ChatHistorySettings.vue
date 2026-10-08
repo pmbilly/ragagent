@@ -156,7 +156,7 @@ const saveConfig = async () => {
 
     const response = await updateTenantChatHistoryConfig(config)
 
-    // Update initial config from response (includes auto-managed knowledge_base_id)
+    // Update initial config from response (includes auto-managed knowledgeBaseId)
     if (response.data) {
       initialConfig.value = {
         enabled: response.data.enabled || false,

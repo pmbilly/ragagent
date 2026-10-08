@@ -475,8 +475,8 @@ final class ActPhase {
         toolSpanMeta.put("iteration", iteration);
         toolSpanMeta.put("round", round);
         toolSpanMeta.put("tool_index", i + 1);
-        toolSpanMeta.put("tool_call_id", tc.getId());
-        toolSpanMeta.put("session_id", sessionId);
+        toolSpanMeta.put("toolCallId", tc.getId());
+        toolSpanMeta.put("sessionId", sessionId);
         toolSpanMeta.put("argument_resolution", argumentResolution);
         toolSpanMeta.put("unresolved_handle_count",
                 tc.getUnresolvedHandles() == null ? 0 : tc.getUnresolvedHandles().size());
@@ -582,7 +582,7 @@ final class ActPhase {
         boolean success = tc.getResult() != null && tc.getResult().isSuccess();
         Map<String, Object> output = new LinkedHashMap<>();
         output.put("success", success);
-        output.put("duration_ms", durationMs);
+        output.put("durationMs", durationMs);
         if (tc.getResult() != null) {
             if (!tc.getResult().getOutput().isEmpty()) {
                 output.put("output", AgentEngine.truncateRunes(tc.getResult().getOutput(), LANGFUSE_TOOL_OUTPUT_PREVIEW));
@@ -612,7 +612,7 @@ final class ActPhase {
         }
         Map<String, Object> meta = new LinkedHashMap<>();
         meta.put("success", success);
-        meta.put("duration_ms", durationMs);
+        meta.put("durationMs", durationMs);
         span.finish(output, meta, spanErr);
     }
 
@@ -687,7 +687,7 @@ final class ActPhase {
                 modelArgKeys.sort(KEY_BYTE_ORDER);
             }
             Map<String, Object> out = new LinkedHashMap<>();
-            out.put("tool_call_id", tc.getId());
+            out.put("toolCallId", tc.getId());
             out.put("model_arg_keys", modelArgKeys);
             out.put("resolved_arg_keys", resolvedArgs == null ? List.of() : sortedKeys(resolvedArgs));
             out.put("argument_resolution", resolution);
@@ -697,7 +697,7 @@ final class ActPhase {
             return out;
         }
         Map<String, Object> out = new LinkedHashMap<>();
-        out.put("tool_call_id", tc.getId());
+        out.put("toolCallId", tc.getId());
         out.put("model_arguments", traceArgumentValue(modelArguments));
         out.put("resolved_arguments", deepSortedMap(resolvedArgs));
         out.put("argument_resolution", resolution);

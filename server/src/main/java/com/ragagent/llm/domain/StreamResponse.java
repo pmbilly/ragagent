@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ragagent.common.web.SortedMapSerializer;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.common.llm.ResponseType;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 流式响应。
@@ -22,7 +22,7 @@ public class StreamResponse {
 
     @JsonProperty("id")
     private String id = "";
-    @JsonProperty("response_type")
+    @JsonProperty("responseType")
     private ResponseType responseType;
     @JsonProperty("content")
     private String content = "";
@@ -35,16 +35,16 @@ public class StreamResponse {
      *
      * <p>为空时整键省略。</p>
      */
-    @JsonProperty("knowledge_references")
+    @JsonProperty("knowledgeReferences")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<SearchResult> knowledgeReferences;
-    @JsonProperty("session_id")
+    @JsonProperty("sessionId")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String sessionId;
-    @JsonProperty("assistant_message_id")
+    @JsonProperty("assistantMessageId")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String assistantMessageId;
-    @JsonProperty("tool_calls")
+    @JsonProperty("toolCalls")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<ToolCall> toolCalls;
     /**
@@ -60,7 +60,7 @@ public class StreamResponse {
     @JsonProperty("usage")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private TokenUsage usage;
-    @JsonProperty("finish_reason")
+    @JsonProperty("finishReason")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String finishReason;
 

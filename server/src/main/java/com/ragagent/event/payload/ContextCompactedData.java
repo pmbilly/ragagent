@@ -21,16 +21,16 @@ public class ContextCompactedData {
     @JsonProperty("round")
     private int round;
 
-    @JsonProperty("tokens_before")
+    @JsonProperty("tokensBefore")
     private int tokensBefore;
 
-    @JsonProperty("tokens_after")
+    @JsonProperty("tokensAfter")
     private int tokensAfter;
 
-    @JsonProperty("messages_before")
+    @JsonProperty("messagesBefore")
     private int messagesBefore;
 
-    @JsonProperty("messages_after")
+    @JsonProperty("messagesAfter")
     private int messagesAfter;
 
     @JsonProperty("summary")
@@ -42,7 +42,7 @@ public class ContextCompactedData {
     private boolean degraded;
 
     /** 切口落在单个 turn 内的标记；false 省略 */
-    @JsonProperty("split_turn")
+    @JsonProperty("splitTurn")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private boolean splitTurn;
 
@@ -119,6 +119,7 @@ public class ContextCompactedData {
         this.summary = QueryData.orEmpty(v);
     }
 
+    @JsonProperty("degraded")
     public boolean isDegraded() {
         return degraded;
     }
@@ -127,6 +128,7 @@ public class ContextCompactedData {
         this.degraded = v;
     }
 
+    @JsonProperty("splitTurn")
     public boolean isSplitTurn() {
         return splitTurn;
     }

@@ -128,12 +128,12 @@ class AgentStreamBridgeTest {
         StreamEvent first = appendedOfType(ResponseType.THINKING).get(0);
         assertThat(first.getContent()).isEqualTo("让我查一下");
         assertThat(first.isDone()).isFalse();
-        assertThat(first.getData()).containsOnlyKeys("event_id");
+        assertThat(first.getData()).containsOnlyKeys("eventId");
 
         emit(EventType.EVENT_AGENT_THOUGHT, "e-thought", new AgentThoughtData("", 1, true));
         StreamEvent done = appendedOfType(ResponseType.THINKING).get(1);
         assertThat(done.isDone()).isTrue();
-        assertThat(done.getData()).containsKeys("event_id", "duration_ms", "completed_at");
+        assertThat(done.getData()).containsKeys("eventId", "durationMs", "completedAt");
     }
 
     @Test
@@ -146,8 +146,8 @@ class AgentStreamBridgeTest {
         StreamEvent call = appendedOfType(ResponseType.TOOL_CALL).get(0);
         assertThat(call.getContent()).isEqualTo("Calling tool: kb_search");
         assertThat(call.isDone()).isFalse();
-        assertThat(call.getData()).containsEntry("tool_call_id", "tc-1")
-                .containsEntry("tool_name", "kb_search");
+        assertThat(call.getData()).containsEntry("toolCallId", "tc-1")
+                .containsEntry("toolName", "kb_search");
         // 工具调用前的流出文本是非终局轮的前导，不进持久化答案
         assertThat(bridge.composedFinalAnswer()).isEmpty();
 
@@ -163,8 +163,8 @@ class AgentStreamBridgeTest {
                 Map.of("answer", "42"));
         emit(EventType.EVENT_AGENT_TOOL_RESULT, "e-ok", ok);
         StreamEvent okEvent = appendedOfType(ResponseType.TOOL_RESULT).get(0);
-        assertThat(okEvent.getData()).containsEntry("success", true).containsEntry("tool_name", "web_search")
-                .containsKey("duration_ms");
+        assertThat(okEvent.getData()).containsEntry("success", true).containsEntry("toolName", "web_search")
+                .containsKey("durationMs");
 
         AgentToolResultData failed = new AgentToolResultData("tc-10", "web_search", "", "boom", false, 0,
                 2, Map.of());
@@ -208,13 +208,13 @@ class AgentStreamBridgeTest {
         assertThat(answers).hasSize(2);
         assertThat(answers.get(0).getContent()).isEqualTo("最终答案");
         assertThat(answers.get(0).isDone()).isFalse();
-        assertThat(answers.get(0).getData()).containsEntry("is_fallback", true);
+        assertThat(answers.get(0).getData()).containsEntry("isFallback", true);
         assertThat(answers.get(1).isDone()).isTrue();
 
         StreamEvent event = appendedOfType(ResponseType.COMPLETE).get(0);
         assertThat(event.isDone()).isTrue();
         assertThat(event.getUsage()).isSameAs(usage);
-        assertThat(event.getData()).containsEntry("total_steps", 3)
+        assertThat(event.getData()).containsEntry("totalSteps", 3)
                 .containsEntry("final_content", "最终答案");
         assertThat(assistantMessage.isCompleted()).isTrue();
         assertThat(assistantMessage.getContent()).isEqualTo("最终答案");

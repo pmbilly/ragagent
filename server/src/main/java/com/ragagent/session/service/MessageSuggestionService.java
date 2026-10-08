@@ -107,8 +107,8 @@ public class MessageSuggestionService {
         Map<String, Object> spanConfig = followUps(
                 spanEc == null ? null : spanEc.getQuestionSuggestions());
         Map<String, Object> spanInput = new LinkedHashMap<>();
-        spanInput.put("session_id", sessionId);
-        spanInput.put("assistant_message_id", assistantMessageId);
+        spanInput.put("sessionId", sessionId);
+        spanInput.put("assistantMessageId", assistantMessageId);
         spanInput.put("mode", strVal(spanConfig, "mode"));
         Map<String, Object> spanMeta = new LinkedHashMap<>();
         spanMeta.put("count", spanConfig == null ? null : spanConfig.get("count"));
@@ -516,7 +516,7 @@ public class MessageSuggestionService {
         }
         for (JsonNode n : arr) {
             out.add(new Object[] {n.path("question").asText(""),
-                    n.path("source").asText(""), n.path("knowledge_base_id").asText("")});
+                    n.path("source").asText(""), n.path("knowledgeBaseId").asText("")});
         }
         return out;
     }
@@ -537,7 +537,7 @@ public class MessageSuggestionService {
             if (m == null) {
                 continue;
             }
-            Object kb = firstNonNull(m.get("knowledge_base_id"), m.get("knowledgeBaseId"));
+            Object kb = firstNonNull(m.get("knowledgeBaseId"), m.get("knowledgeBaseId"));
             Object ids = firstNonNull(m.get("tag_ids"), m.get("tagIds"));
             List<String> tagIds = new ArrayList<>();
             if (ids instanceof List<?> list) {

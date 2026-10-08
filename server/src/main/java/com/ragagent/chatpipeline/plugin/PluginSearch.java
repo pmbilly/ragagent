@@ -67,7 +67,7 @@ public final class PluginSearch implements Plugin {
                 chatManage.getKnowledgeBaseIds(), chatManage.getKnowledgeIds());
         if (!hasKBTargets && !chatManage.isWebSearchEnabled()) {
             Map<String, Object> f = new LinkedHashMap<>();
-            f.put("session_id", chatManage.getSessionId());
+            f.put("sessionId", chatManage.getSessionId());
             PipelineLog.error("Search", "kb_not_found", f);
             return null;
         }
@@ -122,7 +122,7 @@ public final class PluginSearch implements Plugin {
         if (kbErr != null) {
             Map<String, Object> f = new LinkedHashMap<>();
             f.put("error", kbErr.getMessage());
-            f.put("result_count", allResults.size());
+            f.put("resultCount", allResults.size());
             PipelineLog.warn("Search", "kb_search_partial_failure", f);
         }
 
@@ -143,24 +143,24 @@ public final class PluginSearch implements Plugin {
 
         if (!chatManage.getSearchResult().isEmpty()) {
             Map<String, Object> f = new LinkedHashMap<>();
-            f.put("session_id", chatManage.getSessionId());
-            f.put("result_count", chatManage.getSearchResult().size());
+            f.put("sessionId", chatManage.getSessionId());
+            f.put("resultCount", chatManage.getSearchResult().size());
             PipelineLog.info("Search", "output", f);
             return next.next();
         }
         Map<String, Object> f = new LinkedHashMap<>();
-        f.put("session_id", chatManage.getSessionId());
-        f.put("result_count", 0);
+        f.put("sessionId", chatManage.getSessionId());
+        f.put("resultCount", 0);
         PipelineLog.warn("Search", "output", f);
         return PluginError.SEARCH_NOTHING;
     }
 
     private void logInput(ChatManage chatManage) {
         Map<String, Object> f = new LinkedHashMap<>();
-        f.put("session_id", chatManage.getSessionId());
+        f.put("sessionId", chatManage.getSessionId());
         f.put("rewrite_query", chatManage.getRewriteQuery());
         f.put("search_targets", chatManage.getSearchTargets().size());
-        f.put("tenant_id", chatManage.getTenantId());
+        f.put("tenantId", chatManage.getTenantId());
         f.put("web_enabled", chatManage.isWebSearchEnabled());
         PipelineLog.info("Search", "input", f);
 

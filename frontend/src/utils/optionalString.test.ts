@@ -11,7 +11,7 @@ test('serializes cleared optional strings as an explicit empty value', () => {
   assert.equal(normalizeOptionalString(undefined), '')
   assert.equal(normalizeOptionalString(null), '')
   assert.equal(
-    JSON.stringify({ knowledge_base_id: normalizeOptionalString(undefined) }),
-    '{"knowledge_base_id":""}',
+    JSON.stringify({ knowledgeBaseId: normalizeOptionalString(undefined) }),
+    '{"knowledgeBaseId":""}',
   )
 })

@@ -1,18 +1,18 @@
 package com.ragagent.event.payload;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 
 /**
  * Agent 反思数据。
  *
  * <p>四字段全部恒输出：零值输出
- * {@code {"tool_call_id":"","content":"","iteration":0,"done":false}}。</p>
+ * {@code {"toolCallId":"","content":"","iteration":0,"done":false}}。</p>
  */
 
 public class AgentReflectionData {
 
     /** 工具调用 ID（追踪用） */
-    @JsonProperty("tool_call_id")
+    @JsonProperty("toolCallId")
     private String toolCallId = "";
 
     @JsonProperty("content")

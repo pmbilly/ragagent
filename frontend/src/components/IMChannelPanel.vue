@@ -519,7 +519,7 @@
               </div>
               <div class="form-item">
                 <label class="form-label">{{ $t('agentEditor.im.yunzhijiaTimeout') }}</label>
-                <t-input-number v-model="formData.credentials.timeout_seconds" placeholder="10" :min="1" :max="60"
+                <t-input-number v-model="formData.credentials.timeoutSeconds" placeholder="10" :min="1" :max="60"
                   style="width: 100%;" />
                 <p class="form-desc">{{ $t('agentEditor.im.yunzhijiaTimeoutHint') }}</p>
               </div>
@@ -824,7 +824,7 @@ function onPlatformChange(val: string | number | boolean) {
     formData.value.outputMode = 'stream';
     if (val === 'yunzhijia') {
       formData.value.credentials = {
-        timeout_seconds: 10,
+        timeoutSeconds: 10,
         allowed_webhook_host_suffix: 'yunzhijia.com',
       };
     }
@@ -842,8 +842,8 @@ function normalizeYunzhijiaCredentials() {
   if (!formData.value.credentials.allowed_webhook_host_suffix) {
     formData.value.credentials.allowed_webhook_host_suffix = 'yunzhijia.com';
   }
-  if (!formData.value.credentials.timeout_seconds) {
-    formData.value.credentials.timeout_seconds = 10;
+  if (!formData.value.credentials.timeoutSeconds) {
+    formData.value.credentials.timeoutSeconds = 10;
   }
 }
 

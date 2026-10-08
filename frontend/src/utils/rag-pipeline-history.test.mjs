@@ -17,8 +17,8 @@ test('synthesizeRagPipelineToolEvents builds completed retrieval steps', () => {
   })
 
   assert.equal(events.length, 2)
-  assert.equal(events[0].tool_name, 'query_understand')
-  assert.equal(events[1].tool_name, 'knowledge_search')
+  assert.equal(events[0].toolName, 'query_understand')
+  assert.equal(events[1].toolName, 'knowledge_search')
   assert.equal(events[1].tool_data.count, 3)
   assert.equal(events[1].tool_data.search_source, 'knowledge')
 })
@@ -51,9 +51,9 @@ test('ensureRagPipelineHistoryStream does not invent retrieval for attachment-on
     knowledgeReferences: [],
     agentEventStream: [
       {
-        type: 'tool_call',
-        tool_name: 'attachment_parsing',
-        tool_call_id: 'attach-1',
+        type: 'toolCall',
+        toolName: 'attachment_parsing',
+        toolCallId: 'attach-1',
         pending: false,
         success: true,
         tool_data: { parsedCount: 1, skippedCount: 0 },
@@ -67,15 +67,15 @@ test('ensureRagPipelineHistoryStream does not invent retrieval for attachment-on
   assert.equal(item.hideContent, true)
   assert.equal(hasRagPipelineToolEvents(item.agentEventStream), false)
   assert.equal(
-    item.agentEventStream.some((event) => event.tool_name === 'knowledge_search'),
+    item.agentEventStream.some((event) => event.toolName === 'knowledge_search'),
     false,
   )
   assert.equal(
-    item.agentEventStream.some((event) => event.tool_name === 'query_understand'),
+    item.agentEventStream.some((event) => event.toolName === 'query_understand'),
     false,
   )
   assert.equal(
-    item.agentEventStream.some((event) => event.tool_name === 'attachment_parsing'),
+    item.agentEventStream.some((event) => event.toolName === 'attachment_parsing'),
     true,
   )
   assert.equal(
@@ -105,9 +105,9 @@ test('ensureRagPipelineHistoryStream restores quick-answer history after reload'
 
 test('ensureRagPipelineHistoryStream keeps existing pipeline events', () => {
   const existing = {
-    type: 'tool_call',
-    tool_name: 'knowledge_search',
-    tool_call_id: 'live-1',
+    type: 'toolCall',
+    toolName: 'knowledge_search',
+    toolCallId: 'live-1',
     pending: false,
   }
   const item = {
@@ -119,7 +119,7 @@ test('ensureRagPipelineHistoryStream keeps existing pipeline events', () => {
   ensureRagPipelineHistoryStream(item)
 
   assert.equal(item.agentEventStream.length, 1)
-  assert.equal(item.agentEventStream[0].tool_call_id, 'live-1')
+  assert.equal(item.agentEventStream[0].toolCallId, 'live-1')
 })
 
 test('RAG_TIMELINE_TOOL_NAMES includes attachment prep tools', () => {

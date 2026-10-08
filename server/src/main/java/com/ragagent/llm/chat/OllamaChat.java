@@ -191,7 +191,7 @@ public class OllamaChat implements LlmChatClient {
                                 // data 键按字母序序列化
                                 Map<String, Object> data = new LinkedHashMap<>();
                                 data.put("source", "thinking_tool");
-                                data.put("tool_call_id", tooli2s(tc.getFunction().getIndex()));
+                                data.put("toolCallId", tooli2s(tc.getFunction().getIndex()));
                                 thoughtChunk.setData(data);
                                 put(streamQueue, thoughtChunk);
                             }

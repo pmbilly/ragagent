@@ -118,7 +118,7 @@ export function buildShellExecView(
     command: asString(record.command) || asString(argumentsRecord.command) || skillScriptCommand(record, argumentsRecord),
     workDir: asString(record.work_dir) || asString(argumentsRecord.work_dir),
     exitCode: asNumber(record.exit_code),
-    durationMs: asNumber(record.duration_ms),
+    durationMs: asNumber(record.durationMs),
     killed: asBool(record.killed),
     truncated: asBool(record.truncated) || asBool(record.stdout_truncated) || asBool(record.stderr_truncated),
     stdoutBinary: asBool(record.stdout_binary),

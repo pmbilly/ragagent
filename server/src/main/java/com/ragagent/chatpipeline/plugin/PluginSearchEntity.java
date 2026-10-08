@@ -94,7 +94,7 @@ public final class PluginSearchEntity implements Plugin {
             chunks = chunkRepo.listChunksById(tenantId, chunkIDs);
         } catch (RuntimeException e) {
             Map<String, Object> f = new LinkedHashMap<>();
-            f.put("session_id", chatManage.getSessionId());
+            f.put("sessionId", chatManage.getSessionId());
             f.put("error", e.getMessage());
             PipelineLog.error("search_entity", "list_chunks", f);
             return next.next();
@@ -108,7 +108,7 @@ public final class PluginSearchEntity implements Plugin {
             knowledges = knowledgeRepo.getKnowledgeBatch(tenantId, knowledgeIDs);
         } catch (RuntimeException e) {
             Map<String, Object> f = new LinkedHashMap<>();
-            f.put("session_id", chatManage.getSessionId());
+            f.put("sessionId", chatManage.getSessionId());
             f.put("error", e.getMessage());
             PipelineLog.error("search_entity", "list_knowledge", f);
             return next.next();
@@ -130,7 +130,7 @@ public final class PluginSearchEntity implements Plugin {
         chatManage.setSearchResult(SearchSupport.removeDuplicateResults(chatManage.getSearchResult()));
         if (chatManage.getSearchResult() == null || chatManage.getSearchResult().isEmpty()) {
             Map<String, Object> f = new LinkedHashMap<>();
-            f.put("session_id", chatManage.getSessionId());
+            f.put("sessionId", chatManage.getSessionId());
             PipelineLog.info("search_entity", "no_new_result", f);
             return PluginError.SEARCH_NOTHING;
         }

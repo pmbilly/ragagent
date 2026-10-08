@@ -41,9 +41,9 @@
               </div>
 
               <!-- Context Compaction -->
-              <div v-if="event.type === 'context_compacted'" class="tool-event">
+              <div v-if="event.type === 'contextCompacted'" class="tool-event">
                 <div class="action-card">
-                  <div class="action-header" @click="toggleEvent(event.event_id)">
+                  <div class="action-header" @click="toggleEvent(event.eventId)">
                     <div class="action-title">
                       <span class="action-title-icon icon-mask" :style="maskIconStyle(compactionIcon)"
                         aria-hidden="true" />
@@ -51,7 +51,7 @@
                       <span class="action-summary">{{ compactionSummaryText(event) }}</span>
                     </div>
                   </div>
-                  <div v-if="event.summary && isEventExpanded(event.event_id)" class="action-details">
+                  <div v-if="event.summary && isEventExpanded(event.eventId)" class="action-details">
                     <div class="thinking-detail-content markdown-content">
                       <div v-html="renderMarkdownContent(event.summary)"></div>
                     </div>
@@ -64,15 +64,15 @@
                    reasoning is the expandable body. -->
               <div v-if="event.type === 'thinking'" class="tool-event">
                 <div class="action-card thinking-event-card"
-                  :class="{ 'action-pending': isThinkingActive(event.event_id) }">
-                  <div class="action-header" @click="toggleEvent(event.event_id)">
+                  :class="{ 'action-pending': isThinkingActive(event.eventId) }">
+                  <div class="action-header" @click="toggleEvent(event.eventId)">
                     <div class="action-title" :class="{
-                      'thinking-inline-title': !event.title && isEventExpanded(event.event_id),
+                      'thinking-inline-title': !event.title && isEventExpanded(event.eventId),
                     }">
                       <span class="action-title-icon icon-mask" :style="maskIconStyle(thinkingIcon)"
                         aria-hidden="true" />
                       <span v-if="event.title" class="action-name action-preamble-title">{{ event.title }}</span>
-                      <div v-else-if="event.content && isEventExpanded(event.event_id)"
+                      <div v-else-if="event.content && isEventExpanded(event.eventId)"
                         class="thinking-inline-content markdown-content">
                         <div class="thinking-inline-markdown" v-html="renderMarkdownContent(event.content)"></div>
                       </div>
@@ -80,7 +80,7 @@
                         }}</span>
                     </div>
                   </div>
-                  <div v-if="event.title && event.content && isEventExpanded(event.event_id)" class="action-details">
+                  <div v-if="event.title && event.content && isEventExpanded(event.eventId)" class="action-details">
                     <div class="thinking-detail-content markdown-content">
                       <div v-html="renderMarkdownContent(event.content)"></div>
                     </div>
@@ -89,21 +89,21 @@
               </div>
 
               <!-- Thinking Tool Call -->
-              <div v-else-if="event.type === 'tool_call' && event.tool_name === 'thinking'" class="tool-event">
+              <div v-else-if="event.type === 'toolCall' && event.toolName === 'thinking'" class="tool-event">
                 <div class="action-card"
-                  :class="{ 'action-pending': event.pending || isThinkingActive(event.tool_call_id) }">
-                  <div class="action-header" @click="toggleEvent(event.tool_call_id)">
+                  :class="{ 'action-pending': event.pending || isThinkingActive(event.toolCallId) }">
+                  <div class="action-header" @click="toggleEvent(event.toolCallId)">
                     <div class="action-title">
                       <span class="action-title-icon icon-mask" :style="maskIconStyle(thinkingIcon)"
                         aria-hidden="true" />
                       <span class="action-name">{{ $t('agent.think') }}</span>
                       <span v-if="event.tool_data?.thoughtNumber" class="action-badge">{{
                         event.tool_data.thoughtNumber }}/{{ event.tool_data.totalThoughts }}</span>
-                      <span v-if="getThinkingSummary(event) && !isEventExpanded(event.tool_call_id)"
+                      <span v-if="getThinkingSummary(event) && !isEventExpanded(event.toolCallId)"
                         class="action-summary">{{ getThinkingSummary(event) }}</span>
                     </div>
                   </div>
-                  <div v-if="event.tool_data?.thought && isEventExpanded(event.tool_call_id)" class="action-details">
+                  <div v-if="event.tool_data?.thought && isEventExpanded(event.toolCallId)" class="action-details">
                     <div class="thinking-detail-content markdown-content">
                       <div v-html="renderMarkdownContent(event.tool_data.thought)"></div>
                     </div>
@@ -112,26 +112,26 @@
               </div>
 
               <!-- MCP tool human approval (issue #1173) -->
-              <div v-else-if="event.type === 'tool_approval_required'" class="tool-event">
-                <ToolApprovalCard :pending-id="event.pending_id" :service-name="event.service_name || ''"
-                  :mcp-tool-name="event.mcp_tool_name || ''" :description="event.description"
-                  :args-json="event.args_json" :timeout-seconds="event.timeout_seconds"
-                  :requested-at="event.requested_at" :resolved="event.resolved" :approved="event.approved"
+              <div v-else-if="event.type === 'toolApprovalRequired'" class="tool-event">
+                <ToolApprovalCard :pending-id="event.pendingId" :service-name="event.serviceName || ''"
+                  :mcp-tool-name="event.mcpToolName || ''" :description="event.description"
+                  :args-json="event.argsJson" :timeout-seconds="event.timeoutSeconds"
+                  :requested-at="event.requestedAtUnix" :resolved="event.resolved" :approved="event.approved"
                   :resolve-reason="event.resolve_reason" v-bind="embedAuthProps" />
               </div>
 
               <!-- MCP OAuth in-conversation authorization prompt -->
-              <div v-else-if="event.type === 'mcp_oauth_required'" class="tool-event">
-                <McpOAuthCard :pending-id="event.pending_id" :service-id="event.service_id || ''"
-                  :service-name="event.service_name || ''" :mcp-tool-name="event.mcp_tool_name || ''"
-                  :timeout-seconds="event.timeout_seconds" :requested-at="event.requested_at"
+              <div v-else-if="event.type === 'mcpOauthRequired'" class="tool-event">
+                <McpOAuthCard :pending-id="event.pendingId" :service-id="event.serviceId || ''"
+                  :service-name="event.serviceName || ''" :mcp-tool-name="event.mcpToolName || ''"
+                  :timeout-seconds="event.timeoutSeconds" :requested-at="event.requestedAtUnix"
                   :resolved="event.resolved" :authorized="event.authorized"
-                  :resolve-reason="event.resolve_reason" :timed-out="event.timed_out" :canceled="event.canceled"
+                  :resolve-reason="event.resolve_reason" :timed-out="event.timedOut" :canceled="event.canceled"
                   v-bind="embedAuthProps" />
               </div>
 
               <!-- Tool Call Event (non-thinking) -->
-              <div v-else-if="event.type === 'tool_call'" class="tool-event">
+              <div v-else-if="event.type === 'toolCall'" class="tool-event">
                 <div class="action-card" :class="{
                   'action-pending': event.pending,
                   'action-error': event.success === false,
@@ -146,9 +146,9 @@
                   <div class="action-header" @click.stop="handleActionHeaderClick(event)"
                     :class="{ 'no-results': !hasActionResult(event) }">
                     <div class="action-title">
-                      <t-icon v-if="event.tool_name" class="action-title-icon"
-                        :name="getToolIconName(event.tool_name)" />
-                      <t-tooltip v-if="event.tool_name === 'todo_write' && event.tool_data?.steps"
+                      <t-icon v-if="event.toolName" class="action-title-icon"
+                        :name="getToolIconName(event.toolName)" />
+                      <t-tooltip v-if="event.toolName === 'todo_write' && event.tool_data?.steps"
                         :content="t('agent.updatePlan')" placement="top">
                         <span class="action-name">{{ $t('agent.updatePlan') }}</span>
                       </t-tooltip>
@@ -158,7 +158,7 @@
                     </div>
                   </div>
 
-                  <div v-if="!event.pending && event.tool_name === 'todo_write' && event.tool_data?.steps"
+                  <div v-if="!event.pending && event.toolName === 'todo_write' && event.tool_data?.steps"
                     class="plan-status-summary-fixed">
                     <div class="plan-status-text">
                       <template v-for="(part, partIndex) in getPlanStatusItems(event)" :key="partIndex">
@@ -170,34 +170,34 @@
                   </div>
 
                   <div
-                    v-if="!event.pending && (event.tool_name === 'search_knowledge' || event.tool_name === 'knowledge_search') && event.tool_data"
+                    v-if="!event.pending && (event.toolName === 'search_knowledge' || event.toolName === 'knowledge_search') && event.tool_data"
                     class="search-results-summary-fixed">
                     <div class="results-summary-text" v-html="getSearchResultsSummary(event)"></div>
                   </div>
 
-                  <div v-if="!event.pending && event.tool_name === 'web_search' && event.tool_data"
+                  <div v-if="!event.pending && event.toolName === 'web_search' && event.tool_data"
                     class="search-results-summary-fixed">
                     <div class="results-summary-text"
                       v-html="t('agent.webSearchFound', { count: getResultsCount(event.tool_data) })">
                     </div>
                   </div>
 
-                  <div v-if="!event.pending && event.tool_name === 'grep_chunks' && event.tool_data"
+                  <div v-if="!event.pending && event.toolName === 'grep_chunks' && event.tool_data"
                     class="search-results-summary-fixed grep-summary">
                     <div class="results-summary-text" v-html="getGrepResultsSummary(event.tool_data)"></div>
                   </div>
 
-                  <div v-if="!event.pending && event.tool_name === 'list_knowledge_chunks' && event.tool_data"
+                  <div v-if="!event.pending && event.toolName === 'list_knowledge_chunks' && event.tool_data"
                     class="search-results-summary-fixed knowledge-chunks-summary">
                     <div class="results-summary-text" v-html="getKnowledgeChunksSummary(event.tool_data)"></div>
                   </div>
 
-                  <div v-if="!event.pending && event.tool_name === 'attachment_parsing'"
+                  <div v-if="!event.pending && event.toolName === 'attachment_parsing'"
                     class="search-results-summary-fixed attachment-parsing-summary">
                     <div class="results-summary-text" v-html="getAttachmentParsingSummary(event)"></div>
                   </div>
 
-                    <div v-if="isEventExpanded(event.tool_call_id) && !event.pending && hasExpandableResults(event)"
+                    <div v-if="isEventExpanded(event.toolCallId) && !event.pending && hasExpandableResults(event)"
                     class="action-details">
                     <div v-if="resolveToolDisplayType(event)" class="tool-result-wrapper">
                       <ToolResultRenderer :display-type="resolveToolDisplayType(event)" :tool-data="event.tool_data"
@@ -272,9 +272,9 @@
             </div>
 
             <!-- Context Compaction -->
-            <div v-if="event.type === 'context_compacted'" class="tool-event">
+            <div v-if="event.type === 'contextCompacted'" class="tool-event">
               <div class="action-card">
-                <div class="action-header" @click="toggleEvent(event.event_id)">
+                <div class="action-header" @click="toggleEvent(event.eventId)">
                   <div class="action-title">
                     <span class="action-title-icon icon-mask" :style="maskIconStyle(compactionIcon)"
                       aria-hidden="true" />
@@ -282,7 +282,7 @@
                     <span class="action-summary">{{ compactionSummaryText(event) }}</span>
                   </div>
                 </div>
-                <div v-if="event.summary && isEventExpanded(event.event_id)" class="action-details">
+                <div v-if="event.summary && isEventExpanded(event.eventId)" class="action-details">
                   <div class="thinking-detail-content markdown-content">
                     <div v-html="renderMarkdownContent(event.summary)"></div>
                   </div>
@@ -295,22 +295,22 @@
              the expandable body. -->
             <div v-if="event.type === 'thinking'" class="tool-event">
               <div class="action-card thinking-event-card"
-                :class="{ 'action-pending': isThinkingActive(event.event_id) }">
-                <div class="action-header" @click="toggleEvent(event.event_id)">
+                :class="{ 'action-pending': isThinkingActive(event.eventId) }">
+                <div class="action-header" @click="toggleEvent(event.eventId)">
                   <div class="action-title" :class="{
-                    'thinking-inline-title': !event.title && isEventExpanded(event.event_id),
+                    'thinking-inline-title': !event.title && isEventExpanded(event.eventId),
                   }">
                     <span class="action-title-icon icon-mask" :style="maskIconStyle(thinkingIcon)" aria-hidden="true" />
                     <span v-if="event.title" class="action-name action-preamble-title">{{ event.title }}</span>
-                    <div v-else-if="event.content && isEventExpanded(event.event_id)"
+                    <div v-else-if="event.content && isEventExpanded(event.eventId)"
                       class="thinking-inline-content markdown-content">
                       <div class="thinking-inline-markdown" v-html="renderMarkdownContent(event.content)"></div>
                     </div>
-                    <span v-else-if="getThinkingSummary(event) && !isEventExpanded(event.event_id)"
+                    <span v-else-if="getThinkingSummary(event) && !isEventExpanded(event.eventId)"
                       class="action-summary">{{ getThinkingSummary(event) }}</span>
                   </div>
                 </div>
-                <div v-if="event.title && event.content && isEventExpanded(event.event_id)" class="action-details">
+                <div v-if="event.title && event.content && isEventExpanded(event.eventId)" class="action-details">
                   <div class="thinking-detail-content markdown-content">
                     <div v-html="renderMarkdownContent(event.content)"></div>
                   </div>
@@ -319,37 +319,37 @@
             </div>
 
             <!-- MCP tool human approval -->
-            <div v-else-if="event.type === 'tool_approval_required'" class="tool-event">
-              <ToolApprovalCard :pending-id="event.pending_id" :service-name="event.service_name || ''"
-                :mcp-tool-name="event.mcp_tool_name || ''" :description="event.description" :args-json="event.args_json"
-                :timeout-seconds="event.timeout_seconds" :requested-at="event.requested_at" :resolved="event.resolved"
+            <div v-else-if="event.type === 'toolApprovalRequired'" class="tool-event">
+              <ToolApprovalCard :pending-id="event.pendingId" :service-name="event.serviceName || ''"
+                :mcp-tool-name="event.mcpToolName || ''" :description="event.description" :args-json="event.argsJson"
+                :timeout-seconds="event.timeoutSeconds" :requested-at="event.requestedAtUnix" :resolved="event.resolved"
                 :approved="event.approved" :resolve-reason="event.resolve_reason" v-bind="embedAuthProps" />
             </div>
 
             <!-- MCP OAuth in-conversation authorization prompt -->
-            <div v-else-if="event.type === 'mcp_oauth_required'" class="tool-event">
-              <McpOAuthCard :pending-id="event.pending_id" :service-id="event.service_id || ''"
-                :service-name="event.service_name || ''" :mcp-tool-name="event.mcp_tool_name || ''"
-                :timeout-seconds="event.timeout_seconds" :requested-at="event.requested_at" :resolved="event.resolved"
-                :authorized="event.authorized" :resolve-reason="event.resolve_reason" :timed-out="event.timed_out"
+            <div v-else-if="event.type === 'mcpOauthRequired'" class="tool-event">
+              <McpOAuthCard :pending-id="event.pendingId" :service-id="event.serviceId || ''"
+                :service-name="event.serviceName || ''" :mcp-tool-name="event.mcpToolName || ''"
+                :timeout-seconds="event.timeoutSeconds" :requested-at="event.requestedAtUnix" :resolved="event.resolved"
+                :authorized="event.authorized" :resolve-reason="event.resolve_reason" :timed-out="event.timedOut"
                 :canceled="event.canceled" v-bind="embedAuthProps" />
             </div>
 
             <!-- Thinking Tool Call -->
-            <div v-else-if="event.type === 'tool_call' && event.tool_name === 'thinking'" class="tool-event">
+            <div v-else-if="event.type === 'toolCall' && event.toolName === 'thinking'" class="tool-event">
               <div class="action-card"
-                :class="{ 'action-pending': event.pending || isThinkingActive(event.tool_call_id) }">
-                <div class="action-header" @click="toggleEvent(event.tool_call_id)">
+                :class="{ 'action-pending': event.pending || isThinkingActive(event.toolCallId) }">
+                <div class="action-header" @click="toggleEvent(event.toolCallId)">
                   <div class="action-title">
                     <span class="action-title-icon icon-mask" :style="maskIconStyle(thinkingIcon)" aria-hidden="true" />
                     <span class="action-name">{{ $t('agent.think') }}</span>
                     <span v-if="event.tool_data?.thoughtNumber" class="action-badge">{{ event.tool_data.thoughtNumber
                     }}/{{ event.tool_data.totalThoughts }}</span>
-                    <span v-if="getThinkingSummary(event) && !isEventExpanded(event.tool_call_id)"
+                    <span v-if="getThinkingSummary(event) && !isEventExpanded(event.toolCallId)"
                       class="action-summary">{{ getThinkingSummary(event) }}</span>
                   </div>
                 </div>
-                <div v-if="event.tool_data?.thought && isEventExpanded(event.tool_call_id)" class="action-details">
+                <div v-if="event.tool_data?.thought && isEventExpanded(event.toolCallId)" class="action-details">
                   <div class="thinking-detail-content markdown-content">
                     <div v-html="renderMarkdownContent(event.tool_data.thought)"></div>
                   </div>
@@ -386,7 +386,7 @@
                   </t-button>
                   <span v-if="hasArtifacts" class="answer-toolbar__artifact-count" aria-hidden="true">{{ artifactCount }}</span>
                 </span>
-                <t-tooltip v-if="event.is_fallback" :content="$t('chat.fallbackHint')" placement="top">
+                <t-tooltip v-if="event.isFallback" :content="$t('chat.fallbackHint')" placement="top">
                   <t-button size="small" variant="outline" shape="round" class="fallback-icon-btn">
                     <t-icon name="info-circle" />
                   </t-button>
@@ -404,7 +404,7 @@
             </div>
 
             <!-- Tool Call Event (non-thinking) -->
-            <div v-else-if="event.type === 'tool_call'" class="tool-event">
+            <div v-else-if="event.type === 'toolCall'" class="tool-event">
               <div class="action-card" :class="{
                 'action-pending': event.pending,
                 'action-error': event.success === false,
@@ -419,8 +419,8 @@
                 <div class="action-header" @click.stop="handleActionHeaderClick(event)"
                   :class="{ 'no-results': !hasActionResult(event) }">
                   <div class="action-title">
-                    <t-icon v-if="event.tool_name" class="action-title-icon" :name="getToolIconName(event.tool_name)" />
-                    <t-tooltip v-if="event.tool_name === 'todo_write' && event.tool_data?.steps"
+                    <t-icon v-if="event.toolName" class="action-title-icon" :name="getToolIconName(event.toolName)" />
+                    <t-tooltip v-if="event.toolName === 'todo_write' && event.tool_data?.steps"
                       :content="t('agent.updatePlan')" placement="top">
                       <span class="action-name">
                         {{ $t('agent.updatePlan') }}
@@ -432,7 +432,7 @@
                   </div>
                 </div>
 
-                <div v-if="!event.pending && event.tool_name === 'todo_write' && event.tool_data?.steps"
+                <div v-if="!event.pending && event.toolName === 'todo_write' && event.tool_data?.steps"
                   class="plan-status-summary-fixed">
                   <div class="plan-status-text">
                     <template v-for="(part, partIndex) in getPlanStatusItems(event)" :key="partIndex">
@@ -444,34 +444,34 @@
                 </div>
 
                 <div
-                  v-if="!event.pending && (event.tool_name === 'search_knowledge' || event.tool_name === 'knowledge_search') && event.tool_data"
+                  v-if="!event.pending && (event.toolName === 'search_knowledge' || event.toolName === 'knowledge_search') && event.tool_data"
                   class="search-results-summary-fixed">
                   <div class="results-summary-text" v-html="getSearchResultsSummary(event)"></div>
                 </div>
 
-                <div v-if="!event.pending && event.tool_name === 'web_search' && event.tool_data"
+                <div v-if="!event.pending && event.toolName === 'web_search' && event.tool_data"
                   class="search-results-summary-fixed">
                   <div class="results-summary-text"
                     v-html="t('agent.webSearchFound', { count: getResultsCount(event.tool_data) })">
                   </div>
                 </div>
 
-                <div v-if="!event.pending && event.tool_name === 'grep_chunks' && event.tool_data"
+                <div v-if="!event.pending && event.toolName === 'grep_chunks' && event.tool_data"
                   class="search-results-summary-fixed grep-summary">
                   <div class="results-summary-text" v-html="getGrepResultsSummary(event.tool_data)"></div>
                 </div>
 
-                <div v-if="!event.pending && event.tool_name === 'list_knowledge_chunks' && event.tool_data"
+                <div v-if="!event.pending && event.toolName === 'list_knowledge_chunks' && event.tool_data"
                   class="search-results-summary-fixed knowledge-chunks-summary">
                   <div class="results-summary-text" v-html="getKnowledgeChunksSummary(event.tool_data)"></div>
                 </div>
 
-                <div v-if="!event.pending && event.tool_name === 'attachment_parsing'"
+                <div v-if="!event.pending && event.toolName === 'attachment_parsing'"
                   class="search-results-summary-fixed attachment-parsing-summary">
                   <div class="results-summary-text" v-html="getAttachmentParsingSummary(event)"></div>
                 </div>
 
-                <div v-if="isEventExpanded(event.tool_call_id) && !event.pending && hasExpandableResults(event)"
+                <div v-if="isEventExpanded(event.toolCallId) && !event.pending && hasExpandableResults(event)"
                   class="action-details">
                   <div v-if="resolveToolDisplayType(event)" class="tool-result-wrapper">
                     <ToolResultRenderer :display-type="resolveToolDisplayType(event)" :tool-data="event.tool_data"
@@ -691,7 +691,7 @@ const getLocalizedToolName = (toolName?: string | null): string => {
 
 /**
  * Format MCP tool name for friendly display.
- * Input:  "mcp_{service_name}_{tool_name}" (all lowercase, underscores)
+ * Input:  "mcp_{serviceName}_{toolName}" (all lowercase, underscores)
  * Output: "Service Name: tool name"
  */
 const formatMCPToolName = (rawName: string): string => {
@@ -876,7 +876,7 @@ import compactionIcon from '@/assets/img/context-compaction.svg';
 
 interface SessionData {
   id?: string;
-  assistant_message_id?: string;
+  assistantMessageId?: string;
   requestId?: string;
   debugRequest?: Record<string, unknown>;
   isAgentMode?: boolean;
@@ -926,7 +926,7 @@ const {
 } = useChatMemoryRow(() => props.session?.usedMemories as UsedMemory[] | undefined);
 
 const resolveAssistantMessageId = (session?: SessionData) =>
-  String(session?.assistant_message_id || session?.id || '').trim();
+  String(session?.assistantMessageId || session?.id || '').trim();
 
 // Agent answers embed exported charts and knowledge-base images as
 // `resource://` handles. Embed visitors use the channel-scoped proxy. Logged-in
@@ -944,7 +944,7 @@ const protectedFileAccess = computed<ProtectedFileAccessContext | undefined>(() 
 });
 
 // Re-hydrate when the message authorization anchor becomes available or is
-// corrected (e.g. requestId → persisted assistant_message_id after agent_query).
+// corrected (e.g. requestId → persisted assistantMessageId after agentQuery).
 watch(
   () => {
     const access = protectedFileAccess.value;
@@ -1022,7 +1022,7 @@ const getReferencesForDrawer = (
   if (messageReferences?.length) return messageReferences;
 
   // Agent answers can already contain citation tags before the aggregated
-  // knowledge_references event is emitted (and some restored conversations do
+  // knowledgeReferences event is emitted (and some restored conversations do
   // not have that aggregate at all). The completed retrieval tool events still
   // carry the same source data, so use them to keep citation clicks in the
   // references drawer instead of falling through to KB-page navigation.
@@ -1106,7 +1106,7 @@ const formatToolResultContent = (value: unknown): string => {
 const isMcpTool = (toolName?: string | null): boolean => String(toolName || '').startsWith('mcp_');
 
 const resolveToolDisplayType = (event: any): DisplayType | undefined => {
-  const mcpType = getMcpToolDisplayType(event?.tool_name)
+  const mcpType = getMcpToolDisplayType(event?.toolName)
   if (mcpType) return mcpType
   if (event?.displayType) return event.displayType as DisplayType
   return undefined
@@ -1175,11 +1175,11 @@ const buildToolResultReference = (
   content: string,
 ): KnowledgeReferenceLike[] => {
   if (!content) return [];
-  const toolName = String(event.tool_name || '');
+  const toolName = String(event.toolName || '');
   const title = getToolTitle(event);
   return [{
-    id: event.tool_call_id || toolName,
-    chunkType: 'tool_result',
+    id: event.toolCallId || toolName,
+    chunkType: 'toolResult',
     knowledgeTitle: title,
     content,
     metadata: {
@@ -1192,7 +1192,7 @@ const buildToolResultReference = (
 
 function getToolReferenceItems(event: any): KnowledgeReferenceLike[] {
   if (!event || event.pending) return [];
-  const toolName = event.tool_name;
+  const toolName = event.toolName;
   const toolData = event.tool_data;
 
   if (isMcpTool(toolName)) {
@@ -1207,10 +1207,10 @@ function getToolReferenceItems(event: any): KnowledgeReferenceLike[] {
   if (!toolData) return [];
 
   if (toolName === 'wiki_search' || toolName === 'wiki_read_page') {
-    return parseWikiToolReferences(toolName, event.output, event.tool_call_id || toolName)
+    return parseWikiToolReferences(toolName, event.output, event.toolCallId || toolName)
       .map((item) => ({
         id: item.id,
-        chunkType: 'tool_result',
+        chunkType: 'toolResult',
         knowledgeTitle: item.title,
         content: item.content,
         metadata: {
@@ -1331,7 +1331,7 @@ function getToolReferenceItems(event: any): KnowledgeReferenceLike[] {
     const output = cleanToolOutputContent(event.output);
     if (!output) return [];
     return [{
-      id: toolData.faqId || toolData.knowledgeId || event.tool_call_id,
+      id: toolData.faqId || toolData.knowledgeId || event.toolCallId,
       knowledgeId: toolData.knowledgeId,
       knowledgeTitle: toolData.faqQuestion || toolData.knowledgeTitle || toolData.knowledgeId || getToolDescription(event),
       knowledgeBaseId: toolData.knowledgeBaseId,
@@ -1352,7 +1352,7 @@ const openToolReferences = (event: any): boolean => {
     references: refs,
     highlight: null,
     messageId: props.session?.id,
-    sourceKey: `tool:${props.session?.id || 'session'}:${event.tool_call_id || event.event_id || event.tool_name || 'references'}`,
+    sourceKey: `tool:${props.session?.id || 'session'}:${event.toolCallId || event.eventId || event.toolName || 'references'}`,
   });
   return true;
 };
@@ -1390,8 +1390,8 @@ watch(eventStream, (stream) => {
     if (!event) continue;
 
     const isThinking = event.type === 'thinking' ||
-      (event.type === 'tool_call' && event.tool_name === 'thinking');
-    const id = event.type === 'thinking' ? event.event_id : event.tool_call_id;
+      (event.type === 'toolCall' && event.toolName === 'thinking');
+    const id = event.type === 'thinking' ? event.eventId : event.toolCallId;
 
     if (inTrailingThinking && isThinking && id) {
       newActiveIds.add(id);
@@ -1468,11 +1468,11 @@ const agentDurationMs = ref<number>(0);
 watch(eventStream, (stream) => {
   if (!stream || !Array.isArray(stream)) return;
 
-  // Check for agent_complete event with authoritative duration from backend
+  // Check for agentComplete event with authoritative duration from backend
   if (agentDurationMs.value === 0) {
-    const completeEvent = stream.find((e: any) => e.type === 'agent_complete' && e.total_duration_ms);
+    const completeEvent = stream.find((e: any) => e.type === 'agentComplete' && e.totalDurationMs);
     if (completeEvent) {
-      agentDurationMs.value = completeEvent.total_duration_ms;
+      agentDurationMs.value = completeEvent.totalDurationMs;
     }
   }
 }, { deep: true, immediate: true });
@@ -1585,11 +1585,11 @@ const hasPendingStreamingActivity = computed(() => {
     if (event.pending === true) return true;
     if (
       event.type === 'thinking' &&
-      (event.thinking === true || isThinkingActive(event.event_id))
+      (event.thinking === true || isThinkingActive(event.eventId))
     ) {
       return true;
     }
-    return event.type === 'tool_approval_required' || event.type === 'mcp_oauth_required';
+    return event.type === 'toolApprovalRequired' || event.type === 'mcpOauthRequired';
   });
 });
 
@@ -1677,7 +1677,7 @@ const finalContent = computed(() => {
     const doneAnswer = answerEvents.find((e: any) => e.done === true);
     return {
       type: 'thinking',
-      event_id: lastThinking.event_id,
+      eventId: lastThinking.eventId,
       showAnswerToolbar: !!doneAnswer
     };
   }
@@ -1688,9 +1688,9 @@ const finalContent = computed(() => {
 // Count intermediate steps (after merging consecutive thinking events, matching what user sees in tree)
 const intermediateStepsCount = computed(() => {
   if (!hasAnswerStarted.value && !isSegmentDone.value) return 0;
-  // Count only thinking and tool_call events (exclude plan_task_change, etc.)
+  // Count only thinking and toolCall events (exclude plan_task_change, etc.)
   return intermediateEvents.value.filter(
-    (e: any) => e.type === 'thinking' || e.type === 'tool_call'
+    (e: any) => e.type === 'thinking' || e.type === 'toolCall'
   ).length;
 });
 
@@ -1705,7 +1705,7 @@ const reasoningRoundsCount = computed(() => {
 
 const toolCallsCount = computed(() => {
   if (!hasAnswerStarted.value && !isSegmentDone.value) return 0;
-  return intermediateEvents.value.filter((e: any) => e.type === 'tool_call').length;
+  return intermediateEvents.value.filter((e: any) => e.type === 'toolCall').length;
 });
 
 const intermediateStepsSummary = computed(() => {
@@ -1768,14 +1768,14 @@ const memoryIsLast = computed(
 // Check if event is a "deep thinking" type (either streaming thinking or thinking tool call)
 const isThinkingLikeEvent = (event: any): boolean => {
   if (event.type === 'thinking') return true;
-  if (event.type === 'tool_call' && event.tool_name === 'thinking') return true;
+  if (event.type === 'toolCall' && event.toolName === 'thinking') return true;
   return false;
 };
 
 // Extract thinking content from an event
 const getThinkingContent = (event: any): string => {
   if (event.type === 'thinking') return event.content || '';
-  if (event.type === 'tool_call' && event.tool_name === 'thinking') {
+  if (event.type === 'toolCall' && event.toolName === 'thinking') {
     return event.tool_data?.thought || event.output || '';
   }
   return '';
@@ -1804,13 +1804,13 @@ const buildFullEventList = (stream: any[]) => {
 
   for (let i = 0; i < validStream.length; i++) {
     const event = validStream[i];
-    if (event.type === 'tool_call' && event.tool_name === 'todo_write' && event.tool_data?.task) {
+    if (event.type === 'toolCall' && event.toolName === 'todo_write' && event.tool_data?.task) {
       const currentTask = event.tool_data.task;
       if (lastTask === null || currentTask !== lastTask) {
         result.push({
           type: 'plan_task_change',
           task: currentTask,
-          event_id: `plan-task-change-${event.tool_call_id || i}`,
+          eventId: `plan-task-change-${event.toolCallId || i}`,
           timestamp: event.timestamp || Date.now()
         });
       }
@@ -1824,7 +1824,7 @@ const buildFullEventList = (stream: any[]) => {
         const prevContent = prev._mergedContent || getThinkingContent(prev);
         const curContent = getThinkingContent(event);
 
-        // Deduplicate: when a tool_call thinking event's thought content was
+        // Deduplicate: when a toolCall thinking event's thought content was
         // already delivered via streaming thinking events (same text), skip it.
         if (curContent && prevContent && prevContent.includes(curContent)) {
           continue;
@@ -1833,7 +1833,7 @@ const buildFullEventList = (stream: any[]) => {
           // Current fully contains previous — replace instead of appending
           result[result.length - 1] = {
             type: 'thinking',
-            event_id: prev.event_id,
+            eventId: prev.eventId,
             content: curContent,
             thinking: prev.thinking || event.thinking,
             timestamp: prev.timestamp,
@@ -1846,7 +1846,7 @@ const buildFullEventList = (stream: any[]) => {
         const merged = [prevContent, curContent].filter(Boolean).join('\n\n');
         result[result.length - 1] = {
           type: 'thinking',
-          event_id: prev.event_id,
+          eventId: prev.eventId,
           content: merged,
           thinking: prev.thinking || event.thinking,
           timestamp: prev.timestamp,
@@ -1878,7 +1878,7 @@ const buildFullEventList = (stream: any[]) => {
       // rounds). Rounds with reasoning_content merge preamble into prev.title.
       folded.push({
         type: 'thinking',
-        event_id: e.event_id,
+        eventId: e.eventId,
         title: preambleText,
         content: '',
         thinking: false,
@@ -1891,7 +1891,7 @@ const buildFullEventList = (stream: any[]) => {
 
   // Drop thinking cards that are entirely empty (no title and no body). Some
   // models emit "\n\n" before a tool call (e.g. qwen3 blank lines between
-  // [assistant] and tool_calls), which would otherwise show an empty "思考"
+  // [assistant] and toolCalls), which would otherwise show an empty "思考"
   // card. Keep cards that carry a title (a relocated preamble) even with no
   // reasoning body.
   return folded.filter((e: any) => {
@@ -1924,8 +1924,8 @@ const hiddenThinkingEventIds = computed<Set<string>>(() => {
     const hasRealAnswer = stream.some(
       (e: any) => e.type === 'answer' && !e.superseded && e.content && e.content.trim()
     );
-    if (!hasRealAnswer && final.event_id) {
-      hidden.add(final.event_id);
+    if (!hasRealAnswer && final.eventId) {
+      hidden.add(final.eventId);
     }
   }
 
@@ -1941,8 +1941,8 @@ const hiddenThinkingEventIds = computed<Set<string>>(() => {
   if (answerContent.trim()) {
     const merged = buildFullEventList(stream);
     for (const e of merged) {
-      if (e.type !== 'thinking' || !e.event_id) continue;
-      if (hidden.has(e.event_id)) continue;
+      if (e.type !== 'thinking' || !e.eventId) continue;
+      if (hidden.has(e.eventId)) continue;
       // Hide a step card that duplicates the final answer. Match the body, or a
       // title-only card (a relocated preamble) whose title equals the answer —
       // but keep cards that still carry a distinct reasoning body so the
@@ -1951,7 +1951,7 @@ const hiddenThinkingEventIds = computed<Set<string>>(() => {
       const titleOnlyMatches = e.title && !(e.content && e.content.trim()) &&
         thinkingEqualsAnswer(e.title, answerContent);
       if (bodyMatches || titleOnlyMatches) {
-        hidden.add(e.event_id);
+        hidden.add(e.eventId);
       }
     }
   }
@@ -1970,12 +1970,12 @@ const intermediateEvents = computed(() => {
   const result = buildFullEventList(stream);
   const hidden = hiddenThinkingEventIds.value;
   return result.filter((e: any) => {
-    if (e.type === 'answer' || e.type === 'agent_complete') return false;
+    if (e.type === 'answer' || e.type === 'agentComplete') return false;
     // Mid-run injected user messages render as normal user bubbles in the
     // message list, not inside the steps tree — the tree template has no
     // branch for this type and would otherwise emit an empty node.
-    if (e.type === 'user_message_injected') return false;
-    if (e.type === 'thinking' && e.event_id && hidden.has(e.event_id)) return false;
+    if (e.type === 'userMessageInjected') return false;
+    if (e.type === 'thinking' && e.eventId && hidden.has(e.eventId)) return false;
     return true;
   });
 });
@@ -1996,7 +1996,7 @@ const displayEvents = computed(() => {
     // Injected user messages render as normal user bubbles in the message
     // list — never inside the agent timeline (the template has no branch for
     // the type and would render an empty card).
-    (e: any) => e.type !== 'user_message_injected',
+    (e: any) => e.type !== 'userMessageInjected',
   );
 
   // Embed channels can hide all intermediate agent activity from visitors
@@ -2027,7 +2027,7 @@ const displayEvents = computed(() => {
     return answerEvents;
   }
 
-  // If the intermediate-steps tree is active, all thinking/tool_call events
+  // If the intermediate-steps tree is active, all thinking/toolCall events
   // are already rendered there. Showing anything else here would duplicate
   // them. This covers both the user-stopped case and any completion path
   // that didn't produce an answer event.
@@ -2052,12 +2052,12 @@ const displayEvents = computed(() => {
     // event was removed from `result`, but its content is the final answer
     // here, not reasoning, and must still be promoted.
     const thinking = fullList.find((e: any) =>
-      e.type === 'thinking' && e.event_id === final.event_id
+      e.type === 'thinking' && e.eventId === final.eventId
     );
     if (!thinking || !thinking.content) return result;
     return [{
       type: 'answer',
-      event_id: thinking.event_id,
+      eventId: thinking.eventId,
       content: thinking.content,
       done: true,
       _promoted_from_thinking: true,
@@ -2070,13 +2070,13 @@ const displayEvents = computed(() => {
 // Get unique key for event
 const getEventKey = (event: any, index: number): string => {
   if (!event) return `event-${index}`;
-  if (event.event_id) return `event-${event.event_id}`;
-  if (event.tool_call_id) return `tool-${event.tool_call_id}`;
-  if (event.type === 'tool_approval_required' && event.pending_id) {
-    return `approval-${event.pending_id}`;
+  if (event.eventId) return `event-${event.eventId}`;
+  if (event.toolCallId) return `tool-${event.toolCallId}`;
+  if (event.type === 'toolApprovalRequired' && event.pendingId) {
+    return `approval-${event.pendingId}`;
   }
-  if (event.type === 'mcp_oauth_required' && event.pending_id) {
-    return `mcp-oauth-${event.pending_id}`;
+  if (event.type === 'mcpOauthRequired' && event.pendingId) {
+    return `mcp-oauth-${event.pendingId}`;
   }
   return `event-${index}-${event.type || 'unknown'}`;
 };
@@ -2103,8 +2103,8 @@ const handleActionHeaderClick = (event: any) => {
     openToolReferences(event);
     return;
   }
-  if (hasExpandableResults(event) && event.tool_call_id) {
-    toggleEvent(event.tool_call_id);
+  if (hasExpandableResults(event) && event.toolCallId) {
+    toggleEvent(event.toolCallId);
   }
 };
 
@@ -2132,7 +2132,7 @@ const isReferenceDrawerTool = (toolName?: string | null): boolean =>
   toolName === 'wiki_read_source_doc';
 
 const hasExpandableResults = (event: any): boolean => {
-  if (isReferenceDrawerTool(event?.tool_name)) return false;
+  if (isReferenceDrawerTool(event?.toolName)) return false;
   return hasResults(event);
 };
 
@@ -2142,7 +2142,7 @@ const hasActionResult = (event: any): boolean => canOpenToolReferences(event) ||
 const hasResults = (event: any): boolean => {
   if (!event || !event.tool_data) return true; // Default to true for other tools
 
-  const toolName = event.tool_name;
+  const toolName = event.toolName;
 
   // For knowledge search tools
   if (toolName === 'search_knowledge' || toolName === 'knowledge_search') {
@@ -2225,7 +2225,7 @@ const getKbIdForWiki = (slug: string): string => {
     for (let i = props.session.agentEventStream.length - 1; i >= 0; i--) {
       const event = props.session.agentEventStream[i];
       const foundKbs = event?.tool_data?.foundKbs;
-      if (event.type === 'tool_call' && foundKbs) {
+      if (event.type === 'toolCall' && foundKbs) {
         const hit = pickKbId(foundKbs[slug]);
         if (hit) return hit;
       }
@@ -2546,7 +2546,7 @@ const renderMermaidDiagrams = async () => {
 const getToolSummary = (event: any): string => {
   if (!event || event.pending || !event.success) return '';
 
-  const toolName = event.tool_name;
+  const toolName = event.toolName;
   const toolData = event.tool_data;
 
   // For search tools, don't return summary here - it will be displayed in SearchResults component
@@ -2656,8 +2656,8 @@ const getPlanStatusSummary = (event: any): string => {
  * see verbatim.
  */
 const compactionSummaryText = (event: any): string => {
-  const before = Number(event?.tokens_before) || 0;
-  const after = Number(event?.tokens_after) || 0;
+  const before = Number(event?.tokensBefore) || 0;
+  const after = Number(event?.tokensAfter) || 0;
   const parts: string[] = [];
   if (before > 0 && after > 0) {
     parts.push(
@@ -2748,20 +2748,20 @@ const getToolTitle = (event: any): string => {
   const mcpTitle = getMcpToolTitle(t, event)
   if (mcpTitle) return mcpTitle
   if (event.pending) {
-    if (event.tool_name === 'image_analysis') {
+    if (event.toolName === 'image_analysis') {
       return t('agentStream.toolStatus.imageAnalyzing');
     }
-    if (event.tool_name === 'attachment_parsing') {
+    if (event.toolName === 'attachment_parsing') {
       return t('agentStream.toolStatus.attachmentParsing');
     }
-    if (event.tool_name === 'wiki_search' || event.tool_name === 'wiki_read_page') {
-      return `${getLocalizedToolName(event.tool_name)}...`;
+    if (event.toolName === 'wiki_search' || event.toolName === 'wiki_read_page') {
+      return `${getLocalizedToolName(event.toolName)}...`;
     }
-    const localizedName = getLocalizedToolName(event.tool_name);
+    const localizedName = getLocalizedToolName(event.toolName);
     return t('agentStream.toolStatus.calling', { name: localizedName });
   }
 
-  const toolName = event.tool_name;
+  const toolName = event.toolName;
   const isSearchTool = toolName === 'search_knowledge' || toolName === 'knowledge_search' || toolName === 'wiki_search';
   const isWebSearchTool = toolName === 'web_search';
   const isGrepTool = toolName === 'grep_chunks';
@@ -2873,21 +2873,21 @@ const skillScriptCommandLabel = (event: any): string => {
 // Tool description
 const getToolDescription = (event: any): string => {
   if (event.pending) {
-    if (event.tool_name === 'image_analysis') {
+    if (event.toolName === 'image_analysis') {
       return t('agentStream.toolStatus.imageAnalyzing');
     }
-    if (event.tool_name === 'attachment_parsing') {
+    if (event.toolName === 'attachment_parsing') {
       return t('agentStream.toolStatus.attachmentParsing');
     }
-    if (event.tool_name === 'query_understand') {
+    if (event.toolName === 'query_understand') {
       return t('agentStream.toolStatus.queryUnderstanding');
     }
-    const localizedName = getLocalizedToolName(event.tool_name);
+    const localizedName = getLocalizedToolName(event.toolName);
     return t('agentStream.toolStatus.calling', { name: localizedName });
   }
 
   const success = event.success === true;
-  const toolName = event.tool_name;
+  const toolName = event.toolName;
 
   if (toolName === 'search_knowledge' || toolName === 'knowledge_search') {
     return success ? t('agentStream.toolStatus.searchKb') : t('agentStream.toolStatus.searchKbFailed');

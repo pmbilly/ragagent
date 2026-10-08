@@ -31,7 +31,7 @@ public final class PluginLoadHistory implements Plugin {
     public PluginError onEvent(String eventType, ChatManage chatManage, Plugin.Chain next) {
         if (chatManage.getMaxRounds() <= 0) {
             Map<String, Object> f = new LinkedHashMap<>();
-            f.put("session_id", chatManage.getSessionId());
+            f.put("sessionId", chatManage.getSessionId());
             f.put("reason", "multi_turn_disabled");
             PipelineLog.info("LoadHistory", "skipped", f);
             return next.next();
@@ -39,7 +39,7 @@ public final class PluginLoadHistory implements Plugin {
         int maxRounds = chatManage.getMaxRounds();
 
         Map<String, Object> in = new LinkedHashMap<>();
-        in.put("session_id", chatManage.getSessionId());
+        in.put("sessionId", chatManage.getSessionId());
         in.put("max_rounds", maxRounds);
         PipelineLog.info("LoadHistory", "input", in);
 
@@ -49,7 +49,7 @@ public final class PluginLoadHistory implements Plugin {
                     chatManage.getSessionId(), maxRounds, maxRounds * 2 + 10);
         } catch (RuntimeException e) {
             Map<String, Object> f = new LinkedHashMap<>();
-            f.put("session_id", chatManage.getSessionId());
+            f.put("sessionId", chatManage.getSessionId());
             f.put("error", e.getMessage());
             PipelineLog.warn("LoadHistory", "history_fetch", f);
             return next.next();
@@ -58,7 +58,7 @@ public final class PluginLoadHistory implements Plugin {
         chatManage.setHistory(historyList);
 
         Map<String, Object> out = new LinkedHashMap<>();
-        out.put("session_id", chatManage.getSessionId());
+        out.put("sessionId", chatManage.getSessionId());
         out.put("history_rounds", historyList == null ? 0 : historyList.size());
         out.put("max_rounds", maxRounds);
         PipelineLog.info("LoadHistory", "output", out);

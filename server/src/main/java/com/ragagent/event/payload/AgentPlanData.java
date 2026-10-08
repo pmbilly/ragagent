@@ -22,7 +22,7 @@ public class AgentPlanData {
     private List<String> plan;
 
     /** 0 省略 */
-    @JsonProperty("duration_ms")
+    @JsonProperty("durationMs")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private long durationMs;
 
@@ -51,6 +51,7 @@ public class AgentPlanData {
         this.plan = v;
     }
 
+    @JsonProperty("durationMs")
     public long getDurationMs() {
         return durationMs;
     }

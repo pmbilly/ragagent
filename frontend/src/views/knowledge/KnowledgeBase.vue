@@ -237,7 +237,7 @@ const goToParserSettings = () => {
 // Permission control: check if current user owns this KB or has edit/manage permission
 //
 // "Owner" here is "the original creator of this KB" (PR 5 introduced
-// CreatorID). The previous version compared kb.tenant_id to the active
+// CreatorID). The previous version compared kb.tenantId to the active
 // tenant id, which only answers "is this KB inside our tenant" — that
 // is true even for a Viewer in someone else's tenant, so the gate
 // silently bypassed every role check below. Now we require an explicit

@@ -16,22 +16,22 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class AgentCompleteData {
 
-    @JsonProperty("session_id")
+    @JsonProperty("sessionId")
     private String sessionId = "";
 
-    @JsonProperty("total_steps")
+    @JsonProperty("totalSteps")
     private int totalSteps;
 
-    @JsonProperty("final_answer")
+    @JsonProperty("finalAnswer")
     private String finalAnswer = "";
 
     /** null 或空列表都省略 */
-    @JsonProperty("knowledge_refs")
+    @JsonProperty("knowledgeRefs")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<Object> knowledgeRefs;
 
     /** null 或空省略 */
-    @JsonProperty("agent_steps")
+    @JsonProperty("agentSteps")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Object agentSteps;
 
@@ -41,16 +41,16 @@ public class AgentCompleteData {
     private Object usage;
 
     /** 0 恒输出 */
-    @JsonProperty("total_duration_ms")
+    @JsonProperty("totalDurationMs")
     private long totalDurationMs;
 
     /** Assistant message ID；空串省略 */
-    @JsonProperty("message_id")
+    @JsonProperty("messageId")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private String messageId = "";
 
     /** 空串省略 */
-    @JsonProperty("request_id")
+    @JsonProperty("requestId")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private String requestId = "";
 
@@ -102,6 +102,7 @@ public class AgentCompleteData {
         this.finalAnswer = QueryData.orEmpty(v);
     }
 
+    @JsonProperty("knowledgeRefs")
     public List<Object> getKnowledgeRefs() {
         return knowledgeRefs;
     }
@@ -110,6 +111,7 @@ public class AgentCompleteData {
         this.knowledgeRefs = v;
     }
 
+    @JsonProperty("agentSteps")
     public Object getAgentSteps() {
         return agentSteps;
     }
@@ -118,6 +120,7 @@ public class AgentCompleteData {
         this.agentSteps = v;
     }
 
+    @JsonProperty("usage")
     public Object getUsage() {
         return usage;
     }
@@ -126,6 +129,7 @@ public class AgentCompleteData {
         this.usage = v;
     }
 
+    @JsonProperty("totalDurationMs")
     public long getTotalDurationMs() {
         return totalDurationMs;
     }
@@ -134,6 +138,7 @@ public class AgentCompleteData {
         this.totalDurationMs = v;
     }
 
+    @JsonProperty("messageId")
     public String getMessageId() {
         return messageId;
     }
@@ -142,6 +147,7 @@ public class AgentCompleteData {
         this.messageId = QueryData.orEmpty(v);
     }
 
+    @JsonProperty("requestId")
     public String getRequestId() {
         return requestId;
     }
@@ -150,6 +156,7 @@ public class AgentCompleteData {
         this.requestId = QueryData.orEmpty(v);
     }
 
+    @JsonProperty("extra")
     public Map<String, Object> getExtra() {
         return extra;
     }

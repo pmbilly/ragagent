@@ -123,10 +123,10 @@ final class QaSseOrchestrator {
     private void writeAgentQueryEvent(QaRequestContext reqCtx) {
         String assistantMessageId = reqCtx.assistantMessage == null ? "" : reqCtx.assistantMessage.getId();
         Map<String, Object> data = new LinkedHashMap<>();
-        data.put("session_id", reqCtx.sessionId);
-        data.put("assistant_message_id", assistantMessageId);
+        data.put("sessionId", reqCtx.sessionId);
+        data.put("assistantMessageId", assistantMessageId);
         if (!reqCtx.userMessageID.isEmpty()) {
-            data.put("user_message_id", reqCtx.userMessageID);
+            data.put("userMessageId", reqCtx.userMessageID);
         }
         if (reqCtx.userCreatedAt != null) {
             data.put("user_created_at", reqCtx.userCreatedAt.toInstant().toString());

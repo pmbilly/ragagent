@@ -208,7 +208,7 @@ public class Gate implements McpApproval, AutoCloseable {
                     ResponseType.TOOL_APPROVAL_REQUIRED,
                     req.sessionId(),
                     data,
-                    Map.of("assistant_message_id", req.assistantMessageId(), "pending_id", pendingId),
+                    Map.of("assistantMessageId", req.assistantMessageId(), "pending_id", pendingId),
                     req.requestId());
             try {
                 req.eventBus().emit(evt);
@@ -274,7 +274,7 @@ public class Gate implements McpApproval, AutoCloseable {
                     ResponseType.MCP_OAUTH_REQUIRED,
                     req.sessionId(),
                     data,
-                    Map.of("assistant_message_id", req.assistantMessageId(), "pending_id", pendingId),
+                    Map.of("assistantMessageId", req.assistantMessageId(), "pending_id", pendingId),
                     req.requestId());
             try {
                 req.eventBus().emit(evt);
@@ -529,7 +529,7 @@ public class Gate implements McpApproval, AutoCloseable {
                     req.sessionId(),
                     new ToolApprovalResolvedData(pendingId, d.approved(), d.reason(), d.timedOut(),
                             d.contextCanceled()),
-                    Map.of("assistant_message_id", req.assistantMessageId()),
+                    Map.of("assistantMessageId", req.assistantMessageId()),
                     req.requestId()));
         } catch (RuntimeException e) {
             log.warn("emit tool approval resolved failed (pending_id={}): {}", pendingId, e.toString());
@@ -545,7 +545,7 @@ public class Gate implements McpApproval, AutoCloseable {
                     req.sessionId(),
                     new McpOauthResolvedData(pendingId, req.serviceId(), d.approved(), d.reason(),
                             d.timedOut(), d.contextCanceled()),
-                    Map.of("assistant_message_id", req.assistantMessageId()),
+                    Map.of("assistantMessageId", req.assistantMessageId()),
                     req.requestId()));
         } catch (RuntimeException e) {
             log.warn("emit mcp oauth resolved failed (pending_id={}): {}", pendingId, e.toString());

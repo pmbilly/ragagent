@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class UserMessageInjectedData {
 
     /** 与排队的 steer 事件关联 */
-    @JsonProperty("steer_id")
+    @JsonProperty("steerId")
     private String steerId = "";
 
     /** 注入的文本（与发给模型的一致） */
@@ -23,11 +23,11 @@ public class UserMessageInjectedData {
     private String content = "";
 
     /** 该轮的持久 assistant 消息 ID */
-    @JsonProperty("message_id")
+    @JsonProperty("messageId")
     private String messageId = "";
 
     /** 空串省略 */
-    @JsonProperty("user_message_id")
+    @JsonProperty("userMessageId")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private String userMessageId = "";
 
@@ -66,6 +66,7 @@ public class UserMessageInjectedData {
         this.messageId = QueryData.orEmpty(v);
     }
 
+    @JsonProperty("userMessageId")
     public String getUserMessageId() {
         return userMessageId;
     }

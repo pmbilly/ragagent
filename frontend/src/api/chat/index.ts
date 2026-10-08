@@ -14,34 +14,34 @@ export async function getSessionsList(page: number, page_size: number, source?: 
   return get(`/api/v1/sessions?${params.toString()}`);
 }
 
-export async function pinSession(session_id: string) {
-  return post(`/api/v1/sessions/${session_id}/pin`, {});
+export async function pinSession(sessionId: string) {
+  return post(`/api/v1/sessions/${sessionId}/pin`, {});
 }
 
-export async function unpinSession(session_id: string) {
-  return del(`/api/v1/sessions/${session_id}/pin`);
+export async function unpinSession(sessionId: string) {
+  return del(`/api/v1/sessions/${sessionId}/pin`);
 }
 
-export async function generateSessionsTitle(session_id: string, data: any) {
-  return post(`/api/v1/sessions/${session_id}/generate_title`, data);
+export async function generateSessionsTitle(sessionId: string, data: any) {
+  return post(`/api/v1/sessions/${sessionId}/generate_title`, data);
 }
 
-export async function updateSession(session_id: string, data: { title: string; description?: string }) {
-  return put(`/api/v1/sessions/${session_id}`, data);
+export async function updateSession(sessionId: string, data: { title: string; description?: string }) {
+  return put(`/api/v1/sessions/${sessionId}`, data);
 }
 
-export async function knowledgeChat(data: { session_id: string; query: string; }) {
-  return postChat(`/api/v1/knowledge-chat/${data.session_id}`, { query: data.query, channel: "web" });
+export async function knowledgeChat(data: { sessionId: string; query: string; }) {
+  return postChat(`/api/v1/knowledge-chat/${data.sessionId}`, { query: data.query, channel: "web" });
 }
 
 // Agent chat with streaming support
 export async function agentChat(data: { 
-  session_id: string; 
+  sessionId: string; 
   query: string;
   knowledgeBaseIds?: string[];
   agentEnabled: boolean;
 }) {
-  return postChat(`/api/v1/agent-chat/${data.session_id}`, { 
+  return postChat(`/api/v1/agent-chat/${data.sessionId}`, { 
     query: data.query,
     knowledgeBaseIds: data.knowledgeBaseIds,
     agentEnabled: data.agentEnabled,
@@ -49,18 +49,18 @@ export async function agentChat(data: {
   });
 }
 
-export async function getMessageList(data: { session_id: string; limit: number, created_at: string }) {
+export async function getMessageList(data: { sessionId: string; limit: number, created_at: string }) {
   // 查询参数是 §14.9l S2 后的 camelCase（beforeTime）；data.created_at 只是本地游标
   // （上一页最早一条消息的 createdAt），不是线格式键。
   if (data.created_at) {
-    return get(`/api/v1/messages/${data.session_id}/load?beforeTime=${encodeURIComponent(data.created_at)}&limit=${data.limit}`);
+    return get(`/api/v1/messages/${data.sessionId}/load?beforeTime=${encodeURIComponent(data.created_at)}&limit=${data.limit}`);
   } else {
-    return get(`/api/v1/messages/${data.session_id}/load?limit=${data.limit}`);
+    return get(`/api/v1/messages/${data.sessionId}/load?limit=${data.limit}`);
   }
 }
 
-export async function delSession(session_id: string) {
-  return del(`/api/v1/sessions/${session_id}`);
+export async function delSession(sessionId: string) {
+  return del(`/api/v1/sessions/${sessionId}`);
 }
 
 export async function batchDelSessions(ids: string[]) {
@@ -71,16 +71,16 @@ export async function deleteAllSessions() {
   return del(`/api/v1/sessions/batch`, { deleteAll: true });
 }
 
-export async function getSession(session_id: string) {
-  return get(`/api/v1/sessions/${session_id}`);
+export async function getSession(sessionId: string) {
+  return get(`/api/v1/sessions/${sessionId}`);
 }
 
-export async function stopSession(session_id: string, message_id: string) {
-  return post(`/api/v1/sessions/${session_id}/stop`, { messageId: message_id });
+export async function stopSession(sessionId: string, messageId: string) {
+  return post(`/api/v1/sessions/${sessionId}/stop`, { messageId: messageId });
 }
 
-export async function clearSessionMessages(session_id: string) {
-  return del(`/api/v1/sessions/${session_id}/messages`);
+export async function clearSessionMessages(sessionId: string) {
+  return del(`/api/v1/sessions/${sessionId}/messages`);
 }
 
 // ---------------------------------------------------------------------------
@@ -114,17 +114,17 @@ export interface ArtifactMeta {
 
 // listMessageArtifacts returns the artifacts attached to a single assistant
 // message. Used by the drawer opened from the message action toolbar.
-export async function listMessageArtifacts(session_id: string, message_id: string) {
+export async function listMessageArtifacts(sessionId: string, messageId: string) {
   return get(
-    `/api/v1/sessions/${session_id}/messages/${message_id}/artifacts`,
+    `/api/v1/sessions/${sessionId}/messages/${messageId}/artifacts`,
   );
 }
 
 // listSessionArtifacts returns every artifact recorded against the whole
 // session, in creation order. Powers "download everything generated in this
 // chat" drawers.
-export async function listSessionArtifacts(session_id: string) {
-  return get(`/api/v1/sessions/${session_id}/artifacts`);
+export async function listSessionArtifacts(sessionId: string) {
+  return get(`/api/v1/sessions/${sessionId}/artifacts`);
 }
 
 // downloadArtifact streams a single artifact's bytes as a Blob so the caller
@@ -133,11 +133,11 @@ export async function listSessionArtifacts(session_id: string) {
 // `getDown` keeps auth intact and lets the response be turned into an
 // object URL.
 export async function downloadArtifact(
-  session_id: string,
-  message_id: string,
+  sessionId: string,
+  messageId: string,
   index: number,
 ): Promise<Blob> {
   return getDown(
-    `/api/v1/sessions/${session_id}/messages/${message_id}/artifacts/${index}/download`,
+    `/api/v1/sessions/${sessionId}/messages/${messageId}/artifacts/${index}/download`,
   );
 }

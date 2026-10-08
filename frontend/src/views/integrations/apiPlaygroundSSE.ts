@@ -14,7 +14,7 @@ interface TerminalState {
 }
 
 interface StreamEventPayload {
-  response_type?: unknown
+  responseType?: unknown
   type?: unknown
   content?: unknown
   message?: unknown
@@ -65,7 +65,7 @@ function applyFrame(frame: string, answerChunks: string[]): TerminalState | unde
     return undefined
   }
 
-  const responseType = payload.response_type ?? payload.type
+  const responseType = payload.responseType ?? payload.type
   if (responseType === 'answer' && typeof payload.content === 'string') {
     answerChunks.push(payload.content)
   }

@@ -11,14 +11,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class MergeData {
 
-    @JsonProperty("input_count")
+    @JsonProperty("inputCount")
     private int inputCount;
 
-    @JsonProperty("output_count")
+    @JsonProperty("outputCount")
     private int outputCount;
 
     /** dedup, fusion, etc. */
-    @JsonProperty("merge_type")
+    @JsonProperty("mergeType")
     private String mergeType = "";
 
     /** null 或空省略 */
@@ -27,7 +27,7 @@ public class MergeData {
     private Object results;
 
     /** 0 省略 */
-    @JsonProperty("duration_ms")
+    @JsonProperty("durationMs")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private long durationMs;
 
@@ -73,6 +73,7 @@ public class MergeData {
         this.mergeType = QueryData.orEmpty(v);
     }
 
+    @JsonProperty("results")
     public Object getResults() {
         return results;
     }
@@ -81,6 +82,7 @@ public class MergeData {
         this.results = v;
     }
 
+    @JsonProperty("durationMs")
     public long getDurationMs() {
         return durationMs;
     }
@@ -89,6 +91,7 @@ public class MergeData {
         this.durationMs = v;
     }
 
+    @JsonProperty("extra")
     public Map<String, Object> getExtra() {
         return extra;
     }

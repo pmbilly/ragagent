@@ -48,7 +48,7 @@ public final class PluginIntoChatMessage implements Plugin {
     @Override
     public PluginError onEvent(String eventType, ChatManage chatManage, Plugin.Chain next) {
         Map<String, Object> in = new LinkedHashMap<>();
-        in.put("session_id", chatManage.getSessionId());
+        in.put("sessionId", chatManage.getSessionId());
         in.put("merge_result_cnt", chatManage.getMergeResult() == null ? 0 : chatManage.getMergeResult().size());
         in.put("template_len", chatManage.getSummaryConfig().getContextTemplate().length());
         PipelineLog.info("IntoChatMessage", "input", in);
@@ -88,7 +88,7 @@ public final class PluginIntoChatMessage implements Plugin {
         String safeQuery = InputSanitizer.validateInput(chatManage.getQuery());
         if (safeQuery == null) {
             Map<String, Object> f = new LinkedHashMap<>();
-            f.put("session_id", chatManage.getSessionId());
+            f.put("sessionId", chatManage.getSessionId());
             PipelineLog.warn("IntoChatMessage", "invalid_query", f);
             return PluginError.TEMPLATE_EXECUTE.withError(
                     new RuntimeException("user query contains invalid content"));
@@ -104,7 +104,7 @@ public final class PluginIntoChatMessage implements Plugin {
                     userContent = safeRewrite;
                 } else {
                     Map<String, Object> f = new LinkedHashMap<>();
-                    f.put("session_id", chatManage.getSessionId());
+                    f.put("sessionId", chatManage.getSessionId());
                     PipelineLog.warn("IntoChatMessage", "invalid_rewrite_query_fallback", f);
                 }
             }
@@ -131,7 +131,7 @@ public final class PluginIntoChatMessage implements Plugin {
             }
 
             Map<String, Object> f = new LinkedHashMap<>();
-            f.put("session_id", chatManage.getSessionId());
+            f.put("sessionId", chatManage.getSessionId());
             f.put("user_content_len", chatManage.getUserContent().length());
             f.put("has_template", !chatManage.getSummaryConfig().getContextTemplate().isEmpty());
             PipelineLog.info("IntoChatMessage", "no_search_with_template", f);
@@ -209,7 +209,7 @@ public final class PluginIntoChatMessage implements Plugin {
 
         chatManage.setUserContent(userContent);
         Map<String, Object> out = new LinkedHashMap<>();
-        out.put("session_id", chatManage.getSessionId());
+        out.put("sessionId", chatManage.getSessionId());
         out.put("user_content_len", chatManage.getUserContent().length());
         out.put("faq_priority", chatManage.isFaqPriorityEnabled());
         out.put("intent", chatManage.getIntent());
@@ -225,8 +225,8 @@ public final class PluginIntoChatMessage implements Plugin {
     private void persistRenderedContent(ChatManage chatManage) {
         if (chatManage.getUserMessageId().isEmpty() || chatManage.getUserContent().isEmpty()) {
             Map<String, Object> f = new LinkedHashMap<>();
-            f.put("session_id", chatManage.getSessionId());
-            f.put("user_message_id", chatManage.getUserMessageId());
+            f.put("sessionId", chatManage.getSessionId());
+            f.put("userMessageId", chatManage.getUserMessageId());
             f.put("has_user_content", !chatManage.getUserContent().isEmpty());
             f.put("reason", "empty_id_or_content");
             PipelineLog.info("IntoChatMessage", "persist_rendered_content_skip", f);
@@ -236,8 +236,8 @@ public final class PluginIntoChatMessage implements Plugin {
             return;
         }
         Map<String, Object> f = new LinkedHashMap<>();
-        f.put("session_id", chatManage.getSessionId());
-        f.put("user_message_id", chatManage.getUserMessageId());
+        f.put("sessionId", chatManage.getSessionId());
+        f.put("userMessageId", chatManage.getUserMessageId());
         f.put("rendered_content_len", chatManage.getUserContent().length());
         PipelineLog.info("IntoChatMessage", "persist_rendered_content", f);
         final ChatManage cm = chatManage;
@@ -247,8 +247,8 @@ public final class PluginIntoChatMessage implements Plugin {
                         cm.getUserMessageId(), cm.getUserContent());
             } catch (RuntimeException e) {
                 Map<String, Object> w = new LinkedHashMap<>();
-                w.put("session_id", cm.getSessionId());
-                w.put("user_message_id", cm.getUserMessageId());
+                w.put("sessionId", cm.getSessionId());
+                w.put("userMessageId", cm.getUserMessageId());
                 w.put("error", e.getMessage());
                 PipelineLog.warn("IntoChatMessage", "persist_rendered_content_error", w);
             }

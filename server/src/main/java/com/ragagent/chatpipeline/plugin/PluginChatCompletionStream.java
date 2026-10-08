@@ -59,7 +59,7 @@ public final class PluginChatCompletionStream implements Plugin {
     @Override
     public PluginError onEvent(String eventType, ChatManage chatManage, Plugin.Chain next) {
         Map<String, Object> in = new LinkedHashMap<>();
-        in.put("session_id", chatManage.getSessionId());
+        in.put("sessionId", chatManage.getSessionId());
         in.put("user_question", chatManage.getUserContent());
         in.put("history_rounds", chatManage.getHistory() == null ? 0 : chatManage.getHistory().size());
         in.put("chat_model", chatManage.getChatModelId());
@@ -87,14 +87,14 @@ public final class PluginChatCompletionStream implements Plugin {
         // 事件流必需 EventBus
         if (chatManage.getEventBus() == null) {
             Map<String, Object> f = new LinkedHashMap<>();
-            f.put("session_id", chatManage.getSessionId());
+            f.put("sessionId", chatManage.getSessionId());
             PipelineLog.error("Stream", "eventbus_missing", f);
             return PluginError.MODEL_CALL.withError(new RuntimeException("EventBus is required for streaming"));
         }
         EventBusInterface eventBus = chatManage.getEventBus();
 
         Map<String, Object> er = new LinkedHashMap<>();
-        er.put("session_id", chatManage.getSessionId());
+        er.put("sessionId", chatManage.getSessionId());
         PipelineLog.info("Stream", "eventbus_ready", er);
 
         // 建流（建立失败立即抛错）
@@ -120,7 +120,7 @@ public final class PluginChatCompletionStream implements Plugin {
         }
 
         Map<String, Object> ms = new LinkedHashMap<>();
-        ms.put("session_id", chatManage.getSessionId());
+        ms.put("sessionId", chatManage.getSessionId());
         PipelineLog.info("Stream", "model_started", ms);
 
         // 消费线程（虚拟线程）
@@ -150,14 +150,14 @@ public final class PluginChatCompletionStream implements Plugin {
                 flushDecoders(eventBus, chatManage, thinkingID, answerID, thinkingDecoder, answerDecoder);
                 closeThinking(eventBus, chatManage, thinkingID, thinkingOpen);
                 Map<String, Object> f = new LinkedHashMap<>();
-                f.put("session_id", chatManage.getSessionId());
+                f.put("sessionId", chatManage.getSessionId());
                 PipelineLog.info("Stream", "channel_close", f);
                 return;
             }
 
             if (ResponseType.ERROR == response.getResponseType()) {
                 Map<String, Object> f = new LinkedHashMap<>();
-                f.put("session_id", chatManage.getSessionId());
+                f.put("sessionId", chatManage.getSessionId());
                 f.put("error", response.getContent());
                 PipelineLog.error("Stream", "stream_error", f);
                 Event errEvt = new Event();

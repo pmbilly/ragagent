@@ -17,7 +17,7 @@ const deferred = () => {
 }
 function harness(overrides = {}) {
   const state = {
-    session_id: { value: 'session' }, currentAssistantMessageId: { value: 'assistant' },
+    sessionId: { value: 'session' }, currentAssistantMessageId: { value: 'assistant' },
     isReplying: { value: true }, isStreaming: { value: true },
     steerQueue: { value: [] }, messagesList: reactive([]), crypto: webcrypto, makeSteerClientId,
     previewSteerMessage, discardSteerPreview, reconcileSteerMessageId,
@@ -96,10 +96,10 @@ test('failed promotion restores the after queue and removes only its optimistic 
 })
 
 const streamSource = readFileSync(new URL('../../composables/useChatStreamHandler.ts', import.meta.url), 'utf8')
-const receiptStart = streamSource.indexOf("case 'user_message_injected': {")
+const receiptStart = streamSource.indexOf("case 'userMessageInjected': {")
 const receiptEnd = streamSource.indexOf("case 'complete':", receiptStart)
 assert.ok(receiptStart >= 0 && receiptEnd > receiptStart)
-const receipt = ts.transpile(`() => { switch ('user_message_injected') {
+const receipt = ts.transpile(`() => { switch ('userMessageInjected') {
   ${streamSource.slice(receiptStart, receiptEnd)}
 } }`)
 
@@ -107,7 +107,7 @@ function receiveInjection(h, steerId, userId) {
   vm.runInNewContext(receipt, {
     messagesList: h.state.messagesList,
     message: h.state.messagesList.findLast(m => m.role === 'assistant'),
-    dataPayload: { steer_id: steerId, user_message_id: userId, content: '写到Docx' },
+    dataPayload: { steerId: steerId, userMessageId: userId, content: '写到Docx' },
     data: {}, dataId: 'request', replaySegments: new Map(),
     forkAfterInjectedUser, log() {}, emitMessageCreated() {}, onAgentChunkBound() {},
     onUserMessageInjected(id) {

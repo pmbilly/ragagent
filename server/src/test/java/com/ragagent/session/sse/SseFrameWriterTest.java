@@ -76,7 +76,7 @@ class SseFrameWriterTest {
 
         assertThat(canonFrame(body(write(r)))).isEqualTo(canonFrame(
                 "event:message\n"
-                        + "data:{\"id\":\"req-1\",\"response_type\":\"answer\","
+                        + "data:{\"id\":\"req-1\",\"responseType\":\"answer\","
                         + "\"content\":\"hi there\",\"done\":false}\n\n"));
     }
 
@@ -88,7 +88,7 @@ class SseFrameWriterTest {
 
         assertThat(canonFrame(body(write(r)))).isEqualTo(canonFrame(
                 "event:message\n"
-                        + "data:{\"id\":\"req-1\",\"response_type\":\"answer\","
+                        + "data:{\"id\":\"req-1\",\"responseType\":\"answer\","
                         + "\"content\":\"a \\u003c b \\u0026 c \\u003e d\",\"done\":false}\n\n"));
     }
 
@@ -101,16 +101,16 @@ class SseFrameWriterTest {
         nested.put("z", 1);
         nested.put("a", 2);
         Map<String, Object> data = new LinkedHashMap<>();
-        data.put("tool_name", "t");
-        data.put("event_id", "e1");
+        data.put("toolName", "t");
+        data.put("eventId", "e1");
         data.put("nested", nested);
         r.setData(data);
 
         assertThat(canonFrame(body(write(r)))).isEqualTo(canonFrame(
                 "event:message\n"
-                        + "data:{\"id\":\"req-1\",\"response_type\":\"tool_call\",\"content\":\"\","
-                        + "\"done\":false,\"data\":{\"event_id\":\"e1\","
-                        + "\"nested\":{\"a\":2,\"z\":1},\"tool_name\":\"t\"}}\n\n"));
+                        + "data:{\"id\":\"req-1\",\"responseType\":\"toolCall\",\"content\":\"\","
+                        + "\"done\":false,\"data\":{\"eventId\":\"e1\","
+                        + "\"nested\":{\"a\":2,\"z\":1},\"toolName\":\"t\"}}\n\n"));
     }
 
     /** 正文里的换行在 JSON 里是 {@code \n} 转义，**不能**真断行（否则帧就碎了）。 */
@@ -121,7 +121,7 @@ class SseFrameWriterTest {
 
         assertThat(canonFrame(body(write(r)))).isEqualTo(canonFrame(
                 "event:message\n"
-                        + "data:{\"id\":\"req-1\",\"response_type\":\"answer\","
+                        + "data:{\"id\":\"req-1\",\"responseType\":\"answer\","
                         + "\"content\":\"line1\\nline2\",\"done\":true}\n\n"));
     }
 
@@ -132,7 +132,7 @@ class SseFrameWriterTest {
 
         assertThat(canonFrame(body(write(r)))).isEqualTo(canonFrame(
                 "event:message\n"
-                        + "data:{\"id\":\"req-1\",\"response_type\":\"complete\","
+                        + "data:{\"id\":\"req-1\",\"responseType\":\"complete\","
                         + "\"content\":\"\",\"done\":true}\n\n"));
     }
 

@@ -273,7 +273,7 @@ async function copyMarkdown(): Promise<void> {
   try {
     const messages = await collectAllSessionMessages(async (beforeTime, limit) => {
       const response: any = await getMessageList({
-        session_id: session.id,
+        sessionId: session.id,
         created_at: beforeTime,
         limit,
       })

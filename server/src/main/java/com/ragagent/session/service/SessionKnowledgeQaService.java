@@ -182,7 +182,7 @@ public class SessionKnowledgeQaService {
                 com.ragagent.tracing.langfuse.LangfuseManager.get().startSpan(
                         new com.ragagent.tracing.langfuse.LangfuseManager.SpanOptions(
                                 "qa.setup", null,
-                                java.util.Map.of("session_id", sessionId == null ? "" : sessionId)));
+                                java.util.Map.of("sessionId", sessionId == null ? "" : sessionId)));
 
         // Resolve knowledge bases using shared helper
         KnowledgeResolution kb = resolution.resolveKnowledgeBases(req);
@@ -403,7 +403,7 @@ public class SessionKnowledgeQaService {
             if (stageSpan != null) {
                 String stageErr = err != null && err != PluginError.SEARCH_NOTHING
                         ? (err.err != null ? err.err.getMessage() : err.description) : null;
-                stageSpan.finish(java.util.Map.of("duration_ms", stageDuration), null, stageErr);
+                stageSpan.finish(java.util.Map.of("durationMs", stageDuration), null, stageErr);
             }
 
             // 用户停止：先于"检索无结果"判定
@@ -424,7 +424,7 @@ public class SessionKnowledgeQaService {
             if (err != null) {
                 Map<String, Object> f = new LinkedHashMap<>();
                 f.put("event", eventType);
-                f.put("duration_ms", stageDuration);
+                f.put("durationMs", stageDuration);
                 f.put("error_type", err.errorType);
                 f.put("description", err.description);
                 PipelineLog.error("Pipeline", "stage_failed", f);
@@ -436,9 +436,9 @@ public class SessionKnowledgeQaService {
         }
 
         Map<String, Object> f = new LinkedHashMap<>();
-        f.put("session_id", chatManage.getSessionId());
+        f.put("sessionId", chatManage.getSessionId());
         f.put("total_stages", eventList.size());
-        f.put("total_duration_ms", System.currentTimeMillis() - pipelineStart);
+        f.put("totalDurationMs", System.currentTimeMillis() - pipelineStart);
         PipelineLog.info("Pipeline", "all_stages_complete", f);
     }
 

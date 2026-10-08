@@ -8,34 +8,34 @@ import { resetSteerTurnForReplay } from '../utils/steerStreamFork.ts'
 const source = readFileSync(new URL('./useChatStreamHandler.ts', import.meta.url), 'utf8')
 
 test('command output updates only its pending tool and cannot replace a final result', () => {
-  const start = source.indexOf("case 'command_output': {")
-  const block = source.slice(start, source.indexOf("case 'tool_result':", start))
-  const command = { type: 'tool_call', tool_name: 'shell_exec', tool_call_id: 'a', pending: true }
-  const other = { type: 'tool_call', tool_name: 'shell_exec', tool_call_id: 'b', pending: true }
+  const start = source.indexOf("case 'commandOutput': {")
+  const block = source.slice(start, source.indexOf("case 'toolResult':", start))
+  const command = { type: 'toolCall', toolName: 'shell_exec', toolCallId: 'a', pending: true }
+  const other = { type: 'toolCall', toolName: 'shell_exec', toolCallId: 'b', pending: true }
   const message = { agentEventStream: [command, other] }
-  const process = vm.runInNewContext(ts.transpile(`(dataPayload) => { switch ('command_output') { ${block} } }`), { message })
-  process({ tool_call_id: 'a', output: 'Reading CSV', done: false })
-  assert.equal(command.command_output.output, 'Reading CSV')
+  const process = vm.runInNewContext(ts.transpile(`(dataPayload) => { switch ('commandOutput') { ${block} } }`), { message })
+  process({ toolCallId: 'a', output: 'Reading CSV', done: false })
+  assert.equal(command.commandOutput.output, 'Reading CSV')
   assert.equal(command.pending, true)
-  assert.equal(other.command_output, undefined)
-  process({ tool_call_id: 'missing', output: 'unmatched' })
+  assert.equal(other.commandOutput, undefined)
+  process({ toolCallId: 'missing', output: 'unmatched' })
   assert.equal(message.agentEventStream.length, 2)
-  process({ tool_call_id: 'a', output: 'Finished', done: true })
-  process({ tool_call_id: 'a', output: 'late chunk', done: false })
-  assert.equal(command.command_output.output, 'Finished')
+  process({ toolCallId: 'a', output: 'Finished', done: true })
+  process({ toolCallId: 'a', output: 'late chunk', done: false })
+  assert.equal(command.commandOutput.output, 'Finished')
   command.pending = false
   command.output = 'Final tool result'
-  process({ tool_call_id: 'a', output: 'more late output', done: false })
+  process({ toolCallId: 'a', output: 'more late output', done: false })
   assert.equal(command.output, 'Final tool result')
 })
 
-test('replaying agent_query binds the first segment and preserves distinct row IDs', () => {
+test('replaying agentQuery binds the first segment and preserves distinct row IDs', () => {
   const messagesList = [
     { id: 'a', role: 'assistant', requestId: 'r', steerForked: true, completed: true },
     { id: 'u', role: 'user', requestId: 'r' },
-    { id: 'a:steer:1', assistant_message_id: 'a', role: 'assistant', requestId: 'r', completed: false },
+    { id: 'a:steer:1', assistantMessageId: 'a', role: 'assistant', requestId: 'r', completed: false },
   ]
-  const start = source.indexOf("if (data.response_type === 'agent_query')")
+  const start = source.indexOf("if (data.responseType === 'agentQuery')")
   const block = source.slice(start, source.indexOf('const isAgentOnlyResponse', start))
   const replaySegments = new Map()
   const process = vm.runInNewContext(ts.transpile(`(data) => { ${block} }`), {
@@ -45,7 +45,7 @@ test('replaying agent_query binds the first segment and preserves distinct row I
     findLastMessage: fn => [...messagesList].reverse().find(fn),
     log() {}, ensureAgentMessageShell() {}, bindServerTurnTimestamps() {}, onAgentQuery() {},
   })
-  process({ response_type: 'agent_query', id: 'r', assistant_message_id: 'a' })
+  process({ responseType: 'agentQuery', id: 'r', assistantMessageId: 'a' })
   assert.deepEqual(messagesList.map(m => m.id), ['a', 'u', 'a:steer:1'])
   assert.equal(replaySegments.get('r'), messagesList[0])
 })
@@ -58,7 +58,7 @@ test('failed tool results keep stdout/output instead of replacing it with the sh
   )
 })
 
-test('later tool_call events merge arguments onto the same pending card', () => {
+test('later toolCall events merge arguments onto the same pending card', () => {
   assert.match(source, /function mergeToolCallArguments/)
   assert.match(source, /toolCallEvent\.arguments = mergeToolCallArguments\(toolCallEvent\.arguments, incomingArguments\)/)
 })
@@ -107,7 +107,7 @@ test('completed agent messages with content but no events still render', () => {
 })
 
 test('injected user messages fork a continuation assistant below the bubble', () => {
-  const chunkStart = source.indexOf("case 'user_message_injected'")
+  const chunkStart = source.indexOf("case 'userMessageInjected'")
   const chunkEnd = source.indexOf("case 'complete'", chunkStart)
   const chunk = source.slice(chunkStart, chunkEnd)
   assert.notEqual(chunkStart, -1)
@@ -120,7 +120,7 @@ test('injected user messages fork a continuation assistant below the bubble', ()
 
 test('agent answer.done does not mark the session idle', () => {
   const chunkStart = source.indexOf("case 'answer':")
-  const chunkEnd = source.indexOf("case 'user_message_injected'", chunkStart)
+  const chunkEnd = source.indexOf("case 'userMessageInjected'", chunkStart)
   assert.notEqual(chunkStart, -1)
   assert.notEqual(chunkEnd, -1)
   const chunk = source.slice(chunkStart, chunkEnd)
@@ -135,7 +135,7 @@ test('agent answer.done does not mark the session idle', () => {
 // this event arrives for a message history has already loaded. Synthesizing a
 // bubble unconditionally puts the same message on screen twice.
 test('a replayed injection reuses the persisted row instead of duplicating it', () => {
-  const chunkStart = source.indexOf("case 'user_message_injected'")
+  const chunkStart = source.indexOf("case 'userMessageInjected'")
   const chunkEnd = source.indexOf("case 'complete'", chunkStart)
   const chunk = source.slice(chunkStart, chunkEnd)
   assert.notEqual(chunkStart, -1)

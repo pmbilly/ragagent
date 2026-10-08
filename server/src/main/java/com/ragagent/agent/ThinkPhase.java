@@ -277,8 +277,8 @@ final class ThinkPhase {
 
         ThinkChunkEmitter emitFunc = (chunk, fullContent) -> {
             if (chunk.getResponseType() == ResponseType.TOOL_CALL && chunk.getData() != null) {
-                String toolCallID = SteerIntake.mapString(chunk.getData(), "tool_call_id");
-                String toolName = SteerIntake.mapString(chunk.getData(), "tool_name");
+                String toolCallID = SteerIntake.mapString(chunk.getData(), "toolCallId");
+                String toolName = SteerIntake.mapString(chunk.getData(), "toolName");
                 @SuppressWarnings("unchecked")
                 Map<String, Object> args = (Map<String, Object>) chunk.getData().get("arguments");
 
@@ -303,7 +303,7 @@ final class ThinkPhase {
             // thinking 工具的流式思考内容
             if (chunk.getResponseType() == ResponseType.THINKING && chunk.getData() != null) {
                 if ("thinking_tool".equals(SteerIntake.mapString(chunk.getData(), "source"))) {
-                    String toolCallID = SteerIntake.mapString(chunk.getData(), "tool_call_id");
+                    String toolCallID = SteerIntake.mapString(chunk.getData(), "toolCallId");
                     String eventID = thinkingToolIDs.computeIfAbsent(toolCallID,
                             k -> EventIds.generateEventID("thinking-tool"));
                     emittedEventTypes.merge("thinking_tool_chunk", 1, Integer::sum);

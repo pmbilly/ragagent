@@ -16,10 +16,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class AgentToolCallData {
 
     /** 工具调用 ID（追踪用） */
-    @JsonProperty("tool_call_id")
+    @JsonProperty("toolCallId")
     private String toolCallId = "";
 
-    @JsonProperty("tool_name")
+    @JsonProperty("toolName")
     private String toolName = "";
 
     /** null 或空省略 */
@@ -63,6 +63,7 @@ public class AgentToolCallData {
         this.toolName = QueryData.orEmpty(v);
     }
 
+    @JsonProperty("arguments")
     public Map<String, Object> getArguments() {
         return arguments;
     }
@@ -71,6 +72,7 @@ public class AgentToolCallData {
         this.arguments = v;
     }
 
+    @JsonProperty("iteration")
     public int getIteration() {
         return iteration;
     }
@@ -79,6 +81,7 @@ public class AgentToolCallData {
         this.iteration = v;
     }
 
+    @JsonProperty("hint")
     public String getHint() {
         return hint;
     }

@@ -12,10 +12,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class StopData {
 
-    @JsonProperty("session_id")
+    @JsonProperty("sessionId")
     private String sessionId = "";
 
-    @JsonProperty("message_id")
+    @JsonProperty("messageId")
     private String messageId = "";
 
     /** 停止原因（可选）；空串省略 */
@@ -48,6 +48,7 @@ public class StopData {
         this.messageId = QueryData.orEmpty(v);
     }
 
+    @JsonProperty("reason")
     public String getReason() {
         return reason;
     }

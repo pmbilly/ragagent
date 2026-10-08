@@ -360,7 +360,7 @@ export type ToolResultData =
 export interface ActionData {
     description: string;
     success: boolean;
-    tool_name?: string;
+    toolName?: string;
     arguments?: any;
     output?: string;
     error?: string;

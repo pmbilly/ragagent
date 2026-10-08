@@ -7,7 +7,7 @@ import { createSessionActivityState, type SessionActivity } from './sessionActiv
 export const useSessionActivityStore = defineStore('sessionActivity', () => {
   const entries = reactive<Record<string, SessionActivity>>({})
   const activity = createSessionActivityState(entries, async sessionId => {
-    const result: any = await getMessageList({ session_id: sessionId, limit: 20, created_at: '' })
+    const result: any = await getMessageList({ sessionId: sessionId, limit: 20, created_at: '' })
     // 裸数组：响应体即消息列表
     return Array.isArray(result) ? result : []
   })

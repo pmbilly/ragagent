@@ -168,7 +168,7 @@ public class StreamEventEmitter {
                 data.put(String.valueOf(entry.getKey()), entry.getValue());
             }
         }
-        data.putIfAbsent("event_id", eventId);
+        data.putIfAbsent("eventId", eventId);
         return data;
     }
 

@@ -178,7 +178,7 @@ const loadFollowUpSuggestions = async (
   ensure = false,
   regenerate = false,
 ) => {
-  const messageId = String(message.id || message.assistant_message_id || '')
+  const messageId = String(message.id || message.assistantMessageId || '')
   const targetSessionId = props.sessionId
   if (!props.showSuggestedQuestions || !messageId || !targetSessionId || message.suggestionsDismissed) return
   message.suggestionLoading = true

@@ -612,7 +612,7 @@ public class SessionService {
                 }
                 if (bus != null) {
                     try {
-                        bus.emit(new Event(EventIds.generateEventID("session_title"),
+                        bus.emit(new Event(EventIds.generateEventID("sessionTitle"),
                                 EventType.EVENT_SESSION_TITLE, session.getId(),
                                 new SessionTitleData(session.getId(), title), null, requestId));
                     } catch (RuntimeException e) {

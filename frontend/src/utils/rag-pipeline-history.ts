@@ -48,9 +48,9 @@ export function hasRagPipelineToolEvents(stream: Array<Record<string, unknown>> 
   if (!stream?.length) return false
   return stream.some((event) => {
     return (
-      event.type === 'tool_call' &&
-      typeof event.tool_name === 'string' &&
-      RAG_PIPELINE_TOOL_NAMES.has(event.tool_name)
+      event.type === 'toolCall' &&
+      typeof event.toolName === 'string' &&
+      RAG_PIPELINE_TOOL_NAMES.has(event.toolName)
     )
   })
 }
@@ -84,16 +84,16 @@ export function synthesizeRagPipelineToolEvents(
 
   const events: Array<Record<string, unknown>> = [
     {
-      type: 'tool_call',
-      tool_call_id: 'rag-history-query-understand',
-      tool_name: 'query_understand',
+      type: 'toolCall',
+      toolCallId: 'rag-history-query-understand',
+      toolName: 'query_understand',
       pending: false,
       success: true,
     },
     {
-      type: 'tool_call',
-      tool_call_id: 'rag-history-knowledge-search',
-      tool_name: 'knowledge_search',
+      type: 'toolCall',
+      toolCallId: 'rag-history-knowledge-search',
+      toolName: 'knowledge_search',
       pending: false,
       success: true,
       arguments: { search_source: searchSource },
@@ -133,9 +133,9 @@ export function ensureRagPipelineHistoryStream(item: RagHistoryMessage & {
   const synthesized = synthesizeRagPipelineToolEvents(item)
   const preserved = stream.filter((event) => {
     return !(
-      event.type === 'tool_call' &&
-      typeof event.tool_name === 'string' &&
-      RAG_PIPELINE_TOOL_NAMES.has(event.tool_name)
+      event.type === 'toolCall' &&
+      typeof event.toolName === 'string' &&
+      RAG_PIPELINE_TOOL_NAMES.has(event.toolName)
     )
   })
 

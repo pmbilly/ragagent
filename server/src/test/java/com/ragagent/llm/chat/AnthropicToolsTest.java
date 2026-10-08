@@ -244,9 +244,9 @@ class AnthropicToolsTest {
             }
         }
         assertEquals(2, chunks.size());
-        assertEquals("tool_call", chunks.get(0).getResponseType().value());
-        assertEquals("call_1", chunks.get(0).getData().get("tool_call_id"));
-        assertEquals("search", chunks.get(0).getData().get("tool_name"));
+        assertEquals("toolCall", chunks.get(0).getResponseType().value());
+        assertEquals("call_1", chunks.get(0).getData().get("toolCallId"));
+        assertEquals("search", chunks.get(0).getData().get("toolName"));
     }
 
     // ------------------------------------------------------------------

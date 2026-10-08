@@ -27,7 +27,7 @@ import com.ragagent.llm.domain.ToolCall;
  * 期望值全部是 {@link GoRecording46B} 的录制常量。
  *
  * <p>掩码约定（探针在录制侧做了同款替换，两侧掩码后逐字节可比）：事件 id 的 uuid
- * 前缀 → {@code xxxxxxxx-}；duration/duration_ms/total_duration_ms → 0；
+ * 前缀 → {@code xxxxxxxx-}；duration/durationMs/totalDurationMs → 0；
  * {@code "timestamp":"..."} → {@code "TS"}；{@code <currentTime>} 日期段 → DATE。</p>
  */
 final class Engine46bStubSupport {
@@ -35,7 +35,7 @@ final class Engine46bStubSupport {
     private Engine46bStubSupport() {
     }
 
-    private static final Pattern DUR = Pattern.compile(",\"(duration_ms|duration|total_duration_ms)\":\\d+");
+    private static final Pattern DUR = Pattern.compile(",\"(durationMs|duration|totalDurationMs)\":\\d+");
     private static final Pattern TS = Pattern.compile("\"timestamp\":\"[^\"]*\"");
     private static final Pattern DATE = Pattern.compile("<currentTime>[^<]*</currentTime>");
     private static final Pattern DATE_ESC = Pattern.compile(
@@ -116,7 +116,7 @@ final class Engine46bStubSupport {
                 }
                 sb.append("{\"type\":").append(jsonStr(e.type()))
                         .append(",\"id\":").append(jsonStr(e.id()))
-                        .append(",\"session_id\":").append(jsonStr(e.sessionId()))
+                        .append(",\"sessionId\":").append(jsonStr(e.sessionId()))
                         .append(",\"data\":").append(e.dataJson()).append('}');
             }
             return sb.append(']').toString();
@@ -310,8 +310,8 @@ final class Engine46bStubSupport {
         StreamResponse r = new StreamResponse();
         r.setResponseType(ResponseType.TOOL_CALL);
         Map<String, Object> data = new java.util.LinkedHashMap<>();
-        data.put("tool_call_id", id);
-        data.put("tool_name", name);
+        data.put("toolCallId", id);
+        data.put("toolName", name);
         if (!argsJSON.isEmpty()) {
             data.put("arguments", argsMap(argsJSON));
         }

@@ -73,15 +73,15 @@ public final class PluginQueryUnderstand implements Plugin {
         boolean needRewrite = chatManage.isEnableRewrite();
         if (!needRewrite && !hasImages) {
             Map<String, Object> f = new LinkedHashMap<>();
-            f.put("session_id", chatManage.getSessionId());
+            f.put("sessionId", chatManage.getSessionId());
             f.put("reason", "rewrite_disabled_no_images");
             PipelineLog.info("QueryUnderstand", "skip", f);
             return next.next();
         }
 
         Map<String, Object> in = new LinkedHashMap<>();
-        in.put("session_id", chatManage.getSessionId());
-        in.put("tenant_id", chatManage.getTenantId());
+        in.put("sessionId", chatManage.getSessionId());
+        in.put("tenantId", chatManage.getTenantId());
         in.put("user_query", chatManage.getQuery());
         in.put("has_images", hasImages);
         in.put("enable_rewrite", chatManage.isEnableRewrite());
@@ -92,7 +92,7 @@ public final class PluginQueryUnderstand implements Plugin {
         if (chatManage.getHistory() != null && !chatManage.getHistory().isEmpty()) {
             historyList = chatManage.getHistory();
             Map<String, Object> f = new LinkedHashMap<>();
-            f.put("session_id", chatManage.getSessionId());
+            f.put("sessionId", chatManage.getSessionId());
             f.put("rounds", historyList.size());
             PipelineLog.info("QueryUnderstand", "history_reused", f);
         } else {
@@ -103,7 +103,7 @@ public final class PluginQueryUnderstand implements Plugin {
         ModelChoice choice = selectModel(chatManage, hasImages);
         if (choice.model == null) {
             Map<String, Object> f = new LinkedHashMap<>();
-            f.put("session_id", chatManage.getSessionId());
+            f.put("sessionId", chatManage.getSessionId());
             PipelineLog.error("QueryUnderstand", "get_model", f);
             return next.next();
         }
@@ -133,7 +133,7 @@ public final class PluginQueryUnderstand implements Plugin {
             response = choice.model.chat(callMessages, opt);
         } catch (RuntimeException e) {
             Map<String, Object> f = new LinkedHashMap<>();
-            f.put("session_id", chatManage.getSessionId());
+            f.put("sessionId", chatManage.getSessionId());
             f.put("error", e.getMessage());
             PipelineLog.error("QueryUnderstand", "model_call", f);
             return next.next();
@@ -151,14 +151,14 @@ public final class PluginQueryUnderstand implements Plugin {
         if (!chatManage.needsRetrieval()) {
             if (applyIntentPromptOverride(chatManage, config.getIntentSystemPrompts())) {
                 Map<String, Object> f = new LinkedHashMap<>();
-                f.put("session_id", chatManage.getSessionId());
+                f.put("sessionId", chatManage.getSessionId());
                 f.put("intent", chatManage.getIntent());
                 PipelineLog.info("QueryUnderstand", "prompt_override", f);
             }
         }
 
         Map<String, Object> out = new LinkedHashMap<>();
-        out.put("session_id", chatManage.getSessionId());
+        out.put("sessionId", chatManage.getSessionId());
         out.put("rewrite_query", chatManage.getRewriteQuery());
         out.put("intent", chatManage.getIntent());
         out.put("has_image_desc", !chatManage.getImageDescription().isEmpty());
@@ -175,8 +175,8 @@ public final class PluginQueryUnderstand implements Plugin {
             msg = messageService.getMessage(chatManage.getSessionId(), chatManage.getUserMessageId());
         } catch (RuntimeException e) {
             Map<String, Object> f = new LinkedHashMap<>();
-            f.put("session_id", chatManage.getSessionId());
-            f.put("user_message_id", chatManage.getUserMessageId());
+            f.put("sessionId", chatManage.getSessionId());
+            f.put("userMessageId", chatManage.getUserMessageId());
             f.put("error", e.getMessage());
             PipelineLog.warn("QueryUnderstand", "get_user_message", f);
             return;
@@ -195,8 +195,8 @@ public final class PluginQueryUnderstand implements Plugin {
                     chatManage.getUserMessageId(), images);
         } catch (RuntimeException e) {
             Map<String, Object> f = new LinkedHashMap<>();
-            f.put("session_id", chatManage.getSessionId());
-            f.put("user_message_id", chatManage.getUserMessageId());
+            f.put("sessionId", chatManage.getSessionId());
+            f.put("userMessageId", chatManage.getUserMessageId());
             f.put("error", e.getMessage());
             PipelineLog.warn("QueryUnderstand", "update_image_caption", f);
         }
@@ -214,7 +214,7 @@ public final class PluginQueryUnderstand implements Plugin {
                     chatManage.getSessionId(), maxRounds, 20);
         } catch (RuntimeException e) {
             Map<String, Object> f = new LinkedHashMap<>();
-            f.put("session_id", chatManage.getSessionId());
+            f.put("sessionId", chatManage.getSessionId());
             f.put("error", e.getMessage());
             PipelineLog.warn("QueryUnderstand", "history_fetch", f);
             return null;
@@ -222,7 +222,7 @@ public final class PluginQueryUnderstand implements Plugin {
         chatManage.setHistory(historyList);
         if (historyList != null && !historyList.isEmpty()) {
             Map<String, Object> f = new LinkedHashMap<>();
-            f.put("session_id", chatManage.getSessionId());
+            f.put("sessionId", chatManage.getSessionId());
             f.put("history_rounds", historyList.size());
             PipelineLog.info("QueryUnderstand", "history_ready", f);
         }
@@ -241,7 +241,7 @@ public final class PluginQueryUnderstand implements Plugin {
                     return new ModelChoice(m, true);
                 } catch (RuntimeException e) {
                     Map<String, Object> f = new LinkedHashMap<>();
-                    f.put("session_id", chatManage.getSessionId());
+                    f.put("sessionId", chatManage.getSessionId());
                     f.put("error", e.getMessage());
                     PipelineLog.warn("QueryUnderstand", "vision_model_fallback", f);
                 }
@@ -252,14 +252,14 @@ public final class PluginQueryUnderstand implements Plugin {
                     return new ModelChoice(m, true);
                 } catch (RuntimeException e) {
                     Map<String, Object> f = new LinkedHashMap<>();
-                    f.put("session_id", chatManage.getSessionId());
+                    f.put("sessionId", chatManage.getSessionId());
                     f.put("vlm_model_id", chatManage.getVlmModelId());
                     f.put("error", e.getMessage());
                     PipelineLog.warn("QueryUnderstand", "vlm_model_fallback", f);
                 }
             }
             Map<String, Object> f = new LinkedHashMap<>();
-            f.put("session_id", chatManage.getSessionId());
+            f.put("sessionId", chatManage.getSessionId());
             PipelineLog.warn("QueryUnderstand", "no_vision_model", f);
         }
 
@@ -274,7 +274,7 @@ public final class PluginQueryUnderstand implements Plugin {
             if (!chatManage.getQueryUnderstandModelId().isEmpty()
                     && !textModelId.equals(chatManage.getChatModelId())) {
                 Map<String, Object> f = new LinkedHashMap<>();
-                f.put("session_id", chatManage.getSessionId());
+                f.put("sessionId", chatManage.getSessionId());
                 f.put("query_understand_model_id", chatManage.getQueryUnderstandModelId());
                 f.put("error", e.getMessage());
                 PipelineLog.warn("QueryUnderstand", "query_understand_model_fallback", f);
@@ -285,7 +285,7 @@ public final class PluginQueryUnderstand implements Plugin {
                 }
             }
             Map<String, Object> f = new LinkedHashMap<>();
-            f.put("session_id", chatManage.getSessionId());
+            f.put("sessionId", chatManage.getSessionId());
             f.put("chat_model_id", textModelId);
             f.put("error", e.getMessage());
             PipelineLog.error("QueryUnderstand", "get_model", f);
@@ -358,7 +358,7 @@ public final class PluginQueryUnderstand implements Plugin {
         b.append("\n</asker_background>");
 
         Map<String, Object> fields = new LinkedHashMap<>();
-        fields.put("session_id", chatManage.getSessionId());
+        fields.put("sessionId", chatManage.getSessionId());
         fields.put("interests", memCtx.interests() == null ? 0 : memCtx.interests().size());
         fields.put("documents", memCtx.documents() == null ? 0 : memCtx.documents().size());
         fields.put("items", memCtx.items() == null ? 0 : memCtx.items().size());

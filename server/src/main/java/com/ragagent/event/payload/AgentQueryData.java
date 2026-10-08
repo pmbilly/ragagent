@@ -11,14 +11,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class AgentQueryData {
 
-    @JsonProperty("session_id")
+    @JsonProperty("sessionId")
     private String sessionId = "";
 
     @JsonProperty("query")
     private String query = "";
 
     /** 空串省略 */
-    @JsonProperty("request_id")
+    @JsonProperty("requestId")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private String requestId = "";
 
@@ -54,6 +54,7 @@ public class AgentQueryData {
         this.query = QueryData.orEmpty(v);
     }
 
+    @JsonProperty("requestId")
     public String getRequestId() {
         return requestId;
     }
@@ -62,6 +63,7 @@ public class AgentQueryData {
         this.requestId = QueryData.orEmpty(v);
     }
 
+    @JsonProperty("extra")
     public Map<String, Object> getExtra() {
         return extra;
     }

@@ -10,17 +10,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * emit 点：ActPhase（{@code <toolCallID>-tool-result}），见包注释 emit 表 #17。
  *
  * <p>零值输出
- * {@code {"tool_call_id":"","tool_name":"","output":"","success":false,"iteration":0}}；
+ * {@code {"toolCallId":"","toolName":"","output":"","success":false,"iteration":0}}；
  * {@code error}/{@code duration_ms}/{@code data} 空则省略。</p>
  */
 
 public class AgentToolResultData {
 
     /** 工具调用 ID（追踪用） */
-    @JsonProperty("tool_call_id")
+    @JsonProperty("toolCallId")
     private String toolCallId = "";
 
-    @JsonProperty("tool_name")
+    @JsonProperty("toolName")
     private String toolName = "";
 
     @JsonProperty("output")
@@ -36,7 +36,7 @@ public class AgentToolResultData {
     private boolean success;
 
     /** 0 省略 */
-    @JsonProperty("duration_ms")
+    @JsonProperty("durationMs")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private long durationMs;
 
@@ -88,6 +88,7 @@ public class AgentToolResultData {
         this.output = QueryData.orEmpty(v);
     }
 
+    @JsonProperty("error")
     public String getError() {
         return error;
     }
@@ -96,6 +97,7 @@ public class AgentToolResultData {
         this.error = QueryData.orEmpty(v);
     }
 
+    @JsonProperty("success")
     public boolean isSuccess() {
         return success;
     }
@@ -104,6 +106,7 @@ public class AgentToolResultData {
         this.success = v;
     }
 
+    @JsonProperty("durationMs")
     public long getDurationMs() {
         return durationMs;
     }
@@ -112,6 +115,7 @@ public class AgentToolResultData {
         this.durationMs = v;
     }
 
+    @JsonProperty("iteration")
     public int getIteration() {
         return iteration;
     }
@@ -120,6 +124,7 @@ public class AgentToolResultData {
         this.iteration = v;
     }
 
+    @JsonProperty("data")
     public Map<String, Object> getData() {
         return data;
     }

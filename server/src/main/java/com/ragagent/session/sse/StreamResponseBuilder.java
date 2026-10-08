@@ -75,10 +75,10 @@ public final class StreamResponseBuilder {
         if (evt.getType() == ResponseType.AGENT_QUERY) {
             Map<String, Object> data = evt.getData();
             if (data != null) {
-                if (data.get("session_id") instanceof String sid) {
+                if (data.get("sessionId") instanceof String sid) {
                     response.setSessionId(sid);
                 }
-                if (data.get("assistant_message_id") instanceof String amid) {
+                if (data.get("assistantMessageId") instanceof String amid) {
                     response.setAssistantMessageId(amid);
                 }
             }
@@ -140,7 +140,7 @@ public final class StreamResponseBuilder {
         sr.setKnowledgeFilename(getString(refMap, "knowledge_filename"));
         sr.setKnowledgeSource(getString(refMap, "knowledge_source"));
         sr.setKnowledgeDescription(getString(refMap, "knowledge_description"));
-        sr.setKnowledgeBaseId(getString(refMap, "knowledge_base_id"));
+        sr.setKnowledgeBaseId(getString(refMap, "knowledgeBaseId"));
 
         if (refMap.get("metadata") instanceof Map<?, ?> meta) {
             Map<String, String> metadata = new LinkedHashMap<>();

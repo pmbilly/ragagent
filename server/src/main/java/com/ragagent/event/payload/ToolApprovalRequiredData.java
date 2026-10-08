@@ -8,9 +8,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * emit 点：common/approval/Gate（{@code <pendingID>-approval-required}），见包注释 emit 表 #10。
  *
  * <p>minimal 形态：{@code args}/{@code args_json}/{@code request_id} 空则省略；其余恒输出——零值时
- * {@code {"pending_id":"","tenant_id":0,"session_id":"","assistant_message_id":"","service_id":"",
+ * {@code {"pendingId":"","tenantId":0,"sessionId":"","assistantMessageId":"","serviceId":"",
  * "service_name":"","mcp_tool_name":"","registered_tool_name":"","description":"",
- * "timeout_seconds":0,"requested_at":0,"tool_call_id":""}}。</p>
+ * "timeout_seconds":0,"requestedAtUnix":0,"toolCallId":""}}。</p>
  *
  * <p>{@code args} 是解析后的 JSON 对象（给 UI 渲染表单），{@code args_json} 是原始
  * JSON 串（给回填），两者都提供。</p>
@@ -18,29 +18,29 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ToolApprovalRequiredData {
 
-    @JsonProperty("pending_id")
+    @JsonProperty("pendingId")
     private String pendingId = "";
 
     /** 0 恒输出 */
-    @JsonProperty("tenant_id")
+    @JsonProperty("tenantId")
     private long tenantId;
 
-    @JsonProperty("session_id")
+    @JsonProperty("sessionId")
     private String sessionId = "";
 
-    @JsonProperty("assistant_message_id")
+    @JsonProperty("assistantMessageId")
     private String assistantMessageId = "";
 
-    @JsonProperty("service_id")
+    @JsonProperty("serviceId")
     private String serviceId = "";
 
-    @JsonProperty("service_name")
+    @JsonProperty("serviceName")
     private String serviceName = "";
 
-    @JsonProperty("mcp_tool_name")
+    @JsonProperty("mcpToolName")
     private String mcpToolName = "";
 
-    @JsonProperty("registered_tool_name")
+    @JsonProperty("registeredToolName")
     private String registeredToolName = "";
 
     @JsonProperty("description")
@@ -52,22 +52,22 @@ public class ToolApprovalRequiredData {
     private Object args;
 
     /** 空串省略 */
-    @JsonProperty("args_json")
+    @JsonProperty("argsJson")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private String argsJson = "";
 
-    @JsonProperty("timeout_seconds")
+    @JsonProperty("timeoutSeconds")
     private int timeoutSeconds;
 
     /** 请求发出时间（unix 秒）；0 恒输出 */
-    @JsonProperty("requested_at")
+    @JsonProperty("requestedAtUnix")
     private long requestedAtUnix;
 
-    @JsonProperty("tool_call_id")
+    @JsonProperty("toolCallId")
     private String toolCallId = "";
 
     /** 空串省略 */
-    @JsonProperty("request_id")
+    @JsonProperty("requestId")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private String requestId = "";
 
@@ -168,6 +168,7 @@ public class ToolApprovalRequiredData {
         this.description = QueryData.orEmpty(v);
     }
 
+    @JsonProperty("args")
     public Object getArgs() {
         return args;
     }
@@ -176,6 +177,7 @@ public class ToolApprovalRequiredData {
         this.args = v;
     }
 
+    @JsonProperty("argsJson")
     public String getArgsJson() {
         return argsJson;
     }
@@ -184,6 +186,7 @@ public class ToolApprovalRequiredData {
         this.argsJson = QueryData.orEmpty(v);
     }
 
+    @JsonProperty("timeoutSeconds")
     public int getTimeoutSeconds() {
         return timeoutSeconds;
     }
@@ -208,6 +211,7 @@ public class ToolApprovalRequiredData {
         this.toolCallId = QueryData.orEmpty(v);
     }
 
+    @JsonProperty("requestId")
     public String getRequestId() {
         return requestId;
     }

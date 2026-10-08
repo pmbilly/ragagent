@@ -72,7 +72,7 @@ test('stop clears the queue only after the stop API succeeds', () => {
 
 // Matching queued text against the message list attaches the wrong bubble as
 // soon as the user sends the same thing twice. The follow-up run persists its
-// query under its own request_id, which identifies the rows exactly.
+// query under its own requestId, which identifies the rows exactly.
 test('follow-up attaches persisted users by requestId', () => {
   const fn = attachSteerFollowUpSource()
   assert.match(fn, /persisted\.requestId !== newAssistant\.requestId/)
@@ -135,13 +135,13 @@ test('remaining overlay after-items chain after a follow-up stream ends', () => 
 })
 
 // Switching sessions while the follow-up poll is in flight used to keep
-// using session_id.value, so continue-stream landed on the new chat.
+// using sessionId.value, so continue-stream landed on the new chat.
 test('follow-up attach aborts when the session changes', () => {
   const fn = attachSteerFollowUpSource()
-  assert.match(fn, /const sessionId = session_id\.value/)
-  assert.match(fn, /session_id\.value !== sessionId/)
-  assert.match(fn, /getMessageList\(\{ session_id: sessionId/)
-  assert.match(fn, /session_id: sessionId/)
+  assert.match(fn, /const sessionId = sessionId\.value/)
+  assert.match(fn, /sessionId\.value !== sessionId/)
+  assert.match(fn, /getMessageList\(\{ sessionId: sessionId/)
+  assert.match(fn, /sessionId: sessionId/)
 })
 
 // After a mid-run inject the completing bubble is a steer-cont-* segment.

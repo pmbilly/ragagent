@@ -348,13 +348,13 @@ const steps = computed(() => {
   return stream
     .filter((event) => {
       return (
-        event.type === 'tool_call' &&
-        typeof event.tool_name === 'string' &&
-        RAG_TIMELINE_TOOL_NAMES.has(event.tool_name)
+        event.type === 'toolCall' &&
+        typeof event.toolName === 'string' &&
+        RAG_TIMELINE_TOOL_NAMES.has(event.toolName)
       )
     })
     .map((event) => {
-      const toolName = String(event.tool_name)
+      const toolName = String(event.toolName)
       const pending = event.pending === true
       const toolData =
         event.tool_data && typeof event.tool_data === 'object'
@@ -375,12 +375,12 @@ const steps = computed(() => {
       const canOpenReferences = !pending && isSearchTool && hasReferences.value
 
       return {
-        id: String(event.tool_call_id || `${toolName}-${event.timestamp || 0}`),
+        id: String(event.toolCallId || `${toolName}-${event.timestamp || 0}`),
         toolName,
         pending,
         iconName: getAgentToolIconName(toolName, searchSource),
         title: getRagPipelineStepTitle(t, {
-          tool_name: toolName,
+          toolName: toolName,
           pending,
           success: event.success as boolean | undefined,
           arguments: event.arguments,

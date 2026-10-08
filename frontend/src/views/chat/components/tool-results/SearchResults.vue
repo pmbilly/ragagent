@@ -121,13 +121,13 @@ const hasSearchParams = computed(() => {
   
   return !!(
     (Array.isArray(args.knowledgeBaseIds) && args.knowledgeBaseIds.length > 0) ||
-    args.top_k || args.vector_threshold || args.keyword_threshold || args.min_score);
+    args.topK || args.vector_threshold || args.keyword_threshold || args.min_score);
 });
 
 const hasOtherParams = computed(() => {
   const args = parsedArguments.value;
   if (!args || typeof args !== 'object') return false;
-  return !!(args.top_k || args.vector_threshold || args.keyword_threshold || args.min_score);
+  return !!(args.topK || args.vector_threshold || args.keyword_threshold || args.min_score);
 });
 
 
