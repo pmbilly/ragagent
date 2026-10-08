@@ -316,7 +316,7 @@ class ImFoundationContractTest {
         assertFx("brief_tool_summary", ToolDisplay.briefToolSummary("x".repeat(300)));
         assertFx("strip_citation", ImFormat.stripImCitationTags("a<kb id=\"1\"/>b<web>c"));
         assertFx("strip_image_xml", ImFormat.stripImageXMLTags(
-                "x<image src=\"s\"><image_original>orig text</image_original></image>y"));
+                "x<image src=\"s\"><imageOriginal>orig text</imageOriginal></image>y"));
         assertFx("holdback_cutoff", String.valueOf(ImFormat.holdbackCutoff("abc<think")));
 
         IncomingMessage fileMsg = IncomingMessage.of("wecom", "u", "");

@@ -155,19 +155,19 @@ class WikiIngestTextUtilsTest {
         assertThat(WikiImageMarkup.stripImageMarkup("Before <img src=\"x.png\" alt=\"y\"/> after"))
                 .isEqualTo("Before  after");
 
-        // 回归护栏：早期版本把整个 <image>...</image> 块删掉（含 <image_ocr> 内容），
+        // 回归护栏：早期版本把整个 <image>...</image> 块删掉（含 <imageOcr> 内容），
         // 静默摧毁了成功的 VLM OCR 结果。修复必须保留内侧 OCR / caption 文本。
         String enriched = "<image url=\"images/page_1.png\">\n"
-                + "<image_original>![p1](images/page_1.png)</image_original>\n"
-                + "<image_caption>scanned letter on letterhead</image_caption>\n"
-                + "<image_ocr>SEHR GEEHRTER HERR MUSTERMANN, ...</image_ocr>\n"
+                + "<imageOriginal>![p1](images/page_1.png)</imageOriginal>\n"
+                + "<imageCaption>scanned letter on letterhead</imageCaption>\n"
+                + "<imageOcr>SEHR GEEHRTER HERR MUSTERMANN, ...</imageOcr>\n"
                 + "</image>";
         assertThat(WikiImageMarkup.stripImageMarkup(enriched))
                 .isEqualTo("\n\nscanned letter on letterhead\nSEHR GEEHRTER HERR MUSTERMANN, ...\n");
 
         // 空的 <image> 块（OCR 失败）退化为空白
         assertThat(WikiImageMarkup.stripImageMarkup(
-                "<image url=\"x\"><image_original>![a](x)</image_original></image>"))
+                "<image url=\"x\"><imageOriginal>![a](x)</imageOriginal></image>"))
                 .isEmpty();
     }
 
@@ -189,15 +189,15 @@ class WikiIngestTextUtilsTest {
         // 图片 + 成功的 VLM OCR（修复点）
         assertThat(WikiImageMarkup.hasSufficientTextContent(
                 "<image url=\"images/p1.png\">\n"
-                        + "<image_original>![p1](images/p1.png)</image_original>\n"
-                        + "<image_caption>scanned letter</image_caption>\n"
-                        + "<image_ocr>Sehr geehrter Herr Mustermann, in der Sache 4711/2024 ...</image_ocr>\n"
+                        + "<imageOriginal>![p1](images/p1.png)</imageOriginal>\n"
+                        + "<imageCaption>scanned letter</imageCaption>\n"
+                        + "<imageOcr>Sehr geehrter Herr Mustermann, in der Sache 4711/2024 ...</imageOcr>\n"
                         + "</image>")).isTrue();
 
         // 图片 + 失败的 VLM OCR（仍拒绝）
         assertThat(WikiImageMarkup.hasSufficientTextContent(
                 "<image url=\"images/p1.png\">\n"
-                        + "<image_original>![p1](images/p1.png)</image_original>\n"
+                        + "<imageOriginal>![p1](images/p1.png)</imageOriginal>\n"
                         + "</image>")).isFalse();
 
         // 充足文本混着图片仍通过
@@ -229,8 +229,8 @@ class WikiIngestTextUtilsTest {
     @DisplayName("TestMaskImageURLs/富化图片属性与原始 Markdown 共用同一 token")
     void maskEnrichedImageSharesToken() {
         String input = "<image url=\"" + URL_A + "\">\n"
-                + "<image_original>![page](" + URL_A + ")</image_original>\n"
-                + "<image_caption>caption text</image_caption>\n"
+                + "<imageOriginal>![page](" + URL_A + ")</imageOriginal>\n"
+                + "<imageCaption>caption text</imageCaption>\n"
                 + "</image>";
         WikiImageMarkup.Masked masked = WikiImageMarkup.maskImageURLs(input);
 

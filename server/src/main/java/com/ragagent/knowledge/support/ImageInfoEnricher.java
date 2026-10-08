@@ -239,7 +239,7 @@ public final class ImageInfoEnricher {
             ImageInfo imgInfo = infoMap.get(match.url());
             StringBuilder b = new StringBuilder();
             b.append("<image url=\"").append(match.url()).append("\">\n");
-            b.append("<image_original>").append(match.whole()).append("</image_original>\n");
+            b.append("<imageOriginal>").append(match.whole()).append("</imageOriginal>\n");
             if (imgInfo != null) {
                 b.append(buildImageInfoXml(imgInfo));
             }
@@ -388,10 +388,10 @@ public final class ImageInfoEnricher {
     public static String buildImageInfoXml(ImageInfo img) {
         StringBuilder b = new StringBuilder();
         if (img != null && !img.getCaption().isEmpty()) {
-            b.append("<image_caption>").append(img.getCaption()).append("</image_caption>\n");
+            b.append("<imageCaption>").append(img.getCaption()).append("</imageCaption>\n");
         }
         if (img != null && !img.getOcrText().isEmpty()) {
-            b.append("<image_ocr>").append(img.getOcrText()).append("</image_ocr>\n");
+            b.append("<imageOcr>").append(img.getOcrText()).append("</imageOcr>\n");
         }
         return b.toString();
     }
@@ -430,7 +430,7 @@ public final class ImageInfoEnricher {
             ImageInfo imgInfo = infoMap.get(match.url());
             if (imgInfo != null && !imgInfo.getCaption().isEmpty()) {
                 String replacement = match.whole() + "\n"
-                        + "<image_caption>" + imgInfo.getCaption() + "</image_caption>";
+                        + "<imageCaption>" + imgInfo.getCaption() + "</imageCaption>";
                 content = replaceFirst(content, match.whole(), replacement);
             }
         }
@@ -441,7 +441,7 @@ public final class ImageInfoEnricher {
                 continue;
             }
             if (!imgInfo.getCaption().isEmpty()) {
-                extras.add("<image_caption>" + imgInfo.getCaption() + "</image_caption>");
+                extras.add("<imageCaption>" + imgInfo.getCaption() + "</imageCaption>");
             }
         }
         if (!extras.isEmpty()) {
@@ -509,10 +509,10 @@ public final class ImageInfoEnricher {
     static String buildCaptionOcrBlock(ImageInfo img) {
         List<String> parts = new ArrayList<>();
         if (!img.getCaption().isEmpty()) {
-            parts.add("<image_caption>" + img.getCaption() + "</image_caption>");
+            parts.add("<imageCaption>" + img.getCaption() + "</imageCaption>");
         }
         if (!img.getOcrText().isEmpty()) {
-            parts.add("<image_ocr>" + img.getOcrText() + "</image_ocr>");
+            parts.add("<imageOcr>" + img.getOcrText() + "</imageOcr>");
         }
         return String.join("\n", parts);
     }

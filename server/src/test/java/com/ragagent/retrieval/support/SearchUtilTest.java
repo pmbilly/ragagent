@@ -156,9 +156,9 @@ class SearchUtilTest {
         String info = marshalOf("local://1/a.png", "", "A caption", "OCR text");
         String got = ImageInfoEnricher.enrichContentWithImageInfo(content, info);
         assertTrue(got.contains("<image url=\"local://1/a.png\">"));
-        assertTrue(got.contains("<image_original>![alt](local://1/a.png)</image_original>"));
-        assertTrue(got.contains("<image_caption>A caption</image_caption>"));
-        assertTrue(got.contains("<image_ocr>OCR text</image_ocr>"));
+        assertTrue(got.contains("<imageOriginal>![alt](local://1/a.png)</imageOriginal>"));
+        assertTrue(got.contains("<imageCaption>A caption</imageCaption>"));
+        assertTrue(got.contains("<imageOcr>OCR text</imageOcr>"));
         assertTrue(got.endsWith("</image> after"));
     }
 
@@ -172,7 +172,7 @@ class SearchUtilTest {
                 ImageInfoEnricher.enrichContentWithImageInfo(content, noInfo));
         String withCaption = ImageInfoMatchUtil.marshalImageInfos(List.of(infoOf(
                 "local://2/b.png", "", "cap2", "")));
-        assertEquals("no images here\n<image url=\"local://2/b.png\">\n<image_caption>cap2</image_caption>\n</image>",
+        assertEquals("no images here\n<image url=\"local://2/b.png\">\n<imageCaption>cap2</imageCaption>\n</image>",
                 ImageInfoEnricher.enrichContentWithImageInfo(content, withCaption));
     }
 
@@ -213,9 +213,9 @@ class SearchUtilTest {
     @Test
     void buildImageInfoXmlVariants() {
         ImageInfo i = infoOf("u", "", "cap", "text");
-        assertEquals("<image_caption>cap</image_caption>\n<image_ocr>text</image_ocr>\n",
+        assertEquals("<imageCaption>cap</imageCaption>\n<imageOcr>text</imageOcr>\n",
                 ImageInfoEnricher.buildImageInfoXml(i));
-        assertEquals("<image url=\"u\">\n<image_caption>cap</image_caption>\n<image_ocr>text</image_ocr>\n</image>",
+        assertEquals("<image url=\"u\">\n<imageCaption>cap</imageCaption>\n<imageOcr>text</imageOcr>\n</image>",
                 ImageInfoEnricher.buildImageInfoXmlWithUrl("u", i));
         ImageInfo empty = infoOf("", "", "", "");
         assertEquals("", ImageInfoEnricher.buildImageInfoXmlWithUrl("u", empty));
@@ -228,12 +228,12 @@ class SearchUtilTest {
                 infoOf("u1", "", "cap1", "ocr1"),
                 infoOf("u2", "", "cap2", "")));
         String captionOnly = ImageInfoEnricher.enrichContentCaptionOnly(content, info);
-        assertEquals("![a](u1)\n<image_caption>cap1</image_caption> text\n<image_caption>cap2</image_caption>",
+        assertEquals("![a](u1)\n<imageCaption>cap1</imageCaption> text\n<imageCaption>cap2</imageCaption>",
                 captionOnly);
 
         String captionOcr = ImageInfoEnricher.enrichContentCaptionAndOcr(content, info);
-        assertEquals("![a](u1)\n<image_caption>cap1</image_caption>\n<image_ocr>ocr1</image_ocr> text"
-                        + "\n<image_caption>cap2</image_caption>",
+        assertEquals("![a](u1)\n<imageCaption>cap1</imageCaption>\n<imageOcr>ocr1</imageOcr> text"
+                        + "\n<imageCaption>cap2</imageCaption>",
                 captionOcr);
     }
 

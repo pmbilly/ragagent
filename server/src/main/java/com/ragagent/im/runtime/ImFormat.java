@@ -31,7 +31,7 @@ public final class ImFormat {
 
     private static final Pattern CITATION_TAG_RE = Pattern.compile("<(?:kb|web)\\b[^>]*/?>");
     private static final Pattern IMAGE_XML_BLOCK_RE = Pattern.compile("(?s)<image\\b[^>]*>.*?</image>");
-    private static final Pattern IMAGE_ORIGINAL_RE = Pattern.compile("<image_original>(.*?)</image_original>");
+    private static final Pattern IMAGE_ORIGINAL_RE = Pattern.compile("<imageOriginal>(.*?)</imageOriginal>");
 
     /** 移除 s 里的 &lt;kb .../&gt; 与 &lt;web .../&gt; 行内引用标签。 */
     public static String stripImCitationTags(String s) {

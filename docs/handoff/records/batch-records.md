@@ -984,3 +984,15 @@
 - **机制（为什么包环不写进 ArchUnit）**：类注释写明分工——**包级结构（包间环/分层/config 依赖）归脚本棘轮，代码级规则归本测试**；「顶层包无环」落在脚本 R1b（SCC）。
 - **闸门**：后端全量 **4,836**/0 + `spotlessCheck` + 四守卫（JSON 键名 / 包环含 SCC / Go 锚点 / 跨面键）全绿。
 - **下一步候选**：§15.3「已解除」三面（SSE 事件载荷键 / wiki 图片标记 / 落库 jsonb 存量键），或阶段 4 续做 C2~C8 端口化（`auth` 依赖下沉、`wiki→knowledge` 门面 43 处）。
+
+**✅ B93a（2026-10-08，wiki 图片标记 camel 化）**
+- **口径（先分清"标记名"与"值"）**：`image_ocr` / `image_caption` 在本仓**同时是 chunk_type 的值**（`common/pipeline/ChunkTypes.IMAGE_OCR/IMAGE_CAPTION`、`WikiIngestService.CHUNK_TYPE_*`、`retrieval/HybridResultOps` 的 chunkType 过滤、`ChunkController` 文档化的 `?chunkType=image_caption`、落库 `chunks.chunk_type` 取值）。**值属语义，保留**（§2.4）；本批只改**标记名**：
+  `<image_caption>` → `<imageCaption>`、`<image_ocr>` → `<imageOcr>`、`<image_original>` → `<imageOriginal>`（包装标签 `<image>`/`<images>` 单词，不动）。
+- **改动 11 文件 / 97 处标签位**：`common/wiki/WikiImageMarkup`（`IMAGE_ORIGINAL_BLOCK_RE` 等三块正则 + javadoc）、`knowledge/support/ImageInfoEnricher`（7 处，把 image_info 包成标记）、`wiki/service/WikiImageEnricher`、`DefaultWikiImageEnricher`（javadoc）、`im/runtime/ImFormat`（剥离正则）、测试 4 文件（`WikiIngestTextUtilsTest` 21 / `SearchUtilTest` 26 / `GraphChunkSelectorTest` 2 / `ImFoundationContractTest` 2）、前端 `utils/chatMarkdownRenderer.ts`（3 条 legacy 正则）+ `chatMarkdownRenderer.test.ts`（夹具 + 3 条负向断言）。
+- **不要动的三处（易误伤）**：① docreader 候选键列表（`PluginQueryUnderstand` 的 `image_ocr_text`/`ocr_content`/`image_ocr` 入站候选，外部载荷）；② `PipelineLog` 的 span 名 `update_image_caption`（观测面）；③ chunk_type 值（见上）。
+- **过程事故（转义形态漏改，同类第二次）**：
+  - `<image_original\\b`（Java 正则里的词边界，`\b` 不是 `[\s>]`）→ 首轮漏改 ⇒ `IMAGE_ORIGINAL_BLOCK_RE` 仍匹配旧开标签、**新内容里的冗余块删不掉**（静默功能缺陷，无测试覆盖，靠人工复扫发现）。修：改开标签为 `<imageOriginal\b`。
+  - `<\\/image_caption>`（JS 正则里 `<`+`\`+`/` 的转义斜杠）→ 首轮只改了开标签，闭合标签没跟上 ⇒ 前端 3 条用例红。修：连闭合标签一起改。
+  - **教训固化**：改名批的"任意转义深度"扫描必须把 `\b`（词边界）与转义斜杠 `\\/` 一并纳入模式；`<tag\b` 形态在 Java 正则里普遍存在。
+- **闸门**：后端全量 **4,836**/0 + 前端 **736**/736 + `vue-tsc` 0 错 + `spotlessCheck` + 四守卫（JSON 键名 / 包环含 SCC / Go 锚点 / 跨面键）全绿。
+- **B93 余项**：SSE/Redis 事件载荷键（`session_id`/`tool_name`/`total_steps`…）、落库 jsonb 存量键（agent_steps payload / memory 抽取状态 / 租户配置内容）。

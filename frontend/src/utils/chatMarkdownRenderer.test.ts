@@ -101,8 +101,8 @@ test('normalizeLegacyImageContextMarkup converts copied image XML to Markdown', 
   const input = [
     'before',
     '<image url="resource://AbCdEfGhIjKlMnOpQrStUv">',
-    '<image_caption>目标说话人提取的流程图 [测试]</image_caption>',
-    '<image_ocr>目标说话人提取</image_ocr>',
+    '<imageCaption>目标说话人提取的流程图 [测试]</imageCaption>',
+    '<imageOcr>目标说话人提取</imageOcr>',
     '</image>',
     'after',
   ].join('\n')
@@ -111,7 +111,7 @@ test('normalizeLegacyImageContextMarkup converts copied image XML to Markdown', 
   assert.ok(
     output.includes('![目标说话人提取的流程图 \\[测试\\]](resource://AbCdEfGhIjKlMnOpQrStUv)'),
   )
-  assert.doesNotMatch(output, /<image|image_caption|image_ocr/)
+  assert.doesNotMatch(output, /<image|imageCaption|imageOcr/)
   assert.match(output, /before[\s\S]*after/)
 })
 
@@ -119,8 +119,8 @@ test('normalizeLegacyImageContextMarkup keeps original Markdown when present', (
   const input = [
     '<images>',
     '<image url="resource://AbCdEfGhIjKlMnOpQrStUv">',
-    '<image_original>![原图](resource://AbCdEfGhIjKlMnOpQrStUv)</image_original>',
-    '<image_caption>description</image_caption>',
+    '<imageOriginal>![原图](resource://AbCdEfGhIjKlMnOpQrStUv)</imageOriginal>',
+    '<imageCaption>description</imageCaption>',
     '</image>',
     '</images>',
   ].join('\n')
@@ -136,11 +136,11 @@ test('normalizeLegacyImageContextMarkup hides an unfinished XML block while stre
   for (const partial of [
     '<ima',
     '<image url="resource://AbCdEfGhIjKlMnOpQrStUv">',
-    '<image url="resource://AbCdEfGhIjKlMnOpQrStUv">\n<image_caption>流程图',
+    '<image url="resource://AbCdEfGhIjKlMnOpQrStUv">\n<imageCaption>流程图',
   ]) {
     const output = normalizeLegacyImageContextMarkup(prefix + partial, true)
     assert.equal(output, prefix + '<span class="streaming-image-loading"><span class="streaming-image-loading__skeleton"></span></span>')
-    assert.doesNotMatch(output, /resource:\/\/|image_caption|<ima/)
+    assert.doesNotMatch(output, /resource:\/\/|imageCaption|<ima/)
   }
 })
 
@@ -157,7 +157,7 @@ test('renderChatMarkdown renders leaked legacy image XML through the safe image 
     isValidImageUrl: (href) => href.startsWith('resource://'),
   })
   const html = renderChatMarkdown(
-    '<image url="resource://AbCdEfGhIjKlMnOpQrStUv"><image_caption>流程图</image_caption></image>',
+    '<image url="resource://AbCdEfGhIjKlMnOpQrStUv"><imageCaption>流程图</imageCaption></image>',
     {
       renderer,
       escapeMarkdown: (text) => text,
@@ -167,7 +167,7 @@ test('renderChatMarkdown renders leaked legacy image XML through the safe image 
   )
 
   assert.match(html, /<img src="resource:\/\/AbCdEfGhIjKlMnOpQrStUv" alt="流程图">/)
-  assert.doesNotMatch(html, /image_caption|&lt;image/)
+  assert.doesNotMatch(html, /imageCaption|&lt;image/)
 })
 
 test('stripIncompleteCitationTag hides only an unfinished streaming citation tail', () => {

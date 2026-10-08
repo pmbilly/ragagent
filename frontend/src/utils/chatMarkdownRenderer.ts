@@ -82,9 +82,9 @@ export function replaceIncompleteImageWithPlaceholder(content: string): string {
 
 const LEGACY_IMAGE_BLOCK_RE = /<image\b([^>]*)>([\s\S]*?)<\/images?>/gi
 const LEGACY_IMAGES_WRAPPER_RE = /<\/?images\b[^>]*>/gi
-const LEGACY_IMAGE_ORIGINAL_RE = /<image_original>([\s\S]*?)<\/image_original>/i
-const LEGACY_IMAGE_CAPTION_RE = /<image_caption>([\s\S]*?)<\/image_caption>/i
-const LEGACY_IMAGE_OCR_RE = /<image_ocr>([\s\S]*?)<\/image_ocr>/i
+const LEGACY_IMAGE_ORIGINAL_RE = /<imageOriginal>([\s\S]*?)<\/imageOriginal>/i
+const LEGACY_IMAGE_CAPTION_RE = /<imageCaption>([\s\S]*?)<\/imageCaption>/i
+const LEGACY_IMAGE_OCR_RE = /<imageOcr>([\s\S]*?)<\/imageOcr>/i
 const COMPLETE_MARKDOWN_CODE_RE = /(```[\s\S]*?```|~~~[\s\S]*?~~~|`[^`\n]*`)/g
 const IMAGE_URL_SCHEME = '(?:https?|resource|storage|local|minio|s3|cos|tos|oss|obs|ks3)'
 const FULLWIDTH_IMAGE_OPEN_RE = new RegExp(`(!\\[[^\\]\\n]*\\])（(?=${IMAGE_URL_SCHEME}://)`, 'gi')

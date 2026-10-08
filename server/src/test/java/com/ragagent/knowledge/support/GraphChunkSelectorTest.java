@@ -34,7 +34,7 @@ class GraphChunkSelectorTest {
     void extractableText() {
         assertTrue(GraphChunkSelector.chunkHasExtractableText("张三在腾讯工作"));
         assertFalse(GraphChunkSelector.chunkHasExtractableText("![img](http://x/y.png)"));
-        assertFalse(GraphChunkSelector.chunkHasExtractableText("<image_original>![a](b.png)</image_original>"));
+        assertFalse(GraphChunkSelector.chunkHasExtractableText("<imageOriginal>![a](b.png)</imageOriginal>"));
         assertFalse(GraphChunkSelector.chunkHasExtractableText("   "));
     }
 

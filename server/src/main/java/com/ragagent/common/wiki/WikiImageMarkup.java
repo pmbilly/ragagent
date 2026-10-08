@@ -20,10 +20,10 @@ import com.ragagent.common.text.Whitespace;
  *
  * <h2>为什么剥离图片标记要保留内侧文本</h2>
  * <p>PDF 扫描件的 VLM OCR 成功时，抽取文本会被包在
- * {@code <image_ocr>...</image_ocr>} 里（外层还有 {@code <image>}）。若天真地
+ * {@code <imageOcr>...</imageOcr>} 里（外层还有 {@code <image>}）。若天真地
  * "整块 {@code <image>...</image>} 删掉"，就会丢掉 OCR 文本——恰好是我们最想要的
  * 东西。所以本类只删<b>标签</b>（{@code imageWrapperTagRE}），保留标签之间的内容；
- * 只有 {@code <image_original>}（纯粹是已删图片链接的冗余副本）才整块删除。</p>
+ * 只有 {@code <imageOriginal>}（纯粹是已删图片链接的冗余副本）才整块删除。</p>
  *
  * <h2>正则说明</h2>
  * <p>{@code (?is)} / {@code (?i)}
@@ -41,15 +41,15 @@ public final class WikiImageMarkup {
     /** Markdown 图片引用 {@code ![alt](path)} */
     static final Pattern MD_IMAGE_REF_RE = Pattern.compile("!\\[[^\\]]*\\]\\([^)]*\\)");
 
-    /** {@code <image_original>...</image_original>} 冗余块（值复制了已删的图片链接） */
+    /** {@code <imageOriginal>...</imageOriginal>} 冗余块（值复制了已删的图片链接） */
     static final Pattern IMAGE_ORIGINAL_BLOCK_RE =
-            Pattern.compile("(?is)<image_original\\b[^>]*>.*?</image_original>");
+            Pattern.compile("(?is)<imageOriginal\\b[^>]*>.*?</imageOriginal>");
 
     /** 自闭合 / 只带属性的 HTML {@code <img>} 标签 */
     static final Pattern HTML_IMG_TAG_RE = Pattern.compile("(?i)<img\\b[^>]*/?>");
 
     /**
-     * 包装式 {@code <image> / <images> / <image_caption> / <image_ocr>} 标签
+     * 包装式 {@code <image> / <images> / <imageCaption> / <imageOcr>} 标签
      * （开或闭）。<b>只匹配标签本身</b>，标签之间的文本保留。
      */
     static final Pattern IMAGE_WRAPPER_TAG_RE = Pattern.compile("(?i)</?image[a-z_]*\\b[^>]*/?>");
@@ -296,11 +296,11 @@ public final class WikiImageMarkup {
 
     /**
      * 删掉"只有图片"的占位
-     * （Markdown 图片引用、{@code <img>} 标签、{@code <image_original>} 冗余块），
-     * 并<b>解开</b> {@code <image>/<image_caption>/<image_ocr>} 包装标签，
+     * （Markdown 图片引用、{@code <img>} 标签、{@code <imageOriginal>} 冗余块），
+     * 并<b>解开</b> {@code <image>/<imageCaption>/<imageOcr>} 包装标签，
      * 把 OCR / caption 文本留成行内纯文本。
      *
-     * <p>处理顺序有意义：先删 {@code <image_original>} 整块
+     * <p>处理顺序有意义：先删 {@code <imageOriginal>} 整块
      * （其中含 Markdown 图片引用），再删裸 Markdown 图片引用，再删 {@code <img>}，
      * 最后才解开包装标签。</p>
      */

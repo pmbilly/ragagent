@@ -18,7 +18,7 @@ import com.ragagent.wiki.service.ingest.WikiIngestService;
  *   <li>{@code content = reconstructContent(chunks)} —— 纯文本重建（见
  *       {@link WikiIngestService#reconstructContent}）；</li>
  *   <li>收集文本 chunk 的 ID，按 chunk 汇总图片信息；</li>
- *   <li>把 {@code <image>/<image_ocr>/<image_caption>} 块内联进正文。</li>
+ *   <li>把 {@code <image>/<imageOcr>/<imageCaption>} 块内联进正文。</li>
  * </ol>
  *
  * <p><b>未接线时的退化行为</b>：{@code wikiService} 在 enrich 服务缺席时返回

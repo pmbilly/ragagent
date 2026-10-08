@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
  *   <li>收集文本 chunk 的 ID（调用方已按 {@code ChunkType=text} 过滤）；</li>
  *   <li>{@code CollectImageInfoByChunkIDs} + {@code MergeImageInfoJSON} 汇总图片信息；</li>
  *   <li>合并结果非空时 {@code EnrichContentWithImageInfo} 把
- *       {@code <image>/<image_ocr>/<image_caption>} 块内联进正文；否则原样返回。</li>
+ *       {@code <image>/<imageOcr>/<imageCaption>} 块内联进正文；否则原样返回。</li>
  * </ol>
  *
  * <p>没有实现 bean 时 {@code WikiIngestService} 恒走
