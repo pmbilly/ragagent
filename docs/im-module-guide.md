@@ -111,7 +111,7 @@ graph LR
 | 谁消费 im | **1 个文件**：`config/ImAdapterWiringConfig` | 注册 10 个平台工厂（telegram/slack/qqbot/wecom/feishu/lark/dingtalk/wechat/mattermost/yunzhijia）+ 延迟注入 `StreamManager`；**未注册的平台 `startChannel` 只打 WARN，渠道保持未启动，绝不静默假装成功**（该类 javadoc 原文） |
 | im 消费谁（import 条数） | common 29 / session 17 / agent 9 / event 5 / knowledge 4 / stream 3 | session 的消费集中在 `service/` 的 **6 个文件**（ImService、ImQaRunner、ImQaRequests、ImSessionResolver、ImStreamPipeline、ImAttachmentPreparer）；agent 的 9 条里有 2 条是 domain 实体借 `JsonbRawStringTypeHandler`（§2.2） |
 
-**门面是本模块的枢纽**：`ImService` 保留消息入口、命令执行、附件入口与装配面，9 个协作者经包内可见字段回引门面（§14.7.4 拆分先例）。**B123~B127 四刀后的分工**：`ImStopOps` 跨实例 /stop 全链路、`ImInboundGuardOps` 去重与限流、`ImKnowledgeBridgeOps` 知识库接面（命令 KB/检索 + 附件入库）、`ImChannelRuntimeOps` 渠道生命周期 + 选主 + 配置广播。**注意**：`ImChannelRuntimeOps` 里的 `startChannelsOnReady`（重启后按库启动全部渠道）**全仓无调用者**——疑似未接线，登记在案（详见 HANDOFF B127）；`ImKnowledgeBridgeOps` 的 KB/检索两桩同理。
+**门面是本模块的枢纽**：`ImService` 保留消息入口、命令执行、附件入口与装配面，9 个协作者经包内可见字段回引门面（§14.7.4 拆分先例）。**B123~B127 四刀后的分工**：`ImStopOps` 跨实例 /stop 全链路、`ImInboundGuardOps` 去重与限流、`ImKnowledgeBridgeOps` 知识库接面（命令 KB/检索 + 附件入库）、`ImChannelRuntimeOps` 渠道生命周期 + 选主 + 配置广播。**两个触发点挂在门面上**（B128）：`startChannelsOnReady` 带 `@EventListener(ApplicationReadyEvent)`、`stop` 带 `@PreDestroy` —— 实现在 `ImChannelRuntimeOps`，但**那个类不是 bean** ⇒ 钩子必须留在门面，否则静默失效（B127 曾把注解随块搬走，编译与全量测试都没抓到；现由 **ArchUnit A13** + `ImLifecycleWiringTest` 双保险）。另：`ImKnowledgeBridgeOps` 的 KB/检索两桩恒返回空（功能缺口，待接线，详见 HANDOFF B126）。
 
 ---
 

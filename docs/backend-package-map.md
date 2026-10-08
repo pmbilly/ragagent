@@ -125,7 +125,7 @@ B33 已归位：`AppEnvLookup` → `common/deployment`、`StorageRuntimeEnv` →
 | 前缀 | 出处 | 条数 | 主题 | 在哪看 |
 |---|---|---|---|---|
 | **`R*`** | `scripts/check-package-cycles.py` | 10（R1/R1b/R2/R3/R3b/R4~R8）| **依赖与结构**：包间环、间接环（SCC）、依赖 `config`、L2→L3 条数与处数、`common` 纪律、`package`↔路径一致、**禁内联全限定名** | 脚本 docstring + 运行输出 |
-| **`A*`** | `com.ragagent.arch.ArchitectureRulesTest` / `ClasspathResourcesTest` | 14（A1~A12b）| **代码规范**：裸 `getenv`、属性类扫描覆盖、双装配、`install*` 调用面、裸 NUL、`@Lazy`、裸 JDBC、字符串列名 wrapper、`.last(` 拼接、分层倒挂、`*Mapper` 包约定、classpath 资源存在性 | 测试 `@DisplayName` |
+| **`A*`** | `com.ragagent.arch.ArchitectureRulesTest` / `ClasspathResourcesTest` | 15（A1~A13）| **代码规范**：裸 `getenv`、属性类扫描覆盖、双装配、`install*` 调用面、裸 NUL、`@Lazy`、裸 JDBC、字符串列名 wrapper、`.last(` 拼接、分层倒挂、`*Mapper` 包约定、classpath 资源存在性、**生命周期/事件钩子必须在 Spring 扫描到的类上（A13，B128 事故产物）** | 测试 `@DisplayName` |
 | **`S*`** | `scripts/check-stray-dirs.py` | 2（S1/S2）| **目录卫生**：游离目录（对 git 不可见的空目录）、死包目录（整棵子树无 `.java`）| 脚本 docstring |
 | 其余脚本 | `check-json-key-case` / `check-go-anchors` / `check-fe-contract-keys` / `check-event-face-case` / `check-file-size` | — | 换锚命名、注释锚点、前后端契约键、事件面命名、文件体量棘轮 | 各自 docstring |
 

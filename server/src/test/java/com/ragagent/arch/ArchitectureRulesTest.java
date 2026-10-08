@@ -21,6 +21,7 @@ import com.ragagent.common.storage.StorageRuntimeEnv;
 import com.tngtech.archunit.core.domain.JavaAnnotation;
 import com.tngtech.archunit.core.domain.JavaCall;
 import com.tngtech.archunit.core.domain.JavaClass;
+import com.tngtech.archunit.core.domain.JavaMethod;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.domain.JavaConstructor;
 import com.tngtech.archunit.core.domain.JavaConstructorCall;
@@ -31,6 +32,7 @@ import com.tngtech.archunit.lang.SimpleConditionEvent;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.event.EventListener;
 
 import java.util.Map;
 import java.util.TreeSet;
@@ -38,6 +40,9 @@ import java.util.function.Predicate;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.stereotype.Component;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import org.springframework.stereotype.Service;
 
 /**
@@ -561,5 +566,37 @@ class ArchitectureRulesTest {
                 .because("@MapperScan(\"com.ragagent.**.mapper\") 只扫 mapper 包；"
                         + "放错包 = 启动期缺 Bean 或该 mapper 静默不注册")
                 .check(MAIN);
+    }
+
+    @Test
+    @DisplayName("A13：@EventListener/@PostConstruct/@PreDestroy 方法必须声明在 Spring 扫描到的类上")
+    void lifecycleHooksMustLiveOnScannedBeans() {
+        // 判据来自一次真实事故（B127 → B128）：把 @EventListener/@PreDestroy 随方法一起
+        // 搬进"由门面 new 出来的协作者类"——那个类不是 Spring bean ⇒ 注解**静默失效**
+        // （渠道不再随应用启动、停机钩子不再执行），而编译与 4,700+ 全量测试**全部照绿**。
+        // 这类失效没有任何运行期报错，只能靠本规则兜住。
+        //
+        // 口径：方法所在类必须被 Spring 扫到。（探针实测修正过一次判据：只认 @Component 派生会把
+        // @ConfigurationProperties 类误报——它们经 @ConfigurationPropertiesScan 注册，同样是 bean，
+        // 且 A2 已保证这类类落在扫描名单覆盖的包内，两条规则正好接上。）
+        // 由 @Bean 方法返回的生命周期对象不在此列——那是 SmartLifecycle 语义，不是方法注解。
+        Set<String> actual = new TreeSet<>();
+        for (JavaClass clazz : MAIN) {
+            if (clazz.isMetaAnnotatedWith(Component.class)
+                    || clazz.isAnnotatedWith(ConfigurationProperties.class)) {
+                continue;
+            }
+            for (JavaMethod method : clazz.getMethods()) {
+                if (method.isAnnotatedWith(EventListener.class)
+                        || method.isAnnotatedWith(PostConstruct.class)
+                        || method.isAnnotatedWith(PreDestroy.class)) {
+                    actual.add(topLevel(clazz).getName() + "#" + method.getName());
+                }
+            }
+        }
+        assertThat(actual)
+                .as("A13 钩子方法不在 Spring 扫描到的类上 ⇒ 注解静默失效（无报错、测试也绿）。"
+                        + "修法：把钩子挪到 bean（如域门面）上，或把该类变成 bean")
+                .isEmpty();
     }
 }

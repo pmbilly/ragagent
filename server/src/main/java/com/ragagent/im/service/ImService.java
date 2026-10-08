@@ -8,7 +8,11 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.annotation.PreDestroy;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -458,12 +462,20 @@ public class ImService implements AgentChannelCleaner {
         channelRuntime.onChannelChanged(channelId);
     }
 
-    /** 运行时就绪后启动渠道。实现见 {@link ImChannelRuntimeOps}。 */
+    /**
+     * 运行时就绪后启动渠道（B128 起此处的 {@code @EventListener} 是**唯一触发入口**：
+     * 实现在 {@link ImChannelRuntimeOps#startChannelsOnReady()}，而那个类不是 Spring bean）。
+     */
+    @EventListener(ApplicationReadyEvent.class)
     public void startChannelsOnReady() {
         channelRuntime.startChannelsOnReady();
     }
 
-    /** 运行时停止（队列 + 全部渠道 + leader 线程）。实现见 {@link ImChannelRuntimeOps}。 */
+    /**
+     * 运行时停止（队列 + 全部渠道 + leader 线程）。B128 起此处的 {@code @PreDestroy}
+     * 是**唯一触发入口**（实现在 {@link ImChannelRuntimeOps#stop()}）。
+     */
+    @PreDestroy
     public void stop() {
         channelRuntime.stop();
     }
