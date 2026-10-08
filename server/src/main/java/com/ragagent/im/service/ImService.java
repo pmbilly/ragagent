@@ -27,7 +27,6 @@ import com.ragagent.agent.management.service.CustomAgentService;
 import com.ragagent.approval.RedisPubSub;
 import com.ragagent.approval.SpringRedisPubSub;
 import com.ragagent.common.context.TenantContext;
-import com.ragagent.common.llm.ResponseType;
 import com.ragagent.im.domain.ChannelSessionEntity;
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.mapper.ChannelSessionMapper;
@@ -54,9 +53,7 @@ import com.ragagent.session.service.MessageService;
 import com.ragagent.session.service.SessionAgentQaService;
 import com.ragagent.session.service.SessionKnowledgeQaService;
 import com.ragagent.session.service.SessionService;
-import com.ragagent.stream.StreamEvent;
 import com.ragagent.stream.StreamManager;
-import com.ragagent.stream.StreamStopWatcher;
 import com.ragagent.event.TenantContextSnapshot;
 import com.ragagent.storage.support.Resolver;
 
@@ -79,10 +76,6 @@ public class ImService implements AgentChannelCleaner {
     private static final Logger log = LoggerFactory.getLogger(ImService.class);
     static final ObjectMapper JSON = new ObjectMapper();
 
-    /** 执行前 /stop 标记的 TTL。 */
-    private static final int STOP_MARKER_TTL_SECONDS = 30;
-    /** 跨实例在途映射的 TTL（10 分钟）。 */
-    private static final int INFLIGHT_TTL_SECONDS = 600;
     /** 消息去重标记的 TTL。 */
     private static final int DEDUP_TTL_SECONDS = 300;
     /** WS 长连接 leader 锁的 TTL。 */
@@ -127,6 +120,8 @@ public class ImService implements AgentChannelCleaner {
     final ImSessionResolver sessionResolver;
     final ImQaRequests qaRequests;
     final ImAttachmentPreparer attachmentPreparer;
+    /** 跨实例 /stop 全链路（B123 自本类外提；与门面共享 inflight 表）。 */
+    final ImStopOps stopOps;
     /** 知识库创建面（渠道配了 KB 时附件异步入库；组件缺席时跳过）。 */
     private final ObjectProvider<KnowledgeService> knowledgeServices;
 
@@ -139,8 +134,6 @@ public class ImService implements AgentChannelCleaner {
     private final Map<String, Long> processedMsgs = new ConcurrentHashMap<>();
     /** 在途请求（/stop 的本地取消面）。 */
     final Map<String, InflightEntry> inflight = new ConcurrentHashMap<>();
-    /** 跨实例 /stop 标记的本地等价物。 */
-    private final Map<String, Long> stopMarkers = new ConcurrentHashMap<>();
 
     /** 运行中的渠道状态。 */
     record ChannelState(ImChannelEntity channel, Adapter adapter,
@@ -217,6 +210,7 @@ public class ImService implements AgentChannelCleaner {
             qaRunner.executeQARequest(t);
         }, store, globalMaxWorkers, null);
         this.qaQueue.start();
+        this.stopOps = new ImStopOps(store, qaQueue, inflight, () -> streamManagerRef);
         if (pubSub != null) {
             startChannelConfigSubscriber();
         }
@@ -884,7 +878,7 @@ public class ImService implements AgentChannelCleaner {
             // 软删当前映射：下条 IM 消息解析出全新会话。
             channelSessions.softDelete(channelSession.getId(), OffsetDateTime.now());
         } else if (result.action == Commands.ACTION_STOP) {
-            doLocalStop(channel, msg, channelSession);
+            stopOps.doLocalStop(channel, msg, channelSession);
         }
 
         boolean sent = false;
@@ -904,111 +898,21 @@ public class ImService implements AgentChannelCleaner {
                 cmd.name(), channel.getId(), msg.userId, result.action);
     }
 
-    private void doLocalStop(ImChannelEntity channel, IncomingMessage msg,
-            ChannelSessionEntity channelSession) {
-        String stopThreadId = ImTypes.SESSION_MODE_THREAD.equals(channel.getSessionMode())
-                ? msg.threadId : "";
-        String inflightKey = ImFormat.makeUserKey(channel.getId(), msg.userId, msg.chatId,
-                stopThreadId);
-        // 1. 本地取消：出队或在途取消（在途时同时拿到本实例已知的 session/message）。
-        boolean localStopped = qaQueue.remove(inflightKey);
-        InflightEntry entry = localStopped ? null : inflight.remove(inflightKey);
-        String sessionId = "";
-        String messageId = "";
-        if (entry != null) {
-            entry.cancel.getAsBoolean();
-            localStopped = true;
-            sessionId = entry.sessionId;
-            messageId = entry.assistantMessageId;
-        }
-        // 2. 跨实例：本地 inflight 没命中时，查 Redis 在途映射拿 IDs。
-        if ((sessionId.isEmpty() || messageId.isEmpty()) && redisStore != null) {
-            String[] pair = redisStore.loadInflight(inflightKey);
-            if (pair != null) {
-                sessionId = pair[0];
-                messageId = pair[1];
-            }
-        }
-        // 3. 写 stop 事件到 StreamManager（与本仓 web /stop 同契约）：
-        //    本轮的 stop watcher 与跨实例的引擎据此取消。
-        if (!sessionId.isEmpty() && !messageId.isEmpty()) {
-            writeStopEvent(sessionId, messageId);
-            log.info("[IM] Wrote stop event to StreamManager: session={} message={}",
-                    sessionId, messageId);
-        }
-        // 4. 标记兜底：给尚未创建 assistant message 的请求（执行前检查消费）。
-        if (redisStore != null) {
-            redisStore.setStopMarker(inflightKey, STOP_MARKER_TTL_SECONDS);
-        } else {
-            stopMarkers.put(inflightKey, System.currentTimeMillis());
-        }
-        if (!localStopped && sessionId.isEmpty()) {
-            log.info("[IM] Set stop marker (no inflight found): key={}", inflightKey);
-        }
-    }
+    // ── 跨实例 /stop 的对外面（B123：实现在 ImStopOps） ────────────────────
 
-    /** 写 stop 事件到本轮次的流（形状与本仓 web /stop 一致，另带 {@code source=im}）。 */
-    private void writeStopEvent(String sessionId, String messageId) {
-        StreamManager sm = streamManagerRef;
-        if (sm == null) {
-            log.warn("[IM] StreamManager not wired; stop event skipped: session={} message={}",
-                    sessionId, messageId);
-            return;
-        }
-        StreamEvent stopEvent = new StreamEvent("stop-" + System.nanoTime(), ResponseType.STOP, "", true);
-        stopEvent.setTimestamp(OffsetDateTime.now());
-        Map<String, Object> data = new LinkedHashMap<>();
-        data.put("session_id", sessionId);
-        data.put("message_id", messageId);
-        data.put("reason", "user_requested");
-        data.put("source", "im");
-        stopEvent.setData(data);
-        try {
-            sm.appendEvent(sessionId, messageId, stopEvent);
-        } catch (RuntimeException e) {
-            log.warn("[IM] Failed to write stop event to StreamManager: {}", e.getMessage());
-        }
-    }
-
-    /** 执行前 /stop 检查：本地标记（单实例）或 Redis 标记（跨实例）命中即清除并返回 true。 */
+    /** 执行前 /stop 检查。实现见 {@link ImStopOps#checkAndClearStopMarker}。 */
     boolean checkAndClearStopMarker(String userKey) {
-        Long local = stopMarkers.remove(userKey);
-        boolean hit = local != null
-                && (System.currentTimeMillis() - local) < STOP_MARKER_TTL_SECONDS * 1000L;
-        if (redisStore != null && redisStore.checkAndClearStopMarker(userKey)) {
-            hit = true;
-        }
-        return hit;
+        return stopOps.checkAndClearStopMarker(userKey);
     }
 
-    /**
-     * 在途登记（assistant message 创建后调用）：绑定 entry 的 session/message、
-     * 写跨实例 inflight 映射，并启动 StreamManager stop watcher（跨实例 /stop 的消费侧）。
-     */
+    /** 在途登记（assistant message 创建后调用）。实现见 {@link ImStopOps#bindInflight}。 */
     void bindInflight(QaAttach attach, String assistantMessageId) {
-        InflightEntry entry = attach.inflight();
-        if (entry == null) {
-            return;
-        }
-        String sessionId = attach.session().getId();
-        entry.sessionId = sessionId;
-        entry.assistantMessageId = assistantMessageId;
-        if (redisStore != null) {
-            redisStore.storeInflight(attach.userKey(), sessionId, assistantMessageId,
-                    INFLIGHT_TTL_SECONDS);
-        }
-        if (streamManagerRef != null && entry.queueReq != null) {
-            QaQueue.QaRequest req = entry.queueReq;
-            StreamStopWatcher.start(streamManagerRef, sessionId, assistantMessageId,
-                    () -> !req.isCancelled(), req::cancel);
-        }
+        stopOps.bindInflight(attach, assistantMessageId);
     }
 
-    /** 在途映射退场（QA 结束调用；Redis 未启用时空操作）。 */
+    /** 在途映射退场（QA 结束调用）。实现见 {@link ImStopOps#unbindInflight}。 */
     void unbindInflight(String userKey) {
-        if (redisStore != null) {
-            redisStore.clearInflight(userKey);
-        }
+        stopOps.unbindInflight(userKey);
     }
 
     private volatile StreamManager streamManagerRef;

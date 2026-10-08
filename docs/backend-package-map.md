@@ -110,7 +110,7 @@ B33 已归位：`AppEnvLookup` → `common/deployment`、`StorageRuntimeEnv` →
 
 | 行数 | 文件 | | 行数 | 文件 |
 |---|---|---|---|---|
-| 1091 | `im/service/ImService` | | 772 | `retrieval/HybridSearchService` |
+| 995 | `im/service/ImService`（B123 首刀 1091→995） | | 772 | `retrieval/HybridSearchService` |
 | 1041 | `session/service/SessionKnowledgeQaService` | | 765 | `memory/service/MemoryService` |
 | 919 | `memory/mapper/MemoryIndexStore` | | 763 | `agent/ActPhase` |
 | 847 | `knowledge/task/KnowledgeProcessWorker` | | 761 | `im/runtime/ToolDisplay` |
