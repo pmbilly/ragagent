@@ -88,7 +88,8 @@ ArchUnit 1.3.0 **已是测试依赖**（`server/build.gradle.kts:111`），可�
 
 > C2~C8 全部做完后，SCC-A 消失，包图成为 DAG，`audit`/`common`/`llm` 在底，业务域在顶。
 
-### 2.3 common 纪律与减重（B101/B102）
+### 2.3 common 纪律与减重（B101~B104）
+
 
 | 项 | 状态 |
 |---|---|
@@ -103,6 +104,18 @@ ArchUnit 1.3.0 **已是测试依赖**（`server/build.gradle.kts:111`），可�
 | **R6 追加第三条** | ✅ B104：`common/**/mapper/**`、`common/**/repository/**` **不得存在**（实体+mapper 归域）；探针（common 下建 mapper 子包）验证会红 |
 | **R7** `package` 声明↔路径一致 | ✅ B105：`package X;` 必须等于路径推导包名（main/test 都查）——**javac 与 spotless 的盲区**（按源集全量编译不看目录），只有 IDE 抓；探针（声明 `com.ragagent.wrong`）验证会红 |
 | common 体量轨迹 | 11,183（B101 前）→ 9,374（B102 approval）→ 8,175（B103 settings + memory 词汇）→ **7,812 行 / 114 文件**（B104 tenant 拆分），四批共 **-30%** |
+
+### 2.4 L2 → L3 清零（R3：能力层不得依赖业务域）
+
+| 边 | 状态 | 处置 |
+|---|---|---|
+| `chatpipeline → websearch` | ✅ B106（1 处） | 端口签名改收 **L1 配置**（`common.tenant.WebSearchConfig`）；执行面配置的转换搬进域侧 `WebSearchService.WebSearchConfig.from(...)`，适配仍在 `session/QaWiring` |
+| `chatpipeline → memory` | ✅ B106（5 处） | `MemoryRecall`/`MemoryRetrievalContext` 下沉 `common.memory`（条目改 `MemoryItemView` ✓ 实体不越层）；`MemoryText.mergeUsedMemories` 的通用去重下沉 `common.text.ListMerges`（记忆侧保留薄委托）；`QaWiring` 变成纯委托 |
+| `retrieval → vectorstore` | ⬜ 待做（14 处） | 先判性质：`vectorstore` 是"向量库驱动/存储能力"还是业务域？若定性为**能力层**⇒ 复核 `L2` 名单（连同 `IndexConfig`/`ConnectionConfig`/`VectorStore` 的位置）；否则按端口化处理 |
+| `chatpipeline → knowledge` | ⬜ 待做（17 处） | **最大一条**：管线引用 knowledge 的 `Chunk`/`Knowledge`/`KnowledgeBase` 实体与 `FaqChunkMetadata`/`DocumentChunkMetadata`/`GeneratedQuestion` 等元数据 + `ImageInfoEnricher`/`SearchChunkMerge` 算法 ⇒ 需要"管线数据模型"级设计（视图 + 纯函数下沉），单独立项 |
+| `chatpipeline → agent` | ⬜ 待做（15 处） | 异构：`tools.SearchTarget`（7 处，明显是共享词汇 ⇒ 可下沉）、`agent.modelcontext.*`（2 处）、`tools.data.DataAnalysisTool`+`DataAnalysisSessionBridge`（适配器位置问题）、`PromptInstructions`/`support.Fetcher`（各 1 处）|
+
+**B106 附带修正的一处隐患**：`PluginSearchOps` 原先把 agent 级 `max_results` 覆写直接写在执行面配置对象上；改造后若直接改 L1 租户配置对象会**污染租户配置缓存** ⇒ 已改为先 `copy()` 再覆写（`common/tenant/WebSearchConfig.copy()` 新方法 + javadoc 写明纪律）。
 
 ## 3. 目标模块图（**6 个模块，不是 30 个**）
 

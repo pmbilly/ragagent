@@ -317,12 +317,12 @@ public class QaWiring {
     public PipelinePorts.MemoryService qaPipelineMemoryService(MemoryService memoryService) {
         return new PipelinePorts.MemoryService() {
             @Override
-            public com.ragagent.memory.service.MemoryRecall recall(String query) {
+            public com.ragagent.common.memory.MemoryRecall recall(String query) {
                 return memoryService.recall(query);
             }
 
             @Override
-            public com.ragagent.memory.service.MemoryRetrievalContext retrievalContextFor() {
+            public com.ragagent.common.memory.MemoryRetrievalContext retrievalContextFor() {
                 return memoryService.retrievalContextFor();
             }
 
@@ -339,9 +339,11 @@ public class QaWiring {
         return new PipelinePorts.WebSearch() {
             @Override
             public List<com.ragagent.retrieval.domain.WebSearchResult> search(
-                    String providerId, WebSearchService.WebSearchConfig config, String query) {
+                    String providerId, com.ragagent.common.tenant.WebSearchConfig config, String query) {
+                // L1 租户配置 → 执行面配置的转换留在域侧（管线不接触 WebSearchService.WebSearchConfig）
+                WebSearchService.WebSearchConfig exec = WebSearchService.WebSearchConfig.from(config);
                 Long tenantId = com.ragagent.common.context.TenantContext.currentTenantId();
-                return webSearchService.search(tenantId == null ? 0L : tenantId, providerId, config, query);
+                return webSearchService.search(tenantId == null ? 0L : tenantId, providerId, exec, query);
             }
         };
     }

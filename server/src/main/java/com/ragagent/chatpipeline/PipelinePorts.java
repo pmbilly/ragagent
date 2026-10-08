@@ -4,13 +4,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.ragagent.llm.LlmChatClient;
-import com.ragagent.memory.service.MemoryRecall;
-import com.ragagent.memory.service.MemoryRetrievalContext;
+import com.ragagent.common.memory.MemoryRecall;
+import com.ragagent.common.memory.MemoryRetrievalContext;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.common.session.PipelineMessageImageView;
 import com.ragagent.common.session.PipelineMessageView;
 import com.ragagent.retrieval.domain.WebSearchResult;
-import com.ragagent.websearch.service.WebSearchService;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.retrieval.graph.RetrieveGraphRepository;
@@ -33,7 +32,7 @@ import com.ragagent.common.pipeline.SearchParams;
  *       方法需在该类补方法或 adapter 内直写 mapper）。</li>
  *   <li>{@link MemoryService} → memory.service.MemoryService（recall/retrievalContextFor/
  *       documentAffinity 签名已对齐）。</li>
- *   <li>{@link WebSearchService} → websearch.service.WebSearchService.search。</li>
+ *   <li>websearch 面 → 域侧适配器转成执行面配置（见 {@code session/QaWiring}）。</li>
  *   <li>{@link RetrieveGraphRepository} → 图检索仓储（neo4j/图库面）。</li>
  *   <li>{@link TenantService} / {@link SessionService} / {@link WebSearchStateService} /
  *       {@link WebSearchProviderRepository}：占位接口——管线只判空、从不调用其方法。</li>
@@ -125,7 +124,8 @@ public final class PipelinePorts {
 
     /** web 搜索执行（providerID + 执行面配置）。 */
     public interface WebSearch {
-        List<WebSearchResult> search(String providerId, WebSearchService.WebSearchConfig config, String query);
+        List<WebSearchResult> search(String providerId, com.ragagent.common.tenant.WebSearchConfig config,
+                                      String query);
     }
     // ----- 占位接口（管线只判空、从不调用方法） -----
 

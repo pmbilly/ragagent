@@ -22,7 +22,8 @@ import com.ragagent.chatpipeline.plugin.PluginMemoryRecall;
 import com.ragagent.chatpipeline.plugin.PluginRerank;
 import com.ragagent.chatpipeline.plugin.PluginWikiBoost;
 import com.ragagent.chatpipeline.support.ReferencesSupport;
-import com.ragagent.memory.service.MemoryRecall;
+import com.ragagent.common.memory.MemoryItemView;
+import com.ragagent.common.memory.MemoryRecall;
 import com.ragagent.common.retrieval.SearchResult;
 
 /**
@@ -399,14 +400,8 @@ class RerankRecordingTest {
     void memoryRecall() {
         Rec46cSupport.RecBus bus = new Rec46cSupport.RecBus();
         Rec46cSupport.StubMemoryService mem = new Rec46cSupport.StubMemoryService();
-        var item1 = new com.ragagent.memory.domain.MemoryItem();
-        item1.setId("m1");
-        item1.setKind("fact");
-        item1.setContent("用户偏好中文回答");
-        var item2 = new com.ragagent.memory.domain.MemoryItem();
-        item2.setId("m2");
-        item2.setKind("interest");
-        item2.setContent("检索系统调优");
+        var item1 = new MemoryItemView("m1", "fact", "用户偏好中文回答");
+        var item2 = new MemoryItemView("m2", "interest", "检索系统调优");
         mem.recallValue = new MemoryRecall("<memory>用户背景记忆</memory>",
                 new ArrayList<>(List.of(item1, item2)));
         PluginMemoryRecall p = new PluginMemoryRecall(mem);

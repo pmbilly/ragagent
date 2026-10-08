@@ -25,8 +25,8 @@ import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
 import com.ragagent.common.llm.ResponseType;
 import com.ragagent.llm.domain.StreamResponse;
-import com.ragagent.memory.service.MemoryRecall;
-import com.ragagent.memory.service.MemoryRetrievalContext;
+import com.ragagent.common.memory.MemoryRecall;
+import com.ragagent.common.memory.MemoryRetrievalContext;
 import com.ragagent.rerank.RankResult;
 import com.ragagent.retrieval.support.SearchTextUtil;
 import com.ragagent.rerank.Reranker;
@@ -635,7 +635,7 @@ final class Rec46cSupport {
 
         @Override
         public List<com.ragagent.retrieval.domain.WebSearchResult> search(String providerId,
-                                                                          com.ragagent.websearch.service.WebSearchService.WebSearchConfig config,
+                                                                          com.ragagent.common.tenant.WebSearchConfig config,
                                                                           String query) {
             if (err != null) {
                 throw err;

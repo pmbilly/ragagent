@@ -5,7 +5,6 @@ import com.ragagent.common.memory.MemoryKeys;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
@@ -304,23 +303,7 @@ public final class MemoryText {
      */
     public static <T> List<T> mergeUsedMemories(List<T> existing, List<T> additional,
                                                 java.util.function.Function<T, String> idOf) {
-        if (additional == null || additional.isEmpty()) {
-            return existing;
-        }
-        List<T> base = existing == null ? new ArrayList<>() : existing;
-        java.util.Set<String> seen = new java.util.HashSet<>();
-        List<T> merged = new ArrayList<>(base.size() + additional.size());
-        for (List<T> list : List.of(base, additional)) {
-            for (T item : list) {
-                String id = idOf.apply(item);
-                if (id != null && !id.isEmpty()) {
-                    if (!seen.add(id)) {
-                        continue;
-                    }
-                }
-                merged.add(item);
-            }
-        }
-        return merged;
+        // B106：实现下沉到 common.text.ListMerges（L2 管线也要用同一份去重语义）
+        return com.ragagent.common.text.ListMerges.mergeDistinctByKey(existing, additional, idOf);
     }
 }

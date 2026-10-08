@@ -102,4 +102,24 @@ public class WebSearchConfig {
             blacklist = List.of();
         }
     }
+
+    /**
+     * 浅拷贝（B106）：调用方需要"临时改几个字段再传给执行面"时**必须**先 copy，
+     * 否则会改到租户配置缓存里的同一个对象。
+     */
+    public WebSearchConfig copy() {
+        WebSearchConfig c = new WebSearchConfig();
+        c.provider = provider;
+        c.apiKey = apiKey;
+        c.maxResults = maxResults;
+        c.includeDate = includeDate;
+        c.compressionMethod = compressionMethod;
+        c.blacklist = blacklist == null ? null : new java.util.ArrayList<>(blacklist);
+        c.embeddingModelId = embeddingModelId;
+        c.embeddingDimension = embeddingDimension;
+        c.rerankModelId = rerankModelId;
+        c.documentFragments = documentFragments;
+        c.proxyUrl = proxyUrl;
+        return c;
+    }
 }

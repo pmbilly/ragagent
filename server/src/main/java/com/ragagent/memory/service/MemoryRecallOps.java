@@ -9,6 +9,7 @@ import java.util.Set;
 
 import com.ragagent.common.memory.MemoryConfig;
 import com.ragagent.common.memory.MemoryKeys;
+import com.ragagent.common.memory.MemoryRecall;
 import com.ragagent.common.memory.MemoryKinds;
 import com.ragagent.memory.domain.MemoryItem;
 import com.ragagent.memory.domain.MemoryRender;
@@ -196,7 +197,7 @@ final class MemoryRecallOps {
         recallSpan.finish(MemoryTrace.summarizeMemoryRecallOutput(okMeta, used),
                 Map.of("tenant_id", scope.tenantId()), null);
 
-        return new MemoryRecall(prompt, used);
+        return new MemoryRecall(prompt, MemoryViews.toViews(used));
     }
 
     /** recall 的两处"主体取不到"分支（它们只差 reason 文案）。 */

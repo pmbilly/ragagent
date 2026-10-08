@@ -323,12 +323,12 @@ final class PluginSearchOps {
 
         // 租户级 web 配置（ctx 里的租户信息；Java 侧从 TenantContext 取，探针/装配期可注入）
         com.ragagent.common.tenant.WebSearchConfig tenantCfg = currentTenantWebSearchConfig();
-        com.ragagent.websearch.service.WebSearchService.WebSearchConfig webConfig =
-                effectiveWebSearchConfig(tenantCfg);
+        // 先 copy：agent 级覆写绝不能改到租户配置缓存里的同一个对象（B106）
+        com.ragagent.common.tenant.WebSearchConfig webConfig = tenantCfg == null ? null : tenantCfg.copy();
 
         // agent 级覆写
-        if (chatManage.getWebSearchMaxResults() > 0) {
-            webConfig.maxResults = chatManage.getWebSearchMaxResults();
+        if (webConfig != null && chatManage.getWebSearchMaxResults() > 0) {
+            webConfig.setMaxResults(chatManage.getWebSearchMaxResults());
         }
 
         Map<String, Object> f = new LinkedHashMap<>();
@@ -339,7 +339,7 @@ final class PluginSearchOps {
         Span webSpan = LangfuseManager.get().startSpan(new LangfuseManager.SpanOptions(
                 "web_search",
                 mapOf("provider_id", providerId, "query", chatManage.getRewriteQuery(),
-                        "max_results", webConfig.maxResults),
+                        "max_results", webConfig == null ? 0 : webConfig.getMaxResults()),
                 null));
         List<WebSearchResult> webResults;
         try {
@@ -363,7 +363,7 @@ final class PluginSearchOps {
 
     /**
      * 租户 web 配置：按 TenantContext 实时读取，
-     * 无租户上下文 → null，走 {@link #effectiveWebSearchConfig} 的缺省分支。
+     * 无租户上下文 → null，由域侧适配器按空配置走缺省分支。
      */
     private com.ragagent.common.tenant.WebSearchConfig currentTenantWebSearchConfig() {
         if (service.tenantService == null) {
@@ -373,26 +373,6 @@ final class PluginSearchOps {
     }
 
     /** 执行面配置的生效值合并（缺省补齐）。 */
-    static com.ragagent.websearch.service.WebSearchService.WebSearchConfig effectiveWebSearchConfig(
-            com.ragagent.common.tenant.WebSearchConfig cfg) {
-        com.ragagent.websearch.service.WebSearchService.WebSearchConfig out =
-                new com.ragagent.websearch.service.WebSearchService.WebSearchConfig();
-        if (cfg == null) {
-            return out;
-        }
-        out.blacklist = cfg.getBlacklist() == null ? new java.util.ArrayList<>() : new java.util.ArrayList<>(cfg.getBlacklist());
-        out.apiKey = cfg.getApiKey() == null ? "" : cfg.getApiKey();
-        out.documentFragments = cfg.getDocumentFragments();
-        out.embeddingModelId = cfg.getEmbeddingModelId() == null ? "" : cfg.getEmbeddingModelId();
-        out.includeDate = cfg.isIncludeDate();
-        out.maxResults = cfg.getMaxResults();
-        out.provider = cfg.getProvider() == null ? "" : cfg.getProvider();
-        out.proxyUrl = cfg.getProxyUrl() == null ? "" : cfg.getProxyUrl();
-        return out;
-        // 尚有 rerank_model_id/embedding_dimension 两个键未在执行形状
-        // WebSearchConfig 承载（仅 RAG 压缩消费，search 路径不用），随压缩
-        // 路径接线时补。
-    }
 
     private static Map<String, Object> mapOf(Object... kv) {
         Map<String, Object> m = new LinkedHashMap<>();

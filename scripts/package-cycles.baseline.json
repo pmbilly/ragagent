@@ -12,14 +12,6 @@
       "knowledge"
     ],
     [
-      "chatpipeline",
-      "memory"
-    ],
-    [
-      "chatpipeline",
-      "websearch"
-    ],
-    [
       "retrieval",
       "vectorstore"
     ]

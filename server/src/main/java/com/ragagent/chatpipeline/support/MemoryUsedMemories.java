@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ragagent.common.session.PipelineUsedMemoryView;
-import com.ragagent.memory.domain.MemoryItem;
-import com.ragagent.memory.domain.MemoryText;
+import com.ragagent.common.memory.MemoryItemView;
+import com.ragagent.common.text.ListMerges;
 
 /**
  * {@code memory_items} → 客户端可见形态的投影（条目投影 + 已展示记忆合并）。
@@ -24,12 +24,12 @@ public final class MemoryUsedMemories {
      * <p>{@code null} 条目被<b>跳过</b>，且返回值恒是<b>非 null</b> 的列表
      * ——落库时它会写成 {@code []} 而不是 {@code null}。</p>
      */
-    public static List<PipelineUsedMemoryView> usedMemoriesFromItems(List<MemoryItem> items) {
+    public static List<PipelineUsedMemoryView> usedMemoriesFromItems(List<MemoryItemView> items) {
         List<PipelineUsedMemoryView> used = new ArrayList<>(items == null ? 0 : items.size());
         if (items == null) {
             return used;
         }
-        for (MemoryItem item : items) {
+        for (MemoryItemView item : items) {
             if (item == null) {
                 continue;
             }
@@ -45,6 +45,6 @@ public final class MemoryUsedMemories {
      */
     public static List<PipelineUsedMemoryView> mergeUsedMemories(
             List<PipelineUsedMemoryView> existing, List<PipelineUsedMemoryView> additional) {
-        return MemoryText.mergeUsedMemories(existing, additional, PipelineUsedMemoryView::id);
+        return ListMerges.mergeDistinctByKey(existing, additional, PipelineUsedMemoryView::id);
     }
 }

@@ -319,5 +319,30 @@ public class WebSearchService {
         public WebSearchFilters getFilters() {
             return filters;
         }
+        /**
+         * 租户配置（{@code common.tenant}，L1）→ 执行面配置（B106 由管线搬入：
+         * 管线只持有 L1 配置，转换发生在域侧，依赖方向保持"管线 → L1 ← websearch"）。
+         *
+         * <p>缺省合并口径与迁移前逐字一致：{@code cfg == null} → 全默认；各字段空值回落默认。</p>
+         */
+        public static WebSearchConfig from(com.ragagent.common.tenant.WebSearchConfig cfg) {
+            WebSearchConfig out = new WebSearchConfig();
+            if (cfg == null) {
+                return out;
+            }
+            out.blacklist = cfg.getBlacklist() == null
+                    ? new java.util.ArrayList<>() : new java.util.ArrayList<>(cfg.getBlacklist());
+            out.apiKey = cfg.getApiKey() == null ? "" : cfg.getApiKey();
+            out.documentFragments = cfg.getDocumentFragments();
+            out.embeddingModelId = cfg.getEmbeddingModelId() == null ? "" : cfg.getEmbeddingModelId();
+            out.includeDate = cfg.isIncludeDate();
+            out.maxResults = cfg.getMaxResults();
+            out.provider = cfg.getProvider() == null ? "" : cfg.getProvider();
+            out.proxyUrl = cfg.getProxyUrl() == null ? "" : cfg.getProxyUrl();
+            return out;
+            // 尚有 rerank_model_id/embedding_dimension 两个键未在执行形状 WebSearchConfig
+            // 承载（仅 RAG 压缩消费，search 路径不用），随压缩路径接线时补。
+        }
     }
+
 }

@@ -34,6 +34,8 @@ import com.ragagent.memory.mapper.MemoryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import com.ragagent.common.memory.MemoryRecall;
+import com.ragagent.common.memory.MemoryRetrievalContext;
 
 /**
  * 跨会话长期记忆的写入、召回与记忆管理器。

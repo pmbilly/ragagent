@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import com.ragagent.common.memory.MemoryRetrievalContext;
 
 /**
  * service 层的编排逻辑，跑在**真实 H2 仓储**上（照 §7.5 与

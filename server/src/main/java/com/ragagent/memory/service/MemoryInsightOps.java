@@ -1,5 +1,6 @@
 package com.ragagent.memory.service;
 
+import com.ragagent.common.memory.MemoryRetrievalContext;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -100,7 +101,7 @@ final class MemoryInsightOps {
         List<String> documents = topDocumentTitles(scope);
 
         MemoryRetrievalContext retrievalCtx = new MemoryRetrievalContext(
-                String.join("；", background), interests, documents, used);
+                String.join("；", background), interests, documents, MemoryViews.toViews(used));
         log.info("memory: retrieval context subject={} interests={} documents={} items={}",
                 scope.subjectId(), interests.size(), documents == null ? 0 : documents.size(),
                 used.size());

@@ -1215,3 +1215,16 @@
   探针（`src/test/java/com/ragagent/probe/ProbeDecl.java` 声明 `com.ragagent.wrong`）→ 报
   「package 声明↔路径（R7）：1 处不一致；✗ …（声明 com.ragagent.wrong，应为 com.ragagent.probe）」✓（探针已删）。
 - **闸门**：后端全量 BUILD SUCCESSFUL + `spotlessCheck` + 四守卫（含 R7）绿。
+
+**✅ B106（2026-10-08，L2→L3 清零①：`chatpipeline → websearch` + `chatpipeline → memory`；5 → 3 条）**
+- **先量后动**：把 5 条边的方法级引用全列出来（`chatpipeline→agent` 15 / `→knowledge` 17 / `→memory` 5 / `→websearch` 1 / `retrieval→vectorstore` 14），按"便宜先做"排序：websearch 与 memory 是**端口签名 + 词汇位置**问题，knowledge/agent 是**管线数据模型**级工程，vectorstore 先要判"它算不算能力层"。
+- **websearch（1 处）**：`PipelinePorts.WebSearch.search(providerId, WebSearchService.WebSearchConfig, query)` ⇒ 改收 **L1** `common.tenant.WebSearchConfig`；
+  管线里那个把 L1 配置转成执行面配置的静态函数（`PluginSearchOps.effectiveWebSearchConfig`）**整体搬进域侧**（`WebSearchService.WebSearchConfig.from(...)`，含"两个键未承载"的原注释）；
+  `session/QaWiring` 的适配器做转换（它在 L3 `session`，允许接触两侧）。
+- **memory（5 处）**：`MemoryRecall`/`MemoryRetrievalContext` 从 `memory.service` 下沉 **`common.memory`**，条目类型换成新的 **`MemoryItemView`**（id/kind/content，正是管线读的字段）；
+  记忆侧新增 `MemoryViews.toView(s)` 做实体→视图投影（实体不出域）；`MemoryText.mergeUsedMemories` 的**泛型去重**下沉 `common.text.ListMerges.mergeDistinctByKey`（记忆侧保留薄委托 ⇒ 原 `MemoryTextTest` 不动）；
+  `QaWiring` 的 memory 适配器由"逐方法转类型"变成**纯委托**（因为记忆域 API 已直接返回 L1 记录）。
+- **顺带修掉一处我会引入的隐患**：管线里的 agent 级 `max_results` 覆写，原先写在**执行面配置的副本**上；改完端口后若直接写 `webConfig.maxResults` 就是写**租户配置缓存里的同一个对象** ⇒ 改为 `tenantCfg.copy()` 后覆写，并给 `common.tenant.WebSearchConfig` 补了 `copy()` + 纪律 javadoc（该字段原先还是 private 直访，一并改成 setter）。
+- **测试随类型更新**：`Rec46cSupport.StubWebSearch` 的签名、`StubMemoryService` 的两个常量、`RerankRecordingTest.memoryRecall`（用 `MemoryItemView` 替掉实体构造）、`MemoryServiceOrchestrationTest` 补 import。
+- **基线刷新**：`L2 → L3 直连 5 → 3 条`；剩余三条与处置思路登记在方案文档 §2.4（`retrieval→vectorstore` 先判性质；`chatpipeline→knowledge`/`→agent` 需"管线数据模型"级设计）。
+- **闸门**：后端全量 BUILD SUCCESSFUL + `spotlessCheck` + 五守卫（键名 / 包环含 R1~R7 / Go 锚点 / 跨面键）绿。

@@ -13,7 +13,7 @@ import com.ragagent.chatpipeline.support.MemoryUsedMemories;
 import com.ragagent.event.Event;
 import com.ragagent.event.EventType;
 import com.ragagent.event.payload.MemoryRecalledData;
-import com.ragagent.memory.domain.MemoryItem;
+import com.ragagent.common.memory.MemoryItemView;
 import com.ragagent.common.session.PipelineUsedMemoryView;
 import com.ragagent.retrieval.obs.RetrievalObs;
 
@@ -64,13 +64,13 @@ public final class PluginMemoryRecall implements Plugin {
         }
 
         chatManage.setMemoryPrompt(prompt);
-        List<MemoryItem> items = recall.items() == null ? List.of() : recall.items();
+        List<MemoryItemView> items = recall.items() == null ? List.of() : recall.items();
         List<PipelineUsedMemoryView> used = MemoryUsedMemories.usedMemoriesFromItems(items);
         chatManage.setUsedMemories(used);
         emitMemoryRecalled(chatManage.getEventBus(), chatManage.getSessionId(), used);
 
         List<String> memoryIDs = new ArrayList<>();
-        for (MemoryItem item : items) {
+        for (MemoryItemView item : items) {
             if (item != null && item.getId() != null && !item.getId().isEmpty()) {
                 memoryIDs.add(item.getId());
             }
