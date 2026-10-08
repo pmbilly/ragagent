@@ -466,13 +466,33 @@ public class KnowledgeService implements KnowledgeDocumentGateway {
      * 跨域只读端口的实现（{@link KnowledgeDocumentGateway}）：检索结果装配按 id 批量取
      * 文档元数据，语义与 {@link #getKnowledgeBatchWithSharedAccess} 一致。
      */
+    /**
+     * 实体 → L1 facts 投影（域内公用：端口实现与装配层共用一份映射，避免漂移）。
+     * 仅带调用方真正读取的字段。
+     */
+    /** 批量投影（保持入参顺序）。 */
+    public static List<KnowledgeDocumentFacts> factsOf(List<Knowledge> rows) {
+        List<KnowledgeDocumentFacts> out = new ArrayList<>();
+        for (Knowledge k : rows) {
+            out.add(factsOf(k));
+        }
+        return out;
+    }
+
+    public static KnowledgeDocumentFacts factsOf(Knowledge k) {
+        if (k == null) {
+            return null;
+        }
+        return new KnowledgeDocumentFacts(k.getId(), k.getTitle(), k.getMetadata(),
+                k.getFileName(), k.getSource(), k.getChannel(), k.getDescription(),
+                k.getKnowledgeBaseId(), k.getTenantId(), k.getFileType(), k.getFilePath());
+    }
+
     @Override
     public List<KnowledgeDocumentFacts> findAccessibleDocuments(long tenantId, List<String> knowledgeIds) {
         List<KnowledgeDocumentFacts> out = new ArrayList<>();
         for (Knowledge k : getKnowledgeBatchWithSharedAccess(tenantId, knowledgeIds)) {
-            out.add(new KnowledgeDocumentFacts(k.getId(), k.getTitle(), k.getMetadata(),
-                    k.getFileName(), k.getSource(), k.getChannel(), k.getDescription(),
-                    k.getKnowledgeBaseId()));
+            out.add(factsOf(k));
         }
         return out;
     }

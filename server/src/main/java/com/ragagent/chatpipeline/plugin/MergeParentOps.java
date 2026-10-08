@@ -10,8 +10,8 @@ import com.ragagent.chatpipeline.PipelineLog;
 import com.ragagent.chatpipeline.support.ImageInfoCollector;
 import com.ragagent.common.pipeline.ChunkTypes;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.support.ImageInfoEnricher;
+import com.ragagent.common.knowledge.ChunkFacts;
+import com.ragagent.retrieval.support.ImageInfoEnricher;
 import com.ragagent.retrieval.support.ChunkSearchUtil;
 import com.ragagent.retrieval.support.ImageInfoMatchUtil;
 
@@ -56,7 +56,7 @@ final class MergeParentOps {
         }
 
         List<SearchResult> working = results;
-        List<Chunk> parentChunks;
+        List<ChunkFacts> parentChunks;
         try {
             parentChunks = service.chunkRepo.listChunksById(tenantId, new ArrayList<>(parentIds.keySet()));
         } catch (RuntimeException e) {
@@ -66,9 +66,9 @@ final class MergeParentOps {
             return results;
         }
 
-        Map<String, Chunk> parentMap = new LinkedHashMap<>();
-        for (Chunk c : parentChunks) {
-            parentMap.put(c.getId(), c);
+        Map<String, ChunkFacts> parentMap = new LinkedHashMap<>();
+        for (ChunkFacts c : parentChunks) {
+            parentMap.put(c.id(), c);
         }
 
         // 图片命中走 image → text → parent_text 链：只为这些结果取祖父块
@@ -82,28 +82,28 @@ final class MergeParentOps {
         if (!imageTextParentIds.isEmpty()) {
             List<String> grandparentIds = new ArrayList<>();
             Map<String, Boolean> grandparentSeen = new LinkedHashMap<>();
-            for (Chunk parent : parentChunks) {
-                if (!imageTextParentIds.containsKey(parent.getId())) {
+            for (ChunkFacts parent : parentChunks) {
+                if (!imageTextParentIds.containsKey(parent.id())) {
                     continue;
                 }
-                if (parent.getParentChunkId().isEmpty() || !ChunkTypes.TEXT.equals(parent.getChunkType())) {
+                if (parent.parentChunkId().isEmpty() || !ChunkTypes.TEXT.equals(parent.chunkType())) {
                     continue;
                 }
-                if (parentMap.containsKey(parent.getParentChunkId())) {
+                if (parentMap.containsKey(parent.parentChunkId())) {
                     continue;
                 }
-                if (grandparentSeen.containsKey(parent.getParentChunkId())) {
+                if (grandparentSeen.containsKey(parent.parentChunkId())) {
                     continue;
                 }
-                grandparentSeen.put(parent.getParentChunkId(), Boolean.TRUE);
-                grandparentIds.add(parent.getParentChunkId());
+                grandparentSeen.put(parent.parentChunkId(), Boolean.TRUE);
+                grandparentIds.add(parent.parentChunkId());
             }
             if (!grandparentIds.isEmpty()) {
-                List<Chunk> grandparents;
+                List<ChunkFacts> grandparents;
                 try {
                     grandparents = service.chunkRepo.listChunksById(tenantId, grandparentIds);
-                    for (Chunk grandparent : grandparents) {
-                        parentMap.put(grandparent.getId(), grandparent);
+                    for (ChunkFacts grandparent : grandparents) {
+                        parentMap.put(grandparent.id(), grandparent);
                     }
                 } catch (RuntimeException e) {
                     Map<String, Object> f = new LinkedHashMap<>();
@@ -127,21 +127,21 @@ final class MergeParentOps {
 
             if (ChunkTypes.TEXT.equals(r.getChunkType())) {
                 // text → parent_text：扩展到全父块给上下文；ImageInfo 只取本子块的
-                Chunk parent = parentMap.get(r.getParentChunkId());
-                if (parent == null || parent.getContent().isEmpty()
-                        || !ChunkTypes.PARENT_TEXT.equals(parent.getChunkType())) {
+                ChunkFacts parent = parentMap.get(r.getParentChunkId());
+                if (parent == null || parent.content().isEmpty()
+                        || !ChunkTypes.PARENT_TEXT.equals(parent.chunkType())) {
                     continue;
                 }
                 Map<String, Object> f = new LinkedHashMap<>();
                 f.put("child_id", r.getId());
                 f.put("parent_id", r.getParentChunkId());
                 f.put("child_len", PluginMerge.runeLen(r.getContent()));
-                f.put("parent_len", PluginMerge.runeLen(parent.getContent()));
+                f.put("parent_len", PluginMerge.runeLen(parent.content()));
                 f.put("scoped_img", true);
                 PipelineLog.info("Merge", "parent_resolve", f);
                 assignScopedImageInfo(r, scopedImageInfo, r.getId());
                 String parentContent = ImageInfoMatchUtil.pruneMarkdownImagesByImageInfo(
-                        parent.getContent(), r.getImageInfo());
+                        parent.content(), r.getImageInfo());
                 r.setContent(ChunkSearchUtil.joinChunkContent(parentContent, r.getContent(), "\n\n"));
                 r.setContentRewritten(true);
                 if (!PluginMerge.containsId(r.getSubChunkId(), r.getId())) {
@@ -149,34 +149,34 @@ final class MergeParentOps {
                 }
             } else if (ChunkTypes.IMAGE_OCR.equals(r.getChunkType())
                     || ChunkTypes.IMAGE_CAPTION.equals(r.getChunkType())) {
-                Chunk textParent = parentMap.get(r.getParentChunkId());
-                if (textParent == null || textParent.getContent().isEmpty()
-                        || !ChunkTypes.TEXT.equals(textParent.getChunkType())) {
+                ChunkFacts textParent = parentMap.get(r.getParentChunkId());
+                if (textParent == null || textParent.content().isEmpty()
+                        || !ChunkTypes.TEXT.equals(textParent.chunkType())) {
                     continue;
                 }
                 String hitImageInfo = r.getImageInfo();
                 // 命中块本身携带识别文本（Content 是 OCR/描述），先存后覆写（#3052）
                 String childRecognizedContent = r.getContent();
-                Chunk contentSource = textParent;
-                if (!textParent.getParentChunkId().isEmpty()) {
-                    Chunk grandparent = parentMap.get(textParent.getParentChunkId());
-                    if (grandparent != null && ChunkTypes.PARENT_TEXT.equals(grandparent.getChunkType())
-                            && !grandparent.getContent().isEmpty()) {
+                ChunkFacts contentSource = textParent;
+                if (!textParent.parentChunkId().isEmpty()) {
+                    ChunkFacts grandparent = parentMap.get(textParent.parentChunkId());
+                    if (grandparent != null && ChunkTypes.PARENT_TEXT.equals(grandparent.chunkType())
+                            && !grandparent.content().isEmpty()) {
                         contentSource = grandparent;
                     }
                 }
-                r.setContent(textParent.getContent());
-                r.setChunkIndex(textParent.getChunkIndex());
+                r.setContent(textParent.content());
+                r.setChunkIndex(textParent.chunkIndex());
                 r.setContentRewritten(true);
-                assignScopedImageInfo(r, scopedImageInfo, textParent.getId());
+                assignScopedImageInfo(r, scopedImageInfo, textParent.id());
                 if (r.getImageInfo().isEmpty() && !hitImageInfo.isEmpty()) {
                     r.setImageInfo(ImageInfoMatchUtil.filterImageInfoByContentUrls(
-                            textParent.getContent(), hitImageInfo));
+                            textParent.content(), hitImageInfo));
                 }
                 String textContent = ImageInfoMatchUtil.pruneMarkdownImagesByImageInfo(
-                        textParent.getContent(), r.getImageInfo());
+                        textParent.content(), r.getImageInfo());
                 String parentContent = ImageInfoMatchUtil.pruneMarkdownImagesByImageInfo(
-                        contentSource.getContent(), r.getImageInfo());
+                        contentSource.content(), r.getImageInfo());
                 r.setContent(ChunkSearchUtil.joinChunkContent(parentContent, textContent, "\n\n"));
                 // 父/祖父 markdown 之后重新接上识别文本（JoinChunkContent 折叠重复）
                 r.setContent(ChunkSearchUtil.joinChunkContent(r.getContent(), childRecognizedContent, "\n\n"));
@@ -186,10 +186,10 @@ final class MergeParentOps {
                 Map<String, Object> f = new LinkedHashMap<>();
                 f.put("child_id", r.getId());
                 f.put("child_type", r.getChunkType());
-                f.put("text_id", textParent.getId());
-                f.put("parent_id", contentSource.getId());
+                f.put("text_id", textParent.id());
+                f.put("parent_id", contentSource.id());
                 f.put("match_len", PluginMerge.runeLen(r.getContent()));
-                f.put("parent_len", PluginMerge.runeLen(contentSource.getContent()));
+                f.put("parent_len", PluginMerge.runeLen(contentSource.content()));
                 f.put("scoped", true);
                 PipelineLog.info("Merge", "image_parent_resolve", f);
                 if (!PluginMerge.containsId(r.getSubChunkId(), r.getId())) {
@@ -202,7 +202,7 @@ final class MergeParentOps {
     }
 
 
-    static List<String> collectScopedTextChildIds(List<SearchResult> results, Map<String, Chunk> parentMap) {
+    static List<String> collectScopedTextChildIds(List<SearchResult> results, Map<String, ChunkFacts> parentMap) {
         Map<String, Boolean> seen = new LinkedHashMap<>();
         List<String> ids = new ArrayList<>();
         for (SearchResult r : results) {
@@ -211,8 +211,8 @@ final class MergeParentOps {
             }
             switch (r.getChunkType()) {
                 case ChunkTypes.TEXT -> {
-                    Chunk parent = parentMap.get(r.getParentChunkId());
-                    if (parent == null || !ChunkTypes.PARENT_TEXT.equals(parent.getChunkType())) {
+                    ChunkFacts parent = parentMap.get(r.getParentChunkId());
+                    if (parent == null || !ChunkTypes.PARENT_TEXT.equals(parent.chunkType())) {
                         continue;
                     }
                     if (seen.containsKey(r.getId())) {
@@ -305,8 +305,8 @@ final class MergeParentOps {
 
         List<String> baseIds = new ArrayList<>(baseIdsSet.keySet());
 
-        Map<String, Chunk> chunkMap = new LinkedHashMap<>();
-        List<Chunk> chunks;
+        Map<String, ChunkFacts> chunkMap = new LinkedHashMap<>();
+        List<ChunkFacts> chunks;
         try {
             chunks = service.chunkRepo.listChunksById(tenantId, baseIds);
         } catch (RuntimeException e) {
@@ -315,34 +315,34 @@ final class MergeParentOps {
             PipelineLog.warn("Merge", "expand_list_base_failed", f);
             return results;
         }
-        for (Chunk chunk : chunks) {
-            chunkMap.put(chunk.getId(), chunk);
+        for (ChunkFacts chunk : chunks) {
+            chunkMap.put(chunk.id(), chunk);
         }
 
         Map<String, Boolean> neighborIdsSet = new LinkedHashMap<>();
-        for (Chunk chunk : chunkMap.values()) {
+        for (ChunkFacts chunk : chunkMap.values()) {
             if (chunk == null) {
                 continue;
             }
-            if (!chunk.getPreChunkId().isEmpty() && !chunkMap.containsKey(chunk.getPreChunkId())) {
-                neighborIdsSet.put(chunk.getPreChunkId(), Boolean.TRUE);
+            if (!chunk.preChunkId().isEmpty() && !chunkMap.containsKey(chunk.preChunkId())) {
+                neighborIdsSet.put(chunk.preChunkId(), Boolean.TRUE);
             }
-            if (!chunk.getNextChunkId().isEmpty() && !chunkMap.containsKey(chunk.getNextChunkId())) {
-                neighborIdsSet.put(chunk.getNextChunkId(), Boolean.TRUE);
+            if (!chunk.nextChunkId().isEmpty() && !chunkMap.containsKey(chunk.nextChunkId())) {
+                neighborIdsSet.put(chunk.nextChunkId(), Boolean.TRUE);
             }
         }
 
         if (!neighborIdsSet.isEmpty()) {
             List<String> neighborIDs = new ArrayList<>(neighborIdsSet.keySet());
             try {
-                List<Chunk> neighbors = service.chunkRepo.listChunksById(tenantId, neighborIDs);
-                for (Chunk chunk : neighbors) {
-                    chunkMap.put(chunk.getId(), chunk);
+                List<ChunkFacts> neighbors = service.chunkRepo.listChunksById(tenantId, neighborIDs);
+                for (ChunkFacts chunk : neighbors) {
+                    chunkMap.put(chunk.id(), chunk);
                     Map<String, Object> f = new LinkedHashMap<>();
-                    f.put("neighbor_chunk_id", chunk.getId());
-                    f.put("neighbor_content", chunk.getContent());
-                    f.put("neighbor_chunk_type", chunk.getChunkType());
-                    f.put("neighbor_len", PluginMerge.runeLen(chunk.getContent()));
+                    f.put("neighbor_chunk_id", chunk.id());
+                    f.put("neighbor_content", chunk.content());
+                    f.put("neighbor_chunk_type", chunk.chunkType());
+                    f.put("neighbor_len", PluginMerge.runeLen(chunk.content()));
                     PipelineLog.info("Merge", "expand_list_neighbor_success", f);
                 }
             } catch (RuntimeException e) {
@@ -354,9 +354,9 @@ final class MergeParentOps {
 
         for (SearchResult res : targets) {
             fetchChunksIfMissing(tenantId, chunkMap, res.getId());
-            Chunk baseChunk = chunkMap.get(res.getId());
-            if (baseChunk == null || baseChunk.getContent().isEmpty()
-                    || !ChunkTypes.TEXT.equals(baseChunk.getChunkType())) {
+            ChunkFacts baseChunk = chunkMap.get(res.getId());
+            if (baseChunk == null || baseChunk.content().isEmpty()
+                    || !ChunkTypes.TEXT.equals(baseChunk.chunkType())) {
                 continue;
             }
 
@@ -365,28 +365,28 @@ final class MergeParentOps {
             List<String> prevIDs = new ArrayList<>();
             List<String> nextIDs = new ArrayList<>();
 
-            String prevCursor = baseChunk.getPreChunkId();
-            String nextCursor = baseChunk.getNextChunkId();
+            String prevCursor = baseChunk.preChunkId();
+            String nextCursor = baseChunk.nextChunkId();
 
             fetchChunksIfMissing(tenantId, chunkMap, prevCursor, nextCursor);
 
             if (!prevCursor.isEmpty()) {
-                Chunk prevChunk = chunkMap.get(prevCursor);
-                if (prevChunk != null && prevChunk.getKnowledgeId().equals(baseChunk.getKnowledgeId())) {
-                    prevContent.append(prevChunk.getContent());
-                    prevIDs.add(prevChunk.getId());
-                    prevCursor = prevChunk.getPreChunkId();
+                ChunkFacts prevChunk = chunkMap.get(prevCursor);
+                if (prevChunk != null && prevChunk.knowledgeId().equals(baseChunk.knowledgeId())) {
+                    prevContent.append(prevChunk.content());
+                    prevIDs.add(prevChunk.id());
+                    prevCursor = prevChunk.preChunkId();
                 } else {
                     prevCursor = "";
                 }
             }
 
             if (!nextCursor.isEmpty()) {
-                Chunk nextChunk = chunkMap.get(nextCursor);
-                if (nextChunk != null && nextChunk.getKnowledgeId().equals(baseChunk.getKnowledgeId())) {
-                    nextContent.append(nextChunk.getContent());
-                    nextIDs.add(nextChunk.getId());
-                    nextCursor = nextChunk.getNextChunkId();
+                ChunkFacts nextChunk = chunkMap.get(nextCursor);
+                if (nextChunk != null && nextChunk.knowledgeId().equals(baseChunk.knowledgeId())) {
+                    nextContent.append(nextChunk.content());
+                    nextIDs.add(nextChunk.id());
+                    nextCursor = nextChunk.nextChunkId();
                 } else {
                     nextCursor = "";
                 }
@@ -394,7 +394,7 @@ final class MergeParentOps {
 
             String merged;
             while (true) {
-                merged = PluginMerge.mergeOrderedContent(prevContent.toString(), baseChunk.getContent(),
+                merged = PluginMerge.mergeOrderedContent(prevContent.toString(), baseChunk.content(),
                         nextContent.toString(), maxLen);
                 if (merged.isEmpty()) {
                     break;
@@ -409,20 +409,20 @@ final class MergeParentOps {
                 boolean expanded = false;
                 if (!prevCursor.isEmpty()) {
                     fetchChunksIfMissing(tenantId, chunkMap, prevCursor);
-                    Chunk prevChunk = chunkMap.get(prevCursor);
-                    if (prevChunk != null && prevChunk.getKnowledgeId().equals(baseChunk.getKnowledgeId())) {
+                    ChunkFacts prevChunk = chunkMap.get(prevCursor);
+                    if (prevChunk != null && prevChunk.knowledgeId().equals(baseChunk.knowledgeId())) {
                         // 前块内容前接（带重叠折叠，\n\n 连接）
                     prevContent = new StringBuilder(
-                            ChunkSearchUtil.joinChunkContent(prevChunk.getContent(), prevContent.toString(), "\n\n"));
-                        prevIDs.add(0, prevChunk.getId());
-                        prevCursor = prevChunk.getPreChunkId();
+                            ChunkSearchUtil.joinChunkContent(prevChunk.content(), prevContent.toString(), "\n\n"));
+                        prevIDs.add(0, prevChunk.id());
+                        prevCursor = prevChunk.preChunkId();
                         expanded = true;
                     } else {
                         prevCursor = "";
                     }
                 }
 
-                merged = PluginMerge.mergeOrderedContent(prevContent.toString(), baseChunk.getContent(),
+                merged = PluginMerge.mergeOrderedContent(prevContent.toString(), baseChunk.content(),
                         nextContent.toString(), maxLen);
                 if (PluginMerge.runeLen(merged) >= minLen) {
                     break;
@@ -430,13 +430,13 @@ final class MergeParentOps {
 
                 if (!nextCursor.isEmpty()) {
                     fetchChunksIfMissing(tenantId, chunkMap, nextCursor);
-                    Chunk nextChunk = chunkMap.get(nextCursor);
-                    if (nextChunk != null && nextChunk.getKnowledgeId().equals(baseChunk.getKnowledgeId())) {
+                    ChunkFacts nextChunk = chunkMap.get(nextCursor);
+                    if (nextChunk != null && nextChunk.knowledgeId().equals(baseChunk.knowledgeId())) {
                         // 后块内容后接（带重叠折叠，\n\n 连接）
                         nextContent = new StringBuilder(
-                                ChunkSearchUtil.joinChunkContent(nextContent.toString(), nextChunk.getContent(), "\n\n"));
-                        nextIDs.add(nextChunk.getId());
-                        nextCursor = nextChunk.getNextChunkId();
+                                ChunkSearchUtil.joinChunkContent(nextContent.toString(), nextChunk.content(), "\n\n"));
+                        nextIDs.add(nextChunk.id());
+                        nextCursor = nextChunk.nextChunkId();
                         expanded = true;
                     } else {
                         nextCursor = "";
@@ -473,7 +473,7 @@ final class MergeParentOps {
             f.put("next_ids", nextIDs);
             f.put("before_len", beforeLen);
             f.put("after_len", PluginMerge.runeLen(res.getContent()));
-            f.put("base_content", baseChunk.getContent());
+            f.put("base_content", baseChunk.content());
             f.put("after_content", res.getContent());
             f.put("chunk_type", res.getChunkType());
             f.put("remaining_prev", prevCursor);
@@ -486,7 +486,7 @@ final class MergeParentOps {
 
 
 
-    void fetchChunksIfMissing(long tenantId, Map<String, Chunk> chunkMap, String... chunkIds) {
+    void fetchChunksIfMissing(long tenantId, Map<String, ChunkFacts> chunkMap, String... chunkIds) {
         List<String> missing = new ArrayList<>(chunkIds.length);
         for (String id : chunkIds) {
             if (id == null || id.isEmpty()) {
@@ -500,7 +500,7 @@ final class MergeParentOps {
             return;
         }
 
-        List<Chunk> chunks;
+        List<ChunkFacts> chunks;
         try {
             chunks = service.chunkRepo.listChunksById(tenantId, missing);
         } catch (RuntimeException e) {
@@ -512,9 +512,9 @@ final class MergeParentOps {
         }
 
         Map<String, Boolean> found = new LinkedHashMap<>();
-        for (Chunk chunk : chunks) {
-            chunkMap.put(chunk.getId(), chunk);
-            found.put(chunk.getId(), Boolean.TRUE);
+        for (ChunkFacts chunk : chunks) {
+            chunkMap.put(chunk.id(), chunk);
+            found.put(chunk.id(), Boolean.TRUE);
         }
 
         for (String id : missing) {

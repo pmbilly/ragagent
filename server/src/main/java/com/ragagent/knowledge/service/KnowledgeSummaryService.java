@@ -29,7 +29,7 @@ import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
 import com.ragagent.model.service.ModelRuntimeFactory;
-import com.ragagent.knowledge.support.ImageInfoEnricher;
+import com.ragagent.retrieval.support.ImageInfoEnricher;
 import com.ragagent.common.retrieval.SearchChunkMerge;
 import com.ragagent.common.wiki.WikiImageMarkup;
 import com.ragagent.common.wiki.WikiLanguageSupport;
@@ -406,7 +406,8 @@ public class KnowledgeSummaryService {
             chunkIds.add(chunk.getId());
         }
         Map<String, String> imageInfoMap = ImageInfoEnricher.collectImageInfoByChunkIds(
-                chunkRepo::listChunksByParentIDs, knowledge.getTenantId(), chunkIds);
+                (tid, pids) -> ChunkPortAdapter.factsAll(chunkRepo.listChunksByParentIDs(tid, pids)),
+                knowledge.getTenantId(), chunkIds);
         String mergedImageInfo = ImageInfoEnricher.mergeImageInfoJson(imageInfoMap);
         if (mergedImageInfo != null && !mergedImageInfo.isEmpty()) {
             // 图片优先文档（正文极短）：caption 信号不足，OCR 才是真内容；文本正文够长

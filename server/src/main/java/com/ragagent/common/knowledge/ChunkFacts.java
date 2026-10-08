@@ -28,5 +28,6 @@ public record ChunkFacts(
         String preChunkId,
         String nextChunkId,
         JsonNode relationChunks,
-        JsonNode metadata) {
+        JsonNode metadata,
+        String imageInfo) {
 }

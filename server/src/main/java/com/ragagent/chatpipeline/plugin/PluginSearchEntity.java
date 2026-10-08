@@ -15,8 +15,8 @@ import com.ragagent.chatpipeline.support.SearchSupport;
 import com.ragagent.common.graph.GraphData;
 import com.ragagent.common.graph.GraphNode;
 import com.ragagent.common.graph.NameSpace;
-import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.common.knowledge.ChunkFacts;
+import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.common.graph.GraphRelation;
 import com.ragagent.retrieval.graph.RetrieveGraphRepository;
@@ -28,7 +28,7 @@ import com.ragagent.common.context.TenantContext;
  * 转成 SearchResult（分数恒 1.0、MatchTypeGraph）并合入 SearchResult。
  *
  * <p>各知识库的并发结果合并进共享列表，用 LinkedHashSet 保出现序确定
- * （消费端按稳定段比较）。chunk2SearchResult 的 metadata 取 Knowledge 的元数据
+ * （消费端按稳定段比较）。chunk2SearchResult 的 metadata 取 KnowledgeDocumentFacts 的元数据
  * （jsonb → 字符串 map，值做字符串化，解析失败为 null）。</p>
  */
 public final class PluginSearchEntity implements Plugin {
@@ -90,7 +90,7 @@ public final class PluginSearchEntity implements Plugin {
             PipelineLog.info("search_entity", "no_new_chunk", new LinkedHashMap<>());
             return next.next();
         }
-        List<Chunk> chunks;
+        List<ChunkFacts> chunks;
         try {
             chunks = chunkRepo.listChunksById(tenantId, chunkIDs);
         } catch (RuntimeException e) {
@@ -101,10 +101,10 @@ public final class PluginSearchEntity implements Plugin {
             return next.next();
         }
         List<String> knowledgeIDs = new ArrayList<>();
-        for (Chunk chunk : chunks) {
-            knowledgeIDs.add(chunk.getKnowledgeId());
+        for (ChunkFacts chunk : chunks) {
+            knowledgeIDs.add(chunk.knowledgeId());
         }
-        List<Knowledge> knowledges;
+        List<KnowledgeDocumentFacts> knowledges;
         try {
             knowledges = knowledgeRepo.getKnowledgeBatch(tenantId, knowledgeIDs);
         } catch (RuntimeException e) {
@@ -115,13 +115,13 @@ public final class PluginSearchEntity implements Plugin {
             return next.next();
         }
 
-        Map<String, Knowledge> knowledgeMap = new LinkedHashMap<>();
-        for (Knowledge knowledge : knowledges) {
-            knowledgeMap.put(knowledge.getId(), knowledge);
+        Map<String, KnowledgeDocumentFacts> knowledgeMap = new LinkedHashMap<>();
+        for (KnowledgeDocumentFacts knowledge : knowledges) {
+            knowledgeMap.put(knowledge.id(), knowledge);
         }
         List<SearchResult> entityResults = new ArrayList<>();
-        for (Chunk chunk : chunks) {
-            entityResults.add(chunk2SearchResult(chunk, knowledgeMap.get(chunk.getKnowledgeId())));
+        for (ChunkFacts chunk : chunks) {
+            entityResults.add(chunk2SearchResult(chunk, knowledgeMap.get(chunk.knowledgeId())));
         }
         enrichSearchResultsImageInfo(tenantId, entityResults);
         if (chatManage.getSearchResult() == null) {
@@ -193,40 +193,40 @@ public final class PluginSearchEntity implements Plugin {
         return chunkIDs;
     }
 
-    static SearchResult chunk2SearchResult(Chunk chunk, Knowledge knowledge) {
+    static SearchResult chunk2SearchResult(ChunkFacts chunk, KnowledgeDocumentFacts knowledge) {
         SearchResult r = new SearchResult();
-        r.setId(chunk.getId());
-        r.setContent(chunk.getContent());
-        r.setContentRevision(chunk.getContentRevision());
-        r.setKnowledgeId(chunk.getKnowledgeId());
-        r.setChunkIndex(chunk.getChunkIndex());
-        r.setKnowledgeTitle(knowledge == null ? "" : knowledge.getTitle());
-        r.setStartAt(chunk.getStartAt());
-        r.setEndAt(chunk.getEndAt());
-        r.setSeq(chunk.getChunkIndex());
+        r.setId(chunk.id());
+        r.setContent(chunk.content());
+        r.setContentRevision(chunk.contentRevision());
+        r.setKnowledgeId(chunk.knowledgeId());
+        r.setChunkIndex(chunk.chunkIndex());
+        r.setKnowledgeTitle(knowledge == null ? "" : knowledge.title());
+        r.setStartAt(chunk.startAt());
+        r.setEndAt(chunk.endAt());
+        r.setSeq(chunk.chunkIndex());
         r.setScore(1.0);
         r.setMatchType(MatchTypes.GRAPH);
         r.setMetadata(knowledgeMetadata(knowledge));
-        r.setChunkType(chunk.getChunkType());
-        r.setParentChunkId(chunk.getParentChunkId());
-        r.setImageInfo(chunk.getImageInfo());
-        r.setKnowledgeFilename(knowledge == null ? "" : knowledge.getFileName());
-        r.setKnowledgeSource(knowledge == null ? "" : knowledge.getSource());
-        r.setKnowledgeChannel(knowledge == null ? "" : knowledge.getChannel());
-        r.setChunkMetadata(chunk.getMetadata());
-        r.setKnowledgeBaseId(knowledge == null ? "" : knowledge.getKnowledgeBaseId());
+        r.setChunkType(chunk.chunkType());
+        r.setParentChunkId(chunk.parentChunkId());
+        r.setImageInfo(chunk.imageInfo());
+        r.setKnowledgeFilename(knowledge == null ? "" : knowledge.fileName());
+        r.setKnowledgeSource(knowledge == null ? "" : knowledge.source());
+        r.setKnowledgeChannel(knowledge == null ? "" : knowledge.channel());
+        r.setChunkMetadata(chunk.metadata());
+        r.setKnowledgeBaseId(knowledge == null ? "" : knowledge.knowledgeBaseId());
         return r;
     }
 
     /** knowledge 的 metadata jsonb 投影为全字符串 map（值统一字符串化）；空表无键、解析失败返回空 map。 */
-    static Map<String, String> knowledgeMetadata(Knowledge knowledge) {
+    static Map<String, String> knowledgeMetadata(KnowledgeDocumentFacts knowledge) {
         Map<String, String> metadata = new LinkedHashMap<>();
-        if (knowledge == null || knowledge.getMetadata() == null
-                || !knowledge.getMetadata().isObject()
-                || knowledge.getMetadata().isEmpty()) {
+        if (knowledge == null || knowledge.metadata() == null
+                || !knowledge.metadata().isObject()
+                || knowledge.metadata().isEmpty()) {
             return metadata;
         }
-        var fields = knowledge.getMetadata().fields();
+        var fields = knowledge.metadata().fields();
         while (fields.hasNext()) {
             var e = fields.next();
             var v = e.getValue();

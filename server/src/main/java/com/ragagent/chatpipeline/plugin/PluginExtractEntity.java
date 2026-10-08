@@ -9,8 +9,8 @@ import com.ragagent.chatpipeline.ChatManage;
 import com.ragagent.chatpipeline.PipelineEventType;
 import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.common.graph.GraphNode;
-import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.common.knowledge.KnowledgeBaseView;
+import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.llm.extract.EntityExtraction;
 import com.ragagent.llm.extract.PipelineConfig;
 import com.ragagent.llm.LlmChatClient;
@@ -73,20 +73,20 @@ public final class PluginExtractEntity implements Plugin {
 
         Map<String, String> knowledgeToKBMap = new LinkedHashMap<>();
         if (chatManage.getKnowledgeIds() != null && !chatManage.getKnowledgeIds().isEmpty()) {
-            List<Knowledge> knowledges;
+            List<KnowledgeDocumentFacts> knowledges;
             try {
                 knowledges = knowledgeService.getKnowledgeBatchWithSharedAccess(
                         chatManage.getTenantId(), chatManage.getKnowledgeIds());
             } catch (RuntimeException e) {
                 return next.next();
             }
-            for (Knowledge k : knowledges) {
-                kbIDSet.put(k.getKnowledgeBaseId(), Boolean.TRUE);
-                knowledgeToKBMap.put(k.getId(), k.getKnowledgeBaseId());
+            for (KnowledgeDocumentFacts k : knowledges) {
+                kbIDSet.put(k.knowledgeBaseId(), Boolean.TRUE);
+                knowledgeToKBMap.put(k.id(), k.knowledgeBaseId());
             }
         }
 
-        List<KnowledgeBase> kbs;
+        List<KnowledgeBaseView> kbs;
         try {
             kbs = knowledgeBaseRepo.getKnowledgeBaseByIDs(new ArrayList<>(kbIDSet.keySet()));
         } catch (RuntimeException e) {
@@ -94,7 +94,7 @@ public final class PluginExtractEntity implements Plugin {
         }
 
         Map<String, Boolean> enabledKBSet = new LinkedHashMap<>();
-        for (KnowledgeBase kb : kbs) {
+        for (KnowledgeBaseView kb : kbs) {
             if (extractEnabled(kb)) {
                 enabledKBSet.put(kb.getId(), Boolean.TRUE);
             }
@@ -132,7 +132,7 @@ public final class PluginExtractEntity implements Plugin {
     }
 
     /** extract_config jsonb 的 enabled 开关（缺省关）。 */
-    private static boolean extractEnabled(KnowledgeBase kb) {
+    private static boolean extractEnabled(KnowledgeBaseView kb) {
         var cfg = kb.getExtractConfig();
         return cfg != null && !cfg.isNull()
                 && cfg.has("enabled") && cfg.path("enabled").asBoolean(false);

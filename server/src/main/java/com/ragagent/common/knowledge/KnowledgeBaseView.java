@@ -23,6 +23,9 @@ public final class KnowledgeBaseView {
     private String embeddingModelId;
     private boolean wikiEnabled;
     private JsonNode wikiConfig;
+    private boolean vectorEnabled;
+    private boolean keywordEnabled;
+    private JsonNode extractConfig;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
 
@@ -105,6 +108,33 @@ public final class KnowledgeBaseView {
 
     public void setWikiConfig(JsonNode wikiConfig) {
         this.wikiConfig = wikiConfig;
+    }
+
+    /** {@code indexing_strategy.vectorEnabled} 的等价投影。 */
+    public boolean isVectorEnabled() {
+        return vectorEnabled;
+    }
+
+    public void setVectorEnabled(boolean vectorEnabled) {
+        this.vectorEnabled = vectorEnabled;
+    }
+
+    /** {@code indexing_strategy.keywordEnabled} 的等价投影。 */
+    public boolean isKeywordEnabled() {
+        return keywordEnabled;
+    }
+
+    public void setKeywordEnabled(boolean keywordEnabled) {
+        this.keywordEnabled = keywordEnabled;
+    }
+
+    /** {@code extract_config} jsonb 原始载荷（解读留给消费方，视图不替它判定）。 */
+    public JsonNode getExtractConfig() {
+        return extractConfig;
+    }
+
+    public void setExtractConfig(JsonNode extractConfig) {
+        this.extractConfig = extractConfig;
     }
 
     public OffsetDateTime getCreatedAt() {

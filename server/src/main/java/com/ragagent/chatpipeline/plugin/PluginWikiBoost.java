@@ -6,7 +6,7 @@ import com.ragagent.common.retrieval.SearchTarget;
 import com.ragagent.chatpipeline.ChatManage;
 import com.ragagent.chatpipeline.PipelineEventType;
 import com.ragagent.chatpipeline.PipelinePorts;
-import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.common.knowledge.KnowledgeBaseView;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.common.pipeline.ChunkTypes;
 
@@ -59,13 +59,13 @@ public final class PluginWikiBoost implements Plugin {
             if (target == null || target.knowledgeBaseId().isEmpty()) {
                 continue;
             }
-            KnowledgeBase kb;
+            KnowledgeBaseView kb;
             try {
                 kb = kbService.getKnowledgeBaseByIdOnly(target.knowledgeBaseId());
             } catch (RuntimeException e) {
                 kb = null;
             }
-            if (kb != null && kb.getIndexingStrategy().isWikiEnabled()) {
+            if (kb != null && kb.isWikiEnabled()) {
                 hasWikiKB = true;
                 break;
             }

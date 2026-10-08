@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.support;
+package com.ragagent.retrieval.support;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -7,10 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
-import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.retrieval.domain.ImageInfo;
-import com.ragagent.retrieval.support.ChunkSearchUtil;
-import com.ragagent.retrieval.support.ImageInfoMatchUtil;
 
 /**
  * 图片信息与正文的互相富化：解析 chunk 的 {@code image_info} JSON，合并为数组，
@@ -75,14 +73,19 @@ public final class ImageInfoEnricher {
      *
      * <p>仓储以 {@code lister} 回调注入（tenantId + parentIDs → 子块列表），
      * 聊天管线端口与知识库的具体仓储都走这里，避免两份实现漂移。</p>
+     *
+     * <p>B114：{@code lister} 的元素类型由实体 {@code Chunk} 改为 L1 的
+     * {@link ChunkFacts}——本方法是 {@code chatpipeline} 唯一还需要 chunk 实体的入口
+     * （插件侧的 {@code ChunkRepository} 端口现在返回 facts），实体不再越层。
+     * 知识域内部调用方用 {@code ChunkPortAdapter.factsAll(...)} 投影后再传入。</p>
      */
     public static Map<String, String> collectImageInfoByChunkIds(
-            BiFunction<Long, List<String>, List<Chunk>> lister,
+            BiFunction<Long, List<String>, List<ChunkFacts>> lister,
             long tenantId, List<String> chunkIds) {
         if (chunkIds == null || chunkIds.isEmpty()) {
             return null;
         }
-        List<Chunk> children;
+        List<ChunkFacts> children;
         try {
             children = lister.apply(tenantId, chunkIds);
         } catch (RuntimeException e) {
@@ -95,36 +98,36 @@ public final class ImageInfoEnricher {
         Map<String, Map<String, ImageInfo>> aggMap = new LinkedHashMap<>();
         List<String> textChildIds = new ArrayList<>();
         Map<String, String> textToParent = new LinkedHashMap<>();
-        for (Chunk child : children) {
-            if (!child.isIsEnabled()) {
+        for (ChunkFacts child : children) {
+            if (!child.enabled()) {
                 continue;
             }
-            switch (child.getChunkType()) {
-                case "image_ocr", "image_caption" -> addChildInfo(aggMap, child.getParentChunkId(), child);
+            switch (child.chunkType()) {
+                case "image_ocr", "image_caption" -> addChildInfo(aggMap, child.parentChunkId(), child);
                 case "text" -> {
-                    textChildIds.add(child.getId());
-                    textToParent.put(child.getId(), child.getParentChunkId());
+                    textChildIds.add(child.id());
+                    textToParent.put(child.id(), child.parentChunkId());
                 }
                 default -> {
                 }
             }
         }
         if (!textChildIds.isEmpty()) {
-            List<Chunk> grandChildren;
+            List<ChunkFacts> grandChildren;
             try {
                 grandChildren = lister.apply(tenantId, textChildIds);
             } catch (RuntimeException e) {
                 grandChildren = null;
             }
             if (grandChildren != null) {
-                for (Chunk gc : grandChildren) {
-                    if (!gc.isIsEnabled()) {
+                for (ChunkFacts gc : grandChildren) {
+                    if (!gc.enabled()) {
                         continue;
                     }
-                    if (!"image_ocr".equals(gc.getChunkType()) && !"image_caption".equals(gc.getChunkType())) {
+                    if (!"image_ocr".equals(gc.chunkType()) && !"image_caption".equals(gc.chunkType())) {
                         continue;
                     }
-                    String parentTextID = textToParent.get(gc.getParentChunkId());
+                    String parentTextID = textToParent.get(gc.parentChunkId());
                     if (parentTextID != null) {
                         addChildInfo(aggMap, parentTextID, gc);
                     }
@@ -145,11 +148,11 @@ public final class ImageInfoEnricher {
     /** URL（空则 OriginalURL）去重 + 非空 OCR/Caption 字段覆盖。 */
     private static void addChildInfo(Map<String, Map<String, ImageInfo>> aggMap,
                                      String targetID,
-                                     Chunk child) {
-        if (child.getImageInfo() == null || child.getImageInfo().isEmpty()) {
+                                     ChunkFacts child) {
+        if (child.imageInfo() == null || child.imageInfo().isEmpty()) {
             return;
         }
-        List<ImageInfo> infos = ImageInfoMatchUtil.parseInfos(child.getImageInfo());
+        List<ImageInfo> infos = ImageInfoMatchUtil.parseInfos(child.imageInfo());
         if (infos == null || infos.isEmpty()) {
             return;
         }

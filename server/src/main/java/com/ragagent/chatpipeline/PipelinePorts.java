@@ -16,9 +16,9 @@ import com.ragagent.retrieval.graph.RetrieveGraphRepository;
 import com.ragagent.common.pipeline.SearchParams;
 import com.ragagent.common.llm.ToolResult;
 import com.ragagent.common.tenant.WebSearchConfig;
-import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.common.knowledge.ChunkFacts;
+import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
+import com.ragagent.common.knowledge.KnowledgeBaseView;
 import com.ragagent.rerank.Reranker;
 
 /**
@@ -65,10 +65,10 @@ public final class PipelinePorts {
     /** 知识库面：chat 管线所需的方法子集。 */
     public interface KnowledgeBaseService {
         /** 按 ID 直取（无租户过滤）。 */
-        KnowledgeBase getKnowledgeBaseByIdOnly(String id);
+        KnowledgeBaseView getKnowledgeBaseByIdOnly(String id);
 
         /** 批量直取（无租户过滤；缺失 ID 跳过）。 */
-        List<KnowledgeBase> getKnowledgeBasesByIdsOnly(List<String> ids);
+        List<KnowledgeBaseView> getKnowledgeBasesByIdsOnly(List<String> ids);
 
         List<SearchResult> hybridSearch(String knowledgeBaseId, SearchParams params);
 
@@ -81,29 +81,30 @@ public final class PipelinePorts {
     /** 知识面：chat 管线所需的方法子集。 */
     public interface KnowledgeService {
         /** 按租户过滤取单条（adapter 从 TenantContext 取租户）。 */
-        Knowledge getKnowledgeById(String id);
+        KnowledgeDocumentFacts getKnowledgeById(String id);
 
-        List<Knowledge> getKnowledgeBatch(long tenantId, List<String> ids);
+        List<KnowledgeDocumentFacts> getKnowledgeBatch(long tenantId, List<String> ids);
 
-        List<Knowledge> getKnowledgeBatchWithSharedAccess(long tenantId, List<String> ids);
+        List<KnowledgeDocumentFacts> getKnowledgeBatchWithSharedAccess(
+                long tenantId, List<String> ids);
     }
 
     /** chunk 面：chat 管线所需的方法子集。 */
     public interface ChunkRepository {
-        List<Chunk> listChunksById(long tenantId, List<String> ids);
+        List<ChunkFacts> listChunksById(long tenantId, List<String> ids);
 
         /** image_info 聚合用。 */
-        List<Chunk> listChunksByParentIds(long tenantId, List<String> parentIds);
+        List<ChunkFacts> listChunksByParentIds(long tenantId, List<String> parentIds);
     }
 
     /** 知识批量取仓储。 */
     public interface KnowledgeRepository {
-        List<Knowledge> getKnowledgeBatch(long tenantId, List<String> ids);
+        List<KnowledgeDocumentFacts> getKnowledgeBatch(long tenantId, List<String> ids);
     }
 
     /** 知识库批量取仓储。 */
     public interface KnowledgeBaseRepository {
-        List<KnowledgeBase> getKnowledgeBaseByIDs(List<String> ids);
+        List<KnowledgeBaseView> getKnowledgeBaseByIDs(List<String> ids);
     }
 
     /** 消息面：chat 管线所需的方法子集。 */

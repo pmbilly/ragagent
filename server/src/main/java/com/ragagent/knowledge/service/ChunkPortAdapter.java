@@ -13,7 +13,8 @@ import com.ragagent.common.pipeline.ChunkTypes;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.mapper.ChunkMapper;
 import com.ragagent.knowledge.repository.ChunkRepository;
-import com.ragagent.knowledge.support.ImageInfoEnricher;
+import com.ragagent.retrieval.support.ImageInfoEnricher;
+import com.ragagent.common.knowledge.ChunkFacts;
 
 /**
  * {@link ChunkPort} 的 knowledge 侧实现（B98/C2）。
@@ -81,13 +82,38 @@ public class ChunkPortAdapter implements ChunkPort {
             return content;
         }
         Map<String, String> imageInfoMap = ImageInfoEnricher.collectImageInfoByChunkIds(
-                chunkRepository::listChunksByParentIDs, tenantId, ids);
+                (tid, pids) -> factsAll(chunkRepository.listChunksByParentIDs(tid, pids)),
+                tenantId, ids);
         String mergedImageInfo = ImageInfoEnricher.mergeImageInfoJson(imageInfoMap);
         if (mergedImageInfo == null || mergedImageInfo.isEmpty()) {
             // 合并后没有图片信息 → 原样返回
             return content;
         }
         return ImageInfoEnricher.enrichContentWithImageInfo(content, mergedImageInfo);
+    }
+
+    /**
+     * 实体 → L1 **facts** 投影（{@link ChunkFacts}，16 字段；B114 起作为"实体→facts"的
+     * 域内公用投影，供 chat 管线的 {@code PipelinePorts.ChunkRepository} 装配点复用，
+     * 避免映射逻辑两处漂移）。仅带调用方真正读取的字段。
+     */
+    public static ChunkFacts factsOf(Chunk c) {
+        if (c == null) {
+            return null;
+        }
+        return new ChunkFacts(c.getId(), c.getKnowledgeId(), c.getContent(), c.getChunkType(),
+                c.getIndexStatus(), c.isIsEnabled(), c.getChunkIndex(), c.getStartAt(),
+                c.getEndAt(), c.getContentRevision(), c.getParentChunkId(), c.getPreChunkId(),
+                c.getNextChunkId(), c.getRelationChunks(), c.getMetadata(), c.getImageInfo());
+    }
+
+    /** 批量投影（保持入参顺序；{@code null} 元素原样保留）。 */
+    public static List<ChunkFacts> factsAll(List<Chunk> rows) {
+        List<ChunkFacts> out = new ArrayList<>();
+        for (Chunk c : rows) {
+            out.add(factsOf(c));
+        }
+        return out;
     }
 
     public static ChunkView view(Chunk c) {

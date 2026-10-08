@@ -21,12 +21,13 @@ import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.service.KnowledgeBaseService;
 import com.ragagent.knowledge.service.KnowledgeService;
-import com.ragagent.knowledge.support.ImageInfoEnricher;
+import com.ragagent.retrieval.support.ImageInfoEnricher;
 import com.ragagent.rerank.RankResult;
 import com.ragagent.rerank.Reranker;
 import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.common.pipeline.ChunkTypes;
 import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.knowledge.service.ChunkPortAdapter;
 
 /**
  * {@code AgentToolBackends} 的**知识库检索簇**：知识库检索 / chunk 列举 /
@@ -178,7 +179,8 @@ final class AgentToolKbBackends {
                 return;
             }
             Map<String, String> infoMap = ImageInfoEnricher.collectImageInfoByChunkIds(
-                    chunkRepository::listChunksByParentIDs, tenantId, chunkIDs);
+                    (tid, pids) -> ChunkPortAdapter.factsAll(chunkRepository.listChunksByParentIDs(tid, pids)),
+                    tenantId, chunkIDs);
             if (infoMap == null || infoMap.isEmpty()) {
                 return;
             }
@@ -454,7 +456,8 @@ final class AgentToolKbBackends {
     }
     public DocChunkSupport.ImageInfoCollector imageInfoCollector() {
         return (tenantId, chunkIds) -> ImageInfoEnricher.collectImageInfoByChunkIds(
-                chunkRepository::listChunksByParentIDs, tenantId, chunkIds);
+                (tid, pids) -> ChunkPortAdapter.factsAll(chunkRepository.listChunksByParentIDs(tid, pids)),
+                tenantId, chunkIds);
     }
     public QueryKnowledgeGraphTool.GraphSearch graphSearch() {
         return new QueryKnowledgeGraphTool.GraphSearch() {

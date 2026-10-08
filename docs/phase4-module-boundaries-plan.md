@@ -7,10 +7,21 @@
 
 ## 0. 一句话结论
 
-**环不在"两两双向"层（守卫基线 0 组），而在"三包以上间接环"（实测 2 个 SCC，覆盖 11 个包）**；
-其中 **1 处是一行配置搬家的零风险切割**（`stream → config`），另 **1 个 SCC 的 5 条大边是真正的模块化前置**
-（`wiki→knowledge` 43 处、`knowledge→retrieval` 47 处、`knowledge→auth` 17 处、`storage→auth` 16 处、`audit→wiki` 1 处）。
-ArchUnit 1.3.0 **已是测试依赖**（`server/build.gradle.kts:111`），可直接落规则。
+**2026-10-08 收官：包图层级与分层纪律全部归零 —— 环 0 组（含间接环 SCC 0 组）、`L2 → L3` 直连 0 条、
+L1 底座（`common`/`event`/`stream`/`tracing`）→ 业务域 0 条、依赖 `config` 的包 0 个、内联全限定名违规 0 处。
+包图是 DAG，阶段 4（Gradle 多模块）的前置条件达成。**
+
+三条主线各自的解法：
+
+1. **间接环（SCC）**：SCC-A（7 域）由 B94/C8 一条 `audit → wiki` 边瓦解；SCC-B（4 域）由 C1
+   （`StreamProperties` 搬入 `stream`）瓦解。**B111 发现守卫只解析 `import` 行 ⇒ 内联全限定名是盲区**，
+   清掉 1,331 行后第一次看见真实的 2 组两两环与一组 8 域间接环；**B112 用最小反馈边集（2 条边 / 3 处）
+   一次收口**（§4）。
+2. **跨域直连边**：C2~C10 逐条端口化/下沉（§2），`wiki→knowledge` 43→0、`chatpipeline→knowledge` 17→0 等。
+3. **分层违例 `L2 → L3`**：B106~B114 分七批清零（§2.4）。
+
+ArchUnit 1.3.0 **已是测试依赖**（`server/build.gradle.kts:111`），可直接落规则 ⇒ 下一步是 M1
+（拆 Gradle 多模块 + 模块间只许单向）。
 
 ## 1. 现状实测（2026-10-08）
 
@@ -115,7 +126,7 @@ ArchUnit 1.3.0 **已是测试依赖**（`server/build.gradle.kts:111`），可�
 | `chatpipeline → websearch` | ✅ B106（1 处） | 端口签名改收 **L1 配置**（`common.tenant.WebSearchConfig`）；执行面配置的转换搬进域侧 `WebSearchService.WebSearchConfig.from(...)`，适配仍在 `session/QaWiring` |
 | `chatpipeline → memory` | ✅ B106（5 处） | `MemoryRecall`/`MemoryRetrievalContext` 下沉 `common.memory`（条目改 `MemoryItemView` ✓ 实体不越层）；`MemoryText.mergeUsedMemories` 的通用去重下沉 `common.text.ListMerges`（记忆侧保留薄委托）；`QaWiring` 变成纯委托 |
 | `retrieval → vectorstore` | ✅ B107（14 处 + 1 处全限定遗漏） | **性质判定**：`vectorstore` 有 `domain`(7)/`mapper`/`controller`/`service` ⇒ 是**业务域**（驱动在 `retrieval/engine/*`），不能靠"重分类"绕过 ⇒ 处置：① **值对象下沉**——`IndexConfig`/`ConnectionConfig`（公开字段 JSON DTO，域与 L2 共用）→ `common.vectorstore`；② **实体/mapper 端口化**——`VectorStoreView`（id/tenantId/name/engineType + 两个配置）+ `VectorStoreLookup.byId(tenantId, storeId)`，实现留 `vectorstore/service/VectorStoreLookupAdapter`（直接委托 `VectorStoreRepository#getByID`）；③ 纯谓词也下沉——`EnvStoreIds.isEnvStoreId`（`__env_` 前缀，`vectorstore.domain.EnvVectorStores` 保留同名委托）；④ 装配层 `config/RetrievalEngineWiringConfig` 改注入端口；测试替身 `FakeStoreRepo` 从"实现整个 mapper"收窄为"实现 1 个方法的端口"（净删 4 个多余重写）|
-| `chatpipeline → knowledge` | ◐ B110+B111（17 → **15 处**，B111 盲区修正 +3） | **B110 清掉 5 处**：① **元数据载荷下沉**——`FaqChunkMetadata`/`DocumentChunkMetadata`/`GeneratedQuestion`（三者的 `com.ragagent.*` import 实测为 0，纯 JSON 载荷）→ `common.knowledge`；② **算法下沉**——`SearchChunkMerge`（187 行，`mergeTextChunks` 只读 `getStartAt/getChunkIndex/getContent/getEndAt`，**正好落在 6 字段 `ChunkView` 里**）→ `common.retrieval` 并改收 `ChunkView`（`KnowledgeSummaryService` 用 `ChunkPortAdapter.viewAll` 投影，投影方法转 public 作域内公用）。**剩余 12 处**：9 处**实体**（`Chunk`×3/`Knowledge`×3/`KnowledgeBase`×3）+ 3 处 `ImageInfoEnricher`（用的是 `collectImageInfoByChunkIds`/`enrichContentWithImageInfoForChat`/`clearImageInfoTextMatchingBody` **三个不同的静态方法**，其中 collector 的形参是 `BiFunction<…, List<Chunk>>` ⇒ 要么给 `ChunkView` 补回 `imageInfo` 字段、要么按 C2 的做法扩端口；三个方法本体是纯文本函数，可单独下沉）|
+| `chatpipeline → knowledge` | ✅ **B114（17 → 0）** | **B110 清掉 5 处**：① **元数据载荷下沉**——`FaqChunkMetadata`/`DocumentChunkMetadata`/`GeneratedQuestion`（三者的 `com.ragagent.*` import 实测为 0，纯 JSON 载荷）→ `common.knowledge`；② **算法下沉**——`SearchChunkMerge`（187 行，`mergeTextChunks` 只读 `getStartAt/getChunkIndex/getContent/getEndAt`，**正好落在 6 字段 `ChunkView` 里**）→ `common.retrieval` 并改收 `ChunkView`（`KnowledgeSummaryService` 用 `ChunkPortAdapter.viewAll` 投影，投影方法转 public 作域内公用）。**剩余 12 处**：9 处**实体**（`Chunk`×3/`Knowledge`×3/`KnowledgeBase`×3）+ 3 处 `ImageInfoEnricher`（用的是 `collectImageInfoByChunkIds`/`enrichContentWithImageInfoForChat`/`clearImageInfoTextMatchingBody` **三个不同的静态方法**，其中 collector 的形参是 `BiFunction<…, List<Chunk>>` ⇒ 要么给 `ChunkView` 补回 `imageInfo` 字段、要么按 C2 的做法扩端口；三个方法本体是纯文本函数，可单独下沉）|
 | `webfetch → datasource` | ✅ **B113（2 处）** | `webfetch/AgentMarkdown` 静态复用 `datasource.connector.rss` 的 `HtmlToMarkdown`/`JdkHtmlToMarkdown`（此前整条边在图里不存在）⇒ 候选修法：**B113 已解**：`HtmlToMarkdown`（接缝，32 行）+ `JdkHtmlToMarkdown`（有界实现，544 行）+ `HtmlConversionException` + `HtmlEntities` **四个类实测 `com.ragagent.*` import 全为 0**（纯 HTML 工具）⇒ 一并下沉 **`common/web`**（与既有 `HtmlText` 同族）；`RssConnector`/`JdkXmlFeedParser`（留在 datasource）与 `webfetch/AgentMarkdown` 两侧补 import；`HtmlEntities` 由包级可见改 **public**（跨包访问需要）；测试 `JdkHtmlToMarkdownTest` 随包搬入 `test/…/common/web/`（R7 一致），其空白归一等价改用 L1 `common.text.Whitespace.trimSpace`（18 条语料测试全绿，证明等价） |
 
 ## 3. B111 发现：内联全限定名是依赖图的盲区（已上 R8 守卫）
@@ -234,3 +245,29 @@ B111 暴露的 8 域间接环看着吓人（`agent`/`auth`/`chatpipeline`/`datas
   报 `新增环：1 agent⇄im` + `间接环新增成员 ['agent','im','session']` ✓（探针已删）
 - 基线已归零（`两两环 0 组 / 间接环 0 组`）⇒ 之后任何回流都会立即变红
 - 顺延：原 B112 计划（L2→L3 剩余清零）→ **B113**
+
+**B114 落地记录（chatpipeline → knowledge 归零，实体不再越层）**
+
+| 消费面 | 原载荷 | 换成 | 依据 |
+|---|---|---|---|
+| `KnowledgeBaseService.getKnowledgeBaseByIdOnly` / `getKnowledgeBasesByIdsOnly`、`KnowledgeBaseRepository.getKnowledgeBaseByIDs` | `knowledge.domain.KnowledgeBase` | **`KnowledgeBaseView`**（+3 字段：`vectorEnabled`/`keywordEnabled`/`extractConfig`） | 视图是 getter 风格 ⇒ 消费点零改写；`IndexingStrategy` 拆成扁平布尔与既有 `wikiEnabled` 同款 |
+| `KnowledgeService.getKnowledgeById` / `getKnowledgeBatch` / `getKnowledgeBatchWithSharedAccess`、`KnowledgeRepository.getKnowledgeBatch` | `knowledge.domain.Knowledge` | **`KnowledgeDocumentFacts`**（+3 字段：`tenantId`/`fileType`/`filePath`） | 复用 retrieval 已在用的 facts 记录（"需要更多字段时先改这里"） |
+| `ChunkRepository.listChunksById` / `listChunksByParentIds` | `knowledge.domain.Chunk` | **`ChunkFacts`**（+1 字段：`imageInfo`） | 同上 |
+
+- **语义保持**：`QaWiring` 的适配器仍走 `kbService.getAllTenantById(...)`（含 `ensureDefaults`
+  的"索引策略零值 → vector+keyword 默认"回填），**投影在回填之后取值** ⇒ 检索行为不变；
+  每个方法各自的租户/软删语义也原样保留（投影只是最后一步换形状）。
+- **投影统一**：`ChunkPortAdapter.factsOf/factsAll`（新增）、`KnowledgeService.factsOf`（新增，含批量重载）、
+  `KnowledgeBaseLookupAdapter.view`（B114 转 public）——域内一份映射，装配层复用，避免漂移。
+- **`ImageInfoEnricher`（575 行）迁 `knowledge.support` → `retrieval.support`**：B114 把它唯一还需要
+  实体的入口（`collectImageInfoByChunkIds` 的 lister 回调）改成收 `ChunkFacts` 之后，本类
+  **零 knowledge 依赖**、只依赖 `retrieval.*` ⇒ 与依赖同处；且 `retrieval → chatpipeline` 不存在
+  ⇒ 只新增单向边 `chatpipeline → retrieval`（L2→L2，合法）。顺带修掉一处"知识域放检索工具"的错位。
+- **测试侧**：四个替身（`StubKnowledgeService`/`StubKnowledgeRepo`/`StubChunkRepo`/`StubKBService`）
+  **内部保留实体、端口方法投影**——镜像生产侧 `QaWiring` 的做法 ⇒ 测试夹具零改写、且更真实。
+
+> ⚠️ **迁移教训（值得记下）**：`ChunkFacts`/`KnowledgeDocumentFacts` 是 **record**（访问器 `content()`
+> 而非 `getContent()`），而消费方是 getter 风格 ⇒ 本次有 **124 处访问器改名**；另外
+> `chunk` 这类名字在**不同作用域**分别指 `Chunk` 与 `SearchResult` ⇒ 全局改名会误伤，
+> 必须按作用域（声明类型唯一性）过滤，剩下的用编译器错误行清单精确改写。
+> 将来若还要给 getter 风格的消费方换 facts，优先考虑让 facts 带 getter 别名或新开 getter 风格载荷。

@@ -2,15 +2,8 @@
   "cycles": [],
   "sccs": [],
   "depend_on_config": [],
-  "l2_to_l3": [
-    [
-      "chatpipeline",
-      "knowledge"
-    ]
-  ],
-  "l2_to_l3_sites": {
-    "chatpipeline->knowledge": 15
-  },
+  "l2_to_l3": [],
+  "l2_to_l3_sites": {},
   "common_beans": {
     "crypto": 1,
     "security": 1,

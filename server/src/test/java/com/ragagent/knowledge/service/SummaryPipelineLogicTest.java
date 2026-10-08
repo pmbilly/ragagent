@@ -7,10 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
+import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.retrieval.domain.ImageInfo;
-import com.ragagent.knowledge.support.ImageInfoEnricher;
+import com.ragagent.retrieval.support.ImageInfoEnricher;
 import org.junit.jupiter.api.Test;
 import com.ragagent.retrieval.support.ChunkSearchUtil;
 import com.ragagent.knowledge.support.KnowledgeIndexContent;
@@ -67,15 +68,11 @@ class SummaryPipelineLogicTest {
 
     // ── ImageInfoEnricher.collectImageInfoByChunkIds ───────────────────────
 
-    private static Chunk chunk(String id, String parentId, String type,
-                               boolean enabled, String imageInfoJson) {
-        Chunk c = new Chunk();
-        c.setId(id);
-        c.setParentChunkId(parentId);
-        c.setChunkType(type);
-        c.setIsEnabled(enabled);
-        c.setImageInfo(imageInfoJson);
-        return c;
+    /** 本测试只读 id/parentChunkId/chunkType/enabled/imageInfo 五个字段。 */
+    private static ChunkFacts chunk(String id, String parentId, String type,
+                                    boolean enabled, String imageInfoJson) {
+        return new ChunkFacts(id, null, null, type, null, enabled, 0, 0, 0, 0,
+                parentId, null, null, null, null, imageInfoJson);
     }
 
     private static String imageJson(String url, String caption, String ocr) {
@@ -89,13 +86,13 @@ class SummaryPipelineLogicTest {
     @Test
     void collectResolvesDirectChildrenAndGrandChildren() {
         // 第一级：chunkA 的图片子块；parentText 的文本子块（其下还有图片孙辈）
-        List<Chunk> firstLevel = List.of(
+        List<ChunkFacts> firstLevel = List.of(
                 chunk("img-1", "chunkA", "image_ocr", true, imageJson("u1", "", "ocr-1")),
                 chunk("text-child", "parentText", "text", true, ""));
-        List<Chunk> secondLevel = List.of(
+        List<ChunkFacts> secondLevel = List.of(
                 chunk("img-2", "text-child", "image_caption", true, imageJson("u2", "cap-2", "")));
 
-        BiFunction<Long, List<String>, List<Chunk>> lister = (tenantId, ids) ->
+        BiFunction<Long, List<String>, List<ChunkFacts>> lister = (tenantId, ids) ->
                 ids.contains("text-child") ? secondLevel : firstLevel;
 
         Map<String, String> out = ImageInfoEnricher.collectImageInfoByChunkIds(
@@ -109,7 +106,7 @@ class SummaryPipelineLogicTest {
 
     @Test
     void collectSkipsDisabledChildren() {
-        List<Chunk> children = List.of(
+        List<ChunkFacts> children = List.of(
                 chunk("img-1", "chunkA", "image_ocr", false, imageJson("u1", "", "ocr-1")));
         Map<String, String> out = ImageInfoEnricher.collectImageInfoByChunkIds(
                 (t, ids) -> children, 7L, List.of("chunkA"));
@@ -119,7 +116,7 @@ class SummaryPipelineLogicTest {
     @Test
     void collectMergesByUrlKeepingNonEmptyFields() {
         // 同一 URL 的 OCR 与 caption 来自两个子块 → 合并为一条（后写覆盖非空字段）
-        List<Chunk> children = List.of(
+        List<ChunkFacts> children = List.of(
                 chunk("img-1", "chunkA", "image_ocr", true, imageJson("same", "", "ocr-x")),
                 chunk("img-2", "chunkA", "image_caption", true, imageJson("same", "cap-x", "")));
         Map<String, String> out = ImageInfoEnricher.collectImageInfoByChunkIds(

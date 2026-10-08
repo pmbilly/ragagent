@@ -44,6 +44,12 @@ import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.retrieval.domain.WebSearchResult;
 import com.ragagent.support.ContractJson;
+import com.ragagent.common.knowledge.ChunkFacts;
+import com.ragagent.common.knowledge.KnowledgeBaseView;
+import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
+import com.ragagent.knowledge.service.ChunkPortAdapter;
+import com.ragagent.knowledge.service.KnowledgeBaseLookupAdapter;
+import com.ragagent.knowledge.service.KnowledgeService;
 
 /**
  * 4.6c 录制回放的替身与掩码工具。
@@ -549,23 +555,24 @@ final class Rec46cSupport {
     /** 对照 zzKnowledgeService。 */
     static final class StubKnowledgeService implements PipelinePorts.KnowledgeService {
         @Override
-        public Knowledge getKnowledgeById(String id) {
+        public KnowledgeDocumentFacts getKnowledgeById(String id) {
             Knowledge k = new Knowledge();
             k.setId(id);
             k.setTitle("标题-" + id);
             k.setFileName(id + ".csv");
             k.setDescription("描述");
-            return k;
+            // B114：端口载荷是 facts，实体只在替身内部（镜像生产侧 QaWiring 的投影）。
+            return KnowledgeService.factsOf(k);
         }
 
         @Override
-        public List<Knowledge> getKnowledgeBatch(long tenantId,
-                                                                               List<String> ids) {
+        public List<KnowledgeDocumentFacts> getKnowledgeBatch(long tenantId,
+                                                              List<String> ids) {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public List<Knowledge> getKnowledgeBatchWithSharedAccess(
+        public List<KnowledgeDocumentFacts> getKnowledgeBatchWithSharedAccess(
                 long tenantId, List<String> ids) {
             throw new UnsupportedOperationException();
         }
@@ -579,8 +586,8 @@ final class Rec46cSupport {
         final Map<String, Knowledge> items = new LinkedHashMap<>();
 
         @Override
-        public List<Knowledge> getKnowledgeBatch(long tenantId,
-                                                                               List<String> ids) {
+        public List<KnowledgeDocumentFacts> getKnowledgeBatch(long tenantId,
+                                                              List<String> ids) {
             List<Knowledge> out = new ArrayList<>();
             for (String id : ids) {
                 var k = items.get(id);
@@ -588,7 +595,7 @@ final class Rec46cSupport {
                     out.add(k);
                 }
             }
-            return out;
+            return KnowledgeService.factsOf(out);
         }
     }
 
@@ -658,7 +665,7 @@ final class Rec46cSupport {
         final List<String> calls = new ArrayList<>();
 
         @Override
-        public List<Chunk> listChunksById(long tenantId, List<String> ids) {
+        public List<ChunkFacts> listChunksById(long tenantId, List<String> ids) {
             calls.add(String.join(",", ids));
             if (listErr) {
                 throw new RuntimeException("db unavailable");
@@ -670,19 +677,19 @@ final class Rec46cSupport {
                     out.add(chunk);
                 }
             }
-            return out;
+            return ChunkPortAdapter.factsAll(out);
         }
 
         @Override
-        public List<Chunk> listChunksByParentIds(long tenantId,
-                                                                               List<String> parentIds) {
+        public List<ChunkFacts> listChunksByParentIds(long tenantId,
+                                                      List<String> parentIds) {
             List<Chunk> out = new ArrayList<>();
             for (var c : chunks.values()) {
                 if (c != null && parentIds.contains(c.getParentChunkId())) {
                     out.add(c);
                 }
             }
-            return out;
+            return ChunkPortAdapter.factsAll(out);
         }
     }
 
@@ -703,7 +710,7 @@ final class Rec46cSupport {
         private final Object lock = new Object();
 
         @Override
-        public KnowledgeBase getKnowledgeBaseByIdOnly(String id) {
+        public KnowledgeBaseView getKnowledgeBaseByIdOnly(String id) {
             byIDOnlyCalls++;
             if (kbErr != null) {
                 throw kbErr;
@@ -712,19 +719,19 @@ final class Rec46cSupport {
             if (kb == null) {
                 throw new RuntimeException("kb " + id + " not found");
             }
-            return kb;
+            return KnowledgeBaseLookupAdapter.view(kb);
         }
 
         @Override
-        public List<KnowledgeBase> getKnowledgeBasesByIdsOnly(List<String> ids) {
+        public List<KnowledgeBaseView> getKnowledgeBasesByIdsOnly(List<String> ids) {
             if (kbErr != null) {
                 throw kbErr;
             }
-            List<KnowledgeBase> out = new ArrayList<>();
+            List<KnowledgeBaseView> out = new ArrayList<>();
             for (String id : ids) {
                 var kb = kbs.get(id);
                 if (kb != null) {
-                    out.add(kb);
+                    out.add(KnowledgeBaseLookupAdapter.view(kb));
                 }
             }
             return out;

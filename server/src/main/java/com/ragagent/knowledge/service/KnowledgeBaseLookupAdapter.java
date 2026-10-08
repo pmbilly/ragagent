@@ -95,7 +95,12 @@ public class KnowledgeBaseLookupAdapter implements KnowledgeBaseLookup {
         return k != null;
     }
 
-    private static KnowledgeBaseView view(KnowledgeBase kb) {
+    /**
+     * 实体 → L1 视图的**域内公用投影**（B114 起转 public：装配层
+     * {@code session/service/QaWiring} 需要把 KB 交给 chat 管线，
+     * 而实体不许越层 ⇒ 复用同一份投影，避免映射逻辑两处漂移）。
+     */
+    public static KnowledgeBaseView view(KnowledgeBase kb) {
         if (kb == null) {
             return null;
         }
@@ -110,6 +115,9 @@ public class KnowledgeBaseLookupAdapter implements KnowledgeBaseLookup {
         v.setEmbeddingModelId(kb.getEmbeddingModelId());
         v.setWikiEnabled(kb.getIndexingStrategy() != null && kb.getIndexingStrategy().isWikiEnabled());
         v.setWikiConfig(kb.getWikiConfig());
+        v.setVectorEnabled(kb.getIndexingStrategy() != null && kb.getIndexingStrategy().isVectorEnabled());
+        v.setKeywordEnabled(kb.getIndexingStrategy() != null && kb.getIndexingStrategy().isKeywordEnabled());
+        v.setExtractConfig(kb.getExtractConfig());
         v.setCreatedAt(kb.getCreatedAt());
         v.setUpdatedAt(kb.getUpdatedAt());
         return v;

@@ -19,5 +19,8 @@ public record KnowledgeDocumentFacts(
         String source,
         String channel,
         String description,
-        String knowledgeBaseId) {
+        String knowledgeBaseId,
+        Long tenantId,
+        String fileType,
+        String filePath) {
 }

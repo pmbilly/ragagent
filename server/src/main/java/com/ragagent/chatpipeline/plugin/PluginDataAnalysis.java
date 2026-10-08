@@ -14,7 +14,7 @@ import com.ragagent.chatpipeline.PipelineLog;
 import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.chatpipeline.support.MatchTypes;
 import com.ragagent.common.llm.ToolResult;
-import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.common.retrieval.SearchResult;
@@ -81,7 +81,7 @@ public final class PluginDataAnalysis implements Plugin {
         // 2. 只处理首个数据文件
         SearchResult targetFile = dataFiles.get(0);
 
-        Knowledge knowledge;
+        KnowledgeDocumentFacts knowledge;
         try {
             knowledge = knowledgeService.getKnowledgeById(targetFile.getKnowledgeId());
         } catch (RuntimeException e) {
@@ -98,8 +98,8 @@ public final class PluginDataAnalysis implements Plugin {
             PipelinePorts.TableSchema schema;
             try {
                 schema = tool.loadFromKnowledge(new PipelinePorts.KnowledgeData(
-                        knowledge.getId(), knowledge.getKnowledgeBaseId(), knowledge.getTenantId(),
-                        knowledge.getFileType(), knowledge.getFilePath()));
+                        knowledge.id(), knowledge.knowledgeBaseId(), knowledge.tenantId(),
+                        knowledge.fileType(), knowledge.filePath()));
             } catch (RuntimeException e) {
                 Map<String, Object> f = new LinkedHashMap<>();
                 f.put("error", e.getMessage());
@@ -115,7 +115,7 @@ public final class PluginDataAnalysis implements Plugin {
             }
 
             String analysisPrompt = "\nUser Question: " + chatManage.getQuery()
-                    + "\nKnowledge ID: " + knowledge.getId()
+                    + "\nKnowledge ID: " + knowledge.id()
                     + "\nTable Schema: " + tableSchemaDescription(schema)
                     + "\n\nDetermine if the user's question requires data analysis (e.g., statistics, aggregation, filtering) on this table."
                     + "\nIf YES, generate a DuckDB SQL query to answer the user's question and fill in the knowledge_id and sql fields."
@@ -153,14 +153,14 @@ public final class PluginDataAnalysis implements Plugin {
 
             // 5. 结果并回 MergeResult
             SearchResult analysisResult = new SearchResult();
-            analysisResult.setId("analysis_" + knowledge.getId());
+            analysisResult.setId("analysis_" + knowledge.id());
             analysisResult.setContent(toolResult.getOutput());
             analysisResult.setScore(1.0);
             analysisResult.setMatchType(MatchTypes.DATA_ANALYSIS);
-            analysisResult.setKnowledgeId(knowledge.getId());
-            analysisResult.setKnowledgeTitle(knowledge.getTitle());
-            analysisResult.setKnowledgeFilename(knowledge.getFileName());
-            analysisResult.setKnowledgeDescription(knowledge.getDescription());
+            analysisResult.setKnowledgeId(knowledge.id());
+            analysisResult.setKnowledgeTitle(knowledge.title());
+            analysisResult.setKnowledgeFilename(knowledge.fileName());
+            analysisResult.setKnowledgeDescription(knowledge.description());
             chatManage.getMergeResult().add(analysisResult);
         } finally {
             tool.cleanup();

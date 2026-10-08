@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import javax.sql.DataSource;
+import com.ragagent.knowledge.service.ChunkPortAdapter;
 
 /**
  * chunk 仓储（文档与 FAQ 的 chunk 行读写，方法式门面）。数据访问契约如下，
@@ -134,14 +135,7 @@ public class ChunkRepository implements ChunkSearchGateway {
      */
     @Override
     public List<ChunkFacts> findChunks(long tenantId, List<String> chunkIds) {
-        List<ChunkFacts> out = new ArrayList<>();
-        for (Chunk c : listChunksById(tenantId, chunkIds)) {
-            out.add(new ChunkFacts(c.getId(), c.getKnowledgeId(), c.getContent(), c.getChunkType(),
-                    c.getIndexStatus(), c.isIsEnabled(), c.getChunkIndex(), c.getStartAt(),
-                    c.getEndAt(), c.getContentRevision(), c.getParentChunkId(), c.getPreChunkId(),
-                    c.getNextChunkId(), c.getRelationChunks(), c.getMetadata()));
-        }
-        return out;
+        return ChunkPortAdapter.factsAll(listChunksById(tenantId, chunkIds));
     }
 
     /**

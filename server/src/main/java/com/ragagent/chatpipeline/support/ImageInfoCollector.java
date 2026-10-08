@@ -7,7 +7,7 @@ import java.util.Map;
 
 import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.knowledge.support.ImageInfoEnricher;
+import com.ragagent.retrieval.support.ImageInfoEnricher;
 
 /**
  * 按命中 chunk 批量聚合子块 image_info（search_entity/merge 消费）。

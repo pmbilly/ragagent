@@ -37,7 +37,6 @@ import com.ragagent.common.context.TenantContext;
 import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.settings.ConversationProperties;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.service.KnowledgeBaseService;
@@ -70,6 +69,11 @@ import com.ragagent.common.pipeline.SearchParams;
 import com.ragagent.common.tenant.WebSearchConfig;
 import com.ragagent.retrieval.domain.WebSearchResult;
 import com.ragagent.tenant.Tenant;
+import com.ragagent.common.knowledge.ChunkFacts;
+import com.ragagent.common.knowledge.KnowledgeBaseView;
+import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
+import com.ragagent.knowledge.service.ChunkPortAdapter;
+import com.ragagent.knowledge.service.KnowledgeBaseLookupAdapter;
 
 /**
  * chat 管线 + QA 面装配（docs/known-issues/05-wave-4.md 的 11 seam 清单）。
@@ -178,20 +182,23 @@ public class QaWiring {
             KnowledgeBaseService kbService, HybridSearchService hybridSearchService) {
         return new PipelinePorts.KnowledgeBaseService() {
             @Override
-            public KnowledgeBase getKnowledgeBaseByIdOnly(String id) {
+            public KnowledgeBaseView getKnowledgeBaseByIdOnly(String id) {
+                // 语义保持：仍走 getAllTenantById（含 ensureDefaults 的"索引策略零值 →
+                // vector+keyword 默认"回填），投影在回填**之后**取值。
                 KnowledgeBase kb = kbService.getAllTenantById(id);
                 if (kb == null) {
                     // 插件取 KB 元数据失败 → BizError(1003) → 管线 500 信封
                     throw new PipelinePorts.PipelinePortException(
                             "error code: 1003, error message: knowledge base not found");
                 }
-                return kb;
+                return KnowledgeBaseLookupAdapter.view(kb);
             }
 
             @Override
-            public List<KnowledgeBase> getKnowledgeBasesByIdsOnly(List<String> ids) {
+            public List<KnowledgeBaseView> getKnowledgeBasesByIdsOnly(List<String> ids) {
                 return ids.stream().map(kbService::getAllTenantById)
-                        .filter(kb -> kb != null).collect(java.util.stream.Collectors.toList());
+                        .filter(kb -> kb != null).map(KnowledgeBaseLookupAdapter::view)
+                        .collect(java.util.stream.Collectors.toList());
             }
 
             @Override
@@ -234,19 +241,22 @@ public class QaWiring {
     public PipelinePorts.KnowledgeService qaPipelineKnowledgeService(KnowledgeService knowledgeService) {
         return new PipelinePorts.KnowledgeService() {
             @Override
-            public Knowledge getKnowledgeById(String id) {
+            public KnowledgeDocumentFacts getKnowledgeById(String id) {
                 // 知识查询带租户过滤（从 TenantContext 取）
-                return knowledgeService.getKnowledgeInTenant(TenantContext.currentTenantId(), id);
+                return KnowledgeService.factsOf(
+                        knowledgeService.getKnowledgeInTenant(TenantContext.currentTenantId(), id));
             }
 
             @Override
-            public List<Knowledge> getKnowledgeBatch(long tenantId, List<String> ids) {
-                return knowledgeService.getKnowledgeBatch(tenantId, ids);
+            public List<KnowledgeDocumentFacts> getKnowledgeBatch(long tenantId, List<String> ids) {
+                return KnowledgeService.factsOf(knowledgeService.getKnowledgeBatch(tenantId, ids));
             }
 
             @Override
-            public List<Knowledge> getKnowledgeBatchWithSharedAccess(long tenantId, List<String> ids) {
-                return knowledgeService.getKnowledgeBatchWithSharedAccess(tenantId, ids);
+            public List<KnowledgeDocumentFacts> getKnowledgeBatchWithSharedAccess(
+                    long tenantId, List<String> ids) {
+                return KnowledgeService.factsOf(
+                        knowledgeService.getKnowledgeBatchWithSharedAccess(tenantId, ids));
             }
         };
     }
@@ -256,17 +266,17 @@ public class QaWiring {
     public PipelinePorts.ChunkRepository qaPipelineChunkRepository(ChunkRepository chunkRepository) {
         return new PipelinePorts.ChunkRepository() {
             @Override
-            public List<Chunk> listChunksById(long tenantId, List<String> ids) {
-                return chunkRepository.listChunksById(tenantId, ids);
+            public List<ChunkFacts> listChunksById(long tenantId, List<String> ids) {
+                return ChunkPortAdapter.factsAll(chunkRepository.listChunksById(tenantId, ids));
             }
 
             @Override
-            public List<Chunk> listChunksByParentIds(long tenantId, List<String> parentIds) {
+            public List<ChunkFacts> listChunksByParentIds(long tenantId, List<String> parentIds) {
                 List<Chunk> out = new ArrayList<>();
                 for (String parentId : parentIds) {
                     out.addAll(chunkRepository.listChunkByParentId(tenantId, parentId));
                 }
-                return out;
+                return ChunkPortAdapter.factsAll(out);
             }
         };
     }
@@ -276,8 +286,8 @@ public class QaWiring {
     public PipelinePorts.KnowledgeRepository qaPipelineKnowledgeRepository(KnowledgeService knowledgeService) {
         return new PipelinePorts.KnowledgeRepository() {
             @Override
-            public List<Knowledge> getKnowledgeBatch(long tenantId, List<String> ids) {
-                return knowledgeService.getKnowledgeBatch(tenantId, ids);
+            public List<KnowledgeDocumentFacts> getKnowledgeBatch(long tenantId, List<String> ids) {
+                return KnowledgeService.factsOf(knowledgeService.getKnowledgeBatch(tenantId, ids));
             }
         };
     }
@@ -288,9 +298,10 @@ public class QaWiring {
             KnowledgeBaseService kbService) {
         return new PipelinePorts.KnowledgeBaseRepository() {
             @Override
-            public List<KnowledgeBase> getKnowledgeBaseByIDs(List<String> ids) {
+            public List<KnowledgeBaseView> getKnowledgeBaseByIDs(List<String> ids) {
                 return ids.stream().map(kbService::getAllTenantById)
-                        .filter(kb -> kb != null).collect(java.util.stream.Collectors.toList());
+                        .filter(kb -> kb != null).map(KnowledgeBaseLookupAdapter::view)
+                        .collect(java.util.stream.Collectors.toList());
             }
         };
     }

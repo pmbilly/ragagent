@@ -14,7 +14,7 @@ import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.common.pipeline.SearchParams;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.event.TenantContextSnapshot;
-import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.common.knowledge.KnowledgeBaseView;
 import com.ragagent.tracing.langfuse.LangfuseManager;
 import com.ragagent.tracing.langfuse.Span;
 import com.ragagent.retrieval.domain.WebSearchResult;
@@ -54,13 +54,13 @@ final class PluginSearchOps {
         for (SearchTarget t : chatManage.getSearchTargets()) {
             kbIds.add(t == null ? null : t.knowledgeBaseId());
         }
-        List<KnowledgeBase> kbList = new ArrayList<>();
-        Map<String, KnowledgeBase> kbMap = new LinkedHashMap<>();
+        List<KnowledgeBaseView> kbList = new ArrayList<>();
+        Map<String, KnowledgeBaseView> kbMap = new LinkedHashMap<>();
         try {
-            List<KnowledgeBase> kbs = service.knowledgeBaseService.getKnowledgeBasesByIdsOnly(kbIds);
+            List<KnowledgeBaseView> kbs = service.knowledgeBaseService.getKnowledgeBasesByIdsOnly(kbIds);
             if (kbs != null) {
                 kbList = kbs;
-                for (KnowledgeBase kb : kbs) {
+                for (KnowledgeBaseView kb : kbs) {
                     if (kb != null) {
                         kbMap.put(kb.getId(), kb);
                     }
@@ -74,7 +74,7 @@ final class PluginSearchOps {
 
         // 只给"取到了"的 KB 求身份键（与既有行为一致：取不到的 KB 回落空 key 组）
         Map<String, String> modelKeyMap = service.knowledgeBaseService.resolveEmbeddingModelKeys(
-                kbList.stream().map(KnowledgeBase::getId).toList());
+                kbList.stream().map(KnowledgeBaseView::getId).toList());
 
         // 分组迭代顺序不影响结果集：结果合并由全局列表承接
         Map<String, List<SearchTarget>> groups = new LinkedHashMap<>();
@@ -119,7 +119,7 @@ final class PluginSearchOps {
         return results;
     }
     private void searchModelGroup(String modelKey, List<SearchTarget> targets, ChatManage chatManage,
-                                  String queryText, Map<String, KnowledgeBase> kbMap,
+                                  String queryText, Map<String, KnowledgeBaseView> kbMap,
                                   List<SearchResult> results, Throwable[] firstErr,
                                   java.util.concurrent.atomic.AtomicBoolean errOnce, Object lock) {
         // 组内算一次查询向量；失败时只保留有关键词索引的目标（向量-only 必须上报根因）
@@ -133,7 +133,7 @@ final class PluginSearchOps {
             } catch (RuntimeException e) {
                 List<SearchTarget> keep = new ArrayList<>(targets.size());
                 for (SearchTarget target : targets) {
-                    KnowledgeBase kb = kbMap.get(target.knowledgeBaseId());
+                    KnowledgeBaseView kb = kbMap.get(target.knowledgeBaseId());
                     if (!targetReportsEmbedFailure(kb)) {
                         keep.add(target);
                         continue;
@@ -232,7 +232,7 @@ final class PluginSearchOps {
      * wiki/图-only 的 KB 无向量或关键词索引可降级，
      * HybridSearch 返回空且无错；FAQ KB 必须上报；其余看索引开关。
      */
-    static boolean targetReportsEmbedFailure(KnowledgeBase kb) {
+    static boolean targetReportsEmbedFailure(KnowledgeBaseView kb) {
         if (kb == null) {
             return false;
         }
@@ -246,13 +246,13 @@ final class PluginSearchOps {
     }
 
     /** KB 索引策略开启向量检索。 */
-    static boolean isVectorEnabled(KnowledgeBase kb) {
-        return kb != null && kb.getIndexingStrategy().isVectorEnabled();
+    static boolean isVectorEnabled(KnowledgeBaseView kb) {
+        return kb != null && kb.isVectorEnabled();
     }
 
     /** KB 索引策略开启关键词检索。 */
-    static boolean isKeywordEnabled(KnowledgeBase kb) {
-        return kb != null && kb.getIndexingStrategy().isKeywordEnabled();
+    static boolean isKeywordEnabled(KnowledgeBaseView kb) {
+        return kb != null && kb.isKeywordEnabled();
     }
 
     private List<SearchResult> searchSingleTarget(ChatManage chatManage, SearchTarget t,

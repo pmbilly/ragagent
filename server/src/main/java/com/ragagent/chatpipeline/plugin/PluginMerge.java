@@ -13,7 +13,7 @@ import com.ragagent.chatpipeline.PipelineLog;
 import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.chatpipeline.support.MatchTypes;
 import com.ragagent.chatpipeline.support.SearchSupport;
-import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.FaqChunkMetadata;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.retrieval.support.ChunkSearchUtil;
@@ -296,7 +296,7 @@ public final class PluginMerge implements Plugin {
             return results;
         }
 
-        List<Chunk> chunks;
+        List<ChunkFacts> chunks;
         try {
             chunks = chunkRepo.listChunksById(tenantId, new ArrayList<>(chunkIdSet.keySet()));
         } catch (RuntimeException e) {
@@ -307,7 +307,7 @@ public final class PluginMerge implements Plugin {
         }
 
         int updated = 0;
-        for (Chunk chunk : chunks) {
+        for (ChunkFacts chunk : chunks) {
             if (chunk == null) {
                 continue;
             }
@@ -319,7 +319,7 @@ public final class PluginMerge implements Plugin {
             if (content.isEmpty()) {
                 continue;
             }
-            List<SearchResult> matched = chunkResultMap.get(chunk.getId());
+            List<SearchResult> matched = chunkResultMap.get(chunk.id());
             if (matched == null) {
                 continue;
             }
@@ -341,8 +341,8 @@ public final class PluginMerge implements Plugin {
     }
 
     /** FAQ 元数据解析（解析失败/无 FAQ 字段 → null）。 */
-    private FaqChunkMetadata parseFaqMetadata(Chunk chunk) {
-        JsonNode meta = chunk.getMetadata();
+    private FaqChunkMetadata parseFaqMetadata(ChunkFacts chunk) {
+        JsonNode meta = chunk.metadata();
         if (meta == null || meta.isNull() || !meta.isObject()) {
             return null;
         }
@@ -354,7 +354,7 @@ public final class PluginMerge implements Plugin {
             return FaqChunkMetadata.fromJson(meta);
         } catch (RuntimeException e) {
             Map<String, Object> f = new LinkedHashMap<>();
-            f.put("chunk_id", chunk.getId());
+            f.put("chunk_id", chunk.id());
             f.put("error", e.getMessage());
             PipelineLog.warn("Merge", "faq_metadata_parse_failed", f);
             return null;
