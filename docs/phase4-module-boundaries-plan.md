@@ -271,3 +271,70 @@ B111 暴露的 8 域间接环看着吓人（`agent`/`auth`/`chatpipeline`/`datas
 > `chunk` 这类名字在**不同作用域**分别指 `Chunk` 与 `SearchResult` ⇒ 全局改名会误伤，
 > 必须按作用域（声明类型唯一性）过滤，剩下的用编译器错误行清单精确改写。
 > 将来若还要给 getter 风格的消费方换 facts，优先考虑让 facts 带 getter 别名或新开 getter 风格载荷。
+
+
+## 5. M1 可行性侦察（2026-10-08 B115，仅侦察，未动构建）
+
+方法：A 线清点构建/装配/资源面（子代理），B 线算带权包图 + 拓扑分层 + 最优切分。
+
+### 5.1 三条结论
+
+**① 因为包图已是 DAG，拆模块"零业务代码改动"。**
+拆模块 = 搬文件 + 每个模块写一行 `project()` 依赖；**`import` 语句全部不动**
+（B112 解环 + B114 清分层带来的直接红利）。
+
+**② 但"按业务域拆"不可行 —— 中部没有便宜缝。**
+把"最优切分"形式化了：DAG 拓扑序里按**连续块**切分保证模块间无环，于是模块划分＝
+找代价最小的切割点。实测：
+
+| 口径 | 结果 |
+|---|---|
+| 按引用处数 | 每条边界 ≈1800 处，**几乎恒定**（被 `→ common` 底噪吞掉） |
+| 按跨界的**不同类型数** | 中部边界 **240~416 类型**，只有两端便宜 |
+| 最优切分的形态 | **退化**：只能摘出 `common`/`approval`/`audit`/`config` 等小域，剩下 ~272k LOC 长在一起 |
+
+⇒ 15 个业务域若各自成模块，每个切点要暴露 178~268 个类型——**它们不是模块，它们就是"应用"**。
+
+**③ 真正的缝在"架构层"，不在"业务域"**（与守卫的 L1/L2/L3 同构）：
+
+| 模块 | 成员域 | 文件 | LOC | 对外暴露类型 |
+|---|---|---|---|---|
+| **`:contracts`** | `common`、`event` | 175 | 13.8k | **0**（自身零依赖 ⇒ build 文件无任何 `project()`）|
+| **`:engine`** | `llm`、`retrieval`、`embedding`、`rerank`、`chatpipeline`、`modelcontext`、`webfetch`、`stream`、`tracing`、`model`、`vectorstore` | 368 | 58.3k | 79 → contracts |
+| **`:app`** | `agent`、`auth`、`knowledge`、`session`、`wiki`、`im`、`mcp`、`memory`、`storage`、`system`、`tenant`、`websearch`、`settings`、`audit`、`approval` | 1151 | 177.9k | 102 → engine、129 → contracts |
+| **`:datasource`** | `datasource`（**入度 0**，无人依赖） | 125 | 26.9k | 2 → engine、20 → app |
+| **`:misc`** | `embed`、`initialization`、`evaluation`、`favorite` | 56 | 7.7k | 25 → engine、41 → app |
+| **`:boot`** | `config` + `RagAgentApplication` + `application.yml` + `spring.factories` | 12 | 1.7k | 25 → engine、35 → app |
+
+已核验：**无下层→上层引用，模块图为 DAG** ✓；`:engine → :contracts` 仅 **79 类型**
+（非常干净，是 R3=0 的直接红利）。
+
+### 5.2 风险清单
+
+1. **装配面绑定单根包**：`@SpringBootApplication`（无 `scanBasePackages`）+ `@MapperScan("com.ragagent.**.mapper")`
+   + `@ConfigurationPropertiesScan` **15 个包白名单** + `spring.factories` 的 EPP
+   ⇒ 包一动，入口类与 ArchUnit R2/R3/R11 守卫必须同步。
+2. **13 处 classpath 资源是"静默 null"**（`if (in == null) return/continue`）：`agent/management/**`、
+   `initialization/**`、`/jieba/**`、`common/text/**`、`/dataset/**`。已逐个核实**读法都是 classloader
+   绝对路径 ✓**（不会因搬家解析失败），但**缺资源不报错** ⇒ 必须补一条"资源存在性断言测试"。
+3. **路径硬编码**：proto srcDir 来自 `../docreader` + `$rootDir/otlp-proto`；迁移来自
+   `$rootDir/migrations/versioned` 且运行时读 `filesystem:./build/generated-migrations`
+   （绑定模块目录 + 工作目录）；**5 个守卫脚本 + `GoldenContract` 都硬编码 `server/src/...`**。
+4. **spotless `ratchetFrom("seed")`**：大规模搬家会让 ratchet 判定面骤增 ⇒ CI 可能出现
+   "无关文件被格式化"的巨大 diff（需一次性 `spotlessApply` 或重置 ratchet 基线）。
+5. **测试归属（设计要点）**：419 测试文件 / ~109 个 `@SpringBootTest`。给 `:datasource` 写测试会形成
+   项目环（`:datasource` 依赖 `:app`）⇒ 解法：**单测随域搬、集成测试集中到 `:boot`**（boot 在 DAG 顶端，
+   能看见所有模块 ✓），共享基座（`TestSchema`、`GoldenContract`）改 `java-test-fixtures`。
+
+### 5.3 价值判断与推进策略
+
+| | 现守卫（脚本 + R8） | Gradle 多模块 |
+|---|---|---|
+| 边界强制力 | 脚本级（可被改白名单绕过） | **编译器级，绕不过** |
+| 已有覆盖 | R1/R1b/R3/R5/R6/R7/R8 已覆盖同一批规则 | 同规则硬化 |
+| 一次成本 | — | 搬 1,887 + 419 文件、6 个 build 文件、6 处守卫脚本改造、资源/装配/proto/迁移路径模块化 |
+| 增量收益 | — | 主要来自 **`:contracts` 与 `:engine` 两条硬边界**（`:app` 内部 15 域仍是软的，因为中部无缝） |
+
+⇒ **不做一次性 6 模块拆分。第一步只做 `:contracts`**：它是**零成本切点**
+（自身零依赖、175 文件；界外→界内的 1,409 处引用全部只变成一行 `project(":contracts")`），
+却能把"底座不得依赖任何域"从**脚本规则升格为编译规则**——整个 M1 里性价比最高的一刀。
