@@ -41,7 +41,9 @@ MAIN = ROOT / 'server/src/main/java/com/ragagent'
 
 # 冻结面（第三方线格式/租户配置/模型载荷等）——整目录豁免，理由见 HANDOFF §15.3。
 FROZEN_PREFIXES = (
-    'datasource/connector', 'event/', 'llm/', 'stream/', 'auth/domain/tenantconfig',
+    # 2026-10-08 B93b：`event/` 与 `stream/` 已 camel 化（事件面），从冻结名单摘除；
+    # 事件面口径另由 scripts/check-event-face-case.py 守（载荷注解/事件名/响应类型值）。
+    'datasource/connector', 'llm/', 'auth/domain/tenantconfig',
     'common/pipeline/SearchParams', 'mcp/oauth', 'memory/service/MemoryExtractionLlm',
     'memory/service/MemoryExtractPayload', 'docreader', 'rerank/RankResult',
     'tracing/langfuse', 'retrieval/engine/doris', 'retrieval/domain/ImageInfo',

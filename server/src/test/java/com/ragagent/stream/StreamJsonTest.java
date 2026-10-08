@@ -92,9 +92,9 @@ class StreamJsonTest {
 
     @Test
     void liveRunPayloadMatchesGo() {
-        // 期望形状：{"assistant_message_id":"msg-1","request_id":"req-1"}
+        // 期望形状：{"assistantMessageId":"msg-1","requestId":"req-1"}
         assertEquals(
-                "{\"assistant_message_id\":\"msg-1\",\"request_id\":\"req-1\"}",
+                "{\"assistantMessageId\":\"msg-1\",\"requestId\":\"req-1\"}",
                 StreamJson.write(new LiveRunPayload("msg-1", "req-1")));
     }
 

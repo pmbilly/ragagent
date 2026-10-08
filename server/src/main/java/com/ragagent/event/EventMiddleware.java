@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
  *   <li>{@link #withLogging()}：前置 info、失败 error、成功 debug
  *       （type/session/request 字段）。</li>
  *   <li>{@link #withTiming()}：耗时（毫秒）写进 <b>event.metadata 的共享 map</b>——
- *       调用方持有的 Event 能看到 {@code duration_ms}（浅拷贝共享同一 map）。</li>
+ *       调用方持有的 Event 能看到 {@code durationMs}（浅拷贝共享同一 map）。</li>
  *   <li>{@link #withRecovery()}：panic 转成
  *       {@link PanicError}（{@code panic in event handler: ...}）。</li>
  *   <li>{@link #chain(EventMiddleware...)}：<b>先列的在外层</b>
@@ -60,7 +60,7 @@ public interface EventMiddleware {
                     metadata = new LinkedHashMap<>();
                     event.setMetadata(metadata);
                 }
-                metadata.put("duration_ms", elapsed.toMillis());
+                metadata.put("durationMs", elapsed.toMillis());
             }
         };
     }

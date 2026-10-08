@@ -8,8 +8,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  *
  * <p>字段序固定。两个键恒输出。</p>
  */
-@JsonPropertyOrder({"assistant_message_id", "request_id"})
+@JsonPropertyOrder({"assistantMessageId", "requestId"})
 public record LiveRunPayload(
-        @JsonProperty("assistant_message_id") String assistantMessageId,
-        @JsonProperty("request_id") String requestId) {
+        @JsonProperty("assistantMessageId") String assistantMessageId,
+        @JsonProperty("requestId") String requestId) {
 }

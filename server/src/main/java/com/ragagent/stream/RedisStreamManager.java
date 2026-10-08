@@ -429,7 +429,7 @@ public class RedisStreamManager implements StreamManager {
         }
         // 匹配序列化后的字段而不是在 Lua 里解码：标记由上面的 setLiveRun 写入，
         // 编码方式是我们自己可以依赖的。needle 走同一个 mapper，别手工拼引号。
-        String needle = "\"assistant_message_id\":" + StreamJson.writeString(assistantMessageId);
+        String needle = "\"assistantMessageId\":" + StreamJson.writeString(assistantMessageId);
         try {
             template.execute(CLEAR_LIVE_RUN_CAS, Collections.singletonList(buildLiveRunKey(sessionId)), needle);
         } catch (DataAccessException e) {

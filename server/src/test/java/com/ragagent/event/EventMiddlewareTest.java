@@ -67,7 +67,7 @@ class EventMiddlewareTest {
         });
         Event event = new Event("", "evt", "", null, new java.util.LinkedHashMap<>(), "");
         h.handle(event);
-        Object ms = event.getMetadata().get("duration_ms");
+        Object ms = event.getMetadata().get("durationMs");
         assertInstanceOf(Long.class, ms);
         assertTrue((Long) ms >= 0);
     }
@@ -79,7 +79,7 @@ class EventMiddlewareTest {
         });
         Event event = new Event("", "evt", "", null, null, "");
         h.handle(event);
-        assertTrue(event.getMetadata() != null && event.getMetadata().containsKey("duration_ms"));
+        assertTrue(event.getMetadata() != null && event.getMetadata().containsKey("durationMs"));
     }
 
     @Test

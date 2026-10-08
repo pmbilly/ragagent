@@ -1016,3 +1016,17 @@
 - **新守卫 `scripts/check-event-face-case.py`**（已接入 CI guards 作业）：四类口径——① 事件载荷类不得有 snake `@JsonProperty`（camel 显式注解允许，因其承载 include/顺序语义）；② `EventType`/`ResponseType` 值不得含 `_`/`.`；③ 路径变量不得含 `_`；④ `@RequestParam` 显式名不得含 `_`（OIDC 白名单登记理由）。
   **红态探针**：临时建 `ProbeController`（snake 路径变量 + snake 查询参数）+ `ProbeData`（snake 载荷注解）→ 四类违例全部报出、非零退出；删除后转绿 ✓。
 - **闸门**：后端 4,838/0；前端 736/0 + `vue-tsc` 0；`spotlessCheck`；五守卫绿。
+
+**✅ B93b-3（2026-10-08，事件/流收尾 + 面登记）**
+- **冻结节流清理暴露真残留**：把 `check-json-key-case.py` 的 `FROZEN_PREFIXES` 里过期的 `event/`、`stream/` 摘掉（二者已 camel）后，守卫立刻报出：
+  · `event/EventMiddleware` 的事件元数据 `duration_ms` —— **前端早已按 `durationMs` 读**（B93b 前端改名），即该字段在改动窗口内静默丢失 ⇒ 改 camel（含 javadoc）。
+  · `stream/LiveRunPayload` 的 `assistant_message_id`/`request_id`（record + `@JsonPropertyOrder`）⇒ camel。
+- **第 4 个真 bug（静默）**：`RedisStreamManager.clearLiveRun` 的 CAS 用**原始子串** `"\"assistant_message_id\":"` 匹配序列化标记 ⇒ 键改名后 CAS 永不命中、live-run 标记不再清除（影响并发轮次判断）。
+  由 `RedisStreamManagerTest.clearLiveRunDropsTheMarkerOnlyWhenItStillNamesThatRun` 抓出，改为 `assistantMessageId`。**教训：键位扫描必须覆盖"字符串里做原始键匹配"的形态（needle/marker/CAS）。**
+- **面登记（"为什么还有 snake"的正面回答）**：六类显式冻结并附理由（守卫脚本内联）——
+  ① `chatpipeline/plugin` 的 rerank/观测行（`rank`/`model_score`/`retrieval_score`…，前端零消费，进 `RetrievalObs`）；
+  ② `RetrievalObs` 观测面；③ 平台适配器（`im/**`、`websearch/provider`、`rerank`、`asr`、`vlm`、`datasource/connector`，键名由对方 API 定）；
+  ④ `tracing/langfuse`；⑤ DB 列与 mapper（`@TableField`/`@Results`/JDBC `rs.get*`）；⑥ `llm/**`（供应商协议）。
+- **一致性自检**：SSE references 面两侧同为 camel（写 `ReferencesSupport` ↔ 读 `ModelOutput`/`ToolResultPersist`/`ToolDisplay`/`StreamResponseBuilder`）；rerank 行与 references 行是**不同结构**（前者进 obs，后者进事件），未互相污染。
+- **闸门**：后端 4,838/0；前端 736/0 + `vue-tsc` 0；`spotlessCheck`；五守卫绿（换锚守卫 260 条基线逐条复核）。
+- **附带发现**：`EmbedRateLimiterTest.redisPathSharesBudgetAcrossInstances` **偶发 flaky**（Redis 跨实例限流时序，复跑即过）——记录在案，未做处理。
