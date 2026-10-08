@@ -216,7 +216,7 @@ public final class AgentPrompts {
             if (kbType.isEmpty()) {
                 kbType = "document";
             }
-            b.append("<knowledge_base id=\"%s\" name=\"%s\" type=\"%s\" doc_count=\"%d\" capabilities=\"%s\">\n"
+            b.append("<knowledgeBase id=\"%s\" name=\"%s\" type=\"%s\" doc_count=\"%d\" capabilities=\"%s\">\n"
                     .formatted(escapeXMLAttr(kb.id()), escapeXMLAttr(formatDocSummary(kb.name(), 160)),
                             escapeXMLAttr(kbType), kb.docCount(),
                             escapeXMLAttr(String.join(",", kb.capabilities()))));
@@ -239,13 +239,13 @@ public final class AgentPrompts {
                     if (name == null || name.isEmpty()) {
                         name = doc.fileName();
                     }
-                    b.append("<document knowledge_id=\"%s\" chunk_id=\"%s\" type=\"%s\"><name>%s</name></document>\n"
+                    b.append("<document knowledgeId=\"%s\" chunkId=\"%s\" type=\"%s\"><name>%s</name></document>\n"
                             .formatted(escapeXMLAttr(doc.knowledgeId()), escapeXMLAttr(doc.chunkId()),
                                     escapeXMLAttr(doc.type()), escapeXMLAttr(formatDocSummary(name, 160))));
                 }
                 b.append("</recent_documents>\n");
             }
-            b.append("</knowledge_base>\n");
+            b.append("</knowledgeBase>\n");
         }
         b.append("</knowledge_bases>");
         return b.toString();

@@ -161,9 +161,9 @@ final class ModelOutput {
             }
             String fileType = stringValue(row, "fileType");
             if (!fileType.isEmpty()) {
-                b.append(" file_type=\"").append(SourceRegistry.escapeAttr(fileType)).append("\"");
+                b.append(" fileType=\"").append(SourceRegistry.escapeAttr(fileType)).append("\"");
             }
-            b.append(" chunk_count=\"").append(intValue(row, "chunkCount")).append("\">\n");
+            b.append(" chunkCount=\"").append(intValue(row, "chunkCount")).append("\">\n");
             String description = stringValue(row, "description");
             if (!description.isEmpty()) {
                 b.append("    <description>").append(SourceRegistry.escapeText(description)).append("</description>\n");
@@ -280,7 +280,7 @@ final class ModelOutput {
                 output = output.substring(0, output.length() - "</retrieval>".length());
             }
             output += "  <pagination remaining=\"" + remaining + "\" page=\"" + intValue(data, "page")
-                    + "\" page_size=\"" + intValue(data, "pageSize") + "\" />\n</retrieval>";
+                    + "\" pageSize=\"" + intValue(data, "pageSize") + "\" />\n</retrieval>";
         }
         return output;
     }
@@ -414,7 +414,7 @@ final class ModelOutput {
                 writeWebPageFileHint(b, row);
                 if (stringValue(row, "fullOutputPath").isEmpty()) {
                     b.append("    <continue url=\"").append(handle)
-                            .append("\" next_offset=\"0\">Read with web_fetch for more page content.</continue>\n");
+                            .append("\" nextOffset=\"0\">Read with web_fetch for more page content.</continue>\n");
                 }
             } else if ("failed".equals(stringValue(row, "pageStatus"))) {
                 b.append("    <page_fetch status=\"failed\">").append(SourceRegistry.escapeText(stringValue(row, "pageError")))
@@ -493,10 +493,10 @@ final class ModelOutput {
                     if (total == 0) {
                         total = offset + runeCount;
                     }
-                    b.append("    <range offset=\"").append(offset).append("\" returned_chars=\"").append(shown)
-                            .append("\" content_length=\"").append(total).append("\" />\n");
+                    b.append("    <range offset=\"").append(offset).append("\" returnedChars=\"").append(shown)
+                            .append("\" contentLength=\"").append(total).append("\" />\n");
                     if (boolValue(row, "truncated") || shown < runeCount) {
-                        b.append("    <continue url=\"").append(handle).append("\" next_offset=\"").append(offset + shown)
+                        b.append("    <continue url=\"").append(handle).append("\" nextOffset=\"").append(offset + shown)
                                 .append("\">Call web_fetch with this url and offset to read more.</continue>\n");
                     }
                 }
@@ -504,7 +504,7 @@ final class ModelOutput {
                 b.append(" retryable=\"").append(boolValue(row, "retryable")).append("\"");
                 String errorCode = stringValue(row, "errorCode");
                 if (!errorCode.isEmpty()) {
-                    b.append(" error_code=\"").append(SourceRegistry.escapeAttr(errorCode)).append("\"");
+                    b.append(" errorCode=\"").append(SourceRegistry.escapeAttr(errorCode)).append("\"");
                 }
                 b.append(">\n");
                 String errorMessage = stringValue(row, "errorMessage");
@@ -548,7 +548,7 @@ final class ModelOutput {
         }
         String message = stringValue(row, "storageError");
         if (!message.isEmpty()) {
-            b.append("    <storage_error>").append(SourceRegistry.escapeText(message)).append("</storage_error>\n");
+            b.append("    <storageError>").append(SourceRegistry.escapeText(message)).append("</storageError>\n");
         }
     }
 

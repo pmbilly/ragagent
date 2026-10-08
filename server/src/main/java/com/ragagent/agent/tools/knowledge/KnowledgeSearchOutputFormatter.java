@@ -66,7 +66,7 @@ final class KnowledgeSearchOutputFormatter {
             }
             hasMetadata = true;
             documents.append(String.format(Locale.ROOT,
-                    "<document knowledge_id=\"%s\" knowledge_base_id=\"%s\" title=\"%s\">\n",
+                    "<document knowledgeId=\"%s\" knowledgeBaseId=\"%s\" title=\"%s\">\n",
                     FaqSnippet.xmlEscape(result.sr.knowledgeId),
                     FaqSnippet.xmlEscape(result.sr.knowledgeBaseId),
                     FaqSnippet.xmlEscape(result.sr.knowledgeTitle)));
@@ -158,14 +158,14 @@ final class KnowledgeSearchOutputFormatter {
             if (seen) {
                 if (isFAQ) {
                     ob.append(String.format(Locale.ROOT,
-                            "<faq rank=\"%d\" faq_id=\"%s\" index=\"%d\" knowledge_base_id=\"%s\" knowledge_title=\"%s\" score=\"%.3f\" source_query=\"%s\" already_seen=\"true\">\n",
+                            "<faq rank=\"%d\" faqId=\"%s\" index=\"%d\" knowledgeBaseId=\"%s\" knowledgeTitle=\"%s\" score=\"%.3f\" sourceQuery=\"%s\" already_seen=\"true\">\n",
                             i + 1, FaqSnippet.xmlEscape(nz(result.sr.id)), result.sr.chunkIndex,
                             FaqSnippet.xmlEscape(nz(result.sr.knowledgeBaseId)),
                             FaqSnippet.xmlEscape(nz(result.sr.knowledgeTitle)),
                             result.sr.score, FaqSnippet.xmlEscape(sourceQuery)));
                 } else {
                     ob.append(String.format(Locale.ROOT,
-                            "<chunk rank=\"%d\" chunk_id=\"%s\" chunk_index=\"%d\" knowledge_id=\"%s\" knowledge_base_id=\"%s\" knowledge_title=\"%s\" score=\"%.3f\" source_query=\"%s\" already_seen=\"true\">\n",
+                            "<chunk rank=\"%d\" chunkId=\"%s\" chunkIndex=\"%d\" knowledgeId=\"%s\" knowledgeBaseId=\"%s\" knowledgeTitle=\"%s\" score=\"%.3f\" sourceQuery=\"%s\" already_seen=\"true\">\n",
                             i + 1, FaqSnippet.xmlEscape(nz(result.sr.id)), result.sr.chunkIndex,
                             FaqSnippet.xmlEscape(nz(result.sr.knowledgeId)),
                             FaqSnippet.xmlEscape(nz(result.sr.knowledgeBaseId)),
@@ -177,14 +177,14 @@ final class KnowledgeSearchOutputFormatter {
             } else {
                 if (isFAQ) {
                     ob.append(String.format(Locale.ROOT,
-                            "<faq rank=\"%d\" faq_id=\"%s\" index=\"%d\" knowledge_base_id=\"%s\" knowledge_title=\"%s\" score=\"%.3f\" source_query=\"%s\">\n",
+                            "<faq rank=\"%d\" faqId=\"%s\" index=\"%d\" knowledgeBaseId=\"%s\" knowledgeTitle=\"%s\" score=\"%.3f\" sourceQuery=\"%s\">\n",
                             i + 1, FaqSnippet.xmlEscape(nz(result.sr.id)), result.sr.chunkIndex,
                             FaqSnippet.xmlEscape(nz(result.sr.knowledgeBaseId)),
                             FaqSnippet.xmlEscape(nz(result.sr.knowledgeTitle)),
                             result.sr.score, FaqSnippet.xmlEscape(sourceQuery)));
                 } else {
                     ob.append(String.format(Locale.ROOT,
-                            "<chunk rank=\"%d\" chunk_id=\"%s\" chunk_index=\"%d\" knowledge_id=\"%s\" knowledge_base_id=\"%s\" knowledge_title=\"%s\" score=\"%.3f\" source_query=\"%s\">\n",
+                            "<chunk rank=\"%d\" chunkId=\"%s\" chunkIndex=\"%d\" knowledgeId=\"%s\" knowledgeBaseId=\"%s\" knowledgeTitle=\"%s\" score=\"%.3f\" sourceQuery=\"%s\">\n",
                             i + 1, FaqSnippet.xmlEscape(nz(result.sr.id)), result.sr.chunkIndex,
                             FaqSnippet.xmlEscape(nz(result.sr.knowledgeId)),
                             FaqSnippet.xmlEscape(nz(result.sr.knowledgeBaseId)),
@@ -199,7 +199,7 @@ final class KnowledgeSearchOutputFormatter {
                     snippet = extractSnippetForQueries(nz(result.sr.content), queries);
                 }
                 if (!snippet.isEmpty()) {
-                    ob.append(String.format(Locale.ROOT, "<match_snippet>%s</match_snippet>\n",
+                    ob.append(String.format(Locale.ROOT, "<matchSnippet>%s</matchSnippet>\n",
                             FaqSnippet.xmlEscape(snippet)));
                 }
                 // content 原样输出，不做 xmlEscape（输出契约）。
@@ -286,7 +286,7 @@ final class KnowledgeSearchOutputFormatter {
                 long remaining = totalChunks - retrievedCount;
                 double percentage = retrievedCount / (double) totalChunks * 100;
                 ob.append(String.format(Locale.ROOT,
-                        "<document_stat knowledge_id=\"%s\" title=\"%s\" total_chunks=\"%d\" retrieved=\"%d\" remaining=\"%d\" coverage=\"%.1f%%\" />\n",
+                        "<document_stat knowledgeId=\"%s\" title=\"%s\" totalChunks=\"%d\" retrieved=\"%d\" remaining=\"%d\" coverage=\"%.1f%%\" />\n",
                         FaqSnippet.xmlEscape(knowledgeID), FaqSnippet.xmlEscape(title), totalChunks,
                         retrievedCount, remaining, percentage));
             }

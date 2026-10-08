@@ -171,12 +171,12 @@ final class PromptAssembly {
                     title = d.knowledgeId();
                 }
                 if (!d.fileType().isEmpty()) {
-                    sb.append("    <document knowledge_id=\"").append(escapeXMLAttr(d.knowledgeId()))
+                    sb.append("    <document knowledgeId=\"").append(escapeXMLAttr(d.knowledgeId()))
                             .append("\" title=\"").append(escapeXMLAttr(title))
-                            .append("\" file_type=\"").append(escapeXMLAttr(d.fileType()))
+                            .append("\" fileType=\"").append(escapeXMLAttr(d.fileType()))
                             .append("\" />\n");
                 } else {
-                    sb.append("    <document knowledge_id=\"").append(escapeXMLAttr(d.knowledgeId()))
+                    sb.append("    <document knowledgeId=\"").append(escapeXMLAttr(d.knowledgeId()))
                             .append("\" title=\"").append(escapeXMLAttr(title)).append("\" />\n");
                 }
             }
@@ -198,14 +198,14 @@ final class PromptAssembly {
                 }
                 if (svc.discoverable() && svc.toolNames() != null && !svc.toolNames().isEmpty()) {
                     lines.add("Use relevant available MCP functions for service @"
-                            + sanitizeMustUseField(svc.name()) + " (server_id=\""
+                            + sanitizeMustUseField(svc.name()) + " (serverId=\""
                             + sanitizeMustUseField(svc.id()) + "\") before answering. Their descriptions "
                             + "identify the service and original tool names; use "
                             + "discover_mcp_tools if the service needs reconnection or authentication.");
                     continue;
                 }
                 if (svc.discoverable()) {
-                    lines.add("Use discover_mcp_tools(mode=\"list_tools\", server_id=\""
+                    lines.add("Use discover_mcp_tools(mode=\"list_tools\", serverId=\""
                             + sanitizeMustUseField(svc.id()) + "\") for the selected MCP service @"
                             + sanitizeMustUseField(svc.name()) + ". Describe the required tools, then use "
                             + "the offered functions or call_mcp_tool as available before answering; report "

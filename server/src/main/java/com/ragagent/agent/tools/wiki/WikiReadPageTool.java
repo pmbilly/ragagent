@@ -251,9 +251,9 @@ public class WikiReadPageTool extends BaseTool {
                 title = ref.substring(pipe + 1);
             }
             if (!title.isEmpty()) {
-                sources.add("<source knowledge_id=\"" + kid + "\">" + title + "</source>");
+                sources.add("<source knowledgeId=\"" + kid + "\">" + title + "</source>");
             } else {
-                sources.add("<source knowledge_id=\"" + kid + "\"/>");
+                sources.add("<source knowledgeId=\"" + kid + "\"/>");
             }
         }
 

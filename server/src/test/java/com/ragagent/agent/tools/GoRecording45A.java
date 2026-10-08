@@ -517,7 +517,7 @@ public final class GoRecording45A {
             "{\"group\":\"registry\",\"id\":\"legacy_execute_skill_script\",\"result\":\"{\\\"success\\\":false,\\\"output\\\":\\\"\\\",\\\"error\\\":\\\"execute_skill_script is no longer available; use shell_exec(skill_name=..., command=...) to run skill scripts\\\"}\"}";
 
     public static final String R_REGISTRY_LEGACY_READ_SKILL =
-            "{\"group\":\"registry\",\"id\":\"legacy_read_skill\",\"result\":\"{\\\"success\\\":false,\\\"output\\\":\\\"\\\",\\\"error\\\":\\\"read_skill is no longer available; use read_file(path=\\\\\\\"skill://\\\\u003cname\\\\u003e/\\\\u003cfile_path or SKILL.md\\\\u003e\\\\\\\")\\\"}\"}";
+            "{\"group\":\"registry\",\"id\":\"legacy_read_skill\",\"result\":\"{\\\"success\\\":false,\\\"output\\\":\\\"\\\",\\\"error\\\":\\\"read_skill is no longer available; use read_file(path=\\\\\\\"skill://\\\\u003cname\\\\u003e/\\\\u003cfilePath or SKILL.md\\\\u003e\\\\\\\")\\\"}\"}";
 
     public static final String R_REGISTRY_LEGACY_READ_SANDBOX_FILE =
             "{\"group\":\"registry\",\"id\":\"legacy_read_sandbox_file\",\"result\":\"{\\\"success\\\":false,\\\"output\\\":\\\"\\\",\\\"error\\\":\\\"read_sandbox_file is no longer available; use read_file(path=...)\\\"}\"}";
@@ -586,7 +586,7 @@ public final class GoRecording45A {
             "{\"group\":\"faq\",\"id\":\"similar_nil\",\"out\":\"\"}";
 
     public static final String R_FAQ_ENTRY_XML =
-            "{\"group\":\"faq\",\"id\":\"entry_xml\",\"out\":\"<faq faq_id=\\\"faq-chunk-1\\\" index=\\\"0\\\" question=\\\"如何创建知识库？\\\">\\n<question>如何创建知识库？</question>\\n<similar_question>怎么创建知识库？</similar_question>\\n<answer>在控制台点击新建知识库。</answer>\\n</faq>\\n\"}";
+            "{\"group\":\"faq\",\"id\":\"entry_xml\",\"out\":\"<faq faqId=\\\"faq-chunk-1\\\" index=\\\"0\\\" question=\\\"如何创建知识库？\\\">\\n<question>如何创建知识库？</question>\\n<similar_question>怎么创建知识库？</similar_question>\\n<answer>在控制台点击新建知识库。</answer>\\n</faq>\\n\"}";
 
     public static final String R_FAQ_MATCH_SNIPPET_QUERIES =
             "{\"group\":\"faq\",\"id\":\"match_snippet_queries\",\"out\":\"Q: 如何创建知识库？ | A: 在控制台点击新建知识库。\"}";

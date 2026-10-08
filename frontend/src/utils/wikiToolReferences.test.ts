@@ -74,3 +74,20 @@ test('ignores non-wiki tools and empty result sets', () => {
   assert.deepEqual(parseWikiToolReferences('web_search', '<page>ignored</page>'), [])
   assert.deepEqual(parseWikiToolReferences('wiki_search', '<search_results count="0" />'), [])
 })
+
+test('parses the renamed camel element names emitted by the tools', () => {
+  const refs = parseWikiToolReferences('wiki_search', `
+    <search_results count="1" query="RAG">
+      <page>
+        <knowledgeBaseId>kb-9</knowledgeBaseId>
+        <link>[[concept/rag|Retrieval-Augmented Generation]]</link>
+        <summary>Grounds answers in retrieved evidence.</summary>
+        <matchSnippet>RAG combines retrieval and generation.</matchSnippet>
+      </page>
+    </search_results>
+  `, 'call-2')
+
+  assert.equal(refs.length, 1)
+  assert.equal(refs[0].knowledgeBaseId, 'kb-9')
+  assert.equal(refs[0].content, 'Grounds answers in retrieved evidence.\n\nRAG combines retrieval and generation.')
+})

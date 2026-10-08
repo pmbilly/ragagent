@@ -177,7 +177,7 @@ public class WikiSearchTool extends BaseTool {
 
                 String snippet = WikiTexts.extractSnippet(p.content(), query);
                 String snippetTag = snippet.isEmpty() ? ""
-                        : "\n<match_snippet>" + snippet + "</match_snippet>";
+                        : "\n<matchSnippet>" + snippet + "</matchSnippet>";
 
                 String aliasesTag = p.aliases() == null || p.aliases().isEmpty() ? ""
                         : "\n<aliases>" + String.join(", ", p.aliases()) + "</aliases>";
@@ -186,7 +186,7 @@ public class WikiSearchTool extends BaseTool {
                 if (seen) {
                     summary = "(summary omitted, already seen in previous search)";
                 }
-                sb.append("<page>\n<knowledge_base_id>").append(kbId).append("</knowledge_base_id>\n");
+                sb.append("<page>\n<knowledgeBaseId>").append(kbId).append("</knowledgeBaseId>\n");
                 sb.append("<link>[[").append(p.slug()).append('|').append(p.title()).append("]]</link>\n");
                 sb.append("<type>").append(p.pageType()).append("</type>").append(aliasesTag).append('\n');
                 sb.append("<summary>").append(summary).append("</summary>").append(snippetTag).append('\n');

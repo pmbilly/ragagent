@@ -38,6 +38,15 @@ function joinDistinct(parts: string[]): string {
  * individual drawer cards. The payload is intentionally parsed leniently:
  * page content is Markdown and is not guaranteed to be valid XML.
  */
+/** 元素名双拼读取：新载荷 camel 优先，历史载荷 snake 兜底。 */
+function firstTag(block: string, ...names: string[]): string {
+  for (const name of names) {
+    const value = extractTag(block, name)
+    if (value) return value
+  }
+  return ''
+}
+
 export function parseWikiToolReferences(
   toolName: string,
   output: unknown,
@@ -50,10 +59,10 @@ export function parseWikiToolReferences(
       const { slug, title } = parseWikiLink(extractTag(page, 'link'))
       const content = joinDistinct([
         extractTag(page, 'summary'),
-        extractTag(page, 'match_snippet'),
+        firstTag(page, 'matchSnippet', 'match_snippet'),
       ])
       if (!slug && !title && !content) return []
-      const knowledgeBaseId = extractTag(page, 'knowledge_base_id') || undefined
+      const knowledgeBaseId = firstTag(page, 'knowledgeBaseId', 'knowledge_base_id') || undefined
       return [{
         id: `${toolCallId}:${knowledgeBaseId || 'wiki'}:${slug || index + 1}`,
         title: title || slug || `Wiki ${index + 1}`,
@@ -72,7 +81,7 @@ export function parseWikiToolReferences(
       // was duplicated, so summary is only a fallback for body-less pages.
       const content = extractTag(page, 'content') || extractTag(page, 'summary')
       if (!slug && !title && !content) return []
-      const knowledgeBaseId = extractTag(page, 'knowledge_base_id') || undefined
+      const knowledgeBaseId = firstTag(page, 'knowledgeBaseId', 'knowledge_base_id') || undefined
       return [{
         id: `${toolCallId}:${knowledgeBaseId || 'wiki'}:${slug || index + 1}`,
         title: title || slug || `Wiki ${index + 1}`,

@@ -128,7 +128,7 @@ public final class FaqSnippet {
         if (!q.isEmpty()) {
             questionAttr = " question=\"" + xmlEscape(q) + "\"";
         }
-        b.append("<faq faq_id=\"").append(xmlEscape(c.getId())).append("\" index=\"")
+        b.append("<faq faqId=\"").append(xmlEscape(c.getId())).append("\" index=\"")
                 .append(c.getChunkIndex()).append("\"").append(questionAttr).append(">\n");
 
         if (!faqFieldsEmpty(meta)) {

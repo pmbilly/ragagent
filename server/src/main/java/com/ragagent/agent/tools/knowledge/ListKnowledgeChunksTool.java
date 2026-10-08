@@ -66,8 +66,8 @@ public class ListKnowledgeChunksTool extends BaseTool {
             "Retrieve full chunk content for a document or a single FAQ entry.\n"
                     + "\n"
                     + "## Use After grep_chunks or knowledge_search:\n"
-                    + "- **FAQ hit** (type faq): list_knowledge_chunks(faq_id=\"cN\") — reads that one FAQ chunk with answers from metadata.\n"
-                    + "- **Document hit**: list_knowledge_chunks(knowledge_id=\"dN\") — pages through all chunks.\n"
+                    + "- **FAQ hit** (type faq): list_knowledge_chunks(faqId=\"cN\") — reads that one FAQ chunk with answers from metadata.\n"
+                    + "- **Document hit**: list_knowledge_chunks(knowledgeId=\"dN\") — pages through all chunks.\n"
                     + "\n"
                     + "## Parameters (provide exactly one id target):\n"
                     + "- faq_id (optional): Short cN ID for an FAQ chunk from grep_chunks / knowledge_search.\n"
@@ -342,7 +342,7 @@ public class ListKnowledgeChunksTool extends BaseTool {
         if (knowledgeTitle != null && !knowledgeTitle.isEmpty()) {
             titleAttr = String.format(" title=\"%s\"", knowledgeTitle);
         }
-        b.append(String.format("<knowledge_chunks knowledge_id=\"%s\"%s total=\"%d\" fetched=\"%d\">\n",
+        b.append(String.format("<knowledge_chunks knowledgeId=\"%s\"%s total=\"%d\" fetched=\"%d\">\n",
                 knowledgeID, titleAttr, total, fetched));
 
         if (fetched == 0) {
@@ -359,10 +359,10 @@ public class ListKnowledgeChunksTool extends BaseTool {
 
             String q = FaqSnippet.faqStandardQuestion(c);
             if (q != null && !q.isEmpty()) {
-                b.append(String.format("<chunk chunk_id=\"%s\" chunk_index=\"%d\" type=\"%s\" question=\"%s\">\n",
+                b.append(String.format("<chunk chunkId=\"%s\" chunkIndex=\"%d\" type=\"%s\" question=\"%s\">\n",
                         c.getId(), c.getChunkIndex(), c.getChunkType(), FaqSnippet.xmlEscape(q)));
             } else {
-                b.append(String.format("<chunk chunk_id=\"%s\" chunk_index=\"%d\" type=\"%s\">\n",
+                b.append(String.format("<chunk chunkId=\"%s\" chunkIndex=\"%d\" type=\"%s\">\n",
                         c.getId(), c.getChunkIndex(), c.getChunkType()));
             }
             b.append(String.format("<content>%s</content>\n", summarizeContent(c.getContent())));

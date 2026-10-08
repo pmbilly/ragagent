@@ -29,7 +29,7 @@ import java.util.List;
             StringBuilder b = new StringBuilder();
             b.append("<wiki_page>\n");
             b.append("<metadata>\n");
-            b.append("<knowledge_base_id>").append(kbId).append("</knowledge_base_id>\n");
+            b.append("<knowledgeBaseId>").append(kbId).append("</knowledgeBaseId>\n");
             b.append("<link>[[").append(page.slug()).append('|').append(page.title()).append("]]</link>\n");
             b.append("<type>").append(page.pageType()).append("</type>\n");
             b.append("<aliases>").append(String.join(", ", page.aliases())).append("</aliases>\n");

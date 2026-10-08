@@ -116,7 +116,7 @@ public final class ToolDefinitions {
             case LEGACY_TOOL_EXECUTE_SKILL_SCRIPT ->
                     "execute_skill_script is no longer available; use shell_exec(skill_name=..., command=...) to run skill scripts";
             case LEGACY_TOOL_READ_SKILL ->
-                    "read_skill is no longer available; use read_file(path=\"skill://<name>/<file_path or SKILL.md>\")";
+                    "read_skill is no longer available; use read_file(path=\"skill://<name>/<filePath or SKILL.md>\")";
             case LEGACY_TOOL_READ_SANDBOX_FILE ->
                     "read_sandbox_file is no longer available; use read_file(path=...)";
             default -> "";

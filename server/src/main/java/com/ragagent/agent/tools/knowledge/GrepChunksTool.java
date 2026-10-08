@@ -60,8 +60,8 @@ public class GrepChunksTool extends BaseTool {
             + "Use this to locate candidate chunks by exact identifiers, error codes, product names, or recurring terms.\n"
             + "\n"
             + "## Deep read after grep:\n"
-            + "- **FAQ hit** (chunk type faq): call list_knowledge_chunks with **faq_id=cN** from the grep result (NOT the parent dN document ID).\n"
-            + "- **Document hit**: call list_knowledge_chunks with **knowledge_id=dN**, or get_document_info with **knowledge_ids=[dN]**.";
+            + "- **FAQ hit** (chunk type faq): call list_knowledge_chunks with **faqId=cN** from the grep result (NOT the parent dN document ID).\n"
+            + "- **Document hit**: call list_knowledge_chunks with **knowledgeId=dN**, or get_document_info with **knowledgeIds=[dN]**.";
 
     /** 单次返回上限（硬编码常量）。 */
     static final int LIMIT = 30;
@@ -601,7 +601,7 @@ public class GrepChunksTool extends BaseTool {
     String formatOutput(List<GrepChunkView> results, List<String> queries, List<Pattern> compiled) {
         StringBuilder b = new StringBuilder();
 
-        b.append(String.format(Locale.ROOT, "<grep_results chunk_count=\"%d\">\n", results.size()));
+        b.append(String.format(Locale.ROOT, "<grep_results chunkCount=\"%d\">\n", results.size()));
         for (String q : queries) {
             b.append(String.format(Locale.ROOT, "<query>%s</query>\n", FaqSnippet.xmlEscape(q)));
         }
@@ -618,7 +618,7 @@ public class GrepChunksTool extends BaseTool {
             String extraAttr = "";
             String faqQ = FaqSnippet.faqStandardQuestion(r.toChunk());
             if (!faqQ.isEmpty()) {
-                extraAttr = String.format(Locale.ROOT, " faq_question=\"%s\"", FaqSnippet.xmlEscape(faqQ));
+                extraAttr = String.format(Locale.ROOT, " faqQuestion=\"%s\"", FaqSnippet.xmlEscape(faqQ));
             }
             boolean isFAQ = "faq".equals(GrepChunkView.nz(r.chunkType));
 
@@ -630,24 +630,24 @@ public class GrepChunksTool extends BaseTool {
             if (isFAQ) {
                 if (seen) {
                     b.append(String.format(Locale.ROOT,
-                            "<faq faq_id=\"%s\" knowledge_title=\"%s\"%s index=\"%d\" score=\"%.3f\" already_seen=\"true\">\n",
+                            "<faq faqId=\"%s\" knowledgeTitle=\"%s\"%s index=\"%d\" score=\"%.3f\" already_seen=\"true\">\n",
                             FaqSnippet.xmlEscape(id), FaqSnippet.xmlEscape(knowledgeTitle),
                             extraAttr, r.chunkIndex, r.matchScore));
                 } else {
                     b.append(String.format(Locale.ROOT,
-                            "<faq faq_id=\"%s\" knowledge_title=\"%s\"%s index=\"%d\" score=\"%.3f\">\n",
+                            "<faq faqId=\"%s\" knowledgeTitle=\"%s\"%s index=\"%d\" score=\"%.3f\">\n",
                             FaqSnippet.xmlEscape(id), FaqSnippet.xmlEscape(knowledgeTitle),
                             extraAttr, r.chunkIndex, r.matchScore));
                 }
             } else if (seen) {
                 b.append(String.format(Locale.ROOT,
-                        "<chunk chunk_id=\"%s\" knowledge_id=\"%s\" knowledge_title=\"%s\"%s chunk_index=\"%d\" score=\"%.3f\" already_seen=\"true\">\n",
+                        "<chunk chunkId=\"%s\" knowledgeId=\"%s\" knowledgeTitle=\"%s\"%s chunkIndex=\"%d\" score=\"%.3f\" already_seen=\"true\">\n",
                         FaqSnippet.xmlEscape(id), FaqSnippet.xmlEscape(knowledgeID),
                         FaqSnippet.xmlEscape(knowledgeTitle),
                         extraAttr, r.chunkIndex, r.matchScore));
             } else {
                 b.append(String.format(Locale.ROOT,
-                        "<chunk chunk_id=\"%s\" knowledge_id=\"%s\" knowledge_title=\"%s\"%s chunk_index=\"%d\" score=\"%.3f\">\n",
+                        "<chunk chunkId=\"%s\" knowledgeId=\"%s\" knowledgeTitle=\"%s\"%s chunkIndex=\"%d\" score=\"%.3f\">\n",
                         FaqSnippet.xmlEscape(id), FaqSnippet.xmlEscape(knowledgeID),
                         FaqSnippet.xmlEscape(knowledgeTitle),
                         extraAttr, r.chunkIndex, r.matchScore));
@@ -663,7 +663,7 @@ public class GrepChunksTool extends BaseTool {
             if (seen) {
                 b.append("<note>(snippet omitted, already returned in a previous grep_chunks call this session)</note>\n");
             } else if (!snippet.isEmpty()) {
-                b.append(String.format(Locale.ROOT, "<match_snippet>%s</match_snippet>\n",
+                b.append(String.format(Locale.ROOT, "<matchSnippet>%s</matchSnippet>\n",
                         FaqSnippet.xmlEscape(snippet)));
             }
             if (isFAQ) {

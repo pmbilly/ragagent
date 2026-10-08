@@ -112,7 +112,7 @@ public class WikiReadSourceDocTool extends BaseTool {
         StringBuilder sb = new StringBuilder();
         sb.append("<source_document>\n<metadata>\n");
         sb.append("<title>").append(knowledge.title()).append("</title>\n");
-        sb.append("<knowledge_id>").append(knowledgeID).append("</knowledge_id>\n");
+        sb.append("<knowledgeId>").append(knowledgeID).append("</knowledgeId>\n");
 
         boolean hasRange = startChunkIndex > 0;
         Pattern re = null;
@@ -283,7 +283,7 @@ public class WikiReadSourceDocTool extends BaseTool {
             page++;
         }
 
-        sb.append("<total_chunks>").append(totalChunks).append("</total_chunks>\n</metadata>\n");
+        sb.append("<totalChunks>").append(totalChunks).append("</totalChunks>\n</metadata>\n");
 
         if (matchCount > 0) {
             sb.append("<chunks count=\"").append(matchCount).append("\">\n");

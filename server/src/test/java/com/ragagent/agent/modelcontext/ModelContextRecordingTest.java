@@ -196,15 +196,15 @@ class ModelContextRecordingTest {
     void citationsLegacyAndLabeledRefs() {
         SourceRegistry rl = new SourceRegistry(true);
         rl.registerLegacyToolReferences(
-                "x <chunk knowledge_id=\"doc-9\" chunk_id=\"ch-9\" knowledge_base_id=\"kb-9\" knowledge_title=\"Doc9\"> <faq faq_id=\"fq-1\" doc=\"d-f\">", false);
+                "x <chunk knowledgeId=\"doc-9\" chunkId=\"ch-9\" knowledgeBaseId=\"kb-9\" knowledgeTitle=\"Doc9\"> <faq faqId=\"fq-1\" doc=\"d-f\">", false);
         String ch9 = rl.chunkHandle("ch-9").toLowerCase();
         String fq1 = rl.chunkHandle("fq-1").toLowerCase();
         assertThat(rl.expandText("<ref id=\"" + ch9 + "\"/><ref id=\"" + fq1 + "\"/>"))
                 .isEqualTo(rec(R_CITATIONS_LEGACY_REFS).get("out").get("expand").asText());
 
         SourceRegistry rm = new SourceRegistry(true);
-        rm.registerLabeledReferences("a knowledge_id=\"doc-elem-1\" <knowledge_id> doc-elem-2 </knowledge_id>"
-                + " kb_id=\"kb-elem-1\" <knowledge_base_id> kb-elem-2 </knowledge_base_id>"
+        rm.registerLabeledReferences("a knowledgeId=\"doc-elem-1\" <knowledgeId> doc-elem-2 </knowledgeId>"
+                + " kbId=\"kb-elem-1\" <knowledgeBaseId> kb-elem-2 </knowledgeBaseId>"
                 + " plain 12345678-1234-1234-1234-123456789abc text");
         JsonNode labeled = rec(R_CITATIONS_LABELED_REFS).get("out");
         // 探针用 fmt.Sprintf("%v", []string{...}) 记录 → "[d1 d2]" 字符串
@@ -522,7 +522,7 @@ class ModelContextRecordingTest {
         SourceRegistry rdef = new SourceRegistry(true);
         ToolResult def = new ToolResult();
         def.setSuccess(true);
-        def.setOutput("{\"knowledgeId\":\"def-doc-1\",\"kb\":\"b1\"} meta knowledge_id=\"def-doc-2\" tail");
+        def.setOutput("{\"knowledgeId\":\"def-doc-1\",\"kb\":\"b1\"} meta knowledgeId=\"def-doc-2\" tail");
         assertThat(ModelOutput.modelOutput(rdef, def)).isEqualTo(out(R_MODEL_OUTPUT_DEFAULT_BRANCH));
         // 探针的四个 ref：def-doc-1 与 b1 未注册（整串不是 JSON，结构化注册早退；
         // labeled 只认 attr 形态的 def-doc-2 → d1），后者不在 citable → 全部丢弃
