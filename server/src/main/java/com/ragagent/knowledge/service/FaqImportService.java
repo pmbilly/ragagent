@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
-import com.ragagent.knowledge.domain.FaqChunkMetadata;
+import com.ragagent.common.knowledge.FaqChunkMetadata;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.dto.faq.FaqFailedEntry;

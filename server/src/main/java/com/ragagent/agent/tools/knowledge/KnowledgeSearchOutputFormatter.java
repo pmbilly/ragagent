@@ -10,7 +10,7 @@ import java.util.Set;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.llm.ToolResult;
 import com.ragagent.agent.tools.DocChunkSupport.ImageInfoView;
-import com.ragagent.knowledge.domain.FaqChunkMetadata;
+import com.ragagent.common.knowledge.FaqChunkMetadata;
 import com.ragagent.knowledge.domain.Chunk;
 
 import com.ragagent.agent.tools.knowledge.KnowledgeSearchTool.ResultWithMeta;

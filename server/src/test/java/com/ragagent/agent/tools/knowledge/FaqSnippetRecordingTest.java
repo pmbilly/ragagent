@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.domain.FaqChunkMetadata;
+import com.ragagent.common.knowledge.FaqChunkMetadata;
 import com.ragagent.agent.tools.GoRecording45A;
 import com.ragagent.agent.tools.RecordingSupport;
 

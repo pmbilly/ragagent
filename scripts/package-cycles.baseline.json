@@ -8,6 +8,9 @@
       "knowledge"
     ]
   ],
+  "l2_to_l3_sites": {
+    "chatpipeline->knowledge": 12
+  },
   "common_beans": {
     "crypto": 1,
     "security": 1,

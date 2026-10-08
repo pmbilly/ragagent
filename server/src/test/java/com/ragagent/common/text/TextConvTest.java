@@ -56,7 +56,7 @@ class TextConvTest {
     @Test
     void normalizeQuestion_matchesGoCorpus() {
         for (String[] pair : NORM_CORPUS) {
-            assertThat(com.ragagent.knowledge.domain.FaqChunkMetadata.normalizeQuestion(pair[0]))
+            assertThat(com.ragagent.common.knowledge.FaqChunkMetadata.normalizeQuestion(pair[0]))
                     .as("NormalizeQuestion(%s)", pair[0])
                     .isEqualTo(pair[1]);
         }
@@ -65,8 +65,8 @@ class TextConvTest {
     @Test
     void contentHash_matchesGoCorpus() {
         // 语料期望值：calculateContentHash（aa0f3822...）
-        com.ragagent.knowledge.domain.FaqChunkMetadata meta =
-                new com.ragagent.knowledge.domain.FaqChunkMetadata();
+        com.ragagent.common.knowledge.FaqChunkMetadata meta =
+                new com.ragagent.common.knowledge.FaqChunkMetadata();
         meta.standardQuestion = "怎么 绑定 手机？";
         meta.similarQuestions = java.util.List.of("如何绑定手机", "How to bind phone");
         meta.negativeQuestions = java.util.List.of("怎么解绑手机");
@@ -74,26 +74,26 @@ class TextConvTest {
         meta.answerStrategy = "all";
         meta.version = 1;
         meta.source = "faq";
-        assertThat(com.ragagent.knowledge.domain.FaqChunkMetadata.calculateContentHash(meta))
+        assertThat(com.ragagent.common.knowledge.FaqChunkMetadata.calculateContentHash(meta))
                 .isEqualTo("aa0f3822df446266592d86568ac5440c3fcfb388161730e043132f306bbbc44e");
 
         // 相似问顺序不影响 hash（排序后进串）
-        com.ragagent.knowledge.domain.FaqChunkMetadata reordered =
-                new com.ragagent.knowledge.domain.FaqChunkMetadata();
+        com.ragagent.common.knowledge.FaqChunkMetadata reordered =
+                new com.ragagent.common.knowledge.FaqChunkMetadata();
         reordered.standardQuestion = "怎么 绑定 手机？";
         reordered.similarQuestions = java.util.List.of("How to bind phone", "如何绑定手机");
         reordered.answers = java.util.List.of("进入设置，选择设备，点击绑定。");
         reordered.answerStrategy = "all";
         reordered.version = 1;
         reordered.source = "faq";
-        assertThat(com.ragagent.knowledge.domain.FaqChunkMetadata.calculateContentHash(reordered))
+        assertThat(com.ragagent.common.knowledge.FaqChunkMetadata.calculateContentHash(reordered))
                 .isEqualTo("4779365a6b2bd1f57353fee4c5eefd56485d10976062c73ae30aff3ed76fc5da");
     }
 
     @Test
     void sanitize_matchesGoSemantics() {
-        com.ragagent.knowledge.domain.FaqChunkMetadata meta =
-                new com.ragagent.knowledge.domain.FaqChunkMetadata();
+        com.ragagent.common.knowledge.FaqChunkMetadata meta =
+                new com.ragagent.common.knowledge.FaqChunkMetadata();
         meta.standardQuestion = "  x  ";
         meta.similarQuestions = new java.util.ArrayList<>(java.util.List.of(" a ", "", " a ", "b"));
         meta.version = 0;

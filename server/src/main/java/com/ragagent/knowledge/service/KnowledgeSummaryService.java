@@ -30,7 +30,7 @@ import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
 import com.ragagent.model.service.ModelRuntimeFactory;
 import com.ragagent.knowledge.support.ImageInfoEnricher;
-import com.ragagent.knowledge.support.SearchChunkMerge;
+import com.ragagent.common.retrieval.SearchChunkMerge;
 import com.ragagent.common.wiki.WikiImageMarkup;
 import com.ragagent.common.wiki.WikiLanguageSupport;
 import org.slf4j.Logger;
@@ -399,7 +399,7 @@ public class KnowledgeSummaryService {
             }
             chunkContents = String.join("\n\n", parts);
         } else {
-            chunkContents = SearchChunkMerge.mergeTextChunks(sortedChunks, "");
+            chunkContents = SearchChunkMerge.mergeTextChunks(ChunkPortAdapter.viewAll(sortedChunks), "");
         }
         List<String> chunkIds = new ArrayList<>(sortedChunks.size());
         for (Chunk chunk : sortedChunks) {

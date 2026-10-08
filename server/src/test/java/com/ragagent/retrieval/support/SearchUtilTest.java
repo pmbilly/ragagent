@@ -9,9 +9,9 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
-import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.ChunkView;
 import com.ragagent.knowledge.support.ImageInfoEnricher;
-import com.ragagent.knowledge.support.SearchChunkMerge;
+import com.ragagent.common.retrieval.SearchChunkMerge;
 import com.ragagent.retrieval.domain.ImageInfo;
 
 /**
@@ -20,8 +20,8 @@ import com.ragagent.retrieval.domain.ImageInfo;
  */
 class SearchUtilTest {
 
-    private static Chunk chunk(String content, String type, int startAt, int endAt, int index) {
-        Chunk c = new Chunk();
+    private static ChunkView chunk(String content, String type, int startAt, int endAt, int index) {
+        ChunkView c = new ChunkView();
         c.setContent(content);
         c.setChunkType(type);
         c.setStartAt(startAt);
@@ -114,7 +114,7 @@ class SearchUtilTest {
     @Test
     void mergeTextChunksOrdersFiltersAndStitches() {
         String header = "| a | b |\n|:--|:--|\n";
-        List<Chunk> chunks = new ArrayList<>();
+        List<ChunkView> chunks = new ArrayList<>();
         chunks.add(chunk(header + "| r1 | x |\n| r2 | y |\n", "text", 0, 20, 0));
         chunks.add(chunk(header + "| r2 | y |\n| r3 | z |\n", "text", 10, 40, 1));
         assertEquals(header + "| r1 | x |\n| r2 | y |\n| r3 | z |\n",
@@ -123,7 +123,7 @@ class SearchUtilTest {
 
     @Test
     void mergeTextChunksGapSeparator() {
-        List<Chunk> chunks = new ArrayList<>();
+        List<ChunkView> chunks = new ArrayList<>();
         chunks.add(chunk("first", "text", 0, 5, 0));
         chunks.add(chunk("second", "text", 100, 106, 1));
         assertEquals("first\nsecond", SearchChunkMerge.mergeTextChunks(chunks, "\n"));
@@ -133,7 +133,7 @@ class SearchUtilTest {
     void mergeTextChunksEmptyAndCovered() {
         assertTrue(SearchChunkMerge.mergeTextChunks(List.of(), "\n").isEmpty());
         // 后段被前段完全覆盖（EndAt <= mergedEnd）→ 跳过
-        List<Chunk> chunks = new ArrayList<>();
+        List<ChunkView> chunks = new ArrayList<>();
         chunks.add(chunk("abcdef", "text", 0, 6, 0));
         chunks.add(chunk("cd", "text", 2, 4, 1));
         assertEquals("abcdef", SearchChunkMerge.mergeTextChunks(chunks, "\n"));

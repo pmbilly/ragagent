@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.domain;
+package com.ragagent.common.knowledge;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;

@@ -1272,3 +1272,14 @@
 - **基线**：`L2 → L3 直连 2 → 1 条`（仅剩 `chatpipeline → knowledge`）。
 - **闸门**：后端全量 BUILD SUCCESSFUL + `spotlessCheck` + 五守卫（含 R7）绿。
 - **收尾状态**：R3（L2 不依赖 L3）只剩 1 条边，且该边已就"视图化（A）vs 登记为允许（B）"两条路线给出评估（见方案文档 §2.4）。
+
+**✅ B110（2026-10-08，L2→L3 清零⑤：载荷 + 算法下沉；17 → 12 处）+ R3b 处数棘轮**
+- **先分类再定批**：把 `chatpipeline → knowledge` 的 17 处按性质分三类——实体 **9**（`Chunk`×3/`Knowledge`×3/`KnowledgeBase`×3）、元数据载荷 **3**、算法 **5**（`ImageInfoEnricher`×3 + `SearchChunkMerge`×2）⇒ 先做便宜的两类。
+- **载荷下沉**：`FaqChunkMetadata`/`DocumentChunkMetadata`/`GeneratedQuestion` 三个类对 `com.ragagent.*` 的 import **实测为 0** ⇒ 纯 JSON 载荷 ⇒ 直接搬 `common.knowledge`（同包既有 `package-info` 的"载荷"定位）。
+- **算法下沉**：`SearchChunkMerge` → `common.retrieval`，`mergeTextChunks` 的形参从 `List<Chunk>` 改 `List<ChunkView>`——**关键发现**：它只读 `getStartAt`/`getChunkIndex`/`getContent`/`getEndAt`，恰好都在 C2 收窄后的 6 字段视图内 ⇒ **无需加宽视图**。
+  调用方 `KnowledgeSummaryService` 改用 `ChunkPortAdapter.viewAll(...)`（该方法由 package-private 转 **public**，成为域内"实体 → L1 视图"的公用投影）；测试 `SearchUtilTest` 的 `chunk(...)` 夹具改返回 `ChunkView`。
+- **新增守卫 R3b（处数棘轮）**：R3 原先只登记"L2→L3 边是否存在"——清一条大边要分多批，边不消失就看不出进展。现在**每条边登记 import 处数**（`l2_to_l3_sites`），只许减不许增；基线写入 `chatpipeline->knowledge=12`。
+  红态探针（在 `chatpipeline` 加一个 `import com.ragagent.knowledge.domain.Chunk;`）→ 报 `处数 chatpipeline->knowledge=13；✗ 处数反弹：['chatpipeline->knowledge']` + 非零退出 ✓（探针已删）。
+  · 顺带修掉一处**脚本语法事故**：加打印行时把旧的续行留在了后面（`IndentationError`）⇒ 已修（纪律：改多行 print 时先读回该段再改）。
+- **剩余 12 处（B111 方案）**：9 处实体（视图化 or 有界登记）+ 3 处 `ImageInfoEnricher`（三个**不同**静态方法；collector 的形参是 `BiFunction<…, List<Chunk>>` ⇒ 需给 `ChunkView` 补回 `imageInfo` 字段或按 C2 扩端口，另两个是纯文本函数可单独下沉）。
+- **闸门**：后端全量 BUILD SUCCESSFUL + `spotlessCheck` + 五守卫（含 R3b/R7）绿。

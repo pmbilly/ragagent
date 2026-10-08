@@ -42,6 +42,13 @@ for p in sorted(ROOT.iterdir()):
 cycles = sorted({tuple(sorted((a, b))) for a, t in edge.items() for b in t if a in edge.get(b, ())})
 to_config = sorted(a for a in edge if "config" in edge[a])
 l2_to_l3 = sorted((a, b) for a in L2 for b in edge[a] if b in L3)
+# R3b：每条 L2→L3 边的 import 处数（棘轮：只许减不许增）
+IMP_EDGE = re.compile(r"^import com\.ragagent\.VICTIM\.", re.M)
+l2_to_l3_sites = {}
+for _a, _b in l2_to_l3:
+    _pat = re.compile(r"^import com\.ragagent\." + _b + r"\.", re.M)
+    l2_to_l3_sites[_a + "->" + _b] = sum(
+        len(_pat.findall(_p.read_text(encoding="utf-8"))) for _p in (ROOT / _a).rglob("*.java"))
 relapsed = sorted((a, b) for a, b in DECOUPLED if b in edge.get(a, ()))
 
 # L1 核心底座：不得依赖业务域（R5）
@@ -114,6 +121,7 @@ state = {
     "sccs": [list(c) for c in sccs],
     "depend_on_config": to_config,
     "l2_to_l3": [list(x) for x in l2_to_l3],
+    "l2_to_l3_sites": l2_to_l3_sites,
     "common_beans": common_beans,
     "common_persistence": common_persistence,
 }
@@ -132,6 +140,8 @@ new_l23 = [list(x) for x in state["l2_to_l3"] if list(x) not in old.get("l2_to_l
 old_sccs = [tuple(c) for c in old.get("sccs", [])]
 full = {m for c in old_sccs for m in c}
 new_scc_members = sorted({m for c in sccs for m in c} - full)
+old_sites = old.get("l2_to_l3_sites", {})
+grew_sites = sorted(k for k, v in l2_to_l3_sites.items() if v > old_sites.get(k, 0))
 fixed_sccs = [c for c in old_sccs if list(c) not in state["sccs"]]
 new_beans = sorted(k for k, v in common_beans.items() if v > old.get("common_beans", {}).get(k, 0))
 new_persist = sorted(k for k, v in common_persistence.items()
@@ -148,7 +158,9 @@ print(f"间接环（SCC）：{len(sccs)} 组（基线 {len(old.get('sccs', []))}
 if fixed_sccs:
     print(f"  已消除（请刷新基线）：{len(fixed_sccs)} 组 → " + " | ".join(",".join(c) for c in fixed_sccs))
 print(f"L2 → L3 直连：{len(l2_to_l3)} 条（基线 {len(old.get('l2_to_l3', []))}）"
-      + ("" if not new_l23 else "；新增：" + ", ".join(f"{a}→{b}" for a, b in new_l23)))
+      + "；处数 " + ", ".join(f"{k}={v}" for k, v in sorted(l2_to_l3_sites.items()))
+      + ("" if not new_l23 else "；新增边：" + ", ".join(f"{a}→{b}" for a, b in new_l23))
+      + ("" if not grew_sites else f"；✗ 处数反弹：{grew_sites}"))
 
 print(f"已解耦包对（R4）：{len(DECOUPLED)} 对" + ("" if not relapsed
       else "；✗ 回流：" + ", ".join(f"{a}→{b}" for a, b in relapsed)))
@@ -163,7 +175,8 @@ print(f"common 实现痕迹（R6）：bean {sum(common_beans.values())} 个 / �
       + ("" if not (new_beans or new_persist) else
          f"；✗ 新增：bean {new_beans} / 持久层 {new_persist}"))
 
-if new_cycles or new_cfg or new_l23 or new_scc_members or relapsed or l1_to_l3 or new_beans or new_persist or miss_decl:
+if (new_cycles or new_cfg or new_l23 or new_scc_members or relapsed or l1_to_l3 or new_beans
+        or new_persist or miss_decl or grew_sites):
     print("\n✗ 守卫失败：出现新的环（含间接环）、新的分层违例，或已解耦包对回流（见上）。")
     sys.exit(1)
 print("\n✓ 守卫通过：环与分层违例均未增加。")

@@ -7,7 +7,7 @@ import com.ragagent.common.error.BizException;
 import com.ragagent.common.security.LogSanitizer;
 import com.ragagent.common.web.RejectEmptyBody;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.domain.GeneratedQuestion;
+import com.ragagent.common.knowledge.GeneratedQuestion;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.dto.chunk.ChunkPageResponse;
 import com.ragagent.knowledge.dto.chunk.ChunkRevisionResponse;

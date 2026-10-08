@@ -10,7 +10,7 @@ import com.ragagent.TestSchema;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.BizException;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.domain.GeneratedQuestion;
+import com.ragagent.common.knowledge.GeneratedQuestion;
 import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;

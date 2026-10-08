@@ -18,8 +18,8 @@ import com.ragagent.chatpipeline.plugin.PluginMerge;
 import com.ragagent.chatpipeline.support.SearchSupport;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.knowledge.domain.FaqChunkMetadata;
-import com.ragagent.knowledge.support.SearchChunkMerge;
+import com.ragagent.common.knowledge.FaqChunkMetadata;
+import com.ragagent.common.retrieval.SearchChunkMerge;
 
 /**
  * 录制回放：merge 五件（classify / sequential / group / parent / expand / faq / history）

@@ -5,7 +5,7 @@ import java.util.Set;
 import java.util.StringJoiner;
 
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.domain.FaqChunkMetadata;
+import com.ragagent.common.knowledge.FaqChunkMetadata;
 
 /**
  * FAQ 元数据在工具输出中的投影。

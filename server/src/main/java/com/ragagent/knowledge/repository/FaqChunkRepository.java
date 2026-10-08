@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.common.mybatis.PageRequests;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.domain.FaqChunkMetadata;
+import com.ragagent.common.knowledge.FaqChunkMetadata;
 import org.springframework.stereotype.Component;
 import com.ragagent.common.jdbc.DatabaseDialects;
 import com.ragagent.knowledge.mapper.ChunkMapper;

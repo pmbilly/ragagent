@@ -9,7 +9,7 @@ import com.ragagent.chatpipeline.ChatManage;
 import com.ragagent.chatpipeline.History;
 import com.ragagent.chatpipeline.PipelineLog;
 import com.ragagent.chatpipeline.plugin.PluginSearch;
-import com.ragagent.knowledge.support.SearchChunkMerge;
+import com.ragagent.common.retrieval.SearchChunkMerge;
 import com.ragagent.retrieval.support.SearchTextUtil;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.retrieval.obs.RetrievalObs;

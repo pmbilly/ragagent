@@ -18,6 +18,9 @@ import com.ragagent.knowledge.support.ImageInfoEnricher;
 /**
  * {@link ChunkPort} 的 knowledge 侧实现（B98/C2）。
  *
+ * <p>{@link #view}/{@link #viewAll} 同时作为域内"实体 → L1 视图"的公用投影（B110：
+ * {@code KnowledgeSummaryService} 调 {@code common.retrieval.SearchChunkMerge} 时复用）。
+ *
  * <p>四个方法的过滤条件/降级姿态与迁移前的 wiki 侧实现<b>逐字一致</b>：
  * {@code textChunks} 来自 {@code WikiIngestBatchHandler}、{@code chunksByIds} 来自
  * {@code WikiIngestCitePipeline}、{@code deleteChunk} 来自 {@code DefaultWikiChunkCleaner}、
@@ -87,7 +90,7 @@ public class ChunkPortAdapter implements ChunkPort {
         return ImageInfoEnricher.enrichContentWithImageInfo(content, mergedImageInfo);
     }
 
-    static ChunkView view(Chunk c) {
+    public static ChunkView view(Chunk c) {
         if (c == null) {
             return null;
         }
@@ -101,7 +104,7 @@ public class ChunkPortAdapter implements ChunkPort {
         return v;
     }
 
-    static List<ChunkView> viewAll(List<Chunk> rows) {
+    public static List<ChunkView> viewAll(List<Chunk> rows) {
         List<ChunkView> out = new ArrayList<>(rows == null ? 0 : rows.size());
         if (rows != null) {
             for (Chunk c : rows) {

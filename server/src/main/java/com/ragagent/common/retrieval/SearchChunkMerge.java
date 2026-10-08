@@ -1,10 +1,11 @@
-package com.ragagent.knowledge.support;
+package com.ragagent.common.retrieval;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import com.ragagent.common.knowledge.ChunkView;
 
-import com.ragagent.knowledge.domain.Chunk;
+
 
 /**
  * chunk 内容的重叠拼接（{@code AppendWithOverlap / AppendWithExactOverlap /
@@ -109,15 +110,15 @@ public final class SearchChunkMerge {
      * gapSep 用于位置不相邻（有间隙）或 EndAt==0 的两段之间；传空串直接拼接。
      * 调用方负责先做类型过滤（本函数不感知 ChunkType）。
      */
-    public static String mergeTextChunks(List<Chunk> chunks,
+    public static String mergeTextChunks(List<ChunkView> chunks,
                                          String gapSep) {
         if (chunks == null || chunks.isEmpty()) {
             return "";
         }
-        List<Chunk> sorted = new ArrayList<>(chunks);
+        List<ChunkView> sorted = new ArrayList<>(chunks);
         sorted.sort(Comparator
-                .comparingInt(Chunk::getStartAt)
-                .thenComparingInt(Chunk::getChunkIndex));
+                .comparingInt(ChunkView::getStartAt)
+                .thenComparingInt(ChunkView::getChunkIndex));
 
         String merged = "";
         int mergedEnd = -1;
