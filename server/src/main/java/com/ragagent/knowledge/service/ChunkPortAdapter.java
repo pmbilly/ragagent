@@ -93,17 +93,11 @@ public class ChunkPortAdapter implements ChunkPort {
         }
         ChunkView v = new ChunkView();
         v.setId(c.getId());
-        v.setTenantId(c.getTenantId() == null ? 0L : c.getTenantId());
-        v.setKnowledgeId(c.getKnowledgeId());
-        v.setKnowledgeBaseId(c.getKnowledgeBaseId());
         v.setContent(c.getContent());
         v.setChunkType(c.getChunkType());
         v.setChunkIndex(c.getChunkIndex());
         v.setStartAt(c.getStartAt());
         v.setEndAt(c.getEndAt());
-        v.setParentChunkId(c.getParentChunkId());
-        v.setImageInfo(c.getImageInfo());
-        v.setMetadata(c.getMetadata());
         return v;
     }
 

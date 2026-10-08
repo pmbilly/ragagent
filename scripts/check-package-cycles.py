@@ -44,6 +44,22 @@ to_config = sorted(a for a in edge if "config" in edge[a])
 l2_to_l3 = sorted((a, b) for a in L2 for b in edge[a] if b in L3)
 relapsed = sorted((a, b) for a, b in DECOUPLED if b in edge.get(a, ()))
 
+# L1 核心底座：不得依赖业务域（R5）
+L1_CORE = {"common", "event", "stream", "tracing"}
+l1_to_l3 = sorted((a, b) for a in L1_CORE for b in edge.get(a, ()) if b in L3)
+
+# common 实现痕迹（R6）：按子包登记，只许减不许增
+BEAN_RE = re.compile(r"^\s*@(Component|Service|Repository|Configuration)\b", re.M)
+PERSIST_RE = re.compile(r"^import com\.ragagent\.[\w.]+\.(mapper|repository)\.", re.M)
+common_beans, common_persistence = {}, {}
+for _p in sorted((ROOT / "common").rglob("*.java")):
+    _pkg = str(_p.parent.relative_to(ROOT / "common")) if _p.parent != ROOT / "common" else "."
+    _txt = _p.read_text(encoding="utf-8")
+    if BEAN_RE.search(_txt):
+        common_beans[_pkg] = common_beans.get(_pkg, 0) + 1
+    if PERSIST_RE.search(_txt):
+        common_persistence[_pkg] = common_persistence.get(_pkg, 0) + 1
+
 # 强连通分量（Tarjan）：三包以上的环
 import sys as _sys
 _sys.setrecursionlimit(10000)
@@ -84,6 +100,8 @@ state = {
     "sccs": [list(c) for c in sccs],
     "depend_on_config": to_config,
     "l2_to_l3": [list(x) for x in l2_to_l3],
+    "common_beans": common_beans,
+    "common_persistence": common_persistence,
 }
 
 if "--write" in sys.argv:
@@ -101,6 +119,9 @@ old_sccs = [tuple(c) for c in old.get("sccs", [])]
 full = {m for c in old_sccs for m in c}
 new_scc_members = sorted({m for c in sccs for m in c} - full)
 fixed_sccs = [c for c in old_sccs if list(c) not in state["sccs"]]
+new_beans = sorted(k for k, v in common_beans.items() if v > old.get("common_beans", {}).get(k, 0))
+new_persist = sorted(k for k, v in common_persistence.items()
+                     if v > old.get("common_persistence", {}).get(k, 0))
 
 print(f"环：{len(cycles)} 组（基线 {len(old.get('cycles', []))}）")
 print(f"  新增环：{len(new_cycles)}" + ("" if not new_cycles else " " + ", ".join(f"{a}⇄{b}" for a, b in new_cycles)))
@@ -118,7 +139,15 @@ print(f"L2 → L3 直连：{len(l2_to_l3)} 条（基线 {len(old.get('l2_to_l3',
 print(f"已解耦包对（R4）：{len(DECOUPLED)} 对" + ("" if not relapsed
       else "；✗ 回流：" + ", ".join(f"{a}→{b}" for a, b in relapsed)))
 
-if new_cycles or new_cfg or new_l23 or new_scc_members or relapsed:
+print(f"L1 底座（common/event/stream/tracing）→ 业务域：{len(l1_to_l3)} 条"
+      + ("" if not l1_to_l3 else "；✗ " + ", ".join(f"{a}→{b}" for a, b in l1_to_l3)))
+print(f"common 实现痕迹（R6）：bean {sum(common_beans.values())} 个 / 域持久层引用 "
+      f"{sum(common_persistence.values())} 处（基线 "
+      f"{sum(old.get('common_beans', {}).values())}/{sum(old.get('common_persistence', {}).values())}）"
+      + ("" if not (new_beans or new_persist) else
+         f"；✗ 新增：bean {new_beans} / 持久层 {new_persist}"))
+
+if new_cycles or new_cfg or new_l23 or new_scc_members or relapsed or l1_to_l3 or new_beans or new_persist:
     print("\n✗ 守卫失败：出现新的环（含间接环）、新的分层违例，或已解耦包对回流（见上）。")
     sys.exit(1)
 print("\n✓ 守卫通过：环与分层违例均未增加。")

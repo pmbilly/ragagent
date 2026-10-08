@@ -1143,3 +1143,15 @@
 - **守卫**：`check-package-cycles.py` 新增 **R4 解耦对棘轮**（`DECOUPLED = [("wiki","knowledge")]`，绝对禁止回流）；红态探针（在 wiki 建类 import `SpanTracker`）→ 报 `✗ 回流：wiki→knowledge` 并非零退出 ✓（探针已删）。
 - **闸门**：后端全量 BUILD SUCCESSFUL（4,843/0）+ `spotlessCheck` + 四守卫（键名/包环含 SCC 与 R4/Go 锚点/跨面键）绿。
 - **下一步**：阶段 4 剩余断点为 **C3~C8**（`auth` 依赖下沉、`audit`/`model`/`retrieval`/`storage` 各自断点）；SCC-A 现为 7 包环，C2 归零后 wiki 侧已不再参与该环的 knowledge 边。
+
+**✅ B101（2026-10-08，common 纪律：R5/R6 守卫 + 载荷收窄）**
+- **背景**：审阅"common 会不会太重"时的结论——**契约层（`common.knowledge` 18 文件 = 15 接口/record + 2 零方法体 DTO）不是重量来源**（652 行 / 0 域依赖 / 5 个消费域），
+  真重量在 `common/approval`（1,755 行 / 8 类 / 子系统）、`tenant`、`settings`、`web`、`security`（合计 ~6.5k 行）。本批先把**纪律**固化成守卫，归位留后续批次。
+- **R5（绝对禁止）**：L1 底座 `common`/`event`/`stream`/`tracing` 不得 import 业务域（L3）。实测 0 条 ✓。探针（`common` 建类 import `wiki.domain.WikiConstants`）→ 报 `L1 底座 → 业务域：1 条；✗ common→wiki`、**退出码 1** ✓。
+- **R6（棘轮）**：`common` 实现痕迹按子包登记、只许减不许增——① Spring 注册型注解（`^\s*@(Component|Service|Repository|Configuration)`，避开 javadoc 误命中）；② `import com.ragagent.*.mapper|repository.*`。
+  基线：bean `{crypto:1, security:1, storage:1}`、持久层引用 `{}`。探针（`common/knowledge` 加 `@Component` 类）→ 报 `✗ 新增：bean ['knowledge']` ✓。
+  · 注：`common/knowledge` 同目录里出现过 3 处"疑似 Spring/Mapper"命中，核查后全是 **javadoc 提及**（非代码依赖）✓。
+- **载荷收窄**：`ChunkView` 12 字段 → **6 字段**（按实测消费点：`getContent`×20、`getId`×9、`getEndAt`×7、`getChunkType`×3、`getStartAt`×2、`getChunkIndex`×2；
+  `tenantId`/`knowledgeId`/`knowledgeBaseId`/`parentChunkId`/`imageInfo`/`metadata` 无消费点 ⇒ 删）。`ChunkPortAdapter.view()` 同步；零编译错误即证明收窄安全 ✓。
+- **闸门**：后端全量 BUILD SUCCESSFUL + `spotlessCheck` + 四守卫（键名 / 包环含 SCC·R4·R5·R6 / Go 锚点 / 跨面键）绿。
+- **下一步（"common 减重"正解）**：`common/approval` 域归位（1,755 行 / 8 类：`Gate`/`EventBus`/`SpringRedisPubSub`/`ToolPolicy`/`McpApproval`）——评估独立成 `approval` 域或并入 `mcp`/`agent`；随后 L2→L3 剩余 5 条清零 + R13。

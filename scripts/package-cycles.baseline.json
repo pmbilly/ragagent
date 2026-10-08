@@ -23,5 +23,11 @@
       "retrieval",
       "vectorstore"
     ]
-  ]
+  ],
+  "common_beans": {
+    "crypto": 1,
+    "security": 1,
+    "storage": 1
+  },
+  "common_persistence": {}
 }
