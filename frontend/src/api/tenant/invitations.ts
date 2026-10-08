@@ -179,7 +179,7 @@ export async function createInvitation(
  * Revoke a still-pending invitation. Already-finalised rows return
  * 409; rows from another tenant render as 404 to avoid existence
  * leaks across tenants.
- * Backend: DELETE /api/v1/tenants/:id/invitations/:inv_id (Owner+).
+ * Backend: DELETE /api/v1/tenants/:id/invitations/:invId (Owner+).
  */
 export async function revokeInvitation(
   tenantId: number,
@@ -229,7 +229,7 @@ export async function getMyPendingInvitationCount(): Promise<PendingCountRespons
  * Accept one of MY pending invitations. On success the backend also
  * creates the tenant_members row in the same flow; the caller should
  * then refresh memberships in the auth store.
- * Backend: POST /api/v1/me/invitations/:inv_id/accept (authenticated).
+ * Backend: POST /api/v1/me/invitations/:invId/accept (authenticated).
  */
 export async function acceptInvitation(invId: number): Promise<AcceptInvitationResponse> {
   // 后端 200 裸 {membership,tenantName}（§2.1）；适配成既有的 success/data 契约
@@ -257,7 +257,7 @@ export async function acceptInvitationByToken(
 
 /**
  * Decline one of MY pending invitations.
- * Backend: POST /api/v1/me/invitations/:inv_id/decline (authenticated).
+ * Backend: POST /api/v1/me/invitations/:invId/decline (authenticated).
  */
 export async function declineInvitation(invId: number): Promise<SimpleResponse> {
   // 后端 204 无体（§2.1）；适配成既有的 success 契约

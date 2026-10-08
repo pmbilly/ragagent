@@ -5,7 +5,7 @@
  *   - `/files`                                → 登录态 Bearer + X-Tenant-ID
  *   - `/api/v1/knowledge-bases/:id/files`     → 知识库访问权限（跨租户共享库）
  *   - `/api/v1/sessions/:id/messages/:mid/files` → 会话消息归属 + 共享智能体权限
- *   - `/api/v1/embed/:channel_id/files`       → 嵌入访客的 Embed token
+ *   - `/api/v1/embed/:channelId/files`       → 嵌入访客的 Embed token
  *
  * 选哪条代理取决于当前请求的鉴权平面，而不是取决于哪个组件在渲染图片。
  * 这里把该决策收敛成单一真相源，渲染组件只需声明作用域，不再各自拼 URL。

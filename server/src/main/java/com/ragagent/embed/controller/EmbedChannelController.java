@@ -41,7 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
  * embed 渠道 HTTP 层（管理面/公开面路由）。
  *
  * <p><b>管理面</b>（JWT + RBAC + API-Key manage_channels 门）：POST/GET
- * /agents/:id/embed-channels、GET/PUT/DELETE /embed-channels/:channel_id、
+ * /agents/:id/embed-channels、GET/PUT/DELETE /embed-channels/:channelId、
  * rotate-token、preview-session、stats。</p>
  *
  * <p><b>公开面</b>（EmbedAuthFilter 已注入渠道与租户上下文）：exchange、config、
