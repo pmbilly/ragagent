@@ -1,4 +1,4 @@
-package com.ragagent.agent.support;
+package com.ragagent.webfetch;
 
 import java.net.URI;
 import java.util.ArrayList;

@@ -420,7 +420,7 @@ public class QaWiring {
         mgr.register(new PluginWebFetch());
         mgr.register(new PluginMerge(chunkRepository));
         mgr.register(new com.ragagent.chatpipeline.plugin.PluginDataAnalysis(modelService, knowledgeService,
-                new com.ragagent.chatpipeline.DataAnalysisSessionFactoryAdapter()));
+                new com.ragagent.agent.tools.data.DataAnalysisSessionFactoryAdapter()));
         mgr.register(new PluginIntoChatMessage(messageService));
         mgr.register(new PluginChatCompletion(modelService));
         mgr.register(new PluginChatCompletionStream(modelService));

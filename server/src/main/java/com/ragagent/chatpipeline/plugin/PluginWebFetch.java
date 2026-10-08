@@ -11,7 +11,7 @@ import com.ragagent.chatpipeline.ChatManage;
 import com.ragagent.chatpipeline.PipelineEventType;
 import com.ragagent.chatpipeline.PipelineLog;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.agent.support.Fetcher;
+import com.ragagent.webfetch.Fetcher;
 
 /**
  * WEB_FETCH 阶段插件：rerank 之后对 web 结果

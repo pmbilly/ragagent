@@ -1,4 +1,4 @@
-package com.ragagent.agent.support;
+package com.ragagent.webfetch;
 
 /**
  * 抓取失败的可机读错误。

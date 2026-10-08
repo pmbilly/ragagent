@@ -1,4 +1,4 @@
-package com.ragagent.agent.support;
+package com.ragagent.webfetch;
 
 import static org.junit.jupiter.api.Assertions.*;
 

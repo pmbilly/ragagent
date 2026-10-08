@@ -166,13 +166,30 @@ public final class PipelinePorts {
         DataAnalysisSession create(String sessionId);
     }
 
-    /** 一次数据装载/执行/清理会话（DataAnalysisTool 的插件可见面）。 */
+    /**
+     * 一次数据装载/执行/清理会话。
+     *
+     * <p>B109：签名原先直接用 {@code agent.tools.data.DataAnalysisTool} 的嵌套 record ⇒ L2 依赖 L3。
+     * 现改收本端口自有的三个 record（形状与工具侧一致），由 agent 侧适配器做转换。</p>
+     */
     public interface DataAnalysisSession {
-        com.ragagent.agent.tools.data.DataAnalysisTool.TableSchema loadFromKnowledge(
-                com.ragagent.agent.tools.data.DataAnalysisTool.KnowledgeData knowledge);
+        TableSchema loadFromKnowledge(KnowledgeData knowledge);
 
         com.ragagent.common.llm.ToolResult execute(JsonNode args);
 
         void cleanup();
+    }
+
+    /** 待分析的知识文件（形状对齐 {@code DataAnalysisTool.KnowledgeData}）。 */
+    public record KnowledgeData(String id, String knowledgeBaseId, long tenantId, String fileType,
+                                String filePath) {
+    }
+
+    /** 表格列（形状对齐 {@code DataAnalysisTool.ColumnInfo}）。 */
+    public record ColumnInfo(String name, String type, String nullable) {
+    }
+
+    /** 表 schema：表名 + 列 + 行数（形状对齐 {@code DataAnalysisTool.TableSchema}）。 */
+    public record TableSchema(String tableName, List<ColumnInfo> columns, long rowCount) {
     }
 }

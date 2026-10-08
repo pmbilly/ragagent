@@ -14,7 +14,6 @@ import com.ragagent.chatpipeline.PipelineLog;
 import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.chatpipeline.support.MatchTypes;
 import com.ragagent.common.llm.ToolResult;
-import com.ragagent.agent.tools.data.DataAnalysisTool;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
@@ -94,9 +93,9 @@ public final class PluginDataAnalysis implements Plugin {
         // 3. 工具会话：装载 → LLM 生成 SQL → 执行
         PipelinePorts.DataAnalysisSession tool = toolFactory.create(chatManage.getSessionId());
         try {
-            DataAnalysisTool.TableSchema schema;
+            PipelinePorts.TableSchema schema;
             try {
-                schema = tool.loadFromKnowledge(new DataAnalysisTool.KnowledgeData(
+                schema = tool.loadFromKnowledge(new PipelinePorts.KnowledgeData(
                         knowledge.getId(), knowledge.getKnowledgeBaseId(), knowledge.getTenantId(),
                         knowledge.getFileType(), knowledge.getFilePath()));
             } catch (RuntimeException e) {
@@ -186,13 +185,13 @@ public final class PluginDataAnalysis implements Plugin {
     }
 
     /** 渲染表结构描述：表名、列数、行数与列信息。 */
-    static String tableSchemaDescription(DataAnalysisTool.TableSchema schema) {
+    static String tableSchemaDescription(PipelinePorts.TableSchema schema) {
         StringBuilder builder = new StringBuilder();
         builder.append(String.format("Table name: %s\n", schema.tableName()));
         builder.append(String.format("Columns: %d\n", schema.columns().size()));
         builder.append(String.format("Rows: %d\n\n", schema.rowCount()));
         builder.append("Column info:\n");
-        for (DataAnalysisTool.ColumnInfo col : schema.columns()) {
+        for (PipelinePorts.ColumnInfo col : schema.columns()) {
             builder.append(String.format("- %s (%s)\n", col.name(), col.type()));
         }
         return builder.toString();

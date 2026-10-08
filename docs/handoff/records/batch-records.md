@@ -1256,3 +1256,19 @@
   - `DataAnalysisTool`（573 行）+ `DataAnalysisSessionBridge`（3 处：`DataAnalysisSessionFactoryAdapter`、`PluginDataAnalysis`、`PipelinePorts` 的两处嵌套类型引用）⇒ 管线侧定义端口（数据分析执行 + 表结构加载），适配器从 `chatpipeline` 搬回 `agent` 侧；
   - `agent.support.Fetcher`（1 处：`PluginWebFetch`）⇒ 把 `Fetcher` + `FetchException` + `BrowserRenderer` + `AgentMarkdown` 一起搬进预留的 L2 包 `webfetch`（需先核这 4 个文件是否自洽）。
 - **闸门**：后端全量 BUILD SUCCESSFUL + `spotlessCheck` + 五守卫（含 R7：0 处声明↔路径不一致）绿。
+
+**✅ B109（2026-10-08，L2→L3 清零④：`chatpipeline → agent` 归零；4 → 0）**
+- **两块处置**：
+  1. **`webfetch` 落地**（L2 预留名）：`Fetcher`（585 行）+ `FetchException` + `BrowserRenderer` + `AgentMarkdown` 从 `agent.support` 整体搬入 `com.ragagent.webfetch`。
+     搬运前先验证：**4 个文件对 `com.ragagent.*` 的 import 均为 0**（完全自洽）⇒ 属"整块能力"而不是"agent 的实现"，搬过去即 L2；测试 `WebFetchTest` 随类型搬到 `test/java/com/ragagent/webfetch/`。
+  2. **DataAnalysis 端口化**：`PipelinePorts` 新增端口自有 record **`KnowledgeData` / `ColumnInfo` / `TableSchema`**（形状对齐 `DataAnalysisTool` 的同名嵌套 record），`DataAnalysisSession.loadFromKnowledge` 改收端口 record；
+     适配器 `DataAnalysisSessionFactoryAdapter`（原先住 L2 管线里、直接 new `DataAnalysisTool`）**搬回 `agent.tools.data`**，并在那里做 `工具 record → 端口 record` 的转换；`PluginDataAnalysis` 的表结构描述与装载调用改走端口类型；`QaWiring` 装配点同步。
+     ⇒ 管线只认自己的端口类型，**不再 import `agent.*`**（`chatpipeline → agent` 归零）。
+- **两次"自伤"与对应纪律**（都是我自己造成的，记录以便复用）：
+  1. **R7 首次实战拦截**：搬适配器时我把新内容 `write_text` 写回了**旧路径**（对象用错）⇒ 守卫立刻报「声明 `com.ragagent.agent.tools.data` 与路径 `chatpipeline/` 不一致」⇒ `git mv` 纠正。
+     **纪律：`git mv` 之后要写新内容，必须把变量指向**新路径**（本次教训：`p.unlink()` 之后不要复用同一个 `Path` 变量）。**
+  2. **Gradle 增量编译假报**：`git mv` + 内容改写后，编译报 `cannot find symbol`（类型明明存在）⇒ `--rerun-tasks` 后 BUILD SUCCESSFUL。
+     **纪律：搬目录/改包后若报"找不到明显存在"的符号，先 `--rerun-tasks` 或 clean 再排查**（避免在假报上浪费轮次）。
+- **基线**：`L2 → L3 直连 2 → 1 条`（仅剩 `chatpipeline → knowledge`）。
+- **闸门**：后端全量 BUILD SUCCESSFUL + `spotlessCheck` + 五守卫（含 R7）绿。
+- **收尾状态**：R3（L2 不依赖 L3）只剩 1 条边，且该边已就"视图化（A）vs 登记为允许（B）"两条路线给出评估（见方案文档 §2.4）。
