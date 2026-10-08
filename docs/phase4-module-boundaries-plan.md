@@ -65,7 +65,7 @@ ArchUnit 1.3.0 **已是测试依赖**（`server/build.gradle.kts:111`），可�
 - 既有守卫：`check-package-cycles.py`（环/分层棘轮）、`pkg-audit.py`（分包体检）、
   `check-json-key-case.py`（JSON 键名 camel 棘轮 260 条）、`check-go-anchors.py`（Go 锚点棘轮）、
   `check-fe-contract-keys.py`（前后端跨面键名），外加 ~25 个 `ab-*.sh` 验收脚本。
-- 构建：单模块 `server`（`settings.gradle.kts` 只 include("server")），产物 Spring Boot jar；
+- 构建：**多模块**（B116 起 `settings.gradle.kts` include `server` + `contracts`；契约层 `common`/`event` 在 `:contracts`，其余在 `:server`），产物 Spring Boot jar；
   其它目录 `docreader/`（Go 容器）、`frontend/`、`mcp-server/`、`otlp-proto/` 不在 Gradle 内。
 
 ## 2. 必须先解的环（切割清单，按性价比排序）
@@ -338,3 +338,53 @@ B111 暴露的 8 域间接环看着吓人（`agent`/`auth`/`chatpipeline`/`datas
 ⇒ **不做一次性 6 模块拆分。第一步只做 `:contracts`**：它是**零成本切点**
 （自身零依赖、175 文件；界外→界内的 1,409 处引用全部只变成一行 `project(":contracts")`），
 却能把"底座不得依赖任何域"从**脚本规则升格为编译规则**——整个 M1 里性价比最高的一刀。
+
+
+## 6. B116：`:contracts` 抽取落地（M1 第一步）
+
+按 §5.3 的策略只做**零成本切点**：把 `common` + `event`（175 文件 / LOC 13.8k）抽成
+**唯一一个没有任何 `project(...)` 依赖的模块**，把"底座不得反向依赖任何域"从守卫脚本规则
+**升格为编译规则**。
+
+### 6.1 落地内容
+
+| 项 | 内容 |
+|---|---|
+| 模块 | 新增 `:contracts`（`java-library` + `io.spring.dependency-management` + spotless）|
+| 依赖 | `:contracts` **零 project 依赖**；`:server` 声明 `implementation(project(":contracts"))` |
+| 依赖声明 | 按 `common`/`event` 的**实际 import 面**声明（jackson / spring-context·web·webmvc·jdbc / spring-boot·autoconfigure / spring-data-redis / slf4j / mybatis-plus 3.5.7 / jakarta servlet·validation），**不用 starter**，避免把自动配置漏进库 |
+| 搬迁 | `git mv` `common/`、`event/`（主源码）+ `resources/common/text/*.txt`（被 `/common/text/…` 绝对路径读）+ **9 个纯底座测试**（2 个 `@SpringBootTest` 与引用其它域的 5 个留在 `:server`）|
+| 资源 | 13 处 classpath 资源读法**逐个核实全是 classloader 绝对路径** ✓（不会因搬家解析失败）；但**缺资源静默 null** 的性质未变 ⇒ "资源存在性断言"仍待补（§5.2-2）|
+
+### 6.2 守卫与规则的多模块化（否则会**静默失覆盖**）
+
+新增 `scripts/_source_roots.py` 作为**源码根的单一事实来源**（`MODULE_DIRS` 一行加模块），5 个守卫全部改为按它遍历：
+
+- `check-package-cycles.py`：R1/R1b/R3/R3b/R5/R6/R7/R8 全部改为跨模块（域集合合并、`common` 可能在任一模块）
+- `check-json-key-case.py` / `check-go-anchors.py` / `check-fe-contract-keys.py` / `check-event-face-case.py`：路径常量 → 多模块遍历
+
+> ⚠️ **拆模块时最容易踩的静默坑（实测）**：守卫仍扫 `server/...` 时，`R6 bean 3 → 0`、
+> `R8 31 → 28`、`R5` 变成**空检查**——全绿但少覆盖 175 个文件。改造后 R6/R8 数字复原，
+> 并做红态探针验证（往 `contracts/common` 注入 `knowledge.domain.Chunk` ⇒ R5 报 `common→knowledge` 且退出码 1）。
+
+### 6.3 两个 ArchUnit 坑（都实测踩到）
+
+1. **`ArchitectureRulesTest.MAIN` 的导入过滤器必须用 `Location.contains`，不能用 `location.asURI()`**：
+   ArchUnit 对 **jar 内的类**求 `asURI` 会抛异常，而"抛异常的导入选项"被当作**排除** ⇒
+   `:contracts`（在 `:server` 类路径上以 **jar 形态**出现）被整段排除，R7 基线条目随即报
+   "已不再违例"。探针四变体定位：`asURI` 版命中 0 / `Location.contains` 版命中 1。
+   过滤器改为 `!location.contains("/classes/java/test/")`。
+2. **源码遍历类规则**（R5 裸 NUL、R9 `.last` 拼接）原先固定 `Path.of("src/main/java")`，
+   拆模块后只覆盖 `:server` ⇒ 改为 `backendSourceRoots(...)`（同时遍历 `src/…` 与
+   `../contracts/src/…`，不存在的根跳过）。
+
+### 6.4 结果
+
+| 指标 | 值 |
+|---|---|
+| 模块数 | 2（`:contracts` 零 project 依赖 / `:server` → `:contracts`）|
+| 编译期硬约束 | ✅ **探针验证**：往 `:contracts` 注入 `import com.ragagent.knowledge.domain.Chunk` ⇒ `:contracts:compileJava` **FAILED**（`package com.ragagent.knowledge does not exist`）——底座反向依赖从此**改不动** |
+| 闸门 | `./gradlew spotlessCheck build` = **BUILD SUCCESSFUL**（4,778 测试）+ 五守卫绿 |
+
+**下一步（未做）**：`:engine`（L2 能力层，11 域 / 58.3k LOC，对 `:contracts` 只暴露 79 类型）
+——它是第二条硬边界；再做则是 `:app` / `:datasource` / `:misc` / `:boot`（§5.1-③）。

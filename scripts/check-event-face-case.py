@@ -25,10 +25,13 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-SRC = ROOT / "server/src/main/java/com/ragagent"
-PAYLOAD_DIR = SRC / "event/payload"
-EVENT_TYPE = SRC / "event/EventType.java"
-RESPONSE_TYPE = SRC / "common/llm/ResponseType.java"
+# 多模块（B116）：event/* 与 common/llm/ResponseType 都随底座搬入了 contracts，
+# 路径改成按模块查找（新增模块无需改这里）。
+import _source_roots as _sr
+
+PAYLOAD_DIR = _sr.find_pkg_path("event/payload")
+EVENT_TYPE = _sr.find_pkg_path("event/EventType.java")
+RESPONSE_TYPE = _sr.find_pkg_path("common/llm/ResponseType.java")
 
 # 查询参数白名单（键 → 判定依据）。OIDC/OAuth2 标准参数，由外部协议决定，不得改名。
 QUERY_WHITELIST = {
@@ -75,29 +78,30 @@ REQPARAM_ANN = re.compile(r'@RequestParam\(\s*(?:value\s*=\s*)?"([^"]+)"')
 
 
 def check_routes() -> None:
-    for p in sorted(SRC.rglob("*.java")):
-        rel = str(p.relative_to(ROOT))
-        t = p.read_text(encoding="utf-8")
-        for m in MAPPING.finditer(t):
-            body = m.group(1)
-            if '"' not in body:
-                continue
-            for v in PATH_VAR.findall(body):
-                if "_" in v:
-                    line = t[: m.start()].count("\n") + 1
-                    problems.append(
-                        f"{rel}:{line} 路径变量含下划线：{{{v}}}"
-                        "（改 camel；路径变量名不进具体 URL，对外零影响）"
-                    )
-        for i, line in enumerate(t.splitlines(), 1):
-            for rx, why in ((PATHVAR_ANN, "路径变量"), (REQPARAM_ANN, "查询参数")):
-                for m in rx.finditer(line):
-                    name = m.group(1)
-                    if "_" not in name:
-                        continue
-                    if why == "查询参数" and name in QUERY_WHITELIST:
-                        continue
-                    problems.append(f"{rel}:{i} {why}名含下划线：{name}（{why}名统一 camel）")
+    for _r in _sr.backend_pkg_roots():
+        for p in sorted(_r.rglob("*.java")):
+            rel = str(p.relative_to(ROOT))
+            t = p.read_text(encoding="utf-8")
+            for m in MAPPING.finditer(t):
+                body = m.group(1)
+                if '"' not in body:
+                    continue
+                for v in PATH_VAR.findall(body):
+                    if "_" in v:
+                        line = t[: m.start()].count("\n") + 1
+                        problems.append(
+                            f"{rel}:{line} 路径变量含下划线：{{{v}}}"
+                            "（改 camel；路径变量名不进具体 URL，对外零影响）"
+                        )
+            for i, line in enumerate(t.splitlines(), 1):
+                for rx, why in ((PATHVAR_ANN, "路径变量"), (REQPARAM_ANN, "查询参数")):
+                    for m in rx.finditer(line):
+                        name = m.group(1)
+                        if "_" not in name:
+                            continue
+                        if why == "查询参数" and name in QUERY_WHITELIST:
+                            continue
+                        problems.append(f"{rel}:{i} {why}名含下划线：{name}（{why}名统一 camel）")
 
 
 def main() -> int:

@@ -37,7 +37,11 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-MAIN = ROOT / 'server/src/main/java/com/ragagent'
+# 多模块（B116）：遍历所有模块的 com/ragagent 包根；rel 仍是相对包根的路径
+# （与冻结基线里的键形状一致）。
+import _source_roots as _sr
+
+PKG_ROOTS = _sr.backend_pkg_roots()
 
 # 冻结面（第三方线格式/租户配置/模型载荷等）——整目录豁免，理由见 HANDOFF §15.3。
 FROZEN_PREFIXES = (
@@ -194,8 +198,8 @@ SNAKE_IN_LIST = re.compile(r'"([a-z0-9]+(?:_[a-z0-9]+)+)"')
 
 def hits() -> dict[str, set[str]]:
     found: dict[str, set[str]] = {}
-    for path in sorted(MAIN.rglob('*.java')):
-        rel = str(path.relative_to(MAIN))
+    for path, rel in sorted(
+            (p, str(p.relative_to(r))) for r in PKG_ROOTS for p in r.rglob('*.java')):
         if rel.startswith(FROZEN_PREFIXES):
             continue
         text = path.read_text(encoding='utf-8', errors='ignore')

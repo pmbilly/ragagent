@@ -38,7 +38,10 @@ import sys
 ROOT = pathlib.Path(".")
 BASELINE = pathlib.Path("scripts/fe-snake-contracts.baseline.json")
 FE_DIRS = ("frontend/src",)
-BE_DIR = "server/src/main"
+# 多模块（B116）：后端字面量面 = 所有模块的 src/main。
+import _source_roots as _sr
+
+BE_DIRS = [d for _, _, d in _sr.java_roots(("main",))]
 FE_SUFFIX = (".ts", ".vue", ".mjs", ".js")
 SNAKE = re.compile(r"(?<![A-Za-z0-9_])([a-z][a-z0-9]*_[a-z0-9_]+)(?![A-Za-z0-9_])")
 BEM = re.compile(r"[a-z0-9]+__[a-z0-9]")
@@ -51,7 +54,7 @@ def camel(key: str) -> str:
 
 def be_literals() -> set[str]:
     lits = set()
-    for p in pathlib.Path(BE_DIR).rglob("*.java"):
+    for p in (q for _d in BE_DIRS for q in pathlib.Path(_d).rglob("*.java")):
         for m in re.finditer(r'"([A-Za-z][A-Za-z0-9_]{2,40})"', p.read_text(encoding="utf-8", errors="ignore")):
             lits.add(m.group(1))
     return lits

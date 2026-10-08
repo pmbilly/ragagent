@@ -32,7 +32,10 @@ import pathlib
 import re
 import sys
 
-ROOT = pathlib.Path("server/src/main/java")
+# 多模块（B116）：遍历所有模块的 src/main/java（基线键仍是相对该根的路径）。
+import _source_roots as _sr
+
+ROOTS = [d for _, _, d in _sr.java_roots(("main",))]
 BASELINE = pathlib.Path("scripts/go-anchors.baseline.json")
 
 PATTERNS = {
@@ -48,10 +51,11 @@ def count(path: pathlib.Path) -> int:
 
 def scan() -> dict:
     state = {}
-    for f in sorted(ROOT.rglob("*.java")):
-        n = count(f)
-        if n:
-            state[str(f.relative_to(ROOT))] = n
+    for root in ROOTS:
+        for f in sorted(root.rglob("*.java")):
+            n = count(f)
+            if n:
+                state[str(f.relative_to(root))] = n
     return state
 
 

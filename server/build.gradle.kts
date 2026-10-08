@@ -52,6 +52,8 @@ configurations {
 }
 
 dependencies {
+    // 底座契约层（common + event）——B116 抽成独立模块后在此声明依赖
+    implementation(project(":contracts"))
     // Spring
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")

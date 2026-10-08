@@ -89,7 +89,12 @@ class ArchitectureRulesTest {
      * 那些不是本规则的治理对象。</p>
      */
     private static final JavaClasses MAIN = new ClassFileImporter()
-            .withImportOption(location -> location.asURI().getPath().contains("/classes/java/main/"))
+            // B116 多模块：**不能用 location.asURI()** —— ArchUnit 对 jar 内的类求 asURI
+            // 会抛异常，而"抛异常的导入选项"被当作**排除**，于是 :contracts（在 :server 的
+            // 类路径上以 jar 形态出现）被整段排除，R7 基线条目随即报"已不再违例"（实测踩到，
+            // 探针四变体定位：asURI 版命中 0、Location.contains 版命中 1）。
+            // 改用 Location.contains 排除测试类。
+            .withImportOption(location -> !location.contains("/classes/java/test/"))
             .importPackages("com.ragagent");
 
     /**
@@ -198,8 +203,9 @@ class ArchitectureRulesTest {
     @DisplayName("R5：源文件不得含裸 NUL 字节（会让 grep/ripgrep 判为二进制并静默跳过该文件）")
     void noRawNulBytesInSources() throws java.io.IOException {
         java.util.List<String> offenders = new java.util.ArrayList<>();
-        for (java.nio.file.Path root : java.util.List.of(
-                java.nio.file.Path.of("src/main/java"), java.nio.file.Path.of("src/test/java"))) {
+        for (java.nio.file.Path root : java.util.stream.Stream.of(
+                backendSourceRoots("main/java"), backendSourceRoots("test/java"))
+                .flatMap(java.util.List::stream).toList()) {
             if (!java.nio.file.Files.isDirectory(root)) {
                 continue;
             }
@@ -395,18 +401,33 @@ class ArchitectureRulesTest {
      */
     private static final Map<String, String> LAST_CONCAT_BASELINE = Map.of();
 
+    /**
+     * 后端源码根（B116 多模块）：本类在 {@code :server} 里运行，工作目录是 {@code server/}，
+     * 故契约层（{@code common}/{@code event}，已抽到 {@code :contracts}）用相对路径指过去。
+     * 不存在的根由调用方跳过 ⇒ 单模块布局下仍然可用。
+     */
+    private static java.util.List<java.nio.file.Path> backendSourceRoots(String sourceSet) {
+        return java.util.List.of(java.nio.file.Path.of("src/" + sourceSet),          // server 自己
+                java.nio.file.Path.of("../contracts/src/" + sourceSet));             // 契约层
+    }
+
     @Test
     @DisplayName("R9：.last(...) 参数必须是纯字符串字面量（拼接=注入面+方言漂移）")
     void lastOnlyConstantStrings() throws java.io.IOException {
         Set<String> actual = new TreeSet<>();
-        try (var walk = java.nio.file.Files.walk(java.nio.file.Path.of("src/main/java"))) {
-            for (java.nio.file.Path file : walk.filter(java.nio.file.Files::isRegularFile)
-                    .filter(f -> f.toString().endsWith(".java")).toList()) {
-                boolean[] inBlockComment = {false};
-                for (String line : java.nio.file.Files.readAllLines(file)) {
-                    if (isConcatLast(stripComments(line, inBlockComment))) {
-                        actual.add(file.toString().replace('\\', '/'));
-                        break;
+        for (java.nio.file.Path root : backendSourceRoots("main/java")) {
+            if (!java.nio.file.Files.isDirectory(root)) {
+                continue;
+            }
+            try (var walk = java.nio.file.Files.walk(root)) {
+                for (java.nio.file.Path file : walk.filter(java.nio.file.Files::isRegularFile)
+                        .filter(f -> f.toString().endsWith(".java")).toList()) {
+                    boolean[] inBlockComment = {false};
+                    for (String line : java.nio.file.Files.readAllLines(file)) {
+                        if (isConcatLast(stripComments(line, inBlockComment))) {
+                            actual.add(file.toString().replace('\\', '/'));
+                            break;
+                        }
                     }
                 }
             }

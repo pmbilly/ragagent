@@ -7,3 +7,4 @@ pluginManagement {
 
 rootProject.name = "ragagent-java"
 include("server")
+include("contracts")

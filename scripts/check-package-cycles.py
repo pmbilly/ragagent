@@ -31,24 +31,44 @@ import re
 import sys
 from collections import defaultdict
 
-ROOT = pathlib.Path("server/src/main/java/com/ragagent")
+# 多模块（B116）：源码根的单一事实来源在 _source_roots.py（新增模块只改那里）。
+# 拆出 contracts 后此处若仍写死 server/...，R5/R6/R8 会**静默失覆盖**。
+import _source_roots as _sr
+
+PKG_ROOTS = _sr.backend_pkg_roots()
+DOMAIN_FILES = defaultdict(list)          # 域 → 各模块下的 .java（合并）
+for _r in PKG_ROOTS:
+    for _p in sorted(_r.iterdir()):
+        if _p.is_dir():
+            DOMAIN_FILES[_p.name].extend(_p.rglob("*.java"))
+ALL_FILES = sorted(f for _fs in DOMAIN_FILES.values() for f in _fs)
+
+
+def rel(f):
+    """相对其所在模块的 com/ragagent 包根（报错信息用）。"""
+    for _r in PKG_ROOTS:
+        try:
+            return str(f.relative_to(_r))
+        except ValueError:
+            continue
+    return str(f)
+
+
 BASELINE = pathlib.Path("scripts/package-cycles.baseline.json")
 L2 = {"llm", "retrieval", "embedding", "rerank", "chatpipeline", "modelcontext",
       "searchutil", "storageurl", "webfetch"}
 L1 = {"common", "event", "stream", "tracing", "config"}
-L3 = sorted({d.name for d in ROOT.iterdir() if d.is_dir()} - L2 - L1)
+L3 = sorted(set(DOMAIN_FILES) - L2 - L1)
 # 已完成端口化、禁止回流的包对（R4）
 DECOUPLED = [("wiki", "knowledge")]
 
 IMP = re.compile(r"^import com\.ragagent\.(\w+)\.", re.M)
 edge = defaultdict(set)
-for p in sorted(ROOT.iterdir()):
-    if not p.is_dir():
-        continue
-    for f in p.rglob("*.java"):
+for _dom, _fs in DOMAIN_FILES.items():
+    for f in _fs:
         for m in IMP.finditer(f.read_text(encoding="utf-8")):
-            if m.group(1) != p.name:
-                edge[p.name].add(m.group(1))
+            if m.group(1) != _dom:
+                edge[_dom].add(m.group(1))
 
 cycles = sorted({tuple(sorted((a, b))) for a, t in edge.items() for b in t if a in edge.get(b, ())})
 to_config = sorted(a for a in edge if "config" in edge[a])
@@ -59,7 +79,7 @@ l2_to_l3_sites = {}
 for _a, _b in l2_to_l3:
     _pat = re.compile(r"^import com\.ragagent\." + _b + r"\.", re.M)
     l2_to_l3_sites[_a + "->" + _b] = sum(
-        len(_pat.findall(_p.read_text(encoding="utf-8"))) for _p in (ROOT / _a).rglob("*.java"))
+        len(_pat.findall(_p.read_text(encoding="utf-8"))) for _p in DOMAIN_FILES.get(_a, ()))
 relapsed = sorted((a, b) for a, b in DECOUPLED if b in edge.get(a, ()))
 
 # L1 核心底座：不得依赖业务域（R5）
@@ -71,13 +91,16 @@ BEAN_RE = re.compile(r"^\s*@(Component|Service|Repository|Configuration)\b", re.
 PERSIST_RE = re.compile(r"^import com\.ragagent\.[\w.]+\.(mapper|repository)\.", re.M)
 # package 声明 ↔ 路径（R7）
 miss_decl = []
-for _root in ("main/java", "test/java"):
-    _base = pathlib.Path("server/src") / _root
-    for _p in _base.rglob("*.java"):
-        _m = re.search(r"^package\s+([\w.]+);", _p.read_text(encoding="utf-8"), re.M)
-        _exp = str(_p.parent.relative_to(_base)).replace("/", ".")
-        if _m and _m.group(1) != _exp:
-            miss_decl.append(f"{_p}（声明 {_m.group(1)}，应为 {_exp}）")
+for _mod in _sr.MODULE_DIRS:
+    for _root in ("main/java", "test/java"):
+        _base = pathlib.Path(_mod) / "src" / _root
+        if not _base.is_dir():
+            continue
+        for _p in _base.rglob("*.java"):
+            _m = re.search(r"^package\s+([\w.]+);", _p.read_text(encoding="utf-8"), re.M)
+            _exp = str(_p.parent.relative_to(_base)).replace("/", ".")
+            if _m and _m.group(1) != _exp:
+                miss_decl.append(f"{_p}（声明 {_m.group(1)}，应为 {_exp}）")
 miss_decl = sorted(miss_decl)
 
 # R8：内联全限定名（依赖图完整性）——上面 R1/R1b/R3 都只解析 import 行，写成
@@ -139,7 +162,7 @@ def _r8_spans(line, in_block):
 
 
 _r8_types, _r8_pkg_types = set(), defaultdict(set)
-for _p in ROOT.rglob("*.java"):
+for _p in ALL_FILES:
     _t = _p.read_text(encoding="utf-8")
     _pm = _R8_PKG.search(_t)
     if not _pm:
@@ -150,7 +173,7 @@ for _p in ROOT.rglob("*.java"):
     _r8_pkg_types[_pk] |= set(_R8_TOP.findall(_t))
 
 r8_allowed, r8_violations = 0, []
-for _p in sorted(ROOT.rglob("*.java")):
+for _p in sorted(ALL_FILES):
     _t = _p.read_text(encoding="utf-8")
     _pm = _R8_PKG.search(_t)
     if not _pm:
@@ -183,18 +206,20 @@ for _p in sorted(ROOT.rglob("*.java")):
                         or (_tp != _pk and _simple in _r8_pkg_types.get(_pk, ()))):
                     r8_allowed += 1
                 else:
-                    r8_violations.append(f"{_p.relative_to(ROOT)}:{_no} → {_m.group(0)}")
+                    r8_violations.append(f"{rel(_p)}:{_no} → {_m.group(0)}")
 r8_violations = sorted(r8_violations)
 
 common_beans, common_persistence = {}, {}
+_COMMON_DIRS = [r / "common" for r in PKG_ROOTS if (r / "common").is_dir()]
 common_persistence["(mapper/repository 子包)"] = sum(
-    1 for _d in (ROOT / "common").rglob("*")
+    1 for _cd in _COMMON_DIRS for _d in _cd.rglob("*")
     if _d.is_dir() and _d.name in ("mapper", "repository") and any(_d.glob("*.java")))
-for _p in sorted((ROOT / "common").rglob("*.java")):
-    _pkg = str(_p.parent.relative_to(ROOT / "common")) if _p.parent != ROOT / "common" else "."
-    _txt = _p.read_text(encoding="utf-8")
-    if BEAN_RE.search(_txt):
-        common_beans[_pkg] = common_beans.get(_pkg, 0) + 1
+for _cd in _COMMON_DIRS:
+    for _p in sorted(_cd.rglob("*.java")):
+        _pkg = str(_p.parent.relative_to(_cd)) if _p.parent != _cd else "."
+        _txt = _p.read_text(encoding="utf-8")
+        if BEAN_RE.search(_txt):
+            common_beans[_pkg] = common_beans.get(_pkg, 0) + 1
     if PERSIST_RE.search(_txt):
         common_persistence[_pkg] = common_persistence.get(_pkg, 0) + 1
 
