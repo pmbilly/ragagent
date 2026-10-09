@@ -22,6 +22,8 @@ Map / MyBatis 列名等非 JSON 键**（如 `*Repository` 的 `deleted_at`），
 判定某键是真债还是冻结/数据值时，**必须看消费者**（FE 读？夹具断言？第三方 API？）。
 
 **2026-10-08（B88）**：工具面（`agent/tools/**` 及 agent 管线消费侧）已全量 camel 化，
+**已知盲区**：自定义 key-value helper（如 `KnowledgeTagService.details(Object... keyValues)`）里的键名**七种形态都扫不到** ⇒ B147b 用一次性 grep 复核过 `grep -rnE "details\\(\" server/src/main`；新增此类 helper 时请照做。
+
 原先整目录的 `agent/tools/` 冻结豁免已摘除；2026-10-09 B141 又摘除 `datasource/connector` 的整目录豁免（改为文件级，见 FROZEN_PREFIXES 内注释——该豁免曾让 134 个键静默逃逸）；该目录残留的 snake 仅限三类并逐条登记在本脚本 BASELINE：
 ① 外部载荷读侧（docreader image_info 的 `original_url`/`ocr_text` 等，键名由对方服务决定）、
 ② MyBatis/JDBC 列名与 SQL 参数、③ 第三方面（websearch metadata `published_at` 等）。
@@ -150,14 +152,13 @@ BASELINE: dict[str, set[str]] = {
     # memory 观测/追踪载荷（非契约）
     'memory/service/MemoryTrace.java': {'conditioned_items', 'document_count', 'interest_count', 'recalled_items', 'recalled_items_truncated'},
     # WeKnora Cloud 第三方 API
-    # 读取 SQL/检索行键（存量面）
     # Cypher 字段
     'retrieval/graph/Neo4jGraphRepository.java': {'knowledge_id', 'source_labels', 'target_labels'},
     # ImageInfo 面（§15.3 冻结族）
     'retrieval/support/ImageInfoMatchUtil.java': {'end_pos', 'ocr_text', 'original_url', 'start_pos'},
-    # web 引用载荷（同 ReferencesSupport 存量面）
+    # websearch metadata 的 published_at（§15.3 ① 外部决定：键名由搜索服务给，非我们的 JSON 面）。
+    # B147a 复核改标：原写「存量面」是错的——与 ReferencesSupport 同族，属外部词汇而非历史数据。
     'retrieval/support/WebResultConverter.java': {'published_at'},
-    # 工具结果/附件载荷（存量面，同 tool-results）
     # SSE complete 事件的 data 键（B136 复核：与上条同属**冻结的线协议** §14.9l 前提判定 2；
     # 同上（SSE/消息载荷）
     'session/controller/SessionController.java': {'message_id', 'session_id'},

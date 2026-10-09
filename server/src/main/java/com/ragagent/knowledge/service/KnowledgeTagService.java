@@ -231,8 +231,8 @@ public class KnowledgeTagService {
             }
             recordKbActivity(tenantId, tag.getKnowledgeBaseId(), AuditAction.TAG_UPDATED,
                     "knowledge_tag", tag.getId(),
-                    details("name", tag.getName(), "content_cleared", true,
-                            "excluded_count", excludeUUIDs.size()));
+                    details("name", tag.getName(), "contentCleared", true,
+                            "excludedCount", excludeUUIDs.size()));
             return;
         }
 
@@ -249,8 +249,8 @@ public class KnowledgeTagService {
         if (!excludeUUIDs.isEmpty()) {
             recordKbActivity(tenantId, tag.getKnowledgeBaseId(), AuditAction.TAG_UPDATED,
                     "knowledge_tag", tag.getId(),
-                    details("name", tag.getName(), "content_cleared", true,
-                            "excluded_count", excludeUUIDs.size()));
+                    details("name", tag.getName(), "contentCleared", true,
+                            "excludedCount", excludeUUIDs.size()));
             return;
         }
         tagRepo.delete(tenantId, id);
