@@ -1,7 +1,6 @@
 package com.ragagent.event.payload;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 上下文压缩报告。
@@ -15,34 +14,25 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class ContextCompactedData {
 
     /** threshold | overflow */
-    @JsonProperty("reason")
     private String reason = "";
 
-    @JsonProperty("round")
     private int round;
 
-    @JsonProperty("tokensBefore")
     private int tokensBefore;
 
-    @JsonProperty("tokensAfter")
     private int tokensAfter;
 
-    @JsonProperty("messagesBefore")
     private int messagesBefore;
 
-    @JsonProperty("messagesAfter")
     private int messagesAfter;
 
-    @JsonProperty("summary")
     private String summary = "";
 
     /** 摘要来自机械归档（summarizer 失败）的降级标记；false 省略 */
-    @JsonProperty("degraded")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private boolean degraded;
 
     /** 切口落在单个 turn 内的标记；false 省略 */
-    @JsonProperty("splitTurn")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private boolean splitTurn;
 
@@ -119,7 +109,6 @@ public class ContextCompactedData {
         this.summary = QueryData.orEmpty(v);
     }
 
-    @JsonProperty("degraded")
     public boolean isDegraded() {
         return degraded;
     }
@@ -128,7 +117,6 @@ public class ContextCompactedData {
         this.degraded = v;
     }
 
-    @JsonProperty("splitTurn")
     public boolean isSplitTurn() {
         return splitTurn;
     }

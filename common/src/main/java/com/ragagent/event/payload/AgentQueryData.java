@@ -3,7 +3,6 @@ package com.ragagent.event.payload;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Agent 查询事件数据。
@@ -11,19 +10,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class AgentQueryData {
 
-    @JsonProperty("sessionId")
     private String sessionId = "";
 
-    @JsonProperty("query")
     private String query = "";
 
     /** 空串省略 */
-    @JsonProperty("requestId")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private String requestId = "";
 
     /** null 或空省略 */
-    @JsonProperty("extra")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, Object> extra;
 
@@ -54,7 +49,6 @@ public class AgentQueryData {
         this.query = QueryData.orEmpty(v);
     }
 
-    @JsonProperty("requestId")
     public String getRequestId() {
         return requestId;
     }
@@ -63,7 +57,6 @@ public class AgentQueryData {
         this.requestId = QueryData.orEmpty(v);
     }
 
-    @JsonProperty("extra")
     public Map<String, Object> getExtra() {
         return extra;
     }

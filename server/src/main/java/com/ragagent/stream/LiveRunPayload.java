@@ -1,6 +1,5 @@
 package com.ragagent.stream;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
@@ -10,6 +9,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  */
 @JsonPropertyOrder({"assistantMessageId", "requestId"})
 public record LiveRunPayload(
-        @JsonProperty("assistantMessageId") String assistantMessageId,
-        @JsonProperty("requestId") String requestId) {
+        String assistantMessageId,
+        String requestId) {
 }

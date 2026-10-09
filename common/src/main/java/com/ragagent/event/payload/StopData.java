@@ -1,7 +1,6 @@
 package com.ragagent.event.payload;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 停止生成请求数据。
@@ -12,14 +11,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class StopData {
 
-    @JsonProperty("sessionId")
     private String sessionId = "";
 
-    @JsonProperty("messageId")
     private String messageId = "";
 
     /** 停止原因（可选）；空串省略 */
-    @JsonProperty("reason")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private String reason = "";
 
@@ -48,7 +44,6 @@ public class StopData {
         this.messageId = QueryData.orEmpty(v);
     }
 
-    @JsonProperty("reason")
     public String getReason() {
         return reason;
     }

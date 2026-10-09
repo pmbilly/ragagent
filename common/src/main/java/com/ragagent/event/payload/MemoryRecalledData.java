@@ -1,5 +1,4 @@
 package com.ragagent.event.payload;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 /**
@@ -12,7 +11,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class MemoryRecalledData {
 
     /** null 也输出 null */
-    @JsonProperty("memories")
     private Object memories;
 
     public MemoryRecalledData() {

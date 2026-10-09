@@ -1,7 +1,6 @@
 package com.ragagent.event.payload;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 会话内 OAuth 提示结果（authorized / timeout / cancel）确认事件体。
@@ -13,28 +12,22 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class MCPOAuthResolvedData {
 
-    @JsonProperty("pendingId")
     private String pendingId = "";
 
-    @JsonProperty("serviceId")
     private String serviceId = "";
 
     /** false 恒输出 */
-    @JsonProperty("authorized")
     private boolean authorized;
 
     /** 空串省略 */
-    @JsonProperty("reason")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private String reason = "";
 
     /** false 省略 */
-    @JsonProperty("timedOut")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private boolean timedOut;
 
     /** false 省略 */
-    @JsonProperty("canceled")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private boolean canceled;
 
@@ -75,7 +68,6 @@ public class MCPOAuthResolvedData {
         this.authorized = v;
     }
 
-    @JsonProperty("reason")
     public String getReason() {
         return reason;
     }
@@ -84,7 +76,6 @@ public class MCPOAuthResolvedData {
         this.reason = QueryData.orEmpty(v);
     }
 
-    @JsonProperty("timedOut")
     public boolean isTimedOut() {
         return timedOut;
     }
@@ -93,7 +84,6 @@ public class MCPOAuthResolvedData {
         this.timedOut = v;
     }
 
-    @JsonProperty("canceled")
     public boolean isCanceled() {
         return canceled;
     }

@@ -1,5 +1,4 @@
 package com.ragagent.event.payload;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 /**
@@ -13,10 +12,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class AgentReferencesData {
 
     /** null 也输出 null */
-    @JsonProperty("references")
     private Object references;
 
-    @JsonProperty("iteration")
     private int iteration;
 
     public AgentReferencesData() {

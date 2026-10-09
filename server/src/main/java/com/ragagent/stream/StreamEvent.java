@@ -5,7 +5,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.ragagent.common.llm.ResponseType;
 import com.ragagent.llm.domain.TokenUsage;
@@ -31,29 +30,22 @@ import com.ragagent.llm.domain.TokenUsage;
 public class StreamEvent {
 
     /** 唯一事件 ID；steer 子列表靠它去重。 */
-    @JsonProperty("id")
     private String id = "";
 
-    @JsonProperty("type")
     private ResponseType type;
 
     /** 事件内容（流式事件里是一段增量）。 */
-    @JsonProperty("content")
     private String content = "";
 
-    @JsonProperty("done")
     private boolean done;
 
-    @JsonProperty("timestamp")
     private OffsetDateTime timestamp;
 
     /** 附加数据（引用、元信息等）。null 时整键省略。 */
-    @JsonProperty("data")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, Object> data;
 
     /** 整轮聚合的 token 用量（complete 事件）。空时整键省略。 */
-    @JsonProperty("usage")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private TokenUsage usage;
 

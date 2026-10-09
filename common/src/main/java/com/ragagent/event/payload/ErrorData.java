@@ -3,7 +3,6 @@ package com.ragagent.event.payload;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 错误事件数据。
@@ -12,28 +11,22 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ErrorData {
 
-    @JsonProperty("error")
     private String error = "";
 
     /** 空串省略 */
-    @JsonProperty("errorCode")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private String errorCode = "";
 
     /** 错误发生的阶段（恒输出） */
-    @JsonProperty("stage")
     private String stage = "";
 
-    @JsonProperty("sessionId")
     private String sessionId = "";
 
     /** 空串省略 */
-    @JsonProperty("query")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private String query = "";
 
     /** null 或空省略 */
-    @JsonProperty("extra")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, Object> extra;
 
@@ -58,7 +51,6 @@ public class ErrorData {
         this.error = QueryData.orEmpty(v);
     }
 
-    @JsonProperty("errorCode")
     public String getErrorCode() {
         return errorCode;
     }
@@ -67,7 +59,6 @@ public class ErrorData {
         this.errorCode = QueryData.orEmpty(v);
     }
 
-    @JsonProperty("stage")
     public String getStage() {
         return stage;
     }
@@ -84,7 +75,6 @@ public class ErrorData {
         this.sessionId = QueryData.orEmpty(v);
     }
 
-    @JsonProperty("query")
     public String getQuery() {
         return query;
     }
@@ -93,7 +83,6 @@ public class ErrorData {
         this.query = QueryData.orEmpty(v);
     }
 
-    @JsonProperty("extra")
     public Map<String, Object> getExtra() {
         return extra;
     }

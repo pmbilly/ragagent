@@ -1,5 +1,4 @@
 package com.ragagent.event.payload;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 /**
@@ -12,17 +11,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class AgentReflectionData {
 
     /** 工具调用 ID（追踪用） */
-    @JsonProperty("toolCallId")
     private String toolCallId = "";
 
-    @JsonProperty("content")
     private String content = "";
 
-    @JsonProperty("iteration")
     private int iteration;
 
     /** 流式是否完成 */
-    @JsonProperty("done")
     private boolean done;
 
     public AgentReflectionData() {

@@ -1,7 +1,6 @@
 package com.ragagent.event.payload;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 会话内 MCP OAuth 授权提示事件体。
@@ -16,41 +15,30 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class MCPOAuthRequiredData {
 
-    @JsonProperty("pendingId")
     private String pendingId = "";
 
     /** 0 恒输出 */
-    @JsonProperty("tenantId")
     private long tenantId;
 
-    @JsonProperty("sessionId")
     private String sessionId = "";
 
-    @JsonProperty("assistantMessageId")
     private String assistantMessageId = "";
 
-    @JsonProperty("serviceId")
     private String serviceId = "";
 
-    @JsonProperty("serviceName")
     private String serviceName = "";
 
-    @JsonProperty("mcpToolName")
     private String mcpToolName = "";
 
     /** 0（仅提示形态）也输出 */
-    @JsonProperty("timeoutSeconds")
     private int timeoutSeconds;
 
     /** 请求发出时间（unix 秒）；恒输出 */
-    @JsonProperty("requestedAtUnix")
     private long requestedAtUnix;
 
-    @JsonProperty("toolCallId")
     private String toolCallId = "";
 
     /** 空串省略 */
-    @JsonProperty("requestId")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private String requestId = "";
 
@@ -154,7 +142,6 @@ public class MCPOAuthRequiredData {
         this.toolCallId = QueryData.orEmpty(v);
     }
 
-    @JsonProperty("requestId")
     public String getRequestId() {
         return requestId;
     }

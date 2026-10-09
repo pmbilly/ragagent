@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record OAuthProtectedResource(
         @JsonProperty("authorization_servers") List<String> authorizationServers,
-        @JsonProperty("resource") String resource,
+        String resource,
         @JsonProperty("resource_name") String resourceName) {
 
     public OAuthProtectedResource {

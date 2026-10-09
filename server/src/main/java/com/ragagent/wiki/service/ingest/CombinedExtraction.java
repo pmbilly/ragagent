@@ -3,7 +3,6 @@ package com.ragagent.wiki.service.ingest;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ragagent.common.wiki.ExtractedItem;
 
 /**
@@ -13,10 +12,8 @@ import com.ragagent.common.wiki.ExtractedItem;
 
 public class CombinedExtraction {
 
-    @JsonProperty("entities")
     private List<ExtractedItem> entities = new ArrayList<>();
 
-    @JsonProperty("concepts")
     private List<ExtractedItem> concepts = new ArrayList<>();
 
     public CombinedExtraction() {}

@@ -1,5 +1,4 @@
 package com.ragagent.event.payload;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 /**
@@ -12,13 +11,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class AgentThoughtData {
 
-    @JsonProperty("content")
     private String content = "";
 
-    @JsonProperty("iteration")
     private int iteration;
 
-    @JsonProperty("done")
     private boolean done;
 
     public AgentThoughtData() {

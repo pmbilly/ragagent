@@ -14,29 +14,23 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ChatData {
 
-    @JsonProperty("query")
     private String query = "";
 
-    @JsonProperty("modelId")
     private String modelId = "";
 
     /** 空串省略 */
-    @JsonProperty("response")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private String response = "";
 
     /** 空串省略 */
-    @JsonProperty("streamChunk")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private String streamChunk = "";
 
     /** 0 省略 */
-    @JsonProperty("tokenCount")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private int tokenCount;
 
     /** 0 省略 */
-    @JsonProperty("durationMs")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private long durationMs;
 
@@ -45,7 +39,6 @@ public class ChatData {
     private boolean isStream;
 
     /** null 或空省略 */
-    @JsonProperty("extra")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, Object> extra;
 
@@ -80,7 +73,6 @@ public class ChatData {
         this.modelId = QueryData.orEmpty(v);
     }
 
-    @JsonProperty("response")
     public String getResponse() {
         return response;
     }
@@ -89,7 +81,6 @@ public class ChatData {
         this.response = QueryData.orEmpty(v);
     }
 
-    @JsonProperty("streamChunk")
     public String getStreamChunk() {
         return streamChunk;
     }
@@ -98,7 +89,6 @@ public class ChatData {
         this.streamChunk = QueryData.orEmpty(v);
     }
 
-    @JsonProperty("tokenCount")
     public int getTokenCount() {
         return tokenCount;
     }
@@ -107,7 +97,6 @@ public class ChatData {
         this.tokenCount = v;
     }
 
-    @JsonProperty("durationMs")
     public long getDurationMs() {
         return durationMs;
     }
@@ -127,7 +116,6 @@ public class ChatData {
         this.isStream = v;
     }
 
-    @JsonProperty("extra")
     public Map<String, Object> getExtra() {
         return extra;
     }

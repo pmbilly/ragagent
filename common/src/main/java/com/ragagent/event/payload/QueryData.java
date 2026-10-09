@@ -3,7 +3,6 @@ package com.ragagent.event.payload;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 查询相关事件数据。
@@ -14,24 +13,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class QueryData {
 
-    @JsonProperty("originalQuery")
     private String originalQuery = "";
 
     /** 空串省略 */
-    @JsonProperty("rewrittenQuery")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private String rewrittenQuery = "";
 
-    @JsonProperty("sessionId")
     private String sessionId = "";
 
     /** 空串省略 */
-    @JsonProperty("userId")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private String userId = "";
 
     /** null 或空 map 都省略 */
-    @JsonProperty("extra")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, Object> extra;
 
@@ -59,7 +53,6 @@ public class QueryData {
         this.originalQuery = orEmpty(v);
     }
 
-    @JsonProperty("rewrittenQuery")
     public String getRewrittenQuery() {
         return rewrittenQuery;
     }
@@ -68,7 +61,6 @@ public class QueryData {
         this.rewrittenQuery = orEmpty(v);
     }
 
-    @JsonProperty("sessionId")
     public String getSessionId() {
         return sessionId;
     }
@@ -77,7 +69,6 @@ public class QueryData {
         this.sessionId = orEmpty(v);
     }
 
-    @JsonProperty("userId")
     public String getUserId() {
         return userId;
     }
@@ -86,7 +77,6 @@ public class QueryData {
         this.userId = orEmpty(v);
     }
 
-    @JsonProperty("extra")
     public Map<String, Object> getExtra() {
         return extra;
     }

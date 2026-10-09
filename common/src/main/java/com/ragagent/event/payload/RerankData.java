@@ -3,7 +3,6 @@ package com.ragagent.event.payload;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 排序事件数据。
@@ -11,36 +10,28 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class RerankData {
 
-    @JsonProperty("query")
     private String query = "";
 
     /** 输入的候选数量 */
-    @JsonProperty("inputCount")
     private int inputCount;
 
     /** 输出的结果数量 */
-    @JsonProperty("outputCount")
     private int outputCount;
 
-    @JsonProperty("modelId")
     private String modelId = "";
 
     /** 同 RetrievalData.threshold：包装类型防 Jackson 原生 primitive 序列化器绕过 EventJson 的浮点格式 */
-    @JsonProperty("threshold")
     private Double threshold = 0.0;
 
     /** null 或空省略 */
-    @JsonProperty("results")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Object results;
 
     /** 排序耗时（毫秒）；0 省略 */
-    @JsonProperty("durationMs")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private long durationMs;
 
     /** null 或空省略 */
-    @JsonProperty("extra")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, Object> extra;
 
@@ -99,7 +90,6 @@ public class RerankData {
         this.threshold = v == null ? 0.0 : v;
     }
 
-    @JsonProperty("results")
     public Object getResults() {
         return results;
     }
@@ -108,7 +98,6 @@ public class RerankData {
         this.results = v;
     }
 
-    @JsonProperty("durationMs")
     public long getDurationMs() {
         return durationMs;
     }
@@ -117,7 +106,6 @@ public class RerankData {
         this.durationMs = v;
     }
 
-    @JsonProperty("extra")
     public Map<String, Object> getExtra() {
         return extra;
     }

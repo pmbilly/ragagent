@@ -13,12 +13,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 
 public record NewSlugFromCitation(
-        @JsonProperty("type") String type,
-        @JsonProperty("name") String name,
-        @JsonProperty("slug") String slug,
-        @JsonProperty("aliases") List<String> aliases,
-        @JsonProperty("description") String description,
-        @JsonProperty("details") String details,
+        String type,
+        String name,
+        String slug,
+        List<String> aliases,
+        String description,
+        String details,
         @JsonProperty("source_chunks") @JsonInclude(JsonInclude.Include.NON_EMPTY)
         List<String> sourceChunks) {
 

@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ragagent.common.web.SortedMapSerializer;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.common.llm.ResponseType;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 流式响应。
@@ -20,13 +19,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class StreamResponse {
 
-    @JsonProperty("id")
     private String id = "";
-    @JsonProperty("responseType")
     private ResponseType responseType;
-    @JsonProperty("content")
     private String content = "";
-    @JsonProperty("done")
     private boolean done;
     /**
      * 检索引用（{@link SearchResult} 列表）。
@@ -35,16 +30,12 @@ public class StreamResponse {
      *
      * <p>为空时整键省略。</p>
      */
-    @JsonProperty("knowledgeReferences")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<SearchResult> knowledgeReferences;
-    @JsonProperty("sessionId")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String sessionId;
-    @JsonProperty("assistantMessageId")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String assistantMessageId;
-    @JsonProperty("toolCalls")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<ToolCall> toolCalls;
     /**
@@ -54,13 +45,10 @@ public class StreamResponse {
      * 大多用 {@code LinkedHashMap} 按写入序；
      * 嵌套的 {@code arguments} 之类更是直接来自模型返回的 JSON，外层排不掉。</p>
      */
-    @JsonProperty("data")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, Object> data;
-    @JsonProperty("usage")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private TokenUsage usage;
-    @JsonProperty("finishReason")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String finishReason;
 

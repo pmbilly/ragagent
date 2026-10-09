@@ -3,7 +3,6 @@ package com.ragagent.event.payload;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 检索事件数据。
@@ -15,39 +14,30 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class RetrievalData {
 
-    @JsonProperty("query")
     private String query = "";
 
-    @JsonProperty("knowledgeBaseId")
     private String knowledgeBaseId = "";
 
-    @JsonProperty("topK")
     private int topK;
 
     /** 0 也输出。用包装类型 Double：primitive double 走 Jackson 内置
      * PrimitiveDoubleSerializer，会绕过 EventJson 注册的浮点格式（0.0 ≠ 0，实测踩过） */
-    @JsonProperty("threshold")
     private Double threshold = 0.0;
 
     /** vector, keyword, entity */
-    @JsonProperty("retrievalType")
     private String retrievalType = "";
 
-    @JsonProperty("resultCount")
     private int resultCount;
 
     /** null 或空省略 */
-    @JsonProperty("results")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Object results;
 
     /** 检索耗时（毫秒）；0 省略 */
-    @JsonProperty("durationMs")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private long durationMs;
 
     /** null 或空省略 */
-    @JsonProperty("extra")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, Object> extra;
 
@@ -116,7 +106,6 @@ public class RetrievalData {
         this.resultCount = v;
     }
 
-    @JsonProperty("results")
     public Object getResults() {
         return results;
     }
@@ -125,7 +114,6 @@ public class RetrievalData {
         this.results = v;
     }
 
-    @JsonProperty("durationMs")
     public long getDurationMs() {
         return durationMs;
     }
@@ -134,7 +122,6 @@ public class RetrievalData {
         this.durationMs = v;
     }
 
-    @JsonProperty("extra")
     public Map<String, Object> getExtra() {
         return extra;
     }

@@ -3,7 +3,6 @@ package com.ragagent.event.payload;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 工具执行结果数据。
@@ -17,34 +16,26 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class AgentToolResultData {
 
     /** 工具调用 ID（追踪用） */
-    @JsonProperty("toolCallId")
     private String toolCallId = "";
 
-    @JsonProperty("toolName")
     private String toolName = "";
 
-    @JsonProperty("output")
     private String output = "";
 
     /** 空串省略 */
-    @JsonProperty("error")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private String error = "";
 
     /** false 恒输出 */
-    @JsonProperty("success")
     private boolean success;
 
     /** 0 省略 */
-    @JsonProperty("durationMs")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private long durationMs;
 
-    @JsonProperty("iteration")
     private int iteration;
 
     /** 工具结果的结构化数据（display_type、格式化结果等）；null 或空省略 */
-    @JsonProperty("data")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, Object> data;
 
@@ -88,7 +79,6 @@ public class AgentToolResultData {
         this.output = QueryData.orEmpty(v);
     }
 
-    @JsonProperty("error")
     public String getError() {
         return error;
     }
@@ -97,7 +87,6 @@ public class AgentToolResultData {
         this.error = QueryData.orEmpty(v);
     }
 
-    @JsonProperty("success")
     public boolean isSuccess() {
         return success;
     }
@@ -106,7 +95,6 @@ public class AgentToolResultData {
         this.success = v;
     }
 
-    @JsonProperty("durationMs")
     public long getDurationMs() {
         return durationMs;
     }
@@ -115,7 +103,6 @@ public class AgentToolResultData {
         this.durationMs = v;
     }
 
-    @JsonProperty("iteration")
     public int getIteration() {
         return iteration;
     }
@@ -124,7 +111,6 @@ public class AgentToolResultData {
         this.iteration = v;
     }
 
-    @JsonProperty("data")
     public Map<String, Object> getData() {
         return data;
     }

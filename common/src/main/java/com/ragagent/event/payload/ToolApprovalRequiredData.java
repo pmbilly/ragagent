@@ -1,7 +1,6 @@
 package com.ragagent.event.payload;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 危险 MCP 工具即将执行时的"请求批准"事件体。
@@ -18,56 +17,41 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ToolApprovalRequiredData {
 
-    @JsonProperty("pendingId")
     private String pendingId = "";
 
     /** 0 恒输出 */
-    @JsonProperty("tenantId")
     private long tenantId;
 
-    @JsonProperty("sessionId")
     private String sessionId = "";
 
-    @JsonProperty("assistantMessageId")
     private String assistantMessageId = "";
 
-    @JsonProperty("serviceId")
     private String serviceId = "";
 
-    @JsonProperty("serviceName")
     private String serviceName = "";
 
-    @JsonProperty("mcpToolName")
     private String mcpToolName = "";
 
-    @JsonProperty("registeredToolName")
     private String registeredToolName = "";
 
-    @JsonProperty("description")
     private String description = "";
 
     /** null 或空省略 */
-    @JsonProperty("args")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Object args;
 
     /** 空串省略 */
-    @JsonProperty("argsJson")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private String argsJson = "";
 
-    @JsonProperty("timeoutSeconds")
     private int timeoutSeconds;
 
     /** 请求发出时间（unix 秒）；0 恒输出 */
-    @JsonProperty("requestedAtUnix")
     private long requestedAtUnix;
 
-    @JsonProperty("toolCallId")
     private String toolCallId = "";
 
     /** 空串省略 */
-    @JsonProperty("requestId")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private String requestId = "";
 
@@ -168,7 +152,6 @@ public class ToolApprovalRequiredData {
         this.description = QueryData.orEmpty(v);
     }
 
-    @JsonProperty("args")
     public Object getArgs() {
         return args;
     }
@@ -177,7 +160,6 @@ public class ToolApprovalRequiredData {
         this.args = v;
     }
 
-    @JsonProperty("argsJson")
     public String getArgsJson() {
         return argsJson;
     }
@@ -186,7 +168,6 @@ public class ToolApprovalRequiredData {
         this.argsJson = QueryData.orEmpty(v);
     }
 
-    @JsonProperty("timeoutSeconds")
     public int getTimeoutSeconds() {
         return timeoutSeconds;
     }
@@ -211,7 +192,6 @@ public class ToolApprovalRequiredData {
         this.toolCallId = QueryData.orEmpty(v);
     }
 
-    @JsonProperty("requestId")
     public String getRequestId() {
         return requestId;
     }

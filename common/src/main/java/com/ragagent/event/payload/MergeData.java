@@ -3,7 +3,6 @@ package com.ragagent.event.payload;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 合并事件数据。
@@ -11,28 +10,22 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class MergeData {
 
-    @JsonProperty("inputCount")
     private int inputCount;
 
-    @JsonProperty("outputCount")
     private int outputCount;
 
     /** dedup, fusion, etc. */
-    @JsonProperty("mergeType")
     private String mergeType = "";
 
     /** null 或空省略 */
-    @JsonProperty("results")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Object results;
 
     /** 0 省略 */
-    @JsonProperty("durationMs")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private long durationMs;
 
     /** null 或空省略 */
-    @JsonProperty("extra")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, Object> extra;
 
@@ -73,7 +66,6 @@ public class MergeData {
         this.mergeType = QueryData.orEmpty(v);
     }
 
-    @JsonProperty("results")
     public Object getResults() {
         return results;
     }
@@ -82,7 +74,6 @@ public class MergeData {
         this.results = v;
     }
 
-    @JsonProperty("durationMs")
     public long getDurationMs() {
         return durationMs;
     }
@@ -91,7 +82,6 @@ public class MergeData {
         this.durationMs = v;
     }
 
-    @JsonProperty("extra")
     public Map<String, Object> getExtra() {
         return extra;
     }

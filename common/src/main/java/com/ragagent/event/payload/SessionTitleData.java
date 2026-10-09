@@ -1,5 +1,4 @@
 package com.ragagent.event.payload;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 /**
@@ -9,10 +8,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class SessionTitleData {
 
-    @JsonProperty("sessionId")
     private String sessionId = "";
 
-    @JsonProperty("title")
     private String title = "";
 
     public SessionTitleData() {

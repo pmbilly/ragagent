@@ -3,7 +3,6 @@ package com.ragagent.event.payload;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Agent 计划事件数据。
@@ -14,15 +13,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class AgentPlanData {
 
-    @JsonProperty("query")
     private String query = "";
 
     /** 步骤描述；null 与空列表都按原样输出 */
-    @JsonProperty("plan")
     private List<String> plan;
 
     /** 0 省略 */
-    @JsonProperty("durationMs")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private long durationMs;
 
@@ -51,7 +47,6 @@ public class AgentPlanData {
         this.plan = v;
     }
 
-    @JsonProperty("durationMs")
     public long getDurationMs() {
         return durationMs;
     }

@@ -14,11 +14,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class AgentFinalAnswerData {
 
-    @JsonProperty("content")
     private String content = "";
 
     /** false 恒输出（Done:true 是收尾标记） */
-    @JsonProperty("done")
     private boolean done;
 
     /** 兜底回答（无知识库命中）标记；false 省略 */

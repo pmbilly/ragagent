@@ -3,7 +3,6 @@ package com.ragagent.event.payload;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 工具调用通知数据。
@@ -16,22 +15,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class AgentToolCallData {
 
     /** 工具调用 ID（追踪用） */
-    @JsonProperty("toolCallId")
     private String toolCallId = "";
 
-    @JsonProperty("toolName")
     private String toolName = "";
 
     /** null 或空省略 */
-    @JsonProperty("arguments")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, Object> arguments;
 
-    @JsonProperty("iteration")
     private int iteration;
 
     /** 人可读的工具提示，如 {@code web_search("query")}；空串省略 */
-    @JsonProperty("hint")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private String hint = "";
 
@@ -63,7 +57,6 @@ public class AgentToolCallData {
         this.toolName = QueryData.orEmpty(v);
     }
 
-    @JsonProperty("arguments")
     public Map<String, Object> getArguments() {
         return arguments;
     }
@@ -72,7 +65,6 @@ public class AgentToolCallData {
         this.arguments = v;
     }
 
-    @JsonProperty("iteration")
     public int getIteration() {
         return iteration;
     }
@@ -81,7 +73,6 @@ public class AgentToolCallData {
         this.iteration = v;
     }
 
-    @JsonProperty("hint")
     public String getHint() {
         return hint;
     }

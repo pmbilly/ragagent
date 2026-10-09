@@ -1,7 +1,6 @@
 package com.ragagent.event.payload;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 用户决定（或超时/取消）的确认事件体。
@@ -13,25 +12,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ToolApprovalResolvedData {
 
-    @JsonProperty("pendingId")
     private String pendingId = "";
 
     /** false 恒输出 */
-    @JsonProperty("approved")
     private boolean approved;
 
     /** 空串省略 */
-    @JsonProperty("reason")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private String reason = "";
 
     /** false 省略 */
-    @JsonProperty("timedOut")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private boolean timedOut;
 
     /** false 省略 */
-    @JsonProperty("canceled")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private boolean canceled;
 
@@ -63,7 +57,6 @@ public class ToolApprovalResolvedData {
         this.approved = v;
     }
 
-    @JsonProperty("reason")
     public String getReason() {
         return reason;
     }
@@ -72,7 +65,6 @@ public class ToolApprovalResolvedData {
         this.reason = QueryData.orEmpty(v);
     }
 
-    @JsonProperty("timedOut")
     public boolean isTimedOut() {
         return timedOut;
     }
@@ -81,7 +73,6 @@ public class ToolApprovalResolvedData {
         this.timedOut = v;
     }
 
-    @JsonProperty("canceled")
     public boolean isCanceled() {
         return canceled;
     }

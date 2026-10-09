@@ -3,7 +3,6 @@ package com.ragagent.event.payload;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Agent 工具执行事件数据。
@@ -15,30 +14,23 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class AgentActionData {
 
-    @JsonProperty("iteration")
     private int iteration;
 
-    @JsonProperty("toolName")
     private String toolName = "";
 
     /** null map 也输出 null */
-    @JsonProperty("toolInput")
     private Map<String, Object> toolInput;
 
-    @JsonProperty("toolOutput")
     private String toolOutput = "";
 
     /** false 恒输出 */
-    @JsonProperty("success")
     private boolean success;
 
     /** 空串省略 */
-    @JsonProperty("error")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private String error = "";
 
     /** 0 恒输出 */
-    @JsonProperty("durationMs")
     private long durationMs;
 
     public AgentActionData() {
@@ -95,7 +87,6 @@ public class AgentActionData {
         this.success = v;
     }
 
-    @JsonProperty("error")
     public String getError() {
         return error;
     }
@@ -104,7 +95,6 @@ public class AgentActionData {
         this.error = QueryData.orEmpty(v);
     }
 
-    @JsonProperty("durationMs")
     public long getDurationMs() {
         return durationMs;
     }
