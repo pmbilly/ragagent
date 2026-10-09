@@ -208,7 +208,10 @@ class EvaluationContractTest {
         assertEquals(200, r.getResponse().getStatus(), raw(r));
         JsonNode node = MAPPER.readTree(raw(r));
         JsonNode task = node.path("task");
-        for (int i = 0; i < 250 && task.path("status").asInt() <= 1; i++) {
+        // 轮询上界原为 250 × 20ms = **5s**（同步手段，不是被测语义）。本仓把本用例登记为已知偶发：
+        // 受限 runner 上后台任务略有排队就超 5s ⇒ 假红。改为 30s —— 断言一字未动 ⇒ 检测力不减
+        // （任务若永不达终态，循环退出后那行 assertEquals(3, …) 照样失败）。
+        for (int i = 0; i < 1500 && task.path("status").asInt() <= 1; i++) {
             Thread.sleep(20);
             r = mockMvc.perform(get("/api/v1/evaluation?taskId=" + taskId)
                     .header("Authorization", owner)).andReturn();

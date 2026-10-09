@@ -56,6 +56,11 @@ jobs:
           distribution: temurin
           java-version: "21"
       - uses: gradle/actions/setup-gradle@v4
+      # 嵌入式 Redis 依赖 `redis-server` 在 PATH 上（common 的 EmbeddedRedis 夹具会自己起实例）。
+      # ubuntu-latest 不带它 ⇒ 4 个 Redis 测试被 assumeTrue **静默跳过**（B170 实测：本地收窄 PATH
+      # 复现出同样的 4 skipped，而 CI 只报 '4 skipped' 看不出丢了什么覆盖）。与 B158「CI 起真 PG」同一精神。
+      - name: 装 redis-server（让 Redis 测试在 CI 真跑，不再静默跳过）
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq redis-server
       - name: 灌基线（全新库守卫：V1__baseline.sql 必须能灌进空 ParadeDB）
         env:
           PGPASSWORD: 'postgres123!@#'
