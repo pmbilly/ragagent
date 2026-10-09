@@ -1,6 +1,7 @@
 plugins {
     java
     id("org.springframework.boot")
+    `java-test-fixtures`   // 共享测试基建（TestSchema/契约夹具/桩服务器：B164 起）
     id("io.spring.dependency-management")
     id("com.google.protobuf")
     id("com.diffplug.spotless")
@@ -111,6 +112,7 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok")
 
     // 测试
+    testFixturesImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     // 架构规则测试（CI 的 ./gradlew build 即闸门）
     testImplementation("com.tngtech.archunit:archunit:1.3.0")
@@ -148,6 +150,15 @@ val syncMigrations = tasks.register<Copy>("syncMigrations") {
     into(layout.buildDirectory.dir("generated-migrations"))
 }
 tasks.named("processResources") { dependsOn(syncMigrations) }
+
+// java-test-fixtures × protobuf 插件的隐式依赖冲突（extractIncludeTestFixturesProto 读 build/resources/main,
+// 与 spring-boot 的 bootBuildInfo 输出相撞 ⇒ Gradle 校验报错）。testFixtures 不需要 proto ⇒ 关掉相关任务。
+tasks.matching { it.name.contains("TestProto") || it.name.contains("TestFixturesProto") }.configureEach { enabled = false }
+
+// java-test-fixtures 默认**不继承** implementation（B164 实测：夹具编译看不到 jackson/engine/common）
+// ⇒ 让夹具与主源码同一套依赖。
+configurations.named("testFixturesImplementation") { extendsFrom(configurations.getByName("implementation")) }
+configurations.named("testFixturesRuntimeOnly") { extendsFrom(configurations.getByName("runtimeOnly")) }
 
 tasks.withType<Test> {
     // CI 也提供真库（ci.yml 的 postgres 服务 + 灌 V1__baseline.sql，B158）⇒ 无需按标签排除录测试；

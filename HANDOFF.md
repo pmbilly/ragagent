@@ -291,6 +291,9 @@
 - 已知偶发（第二个）：`EvaluationContractTest.getTerminalRunsExecution` 在**全量并发**下偶发失败
   （期望 `model ID cannot be empty`、实际空串；单独 `--tests "*EvaluationContractTest"` 重跑通过）。
   与代码改动无关，遇到时先单独重跑确认（2026-09-30 首次观察到）。
+- 已知偶发（第三个，2026-10-09 B164 观察到）：`EmbedRateLimiterTest.redisPathSharesBudgetAcrossInstances`
+  在**全量并发**下偶发失败（Redis 面跨实例共享预算，时序敏感）；单独 `--tests "*EmbedRateLimiterTest"` 重跑通过。
+  与代码改动无关，遇到先单独重跑确认。
 - 裁剪功能的测试/fixture 随 PR 删除；阶段 1 末对比器改 **JSON 语义对比**后，fixture 锚定的是**本仓自己的行为**，与 Go 再无关系（键序/转义差异不算失败）。
 - A/B 对拍脚本与 `artifacts/` 产物未带入本仓（留在旧仓）。
 
