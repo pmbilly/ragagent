@@ -29,7 +29,7 @@ Map / MyBatis 列名等非 JSON 键**（如 `*Repository` 的 `deleted_at`），
 ② MyBatis/JDBC 列名与 SQL 参数、③ 第三方面（websearch metadata `published_at` 等）。
 工具**名**（`wiki_write_page` 等 36 个）与工具 schema 的 **enum 值**（`list_servers`/`list_tools`…）按 §2.4「字段名 camel、值按各自语义」保留 snake。
 
-**BASELINE 条目是文件级**：某文件登记后，将来在其中**新增**的 snake 键不会被点名——
+**BASELINE 条目按“文件 + 具体键”登记**（键级 ✓）：只有列出的键被放行，将来在其中**新增**的 snake 键仍会被点名——
 在已登记文件里加新键时，请先看该文件是否在基线（或按族核查）。
 """
 from __future__ import annotations
@@ -78,10 +78,13 @@ FROZEN_PREFIXES = (
     'datasource/connector/notion/NotionMarkdown',
     'datasource/connector/notion/NotionProperties',
     'datasource/connector/yuque/YuqueApiTypes',
-    'llm/', 'common/tenant',
+    'llm/', 'common/llm', 'common/tenant',
     'common/pipeline/SearchParams', 'mcp/oauth', 'memory/service/MemoryExtractionLlm',
     'memory/service/MemoryExtractPayload', 'docreader', 'rerank/RankResult',
-    'tracing/langfuse', 'retrieval/engine/doris', 'retrieval/domain/ImageInfo',
+    'tracing/langfuse', 'tracing/decorators', 'retrieval/engine/doris', 'retrieval/domain/ImageInfo',
+    # ⚠️ 前缀冻结会在**换包**时静默失效（B168 实测 ✗）：B162 把 llm/TokenUsage 搬进 common/llm、
+    # B163 把 6 个 Langfuse 装饰器从 tracing/langfuse 换包到 tracing/decorators ⇒ 旧前缀不再命中，
+    # 冻结悄悄失效、CI 才报"非冻结面出现新的 snake 键"。**换包时务必回来核这里** ✓。
     'common/wiki/ExtractedItem', 'chatpipeline/plugin', 'agent/AgentEngine',
     'agent/ReActIteration', 'retrieval/HybridSearchService', 'retrieval/vlm/VlmClient',
     'knowledge/service/ChunkExtractService', 'knowledge/task/KnowledgeProcessWorker',

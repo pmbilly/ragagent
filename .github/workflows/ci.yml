@@ -22,23 +22,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: 环与分层违例只许减不许增
-        run: python3 scripts/check-package-cycles.py
-      - name: Go 锚点注释只许减不许增（B9：随触碰清洗的执行机制）
-        run: python3 scripts/check-go-anchors.py
-      - name: 前端契约键棘轮（前端 snake / 后端 camel 只许减不许增）
-        run: python3 scripts/check-fe-contract-keys.py
-      - name: 换锚棘轮（非冻结面不许新增 snake JSON 键；基线含逐条理由）
-        run: python3 scripts/check-json-key-case.py --strict
-      - name: 事件面/路由面命名口径（B93b：载荷注解/事件名与响应类型值/路径变量/查询参数一律 camel）
-        run: python3 scripts/check-event-face-case.py
-      - name: 大文件棘轮（B121：不得新增 >600 行的主源码文件；拆小后 --write 收紧基线）
-        run: python3 scripts/check-file-size.py
-      - name: 目录卫生（B124：游离目录 S1 / 死包目录 S2 —— 对 git 不可见的残留）
-        run: python3 scripts/check-stray-dirs.py
-      - name: 死成员守卫（B131：重复/未使用 import，遗留 Logger/ObjectMapper 字段）
-        run: python3 scripts/check-dead-members.py
-
+      # 八守卫跑**同一份** scripts/run-guards.sh（B168）：本地 `bash scripts/run-guards.sh` 即 CI 同口径。
+      # 起因：本地手敲守卫时漏了 check-json-key-case 的 --strict（默认只报告、退出 0）⇒ 本地绿而 CI 红。
+      - name: 八守卫（单一入口：包环 / Go 锚点 / 前端契约键 / 换锚 --strict / 事件面 / 大文件 / 目录卫生 / 死成员）
+        run: bash scripts/run-guards.sh
   backend:
     name: 后端 build + test + spotless
     runs-on: ubuntu-latest
