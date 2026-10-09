@@ -11,11 +11,15 @@ import static org.mockito.Mockito.when;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
+import org.apache.ibatis.builder.MapperBuilderAssistant;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.ragagent.common.knowledge.KnowledgeFinalizePort;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
@@ -27,10 +31,28 @@ import com.ragagent.knowledge.mapper.KnowledgeMapper;
  * <p><b>为什么值得单测</b>：没有它，文档会永远停在 {@code finalizing}。它的正确性完全体现在
  * <b>两条 UPDATE 的 WHERE 子句</b>上：递减必须钳在零、晋升必须"无 SELECT、无条件尝试"——
  * 先 SELECT 再决定曾导致 pending_subtasks_count 卡死。</p>
+ *
+ * <p><b>为什么必须自预热 lambda 缓存</b>（2026-10-10 补，修的是本仓的存量红 ✗）：
+ * {@code Knowledge::getId} 这类 lambda 由 MyBatis-Plus 的<b>静态</b>缓存解析（{@code LambdaUtils}），
+ * 而该缓存的初始化发生在 MyBatis 启动装配里 ⇒ 这是**纯单测**（无 Spring 上下文）时无人预热，
+ * {@code new LambdaUpdateWrapper<>()} 会抛 {@code can not find lambda cache for this entity}；
+ * 又恰好被实现的 {@code catch (RuntimeException)} 吞掉 ⇒ 表现为"zero interactions"（6 例全红 ✓）。
+ * 此前它偶发能绿，只因同 fork 里先跑过 Spring 测试 ⇒ **顺序依赖的假绿** ✗（{@code maxParallelForks=4}
+ * 后更容易落在未预热的 fork）。故在 {@link BeforeAll} 里显式初始化 TableInfo，测试自给自足。</p>
  */
 class KnowledgeFinalizeAdapterTest {
 
     private static final OffsetDateTime NOW = OffsetDateTime.of(2026, 10, 8, 0, 0, 0, 0, ZoneOffset.UTC);
+
+    /**
+     * MyBatis-Plus 的 lambda → 列名解析依赖<b>全局静态</b> TableInfo 缓存（生产里由 MyBatis 启动装配
+     * 填充）。纯单测须自行初始化，否则 {@code new LambdaUpdateWrapper<>()} 抛
+     * {@code can not find lambda cache for this entity}。
+     */
+    @BeforeAll
+    static void initLambdaCache() {
+        TableInfoHelper.initTableInfo(new MapperBuilderAssistant(new MybatisConfiguration(), ""), Knowledge.class);
+    }
 
     private final KnowledgeMapper knowledgeMapper = mock(KnowledgeMapper.class);
     private final KnowledgeFinalizeAdapter adapter = new KnowledgeFinalizeAdapter(knowledgeMapper);
