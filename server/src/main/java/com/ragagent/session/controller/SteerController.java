@@ -43,7 +43,7 @@ import com.ragagent.common.llm.ResponseType;
  * 关键契约：delivery 缺省 after（注入是显式 opt-in）；队列深度按未消费条数计
  * （max 10）；query 上限 10000 码点；live run 指向的消息已完成时清理并视为无 run；
  * consumed 标记在事件 data 上（跨副本一致）；503=活 turn 查询失败（可重试），
- * 409=活轮已切换/steer_id 被占用。
+ * 409=活轮已切换/steerId 被占用。
  */
 @RestController
 public class SteerController {
@@ -111,7 +111,7 @@ public class SteerController {
             for (StreamEvent delivered : previous) {
                 if (delivered.getId().equals(steerIdIn) && isConsumed(delivered)) {
                     if (!delivered.getContent().equals(query)) {
-                        throw conflict("steer_id already belongs to another message");
+                        throw conflict("steerId already belongs to another message");
                     }
                     return ok(ordered("status", "already_injected", "steerId", steerIdIn));
                 }
@@ -131,12 +131,12 @@ public class SteerController {
         if (steerId.isEmpty()) {
             steerId = UUID.randomUUID().toString();
         } else if (!isValidUuid(steerId)) {
-            throw new BizException(AppError.badRequest("invalid steer_id"));
+            throw new BizException(AppError.badRequest("invalid steerId"));
         }
         for (StreamEvent existingEvent : existing) {
             if (existingEvent.getId().equals(steerId)) {
                 if (!existingEvent.getContent().equals(query)) {
-                    throw conflict("steer_id already belongs to another message");
+                    throw conflict("steerId already belongs to another message");
                 }
                 Map<String, Object> body = new LinkedHashMap<>();
                 body.put("assistantMessageId", assistantId);
@@ -368,10 +368,10 @@ public class SteerController {
         StreamEvent evt = new StreamEvent(id,
                 ResponseType.STEER, query, true);
         Map<String, Object> data = new LinkedHashMap<>();
-        data.put("steer_id", id);
+        data.put("steerId", id);
         data.put("channel", channel == null ? "" : channel);
         data.put("delivery", DELIVERY_INJECT);
-        data.put("mentioned_items", mentionedItemsToRaw(mentionedItems));
+        data.put("mentionedItems", mentionedItemsToRaw(mentionedItems));
         evt.setData(data);
         return evt;
     }
@@ -385,11 +385,11 @@ public class SteerController {
                 raw.put("id", item.getId());
                 raw.put("name", item.getName());
                 raw.put("type", item.getType());
-                raw.put("kb_type", item.getKbType());
-                raw.put("kb_id", item.getKbId());
-                raw.put("kb_name", item.getKbName());
-                raw.put("service_id", item.getServiceId());
-                raw.put("skill_name", item.getSkillName());
+                raw.put("kbType", item.getKbType());
+                raw.put("kbId", item.getKbId());
+                raw.put("kbName", item.getKbName());
+                raw.put("serviceId", item.getServiceId());
+                raw.put("skillName", item.getSkillName());
                 out.add(raw);
             }
         }
@@ -445,7 +445,7 @@ public class SteerController {
             item.put("steerId", evt.getId());
             item.put("content", evt.getContent());
             item.put("delivery", deliveryOf(evt));
-            Object mentions = evt.getData() == null ? null : evt.getData().get("mentioned_items");
+            Object mentions = evt.getData() == null ? null : evt.getData().get("mentionedItems");
             if (mentions != null) {
                 item.put("mentionedItems", MentionedItem.fromRawList(mentions));
             }
@@ -454,7 +454,7 @@ public class SteerController {
         return out;
     }
 
-    /** steer_id 必须是合法 UUID。 */
+    /** steerId 必须是合法 UUID。 */
     static boolean isValidUuid(String value) {
         try {
             UUID.fromString(value);

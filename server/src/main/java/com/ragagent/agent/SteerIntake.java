@@ -63,7 +63,7 @@ final class SteerIntake {
             }
             String steerID = mapString(evt, "id");
             String userMessageID = engine.steerSink.persistSteerMessage(sessionId, messageID, steerID,
-                    content, evt.get("mentioned_items"), mapString(evt, "channel"));
+                    content, evt.get("mentionedItems"), mapString(evt, "channel"));
             if (userMessageID == null || userMessageID.isEmpty()) {
                 log.warn("[Agent] Steer persist failed for {}, leaving event pending", steerID);
                 continue;

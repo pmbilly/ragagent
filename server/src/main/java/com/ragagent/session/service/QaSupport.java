@@ -459,10 +459,10 @@ public final class QaSupport {
         evt.setContent(query);
         evt.setDone(true);
         Map<String, Object> data = new LinkedHashMap<>();
-        data.put("steer_id", id);
+        data.put("steerId", id);
         data.put("channel", channel);
         data.put("delivery", STEER_DELIVERY_INJECT);
-        data.put("mentioned_items", mentionedItemsToRaw(mentionedItems));
+        data.put("mentionedItems", mentionedItemsToRaw(mentionedItems));
         evt.setData(data);
         return evt;
     }
@@ -476,11 +476,11 @@ public final class QaSupport {
                 raw.put("id", item.getId());
                 raw.put("name", item.getName());
                 raw.put("type", item.getType());
-                raw.put("kb_type", item.getKbType());
-                raw.put("kb_id", item.getKbId());
-                raw.put("kb_name", item.getKbName());
-                raw.put("service_id", item.getServiceId());
-                raw.put("skill_name", item.getSkillName());
+                raw.put("kbType", item.getKbType());
+                raw.put("kbId", item.getKbId());
+                raw.put("kbName", item.getKbName());
+                raw.put("serviceId", item.getServiceId());
+                raw.put("skillName", item.getSkillName());
                 out.add(raw);
             }
         }

@@ -23,6 +23,7 @@
   "engine_type": "注释引用（非契约键）（VectorStoreSettings 注释 ×3；wire 是 camel engineType，VectorStoreResponse:19）",
   "extra_config": "注释引用（非契约键）（ModelEditorDialog:408 thinking_control 路径说明）",
   "indexing_strategy": "注释引用（非契约键）（Input-field:345 / KBEditorModal:1236,1267 能力位回退说明；wire 是 camel indexingStrategy）",
+  "kb_name": "本地 UI 类型（GlobalCommandPalette 的 CmdkChunk：由 camel 源字段本地算出、仅渲染未出网；B135c 逐条复核）",
   "last_request_state": "注释引用（非契约键）（chat/index:254,533 会话恢复链路说明；服务端自管字段）",
   "launcher_icon": "注释引用 + widgetPublicConfigContract 守卫断言其不得出现（已修 camel launcherIcon 面）",
   "max_concurrency": "i18n 文案值（模型并发上限设置说明）+ 注释引用（api/model:38；wire 是 camel maxConcurrency）",

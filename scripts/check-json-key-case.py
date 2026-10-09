@@ -151,20 +151,14 @@ BASELINE: dict[str, set[str]] = {
     'session/controller/QaSseOrchestrator.java': {'assistant_created_at', 'assistant_message_id', 'session_id', 'user_created_at', 'user_message_id'},
     # 同上（SSE/消息载荷）
     'session/controller/SessionController.java': {'message_id', 'session_id'},
-    # steer 载荷（与 agent_steps 同族）
-    'session/controller/SteerController.java': {'kb_id', 'kb_name', 'kb_type', 'mentioned_items', 'service_id', 'skill_name', 'steer_id'},
     # MyBatis 列名写入点（非 JSON 键）
     'session/mapper/MessageRepository.java': {'agent_duration_ms', 'agent_id', 'agent_tenant_id', 'is_completed', 'is_fallback', 'knowledge_id', 'model_id', 'rendered_content', 'request_id', 'updated_at'},
     # MyBatis 列名写入点（非 JSON 键）
     # agent_steps 落库列 + 历史回放
     'session/service/AgentStreamBridge.java': {'completed_at', 'duration_ms', 'event_id', 'final_content', 'is_fallback', 'message_id', 'messages_after', 'messages_before', 'pending_id', 'session_id', 'split_turn', 'steer_id', 'tokens_after', 'tokens_before', 'tool_call_id', 'tool_name', 'total_duration_ms', 'total_steps', 'user_message_id'},
     # agent_steps/推荐面落库 + 回放
-    # agent_steps 落库列 + 回放
-    'session/service/QaSupport.java': {'kb_id', 'kb_name', 'kb_type', 'mentioned_items', 'service_id', 'skill_name', 'steer_id'},
     # 观测面（B135 复核改标：setupSpan.finish 的 setup 输出 + 日志字段 Map.of("event", …, "duration_ms", …)）
     'session/service/SessionKnowledgeQaService.java': {'duration_ms', 'error_type', 'knowledge_base_ids', 'search_targets', 'session_id', 'total_duration_ms', 'total_stages'},
-    # agent_steps 落库列 + 回放
-    'session/service/SteerSinkBridge.java': {'mentioned_items'},
     # HTTP query 参数名（非 JSON 键）
     'storage/fileserve/FileProxyService.java': {'file_path'},
     # 存储引擎面（snake，B14 冻结）

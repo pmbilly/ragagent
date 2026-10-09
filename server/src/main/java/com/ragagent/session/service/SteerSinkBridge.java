@@ -99,16 +99,16 @@ public final class SteerSinkBridge implements SteerSink {
         return out;
     }
 
-    /** 事件 → 引擎侧 raw map（id/content/mentioned_items/channel/delivery）。 */
+    /** 事件 → 引擎侧 raw map（id/content/mentionedItems/channel/delivery）。 */
     private static Map<String, Object> steerEventToRaw(StreamEvent evt) {
         Map<String, Object> raw = new LinkedHashMap<>();
         raw.put("id", evt.getId());
         raw.put("content", evt.getContent());
         Map<String, Object> data = evt.getData();
         if (data != null) {
-            Object m = data.get("mentioned_items");
+            Object m = data.get("mentionedItems");
             if (m instanceof List<?> l) {
-                raw.put("mentioned_items", l);
+                raw.put("mentionedItems", l);
             }
             Object ch = data.get("channel");
             if (ch instanceof String s) {

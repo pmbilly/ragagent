@@ -9,8 +9,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  * 也要输出成空串，不能省略（§1.6 禁止条件键）。键名＝Java 字段名
  * （{@code kbType}/{@code kbId}/{@code kbName}/{@code serviceId}/{@code skillName}）。</p>
  *
- * <p>⚠️ 它**落两处 jsonb**（{@code messages.mentioned_items} 与
- * {@code sessions.agent_config.mentioned_items}），换键名必须配存量迁移。</p>
+ * <p>⚠️ 它**落两处 jsonb**（{@code messages.mentionedItems} 与
+ * {@code sessions.agent_config.mentionedItems}），换键名必须配存量迁移。</p>
  *
  * <p>{@link #fromRawMap} 负责从 steer 事件里 JSON 安全的 map 形态重建本结构
  * （只认 string 类型的值，其余当空串）。</p>
@@ -44,7 +44,7 @@ public class MentionedItem {
     }
 
     /**
-     * 从"原始 map 列表"重建（steer 事件 data 里的 {@code mentioned_items} 这类**冻结载荷**：
+     * 从"原始 map 列表"重建（steer 事件 data 里的 {@code mentionedItems} 这类**冻结载荷**：
      * 键名是下划线的线协议形状，不是本实体的字段名）。非 List 输入返回空列表。
      */
     public static java.util.List<MentionedItem> fromRawList(Object raw) {
@@ -79,11 +79,11 @@ public class MentionedItem {
         item.id = mapString(m, "id");
         item.name = mapString(m, "name");
         item.type = mapString(m, "type");
-        item.kbType = mapString(m, "kb_type");
-        item.kbId = mapString(m, "kb_id");
-        item.kbName = mapString(m, "kb_name");
-        item.serviceId = mapString(m, "service_id");
-        item.skillName = mapString(m, "skill_name");
+        item.kbType = mapString(m, "kbType");
+        item.kbId = mapString(m, "kbId");
+        item.kbName = mapString(m, "kbName");
+        item.serviceId = mapString(m, "serviceId");
+        item.skillName = mapString(m, "skillName");
         return item;
     }
 
