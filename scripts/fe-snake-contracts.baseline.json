@@ -19,6 +19,8 @@
   "description_language": "上传覆盖面冻结键（B13 已知缺口：process_overrides 后端暂不消费、前端写读自洽；B67 两面规则禁混读，后端解析运行时按 snake 读）",
   "display_name": "仅存于守卫/测试自身（B72 修复后的禁用模式）（crossFaceKeyContract 知识面 legacy 对照表；接口下发 camel fileName/errorMessage）",
   "enable_parent_child": "上传覆盖面冻结键（B13 已知缺口：process_overrides 后端暂不消费、前端写读自洽；B67 两面规则禁混读，后端解析运行时按 snake 读）",
+  "end_at": "仅存于守卫/测试自身（crossFaceKeyContract 第①条 forbid 正则列出 chunk 面已修失配键；wire 是 camel endAt，SearchResult 字段）",
+  "start_at": "仅存于守卫/测试自身（同上；wire 是 camel startAt，SearchResult 字段）",
   "end_time": "已废弃死查询参数（同 start_time）",
   "engine_type": "注释引用（非契约键）（VectorStoreSettings 注释 ×3；wire 是 camel engineType，VectorStoreResponse:19）",
   "extra_config": "注释引用（非契约键）（ModelEditorDialog:408 thinking_control 路径说明）",

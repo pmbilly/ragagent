@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.llm.ResponseType;
 import com.ragagent.llm.domain.StreamResponse;
@@ -60,33 +61,43 @@ class StreamResponseBuilderTest {
         assertThat(json).contains("\"knowledgeFilename\":\"a.md\",\"knowledgeSource\":\"file\"");
         assertThat(json).contains("\"knowledgeBaseId\":\"kb-1\"");
         // data 直通：库内 snake 键 + 未知键原样带出
+        // 重建结果**自身**（不是 data 直通）必须真的带上这些字段——
+        // 若读者按错的键形状读，这里会全空（B135b1 修复的正是这个静默缺陷）
+        JsonNode rebuilt = MAPPER.readTree(json).path("knowledgeReferences").path(0);
+        assertThat(rebuilt.path("knowledgeId").asText()).isEqualTo("kb-1");
+        assertThat(rebuilt.path("chunkIndex").asInt()).isEqualTo(3);
+        assertThat(rebuilt.path("knowledgeTitle").asText()).isEqualTo("t");
+        assertThat(rebuilt.path("startAt").asInt()).isEqualTo(10);
+        assertThat(rebuilt.path("endAt").asInt()).isEqualTo(20);
+        assertThat(rebuilt.path("knowledgeFilename").asText()).isEqualTo("a.md");
+        assertThat(rebuilt.path("knowledgeSource").asText()).isEqualTo("file");
         assertThat(json).contains("\"data\":{\"references\":[");
-        assertThat(json).contains("\"chunk_index\":3");
+        assertThat(json).contains("\"chunkIndex\":3");
         assertThat(json).contains("\"extra_unknown_key\":\"ignored\"");
     }
 
     /**
-     * 与 {@code data.references[]} 线格式同形的输入——注意故意用<b>乱序</b>的
+     * 与 {@code SearchResult} 序列化后（＝{@code data.references[]} 与 Redis 回放）同形的输入——注意故意用<b>乱序</b>的
      * {@code LinkedHashMap}，并混入一个不认识的键，验证两件事：
      * 输出键序与插入序无关（按键名排序），未知键照旧回显在 {@code data} 里。
      */
     private static Map<String, Object> redisRoundTrippedRef() {
         Map<String, Object> ref = new LinkedHashMap<>();
-        ref.put("knowledge_id", "kb-1");
+        ref.put("knowledgeId", "kb-1");
         ref.put("id", "chunk-1");
-        ref.put("chunk_index", 3);
+        ref.put("chunkIndex", 3);
         ref.put("content", "hello");
-        ref.put("knowledge_title", "t");
-        ref.put("start_at", 10);
-        ref.put("end_at", 20);
+        ref.put("knowledgeTitle", "t");
+        ref.put("startAt", 10);
+        ref.put("endAt", 20);
         ref.put("seq", 2);
         ref.put("score", 0.75);
-        ref.put("chunk_type", "text");
-        ref.put("parent_chunk_id", "");
-        ref.put("image_info", "");
-        ref.put("knowledge_filename", "a.md");
-        ref.put("knowledge_source", "file");
-        ref.put("knowledge_description", "");
+        ref.put("chunkType", "text");
+        ref.put("parentChunkId", "");
+        ref.put("imageInfo", "");
+        ref.put("knowledgeFilename", "a.md");
+        ref.put("knowledgeSource", "file");
+        ref.put("knowledgeDescription", "");
         ref.put("knowledgeBaseId", "kb-1");
         ref.put("metadata", Map.of("lang", "zh"));
         ref.put("extra_unknown_key", "ignored");

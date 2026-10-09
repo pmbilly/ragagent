@@ -148,15 +148,13 @@ BASELINE: dict[str, set[str]] = {
     # web 引用载荷（同 ReferencesSupport 存量面）
     'retrieval/support/WebResultConverter.java': {'published_at'},
     # 工具结果/附件载荷（存量面，同 tool-results）
-    # SSE/消息载荷（与 agent_steps 同族，改则直播与回放脱节）
-    'session/controller/QaSseOrchestrator.java': {'assistant_created_at', 'assistant_message_id', 'session_id', 'user_created_at', 'user_message_id'},
+    # SSE `agentQuery` 的 data 载荷＝**冻结的线协议**（§14.9l 前提判定 2；FE `messageTimestamp.ts` 明写"别顺手 camelCase"且有断言钉住）⇒ 待拍板；条目按实际存在的键收窄（原 5 键里 3 个后端已无）
+    'session/controller/QaSseOrchestrator.java': {'assistant_created_at', 'user_created_at'},
     # 同上（SSE/消息载荷）
     'session/controller/SessionController.java': {'message_id', 'session_id'},
     # MyBatis 列名写入点（非 JSON 键）
     'session/mapper/MessageRepository.java': {'agent_duration_ms', 'agent_id', 'agent_tenant_id', 'is_completed', 'is_fallback', 'knowledge_id', 'model_id', 'rendered_content', 'request_id', 'updated_at'},
     # MyBatis 列名写入点（非 JSON 键）
-    # agent_steps 落库列 + 历史回放
-    'session/service/AgentStreamBridge.java': {'completed_at', 'duration_ms', 'event_id', 'final_content', 'is_fallback', 'message_id', 'messages_after', 'messages_before', 'pending_id', 'session_id', 'split_turn', 'steer_id', 'tokens_after', 'tokens_before', 'tool_call_id', 'tool_name', 'total_duration_ms', 'total_steps', 'user_message_id'},
     # agent_steps/推荐面落库 + 回放
     # 观测面（B135 复核改标：setupSpan.finish 的 setup 输出 + 日志字段 Map.of("event", …, "duration_ms", …)）
     'session/service/SessionKnowledgeQaService.java': {'duration_ms', 'error_type', 'knowledge_base_ids', 'search_targets', 'session_id', 'total_duration_ms', 'total_stages'},
