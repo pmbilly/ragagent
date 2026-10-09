@@ -1,6 +1,5 @@
 package com.ragagent.datasource.connector.notion;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * {@code "equation"} 型富文本的内容。
@@ -9,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public final class NotionEquation {
 
-    @JsonProperty("expression")
     public String expression;
 
     public String expression() {

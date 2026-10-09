@@ -363,7 +363,7 @@ JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
 ## 7. 模块约定与坑（必读）
 
 1. **两套错误形态刻意并存**：主控 `{"error":"..."}` 单键体 vs 凭据 `AppError` 信封——两个 controller 的类注释都写明"别统一"。顺手"修复"它会破坏 39 个 `ds-*` 夹具里的错误金片。
-2. **`connector/` 第三方线格式 350 处永久冻结**（`FeishuApiTypes`/`YuqueApiTypes`/`ImaApiTypes`/`GitLabClient`/`NotionClient` 等）：字段名由对方 API 决定，与 mcp 的 RFC 面同类——**别把它们"改回 camelCase"**（HANDOFF §14.6 / §14.9q）。要动只有一种情况：对接对方 API 版本升级。
+2. **`connector/` 第三方线格式 350 处永久冻结**（**2026-10-09 B152 补注**：其中「键=字段名」的**冗余注解 12 处已清** ✓ —— 线格式（键名与字段序）**仍永久冻结** ✓；带蛇形键/混用改名注解的那部分本就必要，连同 49 个混用类型一并保留 ✓）（`FeishuApiTypes`/`YuqueApiTypes`/`ImaApiTypes`/`GitLabClient`/`NotionClient` 等）：字段名由对方 API 决定，与 mcp 的 RFC 面同类——**别把它们"改回 camelCase"**（HANDOFF §14.6 / §14.9q）。要动只有一种情况：对接对方 API 版本升级。
 3. **`lf_*` 五键冻结**：`DataSourceSyncPayload` 里 `lf_trace_id` 等是 `TracingContext` **平铺载具的命名空间前缀**（四个域共用同一形状）；去前缀会与载荷自有字段撞名（`userId`/`sessionId`）。要清理应改成嵌套 `tracing` 键——那是形状变更，另批（HANDOFF §14.9q D3 / §14.6）。
 4. **`config` 内层键是数据不是键**：外层包装（`type`/`credentials`/`resourceIds`/`settings`）是我方 schema；内层 `settings`/`credentials` 的键是各 connector 的配置字段名（如 `app_id`），由 `ConnectorMetadata` 描述符与前端表单按同名提交——改了同时打断表单与既有行（§14.9q 入场判定）。
 5. **显式 SQL 里的 jsonb 必须逐条挂 typeHandler**：实体上的 `@TableField(typeHandler)` 在 `@Select`/wrapper `set()` 路径**不生效**，漏挂退化成 Java 序列化落库成字符串（`SyncLogMapper` / `DataSourceRepository` 注释原文警告）。
@@ -397,7 +397,7 @@ JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
 | ~~`@JsonProperty` 换锚 493 处~~ | **已解决（2026-10-01~10-02，D1~D3）** | 493→417→366→355；余 355 全是冻结面（350 connector 线格式 + 5 `lf_*`），**可换锚面 = 0**；落库迁移 SQL 已跑（dev 库 0 行、真 PG 合成行验证）；`DataSourceJsonTest` 的 Go 逐字节 golden 已按"内部载荷非对外契约"改写为本方形状（HANDOFF §14.9q） |
 | InProcess 队列多实例重复同步 | 部署风险 | 多副本上线前切 Redis 实现（`datasource.redis-enabled=true`）；开关打开但连不上=启动失败，属预期（§7 第 8 条） |
 | `MapperKnowledgeBridge` 是"最小可用闭环" | 技术债 | `KnowledgeService` 补齐 metadata/tagIDs 入参后可收敛回正道；在那之前新同步字段要**显式评估**是否进了这条最小闭环，否则落库后找回不了 |
-| 350 处 connector 线格式 + `lf_*` 5 键 | **永久冻结（非待办）** | 列在此处只为防"误报为债"；改动条件见 §7 第 2/3 条 |
+| 350 处 connector 线格式（**其中冗余注解 12 处于 B152 已清，余 312 处按此清单守**）+ `lf_*` 5 键 | **永久冻结（非待办）** | 列在此处只为防"误报为债"；改动条件见 §7 第 2/3 条 |
 | `sync_logs` 物理删 + retention 清理 | 已知设计 | 日志会被 `CleanupOldLogs` 按 `sync_log_retention_days`（默认 30）删掉——别把 sync_log 当永久审计源，审计汇总另有 audit 域 |
 
 ---

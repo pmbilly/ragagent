@@ -1,6 +1,5 @@
 package com.ragagent.datasource.connector.notion;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * mention 里的日期信息。
@@ -9,10 +8,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public final class NotionDateMention {
 
-    @JsonProperty("start")
     public String start;
 
-    @JsonProperty("end")
     public String end;
 
     public String start() {

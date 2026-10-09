@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
@@ -26,25 +25,18 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public class OllamaChatRequest {
 
-    @JsonProperty("model")
     private String model = "";
-    @JsonProperty("messages")
     private List<OllamaMessage> messages = new ArrayList<>();
-    @JsonProperty("stream")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Boolean stream;
     /** 响应格式约束，直接透传（对应 ChatOptions.format） */
-    @JsonProperty("format")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private JsonNode format;
-    @JsonProperty("tools")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<OllamaTool> tools;
     /** 模型参数（temperature / top_p / num_predict 等），恒输出 */
-    @JsonProperty("options")
     private Map<String, Object> options = new LinkedHashMap<>();
     /** 思考开关：Boolean（或 "high"/"medium"/"low" 字符串） */
-    @JsonProperty("think")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Object think;
 

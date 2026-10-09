@@ -1,6 +1,5 @@
 package com.ragagent.datasource.connector.notion;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 富文本的样式信息。
@@ -13,21 +12,15 @@ public final class NotionAnnotations {
     /** 缺省形态：所有样式关闭。 */
     public static final NotionAnnotations EMPTY = new NotionAnnotations();
 
-    @JsonProperty("bold")
     public boolean bold;
 
-    @JsonProperty("italic")
     public boolean italic;
 
-    @JsonProperty("strikethrough")
     public boolean strikethrough;
 
-    @JsonProperty("underline")
     public boolean underline;
 
-    @JsonProperty("code")
     public boolean code;
 
-    @JsonProperty("color")
     public String color;
 }

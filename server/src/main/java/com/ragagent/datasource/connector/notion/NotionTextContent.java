@@ -1,6 +1,5 @@
 package com.ragagent.datasource.connector.notion;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * {@code "text"} 型富文本的内容。
@@ -11,10 +10,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public final class NotionTextContent {
 
-    @JsonProperty("content")
     public String content;
 
-    @JsonProperty("link")
     public Link link;
 
     public String content() {
@@ -23,7 +20,6 @@ public final class NotionTextContent {
 
     /** 只带 {@code url} 的链接引用。 */
     public static final class Link {
-        @JsonProperty("url")
         public String url;
     }
 }

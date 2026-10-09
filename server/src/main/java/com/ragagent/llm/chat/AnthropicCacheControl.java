@@ -1,7 +1,6 @@
 package com.ragagent.llm.chat;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Anthropic content 断点标记。
@@ -11,9 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class AnthropicCacheControl {
 
-    @JsonProperty("type")
     private String type = "";
-    @JsonProperty("ttl")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String ttl;
 

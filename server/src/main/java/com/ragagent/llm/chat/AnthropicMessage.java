@@ -1,6 +1,5 @@
 package com.ragagent.llm.chat;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Anthropic 消息。
@@ -11,9 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class AnthropicMessage {
 
-    @JsonProperty("role")
     private String role = "";
-    @JsonProperty("content")
     private Object content;
 
     public AnthropicMessage() {

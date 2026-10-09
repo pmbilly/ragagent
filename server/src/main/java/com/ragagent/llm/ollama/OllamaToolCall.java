@@ -2,7 +2,6 @@ package com.ragagent.llm.ollama;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -20,10 +19,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OllamaToolCall {
 
-    @JsonProperty("id")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String id;
-    @JsonProperty("function")
     private Function function = new Function();
 
     public OllamaToolCall() {
@@ -39,12 +36,9 @@ public class OllamaToolCall {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Function {
 
-        @JsonProperty("index")
         private int index;
-        @JsonProperty("name")
         private String name = "";
         /** 参数对象，恒非 null：空即 {@code {}}。 */
-        @JsonProperty("arguments")
         private ObjectNode arguments = JsonNodeFactory.instance.objectNode();
 
         public int getIndex() { return index; }

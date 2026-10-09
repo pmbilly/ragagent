@@ -1,6 +1,5 @@
 package com.ragagent.llm.domain;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -11,9 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class ChatTool {
 
     /** 恒为 "function" */
-    @JsonProperty("type")
     private String type = "function";
-    @JsonProperty("function")
     private FunctionDef function = new FunctionDef();
 
     public ChatTool() {

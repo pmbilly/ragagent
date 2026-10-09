@@ -1,6 +1,5 @@
 package com.ragagent.llm.domain;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 函数调用详情。
@@ -9,10 +8,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class FunctionCall {
 
-    @JsonProperty("name")
     private String name = "";
     /** JSON 字符串（**不是**对象；Ollama 路径另用 map）。 */
-    @JsonProperty("arguments")
     private String arguments = "";
 
     public FunctionCall() {

@@ -6,9 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.DisplayName;
@@ -31,50 +29,14 @@ import org.junit.jupiter.api.Test;
  *       「field 'name' is required」）。</li>
  * </ol>
  *
- * <p>必要形态因此只剩四类，规则见下：键≠隐式名（关键字冲突等）· 键形如 {@code isXxx} 的布尔属性
- * （getter 的隐式名会丢 {@code is}）· Jackson 探测不到的成员 · 外部协议面（{@link #ALLOWED_FACES} /
- * {@link #ALLOWED_FILES}，每条带理由）。另有一类"看似冗余实为字段序锚"的：见
- * {@link #hasRenamedAnnotation}（混用改名注解的类型，整文件跳过）。</p>
+ * <p>必要形态只剩四类，规则见下：键≠隐式名（外部协议 / 关键字冲突等）· 键形如 {@code isXxx} 的布尔属性
+ * （getter 的隐式名会丢 {@code is}）· Jackson 探测不到的成员 · 「字段序锚」——见
+ * {@link #hasRenamedAnnotation}（混用改名注解的类型，整文件跳过）。<b>B152 起不再有面级放行表</b>：
+ * 外部协议面的冗余注解（43 处）也已清掉，剩下的全是上面四类。</p>
  *
  * <p>基线 <b>0</b>（不是棘轮——B151 已把我们自己的面清零，从第一天起就是"新增即红"）。</p>
  */
 class JsonPropertyHygieneTest {
-
-    /**
-     * 允许逐字段 {@code @JsonProperty} 的面（都带理由）。清理某面后请同步收紧本表——留着不疼，
-     * 但下一批人就不知道那面其实已经干净了。
-     */
-    private static final Map<String, String> ALLOWED_FACES = allowedFaces();
-
-    private static Map<String, String> allowedFaces() {
-        Map<String, String> faces = new LinkedHashMap<>();
-        faces.put("datasource/connector/", "连接器：对方 API 的蛇形键（§14.6 冻结面）");
-        faces.put("llm/chat/Anthropic", "Anthropic 线格式（外部协议）");
-        faces.put("llm/ollama/", "Ollama 线格式（外部协议）");
-        faces.put("llm/provider/", "provider 线格式（外部协议）");
-        faces.put("rerank/", "RankResult 供 models/{id}/debug 的 raw_response（§14.6）");
-        return faces;
-    }
-
-    /**
-     * 逐文件放行：{@code llm/domain} 下「provider 线格式的类型化视图」——它们的键就是要原样进
-     * provider 请求体/响应解析的（§14.6「provider 请求体」边界），其中部分还是蛇形冻结键
-     * （{@code multi_content}/{@code tool_call_id}）。面内新旧注解一律不动。
-     *
-     * <p>同包的 {@code StreamResponse} <b>不在</b>此表：它是我们自己的 SSE 事件体（键已全 camel），
-     * 冗余注解已在 B151 清掉，故继续受本守卫约束（防回流）。</p>
-     */
-    private static final Map<String, String> ALLOWED_FILES = allowedFiles();
-
-    private static Map<String, String> allowedFiles() {
-        Map<String, String> files = new LinkedHashMap<>();
-        String why = "provider 线格式视图（OpenAI/Ollama 兼容，§14.6 边界）";
-        for (String f : new String[] {"ChatMessage", "ChatOptions", "ChatResponse", "ChatTool",
-                "FunctionCall", "FunctionDef", "ImageUrl", "MessageContentPart", "ToolCall"}) {
-            files.put("llm/domain/" + f + ".java", why);
-        }
-        return files;
-    }
 
     /**
      * 短形式与<b>全限定</b>形式都要认——HANDOFF §14.6 的口径警告：只扫短名会漏（{@code QaRequests} 那批用
@@ -103,18 +65,13 @@ class JsonPropertyHygieneTest {
                 for (Path file : walk.filter(Files::isRegularFile)
                         .filter(f -> f.toString().endsWith(".java")).sorted().toList()) {
                     String rel = relative(file);
-                    if (ALLOWED_FACES.keySet().stream().anyMatch(rel::startsWith)
-                            || ALLOWED_FILES.containsKey(rel)) {
-                        continue;
-                    }
                     collect(file, rel, offenders);
                 }
             }
         }
         assertThat(offenders)
                 .as("@JsonProperty 只是噪音的情形：键=隐式属性名 **且** Jackson 本会自己探测到它"
-                        + "（record 分量 / public 字段 / public 访问器）。必要形态见类注释；外部面 %s",
-                        ALLOWED_FACES.keySet())
+                        + "（record 分量 / public 字段 / public 访问器）。其余形态见类注释，都属必要")
                 .isEmpty();
     }
 

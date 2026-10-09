@@ -1,7 +1,6 @@
 package com.ragagent.llm.domain;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
@@ -12,10 +11,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 public class ImageUrl {
 
     /** URL 或 base64 data URI */
-    @JsonProperty("url")
     private String url = "";
     /** "auto" / "low" / "high" */
-    @JsonProperty("detail")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String detail;
 

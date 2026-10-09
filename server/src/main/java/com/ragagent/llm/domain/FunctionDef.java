@@ -1,6 +1,5 @@
 package com.ragagent.llm.domain;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -10,12 +9,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 @JsonPropertyOrder({"name", "description", "parameters"})
 public class FunctionDef {
 
-    @JsonProperty("name")
     private String name = "";
-    @JsonProperty("description")
     private String description = "";
     /** JSON Schema（JsonNode 自由构造，原样透传） */
-    @JsonProperty("parameters")
     private JsonNode parameters;
 
     public FunctionDef() {
