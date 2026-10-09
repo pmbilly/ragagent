@@ -45,7 +45,7 @@
     "server/src/main/java/com/ragagent/knowledge/task/KnowledgeProcessWorker.java": 847,
     "server/src/main/java/com/ragagent/llm/chat/AnthropicChat.java": 760,
     "server/src/main/java/com/ragagent/mcp/service/McpServiceService.java": 605,
-    "server/src/main/java/com/ragagent/memory/mapper/MemoryIndexStore.java": 919,
+    "server/src/main/java/com/ragagent/memory/mapper/MemoryIndexStore.java": 631,
     "server/src/main/java/com/ragagent/memory/service/MemoryExtractionService.java": 718,
     "server/src/main/java/com/ragagent/memory/service/MemoryService.java": 765,
     "server/src/main/java/com/ragagent/model/controller/ModelDebugController.java": 610,
@@ -81,11 +81,6 @@
       "status": "accepted",
       "since": "2026-10-01",
       "reason": "摄取 worker 的状态机与补偿面同生命周期，再切不落在自然接缝上（已在类 javadoc 自述）"
-    },
-    "server/src/main/java/com/ragagent/memory/mapper/MemoryIndexStore.java": {
-      "status": "accepted",
-      "since": "2026-10-01",
-      "reason": "六段同属「索引侧读写」一个关注点，再切不落在自然接缝上（B122 复核：持有 MemoryRepository 回引，六段共用 repo 与方言判定；已在类 javadoc 自述）"
     }
   }
 }

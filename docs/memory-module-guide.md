@@ -67,7 +67,7 @@ graph TB
     AUTH -. 共享载荷类型 .-> ROOT
 ```
 
-**三个必须知道的数字**：最大类 919 行（`mapper/MemoryIndexStore`，全仓仅剩的 4 个 ≥800 行**登记例外**之一，用户 2026-10-01 定调"不硬切"）；`service/` 6,355 行（约占 50%，门面 + 切片全在这）；**仓储（3,240 行 / 12 文件）不住 `repository/` 而住 `mapper/`**——历史约定，见 §9。
+**三个必须知道的数字**：最大类 **`service/MemoryService` 765 行**（B130 复核后：原最大类 `mapper/MemoryIndexStore` 919 行已**出榜**——向量面独立为 `mapper/MemoryVectorStore`，例外解除；本域 **≥800 归零**）；`service/` 6,355 行（约占 50%，门面 + 切片全在这）；**仓储（3,240 行 / 12 文件）不住 `repository/` 而住 `mapper/`**——历史约定，见 §9。
 
 ---
 
@@ -82,7 +82,7 @@ graph TB
 | `service/` | 26 / 6,355 | 门面 `MemoryService` + 切片：`MemoryCatalogOps`（管理面）/ `MemoryInsightOps`（检索面）/ `MemoryRecallOps`（召回装配）/ `MemoryExtractionService` + `MemoryTranscriptOps` + `MemoryExtractionLlm`（蒸馏）/ `MemoryConsolidationService`（整仓回顾）/ `MemoryVectorService` / `MemoryRecallSelector` / `MemoryTopicResolver`；队列接口 + InProcess/Redis 两实现 | SQL（→ `mapper/`）、HTTP 关注点 |
 | `domain/` | 27 / 2,496 | 7 个实体（`@TableName`）+ jsonb 值类型（`MemoryExtractionState` 等）+ 2 个 TypeHandler + 纯工具（`MemoryText` / `MemoryRender` / `MemoryVectors`）+ 领域类型 `MemoryPage` + 4 个领域异常 | 线格式请求体（→ `dto/`；响应实体直接用 domain，见 §3.2） |
 | `dto/` | 6 / 79（5 类型 + package-info） | 3 个带体端点的请求 record + `MemoryListResponse` / `MemoryExportResponse` 两个响应壳 | 域形状（响应体=domain 实体，直出） |
-| `mapper/` | 12 / 3,240 | 仓储门面 `MemoryRepository`（454 行）+ `MemoryItemStore`（458）+ `MemoryIndexStore`（919）+ 7 个 MyBatis-Plus 接口 + `MemoryTxTemplate` + `VectorHitRow` | ⚠️ 这里**不是** MyBatis-Plus 纯接口层——仓储门面因历史约定住在此包（HANDOFF §12 注） |
+| `mapper/` | 12 / 3,240 | 仓储门面 `MemoryRepository`（454 行）+ `MemoryItemStore`（458）+ `MemoryIndexStore`（636，B130 起只余话题/亲和/抽取）+ `MemoryVectorStore`（318，向量面）+ 7 个 MyBatis-Plus 接口 + `MemoryTxTemplate` + `VectorHitRow` | ⚠️ 这里**不是** MyBatis-Plus 纯接口层——仓储门面因历史约定住在此包（HANDOFF §12 注） |
 
 ### 1.2 依赖方向（谁消费我、我消费谁）
 
@@ -358,7 +358,7 @@ flowchart LR
 | 改抽取提示词 / 模型输出解析 | `service/MemoryExtractionLlm` | 这里是全域仅存的 22 处 `@JsonProperty` 所在——**LLM 载荷登记保留**，别顺手清 |
 | 改蒸馏节奏 / 防抖 / 租约 | `service/MemoryExtractionService` + `MemoryRunBudget` + `InProcessMemoryExtractTaskQueue` / `RedisMemoryExtractTaskQueue` | 水位线先行语义不许破；投递失败必须抛异常让调用方释放槽位 |
 | 改召回注入内容 / 预算 | `service/MemoryRecallOps` + `MemoryRecallSelector` + `domain/MemoryRender` | "永不失败"原则；注入≠上报两个集合；码点预算连换行都算 |
-| 改语义召回 / 向量编解码 | `service/MemoryVectorService` + `domain/MemoryVectors` + `mapper/MemoryIndexStore` | `embeddingModelId` 留空＝关语义召回只用字面；pgvector 列缺失要走回退（H2 是 VARBINARY） |
+| 改语义召回 / 向量编解码 | `service/MemoryVectorService` + `domain/MemoryVectors` + `mapper/MemoryVectorStore` | `embeddingModelId` 留空＝关语义召回只用字面；pgvector 列缺失要走回退（H2 是 VARBINARY） |
 | 改整仓回顾 | `service/MemoryConsolidationService` | 不许上请求路径；结果对象 `MemoryConsolidationResult` 直接是响应体 |
 | 改工作区配置语义 | `common/settings/MemoryConfig` + `MemoryKeys`（不在本包！） | HTTP 面在 **auth** 的 KV 端点；改键名必须同批跑存量迁移 SQL，且**先改 auth 侧 `TenantCatalogContractTest` 的 `ct-kv-mem-*` 夹具** |
 | 改话题 / 文档亲和度 | `service/MemoryTopicResolver` + `MemoryCatalogOps` / `MemoryInsightOps` | `promote` 是动作端点（200）；aliases 与 pending_sessions 共用 TypeHandler |
@@ -399,7 +399,7 @@ cd frontend && npx vue-tsc --build --force && npm test
 3. **`recall` 永不失败**（`MemoryRecallOps` 类注释）：记忆是增强，任何失败必须退化成普通回答。往召回链上加"会抛异常"的步骤前先想清楚退化路径。
 4. **喂给模型的文本不是给人看的，别"顺手优化"**：`MemoryRender` 的分组顺序 / 英文表头 / 连字符 / 码点预算算法（换行也算码点）都是已钉住的输出契约；`MemoryText` 的四处口径（码点计数、Unicode White_Space 而非 `isWhitespace`、`Locale.ROOT`、CJK 正则不写 `\b`）同理。
 5. **仓储住在 `mapper/` 包**（含 `MemoryRepository` / `MemoryItemStore` / `MemoryIndexStore` / `MemoryTxTemplate`）：HANDOFF §12 注明"历史约定，其批次跟随 `repository/` 分层"。别按 knowledge 的骨架想当然去找 `repository/`，也别在功能批里顺手搬家（结构搬迁批闸门 ≈3m25s，要单独立批）。
-6. **`MemoryIndexStore` 919 行是登记例外**（HANDOFF §14.3；六段同属"索引侧读写"一个关注点，用户 2026-10-01 定调不硬切；B70 后 A7 白名单理由收窄为"列存在性探测"）。复核它先读类注释，别按"神类"惯性开刀。
+6. **`MemoryIndexStore` 的"登记例外"已于 B130 复核解除**（919→636，向量面独立为 `MemoryVectorStore`；当年理由「六段同属『索引侧读写』一个关注点」是**层次**论点而非内聚论点，按**表家族**切开即见接缝）。**复核判据可复用**：看例外理由说的是层次还是内聚、看每簇用哪个 mapper/表。原句留档：（HANDOFF §14.3；六段同属"索引侧读写"一个关注点，用户 2026-10-01 定调不硬切；B70 后 A7 白名单理由收窄为"列存在性探测"）。复核它先读类注释，别按"神类"惯性开刀。
 7. **空列表写 `[]` 不写 SQL NULL**（`MemoryStringListTypeHandler` 类注释）：与 wiki 那套"空列表写 NULL"**刻意相反**，别跨域套用。
 8. **`UpdateWrapper.set()` 不套实体 typeHandler**（`MemorySubjectMapper` 类注释）：jsonb 列的 `@Update` 注解 SQL 必须手写 `typeHandler=...`，漏了"写得进、读出来是零值"。
 9. **导出与列表的空值形态刻意不同**（`MemoryController` 注释）：`GET /items` 空仓是 `"items":[]`，`GET /export` 空仓是 `"items":null`——契约未要求统一，别"修"它。同理 `Content-Type` 必须手写字符串 `application/json; charset=utf-8`（带空格；`MediaType.toString()` 会把空格吃掉，而本项目验收是 diff 字节）。
@@ -427,8 +427,8 @@ cd frontend && npx vue-tsc --build --force && npm test
 
 | 项 | 性质 | 建议 |
 |---|---|---|
-| 仓储门面（`MemoryRepository` / `MemoryItemStore` / `MemoryIndexStore` / `MemoryTxTemplate`）仍在 `mapper/`，无 `repository/` 子包 | 结构欠账（已登记） | HANDOFF §12 注明"批次跟随 `repository/` 分层"；属结构搬迁批（全仓闸门 ≈3m25s），**别混进功能批**；`session`/`datasource` 同款欠账，届时同批对齐 |
-| `MemoryIndexStore` 919 行 | 登记例外（非待办） | 六段同属索引侧读写，用户定调不硬切；复核判据与 A7 白名单理由见类注释 + HANDOFF §14.3 |
+| 仓储门面（`MemoryRepository` / `MemoryItemStore` / `MemoryIndexStore` / `MemoryVectorStore` / `MemoryTxTemplate`）仍在 `mapper/`，无 `repository/` 子包（B130 新增的向量仓同样落此，**打包归位时一并处理**） | 结构欠账（已登记） | HANDOFF §12 注明"批次跟随 `repository/` 分层"；属结构搬迁批（全仓闸门 ≈3m25s），**别混进功能批**；`session`/`datasource` 同款欠账，届时同批对齐 |
+| ~~`MemoryIndexStore` 919 行~~ | **已出榜（2026-10-08 B130）**：919→636，向量面独立为 `MemoryVectorStore`（318）；例外解除、A7 白名单条目随簇迁移；剩余簇（抽取进度）可选再切一刀 | 六段同属索引侧读写，用户定调不硬切；复核判据与 A7 白名单理由见类注释 + HANDOFF §14.3 |
 | 抽取的语言上下文未接入 | 功能缺口 | `MemoryExtractionService` 类注释"三处形状差异"第 1 条：租户/语言不再从上下文重建（约束是"后台不许读 ThreadLocal"）；做多语言蒸馏时从 `MemoryExtractPayload` 补，别在 worker 里读上下文 |
 | `EmptyContent` / `PreviouslyForgotten` 落 500 而非 400 | 契约瑕疵（刻意保留） | `MemoryController` 类注释"刻意不在 switch"，已实测钉住（2026-09-18）；要改先改契约标准（§1.13）再动代码，否则契约测试全红 |
 | `vectorRecall` / `retrievalConditioning` 三态 `Boolean` | 兼容风险 | `null`=走默认 ≠ `false`=显式关；压平成 `boolean` 等于替工作区管理员做决定（`MemoryConfig` 类注释）。任何"简化配置类型"的提议都死在这 |
@@ -446,7 +446,7 @@ cd frontend && npx vue-tsc --build --force && npm test
 | 记忆为什么没生效 | 三层开关 §4.3：`common/settings/MemoryConfig`（工作区）→ `memory_subjects.enabled`（用户）→ `MemoryContext`（按请求） |
 | 记忆的种类 / 状态 / 预算常量 | `common/settings/MemoryKinds`（ kinds、RESIDENT、状态、全部码点预算） |
 | 去重 / 取代 / 遗忘怎么实现 | `domain/MemoryText`（normalized_key、fingerprint）+ `memory_tombstones` + `MemoryItem.replacesId` |
-| 向量怎么存、pgvector 缺列怎么办 | `domain/MemoryVectors`（编解码/余弦）+ `mapper/MemoryIndexStore`（halfvec 就绪探测与回退） |
+| 向量怎么存、pgvector 缺列怎么办 | `domain/MemoryVectors`（编解码/余弦）+ `mapper/MemoryVectorStore`（halfvec 就绪探测与回退） |
 | 租约 / 防抖 / 重试语义 | `MemoryExtractionState`（jsonb 租约）+ `MemoryExtractTaskQueue` 接口注释（三条必须保留的语义） |
 | 工作区配置长什么样 | `common/settings/MemoryConfig`（javadoc 含完整 JSON 形态；HTTP 面在 auth KV 端点） |
 | 表结构 / 索引 / H2 差异 | `TestSchema.createMemoryTables`（javadoc 列全三处 DDL 差异）+ `migrations/versioned/V1__baseline.sql` |

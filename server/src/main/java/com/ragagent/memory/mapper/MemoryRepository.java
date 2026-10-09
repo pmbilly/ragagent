@@ -91,6 +91,7 @@ public class MemoryRepository {
 
     /** 索引侧读写协作者（构造期装配）。 */
     final MemoryIndexStore indexStore;
+    final MemoryVectorStore vectorStore;
 
     /** 条目/墓碑读写协作者（构造期装配）。 */
     final MemoryItemStore itemStore;
@@ -127,6 +128,7 @@ public class MemoryRepository {
         this.extractionMapper = extractionMapper;
         this.tx = tx;
         this.indexStore = new MemoryIndexStore(this);
+        this.vectorStore = new MemoryVectorStore(this);
         this.itemStore = new MemoryItemStore(this);
         this.dataSource = dataSource;
         this.postgres = DatabaseDialects.isPostgres(dataSource);
@@ -393,27 +395,27 @@ public class MemoryRepository {
 
     /** 实现随协作者 {@link MemoryIndexStore}。 */
         public void upsertItemEmbedding(MemoryScope scope, MemoryItemEmbedding embedding) {
-        indexStore.upsertItemEmbedding(scope, embedding);
+        vectorStore.upsertItemEmbedding(scope, embedding);
     }
 
     /** 实现随协作者 {@link MemoryIndexStore}。 */
         public void deleteItemEmbedding(MemoryScope scope, String itemId) {
-        indexStore.deleteItemEmbedding(scope, itemId);
+        vectorStore.deleteItemEmbedding(scope, itemId);
     }
 
     /** 实现随协作者 {@link MemoryIndexStore}。 */
         public Map<String, float[]> itemEmbeddings(MemoryScope scope, List<String> itemIds, String modelId) {
-        return indexStore.itemEmbeddings(scope, itemIds, modelId);
+        return vectorStore.itemEmbeddings(scope, itemIds, modelId);
     }
 
     /** 实现随协作者 {@link MemoryIndexStore}。 */
         public List<MemoryVectorHit> searchItemsByVector(MemoryScope scope, MemoryVectorQuery query) {
-        return indexStore.searchItemsByVector(scope, query);
+        return vectorStore.searchItemsByVector(scope, query);
     }
 
     /** 实现随协作者 {@link MemoryIndexStore}。 */
         public int syncVectorColumn(MemoryScope scope, int limit) {
-        return indexStore.syncVectorColumn(scope, limit);
+        return vectorStore.syncVectorColumn(scope, limit);
     }
 
     /** 实现随协作者 {@link MemoryIndexStore}。 */

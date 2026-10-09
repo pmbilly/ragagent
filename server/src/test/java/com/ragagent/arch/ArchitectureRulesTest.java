@@ -314,7 +314,7 @@ class ArchitectureRulesTest {
             Map.entry("com.ragagent.session.service.SessionKnowledgeQaService", "PG 专有 SQL（多表 JOIN 标签检索）"),
             Map.entry("com.ragagent.system.service.SystemInfoService", "PG 专有 SQL（系统元数据）"),
             Map.entry("com.ragagent.vectorstore.service.VectorStoreConfigService", "PG 专有 SQL（向量库配置）"),
-            Map.entry("com.ragagent.memory.mapper.MemoryIndexStore", "列存在性探测（JDBC 元数据）"),
+            Map.entry("com.ragagent.memory.mapper.MemoryVectorStore", "列存在性探测（JDBC 元数据）"),
             Map.entry("com.ragagent.storage.mapper.ResourceRepository", "PG 专有 SQL（存储资源查询，JdbcClient）"),
             Map.entry("com.ragagent.storage.mapper.StorageBackendRepository", "PG 专有 SQL（存储后端元数据，JdbcClient）"));
 

@@ -62,10 +62,16 @@ def scan() -> dict[str, tuple[int, bool, int | None]]:
         lines = p.read_text(encoding="utf-8").splitlines()
         marked, claim = False, None
         for i, line in enumerate(lines[:120]):      # 标记写在类头附近
-            if MARKER.search(line):
-                m = MARKER_NUM.search("\n".join(lines[i:i + 3]))   # 标记可能跨行续写
-                marked, claim = True, (int(m.group(1)) if m else None)
-                break
+            if not MARKER.search(line):
+                continue
+            # 只认「活跃自称」：**回顾性提及**不算——例外解除后，类注释里往往留着
+            # 「原『规模例外』已解除 / 复核判定…」这类历史说明（B130 实测误报）。
+            # 判据：同一行里出现「解除」或「复核」关键词即视为回顾，跳过。
+            if "解除" in line or "复核" in line:
+                continue
+            m = MARKER_NUM.search("\n".join(lines[i:i + 3]))   # 标记可能跨行续写
+            marked, claim = True, (int(m.group(1)) if m else None)
+            break
         out[str(p.relative_to(_sr.REPO))] = (len(lines), marked, claim)
     return out
 
