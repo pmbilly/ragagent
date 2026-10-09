@@ -85,7 +85,8 @@ BASELINE: dict[str, set[str]] = {
     # chat_parser_engine_rules 则是 agent 侧规则的透传保留（§14.9 表②）。
     'tenant/ParserEngineConfig.java': {'chat_parser_engine_rules', 'mineru_api_key', 'mineru_cloud_enable_formula', 'mineru_cloud_enable_ocr', 'mineru_cloud_enable_table', 'mineru_cloud_language', 'mineru_cloud_model', 'mineru_enable_formula', 'mineru_enable_ocr', 'mineru_enable_table', 'mineru_endpoint', 'mineru_language', 'mineru_model', 'mineru_parse_method', 'mineru_vlm_server_url', 'odl_hybrid', 'odl_hybrid_fallback', 'odl_hybrid_mode', 'odl_hybrid_url', 'odl_markdown_with_html', 'paddleocr_vl_cloud_model', 'paddleocr_vl_cloud_token', 'paddleocr_vl_cloud_use_chart_recognition', 'paddleocr_vl_cloud_use_seal_recognition', 'paddleocr_vl_endpoint', 'paddleocr_vl_use_chart_recognition', 'paddleocr_vl_use_seal_recognition'},
     # 租户配置 jsonb（存量面；B132 起 chat-history / retrieval 两段已换锚，余段待判定）
-    'auth/service/TenantService.java': {'compression_strategy', 'deleted_at', 'max_tokens', 'recent_message_count', 'summarize_threshold'},
+    # 软删除列（B135d 复核：原条目混了 context_config 的 4 个键，已随本批换锚移出）
+    'auth/service/TenantService.java': {'deleted_at'},
     # 内部预设名（presets() 仅内部查表）
     'chatpipeline/PipelineBuilder.java': {'chat_history_stream', 'chat_stream', 'rag_stream'},
     # PipelineLog 观测面（日志字段，非契约）

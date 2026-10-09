@@ -368,10 +368,10 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
     private static void normalizeContextConfig(Tenant t) {
         JsonNode cfg = t.getContextConfig();
         ObjectNode out = MAPPER.createObjectNode();
-        out.put("max_tokens", intOrZero(cfg, "max_tokens"));
-        out.put("compression_strategy", textOrEmpty(cfg, "compression_strategy"));
-        out.put("recent_message_count", intOrZero(cfg, "recent_message_count"));
-        out.put("summarize_threshold", intOrZero(cfg, "summarize_threshold"));
+        out.put("maxTokens", intOrZero(cfg, "maxTokens"));
+        out.put("compressionStrategy", textOrEmpty(cfg, "compressionStrategy"));
+        out.put("recentMessageCount", intOrZero(cfg, "recentMessageCount"));
+        out.put("summarizeThreshold", intOrZero(cfg, "summarizeThreshold"));
         t.setContextConfig(out);
     }
 
