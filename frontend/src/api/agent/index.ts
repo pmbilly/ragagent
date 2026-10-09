@@ -255,8 +255,8 @@ export function getPlaceholders(): Promise<{ data: PlaceholdersResponse }> {
 // 后端 kbFilter 结构（见 agent/management/service/AgentTypePresets）
 export interface AgentTypeKBFilter {
   anyOf?: string[];   // KB 至少拥有其一
-  all_of?: string[];   // KB 必须全部拥有
-  none_of?: string[];  // KB 必须全部不拥有
+  allOf?: string[];   // KB 必须全部拥有
+  noneOf?: string[];  // KB 必须全部不拥有
 }
 
 // KB 能力标签（后端 types.KBCapabilities 的 JSON）

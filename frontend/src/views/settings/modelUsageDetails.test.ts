@@ -12,7 +12,7 @@ const agentEditorSource = readFileSync(new URL('../agent/AgentEditorModal.vue', 
 
 test('model deletion renders structured usage groups and localized fallback errors', () => {
   assert.match(source, /error instanceof ModelInUseError/)
-  assert.match(source, /usageConflict\.knowledge_bases/)
+  assert.match(source, /usageConflict\.knowledgeBases/)
   assert.match(source, /usageConflict\.agents/)
   assert.match(source, /usageConflict\.longTermMemory\.bindings/)
   assert.match(source, /MessagePlugin\.error\(error\.message \|\| t\('modelSettings\.toasts\.deleteFailed'\)\)/)

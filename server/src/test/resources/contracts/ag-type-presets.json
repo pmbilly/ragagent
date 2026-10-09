@@ -106,7 +106,7 @@
       "kbSelectionMode": "all"
     },
     "kbFilter": {
-      "none_of": [
+      "noneOf": [
         "faq"
       ]
     }

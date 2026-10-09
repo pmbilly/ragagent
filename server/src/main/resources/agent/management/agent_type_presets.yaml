@@ -14,8 +14,8 @@
 #
 # Supported kbFilter predicates (evaluated against a KB's `capabilities`):
 #   anyOf:   KB must expose at least ONE of the listed capability names.
-#   all_of:   KB must expose ALL of the listed capability names.
-#   none_of:  KB must expose NONE of the listed capability names.
+#   allOf:   KB must expose ALL of the listed capability names.
+#   noneOf:  KB must expose NONE of the listed capability names.
 # Capability names: vector, keyword, wiki, graph, faq.
 # An empty kbFilter (or kbFilter absent) means "any KB is allowed".
 #
@@ -23,7 +23,7 @@
 # predicate from `config.allowed_tools` via `deriveKbFilterFromTools` (see
 # `frontend/src/utils/tool-capabilities.ts`). You only need to write an
 # explicit `kbFilter` here when the preset requires a business rule that
-# can't be inferred from the tools alone (e.g. `none_of: [faq]` on
+# can't be inferred from the tools alone (e.g. `noneOf: [faq]` on
 # data-analysis). Keeping the map lean avoids the "two sources of truth"
 # drift that used to plague this file.
 
@@ -191,7 +191,7 @@ agentTypePresets:
     # (FAQ KBs technically have vector/keyword chunks but they're Q&A pairs,
     # not tabular data, so data_schema would produce garbage on them).
     kbFilter:
-      none_of: ["faq"]
+      noneOf: ["faq"]
 
   # --------------------------------------------------------------------------
   # Custom — no preset; user configures everything by hand.

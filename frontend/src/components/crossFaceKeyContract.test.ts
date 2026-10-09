@@ -396,12 +396,24 @@ test('api 面 snake 记号棘轮：只许减不许增', () => {
     'api/chat/': 'SSE/事件载荷与本地游标（事件协议面）；B135b2 起事件面已全 camel，'
       + '本条目仅覆盖面内残留，规则见 HANDOFF §15.3',
     'api/system/index.ts': '系统设置 KV + 沙箱/任务引擎直出载荷（§15.2 纪律：冻结面不换；expires_at_unix 已于 B72 修 camel）',
-    'api/model/modelUsage.ts': '后端 putObject 亲手构造的 snake 载荷（前后端一致）',
   }
+  // —— B149：原「整文件白名单」api/model/modelUsage.ts 已删除（其理由「前后端一致」对任何线格式
+  //    键都成立 ⇒ 等于没有理由），改为逐键登记下方 10 条。该文件自此与其它 api 面同受
+  //    「新增 snake 即红」约束。
+  const BINDING_CODE_INTERNAL_MAP =
+    '已核实：binding 码（值）在前端局部映射表里当键用——非线格式键（后端产出的是值，键面全 camel）'
   const BASELINE: Record<string, string> = {
-    'api/agent/index.ts:all_of': '已核实：同上',
-    'api/agent/index.ts:none_of': '已核实：同上',
     'api/agent/index.ts:file_types': '已核实：后端 ParserEngineRules 按 file_types 读规则 jsonb，两侧一致',
+    'api/model/modelUsage.ts:asr_model': BINDING_CODE_INTERNAL_MAP,
+    'api/model/modelUsage.ts:chat_model': BINDING_CODE_INTERNAL_MAP,
+    'api/model/modelUsage.ts:embedding_model': BINDING_CODE_INTERNAL_MAP,
+    'api/model/modelUsage.ts:follow_up_model': BINDING_CODE_INTERNAL_MAP,
+    'api/model/modelUsage.ts:image_processing_model': BINDING_CODE_INTERNAL_MAP,
+    'api/model/modelUsage.ts:query_understand_model': BINDING_CODE_INTERNAL_MAP,
+    'api/model/modelUsage.ts:rerank_model': BINDING_CODE_INTERNAL_MAP,
+    'api/model/modelUsage.ts:summary_model': BINDING_CODE_INTERNAL_MAP,
+    'api/model/modelUsage.ts:vlm_model': BINDING_CODE_INTERNAL_MAP,
+    'api/model/modelUsage.ts:wiki_synthesis_model': BINDING_CODE_INTERNAL_MAP,
     'api/auth/index.ts:owner_id': '已核实：前端本地快照键（注释已声明后端 TenantResponse 无此键）',
     'api/embed/index.ts:channel_id': '已核实：embed 宿主↔iframe 消息协议（widget.js 与 Vue 侧同一套键）',
     'api/embed/index.ts:session_id': '已核实：同上',
@@ -507,4 +519,19 @@ test('B72 回归钉：DRIFT 修复面不得回流 snake（chunk 编辑/FAQ 标�
   // ⑦ 集成页请求预览串必须与实发一致（后端 QaRequests 全 camel）
   forbid('views/integrations/ApiIntegrationSettings.vue', /agent_enabled:/,
     '预览串与实发一致：agentEnabled/agentId（照抄旧预览会写出 agent 模式失效的请求）')
+})
+
+
+test('B149 回归钉：2300 details 的键面（knowledgeBases）不得回流 snake', () => {
+  // ModelService 亲手构造的 2300 details 键面全 camel（唯一漏网的 knowledge_bases 已换锚）；
+  // snake 读写会让「模型被占用」对话框静默空掉。三处 = api 类型 + 视图读侧 + 视图源码扫描断言。
+  //
+  // 为什么只有这一项：预设 kbFilter 的 allOf/noneOf 不在此钉——scripts/check-fe-contract-keys.py
+  // 已天然覆盖它（后端已无对应 snake 字面量 ⇒ 前端任何文件再写即「新增即红」，覆盖面比钉子更全）；
+  // 而 knowledge_bases 在 backend 仍作为 DB 表名/模板令牌存在 ⇒ 按守卫设计被跳过，故须在此显式钉住。
+  const forbidSnake = (rel: string, why: string) => assert.doesNotMatch(
+    readFileSync(join(SRC, rel), 'utf8'), /\bknowledge_bases\b/, `${rel}: ${why}`)
+  forbidSnake('api/model/modelUsage.ts', '键是 knowledgeBases')
+  forbidSnake('views/settings/ModelSettings.vue', '读 usageConflict.knowledgeBases')
+  forbidSnake('views/settings/modelUsageDetails.test.ts', '源码扫描断言同上')
 })

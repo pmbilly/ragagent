@@ -23,7 +23,7 @@ export interface ModelUsageResource {
 }
 
 export interface ModelUsageDetails {
-  knowledge_bases: ModelUsageResource[]
+  knowledgeBases: ModelUsageResource[]
   agents: ModelUsageResource[]
   longTermMemory: {
     bindings: string[]
@@ -80,13 +80,13 @@ function parseTotal(value: unknown, listed: number): number {
 export function parseModelUsageDetails(value: unknown): ModelUsageDetails | null {
   if (!isRecord(value) || !isRecord(value.longTermMemory)) return null
 
-  const knowledgeBases = parseResources(value.knowledge_bases)
+  const knowledgeBases = parseResources(value.knowledgeBases)
   const agents = parseResources(value.agents)
   const memoryBindings = parseBindings(value.longTermMemory.bindings)
   if (!knowledgeBases || !agents || !memoryBindings) return null
 
   const details: ModelUsageDetails = {
-    knowledge_bases: knowledgeBases,
+    knowledgeBases: knowledgeBases,
     agents,
     longTermMemory: { bindings: memoryBindings },
     knowledgeBaseTotal: parseTotal(value.knowledgeBaseTotal, knowledgeBases.length),

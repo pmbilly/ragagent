@@ -271,7 +271,7 @@ public class ModelService implements ModelGateway  {
     private static boolean inUse(JsonNode usage) {
         return usage.get("knowledgeBaseTotal").asLong() > 0
                 || usage.get("agentTotal").asLong() > 0
-                || usage.get("knowledge_bases").size() > 0
+                || usage.get("knowledgeBases").size() > 0
                 || usage.get("agents").size() > 0
                 || usage.get("longTermMemory").get("bindings").size() > 0;
     }
@@ -298,7 +298,7 @@ public class ModelService implements ModelGateway  {
      */
     public JsonNode getModelUsageDetails(long tid, String modelId) {
         ObjectNode details = MAPPER.createObjectNode();
-        ArrayNode kbs = details.putArray("knowledge_bases");
+        ArrayNode kbs = details.putArray("knowledgeBases");
         ArrayNode agents = details.putArray("agents");
         ObjectNode memory = details.putObject("longTermMemory");
         ArrayNode memoryBindings = memory.putArray("bindings");

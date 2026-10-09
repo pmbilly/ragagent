@@ -15,7 +15,7 @@ import {
 } from './modelUsage'
 
 const details = {
-  knowledge_bases: [
+  knowledgeBases: [
     { id: 'kb-1', name: 'Product docs', bindings: ['vlm_model'] },
     { id: 'kb-2', name: 'Engineering', bindings: ['vlm_model'] },
   ],
@@ -46,8 +46,8 @@ test('keeps untruncated totals when the listed collections are capped', () => {
   })
   assert.equal(parsed?.knowledgeBaseTotal, 80)
   assert.equal(parsed?.agentTotal, 12)
-  assert.equal(modelUsageResourceCount(parsed!.knowledge_bases, parsed!.knowledgeBaseTotal), 80)
-  assert.equal(modelUsageListTruncated(parsed!.knowledge_bases, parsed!.knowledgeBaseTotal), true)
+  assert.equal(modelUsageResourceCount(parsed!.knowledgeBases, parsed!.knowledgeBaseTotal), 80)
+  assert.equal(modelUsageListTruncated(parsed!.knowledgeBases, parsed!.knowledgeBaseTotal), true)
   assert.equal(modelUsageListTruncated(parsed!.agents, parsed!.agentTotal), true)
 })
 
@@ -68,19 +68,19 @@ test('recognizes only the dedicated model-in-use code with a valid payload', () 
 })
 
 test('rejects malformed details instead of guessing from the server message', () => {
-  assert.equal(parseModelUsageDetails({ knowledge_bases: [], agents: [] }), null)
+  assert.equal(parseModelUsageDetails({ knowledgeBases: [], agents: [] }), null)
   assert.equal(parseModelUsageDetails({
-    knowledge_bases: [],
+    knowledgeBases: [],
     agents: [],
     longTermMemory: { bindings: [] },
   }), null)
   assert.equal(parseModelUsageDetails({
-    knowledge_bases: [{ id: 'kb-1', name: 'Docs', bindings: [] }],
+    knowledgeBases: [{ id: 'kb-1', name: 'Docs', bindings: [] }],
     agents: [],
     longTermMemory: { bindings: [] },
   }), null)
   assert.equal(parseModelUsageDetails({
-    knowledge_bases: [{ id: 'kb-1', name: 'Docs', bindings: 'vlm_model' }],
+    knowledgeBases: [{ id: 'kb-1', name: 'Docs', bindings: 'vlm_model' }],
     agents: [],
     longTermMemory: { bindings: [] },
   }), null)

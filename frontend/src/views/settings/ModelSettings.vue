@@ -153,14 +153,14 @@
         </p>
 
         <div class="model-usage-dialog__content">
-          <section v-if="usageConflict.knowledge_bases.length" class="model-usage-group">
+          <section v-if="usageConflict.knowledgeBases.length" class="model-usage-group">
             <h3>
               {{ $t('modelSettings.usage.knowledgeBases', {
-                count: modelUsageResourceCount(usageConflict.knowledge_bases, usageConflict.knowledgeBaseTotal)
+                count: modelUsageResourceCount(usageConflict.knowledgeBases, usageConflict.knowledgeBaseTotal)
               }) }}
             </h3>
             <ul>
-              <li v-for="resource in usageConflict.knowledge_bases" :key="resource.id">
+              <li v-for="resource in usageConflict.knowledgeBases" :key="resource.id">
                 <div class="model-usage-resource">
                   <strong>{{ resource.name || resource.id }}</strong>
                   <div class="model-usage-bindings">
@@ -185,12 +185,12 @@
               </li>
             </ul>
             <p
-              v-if="modelUsageListTruncated(usageConflict.knowledge_bases, usageConflict.knowledgeBaseTotal)"
+              v-if="modelUsageListTruncated(usageConflict.knowledgeBases, usageConflict.knowledgeBaseTotal)"
               class="model-usage-truncated"
             >
               {{ $t('modelSettings.usage.truncated', {
-                shown: usageConflict.knowledge_bases.length,
-                total: modelUsageResourceCount(usageConflict.knowledge_bases, usageConflict.knowledgeBaseTotal)
+                shown: usageConflict.knowledgeBases.length,
+                total: modelUsageResourceCount(usageConflict.knowledgeBases, usageConflict.knowledgeBaseTotal)
               }) }}
             </p>
           </section>

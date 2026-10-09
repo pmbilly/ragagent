@@ -14,9 +14,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * agent 类型预设。
  *
- * <p>响应键序固定：id → i18n → config → kb_filter，
+ * <p>响应键序固定：id → i18n → config → kbFilter，
  * 内层 i18n 键<b>字母序</b>（只保留
- * default + 命中 locale 两项）；config/kb_filter 的零值键整键省略。</p>
+ * default + 命中 locale 两项）；config/kbFilter 的零值键整键省略。</p>
  */
 @Component
 public class AgentTypePresets {
@@ -65,8 +65,8 @@ public class AgentTypePresets {
             if (filter != null && filter.isObject() && filter.size() > 0) {
                 ObjectNode f = item.putObject("kbFilter");
                 copyIfNonEmptyArray((ObjectNode) filter, "anyOf", f);
-                copyIfNonEmptyArray((ObjectNode) filter, "all_of", f);
-                copyIfNonEmptyArray((ObjectNode) filter, "none_of", f);
+                copyIfNonEmptyArray((ObjectNode) filter, "allOf", f);
+                copyIfNonEmptyArray((ObjectNode) filter, "noneOf", f);
             }
         }
         return out;

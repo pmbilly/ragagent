@@ -2809,11 +2809,11 @@ const presetKbMismatchReason = (preset: AgentTypePreset): string => {
 //   - 工具 → anyOf（"KB 至少要能被其中一个工具用得上"）由
 //     `deriveKbFilterFromTools` 自动算出；
 //   - YAML 里的 `kbFilter` 只负责**工具推不出来**的业务规则（如
-//     data-analysis 的 `none_of: ["faq"]`），作为增量合并，而不是整体覆盖；
-//   - `all_of` / `none_of` 直接从 YAML 继承（工具不表达这类约束）。
+//     data-analysis 的 `noneOf: ["faq"]`），作为增量合并，而不是整体覆盖；
+//   - `allOf` / `noneOf` 直接从 YAML 继承（工具不表达这类约束）。
 //
 // 这样 rag-qa / wiki-qa / hybrid 在 YAML 里彻底不写 `kbFilter`，
-// data-analysis 只需声明额外的 `none_of`，"工具→能力"的映射只在
+// data-analysis 只需声明额外的 `noneOf`，"工具→能力"的映射只在
 // `@/utils/tool-capabilities` 维护一份。
 const effectiveKbFilter = (preset: AgentTypePreset | null): AgentTypeKBFilter | null => {
   if (!preset) return null;
@@ -2822,10 +2822,10 @@ const effectiveKbFilter = (preset: AgentTypePreset | null): AgentTypeKBFilter | 
 
   // YAML 提供 anyOf 时整体覆盖推导（给显式控制留口子）；否则用推导的
   const anyOf = (yaml?.anyOf && yaml.anyOf.length > 0) ? yaml.anyOf : (derived?.anyOf ?? []);
-  const allOf = yaml?.all_of ?? [];
-  const noneOf = yaml?.none_of ?? [];
+  const allOf = yaml?.allOf ?? [];
+  const noneOf = yaml?.noneOf ?? [];
   if (anyOf.length === 0 && allOf.length === 0 && noneOf.length === 0) return null;
-  return { anyOf: anyOf, all_of: allOf, none_of: noneOf };
+  return { anyOf: anyOf, allOf: allOf, noneOf: noneOf };
 };
 
 // 评估单个 KB 是否满足给定预设的 kbFilter
@@ -2850,8 +2850,8 @@ const kbSatisfiesPresetFilter = (kb: { capabilities?: KBCapabilities; ragEnabled
     }
   };
   const reason = presetKbMismatchReason(preset);
-  if (filter.all_of && filter.all_of.length > 0) {
-    for (const n of filter.all_of) {
+  if (filter.allOf && filter.allOf.length > 0) {
+    for (const n of filter.allOf) {
       if (!has(n)) return { ok: false, reason };
     }
   }
@@ -2860,8 +2860,8 @@ const kbSatisfiesPresetFilter = (kb: { capabilities?: KBCapabilities; ragEnabled
       return { ok: false, reason };
     }
   }
-  if (filter.none_of && filter.none_of.length > 0) {
-    for (const n of filter.none_of) {
+  if (filter.noneOf && filter.noneOf.length > 0) {
+    for (const n of filter.noneOf) {
       if (has(n)) return { ok: false, reason };
     }
   }
