@@ -99,7 +99,7 @@ class KnowledgeQaContractTest {
     /**
      * SSE 帧骨架（stub LLM 全链路录制）：帧序 agent_query → answer(done=false) →
      * answer(done=true) → complete；帧格式 event:message\ndata:<json>\n\n；
-     * complete 键集 total_steps/total_duration_ms/final_content（无 usage 键时两侧同缺）。
+     * complete 键集 total_steps/total_duration_ms/finalContent（无 usage 键时两侧同缺）。
      */
     @Test
     void sseFullChainFrameSkeleton() throws Exception {
@@ -117,10 +117,10 @@ class KnowledgeQaContractTest {
         assertTrue(sse.contains("你好，"), "chunk1");
         assertTrue(sse.contains("我是知识助手。"), "chunk2");
         assertTrue(sse.contains("\"done\":false"), "first chunk not done");
-        // complete 的 final_content = 分片重组
-        assertTrue(sse.contains("final_content\":\"你好，我是知识助手。"), "final content");
+        // complete 的 finalContent = 分片重组
+        assertTrue(sse.contains("finalContent\":\"你好，我是知识助手。"), "final content");
         // agent_query 携带 user/assistant 时间戳与 id 关联
-        assertTrue(sse.contains("assistant_created_at"), "agent_query timestamps");
+        assertTrue(sse.contains("assistantCreatedAt"), "agent_query timestamps");
         assertTrue(sse.contains("user_message_id"), "agent_query user id");
         // 扣留重组键：answer 分片共享同一 event_id 形态
         assertTrue(sse.contains("event_id\":\"<EVT>-answer\""), "answer event id");

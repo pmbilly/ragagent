@@ -11,7 +11,11 @@
      —— 家族前缀保留为 camel 前缀（`agentStep`），不再用点号层级；
   ③ URL 路径模板里的**路径变量**不得含 `_`（`{sessionId}`；路径变量名不进具体 URL，
      改它对外零影响；`{id}`/`{key}` 这类单词不受限）；
-  ④ `@RequestParam` 的显式名不得含 `_`，除白名单（OIDC 标准参数，属外部协议）。
+  ④ `@RequestParam` 的显式名不得含 `_`，除白名单（OIDC 标准参数，属外部协议）；
+  ⑤ **手搓事件载荷**（不经 `event/payload` 类、直接 `map.put("键", …)` 或 helper 二参形态的
+     事件生产/消费文件）里的**键字面量**不得含 `_` —— ① 只扫 `event/payload/*.java`，而这批文件正是
+     B93b 记录里"机制二"漏扫过的地方（曾静默丢 `tool_call_id`；B135b2 又收尾了
+     `finalContent`/`userCreatedAt`/`assistantCreatedAt` 3 键）。名单须逐条写理由。
 
 豁免：
   · 供应商/平台线格式（`llm/chat/**`、`datasource/connector/**`、`im/feishu/**`）本脚本不扫；
@@ -104,10 +108,67 @@ def check_routes() -> None:
                         problems.append(f"{rel}:{i} {why}名含下划线：{name}（{why}名统一 camel）")
 
 
+# ── ⑤ 手搓事件载荷的键字面量（名单逐条写理由）────────────────────────────────
+# 为什么需要它：① 只覆盖 `event/payload/*.java`；SSE/进度/steer 事件还有一批"手搓 map"的生产与
+# 消费文件，键写在 `put/set/get/path/containsKey/getString(...)` 或 helper 二参形态里
+# （B93b 的"机制二"：`mapString(chunk.getData(), "tool_call_id")` 曾被四类键位模式全部漏掉）。
+EVENT_MAP_FILES = {
+    'session/controller/QaSseOrchestrator.java':
+        'agentQuery/data 载荷生产侧（手工 put；B135b2 收尾 3 键）',
+    'session/service/AgentStreamBridge.java':
+        'SSE 事件桥（手工 put；B93b 已 camel 38 处键位，B135b2 收尾 finalContent）',
+    'session/sse/StreamResponseBuilder.java':
+        'SSE 响应构建 + Redis 回放的引用重建（读 SearchResult 形状）',
+    'chatpipeline/PipelineProgress.java':
+        '进度事件生产侧（B134 已 camel；棘轮自此覆盖）',
+    'session/controller/SteerController.java':
+        'steer 事件载荷生产侧（B135c 已 camel）',
+    'session/service/QaSupport.java':
+        'mention 载荷生产侧（B135c 已 camel）',
+    'session/service/SteerSinkBridge.java':
+        'mention 载荷读取/规范化侧（B135c 已 camel）',
+    'im/runtime/ToolDisplay.java':
+        'IM 侧读取同一批事件载荷（step.arguments/step.data）',
+}
+# 值面豁免（B88 决策：工具名与 schema enum 值是"各自语义"，不是字段名；§15.3 ②）——
+# 它们会出现在键位调用里（如 `LABELS.get("wiki_search")`），但语义是**值**。逐条登记。
+VALUE_TOKENS = {
+    'im/runtime/ToolDisplay.java': {
+        'data_analysis', 'data_schema', 'database_query', 'edit_sandbox_file', 'execute_skill_script',
+        'get_document_content', 'get_document_info', 'get_related_documents', 'grep_chunks',
+        'image_analysis', 'knowledge_graph_extract', 'knowledge_search', 'list_knowledge_chunks',
+        'list_sandbox_files', 'query_knowledge_graph', 'query_understand', 'read_sandbox_file',
+        'read_skill', 'search_knowledge', 'shell_exec', 'todo_write', 'web_fetch', 'web_search',
+        'wiki_read_page', 'wiki_read_source_doc', 'wiki_search', 'write_sandbox_file',
+    },
+}
+
+# 键位形态：① 直接调用 `x.put("k"` / `.getString(m, "k"` 等；② helper 二参形态 `foo(map, "k")`
+KEY_CALL = re.compile(r'\.(?:put|putAll|set|get|path|containsKey|getString|getFloat64|textOr)\s*\(\s*"([^"]+)"')
+KEY_HELPER = re.compile(r'(?<![\w.])\w+\([^;()]*,\s*"([^"]+)"\)')
+
+
+def check_event_map_keys() -> None:
+    for rel, why in sorted(EVENT_MAP_FILES.items()):
+        path = ROOT / 'server/src/main/java/com/ragagent' / rel
+        if not path.exists():
+            problems.append(f'{rel} 不在预期路径（EVENT_MAP_FILES 需更新）')
+            continue
+        for i, line in enumerate(path.read_text(encoding='utf-8').splitlines(), 1):
+            s = line.strip()
+            if s.startswith('*') or s.startswith('//'):
+                continue                      # 注释/javadoc 里的键名不算（如 {@code session_id}）
+            allowed = VALUE_TOKENS.get(rel, set())
+            for m in KEY_CALL.finditer(line):
+                if '_' in m.group(1) and m.group(1) not in allowed:
+                    problems.append(f'{rel}:{i} 手搓事件载荷键仍是 snake：{m.group(1)}（{why}）')
+
+
 def main() -> int:
     check_payload_annotations()
     check_enum_values()
     check_routes()
+    check_event_map_keys()
     if problems:
         print("✗ 事件面/路由面命名口径违例：\n")
         for x in problems:

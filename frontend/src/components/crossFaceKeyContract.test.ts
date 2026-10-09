@@ -393,7 +393,8 @@ test('api 面 snake 记号棘轮：只许减不许增', () => {
   //   · 13 键保留为「已核实合法」（下方 BASELINE，每条写明判定依据）。
   // 口径：新增一处 snake 即红；清理一处后从 BASELINE 删除（只许减）；基线条目消失会报过期。
   const FACE_WHITELIST: Record<string, string> = {
-    'api/chat/': 'SSE/事件载荷与本地游标（事件协议面；agent-chat 同时是对外文档化 API，见 B72 设计稿）',
+    'api/chat/': 'SSE/事件载荷与本地游标（事件协议面）；B135b2 起事件面已全 camel，'
+      + '本条目仅覆盖面内残留，规则见 HANDOFF §15.3',
     'api/system/index.ts': '系统设置 KV + 沙箱/任务引擎直出载荷（§15.2 纪律：冻结面不换；expires_at_unix 已于 B72 修 camel）',
     'api/model/modelUsage.ts': '后端 putObject 亲手构造的 snake 载荷（前后端一致）',
   }
@@ -498,12 +499,13 @@ test('B72 回归钉：DRIFT 修复面不得回流 snake（chunk 编辑/FAQ 标�
   // ⑤ 平台 API Key 有效期：PlatformAPIKeyCreateRequest.expiresAtUnix（潜伏断链）
   forbid('api/system/index.ts', /\bexpires_at_unix\b/, '平台 API Key 创建载荷用 expiresAtUnix')
   // ⑥ SSE 死读：后端无任何事件发平名 created_at —— agentQuery 的时间键是
-  //    user_created_at/assistant_created_at（QaSseOrchestrator，冻结协议键），
+  //    userCreatedAt/assistantCreatedAt（QaSseOrchestrator；B135b2 收尾：
+  //    B93b 已把事件面翻转为 camel，这 3 键是漏扫尾巴），
   //    agentQuery 的绑定走 bindServerTurnTimestamps；userMessageInjected 无时间键。
   forbid('composables/useChatStreamHandler.ts', /data\.created_at/,
     'SSE 载荷无平名 created_at（读到的恒 undefined）')
-  require('utils/messageTimestamp.ts', /payload\.assistant_created_at/,
-    'assistant 时间读 assistant_created_at（冻结协议键，别顺手 camelCase）')
+  require('utils/messageTimestamp.ts', /payload\.assistantCreatedAt/,
+    'assistant 时间读 assistantCreatedAt（SSE 面已全 camel，别再读 snake——B135b2）')
   // ⑦ 集成页请求预览串必须与实发一致（后端 QaRequests 全 camel）
   forbid('views/integrations/ApiIntegrationSettings.vue', /agent_enabled:/,
     '预览串与实发一致：agentEnabled/agentId（照抄旧预览会写出 agent 模式失效的请求）')

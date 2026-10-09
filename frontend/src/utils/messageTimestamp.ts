@@ -30,7 +30,7 @@ export function ensureMessageCreatedAt<T extends MessageWithTimestamp>(
 
 /**
  * `payload` 是 SSE `agentQuery` 事件的 data 载荷——**冻结的线协议**，键名仍是下划线
- * （`assistant_created_at` / `user_created_at` / `userMessageId`），别顺手 camelCase
+ * （`assistantCreatedAt` / `userCreatedAt` / `userMessageId`），别顺手 camelCase
  * （§14.9l 前提判定 2）。写回消息对象时才用 `createdAt`。
  */
 export function bindServerTurnTimestamps(
@@ -41,10 +41,10 @@ export function bindServerTurnTimestamps(
   if (!payload) return
 
   if (assistant) {
-    applyMessageCreatedAt(assistant, payload.assistant_created_at)
+    applyMessageCreatedAt(assistant, payload.assistantCreatedAt)
   }
 
-  const userCreatedAt = payload.user_created_at
+  const userCreatedAt = payload.userCreatedAt
   const userMessageId = typeof payload.userMessageId === 'string' ? payload.userMessageId : ''
   if (!normalizeMessageCreatedAt(userCreatedAt) && !userMessageId) return
 

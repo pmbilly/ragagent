@@ -579,7 +579,7 @@ public final class AgentStreamBridge {
         Map<String, Object> completeData = new LinkedHashMap<>();
         completeData.put("totalSteps", data.getTotalSteps());
         completeData.put("totalDurationMs", data.getTotalDurationMs());
-        completeData.put("final_content", assistantMessage.getContent());
+        completeData.put("finalContent", assistantMessage.getContent());
         TokenUsage turnUsage = data.getUsage() instanceof TokenUsage u ? u : null;
         if (turnUsage != null) {
             completeData.put("usage", turnUsage);

@@ -136,10 +136,10 @@ final class QaSseOrchestrator {
             data.put("userMessageId", reqCtx.userMessageID);
         }
         if (reqCtx.userCreatedAt != null) {
-            data.put("user_created_at", reqCtx.userCreatedAt.toInstant().toString());
+            data.put("userCreatedAt", reqCtx.userCreatedAt.toInstant().toString());
         }
         if (reqCtx.assistantMessage != null && reqCtx.assistantMessage.getCreatedAt() != null) {
-            data.put("assistant_created_at", reqCtx.assistantMessage.getCreatedAt().toInstant().toString());
+            data.put("assistantCreatedAt", reqCtx.assistantMessage.getCreatedAt().toInstant().toString());
         }
         StreamEvent evt = new StreamEvent();
         evt.setId("query-" + System.nanoTime());

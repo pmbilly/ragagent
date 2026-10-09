@@ -995,7 +995,7 @@ export function useChatStreamHandler(options: UseChatStreamHandlerOptions) {
       case 'complete': {
         if (dataId) replaySegments.delete(dataId)
         log('[Agent] Complete event received')
-        applyFinalArtifactContent(message, (dataPayload as any)?.final_content)
+        applyFinalArtifactContent(message, (dataPayload as any)?.finalContent)
         loading.value = false
         isReplying.value = false
         message.completed = true

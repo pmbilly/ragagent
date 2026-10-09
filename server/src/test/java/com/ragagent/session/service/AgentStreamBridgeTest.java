@@ -215,7 +215,7 @@ class AgentStreamBridgeTest {
         assertThat(event.isDone()).isTrue();
         assertThat(event.getUsage()).isSameAs(usage);
         assertThat(event.getData()).containsEntry("totalSteps", 3)
-                .containsEntry("final_content", "最终答案");
+                .containsEntry("finalContent", "最终答案");
         assertThat(assistantMessage.isCompleted()).isTrue();
         assertThat(assistantMessage.getContent()).isEqualTo("最终答案");
     }

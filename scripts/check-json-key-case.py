@@ -149,10 +149,6 @@ BASELINE: dict[str, set[str]] = {
     'retrieval/support/WebResultConverter.java': {'published_at'},
     # 工具结果/附件载荷（存量面，同 tool-results）
     # SSE complete 事件的 data 键（B136 复核：与上条同属**冻结的线协议** §14.9l 前提判定 2；
-    # FE `useChatStreamHandler.ts` 在读 final_content）⇒ 并入 B135b2 拍板项
-    'session/service/AgentStreamBridge.java': {'final_content'},
-    # SSE `agentQuery` 的 data 载荷＝**冻结的线协议**（§14.9l 前提判定 2；FE `messageTimestamp.ts` 明写"别顺手 camelCase"且有断言钉住）⇒ 待拍板；条目按实际存在的键收窄（原 5 键里 3 个后端已无）
-    'session/controller/QaSseOrchestrator.java': {'assistant_created_at', 'user_created_at'},
     # 同上（SSE/消息载荷）
     'session/controller/SessionController.java': {'message_id', 'session_id'},
     # MyBatis 列名写入点（非 JSON 键）
