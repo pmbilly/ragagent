@@ -11,7 +11,6 @@ import java.util.regex.Pattern;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ToolCall;
 import com.ragagent.llm.domain.MessageContentPart;
-import com.ragagent.llm.domain.ToolCall;
 
 /**
  * model-context registry 的持久资源半边：为存储资源引用分配请求局部 res://NNNN 句柄，

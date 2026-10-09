@@ -59,7 +59,6 @@ import com.ragagent.agent.tools.knowledge.GetDocumentInfoTool;
 import com.ragagent.agent.tools.knowledge.ListKnowledgeChunksTool;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.common.tenant.WebSearchConfig;
-import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.storage.TenantFileStorage;
 import com.ragagent.tenant.Tenant;
 import com.ragagent.websearch.service.WebSearchService;

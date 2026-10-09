@@ -23,10 +23,7 @@ public final class EnvVectorStores {
 
     public static boolean isEnvStoreId(String id) {
         // B107：谓词下沉 L1（L2 引擎工厂也要用），这里保留同名入口以兼容域内调用
-        if (true) {
-            return EnvStoreIds.isEnvStoreId(id);
-        }
-        return id != null && id.startsWith(ENV_STORE_ID_PREFIX);
+        return EnvStoreIds.isEnvStoreId(id);
     }
 
     public static List<VectorStore> build(String retrieveDriver, EnvLookup env) {

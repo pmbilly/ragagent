@@ -34,7 +34,6 @@ import com.ragagent.llm.domain.ChatResponse;
 import com.ragagent.modelcontext.Registry;
 import com.ragagent.tracing.langfuse.LangfuseManager;
 import com.ragagent.tracing.langfuse.Span;
-import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.BizException;
 import com.ragagent.llm.domain.FunctionCall;
 

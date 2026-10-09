@@ -10,8 +10,6 @@ import com.ragagent.llm.ollama.OllamaService;
 import com.ragagent.model.domain.Model;
 import com.ragagent.model.domain.ModelParameters;
 import com.ragagent.model.service.ModelService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 import com.ragagent.model.service.ModelRuntimeConfigs;
@@ -30,7 +28,6 @@ import com.ragagent.model.service.ModelRuntimeConfigs;
 @Component
 public class DefaultWikiModelResolver implements WikiModelResolver {
 
-    private static final Logger log = LoggerFactory.getLogger(DefaultWikiModelResolver.class);
 
     private final ModelService modelService;
     private final ObjectProvider<OllamaService> ollamaService;

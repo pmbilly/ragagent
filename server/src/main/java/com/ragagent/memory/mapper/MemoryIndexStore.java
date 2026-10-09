@@ -24,8 +24,6 @@ import com.ragagent.memory.domain.MemoryScope;
 import com.ragagent.memory.domain.MemorySubject;
 import com.ragagent.memory.domain.MemorySubjectMissingException;
 import com.ragagent.memory.domain.MemoryTopicStat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * 记忆索引侧读写：**话题统计、文档亲和、抽取进度**，以及本类与仓储共用的内部工具
@@ -41,7 +39,6 @@ import org.slf4j.LoggerFactory;
  */
 final class MemoryIndexStore {
 
-    private static final Logger log = LoggerFactory.getLogger(MemoryIndexStore.class);
 
     private final MemoryRepository repo;
 

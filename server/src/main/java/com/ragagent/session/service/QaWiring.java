@@ -62,7 +62,6 @@ import com.ragagent.auth.service.TenantService;
 import com.ragagent.chatpipeline.plugin.PluginDataAnalysis;
 import com.ragagent.chatpipeline.plugin.PluginSearch;
 import com.ragagent.chatpipeline.plugin.PluginSearchEntity;
-import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.memory.MemoryRecall;
 import com.ragagent.common.memory.MemoryRetrievalContext;
 import com.ragagent.common.pipeline.SearchParams;

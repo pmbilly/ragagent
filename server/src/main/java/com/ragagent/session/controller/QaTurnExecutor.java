@@ -27,7 +27,6 @@ import com.ragagent.session.service.SessionKnowledgeQaService;
 import com.ragagent.stream.StreamManager;
 import jakarta.servlet.http.HttpServletResponse;
 import com.ragagent.auth.service.TenantService;
-import com.ragagent.common.error.BizException;
 import com.ragagent.event.TenantContextSnapshot;
 import com.ragagent.session.domain.MessageExecutionContext;
 import com.ragagent.session.service.SessionLookupScope;

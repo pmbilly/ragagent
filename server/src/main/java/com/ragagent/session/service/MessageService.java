@@ -31,7 +31,6 @@ import com.ragagent.common.wiki.WikiLanguageSupport;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.service.KnowledgeBaseService;
 import com.ragagent.session.domain.ArtifactVersions;
-import com.ragagent.session.domain.MessageArtifact;
 
 /**
  * 消息服务。

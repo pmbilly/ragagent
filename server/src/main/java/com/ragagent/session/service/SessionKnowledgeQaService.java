@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.chatpipeline.ChatManage;
 import com.ragagent.chatpipeline.EventManager;
@@ -40,7 +39,6 @@ import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.session.support.PipelineViews;
 import com.ragagent.agent.management.domain.CustomAgentEntity;
 import com.ragagent.auth.service.TenantService;
-import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.retrieval.SearchTarget;
 import com.ragagent.tracing.langfuse.LangfuseManager;
 import com.ragagent.tracing.langfuse.Span;
@@ -61,7 +59,6 @@ import com.ragagent.websearch.mapper.WebSearchProviderRepository;
 public class SessionKnowledgeQaService {
 
     private static final Logger log = LoggerFactory.getLogger(SessionKnowledgeQaService.class);
-    private static final ObjectMapper JSON = new ObjectMapper();
 
     final EventManager eventManager;
     final ConversationProperties cfg;
@@ -384,7 +381,7 @@ public class SessionKnowledgeQaService {
             }
             // Emit references before answer streaming（complete 关流前必达）
             if (PipelineEventType.CHAT_COMPLETION_STREAM.equals(eventType)) {
-                fallback.emitKnowledgeReferencesEvent(chatManage);
+                SessionQaFallback.emitKnowledgeReferencesEvent(chatManage);
             }
             PluginError err = eventManager.trigger(eventType, chatManage);
             if (understandProgress != null && PipelineEventType.QUERY_UNDERSTAND.equals(eventType)) {

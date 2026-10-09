@@ -35,6 +35,8 @@ jobs:
         run: python3 scripts/check-file-size.py
       - name: 目录卫生（B124：游离目录 S1 / 死包目录 S2 —— 对 git 不可见的残留）
         run: python3 scripts/check-stray-dirs.py
+      - name: 死成员守卫（B131：重复/未使用 import，遗留 Logger/ObjectMapper 字段）
+        run: python3 scripts/check-dead-members.py
 
   backend:
     name: 后端 build + test + spotless

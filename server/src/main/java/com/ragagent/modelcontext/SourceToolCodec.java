@@ -16,7 +16,6 @@ import com.ragagent.llm.domain.ToolCall;
 
 import com.ragagent.common.web.ToolJson;
 import com.ragagent.llm.domain.MessageContentPart;
-import com.ragagent.llm.domain.ToolCall;
 
 /**
  * source 句柄的<b>工具参数编解码</b>（自 {@code SourceRegistry} 的同名段外提）。

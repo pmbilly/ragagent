@@ -57,8 +57,6 @@ public class DataSourceCredentialsController {
     private static final ObjectMapper MAPPER = JsonMappers.lenient()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-    /** 校验失败文案里的请求体类型名（保持线上原文）。 */
-    private static final String REQUEST_TYPE_NAME = "dataSourceCredentialsPutRequest";
 
     private final DataSourceService service;
     private final KnowledgeBridge kbBridge;

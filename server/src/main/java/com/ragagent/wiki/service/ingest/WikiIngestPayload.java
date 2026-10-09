@@ -3,7 +3,6 @@ package com.ragagent.wiki.service.ingest;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ragagent.common.context.TracingContext;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.ragagent.common.context.TracingContext;
 
 /**
  * wiki ingest 批次触发任务的载荷。

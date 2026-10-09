@@ -35,7 +35,6 @@ import com.ragagent.auth.service.TenantService;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.security.TenantAPIKeyScope;
 import com.ragagent.memory.service.MemoryExtractionService;
-import com.ragagent.session.service.MessageSuggestionService;
 import com.ragagent.session.service.SteerRunCoordinator;
 import com.ragagent.session.sse.SseFrameWriter;
 import com.ragagent.storage.support.FileService;
