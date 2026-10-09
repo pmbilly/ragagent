@@ -135,7 +135,7 @@ B33 已归位：`AppEnvLookup` → `common/deployment`、`StorageRuntimeEnv` →
 
 ### P2b 超大文件（> 600 行；棘轮 `scripts/check-file-size.py`，B121 上线）
 
-**现状**（2026-10-08 B127 盘点）：主源码里 **> 600 行有 67 个**、其中 ≥800 **4 个**（3 个已论证例外 + 1 个待还债）。**已出榜**：`im/service/ImService`（B123~B127 四刀 1,091→554，守卫自动清理其豁免登记）。
+**现状**（2026-10-08 B129 盘点）：主源码里 **> 600 行有 67 个**、其中 ≥800 **3 个**（**全部是已论证例外**；"待还债"归零）。**已出榜**：`im/service/ImService`（B123~B127 四刀 1,091→554）、`session/service/SessionKnowledgeQaService`（B129 两刀 1,041→756）。**已出榜**：`im/service/ImService`（B123~B127 四刀 1,091→554，守卫自动清理其豁免登记）。
 最大的 12 个（**就是后续拆分的待办清单**）：
 
 | 行数 | 文件 | | 行数 | 文件 |

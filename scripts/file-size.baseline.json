@@ -59,7 +59,7 @@
     "server/src/main/java/com/ragagent/session/service/AgentEngineAssembler.java": 631,
     "server/src/main/java/com/ragagent/session/service/AgentStreamBridge.java": 667,
     "server/src/main/java/com/ragagent/session/service/MessageSuggestionService.java": 606,
-    "server/src/main/java/com/ragagent/session/service/SessionKnowledgeQaService.java": 1041,
+    "server/src/main/java/com/ragagent/session/service/SessionKnowledgeQaService.java": 756,
     "server/src/main/java/com/ragagent/session/service/SessionService.java": 644,
     "server/src/main/java/com/ragagent/storage/fileserve/StorageFileResolver.java": 789,
     "server/src/main/java/com/ragagent/system/controller/SystemController.java": 704,
@@ -86,11 +86,6 @@
       "status": "accepted",
       "since": "2026-10-01",
       "reason": "六段同属「索引侧读写」一个关注点，再切不落在自然接缝上（B122 复核：持有 MemoryRepository 回引，六段共用 repo 与方言判定；已在类 javadoc 自述）"
-    },
-    "server/src/main/java/com/ragagent/session/service/SessionKnowledgeQaService.java": {
-      "status": "pending",
-      "since": "2026-10-08",
-      "reason": "理由缺失待复核：HANDOFF 记「§14.5 已登记例外」，但类 javadoc 并无自述理由（§14.5 明文要求「例外必须在类 javadoc 写明理由」）。HANDOFF 自己已把它列为「例外复核」待办 ⇒ 需复核出接缝理由补写 javadoc，或拆分"
     }
   }
 }

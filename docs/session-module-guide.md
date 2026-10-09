@@ -73,7 +73,7 @@ graph TB
     CTRL -. 序列化 .-> DOM
 ```
 
-**三个必须知道的数字**：最大类 `SessionKnowledgeQaService` 1,029 行（全仓仅剩 4 个 ≥800 行**登记例外**之一，见 HANDOFF §14.3；其后 `AgentStreamBridge` 667 / `SessionService` 640）；`service/` 11,814 行 ≈ **54%** 的代码量，且 2026-09-30~10-01 一批刚从 8 个神类切出 15 个同包协作者；36 个端点里 **3 条是 SSE 流**，字节契约集中在 `sse/` 两个类手里。
+**三个必须知道的数字**：最大类 `SessionKnowledgeQaService` **756 行**（B129 例外复核后两刀出榜：兜底流渲染外提 `SessionQaFallback`（+223 行）+ WebSearch 参数解析新建叶子 `QaWebSearchParams`；其后 `AgentStreamBridge` 667 / `SessionService` 640）；`service/` 11,814 行 ≈ **54%** 的代码量，且 2026-09-30~10-01 一批刚从 8 个神类切出 15 个同包协作者；36 个端点里 **3 条是 SSE 流**，字节契约集中在 `sse/` 两个类手里。
 
 ---
 
@@ -456,7 +456,7 @@ cd frontend && npx vue-tsc --build --force && npm test
 
 | 项 | 性质 | 建议 |
 |---|---|---|
-| `SessionKnowledgeQaService` 1,029 行 | 登记例外 | 全仓仅剩 4 个 ≥800 行例外之一（HANDOFF §14.3）；要拆按 §13.1 套路：先侦察三类依赖，"先落被依赖方"解受阻刀 |
+| ~~`SessionKnowledgeQaService` 1,029 行~~ | **已出榜（2026-10-08 B129）**：1,041→**756**，两刀——① 兜底流渲染簇（207 行）**并入既有** `SessionQaFallback`（那些方法的唯一调用方本来就是它，原先是它回调门面 ✗）；② WebSearch 参数解析簇（69 行）新建叶子 `QaWebSearchParams`。教训见 HANDOFF B129（"同名注入"优于"加前缀"）|
 | `MessageFileProxyController` 跨租户两条授予路径未实现 | 已知收紧（偏保守） | shared-agent / org-shared KB 下 owner ≠ caller 恒 403（类注释）；要放开走 `FileAccessResolver` 端口补，需单独一批 + fixture |
 | `SessionKnowledgeQaService` 的 hybridSearch adapter 空实现 | 备案差异 | javadoc"已知差异（备案）"；检索执行面收口归检索面专项，别在本域顺手补 |
 | `@Valid` 默认 message locale 漂移 | 存量 | 本域旧注解未显式 message（§7-11）；错误形态统一批路过时顺手改 |

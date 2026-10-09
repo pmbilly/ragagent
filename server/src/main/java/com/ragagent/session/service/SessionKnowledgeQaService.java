@@ -27,21 +27,12 @@ import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.BizException;
 import com.ragagent.common.prompt.MessageAttachmentsPrompt;
 import com.ragagent.settings.ConversationProperties;
-import com.ragagent.event.Event;
 import com.ragagent.event.EventBus;
-import com.ragagent.event.EventBusInterface;
-import com.ragagent.event.EventType;
-import com.ragagent.event.payload.AgentFinalAnswerData;
-import com.ragagent.event.payload.AgentReferencesData;
-import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.service.KnowledgeBaseService;
 import com.ragagent.knowledge.service.KnowledgeService;
-import com.ragagent.common.llm.ResponseType;
-import com.ragagent.llm.domain.StreamResponse;
 import com.ragagent.model.domain.Model;
 import com.ragagent.model.service.ModelService;
-import com.ragagent.modelcontext.Registry;
 import com.ragagent.common.retrieval.SearchResult;
 
 import static com.ragagent.session.service.QaSupport.TagScope;
@@ -50,12 +41,7 @@ import com.ragagent.session.support.PipelineViews;
 import com.ragagent.agent.management.domain.CustomAgentEntity;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.common.context.TenantContext;
-import com.ragagent.common.prompt.AgentPromptPlaceholders;
 import com.ragagent.common.retrieval.SearchTarget;
-import com.ragagent.common.tenant.WebSearchConfig;
-import com.ragagent.event.EventIds;
-import com.ragagent.llm.domain.ChatResponse;
-import com.ragagent.tenant.Tenant;
 import com.ragagent.tracing.langfuse.LangfuseManager;
 import com.ragagent.tracing.langfuse.Span;
 import com.ragagent.websearch.mapper.WebSearchProviderRepository;
@@ -90,6 +76,8 @@ public class SessionKnowledgeQaService {
     /** 解析/降级协作者(构造期装配)。 */
     final SessionQaResolution resolution;
     final SessionQaFallback fallback;
+    /** WebSearch/WebFetch 有效参数解析（B129 自本类外提）。 */
+    final QaWebSearchParams webSearchParams;
 
     public SessionKnowledgeQaService(EventManager eventManager,
             ConversationProperties cfg,
@@ -111,6 +99,7 @@ public class SessionKnowledgeQaService {
         this.dataSource = dataSource;
         this.resolution = new SessionQaResolution(this);
         this.fallback = new SessionQaFallback(this);
+        this.webSearchParams = new QaWebSearchParams(this);
     }
 
     // ── seam 委托:实现随 Resolution 协作者(外部消费面不变) ──
@@ -269,10 +258,10 @@ public class SessionKnowledgeQaService {
         chatManage.setRewritePromptSystem(cfg.getRewritePromptSystem());
         chatManage.setRewritePromptUser(cfg.getRewritePromptUser());
         chatManage.setWebSearchEnabled(req.webSearchEnabled);
-        chatManage.setWebSearchProviderId(resolveWebSearchProviderId(req, retrievalTenantId));
-        chatManage.setWebSearchMaxResults(resolveWebSearchMaxResults(req));
-        chatManage.setWebFetchEnabled(resolveWebFetchEnabled(req));
-        chatManage.setWebFetchTopN(resolveWebFetchTopN(req));
+        chatManage.setWebSearchProviderId(webSearchParams.resolveWebSearchProviderId(req, retrievalTenantId));
+        chatManage.setWebSearchMaxResults(webSearchParams.resolveWebSearchMaxResults(req));
+        chatManage.setWebFetchEnabled(webSearchParams.resolveWebFetchEnabled(req));
+        chatManage.setWebFetchTopN(webSearchParams.resolveWebFetchTopN(req));
         chatManage.setTenantId(retrievalTenantId);
         chatManage.setImages(req.imageUrls);
         chatManage.setVlmModelId(vlmModelId);
@@ -395,7 +384,7 @@ public class SessionKnowledgeQaService {
             }
             // Emit references before answer streaming（complete 关流前必达）
             if (PipelineEventType.CHAT_COMPLETION_STREAM.equals(eventType)) {
-                emitKnowledgeReferencesEvent(chatManage);
+                fallback.emitKnowledgeReferencesEvent(chatManage);
             }
             PluginError err = eventManager.trigger(eventType, chatManage);
             if (understandProgress != null && PipelineEventType.QUERY_UNDERSTAND.equals(eventType)) {
@@ -597,109 +586,8 @@ public class SessionKnowledgeQaService {
         return sharedPermitsViewer != null && sharedPermitsViewer.getAsBoolean();
     }
 
-    // ==================================================================
-    // fallback
-    // ==================================================================
-
-    static String trailTrim(String s) {
-        int end = s.length();
-        while (end > 0) {
-            char c = s.charAt(end - 1);
-            if (c == ' ' || c == '\t' || c == '\r' || c == '\n') {
-                end--;
-            } else {
-                break;
-            }
-        }
-        return s.substring(0, end);
-    }
-
-    /** 渲染 fallback prompt。 */
-    String renderFallbackPrompt(ChatManage chatManage) {
-        String query = chatManage.getQuery();
-        String rq = chatManage.getRewriteQuery() == null ? "" : chatManage.getRewriteQuery().trim();
-        if (!rq.isEmpty()) {
-            query = rq;
-        }
-        String kbDocuments = buildKbDocumentListing(chatManage);
-        String result = AgentPromptPlaceholders.renderPromptPlaceholders(chatManage.getFallbackPrompt(), Map.of(
-                "query", query,
-                "language", chatManage.getLanguage(),
-                "kb_documents", kbDocuments));
-        if (!chatManage.getImageDescription().isEmpty() && !chatManage.isChatModelSupportsVision()) {
-            result += "\n\n[用户上传图片内容]\n" + chatManage.getImageDescription();
-        }
-        if (!chatManage.getQuotedContext().isEmpty()) {
-            result += "\n\n" + chatManage.getQuotedContext();
-        }
-        return result;
-    }
-
-    /** 组装 KB 文档清单。 */
-    private String buildKbDocumentListing(ChatManage chatManage) {
-        Set<String> kbIds = new LinkedHashSet<>();
-        if (chatManage.getSearchTargets() != null) {
-            for (var t : chatManage.getSearchTargets()) {
-                kbIds.add(t.knowledgeBaseId());
-            }
-        }
-        kbIds.addAll(chatManage.getKnowledgeBaseIds());
-        if (kbIds.isEmpty()) {
-            return "";
-        }
-        final int maxDocuments = 50;
-        StringBuilder b = new StringBuilder();
-        int total = 0;
-        for (String kbId : kbIds) {
-            if (total >= maxDocuments) {
-                break;
-            }
-            List<Knowledge> knowledges;
-            try {
-                knowledges = knowledgeService.listKnowledge(kbId, 1, 10000, null, null, null, null, false).getRecords();
-            } catch (RuntimeException e) {
-                log.warn("buildKBDocumentListing: failed to list knowledge for KB {}: {}", kbId, e.toString());
-                continue;
-            }
-            for (Knowledge k : knowledges) {
-                if (total >= maxDocuments) {
-                    break;
-                }
-                if (!"enabled".equals(k.getEnableStatus())) {
-                    continue;
-                }
-                String title = k.getTitle();
-                if (title == null || title.isEmpty()) {
-                    title = k.getFileName();
-                }
-                if (title == null || title.isEmpty()) {
-                    continue;
-                }
-                b.append("- ").append(title);
-                if (k.getFileType() != null && !k.getFileType().isEmpty()) {
-                    b.append(" (").append(k.getFileType()).append(")");
-                }
-                if (k.getDescription() != null && !k.getDescription().isEmpty()) {
-                    String desc = k.getDescription();
-                    if (desc.codePointCount(0, desc.length()) > 100) {
-                        desc = substringByCodePoints(desc, 100) + "...";
-                    }
-                    b.append(": ").append(desc);
-                }
-                b.append("\n");
-                total++;
-            }
-        }
-        if (b.length() == 0) {
-            return "";
-        }
-        if (total >= maxDocuments) {
-            b.append(String.format("... (showing first %d documents)%n", maxDocuments));
-        }
-        return b.toString();
-    }
-
-    private static String substringByCodePoints(String s, int max) {
+    // substringByCodePoints 仍留在门面：modelcontext/ModelOutput 也在用（跨域共享的小工具）
+    static String substringByCodePoints(String s, int max) {
         int i = 0;
         int cp = 0;
         while (i < s.length() && cp < max) {
@@ -710,181 +598,8 @@ public class SessionKnowledgeQaService {
         return s.substring(0, i);
     }
 
-    /** 消费 fallback 流。 */
-    void consumeFallbackStream(ChatManage chatManage,
-            java.util.concurrent.BlockingQueue<StreamResponse> responseChan, Registry modelContext) {
-        String fallbackId = EventIds.generateEventID("fallback");
-        EventBusInterface eventBus = chatManage.getEventBus();
-        StringBuilder finalContent = new StringBuilder();
-        boolean streamCompleted = false;
-        var decoder = modelContext.streamDecoder();
-        // 生产者异常/中断时不投终态元素（RemoteApiChat 的 catch-return 路径）——
-        // 无上限的 poll 空转每次回退泄漏一个自旋虚拟线程。连续空读超时即收束
-        // （主流路径 takeQuietly 120s 同款兜底思想）。
-        int emptyPolls = 0;
 
-        while (true) {
-            StreamResponse response;
-            try {
-                response = responseChan.poll(1, java.util.concurrent.TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                break;
-            }
-            if (response == null) {
-                if (++emptyPolls >= 120) {
-                    log.warn("fallback stream produced no terminal frame after {}s, giving up",
-                            emptyPolls);
-                    break;
-                }
-                continue; // Java 无 channel 关闭：done 收束约定由生产者保证
-            }
-            emptyPolls = 0;
-            if (response.getResponseType() == ResponseType.ANSWER) {
-                String content = decoder.feed(response.getContent());
-                if (response.isDone()) {
-                    content += decoder.flush();
-                }
-                finalContent.append(content);
-                Event evt = new Event();
-                evt.setId(fallbackId);
-                evt.setType(EventType.EVENT_AGENT_FINAL_ANSWER);
-                evt.setSessionId(chatManage.getSessionId());
-                AgentFinalAnswerData data = new AgentFinalAnswerData(content, response.isDone(), true);
-                evt.setData(data);
-                try {
-                    eventBus.emit(evt);
-                } catch (RuntimeException e) {
-                    log.error("Failed to emit fallback answer chunk event: {}", e.toString());
-                }
-                if (response.isDone()) {
-                    ChatResponse cr = new ChatResponse();
-                    cr.setContent(finalContent.toString());
-                    chatManage.setChatResponse(cr);
-                    streamCompleted = true;
-                    log.info("Fallback streaming response completed");
-                    break;
-                }
-            }
-        }
-        if (!streamCompleted) {
-            log.warn("Fallback stream closed without completion, emitting final event with fixed response");
-            emitFallbackAnswer(chatManage, chatManage.getFallbackResponse());
-        }
-    }
 
-    /** 发送 knowledge_references 事件。 */
-    private static void emitKnowledgeReferencesEvent(ChatManage chatManage) {
-        if (chatManage == null || chatManage.getEventBus() == null
-                || chatManage.getMergeResult() == null || chatManage.getMergeResult().isEmpty()) {
-            return;
-        }
-        log.info("Emitting references event with {} results (pre-answer)", chatManage.getMergeResult().size());
-        Event evt = new Event();
-        evt.setId(EventIds.generateEventID("references"));
-        evt.setType(EventType.EVENT_AGENT_REFERENCES);
-        evt.setSessionId(chatManage.getSessionId());
-        evt.setData(new AgentReferencesData(chatManage.getMergeResult(), 0));
-        try {
-            chatManage.getEventBus().emit(evt);
-        } catch (RuntimeException e) {
-            log.error("Failed to emit references event: {}", e.toString());
-        }
-    }
-
-    /** 发送 fallback 答案。 */
-    void emitFallbackAnswer(ChatManage chatManage, String content) {
-        EventBusInterface eventBus = chatManage.getEventBus();
-        if (eventBus == null) {
-            return;
-        }
-        if (!chatManage.citationsEnabled()) {
-            Registry registry = new Registry(false);
-            content = registry.decodeOutputText(content);
-        }
-        String fallbackId = EventIds.generateEventID("fallback");
-        Event evt = new Event();
-        evt.setId(fallbackId);
-        evt.setType(EventType.EVENT_AGENT_FINAL_ANSWER);
-        evt.setSessionId(chatManage.getSessionId());
-        evt.setData(new AgentFinalAnswerData(content, true, true));
-        try {
-            eventBus.emit(evt);
-            log.info("Fallback answer event emitted successfully");
-        } catch (RuntimeException e) {
-            log.error("Failed to emit fallback answer event: {}", e.toString());
-        }
-    }
-
-    // ==================================================================
-    // web search 解析
-    // ==================================================================
-
-    private String resolveWebSearchProviderId(QaSupport.QaRequest req, long tenantId) {
-        if (req.agentConfig != null) {
-            String providerId = req.agentConfig.path("webSearchProviderId").asText("");
-            if (!providerId.isEmpty()) {
-                return providerId;
-            }
-        }
-        try {
-            for (var provider : webSearchProviderRepository.list(tenantId)) {
-                if (provider != null && provider.isDefault() && provider.getId() != null
-                        && !provider.getId().isEmpty()) {
-                    return provider.getId();
-                }
-            }
-        } catch (RuntimeException ignored) {
-            // 获取失败 → 留空
-        }
-        return "";
-    }
-
-    private boolean resolveWebFetchEnabled(QaSupport.QaRequest req) {
-        if (req.agentConfig != null) {
-            return req.agentConfig.path("webFetchEnabled").asBoolean(false);
-        }
-        return false;
-    }
-
-    private int resolveWebFetchTopN(QaSupport.QaRequest req) {
-        if (req.agentConfig != null) {
-            int topN = req.agentConfig.path("webFetchTopN").asInt(0);
-            if (topN > 0) {
-                return topN;
-            }
-        }
-        return 3;
-    }
-
-    private int resolveWebSearchMaxResults(QaSupport.QaRequest req) {
-        if (req.agentConfig != null) {
-            int max = req.agentConfig.path("webSearchMaxResults").asInt(0);
-            if (max > 0) {
-                return max;
-            }
-        }
-        // 租户缺省分支：读租户 WebSearchConfig 的 maxResults
-        Long tid = TenantContext.currentTenantId();
-        if (tid != null) {
-            try {
-                Tenant tenant = tenantService.getTenantById(tid);
-                if (tenant != null && tenant.getWebSearchConfig() != null
-                        && !tenant.getWebSearchConfig().isNull()) {
-                    WebSearchConfig cfg =
-                            JSON.treeToValue(tenant.getWebSearchConfig(),
-                                    WebSearchConfig.class);
-                    int max = cfg.getMaxResults();
-                    if (max > 0) {
-                        return max;
-                    }
-                }
-            } catch (RuntimeException | com.fasterxml.jackson.core.JsonProcessingException e) {
-                log.warn("resolveWebSearchMaxResults tenant config parse failed: {}", e.getMessage());
-            }
-        }
-        return 10; // types.DefaultWebSearchMaxResults
-    }
 
     // ==================================================================
     // 纯函数族
