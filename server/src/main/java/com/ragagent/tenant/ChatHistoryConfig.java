@@ -1,22 +1,18 @@
 package com.ragagent.tenant;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 聊天历史配置段。
- * 三个字段都恒输出。knowledge_base_id 由后端自动管理（隐藏 KB），
+ * 三个字段都恒输出。knowledgeBaseId 由后端自动管理（隐藏 KB），
  * 客户端 PUT 携带的值会被丢弃（controller 重建对象）。
  */
 
 public class ChatHistoryConfig {
 
-    @JsonProperty("enabled")
     private boolean enabled;
 
-    @JsonProperty("embedding_model_id")
     private String embeddingModelId = "";
 
-    @JsonProperty("knowledge_base_id")
     private String knowledgeBaseId = "";
 
     public boolean isEnabled() { return enabled; }

@@ -1,1 +1,1 @@
-{"error":{"code":1000,"message":"vector_threshold must be between 0 and 1","details":null}}
+{"error":{"code":1000,"message":"vectorThreshold must be between 0 and 1","details":null}}

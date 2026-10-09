@@ -3,12 +3,17 @@ import { get, put } from '@/utils/request'
 // RetrievalConfig represents the global retrieval/search configuration for a tenant.
 // Shared by knowledge search and message search.
 export interface RetrievalConfig {
-  embedding_top_k: number
-  vector_threshold: number
-  keyword_threshold: number
-  rerank_top_k: number
-  rerank_threshold: number
-  rerank_model_id: string
+  embeddingTopK: number
+  vectorThreshold: number
+  keywordThreshold: number
+  rerankTopK: number
+  rerankThreshold: number
+  rerankModelId: string
+  // 以下三键由高级配置/API 设定，本仓界面不渲染；服务端取 0/0.0 时省略键，故为可选。
+  // 必须原样透传：PUT 是整体替换，漏带即被重置为服务端缺省（60 / 0.7 / 0.3）。
+  rrfK?: number
+  rrfVectorWeight?: number
+  rrfKeywordWeight?: number
 }
 
 // Get tenant retrieval config via KV API

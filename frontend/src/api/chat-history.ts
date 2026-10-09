@@ -1,11 +1,11 @@
 import { get, put, post } from '@/utils/request'
 
 // ChatHistoryConfig represents the chat history KB configuration for a tenant.
-// knowledge_base_id is auto-managed by the backend; frontend only sets other fields.
+// knowledgeBaseId is auto-managed by the backend; frontend only sets other fields.
 export interface ChatHistoryConfig {
   enabled: boolean
-  embedding_model_id: string
-  knowledge_base_id?: string // read-only, auto-managed
+  embeddingModelId: string
+  knowledgeBaseId?: string // read-only, auto-managed
 }
 
 // ChatHistoryKBStats represents statistics about the chat history knowledge base

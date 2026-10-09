@@ -1,49 +1,39 @@
 package com.ragagent.tenant;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 检索配置段。
  *
- * <p>前六个字段恒输出；rrf_* 三个空值（0 / 0.0）省略键。浮点走 Jackson 默认形态（0.0）。</p>
+ * <p>前六个字段恒输出；rrfK / rrfVectorWeight / rrfKeywordWeight 三个空值（0 / 0.0）省略键。浮点走 Jackson 默认形态（0.0）。</p>
  */
 
 public class RetrievalConfig {
 
-    @JsonProperty("embedding_top_k")
     private int embeddingTopK;
 
 
-    @JsonProperty("vector_threshold")
     private double vectorThreshold;
 
 
-    @JsonProperty("keyword_threshold")
     private double keywordThreshold;
 
-    @JsonProperty("rerank_top_k")
     private int rerankTopK;
 
 
-    @JsonProperty("rerank_threshold")
     private double rerankThreshold;
 
-    @JsonProperty("rerank_model_id")
     private String rerankModelId = "";
 
     /** 数值 0 省略键 */
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-    @JsonProperty("rrf_k")
     private int rrfK;
 
     /** 0.0 省略键（NON_DEFAULT 对 primitive double 即 0.0） */
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-    @JsonProperty("rrf_vector_weight")
     private double rrfVectorWeight;
 
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-    @JsonProperty("rrf_keyword_weight")
     private double rrfKeywordWeight;
 
     public int getEmbeddingTopK() { return embeddingTopK; }

@@ -91,8 +91,8 @@ class MessageServiceVectorSearchTest {
             String kbId) {
         ObjectNode n = MAPPER.createObjectNode();
         n.put("enabled", enabled);
-        n.put("embedding_model_id", embeddingModelId);
-        n.put("knowledge_base_id", kbId);
+        n.put("embeddingModelId", embeddingModelId);
+        n.put("knowledgeBaseId", kbId);
         return n;
     }
 
@@ -205,7 +205,7 @@ class MessageServiceVectorSearchTest {
         assertThat(sp.getVectorThreshold()).isEqualTo(0.25);
         assertThat(sp.isDisableKeywordsMatch()).isTrue();
         assertThat(sp.isDisableVectorMatch()).isFalse();
-        // rerank_model_id 为空 → 不取模型，直接返回
+        // rerankModelId 为空 → 不取模型，直接返回
         verifyNoInteractions(modelRuntimeFactory);
 
         assertThat(result.getTotal()).isEqualTo(2);

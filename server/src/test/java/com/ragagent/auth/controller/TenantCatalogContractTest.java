@@ -45,7 +45,7 @@ import com.ragagent.support.ContractJson;
  * （响应不比 golden，只取 id），X-Tenant-ID 切过去再打 KV。</p>
  *
  * <p>掩码（两侧同掩码）：租户/设置行的数字 id、UUID（default_storage_backend_id、
- * knowledge_base_id、last_modified_by、embedding_model_id）、时间戳、
+ * knowledgeBaseId、last_modified_by、embeddingModelId）、时间戳、
  * apiKey 明文、parser SSRF 错误里的解析 IP（fake-ip 段每次解析可能不同）。</p>
  *
  * <p><b>已知不录</b>：parser 三条 PUT 全是 SSRF 失败路径（无成功路径 golden，
@@ -315,17 +315,17 @@ class TenantCatalogContractTest {
         long alpha = createAlpha();
         assertGolden(kvGet("chat-history-config", alpha), 200, "ct-kv-chat-get-default.json");
         assertGolden(kvPut("chat-history-config", alpha,
-                "{\"enabled\":false,\"embedding_model_id\":\"\"}"),
+                "{\"enabled\":false,\"embeddingModelId\":\"\"}"),
                 200, "ct-kv-chat-put-off.json");
-        // enable：自动建隐藏 KB，knowledge_base_id 是随机 uuid（掩码）；
+        // enable：自动建隐藏 KB，knowledgeBaseId 是随机 uuid（掩码）；
         // Java KnowledgeBaseService 对无后端租户容忍（backend null 直接返回）
         assertMasked(kvPut("chat-history-config", alpha,
-                "{\"enabled\":true,\"embedding_model_id\":\"" + EMBEDDING_MODEL + "\"}"),
+                "{\"enabled\":true,\"embeddingModelId\":\"" + EMBEDDING_MODEL + "\"}"),
                 200, "ct-kv-chat-put-enable.json");
         assertMasked(kvGet("chat-history-config", alpha), 200, "ct-kv-chat-get-after.json");
         // 再次 enable：模型未变 → 沿用存量 KB（uuid 与上一条相同，掩码后对齐）
         assertMasked(kvPut("chat-history-config", alpha,
-                "{\"enabled\":true,\"embedding_model_id\":\"" + EMBEDDING_MODEL + "\"}"),
+                "{\"enabled\":true,\"embeddingModelId\":\"" + EMBEDDING_MODEL + "\"}"),
                 200, "ct-kv-chat-put-again.json");
     }
 
@@ -336,14 +336,14 @@ class TenantCatalogContractTest {
         long alpha = createAlpha();
         assertGolden(kvGet("retrieval-config", alpha), 200, "ct-kv-ret-get-default.json");
         assertGolden(kvPut("retrieval-config", alpha,
-                "{\"embedding_top_k\":20,\"vector_threshold\":0.5,\"keyword_threshold\":0.4,"
-                        + "\"rerank_top_k\":5,\"rerank_threshold\":0.1,\"rerank_model_id\":\"rm-1\","
-                        + "\"rrf_k\":60,\"rrf_vector_weight\":0.7,\"rrf_keyword_weight\":0.3}"),
+                "{\"embeddingTopK\":20,\"vectorThreshold\":0.5,\"keywordThreshold\":0.4,"
+                        + "\"rerankTopK\":5,\"rerankThreshold\":0.1,\"rerankModelId\":\"rm-1\","
+                        + "\"rrfK\":60,\"rrfVectorWeight\":0.7,\"rrfKeywordWeight\":0.3}"),
                 200, "ct-kv-ret-put.json");
         assertGolden(kvGet("retrieval-config", alpha), 200, "ct-kv-ret-get-after.json");
-        assertGolden(kvPut("retrieval-config", alpha, "{\"vector_threshold\":1.5}"),
+        assertGolden(kvPut("retrieval-config", alpha, "{\"vectorThreshold\":1.5}"),
                 400, "ct-kv-ret-put-bad-vector.json");
-        assertGolden(kvPut("retrieval-config", alpha, "{\"embedding_top_k\":201}"),
+        assertGolden(kvPut("retrieval-config", alpha, "{\"embeddingTopK\":201}"),
                 400, "ct-kv-ret-put-bad-topk.json");
     }
 

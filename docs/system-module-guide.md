@@ -312,7 +312,7 @@ cd frontend && npx vue-tsc --build --force && npm test
 1. **jsonb 双保险 + H2 保留字**：`value` 列必须 typeHandler + `autoResultMap` 成对出现；`key`/`value` 列名带引号（实体 `@TableField` 与 `TestSchema` 两处）。出处：`SystemSetting` 源码注释、`TestSchema` 建表注释。
 2. **ssrf.whitelist 的启动预载不能删**：guard 是进程级静态、初始化只读 env；删了预载，重启后 DB 白名单静默失效。出处：`SystemSettingService` javadoc（实测案例）。
 3. **settings 的错误文案与 description 是契约**：`unknown setting key "x"`、`invalid value for ...`、registry 的 description 都会原样出现在响应里。出处：`SystemSettingRegistry` javadoc（"Description 文案是响应体的一部分，不是注释"）。
-4. **check 类端点的请求侧 snake 是冻结面**：与租户配置 jsonb 同形，别"顺手"DTO 化——要与 knowledge 域租户配置解冻同批。出处：`SystemController` javadoc + HANDOFF §14.9f 边界。
+4. **check 类端点的请求侧 snake 是冻结面**：与租户配置 jsonb 同形，别"顺手"DTO 化——要与 knowledge 域租户配置解冻同批。出处：`SystemController` javadoc + HANDOFF §14.9f 边界。（2026-10-09 更新：§15.3「已解除」表下租户配置内容**已开始换锚**——B132 完成 `chat-history-config` / `retrieval-config` 两段；本条所指的"同批"对象仍是其余段与系统 check 端点自身。）
 5. **审计 details 键名有意保留 snake**：`target_email`/`quota_gb`/`old_value`/`task_id` 是跨域事件载荷，要改就独立一批（RBAC/settings/队列产生方一起）。出处：HANDOFF §14.9g"有意保留（勿当漏网）"。
 6. **capabilities 的键序与部署漂移**：JSON 输出必须按键字母序（holder 用 LinkedHashMap 保序所以按字母序插入）；capabilities 表达**部署状态**而非代码契约，跨部署不做字节比对。出处：`DeploymentCapabilitiesHolder` 注释 + `SystemContractTest` javadoc。
 7. **探测逻辑长在 controller 里**：`SystemController` 700 行，storage check 的 7 个 provider 分支、文案分派、`overridesFromRaw` 的 20+ 个 snake 键全在 controller。改 provider 语义只动这一处，但别把它当 service 层逻辑复用。

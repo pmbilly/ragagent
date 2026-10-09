@@ -382,10 +382,10 @@ public class MessageService {
         if (!node.path("enabled").asBoolean(false)) {
             return "chat history indexing disabled";
         }
-        if (node.path("embedding_model_id").asText("").isEmpty()) {
+        if (node.path("embeddingModelId").asText("").isEmpty()) {
             return "enabled but no embedding model selected";
         }
-        if (node.path("knowledge_base_id").asText("").isEmpty()) {
+        if (node.path("knowledgeBaseId").asText("").isEmpty()) {
             return "enabled but chat history knowledge base not created yet";
         }
         return "chat history config incomplete";
@@ -429,8 +429,8 @@ public class MessageService {
         }
 
         stats.setEnabled(true);
-        stats.setEmbeddingModelId(cfg.path("embedding_model_id").asText(""));
-        stats.setKnowledgeBaseId(cfg.path("knowledge_base_id").asText(""));
+        stats.setEmbeddingModelId(cfg.path("embeddingModelId").asText(""));
+        stats.setKnowledgeBaseId(cfg.path("knowledgeBaseId").asText(""));
 
         String kbId = stats.getKnowledgeBaseId();
         if (kbId.isEmpty()) {

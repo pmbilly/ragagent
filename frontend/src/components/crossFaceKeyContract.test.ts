@@ -395,7 +395,6 @@ test('api 面 snake 记号棘轮：只许减不许增', () => {
   const FACE_WHITELIST: Record<string, string> = {
     'api/chat/': 'SSE/事件载荷与本地游标（事件协议面；agent-chat 同时是对外文档化 API，见 B72 设计稿）',
     'api/system/index.ts': '系统设置 KV + 沙箱/任务引擎直出载荷（§15.2 纪律：冻结面不换；expires_at_unix 已于 B72 修 camel）',
-    'api/retrieval.ts': '检索参数设置键（系统设置面）',
     'api/model/modelUsage.ts': '后端 putObject 亲手构造的 snake 载荷（前后端一致）',
   }
   const BASELINE: Record<string, string> = {
@@ -405,8 +404,6 @@ test('api 面 snake 记号棘轮：只许减不许增', () => {
     'api/agent/index.ts:none_of': '已核实：同上',
     'api/agent/index.ts:file_types': '已核实：后端 ParserEngineRules 按 file_types 读规则 jsonb，两侧一致',
     'api/auth/index.ts:owner_id': '已核实：前端本地快照键（注释已声明后端 TenantResponse 无此键）',
-    'api/chat-history.ts:embedding_model_id': '已核实：后端 MessageService/MessageSearch 按 node.path(...) 读 jsonb',
-    'api/chat-history.ts:knowledge_base_id': '已核实：同上',
     'api/embed/index.ts:channel_id': '已核实：embed 宿主↔iframe 消息协议（widget.js 与 Vue 侧同一套键）',
     'api/embed/index.ts:session_id': '已核实：同上',
     'api/knowledge-base/index.ts:tag_ids': '已核实：列表筛选查询参数（后端按 snake 接收）',

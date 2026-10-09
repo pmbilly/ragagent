@@ -254,30 +254,30 @@ req ct-kv-chat-get-default.json GET /tenants/kv/chat-history-config \
   -H "Authorization: Bearer ${SELF}" -H "X-Tenant-ID: ${ALPHA_ID}"
 req ct-kv-chat-put-off.json    PUT /tenants/kv/chat-history-config \
   -H "Authorization: Bearer ${SELF}" -H "X-Tenant-ID: ${ALPHA_ID}" -H 'Content-Type: application/json' \
-  -d '{"enabled":false,"embedding_model_id":""}'
+  -d '{"enabled":false,"embeddingModelId":""}'
 req ct-kv-chat-put-enable.json PUT /tenants/kv/chat-history-config \
   -H "Authorization: Bearer ${SELF}" -H "X-Tenant-ID: ${ALPHA_ID}" -H 'Content-Type: application/json' \
-  -d '{"enabled":true,"embedding_model_id":"'"${EMBEDDING_MODEL}"'"}'
+  -d '{"enabled":true,"embeddingModelId":"'"${EMBEDDING_MODEL}"'"}'
 req ct-kv-chat-get-after.json  GET /tenants/kv/chat-history-config \
   -H "Authorization: Bearer ${SELF}" -H "X-Tenant-ID: ${ALPHA_ID}"
 req ct-kv-chat-put-again.json  PUT /tenants/kv/chat-history-config \
   -H "Authorization: Bearer ${SELF}" -H "X-Tenant-ID: ${ALPHA_ID}" -H 'Content-Type: application/json' \
-  -d '{"enabled":true,"embedding_model_id":"'"${EMBEDDING_MODEL}"'"}'
+  -d '{"enabled":true,"embeddingModelId":"'"${EMBEDDING_MODEL}"'"}'
 
 echo "==> 12) KV retrieval-config"
 req ct-kv-ret-get-default.json GET /tenants/kv/retrieval-config \
   -H "Authorization: Bearer ${SELF}" -H "X-Tenant-ID: ${ALPHA_ID}"
 req ct-kv-ret-put.json         PUT /tenants/kv/retrieval-config \
   -H "Authorization: Bearer ${SELF}" -H "X-Tenant-ID: ${ALPHA_ID}" -H 'Content-Type: application/json' \
-  -d '{"embedding_top_k":20,"vector_threshold":0.5,"keyword_threshold":0.4,"rerank_top_k":5,"rerank_threshold":0.1,"rerank_model_id":"rm-1","rrf_k":60,"rrf_vector_weight":0.7,"rrf_keyword_weight":0.3}'
+  -d '{"embeddingTopK":20,"vectorThreshold":0.5,"keywordThreshold":0.4,"rerankTopK":5,"rerankThreshold":0.1,"rerankModelId":"rm-1","rrfK":60,"rrfVectorWeight":0.7,"rrfKeywordWeight":0.3}'
 req ct-kv-ret-get-after.json   GET /tenants/kv/retrieval-config \
   -H "Authorization: Bearer ${SELF}" -H "X-Tenant-ID: ${ALPHA_ID}"
 req ct-kv-ret-put-bad-vector.json PUT /tenants/kv/retrieval-config \
   -H "Authorization: Bearer ${SELF}" -H "X-Tenant-ID: ${ALPHA_ID}" -H 'Content-Type: application/json' \
-  -d '{"vector_threshold":1.5}'
+  -d '{"vectorThreshold":1.5}'
 req ct-kv-ret-put-bad-topk.json PUT /tenants/kv/retrieval-config \
   -H "Authorization: Bearer ${SELF}" -H "X-Tenant-ID: ${ALPHA_ID}" -H 'Content-Type: application/json' \
-  -d '{"embedding_top_k":201}'
+  -d '{"embeddingTopK":201}'
 
 echo "==> 13) KV memory-config"
 req ct-kv-mem-get-default.json GET /tenants/kv/memory-config \

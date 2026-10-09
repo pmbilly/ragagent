@@ -1,1 +1,1 @@
-{"embedding_top_k":20,"vector_threshold":0.5,"keyword_threshold":0.4,"rerank_top_k":5,"rerank_threshold":0.1,"rerank_model_id":"rm-1","rrf_k":60,"rrf_vector_weight":0.7,"rrf_keyword_weight":0.3}
+{"embeddingTopK":20,"vectorThreshold":0.5,"keywordThreshold":0.4,"rerankTopK":5,"rerankThreshold":0.1,"rerankModelId":"rm-1","rrfK":60,"rrfVectorWeight":0.7,"rrfKeywordWeight":0.3}

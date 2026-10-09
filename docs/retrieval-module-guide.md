@@ -153,7 +153,7 @@ graph LR
 | 检索类型 | `vector` / `keywords` | `EngineTypes.RETRIEVER_*`（每店声明支持哪些） |
 | 命中类型 MatchType | 0 embedding / 1 keywords / 2 near_by_chunk / 3 history / 4 parent_chunk / 5 relation_chunk | 命中标记（0 起连续编号，`HybridSearchService` 与 `EngineTypes` 各有一份常量） |
 | 内容来源 | 0 file / 1 faq | `EngineTypes.SOURCE_TYPE_*`；`VectorStoreService.IndexRow` 的 source_type 恒 0 |
-| RRF 配置 | `rrf_k` 缺省 60、`rrf_vector_weight` 0.7、`rrf_keyword_weight` 0.3 | 租户 `retrieval_config` jsonb（`HybridSearchService.RetrievalConfigView` 读，0/负值回落缺省） |
+| RRF 配置 | `rrfK` 缺省 60、`rrfVectorWeight` 0.7、`rrfKeywordWeight` 0.3 | 租户 `retrieval_config` jsonb（`HybridSearchService.RetrievalConfigView` 读，0/负值回落缺省） |
 
 ---
 
@@ -213,7 +213,7 @@ sequenceDiagram
     H->>ENG: 单组直取 / 多组虚拟线程扇出（上限 4、组超时缺省 30s）
     Note over ENG: 跨引擎类型先过 EngineAwareNormalizer 归一<br/>（只归向量分，BM25 透传）
     ENG-->>H: 命中 → toPgShape（IndexHit）
-    H->>FUS: 向量/关键词分流 → RRF 融合（rrf_k=60，0.7/0.3）或按分去重
+    H->>FUS: 向量/关键词分流 → RRF 融合（rrfK=60，0.7/0.3）或按分去重
     FUS->>FUS: FAQ 后处理（迭代只涨 TopK，负向问题过滤）
     H->>H: 截断到 matchCount
     H->>RES: 命中 → SearchResult（chunk 元数据补全 + FAQ 问题回填）

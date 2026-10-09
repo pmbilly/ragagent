@@ -78,8 +78,8 @@ class MessageServiceChatHistoryIndexTest {
     private static ObjectNode configured(String embeddingModelId, String kbId) {
         ObjectNode n = MAPPER.createObjectNode();
         n.put("enabled", true);
-        n.put("embedding_model_id", embeddingModelId);
-        n.put("knowledge_base_id", kbId);
+        n.put("embeddingModelId", embeddingModelId);
+        n.put("knowledgeBaseId", kbId);
         return n;
     }
 
@@ -118,8 +118,8 @@ class MessageServiceChatHistoryIndexTest {
         // enabled 但缺 embedding 模型 → 三要素不全，视为未配置
         ObjectNode n = MAPPER.createObjectNode();
         n.put("enabled", true);
-        n.put("embedding_model_id", "");
-        n.put("knowledge_base_id", "kb-1");
+        n.put("embeddingModelId", "");
+        n.put("knowledgeBaseId", "kb-1");
         tenantWith(n);
 
         service.indexMessageToKb("q", "a", "m-1", "s-1");

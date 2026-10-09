@@ -12,13 +12,13 @@
           <span>{{ t('retrievalSettings.rerankModelLabel') }} <span class="required-mark">*</span></span>
         </div>
         <p class="setting-desc">{{ t('retrievalSettings.rerankModelDescription') }}</p>
-        <p v-if="!localConfig.rerank_model_id" class="setting-desc warning-text">
+        <p v-if="!localConfig.rerankModelId" class="setting-desc warning-text">
           {{ t('retrievalSettings.rerankModelRequired') }}
         </p>
         <div class="setting-control-full">
           <ModelSelector
             model-type="Rerank"
-            :selected-model-id="localConfig.rerank_model_id"
+            :selected-model-id="localConfig.rerankModelId"
             :disabled="!canEdit"
             @update:selected-model-id="handleModelChange"
           />
@@ -29,10 +29,10 @@
       <div class="setting-item">
         <div class="setting-label-row">
           <span>{{ t('retrievalSettings.embeddingTopKLabel') }}</span>
-          <span class="value-display">{{ localConfig.embedding_top_k }}</span>
+          <span class="value-display">{{ localConfig.embeddingTopK }}</span>
         </div>
         <t-slider
-          v-model="localConfig.embedding_top_k"
+          v-model="localConfig.embeddingTopK"
           :min="1"
           :max="100"
           :step="1"
@@ -45,10 +45,10 @@
       <div class="setting-item">
         <div class="setting-label-row">
           <span>{{ t('retrievalSettings.vectorThresholdLabel') }}</span>
-          <span class="value-display">{{ localConfig.vector_threshold.toFixed(2) }}</span>
+          <span class="value-display">{{ localConfig.vectorThreshold.toFixed(2) }}</span>
         </div>
         <t-slider
-          v-model="localConfig.vector_threshold"
+          v-model="localConfig.vectorThreshold"
           :min="0"
           :max="1"
           :step="0.05"
@@ -61,10 +61,10 @@
       <div class="setting-item">
         <div class="setting-label-row">
           <span>{{ t('retrievalSettings.keywordThresholdLabel') }}</span>
-          <span class="value-display">{{ localConfig.keyword_threshold.toFixed(2) }}</span>
+          <span class="value-display">{{ localConfig.keywordThreshold.toFixed(2) }}</span>
         </div>
         <t-slider
-          v-model="localConfig.keyword_threshold"
+          v-model="localConfig.keywordThreshold"
           :min="0"
           :max="1"
           :step="0.05"
@@ -77,10 +77,10 @@
       <div class="setting-item">
         <div class="setting-label-row">
           <span>{{ t('retrievalSettings.rerankTopKLabel') }}</span>
-          <span class="value-display">{{ localConfig.rerank_top_k }}</span>
+          <span class="value-display">{{ localConfig.rerankTopK }}</span>
         </div>
         <t-slider
-          v-model="localConfig.rerank_top_k"
+          v-model="localConfig.rerankTopK"
           :min="1"
           :max="100"
           :step="1"
@@ -93,10 +93,10 @@
       <div class="setting-item">
         <div class="setting-label-row">
           <span>{{ t('retrievalSettings.rerankThresholdLabel') }}</span>
-          <span class="value-display">{{ localConfig.rerank_threshold.toFixed(2) }}</span>
+          <span class="value-display">{{ localConfig.rerankThreshold.toFixed(2) }}</span>
         </div>
         <t-slider
-          v-model="localConfig.rerank_threshold"
+          v-model="localConfig.rerankThreshold"
           :min="-10"
           :max="10"
           :step="0.1"
@@ -128,12 +128,12 @@ const authStore = useAuthStore()
 const canEdit = computed(() => authStore.hasRole('admin'))
 
 const defaultConfig: RetrievalConfig = {
-  embedding_top_k: 50,
-  vector_threshold: 0.15,
-  keyword_threshold: 0.3,
-  rerank_top_k: 10,
-  rerank_threshold: 0.2,
-  rerank_model_id: '',
+  embeddingTopK: 50,
+  vectorThreshold: 0.15,
+  keywordThreshold: 0.3,
+  rerankTopK: 10,
+  rerankThreshold: 0.2,
+  rerankModelId: '',
 }
 
 const localConfig = reactive<RetrievalConfig>({ ...defaultConfig })
@@ -146,12 +146,16 @@ const loadConfig = async () => {
     if (response.data) {
       const cfg = response.data
       Object.assign(localConfig, {
-        embedding_top_k: cfg.embedding_top_k || defaultConfig.embedding_top_k,
-        vector_threshold: cfg.vector_threshold || defaultConfig.vector_threshold,
-        keyword_threshold: cfg.keyword_threshold || defaultConfig.keyword_threshold,
-        rerank_top_k: cfg.rerank_top_k || defaultConfig.rerank_top_k,
-        rerank_threshold: cfg.rerank_threshold ?? defaultConfig.rerank_threshold,
-        rerank_model_id: cfg.rerank_model_id || '',
+        embeddingTopK: cfg.embeddingTopK || defaultConfig.embeddingTopK,
+        vectorThreshold: cfg.vectorThreshold || defaultConfig.vectorThreshold,
+        keywordThreshold: cfg.keywordThreshold || defaultConfig.keywordThreshold,
+        rerankTopK: cfg.rerankTopK || defaultConfig.rerankTopK,
+        rerankThreshold: cfg.rerankThreshold ?? defaultConfig.rerankThreshold,
+        rerankModelId: cfg.rerankModelId || '',
+        // rrf 三键本页不渲染，仅原样透传（服务端省略键时保持 undefined，序列化自动丢弃）
+        rrfK: cfg.rrfK,
+        rrfVectorWeight: cfg.rrfVectorWeight,
+        rrfKeywordWeight: cfg.rrfKeywordWeight,
       })
       initialConfig = { ...localConfig }
     }
@@ -194,7 +198,7 @@ const debouncedSave = () => {
 
 const handleParamChange = () => debouncedSave()
 const handleModelChange = (modelId: string) => {
-  localConfig.rerank_model_id = modelId
+  localConfig.rerankModelId = modelId
   debouncedSave()
 }
 

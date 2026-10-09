@@ -721,9 +721,9 @@ public class HybridSearchService {
                 return RetrievalConfigView.DEFAULTS;
             }
             return new RetrievalConfigView(
-                    node.path("rrf_k").asInt(0),
-                    node.path("rrf_vector_weight").asDouble(0),
-                    node.path("rrf_keyword_weight").asDouble(0));
+                    node.path("rrfK").asInt(0),
+                    node.path("rrfVectorWeight").asDouble(0),
+                    node.path("rrfKeywordWeight").asDouble(0));
         } catch (Exception e) {
             return RetrievalConfigView.DEFAULTS;
         }

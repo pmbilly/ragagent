@@ -92,11 +92,11 @@ const loadConfig = async () => {
 
       initialConfig.value = {
         enabled: config.enabled || false,
-        embedding_model_id: config.embedding_model_id || '',
+        embeddingModelId: config.embeddingModelId || '',
       }
 
       localEnabled.value = config.enabled || false
-      localEmbeddingModelId.value = config.embedding_model_id || ''
+      localEmbeddingModelId.value = config.embeddingModelId || ''
 
       await nextTick()
       await nextTick()
@@ -104,7 +104,7 @@ const loadConfig = async () => {
     } else {
       initialConfig.value = {
         enabled: false,
-        embedding_model_id: '',
+        embeddingModelId: '',
       }
       await nextTick()
       setTimeout(() => { isInitializing.value = false }, 100)
@@ -113,7 +113,7 @@ const loadConfig = async () => {
     console.error('Failed to load chat history config:', error)
     initialConfig.value = {
       enabled: false,
-      embedding_model_id: '',
+      embeddingModelId: '',
     }
     await nextTick()
     setTimeout(() => { isInitializing.value = false }, 100)
@@ -140,7 +140,7 @@ const hasConfigChanged = (): boolean => {
   if (!initialConfig.value) return true
   const initial = initialConfig.value
   if (localEnabled.value !== initial.enabled) return true
-  if (localEmbeddingModelId.value !== initial.embedding_model_id) return true
+  if (localEmbeddingModelId.value !== initial.embeddingModelId) return true
   return false
 }
 
@@ -151,7 +151,7 @@ const saveConfig = async () => {
   try {
     const config: ChatHistoryConfig = {
       enabled: localEnabled.value,
-      embedding_model_id: localEmbeddingModelId.value,
+      embeddingModelId: localEmbeddingModelId.value,
     }
 
     const response = await updateTenantChatHistoryConfig(config)
@@ -160,7 +160,7 @@ const saveConfig = async () => {
     if (response.data) {
       initialConfig.value = {
         enabled: response.data.enabled || false,
-        embedding_model_id: response.data.embedding_model_id || '',
+        embeddingModelId: response.data.embeddingModelId || '',
       }
     } else {
       initialConfig.value = { ...config }

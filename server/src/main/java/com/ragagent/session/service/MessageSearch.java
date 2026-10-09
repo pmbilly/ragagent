@@ -204,9 +204,9 @@ final class MessageSearch {
         }
         ChatHistoryConfig cfg = new ChatHistoryConfig();
         cfg.setEnabled(node.path("enabled").asBoolean(false));
-        cfg.setEmbeddingModelId(node.path("embedding_model_id").asText(""));
-        cfg.setKnowledgeBaseId(node.path("knowledge_base_id").asText(""));
-        // 三要素判定：enabled + embedding_model_id + knowledge_base_id
+        cfg.setEmbeddingModelId(node.path("embeddingModelId").asText(""));
+        cfg.setKnowledgeBaseId(node.path("knowledgeBaseId").asText(""));
+        // 三要素判定：enabled + embeddingModelId + knowledgeBaseId
         if (cfg.isEnabled() && !cfg.getEmbeddingModelId().isEmpty()
                 && !cfg.getKnowledgeBaseId().isEmpty()) {
             return cfg;

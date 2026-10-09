@@ -289,7 +289,7 @@ final class TenantConfigOps {
         Tenant tenant = requireContextTenant();
         ChatHistoryConfig existing = parseConfig(tenant.getChatHistoryConfig(), ChatHistoryConfig.class);
 
-        // 重建对象（knowledge_base_id 不受客户端控制），
+        // 重建对象（knowledgeBaseId 不受客户端控制），
         // 嵌入模型未变时沿用存量 KB
         ChatHistoryConfig cfg = new ChatHistoryConfig();
         cfg.setEnabled(req.isEnabled());
@@ -337,19 +337,19 @@ final class TenantConfigOps {
         }
         // 五段范围校验（在租户检查之前）
         if (cfg.getVectorThreshold() < 0 || cfg.getVectorThreshold() > 1) {
-            throw new BizException(AppError.badRequest("vector_threshold must be between 0 and 1"));
+            throw new BizException(AppError.badRequest("vectorThreshold must be between 0 and 1"));
         }
         if (cfg.getKeywordThreshold() < 0 || cfg.getKeywordThreshold() > 1) {
-            throw new BizException(AppError.badRequest("keyword_threshold must be between 0 and 1"));
+            throw new BizException(AppError.badRequest("keywordThreshold must be between 0 and 1"));
         }
         if (cfg.getRerankThreshold() < -10 || cfg.getRerankThreshold() > 10) {
-            throw new BizException(AppError.badRequest("rerank_threshold must be between -10 and 10"));
+            throw new BizException(AppError.badRequest("rerankThreshold must be between -10 and 10"));
         }
         if (cfg.getEmbeddingTopK() < 0 || cfg.getEmbeddingTopK() > 200) {
-            throw new BizException(AppError.badRequest("embedding_top_k must be between 0 and 200"));
+            throw new BizException(AppError.badRequest("embeddingTopK must be between 0 and 200"));
         }
         if (cfg.getRerankTopK() < 0 || cfg.getRerankTopK() > 200) {
-            throw new BizException(AppError.badRequest("rerank_top_k must be between 0 and 200"));
+            throw new BizException(AppError.badRequest("rerankTopK must be between 0 and 200"));
         }
         Tenant tenant = requireContextTenant();
         tenant.setRetrievalConfig(TenantBindSupport.MAPPER.valueToTree(cfg));

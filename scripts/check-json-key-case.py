@@ -2,7 +2,7 @@
 """换锚棘轮：非冻结面不许出现新的 snake JSON 键。
 
 判据（§2）：**我们自己的** JSON 面（HTTP 请求/响应、自有 jsonb）键名＝Java 字段名（camel）。
-第三方线格式（datasource connector、event/llm 载荷、langfuse、租户配置 jsonb、Doris 客户端、
+第三方线格式（datasource connector、event/llm 载荷、langfuse、租户配置 jsonb（余段）、Doris 客户端、
 图片信息、SearchParams 等）与**模型输出契约**、**既有内部 jsonb 状态**属冻结面，保留 snake。
 
 本脚本扫描 main 代码里的三类键写入点，与基线（本文件内联）比对：
@@ -81,7 +81,7 @@ BASELINE: dict[str, set[str]] = {
     'auth/service/TenantInvitationService.java': {'invitation_id', 'responded_at', 'updated_at'},
     # MyBatis 列名/参数（非 JSON 键）
     'auth/service/TenantMemberService.java': {'deleted_at', 'is_revoked', 'new_role', 'old_role', 'tenant_id', 'updated_at'},
-    # 租户配置 jsonb（存量面）
+    # 租户配置 jsonb（存量面；B132 起 chat-history / retrieval 两段已换锚，余段待判定）
     'auth/service/TenantService.java': {'compression_strategy', 'deleted_at', 'max_tokens', 'recent_message_count', 'summarize_threshold'},
     # 内部预设名（presets() 仅内部查表）
     'chatpipeline/PipelineBuilder.java': {'chat_history_stream', 'chat_stream', 'rag_stream'},
