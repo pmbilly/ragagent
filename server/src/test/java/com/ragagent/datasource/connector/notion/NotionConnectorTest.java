@@ -358,7 +358,7 @@ class NotionConnectorTest {
                     .isEqualTo(OffsetDateTime.parse("2026-01-15T10:00:00Z").toInstant());
             assertThat(item.getMetadata())
                     .containsEntry("channel", "notion")
-                    .containsEntry("object_type", "page");
+                    .containsEntry("objectType", "page");
             // 段落 + child_page 链接（子页面本身因 404 抓不到，被跳过）。
             // 注意链接里的 ID 被去掉了连字符
             assertThat(NotionTestSupport.contentOf(item))
@@ -383,7 +383,7 @@ class NotionConnectorTest {
             assertThat(item.getUrl()).isEqualTo("https://notion.so/db1");
             assertThat(item.getMetadata())
                     .containsEntry("channel", "notion")
-                    .containsEntry("object_type", "database");
+                    .containsEntry("objectType", "database");
             assertThat(NotionTestSupport.contentOf(item))
                     .isEqualTo("# Test Database\n\n| Title | Status |\n|---|---|\n"
                             + "| Record One | Done |");
@@ -407,7 +407,7 @@ class NotionConnectorTest {
             // database 这一项是**父库标题**：记录的父是 data_source（ds-1），
             // 而桩里的 data_source 响应没有顶层 title → extractTitle 回 ""
             assertThat(item.getMetadata())
-                    .containsEntry("object_type", "page")
+                    .containsEntry("objectType", "page")
                     .containsEntry("database", "");
             // 属性列表（**不**转义 |、**不**把换行换成 <br>——那是表格才有的处理）
             assertThat(NotionTestSupport.contentOf(item))
@@ -445,7 +445,7 @@ class NotionConnectorTest {
             Map<String, Object> editTimes = new LinkedHashMap<>();
             editTimes.put("page-1", "2026-01-15T10:00:00Z");
             Map<String, Object> connectorCursor = new LinkedHashMap<>();
-            connectorCursor.put("page_edit_times", editTimes);
+            connectorCursor.put("pageEditTimes", editTimes);
             cursor.setConnectorCursor(connectorCursor);
 
             Connector.FetchIncrementalResult result =
@@ -467,10 +467,10 @@ class NotionConnectorTest {
                     connector.fetchIncremental(config, new SyncCursor());
 
             assertThat(ids(result.items())).containsExactly("root");
-            // cursor 形状：{"page_edit_times":{...}}，键排序、时间是保留小数位的 RFC3339
+            // cursor 形状：{"pageEditTimes":{...}}，键排序、时间是保留小数位的 RFC3339
             Map<String, Object> connectorCursor = result.cursor().getConnectorCursor();
-            assertThat(connectorCursor).containsOnlyKeys("page_edit_times");
-            Map<?, ?> rootTimes = (Map<?, ?>) connectorCursor.get("page_edit_times");
+            assertThat(connectorCursor).containsOnlyKeys("pageEditTimes");
+            Map<?, ?> rootTimes = (Map<?, ?>) connectorCursor.get("pageEditTimes");
             assertThat(rootTimes.get("root")).isEqualTo("2026-01-15T10:00:00Z");
             assertThat(result.cursor().getLastSyncTime()).isNotNull();
         }
@@ -491,7 +491,7 @@ class NotionConnectorTest {
             editTimes.put("other", "2026-01-15T13:00:00Z"); // 没变
             editTimes.put("vanish", "2026-01-01T00:00:00Z"); // 真的消失了
             Map<String, Object> connectorCursor = new LinkedHashMap<>();
-            connectorCursor.put("page_edit_times", editTimes);
+            connectorCursor.put("pageEditTimes", editTimes);
             prev.setConnectorCursor(connectorCursor);
 
             Connector.FetchIncrementalResult result = connector.fetchIncremental(config, prev);
@@ -511,7 +511,7 @@ class NotionConnectorTest {
             // NotionCursorCodec 的写入侧保证，下方断言兜住形状）
             @SuppressWarnings("unchecked")
             Map<String, Object> newTimes =
-                    (Map<String, Object>) result.cursor().getConnectorCursor().get("page_edit_times");
+                    (Map<String, Object>) result.cursor().getConnectorCursor().get("pageEditTimes");
             assertThat(newTimes).containsOnlyKeys("child", "ds1", "grand", "root");
             assertThat(newTimes).doesNotContainKey("vanish");
         }
@@ -545,7 +545,7 @@ class NotionConnectorTest {
         editTimes.put("k5", OffsetDateTime.parse("2026-01-15T10:00:00+05:30"));
 
         SyncCursor cursor = NotionConnector.buildCursor(editTimes);
-        Map<?, ?> times = (Map<?, ?>) cursor.getConnectorCursor().get("page_edit_times");
+        Map<?, ?> times = (Map<?, ?>) cursor.getConnectorCursor().get("pageEditTimes");
 
         // cursor 的 map 恒按键排序；时间保留自己的偏移（不归一化时区）
         List<String> keys = new ArrayList<>();
@@ -562,9 +562,9 @@ class NotionConnectorTest {
     @Test
     void buildCursorEmptyEditTimes() {
         SyncCursor cursor = NotionConnector.buildCursor(new LinkedHashMap<>());
-        Map<?, ?> times = (Map<?, ?>) cursor.getConnectorCursor().get("page_edit_times");
+        Map<?, ?> times = (Map<?, ?>) cursor.getConnectorCursor().get("pageEditTimes");
         assertThat(times).isEmpty();
-        assertThat(cursor.getConnectorCursor()).containsOnlyKeys("page_edit_times");
+        assertThat(cursor.getConnectorCursor()).containsOnlyKeys("pageEditTimes");
     }
 
     // ── 纯函数：排除集 / 父子判定 ────────────────────────────────────────
@@ -675,7 +675,7 @@ class NotionConnectorTest {
 
             assertThat(NotionTestSupport.contentOf(item)).isEqualTo(
                     "# Record One\n\n- **Status**: Done\nLine2|Pipe\n- **Tag**: X|Y");
-            assertThat(item.getMetadata()).containsOnlyKeys("channel", "object_type", "database");
+            assertThat(item.getMetadata()).containsOnlyKeys("channel", "objectType", "database");
             assertThat(item.getMetadata()).containsEntry("database", "Test Database");
         }
     }
@@ -906,7 +906,7 @@ class NotionConnectorTest {
             assertThat(attachment.getContentType()).isEqualTo("application/pdf");
             assertThat(attachment.getSourceResourceId()).isEqualTo("page-1");
             assertThat(attachment.getMetadata())
-                    .containsEntry("object_type", "attachment");
+                    .containsEntry("objectType", "attachment");
             assertThat(NotionTestSupport.contentOf(attachment)).isEqualTo("PDF");
             // 图片只出现在 markdown 里，不做单独条目
             assertThat(NotionTestSupport.contentOf(items.get(0)))

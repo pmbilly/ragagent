@@ -21,7 +21,7 @@ import java.time.ZoneOffset;
  *       Java 标准 {@code Double.toString}。</li>
  *   <li><b>时间字面量保留原偏移</b>：项目的
  *       {@code ZeroTimeSerializer} 会把时间归一化到 JVM 默认时区（那条规则服务的是
- *       落 jsonb 的领域对象），而 cursor 里的 {@code page_edit_times} 必须是
+ *       落 jsonb 的领域对象），而 cursor 里的 {@code pageEditTimes} 必须是
  *       <b>Notion 原样给的 UTC 串</b>——归一化会把 {@code …Z} 写成 {@code +08:00}，
  *       字面量就漂了，故这里另写一份。</li>
  * </ol>

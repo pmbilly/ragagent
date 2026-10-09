@@ -22,7 +22,7 @@ Map / MyBatis 列名等非 JSON 键**（如 `*Repository` 的 `deleted_at`），
 判定某键是真债还是冻结/数据值时，**必须看消费者**（FE 读？夹具断言？第三方 API？）。
 
 **2026-10-08（B88）**：工具面（`agent/tools/**` 及 agent 管线消费侧）已全量 camel 化，
-原先整目录的 `agent/tools/` 冻结豁免已摘除；该目录残留的 snake 仅限三类并逐条登记在本脚本 BASELINE：
+原先整目录的 `agent/tools/` 冻结豁免已摘除；2026-10-09 B141 又摘除 `datasource/connector` 的整目录豁免（改为文件级，见 FROZEN_PREFIXES 内注释——该豁免曾让 134 个键静默逃逸）；该目录残留的 snake 仅限三类并逐条登记在本脚本 BASELINE：
 ① 外部载荷读侧（docreader image_info 的 `original_url`/`ocr_text` 等，键名由对方服务决定）、
 ② MyBatis/JDBC 列名与 SQL 参数、③ 第三方面（websearch metadata `published_at` 等）。
 工具**名**（`wiki_write_page` 等 36 个）与工具 schema 的 **enum 值**（`list_servers`/`list_tools`…）按 §2.4「字段名 camel、值按各自语义」保留 snake。
@@ -47,7 +47,33 @@ PKG_ROOTS = _sr.backend_pkg_roots()
 FROZEN_PREFIXES = (
     # 2026-10-08 B93b：`event/` 与 `stream/` 已 camel 化（事件面），从冻结名单摘除；
     # 事件面口径另由 scripts/check-event-face-case.py 守（载荷注解/事件名/响应类型值）。
-    'datasource/connector', 'llm/', 'common/tenant',
+    #
+    # 2026-10-09 B141：`datasource/connector` 整目录豁免 → **文件级**（原豁免是"可换锚面 0"
+    # 这一误判的根因：一摘掉就露出 26 文件/134 键，见 §15.1.1 B133/B139/B140/B141）。
+    # 下列文件是**对方 API 的载荷类型与客户端**——键名由外部服务定义，改名会导致请求/解析失败：
+    #   · 飞书：docx block 结构 / 各 API 响应类型 / 客户端 / 错误码
+    #   · Notion：block·page·parent·rich-text·paginated 等响应结构（NotionConnector/NotionCursor/
+    #     NotionFetchOps **不在**名单里——它们的键是我们自己的，B140/B141 已换锚）
+    #   · GitLab：响应字段（ref/per_page/page 等查询参数与响应结构）
+    #   · Ima：响应类型 + 请求体字段（req.put("knowledge_base_id"…) 等，见 ImaClient）
+    #   · 语雀：响应类型
+    'datasource/connector/feishu/core/DocxBlocks',
+    'datasource/connector/feishu/core/FeishuApiTypes',
+    'datasource/connector/feishu/core/FeishuClient',
+    'datasource/connector/feishu/core/FeishuErrors',
+    'datasource/connector/gitlab/GitLabClient',
+    'datasource/connector/ima/ImaApiTypes',
+    'datasource/connector/ima/ImaClient',
+    'datasource/connector/notion/NotionBlock',
+    'datasource/connector/notion/NotionClient',
+    'datasource/connector/notion/NotionFile',
+    'datasource/connector/notion/NotionMention',
+    'datasource/connector/notion/NotionPage',
+    'datasource/connector/notion/NotionPaginatedResponse',
+    'datasource/connector/notion/NotionParent',
+    'datasource/connector/notion/NotionRichText',
+    'datasource/connector/yuque/YuqueApiTypes',
+    'llm/', 'common/tenant',
     'common/pipeline/SearchParams', 'mcp/oauth', 'memory/service/MemoryExtractionLlm',
     'memory/service/MemoryExtractPayload', 'docreader', 'rerank/RankResult',
     'tracing/langfuse', 'retrieval/engine/doris', 'retrieval/domain/ImageInfo',
@@ -84,9 +110,6 @@ BASELINE: dict[str, set[str]] = {
     # 租户 KV 复用同一词汇，改名须先加边界翻译层——属独立决策，故登记冻结。
     # chat_parser_engine_rules 则是 agent 侧规则的透传保留（§14.9 表②）。
     'tenant/ParserEngineConfig.java': {'chat_parser_engine_rules', 'mineru_api_key', 'mineru_cloud_enable_formula', 'mineru_cloud_enable_ocr', 'mineru_cloud_enable_table', 'mineru_cloud_language', 'mineru_cloud_model', 'mineru_enable_formula', 'mineru_enable_ocr', 'mineru_enable_table', 'mineru_endpoint', 'mineru_language', 'mineru_model', 'mineru_parse_method', 'mineru_vlm_server_url', 'odl_hybrid', 'odl_hybrid_fallback', 'odl_hybrid_mode', 'odl_hybrid_url', 'odl_markdown_with_html', 'paddleocr_vl_cloud_model', 'paddleocr_vl_cloud_token', 'paddleocr_vl_cloud_use_chart_recognition', 'paddleocr_vl_cloud_use_seal_recognition', 'paddleocr_vl_endpoint', 'paddleocr_vl_use_chart_recognition', 'paddleocr_vl_use_seal_recognition'},
-    # 租户配置 jsonb（存量面；B132 起 chat-history / retrieval 两段已换锚，余段待判定）
-    # 软删除列（B135d 复核：原条目混了 context_config 的 4 个键，已随本批换锚移出）
-    'auth/service/TenantService.java': {'deleted_at'},
     # 内部预设名（presets() 仅内部查表）
     'chatpipeline/PipelineBuilder.java': {'chat_history_stream', 'chat_stream', 'rag_stream'},
     # PipelineLog 观测面（日志字段，非契约）
@@ -97,12 +120,6 @@ BASELINE: dict[str, set[str]] = {
     'common/filter/RequestIdFilter.java': {'request_id'},
     # OpenSearch 字段
     'config/OpenSearchAuditSinkAdapter.java': {'dst_alias', 'src_alias'},
-    # datasource 配置 jsonb（存量面）
-    'datasource/dto/DataSourceResponse.java': {'feed_urls'},
-    # MyBatis 列名/参数（非 JSON 键）
-    # MyBatis 列名/参数（非 JSON 键）
-    # MyBatis 列名/参数（非 JSON 键）
-    'datasource/service/DataSourceItemOps.java': {'datasource_id', 'external_id', 'source_created_at', 'source_resource_id', 'source_updated_at'},
     # MyBatis 列名/参数（非 JSON 键）
     'datasource/service/DataSourceSupport.java': {'processing_status', 'resource_ids', 'task_id'},
     # MyBatis 列名/参数（非 JSON 键）
@@ -161,8 +178,6 @@ BASELINE: dict[str, set[str]] = {
     # ⇒ `check-event-face-case.py` 扫不到）+ **代理响应体键**（FileProxyService:281 是真 JSON 键）
     # ⇒ 按 §14.9「自有查询参数名统一 camel」该改，登记为候选（见 HANDOFF）
     'storage/fileserve/FileProxyService.java': {'file_path'},
-    # 存储引擎面（snake，B14 冻结）
-    'storage/fileserve/StorageFileResolver.java': {'default_provider', 'path_prefix'},
     # 存储引擎配置面（snake，同上）
     'system/controller/SystemController.java': {'access_key_id', 'bucket_name', 'mineru_parse_method', 'secret_access_key', 'use_ssl', 'weknoracloud_app_id'},
     # MyBatis 列名/参数（非 JSON 键）

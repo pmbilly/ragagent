@@ -4,13 +4,12 @@ import java.time.OffsetDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 增量同步的私有游标。
  *
  * <p>它的 JSON 形态就是 {@code data_sources.last_sync_cursor} 里
- * {@code connector_cursor} 那一层：{@code {"page_edit_times":{"<page_id>":"<RFC3339>"}}}。</p>
+ * {@code connector_cursor} 那一层：{@code {"pageEditTimes":{"<page_id>":"<RFC3339>"}}}。</p>
  *
  * <p><b>它是落 jsonb 的值形状</b>，但与 {@code SyncCursor} 不同——游标 map 由
  * 连接器自己构造（{@code buildCursor}），不经 Jackson 序列化，
@@ -22,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public final class NotionCursor {
 
-    @JsonProperty("page_edit_times")
     public Map<String, OffsetDateTime> pageEditTimes;
 
     public Map<String, OffsetDateTime> pageEditTimes() {

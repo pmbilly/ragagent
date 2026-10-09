@@ -97,7 +97,7 @@ final class NotionFetchOps {
             item.setUpdatedAt(page.lastEditedTime);
             Map<String, String> metadata = new LinkedHashMap<>();
             metadata.put("channel", NotionConstants.CHANNEL_NOTION);
-            metadata.put("object_type", NotionConstants.OBJECT_TYPE_PAGE);
+            metadata.put("objectType", NotionConstants.OBJECT_TYPE_PAGE);
             item.setMetadata(metadata);
             items.add(item);
         }
@@ -126,7 +126,7 @@ final class NotionFetchOps {
             item.setSourceResourceId(page.id());
             Map<String, String> metadata = new LinkedHashMap<>();
             metadata.put("channel", NotionConstants.CHANNEL_NOTION);
-            metadata.put("object_type", NotionConstants.OBJECT_TYPE_ATTACHMENT);
+            metadata.put("objectType", NotionConstants.OBJECT_TYPE_ATTACHMENT);
             item.setMetadata(metadata);
             items.add(item);
         }
@@ -369,7 +369,7 @@ final class NotionFetchOps {
         item.setUpdatedAt(record.lastEditedTime);
         Map<String, String> metadata = new LinkedHashMap<>();
         metadata.put("channel", NotionConstants.CHANNEL_NOTION);
-        metadata.put("object_type", NotionConstants.OBJECT_TYPE_PAGE);
+        metadata.put("objectType", NotionConstants.OBJECT_TYPE_PAGE);
         metadata.put("database", dbTitle == null ? "" : dbTitle);
         item.setMetadata(metadata);
         return item;
@@ -488,7 +488,7 @@ final class NotionFetchOps {
         item.setUpdatedAt(updatedAt);
         Map<String, String> metadata = new LinkedHashMap<>();
         metadata.put("channel", NotionConstants.CHANNEL_NOTION);
-        metadata.put("object_type", NotionConstants.OBJECT_TYPE_DATABASE);
+        metadata.put("objectType", NotionConstants.OBJECT_TYPE_DATABASE);
         item.setMetadata(metadata);
         return item;
     }

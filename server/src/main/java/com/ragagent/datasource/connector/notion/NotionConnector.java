@@ -254,13 +254,13 @@ public final class NotionConnector implements Connector {
             List<FetchedItem> items = fetchAll(config, resourceIds);
 
             // 用抓到的条目的 UpdatedAt 建 cursor。记录级编辑时间逐条跟踪
-            // （object_type == "page"）；数据库容器 ID 也显式登记，
+            // （objectType == "page"）；数据库容器 ID 也显式登记，
             // 好让增量同步能判断"这个库到底变没变"，避免每轮都全量查记录。
             Map<String, OffsetDateTime> newEditTimes = new LinkedHashMap<>();
             for (FetchedItem item : items) {
                 Map<String, String> metadata = item.getMetadata();
                 if (metadata != null
-                        && NotionConstants.OBJECT_TYPE_PAGE.equals(metadata.get("object_type"))) {
+                        && NotionConstants.OBJECT_TYPE_PAGE.equals(metadata.get("objectType"))) {
                     newEditTimes.put(item.getExternalId(), item.getUpdatedAt());
                 }
             }
@@ -357,7 +357,7 @@ public final class NotionConnector implements Connector {
         }
 
         Map<String, Object> cursorMap = new LinkedHashMap<>();
-        cursorMap.put("page_edit_times", pageEditTimes);
+        cursorMap.put("pageEditTimes", pageEditTimes);
 
         SyncCursor syncCursor = new SyncCursor();
         syncCursor.setLastSyncTime(NotionValues.now());
