@@ -17,8 +17,8 @@
 候选 = 同时满足三条的 snake 记号：
 
   1. 出现在 ``frontend/src`` 的 ``.ts/.vue/.mjs`` 里（词边界匹配，避开 ``manage_mcp_services`` 这类子串）；
-  2. 后端 ``server/src/main`` 里**存在**其 camel 化形态（说明后端已换锚）；
-  3. 后端 ``server/src/main`` 里**不存在**该 snake 字面量（说明后端不再认它）。
+  2. 后端 ``domains/src/main`` 里**存在**其 camel 化形态（说明后端已换锚）；
+  3. 后端 ``domains/src/main`` 里**不存在**该 snake 字面量（说明后端不再认它）。
 
 **不是契约键**的记号由基线登记豁免（理由写在基线里）：注释引用 / i18n 键 / CSS 类名 /
 DB 列名 / 前端局部状态 / 查询参数 / 冻结面 …… 判定口诀见 HANDOFF §15.1.1 B19 段：

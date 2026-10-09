@@ -326,7 +326,7 @@ sequenceDiagram
 ```bash
 # 每次改动后必跑（约 3 分钟）
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test :server:spotlessCheck
+  ./gradlew :domains:test :domains:spotlessCheck
 # 动了 SSE 可见形状（进度/引用事件的 data 字段）→ session 域契约与前端同批：
 cd frontend && npx vue-tsc --build --force && npm test
 ```
@@ -362,8 +362,8 @@ cd frontend && npx vue-tsc --build --force && npm test
 
 ## 8. 测试与验证
 
-- **规模**：`server/src/test/java/com/ragagent/chatpipeline/` 下 **9 个 java 文件 / 7 个测试类 / 45 个 `@Test`**（2026-10-08 实测）：`PipelineCoreRecordingTest` 6、`PipelineLifecycleRecordingTest` 8、`SearchRecordingTest` 8、`SearchGradingTest` 2、`MergeRecordingTest` 7、`RerankRecordingTest` 6、`QueryUnderstandRecordingTest` 8；另两个文件是支撑设施（`GoRecording46C`、`Rec46cSupport`，无 `@Test`）。
-- **fixture 形态（与 knowledge 域不同，别找错地方）**：本模块在 `server/src/test/resources/contracts/` **没有** fixture——期望值全部内嵌在 `GoRecording46C` 的 **263 条录制常量**里（静态 REGISTRY）。录制 provenance：Go 原版同包探针驱动管线纯函数与各插件 `OnEvent` → `rec46c.jsonl` → 生成 `GoRecording46C.java`（**禁止手改**，重生成命令在头注释；探针本体在 Go 仓 `/tmp/toolrec46c`，一次性产物）。
+- **规模**：`domains/src/test/java/com/ragagent/chatpipeline/` 下 **9 个 java 文件 / 7 个测试类 / 45 个 `@Test`**（2026-10-08 实测）：`PipelineCoreRecordingTest` 6、`PipelineLifecycleRecordingTest` 8、`SearchRecordingTest` 8、`SearchGradingTest` 2、`MergeRecordingTest` 7、`RerankRecordingTest` 6、`QueryUnderstandRecordingTest` 8；另两个文件是支撑设施（`GoRecording46C`、`Rec46cSupport`，无 `@Test`）。
+- **fixture 形态（与 knowledge 域不同，别找错地方）**：本模块在 `domains/src/test/resources/contracts/` **没有** fixture——期望值全部内嵌在 `GoRecording46C` 的 **263 条录制常量**里（静态 REGISTRY）。录制 provenance：Go 原版同包探针驱动管线纯函数与各插件 `OnEvent` → `rec46c.jsonl` → 生成 `GoRecording46C.java`（**禁止手改**，重生成命令在头注释；探针本体在 Go 仓 `/tmp/toolrec46c`，一次性产物）。
 - **比较口径**：不是 JSON 语义比较，是**掩码后逐字节可比**——`Rec46cSupport.mask` 与录制侧同款：完整 uuid → `MASKED-UUID`、事件 id 8-hex 前缀 → `xxxxxxxx-`、`"duration_ms":N` 连键删除、日期 → `DATE`、英文星期 → `WEEKDAY`、`127.0.0.1:N` → `PORT`。期望串是 Go `json.Marshal` 形态（map 排序 + HTML 转义 + Go 浮点），Java 侧用 `EventJson.write` 对齐。
 - **这套录制抓回过 3 个真缺陷**（价值证明）：merge_expand 替换语义、UTF-8 字节 len、引号字符类只有直引号+「」『』（hexdump 验证）——见 known-issues 05。
 - **分级语义**：`SearchGradingTest` 单独钉"硬错 vs 降级"（§4.1 要点），场景来自 dev PG 真实脏数据（KB 绑定已删除的 vector store → 2200 硬错）。

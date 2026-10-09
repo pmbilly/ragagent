@@ -158,7 +158,7 @@ graph LR
   2. 若对方是 **OpenAI 兼容 `/rerank` 协议则无需新类**——落工厂 default 分支即可（SiliconFlow/generic 就是这么白嫖的）。
   3. `RerankerFactory.newRerankerInner` 的 switch 加 case；路由名先过 `llm/provider` 的 `ProviderName.fromValue` / `ProviderRegistry.detectProvider`（加名字/URL 特征要在**那边**改）。
   4. 若是 Bearer 之外的签名认证：`appSecret` 槽位 + 自建 signer 内部类（照 `Tc3Signer`/`VolcengineSigner` 抄）；注意 `customHeaders` 只注入 5 家 Bearer 型，签名家不收。
-  5. `RerankWireTest` 加 stub A/B 用例 + `server/src/test/resources/wire/rerank_xxx.json` 录制；`provider/package-info.java` 名单同步。
+  5. `RerankWireTest` 加 stub A/B 用例 + `domains/src/test/resources/wire/rerank_xxx.json` 录制；`provider/package-info.java` 名单同步。
 
 ---
 
@@ -249,10 +249,10 @@ flowchart TD
 ```bash
 # 每次改动后必跑（全量 + spotless）
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test :server:spotlessCheck
+  ./gradlew :domains:test :domains:spotlessCheck
 # 迭代中只动本包时可先单类（秒级）
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test --tests "com.ragagent.rerank.RerankWireTest"
+  ./gradlew :domains:test --tests "com.ragagent.rerank.RerankWireTest"
 ```
 
 **A. 接新 provider**：`provider/` 加类（构造校验 + 手搓请求体 + 解析）→ 工厂加 case → wire 录制 + stub 用例 → 单类绿 → 全量绿 + spotless → 提交。
@@ -282,7 +282,7 @@ cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Cont
 
 ## 8. 测试与验证
 
-- **规模**：`server/src/test/java/com/ragagent/rerank/` 下 **1 个测试类 `RerankWireTest` / 22 个 `@Test`**；wire 录制 **8 份**（`server/src/test/resources/wire/rerank_*.json`：openai、openai_truncate、aliyun、zhipu、jina、nvidia、volcengine、lkeap）。
+- **规模**：`domains/src/test/java/com/ragagent/rerank/` 下 **1 个测试类 `RerankWireTest` / 22 个 `@Test`**；wire 录制 **8 份**（`domains/src/test/resources/wire/rerank_*.json`：openai、openai_truncate、aliyun、zhipu、jina、nvidia、volcengine、lkeap）。
 - **手法**：本地 `com.sun.net.httpserver.HttpServer` 起 stub → 请求体与 wire 录制**逐字节** A/B 比对 + 确定性语义表（`RankResult` 宽容解析 8 行全表、NVIDIA logit sigmoid 三点、truncate opt-in 与非法值三连、SSRF 直连与重定向、工厂路由、配置映射含 null→null）。
 - **注意**：测试直接 `new` 具体 provider（不经工厂），且是全仓唯一允许 import `model.domain` 的地方（测映射本身，见 §7.3）。
 - **已知偶发 2 例**（全量并发下偶发，遇到先单独重跑，别误判回归；与本包无关，是仓库级已知项）：
@@ -318,5 +318,5 @@ cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Cont
 | 观测在哪包的 | `tracing/langfuse/LangfuseReranker`（装饰器）+ `LangfusePayloads` |
 | LKEAP / Volcengine 的批式规则 | 本文 §4.3 表 + `LkeapReranker.lkeapRerankBatches`（纯函数，直接可测） |
 | SSRF 拦在哪 | `RerankHttp.validateRerankBaseUrl` → `llm/chat/LlmTransport`（重定向也拦，§7.8） |
-| 测试怎么跑、录制在哪 | §8；单类 `--tests "com.ragagent.rerank.RerankWireTest"`，录制 `server/src/test/resources/wire/` |
+| 测试怎么跑、录制在哪 | §8；单类 `--tests "com.ragagent.rerank.RerankWireTest"`，录制 `domains/src/test/resources/wire/` |
 | 目录为什么这样分 | 本文 §1 + 两份 `package-info.java`（根与 provider/ 各一份，都是职责地图） |

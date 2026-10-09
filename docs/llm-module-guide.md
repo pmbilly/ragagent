@@ -325,10 +325,10 @@ sequenceDiagram
 ```bash
 # 迭代中（秒级~1 分钟）：先跑本模块
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test --tests "com.ragagent.llm.*" :server:spotlessCheck
+  ./gradlew :domains:test --tests "com.ragagent.llm.*" :domains:spotlessCheck
 # 收口（结构搬迁批，约 3 分钟）：全量
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test :server:spotlessCheck
+  ./gradlew :domains:test :domains:spotlessCheck
 ```
 
 **A. 接新厂商**：`ProviderName` 枚举 → `*Provider`（元数据 + validateConfig）→ `ProviderRegistry` 两处注册 → `ProviderAdapters` 按需加适配器 → `ProviderCatalogParityTest` 逼出 model 域 golden 同批 → 补三件测试（Registry/Validation/Parity）→ 三绿 → 提交。

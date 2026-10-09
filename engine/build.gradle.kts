@@ -5,7 +5,7 @@
 // 从守卫脚本规则**升格为编译规则** —— 此前由 check-package-cycles.py 的 R3 守（可被改白名单绕过），
 // 现在往本模块 import 任何业务域类型都会 compileJava 失败（探针见 HANDOFF B161 行）。
 //
-// 依赖方向：server → engine → common；engine 的出边只有 common / event
+// 依赖方向：domains → engine → common；engine 的出边只有 common / event
 // （2026-10-09 实测：common 320 处 / event 21 处，业务域 0 处）。
 plugins {
     `java-library`

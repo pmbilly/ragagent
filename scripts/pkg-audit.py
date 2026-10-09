@@ -14,7 +14,7 @@ import re
 import sys
 from collections import Counter, defaultdict
 
-ROOT = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else "server/src/main/java/com/ragagent")
+ROOT = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else "domains/src/main/java/com/ragagent")
 PKGS = sorted(d.name for d in ROOT.iterdir() if d.is_dir())
 FILES = {p: sorted((ROOT / p).rglob("*.java")) for p in PKGS}
 LAYERS = ("controller", "service", "domain", "dto", "mapper", "repository", "support", "task",

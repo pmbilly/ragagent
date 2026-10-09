@@ -65,7 +65,7 @@ ArchUnit 1.3.0 **已是测试依赖**（`server/build.gradle.kts:111`），可�
 - 既有守卫：`check-package-cycles.py`（环/分层棘轮）、`pkg-audit.py`（分包体检）、
   `check-json-key-case.py`（JSON 键名 camel 棘轮 260 条）、`check-go-anchors.py`（Go 锚点棘轮）、
   `check-fe-contract-keys.py`（前后端跨面键名），外加 ~25 个 `ab-*.sh` 验收脚本。
-- 构建：**多模块**（B116 起 `settings.gradle.kts` include `server` + `common`；共享内核 `common`/`event` 在 `:common`，其余在 `:server`；B117 定名），产物 Spring Boot jar；
+- 构建：**多模块**（B116 起 `settings.gradle.kts` include `domains` + `common`；共享内核 `common`/`event` 在 `:common`，其余在 `:domains`；B117 定名），产物 Spring Boot jar；
   其它目录 `docreader/`（Go 容器）、`frontend/`、`mcp-server/`、`otlp-proto/` 不在 Gradle 内。
 
 ## 2. 必须先解的环（切割清单，按性价比排序）
@@ -352,9 +352,9 @@ B111 暴露的 8 域间接环看着吓人（`agent`/`auth`/`chatpipeline`/`datas
 | 项 | 内容 |
 |---|---|
 | 模块 | 新增 `:common`（`java-library` + `io.spring.dependency-management` + spotless）|
-| 依赖 | `:common` **零 project 依赖**；`:server` 声明 `implementation(project(":common"))` |
+| 依赖 | `:common` **零 project 依赖**；`:domains` 声明 `implementation(project(":common"))` |
 | 依赖声明 | 按 `common`/`event` 的**实际 import 面**声明（jackson / spring-context·web·webmvc·jdbc / spring-boot·autoconfigure / spring-data-redis / slf4j / mybatis-plus 3.5.7 / jakarta servlet·validation），**不用 starter**，避免把自动配置漏进库 |
-| 搬迁 | `git mv` `common/`、`event/`（主源码）+ `resources/common/text/*.txt`（被 `/common/text/…` 绝对路径读）+ **9 个纯底座测试**（2 个 `@SpringBootTest` 与引用其它域的 5 个留在 `:server`）|
+| 搬迁 | `git mv` `common/`、`event/`（主源码）+ `resources/common/text/*.txt`（被 `/common/text/…` 绝对路径读）+ **9 个纯底座测试**（2 个 `@SpringBootTest` 与引用其它域的 5 个留在 `:domains`）|
 | 资源 | 13 处 classpath 资源读法**逐个核实全是 classloader 绝对路径** ✓（不会因搬家解析失败）；**缺资源静默 null** 已由 ✅ **B118** 的 R12a/R12b 断言兜住（见 §7）|
 
 ### 6.2 守卫与规则的多模块化（否则会**静默失覆盖**）
@@ -372,18 +372,18 @@ B111 暴露的 8 域间接环看着吓人（`agent`/`auth`/`chatpipeline`/`datas
 
 1. **`ArchitectureRulesTest.MAIN` 的导入过滤器必须用 `Location.contains`，不能用 `location.asURI()`**：
    ArchUnit 对 **jar 内的类**求 `asURI` 会抛异常，而"抛异常的导入选项"被当作**排除** ⇒
-   `:common`（在 `:server` 类路径上以 **jar 形态**出现）被整段排除，R7 基线条目随即报
+   `:common`（在 `:domains` 类路径上以 **jar 形态**出现）被整段排除，R7 基线条目随即报
    "已不再违例"。探针四变体定位：`asURI` 版命中 0 / `Location.contains` 版命中 1。
    过滤器改为 `!location.contains("/classes/java/test/")`。
 2. **源码遍历类规则**（R5 裸 NUL、R9 `.last` 拼接）原先固定 `Path.of("src/main/java")`，
-   拆模块后只覆盖 `:server` ⇒ 改为 `backendSourceRoots(...)`（同时遍历 `src/…` 与
+   拆模块后只覆盖 `:domains` ⇒ 改为 `backendSourceRoots(...)`（同时遍历 `src/…` 与
    `../contracts/src/…`，不存在的根跳过）。
 
 ### 6.4 结果
 
 | 指标 | 值 |
 |---|---|
-| 模块数 | 2（`:common` 零 project 依赖 / `:server` → `:common`）|
+| 模块数 | 2（`:common` 零 project 依赖 / `:domains` → `:common`）|
 | 编译期硬约束 | ✅ **探针验证**：往 `:common` 注入 `import com.ragagent.knowledge.domain.Chunk` ⇒ `:common:compileJava` **FAILED**（`package com.ragagent.knowledge does not exist`）——底座反向依赖从此**改不动** |
 | 闸门 | `./gradlew spotlessCheck build` = **BUILD SUCCESSFUL**（4,778 测试）+ 五守卫绿 |
 
@@ -397,7 +397,7 @@ B111 暴露的 8 域间接环看着吓人（`agent`/`auth`/`chatpipeline`/`datas
 
 | 既有用法 | 规模 |
 |---|---|
-| `server/src/test/resources/contracts/**`（golden HTTP 契约夹具） | **1,426 个文件** |
+| `domains/src/test/resources/contracts/**`（golden HTTP 契约夹具） | **1,426 个文件** |
 | 读它的测试类 | 18 个 |
 | 类名含 `Contract` 的测试类 | **49 个** |
 
@@ -426,7 +426,7 @@ B111 暴露的 8 域间接环看着吓人（`agent`/`auth`/`chatpipeline`/`datas
 本文档。**无影响**：包名、`import`（0 行改动）、Dockerfile（只取 `server/build/libs` 的 bootJar）、
 jar 名（`common-*.jar`，无人依赖）。
 
-**复验**：`./gradlew projects` → `:common` + `:server` ✓；
+**复验**：`./gradlew projects` → `:common` + `:domains` ✓；
 编译期硬约束探针（往 `:common` 注入 `knowledge.domain.Chunk`）⇒ `:common:compileJava` **FAILED** ✓；
 `./gradlew spotlessCheck build` = BUILD SUCCESSFUL + 五守卫绿。
 
@@ -438,7 +438,7 @@ jar 名（`common-*.jar`，无人依赖）。
 内置 agent 列表为空、jieba 分词退化、甚至 `spring.factories` 的 EPP 不注册。
 B116 搬家时已经搬过一批资源（`common/text/*.txt`），这类风险从此刻起是真实的。
 
-**落地**：`server/src/test/java/com/ragagent/arch/ClasspathResourcesTest.java`（`com.ragagent.arch` 守卫族），
+**落地**：`domains/src/test/java/com/ragagent/arch/ClasspathResourcesTest.java`（`com.ragagent.arch` 守卫族），
 两条断言：
 
 | 断言 | 内容 | 覆盖的故障 |
@@ -453,7 +453,7 @@ B116 搬家时已经搬过一批资源（`common/text/*.txt`），这类风险�
 - **R12b 的巧妙点**：只看 `getResourceAsStream("字面量")` 单实参形式，
   拼接形式（`DIR + fileName`）天然不命中 ⇒ **零误报**，且不必解析常量表
 - **多模块复用**：扫描根复用 `ArchitectureRulesTest.backendSourceRoots("main/java")`
-  （该函数 B118 起放开为包级可见），因此同时覆盖 `server/src/main/java` 与 `../common/src/main/java`
+  （该函数 B118 起放开为包级可见），因此同时覆盖 `domains/src/main/java` 与 `../common/src/main/java`
 - **维护**：新增 classpath 资源时在 `RESOURCES` 加一行（写清消费方），两条断言自动覆盖
 
 **红态探针（两条各验一次）**：
@@ -506,7 +506,7 @@ B116 搬家时已经搬过一批资源（`common/text/*.txt`），这类风险�
 
 | 探针 | 结果 |
 |---|---|
-| 往 `AgentConsts` 注入 `{@link com.ragagent.does.NotExist}` | `:server:javadoc` FAILED（`AgentConsts.java:10: error: reference not found`）✓；因 `check` 连带 javadoc，**`:server:check` 退出码 1** ⇒ `build`/CI 会红 ✓ |
+| 往 `AgentConsts` 注入 `{@link com.ragagent.does.NotExist}` | `:domains:javadoc` FAILED（`AgentConsts.java:10: error: reference not found`）✓；因 `check` 连带 javadoc，**`:domains:check` 退出码 1** ⇒ `build`/CI 会红 ✓ |
 
 **闸门**：`./gradlew spotlessCheck build` = BUILD SUCCESSFUL（含两模块 javadoc，**0 error / 0 warning**）+ 五守卫绿。
 
@@ -530,7 +530,7 @@ B116 搬家时已经搬过一批资源（`common/text/*.txt`），这类风险�
 | 模块 | 新增 `:engine`（`java-library` + `java-test-fixtures` + `io.spring.dependency-management` + spotless + protobuf）|
 | 成员 | `llm` `retrieval` `embedding` `rerank` `chatpipeline` `modelcontext` `webfetch` `stream` `tracing` `model` `vectorstore`（368 文件 / 58.3k 行）|
 | 依赖 | `api(project(":common"))` + 依 import 面声明（jackson/spring/slf4j/mybatis-plus/neo4j/sqlite/protobuf/snakeyaml/Hikari/jakarta）；`runtimeOnly` 驱动（mysql/pg）|
-| 搬迁 | 主源码 368 · 测试 **65 搬 / 20 留**（`GoRecording*` 夹具 / `@SpringBootTest` / 跨域者留在 `:server`）· 资源 `jieba/`(1.1M)、`extract_config.yaml`、`wire/`→testFixtures、jieba 基线→engine 测试资源 |
+| 搬迁 | 主源码 368 · 测试 **65 搬 / 20 留**（`GoRecording*` 夹具 / `@SpringBootTest` / 跨域者留在 `:domains`）· 资源 `jieba/`(1.1M)、`extract_config.yaml`、`wire/`→testFixtures、jieba 基线→engine 测试资源 |
 | 守卫 | `_source_roots.MODULE_DIRS` +engine · `check-stray-dirs` 两处 +engine · `check-event-face-case` 改 `_sr.find_pkg_path` · `check-file-size --write` · `backendSourceRoots` +`../engine/src/…` |
 | 探针 | 注入 `com.ragagent.knowledge.domain.Chunk` ⇒ `:engine:compileJava` **FAILED**（`package … does not exist`）；还原后 SUCCESSFUL |
 | 闸门 | `spotlessCheck build` BUILD SUCCESSFUL（1m39s）· 4,793 测试 0 失败（server 4072 + engine 721，与拆分前同数）· 八守卫绿 |

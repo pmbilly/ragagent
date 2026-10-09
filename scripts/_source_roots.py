@@ -1,6 +1,6 @@
 """后端源码根的**单一事实来源**（多模块）。
 
-B116 起后端拆成多个 Gradle 模块（`server` / `common` / …），守卫脚本不得再硬编码
+B116 起后端拆成多个 Gradle 模块（`domains` / `common` / …），守卫脚本不得再硬编码
 单模块路径——否则新增模块时守卫会**静默失明**（B116 实测：拆出 :common 后
 `check-package-cycles.py` 仍扫 `server/...`，R5/R6/R8 立刻少覆盖 175 个文件）。
 
@@ -12,7 +12,7 @@ import pathlib
 REPO = pathlib.Path(__file__).resolve().parent.parent
 
 #: 参与守卫的后端 Gradle 模块目录（按依赖自底向上列，便于阅读）
-MODULE_DIRS = ["server", "common", "engine", "boot"]
+MODULE_DIRS = ["domains", "common", "engine", "boot"]
 
 
 def java_roots(sources=("main",)):

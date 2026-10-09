@@ -246,7 +246,7 @@ def _verbs_in(args: str):
 
 
 def parse_java(root: str):
-    base_dir = os.path.join(root, "server", "src", "main", "java", "com", "ragagent")
+    base_dir = os.path.join(root, "domains", "src", "main", "java", "com", "ragagent")
     found = defaultdict(set)
     for dirpath, _dirs, filenames in os.walk(base_dir):
         for fn in filenames:

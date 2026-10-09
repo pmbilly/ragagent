@@ -370,12 +370,12 @@ sequenceDiagram
 ```bash
 # 每次改动后必跑（约 3 分钟）
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test :server:spotlessCheck
+  ./gradlew :domains:test :domains:spotlessCheck
 # 若动了前端可见契约（字段名/信封/状态码），同批带前端：
 cd frontend && npx vue-tsc --build --force && npm test
 ```
 
-**A. 加端点**：`dto` 请求（`@Valid` + 显式 message）→ `controller` → `service` 用例 → 补/重录 golden（`server/src/test/resources/contracts/`）→ 三绿 → 提交。
+**A. 加端点**：`dto` 请求（`@Valid` + 显式 message）→ `controller` → `service` 用例 → 补/重录 golden（`domains/src/test/resources/contracts/`）→ 三绿 → 提交。
 
 **B. 加参数字段**：`ModelParameters` → 两条 DTO + reconciler 解析 → golden 复核（`model-get.json` 等键集合会变）→ 三绿；对前端可见则同批改前端类型。
 
@@ -405,7 +405,7 @@ cd frontend && npx vue-tsc --build --force && npm test
 
 ## 8. 测试与验证
 
-- **规模**：本模块 **2 个测试类 / 32 个用例**（`ModelContractTest` 8 + `ModelDebugContractTest` 24，均在 `server/src/test/java/com/ragagent/model/`）；兜底的契约 golden **37 份**：`model-*` 12 + `models-list-empty.json` 1 + `md-*` 24。
+- **规模**：本模块 **2 个测试类 / 32 个用例**（`ModelContractTest` 8 + `ModelDebugContractTest` 24，均在 `domains/src/test/java/com/ragagent/model/`）；兜底的契约 golden **37 份**：`model-*` 12 + `models-list-empty.json` 1 + `md-*` 24。
 - **fixture 归属（实测核实，纠正讹传）**：`model-providers*.json`、`models-list-empty.json` 属**本域** `ModelContractTest`（不在消费侧）；`init-put-config-*.json` 属 `agent/management/AgentContractTest`（initialization 配置面）；`w5b-*.json` 属 `agent/management/W5bInitializationContractTest`（连通性/初始化向导，消费模型但 golden 归 initialization 面）。
 - **比较口径**：`support/GoldenContract` 统一比较器 + `ContractJson.semantic` 归一（键序/转义不敏感）；动态字段掩码后语义比对（模型 UUID / 时间戳 / `elapsedMs`），静态断言字节一致。fixture 锚定**本仓自己的行为**。
 - **debug 契约测试的 stub**：in-JVM `HttpServer` 重放 `scripts/stub-llm-server.py` 的响应（录制脚本 `scripts/record-modeldebug-golden.sh`）；种子数据与录制同构（租户 10009、模型 `b0000000-…-01..09`）；唯一掩码 `elapsedMs`。

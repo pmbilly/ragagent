@@ -203,8 +203,8 @@ graph LR
 
 1. `provider/` 新建 `XxxEmbedder extends BaseEmbedder`：构造器兜底（baseUrl 默认、`truncatePromptTokens` 0→511）、构造尾部 `validateEmbeddingBaseUrl`、`batchEmbed` 用 `ProviderJson` 序列化（**字段序固定**）+ `EmbeddingHttp.postWithRetry` 发送 + 非 200 按自家文案抛。
 2. `EmbedderFactory.newEmbedderInner` 的 remote `switch` 加一个 `case "xxx"`（记得 `setCustomHeaders`）。
-3. `EmbeddingWireTest` 加用例：stub server 起在 127.0.0.1，请求体/路径/头部与 `server/src/test/resources/wire/xxx.json` **逐字节比对**，错误分支（401/429/5xx/SSRF）核对判定。
-4. 跑 `:server:test`（本包单类：`--tests "com.ragagent.embedding.EmbeddingWireTest"`）+ spotless。
+3. `EmbeddingWireTest` 加用例：stub server 起在 127.0.0.1，请求体/路径/头部与 `domains/src/test/resources/wire/xxx.json` **逐字节比对**，错误分支（401/429/5xx/SSRF）核对判定。
+4. 跑 `:domains:test`（本包单类：`--tests "com.ragagent.embedding.EmbeddingWireTest"`）+ spotless。
 5. 若 provider 名需要识别：同步 `llm/provider/ProviderName` / `ProviderRegistry`（不在本包）。
 
 ---
@@ -306,11 +306,11 @@ flowchart TD
 ```bash
 # 快速内环（改本包后先跑这个，秒级~分钟级）
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test --tests "com.ragagent.embedding.EmbeddingWireTest"
+  ./gradlew :domains:test --tests "com.ragagent.embedding.EmbeddingWireTest"
 
 # 每次改动后必跑的提交闸门
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test :server:spotlessCheck
+  ./gradlew :domains:test :domains:spotlessCheck
 ```
 
 **A. 接新 provider**：`provider/` 新类（骨架抄 `OpenAiEmbedder`，差异照 §1.1 表）→ 工厂 case 分支 → wire fixture（stub 录制）→ `EmbeddingWireTest` 用例 → 快速内环 → 全量闸门 → 提交。
@@ -341,7 +341,7 @@ cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Cont
 
 ## 8. 测试与验证
 
-- **本模块**：**1 个测试类 `EmbeddingWireTest`（20 个 `@Test`）**，stub server 起在 `127.0.0.1`（测试禁真实网络）；请求体/路径/头部与 `server/src/test/resources/wire/*.json` **逐字节比对**，错误分支（401/429/5xx/SSRF）核对判定。embedding 相关 wire fixture **10 个**：`aliyun` / `azure_openai` / `gemini` / `jina` / `nvidia_passage` / `nvidia_query` / `openai_default` / `openai_override` / `volcengine` / `zhipu`（同目录的 `rerank_*` / `ws_*` 属 rerank 与 websearch）。
+- **本模块**：**1 个测试类 `EmbeddingWireTest`（20 个 `@Test`）**，stub server 起在 `127.0.0.1`（测试禁真实网络）；请求体/路径/头部与 `domains/src/test/resources/wire/*.json` **逐字节比对**，错误分支（401/429/5xx/SSRF）核对判定。embedding 相关 wire fixture **10 个**：`aliyun` / `azure_openai` / `gemini` / `jina` / `nvidia_passage` / `nvidia_query` / `openai_default` / `openai_override` / `volcengine` / `zhipu`（同目录的 `rerank_*` / `ws_*` 属 rerank 与 websearch）。
 - **覆盖面**：9 家 provider 的请求形态与错误文案、SSRF 拒绝/放行、`ModelRuntimeConfigs` 全字段映射（`configFromModelMapsAllFields`——测试范围串起 model 域，正是"配置值去实体化"后的真实驱动链）、并发过闸的后台/交互区分、`BatchEmbedder` 的结果归位/首错短路/数量不等文案。
 - **仓级口径**：全量 4,704 个后端用例 0 失败 + spotlessCheck 绿（HANDOFF B62 批，2026-10-04 记录；本包改动跑全量闸门即可覆盖）。
 - **已知偶发 2 例**（遇到先单独重跑，别误判回归；均与本包无关，全仓共有）：
@@ -375,6 +375,6 @@ cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Cont
 | 为什么后台向量化被限流而查询没有 | `ConcurrencyEmbedder.gate()`（`BackgroundTaskContext` 判断，§7.4） |
 | 维度覆盖什么时候生效 | `BaseEmbedder.supportsDimensionsParam`（显式覆盖 + 维度为正，§7.6） |
 | NVIDIA query/passage 怎么切 | `EmbedQueryContext`（⚠️ markQuery 生产无调用点，§7.3） |
-| 线格式契约在哪钉死 | `EmbeddingWireTest` + `server/src/test/resources/wire/*.json`（embedding 相关 10 个） |
+| 线格式契约在哪钉死 | `EmbeddingWireTest` + `domains/src/test/resources/wire/*.json`（embedding 相关 10 个） |
 | 查询侧向量化和本包什么关系 | `HybridSearchService` → `common/embedding` `EmbeddingGateway` → `knowledge/client/EmbedderClient`（**不走本包**，§3.1 注） |
 | 目录为什么这样分 | 两份 `package-info.java` + `docs/backend-package-map.md`（P1 provider 族拆分：根 9 框架 + `provider/` 11） |

@@ -32,7 +32,7 @@ import sys
 from collections import defaultdict
 
 # 多模块（B116）：源码根的单一事实来源在 _source_roots.py（新增模块只改那里）。
-# 拆出 contracts 后此处若仍写死 server/...，R5/R6/R8 会**静默失覆盖**。
+# 拆出 contracts 后此处若仍写死 domains/...，R5/R6/R8 会**静默失覆盖**。
 import _source_roots as _sr
 
 PKG_ROOTS = _sr.backend_pkg_roots()

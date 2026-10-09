@@ -277,7 +277,7 @@ flowchart LR
 ```bash
 # 每次改动后必跑（约 3 分钟）
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test :server:spotlessCheck
+  ./gradlew :domains:test :domains:spotlessCheck
 # 本包重点单类（改 stream 自身时先跑这四个，快）
 #   --tests "com.ragagent.stream.*"
 # 注意：RedisStreamManagerTest 需要环境有 redis-server（或 REDIS_TEST_ADDR），否则静默跳过——

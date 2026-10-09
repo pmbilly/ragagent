@@ -480,7 +480,7 @@ flowchart TD
 | 改 KB 创建默认值 / 校验 | `service/KnowledgeBaseService.createKnowledgeBase` + `ensureDefaults` | 向量库绑定校验走 retriever（哨兵文案 2200/2201）；补创建类 fixture |
 | 改处理卡死的兜底策略 | `service/HousekeepingService`（周期扫描 + stale 阈值） | 它决定“用户多久看到失败”，改阈值要看前端轮询节奏 |
 | 加一个端点 | `controller/` 加方法 + `dto/` 加请求记录（`@Valid`）+ `service/` 加用例 | 响应别手搓 `ObjectNode`；错误用 `AppError` / `BizException` |
-| 给文档/chunk 加字段 | `domain/` 实体 + `dto/` 响应记录 | **schema 两处同改**：`migrations/versioned/V1__baseline.sql` + `server/src/test/java/com/ragagent/TestSchema.java`（否则 H2 报 `Column not found`） |
+| 给文档/chunk 加字段 | `domain/` 实体 + `dto/` 响应记录 | **schema 两处同改**：`migrations/versioned/V1__baseline.sql` + `domains/src/test/java/com/ragagent/TestSchema.java`（否则 H2 报 `Column not found`） |
 | 加处理阶段 | `task/KnowledgeProcessWorker` + `KnowledgeService.ALL_STAGES` + `KnowledgeProcessingSpan.STAGE_*` | 前端进度条按阶段名渲染；补 fixture |
 | 改 jsonb 形状 | `domain/` 里的值类型 | 值类型字段一律显式输出；读方要容错 |
 | 改切分策略 | `chunker/`（`HeadingSplitter` / `HeuristicSplitter` / `LegacySplitter`）+ `support/ParserEngineRules` | `chunker/preview` 端点有契约 fixture（`cprev-*.json`） |
@@ -499,12 +499,12 @@ flowchart TD
 ```bash
 # 每次改动后必跑（约 3 分钟）
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test :server:spotlessCheck
+  ./gradlew :domains:test :domains:spotlessCheck
 # 若动了前端可见契约（字段名/信封/状态码），同批带前端：
 cd frontend && npx vue-tsc --build --force && npm test
 ```
 
-**A. 加端点**：`dto` 请求 → `controller`（`@Valid`）→ `service` 用例（装配在门面）→ 补契约 fixture（`server/src/test/resources/contracts/`）→ 三绿 → 提交。
+**A. 加端点**：`dto` 请求 → `controller`（`@Valid`）→ `service` 用例（装配在门面）→ 补契约 fixture（`domains/src/test/resources/contracts/`）→ 三绿 → 提交。
 
 **B. 加字段**：`domain`（若落库）→ baseline SQL + `TestSchema` → `dto` 响应 → fixture → 三绿。若字段对**前端可见**，同批改前端类型与页面。
 
@@ -531,7 +531,7 @@ cd frontend && npx vue-tsc --build --force && npm test
 
 ## 8. 测试与验证
 
-- **规模**：**4,681** 个后端用例（含 6 个 skip）/ 1,366 个契约 fixture；本模块的 fixture 在 `server/src/test/resources/contracts/`（`chunk-*`、`cprev-*`、`faq-*`、`knowledge-*`、`kb-*`）。
+- **规模**：**4,681** 个后端用例（含 6 个 skip）/ 1,366 个契约 fixture；本模块的 fixture 在 `domains/src/test/resources/contracts/`（`chunk-*`、`cprev-*`、`faq-*`、`knowledge-*`、`kb-*`）。
 - **比较口径**：契约比较器是**语义比较**（键序 / 转义归一化后比），fixture 锚定的是**本仓自己的行为**。
 - **已知偶发 2 例**（遇到先单独重跑，别误判回归）：
   - `WebToolsRecordingTest.searchWithContentFetchesLeadingPagesViaSharedFetchTool`（全量并发下偶发）

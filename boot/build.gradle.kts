@@ -4,7 +4,7 @@
 // 集成测试（@SpringBootTest）也必须住在这里 —— 它们隐式依赖 `@SpringBootConfiguration`（包级向上搜索），
 // 而 `:domains` 看不到 `:boot`（方向是 boot → domains）。
 //
-// 依赖方向：boot → domains(:server) → engine → common（一路向下，无环）。
+// 依赖方向：boot → domains（原 :server，B167 更名）→ engine → common（一路向下，无环）。
 plugins {
     java
     id("org.springframework.boot")
@@ -35,8 +35,8 @@ dependencyManagement {
 }
 
 dependencies {
-    implementation(project(":server"))
-    // 组合根本身用到的 API（:server 的 compileOnly/implementation 不会传递到编译面）
+    implementation(project(":domains"))
+    // 组合根本身用到的 API（:domains 的 compileOnly/implementation 不会传递到编译面）
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-aop")
@@ -46,10 +46,10 @@ dependencies {
     compileOnly("jakarta.validation:jakarta.validation-api")
     implementation(project(":engine"))
     implementation(project(":common"))
-    testImplementation(testFixtures(project(":server")))
+    testImplementation(testFixtures(project(":domains")))
     testImplementation(testFixtures(project(":common")))   // EmbeddedRedis（共享测试基座）
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    // 集成测试走内存库（与 :server 同口径）。⚠️ testRuntimeOnly **不可传递** ⇒ 必须显式声明，
+    // 集成测试走内存库（与 :domains 同口径）。⚠️ testRuntimeOnly **不可传递** ⇒ 必须显式声明，
     // 否则测试会落到 application.yml 里的真 PG URL 上，TestSchema 的 H2 专有 DDL 直接 bad SQL grammar。
     testRuntimeOnly("com.h2database:h2")
     testImplementation("com.tngtech.archunit:archunit:1.3.0")   // 架构规则（随 B165 迁入）
@@ -88,7 +88,7 @@ tasks.withType<Test> {
     useJUnitPlatform()
     // 契约夹具按「模块相对 + server/ 兜底」两候选读 **文件路径**（18 处调用点 + GoldenContract 内置）；
     // 集成测试从 :server 迁到 :boot 后，工作目录变成 boot/ ⇒ 两个候选都落空（B165 实测 97 处失败）。
-    // 统一把工作目录设为**仓库根**，两候选中的第二个（server/src/test/resources/contracts/…）即可命中。
+    // 统一把工作目录设为**仓库根**，两候选中的第二个（domains/src/testFixtures/resources/contracts/…）即可命中。
     workingDir = rootDir
     // ⚠️ 惰性取（doFirst）：配置期解析 testRuntimeClasspath 会与其他项目请求本模块 testFixtures
     // 元数据相撞（B165 实测：":server local metadata has not been calculated yet"）。
@@ -101,7 +101,7 @@ tasks.withType<Test> {
     }
     jvmArgs("-XX:+EnableDynamicAgentLoading")
     maxHeapSize = "2g"
-    // 测试沙箱化：DOCREADER_ADDR 一律置空（与 :server 同口径）
+    // 测试沙箱化：DOCREADER_ADDR 一律置空（与 :domains 同口径）
     environment("DOCREADER_ADDR", "")
     systemProperty("contract.refresh", System.getProperty("contract.refresh") ?: "false")
 }

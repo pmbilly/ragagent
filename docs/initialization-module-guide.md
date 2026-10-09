@@ -322,7 +322,7 @@ sequenceDiagram
 ```bash
 # 每次改动后必跑（约 3 分钟）
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test :server:spotlessCheck
+  ./gradlew :domains:test :domains:spotlessCheck
 # 若动了前端可见契约（字段名/信封/状态码），同批带前端：
 cd frontend && npx vue-tsc --build --force && npm test
 ```
@@ -356,8 +356,8 @@ cd frontend && npx vue-tsc --build --force && npm test
 ## 8. 测试与验证
 
 - **规模（2026-10-08 实测）**：直接覆盖本域的测试类 **3 个 / `@Test` 方法 6 个**；全仓基线约 **4,836** 用例（B84–B88 闸门口径）。
-- **跨域挂载（本域最非常规的一点）**：本域自有测试树 `server/src/test/java/com/ragagent/initialization/` 只有 **1 类 1 用例**（`OllamaBindJsonObjectTest`，bindJsonObject 的 400 文案钉子）；主力契约测试全挂在 **agent 测试树**——`agent/management/W5bInitializationContractTest`（4 用例：down/up/upstream 三家族 + fabri-tag 形状，45 个 `w5b-*` golden，in-JVM Ollama stub 11434 + OpenAI 兼容 stub）与 `agent/management/AgentContractTest`（3 用例中的 `agentAndInitializationFlow` 覆盖 17 个 `init-*` golden）。原因：`agentm` 时代同包，B36 并入 agent 时测试树未随域归属走（agent 手册 §8/§9 已登记）。
-- **fixture**：`server/src/test/resources/contracts/` 下 **62 个**——`init-*` 17（config 三端点）+ `w5b-*` 45（系统级 14 端点）。录制：`scripts/record-ag-golden.sh`（43 `ag-*` + 17 `init-*`）、`scripts/record-w5b-golden.sh`；docreader 执行步走 `scripts/ab-w5b.sh` 双端 A/B（不进 golden）。
+- **跨域挂载（本域最非常规的一点）**：本域自有测试树 `domains/src/test/java/com/ragagent/initialization/` 只有 **1 类 1 用例**（`OllamaBindJsonObjectTest`，bindJsonObject 的 400 文案钉子）；主力契约测试全挂在 **agent 测试树**——`agent/management/W5bInitializationContractTest`（4 用例：down/up/upstream 三家族 + fabri-tag 形状，45 个 `w5b-*` golden，in-JVM Ollama stub 11434 + OpenAI 兼容 stub）与 `agent/management/AgentContractTest`（3 用例中的 `agentAndInitializationFlow` 覆盖 17 个 `init-*` golden）。原因：`agentm` 时代同包，B36 并入 agent 时测试树未随域归属走（agent 手册 §8/§9 已登记）。
+- **fixture**：`domains/src/test/resources/contracts/` 下 **62 个**——`init-*` 17（config 三端点）+ `w5b-*` 45（系统级 14 端点）。录制：`scripts/record-ag-golden.sh`（43 `ag-*` + 17 `init-*`）、`scripts/record-w5b-golden.sh`；docreader 执行步走 `scripts/ab-w5b.sh` 双端 A/B（不进 golden）。
 - **比较口径**：语义比较（`ContractJson.semantic` 键序/转义归一）+ 掩码（`<ts>` / `<uuid>` / `<ollama-err>` / `<tags>`），fixture 锚定的是**本仓自己的行为**。
 - **已知偶发 2 例**（全仓共通，遇到先单独重跑，别误判回归）：
   - `WebToolsRecordingTest.searchWithContentFetchesLeadingPagesViaSharedFetchTool`（全量并发下偶发）

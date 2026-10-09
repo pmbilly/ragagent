@@ -15,7 +15,7 @@
     python3 scripts/normalize-blank-lines.py --apply    # 自动扫描并写回
     python3 scripts/normalize-blank-lines.py --apply <file>...   # 指定文件
 
-自动扫描口径：`server/src/main/java` 下 >100 行且空白行占比 >30% 的文件。
+自动扫描口径：`domains/src/main/java` 下 >100 行且空白行占比 >30% 的文件。
 """
 import pathlib
 import re
@@ -25,7 +25,7 @@ import sys
 TYPE_HDR = re.compile(r'\b(class|interface|enum|record)\b')
 IMPORT_RE = re.compile(r'^import ')
 PACKAGE_RE = re.compile(r'^package ')
-ROOT = 'server/src/main/java'
+ROOT = 'domains/src/main/java'
 
 
 def mask(text):

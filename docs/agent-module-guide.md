@@ -362,7 +362,7 @@ flowchart TD
 | 我想… | 主要改这里 | 别忘了 |
 |---|---|---|
 | 加/改 agent 配置键 | `management/service/AgentConfigJson`（补默认/校验）+ `BuiltinAgentRegistry.CONFIG_KEYS`（已知键全集）+ `management/dto/AgentResponses.agentConfigMap`（响应声明序） | **三处同改**；YAML 未知键会被静默丢弃；前端同批（camel）；补 `ag-*` 金片 |
-| 改内建智能体 | `server/src/main/resources/agent/management/builtin_agents.yaml` + `BuiltinAgentRegistry`（展示序 / 模板解析） | prompt 引用按 11 个模板文件固定顺序查找；`builtin_agents.yaml` 里的 snake 键（如 `reflection_enabled`）会被丢弃 |
+| 改内建智能体 | `domains/src/main/resources/agent/management/builtin_agents.yaml` + `BuiltinAgentRegistry`（展示序 / 模板解析） | prompt 引用按 11 个模板文件固定顺序查找；`builtin_agents.yaml` 里的 snake 键（如 `reflection_enabled`）会被丢弃 |
 | 加一个新工具 | `tools/`（或能力子包）实现 `AgentTool` + `tools/ToolDefinitions` 加名常量 + 注册点 + `ToolCapabilities` 声明 KB 能力 | 工具输出是**自有 schema**（§11 边界，别当 REST 契约改）；补实录或单测 |
 | 改知识检索工具行为 | `tools/knowledge/`（`KnowledgeSearchTool` + `KnowledgeSearchRanking` / `KnowledgeSearchOutputFormatter`） | 跨族接缝 `DocChunkSupport` / `SearchAuth` / `SearchTarget` 在 `tools/` 根；分页参数 `page_size` 两侧都在用（B73 翻案例） |
 | 改 database_query 安全语义 | `tools/sql/SqlGuard` + tokenizer / 深检查 / 注入分析协作者 | 校验 Phase 顺序与错误三元组（type/message/details）固定；`DatabaseQueryRecordingTest` 钉住 |
@@ -384,7 +384,7 @@ flowchart TD
 ```bash
 # 每次改动后必跑（约 3 分钟）
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test :server:spotlessCheck
+  ./gradlew :domains:test :domains:spotlessCheck
 # 若动了前端可见契约（字段名/信封/状态码），同批带前端：
 cd frontend && npx vue-tsc --build --force && npm test
 ```
@@ -421,9 +421,9 @@ cd frontend && npx vue-tsc --build --force && npm test
 
 ## 8. 测试与验证
 
-- **规模**：本模块测试树 `server/src/test/java/com/ragagent/agent/` 共 **69 个测试类 / 350 个 `@Test`**（2026-10-08 实测）。分布：`tools/` 全家 36 类（根 23 + 能力子包 knowledge 6 / web 3 / wiki 2 / sql 1 / data 1）、根 12、`compaction/` 7、`management/` 5、`skills/` 4、`modelcontext/` 3、`domain/` 与 `support/` 各 1。全仓基线约 4,836 用例（HANDOFF B85 口径）。
+- **规模**：本模块测试树 `domains/src/test/java/com/ragagent/agent/` 共 **69 个测试类 / 350 个 `@Test`**（2026-10-08 实测）。分布：`tools/` 全家 36 类（根 23 + 能力子包 knowledge 6 / web 3 / wiki 2 / sql 1 / data 1）、根 12、`compaction/` 7、`management/` 5、`skills/` 4、`modelcontext/` 3、`domain/` 与 `support/` 各 1。全仓基线约 4,836 用例（HANDOFF B85 口径）。
 - **两类测试风格**：
-  - **契约金片**：`AgentContractTest` 对照 `server/src/test/resources/contracts/` 的 **42 个 `ag-*.json`**（+ 引用 17 个 `init-*.json`），dev server 录制（`scripts/record-ag-golden.sh`），掩码比对、语义比较（键序/转义归一化后比）。`ag-*` 是 §11 冻结边界：改契约必须走重录脚本 + 差异复核，**别手改金片**。
+  - **契约金片**：`AgentContractTest` 对照 `domains/src/test/resources/contracts/` 的 **42 个 `ag-*.json`**（+ 引用 17 个 `init-*.json`），dev server 录制（`scripts/record-ag-golden.sh`），掩码比对、语义比较（键序/转义归一化后比）。`ag-*` 是 §11 冻结边界：改契约必须走重录脚本 + 差异复核，**别手改金片**。
   - **录制实录**：`GoRecording*.java` 常量类（根 / `tools/` 45A/B/C / `modelcontext/` 46A）+ `*RecordingTest` 族——对旧实现跑出的真值直接生成为常量，逐字节比对，禁手改。
 - **已知偶发 2 例**（全仓共通，遇到先单独重跑，别误判回归）：
   - `WebToolsRecordingTest.searchWithContentFetchesLeadingPagesViaSharedFetchTool`（就在本模块 `tools/web/`；全量并发下偶发）

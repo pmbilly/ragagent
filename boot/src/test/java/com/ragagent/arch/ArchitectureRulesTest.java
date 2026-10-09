@@ -413,7 +413,7 @@ class ArchitectureRulesTest {
     private static final Map<String, String> LAST_CONCAT_BASELINE = Map.of();
 
     /**
-     * 后端源码根（B116 多模块）：本类在 {@code :server} 里运行，工作目录是 {@code server/}，
+     * 后端源码根（B116 多模块）：本类在 {@code :boot} 里运行（B165 迁入；P3b-3 后模块名为 {@code :domains}），
      * 故共享内核（{@code common}/{@code event}，已抽到 {@code :common}）用相对路径指过去。
      * 不存在的根由调用方跳过 ⇒ 单模块布局下仍然可用。
      * 包级可见：{@link ClasspathResourcesTest} 的反漂移扫描复用同一份根清单（B118）。

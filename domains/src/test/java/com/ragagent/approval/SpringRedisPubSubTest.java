@@ -29,7 +29,7 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
  * {@link SpringRedisPubSub} 的真 Redis 测试（对照 go-redis 的 Subscribe/Publish 语义）。
  *
  * <p>仅在本地能连上**且能通过认证**的 Redis（默认 localhost:16379，与
- * server/src/test/resources 的 spring.data.redis 一致）时运行，否则整体跳过——
+ * domains/src/test/resources 的 spring.data.redis 一致）时运行，否则整体跳过——
  * 仓库里没有 embedded redis，其余跨实例场景由 {@link FakeRedisPubSub} 覆盖
  * （见 {@link GateCrossInstanceTest}）。</p>
  *

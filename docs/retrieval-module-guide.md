@@ -300,9 +300,9 @@ flowchart LR
 ```bash
 # 每次改动后必跑（约 3 分钟）
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test :server:spotlessCheck
+  ./gradlew :domains:test :domains:spotlessCheck
 # 引擎仓动了外部形状时，可单跑本域（快）：
-#   ./gradlew :server:test --tests "com.ragagent.retrieval.*"
+#   ./gradlew :domains:test --tests "com.ragagent.retrieval.*"
 ```
 
 **A. 调检索行为（融合 / FAQ / 截断）**：改 `HybridFusionOps` → 跑 `HybridSearchServiceStoreGroupTest` + `CompositeRetrieveEngineTest` → 若影响 SSE/引用可见形状，同批改 chatpipeline 消费方与前端 → 三绿 → 提交。
@@ -334,8 +334,8 @@ cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Cont
 
 ## 8. 测试与验证
 
-- **规模**：`server/src/test/java/com/ragagent/retrieval/` 下 **34 个 java 文件（33 个测试类 + 1 个假件支撑类 `RetrievalEngineTestSupport`）**，**328 个 `@Test`**，约 9,958 行测试代码。分布：`engine/` 27 个（9 个根级——含假件支撑类——+ 8 店镜像目录 18 个）、`support/` 2、`vlm/` 2、`graph/` 1、`artifact/` 1、根 1（`HybridSearchServiceStoreGroupTest`，11 用例钉 store-group 路由/扇出/归一）。
-- **fixture**：本域**无 HTTP 契约 fixture**（无端点，全靠单测 + 假件/假 JDBC）。两个数据契约：`server/src/test/resources/contracts/w5g3c-artifacts.tsv`（20 行，`ArtifactReferenceRewriter` 的字节契约）与 `server/src/test/resources/jieba/jieba_baseline.json`（`JiebaTokenizerDiffTest` 分词基线）。
+- **规模**：`domains/src/test/java/com/ragagent/retrieval/` 下 **34 个 java 文件（33 个测试类 + 1 个假件支撑类 `RetrievalEngineTestSupport`）**，**328 个 `@Test`**，约 9,958 行测试代码。分布：`engine/` 27 个（9 个根级——含假件支撑类——+ 8 店镜像目录 18 个）、`support/` 2、`vlm/` 2、`graph/` 1、`artifact/` 1、根 1（`HybridSearchServiceStoreGroupTest`，11 用例钉 store-group 路由/扇出/归一）。
+- **fixture**：本域**无 HTTP 契约 fixture**（无端点，全靠单测 + 假件/假 JDBC）。两个数据契约：`domains/src/test/resources/contracts/w5g3c-artifacts.tsv`（20 行，`ArtifactReferenceRewriter` 的字节契约）与 `domains/src/test/resources/jieba/jieba_baseline.json`（`JiebaTokenizerDiffTest` 分词基线）。
 - **真服务端 IT（默认跳过）**：`MilvusDriverLocalIT` / `WeaviateDriverLocalIT` 各 2 用例，env 门控（`WEKNORA_MILVUS_IT=true` / `WEKNORA_WEAVIATE_IT=true`），起 compose 口径的 standalone 对真实服务端验证——引擎线格式改动时手动跑。
 - **已知偶发 2 例**（全仓级，遇到先单独重跑，别误判回归）：
   - `WebToolsRecordingTest.searchWithContentFetchesLeadingPagesViaSharedFetchTool`（全量并发下偶发）

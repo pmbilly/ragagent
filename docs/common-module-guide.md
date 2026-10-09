@@ -254,7 +254,7 @@ flowchart TD
 ```bash
 # 每次改动后必跑（约 3 分钟）
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test :server:spotlessCheck
+  ./gradlew :domains:test :domains:spotlessCheck
 # 动了包结构（新增子包/跨包引用）后必跑包守卫
 python3 scripts/check-package-cycles.py
 # 若契约夹具需要重录（改 JSON 形状），跑单类带开关，随后必须结构化复核差异（HANDOFF §13.12/13.13）
@@ -293,7 +293,7 @@ python3 scripts/check-package-cycles.py
 
 ## 8. 测试与验证
 
-- **规模**：`server/src/test/java/com/ragagent/common/` 下 **20 个 java 文件 / 15 个测试类 / 110 个 `@Test`**（另 5 个是测试脚手架：`JsonRoundTrip`、`FakeRedisPubSub`、`RecordingEventBus`、`StubChecker`、`TestCancellation`）。
+- **规模**：`domains/src/test/java/com/ragagent/common/` 下 **20 个 java 文件 / 15 个测试类 / 110 个 `@Test`**（另 5 个是测试脚手架：`JsonRoundTrip`、`FakeRedisPubSub`、`RecordingEventBus`、`StubChecker`、`TestCancellation`）。
 - **分布**：根 `JsonContractRoundTripTest` 36（JSON 形状往返）+ `RuntimeSnapshotTest` 4；`approval/` 42（`GateTest` 24、`ApprovalWireFormatTest` 7、`GateCrossInstanceTest` 5、`ToolPolicyTest` 4、`SpringRedisPubSubTest` 2）；`web/` 17（`ValidationContractTest` 8、`ContractTest` 4、`JsonFaceVocabularyTest` 3、`RequestFieldsTest` 2）；`text/TextConvTest` 4；`security/IpClassTest` 3；`settings/SystemSettingRegistryTest` 2；`context/TracingCarrierNestingTest` 2。
 - **契约钉子**：`approval` 的报文键名、`web/` 的校验文案与 JSON 面词汇、`RuntimeSnapshotTest` 的启动期快照口径——动这些面的批次必须同批补断言。
 - **本包之上还有全量闸门**（§6 命令块）：common 类型被全仓 4,800+ 用例间接覆盖，改契约面先跑全量再谈"没问题"。

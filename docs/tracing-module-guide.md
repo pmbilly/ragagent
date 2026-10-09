@@ -258,13 +258,13 @@ flowchart LR
 ```bash
 # 每次改动后必跑（约 3 分钟）
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test :server:spotlessCheck
+  ./gradlew :domains:test :domains:spotlessCheck
 # 只跑本模块（快路径）
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test --tests "com.ragagent.tracing.*"
+  ./gradlew :domains:test --tests "com.ragagent.tracing.*"
 ```
 
-**A. 加打点**：调用点 `startSpan`/`startGeneration` → finish（成功/失败两路）→ `:server:test` 三绿 → 提交。
+**A. 加打点**：调用点 `startSpan`/`startGeneration` → finish（成功/失败两路）→ `:domains:test` 三绿 → 提交。
 
 **B. 新异步域缝树**：载荷加 `tracing` 字段（含归一与结构视图）→ 入队点 inject → worker 侧 TaskScope（含失败路径显式 finish）→ 断言负载字节（启用/未启用两种）→ 三绿 → 提交。
 
@@ -292,7 +292,7 @@ cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Cont
 
 ## 8. 测试与验证
 
-- **规模**：**8 个测试类 / 38 个 @Test**（`server/src/test/java/com/ragagent/tracing/langfuse/`，1,398 行）。**无契约 fixture**——wire 契约全部钉在代码断言里。
+- **规模**：**8 个测试类 / 38 个 @Test**（`domains/src/test/java/com/ragagent/tracing/langfuse/`，1,398 行）。**无契约 fixture**——wire 契约全部钉在代码断言里。
 - **测试清单**：
 
 | 测试类 | 用例 | 钉什么 |

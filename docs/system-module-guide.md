@@ -294,7 +294,7 @@ flowchart TB
 ```bash
 # 每次改动后必跑
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test :server:spotlessCheck
+  ./gradlew :domains:test :domains:spotlessCheck
 # 若动了前端可见契约（键名/文案/状态码），同批带前端：
 cd frontend && npx vue-tsc --build --force && npm test
 ```
@@ -326,7 +326,7 @@ cd frontend && npx vue-tsc --build --force && npm test
 ## 8. 测试与验证
 
 - **规模**：本包 **1 个契约测试类** `SystemContractTest`（804 行 / **19 个 `@Test`**），MockMvc 全栈（真实 RBAC + 真实 seed）。种子：租户 10002 + 系统管理员 javasysadmin + 基线 owner/viewer。
-- **fixture**：`server/src/test/resources/contracts/` 下 `sys-*`（18 个）与 `adm-*`（55 个）；测试实际引用 59 个名字。注意 `adm-key-*`（11 个）锚的是 **auth 域 API-Key 响应元素**（该域未换锚时的跨域契约）；`adm-settings-*` 锚的是本包设置面。
+- **fixture**：`domains/src/test/resources/contracts/` 下 `sys-*`（18 个）与 `adm-*`（55 个）；测试实际引用 59 个名字。注意 `adm-key-*`（11 个）锚的是 **auth 域 API-Key 响应元素**（该域未换锚时的跨域契约）；`adm-settings-*` 锚的是本包设置面。
 - **掩码**：UUID/时间戳掩码正则的键名字符集是 `[a-zA-Z_]+`（§14.9f 换锚时从 `[a-z_]+` 放宽——键改名必须同步放宽正则，HANDOFF §13.13）；另掩 key 数字 id、token 明文、affected、started_at/uptime/db_version/timestamp。
 - **不做字节比对的三处**（部署态差异，测试 javadoc 注明）：capabilities（键集比对 + 本部署断言）、parser-engines 及 check（禁真实网络 → 静态分支内联断言）、info 的 db_version（H2 无 flyway 表 → 键省略）。
 - **已知偶发 2 例**（都不在本包，但跑全量闸门时会遇到；先单独重跑再判回归）：

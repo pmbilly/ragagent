@@ -17,7 +17,7 @@ public final class SourceRoots {
 
     private SourceRoots() {}
 
-    private static final String[] MODULES = {"server", "common", "engine", "boot"};
+    private static final String[] MODULES = {"domains", "common", "engine", "boot"};
 
     public static Path repoRoot() {
         Path p = Path.of("").toAbsolutePath();

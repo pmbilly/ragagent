@@ -52,7 +52,7 @@ import com.ragagent.support.ContractJson;
  * <h2>golden 的来源</h2>
  * <p>全部 golden 都是对<b>运行中的 dev server</b>（录制时 :8080，db=localhost:15432）
  * 打真实请求录下来的，录制脚本是 {@code scripts/record-datasource-golden.sh}，
- * 文件在 {@code server/src/test/resources/contracts/ds-*.json}。</p>
+ * 文件在 {@code domains/src/testFixtures/resources/contracts/ds-*.json}。</p>
  *
  * <p><b>录制前的额外准备</b>：服务带
  * {@code SSRF_WHITELIST=127.0.0.1,::1,localhost} 启动，且 127.0.0.1:18099 上跑着一个

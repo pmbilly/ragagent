@@ -112,7 +112,7 @@ graph LR
 | 数据 | 载体 | 生命周期 |
 |---|---|---|
 | 评测任务（task + params + metric） | `EvaluationService.store`（`ConcurrentHashMap<String, EvaluationDetail>`，进程内存） | 随进程存亡；**重启即丢**，之后 GET 同 taskId → 500 `task not found` |
-| 评测数据集 | classpath `server/src/main/resources/dataset/samples.json`（5 张逻辑"表"：`queries`/`corpus`/`answers`/`qrels`/`qas`；当前 1 QA 对 / 4 passage / 1 答案） | 随仓库固化；`DatasetService` 双重检查锁缓存一次 |
+| 评测数据集 | classpath `domains/src/main/resources/dataset/samples.json`（5 张逻辑"表"：`queries`/`corpus`/`answers`/`qrels`/`qas`；当前 1 QA 对 / 4 passage / 1 答案） | 随仓库固化；`DatasetService` 双重检查锁缓存一次 |
 | 临时知识库 | 借 `knowledge` 域真实建库（名字固定 `evaluation`） | run 结束 `deleteKnowledge` + `deleteKnowledgeBase` 删除；失败路径会残留（见 §7） |
 
 ### 2.2 jsonb 列与值类型对照 —— **不适用**
@@ -242,7 +242,7 @@ stateDiagram-v2
 | 改某个指标算法 | `metric/` 对应类（如 `NdcgMetric`） | `RetrievalMetricsTest` 钉的是 Go 对数（`*MatchesGoCases`）；`MetricCommon.log2` 的 frexp 语义别顺手"简化" |
 | 加一项指标 | `metric/` 新实现 `Metrics` + `MetricHook.CALCULATORS` 注册 + `EvaluationDtos` 的 `RetrievalMetrics`/`GenerationMetrics` 加字段 | 12 项顺序固定在 `CALCULATORS`；均值口径在 `MetricList.avg` |
 | 换生成类指标的分词 | `metric/MetricSegmenter.setSegmenter` 接缝（默认二字滑窗） | 只影响 BLEU/ROUGE；纪律同 chatpipeline：**不在 searchutil 上加出口**，注入即恢复 |
-| 换/加数据集 | `service/DatasetService.load` + `server/src/main/resources/dataset/samples.json` | 数据集更新需用转换脚本重新生成（javadoc）；`DatasetServiceTest` 两用例要同步 |
+| 换/加数据集 | `service/DatasetService.load` + `domains/src/main/resources/dataset/samples.json` | 数据集更新需用转换脚本重新生成（javadoc）；`DatasetServiceTest` 两用例要同步 |
 | 改管线参数默认值 | `EvaluationService.buildParams`（@Value `conversation.*`）+ `service/EvaluationPromptDefaults` | prompt 常量是**响应体的一部分**，golden 随部署配置漂移（§7 第 6 条） |
 | 改进度/终态写法 | `EvaluationService.evalDataset` / `runQaPair` | 别破坏「POST=创建快照、GET=live 对象」语义（契约测试在钉） |
 | 改清理行为 | `evalDataset` 的 finally 块 | 失败仅 error 日志；"残留临时 KB"是已备案现状 |
@@ -258,13 +258,13 @@ stateDiagram-v2
 ```bash
 # 每次改动后必跑
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test :server:spotlessCheck
+  ./gradlew :domains:test :domains:spotlessCheck
 # 只跑本域（快路，约秒级~分钟级）
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test --tests "com.ragagent.evaluation.*"
+  ./gradlew :domains:test --tests "com.ragagent.evaluation.*"
 # 偶发用例单独重跑（见 §8）
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test --tests "*EvaluationContractTest"
+  ./gradlew :domains:test --tests "*EvaluationContractTest"
 ```
 
 **A. 加请求/响应字段**：`dto` → `controller`（`@Valid`/`@RejectEmptyBody`）→ `service` 缺省链 → 重录/补 `ev-*` fixture → 全绿 → 提交。前端零调用面，无需带前端改动。
@@ -304,14 +304,14 @@ cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Cont
 | `metric/GenerationMetricsTest`（71 行） | 7 | BLEU/ROUGE 边界（全同/空/smoothing 无重叠/部分重叠） |
 | `service/DatasetServiceTest`（41 行） | 2 | samples.json 与 Go 数据集逐字一致 + datasetId 被忽略 |
 
-- **fixture**：`server/src/test/resources/contracts/` 下 **`ev-` 前缀 10 个**（`ev-post` / `ev-post-badjson` / `ev-post-nobody` / `ev-post-empty` / `ev-post-kb-missing` / `ev-get` / `ev-get-missing` / `ev-get-unknown` / `ev-get-viewer` / `ev-post-viewer`）。其中 **7 个被 `golden()` 直接比对**；`ev-get.json` / `ev-get-viewer.json` / `ev-post-viewer.json` 是存档形态（现用例改为内联断言/轮询，见下）。
+- **fixture**：`domains/src/test/resources/contracts/` 下 **`ev-` 前缀 10 个**（`ev-post` / `ev-post-badjson` / `ev-post-nobody` / `ev-post-empty` / `ev-post-kb-missing` / `ev-get` / `ev-get-missing` / `ev-get-unknown` / `ev-get-viewer` / `ev-post-viewer`）。其中 **7 个被 `golden()` 直接比对**；`ev-get.json` / `ev-get-viewer.json` / `ev-post-viewer.json` 是存档形态（现用例改为内联断言/轮询，见下）。
 - **比较口径**：`ContractJson.semantic` 语义比较（键序/HTML 转义归一）；`ev-post` 两侧同掩码（taskId → `<taskid>`、startTime → `<ts>`）。
 - **契约测试会真跑流水线**：测试部署无 embedding 模型 → `getTerminalRunsExecution` 里段落同步建索引在 `ChunkVectorIndexer` 失败 `model ID cannot be empty` → 终态 failed（**确定性**）；metric 显式 null（键恒在）。部署有模型时才会跑到指标产出（fixture `ev-get.json` 记录的终态形态）。
 - **已知偶发**：`EvaluationContractTest.getTerminalRunsExecution` 全量并发下偶发，单独重跑通过：
 
 ```bash
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test --tests "*EvaluationContractTest"
+  ./gradlew :domains:test --tests "*EvaluationContractTest"
 ```
 
 - **改前端可见契约时**：本域目前**前端零调用面**（2026-10-08 grep `api/v1/evaluation` 于 `frontend/src` 为 0，与 HANDOFF §14.9b 打样记录一致），无需同批带前端；但一旦前端开始调用，按仓库纪律同批改。
@@ -339,7 +339,7 @@ cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Cont
 | rag 管线在哪重放 | `EvaluationService.runQaPair` → `SessionKnowledgeQaService.knowledgeQAByEvent(chatManage, presets["rag"])` |
 | 12 项指标怎么注册与求均值 | `service/MetricHook.CALCULATORS`（12 个 Slot）+ `MetricList.avg` |
 | 某个指标的算法 | `metric/` 同名类；切句/分词/log2 在 `MetricCommon` / `MetricSegmenter` |
-| 数据集长什么样 | `server/src/main/resources/dataset/samples.json` + `DatasetService` 内部 `Dataset` record（5 张逻辑表） |
+| 数据集长什么样 | `domains/src/main/resources/dataset/samples.json` + `DatasetService` 内部 `Dataset` record（5 张逻辑表） |
 | 响应 JSON 的形状 | `dto/EvaluationDtos`（字段声明序 = 键序；javadoc 即契约） |
 | 错误文案为什么这么写 | `EvaluationService.ERR_*` 常量 + `kbNotFoundMessage`（§7 第 5 条） |
 | prompt 常量哪来的 | `service/EvaluationPromptDefaults`（部署 config.yaml 生效值，随配置漂移） |

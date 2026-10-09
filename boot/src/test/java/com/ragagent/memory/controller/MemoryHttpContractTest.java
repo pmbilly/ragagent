@@ -46,7 +46,7 @@ import com.ragagent.support.ContractJson;
  * <p>golden 均为对运行中的服务打真实请求后落盘录制：错误面（{@code memory-not-found.json} 等）
  * 录于契约换锚前；成功面在 <b>2026-10-01 契约换锚</b>后重录——信封退役、键名 camelCase、
  * 列表改 {@code {items,page,pageSize,total}}、创建 201 / 删除类 204。文件都在
- * {@code server/src/test/resources/contracts/memory-*.json}。</p>
+ * {@code domains/src/testFixtures/resources/contracts/memory-*.json}。</p>
  *
  * <p>录制序（顺序会影响响应内容——列表顺序、计数）：</p>
  * <pre>

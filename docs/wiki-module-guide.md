@@ -366,7 +366,7 @@ flowchart LR
 | 改 lint / 自动修复 | `service/page/WikiLintService` | issue 三态校验在 `controller/WikiMaintenanceOps` |
 | 改 slug 规则 / 别名匹配 | `service/page/WikiSlugHandles` + `SlugFuzzy` + `ingest/NewSlugFromCitation` | 唯一索引是**部分唯一**（`WHERE deleted_at IS NULL`），已删 slug 可复用 |
 | 改多副本协调 | 根 `WikiRedisWiring` + 各端口 Redis 实现 | `wiki.redis-enabled=true` 才切 Redis；@Primary 必须因 InProcess 是无条件 @Component |
-| 加表 / 加字段 | `domain/` 实体 + `mapper/` | **schema 两处同改**：`migrations/versioned/V1__baseline.sql` + `server/src/test/java/com/ragagent/TestSchema.java`；jsonb 记得 `autoResultMap` |
+| 加表 / 加字段 | `domain/` 实体 + `mapper/` | **schema 两处同改**：`migrations/versioned/V1__baseline.sql` + `domains/src/test/java/com/ragagent/TestSchema.java`；jsonb 记得 `autoResultMap` |
 | 改图谱 / 统计 | `service/ingest/WikiGraphCalculator` + `controller/WikiStatsOps` | 图谱"熟悉知识"叠加层（FamiliarKnowledgeIDs）恒 null，是已知差异 |
 | 改 agent 的 wiki 工具行为 | **不在本包**：`agent/tools/wiki/`，数据面在 `session/AgentToolWikiBackends` | 工具只认 `WikiPageService` 门面；实录测试在 `agent/tools/wiki/` |
 
@@ -379,7 +379,7 @@ flowchart LR
 ```bash
 # 每次改动后必跑（约 3 分钟）
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test :server:spotlessCheck
+  ./gradlew :domains:test :domains:spotlessCheck
 # 若动了前端可见契约（字段名/信封/状态码），同批带前端：
 cd frontend && npx vue-tsc --build --force && npm test
 ```
@@ -413,8 +413,8 @@ cd frontend && npx vue-tsc --build --force && npm test
 
 ## 8. 测试与验证
 
-- **规模**：`server/src/test/java/com/ragagent/wiki/` 下 **32 个测试类 / 469 个 `@Test` + 12 个 `@ParameterizedTest`**；另有邻接测试：`agent/tools/wiki/` 2 个实录类（17 `@Test`）、`session/AgentToolBackendsWikiTest`（12 `@Test`）。
-- **fixture**：`server/src/test/resources/contracts/` 下前缀 **`wiki-*` 共 16 个**（`WikiHttpContractTest` 消费，覆盖 21 个端点的代表性形态：创建 403、空文件夹、图谱、索引、lint、404、乐观锁更新等）。
+- **规模**：`domains/src/test/java/com/ragagent/wiki/` 下 **32 个测试类 / 469 个 `@Test` + 12 个 `@ParameterizedTest`**；另有邻接测试：`agent/tools/wiki/` 2 个实录类（17 `@Test`）、`session/AgentToolBackendsWikiTest`（12 `@Test`）。
+- **fixture**：`domains/src/test/resources/contracts/` 下前缀 **`wiki-*` 共 16 个**（`WikiHttpContractTest` 消费，覆盖 21 个端点的代表性形态：创建 403、空文件夹、图谱、索引、lint、404、乐观锁更新等）。
 - **比较口径**：契约比较器是**语义比较**（键序 / 转义归一化后比），fixture 锚定的是**本仓自己的行为**；掩码正则按键名锚定，**键改名必须同步放宽 `[a-z_]+` → `[A-Za-z_]+`**（§13.13，否则掩码静默失效）。
 - **已知偶发 2 例**（全量并发下偶发，遇到先单独重跑，别误判回归）：
   - `WebToolsRecordingTest.searchWithContentFetchesLeadingPagesViaSharedFetchTool`

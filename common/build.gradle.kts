@@ -2,11 +2,11 @@
 //
 // 存在意义（B116 抽取，B117 定名 :common）：把"底座不得反向依赖任何业务域"从守卫脚本规则
 // **升格为编译规则** —— 此前由 check-package-cycles.py 的 R5 守（可被改白名单绕过），现在改不动了。
-// 依赖方向：server → common；**common → 无**（本 build 文件里没有任何 project(...)）。
+// 依赖方向：domains → common；**common → 无**（本 build 文件里没有任何 project(...)）。
 //
 // 命名取 common 而非 contracts 的两个理由：
 //   1. 与顶层包一致 —— 135/175 文件就在 com.ragagent.common 下（模块名 = 顶层包名，最常规）；
-//   2. 本仓 "contracts" 已被占用 —— server/src/test/resources/contracts 有 1,426 个 golden
+//   2. 本仓 "contracts" 已被占用 —— domains/src/testFixtures/resources/contracts 有 1,426 个 golden
 //      契约夹具、另有 49 个 *ContractTest，再叫 contracts 会语义撞车。
 //
 // ⚠️ 门槛（名字不承担约束，故写在这里）：这里只应有**跨域词汇 / 不可变载荷 / 端口契约**；

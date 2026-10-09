@@ -395,7 +395,7 @@ flowchart LR
 | 改 URL 重写 | `support/Rewriter`（记忆化/日志）+ `support/StreamRewriter`（扣留）+ `Mode` | 尾部锚定 `\z`；URL 只记 DEBUG；handle 降级是特性不是 bug |
 | 改 local 双实现的共享内核 | `fileserve/StoragePathGuard`（单一份实现） | 两支调用方（knowledge.LocalStorageService / LocalFileContentService）**各自保留**引用形态与错误通道，不合并 |
 | 加资源生命周期规则 | `service/ResourceCatalogService` + `mapper/ResourceRepository` | `/r/` 令牌窗口=TTL/2；撤销行留到过期（墓碑语义） |
-| 动 storage_backends 表 | `domain/StorageBackend` + `mapper/StorageBackendRepository`（COLS 与两处方言分支） | schema 两处同改：`migrations/versioned/V1__baseline.sql` + `server/src/test/java/com/ragagent/TestSchema.java`（否则 H2 `Column not found`） |
+| 动 storage_backends 表 | `domain/StorageBackend` + `mapper/StorageBackendRepository`（COLS 与两处方言分支） | schema 两处同改：`migrations/versioned/V1__baseline.sql` + `domains/src/test/java/com/ragagent/TestSchema.java`（否则 H2 `Column not found`） |
 
 ---
 
@@ -406,7 +406,7 @@ flowchart LR
 ```bash
 # 每次改动后必跑（约 3 分钟）
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test :server:spotlessCheck
+  ./gradlew :domains:test :domains:spotlessCheck
 # 若动了前端可见契约（字段名/信封/状态码），同批带前端：
 cd frontend && npx vue-tsc --build --force && npm test
 ```

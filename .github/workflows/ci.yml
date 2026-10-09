@@ -2,7 +2,7 @@
 # 测试自含（契约 fixture，无 Testcontainers）；backend job 另起 ParadeDB 服务容器（B158）：
 # 灌基线（全新库守卫）+ 支撑两个连真 PG 的录测试。
 # 2026-09-30 增：包结构守卫（环 / 分层棘轮，scripts/check-package-cycles.py）。
-# 2026-10-02 增（B10）：架构规则随测试套件跑（server/src/test/.../arch/ArchitectureRulesTest.java：
+# 2026-10-02 增（B10）：架构规则随测试套件跑（boot/src/test/.../arch/ArchitectureRulesTest.java（B165 迁入）：
 #   禁裸 getenv / 属性类必须被 @ConfigurationPropertiesScan 覆盖 / 配置类不得双装配 /
 #   install* 只许装配层调用）——后端 job 的 `./gradlew build` 即闸门；包级规则仍归上面的 guards job。
 name: CI

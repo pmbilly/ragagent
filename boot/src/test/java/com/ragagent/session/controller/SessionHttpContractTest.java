@@ -39,7 +39,7 @@ import com.ragagent.support.ContractJson;
  * <h2>期望值来源：录制 golden</h2>
  * <p>golden 是对运行中的 dev server（:8080，db=localhost:15432）打真实请求录的，
  * 脚本 {@code scripts/record-session-golden.sh}，文件
- * {@code server/src/test/resources/contracts/session-*.json}。录制时 dev 库的
+ * {@code domains/src/testFixtures/resources/contracts/session-*.json}。录制时 dev 库的
  * 测试租户里恰好遗留了一条空标题会话，所以列表类 golden 有 <b>4</b> 个条目——
  * H2 侧用 {@link #seedListState()} 精确复现录制时刻的状态（含 updated_at 的相对
  * 顺序：second-no-title &gt; golden-session &gt; u &gt; junk）。</p>

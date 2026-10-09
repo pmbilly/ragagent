@@ -240,10 +240,10 @@ flowchart LR
 ```bash
 # 每次改动后必跑（约 3 分钟）
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test :server:spotlessCheck
+  ./gradlew :domains:test :domains:spotlessCheck
 # 只跑本包测试（秒级，迭代期用）
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test --tests "com.ragagent.event.*"
+  ./gradlew :domains:test --tests "com.ragagent.event.*"
 # 若动了 SSE 可见契约（payload 键名/键序/省略边界），同批带前端：
 cd ~/ragagent/frontend && npx vue-tsc --build --force && npm test
 ```
@@ -274,7 +274,7 @@ cd ~/ragagent/frontend && npx vue-tsc --build --force && npm test
 
 ## 8. 测试与验证
 
-- **规模**：4 个测试类 / **98** 个 `@Test` / 1,283 行（`server/src/test/java/com/ragagent/event/`，2026-10-08 实测）：
+- **规模**：4 个测试类 / **98** 个 `@Test` / 1,283 行（`domains/src/test/java/com/ragagent/event/`，2026-10-08 实测）：
 
 | 测试类 | @Test | 钉什么 |
 |---|---|---|

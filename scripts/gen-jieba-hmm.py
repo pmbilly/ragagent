@@ -9,7 +9,7 @@
 用法：
     python3 scripts/gen-jieba-hmm.py \\
         [--gse ~/go/pkg/mod/github.com/go-ego/gse@v0.80.3] \\
-        [--out server/src/main/resources/jieba/hmm_model.json]
+        [--out domains/src/main/resources/jieba/hmm_model.json]
 
 产物（按 IEEE754 最短往返表示，保证与 Go 侧逐位一致）：
     {"source":..., "minFloat":..., "probStart":{...}, "prevStatus":{...},
@@ -86,7 +86,7 @@ def parse_viterbi(path):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--gse", default=DEFAULT_GSE)
-    ap.add_argument("--out", default="server/src/main/resources/jieba/hmm_model.json")
+    ap.add_argument("--out", default="domains/src/main/resources/jieba/hmm_model.json")
     args = ap.parse_args()
 
     hmm = os.path.join(args.gse, "hmm")

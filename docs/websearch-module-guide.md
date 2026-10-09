@@ -142,7 +142,7 @@ erDiagram
     }
 ```
 
-单表域，无关联表。表由**迁移 000030** 引入：基线在 `migrations/versioned/V1__baseline.sql`（`web_search_providers`），测试侧同形建表在 `server/src/test/java/com/ragagent/TestSchema.java`（约 L538）。另有**非表状态**：Redis 键 `tempkb:<sessionID>`（§4.3）。
+单表域，无关联表。表由**迁移 000030** 引入：基线在 `migrations/versioned/V1__baseline.sql`（`web_search_providers`），测试侧同形建表在 `domains/src/test/java/com/ragagent/TestSchema.java`（约 L538）。另有**非表状态**：Redis 键 `tempkb:<sessionID>`（§4.3）。
 
 ### 2.2 配置 / 契约类型
 
@@ -321,12 +321,12 @@ stateDiagram-v2
 ```bash
 # 每次改动后必跑（约 3 分钟）
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test :server:spotlessCheck
+  ./gradlew :domains:test :domains:spotlessCheck
 # 单域快速迭代（秒级）
-./gradlew :server:test --tests "com.ragagent.websearch.*"
+./gradlew :domains:test --tests "com.ragagent.websearch.*"
 # 契约夹具重录（改契约后；重录后必须结构化复核差异，HANDOFF §13.12）
 JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test --tests "com.ragagent.websearch.controller.WebSearchProviderContractTest" -Dcontract.refresh=true
+  ./gradlew :domains:test --tests "com.ragagent.websearch.controller.WebSearchProviderContractTest" -Dcontract.refresh=true
 ```
 
 **A. 接新 provider**：实现 `WebSearchProvider` → 注册表 + `VALID_PROVIDER_TYPES` → 两处参数校验分支 → `WebSearchProviderTypes` 条目 → `EmptyTestResults` 文案 → wire 录制 + `wsp-*` fixture → 三绿 → 提交。
@@ -358,8 +358,8 @@ JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
 
 ## 8. 测试与验证
 
-- **规模（2026-10-08 实测）**：`server/src/test/java/com/ragagent/websearch/` 下 **5 个测试类 / 48 个 `@Test`**：
-  - `controller/WebSearchProviderContractTest`（8）——MockMvc 契约面，43 个 `wsp-*` fixture（`server/src/test/resources/contracts/`）；每个 `@Test` 从同一播种出发按录制序串完自己段落的前置变更（类 javadoc）；已接入 `-Dcontract.refresh=true` 重录（HANDOFF §13.12）。
+- **规模（2026-10-08 实测）**：`domains/src/test/java/com/ragagent/websearch/` 下 **5 个测试类 / 48 个 `@Test`**：
+  - `controller/WebSearchProviderContractTest`（8）——MockMvc 契约面，43 个 `wsp-*` fixture（`domains/src/test/resources/contracts/`）；每个 `@Test` 从同一播种出发按录制序串完自己段落的前置变更（类 javadoc）；已接入 `-Dcontract.refresh=true` 重录（HANDOFF §13.12）。
   - `provider/WebSearchProviderExecTest`（28）——本地 stub server（`com.sun.net.httpserver`），请求体 / URL 与 `resources/wire/ws_*.json`（11 个：brave/tavily/ollama/searxng/baidu/keenable×2/metaso/zhipu/exa/bocha）逐字节比对 + 各 provider 确定性分支。
   - `service/WebSearchServiceExecTest`（4）——mock 仓储 + stub provider，钉 resolveProvider / 过滤分支 / 黑名单。
   - `service/WebSearchTempKbStateServiceTest`（7）、`controller/WebSearchProviderRequestBindingTest`（1）。
@@ -392,7 +392,7 @@ JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
 | 错误为什么一会儿 401、一会儿 400、一会儿 200 | `WebSearchProviderController` javadoc 的错误形态分层 + 本文 §3.2 表 |
 | api_key 去了哪 | `domain/WebSearchParamsTypeHandler`（落库加密）+ `dto/WebSearchProviderResponse.from`（响应摘除）+ `PUT /{id}`（恒保留存量），§7.2 |
 | 13 家 provider 怎么注册 / 校验 | `provider/WebSearchProviderRegistry` + `service/WebSearchProviderService`（`VALID_PROVIDER_TYPES` 与两处校验 switch） |
-| 一家 provider 的真实请求/响应长什么样 | `server/src/test/resources/wire/ws_*.json` 录制 + `provider/` 对应类 |
+| 一家 provider 的真实请求/响应长什么样 | `domains/src/test/resources/wire/ws_*.json` 录制 + `provider/` 对应类 |
 | 黑名单规则语法 | `service/WebSearchService.matchesBlacklistRule`：`/…/` 是正则（非锚定 `find()`）；否则 `*`→`.*` 全串锚定 |
 | 搜索执行被谁调用 | `agent/tools/web/WebSearchTool`、`chatpipeline/plugin/PluginSearchOps`、`session/QaWiring`（`PipelinePorts.WebSearch` 端口接线） |
 | 临时 KB 是什么、谁在清 | `service/WebSearchTempKbStateService`（Redis `tempkb:<sessionID>`）+ `session/SessionService` 会话删除三件套，§4.3 |

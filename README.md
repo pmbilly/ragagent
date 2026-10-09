@@ -31,7 +31,7 @@ WeKnora（[Tencent/WeKnora](https://github.com/Tencent/WeKnora)）后端的 **Ja
 
 ## 能力地图
 
-后端 37 个领域包（`server/src/main/java/com/ragagent/`），与 Go 仓包一一对应：
+后端 37 个领域包（`domains/src/main/java/com/ragagent/`），与 Go 仓包一一对应：
 
 | 域 | 包 | 内容 |
 |---|---|---|
@@ -128,7 +128,7 @@ VITE_DEV_PROXY_TARGET=http://localhost:8082 npm run dev
 export PATH="/opt/homebrew/opt/openjdk@21/bin:$PATH"   # 换 shell 必设，否则找不到 JRT
 
 # 定向（写码微循环，某领域包）
-./gradlew :server:test --tests "com.ragagent.session.*"
+./gradlew :domains:test --tests "com.ragagent.session.*"
 
 # 日常提交门：只跑受影响批（改动文件 → 领域包 → 批次，约 30~80s）
 ./scripts/acceptance.sh --changed
@@ -141,13 +141,13 @@ export PATH="/opt/homebrew/opt/openjdk@21/bin:$PATH"   # 换 shell 必设，否�
 # 真实 Docker 集成（默认跳过；OrbStack 注意 DOCKER_HOST）
 DOCKER_HOST=unix:///$HOME/.orbstack/run/docker.sock \
 WEKNORA_SANDBOX_DOCKER_IT=true WEKNORA_SANDBOX_DOCKER_ENABLED=true \
-./gradlew :server:test --tests "com.ragagent.sandbox.runtime.DockerSandboxIntegrationTest" \
+./gradlew :domains:test --tests "com.ragagent.sandbox.runtime.DockerSandboxIntegrationTest" \
                          --tests "com.ragagent.session.service.ArtifactDrainDockerIT"
 ```
 
 三个层次：
 
-1. **golden 契约测试**（`server/src/test/resources/contracts/`，1,748 个实录）：MockMvc 掩码比对（UUID/时间戳等动态字段掩掉后逐字节）。
+1. **golden 契约测试**（`domains/src/test/resources/contracts/`，1,748 个实录）：MockMvc 掩码比对（UUID/时间戳等动态字段掩掉后逐字节）。
 2. **双端 stub A/B**（`scripts/ab-*.sh`）：双端同指 `scripts/stub-llm-server.py`，走真实 HTTP/SSE 全链路；agent 出站 LLM 请求体已可**全 body 对拍**（tools/messages/键序双路径）。
 3. **真实集成**：dev PG（非 H2）暴露 jsonb/NOT NULL/时区差异；Docker IT 验证沙箱执行面与产物排水全链。
 

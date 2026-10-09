@@ -1,4 +1,4 @@
-# ⚠️ 与 `server/src/test/resources/application.yml` 同内容（B165）：集成测试从 :server 迁到 :boot 后，
+# ⚠️ 与 `domains/src/test/resources/application.yml` 同内容（B165）：集成测试从 :server 迁到 :boot 后，
 # 测试配置必须落在**本模块自己的 test/resources** 才生效 —— 依赖模块的 resources 会被
 # 本模块 main/resources/application.yml（真 PG 配置）**抢先命中**，测试就会打到真库上。
 # 测试专用：契约/单元测试不依赖外部 postgres/redis

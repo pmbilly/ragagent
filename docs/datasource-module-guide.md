@@ -340,12 +340,12 @@ flowchart TD
 ```bash
 # 每次改动后必跑（全量约 3 分钟；单域先行可用 --tests "com.ragagent.datasource.*"）
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test :server:spotlessCheck
+  ./gradlew :domains:test :domains:spotlessCheck
 # 若动了前端可见契约（键名/形态/状态码），同批带前端：
 cd frontend && npx vue-tsc --build --force && npm test
 # 契约夹具重录（键改名一律重录，别手改结构；重录后必须结构化复核差异，§13.12）
 JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test --tests "com.ragagent.datasource.DataSourceHttpContractTest" -Dcontract.refresh=true
+  ./gradlew :domains:test --tests "com.ragagent.datasource.DataSourceHttpContractTest" -Dcontract.refresh=true
 ```
 
 **A. 加连接器**：§4.3 六步 → 单域全绿 → 全量三绿 → 提交。注册表在装配期校验（null / 空 type 抛异常聚合），配错**启动就炸**，别在运行期吞。
@@ -381,9 +381,9 @@ JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
 
 ## 8. 测试与验证
 
-- **规模**（2026-10-08 实测，`server/src/test/java/com/ragagent/datasource/`）：**38 个测试类** / 46 个 java 文件（另 8 个是支撑件：`FeishuTestServer`、`FeishuTestSupport`、`WikiFixtures`、`GitLabServerStub`、`NotionStubServer`、`NotionTestSupport`、`FakeIma`、`FakeYuque`）；**788 个 `@Test` + 14 个 `@ParameterizedTest`**。
-- **契约夹具**：`server/src/test/resources/contracts/` 下 **39 个 `ds-*`** 金片（`DataSourceHttpContractTest` 消费）；比较器是**语义比较**（键序/转义归一化后比，B2 统一 GoldenContract 后字节级对比清零）。连接器协议面不走金片，走**进程内 stub server**（真实 HTTP 走一遍 `ConnectorHttp` 的 SSRF/重定向/超时栈）。
-- **单域验证**：`./gradlew :server:test --tests "com.ragagent.datasource.*"`；闸门仍以全量 `:server:test :server:spotlessCheck` 为准（§13.4：读 `TEST-*.xml` 的 `failures+errors==0` 且用例数达标，compileTestJava 绿 ≠ 测试绿）。
+- **规模**（2026-10-08 实测，`domains/src/test/java/com/ragagent/datasource/`）：**38 个测试类** / 46 个 java 文件（另 8 个是支撑件：`FeishuTestServer`、`FeishuTestSupport`、`WikiFixtures`、`GitLabServerStub`、`NotionStubServer`、`NotionTestSupport`、`FakeIma`、`FakeYuque`）；**788 个 `@Test` + 14 个 `@ParameterizedTest`**。
+- **契约夹具**：`domains/src/test/resources/contracts/` 下 **39 个 `ds-*`** 金片（`DataSourceHttpContractTest` 消费）；比较器是**语义比较**（键序/转义归一化后比，B2 统一 GoldenContract 后字节级对比清零）。连接器协议面不走金片，走**进程内 stub server**（真实 HTTP 走一遍 `ConnectorHttp` 的 SSRF/重定向/超时栈）。
+- **单域验证**：`./gradlew :domains:test --tests "com.ragagent.datasource.*"`；闸门仍以全量 `:domains:test :domains:spotlessCheck` 为准（§13.4：读 `TEST-*.xml` 的 `failures+errors==0` 且用例数达标，compileTestJava 绿 ≠ 测试绿）。
 - **已知偶发 2 例**（全量并发下偶发，先单独重跑再判回归，出处 knowledge 手册 §8 同源）：`WebToolsRecordingTest.searchWithContentFetchesLeadingPagesViaSharedFetchTool`、`EvaluationContractTest.getTerminalRunsExecution`。
 - **改前端可见契约时**：后端与前端**同批**改完再提交（本域前端消费面：`api/datasource/index.ts` + `views/knowledge/settings/DataSource*.vue`）。
 

@@ -374,7 +374,7 @@ flowchart LR
 | 改租户 KV 配置 | `controller/TenantConfigOps`（7 个键的 case 分发）+ `domain/tenantconfig/` 值类型 | **tenantconfig 是冻结面**（§7.1）；`web-search` 空配置要 `NullNode` 显式 null |
 | 改 API Key 签发/校验 | `apikey/service/TenantAPIKeyService` + `TenantAPIKeyValidator` | 明文只回一次；`key_hash` 是 SHA-256 hex；撤销/过期与不存在同文案 |
 | 改 API Key 门禁规则 | `apikey/filter/APIKeyRoutePolicies`（登记）+ `APIKeyRouteAuthorizer`（归一化） | 注册与查询同一种归一化；api-keys 端点本身永不登记 |
-| 给用户/租户加字段 | `domain/` 实体 + `dto/` 响应记录 | **schema 两处同改**：`migrations/versioned/V1__baseline.sql` + `server/src/test/java/com/ragagent/TestSchema.java`（否则 H2 报 Column not found）；`User`/`Tenant` 实体直连大量端点，动形状 = 大面金片重录（§7.2） |
+| 给用户/租户加字段 | `domain/` 实体 + `dto/` 响应记录 | **schema 两处同改**：`migrations/versioned/V1__baseline.sql` + `domains/src/test/java/com/ragagent/TestSchema.java`（否则 H2 报 Column not found）；`User`/`Tenant` 实体直连大量端点，动形状 = 大面金片重录（§7.2） |
 | 改 jsonb 形状 | `domain/` 值类型 + handler | jsonb 必须 `autoResultMap = true`；`tenant_api_keys` 的手写 SQL 列名单独核对（§7.3） |
 | 改认证放行面 | `filter/AuthFilter`（`NO_AUTH_API` / `isTenantOptionalAPI` / 旁路组） | 401 响应体逐字节金片锁定；放行面扩一条 = 安全评审级别动作 |
 | 改 401/403 文案 | `filter/WsAuthSupport` / `apikey/filter/APIKeyGateResponses` | 纯字符串信封，金片逐字节比对；auth 类型错文案已换字段级（B83，2026-10-07） |
@@ -389,12 +389,12 @@ flowchart LR
 ```bash
 # 每次改动后必跑（约 3 分钟）
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test :server:spotlessCheck
+  ./gradlew :domains:test :domains:spotlessCheck
 # 若动了前端可见契约（字段名/信封/状态码），同批带前端：
 cd frontend && npx vue-tsc --build --force && npm test
 ```
 
-**A. 加端点**：`dto/` 请求记录 → `controller/`（`@Valid`，别手搓 `ObjectNode`/Map 信封）→ `service/` 用例 → API-Key 策略表与 RBAC 规则按需补登记 → 补契约金片（`server/src/test/resources/contracts/`）→ 三绿 → 提交。
+**A. 加端点**：`dto/` 请求记录 → `controller/`（`@Valid`，别手搓 `ObjectNode`/Map 信封）→ `service/` 用例 → API-Key 策略表与 RBAC 规则按需补登记 → 补契约金片（`domains/src/test/resources/contracts/`）→ 三绿 → 提交。
 
 **B. 加字段**：`domain/`（若落库；jsonb 记得 `autoResultMap`）→ baseline SQL + `TestSchema` → `dto/` 响应 → 金片 → 三绿。若字段**前端可见**，同批改前端类型与页面（auth 面曾两次栽在"后端 camel / 前端 snake"断链，见 §7.13）。
 
@@ -427,7 +427,7 @@ cd frontend && npx vue-tsc --build --force && npm test
 
 ## 8. 测试与验证
 
-- **规模**：本模块 `server/src/test/java/com/ragagent/auth/` 下 **15 个测试类 / 186 个 `@Test`**（契约 6 类：`AuthContractTest` 10、`AuthRegisterContractTest` 9、`OidcContractTest` 4、`TenantCatalogContractTest` 9、`TenantMemberContractTest` 24、`W5aSundryRoutesContractTest` 1（一方法打 56 条金片）；apikey 子域 9 类 129 用例）。全仓安全网 **4,831 用例**（B83 闸门口径，2026-10-07）。
+- **规模**：本模块 `domains/src/test/java/com/ragagent/auth/` 下 **15 个测试类 / 186 个 `@Test`**（契约 6 类：`AuthContractTest` 10、`AuthRegisterContractTest` 9、`OidcContractTest` 4、`TenantCatalogContractTest` 9、`TenantMemberContractTest` 24、`W5aSundryRoutesContractTest` 1（一方法打 56 条金片）；apikey 子域 9 类 129 用例）。全仓安全网 **4,831 用例**（B83 闸门口径，2026-10-07）。
 - **fixture**：auth 测试共引用 **264 个金片**（去重后实测），七个来源：`mb-*` 91（成员/邀请/API 主体）、`ct-*` 54（租户 CRUD/KV 配置）、`w5a-*` 56（小散路由：auth 补 3 + 租户 CRUD 4 + KB 标签 4 + IM 回调 2）、`reg-*` 41（注册/改密/偏好）、`oidc-*` 13、`login-*` 6、散件 3（`x-tenant-id-*` 2、`tenant-required-*` 1）。录制脚本：`scripts/record-golden.sh`、`scripts/record-w5a-golden.sh`。
 - **比较口径**：动态字段（uuid/时间戳/JWT/序列 id）掩码归一后**逐字节比对**；静态 4xx 金片直接逐字节断言。批量重录用 `-Dcontract.refresh=true`（§13.12），重录后**必须结构化复核差异**（解析新旧 JSON 比键集与取值），否则就成了"测试适应实现"。
 - **改契约的外域牵动**：API Key 请求体/解包改动波及 memory/datasource/storage 的 scoped-key 用例与 `SystemContractTest` 平台密钥面（§14.9j 实录）。

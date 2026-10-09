@@ -403,20 +403,20 @@ stateDiagram-v2
 ```bash
 # 每次改动后必跑（全量闸门）
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test :server:spotlessCheck
+  ./gradlew :domains:test :domains:spotlessCheck
 # 迭代中单域快跑（秒级）：
-./gradlew :server:test --tests "com.ragagent.session.*"
+./gradlew :domains:test --tests "com.ragagent.session.*"
 # 若动了前端可见契约（字段名/信封/状态码/SSE 事件），同批带前端：
 cd frontend && npx vue-tsc --build --force && npm test
 ```
 
-**A. 加端点**：`dto/` 请求记录 → `controller/`（`@Valid`、错误走 `BizException`/`AppError`）→ `service/` 用例 → 补契约 fixture（`server/src/test/resources/contracts/`，掩码正则键名字符集用 `[A-Za-z_]+`）→ 三绿 → 提交。
+**A. 加端点**：`dto/` 请求记录 → `controller/`（`@Valid`、错误走 `BizException`/`AppError`）→ `service/` 用例 → 补契约 fixture（`domains/src/test/resources/contracts/`，掩码正则键名字符集用 `[A-Za-z_]+`）→ 三绿 → 提交。
 
 **B. 加 jsonb 字段**：`domain/` 实体（TypeHandler + `autoResultMap`）→ `MessageMapper` 显式 `@Results` 补列 → 写路径 wrapper 三参 `set` → 契约 golden 重录并**结构化复核差异**（HANDOFF §13.12）→ 三绿。
 
 **C. 加 SSE 事件类型**：`ResponseType`（`common/llm`）→ `StreamResponseBuilder` 映射表 → `AgentStreamBridge` 订阅 → `AgentStreamBridgeTest` 先行 → golden 重录（`-Dcontract.refresh=true` 仅限已接入的契约测试）→ 三绿。
 
-**D. 加表**：`domain/` 实体 → `mapper/` 接口 + 仓储门面 → schema 两处同改（`migrations/versioned/V1__baseline.sql` + `server/src/test/java/com/ragagent/TestSchema.java`，否则 H2 报 `Column not found`）→ 三绿。
+**D. 加表**：`domain/` 实体 → `mapper/` 接口 + 仓储门面 → schema 两处同改（`migrations/versioned/V1__baseline.sql` + `domains/src/test/java/com/ragagent/TestSchema.java`，否则 H2 报 `Column not found`）→ 三绿。
 
 **E. 重构（切片/搬迁）**：按 HANDOFF §13.1 套路（侦察三类依赖 → 按调用点定边界 → harness 干跑 → 逐字忠实性核验）；`@Autowired` 字段改 `ObjectProvider` 构造注入；`record` 跨类搬运把 `r.x` 改 `r.x()`。本域 §11.3 八神类批次的实测结论：**受阻刀的解法是"先落被依赖方"**。
 
@@ -441,8 +441,8 @@ cd frontend && npx vue-tsc --build --force && npm test
 
 ## 8. 测试与验证
 
-- **规模**：**38** 个测试类 / **394** 个 `@Test`（2026-10-08 实测；HANDOFF 2026-10-01 口径为 388）。单域命令：`./gradlew :server:test --tests "com.ragagent.session.*"`。
-- **fixture 前缀**（`server/src/test/resources/contracts/`，共 **160** 个）：
+- **规模**：**38** 个测试类 / **394** 个 `@Test`（2026-10-08 实测；HANDOFF 2026-10-01 口径为 388）。单域命令：`./gradlew :domains:test --tests "com.ragagent.session.*"`。
+- **fixture 前缀**（`domains/src/test/resources/contracts/`，共 **160** 个）：
   `session-` 45（`SessionHttpContractTest`）、`msg-` 22（`MessageHttpContractTest`）、`sug-` 20（`MessageSuggestionContractTest`）、`g6-` 20（`SessionG6ContractTest`）、`att-` 15（`AttachmentContractTest`）、`w5d-` 14（`W5dTerminalEmbedContractTest`）、`qa46d-` 14（`KnowledgeQaContractTest` + `TemporaryDocumentUploadContractTest`；内含 `kch-*`/`ach-*` SSE golden——stub LLM 录制，掩码后逐字节比对）、`st-` 10（`SteerContractTest`）。
 - **比较口径**：契约比较器是**语义比较**（键序 / 转义归一化后比），fixture 锚定的是**本仓自己的行为**；SSE golden 按掩码后**逐字节**比对（更严）。
 - **已知偶发 2 例**（全仓，遇到先单独重跑，别误判回归）：

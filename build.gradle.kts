@@ -1,7 +1,7 @@
 import org.gradle.external.javadoc.StandardJavadocDocletOptions
 
 // 根构建脚本：公共配置（坐标/仓库）与插件版本统一声明；插件此处不应用（apply false），
-// 由 server 模块应用。
+// 由各模块（domains/engine/common/boot）应用。
 plugins {
     java
     id("org.springframework.boot") version "3.3.5" apply false
@@ -20,7 +20,7 @@ subprojects {
     plugins.withId("java") {
         // `-parameters`：MyBatis 无 @Param 的参数绑定、Spring MVC/Jackson 的**参数名反射**都依赖它。
         // 该标志原由 org.springframework.boot 插件自动附加；B165 把 boot 插件从 :server 移到 :boot 后
-        // :server 丢失了它 ⇒ 运行期大批 500（实测：BindingException: Parameter 'ids' not found +
+        // :domains 丢失了它（当时还叫 :server） ⇒ 运行期大批 500（实测：BindingException: Parameter 'ids' not found +
         // IllegalArgumentException: Name for argument … not specified）。放这里统一声明，别再依赖插件隐含行为。
         tasks.withType<JavaCompile>().configureEach {
             options.compilerArgs.add("-parameters")

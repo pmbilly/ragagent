@@ -146,7 +146,7 @@ erDiagram
     }
 ```
 
-> 单表、无外键、无关联表。列定义以 `migrations/versioned/V1__baseline.sql`（源自迁移 000044 + 000073，scope 两列由 000073 补入）为准，H2 测试库镜像在 `server/src/test/java/com/ragagent/TestSchema.java`（`audit_logs` 建表段）——**两处同改**，漏改 H2 报 `Column not found`。5 个索引：`(tenant_id, id DESC)`、`(actor_user_id)`、`(tenant_id, action)`、`(created_at)`、`(tenant_id, scope_type, scope_id, id DESC)`。表**只追加**：没有 `updated_at`、没有 `deleted_at`、没有 Update 语句。
+> 单表、无外键、无关联表。列定义以 `migrations/versioned/V1__baseline.sql`（源自迁移 000044 + 000073，scope 两列由 000073 补入）为准，H2 测试库镜像在 `domains/src/test/java/com/ragagent/TestSchema.java`（`audit_logs` 建表段）——**两处同改**，漏改 H2 报 `Column not found`。5 个索引：`(tenant_id, id DESC)`、`(actor_user_id)`、`(tenant_id, action)`、`(created_at)`、`(tenant_id, scope_type, scope_id, id DESC)`。表**只追加**：没有 `updated_at`、没有 `deleted_at`、没有 Update 语句。
 
 ### 2.2 jsonb 列与值类型对照
 
@@ -303,7 +303,7 @@ sequenceDiagram
 | 改 wiki 活动埋点 | `service/WikiActivityAuditRecorder`（实现 `wiki/domain/WikiActivityAudit` 端口） | count=0 或无租户**不写**；details 不带 task 上下文三键（javadoc 说明） |
 | 改保留期策略 | `service/AuditLogRetentionRunner` + `AuditRetentionLifecycle` | 配置键 `weknora.audit.retention-days` 缺省 90；0=关闭 |
 | 加一个查询端点 | `controller/AuditLogController` + 必要时 `AuditLogQuery` 扩展 | 守卫规则在 `config/WebConfig`（`rbac.addRule` / `addSystemAdminRule`）登记；错误用 `AppError` / `BizException` |
-| 改 `audit_logs` 表结构 | `migrations/versioned/V1__baseline.sql` + `server/src/test/java/com/ragagent/TestSchema.java` | **两处同改**（否则 H2 `Column not found`）；这是只追加表，别加更新路径 |
+| 改 `audit_logs` 表结构 | `migrations/versioned/V1__baseline.sql` + `domains/src/test/java/com/ragagent/TestSchema.java` | **两处同改**（否则 H2 `Column not found`）；这是只追加表，别加更新路径 |
 | 改 OpenSearch 副作用审计 | `config/OpenSearchAuditSinkAdapter`（实现驱动的 `AuditSink` 接口） | 无租户上下文**自跳过**（防写 `tenant_id=0` 污染平台审计线）；details 只装非敏感字段 |
 | 改 KB 活动端点的归属判定 | `controller/AuditLogController.listKnowledgeBaseActivity` 三层判定 | 第三层 403 是守卫形态不是 AppError 信封（§3.2）；跨租户现状是 404（§7） |
 
@@ -316,7 +316,7 @@ sequenceDiagram
 ```bash
 # 每次改动后必跑
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test :server:spotlessCheck
+  ./gradlew :domains:test :domains:spotlessCheck
 # 若动了前端可见契约（action 字符串 / 响应键名 / 游标语义），同批带前端：
 cd frontend && npx vue-tsc --build --force && npm test
 ```
@@ -352,10 +352,10 @@ cd frontend && npx vue-tsc --build --force && npm test
 
 ## 8. 测试与验证
 
-- **规模**：**6 个测试类 / 66 个 `@Test`**（2026-10-08，grep 口径），全在 `server/src/test/java/com/ragagent/audit/`：
+- **规模**：**6 个测试类 / 66 个 `@Test`**（2026-10-08，grep 口径），全在 `domains/src/test/java/com/ragagent/audit/`：
   `AuditLogControllerTest`(18)、`AuditLogRepositoryTest`(12)、`AuditLogServiceTest`(11)、`AuditLogRetentionTest`(11)、`RbacDeniedAuditTest`(8)、`WikiActivityAuditRecorderTest`(6)。
 - **形态**：唯一 `@SpringBootTest` 是 `AuditLogRepositoryTest`（H2 + `TestSchema`，真走 MVC 栈）；其余 5 个是纯单测（standalone MockMvc / mock 仓储 / `FakeClock` 驱动去重窗口与保留期边界，不 sleep）。
-- **契约 fixture：不适用**——本模块 **0 个** fixture 文件（`server/src/test/resources/contracts/` 下无 `audit-*`；全模块测试不加载任何资源文件）。原因是响应面只有 1 个 DTO 且形状简单，`AuditLogControllerTest` 用**内联 JSON 字符串断言**（如 `{"items":[],"nextCursor":0}`）钉契约。代价：改响应形状必须手工同步这些断言（§6.C）。
+- **契约 fixture：不适用**——本模块 **0 个** fixture 文件（`domains/src/test/resources/contracts/` 下无 `audit-*`；全模块测试不加载任何资源文件）。原因是响应面只有 1 个 DTO 且形状简单，`AuditLogControllerTest` 用**内联 JSON 字符串断言**（如 `{"items":[],"nextCursor":0}`）钉契约。代价：改响应形状必须手工同步这些断言（§6.C）。
 - **已知偶发 2 例**（全仓级，遇到先单独重跑，别误判回归）：
   - `WebToolsRecordingTest.searchWithContentFetchesLeadingPagesViaSharedFetchTool`（全量并发下偶发）
   - `EvaluationContractTest.getTerminalRunsExecution`（全量并发下偶发；单独 `--tests "*EvaluationContractTest"` 通过）

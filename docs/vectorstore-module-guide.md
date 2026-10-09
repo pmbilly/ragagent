@@ -71,7 +71,7 @@ graph TB
 ```
 
 **三个必须知道的数字**：最大类 556 行（`VectorStoreConfigService`，校验固定序 + 9 引擎探测器一肩挑）；
-**1 个 controller / 8 条路由**是本域全部 HTTP 面；**28 个 `vs-*` golden**（`server/src/test/resources/contracts/`）钉死响应与错误文案。
+**1 个 controller / 8 条路由**是本域全部 HTTP 面；**28 个 `vs-*` golden**（`domains/src/test/resources/contracts/`）钉死响应与错误文案。
 
 ---
 
@@ -338,10 +338,10 @@ flowchart LR
 ```bash
 # 每次改动后必跑（约 3 分钟）
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test :server:spotlessCheck
+  ./gradlew :domains:test :domains:spotlessCheck
 # 只跑本域 + 消费方测试（更快）
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test --tests "com.ragagent.vectorstore.*" --tests "com.ragagent.retrieval.engine.*"
+  ./gradlew :domains:test --tests "com.ragagent.vectorstore.*" --tests "com.ragagent.retrieval.engine.*"
 ```
 
 **A. 接一家新向量库**：`VectorStoreEngines` 白名单 → `VectorStoreTypes` 条目（顺序对齐既有 7 条）→
@@ -400,9 +400,9 @@ golden 重录（-Dcontract.refresh=true）→ 结构化复核差异 → 三绿 �
 
 ## 8. 测试与验证
 
-- **规模**：本域 **1** 个契约测试类（`server/src/test/java/com/ragagent/vectorstore/VectorStoreContractTest`，
+- **规模**：本域 **1** 个契约测试类（`domains/src/test/java/com/ragagent/vectorstore/VectorStoreContractTest`，
   `@SpringBootTest + MockMvc）/**3** 个 `@Test` 方法（三节：类型与 env 形态 + 404 面 / 创建失败序 / 种子行
-  CRUD + 探测），共 **28** 个 golden 对比 → `server/src/test/resources/contracts/` 下 **28 个 `vs-*` 文件**；
+  CRUD + 探测），共 **28** 个 golden 对比 → `domains/src/test/resources/contracts/` 下 **28 个 `vs-*` 文件**；
   录制脚本 `scripts/record-infra-config-golden.sh`。
 - **掩码**：UUID（键值两种形态）与时间戳用正则掩码后做**精确字符串比较**；`-Dcontract.refresh=true`
   重录开关本测试已接入（`REFRESH_FIXTURES`，重录后必须结构化复核，HANDOFF §13.12）。

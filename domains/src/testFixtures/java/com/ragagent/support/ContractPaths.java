@@ -20,8 +20,8 @@ public final class ContractPaths {
 
     /** 候选目录（相对仓库根，按优先级）。 */
     private static final List<String> DIRS = List.of(
-            "server/src/testFixtures/resources/contracts",
-            "server/src/test/resources/contracts",
+            "domains/src/testFixtures/resources/contracts",
+            "domains/src/test/resources/contracts",
             "src/test/resources/contracts");
 
     private static Path repoRoot() {

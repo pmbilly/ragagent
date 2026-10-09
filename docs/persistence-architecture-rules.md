@@ -3,7 +3,7 @@
 > 2026-10-05，依据架构师四条意见 + 本仓实测数据修订。原意见的方向均予采纳，
 > 个别条款按「失败模式」而非「工具」改写，并补齐执行机制（机器强制 + 棘轮基线）。
 > 数据底座见文末「现状基线」；机器强制面见
-> `server/src/test/java/com/ragagent/arch/ArchitectureRulesTest.java`（A6-A9）
+> `domains/src/test/java/com/ragagent/arch/ArchitectureRulesTest.java`（A6-A9）
 > 与 `common/mybatis/FullTableWriteGuard`。
 
 ## 1. 持久层

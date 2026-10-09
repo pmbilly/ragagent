@@ -174,7 +174,7 @@ erDiagram
     }
 ```
 
-> schema 两处同改：`migrations/versioned/V1__baseline.sql`（`embed_channels` 建表在 V1 基线内）+ `server/src/test/java/com/ragagent/TestSchema.java`（H2 版本，约 825 行起）。与 knowledge 域的规矩一致：漏改 `TestSchema` 会在 H2 测试上报 `Column not found`。
+> schema 两处同改：`migrations/versioned/V1__baseline.sql`（`embed_channels` 建表在 V1 基线内）+ `domains/src/test/java/com/ragagent/TestSchema.java`（H2 版本，约 825 行起）。与 knowledge 域的规矩一致：漏改 `TestSchema` 会在 H2 测试上报 `Column not found`。
 
 ### 2.2 jsonb 列与值类型对照
 
@@ -348,13 +348,13 @@ sequenceDiagram
 ```bash
 # 每次改动后必跑（闸门口径见 HANDOFF §13.4：读 test-results XML 判 0 失败，别看控制台）
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test :server:spotlessCheck
+  ./gradlew :domains:test :domains:spotlessCheck
 
 # 只跑本域（快路径）
-./gradlew :server:test --tests "com.ragagent.embedchannel.*"
+./gradlew :domains:test --tests "com.ragagent.embedchannel.*"
 
 # 契约夹具批量重录（HANDOFF §13.12；本域是全仓第一个接入该开关的测试）
-./gradlew :server:test --tests "com.ragagent.embedchannel.EmbedContractTest" -Dcontract.refresh=true
+./gradlew :domains:test --tests "com.ragagent.embedchannel.EmbedContractTest" -Dcontract.refresh=true
 ```
 
 **A. 加端点**：按 §5 选 Ops 面 → 路由 + 方法 → golden（录或手写，掩码沿用 `EmbedContractTest` 的 `em_<token>`/`ems_<token>`/`<uuid>`/`<ts>` 四件套）→ 三绿 → 提交。
@@ -425,5 +425,5 @@ cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Cont
 | 落库行为为什么怪（create 恒 true / "null" 覆写） | `EmbedChannelEntity` javadoc「落库行为清单」+ 本文 §7 第 3/4 条 |
 | 错误码怎么分派 | `EmbedError.Kind` → `EmbedChannelController.writeMgmtError`（管理面）/ `EmbedAuthFilter.writePlain`（公开面） |
 | 容器层错误为什么是纯文本 | `PlainTextErrorReportValve` + `EmbedWiring`（本域产物，全仓生效） |
-| 契约的权威依据 | `server/src/test/resources/contracts/emb-*.json`（61 个）+ `scripts/record-emb-golden.sh`；注释与 golden 冲突时信 golden |
+| 契约的权威依据 | `domains/src/test/resources/contracts/emb-*.json`（61 个）+ `scripts/record-emb-golden.sh`；注释与 golden 冲突时信 golden |
 | 目录为什么这样分 | 本文 §1 + 根 `package-info.java`（一句话职责地图） |

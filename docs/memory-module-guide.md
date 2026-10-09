@@ -362,7 +362,7 @@ flowchart LR
 | 改整仓回顾 | `service/MemoryConsolidationService` | 不许上请求路径；结果对象 `MemoryConsolidationResult` 直接是响应体 |
 | 改工作区配置语义 | `common/settings/MemoryConfig` + `MemoryKeys`（不在本包！） | HTTP 面在 **auth** 的 KV 端点；改键名必须同批跑存量迁移 SQL，且**先改 auth 侧 `TenantCatalogContractTest` 的 `ct-kv-mem-*` 夹具** |
 | 改话题 / 文档亲和度 | `service/MemoryTopicResolver` + `MemoryCatalogOps` / `MemoryInsightOps` | `promote` 是动作端点（200）；aliases 与 pending_sessions 共用 TypeHandler |
-| 加字段 / 加表 | `domain/` 实体 + `migrations/versioned/V1__baseline.sql` + `server/src/test/java/com/ragagent/TestSchema.java` 的 `createMemoryTables` | **schema 两处同改**（否则 H2 报 `Column not found`）；jsonb 列记得 `autoResultMap = true` + 双处 typeHandler |
+| 加字段 / 加表 | `domain/` 实体 + `migrations/versioned/V1__baseline.sql` + `domains/src/test/java/com/ragagent/TestSchema.java` 的 `createMemoryTables` | **schema 两处同改**（否则 H2 报 `Column not found`）；jsonb 列记得 `autoResultMap = true` + 双处 typeHandler |
 | 改分页 / 错误形态 | `controller/MemoryController`（`listPaging` / `fail`） | 容错分页与 404 同形是实测钉住的契约，改动先改契约文档再动代码 |
 | 改脱敏 / 文本口径 | `domain/MemoryText` | 码点计数、Unicode White_Space、`Locale.ROOT`、CJK 正则不写 `\b`——四处都是刻意口径 |
 
@@ -375,7 +375,7 @@ flowchart LR
 ```bash
 # 每次改动后必跑（约 3 分钟）
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test :server:spotlessCheck
+  ./gradlew :domains:test :domains:spotlessCheck
 # 若动了前端可见契约（字段名/信封/状态码），同批带前端：
 cd frontend && npx vue-tsc --build --force && npm test
 ```
@@ -415,7 +415,7 @@ cd frontend && npx vue-tsc --build --force && npm test
 
 - **规模**：本模块 **17** 个测试类 / **347** 个 `@Test`（2026-10-08 实测 `grep -c '@Test'`）；全仓后端用例 4,836（B85 记录）兜底。
 - **分层**：`controller/MemoryHttpContractTest`（37 用例，16 端点全覆盖）；`MemoryEntityJsonTest`（22，实体 JSON 逐字节）；仓储三件套 `MemoryRepositoryTest`（52）/ `MemoryExtractionRepositoryTest`（23）/ `MemoryVectorRepositoryTest`（17）；`service/` 8 个类（Orchestration 34、ExtractionService 33、ExtractionHelpers 19、Lexical 12、TopicResolver 10、RecallSelector 6、RedisQueue 5、VectorLogic 4）；域工具 `MemoryTextTest`（40）/ `MemoryLifecycleTest`（15）/ `MemoryVectorsTest`（10）/ `MemoryContractTest`（8）。
-- **fixture**：`server/src/test/resources/contracts/memory-*.json` 共 **21 个**；比较口径是**逐字节 diff**（动态 id 用 `goldenMasked` 掩码），成功面 golden 于 2026-10-01 契约换锚后重录、录制顺序在测试类注释里（顺序会影响列表内容）。`tenants.memory_config` 的 KV 契约夹具（`ct-kv-mem-*` 7 个）在 **auth 侧** `TenantCatalogContractTest`——改 MemoryConfig 键名要跨包改它。
+- **fixture**：`domains/src/test/resources/contracts/memory-*.json` 共 **21 个**；比较口径是**逐字节 diff**（动态 id 用 `goldenMasked` 掩码），成功面 golden 于 2026-10-01 契约换锚后重录、录制顺序在测试类注释里（顺序会影响列表内容）。`tenants.memory_config` 的 KV 契约夹具（`ct-kv-mem-*` 7 个）在 **auth 侧** `TenantCatalogContractTest`——改 MemoryConfig 键名要跨包改它。
 - **已知偶发 2 例**（全仓共有，遇到先单独重跑，别误判回归）：
   - `WebToolsRecordingTest.searchWithContentFetchesLeadingPagesViaSharedFetchTool`（全量并发下偶发）
   - `EvaluationContractTest.getTerminalRunsExecution`（全量并发下偶发；单独 `--tests "*EvaluationContractTest"` 通过）

@@ -11,7 +11,7 @@
 ## ⭐ 接手须知（5 分钟版）
 
 0. **文档布局（2026-10-02 重组）**：本文件＝**常读面**（接手须知 / §2 决策 / §13 方法论 / §14.1~14.6 判据与坑 / §14.9 换锚总纲 / §15 批次表与纪律）；**查证面已移出**——域级作战与执行记录见 `docs/handoff/plans/`（索引见 §14.7+）、逐批执行记录见 `docs/handoff/records/batch-records.md`（索引见 §15.1.1）。
-1. **先验证基线全绿**（三条命令见 §9；session 域单域验证：`./gradlew :server:test --tests "com.ragagent.session.*"`，当前 **388 条 / 失败 0**）。
+1. **先验证基线全绿**（三条命令见 §9；session 域单域验证：`./gradlew :domains:test --tests "com.ragagent.session.*"`，当前 **388 条 / 失败 0**）。
 2. **总目标**＝按 Java 标准提升可读性（§0）；**行为不变**是底线（测试是安全网）；已定决策见 §2（勿再讨论）。
 3. **已完成**：P0/P1/P2/P3 包结构治理（§11.8~§11.14）；**session 域阶段 2 神类批次全收官**（§11 总览表）——
    `SessionAgentQaService` 1,430→**364**、`KnowledgeQaController` 1,614→**328**、`SessionQaResolution` 2,906→**706**，
@@ -250,7 +250,7 @@
    `datasource` 与 `:misc` 四域**并进 `:domains`**（不单列 ✓）；`:channels` = `im` + `embedchannel` + `channels.api`（API key 通道，
    **前置：解 `auth ⇄ apikey` 22+22 处互依** ✗）；`:boot` = `RagAgentApplication` + `config` + 装配/扫描 + `application.yml`
    + `spring.factories` + `syncMigrations`（Flyway 走**相对工作目录**的 `./build/generated-migrations` ✗ ⇒ Copy 目标必须在本模块）+ bootJar ✓；
-   `channels.*` 包改名与模块目录改名（`server/`→`domains/`）**合并成一次命名对齐批** ✓（`server/src` 波及 7 脚本 · 1 基线 · 30 文档 ✓）。
+   `channels.*` 包改名与模块目录改名（`domains/`→`domains/`）**合并成一次命名对齐批** ✓（`server/src` 波及 7 脚本 · 1 基线 · 30 文档 ✓）。
    **`:app` 不建议拆**（中部无缝：界上暴露 178~268 类型，文档结论"它们不是模块，是应用"）。
    **该步 5 条已知风险**（文档 §5.2，均有对治先例）：装配面绑定单根包（入口类 + R2/R3/R11 须同步）·
    13 处 classpath 资源静默 null（B118 已补存在性断言 ✓）· 路径硬编码（proto / migrations / 5 守卫 / `GoldenContract`）·
@@ -281,7 +281,7 @@
 - **三条验证命令（接手先跑一遍确认基线）**：
   ```bash
   # 后端全量（约 3 分钟；期望 BUILD SUCCESSFUL，4,670 用例 0 失败）
-  cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home ./gradlew :server:test
+  cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home ./gradlew :domains:test
   # 前端类型检查（期望 0 错误）
   cd ~/ragagent/frontend && npx vue-tsc --build --force
   # 前端单测（期望 pass 690 / fail 0）
@@ -457,7 +457,7 @@ knowledge/
 ### 13.9 闸门命令的环境卫生（2026-10-01 evaluation 打样批，1 条）
 
 **source .env 的 shell 会把 `SYSTEM_AES_KEY` 等变量泄漏给同 shell 里跑的 Gradle 测试**：
-CLI 起服务常写 `set -a && . ./.env && set +a && ./gradlew :server:bootRun`；Agent 工具链会
+CLI 起服务常写 `set -a && . ./.env && set +a && ./gradlew :domains:bootRun`；Agent 工具链会
 **复用同一 shell**，后续在同一会话里跑的全量测试就带上了这些变量——`DataSourceConfig.toJSON()`
 走 AES 加密分支，`DataSourceJsonTest.dataSourceConfigToJsonMatchesGoMarshal` 的"无 KEY 时凭据
 原样落库"断言失败（**1/4669，其余全绿，极易误判为回归**）。
@@ -490,7 +490,7 @@ App 侧（Vite / vue-tsc）不受影响。
 
 ```bash
 JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test --tests "com.ragagent.embed.EmbedContractTest" -Dcontract.refresh=true
+  ./gradlew :domains:test --tests "com.ragagent.embed.EmbedContractTest" -Dcontract.refresh=true
 ```
 
 命中时把**掩码后的实际响应**写回 `src/test/resources/contracts/`（`server/build.gradle.kts` 负责把该
@@ -525,7 +525,7 @@ JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
 2. **每步全绿再走下一步**（2026-09-30 起分档，命令见 §14.4）：闸门按改动性质分档——迭代中只跑单类/单域；
    **常规批**（同包抽协作者、成员增删、卫生、文案）= `--rerun-tasks` 重编（~31s）+ 受影响域测试（~30s）
    + `spotlessCheck`（~10s）≈ 1m10s；**结构搬迁批**（跨包 `git mv`、改共享 API、删类）=
-   `clean :server:test :spotlessCheck`（~3m25s）。**判据：抓断链靠"强制重编"（便宜），防跨域行为回归才靠全量（贵）**
+   `clean :domains:test :spotlessCheck`（~3m25s）。**判据：抓断链靠"强制重编"（便宜），防跨域行为回归才靠全量（贵）**
    ——别把两件事混成一件（§13.21 的两次假绿根因都是**编译错误**被增量编译掩盖，重编即可暴露；
    用例数只认"干净一遍"后的 `build/test-results/test/*.xml` 汇总）。
    这是"种子 fork + 渐进转型"优于重写的全部意义（§9）。
@@ -580,29 +580,29 @@ JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
 （六段同属索引侧读写，用户定调不硬切；javadoc 本批补例外说明）、`KnowledgeService` 848 /
 `KnowledgeProcessWorker` 816（knowledge 门面与摄取状态机，类注释已备案；后者本批补 javadoc）。
 
-复测命令：`git ls-files 'server/src/main/java/**/*.java' | xargs wc -l | sort -rn | head -20`
+复测命令：`git ls-files 'domains/src/main/java/**/*.java' | xargs wc -l | sort -rn | head -20`
 
 ### 14.4 体检命令（复制即用）
 
 ```bash
 cd ~/ragagent
 # 神类/大文件排行（全仓）
-git ls-files 'server/src/main/java/**/*.java' | xargs wc -l | sort -rn | head -25
+git ls-files 'domains/src/main/java/**/*.java' | xargs wc -l | sort -rn | head -25
 # Go 债务：锚点注释 / 逐字段 @JsonProperty / 手写 rawBody 绑定
-git grep -cE '对照 Go|GORM|Go 的' -- 'server/src/main/java/**/*.java' | sort -t: -k2 -nr | head -15
-git grep -c '@JsonProperty(' -- 'server/src/main/java/**/*.java' | sort -t: -k2 -nr | head -15
-git grep -nE '@RequestBody\s+(String|Map<|JsonNode|Object)' -- 'server/src/main/java/**/*.java'
+git grep -cE '对照 Go|GORM|Go 的' -- 'domains/src/main/java/**/*.java' | sort -t: -k2 -nr | head -15
+git grep -c '@JsonProperty(' -- 'domains/src/main/java/**/*.java' | sort -t: -k2 -nr | head -15
+git grep -nE '@RequestBody\s+(String|Map<|JsonNode|Object)' -- 'domains/src/main/java/**/*.java'
 # 卫生闸门（ratchet：只覆盖 seed 后触碰过的文件，这是设计不是遗漏）
-./gradlew :server:spotlessCheck
+./gradlew :domains:spotlessCheck
 # 收尾闸门（按改动分档；实测：重编 ~31s / 单域 ~30s / spotless ~10s / 全量 ~2m50s / clean 全量 ~3m25s）
 # ① 常规批（同包抽协作者、成员增删、卫生、文案）≈ 1m10s
-./gradlew :server:compileJava :server:compileTestJava --rerun-tasks   # 专抓"引用被搬走"的断链
-./gradlew :server:test --tests "com.ragagent.<受影响域>.*"
-./gradlew :server:spotlessCheck
+./gradlew :domains:compileJava :domains:compileTestJava --rerun-tasks   # 专抓"引用被搬走"的断链
+./gradlew :domains:test --tests "com.ragagent.<受影响域>.*"
+./gradlew :domains:spotlessCheck
 # ② 结构搬迁批（跨包 git mv / 改共享 API / 删类）≈ 3m25s
-./gradlew :server:clean :server:test :server:spotlessCheck
+./gradlew :domains:clean :domains:test :domains:spotlessCheck
 # ③ 迭代中：单类/单域（秒级）
-./gradlew :server:test --tests "com.ragagent.session.service.SomeTest"
+./gradlew :domains:test --tests "com.ragagent.session.service.SomeTest"
 # 前端契约同步（触及前端契约时）
 (cd frontend && npx vue-tsc --build --force && npm test)
 ```
@@ -619,7 +619,7 @@ git grep -nE '@RequestBody\s+(String|Map<|JsonNode|Object)' -- 'server/src/main/
 - [ ] **无全限定名注解**（除真同名冲突并在注释说明）；校验 `message` 保持「字段名: 原因」前缀格式
 - [ ] **死成员清零**：未使用 logger / `ObjectMapper` / 私有方法 / 局部变量 / **只注入不读取的 final 依赖**（口径见 §13.15 ①④）；javac 不报未使用私有成员、Spotless 也只查 import，**必须主动扫**——B131 起 `scripts/check-dead-members.py` 覆盖其中可自动化的三类（重复 import / 未使用 import / 遗留 Logger·ObjectMapper 字段）；私有方法、局部变量、只注入不读取的依赖仍需人工（常量族的"声明未用"是词汇表性质，全仓 934 处，刻意不做硬门）
 - [ ] 触点变更后按 §14.4 分档收口：**常规批** = `--rerun-tasks` 重编 + 受影响域测试 + `spotlessCheck`；
-      **结构搬迁批** = `clean :server:test :spotlessCheck`（+ 触及前端契约时 `vue-tsc` 0 错误 / `npm test` 全绿）
+      **结构搬迁批** = `clean :domains:test :spotlessCheck`（+ 触及前端契约时 `vue-tsc` 0 错误 / `npm test` 全绿）
 - [ ] §4 数据、§12 地图、§13 经验、本节候选表四处同步更新
 
 ### 14.6 不要做什么（踩过的坑，别再踩）
@@ -631,7 +631,7 @@ git grep -nE '@RequestBody\s+(String|Map<|JsonNode|Object)' -- 'server/src/main/
   「兼容历史数据」已整体作废；「协议/行为面」要连提示词与解析器同批且需拍板；「外部决定」才是真不能动。
 - **别为数字写注释**：getter/POJO 访问器保持 0 javadoc（§13.8 第 3 条）。
 - **别做全仓文本替换**：先用单文件验证再决定扩大（§13.2 的两次翻车）。
-- **别跳过闸门**：只跑 `:server:test` 会漏掉 Spotless（§13.9）。
+- **别跳过闸门**：只跑 `:domains:test` 会漏掉 Spotless（§13.9）。
 
 
 ### 14.9 契约工作（阶段 3 换锚）——何时做 / 做什么 / 怎么验收（2026-10-01 补写）
@@ -726,6 +726,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | **B13 B0 残留批 2** | 孤儿存储组件判定与删除（④）+ `/auth/config` 版本信号消除登录 403 噪音（⑤）+ `process_overrides` 移植缺口判定 | P2 | 小 | ✅ **完成（2026-10-02）**——详见 15.1.1 |
 | **B14 存储读侧投影合并** | 引擎面 env 回落行 vs 落库面类型化记录（两套词汇） | P2 | 中 | ✅ **完成（2026-10-02）**——合并为「一面一源」（落库面 camel、引擎面由唯一次名器派生）+ 修掉两个同源静默 bug（① 非 minio 行凭据被丢；② 环境供给行读回来为空），含红态证明、消费者层断言与真机验证；另登记供给器明文落库（未修）。详见 15.1.1 |
 | **B15 供给行明文落库** | 供给器绕过加密直写 jsonb | P2 | 小 | ✅ **完成（2026-10-02）**——抽出唯一读写口 `StorageConfigCodec`（存储服务与供给器共用），真机 A/B 证明凭据由明文转为 `enc:v1:`；全量绿。详见 15.1.1 |
+| **B167 P3b-3：`server/` → `domains/` 模块更名** | 目录 + settings + boot 引用 + 2 处中央模块表 + 5 脚本默认路径 + 194 处文档 | P2 | 中 | ✅ **完成（2026-10-10，`wip/p3b-2-boot` 分支）**——**理由**：拆分后 `:server` 名字失真（它装业务域 ✓，组合根已独立为 `:boot` ✓）⇒ 四模块名各安其位：**boot（组合根）→ domains（业务域）→ engine（能力层）→ common（共享层）** ✓。**设计要点**：模块表是**集中的两处** ✓（`scripts/_source_roots.py` 的 `MODULE_DIRS` + `SourceRoots.java` 的 `MODULES` ✓）⇒ 守卫与 ArchUnit **自动跟随** ✓（这正是 B116 立"单一事实来源"的回报 ✓）；散落的硬编码只有 `check-stray-dirs` 的两条源根 ✓ 已改。**历史保留**：HANDOFF 的批次行**逐行跳过** ✓（当时确实叫 `:server` ✓ 保历史真实 ✓），其余功能引用全改 ✓。**顺带修一处真缺口** ✗：`:domains` 原本没有 `targetExclude("build/**")`（common/engine/boot 都有 ✓）⇒ 改名后 ratchet 把 `build/generated/source/proto` 的 protoc 产物也当成"触碰过" ✗ ⇒ spotless 红 ✓；已按既有约定补上 ✓（生成代码不该被格式化 ✓）。**验证**：`spotlessCheck build` = **BUILD SUCCESSFUL** ✓ · domains 2872 + engine 547 + common 127 + boot 1312 = **4858 用例 / 0 失败** ✓（**逐模块与改名前一模一样** ⇒ 无覆盖损失 ✓）· 八守卫全绿 ✓ · 守卫源码根**正面核验**（domains main/test/testFixtures = 1376/278/26 个 .java ✓= 与更名前 server 一致 ✓ 无静默失明 ✓）· `pkg-audit` 默认路径正常 ✓。**遗留**：`file-size` 基线已按新路径重生成并重挂 2 条例外 ✓。 |
 | **B166 修 main 存量红：`KnowledgeFinalizeAdapterTest` 6 例** | 测试自预热 MP lambda 缓存 | P1 | 小 | ✅ **完成（2026-10-10）**——**症状**：6 例红 ✗（3 例 `Wanted but not invoked: knowledgeMapper.update(isNull(), <any>)` （"zero interactions"）、3 例 `Expecting value to be true but was false`）。**定位链**：测试/实现自 **B100（`66045eca`）后都没动过** ✗ ⇒ 先怀疑输入装配 ✓，但 `knowledgeId="kid-1"` 非空 ✓ ⇒ 唯一能造成"零交互"的路径是实现的 `catch (RuntimeException)` 吞掉了异常 ✓；去**测试输出**里挖实现自记的 warn 日志 ✓ = **`can not find lambda cache for this entity [com.ragagent.knowledge.domain.Knowledge]`** ✓✓ —— `Knowledge::getId` 这类 lambda 由 MyBatis-Plus 的**全局静态**缓存解析（`LambdaUtils`），该缓存在生产里由 MyBatis 启动装配填充，而本类是**纯单测**（无 Spring 上下文）⇒ 无人预热 ⇒ `new LambdaUpdateWrapper<>()` 抛 ⇒ 被 catch 吞 ⇒ 早退 ⇒ "zero interactions" ✓。**为什么以前"绿"**：同 fork 里若先跑过 Spring 测试就顺带预热了 ✓ ⇒ **顺序依赖的假绿** ✗（B142 的 `maxParallelForks=4` 后更容易落在未预热的 fork ✓）。**修**：测试 `@BeforeAll` 里 `TableInfoHelper.initTableInfo(new MapperBuilderAssistant(new MybatisConfiguration(), ""), Knowledge.class)` **自预热** ✓（测试自给自足，不靠邻居 ✓）+ javadoc 写明机理与"假绿"教训 ✓。**验证**：单跑该类 rc=0 ✓（7/0）；全仓 `spotlessCheck build` = **BUILD SUCCESSFUL** ✓（server **4184**/0 + engine 547/0 + common 127/0 = **4858 用例 0 失败** ✓）。**副作用（正面）**：此类测试从"看运气"变成确定性 ✓。 |
 | **B165 P3b-2：`:boot` 拆分跑通（组合根独立 + 集成测试归位）** | boot 模块 + config/入口/资源迁入 + 87+6 集成测试迁入 + 3 个卡点修复 | P1 | 大 | ✅ **完成（2026-10-10，`wip/p3b-2-boot` 分支）**——从 1192 失败一路收到 **0**（`boot` 1312 / `engine` 547 / `common` 127 全绿）。**三个卡点全是"搬迁的静默行为变化"** ✗：① **测试配置优先级**：测试 `application.yml` 挪进 testFixtures 后，**依赖模块的 resources 会被本模块 `main/resources/application.yml` 抢先命中** ⇒ 集成测试跑在**真 PG** 上，`TestSchema` 的 H2 专有 DDL 直接 bad SQL grammar（1192 失败主因）；修=yml 回两侧 `test/resources` ✓。② **契约夹具路径**：金片用「模块相对 + `server/` 兜底」两候选读文件路径，测试迁 `:boot` 后 CWD 变 `boot/` ⇒ 两候选同时落空（97→53 那批）；修=新增夹具 **`com.ragagent.support.ContractPaths`（仓库根定位、与 CWD 无关）** + 金片统一放 `server/src/testFixtures/resources/contracts` + 10 个自建路径的测试改走它 ✓。③ **`-parameters` 丢失**（最隐蔽）：原由 `org.springframework.boot` 插件自动附加，boot 插件移到 `:boot` 后 `:server` 静默丢失 ⇒ MyBatis 无 `@Param` 绑定与 Spring MVC 参数名反射全失效 ⇒ 大批 500（`Parameter 'ids' not found` / `Name for argument … not specified`）；修=**根 build `subprojects` 统一声明** ✓。⚠️ **独立发现（存量，与拆分无关）**：`KnowledgeFinalizeAdapterTest` **6 例在 main 上也红** ✗（临时 worktree 复跑确认同批用例名）⇒ 本分支 red 全来自它，**另案处理**。**待办**：P3b-3 = `server/` → `:domains` 更名（波及 **7 脚本 · 1 基线 · 30 文档**）。 |
 | **B16 静默失效定向扫描** | 枚举「静默丢数据」机制点并逐对核写读词汇 | P1 | 中 | ✅ **完成（2026-10-02）**——未发现新缺陷（负面结果如实记录）；产出两个此前不存在的守卫（EPP 运行时守卫 + 契约面键名防回流守卫，均含红态证明）；附带盘出 B17 换锚欠账清单。详见 15.1.1 |
@@ -990,14 +991,14 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 
 **✅ B10（2026-10-02，代码级架构规则进 CI）**
 - **前提核对**：B10 原描述「环 0 组基线 + 包依赖白名单固化」**已于 2026-09-30 在 CI**（`scripts/check-package-cycles.py` 挂 guards job，环/分层/域依赖 `config` 三项带基线棘轮）。本批的真实缺口是 **ArchUnit 级（代码级）规则**。
-- 新增 `server/src/test/java/com/ragagent/arch/ArchitectureRulesTest.java`（测试依赖 `com.tngtech.archunit:archunit:1.3.0`），四条**当前零违例**的规则：
+- 新增 `domains/src/test/java/com/ragagent/arch/ArchitectureRulesTest.java`（测试依赖 `com.tngtech.archunit:archunit:1.3.0`），四条**当前零违例**的规则：
   - **R1 禁裸 `System.getenv`**（守 B6 成果 149→0；含无参重载）；
   - **R2 `@ConfigurationProperties` 类必须被 `@ConfigurationPropertiesScan` 名单覆盖**（漏扫描 = **静默**取默认值，B6 期间反复踩）；
   - **R3 配置类不得同时 `@Component/@Service`**（双装配）；
   - **R4 `install*`（启动期写入查找面/快照）只许 `*.config` 装配层调用**（把批次 6~10 各类注释里的约束变成红条）。
 - 分工写进类注释与 CI 注释：**包级**归脚本棘轮、**代码级**归 ArchUnit，不重复建设。
 - 两条实现要点（都属「静态闸门盲区」同类）：① 导入面必须按输出目录过滤到 **main**（`importPackages` 会连测试类一起扫，而测试里读真实 env 是**合法**的——各 connector 桩要读宿主 env 拼 SSRF 白名单），并加「导入面 >500 类」自证断言防**规则空转**；② **`noClasses().should(自定义条件)` 会把条件取反**（手写 violation 被反转成通过），R4 因此一度「永远绿」。
-- **验证（核心）**：造一个探针类（未扫描包 + `@Component`&`@ConfigurationProperties` 双注解 + 内部调 `System.getenv` 与 `AppEnvLookup.install`）同时触发四规则 → **四条确实全红**（首次只红三条，正是借此发现 R4 空转）→ 删探针复绿。闸门：`spotlessCheck` 绿 + 全量 **4697** 测试绿（+4）。命令：`./gradlew :server:test --tests "com.ragagent.arch.ArchitectureRulesTest"`。
+- **验证（核心）**：造一个探针类（未扫描包 + `@Component`&`@ConfigurationProperties` 双注解 + 内部调 `System.getenv` 与 `AppEnvLookup.install`）同时触发四规则 → **四条确实全红**（首次只红三条，正是借此发现 R4 空转）→ 删探针复绿。闸门：`spotlessCheck` 绿 + 全量 **4697** 测试绿（+4）。命令：`./gradlew :domains:test --tests "com.ragagent.arch.ArchitectureRulesTest"`。
 - 新增纪律已写入 §15.2 第 6~8 条（探针 / 扩展点注册实测 / 先读被验对象注释）。
 
 ### 15.3 非目标（冻结面，见 §14.6，勿列入修复）

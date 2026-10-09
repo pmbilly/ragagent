@@ -141,7 +141,7 @@ def split_top(s: str):
 def build_type_index(java_root: str):
     """全仓类型 → wire 字段（@JsonProperty 优先；record 组件剥注解）。"""
     idx = {}
-    base = os.path.join(java_root, "server", "src", "main", "java", "com", "ragagent")
+    base = os.path.join(java_root, "domains", "src", "main", "java", "com", "ragagent")
     for dirpath, _d, files in os.walk(base):
         for fn in files:
             if not fn.endswith('.java'):
@@ -347,7 +347,7 @@ def file_routes(full_path, type_idx):
 
 
 def collect(java_root: str):
-    base_dir = os.path.join(java_root, "server", "src", "main", "java", "com", "ragagent")
+    base_dir = os.path.join(java_root, "domains", "src", "main", "java", "com", "ragagent")
     routes = rr.parse_java(java_root)
 
     # RBAC 规则

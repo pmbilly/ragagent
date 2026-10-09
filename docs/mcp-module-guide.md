@@ -389,7 +389,7 @@ flowchart LR
 | 改工具审批策略 | `service/McpToolApprovalService` + `mapper/McpToolApprovalRepository` | 部分列更新；缺行=enabled；空补丁拒绝 |
 | 改审批桥 | `service/Adapter` + `McpToolPolicySource` + `McpWiring`（Gate 装配） | 这是 agent⇄mcp 的缝合点，动它要连 `common/approval` 一起看 |
 | 加端点 | `controller/` 加方法 + `config/WebConfig` 加 RBAC 规则 | 具体路径规则排在 `/mcp-services/*` 之前；补 `mcp-*` fixture |
-| 加 jsonb 字段 | `domain/` 值类型 + handler | **schema 两处同改**：`migrations/versioned/V1__baseline.sql` + `server/src/test/java/com/ragagent/TestSchema.java`（191–237 行已有 5 张表）；存量行要迁移 SQL |
+| 加 jsonb 字段 | `domain/` 值类型 + handler | **schema 两处同改**：`migrations/versioned/V1__baseline.sql` + `domains/src/test/java/com/ragagent/TestSchema.java`（191–237 行已有 5 张表）；存量行要迁移 SQL |
 | 改密钥加密方式 | `domain/McpSecretTypeHandler` / `McpAuthConfigTypeHandler` + `common/crypto/CryptoService` | 读回宽容解密（历史明文行）；wrapper 更新要三参 typeHandler 写法 |
 | 改使用说明生成 | `controller/McpUsageInstructionsOps`（LLM 输入拼装/摘录） | 门面留 static 薄委托（`McpUsageInputTest` static 直调） |
 
@@ -402,9 +402,9 @@ flowchart LR
 ```bash
 # 每次改动后必跑（约 3 分钟）
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test :server:spotlessCheck
+  ./gradlew :domains:test :domains:spotlessCheck
 # 迭代中先跑本域（秒级）
-./gradlew :server:test --tests "com.ragagent.mcp.*"
+./gradlew :domains:test --tests "com.ragagent.mcp.*"
 # 若动了前端可见契约（字段名/信封/状态码），同批带前端：
 cd frontend && npx vue-tsc --build --force && npm test
 ```
@@ -440,8 +440,8 @@ cd frontend && npx vue-tsc --build --force && npm test
 
 ## 8. 测试与验证
 
-- **规模**（2026-10-08 实测）：`server/src/test/java/com/ragagent/mcp/` 下 **31 个 java 文件**，其中 **27 个测试类 / 245 个 `@Test`**（另 4 个是测试基建：`McpServerStub`、`OAuthServerStub`、`FakeOAuthRepository`、`FakeOAuthStateRedis`）。分包：`controller/` 69、`protocol/` 58、`oauth/` 47、`service/` 39、`repository/` 12、`dto/` 11、`domain/` 5、根 `McpContractTest` 4（合计 245）。
-- **fixture 前缀**：`server/src/test/resources/contracts/` 下 **`mcp-*` 16 个**（create / list / get / update / delete / create-auth / create-forbidden-viewer / create-ssrf-rejected / not-found / test / tools / metadata / credentials-put / credentials-delete / credentials-bad-field / tool-approvals）。`McpContractTest` 掩码 UUID 与时间戳；支持 `-Dcontract.refresh=true` 重录。
+- **规模**（2026-10-08 实测）：`domains/src/test/java/com/ragagent/mcp/` 下 **31 个 java 文件**，其中 **27 个测试类 / 245 个 `@Test`**（另 4 个是测试基建：`McpServerStub`、`OAuthServerStub`、`FakeOAuthRepository`、`FakeOAuthStateRedis`）。分包：`controller/` 69、`protocol/` 58、`oauth/` 47、`service/` 39、`repository/` 12、`dto/` 11、`domain/` 5、根 `McpContractTest` 4（合计 245）。
+- **fixture 前缀**：`domains/src/test/resources/contracts/` 下 **`mcp-*` 16 个**（create / list / get / update / delete / create-auth / create-forbidden-viewer / create-ssrf-rejected / not-found / test / tools / metadata / credentials-put / credentials-delete / credentials-bad-field / tool-approvals）。`McpContractTest` 掩码 UUID 与时间戳；支持 `-Dcontract.refresh=true` 重录。
 - **比较口径**：金片对比走统一基建（**语义归一** + strip + 重录开关）；fixture 锚定的是本仓自己的行为。
 - **协议测试有真替身**：`McpServerStub`（假 MCP 服务器）与 `OAuthServerStub`（假授权服务器）是功能替身，不是 mock——改传输/OAuth 行为时优先扩展替身而不是绕过它。
 - **已知偶发 2 例**（全量并发下偶发，遇到先单独重跑，别误判回归；与本模块无关但会污染闸门）：

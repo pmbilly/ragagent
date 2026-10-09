@@ -32,8 +32,8 @@ MODULE_ALLOW: dict[str, str] = {}
 
 # 源码树根（S2 扫描范围）
 SOURCE_ROOTS = (
-    "server/src/main/java",
-    "server/src/test/java",
+    "domains/src/main/java",
+    "domains/src/test/java",
     "common/src/main/java",
     "common/src/test/java",
     "engine/src/main/java",
@@ -62,7 +62,7 @@ def _ignored(path: pathlib.Path) -> bool:
 def check_stray_dirs() -> list[str]:
     problems = []
     scan = [(ROOT, ROOT_ALLOW)]
-    for mod in (ROOT / "server", ROOT / "common", ROOT / "engine", ROOT / "boot", ROOT / "frontend", ROOT / "mcp-server",
+    for mod in (ROOT / "domains", ROOT / "common", ROOT / "engine", ROOT / "boot", ROOT / "frontend", ROOT / "mcp-server",
                 ROOT / "docreader", ROOT / "otlp-proto", ROOT / "migrations", ROOT / "docs",
                 ROOT / "scripts"):
         if mod.is_dir():

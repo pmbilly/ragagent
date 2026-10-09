@@ -11,7 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 
 /**
- * 契约测试：对照 golden 响应（server/src/test/resources/contracts/）。
+ * 契约测试：对照 golden 响应（domains/src/testFixtures/resources/contracts/）。
  * 每录一条 golden，这里加一条断言。JSON 字符串逐字符比对——契约就是字节级一致。
  */
 @SpringBootTest

@@ -215,7 +215,7 @@ sequenceDiagram
 ```bash
 # 每次改动后必跑（全量约 3 分钟；本域也可先单独跑：--tests "com.ragagent.favorite.*"）
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test :server:spotlessCheck
+  ./gradlew :domains:test :domains:spotlessCheck
 # 若动了前端可见契约（字段名/状态码/信封），同批带前端：
 cd frontend && npx vue-tsc --build --force && npm test
 ```
@@ -243,7 +243,7 @@ cd frontend && npx vue-tsc --build --force && npm test
 
 ## 8. 测试与验证
 
-- **规模**：1 个测试类 `FavoriteContractTest`（251 行）/ **5 个 `@Test`**（`emptyListThenNoType` / `addThenList` / `removeRealAndGhost` / `badRequestFamily` / `authFamily`）；golden 前缀 **`fav-`**，盘上 **15 个**（`server/src/test/resources/contracts/fav-*.json`）。录制脚本 `scripts/record-fav-cprev-golden.sh` 共 20 条请求，其中 5 条（add/remove 成功）无响应体，测试里只钉状态码 + 空体、不落盘。
+- **规模**：1 个测试类 `FavoriteContractTest`（251 行）/ **5 个 `@Test`**（`emptyListThenNoType` / `addThenList` / `removeRealAndGhost` / `badRequestFamily` / `authFamily`）；golden 前缀 **`fav-`**，盘上 **15 个**（`domains/src/test/resources/contracts/fav-*.json`）。录制脚本 `scripts/record-fav-cprev-golden.sh` 共 20 条请求，其中 5 条（add/remove 成功）无响应体，测试里只钉状态码 + 空体、不落盘。
 - **场景顺序有状态依赖**：空列表 → add ×2 + 重复 add → 列表回读 → remove 真实行 + 幽灵行 → 列表回读 → 400 家族 → 401 家族。改用例时**严格保持该序**，别拆成乱序独立用例。
 - **种子与对齐**：H2（`TestSchema`）镜像录制身份——租户 `10002` + owner `11111111-…-5501`（`java-phase1@weknora.test` / `Passw0rd!`）；表无外键，`resource_id` 用固定假 id（`fav-kb-fixed-0001` 等），两侧行集可逐字节对齐。唯一动态值 `created_at` 用 `TS_PATTERN` 两侧同掩码。
 - **比较口径**：`ContractJson.semantic` 语义比较（键序/转义归一），fixture 锚定**本仓自己的行为**，与 Go 无关。

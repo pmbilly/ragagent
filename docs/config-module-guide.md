@@ -215,9 +215,9 @@ sequenceDiagram
 ```bash
 # 每次改动后必跑（约 3 分钟）
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test :server:spotlessCheck
+  ./gradlew :domains:test :domains:spotlessCheck
 # 本包单测 + 架构规则（装配层专属两道闸，秒级）
-./gradlew :server:test --tests "com.ragagent.config.*" --tests "com.ragagent.arch.ArchitectureRulesTest"
+./gradlew :domains:test --tests "com.ragagent.config.*" --tests "com.ragagent.arch.ArchitectureRulesTest"
 python3 scripts/check-package-cycles.py   # 依赖 config 的包必须保持 =1（stream）
 ```
 
@@ -234,7 +234,7 @@ python3 scripts/check-package-cycles.py   # 依赖 config 的包必须保持 =1�
 ## 7. 模块约定与坑（必读）
 
 1. **`RetrievalEnvLookup.install` 的安装点不能挪**：必须在 `RetrievalEngineWiringConfig` 构造器（早于任何引擎 `@Bean`）。挪进通用快照装配类会因 bean 实例化顺序不保证而**静默丢掉 env 里配的集合/索引名**（不报错、检索照跑、就是配置没生效）——出处：该类构造器 javadoc + retrieval 手册 §7 第 5 条。
-2. **`AppEnvLookupEnvironmentPostProcessor` 必须走 `META-INF/spring.factories`**：Spring Boot 3.3 的 EPP 仍由它装载；写进 `.imports` 会被**静默忽略**（不报错、不执行、读点回落"未配置"）——出处：`server/src/main/resources/META-INF/spring.factories` 注释（实测结论原文）。
+2. **`AppEnvLookupEnvironmentPostProcessor` 必须走 `META-INF/spring.factories`**：Spring Boot 3.3 的 EPP 仍由它装载；写进 `.imports` 会被**静默忽略**（不报错、不执行、读点回落"未配置"）——出处：`domains/src/main/resources/META-INF/spring.factories` 注释（实测结论原文）。
 3. **历史教训：什么不该留在这里**——① `AppEnvLookup` 曾放本包、被 11 个包引用，守卫红灯（环 5 组），B33（2026-10-02）下沉 `common/deployment` 回基线；② `TenantProperties` 曾造成 `common ⇄ config` 包环，归位 `common/tenant` 后消解（backend-package-map §P0）。结论：本包只留**装配**，可复用值/工具一律下沉 common。
 4. **RBAC 顺序三连**（`WebConfig` 注册处注释 + auth 手册 §7 第 7 条）：① `APIKeyGateInterceptor`（order=-1）必须先于 `RbacInterceptor`——能力判定先于角色判定，且 RBAC 对 API-Key 主体短路；② 静态段规则先于 `/{id}` 通配登记（AntPathMatcher 取**首个**命中，顺序错 = 规则被通配遮蔽）；③ 拦截器 pattern 清单与规则成对维护——W5a 漂移实录：chunks/faq 等 6 个前缀的 addRule 早已存在，但拦截器 pattern 没覆盖 → 规则空转。
 5. **ArchUnit 四条代码级红线**（B10，`com.ragagent.arch.ArchitectureRulesTest`）：A1 禁裸 `System.getenv`；A2 属性类必须被扫描名单覆盖；A3 配置类不得双注解（双装配）；A4 `install*` 只许 `*.config` 装配层调用。本包是 A4 唯一合法调用地。
@@ -247,7 +247,7 @@ python3 scripts/check-package-cycles.py   # 依赖 config 的包必须保持 =1�
 
 ## 8. 测试与验证
 
-- **规模**：**6 个测试类 / 35 个 `@Test`**（`server/src/test/java/com/ragagent/config/`，共 767 行）。本包无契约 fixture——它没有 HTTP 面；跨域行为由各域契约/golden 测试兜底。
+- **规模**：**6 个测试类 / 35 个 `@Test`**（`domains/src/test/java/com/ragagent/config/`，共 767 行）。本包无契约 fixture——它没有 HTTP 面；跨域行为由各域契约/golden 测试兜底。
 
 | 测试类 | 用例 | 钉住什么 |
 |---|---|---|
@@ -290,4 +290,4 @@ python3 scripts/check-package-cycles.py   # 依赖 config 的包必须保持 =1�
 | MyBatis 防护链怎么排 | `MybatisPlusConfig`（分页 → 全表写防护 → 租户探测末位） |
 | 启动期快照（AES/SSRF/上传限额/存储） | `RuntimeSnapshotWiring` 构造器（§4.3 时序） |
 | 谁 import 了我 | 只有 `stream/StreamManagerConfig` → `StreamProperties`；守卫 `python3 scripts/check-package-cycles.py` |
-| 本包的行为被谁钉住 | `server/src/test/java/com/ragagent/config/`（6 类 35 用例）+ `com.ragagent.arch.ArchitectureRulesTest`（A1–A4） |
+| 本包的行为被谁钉住 | `domains/src/test/java/com/ragagent/config/`（6 类 35 用例）+ `com.ragagent.arch.ArchitectureRulesTest`（A1–A4） |

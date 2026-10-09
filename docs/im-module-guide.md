@@ -319,7 +319,7 @@ flowchart LR
 | 改 QA 编排 | full → `service/ImQaRunner`；stream → `service/ImStreamPipeline` | `output_mode` 在 `ImQaRunner` 判（`"full".equals(...)`）；两支共享 `ImQaRequests` 底座 |
 | 改附件下载 / 异步入库 | `service/ImAttachmentPreparer` + `service/ImKnowledgeBridgeOps` 附件异步入库段 | 扩展名白名单 `SUPPORTED_KB_FILE_EXTS`（15 种）在 `ImKnowledgeBridgeOps` 常量区；入库走 `KnowledgeService` |
 | 改渠道 CRUD / 校验钩子 | `controller/ImChannelController` + `service/ImChannelService`（beforeCreate/beforeSave/bot_identity） | mode/outputMode/sessionMode 缺省值在控制器与钩子**两处**各一份 |
-| 给渠道表加字段 | `domain/` 实体 + `mapper/` 显式 SQL | **schema 两处同改**：`migrations/versioned/V1__baseline.sql` + `server/src/test/java/com/ragagent/TestSchema.java`（否则 H2 报 Column not found） |
+| 给渠道表加字段 | `domain/` 实体 + `mapper/` 显式 SQL | **schema 两处同改**：`migrations/versioned/V1__baseline.sql` + `domains/src/test/java/com/ragagent/TestSchema.java`（否则 H2 报 Column not found） |
 | 改长连接守护策略 | `runtime/ImSupervisor` + 各渠道 Client | 周期重建决定"僵尸连接最坏中断时长"，动前看 `ImSupervisor` javadoc |
 
 ---
@@ -331,9 +331,9 @@ flowchart LR
 ```bash
 # 每次改动后必跑（约 3 分钟）
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :server:test :server:spotlessCheck
+  ./gradlew :domains:test :domains:spotlessCheck
 # 本模块快速回归（每刀内部闸门）
-./gradlew :server:test --tests "com.ragagent.im.*"   # 阈值 ≥145
+./gradlew :domains:test --tests "com.ragagent.im.*"   # 阈值 ≥145
 # 若动了前端可见契约（字段名/信封/状态码），同批带前端：
 cd frontend && npx vue-tsc --build --force && npm test
 ```
@@ -366,8 +366,8 @@ cd frontend && npx vue-tsc --build --force && npm test
 
 ## 8. 测试与验证
 
-- **规模**：`server/src/test/java/com/ragagent/im/` 下 **25 个测试类 / 145 个 `@Test`**（2026-10-08 实测；§14.7.11 拆分时为 121 条，之后 feat 批增长）。金片重录脚本 `scripts/record-emb-golden.sh` + `-Dcontract.refresh=true`（§13.12 机制）。
-- **fixture 前缀**（`server/src/test/resources/contracts/`，共 30 个锚定本模块）：
+- **规模**：`domains/src/test/java/com/ragagent/im/` 下 **25 个测试类 / 145 个 `@Test`**（2026-10-08 实测；§14.7.11 拆分时为 121 条，之后 feat 批增长）。金片重录脚本 `scripts/record-emb-golden.sh` + `-Dcontract.refresh=true`（§13.12 机制）。
+- **fixture 前缀**（`domains/src/test/resources/contracts/`，共 30 个锚定本模块）：
   - `imc-*`（20 个 JSON）：渠道 CRUD 契约（`ImContractTest` 驱动，掩码 uuid/时间戳，语义比较——键序/转义归一化后比）
   - `w5a-im-*`（7 个）：回调四场景 + 渠道 create/toggle；**部分由 `auth/controller/W5aSundryRoutesContractTest` 跨域消费**（杂项路由契约）
   - `w5g1-im-foundation.tsv`：`ToolDisplay` 等运行时底座的**字节契约**；`w5g3-im-adapter-signatures.tsv`（7 行）：slack/dingtalk/telegram 验签字节契约；`w5g3b-im-crypt.tsv`：feishu/wecom 加解密
