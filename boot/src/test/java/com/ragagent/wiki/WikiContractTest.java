@@ -323,10 +323,7 @@ class WikiContractTest {
     private static String goldenChecked(String name, String actualBody) throws Exception {
         String masked = mask(actualBody);
         if (REFRESH_FIXTURES) {
-            java.nio.file.Path file = java.nio.file.Path.of("src/test/resources/contracts", name);
-            if (!java.nio.file.Files.exists(file)) {
-                file = java.nio.file.Path.of("server/src/test/resources/contracts", name);
-            }
+            java.nio.file.Path file = com.ragagent.support.ContractPaths.resolveForWrite(name);
             java.nio.file.Files.writeString(file, masked + "\n");
             return masked;
         }

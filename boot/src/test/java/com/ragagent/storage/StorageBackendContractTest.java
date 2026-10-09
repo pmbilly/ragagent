@@ -175,10 +175,7 @@ class StorageBackendContractTest {
     private static final boolean REFRESH_FIXTURES = Boolean.getBoolean("contract.refresh");
 
     private void compare(String golden, String actual) throws Exception {
-        Path file = Path.of("src/test/resources/contracts", golden);
-        if (!Files.exists(file)) {
-            file = Path.of("server/src/test/resources/contracts", golden);
-        }
+        Path file = com.ragagent.support.ContractPaths.resolveForWrite(golden);
         if (REFRESH_FIXTURES) {
             Files.writeString(file, mask(actual) + "\n");
             return;

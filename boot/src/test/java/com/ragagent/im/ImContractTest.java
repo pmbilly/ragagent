@@ -179,7 +179,7 @@ class ImContractTest {
         assertEquals(status, r.getResponse().getStatus(), goldenName + " 状态码不符: " + raw(r));
         String actual = mask(raw(r));
         if (REFRESH_FIXTURES) {
-            java.nio.file.Path target = java.nio.file.Path.of("src/test/resources/contracts", goldenName);
+            java.nio.file.Path target = com.ragagent.support.ContractPaths.resolveForWrite(goldenName);
             java.nio.file.Files.writeString(target, actual + "\n");
             return r;
         }

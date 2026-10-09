@@ -1,0 +1,31 @@
+# ⚠️ 与 `server/src/test/resources/application.yml` 同内容（B165）：集成测试从 :server 迁到 :boot 后，
+# 测试配置必须落在**本模块自己的 test/resources** 才生效 —— 依赖模块的 resources 会被
+# 本模块 main/resources/application.yml（真 PG 配置）**抢先命中**，测试就会打到真库上。
+# 测试专用：契约/单元测试不依赖外部 postgres/redis
+spring:
+  flyway:
+    enabled: false
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  data:
+    redis:
+      host: localhost
+      port: 16379
+
+weknora:
+  # /system/info 的固定值：build-info.properties 在测试 classpath 里同样存在，但
+  # version/commit/build_time 随构建漂移会让 golden 不稳定 → 全部用配置固定。
+  system:
+    version: 0.8.0-test
+    commit-id: testcommit
+    build-time: 2026-01-01T00:00:00Z
+    java-version: test-jvm
+  storage:
+    local-base-dir: ./build/test-files   # 测试期本地文件落点（KB 文档上传）
+
+logging:
+  level:
+    com.ragagent: WARN

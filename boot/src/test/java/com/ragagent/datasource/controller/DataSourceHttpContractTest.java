@@ -286,7 +286,7 @@ class DataSourceHttpContractTest {
         com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
         if (REFRESH_FIXTURES) {
             java.nio.file.Files.writeString(
-                    java.nio.file.Paths.get("src/test/resources/contracts", goldenFile), mask(actualJson));
+                    com.ragagent.support.ContractPaths.resolveForWrite(goldenFile), mask(actualJson));
             System.out.println("REFRESH " + goldenFile + "（顺序不稳定的目录：按掩码后的实际重录）");
             return;   // 必返回：ClassPathResource 读的是 build 产物里的旧副本
         }
@@ -965,7 +965,7 @@ class DataSourceHttpContractTest {
     /** golden 比对的统一入口：换锚批一律走这里（键序/转义/掩码在 mask 里处理）。 */
     private void assertGoldenBody(String name, String actual) throws Exception {
         if (REFRESH_FIXTURES) {
-            java.nio.file.Path path = java.nio.file.Paths.get("src/test/resources/contracts", name);
+            java.nio.file.Path path = com.ragagent.support.ContractPaths.resolveForWrite(name);
             java.nio.file.Files.writeString(path, mask(actual));
             System.out.println("REFRESH " + name);
             return;

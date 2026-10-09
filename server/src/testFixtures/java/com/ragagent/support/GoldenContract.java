@@ -44,10 +44,7 @@ public final class GoldenContract {
      */
     public static void assertEquals(String contractsDir, String name,
             UnaryOperator<String> mask, String actual) throws Exception {
-        Path file = Path.of(contractsDir, name);
-        if (!Files.exists(file)) {
-            file = Path.of("server", contractsDir, name);
-        }
+        Path file = ContractPaths.resolveIn(contractsDir, name);   // B165：仓库根定位
         String maskedActual = mask.apply(actual);
         if (REFRESH) {
             Files.writeString(file, maskedActual + "\n");

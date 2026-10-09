@@ -18,6 +18,14 @@ subprojects {
     // withId：root 的 subprojects{} 在子项目应用插件**之前**求值，
     // 直接 tasks.named("check") 会报 "Task with name 'check' not found"（实测）。
     plugins.withId("java") {
+        // `-parameters`：MyBatis 无 @Param 的参数绑定、Spring MVC/Jackson 的**参数名反射**都依赖它。
+        // 该标志原由 org.springframework.boot 插件自动附加；B165 把 boot 插件从 :server 移到 :boot 后
+        // :server 丢失了它 ⇒ 运行期大批 500（实测：BindingException: Parameter 'ids' not found +
+        // IllegalArgumentException: Name for argument … not specified）。放这里统一声明，别再依赖插件隐含行为。
+        tasks.withType<JavaCompile>().configureEach {
+            options.compilerArgs.add("-parameters")
+        }
+
         tasks.withType<Javadoc>().configureEach {
             (options as StandardJavadocDocletOptions).apply {
                 addStringOption("Xdoclint:reference", "-quiet")

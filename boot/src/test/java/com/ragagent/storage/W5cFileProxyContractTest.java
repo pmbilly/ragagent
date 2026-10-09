@@ -262,8 +262,8 @@ class W5cFileProxyContractTest {
     }
 
     private Path golden(String name) {
-        Path file = Path.of("src/test/resources/contracts", name);
-        return Files.exists(file) ? file : Path.of("server/src/test/resources/contracts", name);
+        Path file = com.ragagent.support.ContractPaths.resolve(name);
+        return com.ragagent.support.ContractPaths.resolve(name);
     }
 
     private String raw(MvcResult r) {

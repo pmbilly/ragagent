@@ -351,7 +351,7 @@ class McpContractTest {
 
     private void assertGoldenBody(String name, String actual, String label) throws Exception {
         if (REFRESH_FIXTURES) {
-            java.nio.file.Path path = java.nio.file.Paths.get("src/test/resources/contracts", name);
+            java.nio.file.Path path = com.ragagent.support.ContractPaths.resolveForWrite(name);
             java.nio.file.Files.writeString(path, mask(actual));
             System.out.println("REFRESH " + name);
             return;
