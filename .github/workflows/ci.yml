@@ -72,6 +72,12 @@ jobs:
       - name: Build & test（PG 走默认 localhost:15432 + dev 同口令 ⇒ 两个录测试真跑）
         run: ./gradlew build
 
+      # B171：失败/跳过都摆上台面 —— 失败用例名 + 首行消息、**跳过用例名 + 原因**（跳过 = 覆盖没跑）。
+      # 在 Actions 里还会发 ::error/::notice 注解 ⇒ 可用公开 API 读（无需人肉捞日志）。
+      - name: 测试汇总（失败与跳过清单；失败时也跑）
+        if: always()
+        run: python3 scripts/test-summary.py
+
   frontend:
     name: 前端 type-check + test + build
     runs-on: ubuntu-latest
