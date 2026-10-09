@@ -34,7 +34,7 @@ public final class FeishuTestSupport {
      * 放行本机回环与飞书官方 origin 的白名单
      * （{@code SSRF_WHITELIST=127.0.0.1,localhost,open.feishu.cn,open.larksuite.com}）。
      *
-     * <p>飞书那两个域名必须放行：配置解析会拿解析出来的 base_url
+     * <p>飞书那两个域名必须放行：配置解析会拿解析出来的 baseUrl
      * （region 默认就是 {@code https://open.feishu.cn}）过一遍 SSRF 策略，
      * 而**测试不会真的连它们**——只是不让白名单校验把配置解析挡掉。</p>
      */
@@ -105,9 +105,9 @@ public final class FeishuTestSupport {
     public static DataSourceConfig config(String connectorType, String baseUrl,
                                           List<String> resourceIds, boolean multimodal) {
         Map<String, Object> creds = new LinkedHashMap<>();
-        creds.put("app_id", "test-app-id");
-        creds.put("app_secret", "test-app-secret");
-        creds.put("base_url", baseUrl);
+        creds.put("appId", "test-app-id");
+        creds.put("appSecret", "test-app-secret");
+        creds.put("baseUrl", baseUrl);
 
         DataSourceConfig c = new DataSourceConfig();
         c.setType(connectorType);

@@ -36,15 +36,16 @@ class YuqueFormatsTest {
         assertThat(cfg.baseURL()).isEqualTo(want);
     }
 
-    /** {@code baseURL()} 是方法：不得成为 JSON 属性。 */
+    /** {@code baseURL()} 是**方法**：不得成为 JSON 属性——键集＝字段（B139 换锚后 key 就是 {@code baseUrl}）。 */
     @Test
     void getBaseUrlIsNotAJsonProperty() throws Exception {
         YuqueConfig cfg = new YuqueConfig();
         cfg.setApiToken("tok");
         cfg.setBaseUrl("https://company.yuque.com");
         String json = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(cfg);
-        assertThat(json).contains("\"api_token\"").contains("\"base_url\"");
-        assertThat(json).doesNotContain("baseURL").doesNotContain("baseUrl\"");
+        // 键名＝字段名 ⇒ 逐字节钉住；baseURL() 不产生额外属性（原来它被误当 camel 键的"多余物"）
+        assertThat(json).isEqualTo("{\"apiToken\":\"tok\",\"baseUrl\":\"https://company.yuque.com\"}");
+        assertThat(json).doesNotContain("baseURL");
     }
 
     // ── buildDocURL ──────────────────────────────────────────────────────

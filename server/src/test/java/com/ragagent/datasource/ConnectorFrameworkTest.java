@@ -44,8 +44,8 @@ class ConnectorFrameworkTest {
                 .isEqualTo("invalid configuration: settings.projects is required");
         assertThat(new ConnectorException.InvalidCredentials().getMessage())
                 .isEqualTo("invalid credentials");
-        assertThat(new ConnectorException.InvalidCredentials("api_token is required").getMessage())
-                .isEqualTo("invalid credentials: api_token is required");
+        assertThat(new ConnectorException.InvalidCredentials("apiToken is required").getMessage())
+                .isEqualTo("invalid credentials: apiToken is required");
         assertThat(new ConnectorException.FetchFailed("rate limited: x").getMessage())
                 .isEqualTo("failed to fetch items from source: rate limited: x");
         assertThat(new ConnectorException.ResourceNotFound("/v1/pages/abc").getMessage())
@@ -314,7 +314,7 @@ class ConnectorFrameworkTest {
         // icon 有值时照写
         ConnectorMetadata withIcon = new ConnectorMetadata(
                 "notion", "Notion", "Sync pages and databases from Notion", "n.svg",
-                1, "api_key", List.of("incremental"));
+                1, "apiKey", List.of("incremental"));
         assertThat(mapper.writeValueAsString(withIcon)).startsWith(
                 "{\"type\":\"notion\",\"name\":\"Notion\","
                         + "\"description\":\"Sync pages and databases from Notion\","

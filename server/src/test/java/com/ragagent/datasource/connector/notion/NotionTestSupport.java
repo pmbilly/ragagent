@@ -80,11 +80,11 @@ final class NotionTestSupport {
         DataSourceConfig c = new DataSourceConfig();
         c.setType(DataSourceConstants.CONNECTOR_TYPE_NOTION);
         Map<String, Object> credentials = new LinkedHashMap<>();
-        credentials.put("api_key", apiKey);
+        credentials.put("apiKey", apiKey);
         c.setCredentials(credentials);
         c.setResourceIds(resourceIds == null ? new ArrayList<>() : new ArrayList<>(resourceIds));
         Map<String, Object> settings = new LinkedHashMap<>();
-        settings.put("base_url", baseUrl);
+        settings.put("baseUrl", baseUrl);
         c.setSettings(settings);
         return c;
     }

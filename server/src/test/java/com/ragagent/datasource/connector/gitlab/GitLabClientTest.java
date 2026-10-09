@@ -84,7 +84,7 @@ class GitLabClientTest {
     @Test
     void validateRejectsMissingCredentials() {
         DataSourceConfig ds = new DataSourceConfig();
-        ds.setCredentials(Map.of("base_url", "https://gitlab.example.com"));
+        ds.setCredentials(Map.of("baseUrl", "https://gitlab.example.com"));
 
         assertThatThrownBy(() -> new GitLabConnector().validate(ds))
                 .isInstanceOf(ConnectorException.class)
@@ -130,7 +130,7 @@ class GitLabClientTest {
 
     // ── newClient 归一 ──────────────────────────────────────────────────
 
-    /** newClient 会把缺省 base_url 归一成带 {@code /api/v4} 的形式。 */
+    /** newClient 会把缺省 baseUrl 归一成带 {@code /api/v4} 的形式。 */
     @Test
     void newClientNormalizesApiBaseUrl() throws IOException {
         try (GitLabServerStub stub = new GitLabServerStub(exchange -> GitLabServerStub.status(exchange, 404))) {
@@ -351,7 +351,7 @@ class GitLabClientTest {
     private static DataSourceConfig credentialsConfig(String baseUrl, String token) {
         DataSourceConfig ds = new DataSourceConfig();
         Map<String, Object> credentials = new LinkedHashMap<>();
-        credentials.put("base_url", baseUrl);
+        credentials.put("baseUrl", baseUrl);
         credentials.put("access_token", token);
         ds.setCredentials(credentials);
         return ds;

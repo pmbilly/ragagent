@@ -12,9 +12,9 @@ import com.ragagent.datasource.domain.DataSourceConfig;
  * <ol>
  *   <li>config 为 {@code null} → <b>裸</b> {@code InvalidConfig}
  *       （{@code "invalid configuration"}，**不带细节**）。</li>
- *   <li>credentials 里没有 {@code api_key} 键 → {@code "invalid credentials: missing api_key"}。</li>
- *   <li>{@code api_key} 不是字符串、或是**空串** → 同一个哨兵、同一句
- *       {@code "invalid credentials: api_key must be a non-empty string"}
+ *   <li>credentials 里没有 {@code apiKey} 键 → {@code "invalid credentials: missing apiKey"}。</li>
+ *   <li>{@code apiKey} 不是字符串、或是**空串** → 同一个哨兵、同一句
+ *       {@code "invalid credentials: apiKey must be a non-empty string"}
  *       （数字 42 与 {@code ""} 得到同一句话）。</li>
  * </ol>
  */
@@ -37,12 +37,12 @@ public final class NotionConfig {
             throw new ConnectorException.InvalidConfig();
         }
         Map<String, Object> credentials = config.getCredentials();
-        if (credentials == null || !credentials.containsKey("api_key")) {
-            throw new ConnectorException.InvalidCredentials("missing api_key");
+        if (credentials == null || !credentials.containsKey("apiKey")) {
+            throw new ConnectorException.InvalidCredentials("missing apiKey");
         }
-        Object raw = credentials.get("api_key");
+        Object raw = credentials.get("apiKey");
         if (!(raw instanceof String token) || token.isEmpty()) {
-            throw new ConnectorException.InvalidCredentials("api_key must be a non-empty string");
+            throw new ConnectorException.InvalidCredentials("apiKey must be a non-empty string");
         }
         return new NotionConfig(token);
     }

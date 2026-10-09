@@ -5,7 +5,6 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.datasource.ConnectorException;
@@ -21,7 +20,7 @@ import com.ragagent.datasource.domain.DataSourceConfig;
  * （这是本项目复发率最高的一类错误）。</p>
  *
  * <h2>企业/私有部署</h2>
- * <p>{@code base_url} 空 → {@code https://www.yuque.com}；缺 scheme 补
+ * <p>{@code baseUrl} 空 → {@code https://www.yuque.com}；缺 scheme 补
  * {@code https://}；去尾斜杠。</p>
  *
  * <h2>内部 API 形状，不是契约</h2>
@@ -33,17 +32,15 @@ public class YuqueConfig {
     public static final String DEFAULT_BASE_URL = "https://www.yuque.com";
 
     /**
-     * 忽略未知属性（credentials 里的键只多不少，{@code base_url} 这类字段可选）。
+     * 忽略未知属性（credentials 里的键只多不少，{@code baseUrl} 这类字段可选）。
      */
     private static final ObjectMapper MAPPER = JsonMappers.lenient()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     /** 语雀设置页里的个人令牌，随 {@code X-Auth-Token} 头发送。 */
-    @JsonProperty("api_token")
     private String apiToken = "";
 
     /** 部署基地址；空 → {@link #DEFAULT_BASE_URL}。为空省略 → 空时整键消失。 */
-    @JsonProperty("base_url")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String baseUrl = "";
 
@@ -89,11 +86,11 @@ public class YuqueConfig {
      * 解析并校验语雀配置。
      *
      * <p>顺序：config 为 {@code null} → {@link ConnectorException.InvalidConfig}；
-     * 反序列化失败 → {@code "parse yuque credentials: ..."}；{@code api_token}
+     * 反序列化失败 → {@code "parse yuque credentials: ..."}；{@code apiToken}
      * 空白 → {@link ConnectorException.InvalidCredentials}；最后过 SSRF 策略。</p>
      *
      * <p><b>最后一步会真的解析 DNS</b>（除非命中白名单）。测试必须把
-     * {@code base_url} 指向被放行的 stub server，不能留空回落到
+     * {@code baseUrl} 指向被放行的 stub server，不能留空回落到
      * {@code https://www.yuque.com}。</p>
      */
     public static YuqueConfig parse(DataSourceConfig config) {
@@ -113,7 +110,7 @@ public class YuqueConfig {
             throw new ConnectorException("parse yuque credentials: " + e.getMessage(), e);
         }
         if (isGoBlank(cfg.apiToken)) {
-            throw new ConnectorException.InvalidCredentials("api_token is required");
+            throw new ConnectorException.InvalidCredentials("apiToken is required");
         }
         ConnectorHttp.validateConnectorBaseUrl(cfg.baseURL());
         return cfg;

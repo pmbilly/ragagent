@@ -576,16 +576,16 @@ class ImaConnectorTest {
 
     // ── 校验与参数 ───────────────────────────────────────────────────────
 
-    /** 缺 client_id 时 validate 拒绝。 */
+    /** 缺 clientId 时 validate 拒绝。 */
     @Test
     void validateRejectsMissingClientId() throws Exception {
         try (FakeIma f = new FakeIma()) {
             DataSourceConfig cfg = f.config();
-            cfg.getCredentials().put("client_id", "");
+            cfg.getCredentials().put("clientId", "");
 
             assertThatThrownBy(() -> connector().validate(cfg))
                     .isInstanceOf(ConnectorException.InvalidCredentials.class)
-                    .hasMessageContaining("client_id");
+                    .hasMessageContaining("clientId");
         }
     }
 
@@ -596,14 +596,14 @@ class ImaConnectorTest {
                 .isInstanceOf(ConnectorException.InvalidConfig.class);
     }
 
-    /** base_url 的 SSRF 档：元数据地址必须被拒。 */
+    /** baseUrl 的 SSRF 档：元数据地址必须被拒。 */
     @Test
     void parseRejectsSsrfBaseUrl() {
         DataSourceConfig cfg = new DataSourceConfig();
         Map<String, Object> credentials = new LinkedHashMap<>();
-        credentials.put("client_id", "cid");
-        credentials.put("api_key", "key");
-        credentials.put("base_url", "http://169.254.169.254");
+        credentials.put("clientId", "cid");
+        credentials.put("apiKey", "key");
+        credentials.put("baseUrl", "http://169.254.169.254");
         cfg.setCredentials(credentials);
 
         assertThatThrownBy(() -> ImaConfig.parse(cfg))
@@ -666,7 +666,7 @@ class ImaConnectorTest {
     void kbListingFailureAbortsTheWholeWalk() throws Exception {
         try (FakeIma f = new FakeIma()) {
             DataSourceConfig cfg = f.config("kb1");
-            cfg.getCredentials().put("base_url", "http://127.0.0.1:1"); // 端口上没人听
+            cfg.getCredentials().put("baseUrl", "http://127.0.0.1:1"); // 端口上没人听
 
             assertThatThrownBy(() -> connector().fetchAll(cfg, List.of("kb1")))
                     .isInstanceOf(ConnectorException.class);

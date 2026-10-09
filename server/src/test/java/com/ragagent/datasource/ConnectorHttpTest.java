@@ -23,7 +23,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
- * {@link ConnectorHttp} 的语义测试（HTTP 客户端、base_url 的 SSRF 校验、
+ * {@link ConnectorHttp} 的语义测试（HTTP 客户端、baseUrl 的 SSRF 校验、
  * 重定向安全、出站请求的 SSRF 拦截）。
  *
  * <h2>为什么必须用 stub server</h2>
@@ -165,7 +165,7 @@ class ConnectorHttpTest {
     /**
      * 没有 scheme 的主机会先被补成 {@code https://<host>} 再校验——所以直接写一个
      * 裸内网 IP 一样会被拒（裸 IP 一律不允许）。错误文本为
-     * {@code base_url SSRF validation failed: <原因>}。
+     * {@code baseUrl SSRF validation failed: <原因>}。
      */
     @Test
     void ssrfRejectedBaseUrlCarriesGoPrefix() {
@@ -173,7 +173,7 @@ class ConnectorHttpTest {
         try {
             assertThatThrownBy(() -> ConnectorHttp.validateConnectorBaseUrl("http://10.0.0.5"))
                     .isInstanceOf(ConnectorException.class)
-                    .hasMessageStartingWith("base_url SSRF validation failed: ")
+                    .hasMessageStartingWith("baseUrl SSRF validation failed: ")
                     .hasMessageContaining("direct IP address access is not allowed");
         } finally {
             ConnectorHttp.ssrfGuard().reloadWhitelist("127.0.0.1,::1,localhost");

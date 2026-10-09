@@ -66,7 +66,7 @@ echo "    DS_ID=$DS_ID"
 echo "==> 3) 读 / 改 / 列表"
 req ds-get.json GET "/datasource/${DS_ID}"
 req ds-update.json PUT "/datasource/${DS_ID}" -H 'Content-Type: application/json' \
-  -d '{"name":"golden-rss-renamed","sync_mode":"full","sync_deletions":false,"error_message":"","config":{"type":"rss","settings":{"feedUrls":"http://127.0.0.1:18099/feed.xml"},"credentials":{"feedUrls":"http://127.0.0.1:18099/feed.xml","api_token":"should-be-ignored"}}}'
+  -d '{"name":"golden-rss-renamed","sync_mode":"full","sync_deletions":false,"error_message":"","config":{"type":"rss","settings":{"feedUrls":"http://127.0.0.1:18099/feed.xml"},"credentials":{"feedUrls":"http://127.0.0.1:18099/feed.xml","apiToken":"should-be-ignored"}}}'
 req ds-get-after-update.json GET "/datasource/${DS_ID}"
 req ds-list.json GET "/datasource?kb_id=${KB}"
 req ds-unknown-id.json GET "/datasource/${UNKNOWN_KB}"

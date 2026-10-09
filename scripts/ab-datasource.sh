@@ -163,7 +163,7 @@ hit get_unknown "${GO_PORT}" "${GO_TOKEN}" GET "/datasource/${UNKNOWN}"
 hit get_unknown "${JAVA_PORT}" "${JAVA_TOKEN}" GET "/datasource/${UNKNOWN}"
 cmp_resp get_unknown
 
-PUT_BODY='{"name":"ab-rss-renamed","sync_mode":"full","sync_deletions":false,"error_message":"","config":{"type":"rss","settings":{"feedUrls":"'"${FEED}"'"},"credentials":{"feedUrls":"'"${FEED}"'","api_token":"should-be-ignored"}}}'
+PUT_BODY='{"name":"ab-rss-renamed","sync_mode":"full","sync_deletions":false,"error_message":"","config":{"type":"rss","settings":{"feedUrls":"'"${FEED}"'"},"credentials":{"feedUrls":"'"${FEED}"'","apiToken":"should-be-ignored"}}}'
 hit update "${GO_PORT}" "${GO_TOKEN}" PUT "/datasource/${GO_DS}" -H 'Content-Type: application/json' -d "${PUT_BODY}"
 hit update "${JAVA_PORT}" "${JAVA_TOKEN}" PUT "/datasource/${JAVA_DS}" -H 'Content-Type: application/json' -d "${PUT_BODY}"
 cmp_resp update

@@ -106,8 +106,8 @@ class WikiConnectorTest {
     void connectorValidateBadCredentials() {
         DataSourceConfig ds = new DataSourceConfig();
         ds.setCredentials(new LinkedHashMap<>(Map.of(
-                "app_id", "bad", "app_secret", "bad",
-                "base_url", "http://127.0.0.1:1")));
+                "appId", "bad", "appSecret", "bad",
+                "baseUrl", "http://127.0.0.1:1")));
 
         assertThatThrownBy(() -> connector().validate(ds))
                 .isInstanceOf(ConnectorException.class)

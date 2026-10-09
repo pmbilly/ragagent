@@ -214,7 +214,7 @@ class DataSourceJsonTest {
         DataSourceConfig c = new DataSourceConfig();
         c.setType("feishu");
         Map<String, Object> creds = new LinkedHashMap<>();
-        creds.put("app_id", "x");
+        creds.put("appId", "x");
         creds.put("n", 1.0d);
         creds.put("b", true);
         c.setCredentials(creds);
@@ -224,7 +224,7 @@ class DataSourceJsonTest {
         c.setSettings(settings);
 
         assertThat(write(c)).isEqualTo(
-                "{\"type\":\"feishu\",\"credentials\":{\"app_id\":\"x\",\"b\":true,\"n\":1.0},"
+                "{\"type\":\"feishu\",\"credentials\":{\"appId\":\"x\",\"b\":true,\"n\":1.0},"
                         + "\"resourceIds\":[\"r1\",\"r2\"],\"settings\":{\"folder_token\":\"ft\"}}");
     }
 
@@ -245,7 +245,7 @@ class DataSourceJsonTest {
     @Test
     void dataSourceConfigHasMethodsAreNotProperties() throws Exception {
         DataSourceConfig c = new DataSourceConfig();
-        c.setCredentials(new LinkedHashMap<>(Map.of("app_id", "x")));
+        c.setCredentials(new LinkedHashMap<>(Map.of("appId", "x")));
         String out = write(c);
         assertThat(c.hasCredentials()).isTrue();
         assertThat(c.hasConfiguredCredentials("feishu")).isTrue();
@@ -590,7 +590,7 @@ class DataSourceJsonTest {
 
         // 非 RSS 连接器不看 authHeaders
         DataSourceConfig feishu = new DataSourceConfig();
-        feishu.setCredentials(new LinkedHashMap<>(Map.of("app_id", "x")));
+        feishu.setCredentials(new LinkedHashMap<>(Map.of("appId", "x")));
         assertThat(feishu.hasConfiguredCredentials("feishu")).isTrue();
 
         // 只有空白也算没配
@@ -747,7 +747,7 @@ class DataSourceJsonTest {
 
         DataSourceConfig full = new DataSourceConfig();
         full.setType("feishu");
-        full.setCredentials(new LinkedHashMap<>(Map.of("app_id", "x")));
+        full.setCredentials(new LinkedHashMap<>(Map.of("appId", "x")));
         full.setResourceIds(new ArrayList<>(List.of("r")));
         full.setSettings(new LinkedHashMap<>(Map.of("k", "v")));
         full.setMultimodalEnabled(true);
@@ -873,11 +873,11 @@ class DataSourceJsonTest {
     void dataSourceConfigToJsonDoesNotMutateCaller() throws Exception {
         DataSourceConfig c = new DataSourceConfig();
         Map<String, Object> creds = new LinkedHashMap<>();
-        creds.put("app_id", "plain");
+        creds.put("appId", "plain");
         c.setCredentials(creds);
 
         c.toJSON();
-        assertThat(c.getCredentials()).containsEntry("app_id", "plain");
+        assertThat(c.getCredentials()).containsEntry("appId", "plain");
     }
 
     /** {@code SyncResult.toJSON()} / {@code SyncCursor.toJSON()} 的形状。 */

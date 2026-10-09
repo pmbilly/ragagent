@@ -156,38 +156,38 @@ class NotionConnectorTest {
         missing.setCredentials(new LinkedHashMap<>());
         assertThatThrownBy(() -> NotionConfig.parse(missing))
                 .isInstanceOf(ConnectorException.InvalidCredentials.class)
-                .hasMessage("invalid credentials: missing api_key");
+                .hasMessage("invalid credentials: missing apiKey");
 
         // credentials 整张 map 为 null → 同样是 missing
         assertThatThrownBy(() -> NotionConfig.parse(new DataSourceConfig()))
                 .isInstanceOf(ConnectorException.InvalidCredentials.class)
-                .hasMessage("invalid credentials: missing api_key");
+                .hasMessage("invalid credentials: missing apiKey");
 
         DataSourceConfig empty = new DataSourceConfig();
         Map<String, Object> creds = new LinkedHashMap<>();
-        creds.put("api_key", "");
+        creds.put("apiKey", "");
         empty.setCredentials(creds);
         assertThatThrownBy(() -> NotionConfig.parse(empty))
                 .isInstanceOf(ConnectorException.InvalidCredentials.class)
-                .hasMessage("invalid credentials: api_key must be a non-empty string");
+                .hasMessage("invalid credentials: apiKey must be a non-empty string");
 
         // 非字符串：与"空串"合并成同一条分支
         DataSourceConfig numeric = new DataSourceConfig();
         Map<String, Object> numericCreds = new LinkedHashMap<>();
-        numericCreds.put("api_key", 42);
+        numericCreds.put("apiKey", 42);
         numeric.setCredentials(numericCreds);
         assertThatThrownBy(() -> NotionConfig.parse(numeric))
                 .isInstanceOf(ConnectorException.InvalidCredentials.class)
-                .hasMessage("invalid credentials: api_key must be a non-empty string");
+                .hasMessage("invalid credentials: apiKey must be a non-empty string");
 
         // null 值同理
         DataSourceConfig nullValue = new DataSourceConfig();
         Map<String, Object> nullCreds = new LinkedHashMap<>();
-        nullCreds.put("api_key", null);
+        nullCreds.put("apiKey", null);
         nullValue.setCredentials(nullCreds);
         assertThatThrownBy(() -> NotionConfig.parse(nullValue))
                 .isInstanceOf(ConnectorException.InvalidCredentials.class)
-                .hasMessage("invalid credentials: api_key must be a non-empty string");
+                .hasMessage("invalid credentials: apiKey must be a non-empty string");
     }
 
     @Test
@@ -198,12 +198,12 @@ class NotionConnectorTest {
                 .isEqualTo("https://api.notion.com");
         DataSourceConfig empty = new DataSourceConfig();
         Map<String, Object> settings = new LinkedHashMap<>();
-        settings.put("base_url", "");
+        settings.put("baseUrl", "");
         empty.setSettings(settings);
         assertThat(NotionConnector.extractBaseUrl(empty)).isEqualTo("https://api.notion.com");
         DataSourceConfig nonString = new DataSourceConfig();
         Map<String, Object> settings2 = new LinkedHashMap<>();
-        settings2.put("base_url", 7);
+        settings2.put("baseUrl", 7);
         nonString.setSettings(settings2);
         assertThat(NotionConnector.extractBaseUrl(nonString)).isEqualTo("https://api.notion.com");
         assertThat(NotionConnector.extractBaseUrl(
@@ -929,7 +929,7 @@ class NotionConnectorTest {
         }
     }
 
-    /** 请求头与 base_url 的默认值：默认打到 api.notion.com（这里只断言字符串）。 */
+    /** 请求头与 baseUrl 的默认值：默认打到 api.notion.com（这里只断言字符串）。 */
     @Test
     void defaultBaseUrlConstant() {
         assertThat(NotionConstants.DEFAULT_BASE_URL).isEqualTo("https://api.notion.com");

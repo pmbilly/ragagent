@@ -26,7 +26,7 @@ class GitLabConfigTest {
     @Test
     void parseConfigCollapsesDirectories() {
         DataSourceConfig ds = settingsConfig(Map.of("projects", List.of(Map.of(
-                "project_id", "team/docs",
+                "projectId", "team/docs",
                 "ref", "main",
                 "paths", List.of("docs/guide", "docs", "docs")))));
 
@@ -42,7 +42,7 @@ class GitLabConfigTest {
     @Test
     void parseConfigRootMeansWholeProject() {
         DataSourceConfig ds = settingsConfig(Map.of("projects", List.of(Map.of(
-                "project_id", "42",
+                "projectId", "42",
                 "paths", List.of("/")))));
 
         GitLabConfig cfg = GitLabConfig.parse(ds);
@@ -184,34 +184,34 @@ class GitLabConfigTest {
     @Test
     void parseConfigRejectsBadProjectIds() {
         assertBadProjectId(Map.of());
-        assertBadProjectId(Map.of("project_id", 5));
-        assertBadProjectId(Map.of("project_id", "  "));
-        assertBadProjectId(Map.of("project_id", " " + "a" + " "), Map.of("project_id", "a"));
+        assertBadProjectId(Map.of("projectId", 5));
+        assertBadProjectId(Map.of("projectId", "  "));
+        assertBadProjectId(Map.of("projectId", " " + "a" + " "), Map.of("projectId", "a"));
     }
 
     @SafeVarargs
     private static void assertBadProjectId(Map<String, Object>... projects) {
         assertThatThrownBy(() -> GitLabConfig.parse(settingsConfig(settings("projects", List.of(projects)))))
                 .isInstanceOf(ConnectorException.InvalidConfig.class)
-                .hasMessage("invalid configuration: project_id must be unique and non-empty");
+                .hasMessage("invalid configuration: projectId must be unique and non-empty");
     }
 
     @Test
     void parseConfigRejectsBadPaths() {
         assertThatThrownBy(() -> GitLabConfig.parse(settingsConfig(
-                settings("projects", List.of(Map.of("project_id", "a", "paths", "x"))))))
+                settings("projects", List.of(Map.of("projectId", "a", "paths", "x"))))))
                 .isInstanceOf(ConnectorException.InvalidConfig.class)
                 .hasMessage("invalid configuration: paths must be an array");
         assertThatThrownBy(() -> GitLabConfig.parse(settingsConfig(
-                settings("projects", List.of(Map.of("project_id", "a", "paths", List.of(3)))))))
+                settings("projects", List.of(Map.of("projectId", "a", "paths", List.of(3)))))))
                 .isInstanceOf(ConnectorException.InvalidConfig.class)
                 .hasMessage("invalid configuration: path must be a string");
         assertThatThrownBy(() -> GitLabConfig.parse(settingsConfig(
-                settings("projects", List.of(Map.of("project_id", "a", "paths", List.of("docs/../x")))))))
+                settings("projects", List.of(Map.of("projectId", "a", "paths", List.of("docs/../x")))))))
                 .isInstanceOf(ConnectorException.InvalidConfig.class)
                 .hasMessage("invalid configuration: invalid repository path");
         assertThatThrownBy(() -> GitLabConfig.parse(settingsConfig(
-                settings("projects", List.of(Map.of("project_id", "a", "paths", List.of("a\\b")))))))
+                settings("projects", List.of(Map.of("projectId", "a", "paths", List.of("a\\b")))))))
                 .isInstanceOf(ConnectorException.InvalidConfig.class)
                 .hasMessage("invalid configuration: path must use forward slashes");
     }
@@ -220,12 +220,12 @@ class GitLabConfigTest {
     @Test
     void parseConfigToleratesNonStringRefAndMissingPaths() {
         GitLabConfig cfg = GitLabConfig.parse(settingsConfig(
-                settings("projects", List.of(Map.of("project_id", "a", "ref", 5)))));
+                settings("projects", List.of(Map.of("projectId", "a", "ref", 5)))));
         assertThat(cfg.projects().get(0).ref()).isEmpty();
         assertThat(cfg.projects().get(0).paths()).isNull();
 
         GitLabConfig cfg2 = GitLabConfig.parse(settingsConfig(
-                settings("projects", List.of(Map.of("project_id", "team/docs")))));
+                settings("projects", List.of(Map.of("projectId", "team/docs")))));
         assertThat(cfg2.projects().get(0).projectId()).isEqualTo("team/docs");
         assertThat(cfg2.projects().get(0).ref()).isEmpty();
         assertThat(cfg2.projects().get(0).paths()).isNull();
@@ -235,7 +235,7 @@ class GitLabConfigTest {
     @Test
     void parseConfigRootPathWinsOverSiblings() {
         GitLabConfig cfg = GitLabConfig.parse(settingsConfig(settings("projects", List.of(Map.of(
-                "project_id", "a",
+                "projectId", "a",
                 "ref", " m ",
                 "paths", List.of("/", "docs/guide", "docs"))))));
         assertThat(cfg.projects().get(0).ref()).isEqualTo("m");

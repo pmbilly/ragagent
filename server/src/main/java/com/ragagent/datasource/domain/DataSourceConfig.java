@@ -24,8 +24,8 @@ import com.ragagent.common.crypto.CryptoService;
  * <pre>
  *   DataSourceConfig{}            → {"type":"","credentials":null,"resourceIds":null,"settings":null}
  *   DataSourceConfig{Type:"rss"}  → {"type":"rss","credentials":null,"resourceIds":null,"settings":null}
- *   带全部字段                     → {"type":"feishu","credentials":{"app_id":"x","b":true,"n":1},
- *                                    "resourceIds":["r1","r2"],"settings":{"folder_token":"ft"}}
+ *   带全部字段                     → {"type":"feishu","credentials":{"appId":"x","b":true,"n":1},
+ *                                    "resourceIds":["r1","r2"],"settings":{"timezone":"Asia/Shanghai"}}
  * </pre>
  * <p><b>四个键全部恒输出</b>，{@code multimodalEnabled} 一个键都不出。</p>
  *

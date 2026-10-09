@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ragagent.datasource.ConnectorException;
 import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.common.text.Whitespace;
@@ -13,10 +12,10 @@ import com.ragagent.common.text.Whitespace;
  * GitLab 数据源的 {@code settings} 形状与解析。
  *
  * <h2>它住在 {@code DataSourceConfig.settings} 这个 jsonb 列里</h2>
- * <p>形状是 {@code {"projects":[{"project_id":"…","ref":"…","paths":["…"]}]}}。
+ * <p>形状是 {@code {"projects":[{"projectId":"…","ref":"…","paths":["…"]}]}}。
  * 因为它会落库、也会经 {@code GET /datasources/:id} 回给前端，
  * {@link ProjectSelection} 的键名必须逐字对齐 settings 里既有的 json 键
- * （{@code project_id} / {@code ref} / {@code paths}）。</p>
+ * （{@code projectId} / {@code ref} / {@code paths}）。</p>
  *
  * <h2>三条容易写错的语义</h2>
  * <ol>
@@ -54,9 +53,9 @@ public final class GitLabConfig {
      * 空列表会与"整个项目"的判据混在一起。</p>
      */
     public record ProjectSelection(
-            @JsonProperty("project_id") String projectId,
-            @JsonProperty("ref") String ref,
-            @JsonProperty("paths") List<String> paths) {
+            String projectId,
+            String ref,
+            List<String> paths) {
     }
 
     /**
@@ -83,9 +82,9 @@ public final class GitLabConfig {
             if (!(rawProject instanceof Map<?, ?> m)) {
                 throw new ConnectorException.InvalidConfig("invalid project selection");
             }
-            String id = Whitespace.trimSpace(asString(m.get("project_id")));
+            String id = Whitespace.trimSpace(asString(m.get("projectId")));
             if (id.isEmpty() || !seen.add(id)) {
-                throw new ConnectorException.InvalidConfig("project_id must be unique and non-empty");
+                throw new ConnectorException.InvalidConfig("projectId must be unique and non-empty");
             }
             List<String> paths = new ArrayList<>();
             if (m.containsKey("paths")) {

@@ -412,7 +412,7 @@ class ImaClientTest {
         }
     }
 
-    /** 打 FakeIma 的客户端（base_url 指向 stub；ImaClient 自身不做 SSRF 校验）。 */
+    /** 打 FakeIma 的客户端（baseUrl 指向 stub；ImaClient 自身不做 SSRF 校验）。 */
     private static ImaClient clientFor(FakeIma f) {
         ImaConfig cfg = new ImaConfig();
         cfg.setClientId("cid");

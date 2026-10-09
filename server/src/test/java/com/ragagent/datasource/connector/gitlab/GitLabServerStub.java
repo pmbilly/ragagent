@@ -17,7 +17,7 @@ import com.sun.net.httpserver.HttpServer;
  * GitLab API 的最小桩服务。
  *
  * <p>绑 {@code 127.0.0.1}、端口 0 自动分配，通过
- * {@link #baseUrl()} 拿到 {@code http://127.0.0.1:<port>} 当 {@code base_url}
+ * {@link #baseUrl()} 拿到 {@code http://127.0.0.1:<port>} 当 {@code baseUrl}
  * ——它已含 {@code ://}，所以 {@code newClient} 只会补 {@code /api/v4}。</p>
  *
  * <h2>SSRF 白名单</h2>

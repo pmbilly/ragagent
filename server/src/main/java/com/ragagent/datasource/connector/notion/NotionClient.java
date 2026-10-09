@@ -93,7 +93,7 @@ public final class NotionClient {
         this.httpClient = httpClient;
     }
 
-    /** 空 base_url 回落默认值，再做 SSRF 校验。 */
+    /** 空 baseUrl 回落默认值，再做 SSRF 校验。 */
     public static NotionClient create(String token, String baseUrl) {
         String resolved = (baseUrl == null || baseUrl.isEmpty())
                 ? NotionConstants.DEFAULT_BASE_URL
@@ -102,7 +102,7 @@ public final class NotionClient {
         return new NotionClient(token, resolved);
     }
 
-    /** 测试/连接器共用的工厂：允许替换限流与退避，但仍做 base_url 校验。 */
+    /** 测试/连接器共用的工厂：允许替换限流与退避，但仍做 baseUrl 校验。 */
     public static NotionClient forTesting(String token, String baseUrl, RateLimiter limiter,
                                           Backoff backoff, Sleeper sleeper) {
         String resolved = (baseUrl == null || baseUrl.isEmpty())

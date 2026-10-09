@@ -71,22 +71,22 @@ public final class ConnectorCatalog {
                 DataSourceConstants.CONNECTOR_TYPE_NOTION,
                 "Notion",
                 "Sync pages and databases from Notion",
-                1, "api_key", List.of("incremental")));
+                1, "apiKey", List.of("incremental")));
         m.put(DataSourceConstants.CONNECTOR_TYPE_CONFLUENCE, new ConnectorMetadata(
                 DataSourceConstants.CONNECTOR_TYPE_CONFLUENCE,
                 "Confluence",
                 "Sync spaces and pages from Atlassian Confluence",
-                2, "api_key", List.of("incremental")));
+                2, "apiKey", List.of("incremental")));
         m.put(DataSourceConstants.CONNECTOR_TYPE_YUQUE, new ConnectorMetadata(
                 DataSourceConstants.CONNECTOR_TYPE_YUQUE,
                 "Yuque (语雀)",
                 "Sync knowledge bases and documents from Yuque",
-                3, "api_key", List.of("incremental")));
+                3, "apiKey", List.of("incremental")));
         m.put(DataSourceConstants.CONNECTOR_TYPE_IMA, new ConnectorMetadata(
                 DataSourceConstants.CONNECTOR_TYPE_IMA,
                 "Tencent IMA (ima.qq.com)",
                 "Sync knowledge bases and documents from Tencent IMA",
-                3, "api_key", List.of("incremental", "deletion_sync")));
+                3, "apiKey", List.of("incremental", "deletion_sync")));
         m.put(DataSourceConstants.CONNECTOR_TYPE_GITHUB, new ConnectorMetadata(
                 DataSourceConstants.CONNECTOR_TYPE_GITHUB,
                 "GitHub",
@@ -106,7 +106,7 @@ public final class ConnectorCatalog {
                 DataSourceConstants.CONNECTOR_TYPE_DINGTALK,
                 "DingTalk (钉钉)",
                 "Sync documents and content from DingTalk",
-                7, "api_key", List.of("incremental")));
+                7, "apiKey", List.of("incremental")));
         m.put(DataSourceConstants.CONNECTOR_TYPE_WEB_CRAWLER, new ConnectorMetadata(
                 DataSourceConstants.CONNECTOR_TYPE_WEB_CRAWLER,
                 "Web Crawler (Sitemap)",

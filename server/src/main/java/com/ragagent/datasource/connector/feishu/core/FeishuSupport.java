@@ -77,13 +77,13 @@ public final class FeishuSupport {
      * 从 {@code DataSourceConfig} 的
      * credentials 里解出飞书配置并校验。
      *
-     * <p><b>{@code base_url} 刻意保留为显式覆写</b>：早在 lark 连接器存在之前就有
+     * <p><b>{@code baseUrl} 刻意保留为显式覆写</b>：早在 lark 连接器存在之前就有
      * 数据源把 "feishu" 连接器指向 {@code open.larksuite.com}，那条路径必须继续可用；
      * 没配时用 region 自己的 host 填上，让下游拿到的是具体值。</p>
      *
      * @throws ConnectorException {@code "config is nil"} /
-     *                            {@code "<type> app_id and app_secret are required"} /
-     *                            base_url 的 SSRF 拒绝
+     *                            {@code "<type> appId and appSecret are required"} /
+     *                            baseUrl 的 SSRF 拒绝
      */
     public static FeishuConfig parseFeishuConfig(DataSourceConfig config, FeishuRegion region) {
         if (config == null) {
@@ -106,7 +106,7 @@ public final class FeishuSupport {
 
         if (feishuConfig.getAppId().isEmpty() || feishuConfig.getAppSecret().isEmpty()) {
             throw new ConnectorException(
-                    region.connectorType() + " app_id and app_secret are required");
+                    region.connectorType() + " appId and appSecret are required");
         }
 
         if (feishuConfig.getBaseUrl().isEmpty()) {

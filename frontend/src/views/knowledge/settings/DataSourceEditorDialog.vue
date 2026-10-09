@@ -209,18 +209,18 @@ const driveRootLoaded = ref(false)
 const isDriveConnector = (type: string) => type === 'feishu_drive' || type === 'lark_drive'
 const isGitLabConnector = (type: string) => type === 'gitlab'
 
-interface GitLabProjectInput { project_id: string; ref: string; pathsText: string }
+interface GitLabProjectInput { projectId: string; ref: string; pathsText: string }
 const gitlabProjects = ref<GitLabProjectInput[]>([])
 function syncGitLabProjectsToSettings() {
   if (!isGitLabConnector(form.value.type)) return
   form.value.config.settings.projects = gitlabProjects.value
-    .filter(project => project.project_id.trim())
+    .filter(project => project.projectId.trim())
     .map(project => ({
-      project_id: project.project_id.trim(), ref: project.ref.trim(),
+      projectId: project.projectId.trim(), ref: project.ref.trim(),
       paths: project.pathsText.split(/[\n,]/).map(path => path.trim()).filter(Boolean),
     }))
 }
-function addGitLabProject() { gitlabProjects.value.push({ project_id: '', ref: '', pathsText: '' }) }
+function addGitLabProject() { gitlabProjects.value.push({ projectId: '', ref: '', pathsText: '' }) }
 function removeGitLabProject(index: number) { gitlabProjects.value.splice(index, 1); syncGitLabProjectsToSettings() }
 
 // extractDriveFolderToken accepts either a bare folder_token or a Drive folder
@@ -511,9 +511,9 @@ const connectorDefs = computed<ConnectorDef[]>(() => [
       'docx:document:readonly',
     ],
     fields: [
-      { key: 'app_id', labelKey: 'datasource.field.appId', placeholder: 'cli_xxxx' },
-      { key: 'app_secret', labelKey: 'datasource.field.appSecret', placeholder: '', secret: true },
-      { key: 'base_url', labelKey: 'datasource.field.baseUrl', placeholder: 'https://open.feishu.cn', optional: true, hintKey: 'datasource.field.baseUrlHint' },
+      { key: 'appId', labelKey: 'datasource.field.appId', placeholder: 'cli_xxxx' },
+      { key: 'appSecret', labelKey: 'datasource.field.appSecret', placeholder: '', secret: true },
+      { key: 'baseUrl', labelKey: 'datasource.field.baseUrl', placeholder: 'https://open.feishu.cn', optional: true, hintKey: 'datasource.field.baseUrlHint' },
     ],
   },
   {
@@ -532,9 +532,9 @@ const connectorDefs = computed<ConnectorDef[]>(() => [
       'docx:document:readonly',
     ],
     fields: [
-      { key: 'app_id', labelKey: 'datasource.field.appId', placeholder: 'cli_xxxx' },
-      { key: 'app_secret', labelKey: 'datasource.field.appSecret', placeholder: '', secret: true },
-      { key: 'base_url', labelKey: 'datasource.field.baseUrl', placeholder: 'https://open.feishu.cn', optional: true, hintKey: 'datasource.field.baseUrlHint' },
+      { key: 'appId', labelKey: 'datasource.field.appId', placeholder: 'cli_xxxx' },
+      { key: 'appSecret', labelKey: 'datasource.field.appSecret', placeholder: '', secret: true },
+      { key: 'baseUrl', labelKey: 'datasource.field.baseUrl', placeholder: 'https://open.feishu.cn', optional: true, hintKey: 'datasource.field.baseUrlHint' },
     ],
   },
   {
@@ -552,9 +552,9 @@ const connectorDefs = computed<ConnectorDef[]>(() => [
       'docx:document:readonly',
     ],
     fields: [
-      { key: 'app_id', labelKey: 'datasource.field.appId', placeholder: 'cli_xxxx' },
-      { key: 'app_secret', labelKey: 'datasource.field.appSecret', placeholder: '', secret: true },
-      { key: 'base_url', labelKey: 'datasource.field.baseUrl', placeholder: 'https://open.feishu.cn', optional: true, hintKey: 'datasource.field.baseUrlHint' },
+      { key: 'appId', labelKey: 'datasource.field.appId', placeholder: 'cli_xxxx' },
+      { key: 'appSecret', labelKey: 'datasource.field.appSecret', placeholder: '', secret: true },
+      { key: 'baseUrl', labelKey: 'datasource.field.baseUrl', placeholder: 'https://open.feishu.cn', optional: true, hintKey: 'datasource.field.baseUrlHint' },
     ],
   },
   {
@@ -570,9 +570,9 @@ const connectorDefs = computed<ConnectorDef[]>(() => [
       'docx:document:readonly',
     ],
     fields: [
-      { key: 'app_id', labelKey: 'datasource.field.appId', placeholder: 'cli_xxxx' },
-      { key: 'app_secret', labelKey: 'datasource.field.appSecret', placeholder: '', secret: true },
-      { key: 'base_url', labelKey: 'datasource.field.baseUrl', placeholder: 'https://open.larksuite.com', optional: true, hintKey: 'datasource.field.baseUrlHint' },
+      { key: 'appId', labelKey: 'datasource.field.appId', placeholder: 'cli_xxxx' },
+      { key: 'appSecret', labelKey: 'datasource.field.appSecret', placeholder: '', secret: true },
+      { key: 'baseUrl', labelKey: 'datasource.field.baseUrl', placeholder: 'https://open.larksuite.com', optional: true, hintKey: 'datasource.field.baseUrlHint' },
     ],
   },
   {
@@ -583,7 +583,7 @@ const connectorDefs = computed<ConnectorDef[]>(() => [
     permissionPageUrl: '',
     requiredPermissions: [],
     fields: [
-      { key: 'api_key', labelKey: 'datasource.field.integrationToken', placeholder: 'ntn_xxxx', secret: true },
+      { key: 'apiKey', labelKey: 'datasource.field.integrationToken', placeholder: 'ntn_xxxx', secret: true },
     ],
   },
   {
@@ -597,8 +597,8 @@ const connectorDefs = computed<ConnectorDef[]>(() => [
       'doc:read',
     ],
     fields: [
-      { key: 'api_token', labelKey: 'datasource.field.apiToken', placeholder: '', secret: true },
-      { key: 'base_url', labelKey: 'datasource.field.baseUrl', placeholder: 'https://www.yuque.com', optional: true, hintKey: 'datasource.field.baseUrlHint' },
+      { key: 'apiToken', labelKey: 'datasource.field.apiToken', placeholder: '', secret: true },
+      { key: 'baseUrl', labelKey: 'datasource.field.baseUrl', placeholder: 'https://www.yuque.com', optional: true, hintKey: 'datasource.field.baseUrlHint' },
     ],
   },
   {
@@ -611,9 +611,9 @@ const connectorDefs = computed<ConnectorDef[]>(() => [
     permissionPageUrl: 'https://ima.qq.com/agent-interface',
     requiredPermissions: [],
     fields: [
-      { key: 'client_id', labelKey: 'datasource.field.imaClientId', placeholder: '', secret: true },
-      { key: 'api_key', labelKey: 'datasource.field.imaApiKey', placeholder: '', secret: true },
-      { key: 'base_url', labelKey: 'datasource.field.baseUrl', placeholder: 'https://ima.qq.com', optional: true, hintKey: 'datasource.field.baseUrlHint' },
+      { key: 'clientId', labelKey: 'datasource.field.imaClientId', placeholder: '', secret: true },
+      { key: 'apiKey', labelKey: 'datasource.field.imaApiKey', placeholder: '', secret: true },
+      { key: 'baseUrl', labelKey: 'datasource.field.baseUrl', placeholder: 'https://ima.qq.com', optional: true, hintKey: 'datasource.field.baseUrlHint' },
     ],
   },
   {
@@ -630,7 +630,7 @@ const connectorDefs = computed<ConnectorDef[]>(() => [
   {
     type: 'gitlab', available: true, docUrl: '', permissionDocUrl: '', permissionPageUrl: '', requiredPermissions: [],
     fields: [
-      { key: 'base_url', labelKey: 'datasource.gitlab.baseUrl', placeholder: 'https://gitlab.example.com' },
+      { key: 'baseUrl', labelKey: 'datasource.gitlab.baseUrl', placeholder: 'https://gitlab.example.com' },
       { key: 'access_token', labelKey: 'datasource.gitlab.accessToken', placeholder: '', secret: true },
     ],
   },
@@ -698,7 +698,7 @@ watch(visible, async (v) => {
     if (isGitLabConnector(form.value.type)) {
       const savedProjects = Array.isArray(form.value.config.settings.projects) ? form.value.config.settings.projects : []
       gitlabProjects.value = savedProjects.map((project: any) => ({
-        project_id: String(project.project_id || ''), ref: String(project.ref || ''),
+        projectId: String(project.projectId || ''), ref: String(project.ref || ''),
         pathsText: Array.isArray(project.paths) ? project.paths.join('\n') : '',
       }))
     }
@@ -1004,7 +1004,7 @@ async function nextStep() {
   }
   if (step.value === 2 && isGitLabConnector(form.value.type)) {
     syncGitLabProjectsToSettings()
-    if (!gitlabProjects.value.some(project => project.project_id.trim())) {
+    if (!gitlabProjects.value.some(project => project.projectId.trim())) {
       MessagePlugin.warning(t('datasource.gitlab.projectRequired'))
       return
     }
@@ -1570,7 +1570,7 @@ const drawerConfirmText = computed(() => {
               <t-button variant="text" size="small" theme="danger" @click="removeGitLabProject(index)"><t-icon name="delete" /></t-button>
             </div>
             <label class="form-label required">{{ t('datasource.gitlab.projectId') }}</label>
-            <t-input v-model="project.project_id" :placeholder="t('datasource.gitlab.projectIdPlaceholder')" />
+            <t-input v-model="project.projectId" :placeholder="t('datasource.gitlab.projectIdPlaceholder')" />
             <label class="form-label">{{ t('datasource.gitlab.ref') }}</label>
             <t-input v-model="project.ref" :placeholder="t('datasource.gitlab.refPlaceholder')" />
             <label class="form-label">{{ t('datasource.gitlab.paths') }}</label>

@@ -572,10 +572,10 @@ class YuqueConnectorTest {
     void parseRejectsMissingApiToken() throws Exception {
         try (FakeYuque f = new FakeYuque()) {
             DataSourceConfig cfg = f.config();
-            cfg.getCredentials().put("api_token", "");
+            cfg.getCredentials().put("apiToken", "");
             assertThatThrownBy(() -> connector().validate(cfg))
                     .isInstanceOf(ConnectorException.InvalidCredentials.class)
-                    .hasMessageContaining("api_token");
+                    .hasMessageContaining("apiToken");
         }
     }
 
@@ -586,7 +586,7 @@ class YuqueConnectorTest {
                 .isInstanceOf(ConnectorException.InvalidConfig.class);
     }
 
-    /** 默认 base_url 只有作为**字符串**被断言（不写真实公网域名，见约定 §7.5 第 7 条）。 */
+    /** 默认 baseUrl 只有作为**字符串**被断言（不写真实公网域名，见约定 §7.5 第 7 条）。 */
     @Test
     void defaultBaseUrlIsThePublicYuqueHost() {
         YuqueConfig cfg = new YuqueConfig();

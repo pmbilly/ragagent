@@ -15,7 +15,7 @@ import java.util.List;
  * <h2>message 即哨兵原文</h2>
  * <p>无参构造器产出的 {@code getMessage()} 就是哨兵原文（例如
  * {@code "invalid credentials"}），带 detail 的构造器产出
- * {@code "invalid credentials: api_token is required"}——文本逐字稳定，便于日志检索。</p>
+ * {@code "invalid credentials: apiToken is required"}——文本逐字稳定，便于日志检索。</p>
  *
  * <h2>为什么这些 message 不直接上线</h2>
  * <p>与 {@code DataSourceException} 一样：真正的 HTTP 文案由 handler 另写

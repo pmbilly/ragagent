@@ -435,7 +435,7 @@ class DataSourceHttpContractTest {
      * {@code created_at} 都是零值，只有 {@code updated_at} 是真实的（更新时新时间
      * 被写回了内存对象）。
      *
-     * <p>同时钉住"凭据永不从这条端点流入"：body 里带的 {@code api_token} 不会出现，
+     * <p>同时钉住"凭据永不从这条端点流入"：body 里带的 {@code apiToken} 不会出现，
      * 原来在 credentials 里的 {@code feedUrls} 也会被整块换成库里的旧值
      * （旧值是 null）——所以响应里根本没有 credentials 键。</p>
      */
@@ -446,7 +446,7 @@ class DataSourceHttpContractTest {
                 "{\"name\":\"golden-rss-renamed\",\"syncMode\":\"full\",\"syncDeletions\":false,"
                         + "\"errorMessage\":\"\",\"config\":{\"type\":\"rss\",\"settings\":"
                         + "{\"feedUrls\":\"" + FEED_URL + "\"},\"credentials\":{\"feedUrls\":\""
-                        + FEED_URL + "\",\"api_token\":\"should-be-ignored\"}}}")
+                        + FEED_URL + "\",\"apiToken\":\"should-be-ignored\"}}}")
                 .header("Authorization", bearer));
 
         assertEquals(200, r.getResponse().getStatus(), raw(r));
@@ -481,7 +481,7 @@ class DataSourceHttpContractTest {
                 "{\"name\":\"golden-rss-renamed\",\"syncMode\":\"full\",\"syncDeletions\":false,"
                         + "\"errorMessage\":\"\",\"config\":{\"type\":\"rss\",\"settings\":"
                         + "{\"feedUrls\":\"" + FEED_URL + "\"},\"credentials\":{\"feedUrls\":\""
-                        + FEED_URL + "\",\"api_token\":\"should-be-ignored\"}}}")
+                        + FEED_URL + "\",\"apiToken\":\"should-be-ignored\"}}}")
                 .header("Authorization", bearer));
 
         MvcResult r = perform(get("/api/v1/datasource?kbId=" + KB_MAIN)

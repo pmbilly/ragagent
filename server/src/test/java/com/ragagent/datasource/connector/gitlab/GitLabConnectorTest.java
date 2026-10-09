@@ -118,7 +118,7 @@ class GitLabConnectorTest {
             }
         })) {
             GitLabConnector connector = new GitLabConnector();
-            DataSourceConfig ds = projectConfig(stub.baseUrl(), Map.of("project_id", "1",
+            DataSourceConfig ds = projectConfig(stub.baseUrl(), Map.of("projectId", "1",
                     "paths", List.of()));
             RecordingHandler handler = new RecordingHandler();
 
@@ -171,7 +171,7 @@ class GitLabConnectorTest {
             }
         })) {
             GitLabConnector connector = new GitLabConnector();
-            DataSourceConfig ds = projectConfig(stub.baseUrl(), Map.of("project_id", "1",
+            DataSourceConfig ds = projectConfig(stub.baseUrl(), Map.of("projectId", "1",
                     "paths", List.of()));
             RecordingHandler handler = new RecordingHandler();
 
@@ -197,7 +197,7 @@ class GitLabConnectorTest {
         GitLabServerStub stub = new GitLabServerStub(compareTimeoutRoute());
         try (stub) {
             GitLabConnector connector = new GitLabConnector();
-            DataSourceConfig ds = projectConfig(stub.baseUrl(), Map.of("project_id", "1",
+            DataSourceConfig ds = projectConfig(stub.baseUrl(), Map.of("projectId", "1",
                     "paths", List.of()));
             RecordingHandler handler = new RecordingHandler();
 
@@ -233,7 +233,7 @@ class GitLabConnectorTest {
         });
         try (stub) {
             GitLabConnector connector = new GitLabConnector();
-            DataSourceConfig ds = projectConfig(stub.baseUrl(), Map.of("project_id", "1",
+            DataSourceConfig ds = projectConfig(stub.baseUrl(), Map.of("projectId", "1",
                     "paths", List.of()));
             RecordingHandler handler = new RecordingHandler();
 
@@ -260,7 +260,7 @@ class GitLabConnectorTest {
         });
         try (stub) {
             GitLabConnector connector = new GitLabConnector();
-            DataSourceConfig ds = projectConfig(stub.baseUrl(), Map.of("project_id", "1",
+            DataSourceConfig ds = projectConfig(stub.baseUrl(), Map.of("projectId", "1",
                     "paths", List.of()));
             RecordingHandler handler = new RecordingHandler();
 
@@ -289,7 +289,7 @@ class GitLabConnectorTest {
         });
         try (stub) {
             GitLabConnector connector = new GitLabConnector();
-            DataSourceConfig ds = projectConfig(stub.baseUrl(), Map.of("project_id", "1",
+            DataSourceConfig ds = projectConfig(stub.baseUrl(), Map.of("projectId", "1",
                     "paths", List.of()));
 
             RecordingHandler handler = new RecordingHandler();
@@ -341,13 +341,13 @@ class GitLabConnectorTest {
             GitLabConnector connector = new GitLabConnector();
             DataSourceConfig ds = new DataSourceConfig();
             Map<String, Object> credentials = new LinkedHashMap<>();
-            credentials.put("base_url", stub.baseUrl());
+            credentials.put("baseUrl", stub.baseUrl());
             credentials.put("access_token", "token");
             ds.setCredentials(credentials);
             Map<String, Object> settings = new LinkedHashMap<>();
             settings.put("projects", List.of(
-                    Map.of("project_id", "1", "ref", "master", "paths", List.of()),
-                    Map.of("project_id", "2", "ref", "master", "paths", List.of())));
+                    Map.of("projectId", "1", "ref", "master", "paths", List.of()),
+                    Map.of("projectId", "2", "ref", "master", "paths", List.of())));
             ds.setSettings(settings);
 
             Connector.FetchIncrementalResult first = connector.fetchIncremental(ds, null);
@@ -382,14 +382,14 @@ class GitLabConnectorTest {
         });
         try (stub) {
             GitLabConnector connector = new GitLabConnector();
-            DataSourceConfig ds = projectConfig(stub.baseUrl(), Map.of("project_id", "1",
+            DataSourceConfig ds = projectConfig(stub.baseUrl(), Map.of("projectId", "1",
                     "paths", List.of()));
 
             List<FetchedItem> items = connector.fetchAll(ds, null);
 
             assertThat(items).hasSize(1);
             assertThat(items.get(0).getMetadata()).containsEntry("gitlab_ref", "main");
-            // tree 用的是选择里的 project_id 原文；raw 用的是 API 返回的数字 ID
+            // tree 用的是选择里的 projectId 原文；raw 用的是 API 返回的数字 ID
             assertThat(stub.requestPaths).contains("/api/v4/projects/1/repository/tree",
                     "/api/v4/projects/1/repository/files/README%2Emd/raw");
         }
@@ -409,7 +409,7 @@ class GitLabConnectorTest {
         });
         try (stub) {
             GitLabConnector connector = new GitLabConnector();
-            DataSourceConfig ds = projectConfig(stub.baseUrl(), Map.of("project_id", "1",
+            DataSourceConfig ds = projectConfig(stub.baseUrl(), Map.of("projectId", "1",
                     "paths", List.of()));
 
             assertThat(connector.fetchAll(ds, null)).isNull();
@@ -446,7 +446,7 @@ class GitLabConnectorTest {
         });
         try (stub) {
             GitLabConnector connector = new GitLabConnector();
-            DataSourceConfig ds = projectConfig(stub.baseUrl(), Map.of("project_id", "1",
+            DataSourceConfig ds = projectConfig(stub.baseUrl(), Map.of("projectId", "1",
                     "paths", List.of()));
 
             List<Resource> projects = connector.listResources(ds, "");
@@ -552,7 +552,7 @@ class GitLabConnectorTest {
     private static DataSourceConfig projectConfig(String baseUrl, Map<String, Object> project) {
         DataSourceConfig ds = new DataSourceConfig();
         Map<String, Object> credentials = new LinkedHashMap<>();
-        credentials.put("base_url", baseUrl);
+        credentials.put("baseUrl", baseUrl);
         credentials.put("access_token", "token");
         ds.setCredentials(credentials);
         Map<String, Object> settings = new LinkedHashMap<>();

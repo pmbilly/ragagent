@@ -73,17 +73,17 @@ public final class ConnectorHttp {
     }
 
     // ------------------------------------------------------------------
-    // base_url 校验与客户端工厂
+    // baseUrl 校验与客户端工厂
     // ------------------------------------------------------------------
 
     /**
-     * 把连接器的 {@code base_url} 过一遍 SSRF 策略。
+     * 把连接器的 {@code baseUrl} 过一遍 SSRF 策略。
      *
      * <p>空串放行（调用方会在发请求前套上自己的默认值）；没有 scheme 时补 {@code https://}
      * 之后再校验——这一步很关键：{@code evil.internal} 这种裸主机会被补成
      * {@code https://evil.internal} 再被解析，否则整串会被 URL 解析器当成 path 而绕过主机校验。</p>
      *
-     * @throws ConnectorException 消息为 {@code "base_url SSRF validation failed: <SsrfGuard 原文>"}
+     * @throws ConnectorException 消息为 {@code "baseUrl SSRF validation failed: <SsrfGuard 原文>"}
      */
     public static void validateConnectorBaseUrl(String rawUrl) {
         String url = rawUrl == null ? "" : rawUrl.trim();
@@ -96,7 +96,7 @@ public final class ConnectorHttp {
         try {
             ssrfGuard.validateURLForSSRF(url);
         } catch (SsrfGuard.SsrfException e) {
-            throw new ConnectorException("base_url SSRF validation failed: " + e.getMessage(), e);
+            throw new ConnectorException("baseUrl SSRF validation failed: " + e.getMessage(), e);
         }
     }
 

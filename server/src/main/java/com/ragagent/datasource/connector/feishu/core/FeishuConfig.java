@@ -6,7 +6,6 @@ import java.time.ZoneOffset;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 飞书连接器配置与导出格式常量。
@@ -17,8 +16,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * 所以本类<b>不需要</b>{@code @JsonIgnore}/蛇形键名/往返测试那套契约治理
  * （只有会落 jsonb 或作响应体的类型才需要）。</p>
  *
- * <p>键名沿用 credentials 里的既定键（{@code app_id}/{@code app_secret}/{@code base_url}/{@code timezone}），
- * 因为<b>入参</b>是外部系统/前端写进 credentials 的 JSON——解析不认这些键就读不出凭据。</p>
+ * <p>键名＝字段名（{@code appId}/{@code appSecret}/{@code baseUrl}/{@code timezone}）——B139 换锚口径：
+ * <b>入参</b>是前端写进 credentials 的 JSON（同批已改），而**出网字段**（飞书 OAuth 的
+ * {@code app_id}/{@code app_secret}）由 {@link FeishuTransport} 另建，与本类的键解耦。</p>
  *
  * <h2>落库行为清单</h2>
  * <ol>
@@ -73,13 +73,10 @@ public class FeishuConfig {
             EXPORT_TYPE_XLSX, ".xlsx",
             EXPORT_TYPE_PDF, ".pdf");
 
-    @JsonProperty("app_id")
     private String appId = "";
 
-    @JsonProperty("app_secret")
     private String appSecret = "";
 
-    @JsonProperty("base_url")
     private String baseUrl = "";
 
     /**
@@ -89,7 +86,6 @@ public class FeishuConfig {
      * 用 UTC 渲染会把日期整体挪一天。空 → {@code GMT+8}（飞书大陆租户），
      * Lark 其他时区的租户要显式设置。</p>
      */
-    @JsonProperty("timezone")
     private String timezone = "";
 
     public FeishuConfig() {
@@ -131,7 +127,7 @@ public class FeishuConfig {
      * 没配就回飞书默认 origin。
      *
      * <p>注意这是<b>二级兜底</b>：一级是 {@link FeishuSupport#parseFeishuConfig}
-     * 用 region 的 host 填上（那样 {@code base_url} 留空的老数据源能跟着 region 走）。</p>
+     * 用 region 的 host 填上（那样 {@code baseUrl} 留空的老数据源能跟着 region 走）。</p>
      */
     public String resolveBaseUrl() {
         return baseUrl.isEmpty() ? DEFAULT_BASE_URL : baseUrl;

@@ -209,13 +209,13 @@ final class FakeYuque implements AutoCloseable {
         }
     }
 
-    /** 构造 connector 用的配置（base_url 指向本 stub）。 */
+    /** 构造 connector 用的配置（baseUrl 指向本 stub）。 */
     DataSourceConfig config(String... resourceIds) {
         DataSourceConfig cfg = new DataSourceConfig();
         cfg.setType("yuque");
         Map<String, Object> credentials = new LinkedHashMap<>();
-        credentials.put("api_token", "tok-super-secret-value-1234");
-        credentials.put("base_url", baseUrl());
+        credentials.put("apiToken", "tok-super-secret-value-1234");
+        credentials.put("baseUrl", baseUrl());
         cfg.setCredentials(credentials);
         cfg.setResourceIds(new ArrayList<>(List.of(resourceIds)));
         return cfg;

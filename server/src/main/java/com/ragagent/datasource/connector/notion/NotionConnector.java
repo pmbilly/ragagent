@@ -601,12 +601,12 @@ public final class NotionConnector implements Connector {
     }
 
     /**
-     * {@code settings.base_url} 是非空字符串就用它，
+     * {@code settings.baseUrl} 是非空字符串就用它，
      * 否则回 {@code DefaultBaseURL}。
      */
     static String extractBaseUrl(DataSourceConfig config) {
         if (config != null && config.getSettings() != null) {
-            Object url = config.getSettings().get("base_url");
+            Object url = config.getSettings().get("baseUrl");
             if (url instanceof String s && !s.isEmpty()) {
                 return s;
             }

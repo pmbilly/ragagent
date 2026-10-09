@@ -75,7 +75,7 @@ public final class GitLabClient {
      *       {@code .../api/v4extra/api/v4}（这条是刻意保留的既有行为）。</li>
      * </ol>
      *
-     * @throws ConnectorException 配置缺失或 base_url 未过 SSRF 策略
+     * @throws ConnectorException 配置缺失或 baseUrl 未过 SSRF 策略
      */
     public static GitLabClient newClient(String baseUrl, String token) {
         String base = Whitespace.trimSpace(baseUrl).replaceAll("^/+|/+$", "");

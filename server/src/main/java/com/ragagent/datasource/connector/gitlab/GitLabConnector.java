@@ -26,7 +26,7 @@ import com.ragagent.common.text.Whitespace;
  * GitLab 数据源连接器。
  *
  * <h2>无状态</h2>
- * <p>每个数据源自带 base_url 与 access_token（存在加密后的 credentials 里）。
+ * <p>每个数据源自带 baseUrl 与 access_token（存在加密后的 credentials 里）。
  * <b>刻意不复用</b>注册表里的实例，
  * 否则两个数据源会共用第一次拿到的 token。
  * {@link #configured} 每次调用都造一个新 client，连接器本身不持有任何字段。</p>
@@ -92,7 +92,7 @@ public class GitLabConnector implements StreamingConnector {
             throw new ConnectorException.InvalidConfig();
         }
         Map<String, Object> creds = config.getCredentials();
-        String baseUrl = asString(creds, "base_url");
+        String baseUrl = asString(creds, "baseUrl");
         String token = asString(creds, "access_token");
         GitLabClient client = GitLabClient.newClient(baseUrl, token);
         return new Configured(client, client.baseUrl());
@@ -185,7 +185,7 @@ public class GitLabConnector implements StreamingConnector {
      * 递归遍历配置的目录、逐个文件拉正文。
      *
      * <p><b>注意 id 的不对称</b>：{@code tree} 走的是<b>选择里的</b>
-     * {@code project_id} 原文（可以是 {@code group/project}），而 {@code raw}
+     * {@code projectId} 原文（可以是 {@code group/project}），而 {@code raw}
      * 走的是 API 返回的<b>数字 ID</b>。{@link #fetchStream} 则两者都用数字 ID
      * （它先调了 {@code project}）。这不是笔误，改任一处都会让请求打到别的 URL 上。</p>
      *

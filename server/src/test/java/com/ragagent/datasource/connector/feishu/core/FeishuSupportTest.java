@@ -98,9 +98,9 @@ class FeishuSupportTest {
         @Test
         void valid() {
             Map<String, Object> creds = new LinkedHashMap<>();
-            creds.put("app_id", "id1");
-            creds.put("app_secret", "sec1");
-            creds.put("base_url", "https://open.feishu.cn");
+            creds.put("appId", "id1");
+            creds.put("appSecret", "sec1");
+            creds.put("baseUrl", "https://open.feishu.cn");
             DataSourceConfig ds = new DataSourceConfig();
             ds.setCredentials(creds);
 
@@ -123,10 +123,10 @@ class FeishuSupportTest {
 
             for (int i = 0; i < cases.length; i++) {
                 Map<String, Object> creds = new LinkedHashMap<>();
-                creds.put("app_id", "cli_x");
-                creds.put("app_secret", "s");
+                creds.put("appId", "cli_x");
+                creds.put("appSecret", "s");
                 if (cases[i][1] != null) {
-                    creds.put("base_url", cases[i][1]);
+                    creds.put("baseUrl", cases[i][1]);
                 }
                 DataSourceConfig ds = new DataSourceConfig();
                 ds.setCredentials(creds);
@@ -145,13 +145,13 @@ class FeishuSupportTest {
         @Test
         void missingCredentials() {
             Map<String, Object> creds = new LinkedHashMap<>();
-            creds.put("app_id", "id1"); // 缺 app_secret
+            creds.put("appId", "id1"); // 缺 appSecret
             DataSourceConfig ds = new DataSourceConfig();
             ds.setCredentials(creds);
 
             assertThatThrownBy(() -> FeishuSupport.parseFeishuConfig(ds, FeishuRegion.FEISHU))
                     .isInstanceOf(ConnectorException.class)
-                    .hasMessage("feishu app_id and app_secret are required");
+                    .hasMessage("feishu appId and appSecret are required");
         }
 
         @Test
@@ -159,15 +159,15 @@ class FeishuSupportTest {
             DataSourceConfig ds = new DataSourceConfig();
             assertThatThrownBy(() -> FeishuSupport.parseFeishuConfig(ds, FeishuRegion.LARK))
                     .isInstanceOf(ConnectorException.class)
-                    .hasMessage("lark app_id and app_secret are required");
+                    .hasMessage("lark appId and appSecret are required");
         }
 
         @Test
         @DisplayName("timezone 从 settings 里取，且被 trim（对照 Go 的 strings.TrimSpace）")
         void timezoneFromSettings() {
             Map<String, Object> creds = new LinkedHashMap<>();
-            creds.put("app_id", "id1");
-            creds.put("app_secret", "sec1");
+            creds.put("appId", "id1");
+            creds.put("appSecret", "sec1");
             DataSourceConfig ds = new DataSourceConfig();
             ds.setCredentials(creds);
             ds.setSettings(new LinkedHashMap<>(Map.of("timezone", "  Asia/Shanghai  ")));
@@ -180,8 +180,8 @@ class FeishuSupportTest {
         @DisplayName("settings.timezone 非字符串时忽略（对照 Go 的 type assertion）")
         void timezoneNonStringIgnored() {
             Map<String, Object> creds = new LinkedHashMap<>();
-            creds.put("app_id", "id1");
-            creds.put("app_secret", "sec1");
+            creds.put("appId", "id1");
+            creds.put("appSecret", "sec1");
             DataSourceConfig ds = new DataSourceConfig();
             ds.setCredentials(creds);
             ds.setSettings(new LinkedHashMap<>(Map.of("timezone", 8)));

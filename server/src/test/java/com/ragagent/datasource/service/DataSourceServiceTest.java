@@ -506,11 +506,11 @@ class DataSourceServiceTest {
         DataSource ds = newDataSource(DataSourceConstants.CONNECTOR_TYPE_NOTION, null, null);
 
         Map<String, Object> creds = new LinkedHashMap<>();
-        creds.put("api_token", "secret-token");
+        creds.put("apiToken", "secret-token");
         DataSource updated = service.updateDataSourceCredentials(ds.getId(), creds);
 
         DataSourceConfig parsed = updated.parseConfig();
-        assertThat(parsed.getCredentials()).containsEntry("api_token", "secret-token");
+        assertThat(parsed.getCredentials()).containsEntry("apiToken", "secret-token");
         assertThat(parsed.hasConfiguredCredentials(updated.getType())).isTrue();
         // 写库后立刻做一次真实连接校验（当场告诉用户新 token 对不对）
         assertThat(notion.validateCalls).isEqualTo(1);
@@ -537,7 +537,7 @@ class DataSourceServiceTest {
     @Test
     void clearCredentialsWipesConfiguredMap() {
         DataSource ds = newDataSource(DataSourceConstants.CONNECTOR_TYPE_NOTION, null, null);
-        service.updateDataSourceCredentials(ds.getId(), Map.of("api_token", "t"));
+        service.updateDataSourceCredentials(ds.getId(), Map.of("apiToken", "t"));
 
         service.clearDataSourceCredentials(ds.getId());
 
