@@ -544,3 +544,25 @@ B116 搬家时已经搬过一批资源（`common/text/*.txt`），这类风险�
 3. **ArchUnit 的导入过滤器要排 testFixtures 的两种形态**：项目依赖在 ArchUnit 眼里是 **jar**
    （B116 同款）⇒ 既排 `/classes/java/testFixtures/`（dir）也排 `-test-fixtures.jar`（jar）；
    否则 testFixtures 里的 `System.getenv`（EmbeddedRedis 探测 redis-server）会把 A1 判红。
+
+## 10. B162：P1+P2（L1 对齐 + `:engine` 边界校准）+ 用户定案的 5 模块图
+
+**用户定案（2026-10-09）**：`:common` / `:engine` / `:domains` / `:channels` / `:boot`；`datasource` 与
+`:misc` 四域（`embedchannel` 除外）并进 `:domains`；`:channels` = `im` + `embedchannel` + `channels.api`。
+
+| 动作 | 内容 | 实测依据 |
+|---|---|---|
+| P1 | `stream` 下沉 `:common`（含 `TokenUsage`/`PromptCacheStatus` 沉 `common.llm`、`EmbeddedRedis` 归 common testFixtures）| `stream → llm` 仅 **1 条边**；其余出边只有 `common` |
+| P2 | `model` + `vectorstore` 出 `:engine` | 引擎内 **0 条**入边 ⇒ 零解边；顺带修 L2 有 controller |
+| 待 P3 | `tracing` 下沉（`tracing → llm/embedding/rerank` **11 条边**）| 需逐边定性：沉载荷 or 反转接口 |
+| 待 P4 | `:channels` + `channels.*` 改名 | 前置：`auth ⇄ apikey` **22 + 22** 处互依 ✗ |
+
+**新沉淀（写给下一次拆模块 / 新建模块）**：
+
+1. **新模块的测试任务必须显式配 `useJUnitPlatform()`**：B162 实测 `common` 的 8 个测试类自 B116
+   起**静默未跑**（`build` 里 `common tests=0` 仍全绿）⇒ 补配后 +104 个测试。这与会"静默失覆盖"的
+   守卫路径是同一族坑（B116 记录过）。
+2. **共享测试基座放最底层模块的 testFixtures**：`EmbeddedRedis` 从 `:engine` 移到 `:common`
+   （否则 `:common` 的测试反向依赖 `:engine` ⇒ 项目环）。
+3. **javadoc 的 `{@link}` 是跨模块边**：每次搬家后 doclint 守卫（B119）都会把"注释还指着旧模块类型"
+   当构建错误抓出来（B161 二例、B162 一例）⇒ 搬家批次里要预留这一步。

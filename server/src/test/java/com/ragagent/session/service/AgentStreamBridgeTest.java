@@ -30,7 +30,7 @@ import com.ragagent.event.payload.AgentThoughtData;
 import com.ragagent.event.payload.AgentToolCallData;
 import com.ragagent.event.payload.AgentToolResultData;
 import com.ragagent.event.payload.MemoryRecalledData;
-import com.ragagent.llm.domain.TokenUsage;
+import com.ragagent.common.llm.TokenUsage;
 import com.ragagent.session.domain.Message;
 import com.ragagent.stream.StreamEvent;
 import com.ragagent.stream.StreamManager;

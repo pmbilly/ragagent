@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ragagent.agent.domain.AgentStep;
-import com.ragagent.llm.domain.TokenUsage;
+import com.ragagent.common.llm.TokenUsage;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.session.domain.MentionedItem;
 import com.ragagent.session.domain.Message;

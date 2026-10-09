@@ -24,7 +24,7 @@ import com.ragagent.event.EventIds;
 import com.ragagent.event.EventType;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatResponse;
-import com.ragagent.llm.domain.TokenUsage;
+import com.ragagent.common.llm.TokenUsage;
 import com.ragagent.common.web.ToolJson;
 import com.ragagent.llm.domain.FunctionCall;
 

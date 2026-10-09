@@ -14,7 +14,7 @@ import com.ragagent.event.EventJson;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatResponse;
 import com.ragagent.llm.domain.StreamResponse;
-import com.ragagent.llm.domain.TokenUsage;
+import com.ragagent.common.llm.TokenUsage;
 import com.ragagent.support.ContractJson;
 import com.ragagent.agent.compaction.CompactionSettings;
 import com.ragagent.llm.domain.ChatTool;

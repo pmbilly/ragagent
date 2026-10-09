@@ -11,7 +11,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ragagent.agent.domain.AgentStep;
 import com.ragagent.common.web.PgJsonTypeHandler;
-import com.ragagent.llm.domain.TokenUsage;
+import com.ragagent.common.llm.TokenUsage;
 import com.ragagent.common.retrieval.SearchResult;
 
 /**

@@ -51,7 +51,7 @@ import com.ragagent.llm.domain.ChatTool;
 import com.ragagent.common.llm.ResponseType;
 import com.ragagent.llm.domain.StreamResponse;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.llm.domain.TokenUsage;
+import com.ragagent.common.llm.TokenUsage;
 import com.ragagent.storage.dto.StorageConfig;
 import com.ragagent.common.vectorstore.ConnectionConfig;
 import com.ragagent.common.vectorstore.IndexConfig;
