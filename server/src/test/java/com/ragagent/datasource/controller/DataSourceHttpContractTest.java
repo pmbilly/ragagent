@@ -68,7 +68,7 @@ import com.ragagent.support.ContractJson;
  *   → create(无 body / 非法 JSON / 未注册连接器 / 未知库 / 缺 kb_id / 坏配置 / 成功 201)
  *   → get / put / get / list / get(未知 id)
  *   → validate / validate-credentials(缺字段, 成功) / resources / resource-ancestors(空, 非空)
- *   → credentials PUT(缺字段 / 空 map / 无秘密 / 有 auth_headers) / PUT 非法字段 / get
+ *   → credentials PUT(缺字段 / 空 map / 无秘密 / 有 authHeaders) / PUT 非法字段 / get
  *   → sync → logs(limit=0 / limit=abc / offset=-5 / limit=2) → log / log(未知)
  *   → pause / resume → viewer 403 → 删数据源 → get(已删)
  * </pre>
@@ -405,7 +405,7 @@ class DataSourceHttpContractTest {
             var cfg = root.path("config");
             org.assertj.core.api.Assertions.assertThat(cfg.path("type").asText()).isEqualTo("rss");
             org.assertj.core.api.Assertions.assertThat(
-                    cfg.path("settings").path("feed_urls").asText()).isEqualTo(FEED_URL);
+                    cfg.path("settings").path("feedUrls").asText()).isEqualTo(FEED_URL);
             var creds = root.path("credentials").path("credentials");
             org.assertj.core.api.Assertions.assertThat(creds.path("configured").asBoolean()).isFalse();
         }
@@ -436,7 +436,7 @@ class DataSourceHttpContractTest {
      * 被写回了内存对象）。
      *
      * <p>同时钉住"凭据永不从这条端点流入"：body 里带的 {@code api_token} 不会出现，
-     * 原来在 credentials 里的 {@code feed_urls} 也会被整块换成库里的旧值
+     * 原来在 credentials 里的 {@code feedUrls} 也会被整块换成库里的旧值
      * （旧值是 null）——所以响应里根本没有 credentials 键。</p>
      */
     @Test
@@ -445,7 +445,7 @@ class DataSourceHttpContractTest {
         MvcResult r = perform(jsonBody(put("/api/v1/datasource/" + id),
                 "{\"name\":\"golden-rss-renamed\",\"syncMode\":\"full\",\"syncDeletions\":false,"
                         + "\"errorMessage\":\"\",\"config\":{\"type\":\"rss\",\"settings\":"
-                        + "{\"feed_urls\":\"" + FEED_URL + "\"},\"credentials\":{\"feed_urls\":\""
+                        + "{\"feedUrls\":\"" + FEED_URL + "\"},\"credentials\":{\"feedUrls\":\""
                         + FEED_URL + "\",\"api_token\":\"should-be-ignored\"}}}")
                 .header("Authorization", bearer));
 
@@ -464,7 +464,7 @@ class DataSourceHttpContractTest {
             var cfg = root.path("config");
             org.assertj.core.api.Assertions.assertThat(cfg.path("type").asText()).isEqualTo("rss");
             org.assertj.core.api.Assertions.assertThat(
-                    cfg.path("settings").path("feed_urls").asText()).isEqualTo(FEED_URL);
+                    cfg.path("settings").path("feedUrls").asText()).isEqualTo(FEED_URL);
         }
 
         // 库里真实的行没有被这些零值覆盖：type/status/schedule 都还在
@@ -480,7 +480,7 @@ class DataSourceHttpContractTest {
         perform(jsonBody(put("/api/v1/datasource/" + id),
                 "{\"name\":\"golden-rss-renamed\",\"syncMode\":\"full\",\"syncDeletions\":false,"
                         + "\"errorMessage\":\"\",\"config\":{\"type\":\"rss\",\"settings\":"
-                        + "{\"feed_urls\":\"" + FEED_URL + "\"},\"credentials\":{\"feed_urls\":\""
+                        + "{\"feedUrls\":\"" + FEED_URL + "\"},\"credentials\":{\"feedUrls\":\""
                         + FEED_URL + "\",\"api_token\":\"should-be-ignored\"}}}")
                 .header("Authorization", bearer));
 
@@ -511,11 +511,11 @@ class DataSourceHttpContractTest {
         assertGoldenBody("ds-validate-credentials-bad.json", raw(r));
     }
 
-    /** 裸凭据试连（不落库）：{@code feed_urls} 可以走 credentials 这个历史位置。 */
+    /** 裸凭据试连（不落库）：{@code feedUrls} 可以走 credentials 这个历史位置。 */
     @Test
     void validateCredentialsMatchesGoAndPersistsNothing() throws Exception {
         MvcResult r = perform(jsonBody(post("/api/v1/datasource/validate-credentials"),
-                "{\"type\":\"rss\",\"credentials\":{\"feed_urls\":\"" + FEED_URL + "\"}}")
+                "{\"type\":\"rss\",\"credentials\":{\"feedUrls\":\"" + FEED_URL + "\"}}")
                 .header("Authorization", bearer));
         assertEquals(200, r.getResponse().getStatus(), raw(r));
         assertGoldenBody("ds-validate-credentials.json", raw(r));
@@ -588,26 +588,26 @@ class DataSourceHttpContractTest {
     }
 
     /**
-     * RSS 的 {@code feed_urls} 是<b>非密钥配置</b>：它会被从 credentials 里剥掉，
+     * RSS 的 {@code feedUrls} 是<b>非密钥配置</b>：它会被从 credentials 里剥掉，
      * 所以"配没配"仍是 false。这一条把"configured 的判据按连接器各异"钉住了。
      */
     @Test
     void credentialsPutStripsRssFeedUrlsAndStaysUnconfigured() throws Exception {
         String id = createId();
         MvcResult r = perform(jsonBody(put("/api/v1/datasource/" + id + "/credentials"),
-                "{\"credentials\":{\"feed_urls\":\"" + FEED_URL + "\"}}")
+                "{\"credentials\":{\"feedUrls\":\"" + FEED_URL + "\"}}")
                 .header("Authorization", bearer));
         assertEquals(200, r.getResponse().getStatus(), raw(r));
         assertGoldenBody("ds-credentials-put.json", raw(r));
 
-        // 读回来确认：credentials 里没有 feed_urls（被剥掉）、settings 里照旧，
+        // 读回来确认：credentials 里没有 feedUrls（被剥掉）、settings 里照旧，
         // configured 仍是 false。⚠️ 这里不逐字节比 ds-get-after-credentials.json
         // ——那条 golden 录在"先 PUT 改过名字与 sync_mode"之后，状态不同。
         MvcResult after = perform(get("/api/v1/datasource/" + id).header("Authorization", bearer));
         String afterBody = raw(after);
         assertThat(afterBody).contains("\"configured\":false");
         assertThat(afterBody).contains(
-                "\"settings\":{\"feed_urls\":\"" + FEED_URL + "\"}");
+                "\"settings\":{\"feedUrls\":\"" + FEED_URL + "\"}");
         assertThat(afterBody).doesNotContain("enc:v1:");
         // 落库的 config 里 credentials 为 null（剥完 map 空了 → 整键为 null）
         String stored = jdbc.queryForObject(
@@ -616,13 +616,13 @@ class DataSourceHttpContractTest {
         assertThat(stored).doesNotContain("\"credentials\":{\"");
     }
 
-    /** 给了 {@code auth_headers}（这才是 RSS 的密钥）→ configured 翻成 true。 */
+    /** 给了 {@code authHeaders}（这才是 RSS 的密钥）→ configured 翻成 true。 */
     @Test
     void credentialsPutWithAuthHeadersReportsConfigured() throws Exception {
         String id = createId();
         MvcResult r = perform(jsonBody(put("/api/v1/datasource/" + id + "/credentials"),
-                "{\"credentials\":{\"feed_urls\":\"" + FEED_URL
-                        + "\",\"auth_headers\":\"X-Token: abc\"}}")
+                "{\"credentials\":{\"feedUrls\":\"" + FEED_URL
+                        + "\",\"authHeaders\":\"X-Token: abc\"}}")
                 .header("Authorization", bearer));
         assertEquals(200, r.getResponse().getStatus(), raw(r));
         assertGoldenBody("ds-credentials-put-auth-headers.json", raw(r));
@@ -644,7 +644,7 @@ class DataSourceHttpContractTest {
     void credentialsDeleteWipesAndIsIdempotent() throws Exception {
         String id = createId();
         perform(jsonBody(put("/api/v1/datasource/" + id + "/credentials"),
-                "{\"credentials\":{\"auth_headers\":\"X-Token: abc\"}}")
+                "{\"credentials\":{\"authHeaders\":\"X-Token: abc\"}}")
                 .header("Authorization", bearer));
 
         MvcResult first = perform(delete("/api/v1/datasource/" + id + "/credentials/credentials")
@@ -874,8 +874,8 @@ class DataSourceHttpContractTest {
         return perform(jsonBody(post("/api/v1/datasource"),
                 "{\"name\":\"golden-rss\",\"type\":\"rss\",\"knowledgeBaseId\":\"" + KB_MAIN
                         + "\",\"syncSchedule\":\"0 0 * * * *\",\"config\":{\"type\":\"rss\","
-                        + "\"settings\":{\"feed_urls\":\"" + FEED_URL + "\"},"
-                        + "\"credentials\":{\"feed_urls\":\"" + FEED_URL + "\"}}}")
+                        + "\"settings\":{\"feedUrls\":\"" + FEED_URL + "\"},"
+                        + "\"credentials\":{\"feedUrls\":\"" + FEED_URL + "\"}}}")
                 .header("Authorization", bearer));
     }
 

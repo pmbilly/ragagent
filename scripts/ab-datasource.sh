@@ -143,7 +143,7 @@ cmp_resp create_null_cfg
 
 echo "==> 2) 创建成功 → 读 → 改 → 列表"
 create_body() { # create_body <kb>
-  printf '{"name":"ab-rss","type":"rss","knowledge_base_id":"%s","sync_schedule":"0 0 * * * *","config":{"type":"rss","settings":{"feed_urls":"%s"},"credentials":{"feed_urls":"%s"}}}' "$1" "${FEED}" "${FEED}"
+  printf '{"name":"ab-rss","type":"rss","knowledge_base_id":"%s","sync_schedule":"0 0 * * * *","config":{"type":"rss","settings":{"feedUrls":"%s"},"credentials":{"feedUrls":"%s"}}}' "$1" "${FEED}" "${FEED}"
 }
 hit create "${GO_PORT}" "${GO_TOKEN}" POST /datasource -H 'Content-Type: application/json' \
   -d "$(create_body "${GO_KB}")"
@@ -163,7 +163,7 @@ hit get_unknown "${GO_PORT}" "${GO_TOKEN}" GET "/datasource/${UNKNOWN}"
 hit get_unknown "${JAVA_PORT}" "${JAVA_TOKEN}" GET "/datasource/${UNKNOWN}"
 cmp_resp get_unknown
 
-PUT_BODY='{"name":"ab-rss-renamed","sync_mode":"full","sync_deletions":false,"error_message":"","config":{"type":"rss","settings":{"feed_urls":"'"${FEED}"'"},"credentials":{"feed_urls":"'"${FEED}"'","api_token":"should-be-ignored"}}}'
+PUT_BODY='{"name":"ab-rss-renamed","sync_mode":"full","sync_deletions":false,"error_message":"","config":{"type":"rss","settings":{"feedUrls":"'"${FEED}"'"},"credentials":{"feedUrls":"'"${FEED}"'","api_token":"should-be-ignored"}}}'
 hit update "${GO_PORT}" "${GO_TOKEN}" PUT "/datasource/${GO_DS}" -H 'Content-Type: application/json' -d "${PUT_BODY}"
 hit update "${JAVA_PORT}" "${JAVA_TOKEN}" PUT "/datasource/${JAVA_DS}" -H 'Content-Type: application/json' -d "${PUT_BODY}"
 cmp_resp update
@@ -227,9 +227,9 @@ hit validate_creds_bad "${JAVA_PORT}" "${JAVA_TOKEN}" POST /datasource/validate-
 cmp_resp validate_creds_bad
 
 hit validate_creds "${GO_PORT}" "${GO_TOKEN}" POST /datasource/validate-credentials -H 'Content-Type: application/json' \
-  -d '{"type":"rss","credentials":{"feed_urls":"'"${FEED}"'"}}'
+  -d '{"type":"rss","credentials":{"feedUrls":"'"${FEED}"'"}}'
 hit validate_creds "${JAVA_PORT}" "${JAVA_TOKEN}" POST /datasource/validate-credentials -H 'Content-Type: application/json' \
-  -d '{"type":"rss","credentials":{"feed_urls":"'"${FEED}"'"}}'
+  -d '{"type":"rss","credentials":{"feedUrls":"'"${FEED}"'"}}'
 cmp_resp validate_creds
 
 hit resources "${GO_PORT}" "${GO_TOKEN}" GET "/datasource/${GO_DS}/resources"
@@ -253,15 +253,15 @@ for spec in "creds_missing:{}" "creds_empty:{\"credentials\":{}}"; do
 done
 
 hit creds_put "${GO_PORT}" "${GO_TOKEN}" PUT "/datasource/${GO_DS}/credentials" -H 'Content-Type: application/json' \
-  -d '{"credentials":{"feed_urls":"'"${FEED}"'"}}'
+  -d '{"credentials":{"feedUrls":"'"${FEED}"'"}}'
 hit creds_put "${JAVA_PORT}" "${JAVA_TOKEN}" PUT "/datasource/${JAVA_DS}/credentials" -H 'Content-Type: application/json' \
-  -d '{"credentials":{"feed_urls":"'"${FEED}"'"}}'
+  -d '{"credentials":{"feedUrls":"'"${FEED}"'"}}'
 cmp_resp creds_put
 
 hit creds_put_auth "${GO_PORT}" "${GO_TOKEN}" PUT "/datasource/${GO_DS}/credentials" -H 'Content-Type: application/json' \
-  -d '{"credentials":{"feed_urls":"'"${FEED}"'","auth_headers":"X-Token: abc"}}'
+  -d '{"credentials":{"feedUrls":"'"${FEED}"'","authHeaders":"X-Token: abc"}}'
 hit creds_put_auth "${JAVA_PORT}" "${JAVA_TOKEN}" PUT "/datasource/${JAVA_DS}/credentials" -H 'Content-Type: application/json' \
-  -d '{"credentials":{"feed_urls":"'"${FEED}"'","auth_headers":"X-Token: abc"}}'
+  -d '{"credentials":{"feedUrls":"'"${FEED}"'","authHeaders":"X-Token: abc"}}'
 cmp_resp creds_put_auth
 
 hit creds_del_bad "${GO_PORT}" "${GO_TOKEN}" DELETE "/datasource/${GO_DS}/credentials/nope"

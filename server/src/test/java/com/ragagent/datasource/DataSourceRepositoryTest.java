@@ -160,7 +160,7 @@ class DataSourceRepositoryTest {
         DataSource ds = newDataSource("n", "kb1");
         DataSourceConfig cfg = new DataSourceConfig();
         cfg.setType(DataSourceConstants.CONNECTOR_TYPE_RSS);
-        cfg.setSettings(new LinkedHashMap<>(Map.of("feed_urls", "https://example.invalid/feed")));
+        cfg.setSettings(new LinkedHashMap<>(Map.of("feedUrls", "https://example.invalid/feed")));
         ds.setConfig(cfg.toJSON());
 
         SyncCursor cursor = new SyncCursor();
@@ -180,7 +180,7 @@ class DataSourceRepositoryTest {
         assertThat(stored.getLastSyncResult()).isNotNull();
 
         assertThat(stored.parseConfig().getSettings())
-                .containsEntry("feed_urls", "https://example.invalid/feed");
+                .containsEntry("feedUrls", "https://example.invalid/feed");
 
         // ⚠️ 数字必须活着回来（jsonb 存的是 JSON 数字，不是字符串）。
         // 但**不要**断言 Java 侧的具体类型：Jackson 解析成 Integer/Double——

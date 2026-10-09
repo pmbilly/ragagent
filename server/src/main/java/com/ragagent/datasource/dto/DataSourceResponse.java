@@ -8,7 +8,6 @@ import com.ragagent.common.web.SortedMapSerializer;
 import com.ragagent.common.web.ZeroTimeSerializer;
 import com.ragagent.datasource.domain.DataSource;
 import com.ragagent.datasource.domain.DataSourceConfig;
-import com.ragagent.datasource.domain.DataSourceConstants;
 import com.ragagent.datasource.domain.SyncLog;
 
 /**
@@ -22,10 +21,11 @@ import com.ragagent.datasource.domain.SyncLog;
  *
  * <h2>键序 = 声明序</h2>
  * <pre>
- *   {"id","tenant_id","knowledge_base_id","name","type","config","sync_schedule","sync_mode",
- *    "status","conflict_strategy","sync_deletions","last_sync_at","last_sync_cursor",
- *    "last_sync_result","error_message","sync_log_retention_days","created_at","updated_at",
- *    "total_items_synced","latest_sync_log","credentials"}
+ *   {"id","tenantId","knowledgeBaseId","name","type","config","syncSchedule","syncMode",
+ *    "status","conflictStrategy","syncDeletions","lastSyncAt","lastSyncCursor",
+ *    "lastSyncResult","errorMessage","syncLogRetentionDays","createdAt","updatedAt",
+ *    "totalItemsSynced","latestSyncLog","credentials"}
+ *   ← B137 订正：本类字段全 camel、零注解（原注写 snake 是 Go 期残留）
  * </pre>
  * <p>按字段声明序输出（不是字母序）——{@code config} 夹在 {@code type} 与
  * {@code sync_schedule} 之间、{@code credentials} 在最后。</p>
@@ -116,7 +116,6 @@ public class DataSourceResponse {
             cfgDto.setType(parsed.getType());
             cfgDto.setResourceIds(parsed.getResourceIds());
             cfgDto.setSettings(parsed.getSettings());
-            enrichRssFeedUrlsInSettings(ds.getType(), parsed, cfgDto);
             configured = parsed.hasConfiguredCredentials(ds.getType());
         }
 
@@ -143,39 +142,6 @@ public class DataSourceResponse {
         out.latestSyncLog = ds.getLatestSyncLog();
         out.credentials = CredentialsResponse.credentials(configured).fields();
         return out;
-    }
-
-    /**
-     * 把 {@code feed_urls} 从 credentials
-     * 补进 settings。
-     *
-     * <p>Feed URL <b>不是密钥</b>，但它历史上住在加密的 credentials blob 里；
-     * 在"新的 settings 里没有"时把老位置的值回显出来，前端才不至于在编辑老数据源时
-     * 看到空白的订阅地址。</p>
-     */
-    static void enrichRssFeedUrlsInSettings(String dsType, DataSourceConfig parsed,
-                                            DataSourceConfigDto cfgDto) {
-        if (!DataSourceConstants.CONNECTOR_TYPE_RSS.equals(dsType) || parsed == null || cfgDto == null) {
-            return;
-        }
-        if (cfgDto.getSettings() != null) {
-            Object v = cfgDto.getSettings().get("feed_urls");
-            if (v instanceof String s && !s.trim().isEmpty()) {
-                return;
-            }
-        }
-        Map<String, Object> creds = parsed.getCredentials();
-        if (creds == null) {
-            return;
-        }
-        Object raw = creds.get("feed_urls");
-        if (!(raw instanceof String feedUrls) || feedUrls.trim().isEmpty()) {
-            return;
-        }
-        if (cfgDto.getSettings() == null) {
-            cfgDto.setSettings(new java.util.LinkedHashMap<>());
-        }
-        cfgDto.getSettings().put("feed_urls", feedUrls);
     }
 
     public String getId() { return id; }

@@ -13,7 +13,7 @@ import com.ragagent.common.web.ZeroTimeSerializer;
  * <h2>JSON 形状（{@code DataSourceJsonTest} 逐字节钉住）</h2>
  * <pre>
  *   FetchedItem{} →
- *   {"external_id":"","title":"","content":null,"content_type":"","file_name":"","url":"",
+ *   {"externalId":"","title":"","content":null,"content_type":"","file_name":"","url":"",
  *    "updated_at":"0001-01-01T00:00:00Z","created_at":"0001-01-01T00:00:00Z",
  *    "metadata":null,"deleted":false,"sourceResourceId":"","replacesSubtree":false,
  *    "subtreeKeep":null}

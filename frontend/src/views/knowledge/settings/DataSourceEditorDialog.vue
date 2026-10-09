@@ -127,9 +127,9 @@ function syncRssAuthHeadersToCredentials() {
   if (form.value.type !== 'rss') return
   const serialized = serializeAuthHeaders(rssAuthHeaders.value)
   if (serialized) {
-    form.value.config.credentials.auth_headers = serialized
+    form.value.config.credentials.authHeaders = serialized
   } else {
-    delete form.value.config.credentials.auth_headers
+    delete form.value.config.credentials.authHeaders
   }
 }
 
@@ -138,14 +138,14 @@ function syncRssAuthHeadersToCredentials() {
 // selected feed resource IDs when settings are still empty.
 function hydrateRssFeedUrlsFromConfig(config: { settings?: Record<string, any> | null; resourceIds?: string[] | null }) {
   const settings = config.settings || {}
-  if (String(settings.feed_urls || '').trim()) {
+  if (String(settings.feedUrls || '').trim()) {
     return { ...settings }
   }
   const ids = config.resourceIds || []
   if (ids.length === 0) {
     return { ...settings }
   }
-  return { ...settings, feed_urls: ids.join('\n') }
+  return { ...settings, feedUrls: ids.join('\n') }
 }
 
 function addRssAuthHeader() {
@@ -624,7 +624,7 @@ const connectorDefs = computed<ConnectorDef[]>(() => [
     permissionPageUrl: '',
     requiredPermissions: [],
     fields: [
-      { key: 'auth_headers', labelKey: 'datasource.field.authHeaders', placeholder: '', optional: true, hintKey: 'datasource.field.authHeadersHint', fieldType: 'custom_headers' },
+      { key: 'authHeaders', labelKey: 'datasource.field.authHeaders', placeholder: '', optional: true, hintKey: 'datasource.field.authHeadersHint', fieldType: 'custom_headers' },
     ],
   },
   {
@@ -754,7 +754,7 @@ watch(
 )
 
 watch(
-  () => form.value.config.settings.feed_urls,
+  () => form.value.config.settings.feedUrls,
   () => {
     if (needsConnectionTest()) {
       testResult.value = ''
@@ -802,7 +802,7 @@ async function testConnection() {
       const creds = { ...form.value.config.credentials }
       if (form.value.type === 'rss') {
         // validate-credentials is credentials-only; feed URLs live in settings.
-        creds.feed_urls = form.value.config.settings.feed_urls
+        creds.feedUrls = form.value.config.settings.feedUrls
       }
       await validateCredentials(form.value.type, creds)
     }
@@ -960,7 +960,7 @@ function toggleResource(id: string) {
 
 function validateRssFeedUrls(): boolean {
   if (form.value.type !== 'rss') return true
-  if (!String(form.value.config.settings.feed_urls || '').trim()) {
+  if (!String(form.value.config.settings.feedUrls || '').trim()) {
     MessagePlugin.warning(`${t('datasource.field.feedUrls')} ${t('datasource.isRequired')}`)
     return false
   }
@@ -1408,7 +1408,7 @@ const drawerConfirmText = computed(() => {
         <div class="form-item">
           <label class="form-label required">{{ t('datasource.field.feedUrls') }}</label>
           <t-textarea
-            v-model="form.config.settings.feed_urls"
+            v-model="form.config.settings.feedUrls"
             placeholder="https://example.com/feed.xml"
             :autosize="{ minRows: 2, maxRows: 6 }"
             autocomplete="off"

@@ -14,7 +14,6 @@ import com.fasterxml.jackson.databind.cfg.CoercionInputShape;
 import com.fasterxml.jackson.databind.type.LogicalType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.ragagent.datasource.ConnectorException;
 import com.ragagent.datasource.domain.DataSourceConfig;
 
@@ -22,14 +21,17 @@ import com.ragagent.datasource.domain.DataSourceConfig;
  * RSS 连接器的私有配置（解析 + feed 地址/请求头的存储形状）。
  *
  * <h2>两处存放位置，以及"谁覆盖谁"</h2>
- * <p>{@code feed_urls} 是<b>非密钥</b>配置，住在
- * {@code DataSourceConfig.Settings}（UI 上改它不需要换凭据）；{@code auth_headers}
+ * <p>{@code feedUrls} 是<b>非密钥</b>配置，住在
+ * {@code DataSourceConfig.Settings}（UI 上改它不需要换凭据）；{@code authHeaders}
  * 可能带密钥，住在 {@code Credentials}（落库前会被 AES 加密）。
- * 为了兼容老数据行，{@code Credentials} 里可能也还有 {@code feed_urls}
- * ——但 <b>settings 里的值优先覆盖它</b>（且只在非空时覆盖）。</p>
+ * <b>settings 里的值优先</b>（只在非空时覆盖 Credentials 里的同名项）。</p>
+ *
+ * <p>历史上有过"把 feed 地址误存进 Credentials"的写入路径，现由
+ * {@link DataSourceConfig#stripNonSecretCredentials} 在落库前清掉 ⇒ 本类不再需要
+ * 任何"老位置回显"逻辑（B137：原 {@code enrichRssFeedUrlsInSettings} 已随之删除）。</p>
  *
  * <h2>为什么反序列化要用"不许标量强转"的 mapper</h2>
- * <p>{@code {"feed_urls": 12}} 必须报错，不能静默强转成 {@code "12"}——
+ * <p>{@code {"feedUrls": 12}} 必须报错，不能静默强转成 {@code "12"}——
  * 数字/布尔塞进字符串字段是配置错误，静默强转会把它变成"看起来合法的坏配置"
  * （Jackson 默认会强转，这里显式关掉）。</p>
  */
@@ -38,12 +40,10 @@ final class RssConfig {
     private static final ObjectMapper MAPPER = buildMapper();
 
     private static ObjectMapper buildMapper() {
+        // 键名＝Java 字段名（feedUrls / authHeaders）——**不设命名策略**：
+        // §2 第 4 条禁 @JsonNaming/命名策略，且键名与字段名一致才不会被静默丢弃。
         ObjectMapper mapper = JsonMappers.lenient()
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                // 键名是蛇形（feed_urls / auth_headers），Java 字段是驼峰
-                // —— 用命名策略对上（别改成给字段加 @JsonProperty，
-                // 那会让字段与 getter 分裂成两个属性）。
-                .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         // 数字塞进 string 字段要报错，不能静默强转成 "12"。
         mapper.coercionConfigFor(LogicalType.Textual)
                 .setCoercion(CoercionInputShape.Integer, CoercionAction.Fail)
@@ -52,11 +52,11 @@ final class RssConfig {
         return mapper;
     }
 
-    /** {@code feed_urls}：换行或逗号分隔的 feed 地址列表。 */
+    /** {@code feedUrls}：换行或逗号分隔的 feed 地址列表。 */
     private String feedUrls = "";
 
     /**
-     * {@code auth_headers}：换行分隔的 {@code "Name: Value"} 自定义请求头，
+     * {@code authHeaders}：换行分隔的 {@code "Name: Value"} 自定义请求头，
      * <b>只作用于 feed 抓取</b>，绝不发给第三方文章页。
      */
     private String authHeaders;
@@ -97,8 +97,8 @@ final class RssConfig {
      *   <li>Credentials 解不出 {@link RssConfig} → 普通 {@code ConnectorException}
      *       （前缀 {@code "parse rss credentials: "}，<b>不是</b>哨兵包装，
      *       所以调用方认不出类型）；</li>
-     *   <li>Settings 里的 {@code feed_urls} 非空 → 覆盖 Credentials 里的；</li>
-     *   <li>最终列表为空 → {@link ConnectorException.InvalidCredentials}{@code ("feed_urls is required")}。</li>
+     *   <li>Settings 里的 {@code feedUrls} 非空 → 覆盖 Credentials 里的；</li>
+     *   <li>最终列表为空 → {@link ConnectorException.InvalidCredentials}{@code ("feedUrls is required")}。</li>
      * </ol>
      */
     static RssConfig parse(DataSourceConfig config) {
@@ -121,13 +121,13 @@ final class RssConfig {
             cfg.feedUrls = fromSettings;
         }
         if (cfg.feedUrlList().isEmpty()) {
-            throw new ConnectorException.InvalidCredentials("feed_urls is required");
+            throw new ConnectorException.InvalidCredentials("feedUrls is required");
         }
         return cfg;
     }
 
     /**
-     * 从 settings 里抠出 {@code feed_urls}。
+     * 从 settings 里抠出 {@code feedUrls}。
      *
      * <p>非字符串（数字 / 布尔 / 对象）一律当成"没配"，<b>不报错</b>——
      * 这与 {@link #parse} 里 Credentials 的严格反序列化不同（settings 是宽松来源）。</p>
@@ -136,7 +136,7 @@ final class RssConfig {
         if (settings == null || settings.isEmpty()) {
             return "";
         }
-        Object raw = settings.get("feed_urls");
+        Object raw = settings.get("feedUrls");
         if (!(raw instanceof String s)) {
             return "";
         }

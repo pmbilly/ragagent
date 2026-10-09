@@ -59,14 +59,14 @@ req ds-create-bad-creds.json POST /datasource -H 'Content-Type: application/json
   -d "{\"name\":\"x\",\"type\":\"rss\",\"knowledge_base_id\":\"${KB}\"}"
 
 req ds-create.json POST /datasource -H 'Content-Type: application/json' \
-  -d "{\"name\":\"golden-rss\",\"type\":\"rss\",\"knowledge_base_id\":\"${KB}\",\"sync_schedule\":\"0 0 * * * *\",\"config\":{\"type\":\"rss\",\"settings\":{\"feed_urls\":\"http://127.0.0.1:18099/feed.xml\"},\"credentials\":{\"feed_urls\":\"http://127.0.0.1:18099/feed.xml\"}}}"
+  -d "{\"name\":\"golden-rss\",\"type\":\"rss\",\"knowledge_base_id\":\"${KB}\",\"sync_schedule\":\"0 0 * * * *\",\"config\":{\"type\":\"rss\",\"settings\":{\"feedUrls\":\"http://127.0.0.1:18099/feed.xml\"},\"credentials\":{\"feedUrls\":\"http://127.0.0.1:18099/feed.xml\"}}}"
 DS_ID="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["id"])' "${OUT}/ds-create.json")"
 echo "    DS_ID=$DS_ID"
 
 echo "==> 3) 读 / 改 / 列表"
 req ds-get.json GET "/datasource/${DS_ID}"
 req ds-update.json PUT "/datasource/${DS_ID}" -H 'Content-Type: application/json' \
-  -d '{"name":"golden-rss-renamed","sync_mode":"full","sync_deletions":false,"error_message":"","config":{"type":"rss","settings":{"feed_urls":"http://127.0.0.1:18099/feed.xml"},"credentials":{"feed_urls":"http://127.0.0.1:18099/feed.xml","api_token":"should-be-ignored"}}}'
+  -d '{"name":"golden-rss-renamed","sync_mode":"full","sync_deletions":false,"error_message":"","config":{"type":"rss","settings":{"feedUrls":"http://127.0.0.1:18099/feed.xml"},"credentials":{"feedUrls":"http://127.0.0.1:18099/feed.xml","api_token":"should-be-ignored"}}}'
 req ds-get-after-update.json GET "/datasource/${DS_ID}"
 req ds-list.json GET "/datasource?kb_id=${KB}"
 req ds-unknown-id.json GET "/datasource/${UNKNOWN_KB}"
@@ -77,7 +77,7 @@ req ds-validate-credentials-bad.json POST /datasource/validate-credentials \
   -H 'Content-Type: application/json' -d '{}'
 req ds-validate-credentials.json POST /datasource/validate-credentials \
   -H 'Content-Type: application/json' \
-  -d '{"type":"rss","credentials":{"feed_urls":"http://127.0.0.1:18099/feed.xml"}}'
+  -d '{"type":"rss","credentials":{"feedUrls":"http://127.0.0.1:18099/feed.xml"}}'
 req ds-resources.json GET "/datasource/${DS_ID}/resources"
 req ds-ancestors-empty.json POST "/datasource/${DS_ID}/resource-ancestors" \
   -H 'Content-Type: application/json' -d '{"resource_ids":[]}'
@@ -91,10 +91,10 @@ req ds-credentials-put-empty.json PUT "/datasource/${DS_ID}/credentials" \
   -H 'Content-Type: application/json' -d '{"credentials":{}}'
 req ds-credentials-put.json PUT "/datasource/${DS_ID}/credentials" \
   -H 'Content-Type: application/json' \
-  -d '{"credentials":{"feed_urls":"http://127.0.0.1:18099/feed.xml"}}'
+  -d '{"credentials":{"feedUrls":"http://127.0.0.1:18099/feed.xml"}}'
 req ds-credentials-put-auth-headers.json PUT "/datasource/${DS_ID}/credentials" \
   -H 'Content-Type: application/json' \
-  -d '{"credentials":{"feed_urls":"http://127.0.0.1:18099/feed.xml","auth_headers":"X-Token: abc"}}'
+  -d '{"credentials":{"feedUrls":"http://127.0.0.1:18099/feed.xml","authHeaders":"X-Token: abc"}}'
 req ds-credentials-delete-bad-field.json DELETE "/datasource/${DS_ID}/credentials/nope"
 req ds-get-after-credentials.json GET "/datasource/${DS_ID}"
 

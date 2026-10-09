@@ -577,25 +577,25 @@ class DataSourceJsonTest {
         assertThat(c.hasCredentials()).isFalse();
         assertThat(c.hasConfiguredCredentials("rss")).isFalse();
 
-        c.setCredentials(new LinkedHashMap<>(Map.of("feed_urls", "x", "auth_headers", "y")));
+        c.setCredentials(new LinkedHashMap<>(Map.of("feedUrls", "x", "authHeaders", "y")));
         assertThat(c.hasCredentials()).isTrue();
         assertThat(c.hasConfiguredCredentials("rss")).isTrue();
 
         DataSourceConfig onlyFeedUrls = new DataSourceConfig();
-        onlyFeedUrls.setCredentials(new LinkedHashMap<>(Map.of("feed_urls", "x")));
+        onlyFeedUrls.setCredentials(new LinkedHashMap<>(Map.of("feedUrls", "x")));
         assertThat(onlyFeedUrls.hasConfiguredCredentials("rss"))
-                .as("RSS 只有 feed_urls 时不算配了凭据").isFalse();
+                .as("RSS 只有 feedUrls 时不算配了凭据").isFalse();
         onlyFeedUrls.stripNonSecretCredentials("rss");
         assertThat(onlyFeedUrls.getCredentials()).as("清空后置为 null（=> 落库写 SQL NULL）").isNull();
 
-        // 非 RSS 连接器不看 auth_headers
+        // 非 RSS 连接器不看 authHeaders
         DataSourceConfig feishu = new DataSourceConfig();
         feishu.setCredentials(new LinkedHashMap<>(Map.of("app_id", "x")));
         assertThat(feishu.hasConfiguredCredentials("feishu")).isTrue();
 
         // 只有空白也算没配
         DataSourceConfig blank = new DataSourceConfig();
-        blank.setCredentials(new LinkedHashMap<>(Map.of("auth_headers", "   ")));
+        blank.setCredentials(new LinkedHashMap<>(Map.of("authHeaders", "   ")));
         assertThat(blank.hasConfiguredCredentials("rss")).isFalse();
     }
 
@@ -628,9 +628,9 @@ class DataSourceJsonTest {
 
         DataSourceConfig c = new DataSourceConfig();
         c.setType("rss");
-        c.setCredentials(new LinkedHashMap<>(Map.of("auth_headers", "x", "n", 3.0d)));
+        c.setCredentials(new LinkedHashMap<>(Map.of("authHeaders", "x", "n", 3.0d)));
         c.setResourceIds(new ArrayList<>(List.of("r")));
-        c.setSettings(new LinkedHashMap<>(Map.of("feed_urls", "u")));
+        c.setSettings(new LinkedHashMap<>(Map.of("feedUrls", "u")));
         assertRoundTripsNaked(c, DataSourceConfig.class);
 
         SyncCursor cursor = new SyncCursor();
@@ -858,14 +858,14 @@ class DataSourceJsonTest {
 
         DataSourceConfig c = new DataSourceConfig();
         c.setType("rss");
-        c.setCredentials(new LinkedHashMap<>(Map.of("auth_headers", "h")));
-        c.setSettings(new LinkedHashMap<>(Map.of("feed_urls", "u")));
+        c.setCredentials(new LinkedHashMap<>(Map.of("authHeaders", "h")));
+        c.setSettings(new LinkedHashMap<>(Map.of("feedUrls", "u")));
         c.setMultimodalEnabled(true);
 
         // 没有 SYSTEM_AES_KEY 时凭据原样落库（不加密）
         assertThat(MAPPER.writeValueAsString(c.toJSON())).isEqualTo(
-                "{\"type\":\"rss\",\"credentials\":{\"auth_headers\":\"h\"},"
-                        + "\"resourceIds\":null,\"settings\":{\"feed_urls\":\"u\"}}");
+                "{\"type\":\"rss\",\"credentials\":{\"authHeaders\":\"h\"},"
+                        + "\"resourceIds\":null,\"settings\":{\"feedUrls\":\"u\"}}");
     }
 
     /** {@code toJSON()} 不得改动调用方的内存 map（内部用浅拷贝）。 */

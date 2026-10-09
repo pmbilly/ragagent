@@ -474,7 +474,7 @@ class DataSourceServiceTest {
     void updateForcePreservesStoredCredentials() {
         DataSource ds = newDataSource(DataSourceConstants.CONNECTOR_TYPE_RSS, null, null);
         Map<String, Object> stored = new LinkedHashMap<>();
-        stored.put("feed_urls", "https://example.test/feed.xml");
+        stored.put("feedUrls", "https://example.test/feed.xml");
         DataSourceConfig cfg = new DataSourceConfig();
         cfg.setType(DataSourceConstants.CONNECTOR_TYPE_RSS);
         cfg.setCredentials(stored);
@@ -487,14 +487,14 @@ class DataSourceServiceTest {
         com.fasterxml.jackson.databind.node.ObjectNode incoming =
                 new com.fasterxml.jackson.databind.ObjectMapper().createObjectNode();
         incoming.put("type", DataSourceConstants.CONNECTOR_TYPE_RSS);
-        incoming.putObject("credentials").put("feed_urls", "https://attacker.test/feed.xml");
+        incoming.putObject("credentials").put("feedUrls", "https://attacker.test/feed.xml");
         req.setConfig(incoming);
 
         DataSource updated = service.updateDataSource(req);
 
         DataSourceConfig parsed = updated.parseConfig();
         assertThat(parsed).isNotNull();
-        // RSS 的 feed_urls 属于非密钥配置，会被 StripNonSecretCredentials 从 credentials 里剔掉；
+        // RSS 的 feedUrls 属于非密钥配置，会被 StripNonSecretCredentials 从 credentials 里剔掉；
         // 关键是"攻击者提交的那个 URL 没有留下"。
         assertThat(parsed.getCredentials()).isNullOrEmpty();
     }
@@ -585,7 +585,7 @@ class DataSourceServiceTest {
 
     @Test
     void validateCredentialsUsesRawMapWithoutPersisting() {
-        Map<String, Object> creds = Map.of("feed_urls", "https://example.test/f.xml");
+        Map<String, Object> creds = Map.of("feedUrls", "https://example.test/f.xml");
 
         service.validateCredentials(DataSourceConstants.CONNECTOR_TYPE_RSS, creds);
 

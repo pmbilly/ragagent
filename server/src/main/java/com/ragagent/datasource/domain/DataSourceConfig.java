@@ -126,7 +126,7 @@ public class DataSourceConfig {
      * **用户可见的密钥**是否已配置。
      *
      * <p>RSS 的 feed URL 是非密钥配置（属于 settings）；对该连接器而言，
-     * 只有 {@code auth_headers} 算凭据。所以 {@code auth_headers} 缺失、或只有空白，
+     * 只有 {@code authHeaders} 算凭据。所以 {@code authHeaders} 缺失、或只有空白，
      * 都算"没配"。</p>
      */
     @JsonIgnore
@@ -135,10 +135,10 @@ public class DataSourceConfig {
             return false;
         }
         if (DataSourceConstants.CONNECTOR_TYPE_RSS.equals(connectorType)) {
-            if (!credentials.containsKey("auth_headers")) {
+            if (!credentials.containsKey("authHeaders")) {
                 return false;
             }
-            Object raw = credentials.get("auth_headers");
+            Object raw = credentials.get("authHeaders");
             return raw instanceof String s && !s.trim().isEmpty();
         }
         return true;
@@ -148,7 +148,7 @@ public class DataSourceConfig {
      * 落库前把**误存进** credentials
      * 的非密钥项删掉。
      *
-     * <p>RSS 的 {@code feed_urls} 历史上曾住在 credentials 里、现在归 settings；
+     * <p>RSS 的 {@code feedUrls} 历史上曾住在 credentials 里、现在归 settings；
      * 清完若 map 空了就置为 {@code null}——
      * 落库那一步会把它写成 SQL NULL，与"从未配过凭据"不可区分。</p>
      *
@@ -159,7 +159,7 @@ public class DataSourceConfig {
             return;
         }
         if (DataSourceConstants.CONNECTOR_TYPE_RSS.equals(connectorType)) {
-            credentials.remove("feed_urls");
+            credentials.remove("feedUrls");
             if (credentials.isEmpty()) {
                 credentials = null;
             }

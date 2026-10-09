@@ -17,7 +17,7 @@ import com.ragagent.common.web.ZeroTimeSerializer;
  * <h2>JSON 形状（{@code DataSourceJsonTest} 逐字节钉住）</h2>
  * <pre>
  *   Resource{} →
- *   {"external_id":"","name":"","type":"","description":"","url":"",
+ *   {"externalId":"","name":"","type":"","description":"","url":"",
  *    "modified_at":"0001-01-01T00:00:00Z"}
  *   Resource(全字段) →
  *   {"external_id":"e1","name":"n","type":"document","description":"d","url":"u",

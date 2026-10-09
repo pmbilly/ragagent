@@ -241,10 +241,10 @@ class RssPureFunctionsTest {
         assertThat(RssConfig.feedUrlsFromSettings(null)).isEmpty();
         assertThat(RssConfig.feedUrlsFromSettings(Map.of())).isEmpty();
         assertThat(RssConfig.feedUrlsFromSettings(Map.of("x", 1))).isEmpty();
-        assertThat(RssConfig.feedUrlsFromSettings(mapOfNullable("feed_urls", 12))).isEmpty();
-        assertThat(RssConfig.feedUrlsFromSettings(mapOfNullable("feed_urls", "  https://a/f  ")))
+        assertThat(RssConfig.feedUrlsFromSettings(mapOfNullable("feedUrls", 12))).isEmpty();
+        assertThat(RssConfig.feedUrlsFromSettings(mapOfNullable("feedUrls", "  https://a/f  ")))
                 .isEqualTo("https://a/f");
-        assertThat(RssConfig.feedUrlsFromSettings(mapOfNullable("feed_urls", "   "))).isEmpty();
+        assertThat(RssConfig.feedUrlsFromSettings(mapOfNullable("feedUrls", "   "))).isEmpty();
     }
 
     private static Map<String, Object> mapOfNullable(String key, Object value) {
@@ -310,19 +310,19 @@ class RssPureFunctionsTest {
     @Test
     void parseConfigRequiresFeedUrls() {
         DataSourceConfig config = new DataSourceConfig();
-        config.setSettings(mapOfNullable("feed_urls", "   "));
+        config.setSettings(mapOfNullable("feedUrls", "   "));
         config.setCredentials(new LinkedHashMap<>());
         assertThatThrownBy(() -> RssConfig.parse(config))
                 .isInstanceOf(ConnectorException.InvalidCredentials.class)
-                .hasMessage("invalid credentials: feed_urls is required");
+                .hasMessage("invalid credentials: feedUrls is required");
     }
 
     @Test
     void parseConfigSettingsOverrideCredentials() {
         DataSourceConfig config = new DataSourceConfig();
-        config.setSettings(mapOfNullable("feed_urls", "https://settings.example/feed.xml"));
+        config.setSettings(mapOfNullable("feedUrls", "https://settings.example/feed.xml"));
         Map<String, Object> credentials = new LinkedHashMap<>();
-        credentials.put("feed_urls", "https://legacy.example/feed.xml");
+        credentials.put("feedUrls", "https://legacy.example/feed.xml");
         config.setCredentials(credentials);
         assertThat(RssConfig.parse(config).feedUrlList())
                 .containsExactly("https://settings.example/feed.xml");
@@ -333,7 +333,7 @@ class RssPureFunctionsTest {
         DataSourceConfig config = new DataSourceConfig();
         config.setSettings(new LinkedHashMap<>());
         Map<String, Object> credentials = new LinkedHashMap<>();
-        credentials.put("feed_urls", "https://legacy.example/feed.xml");
+        credentials.put("feedUrls", "https://legacy.example/feed.xml");
         config.setCredentials(credentials);
         assertThat(RssConfig.parse(config).feedUrlList())
                 .containsExactly("https://legacy.example/feed.xml");
@@ -344,7 +344,7 @@ class RssPureFunctionsTest {
         // JSON 规范里数字不能赋给 string 字段；Jackson 默认会强转，故 mapper 显式关掉了它。
         DataSourceConfig config = new DataSourceConfig();
         config.setSettings(new LinkedHashMap<>());
-        config.setCredentials(mapOfNullable("feed_urls", 12));
+        config.setCredentials(mapOfNullable("feedUrls", 12));
         assertThatThrownBy(() -> RssConfig.parse(config))
                 .isInstanceOf(ConnectorException.class)
                 .hasMessageStartingWith("parse rss credentials: ");
@@ -353,8 +353,8 @@ class RssPureFunctionsTest {
     @Test
     void parseConfigParsesAuthHeaders() {
         DataSourceConfig config = new DataSourceConfig();
-        config.setSettings(mapOfNullable("feed_urls", "https://a.example/f"));
-        config.setCredentials(mapOfNullable("auth_headers", "X-Test-Auth: secret"));
+        config.setSettings(mapOfNullable("feedUrls", "https://a.example/f"));
+        config.setCredentials(mapOfNullable("authHeaders", "X-Test-Auth: secret"));
         assertThat(RssConfig.parse(config).parseHeaders()).containsEntry("X-Test-Auth", "secret");
     }
 

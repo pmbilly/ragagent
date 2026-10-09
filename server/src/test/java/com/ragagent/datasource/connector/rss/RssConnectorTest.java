@@ -213,11 +213,11 @@ class RssConnectorTest {
         DataSourceConfig config = new DataSourceConfig();
         config.setType("rss");
         Map<String, Object> settings = new LinkedHashMap<>();
-        settings.put("feed_urls", feedUrls);
+        settings.put("feedUrls", feedUrls);
         config.setSettings(settings);
         Map<String, Object> credentials = new LinkedHashMap<>();
         if (headers != null && !headers.isEmpty()) {
-            credentials.put("auth_headers", headers);
+            credentials.put("authHeaders", headers);
         }
         config.setCredentials(credentials);
         return config;
@@ -283,12 +283,12 @@ class RssConnectorTest {
     void validateRequiresFeedUrls() {
         DataSourceConfig config = new DataSourceConfig();
         Map<String, Object> settings = new LinkedHashMap<>();
-        settings.put("feed_urls", "   ");
+        settings.put("feedUrls", "   ");
         config.setSettings(settings);
         config.setCredentials(new LinkedHashMap<>());
         assertThatThrownBy(() -> new RssConnector().validate(config))
                 .isInstanceOf(ConnectorException.InvalidCredentials.class)
-                .hasMessage("invalid credentials: feed_urls is required");
+                .hasMessage("invalid credentials: feedUrls is required");
     }
 
     // ── ListResources ────────────────────────────────────────────────────

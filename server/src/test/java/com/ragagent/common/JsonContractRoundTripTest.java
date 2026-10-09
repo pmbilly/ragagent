@@ -868,8 +868,8 @@ class JsonContractRoundTripTest {
         DataSourceConfig cfg = new DataSourceConfig();
         cfg.setType(DataSourceConstants.CONNECTOR_TYPE_RSS);
         cfg.setResourceIds(List.of("r1", "r2"));
-        cfg.setSettings(new java.util.LinkedHashMap<>(Map.of("feed_urls", "http://f")));
-        cfg.setCredentials(new java.util.LinkedHashMap<>(Map.of("auth_headers", "X-Token: t")));
+        cfg.setSettings(new java.util.LinkedHashMap<>(Map.of("feedUrls", "http://f")));
+        cfg.setCredentials(new java.util.LinkedHashMap<>(Map.of("authHeaders", "X-Token: t")));
         cfg.setMultimodalEnabled(true); // 不进 JSON（本行是它的防线）
         assertRoundTrips(cfg, DataSourceConfig.class,
                 "types.DataSourceConfig ← DataSourceConfig（multimodal_enabled 不出现）");
