@@ -148,6 +148,9 @@ BASELINE: dict[str, set[str]] = {
     # web 引用载荷（同 ReferencesSupport 存量面）
     'retrieval/support/WebResultConverter.java': {'published_at'},
     # 工具结果/附件载荷（存量面，同 tool-results）
+    # SSE complete 事件的 data 键（B136 复核：与上条同属**冻结的线协议** §14.9l 前提判定 2；
+    # FE `useChatStreamHandler.ts` 在读 final_content）⇒ 并入 B135b2 拍板项
+    'session/service/AgentStreamBridge.java': {'final_content'},
     # SSE `agentQuery` 的 data 载荷＝**冻结的线协议**（§14.9l 前提判定 2；FE `messageTimestamp.ts` 明写"别顺手 camelCase"且有断言钉住）⇒ 待拍板；条目按实际存在的键收窄（原 5 键里 3 个后端已无）
     'session/controller/QaSseOrchestrator.java': {'assistant_created_at', 'user_created_at'},
     # 同上（SSE/消息载荷）
@@ -158,7 +161,9 @@ BASELINE: dict[str, set[str]] = {
     # agent_steps/推荐面落库 + 回放
     # 观测面（B135 复核改标：setupSpan.finish 的 setup 输出 + 日志字段 Map.of("event", …, "duration_ms", …)）
     'session/service/SessionKnowledgeQaService.java': {'duration_ms', 'error_type', 'knowledge_base_ids', 'search_targets', 'session_id', 'total_duration_ms', 'total_stages'},
-    # HTTP query 参数名（非 JSON 键）
+    # 文件服务面（B136 复核）：HTTP query 参数名（`request.getParameter`，非 Spring 注解
+    # ⇒ `check-event-face-case.py` 扫不到）+ **代理响应体键**（FileProxyService:281 是真 JSON 键）
+    # ⇒ 按 §14.9「自有查询参数名统一 camel」该改，登记为候选（见 HANDOFF）
     'storage/fileserve/FileProxyService.java': {'file_path'},
     # 存储引擎面（snake，B14 冻结）
     'storage/fileserve/StorageFileResolver.java': {'default_provider', 'path_prefix'},
@@ -166,13 +171,18 @@ BASELINE: dict[str, set[str]] = {
     'system/controller/SystemController.java': {'access_key_id', 'bucket_name', 'mineru_parse_method', 'secret_access_key', 'use_ssl', 'weknoracloud_app_id'},
     # MyBatis 列名/参数（非 JSON 键）
     # MyBatis 列名写入点（非 JSON 键）
-    # 模型输出契约（提示词里就是 new_slugs；只解析入站）
+    # 模型输出契约（§15.3 ② 拍板项）：提示词里就是 new_slugs，只解析入站；
+    # B136 复核确认仍在用（WikiChunkCitationPrompt 的输出项）
     'wiki/service/ingest/WikiIngestCitePipeline.java': {'new_slugs'},
-    # wiki 摄取内部 jsonb 状态（存量）
+    # span 观测面（B136 复核改标：原写「wiki 摄取内部 jsonb 状态（存量）」是错的——
+    # 站点全是 extractInput/extractOut/summaryInput/summaryOut/classifyOut 的 span 进出，
+    # 去向 handler.spans.endSpan(...)；FE 零命中 ⇒ 同 ActPhase 面，非 JSON 契约）
     'wiki/service/ingest/WikiIngestMapPhase.java': {'body_preview', 'candidate_slugs', 'cited_chunks', 'cited_slugs', 'classify_batches', 'concepts_preview', 'content_chars', 'doc_title', 'entities_preview', 'extracted_pages', 'extracted_slugs', 'new_slugs', 'new_slugs_sample', 'old_pages', 'pass0_fallback', 'reparse_slugs', 'stale_slugs', 'summary_chars', 'summary_line', 'summary_preview', 'top_cited', 'uncited_slugs'},
-    # wiki 摄取内部 jsonb 状态（存量）
+    # span 观测面（B136 复核改标：原写「wiki 摄取内部 jsonb 状态（存量）」是错的——
+    # 站点全是 extractInput/extractOut/summaryInput/summaryOut/classifyOut 的 span 进出，
+    # 去向 handler.spans.endSpan(...)；FE 零命中 ⇒ 同 ActPhase 面，非 JSON 契约）
     'wiki/service/ingest/WikiIngestReducePhase.java': {'addition_failed', 'affected_type', 'chunk_refs', 'content_preview', 'page_summary', 'page_title', 'page_type', 'source_refs'},
-    # wiki 摄取内部 jsonb 统计（存量）
+    # span 观测面（B136 复核改标：同上——mapsStats→endSpan 的收尾输出，FE 零命中）
     'wiki/service/ingest/WikiIngestRunSupport.java': {'failed_slug_writes', 'pages_dropped', 'pages_dropped_preview', 'pages_total', 'pages_written', 'pages_written_preview'},
     # 模型输出契约（LLM 载荷）
     'wiki/service/page/NewSlugFromCitation.java': {'source_chunks'},
