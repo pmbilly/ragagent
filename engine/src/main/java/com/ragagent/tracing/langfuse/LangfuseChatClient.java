@@ -104,7 +104,7 @@ public final class LangfuseChatClient implements LlmChatClient {
         Thread.ofVirtual().name("langfuse-chat-stream").start(() -> {
             StringBuilder content = new StringBuilder();
             StringBuilder reasoning = new StringBuilder();
-            com.ragagent.llm.domain.TokenUsage usage = null;
+            com.ragagent.common.llm.TokenUsage usage = null;
             List<ToolCall> toolCalls = null;
             String finishReason = "";
             boolean firstToken = false;

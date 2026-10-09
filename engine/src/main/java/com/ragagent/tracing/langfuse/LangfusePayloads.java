@@ -178,7 +178,7 @@ final class LangfusePayloads {
     }
 
     /** chat 用量换算：三值全零 → null（不上报）；否则映射 + unit=TOKENS。 */
-    static TokenUsage convertUsage(com.ragagent.llm.domain.TokenUsage usage) {
+    static TokenUsage convertUsage(com.ragagent.common.llm.TokenUsage usage) {
         if (usage == null) {
             return null;
         }

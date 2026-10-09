@@ -14,8 +14,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.llm.domain.CacheRetention;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
-import com.ragagent.llm.domain.PromptCacheStatus;
-import com.ragagent.llm.domain.TokenUsage;
+import com.ragagent.common.llm.PromptCacheStatus;
+import com.ragagent.common.llm.TokenUsage;
 import com.ragagent.llm.provider.ProviderName;
 
 import org.springframework.http.HttpHeaders;

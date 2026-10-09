@@ -82,9 +82,9 @@ dependencies {
     compileOnly("jakarta.servlet:jakarta.servlet-api")
     compileOnly("jakarta.validation:jakarta.validation-api")
 
+    testImplementation(testFixtures(project(":common")))   // EmbeddedRedis（B162 起在 :common）
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     // EmbeddedRedis（testFixtures）用 Lettuce 建连接 ⇒ fixtures 侧显式声明
-    testFixturesImplementation("io.lettuce:lettuce-core")
     // 主源码用 compileOnly 的 API（servlet/validation），测试期也要在类路径上
     testImplementation("jakarta.servlet:jakarta.servlet-api")
     testImplementation("jakarta.validation:jakarta.validation-api")

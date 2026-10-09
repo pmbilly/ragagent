@@ -55,7 +55,8 @@ dependencies {
     // 共享内核（common + event）——B116 抽成独立模块后在此声明依赖（B117 定名 :common）
     implementation(project(":common"))
     implementation(project(":engine"))
-    testImplementation(testFixtures(project(":engine")))
+    testImplementation(testFixtures(project(":engine")))    // wire/ 录制夹具
+    testImplementation(testFixtures(project(":common")))    // EmbeddedRedis（B162 起在 :common）
     // Spring
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")

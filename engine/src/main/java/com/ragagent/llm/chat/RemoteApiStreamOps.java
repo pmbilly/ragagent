@@ -10,7 +10,7 @@ import java.util.concurrent.BlockingQueue;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.llm.ResponseType;
 import com.ragagent.llm.domain.StreamResponse;
-import com.ragagent.llm.domain.TokenUsage;
+import com.ragagent.common.llm.TokenUsage;
 import com.ragagent.llm.domain.ToolCall;
 
 import org.slf4j.Logger;

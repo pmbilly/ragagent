@@ -14,6 +14,7 @@
 //    是守卫 R6 的棘轮基线，只许减不许增。
 plugins {
     `java-library`
+    `java-test-fixtures`   // 共享测试基座（EmbeddedRedis：L1 与上层测试共用）
     id("io.spring.dependency-management")
     id("com.diffplug.spotless")
 }
@@ -58,5 +59,19 @@ dependencies {
     compileOnly("jakarta.servlet:jakarta.servlet-api")
     compileOnly("jakarta.validation:jakarta.validation-api")
 
+    testFixturesImplementation("io.lettuce:lettuce-core")   // EmbeddedRedis 建连接用
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+}
+
+tasks.withType<Test> {
+    // B162 实测踩到：原先 common 没有测试 ⇒ 缺 useJUnitPlatform() 也看不出来；
+    // 搬入 stream 的 4 个测试类后它们**静默不跑**（build 里 common tests=0）⇒ 补上（与 engine 同口径）。
+    useJUnitPlatform()
+    val byteBuddyAgent = configurations.testRuntimeClasspath.get().files
+        .firstOrNull { it.name.startsWith("byte-buddy-agent-") }
+    if (byteBuddyAgent != null) {
+        jvmArgs("-javaagent:$byteBuddyAgent")
+    }
+    jvmArgs("-XX:+EnableDynamicAgentLoading")
+    maxHeapSize = "1g"
 }

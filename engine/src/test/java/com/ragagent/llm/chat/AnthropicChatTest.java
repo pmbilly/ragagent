@@ -23,7 +23,7 @@ import com.ragagent.llm.domain.ChatConfig;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
-import com.ragagent.llm.domain.PromptCacheStatus;
+import com.ragagent.common.llm.PromptCacheStatus;
 import com.ragagent.llm.domain.StreamResponse;
 
 import com.sun.net.httpserver.HttpExchange;
