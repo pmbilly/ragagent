@@ -57,7 +57,7 @@ class JsonPropertyHygieneTest {
     @DisplayName("A14：我们的面里不得有「键=隐式属性名」且「Jackson 本可自动探测」的逐字段 @JsonProperty")
     void redundantJsonPropertyIsForbidden() throws IOException {
         List<String> offenders = new ArrayList<>();
-        for (Path root : ArchitectureRulesTest.backendSourceRoots("main/java")) {
+        for (Path root : SourceRoots.backend("main/java")) {
             if (!Files.isDirectory(root)) {
                 continue;
             }

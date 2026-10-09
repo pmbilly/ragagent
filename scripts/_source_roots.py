@@ -12,7 +12,7 @@ import pathlib
 REPO = pathlib.Path(__file__).resolve().parent.parent
 
 #: 参与守卫的后端 Gradle 模块目录（按依赖自底向上列，便于阅读）
-MODULE_DIRS = ["server", "common", "engine"]
+MODULE_DIRS = ["server", "common", "engine", "boot"]
 
 
 def java_roots(sources=("main",)):

@@ -419,9 +419,7 @@ class ArchitectureRulesTest {
      * 包级可见：{@link ClasspathResourcesTest} 的反漂移扫描复用同一份根清单（B118）。
      */
     static java.util.List<java.nio.file.Path> backendSourceRoots(String sourceSet) {
-        return java.util.List.of(java.nio.file.Path.of("src/" + sourceSet),          // server 自己
-                java.nio.file.Path.of("../common/src/" + sourceSet),                 // 共享内核
-                java.nio.file.Path.of("../engine/src/" + sourceSet));               // 能力层
+        return SourceRoots.backend(sourceSet);   // B165：仓库根定位（多模块夹具）
     }
 
     @Test

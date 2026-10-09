@@ -1,6 +1,5 @@
 plugins {
     java
-    id("org.springframework.boot")
     `java-test-fixtures`   // 共享测试基建（TestSchema/契约夹具/桩服务器：B164 起）
     id("io.spring.dependency-management")
     id("com.google.protobuf")
@@ -22,23 +21,7 @@ spotless {
  * build-info.properties（/system/info 用）：version 显式对齐前端 package.json 的 0.8.0，
  * 否则前端按「后端版本 != 前端版本」显示「版本不匹配」告警。
  */
-fun gitShortCommit(): String = try {
-    providers.exec {
-        commandLine("git", "rev-parse", "--short", "HEAD")
-        workingDir = rootDir
-    }.standardOutput.asText.get().trim().ifEmpty { "unknown" }
-} catch (_: Exception) {
-    "unknown" // 非 git 检出（如打包好的源码树）→ 显示 unknown
-}
 
-springBoot {
-    buildInfo {
-        properties {
-            version = "0.8.0"
-            additional = mapOf("commitId" to gitShortCommit())
-        }
-    }
-}
 
 java {
     toolchain {
@@ -49,6 +32,13 @@ java {
 configurations {
     compileOnly {
         extendsFrom(configurations.annotationProcessor.get())
+    }
+}
+
+// 依赖版本由 Boot BOM 统一（原由 org.springframework.boot 插件自动附带；B165 拆 :boot 后显式声明）
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.boot:spring-boot-dependencies:3.3.5")
     }
 }
 
@@ -166,10 +156,14 @@ tasks.withType<Test> {
     useJUnitPlatform()
     // Mockito inline 在 JDK 21+ 自挂 attach 会被拒（MockitoInitializationException 批量假失败）：
     // 把 byte-buddy-agent 显式挂为 javaagent，Mockito 检测到已装入的 instrumentation 后不再 attach。
-    val byteBuddyAgent = configurations.testRuntimeClasspath.get().files
-        .firstOrNull { it.name.startsWith("byte-buddy-agent-") }
-    if (byteBuddyAgent != null) {
-        jvmArgs("-javaagent:$byteBuddyAgent")
+    // ⚠️ 惰性取（doFirst）：配置期解析 testRuntimeClasspath 会与其他项目请求本模块 testFixtures
+    // 元数据相撞（B165 实测：":server local metadata has not been calculated yet"）。
+    doFirst {
+        val byteBuddyAgent = configurations.testRuntimeClasspath.get().files
+            .firstOrNull { it.name.startsWith("byte-buddy-agent-") }
+        if (byteBuddyAgent != null) {
+            jvmArgs("-javaagent:$byteBuddyAgent")
+        }
     }
     jvmArgs("-XX:+EnableDynamicAgentLoading")
     // 并行分叉（2026-10-09 B142）：此前是**单 fork 串行**跑完 4,792 条 ⇒ 10 核机器上测试期间 9 核闲着，
