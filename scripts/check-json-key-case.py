@@ -11,10 +11,18 @@
   ③ 帮手式写入：`putNonEmpty|putTrue|putAlways|putOmitEmpty(<任意>, "snake"`
 基线只记录**已逐条复核**的例外；出现基线之外的新命中即失败（棘轮：只许减不许增）。
 
-用法：python3 scripts/check-json-key-case.py [--list|--strict]
+用法：python3 scripts/check-json-key-case.py [--list|--strict|--write]
   默认＝报告（列出基线外命中但**退出 0**）；--strict＝闸门（有基线外命中即退出 1，
   供将来判定完成后接 CI 用——当前基线只含 3 组已逐条复核的例外，其余待判项
   （SQL 参数键假阳性、诊断载荷等）不能当作已复核例外入基线）。
+  --write＝重新登记**冻结覆盖快照**（见下条，登记即声明责任）。
+
+**冻结覆盖快照（B169 / scripts/json-key-freeze.baseline.json）**：把「当前被 FROZEN_PREFIXES
+覆盖**且含 snake 键**的文件 → 命中前缀」存成快照，**离开**或**新进入**冻结集合都会使 --strict 失败。
+起因（B168 实测 ✗）：B162 把 `llm/TokenUsage` 搬进 `common/llm`、B163 把 6 个 Langfuse 装饰器从
+`tracing/langfuse` 换包到 `tracing/decorators` ⇒ **前缀不再命中、冻结静默失效** ✗，直到 CI 才报出；
+更糟的是当时 CI 的提示语是「确属第三方/模型契约则加入 BASELINE」——**若照做就会把静默失保合法化** ✗。
+有了快照，同一提交内就报「离开冻结面」✓。前缀冻结的固有脆弱点：**换包 = 失效**，故换包后要回核名单。
 
 **已知边界（诚实声明）**：本扫描器按文本模式匹配 `put/set("snake"` 等，**会命中 SQL 参数
 Map / MyBatis 列名等非 JSON 键**（如 `*Repository` 的 `deleted_at`），故 `--list` 是**待判
@@ -34,6 +42,7 @@ Map / MyBatis 列名等非 JSON 键**（如 `*Repository` 的 `deleted_at`），
 """
 from __future__ import annotations
 
+import json
 import pathlib
 import re
 import sys
@@ -277,28 +286,90 @@ PATTERNS = (
 SNAKE_IN_LIST = re.compile(r'"([a-z0-9]+(?:_[a-z0-9]+)+)"')
 
 
+def keys_of(path: pathlib.Path) -> set[str]:
+    """扫一个 Java 文件里的 snake 键写入点（三类形态；供 hits 与冻结覆盖快照共用）。"""
+    text = path.read_text(encoding='utf-8', errors='ignore')
+    keys: set[str] = set()
+    for m in PATTERNS[0].finditer(text):
+        keys.add(m.group(1))
+    for m in PATTERNS[1].finditer(text):              # @JsonPropertyOrder({...})
+        keys.update(SNAKE_IN_LIST.findall(m.group(1)))
+    for pattern in PATTERNS[2:]:
+        for m in pattern.finditer(text):
+            keys.add(m.group(1))
+    return keys
+
+
+def all_files():
+    """(绝对路径, 相对包根的键路径) —— 两处扫描（违规面 / 冻结面）共用同一枚举口径。"""
+    for r in PKG_ROOTS:
+        for p in sorted(r.rglob('*.java')):
+            yield p, str(p.relative_to(r))
+
+
 def hits() -> dict[str, set[str]]:
     found: dict[str, set[str]] = {}
-    for path, rel in sorted(
-            (p, str(p.relative_to(r))) for r in PKG_ROOTS for p in r.rglob('*.java')):
+    for path, rel in all_files():
         if rel.startswith(FROZEN_PREFIXES):
             continue
-        text = path.read_text(encoding='utf-8', errors='ignore')
-        keys: set[str] = set()
-        for m in PATTERNS[0].finditer(text):
-            keys.add(m.group(1))
-        for m in PATTERNS[1].finditer(text):          # @JsonPropertyOrder({...})
-            keys.update(SNAKE_IN_LIST.findall(m.group(1)))
-        for pattern in PATTERNS[2:]:
-            for m in pattern.finditer(text):
-                keys.add(m.group(1))
+        keys = keys_of(path)
         if keys:
             found[rel] = keys
     return found
 
 
+def freeze_coverage() -> dict[str, str]:
+    """冻结覆盖快照口径（B169）：被 FROZEN_PREFIXES 覆盖**且含 snake 键**的文件 → 命中前缀。
+
+    只收含 snake 键的文件：没有键的文件进出冻结区无信息量（避免噪音）；含键的才有被罩着的价值。
+    """
+    covered: dict[str, str] = {}
+    for path, rel in all_files():
+        prefix = next((p for p in FROZEN_PREFIXES if rel.startswith(p)), None)
+        if prefix is None:
+            continue
+        if keys_of(path):
+            covered[rel] = prefix
+    return covered
+
+
+FREEZE_SNAPSHOT = ROOT / 'scripts' / 'json-key-freeze.baseline.json'
+
+
+def load_snapshot() -> dict[str, str]:
+    """读冻结覆盖快照；缺文件时返回空（首次运行会提示 --write）。"""
+    if not FREEZE_SNAPSHOT.exists():
+        return {}
+    return json.loads(FREEZE_SNAPSHOT.read_text(encoding='utf-8')).get('files', {})
+
+
+def save_snapshot(covered: dict[str, str]) -> None:
+    FREEZE_SNAPSHOT.write_text(
+        json.dumps({
+            'note': '冻结覆盖快照（B169）：被 FROZEN_PREFIXES 覆盖且含 snake 键的文件 → 命中前缀。'
+                    '由 --write 生成；离开或新进入冻结集合都会使 --strict 失败（确认后用 --write 登记）。'
+                    '⚠️ 前缀冻结会在「换包」时静默失效 ⇒ 换包后务必回核 FROZEN_PREFIXES 并 --write。',
+            'files': dict(sorted(covered.items())),
+        }, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+
 def main() -> int:
     found = hits()
+    covered = freeze_coverage()
+    old = load_snapshot()
+    left = sorted(set(old) - set(covered))
+    entered = sorted(set(covered) - set(old))
+
+    if '--write' in sys.argv:
+        save_snapshot(covered)
+        print(f'✓ 冻结覆盖快照已写入：{FREEZE_SNAPSHOT.name}（{len(covered)} 个文件）；'
+              f'相对旧快照：离开 {len(left)}、进入 {len(entered)}')
+        for f in left[:8]:
+            print(f'    离开：{f}（原前缀 {old[f]}）')
+        for f in entered[:8]:
+            print(f'    进入：{f}（现前缀 {covered[f]}）')
+        return 0
+
     violations = {f: sorted(k - BASELINE.get(f, set())) for f, k in found.items()}
     violations = {f: k for f, k in violations.items() if k}
     stale = sorted(f for f in BASELINE if f not in found)
@@ -307,19 +378,36 @@ def main() -> int:
         for f, keys in sorted(found.items()):
             mark = '基线' if f in BASELINE else '**新增**'
             print(f'  [{mark}] {f}: {sorted(keys)}')
+        print(f'  [冻结覆盖] {len(covered)} 个文件（快照 {len(old)} 个）')
         return 0
 
-    if violations and '--strict' not in sys.argv:
-        print(f'ℹ 待判清单：{len(violations)} 个文件有基线外的 snake 键 '
-              f'（未复核为真债，也未被入基线；详见 --list）。默认不判失败。')
+    drift = bool(left or entered)
+    if (violations or drift) and '--strict' not in sys.argv:
+        if violations:
+            print(f'ℹ 待判清单：{len(violations)} 个文件有基线外的 snake 键 '
+                  f'（未复核为真债，也未被入基线；详见 --list）。默认不判失败。')
+        if drift:
+            print(f'ℹ 冻结覆盖有变化：离开 {len(left)}、进入 {len(entered)}（详见 --strict）。默认不判失败。')
         return 0
+    failed = False
     if violations:
         print('✗ 非冻结面出现新的 snake JSON 键（§2：自己的 JSON 面用 camel）：')
         for f, keys in sorted(violations.items()):
             print(f'    {f}: {keys}')
         print('  → 改 camel（同一提交带上前端与夹具）；确属第三方/模型契约则加入本脚本 BASELINE 并写明理由。')
+        failed = True
+    if drift:
+        print('✗ 冻结覆盖发生变化（B169 快照）——前缀冻结在「换包」时会静默失效：')
+        for f in left:
+            print(f'    离开：{f}（原前缀 {old[f]}）⇒ 不再被任何前缀罩住，多半是换包 ✗；'
+                  f'请回核 FROZEN_PREFIXES（补新位置前缀），确属有意解除再 --write')
+        for f in entered:
+            print(f'    进入：{f}（现前缀 {covered[f]}）⇒ 确认它确属第三方/模型载荷（我们自己的面应改 camel），'
+                  f'确认后 --write 登记')
+        failed = True
+    if failed:
         return 1
-    note = f'（基线 {sum(len(v) for v in BASELINE.values())} 条，均已逐条复核）'
+    note = f'（基线 {sum(len(v) for v in BASELINE.values())} 条，均已逐条复核；冻结覆盖 {len(covered)} 个文件）'
     if stale:
         note += f'；注意基线中有 {len(stale)} 个文件已无命中，可清理：{stale[:3]}'
     print(f'✓ 无新增 snake JSON 键 {note}')

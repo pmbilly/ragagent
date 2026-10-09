@@ -26,7 +26,7 @@ run() {
 run '环与分层违例只许减不许增'        python3 scripts/check-package-cycles.py
 run 'Go 锚点注释只许减不许增（B9）'    python3 scripts/check-go-anchors.py
 run '前端契约键棘轮（前端 snake / 后端 camel）' python3 scripts/check-fe-contract-keys.py
-run '换锚棘轮（--strict 闸门：非冻结面不许新增 snake JSON 键）' python3 scripts/check-json-key-case.py --strict
+run '换锚棘轮 + 冻结覆盖快照（--strict：非冻结面不许新增 snake 键；冻结面不许静默失去覆盖）' python3 scripts/check-json-key-case.py --strict
 run '事件面/路由面命名口径（B93b）'    python3 scripts/check-event-face-case.py
 run '大文件棘轮（B121：不得新增 >600 行主源码）' python3 scripts/check-file-size.py
 run '目录卫生（B124：游离目录 / 死包目录）' python3 scripts/check-stray-dirs.py
