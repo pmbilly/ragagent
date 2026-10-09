@@ -420,8 +420,8 @@ function outcomeTheme(value: AuditOutcome): 'success' | 'danger' | 'warning' | '
 }
 
 const taskDetailKeys = [
-  'task_id', 'trigger', 'processing_status', 'source_kb_id', 'target_kb_id',
-  'sync_log_id', 'mode', 'attempt', 'count', 'total', 'processed', 'failed', 'skipped', 'failureStage',
+  'taskId', 'trigger', 'processingStatus', 'sourceKbId', 'targetKbId',
+  'syncLogId', 'mode', 'attempt', 'count', 'total', 'processed', 'failed', 'skipped', 'failureStage',
 ] as const
 
 function taskFields(entry: KnowledgeBaseActivity): DetailField[] {

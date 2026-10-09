@@ -572,7 +572,7 @@ public class DataSourceService implements DataSourceSyncHandler {
                     AuditAction.DATASOURCE_SYNC_FAILED, "data_source", ds.getId(),
                     AuditOutcome.FAILED,
                     DataSourceSupport.mapOf("name", ds.getName(), "type", ds.getType(),
-                            "sync_log_id", syncLog.getId(), "trigger", "manual"),
+                            "syncLogId", syncLog.getId(), "trigger", "manual"),
                     null, false);
             throw e;
         }
@@ -582,7 +582,7 @@ public class DataSourceService implements DataSourceSyncHandler {
                 AuditAction.DATASOURCE_SYNC_STARTED, "data_source", ds.getId(),
                 AuditOutcome.ACCEPTED,
                 DataSourceSupport.mapOf("name", ds.getName(), "type", ds.getType(),
-                        "sync_log_id", syncLog.getId(), "task_id", taskId,
+                        "syncLogId", syncLog.getId(), "taskId", taskId,
                         "trigger", "manual", "processing_status", "pending"),
                 null, false);
         return syncLog;

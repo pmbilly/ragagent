@@ -2241,12 +2241,12 @@ export default {
         wiki: 'Wiki'
       },
       detailFields: {
-        task_id: 'タスクID',
+        taskId: 'タスクID',
         trigger: 'トリガ',
-        processing_status: '処理ステータス',
-        source_kb_id: '移動元ナレッジベースID',
-        target_kb_id: '移動先ナレッジベースID',
-        sync_log_id: '同期ログID',
+        processingStatus: '処理ステータス',
+        sourceKbId: '移動元ナレッジベースID',
+        targetKbId: '移動先ナレッジベースID',
+        syncLogId: '同期ログID',
         mode: 'モード',
         attempt: '処理試行回数',
         count: '件数',

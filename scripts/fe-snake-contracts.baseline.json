@@ -42,6 +42,7 @@
   "storage_type": "多模态联调本地入参键（testMultimodalFunction，发送前映射 camel form 字段 cosAppId/storageType 等；InitializationController @RequestParam 全 camel）",
   "supports_vision": "仅存于守卫/测试自身（B72 修复后的禁用模式）（modelSelectorFilter 测试名引用）",
   "table_metadata_instructions": "上传覆盖面冻结键（B13 已知缺口：process_overrides 后端暂不消费、前端写读自洽；B67 两面规则禁混读，后端解析运行时按 snake 读）",
+  "task_id": "守卫测试自身的 forbid 正则（非契约键）（crossFaceKeyContract.test.ts:256 是**负向钉子**：禁止前端读 res.data.task_id——wire 早就是 taskId；B146 换锚审计 details 后该处仍是禁读对象）",
   "token_limit": "上传覆盖面冻结键（B13 已知缺口：process_overrides 后端暂不消费、前端写读自洽；B67 两面规则禁混读，后端解析运行时按 snake 读）",
   "web_search_enabled": "仅存于守卫/测试自身（B72 修复后的禁用模式）（streame.test 断言该死键不再出现在请求体）",
   "welcome_message": "仅存于守卫/测试自身（B72 修复后的禁用模式）（B55 删除死字段的历史记录注释）",

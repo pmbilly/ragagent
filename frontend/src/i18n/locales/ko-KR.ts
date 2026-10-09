@@ -3830,12 +3830,12 @@ export default {
         'faq.import_failed': 'FAQ 가져오기 실패'
       },
       detailFields: {
-        task_id: '작업 ID',
+        taskId: '작업 ID',
         trigger: '트리거',
-        processing_status: '처리 상태',
-        source_kb_id: '소스 지식 베이스 ID',
-        target_kb_id: '대상 지식 베이스 ID',
-        sync_log_id: '동기화 로그 ID',
+        processingStatus: '처리 상태',
+        sourceKbId: '소스 지식 베이스 ID',
+        targetKbId: '대상 지식 베이스 ID',
+        syncLogId: '동기화 로그 ID',
         mode: '모드',
         attempt: '처리 시도',
         count: '항목 수',

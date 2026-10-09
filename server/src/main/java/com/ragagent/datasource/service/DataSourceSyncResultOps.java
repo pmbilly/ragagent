@@ -89,7 +89,7 @@ final class DataSourceSyncResultOps {
         service.support.recordKbActivity(ds.getTenantId(), ds.getKnowledgeBaseId(), action,
                 "data_source", ds.getId(), outcome,
                 DataSourceSupport.mapOf("name", ds.getName(), "type", ds.getType(),
-                        "sync_log_id", syncLog.getId(),
+                        "syncLogId", syncLog.getId(),
                         "total", result.getTotal(), "created", result.getCreated(),
                         "updated", result.getUpdated(), "deleted", result.getDeleted(),
                         "skipped", result.getSkipped(), "failed", result.getFailed()),

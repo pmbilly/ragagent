@@ -3832,12 +3832,12 @@ export default {
         'faq.import_failed': '导入 FAQ 失败'
       },
       detailFields: {
-        task_id: '任务 ID',
+        taskId: '任务 ID',
         trigger: '触发方式',
-        processing_status: '处理状态',
-        source_kb_id: '来源知识库 ID',
-        target_kb_id: '目标知识库 ID',
-        sync_log_id: '同步记录 ID',
+        processingStatus: '处理状态',
+        sourceKbId: '来源知识库 ID',
+        targetKbId: '目标知识库 ID',
+        syncLogId: '同步记录 ID',
         mode: '执行模式',
         attempt: '处理批次',
         count: '项目数',

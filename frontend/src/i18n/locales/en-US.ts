@@ -2241,12 +2241,12 @@ export default {
         wiki: 'Wiki'
       },
       detailFields: {
-        task_id: 'Task ID',
+        taskId: 'Task ID',
         trigger: 'Trigger',
-        processing_status: 'Processing status',
-        source_kb_id: 'Source knowledge base ID',
-        target_kb_id: 'Target knowledge base ID',
-        sync_log_id: 'Sync log ID',
+        processingStatus: 'Processing status',
+        sourceKbId: 'Source knowledge base ID',
+        targetKbId: 'Target knowledge base ID',
+        syncLogId: 'Sync log ID',
         mode: 'Mode',
         attempt: 'Processing attempt',
         count: 'Item count',

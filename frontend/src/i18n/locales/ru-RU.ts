@@ -3830,12 +3830,12 @@ export default {
         'faq.import_failed': 'Ошибка импорта FAQ'
       },
       detailFields: {
-        task_id: 'ID задачи',
+        taskId: 'ID задачи',
         trigger: 'Запуск',
-        processing_status: 'Статус обработки',
-        source_kb_id: 'ID исходной базы',
-        target_kb_id: 'ID целевой базы',
-        sync_log_id: 'ID журнала синхронизации',
+        processingStatus: 'Статус обработки',
+        sourceKbId: 'ID исходной базы',
+        targetKbId: 'ID целевой базы',
+        syncLogId: 'ID журнала синхронизации',
         mode: 'Режим',
         attempt: 'Попытка',
         count: 'Количество',

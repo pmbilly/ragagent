@@ -240,22 +240,22 @@ final class DataSourceSupport {
         }
         if (task != null) {
             if (task.taskId() != null && !task.taskId().isEmpty()
-                    && !activityDetails.containsKey("task_id")) {
-                activityDetails.put("task_id", task.taskId());
+                    && !activityDetails.containsKey("taskId")) {
+                activityDetails.put("taskId", task.taskId());
             }
             if (task.trigger() != null && !task.trigger().isEmpty()
                     && !activityDetails.containsKey("trigger")) {
                 activityDetails.put("trigger", task.trigger());
             }
-            if (!activityDetails.containsKey("processing_status")) {
+            if (!activityDetails.containsKey("processingStatus")) {
                 switch (effOutcome) {
-                    case AuditOutcome.ACCEPTED -> activityDetails.put("processing_status", "pending");
-                    case AuditOutcome.SUCCESS -> activityDetails.put("processing_status", "completed");
-                    case AuditOutcome.PARTIAL -> activityDetails.put("processing_status", "partial");
+                    case AuditOutcome.ACCEPTED -> activityDetails.put("processingStatus", "pending");
+                    case AuditOutcome.SUCCESS -> activityDetails.put("processingStatus", "completed");
+                    case AuditOutcome.PARTIAL -> activityDetails.put("processingStatus", "partial");
                     case AuditOutcome.FAILED, AuditOutcome.DENIED ->
-                            activityDetails.put("processing_status", "failed");
+                            activityDetails.put("processingStatus", "failed");
                     case AuditOutcome.CANCELED ->
-                            activityDetails.put("processing_status", "canceled");
+                            activityDetails.put("processingStatus", "canceled");
                     default -> { }
                 }
             }
