@@ -70,28 +70,34 @@ public final class EmbeddedRedis implements AutoCloseable {
         if (binary == null) {
             return null;
         }
-        int port = freePort();
-        List<String> cmd = new ArrayList<>(List.of(
-                binary.toString(),
-                "--port", Integer.toString(port),
-                "--bind", "127.0.0.1",
-                "--save", "",
-                "--appendonly", "no",
-                "--daemonize", "no"));
-        Process process;
-        try {
-            process = new ProcessBuilder(cmd)
-                    .redirectOutput(ProcessBuilder.Redirect.DISCARD)
-                    .redirectErrorStream(true)
-                    .start();
-        } catch (IOException e) {
-            return null;
-        }
-        if (!awaitPort("127.0.0.1", port, Duration.ofSeconds(10))) {
+        // 端口分配是 TOCTOU：freePort() 关掉探测 socket 到 redis-server 真正 bind 之间，
+        // 另一个测试 JVM（maxParallelForks）可能选中同一端口——那时 awaitPort 会**成功**，
+        // 但连到的是别人家的 redis，且会被先跑完的那个 fork 一起杀掉（B142 实测
+        // "Unable to connect to Redis"）。所以：失败就换端口重试，且必须**确认自己起的进程还活着**。
+        for (int attempt = 0; attempt < 5; attempt++) {
+            int port = freePort();
+            List<String> cmd = new ArrayList<>(List.of(
+                    binary.toString(),
+                    "--port", Integer.toString(port),
+                    "--bind", "127.0.0.1",
+                    "--save", "",
+                    "--appendonly", "no",
+                    "--daemonize", "no"));
+            Process process;
+            try {
+                process = new ProcessBuilder(cmd)
+                        .redirectOutput(ProcessBuilder.Redirect.DISCARD)
+                        .redirectErrorStream(true)
+                        .start();
+            } catch (IOException e) {
+                continue;
+            }
+            if (awaitPort(process, "127.0.0.1", port, Duration.ofSeconds(10))) {
+                return new EmbeddedRedis(process, "127.0.0.1", port);
+            }
             process.destroyForcibly();
-            return null;
         }
-        return new EmbeddedRedis(process, "127.0.0.1", port);
+        return null;
     }
 
     public StringRedisTemplate template() {
@@ -150,9 +156,13 @@ public final class EmbeddedRedis implements AutoCloseable {
         }
     }
 
-    private static boolean awaitPort(String host, int port, Duration timeout) {
+    /** 等到端口可连**且自己起的进程仍然存活**——进程先死说明端口被别人抢了，不是我们的实例。 */
+    private static boolean awaitPort(Process process, String host, int port, Duration timeout) {
         long deadline = System.nanoTime() + timeout.toNanos();
         while (System.nanoTime() < deadline) {
+            if (!process.isAlive()) {
+                return false;
+            }
             try (Socket socket = new Socket()) {
                 socket.connect(new InetSocketAddress(host, port), 200);
                 return true;

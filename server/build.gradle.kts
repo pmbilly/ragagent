@@ -158,9 +158,14 @@ tasks.withType<Test> {
         jvmArgs("-javaagent:$byteBuddyAgent")
     }
     jvmArgs("-XX:+EnableDynamicAgentLoading")
-    // 测试 JVM 堆 5g：套件规模（多个 @SpringBootTest 上下文变体各自驻留整份上下文）决定，
-    // 历史曲线 512M→1g→2g→3g→4g→5g；继续加测试量时按需上调，治本是收敛上下文变体数。
-    maxHeapSize = "5g"
+    // 并行分叉（2026-10-09 B142）：此前是**单 fork 串行**跑完 4,792 条 ⇒ 10 核机器上测试期间 9 核闲着，
+    // 而套件是 I/O 型长尾（Top 20 类占 55%，全是 HTTP 契约往返与嵌入式 Redis）⇒ 分叉收益直接。
+    // 实测：全量测试 214s → 见 §15.1.1 B142 记录（连跑三遍验稳定性）。
+    // 注意：契约类会各起桩服务器/嵌入式 Redis，若将来出现端口或夹具冲突，先降 fork 数再查桩。
+    maxParallelForks = 4
+    // 测试 JVM 堆：单 fork 时代 5g（多个 @SpringBootTest 上下文各自驻留整份上下文）；
+    // 分 4 叉后每个 JVM 驻留的上下文≈1/4 ⇒ 2g 起步（fork 数变了就重新看堆，别照搬旧值）。
+    maxHeapSize = "2g"
 
     // 测试沙箱化：DOCREADER_ADDR 一律置空，避免测试 JVM 继承 shell 里 source 过的
     // dev-env.sh 而连上真 docreader 造成假红（空串与未设等价）。
