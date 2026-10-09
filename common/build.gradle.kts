@@ -17,12 +17,15 @@ plugins {
     `java-test-fixtures`   // 共享测试基座（EmbeddedRedis：L1 与上层测试共用）
     id("io.spring.dependency-management")
     id("com.diffplug.spotless")
+    id("com.google.protobuf")   // OTLP proto（tracing 核心随 B163 迁入）
 }
 
 // 格式卫生：与 server 同口径（ratchet 从 seed 起只检查触碰过的文件）。
 spotless {
     java {
         ratchetFrom("seed")
+        // proto 插件把生成目录加进 source set ⇒ 生成的 OTLP 代码会被扫到（B161 engine 同款）
+        targetExclude("build/**")
         removeUnusedImports()
         trimTrailingWhitespace()
         endWithNewline()
@@ -33,6 +36,16 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
     }
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.25.5"
+    }
+}
+
+sourceSets["main"].proto {
+    srcDir("$rootDir/otlp-proto")
 }
 
 dependencyManagement {
@@ -54,6 +67,7 @@ dependencies {
     api("org.springframework.boot:spring-boot-autoconfigure")
     api("org.springframework.data:spring-data-redis")
     api("org.slf4j:slf4j-api")
+    implementation("com.google.protobuf:protobuf-java:3.25.5")
     // mybatis-plus：提供 org.apache.ibatis.* 与 com.baomidou.*（含 net.sf.jsqlparser）
     api("com.baomidou:mybatis-plus-spring-boot3-starter:3.5.7")
     compileOnly("jakarta.servlet:jakarta.servlet-api")
@@ -61,6 +75,9 @@ dependencies {
 
     testFixturesImplementation("io.lettuce:lettuce-core")   // EmbeddedRedis 建连接用
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    // 主源码用 compileOnly 的 API（servlet/validation），测试期也要在类路径上（B163 实测）
+    testImplementation("jakarta.servlet:jakarta.servlet-api")
+    testImplementation("jakarta.validation:jakarta.validation-api")
 }
 
 tasks.withType<Test> {

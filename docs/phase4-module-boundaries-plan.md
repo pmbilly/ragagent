@@ -566,3 +566,25 @@ B116 搬家时已经搬过一批资源（`common/text/*.txt`），这类风险�
    （否则 `:common` 的测试反向依赖 `:engine` ⇒ 项目环）。
 3. **javadoc 的 `{@link}` 是跨模块边**：每次搬家后 doclint 守卫（B119）都会把"注释还指着旧模块类型"
    当构建错误抓出来（B161 二例、B162 一例）⇒ 搬家批次里要预留这一步。
+
+## 11. B163：`tracing` 按层次拆分（P3a）——"不是纯 L1"的实证
+
+**逐边定性（11 条）**：全部落在 4 个**装饰器**文件（`LangfuseChatClient`/`LangfuseEmbedder`/
+`LangfuseReranker`/`LangfusePayloads`），它们包装 `LlmChatClient`/`Embedder`/`Reranker`
+三个 **L2 接口** ⇒ tracing 天然要依赖 L2 ✗（B115 当年据此把它放进 `:engine` 是对的）。
+
+**处置**：不整体搬，按性质拆 ——
+
+| 侧 | 内容 | 归属 |
+|---|---|---|
+| core | 20 文件（观测原语 + OTLP 导出 + 配置/属性）| `:common`（+ OTLP proto 从 `:engine` 移交）|
+| 装饰 | 4 装饰器 + `LangfuseWiring` + `LangfuseVlm` = 6 文件 | `:engine` 新包 `com.ragagent.tracing.decorators` |
+
+**两条新沉淀**：
+
+1. **跨模块的"包私有"等于不可见**（B162/B163 连撞）：core 的 `RecordedSpan`/`LangfuseRegistry` 等
+   包私有类只对**同名包**的测试可见 ⇒ 测试要么随 code 同包（`:common`），要么留在"能在类路径上同时
+   看到两侧"的模块且**必须用同名包**（本例 `:engine` 的 `tracing.langfuse`）。这是 Gradle 多模块
+   （非 JPMS）下最容易低估的一条。
+2. **proto 生成源随消费者走**：`OtlpHttpExporter` 迁 `:common` ⇒ protobuf 插件 + `otlp-proto` srcDir
+   + `spotless targetExclude("build/**")` 三件套一并迁（B161 在 `:engine` 已踩过一次同样的 spotless 坑）。

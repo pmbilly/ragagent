@@ -20,9 +20,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
-import com.ragagent.tracing.langfuse.LangfuseChatClient;
-import com.ragagent.tracing.langfuse.LangfuseEmbedder;
-import com.ragagent.tracing.langfuse.LangfuseReranker;
+import com.ragagent.tracing.decorators.LangfuseChatClient;
+import com.ragagent.tracing.decorators.LangfuseEmbedder;
+import com.ragagent.tracing.decorators.LangfuseReranker;
 
 /**
  * 模型运行时工厂（chat / embedding / rerank / vlm / asr 五类运行时客户端的装配归口，

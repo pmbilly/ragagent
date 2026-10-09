@@ -1,5 +1,9 @@
 package com.ragagent.tracing.langfuse;
 
+import com.ragagent.tracing.decorators.LangfuseVlm;
+import com.ragagent.tracing.decorators.LangfuseReranker;
+import com.ragagent.tracing.decorators.LangfuseEmbedder;
+import com.ragagent.tracing.decorators.LangfuseChatClient;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;

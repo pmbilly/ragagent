@@ -14,9 +14,6 @@ plugins {
     `java-test-fixtures`
     id("io.spring.dependency-management")
     id("com.diffplug.spotless")
-    // OTLP proto（tracing 的 langfuse OTLP/HTTP 导出用）；docreader 的 proto 留在 server
-    // —— 其 gRPC 客户端不在本模块（实测）。
-    id("com.google.protobuf")
 }
 
 // 格式卫生：与 server / common 同口径（ratchet 从 seed 起只检查触碰过的文件）。
@@ -43,17 +40,6 @@ dependencyManagement {
     }
 }
 
-// OTLP proto 源目录：与 server 同一份 vendored 目录（只有消息定义、无 service ⇒ 不接 gRPC 插件）。
-protobuf {
-    protoc {
-        artifact = "com.google.protobuf:protoc:3.25.5"
-    }
-}
-
-sourceSets["main"].proto {
-    srcDir("$rootDir/otlp-proto")
-}
-
 dependencies {
     // 底座：engine 的公开面大量使用 common 词汇（端口/载荷/视图）⇒ api 暴露给 server。
     api(project(":common"))
@@ -73,7 +59,6 @@ dependencies {
     implementation("com.baomidou:mybatis-plus-spring-boot3-starter:3.5.7")
     implementation("org.neo4j.driver:neo4j-java-driver:5.28.5")
     implementation("org.xerial:sqlite-jdbc:3.46.1.3")
-    implementation("com.google.protobuf:protobuf-java:3.25.5")
     implementation("org.yaml:snakeyaml")
     implementation("com.zaxxer:HikariCP")
     // 运行期驱动（JDBC ServiceLoader 加载，编译期不可见；Doris 走 mysql 协议、pgvector 走 pg）

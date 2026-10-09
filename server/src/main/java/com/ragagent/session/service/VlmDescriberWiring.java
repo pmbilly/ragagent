@@ -7,7 +7,7 @@ import com.ragagent.model.domain.Model;
 import com.ragagent.model.service.ModelRuntimeFactory;
 import com.ragagent.retrieval.vlm.VlmClient;
 import com.ragagent.retrieval.vlm.VlmHttpTransport;
-import com.ragagent.tracing.langfuse.LangfuseVlm;
+import com.ragagent.tracing.decorators.LangfuseVlm;
 import org.springframework.stereotype.Component;
 
 /**
