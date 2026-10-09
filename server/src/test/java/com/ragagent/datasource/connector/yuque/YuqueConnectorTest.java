@@ -104,7 +104,7 @@ class YuqueConnectorTest {
             assertThat(ab.getDescription()).isEqualTo("team-a/ab");
             assertThat(ab.getType()).isEqualTo("book");
             assertThat(ab.getUrl()).isEqualTo(f.baseUrl() + "/team-a/ab");
-            assertThat(ab.getMetadata()).containsEntry("book_type", "Book")
+            assertThat(ab.getMetadata()).containsEntry("bookType", "Book")
                     .containsEntry("public", 1);
             // 未提供 updated_at 的仓库 → 零值时间
             assertThat(ZeroTimeSerializer.isZeroValue(ab.getModifiedAt())).isTrue();
@@ -232,11 +232,11 @@ class YuqueConnectorTest {
             assertThat(it.getFileName()).isEqualTo("Hello.md");
             assertThat(it.getUrl()).isEqualTo(f.baseUrl() + "/alice/demo/hello");
             assertThat(it.getMetadata().get("channel")).isEqualTo("yuque");
-            assertThat(it.getMetadata().get("doc_id")).isEqualTo("101");
-            assertThat(it.getMetadata().get("book_id")).isEqualTo("7");
+            assertThat(it.getMetadata().get("docId")).isEqualTo("101");
+            assertThat(it.getMetadata().get("bookId")).isEqualTo("7");
             assertThat(it.getMetadata().get("slug")).isEqualTo("hello");
             assertThat(it.getMetadata().get("creator")).isEqualTo("7");
-            assertThat(it.getMetadata().get("word_count")).isEqualTo("42");
+            assertThat(it.getMetadata().get("wordCount")).isEqualTo("42");
             assertThat(it.getUpdatedAt().toInstant())
                     .isEqualTo(java.time.Instant.parse("2026-04-20T10:00:00Z"));
             assertThat(f.callCount("/api/v2/repos/docs/102"))
@@ -306,8 +306,8 @@ class YuqueConnectorTest {
             assertThat(placeholder.getExternalId()).isEqualTo("301");
             assertThat(placeholder.getTitle()).isEqualTo("Broken");
             assertThat(placeholder.getMetadata().get("channel")).isEqualTo("yuque");
-            assertThat(placeholder.getMetadata().get("doc_id")).isEqualTo("301");
-            assertThat(placeholder.getMetadata().get("book_id")).isEqualTo("9");
+            assertThat(placeholder.getMetadata().get("docId")).isEqualTo("301");
+            assertThat(placeholder.getMetadata().get("bookId")).isEqualTo("9");
             assertThat(placeholder.getMetadata().get("slug")).isEqualTo("broken");
             assertThat(placeholder.getContent()).isNull();
             assertThat(placeholder.getMetadata().get("error")).contains("status=400");
@@ -360,7 +360,7 @@ class YuqueConnectorTest {
 
             FetchedItem html = items.stream().filter(i -> i.getExternalId().equals("501"))
                     .findFirst().orElseThrow();
-            assertThat(html.getMetadata().get("skip_reason")).isEqualTo("unsupported format: html");
+            assertThat(html.getMetadata().get("skipReason")).isEqualTo("unsupported format: html");
             assertThat(html.getContent()).isNull();
 
             FetchedItem ok = items.stream().filter(i -> i.getExternalId().equals("502"))

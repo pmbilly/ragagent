@@ -130,7 +130,7 @@ class WikiConnectorTest {
         assertThat(resources.get(0).isHasChildren()).isTrue();
         assertThat(resources.get(0).getMetadata())
                 .containsEntry("visibility", "public")
-                .containsEntry("space_id", "space1");
+                .containsEntry("spaceId", "space1");
     }
 
     @Test
@@ -175,10 +175,10 @@ class WikiConnectorTest {
         assertThat(child.getName()).isEqualTo("Child");
         assertThat(child.getType()).isEqualTo("wiki_node");
         assertThat(child.getMetadata())
-                .containsEntry("space_id", "space1")
-                .containsEntry("node_token", "nt-child")
-                .containsEntry("obj_token", "obj-child")
-                .containsEntry("obj_type", "docx");
+                .containsEntry("spaceId", "space1")
+                .containsEntry("nodeToken", "nt-child")
+                .containsEntry("objToken", "obj-child")
+                .containsEntry("objType", "docx");
     }
 
     @Test
@@ -248,11 +248,11 @@ class WikiConnectorTest {
             assertThat(item.getFileName()).isEqualTo("exported.docx");
             assertThat(item.getContentType()).isEqualTo("application/octet-stream");
             assertThat(item.getMetadata())
-                    .containsEntry("obj_type", "docx")
+                    .containsEntry("objType", "docx")
                     .containsEntry("channel", "feishu")
-                    .containsEntry("obj_token", "obj-docx-1")
-                    .containsEntry("node_token", "nt1")
-                    .containsEntry("space_id", "space1");
+                    .containsEntry("objToken", "obj-docx-1")
+                    .containsEntry("nodeToken", "nt1")
+                    .containsEntry("spaceId", "space1");
             assertThat(item.getSourceResourceId()).isEqualTo("space1");
             assertThat(item.getUrl()).isEqualTo("https://feishu.cn/wiki/nt1");
             // 源时间戳来自文档（obj_*），不是 wiki 节点属性——改名/移动不算内容编辑
@@ -288,7 +288,7 @@ class WikiConnectorTest {
             List<FetchedItem> items = connector().fetchAll(config(List.of("space1")),
                     List.of("space1"));
             assertThat(items).hasSize(1);
-            assertThat(items.get(0).getMetadata()).containsEntry("obj_type", "sheet");
+            assertThat(items.get(0).getMetadata()).containsEntry("objType", "sheet");
         }
 
         @Test
@@ -300,7 +300,7 @@ class WikiConnectorTest {
             List<FetchedItem> items = connector().fetchAll(config(List.of("space1")),
                     List.of("space1"));
             assertThat(items).hasSize(1);
-            assertThat(items.get(0).getMetadata()).containsEntry("obj_type", "bitable");
+            assertThat(items.get(0).getMetadata()).containsEntry("objType", "bitable");
         }
 
         @Test
@@ -316,7 +316,7 @@ class WikiConnectorTest {
             assertThat(new String(item.getContent(), StandardCharsets.UTF_8))
                     .isEqualTo("fake-pdf-binary");
             assertThat(item.getFileName()).isEqualTo("manual.pdf");
-            assertThat(item.getMetadata()).containsEntry("obj_type", "file");
+            assertThat(item.getMetadata()).containsEntry("objType", "file");
         }
 
         @Test
@@ -415,9 +415,9 @@ class WikiConnectorTest {
             assertThat(placeholder.getTitle()).isEqualTo("Parent.pdf");
             assertThat(placeholder.getMetadata())
                     .containsEntry("channel", "feishu")
-                    .containsEntry("node_token", "nt-parent")
-                    .containsEntry("space_id", "space1")
-                    .containsEntry("failure_stage", "list_children");
+                    .containsEntry("nodeToken", "nt-parent")
+                    .containsEntry("spaceId", "space1")
+                    .containsEntry("failureStage", "list_children");
             assertThat(placeholder.getMetadata().get("error"))
                     .contains("list children of nt-parent");
         }
@@ -563,7 +563,7 @@ class WikiConnectorTest {
                 }
             }
             assertThat(placeholder).isNotNull();
-            assertThat(placeholder.getMetadata()).containsEntry("node_token", "nt-parent");
+            assertThat(placeholder.getMetadata()).containsEntry("nodeToken", "nt-parent");
         }
 
         @Test
@@ -647,7 +647,7 @@ class WikiConnectorTest {
             assertThat(att.getTitle()).isEqualTo("report.pdf");
             assertThat(att.getMetadata())
                     .containsEntry("attachment", "true")
-                    .containsEntry("parent_node_token", "nt-docx")
+                    .containsEntry("parentNodeToken", "nt-docx")
                     .containsEntry("channel", "feishu");
             assertThat(att.getContent()).isEqualTo(attContent);
             assertThat(att.getFileName()).isEqualTo("report.pdf");
@@ -928,7 +928,7 @@ class WikiConnectorTest {
             assertThat(att.getContent()).isEqualTo(bigPdf);
             assertThat(att.getMetadata())
                     .containsEntry("attachment", "true")
-                    .containsEntry("parent_node_token", "nt-golden");
+                    .containsEntry("parentNodeToken", "nt-golden");
         }
     }
 

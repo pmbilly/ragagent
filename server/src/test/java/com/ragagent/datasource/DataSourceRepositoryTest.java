@@ -358,7 +358,7 @@ class DataSourceRepositoryTest {
 
         DataSourceConfig cfg = new DataSourceConfig();
         cfg.setType(DataSourceConstants.CONNECTOR_TYPE_FEISHU);
-        cfg.setSettings(new LinkedHashMap<>(Map.of("folder_token", "ft")));
+        cfg.setSettings(new LinkedHashMap<>(Map.of("timezone", "Asia/Shanghai")));
 
         DataSource patch = new DataSource();
         patch.setId(ds.getId());
@@ -366,7 +366,7 @@ class DataSourceRepositoryTest {
         repo.update(patch);
 
         assertThat(repo.findById(ds.getId()).parseConfig().getSettings())
-                .containsEntry("folder_token", "ft");
+                .containsEntry("timezone", "Asia/Shanghai");
     }
 
     // ── updateSyncState ────────────────────────────────────────────────────

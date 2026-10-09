@@ -3845,7 +3845,7 @@ export default {
         processed: '已处理',
         failed: '失败数',
         skipped: '跳过数',
-        failure_stage: '失败阶段'
+        failureStage: '失败阶段'
       },
       targets: {
         knowledge_base: '知识库',

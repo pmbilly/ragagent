@@ -218,7 +218,7 @@ public class ImaConnector implements Connector {
             r.setDescription(desc);
             r.setUrl(cfg.baseURL());
             Map<String, Object> metadata = new LinkedHashMap<>();
-            metadata.put("cover_url", coverUrl);
+            metadata.put("coverUrl", coverUrl);
             r.setMetadata(metadata);
             out.add(r);
         }
@@ -636,20 +636,20 @@ public class ImaConnector implements Connector {
                                                     GetMediaInfoResp info, String kbId) {
         Map<String, String> m = new LinkedHashMap<>();
         m.put("channel", "ima");
-        m.put("media_id", f.getMediaId());
-        m.put("ima_logical_key", externalId);
-        m.put("knowledge_base_id", kbId);
-        m.put("folder_path", f.getFolderPath());
-        m.put("media_type", Integer.toString(info.getMediaType()));
+        m.put("mediaId", f.getMediaId());
+        m.put("imaLogicalKey", externalId);
+        m.put("knowledgeBaseId", kbId);
+        m.put("folderPath", f.getFolderPath());
+        m.put("mediaType", Integer.toString(info.getMediaType()));
         if (!f.getParentFolderId().isEmpty()) {
-            m.put("parent_folder_id", f.getParentFolderId());
+            m.put("parentFolderId", f.getParentFolderId());
         }
         String fp = folderPath.get(f.getParentFolderId());
         if (fp != null && !fp.isEmpty()) {
-            m.put("folder_path", fp);
+            m.put("folderPath", fp);
         }
         if (!info.getNotebookExtInfo().getNotebookId().isEmpty()) {
-            m.put("notebook_id", info.getNotebookExtInfo().getNotebookId());
+            m.put("notebookId", info.getNotebookExtInfo().getNotebookId());
         }
         return m;
     }

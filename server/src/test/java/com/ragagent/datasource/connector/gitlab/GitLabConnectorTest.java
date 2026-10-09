@@ -388,7 +388,7 @@ class GitLabConnectorTest {
             List<FetchedItem> items = connector.fetchAll(ds, null);
 
             assertThat(items).hasSize(1);
-            assertThat(items.get(0).getMetadata()).containsEntry("gitlab_ref", "main");
+            assertThat(items.get(0).getMetadata()).containsEntry("gitlabRef", "main");
             // tree 用的是选择里的 projectId 原文；raw 用的是 API 返回的数字 ID
             assertThat(stub.requestPaths).contains("/api/v4/projects/1/repository/tree",
                     "/api/v4/projects/1/repository/files/README%2Emd/raw");

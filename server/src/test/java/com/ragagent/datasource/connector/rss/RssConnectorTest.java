@@ -308,7 +308,7 @@ class RssConnectorTest {
             // 没有 <lastBuildDate>/<dc:date> → 解析不出时间 → modified_at 留零值
             assertThat(res.getModifiedAt().toInstant())
                     .isEqualTo(java.time.Instant.parse("0001-01-01T00:00:00Z"));
-            assertThat(res.getMetadata()).containsEntry("item_count", 2);
+            assertThat(res.getMetadata()).containsEntry("itemCount", 2);
         }
     }
 
@@ -406,10 +406,10 @@ class RssConnectorTest {
             assertThat(first.isDeleted()).isFalse();
             assertThat(first.getSourceResourceId()).isEqualTo(feed.feedUrl());
             assertThat(first.getMetadata()).containsOnlyKeys(
-                    "channel", "feed_url", "feed_title", "guid", "link", "author");
+                    "channel", "feedUrl", "feedTitle", "guid", "link", "author");
             assertThat(first.getMetadata().get("channel")).isEqualTo("rss");
-            assertThat(first.getMetadata().get("feed_url")).isEqualTo(feed.feedUrl());
-            assertThat(first.getMetadata().get("feed_title")).isEqualTo("Test Feed");
+            assertThat(first.getMetadata().get("feedUrl")).isEqualTo(feed.feedUrl());
+            assertThat(first.getMetadata().get("feedTitle")).isEqualTo("Test Feed");
             assertThat(first.getMetadata().get("guid")).isEqualTo("guid-1");
             assertThat(first.getMetadata().get("link")).isEqualTo(feed.baseUrl() + "/article/a1");
             assertThat(first.getMetadata().get("author")).isEmpty();

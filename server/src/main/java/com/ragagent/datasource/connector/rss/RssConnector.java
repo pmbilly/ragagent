@@ -173,7 +173,7 @@ public class RssConnector implements Connector {
      *       {@code Description} = feed.Description 去首尾空白、
      *       {@code URL = feed.Link}（非空时）、
      *       {@code ModifiedAt = feed.UpdatedParsed}（非 {@code null} 时）、
-     *       {@code metadata.put("item_count", feed.items().size())}。</li>
+     *       {@code metadata.put("itemCount", feed.items().size())}。</li>
      * </ul>
      */
     @Override
@@ -223,7 +223,7 @@ public class RssConnector implements Connector {
                 res.setModifiedAt(feed.updatedParsed());
             }
             Map<String, Object> metadata = new LinkedHashMap<>();
-            metadata.put("item_count", feed.items().size());
+            metadata.put("itemCount", feed.items().size());
             res.setMetadata(metadata);
             out.add(res);
         }
@@ -485,8 +485,8 @@ public class RssConnector implements Connector {
 
         Map<String, String> metadata = new LinkedHashMap<>();
         metadata.put("channel", CHANNEL_RSS);
-        metadata.put("feed_url", feedUrl);
-        metadata.put("feed_title", RssUtil.nullToEmpty(feed.title()));
+        metadata.put("feedUrl", feedUrl);
+        metadata.put("feedTitle", RssUtil.nullToEmpty(feed.title()));
         metadata.put("guid", RssUtil.nullToEmpty(item.guid()));
         metadata.put("link", RssUtil.nullToEmpty(item.link()));
         metadata.put("author", author);

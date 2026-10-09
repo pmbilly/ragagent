@@ -125,7 +125,7 @@ class FeishuErrorsTest {
                 "feishu api error: status=500 body={\"code\":1663}");
         Map<String, String> extra = new LinkedHashMap<>();
         extra.put("channel", "feishu");
-        extra.put("node_token", "nt1");
+        extra.put("nodeToken", "nt1");
 
         Map<String, String> m = FeishuErrors.feishuErrorItemMeta(err, extra);
         assertThat(m).containsEntry("error", err.getMessage())
@@ -134,7 +134,7 @@ class FeishuErrorsTest {
                 .containsEntry("error_reason",
                         "Feishu API error (code=1663); will retry on the next sync")
                 .containsEntry("channel", "feishu")
-                .containsEntry("node_token", "nt1")
+                .containsEntry("nodeToken", "nt1")
                 .hasSize(6);
     }
 

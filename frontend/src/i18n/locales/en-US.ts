@@ -2254,7 +2254,7 @@ export default {
         processed: 'Processed',
         failed: 'Failed',
         skipped: 'Skipped',
-        failure_stage: 'Failure stage'
+        failureStage: 'Failure stage'
       },
       actions: {
         'kb.created': 'Knowledge base created',

@@ -230,7 +230,7 @@ class DriveConnectorTest {
         assertThat(r.getType()).isEqualTo("drive_folder");
         assertThat(r.getUrl()).isEqualTo("https://feishu.cn/drive/folder/folder1");
         assertThat(r.isHasChildren()).isTrue();
-        assertThat(r.getMetadata()).containsEntry("folder_token", "folder1");
+        assertThat(r.getMetadata()).containsEntry("folderToken", "folder1");
     }
 
     @Test
@@ -271,9 +271,9 @@ class DriveConnectorTest {
         assertThat(doc.getType()).isEqualTo("docx");
         assertThat(doc.isHasChildren()).isFalse();
         assertThat(doc.getMetadata())
-                .containsEntry("file_token", "fdoc1")
-                .containsEntry("obj_type", "docx")
-                .containsEntry("folder_token", "folder1");
+                .containsEntry("fileToken", "fdoc1")
+                .containsEntry("objType", "docx")
+                .containsEntry("folderToken", "folder1");
         Resource sub = byId.get("folder1:fsub");
         assertThat(sub.isHasChildren()).isTrue();
 

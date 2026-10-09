@@ -213,7 +213,7 @@ public class YuqueConnector implements Connector {
             res.setModifiedAt(YuqueFormats.parseContentUpdatedAt(r.getUpdatedAt()));
             Map<String, Object> metadata = new LinkedHashMap<>();
             metadata.put("public", r.getPublicValue());
-            metadata.put("book_type", r.getType());
+            metadata.put("bookType", r.getType());
             res.setMetadata(metadata);
             out.add(res);
         }
@@ -354,8 +354,8 @@ public class YuqueConnector implements Connector {
                     Map<String, String> metadata = new LinkedHashMap<>();
                     metadata.put("error", e.getMessage());
                     metadata.put("channel", "yuque");
-                    metadata.put("doc_id", docIdStr);
-                    metadata.put("book_id", bookIdStr);
+                    metadata.put("docId", docIdStr);
+                    metadata.put("bookId", bookIdStr);
                     metadata.put("slug", d.getSlug());
                     FetchedItem placeholder = new FetchedItem();
                     placeholder.setExternalId(docIdStr);
@@ -379,10 +379,10 @@ public class YuqueConnector implements Connector {
                             d.getId(), d.getTitle(), detail.getFormat());
                     Map<String, String> metadata = new LinkedHashMap<>();
                     metadata.put("channel", "yuque");
-                    metadata.put("doc_id", docIdStr);
-                    metadata.put("book_id", bookIdStr);
+                    metadata.put("docId", docIdStr);
+                    metadata.put("bookId", bookIdStr);
                     metadata.put("slug", d.getSlug());
-                    metadata.put("skip_reason", "unsupported format: " + detail.getFormat());
+                    metadata.put("skipReason", "unsupported format: " + detail.getFormat());
                     FetchedItem placeholder = new FetchedItem();
                     placeholder.setExternalId(docIdStr);
                     placeholder.setTitle(d.getTitle());
@@ -393,11 +393,11 @@ public class YuqueConnector implements Connector {
                 }
 
                 Map<String, String> metadata = new LinkedHashMap<>();
-                metadata.put("doc_id", docIdStr);
-                metadata.put("book_id", bookIdStr);
+                metadata.put("docId", docIdStr);
+                metadata.put("bookId", bookIdStr);
                 metadata.put("slug", d.getSlug());
                 metadata.put("creator", Long.toString(d.getUserId()));
-                metadata.put("word_count", Integer.toString(d.getWordCount()));
+                metadata.put("wordCount", Integer.toString(d.getWordCount()));
                 metadata.put("channel", "yuque");
 
                 FetchedItem item = new FetchedItem();

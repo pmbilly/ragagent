@@ -264,7 +264,7 @@ public final class DocxFetcher {
     /** 附件的子条目 metadata：父节点 metadata 的克隆 + 两个标记。 */
     private static Map<String, String> childMeta(DocxFetchInput in) {
         Map<String, String> m = new LinkedHashMap<>(in.baseMeta);
-        m.put("parent_node_token", in.docToken);
+        m.put("parentNodeToken", in.docToken);
         m.put("attachment", "true");
         return m;
     }
@@ -272,7 +272,7 @@ public final class DocxFetcher {
     /** 内嵌图片的子条目 metadata。 */
     private static Map<String, String> imgMeta(DocxFetchInput in) {
         Map<String, String> m = new LinkedHashMap<>(in.baseMeta);
-        m.put("parent_node_token", in.docToken);
+        m.put("parentNodeToken", in.docToken);
         m.put("embeddedImage", "true");
         return m;
     }

@@ -117,7 +117,7 @@ public class WikiConnector implements StreamingConnector {
                 r.setHasChildren(true);
                 Map<String, Object> meta = new LinkedHashMap<>();
                 meta.put("visibility", space.visibility());
-                meta.put("space_id", space.spaceId());
+                meta.put("spaceId", space.spaceId());
                 r.setMetadata(meta);
                 resources.add(r);
             }
@@ -379,10 +379,10 @@ public class WikiConnector implements StreamingConnector {
         OffsetDateTime editTime = contentEditTime(node);
         OffsetDateTime createTime = contentCreateTime(node);
         Map<String, String> baseMeta = new LinkedHashMap<>();
-        baseMeta.put("obj_token", node.getObjToken());
-        baseMeta.put("obj_type", node.getObjType());
-        baseMeta.put("node_token", node.getNodeToken());
-        baseMeta.put("space_id", spaceId);
+        baseMeta.put("objToken", node.getObjToken());
+        baseMeta.put("objType", node.getObjType());
+        baseMeta.put("nodeToken", node.getNodeToken());
+        baseMeta.put("spaceId", spaceId);
         baseMeta.put("creator", node.getCreator());
         baseMeta.put("owner", node.getOwner());
         baseMeta.put("channel", FeishuSupport.CHANNEL_FEISHU);
@@ -555,10 +555,10 @@ public class WikiConnector implements StreamingConnector {
         r.setHasChildren(node.isHasChild());
         r.setModifiedAt(FeishuSupport.orGoZero(modifiedAt));
         Map<String, Object> meta = new LinkedHashMap<>();
-        meta.put("space_id", spaceId);
-        meta.put("node_token", node.getNodeToken());
-        meta.put("obj_token", node.getObjToken());
-        meta.put("obj_type", node.getObjType());
+        meta.put("spaceId", spaceId);
+        meta.put("nodeToken", node.getNodeToken());
+        meta.put("objToken", node.getObjToken());
+        meta.put("objType", node.getObjType());
         r.setMetadata(meta);
         return r;
     }
@@ -578,9 +578,9 @@ public class WikiConnector implements StreamingConnector {
             }
             Map<String, String> extra = new LinkedHashMap<>();
             extra.put("channel", FeishuSupport.CHANNEL_FEISHU);
-            extra.put("node_token", node.getNodeToken());
-            extra.put("space_id", spaceId);
-            extra.put("failure_stage", "list_children");
+            extra.put("nodeToken", node.getNodeToken());
+            extra.put("spaceId", spaceId);
+            extra.put("failureStage", "list_children");
 
             FetchedItem item = new FetchedItem();
             item.setExternalId(node.getNodeToken());

@@ -430,10 +430,10 @@ public class DriveConnector implements StreamingConnector {
                 ? FeishuSupport.CHANNEL_LARK_DRIVE
                 : FeishuSupport.CHANNEL_FEISHU_DRIVE;
         Map<String, String> baseMeta = new LinkedHashMap<>();
-        baseMeta.put("obj_token", file.getToken());
-        baseMeta.put("obj_type", file.getType());
-        baseMeta.put("file_token", file.getToken());
-        baseMeta.put("folder_token", file.getParentToken());
+        baseMeta.put("objToken", file.getToken());
+        baseMeta.put("objType", file.getType());
+        baseMeta.put("fileToken", file.getToken());
+        baseMeta.put("folderToken", file.getParentToken());
         baseMeta.put("channel", channel);
 
         switch (file.getType()) {
@@ -627,7 +627,7 @@ public class DriveConnector implements StreamingConnector {
         r.setUrl(region.driveFolderUrl(folderToken));
         r.setHasChildren(true);
         Map<String, Object> meta = new LinkedHashMap<>();
-        meta.put("folder_token", folderToken);
+        meta.put("folderToken", folderToken);
         r.setMetadata(meta);
         return r;
     }
@@ -665,9 +665,9 @@ public class DriveConnector implements StreamingConnector {
         r.setHasChildren("folder".equals(file.getType()));
         r.setModifiedAt(FeishuSupport.orGoZero(modifiedAt));
         Map<String, Object> meta = new LinkedHashMap<>();
-        meta.put("file_token", file.getToken());
-        meta.put("obj_type", file.getType());
-        meta.put("folder_token", file.getParentToken());
+        meta.put("fileToken", file.getToken());
+        meta.put("objType", file.getType());
+        meta.put("folderToken", file.getParentToken());
         r.setMetadata(meta);
         return r;
     }
@@ -682,8 +682,8 @@ public class DriveConnector implements StreamingConnector {
         for (DriveFileListFailure failure : failures) {
             Map<String, String> extra = new LinkedHashMap<>();
             extra.put("channel", channel);
-            extra.put("folder_token", failure.folderToken());
-            extra.put("failure_stage", "list_children");
+            extra.put("folderToken", failure.folderToken());
+            extra.put("failureStage", "list_children");
 
             FetchedItem item = new FetchedItem();
             item.setExternalId(failure.folderToken());

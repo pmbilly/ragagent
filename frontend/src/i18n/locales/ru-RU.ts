@@ -3843,7 +3843,7 @@ export default {
         processed: 'Обработано',
         failed: 'Ошибок',
         skipped: 'Пропущено',
-        failure_stage: 'Этап ошибки'
+        failureStage: 'Этап ошибки'
       },
       targets: {
         knowledge_base: 'База знаний',

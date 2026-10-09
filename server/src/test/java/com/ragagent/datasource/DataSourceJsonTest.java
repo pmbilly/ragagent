@@ -220,12 +220,12 @@ class DataSourceJsonTest {
         c.setCredentials(creds);
         c.setResourceIds(new ArrayList<>(List.of("r1", "r2")));
         Map<String, Object> settings = new LinkedHashMap<>();
-        settings.put("folder_token", "ft");
+        settings.put("timezone", "Asia/Shanghai");
         c.setSettings(settings);
 
         assertThat(write(c)).isEqualTo(
                 "{\"type\":\"feishu\",\"credentials\":{\"appId\":\"x\",\"b\":true,\"n\":1.0},"
-                        + "\"resourceIds\":[\"r1\",\"r2\"],\"settings\":{\"folder_token\":\"ft\"}}");
+                        + "\"resourceIds\":[\"r1\",\"r2\"],\"settings\":{\"timezone\":\"Asia/Shanghai\"}}");
     }
 
     /**

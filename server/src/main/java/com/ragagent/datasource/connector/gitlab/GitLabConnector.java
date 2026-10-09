@@ -439,11 +439,11 @@ public class GitLabConnector implements StreamingConnector {
         // fetched here, and a fetch timestamp would be a fabricated source time.
         Map<String, String> metadata = new LinkedHashMap<>();
         metadata.put("channel", DataSourceConstants.CONNECTOR_TYPE_GITLAB);
-        metadata.put("source_type", "gitlab");
-        metadata.put("gitlab_project_id", projectId);
-        metadata.put("gitlab_ref", ref);
-        metadata.put("gitlab_path", file);
-        metadata.put("gitlab_url", p.webUrl() + "/-/blob/" + ref + "/" + file);
+        metadata.put("sourceType", "gitlab");
+        metadata.put("gitlabProjectId", projectId);
+        metadata.put("gitlabRef", ref);
+        metadata.put("gitlabPath", file);
+        metadata.put("gitlabUrl", p.webUrl() + "/-/blob/" + ref + "/" + file);
         item.setMetadata(metadata);
         return item;
     }
@@ -459,7 +459,7 @@ public class GitLabConnector implements StreamingConnector {
         item.setDeleted(true);
         Map<String, String> metadata = new LinkedHashMap<>();
         metadata.put("channel", DataSourceConstants.CONNECTOR_TYPE_GITLAB);
-        metadata.put("gitlab_path", file);
+        metadata.put("gitlabPath", file);
         item.setMetadata(metadata);
         return item;
     }

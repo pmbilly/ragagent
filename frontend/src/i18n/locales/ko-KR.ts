@@ -3843,7 +3843,7 @@ export default {
         processed: '처리됨',
         failed: '실패',
         skipped: '건너뜀',
-        failure_stage: '실패 단계'
+        failureStage: '실패 단계'
       },
       targets: {
         knowledge_base: '지식 베이스',

@@ -216,7 +216,7 @@ class ImaConnectorTest {
             FetchedItem updated = mustFindItem(second.items(), key);
             assertThat(updated.isDeleted()).isFalse();
             assertThat(new String(updated.getContent(), StandardCharsets.UTF_8)).isEqualTo("v2");
-            assertThat(updated.getMetadata().get("media_id")).isEqualTo("m-v2");
+            assertThat(updated.getMetadata().get("mediaId")).isEqualTo("m-v2");
             for (FetchedItem it : second.items()) {
                 assertThat(it.isDeleted()).as("no tombstone expected, got %s",
                         describeItems(second.items())).isFalse();
@@ -270,7 +270,7 @@ class ImaConnectorTest {
                     .isEqualTo("# Standup\n- shipped the connector");
             assertThat(note.getFileName()).endsWith(".md");
             assertThat(note.getContentType()).isEqualTo("text/markdown");
-            assertThat(note.getMetadata().get("notebook_id")).isEqualTo("987654321");
+            assertThat(note.getMetadata().get("notebookId")).isEqualTo("987654321");
             assertThat(f.callCount("get_doc_content:987654321")).isEqualTo(1);
         }
     }
@@ -435,12 +435,12 @@ class ImaConnectorTest {
             List<FetchedItem> items = connector().fetchAll(f.config("kb1"), List.of("kb1"));
 
             FetchedItem deep = mustFindItem(items, ImaFormats.logicalKey("kb1", "f2", "Deep"));
-            assertThat(deep.getMetadata().get("folder_path")).isEqualTo("Outer/Inner");
-            assertThat(deep.getMetadata().get("parent_folder_id")).isEqualTo("f2");
+            assertThat(deep.getMetadata().get("folderPath")).isEqualTo("Outer/Inner");
+            assertThat(deep.getMetadata().get("parentFolderId")).isEqualTo("f2");
 
             FetchedItem root = mustFindItem(items, ImaFormats.logicalKey("kb1", "", "Root"));
-            assertThat(root.getMetadata().get("folder_path")).isEmpty();
-            assertThat(root.getMetadata()).doesNotContainKey("parent_folder_id");
+            assertThat(root.getMetadata().get("folderPath")).isEmpty();
+            assertThat(root.getMetadata()).doesNotContainKey("parentFolderId");
         }
     }
 
@@ -455,7 +455,7 @@ class ImaConnectorTest {
 
             var rootBody = f.lastRequestBody("get_knowledge_list");
             assertThat(rootBody).isNotNull();
-            assertThat(rootBody.get("knowledge_base_id").asText()).isEqualTo("kb1");
+            assertThat(rootBody.get("knowledge_base_id").asText()).isEqualTo("kb1");  // ← 出网请求：Ima 契约
             assertThat(rootBody.has("folder_id")).as("folder_id must be omitted for the root").isFalse();
             assertThat(rootBody.get("limit").asInt()).isEqualTo(ImaClient.DEFAULT_PAGE_SIZE);
         }
@@ -496,15 +496,15 @@ class ImaConnectorTest {
 
             Map<String, String> meta = item.getMetadata();
             assertThat(meta).containsOnlyKeys(
-                    "channel", "media_id", "ima_logical_key", "knowledge_base_id",
-                    "folder_path", "media_type");
+                    "channel", "mediaId", "imaLogicalKey", "knowledgeBaseId",
+                    "folderPath", "mediaType");
             assertThat(meta.get("channel")).isEqualTo("ima");
-            assertThat(meta.get("media_id")).isEqualTo("m1");
-            assertThat(meta.get("ima_logical_key"))
+            assertThat(meta.get("mediaId")).isEqualTo("m1");
+            assertThat(meta.get("imaLogicalKey"))
                     .isEqualTo(ImaFormats.logicalKey("kb1", "", "T1"));
-            assertThat(meta.get("knowledge_base_id")).isEqualTo("kb1");
-            assertThat(meta.get("folder_path")).isEmpty();
-            assertThat(meta.get("media_type")).isEqualTo("7");
+            assertThat(meta.get("knowledgeBaseId")).isEqualTo("kb1");
+            assertThat(meta.get("folderPath")).isEmpty();
+            assertThat(meta.get("mediaType")).isEqualTo("7");
         }
     }
 
@@ -518,8 +518,8 @@ class ImaConnectorTest {
 
             List<FetchedItem> items = connector().fetchAll(f.config("kb1"), List.of("kb1"));
             FetchedItem note = mustFindItem(items, ImaFormats.logicalKey("kb1", "", "N"));
-            assertThat(note.getMetadata()).containsEntry("notebook_id", "n1");
-            assertThat(note.getMetadata()).containsEntry("media_type", "11");
+            assertThat(note.getMetadata()).containsEntry("notebookId", "n1");
+            assertThat(note.getMetadata()).containsEntry("mediaType", "11");
         }
     }
 
@@ -539,7 +539,7 @@ class ImaConnectorTest {
             assertThat(resources.get(1).getExternalId()).isEqualTo("kb-b");
             assertThat(resources.get(0).getDescription()).isEqualTo("desc kb-a");
             assertThat(resources.get(0).getType()).isEqualTo("knowledge_base");
-            assertThat(resources.get(0).getMetadata()).containsEntry("cover_url", "");
+            assertThat(resources.get(0).getMetadata()).containsEntry("coverUrl", "");
             assertThat(resources.get(0).getUrl()).isEqualTo(f.baseUrl());
             // 零值时间 → 恒输出的 year-1 字面量（见 Resource 的类注释）
             assertThat(resources.get(0).getModifiedAt())
@@ -555,14 +555,14 @@ class ImaConnectorTest {
             Map<String, Object> entry = new LinkedHashMap<>();
             entry.put("id", "kb-x");
             entry.put("name", "X");
-            entry.put("cover_url", "https://cover");
+            entry.put("cover_url", "https://cover");  // ← 夹具响应：Ima 的字段名（外部契约，勿 camel 化）
             f.setSearchBases(List.of(entry));
 
             List<Resource> resources = connector().listResources(f.config(), "");
 
             assertThat(resources).hasSize(1);
             assertThat(resources.get(0).getExternalId()).isEqualTo("kb-x");
-            assertThat(resources.get(0).getMetadata()).containsEntry("cover_url", "https://cover");
+            assertThat(resources.get(0).getMetadata()).containsEntry("coverUrl", "https://cover");
         }
     }
 

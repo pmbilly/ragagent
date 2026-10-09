@@ -2254,7 +2254,7 @@ export default {
         processed: '処理済み',
         failed: '失敗',
         skipped: 'スキップ',
-        failure_stage: '失敗した段階'
+        failureStage: '失敗した段階'
       },
       actions: {
         'kb.created': 'ナレッジベースを作成',
