@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
@@ -96,7 +97,10 @@ class SyncLogRepositoryTest {
     /** 调用方已给的 {@code started_at} 不能被覆盖（仅在零值时补 now）。 */
     @Test
     void createKeepsCallerSuppliedStartedAt() {
-        OffsetDateTime when = OffsetDateTime.now(ZoneOffset.UTC).minusHours(3);
+        // 存储精度是**微秒**（PG 的 timestamptz / H2 的 TIMESTAMP 都是 6 位小数）⇒ 输入先截到微秒再比对。
+        // ⚠️ 不能直接用 OffsetDateTime.now()：**Linux 时钟给纳秒** ⇒ 精确回环在 CI 上必红 ✗
+        //（macOS 时钟只到微秒 ⇒ 本地永远复现不出 ✓；2026-10-10 的 CI 实测两条同类失败）。
+        OffsetDateTime when = OffsetDateTime.now(ZoneOffset.UTC).minusHours(3).truncatedTo(ChronoUnit.MICROS);
         SyncLog log = newLog(DataSourceConstants.SYNC_LOG_STATUS_SUCCESS);
         log.setStartedAt(when);
         repo.create(log);

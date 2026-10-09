@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -178,7 +179,10 @@ class MemoryRepositoryTest {
     /** {@code valid_from} 若调用方已经给了就不动（为 null 时才由仓储补默认）。 */
     @Test
     void createItemKeepsCallerSuppliedValidFrom() {
-        OffsetDateTime when = OffsetDateTime.now().minusDays(3);
+        // 存储精度是**微秒**（PG 的 timestamptz / H2 的 TIMESTAMP 都是 6 位小数）⇒ 输入先截到微秒再比对。
+        // ⚠️ 不能直接用 OffsetDateTime.now()：**Linux 时钟给纳秒** ⇒ 精确回环在 CI 上必红 ✗
+        //（macOS 时钟只到微秒 ⇒ 本地永远复现不出 ✓；2026-10-10 的 CI 实测两条同类失败）。
+        OffsetDateTime when = OffsetDateTime.now().minusDays(3).truncatedTo(ChronoUnit.MICROS);
         MemoryItem item = newItem("x", "t");
         item.setValidFrom(when);
         repo.createItem(item);
