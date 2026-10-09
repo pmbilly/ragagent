@@ -78,7 +78,7 @@ public class FileServiceResolver implements Resolver {
         if (provider.isEmpty()) {
             JsonNode config = tenant == null ? null : tenant.getStorageEngineConfig();
             if (config != null && config.isObject()) {
-                JsonNode defaultProvider = config.get("default_provider");
+                JsonNode defaultProvider = config.get("defaultProvider");
                 if (defaultProvider != null && defaultProvider.isTextual()) {
                     provider = defaultProvider.asText().trim().toLowerCase(Locale.ROOT);
                 }

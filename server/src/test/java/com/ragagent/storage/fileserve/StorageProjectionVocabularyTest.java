@@ -27,9 +27,10 @@ import org.junit.jupiter.api.Test;
  *       {@code dto/StorageConfig} 同族（{@code accessKeyId}/{@code bucketName}/{@code pathPrefix}…），
  *       消费者是 {@code storage_backends.config} 的读写两侧
  *       （{@code StorageBackendService.configOf/serializeConfig}，忽略未知键）。</li>
- *   <li><b>引擎面（snake）</b>——{@code StorageFileResolver.toStorageEngineConfig} 的
+ *   <li><b>引擎面（camel，B133 起）</b>——{@code StorageFileResolver.toStorageEngineConfig} 的
  *       {@code renameConfigKeys(provider)} 单点派生，消费者是 {@code StorageEngineConfig}
- *       各 provider 段与解析器的完备性自校验。</li>
+ *       各 provider 段与解析器的完备性自校验。落库面与引擎面现已同词汇，唯一的差是
+ *       <b>凭据两键的 provider 分族命名</b>（见下）。</li>
  * </ul>
  *
  * <p><b>为什么不许再出现第二份投影</b>：这里曾有两套手写实现、两套键名，产出过两个静默
@@ -45,13 +46,13 @@ class StorageProjectionVocabularyTest {
     /** 落库面（camel）：{@code StorageProviderEnv.*.writeConfig} 在全开输入下的键集合。 */
     private static final Map<String, List<String>> ROW_FACE_KEYS = new LinkedHashMap<>();
 
-    /** 引擎面（snake）：经 {@code renameConfigKeys(provider)} 后的键集合。 */
+    /** 引擎面（camel，B133 起）：经 {@code renameConfigKeys(provider)} 后的键集合。 */
     private static final Map<String, List<String>> ENGINE_FACE_KEYS = new LinkedHashMap<>();
 
-    /** 凭据键的两族写法：两面之差只会出现在这两族之间。 */
+    /** 凭据键的两族写法：两面之差只会出现在这两族之间（B133 后两族都是 camel）。 */
     private static final List<String> CREDENTIAL_CAMEL = List.of("accessKeyId", "secretAccessKey");
     private static final List<String> CREDENTIAL_ENGINE = List.of(
-            "access_key_id", "secret_access_key", "secret_id", "secret_key", "access_key");
+            "accessKeyId", "secretAccessKey", "secretId", "secretKey", "accessKey");
 
     static {
         ROW_FACE_KEYS.put("local", List.of("pathPrefix"));
@@ -68,19 +69,19 @@ class StorageProjectionVocabularyTest {
         ROW_FACE_KEYS.put("obs", List.of("endpoint", "region", "accessKeyId", "secretAccessKey",
                 "bucketName", "pathPrefix", "useSsl"));
 
-        ENGINE_FACE_KEYS.put("local", List.of("path_prefix"));
-        ENGINE_FACE_KEYS.put("minio", List.of("mode", "endpoint", "access_key_id", "secret_access_key",
-                "bucket_name", "path_prefix", "use_ssl"));
-        ENGINE_FACE_KEYS.put("s3", List.of("endpoint", "region", "access_key", "secret_key",
-                "bucket_name", "path_prefix", "use_ssl", "force_path_style"));
-        ENGINE_FACE_KEYS.put("cos", List.of("region", "secret_id", "secret_key", "bucket_name",
-                "path_prefix", "app_id", "temp_bucket_name", "temp_region"));
-        ENGINE_FACE_KEYS.put("tos", List.of("endpoint", "region", "access_key", "secret_key",
-                "bucket_name", "path_prefix", "temp_bucket_name", "temp_region"));
-        ENGINE_FACE_KEYS.put("oss", List.of("endpoint", "region", "access_key", "secret_key",
-                "bucket_name", "path_prefix", "use_temp_bucket", "temp_bucket_name", "temp_region"));
-        ENGINE_FACE_KEYS.put("obs", List.of("endpoint", "region", "access_key", "secret_key",
-                "bucket_name", "path_prefix", "use_ssl"));
+        ENGINE_FACE_KEYS.put("local", List.of("pathPrefix"));
+        ENGINE_FACE_KEYS.put("minio", List.of("mode", "endpoint", "accessKeyId", "secretAccessKey",
+                "bucketName", "pathPrefix", "useSsl"));
+        ENGINE_FACE_KEYS.put("s3", List.of("endpoint", "region", "accessKey", "secretKey",
+                "bucketName", "pathPrefix", "useSsl", "forcePathStyle"));
+        ENGINE_FACE_KEYS.put("cos", List.of("region", "secretId", "secretKey", "bucketName",
+                "pathPrefix", "appId", "tempBucketName", "tempRegion"));
+        ENGINE_FACE_KEYS.put("tos", List.of("endpoint", "region", "accessKey", "secretKey",
+                "bucketName", "pathPrefix", "tempBucketName", "tempRegion"));
+        ENGINE_FACE_KEYS.put("oss", List.of("endpoint", "region", "accessKey", "secretKey",
+                "bucketName", "pathPrefix", "useTempBucket", "tempBucketName", "tempRegion"));
+        ENGINE_FACE_KEYS.put("obs", List.of("endpoint", "region", "accessKey", "secretKey",
+                "bucketName", "pathPrefix", "useSsl"));
     }
 
     @AfterEach
@@ -112,16 +113,15 @@ class StorageProjectionVocabularyTest {
     }
 
     @Test
-    @DisplayName("两面之差只在凭据命名：其余键只是 camel→snake")
+    @DisplayName("两面之差只在凭据命名：其余键两面一致（B133 后引擎面也是 camel）")
     void facesDifferOnlyInCredentials() {
         for (String provider : ROW_FACE_KEYS.keySet()) {
             List<String> nonCredentialCamel = ROW_FACE_KEYS.get(provider).stream()
                     .filter(k -> !CREDENTIAL_CAMEL.contains(k)).toList();
-            List<String> expectedEngine = nonCredentialCamel.stream()
-                    .map(StorageProjectionVocabularyTest::camelToSnake).toList();
+            List<String> expectedEngine = nonCredentialCamel;
             List<String> actualEngineNonCredential = ENGINE_FACE_KEYS.get(provider).stream()
                     .filter(k -> !CREDENTIAL_ENGINE.contains(k)).toList();
-            assertThat(actualEngineNonCredential).as("%s：非凭据键两面只差写法", provider)
+            assertThat(actualEngineNonCredential).as("%s：非凭据键两面一致", provider)
                     .containsExactlyInAnyOrderElementsOf(expectedEngine);
         }
     }
@@ -158,20 +158,8 @@ class StorageProjectionVocabularyTest {
             }
         };
         JsonNode engine = StorageFileResolver.toStorageEngineConfig(row, crypto);
-        assertThat(engine.path("default_provider").asText()).isEqualTo(provider);
+        assertThat(engine.path("defaultProvider").asText()).isEqualTo(provider);
         return engine.path(provider);
-    }
-
-    private static String camelToSnake(String key) {
-        StringBuilder out = new StringBuilder();
-        for (char ch : key.toCharArray()) {
-            if (Character.isUpperCase(ch)) {
-                out.append('_').append(Character.toLowerCase(ch));
-            } else {
-                out.append(ch);
-            }
-        }
-        return out.toString();
     }
 
     private static List<String> fieldNames(JsonNode node) {

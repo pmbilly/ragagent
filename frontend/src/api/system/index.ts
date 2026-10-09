@@ -175,59 +175,59 @@ export function reconnectDocReader(addr: string): Promise<ParserEnginesResponse>
 // ---- 存储引擎配置（空间级，供文档/图片存储与 docreader 使用） ----
 
 export interface StorageEngineConfig {
-  default_provider: string // "local" | "minio" | "cos" | "tos" | "s3" | "oss" | "ks3" | "obs"
-  local: { path_prefix: string }
-  minio: { mode: string; endpoint: string; access_key_id: string; secret_access_key: string; bucket_name: string; use_ssl: boolean; path_prefix: string }
+  defaultProvider: string // "local" | "minio" | "cos" | "tos" | "s3" | "oss" | "ks3" | "obs"
+  local: { pathPrefix: string }
+  minio: { mode: string; endpoint: string; accessKeyId: string; secretAccessKey: string; bucketName: string; useSsl: boolean; pathPrefix: string }
   cos: {
-    secret_id: string
-    secret_key: string
+    secretId: string
+    secretKey: string
     region: string
-    bucket_name: string
-    app_id: string
-    path_prefix: string
+    bucketName: string
+    appId: string
+    pathPrefix: string
   }
   tos: {
     endpoint: string
     region: string
-    access_key: string
-    secret_key: string
-    bucket_name: string
-    path_prefix: string
+    accessKey: string
+    secretKey: string
+    bucketName: string
+    pathPrefix: string
   }
   s3: {
     endpoint: string // optional for standard AWS S3
     region: string
-    access_key: string // both keys empty => AWS default credential chain
-    secret_key: string
-    bucket_name: string
-    path_prefix: string
+    accessKey: string // both keys empty => AWS default credential chain
+    secretKey: string
+    bucketName: string
+    pathPrefix: string
   }
   oss: {
     endpoint: string
     region: string
-    access_key: string
-    secret_key: string
-    bucket_name: string
-    path_prefix: string
-    use_temp_bucket: boolean
-    temp_bucket_name: string
-    temp_region: string
+    accessKey: string
+    secretKey: string
+    bucketName: string
+    pathPrefix: string
+    useTempBucket: boolean
+    tempBucketName: string
+    tempRegion: string
   }
   ks3: {
     endpoint: string
     region: string
-    access_key: string
-    secret_key: string
-    bucket_name: string
-    path_prefix: string
+    accessKey: string
+    secretKey: string
+    bucketName: string
+    pathPrefix: string
   }
   obs: {
     endpoint: string
     region: string
-    access_key: string
-    secret_key: string
-    bucket_name: string
-    path_prefix: string
+    accessKey: string
+    secretKey: string
+    bucketName: string
+    pathPrefix: string
   }
 }
 

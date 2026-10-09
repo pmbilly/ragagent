@@ -81,6 +81,11 @@ BASELINE: dict[str, set[str]] = {
     'auth/service/TenantInvitationService.java': {'invitation_id', 'responded_at', 'updated_at'},
     # MyBatis 列名/参数（非 JSON 键）
     'auth/service/TenantMemberService.java': {'deleted_at', 'is_revoked', 'new_role', 'old_role', 'tenant_id', 'updated_at'},
+    # 外部耦合（B133 逐键复核）：docreader config_overrides 的 map 键名由对方服务定义
+    # （docreader/docreader.proto 里 config_overrides 是泛型 map，服务本体不在本仓）；
+    # 租户 KV 复用同一词汇，改名须先加边界翻译层——属独立决策，故登记冻结。
+    # chat_parser_engine_rules 则是 agent 侧规则的透传保留（§14.9 表②）。
+    'tenant/ParserEngineConfig.java': {'chat_parser_engine_rules', 'mineru_api_key', 'mineru_cloud_enable_formula', 'mineru_cloud_enable_ocr', 'mineru_cloud_enable_table', 'mineru_cloud_language', 'mineru_cloud_model', 'mineru_enable_formula', 'mineru_enable_ocr', 'mineru_enable_table', 'mineru_endpoint', 'mineru_language', 'mineru_model', 'mineru_parse_method', 'mineru_vlm_server_url', 'odl_hybrid', 'odl_hybrid_fallback', 'odl_hybrid_mode', 'odl_hybrid_url', 'odl_markdown_with_html', 'paddleocr_vl_cloud_model', 'paddleocr_vl_cloud_token', 'paddleocr_vl_cloud_use_chart_recognition', 'paddleocr_vl_cloud_use_seal_recognition', 'paddleocr_vl_endpoint', 'paddleocr_vl_use_chart_recognition', 'paddleocr_vl_use_seal_recognition'},
     # 租户配置 jsonb（存量面；B132 起 chat-history / retrieval 两段已换锚，余段待判定）
     'auth/service/TenantService.java': {'compression_strategy', 'deleted_at', 'max_tokens', 'recent_message_count', 'summarize_threshold'},
     # 内部预设名（presets() 仅内部查表）

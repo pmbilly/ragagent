@@ -1076,7 +1076,7 @@ async function loadTenantDefaultStorageProvider(force = false) {
   try {
     await editorResources.ensureStorageEngine(force)
     tenantDefaultStorageProvider.value = editorResources.resolveUsableStorageProvider(
-      editorResources.storageConfig?.default_provider,
+      editorResources.storageConfig?.defaultProvider,
     )
   } catch {
     tenantDefaultStorageProvider.value = editorResources.resolveUsableStorageProvider()

@@ -208,8 +208,8 @@ public class KnowledgeBaseService
         String provider = "";
         var storageView = tenantConfigLookup.storageView(tenantId());
         if (storageView != null && storageView.storageEngineConfig() != null
-                && storageView.storageEngineConfig().path("default_provider").isTextual()) {
-            provider = storageView.storageEngineConfig().path("default_provider").asText().toLowerCase().trim();
+                && storageView.storageEngineConfig().path("defaultProvider").isTextual()) {
+            provider = storageView.storageEngineConfig().path("defaultProvider").asText().toLowerCase().trim();
         }
         if (provider.isEmpty() || !isStorageAllowed(provider)) {
             provider = firstAllowedStorage();

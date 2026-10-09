@@ -25,11 +25,11 @@ class FileServiceResolverWiringTest {
     void resolvesProviderServiceFromTenantConfig() {
         Tenant tenant = new Tenant();
         ObjectNode sec = new ObjectMapper().createObjectNode();
-        sec.put("default_provider", "cos");
+        sec.put("defaultProvider", "cos");
         ObjectNode cos = sec.putObject("cos");
-        cos.put("secret_id", "id");
-        cos.put("secret_key", "key");
-        cos.put("bucket_name", "bk-125");
+        cos.put("secretId", "id");
+        cos.put("secretKey", "key");
+        cos.put("bucketName", "bk-125");
         cos.put("region", "ap-guangzhou");
         tenant.setStorageEngineConfig(sec);
 
@@ -48,14 +48,14 @@ class FileServiceResolverWiringTest {
         FileServiceResolver noConfig = new FileServiceResolver(empty, null, null);
         assertNull(noConfig.resolveFileService("cos://bk/ap-guangzhou/a/b.png"));
 
-        // 引用不带 provider scheme → 用租户 default_provider；仍无 → null（不解析）
+        // 引用不带 provider scheme → 用租户 defaultProvider；仍无 → null（不解析）
         assertNull(noConfig.resolveFileService("plain/path.png"));
 
         // 不完备的 cos 段 → 工厂抛"incomplete cos config" → 回落 defaultSvc（此处非空）
         Tenant partial = new Tenant();
         ObjectNode sec = new ObjectMapper().createObjectNode();
-        sec.put("default_provider", "cos");
-        sec.putObject("cos").put("secret_id", "id");
+        sec.put("defaultProvider", "cos");
+        sec.putObject("cos").put("secretId", "id");
         partial.setStorageEngineConfig(sec);
         StubUrlFileService fallback = new StubUrlFileService();
         FileServiceResolver partialResolver = new FileServiceResolver(partial, fallback, null);

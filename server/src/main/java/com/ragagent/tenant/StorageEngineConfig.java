@@ -1,7 +1,6 @@
 package com.ragagent.tenant;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ragagent.tenant.StorageEngineConfig.S3EngineConfig;
 import com.ragagent.tenant.StorageEngineConfig.MinioEngineConfig;
 import com.ragagent.tenant.StorageEngineConfig.ObsEngineConfig;
@@ -13,46 +12,37 @@ import com.ragagent.tenant.StorageEngineConfig.TosEngineConfig;
 /**
  * 存储引擎配置段（8 个 provider 子结构）。
  *
- * <p>default_provider 恒输出（零值 ""）；8 个 provider 子结构
+ * <p>defaultProvider 恒输出（零值 ""）；8 个 provider 子结构
  * 为 null 时省略键。provider 子结构内部字段**全部恒输出**——
  * 对象一旦存在，所有键恒输出（含 "" 与 false），golden ct-kv-storage-* 钉住。</p>
  */
 
 public class StorageEngineConfig {
 
-    @JsonProperty("default_provider")
     private String defaultProvider = "";
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    @JsonProperty("local")
     private LocalEngineConfig local;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    @JsonProperty("minio")
     private MinioEngineConfig minio;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    @JsonProperty("cos")
     private CosEngineConfig cos;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    @JsonProperty("tos")
     private TosEngineConfig tos;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    @JsonProperty("s3")
     private S3EngineConfig s3;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    @JsonProperty("oss")
     private OssEngineConfig oss;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    @JsonProperty("ks3")
     private Ks3EngineConfig ks3;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    @JsonProperty("obs")
     private ObsEngineConfig obs;
 
     public String getDefaultProvider() { return defaultProvider; }
@@ -75,7 +65,6 @@ public class StorageEngineConfig {
     public void setObs(ObsEngineConfig v) { obs = v; }
 
     public static class LocalEngineConfig {
-        @JsonProperty("path_prefix")
         private String pathPrefix = "";
 
         public String getPathPrefix() { return pathPrefix; }
@@ -83,19 +72,12 @@ public class StorageEngineConfig {
     }
 
     public static class MinioEngineConfig {
-        @JsonProperty("mode")
         private String mode = "";
-        @JsonProperty("endpoint")
         private String endpoint = "";
-        @JsonProperty("access_key_id")
         private String accessKeyId = "";
-        @JsonProperty("secret_access_key")
         private String secretAccessKey = "";
-        @JsonProperty("bucket_name")
         private String bucketName = "";
-        @JsonProperty("use_ssl")
         private boolean useSsl;
-        @JsonProperty("path_prefix")
         private String pathPrefix = "";
 
         public String getMode() { return mode; }
@@ -115,21 +97,13 @@ public class StorageEngineConfig {
     }
 
     public static class CosEngineConfig {
-        @JsonProperty("secret_id")
         private String secretId = "";
-        @JsonProperty("secret_key")
         private String secretKey = "";
-        @JsonProperty("region")
         private String region = "";
-        @JsonProperty("bucket_name")
         private String bucketName = "";
-        @JsonProperty("app_id")
         private String appId = "";
-        @JsonProperty("path_prefix")
         private String pathPrefix = "";
-        @JsonProperty("temp_bucket_name")
         private String tempBucketName = "";
-        @JsonProperty("temp_region")
         private String tempRegion = "";
 
         public String getSecretId() { return secretId; }
@@ -151,21 +125,13 @@ public class StorageEngineConfig {
     }
 
     public static class TosEngineConfig {
-        @JsonProperty("endpoint")
         private String endpoint = "";
-        @JsonProperty("region")
         private String region = "";
-        @JsonProperty("access_key")
         private String accessKey = "";
-        @JsonProperty("secret_key")
         private String secretKey = "";
-        @JsonProperty("bucket_name")
         private String bucketName = "";
-        @JsonProperty("path_prefix")
         private String pathPrefix = "";
-        @JsonProperty("temp_bucket_name")
         private String tempBucketName = "";
-        @JsonProperty("temp_region")
         private String tempRegion = "";
 
         public String getEndpoint() { return endpoint; }
@@ -187,21 +153,13 @@ public class StorageEngineConfig {
     }
 
     public static class S3EngineConfig {
-        @JsonProperty("endpoint")
         private String endpoint = "";
-        @JsonProperty("region")
         private String region = "";
-        @JsonProperty("access_key")
         private String accessKey = "";
-        @JsonProperty("secret_key")
         private String secretKey = "";
-        @JsonProperty("bucket_name")
         private String bucketName = "";
-        @JsonProperty("path_prefix")
         private String pathPrefix = "";
-        @JsonProperty("use_ssl")
         private boolean useSsl;
-        @JsonProperty("force_path_style")
         private boolean forcePathStyle;
 
         public String getEndpoint() { return endpoint; }
@@ -223,23 +181,14 @@ public class StorageEngineConfig {
     }
 
     public static class OssEngineConfig {
-        @JsonProperty("endpoint")
         private String endpoint = "";
-        @JsonProperty("region")
         private String region = "";
-        @JsonProperty("access_key")
         private String accessKey = "";
-        @JsonProperty("secret_key")
         private String secretKey = "";
-        @JsonProperty("bucket_name")
         private String bucketName = "";
-        @JsonProperty("path_prefix")
         private String pathPrefix = "";
-        @JsonProperty("use_temp_bucket")
         private boolean useTempBucket;
-        @JsonProperty("temp_bucket_name")
         private String tempBucketName = "";
-        @JsonProperty("temp_region")
         private String tempRegion = "";
 
         public String getEndpoint() { return endpoint; }
@@ -263,17 +212,11 @@ public class StorageEngineConfig {
     }
 
     public static class Ks3EngineConfig {
-        @JsonProperty("endpoint")
         private String endpoint = "";
-        @JsonProperty("region")
         private String region = "";
-        @JsonProperty("access_key")
         private String accessKey = "";
-        @JsonProperty("secret_key")
         private String secretKey = "";
-        @JsonProperty("bucket_name")
         private String bucketName = "";
-        @JsonProperty("path_prefix")
         private String pathPrefix = "";
 
         public String getEndpoint() { return endpoint; }
@@ -291,19 +234,12 @@ public class StorageEngineConfig {
     }
 
     public static class ObsEngineConfig {
-        @JsonProperty("endpoint")
         private String endpoint = "";
-        @JsonProperty("region")
         private String region = "";
-        @JsonProperty("access_key")
         private String accessKey = "";
-        @JsonProperty("secret_key")
         private String secretKey = "";
-        @JsonProperty("bucket_name")
         private String bucketName = "";
-        @JsonProperty("path_prefix")
         private String pathPrefix = "";
-        @JsonProperty("use_ssl")
         private boolean useSsl;
 
         public String getEndpoint() { return endpoint; }

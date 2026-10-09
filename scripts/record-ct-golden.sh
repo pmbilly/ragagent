@@ -239,15 +239,15 @@ req ct-kv-storage-get-default.json GET /tenants/kv/storage-engine-config \
   -H "Authorization: Bearer ${SELF}" -H "X-Tenant-ID: ${ALPHA_ID}"
 req ct-kv-storage-put.json     PUT /tenants/kv/storage-engine-config \
   -H "Authorization: Bearer ${SELF}" -H "X-Tenant-ID: ${ALPHA_ID}" -H 'Content-Type: application/json' \
-  -d '{"default_provider":"minio","minio":{"mode":"remote","endpoint":"http://minio.example.com","access_key_id":"AK","secret_access_key":"SK","bucket_name":"b","use_ssl":false,"path_prefix":"p"}}'
+  -d '{"defaultProvider":"minio","minio":{"mode":"remote","endpoint":"http://minio.example.com","accessKeyId":"AK","secretAccessKey":"SK","bucketName":"b","useSsl":false,"pathPrefix":"p"}}'
 req ct-kv-storage-get-after.json GET /tenants/kv/storage-engine-config \
   -H "Authorization: Bearer ${SELF}" -H "X-Tenant-ID: ${ALPHA_ID}"
 req ct-kv-storage-put-preserve.json PUT /tenants/kv/storage-engine-config \
   -H "Authorization: Bearer ${SELF}" -H "X-Tenant-ID: ${ALPHA_ID}" -H 'Content-Type: application/json' \
-  -d '{"default_provider":"minio","minio":{"mode":"remote","endpoint":"http://minio2.example.com","access_key_id":"***","secret_access_key":"***","bucket_name":"b2","use_ssl":true,"path_prefix":"p2"}}'
+  -d '{"defaultProvider":"minio","minio":{"mode":"remote","endpoint":"http://minio2.example.com","accessKeyId":"***","secretAccessKey":"***","bucketName":"b2","useSsl":true,"pathPrefix":"p2"}}'
 req ct-kv-storage-put-empty-provider.json PUT /tenants/kv/storage-engine-config \
   -H "Authorization: Bearer ${SELF}" -H "X-Tenant-ID: ${ALPHA_ID}" -H 'Content-Type: application/json' \
-  -d '{"default_provider":" "}'
+  -d '{"defaultProvider":" "}'
 
 echo "==> 11) KV chat-history-config（enable 场景自动建隐藏 KB，uuid 掩码）"
 req ct-kv-chat-get-default.json GET /tenants/kv/chat-history-config \

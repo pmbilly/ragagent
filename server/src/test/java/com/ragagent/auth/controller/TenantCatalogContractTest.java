@@ -292,19 +292,19 @@ class TenantCatalogContractTest {
         long alpha = createAlpha();
         assertGolden(kvGet("storage-engine-config", alpha), 200, "ct-kv-storage-get-default.json");
         assertGolden(kvPut("storage-engine-config", alpha,
-                "{\"default_provider\":\"minio\",\"minio\":{\"mode\":\"remote\","
-                        + "\"endpoint\":\"http://minio.example.com\",\"access_key_id\":\"AK\","
-                        + "\"secret_access_key\":\"SK\",\"bucket_name\":\"b\",\"use_ssl\":false,"
-                        + "\"path_prefix\":\"p\"}}"),
+                "{\"defaultProvider\":\"minio\",\"minio\":{\"mode\":\"remote\","
+                        + "\"endpoint\":\"http://minio.example.com\",\"accessKeyId\":\"AK\","
+                        + "\"secretAccessKey\":\"SK\",\"bucketName\":\"b\",\"useSsl\":false,"
+                        + "\"pathPrefix\":\"p\"}}"),
                 200, "ct-kv-storage-put.json");
         assertGolden(kvGet("storage-engine-config", alpha), 200, "ct-kv-storage-get-after.json");
         assertGolden(kvPut("storage-engine-config", alpha,
-                "{\"default_provider\":\"minio\",\"minio\":{\"mode\":\"remote\","
-                        + "\"endpoint\":\"http://minio2.example.com\",\"access_key_id\":\"***\","
-                        + "\"secret_access_key\":\"***\",\"bucket_name\":\"b2\",\"use_ssl\":true,"
-                        + "\"path_prefix\":\"p2\"}}"),
+                "{\"defaultProvider\":\"minio\",\"minio\":{\"mode\":\"remote\","
+                        + "\"endpoint\":\"http://minio2.example.com\",\"accessKeyId\":\"***\","
+                        + "\"secretAccessKey\":\"***\",\"bucketName\":\"b2\",\"useSsl\":true,"
+                        + "\"pathPrefix\":\"p2\"}}"),
                 200, "ct-kv-storage-put-preserve.json");
-        assertGolden(kvPut("storage-engine-config", alpha, "{\"default_provider\":\" \"}"),
+        assertGolden(kvPut("storage-engine-config", alpha, "{\"defaultProvider\":\" \"}"),
                 200, "ct-kv-storage-put-empty-provider.json");
     }
 

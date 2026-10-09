@@ -187,7 +187,7 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
 
     /**
      * 存储桶唯一性校验：
-     * minio/cos/tos/s3/oss 五族的 bucket_name 跨租户唯一；仅当本租户**改动**
+     * minio/cos/tos/s3/oss 五族的 bucketName 跨租户唯一；仅当本租户**改动**
      * 了某族桶名（与库存旧值不同）且该桶名被别的租户占用时拒绝。
      * 旧租户行读取失败/不存在按"无旧值"处理（selectById 返回 null）。
      */
@@ -227,7 +227,7 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
         }
     }
 
-    /** 取 minio/cos/tos/s3/oss 五族的非空 bucket_name */
+    /** 取 minio/cos/tos/s3/oss 五族的非空 bucketName */
     private static Map<String, String> bucketNames(JsonNode cfg) {
         if (cfg == null || cfg.isNull() || !cfg.isObject()) {
             return Map.of();
@@ -238,7 +238,7 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
             if (node == null || !node.isObject()) {
                 continue;
             }
-            JsonNode bucket = node.get("bucket_name");
+            JsonNode bucket = node.get("bucketName");
             if (bucket != null && bucket.isTextual() && !bucket.asText().isEmpty()) {
                 out.put(provider, bucket.asText());
             }

@@ -113,13 +113,13 @@ class ProviderWiringTest {
         row.setConfig(config);
 
         JsonNode engine = StorageFileResolver.toStorageEngineConfig(row, crypto);
-        assertEquals("minio", engine.path("default_provider").asText());
+        assertEquals("minio", engine.path("defaultProvider").asText());
         assertEquals("localhost:9100", engine.path("minio").path("endpoint").asText());
-        assertEquals("AK-minio", engine.path("minio").path("access_key_id").asText());
-        assertEquals("SK-minio", engine.path("minio").path("secret_access_key").asText());
+        assertEquals("AK-minio", engine.path("minio").path("accessKeyId").asText());
+        assertEquals("SK-minio", engine.path("minio").path("secretAccessKey").asText());
 
         // 无 enc:v1: 前缀 → 原样（照存储层"带前缀才解密"的语义）；且 s3 段的凭据键是
-        // access_key/secret_key（不是 minio 的 access_key_id/secret_access_key）
+        // accessKey/secretKey（不是 minio 的 accessKeyId/secretAccessKey）
         ObjectNode plain = mapper.createObjectNode();
         plain.put("accessKeyId", "plain-ak");
         plain.put("secretAccessKey", "plain-sk");
@@ -127,8 +127,8 @@ class ProviderWiringTest {
         plainRow.setProvider("s3");
         plainRow.setConfig(plain);
         JsonNode plainEngine = StorageFileResolver.toStorageEngineConfig(plainRow, crypto);
-        assertEquals("plain-ak", plainEngine.path("s3").path("access_key").asText());
-        assertEquals("plain-sk", plainEngine.path("s3").path("secret_key").asText());
+        assertEquals("plain-ak", plainEngine.path("s3").path("accessKey").asText());
+        assertEquals("plain-sk", plainEngine.path("s3").path("secretKey").asText());
     }
 
     @Test
@@ -145,13 +145,13 @@ class ProviderWiringTest {
         ObjectMapper engineMapper = new ObjectMapper().configure(
                 com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-        // minio：access_key_id / secret_access_key
+        // minio：accessKeyId / secretAccessKey
         assertRowCredentialsBind(mapper, engineMapper, crypto, "minio", "AK-minio", "SK-minio");
 
-        // s3：access_key / secret_key（此前这里恒为「无凭据」，行校验还恰好不报错）
+        // s3：accessKey / secretKey（此前这里恒为「无凭据」，行校验还恰好不报错）
         assertRowCredentialsBind(mapper, engineMapper, crypto, "s3", "AK-s3", "SK-s3");
 
-        // cos：secret_id / secret_key
+        // cos：secretId / secretKey
         assertRowCredentialsBind(mapper, engineMapper, crypto, "cos", "AK-cos", "SK-cos");
     }
 
@@ -171,18 +171,18 @@ class ProviderWiringTest {
 
         switch (provider) {
             case "minio" -> {
-                assertEquals(accessKey, engine.path("minio").path("access_key_id").asText(),
-                        "minio 引擎面凭据键应为 access_key_id");
+                assertEquals(accessKey, engine.path("minio").path("accessKeyId").asText(),
+                        "minio 引擎面凭据键应为 accessKeyId");
                 assertEquals(accessKey, typed.getMinio().getAccessKeyId(), "minio 凭据应绑定");
                 assertEquals(secretKey, typed.getMinio().getSecretAccessKey(), "minio 密钥应绑定");
             }
             case "cos" -> {
-                assertEquals(accessKey, typed.getCos().getSecretId(), "cos 凭据应绑定到 secret_id");
-                assertEquals(secretKey, typed.getCos().getSecretKey(), "cos 密钥应绑定到 secret_key");
+                assertEquals(accessKey, typed.getCos().getSecretId(), "cos 凭据应绑定到 secretId");
+                assertEquals(secretKey, typed.getCos().getSecretKey(), "cos 密钥应绑定到 secretKey");
             }
             default -> {
-                assertEquals(accessKey, typed.getS3().getAccessKey(), provider + " 凭据应绑定到 access_key");
-                assertEquals(secretKey, typed.getS3().getSecretKey(), provider + " 密钥应绑定到 secret_key");
+                assertEquals(accessKey, typed.getS3().getAccessKey(), provider + " 凭据应绑定到 accessKey");
+                assertEquals(secretKey, typed.getS3().getSecretKey(), provider + " 密钥应绑定到 secretKey");
             }
         }
     }
@@ -309,11 +309,11 @@ class ProviderWiringTest {
 
     private static ObjectNode completeCosConfig() {
         ObjectNode sec = new ObjectMapper().createObjectNode();
-        sec.put("default_provider", "cos");
+        sec.put("defaultProvider", "cos");
         ObjectNode cos = sec.putObject("cos");
-        cos.put("secret_id", "id");
-        cos.put("secret_key", "key");
-        cos.put("bucket_name", "bk-125");
+        cos.put("secretId", "id");
+        cos.put("secretKey", "key");
+        cos.put("bucketName", "bk-125");
         cos.put("region", "ap-guangzhou");
         return sec;
     }

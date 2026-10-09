@@ -195,7 +195,7 @@ public class StorageFileResolver {
         if (sec == null) {
             return "";
         }
-        JsonNode dp = sec.get("default_provider");
+        JsonNode dp = sec.get("defaultProvider");
         if (dp == null || !dp.isTextual()) {
             return "";
         }
@@ -209,7 +209,7 @@ public class StorageFileResolver {
 
     /**
      * provider 可空 → 租户
-     * default_provider；完备性检查的错误文案为固定线格式（presigned-preview 400 可见）。
+     * defaultProvider；完备性检查的错误文案为固定线格式（presigned-preview 400 可见）。
      */
     public FactoryResult newFileServiceFromStorageConfig(String provider, JsonNode sec, String localBaseDir) {
         String p = provider == null ? "" : provider.trim().toLowerCase(java.util.Locale.ROOT);
@@ -227,7 +227,7 @@ public class StorageFileResolver {
                 String dir = baseDir;
                 JsonNode local = sec == null ? null : sec.get("local");
                 if (local != null) {
-                    String pathPrefix = textOrNull(local.get("path_prefix"));
+                    String pathPrefix = textOrNull(local.get("pathPrefix"));
                     if (pathPrefix != null && !pathPrefix.trim().isEmpty()) {
                         String joined = LocalFileContentService.joinPath(dir, pathPrefix.trim());
                         try {
@@ -247,9 +247,9 @@ public class StorageFileResolver {
                 }
                 boolean remote = "remote".equals(textOr(m.get("mode"), ""));
                 String endpoint = remote ? textOr(m.get("endpoint"), "").trim() : env("MINIO_ENDPOINT");
-                String accessKey = remote ? textOr(m.get("access_key_id"), "").trim() : env("MINIO_ACCESS_KEY_ID");
-                String secretKey = remote ? textOr(m.get("secret_access_key"), "").trim() : env("MINIO_SECRET_ACCESS_KEY");
-                String bucket = textOr(m.get("bucket_name"), "").trim();
+                String accessKey = remote ? textOr(m.get("accessKeyId"), "").trim() : env("MINIO_ACCESS_KEY_ID");
+                String secretKey = remote ? textOr(m.get("secretAccessKey"), "").trim() : env("MINIO_SECRET_ACCESS_KEY");
+                String bucket = textOr(m.get("bucketName"), "").trim();
                 if (bucket.isEmpty()) {
                     bucket = env("MINIO_BUCKET_NAME");
                 }
@@ -261,8 +261,8 @@ public class StorageFileResolver {
             }
             case "cos": {
                 JsonNode c = sec == null ? null : sec.get("cos");
-                if (c == null || textOr(c.get("secret_id"), "").isEmpty() || textOr(c.get("secret_key"), "").isEmpty()
-                        || textOr(c.get("bucket_name"), "").isEmpty() || textOr(c.get("region"), "").isEmpty()) {
+                if (c == null || textOr(c.get("secretId"), "").isEmpty() || textOr(c.get("secretKey"), "").isEmpty()
+                        || textOr(c.get("bucketName"), "").isEmpty() || textOr(c.get("region"), "").isEmpty()) {
                     return new FactoryResult(null, p, "incomplete cos config");
                 }
                 return providerBacked(p, sec, baseDir);
@@ -270,19 +270,19 @@ public class StorageFileResolver {
             case "tos": {
                 JsonNode t = sec == null ? null : sec.get("tos");
                 if (t == null || textOr(t.get("endpoint"), "").isEmpty() || textOr(t.get("region"), "").isEmpty()
-                        || textOr(t.get("access_key"), "").isEmpty() || textOr(t.get("secret_key"), "").isEmpty()
-                        || textOr(t.get("bucket_name"), "").isEmpty()) {
+                        || textOr(t.get("accessKey"), "").isEmpty() || textOr(t.get("secretKey"), "").isEmpty()
+                        || textOr(t.get("bucketName"), "").isEmpty()) {
                     return new FactoryResult(null, p, "incomplete tos config");
                 }
                 return providerBacked(p, sec, baseDir);
             }
             case "s3": {
                 JsonNode s = sec == null ? null : sec.get("s3");
-                if (s == null || textOr(s.get("region"), "").isEmpty() || textOr(s.get("bucket_name"), "").isEmpty()) {
+                if (s == null || textOr(s.get("region"), "").isEmpty() || textOr(s.get("bucketName"), "").isEmpty()) {
                     return new FactoryResult(null, p, "incomplete s3 config");
                 }
-                boolean hasKey = !textOr(s.get("access_key"), "").isEmpty();
-                boolean hasSecret = !textOr(s.get("secret_key"), "").isEmpty();
+                boolean hasKey = !textOr(s.get("accessKey"), "").isEmpty();
+                boolean hasSecret = !textOr(s.get("secretKey"), "").isEmpty();
                 if (hasKey != hasSecret) {
                     return new FactoryResult(null, p, "incomplete s3 config");
                 }
@@ -291,9 +291,9 @@ public class StorageFileResolver {
             case "obs": {
                 JsonNode o = sec == null ? null : sec.get("obs");
                 String endpoint = o != null ? textOr(o.get("endpoint"), "").trim() : "";
-                String accessKey = o != null ? textOr(o.get("access_key"), "").trim() : "";
-                String secretKey = o != null ? textOr(o.get("secret_key"), "").trim() : "";
-                String bucket = o != null ? textOr(o.get("bucket_name"), "").trim() : "";
+                String accessKey = o != null ? textOr(o.get("accessKey"), "").trim() : "";
+                String secretKey = o != null ? textOr(o.get("secretKey"), "").trim() : "";
+                String bucket = o != null ? textOr(o.get("bucketName"), "").trim() : "";
                 if (endpoint.isEmpty()) {
                     endpoint = env("OBS_ENDPOINT");
                 }
@@ -314,8 +314,8 @@ public class StorageFileResolver {
             case "oss": {
                 JsonNode o = sec == null ? null : sec.get("oss");
                 if (o == null || textOr(o.get("endpoint"), "").isEmpty() || textOr(o.get("region"), "").isEmpty()
-                        || textOr(o.get("access_key"), "").isEmpty() || textOr(o.get("secret_key"), "").isEmpty()
-                        || textOr(o.get("bucket_name"), "").isEmpty()) {
+                        || textOr(o.get("accessKey"), "").isEmpty() || textOr(o.get("secretKey"), "").isEmpty()
+                        || textOr(o.get("bucketName"), "").isEmpty()) {
                     return new FactoryResult(null, p, "incomplete oss config");
                 }
                 return providerBacked(p, sec, baseDir);
@@ -323,8 +323,8 @@ public class StorageFileResolver {
             case "ks3": {
                 JsonNode k = sec == null ? null : sec.get("ks3");
                 if (k == null || textOr(k.get("endpoint"), "").isEmpty() || textOr(k.get("region"), "").isEmpty()
-                        || textOr(k.get("access_key"), "").isEmpty() || textOr(k.get("secret_key"), "").isEmpty()
-                        || textOr(k.get("bucket_name"), "").isEmpty()) {
+                        || textOr(k.get("accessKey"), "").isEmpty() || textOr(k.get("secretKey"), "").isEmpty()
+                        || textOr(k.get("bucketName"), "").isEmpty()) {
                     return new FactoryResult(null, p, "incomplete ks3 config");
                 }
                 return providerBacked(p, sec, baseDir);
@@ -362,7 +362,7 @@ public class StorageFileResolver {
 
     /**
      * 写面解析：按
-     * backend 优先 → 环境回归 → 租户 default_provider 的顺序解析出**原始** provider
+     * backend 优先 → 环境回归 → 租户 defaultProvider 的顺序解析出**原始** provider
      * 服务（知识上传的 {@code SaveFile} / 读取的 {@code GetFile} 直连它，不经过
      * resource catalog 装饰——装饰层是给 HTTP 流式面用的）。
      *
@@ -473,15 +473,15 @@ public class StorageFileResolver {
     static JsonNode toStorageEngineConfig(StorageBackend b, CryptoService crypto) {
         var cfg = new com.fasterxml.jackson.databind.node.ObjectNode(
                 com.fasterxml.jackson.databind.json.JsonMapper.builder().build().getNodeFactory());
-        cfg.put("default_provider", b.getProvider());
+        cfg.put("defaultProvider", b.getProvider());
         JsonNode c = b.getConfig();
         switch (b.getProvider() == null ? "" : b.getProvider()) {
             case "local" -> {
                 var local = cfg.putObject("local");
-                local.put("path_prefix", textValue(c, "pathPrefix"));
+                local.put("pathPrefix", textValue(c, "pathPrefix"));
             }
             default -> {
-                // local 之外只需 default_provider
+                // local 之外只需 defaultProvider
                 // 与 provider 段（完备性检查读 sec.<provider>.*）。实例行配置是 camelCase
                 //（StorageConfig 键名=字段名），这里改写成引擎面既定的 snake 键；凭据先解密。
                 if (c != null) {
@@ -496,12 +496,12 @@ public class StorageFileResolver {
     }
 
     /**
-     * 行配置（camelCase）→ 引擎面键（snake，冻结面）。自由键原样保留。
+     * 行配置（camelCase）→ 各 provider 段字段名。自由键原样保留。
      *
-     * <p><b>凭据两键按 provider 分族</b>：引擎面各段的 {@code @JsonProperty} 并不统一——
-     * {@code MinioEngineConfig} 认 {@code access_key_id}/{@code secret_access_key}、
-     * {@code CosEngineConfig} 认 {@code secret_id}/{@code secret_key}、
-     * 其余（s3/tos/oss/ks3/obs）认 {@code access_key}/{@code secret_key}。</p>
+     * <p><b>凭据两键按 provider 分族</b>：各段的字段名并不统一——
+     * {@code MinioEngineConfig} 认 {@code accessKeyId}/{@code secretAccessKey}、
+     * {@code CosEngineConfig} 认 {@code secretId}/{@code secretKey}、
+     * 其余（s3/tos/oss/ks3/obs）认 {@code accessKey}/{@code secretKey}。</p>
      *
      * <p>此前这里统一改写成 minio 形态，于是<b>除 minio 外的行配置凭据被 Jackson 静默丢弃</b>
      * （转换器配了 {@code FAIL_ON_UNKNOWN_PROPERTIES=false}，未知键不报错）——云读退化为
@@ -514,20 +514,13 @@ public class StorageFileResolver {
         }
         String p = provider == null ? "" : provider.trim().toLowerCase(java.util.Locale.ROOT);
         String accessField = switch (p) {
-            case "minio" -> "access_key_id";
-            case "cos" -> "secret_id";
-            default -> "access_key";
+            case "minio" -> "accessKeyId";
+            case "cos" -> "secretId";
+            default -> "accessKey";
         };
-        String secretField = "minio".equals(p) ? "secret_access_key" : "secret_key";
+        String secretField = "minio".equals(p) ? "secretAccessKey" : "secretKey";
         moveKey(obj, "accessKeyId", accessField);
         moveKey(obj, "secretAccessKey", secretField);
-        for (String[] pair : new String[][]{
-                {"bucketName", "bucket_name"}, {"pathPrefix", "path_prefix"},
-                {"appId", "app_id"}, {"useSsl", "use_ssl"},
-                {"forcePathStyle", "force_path_style"}, {"useTempBucket", "use_temp_bucket"},
-                {"tempBucketName", "temp_bucket_name"}, {"tempRegion", "temp_region"}}) {
-            moveKey(obj, pair[0], pair[1]);
-        }
     }
 
     /** 改键：目标键已存在时保留现状（行里显式给的引擎面键优先）。 */
@@ -542,7 +535,7 @@ public class StorageFileResolver {
     private static void decryptCredentials(com.fasterxml.jackson.databind.JsonNode providerConfig,
             CryptoService crypto) {
         for (String field : new String[]{
-                "access_key_id", "secret_access_key", "secret_id", "secret_key", "access_key"}) {
+                "accessKeyId", "secretAccessKey", "secretId", "secretKey", "accessKey"}) {
             com.fasterxml.jackson.databind.JsonNode value = providerConfig.get(field);
             if (value != null && value.isTextual()) {
                 ((com.fasterxml.jackson.databind.node.ObjectNode) providerConfig)

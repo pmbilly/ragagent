@@ -87,14 +87,14 @@ class TenantFileStorageTest {
         Tenant tenant = new Tenant();
         tenant.setId(7L);
         ObjectNode sec = new ObjectMapper().createObjectNode();
-        sec.put("default_provider", "local");
+        sec.put("defaultProvider", "local");
         tenant.setStorageEngineConfig(sec);
 
         TenantFileStorage storage = facade(dir, tenant);
         String path = storage.save(7L, "k-2", "a.txt", "x".getBytes(StandardCharsets.UTF_8));
         assertEquals("resource://7/k-2/a.txt", path);
         // local 的 provider 服务为 null（写面解析的"走本地"信号）。
-        // 经租户 default_provider 表达——显式传 provider 会走 legacy alias 查询（要 DB 仓储）。
+        // 经租户 defaultProvider 表达——显式传 provider 会走 legacy alias 查询（要 DB 仓储）。
         StorageFileResolver.ProviderResolution pr = new StorageFileResolver(null, null)
                 .resolveProviderService(tenant, "", null, dir.toString());
         assertNull(pr.service());
@@ -108,11 +108,11 @@ class TenantFileStorageTest {
         Tenant tenant = new Tenant();
         tenant.setId(9L);
         ObjectNode sec = new ObjectMapper().createObjectNode();
-        sec.put("default_provider", "cos");
+        sec.put("defaultProvider", "cos");
         ObjectNode cos = sec.putObject("cos");
-        cos.put("secret_id", "id");
-        cos.put("secret_key", "key");
-        cos.put("bucket_name", "bk-125");
+        cos.put("secretId", "id");
+        cos.put("secretKey", "key");
+        cos.put("bucketName", "bk-125");
         cos.put("region", "ap-guangzhou");
         tenant.setStorageEngineConfig(sec);
 
@@ -130,8 +130,8 @@ class TenantFileStorageTest {
         Tenant tenant = new Tenant();
         tenant.setId(9L);
         ObjectNode sec = new ObjectMapper().createObjectNode();
-        sec.put("default_provider", "cos");
-        sec.putObject("cos").put("secret_id", "id"); // 缺 secret_key/bucket/region
+        sec.put("defaultProvider", "cos");
+        sec.putObject("cos").put("secretId", "id"); // 缺 secretKey/bucket/region
         tenant.setStorageEngineConfig(sec);
 
         TenantFileStorage storage = facade(dir, tenant);
@@ -148,7 +148,7 @@ class TenantFileStorageTest {
         Tenant tenant = new Tenant();
         tenant.setId(11L);
         ObjectNode sec = new ObjectMapper().createObjectNode();
-        sec.put("default_provider", "cos");
+        sec.put("defaultProvider", "cos");
         tenant.setStorageEngineConfig(sec); // cos 段缺失 → 解析失败
 
         TenantFileStorage storage = facade(dir, tenant);
