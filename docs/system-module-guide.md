@@ -313,7 +313,7 @@ cd frontend && npx vue-tsc --build --force && npm test
 2. **ssrf.whitelist 的启动预载不能删**：guard 是进程级静态、初始化只读 env；删了预载，重启后 DB 白名单静默失效。出处：`SystemSettingService` javadoc（实测案例）。
 3. **settings 的错误文案与 description 是契约**：`unknown setting key "x"`、`invalid value for ...`、registry 的 description 都会原样出现在响应里。出处：`SystemSettingRegistry` javadoc（"Description 文案是响应体的一部分，不是注释"）。
 4. **check 类端点的请求侧 snake 是冻结面**：与租户配置 jsonb 同形，别"顺手"DTO 化——要与 knowledge 域租户配置解冻同批。出处：`SystemController` javadoc + HANDOFF §14.9f 边界。（2026-10-09 更新：§15.3「已解除」表下租户配置内容**已开始换锚**——B132 完成 `chat-history-config` / `retrieval-config`，B133 完成 `storage-engine-config`；`parser-engine-config` 判为**外部决定**（docreader `config_overrides`）保持 snake。本条的系统 check 端点自身仍未动，解冻已无前置依赖，可独立成批。）
-5. **审计 details 键名有意保留 snake**：`target_email`/`quota_gb`/`old_value`/`task_id` 是跨域事件载荷，要改就独立一批（RBAC/settings/队列产生方一起）。出处：HANDOFF §14.9g"有意保留（勿当漏网）"。
+5. **审计 details 键名**（2026-10-09 更新）：原先整族保留 snake，B135a 已把**守卫登记的那 8 键**换锚 camel（`rawPath`/`requiredRole`/`scopeType`/`quotaBytes`/`quotaGb`/`valueType`/`oldValue`/`newValue`——details 面其余键（`tenantId`/`newRole`/`sourceType`/`agentTotal`/`slug`…）本就是 camel）；**余 `task_id`（datasource 活动详情）与 `target_email`** 仍 snake，属跨域事件载荷，按原口径"要改就独立一批（RBAC/settings/队列产生方一起）"。出处：HANDOFF §14.9g + B135a 批记录。
 6. **capabilities 的键序与部署漂移**：JSON 输出必须按键字母序（holder 用 LinkedHashMap 保序所以按字母序插入）；capabilities 表达**部署状态**而非代码契约，跨部署不做字节比对。出处：`DeploymentCapabilitiesHolder` 注释 + `SystemContractTest` javadoc。
 7. **探测逻辑长在 controller 里**：`SystemController` 700 行，storage check 的 7 个 provider 分支、文案分派、`overridesFromRaw` 的 20+ 个 snake 键全在 controller。改 provider 语义只动这一处，但别把它当 service 层逻辑复用。
 8. **换锚/改键名前统计要两种写法都 grep**（`@JsonProperty` 与全限定 `@com.fasterxml...`）：auth 域曾因短名 grep 漏算 98 处。出处：HANDOFF §14.9h"口径修正"。

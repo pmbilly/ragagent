@@ -347,7 +347,7 @@ function auditTargetDiff(row: AuditLog): string {
   if (row.action === 'system.setting_changed') {
     if (row.targetType === 'tenant_storage_quota') {
       const affected = typeof details.affected === 'number' ? details.affected : null
-      const gb = typeof details.quota_gb === 'number' ? details.quota_gb : null
+      const gb = typeof details.quotaGb === 'number' ? details.quotaGb : null
       if (affected !== null && gb !== null) {
         return t('system.globalSettings.audit.target.bulkQuotaDiff', {
           count: String(affected),
@@ -370,8 +370,8 @@ function auditTargetDiff(row: AuditLog): string {
     }
     return ''
   }
-  if (row.action === 'rbac.access_denied' && typeof details.required_role === 'string') {
-    return t('system.globalSettings.audit.target.requiredRole', { role: details.required_role })
+  if (row.action === 'rbac.access_denied' && typeof details.requiredRole === 'string') {
+    return t('system.globalSettings.audit.target.requiredRole', { role: details.requiredRole })
   }
   return ''
 }
@@ -392,8 +392,8 @@ function formatSettingDiff(details: Record<string, unknown>): string {
   }
   const truncate = (s: string): string =>
     s.length > SETTING_DIFF_MAX_LEN ? s.slice(0, SETTING_DIFF_MAX_LEN - 1) + '…' : s
-  const oldStr = truncate(fmt(details.old_value))
-  const newStr = truncate(fmt(details.new_value))
+  const oldStr = truncate(fmt(details.oldValue))
+  const newStr = truncate(fmt(details.newValue))
   if (oldStr === newStr) return ''
   return `${oldStr} → ${newStr}`
 }

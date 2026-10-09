@@ -132,7 +132,7 @@ public class AuditLogService {
      *
      * <p><b>requestPath 用路由模板而非原始 URL</b>：否则攻击者遍历 URL 里的 UUID 会
      * 让每个请求都拿到新的去重键，窗口失效、表被撑爆。原始 URL 保留在 Details 的
-     * {@code raw_path} 里供取证用，所以"探测了哪个资源"并没有丢。</p>
+     * {@code rawPath} 里供取证用，所以"探测了哪个资源"并没有丢。</p>
      *
      * @param tenantId      调用方活动空间；0 = system 作用域
      * @param actorUserId   调用方用户 ID
@@ -173,13 +173,13 @@ public class AuditLogService {
         }
 
         // details 键按**字母序**输出
-        // → raw_path（r-a）在 required_role（r-e）之前。PG jsonb 落库后还会按
+        // → rawPath（r-a）在 requiredRole（r-e）之前。PG jsonb 落库后还会按
         // （长度, 字节序）再规范化一次，Java 读取路径的 PgJsonTypeHandler 做同样的事，两端一致。
         ObjectNode details = AUDIT_DETAILS_MAPPER.createObjectNode();
         if (!raw.isEmpty() && !raw.equals(path)) {
-            details.put("raw_path", raw);
+            details.put("rawPath", raw);
         }
-        details.put("required_role", requiredRole == null ? "" : requiredRole);
+        details.put("requiredRole", requiredRole == null ? "" : requiredRole);
 
         log(newAuditLog(tenantId, actor, actorRole, AuditAction.ACCESS_DENIED,
                 path, requestMethod, AuditOutcome.DENIED, details));

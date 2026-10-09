@@ -1100,8 +1100,8 @@ function auditTargetDiff(row: AuditLog): string {
     if (d.old_role && d.new_role) return `${d.old_role} → ${d.new_role}`
   }
   if (row.action === 'rbac.access_denied') {
-    if (typeof d.required_role === 'string') {
-      return t('tenantMember.audit.requiredRole', { role: d.required_role })
+    if (typeof d.requiredRole === 'string') {
+      return t('tenantMember.audit.requiredRole', { role: d.requiredRole })
     }
   }
   if (row.action === 'rbac.invitation_sent' || row.action === 'rbac.invitation_revoked') {

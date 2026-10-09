@@ -605,7 +605,7 @@ class JsonContractRoundTripTest {
      * <ol>
      *   <li>{@code AuditLog} 的 15 个键<b>恒输出</b>——键名必须逐字对齐线格式
      *       （{@code actor_user_id} / {@code target_user_id} / {@code request_method} …
-     *       最易漏的是 {@code scope_type}/{@code scope_id}，它们是迁移 000073 才加的）；</li>
+     *       最易漏的是 {@code scopeType}/{@code scope_id}，它们是迁移 000073 才加的）；</li>
      *   <li>它<b>同时是</b> jsonb 列的宿主：{@code details} 走 PgJsonTypeHandler，
      *       本测试的裸 ObjectMapper 不注册 JSR-310，所以时间字段留空
      *       （时间格式另由 JacksonConfig + 控制器测试覆盖）；</li>
@@ -617,8 +617,8 @@ class JsonContractRoundTripTest {
     @Test
     void auditLogContractsRoundTrip() {
         ObjectNode details = MAPPER.createObjectNode();
-        details.put("raw_path", "/api/v1/tenants/7");
-        details.put("required_role", "admin");
+        details.put("rawPath", "/api/v1/tenants/7");
+        details.put("requiredRole", "admin");
 
         AuditLog entry = new AuditLog();
         entry.setId(102L);

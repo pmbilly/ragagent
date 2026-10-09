@@ -442,16 +442,16 @@ public class SystemSettingService implements SystemSettingGateway {
         }
     }
 
-    /** tenant_id=0 + old_value/new_value（RawMessage 直嵌）。 */
+    /** tenant_id=0 + oldValue/newValue（RawMessage 直嵌）。 */
     private void emitChangeAudit(String key, String valueType, JsonNode oldValue, JsonNode newValue) {
         if (auditService == null) {
             return;
         }
         var details = MAPPER.createObjectNode();
         details.put("key", key);
-        details.put("value_type", valueType);
-        details.set("old_value", oldValue == null ? MAPPER.nullNode() : oldValue);
-        details.set("new_value", newValue == null ? MAPPER.nullNode() : newValue);
+        details.put("valueType", valueType);
+        details.set("oldValue", oldValue == null ? MAPPER.nullNode() : oldValue);
+        details.set("newValue", newValue == null ? MAPPER.nullNode() : newValue);
         AuditLog entry = new AuditLog();
         entry.setTenantId(0L);
         entry.setActorUserId(auditActor());

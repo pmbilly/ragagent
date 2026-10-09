@@ -17,7 +17,7 @@ export type AuditOutcome = 'accepted' | 'success' | 'failed' | 'partial' | 'canc
 
 // AuditLog mirrors audit/domain/AuditLog. `details` is the JSONB
 // blob — for role changes it carries `{"old_role":..., "new_role":...}`,
-// for access_denied it carries `{"required_role":...}`. We keep it as
+// for access_denied it carries `{"requiredRole":...}`. We keep it as
 // an opaque record so future detail shapes don't need a frontend
 // breaking change.
 export interface AuditLog {

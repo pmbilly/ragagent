@@ -26,7 +26,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 /**
  * audit_logs 仓储语义测试（H2）——补齐 mock 测不出来的 SQL 行为部分。
  *
- * <p>覆盖：作用域过滤（scope_type/scope_id）、UnscopedOnly、租户边界、
+ * <p>覆盖：作用域过滤（scopeType/scope_id）、UnscopedOnly、租户边界、
  * id DESC 排序与游标、limit 默认/上限、action/outcome/actor 过滤、
  * 去重 count 的窗口与元组语义、retention DELETE 的影响行数，
  * 以及 details 这个 jsonb 列的往返（读回经 PgJsonTypeHandler 规范化）。</p>
@@ -228,8 +228,8 @@ class AuditLogRepositoryTest {
     void detailsRoundTripsThroughJsonbColumn() {
         ObjectNode details = MAPPER.createObjectNode();
         // 故意按非规范序插入，读回必须已被规范化
-        details.put("required_role", "admin");
-        details.put("raw_path", "/api/v1/tenants/10002/audit-log");
+        details.put("requiredRole", "admin");
+        details.put("rawPath", "/api/v1/tenants/10002/audit-log");
 
         AuditLog e = row(7, AuditAction.ACCESS_DENIED, "", "");
         e.setDetails(details);
@@ -237,13 +237,13 @@ class AuditLogRepositoryTest {
 
         AuditLog back = repo.list(7, AuditLogQuery.empty()).get(0);
         assertThat(back.getDetails()).isNotNull();
-        assertThat(back.getDetails().get("required_role").asText()).isEqualTo("admin");
-        assertThat(back.getDetails().get("raw_path").asText())
+        assertThat(back.getDetails().get("requiredRole").asText()).isEqualTo("admin");
+        assertThat(back.getDetails().get("rawPath").asText())
                 .isEqualTo("/api/v1/tenants/10002/audit-log");
-        // 规范化后的键序：raw_path(8) 短于 required_role(13)
+        // 规范化后的键序：rawPath(8) 短于 requiredRole(13)
         List<String> names = new ArrayList<>();
         back.getDetails().fieldNames().forEachRemaining(names::add);
-        assertThat(names).containsExactly("raw_path", "required_role");
+        assertThat(names).containsExactly("rawPath", "requiredRole");
     }
 
     /** details 为 null 时落库默认 '{}'（不是 NULL，也不是 "null"）——列是 NOT NULL DEFAULT '{}'。 */

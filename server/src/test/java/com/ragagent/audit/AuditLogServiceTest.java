@@ -179,10 +179,10 @@ class AuditLogServiceTest {
         assertThat(row.getRequestPath()).isEqualTo("/api/v1/tenants/7");
         assertThat(row.getRequestMethod()).isEqualTo("PUT");
         assertThat(row.getActorRole()).isEqualTo("viewer");
-        assertThat(row.getDetails().get("required_role").asText()).isEqualTo("admin");
-        // raw_path 与 request_path 相同时**不写**（去重同一资源）
-        assertThat(row.getDetails().has("raw_path")).isFalse();
-        assertThat(row.getDetails().fieldNames()).toIterable().containsExactly("required_role");
+        assertThat(row.getDetails().get("requiredRole").asText()).isEqualTo("admin");
+        // rawPath 与 request_path 相同时**不写**（去重同一资源）
+        assertThat(row.getDetails().has("rawPath")).isFalse();
+        assertThat(row.getDetails().fieldNames()).toIterable().containsExactly("requiredRole");
     }
 
     /**
@@ -230,11 +230,11 @@ class AuditLogServiceTest {
 
     /**
      * 路由模板与原始 URL 不同时：{@code request_path} 记<b>模板</b>（去重键稳定，
-     * 遍历 UUID 无法绕开窗口），原始 URL 进 Details 的 {@code raw_path} 供取证。
+     * 遍历 UUID 无法绕开窗口），原始 URL 进 Details 的 {@code rawPath} 供取证。
      *
      * <p>这是对运行中 dev server 实测确认的契约：
      * {@code {"request_path":"/api/v1/tenants/:id/audit-log",
-     * "details":{"raw_path":"/api/v1/tenants/10002/audit-log","required_role":"admin"}}}。</p>
+     * "details":{"rawPath":"/api/v1/tenants/10002/audit-log","requiredRole":"admin"}}}。</p>
      */
     @Test
     void logDeniedUsesRouteTemplateAndKeepsRawPathInDetails() {
@@ -247,12 +247,12 @@ class AuditLogServiceTest {
         AuditLog row = f.created().get(0);
         assertThat(row.getRequestPath()).isEqualTo("/api/v1/tenants/{id}/audit-log");
         assertThat(row.getRequestMethod()).isEqualTo("GET");
-        assertThat(row.getDetails().get("raw_path").asText())
+        assertThat(row.getDetails().get("rawPath").asText())
                 .isEqualTo("/api/v1/tenants/10002/audit-log");
-        assertThat(row.getDetails().get("required_role").asText()).isEqualTo("admin");
-        // 键序按字母序：raw_path 在 required_role 之前
+        assertThat(row.getDetails().get("requiredRole").asText()).isEqualTo("admin");
+        // 键序按字母序：rawPath 在 requiredRole 之前
         assertThat(row.getDetails().fieldNames()).toIterable()
-                .containsExactly("raw_path", "required_role");
+                .containsExactly("rawPath", "requiredRole");
     }
 
     /** 调用点会传 {@code "system_admin"} 字面量（RequireSystemAdmin 路径，实测所见）。 */
@@ -263,7 +263,7 @@ class AuditLogServiceTest {
         f.svc().logDenied(10002L, "u-owner", "user", "system_admin",
                 "/api/v1/system/admin/audit-log", "GET");
 
-        assertThat(f.created().get(0).getDetails().get("required_role").asText())
+        assertThat(f.created().get(0).getDetails().get("requiredRole").asText())
                 .isEqualTo("system_admin");
     }
 

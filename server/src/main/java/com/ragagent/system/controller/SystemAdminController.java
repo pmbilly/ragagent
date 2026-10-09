@@ -318,10 +318,10 @@ public class SystemAdminController {
                 item.lastUsedAt(), item.expiresAt(), item.createdAt());
     }
 
-    /** API-Key 审计（details: scope_type/capabilities；target_type=api_key）。 */
+    /** API-Key 审计（details: scopeType/capabilities；target_type=api_key）。 */
     private void emitAPIKeyAudit(String action, long keyId, List<String> capabilities) {
         var details = new LinkedHashMap<String, Object>();
-        details.put("scope_type", APIKeyScopeType.PLATFORM);
+        details.put("scopeType", APIKeyScopeType.PLATFORM);
         details.put("capabilities", capabilities);
         AuditLog entry = new AuditLog();
         entry.setTenantId(0L);
@@ -503,8 +503,8 @@ public class SystemAdminController {
         // 全表写走具名 Mapper 方法（FullTableWriteGuard 登记例外），不再匿名 update(null, wrapper)
         int affected = tenantMapper.applyDefaultStorageQuota(quotaBytes);
         var details = new LinkedHashMap<String, Object>();
-        details.put("quota_bytes", quotaBytes);
-        details.put("quota_gb", gb);
+        details.put("quotaBytes", quotaBytes);
+        details.put("quotaGb", gb);
         details.put("affected", affected);
         AuditLog entry = new AuditLog();
         entry.setTenantId(0L);

@@ -69,14 +69,12 @@ FROZEN_PREFIXES = (
 
 # 基线：已逐条复核的例外（文件相对路径 → 允许的键集合）。新增即失败。
 BASELINE: dict[str, set[str]] = {
-    # agent_steps 落库列 + 历史回放
+    # Langfuse span/trace 观测面（B135 复核改标：原写「agent_steps 落库列 + 历史回放」，实测站点是 toolSpanInput/toolSpanMeta 与 traceArgumentValue 构造 ⇒ 观测面，非 JSON 契约）
     'agent/ActPhase.java': {'args_redacted', 'argument_resolution', 'data_keys', 'duration_ms', 'image_count', 'mcp_service', 'mcp_tool', 'model_arg_keys', 'model_arguments', 'output_len', 'resolved_arg_keys', 'resolved_arguments', 'session_id', 'tool_call_id', 'tool_index', 'unresolved_handle_count', 'unresolved_handles'},
     # 模板令牌（数据值，非 JSON 键）
     'agent/AgentPrompts.java': {'current_time', 'web_search_status'},
     # 工具名（模型可见的函数名；§2.4 只管字段名，B88 决策：工具名与 enum 值保留 snake）
     'agent/tools/ToolCapabilities.java': {'data_analysis', 'data_schema', 'database_query', 'get_document_info', 'grep_chunks', 'knowledge_search', 'list_knowledge_chunks', 'query_knowledge_graph', 'todo_write', 'wiki_delete_page', 'wiki_flag_issue', 'wiki_read_issue', 'wiki_read_page', 'wiki_read_source_doc', 'wiki_rename_page', 'wiki_replace_text', 'wiki_search', 'wiki_update_issue', 'wiki_write_page'},
-    # 审计 details jsonb（存量 + 回放）
-    'audit/service/AuditLogService.java': {'raw_path', 'required_role'},
     # MyBatis 列名/参数（非 JSON 键）
     'auth/service/TenantInvitationService.java': {'invitation_id', 'responded_at', 'updated_at'},
     # MyBatis 列名/参数（非 JSON 键）
@@ -126,7 +124,7 @@ BASELINE: dict[str, set[str]] = {
     'knowledge/service/SpanTracker.java': {'langfuse_trace_id', 'updated_at'},
     # 提示词模板变量（数据值，模板里是 {{server_name}} 等）
     'mcp/controller/McpUsageInstructionsOps.java': {'omitted_tools', 'server_description', 'server_instructions', 'server_name'},
-    # MCP 存量 metadata 形态（算体积用）
+    # 8 MiB 门禁的体积度量形态（B135 复核改标：镜像 metadata 表列，属 §15.3 ③ DDL 面）
     'mcp/service/McpMetadataService.java': {'server_description', 'server_name', 'server_version', 'service_id', 'synced_at'},
     # memory 观测/追踪载荷（非契约）
     'memory/service/MemoryInsightOps.java': {'candidate_count', 'lexical_hits', 'matched_count', 'ranking_mode', 'subject_id', 'vector_hits', 'vector_outside', 'vector_skip'},
@@ -163,7 +161,7 @@ BASELINE: dict[str, set[str]] = {
     # agent_steps/推荐面落库 + 回放
     # agent_steps 落库列 + 回放
     'session/service/QaSupport.java': {'kb_id', 'kb_name', 'kb_type', 'mentioned_items', 'service_id', 'skill_name', 'steer_id'},
-    # agent_steps 落库列 + 回放
+    # 观测面（B135 复核改标：setupSpan.finish 的 setup 输出 + 日志字段 Map.of("event", …, "duration_ms", …)）
     'session/service/SessionKnowledgeQaService.java': {'duration_ms', 'error_type', 'knowledge_base_ids', 'search_targets', 'session_id', 'total_duration_ms', 'total_stages'},
     # agent_steps 落库列 + 回放
     'session/service/SteerSinkBridge.java': {'mentioned_items'},
@@ -171,13 +169,9 @@ BASELINE: dict[str, set[str]] = {
     'storage/fileserve/FileProxyService.java': {'file_path'},
     # 存储引擎面（snake，B14 冻结）
     'storage/fileserve/StorageFileResolver.java': {'default_provider', 'path_prefix'},
-    # 平台审计 details jsonb（存量 + 回放）
-    'system/controller/SystemAdminController.java': {'quota_bytes', 'quota_gb', 'scope_type'},
     # 存储引擎配置面（snake，同上）
     'system/controller/SystemController.java': {'access_key_id', 'bucket_name', 'mineru_parse_method', 'secret_access_key', 'use_ssl', 'weknoracloud_app_id'},
     # MyBatis 列名/参数（非 JSON 键）
-    # 平台审计 details jsonb（存量 + 回放）
-    'system/service/SystemSettingService.java': {'new_value', 'old_value', 'value_type'},
     # MyBatis 列名写入点（非 JSON 键）
     # 模型输出契约（提示词里就是 new_slugs；只解析入站）
     'wiki/service/ingest/WikiIngestCitePipeline.java': {'new_slugs'},
