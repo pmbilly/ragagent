@@ -746,7 +746,7 @@ class WikiConnectorTest {
             assertThat(img.getContentType()).isEqualTo("image/png");
             assertThat(img.getTitle()).isEqualTo("Doc With Image（内嵌图片）");
             assertThat(img.getMetadata())
-                    .containsEntry("embedded_image", "true")
+                    .containsEntry("embeddedImage", "true")
                     .doesNotContainKey("attachment");
             assertThat(img.getContent()).isEqualTo(png);
             assertThat(main.getSubtreeKeep()).contains(childId);
@@ -783,7 +783,7 @@ class WikiConnectorTest {
             assertThat(errItem.getExternalId()).isEqualTo(childId);
             assertThat(errItem.getContent() == null || errItem.getContent().length == 0).isTrue();
             assertThat(errItem.getMetadata().get("error")).isNotEmpty();
-            assertThat(errItem.getMetadata()).containsEntry("embedded_image", "true");
+            assertThat(errItem.getMetadata()).containsEntry("embeddedImage", "true");
             assertThat(main.getSubtreeKeep()).contains(childId);
             int mediasBefore = server.countPath("/open-apis/drive/v1/medias/" + imgToken + "/download");
 
@@ -944,8 +944,8 @@ class WikiConnectorTest {
         SyncCursor cursor = FeishuCursorCodec
                 .encodeSpaceNodeTimes(times, lastSync);
 
-        assertThat(cursor.getConnectorCursor()).containsKey("last_sync_time");
-        assertThat(cursor.getConnectorCursor()).containsKey("space_node_times");
+        assertThat(cursor.getConnectorCursor()).containsKey("lastSyncTime");
+        assertThat(cursor.getConnectorCursor()).containsKey("spaceNodeTimes");
         assertThat(cursor.getLastSyncTime().toInstant()).isEqualTo(lastSync.toInstant());
 
         // 模拟一次 jsonb 落库再读回
@@ -961,8 +961,8 @@ class WikiConnectorTest {
     void cursorOmitsEmptyTimes() {
         SyncCursor cursor = FeishuCursorCodec
                 .encodeSpaceNodeTimes(Map.of(), OffsetDateTime.now());
-        assertThat(cursor.getConnectorCursor()).doesNotContainKey("space_node_times");
-        assertThat(cursor.getConnectorCursor()).containsKey("last_sync_time");
+        assertThat(cursor.getConnectorCursor()).doesNotContainKey("spaceNodeTimes");
+        assertThat(cursor.getConnectorCursor()).containsKey("lastSyncTime");
 
         assertThat(FeishuCursorCodec
                 .decodeSpaceNodeTimes(Map.of())).isNull();

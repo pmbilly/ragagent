@@ -6,7 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.web.ZeroTimeSerializer;
@@ -16,7 +15,7 @@ import com.ragagent.common.web.ZeroTimeSerializer;
  * {@link com.ragagent.datasource.domain.SyncCursor#getConnectorCursor()}、
  * 最终落在 {@code data_sources.last_sync_cursor} 这个 jsonb 列里。
  *
- * <p>形状是 {@code last_sync_time} + {@code book_doc_times}：
+ * <p>形状是 {@code lastSyncTime} + {@code bookDocTimes}：
  * 外层键是 book_id（字符串），内层键是 doc_id（字符串），值是**原始的**
  * {@code content_updated_at} RFC3339 字符串（不做时间解析——变更检测就是
  * 字符串相等比较，这样连"语雀改了时间格式"都不会误判为全员变更）。</p>
@@ -30,11 +29,9 @@ public class YuqueCursor {
     private static final ObjectMapper MAPPER = JsonMappers.lenient()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-    @JsonProperty("last_sync_time")
     private OffsetDateTime lastSyncTime = ZeroTimeSerializer.ZERO_DATE_TIME;
 
     /** {@code { book_id: { doc_id: content_updated_at } }}；为空省略 → 空时整键消失。 */
-    @JsonProperty("book_doc_times")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, Map<String, String>> bookDocTimes;
 
@@ -57,7 +54,7 @@ public class YuqueCursor {
     /**
      * 把有类型的游标摊成扁平 map。
      *
-     * <p>净效果（已在 {@code YuqueCursorTest} 钉住）：{@code last_sync_time} 是
+     * <p>净效果（已在 {@code YuqueCursorTest} 钉住）：{@code lastSyncTime} 是
      * <b>RFC3339 字符串</b>，
      * {@code book_doc_times} 是嵌套字符串 map；后者为空时整个键不出现。</p>
      */

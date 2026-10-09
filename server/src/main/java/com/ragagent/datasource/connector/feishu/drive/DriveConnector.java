@@ -45,7 +45,7 @@ import com.ragagent.datasource.domain.SyncCursor;
  *   子项       : "folderToken:fileToken"
  * </pre>
  * <p>根资源的 ExternalID 是<b>裸的 rootFolderToken</b>（不带 {@code ":token"} 后缀），
- * 这样它才与用户存在 {@code form.config.resource_ids = [folderToken]} 里的值一致——
+ * 这样它才与用户存在 {@code form.config.resourceIds = [folderToken]} 里的值一致——
  * 写成 {@code "token:token"} 会让编辑时的选中匹配失效。</p>
  *
  * <h2>落库行为清单</h2>
@@ -613,7 +613,7 @@ public class DriveConnector implements StreamingConnector {
      * 子文件夹请用 {@link #driveFileToResource}——列表 API 会返回每个子文件夹的 Name。</p>
      *
      * <p>根的 ExternalID 是<b>裸的 rootFolderToken</b>（无 {@code ":fileToken"} 后缀），
-     * 以便与用户存在 {@code form.config.resource_ids = [folderToken]} 里的值匹配。</p>
+     * 以便与用户存在 {@code form.config.resourceIds = [folderToken]} 里的值匹配。</p>
      *
      * <p>{@code parentToken} 参数当前未被使用，仅为保持调用方签名稳定而保留。</p>
      */

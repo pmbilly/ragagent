@@ -387,7 +387,7 @@ class YuqueConnectorTest {
 
             assertThat(result.items()).hasSize(2);
             assertThat(result.cursor()).isNotNull();
-            assertThat(result.cursor().getConnectorCursor()).containsKey("book_doc_times");
+            assertThat(result.cursor().getConnectorCursor()).containsKey("bookDocTimes");
         }
     }
 
@@ -679,7 +679,7 @@ class YuqueConnectorTest {
                     FakeYuque.docDetail(1, "A", "markdown", "a", "2026-04-20T10:00:00Z", "alice/a")));
 
             SyncCursor cursor = connector().fetchIncremental(f.config("10"), null).cursor();
-            Object times = cursor.getConnectorCursor().get("book_doc_times");
+            Object times = cursor.getConnectorCursor().get("bookDocTimes");
             assertThat(times).isInstanceOf(Map.class);
             Map<String, Object> inner = (Map<String, Object>) ((Map<String, Object>) times).get("10");
             assertThat(inner).containsEntry("1", "2026-04-20T10:00:00Z");

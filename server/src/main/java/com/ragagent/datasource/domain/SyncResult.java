@@ -18,10 +18,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *   SyncResult{} → {"total":0,"created":0,"updated":0,"deleted":0,"skipped":0,"failed":0}
  *   SyncResult(全字段) →
  *   {"total":1,"created":2,"updated":3,"deleted":4,"skipped":5,"failed":6,
- *    "deletion_failed":7,
+ *    "deletionFailed":7,
  *    "errors":[{"title":"t","code":"c","params":{"code":"1663"},"message":"m"}],
- *    "next_cursor":{"last_sync_time":"0001-01-01T00:00:00Z","connector_cursor":null,
- *                   "last_schema_hash":"h"}}
+ *    "nextCursor":{"lastSyncTime":"0001-01-01T00:00:00Z","connectorCursor":null,
+ *                   "lastSchemaHash":"h"}}
  * </pre>
  * <p>九个键**全部恒输出**（键名＝字段名）——{@code deletionFailed} 零值写 0、
  * {@code errors} 写 {@code null}（null 与空列表同形）、{@code nextCursor} 写 {@code null}。

@@ -265,7 +265,7 @@ class RssPureFunctionsTest {
         prev.setFeedSignals(new LinkedHashMap<>(Map.of(
                 "f1", new LinkedHashMap<>(Map.of("i1", "s1")))));
 
-        // 期望值：f1 -> {"feed_items":{"f1":{"i1":"h1"}},"feed_signals":{"f1":{"i1":"s1"}}}
+        // 期望值：f1 -> {"feedItems":{"f1":{"i1":"h1"}},"feedSignals":{"f1":{"i1":"s1"}}}
         RssCursor dst = new RssCursor();
         dst.setLastSyncTime(utc(2006, 1, 2, 15, 4, 5));
         dst.setFeedItems(new LinkedHashMap<>());

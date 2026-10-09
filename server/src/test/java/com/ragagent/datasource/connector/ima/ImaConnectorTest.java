@@ -644,13 +644,13 @@ class ImaConnectorTest {
 
             SyncCursor cursor = connector().fetchIncremental(f.config("kb1"), null).cursor();
 
-            assertThat(cursor.getConnectorCursor()).containsOnlyKeys("last_sync_time", "kb_logical");
-            assertThat(cursor.getConnectorCursor().get("last_sync_time")).isInstanceOf(String.class);
-            assertThat((String) cursor.getConnectorCursor().get("last_sync_time"))
+            assertThat(cursor.getConnectorCursor()).containsOnlyKeys("lastSyncTime", "kbLogical");
+            assertThat(cursor.getConnectorCursor().get("lastSyncTime")).isInstanceOf(String.class);
+            assertThat((String) cursor.getConnectorCursor().get("lastSyncTime"))
                     .startsWith("20");  // RFC3339（JVM 默认时区）
             @SuppressWarnings("unchecked")
             Map<String, Object> kbLogical =
-                    (Map<String, Object>) cursor.getConnectorCursor().get("kb_logical");
+                    (Map<String, Object>) cursor.getConnectorCursor().get("kbLogical");
             assertThat(kbLogical).containsOnlyKeys("kb1");
             @SuppressWarnings("unchecked")
             Map<String, Object> entries = (Map<String, Object>) kbLogical.get("kb1");

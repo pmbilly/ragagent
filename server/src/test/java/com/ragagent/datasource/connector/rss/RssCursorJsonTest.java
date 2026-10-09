@@ -24,23 +24,23 @@ import org.junit.jupiter.api.Test;
  *
  * <h2>序列化行为（期望值）</h2>
  * <pre>
- *   lastSyncTime=t, 两个 map 都为空                     → {"last_sync_time":"2006-01-02T15:04:05Z"}
- *                                                        （feed_items/feed_signals 两个键不输出）
+ *   lastSyncTime=t, 两个 map 都为空                     → {"lastSyncTime":"2006-01-02T15:04:05Z"}
+ *                                                        （feedItems/feedSignals 两个键不输出）
  *   两个 map 为 null                                    → 同上
  *   {feedItems:{"https://a/f":{"guid-1":"h:abc",...}},
- *    feedSignals:{"https://a/f":{...}}}                → {"last_sync_time":...,
- *                                                         "feed_items":{...},"feed_signals":{...}}
+ *    feedSignals:{"https://a/f":{...}}}                → {"lastSyncTime":...,
+ *                                                         "feedItems":{...},"feedSignals":{...}}
  *   {feedItems:{"z":{}}, feedSignals:{"z":{}}}          → 两个键**保留**（值是空 map 但键在）
  * </pre>
  * <p>真实同步产出的一整条 {@code SyncCursor} 示例：
- * {@code {"last_sync_time":"2026-09-18T06:09:08.504305Z","connector_cursor":{"feed_items":{…},
- * "feed_signals":{…},"last_sync_time":"2026-09-18T06:09:08.504305Z"},"last_schema_hash":""}}
- * ——注意 {@code connector_cursor} 里的键是<b>字母序</b>（{@code feed_items} &lt;
- * {@code feed_signals} &lt; {@code last_sync_time}），
+ * {@code {"lastSyncTime":"2026-09-18T06:09:08.504305Z","connector_cursor":{"feedItems":{…},
+ * "feedSignals":{…},"lastSyncTime":"2026-09-18T06:09:08.504305Z"},"last_schema_hash":""}}
+ * ——注意 {@code connectorCursor} 里的键是<b>字母序</b>（{@code feedItems} &lt;
+ * {@code feedSignals} &lt; {@code lastSyncTime}），
  * 由 {@code DataSourceMapSerializer} 保证。</p>
  *
  * <h2>时间的时区写法</h2>
- * <p>{@code last_sync_time} 按标准 ISO-8601 输出 UTC（{@code "…Z"}）。
+ * <p>{@code lastSyncTime} 按标准 ISO-8601 输出 UTC（{@code "…Z"}）。
  * {@link #lastSyncTimeIsSameInstantAndUtcLikeGo()} 把这条表示显式钉住。</p>
  */
 class RssCursorJsonTest {
@@ -63,13 +63,13 @@ class RssCursorJsonTest {
 
     @Test
     void omitsEmptyFeedMapsButKeepsLastSyncTime() {
-        // 空 map / null map 都只输出 last_sync_time
+        // 空 map / null map 都只输出 lastSyncTime
         Map<String, Object> emptyMaps = cursor(t(), new LinkedHashMap<>(), new LinkedHashMap<>())
                 .toMap();
-        assertThat(emptyMaps).containsOnlyKeys("last_sync_time");
+        assertThat(emptyMaps).containsOnlyKeys("lastSyncTime");
 
         Map<String, Object> nilMaps = cursor(t(), null, null).toMap();
-        assertThat(nilMaps).containsOnlyKeys("last_sync_time");
+        assertThat(nilMaps).containsOnlyKeys("lastSyncTime");
     }
 
     @Test
@@ -80,10 +80,10 @@ class RssCursorJsonTest {
         signals.put("https://a/f", new LinkedHashMap<>(Map.of("guid-1", "s:11")));
 
         Map<String, Object> map = cursor(t(), items, signals).toMap();
-        assertThat(map).containsOnlyKeys("last_sync_time", "feed_items", "feed_signals");
+        assertThat(map).containsOnlyKeys("lastSyncTime", "feedItems", "feedSignals");
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> feedItems = (Map<String, Object>) map.get("feed_items");
+        Map<String, Object> feedItems = (Map<String, Object>) map.get("feedItems");
         assertThat(feedItems).containsOnlyKeys("https://a/f");
         @SuppressWarnings("unchecked")
         Map<String, Object> inner = (Map<String, Object>) feedItems.get("https://a/f");
@@ -93,15 +93,15 @@ class RssCursorJsonTest {
 
     @Test
     void keepsFeedKeyWhenInnerMapIsEmpty() {
-        // {feedItems:{"z":{}}} → "feed_items":{"z":{}} —— 键的省略只看外层 map 的长度
+        // {feedItems:{"z":{}}} → "feedItems":{"z":{}} —— 键的省略只看外层 map 的长度
         Map<String, Map<String, String>> items = new LinkedHashMap<>();
         items.put("z", new LinkedHashMap<>());
         Map<String, Map<String, String>> signals = new LinkedHashMap<>();
         signals.put("z", new LinkedHashMap<>());
         Map<String, Object> map = cursor(t(), items, signals).toMap();
-        assertThat(map).containsOnlyKeys("last_sync_time", "feed_items", "feed_signals");
+        assertThat(map).containsOnlyKeys("lastSyncTime", "feedItems", "feedSignals");
         // outer key 保留、"内层是空 map"也保留（省略与否只看外层长度）
-        assertThat(map.get("feed_items").toString()).isEqualTo("{z={}}");
+        assertThat(map.get("feedItems").toString()).isEqualTo("{z={}}");
     }
 
     @Test
@@ -120,17 +120,17 @@ class RssCursorJsonTest {
         // 键序：外层 SyncCursor 键名＝字段名；connectorCursor 内层是 rss 私有键（不动），
         // 且内层 map 恒按字母序输出（DataSourceMapSerializer）
         assertThat(keyOrder(json)).containsExactly(
-                "lastSyncTime", "connectorCursor", "feed_items", "feed_signals",
-                "last_sync_time", "lastSchemaHash");
+                "lastSyncTime", "connectorCursor", "feedItems", "feedSignals",
+                "lastSyncTime", "lastSchemaHash");
         assertThat(json).contains("\"lastSchemaHash\":\"\"");
-        assertThat(json).contains("\"feed_items\"");
+        assertThat(json).contains("\"feedItems\"");
         assertThat(json).contains("\"guid-1\":\"h:abc\"");
     }
 
     @Test
     void lastSyncTimeIsSameInstantAndUtcLikeGo() {
         Map<String, Object> map = cursor(t(), null, null).toMap();
-        String rendered = (String) map.get("last_sync_time");
+        String rendered = (String) map.get("lastSyncTime");
         // 瞬时一致：这是跨语言能互相读回的关键
         assertThat(Instant.parse(rendered)).isEqualTo(t().toInstant());
         // 按标准 ISO-8601 输出 UTC。
@@ -155,8 +155,8 @@ class RssCursorJsonTest {
     void toleratesUnknownKeysOnRead() {
         // 读路径必须容忍未知键：旧数据里可能多出将来新增的字段。
         Map<String, Object> stored = new LinkedHashMap<>();
-        stored.put("last_sync_time", "2006-01-02T15:04:05Z");
-        stored.put("feed_items", new LinkedHashMap<String, Object>());
+        stored.put("lastSyncTime", "2006-01-02T15:04:05Z");
+        stored.put("feedItems", new LinkedHashMap<String, Object>());
         stored.put("a_future_key", "ignored");
         RssCursor restored = RssCursor.fromMap(stored);
         assertThat(restored).isNotNull();

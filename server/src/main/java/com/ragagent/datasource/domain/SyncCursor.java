@@ -15,15 +15,15 @@ import com.ragagent.common.web.ZeroTimeSerializer;
  *
  * <p>它落 {@code data_sources.last_sync_cursor} 这个 jsonb 列——是
  * {@code DataSource.lastSyncCursor} 的**值形状**，而不是一个独立契约；
- * 连接器私有的字段全塞进 {@code connector_cursor} 这张 map 里，所以结构可以随连接器演进。</p>
+ * 连接器私有的字段全塞进 {@code connectorCursor} 这张 map 里，所以结构可以随连接器演进。</p>
  *
  * <h2>JSON 形状（{@code DataSourceJsonTest} 逐字节钉住）</h2>
  * <pre>
  *   SyncCursor{} →
- *   {"last_sync_time":"0001-01-01T00:00:00Z","connector_cursor":null,"last_schema_hash":""}
+ *   {"lastSyncTime":"0001-01-01T00:00:00Z","connectorCursor":null,"lastSchemaHash":""}
  *   SyncCursor(全字段) →
- *   {"last_sync_time":"2026-09-18T10:00:00+08:00",
- *    "connector_cursor":{"n":2,"page_token":"p"},"last_schema_hash":"h"}
+ *   {"lastSyncTime":"2026-09-18T10:00:00+08:00",
+ *    "connectorCursor":{"n":2,"page_token":"p"},"last_schema_hash":"h"}
  * </pre>
  * <p>{@code connectorCursor} {@code null} 时输出 {@code null}（恒输出）；
  * 且 map 键序按字母序排列（{@code n} 在 {@code page_token} 前）。</p>

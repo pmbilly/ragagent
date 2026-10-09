@@ -254,7 +254,7 @@ public class DataSourceService implements DataSourceSyncHandler {
      *
      * <p>⚠️ {@code configActuallyChanged} 判"整块配置是否
      * 逐字段相同"：用<b>规范化 JSON 树相等</b>表达（字段集为
-     * type / credentials / resource_ids / settings），见 {@code configDeepEquals}。</p>
+     * type / credentials / resourceIds / settings），见 {@code configDeepEquals}。</p>
      */
     public DataSource updateDataSource(DataSource ds) {
         if (ds == null || ds.getId() == null || ds.getId().isEmpty()) {
@@ -487,7 +487,7 @@ public class DataSourceService implements DataSourceSyncHandler {
      * 解析资源祖先。
      *
      * <p>⚠️ <b>空入参直接短路</b>：{@code resourceIds} 为空时直接回空列表，
-     * 连数据源都不查——所以"给一个不存在的数据源 + 空 resource_ids"回的是
+     * 连数据源都不查——所以"给一个不存在的数据源 + 空 resourceIds"回的是
      * <b>200 + {"ancestors":[]}</b>，不是 404。这条实测行为很容易在重构时被"顺手修正"。</p>
      */
     public List<String> resolveResourceAncestors(String dsId, List<String> resourceIds) {

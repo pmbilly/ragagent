@@ -273,7 +273,7 @@ public final class DocxFetcher {
     private static Map<String, String> imgMeta(DocxFetchInput in) {
         Map<String, String> m = new LinkedHashMap<>(in.baseMeta);
         m.put("parent_node_token", in.docToken);
-        m.put("embedded_image", "true");
+        m.put("embeddedImage", "true");
         return m;
     }
 

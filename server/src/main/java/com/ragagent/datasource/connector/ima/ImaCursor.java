@@ -6,7 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.web.ZeroTimeSerializer;
@@ -48,16 +47,13 @@ public class ImaCursor {
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     /** 上次同步时间（零值也输出字面量）。 */
-    @JsonProperty("last_sync_time")
     private OffsetDateTime lastSyncTime = ZeroTimeSerializer.ZERO_DATE_TIME;
 
     /** {@code { kb_id: { logical_key: media_id } }}；为空省略 → 空时整个键消失。 */
-    @JsonProperty("kb_logical")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, Map<String, String>> kbLogical;
 
     /** 遗留字段：从不写入、从不读取。 */
-    @JsonProperty("kb_media")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, Map<String, String>> kbMedia;
 
@@ -88,7 +84,7 @@ public class ImaCursor {
     /**
      * 把有类型的游标摊成扁平 map。
      *
-     * <p>净效果（已在 {@code ImaCursorTest} 中钉住）：{@code last_sync_time} 是一个
+     * <p>净效果（已在 {@code ImaCursorTest} 中钉住）：{@code lastSyncTime} 是一个
      * <b>RFC3339 字符串</b>，{@code kb_logical} 是嵌套的字符串 map；{@code kb_media}
      * 为 null 时整个键不出现。</p>
      */

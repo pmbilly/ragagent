@@ -202,7 +202,7 @@ class DriveConnectorTest {
         times.put("folder2:subA", Map.of("fdoc3", "300"));
 
         SyncCursor cursor = FeishuCursorCodec.encodeFileTimes(times, OffsetDateTime.now());
-        assertThat(cursor.getConnectorCursor()).containsKey("file_times");
+        assertThat(cursor.getConnectorCursor()).containsKey("fileTimes");
         assertThat(cursor.getConnectorCursor()).doesNotContainKey("space_node_times");
 
         Map<String, Map<String, String>> restored = FeishuCursorCodec.decodeFileTimes(
@@ -636,7 +636,7 @@ class DriveConnectorTest {
             connector().fetchStream(config(List.of("folder1")), null, h);
 
             assertThat(h.cursorSnapshots).isNotEmpty();
-            assertThat(h.cursorSnapshots.get(0)).containsKey("file_times");
+            assertThat(h.cursorSnapshots.get(0)).containsKey("fileTimes");
             assertThat(h.cursorSnapshots.get(0)).doesNotContainKey("space_node_times");
             assertThat(h.fileTimes.get(0).get("folder1")).containsKey("fpdf");
         } finally {

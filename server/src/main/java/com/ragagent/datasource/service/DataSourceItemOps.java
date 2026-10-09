@@ -89,7 +89,7 @@ final class DataSourceItemOps {
             return;
         } catch (RuntimeException err) {
             String embeddedImage = item.getMetadata() == null
-                    ? null : item.getMetadata().get("embedded_image");
+                    ? null : item.getMetadata().get("embeddedImage");
             if ("true".equals(embeddedImage)) {
                 // 从文档里抽出来做 OCR 的图片是"尽力而为"的增强，不是文档本身：
                 // 知识库灌不进去（没配 VLM/对象存储）时跳过即可，别让整次同步失败。
@@ -183,17 +183,17 @@ final class DataSourceItemOps {
         }
 
         Map<String, String> metadata = new LinkedHashMap<>();
-        metadata.put("external_id", item.getExternalId());
-        metadata.put("source_resource_id", item.getSourceResourceId());
-        metadata.put("datasource_id", ds.getId());
+        metadata.put("externalId", item.getExternalId());
+        metadata.put("sourceResourceId", item.getSourceResourceId());
+        metadata.put("datasourceId", ds.getId());
         // 源系统自己的最后修改时间：knowledge 行的 updated_at 每次重解析都会动，
         // 所以这是"这份文档本身有多旧"的唯一记录。
         if (!DataSourceSupport.isZeroTime(item.getUpdatedAt())) {
-            metadata.put("source_updated_at", item.getUpdatedAt().toInstant()
+            metadata.put("sourceUpdatedAt", item.getUpdatedAt().toInstant()
                     .atOffset(ZoneOffset.UTC).format(DataSourceService.RFC3339));
         }
         if (!DataSourceSupport.isZeroTime(item.getCreatedAt())) {
-            metadata.put("source_created_at", item.getCreatedAt().toInstant()
+            metadata.put("sourceCreatedAt", item.getCreatedAt().toInstant()
                     .atOffset(ZoneOffset.UTC).format(DataSourceService.RFC3339));
         }
         metadata.putAll(itemMeta);
@@ -277,7 +277,7 @@ final class DataSourceItemOps {
         if (dup == null || dup.existing() == null) {
             return false;
         }
-        String externalId = DataSourceSupport.readMetadataValue(dup.existing(), "external_id");
+        String externalId = DataSourceSupport.readMetadataValue(dup.existing(), "externalId");
         return Objects.equals(externalId, item.getExternalId());
     }
 
@@ -296,9 +296,9 @@ final class DataSourceItemOps {
         List<Knowledge> children;
         try {
             children = service.knowledge.findByMetadataKeyPrefix(ds.getTenantId(), ds.getKnowledgeBaseId(),
-                    "external_id", SubtreeChildIds.subtreeChildPrefix(item.getExternalId()));
+                    "externalId", SubtreeChildIds.subtreeChildPrefix(item.getExternalId()));
         } catch (RuntimeException e) {
-            log.warn("[datasource] failed to list subtree of external_id={}: {}",
+            log.warn("[datasource] failed to list subtree of externalId={}: {}",
                     item.getExternalId(), e.getMessage());
             return;
         }
@@ -308,11 +308,11 @@ final class DataSourceItemOps {
         List<String> subtreeKeep = item.getSubtreeKeep() == null ? List.of() : item.getSubtreeKeep();
         List<String> ids = new ArrayList<>();
         for (Knowledge child : children) {
-            // 限定本次数据源：同一个知识库里另一个连接器的同前缀 external_id 不该被清扫
-            if (!Objects.equals(DataSourceSupport.readMetadataValue(child, "datasource_id"), ds.getId())) {
+            // 限定本次数据源：同一个知识库里另一个连接器的同前缀 externalId 不该被清扫
+            if (!Objects.equals(DataSourceSupport.readMetadataValue(child, "datasourceId"), ds.getId())) {
                 continue;
             }
-            if (subtreeKeep.contains(DataSourceSupport.readMetadataValue(child, "external_id"))) {
+            if (subtreeKeep.contains(DataSourceSupport.readMetadataValue(child, "externalId"))) {
                 continue;
             }
             ids.add(child.getId());

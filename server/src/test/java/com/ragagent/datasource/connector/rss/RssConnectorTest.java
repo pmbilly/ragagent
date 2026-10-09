@@ -622,7 +622,7 @@ class RssConnectorTest {
 
             @SuppressWarnings("unchecked")
             Map<String, Object> feedItems =
-                    (Map<String, Object>) result.cursor().getConnectorCursor().get("feed_items");
+                    (Map<String, Object>) result.cursor().getConnectorCursor().get("feedItems");
             @SuppressWarnings("unchecked")
             Map<String, Object> items = (Map<String, Object>) feedItems.get(feed.feedUrl());
             assertThat(items).containsOnlyKeys("guid-1", "guid-2");
@@ -633,7 +633,7 @@ class RssConnectorTest {
 
             @SuppressWarnings("unchecked")
             Map<String, Object> feedSignals =
-                    (Map<String, Object>) result.cursor().getConnectorCursor().get("feed_signals");
+                    (Map<String, Object>) result.cursor().getConnectorCursor().get("feedSignals");
             @SuppressWarnings("unchecked")
             Map<String, Object> signals = (Map<String, Object>) feedSignals.get(feed.feedUrl());
             assertThat(signals).containsOnlyKeys("guid-1", "guid-2");
@@ -725,7 +725,7 @@ class RssConnectorTest {
     @SuppressWarnings("unchecked")
     private static Map<String, String> fingerprints(SyncCursor cursor, String feedUrl) {
         Map<String, Object> feedItems =
-                (Map<String, Object>) cursor.getConnectorCursor().get("feed_items");
+                (Map<String, Object>) cursor.getConnectorCursor().get("feedItems");
         return (Map<String, String>) feedItems.get(feedUrl);
     }
 
@@ -763,7 +763,7 @@ class RssConnectorTest {
                         assertThat(partial.items()).hasSize(2);
                         assertThat(partial.cursor()).isNotNull();
                         assertThat(partial.cursor().getConnectorCursor())
-                                .containsKeys("feed_items", "feed_signals", "last_sync_time");
+                                .containsKeys("feedItems", "feedSignals", "lastSyncTime");
                         assertThat(partial.getMessage())
                                 .startsWith("partial fetch: ")
                                 .contains("http://127.0.0.1:1/boom.xml");
@@ -812,7 +812,7 @@ class RssConnectorTest {
                 assertThat(failed.cursor()).isNotNull();
                 @SuppressWarnings("unchecked")
                 Map<String, Object> feedItems =
-                        (Map<String, Object>) failed.cursor().getConnectorCursor().get("feed_items");
+                        (Map<String, Object>) failed.cursor().getConnectorCursor().get("feedItems");
                 @SuppressWarnings("unchecked")
                 Map<String, Object> items = (Map<String, Object>) feedItems.get(feed.feedUrl());
                 assertThat(items).containsOnlyKeys("guid-1", "guid-2");

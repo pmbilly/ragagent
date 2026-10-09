@@ -6,7 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.web.ZeroTimeSerializer;
@@ -18,18 +17,18 @@ import com.ragagent.common.web.ZeroTimeSerializer;
  * <p>它被序列化成一张 map 塞进
  * {@link com.ragagent.datasource.domain.SyncCursor#getConnectorCursor()}，最终落
  * {@code data_sources.last_sync_cursor} 这个 jsonb 列。JSON 键名
- * （{@code last_sync_time} / {@code feed_items} / {@code feed_signals}）
+ * （{@code lastSyncTime} / {@code feedItems} / {@code feedSignals}）
  * 必须与既有数据逐字一致，新旧数据要能互读。</p>
  *
  * <h2>序列化形状（{@code RssCursorJsonTest} 逐字节钉住）</h2>
  * <pre>
- *   {lastSyncTime: t}                     → {"last_sync_time":"2006-01-02T15:04:05Z"}
+ *   {lastSyncTime: t}                     → {"lastSyncTime":"2006-01-02T15:04:05Z"}
  *   （feedItems/feedSignals 都是空 map）    → 同上（两个键被省略）
- *   {feedItems:{"f":{"g":"h:1"}}, ...}    → {"last_sync_time":...,
- *                                            "feed_items":{"f":{"g":"h:1"}},
- *                                            "feed_signals":{...}}
+ *   {feedItems:{"f":{"g":"h:1"}}, ...}    → {"lastSyncTime":...,
+ *                                            "feedItems":{"f":{"g":"h:1"}},
+ *                                            "feedSignals":{...}}
  * </pre>
- * <p>要点：{@code last_sync_time} 恒输出（零值也输出字面量）；
+ * <p>要点：{@code lastSyncTime} 恒输出（零值也输出字面量）；
  * 另两个键对 map 看 {@code size}，<b>空 map 整个键消失</b>，
  * 而"有一个键、值是空 map"时那个键<b>保留</b>（{@code {"z":{}}} 会输出）。</p>
  *
@@ -46,14 +45,12 @@ public class RssCursor {
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     /** 本次同步的时间（UTC）。恒输出。 */
-    @JsonProperty("last_sync_time")
     private OffsetDateTime lastSyncTime = ZeroTimeSerializer.ZERO_DATE_TIME;
 
     /**
      * {@code feedURL → itemID → 内容指纹}（{@code "h:<sha256 前 16 位十六进制>"}）。
      * 为空省略：{@code null} 或空 map 时整个键消失。
      */
-    @JsonProperty("feed_items")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, Map<String, String>> feedItems;
 
@@ -62,7 +59,6 @@ public class RssCursor {
      * 与 {@link #feedItems} 的区别：它是<b>只看 feed、不抓文章页</b>就能算出来的，
      * 用来在增量同步时省掉整页抓取。
      */
-    @JsonProperty("feed_signals")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, Map<String, String>> feedSignals;
 

@@ -130,7 +130,7 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
         }
         for (Knowledge k : listLive(tenantId, kbId)) {
             Map<String, String> md = readMetadata(k);
-            if (dataSourceId.equals(md.get("datasource_id")) && externalId.equals(md.get("external_id"))) {
+            if (dataSourceId.equals(md.get("datasourceId")) && externalId.equals(md.get("externalId"))) {
                 return k;
             }
         }

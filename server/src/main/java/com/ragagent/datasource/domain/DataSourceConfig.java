@@ -22,10 +22,10 @@ import com.ragagent.common.crypto.CryptoService;
  *
  * <h2>JSON 形状（{@code DataSourceJsonTest} 逐字节钉住）</h2>
  * <pre>
- *   DataSourceConfig{}            → {"type":"","credentials":null,"resource_ids":null,"settings":null}
- *   DataSourceConfig{Type:"rss"}  → {"type":"rss","credentials":null,"resource_ids":null,"settings":null}
+ *   DataSourceConfig{}            → {"type":"","credentials":null,"resourceIds":null,"settings":null}
+ *   DataSourceConfig{Type:"rss"}  → {"type":"rss","credentials":null,"resourceIds":null,"settings":null}
  *   带全部字段                     → {"type":"feishu","credentials":{"app_id":"x","b":true,"n":1},
- *                                    "resource_ids":["r1","r2"],"settings":{"folder_token":"ft"}}
+ *                                    "resourceIds":["r1","r2"],"settings":{"folder_token":"ft"}}
  * </pre>
  * <p><b>四个键全部恒输出</b>，{@code multimodalEnabled} 一个键都不出。</p>
  *

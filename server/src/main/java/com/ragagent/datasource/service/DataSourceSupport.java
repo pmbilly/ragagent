@@ -108,7 +108,7 @@ final class DataSourceSupport {
      * 深比较两个配置：折成规范化 JSON 树再比。
      *
      * <p>字段集：{@code type} / {@code credentials} /
-     * {@code resource_ids} / {@code settings}。<b>不含</b> {@code multimodal_enabled}
+     * {@code resourceIds} / {@code settings}。<b>不含</b> {@code multimodal_enabled}
      * ——它在本方法被调用时两侧都还是零值（{@code @JsonIgnore}、从不落库、
      * 只在同步抓取前临时填）。</p>
      */
@@ -120,7 +120,7 @@ final class DataSourceSupport {
         ObjectNode node = DataSourceService.MAPPER.createObjectNode();
         node.put("type", cfg.getType());
         node.set("credentials", DataSourceService.MAPPER.valueToTree(cfg.getCredentials()));
-        node.set("resource_ids", DataSourceService.MAPPER.valueToTree(cfg.getResourceIds()));
+        node.set("resourceIds", DataSourceService.MAPPER.valueToTree(cfg.getResourceIds()));
         node.set("settings", DataSourceService.MAPPER.valueToTree(cfg.getSettings()));
         return node;
     }
