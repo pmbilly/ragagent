@@ -66,7 +66,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * <h2>回归来源</h2>
  *
  * <p>逐 token 基线由 {@code scripts/jieba-diff-probe/}（同参数）生成，落在
- * {@code server/src/test/resources/jieba/jieba_baseline.json}；回归测试
+ * {@code engine/src/test/resources/jieba/jieba_baseline.json}；回归测试
  * {@code JiebaTokenizerDiffTest} 对 {@code cutHmmOn}（裸切分）与 {@code sdkTokenize}（含停用词）
  * 两份基准逐句逐 token 断言。HMM 表由 {@code scripts/gen-jieba-hmm.py} 从上游 jieba 分词库源码机械提取成
  * {@code resources/jieba/hmm_model.json}（发射概率等是上游包内非导出变量，源码是唯一权威表示）。</p>

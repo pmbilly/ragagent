@@ -54,6 +54,8 @@ configurations {
 dependencies {
     // 共享内核（common + event）——B116 抽成独立模块后在此声明依赖（B117 定名 :common）
     implementation(project(":common"))
+    implementation(project(":engine"))
+    testImplementation(testFixtures(project(":engine")))
     // Spring
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
@@ -133,9 +135,7 @@ protobuf {
 }
 sourceSets["main"].proto {
     srcDir("../docreader")
-    // OTLP proto（langfuse OTLP/HTTP 导出用）：vendored 自 open-telemetry/opentelemetry-proto
-    // v1.10.0（common/resource/trace 三文件，未改动）。
-    srcDir("$rootDir/otlp-proto")
+    // OTLP proto 已随 tracing 迁往 :engine（B161）——别在两个模块各生成一份同名类。
 }
 
 // Flyway 命名 V<version>__<desc>.sql；迁移已基线化（V1__baseline.sql，历史增量不再参与构建），

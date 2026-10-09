@@ -35,7 +35,7 @@ import com.ragagent.llm.limiter.LocalLimiter;
 
 /**
  * embedding 客户端的 stub server A/B：请求体/路径/头部与录制
- * （server/src/test/resources/wire/*.json）逐字节比对；错误分支（401/429/5xx/SSRF）
+ * （engine/src/testFixtures/resources/wire/*.json）逐字节比对；错误分支（401/429/5xx/SSRF）
  * 核对判定。测试禁真实网络——全部打 127.0.0.1 stub。
  */
 class EmbeddingWireTest {

@@ -8,3 +8,4 @@ pluginManagement {
 rootProject.name = "ragagent-java"
 include("server")
 include("common")
+include("engine")

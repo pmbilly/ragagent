@@ -196,7 +196,7 @@ public final class Registry {
 
     /**
      * 引擎桥接（新增公开重载，无行为变更）：{@code ChunkReference} 是包内类型，
-     * agent 引擎（{@link com.ragagent.agent.PromptAssembly} 的 registerRuntimeReferences）
+     * agent 引擎（{@code com.ragagent.agent.PromptAssembly} 的 registerRuntimeReferences；跨模块类型故用 {@code}）
      * 拿不到构造面，按字段透传。
      */
     public String registerContextChunk(String chunkId, String knowledgeId, String knowledgeBaseId,

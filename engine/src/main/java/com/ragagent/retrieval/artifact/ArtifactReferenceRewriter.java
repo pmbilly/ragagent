@@ -28,7 +28,7 @@ public final class ArtifactReferenceRewriter {
     private static final Pattern TITLE_SUFFIX_RE =
             Pattern.compile("(?s)^(.*?)(\\s+(?:\"[^\"]*\"|'[^']*'))$");
 
-    /** {@link com.ragagent.session.domain.MessageArtifact} 的消费面（子集）。 */
+    /** {@code com.ragagent.session.domain.MessageArtifact} 的消费面（子集）——跨模块类型，本模块类路径不可见，javadoc 只作文字引用。 */
     public record Artifact(String fileName, String url) {
     }
 

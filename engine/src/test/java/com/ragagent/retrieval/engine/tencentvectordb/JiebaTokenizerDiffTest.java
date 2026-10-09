@@ -38,7 +38,7 @@ class JiebaTokenizerDiffTest {
     private static JsonNode baseline() throws Exception {
         try (InputStream in = JiebaTokenizerDiffTest.class
                 .getResourceAsStream("/jieba/jieba_baseline.json")) {
-            assertThat(in).as("基准缺失：server/src/test/resources/jieba/jieba_baseline.json").isNotNull();
+            assertThat(in).as("基准缺失：engine/src/test/resources/jieba/jieba_baseline.json").isNotNull();
             return MAPPER.readTree(in);
         }
     }

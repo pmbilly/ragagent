@@ -99,7 +99,13 @@ class ArchitectureRulesTest {
             // 类路径上以 jar 形态出现）被整段排除，A7 基线条目随即报"已不再违例"（实测踩到，
             // 探针四变体定位：asURI 版命中 0、Location.contains 版命中 1）。
             // 改用 Location.contains 排除测试类。
-            .withImportOption(location -> !location.contains("/classes/java/test/"))
+            // B161：testFixtures 也是测试基建（如 EmbeddedRedis 的 getenv 探测 redis-server）——
+            // 拆分前它们在 src/test/java 下本就被排除，故一并排除，保持 A1 只盯 main 的语义。
+            // 注意：项目依赖在 ArchUnit 眼里是 **jar**（B116 实测）⇒ testFixtures 以
+            // <模块>-test-fixtures.jar 形态出现，dir 与 jar 两种写法都要排。
+            .withImportOption(location -> !location.contains("/classes/java/test/")
+                    && !location.contains("/classes/java/testFixtures/")   // 本模块 testFixtures（dir 形态）
+                    && !location.contains("-test-fixtures.jar"))            // 跨模块 testFixtures（jar 形态）
             .importPackages("com.ragagent");
 
     /**
@@ -414,7 +420,8 @@ class ArchitectureRulesTest {
      */
     static java.util.List<java.nio.file.Path> backendSourceRoots(String sourceSet) {
         return java.util.List.of(java.nio.file.Path.of("src/" + sourceSet),          // server 自己
-                java.nio.file.Path.of("../common/src/" + sourceSet));                // 共享内核
+                java.nio.file.Path.of("../common/src/" + sourceSet),                 // 共享内核
+                java.nio.file.Path.of("../engine/src/" + sourceSet));               // 能力层
     }
 
     @Test

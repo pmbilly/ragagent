@@ -36,6 +36,8 @@ SOURCE_ROOTS = (
     "server/src/test/java",
     "common/src/main/java",
     "common/src/test/java",
+    "engine/src/main/java",
+    "engine/src/test/java",
 )
 
 
@@ -58,7 +60,7 @@ def _ignored(path: pathlib.Path) -> bool:
 def check_stray_dirs() -> list[str]:
     problems = []
     scan = [(ROOT, ROOT_ALLOW)]
-    for mod in (ROOT / "server", ROOT / "common", ROOT / "frontend", ROOT / "mcp-server",
+    for mod in (ROOT / "server", ROOT / "common", ROOT / "engine", ROOT / "frontend", ROOT / "mcp-server",
                 ROOT / "docreader", ROOT / "otlp-proto", ROOT / "migrations", ROOT / "docs",
                 ROOT / "scripts"):
         if mod.is_dir():

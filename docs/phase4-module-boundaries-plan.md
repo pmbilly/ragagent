@@ -387,7 +387,7 @@ B111 暴露的 8 域间接环看着吓人（`agent`/`auth`/`chatpipeline`/`datas
 | 编译期硬约束 | ✅ **探针验证**：往 `:common` 注入 `import com.ragagent.knowledge.domain.Chunk` ⇒ `:common:compileJava` **FAILED**（`package com.ragagent.knowledge does not exist`）——底座反向依赖从此**改不动** |
 | 闸门 | `./gradlew spotlessCheck build` = **BUILD SUCCESSFUL**（4,778 测试）+ 五守卫绿 |
 
-**下一步（未做）**：`:engine`（L2 能力层，11 域 / 58.3k LOC，对 `:common` 只暴露 79 类型）
+**✅ 已完成（B161，2026-10-09）**：`:engine`（L2 能力层，11 域 / 58.3k LOC，对 `:common` 只暴露 79 类型）
 ——它是第二条硬边界；再做则是 `:app` / `:datasource` / `:misc` / `:boot`（§5.1-③）。
 
 
@@ -520,3 +520,27 @@ B116 搬家时已经搬过一批资源（`common/text/*.txt`），这类风险�
 
 > 与 M1 的关系：模块化会**放大**命名分歧的代价（跨模块引用要选 `api`/`implementation`、
 > 读代码要跨模块跳转）⇒ 先把共享词汇理干净，M1 的边界才划得动（§5.3 的推进顺序同理）。
+
+## 9. B161：`:engine` 抽取落地（M1 第二步，2026-10-09）
+
+承 §6 的"下一步"，按同一套路做第二条硬边界（`:common` 是第一条）：
+
+| 项 | 内容 |
+|---|---|
+| 模块 | 新增 `:engine`（`java-library` + `java-test-fixtures` + `io.spring.dependency-management` + spotless + protobuf）|
+| 成员 | `llm` `retrieval` `embedding` `rerank` `chatpipeline` `modelcontext` `webfetch` `stream` `tracing` `model` `vectorstore`（368 文件 / 58.3k 行）|
+| 依赖 | `api(project(":common"))` + 依 import 面声明（jackson/spring/slf4j/mybatis-plus/neo4j/sqlite/protobuf/snakeyaml/Hikari/jakarta）；`runtimeOnly` 驱动（mysql/pg）|
+| 搬迁 | 主源码 368 · 测试 **65 搬 / 20 留**（`GoRecording*` 夹具 / `@SpringBootTest` / 跨域者留在 `:server`）· 资源 `jieba/`(1.1M)、`extract_config.yaml`、`wire/`→testFixtures、jieba 基线→engine 测试资源 |
+| 守卫 | `_source_roots.MODULE_DIRS` +engine · `check-stray-dirs` 两处 +engine · `check-event-face-case` 改 `_sr.find_pkg_path` · `check-file-size --write` · `backendSourceRoots` +`../engine/src/…` |
+| 探针 | 注入 `com.ragagent.knowledge.domain.Chunk` ⇒ `:engine:compileJava` **FAILED**（`package … does not exist`）；还原后 SUCCESSFUL |
+| 闸门 | `spotlessCheck build` BUILD SUCCESSFUL（1m39s）· 4,793 测试 0 失败（server 4072 + engine 721，与拆分前同数）· 八守卫绿 |
+
+**三条新沉淀（写给下一次拆模块）**：
+
+1. **共享测试基座走 `java-test-fixtures`**（§5.2 风险 5 的首次落地）：`EmbeddedRedis` 被 engine 2 个 +
+   server 15 个测试共用 ⇒ 放 `engine/src/testFixtures`，server 侧 `testImplementation(testFixtures(project(":engine")))`。
+2. **测试资源与驱动要随码走**：`wire/*.json`（engine 2 用 + server 1 用 ⇒ 放 testFixtures resources）、
+   `jieba_baseline.json`（→ engine 测试资源）、JDBC 驱动（`runtimeOnly`，ServiceLoader 加载、编译期不可见）。
+3. **ArchUnit 的导入过滤器要排 testFixtures 的两种形态**：项目依赖在 ArchUnit 眼里是 **jar**
+   （B116 同款）⇒ 既排 `/classes/java/testFixtures/`（dir）也排 `-test-fixtures.jar`（jar）；
+   否则 testFixtures 里的 `System.getenv`（EmbeddedRedis 探测 redis-server）会把 A1 判红。

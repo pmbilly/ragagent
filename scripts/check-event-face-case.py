@@ -150,8 +150,9 @@ KEY_HELPER = re.compile(r'(?<![\w.])\w+\([^;()]*,\s*"([^"]+)"\)')
 
 def check_event_map_keys() -> None:
     for rel, why in sorted(EVENT_MAP_FILES.items()):
-        path = ROOT / 'server/src/main/java/com/ragagent' / rel
-        if not path.exists():
+        # B161：多模块感知（原硬编码 server/ ⇒ 搬家后静默找不到）
+        path = _sr.find_pkg_path(rel)
+        if path is None or not path.exists():
             problems.append(f'{rel} 不在预期路径（EVENT_MAP_FILES 需更新）')
             continue
         for i, line in enumerate(path.read_text(encoding='utf-8').splitlines(), 1):
