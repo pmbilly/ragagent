@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -33,7 +34,11 @@ import com.ragagent.support.ContractJson;
  * （id 前缀 aa45b），经 {@link JdbcGrepSearch} 真跑与仓储层同构的 SQL
  * （~* 正则、scopeClause OR、created_at DESC LIMIT 500、COUNT(*) 回填）。
  * dev PG 不可达时测试显式失败（不允许跳过）。</p>
+ *
+ * <p><b>CI</b>：带 {@code needs-dev-pg} 标签 ⇒ {@code server/build.gradle.kts} 在 {@code CI} 环境变量
+ * 存在时排除本标签（CI 不提供 PG，也不灌基线）。本地**刻意不排除**（保留"不可达即失败"的语义）。</p>
  */
+@Tag("needs-dev-pg")
 class GrepChunksRecordingTest {
 
     static final String KB_A = "aa45ba01";

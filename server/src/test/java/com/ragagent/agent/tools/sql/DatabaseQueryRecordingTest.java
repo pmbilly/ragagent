@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -32,7 +33,11 @@ import com.ragagent.agent.tools.RecordingSupport;
  * 种子（id 前缀 aa45bq），经 {@link JdbcExecutor} 真跑注入后的 SQL 端到端验证
  * （tenant 过滤 / soft-delete / hidden-KB / chunk-enabled / scope 注入都在
  * 语料的结果集里可见）。dev PG 不可达时测试显式失败（不允许跳过）。</p>
+ *
+ * <p><b>CI</b>：带 {@code needs-dev-pg} 标签 ⇒ {@code server/build.gradle.kts} 在 {@code CI} 环境变量
+ * 存在时排除本标签（CI 不提供 PG，也不灌基线）。本地**刻意不排除**（保留"不可达即失败"的语义）。</p>
  */
+@Tag("needs-dev-pg")
 class DatabaseQueryRecordingTest {
 
     static Connection db;
