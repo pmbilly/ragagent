@@ -180,8 +180,8 @@ public class FaqEntryCommandService {
             log.info("FAQ entry created: kb={}, entry={}", kb.getId(), chunk.getSeqId());
             recordKbActivity(tid, kb.getId(), AuditAction.KNOWLEDGE_CREATED,
                     "faq_entry", chunk.getId(),
-                    Map.of("entry_id", chunk.getSeqId() == null ? 0L : chunk.getSeqId(),
-                            "source_type", "faq"));
+                    Map.of("entryId", chunk.getSeqId() == null ? 0L : chunk.getSeqId(),
+                            "sourceType", "faq"));
             return entry;
         } finally {
             taskStore.releaseCreateGuard(guardKey);
@@ -278,8 +278,8 @@ public class FaqEntryCommandService {
         log.info("FAQ entry updated: kb={}, entry={}", kb.getId(), chunk.getSeqId());
         recordKbActivity(tid, kb.getId(), AuditAction.KNOWLEDGE_UPDATED,
                 "faq_entry", chunk.getId(),
-                Map.of("entry_id", chunk.getSeqId() == null ? 0L : chunk.getSeqId(),
-                        "source_type", "faq"));
+                Map.of("entryId", chunk.getSeqId() == null ? 0L : chunk.getSeqId(),
+                        "sourceType", "faq"));
         return entry;
     }
 
@@ -379,8 +379,8 @@ public class FaqEntryCommandService {
         }
         recordKbActivity(tid, kb.getId(), AuditAction.KNOWLEDGE_UPDATED,
                 "faq_entry", chunk.getId(),
-                Map.of("entry_id", chunk.getSeqId() == null ? 0L : chunk.getSeqId(),
-                        "source_type", "faq"));
+                Map.of("entryId", chunk.getSeqId() == null ? 0L : chunk.getSeqId(),
+                        "sourceType", "faq"));
         return entry;
     }
 
@@ -596,7 +596,7 @@ public class FaqEntryCommandService {
         log.info("FAQ entries deleted: kb={}, count={}", kb.getId(), chunksToRemove.size());
         Map<String, Object> details = new LinkedHashMap<>();
         details.put("count", chunksToRemove.size());
-        details.put("source_type", "faq");
+        details.put("sourceType", "faq");
         List<String> titles = new ArrayList<>(chunksToRemove.size());
         for (Chunk chunk : chunksToRemove) {
             titles.add(faqChunkQuestion(chunk));
