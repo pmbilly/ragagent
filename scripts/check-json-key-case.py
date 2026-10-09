@@ -101,15 +101,15 @@ FROZEN_PREFIXES = (
 # 基线：已逐条复核的例外（文件相对路径 → 允许的键集合）。新增即失败。
 BASELINE: dict[str, set[str]] = {
     # Langfuse span/trace 观测面（B135 复核改标：原写「agent_steps 落库列 + 历史回放」，实测站点是 toolSpanInput/toolSpanMeta 与 traceArgumentValue 构造 ⇒ 观测面，非 JSON 契约）
-    'agent/ActPhase.java': {'args_redacted', 'argument_resolution', 'data_keys', 'duration_ms', 'image_count', 'mcp_service', 'mcp_tool', 'model_arg_keys', 'model_arguments', 'output_len', 'resolved_arg_keys', 'resolved_arguments', 'session_id', 'tool_call_id', 'tool_index', 'unresolved_handle_count', 'unresolved_handles'},
+    'agent/ActPhase.java': {'args_redacted', 'argument_resolution', 'data_keys', 'image_count', 'mcp_service', 'mcp_tool', 'model_arg_keys', 'model_arguments', 'output_len', 'resolved_arg_keys', 'resolved_arguments', 'tool_index', 'unresolved_handle_count', 'unresolved_handles'},
     # 模板令牌（数据值，非 JSON 键）
     'agent/AgentPrompts.java': {'current_time', 'web_search_status'},
     # 工具名（模型可见的函数名；§2.4 只管字段名，B88 决策：工具名与 enum 值保留 snake）
     'agent/tools/ToolCapabilities.java': {'data_analysis', 'data_schema', 'database_query', 'get_document_info', 'grep_chunks', 'knowledge_search', 'list_knowledge_chunks', 'query_knowledge_graph', 'todo_write', 'wiki_delete_page', 'wiki_flag_issue', 'wiki_read_issue', 'wiki_read_page', 'wiki_read_source_doc', 'wiki_rename_page', 'wiki_replace_text', 'wiki_search', 'wiki_update_issue', 'wiki_write_page'},
     # MyBatis 列名/参数（非 JSON 键）
-    'auth/service/TenantInvitationService.java': {'invitation_id', 'responded_at', 'updated_at'},
+    'auth/service/TenantInvitationService.java': {'invitation_id'},
     # MyBatis 列名/参数（非 JSON 键）
-    'auth/service/TenantMemberService.java': {'deleted_at', 'is_revoked', 'new_role', 'old_role', 'tenant_id', 'updated_at'},
+    'auth/service/TenantMemberService.java': {'new_role', 'old_role'},
     # 外部耦合（B133 逐键复核）：docreader config_overrides 的 map 键名由对方服务定义
     # （docreader/docreader.proto 里 config_overrides 是泛型 map，服务本体不在本仓）；
     # 租户 KV 复用同一词汇，改名须先加边界翻译层——属独立决策，故登记冻结。
@@ -126,23 +126,21 @@ BASELINE: dict[str, set[str]] = {
     # OpenSearch 字段
     'config/OpenSearchAuditSinkAdapter.java': {'dst_alias', 'src_alias'},
     # MyBatis 列名/参数（非 JSON 键）
-    'datasource/service/DataSourceSupport.java': {'processing_status', 'resource_ids', 'task_id'},
-    # MyBatis 列名/参数（非 JSON 键）
     # MyBatis 列名/参数（非 JSON 键）
     # MyBatis 列名/参数（非 JSON 键）
     # MyBatis 列名/参数（非 JSON 键）
     # MyBatis 列名/参数（非 JSON 键）
     # MyBatis 列名/参数（非 JSON 键）
     # MyBatis 列名写入点（非 JSON 键）
-    'knowledge/service/KnowledgeFileService.java': {'content_revision', 'embedding_model_id', 'enable_status', 'error_message', 'file_hash', 'file_name', 'file_path', 'file_size', 'file_type', 'parse_status', 'processed_at', 'summary_status', 'updated_at'},
+    'knowledge/service/KnowledgeFileService.java': {'updated_at'},
     # MyBatis 列名/参数（非 JSON 键）
     # MyBatis 列名/参数（非 JSON 键）
     # MyBatis 列名/参数（非 JSON 键）
     # MyBatis 列名/参数（非 JSON 键）
-    'knowledge/service/KnowledgeService.java': {'deleted_at', 'updated_at'},
+    'knowledge/service/KnowledgeService.java': {'updated_at'},
     # MyBatis 列名/参数（非 JSON 键）
     # langfuse 面
-    'knowledge/service/SpanTracker.java': {'langfuse_trace_id', 'updated_at'},
+    'knowledge/service/SpanTracker.java': {'langfuse_trace_id'},
     # 提示词模板变量（数据值，模板里是 {{server_name}} 等）
     'mcp/controller/McpUsageInstructionsOps.java': {'omitted_tools', 'server_description', 'server_instructions', 'server_name'},
     # 8 MiB 门禁的体积度量形态（B135 复核改标：镜像 metadata 表列，属 §15.3 ③ DDL 面）
@@ -155,7 +153,7 @@ BASELINE: dict[str, set[str]] = {
     # Cypher 字段
     'retrieval/graph/Neo4jGraphRepository.java': {'knowledge_id', 'source_labels', 'target_labels'},
     # ImageInfo 面（§15.3 冻结族）
-    'retrieval/support/ImageInfoMatchUtil.java': {'end_pos', 'ocr_text', 'original_url', 'start_pos'},
+    'retrieval/support/ImageInfoMatchUtil.java': {'end_pos', 'start_pos'},
     # websearch metadata 的 published_at（§15.3 ① 外部决定：键名由搜索服务给，非我们的 JSON 面）。
     # B147a 复核改标：原写「存量面」是错的——与 ReferencesSupport 同族，属外部词汇而非历史数据。
     'retrieval/support/WebResultConverter.java': {'published_at'},
@@ -169,7 +167,7 @@ BASELINE: dict[str, set[str]] = {
     # ⇒ 按 §14.9「自有查询参数名统一 camel」该改，登记为候选（见 HANDOFF）
     'storage/fileserve/FileProxyService.java': {'file_path'},
     # 存储引擎配置面 + 云厂商凭据字段（snake，同上；B143 起含读侧形态 access_key/secret_id/secret_key 与 legacy mineru_enable_ocr）
-    'system/controller/SystemController.java': {'access_key', 'access_key_id', 'bucket_name', 'mineru_enable_ocr', 'mineru_parse_method', 'secret_access_key', 'secret_id', 'secret_key', 'use_ssl', 'weknoracloud_app_id'},
+    'system/controller/SystemController.java': {'access_key', 'access_key_id', 'bucket_name', 'mineru_enable_ocr', 'mineru_parse_method', 'secret_access_key', 'secret_id', 'secret_key', 'use_ssl'},
     # MyBatis 列名/参数（非 JSON 键）
     # MyBatis 列名写入点（非 JSON 键）
     # 模型输出契约（§15.3 ② 拍板项）：提示词里就是 new_slugs，只解析入站；
@@ -232,9 +230,9 @@ BASELINE: dict[str, set[str]] = {
     # Langfuse 任务 span 载荷（同上，观测面）
     'memory/service/InProcessMemoryExtractTaskQueue.java': {'subject_id'},
     # span 观测面（同本文件既有条目）
-    'memory/service/MemoryInsightOps.java': {'candidate_count', 'lexical_hits', 'matched_count', 'memory/service/MemoryInsightOps.java', 'ranking_mode', 'subject_id', 'tenant_id', 'vector_hits', 'vector_outside', 'vector_skip'},
+    'memory/service/MemoryInsightOps.java': {'candidate_count', 'lexical_hits', 'matched_count', 'ranking_mode', 'subject_id', 'tenant_id', 'vector_hits', 'vector_outside', 'vector_skip'},
     # span 观测面（同本文件既有条目）
-    'memory/service/MemoryRecallOps.java': {'block_runes', 'candidate_count', 'fused_candidates', 'interest_injected', 'interest_relevant', 'interest_total', 'lexical_hits', 'matched_count', 'memory/service/MemoryRecallOps.java', 'prompt_runes', 'ranking_mode', 'resident_count', 'subject_id', 'tenant_id', 'used_count', 'vector_hits', 'vector_outside', 'vector_skip'},
+    'memory/service/MemoryRecallOps.java': {'block_runes', 'candidate_count', 'fused_candidates', 'interest_injected', 'interest_relevant', 'interest_total', 'lexical_hits', 'matched_count', 'prompt_runes', 'ranking_mode', 'resident_count', 'subject_id', 'tenant_id', 'used_count', 'vector_hits', 'vector_outside', 'vector_skip'},
     # Langfuse 任务 span 载荷（同上，观测面）
     'memory/service/RedisMemoryExtractTaskQueue.java': {'subject_id'},
     # 工具名（模型可见的函数名；§2.4 只管字段名，B88 决策：工具名与 enum 值保留 snake。同族见 agent/tools/ToolCapabilities.java 的登记）
@@ -242,7 +240,7 @@ BASELINE: dict[str, set[str]] = {
     # span 观测面（followUpSpan.finish 的 metadata）
     'session/service/MessageSuggestionService.java': {'question_count'},
     # span 观测面（同本文件既有条目）
-    'session/service/SessionKnowledgeQaService.java': {'error_type', 'event_type', 'knowledge_base_ids', 'search_targets', 'session/service/SessionKnowledgeQaService.java', 'total_stages'},
+    'session/service/SessionKnowledgeQaService.java': {'error_type', 'event_type', 'knowledge_base_ids', 'search_targets', 'total_stages'},
     # 队列任务 span 载荷（观测面；同名键在别处是 DB 列名，此处不是）
     'wiki/service/ingest/WikiIngestTaskRunner.java': {'knowledge_base_id'},
     'wiki/service/page/NewSlugFromCitation.java': {'source_chunks'},
