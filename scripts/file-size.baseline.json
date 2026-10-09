@@ -3,6 +3,7 @@
   "growthSlack": 30,
   "exemptLine": 800,
   "limits": {
+    "boot/src/main/java/com/ragagent/config/WebConfig.java": 669,
     "engine/src/main/java/com/ragagent/chatpipeline/plugin/PluginMerge.java": 661,
     "engine/src/main/java/com/ragagent/chatpipeline/plugin/PluginRerank.java": 683,
     "engine/src/main/java/com/ragagent/llm/chat/AnthropicChat.java": 760,
@@ -22,7 +23,6 @@
     "server/src/main/java/com/ragagent/auth/apikey/filter/APIKeyRoutePolicies.java": 717,
     "server/src/main/java/com/ragagent/auth/controller/AuthController.java": 666,
     "server/src/main/java/com/ragagent/auth/service/UserService.java": 757,
-    "server/src/main/java/com/ragagent/config/WebConfig.java": 669,
     "server/src/main/java/com/ragagent/datasource/connector/feishu/core/DocxBlocks.java": 730,
     "server/src/main/java/com/ragagent/datasource/connector/feishu/core/FeishuApiTypes.java": 669,
     "server/src/main/java/com/ragagent/datasource/connector/feishu/core/FeishuClient.java": 687,
