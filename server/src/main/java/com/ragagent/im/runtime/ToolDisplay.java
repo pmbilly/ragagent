@@ -546,7 +546,7 @@ public final class ToolDisplay {
         if (!fromData.isEmpty()) {
             return fromData;
         }
-        if (step.arguments != null && step.arguments.get("search_source") instanceof String source
+        if (step.arguments != null && step.arguments.get("searchSource") instanceof String source
                 && !source.isEmpty()) {
             return source;
         }
@@ -557,7 +557,7 @@ public final class ToolDisplay {
         if (data == null) {
             return "";
         }
-        if (data.get("search_source") instanceof String source) {
+        if (data.get("searchSource") instanceof String source) {
             return source.strip();
         }
         return "";
@@ -600,8 +600,8 @@ public final class ToolDisplay {
             return "未找到匹配的内容";
         }
         String source = imSearchSourceFromData(data);
-        int webCount = imIntField(data, "web_count");
-        int docCount = imIntField(data, "doc_count");
+        int webCount = imIntField(data, "webCount");
+        int docCount = imIntField(data, "docCount");
         if (source.equals(RETRIEVAL_SOURCE_WEB) || (webCount > 0 && docCount == 0)) {
             return "找到 " + count + " 条网页";
         }

@@ -20,7 +20,7 @@ import com.ragagent.common.retrieval.SearchResult;
  *
  * <p>合并检索窗口：SEARCH_PARALLEL/RERANK/MERGE/FILTER_TOP_K（+ web_fetch/data_analysis
  * 条件生效）共用一个 {@code knowledge_search} 工具的 pending/tool_result 事件对；
- * ErrSearchNothing 短路时窗口照关（候选数进 data.candidate_count，命中数清零——
+ * ErrSearchNothing 短路时窗口照关（候选数进 data.candidateCount，命中数清零——
  * "检索到 N 条" 不能许诺回答从未见过引用）。query_understand 有独立窗口。</p>
  *
  * <p>tool_call_id 是 uuid；duration 为零值时输出省略该键。事件经 EventBus emit，
@@ -103,7 +103,7 @@ public final class PipelineProgress {
         }
         String toolCallId = UUID.randomUUID().toString();
         Map<String, Object> args = new LinkedHashMap<>();
-        args.put("search_source", retrievalSearchSource(chatManage));
+        args.put("searchSource", retrievalSearchSource(chatManage));
         if (!chatManage.getRewriteQuery().isEmpty()) {
             args.put("query", chatManage.getRewriteQuery());
         } else if (!chatManage.getQuery().isEmpty()) {
@@ -125,7 +125,7 @@ public final class PipelineProgress {
             args.put("query", chatManage.getQuery());
         }
         if (chatManage.getImages() != null && !chatManage.getImages().isEmpty()) {
-            args.put("has_images", true);
+            args.put("hasImages", true);
         }
         emit(chatManage.getEventBus(), toolCallEvent(chatManage.getSessionId(), toolCallId,
                 QUERY_UNDERSTAND_PROGRESS_TOOL, args));
@@ -153,7 +153,7 @@ public final class PipelineProgress {
         emit(chatManage.getEventBus(), toolResultEvent(chatManage.getSessionId(), data));
     }
 
-    /** 命中分档文案 + search_source + ErrSearchNothing 候选语义。 */
+    /** 命中分档文案 + searchSource + ErrSearchNothing 候选语义。 */
     public static void endRetrievalProgress(ChatManage chatManage, StageProgress progress,
                                             long startMillis, PluginError stageErr) {
         if (progress == null || chatManage == null || chatManage.getEventBus() == null) {
@@ -200,10 +200,10 @@ public final class PipelineProgress {
 
         Map<String, Object> structured = new LinkedHashMap<>();
         structured.put("count", count);
-        structured.put("doc_count", docCount);
-        structured.put("web_count", webCount);
-        structured.put("search_source", searchSource);
-        structured.put("candidate_count", candidateCount);
+        structured.put("docCount", docCount);
+        structured.put("webCount", webCount);
+        structured.put("searchSource", searchSource);
+        structured.put("candidateCount", candidateCount);
 
         long durationMs = clock.millis() - startMillis;
         AgentToolResultData data = new AgentToolResultData();

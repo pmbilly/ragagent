@@ -282,12 +282,12 @@ sequenceDiagram
 
     S->>PR: beginRetrievalProgress（进入首个窗口阶段）
     PR->>EB: EVENT_AGENT_TOOL_CALL（knowledge_search pending，tool_call_id=uuid）
-    EB->>FE: 正在检索…（search_source: knowledge/web/mixed）
+    EB->>FE: 正在检索…（searchSource: knowledge/web/mixed）
 
     Note over PR: 合并窗口：chunk_search_parallel / rerank / merge /<br/>filter_top_k（+web_fetch / data_analysis 条件生效）<br/>共用一个 pending/tool_result 事件对；query_understand 独立窗口
 
     S->>PR: shouldCloseRetrievalProgress（末窗口阶段完成 或 stageErr 非空）
-    PR->>EB: EVENT_AGENT_TOOL_RESULT（candidate_count / 命中数清零规则见下）
+    PR->>EB: EVENT_AGENT_TOOL_RESULT（candidateCount / 命中数清零规则见下）
     Note over PR: SEARCH_NOTHING 短路时窗口照关——候选数照实、命中数清零，<br/>"检索到 N 条"不许诺回答从未见过的引用
     S->>EB: EVENT_AGENT_REFERENCES（mergeResult 全量，流式前必达）
     EB->>FE: 引用列表 → 随后的流式回答帧

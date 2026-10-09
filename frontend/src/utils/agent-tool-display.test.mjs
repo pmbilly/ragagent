@@ -66,11 +66,11 @@ test('getKnowledgeSearchSummaryHtml includes file count when present', () => {
 // points at the threshold rather than at the knowledge base.
 test('getKnowledgeSearchSummaryHtml distinguishes filtered candidates from an empty search', () => {
   assert.match(
-    getKnowledgeSearchSummaryHtml(t, { count: 0, candidate_count: 10 }),
+    getKnowledgeSearchSummaryHtml(t, { count: 0, candidateCount: 10 }),
     /matched <strong>10<\/strong>, none relevant/,
   )
   assert.equal(
-    getKnowledgeSearchSummaryHtml(t, { count: 0, candidate_count: 0 }),
+    getKnowledgeSearchSummaryHtml(t, { count: 0, candidateCount: 0 }),
     'agentStream.search.noResults',
   )
 })
@@ -84,12 +84,12 @@ test('getRagPipelineStepTitle uses query-aware search labels', () => {
   assert.equal(title, 'searching 讯飞开放平台')
 })
 
-test('getRagPipelineStepTitle uses web labels when search_source is web', () => {
+test('getRagPipelineStepTitle uses web labels when searchSource is web', () => {
   const title = getRagPipelineStepTitle(t, {
     toolName: 'knowledge_search',
     pending: false,
     success: true,
-    arguments: { search_source: 'web' },
+    arguments: { searchSource: 'web' },
   })
   assert.equal(title, 'agentStream.toolStatus.webSearch')
 })

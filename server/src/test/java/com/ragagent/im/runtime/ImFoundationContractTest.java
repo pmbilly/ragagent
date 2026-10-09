@@ -200,10 +200,10 @@ class ImFoundationContractTest {
                 new ToolDisplay.IMToolStep("x", "query_understand").success()));
         assertFx("ragline_ks_web_pending", ToolDisplay.formatIMRagPipelineLine(
                 new ToolDisplay.IMToolStep("x", "knowledge_search").pending()
-                        .args(Map.of("search_source", "web", "query", "news"))));
+                        .args(Map.of("searchSource", "web", "query", "news"))));
         assertFx("ragline_ks_mixed_pending", ToolDisplay.formatIMRagPipelineLine(
                 new ToolDisplay.IMToolStep("x", "knowledge_search").pending()
-                        .args(Map.of("search_source", "mixed"))));
+                        .args(Map.of("searchSource", "mixed"))));
         assertFx("ragline_ks_kb_done", ToolDisplay.formatIMRagPipelineLine(
                 new ToolDisplay.IMToolStep("x", "knowledge_search").success()
                         .args(Map.of("query", "q")).data(Map.of("count", 2d, "results", List.of(1, 2)))));
@@ -214,10 +214,10 @@ class ImFoundationContractTest {
     @Test
     void summaryHelpers() {
         assertFx("ksm_web", ToolDisplay.imKnowledgeSearchSummary(Map.of(
-                "count", 4d, "search_source", "web", "web_count", 4d, "doc_count", 0d,
+                "count", 4d, "searchSource", "web", "webCount", 4d, "docCount", 0d,
                 "results", List.of(1, 2, 3, 4))));
         assertFx("ksm_mixed", ToolDisplay.imKnowledgeSearchSummary(Map.of(
-                "count", 7d, "search_source", "mixed", "web_count", 2d, "doc_count", 5d,
+                "count", 7d, "searchSource", "mixed", "webCount", 2d, "docCount", 5d,
                 "results", List.of(1))));
         assertFx("ksm_kbcounts", ToolDisplay.imKnowledgeSearchSummary(Map.of(
                 "count", 3d, "kbCounts", Map.of("a", 1, "b", 2), "results", List.of(1))));

@@ -79,9 +79,9 @@ export function getRetrievalSearchSource(
 ): RetrievalSearchSource {
   const fromArgs =
     args && typeof args === 'object'
-      ? String((args as Record<string, unknown>).search_source || '')
+      ? String((args as Record<string, unknown>).searchSource || '')
       : ''
-  const fromData = toolData ? String(toolData.search_source || '') : ''
+  const fromData = toolData ? String(toolData.searchSource || '') : ''
   const source = (fromData || fromArgs).trim()
   if (source === 'web' || source === 'mixed') {
     return source
@@ -124,7 +124,7 @@ export function getKnowledgeSearchSummaryHtml(
     // turn answered from the fallback with nothing retrieved in its context. Say
     // that rather than "no matching content": the difference is what tells you to
     // look at the threshold instead of the knowledge base.
-    const candidateCount = Number(toolData.candidate_count) || 0
+    const candidateCount = Number(toolData.candidateCount) || 0
     if (candidateCount > 0) {
       return t('agentStream.search.candidatesBelowThreshold', {
         count: `<strong>${candidateCount}</strong>`,
@@ -134,8 +134,8 @@ export function getKnowledgeSearchSummaryHtml(
   }
 
   const searchSource = getRetrievalSearchSource(null, toolData)
-  const webCount = Number(toolData.web_count) || 0
-  const docCount = Number(toolData.doc_count) || 0
+  const webCount = Number(toolData.webCount) || 0
+  const docCount = Number(toolData.docCount) || 0
 
   if (searchSource === 'web' || (webCount > 0 && docCount === 0)) {
     return t('agentStream.search.webResults', { count: `<strong>${count}</strong>` })

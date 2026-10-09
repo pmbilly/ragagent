@@ -20,7 +20,7 @@ test('synthesizeRagPipelineToolEvents builds completed retrieval steps', () => {
   assert.equal(events[0].toolName, 'query_understand')
   assert.equal(events[1].toolName, 'knowledge_search')
   assert.equal(events[1].tool_data.count, 3)
-  assert.equal(events[1].tool_data.search_source, 'knowledge')
+  assert.equal(events[1].tool_data.searchSource, 'knowledge')
 })
 
 test('synthesizeRagPipelineToolEvents marks web-only references as web search', () => {
@@ -31,9 +31,9 @@ test('synthesizeRagPipelineToolEvents marks web-only references as web search', 
     ],
   })
 
-  assert.equal(events[1].tool_data.search_source, 'web')
-  assert.equal(events[1].tool_data.web_count, 2)
-  assert.equal(events[1].tool_data.doc_count, 0)
+  assert.equal(events[1].tool_data.searchSource, 'web')
+  assert.equal(events[1].tool_data.webCount, 2)
+  assert.equal(events[1].tool_data.docCount, 0)
 })
 
 test('synthesizeRagPipelineToolEvents skips retrieval when there are no references', () => {
