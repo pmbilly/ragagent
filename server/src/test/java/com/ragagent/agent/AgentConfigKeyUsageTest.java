@@ -21,8 +21,9 @@ import org.junit.jupiter.api.Test;
  * "模型被谁引用"，键名不对 ⇒ 绑定**静默丢失**，而当时 4711 条测试全绿、毫无提示）。这类缺陷只有
  * 源码级扫描能兜住。</p>
  *
- * <p><b>键表来源</b>：直接解析 {@code migrations/versioned/V3__agent_config_keys_camel.sql} 的映射
- * ——迁移与守卫共用一份键表，避免两处各自维护而漂移。</p>
+ * <p><b>键表来源</b>：直接解析 {@code migrations/versioned/V1__baseline.sql} 的【存档·V3 键映射】块
+ * （原 {@code V3__agent_config_keys_camel.sql} 已于 B156 折叠进 V1）的映射 ——迁移与守卫共用一份键表，
+ * 避免两处各自维护而漂移。</p>
  *
  * <p><b>白名单（合法使用 snake 的面，非"agent 配置键"）</b>：追踪/span 载荷、LLM 请求体、DB 列名与
  * 表名、提示词占位符名、第三方协议面、租户配置 jsonb、事件载荷等——见 {@link #ALLOWED_PREFIXES}。</p>
@@ -30,7 +31,7 @@ import org.junit.jupiter.api.Test;
 class AgentConfigKeyUsageTest {
 
     private static final Path MAIN = Path.of("src/main/java/com/ragagent");
-    private static final Path MIGRATION = Path.of("../migrations/versioned/V3__agent_config_keys_camel.sql");
+    private static final Path MIGRATION = Path.of("../migrations/versioned/V1__baseline.sql");
 
     /** 合法 snake 面（按路径前缀/片段排除）。 */
     private static final List<String> ALLOWED_PREFIXES = List.of(
@@ -91,11 +92,11 @@ class AgentConfigKeyUsageTest {
                 .isEmpty();
     }
 
-    /** 从 V3 迁移的 {@code mapping jsonb := '{...}'} 里取出 snake 键集合。 */
+    /** 从 V1 baseline 的存档块（原 V3 迁移，B156 折叠进去）的 {@code mapping jsonb := '...'} 取 snake 键集合。 */
     private static List<String> mappingKeys() throws Exception {
         String sql = Files.readString(MIGRATION);
         Matcher m = Pattern.compile("mapping jsonb := '(\\{.*?\\})'::jsonb", Pattern.DOTALL).matcher(sql);
-        assertThat(m.find()).as("V3 迁移里应能找到 mapping 映射").isTrue();
+        assertThat(m.find()).as("V1 baseline 的存档块里应能找到 V3 的 mapping 映射").isTrue();
         String json = m.group(1);
         List<String> keys = new ArrayList<>();
         Matcher k = Pattern.compile("\"([a-z][a-z0-9_]*)\"\\s*:").matcher(json);

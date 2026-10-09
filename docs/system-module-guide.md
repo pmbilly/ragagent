@@ -127,6 +127,8 @@ erDiagram
 ```
 
 > 平台级单表（迁移 000053；基线 SQL：`migrations/versioned/V1__baseline.sql`），无租户列、无外键。`users.is_system_admin` 列在 auth 域的 users 表上，本包不建表。
+>
+> **迁移（Flyway）**：B156（2026-10-09）起 `migrations/versioned/` **只有一个文件** `V1__baseline.sql` —— 原 V2~V6 已折叠进去（默认值折进建表、skills 折成终态 DDL；V2/V3 的一次性数据改写不折叠，V3 映射以存档块留在文末供 `AgentConfigKeyUsageTest` 解析）。⚠️ **已迁移过的开发库需重建**：Flyway 会因 V1 校验和变化 + V2~V6 文件消失而拒绝启动；测试侧不受影响（`spring.flyway.enabled: false` + H2）。
 
 ### 2.2 设置的四种存储形态（读路径合并规则）
 

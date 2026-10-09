@@ -11,7 +11,7 @@ import com.ragagent.common.web.PgJsonTypeHandler;
 
 /**
  * {@code task_pending_ops} 表实体（表结构以
- * migrations/versioned/000041_task_queue_and_wiki_indexes.up.sql 第 1 段为准）。
+ * {@code migrations/versioned/V1__baseline.sql} 的 {@code task_pending_ops} 段为准）。
  *
  * <p>通用持久化待办队列：把 ad-hoc 的 Redis 列表队列（{@code wiki:pending:<kbID>}）
  * 换成能抗重启、不会被 TTL 驱逐的行。<b>(TaskType, Scope, ScopeID)</b> 三元组是队列身份；

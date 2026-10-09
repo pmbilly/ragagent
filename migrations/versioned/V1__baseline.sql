@@ -414,8 +414,8 @@ CREATE TABLE public.knowledge_bases (
     name character varying(255) NOT NULL,
     description text,
     tenant_id integer NOT NULL,
-    chunking_config jsonb DEFAULT '{"chunk_size": 512, "chunk_overlap": 50, "split_markers": ["\n\n", "\n", "。"], "keep_separator": true}'::jsonb NOT NULL,
-    image_processing_config jsonb DEFAULT '{"model_id": "", "enable_multimodal": false}'::jsonb NOT NULL,
+    chunking_config jsonb DEFAULT '{"chunkSize": 512, "chunkOverlap": 50, "splitMarkers": ["\n\n", "\n", "。"], "keepSeparator": true}'::jsonb NOT NULL,
+    image_processing_config jsonb DEFAULT '{"modelId": "", "enableMultimodal": false}'::jsonb NOT NULL,
     embedding_model_id character varying(64) NOT NULL,
     summary_model_id character varying(64) NOT NULL,
     storage_config jsonb DEFAULT '{}'::jsonb NOT NULL,
@@ -3516,6 +3516,54 @@ ALTER TABLE ONLY public.sync_logs
 ALTER TABLE ONLY public.tenant_api_keys
     ADD CONSTRAINT tenant_api_keys_tenant_id_fkey FOREIGN KEY (tenant_id) REFERENCES public.tenants(id) ON DELETE CASCADE;
 
+
+--
+-- ===============================================================================
+-- 以下由 V2~V6 折叠而来（B156，2026-10-09；**终态等价**，不是拼接）
+--   原 V6__kb_default_config_keys_camel -> 已折进上面的建表（两列 jsonb 默认值 camel）
+--   原 V4__skills + V5__skills_tenant     -> 折成下方终态 DDL（CREATE 直接带 tenant_id）
+--   原 V2__kb_config_keys_camel（KB 配置 jsonb 45 键）
+--   原 V3__agent_config_keys_camel（agent 配置 jsonb ~60 键）
+--     两者的**数据改写**不折叠：它们只改存量行，新库无存量行 => 执行等于空操作。
+--     V3 的键映射以【存档块】逐字保留在文末，供 AgentConfigKeyUsageTest 当键表来源与后人查证。
+--   ⚠️ 已迁移过的**开发库**需重建（Flyway 会因 V1 校验和变化 + V2~V6 文件消失而拒绝启动）。
+-- ===============================================================================
+
+-- ── skills（原 V4 + V5 终态）
+-- 技能 = 指令型 SKILL.md（提示词注入，模型凭指令用现有工具执行；无脚本执行面）。
+-- B57 起从「宿主目录文件」改为数据库存储（多实例一致性）；B60 起从平台级改为租户级：
+--   tenant_id 非空  = 该空间的技能（本空间可见、本空间管理员可读写）
+--   tenant_id NULL = 平台内置层（官方预置，全员可见只读）
+-- 唯一性：同一「命名空间」内 slug 唯一（未删行），平台层用 COALESCE(tenant_id, 0)
+-- 折叠成伪空间 0（真实租户 id >= 1），故平台内置与各租户可用同名 slug。
+CREATE TABLE IF NOT EXISTS skills (
+    id          varchar(64) PRIMARY KEY,
+    slug        varchar(64)  NOT NULL,
+    name        varchar(128) NOT NULL,
+    description text         NOT NULL DEFAULT '',
+    content     text         NOT NULL,
+    version     int          NOT NULL DEFAULT 1,
+    created_by  varchar(64)  NOT NULL DEFAULT '',
+    created_at  timestamptz  NOT NULL DEFAULT now(),
+    updated_at  timestamptz  NOT NULL DEFAULT now(),
+    deleted_at  timestamptz,
+    tenant_id   INTEGER
+);
+
+COMMENT ON COLUMN skills.tenant_id IS '所属空间 id；NULL = 平台内置（全员可见、只读）';
+
+-- 软删后同名 slug 可重建：唯一性只约束未删行，且按命名空间折叠。
+CREATE UNIQUE INDEX IF NOT EXISTS uq_skills_scope_slug_active
+    ON skills (COALESCE(tenant_id, 0), slug) WHERE deleted_at IS NULL;
+
+-- 选择器/目录按「平台层 + 当前空间」查询
+CREATE INDEX IF NOT EXISTS ix_skills_tenant_active ON skills (tenant_id) WHERE deleted_at IS NULL;
+
+-- ── 【存档】原 V3 的键映射（一次性数据改写用；**不执行**，逐字保留供解析与查证）
+-- 键表来源约定：AgentConfigKeyUsageTest 直接解析下面的 mapping jsonb := 赋值（块注释内，故不执行）。
+/* 原 V3__agent_config_keys_camel.sql 的 mapping 原文：
+    mapping jsonb := '{"agent_mode": "agentMode", "agent_type": "agentType", "system_prompt": "systemPrompt", "system_prompt_id": "systemPromptId", "context_template": "contextTemplate", "context_template_id": "contextTemplateId", "model_id": "modelId", "rerank_model_id": "rerankModelId", "max_completion_tokens": "maxCompletionTokens", "citation_enabled": "citationEnabled", "max_iterations": "maxIterations", "llm_call_timeout": "llmCallTimeout", "allowed_tools": "allowedTools", "mcp_selection_mode": "mcpSelectionMode", "mcp_services": "mcpServices", "mcp_auth_wait_timeout": "mcpAuthWaitTimeout", "skills_selection_mode": "skillsSelectionMode", "selected_skills": "selectedSkills", "kb_selection_mode": "kbSelectionMode", "knowledge_bases": "knowledgeBases", "retrieve_kb_only_when_mentioned": "retrieveKbOnlyWhenMentioned", "retain_retrieval_history": "retainRetrievalHistory", "image_upload_enabled": "imageUploadEnabled", "vlm_model_id": "vlmModelId", "audio_upload_enabled": "audioUploadEnabled", "asr_model_id": "asrModelId", "image_storage_provider": "imageStorageProvider", "supported_file_types": "supportedFileTypes", "chat_parser_engine_rules": "chatParserEngineRules", "attachment_image_understanding": "attachmentImageUnderstanding", "attachment_ocr_max_pages": "attachmentOcrMaxPages", "attachment_parse_wait_timeout_sec": "attachmentParseWaitTimeoutSec", "data_analysis_enabled": "dataAnalysisEnabled", "faq_priority_enabled": "faqPriorityEnabled", "faq_direct_answer_threshold": "faqDirectAnswerThreshold", "faq_score_boost": "faqScoreBoost", "web_search_enabled": "webSearchEnabled", "web_search_max_results": "webSearchMaxResults", "web_search_provider_id": "webSearchProviderId", "web_fetch_enabled": "webFetchEnabled", "web_fetch_top_n": "webFetchTopN", "multi_turn_enabled": "multiTurnEnabled", "history_turns": "historyTurns", "memory_enabled": "memoryEnabled", "embedding_top_k": "embeddingTopK", "keyword_threshold": "keywordThreshold", "vector_threshold": "vectorThreshold", "rerank_top_k": "rerankTopK", "rerank_threshold": "rerankThreshold", "enable_query_expansion": "enableQueryExpansion", "enable_rewrite": "enableRewrite", "rewrite_prompt_system": "rewritePromptSystem", "rewrite_prompt_user": "rewritePromptUser", "query_understand_model_id": "queryUnderstandModelId", "fallback_strategy": "fallbackStrategy", "fallback_response": "fallbackResponse", "fallback_prompt": "fallbackPrompt", "intent_prompts": "intentPrompts", "question_suggestions": "questionSuggestions", "follow_ups": "followUps", "max_context_turns": "maxContextTurns", "suppress_on_fallback": "suppressOnFallback", "suppress_when_answer_asks_question": "suppressWhenAnswerAsksQuestion", "knowledge_fallback": "knowledgeFallback", "allow_regenerate": "allowRegenerate", "additional_instruction": "additionalInstruction"}'::jsonb;
+*/
 
 --
 -- PostgreSQL database dump complete

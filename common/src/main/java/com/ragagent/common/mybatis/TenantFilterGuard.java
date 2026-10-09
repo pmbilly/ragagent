@@ -36,8 +36,8 @@ import java.util.Set;
  * （同 {@link FullTableWriteGuard} 的 fail-open）。这些边界收窄都登记在本注释里，
  * 收紧时改这里。</p>
  *
- * <p><b>表注册表</b>：由 migrations 推导（V1__baseline 带 {@code tenant_id} 的 46 表
- * + V4/V5 的 skills）。解析脚本输出直接粘贴，新增带租户列的表时同步维护。</p>
+ * <p><b>表注册表</b>：由 migrations 推导（{@code V1__baseline.sql}：带 {@code tenant_id} 的 46 表
+ * + {@code skills}；B156 起 V4/V5 已折叠进 V1）。解析脚本输出直接粘贴，新增带租户列的表时同步维护。</p>
  */
 public class TenantFilterGuard implements InnerInterceptor {
 
@@ -48,7 +48,8 @@ public class TenantFilterGuard implements InnerInterceptor {
 
     /**
      * 查询时必须出现 {@code tenant_id} 谓词的表（2026-10-05 由 V1__baseline.sql +
-     * V5__skills_tenant.sql 推导；判定脚本是「CREATE TABLE 块内含 tenant_id 列」）。
+     * V5__skills_tenant.sql 推导；B156 起 V5 已折叠 ⇒ **只看 V1__baseline.sql 即可**，且 skills 的
+     * {@code tenant_id} 已直接写在 CREATE 里）。判定脚本是「CREATE TABLE 块内含 tenant_id 列」。
      * 已知误报面：按父键传递范围的查询（如 chunks 按 knowledge_id）也会命中告警——
      * alert 档盘面后，属传递范围的表迁出本表、改在调用面注释范围语义。
      */
