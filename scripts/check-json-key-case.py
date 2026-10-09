@@ -169,7 +169,7 @@ BASELINE: dict[str, set[str]] = {
     # ⇒ 按 §14.9「自有查询参数名统一 camel」该改，登记为候选（见 HANDOFF）
     'storage/fileserve/FileProxyService.java': {'file_path'},
     # 存储引擎配置面 + 云厂商凭据字段（snake，同上；B143 起含读侧形态 access_key/secret_id/secret_key 与 legacy mineru_enable_ocr）
-    'system/controller/SystemController.java': {'access_key', 'access_key_id', 'bucket_name', 'mineru_enable_ocr', 'mineru_parse_method', 'secret_access_key', 'secret_id', 'secret_key', 'system/controller/SystemController.java', 'use_ssl', 'weknoracloud_app_id'},
+    'system/controller/SystemController.java': {'access_key', 'access_key_id', 'bucket_name', 'mineru_enable_ocr', 'mineru_parse_method', 'secret_access_key', 'secret_id', 'secret_key', 'use_ssl', 'weknoracloud_app_id'},
     # MyBatis 列名/参数（非 JSON 键）
     # MyBatis 列名写入点（非 JSON 键）
     # 模型输出契约（§15.3 ② 拍板项）：提示词里就是 new_slugs，只解析入站；
