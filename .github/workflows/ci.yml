@@ -1,5 +1,6 @@
 # CI 起步三样：build / test / Spotless（HANDOFF §8）。
-# 测试自含（契约 fixture，无 Testcontainers），无需起服务容器。
+# 测试自含（契约 fixture，无 Testcontainers）；backend job 另起 ParadeDB 服务容器（B158）：
+# 灌基线（全新库守卫）+ 支撑两个连真 PG 的录测试。
 # 2026-09-30 增：包结构守卫（环 / 分层棘轮，scripts/check-package-cycles.py）。
 # 2026-10-02 增（B10）：架构规则随测试套件跑（server/src/test/.../arch/ArchitectureRulesTest.java：
 #   禁裸 getenv / 属性类必须被 @ConfigurationPropertiesScan 覆盖 / 配置类不得双装配 /
@@ -41,6 +42,24 @@ jobs:
   backend:
     name: 后端 build + test + spotless
     runs-on: ubuntu-latest
+    services:
+      # 与 docker-compose.yml 同镜像同口令（dev 1:1，B158）。CI 也起真库的两条理由：
+      #   ① 灌库守卫：V1__baseline.sql 必须能灌进**全新** ParadeDB（B156 那类只有真库才暴露的缺陷）；
+      #   ② 两个录测试（GrepChunksRecordingTest / DatabaseQueryRecordingTest）连真 PG 才跑 ——
+      #      B157 曾因 CI 无库把它们按标签排除，现由本服务支撑、回归真跑（顺带成为 schema 冒烟）。
+      postgres:
+        image: paradedb/paradedb:v0.22.2-pg17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres123!@#
+          POSTGRES_DB: WeKnora
+        ports:
+          - 15432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
     steps:
       - uses: actions/checkout@v4
         with:
@@ -50,9 +69,15 @@ jobs:
           distribution: temurin
           java-version: "21"
       - uses: gradle/actions/setup-gradle@v4
+      - name: 灌基线（全新库守卫：V1__baseline.sql 必须能灌进空 ParadeDB）
+        env:
+          PGPASSWORD: 'postgres123!@#'
+        run: >-
+          psql -h localhost -p 15432 -U postgres -d WeKnora -v ON_ERROR_STOP=1 -q
+          -f migrations/versioned/V1__baseline.sql
       - name: Spotless check（ratchet 自 seed，仅检查触碰过的文件）
         run: ./gradlew spotlessCheck
-      - name: Build & test
+      - name: Build & test（PG 走默认 localhost:15432 + dev 同口令 ⇒ 两个录测试真跑）
         run: ./gradlew build
 
   frontend:

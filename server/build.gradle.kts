@@ -149,14 +149,9 @@ val syncMigrations = tasks.register<Copy>("syncMigrations") {
 tasks.named("processResources") { dependsOn(syncMigrations) }
 
 tasks.withType<Test> {
-    useJUnitPlatform {
-        // CI 不提供开发库（PG）：带 needs-dev-pg 标签的实录测试在 CI 下排除。
-        // 本地**刻意不排除** —— 那两个测试的 javadoc 写明「dev PG 不可达时显式失败（不允许跳过）」，
-        // 免得本地环境坏掉时被静默掩盖（它们自种数据、对 JdbcExecutor 真跑 SQL）。
-        if (System.getenv("CI") != null) {
-            excludeTags("needs-dev-pg")
-        }
-    }
+    // CI 也提供真库（ci.yml 的 postgres 服务 + 灌 V1__baseline.sql，B158）⇒ 无需按标签排除录测试；
+    // 两个录测试在 CI 与本地同口径：真 PG 不可达即显式失败（不允许跳过）。
+    useJUnitPlatform()
     // Mockito inline 在 JDK 21+ 自挂 attach 会被拒（MockitoInitializationException 批量假失败）：
     // 把 byte-buddy-agent 显式挂为 javaagent，Mockito 检测到已装入的 instrumentation 后不再 attach。
     val byteBuddyAgent = configurations.testRuntimeClasspath.get().files
