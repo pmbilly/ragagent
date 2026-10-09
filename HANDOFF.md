@@ -251,7 +251,7 @@
 - `.env` 已从旧仓原样复制（未入库，gitignore 正常），**待改** `SERVER_PORT` 与库名；`SYSTEM_AES_KEY` 可沿用。
 - **`LOCAL_STORAGE_BASE_DIR` 必须放持久目录、严禁 /tmp**（旧环境实测踩坑 2026-09-28：放在 `/tmp/weknora-java-files`，macOS 定期清理 /tmp 导致已入库文档原始文件丢失——文档列表正常、检索可能正常，但 preview 全 500、重处理报 "failed to read file"，原始文件不可恢复只能重传）。建议 `~/ragagent-data/files` 之类仓库外持久路径。
 - **CI（2026-10-09 现状，B157/B158）**：三 job —— **guards**（8 条 Python 守卫）· **backend**（spotless（ratchet 自 `seed` tag）+ 全量测试 + **把 `V1__baseline.sql` 灌进全新 ParadeDB**；两个连真 PG 的录测试在 CI 真跑）· **frontend**（type-check + test + build）。ArchUnit 规则随测试套件跑（B10），包级规则仍归 guards；ArchUnit **边界固化**属阶段 4。
-- **远程仓库（2026-09-30 起）**：`origin` = `https://github.com/pmbilly/ragagent.git`（**公开**）；首次推送只推了 `main`（`bbf7443`），**`seed` tag 已于 2026-10-09 推送**（B157——CI 的 spotless ratchet 需要它可达）；本地 wip 分支按需推（并行会话在同一仓库提交、同样落在 main，也需推送）。。此后本地提交若要同步，记得 `git push`（并行会话在同一仓库提交、同样落在 main，也需推送）。
+- **远程仓库（2026-09-30 起）**：`origin` = `https://github.com/pmbilly/ragagent.git`（**公开**）；首次推送只推了 `main`（`bbf7443`），**`seed` tag 已于 2026-10-09 推送**（B157——CI 的 spotless ratchet 需要它可达）；本地 wip 分支按需推；此后本地提交若要同步，记得 `git push`（并行会话在同一仓库提交、同样落在 main，也需推送）。
 
 ## 9. 测试与安全网
 
