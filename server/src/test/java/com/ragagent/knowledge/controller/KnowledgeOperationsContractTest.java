@@ -93,14 +93,14 @@ class KnowledgeOperationsContractTest {
             "{\"content\":\"# 手工知识\\n\\n初始内容\",\"format\":\"markdown\","
                     + "\"status\":\"publish\",\"version\":1,\"updatedAt\":\"2026-09-01T00:00:00Z\"}";
     private static final String C2_IMAGE_INFO =
-            "[{\"url\":\"resource://img-1\",\"original_url\":\"\",\"start_pos\":0,\"end_pos\":0,"
-                    + "\"caption\":\"图一\",\"ocr_text\":\"\"}]";
+            "[{\"url\":\"resource://img-1\",\"originalUrl\":\"\",\"start_pos\":0,\"end_pos\":0,"
+                    + "\"caption\":\"图一\",\"ocrText\":\"\"}]";
     private static final String C3_IMAGE_INFO =
-            "[{\"url\":\"resource://img-2\",\"original_url\":\"\",\"start_pos\":0,\"end_pos\":0,"
-                    + "\"caption\":\"别图\",\"ocr_text\":\"别图OCR\"}]";
+            "[{\"url\":\"resource://img-2\",\"originalUrl\":\"\",\"start_pos\":0,\"end_pos\":0,"
+                    + "\"caption\":\"别图\",\"ocrText\":\"别图OCR\"}]";
     private static final String IMG_BODY = "{\"imageInfo\":\"[{\\\"url\\\":\\\"resource://img-1\\\","
-            + "\\\"original_url\\\":\\\"\\\",\\\"start_pos\\\":0,\\\"end_pos\\\":0,"
-            + "\\\"caption\\\":\\\"新图说\\\",\\\"ocr_text\\\":\\\"新OCR\\\"}]\"}";
+            + "\\\"originalUrl\\\":\\\"\\\",\\\"start_pos\\\":0,\\\"end_pos\\\":0,"
+            + "\\\"caption\\\":\\\"新图说\\\",\\\"ocrText\\\":\\\"新OCR\\\"}]\"}";
 
     private static final Pattern TOKEN = Pattern.compile("\"token\":\"([^\"]+)\"");
     private static final Pattern UUID_VALUE = Pattern.compile(

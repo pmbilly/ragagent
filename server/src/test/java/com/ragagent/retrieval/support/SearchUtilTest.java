@@ -258,8 +258,8 @@ class SearchUtilTest {
         String info = marshalOf("u", "", "cap", "recognized text");
         String cleared = ImageInfoEnricher.clearImageInfoTextMatchingBody(
                 info, "recognized text", "image_ocr");
-        assertTrue(cleared.contains("\"ocr_text\":\"\""));
-        assertFalse(cleared.contains("\"ocr_text\":\"recognized text\""));
+        assertTrue(cleared.contains("\"ocrText\":\"\""));
+        assertFalse(cleared.contains("\"ocrText\":\"recognized text\""));
         // chunk 类型不匹配 → 原样返回
         assertEquals(info, ImageInfoEnricher.clearImageInfoTextMatchingBody(
                 info, "recognized text", "image_caption"));

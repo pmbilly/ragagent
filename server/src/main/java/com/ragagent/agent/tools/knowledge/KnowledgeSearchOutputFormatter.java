@@ -325,7 +325,7 @@ final class KnowledgeSearchOutputFormatter {
         }
         for (JsonNode img : arr) {
             out.add(new ImageInfoView(img.path("url").asText(""),
-                    img.path("caption").asText(""), img.path("ocr_text").asText("")));
+                    img.path("caption").asText(""), img.path("ocrText").asText("")));
         }
         return out;
     }

@@ -155,10 +155,6 @@ BASELINE: dict[str, set[str]] = {
     'memory/service/MemoryRecallSelector.java': {'outside_pool', 'skip_reason'},
     # memory 观测/追踪载荷（非契约）
     'memory/service/MemoryTrace.java': {'conditioned_items', 'document_count', 'interest_count', 'recalled_items', 'recalled_items_truncated'},
-    # model 凭据面（两端自洽，统一另立批）
-    # MyBatis 列名/参数（非 JSON 键）
-    # MyBatis 列名/统计查询（非 JSON 键）
-    'model/service/ModelService.java': {'agent_total', 'deleted_at', 'knowledge_base_total'},
     # WeKnora Cloud 第三方 API
     # 读取 SQL/检索行键（存量面）
     # Cypher 字段
@@ -222,27 +218,18 @@ BASELINE: dict[str, set[str]] = {
     'knowledge/support/ParserEngineRules.java': {'file_types'},
     # memory 抽取 payload 键（模型输出契约族）
     'memory/service/MemoryTopicResolver.java': {'same_as'},
-    'wiki/service/page/NewSlugFromCitation.java': {'source_chunks'},
-}
-
-# 读侧形态·**待换锚观察单**（B143 步①）：这些是**真债**（我们自己的 jsonb/metadata 键），
-# 不是"已复核的冻结例外" ⇒ 刻意**不进 BASELINE**（不把欠账写成契约）。
-# 语义：`--list` 里标 `[读侧·待判]`，**不判失败**（CI 的 --strict 也不红）；
-# B144 换锚后逐条删除 ⇒ 这份单子清空即收工（`grep -c 读侧·待判` 可见进度）。
-READ_SHAPE_WATCH: dict[str, set[str]] = {
-    'agent/management/service/AgentSuggestedQuestions.java': {'generated_questions', 'standard_question'},
-    'agent/management/service/AgentTypePresets.java': {'agent_type_presets', 'kb_filter'},
-    'agent/management/service/BuiltinAgentRegistry.java': {'builtin_agents', 'is_builtin'},
-    'agent/tools/DocChunkSupport.java': {'ocr_text', 'original_url'},
-    'agent/tools/knowledge/KnowledgeSearchOutputFormatter.java': {'ocr_text'},
-    'agent/tools/knowledge/KnowledgeSearchRanking.java': {'ocr_text'},
+    # ── 第 6 种形态族（B144 加 SQL JSON 路径扫描时逐条复核；全是列名/表名/外部部署配置）──
+    # 数据库表名（SqlGuard 的 {"knowledge_bases","knowledges","chunks"} 表名单，SQL 注入分析的词表）
     'agent/tools/sql/SqlInjectionAnalyzer.java': {'knowledge_bases'},
+    # 冻结写侧的透传（写侧在 FROZEN_PREFIXES 里的 FeishuErrors；读侧必须与冻结面一致 ⇒ 保留 snake）
     'datasource/service/DataSourceSyncResultOps.java': {'error_reason', 'error_reason_code', 'error_reason_code_value'},
-    'knowledge/service/KnowledgeFileService.java': {'ocr_text', 'original_url'},
+    # 注释里的历史说明（描述该面 SQL 的口径；正文 SQL 已随 B144 改 camel）
+    'datasource/service/KnowledgeBridge.java': {'datasource_id'},
+    # 外部部署配置（./config/builtin_models.yaml，env BUILTIN_MODELS_CONFIG；文档 §4.4 记为可选、默认 no-op ⇒ 键名是对外契约，同 docreader 的 config_overrides）
     'model/service/BuiltinModelsReconciler.java': {'builtin_models', 'is_default', 'tenant_id'},
-    'model/service/ModelService.java': {'asr_config', 'embedding_model_id', 'image_processing_config', 'knowledge_bases', 'long_term_memory', 'summary_model_id', 'vlm_config', 'wiki_config'},
-    'retrieval/support/ChunkSearchUtil.java': {'original_url'},
-    'session/service/MessageSuggestionService.java': {'tag_ids'},
+    # MyBatis 列名（ModelUsageMapper.listKnowledgeBaseRows 的 @Select 直接选这些列：knowledge_bases 表的 embedding_model_id/summary_model_id/image_processing_config/vlm_config/asr_config/wiki_config ⇒ 非我们的 JSON 面）
+    'model/service/ModelService.java': {'asr_config', 'embedding_model_id', 'image_processing_config', 'knowledge_bases', 'summary_model_id', 'vlm_config', 'wiki_config'},
+    'wiki/service/page/NewSlugFromCitation.java': {'source_chunks'},
 }
 
 PATTERNS = (
@@ -255,6 +242,16 @@ PATTERNS = (
     # B132（HybridSearchService 的 rrf_* / MessageService）/ B138（MapperKnowledgeBridge）/
     # B140（NotionConnector 的 object_type）三次真实事故全是这一形态，此前扫不到。
     re.compile(r'\.(?:get|path|getOrDefault|containsKey|remove)\("([a-z0-9]+(?:_[a-z0-9]+)+)"\)'),
+    # SQL 里的 JSON 路径（2026-10-09 B144）：metadata->>'snake' / ->'snake' / ->'$.snake'。
+    # 起因：B138 把写侧改成 camel，却漏了 MapperKnowledgeBridge 的两条 metadata->>'datasource_id'
+    # /->>'external_id' SQL —— 当时扫描用的是双引号字面量，SQL 里是单引号，整类漏掉；
+    # 同批还查出 ChunkRepository/ChunkMapper 的 metadata->>'standard_question' 也是死的（写侧 camel）。
+    re.compile(r"->>?'\$?\.?([a-z0-9]+(?:_[a-z0-9]+)+)'"),
+    # SQL 里的 JSON 路径（2026-10-09 B144）：metadata->>'snake' / ->'snake' / ->'$.snake'。
+    # 起因：B138 把写侧改成 camel，却漏了 MapperKnowledgeBridge 的两条 metadata->>'datasource_id'
+    # /->>'external_id' SQL —— 当时扫描用的是双引号字面量，SQL 里是单引号，整类漏掉；
+    # 同批还查出 ChunkRepository/ChunkMapper 的 metadata->>'standard_question' 也是死的（写侧 camel）。
+    re.compile(r"->>?'\$?\.?([a-z0-9]+(?:_[a-z0-9]+)+)'"),
 )
 SNAKE_IN_LIST = re.compile(r'"([a-z0-9]+(?:_[a-z0-9]+)+)"')
 
@@ -283,28 +280,11 @@ def main() -> int:
     found = hits()
     violations = {f: sorted(k - BASELINE.get(f, set())) for f, k in found.items()}
     violations = {f: k for f, k in violations.items() if k}
-    # 读侧形态的待换锚键：可见但不判失败（见 READ_SHAPE_WATCH 的说明）
-    watch = {f: sorted(set(k) & READ_SHAPE_WATCH.get(f, set()))
-             for f, k in violations.items()}
-    watch = {f: k for f, k in watch.items() if k}
-    violations = {f: [k for k in k if k not in READ_SHAPE_WATCH.get(f, set())]
-                  for f, k in violations.items()}
-    violations = {f: k for f, k in violations.items() if k}
     stale = sorted(f for f in BASELINE if f not in found)
 
     if '--list' in sys.argv:
         for f, keys in sorted(found.items()):
-            in_base = f in BASELINE
-            # 只要含读侧观察键就标出来（混合文件也要可见，别被"基线"盖住）
-            has_watch = bool(set(keys) & READ_SHAPE_WATCH.get(f, set()))
-            if in_base and has_watch:
-                mark = '基线+读侧·待判'
-            elif in_base:
-                mark = '基线'
-            elif has_watch and set(keys) <= READ_SHAPE_WATCH.get(f, set()):
-                mark = '读侧·待判'
-            else:
-                mark = '**新增**'
+            mark = '基线' if f in BASELINE else '**新增**'
             print(f'  [{mark}] {f}: {sorted(keys)}')
         return 0
 
@@ -318,8 +298,7 @@ def main() -> int:
             print(f'    {f}: {keys}')
         print('  → 改 camel（同一提交带上前端与夹具）；确属第三方/模型契约则加入本脚本 BASELINE 并写明理由。')
         return 1
-    note = (f'（基线 {sum(len(v) for v in BASELINE.values())} 条，均已逐条复核；'
-            f'读侧待换锚 {sum(len(v) for v in READ_SHAPE_WATCH.values())} 条，见 READ_SHAPE_WATCH）')
+    note = f'（基线 {sum(len(v) for v in BASELINE.values())} 条，均已逐条复核）'
     if stale:
         note += f'；注意基线中有 {len(stale)} 个文件已无命中，可清理：{stale[:3]}'
     print(f'✓ 无新增 snake JSON 键 {note}')

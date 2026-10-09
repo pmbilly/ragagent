@@ -80,7 +80,7 @@ public final class ChunkSearchUtil {
 
     /**
      * image_info JSON
-     * （{@code [{"url":...,"original_url":...}]}）里出现的全部 URL（url 与
+     * （{@code [{"url":...,"originalUrl":...}]}）里出现的全部 URL（url 与
      */
     public static Set<String> imageURLsFromInfo(String imageInfoJson) {
         Set<String> urls = new LinkedHashSet<>();
@@ -101,7 +101,7 @@ public final class ChunkSearchUtil {
             if (!url.isEmpty()) {
                 urls.add(url);
             }
-            String original = info.path("original_url").asText("");
+            String original = info.path("originalUrl").asText("");
             if (!original.isEmpty()) {
                 urls.add(original);
             }

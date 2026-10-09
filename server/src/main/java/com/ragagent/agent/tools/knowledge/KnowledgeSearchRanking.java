@@ -254,7 +254,7 @@ final class KnowledgeSearchRanking {
             if (!caption.isEmpty()) {
                 imageTexts.add("Image Caption: " + caption);
             }
-            String ocr = img.path("ocr_text").asText("");
+            String ocr = img.path("ocrText").asText("");
             if (!ocr.isEmpty()) {
                 imageTexts.add("Image Text: " + ocr);
             }

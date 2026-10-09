@@ -417,7 +417,7 @@ public final class GoRecording46C {
             "[{\"chunk_index\":7,\"chunk_type\":\"\",\"content\":\"完全不同的第二块\",\"content_revision\":0,\"content_rewritten\":false,\"end_at\":0,\"id\":\"c2\",\"image_info\":\"\",\"kb_id\":\"\",\"knowledge_filename\":\"\",\"knowledge_id\":\"\",\"knowledge_source\":\"\",\"knowledge_title\":\"\",\"match_type\":0,\"metadata\":null,\"parent_chunk_id\":\"\",\"score\":0.9,\"seq\":0,\"start_at\":0,\"sub_chunk_id\":null},{\"chunk_index\":0,\"chunk_type\":\"\",\"content\":\"第一块\",\"content_revision\":0,\"content_rewritten\":false,\"end_at\":0,\"id\":\"c1\",\"image_info\":\"\",\"kb_id\":\"\",\"knowledge_filename\":\"\",\"knowledge_id\":\"\",\"knowledge_source\":\"\",\"knowledge_title\":\"\",\"match_type\":0,\"metadata\":null,\"parent_chunk_id\":\"\",\"score\":0.5,\"seq\":0,\"start_at\":0,\"sub_chunk_id\":null}]";
 
     private static final String R_MERGE_SEQUENTIAL_IMAGE_INFO_MERGE =
-            "[{\"chunk_index\":0,\"chunk_type\":\"\",\"content\":\"一段包含图片的正文\\n\\n一段包含图片的正文补充\",\"content_revision\":1,\"content_rewritten\":false,\"end_at\":0,\"id\":\"c1\",\"image_info\":\"[{\\\"url\\\":\\\"u1\\\",\\\"original_url\\\":\\\"\\\",\\\"start_pos\\\":0,\\\"end_pos\\\":0,\\\"caption\\\":\\\"c1\\\",\\\"ocr_text\\\":\\\"\\\"},{\\\"url\\\":\\\"u2\\\",\\\"original_url\\\":\\\"\\\",\\\"start_pos\\\":0,\\\"end_pos\\\":0,\\\"caption\\\":\\\"\\\",\\\"ocr_text\\\":\\\"o2\\\"}]\",\"kb_id\":\"\",\"knowledge_filename\":\"\",\"knowledge_id\":\"\",\"knowledge_source\":\"\",\"knowledge_title\":\"\",\"match_type\":0,\"metadata\":null,\"parent_chunk_id\":\"\",\"score\":0.8,\"seq\":0,\"start_at\":0,\"sub_chunk_id\":[\"c2\"]}]";
+            "[{\"chunk_index\":0,\"chunk_type\":\"\",\"content\":\"一段包含图片的正文\\n\\n一段包含图片的正文补充\",\"content_revision\":1,\"content_rewritten\":false,\"end_at\":0,\"id\":\"c1\",\"image_info\":\"[{\\\"url\\\":\\\"u1\\\",\\\"originalUrl\\\":\\\"\\\",\\\"start_pos\\\":0,\\\"end_pos\\\":0,\\\"caption\\\":\\\"c1\\\",\\\"ocrText\\\":\\\"\\\"},{\\\"url\\\":\\\"u2\\\",\\\"originalUrl\\\":\\\"\\\",\\\"start_pos\\\":0,\\\"end_pos\\\":0,\\\"caption\\\":\\\"\\\",\\\"ocrText\\\":\\\"o2\\\"}]\",\"kb_id\":\"\",\"knowledge_filename\":\"\",\"knowledge_id\":\"\",\"knowledge_source\":\"\",\"knowledge_title\":\"\",\"match_type\":0,\"metadata\":null,\"parent_chunk_id\":\"\",\"score\":0.8,\"seq\":0,\"start_at\":0,\"sub_chunk_id\":[\"c2\"]}]";
 
     private static final String R_MERGE_SEQUENTIAL_APPEND_FALLBACK =
             "{\"exact\":\"直接重叠的甲乙丙丁\",\"ok\":\"HTML \\u0026amp; 实体头部内容实体头部内容加后续\"}";
@@ -431,10 +431,10 @@ public final class GoRecording46C {
             "[{\"chunk_index\":0,\"chunk_type\":\"text\",\"content\":\"手工插入的前缀\\n\\n父块正文\\n\\n当前被编辑过的子块正文\",\"content_revision\":0,\"content_rewritten\":true,\"end_at\":1001,\"id\":\"child\",\"image_info\":\"\",\"kb_id\":\"\",\"knowledge_filename\":\"\",\"knowledge_id\":\"doc\",\"knowledge_source\":\"\",\"knowledge_title\":\"\",\"match_type\":0,\"metadata\":null,\"parent_chunk_id\":\"parent\",\"score\":0,\"seq\":0,\"start_at\":999,\"sub_chunk_id\":[\"child\"]}]";
 
     private static final String R_MERGE_PARENT_IMAGE_GRANDPARENT =
-            "[{\"chunk_index\":4,\"chunk_type\":\"image_ocr\",\"content\":\"祖父上文\\n\\n![matched](u1)\\n\\n祖父下文\\n\\n当前编辑过的文本子块\\n\\n![matched](u1)\\n\\nmatched image\",\"content_revision\":0,\"content_rewritten\":true,\"end_at\":510,\"id\":\"image\",\"image_info\":\"[{\\\"url\\\":\\\"u1\\\",\\\"original_url\\\":\\\"\\\",\\\"start_pos\\\":0,\\\"end_pos\\\":0,\\\"caption\\\":\\\"\\\",\\\"ocr_text\\\":\\\"\\\"}]\",\"kb_id\":\"\",\"knowledge_filename\":\"\",\"knowledge_id\":\"doc\",\"knowledge_source\":\"\",\"knowledge_title\":\"\",\"match_type\":0,\"metadata\":null,\"parent_chunk_id\":\"text\",\"score\":0,\"seq\":0,\"start_at\":500,\"sub_chunk_id\":[\"image\"]}]";
+            "[{\"chunk_index\":4,\"chunk_type\":\"image_ocr\",\"content\":\"祖父上文\\n\\n![matched](u1)\\n\\n祖父下文\\n\\n当前编辑过的文本子块\\n\\n![matched](u1)\\n\\nmatched image\",\"content_revision\":0,\"content_rewritten\":true,\"end_at\":510,\"id\":\"image\",\"image_info\":\"[{\\\"url\\\":\\\"u1\\\",\\\"originalUrl\\\":\\\"\\\",\\\"start_pos\\\":0,\\\"end_pos\\\":0,\\\"caption\\\":\\\"\\\",\\\"ocrText\\\":\\\"\\\"}]\",\"kb_id\":\"\",\"knowledge_filename\":\"\",\"knowledge_id\":\"doc\",\"knowledge_source\":\"\",\"knowledge_title\":\"\",\"match_type\":0,\"metadata\":null,\"parent_chunk_id\":\"text\",\"score\":0,\"seq\":0,\"start_at\":500,\"sub_chunk_id\":[\"image\"]}]";
 
     private static final String R_MERGE_PARENT_NO_TENANT =
-            "[{\"chunk_index\":4,\"chunk_type\":\"image_ocr\",\"content\":\"祖父上文\\n\\n![matched](u1)\\n\\n祖父下文\\n\\n当前编辑过的文本子块\\n\\n![matched](u1)\\n\\nmatched image\",\"content_revision\":0,\"content_rewritten\":true,\"end_at\":510,\"id\":\"image\",\"image_info\":\"[{\\\"url\\\":\\\"u1\\\",\\\"original_url\\\":\\\"\\\",\\\"start_pos\\\":0,\\\"end_pos\\\":0,\\\"caption\\\":\\\"\\\",\\\"ocr_text\\\":\\\"\\\"}]\",\"kb_id\":\"\",\"knowledge_filename\":\"\",\"knowledge_id\":\"doc\",\"knowledge_source\":\"\",\"knowledge_title\":\"\",\"match_type\":0,\"metadata\":null,\"parent_chunk_id\":\"text\",\"score\":0,\"seq\":0,\"start_at\":500,\"sub_chunk_id\":[\"image\"]}]";
+            "[{\"chunk_index\":4,\"chunk_type\":\"image_ocr\",\"content\":\"祖父上文\\n\\n![matched](u1)\\n\\n祖父下文\\n\\n当前编辑过的文本子块\\n\\n![matched](u1)\\n\\nmatched image\",\"content_revision\":0,\"content_rewritten\":true,\"end_at\":510,\"id\":\"image\",\"image_info\":\"[{\\\"url\\\":\\\"u1\\\",\\\"originalUrl\\\":\\\"\\\",\\\"start_pos\\\":0,\\\"end_pos\\\":0,\\\"caption\\\":\\\"\\\",\\\"ocrText\\\":\\\"\\\"}]\",\"kb_id\":\"\",\"knowledge_filename\":\"\",\"knowledge_id\":\"doc\",\"knowledge_source\":\"\",\"knowledge_title\":\"\",\"match_type\":0,\"metadata\":null,\"parent_chunk_id\":\"text\",\"score\":0,\"seq\":0,\"start_at\":500,\"sub_chunk_id\":[\"image\"]}]";
 
     private static final String R_MERGE_PARENT_CHAT_MANAGE_TENANT =
             "{\"n\":1}";
@@ -589,16 +589,16 @@ public final class GoRecording46C {
             "{\"in\":{\"content\":\"纯文本内容\",\"image_info\":\"\",\"meta_len\":0},\"out\":\"纯文本内容\"}";
 
     private static final String R_RERANK_PASSAGE_CASE01 =
-            "{\"in\":{\"content\":\"\",\"image_info\":\"[{\\\"url\\\":\\\"u1\\\",\\\"original_url\\\":\\\"\\\",\\\"start_pos\\\":0,\\\"end_pos\\\":0,\\\"caption\\\":\\\"图片说明\\\",\\\"ocr_text\\\":\\\"OCR 文本\\\"}]\",\"meta_len\":0},\"out\":\"图片说明\\nOCR 文本\"}";
+            "{\"in\":{\"content\":\"\",\"image_info\":\"[{\\\"url\\\":\\\"u1\\\",\\\"originalUrl\\\":\\\"\\\",\\\"start_pos\\\":0,\\\"end_pos\\\":0,\\\"caption\\\":\\\"图片说明\\\",\\\"ocrText\\\":\\\"OCR 文本\\\"}]\",\"meta_len\":0},\"out\":\"图片说明\\nOCR 文本\"}";
 
     private static final String R_RERANK_PASSAGE_CASE02 =
-            "{\"in\":{\"content\":\"带图片的内容\",\"image_info\":\"[{\\\"url\\\":\\\"u1\\\",\\\"original_url\\\":\\\"\\\",\\\"start_pos\\\":0,\\\"end_pos\\\":0,\\\"caption\\\":\\\"图片说明\\\",\\\"ocr_text\\\":\\\"OCR 文本\\\"}]\",\"meta_len\":0},\"out\":\"带图片的内容\\n\\n图片说明\\nOCR 文本\"}";
+            "{\"in\":{\"content\":\"带图片的内容\",\"image_info\":\"[{\\\"url\\\":\\\"u1\\\",\\\"originalUrl\\\":\\\"\\\",\\\"start_pos\\\":0,\\\"end_pos\\\":0,\\\"caption\\\":\\\"图片说明\\\",\\\"ocrText\\\":\\\"OCR 文本\\\"}]\",\"meta_len\":0},\"out\":\"带图片的内容\\n\\n图片说明\\nOCR 文本\"}";
 
     private static final String R_RERANK_PASSAGE_CASE03 =
             "{\"in\":{\"content\":\"正文\",\"image_info\":\"\",\"meta_len\":143},\"out\":\"正文\\n\\n生成的问题一; 生成的问题二\"}";
 
     private static final String R_RERANK_PASSAGE_CASE04 =
-            "{\"in\":{\"content\":\"带图片和问题\",\"image_info\":\"[{\\\"url\\\":\\\"u1\\\",\\\"original_url\\\":\\\"\\\",\\\"start_pos\\\":0,\\\"end_pos\\\":0,\\\"caption\\\":\\\"图片说明\\\",\\\"ocr_text\\\":\\\"OCR 文本\\\"}]\",\"meta_len\":143},\"out\":\"带图片和问题\\n\\n图片说明\\nOCR 文本\\n生成的问题一; 生成的问题二\"}";
+            "{\"in\":{\"content\":\"带图片和问题\",\"image_info\":\"[{\\\"url\\\":\\\"u1\\\",\\\"originalUrl\\\":\\\"\\\",\\\"start_pos\\\":0,\\\"end_pos\\\":0,\\\"caption\\\":\\\"图片说明\\\",\\\"ocrText\\\":\\\"OCR 文本\\\"}]\",\"meta_len\":143},\"out\":\"带图片和问题\\n\\n图片说明\\nOCR 文本\\n生成的问题一; 生成的问题二\"}";
 
     private static final String R_RERANK_PASSAGE_CASE05 =
             "{\"in\":{\"content\":\"坏图片 JSON\",\"image_info\":\"[{bad\",\"meta_len\":0},\"out\":\"坏图片 JSON\"}";

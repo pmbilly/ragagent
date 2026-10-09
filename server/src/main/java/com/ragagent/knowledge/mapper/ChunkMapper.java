@@ -63,7 +63,7 @@ public interface ChunkMapper extends BaseMapper<Chunk> {
     int updateAllFieldsExceptSeqId(@Param("c") Chunk chunk);
 
     /**
-     * （chunk）：standard_question IN / similar_questions 数组交集。
+     * （chunk）：standardQuestion IN / similarQuestions 数组交集。
      * status ∈ {default 0, stored 1, indexed 2}（stored 的兄弟请求也算，防重试插重行），
      * {@code @Results}（自定义 @Select 不套实体 typeHandler，本仓约定）。
      */
@@ -72,10 +72,10 @@ public interface ChunkMapper extends BaseMapper<Chunk> {
             + "WHERE tenant_id = #{tenantId} AND knowledge_base_id = #{kbId} "
             + "AND chunk_type = 'faq' AND status IN (0, 1, 2) AND id != #{excludeChunkId} "
             + "AND deleted_at IS NULL "
-            + "AND (metadata->>'standard_question' IN "
+            + "AND (metadata->>'standardQuestion' IN "
             + "<foreach collection='questions' item='q' open='(' close=')' separator=','>#{q}</foreach> "
             + "OR EXISTS (SELECT 1 FROM jsonb_array_elements_text("
-            + "COALESCE(metadata->'similar_questions', '[]'::jsonb)) elem "
+            + "COALESCE(metadata->'similarQuestions', '[]'::jsonb)) elem "
             + "WHERE elem.value IN "
             + "<foreach collection='questions' item='q' open='(' close=')' separator=','>#{q}</foreach>)) "
             + "LIMIT 1"

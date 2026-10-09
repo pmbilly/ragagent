@@ -8,26 +8,26 @@
 # A user can always override any auto-filled value — the preset only seeds
 # the form.
 #
-# `kb_filter` decides which KBs the agent editor allows the user to select
+# `kbFilter` decides which KBs the agent editor allows the user to select
 # under this type. The frontend reads this config via GET /agents/type-presets
 # and applies it as a client-side filter.
 #
-# Supported kb_filter predicates (evaluated against a KB's `capabilities`):
-#   any_of:   KB must expose at least ONE of the listed capability names.
+# Supported kbFilter predicates (evaluated against a KB's `capabilities`):
+#   anyOf:   KB must expose at least ONE of the listed capability names.
 #   all_of:   KB must expose ALL of the listed capability names.
 #   none_of:  KB must expose NONE of the listed capability names.
 # Capability names: vector, keyword, wiki, graph, faq.
-# An empty kb_filter (or kb_filter absent) means "any KB is allowed".
+# An empty kbFilter (or kbFilter absent) means "any KB is allowed".
 #
-# NOTE: In the default "tool-driven" mode, the frontend DERIVES the any_of
+# NOTE: In the default "tool-driven" mode, the frontend DERIVES the anyOf
 # predicate from `config.allowed_tools` via `deriveKbFilterFromTools` (see
 # `frontend/src/utils/tool-capabilities.ts`). You only need to write an
-# explicit `kb_filter` here when the preset requires a business rule that
+# explicit `kbFilter` here when the preset requires a business rule that
 # can't be inferred from the tools alone (e.g. `none_of: [faq]` on
 # data-analysis). Keeping the map lean avoids the "two sources of truth"
 # drift that used to plague this file.
 
-agent_type_presets:
+agentTypePresets:
   # --------------------------------------------------------------------------
   # RAG Q&A — classic evidence-based retrieval over chunk indexes.
   # Best for document / FAQ KBs without wiki.
@@ -62,7 +62,7 @@ agent_type_presets:
       retainRetrievalHistory: false
       faqPriorityEnabled: true
       kbSelectionMode: "all"
-    # kb_filter derived from allowedTools: any_of = [vector, keyword]
+    # kbFilter derived from allowedTools: anyOf = [vector, keyword]
 
   # --------------------------------------------------------------------------
   # Wiki Q&A — graph-navigated wiki answering.
@@ -96,7 +96,7 @@ agent_type_presets:
         - "wiki_flag_issue"
       retainRetrievalHistory: false
       kbSelectionMode: "all"
-    # kb_filter derived from allowedTools: any_of = [wiki]
+    # kbFilter derived from allowedTools: anyOf = [wiki]
 
   # --------------------------------------------------------------------------
   # Hybrid RAG + Wiki — single agent that orchestrates both indexes.
@@ -140,7 +140,7 @@ agent_type_presets:
     #  - KB has only chunks    → fallback to pure RAG (see prompt's "Fallback rules")
     #  - KB has only wiki      → fallback to wiki-only answering
     #  - FAQ KB                → allowed; knowledge_search still works on FAQ chunks
-    # kb_filter derived from allowedTools: any_of = [vector, keyword, wiki].
+    # kbFilter derived from allowedTools: anyOf = [vector, keyword, wiki].
     # We only require that the KB expose AT LEAST ONE retrievable surface so
     # the agent has SOMETHING to call. KBs with zero indexing (e.g. graph-only
     # or completely unindexed) are still excluded since no tool will return
@@ -185,12 +185,12 @@ agent_type_presets:
       kbSelectionMode: "all"
     # data_schema / data_analysis tools read ChunkTypeTableSummary /
     # ChunkTypeTableColumn chunks, which are produced by the normal RAG
-    # ingestion pipeline (vector / keyword indexing on). The any_of predicate
+    # ingestion pipeline (vector / keyword indexing on). The anyOf predicate
     # is derived automatically from allowed_tools; we only need to add the
     # FAQ exclusion here since it's a business rule the tool map can't express
     # (FAQ KBs technically have vector/keyword chunks but they're Q&A pairs,
     # not tabular data, so data_schema would produce garbage on them).
-    kb_filter:
+    kbFilter:
       none_of: ["faq"]
 
   # --------------------------------------------------------------------------
@@ -211,4 +211,4 @@ agent_type_presets:
         label: "カスタム"
         description: "完全に自由に設定。ツール、プロンプト、ナレッジベースの範囲を手動で選択します。"
     # No `config:` block → preset applies no auto-fill.
-    # No `kb_filter:`    → all KBs are selectable.
+    # No `kbFilter:`    → all KBs are selectable.

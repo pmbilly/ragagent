@@ -191,11 +191,11 @@ public final class ImageInfoMatchUtil {
     static String marshalOne(ImageInfo info) {
         var node = com.fasterxml.jackson.databind.json.JsonMapper.builder().build().createObjectNode();
         node.put("url", info.getUrl());
-        node.put("original_url", info.getOriginalUrl());
+        node.put("originalUrl", info.getOriginalUrl());
         node.put("start_pos", info.getStartPos());
         node.put("end_pos", info.getEndPos());
         node.put("caption", info.getCaption());
-        node.put("ocr_text", info.getOcrText());
+        node.put("ocrText", info.getOcrText());
         return new String(ProviderJson.marshal(node), java.nio.charset.StandardCharsets.UTF_8);
     }
 
@@ -220,11 +220,11 @@ public final class ImageInfoMatchUtil {
         for (JsonNode item : arr) {
             ImageInfo info = new ImageInfo();
             info.setUrl(item.path("url").asText(""));
-            info.setOriginalUrl(item.path("original_url").asText(""));
+            info.setOriginalUrl(item.path("originalUrl").asText(""));
             info.setStartPos(item.path("start_pos").asInt());
             info.setEndPos(item.path("end_pos").asInt());
             info.setCaption(item.path("caption").asText(""));
-            info.setOcrText(item.path("ocr_text").asText(""));
+            info.setOcrText(item.path("ocrText").asText(""));
             out.add(info);
         }
         return out;

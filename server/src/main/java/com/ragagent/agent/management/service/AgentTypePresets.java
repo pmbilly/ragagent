@@ -34,7 +34,7 @@ public class AgentTypePresets {
             }
             Object raw = new org.yaml.snakeyaml.Yaml().load(in);
             JsonNode root = MAPPER.valueToTree(raw);
-            JsonNode list = root.get("agent_type_presets");
+            JsonNode list = root.get("agentTypePresets");
             if (list == null || !list.isArray()) {
                 return;
             }
@@ -61,10 +61,10 @@ public class AgentTypePresets {
             if (config != null && config.isObject() && config.size() > 0) {
                 item.set("config", presetConfig((ObjectNode) config));
             }
-            JsonNode filter = e.get("kb_filter");
+            JsonNode filter = e.get("kbFilter");
             if (filter != null && filter.isObject() && filter.size() > 0) {
-                ObjectNode f = item.putObject("kb_filter");
-                copyIfNonEmptyArray((ObjectNode) filter, "any_of", f);
+                ObjectNode f = item.putObject("kbFilter");
+                copyIfNonEmptyArray((ObjectNode) filter, "anyOf", f);
                 copyIfNonEmptyArray((ObjectNode) filter, "all_of", f);
                 copyIfNonEmptyArray((ObjectNode) filter, "none_of", f);
             }

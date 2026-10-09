@@ -1092,7 +1092,7 @@ const loadMentionItems = async (q: string, resetIndex = true, append = false) =>
       if (kbMode === 'none') {
         availableKbs = [];
       } else if (kbMode === 'selected') {
-        // 'selected' 完全信任用户在编辑器里的勾选；编辑器已经用 kb_filter 灰显
+        // 'selected' 完全信任用户在编辑器里的勾选；编辑器已经用 kbFilter 灰显
         // 不兼容项，这里不再二次过滤，避免越权擦除用户明确的选择。
         const configuredKbIds = agentKnowledgeBases.value;
         availableKbs = availableKbs.filter((kb: any) => configuredKbIds.includes(kb.id));

@@ -24,7 +24,7 @@
       "indirectRelationChunks": null,
       "metadata": null,
       "contentHash": null,
-      "imageInfo": "[{\"url\":\"resource://img-1\",\"original_url\":\"\",\"start_pos\":0,\"end_pos\":0,\"caption\":\"图一\",\"ocr_text\":\"OCR文字\"}]",
+      "imageInfo": "[{\"url\":\"resource://img-1\",\"originalUrl\":\"\",\"start_pos\":0,\"end_pos\":0,\"caption\":\"图一\",\"ocrText\":\"OCR文字\"}]",
       "createdAt": "2026-09-18T21:59:46.938588+08:00",
       "updatedAt": "2026-09-18T21:59:46.938588+08:00"
     }

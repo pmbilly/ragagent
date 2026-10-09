@@ -31,7 +31,7 @@ class ChunkSearchUtilTest {
     @Test
     void imageURLsFromInfoParsesUrlAndOriginalAndToleratesGarbage() {
         assertThat(ChunkSearchUtil.imageURLsFromInfo(
-                "[{\"url\":\"u1\",\"original_url\":\"o1\"},{\"url\":\"\",\"original_url\":\"o2\"}]"))
+                "[{\"url\":\"u1\",\"originalUrl\":\"o1\"},{\"url\":\"\",\"originalUrl\":\"o2\"}]"))
                 .containsExactlyInAnyOrder("u1", "o1", "o2");
         assertThat(ChunkSearchUtil.imageURLsFromInfo("not json")).isEmpty();
         assertThat(ChunkSearchUtil.imageURLsFromInfo("")).isEmpty();

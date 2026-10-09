@@ -156,7 +156,7 @@
           <section v-if="usageConflict.knowledge_bases.length" class="model-usage-group">
             <h3>
               {{ $t('modelSettings.usage.knowledgeBases', {
-                count: modelUsageResourceCount(usageConflict.knowledge_bases, usageConflict.knowledge_base_total)
+                count: modelUsageResourceCount(usageConflict.knowledge_bases, usageConflict.knowledgeBaseTotal)
               }) }}
             </h3>
             <ul>
@@ -185,19 +185,19 @@
               </li>
             </ul>
             <p
-              v-if="modelUsageListTruncated(usageConflict.knowledge_bases, usageConflict.knowledge_base_total)"
+              v-if="modelUsageListTruncated(usageConflict.knowledge_bases, usageConflict.knowledgeBaseTotal)"
               class="model-usage-truncated"
             >
               {{ $t('modelSettings.usage.truncated', {
                 shown: usageConflict.knowledge_bases.length,
-                total: modelUsageResourceCount(usageConflict.knowledge_bases, usageConflict.knowledge_base_total)
+                total: modelUsageResourceCount(usageConflict.knowledge_bases, usageConflict.knowledgeBaseTotal)
               }) }}
             </p>
           </section>
 
           <section v-if="usageConflict.agents.length" class="model-usage-group">
             <h3>{{ $t('modelSettings.usage.agents', {
-              count: modelUsageResourceCount(usageConflict.agents, usageConflict.agent_total)
+              count: modelUsageResourceCount(usageConflict.agents, usageConflict.agentTotal)
             }) }}</h3>
             <ul>
               <li v-for="resource in usageConflict.agents" :key="resource.id">
@@ -225,22 +225,22 @@
               </li>
             </ul>
             <p
-              v-if="modelUsageListTruncated(usageConflict.agents, usageConflict.agent_total)"
+              v-if="modelUsageListTruncated(usageConflict.agents, usageConflict.agentTotal)"
               class="model-usage-truncated"
             >
               {{ $t('modelSettings.usage.truncated', {
                 shown: usageConflict.agents.length,
-                total: modelUsageResourceCount(usageConflict.agents, usageConflict.agent_total)
+                total: modelUsageResourceCount(usageConflict.agents, usageConflict.agentTotal)
               }) }}
             </p>
           </section>
 
-          <section v-if="usageConflict.long_term_memory.bindings.length" class="model-usage-group">
+          <section v-if="usageConflict.longTermMemory.bindings.length" class="model-usage-group">
             <h3>{{ $t('modelSettings.usage.longTermMemory') }}</h3>
             <div class="model-usage-memory">
               <div class="model-usage-bindings">
                 <t-tag
-                  v-for="(binding, index) in usageConflict.long_term_memory.bindings"
+                  v-for="(binding, index) in usageConflict.longTermMemory.bindings"
                   :key="`${binding}-${index}`"
                   size="small"
                   variant="light"

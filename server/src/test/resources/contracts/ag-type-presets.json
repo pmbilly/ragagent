@@ -105,7 +105,7 @@
       ],
       "kbSelectionMode": "all"
     },
-    "kb_filter": {
+    "kbFilter": {
       "none_of": [
         "faq"
       ]

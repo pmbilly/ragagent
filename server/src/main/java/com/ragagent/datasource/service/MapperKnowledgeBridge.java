@@ -123,8 +123,8 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
                             .eq(Knowledge::getTenantId, tenantId)
                             .eq(Knowledge::getKnowledgeBaseId, kbId)
                             .apply("deleted_at IS NULL")
-                            .apply("metadata->>'datasource_id' = {0}", dataSourceId)
-                            .apply("metadata->>'external_id' = {0}", externalId)
+                            .apply("metadata->>'datasourceId' = {0}", dataSourceId)
+                            .apply("metadata->>'externalId' = {0}", externalId)
                             .last("LIMIT 1"));
             return rows == null || rows.isEmpty() ? null : rows.get(0);
         }

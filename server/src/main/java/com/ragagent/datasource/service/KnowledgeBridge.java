@@ -20,7 +20,7 @@ import com.ragagent.knowledge.domain.KnowledgeBase;
  *       所以本端口的每个方法都显式收租户。</li>
  *   <li><b>能力缺口</b>：{@code KnowledgeService} 的创建入口不收
  *       {@code metadata} 与 {@code tagIDs}（尚未支持）。同步回来时按
- *       {@code metadata->>'external_id'} 找旧行，metadata 缺失就<b>永远</b>找不到
+ *       {@code metadata->>'externalId'} 找旧行，metadata 缺失就<b>永远</b>找不到
  *       ——增量同步会退化成"每次新建一份"。</li>
  *   <li><b>可测</b>：service 的测试用假实现即可驱动整条同步状态机，
  *       不必拉起真实的知识解析管线。</li>
@@ -54,7 +54,7 @@ public interface KnowledgeBridge {
 
     /**
      * 按
-     * {@code metadata->>'datasource_id'} + {@code metadata->>'external_id'} 找，
+     * {@code metadata->>'datasource_id'} + {@code metadata->>'externalId'} 找，
      * <b>限定本租户与知识库、排除软删行</b>；找不到回 {@code null}（不是错误）。
      */
     Knowledge findByDataSourceExternalId(long tenantId, String kbId, String dataSourceId,

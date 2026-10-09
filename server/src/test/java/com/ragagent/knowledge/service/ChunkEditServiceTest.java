@@ -300,7 +300,7 @@ class ChunkEditServiceTest {
         knowledge(DOC, KB);
         Chunk c = chunk(DOC, "![x](local://1/a.png) body");
         Chunk ocr = chunk(DOC, "OCR TEXT", "image_ocr");
-        ocr.setImageInfo("[{\"url\":\"local://1/a.png\",\"original_url\":\"\",\"ocr_text\":\"OCR TEXT\"}]");
+        ocr.setImageInfo("[{\"url\":\"local://1/a.png\",\"originalUrl\":\"\",\"ocrText\":\"OCR TEXT\"}]");
         setParent(ocr, c);
         chunkMapper.updateById(ocr);
 

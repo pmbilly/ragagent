@@ -414,7 +414,7 @@ public class ChunkQuestionService {
 
     /**
      * 语义（metadata 整写 + chunk 更新 + 向量同步三联动）：
-     * 整体替换 metadata（仅 generated_questions 两键；空列表/0 由域类型注解省略）
+     * 整体替换 metadata（仅 generatedQuestions 两键；空列表/0 由域类型注解省略）
      * → 落库 → 重建该分块向量索引。
      */
     private void persistGeneratedQuestions(KnowledgeBase kb, Chunk chunk, List<GeneratedQuestion> generated) {

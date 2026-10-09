@@ -98,7 +98,7 @@ public class BuiltinAgentRegistry {
         } catch (Exception e) {
             throw new IllegalStateException("failed to load builtin_agents.yaml", e);
         }
-        JsonNode agents = presets.get("builtin_agents");
+        JsonNode agents = presets.get("builtinAgents");
         if (agents == null || !agents.isArray()) {
             return;
         }
@@ -125,7 +125,7 @@ public class BuiltinAgentRegistry {
                 });
             }
             entries.put(id, new Entry(id, a.path("avatar").asText(""),
-                    a.path("is_builtin").asBoolean(false), i18n, cfg));
+                    a.path("isBuiltin").asBoolean(false), i18n, cfg));
         }
         resolvePromptRefs();
     }

@@ -132,7 +132,7 @@ class MergeRecordingTest {
                 json(searchResultsShape(p.mergeSequentialChunks("k", separate))));
 
         String imgA = jsonOf(List.of(Map.of("url", "u1", "caption", "c1")));
-        String imgB = jsonOf(List.of(Map.of("url", "u1", "caption", "c1-dup"), Map.of("url", "u2", "ocr_text", "o2")));
+        String imgB = jsonOf(List.of(Map.of("url", "u1", "caption", "c1-dup"), Map.of("url", "u2", "ocrText", "o2")));
         List<SearchResult> joinImg = new ArrayList<>(List.of(
                 sr("c1", "一段包含图片的正文", 0.6, r -> { r.setContentRevision(1); r.setChunkIndex(0); r.setImageInfo(imgA); }),
                 sr("c2", "一段包含图片的正文补充", 0.8, r -> { r.setContentRevision(1); r.setChunkIndex(1); r.setImageInfo(imgB); })));
@@ -194,7 +194,7 @@ class MergeRecordingTest {
         ChatManage tenantCm = new ChatManage();
         tenantCm.setTenantId(1);
 
-        String childImg = jsonOf(List.of(Map.of("url", "u2", "ocr_text", "two")));
+        String childImg = jsonOf(List.of(Map.of("url", "u2", "ocrText", "two")));
         SearchResult res = sr("child", "当前被编辑过的子块正文", 0);
         res.setKnowledgeId("doc");
         res.setChunkType("text");
@@ -205,7 +205,7 @@ class MergeRecordingTest {
         List<SearchResult> got = p.resolveParentChunks(tenantCm, new ArrayList<>(List.of(res)));
         assertRec("merge_parent", "text_to_parent", json(searchResultsShape(got)));
 
-        String ii = jsonOf(List.of(Map.of("url", "u1", "ocr_text", "matched image")));
+        String ii = jsonOf(List.of(Map.of("url", "u1", "ocrText", "matched image")));
         Chunk text = new Chunk();
         text.setId("text");
         text.setParentChunkId("parent");

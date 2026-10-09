@@ -22,9 +22,9 @@ const details = {
   agents: [
     { id: 'agent-1', name: 'Support', bindings: ['chat_model', 'follow_up_model'] },
   ],
-  long_term_memory: { bindings: ['extract_model'] },
-  knowledge_base_total: 2,
-  agent_total: 1,
+  longTermMemory: { bindings: ['extract_model'] },
+  knowledgeBaseTotal: 2,
+  agentTotal: 1,
 }
 
 test('parses grouped model usage details without dropping multiple bindings', () => {
@@ -32,23 +32,23 @@ test('parses grouped model usage details without dropping multiple bindings', ()
 })
 
 test('fills missing totals from the listed collections', () => {
-  const { knowledge_base_total, agent_total, ...withoutTotals } = details
+  const { knowledgeBaseTotal, agentTotal, ...withoutTotals } = details
   assert.deepEqual(parseModelUsageDetails(withoutTotals), details)
-  assert.equal(knowledge_base_total, 2)
-  assert.equal(agent_total, 1)
+  assert.equal(knowledgeBaseTotal, 2)
+  assert.equal(agentTotal, 1)
 })
 
 test('keeps untruncated totals when the listed collections are capped', () => {
   const parsed = parseModelUsageDetails({
     ...details,
-    knowledge_base_total: 80,
-    agent_total: 12,
+    knowledgeBaseTotal: 80,
+    agentTotal: 12,
   })
-  assert.equal(parsed?.knowledge_base_total, 80)
-  assert.equal(parsed?.agent_total, 12)
-  assert.equal(modelUsageResourceCount(parsed!.knowledge_bases, parsed!.knowledge_base_total), 80)
-  assert.equal(modelUsageListTruncated(parsed!.knowledge_bases, parsed!.knowledge_base_total), true)
-  assert.equal(modelUsageListTruncated(parsed!.agents, parsed!.agent_total), true)
+  assert.equal(parsed?.knowledgeBaseTotal, 80)
+  assert.equal(parsed?.agentTotal, 12)
+  assert.equal(modelUsageResourceCount(parsed!.knowledge_bases, parsed!.knowledgeBaseTotal), 80)
+  assert.equal(modelUsageListTruncated(parsed!.knowledge_bases, parsed!.knowledgeBaseTotal), true)
+  assert.equal(modelUsageListTruncated(parsed!.agents, parsed!.agentTotal), true)
 })
 
 test('recognizes only the dedicated model-in-use code with a valid payload', () => {
@@ -72,17 +72,17 @@ test('rejects malformed details instead of guessing from the server message', ()
   assert.equal(parseModelUsageDetails({
     knowledge_bases: [],
     agents: [],
-    long_term_memory: { bindings: [] },
+    longTermMemory: { bindings: [] },
   }), null)
   assert.equal(parseModelUsageDetails({
     knowledge_bases: [{ id: 'kb-1', name: 'Docs', bindings: [] }],
     agents: [],
-    long_term_memory: { bindings: [] },
+    longTermMemory: { bindings: [] },
   }), null)
   assert.equal(parseModelUsageDetails({
     knowledge_bases: [{ id: 'kb-1', name: 'Docs', bindings: 'vlm_model' }],
     agents: [],
-    long_term_memory: { bindings: [] },
+    longTermMemory: { bindings: [] },
   }), null)
   assert.equal(modelInUseErrorFromRequest({
     error: {

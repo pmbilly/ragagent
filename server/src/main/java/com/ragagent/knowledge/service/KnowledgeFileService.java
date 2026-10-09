@@ -296,9 +296,9 @@ public class KnowledgeFileService {
         List<Chunk> addChunks = new ArrayList<>();
         boolean hasOcr = false;
         boolean hasCaption = false;
-        String originalUrl = image.path("original_url").asText("");
+        String originalUrl = image.path("originalUrl").asText("");
         String caption = image.path("caption").asText("");
-        String ocrText = image.path("ocr_text").asText("");
+        String ocrText = image.path("ocrText").asText("");
         for (Chunk child : chunkChildren) {
             JsonNode childImages;
             try {
@@ -309,7 +309,7 @@ public class KnowledgeFileService {
             if (!childImages.isArray() || childImages.isEmpty()) {
                 continue;
             }
-            if (!originalUrl.equals(childImages.get(0).path("original_url").asText(""))) {
+            if (!originalUrl.equals(childImages.get(0).path("originalUrl").asText(""))) {
                 continue;
             }
             switch (child.getChunkType() == null ? "" : child.getChunkType()) {
@@ -323,7 +323,7 @@ public class KnowledgeFileService {
                 }
                 case "image_ocr" -> {
                     hasOcr = true;
-                    if (!ocrText.equals(childImages.get(0).path("ocr_text").asText(""))) {
+                    if (!ocrText.equals(childImages.get(0).path("ocrText").asText(""))) {
                         child.setContent(ocrText);
                         child.setImageInfo(imageInfo);
                         updateChunks.add(child);

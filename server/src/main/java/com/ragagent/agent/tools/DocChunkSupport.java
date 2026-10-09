@@ -105,12 +105,12 @@ public final class DocChunkSupport {
             List<ImageInfoView> out = new ArrayList<>();
             for (com.fasterxml.jackson.databind.JsonNode item : node) {
                 String url = item.path("url").asText("");
-                String originalUrl = item.path("original_url").asText("");
+                String originalUrl = item.path("originalUrl").asText("");
                 if (url.isEmpty()) {
                     url = originalUrl;
                 }
                 out.add(new ImageInfoView(url,
-                        item.path("caption").asText(""), item.path("ocr_text").asText("")));
+                        item.path("caption").asText(""), item.path("ocrText").asText("")));
             }
             return out;
         } catch (java.io.IOException e) {

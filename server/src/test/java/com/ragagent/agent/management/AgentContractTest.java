@@ -93,7 +93,7 @@ class AgentContractTest {
                 + "description, source, parse_status, enable_status) VALUES "
                 + "(?, 10005, ?, 'faq', 'faq-knowledge', '', 'faq', 'completed', 'enabled')",
                 KN_FAQ, KB_FAQ);
-        String faqMeta = "{\"standard_question\":\"怎么 绑定 手机？\",\"answers\":"
+        String faqMeta = "{\"standardQuestion\":\"怎么 绑定 手机？\",\"answers\":"
                 + "[\"进入设置，选择设备，点击绑定。\"],\"answer_strategy\":\"all\",\"version\":1,"
                 + "\"source\":\"faq\"}";
         jdbc.update("INSERT INTO chunks (id, seq_id, tenant_id, knowledge_id, knowledge_base_id, "

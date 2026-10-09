@@ -1054,7 +1054,7 @@ const getGeneratedQuestions = (item: any): GeneratedQuestion[] => {
   if (!item || !item.metadata) return [];
   try {
     const metadata = typeof item.metadata === 'string' ? JSON.parse(item.metadata) : item.metadata;
-    const questions = metadata.generated_questions || [];
+    const questions = metadata.generatedQuestions || [];
     // 兼容旧格式（字符串数组）和新格式（对象数组）
     return questions.map((q: string | GeneratedQuestion, index: number) => {
       if (typeof q === 'string') {
@@ -1073,7 +1073,7 @@ const hasStaleGeneratedQuestions = (item: any) => {
   if (!questions.length) return false;
   try {
     const metadata = typeof item.metadata === 'string' ? JSON.parse(item.metadata || '{}') : (item.metadata || {});
-    const fallbackRevision = metadata.generated_questions_revision || 0;
+    const fallbackRevision = metadata.generatedQuestions_revision || 0;
     const currentRevision = item.contentRevision || 0;
     return questions.some((question) => (question.contentRevision ?? fallbackRevision) !== currentRevision);
   } catch {
@@ -1098,14 +1098,14 @@ const setChunkMetadata = (item: any, metadata: Record<string, any>) => {
 
 const upsertChunkGeneratedQuestion = (item: any, questionData: GeneratedQuestion) => {
   const metadata = getChunkMetadata(item);
-  const questions: GeneratedQuestion[] = [...(metadata.generated_questions || [])];
+  const questions: GeneratedQuestion[] = [...(metadata.generatedQuestions || [])];
   const index = questions.findIndex((q) => q.id === questionData.id);
   if (index >= 0) {
     questions[index] = questionData;
   } else {
     questions.push(questionData);
   }
-  metadata.generated_questions = questions;
+  metadata.generatedQuestions = questions;
   setChunkMetadata(item, metadata);
 };
 
@@ -1406,8 +1406,8 @@ const regenerateQuestions = async (item: any) => {
   try {
     const result: any = await regenerateGeneratedQuestions(item.id);
     const metadata = typeof item.metadata === 'string' ? JSON.parse(item.metadata || '{}') : (item.metadata || {});
-    metadata.generated_questions = result || [];
-    metadata.generated_questions_revision = item.contentRevision || 0;
+    metadata.generatedQuestions = result || [];
+    metadata.generatedQuestions_revision = item.contentRevision || 0;
     item.metadata = metadata;
     questionComposerChunk.value = '';
     MessagePlugin.success(t('knowledgeBase.questionsRegenerated'));
@@ -1441,10 +1441,10 @@ const handleDeleteQuestion = async (item: any, chunkIndex: number, question: Gen
 
     // 更新本地数据
     const metadata = typeof item.metadata === 'string' ? JSON.parse(item.metadata) : item.metadata;
-    if (metadata && metadata.generated_questions) {
-      const idx = metadata.generated_questions.findIndex((q: GeneratedQuestion) => q.id === question.id);
+    if (metadata && metadata.generatedQuestions) {
+      const idx = metadata.generatedQuestions.findIndex((q: GeneratedQuestion) => q.id === question.id);
       if (idx > -1) {
-        metadata.generated_questions.splice(idx, 1);
+        metadata.generatedQuestions.splice(idx, 1);
       }
       item.metadata = typeof item.metadata === 'string' ? JSON.stringify(metadata) : metadata;
     }

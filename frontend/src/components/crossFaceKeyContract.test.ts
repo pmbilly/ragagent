@@ -399,8 +399,6 @@ test('api 面 snake 记号棘轮：只许减不许增', () => {
     'api/model/modelUsage.ts': '后端 putObject 亲手构造的 snake 载荷（前后端一致）',
   }
   const BASELINE: Record<string, string> = {
-    'api/agent/index.ts:kb_filter': '已核实：后端 AgentTypePresets 从预设 JSON 透出（item.putObject("kb_filter")）',
-    'api/agent/index.ts:any_of': '已核实：同上（kb_filter 内层键，定义在预设 JSON 里）',
     'api/agent/index.ts:all_of': '已核实：同上',
     'api/agent/index.ts:none_of': '已核实：同上',
     'api/agent/index.ts:file_types': '已核实：后端 ParserEngineRules 按 file_types 读规则 jsonb，两侧一致',

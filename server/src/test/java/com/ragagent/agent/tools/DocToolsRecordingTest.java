@@ -32,8 +32,8 @@ class DocToolsRecordingTest {
 
     /** 全字段序列化形态（键序 = 声明序）。 */
     static final String MERGED_P1 =
-            "[{\"url\":\"http://x/1.png\",\"original_url\":\"\",\"start_pos\":0,\"end_pos\":0,"
-                    + "\"caption\":\"  图 一  \",\"ocr_text\":\"识别文字\"}]";
+            "[{\"url\":\"http://x/1.png\",\"originalUrl\":\"\",\"start_pos\":0,\"end_pos\":0,"
+                    + "\"caption\":\"  图 一  \",\"ocrText\":\"识别文字\"}]";
 
     // ==================== Fakes ====================
 
@@ -251,7 +251,7 @@ class DocToolsRecordingTest {
         FakeRepo imgRepo = new FakeRepo();
         Chunk q1 = textChunk("q1", "d1", "kb1", 0, "带图段落。");
         Chunk q2 = textChunk("q2", "d1", "kb1", 1, "已有图的段落。");
-        q2.setImageInfo("[{\"url\":\"http://x/2.png\",\"caption\":\"已有图\",\"ocr_text\":\"\"}]");
+        q2.setImageInfo("[{\"url\":\"http://x/2.png\",\"caption\":\"已有图\",\"ocrText\":\"\"}]");
         imgRepo.byKnowledge.put("d1", List.of(q1, q2));
         imgRepo.totals.put("d1", 2L);
         FakeImageCollector imgCollector = new FakeImageCollector();
@@ -365,8 +365,8 @@ class DocToolsRecordingTest {
                 textChunk("g3", "d1", "kb1", 2, "")));
         repo.totals.put("d1", 3L);
         Chunk imgListChunk = textChunk("g4", "d2", "kb1", 0, "图片块");
-        imgListChunk.setImageInfo("[{\"url\":\"http://x/3.png\",\"caption\":\"清单图\",\"ocr_text\":\"清单OCR\"},"
-                + "{\"url\":\"\",\"caption\":\"仅说明\",\"ocr_text\":\"\"}]");
+        imgListChunk.setImageInfo("[{\"url\":\"http://x/3.png\",\"caption\":\"清单图\",\"ocrText\":\"清单OCR\"},"
+                + "{\"url\":\"\",\"caption\":\"仅说明\",\"ocrText\":\"\"}]");
         repo.byKnowledge.put("d2", List.of(imgListChunk));
         repo.totals.put("d2", 1L);
         repo.byKnowledge.put("d0", List.of());

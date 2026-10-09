@@ -75,8 +75,8 @@ class ChunkContractTest {
             "{\"generatedQuestions\":[{\"id\":\"" + Q1 + "\",\"question\":\"已有问题?\","
                     + "\"contentRevision\":0}],\"generatedQuestionsRevision\":0}";
     private static final String C3_IMAGE_INFO =
-            "[{\"url\":\"resource://img-1\",\"original_url\":\"\",\"start_pos\":0,\"end_pos\":0,"
-                    + "\"caption\":\"图一\",\"ocr_text\":\"OCR文字\"}]";
+            "[{\"url\":\"resource://img-1\",\"originalUrl\":\"\",\"start_pos\":0,\"end_pos\":0,"
+                    + "\"caption\":\"图一\",\"ocrText\":\"OCR文字\"}]";
 
     private static final Pattern TOKEN = Pattern.compile("\"token\":\"([^\"]+)\"");
     private static final Pattern UUID_VALUE = Pattern.compile(

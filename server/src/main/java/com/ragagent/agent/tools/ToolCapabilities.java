@@ -158,7 +158,7 @@ public final class ToolCapabilities {
     /**
      * 给定 agent 配置派生有效 KB 过滤器：
      * agentMode 的隐式约束（quick-answer 强制 vector|keyword）与工具派生过滤器的
-     * <b>并集</b>——沿用 any_of 语义：KB 至少暴露其一即通过。
+     * <b>并集</b>——沿用 anyOf 语义：KB 至少暴露其一即通过。
      */
     public static KbFilter deriveKbFilterForAgent(String agentMode, Collection<String> allowedTools) {
         Set<KbCapability> seen = new LinkedHashSet<>();

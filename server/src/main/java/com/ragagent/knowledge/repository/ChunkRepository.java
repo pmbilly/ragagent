@@ -432,11 +432,11 @@ public class ChunkRepository implements ChunkSearchGateway {
             // JSON 路径不是实体属性，Lambda 表达不了——保留 raw apply（{0} 占位参数化，无注入面）
             switch (searchField == null ? "" : searchField) {
                 case "standard_question" -> w.apply(postgres
-                        ? "metadata->>'standard_question' ILIKE {0}"
-                        : "metadata->>'$.standard_question' LIKE {0}", like);
+                        ? "metadata->>'standardQuestion' ILIKE {0}"
+                        : "metadata->>'$.standardQuestion' LIKE {0}", like);
                 case "similar_questions" -> w.apply(postgres
-                        ? "(metadata->'similar_questions')::text ILIKE {0}"
-                        : "JSON_EXTRACT(metadata, '$.similar_questions') LIKE {0}", like);
+                        ? "(metadata->'similarQuestions')::text ILIKE {0}"
+                        : "JSON_EXTRACT(metadata, '$.similarQuestions') LIKE {0}", like);
                 case "answers" -> w.apply(postgres
                         ? "(metadata->'answers')::text ILIKE {0}"
                         : "JSON_EXTRACT(metadata, '$.answers') LIKE {0}", like);

@@ -18,20 +18,22 @@ import org.junit.jupiter.api.Test;
  * 却按 snake {@code generated_questions} 取 → SQL 恒命中 0 行、解析恒 null
  * ⇒ 智能体「推荐问题」永远为空（真机：端点返回 {@code []}，修复后返回库里的问题）。</p>
  *
- * <p>这里同时钉住两处：SQL 过滤用 camel 键（并容忍 snake 存量行）、解析 camel 优先。</p>
+ * <p>这里同时钉住两处：SQL 过滤用 camel 键、解析用 camel 键。<b>B144 起不再要求"容忍 snake
+ * 存量行"</b>——那段理由属 B92 已整体作废的"兼容历史数据"类，且本测试自己的注释早写明
+ * "从未有过改名迁移、全库实测 0 行 snake"，容忍分支实测不可达；留着它反而把死代码锁在库里。</p>
  */
 class AgentSuggestedQuestionsTest {
 
     @Test
-    @DisplayName("解析：camel 键优先，snake 存量行回落；畸形/空值不抛错")
-    void firstGeneratedQuestionReadsCamelAndToleratesSnake() {
+    @DisplayName("解析：只认 camel 键；snake 存量行**不再**回落；畸形/空值不抛错")
+    void firstGeneratedQuestionReadsCamelOnly() {
         String camel = "{\"generatedQuestions\":[{\"id\":\"q1\",\"question\":\"camel 问题\","
                 + "\"contentRevision\":0}],\"generatedQuestionsRevision\":0}";
         assertThat(AgentSuggestedQuestions.firstGeneratedQuestion(camel)).isEqualTo("camel 问题");
 
-        // 历史存量行可能是 snake：仍要能读出来
+        // B144：snake 不再回落（政策作废"兼容历史数据"；实测全库 0 行 snake）
         String snake = "{\"generated_questions\":[{\"question\":\"snake 问题\"}]}";
-        assertThat(AgentSuggestedQuestions.firstGeneratedQuestion(snake)).isEqualTo("snake 问题");
+        assertThat(AgentSuggestedQuestions.firstGeneratedQuestion(snake)).isNull();
 
         // 纯字符串数组元素（兼容旧形态）
         String plain = "{\"generatedQuestions\":[\"纯字符串问题\"]}";
@@ -48,7 +50,7 @@ class AgentSuggestedQuestionsTest {
     @Test
     @DisplayName("SQL 过滤：必须用 camel 键（%generatedQuestions%）——写错键名会让推荐问题恒空")
     void recommendedChunksQueryFiltersOnCamelKey() throws Exception {
-        // 逐条扫：凡是按生成问题键过滤的查询，都必须用 camel 主键（并容忍 snake 存量行）。
+        // 逐条扫：凡是按生成问题键过滤的查询，都必须用 camel（B144 起单一词汇，不再容忍 snake）。
         // 注意别只盯某一个方法——本映射里还有 FAQ 面的查询（按 chunk_type='faq' 过滤，
         // 与生成问题无关），钉错方法会得到假红/假绿。
         int checked = 0;
@@ -67,8 +69,8 @@ class AgentSuggestedQuestionsTest {
                     .as("%s：键名以写入侧为准（camel generatedQuestions）", m.getName())
                     .contains("'%generatedQuestions%'");
             assertThat(sql)
-                    .as("%s：容忍 Go 期存量 snake 行", m.getName())
-                    .contains("'%generated_questions%'");
+                    .as("%s：不得再出现 Go 期 snake 键（B144 单一词汇）", m.getName())
+                    .doesNotContain("generated_questions");
         }
         assertThat(checked)
                 .as("应至少有一条按生成问题键过滤的查询（否则本守卫形同虚设）")

@@ -5,7 +5,7 @@
  * knowledge-base capabilities each tool depends on. Used to:
  *   - Gray out tools whose dependencies aren't satisfied by the current scope
  *     (see `AgentEditorModal.vue` → `availableTools`).
- *   - Derive `kb_filter`-style predicates for agent type presets so the same
+ *   - Derive `kbFilter`-style predicates for agent type presets so the same
  *     declarative map drives both the tool allowlist and the KB allowlist
  *     (see `deriveKbFilterFromTools`).
  *
@@ -140,11 +140,11 @@ function primaryMissKind(c: KBCapability): RequirementMissKind {
 }
 
 /**
- * Derive a `kb_filter`-style predicate for a list of tools: a KB satisfies
+ * Derive a `kbFilter`-style predicate for a list of tools: a KB satisfies
  * the derived filter iff at least ONE of the listed tools would be usable
  * on a scope consisting of just that KB.
  *
- * Used by Step 3 so presets don't have to hand-maintain `kb_filter` next
+ * Used by Step 3 so presets don't have to hand-maintain `kbFilter` next
  * to their `allowedTools` — the two are always derived from the same map.
  *
  * Returns `null` when none of the input tools have any KB requirement
@@ -152,7 +152,7 @@ function primaryMissKind(c: KBCapability): RequirementMissKind {
  */
 export function deriveKbFilterFromTools(
   tools: string[],
-): { any_of: KBCapability[] } | null {
+): { anyOf: KBCapability[] } | null {
   const caps = new Set<KBCapability>();
   for (const t of tools) {
     const req = TOOL_CAPABILITY_REQUIREMENTS[t];
@@ -161,7 +161,7 @@ export function deriveKbFilterFromTools(
     req.allOf?.forEach(c => caps.add(c));
   }
   if (caps.size === 0) return null;
-  return { any_of: Array.from(caps) };
+  return { anyOf: Array.from(caps) };
 }
 
 /**
@@ -171,13 +171,13 @@ export function deriveKbFilterFromTools(
  * alone would let wiki-only KBs through even though they can't contribute
  * anything to a RAG answer. Treat this as a property of the agent MODE.
  */
-const QUICK_ANSWER_KB_FILTER: { any_of: KBCapability[] } = {
-  any_of: ['vector', 'keyword'],
+const QUICK_ANSWER_KB_FILTER: { anyOf: KBCapability[] } = {
+  anyOf: ['vector', 'keyword'],
 };
 
 /**
  * Agent-mode aware version of `deriveKbFilterFromTools`: unions the
- * tool-derived `any_of` with the implicit requirement of `agentMode`
+ * tool-derived `anyOf` with the implicit requirement of `agentMode`
  * (currently: quick-answer → vector|keyword).
  *
  * Returns `null` when neither the agent mode nor the tools impose any
@@ -186,15 +186,15 @@ const QUICK_ANSWER_KB_FILTER: { any_of: KBCapability[] } = {
 export function deriveKbFilterForAgent(
   agentMode: string | undefined | null,
   allowedTools: string[] | undefined | null,
-): { any_of: KBCapability[] } | null {
+): { anyOf: KBCapability[] } | null {
   const caps = new Set<KBCapability>();
   if (agentMode === 'quick-answer') {
-    QUICK_ANSWER_KB_FILTER.any_of.forEach(c => caps.add(c));
+    QUICK_ANSWER_KB_FILTER.anyOf.forEach(c => caps.add(c));
   }
   const fromTools = deriveKbFilterFromTools(allowedTools || []);
-  fromTools?.any_of.forEach(c => caps.add(c));
+  fromTools?.anyOf.forEach(c => caps.add(c));
   if (caps.size === 0) return null;
-  return { any_of: Array.from(caps) };
+  return { anyOf: Array.from(caps) };
 }
 
 /**
@@ -212,7 +212,7 @@ export function kbSatisfiesAgentRequirements(
   const filter = deriveKbFilterForAgent(agentMode, allowedTools);
   if (!filter) return true;
   if (!kbCaps) return false;
-  return filter.any_of.some(c => !!kbCaps[c]);
+  return filter.anyOf.some(c => !!kbCaps[c]);
 }
 
 /**
@@ -233,7 +233,7 @@ export function kbSatisfiesToolRequirements(
   const filter = deriveKbFilterFromTools(allowedTools || []);
   if (!filter) return true;
   if (!kbCaps) return false;
-  return filter.any_of.some(c => !!kbCaps[c]);
+  return filter.anyOf.some(c => !!kbCaps[c]);
 }
 
 /**

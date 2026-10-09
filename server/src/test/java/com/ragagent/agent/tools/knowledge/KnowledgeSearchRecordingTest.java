@@ -275,7 +275,7 @@ class KnowledgeSearchRecordingTest {
     void kbFilter() {
         KnowledgeSearchTool tool = new KnowledgeSearchTool(kbSvc(), chunkSvc(), null, null,
                 skb1Targets(), null);
-        assertToolResult("kb_filter", tool.execute(
+        assertToolResult("kbFilter", tool.execute(
                 req("{\"queries\":[\"What is RAG retrieval?\"],\"knowledgeBaseIds\":[\"skb1\"]}")),
                 rec("knowledge_search_kb_filter"));
     }
@@ -389,7 +389,7 @@ class KnowledgeSearchRecordingTest {
         FakeBackend svc = kbSvc();
         SearchResultView r = result("ic1", "skd1", "skb1", "RAG Guide", 0,
                 "Architecture with diagrams.", 0.033, 0);
-        r.imageInfo = "[{\"url\":\"http://x/a.png\",\"caption\":\"  架构图  \",\"ocr_text\":\"系统架构\"}]";
+        r.imageInfo = "[{\"url\":\"http://x/a.png\",\"caption\":\"  架构图  \",\"ocrText\":\"系统架构\"}]";
         svc.hybrid.put("skb1|What is RAG retrieval?", new ArrayList<>(List.of(r)));
         KnowledgeSearchTool tool = new KnowledgeSearchTool(svc, chunkSvc(), null, null,
                 skb1Targets(), null);

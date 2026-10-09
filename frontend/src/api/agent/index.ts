@@ -252,9 +252,9 @@ export function getPlaceholders(): Promise<{ data: PlaceholdersResponse }> {
 
 // ===== 智能体类型预设 =====
 
-// 后端 kb_filter 结构（见 agent/management/service/AgentTypePresets）
+// 后端 kbFilter 结构（见 agent/management/service/AgentTypePresets）
 export interface AgentTypeKBFilter {
-  any_of?: string[];   // KB 至少拥有其一
+  anyOf?: string[];   // KB 至少拥有其一
   all_of?: string[];   // KB 必须全部拥有
   none_of?: string[];  // KB 必须全部不拥有
 }
@@ -290,7 +290,7 @@ export interface AgentTypePreset {
   id: AgentType;
   i18n: Record<string, AgentTypePresetI18n>;
   config?: AgentTypePresetConfig;     // 为空表示"自定义"类型（无预设）
-  kb_filter?: AgentTypeKBFilter;      // 为空表示所有 KB 可选
+  kbFilter?: AgentTypeKBFilter;      // 为空表示所有 KB 可选
 }
 
 // 拉取类型预设列表（编辑器用）

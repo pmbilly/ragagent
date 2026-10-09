@@ -254,9 +254,9 @@ public class ModelService implements ModelGateway  {
         }
         JsonNode usage = getModelUsageDetails(tid, id);
         if (inUse(usage)) {
-            long kbCount = usage.get("knowledge_base_total").asLong();
-            long agentCount = usage.get("agent_total").asLong();
-            boolean memory = usage.get("long_term_memory").get("bindings").size() > 0;
+            long kbCount = usage.get("knowledgeBaseTotal").asLong();
+            long agentCount = usage.get("agentTotal").asLong();
+            boolean memory = usage.get("longTermMemory").get("bindings").size() > 0;
             log.warn("Model {} is in use: kb={} agent={} memory={}", id, kbCount, agentCount, memory);
             throw new BizException(new AppError(2300, formatInUseMessage(kbCount, agentCount, memory), usage, 400));
         }
@@ -269,11 +269,11 @@ public class ModelService implements ModelGateway  {
     }
 
     private static boolean inUse(JsonNode usage) {
-        return usage.get("knowledge_base_total").asLong() > 0
-                || usage.get("agent_total").asLong() > 0
+        return usage.get("knowledgeBaseTotal").asLong() > 0
+                || usage.get("agentTotal").asLong() > 0
                 || usage.get("knowledge_bases").size() > 0
                 || usage.get("agents").size() > 0
-                || usage.get("long_term_memory").get("bindings").size() > 0;
+                || usage.get("longTermMemory").get("bindings").size() > 0;
     }
 
     /** 组装 2300 错误的 in-use 文案。 */
@@ -300,7 +300,7 @@ public class ModelService implements ModelGateway  {
         ObjectNode details = MAPPER.createObjectNode();
         ArrayNode kbs = details.putArray("knowledge_bases");
         ArrayNode agents = details.putArray("agents");
-        ObjectNode memory = details.putObject("long_term_memory");
+        ObjectNode memory = details.putObject("longTermMemory");
         ArrayNode memoryBindings = memory.putArray("bindings");
 
         long kbTotal = 0;
@@ -346,8 +346,8 @@ public class ModelService implements ModelGateway  {
             }
         }
 
-        details.put("knowledge_base_total", kbTotal);
-        details.put("agent_total", agentTotal);
+        details.put("knowledgeBaseTotal", kbTotal);
+        details.put("agentTotal", agentTotal);
         return details;
     }
 

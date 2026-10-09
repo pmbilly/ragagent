@@ -2,10 +2,10 @@
 # Each agent has localized name, description, avatar, and config overrides per language.
 # The "default" locale is used as fallback when the user's language is not found.
 
-builtin_agents:
+builtinAgents:
   - id: "builtin-quick-answer"
     avatar: ""
-    is_builtin: true
+    isBuiltin: true
     i18n:
       default:
         name: "Quick Answer"
@@ -48,7 +48,7 @@ builtin_agents:
 
   - id: "builtin-smart-reasoning"
     avatar: ""
-    is_builtin: true
+    isBuiltin: true
     i18n:
       default:
         name: "Smart Reasoning"
@@ -96,7 +96,7 @@ builtin_agents:
 
   - id: "builtin-data-analyst"
     avatar: "📊"
-    is_builtin: true
+    isBuiltin: true
     i18n:
       default:
         name: "Data Analyst"
@@ -141,7 +141,7 @@ builtin_agents:
 
   - id: "builtin-wiki-researcher"
     avatar: "📚"
-    is_builtin: true
+    isBuiltin: true
     i18n:
       default:
         name: "Wiki Questioner"
@@ -185,7 +185,7 @@ builtin_agents:
 
   - id: "builtin-wiki-fixer"
     avatar: "🔧"
-    is_builtin: true
+    isBuiltin: true
     i18n:
       default:
         name: "Wiki Fixer"

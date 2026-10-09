@@ -2806,29 +2806,29 @@ const presetKbMismatchReason = (preset: AgentTypePreset): string => {
 // 计算预设的"有效 KB 过滤器"：工具推导 + YAML 增量叠加。
 //
 // 设计原则：
-//   - 工具 → any_of（"KB 至少要能被其中一个工具用得上"）由
+//   - 工具 → anyOf（"KB 至少要能被其中一个工具用得上"）由
 //     `deriveKbFilterFromTools` 自动算出；
-//   - YAML 里的 `kb_filter` 只负责**工具推不出来**的业务规则（如
+//   - YAML 里的 `kbFilter` 只负责**工具推不出来**的业务规则（如
 //     data-analysis 的 `none_of: ["faq"]`），作为增量合并，而不是整体覆盖；
 //   - `all_of` / `none_of` 直接从 YAML 继承（工具不表达这类约束）。
 //
-// 这样 rag-qa / wiki-qa / hybrid 在 YAML 里彻底不写 `kb_filter`，
+// 这样 rag-qa / wiki-qa / hybrid 在 YAML 里彻底不写 `kbFilter`，
 // data-analysis 只需声明额外的 `none_of`，"工具→能力"的映射只在
 // `@/utils/tool-capabilities` 维护一份。
 const effectiveKbFilter = (preset: AgentTypePreset | null): AgentTypeKBFilter | null => {
   if (!preset) return null;
   const derived = deriveKbFilterFromTools(preset.config?.allowedTools || []);
-  const yaml = preset.kb_filter;
+  const yaml = preset.kbFilter;
 
-  // YAML 提供 any_of 时整体覆盖推导（给显式控制留口子）；否则用推导的
-  const anyOf = (yaml?.any_of && yaml.any_of.length > 0) ? yaml.any_of : (derived?.any_of ?? []);
+  // YAML 提供 anyOf 时整体覆盖推导（给显式控制留口子）；否则用推导的
+  const anyOf = (yaml?.anyOf && yaml.anyOf.length > 0) ? yaml.anyOf : (derived?.anyOf ?? []);
   const allOf = yaml?.all_of ?? [];
   const noneOf = yaml?.none_of ?? [];
   if (anyOf.length === 0 && allOf.length === 0 && noneOf.length === 0) return null;
-  return { any_of: anyOf, all_of: allOf, none_of: noneOf };
+  return { anyOf: anyOf, all_of: allOf, none_of: noneOf };
 };
 
-// 评估单个 KB 是否满足给定预设的 kb_filter
+// 评估单个 KB 是否满足给定预设的 kbFilter
 const kbSatisfiesPresetFilter = (kb: { capabilities?: KBCapabilities; ragEnabled?: boolean; wikiEnabled?: boolean; type?: string }, preset: AgentTypePreset | null): { ok: boolean; reason: string } => {
   const filter = effectiveKbFilter(preset);
   if (!preset || !filter) return { ok: true, reason: '' };
@@ -2855,8 +2855,8 @@ const kbSatisfiesPresetFilter = (kb: { capabilities?: KBCapabilities; ragEnabled
       if (!has(n)) return { ok: false, reason };
     }
   }
-  if (filter.any_of && filter.any_of.length > 0) {
-    if (!filter.any_of.some(n => has(n))) {
+  if (filter.anyOf && filter.anyOf.length > 0) {
+    if (!filter.anyOf.some(n => has(n))) {
       return { ok: false, reason };
     }
   }

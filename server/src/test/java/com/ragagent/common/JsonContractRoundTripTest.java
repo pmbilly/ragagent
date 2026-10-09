@@ -1097,7 +1097,7 @@ class JsonContractRoundTripTest {
 
         var emptyMeta = new FaqChunkMetadata();
         assertRoundTrips(emptyMeta, FaqChunkMetadata.class,
-                "types.FAQChunkMetadata ← FaqChunkMetadata（零值：仅 standard_question 恒输出）");
+                "types.FAQChunkMetadata ← FaqChunkMetadata（零值：仅 standardQuestion 恒输出）");
 
         var entry = new FaqEntry(970001L, "chunk-1", "kg-1", "kb-1", 965001L, "热门问题",
                 true, true, "怎么绑定手机", List.of("如何绑定"), null, List.of("答案"),

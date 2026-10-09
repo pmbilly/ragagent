@@ -25,11 +25,11 @@ export interface ModelUsageResource {
 export interface ModelUsageDetails {
   knowledge_bases: ModelUsageResource[]
   agents: ModelUsageResource[]
-  long_term_memory: {
+  longTermMemory: {
     bindings: string[]
   }
-  knowledge_base_total: number
-  agent_total: number
+  knowledgeBaseTotal: number
+  agentTotal: number
 }
 
 export class ModelInUseError extends Error {
@@ -78,19 +78,19 @@ function parseTotal(value: unknown, listed: number): number {
 }
 
 export function parseModelUsageDetails(value: unknown): ModelUsageDetails | null {
-  if (!isRecord(value) || !isRecord(value.long_term_memory)) return null
+  if (!isRecord(value) || !isRecord(value.longTermMemory)) return null
 
   const knowledgeBases = parseResources(value.knowledge_bases)
   const agents = parseResources(value.agents)
-  const memoryBindings = parseBindings(value.long_term_memory.bindings)
+  const memoryBindings = parseBindings(value.longTermMemory.bindings)
   if (!knowledgeBases || !agents || !memoryBindings) return null
 
   const details: ModelUsageDetails = {
     knowledge_bases: knowledgeBases,
     agents,
-    long_term_memory: { bindings: memoryBindings },
-    knowledge_base_total: parseTotal(value.knowledge_base_total, knowledgeBases.length),
-    agent_total: parseTotal(value.agent_total, agents.length),
+    longTermMemory: { bindings: memoryBindings },
+    knowledgeBaseTotal: parseTotal(value.knowledgeBaseTotal, knowledgeBases.length),
+    agentTotal: parseTotal(value.agentTotal, agents.length),
   }
   if (knowledgeBases.length === 0 && agents.length === 0 && memoryBindings.length === 0) {
     return null

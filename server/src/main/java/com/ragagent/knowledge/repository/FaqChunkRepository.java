@@ -125,7 +125,7 @@ public class FaqChunkRepository {
 
     /**
      * 找单个
-     * standard_question 或 similar_questions 与给定问题集重叠的 FAQ chunk
+     * standardQuestion 或 similarQuestions 与给定问题集重叠的 FAQ chunk
      * （status ∈ {0,1,2} 全算——stored 的兄弟请求也算，软删行不可见）。
      * 退化为「取候选行后在 JVM 内按同一集合语义过滤」——功能等价、数据量是
      * 多行重叠时取哪一行本就不确定）。</p>

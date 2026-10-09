@@ -78,7 +78,7 @@ class RerankRecordingTest {
 
     @Test
     void rerankPassage() throws Exception {
-        // 金片字节形态的键序与零值字段（url/original_url/start_pos/end_pos/caption/ocr_text）
+        // 金片字节形态的键序与零值字段（url/originalUrl/start_pos/end_pos/caption/ocrText）
         var q1 = ObjectMapperHolder.JSON.createObjectNode();
         q1.put("id", "q1").put("question", "生成的问题一");
         var q2 = ObjectMapperHolder.JSON.createObjectNode();
@@ -88,8 +88,8 @@ class RerankRecordingTest {
         metaNode.put("generatedQuestionsRevision", 1);
         String meta = ObjectMapperHolder.JSON.writeValueAsString(metaNode);
         var imgNode = ObjectMapperHolder.JSON.createObjectNode();
-        imgNode.put("url", "u1").put("original_url", "").put("start_pos", 0)
-                .put("end_pos", 0).put("caption", "图片说明").put("ocr_text", "OCR 文本");
+        imgNode.put("url", "u1").put("originalUrl", "").put("start_pos", 0)
+                .put("end_pos", 0).put("caption", "图片说明").put("ocrText", "OCR 文本");
         String img = "[" + ObjectMapperHolder.JSON.writeValueAsString(imgNode) + "]";
         String badImg = "[{bad";
         List<SearchResult> corpus = new ArrayList<>();
