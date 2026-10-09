@@ -72,6 +72,9 @@ FROZEN_PREFIXES = (
     'datasource/connector/notion/NotionPaginatedResponse',
     'datasource/connector/notion/NotionParent',
     'datasource/connector/notion/NotionRichText',
+    # B143 补：Notion 载荷的文本/markdown 侧读取器（键名同属 Notion 响应结构）
+    'datasource/connector/notion/NotionMarkdown',
+    'datasource/connector/notion/NotionProperties',
     'datasource/connector/yuque/YuqueApiTypes',
     'llm/', 'common/tenant',
     'common/pipeline/SearchParams', 'mcp/oauth', 'memory/service/MemoryExtractionLlm',
@@ -178,8 +181,8 @@ BASELINE: dict[str, set[str]] = {
     # ⇒ `check-event-face-case.py` 扫不到）+ **代理响应体键**（FileProxyService:281 是真 JSON 键）
     # ⇒ 按 §14.9「自有查询参数名统一 camel」该改，登记为候选（见 HANDOFF）
     'storage/fileserve/FileProxyService.java': {'file_path'},
-    # 存储引擎配置面（snake，同上）
-    'system/controller/SystemController.java': {'access_key_id', 'bucket_name', 'mineru_parse_method', 'secret_access_key', 'use_ssl', 'weknoracloud_app_id'},
+    # 存储引擎配置面 + 云厂商凭据字段（snake，同上；B143 起含读侧形态 access_key/secret_id/secret_key 与 legacy mineru_enable_ocr）
+    'system/controller/SystemController.java': {'access_key', 'access_key_id', 'bucket_name', 'mineru_enable_ocr', 'mineru_parse_method', 'secret_access_key', 'secret_id', 'secret_key', 'system/controller/SystemController.java', 'use_ssl', 'weknoracloud_app_id'},
     # MyBatis 列名/参数（非 JSON 键）
     # MyBatis 列名写入点（非 JSON 键）
     # 模型输出契约（§15.3 ② 拍板项）：提示词里就是 new_slugs，只解析入站；
@@ -196,7 +199,50 @@ BASELINE: dict[str, set[str]] = {
     # span 观测面（B136 复核改标：同上——mapsStats→endSpan 的收尾输出，FE 零命中）
     'wiki/service/ingest/WikiIngestRunSupport.java': {'failed_slug_writes', 'pages_dropped', 'pages_dropped_preview', 'pages_total', 'pages_written', 'pages_written_preview'},
     # 模型输出契约（LLM 载荷）
+    # ── 读侧形态族（B143 落第 5 种形态时逐条复核；全是外部契约/数据值，非我们的 JSON 面）──
+    # OIDC/JWT claim 名（IdP 定义，非我们的 JSON 面）
+    'auth/apikey/filter/APIKeyAuthChannel.java': {'tenant_id'},
+    # OAuth 响应字段（IdP 契约）
+    'auth/controller/AuthSessionOps.java': {'refresh_token'},
+    # JWT claim 名（IdP 契约）
+    'auth/service/JwtService.java': {'tenant_id'},
+    # OIDC 标准参数名（协议契约）
+    'auth/service/OidcStateCodec.java': {'redirect_uri'},
+    # JWT claim 名（IdP 契约）
+    'auth/service/UserService.java': {'user_id'},
+    # JWT claim 名（IdP 契约）
+    'auth/service/UserSessionOps.java': {'user_id'},
+    # websearch metadata（§15.3 ① 外部决定）
+    'chatpipeline/support/ReferencesSupport.java': {'published_at'},
+    # 提示词模板变量（数据值，非 JSON 键）
+    'common/prompt/PromptTemplateCatalog.java': {'has_knowledge_base', 'has_web_search'},
+    # provider 配置字段（对方词汇）
+    'embedding/EmbedderFactory.java': {'api_version'},
+    # agent 侧解析规则族（同 chat_parser_engine_rules，§14.9 ②）
+    'knowledge/support/ParserEngineRules.java': {'file_types'},
+    # memory 抽取 payload 键（模型输出契约族）
+    'memory/service/MemoryTopicResolver.java': {'same_as'},
     'wiki/service/page/NewSlugFromCitation.java': {'source_chunks'},
+}
+
+# 读侧形态·**待换锚观察单**（B143 步①）：这些是**真债**（我们自己的 jsonb/metadata 键），
+# 不是"已复核的冻结例外" ⇒ 刻意**不进 BASELINE**（不把欠账写成契约）。
+# 语义：`--list` 里标 `[读侧·待判]`，**不判失败**（CI 的 --strict 也不红）；
+# B144 换锚后逐条删除 ⇒ 这份单子清空即收工（`grep -c 读侧·待判` 可见进度）。
+READ_SHAPE_WATCH: dict[str, set[str]] = {
+    'agent/management/service/AgentSuggestedQuestions.java': {'generated_questions', 'standard_question'},
+    'agent/management/service/AgentTypePresets.java': {'agent_type_presets', 'kb_filter'},
+    'agent/management/service/BuiltinAgentRegistry.java': {'builtin_agents', 'is_builtin'},
+    'agent/tools/DocChunkSupport.java': {'ocr_text', 'original_url'},
+    'agent/tools/knowledge/KnowledgeSearchOutputFormatter.java': {'ocr_text'},
+    'agent/tools/knowledge/KnowledgeSearchRanking.java': {'ocr_text'},
+    'agent/tools/sql/SqlInjectionAnalyzer.java': {'knowledge_bases'},
+    'datasource/service/DataSourceSyncResultOps.java': {'error_reason', 'error_reason_code', 'error_reason_code_value'},
+    'knowledge/service/KnowledgeFileService.java': {'ocr_text', 'original_url'},
+    'model/service/BuiltinModelsReconciler.java': {'builtin_models', 'is_default', 'tenant_id'},
+    'model/service/ModelService.java': {'asr_config', 'embedding_model_id', 'image_processing_config', 'knowledge_bases', 'long_term_memory', 'summary_model_id', 'vlm_config', 'wiki_config'},
+    'retrieval/support/ChunkSearchUtil.java': {'original_url'},
+    'session/service/MessageSuggestionService.java': {'tag_ids'},
 }
 
 PATTERNS = (
@@ -205,6 +251,10 @@ PATTERNS = (
     re.compile(r'\.(?:put|set)\("([a-z0-9]+(?:_[a-z0-9]+)+)"\s*,'),
     re.compile(r'\b(?:putNonEmpty|putTrue|putAlways|putOmitEmpty)\([^,"]*,\s*'
                r'"([a-z0-9]+(?:_[a-z0-9]+)+)"'),
+    # 读侧形态（2026-10-09 B143）：写侧改成 camel 而**读侧仍 snake** ⇒ 静默失效。
+    # B132（HybridSearchService 的 rrf_* / MessageService）/ B138（MapperKnowledgeBridge）/
+    # B140（NotionConnector 的 object_type）三次真实事故全是这一形态，此前扫不到。
+    re.compile(r'\.(?:get|path|getOrDefault|containsKey|remove)\("([a-z0-9]+(?:_[a-z0-9]+)+)"\)'),
 )
 SNAKE_IN_LIST = re.compile(r'"([a-z0-9]+(?:_[a-z0-9]+)+)"')
 
@@ -233,11 +283,28 @@ def main() -> int:
     found = hits()
     violations = {f: sorted(k - BASELINE.get(f, set())) for f, k in found.items()}
     violations = {f: k for f, k in violations.items() if k}
+    # 读侧形态的待换锚键：可见但不判失败（见 READ_SHAPE_WATCH 的说明）
+    watch = {f: sorted(set(k) & READ_SHAPE_WATCH.get(f, set()))
+             for f, k in violations.items()}
+    watch = {f: k for f, k in watch.items() if k}
+    violations = {f: [k for k in k if k not in READ_SHAPE_WATCH.get(f, set())]
+                  for f, k in violations.items()}
+    violations = {f: k for f, k in violations.items() if k}
     stale = sorted(f for f in BASELINE if f not in found)
 
     if '--list' in sys.argv:
         for f, keys in sorted(found.items()):
-            mark = '基线' if f in BASELINE else '**新增**'
+            in_base = f in BASELINE
+            # 只要含读侧观察键就标出来（混合文件也要可见，别被"基线"盖住）
+            has_watch = bool(set(keys) & READ_SHAPE_WATCH.get(f, set()))
+            if in_base and has_watch:
+                mark = '基线+读侧·待判'
+            elif in_base:
+                mark = '基线'
+            elif has_watch and set(keys) <= READ_SHAPE_WATCH.get(f, set()):
+                mark = '读侧·待判'
+            else:
+                mark = '**新增**'
             print(f'  [{mark}] {f}: {sorted(keys)}')
         return 0
 
@@ -251,7 +318,8 @@ def main() -> int:
             print(f'    {f}: {keys}')
         print('  → 改 camel（同一提交带上前端与夹具）；确属第三方/模型契约则加入本脚本 BASELINE 并写明理由。')
         return 1
-    note = f'（基线 {sum(len(v) for v in BASELINE.values())} 条，均已逐条复核）'
+    note = (f'（基线 {sum(len(v) for v in BASELINE.values())} 条，均已逐条复核；'
+            f'读侧待换锚 {sum(len(v) for v in READ_SHAPE_WATCH.values())} 条，见 READ_SHAPE_WATCH）')
     if stale:
         note += f'；注意基线中有 {len(stale)} 个文件已无命中，可清理：{stale[:3]}'
     print(f'✓ 无新增 snake JSON 键 {note}')
