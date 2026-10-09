@@ -621,7 +621,7 @@ git grep -nE '@RequestBody\s+(String|Map<|JsonNode|Object)' -- 'server/src/main/
 
 **进度（2026-10-02 收官）**
 - 已完成：knowledge（含 34 个端点 DTO 化）/ retrieval / 会话链 / chunker-preview / evaluation（§14.9b）/ model（§14.9c/e）/ system（§14.9f/g）/ auth（§14.9h/i/j + 补刀 §14.9s）/ memory（§14.9k）/ session（§14.9l）/ embed（§14.9m）/ mcp（§14.9n/o/p + M6 §14.9s）/ datasource（§14.9q）/ wiki（§14.9r）/ **散存量七域 + 错误体统一（§14.9s）**。
-- **无未完成项**。残留 `@JsonInclude` ~288 处与 Go 零值时间哨兵为登记尾巴（§14.6 / ⭐ 第 4 条），非在办。
+- **无未完成项**。残留 `@JsonInclude` **213 处**（**2026-10-09 机械重算订正**：原写 ~288 处 ✗；NON_EMPTY 104 / NON_DEFAULT 57 / NON_NULL 46 / CUSTOM 3（三个队列载荷）/ ALWAYS 3 ✓，全部落在 §14.6 登记面内）与 Go 零值时间哨兵为登记尾巴（§14.6 / ⭐ 第 4 条），非在办。
 
 **存量表（2026-10-01 盘点实测，§14.9 第 1 步交付物；只读扫描，三分法甄别）**
 
@@ -637,7 +637,7 @@ APIPrincipalConfig 5、RuntimeStat 5 死注、WebSearchResult 死注）；**判�
 第三方）、SearchParams（chat span 载荷）、RankResult（第三方 rerank API）。复查批后全仓 `@JsonProperty` 余量 **913 处
 / 102 文件** 全部是登记冻结面（§14.6）⇒ **③ 类真存量 = 0，阶段 3 收官**。⚠️ **计数口径**：`QaRequests` 那批用的是全限定注解（`@com.fasterxml…JsonProperty`），只 grep `@JsonProperty` 会漏——盘点时两种写法都要扫 | 按域推进，一域一 PR 同批带前端 |
 
-`@JsonInclude`（Go omitempty 直译）存量：**~487 处**（NON_EMPTY 256 / NON_NULL 123 / NON_DEFAULT 108；ALWAYS 19 处是正确形态的显式 null，保留）。
+`@JsonInclude`（Go omitempty 直译）存量：**213 处**（**2026-10-09 机械重算订正**：原写 ~487 处 ✗ = 更早快照的过期计数；NON_EMPTY 104 / NON_DEFAULT 57 / NON_NULL 46 / **CUSTOM 3**（`DataSourceSyncPayload`/`MemoryExtractPayload`/`WikiIngestPayload` 三个队列载荷）· ALWAYS 3 ✓ ——ALWAYS 是正确形态的显式 null ✓）。**按面**：llm 59 · event 50 · tenantconfig(jsonb) 43 · common 19 · agent 10 · connector 8 · tracing(lf_*) 7 · approval 6 · 其余 15 ✓ ⇒ **全在 §15 B3 明文豁免的冻结面内** ✓；**B3 真面（wiki domain 全家 / websearch 三 DTO / VectorStoreTypes）已清零** ✓（机械扫描确认 ✓），我们自己的面仅剩 14 处且逐条有明文理由（如 `RssCursor` javadoc 的「为空省略：`null` 或空 map 时整个键消失」✓ = 该注解即线格式契约 ✓）。
 `@JsonNaming` **0**、Problem Details **0**、Go 序列化器线上引用 **0**（2026-09-30 已一次性删除）。
 Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端调用点"细清单（§14.9 执行顺序第 3 步的入场检查）。
 
