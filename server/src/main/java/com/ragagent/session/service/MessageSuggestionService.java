@@ -557,11 +557,6 @@ public class MessageSuggestionService {
         }
         return out;
     }
-
-    private static Object firstNonNull(Object a, Object b) {
-        return a != null ? a : b;
-    }
-
     private GenerationContext buildGenerationContext(Message current, int maxTurns) {
         if (maxTurns < 1) {
             maxTurns = 2;

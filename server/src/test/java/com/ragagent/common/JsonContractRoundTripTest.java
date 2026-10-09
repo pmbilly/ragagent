@@ -124,7 +124,6 @@ import com.ragagent.tenant.ChatHistoryConfig;
 import com.ragagent.tenant.ParserEngineConfig;
 import com.ragagent.tenant.RetrievalConfig;
 import com.ragagent.tenant.StorageEngineConfig;
-import com.ragagent.websearch.domain.WebSearchProviderParams;
 
 /**
  * 契约实体的 JSON 往返体检——覆盖所有**会落 jsonb 或直接作响应体**的类型。

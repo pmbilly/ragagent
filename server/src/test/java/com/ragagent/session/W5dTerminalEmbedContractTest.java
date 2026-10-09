@@ -7,10 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Base64;
-import java.util.List;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -226,26 +223,5 @@ class W5dTerminalEmbedContractTest {
         assertEquals("inline; filename=w5d-embed-seed.txt",
                 ok.getResponse().getHeader("Content-Disposition"));
         assertEquals("nosniff", ok.getResponse().getHeader("X-Content-Type-Options"));
-    }
-
-    // 头比对辅助（保留给后续头部场景；当前场景断言关键头即可）
-    @SuppressWarnings("unused")
-    private static String normHeaders(String raw) {
-        String[] lines = raw.split("\r?\n");
-        List<String> kept = new ArrayList<>();
-        for (String line : lines) {
-            String l = line.trim();
-            String lower = l.toLowerCase(java.util.Locale.ROOT);
-            if (l.isEmpty() || lower.startsWith("http/") || lower.startsWith("date:")
-                    || lower.startsWith("x-request-id") || lower.startsWith("vary:")
-                    || lower.startsWith("access-control-") || lower.startsWith("keep-alive:")
-                    || lower.startsWith("connection:")) {
-                continue;
-            }
-            kept.add(l);
-        }
-        String[] arr = kept.toArray(new String[0]);
-        Arrays.sort(arr);
-        return String.join("\n", arr);
     }
 }

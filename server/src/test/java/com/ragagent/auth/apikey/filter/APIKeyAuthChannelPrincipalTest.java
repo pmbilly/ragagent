@@ -26,7 +26,6 @@ import com.ragagent.common.context.TenantContext;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import com.ragagent.auth.apikey.domain.TenantAPIKey;
-import com.ragagent.tenant.Tenant;
 
 /**
  * API 主体解析：tenant/direct_header/signed_token 三模式、
