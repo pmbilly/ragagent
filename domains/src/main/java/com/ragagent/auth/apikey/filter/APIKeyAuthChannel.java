@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.service.UserService;
 import com.ragagent.tenant.APIPrincipalConfig;
+import com.ragagent.common.apikey.ApiKeyAuthPort;
 
 /**
  * X-API-Key 认证通道（认证链的第 3 条通道）。
@@ -42,7 +43,7 @@ import com.ragagent.tenant.APIPrincipalConfig;
  * 而契约要求接受任意长度密钥，故手工实现）。</p>
  */
 @Component
-public class APIKeyAuthChannel {
+public class APIKeyAuthChannel implements ApiKeyAuthPort {
 
     /** external-user 头名常量（刻意不读配置里的自定义头名）。 */
     private static final String EXTERNAL_USER_ID_HEADER = "X-External-User-ID";
