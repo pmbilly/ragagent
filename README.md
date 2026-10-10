@@ -90,17 +90,23 @@ docker compose up -d
 # 2) 密钥/连接配置（.env 已 gitignore；dev-env.sh 按 key 读取）
 #    必需键见 scripts/dev-env.sh 头注释（JWT_SECRET / SYSTEM_AES_KEY / DB_*)……
 
-# 3) 后端（默认 :8082）
-./gradlew bootRun
+# 3) 后端（端口由 .env 的 SERVER_PORT 决定；本仓 dev 用 :8083，见 HANDOFF §8）
+./gradlew :boot:bootRun
 #    或带就绪等待：scripts/java-server-up.sh
 
-# 4) 前端（:5173；代理缺省指向 :8080，测试 Java 请显式指向 8082）
+# 4) 前端（:5173；代理缺省指向 :8080，测 Java 请显式指向 .env 的 SERVER_PORT，本仓 dev 为 8083）
 cd frontend && npm ci
-VITE_DEV_PROXY_TARGET=http://localhost:8082 npm run dev
+VITE_DEV_PROXY_TARGET=http://localhost:8083 npm run dev   # 与 .env 的 SERVER_PORT 一致
 ```
 
-登录：`java-phase1@weknora.test` / `Passw0rd!`（租户 10002 owner，含种子数据）。
-平台管理员：`walkadmin@weknora.test` / `Passw0rd!`（`is_system_admin`，可跨租户 + 系统管理端）。
+登录（**本仓独立库 `ragagent` 不含种子数据** ✗ —— §8：「基线合并会改 schema，不能与旧仓共用 dev 库」）：
+首次使用先注册一个账号（注册者即该租户 owner），然后即可登录：
+
+```bash
+curl -s -X POST http://localhost:8083/api/v1/auth/register -H 'Content-Type: application/json' \
+  -d '{"username":"java-phase1","email":"java-phase1@weknora.test","password":"Passw0rd!"}'
+# 之后：java-phase1@weknora.test / Passw0rd!（你注册的那套）
+```
 
 > 命令行取 token：`scripts/token.sh 8082`。
 

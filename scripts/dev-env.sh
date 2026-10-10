@@ -49,7 +49,7 @@ export DB_PORT="${DB_PORT:-15432}"
 export REDIS_HOST="${REDIS_HOST:-localhost}"
 export REDIS_PORT="${REDIS_PORT:-16379}"
 export DOCREADER_ADDR="${DOCREADER_ADDR:-localhost:50051}"
-export JAVA_PORT="${JAVA_PORT:-8082}"
+export JAVA_PORT="${JAVA_PORT:-}"   # B181：留空 ⇒ 末尾统一解析（显式 env > .env 的 SERVER_PORT > 8082）
 export GO_PORT="${GO_PORT:-8080}"
 
 # 从 .env 取单个 key（不要 source 整个文件，见坑 1）
@@ -118,3 +118,13 @@ wait_for_port() {
   echo "TIMEOUT waiting for :${port}" >&2
   return 1
 }
+
+# ── 端口优先级（B181 实测修正）──────────────────────────────────────────────
+# 此前 `export JAVA_PORT="${JAVA_PORT:-8082}"` 只认显式环境变量 ⇒ **把 .env 里故意的
+# SERVER_PORT=8083 覆盖成 8082** ✗（表现：服务起在 8082，而前端代理按 §8 指向 8083 ⇒ 白屏）。
+# 改为：显式 env > .env 的 SERVER_PORT > 8082。放在文件末尾 ⇒ 必定生效（最后一次赋值胜出）。
+_java_port_from_env="$(env_value SERVER_PORT || true)"
+if [ -n "${_java_port_from_env}" ]; then
+  export JAVA_PORT="${JAVA_PORT:-${_java_port_from_env:-8082}}"
+fi
+unset _java_port_from_env

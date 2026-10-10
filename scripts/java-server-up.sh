@@ -27,7 +27,7 @@ SERVER_PORT="${JAVA_PORT}" \
 JWT_SECRET="${JWT_SECRET}" \
 SYSTEM_AES_KEY="${SYSTEM_AES_KEY}" \
 LOCAL_STORAGE_BASE_DIR="${LOCAL_STORAGE_BASE_DIR}" \
-./gradlew bootRun --console=plain > "${LOG}" 2>&1 &
+./gradlew :boot:bootRun --console=plain > "${LOG}" 2>&1 &   # 模块拆分后组合根在 :boot（B165）
 
 echo "==> waiting for readiness（Spring 启动 + Flyway 校验，约 20-40 秒）"
 wait_for_port "${JAVA_PORT}" /api/v1/knowledge-bases 40

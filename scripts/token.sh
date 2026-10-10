@@ -2,7 +2,7 @@
 # 取测试账号的 JWT，供 curl/录制脚本使用。
 #
 # 用法：
-#   scripts/token.sh            # 打 8080（Go）
+#   scripts/token.sh            # 默认跟 .env 的 SERVER_PORT（本仓 dev 8083）
 #   scripts/token.sh 8082       # 打 8082（Java）
 #   scripts/token.sh 8082 viewer
 #
@@ -14,7 +14,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=dev-env.sh
 source "${SCRIPT_DIR}/dev-env.sh"
 
-PORT="${1:-8080}"
+PORT="${1:-${JAVA_PORT:-8080}}"   # B181：默认跟 .env 的 SERVER_PORT（本仓 dev 8083），不再默认 Go 的 8080
 WHO="${2:-owner}"
 if [ "${WHO}" = "viewer" ]; then
   login "${TEST_VIEWER_EMAIL}" "${PORT}"
