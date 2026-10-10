@@ -51,6 +51,11 @@
 
 ## 4. 已知例外（本机制覆盖不到，保持原样）
 
+
+- **外部平台回调**：`ImCallbackController`（`/api/v1/im/callback/**`）全部端点 `void` + 直接写 `HttpServletResponse`（微信/云之家 ACK 等**平台协议原样**）。`ApiResultAdvice.supports()` 对 `void` 返回类型**直接跳过**（B191 ✓）⇒ 既不会包壳也不会双写。响应体形状是平台协议，不属于本仓 API 约定。
+- **二进制 / 非 JSON**：`FileProxyController`（下载、Range）与任何 `produces` 非 `application/json` 的端点 —— advice 按 `selectedContentType` 跳过（B190 ✓）。
+- **AuthFilter 的 401/403**：在 DispatcherServlet 之前写出，不进 advice（B189 ✓ 已实测：金片保持原样也匹配 ✓）。
+
 - **Filter 写的 401/403**（`AuthFilter` / `APIKeyAuthChannel` / `WsAuthSupport`）：在 DispatcherServlet **之前**就写出响应，打标尚未发生 ⇒ 形态不变。（**自写响应的 HandlerInterceptor 不属此列** —— 它们跑在打标之后，须读打标：`RbacInterceptor` 已于 B185 改造 ✓。）
   实测：`ag-noauth` / `ag-badtoken` / `ag-sq-noauth` 金片保持纯字符串 `{"error":"Unauthorized: …"}`
   且契约测试仍绿 —— 即该边界被实测确认，不是猜的。要统一需在 Filter 层单独改造（P3）。

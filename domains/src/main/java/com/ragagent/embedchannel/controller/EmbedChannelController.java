@@ -41,6 +41,7 @@ import com.ragagent.session.controller.KnowledgeQaController;
 import com.ragagent.session.domain.Message;
 import com.ragagent.session.dto.StopSessionRequest;
 import com.ragagent.storage.fileserve.FileProxyService;
+import com.ragagent.common.web.ApiResponse;
 
 /**
  * embed 渠道 HTTP 层（管理面/公开面路由）。
@@ -282,7 +283,7 @@ final FileProxyService fileProxyService;
     }
 
     @PostMapping("/api/v1/embed/{channelId}/sessions/{sessionId}/mcp-oauth-resolutions/{pendingId}")
-    public ResponseEntity<Void> mcpResolve(
+    public ApiResponse<Void> mcpResolve(
             @PathVariable("sessionId") String sessionId,
             @PathVariable("pendingId") String pendingId,
             @RequestBody(required = false) String rawBody) {
@@ -290,14 +291,14 @@ final FileProxyService fileProxyService;
     }
 
     @PostMapping("/api/v1/embed/{channelId}/sessions/{sessionId}/mcp-oauth-resolutions/{pendingId}/cancel")
-    public ResponseEntity<Void> mcpResolveCancel(
+    public ApiResponse<Void> mcpResolveCancel(
             @PathVariable("sessionId") String sessionId,
             @PathVariable("pendingId") String pendingId) {
         return delegateOps.mcpResolveCancel(sessionId, pendingId);
     }
 
     @PostMapping("/api/v1/embed/{channelId}/sessions/{sessionId}/tool-approvals/{pendingId}")
-    public ResponseEntity<?> toolApprovals(@PathVariable("sessionId") String sessionId,
+    public ApiResponse<Void> toolApprovals(@PathVariable("sessionId") String sessionId,
                                            @PathVariable("pendingId") String pendingId,
                                            @RequestBody(required = false) String rawBody) {
         return delegateOps.toolApprovals(sessionId, pendingId, rawBody);

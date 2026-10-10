@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.ragagent.common.web.ApiResponse;
+import com.ragagent.common.web.ApiResult;
 
 /**
  * MCP 服务凭据子资源。把凭据写入从主资源更新里拆出来带来三点收益：
@@ -37,6 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
  * {@code DELETE /api/v1/mcp-services/{id}/credentials/{field}}。</p>
  */
 @RestController
+@ApiResult
 @RequestMapping("/api/v1/mcp-services")
 public class McpCredentialsController {
 
@@ -106,7 +109,7 @@ public class McpCredentialsController {
      * 成功返回 204（即使该字段本来就是空的——幂等）— Admin+。
      */
     @DeleteMapping("/{id}/credentials/{field}")
-    public ResponseEntity<?> deleteField(@PathVariable("id") String id,
+    public ApiResponse<Void> deleteField(@PathVariable("id") String id,
                                          @PathVariable("field") String field) {
         long tenantId = requireTenant();
         String serviceId = LogSanitizer.sanitize(id);
@@ -121,7 +124,7 @@ public class McpCredentialsController {
             log.error("failed to clear credential, service_id={}, field={}", serviceId, field, e);
             throw BizException.internal("failed to clear credential: " + rawMessage(e));
         }
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B191：204 退役
     }
 
     /** 判定"已配置"：配置非 null 且对应字段非空串 */

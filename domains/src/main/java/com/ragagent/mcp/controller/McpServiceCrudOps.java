@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import com.ragagent.common.web.ApiResponse;
 
 /**
  * MCP 服务 CRUD 协作者（自 {@link McpServiceController} 拆出）：创建/列表/详情/更新/删除、
@@ -296,7 +297,7 @@ final class McpServiceCrudOps {
     // ── 删除 ─────────────────────────────────────────────────────────────
 
     /** 权限 Admin+。 */
-    public ResponseEntity<?> deleteMCPService(@PathVariable("id") String id) {
+    public ApiResponse<Void> deleteMCPService(@PathVariable("id") String id) {
         long tenantId = McpServiceController.requireTenant();
         String serviceId = McpServiceController.sanitize(id);
         try {
@@ -307,7 +308,7 @@ final class McpServiceCrudOps {
         }
         log.info("MCP service deleted successfully: {}", serviceId);
         // 同步完成的删除 → 204（无响应体）
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B191：204 退役
     }
 
     // ── 连接测试 / 工具 / 资源 ────────────────────────────────────────────

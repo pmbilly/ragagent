@@ -1,1 +1,1 @@
-{"error":"this bot is already bound to channel \"tg-bot\" (<uuid>); each bot can only be connected to one channel"}
+{"code":0,"data":{"error":"this bot is already bound to channel \"tg-bot\" (<uuid>); each bot can only be connected to one channel"},"message":"ok"}

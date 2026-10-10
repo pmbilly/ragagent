@@ -25,6 +25,11 @@
   1. 金片**逐个点名**（只改被该域测试显式引用的），不做全局前缀匹配——前缀扫会波及未迁移域；
   2. 「error 字符串 ⇒ 错误体」必须能确定期望状态：200 ⇒ 其实是"载荷里带 error 字段"，整块进 data；
   3. 只读+定点写，绝不自动给守卫清单加豁免（check-api-envelope.py --write 只清理失效项）。
+
+  4. 【硬性】补丁**禁止**给"语句中间行"加行尾注释 ✗ —— B189/B190/B191 各栽一次：
+     `compareAndStatus(…, 200,   // …` 或 `.andExpect(status().isOk())   // …;` 都会把后半行
+     （含分号）吞进注释 ⇒ 语法错。规则：注释只能放在**独立行**，或**整条语句结束后**（注释在 `;` 之后）✓
+     ⇒ 将来若用正则批量加注释，先跑一次编译/语法门禁再继续 ✓
 """
 import json
 import pathlib
@@ -174,6 +179,9 @@ def cmd_goldens(domains):
             new = {'code': 0, 'message': 'ok', 'data': d}
         elif isinstance(d, dict) and d.get('code') == 0:
             continue
+        elif isinstance(d, dict) and set(d.keys()) == {'message', 'success'}:
+            # 遗留「受理回执」壳 {"message":…,"success":true} ⇒ 文案进 message，data 为 null
+            new = {'code': 0, 'message': d['message'], 'data': None}
         elif isinstance(d, dict) and set(d.keys()) == {'data', 'success'}:
             # Go 迁移期的遗留成功壳 {"data":…,"success":true} ⇒ 拆壳：载荷就是原 data
             new = {'code': 0, 'message': 'ok', 'data': d['data']}
@@ -207,7 +215,8 @@ def cmd_goldens(domains):
 
 def cmd_checklist(domains):
     for d in domains:
-        print('  ## %s 剩余人工步骤（B188 五类）' % d)
+        print('  ## %s 剩余人工步骤' % d)
+        print('     ⚠️ 第 0 步（B189/B191 各漏一次 ✗）：先跑 `annotate`！忘加 @ApiResult ⇒ 金片已改新形态而响应还是旧的 ⇒ 成串失败 ✓')
         print('     ① 私有错误形态 → BizException(AppError.ofHttpStatus(status,msg))；'
               '调用点 return→throw（含值位置：三元/参数/跨类）')
         print('     ② 手搓 {"success":…} 外壳 → 只返回载荷')

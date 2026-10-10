@@ -13,12 +13,13 @@ import com.ragagent.mcp.domain.McpPrincipal;
 import com.ragagent.mcp.dto.ResolveToolApprovalRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.ragagent.common.web.ApiResponse;
+import com.ragagent.common.web.ApiResult;
 
 /**
  * 处理待审批的 MCP 工具调用。
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 真正的越权防线是 gate 内的 tenant/user 校验。</p>
  */
 @RestController
+@ApiResult
 @RequestMapping("/api/v1/agent")
 public class AgentToolApprovalController {
 
@@ -47,7 +49,7 @@ public class AgentToolApprovalController {
 
     /** 权限 Viewer+。 */
     @PostMapping("/tool-approvals/{pendingId}")
-    public ResponseEntity<Void> resolveToolApproval(@PathVariable("pendingId") String pendingId,
+    public ApiResponse<Void> resolveToolApproval(@PathVariable("pendingId") String pendingId,
                                                     @RequestBody(required = false) ResolveToolApprovalRequest body) {
         Long tenantId = TenantContext.currentTenantId();
         long tenant = tenantId == null ? 0L : tenantId;
@@ -91,7 +93,7 @@ public class AgentToolApprovalController {
             }
         }
         // 无响应体的受理回执 → 204（不再返回 {"success":true}）
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B191：204 退役
     }
 
     /**

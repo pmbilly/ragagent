@@ -388,6 +388,11 @@ class W5aSundryRoutesContractTest {
     private static String jsonPath(MvcResult r, String path) throws Exception {
         com.fasterxml.jackson.databind.JsonNode node =
                 new com.fasterxml.jackson.databind.ObjectMapper().readTree(raw(r));
+        // B191：统一外壳（有 code+data）时先下钻 data；未迁移端点（旧形态）保持原样。
+        // 路径本身以 data 开头时**不下钻**——旧壳 {data,…} 与新壳 {…,data:…} 都有 data 键，语义已对齐 ✓
+        if (!path.startsWith("data") && node.isObject() && node.has("code") && node.has("data")) {
+            node = node.get("data");
+        }
         for (String seg : path.split("\\.")) {
             if (node.isArray() && seg.matches("\\d+")) {
                 node = node.get(Integer.parseInt(seg));

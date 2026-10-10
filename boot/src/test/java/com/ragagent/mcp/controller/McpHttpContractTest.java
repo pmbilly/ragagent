@@ -218,7 +218,8 @@ class McpHttpContractTest {
 
         String s = body(perform(get("/api/v1/mcp-services").header("Authorization", "Bearer " + token)));
         // §2.1：列表裸数组
-        assertTrue(s.startsWith("["), "列表应是裸数组：" + s);
+        assertTrue(s.startsWith("{\"code\":0"), "列表应是统一外壳：" + s);   // B191
+        assertTrue(s.contains("\"data\":[{" ), s);
         assertFalse(s.contains("\"success\""), s);
         assertFalse(s.contains("sk-real-do-not-leak"), s);
     }
@@ -341,8 +342,8 @@ class McpHttpContractTest {
                 .header("Authorization", "Bearer " + token));
 
         // §1.13：同步完成的删除 → 204 且无响应体
-        assertEquals(204, r.getResponse().getStatus());
-        assertEquals("", body(r), "删除不该有响应体");
+        assertEquals(200, r.getResponse().getStatus());   // B191：204 退役 ⇒ 200 + 外壳
+        assertEquals("{\"code\":0,\"message\":\"ok\",\"data\":null}", body(r));   // B191：删除 = 200 + 外壳
     }
 
     // ── 凭据子资源 ───────────────────────────────────────────────────────
@@ -357,8 +358,9 @@ class McpHttpContractTest {
                 .header("Authorization", "Bearer " + token)
                 .contentType("application/json")
                 .content("{}")));
-        assertEquals("{\"fields\":{\"apiKey\":{\"configured\":false},"
-                + "\"token\":{\"configured\":false}}}", current);
+        // B191：统一外壳（data 里才是 fields）
+        assertEquals("{\"code\":0,\"message\":\"ok\",\"data\":{\"fields\":{\"apiKey\":{\"configured\":false},"
+                + "\"token\":{\"configured\":false}}}}", current);
 
         String saved = body(perform(put("/api/v1/mcp-services/" + id + "/credentials")
                 .header("Authorization", "Bearer " + token)
@@ -371,8 +373,8 @@ class McpHttpContractTest {
         // DELETE 幂等，返回 204 无正文
         MvcResult removed = perform(delete("/api/v1/mcp-services/" + id + "/credentials/apiKey")
                 .header("Authorization", "Bearer " + token));
-        assertEquals(204, removed.getResponse().getStatus());
-        assertEquals("", body(removed));
+        assertEquals(200, removed.getResponse().getStatus());   // B191：204 退役 ⇒ 200 + 外壳
+        assertEquals("{\"code\":0,\"message\":\"ok\",\"data\":null}", body(removed));   // B191：200 + 外壳
 
         String after = body(perform(get("/api/v1/mcp-services/" + id)
                 .header("Authorization", "Bearer " + token)));
@@ -399,7 +401,7 @@ class McpHttpContractTest {
         String id = createService(token, "{\"name\":\"appr\",\"transportType\":\"sse\"}");
 
         // §2.1：审批行列表是裸数组
-        assertEquals("[]", body(perform(
+        assertEquals("{\"code\":0,\"message\":\"ok\",\"data\":[]}", body(perform(
                 get("/api/v1/mcp-services/" + id + "/tool-approvals")
                         .header("Authorization", "Bearer " + token))));
 
@@ -408,8 +410,8 @@ class McpHttpContractTest {
                 .contentType("application/json")
                 .content("{\"requireApproval\":true}"));
         // 策略写入 → 204（§14.9n M4：不再回 {"success":true}）
-        assertEquals(204, set.getResponse().getStatus(), body(set));
-        assertEquals("", body(set));
+        assertEquals(200, set.getResponse().getStatus(), body(set));   // B191：204 退役 ⇒ 200 + 外壳
+        assertEquals("{\"code\":0,\"message\":\"ok\",\"data\":null}", body(set));   // B191：策略写入 = 200 + 外壳
 
         String rows = body(perform(get("/api/v1/mcp-services/" + id + "/tool-approvals")
                 .header("Authorization", "Bearer " + token)));
@@ -457,7 +459,7 @@ class McpHttpContractTest {
 
         assertEquals(200, r.getResponse().getStatus());
         // §2.1：裸资源——"从未同步"就是 JSON null（不再是 {"data":null,"success":true}）
-        assertEquals("null", body(r));
+        assertEquals("{\"code\":0,\"message\":\"ok\",\"data\":null}", body(r));   // B191：从未同步 = data:null
     }
 
     @Test

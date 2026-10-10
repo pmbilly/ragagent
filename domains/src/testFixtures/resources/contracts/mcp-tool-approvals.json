@@ -1,1 +1,1 @@
-[{"createdAt":""<ts>"","enabled":true,"id":"<id>","requireApproval":true,"serviceId":"<id>","tenantId":10002,"toolName":"golden_tool","updatedAt":""<ts>""}]
+{"code":0,"data":[{"createdAt":""<ts>"","enabled":true,"id":"<id>","requireApproval":true,"serviceId":"<id>","tenantId":10002,"toolName":"golden_tool","updatedAt":""<ts>""}],"message":"ok"}

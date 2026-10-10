@@ -1,1 +1,1 @@
-{"error":"platform must be one of: 'dingtalk', 'feishu', 'lark', 'mattermost', 'qqbot', 'slack', 'telegram', 'wechat', 'wecom', 'yunzhijia'"}
+{"code":0,"data":{"error":"platform must be one of: 'dingtalk', 'feishu', 'lark', 'mattermost', 'qqbot', 'slack', 'telegram', 'wechat', 'wecom', 'yunzhijia'"},"message":"ok"}

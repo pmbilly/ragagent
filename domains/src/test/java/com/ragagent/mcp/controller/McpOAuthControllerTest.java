@@ -260,13 +260,13 @@ class McpOAuthControllerTest {
     // ── 4. revoke ─────────────────────────────────────────────────────
 
     @Test
-    void revokeReturns204() throws Exception {
+    void revokeReturnsOk() throws Exception {
         OAuthManager.StartResult start = manager.startAuthorization(service, TENANT_ID, PRINCIPAL,
                 "https://app.example.com/api/v1/mcp-oauth/callback", "/");
         manager.completeAuthorization(start.attemptId(), "the-code");
 
         mvc(null, null).perform(delete("/api/v1/mcp-services/" + SERVICE_ID + "/oauth/token"))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk());   // B191：204 退役 ⇒ 200 + 外壳（分号在注释之前）
         assertEquals(false, manager.isAuthorized(TENANT_ID, PRINCIPAL, SERVICE_ID));
     }
 
@@ -329,7 +329,7 @@ class McpOAuthControllerTest {
         mvc(gate, null).perform(post("/api/v1/agent/mcp-oauth-resolutions/p1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"serviceId\":\"" + SERVICE_ID + "\"}"))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk());   // B191：204 退役 ⇒ 200 + 外壳（分号在注释之前）
         org.mockito.Mockito.verify(gate).resolve(anyLong(), anyString(), anyString(), any(Decision.class));
     }
 
@@ -338,7 +338,7 @@ class McpOAuthControllerTest {
     void cancelDeniesPending() throws Exception {
         Gate gate = mock(Gate.class);
         mvc(gate, null).perform(post("/api/v1/agent/mcp-oauth-resolutions/p1/cancel"))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk());   // B191：204 退役 ⇒ 200 + 外壳（分号在注释之前）
         org.mockito.Mockito.verify(gate).resolve(anyLong(), anyString(), anyString(), any(Decision.class));
     }
 

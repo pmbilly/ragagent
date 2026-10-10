@@ -182,15 +182,15 @@ class McpContractTest {
         mockMvc.perform(get("/api/v1/mcp-services/" + id + "/tool-approvals")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
-                .andExpect(content().string("[]"));
+                .andExpect(content().json("{\"code\":0,\"message\":\"ok\",\"data\":[]}"));   // B191：空数组也在 data 里
 
         // 7. 设置审批策略 → 204 无响应体（§14.9n M4：不再回 {"success":true}）
         mockMvc.perform(put("/api/v1/mcp-services/" + id + "/tool-approvals/golden_tool")
                         .header("Authorization", "Bearer " + token)
                         .contentType("application/json")
                         .content("{\"requireApproval\":true}"))
-                .andExpect(status().isNoContent())
-                .andExpect(content().string(""));
+                .andExpect(status().isOk())   // B191：204 退役 ⇒ 200 + 外壳
+                .andExpect(content().json("{\"code\":0,\"message\":\"ok\",\"data\":null}"));
 
         // 8. tool-approvals 有 1 项 → 掩码比对（含生成的 id 与时间戳）
         MvcResult approvals = mockMvc.perform(get("/api/v1/mcp-services/" + id + "/tool-approvals")
@@ -215,7 +215,8 @@ class McpContractTest {
         // 10. credentials delete → 204（golden 是空响应体）
         mockMvc.perform(delete("/api/v1/mcp-services/" + id + "/credentials/apiKey")
                         .header("Authorization", "Bearer " + token))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk())   // B191：204 退役 ⇒ 200 + 外壳
+                .andExpect(content().json("{\"code\":0,\"message\":\"ok\",\"data\":null}"));
 
         // 11. 非法 field → 静态 golden（"unknown credential field: bogus"）
         MvcResult gb2 = mockMvc.perform(delete("/api/v1/mcp-services/" + id + "/credentials/bogus")
@@ -239,8 +240,8 @@ class McpContractTest {
                 .andExpect(status().isOk())
                 .andReturn();
         String testBody = tested.getResponse().getContentAsString(StandardCharsets.UTF_8);
-        // §2.1：裸 McpTestResult（不再有外层信封），success=false 是**业务结论**
-        assertTrue(testBody.startsWith("{\"success\":false"), "应为裸 McpTestResult: " + testBody);
+        // B191：外边是统一外壳，data 里是 McpTestResult；success=false 是**业务结论**
+        assertTrue(testBody.startsWith("{\"code\":0"), "应为统一外壳: " + testBody);
         assertTrue(testBody.contains("\"message\":"), testBody);
 
         // 14. tools：服务已被 update 停用 → 结构化断言错误码
@@ -255,15 +256,15 @@ class McpContractTest {
         // 15. delete → 204（§1.13，无响应体）
         mockMvc.perform(delete("/api/v1/mcp-services/" + id)
                         .header("Authorization", "Bearer " + token))
-                .andExpect(status().isNoContent())
-                .andExpect(content().string(""));
+                .andExpect(status().isOk())   // B191：204 退役 ⇒ 200 + 外壳
+                .andExpect(content().json("{\"code\":0,\"message\":\"ok\",\"data\":null}"));
 
         // 16. 删除后列表为空
         MvcResult empty = mockMvc.perform(get("/api/v1/mcp-services")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andReturn();
-        assertEquals("[]", empty.getResponse().getContentAsString(StandardCharsets.UTF_8),
+        assertEquals("{\"code\":0,\"message\":\"ok\",\"data\":[]}", empty.getResponse().getContentAsString(StandardCharsets.UTF_8),   // B191：空数组在 data 里
                 "§2.1：空列表就是裸 []");
     }
 

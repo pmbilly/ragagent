@@ -39,6 +39,9 @@ import jakarta.servlet.http.HttpServletResponse;
  *       → {"success":true}</li>
  * </ul>
  */
+// B191：本类**不进统一外壳** —— 全部端点 void + 直接写 HttpServletResponse（外部平台回调
+// 协议原样，如微信/云之家 ACK）。ApiResultAdvice.supports() 对 void 返回类型直接跳过，
+// 因此即便类上有 @ApiResult 也不会包装/双写。响应体形状是**平台协议**，不是本仓 API 约定。
 @RestController
 public class ImCallbackController {
 

@@ -31,6 +31,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.ragagent.common.web.ApiResponse;
+import com.ragagent.common.web.ApiResult;
 
 /**
  * 每用户维度的 MCP OAuth2 授权码流程 HTTP 层。
@@ -62,6 +64,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 缺省判断。</p>
  */
 @RestController
+@ApiResult
 @RequestMapping("/api/v1")
 public class McpOAuthController {
 
@@ -233,7 +236,7 @@ public class McpOAuthController {
 
     /** 撤销授权：204 + 回收缓存连接，让下一次调用重新走授权。 */
     @DeleteMapping("/mcp-services/{id}/oauth/token")
-    public ResponseEntity<Void> revoke(@PathVariable("id") String serviceId) {
+    public ApiResponse<Void> revoke(@PathVariable("id") String serviceId) {
         long tenantId = tenantIdOrZero();
         TenantContext.Principal principal = McpPrincipal.oauthPrincipalFromContext();
         if (tenantId == 0 || !McpPrincipal.valid(principal)) {
@@ -245,7 +248,7 @@ public class McpOAuthController {
             throw BizException.internal("failed to revoke authorization: " + e.getMessage());
         }
         closeClient(serviceId);
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B191：204 退役
     }
 
     // ── 5. 会话内 OAuth 挂起 / 取消 ─────────────────────────────────────
@@ -259,7 +262,7 @@ public class McpOAuthController {
      * 真的存在</b>再放行，免得过早/失败的授权把工具调用放回火坑再失败一次。
      */
     @PostMapping("/agent/mcp-oauth-resolutions/{pendingId}")
-    public ResponseEntity<Void> resolveMcpOAuth(
+    public ApiResponse<Void> resolveMcpOAuth(
             @PathVariable("pendingId") String pendingId,
             @RequestBody(required = false) ResolveRequest body) {
         long tenantId = tenantIdOrZero();
@@ -289,7 +292,7 @@ public class McpOAuthController {
         switch (decision) {
             case "cancel", "reject", "skip" -> {
                 resolveGate(approvalGate, tenantId, gateUserId, pendingId, Decision.deny("user canceled"));
-                return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B191：204 退役
             }
             case "authorize" -> {
                 // 继续往下走
@@ -309,14 +312,14 @@ public class McpOAuthController {
         }
 
         resolveGate(approvalGate, tenantId, gateUserId, pendingId, Decision.allow());
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B191：204 退役
     }
 
     /**
      * 用户主动跳过授权，以"拒绝"解除 Agent 阻塞。
      */
     @PostMapping("/agent/mcp-oauth-resolutions/{pendingId}/cancel")
-    public ResponseEntity<Void> cancelMcpOAuth(@PathVariable("pendingId") String pendingId) {
+    public ApiResponse<Void> cancelMcpOAuth(@PathVariable("pendingId") String pendingId) {
         long tenantId = tenantIdOrZero();
         String gateUserId = gateUserId();
         if (tenantId == 0 || gateUserId.isEmpty()) {
@@ -327,7 +330,7 @@ public class McpOAuthController {
             throw BizException.internal("OAuth gate is not configured");
         }
         resolveGate(approvalGate, tenantId, gateUserId, pendingId, Decision.deny("user canceled"));
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B191：204 退役
     }
 
     // ── 内部工具 ───────────────────────────────────────────────────────

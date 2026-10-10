@@ -23,6 +23,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.ragagent.im.wechat.WechatQRCodeService;
+import com.ragagent.common.web.ApiResponse;
+import com.ragagent.common.error.AppError;
+import com.ragagent.common.error.BizException;
+import com.ragagent.common.web.ApiResult;
 
 /**
  * IM 渠道 CRUD + 微信扫码状态面。
@@ -38,6 +42,7 @@ import com.ragagent.im.wechat.WechatQRCodeService;
  * {@code /im/callback/:channel_id} 两条回调路由同样不实现。</p>
  */
 @RestController
+@ApiResult
 public class ImChannelController {
 
     private static final ObjectMapper MAPPER = new ObjectMapper()
@@ -232,16 +237,16 @@ public class ImChannelController {
 
     /** 删除渠道：任何失败都落 500 "failed to delete channel"；成功 204。 */
     @DeleteMapping("/api/v1/im-channels/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") String channelId) {
+    public ApiResponse<Void> delete(@PathVariable("id") String channelId) {
         if (channelId == null || channelId.isEmpty()) {
-            return plain(400, "channel id is required");
+            throw new BizException(AppError.ofHttpStatus(400, "channel id is required"));   // B191：泛型助手在 ApiResponse 返回位不可用 ⇒ 就地展开
         }
         try {
             service.deleteChannel(channelId, currentTenant());
         } catch (RuntimeException e) {
-            return plain(500, "failed to delete channel");
+            throw new BizException(AppError.ofHttpStatus(500, "failed to delete channel"));   // B191：泛型助手在 ApiResponse 返回位不可用 ⇒ 就地展开
         }
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B191：204 退役
     }
 
     /** 切换启用状态：任何失败都落 500 "failed to toggle channel"。 */

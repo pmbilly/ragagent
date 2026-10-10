@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import com.ragagent.session.domain.Message;
 import com.ragagent.session.dto.StopSessionRequest;
+import com.ragagent.common.web.ApiResponse;
 
 /**
  * embed 委托协作者（自 {@link EmbedChannelController} 拆出的
@@ -242,7 +243,7 @@ final class EmbedChannelDelegateOps {
     }
 
     /** MCP OAuth 解析（gate 依赖分支；Gate 未接线时 500——已知差异）。 */
-    public ResponseEntity<Void> mcpResolve(
+    public ApiResponse<Void> mcpResolve(
             @PathVariable("sessionId") String sessionId,
             @PathVariable("pendingId") String pendingId,
             @RequestBody(required = false) String rawBody) {
@@ -260,7 +261,7 @@ final class EmbedChannelDelegateOps {
     }
 
     /** 取消待决的 MCP OAuth 工具授权。 */
-    public ResponseEntity<Void> mcpResolveCancel(
+    public ApiResponse<Void> mcpResolveCancel(
             @PathVariable("sessionId") String sessionId,
             @PathVariable("pendingId") String pendingId) {
         ctrl.ensureSession(LogSanitizer.sanitize(sessionId));
@@ -268,7 +269,7 @@ final class EmbedChannelDelegateOps {
     }
 
     /** 工具审批受理（gate 依赖分支；Gate 未接线时 500 = 已知差异）。 */
-    public ResponseEntity<?> toolApprovals(@PathVariable("sessionId") String sessionId,
+    public ApiResponse<Void> toolApprovals(@PathVariable("sessionId") String sessionId,
                                            @PathVariable("pendingId") String pendingId,
                                            @RequestBody(required = false) String rawBody) {
         ctrl.ensureSession(LogSanitizer.sanitize(sessionId));

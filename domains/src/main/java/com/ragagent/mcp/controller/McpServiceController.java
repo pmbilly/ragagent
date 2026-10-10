@@ -34,6 +34,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.ragagent.common.web.ApiResponse;
+import com.ragagent.common.web.ApiResult;
 
 /**
  * MCP 服务 HTTP 层。
@@ -62,6 +64,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 删除 204；仅<b>工具审批面</b>仍带 {@code {data,success}} 信封。</p>
  */
 @RestController
+@ApiResult
 @RequestMapping("/api/v1/mcp-services")
 public class McpServiceController {
 
@@ -124,7 +127,7 @@ public class McpServiceController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteMCPService(@PathVariable("id") String id) {
+    public ApiResponse<Void> deleteMCPService(@PathVariable("id") String id) {
         return crudOps.deleteMCPService(id);
     }
 
@@ -286,7 +289,7 @@ public class McpServiceController {
      * 两个字段至少提供一个，省略的字段保持原值。</p>
      */
     @PutMapping("/{id}/tool-approvals/{toolName}")
-    public ResponseEntity<?> setMCPToolApproval(@PathVariable("id") String id,
+    public ApiResponse<Void> setMCPToolApproval(@PathVariable("id") String id,
                                                 @PathVariable("toolName") String toolName,
                                                 @RequestBody(required = false) McpToolApprovalPolicyRequest body) {
         long tenantId = requireTenant();
@@ -309,7 +312,7 @@ public class McpServiceController {
             throw BizException.internal(rawMessage(e));
         }
         // 策略写入是无响应体的受理回执 → 204
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B191：204 退役
     }
 
     // ── 工具方法 ─────────────────────────────────────────────────────────

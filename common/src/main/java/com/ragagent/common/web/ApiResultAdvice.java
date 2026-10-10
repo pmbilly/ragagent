@@ -23,6 +23,11 @@ public class ApiResultAdvice implements ResponseBodyAdvice<Object> {
 
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
+        if (returnType.getParameterType() == void.class) {
+            // void 端点自己写响应（外部平台回调 / 流式）⇒ 不能包：会把 null 包成外壳，
+            // 与端点已写入的裸响应**双写** ✗（B191：ImCallbackController 属于这一类）。
+            return false;
+        }
         return ApiResultSupport.isAnnotated(returnType.getContainingClass());
     }
 
