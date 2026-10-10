@@ -2,7 +2,7 @@
 
 > **面向读者**：第一次接手 `com.ragagent.chatpipeline` 的架构师 / 高级开发者。
 > **目标**：30 分钟建立全局观 → 能定位改动点 → 能安全迭代（本模块有 45 个录制回放用例兜底，全仓 4,600+ 后端用例、改坏行为大概率立刻红）。
-> **数据口径**：2026-10-08 实测（`wc -l` 口径）：**44 个 java 文件 / 约 0.77 万行 / 3 个子包（根 + plugin/ + support/）**。
+> **数据口径**：2026-10-11 实测（`wc -l` 口径）：**43 个 java 文件 / 7,705 行 / 2 个子包（plugin/ + support/）+ 根**。
 > **本文档的地位**：模块级导览；仓库级作业规范见仓库根 `HANDOFF.md`（§12 结构地图、§13 踩坑清单、§14 逐包重构范式）。
 
 ---
@@ -353,7 +353,7 @@ cd frontend && npx vue-tsc --build --force && npm test
 6. **`SearchParams` 序列化进 PipelineLog params 载荷仍是 snake**（`SearchRecordingTest` 金片钉住）：chat span/log 载荷属 §14.9s 登记的"仍是 snake 是对的"清单，**别顺手 camel 化**；死代码判定必须扫"参数对象被泛型序列化"的路径。（HANDOFF §14.6/§14.9s）
 7. **image_info 读侧键名由 docreader Go 容器决定**（`original_url/ocr_text/start_pos…`）：管线经端口拿到后按 `.path("original_url")` 读，同属 §14.9s 清单，不得 camel 化。（HANDOFF §14.6）
 8. **`plugin/` 里部分静态/实例辅助方法放宽为 `public` 是给测试用的**：测试在 `com.ragagent.chatpipeline` 根包直接探针，跨子包需要可见性。别当公共 API 依赖，也别"收紧可见性"把测试搞红。（`plugin/package-info.java`）
-9. **Go 工具面 5 类（`GoDoubleSerializer`/`GoTimeSerializer`/`GoMapSerializer`/`GoJsonEscapes`/`GoJson`）与 `EventJson` 仍被本模块依赖**：chatpipeline 手搓载荷、事件总线、Redis 流事件靠其 Go 字节形态，线上注解已清零但工具面**别再当遗产删**（§3 红线：唯一要求一次性全仓完成的动作）。（HANDOFF §2 第 7 条）
+9. **事件/流载荷的字节形态由 `EventJson`（`:common` event/）与 `StreamJson`（`:common` stream/）承载**：键序/时间字面量是线上字节面（B215 备案的 6 处刻意保留序列化），**别当遗产删**。历史注：旧「Go 工具面 5 类」（`GoDoubleSerializer` 等）已于 B39–B48 全部退役，本模块不再依赖；手搓载荷以金片为字节权威。（HANDOFF §2 第 7 条的保留面随退役收敛至 EventJson/StreamJson）
 10. **占位端口存而不读是对齐历史面**：`SessionService`/`ChunkService`/`WebSearchStateService`/`WebSearchProviderRepository` 在 Go 侧只判 nil 或存而不读；`TenantService` 只有 `currentWebSearchConfig` 一个 default 方法。清理它们要先确认无 Go 行为对齐诉求。（`PipelinePorts` javadoc + known-issues 05 装配清单）
 11. **jieba 分词接缝**：expansion 组按实录注入固定分词表（`QueryTokenizer.setSegmenter`），未命中回落二字滑窗——分词结果差异直接改变变体检索行为。（known-issues 05）
 12. **测试分批跑**：agent/chatpipeline 与 apikey/auth 域**同批**跑测试出现过 Mockito attach 假红 110 条，分批即全绿——全量红时先看失败分布是不是这种"整批假红"。（known-issues 05 波 4.6d）

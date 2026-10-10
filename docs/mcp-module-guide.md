@@ -1,8 +1,8 @@
 # mcp 模块手册
 
 > **面向读者**：第一次接手 `com.ragagent.mcp` 的架构师 / 高级开发者。
-> **目标**：30 分钟建立全局观 → 能定位改动点 → 能安全迭代（本模块有 245 个后端用例兜底，改错会立刻红）。
-> **数据口径**：2026-10-08 实测（`wc -l` 口径）：**116 个 java 文件 / 约 1.28 万行 / 7 个子包**。
+> **目标**：30 分钟建立全局观 → 能定位改动点 → 能安全迭代（本模块有 245 个 `@Test` 兜底，另加 2 个 `@ParameterizedTest`，改错会立刻红）。
+> **数据口径**：2026-10-11 实测（`wc -l` 口径）：**117 个 java 文件 / 12,817 行 / 7 个子包**（main 源码；测试已按"是否要 Spring 上下文"分驻 `:domains` 与 `:boot`，见 §8）。
 > **本文档的地位**：模块级导览；仓库级作业规范见仓库根 `HANDOFF.md`（§12 结构地图、§13 踩坑清单、§14 逐包重构范式）。
 
 ---
@@ -24,7 +24,7 @@
 | 审批门机制本体（`Gate` / `Checker` / `Decision` / 挂起-恢复协议） | `common/approval`（本模块只提供 `Adapter` 桥与策略数据） |
 | 会话编排与聊天 SSE 帧 | `session` / `stream` |
 | LLM 调用与凭据（使用说明生成） | `llm` / `model`（经 `LlmChatClient` / `ModelService` 薄依赖） |
-| 嵌入渠道公开面的 MCP 委托端点（5 个） | `embed`（`EmbedChannelDelegateOps` 直接调本模块 controller） |
+| 嵌入渠道公开面的 MCP 委托端点（5 个：OAuth 授权/状态/解析/取消解析 + 工具审批透传） | `embedchannel`（`EmbedChannelDelegateOps` 直接调本模块 controller） |
 
 ### 图 1：模块全景
 
@@ -73,7 +73,7 @@ graph TB
     SVC --> LLM
 ```
 
-**三个必须知道的数字**：`oauth/` + `protocol/` 两个子包 **7,051 行，占全模块 55%**——本模块的大头是"连别人"，不是 CRUD；端点只有 **22 个**，背后是 **5 张表**（管理面薄、协议面厚）；最大类 **605 行**（`McpServiceService`），≥800 行神类已于 2026-10-01 清零（`McpServiceController` 937→372、`OAuthHandler` 825→220，HANDOFF §14.7.10）。
+**三个必须知道的数字**：`oauth/` + `protocol/` 两个子包 **7,049 行，占全模块 55%**——本模块的大头是"连别人"，不是 CRUD；端点只有 **22 个**，背后是 **5 张表**（管理面薄、协议面厚）；最大类 **605 行**（`McpServiceService`），≥800 行神类已于 2026-10-01 清零（`McpServiceController` 937→372、`OAuthHandler` 825→220，HANDOFF §14.7.10）。
 
 ---
 
@@ -83,16 +83,16 @@ graph TB
 
 | 子包 | 文件/行数 | 放什么 | **不放什么** |
 |---|---|---|---|
-| `controller/` | 6 / 1,776（4 controller + `McpServiceCrudOps`/`McpUsageInstructionsOps` 两个切片协作者） | `@RestController`：RBAC 依赖、调服务层、拼响应 | 协议细节（→ `protocol/`）、SQL |
-| `service/` | 6 / 1,289 | `McpServiceService`（服务 CRUD + 凭据）、`McpMetadataService`（目录快照）、`McpToolApprovalService`（逐工具策略）、`Adapter`/`McpToolPolicySource`（审批桥，自 `agent/approval` 下沉） | 传输与握手（→ `protocol/`） |
-| `oauth/` | 33 / 3,619 | 授权码流程全链路：发现（`OAuthDiscovery`）、动态注册、`OAuthHandler`（协议客户端）、`OAuthManager`（编排）、token/state 存储、RFC 文档类型 | 非 OAuth 的协议报文（→ `protocol/`） |
-| `protocol/` | 32 / 3,432 | JSON-RPC 2.0 客户端（`DefaultMcpClient`）、连接池（`McpClientManager`）、两种传输（`SseTransport` / `StreamableHttpTransport`）、出站安全底座（`McpHttp`）、哨兵错误（`McpErrorCode`） | OAuth 编排（→ `oauth/`）、落库 |
-| `domain/` | 20 / 1,410 | 实体（4 个 `@TableName` + 1 个复合主键实体）+ jsonb 值类型 + **3 个自定义 typeHandler** + 传输/鉴权枚举 | 请求/响应形状（→ `dto/`） |
-| `mapper/` | 8 / 806 | 5 个 MyBatis 接口 + **3 个仓储门面**（`McpMetadataRepository` / `McpOAuthRepository` / `McpToolApprovalRepository`）——本模块没有独立 `repository/` 子包，仓储门面放这里 | 业务判断（→ `service/`） |
+| `controller/` | 7 / 1,803（4 controller + `McpServiceCrudOps`/`McpUsageInstructionsOps` 两个切片协作者 + 1 份 `package-info`） | `@RestController`：RBAC 依赖、调服务层、拼响应 | 协议细节（→ `protocol/`）、SQL |
+| `service/` | 6 / 1,291 | `McpServiceService`（服务 CRUD + 凭据）、`McpMetadataService`（目录快照）、`McpToolApprovalService`（逐工具策略）、`Adapter`/`McpToolPolicySource`（审批桥，自 `agent/approval` 下沉） | 传输与握手（→ `protocol/`） |
+| `oauth/` | 33 / 3,614 | 授权码流程全链路：发现（`OAuthDiscovery`）、动态注册、`OAuthHandler`（协议客户端）、`OAuthManager`（编排）、token/state 存储、RFC 文档类型 | 非 OAuth 的协议报文（→ `protocol/`） |
+| `protocol/` | 32 / 3,435 | JSON-RPC 2.0 客户端（`DefaultMcpClient`）、连接池（`McpClientManager`）、两种传输（`SseTransport` / `StreamableHttpTransport`）、出站安全底座（`McpHttp`）、哨兵错误（`McpErrorCode`） | OAuth 编排（→ `oauth/`）、落库 |
+| `domain/` | 20 / 1,407 | 实体（4 个 `@TableName` + 1 个复合主键实体）+ jsonb 值类型 + **3 个自定义 typeHandler** + 传输/鉴权枚举 | 请求/响应形状（→ `dto/`） |
+| `mapper/` | 8 / 807 | 5 个 MyBatis 接口 + **3 个仓储门面**（`McpMetadataRepository` / `McpOAuthRepository` / `McpToolApprovalRepository`）——本模块没有独立 `repository/` 子包，仓储门面放这里 | 业务判断（→ `service/`） |
 | `dto/` | 9 / 389 | `McpServiceResponse`（**无秘密字段的编译期不变式**）、凭据元数据、请求记录、`RoleVisibility`（角色投影） | 持久化注解 |
 | （根） | 2 / 71 | `package-info.java` + `McpWiring`（`McpClientManager` 与 `Gate` 的 bean 装配，消费方此前 `Optional` 注入的缺省兜底由此消除） | — |
 
-> ⚠️ 与 knowledge 等范本域不同：**7 个子包都没有 `package-info.java`**（全模块只有根 1 份，已登记 §9）。接手时包职责以本表 + 各类 javadoc 为准。
+> ⚠️ 与 knowledge 等范本域不同：**除 `controller/` 已补 1 份外，其余 6 个子包都没有 `package-info.java`**（全模块只有根 + controller 2 份，已登记 §9）。接手时包职责以本表 + 各类 javadoc 为准。
 
 ### 1.2 依赖方向（只允许向下；全仓零包间环）
 
@@ -121,7 +121,7 @@ graph LR
 
 ## 2. 数据模型
 
-### 2.1 ER 图（5 张表，见 `migrations/versioned/V1__baseline.sql` 571–668 行）
+### 2.1 ER 图（5 张表，`migrations/versioned/V1__baseline.sql`：571 / 589 / 605 / 627 / 652 行起）
 
 ```mermaid
 erDiagram
@@ -218,37 +218,39 @@ erDiagram
 
 ## 3. HTTP 接口面
 
-### 3.1 端点分组（4 个 controller / 22 个端点；RBAC 规则集中在 `config/WebConfig` 231–252 行）
+### 3.1 端点分组（4 个 controller / 22 个端点；RBAC 规则集中在 `config/WebConfig` 244–266 行）
 
 **服务资源面**（`McpServiceController`，前缀 `/api/v1/mcp-services`，13 个）
 
+> 成功响应一律经 `@ApiResult` 统一外壳（`{code:0,message:"ok",data:…}`），下表"用途"写的是 data 内载荷；创建保持 201（外壳只包 body、不碰状态码）。
+
 | 方法 | 路径 | 用途 | RBAC |
 |---|---|---|---|
-| POST | `/` | 创建（201 裸对象；URL 过 `SsrfGuard` 校验） | Admin+ |
-| GET | `/` | 列表（裸数组） | Viewer+ |
-| GET | `/{id}` | 详情（裸对象；`usageInstructions` 恒为第一字段） | Viewer+ |
+| POST | `/` | 创建（201；URL 过 `SsrfGuard` 校验） | Admin+ |
+| GET | `/` | 列表 | Viewer+ |
+| GET | `/{id}` | 详情（`usageInstructions` 恒为第一字段） | Viewer+ |
 | PUT | `/{id}` | 更新（存在性映射；**正文永不携带秘密**） | Admin+ |
-| DELETE | `/{id}` | 软删（204） | Admin+ |
-| POST | `/{id}/test` | 连接测试（裸 `McpTestResult`） | Admin+ |
-| GET | `/{id}/tools` · `/{id}/resources` | 工具 / 资源目录（裸数组；本行 2 个端点） | Viewer+ |
-| GET | `/{id}/metadata` | 目录快照；**从未同步 = 裸 JSON null**（显式 `NullNode`） | Viewer+ |
+| DELETE | `/{id}` | 软删（200 + 外壳，`data:null`） | Admin+ |
+| POST | `/{id}/test` | 连接测试（`McpTestResult`） | Admin+ |
+| GET | `/{id}/tools` · `/{id}/resources` | 工具 / 资源目录（本行 2 个端点） | Viewer+ |
+| GET | `/{id}/metadata` | 目录快照；**从未同步 = data 内 JSON null**（显式 `NullNode`） | Viewer+ |
 | POST | `/{id}/metadata/refresh` | 刷新快照（静态鉴权写租户共享快照时 handler 内升 Admin+） | Viewer+ |
 | POST | `/{id}/usage-instructions/generate` | LLM 生成使用说明 | Admin+ |
-| GET | `/{id}/tool-approvals` | 工具策略列表（裸数组） | Viewer+ |
-| PUT | `/{id}/tool-approvals/{tool_name}` | 写策略（204；`requireApproval`/`enabled` 至少一个） | Admin+ |
+| GET | `/{id}/tool-approvals` | 工具策略列表 | Viewer+ |
+| PUT | `/{id}/tool-approvals/{tool_name}` | 写策略（200 + 外壳；`requireApproval`/`enabled` 至少一个） | Admin+ |
 
-**凭据子资源**（`McpCredentialsController`，2 个，均 Admin+）：`PUT /api/v1/mcp-services/{id}/credentials`（写 apiKey/token，成功后**回收活动连接**使新凭据立即生效）、`DELETE .../credentials/{field}`（204 幂等；`field` 取 `apiKey`/`token`，镜像响应里 credentials 映射的键名）。拆出这个子资源的理由：从契约层面消灭"掩码值回传覆盖已存密钥"。
+**凭据子资源**（`McpCredentialsController`，2 个，均 Admin+）：`PUT /api/v1/mcp-services/{id}/credentials`（写 apiKey/token，成功后**回收活动连接**使新凭据立即生效；两个字段都缺是**良性空操作**——不报 400，读出当前状态原样返回）、`DELETE .../credentials/{field}`（200 + 外壳，幂等；`field` 取 `apiKey`/`token`，镜像响应里 credentials 映射的键名）。拆出这个子资源的理由：从契约层面消灭"掩码值回传覆盖已存密钥"。
 
 **OAuth 用户面**（`McpOAuthController`，前缀 `/api/v1`，6 个）
 
 | 方法 | 路径 | 用途 | RBAC |
 |---|---|---|---|
-| POST | `/mcp-services/{id}/oauth/authorize-url` | 发起授权 → 裸 `{authorizationUrl, authorizationAttempt}` | Viewer+ |
-| GET | `/mcp-oauth/callback` | 授权服务器回跳；**公开路由**（`AuthFilter.NO_AUTH_API` 放行，一次性 state 自证），**不得**加 RBAC 规则 | 公开 |
-| GET | `/mcp-services/{id}/oauth/status` | 授权状态（裸 4 键恒输出；可带 `authorization_attempt` 只认本次流程） | Viewer+ |
-| DELETE | `/mcp-services/{id}/oauth/token` | 撤销当前用户 token（204） | Viewer+ |
-| POST | `/agent/mcp-oauth-resolutions/{pending_id}` | 对话内授权完成 → 恢复被暂停的 Agent 工具调用（204） | Viewer+ |
-| POST | `/agent/mcp-oauth-resolutions/{pending_id}/cancel` | 用户跳过授权 → 解除 Agent 阻塞（204） | Viewer+ |
+| POST | `/mcp-services/{id}/oauth/authorize-url` | 发起授权 → `{authorizationUrl, authorizationAttempt}` | Viewer+ |
+| GET | `/mcp-oauth/callback` | 授权服务器回跳；**公开路由**（`AuthFilter.NO_AUTH_API` 放行，一次性 state 自证），**不得**加 RBAC 规则；302 回前端 | 公开 |
+| GET | `/mcp-services/{id}/oauth/status` | 授权状态（4 键恒输出；可带 `authorizationAttempt` 只认本次流程） | Viewer+ |
+| DELETE | `/mcp-services/{id}/oauth/token` | 撤销当前用户 token（200 + 外壳） | Viewer+ |
+| POST | `/agent/mcp-oauth-resolutions/{pending_id}` | 对话内授权完成 → 恢复被暂停的 Agent 工具调用（200 + 外壳） | Viewer+ |
+| POST | `/agent/mcp-oauth-resolutions/{pending_id}/cancel` | 用户跳过授权 → 解除 Agent 阻塞（200 + 外壳） | Viewer+ |
 
 **人工审批**（`AgentToolApprovalController`，1 个）：`POST /api/v1/agent/tool-approvals/{pending_id}`（Viewer+，**刻意不收 Admin+**——审批卡片出现在调用者自己的会话里，真正的越权防线是 gate 内的 tenant/user 校验）。
 
@@ -258,10 +260,10 @@ erDiagram
 
 | 约定 | 说明 |
 |---|---|
-| 信封 | 服务资源面 / 审批面 / OAuth 用户面**全部裸对象或裸数组**（M1/M4 换锚收掉）；创建 201、删除与策略写入 204 |
+| 信封 | 四个 controller 全部 `@ApiResult`：**统一响应外壳** `{code,message,data}`（50/52 迁移批收官；此前"全部裸对象/裸数组"的 M1/M4 形态已退役）。创建 201（外壳只包 body）；删除/策略写入/撤销/授权解析都是 200 + 外壳（`data:null`，204 已全仓退役）；错误恒抛 `BizException` 走全局处理器同壳输出 |
 | 键名 | 全 camelCase；`is_builtin` → **`builtin`**（布尔不带 is 前缀，否则 Jackson 同时吐 `builtin` 与 `isBuiltin`） |
 | 永久冻结 | `inputSchema` / `mimeType` 是 **MCP 协议规范字段名**（本来就是 camel），别按项目惯例改 snake；`McpAuthType` 的**枚举取值**（`api_key`/`bearer`/`oauth`）是取值不是键名，一律不动 |
-| 永久冻结（RFC） | `OAuthToken`(RFC 6749 §5.1)、`AuthServerMetadata`(RFC 8414)、`OAuthProtectedResource`(RFC 9728)、`OAuthError`(RFC 6749 §5.2)——本域余 22 处 `@JsonProperty` **全部**在这里，别换锚（HANDOFF §14.9p） |
+| 永久冻结（RFC） | `OAuthToken`(RFC 6749 §5.1)、`AuthServerMetadata`(RFC 8414)、`OAuthProtectedResource`(RFC 9728)、`OAuthError`(RFC 6749 §5.2)——本域余 21 处 `@JsonProperty` **全部**在这四个类里（2026-10-11 实测：10/6/2/3），别换锚（HANDOFF §14.9p） |
 | 可空字段 | 显式输出 `null`（`metadata` 从未同步 = 裸 `NullNode`；`expiresAt=null` = 不过期）——Spring 对 null body 发空正文会炸掉前端 `JSON.parse` |
 | 秘密 | 响应**永不**携带密钥值；"是否已配置"经 `credentials.apiKey.configured` 布尔暴露；回调 query 参数（`state`/`code`）与 URL fragment（`#mcp_oauth_result=...`）是弹窗↔前端的非 JSON 协议 |
 | 校验文案 | 旧 snake 键名照抄 Go 原文（如 `redirect_uri is required`），属已登记的文案-键名不一致（cosmetic），别顺手改 |
@@ -397,7 +399,7 @@ flowchart LR
 
 ## 6. 常见迭代 SOP
 
-> 铁律：**一次只动一个轴**；每步结束**全绿**再走下一步。本模块的契约面（裸对象 / 键名 / 204）已全部换锚完成，**别在重构批里顺手改契约**。
+> 铁律：**一次只动一个轴**；每步结束**全绿**再走下一步。本模块的契约面（统一外壳 / 键名 / 200）已全部换锚完成，**别在重构批里顺手改契约**。
 
 ```bash
 # 每次改动后必跑（约 3 分钟）
@@ -409,7 +411,7 @@ cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Cont
 cd frontend && npx vue-tsc --build --force && npm test
 ```
 
-**A. 改端点/契约**：`controller` → `dto`（显式输出 null）→ `WebConfig` RBAC 规则（注意顺序）→ 补 `mcp-*` fixture → 三绿。契约 fixture 支持重录开关 `-Dcontract.refresh=true`（`McpContractTest`，同 `EmbedContractTest`），**重录后必须结构化复核差异**（HANDOFF §13.12）。
+**A. 改端点/契约**：`controller` → `dto`（显式输出 null）→ `WebConfig` RBAC 规则（注意顺序）→ 补 `mcp-*` fixture → 三绿。契约 fixture 支持重录开关 `-Dcontract.refresh=true`（`McpContractTest` / `McpHttpContractTest`，现居 `:boot`，同 `EmbedContractTest`），**重录后必须结构化复核差异**（HANDOFF §13.12）。
 
 **B. 改落库形状**：`domain`（值类型 + handler）→ `V1__baseline.sql` + `TestSchema` 两处同改 → `grep` 全仓"按旧键读取"的代码 → 存量行迁移 SQL → 三绿。落库键名改动必须想清楚旧行读回语义（mixin 退役教训，§2.2）。
 
@@ -426,7 +428,7 @@ cd frontend && npx vue-tsc --build --force && npm test
 1. **密钥剥离是编译期不变式，不是运行时脱敏**：`dto/McpServiceResponse` 类里**根本没有**秘密字段；`McpServiceService` 的 Get/List 返回**未脱敏实体**（含明文 AuthConfig）仅供内部（客户端构造、凭据元数据推导）——别把未脱敏实体直接塞给控制器。（`McpServiceService`/`McpServiceResponse` javadoc；known-issues/01）
 2. **审批策略"缺行 = enabled=true"**：工具清单来自上游 ListTools，`mcp_tool_approvals` 只存覆盖值。Java boolean 零值是 false 而 DB 列默认 true——仓储必须显式写，不能依赖实体默认值；补丁是部分列更新。（`McpToolApproval` / `McpToolApprovalService` javadoc；known-issues/01）
 3. **OAuth state 默认内存存储**：`weknora.mcp-oauth.redis-state-store` 默认关（Java 的 `StringRedisTemplate` 只要依赖在 classpath 就存在，无法表达"没配 Redis"）。**多副本生产必须打开**，否则回调落到别的副本找不到 state。（known-issues/01 已知差异 4；`McpOAuthWiring` javadoc）
-4. **RFC 协议面永久冻结**：`OAuthToken` / `AuthServerMetadata`(RFC 8414) / `OAuthProtectedResource`(RFC 9728) / `OAuthError`(RFC 6749 §5.2) 的字段名由规范/对方决定——本域余 22 处 `@JsonProperty` **全部**在这些类上，别"顺手 camel 化"。（HANDOFF §14.9p 收官判定）
+4. **RFC 协议面永久冻结**：`OAuthToken` / `AuthServerMetadata`(RFC 8414) / `OAuthProtectedResource`(RFC 9728) / `OAuthError`(RFC 6749 §5.2) 的字段名由规范/对方决定——本域余 21 处 `@JsonProperty` **全部**在这些类上，别"顺手 camel 化"。（HANDOFF §14.9p 收官判定）
 5. **stdio 保留类型但传输硬禁用**（命令注入）：DTO 字段、`stdio_config` 列、枚举值都在，传输层双重拒绝——这是与 Go 对齐的刻意行为，别"修好"。（known-issues/01；`McpTransportType` javadoc）
 6. **`McpAuthType` 读宽松 / 写严格**：2026-10-03 点检实锤——前端发 `"apiKey"`、枚举取值是 `"api_key"`，宽松读把整条鉴权策略静默写成 null，凭据被当成 X-API-Key 发出、用户"配了不生效"。**写侧必须走 `parseStrict`**（未知值 → 400），别在新的写路径上用 `fromValue`。（`McpAuthType` javadoc）
 7. **契约掩码按键名匹配**：`McpContractTest.UUID_KEY_PATTERN` 键改名必须同步放宽（M4 曾因漏 `serviceId` 让夹具混进随机 UUID，跑第二遍就红，像业务回归）。（HANDOFF §13.13；M4 执行记录）
@@ -440,8 +442,10 @@ cd frontend && npx vue-tsc --build --force && npm test
 
 ## 8. 测试与验证
 
-- **规模**（2026-10-08 实测）：`domains/src/test/java/com/ragagent/mcp/` 下 **31 个 java 文件**，其中 **27 个测试类 / 245 个 `@Test`**（另 4 个是测试基建：`McpServerStub`、`OAuthServerStub`、`FakeOAuthRepository`、`FakeOAuthStateRedis`）。分包：`controller/` 69、`protocol/` 58、`oauth/` 47、`service/` 39、`repository/` 12、`dto/` 11、`domain/` 5、根 `McpContractTest` 4（合计 245）。
-- **fixture 前缀**：`domains/src/test/resources/contracts/` 下 **`mcp-*` 16 个**（create / list / get / update / delete / create-auth / create-forbidden-viewer / create-ssrf-rejected / not-found / test / tools / metadata / credentials-put / credentials-delete / credentials-bad-field / tool-approvals）。`McpContractTest` 掩码 UUID 与时间戳；支持 `-Dcontract.refresh=true` 重录。
+- **规模**（2026-10-11 实测，**245 个 `@Test` + 2 个 `@ParameterizedTest`，分驻两模块**）：
+  - `:domains/src/test/java/com/ragagent/mcp/` **21 个 java 文件**（19 个测试类 / **169 个 `@Test`**；另 2 个测试基建同包：`McpServerStub`、`FakeOAuthStateRedis`；`OAuthServerStub` 与 `FakeOAuthRepository` 在 `:domains` 的 `src/testFixtures/java/com/ragagent/mcp/oauth/`）。分包：`protocol/` 58、`oauth/` 47、`controller/` 46、`dto/` 11、`domain/` 5（+1 参数化）、`service/` 2。
+  - `:boot/src/test/java/com/ragagent/mcp/` **76 个 `@Test`**（要 Spring 上下文/真库的都住这）：`service/` 37（`McpServiceServiceTest` 23 + `McpMetadataServiceTest` 8 + `McpToolApprovalServiceTest` 6，另 1 参数化）、契约 `McpContractTest` 4 + `controller/McpHttpContractTest` 23、`repository/` 12（`McpMetadataRepositoryTest` 2 / `McpToolApprovalRepositoryTest` 6 / `McpOAuthRepositoryTest` 4）。
+- **fixture 前缀**：`:domains` 的 **`src/testFixtures/resources/contracts/`** 下 **`mcp-*` 16 个**（create / list / get / update / delete / create-auth / create-forbidden-viewer / create-ssrf-rejected / not-found / test / tools / metadata / credentials-put / credentials-delete / credentials-bad-field / tool-approvals）。掩码 UUID 与时间戳；支持 `-Dcontract.refresh=true` 重录。
 - **比较口径**：金片对比走统一基建（**语义归一** + strip + 重录开关）；fixture 锚定的是本仓自己的行为。
 - **协议测试有真替身**：`McpServerStub`（假 MCP 服务器）与 `OAuthServerStub`（假授权服务器）是功能替身，不是 mock——改传输/OAuth 行为时优先扩展替身而不是绕过它。
 - **已知偶发 2 例**（全量并发下偶发，遇到先单独重跑，别误判回归；与本模块无关但会污染闸门）：
@@ -454,14 +458,13 @@ cd frontend && npx vue-tsc --build --force && npm test
 
 | 项 | 性质 | 建议 |
 |---|---|---|
-| 7 个子包无 `package-info.java`（全模块仅根 1 份） | 结构债 | 对齐 HANDOFF §14.5"每个子包有 package-info"目标；纯文档批，本文 §1.1 可直接作底稿 |
-| `McpServiceController` 类 javadoc 的"响应形态"段落后于 M4（仍写"仅工具审批面带信封"，实际工具审批面已裸数组） | 文档债 | 顺手摘除或改写；以方法级注释与 fixture 为准 |
-| create 可写入 `id` 与 `is_builtin` | 行为债 | Go 侧既有问题照抄（客户端可钉死主键、建跨租户可见的 builtin 行）；建议单独一批收紧（known-issues/01 已知差异 1） |
+| 6 个子包无 `package-info.java`（`controller/` 已补，全模块现存根 + controller 2 份） | 结构债 | 对齐 HANDOFF §14.5"每个子包有 package-info"目标；纯文档批，本文 §1.1 可直接作底稿 |
+| create 可写入 `id` 与 `builtin` | 行为债 | Go 侧既有问题照抄（客户端可钉死主键、建跨租户可见的 builtin 行）；建议单独一批收紧（known-issues/01 已知差异 1） |
 | create 时 `enabled` 恒为 true（GORM `default:true` 语义复刻） | 行为债 | Go 的 POST 实际无法创建 disabled 服务；收紧需连前端一起（known-issues/01 已知差异 2） |
 | 使用说明生成的 WeKnoraCloud 凭据回落缺失（TenantService 无该读取口） | 未接线 | known-issues/01 已知差异 5；动 usage-instructions 前先确认 |
 | LLM 客户端的 langfuse 追踪未实现 → MCP/LLM 观测数据不落 Langfuse | 观测债 | known-issues/01 已知差异 6 |
 | `RoleVisibility.canViewIntegrationSecrets` 的 API key 分支待收口（javadoc 注明与 `ModelController` 同判定、待 API key 主体落地后统一） | 一致性 | 改脱敏判定时两处必须同批 |
-| 22 处 `@JsonProperty` 第三方协议面 | 永久冻结 | **别动**（§7.4）；新改动别往这些类上加字段 |
+| 21 处 `@JsonProperty` 第三方协议面（2026-10-11 实测） | 永久冻结 | **别动**（§7.4）；新改动别往这些类上加字段 |
 
 ---
 
@@ -479,4 +482,4 @@ cd frontend && npx vue-tsc --build --force && npm test
 | state 存储怎么切换 Redis | `oauth/McpOAuthWiring`（`weknora.mcp-oauth.redis-state-store`）+ §7.3 |
 | SSE 和 Streamable 差什么 | `protocol/SseTransport` vs `StreamableHttpTransport`（javadoc 各自的"线上行为逐条对照"） |
 | 哪些键名永远不能改 | §3.2 永久冻结两行 + HANDOFF §14.6 边界清单 |
-| 这么多子包的职责地图 | 本文 §1.1（子包 package-info 尚缺，见 §9 第一行） |
+| 这么多子包的职责地图 | 本文 §1.1（除 controller 外 6 个子包 package-info 尚缺，见 §9 第一行） |

@@ -1,8 +1,8 @@
 # knowledge 模块手册
 
 > **面向读者**：第一次接手 `com.ragagent.knowledge` 的架构师 / 高级开发者。
-> **目标**：30 分钟建立全局观 → 能定位改动点 → 能安全迭代（本模块有 4,681 个后端用例兜底，改错会立刻红）。
-> **数据口径**：2026-09-30 实测（`wc -l` 口径）：**197 个 java 文件 / 约 2.48 万行 / 12 个子包**。
+> **目标**：30 分钟建立全局观 → 能定位改动点 → 能安全迭代（本模块有 28 个测试类 / 275 个用例 + 360 个契约金片兜底，改错会立刻红）。
+> **数据口径**：2026-10-11 实测（`wc -l` 口径）：**218 个 java 文件 / 26,031 行 / 13 个子包**（dto 下再分 5 个二级子包）。
 > **本文档的地位**：模块级导览；仓库级作业规范见仓库根 `HANDOFF.md`（§12 结构地图、§13 踩坑清单、§14 逐包重构范式）。
 
 ---
@@ -23,7 +23,7 @@
 | 会话与 SSE 流、问答编排 | `session`（本模块只提供检索与工具能力） |
 | 检索引擎协议、向量库适配 | `retrieval`（本模块通过 `ChunkVectorIndexer` / `VectorStoreService` 使用它） |
 | 模型调用与凭据 | `model` / `llm`（本模块通过 `EmbedderClient` / `DocReaderClient` 之类的薄客户端调用） |
-| 系统初始化、模型连通性测试、租户级解析规则 | `agentm`（注意：那套配置的 jsonb 内层键**仍是 snake**，与本模块的 camelCase 契约不同） |
+| 系统初始化、模型连通性测试、KB 级解析配置 | `initialization`（注意：前端 `updateKBConfig` 打的是它的 `PUT /api/v1/initialization/config/{kbId}`，与本模块的 KB 更新接口并存，见 §3.1 注） |
 
 ### 图 1：模块全景
 
@@ -34,18 +34,19 @@ graph TB
     end
 
     subgraph knowledge_模块
-        CTRL["controller/（8 个，64 个端点）<br/>只做参数校验与转发"]
-        SVC["service/（29 个）<br/>用例编排 + 门面 KnowledgeService"]
+        CTRL["controller/（8 个，68 个端点）<br/>只做参数校验与转发"]
+        SVC["service/（36 个）<br/>用例编排 + 门面 KnowledgeService"]
         SUP["support/（5 个）<br/>无状态算法：分块选择 / 规则解析 / 批规划"]
         CHK["chunker/（15 个）<br/>切分算法：Heading / Heuristic / Legacy"]
-        TASK["task/（10 个）<br/>队列 + Worker + 进度 + span"]
-        REPO["repository/（5 个）<br/>仓储门面：软删 / 乐观锁 / 方言"]
-        MAP["mapper/（7 个）<br/>MyBatis-Plus 接口"]
-        DOM["domain/（27 个）<br/>实体 + jsonb 值类型 + 状态枚举"]
-        DTO["dto/（75 个）<br/>请求 / 响应 / 视图"]
-        SEC["security/（4 个 guard）"]
-        STORE["storage/（3 个）<br/>本地 / 租户文件存储"]
-        CLI["client/（2 个）<br/>docreader / embedder"]
+        TASK["task/（20 个）<br/>队列 + Worker + 进度 + span<br/>InProcess / Redis 双实现"]
+        REPO["repository/（6 个）<br/>仓储门面：软删 / 乐观锁 / 方言"]
+        MAP["mapper/（8 个）<br/>MyBatis-Plus 接口"]
+        DOM["domain/（23 个）<br/>实体 + jsonb 值类型 + 状态枚举"]
+        DTO["dto/（80 个，5 个二级子包）<br/>请求 / 响应 / 视图"]
+        SEC["security/（5 个）<br/>4 个 guard + package-info"]
+        CFG["config/（3 个）<br/>部署属性：housekeeping /<br/>docreader / batch-embed"]
+        STORE["storage/（4 个）<br/>本地 / 租户文件存储"]
+        CLI["client/（3 个）<br/>docreader / embedder"]
     end
 
     subgraph 外部
@@ -68,7 +69,7 @@ graph TB
     SVC -. 读写 .-> DOM
 ```
 
-**三个必须知道的数字**：最大类 1,234 行（`FaqImportService`，导入状态机，例外已在 javadoc 注明）；`service/` 占 1.13 万行（约 46% 的代码量，是最大的子包）；`dto/` 75 个文件全是一类型一文件。
+**三个必须知道的数字**：最大类 847 行（`task/KnowledgeProcessWorker`，处理 worker，也是全仓大文件棘轮的既有存量）；`service/` 占 1.20 万行（约 46% 的代码量，是最大的子包）；`dto/` 80 个文件（74 个类型 + 6 份 package-info）全部一类型一文件，按 chunk / doc / faq / kb / tag 五个二级子包落位。
 
 ---
 
@@ -78,18 +79,19 @@ graph TB
 
 | 子包 | 文件/行数 | 放什么 | **不放什么** |
 |---|---|---|---|
-| `controller/` | 9 / 2,425（8 个 controller + package-info） | `@RestController`：参数校验（`@Valid` DTO）、调门面、拼响应 | 业务逻辑、SQL、`ObjectNode` 手搓 |
-| `service/` | 29 / 11,342 | Spring 服务（用例编排）、切片服务、门面 `KnowledgeService` | 算法细节（→ `support/`）、SQL（→ `repository/`） |
-| `support/` | 5 / 261 | 无状态零依赖的算法与规则 | 注入任何 Bean、访问数据库 |
+| `controller/` | 9 / 2,453（8 个 controller + package-info） | `@RestController`：参数校验（`@Valid` DTO）、调门面、拼响应 | 业务逻辑、SQL、`ObjectNode` 手搓 |
+| `service/` | 36 / 12,039 | Spring 服务（用例编排）、切片服务、门面 `KnowledgeService`、跨域端口适配器（`*Adapter`） | 算法细节（→ `support/`）、SQL（→ `repository/`） |
+| `support/` | 5 / 263 | 无状态零依赖的算法与规则 | 注入任何 Bean、访问数据库 |
 | `chunker/` | 15 / 2,712 | 切分算法族：`HeadingSplitter` / `HeuristicSplitter` / `LegacySplitter`（Tier 3 算法分档，**不是**待删遗留）+ 规范化工具 | HTTP、持久化 |
-| `task/` | 10 / 1,274 | 队列接口 + InProcess 实现、`KnowledgeProcessWorker`、任务执行器、进度与 span | 具体解析 / 分块逻辑（调 `service/`） |
-| `repository/` | 6 / 1,336 | 仓储门面：软删三面孔、乐观锁、方言分支、事务模板 | 直接暴露 MyBatis 细节 |
-| `mapper/` | 8 / 414 | MyBatis-Plus 接口 + 显式 SQL | 业务判断 |
-| `domain/` | 27 / 1,802 | 实体（`@TableName`）+ **jsonb 值类型** + 状态枚举 | 请求/响应形状（→ `dto/`） |
-| `dto/` | 75 / 1,439（全部一类型一文件） | 一类型一文件：请求（29）/ 响应（18）/ 视图（6）/ 其余 | 持久化注解 |
-| `security/` | 5 / 992 | 4 个守卫：访问、chunk、FAQ、路由 | 业务逻辑 |
-| `storage/` | 4 / 466 | 本地文件、租户文件读写与配额 | 文档解析（→ `client/DocReaderClient`） |
-| `client/` | 3 / 336 | 出站薄封装：docreader、embedder | 重试策略散落（集中在封装内） |
+| `task/` | 20 / 2,032 | 队列接口 + InProcess / Redis 双实现、`KnowledgeProcessWorker`、任务执行器、进度与 span、`KnowledgeRedisWiring` 装配 | 具体解析 / 分块逻辑（调 `service/`） |
+| `repository/` | 6 / 1,364 | 仓储门面：软删三面孔、乐观锁、方言分支、事务模板 | 直接暴露 MyBatis 细节 |
+| `mapper/` | 8 / 413 | MyBatis-Plus 接口 + 显式 SQL | 业务判断 |
+| `domain/` | 23 / 1,391 | 实体（`@TableName`）+ **jsonb 值类型** + 状态枚举 | 请求/响应形状（→ `dto/`） |
+| `dto/` | 80 / 1,451（5 个二级子包，全部一类型一文件） | `chunk/` 12 + `doc/` 16 + `faq/` 21 + `kb/` 15 + `tag/` 7 + 根 3（跨域共用） | 持久化注解 |
+| `security/` | 5 / 995 | 4 个守卫：访问、chunk、FAQ、路由 | 业务逻辑 |
+| `config/` | 3 / 81 | 部署属性（`@ConfigurationProperties`）：`HousekeepingProperties` / `DocReaderProperties` / `BatchEmbedProperties` | 业务逻辑 |
+| `storage/` | 4 / 461 | 本地文件、租户文件读写与配额 | 文档解析（→ `client/DocReaderClient`） |
+| `client/` | 3 / 368 | 出站薄封装：docreader、embedder | 重试策略散落（集中在封装内） |
 
 ### 1.2 依赖方向（只允许向下）
 
@@ -113,7 +115,7 @@ graph LR
     style I fill:#f3e5f5
 ```
 
-**门面模式是本模块的枢纽**：`KnowledgeService`（约 850 行）保留**全部公共方法**并委托给切片服务。它的价值在于——拆分神类时**18+ 个注入点与 Mockito 测试零改动**；缺点是新人容易以为逻辑在门面里，其实都在切片服务。
+**门面模式是本模块的枢纽**：`KnowledgeService`（828 行、17 个注入点）保留**全部公共方法**并委托给切片服务。它的价值在于——拆分神类时**注入点与 Mockito 测试零改动**；缺点是新人容易以为逻辑在门面里，其实都在切片服务。worker → 门面的反向依赖也已解开：入队走 `task/KnowledgeProcessingQueue` 端口，摘要后处理走 `KnowledgeProcessedEvent` 事件（见 §4.5）。
 
 ---
 
@@ -200,6 +202,7 @@ erDiagram
 | `knowledge_bases.config` | `KnowledgeBaseChunkingConfig`（含 `ParserEngineRule`） | 分块尺寸/分隔符/引擎规则/父子块/token 上限 |
 | 同上（同列不同子域） | `KnowledgeBaseIndexingStrategy` / `KnowledgeBaseVlmConfig` / `KnowledgeBaseImageProcessingConfig` / `KnowledgeBaseAsrConfig` | 索引开关、图像描述、语音转写 |
 | `knowledge_bases.storage_config` | `KnowledgeBaseStorageConfig` | 桶、区域、路径前缀、S3 兼容开关 |
+| `knowledge_bases.storage_provider_config` | `KnowledgeBaseStorageProviderConfig`（仅 `provider` 一键） | 存储提供方默认 |
 | `chunks.metadata` | `DocumentChunkMetadata`（普通文档）/ `FaqChunkMetadata`（FAQ） | 生成问题列表 + 版本号；FAQ 条目字段 |
 | `knowledges.metadata` | 透传 `JsonNode` | 搬移状态 `_knowledge_transfer` 等 |
 | 任务队列 / LLM 载荷 | `ExtractChunkPayload` / `QuestionBatchPayload` | 队列内传递（含链路追踪键） |
@@ -250,7 +253,7 @@ erDiagram
 
 **分块**（`ChunkController`，10 个）：`GET /chunks/{knowledgeId}`（列表）、`GET /chunks/by-id/{id}`、`GET /chunks/{knowledgeId}/{id}/revisions`、`PUT /chunks/{knowledgeId}/{id}`（编辑，带乐观锁）、`POST .../revert`（回滚）、`PUT|POST|DELETE /chunks/by-id/{id}/questions*`（生成问题 CRUD）、`DELETE /chunks/{knowledgeId}/{id}`、`DELETE /chunks/{knowledgeId}`。
 
-**FAQ**（`FaqController`，13 个）：条目 CRUD（`/knowledge-bases/{id}/faq/entries`）、导出、`POST .../faq/entry`（单条新增）、相似问追加、字段批量更新（`/entries/fields`）、标签批量（`/entries/tags`）、检索（`POST .../faq/search`）、导入进度（`GET /faq/import/progress/{taskId}`）、上次导入结果展示状态（`PUT .../import/last-result/display`）。
+**FAQ**（`FaqController`，13 个）：条目 CRUD（`/knowledge-bases/{id}/faq/entries`，含单条详情 / 编辑 / 删除）、导出、`POST .../faq/entry`（单条新增）、相似问追加、字段批量更新（`/entries/fields`）、标签批量（`/entries/tags`）、检索（`POST .../faq/search`）、导入进度（`GET /api/v1/faq/import/progress/{taskId}`，注意不带 KB 前缀）、上次导入结果展示状态（`PUT .../import/last-result/display`）。
 
 **知识库本体**（`KnowledgeBaseController`，前缀 `/api/v1/knowledge-bases`，**13 个**）
 
@@ -263,10 +266,10 @@ erDiagram
 | GET | `/{id}/move-targets` | 可搬移的目标库列表 |
 | POST / GET | `/{id}/hybrid-search` | KB 内混合检索（写 / 读两种载荷） |
 | POST | `/copy` + `GET /copy/progress/{taskId}` | 克隆 KB（异步任务 + 进度） |
-| POST | `/{id}/duplicate` | 仅同步 settings（命中重复文档 → 409 特殊信封） |
-| POST | `/{id}/rebuild-index` | 全量重建向量索引 |
+| POST | `/{id}/duplicate` | 仅同步 settings → **201** + `{sourceId,targetId,knowledgeBase}` |
+| POST | `/{id}/rebuild-index` | 全量重建向量索引（返回重建文档数） |
 
-> ⚠️ **配置更新的第二条路径**：前端 `updateKBConfig` 实际打的是 **agentm 域**的 `PUT /api/v1/initialization/config/{kbId}`（自有契约、**内层键仍是 snake**），与本表的 `PUT /{id}` 并存——改配置语义前先确认改的是哪条。
+> ⚠️ **配置更新的第二条路径**：前端 `updateKBConfig` 实际打的是 **initialization 域**的 `PUT /api/v1/initialization/config/{kbId}`（自有契约、内层键同为 camelCase），与本表的 `PUT /{id}` 并存——改配置语义前先确认改的是哪条。
 
 **运维**（`KnowledgeOperationsController`，8 个）：跨库搜索（`GET /knowledge/search`）、标签批量（`PUT /knowledge/tags`）、批量删除/重析、文件夹增删、跨库搬移（`POST /knowledge/move` + `GET /knowledge/move/progress/{taskId}`）。
 
@@ -277,10 +280,10 @@ erDiagram
 | 约定 | 说明 |
 |---|---|
 | 字段名 | **JSON 名 = Java 字段名**（camelCase），禁止逐字段 `@JsonProperty` / 类级 `@JsonNaming` |
-| 信封 | **无** `{data, success}` 信封：资源直出、列表裸数组或 `{items,page,pageSize,total}` |
-| 删除 | 返回 **204**（无 body） |
+| 信封 | **统一响应外壳**：控制器带 `@ApiResult`（`common/web` 的 `ApiResultAdvice` 织入），成功一律 `{code:0, message:"ok", data:…}`；资源/列表进 `data`，**外壳恒存在** |
+| 状态码 | 语义仍在 HTTP 状态上（创建 201、冲突 409 等，advice 只包 body 不改状态）；**删除类也是 200 + 外壳**（204 已退役，`ApiResponse.ok()`） |
 | 可空字段 | **显式输出 `null`**（不做空值省略） |
-| 错误 | `{error: {code, message, details}}`；校验错误的 `details` 是**字段级中文**（`字段名: 原因`） |
+| 错误 | `@ApiResult` 控制器 → `{code:N, message, data:details}`（与成功同码表，`AppError` 数字码）；校验错误的 `data` 是**字段级中文**（`字段名: 原因`，多行按字典序）；乐观锁冲突 409 |
 | 乐观锁 | 编辑类接口带 `expectedRevision`，冲突返回 409 |
 | 全限定名注解 | 不使用（除真同名冲突并在注释说明） |
 
@@ -313,7 +316,7 @@ sequenceDiagram
 
     FE->>C: POST /{id}/copy（或 /{id}/duplicate）
     C->>W: 异步克隆 → GET /copy/progress/{taskId} 轮询
-    Note over W: duplicate = 仅同步 settings；命中重复文档 → 409 特殊信封
+    Note over W: duplicate = 仅同步 settings → 201 + {sourceId,targetId,knowledgeBase}
 
     FE->>C: POST /{id}/rebuild-index
     C->>W: 全量重新向量化（返回重建的文档数）
@@ -325,16 +328,16 @@ sequenceDiagram
 
 | 动作 | 端点 | 关键实现 | 注意 |
 |---|---|---|---|
-| 创建 | `POST /api/v1/knowledge-bases` | `KnowledgeBaseService.createKnowledgeBase` | `ensureDefaults` 装配配置默认值；向量库绑定走 retriever 的绑定校验（归属 + 注册表哨兵，畸形 UUID 快拒） |
+| 创建 | `POST /api/v1/knowledge-bases` | `KnowledgeBaseService.createKnowledgeBase` | `ensureDefaults` 装配配置默认值；向量库绑定校验走 retriever（归属 + 注册表哨兵，畸形 UUID 快拒） |
 | 列表 / 详情 | `GET /api/v1/knowledge-bases` · `GET /{id}` | `listKnowledgeBases` / `getById` | 租户过滤 + 软删过滤 |
-| 更新 | `PUT /{id}` | `updateKnowledgeBase` | ⚠️ 配置还有第二条路径（agentm 的 `PUT /initialization/config/{kbId}`），见 §3.1 注 |
+| 更新 | `PUT /{id}` | `updateKnowledgeBase` | ⚠️ 配置还有第二条路径（initialization 的 `PUT /initialization/config/{kbId}`），见 §3.1 注 |
 | 置顶 / 目标库 | `PUT /{id}/pin` · `GET /{id}/move-targets` | `togglePin` / `listMoveTargets` | pin 是 per-(user,kb) 幂等切换 |
-| 克隆 | `POST /copy` + `GET /copy/progress/{taskId}` | `KnowledgeCloneService` | 异步任务；`POST /{id}/duplicate` 是"仅 settings 同步" |
+| 克隆 | `POST /copy` + `GET /copy/progress/{taskId}` | `KnowledgeCloneService` | 异步任务；`POST /{id}/duplicate` 是"仅 settings 同步"，同步完成 201 |
 | 重建索引 | `POST /{id}/rebuild-index` | 全量重新向量化 | 返回重建文档数（`RebuildIndexResponse`） |
-| 删除 | `DELETE /{id}` · `DELETE /knowledge-bases/{id}/knowledge` | `deleteKnowledgeBase` | **软删**（`deleted_at`）三张表 + 删 pin，不做物理删除 |
+| 删除 | `DELETE /{id}` · `DELETE /knowledge-bases/{id}/knowledge` | `deleteKnowledgeBase` | **软删**（`deleted_at`）三张表 + 删 pin，不做物理删除；返回 200 + 外壳（204 已退役） |
 | 兜底 | 无端点（周期任务） | `HousekeepingService` | 扫描"卡在处理态"的行判 failed；用户可见失败的最坏时延 ≈ 1 个 stale 阈值 + 1 个清扫周期 |
 
-`HousekeepingService` 的存在理由（**接手必读**）：worker 被杀、DocReader 超时、多模态计数收口失败——这三种情况没有任何端点会报错，只能靠它把永久 `processing` 的行推进到 `failed`，否则用户侧看到的是一个永远转的圈。
+`HousekeepingService` 的存在理由（**接手必读**）：worker 被杀、DocReader 超时、多模态计数收口失败——这三种情况没有任何端点会报错，只能靠它把永久 `processing` 的行推进到 `failed`，否则用户侧看到的是一个永远转的圈。开关与阈值走 `config/HousekeepingProperties`（`weknora.housekeeping.*`）。
 
 ### 4.2 文档入库与处理（HTTP → 五阶段）
 
@@ -356,7 +359,7 @@ sequenceDiagram
     FE->>C: POST /knowledge-bases/{id}/knowledge/file
     C->>F: createKnowledge(...)
     F->>FS: 存文件（storage/）＋ 落 knowledges（parse_status=pending）
-    F->>W: enqueue(knowledgeId)
+    F->>W: 经 KnowledgeProcessingQueue 端口 enqueue(knowledgeId)
     W->>Q: 提交异步任务
     Note over W,SP: 每次尝试（attempt）产生一棵 span 树
 
@@ -427,29 +430,31 @@ stateDiagram-v2
 - **FAQ 是"特殊文档"**：一个 FAQ 知识库 = 一篇 `knowledges` 记录（`type=faq`），每条 FAQ = 一个 `chunk`，其 `metadata` 是 `FaqChunkMetadata`（标准问 / 相似问 / 反例 / 答案 / 策略 / 开关）。
 - **写路径**：`FaqEntryCommandService`（单条增改删、字段批量、标签批量）→ `FaqChunkCodec`（编解码 metadata）→ `FaqIndexWriter`（写 chunks + 向量索引）。
 - **读路径**：`FaqEntryQueryService`（列表 / 详情 / 检索）+ 导出面。
-- **导入路径**：`FaqImportService`（状态机 + 进度 + 失败明细）→ 复用 `FaqIndexWriter`。
-- **进度查询**：`GET /faq/import/progress/{taskId}`；跨任务态由 `FaqImportTaskStore` 持有。
+- **导入路径**：`FaqImportService`（状态机 + 进度 + 失败明细，校验与批处理已切片到 `FaqValidateOps` / `FaqBatchOps`，行组装在 `FaqIndexRows`）→ 复用 `FaqIndexWriter`。
+- **进度查询**：`GET /api/v1/faq/import/progress/{taskId}`；跨任务态由 `FaqImportTaskStore` 持有（InProcess / Redis 双实现，见 §4.5）。
 
 ### 4.5 任务、进度与 span 树
 
 ```mermaid
 sequenceDiagram
     participant C as Controller
+    participant Q as KnowledgeProcessingQueue（入队端口）
     participant W as KnowledgeProcessWorker
-    participant Q as ChunkExtractTaskQueue / QuestionGenerationTaskQueue
     participant T as KnowledgeTaskExecutor
     participant SR as KnowledgeSpanRepository
     participant P as KnowledgeTaskProgressStore
 
-    C->>W: enqueue(knowledgeId)
+    C->>Q: enqueue(knowledgeId)
+    Q->>W: 提交 worker（生产方不直连 worker bean）
     W->>T: submit("knowledge-process", task)
-    T->>Q: 取任务（InProcess 实现，可替换为 MQ）
+    T->>Q: 取任务（InProcess / Redis 双实现）
     T->>SR: 写 span（name/parent/status/startedAt）
     T->>P: 更新任务进度（taskId → 进度）
     Note over C,SR: GET /knowledge/{id}/stages<br/>→ KnowledgeSpanService 合成树（返回 ObjectNode）
 ```
 
-- **队列是接口 + 进程内实现**（`InProcess*TaskQueue`）：换 MQ 只需实现同一接口，worker 不动。
+- **队列/进度是接口 + 双实现**：`ChunkExtractTaskQueue` / `QuestionGenerationTaskQueue` / `FaqImportTaskStore` / `KnowledgeTaskProgressStore`（move/clone 进度）各有 InProcess 与 Redis 两版；`task/KnowledgeRedisWiring` 在 `knowledge.redis-enabled=true` 时用 `@Primary` 切到 Redis——多实例部署下导入拦截与进度轮询（负载均衡打到任意副本）才成立。
+- **worker 与门面解耦**：入队走 `KnowledgeProcessingQueue` 端口（生产方不再反向捏住 worker bean）；worker finalize 后发 `KnowledgeProcessedEvent`，`KnowledgeSummaryService` 用同步 `@EventListener` 在发布线程内接（语义与原直调逐字一致）。
 - **span 与 attempt**：每次处理尝试一个 `attempt` 号，span 记录父链；`KnowledgeSpanService` 把行合成树，控制器直接返回（**不经过 DTO**，历史原因见 §7）。
 - **任务 ID**：`KnowledgeTaskIdCodec` 负责编解码（对外短 ID ↔ 内部）。
 
@@ -478,17 +483,18 @@ flowchart TD
 | 我想… | 主要改这里 | 别忘了 |
 |---|---|---|
 | 改 KB 创建默认值 / 校验 | `service/KnowledgeBaseService.createKnowledgeBase` + `ensureDefaults` | 向量库绑定校验走 retriever（哨兵文案 2200/2201）；补创建类 fixture |
-| 改处理卡死的兜底策略 | `service/HousekeepingService`（周期扫描 + stale 阈值） | 它决定“用户多久看到失败”，改阈值要看前端轮询节奏 |
-| 加一个端点 | `controller/` 加方法 + `dto/` 加请求记录（`@Valid`）+ `service/` 加用例 | 响应别手搓 `ObjectNode`；错误用 `AppError` / `BizException` |
-| 给文档/chunk 加字段 | `domain/` 实体 + `dto/` 响应记录 | **schema 两处同改**：`migrations/versioned/V1__baseline.sql` + `domains/src/test/java/com/ragagent/TestSchema.java`（否则 H2 报 `Column not found`） |
+| 改处理卡死的兜底策略 | `service/HousekeepingService`（周期扫描 + stale 阈值）+ `config/HousekeepingProperties` | 它决定“用户多久看到失败”，改阈值要看前端轮询节奏 |
+| 加一个端点 | `controller/` 加方法 + `dto/` 对应二级子包加请求记录（`@Valid`）+ `service/` 加用例 | 响应别手搓 `ObjectNode`；错误用 `AppError` / `BizException`（外壳自动包） |
+| 给文档/chunk 加字段 | `domain/` 实体 + `dto/` 响应记录 | **schema 两处同改**：`migrations/versioned/V1__baseline.sql` + `domains/src/testFixtures/java/com/ragagent/TestSchema.java`（否则 H2 报 `Column not found`） |
 | 加处理阶段 | `task/KnowledgeProcessWorker` + `KnowledgeService.ALL_STAGES` + `KnowledgeProcessingSpan.STAGE_*` | 前端进度条按阶段名渲染；补 fixture |
 | 改 jsonb 形状 | `domain/` 里的值类型 | 值类型字段一律显式输出；读方要容错 |
 | 改切分策略 | `chunker/`（`HeadingSplitter` / `HeuristicSplitter` / `LegacySplitter`）+ `support/ParserEngineRules` | `chunker/preview` 端点有契约 fixture（`cprev-*.json`） |
-| 改检索行为 | `retrieval/HybridSearchService`（融合/去噪）+ `service/ChunkVectorIndexer`（写索引） | 检索面有跨模块契约测试 |
+| 改检索行为 | `retrieval/HybridSearchService`（融合/去噪）+ `service/ChunkVectorIndexer`（写索引，注入 `retrieval/engine/VectorStoreService`） | 检索面有跨模块契约测试 |
 | 改 FAQ 编辑语义 | `service/FaqEntryCommandService` + `FaqChunkCodec`（metadata 编解码） | `FaqChunkMetadata` 的 javadoc 写明"落库 JSON 即契约" |
-| 改 FAQ 导入 | `service/FaqImportService`（状态机）+ `FaqIndexWriter` | 进度/失败明细会被前端轮询消费 |
+| 改 FAQ 导入 | `service/FaqImportService`（状态机）+ `FaqValidateOps` / `FaqBatchOps` / `FaqIndexRows` + `FaqIndexWriter` | 进度/失败明细会被前端轮询消费 |
 | 改存储位置 | `storage/`（`LocalStorageService` / `TenantFileStorage`） | `LOCAL_STORAGE_BASE_DIR` **必须放持久目录、严禁 /tmp**（旧环境踩过丢文件） |
 | 改访问控制 | `security/` 四个 guard | 守卫改动要补 403/404/409 三类 fixture |
+| 加部署开关 | `config/`（`@ConfigurationProperties` 记录） | 只承载原始串/开关，解析与默认值留在用它的服务里 |
 
 ---
 
@@ -500,11 +506,13 @@ flowchart TD
 # 每次改动后必跑（约 3 分钟）
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
   ./gradlew :domains:test :domains:spotlessCheck
+# 结构/契约类守卫（包环、键名口径、外壳合规等十一守卫）可单跑：
+./gradlew :guards
 # 若动了前端可见契约（字段名/信封/状态码），同批带前端：
 cd frontend && npx vue-tsc --build --force && npm test
 ```
 
-**A. 加端点**：`dto` 请求 → `controller`（`@Valid`）→ `service` 用例（装配在门面）→ 补契约 fixture（`domains/src/test/resources/contracts/`）→ 三绿 → 提交。
+**A. 加端点**：`dto` 请求 → `controller`（`@Valid`）→ `service` 用例（装配在门面）→ 补契约 fixture（`domains/src/testFixtures/resources/contracts/`）→ 三绿 → 提交。
 
 **B. 加字段**：`domain`（若落库）→ baseline SQL + `TestSchema` → `dto` 响应 → fixture → 三绿。若字段对**前端可见**，同批改前端类型与页面。
 
@@ -526,17 +534,19 @@ cd frontend && npx vue-tsc --build --force && npm test
 6. **注释判据**：写"名字看不出来的"（三态语义、乐观锁、视图 vs 写入形状的差异、jsonb 列名）；不写名字即语义的 CRUD 请求体。**别在注释里写 git 历史/批次代号**。
 7. **`KnowledgeSpanService` 返回 `ObjectNode` 而非 DTO**：属历史面（span 树形状由仓储行合成），改动它等于改前端进度树契约。
 8. **`chunker/LegacySplitter` 的 "legacy" 是算法分档**（Tier 3），不是待删遗留。
+9. **别新增 >600 行的主源码文件**（大文件棘轮守卫盯存量清单，只许减不许增）；`KnowledgeProcessWorker`（847 行）等是既有存量，改到时能切片就顺手切。
 
 ---
 
 ## 8. 测试与验证
 
-- **规模**：**4,681** 个后端用例（含 6 个 skip）/ 1,366 个契约 fixture；本模块的 fixture 在 `domains/src/test/resources/contracts/`（`chunk-*`、`cprev-*`、`faq-*`、`knowledge-*`、`kb-*`）。
-- **比较口径**：契约比较器是**语义比较**（键序 / 转义归一化后比），fixture 锚定的是**本仓自己的行为**。
+- **规模**：28 个测试类 / 275 个用例——`:domains` 侧 `domains/src/test/java/com/ragagent/knowledge/` 15 类（单测与契约金片 round-trip），`:boot` 侧 `boot/src/test/java/com/ragagent/knowledge/` 13 类（MockMvc 全链路契约 + 仓储/服务测试）。
+- **契约金片**：全仓 `domains/src/testFixtures/resources/contracts/` 共 1,429 个；本域前缀 **`kb-*` / `kg-*`（文档面）/ `ks-*`（搜索/搬移/克隆）/ `faq-*` / `chunk-*` / `cprev-*`（分块预览）合计 360 个**。
+- **比较口径**：契约比较器是**语义比较**（键序 / 转义归一化后比），fixture 锚定的是**本仓自己的行为**；响应体外壳 `{code,message,data}` 已进金片（`kb-get.json` 等）。
 - **已知偶发 2 例**（遇到先单独重跑，别误判回归）：
   - `WebToolsRecordingTest.searchWithContentFetchesLeadingPagesViaSharedFetchTool`（全量并发下偶发）
   - `EvaluationContractTest.getTerminalRunsExecution`（全量并发下偶发；单独 `--tests "*EvaluationContractTest"` 通过）
-- **改前端可见契约时**：后端与前端**同批**改完再提交。
+- **改前端可见契约时**：后端与前端**同批**改完再提交；金片键签名变化会被契约同步守卫拦下要求签字。
 
 ---
 
@@ -545,10 +555,10 @@ cd frontend && npx vue-tsc --build --force && npm test
 | 项 | 性质 | 建议 |
 |---|---|---|
 | ~~KB 配置 jsonb 无契约测试~~ | **已解决（2026-09-30）** | 新增 `knowledge/domain/KnowledgeBaseConfigJsonContractTest`（5 用例）钉死形状：键集合、空值/假值显式输出、7 个配置类型 round-trip、读取容错与「旧 snake 键不再映射」防回流 |
-| ~~搬移中防线两份实现、严格度不一致~~ | **已解决（2026-09-30，`9c01242`）** | `ChunkAccessGuard.rejectMovingKnowledge`（严格：形态异常 → 500）与 `KnowledgeFolderService.rejectMovingKnowledge`（宽松：形态异常**静默放行**）→ 同一份异常 metadata，走文件夹路由被放行、走编辑路由报错。建议统一到严格版（会改变"异常态放行"现行为，需单独一批 + 全量 fixture 验证） |
-| Go 兼容序列化层（`common/web`） | 技术债 | 全仓 400+ 引用，**必须一次性全仓删除**，不能按域分批 |
-| 静态分析闸门缺失 | 工程债 | 死局部变量、静态方法误用实例调用等问题只有 IDE 能发现，建议上 Checkstyle / ErrorProne 进 CI |
-| 死成员扫描器覆盖不全 | 工具债 | 现有扫描覆盖字段 / 私有方法 / 遮蔽 import，**不含未使用局部变量与顶层死类型** |
+| ~~搬移中防线两份实现、严格度不一致~~ | **已解决（2026-09-30，`9c01242`）** | `ChunkAccessGuard.rejectMovingKnowledge` 已是唯一实现，`KnowledgeFolderService` / `KnowledgeBatchOpsService` 复用；行为由 `ChunkAccessGuardMoveGuardTest`（6 用例）钉死 |
+| ~~Go 兼容序列化层必须一次性全仓删除~~ | **已解决（统一响应外壳落地）** | `@ApiResult` + `ApiResultAdvice` 全仓铺开（52 控制器已迁 50，余 2 已登记在 `scripts/check-api-envelope.py` 清单）；删除类 200 + 外壳，204 退役 |
+| 静态分析闸门仍缺 Checkstyle / ErrorProne | 工程债 | 死局部变量、静态方法误用实例调用等问题只有 IDE 能发现；死成员已有守卫脚本（`scripts/check-dead-members.py`），局部变量与顶层死类型仍不在覆盖内 |
+| `KnowledgeProcessWorker` 847 行（域内最大类） | 存量债 | 大文件棘轮只锁"不新增"；改到 worker 时按阶段边界顺手切片 |
 
 ---
 
@@ -561,8 +571,9 @@ cd frontend && npx vue-tsc --build --force && npm test
 | 处理进度怎么算 | `service/SpanTracker` + `KnowledgeSpanService` + `repository/KnowledgeSpanRepository` |
 | 切分策略怎么选 | `support/ParserEngineRules` + `chunker/Chunker` |
 | FAQ 元数据长什么样 | `domain/FaqChunkMetadata`（javadoc 即契约）+ `service/FaqChunkCodec` |
-| 向量索引怎么写 | `service/ChunkVectorIndexer` + `service/VectorStoreService` → `retrieval/` |
+| 向量索引怎么写 | `service/ChunkVectorIndexer` → `retrieval/engine/VectorStoreService`（本模块不直写向量库） |
 | 知识库怎么创建、默认配置怎么装配 | `service/KnowledgeBaseService`（`createKnowledgeBase` → `ensureDefaults`）+ 本文 §4.1 |
-| 处理卡住为什么最终会失败 | `service/HousekeepingService`（兜底网，见 §4.1） |
+| 处理卡住为什么最终会失败 | `service/HousekeepingService`（兜底网，见 §4.1；开关在 `config/HousekeepingProperties`） |
 | 谁在守卫权限 | `security/` 四个类（§4.6） |
-| 目录为什么这样分 | 本文 §1 + 每个包的 `package-info.java`（共 13 份，都是职责地图） |
+| 多实例部署要配什么 | `task/KnowledgeRedisWiring`（`knowledge.redis-enabled=true` 切四个面的 Redis 实现） |
+| 目录为什么这样分 | 本文 §1 + 每个包的 `package-info.java`（共 18 份，都是职责地图；`config/` 暂无） |

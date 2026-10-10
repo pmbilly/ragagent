@@ -2,7 +2,7 @@
 
 > **面向读者**：第一次接手 `com.ragagent.audit` 的架构师 / 高级开发者。
 > **目标**：30 分钟建立全局观 → 能定位改动点 → 能安全迭代（本模块有 66 个后端用例兜底，改错会立刻红）。
-> **数据口径**：2026-10-08 实测（`wc -l` 口径）：**14 个 java 文件 / 约 1.5 千行 / 5 个子包**。
+> **数据口径**：2026-10-11 实测（`wc -l` 口径）：**14 个 java 文件 / 1,499 行 / 5 个子包**（controller/domain/dto/mapper/service）。
 > **本文档的地位**：模块级导览；仓库级作业规范见仓库根 `HANDOFF.md`（§12 结构地图、§13 踩坑清单、§14 逐包重构范式）。
 
 ---
@@ -191,7 +191,7 @@ erDiagram
 | 游标语义 | **id 游标不是 created_at**（重复时间戳不打断翻页）；`nextCursor` = 本页最小 id，**空页为 0**，前端见 0 停止翻页 |
 | 元素键名 | `AuditLog` 15 键恒输出（null 也照写），键名 = camelCase（`tenantId`、`actorUserId`、`createdAt`…），与前端 `frontend/src/api/tenant/audit-log.ts` 的 TS 类型逐字对应。⚠️ 实体 javadoc 的 15 键清单写的是 snake 列名串，读代码时以前端契约为准（见 §7） |
 | 页大小 | 仓储默认 50、**硬帽 100**（`PageRequests.cap` 下推，防误配触发表扫描） |
-| 错误 | 统一错误体 `{error:{code,message,details}}`：租户 ID 非法 400、KB 权限 403、查询失败 500 |
+| 错误 | 外壳形态 `{code,message,data}`：租户 ID 非法 400、KB 权限 403、查询失败 500 |
 | 例外：守卫形态 | KB activity 第三层拒绝走 `GuardForbiddenException`，客户端看到的是 `{"error":"Forbidden: must own the resource or have the required role"}`——**不是** AppError 信封，刻意为之（该判定先于业务处理） |
 | 错误消息透传 | `listOrInternalError` 把原始异常消息带进响应体（前端抽屉逐字显示）；不转的话会被 `GlobalExceptionHandler` 换成固定 "Internal server error" |
 | 写 / 删接口 | **不适用**——本域 HTTP 面只读；写入全部经服务层由生产方触发 |

@@ -1,6 +1,7 @@
 # 服务端接口契约规范（camelCase）
 
-> **状态**：**v1.1（2026-10-02）**——v1.0（2026-09-29）只覆盖知识库模块；v1.1 起升格为**全服务端契约标准**，
+> **状态**：**v1.2（2026-10-11）**——**响应信封已二次翻转**：B183（2026-10-10）起全服务端实行**统一响应外壳**（`@ApiResult` + `ApiResultAdvice`，成功 `{code:0,message,data}`、删除类 **200** 不再 204、错误同形态），本文 §1.11/1.13/§2 的"去信封/204 定稿"条目**就此作废**，权威口径移至 **`docs/api-response-convention.md`**；本文保留 camelCase/可空显式 null/条件键禁令等仍有效的规范，以及 v1.0→v1.1 的落地史。
+> 前版：**v1.1（2026-10-02）**——v1.0（2026-09-29）只覆盖知识库模块；v1.1 起升格为**全服务端契约标准**，
 > 知识库模块的原有细则保留为第一批落地的实例。
 > **适用范围**：全部对外 HTTP 接口。v1.0 以来已完成：knowledge/retrieval/会话链/chunker/evaluation/model/
 > system/auth/memory/session/embed/mcp/datasource/wiki 十四域换锚 + 契约尾巴全清（HANDOFF §14.9r/§14.9s，
@@ -32,10 +33,10 @@
 | 1.8 | 内部字段不外泄（白名单原则） | 明确不输出：`tenantId`、`filePath`、`storageProviderConfig`、`deletedAt`（详见 §3 第 3/4/12 条） |
 | 1.9 | 键顺序 = DTO 声明顺序 | 前端不得依赖键顺序（现状的"字母序"是复刻 Go map 行为的实现细节，一并去除） |
 | 1.10 | 请求体用 DTO（record） | 禁止把数据库实体直接绑定为请求参数；未提供的可选字段语义 = "不修改" |
-| 1.11 | 成功/错误响应信封统一 | 见 §2 |
+| 1.11 | ~~成功/错误响应信封统一~~ → **v1.2 作废**：统一响应外壳 `{code,message,data}`（见 `api-response-convention.md` §1–§3） | ~~见 §2~~ |
 | 1.12 | 分层纪律 | Controller 只做参数校验与响应装配；分页/租户/软删条件统一经查询助手，不手写 |
-| 1.13 | 删除类接口返回 **HTTP 204**（无响应体）✅定稿 | 前端按状态码分支处理，不再解析 `message` |
-| 1.14 | **异步受理类接口返回 HTTP 202** + 任务标识 | 删除/重析/清空/搬移/复制的索引工作异步进行，202 表示"已受理未完成"；体为 `{taskId}` 或 `{deletedCount}`。**同步完成**的删除才是 204（1.13） |
+| 1.13 | ~~删除类接口返回 HTTP 204~~ → **v1.2 作废**：删除类 **200 + 统一外壳**（`data:null`），204 已全仓退役（B185–B208） | 前端解包 `data`，幂等语义不变 |
+| 1.14 | **异步受理类接口返回 HTTP 202** + 任务标识 | 仍有效（`FaqController`/`KnowledgeOperationsController` 的 ACCEPTED 路径）；v1.2 起 body 外壳化（`{taskId}`/`{deletedCount}` 进 `data`） |
 | 1.15 | 创建类接口返回 **HTTP 201** + 新资源视图 | 上传/URL/手工创建文档、创建知识库、创建副本均 201 |
 | 1.16 | **查询参数与路径变量同样 camelCase** | `pageSize`、`fileTypes`、`tagIds`、`folderPath`、`{tagId}`；校验文案里的字段名同步（如 `pageSize must be between 1 and 1000`） |
 | 1.17 | 不返回服务端生成的 UI 文案 | 受理/操作类响应不带 `message`（文案由前端本地化）；进度类载荷的 `message` 属运行时状态，保留 |
@@ -54,14 +55,18 @@
 
 ### 2.1 成功响应
 
-| | 现状 | 目标 |
+> **v1.2 注**：下表"目标"列是 v1.1 的历史目标，**已被统一外壳取代**——现势：所有成功响应 = `{code:0,message,data}`，
+> 载荷（资源/数组/分页容器/`{taskId}`）整体进 `data`；删除类 200 + 外壳；201/202 状态码保留只包 body。
+> 下表保留作历史决策记录。
+
+| | 现状（v1.0 时） | v1.1 目标（已被 v1.2 取代） |
 |---|---|---|
-| 单资源 | `{"data": {...}, "success": true}` | **直接返回资源对象** `{...}` |
-| 列表 | `{"data": [...], "success": true}` | **直接返回数组** `[...]` |
-| 分页 | `{"data": [...], "page": 1, "page_size": 20, "total": 123, "success": true}` | `{"items": [...], "page": 1, "pageSize": 20, "total": 123}` |
-| 删除类 | `{"message": "...", "success": true}` | **HTTP 204（无响应体）** ✅定稿 |
-| 异步受理 | `{"data": {...}, "message": "...", "success": true}` | **HTTP 202** + `{...}`（任务标识/计数，无 message） |
-| 创建 | `{"data": {...}, "success": true}` | **HTTP 201** + 资源视图 |
+| 单资源 | `{"data": {...}, "success": true}` | ~~直接返回资源对象~~ → `data` 内资源对象 |
+| 列表 | `{"data": [...], "success": true}` | ~~直接返回数组~~ → `data` 内数组 |
+| 分页 | `{"data": [...], "page": 1, "page_size": 20, "total": 123, "success": true}` | `data` 内 `{items,page,pageSize,total}` |
+| 删除类 | `{"message": "...", "success": true}` | ~~HTTP 204~~ → **200 + 外壳**（`data:null`） |
+| 异步受理 | `{"data": {...}, "message": "...", "success": true}` | **HTTP 202**，任务标识进 `data` |
+| 创建 | `{"data": {...}, "success": true}` | **HTTP 201**，资源视图进 `data` |
 
 ### 2.2 错误响应（全部统一，✅ 2026-10-02 全域落地）
 
@@ -508,9 +513,9 @@
 | 编号 | 决策点 | 定稿结论 | 落地要求 |
 |---|---|---|---|
 | **A** | 布尔字段命名 | **不保留 `is` 前缀**：JSON = Java 字段名（`pinned`/`enabled`/`recommended`） | 前端取值改为 `kb.pinned`；后端禁止 `@JsonProperty("is_xxx")` 与双 is 命名 |
-| **B** | 响应信封统一 | **本期一起做**（§2.1 / §2.2 全部落地）：成功直接返回资源/数组，分页 `{items,page,pageSize,total}`，错误统一 `{error:{code,message,details}}` | 前端统一请求层改造（拦截器级），取消逐接口解析 `data`/`success` |
+| **B** | 响应信封统一 | ~~本期一起做~~ **v1.2 再翻转**：统一外壳 `{code,message,data}`（前端唯一解包点 `utils/request.ts`）；历史 `{data,success}`/裸对象形态均退役 | 前端拦截器已按新口径改造（`api-response-convention.md` §3） |
 | **C** | 枚举化范围 | **对外契约字段全枚举化**（`status`/`type`/`answerStrategy`/`indexMode` 等），输出小写字符串；内部 DTO 不强制 | 后端用 `enum` + `@JsonValue`；前端用字符串联合类型承接 |
-| **D** | 删除类接口语义 | **HTTP 204（无响应体）** | 前端按状态码处理，不再解析 `message` 字段 |
+| **D** | 删除类接口语义 | ~~HTTP 204~~ → **200 + 统一外壳**（v1.2） | 前端解包 `data`，幂等语义不变 |
 
 > 以上四项自 Phase 2 起生效；Phase 0–1 期间 JSON 保持不变（结构重构 + 测试护栏）。
 

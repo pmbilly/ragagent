@@ -2,7 +2,7 @@
 
 > **面向读者**：第一次接手 `com.ragagent.auth` 的架构师 / 高级开发者。
 > **目标**：30 分钟建立全局观 → 能定位改动点 → 能安全迭代（本模块自带 186 个后端用例 + 264 个契约金片兜底，改错会立刻红）。
-> **数据口径**：2026-10-08 实测（`wc -l` 口径）：**96 个 java 文件 / 约 1.29 万行 / 8 个一级子包**（`apikey` 子域内另有 5 个次级包，`domain` 下另有 `tenantconfig/`）。
+> **数据口径**：2026-10-11 实测（`wc -l` 口径）：**83 个 java 文件 / 11,334 行 / 8 个一级子包**（`apikey` 子域内另有 5 个次级包；原 `domain/tenantconfig/` 配置 VO 与 `Tenant`/`TenantMapper` 实体已搬至 **`domains/tenant/`** 独立成域，见 §1.1）。
 > **本文档的地位**：模块级导览；仓库级作业规范见仓库根 `HANDOFF.md`（§12 结构地图、§13 踩坑清单、§14 逐包重构范式）。
 
 ---
@@ -25,9 +25,10 @@
 | RBAC 拦截器本体、`TenantContext`、`TenantRole` | `common/web` / `common/context` / `common/tenant`（本模块是最大消费方） |
 | KB 置备与存在性校验 | `knowledge` 的端口（`common/knowledge` 的 `KnowledgeBaseProvisioner`/`KnowledgeBaseGateway`） |
 | 存储后端置备与白名单 | `storage` 的端口（`common/storage` 的 `StorageBackendProvisioner`/`StorageAllowList`） |
-| 系统设置（system_settings 表）读写 | `system` 域（本模块经 `common/settings` 的 `SystemSettingGateway` 只读端口） |
-| 租户记忆配置值类型 | `common/settings` 的 `MemoryConfig`（已下沉，消 `auth ⇄ memory` 环） |
-| embed 公开面鉴权 | `embed` 域的 `EmbedAuthFilter`（`AuthFilter` 通道 1.5 让路） |
+| 系统设置（system_settings 表）读写 | `system` 域（本模块经 **`domains/settings`** 包的 `SystemSettingGateway` 只读端口） |
+| 租户记忆配置值类型 | `common/memory` 的 `MemoryConfig`（已下沉，消 `auth ⇄ memory` 环） |
+| 租户实体与租户配置 VO | `domains/tenant`（`Tenant`/`TenantMapper`/`APIPrincipalConfig`/各配置段/`TenantConfigRedaction`，自本包 `domain/` 搬出独立成域） |
+| embed 公开面鉴权 | `embedchannel` 域的 `EmbedAuthFilter`（`AuthFilter` 通道 1.5 让路） |
 
 ### 图 1：模块全景
 
@@ -42,7 +43,7 @@ graph TB
         CTRL["controller/（12 文件，5 个 controller）<br/>登录·租户目录·成员·邀请·API 主体"]
         AK["apikey/（27 文件）<br/>签发/校验/门禁/策略表"]
         SVC["service/（14 个）<br/>JWT·用户·租户·成员·邀请·OIDC"]
-        DOM["domain/（14 个，含 tenantconfig/ 6）<br/>实体 + jsonb 值类型"]
+        DOM["domain/（5 个）<br/>实体；租户配置 VO 已迁 domains/tenant/"]
         DTO["dto/（20 个）<br/>请求/响应记录"]
         MAP["mapper/（5 个）<br/>MyBatis-Plus 接口"]
         CFG["config/（1 个）<br/>JwtProperties"]
@@ -84,7 +85,7 @@ graph TB
 | `controller/` | 12 / 3,422（5 个 controller + 7 个切片协作者） | `@RestController`：参数校验（`@Valid`）、调 service、拼响应；协作者 `AuthOidcOps`/`AuthSessionOps`/`AuthBindingSupport`/`TenantCreateOps`/`TenantCrudOps`/`TenantConfigOps`/`TenantBindSupport` | 业务逻辑、SQL、手搓 `{data,success}` 信封（已清） |
 | `service/` | 14 / 3,086 | `UserService`（登录/注册/令牌生命周期）、`TenantService`/`TenantMemberService`/`TenantInvitationService`、`JwtService`、`OidcService`+`OidcStateCodec`/`OidcConfig`、`PasswordPolicy` | HTTP 形状（→ `dto/`）、SQL 细节（→ `mapper/`） |
 | `filter/` | 2 / 514 | `AuthFilter`（全局三通道认证）+ `WsAuthSupport`（JWT 装配链复用点） | 拦截器（→ `apikey/filter/` 或 `common/web`） |
-| `domain/` | 14 / 1,501（根 8 + `tenantconfig/` 6） | 实体（`@TableName`）+ `APIPrincipalConfig`（加密 jsonb 值类型）+ `tenantconfig/`（5 个租户配置值类型 + 1 个脱敏辅助 `TenantConfigRedaction`，**冻结面**，§7） | 请求/响应形状（→ `dto/`） |
+| `domain/` | 5 / 300 | 实体（`@TableName`）：`AuthToken`/`TenantInvitation`/`TenantMember`/`User`/`UserPreferences`。**租户配置 VO（`APIPrincipalConfig` 等 5 类）与脱敏 `TenantConfigRedaction` 已迁 `domains/tenant/`**（见 [`tenant-module-guide`](tenant-module-guide.md)） | 请求/响应形状（→ `dto/`） |
 | `dto/` | 20 / 430 | 一类型一文件：登录/注册/会话/租户/成员/邀请/偏好请求与响应 | 持久化注解 |
 | `mapper/` | 5 / 71 | MyBatis-Plus 接口（User/Tenant/TenantMember/TenantInvitation/AuthToken） | 业务判断、手写 SQL（手写 SQL 在 `apikey/mapper/`） |
 | `apikey/` | 27 / 3,836（controller 1 · domain 10 · filter 9 · mapper 3 · service 3） | **API Key 子域**：`TenantAPIKeyService`（签发/校验/撤销）、`APIKeyAuthChannel`（认证通道）、`APIKeyGateInterceptor`+`APIKeyRouteAuthorizer`+`APIKeyRoutePolicies`（门禁与策略表）、`TenantAPIKeyBootstrap`（建租户自动发 Key） | 人用登录面（归父包）；2026-09-30 由顶层包 `apikey` 并入（原与 auth 互相成环，并入即消环） |
@@ -202,7 +203,7 @@ erDiagram
 |---|---|---|
 | `users.preferences` | `UserPreferences` + `PgJsonTypeHandler` | **`NON_NULL` 保留**——部分更新协议：省略 = 保持原值，不是省略美化（§7.5）；`last_active_tenant_id=0` 是"清除偏好"哨兵 |
 | `tenants.retriever_engines` | `JsonNode` 透传 | 兼容历史裸数组 `[{...}]` 与现行 `{"engines":[...]}` 包装格式，读取后由 `TenantService` 归一化 |
-| `tenants.context_config` / `web_search_config` / `parser_engine_config` / `credentials` / `storage_engine_config` / `chat_history_config` / `retrieval_config` / `memory_config` | `JsonNode` 透传 | 读取路径"DB 存什么响应什么"；KV 面的**值类型**在 `domain/tenantconfig/`（5 类 + 脱敏辅助，snake 键冻结） |
+| `tenants.context_config` / `web_search_config` / `parser_engine_config` / `credentials` / `storage_engine_config` / `chat_history_config` / `retrieval_config` / `memory_config` | `JsonNode` 透传 | 读取路径"DB 存什么响应什么"；KV 面的**值类型**在 `domains/tenant/`（4 类键已 camel；`ParserEngineConfig` 27 处 snake 键 = MinerU 外部约定冻结面，见 §7.1） |
 | `tenants.api_principal_config` | `APIPrincipalConfig` + `APIPrincipalConfigTypeHandler` | **加密语义 handler**；实体字段 `@JsonIgnore`——任何响应都不输出 |
 | `tenant_api_keys.knowledge_base_ids` / `capabilities` | `List<String>` + `APIKeyStringListTypeHandler`（实体读路径）；`APIKeyRawJsonbTypeHandler`（mapper 手写 SQL 写路径，参数是已编码文本） | 手写 SQL 里**列名 `knowledge_base_ids`/`capabilities` 出现在 SQL 与 `@Result` 两处**——批量替换键名必须按文件白名单（§7.3） |
 
@@ -210,7 +211,7 @@ erDiagram
 
 1. 带自定义 typeHandler 的实体必须 `@TableName(autoResultMap = true)`（`User`/`Tenant`/`TenantAPIKey` 都是）——漏了会"写得进、查出来是 null"。
 2. `tenant_api_keys` 的写路径走 `TenantAPIKeyMapper` 手写 SQL，不是 wrapper——改它先读 `apikey/mapper/TenantAPIKeyMapper` 头注释。
-3. `domain/tenantconfig/` 是**冻结面**：5 个配置值类型共 113 处 `@JsonProperty` snake 键，由 `ct-kv-*` 金片钉住，别"顺手 camel 化"（§7.1）。
+3. 租户配置值类型已迁 `domains/tenant/`；其中**仅 `ParserEngineConfig` 保留 27 处 `@JsonProperty` snake 键**（MinerU 外部约定冻结面，`ct-kv-*` 金片钉住），其余 4 类已 camel（B132/B133 换锚）。别把 ParserEngineConfig"顺手 camel 化"。
 
 ### 2.3 状态与枚举
 
@@ -243,30 +244,30 @@ erDiagram
 | GET | `/validate` | 令牌自检（裸 `UserInfo`） |
 | GET | `/me` | 当前用户（裸 `CurrentUserResponse`，tenant 在**顶层**——见 §7.13） |
 | PUT | `/me/preferences` | 偏好部分更新（`NON_NULL` 协议） |
-| POST | `/change-password` | 改密（204；请求体 camelCase——snake 曾致恒 400，B54 修） |
+| POST | `/change-password` | 改密（200 + 外壳；请求体 camelCase——snake 曾致恒 400，B54 修） |
 | GET | `/oidc/config` · `/oidc/url` · `/oidc/start` · `/oidc/callback` | OIDC 四件套（config/url 在无鉴权白名单） |
-| POST | `/logout` | 吊销当前令牌（204） |
+| POST | `/logout` | 吊销当前令牌（200 + 外壳，无业务数据） |
 | POST | `/refresh` | 刷新（裸 `TokenPairResponse`，轮换出新对） |
 | POST | `/switch-tenant` | 切空间（重新签发令牌对） |
 
-**租户目录/KV 配置**（`TenantCatalogController` + 协作者 `TenantCreateOps`/`TenantCrudOps`/`TenantConfigOps`，9 个）：`POST|GET /api/v1/tenants`、`GET /api/v1/tenants/search`、`GET /api/v1/tenants/all`、`GET|PUT|DELETE /api/v1/tenants/{id}`（删除 204）、`GET|PUT /api/v1/tenants/kv/{key}`（7 个键：`web-search-config` / `prompt-templates` / `parser-engine-config` / `storage-engine-config` / `chat-history-config` / `retrieval-config` / `memory-config`；裸 config 对象，`web-search` 无配置时**显式 `null`**——直接返回 Java null 会变空体，须 `NullNode`）。
+**租户目录/KV 配置**（`TenantCatalogController` + 协作者 `TenantCreateOps`/`TenantCrudOps`/`TenantConfigOps`，9 个）：`POST|GET /api/v1/tenants`、`GET /api/v1/tenants/search`、`GET /api/v1/tenants/all`、`GET|PUT|DELETE /api/v1/tenants/{id}`（删除 200 + 外壳）、`GET|PUT /api/v1/tenants/kv/{key}`（7 个键：`web-search-config` / `prompt-templates` / `parser-engine-config` / `storage-engine-config` / `chat-history-config` / `retrieval-config` / `memory-config`；裸 config 对象，`web-search` 无配置时**显式 `null`**——直接返回 Java null 会变空体，须 `NullNode`）。
 
-**成员**（`TenantMemberController`，5 个）：`GET|POST /api/v1/tenants/{id}/members`（列表 `{members,page,pageSize,total}`）、`PUT|DELETE .../members/{user_id}`（改角色/移除，动作 204）、`POST /api/v1/tenants/{id}/leave`（离开；最后一个 owner 会被拒）。
+**成员**（`TenantMemberController`，5 个）：`GET|POST /api/v1/tenants/{id}/members`（列表 `{members,page,pageSize,total}`）、`PUT|DELETE .../members/{user_id}`（改角色/移除，动作 200 + 外壳）、`POST /api/v1/tenants/{id}/leave`（离开；最后一个 owner 会被拒）。
 
 **邀请**（`TenantInvitationController`，9 个）：`GET|POST|DELETE /api/v1/tenants/{id}/invitations*`、`POST /api/v1/tenants/{id}/invite-links`（链接邀请）、`GET /api/v1/me/invitations`（`{invitations,total}`）+ `/pending-count`（`{pendingCount}`）+ `POST .../{inv_id}/accept|decline`、`POST /api/v1/me/invitations/accept-by-token`（链接接受）。
 
 **API 主体**（`TenantAPIPrincipalController`，3 个）：`GET|PUT /api/v1/tenants/{id}/api-principal-config`、`POST .../api-principal-test-token`（签短时测试令牌；`has_hmac_secret` 只报是否配置，明文永不回显）。
 
-**API Key**（`apikey/controller/TenantAPIKeyController`，前缀 `/api/v1/tenants/{id}/api-keys`，4 个）：`GET`（裸数组）、`POST`（201，明文 Key **只在创建响应出现一次**）、`PUT|DELETE /{key_id}`（更新/撤销，删除 204）。**这四个端点刻意不进 API-Key 策略表**——Key 连 full-access 都进不来（否则一把 Key 能给自己续命/扩权）。
+**API Key**（`apikey/controller/TenantAPIKeyController`，前缀 `/api/v1/tenants/{id}/api-keys`，4 个）：`GET`（数组进 `data`）、`POST`（201，明文 Key **只在创建响应出现一次**）、`PUT|DELETE /{key_id}`（更新/撤销，删除 200 + 外壳）。**这四个端点刻意不进 API-Key 策略表**——Key 连 full-access 都进不来（否则一把 Key 能给自己续命/扩权）。
 
 ### 3.2 契约约定（改接口前必读）
 
 | 约定 | 说明 |
 |---|---|
-| 字段名 | **JSON 名 = Java 字段名**（camelCase）；冻结例外：`domain/tenantconfig/`（snake，§7.1） |
-| 信封 | **无** `{data,success}` 信封：登录/刷新/`/me` 等裸对象、列表 `{items,...}` 形态、删除类 **204**（A1/A2/B 三批 2026-10-01 换锚完成） |
+| 字段名 | **JSON 名 = Java 字段名**（camelCase）；冻结例外：`domains/tenant/ParserEngineConfig`（MinerU snake 约定，§7.1） |
+| 信封 | **统一响应外壳**（B183 起，`@ApiResult` + `ApiResultAdvice`）：成功 `{code:0,message:"ok",data:…}`（载荷进 `data`，201 只包 body 不改状态）；删除类 200 + 外壳（204 已退役）。旧 `{data,success}`/裸对象形态已退役；权威口径见 `docs/api-response-convention.md` |
 | 分页 | 成员 `{members,page,pageSize,total}`、邀请 `{invitations,page,pageSize,total}` |
-| 错误（controller 层） | 401 + `{"error":{code,message,details}}`（AppError 三段式） |
+| 错误 | 控制器层（命中 `@ApiResult`）：`{code,message,data}` 外壳形态（业务码见 `ErrorCode`）；**Dispatcher 之前的过滤器**（AuthFilter 401、API-Key 门禁 403）保持历史形态（如 `{"error":"Unauthorized: …"}` 纯字符串，`unauthorized-401` 金片为准） |
 | 错误（**filter/拦截器层**） | **纯字符串信封**：401 `{"error":"Unauthorized: ..."}`、API-Key 门禁 403 `{"error":"Forbidden: API key scope does not allow this operation"}`、RBAC 403 `{"error":"Forbidden: insufficient workspace role"}`、无空间 409 `{"code":"TENANT_REQUIRED","error":"Workspace required"}`（键按字母序）——**与 AppError 形态不同，golden 逐字节锁定，别"统一"** |
 | 401 文案 | `bearerPresented` 区分"未登录"与"登录态过期"两条文案 |
 | 可空字段 | 显式输出 `null`（`lastUsedAt`/`expiresAt` 恒在）；`UserPreferences` 例外见 §2.2 |

@@ -2,7 +2,7 @@
 
 > **面向读者**：第一次接手 `com.ragagent.system` 的架构师 / 高级开发者。
 > **目标**：30 分钟建立全局观 → 能定位改动点 → 能安全迭代（本模块有 19 条契约用例兜底，改错契约会立刻红）。
-> **数据口径**：2026-10-08 实测（`wc -l` 口径）：**11 个 java 文件 / 约 2.9 千行 / 5 个子包**。
+> **数据口径**：2026-10-11 实测（`wc -l` 口径）：**11 个 java 文件 / 2,949 行 / 5 个子包**（键注册表与只读端口在邻包 `settings/`，见 [`settings-module-guide`](settings-module-guide.md)）。
 > **本文档的地位**：模块级导览；仓库级作业规范见仓库根 `HANDOFF.md`（§12 结构地图、§13 踩坑清单、§14 逐包重构范式）。
 
 ---
@@ -188,7 +188,7 @@ erDiagram
 | 响应键名 | JSON 名 = Java 字段名（camelCase）；`@JsonProperty` 已 **99 → 0**（§14.9f/g） |
 | 请求键名 | 管理面已 DTO 化（`@Valid` + 显式 message 如 `userId: 不能为空`）；**两个 check 端点 + docreader/reconnect 仍收 rawBody、键名 snake**——与租户配置 jsonb 同形，登记冻结面，待解冻再 DTO 化（controller javadoc + §14.9f） |
 | 信封 | **无** `{data,success}` 信封：裸资源对象 / 裸数组 |
-| 删除与动作 | reset 设置、reset-password、删 key → **204**（无 body） |
+| 删除与动作 | reset 设置、reset-password、删 key → **200 + 外壳**（204 已退役） |
 | 可空字段 | **显式输出 null**；虚拟行 id 输出 0（零值不是 null）；时间戳零值为 `0001-01-01T00:00:00Z` |
 | 错误 | AppError 信封；**settings 的校验文案原文即响应体**（`invalid value for "x" (expected int): ...`）；runtime mutate/purge → 503 |
 | 审计 details | `target_email` / `quota_gb` / `old_value` 等**有意保留 snake**（跨域事件载荷，独立批次，勿当漏网——§14.9g"有意保留"清单） |
@@ -319,7 +319,7 @@ cd frontend && npx vue-tsc --build --force && npm test
 6. **capabilities 的键序与部署漂移**：JSON 输出必须按键字母序（holder 用 LinkedHashMap 保序所以按字母序插入）；capabilities 表达**部署状态**而非代码契约，跨部署不做字节比对。出处：`DeploymentCapabilitiesHolder` 注释 + `SystemContractTest` javadoc。
 7. **探测逻辑长在 controller 里**：`SystemController` 700 行，storage check 的 7 个 provider 分支、文案分派、`overridesFromRaw` 的 20+ 个 snake 键全在 controller。改 provider 语义只动这一处，但别把它当 service 层逻辑复用。
 8. **换锚/改键名前统计要两种写法都 grep**（`@JsonProperty` 与全限定 `@com.fasterxml...`）：auth 域曾因短名 grep 漏算 98 处。出处：HANDOFF §14.9h"口径修正"。
-9. **文档计数有两处已漂移，以实测为准**：`SystemSettingRegistry` javadoc 写"17 条"、实测 16 个键；`SystemContractTest` javadoc 写"/system/admin 组 16 条"、实测 17 个端点。出处：2026-10-08 实测（`grep -c "spec("` / `@Mapping` 注解计数）。
+9. ~~文档计数漂移~~ **2026-10-11 复核**：`SystemSettingRegistry` 17 个键（javadoc 正确，B227 曾误数 16 系漏数跨行调用）；`SystemContractTest` javadoc 写"/system/admin 组 16 条"、实测 17 个端点仍以 `@Mapping` 计数为准。
 
 ---
 

@@ -1,16 +1,21 @@
-# 后端分包地图与体检结论（2026-09-30）
+# 后端分包地图与体检结论（2026-10-11 复核）
 
 > **用途**：新人 30 分钟建立"哪个功能在哪个包"的全局观；后续会话按本文的 **P0–P3 待办**推进，
 > 不用重新摸索。**复测**：`python3 scripts/pkg-audit.py`（口径见脚本 docstring）。
-> **基线数据**：**31 个顶层包**（2026-09-30：`apikey`→`auth`、`agentm` 拆出 `initialization`、`searchutil`→`retrieval/support`、`storageurl`→`storage/support`、`webfetch`→`agent/support`）/ **1634 文件 / 284k 行**（`com.ragagent` 子树）；顶层 `package-info` **33/34**（仅 `session` 待其批次补）。
+> **基线数据（2026-10-11 实测）**：**34 个顶层包**（`:domains` 22 + `:engine` 8 + `:common` 4，`config` 归 `:boot`）/ **1,910 文件 / 287k 行**（main Java）；顶层 `package-info` 全覆盖。
+> 历史口径（2026-09-30：31 包 / 1,634 文件 / 284k 行）见 git 历史版本。§3 以下的 P0–P3 待办**保留为过程档案**（内嵌各批次的执行批注），现势以头部与 §1 为准。
 
 ## 1. 三类包（先分清性质，再判断"合理与否"）
 
 | 性质 | 包 | 判定 |
 |---|---|---|
-| **业务域（19）** | knowledge、agent（含 `management/` 子域，2026-10-03 由 `agentm` 并入）、initialization、wiki、session、datasource、memory、mcp、auth（含 `apikey/` 子域）、audit、im、storage、model、system、websearch、embed、vectorstore、favorite、evaluation | 有 `controller/service/domain/dto/mapper/repository` 六件套，HTTP 面明确 |
-| **库式域（4）** | `llm`、`retrieval`、`chatpipeline`、`event` | **无 controller 是对的**——被其他域调用的引擎/管线（`retrieval` 被 chatpipeline 19 文件、knowledge 10、session 7 消费） |
-| **基础设施（7）** | `common`、`config`、`stream`、`modelcontext`、`tracing`、`embedding`、`rerank`（`searchutil`/`storageurl`/`webfetch` 已并入宿主域，见 §3.5）| 横切能力；`common` 被 **30 个包**依赖（位置正确） |
+| **业务域（22，`:domains`）** | knowledge、agent（含 `management/` 子域）、wiki、session、datasource、memory、mcp、auth（含 `apikey/` 子域）、im、storage、model、system、**settings**、**tenant**、websearch、embedchannel、vectorstore、favorite、evaluation、initialization、audit、**approval** | 有 `controller/service/domain/dto/mapper/repository` 六件套（小域或缺省一二件），HTTP 面明确 |
+| **能力层（8，`:engine`）** | `retrieval`、`llm`、`chatpipeline`、`embedding`、`rerank`、`modelcontext`、`tracing`（检索 span 面）、`webfetch` | **无 controller 是对的**——被其他域调用的引擎/管线/provider 客户端 |
+| **平台层（4+1）** | `common`、`event`、`stream`、`tracing`（Langfuse 面，`:common`）+ `config`（`:boot` 组合根） | 横切能力；`common` 被全部业务/能力包依赖（位置正确） |
+
+> 包→模块归属速记：**Java 包共享 `com.ragagent` 根，模块边界由 ArchUnit + 包级棘轮强制**（见 README「总体架构」）。
+> 历史：`embed` 已改名 `embedchannel`；`modelcontext`/`webfetch` 曾先后并入 agent 侧（B35/批 1），现随 `:engine`
+> 独立成包（B116 多模块后归位能力层）；`settings`/`tenant` 为 2026-10 拆出（conversation 配置下沉、租户实体归位）。
 
 **分层约定**（§2.13）：`mapper/` 只放 MyBatis-Plus 接口；`repository/` 放仓储门面（软删/乐观锁/方言）；
 `service/` 放 Spring 服务；`support/` 放无状态算法；其余按 `task/client/storage/security` 角色；
@@ -183,7 +188,7 @@ B33 已归位：`AppEnvLookup` → `common/deployment`、`StorageRuntimeEnv` →
 - [x] **顶层 `package-info` 全覆盖 31/31**（2026-09-30；28 个见 `809115c`，`session` 由批 P3 补：该域批次已交付，
       当时"故意留空避免撞车"的顾虑不再成立）；
 - [ ] `model` 既是顶层域又是层名（`model/domain` vs `auth/domain`）→ 至少在文档里点名，改名后议；
-- [ ] 四个近邻包易混：`embed`(12，HTTP 叶子域，0 包引用) / `embedding`(21，provider 客户端) / `vectorstore`(12) / `rerank`(14)；
+- [x] ~~`embed` 与 `embedding` 易混~~ → **已改名 `embedchannel`**（HTTP 叶子域，0 包引用；HTTP 路径 `/api/v1/embed/*` 不变）；近邻辨析见两份手册（`embedchannel`/`embedding`/`vectorstore`/`rerank`）。
 - [x] **放错包 / 倒挂清零（2026-09-30，批 P3，体检 ④⑤ 已无输出）**：
       `AuditLogListResponse` → `audit/dto`、`WikiActivityAudit`（wiki→audit 的端口接缝）→ `wiki/domain`；
       4 个控制器改走服务层/领域类型（`MemoryController`/`SessionController`/`MessageSuggestionController`/
@@ -197,13 +202,14 @@ B33 已归位：`AppEnvLookup` → `common/deployment`、`StorageRuntimeEnv` →
 ### 分层规则（`scripts/check-package-cycles.py` 可校验其一）
 
 ```
-L4  config                      组合根：Spring 装配；**只出不进**（任何域不得依赖它）
-L3  业务域                       knowledge agent session wiki datasource im memory mcp auth
-                                 audit model storage system websearch embedchannel favorite evaluation
+L4  :boot/config                 组合根：Spring 装配；**只出不进**（任何域不得依赖它）
+L3  :domains 业务域              knowledge agent session wiki datasource im memory mcp auth
+                                 audit model storage system settings tenant websearch
+                                 embedchannel vectorstore favorite evaluation initialization approval
      └ 同级之间：禁直连对方 mapper/实体；跨域走**窄接口（port）或事件**
-L2  能力层                       llm retrieval embedding rerank chatpipeline
-     └ 不得依赖 L3；只接受**配置值**而非业务实体
-L1  平台                         common event stream tracing
+L2  :engine 能力层               llm retrieval embedding rerank chatpipeline modelcontext webfetch tracing*
+     └ 不得依赖 L3；只接受**配置值**而非业务实体（*引擎 span 面的 tracing）
+L1  :common 平台                 common event stream tracing
 ```
 
 ### 契约层命名规范（2026-10-08 B120 定）
@@ -229,8 +235,7 @@ L1  平台                         common event stream tracing
 刻意未动：`VectorStoreLookup.byId`（通用词、124 处命中里多为同名局部变量，分辨成本大于收益）、
 `QaSearchTargets` 的局部 `Map kbById`（局部变量，非契约面）。
 
-### 顶层包 34 → 约 29（并入/改名 5 处 + 1 处待定）
-### 顶层包 34 → 约 29（并入/改名 5 处 + 1 处待定）
+### 顶层包重组档案：34 → 30（并入/改名 5 处，过程记录；现势见 §1）
 
 | 现在 | 重组后 | 理由 |
 |---|---|---|
@@ -284,7 +289,7 @@ system websearch favorite evaluation common config event stream tracing`。
 - ~~`im` / `datasource`~~：**用户已定：保留**（2026-09-30，不再考虑删除）——其结构可按 §14 正常重构；
 - `evaluation`：§2.5 待排期可选项；
 - `agent` 根级 26 个文件：此前已裁定"扰动/收益比不划算"；
-- §11 边界清单（租户配置 jsonb、auth 域、agent fixture、工具输出自有 schema、检索引擎索引文档、Go 工具面 5 类）。
+- §11 边界清单（租户配置 jsonb、auth 域、agent fixture、检索引擎索引文档；~~Go 工具面 5 类~~已退役，字节约束由 `ProviderJson`/`EventJson`/`StreamJson`/`RemoteApiBodyCodec.byteOrderSorted` 承接）。
 
 ## 5. 风险提示
 

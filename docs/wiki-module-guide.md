@@ -1,8 +1,8 @@
 # wiki 模块手册
 
 > **面向读者**：第一次接手 `com.ragagent.wiki` 的架构师 / 高级开发者。
-> **目标**：30 分钟建立全局观 → 能定位改动点 → 能安全迭代（本模块有 481 个测试方法兜底，改错会立刻红）。
-> **数据口径**：2026-10-08 实测（`wc -l` 口径）：**156 个 java 文件 / 约 2.39 万行 / 8 个子包**。
+> **目标**：30 分钟建立全局观 → 能定位改动点 → 能安全迭代（本模块有 32 个测试类 / 479 个用例 + 16 个契约金片兜底，改错会立刻红）。
+> **数据口径**：2026-10-11 实测（`wc -l` 口径）：**156 个 java 文件 / 23,707 行 / 8 个子包**。
 > **本文档的地位**：模块级导览；仓库级作业规范见仓库根 `HANDOFF.md`（§12 结构地图、§13 踩坑清单、§14 逐包重构范式）。
 
 ---
@@ -20,11 +20,11 @@
 
 | 不负责 | 归属 |
 |---|---|
-| 文档解析 / 分块 / 向量化 / 摘要（wiki 的"原料"来源） | `knowledge`（wiki 经 `common/wiki` 端口被它触发，读它的 `Knowledge`/`Chunk` 实体） |
+| 文档解析 / 分块 / 向量化 / 摘要（wiki 的"原料"来源） | `knowledge`（两域互相 **0 直接 import**：wiki 经 `common/knowledge` 视图端口读它的数据，经 `common/wiki` 两端口被它触发，见 §1.2/§4.3） |
 | agent 的 wiki 十件工具（`WikiReadPageTool` 等）的参数解析与视图 | `agent/tools/wiki`（数据经 `session/AgentToolWikiBackends` 桥到本包 `WikiPageService`） |
-| 审计落库 | `audit`（实现本域 `WikiActivityAudit` 接缝；缺 bean 时退化为 debug 日志） |
+| 审计落库 | `audit`（实现接缝 `common/audit/WikiActivityAudit`；缺 bean 时退化为 debug 日志） |
 | LLM 调用与重试传输 | `llm`（本域经 `WikiModelResolver` 解析合成模型，`WikiLlmRetryPolicy` 只管策略） |
-| wiki 功能开关 | `knowledge` 的 `IndexingStrategy.WikiEnabled`（本域只承载 `wiki_config` 调节项） |
+| wiki 功能开关 | `knowledge` 的 `KnowledgeBaseIndexingStrategy`（`isWikiEnabled`；本域只承载 `wiki_config` 调节项） |
 
 ### 图 1：模块全景
 
@@ -35,14 +35,14 @@ graph TB
     end
 
     subgraph wiki_模块
-        CTRL["controller/（9 文件：1 个 controller + 7 个 ops 协作者）<br/>21 个端点全部在此"]
+        CTRL["controller/（9 文件：1 个 controller 274 行 + 7 个 ops 协作者）<br/>21 个端点全部在此，@ApiResult 外壳"]
         PAGE["service/page/（22 文件）<br/>页面门面 / 文件夹 / 链接与 lint / slug 锁"]
         ING["service/ingest/（57 文件，域内最大）<br/>Map→Reduce→Finalize 管线 + 队列 / 锁 / 幂等 / 去重"]
-        PORT["service/ 根（12 文件）<br/>跨切面端口：ChunkCleaner / ImageEnricher /<br/>KnowledgeFinalizer / ModelResolver + 缺省实现"]
+        PORT["service/ 根（12 文件）<br/>跨切面端口：ChunkCleaner / ImageEnricher /<br/>KnowledgeFinalizer / ModelResolver + 缺省实现<br/>+ WikiPromptInstructions（一行委托 common）"]
         PRM["prompt/（3 文件）<br/>三条 prompt 模板"]
-        REPO["mapper/（6 接口）<br/>MyBatis-Plus 接口"]
-        RPO2["repository/（4 文件）<br/>仓储门面 WikiPage · WikiFolder · 死信 · 待重放"]
-        DOM["domain/（40 文件）<br/>6 实体 + 载荷 + 常量 + 异常"]
+        REPO["mapper/（7 文件）<br/>MyBatis-Plus 接口"]
+        RPO2["repository/（5 文件）<br/>仓储门面 WikiPage · WikiFolder · 死信 · 待重放"]
+        DOM["domain/（39 文件）<br/>6 实体 + 载荷 + 常量 + 异常"]
         WIRE["根：WikiRedisWiring<br/>六个协调端口装配"]
     end
 
@@ -76,7 +76,7 @@ graph TB
     REPO -.-> DOM
 ```
 
-**三个必须知道的数字**：**21 个端点全部收在 1 个 controller 里**（knowledge 域是 8 个 controller 68 个端点——两域形态完全不同）；`service/` 三层（根 + ingest + page）合计 16,466 行 ≈ **69%** 的代码量，其中 ingest 一个子包 11,264 行；最大类 762 行（`WikiIngestCitePipeline`），域内 ≥800 行 = 0（2026-10-01 已清零）。
+**三个必须知道的数字**：**21 个端点全部收在 1 个 controller 里**（knowledge 域是 8 个 controller 68 个端点——两域形态完全不同）；`service/` 三层（根 + ingest + page）合计 16,257 行 ≈ **69%** 的代码量，其中 ingest 一个子包 11,130 行；最大类 760 行（`WikiIngestCitePipeline`），域内 ≥800 行 = 0。
 
 ---
 
@@ -86,15 +86,15 @@ graph TB
 
 | 子包 | 文件/行数 | 放什么 | **不放什么** |
 |---|---|---|---|
-| 根 `wiki/` | 2 / 129（1 类 + package-info） | `WikiRedisWiring`：六个协调端口的 InProcess ↔ Redis 装配（`wiki.redis-enabled=true` 切换） | 业务逻辑 |
-| `controller/` | 9 / 1,617（1 个 controller 264 行 + 7 个 ops 协作者 + package-info） | `WikiPageController` 只做转发；`WikiPageOps`/`WikiFolderOps`/`WikiStatsOps`/`WikiMaintenanceOps` 拼 raw JSON；`WikiKbAccessGuard` 守卫；`WikiRequestSupport` 解析/错误 | 业务规则（→ `service/page`）、SQL |
-| `service/` | 12 / 652 | **跨切面端口与缺省实现**：`WikiChunkCleaner` / `WikiImageEnricher` / `WikiKnowledgeFinalizer` / `WikiModelResolver`（各带 Default 实现）+ LLM 重试策略与记账元数据 | 具体管线步骤（→ 两个子包） |
-| `service/ingest/` | 57 / 11,264 | 摄取管线：门面 `WikiIngestService`、Map/Reduce/Finalize 三相、cite 引用管线、任务队列与锁（InProcess/Redis 双实现）、幂等凭据、身份去重、死信与孤儿 op 重放 | 页面读写语义（→ `service/page`） |
-| `service/page/` | 22 / 4,550 | 页面服务（接口门面 `WikiPageService` + 732 行实现）、文件夹支撑、链接与 lint（`WikiLinkify`/`WikiCrossLinker`/`WikiDeadLinks`）、slug 锁与匹配、编辑上下文 | 摄取批次编排（→ `ingest`） |
+| 根 `wiki/` | 2 / 130（1 类 + package-info） | `WikiRedisWiring`：六个协调端口的 InProcess ↔ Redis 装配（`wiki.redis-enabled=true` 切换） | 业务逻辑 |
+| `controller/` | 9 / 1,633（1 个 controller 274 行 + 7 个 ops 协作者 + package-info） | `WikiPageController` 只做转发（`@ApiResult` 外壳入口）；`WikiPageOps`/`WikiFolderOps`/`WikiStatsOps`/`WikiMaintenanceOps` 拼载荷；`WikiKbAccessGuard` 守卫；`WikiRequestSupport` 解析/错误 | 业务规则（→ `service/page`）、SQL |
+| `service/` | 12 / 593 | **跨切面端口与缺省实现**：`WikiChunkCleaner` / `WikiImageEnricher` / `WikiKnowledgeFinalizer` / `WikiModelResolver`（各带 Default 实现）+ LLM 重试策略与记账元数据 + `WikiPromptInstructions`（公共实现上提 `common/prompt` 后的一行委托） | 具体管线步骤（→ 两个子包） |
+| `service/ingest/` | 57 / 11,130 | 摄取管线：门面 `WikiIngestService`、Map/Reduce/Finalize 三相、cite 引用管线、任务队列与锁（InProcess/Redis 双实现）、幂等凭据、身份去重、死信与孤儿 op 重放 | 页面读写语义（→ `service/page`） |
+| `service/page/` | 22 / 4,534 | 页面服务（接口门面 `WikiPageService` + 729 行实现）、文件夹支撑、链接与 lint（`WikiLinkify`/`WikiCrossLinker`/`WikiDeadLinks`）、slug 锁与匹配、编辑上下文 | 摄取批次编排（→ `ingest`） |
 | `mapper/` | 7 / 1,035 | 6 个 MyBatis-Plus 接口（`@MapperScan` 扫描范围）+ `package-info` | — |
-| `repository/` | 5 / 1,313 | 4 个仓储门面（`WikiPageRepository` 709 行：软删 / 时间戳 / 链接重算；另有文件夹、死信槽位、待重放队列）+ `package-info` | 业务判断 |
-| `domain/` | 40 / 2,539 | 6 个 `@TableName` 实体 + 请求/响应形状 + `WikiConstants`（页面类型 / 状态 / 修订保留策略）+ 异常族 + `WikiConfig` 值类型 | 队列载荷（→ `ingest` 的 `WikiIngestPayload`） |
-| `prompt/` | 3 / 834 | `WikiPrompts`（三条 prompt 正文）+ 模板渲染支撑 | 键名解析（解析类型在 `ingest`/`common/wiki`，键被 prompt 钉住，见 §7） |
+| `repository/` | 5 / 1,314 | 4 个仓储门面（`WikiPageRepository` 710 行：软删 / 时间戳 / 链接重算；另有文件夹、死信槽位、待重放队列）+ `package-info` | 业务判断 |
+| `domain/` | 39 / 2,504 | 6 个 `@TableName` 实体 + 请求/响应形状 + `WikiConstants`（页面类型 / 状态 / 修订保留策略）+ 异常族 + `WikiConfig` 值类型 | 队列载荷（→ `ingest` 的 `WikiIngestPayload`） |
+| `prompt/` | 3 / 834 | `WikiPrompts`（三条 prompt 正文）+ 模板渲染支撑 | 键名解析（解析类型在 `ingest`/`common/wiki`，键被 prompt 钉住，见 §7.6） |
 
 ### 1.2 依赖方向
 
@@ -111,7 +111,7 @@ graph LR
     F --> G["domain"]
     B --> G
 
-    B -.->|"读实体/分块 43 处"| H["knowledge"]
+    B -.->|"读知识数据<br/>经 common/knowledge 视图端口"| H["knowledge（适配器侧）"]
     C -.-> H
     K["knowledge"] -.->|"common/wiki 两端口"| C
     S["session/audit"] -.-> B
@@ -123,7 +123,7 @@ graph LR
     style H fill:#eceff1
 ```
 
-**枢纽有两个**：`WikiPageService`（页面门面接口，HTTP 与 session 桥两侧都只认它）和 `WikiIngestService`（实现 `common/wiki` 的 `WikiIngestPort`，对 knowledge 只暴露一个 `enqueueWikiIngest` 方法）。**方向红线**：`knowledge → wiki` 的 import 必须保持为 **0**（环已于 2026-09-30 经 `common/wiki` 值类型 + 两端口解开，`scripts/check-package-cycles.py` 守卫基线为环 0 组）；wiki → knowledge 的 43 处 import 是合法方向，但新增时要掂量是否该走窄端口。
+**枢纽有两个**：`WikiPageService`（页面门面接口，HTTP 与 session 桥两侧都只认它）和 `WikiIngestService`（实现 `common/wiki` 的 `WikiIngestPort`，对 knowledge 只暴露一个 `enqueueWikiIngest` 方法）。**方向红线**：`knowledge ⇄ wiki` 的包级 import 双向都保持为 **0**——knowledge 的数据 wiki 经 `common/knowledge` 的视图/网关端口读（`KnowledgeBaseLookup` / `ChunkPort` / `KnowledgeSpanPort` 等，knowledge 侧用 `service/` 下的 `KnowledgeBaseLookupAdapter` / `ChunkPortAdapter` / `KnowledgeSpanAdapter` 等实现），解环由 `scripts/check-package-cycles.py` 守卫（基线环 0 组）。要给 wiki 补知识数据面，先在 `common/knowledge` 加端口、knowledge 加适配器，别直接 import。
 
 ---
 
@@ -239,36 +239,37 @@ erDiagram
 
 ### 3.1 端点分组（1 个 controller / 21 个端点）
 
-唯一前缀：`/api/v1/knowledgebase/{kb_id}/wiki`（⚠️ 路径变量 `{kb_id}`/`{folder_id}`/`{issue_id}` 是 **snake**——历史路径，前端按此拼 URL，别"顺手"改 camel）。
+唯一前缀：`/api/v1/knowledgebase/{kbId}/wiki`（路径变量 `{kbId}`/`{folderId}`/`{issueId}` 为 **camelCase**；catch-all `{*slug}` 捕获值带前导 "/"，见 §7.4）。
+
+所有端点都声明在 `WikiPageController`（`@ApiResult`），执行体分派给四个 ops 协作者：
 
 **页面 CRUD**（`WikiPageOps`，5 个）
 
 | 方法 | 路径 | 用途 |
 |---|---|---|
-| GET | `/pages` | 页面列表（分页/类型/文件夹/路径过滤），`{pages,total,page,pageSize,totalPages}` |
-| POST | `/pages` | 创建页面 → **201** |
+| GET | `/pages` | 页面列表（分页/类型/文件夹/路径过滤），`data` 内 `{pages,total,page,pageSize,totalPages}` |
+| POST | `/pages` | 创建页面 → **201**（body 仍是外壳） |
 | GET | `/pages/{*slug}` | 页面详情（catch-all slug） |
-| PUT | `/pages/{*slug}` | 编辑（乐观锁 `version`；冲突 **409** `{currentVersion,error}`） |
-| DELETE | `/pages/{*slug}` | 删除（软删）→ **204** |
+| PUT | `/pages/{*slug}` | 编辑（乐观锁 `version`；冲突 **409**，`data` 内 `{currentVersion,error}`） |
+| DELETE | `/pages/{*slug}` | 删除（软删）→ **200 + 外壳**（204 已退役） |
 
 **修订历史**（2 个）：`GET /revisions/{*slug}`（列表）、`POST /revert`（回滚到历史版本）。
 
-**文件夹树**（`WikiFolderOps`，5 个）：`GET /folders`（树）、`POST /folders`（**201**）、`PUT /folders/{folder_id}`（重命名/移动）、`DELETE /folders/{folder_id}`（空才能删，**204**）、`PUT /move-page`（页面换文件夹）。
+**文件夹树**（`WikiFolderOps`，5 个）：`GET /folders`（树）、`POST /folders`（**201**）、`PUT /folders/{folderId}`（重命名/移动）、`DELETE /folders/{folderId}`（空才能删，**200 + 外壳**）、`PUT /move-page`（页面换文件夹）。
 
-**索引 / 图谱 / 统计 / 搜索**（`WikiStatsOps`，4 个）：`GET /index`（目录页）、`GET /graph`（关系图谱，overview/ego）、`GET /stats`、`GET /search`（`{pages:[...]}`）。
+**索引 / 图谱 / 统计 / 搜索**（`WikiStatsOps`，4 个）：`GET /index`（目录页）、`GET /graph`（关系图谱，overview/ego）、`GET /stats`、`GET /search`（`data` 内 `{pages:[...]}`）。
 
-**维护 / 问题**（`WikiMaintenanceOps`，5 个）：`POST /rebuild-links`、`GET /lint`（体检报告）、`POST /auto-fix`（`{fixed,message}`）、`GET /issues`（**裸数组**）、`PUT /issues/{issue_id}/status`（三态流转）。
+**维护 / 问题**（`WikiMaintenanceOps`，5 个）：`POST /rebuild-links`、`GET /lint`（体检报告）、`POST /auto-fix`（`data` 内 `{fixed,message}`）、`GET /issues`（`data` 内**裸数组**）、`PUT /issues/{issueId}/status`（三态流转）。
 
 ### 3.2 契约约定（改接口前必读，本域与 knowledge 域**不同**）
 
 | 约定 | 说明 |
 |---|---|
-| 字段名 | **JSON 名 = Java 字段名（camelCase）**——W1 换锚（2026-10-02）后的现状；**包根 package-info 与 `WikiPage` javadoc 里"JSON 键为 snake"的陈述已过期**，以 fixture（`wiki-page-get.json`）为准 |
-| 信封 | **无** `{data,success}` 信封：实体直出、裸数组（issues）、单键 map（search/rebuild） |
-| 键序 / 空值 | 键序 = 领域字段声明序（B75 摘键序注解后天然跟随声明）；**键恒输出**（`deletedAt:null` 也在）；空列表 → `null`（`EmptyListAsNullSerializer`） |
-| raw map | handler 直写的 map 按**键字母序**输出（`LinkedHashMap` 保证）：`{currentVersion,error}`、`{fixed,message}` 等 |
-| 状态码 | 创建 **201**、删除 **204**、乐观锁冲突 **409** |
-| 错误 | **双轨**：21 个端点里除"KB 访问被拒"外全部走 handler 直写 `{"error":"..."}`（**英文**文案）；KB 校验文案带 `error code: %d, error message: %s` 前缀（如 KB 未启用 wiki → 400 + 前缀文案）；仅 KB 访问拒绝走全局信封 `{success:false,error:{code,details,message}}`。controller javadoc 明写"**逐端点保持原样，不要统一它们**" |
+| 字段名 | **JSON 名 = Java 字段名（camelCase）**——载荷键、路径变量皆是；**包根 / `domain` package-info 与 `WikiPage` javadoc 里"JSON 键为 snake"的陈述已过期**，以 fixture（`wiki-page-get.json`）与 `WikiConstants` 为准 |
+| 信封 | **统一响应外壳**：控制器 `@ApiResult`，成功一律 `{code:0, message:"ok", data:…}`；实体直出 / 裸数组 / 单键 map 都装进 `data`。`data` 里的**载荷形态**仍分三路：实体直出（键序 = 领域字段声明序）、raw map（`{currentVersion,error}`、`{fixed,message}` 等，按**键字母序**）、裸数组（issues）；search 是 `{pages:[...]}` |
+| 状态码 | 语义在 HTTP 状态上：创建 **201**、乐观锁冲突 **409**、删除 **200**（204 退役）；advice 只包 body 不改状态——409 的响应体也是外壳包着 `{currentVersion,error}`（契约样例逐字节钉死） |
+| 键序 / 空值 | 键序 = 领域字段声明序；**键恒输出**（`deletedAt:null` 也在）；空列表 → `null`（`EmptyListAsNullSerializer`） |
+| 错误 | **统一外壳**：ops 抛 `RawJsonError` → 控制器 handler 经 `AppError.ofHttpStatus` 映射成 `{code:N, message, data:null}`（400/403/404 ⇒ 1010/1002/1003），HTTP 状态保持原样；KB 访问拒绝走全局 `GlobalExceptionHandler`，同一个壳。文案仍是**英文**，KB 校验文案保留 `error code: %d, error message: %s` 前缀（如 KB 未启用 wiki → 400 + 前缀文案） |
 | 守卫 | 读端点：Viewer+ 角色 + KB 读权限（跨租户经 org-share / shared-agent 只读授予）；写端点：创建者本人或 Admin+（否则 403）+ KB 写权限。角色下限在 `WebConfig` 注册，KB 访问判定由 `WikiKbAccessGuard` 承接 |
 
 ---
@@ -306,16 +307,16 @@ sequenceDiagram
     Note over H: cite 引用管线（WikiIngestCitePipeline，域内最大类）<br/>写 source_refs "id|title" 与 chunk_refs
 ```
 
-**失败与重试**：op 重试预算耗尽 → 落 `task_dead_letters`（`related_id=knowledge_id` 让失败聚拢到源文档）；孤儿 op 由 `WikiPendingOpReplayer` 启动重放（B12 修复）；`WikiCleanupScope` 保证批次异常退出时释放认领，不用干等 `CLAIM_STALE_AFTER`（90 分钟）。**并发模型**：Standard 模式同 KB 多批次并发、靠认领互不相交行；Lite 模式（无 Redis 单进程）每 KB 串行。
+**失败与重试**：op 重试预算耗尽 → 落 `task_dead_letters`（`related_id=knowledge_id` 让失败聚拢到源文档）；孤儿 op 由 `WikiPendingOpReplayer` 启动重放；`WikiCleanupScope` 保证批次异常退出时释放认领，不用干等 `CLAIM_STALE_AFTER`（90 分钟）。**并发模型**：Standard 模式同 KB 多批次并发、靠认领互不相交行；Lite 模式（无 Redis 单进程）每 KB 串行。
 
 ### 4.2 页面编辑链路（HTTP → 门面 → 仓储）
 
 ```mermaid
 flowchart TD
     A["PUT /pages/{*slug}"] --> G["WikiKbAccessGuard<br/>KB 启用 wiki? 角色与所有权"]
-    G -->|"拒绝"| X1["403/400<br/>error code 前缀文案"]
+    G -->|"拒绝"| X1["403/400<br/>外壳 + error code 前缀文案"]
     G --> O["WikiPageOps<br/>解析 rawBody → WikiEditContext<br/>(edit_source=user)"]
-    O -->|"version 不匹配"| X2["409 {currentVersion, error}<br/>英文文案"]
+    O -->|"version 不匹配"| X2["409 外壳<br/>data: {currentVersion, error}"]
     O --> S["WikiPageService 门面<br/>（HTTP 与 session 桥共用）"]
     S --> I["WikiPageServiceImpl<br/>slug 清洗 / 链接修复 repairContentLinks"]
     I --> R["WikiPageRepository<br/>软删 deleted_at IS NULL 显式写出<br/>时间戳补齐 / 链接重算"]
@@ -332,26 +333,30 @@ flowchart LR
     subgraph knowledge_域
         W["KnowledgeProcessWorker<br/>处理五阶段完成"]
         F2["finalizeWikiSubtask 调用点"]
+        AD["service/ 适配器：<br/>ChunkPortAdapter / KnowledgeSpanAdapter /<br/>KnowledgeBaseLookupAdapter / KnowledgeFinalizeAdapter"]
     end
 
-    subgraph common/wiki（值类型 + 端口）
-        P1["WikiIngestPort<br/>enqueueWikiIngest 1 方法"]
-        P2["WikiFinalizePort<br/>finalizeWikiSubtask 1 方法"]
-        VT["ExtractedItem / SlugUpdate /<br/>WikiImageMarkup / LanguageProperties"]
+    subgraph common 端口层
+        P1["common/wiki：WikiIngestPort<br/>（enqueueWikiIngest 1 方法）"]
+        P2["common/wiki：WikiFinalizePort"]
+        CG["common/knowledge：ChunkPort /<br/>KnowledgeSpanPort / KnowledgeBaseLookup /<br/>KnowledgeFinalizePort + 视图值类型"]
+        VT["common/wiki：ExtractedItem / SlugUpdate /<br/>WikiImageMarkup / LanguageProperties"]
     end
 
     subgraph wiki_域
         S["WikiIngestService<br/>实现 WikiIngestPort"]
-        D["DefaultWikiKnowledgeFinalizer<br/>实现 WikiFinalizePort<br/>递减计数，归零晋升 completed"]
+        D["DefaultWikiKnowledgeFinalizer<br/>经 KnowledgeFinalizePort 递减计数，归零晋升 completed"]
     end
 
     W --> P1 --> S
     F2 --> P2 --> D
-    S & D -.->|"wiki→knowledge 43 处（合法方向）"| K2["knowledge 实体与 mapper<br/>Chunk / Knowledge / KnowledgeBase / SpanTracker"]
+    W -.->|"读 chunk/span 走端口"| CG
+    CG -.-> AD
+    S & D -.->|"经 CG 读知识数据（0 直接 import）"| K2["knowledge 表"]
     S -.-> VT
 ```
 
-**为什么这样**：`WikiIngestService`（拆分前 1,208 行、依赖整套 wiki 服务）不能进 common，knowledge 只用到它一个方法 → 抽最窄端口（`common/wiki/WikiIngestPort` javadoc）；`DefaultWikiKnowledgeFinalizer` 依赖知识域实体与 Mapper（wiki→knowledge 的另一半），同样端口化。**撤回**走同一队列的 `retract` op：`WikiRetractPayload` 携带文档写过的 pageSlugs 与 folderIds → 单来源页删、多来源页 LLM 撤回、回收空目录。
+**为什么这样**：两域曾经互相 import 成环，解法是把知识数据读面也端口化——wiki 侧（ingest 三相、cite 管线、lint、页面服务共 20 个文件）只认 `common/knowledge` 的网关/视图（`ChunkPort` / `KnowledgeSpanPort` / `KnowledgeBaseLookup` 等），knowledge 侧用 `service/` 下的 `*Adapter` 实现它们；`DefaultWikiKnowledgeFinalizer` 的"递减 + 晋升"写也走 `common/knowledge/KnowledgeFinalizePort`。**现在两域包级 import 双向为 0**（环守卫基线环 0 组）。**撤回**走同一队列的 `retract` op：`WikiRetractPayload` 携带文档写过的 pageSlugs 与 folderIds → 单来源页删、多来源页 LLM 撤回、回收空目录。
 
 ---
 
@@ -360,8 +365,8 @@ flowchart LR
 | 我想… | 主要改这里 | 别忘了 |
 |---|---|---|
 | 改页面 CRUD / 编辑语义 | `service/page/WikiPageService`（门面）+ `WikiPageServiceImpl` | 409 冲突形态与英文文案在 `controller/WikiPageOps`；补 `wiki-*` fixture |
-| 改 HTTP 形态 / 错误文案 | `controller/WikiPageOps` + `WikiRequestSupport` | 错误信封是**双轨**（§3.2），别"统一"；raw map 键字母序 |
-| 改抽取 prompt / 文案风格 | `prompt/WikiPrompts` + `service/ingest/WikiIngestLlmSupport` | LLM 解析面键名（`source_chunks` 等 17 处）被 prompt 正文钉住，改键必须连 prompt 一起改（§7.6） |
+| 改 HTTP 形态 / 错误文案 | `controller/WikiPageOps` + `WikiRequestSupport` | 信封已是统一外壳（§3.2）；`data` 里的载荷形态（实体直出/raw map/裸数组）是对 Go 期契约的保真，改它们 = 改前端 |
+| 改抽取 prompt / 文案风格 | `prompt/WikiPrompts` + `service/ingest/WikiIngestLlmSupport` | LLM 解析面键名（`source_chunks` 等，见 §7.6）被 prompt 正文钉住，改键必须连 prompt 一起改 |
 | 改 Reduce 落页 / chunk 引用 | `service/ingest/WikiIngestReducePhase` + `WikiIngestCitePipeline` | `source_refs` 是 `id` 与 `title` 竖线拼接的约定，展示侧按竖线切分 |
 | 改 Finalize（索引/死链/交叉链接） | `service/ingest/WikiIngestFinalizePhase` + `page/WikiDeadLinks` / `WikiCrossLinker` | finalize 是独立任务通道（`wiki:finalize`，op 三种） |
 | 改去重 / 身份认领 | `service/ingest/WikiIdentityDedup` + `WikiIdentityClaimStore`（InProcess/Redis） | 认领失效直接表现为"同标题建出两个页面" |
@@ -369,7 +374,7 @@ flowchart LR
 | 改 lint / 自动修复 | `service/page/WikiLintService` | issue 三态校验在 `controller/WikiMaintenanceOps` |
 | 改 slug 规则 / 别名匹配 | `service/page/WikiSlugHandles` + `SlugFuzzy` + `ingest/NewSlugFromCitation` | 唯一索引是**部分唯一**（`WHERE deleted_at IS NULL`），已删 slug 可复用 |
 | 改多副本协调 | 根 `WikiRedisWiring` + 各端口 Redis 实现 | `wiki.redis-enabled=true` 才切 Redis；@Primary 必须因 InProcess 是无条件 @Component |
-| 加表 / 加字段 | `domain/` 实体 + `mapper/` | **schema 两处同改**：`migrations/versioned/V1__baseline.sql` + `domains/src/test/java/com/ragagent/TestSchema.java`；jsonb 记得 `autoResultMap` |
+| 加表 / 加字段 | `domain/` 实体 + `mapper/` | **schema 两处同改**：`migrations/versioned/V1__baseline.sql` + `domains/src/testFixtures/java/com/ragagent/TestSchema.java`；jsonb 记得 `autoResultMap` |
 | 改图谱 / 统计 | `service/ingest/WikiGraphCalculator` + `controller/WikiStatsOps` | 图谱"熟悉知识"叠加层（FamiliarKnowledgeIDs）恒 null，是已知差异 |
 | 改 agent 的 wiki 工具行为 | **不在本包**：`agent/tools/wiki/`，数据面在 `session/AgentToolWikiBackends` | 工具只认 `WikiPageService` 门面；实录测试在 `agent/tools/wiki/` |
 
@@ -383,6 +388,8 @@ flowchart LR
 # 每次改动后必跑（约 3 分钟）
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
   ./gradlew :domains:test :domains:spotlessCheck
+# 结构/契约类守卫（包环、键名口径、外壳合规等十一守卫）可单跑：
+./gradlew :guards
 # 若动了前端可见契约（字段名/信封/状态码），同批带前端：
 cd frontend && npx vue-tsc --build --force && npm test
 ```
@@ -391,39 +398,40 @@ cd frontend && npx vue-tsc --build --force && npm test
 
 **B. 改摄取行为**：先判断动的是哪一相（Map=prompt 面 / Reduce=落页面 / Finalize=收尾面）→ 对应 Phase 类 → prompt 改动要同步核对解析面键名 → `WikiIngest*Test` 全绿 → 提交。
 
-**C. 加端点**：`controller/` 对应 Ops 协作者加方法 → 形态遵守 §3.2（先确认该端点该走哪条错误轨道）→ 补 fixture → 三绿；**别给 wiki 引入 DTO 化之外的"信封统一"**。
+**C. 加端点**：`WikiPageController` 加转发方法 + 对应 Ops 协作者加执行体 → 形态遵守 §3.2（外壳恒存在；`data` 载荷形态先对齐同类端点）→ 补 fixture → 三绿 → 提交。
 
-**D. 加字段**：`domain/` 实体（jsonb 列记得 typeHandler + `autoResultMap`）→ baseline SQL + `TestSchema` → fixture 重录（`-Dcontract.refresh=true` 可批量，§13.12）→ **重录后必须结构化复核差异** → 三绿；前端可见则同批改 `frontend/src/api/wiki/`。
+**D. 加字段**：`domain/` 实体（jsonb 列记得 typeHandler + `autoResultMap`）→ baseline SQL + `TestSchema` → fixture 重录（`-Dcontract.refresh=true` 可批量）→ **重录后必须结构化复核差异** → 三绿；前端可见则同批改 `frontend/src/api/wiki/`。
 
-**E. 重构（拆类/移动）**：沿 `// ════ 段 ════` 边界拆 → 门面留薄委托 → 测试随类同包 `git mv` → 每包补 `package-info` → 三绿 → 提交（§13 全套方法论适用；落刀写盘一律单空行，`wc -l` 榜单先看空白率）。
+**E. 重构（拆类/移动）**：沿 `// ════ 段 ════` 边界拆 → 门面留薄委托 → 测试随类同包 `git mv` → 每包补 `package-info` → 三绿 → 提交（落刀写盘一律单空行，`wc -l` 榜单先看空白率；不得新增 >600 行主源码——大文件棘轮守卫）。
 
 ---
 
 ## 7. 模块约定与坑（必读）
 
-1. **knowledge → wiki 的 import 必须保持 0**：环已解（2026-09-30，`common/wiki` 值类型 + 两端口），`scripts/check-package-cycles.py` 守卫基线为环 0 组——往 knowledge 塞 wiki 依赖会让守卫红灯。
-2. **本域文档里的"snake 键"陈述已过期**：包根 package-info、`domain/package-info`、`WikiPage` javadoc 仍写"JSON 键为 snake（前端按此解析）"——W1 换锚（§14.9r，2026-10-02）后线格式是 **camelCase**（B55 还修了 6 处用户可见断链）。**以 fixture 和 `WikiConstants` 为准，别照这些注释写 snake 键**。
-3. **错误信封双轨，别统一**：21 个端点除"KB 访问被拒"外全走 handler 直写 `{"error":"..."}`（英文、带 `error code: %d, error message: %s` 前缀的 KB 文案）；controller javadoc 明写"逐端点保持原样，不要统一它们"——这是对 Go 期契约的保真，改形态 = 改前端。
-4. **catch-all slug 带前导 "/"**：`/pages/{*slug}` 捕获值带斜杠，取用前必须剥掉 + trim（`WikiPageController.getSlugParam`），否则查不到页。
+1. **两域包级 import 双向保持 0**：knowledge → wiki 与 wiki → knowledge 都不准直接 import（现状 0，`scripts/check-package-cycles.py` 守卫基线环 0 组）。wiki 要读知识数据走 `common/knowledge` 端口，knowledge 触发 wiki 走 `common/wiki` 两端口。
+2. **代码里的"JSON 键为 snake"注释已过期**：包根 package-info、`domain/package-info`、`WikiPage` javadoc 仍写着 snake——现状是 **camelCase**（载荷、路径变量皆是）。**以 fixture 和 `WikiConstants` 为准，别照这些注释写 snake 键**；改到相关文件时顺手更正。
+3. **`data` 载荷形态是前端契约，别"顺手归一"**：统一外壳落地后错误已单轨（见 §3.2），但 `data` 里实体直出 / raw map 键字母序 / 裸数组的三路形态、错误**英文文案**与 `error code: %d` 前缀仍是对 Go 期契约的保真——改形态 = 改前端，须同批。
+4. **catch-all slug 带前导 "/"**：`/pages/{*slug}` 捕获值带斜杠，取用前必须剥掉 + trim（`WikiRequestSupport.getSlugParam`），否则查不到页。
 5. **派生访问器必须 `@JsonIgnore`**：`WikiPage.sourceKnowledgeIDs()`/`builtFrom()` 不加注解会被 Jackson 当属性序列化，回读 jsonb 还会触发 `UnrecognizedPropertyException`——`WikiPage` javadoc 称之为"复发率最高的坑"。
-6. **LLM 输出解析面冻结**：`CombinedExtraction` / `NewSlugFromCitation` / `CitationBatchResult` / `common/wiki/ExtractedItem` 约 17 处 `@JsonProperty` 的键名由 `WikiPrompts` 三条 prompt 正文钉住——改 Java 侧键名必须连 prompt 一起改，属行为面，另批处理（HANDOFF §15 边界清单）。
+6. **LLM 输出解析面冻结**：`@JsonProperty` 现存 10 处、分布在 4 个类——`common/wiki/ExtractedItem`（`name`/`slug`/`aliases`/`description`/`details`/`source_chunks` 6 处）、`page/NewSlugFromCitation`（`source_chunks`）、`ingest/WikiIngestCitePipeline.CitationBatchResult`（`citations`/`new_slugs`）、`ingest/WikiIngestPayload`（`tracing`）；`CombinedExtraction` 走 camel 字段名（`entities`/`concepts`）。这些键名由 `WikiPrompts` 三条 prompt 正文钉住——改 Java 侧键名必须连 prompt 一起改，属行为面，另批处理（HANDOFF §15 边界清单）。
 7. **`page_metadata` 必须 `insertStrategy = ALWAYS`**：MyBatis-Plus 默认对 null 字段省列会落到 DB 默认 `'{}'`，而契约 golden 里该键是 `null`（字段处注释）。
-8. **KB 配置写侧键名**：`knowledge_bases.wiki_config` 由 KB 更新请求原样落库，**必须用 `WikiConfig` 的 camelCase 字段名**；历史 snake 键被静默忽略——表现为"界面选了合成模型但 ingest 报 `missing_synthesis_model`"（`WikiConfig` javadoc，B3b′ 类缺陷的同族）。
+8. **KB 配置写侧键名**：`knowledge_bases.wiki_config` 由 KB 更新请求原样落库，**必须用 `WikiConfig` 的 camelCase 字段名**；历史 snake 键被静默忽略——表现为"界面选了合成模型但 ingest 报 `missing_synthesis_model`"（`WikiConfig` javadoc）。
 9. **多副本协调默认是单 JVM 语义**：六个协调端口（slug 锁 / finalize 锁 / 身份认领 / 在途限流 / 任务队列 / 删除墓碑）默认全 InProcess，多实例部署必须 `wiki.redis-enabled=true`；漏配的症状是跨实例互斥全部失效。
-10. **死 logger 余 1 处在 `wiki/service`**（HANDOFF import 卫生段登记"余 5 处散在 model/auth/wiki"）——改到该文件时顺手清，Spotless 不删未使用 logger。
+10. **队列载荷的追踪键是平铺 legacy**：五个 `lf_*` 组件平在 `WikiIngestPayload` record 上（键名刻意 snake、空值整键省略），结构视图收在嵌套键 `tracing` 里；四个域的队列载荷同形，别在本域单方面"纠正"它们。
 
 ---
 
 ## 8. 测试与验证
 
-- **规模**：`domains/src/test/java/com/ragagent/wiki/` 下 **32 个测试类 / 469 个 `@Test` + 12 个 `@ParameterizedTest`**；另有邻接测试：`agent/tools/wiki/` 2 个实录类（17 `@Test`）、`session/AgentToolBackendsWikiTest`（12 `@Test`）。
-- **fixture**：`domains/src/test/resources/contracts/` 下前缀 **`wiki-*` 共 16 个**（`WikiHttpContractTest` 消费，覆盖 21 个端点的代表性形态：创建 403、空文件夹、图谱、索引、lint、404、乐观锁更新等）。
-- **比较口径**：契约比较器是**语义比较**（键序 / 转义归一化后比），fixture 锚定的是**本仓自己的行为**；掩码正则按键名锚定，**键改名必须同步放宽 `[a-z_]+` → `[A-Za-z_]+`**（§13.13，否则掩码静默失效）。
+- **规模**：32 个测试类 / 479 个用例——`:domains` 侧 `domains/src/test/java/com/ragagent/wiki/` 25 类（315 用例，摄取管线/页面服务/解析单测为主），`:boot` 侧 `boot/src/test/java/com/ragagent/wiki/` 7 类（164 用例：`WikiContractTest`、`controller/WikiHttpContractTest` 覆盖 21 个端点，另有仓储与服务测试）。
+- **邻接测试**：`agent/tools/wiki/` 2 个实录类（17 用例）、`boot` 的 `session/service/AgentToolBackendsWikiTest`（12 用例）。
+- **fixture**：`domains/src/testFixtures/resources/contracts/` 下前缀 **`wiki-*` 共 16 个**（覆盖 21 个端点的代表性形态：创建 403、空文件夹、图谱、索引、lint、404、乐观锁更新等）。注意两种存法：**错误/创建/更新类金片存完整外壳**（`wiki-page-not-found.json` 含 `code/message/data`，逐字节比对）；**载荷类金片存 `data` 下钻后的形态**（`wiki-page-get.json` 无外壳，测试先 `payload()` 下钻再比）。
+- **比较口径**：契约比较器是**语义比较**（键序 / 转义归一化后比），fixture 锚定的是**本仓自己的行为**；掩码正则按键名锚定，**键改名必须同步放宽 `[a-z_]+` → `[A-Za-z_]+`**（否则掩码静默失效）。
 - **已知偶发 2 例**（全量并发下偶发，遇到先单独重跑，别误判回归）：
   - `WebToolsRecordingTest.searchWithContentFetchesLeadingPagesViaSharedFetchTool`
   - `EvaluationContractTest.getTerminalRunsExecution`（单独 `--tests "*EvaluationContractTest"` 通过）
-- **另防环境泄漏**（§13.9）：source 过 `.env` 的 shell 跑全量会带出 `SYSTEM_AES_KEY`，出现"孤零零 1 个环境相关失败"先 `env | grep SYSTEM_AES`。
-- **改前端可见契约时**：后端与前端**同批**改完再提交（`frontend/src/api/wiki/` 是本域类型面）。
+- **另防环境泄漏**：source 过 `.env` 的 shell 跑全量会带出 `SYSTEM_AES_KEY`，出现"孤零零 1 个环境相关失败"先 `env | grep SYSTEM_AES`。
+- **改前端可见契约时**：后端与前端**同批**改完再提交（`frontend/src/api/wiki/` 是本域类型面）；金片键签名变化会被契约同步守卫拦下要求签字。
 
 ---
 
@@ -431,14 +439,13 @@ cd frontend && npx vue-tsc --build --force && npm test
 
 | 项 | 性质 | 建议 |
 |---|---|---|
-| 包根 / `domain` package-info 与 `WikiPage` javadoc 的"snake 键"陈述过期 | **文档债** | W1 换锚后未回填；改到相关文件时顺手更正，防止下一个新人照注释写 snake 键（§7.2） |
-| wiki 域"原 ORM / 原实现"措辞 19 文件（约 50 处） | 注释卫生债 | HANDOFF §15 已登记为独立卫生批，勿混入功能批 |
+| 包根 / `domain` package-info 与 `WikiPage` javadoc 的"snake 键"陈述过期 | **文档债** | 改到相关文件时顺手更正，防止下一个新人照注释写 snake 键（§7.2） |
 | `process_overrides` 移植缺口（逐文档摄取参数不生效且无提示） | **产品缺口（用户定调）** | 2026-10-02 拍板：保留现状、界面控件不动、未来补后端；**别"顺手修"** |
-| LLM 解析面 17 处 + `lf_*` 5 处 `@JsonProperty` | 永久冻结 | 前者键名连 prompt，后者是平铺追踪载具；都不在本域换锚范围内 |
+| LLM 解析面 `@JsonProperty` 10 处 + `lf_*` 5 键 | 永久冻结 | 前者键名连 prompt（§7.6），后者是平铺追踪载具；都不在本域换锚范围内 |
 | 图谱"熟悉知识"叠加层恒 null | 已知差异 | 无对应模块（controller javadoc"已知差异"条）；前端要接时先立产品项 |
 | 任务侧 langfuse tracing 未接入 | 观测缺口 | `WikiIngestBatchHandler` javadoc"已知取舍"明示；HTTP 入口侧已接，任务侧另批 |
-| Standard 模式同 KB 并发批次依赖认领 + 90 分钟 stale 回收 | 设计取舍 | 崩溃释放已由 `WikiCleanupScope` 兜底（B12）；改并发语义前先读 `WikiIngestBatchHandler` javadoc |
-| 域内 ≥800 行 = 0，最大 762（`WikiIngestCitePipeline`） | 已达标 | 无需再拆；新代码照 §1.1 的子包职责落位 |
+| Standard 模式同 KB 并发批次依赖认领 + 90 分钟 stale 回收 | 设计取舍 | 崩溃释放已由 `WikiCleanupScope` 兜底；改并发语义前先读 `WikiIngestBatchHandler` javadoc |
+| 域内 ≥800 行 = 0，最大 760（`WikiIngestCitePipeline`） | 已达标 | 无需再拆；新代码照 §1.1 的子包职责落位（大文件棘轮：不得新增 >600 行主源码） |
 
 ---
 
@@ -453,7 +460,7 @@ cd frontend && npx vue-tsc --build --force && npm test
 | 同标题为什么不会建两页 | `service/ingest/WikiIdentityClaimStore`（InProcess/Redis）+ slug 锁 |
 | 文档删除后页面怎么撤 | `WikiRetractPayload` + `WikiIngestEnqueueOps.enqueueWikiRetract`（retract op） |
 | 多副本怎么部署 | 根 `WikiRedisWiring`（`wiki.redis-enabled=true` 切六个 Redis 实现） |
-| wiki 配置长什么样 | `domain/WikiConfig`（javadoc 即契约）+ `knowledge` 的 `IndexingStrategy.WikiEnabled`（开关） |
+| wiki 配置长什么样 | `domain/WikiConfig`（javadoc 即契约）+ `knowledge` 的 `KnowledgeBaseIndexingStrategy.isWikiEnabled`（开关） |
 | 死链 / 问题怎么流转 | `service/page/WikiLintService` + `controller/WikiMaintenanceOps`（三态） |
-| 目录为什么这样分 | 本文 §1 + 8 份 `package-info.java`（⚠️ 其"snake"陈述已过期，见 §7.2） |
-| 结构决策的来龙去脉 | `docs/backend-package-map.md`（`wiki/service` 拆分 P2、`knowledge ⇄ wiki` 解环 ④-g）|
+| 目录为什么这样分 | 本文 §1 + 9 份 `package-info.java`（⚠️ 其"snake"陈述已过期，见 §7.2） |
+| 结构决策的来龙去脉 | `docs/backend-package-map.md`（`wiki/service` 拆分、`knowledge ⇄ wiki` 解环与 common 端口化） |

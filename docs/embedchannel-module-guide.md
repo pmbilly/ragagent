@@ -2,7 +2,7 @@
 
 > **面向读者**：第一次接手 `com.ragagent.embedchannel` 的架构师 / 高级开发者。
 > **目标**：30 分钟建立全局观 → 能定位改动点 → 能安全迭代（本域有 61 个 golden 契约夹具兜底，改错会立刻红；全量后端用例按 HANDOFF 批次验收口径 4,700+）。
-> **数据口径**：2026-10-08 实测（`wc -l` 口径）：**16 个 java 文件 / 约 2,900 行 / 5 个子包 + 根包**。
+> **数据口径**：2026-10-11 实测（`wc -l` 口径）：**17 个 java 文件 / 2,937 行 / 5 个子包 + 根包**。
 > **包名沿革**：B124 由 `com.ragagent.embed` 改名为 `com.ragagent.embedchannel`——域内 14 类有 11 类本就叫 `EmbedChannel*`，且与 L2 能力层的 `com.ragagent.embedding`仅差三个字母，是仓库里最容易引错的一对包名。
 > **本文档的地位**：模块级导览；仓库级作业规范见仓库根 `HANDOFF.md`（§12 结构地图、§13 踩坑清单、§14 逐包重构范式）。
 
@@ -208,10 +208,10 @@ erDiagram
 
 | 方法 | 路径 | RBAC | 用途 |
 |---|---|---|---|
-| POST | `/api/v1/agents/{id}/embed-channels` | ADMIN | 创建（201 + 裸对象含 `publishToken`） |
-| GET | `/api/v1/agents/{id}/embed-channels` | VIEWER | 按 agent 列表（裸数组，**不带 token**） |
+| POST | `/api/v1/agents/{id}/embed-channels` | ADMIN | 创建（201，载荷含 `publishToken` 进 `data`） |
+| GET | `/api/v1/agents/{id}/embed-channels` | VIEWER | 按 agent 列表（**不带 token**） |
 | GET | `/api/v1/embed-channels` | VIEWER | 全租户列表（跨 agent，仍不带 token） |
-| GET / PUT / DELETE | `/api/v1/embed-channels/{channel_id}` | GET=VIEWER，PUT/DELETE=ADMIN | 详情（**含 token**）/ 更新（响应**不含** token）/ 软删（204） |
+| GET / PUT / DELETE | `/api/v1/embed-channels/{channel_id}` | GET=VIEWER，PUT/DELETE=ADMIN | 详情（**含 token**）/ 更新（响应**不含** token）/ 软删（200 + 外壳，204 已退役） |
 | POST | `.../rotate-token` | ADMIN | 轮换发布令牌（响应含新 token） |
 | POST | `.../preview-session` | VIEWER | 预览会话签发；禁用渠道 403 专用分支 |
 | GET | `.../stats` | VIEWER | `{sessionCount:N}`（数 `source=embed:渠道id` 的会话） |
@@ -226,7 +226,7 @@ erDiagram
 | GET | `.../config` | 公开配置（20 键**恒输出**：空集合写 `[]`、空串照写） |
 | GET | `.../suggested-questions` | 推荐问题（渠道开关关 → 空 `{questions:[]}`；limit 上限 12） |
 | GET | `.../chunks/{chunk_id}` | 公开分块读（404 优先；跨租户/不在 agent 的 KB 白名单 → 403） |
-| POST | `.../sessions` | 建访客会话：201 `{id, sig}`（sig = HMAC 句柄签名） |
+| POST | `.../sessions` | 建访客会话：201，`{id, sig}` 进 `data`（sig = HMAC 句柄签名） |
 
 **委托面**（`EmbedChannelDelegateOps`，先 `ensureSession` 再透传，14 个）
 
@@ -235,11 +235,11 @@ erDiagram
 | POST | `.../knowledge-chat/{session_id}` | `KnowledgeQaController.knowledgeQA`（patch 后） |
 | POST | `.../agent-chat/{session_id}` | 渠道 agent 是 `builtin-quick-answer` 时仍走 knowledgeQA，否则 `agentQA` |
 | GET | `.../files` | `FileProxyService.serveTenantFiles`（与登录面 `/files` 同 handler 体） |
-| GET | `.../messages/{session_id}/load` | `MessageController.loadMessages`（返回裸 `[Message]`） |
+| GET | `.../messages/{session_id}/load` | `MessageController.loadMessages`（统一外壳，数组在 `data`） |
 | POST | `.../sessions/{session_id}/stop` | `SessionController.stopSession`（⚠️ 请求体键是 `messageId`，本域其余键仍下划线） |
 | GET / POST | `.../sessions/{sid}/messages/{mid}/suggestions` | `MessageSuggestionController`（渠道关建议 → suppressed 裸对象分支优先） |
-| POST | `.../sessions/{sid}/suggestion-events` | 建议事件上报（成功 204） |
-| POST | `.../sessions/{sid}/events` | webhook 事件转发：只收 `message_sent`/`message_received`，受理恒 204（下发 best-effort） |
+| POST | `.../sessions/{sid}/suggestion-events` | 建议事件上报（200 + 外壳，204 已退役） |
+| POST | `.../sessions/{sid}/events` | webhook 事件转发：只收 `message_sent`/`message_received`，受理 200 + 外壳（下发 best-effort 语义不变） |
 | POST / GET | `.../sessions/{sid}/mcp-services/{svc}/oauth/authorize-url` · `.../oauth/status` | `McpOAuthController` |
 | POST | `.../sessions/{sid}/mcp-oauth-resolutions/{pending_id}`（+ `/cancel`） | MCP OAuth 解析/取消 |
 | POST | `.../sessions/{sid}/tool-approvals/{pending_id}` | `AgentToolApprovalController` |
@@ -248,11 +248,11 @@ erDiagram
 
 | 约定 | 本域实际 |
 |---|---|
-| 信封 | **双面都已去信封**（E1 批，2026-10-01）：管理面裸对象/裸数组；公开面 config 裸 20 键、exchange `{sessionToken,expiresIn}`、建会话 201 `{id,sig}`、事件 204。**例外**：委托面的 MCP 三族端点沿用 `McpOAuthController` 自身的 `{data,success}` 信封（E2 未做，登记随 mcp 域批收） |
+| 信封 | **全面统一响应外壳**（B183 起）：管理面/公开面/委托面成功都是 `{code:0,message,data}`——**外壳恒存在**：config 的 20 个键、exchange 的 `{sessionToken,expiresIn}`、建会话的 `{id,sig}` 都**裸放在 `data` 内**（⇒ 消费方**先取 `data` 再取键**）。别把这句读成"config 是裸对象" —— widget 浮标图标曾因此静默失效（2026-10-03 snake 键、2026-10-11 外壳形状，B226）；**公开面端点被第三方页面直接消费**（widget 脚本已散落在别人站点上），契约变更须先评估**已发布的消费方**；create 201 只包 body 不改状态；删除/事件受理 200 + 外壳（204 已退役）。错误也是外壳形态（`emb-mgmt-get-404`：`{code:1003,...}`）；**例外**：`EmbedAuthFilter` 在 Dispatcher 之前写的鉴权失败（畸形头 400 等）保持纯字符串。权威口径见 `docs/api-response-convention.md` |
 | 响应键名 | **键字母序**插入（`row()` 用 `LinkedHashMap` 按字母序逐个 put；类头 javadoc 写的"TreeMap 构建"已过期）；键名＝实体字段名 camelCase |
 | 条件键 | **唯一条件键是 `publishToken`**：详情/创建/轮换带、列表与 PUT 不带——这是**授权边界**不是数据条件键（javadoc 原话：列表里泄漏 publish token 等于把渠道会话签发权发给任何读列表的人） |
-| create / delete | create **201**；delete **204**（无响应体，golden 断言 `body == ""`） |
-| 错误 | 管理面/公开面错误是**纯字符串** `{"error":"..."}`（`PlainErrorException` / filter 的 `writePlain`）；校验文案固定英文（`"at least one allowed origin is required"` 等），与 knowledge 的 AppError 结构化信封**不同** |
+| create / delete | create **201**；delete **200 + 外壳**（204 与空体断言已随 B185 退役，golden 断言 `{code:0,...}`） |
+| 错误 | 控制器层错误 = 外壳形态 `{code,message,data}`（校验文案仍固定英文）；`EmbedAuthFilter` 自写的鉴权失败仍是纯字符串（Dispatcher 之前，`emb-pub-load-badvisitor` 场景）。本域错误**文案**是契约，改必挂 golden |
 | 时间戳 | golden 里 `createdAt/updatedAt` 以 `<ts>` 掩码锚定，ISO 带时区 |
 | 请求体 | `@RequestBody(required=false) String rawBody` 手动绑定：空 body → 400（Jackson 原文措辞）、坏 JSON → 解析器原文措辞；委托面坏 JSON → 400 `"invalid json"` |
 | 容器层错误 | `PlainTextErrorReportValve`：应用没写过响应体的容器错误（畸形请求头等）输出纯文本 `"400 Bad Request"`（golden `emb-pub-load-badvisitor` 只经 A/B 验证、MockMvc 不重放） |
@@ -376,7 +376,7 @@ cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Cont
 5. **委托面 patch 的键名失配是静默的**：`patchEmbedChatPayload` 写错键不报错，只丢渠道约束（§4.2）——这是本域唯一"错误直接变安全漏洞形态"的点。
 6. **`EmbedAuthFilter` 是公开面唯一认证层**：`AuthFilter` 对 `/api/v1/embed/` 前缀整体让路（`AuthFilter.java` 103-105 行 + `EmbedWiring` javadoc）；过滤器顺序 HIGHEST+30（在 AuthFilter 的 HIGHEST+20 之后）。**往公开面加端点不需要也不能登记 RBAC**。
 7. **请求结束必须清上下文**：`EmbedAuthFilter.finally` 清 `TenantContext` + `StorageUrlContext`（javadoc 原话：漏清会把 forced-handle 钉死泄漏到线程的下个请求）。新加公开面异步逻辑时同注意。
-8. **类头 javadoc 有一处过期**：`EmbedChannelController` 类注释写"公开面 envelope `{data,success}`"——E1（2026-10-01）已全面去信封，golden 是权威（本手册 §3.2 以 fixture 实测为准）。遇到注释与 golden 冲突时，**信 golden**。
+8. **类头 javadoc 的信封描述按 golden 为准**：本域信封口径已两度翻转（E1 去信封 → B183 统一外壳），类注释若还写 `{data,success}` 或"去信封"都属过期——现行是统一响应外壳，golden 是权威。遇到注释与 golden 冲突时，**信 golden**。
 9. **限流键带窗口维度**：Redis/本地桶键都是 `embed:ratelimit:{windowMs}:{key}`（1 分钟窗与 24 小时窗互不污染）；ZSET 成员是 `nowMs-序号`（防同毫秒连击少计）。改键格式要同时改测试。
 10. **本域错误文案是契约**：管理面错误分派走 `writeMgmtError` 固定映射，公开面 filter 直接 `writePlain`。改文案必挂 golden；两个"500 operation failed"（agent 归属失败）是刻意归一，不是漏了细分。
 
@@ -384,8 +384,8 @@ cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Cont
 
 ## 8. 测试与验证
 
-- **规模**（2026-10-08 实测）：**3 个测试类 / 10 个 `@Test` / 61 个 `emb-*` golden 夹具**（`emb-mgmt-*` 26 + `emb-pub-*` 35）/ `EmbedContractTest` 内 **56 处 `assertGolden`** 语义比对（键序/转义归一后比，同 knowledge 口径）。
-  - `EmbedContractTest`（591 行）：1 个 `@Test` 主方法贯穿"创建 → 全管理面 → rotate 换 token → 全公开面 → 删除 204 → 删后 404"的完整生命周期；`@Primary` 内存 `EmbedTokenStore` 替换 Redis（测试 yml 不依赖外部 redis；"无可用 store" 由容器无实现承载 → 503 分支）。
+- **规模**（2026-10-11 复核）：**3 个测试类 / 11 个 `@Test` / 61 个 `emb-*` golden 夹具**（`emb-mgmt-*` 26 + `emb-pub-*` 35）/ `EmbedContractTest` 内 **56 处 `assertGolden`** 语义比对（键序/转义归一后比，同 knowledge 口径）。
+  - `EmbedContractTest`（591 行）：1 个 `@Test` 主方法贯穿"创建 → 全管理面 → rotate 换 token → 全公开面 → 删除（200 + 外壳）→ 删后 404"的完整生命周期；`@Primary` 内存 `EmbedTokenStore` 替换 Redis（测试 yml 不依赖外部 redis；"无可用 store" 由容器无实现承载 → 503 分支）。
   - `EmbedChatPayloadPatchTest`（4 用例）：patch 结果**直接反序列化成 `QaRequests` DTO**——键名失配当场红，这是 §7 第 5 条的守卫。
   - `EmbedRateLimiterTest`（5 用例）：本地滑窗 + Redis 路径 + 同毫秒成员唯一性。
 - **golden 录制**：`scripts/record-emb-golden.sh`；掩码四件套 `em_<token>` / `ems_<token>` / `<uuid>` / `<ts>`；`emb-pub-load-badvisitor`（容器层畸形头 400）**刻意不重放**（MockMvc 不经过 Tomcat 协议层），由 A/B 真机验证。
@@ -402,8 +402,8 @@ cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Cont
 | 项 | 性质 | 建议 |
 |---|---|---|
 | **零引用域的处置**（`backend-package-map.md` P3） | 命名债 + 定位待办 | 三个选项已摆上桌面：① **改名 `embedchannel`**（§3.5 已列，与 `embedding` 辨析是一贯痛点；改动 = 包路径 + import 面，因 0 包引用、连带成本极低，但 HTTP 路径 `/api/v1/embed/*` 是对外契约**不在改名范围**）；② 保留现状（靠 `package-info` + 两本手册辨析）；③ 退役评估——**基本不在桌面**：HANDOFF §2 第 5 条用户定稿"保留：mcp、memory、embed、wiki、知识库/检索/会话主链路"。倾向 ①，待用户拍板 |
-| **E2 未做**：mcp 委托三族端点的 `{data,success}` 信封 | 契约尾巴（登记在 14.9m） | 随 mcp 域批收；动它等于改访客 MCP 面，需同批带 widget |
-| **前端历史分页拿不到数据**：`useEmbedChatSession.getmsgList` 读 `res?.data` 解包，而 embed `load` 响应是裸数组 | 既有缺陷（14.9c S2 批登记"归 embed 域的批次处理"） | 接手后优先核实是否仍存在；修前端侧（后端裸数组是 E1 后的正确形态） |
+| ~~E2：mcp 委托三族端点信封~~ | **已随统一外壳落地收编**（B183–B208，`McpOAuthController` 等已标注 `@ApiResult`） | 委托面的线上形态 = 目标控制器现行形态；改访客 MCP 面仍需同批带 widget |
+| **前端历史分页拿不到数据**：`useEmbedChatSession.getmsgList` 读 `res?.data` 解包 | 历史登记（14.9c S2 批） | 接手后核实：`load` 现为统一外壳（数组在 `data`），`res.data` 解包方向恰好对齐，但要以现行前端代码为准 |
 | `stop` 端点请求体键 `messageId` 与本域其余下划线键并存 | 键名不一致（S4 批已知，登记） | 若统一，需与 widget `postMessage` 协议一起评估；否则别单独动 |
 | widget↔host `postMessage` 协议用下划线键（`channel_id`/`session_id`/`type`） | 非 HTTP 契约，登记为 **SDK 边界** | 不动（14.9m 刻意不改项）；改它 = SDK 版本化 |
 | `/embed/.../load` 的查询参数仍是 `before_time`（登录面已改 `beforeTime`） | embed 域自有键（S4 登记遗留） | 属同一"访客面键名换锚"候选批，与上一条同批考虑 |

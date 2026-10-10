@@ -2,7 +2,7 @@
 
 > **面向读者**：第一次接手 `com.ragagent.favorite` 的架构师 / 高级开发者。
 > **目标**：15 分钟建立全局观 → 能定位改动点 → 能安全迭代（本模块有 5 个后端用例 + 15 个 golden 契约钉底，改错会立刻红）。
-> **数据口径**：2026-10-08 实测（`wc -l` 口径）：**5 个 java 文件 / 319 行 / 4 个二级子包（每包恰好 1 个文件）——全仓最小业务域**。
+> **数据口径**：2026-10-11 实测（`wc -l` 口径）：**5 个 java 文件 / 321 行 / 4 个二级子包（每包恰好 1 个文件）——全仓最小业务域**。
 > **本文档的地位**：模块级导览；仓库级作业规范见仓库根 `HANDOFF.md`（§12 结构地图、§13 踩坑清单、§14 逐包重构范式）。
 
 ---
@@ -135,9 +135,9 @@ DDL 在 `migrations/versioned/V1__baseline.sql`（第 1395 行起），主键约
 
 | 方法 | 路径 | 用途 | 成功形态 |
 |---|---|---|---|
-| GET | `/api/v1/user/favorites?type=kb\|agent` | 某类收藏列表，`created_at DESC` | 200 **裸数组**（空 = `[]` 非 null） |
-| POST | `/api/v1/user/favorites` | 添加收藏，body `{"type":"kb","id":"…"}` | **201 无响应体**（重复 add 幂等，同样 201） |
-| DELETE | `/api/v1/user/favorites/{type}/{id}` | 取消收藏 | **204**（**幽灵删除也是 204**） |
+| GET | `/api/v1/user/favorites?type=kb\|agent` | 某类收藏列表，`created_at DESC` | 200，数组进 `data`（空 = `[]` 非 null） |
+| POST | `/api/v1/user/favorites` | 添加收藏，body `{"type":"kb","id":"…"}` | **201**（body = 外壳，`fav-add-ok`：`{code:0,...,data:null}`；重复 add 幂等，同样 201） |
+| DELETE | `/api/v1/user/favorites/{type}/{id}` | 取消收藏 | **200 + 外壳**（**幽灵删除同样 200**；204 已退役） |
 
 **授权模型**（WebConfig 第 509–511 行）：三条规则均 `TenantRole.VIEWER`、`orSystemAdmin=false`；收藏属于"**做收藏动作的人**"而非资源创建者，不走 OwnedXOrAdmin；API key 未声明 → 默认拒绝。handler 内从 `TenantContext` 推导 `(user_id, tenant_id)`，没有"看别人收藏"的路径；两个 401 分支（"user ID not found" / "workspace ID not found"）是防御位，中间件完备时**不可达**。
 
@@ -145,8 +145,8 @@ DDL 在 `migrations/versioned/V1__baseline.sql`（第 1395 行起），主键约
 
 | 约定 | 本域实际 |
 |---|---|
-| 信封 | **无** `{data,success}` 信封：列表裸数组、写操作无体（`ed83cac4` 换锚定稿；旧 Go 信封形态已被 B48 清洗） |
-| 错误 | `AppError` 形状 `{error:{code,message,details}}`；三文案钉死：`invalid request body`（解码措辞进 details）/ `invalid favorite resource type` / `favorite resource id is required` |
+| 信封 | **统一响应外壳**（B183 起）：`{code,message,data}`；列表数组进 `data`、写操作 `data:null`（`fav-remove-ok`）。历史上的裸数组/无体/204 形态已退役，golden 权威 |
+| 错误 | 外壳形态 `{code,message,data}`（明细进 `data`）；三文案钉死：`invalid request body`（解码措辞进 `data`）/ `invalid favorite resource type` / `favorite resource id is required` |
 | 请求体绑定 | **特例**：`@RequestBody String rawBody` + controller 自持 `ObjectMapper`（`FAIL_ON_UNKNOWN_PROPERTIES` 关闭）——为钉住 Go 时代 binding 文案（EOF / invalid character…进 details）。全仓新代码规范是 `@Valid` DTO，本域是登记过的历史兼容面，**别推广** |
 | 字段名 | 响应 = Java 字段名 camelCase（`userId/tenantId/resourceType/resourceId/createdAt`，时间 ISO-8601 带时区）；请求键为小写单词 `type`/`id`（无 camel/snake 之分） |
 | 空值 | 实体无 `@JsonInclude`，字段恒输出 |
@@ -178,16 +178,16 @@ sequenceDiagram
     FE->>C: DELETE /api/v1/user/favorites/{type}/{id}
     C->>S: remove(...)
     S->>M: delete（返回受影响行数，被忽略）
-    S-->>FE: 204（幽灵删除同样 204）
+    S-->>FE: 200 + 外壳（幽灵删除同样 200）
 
     FE->>C: GET /api/v1/user/favorites?type=kb
     C->>S: list(...)
     S->>M: SELECT … WHERE 四键中的三键 ORDER BY created_at DESC
-    S-->>FE: 200 裸数组（空=[]）
+    S-->>FE: 200 外壳（数组在 data，空=[]）
     Note over FE: 列表 join 当前租户的 KB/Agent 索引<br/>看不见的资源静默丢弃（前端侧）
 ```
 
-- **幂等语义被 golden 钉死**：重复 add 不产生新行（仍 201）、删不存在的行不报错（仍 204）——别"顺手"改成 409/404。
+- **幂等语义被 golden 钉死**：重复 add 不产生新行（仍 201）、删不存在的行不报错（仍 200 + 外壳）——别"顺手"改成 409/404。
 - **所有 SQL 都带 `tenant_id` 谓词**：`user_resource_favorites` 在 `TenantFilterGuard.TENANT_TABLES` 名单内，本域 4 条语句**不在**执行期白名单——新增查询必须带 `tenant_id`，否则 enforce 档（`WEKNORA_TENANT_FILTER_GUARD`）下执行期即红（HANDOFF B71）。
 - **切换租户自动换面**：收藏按 `(user, tenant)` 隔离，前端 `useResourcePins` 有租户变更 watcher（composable 头注释）。
 
@@ -230,13 +230,13 @@ cd frontend && npx vue-tsc --build --force && npm test
 
 ## 7. 模块约定与坑（必读）
 
-1. **幂等语义是契约，不是偷懒**：重复 add → 201、幽灵删除 → 204，都被 golden 钉死（`fav-add-dup` 场景 / `fav-remove-ghost`）。改成 404/409 属破坏性变更，要带前端同批。
+1. **幂等语义是契约，不是偷懒**：重复 add → 201、幽灵删除 → 200 + 外壳，都被 golden 钉死（`fav-add-dup` 场景 / `fav-remove-ok`）。改成 404/409 属破坏性变更，要带前端同批。
 2. **错误文案逐字节进 golden**：`invalid favorite resource type` / `favorite resource id is required` / `invalid request body`（解码措辞进 details）。改文案 = 重录 golden；HANDOFF §14.9s 全局错误体批（去 `success:false`）已把本域金片重录过一轮。
 3. **无外键是刻意的**（domain javadoc）：收藏在分享撤销、软删→硬删窗口内保留。加外键/加清理任务都会破坏该语义。
 4. **复合主键 → 纯 SQL mapper**：MyBatis-Plus `@TableId` 只支持单列，四条查询全部显式 `@Select/@Insert/@Delete`（mapper javadoc）。别"升级"成 BaseMapper。
 5. **手绑 rawBody 是登记过的历史特例**：controller 自持 ObjectMapper 钉 Go 时代 binding 文案。新端点不要模仿；若未来全仓统一到 `@Valid`，本域 golden 的 `fav-add-bad-body/empty-body` 两条要同批重录。
 6. **测试类 javadoc 的计数漂了**：类注释写"21 条 fav-*.json"，换锚批 `ed83cac4` 删掉 5 个无体金片后，盘上实测 **15 个**——以实测为准（顺手修注释即可）。
-7. **本域无登记的独有架构坑**；改动遵循仓库通用规约：HANDOFF §3 两条红线、§13 落刀方法论（正向证据 / 忠实性 / 卫生闸门）、契约口径见 `docs/knowledge-module-guide.md` §3.2（全仓统一：无信封、204 删除、错误 `{error:{code,message,details}}`）。
+7. **本域无登记的独有架构坑**；改动遵循仓库通用规约：HANDOFF §3 两条红线、§13 落刀方法论（正向证据 / 忠实性 / 卫生闸门）、契约口径见 `docs/api-response-convention.md`（全仓统一：`{code,message,data}` 外壳、删除 200、错误同形态）。
 8. **租户谓词红线**：`user_resource_favorites` 在 `TenantFilterGuard.TENANT_TABLES`（B71 enforce 档），本域 SQL 全带 `tenant_id`、不在语句白名单——新增查询漏谓词会在执行期直接红。
 
 ---

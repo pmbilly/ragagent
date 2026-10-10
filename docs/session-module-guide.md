@@ -2,7 +2,7 @@
 
 > **面向读者**：第一次接手 `com.ragagent.session` 的架构师 / 高级开发者。
 > **目标**：30 分钟建立全局观 → 能定位改动点 → 能安全迭代（本模块有 394 个后端用例兜底，改错会立刻红）。
-> **数据口径**：2026-10-08 实测（`wc -l` 口径）：**111 个 java 文件 / 约 2.20 万行 / 7 个子包**。
+> **数据口径**：2026-10-11 实测（`wc -l` 口径）：**114 个 java 文件 / 22,248 行 / 8 个子包**（controller/domain/dto/mapper/repository/service/sse/support）。
 > **本文档的地位**：模块级导览；仓库级作业规范见仓库根 `HANDOFF.md`（§12 结构地图、§13 踩坑清单、§14 逐包重构范式）。
 
 ---
@@ -268,11 +268,11 @@ erDiagram
 | 约定 | 说明 |
 |---|---|
 | REST JSON 字段名 | **JSON 名 = Java 字段名**（camelCase）。S1~S5 换锚已完成：`@JsonProperty` 188 → 0（HANDOFF §14.9l），别再加回 |
-| SSE 载荷字段名 | **snake_case**（`response_type` / `session_id` / `assistant_message_id` / `knowledge_references`）——这是 Go 期 LLM 流契约，与 REST 面不同，**别统一** |
-| 信封 | **无** `{data, success}` 信封：会话裸对象（201/200），列表 `{items, page, pageSize, total}` |
+| SSE 载荷字段名 | **camelCase**（`responseType` / `sessionId` / `assistantMessageId` / `knowledgeReferences`）。B93b/B134/B135b2 已把事件面整体翻转为 camel（`AgentStreamBridge` 38 键位 + 前端 43 文件同批）——**事件面自此无 snake 键**（工具名 36 个枚举值除外）；别再按旧口径"保留 snake" |
+| 信封 | **统一响应外壳**（B183 起）：成功 `{code:0,message:"ok",data:…}`，会话/消息载荷进 `data`（创建 201 只包 body）；列表容器（如 `{items,page,pageSize,total}`）整体放 `data`，不再套第二层。权威口径见 `docs/api-response-convention.md` |
 | 可空字段 | **恒输出**（`pinnedAt:null`、`imPlatform:""`），禁条件键（`Session` 类注释 §1.6） |
-| 删除 | **204** 无 body |
-| 错误 | `{error: {code, message, details}}`；`BizException`/`AppError`；分页错误为字段级中文（`page: 必须是整数`，`SessionController.bindPagination`） |
+| 删除 | **200 + 外壳**（204 已退役；幂等语义不变） |
+| 错误 | 控制器层 `{code,message,data}` 外壳形态（`BizException`/`ErrorCode`）；分页错误为字段级中文明细进 `data`（`page: 必须是整数`，`SessionController.bindPagination`） |
 | URL 路径变量 | 保留 Go 期 snake（`{session_id}`/`{message_id}`），**部分端点双别名**（`{id}` 与 `{session_id}` 同路径数组）——别名是兼容面，别删 |
 | QA 入参 | `@JsonIgnoreProperties(ignoreUnknown)`：**未登记的键静默忽略**——旧 snake 键不报错只失效，改键必须客户端同批 |
 | SSE 响应头 | 4 个头逐字保持：`text/event-stream` / `no-cache` / `keep-alive` / `X-Accel-Buffering: no`（`sse/SseContract`）；最终 Content-Type 被渲染器覆盖为 `text/event-stream;charset=utf-8` |
@@ -386,10 +386,10 @@ stateDiagram-v2
 | 改 KB 范围 / mention / 搜索目标收敛 | `service/SessionQaResolution` + `QaKbScope` / `QaMentionTagScope` / `QaSearchTargets` | 有切片测试钉着（`SessionQaResolution*Test`） |
 | 改 agent 工具供给 | `service/AgentToolBackends` / `AgentToolKbBackends` / `AgentToolWikiBackends` / `AgentWebPages` | 工具定义在 `agent/tools`；本域只做后端桥 |
 | 改 agent 事件→流的语义 | `service/AgentStreamBridge`（16 种事件订阅 + superseded 剔除 + duration 记账） | 最高危类；改前先补 `AgentStreamBridgeTest` 契约用例 |
-| 改 SSE 字节 / 载荷字段 | `sse/StreamResponseBuilder`（唯一转换点）+ `sse/SseFrameWriter` + `llm/domain/StreamResponse`（snake 键） | golden 是掩码后逐字节比对；改键必须同步放宽掩码正则（§7-5） |
-| 改断线续播 | `controller/SessionStreamController` + `stream/StreamManager` | `searchResultFromMap` 17 字段是既定行为，别补全 |
+| 改 SSE 字节 / 载荷字段 | `sse/StreamResponseBuilder`（唯一转换点）+ `sse/SseFrameWriter` + `llm/domain/StreamResponse`（键 camel） | golden 是掩码后逐字节比对；改键必须同步放宽掩码正则 + 同批带前端（§7-5） |
+| 改断线续播 | `controller/SessionStreamController` + `stream/StreamManager` | `searchResultFromMap` 的 17 键（16 字段 + metadata，键 camel）是既定行为，别补全 |
 | 给消息加 jsonb 列 | `domain/Message`（`@TableField` + TypeHandler）+ `mapper/MessageMapper` 显式 `@Results` + `MessageMapper` 写 SQL | 自定义 `@Select` 不套实体 typeHandler；wrapper set 要三参写法（§2.2） |
-| 改附件上传/解析 | `service/TemporaryDocumentService` / `TemporaryDocumentProcessor` / `TemporaryDocumentPromptResolver` | 状态机 `uploaded→processing→ready/failed`；prompt 注入看 `ResolveForPrompt` |
+| 改附件上传/解析 | `service/TemporaryDocumentService` / `TemporaryDocumentProcessor` / `TemporaryDocumentPromptResolver` | 状态机 `uploaded→processing→ready/failed`；prompt 注入看 `resolveForPrompt`（方法） |
 | 改 steer 插话 | `controller/SteerController` + `service/SteerRunCoordinator` / `SteerSinkBridge` | 状态键（queued/new_run/…）前端在消费；队深上限别放开 |
 | 改追问建议 | `service/MessageSuggestionService` + `MessageSuggestionPipeline`（无状态管道） | 展示/点击事件走 `MessageSuggestionEvent` 落库 |
 | 改跨域消息载荷 | `common/session` 载荷 + `support/PipelineViews`（两端同批） | 管线与 memory 蒸馏都认载荷不认实体 |

@@ -2,7 +2,7 @@
 
 > **面向读者**：第一次接手 `com.ragagent.websearch` 的架构师 / 高级开发者。
 > **目标**：30 分钟建立全局观 → 能定位改动点 → 能安全迭代（全量后端 4,836 用例兜底，改错会立刻红；本域自有 48 个用例 + 43 个契约 fixture + 11 个 wire 录制）。
-> **数据口径**：2026-10-08 实测（`wc -l` 口径）：**32 个 java 文件 / 约 4.4 千行 / 6 个子包（+ 根 package-info）**。
+> **数据口径**：2026-10-11 实测（`wc -l` 口径）：**32 个 java 文件 / 4,409 行 / 6 个子包（+ 根 package-info）**。
 > **本文档的地位**：模块级导览；仓库级作业规范见仓库根 `HANDOFF.md`（§12 结构地图、§13 踩坑清单、§14 逐包重构范式）。
 
 ---
@@ -209,7 +209,7 @@ erDiagram
 | 请求键 | camelCase（`isDefault` 已 B17② 收口，**不留兼容别名**）；**`extraConfig` 内层键刻意保持 snake**（`search_engine`/`content_size`/`scope`/`freshness`——B30 判定"存量存储层与第三方载荷不动"） |
 | 响应键 | camelCase；**api_key 按构造摘除**，只回 `credentials.apiKey.configured` 布尔（map 恒非空、键恒出现） |
 | 信封 | **混搭是刻意的**：管理面裸对象 / 裸数组；legacy 端点 `{data,success}`；test 成功 `{connected:true}`；凭据面 `{fields:{apiKey:{configured}}}`；前端 api 层显式适配（B58 点名 web-search-provider 为"有意适配的 API 层"） |
-| 删除 | 返回 **204**（provider 与凭据 field 一致） |
+| 删除 | 返回 **200 + 外壳**（204 已退役；provider 与凭据 field 一致） |
 | 敏感字段可见性 | `proxyUrl`/`extraConfig` 仅 Admin+（或持全量 / `manage_tenant_settings` 能力的 API key）可见；不可见时置空串 / null |
 | 校验错误 | 400 AppError code 1000；多字段按声明序 `\n` 连接；**校验文案逐字固定 = test 端点确定性契约** |
 

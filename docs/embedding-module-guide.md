@@ -2,7 +2,7 @@
 
 > **面向读者**：第一次接手 `com.ragagent.embedding` 的架构师 / 高级开发者。
 > **目标**：30 分钟建立全局观 → 能定位改动点 → 能安全迭代（模块自身 20 个 wire 用例钉死线格式，全仓 4,704 个后端用例兜底——HANDOFF B62 批口径，改错会立刻红）。
-> **数据口径**：2026-10-08 实测（`wc -l` 口径）：**20 个 java 文件 / 约 1.6 千行 / 2 个子包**。
+> **数据口径**：2026-10-11 实测（`wc -l` 口径）：**20 个 java 文件 / 1,615 行 / 1 个子包（provider/，9 家）+ 根**。
 > **本文档的地位**：模块级导览；仓库级作业规范见仓库根 `HANDOFF.md`（§12 结构地图、§13 踩坑清单、§14 逐包重构范式）。
 
 ---
@@ -357,7 +357,7 @@ cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Cont
 |---|---|---|
 | `EmbedderPooler`/`BatchEmbedder` 生产未接线（装配点恒传 null，`BATCH_EMBED_SIZE` 不生效） | 能力悬置 | 拍板二选一：把批量路径接到池化上，或整组删除；别长期悬置（本手册 §7.2 的混乱就是悬置的代价） |
 | `EmbedQueryContext.markQuery()` 无生产调用点（NVIDIA 恒 `passage`） | 能力悬置 | 若检索质量需要 query/passage 区分（NVIDIA 官方建议区分），在查询入口 `markQuery`；否则连机制一起收掉 |
-| Go 字节兼容层退役进行中（B37 完成第一刀：provider 请求面；stream 面待决） | 技术债（仓级，HANDOFF B37） | stream 面涉"与 Go 版共用 Redis 的 CAS"需确认 Go 版是否在跑；`GoTimeSerializer`/`GoMapSerializer` 需单独方案。本包直接相关的转义复刻已退役，但**线格式冻结约束未解除**（§7.1） |
+| Go 字节兼容层退役 | ✅ 已完成（B37/B41，2026-10-03） | 本包的 provider 请求面转义复刻与 GoJson 副本已退役（收编 `common/web/ProviderJson`）；旧 `GoTimeSerializer`/`GoMapSerializer` 等工具类已全仓退役。**线格式冻结约束未解除**（§7.1） |
 | aliyun 多模态 embedding 两处口径不一致：工厂支持（DashScope 专用 API + 剥 compatible-mode），连通性测试**早期短路"暂不支持"**（`ModelConnectivityTestService`） | 功能缺口 | 若要开放多模态，先对齐连通性测试的短路分支；`EmbeddingWireTest.aliyunMultimodalRequestAndIndexReorder` 钉死了工厂侧行为 |
 | batchEmbed 返回数量校验不统一：仅 Gemini 与 `BatchEmbedder` 显式报错（"X embeddings for Y inputs"）；Aliyun/Volcengine 按输入逐条构造（天然一致）；OpenAI 兼容族按响应 `data` 长度返回、无校验，而 `BatchEmbedder` 未接线 | 观察项 | 新接 provider 时确认其 count-mismatch 行为；若池化接通则 `BatchEmbedder` 的校验会兜底，若删除则考虑把校验上提 `BaseEmbedder` |
 

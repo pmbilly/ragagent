@@ -2,7 +2,7 @@
 
 > **面向读者**：第一次接手 `com.ragagent.stream` 的架构师 / 高级开发者。
 > **目标**：30 分钟建立全局观 → 能定位改动点 → 能安全迭代（本模块有 39 个后端用例兜底，改错会立刻红；但注意 Redis 侧 15 个用例依赖环境里的 redis-server，没有则**静默跳过**，见 §8）。
-> **数据口径**：2026-10-08 实测（`wc -l` 口径）：**13 个 java 文件 / 1,313 行 / 0 个子包（扁平包）**。
+> **数据口径**：2026-10-11 实测（`wc -l` 口径）：**14 个 java 文件 / 1,332 行 / 0 个子包（扁平包）**。
 > **本文档的地位**：模块级导览；仓库级作业规范见仓库根 `HANDOFF.md`（§12 结构地图、§13 踩坑清单、§14 逐包重构范式）。
 
 ---
@@ -332,7 +332,7 @@ cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Cont
 | 双停止检测实现并存（`StreamStopWatcher` / `startStopWatcher`） | 技术债 | javadoc 已备案不合并的理由（web 版要发 EVENT_STOP 并收流）；动之前先评估语义差异 |
 | 内存后端多副本误用 | 部署风险 | 选型是精确匹配，打错**静默回内存**；考虑启动日志显式打出"当前后端=memory/redis、副本数提示" |
 | `StreamEvent.type` 未设置时为 `null` | 已知差异 | javadoc 备案：真实产出方（agent 引擎 / QA 主链路）恒赋值；新增产出方记得赋值 |
-| ~~stream 面 Go 转义退役~~ | **已解决（B38，2026-10-03）** | `StreamJson` 已退役 Go 转义；**键序保留 = 内部 CAS 稳定性，不是 Go 兼容遗留**——别当遗产删（B75 备案；`GoJsonEscapes` 类仍被 event/MCP 等使用，但已不在本包） |
+| ~~stream 面 Go 转义退役~~ | **已解决（B38，2026-10-03）** | `StreamJson` 已退役 Go 转义；**键序保留 = 内部 CAS 稳定性，不是 Go 兼容遗留**——别当遗产删（B75 备案；`StreamJson` 本体现存于 `:common` stream/，旧 `GoJsonEscapes` 已全仓退役） |
 
 ---
 

@@ -2,7 +2,7 @@
 
 > **面向读者**：第一次接手 `com.ragagent.initialization` 的架构师 / 高级开发者。
 > **目标**：30 分钟建立全局观 → 能定位改动点 → 能安全迭代（本域有 62 个契约 golden + 全仓 4,836 个后端用例兜底，改错会立刻红）。
-> **数据口径**：2026-10-08 实测（`wc -l` 口径）：**14 个 java 文件 / 2,392 行 / 3 个子包（+根）**。
+> **数据口径**：2026-10-11 实测（`wc -l` 口径）：**14 个 java 文件 / 2,408 行 / 3 个子包（+根）**。
 > **本文档的地位**：模块级导览；仓库级作业规范见仓库根 `HANDOFF.md`（§12 结构地图、§13 踩坑清单、§14 逐包重构范式）。
 
 ---
@@ -207,11 +207,11 @@ erDiagram
 |---|---|
 | 字段名 | **JSON 名 = Java 字段名（camelCase）**；本域已无任何 snake（§2.2 核实结论） |
 | 请求绑定 | **17 端点全部 rawBody 手绑**（`@RequestBody(required=false) String rawBody` / `@RequestParam`）——无 `@Valid` DTO；`InitializationRequests` javadoc 登记「契约换锚时一并 DTO 化」 |
-| 响应形状 | **无信封直出**；响应是手组 `ObjectNode` / `TreeMap`，**键序即契约**（config 全 map 字母序、DownloadTask 按 struct 字段序、multimodal 注释点名按字母序插入） |
+| 响应形状 | **统一响应外壳**（B183 起）：手组 `ObjectNode`/`TreeMap` 载荷进 `data`（`init-get-config` 金片）；**键序即契约**（config 全 map 字母序、DownloadTask 按 struct 字段序、multimodal 注释点名按字母序插入）——键序规则不变，只是整体住进 `data` |
 | 凭据回显 | GET config **只回显 `credentials.apiKey` 布尔**（前端注释「exposes credential presence, not values」，builtin/baseUrl 亦脱敏）；**唯一例外**：POST initialize 响应的 `models[].parameters.apiKey` 原样输出（`InitResponses` javadoc 的自有契约） |
-| 错误 | `{error:{code,message,details}}`（`AppError`/`BizException`）；GET config 的 404 有**两种文案**——业务文案「知识库不存在」在同租户路径不可达（守卫先行 404「knowledge base not found」信封，golden 录的是后者），controller javadoc 原文注明 |
+| 错误 | 外壳形态 `{code,message,data}`（`init-get-config-404`：`{code:1003,...,message:"knowledge base not found"}`）；GET config 的 404 有**两种文案**——业务文案「知识库不存在」在同租户路径不可达（守卫先行 404，golden 录的是后者），controller javadoc 原文注明 |
 | 守卫顺序 | **golden 钉死、不能重排**（controller javadoc）：GET=KBAccessRead → `requireKbAccess`；POST/PUT=OwnedKBOrAdminFromKbIDParam（非创建者且非 Admin+ → 403）→ KBAccessWrite → handler |
-| 删除 | 本域**无 DELETE 端点**（204 约定不适用） |
+| 删除 | 本域**无 DELETE 端点** |
 | 双路径 | ⚠️ KB 配置更新有两条路：本域 `PUT /initialization/config/{kbId}`（前端向导用，逐段回填语义）与 knowledge `PUT /api/v1/knowledge-bases/{id}`（名称/描述/config 整列）——改配置语义前先确认改的是哪条 |
 
 ---
@@ -355,7 +355,7 @@ cd frontend && npx vue-tsc --build --force && npm test
 
 ## 8. 测试与验证
 
-- **规模（2026-10-08 实测）**：直接覆盖本域的测试类 **3 个 / `@Test` 方法 6 个**；全仓基线约 **4,836** 用例（B84–B88 闸门口径）。
+- **规模（2026-10-11 复核）**：直接覆盖本域的测试 **2 类**——`OllamaBindJsonObjectTest`（:domains）+ `W5bInitializationContractTest`（:boot，驻 agent/management 包路径）；全仓基线 **4,876 用例**（B223 闸门记录）。
 - **跨域挂载（本域最非常规的一点）**：本域自有测试树 `domains/src/test/java/com/ragagent/initialization/` 只有 **1 类 1 用例**（`OllamaBindJsonObjectTest`，bindJsonObject 的 400 文案钉子）；主力契约测试全挂在 **agent 测试树**——`agent/management/W5bInitializationContractTest`（4 用例：down/up/upstream 三家族 + fabri-tag 形状，45 个 `w5b-*` golden，in-JVM Ollama stub 11434 + OpenAI 兼容 stub）与 `agent/management/AgentContractTest`（3 用例中的 `agentAndInitializationFlow` 覆盖 17 个 `init-*` golden）。原因：`agentm` 时代同包，B36 并入 agent 时测试树未随域归属走（agent 手册 §8/§9 已登记）。
 - **fixture**：`domains/src/test/resources/contracts/` 下 **62 个**——`init-*` 17（config 三端点）+ `w5b-*` 45（系统级 14 端点）。录制：`scripts/record-ag-golden.sh`（43 `ag-*` + 17 `init-*`）、`scripts/record-w5b-golden.sh`；docreader 执行步走 `scripts/ab-w5b.sh` 双端 A/B（不进 golden）。
 - **比较口径**：语义比较（`ContractJson.semantic` 键序/转义归一）+ 掩码（`<ts>` / `<uuid>` / `<ollama-err>` / `<tags>`），fixture 锚定的是**本仓自己的行为**。

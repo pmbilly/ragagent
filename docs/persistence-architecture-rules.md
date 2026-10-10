@@ -1,6 +1,6 @@
 # 持久层架构规约（修订版）
 
-> 2026-10-05，依据架构师四条意见 + 本仓实测数据修订。原意见的方向均予采纳，
+> 2026-10-05，依据架构师四条意见 + 本仓实测数据修订；**2026-10-11 复核**：@Lazy 解环已落地（下）、顶层域数更新。原意见的方向均予采纳，
 > 个别条款按「失败模式」而非「工具」改写，并补齐执行机制（机器强制 + 棘轮基线）。
 > 数据底座见文末「现状基线」；机器强制面见
 > `domains/src/test/java/com/ragagent/arch/ArchitectureRulesTest.java`（A6-A9）
@@ -50,14 +50,15 @@
 
 - **禁止 @Lazy 注入**（A6 机器强制）：循环依赖要拆——下沉公共逻辑至
   Helper/下层服务，或接口反转，或领域事件。
-  - `knowledge` 域门面环在 A6 棘轮基线中，解环专项
-    （下沉 `KnowledgeAccessHelper` + worker 接口反转）落地后清空基线。
+  - ✅ **`knowledge` 域门面环已解（2026-10-05 B69 落地，B227 复核 main 注入点 0）**：
+    下沉 `KnowledgeAccessHelper` + worker 接口反转（`KnowledgeProcessedEvent` 领域事件），
+    A6 棘轮基线清零。
 - 领域事件解耦按需建设，不作通用要求（本仓 `ApplicationEventPublisher`
   现为 0 处使用；事件基础设施是投资项，不是规约条款）。
 
 ## 4. 包结构
 
-- 域级组织（`com.ragagent.<域>.<子域>`）——本仓已合规（28 个顶层域）。
+- 域级组织（`com.ragagent.<域>.<子域>`）——本仓已合规（2026-10-11 口径：22 个业务域 + 8 能力包 + 4 平台包，见 `backend-package-map.md` §1）。
 - 单包平铺类数 **建议** 10~15：超限先评估再拆，不设硬规则
   （domain 包类多常是表多，硬拆制造噪音）。已超限的 25 个包中，
   `wiki/service/ingest`（52 类）是唯一明确的拆分候选，挂台账观察。
@@ -74,7 +75,7 @@
 |---|---|
 | 字符串 wrapper（A8） | 25 类 73 处 → 逐域 Lambda 化中，MessageRepository 1 处保留（jsonb） |
 | `.last(` 拼接（A9） | 23 处 13 文件 → 20 处已迁 `PageRequests`，余 3 处在 knowledge 域 |
-| @Lazy（A6） | 8 类 11 个注入点，全在 knowledge 域（解环专项待办） |
+| @Lazy（A6） | ~~8 类 11 个注入点~~ → ✅ **0**（2026-10-05 B69 解环落地；B227 复核维持） |
 | 裸 JDBC（A7） | 28 类白名单登记，含 9 处可归一的本地 detectPostgres |
 | 无条件全表写 | 匿名 0 处；具名登记 1 处（applyDefaultStorageQuota） |
 | 注解 SQL / XML | 33 文件 / 0 |

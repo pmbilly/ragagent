@@ -2,7 +2,7 @@
 
 > **面向读者**：第一次接手 `com.ragagent.memory` 的架构师 / 高级开发者。
 > **目标**：30 分钟建立全局观 → 能定位改动点 → 能安全迭代（全仓 4,800+ 个后端用例兜底，本模块自身 347 个，改错会立刻红）。
-> **数据口径**：2026-10-08 实测（`wc -l` 口径）：**74 个 java 文件 / 约 1.28 万行 / 5 个子包（+ 根包 2 文件）**。
+> **数据口径**：2026-10-11 实测（`wc -l` 口径）：**75 个 java 文件 / 12,797 行 / 6 个子包（controller/domain/dto/mapper/repository/service；+ 根包）**。
 > **本文档的地位**：模块级导览；仓库级作业规范见仓库根 `HANDOFF.md`（§12 结构地图、§13 踩坑清单、§14 逐包重构范式）。
 
 ---
@@ -235,10 +235,10 @@ erDiagram
 | GET | `/api/v1/memory/items` | 分页列表，`status` 白名单校验**在分页解析之前** |
 | POST | `/api/v1/memory/items` | 手工创建，**201** + 裸条目 |
 | PUT | `/api/v1/memory/items/{id}` | 编辑内容与重要度 |
-| DELETE | `/api/v1/memory/items/{id}` | 永久删除（物理删，无软删），**204** |
+| DELETE | `/api/v1/memory/items/{id}` | 永久删除（物理删，无软删），**200 + 外壳** |
 | POST | `/api/v1/memory/items/{id}/confirm` | 接受一条 `pending` 推断条目 |
-| POST | `/api/v1/memory/items/{id}/reject` | 拒绝＝删除＋写墓碑，**204** |
-| DELETE | `/api/v1/memory/items` | **清空集合**（与按 id 删是两条路由），同步完成，**204** |
+| POST | `/api/v1/memory/items/{id}/reject` | 拒绝＝删除＋写墓碑，**200 + 外壳** |
+| DELETE | `/api/v1/memory/items` | **清空集合**（与按 id 删是两条路由），同步完成，**200 + 外壳** |
 
 **主题**（3 个）：`GET /api/v1/memory/topics`（分页）、`POST /topics/{id}/promote`（动作端点：动主题、产出新条目，按单资源形态返 200 而非 201）、`DELETE /topics/{id}`（停止跟踪，**204**）。
 
@@ -250,9 +250,9 @@ erDiagram
 
 | 约定 | 说明 |
 |---|---|
-| 信封 | **无** `{data,success}` 信封：单资源裸对象、列表 `{items,page,pageSize,total}` |
+| 信封 | **统一响应外壳**（B183 起）：单资源/列表容器（`{items,page,pageSize,total}`）进 `data`。权威口径见 `docs/api-response-convention.md` |
 | 字段名 | JSON 名＝Java 字段名（camelCase）；域实体直接作响应体（`MemoryItem` 是"真正的响应体"）；除 LLM 载荷外禁逐字段 `@JsonProperty`（全域已从 137 处清到 22 处，余者为 LLM 载荷**登记保留**） |
-| 状态码 | 创建 **201**、删除/拒绝/清空 **204**；`promote` 是动作端点返 200 |
+| 状态码 | 创建 **201**（只包 body）；删除/拒绝/清空 **200 + 外壳**（204 已退役）；`promote` 动作端点 200 |
 | 分页 | 请求侧只有 `limit/offset`（**容错**：limit 非法、≤0 或 >200 归 50，offset<0 归 0——实测 `?limit=abc&offset=-5` 返 200 不是 400）；响应换算出 `page/pageSize` |
 | 错误 | `AppError` 信封：NoScope→401、ItemNotFound→404、MemoryConflict→409、SensitiveContent/Disabled→400、其余（含 EmptyContent/PreviouslyForgotten，**刻意**不列）→500+details；"不存在"与"别人的"**同形 404** 防存在性探测 |
 | 请求绑定 | 3 个带体端点用 `dto/` record + `@Valid`，错误由全局处理器统一（空体→"请求体不能为空"、畸形→"请求体格式不正确"、类型错→"<字段>: 类型不正确"、缺 enabled→"enabled: 不能为空"）；未知字段**忽略** |
@@ -414,7 +414,7 @@ cd frontend && npx vue-tsc --build --force && npm test
 
 ## 8. 测试与验证
 
-- **规模**：本模块 **17** 个测试类 / **347** 个 `@Test`（2026-10-08 实测 `grep -c '@Test'`）；全仓后端用例 4,836（B85 记录）兜底。
+- **规模**：本模块 **17** 个测试类 / **347** 个 `@Test`（2026-10-08 实测 `grep -c '@Test'`）；全仓后端用例 4,876（B223 闸门记录）兜底。
 - **分层**：`controller/MemoryHttpContractTest`（37 用例，16 端点全覆盖）；`MemoryEntityJsonTest`（22，实体 JSON 逐字节）；仓储三件套 `MemoryRepositoryTest`（52）/ `MemoryExtractionRepositoryTest`（23）/ `MemoryVectorRepositoryTest`（17）；`service/` 8 个类（Orchestration 34、ExtractionService 33、ExtractionHelpers 19、Lexical 12、TopicResolver 10、RecallSelector 6、RedisQueue 5、VectorLogic 4）；域工具 `MemoryTextTest`（40）/ `MemoryLifecycleTest`（15）/ `MemoryVectorsTest`（10）/ `MemoryContractTest`（8）。
 - **fixture**：`domains/src/test/resources/contracts/memory-*.json` 共 **21 个**；比较口径是**逐字节 diff**（动态 id 用 `goldenMasked` 掩码），成功面 golden 于 2026-10-01 契约换锚后重录、录制顺序在测试类注释里（顺序会影响列表内容）。`tenants.memory_config` 的 KV 契约夹具（`ct-kv-mem-*` 7 个）在 **auth 侧** `TenantCatalogContractTest`——改 MemoryConfig 键名要跨包改它。
 - **已知偶发 2 例**（全仓共有，遇到先单独重跑，别误判回归）：

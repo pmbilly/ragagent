@@ -2,7 +2,7 @@
 
 > **面向读者**：第一次接手 `com.ragagent.evaluation` 的架构师 / 高级开发者。
 > **目标**：30 分钟建立全局观 → 能定位改动点 → 能安全迭代（本模块有 26 个后端用例兜底，改错契约会立刻红）。
-> **数据口径**：2026-10-08 实测（`wc -l` 口径）：**21 个 java 文件 / 约 2,090 行 / 5 个子包**（外加根 `package-info.java` 1 文件 5 行）。
+> **数据口径**：2026-10-11 实测（`wc -l` 口径）：**21 个 java 文件 / 2,094 行 / 5 个子包**（外加根 `package-info.java`）。
 > **本文档的地位**：模块级导览；仓库级作业规范见仓库根 `HANDOFF.md`（§12 结构地图、§13 踩坑清单、§14 逐包重构范式）。
 
 ---
@@ -148,12 +148,12 @@ RBAC 规则登记在 `config/WebConfig.java:322-323`（POST=ADMIN、GET=VIEWER�
 | 约定 | 本域实际 |
 |---|---|
 | 字段名 | **JSON 名 = Java 字段名**（camelCase，全包 0 个 `@JsonProperty` / `@JsonInclude`，打样前 66/12 处已清零） |
-| 信封 | **无** `{data,success}` 信封：`EvaluationDetail` 直出 200 |
-| 错误 | `{error:{code,message,details}}`；本域两档：**1000** 校验类（`请求参数不合法` + 字段级中文 details）、**1007** 执行类（service 抛 `IllegalStateException` → `AppError.internal`，message=原文） |
+| 信封 | **统一响应外壳**（B183 起）：`EvaluationDetail` 进 `data`，成功 `{code:0,...}`。权威口径见 `docs/api-response-convention.md` |
+| 错误 | 外壳形态 `{code,message,data}`；本域两档：**1000** 校验类（`请求参数不合法` + 字段级中文明细进 `data`）、**1007** 执行类（service 抛 `IllegalStateException` → 内部错误，message=原文） |
 | 空体 | 0 字节 → 400 `请求体不能为空`（`@RejectEmptyBody`）；**字面量 `null` 请求体合法**（按全空请求，`EvaluationRequest.empty()`） |
 | 可空字段 | **显式输出 `null`**（`metric` 未产出为 null 且键恒在；`summaryConfig.thinking`、`params.knowledgeBaseIds` 同理） |
 | 时间 | ISO-8601 带时区（`startTime`，`OffsetDateTime.now(ZoneOffset.UTC)`） |
-| 删除 204 / 乐观锁 409 | 不适用（本域无删除、无编辑端点） |
+| 删除类 200 + 外壳 / 乐观锁 409 | 不适用（本域无删除、无编辑端点） |
 | 快照语义 | POST 响应是**创建时刻快照**（status 恒 0）；running/failed 只能 GET 到（§7 第 9 条） |
 
 ---

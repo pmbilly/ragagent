@@ -2,7 +2,7 @@
 
 > **面向读者**：第一次接手 `com.ragagent.llm` 的架构师 / 高级开发者。
 > **目标**：30 分钟建立全局观 → 能定位改动点 → 能安全迭代（本模块有 176 个后端单测兜底，改错会立刻红）。
-> **数据口径**：2026-10-08 实测（`wc -l` 口径）：**104 个 java 文件 / 约 1.16 万行 / 7 个子包**。
+> **数据口径**：2026-10-11 实测（`wc -l` 口径）：**102 个 java 文件 / 11,357 行 / 7 个子包**（asr/chat/domain/extract/limiter/ollama/provider）。
 > **本文档的地位**：模块级导览；仓库级作业规范见仓库根 `HANDOFF.md`（§12 结构地图、§13 踩坑清单、§14 逐包重构范式）。
 
 ---
@@ -188,7 +188,7 @@ graph LR
 | 流式语义 | `chatStream` **先同步建立连接、返回 `BlockingQueue<StreamResponse>`**：建立阶段错误立即抛；进入流后的错误经流内 ERROR 型 `StreamResponse` 传递（`finishReason="incomplete"`）；消费到 `done=true` 即结束（类 javadoc 原文钉死） |
 | 工厂入口 | `LlmChatClients.create(ChatConfig, OllamaService, ConcurrencyGovernor)` 是生产唯一入口；`RemoteApiChat` 的构造签名被 `RemoteApiChatTest` **直 `new` 冻结**（§14.7.8），改签名先改测试床 |
 | 配置值入参 | 本域只收**配置值**（`ChatConfig` / `provider.Config`），不收业务实体——`Model→ChatConfig` 映射在 `model/service/ModelRuntimeConfigs`（L2 红线，见 §1.2） |
-| 协议冻结面 | `domain/StreamResponse`（SSE 事件体）、`domain/ToolCall.provider_metadata` 往返、`provider/Config` 的 snake 键、Anthropic / Ollama 线格式——全是登记边界面（§2.4），动它 = 动线上契约 |
+| 协议冻结面 | `domain/StreamResponse`（SSE 事件体，键 camel）、`domain/ToolCall.provider_metadata` 往返、`provider/Config` 的 snake 键（provider 配置 jsonb 冻结面）、Anthropic / Ollama 线格式——全是登记边界面（§2.4），动它 = 动线上契约 |
 | 目录一致性 | `provider/ProviderRegistry`（运行时）与 `model/service/ProviderRegistry`（HTTP 目录，golden 钉住）**同名不同物**，由 `ProviderCatalogParityTest` 逐字段比对——改任何一侧另一侧必须同批 |
 
 ---
@@ -255,7 +255,7 @@ sequenceDiagram
     end
 ```
 
-`RemoteApiChat` 是 2026-10-01 神类拆分的产物（1,366 → 492，§14.7.8 五刀：`RequestOps`/`BodyCodec`/`HttpOps`/`StreamOps`/`ResponseOps`；`BodyCodec` 里的 `goMarshal/goSorted` 是 **Go 字节形态**，provider 请求体仍依赖，属 §11 边界**别当遗产删**）。超时兜底：chat 300s / stream 600s（`WEKNORA_LLM_CHAT/STREAM_TIMEOUT_SECONDS` 可覆盖）；连接 10s、重定向 ≤10 次、跨域重定向剥凭据头。
+`RemoteApiChat` 是 2026-10-01 神类拆分的产物（1,366 → 492，§14.7.8 五刀：`RemoteApiRequestOps`/`RemoteApiBodyCodec`/`RemoteHttpOps`/`RemoteApiStreamOps`/`RemoteApiResponseOps`）。**provider 请求体仍是 Go 字节形态面**：`RemoteApiBodyCodec` 的 `byteOrderSorted`（map 键序，Go 版 openai-go 结构体序）等服务于出站字节，属 §11 边界**别当遗产删**。超时兜底：chat 300s / stream 600s（`WEKNORA_LLM_CHAT/STREAM_TIMEOUT_SECONDS` 可覆盖）；连接 10s、重定向 ≤10 次、跨域重定向剥凭据头。
 
 ### 4.3 结构化抽取（extract 子域）
 
@@ -346,7 +346,7 @@ cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Cont
 ## 7. 模块约定与坑（必读）
 
 1. **流式的两段错误语义别混**：建连错误同步抛、流中错误走 ERROR 型 `StreamResponse`（`finishReason="incomplete"`）。消费方（session SSE / agent）都按这个写的（`LlmChatClient` javadoc 原文）。
-2. **provider 请求体是 Go 字节形态面**：`RemoteApiBodyCodec` 的 `goMarshal/goSorted` 与 Go 工具面 5 类（`GoDoubleSerializer` 等）服务于 provider 出站；llm 的 172 处 `@JsonProperty` 全是 §14.9 登记冻结面——**别当 Go 遗产清**（HANDOFF §11 / §14.6）。
+2. **provider 请求体是 Go 字节形态面**：`RemoteApiBodyCodec` 的 `byteOrderSorted`（键序）等服务于 provider 出站字节；llm 的 `@JsonProperty` 全是 §14.9 登记冻结面——**别当 Go 遗产清**（HANDOFF §11 / §14.6）。历史注：旧 Go 工具面 5 类已退役（B39–B48），provider 面的转义复刻也已收编 `common/web/ProviderJson`。
 3. **两个 ProviderRegistry 同名不同物**：本域 `llm/provider/ProviderRegistry`（运行时路由与校验）vs `model/service/ProviderRegistry`（HTTP 目录，golden + 前端映射）。两层同源由 `ProviderCatalogParityTest` 钉死，**新增厂商必须两层同批**（类 javadoc 原文警告）。
 4. **新增厂商两处注册**：`ProviderRegistry` 静态块 + `allProviders()`；注册顺序 = `List/ListByModelType` 的输出顺序（javadoc 钉死）。
 5. **超时是 deadline 不是 client timeout**：客户端级超时会把流式提前掐断；deadline 经 `LlmTransport.withLlmTimeout` 施加在请求上（类 javadoc 写明理由）。兜底 chat 300s / stream 600s，环境变量可覆盖。
@@ -379,7 +379,7 @@ cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Cont
 | 子包无 package-info（仅根 1 份） | 卫生债 | 对照 §14.5"每个子包有 package-info"是欠账；§1.1 表可作底稿，随该子包下一批顺手补 |
 | `ChatConfig` javadoc 仍指 `fromModel`（映射已收回 `model/service/ModelRuntimeConfigs`） | 陈旧注释 | 随触碰清洗（§13 惯例：先摘不变量再删），不搞专项 |
 | `LlmChatClients` javadoc "其余 27 个 OpenAI 兼容厂商" | 数字陈旧 | B62（2026-10-04）裁撤 WeKnora Cloud 后实测 `ProviderName` 26 值；随触碰改为 26（含 Anthropic 独立通道）或直接写"其余全部" |
-| provider 请求面的 Go 字节兼容退役 | 进行中（B37 档 3） | 第一刀已退役三份 provider GoJson 副本（embedding/rerank/websearch → `common/web/ProviderJson`）；本模块 `RemoteApiBodyCodec` 的 `goMarshal/goSorted` 待后续批次，**在那之前别动**（§11 边界） |
+| provider 请求面的 Go 字节兼容退役 | ✅ 已完成（B37/B41/B42 档 3） | 三份 provider GoJson 副本已收编 `common/web/ProviderJson`；旧 Go 工具面 5 类已全仓退役。**字节兼容约束本身未解除**：`RemoteApiBodyCodec.byteOrderSorted` 的键序仍是线上字节，别动（§11 边界） |
 | `AnthropicChat` 760 行，本域最大类 | 观察项 | <800 合规（整协议实现单一关注点）；若继续长，按 §13.1 侦察后沿 Anthropic 请求/流式/工具三段拆 |
 | `provider/Config.validateConfig` 尚无生产调用点（仅测试） | 接缝预留 | 接口 javadoc 已注明"供运行时客户端接入时复用"——接之前别删 |
 

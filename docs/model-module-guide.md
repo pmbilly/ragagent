@@ -2,7 +2,7 @@
 
 > **面向读者**：第一次接手 `com.ragagent.model` 的架构师 / 高级开发者。
 > **目标**：30 分钟建立全局观 → 能定位改动点 → 能安全迭代（本模块 32 个契约用例 + 37 份 golden 兜底，改错会立刻红）。
-> **数据口径**：2026-10-08 实测（`wc -l` 口径）：**26 个 java 文件 / 2,802 行 / 5 个子包**。
+> **数据口径**：2026-10-11 实测（`wc -l` 口径）：**26 个 java 文件 / 2,817 行 / 5 个子包**。
 > **本文档的地位**：模块级导览；仓库级作业规范见仓库根 `HANDOFF.md`（§12 结构地图、§13 踩坑清单、§14 逐包重构范式）。
 
 ---
@@ -202,7 +202,7 @@ erDiagram
 | # | 方法 | 路径 | 用途（权限） |
 |---|---|---|---|
 | 1 | POST | `/api/v1/models` | 创建（Admin+）→ **201** 裸 `ModelResponse`；baseUrl SSRF 校验 |
-| 2 | GET | `/api/v1/models` | 列表（Viewer+），裸数组 |
+| 2 | GET | `/api/v1/models` | 列表（Viewer+），数组进 `data` |
 | 3 | GET | `/api/v1/models/{id}` | 详情（Viewer+）；`downloading`/`download_failed` → **500/1007** |
 | 4 | PUT | `/api/v1/models/{id}` | 更新（Admin+；内置仅 SystemAdmin）→ 200；凭证快照保留 |
 | 5 | DELETE | `/api/v1/models/{id}` | 软删（Admin+）→ **204**；内置 400、被引用 **400 code=2300** + usage details |
@@ -216,9 +216,9 @@ erDiagram
 | 约定 | 本域落实 |
 |---|---|
 | 字段名 | JSON 名 = Java 字段名（camelCase）；`@JsonProperty` **87 → 0**（主资源 54 + debug 14 + 落库 19），无 `@JsonNaming` |
-| 信封 | **无**：单资源直出、列表裸数组；创建 201、删除 204 无 body |
+| 信封 | **统一响应外壳**（B183 起）：单资源/列表进 `data`；创建 201（只包 body）、删除 200 + 外壳（204 已退役） |
 | 可空字段 | 显式输出 `null`；参数投影里 **0/空串 = 未设置 → null**（"用后端默认值"的显式语义，`ModelResponse.from`） |
-| 错误 | `{error:{code,message,details}}`；2300 的 `details` 是 ObjectNode **字段序固定**直出（usage 明细） |
+| 错误 | 外壳形态 `{code,message,data}`；2300 段的明细是 ObjectNode **字段序固定**直出进 `data`（usage 明细） |
 | 校验文案 | `@Valid` **显式** `message = "字段名: 不能为空"`——防 locale / Accept-Language 漂移（§13.10，本域示范） |
 | **debug 例外** | 运行时错误不是 HTTP 错误：体内 `ok=false` + `error` 原文，HTTP 恒 200；参数校验错才是 400 信封 |
 | 请求预览脱敏 | debug 的 `request` 只含非密字段：`extraConfig` 过敏感词 → `[REDACTED]`，`customHeaders` 只露头名，顶层键字母序（确定性） |

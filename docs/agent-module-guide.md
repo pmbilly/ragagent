@@ -1,8 +1,8 @@
 # agent 模块手册
 
 > **面向读者**：第一次接手 `com.ragagent.agent` 的架构师 / 高级开发者。
-> **目标**：30 分钟建立全局观 → 能定位改动点 → 能安全迭代（本模块有 350 个后端用例 + 42 个管理面契约金片兜底，改错会立刻红）。
-> **数据口径**：2026-10-08 实测（`wc -l` 口径）：**188 个 java 文件 / 约 3.59 万行 / 7 个一级子包（18 个带码子包）**。
+> **目标**：30 分钟建立全局观 → 能定位改动点 → 能安全迭代（本模块有 334 个后端 `@Test`（含挂在 `:boot` 的全栈契约测试）+ 42 个管理面契约金片兜底，改错会立刻红）。
+> **数据口径**：2026-10-11 实测（`wc -l` 口径）：**169 个 java 文件 / 30,666 行 / 6 个带码一级子包（17 份 package-info）**。注意：`modelcontext/` 与抓取支撑（`Fetcher` 族）已迁 `:engine` 模块（`com.ragagent.modelcontext` / `com.ragagent.webfetch`），仍是本域引擎的组成部分，只是物理位置在 `:engine`。
 > **本文档的地位**：模块级导览；仓库级作业规范见仓库根 `HANDOFF.md`（§12 结构地图、§13 踩坑清单、§14 逐包重构范式）。
 
 ---
@@ -12,8 +12,8 @@
 **它是什么**：ReAct 引擎域的全部后端能力——**把一轮用户提问变成"思考 → 调工具 → 观察 → 再思考"的循环**，外加智能体管理面。
 
 - 引擎本体：`AgentEngine` 门面 + 八段协作者（think / act / observe / prompt / finalize / steer / iteration / context-debug），**跨轮无状态**，每次问答由 session 域装配一份
-- 工具族：知识检索 7 件、wiki 页面 10 件、SQL 1 件（带手写安全守卫）、DuckDB 数据分析 2 件、网页 2 件、通用单件（todo_write / thinking / read_file）+ MCP 动态目录
-- 模型上下文协议：请求局部句柄（cN/dN/bN/wN/iN/res://NNNN）与引用解码——"这次对话能看到什么、怎么引用"的唯一边界
+- 工具族：知识检索 7 件、wiki 页面 10 件、SQL 1 件（带手写安全守卫）、DuckDB 数据分析 2 件、网页 2 件、通用单件（todo_write / thinking / read_file）+ 沙箱/技能文件族与 shell_exec（名字已冻结在 `ToolDefinitions`，沙箱退役后多数无本地实现）+ MCP 动态目录。**工具名是冻结面：`ToolDefinitions` 36 个名字常量（33 在役 + 3 退役）**， snake 写法刻意保留
+- 模型上下文协议（`:engine` 的 `com.ragagent.modelcontext`，跨模块）：请求局部句柄（cN/dN/bN/wN/iN/res://NNNN）与引用解码——"这次对话能看到什么、怎么引用"的唯一边界
 - 上下文压缩：检查点摘要 + 工具结果裁剪，保证长对话不被窗口掐死
 - 技能（指令型）：SKILL.md 提示词注入，三级注入面，`skills` 表存储
 - 管理面：智能体 CRUD（`custom_agents` 表 + 内建 YAML 注册表）、技能目录、变量占位符、类型预设、推荐问题——**本域唯一的 HTTP 面在这**
@@ -47,13 +47,13 @@ graph TB
         MGMT["management/（3 controller / 17 端点）<br/>智能体 CRUD + 技能目录"]
         ENG["AgentEngine + 八段协作者<br/>think/act/observe/prompt/<br/>finalize/steer/iteration/context-debug"]
         REG["tools/ToolRegistry<br/>first-wins 注册 + 排序输出"]
-        FAM["工具族：knowledge 7 / wiki 10 /<br/>sql 1 / data 2 / web 2 / 通用 3"]
+        FAM["工具族：knowledge 7 / wiki 10 /<br/>sql 1 / data 2 / web 2 / 通用 3<br/>+ 文件族冻结名"]
         MCPF["MCP 族 10 类（暂留根）<br/>McpCatalog / McpToolWrapper"]
-        MC["modelcontext/<br/>cN·dN·bN·wN·res:// 句柄"]
+        MC["modelcontext/（:engine，跨模块）<br/>cN·dN·bN·wN·res:// 句柄"]
         CMP["compaction/<br/>检查点压缩"]
         SKL["skills/<br/>Manager + DbSkillSource"]
         DOM["domain/<br/>AgentState / AgentStep / ToolCall"]
-        SUP["support/<br/>Fetcher / BrowserRenderer"]
+        SUP[":engine webfetch/<br/>Fetcher / BrowserRenderer"]
     end
 
     subgraph 外部
@@ -78,7 +78,7 @@ graph TB
     BR -. 消费 .-> EV
 ```
 
-**三个必须知道的数字**：最大类 760 行（`ActPhase`，javadoc 里"836 行例外"的登记已过时，见 §9）——全包无 ≥800 行类；`tools/` 全家 98 文件 / 19,540 行（约 54% 的代码量，是最大的子域）；HTTP 面只有 **3 个 controller / 17 个端点**——引擎本体零 HTTP，执行入口在 session 域。
+**三个必须知道的数字**：最大类 763 行（`ActPhase`，javadoc 里"836 行例外"的登记已过时，见 §9）——全包无 ≥800 行类；`tools/` 全家 98 文件 / 19,467 行（约 63% 的代码量，是最大的子域）；HTTP 面只有 **3 个 controller / 17 个端点**——引擎本体零 HTTP，执行入口在 session 域。
 
 ---
 
@@ -88,19 +88,20 @@ graph TB
 
 | 子包 | 文件/行数 | 放什么 | **不放什么** |
 |---|---|---|---|
-| 根（引擎面） | 25 / 5,420 | `AgentEngine` 门面 + 八段协作者（`ThinkPhase` 572 / `ActPhase` 760 / `ObservePhase` 415 / `PromptAssembly` 434 / `ReActIteration` 282 / `FinalizePhase` 178 / `SteerIntake` 103 / `ContextDebugEmitter` 77）+ 提示词族 + 预算/取消/令牌估算 | Spring 装配（无 `@Component`，由 session 装配）、HTTP |
-| `tools/`（根） | 41 / 7,959 | 工具框架（`AgentTool` / `BaseTool` / `ToolRegistry` 628 / 参数校验 / 输出限额 / `ToolResultPersist`）+ 通用单件（todo_write / thinking / read_file）+ 跨族接缝（`DocChunkSupport` / `SearchAuth` / `SearchTarget`）+ **MCP 族 10 类**（`McpCatalog` 718，全包第三大类） | 各能力域的业务逻辑（→ 五个能力子包） |
-| `tools/wiki/` | 31 / 3,275 | wiki 页面工具十件 + 内容重写 / 路由解析 / 视图类型 | wiki 域的页面存储与摄取 |
-| `tools/knowledge/` | 12 / 4,371 | 知识检索七件（knowledge_search / grep_chunks / list_knowledge_chunks / query_knowledge_graph / get_document_info / search_conversations / search_memory）+ 排序 / 格式化协作者 + FAQ 投影 | 检索引擎与索引（→ `retrieval` / `knowledge`） |
+| 根（引擎面） | 23 / 5,157 | `AgentEngine` 门面（713 行）+ 八段协作者（`ThinkPhase` 574 / `ActPhase` 763 / `ObservePhase` 418 / `PromptAssembly` 428 / `ReActIteration` 283 / `FinalizePhase` 178 / `SteerIntake` 103 / `ContextDebugEmitter` 77）+ 提示词族 + 预算/取消/令牌估算 + `AgentToolNames`（compaction 用工具名常量） | Spring 装配（无 `@Component`，由 session 装配）、HTTP |
+| `tools/`（根） | 40 / 7,820 | 工具框架（`AgentTool` / `BaseTool` / `ToolRegistry` 634 / 参数校验 / 输出限额 / `ToolResultPersist`）+ 通用单件（todo_write / thinking / read_file=技能资源读取）+ 跨族接缝（`DocChunkSupport` / `SearchAuth` / `SearchTarget`）+ **MCP 族 10 类**（`McpCatalog` 723，全包第二大类） | 各能力域的业务逻辑（→ 五个能力子包） |
+| `tools/wiki/` | 31 / 3,276 | wiki 页面工具十件 + 内容重写 / 路由解析 / 视图类型 | wiki 域的页面存储与摄取 |
+| `tools/knowledge/` | 12 / 4,372 | 知识检索七件（knowledge_search / grep_chunks / list_knowledge_chunks / query_knowledge_graph / get_document_info / search_conversations / search_memory）+ 排序 / 格式化协作者 + FAQ 投影 | 检索引擎与索引（→ `retrieval` / `knowledge`） |
 | `tools/sql/` | 6 / 1,916 | `database_query` + 手写 SQL 安全守卫（`SqlGuard` + tokenizer / 深检查 / 注入分析） | 真连接管理（datasource 域） |
-| `tools/data/` | 5 / 870 | `data_analysis` / `data_schema` + DuckDB 实现 + chatpipeline 会话桥 | 沙箱（已裁撤；DuckDB 走独立会话） |
-| `tools/web/` | 3 / 1,149 | `web_search` / `web_fetch` 两件 | 抓取实现本体（→ `support/`） |
-| `management/`（子域） | 21 / 2,874 | controller 4 / 665（3 个 controller）、service 7 / 1,622（CRUD / 内建注册表 / config 校验 / 占位符 / 类型预设 / 推荐问题）、dto 3 / 295、mapper 4 / 205、domain 2 / 79 | 引擎运行时逻辑 |
-| `modelcontext/` | 13 / 4,041 | 请求局部句柄注册表（`Registry` 643）、模型输出封装（`ModelOutput` 734）、流解码、工具策略 | 任何持久化（句柄绝不落库） |
-| `compaction/` | 12 / 1,428 | `Compactor`、溢出判定、截断点选择、序列化器、原因类型 | 上下文窗口策略（→ 根 `ObservePhase`） |
+| `tools/data/` | 6 / 931 | `data_analysis` / `data_schema` + DuckDB 实现 + 会话桥 + `DataAnalysisSessionFactoryAdapter`（`chatpipeline.PipelinePorts.DataAnalysisSessionFactory` 的 agent 侧实现，随 chatpipeline 迁 `:engine` 后搬回本包触达包私有桥） | 沙箱（已裁撤；DuckDB 走独立会话） |
+| `tools/web/` | 3 / 1,152 | `web_search` / `web_fetch` 两件 | 抓取实现本体（→ `:engine` `webfetch/`） |
+| `management/`（子域） | 21 / 2,904 | controller 3 个 / 686（含 package-info）、service 7 / 1,627（CRUD / 内建注册表 / config 校验 / 占位符 / 类型预设 / 推荐问题）、dto 3 / 295、mapper 4 / 205、domain 2 / 79 | 引擎运行时逻辑 |
+| `compaction/` | 12 / 1,430 | `Compactor`、溢出判定、截断点选择、序列化器、原因类型、`FileOps`（沙箱文件操作在压缩中的存续） | 上下文窗口策略（→ 根 `ObservePhase`） |
 | `skills/` | 9 / 1,349 | 指令型技能：`Skill` 解析、`Manager` 三级注入、`SkillCatalogService`、`DbSkillSource`、`SkillEntity` + mapper | 安装管线 / 镜像源（已随沙箱裁撤） |
-| `support/` | 5 / 936 | 网页抓取与渲染（原顶层包 `webfetch`，2026-09-30 并入）：`Fetcher` 两工厂、`BrowserRenderer` 接缝、AgentMarkdown | 工具语义（`web_fetch` 工具在 `tools/web/`） |
 | `domain/` | 5 / 354 | 引擎值类型：`AgentState` / `AgentStep` / `ToolCall` / `ToolCallTarget`——落库 jsonb 与消息响应共用 | 请求/响应形状（管理面的在 `management/dto/`） |
+| `support/`（空壳） | 1 | 只剩一份内容已过时的 `package-info`（抓取栈已迁 `:engine` `webfetch/`：`Fetcher` 两工厂 / `BrowserRenderer` / `AgentMarkdown` / `FetchException`，4 文件）；包待清 | 任何新代码（别往这放） |
+
+> 跨模块成员：`modelcontext/` 13 文件 / 4,064 行现居 `:engine`（`com.ragagent.modelcontext`：`Registry` 643 / `ModelOutput` 734 / `ToolPolicy` 653 / 流解码 / 工具策略），import 面不变、测试仍在 `domains` 测试树；物理位置以 `:engine` 为准。
 
 ### 1.2 依赖方向（外部消费方 → agent → 被依赖域）
 
@@ -222,7 +223,7 @@ erDiagram
 | POST | `/api/v1/agents` | 创建（201；rawBody 手绑，仅 name 必填；API-Key 受限 scope 校验 `kbSelectionMode`） |
 | GET | `/api/v1/agents/{id}` | 详情（内建行也可读） |
 | PUT | `/api/v1/agents/{id}` | 更新（归属校验见 §3.2） |
-| DELETE | `/api/v1/agents/{id}` | 删除（204；内建行 403） |
+| DELETE | `/api/v1/agents/{id}` | 删除（200 + 外壳；内建行 403） |
 | POST | `/api/v1/agents/{id}/copy` | 复制（201；先 404 路径再 scope 校验） |
 | GET | `/api/v1/agents/{id}/suggested-questions` | 推荐问题（kbIds/knowledgeIds/tagScopes CSV 参数 + limit；从 chunks 元数据 + FAQ 随机抽样） |
 
@@ -235,18 +236,18 @@ erDiagram
 | GET / POST | `/api/v1/skills/catalog` | 列表（含 `referencedBy` 引用清单）/ 新建（201；slug 或 name 冲突 409；缺租户上下文 401） |
 | GET | `/{id}` | 编辑草稿（`content` = **剥掉 frontmatter 的正文**，保存时服务端重新组装并自校验） |
 | PUT | `/{id}` | 更新（slug 不可改；平台内置行 403；被引用时禁改名 409） |
-| DELETE | `/{id}` | 删除（204；被引用且无 `force=true` → 409，引用清单进 details；平台内置行 403；软删） |
+| DELETE | `/{id}` | 删除（200 + 外壳；被引用且无 `force=true` → 409，引用清单进 `data`；平台内置行 403；软删） |
 | GET | `/{id}/files` · `/{id}/files/content` | 技能文件（入库技能只有 SKILL.md；形状沿用宿主目录时代） |
 
 ### 3.2 契约约定（改接口前必读）
 
 | 约定 | 说明 |
 |---|---|
-| 字段名 | **JSON 名 = Java 字段名**（camelCase）。响应键由 `AgentResponses` 显式 `put` 固定顺序；`config` 内层键 B18 起 camel，读侧容忍 snake 存量 |
-| 信封 | **无** `{data,success}` 信封：资源直出；仅两个业务键包裹（列表 `{agents, disabledOwnAgentIds}`、技能 `{skills, skillsAvailable}`） |
-| 删除 | 返回 **204**（无 body）；创建返回 **201** |
+| 字段名 | **JSON 名 = Java 字段名**（camelCase）。响应键由 `AgentResponses` 显式 `put` 固定顺序；`config` 内层键 camel（落库 snake 存量已清零，B205 修数） |
+| 信封 | **统一响应外壳**（B183 起）：成功 `{code:0,message,data}`，资源/容器载荷（列表 `{agents,disabledOwnAgentIds}`、技能 `{skills,skillsAvailable}`）整体进 `data`。权威口径见 `docs/api-response-convention.md` |
+| 删除 | 返回 **200 + 外壳**（204 已退役）；创建返回 **201**（只包 body 不改状态） |
 | 可空字段 | 显式输出 `null`（如 `deletedAt`）；时间零值输出 `"0001-01-01T00:00:00Z"`（`ZeroTimeSerializer`） |
-| 错误 | `{error: {code, message, details}}`；`AgentController` 的请求体错误拼进 "Invalid request parameters" 的 details（固定文案兜底，`RequestFields.message("Name","required")`） |
+| 错误 | `{code,message,data}` 外壳形态（`ag-create-badbody`：`{code:1000,...,data:"details"}`）；`AgentController` 的请求体错误以 "Invalid request parameters" 文案 + 明细进 `data`（固定文案兜底，`RequestFields.message("Name","required")`） |
 | 手绑例外 | `AgentController` 是 rawBody 手绑（`bindAgentRequest`）——§14.5 允许的例外，javadoc 已注明；`SkillCatalogController` 用 `@RequestBody` record |
 | 归属守卫 | 写路由在 controller 内做：行存在且**非 Admin+ 且非创建者 → 403**；行不存在**放行给 handler 出 404**；读/列表 Viewer 下限由 `RbacInterceptor` 承担 |
 | locale | `Accept-Language` 首个 tag（env `WEKNORA_LANGUAGE` 优先）→ 内建行 i18n name/description 与校验文案 |
@@ -421,7 +422,7 @@ cd frontend && npx vue-tsc --build --force && npm test
 
 ## 8. 测试与验证
 
-- **规模**：本模块测试树 `domains/src/test/java/com/ragagent/agent/` 共 **69 个测试类 / 350 个 `@Test`**（2026-10-08 实测）。分布：`tools/` 全家 36 类（根 23 + 能力子包 knowledge 6 / web 3 / wiki 2 / sql 1 / data 1）、根 12、`compaction/` 7、`management/` 5、`skills/` 4、`modelcontext/` 3、`domain/` 与 `support/` 各 1。全仓基线约 4,836 用例（HANDOFF B85 口径）。
+- **规模**：本域测试树（`domains` + `:boot` 合计）**56 个测试类 / 306 个 `@Test`**（2026-10-11 实测；B219 删除超大测试常量后收缩，契约测试驻 `:boot`）。全仓基线 **4,876 用例**（B223 闸门记录）。
 - **两类测试风格**：
   - **契约金片**：`AgentContractTest` 对照 `domains/src/test/resources/contracts/` 的 **42 个 `ag-*.json`**（+ 引用 17 个 `init-*.json`），dev server 录制（`scripts/record-ag-golden.sh`），掩码比对、语义比较（键序/转义归一化后比）。`ag-*` 是 §11 冻结边界：改契约必须走重录脚本 + 差异复核，**别手改金片**。
   - **录制实录**：`GoRecording*.java` 常量类（根 / `tools/` 45A/B/C / `modelcontext/` 46A）+ `*RecordingTest` 族——对旧实现跑出的真值直接生成为常量，逐字节比对，禁手改。

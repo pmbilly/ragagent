@@ -1,8 +1,8 @@
 # datasource 模块手册
 
 > **面向读者**：第一次接手 `com.ragagent.datasource` 的架构师 / 高级开发者。
-> **目标**：30 分钟建立全局观 → 能定位改动点 → 能安全迭代（本模块自带 802 个后端用例兜底，改错会立刻红）。
-> **数据口径**：2026-10-08 实测（`wc -l` 口径）：**129 个 java 文件 / 约 2.77 万行 / 6 个顶层子包**（connector 下再分 8 个有码叶子包，飞书一族再分 core/drive/wiki 三层）。
+> **目标**：30 分钟建立全局观 → 能定位改动点 → 能安全迭代（本模块自带 631 个后端用例兜底：`:domains` 579 `@Test` + 14 `@ParameterizedTest`，另有 `:boot` 契约测试 38 个，改错会立刻红）。
+> **数据口径**：2026-10-11 实测（`wc -l` 口径）：**125 个 java 文件 / 26,782 行 / 6 个顶层子包**（connector 下再分 8 个有码叶子包，飞书一族再分 core/drive/wiki 三层）。
 > **本文档的地位**：模块级导览；仓库级作业规范见仓库根 `HANDOFF.md`（§12 结构地图、§13 踩坑清单、§14 逐包重构范式）。本域的批次执行记录在 `docs/handoff/plans/`（§14.7.15/§14.7.16 神类拆分、§14.9q 契约换锚 D1~D3）。
 
 ---
@@ -37,7 +37,7 @@ graph TB
         CTRL["controller/（2 个，17 个端点）<br/>主控 15 + 凭据 2"]
         SVC["service/（10 个）<br/>门面 DataSourceService + 四协作者<br/>+ KnowledgeBridge / AutoTagProvider 端口"]
         SPI["根（16 类）<br/>Connector SPI / Registry / Catalog<br/>ConnectorHttp（SSRF）<br/>队列端口 + Scheduler"]
-        CONN["connector/（77 个，8 个叶子包）<br/>feishu(core/drive/wiki) · notion · rss<br/>yuque · ima · gitlab"]
+        CONN["connector/（73 个，8 个叶子包）<br/>feishu(core/drive/wiki) · notion · rss<br/>yuque · ima · gitlab"]
         PERS["domain/ + mapper/ + dto/<br/>2 实体 · 4 jsonb 值类型 · 契约 DTO"]
         QUEUE["队列双实现<br/>InProcess（默认）/ Redis"]
     end
@@ -62,7 +62,7 @@ graph TB
     CTRL -. 响应出参一律经 dto/ 剥凭据 .-> PERS
 ```
 
-**三个必须知道的数字**：最大类 730 行（`connector/feishu/core/DocxBlocks`，飞书 docx 块解析，域内 ≥800 行已于 2026-10-01 三批清零）；`connector/` 占 19,098 行 ≈ 全域的 69%（管理面只占 31%）；17 个端点**两套错误形态并存**（见 §3.2，本模块最著名的坑）。
+**三个必须知道的数字**：最大类 730 行（`connector/feishu/core/DocxBlocks`，飞书 docx 块解析，域内 ≥800 行已于 2026-10-01 三批清零）；`connector/` 占 18,244 行 ≈ 全域的 68%（管理面只占 32%）；17 个端点**已全部并入统一响应外壳**（`@ApiResult`，成功/失败都是 `{code,message,data}`，删除类端点也是 200——见 §3.2）。
 
 ---
 
@@ -72,12 +72,12 @@ graph TB
 
 | 子包 | 文件/行数 | 放什么 | **不放什么** |
 |---|---|---|---|
-| 根（框架） | 16+1 / 2,121 | 连接器 SPI（`Connector` / `StreamingConnector` / `StreamHandler`）、`ConnectorRegistry` / `ConnectorCatalog` / `ConnectorMetadata`、`ConnectorHttp`（SSRF + 重定向 + 超时）、同步任务端口 `DataSourceSyncTaskQueue` + 双实现 + `Scheduler` | 具体协议（→ `connector/`）、业务编排（→ `service/`） |
-| `connector/`（8 叶子包） | 77 / 19,098 | 六家 provider：`feishu/{core,drive,wiki}` 23 个、`notion` 23、`rss` 18、`yuque` 7、`ima` 7、`gitlab` 5 | 我方 HTTP/落库契约（第三方线格式 350 处**冻结**，见 §7） |
-| `controller/` | 2 / 800 | 2 个 `@RestController`（15+2 端点）+ `KnowledgeBaseOwnerGuard`（KB 归属/白名单守卫，内嵌于 `DataSourceController`） | 业务语义（→ `service/`） |
-| `service/` | 10 / 2,664 | 门面 `DataSourceService`（管理面 + 同步 handler）+ 四协作者（`SyncExecutor` / `ItemOps` / `SyncResultOps` / `Support`）+ 两个端口（`KnowledgeBridge` / `AutoTagProvider`）及生产实现 + 装配 `DataSourceWiring` | 协议细节（→ `connector/`） |
-| `domain/` | 14 / 1,789 | 2 实体（`DataSource` / `SyncLog`）+ jsonb 值类型（`DataSourceConfig` / `SyncCursor` / `SyncResult` / `FetchedItem`…）+ `DataSourceConstants` + 异常 | 请求/响应形状（→ `dto/`） |
-| `dto/` | 4 / 331 | 响应 DTO：`DataSourceResponse` / `DataSourceConfigDto`（**按构造剥离 credentials**）/ `CredentialsResponse` / `CredentialFieldMetadata` | 落库注解、加密后的 config 透传 |
+| 根（框架） | 16+1 / 2,124 | 连接器 SPI（`Connector` / `StreamingConnector` / `StreamHandler`）、`ConnectorRegistry` / `ConnectorCatalog` / `ConnectorMetadata`、`ConnectorHttp`（SSRF + 重定向 + 超时）、同步任务端口 `DataSourceSyncTaskQueue` + 双实现 + `Scheduler` | 具体协议（→ `connector/`）、业务编排（→ `service/`） |
+| `connector/`（8 叶子包） | 73 / 18,244 | 六家 provider：`feishu/{core,drive,wiki}` 17 个（core 15 + drive 1 + wiki 1）、`notion` 23、`rss` 14、`yuque` 7、`ima` 7、`gitlab` 5 | 我方 HTTP/落库契约（第三方线格式 315 处**冻结**，见 §7） |
+| `controller/` | 2 / 770 | 2 个 `@RestController`（15+2 端点）+ `KnowledgeBaseOwnerGuard`（KB 归属/白名单守卫，内嵌于 `DataSourceController`） | 业务语义（→ `service/`） |
+| `service/` | 10 / 2,672 | 门面 `DataSourceService`（管理面 + 同步 handler）+ 四协作者（`DataSourceSyncExecutor` / `DataSourceItemOps` / `DataSourceSyncResultOps` / `DataSourceSupport`）+ 两个端口（`KnowledgeBridge` / `AutoTagProvider`）及生产实现 + 装配 `DataSourceWiring` | 协议细节（→ `connector/`） |
+| `domain/` | 14 / 1,790 | 2 实体（`DataSource` / `SyncLog`）+ jsonb 值类型（`DataSourceConfig` / `SyncCursor` / `SyncResult` / `FetchedItem`…）+ `DataSourceConstants` + 异常 | 请求/响应形状（→ `dto/`） |
+| `dto/` | 4 / 298 | 响应 DTO：`DataSourceResponse` / `DataSourceConfigDto`（**按构造剥离 credentials**）/ `CredentialsResponse` / `CredentialFieldMetadata` | 落库注解、加密后的 config 透传 |
 | `mapper/` | 5 / 884 | MyBatis-Plus 接口（`DataSourceMapper` / `SyncLogMapper`）+ **仓储门面同包**（`DataSourceRepository` / `SyncLogRepository`）+ `DataSourceTxTemplate` | 业务判断 |
 
 > 两个历史约定（HANDOFF 已登记，跟随既有惯例，别单独"顺手"改）：① 本域**没有 `repository/` 子包**，仓储门面与 mapper 同在 `mapper/`；② `DataSourceTxTemplate` 是独立事务 bean——Spring 自调用不走代理，`create`（插入 + 回写 `sync_deletions`）这类两步写必须穿过代理才原子。
@@ -104,9 +104,9 @@ graph LR
     style K fill:#f3e5f5
 ```
 
-**出向**（grep 实测）：`common` 60 处 / `knowledge` 23 处 / `audit` 7 处 / `auth` 3 处。knowledge 依赖全部收在 `MapperKnowledgeBridge` + `KnowledgeTagAutoTagProvider` 两个类里（为什么不直接用 `KnowledgeService`，见 §4.1 的端口说明）；audit 只在同步汇总点记事件（一次同步几千条，单条变更不进审计——`DataSourceItemOps.applyFetchedItem` 的 `suppressed` 参数即此意）。
+**出向**（grep 实测）：`common` 82 处 / `knowledge` 24 处 / `audit` 7 处 / `auth` 1 处。knowledge 依赖全部收在 `MapperKnowledgeBridge` + `KnowledgeTagAutoTagProvider` 两个类里（为什么不直接用 `KnowledgeService`，见 §4.1 的端口说明）；audit 只在同步汇总点记事件（一次同步几千条，单条变更不进审计——`DataSourceItemOps.applyFetchedItem` 的 `suppressed` 参数即此意）。
 
-**入向几乎为零**（这正是 HANDOFF §6.2 写"28.3k 行零耦合"的实测含义）：全仓只有 2 个文件引用本域——`agent/support/AgentMarkdown` 复用 `connector/rss/JdkHtmlToMarkdown`（纯函数，当工具类用）、`common/mybatis/TenantFilterGuard` 白名单点名 `DataSourceMapper.selectActive` 与 `SyncLogMapper.countByStatus` 两个方法。**改这两个方法名/语义时记得看 TenantFilterGuard**，其余改动无跨域涟漪。
+**入向几乎为零**（这正是 HANDOFF §6.2 写"零耦合"的实测含义）：全仓 main 源码只有 1 个文件引用本域——`common/mybatis/TenantFilterGuard` 白名单点名本域 mapper 的 7 个方法（`DataSourceMapper.selectActive` / `selectByIdOrNull` / `selectByKnowledgeBase`、`SyncLogMapper.countByStatus` / `selectLatest` / `selectByDataSource` / `selectByIdOrNull`）。**改这些方法名/语义时记得看 TenantFilterGuard**，其余改动无跨域涟漪。（历史注：原"agent 复用 `connector/rss/JdkHtmlToMarkdown`"的入向已消失——`JdkHtmlToMarkdown` 连同 `HtmlToMarkdown` 接缝上移进了 `common/web`，现在是公共件，复用方 `engine/webfetch/AgentMarkdown` 与本域 `RssConnector` 都从 common 拿。）
 
 ---
 
@@ -174,7 +174,7 @@ erDiagram
 
 | 常量组 | 取值 | 用在哪 |
 |---|---|---|
-| 连接器类型 `type` | 目录 17 项、**注册表只有 9 个实现**（feishu / lark / feishu_drive / lark_drive / notion / yuque / ima / rss / gitlab），其余（confluence / github / google_drive…）是"即将支持"的占位 | `data_sources.type`、`ConnectorCatalog`（`GET /types` 的响应就是这张静态目录，裸数组、稳定排序，**比对按 type 建索引别按下标**） |
+| 连接器类型 `type` | 目录 17 项、**注册表只有 9 个实现**（feishu / lark / feishu_drive / lark_drive / notion / yuque / ima / rss / gitlab），其余（confluence / github / google_drive…）是"即将支持"的占位 | `data_sources.type`、`ConnectorCatalog`（`GET /types` 的响应就是这张静态目录，外壳 data 内数组、稳定排序，**比对按 type 建索引别按下标**） |
 | 同步模式 | `incremental`（默认）/ `full` | `data_sources.sync_mode` |
 | 数据源状态 | `active` / `paused` / `error`（+ `deleted` 软删语义） | `data_sources.status`；同步 failed 且原本非 paused → `error`，paused 手动跑完**保持 paused** |
 | 同步日志状态 | `running` / `success` / `partial` / `failed` / `canceled` | `sync_logs.status`；**`pending` 刻意无常量**——它只出现在"作废在途同步"的判断里，是个从未被写入的半终态 |
@@ -188,29 +188,31 @@ erDiagram
 
 **主控**（`DataSourceController`，15 个）
 
+> 除 201 创建外，成功响应都经 `@ApiResult` 统一外壳输出（`{code:0,message:"ok",data:…}`）；下表"返回"列写的是 **data 内的载荷**。
+
 | 方法 | 路径 | 用途 / 形态 |
 |---|---|---|
-| GET | `/types` | 连接器目录，**裸数组**（`ConnectorMetadata`，按 priority 稳定排序） |
+| GET | `/types` | 连接器目录，data 内是 `ConnectorMetadata` **数组**（按 priority 稳定排序） |
 | POST | `/datasource` | 创建，**201**；请求体经 `KnowledgeBaseOwnerGuard` 校验 KB 归属 |
-| GET | `/datasource` | 列表（`knowledgeBaseId` 必填；分页 `limit` 上限 100） |
-| GET | `/datasource/{id}` | 详情（`DataSourceResponse`，凭据只露 `configured` 布尔） |
+| GET | `/datasource` | 列表（查询参数 `kbId` 必填，缺失/空 → 400 `kb_id is required`；无分页） |
+| GET | `/datasource/{id}` | 详情（`DataSourceResponse`，凭据只露 `fields.credentials.configured` 布尔） |
 | PUT | `/datasource/{id}` | 更新（201 之外的成功都是 200；凭据不走这里，走子资源） |
-| DELETE | `/datasource/{id}` | **204**；软删（`deleted_at`） |
-| POST | `/datasource/{id}/validate` | 真连一次外部 API 验配置 → `{"status":"connected"}` |
+| DELETE | `/datasource/{id}` | **200 + 外壳（`data:null`）**；软删（`deleted_at`）——204 已全仓退役 |
+| POST | `/datasource/{id}/validate` | 真连一次外部 API 验配置 → data 内 `{"status":"connected"}` |
 | POST | `/datasource/validate-credentials` | 不落库、只验凭据 → 同上 |
-| GET | `/datasource/{id}/resources` | 资源树**惰性加载**（`parentId` 空 = 顶层，非空 = 直接子项），裸数组 `Resource` |
-| POST | `/datasource/{id}/resource-ancestors` | 为选中资源解析祖先链（树形选择器回根用，见 `Connector.resolveResourceAncestors`） |
-| POST | `/datasource/{id}/sync` | 手动同步：建 `sync_log(running)` + 入队，返回**裸 SyncLog 实体** |
-| POST | `/datasource/{id}/pause` · `/resume` | `{"status":"paused"}` 等 |
-| GET | `/datasource/{id}/logs` | 同步日志分页；`limit` 非法 → 400，`offset` 非法**静默归 0**（容错分支，有夹具钉住） |
-| GET | `/datasource/logs/{log_id}` | 单条日志（裸 SyncLog） |
+| GET | `/datasource/{id}/resources` | 资源树**惰性加载**（`parentId` 空 = 顶层，非空 = 直接子项），data 内 `Resource` 数组 |
+| POST | `/datasource/{id}/resource-ancestors` | 为选中资源解析祖先链（树形选择器回根用，见 `Connector.resolveResourceAncestors`），data 内 `{"ancestors":[…]}` |
+| POST | `/datasource/{id}/sync` | 手动同步：建 `sync_log(running)` + 入队，返回 SyncLog 载荷 |
+| POST | `/datasource/{id}/pause` · `/resume` | data 内 `{"status":"paused"}` / `{"status":"active"}` |
+| GET | `/datasource/{id}/logs` | 同步日志分页；`limit` 非法 → 400（1..100 之外），`offset` 非法**静默归 0**（容错分支，有夹具钉住） |
+| GET | `/datasource/logs/{logId}` | 单条日志（SyncLog 载荷） |
 
 **凭据子资源**（`DataSourceCredentialsController`，2 个）
 
 | 方法 | 路径 | 用途 |
 |---|---|---|
-| PUT | `/datasource/{id}/credentials` | 整张原子替换凭据 map → 裸 `{"fields":{"credentials":{"configured":true}}}` |
-| DELETE | `/datasource/{id}/credentials/{field}` | 整张清空 → 204 |
+| PUT | `/datasource/{id}/credentials` | 整张原子替换凭据 map（替换后立刻做一次真实连接校验）→ data 内 `{"fields":{"credentials":{"configured":…}}}`；空 map → 400（提示用 DELETE 清空） |
+| DELETE | `/datasource/{id}/credentials/{field}` | 整张清空 → **200 + 外壳（204 已退役）**；field 只认 `credentials`，其余 400 |
 
 > 为什么凭据只有一个逻辑字段：数据源凭据是**按连接器而异的原子 map**（OAuth token 对、GitLab 的 token…），拆成具名字段会造出"配了一半、根本认证不了"的中间态（凭据 controller javadoc；与 mcp/model/websearch 的逐字段凭据是刻意不同的形状）。
 
@@ -218,13 +220,13 @@ erDiagram
 
 | 约定 | 说明 |
 |---|---|
-| 错误形态（⚠️ 本模块最著名约定） | **两套并存、刻意不统一**：主控 15 个端点直写单键体 `{"error":"..."}`；凭据 2 个端点走全局 `AppError` 信封 `{"error":{code,message,details},"success":false}`。两边类注释都写明"别统一" |
+| 响应外壳 | **统一响应外壳一统**：两个控制器都挂 `@ApiResult`，成功一律 `{code:0,message:"ok",data:…}`；错误**恒抛** `BizException` 走 `GlobalExceptionHandler`，同壳输出（HTTP 状态码保留 400/401/403/404/500 语义）。历史"主控单键体 vs 凭据 AppError 信封两套并存、别统一"的约定**已退役**（50/52 控制器迁移批收官，`DataSourceCredentialsController` javadoc 留有退役记录；39 个 `ds-*` 金片全是外壳形状） |
 | 鉴权 | 三层：角色（读端 Viewer+、其余 Admin+，WebConfig）→ `ownDataSource` 租户归属（数据源持有外部凭据，只有属主租户能碰）→ `KnowledgeBaseOwnerGuard` 的 API-Key KB 白名单（主控所有端点共用一处） |
 | 401 文案两组 | create/list 是 `unauthorized: workspace context missing`，其余是 `unauthorized`——所以每个端点自己取租户，**别抽成切面**（controller javadoc 明示） |
-| 凭据 controller 的刻意差异 | 租户缺失是 **400** `Workspace ID cannot be empty`（主控是 401）；"KB 不存在"与"不属于本租户"都折叠成 **404** `data source not found`（主控是 404/403 两种） |
+| 凭据 controller 的刻意差异 | 租户缺失是 **400** `Workspace ID cannot be empty`（主控是 401）；"KB 不存在"与"不属于本租户"都折叠成 **404** `data source not found`（主控是 404/403 两种）；service 报错 DELETE 落 500 而 PUT 落 400 |
 | 键名 | JSON 名 = Java 字段名（camelCase，D1/D2/D3 换锚后已收官）；可空/零值**显式输出**（`forceFull:false`、`maxItems:0`、`trigger:""` 照写） |
-| 实体序列化 | `DataSource`/`SyncLog` 是"半线上"对象：`config`/`last_sync_cursor`/`last_sync_result` 原样透传进 DTO，`latestSyncLog` 裸实体直接进响应——**动实体字段序列化＝动线上契约**（实体 javadoc 醒目位置） |
-| 响应出参 | 管理端点一律经 `DataSourceResponse`/`DataSourceConfigDto` **按构造剥离凭据**（DTO 上压根没有 credentials 字段，密文不可能漏出去） |
+| 实体序列化 | `DataSource`/`SyncLog` 是"半线上"对象：`config`/`last_sync_cursor`/`last_sync_result` 原样透传进 DTO，`latestSyncLog` 载荷直接进响应——**动实体字段序列化＝动线上契约**（实体 javadoc 醒目位置） |
+| 响应出参 | 管理端点一律经 `DataSourceResponse`/`DataSourceConfigDto` **按构造剥离凭据**（DTO 上压根没有 credentials 字段，密文不可能漏出去；"配没配"只经 `credentials.credentials.configured` 一个布尔暴露） |
 
 ---
 
@@ -298,7 +300,7 @@ flowchart TD
     A["① domain/DataSourceConstants<br/>加 type 常量"] --> B["② 实现 Connector<br/>validate / listResources / resolveResourceAncestors<br/>fetchAll / fetchIncremental<br/>（大源再实现 StreamingConnector）"]
     B --> C["③ ConnectorCatalog<br/>加目录元数据（17 项里的展示项）"]
     C --> D["④ service/DataSourceWiring<br/>注册实例（LinkedHashMap，注册失败=启动失败）"]
-    D --> E["⑤ 前端 datasourceIcons.ts<br/>+ DataSourceSettings.vue / EditorDialog"]
+    D --> E["⑤ 前端 datasourceIcons.ts<br/>+ DataSourceSettings.vue / DataSourceEditorDialog.vue"]
     E --> F["⑥ 测试：stub server 桩 +<br/>connector 下各 provider 的测试类"]
 
     B -. "游标落 SyncCursor.connectorCursor 私有 map" .-> G["SyncCursor"]
@@ -308,7 +310,7 @@ flowchart TD
 - `Connector` 的取消模型：方法不带 context 参数，取消 = **线程中断**（`sleep` 抛 `ConnectorException`）；请求超时在各客户端自己的 `HttpRequest.timeout`，任务超时由队列的线程池兜底。
 - `listResources` 的 `parentId` 惰性加载 + `resolveResourceAncestors` 回祖先链，是树形选择器能展开深节点又不全树遍历的配对设计（接口 javadoc）。
 - `fetchIncremental` 是**三返回值形态**：items/cursor 进 record，错误走异常，且**异常与结果可同时有效**（`PartialFetch` 抛出时 items/cursor 已填好）——调用方先取结果再按异常定级。
-- 飞书一族共用 `SyncEngine`（泛型流式引擎，各连接器差异隔离在 `NodeOps` 适配器后），它有三条刻意行为：**续跑快路径**（编辑时间没变 → 跳过但保留游标条目）、**抓取失败不推进游标**（保留旧编辑时间，下次重试而不是被"已同步"永久跳过，Tencent/WeKnora#2136）、**删除检测只在完整列举时做**（部分列举会误报）。
+- 飞书一族共用 `SyncEngine`（泛型流式引擎，各连接器差异隔离在 `NodeOps` 适配器后），它有三条刻意行为：**续跑快路径**（编辑时间没变 → 跳过但保留游标条目）、**抓取失败不推进游标**（保留旧编辑时间，下次重试而不是被"已同步"永久跳过，Tencent/WeKnora#2136）、**删除检测只在完整列举时做**（部分列举会误报）。检查点节奏双保险：每 50 个节点（`checkpointInterval`）或每 30 秒墙钟（`checkpointMaxInterval`）落一次——后者防"节点少但每个都慢（限流）"的同步到 2 小时超时都没存过进度。
 - 所有连接器的出站 HTTP 走 `ConnectorHttp`：SSRF 三层防护（发送前校验 / 重定向 ≤10 跳每跳重校验 / 整体超时预算）；测试打本机桩必须先注入放行 `127.0.0.1` 的 `SsrfGuard` 实例（类 javadoc）。
 
 ---
@@ -324,11 +326,11 @@ flowchart TD
 | 改调度节奏/去重/重试 | 根 `Scheduler`（`MAX_RETRY` / `TASK_TIMEOUT` / TaskID 粒度）+ 队列实现 | 端口四条语义（TaskID 去重、重试预算、超时中断、失败可报）一条都不能丢（端口 javadoc） |
 | 换队列实现（MQ） | 实现 `DataSourceSyncTaskQueue`（现成先例：`RedisDataSourceSyncTaskQueue` + `DataSourceTaskQueueWiring` 的 `@Primary` 开关模式） | Redis 版踩过的坑：跨进程 + TTL 场景要**兼容读**（对比 D3 载荷的"零兼容负担"判定） |
 | 改凭据加密/解密 | `domain/DataSourceConfig.toJSON`（加密）+ `domain/DataSource.parseConfig`（宽容解密） | 解密失败置空不炸是**特性**（行保持可见）；测试孤例失败先查 `SYSTEM_AES_KEY` 环境泄漏（§8） |
-| 加端点 | `controller/DataSourceController` + `service` 门面方法 + 响应走 `dto/` | 主控错误形态是单键 `{"error":"..."}`；每个端点自己取租户、401 文案选对组（§3.2） |
+| 加端点 | `controller/DataSourceController` + `service` 门面方法 + 响应走 `dto/` | 错误一律抛 `BizException` 走统一外壳；每个端点自己取租户、401 文案选对组（§3.2） |
 | 给两张表加字段 | `domain/` 实体 + `mapper/`（显式 SQL 的列清单）+ baseline SQL + `TestSchema` | H2 里 `sync_logs` 不建外键/级联（TestSchema 既有约定）；jsonb 新列想清楚要不要 DEFAULT（§2.2 第 3 条） |
 | 改 jsonb 值形状 | `domain/SyncCursor` / `SyncResult` / `DataSourceConfig` | 键名=Java 字段名恒输出；落库面改键要**同批带迁移 SQL**（D2 有现成范式）；`config` 内层 connector 键不动 |
 | 改飞书连接器 | `connector/feishu/core/`（`FeishuClient` 门面 + Transport/WikiTreeOps/DriveOps 协作者） | `FeishuApiTypes`/`DocxBlocks` 是第三方线格式+LLM 输出面，键名冻结；公开 DTO（`DriveFilePage`）留在原类 |
-| 改 RSS 解析 / HTML→Markdown | `connector/rss/JdkXmlFeedParser` / `JdkHtmlToMarkdown` | 后者被 `agent/support/AgentMarkdown` 跨域复用——改行为等于改 agent 工具输出 |
+| 改 RSS 解析 / HTML→Markdown | `connector/rss/JdkXmlFeedParser`（本域）/ `common/web/JdkHtmlToMarkdown`（已上移公共件） | 后者是 `HtmlToMarkdown` 接缝的有界实现，`engine/webfetch/AgentMarkdown` 与本域 `RssConnector` 共用——改行为等于同时改 agent 工具输出 |
 | 改资源树/祖先解析 | `Connector.listResources` / `resolveResourceAncestors` 各实现 + `GET /resources` 端点 | `SubtreeChildIds` 的 `#` 前缀契约若动，清扫侧必须同步改（§7 第 10 条） |
 
 ---
@@ -343,9 +345,10 @@ cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Cont
   ./gradlew :domains:test :domains:spotlessCheck
 # 若动了前端可见契约（键名/形态/状态码），同批带前端：
 cd frontend && npx vue-tsc --build --force && npm test
-# 契约夹具重录（键改名一律重录，别手改结构；重录后必须结构化复核差异，§13.12）
+# 契约夹具重录（键改名一律重录，别手改结构；重录后必须结构化复核差异，§13.12。
+# 契约测试现居 :boot：com.ragagent.datasource.controller.DataSourceHttpContractTest）
 JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew :domains:test --tests "com.ragagent.datasource.DataSourceHttpContractTest" -Dcontract.refresh=true
+  ./gradlew :boot:test --tests "com.ragagent.datasource.controller.DataSourceHttpContractTest" -Dcontract.refresh=true
 ```
 
 **A. 加连接器**：§4.3 六步 → 单域全绿 → 全量三绿 → 提交。注册表在装配期校验（null / 空 type 抛异常聚合），配错**启动就炸**，别在运行期吞。
@@ -362,9 +365,9 @@ JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
 
 ## 7. 模块约定与坑（必读）
 
-1. **两套错误形态刻意并存**：主控 `{"error":"..."}` 单键体 vs 凭据 `AppError` 信封——两个 controller 的类注释都写明"别统一"。顺手"修复"它会破坏 39 个 `ds-*` 夹具里的错误金片。
-2. **`connector/` 第三方线格式 350 处永久冻结**（**2026-10-09 B152 补注**：其中「键=字段名」的**冗余注解 12 处已清** ✓ —— 线格式（键名与字段序）**仍永久冻结** ✓；带蛇形键/混用改名注解的那部分本就必要，连同 49 个混用类型一并保留 ✓）（`FeishuApiTypes`/`YuqueApiTypes`/`ImaApiTypes`/`GitLabClient`/`NotionClient` 等）：字段名由对方 API 决定，与 mcp 的 RFC 面同类——**别把它们"改回 camelCase"**（HANDOFF §14.6 / §14.9q）。要动只有一种情况：对接对方 API 版本升级。
-3. **`lf_*` 五键冻结**：`DataSourceSyncPayload` 里 `lf_trace_id` 等是 `TracingContext` **平铺载具的命名空间前缀**（四个域共用同一形状）；去前缀会与载荷自有字段撞名（`userId`/`sessionId`）。要清理应改成嵌套 `tracing` 键——那是形状变更，另批（HANDOFF §14.9q D3 / §14.6）。
+1. **错误响应一律走统一外壳**：两个 controller 都挂 `@ApiResult`、错误恒抛 `BizException`——旧 Go 迁移期"主控单键体 vs 凭据 AppError 信封两套并存、别统一"的约定已退役。顺手"复活"旧形态、或绕开外壳直写响应体会破坏 39 个 `ds-*` 金片（它们已按 `{code,message,data}` 重录）。
+2. **`connector/` 第三方线格式 315 处（2026-10-11 实测）永久冻结**（**2026-10-09 B152 补注**：早期「键=字段名」的**冗余注解 12 处已清** ✓ —— 线格式（键名与字段序）**仍永久冻结** ✓；带蛇形键/混用改名注解的那部分本就必要，连同 49 个混用类型一并保留 ✓）（`FeishuApiTypes`/`YuqueApiTypes`/`ImaApiTypes`/`GitLabClient`/`NotionClient` 等）：字段名由对方 API 决定，与 mcp 的 RFC 面同类——**别把它们"改回 camelCase"**（HANDOFF §14.6 / §14.9q）。要动只有一种情况：对接对方 API 版本升级。
+3. **追踪载体已改嵌套 `tracing` 键**：`DataSourceSyncPayload` 的第 8 个组件 `tracing` 里收着 `TracingContext` 的五个 `lf_*` 键（空载体整键省略）；`lf_*` 前缀是 `TracingContext` **自身的命名空间**（四个域共用同一形状），去前缀会与载荷自有字段撞名（`userId`/`sessionId`）——这五键仍冻结（`DataSourceSyncPayload` javadoc；HANDOFF §14.9q D3 / §14.6）。
 4. **`config` 内层键是数据不是键**：外层包装（`type`/`credentials`/`resourceIds`/`settings`）是我方 schema；内层 `settings`/`credentials` 的键是各 connector 的配置字段名（如 `app_id`），由 `ConnectorMetadata` 描述符与前端表单按同名提交——改了同时打断表单与既有行（§14.9q 入场判定）。
 5. **显式 SQL 里的 jsonb 必须逐条挂 typeHandler**：实体上的 `@TableField(typeHandler)` 在 `@Select`/wrapper `set()` 路径**不生效**，漏挂退化成 Java 序列化落库成字符串（`SyncLogMapper` / `DataSourceRepository` 注释原文警告）。
 6. **`sync_deletions` 三步舞与带 DEFAULT 列的回写**（§2.2 第 4 条）：改 `create`/`update` 路径前先读 `DataSource` javadoc 第 8 条——"用户选了 false 会丢"这类问题在这里是真实发生过的。
@@ -381,8 +384,8 @@ JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
 
 ## 8. 测试与验证
 
-- **规模**（2026-10-08 实测，`domains/src/test/java/com/ragagent/datasource/`）：**38 个测试类** / 46 个 java 文件（另 8 个是支撑件：`FeishuTestServer`、`FeishuTestSupport`、`WikiFixtures`、`GitLabServerStub`、`NotionStubServer`、`NotionTestSupport`、`FakeIma`、`FakeYuque`）；**788 个 `@Test` + 14 个 `@ParameterizedTest`**。
-- **契约夹具**：`domains/src/test/resources/contracts/` 下 **39 个 `ds-*`** 金片（`DataSourceHttpContractTest` 消费）；比较器是**语义比较**（键序/转义归一化后比，B2 统一 GoldenContract 后字节级对比清零）。连接器协议面不走金片，走**进程内 stub server**（真实 HTTP 走一遍 `ConnectorHttp` 的 SSRF/重定向/超时栈）。
+- **规模**（2026-10-11 实测）：`:domains/src/test/java/com/ragagent/datasource/` 下 **31 个测试类**（全部 `*Test`）；支撑件 8 个已移至 `:domains` 的 **`src/testFixtures/java/com/ragagent/datasource/`**（`FeishuTestServer`、`FeishuTestSupport`、`WikiFixtures`、`GitLabServerStub`、`NotionStubServer`、`NotionTestSupport`、`FakeIma`、`FakeYuque`）；**579 个 `@Test` + 14 个 `@ParameterizedTest`**，另有 **`:boot` 的 `DataSourceHttpContractTest` 38 个用例**（模块合计 631）。
+- **契约夹具**：`:domains` 的 **`src/testFixtures/resources/contracts/`** 下 **39 个 `ds-*`** 金片（`:boot` 的 `DataSourceHttpContractTest` 消费）；比较器是**语义比较**（键序/转义归一化后比，B2 统一 GoldenContract 后字节级对比清零）。连接器协议面不走金片，走**进程内 stub server**（真实 HTTP 走一遍 `ConnectorHttp` 的 SSRF/重定向/超时栈）。
 - **单域验证**：`./gradlew :domains:test --tests "com.ragagent.datasource.*"`；闸门仍以全量 `:domains:test :domains:spotlessCheck` 为准（§13.4：读 `TEST-*.xml` 的 `failures+errors==0` 且用例数达标，compileTestJava 绿 ≠ 测试绿）。
 - **已知偶发 2 例**（全量并发下偶发，先单独重跑再判回归，出处 knowledge 手册 §8 同源）：`WebToolsRecordingTest.searchWithContentFetchesLeadingPagesViaSharedFetchTool`、`EvaluationContractTest.getTerminalRunsExecution`。
 - **改前端可见契约时**：后端与前端**同批**改完再提交（本域前端消费面：`api/datasource/index.ts` + `views/knowledge/settings/DataSource*.vue`）。
@@ -397,8 +400,8 @@ JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
 | ~~`@JsonProperty` 换锚 493 处~~ | **已解决（2026-10-01~10-02，D1~D3）** | 493→417→366→355；余 355 全是冻结面（350 connector 线格式 + 5 `lf_*`），**可换锚面 = 0**；落库迁移 SQL 已跑（dev 库 0 行、真 PG 合成行验证）；`DataSourceJsonTest` 的 Go 逐字节 golden 已按"内部载荷非对外契约"改写为本方形状（HANDOFF §14.9q） |
 | InProcess 队列多实例重复同步 | 部署风险 | 多副本上线前切 Redis 实现（`datasource.redis-enabled=true`）；开关打开但连不上=启动失败，属预期（§7 第 8 条） |
 | `MapperKnowledgeBridge` 是"最小可用闭环" | 技术债 | `KnowledgeService` 补齐 metadata/tagIDs 入参后可收敛回正道；在那之前新同步字段要**显式评估**是否进了这条最小闭环，否则落库后找回不了 |
-| 350 处 connector 线格式（**其中冗余注解 12 处于 B152 已清，余 312 处按此清单守**）+ `lf_*` 5 键 | **永久冻结（非待办）** | 列在此处只为防"误报为债"；改动条件见 §7 第 2/3 条 |
 | `sync_logs` 物理删 + retention 清理 | 已知设计 | 日志会被 `CleanupOldLogs` 按 `sync_log_retention_days`（默认 30）删掉——别把 sync_log 当永久审计源，审计汇总另有 audit 域 |
+| ~~connector 线格式 350 处（其中冗余注解 12 处 B152 已清）~~ | **现为 315 处（2026-10-11 实测）** | 冻结面随神类拆分/死代码清理自然收敛；仍是**永久冻结（非待办）**，列在此处只为防"误报为债"；改动条件见 §7 第 2/3 条 |
 
 ---
 

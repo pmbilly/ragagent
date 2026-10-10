@@ -2,7 +2,7 @@
 
 > **面向读者**：第一次接手 `com.ragagent.im` 的架构师 / 高级开发者。
 > **目标**：30 分钟建立全局观 → 能定位改动点 → 能安全迭代（本模块有 145 个后端用例 + 30 个契约 fixture 兜底，改错会立刻红）。
-> **数据口径**：2026-10-08 实测（`wc -l` 口径）：**76 个 java 文件 / 约 1.74 万行（17,352）/ 14 个子包**（+ 根 1 个 package-info）。
+> **数据口径**：2026-10-11 实测（`wc -l` 口径）：**80 个 java 文件 / 17,671 行 / 14 个子包**（九渠道一子包 + controller/domain/mapper/runtime/service；+ 根 1 个 package-info）。
 > **本文档的地位**：模块级导览；仓库级作业规范见仓库根 `HANDOFF.md`（§12 结构地图、§13 踩坑清单、§14 逐包重构范式）。
 
 ---
@@ -21,7 +21,7 @@
 | 不负责 | 归属 |
 |---|---|
 | 会话 / 消息存储与 QA 编排本体 | `session`（本模块只做渠道↔会话映射，问答调 `SessionKnowledgeQaService` / `SessionAgentQaService`） |
-| agent 定义与配置 | `agent/management`（渠道绑定的 `CustomAgent` 由 `CustomAgentService` 提供；jsonb typeHandler 也借住在那边，见 §2.2） |
+| agent 定义与配置 | `agent/management`（渠道绑定的 `CustomAgentEntity` 由 `CustomAgentService` 提供；jsonb typeHandler 也借住在那边，见 §2.2） |
 | 知识库与检索 | `knowledge`（附件异步入库经 `KnowledgeService`，附件解析经 `DocReaderClient`） |
 | 适配器工厂装配 | `config/ImAdapterWiringConfig`（**本模块唯一的包外消费方**，1 个文件） |
 | SSE 流基础设施 | `stream`（跨实例 /stop 把取消事件写进 `StreamManager`） |
@@ -44,7 +44,7 @@ graph TB
     end
 
     subgraph 外部
-        AGENT["agent/management<br/>CustomAgent + JsonbRawStringTypeHandler"]
+        AGENT["agent/management<br/>CustomAgentEntity + JsonbRawStringTypeHandler"]
         SESS["session<br/>Session / QA 服务"]
         KB["knowledge<br/>KnowledgeService / DocReaderClient"]
         PG[("PostgreSQL<br/>im_channels + im_channel_sessions")]
@@ -193,11 +193,11 @@ erDiagram
 
 | 方法 | 路径 | 用途 |
 |---|---|---|
-| POST | `/api/v1/agents/{id}/im-channels` | 创建（201 + 裸资源行；platform 必填且须在白名单） |
-| GET | `/api/v1/agents/{id}/im-channels` | per-agent 列表（裸数组；**凭据不出行**，出 `credentialsConfigured`） |
-| GET | `/api/v1/im-channels` | 跨 agent 总览（裸数组；行带 `agentName`） |
+| POST | `/api/v1/agents/{id}/im-channels` | 创建（201，资源行进 `data`；platform 必填且须在白名单） |
+| GET | `/api/v1/agents/{id}/im-channels` | per-agent 列表（数组进 `data`；**凭据不出行**，出 `credentialsConfigured`） |
+| GET | `/api/v1/im-channels` | 跨 agent 总览（数组进 `data`；行带 `agentName`） |
 | PUT | `/api/v1/im-channels/{id}` | 更新（不存在 → 404；换绑 agent 失败 → 400） |
-| DELETE | `/api/v1/im-channels/{id}` | 删除（**任何失败都落 500** "failed to delete channel"，不存在的渠道也是 500；成功 204 无体） |
+| DELETE | `/api/v1/im-channels/{id}` | 删除（失败路径形态见 §3.2 遗留钉子行；成功 200 + 外壳） |
 | POST | `/api/v1/im-channels/{id}/toggle` | 切换启用（不存在 → 404） |
 | POST | `/api/v1/wechat/qrcode` | 微信扫码出站（**接缝**，见 §3.2） |
 | POST | `/api/v1/wechat/qrcode/status` | 扫码轮询绑定（qrcode 必填 → 400；confirmed 时才返回 credentials + baseUrl） |
@@ -214,9 +214,9 @@ erDiagram
 
 | 约定 | 说明 |
 |---|---|
-| 信封 | 成功 = **裸资源行 / 裸数组**（`imc-*` 金片为准）；错误 = **`{"error":"<固定文案>"}` 字符串形态**——**不是** knowledge 域的 `AppError {error:{code,message,details}}`，也不是标准 `{data,success}` 信封 |
+| 信封 | **统一响应外壳**（B183 起）：成功 `{code:0,message:"ok",data:…}`（资源行/数组进 `data`，`imc-delete` 金片）；错误分两路——正规 fail 路径 `{code:1002/1007,...}`（`imc-delete-404`/`imc-guard-viewer`），**遗留钉子**：部分 handler catch 路径写 `code:0 + data.error`（`ImChannelController` 手搓 `body.put("error",...)`，`imc-create-dup`/`imc-toggle-404` 金片钉住）。改钉子 = 改契约，需前端同批 |
 | 响应行 | 控制器手搓 `LinkedHashMap`，**三套键序并存**（资源行 / per-agent 摘要行 / 总览行各自一份，`ImChannelController` javadoc 明示）；`deletedAt` 恒输出 `null` |
-| ⚠️ 过时 javadoc | `ImChannelController` 类头注释仍写 "信封 `{"data":…}`、删除 `{"success":true}`"——**已过时**（§14.9s 七域批换锚后代码与金片都是裸行 + 204）。以 `imc-*` fixture 为准，别照着类头注释"恢复"信封 |
+| ⚠️ javadoc 口径以 golden 为准 | `ImChannelController` 类头注释的信封描述历经三朝（信封 → 裸行+204 → 统一外壳），**现行 = 统一外壳**（B183 起）。以 `imc-*` fixture 为准；类头注释若描述中间朝形态，一律视为过期 |
 | 鉴权 | 回调路由**注册在 Auth 之前**：`AuthFilter` L112 对 `/api/v1/im/callback/` 前缀整体让路，`WebConfig` L628 注明"刻意不在 RBAC 清单"；鉴权 = 各平台自己的验签 |
 | 微信接缝 | `POST /wechat/qrcode` 的 iLink 真出站**本仓不实现**：`WechatQRCodeService` 是 `@Autowired(required=false)` 可缺席 bean，缺席时 500 固定文案 "wechat iLink integration is not wired"；测试用包内 setter 注入 fake |
 | 冻结面 | `yunzhijia/YunzhijiaTypes` 的 `@JsonInclude(NON_EMPTY)` 是**云之家对端 API 契约**（B3 恒输出批曾误列真面，`YunzhijiaAdapterTest` 抓回，HANDOFF §14.6 登记"IM 第三方口径"）——别"顺手"改恒输出 |
@@ -283,7 +283,7 @@ flowchart TD
 
 - **谁拉起适配器**：websocket 型启动时建立长连接（`ImSupervisor` 周期重建防"僵尸连接"，最坏中断限一个周期）；webhook 型惰性——回调到达时才在 `handleMessage` 里补 `startChannel`；wechat 长轮询同理由客户端拉起。
 - **多实例面**（`runtime/QaQueue` + `ImRedisStore` + `ImService` 多实例段）：跨实例 leader 选举（websocket 渠道只许一个实例持连接）、消息去重 SETNX、滑窗限流 ZSET Lua、渠道配置 Pub/Sub 广播、跨实例 /stop（stop 事件写 `StreamManager` + inflight 映射 + 执行前 marker TTL 30s）。**Redis 键字面量是部署面契约，不随版本改名**（`ImRedisKeys` javadoc）。
-- **agent 删除联动**：`deleteChannelsByAgent`（CustomAgentService 调用）——软删该 agent 全部渠道并停适配器，"概览列表与运行中的适配器不得比 agent 活得更久"。
+- **agent 删除联动**：`deleteChannelsByAgent`（`CustomAgentService` 调用，实体 `CustomAgentEntity`）——软删该 agent 全部渠道并停适配器，"概览列表与运行中的适配器不得比 agent 活得更久"。
 
 ### 4.3 渠道接入扩展点（接第 10 家平台时走这里）
 
@@ -353,7 +353,7 @@ cd frontend && npx vue-tsc --build --force && npm test
 ## 7. 模块约定与坑（必读）
 
 1. **本模块 HTTP 契约不是 knowledge 标准**：成功裸行，错误是 `{"error":"<固定英文文案>"}` 字符串——没有 `AppError {code,message,details}` 结构（`ImCallbackController`/`ImChannelController` 实现 + `imc-*` 金片为准）。别按 §2-4 标准"顺手统一"，那是契约变更，要同 PR 带前端 + 金片重录。
-2. **`ImChannelController` 类头 javadoc 已过时**（还写着 `{"data":…}` 信封与删除 `{"success":true}`；现行为：裸行 + 删除 204，`ImContractTest` L143-144 钉死）。**过时注释与代码冲突时以代码 + 金片为准**，顺手修注释。
+2. **`ImChannelController` 类头 javadoc 的信封描述已三期漂移**（信封 → 裸行+删除204 → 统一外壳）；现行 = 统一响应外壳（B183 起），`ImContractTest` + `imc-*` 金片钉死。**过时注释与代码冲突时以代码 + 金片为准**，顺手修注释。
 3. **删除渠道的错误码是 500 不是 404**：任何失败（含渠道不存在）都落 500 "failed to delete channel"；金片名 `imc-delete-404.json` 是历史名，钉的状态码是 500。别"修"成 404——那是行为变更。
 4. **回调路由无 JWT**：`AuthFilter` L112 对 `/api/v1/im/callback/` 让路、`WebConfig` L628 刻意不进 RBAC 清单；鉴权完全靠平台验签。给回调加"鉴权加固"前先确认这一点，否则平台回调全挂。
 5. **yunzhijia 的 `@JsonInclude(NON_EMPTY)` 别动**：`YunzhijiaTypes` 是云之家第三方出站线格式，B3 恒输出批误列真面后被 `YunzhijiaAdapterTest` 抓回（HANDOFF §15.1.1 batch-records 回退记录、§14.6 IM 第三方口径）。
@@ -366,7 +366,7 @@ cd frontend && npx vue-tsc --build --force && npm test
 
 ## 8. 测试与验证
 
-- **规模**：`domains/src/test/java/com/ragagent/im/` 下 **25 个测试类 / 145 个 `@Test`**（2026-10-08 实测；§14.7.11 拆分时为 121 条，之后 feat 批增长）。金片重录脚本 `scripts/record-emb-golden.sh` + `-Dcontract.refresh=true`（§13.12 机制）。
+- **规模**：本域测试树 **28 个测试类 / 156 个 `@Test`**（2026-10-11 实测，含 `:boot` 侧契约测试；§14.7.11 拆分时为 121 条，之后 feat 批增长）。金片重录脚本 `scripts/record-emb-golden.sh` + `-Dcontract.refresh=true`（§13.12 机制）。
 - **fixture 前缀**（`domains/src/test/resources/contracts/`，共 30 个锚定本模块）：
   - `imc-*`（20 个 JSON）：渠道 CRUD 契约（`ImContractTest` 驱动，掩码 uuid/时间戳，语义比较——键序/转义归一化后比）
   - `w5a-im-*`（7 个）：回调四场景 + 渠道 create/toggle；**部分由 `auth/controller/W5aSundryRoutesContractTest` 跨域消费**（杂项路由契约）
