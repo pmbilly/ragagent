@@ -642,6 +642,8 @@ B116 搬家时已经搬过一批资源（`common/text/*.txt`），这类风险�
    天然免疫搬家 ✓✓），file-size 是纯迁移 + 少量历史漂移 ✓。`check-json-key-case.py` 的白名单键也要同批改路径 ✓
    （`auth/apikey/filter/APIKeyAuthChannel.java` → `channels/api/filter/…` ✓）。
 
+4. **跨模块的 `git add` 列表要按模块核对** ✗ —— B210 的 `git add` 里漏了 `common/src`，于是 `TenantFilterGuard.ALLOWED_STATEMENTS` 的 4 条语句名字符串（必须与被搬 mapper 同包 ✓）没随批提交 ✗（表现为：提交后工作区仍 `M`，而本地全绿是因为闸门跑在"含改动的工作区"上 ✓）。**判据**：每批提交后 **`git status --short` 必须为空** ✓（这是"搬家批"最廉价的完整性检查 ✓）。
+
 **结果**：`spotlessCheck build` ✓ 1m23s · **4858 / 0** ✓（与 B209 基线**逐条一致** ✓）· 九守卫全绿 ✓ · 验环 ✓
 · `channels 99` / `domains 2773` / `engine 547` / `common 127` / `boot 1312` ✓。
 **下一步**：迁 `embedchannel` 与 `im` 进 `:channels` ✓（入边已实测为 0 —— 两处"疑似边"均为字符串/注释误报 ✓）。
