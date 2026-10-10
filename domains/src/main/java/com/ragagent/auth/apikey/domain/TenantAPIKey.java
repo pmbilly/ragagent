@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ragagent.common.security.APIKeyScopeType;
 import com.ragagent.common.security.APIKeyCapability;
+import com.ragagent.common.apikey.TenantAPIKeyResponse;
 
 /**
  * tenant_api_keys 表实体。

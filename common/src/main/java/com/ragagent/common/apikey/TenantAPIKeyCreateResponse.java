@@ -1,4 +1,5 @@
-package com.ragagent.auth.apikey.domain;
+package com.ragagent.common.apikey;
+
 
 /**
  * 创建 API Key 的响应体。

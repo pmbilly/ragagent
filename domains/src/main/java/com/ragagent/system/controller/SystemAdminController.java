@@ -8,8 +8,8 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.security.APIKeyCapability;
 import com.ragagent.common.security.APIKeyScopeType;
-import com.ragagent.auth.apikey.domain.TenantAPIKeyCreateResponse;
-import com.ragagent.auth.apikey.domain.TenantAPIKeyResponse;
+import com.ragagent.common.apikey.TenantAPIKeyCreateResponse;
+import com.ragagent.common.apikey.TenantAPIKeyResponse;
 import com.ragagent.auth.apikey.service.TenantAPIKeyService;
 import com.ragagent.audit.domain.AuditAction;
 import com.ragagent.audit.domain.AuditLog;
@@ -42,6 +42,7 @@ import com.ragagent.system.domain.SystemSetting;
 import com.ragagent.system.service.SystemSettingService;
 import com.ragagent.common.web.ApiResult;
 import com.ragagent.common.web.ApiResponse;
+import com.ragagent.auth.apikey.domain.TenantAPIKeyProjections;
 
 /**
  * /api/v1/system/admin 组：用户管理 / 平台 API Key / 系统设置 / 运行时队列 / 配额批量应用。
@@ -261,7 +262,7 @@ public class SystemAdminController {
     public ResponseEntity<List<TenantAPIKeyResponse>> listPlatformKeys() {
         List<TenantAPIKeyResponse> response = new ArrayList<>();
         for (var key : apiKeyService.listPlatform()) {
-            response.add(masked(TenantAPIKeyResponse.from(key), key.getApiKey()));
+            response.add(masked(TenantAPIKeyProjections.from(key), key.getApiKey()));
         }
         return ResponseEntity.ok(response);
     }
@@ -285,7 +286,7 @@ public class SystemAdminController {
         }
         var result = apiKeyService.create(new TenantAPIKeyService.TenantAPIKeyServiceCreateRequest(
                 0L, APIKeyScopeType.PLATFORM, req.name().trim(), false, null, normalized, expiresAt));
-        TenantAPIKeyResponse item = masked(TenantAPIKeyResponse.from(result.apiKey()), result.token());
+        TenantAPIKeyResponse item = masked(TenantAPIKeyProjections.from(result.apiKey()), result.token());
         emitAPIKeyAudit(AuditAction.SYSTEM_API_KEY_CREATED, result.apiKey().getId(),
                 result.apiKey().getCapabilities());
         return ResponseEntity.status(HttpStatus.CREATED)

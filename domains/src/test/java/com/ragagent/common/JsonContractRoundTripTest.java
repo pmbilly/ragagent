@@ -18,7 +18,7 @@ import com.ragagent.agent.domain.ToolCall;
 import com.ragagent.agent.domain.ToolCallTarget;
 import com.ragagent.common.llm.ToolResult;
 import com.ragagent.audit.domain.AuditOutcome;
-import com.ragagent.auth.apikey.domain.TenantAPIKeyCreateResponse;
+import com.ragagent.common.apikey.TenantAPIKeyCreateResponse;
 import com.ragagent.datasource.domain.DataSource;
 import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.domain.DataSourceConstants;
@@ -32,7 +32,7 @@ import com.ragagent.datasource.domain.TaskInitiator;
 import com.ragagent.datasource.dto.CredentialFieldMetadata;
 import com.ragagent.datasource.dto.CredentialsResponse;
 import com.ragagent.datasource.dto.DataSourceResponse;
-import com.ragagent.auth.apikey.domain.TenantAPIKeyResponse;
+import com.ragagent.common.apikey.TenantAPIKeyResponse;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ChunkRevision;
 import com.ragagent.common.knowledge.DocumentChunkMetadata;
@@ -124,6 +124,7 @@ import com.ragagent.tenant.ChatHistoryConfig;
 import com.ragagent.tenant.ParserEngineConfig;
 import com.ragagent.tenant.RetrievalConfig;
 import com.ragagent.tenant.StorageEngineConfig;
+import com.ragagent.auth.apikey.domain.TenantAPIKeyProjections;
 
 /**
  * 契约实体的 JSON 往返体检——覆盖所有**会落 jsonb 或直接作响应体**的类型。
@@ -588,7 +589,7 @@ class JsonContractRoundTripTest {
         assertRoundTrips(key, TenantAPIKey.class,
                 "types.TenantAPIKey ← TenantAPIKey（jsonb 数组列 + 派生方法须 @JsonIgnore）");
 
-        TenantAPIKeyResponse response = TenantAPIKeyResponse.from(key);
+        TenantAPIKeyResponse response = TenantAPIKeyProjections.from(key);
         assertRoundTrips(response, TenantAPIKeyResponse.class,
                 "handler.tenantAPIKeyResponse ← TenantAPIKeyResponse");
         // 三个成功响应体都经它派生，token 在末位

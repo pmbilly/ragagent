@@ -8,9 +8,9 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.auth.apikey.domain.TenantAPIKey;
-import com.ragagent.auth.apikey.domain.TenantAPIKeyCreateResponse;
+import com.ragagent.common.apikey.TenantAPIKeyCreateResponse;
 import com.ragagent.auth.apikey.domain.TenantAPIKeyRequest;
-import com.ragagent.auth.apikey.domain.TenantAPIKeyResponse;
+import com.ragagent.common.apikey.TenantAPIKeyResponse;
 import com.ragagent.auth.apikey.mapper.TenantAPIKeyNotFoundException;
 import com.ragagent.auth.apikey.service.TenantAPIKeyService;
 import com.ragagent.auth.apikey.service.TenantAPIKeyValidator;
@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.ragagent.common.web.ApiResult;
 import com.ragagent.common.web.ApiResponse;
+import com.ragagent.auth.apikey.domain.TenantAPIKeyProjections;
 
 /**
  * 租户 API Key 管理端点（列表 / 创建 / 更新 / 删除）。
@@ -84,7 +85,7 @@ public class TenantAPIKeyController {
         long tenantId = parseWorkspaceIdOrBadRequest(rawId);
         List<TenantAPIKeyResponse> data = new ArrayList<>();
         for (TenantAPIKey key : apiKeyService.listByTenant(tenantId)) {
-            data.add(TenantAPIKeyResponse.from(key));
+            data.add(TenantAPIKeyProjections.from(key));
         }
         return ResponseEntity.ok(data);
     }
@@ -125,7 +126,7 @@ public class TenantAPIKeyController {
         }
 
         return ResponseEntity.status(201).body(TenantAPIKeyCreateResponse.of(
-                TenantAPIKeyResponse.from(result.apiKey()), result.token()));
+                TenantAPIKeyProjections.from(result.apiKey()), result.token()));
     }
 
     // ── 更新 ──
@@ -165,7 +166,7 @@ public class TenantAPIKeyController {
             // 任何服务层错误都落到 404（含 TenantAPIKeyNotFoundException）
             throw new BizException(AppError.notFound("API key not found"));
         }
-        return ResponseEntity.ok(TenantAPIKeyResponse.from(updated));
+        return ResponseEntity.ok(TenantAPIKeyProjections.from(updated));
     }
 
     // ── 删除（软撤销） ──
