@@ -1578,9 +1578,6 @@ onUnmounted(() => {
   display: -webkit-box;
   overflow: hidden;
   -webkit-box-orient: vertical;
-  // 多行截断的**标准属性与前缀属性都要写**：-webkit-line-clamp 供 WebKit/Blink（Safari/Chrome），
-  // line-clamp 是 CSS Overflow Module L4 的标准名（Firefox 68+ 等处生效）。属性名不同、互不覆盖，
-  // 只写前缀会在非 WebKit 浏览器静默失效（less 亦告警）。上方 -webkit-box 系旧式截断的必需前置。
   -webkit-line-clamp: 2;
   line-clamp: 2;
   color: var(--td-text-color-placeholder);

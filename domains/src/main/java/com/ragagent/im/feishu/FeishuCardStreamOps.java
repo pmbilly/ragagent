@@ -135,7 +135,7 @@ final class FeishuCardStreamOps {
         header.put("template", "blue");
         ObjectNode title = FeishuAdapter.MAPPER.createObjectNode();
         title.put("tag", "plain_text");
-        title.put("content", "WeKnora");
+        // title.put("content", "WeKnora");
         header.set("title", title);
         card.set("header", header);
 
