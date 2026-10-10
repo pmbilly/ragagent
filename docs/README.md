@@ -52,3 +52,11 @@
 1. 先读仓库根 `HANDOFF.md`（作业规范）+ `docs/backend-package-map.md`（分包地图）；
 2. 再读自己要接手的域手册 §0/§1/§7（速览、结构、坑）；
 3. 动手前过一遍该手册 §5（改哪里）与 §8（测试与验证）；跨域改动回看 §1.2 依赖方向与 `scripts/check-package-cycles.py` 守卫基线。
+
+## 附：`docs/site/` 的陈旧生成物
+
+`site/architecture.json` / `agent-workflow.json` 是架构图的**源数据**，已随 2026-09-28 功能裁剪同步（沙箱节点已移除）。
+但同目录的 `*.html` 与 `index.html` 是**外部 Archify 工具的渲染产物**，本仓无该工具、无法重新生成，
+因此其中**仍含裁剪前的组件（如「Docker 沙箱」），与当前代码不一致** —— 阅读时请以本文件、`backend-package-map.md`
+与源码为准，不要把 HTML 图当作现状依据。重建计划：用 Archify 基于已修正的 `*.json` 重渲染。
+

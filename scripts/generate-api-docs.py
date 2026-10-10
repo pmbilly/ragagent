@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """生成 API 文档：解析 Java 控制器注解 + RBAC/API-Key 策略，输出静态网页。
 
-用法:  python3 scripts/generate-api-docs.py [--java /Users/billy/ragagent-java]
+用法:  python3 scripts/generate-api-docs.py [--java <仓库根>] [--out <输出目录>]
 
 输出（默认 docs/site/api/，可用 --out 覆盖）:
   api-docs.json   结构化路由数据

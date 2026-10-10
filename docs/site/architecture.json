@@ -25,10 +25,9 @@
      "agent",
      "llm",
      "retrieval",
-     "sandbox",
      "pg"
     ],
-    "note": "AgentEngine 工具循环：出站推理、知识检索、沙箱执行。"
+    "note": "AgentEngine 工具循环：出站推理、知识检索、MCP 与网络工具调用。"
    },
    {
     "id": "infra",
@@ -127,21 +126,6 @@
    ]
   },
   {
-   "id": "sandbox",
-   "type": "security",
-   "label": "Docker 沙箱",
-   "sublabel": "docker-java zerodep",
-   "pos": [
-    660,
-    140
-   ],
-   "size": [
-    140,
-    60
-   ],
-   "tag": "镜像快照"
-  },
-  {
    "id": "llm",
    "type": "external",
    "label": "LLM Provider",
@@ -219,8 +203,7 @@
    "wraps": [
     "api",
     "agent",
-    "retrieval",
-    "sandbox"
+    "retrieval"
    ]
   },
   {
@@ -322,18 +305,6 @@
    "labelAt": [
     838,
     240
-   ]
-  },
-  {
-   "id": "agent-sandbox",
-   "from": "agent",
-   "to": "sandbox",
-   "label": "shell/文件",
-   "fromSide": "top",
-   "toSide": "bottom",
-   "labelAt": [
-    600,
-    252
    ]
   },
   {

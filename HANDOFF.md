@@ -2,7 +2,7 @@
 
 > 本文档写给在 `~/ragagent` 打开的新会话/新成员。**一切背景以本文为准**；最近的执行细节在 `git log`。
 > 种子：自 `~/ragagent-java` @ `646aba7`（2026-09-28）分叉，git 历史完整保留。
-> **最近更新 2026-10-10（B204 文档瘦身：§15.1 批次表压成一行一批，432.9→171.9 KB）**；上一次 2026-10-02（B32 文档重组）：§14 域级作战/执行记录（2269 行）与 §15.1.1 逐批记录（442 行）
+> **最近更新 2026-10-10（B212 交付链路修复：Dockerfile 失效 + 镜像进 CI；§7.3-6 登记全仓架构评估遗留）；上一次 2026-10-10（B204 文档瘦身：§15.1 批次表压成一行一批，432.9→171.9 KB）**；再上一次 2026-10-02（B32 文档重组）：§14 域级作战/执行记录（2269 行）与 §15.1.1 逐批记录（442 行）
 > **已移出本文件**——`docs/handoff/plans/`（索引见 §14.7+）与 `docs/handoff/records/batch-records.md`（索引见 §15.1.1）。
 > 本文件＝**常读面**：接手须知 / §2 决策 / §13 方法论 / §14.1~14.6 判据与坑 / §14.9 换锚总纲 / §15 批次总表与纪律。
 > **当前状态总账**见 §15 末（结构各轴完成 + 5 项已知边界）。
@@ -220,6 +220,14 @@
 4. **编号对照（防混淆）**：§5 用**阶段 0-4**；§14.2 用**步骤 0-4**（单域 SOP）。神类切片属「阶段 2 / 步骤 2」，
    契约换锚属「阶段 3 / 步骤 4」——两套编号并存，引用时写全称。
 5. ~~可选尾巴~~：`QaSearchTargets`（706→**190**）内部细分与 `SessionKnowledgeQaService`（1,036→**753**）的 §14.5 例外复核**均已完成**（2026-10-09 实测；后者见 B129）。
+6. **全仓架构评估遗留（2026-10-10 评估 ⇒ B212 已修第 1 项，其余待用户排期）**。评估结论与逐条证据见本节，**动手前先核实测**：
+   - ✅ **已修（B212）**：根 `Dockerfile` 失效（引用已裁撤的 `:server` + 漏拷 3 模块与 2 个 proto 源目录，**`docker build` 必然失败且从未进 CI**）· Flyway 迁移目录未进镜像（容器启动无 schema 且不报错）· 健康检查只探 TCP · README/api-docs/architecture.json 的已删功能残留。
+   - ⬜ **P1 ① 序列化失控**：**主源码 168 处 `new ObjectMapper()`** 绕过 Spring 统一配置（时区/未知字段容错/枚举策略三套不一致），且**违反本仓 §2-12「新增 mapper 必须接 `JsonMappers.lenient()`」却无守卫**。收编前须先分级（事件载荷 / 第三方协议 / 缓存键——只有第一类该收编），并配棘轮守卫 + 红态探针。
+   - ⬜ **P1 ② 异常吞咽**：**569 处 `catch(Exception|Throwable)`**（严格空 catch 全仓 0 处 ✓）。实质风险集中在 ES/OpenSearch 家族的**静默降级**（`ElasticsearchV7WriteOps:231` / `V7SearchOps:85,118` 三份复制的兜底：filter 解析失败即**清空全部过滤条件** ⇒ 查询范围意外放大）。只治这类"吞掉后换更宽行为"，不搞 569 处专项扫除。
+   - ⬜ **P1 ③ 分层不一致**：约定"`mapper/` 只放 MyBatis-Plus 接口、`repository/` 放仓储门面"，但 **session(4) / wiki(4) / memory(1) 共 9 个 Repository 塞在 `mapper/`**（knowledge 守约 6 个 ✓）。纯移动，契约不变；须同步加 ArchUnit 规则。
+   - ⬜ **P2 工程化债**：九守卫**未接入 Gradle**（本地 `build` 绿 ≠ CI 绿，B168 已踩）· `maxParallelForks` **两套冲突口径**（根 `build.gradle.kts:45` vs `domains:179`，已致 worker OOM）· 无 version catalog（**BOM 字符串散落 5 处** + 8 组版本双写）· `GoRecording45C.java` **单文件 3.61 MB**（全仓最大 Java 文件）· 14 个 Redis 测试 `assumeTrue` **静默跳过** · `tenant` 包（多租户安全关键）**零单测** · 无覆盖率工具 · 2 个 `*IT` 永不执行。
+   - ⬜ **P2 契约单一事实源**：无 OpenAPI/共享 schema，前端 TS 类型手写，一致性全靠正则文本扫描（`check-json-key-case.py` 自述 7 种写法扫不到）。
+   - ⬜ **登记不动**：`docs/site/*.html` 是外部 Archify 产物、本仓无该工具无法重渲染（源 json 已修正，HTML 待外部重渲染）。**2026-10-09 遗留的 25 个 controller 包内协作类已于 B178 判定全部不是缺陷 ✓ 关闭。**
 
 ## 8. 环境与运行
 
@@ -659,6 +667,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 |---|---|---|---|---|
 | **B0 端到端真实走查** | 起服（后端 8083 + 前端 dev）按域走查 14 条链路：注册/登录/**令牌刷新**/登出 → 空间创建/切换/成员邀请/**审计页** → KB 创建/摄取/**处理时间线**/预览 → 检索/对话（SSE）→ wiki 浏览/编辑 → datasource（RSS 桩）同步/凭据 → im 渠道 CRUD → vectorstore/storage 设置 → 收藏/技能目录/模型调试/系统运行时页。每条记录 API 形状 × 视图渲染 × 控制台报错 | **P0** | 1-2 天 | ✅ **完成（2026-10-02）**——14 条链路全走通，修 15 处断点（前端 12：裸体未适配 8 + 字段漂移 4 族； |
 | **B211 P4 回退：`:channels` 试切撤销** | 试切当天判定不划算 ⇒ 整批 revert | P2 | 小 | ✅ **完成（2026-10-10）**——回退 B210 + 2 补丁（`git revert '4950df34^..HEAD'` ✓ **零冲突** ✓；32 改名回迁 + 15 改回 + 2 删 ✓）；`domains/auth/apikey` ✓ 复原、`settings`/`boot` 接线 ✓ 撤、`TenantFilterGuard` 4 条语句名 ✓ 回 `com.ragagent.auth.apikey.mapper`；B210 外提的 API-Key JSON 往返断言**已回迁** `domains/.../JsonContractRoundTripTest` ✓（覆盖不丢 ✓）。**理由（实测，见 plan §13）**：① 平行而非下沉 ✗（`channels → domains` ✓ + auth 4/tenant 2 引用 ✓）；② 金片边界切不净 ✗（apikey 契约仍在 `domains/testFixtures` ✓）；③ 破坏"模块名不进包名"惯例 ✗（`channels.*` 全仓唯一 ✓）；④ 基建登记永久面 ✗（守卫模块清单/基线/包地图 ✓）；⑤ 紧耦合对（22+22 ✓）内聚优于拆分 ✓。**保留**：B206–B209 切边成果 ✓ + 44 边清单 ✓ + 新增模块"三问"判据 ✓。**验证**：`spotlessCheck build` ✓ **1m27s** ✓ · **4858 / 0** ✓（与 B209 基线逐条一致 ✓）· 九守卫 rc=0 ✓ · 外壳 **50/52** ✓（不受模块位置影响 ✓）。 |
+| **B212 交付链路修复：Dockerfile + 镜像进 CI** | 架构评估发现的最高优先级项：**根 Dockerfile 引用 B167 已裁撤的 `:server` 模块名、漏拷 3 个 Gradle 模块与 2 个 proto 源目录 ⇒ `docker build` 必然失败**；而它从未进任何 CI job ⇒ 腐化长期不可见。连带两个运行期缺陷：① Flyway 迁移目录（`filesystem:./build/generated-migrations`，**相对工作目录**）没进镜像 ⇒ 全新容器启动即无 schema 且**不报错**，直到第一条查询才炸；② 健康检查只探 TCP 端口 ⇒ Spring 上下文未起即判健康。同批修文档可信度：README 重写（原文仍在首页宣传已删除的 sandbox / docker-java / 196 迁移 / 37 领域包）、api-docs 重跑（sandbox 残留 **64 → 0**，379 条路由）、`architecture.json` 源数据移除沙箱节点 | **P0** | 小 | ✅ **完成（2026-10-10）**——Dockerfile 改 `:boot:bootJar` + COPY 四模块 + `otlp-proto`/`docreader` 源目录；迁移落 `/app/build/generated-migrations`；健康检查改打 `/health`（装 curl，JRE 镜像无）；**显式 `-x spotlessCheck`**（ratchet 需 `.git`，而 `.dockerignore` 排除之；格式检查归 `spotlessCheck`）。CI 新增第 4 个 job `docker`（构建 + 迁移目录自检）⇒ **路径腐化从此当场变红**。**验证**：`docker build` 成功 **3m21s** ✓ · CI 自检步骤逐字复现通过 ✓ · 非 root uid 1001 ✓ · 九守卫 rc=0 ✓ · `spotlessCheck :domains:test` ✓ **4858 / 0 / 跳过 4** ✓ · **本批零 Java 源码改动**（四模块编译已由 docker build 内 `:boot:bootJar` 全程验证 ✓）。**留待拍板**：`docs/site/*.html` 是外部 Archify 工具产物、本仓无该工具无法重渲染，已在 `docs/README.md` 标注陈旧（源 json 已修正）。 |
 | **B209 P4 第 3 刀：API-Key 认证通道口 + 侦察更正** | 最后一条 main 边清零 | 架构 | 小 | ✅ **完成（2026-10-10）**——`:common` 新增 `ApiKeyAuthPort`（签名与实现逐字一致，含 `throws IOException` ✓ —— 第一版漏了它 ⇒ 编译错 ✓），`APIKeyAuthChannel implements` 该口、`AuthFilter` 改依赖口 ✓ ⇒ **`domains → apikey` 代码边 1 → 0** ✓✓。**侦察更正** ✗：`TenantFilterGuard` 引的是 **MyBatis 语句名字符串白名单**（4 条 ✓）而非 mapper 类型 ⇒ **边 5 是误报** ✓（同 R-d 那类 ✓）；但 apikey 改名 `channels.api` 时这 4 条字符串**必须同批更新** ✓（已写进 §12 ✓）。验证：`spotlessCheck build` ✓ 1m40s · **4858 / 0** ✓ · 九守卫 ✓ · 验环 ✓。 |
 | **B208 P4 第 2 刀：API-Key 管理口 port（:common）** | 窄口 + 脱敏搬移 + 清死依赖/迪米特 | 架构 | 小 | ✅ **完成（2026-10-10）**——`:common` 新增 `ApiKeyAdminPort`（平台列表/建/撤 + 租户默认键 ✓），apikey 侧 `ApiKeyAdminAdapter` 实现（脱敏 `masked()` **逐字搬** ✓）；`SystemAdminController` / `TenantCatalogController` / `TenantCreateOps` 改注入 port ✓（后者顺带修掉 `service.apiKeyService.…` 的迪米特违规 ✗ 与 Catalog 的死依赖 ✗）。**main 侧边数 5 → 1** ✓（只剩 `AuthFilter → APIKeyAuthChannel` ⇒ 第 3 刀 ✓）。验证：`spotlessCheck build` ✓ 1m37s · **4858 / 0** ✓ · 九守卫 ✓ · 验环 ✓。 |
 | **B207 P4 第 1 刀：API-Key 两个响应记录沉 :common** | 记录下沉 + 映射留属主 | 架构 | 小 | ✅ **完成（2026-10-10）**——`TenantAPIKeyResponse` / `TenantAPIKeyCreateResponse` → `com.ragagent.common.apikey` ✓；**关键**：`TenantAPIKeyResponse.from(TenantAPIKey)` 依赖实体 ⇒ **不搬**（搬了会在 `:common` 造反向边 ✗），改建 `auth.apikey.domain.TenantAPIKeyProjections`（语义逐字保留 ✓）。doclint 抓到 `TenantAPIKey` 的 `{@link}` 还指旧包 ✗（§10 沉淀③ 原文生效 ✓）⇒ 全仓修 javadoc 引用 ✓。边数 6 → 5（DTO 两处消失；`SystemAdminController` 改指 projections ⇒ 该边留给第 2 刀的管理口 port 一并消掉 ✓）。验证：`spotlessCheck build` ✓ 1m40s · **4858 / 0** ✓ · 验环 ✓ · 九守卫 ✓。 |

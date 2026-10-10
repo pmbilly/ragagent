@@ -91,6 +91,25 @@ jobs:
         if: always()
         run: python3 scripts/test-summary.py
 
+  docker:
+    name: 服务端镜像构建（Dockerfile 防腐化）
+    runs-on: ubuntu-latest
+    # 本 job 的由来（B212）：Dockerfile 长期只存在于仓库、不进任何 job ⇒ 里面写着**已裁撤的
+    # `:server` 模块名**、漏拷三个 Gradle 模块与 proto 源目录，`docker build` 必然失败却没人知道。
+    # 路径腐化只能靠"真构建一次"发现，文本扫描扫不出来。
+    steps:
+      - uses: actions/checkout@v7
+      # 只验"能构建"，不起容器（起容器要挂 PG/Redis 服务容器，成本远大于收益；
+      # 应用层行为由 backend job 在真 PG 上覆盖）。
+      # 提速空间（未取）：换 `docker/build-push-action` + `cache-from: type=gha` 可复用依赖层。
+      - name: 构建镜像
+        run: docker build -t ragagent-server:ci .
+      # 构建能过 ≠ 镜像能启动：Flyway 的 `filesystem:./build/generated-migrations` 是**相对工作目录**
+      # 的路径，漏落地则全新容器静默无 schema（classpath 位置是空的，不报错，直到第一条查询才炸）。
+      - name: 自检：迁移目录随镜像落地（Flyway filesystem 路径）
+        run: >
+          docker run --rm --entrypoint sh ragagent-server:ci -c
+          'test -s /app/app.jar && test -s /app/build/generated-migrations/V1__baseline.sql'
   frontend:
     name: 前端 type-check + test + build
     runs-on: ubuntu-latest

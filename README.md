@@ -1,230 +1,155 @@
 # ragagent
 
-> **本仓已脱离翻译项目语境**：自 `ragagent-java` @ `646aba7`（2026-09-28）seed 分叉演进，不再承担与 Go 仓（WeKnora）的任何契约对齐义务。
-> 背景与已定决策、转型路线图见 **[HANDOFF.md](HANDOFF.md)**——**新会话请先读它**，不要按下方"翻译版 README"描述的字节级一致目标理解本仓。
+企业级 RAG + Agent 后端。**Spring Boot 3.3.5 / JDK 21 / MyBatis-Plus**，前端 Vue 3 + Vite。
 
-以下为种子时的原 README，描述翻译期状态，仅作历史参考：
-
----
-
-WeKnora（[Tencent/WeKnora](https://github.com/Tencent/WeKnora)）后端的 **Java 全量翻译版**：把 Go（Gin/GORM）后端逐文件翻译为 **Spring Boot 3.3 / JDK 21 / MyBatis-Plus**，前端 **以 Go 仓为基线**（品牌/观感层微调）。团队技术栈统一项目。
-
-**验收标准不是"看起来对"，而是字节级一致**：同一请求打到 Go 与 Java 两侧，响应体（含 JSON 键序、HTML 转义、SSE 帧格式、错误文案、时区渲染）必须**逐字节相同**。为此建立了 1,748 个 golden 契约实录、72 个双端 A/B / 录制脚本，以及一套已验证的翻译方法论（见 [`docs/HANDOFF.md`](docs/HANDOFF.md) §7「翻译约定正文」）。
+> **项目背景**：本仓由 [Tencent/WeKnora](https://github.com/Tencent/WeKnora) 的 Go 后端移植而来，
+> 并已于 2026-09 从"逐文件复刻 Go"转为**Java 本位演进**（详见 [HANDOFF.md](HANDOFF.md) §0/§2）。
+> 当前目标不再是与 Go 仓字节级一致，而是**按 Java 生态的主流标准做可读性与架构收敛**。
+> **接手本仓请先读 [HANDOFF.md](HANDOFF.md)** —— 背景、已定决策、踩坑史与批次纪律都在那里。
 
 ---
 
-## 目录
+## 架构
 
-- [能力地图](#能力地图)
-- [技术栈](#技术栈)
-- [架构：契约驱动的翻译](#架构契约驱动的翻译)
-- [快速开始](#快速开始)
-- [配置](#配置)
-- [测试与验收体系](#测试与验收体系)
-- [项目结构](#项目结构)
-- [脚本索引](#脚本索引)
-- [文档索引](#文档索引)
-- [翻译状态与已知边界](#翻译状态与已知边界)
-- [高频坑速查](#高频坑速查)
+四个 Gradle 模块，**依赖单向、边界由编译期强制**（不是文档约定：往 `:engine` 里写一行业务域 import 就编译失败）：
 
----
+```
+   :boot  ──────►  :domains  ──────►  :engine  ──────►  :common
+  组合根              业务域             能力层            共享内核
+  入口 + 装配         22 个业务域        8 个能力域        4 个底座包
+  13 文件            1,380 文件         295 文件          219 文件
+                     217k 行            50k 行            17.5k 行
+```
 
-## 能力地图
-
-后端 37 个领域包（`domains/src/main/java/com/ragagent/`），与 Go 仓包一一对应：
-
-| 域 | 包 | 内容 |
+| 模块 | 职责 | 依赖 |
 |---|---|---|
-| 基础 | `common` `config` `event` | Go 等价 JSON 序列化器（map 键序/HTML 转义/double/时间）、租户上下文、错误信封、事件总线 |
-| 认证与租户 | `auth` `apikey` `audit` | 登录/JWT/OIDC（未配置=disabled 契约）、API Key 体系（scope+数据面白名单）、审计埋点、跨租户租户目录 |
-| 模型 | `model` `llm` `rerank` `embedding` `tracing` | 模型配置（AES 凭据加密/SSRF 校验）、LLM 客户端（OpenAI 兼容/Anthropic/Ollama，thinking 策略、并发闸门、prompt-cache）、`models/{id}/debug` |
-| 知识库 | `knowledge` `wiki` `faq` `searchutil` `retrieval` `vectorstore` | KB CRUD、文档解析管线（span 时间线）、chunk 编辑/修订、FAQ 双优先级检索、wiki（21 端点+生成管线）、混合检索（pgvector HNSW + ParadeDB BM25 + RRF） |
-| 会话 | `session` `stream` `storage` `storageurl` `webfetch` `websearch` | 会话/消息/SSE 契约层、steer/追问建议/产物、continue-stream、文件代理（Range/预签名/`/r/*` 能力 URL）、agent 网络工具（web_search/web_fetch + 全页快照存储） |
-| Agent | `agent` `agentm` `chatpipeline` `mcp` `modelcontext` | AgentEngine（thinking 流、工具循环、输出预算分摊）、30+ 内置工具（知识检索族/wiki 十件/web 两件/沙箱文件族/MCP）、RAG 快答管线、技能安装管线（installer agent + 镜像快照）、MCP 协议 + OAuth |
-| 沙箱 | `sandbox` | docker-java（zerodep 传输）容器执行面、会话绑定/租约、shell/文件工具 |
-| 协作与集成 | `im` `embed` `datasource` `favorite` `memory` `system` `evaluation` | IM 九渠道回调管线（含 AES 验签）、嵌入问答、数据源连接器、长期记忆、系统管理端、评估数据面（空间分享 org 域已裁撤） |
-| 基础设施 | `docreader/` proto | docreader gRPC 契约（解析服务用官方镜像，目录名镜像 Go 仓） |
+| `:boot` | 组合根：入口类、全局装配、扫描、打包。**只出不进**（无任何模块反向依赖它） | → domains / engine / common |
+| `:domains` | 业务域本体：HTTP 面 + 持久层（knowledge、agent、session、wiki、auth、datasource…） | → engine / common |
+| `:engine` | 能力层：LLM 客户端族、检索引擎适配、embedding/rerank、chatpipeline、MCP。**不得依赖业务域** | → common |
+| `:common` | 共享内核：跨域端口与契约载荷、横切基础设施、事件总线、流管理、追踪。**零 project 依赖** | 无 |
 
-数据库迁移 196 个（`migrations/versioned/`，与 Go 仓 schema 一字不改），PostgreSQL 依赖 **ParadeDB**（BM25）与 pgvector（halfvec HNSW）。
+**跨模块解耦靠端口**：`:engine` 需要业务词汇时，接口下沉到 `:common`（如 `KnowledgeBaseGateway`、`SessionMessagePort`），由 `:domains` 提供实现（`KnowledgeBaseService`、`MessageRepository`）。依赖永远指向下层，无环。
+
+**域内分层约定**：`controller/`（只放 `*Controller`）· `service/`（Spring 服务与用例）· `domain/`（实体）· `dto/`（请求响应）· `mapper/`（**只放 MyBatis-Plus 接口**）· `repository/`（仓储门面：软删/乐观锁/方言分支）· `support/`（无状态算法）。一类型一文件。
+
+> 完整包地图见 [`docs/backend-package-map.md`](docs/backend-package-map.md)，29 个顶层包各有手册（`docs/<包名>-module-guide.md`）。
 
 ## 技术栈
 
 | 层 | 选型 |
 |---|---|
-| 运行时 | JDK 21（虚拟线程：管线并发、工具并行抓取、租户上下文显式拷贝） |
-| 框架 | Spring Boot 3.3.5（Web/Validation/AOP/Redis）、MyBatis-Plus 3.5.7 + 手写 JdbcClient |
-| 存储 | PostgreSQL 17（ParadeDB v0.22.2：pgvector + BM25）、Redis 7.0（stream/绑定存储/限流） |
-| 文档解析 | docreader gRPC（`wechatopenai/weknora-docreader` 官方镜像，proto 已本仓化） |
-| 沙箱 | docker-java 3.7.1（**zerodep 传输**——httpclient5 的 exec hijack 不回传输出帧，踩坑实录见 known-issues） |
-| 数据分析 | DuckDB JDBC（`data_analysis` 工具） |
-| 其他 | Flyway、gRPC/protobuf、jjwt、jtokkit、snakeyaml（vendored 提示词模板） |
-| 前端 | Vue 3.5 + Vite 7（以 Go 仓为基线，品牌/观感层微调） |
-| 测试 | JUnit 5 + AssertJ + MockMvc + H2（内存 DDL 镜像 `TestSchema`）+ stub LLM/stub Ollama |
-
-## 架构：契约驱动的翻译
-
-```
-                ┌────────────── 同一 dev PostgreSQL / Redis ──────────────┐
-   请求 ──────► │  Go :8080（参考实现，只读对照）    Java :8082（翻译目标） │
-                └────────────────────────┬────────────────────────────────┘
-                                         │ 双端响应掩码后逐字节比对（A/B 脚本族）
-   golden ◄── 录制（record-*.sh）────────┘
-   契约测试（1,748 个 contracts/ 实录 + 4,600+ 测试用例）
-```
-
-三条铁律：
-
-1. **录 Go 实录，不靠读码推断**——拿不准的行为把 Go 类型/函数抄进独立程序跑出真值（正则 `$` 语义、UUIDv5 向量、`%q` 动词、空切片 marshal 形态……全部是实录抓出来的）。
-2. **字节即契约**——JSON 键序（map 字节序 / 结构体声明序双路径）、HTML 转义、`omitempty`、RFC3339 纳秒裁尾、SSE 帧格式，全部按 Go 实测逐字节对齐。
-3. **agent 报绿后主会话独立全量复核**——H2 绿不等于 PG 绿，单跑绿不等于全量绿（Mockito self-attach、上下文变体、墙钟脆弱都是抓过的）。
+| 运行时 | JDK 21（虚拟线程：管线并发、工具并行抓取） |
+| 框架 | Spring Boot 3.3.5（Web / Validation / AOP / Redis）、MyBatis-Plus 3.5.7 + 手写 JdbcClient |
+| 存储 | PostgreSQL 17（**ParadeDB** —— pgvector + BM25）、Redis 7（事件流 / 限流 / 跨实例协调） |
+| 文档解析 | docreader gRPC（proto 已本仓化，`:domains` 内生成客户端） |
+| 向量/检索引擎 | pgvector、Milvus、Qdrant、Weaviate、OpenSearch、Elasticsearch 7/8、Doris、SQLite |
+| 数据分析 | DuckDB JDBC（`data_analysis` 工具，独立会话，不依赖沙箱） |
+| 其他 | Flyway（**单份基线迁移**）、jjwt、OTLP 追踪导出、protobuf |
+| 前端 | Vue 3.5 + Vite 7 |
+| 测试 | JUnit 5 + AssertJ + MockMvc + H2（测试 schema `TestSchema`）+ 手写 HTTP 桩（stub LLM / Ollama / OAuth / Notion / 飞书…） |
 
 ## 快速开始
 
-前置：JDK 21（`/opt/homebrew/opt/openjdk@21` 或等效）、Docker、Node 20+。
+前置：JDK 21、Docker、Node 22+。
 
 ```bash
 # 1) 基础设施：postgres(15432) + redis(16379) + docreader(50051)
-#    与 Go 仓 dev 容器同端口，两套只能起一套（本机已有同端口容器时直接复用）
 docker compose up -d
 
-# 2) 密钥/连接配置（.env 已 gitignore；dev-env.sh 按 key 读取）
-#    必需键见 scripts/dev-env.sh 头注释（JWT_SECRET / SYSTEM_AES_KEY / DB_*)……
+# 2) 配置：cp .env.example .env，按需改（.env 已 gitignore）
 
-# 3) 后端（端口由 .env 的 SERVER_PORT 决定；本仓 dev 用 :8083，见 HANDOFF §8）
-./gradlew :boot:bootRun
-#    或带就绪等待：scripts/java-server-up.sh
+# 3) 后端（本仓 dev 用 :8083，避免与旧仓 8082 冲突；端口取自 .env 的 SERVER_PORT）
+bash scripts/java-server-up.sh          # 或 ./gradlew :boot:bootRun
 
-# 4) 前端（:5173；代理缺省指向 :8080，测 Java 请显式指向 .env 的 SERVER_PORT，本仓 dev 为 8083）
-cd frontend && npm ci
-VITE_DEV_PROXY_TARGET=http://localhost:8083 npm run dev   # 与 .env 的 SERVER_PORT 一致
+# 4) 前端（:5173）
+cd frontend && npm ci && VITE_DEV_PROXY_TARGET=http://localhost:8083 npm run dev
 ```
 
-登录（**本仓独立库 `ragagent` 不含种子数据** ✗ —— §8：「基线合并会改 schema，不能与旧仓共用 dev 库」）：
-首次使用先注册一个账号（注册者即该租户 owner），然后即可登录：
+本仓独立库不含种子数据 —— 首次使用先注册账号（注册者即该租户 owner）：
 
 ```bash
 curl -s -X POST http://localhost:8083/api/v1/auth/register -H 'Content-Type: application/json' \
-  -d '{"username":"java-phase1","email":"java-phase1@weknora.test","password":"Passw0rd!"}'
-# 之后：java-phase1@weknora.test / Passw0rd!（你注册的那套）
+  -d '{"username":"demo","email":"demo@example.com","password":"Passw0rd!"}'
 ```
 
-> 命令行取 token：`scripts/token.sh 8082`。
+**镜像部署**：
+
+```bash
+docker build -t ragagent-server .
+docker run --rm -p 8080:8080 --env-file .env ragagent-server
+```
+
+> ⚠️ 镜像内 Flyway 迁移目录是 `/app/build/generated-migrations`（`application.yml` 用的是**相对工作目录**
+> 的 `filesystem:` 路径）。改 `WORKDIR` 或迁移路径时必须同步改 Dockerfile，否则全新容器启动即无 schema
+> —— 且**不会报错**，直到第一条查询才炸。CI 的 `docker` job 有一道自检守住这点。
 
 ## 配置
 
-环境变量（经 `scripts/dev-env.sh` 统一装配，host-run 必须覆盖容器内地址）：
+配置外置在 `boot/src/main/resources/application.yml`，全部走 `${ENV_VAR:default}`。没有 profile 分文件。
 
 | 变量 | 缺省 | 说明 |
 |---|---|---|
-| `SERVER_PORT` | 8082 | Java 服务端口 |
-| `DB_HOST` / `DB_PORT` | localhost / 15432 | ParadeDB（pgvector + BM25） |
-| `REDIS_HOST` / `REDIS_PORT` | localhost / 16379 | stream / 绑定存储 / 限流 |
+| `SERVER_PORT` | 8080 | 服务端口（**本仓 dev 用 8083**） |
+| `DB_HOST` / `DB_PORT` | localhost / 15432 | ParadeDB |
+| `REDIS_HOST` / `REDIS_PORT` | localhost / 16379 | 事件流 / 限流 |
 | `DOCREADER_ADDR` | localhost:50051 | 文档解析 gRPC |
-| `LOCAL_STORAGE_BASE_DIR` | /data/files | 本地存储根 |
-| `JWT_SECRET` / `SYSTEM_AES_KEY` | — | 双侧必须一致（跨语言密文互操作） |
-| `SSRF_WHITELIST_EXTRA` | — | 额外 SSRF 白名单（逗号分隔，支持 `*.example.com`） |
-| `RETRIEVE_DRIVER` | — | 检索引擎选择（需真实导出，不从 .env 静默读） |
-| `VITE_DEV_PROXY_TARGET` | http://localhost:8080 | 前端代理目标（缺省 8080；**本仓 dev 用 8083**，见 HANDOFF §8） |
+| `LOCAL_STORAGE_BASE_DIR` | — | 本地存储根，**必须放持久目录，严禁 `/tmp`** |
+| `JWT_SECRET` / `SYSTEM_AES_KEY` | — | 密钥 |
+| `STREAM_MANAGER_TYPE` | memory | `redis` = 跨实例共享 |
+| `WIKI_REDIS_ENABLED` 等 | false | 各域 Redis 面开关（六处，独立） |
+| `WEKNORA_TENANT_FILTER_GUARD` | enforce | 租户过滤探测：`enforce` / `alert` / `off` |
 
-运行时可调（DB 层即开即用，无需重启）：`system_settings`（沙箱 docker 开关、SSRF 白名单、并发上限 `model.max_concurrency` 等，经 `SystemSettingService` 推送）。
+完整清单见 [`.env.example`](.env.example)。代码内**禁止**裸 `System.getenv()`（架构硬门 A1 守着，目前全仓仅 5 处白名单例外）。
 
-## 测试与验收体系
+## 质量门禁
+
+这是本仓的核心工程资产 —— 重构全程"行为不变"就靠它兜底。
+
+| 门 | 位置 | 作用 |
+|---|---|---|
+| **契约测试** | `domains/src/testFixtures/resources/contracts/`（1,345 个金片）+ 30 个 `*ContractTest` | 逐字节钉死 HTTP 响应形状；改契约必须重录或改金片 |
+| **架构规则** | `boot/src/test/.../arch/ArchitectureRulesTest.java`（ArchUnit，A1–A13） | 禁裸 getenv、禁双装配、禁分层倒挂、Mapper 必须在 `..mapper..`… |
+| **序列化卫生** | `domains/src/test/.../arch/JsonPropertyHygieneTest.java`（A14） | 基线 0：我们自己的面上不得有冗余 `@JsonProperty`（四类必要形态除外） |
+| **九守卫** | `bash scripts/run-guards.sh` | 包循环 / Go 锚点 / 契约键 / JSON 键大小写 / 事件面 / **文件规模棘轮** / 目录卫生 / 死成员 / 统一响应外壳 |
+| **CI** | `.github/workflows/ci.yml` | 4 个 job：guards（九守卫）· backend（真 ParadeDB + 真 Redis + 灌基线 SQL + 全量测试）· docker（镜像构建 + 迁移自检）· frontend |
+
+守卫大多是**棘轮**（ratchet）：登记基线后只许减不许增，例外须写明理由。新增违规当场变红。
 
 ```bash
-export PATH="/opt/homebrew/opt/openjdk@21/bin:$PATH"   # 换 shell 必设，否则找不到 JRT
+export JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home
 
-# 定向（写码微循环，某领域包）
-./gradlew :domains:test --tests "com.ragagent.session.*"
-
-# 日常提交门：只跑受影响批（改动文件 → 领域包 → 批次，约 30~80s）
-./scripts/acceptance.sh --changed
-./scripts/acceptance.sh --changed --dry-run     # 先看映射计划不跑
-
-# 交付门：全量五批（必须分批跑，同 JVM 全量会触发 Mockito self-attach 风暴，见 known-issues/00）
-./scripts/acceptance.sh                         # 约 4 分钟（实测 216~300s）
-./scripts/acceptance.sh --with-ab               # 额外 Go/Java 九族冒烟对拍
-
-# 真实 Docker 集成（默认跳过；OrbStack 注意 DOCKER_HOST）
-DOCKER_HOST=unix:///$HOME/.orbstack/run/docker.sock \
-WEKNORA_SANDBOX_DOCKER_IT=true WEKNORA_SANDBOX_DOCKER_ENABLED=true \
-./gradlew :domains:test --tests "com.ragagent.sandbox.runtime.DockerSandboxIntegrationTest" \
-                         --tests "com.ragagent.session.service.ArtifactDrainDockerIT"
+./gradlew :domains:test --tests "com.ragagent.session.*"   # 定向（迭代用，10~30s）
+./gradlew build                                             # 全量闸门（spotless + 测试 + javadoc）
+bash scripts/run-guards.sh                                  # 九守卫
+cd frontend && npx vue-tsc --build --force && npm test       # 前端
 ```
 
-三个层次：
-
-1. **golden 契约测试**（`domains/src/test/resources/contracts/`，1,748 个实录）：MockMvc 掩码比对（UUID/时间戳等动态字段掩掉后逐字节）。
-2. **双端 stub A/B**（`scripts/ab-*.sh`）：双端同指 `scripts/stub-llm-server.py`，走真实 HTTP/SSE 全链路；agent 出站 LLM 请求体已可**全 body 对拍**（tools/messages/键序双路径）。
-3. **真实集成**：dev PG（非 H2）暴露 jsonb/NOT NULL/时区差异；Docker IT 验证沙箱执行面与产物排水全链。
-
-## 项目结构
-
-```
-├── server/                     Spring Boot 后端
-│   └── src/main/java/com/ragagent/    37 个领域包（见能力地图）
-│   └── src/test/java/com/ragagent/    409 个测试类 / 4,600+ 用例
-│       └── resources/contracts/       1,748 个 golden 实录
-├── frontend/                   Vue 3 + Vite（Go 仓基线 + 品牌/观感微调）
-├── migrations/versioned/       196 个 SQL 迁移（schema 一字不改）
-├── docreader/                  docreader gRPC proto（目录名镜像 Go 仓）
-├── docker-compose.yml          dev 基础设施（postgres/redis/docreader）
-├── scripts/                    84 个脚本：环境装配 / 起服 / golden 录制 / A/B 对拍 / 验收门
-├── docs/
-│   ├── site/                        文档门户（index.html：图册式设计 + 内置 Agent 工作流对比）
-│   │   ├── architecture.html        系统架构交互图（Archify 生成；源=architecture.json）
-│   │   ├── agent-workflow.html      AgentEngine 主循环图（Archify 生成；源=agent-workflow.json）
-│   ├── translation-log.md          翻译日志 + 批次细节 + 坑索引（规范正文在 HANDOFF §7）
-│   ├── known-issues/                按批次分片的契约细节与坑（00 ~ 08）
-│   └── HANDOFF.md                   交接文档（进度基线 + 波次总表/已知剩余，新会话必读 §0.x/§2.0）
-└── gradle/                     wrapper
-```
-
-## 脚本索引
-
-| 类别 | 脚本 | 用途 |
-|---|---|---|
-| 环境 | `scripts/dev-env.sh` | 被其他脚本 source：JDK 路径、端口、.env 按 key 回落 |
-| 起服 | `scripts/java-server-up.sh` / `go-server-up.sh` | 后台起服 + 等就绪（Go 用于 A/B 对照） |
-| 取证 | `scripts/token.sh <port>` | 登录取 JWT |
-| 录制 | `scripts/record-*-golden.sh` | 从 Go 侧录 golden（ag/chunk/kg/w5a/w5b/w5c/w5f/model-debug…） |
-| 对拍 | `scripts/ab-*.sh` | 双端掩码后逐字节比对（session/chunk/kb/w5*/qa46d/tools-web…） |
-| 验收 | `scripts/acceptance.sh` | 门禁：`--changed` 只跑受影响批（日常），缺省全量五批（交付门），`--with-ab` 追加冒烟对拍 |
-| 对账 | `scripts/route-recon.py` | Go↔Java 路由缺口程序化对账（当前真缺口仅 `/swagger/{}`，非翻译目标） |
-| API 文档 | `scripts/generate-api-docs.py` | 解析控制器注解 + RBAC/API-Key 策略，生成 `docs/site/api/`（452 条路由；路由变更后重跑即可） |
-| stub | `scripts/stub-llm-server.py [port]` | LLM/Ollama stub（`STUB_DUMP_DIR` 落盘请求体供 A/B） |
-
-## 文档索引
+## 文档
 
 | 文档 | 内容 |
 |---|---|
-| [`docs/HANDOFF.md`](docs/HANDOFF.md) | **新会话从这里开始**：进度基线（§0.x 倒序批次志）+ §2.0 波次总表与已知剩余、验收流程、协作方式 |
-| [`docs/HANDOFF.md`](docs/HANDOFF.md) §7 | 翻译约定正文（技术栈映射、GORM 隐式行为、错误/响应格式、SSE 纪律、十条强制约束） |
-| [`docs/translation-log.md`](docs/translation-log.md) | 翻译日志（§8）+ 批次细节 + 坑索引（正文在 `known-issues/`） |
-| [`docs/known-issues/`](docs/known-issues/) | 按批次分片的契约细节与踩坑（00-foundation ~ 08-storage-a3） |
-
-## 翻译状态与已知边界
-
-**已完成**：HTTP 面全量（route-recon 对账，唯一留白 `/swagger/{}` 为 Go 工具路由、非翻译目标）；执行面含混合检索、技能安装管线（installer agent + 镜像快照 + 产物排水）、agent 网络工具、沙箱执行、IM 回调管线、`models/{id}/debug`。
-
-**明确边界**（都有备案，非缺陷）：
-
-- **provider-XDEP 族**（dev 双侧都到不了真实后端，接缝与测试已备）：IM 九渠道的平台客户端传输、cube/e2b 终端（envd PTY 执行体/协议/事件三态已落地并被本地桩覆盖，provider 控制面未接线）、真实 LLM install E2E
-- **Owner 暂缓**：EvaluationService 执行步（前端无入口；恢复条件=出现评估调用需求）
-- **备案降级**：langfuse 追踪（no-op 等价于 Go 未启用）、Redis 分布式限流器（单实例 LocalLimiter）、RSS readability 抽取、OIDC enabled 后的网络步
+| **[HANDOFF.md](HANDOFF.md)** | **接手必读**：背景与已定决策、踩坑史、逐包重构范式、批次总表与纪律 |
+| [`docs/README.md`](docs/README.md) | 29 个顶层包手册索引 + 新人阅读路径 |
+| [`docs/backend-package-map.md`](docs/backend-package-map.md) | 分包地图与分层约定 |
+| [`docs/api-response-convention.md`](docs/api-response-convention.md) | 统一响应外壳与错误形态 |
+| [`docs/knowledge-api-contract-v1.md`](docs/knowledge-api-contract-v1.md) | API 契约标准 v1（camelCase、无信封、可空显式 null） |
+| [`docs/persistence-architecture-rules.md`](docs/persistence-architecture-rules.md) | 持久层架构规则 |
+| [`docs/known-issues/`](docs/known-issues/) | 按批次分片的踩坑实录 |
+| [`docs/handoff/`](docs/handoff/) | 域级作战计划与批次执行记录 |
 
 ## 高频坑速查
 
 <details>
-<summary>展开（历史实锤，完整版见 docs/known-issues/）</summary>
+<summary>展开</summary>
 
-- **"Go 通 Java 不通"**：先 `jcmd` 查 Gradle 守护进程把启动 shell 的代理变量固化成 `proxyHost`，再怀疑代码。
-- **跑测试后服务全站 500 + NoClassDefFoundError**：`./gradlew test` 重写了 bootRun 正在用的 `build/classes`——**重启服务即解**，不用查代码。
-- **`--stop` 守护进程会把 bootRun 一起杀掉**：停完必须重启 Java。
-- **旧进程占端口**：起服前 `lsof -ti :8082 | xargs kill`，否则就绪探测打到旧代码、新路由 404。
-- **后台服务被"优雅关闭"**：nohup 后台进程受进程组信号影响（macOS 无 setsid），长跑验证尽量在同一次调用内完成。
-- **`Long != Long` 引用比较**：租户 id 10002 超出 Long 缓存区，一律 `equals`。
-- **H2 绿 ≠ PG 绿**：jsonb 键序、NOT NULL、DDL 默认值只在真 PG 暴露——验收必须连 dev PG。
-- **领域对象 `isXxx()` 派生方法必须 `@JsonIgnore`**：漏了会多吐键，jsonb 回读炸整列。
+- **跑完 `./gradlew build` 必须重启后端**：构建会**就地重写** `bootRun` 正在用的 `build/classes` ⇒ 在线服务**全站 500 + NoClassDefFoundError**。看起来像业务炸了，其实是陈旧类 —— **重启即解，别去查代码**。
+- **`scripts/*-down.sh --stop` 会把 bootRun 一起杀掉** ⇒ 停完记得重启。
+- **`LOCAL_STORAGE_BASE_DIR` 严禁 `/tmp`**：macOS 定期清理 ⇒ 入库文档原始文件丢失且**不可恢复**（列表正常、preview 全 500、无法重处理）。
+- **H2 绿 ≠ PG 绿**：jsonb 键序、NOT NULL、DDL 默认值只在真 PG 暴露 ⇒ 验收必须连真 PG（CI 的 backend job 就是干这个）。
+- **Redis 测试会静默跳过**：14 个测试用 `assumeTrue(redis != null)`，`redis-server` 不在 PATH 就无声不测。看到 skipped 别当"全绿"。
+- **改契约要同 PR 带前端**：前端 TS 类型是**手写**的（无 codegen），后端改字段前端照样编译通过 ⇒ 靠 `scripts/check-fe-contract-keys.py` 兜。
+- **`Long != Long` 引用比较**：租户 id 超出 Long 缓存区，一律 `equals`。
+- **本仓无 version catalog、无覆盖率工具**：加依赖时注意 BOM 字符串在多处重复声明。
 
 </details>
 
