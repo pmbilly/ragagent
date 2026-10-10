@@ -1,3 +1,7 @@
 {
-  "deletedCount": 1
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "deletedCount": 1
+  }
 }

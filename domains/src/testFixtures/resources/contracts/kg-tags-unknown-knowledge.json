@@ -1,1 +1,5 @@
-{"error":{"code":1003,"message":"knowledge not found","details":null}}
+{
+  "code": 1003,
+  "message": "knowledge not found",
+  "data": null
+}

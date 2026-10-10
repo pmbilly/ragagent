@@ -40,6 +40,8 @@ import com.ragagent.knowledge.dto.doc.KnowledgeSearchResponse;
 import com.ragagent.knowledge.dto.chunk.ReparseTaskData;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import com.ragagent.common.web.ApiResult;
+import com.ragagent.common.web.ApiResponse;
 
 /**
  * 知识文档运营操作面：跨库搜索、批量删除/重析、批量标签、跨 KB 搬移与进度、
@@ -48,6 +50,7 @@ import java.util.Set;
  * 语义照既有契约，错误文案与顺序不能调整。
  */
 @RestController
+@ApiResult
 @RequestMapping("/api/v1")
 public class KnowledgeOperationsController {
 
@@ -142,7 +145,7 @@ public class KnowledgeOperationsController {
 
     /** body 携带可选 kb_id；缺省时从首条 knowledge 推导授权 KB（handler 层守卫）。 */
     @PutMapping("/knowledge/tags")
-    public ResponseEntity<Void> updateKnowledgeTagBatch(
+    public ApiResponse<Void> updateKnowledgeTagBatch(
             @Valid @NonNullBody @RequestBody KnowledgeTagBatchRequest req) {
         if (KnowledgeRouteGuards.tenantId() == 0) {
             throw new BizException(AppError.unauthorized("Unauthorized"));
@@ -159,7 +162,7 @@ public class KnowledgeOperationsController {
         }
         guards.batchAccessChecks(authorizedKbId);
         knowledgeService.updateKnowledgeTagBatch(authorizedKbId, req.updates());
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
     // ── 批量删除 / 重析 ──────────────────────────────────────────────────

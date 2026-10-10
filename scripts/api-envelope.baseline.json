@@ -10,11 +10,6 @@
     "domains/src/main/java/com/ragagent/evaluation/controller/EvaluationController.java": "待迁移（存量控制器；B183 起新控制器请直接标注 @ApiResult）",
     "domains/src/main/java/com/ragagent/im/controller/ImCallbackController.java": "待迁移（存量控制器；B183 起新控制器请直接标注 @ApiResult）",
     "domains/src/main/java/com/ragagent/initialization/controller/InitializationController.java": "待迁移（存量控制器；B183 起新控制器请直接标注 @ApiResult）",
-    "domains/src/main/java/com/ragagent/knowledge/controller/KnowledgeBaseController.java": "待迁移（存量控制器；B183 起新控制器请直接标注 @ApiResult）",
-    "domains/src/main/java/com/ragagent/knowledge/controller/KnowledgeBaseFileProxyController.java": "待迁移（存量控制器；B183 起新控制器请直接标注 @ApiResult）",
-    "domains/src/main/java/com/ragagent/knowledge/controller/KnowledgeController.java": "待迁移（存量控制器；B183 起新控制器请直接标注 @ApiResult）",
-    "domains/src/main/java/com/ragagent/knowledge/controller/KnowledgeOperationsController.java": "待迁移（存量控制器；B183 起新控制器请直接标注 @ApiResult）",
-    "domains/src/main/java/com/ragagent/knowledge/controller/KnowledgeTagController.java": "待迁移（存量控制器；B183 起新控制器请直接标注 @ApiResult）",
     "domains/src/main/java/com/ragagent/wiki/controller/WikiPageController.java": "待迁移（存量控制器；B183 起新控制器请直接标注 @ApiResult）",
     "common/src/main/java/com/ragagent/common/web/HealthController.java": "待迁移（存量控制器；B183 起新控制器请直接标注 @ApiResult）"
   }

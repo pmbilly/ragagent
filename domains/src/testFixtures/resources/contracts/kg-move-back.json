@@ -1,4 +1,8 @@
 {
-  "folderPath": "",
-  "movedCount": 1
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "folderPath": "",
+    "movedCount": 1
+  }
 }

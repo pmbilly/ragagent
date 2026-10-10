@@ -1,1 +1,5 @@
-{"error":{"code":1010,"message":"limit must be between 1 and 100","details":null}}
+{
+  "code": 1010,
+  "message": "limit must be between 1 and 100",
+  "data": null
+}

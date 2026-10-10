@@ -237,7 +237,7 @@ def _java_unescape(s):
     return s.replace('\\"', '"').replace('\\\\', '\\').replace('\\n', '\n').replace('\\t', '\t')
 
 
-def cmd_converge(test_filters, rounds=8):
+def cmd_converge(test_filters, rounds=25):
     """失败驱动收敛（见模块 docstring）。test_filters 形如 '*ChunkContractTest'。"""
     env = dict(**__import__('os').environ)
     env.pop('SYSTEM_AES_KEY', None)
@@ -263,11 +263,12 @@ def cmd_converge(test_filters, rounds=8):
         changed = 0
         for cls, name, msg, stack in fails:
             # ① 金片 ← actual
-            m = re.search(r'([a-z0-9][A-Za-z0-9_.-]*\.json)[^\n]*?expected: <(.*?)> but was: <(.*?)>', msg, re.S)
+            m = re.search(r'([a-z0-9][A-Za-z0-9_.-]*\.json)[^\n]*?expected: <(.*?)> but was: <(.*)>', msg, re.S)
             if m:
                 g = CONTRACTS / m.group(1)
-                if g.exists() and g.read_text(encoding='utf-8').strip() != m.group(3):
-                    g.write_text(m.group(3) + '\n', encoding='utf-8')
+                if (g.exists() and m.group(3).strip()[-1:] in ('}', ']')
+                        and g.read_text(encoding='utf-8').strip() != m.group(3)):
+                    g.write_text(m.group(3), encoding='utf-8')   # 不加结尾换行（严格比较的测试会有差异 ✗）
                     print('     ✓ 金片 %s ← actual' % m.group(1))
                     changed += 1
                     continue
@@ -281,6 +282,16 @@ def cmd_converge(test_filters, rounds=8):
                 cand = next((q for q in pathlib.Path(ROOT, 'boot/src/test').rglob(mm.group(1))), None)
                 if cand:
                     fp, stack_file, stack_line = cand, mm.group(1), int(mm.group(2)); break
+            # ①c 另一种失败格式：`golden mismatch: X.json | expected: … | actual: …` ⇒ 金片 ← actual
+            m3 = re.search(r'([a-z0-9][A-Za-z0-9_.-]*\.json).*?actual:\s*(.*?)(?=\s*==>|\s*$)', msg, re.S)
+            if m3:
+                g3 = CONTRACTS / m3.group(1)
+                act = m3.group(2).strip()
+                if g3.exists() and act and g3.read_text(encoding='utf-8').strip() != act:
+                    g3.write_text(act + '\n', encoding='utf-8')
+                    print('     ✓ 金片 %s ← actual（mismatch 格式）' % m3.group(1))
+                    changed += 1
+                    continue
             # ①b 栈行里点名了金片 ⇒ 直接按 actual 写金片（空金片/非 JSON 金片都能修 ✓）
             # 守卫：状态类失败（消息形如 `<golden> status, body=… ==> expected: <204> but was: <200>`）
             # 不能走本规则 ✗，否则会把金片写成外壳而状态断言还是旧值 ⇒ 下一轮又红（B197 实测 ✓）
@@ -290,10 +301,11 @@ def cmd_converge(test_filters, rounds=8):
                 gm = re.search(r'golden\("([a-z0-9][A-Za-z0-9_.-]*\.json)"\)', line)
                 if gm:
                     g = CONTRACTS / gm.group(1)
-                    m2 = re.search(r'but was: <(.*?)>$', msg, re.S)
+                    m2 = re.search(r'but was: <(.*)>$', msg, re.S)
                     actual = (m2.group(1) if m2 else '').strip()
-                    if g.exists() and actual and g.read_text(encoding='utf-8').strip() != actual:
-                        g.write_text(actual + '\n', encoding='utf-8')
+                    if (g.exists() and actual and actual[-1:] in ('}', ']')
+                            and g.read_text(encoding='utf-8').strip() != actual):
+                        g.write_text(actual, encoding='utf-8')
                         print('     ✓ 金片 %s ← actual（栈行点名）' % gm.group(1))
                         changed += 1
                         continue
@@ -310,7 +322,7 @@ def cmd_converge(test_filters, rounds=8):
                         continue
             # ②b 空体期望 → 外壳（按栈行号；204 退役后 body 是外壳）
             if stack_line and re.search(r'expected: <> but was: <', msg):
-                m2 = re.search(r'but was: <(.*?)>', msg, re.S)
+                m2 = re.search(r'but was: <(.*)>', msg, re.S)
                 actual = (m2.group(1) if m2 else '')
                 if fp:
                     lines = fp.read_text(encoding='utf-8').split('\n')
@@ -322,7 +334,7 @@ def cmd_converge(test_filters, rounds=8):
                         changed += 1
                         continue
             # ③ JSON 字面量回填（expected → actual）
-            m = re.search(r'expected: <([{\[].*?)> but was: <([{\[].*?)>', msg, re.S)
+            m = re.search(r'expected: <([{\[].*)> but was: <([{\[].*)>', msg, re.S)
             if m:
                 a, b = m.group(1), m.group(2)
                 key = (cls, a[:40])
@@ -349,6 +361,41 @@ def cmd_converge(test_filters, rounds=8):
             return 1
     print('  ⚠️ 达到轮数上限')
     return 1
+
+
+def cmd_retire204(paths):
+    """把 204（noContent()/NO_CONTENT/status(204)）改成 200 + ApiResponse.ok()。
+
+    做法：往上找方法签名行 → 返回类型换成 ApiResponse<Void> → 该行换 return。
+    调用点若是 `return <helper>(...)` 之类在返回位不可用的形态，编译会报错 ⇒
+    再用编译驱动的「就地展开」补（见 HANDOFF B193/B189 ✓）。
+    """
+    import re as _re
+    total = 0
+    for rel in paths:
+        q = ROOT / rel
+        if not q.exists():
+            print('  ⚠️ 不存在：%s' % rel); continue
+        lines = q.read_text(encoding='utf-8').split('\n')
+        n = 0
+        for k, l in enumerate(lines):
+            if not _re.search(r'noContent\(\)|NO_CONTENT|status\(204\)', l):
+                continue
+            j = k
+            while j >= 0 and not _re.match(r'\s*(public|private|protected)\s', lines[j]):
+                j -= 1
+            lines[j] = _re.sub(r'ResponseEntity<[^>]*>', 'ApiResponse<Void>', lines[j], count=1)
+            lines[k] = '        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）'
+            n += 1
+            print('  ✓ %s:%d %s' % (pathlib.Path(rel).name, k + 1, lines[j].strip()[:88]))
+        if n:
+            txt = '\n'.join(lines)
+            if 'import com.ragagent.common.web.ApiResponse;' not in txt:
+                L = txt.split('\n'); li = max(i for i, x in enumerate(L) if x.startswith('import '))
+                L.insert(li + 1, 'import com.ragagent.common.web.ApiResponse;'); txt = '\n'.join(L)
+            q.write_text(txt, encoding='utf-8')
+        total += n
+    print('  204 退役合计 %d 处' % total)
 
 
 def cmd_lint():
@@ -405,6 +452,8 @@ def main():
         cmd_goldens(argv, prefixes)
     elif mode == 'converge':
         return cmd_converge(argv)
+    elif mode == 'retire204':
+        cmd_retire204(argv)
     elif mode == 'lint':
         return cmd_lint()
     elif mode == 'checklist':

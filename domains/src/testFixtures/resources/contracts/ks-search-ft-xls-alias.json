@@ -1,35 +1,39 @@
 {
-  "items": [
-    {
-      "id": "a2e00001-0000-0000-0000-000000000004",
-      "knowledgeBaseId": "80bde2e1-30c3-4edc-be60-1f9e63f95454",
-      "tags": null,
-      "type": "document",
-      "title": "ksdoc delta 表格",
-      "description": null,
-      "source": "manual",
-      "channel": "web",
-      "parseStatus": "completed",
-      "pendingSubtasksCount": 0,
-      "summaryStatus": "none",
-      "enableStatus": "enabled",
-      "embeddingModelId": null,
-      "fileName": "ksdoc-delta.xlsx",
-      "folderPath": "",
-      "fileType": "xlsx",
-      "fileSize": 10,
-      "fileHash": "000000000000000000000000000000a4",
-      "storageSize": 0,
-      "metadata": null,
-      "customMetadata": {},
-      "lastFaqImportResult": null,
-      "createdAt": "2026-09-19T05:22:14.946304+08:00",
-      "updatedAt": "2026-09-19T05:22:14.946304+08:00",
-      "processedAt": null,
-      "errorMessage": null,
-      "knowledgeBaseName": "ks-golden-kb"
-    }
-  ],
-  "hasMore": false,
-  "total": 1
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "items": [
+      {
+        "id": "a2e00001-0000-0000-0000-000000000004",
+        "knowledgeBaseId": "80bde2e1-30c3-4edc-be60-1f9e63f95454",
+        "tags": null,
+        "type": "document",
+        "title": "ksdoc delta 表格",
+        "description": null,
+        "source": "manual",
+        "channel": "web",
+        "parseStatus": "completed",
+        "pendingSubtasksCount": 0,
+        "summaryStatus": "none",
+        "enableStatus": "enabled",
+        "embeddingModelId": null,
+        "fileName": "ksdoc-delta.xlsx",
+        "folderPath": "",
+        "fileType": "xlsx",
+        "fileSize": 10,
+        "fileHash": "000000000000000000000000000000a4",
+        "storageSize": 0,
+        "metadata": null,
+        "customMetadata": {},
+        "lastFaqImportResult": null,
+        "createdAt": "2026-09-19T05:22:14.946304+08:00",
+        "updatedAt": "2026-09-19T05:22:14.946304+08:00",
+        "processedAt": null,
+        "errorMessage": null,
+        "knowledgeBaseName": "ks-golden-kb"
+      }
+    ],
+    "hasMore": false,
+    "total": 1
+  }
 }

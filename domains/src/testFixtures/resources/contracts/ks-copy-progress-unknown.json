@@ -1,1 +1,5 @@
-{"error":{"code":1003,"message":"KB clone task not found","details":null}}
+{
+  "code": 1003,
+  "message": "KB clone task not found",
+  "data": null
+}

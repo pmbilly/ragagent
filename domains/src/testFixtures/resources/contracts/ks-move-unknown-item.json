@@ -1,1 +1,5 @@
-{"error":{"code":1000,"message":"Knowledge item 11111111-2222-3333-4444-999999999999 not found","details":null}}
+{
+  "code": 1000,
+  "message": "Knowledge item 11111111-2222-3333-4444-999999999999 not found",
+  "data": null
+}

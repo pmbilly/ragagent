@@ -1,4 +1,8 @@
 {
-  "folderPath": "docs/notes",
-  "movedCount": 1
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "folderPath": "docs/notes",
+    "movedCount": 1
+  }
 }

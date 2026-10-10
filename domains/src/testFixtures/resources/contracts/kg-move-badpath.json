@@ -1,4 +1,8 @@
 {
-  "folderPath": "<script>x",
-  "movedCount": 1
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "folderPath": "<script>x",
+    "movedCount": 1
+  }
 }

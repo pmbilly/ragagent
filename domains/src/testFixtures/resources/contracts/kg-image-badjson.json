@@ -1,1 +1,5 @@
-{"error":{"code":1007,"message":"invalid image info payload: Unrecognized token 'not': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')","details":null}}
+{
+  "code": 1007,
+  "message": "invalid image info payload: Unrecognized token 'not': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')",
+  "data": null
+}

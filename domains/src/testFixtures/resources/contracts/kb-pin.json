@@ -1,77 +1,81 @@
 {
-  "asrConfig": {
-    "enabled": false,
-    "modelId": "",
-    "language": ""
-  },
-  "autoTagConfig": null,
-  "capabilities": {
-    "faq": false,
-    "graph": false,
-    "keyword": true,
-    "vector": true,
-    "wiki": false
-  },
-  "chunkCount": 0,
-  "chunkingConfig": {
-    "chunkSize": 0,
-    "chunkOverlap": 0,
-    "separators": null,
-    "parserEngineRules": null,
-    "enableParentChild": false,
-    "parentChunkSize": 0,
-    "childChunkSize": 0,
-    "strategy": null,
-    "tokenLimit": 0,
-    "languages": null,
-    "tableMetadataInstructions": null
-  },
-  "createdAt": "2026-09-17T19:35:58.976351+08:00",
-  "creatorId": "11111111-2222-3333-4444-555555555501",
-  "description": "updated desc",
-  "embeddingModelId": null,
-  "extractConfig": null,
-  "faqConfig": null,
-  "id": "882a3361-fa2d-402b-a383-2a302f9c0184",
-  "imageProcessingConfig": {
-    "modelId": ""
-  },
-  "indexingStrategy": {
-    "vectorEnabled": true,
-    "keywordEnabled": true,
-    "wikiEnabled": false,
-    "graphEnabled": false
-  },
-  "pinned": true,
-  "processing": false,
-  "temporary": false,
-  "knowledgeCount": 0,
-  "name": "golden-kb-renamed",
-  "pinnedAt": "2026-09-17T19:35:59.273485+08:00",
-  "processingCount": 0,
-  "questionGenerationConfig": null,
-  "shareCount": 0,
-  "storageBackendId": "c730730a-70f5-4d86-a7e1-58972cf27567",
-  "summaryModelId": null,
-  "type": "document",
-  "updatedAt": "2026-09-17T19:35:59.23996+08:00",
-  "vlmConfig": {
-    "enabled": false,
-    "modelId": "",
-    "descriptionLanguage": null,
-    "customInstructions": null,
-    "modelName": "",
-    "baseUrl": "",
-    "interfaceType": ""
-  },
-  "wikiConfig": null,
-  "vectorStore": {
-    "id": null,
-    "name": "System default",
-    "source": "env",
-    "engineType": "postgres",
-    "status": "available"
-  },
-  "creatorName": null,
-  "storageProvider": "local"
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "asrConfig": {
+      "enabled": false,
+      "modelId": "",
+      "language": ""
+    },
+    "autoTagConfig": null,
+    "capabilities": {
+      "faq": false,
+      "graph": false,
+      "keyword": true,
+      "vector": true,
+      "wiki": false
+    },
+    "chunkCount": 0,
+    "chunkingConfig": {
+      "chunkSize": 0,
+      "chunkOverlap": 0,
+      "separators": null,
+      "parserEngineRules": null,
+      "enableParentChild": false,
+      "parentChunkSize": 0,
+      "childChunkSize": 0,
+      "strategy": null,
+      "tokenLimit": 0,
+      "languages": null,
+      "tableMetadataInstructions": null
+    },
+    "createdAt": "2026-09-17T19:35:58.976351+08:00",
+    "creatorId": "11111111-2222-3333-4444-555555555501",
+    "description": "updated desc",
+    "embeddingModelId": null,
+    "extractConfig": null,
+    "faqConfig": null,
+    "id": "882a3361-fa2d-402b-a383-2a302f9c0184",
+    "imageProcessingConfig": {
+      "modelId": ""
+    },
+    "indexingStrategy": {
+      "vectorEnabled": true,
+      "keywordEnabled": true,
+      "wikiEnabled": false,
+      "graphEnabled": false
+    },
+    "pinned": true,
+    "processing": false,
+    "temporary": false,
+    "knowledgeCount": 0,
+    "name": "golden-kb-renamed",
+    "pinnedAt": "2026-09-17T19:35:59.273485+08:00",
+    "processingCount": 0,
+    "questionGenerationConfig": null,
+    "shareCount": 0,
+    "storageBackendId": "c730730a-70f5-4d86-a7e1-58972cf27567",
+    "summaryModelId": null,
+    "type": "document",
+    "updatedAt": "2026-09-17T19:35:59.23996+08:00",
+    "vlmConfig": {
+      "enabled": false,
+      "modelId": "",
+      "descriptionLanguage": null,
+      "customInstructions": null,
+      "modelName": "",
+      "baseUrl": "",
+      "interfaceType": ""
+    },
+    "wikiConfig": null,
+    "vectorStore": {
+      "id": null,
+      "name": "System default",
+      "source": "env",
+      "engineType": "postgres",
+      "status": "available"
+    },
+    "creatorName": null,
+    "storageProvider": "local"
+  }
 }

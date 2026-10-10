@@ -1,1 +1,5 @@
-{"error":{"code":1010,"message":"状态仅支持 draft 或 publish","details":null}}
+{
+  "code": 1010,
+  "message": "状态仅支持 draft 或 publish",
+  "data": null
+}

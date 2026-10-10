@@ -1,70 +1,74 @@
 {
-  "attempt": 0,
-  "currentAttempt": 0,
-  "currentStage": "",
-  "knowledgeId": "afa00001-0000-0000-0000-000000000001",
-  "latestAttempt": 0,
-  "parseStatus": "completed",
-  "trace": {
-    "knowledgeId": "afa00001-0000-0000-0000-000000000001",
+  "code": 0,
+  "message": "ok",
+  "data": {
     "attempt": 0,
-    "spanId": "",
-    "name": "knowledge_processing",
-    "kind": "root",
-    "status": "done",
-    "createdAt": "2026-09-19T04:23:37.466421+08:00",
-    "updatedAt": "2026-09-19T04:23:37.466421+08:00",
-    "children": [
-      {
-        "knowledgeId": "afa00001-0000-0000-0000-000000000001",
-        "attempt": 0,
-        "spanId": "",
-        "name": "docreader",
-        "kind": "stage",
-        "status": "done",
-        "createdAt": "2026-09-19T04:23:37.466421+08:00",
-        "updatedAt": "2026-09-19T04:23:37.466421+08:00"
-      },
-      {
-        "knowledgeId": "afa00001-0000-0000-0000-000000000001",
-        "attempt": 0,
-        "spanId": "",
-        "name": "chunking",
-        "kind": "stage",
-        "status": "done",
-        "createdAt": "2026-09-19T04:23:37.466421+08:00",
-        "updatedAt": "2026-09-19T04:23:37.466421+08:00"
-      },
-      {
-        "knowledgeId": "afa00001-0000-0000-0000-000000000001",
-        "attempt": 0,
-        "spanId": "",
-        "name": "embedding",
-        "kind": "stage",
-        "status": "done",
-        "createdAt": "2026-09-19T04:23:37.466421+08:00",
-        "updatedAt": "2026-09-19T04:23:37.466421+08:00"
-      },
-      {
-        "knowledgeId": "afa00001-0000-0000-0000-000000000001",
-        "attempt": 0,
-        "spanId": "",
-        "name": "multimodal",
-        "kind": "stage",
-        "status": "done",
-        "createdAt": "2026-09-19T04:23:37.466421+08:00",
-        "updatedAt": "2026-09-19T04:23:37.466421+08:00"
-      },
-      {
-        "knowledgeId": "afa00001-0000-0000-0000-000000000001",
-        "attempt": 0,
-        "spanId": "",
-        "name": "postprocess",
-        "kind": "stage",
-        "status": "done",
-        "createdAt": "2026-09-19T04:23:37.466421+08:00",
-        "updatedAt": "2026-09-19T04:23:37.466421+08:00"
-      }
-    ]
+    "currentAttempt": 0,
+    "currentStage": "",
+    "knowledgeId": "afa00001-0000-0000-0000-000000000001",
+    "latestAttempt": 0,
+    "parseStatus": "completed",
+    "trace": {
+      "knowledgeId": "afa00001-0000-0000-0000-000000000001",
+      "attempt": 0,
+      "spanId": "",
+      "name": "knowledge_processing",
+      "kind": "root",
+      "status": "done",
+      "createdAt": "2026-09-19T04:23:37.466421+08:00",
+      "updatedAt": "2026-09-19T04:23:37.466421+08:00",
+      "children": [
+        {
+          "knowledgeId": "afa00001-0000-0000-0000-000000000001",
+          "attempt": 0,
+          "spanId": "",
+          "name": "docreader",
+          "kind": "stage",
+          "status": "done",
+          "createdAt": "2026-09-19T04:23:37.466421+08:00",
+          "updatedAt": "2026-09-19T04:23:37.466421+08:00"
+        },
+        {
+          "knowledgeId": "afa00001-0000-0000-0000-000000000001",
+          "attempt": 0,
+          "spanId": "",
+          "name": "chunking",
+          "kind": "stage",
+          "status": "done",
+          "createdAt": "2026-09-19T04:23:37.466421+08:00",
+          "updatedAt": "2026-09-19T04:23:37.466421+08:00"
+        },
+        {
+          "knowledgeId": "afa00001-0000-0000-0000-000000000001",
+          "attempt": 0,
+          "spanId": "",
+          "name": "embedding",
+          "kind": "stage",
+          "status": "done",
+          "createdAt": "2026-09-19T04:23:37.466421+08:00",
+          "updatedAt": "2026-09-19T04:23:37.466421+08:00"
+        },
+        {
+          "knowledgeId": "afa00001-0000-0000-0000-000000000001",
+          "attempt": 0,
+          "spanId": "",
+          "name": "multimodal",
+          "kind": "stage",
+          "status": "done",
+          "createdAt": "2026-09-19T04:23:37.466421+08:00",
+          "updatedAt": "2026-09-19T04:23:37.466421+08:00"
+        },
+        {
+          "knowledgeId": "afa00001-0000-0000-0000-000000000001",
+          "attempt": 0,
+          "spanId": "",
+          "name": "postprocess",
+          "kind": "stage",
+          "status": "done",
+          "createdAt": "2026-09-19T04:23:37.466421+08:00",
+          "updatedAt": "2026-09-19T04:23:37.466421+08:00"
+        }
+      ]
+    }
   }
 }

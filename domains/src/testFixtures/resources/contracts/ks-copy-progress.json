@@ -1,13 +1,1 @@
-{
-  "taskId": "kb_clone_10002_1789767744434_e72152e7_024a16bf9d5",
-  "sourceId": "024a16bf-9d52-4dd4-a8af-733b051ccb7f",
-  "targetId": "b7171cc4-e709-44be-b931-ef850ecd461c",
-  "status": "completed",
-  "progress": 100,
-  "total": 4,
-  "processed": 4,
-  "message": "Knowledge base clone completed successfully",
-  "error": "",
-  "createdAt": 0,
-  "updatedAt": 1789767745
-}
+{"code":0,"data":{"createdAt":0,"error":"","message":"Knowledge base clone completed successfully","processed":4,"progress":100,"sourceId":"<uuid>","status":"completed","targetId":"<uuid>","taskId":"<task>","total":4,"updatedAt":"<epoch>"},"message":"ok"}

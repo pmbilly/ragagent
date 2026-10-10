@@ -1,1 +1,5 @@
-{"error":{"code":1000,"message":"请求参数不合法","details":"mode: 不能为空"}}
+{
+  "code": 1000,
+  "message": "请求参数不合法",
+  "data": "mode: 不能为空"
+}

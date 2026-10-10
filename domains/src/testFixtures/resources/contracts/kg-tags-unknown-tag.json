@@ -1,1 +1,5 @@
-{"error":{"code":1000,"message":"标签 nope 不存在","details":null}}
+{
+  "code": 1000,
+  "message": "标签 nope 不存在",
+  "data": null
+}

@@ -18,6 +18,7 @@ import com.ragagent.storage.fileserve.FileProxyService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import com.ragagent.common.web.ApiResult;
 
 /**
  * newKBScopedFileServeHandlerWithResources + access.ResolveKBFile）。
@@ -29,6 +30,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * → ResolveKBFile → serveAuthorizedFile。</p>
  */
 @RestController
+@ApiResult
 public class KnowledgeBaseFileProxyController {
 
     private final ChunkAccessGuard kbGuard;

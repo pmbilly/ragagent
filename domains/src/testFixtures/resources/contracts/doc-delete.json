@@ -1,3 +1,7 @@
 {
-  "taskId": "474e7a5d-f51c-46a0-87fe-a7ff8f03e2a2"
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "taskId": "474e7a5d-f51c-46a0-87fe-a7ff8f03e2a2"
+  }
 }

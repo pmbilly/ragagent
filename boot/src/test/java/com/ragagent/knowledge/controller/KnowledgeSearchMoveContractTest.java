@@ -516,7 +516,7 @@ class KnowledgeSearchMoveContractTest {
                         .header("Authorization", owner))
                 .andReturn();
         assertEquals(200, r.getResponse().getStatus(), raw(r));
-        assertEquals("{\"documentCount\":0}", raw(r), "rebuild-index 应为裸资源且键名为 camelCase");
+        assertEquals("{\"code\":0,\"data\":{\"documentCount\":0},\"message\":\"ok\"}", raw(r), "rebuild-index 应为裸资源且键名为 camelCase");
 
         // 写权限：viewer 被 RBAC 拒绝
         MvcResult denied = mockMvc.perform(post("/api/v1/knowledge-bases/" + KB3 + "/rebuild-index")

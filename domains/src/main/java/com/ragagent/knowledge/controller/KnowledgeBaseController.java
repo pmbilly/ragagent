@@ -45,6 +45,8 @@ import com.ragagent.common.security.TenantAPIKeyScope;
 import com.ragagent.knowledge.task.KnowledgeTaskIdCodec;
 import com.ragagent.storage.support.Mode;
 import java.util.UUID;
+import com.ragagent.common.web.ApiResult;
+import com.ragagent.common.web.ApiResponse;
 
 /**
  * 知识库 CRUD 与检索入口：列表/详情/更新/删除、置顶、移动目标、混合检索
@@ -63,6 +65,7 @@ import java.util.UUID;
  * 兼容），待改为独立请求 DTO。</p>
  */
 @RestController
+@ApiResult
 @RequestMapping("/api/v1/knowledge-bases")
 public class KnowledgeBaseController {
 
@@ -141,7 +144,7 @@ public class KnowledgeBaseController {
 
     /** 删除知识库；成功返回 204（无响应体，见契约文档 §1.13）。 */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteKnowledgeBase(@PathVariable("id") String id) {
+    public ApiResponse<Void> deleteKnowledgeBase(@PathVariable("id") String id) {
         log.info("Start deleting knowledge base, ID: {}", id);
         KnowledgeBase existing = kbService.getKnowledgeBase(id);
         checkOwnership(existing);
@@ -149,7 +152,7 @@ public class KnowledgeBaseController {
             throw new BizException(AppError.forbidden("Only knowledge base owner can delete"));
         }
         kbService.deleteKnowledgeBase(id);
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
     @PutMapping("/{id}/pin")

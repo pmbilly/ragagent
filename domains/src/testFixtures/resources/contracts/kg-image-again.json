@@ -1,1 +1,5 @@
-{"error":{"code":1007,"message":"model ID cannot be empty","details":null}}
+{
+  "code": 1007,
+  "message": "model ID cannot be empty",
+  "data": null
+}

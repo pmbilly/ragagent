@@ -1,1 +1,5 @@
-{"error":{"code":1000,"message":"知识正在删除中，无法取消解析","details":null}}
+{
+  "code": 1000,
+  "message": "知识正在删除中，无法取消解析",
+  "data": null
+}

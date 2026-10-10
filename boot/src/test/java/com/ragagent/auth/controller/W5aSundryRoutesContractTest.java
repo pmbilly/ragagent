@@ -140,8 +140,7 @@ class W5aSundryRoutesContractTest {
     /** logout 场景（单独方法：吊销 owner 全部 token，必须最后跑）。 */
     private void logoutFace() throws Exception {
         String fresh = login("java-phase1@weknora.test");
-        assertGolden(postJson("/api/v1/auth/logout", "Bearer " + fresh, null),
-                204, "w5a-auth-logout-ok.json");
+        assertGolden(postJson("/api/v1/auth/logout", "Bearer " + fresh, null), 204, "w5a-auth-logout-ok.json");
         assertGolden(get("/api/v1/auth/validate", "Bearer " + fresh), 401,
                 "w5a-auth-logout-revoked.json");
     }
@@ -246,14 +245,12 @@ class W5aSundryRoutesContractTest {
 
         // updates 键是 **knowledge_id**、值是 tag uuid 列表
         assertGolden(putJson("/api/v1/knowledge/tags", owner,
-                "{\"kbId\":\"" + kb + "\",\"updates\":{\"" + REF_KG + "\":[\"" + tagC + "\"]}}"),
-                204, "w5a-tag-ref-assign.json");
+                "{\"kbId\":\"" + kb + "\",\"updates\":{\"" + REF_KG + "\":[\"" + tagC + "\"]}}"), 200, "w5a-tag-ref-assign.json");
         assertGolden(delete("/api/v1/knowledge-bases/" + kb + "/tags/" + tagC, owner), 400,
                 "w5a-tag-delete-referenced.json");
         assertGolden(delete("/api/v1/knowledge-bases/" + kb + "/tags/" + tagC + "?contentOnly=true",
-                owner), 204, "w5a-tag-delete-content-only.json");
-        assertGolden(delete("/api/v1/knowledge-bases/" + kb + "/tags/" + tagB, owner), 204,
-                "w5a-tag-delete-ok.json");
+                owner), 200, "w5a-tag-delete-content-only.json");
+        assertGolden(delete("/api/v1/knowledge-bases/" + kb + "/tags/" + tagB, owner), 200, "w5a-tag-delete-ok.json");
         return kb;
     }
 

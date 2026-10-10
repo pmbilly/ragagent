@@ -1,10 +1,1 @@
-{
-  "id": "33b7aac9-997f-40b4-a4b1-a29b606fa133",
-  "seqId": 10000061,
-  "knowledgeBaseId": "37bc8b4f-a329-4989-bac8-f31d94916cc4",
-  "name": "w5a-标签A2",
-  "color": "#ff0000",
-  "sortOrder": 1,
-  "createdAt": "2026-09-21T07:54:58.965851+08:00",
-  "updatedAt": "2026-09-20T23:54:59.214302Z"
-}
+{"code":0,"data":{"color":"#ff0000","createdAt":"<ts>","id":"<uuid>","knowledgeBaseId":"<uuid>","name":"w5a-标签A2","seqId":<seq>,"sortOrder":1,"updatedAt":"<ts>"},"message":"ok"}

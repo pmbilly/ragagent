@@ -1,79 +1,83 @@
 {
-  "attempt": 0,
-  "currentAttempt": 0,
-  "currentStage": "",
-  "knowledgeId": "afa00001-0000-0000-0000-000000000006",
-  "lastError": {
-    "code": "UNKNOWN",
-    "errorCode": "UNKNOWN",
-    "errorMessage": "解析失败：文档格式不支持",
-    "finishedAt": "2026-09-19T04:23:37.218866+08:00",
-    "message": "解析失败：文档格式不支持",
-    "name": "knowledge_processing",
-    "stage": "knowledge_processing"
-  },
-  "latestAttempt": 0,
-  "parseStatus": "failed",
-  "trace": {
-    "knowledgeId": "afa00001-0000-0000-0000-000000000006",
+  "code": 0,
+  "message": "ok",
+  "data": {
     "attempt": 0,
-    "spanId": "",
-    "name": "knowledge_processing",
-    "kind": "root",
-    "status": "failed",
-    "createdAt": "2026-09-19T04:23:37.484328+08:00",
-    "updatedAt": "2026-09-19T04:23:37.484328+08:00",
-    "children": [
-      {
-        "knowledgeId": "afa00001-0000-0000-0000-000000000006",
-        "attempt": 0,
-        "spanId": "",
-        "name": "docreader",
-        "kind": "stage",
-        "status": "failed",
-        "createdAt": "2026-09-19T04:23:37.484328+08:00",
-        "updatedAt": "2026-09-19T04:23:37.484328+08:00"
-      },
-      {
-        "knowledgeId": "afa00001-0000-0000-0000-000000000006",
-        "attempt": 0,
-        "spanId": "",
-        "name": "chunking",
-        "kind": "stage",
-        "status": "failed",
-        "createdAt": "2026-09-19T04:23:37.484328+08:00",
-        "updatedAt": "2026-09-19T04:23:37.484328+08:00"
-      },
-      {
-        "knowledgeId": "afa00001-0000-0000-0000-000000000006",
-        "attempt": 0,
-        "spanId": "",
-        "name": "embedding",
-        "kind": "stage",
-        "status": "failed",
-        "createdAt": "2026-09-19T04:23:37.484328+08:00",
-        "updatedAt": "2026-09-19T04:23:37.484328+08:00"
-      },
-      {
-        "knowledgeId": "afa00001-0000-0000-0000-000000000006",
-        "attempt": 0,
-        "spanId": "",
-        "name": "multimodal",
-        "kind": "stage",
-        "status": "failed",
-        "createdAt": "2026-09-19T04:23:37.484328+08:00",
-        "updatedAt": "2026-09-19T04:23:37.484328+08:00"
-      },
-      {
-        "knowledgeId": "afa00001-0000-0000-0000-000000000006",
-        "attempt": 0,
-        "spanId": "",
-        "name": "postprocess",
-        "kind": "stage",
-        "status": "failed",
-        "createdAt": "2026-09-19T04:23:37.484328+08:00",
-        "updatedAt": "2026-09-19T04:23:37.484328+08:00"
-      }
-    ]
+    "currentAttempt": 0,
+    "currentStage": "",
+    "knowledgeId": "afa00001-0000-0000-0000-000000000006",
+    "lastError": {
+      "code": "UNKNOWN",
+      "errorCode": "UNKNOWN",
+      "errorMessage": "解析失败：文档格式不支持",
+      "finishedAt": "2026-09-19T04:23:37.218866+08:00",
+      "message": "解析失败：文档格式不支持",
+      "name": "knowledge_processing",
+      "stage": "knowledge_processing"
+    },
+    "latestAttempt": 0,
+    "parseStatus": "failed",
+    "trace": {
+      "knowledgeId": "afa00001-0000-0000-0000-000000000006",
+      "attempt": 0,
+      "spanId": "",
+      "name": "knowledge_processing",
+      "kind": "root",
+      "status": "failed",
+      "createdAt": "2026-09-19T04:23:37.484328+08:00",
+      "updatedAt": "2026-09-19T04:23:37.484328+08:00",
+      "children": [
+        {
+          "knowledgeId": "afa00001-0000-0000-0000-000000000006",
+          "attempt": 0,
+          "spanId": "",
+          "name": "docreader",
+          "kind": "stage",
+          "status": "failed",
+          "createdAt": "2026-09-19T04:23:37.484328+08:00",
+          "updatedAt": "2026-09-19T04:23:37.484328+08:00"
+        },
+        {
+          "knowledgeId": "afa00001-0000-0000-0000-000000000006",
+          "attempt": 0,
+          "spanId": "",
+          "name": "chunking",
+          "kind": "stage",
+          "status": "failed",
+          "createdAt": "2026-09-19T04:23:37.484328+08:00",
+          "updatedAt": "2026-09-19T04:23:37.484328+08:00"
+        },
+        {
+          "knowledgeId": "afa00001-0000-0000-0000-000000000006",
+          "attempt": 0,
+          "spanId": "",
+          "name": "embedding",
+          "kind": "stage",
+          "status": "failed",
+          "createdAt": "2026-09-19T04:23:37.484328+08:00",
+          "updatedAt": "2026-09-19T04:23:37.484328+08:00"
+        },
+        {
+          "knowledgeId": "afa00001-0000-0000-0000-000000000006",
+          "attempt": 0,
+          "spanId": "",
+          "name": "multimodal",
+          "kind": "stage",
+          "status": "failed",
+          "createdAt": "2026-09-19T04:23:37.484328+08:00",
+          "updatedAt": "2026-09-19T04:23:37.484328+08:00"
+        },
+        {
+          "knowledgeId": "afa00001-0000-0000-0000-000000000006",
+          "attempt": 0,
+          "spanId": "",
+          "name": "postprocess",
+          "kind": "stage",
+          "status": "failed",
+          "createdAt": "2026-09-19T04:23:37.484328+08:00",
+          "updatedAt": "2026-09-19T04:23:37.484328+08:00"
+        }
+      ]
+    }
   }
 }

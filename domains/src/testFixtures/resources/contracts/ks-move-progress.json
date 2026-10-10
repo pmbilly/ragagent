@@ -1,14 +1,1 @@
-{
-  "taskId": "kg_move_10002_1789767736229_faf92658_80bde2e130c",
-  "sourceKbId": "80bde2e1-30c3-4edc-be60-1f9e63f95454",
-  "targetKbId": "b7171cc4-e709-44be-b931-ef850ecd461c",
-  "status": "completed",
-  "progress": 100,
-  "total": 1,
-  "processed": 1,
-  "failed": 0,
-  "message": "Moved 1/1 knowledge items",
-  "error": "",
-  "createdAt": 0,
-  "updatedAt": 1789767737
-}
+{"code":0,"data":{"createdAt":0,"error":"","failed":0,"message":"Moved 1/1 knowledge items","processed":1,"progress":100,"sourceKbId":"<uuid>","status":"completed","targetKbId":"<uuid>","taskId":"<task>","total":1,"updatedAt":"<epoch>"},"message":"ok"}

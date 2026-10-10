@@ -1,1 +1,5 @@
-{"error":"Forbidden: insufficient workspace role"}
+{
+  "code": 1002,
+  "message": "Forbidden: insufficient workspace role",
+  "data": null
+}

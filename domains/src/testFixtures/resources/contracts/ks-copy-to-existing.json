@@ -1,5 +1,9 @@
 {
-  "taskId": "kb_clone_10002_1789767744434_e72152e7_024a16bf9d5",
-  "sourceId": "024a16bf-9d52-4dd4-a8af-733b051ccb7f",
-  "targetId": "b7171cc4-e709-44be-b931-ef850ecd461c"
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "taskId": "kb_clone_10002_1789767744434_e72152e7_024a16bf9d5",
+    "sourceId": "024a16bf-9d52-4dd4-a8af-733b051ccb7f",
+    "targetId": "b7171cc4-e709-44be-b931-ef850ecd461c"
+  }
 }

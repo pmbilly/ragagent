@@ -1,1 +1,5 @@
-{"error":{"code":1002,"message":"No permission to operate on this knowledge base","details":null}}
+{
+  "code": 1002,
+  "message": "No permission to operate on this knowledge base",
+  "data": null
+}

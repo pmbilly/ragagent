@@ -1,1 +1,5 @@
-{"error":{"code":1000,"message":"no knowledge IDs provided for batch reparse","details":null}}
+{
+  "code": 1000,
+  "message": "no knowledge IDs provided for batch reparse",
+  "data": null
+}

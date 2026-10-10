@@ -1,20 +1,24 @@
 {
-  "rootDocumentCount": 10,
-  "totalDocumentCount": 13,
-  "folders": [
-    {
-      "path": "<script>x",
-      "name": "<script>x",
-      "documentCount": 2,
-      "totalCount": 3,
-      "children": [
-        {
-          "path": "<script>x/readme",
-          "name": "readme",
-          "documentCount": 1,
-          "totalCount": 1
-        }
-      ]
-    }
-  ]
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "rootDocumentCount": 10,
+    "totalDocumentCount": 13,
+    "folders": [
+      {
+        "path": "<script>x",
+        "name": "<script>x",
+        "documentCount": 2,
+        "totalCount": 3,
+        "children": [
+          {
+            "path": "<script>x/readme",
+            "name": "readme",
+            "documentCount": 1,
+            "totalCount": 1
+          }
+        ]
+      }
+    ]
+  }
 }

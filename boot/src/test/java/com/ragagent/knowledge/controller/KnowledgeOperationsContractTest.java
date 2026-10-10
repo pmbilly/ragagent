@@ -754,7 +754,7 @@ class KnowledgeOperationsContractTest {
                      "kg-clear-nonempty.json", "kg-clear-again.json" -> 202;
                 // 无响应体的操作
                 case "kg-image-empty.json", "kg-tags.json", "kg-tags-clear.json",
-                     "kg-tags-no-kbid.json" -> 204;
+                     "kg-tags-no-kbid.json" -> 200;
                 default -> 200;
         };
     }

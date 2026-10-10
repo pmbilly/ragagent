@@ -1,1 +1,5 @@
-{"error":{"code":1007,"message":"chunk not found","details":null}}
+{
+  "code": 1007,
+  "message": "chunk not found",
+  "data": null
+}

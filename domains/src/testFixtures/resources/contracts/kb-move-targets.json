@@ -1,156 +1,160 @@
-[
-  {
-    "id": "0af07405-b814-495b-8554-117da273cae4",
-    "name": "",
-    "type": "document",
-    "temporary": false,
-    "description": null,
-    "creatorId": "11111111-2222-3333-4444-555555555501",
-    "chunkingConfig": {
-      "chunkSize": 0,
-      "chunkOverlap": 0,
-      "separators": null,
-      "parserEngineRules": null,
-      "enableParentChild": false,
-      "parentChunkSize": 0,
-      "childChunkSize": 0,
-      "strategy": null,
-      "tokenLimit": 0,
-      "languages": null,
-      "tableMetadataInstructions": null
+{
+  "code": 0,
+  "message": "ok",
+  "data": [
+    {
+      "id": "0af07405-b814-495b-8554-117da273cae4",
+      "name": "",
+      "type": "document",
+      "temporary": false,
+      "description": null,
+      "creatorId": "11111111-2222-3333-4444-555555555501",
+      "chunkingConfig": {
+        "chunkSize": 0,
+        "chunkOverlap": 0,
+        "separators": null,
+        "parserEngineRules": null,
+        "enableParentChild": false,
+        "parentChunkSize": 0,
+        "childChunkSize": 0,
+        "strategy": null,
+        "tokenLimit": 0,
+        "languages": null,
+        "tableMetadataInstructions": null
+      },
+      "imageProcessingConfig": {
+        "modelId": ""
+      },
+      "embeddingModelId": null,
+      "summaryModelId": null,
+      "vlmConfig": {
+        "enabled": false,
+        "modelId": "",
+        "descriptionLanguage": null,
+        "customInstructions": null,
+        "modelName": "",
+        "baseUrl": "",
+        "interfaceType": ""
+      },
+      "asrConfig": {
+        "enabled": false,
+        "modelId": "",
+        "language": ""
+      },
+      "storageBackendId": "c730730a-70f5-4d86-a7e1-58972cf27567",
+      "extractConfig": null,
+      "faqConfig": null,
+      "questionGenerationConfig": null,
+      "autoTagConfig": null,
+      "wikiConfig": null,
+      "indexingStrategy": {
+        "vectorEnabled": true,
+        "keywordEnabled": true,
+        "wikiEnabled": false,
+        "graphEnabled": false
+      },
+      "pinned": false,
+      "pinnedAt": null,
+      "createdAt": "2026-09-17T19:35:59.206791+08:00",
+      "updatedAt": "2026-09-17T19:35:59.206792+08:00",
+      "knowledgeCount": 0,
+      "chunkCount": 0,
+      "processing": false,
+      "processingCount": 0,
+      "shareCount": 0,
+      "capabilities": {
+        "vector": true,
+        "keyword": true,
+        "wiki": false,
+        "graph": false,
+        "faq": false
+      },
+      "vectorStore": {
+        "id": null,
+        "name": "System default",
+        "source": "env",
+        "engineType": "postgres",
+        "status": "available"
+      },
+      "creatorName": null,
+      "storageProvider": "local"
     },
-    "imageProcessingConfig": {
-      "modelId": ""
-    },
-    "embeddingModelId": null,
-    "summaryModelId": null,
-    "vlmConfig": {
-      "enabled": false,
-      "modelId": "",
-      "descriptionLanguage": null,
-      "customInstructions": null,
-      "modelName": "",
-      "baseUrl": "",
-      "interfaceType": ""
-    },
-    "asrConfig": {
-      "enabled": false,
-      "modelId": "",
-      "language": ""
-    },
-    "storageBackendId": "c730730a-70f5-4d86-a7e1-58972cf27567",
-    "extractConfig": null,
-    "faqConfig": null,
-    "questionGenerationConfig": null,
-    "autoTagConfig": null,
-    "wikiConfig": null,
-    "indexingStrategy": {
-      "vectorEnabled": true,
-      "keywordEnabled": true,
-      "wikiEnabled": false,
-      "graphEnabled": false
-    },
-    "pinned": false,
-    "pinnedAt": null,
-    "createdAt": "2026-09-17T19:35:59.206791+08:00",
-    "updatedAt": "2026-09-17T19:35:59.206792+08:00",
-    "knowledgeCount": 0,
-    "chunkCount": 0,
-    "processing": false,
-    "processingCount": 0,
-    "shareCount": 0,
-    "capabilities": {
-      "vector": true,
-      "keyword": true,
-      "wiki": false,
-      "graph": false,
-      "faq": false
-    },
-    "vectorStore": {
-      "id": null,
-      "name": "System default",
-      "source": "env",
-      "engineType": "postgres",
-      "status": "available"
-    },
-    "creatorName": null,
-    "storageProvider": "local"
-  },
-  {
-    "id": "793fcc0f-2f4d-4db6-871a-0a7aaf82ae9a",
-    "name": "probe-kb",
-    "type": "document",
-    "temporary": false,
-    "description": null,
-    "creatorId": "11111111-2222-3333-4444-555555555501",
-    "chunkingConfig": {
-      "chunkSize": 0,
-      "chunkOverlap": 0,
-      "separators": null,
-      "parserEngineRules": null,
-      "enableParentChild": false,
-      "parentChunkSize": 0,
-      "childChunkSize": 0,
-      "strategy": null,
-      "tokenLimit": 0,
-      "languages": null,
-      "tableMetadataInstructions": null
-    },
-    "imageProcessingConfig": {
-      "modelId": ""
-    },
-    "embeddingModelId": null,
-    "summaryModelId": null,
-    "vlmConfig": {
-      "enabled": false,
-      "modelId": "",
-      "descriptionLanguage": null,
-      "customInstructions": null,
-      "modelName": "",
-      "baseUrl": "",
-      "interfaceType": ""
-    },
-    "asrConfig": {
-      "enabled": false,
-      "modelId": "",
-      "language": ""
-    },
-    "storageBackendId": "c730730a-70f5-4d86-a7e1-58972cf27567",
-    "extractConfig": null,
-    "faqConfig": null,
-    "questionGenerationConfig": null,
-    "autoTagConfig": null,
-    "wikiConfig": null,
-    "indexingStrategy": {
-      "vectorEnabled": true,
-      "keywordEnabled": true,
-      "wikiEnabled": false,
-      "graphEnabled": false
-    },
-    "pinned": false,
-    "pinnedAt": null,
-    "createdAt": "2026-09-17T19:32:31.961816+08:00",
-    "updatedAt": "2026-09-17T19:32:31.961817+08:00",
-    "knowledgeCount": 0,
-    "chunkCount": 0,
-    "processing": false,
-    "processingCount": 0,
-    "shareCount": 0,
-    "capabilities": {
-      "vector": true,
-      "keyword": true,
-      "wiki": false,
-      "graph": false,
-      "faq": false
-    },
-    "vectorStore": {
-      "id": null,
-      "name": "System default",
-      "source": "env",
-      "engineType": "postgres",
-      "status": "available"
-    },
-    "creatorName": null,
-    "storageProvider": "local"
-  }
-]
+    {
+      "id": "793fcc0f-2f4d-4db6-871a-0a7aaf82ae9a",
+      "name": "probe-kb",
+      "type": "document",
+      "temporary": false,
+      "description": null,
+      "creatorId": "11111111-2222-3333-4444-555555555501",
+      "chunkingConfig": {
+        "chunkSize": 0,
+        "chunkOverlap": 0,
+        "separators": null,
+        "parserEngineRules": null,
+        "enableParentChild": false,
+        "parentChunkSize": 0,
+        "childChunkSize": 0,
+        "strategy": null,
+        "tokenLimit": 0,
+        "languages": null,
+        "tableMetadataInstructions": null
+      },
+      "imageProcessingConfig": {
+        "modelId": ""
+      },
+      "embeddingModelId": null,
+      "summaryModelId": null,
+      "vlmConfig": {
+        "enabled": false,
+        "modelId": "",
+        "descriptionLanguage": null,
+        "customInstructions": null,
+        "modelName": "",
+        "baseUrl": "",
+        "interfaceType": ""
+      },
+      "asrConfig": {
+        "enabled": false,
+        "modelId": "",
+        "language": ""
+      },
+      "storageBackendId": "c730730a-70f5-4d86-a7e1-58972cf27567",
+      "extractConfig": null,
+      "faqConfig": null,
+      "questionGenerationConfig": null,
+      "autoTagConfig": null,
+      "wikiConfig": null,
+      "indexingStrategy": {
+        "vectorEnabled": true,
+        "keywordEnabled": true,
+        "wikiEnabled": false,
+        "graphEnabled": false
+      },
+      "pinned": false,
+      "pinnedAt": null,
+      "createdAt": "2026-09-17T19:32:31.961816+08:00",
+      "updatedAt": "2026-09-17T19:32:31.961817+08:00",
+      "knowledgeCount": 0,
+      "chunkCount": 0,
+      "processing": false,
+      "processingCount": 0,
+      "shareCount": 0,
+      "capabilities": {
+        "vector": true,
+        "keyword": true,
+        "wiki": false,
+        "graph": false,
+        "faq": false
+      },
+      "vectorStore": {
+        "id": null,
+        "name": "System default",
+        "source": "env",
+        "engineType": "postgres",
+        "status": "available"
+      },
+      "creatorName": null,
+      "storageProvider": "local"
+    }
+  ]
+}

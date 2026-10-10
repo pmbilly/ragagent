@@ -1,1 +1,5 @@
-{"error":{"code":1007,"message":"Failed to retrieve file","details":"invalid file path: path traversal denied: path is outside base directory"}}
+{
+  "code": 1007,
+  "message": "Failed to retrieve file",
+  "data": "invalid file path: path traversal denied: path is outside base directory"
+}

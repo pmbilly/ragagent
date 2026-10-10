@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.ragagent.common.web.ApiResult;
+import com.ragagent.common.web.ApiResponse;
 
 /**
  * KB 标签 CRUD 面：列表（分页/关键字）、创建、更新、删除（含排除条目）。
@@ -32,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 判定顺序为既有契约（契约样例依赖）。
  */
 @RestController
+@ApiResult
 public class KnowledgeTagController {
 
 
@@ -100,7 +103,7 @@ public class KnowledgeTagController {
     }
 
     @DeleteMapping("/api/v1/knowledge-bases/{id}/tags/{tagId}")
-    public ResponseEntity<Void> deleteTag(
+    public ApiResponse<Void> deleteTag(
             @PathVariable("id") String id,
             @PathVariable("tagId") String tagIdParam,
             @RequestParam(value = "force", required = false) String force,
@@ -121,7 +124,7 @@ public class KnowledgeTagController {
         List<String> excludeUUIDs = tagService.resolveExcludeUUIDs(kbId, excludeIds);
 
         tagService.deleteTag(tagId, forceFlag, contentOnlyFlag, excludeUUIDs);
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
 

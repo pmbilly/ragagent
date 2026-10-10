@@ -1,6 +1,10 @@
 {
-  "taskId": "kg_move_10002_1789767736229_faf92658_80bde2e130c",
-  "sourceKbId": "80bde2e1-30c3-4edc-be60-1f9e63f95454",
-  "targetKbId": "b7171cc4-e709-44be-b931-ef850ecd461c",
-  "knowledgeCount": 1
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "taskId": "kg_move_10002_1789767736229_faf92658_80bde2e130c",
+    "sourceKbId": "80bde2e1-30c3-4edc-be60-1f9e63f95454",
+    "targetKbId": "b7171cc4-e709-44be-b931-ef850ecd461c",
+    "knowledgeCount": 1
+  }
 }

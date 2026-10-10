@@ -1,4 +1,8 @@
 {
-  "deletedCount": 1,
-  "taskId": "b3c20a06-f6c6-4bc6-bef8-924aba6528b1"
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "deletedCount": 1,
+    "taskId": "b3c20a06-f6c6-4bc6-bef8-924aba6528b1"
+  }
 }

@@ -1,4 +1,8 @@
 {
-  "reparseCount": 1,
-  "taskId": "a9fab710-64a0-43b9-abb3-536e1da0c1c2"
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "reparseCount": 1,
+    "taskId": "a9fab710-64a0-43b9-abb3-536e1da0c1c2"
+  }
 }

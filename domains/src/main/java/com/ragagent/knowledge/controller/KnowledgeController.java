@@ -46,6 +46,8 @@ import com.ragagent.common.context.TenantContext;
 import com.ragagent.knowledge.security.KnowledgeRouteGuards;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.common.web.ApiResult;
+import com.ragagent.common.web.ApiResponse;
 
 /**
  * 知识文档主面：创建（文件/URL/手工）、列表/详情/批量取、解析生命周期
@@ -57,6 +59,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * （code/data/message/success），不走全局错误处理器。</p>
  */
 @RestController
+@ApiResult
 @RequestMapping("/api/v1")
 public class KnowledgeController {
 
@@ -315,7 +318,7 @@ public class KnowledgeController {
 
     /** 更新分块图片信息（无响应体）。 */
     @PutMapping("/knowledge/image/{id}/{chunkId}")
-    public ResponseEntity<Void> updateImageInfo(
+    public ApiResponse<Void> updateImageInfo(
             @PathVariable("id") String id,
             @PathVariable("chunkId") String chunkId,
             @Valid @NonNullBody @RequestBody UpdateImageInfoRequest req) {
@@ -327,7 +330,7 @@ public class KnowledgeController {
         guards.resolveKnowledgeByGuard(safeId, true);
         String imageInfo = req.imageInfo() == null ? "" : req.imageInfo();
         knowledgeService.updateImageInfo(safeId, safeChunkId, imageInfo);
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
     /** 守卫链 + 部分更新（更新字段集合见 {@link UpdateKnowledgeRequest}）。 */
