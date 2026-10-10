@@ -25,7 +25,7 @@ import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.session.domain.Session;
 import com.ragagent.session.domain.SessionListQuery;
 import com.ragagent.session.domain.SessionPage;
-import com.ragagent.session.mapper.SessionRepository;
+import com.ragagent.session.repository.SessionRepository;
 import com.ragagent.agent.management.service.BuiltinAgentRegistry;
 
 /**

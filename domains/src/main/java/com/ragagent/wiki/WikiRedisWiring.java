@@ -23,7 +23,7 @@ import com.ragagent.wiki.service.ingest.WikiIngestTaskHandler;
 import com.ragagent.wiki.service.ingest.WikiIngestTaskQueue;
 import com.ragagent.wiki.service.page.RedisWikiSlugLock;
 import com.ragagent.wiki.service.page.WikiSlugLock;
-import com.ragagent.wiki.mapper.TaskDeadLetterRepository;
+import com.ragagent.wiki.repository.TaskDeadLetterRepository;
 
 /**
  * wiki 域的 Redis 面装配（多实例部署）。

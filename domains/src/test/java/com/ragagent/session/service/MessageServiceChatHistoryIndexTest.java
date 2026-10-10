@@ -26,9 +26,9 @@ import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.service.KnowledgeService;
 import com.ragagent.model.service.ModelRuntimeFactory;
 import com.ragagent.retrieval.HybridSearchService;
-import com.ragagent.session.mapper.MessageRepository;
-import com.ragagent.session.mapper.MessageSuggestionRepository;
-import com.ragagent.session.mapper.SessionRepository;
+import com.ragagent.session.repository.MessageRepository;
+import com.ragagent.session.repository.MessageSuggestionRepository;
+import com.ragagent.session.repository.SessionRepository;
 import com.ragagent.knowledge.service.KnowledgeBaseService;
 
 /**

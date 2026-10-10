@@ -1,5 +1,12 @@
-package com.ragagent.memory.mapper;
+package com.ragagent.memory.repository;
 
+import com.ragagent.memory.mapper.MemoryDocAffinityMapper;
+import com.ragagent.memory.mapper.MemoryExtractionSessionMapper;
+import com.ragagent.memory.mapper.MemoryItemEmbeddingMapper;
+import com.ragagent.memory.mapper.MemoryItemMapper;
+import com.ragagent.memory.mapper.MemorySubjectMapper;
+import com.ragagent.memory.mapper.MemoryTombstoneMapper;
+import com.ragagent.memory.mapper.MemoryTopicStatMapper;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;

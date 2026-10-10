@@ -173,7 +173,7 @@ BASELINE: dict[str, set[str]] = {
     # 同上（SSE/消息载荷）
     'session/controller/SessionController.java': {'message_id', 'session_id'},
     # MyBatis 列名写入点（非 JSON 键）
-    'session/mapper/MessageRepository.java': {'agent_duration_ms', 'agent_id', 'agent_tenant_id', 'is_completed', 'is_fallback', 'knowledge_id', 'model_id', 'rendered_content', 'request_id', 'updated_at'},
+    'session/repository/MessageRepository.java': {'agent_duration_ms', 'agent_id', 'agent_tenant_id', 'is_completed', 'is_fallback', 'knowledge_id', 'model_id', 'rendered_content', 'request_id', 'updated_at'},
     # 文件服务面（B136 复核）：HTTP query 参数名（`request.getParameter`，非 Spring 注解
     # ⇒ `check-event-face-case.py` 扫不到）+ **代理响应体键**（FileProxyService:281 是真 JSON 键）
     # ⇒ 按 §14.9「自有查询参数名统一 camel」该改，登记为候选（见 HANDOFF）

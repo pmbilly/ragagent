@@ -1,4 +1,4 @@
-package com.ragagent.memory.mapper;
+package com.ragagent.memory.repository;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;

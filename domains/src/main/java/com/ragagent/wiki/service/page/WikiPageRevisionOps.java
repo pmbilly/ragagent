@@ -12,7 +12,7 @@ import com.ragagent.wiki.domain.WikiPageIssue;
 import com.ragagent.wiki.domain.WikiPageRevision;
 import com.ragagent.wiki.domain.WikiPageRevisionListResponse;
 import com.ragagent.wiki.domain.WikiRevisionPruneRequest;
-import com.ragagent.wiki.mapper.WikiPageRepository;
+import com.ragagent.wiki.repository.WikiPageRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

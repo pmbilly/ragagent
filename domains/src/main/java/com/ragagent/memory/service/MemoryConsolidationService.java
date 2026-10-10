@@ -22,7 +22,7 @@ import com.ragagent.memory.domain.MemoryScope;
 import com.ragagent.memory.domain.MemorySubject;
 import com.ragagent.memory.domain.MemoryText;
 import com.ragagent.memory.domain.MemoryVectors;
-import com.ragagent.memory.mapper.MemoryRepository;
+import com.ragagent.memory.repository.MemoryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

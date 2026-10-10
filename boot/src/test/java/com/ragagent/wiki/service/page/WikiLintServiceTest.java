@@ -14,7 +14,7 @@ import com.ragagent.wiki.domain.WikiLintIssue;
 import com.ragagent.wiki.domain.WikiLintReport;
 import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.WikiPageNotFoundException;
-import com.ragagent.wiki.mapper.WikiPageRepository;
+import com.ragagent.wiki.repository.WikiPageRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

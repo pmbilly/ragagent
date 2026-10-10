@@ -13,7 +13,7 @@ import org.apache.ibatis.annotations.Mapper;
  * {@code deleteById}。</p>
  *
  * <p>本 Mapper 目前<b>不需要</b>自定义 SQL 语句，存在只为让
- * {@link TaskDeadLetterRepository} 有独立的注入点，并让"这张表归 wiki 模块"在
+ * {@link com.ragagent.wiki.repository.TaskDeadLetterRepository} 有独立的注入点，并让"这张表归 wiki 模块"在
  * 目录结构上一目了然。</p>
  */
 @Mapper

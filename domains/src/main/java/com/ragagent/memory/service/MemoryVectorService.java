@@ -26,7 +26,7 @@ import com.ragagent.memory.domain.MemoryText;
 import com.ragagent.memory.domain.MemoryVectorHit;
 import com.ragagent.memory.domain.MemoryVectorQuery;
 import com.ragagent.memory.domain.MemoryVectors;
-import com.ragagent.memory.mapper.MemoryRepository;
+import com.ragagent.memory.repository.MemoryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

@@ -30,7 +30,7 @@ import org.apache.ibatis.annotations.Update;
  *       {@code tenant_id}/{@code subject_id}，否则会看到别的 subject 的向量。</li>
  * </ul>
  *
- * <p>所有方法都不带事务注解：它们由 {@link MemoryRepository} 在
+ * <p>所有方法都不带事务注解：它们由 {@link com.ragagent.memory.repository.MemoryRepository} 在
  * {@code MemoryTxTemplate.withSubject} 的事务里调用。</p>
  */
 @Mapper

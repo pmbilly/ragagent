@@ -15,7 +15,7 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
-import com.ragagent.wiki.mapper.TaskDeadLetterRepository;
+import com.ragagent.wiki.repository.TaskDeadLetterRepository;
 
 /**
  * {@link WikiIngestTaskQueue} 的 <b>Redis</b> 实现：跨实例共享的任务表。

@@ -38,9 +38,9 @@ import com.ragagent.common.pipeline.SearchParams;
 import com.ragagent.session.domain.Message;
 import com.ragagent.session.domain.MessageSearchResult;
 import com.ragagent.session.domain.MessageWithSession;
-import com.ragagent.session.mapper.MessageRepository;
-import com.ragagent.session.mapper.MessageSuggestionRepository;
-import com.ragagent.session.mapper.SessionRepository;
+import com.ragagent.session.repository.MessageRepository;
+import com.ragagent.session.repository.MessageSuggestionRepository;
+import com.ragagent.session.repository.SessionRepository;
 import com.ragagent.knowledge.service.KnowledgeBaseService;
 import com.ragagent.knowledge.service.KnowledgeService;
 

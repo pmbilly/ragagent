@@ -18,8 +18,6 @@ import com.ragagent.wiki.domain.WikiPageListRequest;
 import com.ragagent.wiki.domain.WikiPageNotFoundException;
 import com.ragagent.wiki.domain.WikiPageRevision;
 import com.ragagent.wiki.domain.WikiRevisionPruneRequest;
-import com.ragagent.wiki.mapper.WikiPageRepository;
-import com.ragagent.wiki.mapper.WikiFolderRepository;
 import com.ragagent.wiki.mapper.WikiPageRevisionMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

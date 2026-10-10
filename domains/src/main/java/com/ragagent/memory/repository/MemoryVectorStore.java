@@ -1,5 +1,6 @@
-package com.ragagent.memory.mapper;
+package com.ragagent.memory.repository;
 
+import com.ragagent.memory.mapper.VectorHitRow;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

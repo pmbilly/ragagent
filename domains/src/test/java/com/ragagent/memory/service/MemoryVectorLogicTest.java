@@ -10,7 +10,7 @@ import com.ragagent.common.memory.MemoryKinds;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import com.ragagent.common.memory.MemoryConfig;
-import com.ragagent.memory.mapper.MemoryRepository;
+import com.ragagent.memory.repository.MemoryRepository;
 
 /**
  * {@link MemoryVectorService} 的纯函数部分

@@ -12,7 +12,7 @@ import com.ragagent.memory.domain.MemoryItem;
 import com.ragagent.common.memory.MemoryKinds;
 import com.ragagent.memory.domain.MemoryScope;
 import com.ragagent.memory.domain.MemorySubjectMissingException;
-import com.ragagent.memory.mapper.MemoryRepository;
+import com.ragagent.memory.repository.MemoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

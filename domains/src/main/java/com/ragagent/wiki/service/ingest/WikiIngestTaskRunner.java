@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 
 import com.ragagent.wiki.domain.TaskDeadLetter;
-import com.ragagent.wiki.mapper.TaskDeadLetterRepository;
+import com.ragagent.wiki.repository.TaskDeadLetterRepository;
 import com.ragagent.tracing.langfuse.LangfuseTaskScope;
 
 /**

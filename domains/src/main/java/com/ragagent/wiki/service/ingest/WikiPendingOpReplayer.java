@@ -3,7 +3,7 @@ package com.ragagent.wiki.service.ingest;
 import java.util.List;
 
 import com.ragagent.wiki.domain.TaskPendingOp;
-import com.ragagent.wiki.mapper.TaskPendingOpsRepository;
+import com.ragagent.wiki.repository.TaskPendingOpsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;

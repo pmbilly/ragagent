@@ -320,7 +320,7 @@ class ArchitectureRulesTest {
             Map.entry("com.ragagent.session.service.SessionKnowledgeQaService", "PG 专有 SQL（多表 JOIN 标签检索）"),
             Map.entry("com.ragagent.system.service.SystemInfoService", "PG 专有 SQL（系统元数据）"),
             Map.entry("com.ragagent.vectorstore.service.VectorStoreConfigService", "PG 专有 SQL（向量库配置）"),
-            Map.entry("com.ragagent.memory.mapper.MemoryVectorStore", "列存在性探测（JDBC 元数据）"),
+            Map.entry("com.ragagent.memory.repository.MemoryVectorStore", "列存在性探测（JDBC 元数据）"),
             Map.entry("com.ragagent.storage.mapper.ResourceRepository", "PG 专有 SQL（存储资源查询，JdbcClient）"),
             Map.entry("com.ragagent.storage.mapper.StorageBackendRepository", "PG 专有 SQL（存储后端元数据，JdbcClient）"));
 
@@ -381,7 +381,7 @@ class ArchitectureRulesTest {
      * 形式，grep 之前漏数的）已于 2026-10-05 分三批 + knowledge 硬文件全部 Lambda 化。
      */
     private static final Set<String> STRING_WRAPPER_BASELINE = Set.of(
-            "com.ragagent.session.mapper.MessageRepository");
+            "com.ragagent.session.repository.MessageRepository");
 
     @Test
     @DisplayName("A8：禁字符串列名 wrapper（new QueryWrapper/UpdateWrapper、Wrappers.query/update/emptyWrapper）")
@@ -571,6 +571,42 @@ class ArchitectureRulesTest {
                 .because("@MapperScan(\"com.ragagent.**.mapper\") 只扫 mapper 包；"
                         + "放错包 = 启动期缺 Bean 或该 mapper 静默不注册")
                 .check(MAIN);
+    }
+
+    /**
+     * 棘轮基线（B213）：{@code :domains} 内 {@code mapper} 包里仍留着的 11 个仓储门面。
+     * 登记理由：本规则上线时 session / wiki / memory 三域已清零（9 类 + memory 协作者 4 类），
+     * 余下域按「碰到哪域归哪域」逐域收敛，基线只许减不许增。
+     * <p>口径不含 {@code :engine} 的 {@code retrieval/engine/**}——引擎适配仓储与检索是一套
+     * 自成体系的目录约定，不适用本分层划分。</p>
+     */
+    private static final Set<String> REPOSITORY_IN_MAPPER_BASELINE = Set.of(
+            "com.ragagent.audit.mapper.AuditLogRepository",
+            "com.ragagent.auth.apikey.mapper.TenantAPIKeyRepository",
+            "com.ragagent.datasource.mapper.DataSourceRepository",
+            "com.ragagent.datasource.mapper.SyncLogRepository",
+            "com.ragagent.mcp.mapper.McpMetadataRepository",
+            "com.ragagent.mcp.mapper.McpOAuthRepository",
+            "com.ragagent.mcp.mapper.McpToolApprovalRepository",
+            "com.ragagent.storage.mapper.ResourceRepository",
+            "com.ragagent.storage.mapper.StorageBackendRepository",
+            "com.ragagent.vectorstore.mapper.VectorStoreRepository",
+            "com.ragagent.websearch.mapper.WebSearchProviderRepository");
+
+    @Test
+    @DisplayName("A11b：仓储门面不得留在 mapper 包（A11 的镜像面：mapper 只放 MyBatis-Plus 接口）")
+    void repositoriesDoNotLiveInMapperPackages() {
+        // 约定来自分包地图：`mapper/` 只放 MyBatis-Plus 接口、`repository/` 放仓储门面。
+        // 门面混在 mapper 包不会报错（Spring stereotype 与 @MapperScan 两条注册路径互不相干），
+        // 代价是"按域类比写代码"的人会把门面继续放进 mapper 包 —— 分层约定就是这样一点点失效的。
+        Set<String> actual = new TreeSet<>();
+        for (JavaClass clazz : MAIN) {
+            JavaClass top = topLevel(clazz);
+            if (top.getSimpleName().endsWith("Repository") && top.getPackageName().endsWith(".mapper")) {
+                actual.add(top.getName());
+            }
+        }
+        ratchet("A11b mapper 包里的仓储门面", REPOSITORY_IN_MAPPER_BASELINE, actual);
     }
 
     @Test

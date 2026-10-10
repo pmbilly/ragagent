@@ -1,5 +1,7 @@
-package com.ragagent.wiki.mapper;
+package com.ragagent.wiki.repository;
 
+import com.ragagent.wiki.mapper.WikiFolderMapper;
+import com.ragagent.wiki.mapper.WikiPageMapper;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

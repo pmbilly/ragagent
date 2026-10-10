@@ -14,7 +14,7 @@ import com.ragagent.memory.domain.MemoryItem;
 import com.ragagent.common.memory.MemoryKinds;
 import com.ragagent.memory.domain.MemoryScope;
 import com.ragagent.memory.domain.MemorySettings;
-import com.ragagent.memory.mapper.MemoryRepository;
+import com.ragagent.memory.repository.MemoryRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

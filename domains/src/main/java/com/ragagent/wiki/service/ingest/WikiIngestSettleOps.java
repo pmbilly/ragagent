@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ragagent.wiki.domain.TaskDeadLetter;
-import com.ragagent.wiki.mapper.TaskDeadLetterRepository;
+import com.ragagent.wiki.repository.TaskDeadLetterRepository;
 import com.ragagent.wiki.service.WikiKnowledgeFinalizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

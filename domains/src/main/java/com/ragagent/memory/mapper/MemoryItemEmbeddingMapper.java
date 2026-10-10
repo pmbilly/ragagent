@@ -105,7 +105,7 @@ public interface MemoryItemEmbeddingMapper extends BaseMapper<MemoryItemEmbeddin
                                               @Param("modelId") String modelId);
 
     /**
-     * {@link com.ragagent.memory.mapper.MemoryItemStore} 内存排名（rankInProcess）用的
+     * {@link com.ragagent.memory.repository.MemoryItemStore} 内存排名（rankInProcess）用的
      * "一次取全" SQL。
      *
      * <p>只取 {@code item_id} 与 {@code vector} 两列；{@code LIMIT} 是

@@ -16,7 +16,7 @@ import org.junit.jupiter.api.io.TempDir;
 import com.ragagent.knowledge.client.DocReaderClient;
 import com.ragagent.session.domain.MessageAttachment;
 import com.ragagent.session.domain.TemporaryDocument;
-import com.ragagent.session.mapper.TemporaryDocumentRepository;
+import com.ragagent.session.repository.TemporaryDocumentRepository;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.llm.asr.AsrTranscriber;
 import com.ragagent.llm.chat.ImageResolver;

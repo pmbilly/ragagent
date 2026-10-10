@@ -1,5 +1,6 @@
-package com.ragagent.memory.mapper;
+package com.ragagent.memory.repository;
 
+import com.ragagent.memory.mapper.MemorySubjectMapper;
 import java.util.function.Function;
 
 import com.ragagent.memory.domain.MemoryScope;

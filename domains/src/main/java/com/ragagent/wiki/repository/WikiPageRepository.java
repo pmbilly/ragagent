@@ -1,5 +1,8 @@
-package com.ragagent.wiki.mapper;
+package com.ragagent.wiki.repository;
 
+import com.ragagent.wiki.mapper.WikiPageIssueMapper;
+import com.ragagent.wiki.mapper.WikiPageMapper;
+import com.ragagent.wiki.mapper.WikiPageRevisionMapper;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

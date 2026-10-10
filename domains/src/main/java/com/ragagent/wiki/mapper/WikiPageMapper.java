@@ -20,7 +20,7 @@ import org.apache.ibatis.annotations.Update;
 import com.ragagent.wiki.domain.WikiPageListRequest;
 
 /**
- * wiki_pages 仓储语句（{@link WikiPageRepository} 的配套 SQL）。
+ * wiki_pages 仓储语句（{@link com.ragagent.wiki.repository.WikiPageRepository} 的配套 SQL）。
  *
  * <p>落库隐式行为清单：</p>
  * <ul>

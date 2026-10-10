@@ -25,7 +25,7 @@ import com.ragagent.knowledge.support.ParserEngineRules;
 import com.ragagent.llm.asr.AsrTranscriber;
 import com.ragagent.model.service.ModelRuntimeFactory;
 import com.ragagent.session.domain.TemporaryDocument;
-import com.ragagent.session.mapper.TemporaryDocumentRepository;
+import com.ragagent.session.repository.TemporaryDocumentRepository;
 import com.ragagent.session.service.TemporaryDocumentService.CreateOptions;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.model.domain.Model;

@@ -40,7 +40,8 @@ graph TB
         ING["service/ingest/（57 文件，域内最大）<br/>Map→Reduce→Finalize 管线 + 队列 / 锁 / 幂等 / 去重"]
         PORT["service/ 根（12 文件）<br/>跨切面端口：ChunkCleaner / ImageEnricher /<br/>KnowledgeFinalizer / ModelResolver + 缺省实现"]
         PRM["prompt/（3 文件）<br/>三条 prompt 模板"]
-        REPO["mapper/（11 文件）<br/>MyBatis-Plus 接口 + 仓储门面"]
+        REPO["mapper/（6 接口）<br/>MyBatis-Plus 接口"]
+        RPO2["repository/（4 文件）<br/>仓储门面 WikiPage · WikiFolder · 死信 · 待重放"]
         DOM["domain/（40 文件）<br/>6 实体 + 载荷 + 常量 + 异常"]
         WIRE["根：WikiRedisWiring<br/>六个协调端口装配"]
     end
@@ -90,7 +91,8 @@ graph TB
 | `service/` | 12 / 652 | **跨切面端口与缺省实现**：`WikiChunkCleaner` / `WikiImageEnricher` / `WikiKnowledgeFinalizer` / `WikiModelResolver`（各带 Default 实现）+ LLM 重试策略与记账元数据 | 具体管线步骤（→ 两个子包） |
 | `service/ingest/` | 57 / 11,264 | 摄取管线：门面 `WikiIngestService`、Map/Reduce/Finalize 三相、cite 引用管线、任务队列与锁（InProcess/Redis 双实现）、幂等凭据、身份去重、死信与孤儿 op 重放 | 页面读写语义（→ `service/page`） |
 | `service/page/` | 22 / 4,550 | 页面服务（接口门面 `WikiPageService` + 732 行实现）、文件夹支撑、链接与 lint（`WikiLinkify`/`WikiCrossLinker`/`WikiDeadLinks`）、slug 锁与匹配、编辑上下文 | 摄取批次编排（→ `ingest`） |
-| `mapper/` | 11 / 2,328 | MyBatis-Plus 接口（显式 SQL 为主）+ 仓储门面（`WikiPageRepository` 706 行：软删 / 时间戳 / 链接重算） | 业务判断 |
+| `mapper/` | 7 / 1,035 | 6 个 MyBatis-Plus 接口（`@MapperScan` 扫描范围）+ `package-info` | — |
+| `repository/` | 5 / 1,313 | 4 个仓储门面（`WikiPageRepository` 709 行：软删 / 时间戳 / 链接重算；另有文件夹、死信槽位、待重放队列）+ `package-info` | 业务判断 |
 | `domain/` | 40 / 2,539 | 6 个 `@TableName` 实体 + 请求/响应形状 + `WikiConstants`（页面类型 / 状态 / 修订保留策略）+ 异常族 + `WikiConfig` 值类型 | 队列载荷（→ `ingest` 的 `WikiIngestPayload`） |
 | `prompt/` | 3 / 834 | `WikiPrompts`（三条 prompt 正文）+ 模板渲染支撑 | 键名解析（解析类型在 `ingest`/`common/wiki`，键被 prompt 钉住，见 §7） |
 
@@ -104,6 +106,7 @@ graph LR
     C --> D["service 根端口"]
     C --> E["prompt"]
     B --> F["mapper"]
+    B --> F2["repository"]
     C --> F
     F --> G["domain"]
     B --> G
@@ -362,7 +365,7 @@ flowchart LR
 | 改 Reduce 落页 / chunk 引用 | `service/ingest/WikiIngestReducePhase` + `WikiIngestCitePipeline` | `source_refs` 是 `id` 与 `title` 竖线拼接的约定，展示侧按竖线切分 |
 | 改 Finalize（索引/死链/交叉链接） | `service/ingest/WikiIngestFinalizePhase` + `page/WikiDeadLinks` / `WikiCrossLinker` | finalize 是独立任务通道（`wiki:finalize`，op 三种） |
 | 改去重 / 身份认领 | `service/ingest/WikiIdentityDedup` + `WikiIdentityClaimStore`（InProcess/Redis） | 认领失效直接表现为"同标题建出两个页面" |
-| 改文件夹树 | `service/page/WikiPageFolderSupport` + `mapper/WikiFolderRepository` | `folder_id` 是唯一真相，`categoryPath` 是派生缓存，写入要重算 |
+| 改文件夹树 | `service/page/WikiPageFolderSupport` + `repository/WikiFolderRepository` | `folder_id` 是唯一真相，`categoryPath` 是派生缓存，写入要重算 |
 | 改 lint / 自动修复 | `service/page/WikiLintService` | issue 三态校验在 `controller/WikiMaintenanceOps` |
 | 改 slug 规则 / 别名匹配 | `service/page/WikiSlugHandles` + `SlugFuzzy` + `ingest/NewSlugFromCitation` | 唯一索引是**部分唯一**（`WHERE deleted_at IS NULL`），已删 slug 可复用 |
 | 改多副本协调 | 根 `WikiRedisWiring` + 各端口 Redis 实现 | `wiki.redis-enabled=true` 才切 Redis；@Primary 必须因 InProcess 是无条件 @Component |

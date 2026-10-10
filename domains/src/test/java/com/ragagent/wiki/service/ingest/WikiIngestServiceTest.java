@@ -31,7 +31,7 @@ import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
 import com.ragagent.llm.domain.StreamResponse;
 import com.ragagent.wiki.domain.TaskPendingOp;
-import com.ragagent.wiki.mapper.TaskPendingOpsRepository;
+import com.ragagent.wiki.repository.TaskPendingOpsRepository;
 import com.ragagent.wiki.prompt.WikiPrompts;
 import com.ragagent.common.wiki.SlugUpdate;
 import com.ragagent.common.wiki.WikiLanguageSupport;

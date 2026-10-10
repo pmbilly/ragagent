@@ -39,7 +39,7 @@ graph TB
         ROOT["根包（2 个）<br/>MemoryContext：agent 级按请求禁用标记"]
         DOM["domain/（27 个）<br/>7 实体 + jsonb 值类型 + TypeHandler<br/>+ MemoryText / MemoryRender / MemoryVectors"]
         DTO["dto/（6 个）<br/>仅 3 个请求 record + 2 个响应壳"]
-        REPO["mapper/（12 个）<br/>仓储门面 MemoryRepository + 7 个 MyBatis 接口<br/>（仓储住 mapper/ 是历史约定）"]
+        REPO["repository/（5 类）<br/>仓储门面 MemoryRepository + IndexStore<br/>ItemStore · VectorStore · TxTemplate"]
     end
 
     subgraph 调用方
@@ -51,7 +51,7 @@ graph TB
     subgraph 外部
         PG[("PostgreSQL<br/>7 张表 + pgvector halfvec")]
         LLM["LLM / embedding 模型<br/>(model / llm 模块)"]
-        SM["session/mapper/MessageRepository<br/>(SessionMessagePort 实现)"]
+        SM["session/repository/MessageRepository<br/>(SessionMessagePort 实现)"]
     end
 
     FE --> CTRL
@@ -67,7 +67,7 @@ graph TB
     AUTH -. 共享载荷类型 .-> ROOT
 ```
 
-**三个必须知道的数字**：最大类 **`service/MemoryService` 765 行**（B130 复核后：原最大类 `mapper/MemoryIndexStore` 919 行已**出榜**——向量面独立为 `mapper/MemoryVectorStore`，例外解除；本域 **≥800 归零**）；`service/` 6,355 行（约占 50%，门面 + 切片全在这）；**仓储（3,240 行 / 12 文件）不住 `repository/` 而住 `mapper/`**——历史约定，见 §9。
+**三个必须知道的数字**：最大类 **`service/MemoryService` 765 行**（B130 复核后：原最大类 `mapper/MemoryIndexStore` 919 行已**出榜**——向量面独立为 `mapper/MemoryVectorStore`，例外解除；本域 **≥800 归零**）；`service/` 6,355 行（约占 50%，门面 + 切片全在这）；**仓储（1,943 行 / 5 类）住 `repository/`、7 个 MyBatis 接口住 `mapper/`**（B213 归位；此前是"仓储住 mapper"的历史约定，§9）。
 
 ---
 
@@ -82,13 +82,14 @@ graph TB
 | `service/` | 26 / 6,355 | 门面 `MemoryService` + 切片：`MemoryCatalogOps`（管理面）/ `MemoryInsightOps`（检索面）/ `MemoryRecallOps`（召回装配）/ `MemoryExtractionService` + `MemoryTranscriptOps` + `MemoryExtractionLlm`（蒸馏）/ `MemoryConsolidationService`（整仓回顾）/ `MemoryVectorService` / `MemoryRecallSelector` / `MemoryTopicResolver`；队列接口 + InProcess/Redis 两实现 | SQL（→ `mapper/`）、HTTP 关注点 |
 | `domain/` | 27 / 2,496 | 7 个实体（`@TableName`）+ jsonb 值类型（`MemoryExtractionState` 等）+ 2 个 TypeHandler + 纯工具（`MemoryText` / `MemoryRender` / `MemoryVectors`）+ 领域类型 `MemoryPage` + 4 个领域异常 | 线格式请求体（→ `dto/`；响应实体直接用 domain，见 §3.2） |
 | `dto/` | 6 / 79（5 类型 + package-info） | 3 个带体端点的请求 record + `MemoryListResponse` / `MemoryExportResponse` 两个响应壳 | 域形状（响应体=domain 实体，直出） |
-| `mapper/` | 12 / 3,240 | 仓储门面 `MemoryRepository`（454 行）+ `MemoryItemStore`（458）+ `MemoryIndexStore`（636，B130 起只余话题/亲和/抽取）+ `MemoryVectorStore`（318，向量面）+ 7 个 MyBatis-Plus 接口 + `MemoryTxTemplate` + `VectorHitRow` | ⚠️ 这里**不是** MyBatis-Plus 纯接口层——仓储门面因历史约定住在此包（HANDOFF §12 注） |
+| `mapper/` | 8 / 1,360 | 7 个 MyBatis-Plus 接口 + `VectorHitRow`（行载体，被 `MemoryItemEmbeddingMapper` 使用） | — |
+| `repository/` | 6 / 1,943 | `MemoryRepository` + `MemoryItemStore` + `MemoryIndexStore`（B130 起只余话题/亲和/抽取）+ `MemoryVectorStore`（向量面）+ `MemoryTxTemplate` + `package-info`；前三者是**包级私有**（与门面同属一个关注点，不跨包暴露） | 业务判断 |
 
 ### 1.2 依赖方向（谁消费我、我消费谁）
 
 ```mermaid
 graph LR
-    SES["session<br/>（4 service + 1 mapper）"] --> SVC["memory/service"]
+    SES["session<br/>（4 service + 1 repository）"] --> SVC["memory/service"]
     CP["chatpipeline<br/>（PipelinePorts / PluginMemoryRecall<br/>/ MemoryUsedMemories）"] --> SVC
     SVC --> PORT["common/session<br/>SessionMessagePort（只读端口）"]
     IMPL["session/mapper/MessageRepository"] -. 实现 .-> PORT
@@ -427,7 +428,8 @@ cd frontend && npx vue-tsc --build --force && npm test
 
 | 项 | 性质 | 建议 |
 |---|---|---|
-| 仓储门面（`MemoryRepository` / `MemoryItemStore` / `MemoryIndexStore` / `MemoryVectorStore` / `MemoryTxTemplate`）仍在 `mapper/`，无 `repository/` 子包（B130 新增的向量仓同样落此，**打包归位时一并处理**） | 结构欠账（已登记） | HANDOFF §12 注明"批次跟随 `repository/` 分层"；属结构搬迁批（全仓闸门 ≈3m25s），**别混进功能批**；`session`/`datasource` 同款欠账，届时同批对齐 |
+| ~~仓储门面仍在 `mapper/`，无 `repository/` 子包~~ | **已清账（2026-10-10 B213）**：5 个门面（`MemoryRepository` / `MemoryItemStore` / `MemoryIndexStore` / `MemoryVectorStore` / `MemoryTxTemplate`）归位 `repository/`；`mapper/` 只留 7 个 MyBatis 接口 + `VectorHitRow`。新增 ArchUnit **A11b** 棘轮守卫（`mapper` 包不得有 `*Repository`）防回流，基线 11 条（audit/auth-apikey/datasource/mcp/storage/vectorstore/websearch 尚未归位，碰到哪域归哪域） | 已完成；A7 白名单条目随包名同步（`memory.mapper.MemoryVectorStore` → `memory.repository.`） |
+| `datasource` 域 2 个仓储（`DataSourceRepository` / `SyncLogRepository`）仍在 `mapper/` | 结构欠账（已登记进 A11b 基线） | 与本域同款形态：JDBC 仓储混在 mapper 包。**不混进功能批**；归位时同步 A7 白名单与 `check-json-key-case` 的键级 BASELINE 路径 |
 | ~~`MemoryIndexStore` 919 行~~ | **已出榜（2026-10-08 B130）**：919→636，向量面独立为 `MemoryVectorStore`（318）；例外解除、A7 白名单条目随簇迁移；剩余簇（抽取进度）可选再切一刀 | 六段同属索引侧读写，用户定调不硬切；复核判据与 A7 白名单理由见类注释 + HANDOFF §14.3 |
 | 抽取的语言上下文未接入 | 功能缺口 | `MemoryExtractionService` 类注释"三处形状差异"第 1 条：租户/语言不再从上下文重建（约束是"后台不许读 ThreadLocal"）；做多语言蒸馏时从 `MemoryExtractPayload` 补，别在 worker 里读上下文 |
 | `EmptyContent` / `PreviouslyForgotten` 落 500 而非 400 | 契约瑕疵（刻意保留） | `MemoryController` 类注释"刻意不在 switch"，已实测钉住（2026-09-18）；要改先改契约标准（§1.13）再动代码，否则契约测试全红 |

@@ -21,7 +21,7 @@ import com.ragagent.knowledge.client.DocReaderClient;
 import com.ragagent.model.service.ModelRuntimeFactory;
 import com.ragagent.session.domain.MessageAttachment;
 import com.ragagent.session.domain.TemporaryDocument;
-import com.ragagent.session.mapper.TemporaryDocumentRepository;
+import com.ragagent.session.repository.TemporaryDocumentRepository;
 import com.ragagent.knowledge.storage.LocalStorageService;
 
 /**

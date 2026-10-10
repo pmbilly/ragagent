@@ -28,7 +28,7 @@ import com.ragagent.model.domain.Model;
 import com.ragagent.model.domain.ModelParameters;
 import com.ragagent.model.service.ModelRuntimeFactory;
 import com.ragagent.session.domain.TemporaryDocument;
-import com.ragagent.session.mapper.TemporaryDocumentRepository;
+import com.ragagent.session.repository.TemporaryDocumentRepository;
 
 /**
  * 附件解析链路的验收（资源租户、引擎回落与音频分支）：

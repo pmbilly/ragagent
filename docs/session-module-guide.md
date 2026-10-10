@@ -44,7 +44,7 @@ graph TB
         TMP["service/ 附件与建议簇<br/>TemporaryDocumentService · MessageSuggestionService · Steer*"]
         SSE["sse/（4 个）<br/>SseContract · SseFrameWriter · StreamResponseBuilder"]
         SUP["support/（2 个）<br/>PipelineViews · MessageReferenceRewriter"]
-        REPO["mapper/（4 组仓储）<br/>Session · Message · TemporaryDocument · Suggestion"]
+        REPO["repository/（4 组仓储）<br/>Session · Message · TemporaryDocument · Suggestion"]
         DOM["domain/（35 个）<br/>6 实体 / 5 表 + 9 个 jsonb TypeHandler"]
     end
 
@@ -86,7 +86,8 @@ graph TB
 | `controller/` | 14 / 4,254（8 个 `@RestController` + 6 个 QA 协作者） | 端点、参数绑定（`QaRequestBinder`）、请求解析（`QaRequestParser`）、SSE 编排（`QaSseOrchestrator`）、执行/收尾（`QaTurnExecutor` / `QaTurnFinalizer`）、附件解析（`QaAttachmentResolver`） | 管线与工具的执行细节（→ `service/` 之外的域） |
 | `service/` | 36 / 11,814 | 会话/消息 CRUD、两条问答入口、管线装配（`QaWiring`）、agent 装配三件套、事件桥（`AgentStreamBridge`）、工具供给（`AgentToolBackends` 族）、临时文档、建议、steer | HTTP、SSE 帧格式（→ `sse/`） |
 | `domain/` | 35 / 3,168 | 6 个实体（5 张表）+ **9 个 jsonb TypeHandler**（8 具体 + 1 公共基类）+ 3 个 NotFound 异常 + 查询/分页值类型 | 请求/响应形状（→ `dto/`） |
-| `mapper/` | 8 / 1,681 | 4 个 MyBatis-Plus mapper + 4 个仓储门面（显式 SQL、软删、方言） | 业务判断 |
+| `mapper/` | 4 / 492 | 4 个 MyBatis-Plus mapper（`@MapperScan` 扫描范围，B213 归位后只剩接口） | — |
+| `repository/` | 5 / 1,210 | 4 个仓储门面（显式 SQL、软删、方言）+ `package-info` | 业务判断 |
 | `sse/` | 4 / 509 | SSE 帧契约：`SseContract`（4 个响应头）、`SseFrameWriter`（帧写出）、`StreamResponseBuilder`（事件→载荷的**唯一转换点**） | 业务编排 |
 | `dto/` | 11 / 312 | 请求/响应记录 + `QaRequests`（三条问答入口共用的入参容器，javadoc 写明为何收一处） | 持久化注解 |
 | `support/` | 2 / 257 | `PipelineViews`（实体↔`common/session` 载荷映射）、`MessageReferenceRewriter`（存储引用重写） | 有状态逻辑 |
@@ -106,7 +107,7 @@ graph LR
         SVC --> SSE["sse"]
         SVC --> SUP["support"]
         CTRL --> DTO["dto"]
-        SVC --> REPO["mapper"]
+        SVC --> REPO["repository"]
         REPO --> DOM["domain"]
     end
 
@@ -379,7 +380,7 @@ stateDiagram-v2
 
 | 我想… | 主要改这里 | 别忘了 |
 |---|---|---|
-| 加/改会话列表行为（过滤、排序） | `service/SessionService` + `mapper/SessionRepository.queryPaged` + `domain/SessionListQuery` | 置顶优先排序串在仓储；Admin 可见性判定 `Session.requiresAdminConsoleRead` |
+| 加/改会话列表行为（过滤、排序） | `service/SessionService` + `repository/SessionRepository.queryPaged` + `domain/SessionListQuery` | 置顶优先排序串在仓储；Admin 可见性判定 `Session.requiresAdminConsoleRead` |
 | 给 QA 请求加参数 | `dto/QaRequests` + `controller/QaRequestParser` + `service/QaSupport.QaRequest` | 未知键静默忽略；前端与 embed 访客页**同批**改 |
 | 改 NORMAL 问答的管线能力 | `service/QaWiring`（插件清单 + `PipelinePorts` 适配） | 插件装配、seam 全在此；动前读 `docs/known-issues/05-wave-4.md` |
 | 改 KB 范围 / mention / 搜索目标收敛 | `service/SessionQaResolution` + `QaKbScope` / `QaMentionTagScope` / `QaSearchTargets` | 有切片测试钉着（`SessionQaResolution*Test`） |

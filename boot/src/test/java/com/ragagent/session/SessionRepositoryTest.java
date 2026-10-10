@@ -9,7 +9,7 @@ import com.ragagent.TestSchema;
 import com.ragagent.session.domain.Session;
 import com.ragagent.session.domain.SessionLastRequestState;
 import com.ragagent.session.domain.SessionNotFoundException;
-import com.ragagent.session.mapper.SessionRepository;
+import com.ragagent.session.repository.SessionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

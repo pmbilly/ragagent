@@ -20,7 +20,9 @@
 
 - 分层方向正确：`common` 在底（30 包依赖）、`retrieval`/`llm` 是库式域不暴露 HTTP；
 - `im` 一渠道一子包（feishu/wechat/dingtalk/slack/mattermost/telegram/qqbot/wecom/yunzhijia + runtime）；
-- 真分层倒挂**极少**：`controller → mapper/repository` 仅 **5 个**（apikey/memory/session×2/storage）；
+- 真分层倒挂**极少**：`controller → mapper/repository` 仅 **7 处 import / 6 个文件**
+  （2026-10-10 B213 实测：agent-management 1 · embedchannel→session 1 · initialization 2 ·
+  system 1 · auth-apikey 1〔引的是 `TenantAPIKeyNotFoundException`，非仓储〕）；
   `service → controller` 仅 **2 个**（wiki/service 的 Ingest 两个类）；`domain/dto → service/controller` 仅 1 个；
 - `controller/` 包里放错的文件只有 **2 个**（`audit/AuditLogListResponse`、`wiki/WikiActivityAudit`）。
 
@@ -136,13 +138,17 @@ B33 已归位：`AppEnvLookup` → `common/deployment`、`StorageRuntimeEnv` →
 ### P2b 超大文件（> 600 行；棘轮 `scripts/check-file-size.py`，B121 上线）
 
 **现状**（2026-10-08 B129 盘点）：主源码里 **> 600 行有 67 个**、其中 ≥800 **3 个**（**全部是已论证例外**；"待还债"归零）。**已出榜**：`im/service/ImService`（B123~B127 四刀 1,091→554）、`session/service/SessionKnowledgeQaService`（B129 两刀 1,041→756）。**已出榜**：`im/service/ImService`（B123~B127 四刀 1,091→554，守卫自动清理其豁免登记）。
+
+> ⚠️ **下表数字已滞后**（2026-10-10 B213 核对：多行行数与"3 个 ≥800"均已不符，如 `MemoryIndexStore`
+> 实测 628 而非 919、`StorageFileResolver` 782 而非 789）。**排期请以 `python3 scripts/check-file-size.py`
+> 的实时读数为准**，本表只当"曾经有哪些大个子"的线索。
 最大的 12 个（**就是后续拆分的待办清单**）：
 
 | 行数 | 文件 | | 行数 | 文件 |
 |---|---|---|---|---|
 | 936 | `im/service/ImService`（B123 首刀 1091→995；B125 二刀 →936） | | 772 | `retrieval/HybridSearchService` |
 | 1041 | `session/service/SessionKnowledgeQaService` | | 765 | `memory/service/MemoryService` |
-| 919 | `memory/mapper/MemoryIndexStore` | | 763 | `agent/ActPhase` |
+| 919 | `memory/repository/MemoryIndexStore`（**B213 已移入 `repository/`**；行数为 10-08 旧值） | | 763 | `agent/ActPhase` |
 | 847 | `knowledge/task/KnowledgeProcessWorker` | | 761 | `im/runtime/ToolDisplay` |
 | 827 | `knowledge/service/KnowledgeService` | | 760 | `llm/chat/AnthropicChat` |
 | 789 | `storage/fileserve/StorageFileResolver` | | 759 | `wiki/service/ingest/WikiIngestCitePipeline` |

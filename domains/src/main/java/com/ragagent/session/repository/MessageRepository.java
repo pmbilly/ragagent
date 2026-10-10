@@ -1,5 +1,7 @@
-package com.ragagent.session.mapper;
+package com.ragagent.session.repository;
 
+import com.ragagent.session.mapper.MessageMapper;
+import com.ragagent.session.mapper.SessionMapper;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;

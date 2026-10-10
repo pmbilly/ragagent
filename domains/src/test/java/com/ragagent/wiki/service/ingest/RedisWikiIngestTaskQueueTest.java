@@ -16,7 +16,7 @@ import java.util.function.BooleanSupplier;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.stream.EmbeddedRedis;
 import com.ragagent.wiki.domain.TaskDeadLetter;
-import com.ragagent.wiki.mapper.TaskDeadLetterRepository;
+import com.ragagent.wiki.repository.TaskDeadLetterRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

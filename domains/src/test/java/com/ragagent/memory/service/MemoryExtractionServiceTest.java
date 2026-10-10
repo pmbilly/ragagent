@@ -32,7 +32,7 @@ import com.ragagent.common.memory.MemoryKinds;
 import com.ragagent.memory.domain.MemoryMessageCursor;
 import com.ragagent.memory.domain.MemoryScope;
 import com.ragagent.memory.domain.MemorySubject;
-import com.ragagent.memory.mapper.MemoryRepository;
+import com.ragagent.memory.repository.MemoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

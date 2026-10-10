@@ -27,7 +27,7 @@ import com.ragagent.session.domain.MessageSearchGroupItem;
 import com.ragagent.session.domain.MessageSearchResult;
 import com.ragagent.session.domain.MessageWithSession;
 import com.ragagent.session.domain.SessionOwnerIds;
-import com.ragagent.session.mapper.MessageRepository;
+import com.ragagent.session.repository.MessageRepository;
 
 
 /**

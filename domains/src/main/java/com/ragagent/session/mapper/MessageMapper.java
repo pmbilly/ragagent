@@ -25,11 +25,11 @@ import org.apache.ibatis.annotations.Update;
  * messages 的 MyBatis-Plus 基础仓储。
  *
  * <p>{@code ListMessagesBySessionAfterCursor}（依赖 memory 模块的
- * {@code MemoryMessageCursor}）已在 {@link MessageRepository} 落地——memory 的 service
+ * {@code MemoryMessageCursor}）已在 {@link com.ragagent.session.repository.MessageRepository} 落地——memory 的 service
  * 层需要它做游标分页，本轮收口回这里，不再由 memory 侧自拼一份 SQL。</p>
  *
  * <p>三条 JOIN sessions 的检索查询里，{@code SearchMessagesByKeyword} 与
- * {@code GetMessagesByRequestIDs} 由 {@link MessageRepository} 两步化
+ * {@code GetMessagesByRequestIDs} 由 {@link com.ragagent.session.repository.MessageRepository} 两步化
  * （先查消息再补标题）；{@code GetMessagesByKnowledgeIDs}（向量搜索回映射）
  * 保留**一条 JOIN SQL**——INNER JOIN 要把「会话已软删」的消息直接排除，
  * 见 {@link #selectMessagesByKnowledgeIds}。</p>

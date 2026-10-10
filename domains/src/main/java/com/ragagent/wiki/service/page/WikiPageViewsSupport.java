@@ -10,7 +10,7 @@ import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.WikiPageListRequest;
 import com.ragagent.wiki.domain.WikiPageListResponse;
 import com.ragagent.wiki.domain.WikiStats;
-import com.ragagent.wiki.mapper.WikiPageRepository;
+import com.ragagent.wiki.repository.WikiPageRepository;
 import com.ragagent.wiki.service.ingest.WikiPendingOpsCounter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

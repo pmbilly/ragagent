@@ -26,7 +26,7 @@ import com.ragagent.session.domain.MessageSuggestionEvent;
 import com.ragagent.session.domain.MessageSuggestionSet;
 import com.ragagent.session.domain.SessionOwnerIds;
 import com.ragagent.session.domain.SuggestionItem;
-import com.ragagent.session.mapper.MessageSuggestionRepository;
+import com.ragagent.session.repository.MessageSuggestionRepository;
 import com.ragagent.common.wiki.WikiLanguageSupport;
 import com.ragagent.common.security.APIKeyScopeContext;
 import com.ragagent.common.security.TenantAPIKeyScope;

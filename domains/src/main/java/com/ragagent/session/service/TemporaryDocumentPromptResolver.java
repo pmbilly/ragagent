@@ -8,7 +8,7 @@ import java.util.Set;
 
 import com.ragagent.session.domain.MessageAttachment;
 import com.ragagent.session.domain.TemporaryDocument;
-import com.ragagent.session.mapper.TemporaryDocumentRepository;
+import com.ragagent.session.repository.TemporaryDocumentRepository;
 
 /**
  * {@code TemporaryDocumentService} 的**提示词渲染子模块**（§14 步骤 2 拆分）：把 ready 的

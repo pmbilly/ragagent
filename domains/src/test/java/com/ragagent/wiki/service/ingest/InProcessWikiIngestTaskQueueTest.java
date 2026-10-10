@@ -16,7 +16,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.ObjectProvider;
 
 import com.ragagent.wiki.domain.TaskDeadLetter;
-import com.ragagent.wiki.mapper.TaskDeadLetterRepository;
+import com.ragagent.wiki.repository.TaskDeadLetterRepository;
 
 /**
  * 进程内虚拟线程任务队列的语义测试。

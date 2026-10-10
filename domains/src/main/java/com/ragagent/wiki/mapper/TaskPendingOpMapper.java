@@ -15,7 +15,7 @@ import org.apache.ibatis.annotations.Update;
  *
  * <p>本 Mapper 只放<b>必须用 SQL 表达</b>的原子语句；CRUD 与条件查询直接用
  * {@link BaseMapper} 的 {@code selectList}/{@code insert}/{@code deleteBatchIds}。
- * 调用方见 {@link TaskPendingOpsRepository}。</p>
+ * 调用方见 {@link com.ragagent.wiki.repository.TaskPendingOpsRepository}。</p>
  */
 @Mapper
 public interface TaskPendingOpMapper extends BaseMapper<TaskPendingOp> {
