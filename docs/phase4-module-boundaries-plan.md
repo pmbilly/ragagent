@@ -617,3 +617,31 @@ B116 搬家时已经搬过一批资源（`common/text/*.txt`），这类风险�
    **MyBatis 语句名字符串白名单**（4 条 ✓：`…TenantAPIKeyMapper.listByPlaceholderHash` / `listPlatform` / `selectByHash` / `selectFirstPlaceholderHashId` ✓）
    ⇒ **不是模块边** ✗（侦察正则误报 ✓，同 R-d 那类 ✓）；**但** apikey 改名 `channels.api` 时这 4 条字符串**必须同批更新** ✓（否则运行期守卫误判 ✓）。
 4. ✅ **验环（B209 一并完成）**：`check-package-cycles` ✓ · 九守卫 ✓ · 全量闸门 ✓（1m40s / 4858-0 ✓）⇒ 代码边归零 ✓。**下一步**：建 `:channels`（`im` + `embedchannel` + `apikey`→`channels.api` ✓）—— 前置已清 ✓。
+
+## 13. B210：建 `:channels` 模块 + 第一件搬迁（`apikey` → `channels.api`，2026-10-10）
+
+**模块**：`settings.gradle.kts` 加 `include("channels")`；`channels/build.gradle.kts` 照 `domains` 模板（含 §10 三件套：
+`spotless targetExclude("build/**")` ✓ · **新模块必须显式 `useJUnitPlatform()`** ✓ · 依赖 `:common` + `:domains`（通道层在 `:domains` 之上 ✓）✓）；
+`:boot` 加 `implementation(project(":channels"))` ✓。
+
+**第一件**：`git mv domains/src/main/java/com/ragagent/auth/apikey → channels/src/main/java/com/ragagent/channels/api` ✓
++ 全局 FQN 替换（含 `TenantFilterGuard` 的 4 条**语句名字符串** ✓ —— 见 §12 边 5 更正 ✓）+ 测试归位：
+7 个单测随迁 `channels/src/test` ✓；`TenantAPIKeyControllerTest` / `TenantAPIKeyRepositoryTest` 归 `:boot`
+（`@SpringBootTest` 型 ✓）；`JsonContractRoundTripTest` 里依赖实体的那一段**外提**为
+`channels/src/test/.../ApiKeyJsonContractTest` ✓（留在 domains 会形成测试期反向依赖 ✗）。
+
+**三条实测教训**（都是"搬家批"通用 ✓）：
+1. **`git mv` 保留 mtime ⇒ Gradle 增量编译会把新路径的产物藏进 `build/tmp/compileTestJava/.../stash-dir/`** ✗
+   —— 表现是"测试总数凭空少 22 条" ✗（用例数 4836 < 基线 4858 ✓）。**处置**：`:boot:compileTestJava --rerun-tasks` ✓
+   （清 `build/classes` 与 `build/tmp` 都无效 ✗）；**判据**：搬家后核对目标 class 文件存在 ✓ + 用例总数与基线一致 ✓。
+2. **守卫的模块表是独立配置** ✗ —— `scripts/_source_roots.py` 的 `MODULE_DIRS` 不加新模块 ⇒ 所有守卫对新模块**静默失明** ✗
+   （B116 已有同款前车之鉴 ✓）。本次表现：外壳守卫先读成 **49/51** ✗（少一个控制器 ✓）⇒ 补 `channels` 后回到 **50/52** ✓。
+   **判据**：新模块落地后先看"守卫扫到的计数"是否复原 ✓。
+3. **路径键基线要随搬家刷新并审 diff** ✓ —— `json-key-freeze` / `file-size` 的基线按**路径**记 ✗ ⇒ 搬家后旧条目成幽灵 ✗、
+   新路径像"新增违规" ✗。**处置**：`--write` 后**必须审 diff**（只许路径迁移 ✓）；本次 json-key 是"离开 0 / 进入 0"（它按包相对路径记，
+   天然免疫搬家 ✓✓），file-size 是纯迁移 + 少量历史漂移 ✓。`check-json-key-case.py` 的白名单键也要同批改路径 ✓
+   （`auth/apikey/filter/APIKeyAuthChannel.java` → `channels/api/filter/…` ✓）。
+
+**结果**：`spotlessCheck build` ✓ 1m23s · **4858 / 0** ✓（与 B209 基线**逐条一致** ✓）· 九守卫全绿 ✓ · 验环 ✓
+· `channels 99` / `domains 2773` / `engine 547` / `common 127` / `boot 1312` ✓。
+**下一步**：迁 `embedchannel` 与 `im` 进 `:channels` ✓（入边已实测为 0 —— 两处"疑似边"均为字符串/注释误报 ✓）。

@@ -9,7 +9,6 @@ import java.util.Set;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.auth.apikey.domain.TenantAPIKey;
 import com.ragagent.audit.dto.AuditLogListResponse;
 import com.ragagent.audit.domain.AuditAction;
 import com.ragagent.audit.domain.AuditLog;
@@ -18,7 +17,6 @@ import com.ragagent.agent.domain.ToolCall;
 import com.ragagent.agent.domain.ToolCallTarget;
 import com.ragagent.common.llm.ToolResult;
 import com.ragagent.audit.domain.AuditOutcome;
-import com.ragagent.common.apikey.TenantAPIKeyCreateResponse;
 import com.ragagent.datasource.domain.DataSource;
 import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.domain.DataSourceConstants;
@@ -32,7 +30,6 @@ import com.ragagent.datasource.domain.TaskInitiator;
 import com.ragagent.datasource.dto.CredentialFieldMetadata;
 import com.ragagent.datasource.dto.CredentialsResponse;
 import com.ragagent.datasource.dto.DataSourceResponse;
-import com.ragagent.common.apikey.TenantAPIKeyResponse;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ChunkRevision;
 import com.ragagent.common.knowledge.DocumentChunkMetadata;
@@ -124,7 +121,6 @@ import com.ragagent.tenant.ChatHistoryConfig;
 import com.ragagent.tenant.ParserEngineConfig;
 import com.ragagent.tenant.RetrievalConfig;
 import com.ragagent.tenant.StorageEngineConfig;
-import com.ragagent.auth.apikey.domain.TenantAPIKeyProjections;
 
 /**
  * 契约实体的 JSON 往返体检——覆盖所有**会落 jsonb 或直接作响应体**的类型。
@@ -561,42 +557,6 @@ class JsonContractRoundTripTest {
 
     // ── 租户 API Key（tenant_api_keys 的两个 jsonb 列 + 四个管理端点的响应体） ──
 
-    /**
-     * API Key 契约实体。三类风险各钉一条：
-     * <ol>
-     *   <li>{@code TenantAPIKey.isPlatform()} / {@code tenantIdValue()} 是派生访问器——
-     *       漏 {@code @JsonIgnore} 会把 {@code "platform":true} 写进序列化结果；</li>
-     *   <li>{@code keyHash} 不进 JSON，必须双向忽略；</li>
-     *   <li>响应体 {@code TenantAPIKeyResponse} 的蛇形键名与
-     *       {@code TenantAPIKeyCreateResponse} 的 token 末位。</li>
-     * </ol>
-     */
-    @Test
-    void tenantApiKeyContractsRoundTrip() {
-        TenantAPIKey key = new TenantAPIKey();
-        key.setId(7L);
-        key.setTenantId(42L);
-        key.setScopeType("tenant");
-        key.setName("integration");
-        key.setKeyHash("deadbeef");          // json:"-" → 不进 JSON
-        key.setApiKey("sk-plaintext");
-        key.setFullAccess(false);
-        key.setKnowledgeBaseIds(List.of("kb-1", "kb-2"));
-        key.setCapabilities(List.of("retrieve", "chat"));
-        // 时间字段留空：本工具用的是**裸** ObjectMapper（未注册 JSR-310 模块），
-        // 非空 OffsetDateTime 会在这里炸，而时间键名/格式已由
-        // TenantAPIKeyControllerTest 与 JacksonConfig 覆盖。
-        assertRoundTrips(key, TenantAPIKey.class,
-                "types.TenantAPIKey ← TenantAPIKey（jsonb 数组列 + 派生方法须 @JsonIgnore）");
-
-        TenantAPIKeyResponse response = TenantAPIKeyProjections.from(key);
-        assertRoundTrips(response, TenantAPIKeyResponse.class,
-                "handler.tenantAPIKeyResponse ← TenantAPIKeyResponse");
-        // 三个成功响应体都经它派生，token 在末位
-        assertRoundTrips(TenantAPIKeyCreateResponse.of(response, "sk-once"),
-                TenantAPIKeyCreateResponse.class,
-                "handler.tenantAPIKeyCreateResponse ← TenantAPIKeyCreateResponse");
-    }
 
     // ── 审计日志（audit_logs.details 落 jsonb + 三个端点的响应体元素） ──────
 
