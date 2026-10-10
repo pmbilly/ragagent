@@ -35,6 +35,15 @@ subprojects {
         // 接进 check ⇒ `./gradlew build`（CI backend job 跑的就是它）会连带执行 javadoc：
         // 注释里出现指向已不存在类型/成员/常量的 {@link}/{@value} 时**构建期就红**。
         tasks.named("check") { dependsOn(tasks.named("javadoc")) }
+
+        // 测试并行（B194）：本仓 4800+ 用例单 JVM 串行约 3 分钟。这里只让 Gradle 按**测试类**分派到
+        // 多个测试 JVM（同类内仍串行 ⇒ 不破坏类内夹具顺序）。分叉数取核数/4 并夹在 1..3：
+        // 本机 10 核 ⇒ 2；CI（2-4 核）⇒ 1，与并行前行为一致 ✓。
+        // ⚠️ 契约测试连的是**真 Postgres**（boot/domains 的 test application.yml）⇒ 开启后必须跑两遍
+        // 全量确认不 flaky（B194 实测两遍全绿才保留）。
+        tasks.withType<Test>().configureEach {
+            maxParallelForks = (Runtime.getRuntime().availableProcessors() / 4).coerceIn(1, 3)
+        }
     }
 }
 
