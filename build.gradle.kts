@@ -46,3 +46,20 @@ allprojects {
         mavenCentral()
     }
 }
+
+// ── dev server「陈旧」提醒（B186）────────────────────────────────────────────
+// 本仓 dev server（scripts/java-server-up.sh 起的 :boot:bootRun）类路径里是**模块 jar**，
+// 而构建会**就地重写**它们 ⇒ 运行中的 JVM 陷入「惰性类加载必炸」状态。2026-10-10 实测两次：
+// ①全端点点 500（B184）；②某条"少走"的功能路径卡住（wiki 搜索的卡片一直转圈，B186）。
+// 这里让 build 收尾时跑一次 scripts/dev-stale-check.sh：只提醒、不阻断；没有 dev server 时静默。
+tasks.register<Exec>("devStaleWarn") {
+    group = "verification"
+    description = "提醒：正在运行的 dev server 是否比刚构建的产物更旧（需重启，见 B184/B186）"
+    workingDir = rootDir
+    commandLine("bash", "scripts/dev-stale-check.sh")
+    isIgnoreExitValue = true
+}
+tasks.matching { it.name == "build" }.configureEach { finalizedBy("devStaleWarn") }
+subprojects {
+    tasks.matching { it.name == "build" }.configureEach { finalizedBy(rootProject.tasks.named("devStaleWarn")) }
+}
