@@ -1665,8 +1665,13 @@ async function runPlayground() {
       throw new Error(sessionPayload?.message || sessionPayload?.error?.message || `HTTP ${sessionResp.status}`)
     }
     playground.session_status = 'success'
-    // 裸资源：响应体即会话对象（§14.9l S1b 起不再有 {data,success} 信封）
-    const sessionID = sessionPayload?.id
+    // 后端自 B183（全仓 API 外壳化）起，`POST /api/v1/sessions` 返回 `{code,message,data:{id,…}}`
+    //（金片 `session-create.json` + `SessionController` 的 `@ApiResult` 可证）。
+    // 旧注释「不再有 {data,success} 信封」描述的是外壳化**之前**的形态 ⇒ 直读 `sessionPayload.id`
+    // 恒 undefined ⇒ 演练必然停在第一步（报 playgroundMissingSessionId），而失败文案分支恰好能读到
+    // 外壳的 message，所以报错看起来"正常"，更难发现。两种形状都吃：外壳优先、裸对象兜底。
+    const sessionEnvelope: any = sessionPayload?.data ?? sessionPayload
+    const sessionID = sessionEnvelope?.id
     if (!sessionID) {
       throw new Error(t('integrations.api.playgroundMissingSessionId'))
     }

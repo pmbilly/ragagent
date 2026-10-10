@@ -486,10 +486,14 @@ export function testMultimodalFunction(testData: {
             .then(response => {
                 if (!response.ok) {
                     return response.json().then((err: any) => {
+                        // 后端自 B183 起错误也是外壳 {code,message,data} ⇒ 兜底补读 message
+                        //（原读法 err?.error?.message 是外壳化前的退役形态，读不到 ⇒ 恒落通用文案）。
                         resolve({ success: false,
-                            message: err?.error?.message || t('error.initialization.testFailed') });
+                            message: err?.message || err?.error?.message || t('error.initialization.testFailed') });
                     });
                 }
+                // 注意：后端成功体是外壳 {code,message,data}（B183 起），此处**刻意未解包** ——
+                // 本函数当前无调用方（潜伏面）；接入时若要载荷请自行取 `.data`，或届时在此统一解包。
                 return response.json().then((data: any) => resolve(data || {}));
             })
             .catch((error: any) => {
