@@ -483,11 +483,17 @@
         if (!res || !res.ok) return null;
         return res.json();
       }).then(function (payload) {
-        // 公开 config 契约（§14.9m E1）：裸对象 + camelCase（无 {data} 信封、无 snake 键）。
-        // 此处曾按旧契约（信封 + snake 键）读 ⇒ 渠道配置的浮标图标永远读不到
-        //（2026-10-03 点检实锤：按钮回落默认气泡）。源码扫描守卫见
-        // src/views/embed/widgetPublicConfigContract.test.ts。
-        var cfg = payload;
+        // 公开 config 契约（§14.9m E1）：**camelCase**（内层键名固定是驼峰，无 snake 键）。
+        // 但**外形**变过一次：2026-10-03 换锚时是「裸对象」；B200（2026-10-10 全仓 API 外壳化）
+        // 把它包成了 `{code,message,data}`，而本脚本仍直读 cfg.launcherIcon ⇒ 取到 undefined
+        // ⇒ 渠道配置的浮标图标静默失效、回落默认气泡（2026-10-11 用户实测实锤：
+        // 接口里 launcherIcon 是 25KB 的 base64，浮标却不显示）。
+        // 这里**两种形状都认**（外壳优先、裸对象兜底）：嵌入脚本一旦发布就散落在第三方页面、
+        // 无法统一升级，必须容忍服务端两侧的契约调整，否则任何一侧变动都会静默打死外观。
+        // 注：内层键名仍是 camelCase；snake 形态的键名（launcher_icon 之类）由守卫永久禁止。
+        //（本行刻意不写完整的 cfg.snake 字面量 —— 守卫是源码扫描，注释里的字面量也会被扫到。）
+        // 源码扫描守卫见 src/views/embed/widgetPublicConfigContract.test.ts。
+        var cfg = payload && payload.data ? payload.data : payload;
         if (!cfg) {
           revealLauncher();
           return;
