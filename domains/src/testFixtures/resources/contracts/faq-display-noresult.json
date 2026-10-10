@@ -1,1 +1,5 @@
-{"error":{"code":1003,"message":"no FAQ import result found","details":null}}
+{
+  "code": 1003,
+  "message": "no FAQ import result found",
+  "data": null
+}

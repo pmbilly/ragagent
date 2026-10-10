@@ -1,1 +1,7 @@
-{"taskId":"faqgolden_custom_1"}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "taskId": "<task>"
+  }
+}

@@ -36,6 +36,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.ragagent.knowledge.security.ChunkAccessGuard;
 import com.ragagent.knowledge.task.KnowledgeTaskIdCodec;
+import com.ragagent.common.web.ApiResult;
+import com.ragagent.common.web.ApiResponse;
 
 /**
  * FAQ 模块 HTTP 面：条目查询/命令/导入三服务的薄绑定层。读路由经
@@ -43,6 +45,7 @@ import com.ragagent.knowledge.task.KnowledgeTaskIdCodec;
  * 参数校验由 {@code @Valid} DTO 约束声明，异常统一走全局 400 处理器。
  */
 @RestController
+@ApiResult
 public class FaqController {
 
 
@@ -194,33 +197,33 @@ public class FaqController {
     }
 
     @PutMapping("/api/v1/knowledge-bases/{id}/faq/entries/fields")
-    public ResponseEntity<Void> updateEntryFieldsBatch(
+    public ApiResponse<Void> updateEntryFieldsBatch(
             @PathVariable("id") String id,
             @Valid @NonNullBody @RequestBody FaqEntryFieldsBatchUpdate req) {
         String kbId = LogSanitizer.sanitize(id);
         requireKbWrite(kbId);
         faqEntryCommand.updateEntryFieldsBatch(kbId, req);
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B197：204 退役
     }
 
     @PutMapping("/api/v1/knowledge-bases/{id}/faq/entries/tags")
-    public ResponseEntity<Void> updateEntryTagBatch(
+    public ApiResponse<Void> updateEntryTagBatch(
             @PathVariable("id") String id,
             @Valid @NonNullBody @RequestBody FaqEntryTagBatchRequest req) {
         String kbId = LogSanitizer.sanitize(id);
         requireKbWrite(kbId);
         faqEntryCommand.updateEntryTagBatch(kbId, req.updates());
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B197：204 退役
     }
 
     @DeleteMapping("/api/v1/knowledge-bases/{id}/faq/entries")
-    public ResponseEntity<Void> deleteEntries(
+    public ApiResponse<Void> deleteEntries(
             @PathVariable("id") String id,
             @Valid @NonNullBody @RequestBody FaqDeleteRequest req) {
         String kbId = LogSanitizer.sanitize(id);
         requireKbWrite(kbId);
         faqEntryCommand.deleteEntries(kbId, req.ids());
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B197：204 退役
     }
 
     /** matchCount 先钳 [10,200]（service 再钳 50）。 */
@@ -238,13 +241,13 @@ public class FaqController {
     }
 
     @PutMapping("/api/v1/knowledge-bases/{id}/faq/import/last-result/display")
-    public ResponseEntity<Void> updateLastImportResultDisplayStatus(
+    public ApiResponse<Void> updateLastImportResultDisplayStatus(
             @PathVariable("id") String id,
             @Valid @NonNullBody @RequestBody UpdateLastImportDisplayStatusRequest req) {
         String kbId = LogSanitizer.sanitize(id);
         requireKbWrite(kbId);
         faqImport.updateLastImportResultDisplayStatus(kbId, req.displayStatus());
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B197：204 退役
     }
 
     // ══════════════════════════ 路由守卫 ══════════════════════════

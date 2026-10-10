@@ -1,1 +1,5 @@
-{"error":{"code":1000,"message":"FAQ 条目 ID 必须为正整数","details":null}}
+{
+  "code": 1000,
+  "message": "FAQ 条目 ID 必须为正整数",
+  "data": null
+}

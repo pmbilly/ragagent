@@ -1,1 +1,5 @@
-{"error":{"code":1000,"message":"相似问「如何绑定手机」已存在","details":null}}
+{
+  "code": 1000,
+  "message": "相似问「如何绑定手机」已存在",
+  "data": null
+}

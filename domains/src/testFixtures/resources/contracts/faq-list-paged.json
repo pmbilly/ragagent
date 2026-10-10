@@ -1,1 +1,55 @@
-{"items":[{"id":970003,"chunkId":"fbc00001-0000-0000-0000-000000000003","knowledgeId":"faa00001-0000-0000-0000-000000000001","knowledgeBaseId":"b039baae-8035-48dd-b33b-d5d0e6f5662d","tagId":965002,"tagName":"售后","enabled":false,"recommended":true,"standardQuestion":"如何退款","similarQuestions":["退款流程"],"negativeQuestions":null,"answers":["请参见帮助中心。"],"answerStrategy":"all","indexMode":"question_only","updatedAt":"2026-09-01T14:00:00+08:00","createdAt":"2026-09-01T14:00:00+08:00","chunkType":"faq","match":null},{"id":970004,"chunkId":"fbc00001-0000-0000-0000-000000000004","knowledgeId":"faa00001-0000-0000-0000-000000000001","knowledgeBaseId":"b039baae-8035-48dd-b33b-d5d0e6f5662d","tagId":0,"tagName":"","enabled":true,"recommended":true,"standardQuestion":"裸内容条目","similarQuestions":null,"negativeQuestions":null,"answers":null,"answerStrategy":"all","indexMode":"question_only","updatedAt":"2026-09-01T13:00:00+08:00","createdAt":"2026-09-01T13:00:00+08:00","chunkType":"faq","match":null}],"page":2,"pageSize":2,"total":4}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "items": [
+      {
+        "id": 970003,
+        "chunkId": "fbc00001-0000-0000-0000-000000000003",
+        "knowledgeId": "faa00001-0000-0000-0000-000000000001",
+        "knowledgeBaseId": "b039baae-8035-48dd-b33b-d5d0e6f5662d",
+        "tagId": 965002,
+        "tagName": "售后",
+        "enabled": false,
+        "recommended": true,
+        "standardQuestion": "如何退款",
+        "similarQuestions": [
+          "退款流程"
+        ],
+        "negativeQuestions": null,
+        "answers": [
+          "请参见帮助中心。"
+        ],
+        "answerStrategy": "all",
+        "indexMode": "question_only",
+        "updatedAt": "2026-09-01T14:00:00+08:00",
+        "createdAt": "2026-09-01T14:00:00+08:00",
+        "chunkType": "faq",
+        "match": null
+      },
+      {
+        "id": 970004,
+        "chunkId": "fbc00001-0000-0000-0000-000000000004",
+        "knowledgeId": "faa00001-0000-0000-0000-000000000001",
+        "knowledgeBaseId": "b039baae-8035-48dd-b33b-d5d0e6f5662d",
+        "tagId": 0,
+        "tagName": "",
+        "enabled": true,
+        "recommended": true,
+        "standardQuestion": "裸内容条目",
+        "similarQuestions": null,
+        "negativeQuestions": null,
+        "answers": null,
+        "answerStrategy": "all",
+        "indexMode": "question_only",
+        "updatedAt": "2026-09-01T13:00:00+08:00",
+        "createdAt": "2026-09-01T13:00:00+08:00",
+        "chunkType": "faq",
+        "match": null
+      }
+    ],
+    "page": 2,
+    "pageSize": 2,
+    "total": 4
+  }
+}

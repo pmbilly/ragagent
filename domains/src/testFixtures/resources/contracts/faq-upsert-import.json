@@ -1,1 +1,7 @@
-{"taskId":"faq_import_10002_1789771871223_37690c59_1901fd0f5de"}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "taskId": "<task>"
+  }
+}

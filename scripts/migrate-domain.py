@@ -282,7 +282,10 @@ def cmd_converge(test_filters, rounds=8):
                 if cand:
                     fp, stack_file, stack_line = cand, mm.group(1), int(mm.group(2)); break
             # ①b 栈行里点名了金片 ⇒ 直接按 actual 写金片（空金片/非 JSON 金片都能修 ✓）
-            if stack_line and fp and re.search(r'but was: <', msg):
+            # 守卫：状态类失败（消息形如 `<golden> status, body=… ==> expected: <204> but was: <200>`）
+            # 不能走本规则 ✗，否则会把金片写成外壳而状态断言还是旧值 ⇒ 下一轮又红（B197 实测 ✓）
+            status_failure = bool(re.search(r'==> expected: <\d{3}> but was: <\d{3}>', msg))
+            if stack_line and fp and not status_failure and re.search(r'but was: <', msg):
                 line = fp.read_text(encoding='utf-8').split('\n')[stack_line - 1]
                 gm = re.search(r'golden\("([a-z0-9][A-Za-z0-9_.-]*\.json)"\)', line)
                 if gm:

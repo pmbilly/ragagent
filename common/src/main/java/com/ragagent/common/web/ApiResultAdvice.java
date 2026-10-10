@@ -41,6 +41,12 @@ public class ApiResultAdvice implements ResponseBodyAdvice<Object> {
         if (selectedContentType != null && !MediaType.APPLICATION_JSON.isCompatibleWith(selectedContentType)) {
             return body;
         }
+        if (body instanceof byte[] || body instanceof org.springframework.core.io.Resource) {
+            // 二进制 / 资源载荷直接放行（B197）：导出类端点常把 JSON/CSV **文本**配成 application/json
+            // 或 text/csv ✗ —— 内容类型判不出来，若包壳则 byte[] 转换器抛 ClassCastException ⇒ 500 ✗
+            // （实测：FaqController.exportEntries 的 `?format=json` 分支，code 1007 ✓）
+            return body;
+        }
         return ApiResponse.ok(body);
     }
 }

@@ -1,1 +1,5 @@
-{"error":{"code":1000,"message":"获取 FAQ 元数据失败","details":null}}
+{
+  "code": 1000,
+  "message": "获取 FAQ 元数据失败",
+  "data": null
+}

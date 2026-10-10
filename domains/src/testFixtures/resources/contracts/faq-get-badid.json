@@ -1,1 +1,5 @@
-{"error":{"code":1000,"message":"entry_id 必须是整数","details":null}}
+{
+  "code": 1000,
+  "message": "entry_id 必须是整数",
+  "data": null
+}

@@ -1,1 +1,5 @@
-{"error":{"code":1000,"message":"answer_strategy 必须是 'all' 或 'random'","details":null}}
+{
+  "code": 1000,
+  "message": "answer_strategy 必须是 'all' 或 'random'",
+  "data": null
+}

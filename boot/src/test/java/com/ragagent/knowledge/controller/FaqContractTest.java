@@ -415,7 +415,7 @@ class FaqContractTest {
 
     @Test
     void section6_fieldsBatch() throws Exception {
-        compareAndStatus("faq-fields-empty.json", 204, "PUT", B1 + "/faq/entries/fields", owner, "{}");
+        compareAndStatus("faq-fields-empty.json", 200, "PUT", B1 + "/faq/entries/fields", owner, "{}");
         compareAndStatus("faq-fields-negid.json", 400, "PUT", B1 + "/faq/entries/fields", owner,
                 "{\"byId\":{\"-5\":{\"enabled\":false}}}");
         compareAndStatus("faq-fields-missing.json", 404, "PUT", B1 + "/faq/entries/fields", owner,
@@ -424,7 +424,7 @@ class FaqContractTest {
                 "{\"byId\":{\"970003\":{\"tagId\":960999}}}");
         compareAndStatus("faq-fields-foreigntag.json", 403, "PUT", B1 + "/faq/entries/fields", owner,
                 "{\"byId\":{\"970003\":{\"tagId\":960002}}}");
-        compareAndStatus("faq-fields-ok.json", 204, "PUT", B1 + "/faq/entries/fields", owner,
+        compareAndStatus("faq-fields-ok.json", 200, "PUT", B1 + "/faq/entries/fields", owner,
                 "{\"byId\":{\"970003\":{\"enabled\":true,\"recommended\":false,\"tagId\":965001}},"
                         + "\"byTag\":{\"965002\":{\"enabled\":true,\"tagId\":965001}},"
                         + "\"excludeIds\":[970001]}");
@@ -440,7 +440,7 @@ class FaqContractTest {
         compareAndStatus("faq-tags-nullbody.json", 400, "PUT", B1 + "/faq/entries/tags", owner, "null");
         compareAndStatus("faq-tags-missing.json", 404, "PUT", B1 + "/faq/entries/tags", owner,
                 "{\"updates\":{\"999999\":965001}}");
-        compareAndStatus("faq-tags-ok.json", 204, "PUT", B1 + "/faq/entries/tags", owner,
+        compareAndStatus("faq-tags-ok.json", 200, "PUT", B1 + "/faq/entries/tags", owner,
                 "{\"updates\":{\"970002\":965001,\"970003\":null}}");
     }
 
@@ -474,7 +474,7 @@ class FaqContractTest {
                 dryRunResult.getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8));
         String dryTask = com.jayway.jsonpath.JsonPath.parse(
                 dryRunResult.getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8))
-                .read("$.taskId");
+                .read("$.data.taskId");
 
         // dry_run 异步（进程内虚拟线程）：轮询到 completed（对照录制脚本的 sleep 3）再比对终态；
         // completed 才清 running key——后续 customtask 才能不被锁
@@ -514,9 +514,9 @@ class FaqContractTest {
                 B2 + "/faq/import/last-result/display", owner, "{\"displayStatus\":\"close\"}");
         compareAndStatus("faq-display-noresult.json", 404, "PUT",
                 B3 + "/faq/import/last-result/display", owner, "{\"displayStatus\":\"close\"}");
-        compareAndStatus("faq-display-close.json", 204, "PUT",
+        compareAndStatus("faq-display-close.json", 200, "PUT",
                 B1 + "/faq/import/last-result/display", owner, "{\"displayStatus\":\"close\"}");
-        compareAndStatus("faq-display-open.json", 204, "PUT",
+        compareAndStatus("faq-display-open.json", 200, "PUT",
                 B1 + "/faq/import/last-result/display", owner, "{\"displayStatus\":\"open\"}");
     }
 

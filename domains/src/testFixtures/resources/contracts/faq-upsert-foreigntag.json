@@ -1,1 +1,5 @@
-{"error":{"code":1002,"message":"标签不属于当前知识库","details":null}}
+{
+  "code": 1002,
+  "message": "标签不属于当前知识库",
+  "data": null
+}
