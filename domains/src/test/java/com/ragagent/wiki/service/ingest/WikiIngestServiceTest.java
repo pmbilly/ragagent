@@ -370,7 +370,7 @@ class WikiIngestServiceTest {
 
     @Test
     @DisplayName("合并只在飞行期间成立：完成后相同请求会真实再执行一次（不是缓存）")
-    void coalescingIsNotACache() {
+    void coalescingIsNotACache() throws Exception {
         CapturingChatClient model = new CapturingChatClient();
         model.response = "r";
         WikiIngestService service = bareService();
@@ -378,6 +378,13 @@ class WikiIngestServiceTest {
 
         service.generateWithTemplate(model, "same {{.Value}}", Map.of("Value", "input"));
         service.generateWithTemplate(model, "same {{.Value}}", Map.of("Value", "input"));
+        // 合并调用的**清理是异步的**（完成回调里摘 in-flight 表项）⇒ 断言前要有界等待，别抢跑 ✗
+        //（CI 2026-10-10 实测：expected: 0 but was: 1 ✓；B174 同族——计数器/状态由异步收尾维护时，
+        // 测试必须轮询到稳定态；断言一字未动 ⇒ 永不归零照旧失败 ✓）。
+        long deadline = System.currentTimeMillis() + 2000;
+        while (service.inflightLlmRequests() != 0 && System.currentTimeMillis() < deadline) {
+            Thread.sleep(10);
+        }
         assertThat(service.inflightLlmRequests()).isZero();
     }
 
