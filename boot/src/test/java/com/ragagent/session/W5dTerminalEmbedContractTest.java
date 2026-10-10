@@ -101,7 +101,6 @@ class W5dTerminalEmbedContractTest {
     }
 
     private Path golden(String name) {
-        Path file = com.ragagent.support.ContractPaths.resolve(name);
         return com.ragagent.support.ContractPaths.resolve(name);
     }
 
