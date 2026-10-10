@@ -30,7 +30,7 @@ java {
 
 dependencyManagement {
     imports {
-        mavenBom("org.springframework.boot:spring-boot-dependencies:3.3.5")
+        mavenBom(libs.spring.boot.dependencies.get().toString())
     }
 }
 
@@ -41,7 +41,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
-    implementation("com.baomidou:mybatis-plus-spring-boot3-starter:3.5.7")
+    implementation(libs.mybatis.plus.starter)
     compileOnly("jakarta.servlet:jakarta.servlet-api")
     compileOnly("jakarta.validation:jakarta.validation-api")
     implementation(project(":engine"))
@@ -52,7 +52,7 @@ dependencies {
     // 集成测试走内存库（与 :domains 同口径）。⚠️ testRuntimeOnly **不可传递** ⇒ 必须显式声明，
     // 否则测试会落到 application.yml 里的真 PG URL 上，TestSchema 的 H2 专有 DDL 直接 bad SQL grammar。
     testRuntimeOnly("com.h2database:h2")
-    testImplementation("com.tngtech.archunit:archunit:1.3.0")   // 架构规则（随 B165 迁入）
+    testImplementation(libs.archunit)   // 架构规则（随 B165 迁入）
     testImplementation("jakarta.servlet:jakarta.servlet-api")
     testImplementation("jakarta.validation:jakarta.validation-api")
 }

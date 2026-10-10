@@ -4,20 +4,42 @@ import org.gradle.external.javadoc.StandardJavadocDocletOptions
 // 由各模块（domains/engine/common/boot）应用。
 plugins {
     java
-    id("org.springframework.boot") version "3.3.5" apply false
-    id("io.spring.dependency-management") version "1.1.6" apply false
-    id("com.google.protobuf") version "0.9.4" apply false
-    id("com.diffplug.spotless") version "8.10.3" apply false
+    // 插件版本统一在 gradle/libs.versions.toml（B214）
+    alias(libs.plugins.spring.boot) apply false
+    alias(libs.plugins.spring.dependency.management) apply false
+    alias(libs.plugins.protobuf) apply false
+    alias(libs.plugins.spotless) apply false
 }
 
 // 各模块 Javadoc 共用一个门槛：**只启用 doclint 的「引用」检查组**。
 // 理由：本仓真实漂移过多次——改名/搬家后注释里的 {@link}/{@code}/{@see} 还指着旧类型
 // （B111~B118 期间人工修过 ≥5 次）。交给 javadoc 自己的解析器判定，零维护成本；
 // HTML 风格（</p>、heading 顺序）与 @param 完整性刻意**不**纳入——噪声大、价值低。
+
+// ── 九守卫（B214）────────────────────────────────────────────────────────────
+// 单一入口 scripts/run-guards.sh（B168 起）：包环 / Go 锚点 / 前端契约键 / JSON 键大小写
+// （--strict）/ 事件面 / 文件规模棘轮 / 目录卫生 / 死成员 / 统一响应外壳。
+// 注册在本块**之前**：下面的 subprojects{} 里 check 要 dependsOn 它，而 tasks.named()
+// 是立即解析的（找不到即抛异常）。
+val guards = tasks.register<Exec>("guards") {
+    group = "verification"
+    description = "九守卫（脚本入口与 CI guards job 同一份）"
+    workingDir = rootDir
+    commandLine("bash", "scripts/run-guards.sh")
+    // 默认 false：守卫失败即构建失败 —— 这正是接入的目的，别改成 ignoreExitValue。
+}
+
 subprojects {
     // withId：root 的 subprojects{} 在子项目应用插件**之前**求值，
-    // 直接 tasks.named("check") 会报 "Task with name 'check' not found"（实测）。
+    // ⚠️ 注意 guards 任务必须注册在本块**之前**（见下方 register），因为
+    // rootProject.tasks.named("guards") 是立即解析的，找不到就抛。
     plugins.withId("java") {
+        // 九守卫（B214 接进 check）：`scripts/run-guards.sh` 是本地与 CI 的**同一份**入口，
+        // 此前它只挂在 CI 的 guards job ⇒ 本地 `./gradlew build` 绿 ≠ CI 绿
+        // （B168 实测漏检过一次真失败：本地手敲守卫漏了 check-json-key-case 的 --strict）。
+        // 代价：CI 会跑两遍守卫（guards job + 本 job 的 build）—— 刻意的，两边同口径
+        // 比省一次扫描值。需要 python3 在 PATH 上（九条守卫都是 Python）。
+        tasks.named("check") { dependsOn(rootProject.tasks.named("guards")) }
         // `-parameters`：MyBatis 无 @Param 的参数绑定、Spring MVC/Jackson 的**参数名反射**都依赖它。
         // 该标志原由 org.springframework.boot 插件自动附加；B165 把 boot 插件从 :server 移到 :boot 后
         // :domains 丢失了它（当时还叫 :server） ⇒ 运行期大批 500（实测：BindingException: Parameter 'ids' not found +

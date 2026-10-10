@@ -41,7 +41,7 @@ configurations {
 // 依赖版本由 Boot BOM 统一（原由 org.springframework.boot 插件自动附带；B165 拆 :boot 后显式声明）
 dependencyManagement {
     imports {
-        mavenBom("org.springframework.boot:spring-boot-dependencies:3.3.5")
+        mavenBom(libs.spring.boot.dependencies.get().toString())
     }
 }
 
@@ -58,47 +58,47 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
 
     // 数据库
-    implementation("com.baomidou:mybatis-plus-spring-boot3-starter:3.5.7")
+    implementation(libs.mybatis.plus.starter)
     implementation("org.postgresql:postgresql")   // PGobject 等编译期可见（VectorStoreService）
     // Neo4j 图库驱动：NEO4J_ENABLE 未启用时驱动为 null，仓储全部操作为 no-op。
-    implementation("org.neo4j.driver:neo4j-java-driver:5.28.5")
+    implementation(libs.neo4j.java.driver)
     // S3 协议族存储后端（s3/minio/obs/ks3 共用一套 S3 协议客户端）。
     // 版本要求 ≥2.30：才有 requestChecksumCalculation 可放宽尾校验和协商——
     // S3 兼容服务（MinIO/OBS/KS3）常拒绝默认协商。
-    implementation("software.amazon.awssdk:s3:2.31.68")
+    implementation(libs.aws.sdk.s3)
     // 厂商原生存储 SDK：阿里云 OSS / 腾讯云 COS / 火山引擎 TOS。
-    implementation("com.aliyun.oss:aliyun-sdk-oss:3.18.1")
-    implementation("com.qcloud:cos_api:5.6.227")
-    implementation("com.volcengine:ve-tos-java-sdk:2.9.19")
+    implementation(libs.aliyun.oss)
+    implementation(libs.qcloud.cos)
+    implementation(libs.volcengine.tos)
     implementation("org.flywaydb:flyway-core")
     implementation("org.flywaydb:flyway-database-postgresql")
 
     // gRPC（docreader 客户端；proto 在仓库根 docreader/ 目录）
-    implementation("net.devh:grpc-client-spring-boot-starter:3.1.0.RELEASE")
-    implementation("com.google.protobuf:protobuf-java:3.25.5")
-    compileOnly("javax.annotation:javax.annotation-api:1.3.2")   // grpc 生成代码的 @Generated 注解
+    implementation(libs.grpc.client.starter)
+    implementation(libs.protobuf.java)
+    compileOnly(libs.javax.annotation.api)   // grpc 生成代码的 @Generated 注解
 
     // DuckDB（SQL 数据分析）
-    implementation("org.duckdb:duckdb_jdbc:1.1.3")
+    implementation(libs.duckdb.jdbc)
 
     // SQLite 检索引擎：xerial 纯 JDBC 驱动，平台 native 由 Maven 构件自带（仓内零二进制）。
     // 3.46.1 起支持 FTS5 / contentless_delete / bm25()。
-    implementation("org.xerial:sqlite-jdbc:3.46.1.3")
+    implementation(libs.sqlite.jdbc)
 
     // Doris 检索引擎：MySQL 协议主链路；Stream Load（HTTP/8030）由 DorisStreamLoadClient
     // 自持，不用 SDK。版本由 Spring Boot BOM 管理。
     implementation("com.mysql:mysql-connector-j")
 
     // JWT
-    implementation("io.jsonwebtoken:jjwt-api:0.12.6")
-    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")
-    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.6")
+    implementation(libs.jjwt.api)
+    runtimeOnly(libs.jjwt.impl)
+    runtimeOnly(libs.jjwt.jackson)
 
     // bcrypt（DefaultCost=10）
     implementation("org.springframework.security:spring-security-crypto")
 
     // tiktoken BPE 编码器（cl100k_base；纯 BPE、纯 Java、零传递依赖）
-    implementation("com.knuddels:jtokkit:1.1.0")
+    implementation(libs.jtokkit)
 
     // 工具
     compileOnly("org.projectlombok:lombok")
@@ -108,7 +108,7 @@ dependencies {
     testFixturesImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     // 架构规则测试（CI 的 ./gradlew build 即闸门）
-    testImplementation("com.tngtech.archunit:archunit:1.3.0")
+    testImplementation(libs.archunit)
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testRuntimeOnly("com.h2database:h2")   // 契约/单元测试内存库，不依赖外部 postgres
 }
@@ -116,11 +116,11 @@ dependencies {
 // proto 源目录指向仓库根 docreader/（单一来源，不复制）
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:3.25.5"
+        artifact = "com.google.protobuf:protoc:${libs.versions.protobuf.get()}"
     }
     plugins {
         create("grpc") {
-            artifact = "io.grpc:protoc-gen-grpc-java:1.66.0"
+            artifact = "io.grpc:protoc-gen-grpc-java:${libs.versions.grpc.get()}"
         }
     }
     generateProtoTasks {

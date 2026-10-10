@@ -1,0 +1,64 @@
+# 依赖版本目录（B214）：把此前散落在 4 个模块 build 文件里的硬编码版本收成单一来源。
+#
+# 起因：`spring-boot-dependencies:3.3.5` 在 4 个模块各写一遍（改版本要改 5 处）、
+# `mybatis-plus-spring-boot3-starter:3.5.7` 3 处、protobuf / neo4j / sqlite / archunit
+# 各 2 处 —— 升级时漏改一处就是「模块间版本漂移」，而且只在运行期才暴露。
+#
+# 范围（刻意的）：只登记**带显式版本号**的坐标与插件。版本由 Boot BOM 统一管理的依赖
+# （starter-* / flyway / h2 / junit-platform-launcher / spring-security-crypto 等）**不**登记
+# —— 它们本就没有版本可管，进了 catalog 反而制造"这里也要改"的错觉。
+#
+# 命名：别名用 kebab-case，Kotlin 访问器把 `-` 读作 `.`（`mybatis-plus-starter` → `libs.mybatis.plus.starter`）。
+
+[versions]
+spring-boot = "3.3.5"
+spring-dependency-management = "1.1.6"
+protobufPlugin = "0.9.4"
+spotless = "8.10.3"
+protobuf = "3.25.5"
+grpc = "1.66.0"
+mybatis-plus = "3.5.7"
+neo4j = "5.28.5"
+sqlite = "3.46.1.3"
+archunit = "1.3.0"
+jjwt = "0.12.6"
+awssdk-s3 = "2.31.68"
+duckdb = "1.1.3"
+grpcClientStarter = "3.1.0.RELEASE"
+javax-annotation = "1.3.2"
+jtokkit = "1.1.0"
+aliyun-oss = "3.18.1"
+qcloud-cos = "5.6.227"
+volcengine-tos = "2.9.19"
+
+[libraries]
+# ── 平台（BOM）：四个模块的 dependencyManagement 共用这一个 ──────────────────
+spring-boot-dependencies = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot" }
+
+# ── 跨模块共享 ─────────────────────────────────────────────────────────────
+mybatis-plus-starter = { module = "com.baomidou:mybatis-plus-spring-boot3-starter", version.ref = "mybatis-plus" }
+protobuf-java = { module = "com.google.protobuf:protobuf-java", version.ref = "protobuf" }
+protoc = { module = "com.google.protobuf:protoc", version.ref = "protobuf" }
+grpc-protoc-gen-java = { module = "io.grpc:protoc-gen-grpc-java", version.ref = "grpc" }
+grpc-client-starter = { module = "net.devh:grpc-client-spring-boot-starter", version.ref = "grpcClientStarter" }
+javax-annotation-api = { module = "javax.annotation:javax.annotation-api", version.ref = "javax-annotation" }
+neo4j-java-driver = { module = "org.neo4j.driver:neo4j-java-driver", version.ref = "neo4j" }
+sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version.ref = "sqlite" }
+archunit = { module = "com.tngtech.archunit:archunit", version.ref = "archunit" }
+jjwt-api = { module = "io.jsonwebtoken:jjwt-api", version.ref = "jjwt" }
+jjwt-impl = { module = "io.jsonwebtoken:jjwt-impl", version.ref = "jjwt" }
+jjwt-jackson = { module = "io.jsonwebtoken:jjwt-jackson", version.ref = "jjwt" }
+
+# ── 存储后端 SDK（domains 专属，但仍登记以保持"带版本者皆在此"的单一来源）────
+aws-sdk-s3 = { module = "software.amazon.awssdk:s3", version.ref = "awssdk-s3" }
+aliyun-oss = { module = "com.aliyun.oss:aliyun-sdk-oss", version.ref = "aliyun-oss" }
+qcloud-cos = { module = "com.qcloud:cos_api", version.ref = "qcloud-cos" }
+volcengine-tos = { module = "com.volcengine:ve-tos-java-sdk", version.ref = "volcengine-tos" }
+duckdb-jdbc = { module = "org.duckdb:duckdb_jdbc", version.ref = "duckdb" }
+jtokkit = { module = "com.knuddels:jtokkit", version.ref = "jtokkit" }
+
+[plugins]
+spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
+spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }
+protobuf = { id = "com.google.protobuf", version.ref = "protobufPlugin" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }

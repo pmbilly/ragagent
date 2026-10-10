@@ -1,5 +1,6 @@
 // 能力层模块（L2）：llm / retrieval / embedding / rerank / chatpipeline / modelcontext /
-// webfetch / stream / tracing / model / vectorstore —— 11 域（368 文件 / 58.3k 行）。
+// webfetch / tracing —— 8 域（295 文件 / 50.1k 行，2026-10-10 实测）。
+// （`stream` 已下沉 `:common`；`tracing` 只留 `decorators` 侧；`model`/`vectorstore` 已回业务侧。）
 //
 // 存在意义（B161，M1 第二步，承 B116 的 :common）：把"能力层不得依赖业务域（L2 → L3 = 0）"
 // 从守卫脚本规则**升格为编译规则** —— 此前由 check-package-cycles.py 的 R3 守（可被改白名单绕过），
@@ -9,14 +10,14 @@
 // （2026-10-09 实测：common 320 处 / event 21 处，业务域 0 处）。
 plugins {
     `java-library`
-    // 共享测试基座（EmbeddedRedis：engine 2 个 + server 15 个测试共用）⇒ 按方案文档 §5.2 风险 5 走 testFixtures，
+    // 共享测试基座（wire/ 录制夹具：domains 的线格式测试消费）⇒ 按方案文档 §5.2 风险 5 走 testFixtures，
     // 而不是把 helper 复制两份或让它留在某一侧的测试树里。
     `java-test-fixtures`
     id("io.spring.dependency-management")
     id("com.diffplug.spotless")
 }
 
-// 格式卫生：与 server / common 同口径（ratchet 从 seed 起只检查触碰过的文件）。
+// 格式卫生：四个模块同口径（ratchet 从 seed 起只检查触碰过的文件）。
 spotless {
     java {
         ratchetFrom("seed")
@@ -36,7 +37,7 @@ java {
 
 dependencyManagement {
     imports {
-        mavenBom("org.springframework.boot:spring-boot-dependencies:3.3.5")
+        mavenBom(libs.spring.boot.dependencies.get().toString())
     }
 }
 
@@ -56,9 +57,9 @@ dependencies {
     api("org.springframework.boot:spring-boot")
     api("org.springframework.boot:spring-boot-autoconfigure")
     api("org.slf4j:slf4j-api")
-    implementation("com.baomidou:mybatis-plus-spring-boot3-starter:3.5.7")
-    implementation("org.neo4j.driver:neo4j-java-driver:5.28.5")
-    implementation("org.xerial:sqlite-jdbc:3.46.1.3")
+    implementation(libs.mybatis.plus.starter)
+    implementation(libs.neo4j.java.driver)
+    implementation(libs.sqlite.jdbc)
     implementation("org.yaml:snakeyaml")
     implementation("com.zaxxer:HikariCP")
     // 运行期驱动（JDBC ServiceLoader 加载，编译期不可见；Doris 走 mysql 协议、pgvector 走 pg）

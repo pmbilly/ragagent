@@ -110,17 +110,21 @@ docker run --rm -p 8080:8080 --env-file .env ragagent-server
 | **契约测试** | `domains/src/testFixtures/resources/contracts/`（1,345 个金片）+ 30 个 `*ContractTest` | 逐字节钉死 HTTP 响应形状；改契约必须重录或改金片 |
 | **架构规则** | `boot/src/test/.../arch/ArchitectureRulesTest.java`（ArchUnit，A1–A13） | 禁裸 getenv、禁双装配、禁分层倒挂、Mapper 必须在 `..mapper..`… |
 | **序列化卫生** | `domains/src/test/.../arch/JsonPropertyHygieneTest.java`（A14） | 基线 0：我们自己的面上不得有冗余 `@JsonProperty`（四类必要形态除外） |
-| **九守卫** | `bash scripts/run-guards.sh` | 包循环 / Go 锚点 / 契约键 / JSON 键大小写 / 事件面 / **文件规模棘轮** / 目录卫生 / 死成员 / 统一响应外壳 |
+| **九守卫** | `bash scripts/run-guards.sh`（**已接入 `check`**，见下） | 包循环 / Go 锚点 / 契约键 / JSON 键大小写 / 事件面 / **文件规模棘轮** / 目录卫生 / 死成员 / 统一响应外壳 |
 | **CI** | `.github/workflows/ci.yml` | 4 个 job：guards（九守卫）· backend（真 ParadeDB + 真 Redis + 灌基线 SQL + 全量测试）· docker（镜像构建 + 迁移自检）· frontend |
 
 守卫大多是**棘轮**（ratchet）：登记基线后只许减不许增，例外须写明理由。新增违规当场变红。
+
+> 九守卫已作为 Gradle 任务 `:guards` **接入 `check`**（B214）⇒ 本地 `./gradlew build` 与 CI 同一口径，
+> 不存在"本地绿、CI 红"。单独跑：`./gradlew guards`（迭代时 `./gradlew :domains:test --tests ...` 不会触发它）。
+> 需要 `python3` 在 PATH 上。CI 会跑两遍守卫（guards job + backend job），是刻意取舍：两边同口径优先。
 
 ```bash
 export JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home
 
 ./gradlew :domains:test --tests "com.ragagent.session.*"   # 定向（迭代用，10~30s）
-./gradlew build                                             # 全量闸门（spotless + 测试 + javadoc）
-bash scripts/run-guards.sh                                  # 九守卫
+./gradlew build                                             # 全量闸门（spotless + 九守卫 + 测试 + javadoc）
+./gradlew guards                                            # 只跑九守卫（build 里已含）
 cd frontend && npx vue-tsc --build --force && npm test       # 前端
 ```
 
@@ -149,7 +153,7 @@ cd frontend && npx vue-tsc --build --force && npm test       # 前端
 - **Redis 测试会静默跳过**：14 个测试用 `assumeTrue(redis != null)`，`redis-server` 不在 PATH 就无声不测。看到 skipped 别当"全绿"。
 - **改契约要同 PR 带前端**：前端 TS 类型是**手写**的（无 codegen），后端改字段前端照样编译通过 ⇒ 靠 `scripts/check-fe-contract-keys.py` 兜。
 - **`Long != Long` 引用比较**：租户 id 超出 Long 缓存区，一律 `equals`。
-- **本仓无 version catalog、无覆盖率工具**：加依赖时注意 BOM 字符串在多处重复声明。
+- **加依赖版本要进 catalog**：`gradle/libs.versions.toml` 是唯一来源（B214 起）。别在模块 build 文件里写 `group:artifact:version` —— 那正是本次收拢掉的形态。无覆盖率工具（jacoco）仍是缺口。
 
 </details>
 

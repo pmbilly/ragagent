@@ -5,7 +5,7 @@
 // 依赖方向：domains → common；**common → 无**（本 build 文件里没有任何 project(...)）。
 //
 // 命名取 common 而非 contracts 的两个理由：
-//   1. 与顶层包一致 —— 135/175 文件就在 com.ragagent.common 下（模块名 = 顶层包名，最常规）；
+//   1. 与顶层包一致 —— 146/219 文件就在 com.ragagent.common 下（模块名 = 顶层包名，最常规）；
 //   2. 本仓 "contracts" 已被占用 —— domains/src/testFixtures/resources/contracts 有 1,426 个 golden
 //      契约夹具、另有 49 个 *ContractTest，再叫 contracts 会语义撞车。
 //
@@ -20,7 +20,7 @@ plugins {
     id("com.google.protobuf")   // OTLP proto（tracing 核心随 B163 迁入）
 }
 
-// 格式卫生：与 server 同口径（ratchet 从 seed 起只检查触碰过的文件）。
+// 格式卫生：四个模块同口径（ratchet 从 seed 起只检查触碰过的文件）。
 spotless {
     java {
         ratchetFrom("seed")
@@ -40,7 +40,7 @@ java {
 
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:3.25.5"
+        artifact = "com.google.protobuf:protoc:${libs.versions.protobuf.get()}"
     }
 }
 
@@ -50,7 +50,7 @@ sourceSets["main"].proto {
 
 dependencyManagement {
     imports {
-        mavenBom("org.springframework.boot:spring-boot-dependencies:3.3.5")
+        mavenBom(libs.spring.boot.dependencies.get().toString())
     }
 }
 
@@ -67,9 +67,9 @@ dependencies {
     api("org.springframework.boot:spring-boot-autoconfigure")
     api("org.springframework.data:spring-data-redis")
     api("org.slf4j:slf4j-api")
-    implementation("com.google.protobuf:protobuf-java:3.25.5")
+    implementation(libs.protobuf.java)
     // mybatis-plus：提供 org.apache.ibatis.* 与 com.baomidou.*（含 net.sf.jsqlparser）
-    api("com.baomidou:mybatis-plus-spring-boot3-starter:3.5.7")
+    api(libs.mybatis.plus.starter)
     compileOnly("jakarta.servlet:jakarta.servlet-api")
     compileOnly("jakarta.validation:jakarta.validation-api")
 
