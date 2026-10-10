@@ -2056,12 +2056,12 @@ const deleteKnowledgeDocuments = async (
   batchDeleting.value = true;
   let submitted = false;
   try {
-    const res = await submit();
+    await submit();
     if (!isActive()) return;
-    if (!res?.success) {
-      MessagePlugin.error(res?.message || t('knowledgeBase.batchDeleteFailed'));
-      return;
-    }
+    // 后端删除契约是**异步受理**：202 + `{taskId}`（单删）/ `{count,taskId}`（批删），
+    // 响应体**没有 success 键** —— 「成功」由 2xx + code 0 表达，其余都会 reject ⇒ 走下方 catch。
+    // 旧写法 `if (!res?.success)` 是同步契约的残留 ⇒ 请求已受理也误报「删除失败」，
+    // 而文档其实已删（刷新即消失）—— 与 AgentList/VectorStoreSettings 同族，那两处已按同一判据修过。
     submitted = true;
     MessagePlugin.info(t('knowledgeBase.deleteSubmitted'));
     if (batch) {
