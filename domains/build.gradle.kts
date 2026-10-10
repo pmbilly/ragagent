@@ -185,4 +185,9 @@ tasks.withType<Test> {
     // 契约夹具重录开关：-Dcontract.refresh=true 时把掩码后的实际响应写回
     // src/test/resources/contracts（平时是断言）；-D 只作用于 daemon JVM，需显式转发。
     systemProperty("contract.refresh", System.getProperty("contract.refresh") ?: "false")
+    // 钉死测试 JVM 时区（B173）：本仓是 Go 移植，**线格式断言里的时间戳就是 +08:00**
+    // （如 AgentStepsJsonTest 期望 "2026-09-18T10:00:00+08:00"），而 CI runner 是 **UTC** ✗
+    // ⇒ 不钉死就是"本机必绿、CI 必红"（2026-10-10 CI 实测 2 条；本机 TZ=UTC 精确复现 ✓）。
+    // 产品部署在 +08:00，故以此为测试基准；其他模块暂未见到时区敏感断言，先只钉这里。
+    systemProperty("user.timezone", "Asia/Shanghai")
 }

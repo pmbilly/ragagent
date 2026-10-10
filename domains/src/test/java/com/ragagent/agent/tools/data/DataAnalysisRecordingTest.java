@@ -233,6 +233,12 @@ class DataAnalysisRecordingTest {
             try {
                 conn = DriverManager.getConnection("jdbc:duckdb:");
                 try (Statement st = conn.createStatement()) {
+                    // 先做一次性联网 INSTALL（B173）：CI runner 与任何新机器都没有 `~/.duckdb` 缓存 ✗
+                    //（2026-10-10 CI 实测 8 条 "Extension ... IO Error" ✗）。INSTALL 对已装的扩展是
+                    // 幂等空操作 ✓；**装不上仍抛原来那条"不可用"消息 ⇒ 缺扩展是显式失败、绝不静默跳过**
+                    //（B170 的教训 ✗）。
+                    st.execute("INSTALL spatial;");
+                    st.execute("INSTALL excel;");
                     st.execute("LOAD spatial;");
                     st.execute("LOAD excel;");
                 }
