@@ -52,6 +52,19 @@ import com.ragagent.support.GoldenContract;
 @AutoConfigureMockMvc
 class WikiContractTest {
 
+
+    /** B202：统一外壳下钻 —— 返回 data 的紧凑 JSON（序保持 ✓）；非外壳原样返回。 */
+    private static String payload(String body) {
+        try {
+            var root = new com.fasterxml.jackson.databind.ObjectMapper().readTree(body);
+            if (root.isObject() && root.has("code") && root.has("data")) {
+                return root.get("data").toString();
+            }
+        } catch (Exception ignored) {
+            // 非 JSON（或空体）⇒ 原样
+        }
+        return body;
+    }
     private static final String BCRYPT = "$2a$10$9U3ZmqQkmCqoQUZapJ1Txe5puo70IHlrnyZnSdE9LO/HUagt5exnK"; // Passw0rd!
     private static final OffsetDateTime TS = OffsetDateTime.of(2026, 9, 18, 10, 0, 0, 123456000, ZoneOffset.ofHours(8));
 
@@ -164,10 +177,13 @@ class WikiContractTest {
                 .andExpect(status().isOk())
                 .andReturn();
         String listBody = list.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        assertTrue(list.getResponse().getContentAsString(StandardCharsets.UTF_8).contains("\"data\""),
+                "list 应带统一外壳（B202）：" + listBody);
+        listBody = payload(listBody);   // B202：外壳下钻
         for (String key : new String[]{"\"pages\"", "\"total\"", "\"page\"", "\"pageSize\"", "\"totalPages\""}) {
             assertTrue(listBody.contains(key), "list 应含分页键 " + key + ": " + listBody);
         }
-        assertFalse(listBody.contains("\"data\""), "list 无 data 信封: " + listBody);
+        assertFalse(listBody.contains("\"code\""), "下钻后 listBody 应为载荷（无 code 键）: " + listBody);
 
         // 3. get → 裸实体
         mockMvc.perform(get(base + "/pages/golden-page")
@@ -259,6 +275,7 @@ class WikiContractTest {
 
         // issues → 裸数组（无信封）
         String issues = body(get(base + "/issues"), token);
+        issues = payload(issues);   // B202：外壳下钻（裸数组断言看载荷）
         assertTrue(issues.trim().startsWith("["), "issues 应为裸数组: " + issues);
     }
 

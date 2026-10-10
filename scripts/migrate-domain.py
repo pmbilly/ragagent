@@ -144,12 +144,26 @@ def cmd_survey(domains):
             eps += len(re.findall(r'@(?:Get|Post|Put|Delete|Patch)Mapping', t))
             for ln, kind in private_error_forms(t):
                 forms.append('%s:%d %s' % (rel.split('/')[-1], ln, kind))
+        # B202：非控制器层（Ops / Support / Guard / Filter…）的 204 也要报 ——
+        # wiki 的两处 noContent() 就在 WikiPageOps / WikiFolderOps ✗（只扫 *Controller.java 会漏）
+        extra = []
+        pkg_root = ROOT / pathlib.Path(rels[0]).parent.parent
+        for q in sorted(pkg_root.rglob('*.java')):
+            if q.name.endswith('Controller.java'):
+                continue
+            for ln, kind in private_error_forms(q.read_text(encoding='utf-8')):
+                if kind.startswith('204'):
+                    extra.append('%s:%d %s' % (q.name, ln, kind))
         refs = golden_refs_of(dom)
         tests = [x.split('/')[-1] for x in test_files_of(dom)]
         print('  %-14s 控制器%d 端点%3d 金片%3d（有状态%d）' %
               (dom, len(rels), eps, len(refs), sum(1 for v in refs.values() if v)))
         print('     测试：%s' % (', '.join(tests) or '—'))
         print('     金片：%s' % (', '.join(sorted(refs)[:8]) + (' …' if len(refs) > 8 else '') or '—'))
+        if extra:
+            print('     ⚠️ 非控制器层 204 %d 处（迁移时也要改成 200 + 外壳）：' % len(extra))
+            for e in extra[:6]:
+                print('        %s' % e)
         if forms:
             print('     ⚠️ 私有形态 %d 处：' % len(forms))
             for f in forms[:8]:

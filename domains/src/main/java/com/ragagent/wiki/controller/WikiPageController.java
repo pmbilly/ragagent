@@ -1,6 +1,5 @@
 package com.ragagent.wiki.controller;
 
-import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.error.BizException;
@@ -20,6 +19,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.ragagent.common.web.ApiResult;
+import com.ragagent.common.error.AppError;
+import com.ragagent.common.web.ApiResponse;
 
 /**
  * Wiki 页面的 HTTP 层。
@@ -77,6 +79,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  */
 @RestController
+@ApiResult
 @RequestMapping("/api/v1/knowledgebase/{kbId}/wiki")
 public class WikiPageController {
 
@@ -256,9 +259,16 @@ public class WikiPageController {
         }
     }
 
-    /** handler 直写的错误信封：{@code {"error": ...}}。 */
+    /**
+     * 裸错误（{@link RawJsonError}）→ <b>统一外壳</b>（B202）。
+     *
+     * <p>退役记录：此前直写 {@code {"error": "…"}}（Go 迁移期与录制脚本对齐的产物 ✗）。
+     * 现在码值取 {@link AppError#ofHttpStatus} 的通用段（400/403/404 ⇒ 1010/1002/1003 ✓），
+     * HTTP 状态码仍按原样返回 ✓，机制本身（守卫/ops 抛 RawJsonError）保留 ✓。</p>
+     */
     @ExceptionHandler(RawJsonError.class)
-    public ResponseEntity<Map<String, Object>> handleRawJsonError(RawJsonError ex) {
-        return WikiRequestSupport.rawError(ex.status(), ex.getMessage());
+    public ResponseEntity<ApiResponse<Void>> handleRawJsonError(RawJsonError ex) {
+        AppError err = AppError.ofHttpStatus(ex.status(), ex.getMessage());
+        return ResponseEntity.status(ex.status()).body(ApiResponse.<Void>fail(err.code(), err.message(), null));
     }
 }

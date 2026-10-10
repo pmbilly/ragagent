@@ -58,6 +58,19 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 @AutoConfigureMockMvc
 class WikiHttpContractTest {
 
+
+    /** B202：统一外壳下钻 —— 返回 data 的紧凑 JSON（序保持 ✓）；非外壳原样返回。 */
+    private static String payload(String body) {
+        try {
+            var root = new com.fasterxml.jackson.databind.ObjectMapper().readTree(body);
+            if (root.isObject() && root.has("code") && root.has("data")) {
+                return root.get("data").toString();
+            }
+        } catch (Exception ignored) {
+            // 非 JSON（或空体）⇒ 原样
+        }
+        return body;
+    }
     private static final String BCRYPT =
             "$2a$10$9U3ZmqQkmCqoQUZapJ1Txe5puo70IHlrnyZnSdE9LO/HUagt5exnK"; // Passw0rd!
 
@@ -207,9 +220,9 @@ class WikiHttpContractTest {
         String body = body(perform(get("/api/v1/knowledgebase/" + KB_FOREIGN + "/wiki/pages")
                 .header("Authorization", "Bearer " + token)));
 
-        assertTrue(body.startsWith("{\"error\":{\"code\":1002,\"message\":\""),
+        assertTrue(body.startsWith("{\"code\":1002,\"message\":\""),   // B202：统一外壳
                 "跨空间拒绝必须是统一错误体：" + body);
-        assertTrue(body.endsWith("\"details\":null}}"), body);
+        assertTrue(body.endsWith("\"data\":null}"), body);   // B202：外壳尾部
         assertTrue(body.contains("Permission denied to access this knowledge base"), body);
     }
 
@@ -274,8 +287,7 @@ class WikiHttpContractTest {
                 .header("Authorization", "Bearer " + token));
 
         assertEquals(400, r.getResponse().getStatus(), body(r));
-        assertEquals("{\"error\":\"error code: 400, error message: Wiki feature is not enabled "
-                + "for this knowledge base\"}", body(r));
+        assertEquals("{\"code\":1000,\"message\":\"error code: 400, error message: Wiki feature is not enabled for this knowledge base\",\"data\":null}", body(r));   // B202：统一外壳
     }
 
     // ══════════════════════════════ 页面 CRUD ══════════════════════════════
@@ -288,6 +300,7 @@ class WikiHttpContractTest {
 
         String body = body(perform(get("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/pages")
                 .header("Authorization", "Bearer " + token)));
+        body = payload(body);   // B202：外壳下钻（形状/序断言看载荷）
 
         assertTrue(body.startsWith("{\"pages\":["), body);
         int iPages = body.indexOf("\"pages\"");
@@ -326,6 +339,7 @@ class WikiHttpContractTest {
 
         assertEquals(201, r.getResponse().getStatus(), body(r));
         String body = body(r);
+        body = payload(body);   // B202：外壳下钻（形状/序断言看载荷）
         assertFalse(body.contains("\"success\""), "实体直出不得带 data/success 信封：" + body);
         int iId = body.indexOf("\"id\":\"");
         int iTenant = body.indexOf("\"tenantId\":");
@@ -350,7 +364,7 @@ class WikiHttpContractTest {
                 .contentType("application/json")
                 .content("{\"slug\":\"x\",\"pageType\":\"bogus\"}"));
         assertEquals(400, bad.getResponse().getStatus(), body(bad));
-        assertEquals("{\"error\":\"Invalid page_type: bogus\"}", body(bad));
+        assertEquals("{\"code\":1000,\"message\":\"Invalid page_type: bogus\",\"data\":null}", body(bad));
 
         MvcResult empty = perform(post("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/pages")
                 .header("Authorization", "Bearer " + token)
@@ -367,7 +381,7 @@ class WikiHttpContractTest {
                 .contentType("application/json"));
 
         assertEquals(400, r.getResponse().getStatus(), body(r));
-        assertEquals("{\"error\":\"Invalid request body: EOF\"}", body(r));
+        assertEquals("{\"code\":1000,\"message\":\"Invalid request body: EOF\",\"data\":null}", body(r));
     }
 
     /** GetPage 走 catch-all slug：多段 slug（{@code entity/acme}）必须原样解析。 */
@@ -388,7 +402,7 @@ class WikiHttpContractTest {
                 .header("Authorization", "Bearer " + token));
 
         assertEquals(404, r.getResponse().getStatus(), body(r));
-        assertEquals("{\"error\":\"Wiki page not found\"}", body(r));
+        assertEquals("{\"code\":1003,\"message\":\"Wiki page not found\",\"data\":null}", body(r));
     }
 
     /**
@@ -406,7 +420,7 @@ class WikiHttpContractTest {
                 .content("{\"title\":\"Acme 2\",\"version\":99}"));
 
         assertEquals(409, r.getResponse().getStatus(), body(r));
-        assertEquals("{\"currentVersion\":1,\"error\":\"Wiki page was modified by someone else\"}",
+        assertEquals("{\"code\":0,\"message\":\"ok\",\"data\":{\"currentVersion\":1,\"error\":\"Wiki page was modified by someone else\"}}",
                 body(r));
     }
 
@@ -439,7 +453,7 @@ class WikiHttpContractTest {
                 .content("{\"status\":\"bogus\"}"));
 
         assertEquals(400, r.getResponse().getStatus(), body(r));
-        assertEquals("{\"error\":\"Invalid status: bogus\"}", body(r));
+        assertEquals("{\"code\":1000,\"message\":\"Invalid status: bogus\",\"data\":null}", body(r));
     }
 
     @Test
@@ -449,8 +463,8 @@ class WikiHttpContractTest {
 
         MvcResult del = perform(delete("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/pages/entity/acme")
                 .header("Authorization", "Bearer " + token));
-        assertEquals(204, del.getResponse().getStatus(), body(del));
-        assertEquals("", body(del));
+        assertEquals(200, del.getResponse().getStatus(), body(del));   // B202：204 退役 ⇒ 200 + 外壳
+        assertEquals("{\"code\":0,\"message\":\"ok\",\"data\":null}", body(del));   // B202：200 + 外壳
 
         assertEquals(404, status(get("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/pages/entity/acme")
                 .header("Authorization", "Bearer " + token)));
@@ -467,6 +481,7 @@ class WikiHttpContractTest {
 
         String body = body(perform(get("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/revisions/entity/acme")
                 .header("Authorization", "Bearer " + token)));
+        body = payload(body);   // B202：外壳下钻（形状断言看载荷）
         int iRev = body.indexOf("\"revisions\"");
         int iTotal = body.indexOf("\"total\"");
         int iCur = body.indexOf("\"currentVersion\"");
@@ -496,7 +511,7 @@ class WikiHttpContractTest {
                     .param("version", bad)
                     .header("Authorization", "Bearer " + token));
             assertEquals(400, r.getResponse().getStatus(), body(r));
-            assertEquals("{\"error\":\"Invalid version\"}", body(r));
+            assertEquals("{\"code\":1000,\"message\":\"Invalid version\",\"data\":null}", body(r));
         }
     }
 
@@ -506,7 +521,7 @@ class WikiHttpContractTest {
         MvcResult r = perform(get("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/revisions/nope")
                 .header("Authorization", "Bearer " + token));
         assertEquals(404, r.getResponse().getStatus(), body(r));
-        assertEquals("{\"error\":\"Wiki page not found\"}", body(r));
+        assertEquals("{\"code\":1003,\"message\":\"Wiki page not found\",\"data\":null}", body(r));
     }
 
     /** Revert 到当前版本 → <b>400</b>（不是 500），文案为固定的哨兵错误。 */
@@ -521,7 +536,7 @@ class WikiHttpContractTest {
                 .content("{\"slug\":\"entity/acme\",\"version\":1}"));
 
         assertEquals(400, r.getResponse().getStatus(), body(r));
-        assertEquals("{\"error\":\"cannot revert to the current version\"}", body(r));
+        assertEquals("{\"code\":1000,\"message\":\"cannot revert to the current version\",\"data\":null}", body(r));
     }
 
     @Test
@@ -551,10 +566,7 @@ class WikiHttpContractTest {
                 .content("{}"));
 
         assertEquals(400, r.getResponse().getStatus(), body(r));
-        assertEquals("{\"error\":\"Invalid request body: "
-                + "field 'slug' is required\\n"
-                + "field 'version' is required\"}",
-                body(r));
+                assertEquals("{\"code\":1000,\"message\":\"Invalid request body: field 'slug' is required\\nfield 'version' is required\",\"data\":null}", body(r));   // B202：统一外壳
     }
 
     // ══════════════════════════════ 移动 / 文件夹 ══════════════════════════════
@@ -568,7 +580,7 @@ class WikiHttpContractTest {
                 .content("{}"));
 
         assertEquals(400, r.getResponse().getStatus(), body(r));
-        assertEquals("{\"error\":\"Invalid request body: field 'slug' is required\"}", body(r));
+        assertEquals("{\"code\":1000,\"message\":\"Invalid request body: field 'slug' is required\",\"data\":null}", body(r));
     }
 
     @Test
@@ -579,7 +591,7 @@ class WikiHttpContractTest {
                 .contentType("application/json")
                 .content("{\"slug\":\"nope\"}"));
         assertEquals(404, r.getResponse().getStatus(), body(r));
-        assertEquals("{\"error\":\"wiki page not found\"}", body(r));
+        assertEquals("{\"code\":1003,\"message\":\"wiki page not found\",\"data\":null}", body(r));
     }
 
     /** 移动页面会重算缓存的 category_path（folder_id 是唯一真相来源）。 */
@@ -612,7 +624,7 @@ class WikiHttpContractTest {
                 .contentType("application/json")
                 .content("{\"parentId\":\"\",\"name\":\"AI\"}"));
         assertEquals(409, dup.getResponse().getStatus(), body(dup));
-        assertEquals("{\"error\":\"wiki folder name conflict\"}", body(dup));
+        assertEquals("{\"code\":1005,\"message\":\"wiki folder name conflict\",\"data\":null}", body(dup));
 
         // 改名
         MvcResult renamed = perform(put("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/folders/" + folderId)
@@ -625,13 +637,13 @@ class WikiHttpContractTest {
         // 空文件夹可删 → 204
         MvcResult del = perform(delete("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/folders/" + folderId)
                 .header("Authorization", "Bearer " + token));
-        assertEquals(204, del.getResponse().getStatus(), body(del));
+        assertEquals(200, del.getResponse().getStatus(), body(del));   // B202：204 退役 ⇒ 200 + 外壳
 
         // 未知文件夹 → 404
         MvcResult missing = perform(delete("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/folders/nope")
                 .header("Authorization", "Bearer " + token));
         assertEquals(404, missing.getResponse().getStatus(), body(missing));
-        assertEquals("{\"error\":\"wiki folder not found\"}", body(missing));
+        assertEquals("{\"code\":1003,\"message\":\"wiki folder not found\",\"data\":null}", body(missing));
     }
 
     /** 非空（含子文件夹）的文件夹不可删 → 409，文案为固定哨兵值。 */
@@ -644,7 +656,7 @@ class WikiHttpContractTest {
         MvcResult r = perform(delete("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/folders/" + parent)
                 .header("Authorization", "Bearer " + token));
         assertEquals(409, r.getResponse().getStatus(), body(r));
-        assertEquals("{\"error\":\"wiki folder is not empty\"}", body(r));
+        assertEquals("{\"code\":1005,\"message\":\"wiki folder is not empty\",\"data\":null}", body(r));
     }
 
     /**
@@ -661,6 +673,7 @@ class WikiHttpContractTest {
 
         String body = body(perform(get("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/folders")
                 .header("Authorization", "Bearer " + token)));
+        body = payload(body);   // B202：外壳下钻（形状/序断言看载荷）
         assertTrue(body.startsWith("{\"parentId\":\"\",\"folders\":["), body);
         assertTrue(body.contains("\"name\":\"AI\""), body);
         assertTrue(body.contains("\"path\":\"AI\""), body);
@@ -671,6 +684,7 @@ class WikiHttpContractTest {
         String children = body(perform(get("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/folders")
                 .param("parentId", parent)
                 .header("Authorization", "Bearer " + token)));
+        children = payload(children);   // B202：外壳下钻（形状/序断言看载荷）
         assertTrue(children.contains("\"name\":\"LLM\""), children);
         assertTrue(children.contains("\"hasChildren\":false"), children);
     }
@@ -685,6 +699,7 @@ class WikiHttpContractTest {
 
         String body = body(perform(get("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/index")
                 .header("Authorization", "Bearer " + token)));
+        body = payload(body);   // B202：外壳下钻（形状/序断言看载荷）
         int iIntro = body.indexOf("\"intro\"");
         int iVersion = body.indexOf("\"version\"");
         int iGroups = body.indexOf("\"groups\"");
@@ -696,13 +711,13 @@ class WikiHttpContractTest {
     /** GetGraph 的参数校验分支逐一钉桩（400 文案逐字固定）。 */
     @ParameterizedTest(name = "{0}")
     @CsvSource(delimiter = '|', value = {
-            "bad mode       | mode=top  | {\"error\":\"mode must be 'overview' or 'ego'\"}",
-            "ego w/o center | mode=ego  | {\"error\":\"center is required when mode=ego\"}",
-            "depth zero     | depth=0   | {\"error\":\"depth must be a positive integer\"}",
-            "depth negative | depth=-2  | {\"error\":\"depth must be a positive integer\"}",
-            "depth not int  | depth=abc | {\"error\":\"depth must be a positive integer\"}",
-            "limit zero     | limit=0   | {\"error\":\"limit must be a positive integer\"}",
-            "limit not int  | limit=x   | {\"error\":\"limit must be a positive integer\"}",
+            "bad mode       | mode=top  | {\"code\":1000,\"message\":\"mode must be 'overview' or 'ego'\",\"data\":null}",
+            "ego w/o center | mode=ego  | {\"code\":1000,\"message\":\"center is required when mode=ego\",\"data\":null}",
+            "depth zero     | depth=0   | {\"code\":1000,\"message\":\"depth must be a positive integer\",\"data\":null}",
+            "depth negative | depth=-2  | {\"code\":1000,\"message\":\"depth must be a positive integer\",\"data\":null}",
+            "depth not int  | depth=abc | {\"code\":1000,\"message\":\"depth must be a positive integer\",\"data\":null}",
+            "limit zero     | limit=0   | {\"code\":1000,\"message\":\"limit must be a positive integer\",\"data\":null}",
+            "limit not int  | limit=x   | {\"code\":1000,\"message\":\"limit must be a positive integer\",\"data\":null}",
     })
     void graphRejectsBadParams(String name, String query, String expected) throws Exception {
         String token = loginOwner();
@@ -736,6 +751,7 @@ class WikiHttpContractTest {
 
         String body = body(perform(get("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/graph")
                 .header("Authorization", "Bearer " + token)));
+        body = payload(body);   // B202：外壳下钻（形状/序断言看载荷）
         assertTrue(body.startsWith("{\"nodes\":["), body);
         assertTrue(body.contains("\"mode\":\"overview\""), body);
         assertTrue(body.contains("\"slug\":\"entity/acme\""), body);
@@ -750,6 +766,7 @@ class WikiHttpContractTest {
 
         String body = body(perform(get("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/stats")
                 .header("Authorization", "Bearer " + token)));
+        body = payload(body);   // B202：外壳下钻（形状/序断言看载荷）
         assertTrue(body.startsWith("{\"totalPages\":1"), body);
         int iPages = body.indexOf("\"totalPages\"");
         int iByType = body.indexOf("\"pagesByType\"");
@@ -769,12 +786,12 @@ class WikiHttpContractTest {
         MvcResult missing = perform(get("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/search")
                 .header("Authorization", "Bearer " + token));
         assertEquals(400, missing.getResponse().getStatus(), body(missing));
-        assertEquals("{\"error\":\"Search query 'q' is required\"}", body(missing));
+        assertEquals("{\"code\":1000,\"message\":\"Search query 'q' is required\",\"data\":null}", body(missing));
 
         MvcResult hit = perform(get("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/search?q=Acme")
                 .header("Authorization", "Bearer " + token));
         assertEquals(200, hit.getResponse().getStatus(), body(hit));
-        assertTrue(body(hit).startsWith("{\"pages\":["),
+        assertTrue(payload(body(hit)).startsWith("{\"pages\":["),
                 "SearchPages 是 gin.H{\"pages\":...}：" + body(hit));
     }
 
@@ -784,7 +801,7 @@ class WikiHttpContractTest {
         MvcResult r = perform(post("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/rebuild-links")
                 .header("Authorization", "Bearer " + token));
         assertEquals(200, r.getResponse().getStatus(), body(r));
-        assertEquals("{\"message\":\"Links rebuilt successfully\"}", body(r));
+        assertEquals("{\"code\":0,\"message\":\"ok\",\"data\":{\"message\":\"Links rebuilt successfully\"}}", body(r));
     }
 
     @Test
@@ -794,6 +811,7 @@ class WikiHttpContractTest {
 
         String report = body(perform(get("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/lint")
                 .header("Authorization", "Bearer " + token)));
+        report = payload(report);   // B202：外壳下钻（形状/序断言看载荷）
         int iKb = report.indexOf("\"knowledgeBaseId\"");
         int iIssues = report.indexOf("\"issues\"");
         int iScore = report.indexOf("\"healthScore\"");
@@ -804,6 +822,7 @@ class WikiHttpContractTest {
 
         String fix = body(perform(post("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/auto-fix")
                 .header("Authorization", "Bearer " + token)));
+        fix = payload(fix);   // B202：外壳下钻（形状/序断言看载荷）
         // 响应键按字母序：fixed < message
         assertTrue(fix.startsWith("{\"fixed\":"), fix);
         assertTrue(fix.contains("\"message\":\"Auto-fixed "), fix);
@@ -816,7 +835,7 @@ class WikiHttpContractTest {
         MvcResult r = perform(get("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/issues")
                 .header("Authorization", "Bearer " + token));
         assertEquals(200, r.getResponse().getStatus(), body(r));
-        assertTrue(body(r).startsWith("["), body(r));
+        assertTrue(payload(body(r)).startsWith("["), body(r));   // B202：外壳下钻
     }
 
     @Test
@@ -828,7 +847,7 @@ class WikiHttpContractTest {
                 .contentType("application/json")
                 .content("{\"status\":\"nope\"}"));
         assertEquals(400, bad.getResponse().getStatus(), body(bad));
-        assertEquals("{\"error\":\"Invalid status. Must be pending, ignored, or resolved\"}", body(bad));
+        assertEquals("{\"code\":1000,\"message\":\"Invalid status. Must be pending, ignored, or resolved\",\"data\":null}", body(bad));
 
         // 缺 required 字段时的 400 文案：字段级校验错误，不带类型名前缀
         MvcResult missing = perform(put("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/issues/i-1/status")
@@ -836,14 +855,14 @@ class WikiHttpContractTest {
                 .contentType("application/json")
                 .content("{}"));
         assertEquals(400, missing.getResponse().getStatus(), body(missing));
-        assertEquals("{\"error\":\"Invalid request body: field 'status' is required\"}", body(missing));
+        assertEquals("{\"code\":1000,\"message\":\"Invalid request body: field 'status' is required\",\"data\":null}", body(missing));
 
         MvcResult ok = perform(put("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/issues/i-1/status")
                 .header("Authorization", "Bearer " + token)
                 .contentType("application/json")
                 .content("{\"status\":\"ignored\"}"));
         assertEquals(200, ok.getResponse().getStatus(), body(ok));
-        assertEquals("{\"message\":\"Issue status updated successfully\"}", body(ok));
+        assertEquals("{\"code\":0,\"message\":\"ok\",\"data\":{\"message\":\"Issue status updated successfully\"}}", body(ok));   // B202：统一外壳
     }
 
     // ══════════════════════════════ 测试工具 ══════════════════════════════

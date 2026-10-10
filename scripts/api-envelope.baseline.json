@@ -1,7 +1,6 @@
 {
   "pending": {
     "domains/src/main/java/com/ragagent/im/controller/ImCallbackController.java": "待迁移（存量控制器；B183 起新控制器请直接标注 @ApiResult）",
-    "domains/src/main/java/com/ragagent/wiki/controller/WikiPageController.java": "待迁移（存量控制器；B183 起新控制器请直接标注 @ApiResult）",
     "common/src/main/java/com/ragagent/common/web/HealthController.java": "已知例外（B200）：/health 是基础设施探针（k8s/docker healthcheck、外部监控 ✓）⇒ 保持 {\"status\":\"ok\"}，不进统一外壳；见 docs/api-response-convention.md"
   }
 }

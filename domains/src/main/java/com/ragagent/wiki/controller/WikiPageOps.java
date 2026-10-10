@@ -38,6 +38,7 @@ import static com.ragagent.wiki.controller.WikiRequestSupport.q;
 import static com.ragagent.wiki.controller.WikiRequestSupport.query;
 import static com.ragagent.wiki.controller.WikiRequestSupport.requiredFieldErrors;
 import static com.ragagent.wiki.controller.WikiRequestSupport.trimSpace;
+import com.ragagent.common.web.ApiResponse;
 
 /**
  * 页面资源端点的执行体：CRUD、修订历史、回滚。KB 访问守卫与活动记账由
@@ -297,7 +298,7 @@ final class WikiPageOps {
         }
 
         activity.recordManualWikiActivity(page, "manual_delete");
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(ApiResponse.ok());   // B202：204 退役（空体与「外壳恒存在」冲突）
     }
 
     // ── 修订历史 ──

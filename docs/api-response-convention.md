@@ -131,3 +131,14 @@ grep -rnE 'error\\.(code|message|details)|\\.data\\.error\\b' frontend/src front
    VectorStoreContractTest / W5bInitializationContractTest / ValidationContractTest）+ W5c 的 api-key 取值 1 处。
 2. **金片脚本只许跳过已含 `code` 的字典** ✗ —— 早先只跳过 `code == 0`，于是把 `{"code":1005,…}` 这类**错误体**又包了一层 ⇒
    出现**双层外壳**金片（本轮拆了 8 个 ✓）。
+
+### 附：B202（wiki）的经验
+
+1. **Go 字节级"裸体/字段序"断言** ✗ —— `WikiHttpContractTest` 有一批 `body.startsWith("{\"pages\":[")` / `indexOf` 序检查，
+   统一外壳下会全红。**最小改法**：给测试加一个 `payload(body)` 助手（把 `data` 用 Jackson 重新序列化成**紧凑** JSON ✓ 键序保持 ✓），
+   在断言前下钻一次即可 —— 原有字节断言**一行不用改** ✓（WikiContractTest 的"裸数组/无 data 信封"断言按新约定反转 ✓）。
+2. **多行/转义字面量回填** ✗ —— converge 的正则只能改**单行**字面量；`+` 拼接的多行期望、
+   `@CsvSource` 单元格、以及 JSON 里带 `\n` 的文案都要**转义级回填**（把"期望/实际"按 Java 源码转义形态替换 ✓），
+   必要时用 actual 做**语义重建**（`json.loads(actual)` → 重建 `{code,message,data}` → 转义成单行断言 ✓）。
+3. **私有 `@ExceptionHandler` 的收口**：wiki 的 `RawJsonError`（守卫/ops 抛 400/403/404）不再直写 `{"error":…}`，
+   改由 handler 输出统一外壳（码值取 `AppError.ofHttpStatus` ✓ 状态码不变 ✓）——机制保留、形态统一 ✓。
