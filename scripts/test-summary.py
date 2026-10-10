@@ -46,7 +46,7 @@ def main() -> int:
             for tc in r.iter("testcase"):
                 name = f'{cls}.{tc.get("name")}'
                 for bad in list(tc.iter("failure")) + list(tc.iter("error")):
-                    msg = (bad.get("message") or "").strip().replace("\n", " ")[:200]
+                    msg = (bad.get("message") or "").strip().replace("\n", " ")[:800]   # 800：够看到 expected/actual 的分叉点（B179）
                     fails.append((mod, name, msg))
                 sk = tc.find("skipped")
                 if sk is not None:

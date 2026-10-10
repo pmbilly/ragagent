@@ -2,6 +2,7 @@ package com.ragagent.evaluation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
@@ -181,10 +182,21 @@ class EvaluationContractTest {
                 "{\"knowledgeBaseId\":\"" + KB_ID + "\",\"chatId\":\"fake-chat-model-id\"}"))
                 .andReturn();
         assertEquals(200, r.getResponse().getStatus(), raw(r));
-        assertEquals(mask(golden("ev-post.json")), mask(raw(r)));
-        // status=0（创建快照；后台线程竞态下 0/1 都可能出现）
-        JsonNode node = MAPPER.readTree(raw(r));
-        assertEquals(0, node.path("task").path("status").asInt());
+        // ⚠️ status 是**创建瞬间的竞态字段**：后台执行线程可能已把 0 推成 1（本用例原注释就自陈
+        // "后台线程竞态下 0/1 都可能出现" ✗，可原断言既做整体比对、又硬要求 0 ⇒ CI 偶发假红，
+        // 2026-10-10 实测 ✓）。改为：两侧**同规则归一** status 后再整体比对 ✓，并单独断言
+        // status ∈ {0,1} ✓ —— 契约不缩水（创建瞬间本来就只该是 0/1 ✓），只是不再对竞态字段要求确定值 ✓。
+        String actual = raw(r);
+        int status = MAPPER.readTree(actual).path("task").path("status").asInt();
+        assertTrue(status == 0 || status == 1,
+                "创建瞬间 status 应为 0/1，实为 " + status + "：" + actual);
+        assertEquals(normalizeCreatedStatus(mask(golden("ev-post.json"))),
+                normalizeCreatedStatus(mask(actual)));
+    }
+
+    /** 把创建瞬间的竞态字段 {@code status}（0/1 二值）两侧同规则归一为 0，供整体形状比对。 */
+    private static String normalizeCreatedStatus(String body) {
+        return body.replaceAll("\"status\":\\s*[01]", "\"status\":0");
     }
 
     /** 终态：真实执行（无 embedding 模型 → failed，errMsg = AppError 原文）。 */
