@@ -70,7 +70,14 @@ jobs:
       - name: Spotless check（ratchet 自 seed，仅检查触碰过的文件）
         run: ./gradlew spotlessCheck
       - name: Build & test（PG 走默认 localhost:15432 + dev 同口令 ⇒ 两个录测试真跑）
-        run: ./gradlew build
+        # `tee` 落盘 + pipefail 保退出码 ⇒ 失败时下面的注解步能把关键行变成注解（公开 API 可读 ✓）
+        run: set -o pipefail; ./gradlew build 2>&1 | tee /tmp/build.log
+
+      # B175：构建失败也自证 —— 日志要鉴权才看得到 ✗，这里把关键行（What went wrong / OOM / worker 崩 …）
+      # 变成 ::error 注解 ⇒ job 页与公开 API 都能读 ✓。
+      - name: 构建日志关键行（失败时把"为什么红"变成注解）
+        if: failure()
+        run: python3 scripts/ci-log-annotate.py /tmp/build.log
 
       # B171：失败/跳过都摆上台面 —— 失败用例名 + 首行消息、**跳过用例名 + 原因**（跳过 = 覆盖没跑）。
       # 在 Actions 里还会发 ::error/::notice 注解 ⇒ 可用公开 API 读（无需人肉捞日志）。

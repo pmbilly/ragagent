@@ -173,7 +173,10 @@ tasks.withType<Test> {
     // 而套件是 I/O 型长尾（Top 20 类占 55%，全是 HTTP 契约往返与嵌入式 Redis）⇒ 分叉收益直接。
     // 实测：全量测试 214s → 见 §15.1.1 B142 记录（连跑三遍验稳定性）。
     // 注意：契约类会各起桩服务器/嵌入式 Redis，若将来出现端口或夹具冲突，先降 fork 数再查桩。
-    maxParallelForks = 4
+    // 分叉数**按核数自适应**（B175）：CI runner 只有 4 核 ✗，而 4 fork × maxHeapSize 2g = 8g
+    // ⇒ 与 daemon / PG 容器抢内存 ⇒ worker 崩（表现为"任务失败但零失败用例" ✗，日志还要鉴权才看得到 ✗）。
+    // 规则：每核 2 个 fork 上限，且不超过原来的 4（本地 10 核 ⇒ 仍是 4，与 B142 的调参一致 ✓）。
+    maxParallelForks = maxOf(1, minOf(4, Runtime.getRuntime().availableProcessors() / 2))
     // 测试 JVM 堆：单 fork 时代 5g（多个 @SpringBootTest 上下文各自驻留整份上下文）；
     // 分 4 叉后每个 JVM 驻留的上下文≈1/4 ⇒ 2g 起步（fork 数变了就重新看堆，别照搬旧值）。
     maxHeapSize = "2g"
