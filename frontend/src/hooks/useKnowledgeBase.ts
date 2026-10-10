@@ -142,8 +142,10 @@ export default function (knowledgeBaseId?: string) {
         uploadInput.value.value = "";
       })
       .catch((err: any) => {
-        const errorMessage = err.error?.message || err.message || t('knowledgeBase.uploadFailed');
-        MessagePlugin.error(err.error?.code === 2400 ? t('knowledgeBase.fileExists') : errorMessage);
+        // 错误体经拦截器摊平到顶层（{status,message,code,data}）：读 err.message / err.code。
+        // 旧读法 err.error?.code（嵌套）恒 undefined ⇒ 重复文件提示从未生效（B229）。
+        const errorMessage = err.message || t('knowledgeBase.uploadFailed');
+        MessagePlugin.error(err.code === 2400 ? t('knowledgeBase.fileExists') : errorMessage);
         uploadInput.value.value = "";
       });
   };

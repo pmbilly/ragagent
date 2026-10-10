@@ -52,14 +52,14 @@ test('keeps untruncated totals when the listed collections are capped', () => {
 })
 
 test('recognizes only the dedicated model-in-use code with a valid payload', () => {
+  // 真实形态：响应拦截器把错误体**摊平**到顶层（`{status, message, code, data}`）。
+  // 旧夹具用的 `{error:{code,details}}` 嵌套形态是 axios 残留 —— 它让 B229 那条
+  // "用量弹窗永不出现"的 bug 长期常绿（测试照着实现写，两边一起错）。
   const conflict = modelInUseErrorFromRequest({
     status: 400,
-    success: false,
-    error: {
-      code: MODEL_IN_USE_ERROR_CODE,
-      message: 'backwards-compatible server message',
-      details,
-    },
+    message: 'model is used by 3 resource(s)',
+    code: MODEL_IN_USE_ERROR_CODE,
+    data: details,
   })
 
   assert.ok(conflict instanceof ModelInUseError)
@@ -84,13 +84,23 @@ test('rejects malformed details instead of guessing from the server message', ()
     agents: [],
     longTermMemory: { bindings: [] },
   }), null)
+  // 码对、但载荷不含任何可用引用 ⇒ 仍返回 null（不拿服务端文案去猜结构）
   assert.equal(modelInUseErrorFromRequest({
-    error: {
-      code: MODEL_IN_USE_ERROR_CODE,
-      message: 'model is used by 1 knowledge base(s)',
-      details: null,
-    },
+    status: 400,
+    message: 'model is used by 1 knowledge base(s)',
+    code: MODEL_IN_USE_ERROR_CODE,
+    data: null,
   }), null)
+})
+
+test('tolerates the legacy nested error shape (defensive branch kept)', () => {
+  // 实现里保留了一条兼容分支（万一调用方拿到的是未摊平的 axios error）。
+  // 这条测试钉住它，同时说明"主路径是顶层形态"。
+  const legacy = modelInUseErrorFromRequest({
+    status: 400,
+    error: { code: MODEL_IN_USE_ERROR_CODE, details },
+  })
+  assert.ok(legacy instanceof ModelInUseError)
 })
 
 test('keeps navigation and localization stable for all resource kinds', () => {

@@ -99,10 +99,16 @@ export function parseModelUsageDetails(value: unknown): ModelUsageDetails | null
 }
 
 export function modelInUseErrorFromRequest(error: unknown): ModelInUseError | null {
-  if (!isRecord(error) || !isRecord(error.error) || error.error.code !== MODEL_IN_USE_ERROR_CODE) {
-    return null
-  }
-  const details = parseModelUsageDetails(error.error.details)
+  if (!isRecord(error)) return null
+  // 响应拦截器会把错误体**摊平到顶层**（utils/request.ts 的错误分支：
+  // `{status, message, ...data}`）⇒ 实际形状是 `{status, message, code, data}`。
+  // 旧写法读 `error.error.code` / `error.error.details` 是 **axios 形态残留** ⇒ 恒 undefined
+  // ⇒ 本函数恒返回 null ⇒「模型被引用」的结构化用量弹窗**永不出现**，用户只见通用 toast
+  //（B229 修正；测试夹具也一并换成真实形态，旧夹具曾让这条 bug 长期常绿）。
+  // 兼容分支：万一调用方直接拿到原始 axios error（含 .error 嵌套），也认。
+  const body: Record<string, unknown> = isRecord(error.error) ? error.error : error
+  if (body.code !== MODEL_IN_USE_ERROR_CODE) return null
+  const details = parseModelUsageDetails(body.details ?? body.data)
   return details ? new ModelInUseError(details) : null
 }
 

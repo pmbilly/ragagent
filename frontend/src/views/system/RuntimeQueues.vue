@@ -801,11 +801,10 @@ async function fetchRuntimeTasks(reset: boolean) {
     tasksHasMore.value = response.hasMore && Boolean(response.nextCursor)
   } catch (err: any) {
     if (requestID !== tasksRequestID) return
-    if (!reset && err?.code === 'runtime_task_cursor_expired') {
-      tasksLoadingMore.value = false
-      await fetchRuntimeTasks(true)
-      return
-    }
+    // 注：曾在此判 `err?.code === 'runtime_task_cursor_expired'` 并重置分页 —— 该分支**永远不执行**：
+    // 后端 SystemAdminController 的 runtime tasks 端点只有 state/pageSize（无 cursor 语义、
+    // 亦无此错误码），错误码在外壳化后也是数字。已移除（B229）；若将来后端真引入游标过期，
+    // 请用真实码值并以 request.ts 摊平后的顶层 `err.code` 判定。
     tasksError.value = err?.message || t('system.globalSettings.runtime.tasks.loadError')
   } finally {
     if (requestID !== tasksRequestID) return

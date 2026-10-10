@@ -2116,7 +2116,9 @@ const startPolling = (taskId: string) => {
     } catch (error: any) {
       console.error('Failed to poll task status:', error)
       // 如果任务不存在或已过期，清除存储
-      if (error?.response?.status === 404 || error?.message?.includes('not found')) {
+      // 拦截器产出的错误对象没有 axios 的 .response（见 utils/request.ts）⇒ 判顶层 error.status；
+      // 文案兜底保留（后端文案含 "not found"）。
+      if (error?.status === 404 || error?.response?.status === 404 || error?.message?.includes('not found')) {
         clearTaskIdFromStorage()
         stopPolling()
         importState.taskId = null
@@ -2225,7 +2227,9 @@ const restoreImportTask = async () => {
   } catch (error: any) {
     console.error('Failed to restore import task:', error)
     // 如果任务不存在或已过期，清除存储
-    if (error?.response?.status === 404 || error?.message?.includes('not found')) {
+    // 拦截器产出的错误对象没有 axios 的 .response（见 utils/request.ts）⇒ 判顶层 error.status；
+      // 文案兜底保留（后端文案含 "not found"）。
+      if (error?.status === 404 || error?.response?.status === 404 || error?.message?.includes('not found')) {
       clearTaskIdFromStorage()
     }
   }

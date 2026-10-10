@@ -1,5 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch, reactive, computed, nextTick } from "vue";
+
+/** 后端 `ErrorCode.KNOWLEDGE_DUPLICATE_FILE` / `_URL`（`common/.../error/ErrorCode.java`）。
+ *  错误体经响应拦截器**摊平**后，码落在**顶层 `error.code`**，且是**数字** —— 勿与字符串比较。 */
+const KNOWLEDGE_DUPLICATE_FILE_CODE = 2400;
+const KNOWLEDGE_DUPLICATE_URL_CODE = 2401;
 import { MessagePlugin } from "tdesign-vue-next";
 import DocContent from "@/components/doc-content.vue";
 import useKnowledgeBase from '@/hooks/useKnowledgeBase';
@@ -1628,8 +1633,11 @@ const executeUploadBatch = async (
     } catch (error: any) {
       failCount++;
       if (totalCount === 1) {
-        let errorMessage = error?.error?.message || error?.message || t('knowledgeBase.uploadFailed');
-        if (error?.code === 'duplicate_file') {
+        // 拦截器把错误摊平到顶层（{status,message,code,data}）⇒ 读 error.message / error.code；
+        // 重复文件的码是**数字 2400**（后端 ErrorCode.KNOWLEDGE_DUPLICATE_FILE），
+        // 旧的字符串比较 'duplicate_file' 恒 false ⇒ 该本地化分支从未生效（B229）。
+        let errorMessage = error?.message || t('knowledgeBase.uploadFailed');
+        if (error?.code === KNOWLEDGE_DUPLICATE_FILE_CODE) {
           errorMessage = t('knowledgeBase.fileExists');
         }
         MessagePlugin.error(errorMessage);
@@ -1672,8 +1680,9 @@ const executeUrlImport = async (
     // ⇒ 走下方 catch（那里的 error.code 才带 duplicate_url）。旧多条件兜底只是恰好有效。
     MessagePlugin.success(t('knowledgeBase.urlImportSuccess'));
   } catch (error: any) {
-    let errorMessage = error?.error?.message || error?.message || t('knowledgeBase.urlImportFailed');
-    if (error?.code === 'duplicate_url') {
+    // 同上：码是数字 2401（ErrorCode.KNOWLEDGE_DUPLICATE_URL），旧字符串比较恒 false。
+    let errorMessage = error?.message || t('knowledgeBase.urlImportFailed');
+    if (error?.code === KNOWLEDGE_DUPLICATE_URL_CODE) {
       errorMessage = t('knowledgeBase.urlExists');
     }
     MessagePlugin.error(errorMessage);

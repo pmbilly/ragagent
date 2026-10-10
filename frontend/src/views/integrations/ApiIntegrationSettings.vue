@@ -1664,7 +1664,14 @@ async function runPlayground() {
     playground.session_response = sessionPayload ? formatJSON(sessionPayload) : compactText(sessionRaw)
     if (!sessionResp.ok || sessionPayload?.success === false) {
       playground.session_status = 'failed'
-      throw new Error(sessionPayload?.message || sessionPayload?.error?.message || `HTTP ${sessionResp.status}`)
+      // 错误体有两种形状：控制器层是外壳 `{code,message,data}`；**过滤器层**（Dispatcher 之前，
+      // 如 API-Key 门禁/Origin 校验）是 `{code:string, error:string}` —— 后者 `error` 是**字符串**，
+      // 取 `.error.message` 会得到 undefined，把最有用的人话换成 "HTTP 409"。两种都读。
+      throw new Error(
+        sessionPayload?.message
+        || (typeof sessionPayload?.error === 'string' ? sessionPayload.error : sessionPayload?.error?.message)
+        || `HTTP ${sessionResp.status}`,
+      )
     }
     playground.session_status = 'success'
     // 后端自 B183（全仓 API 外壳化）起，`POST /api/v1/sessions` 返回 `{code,message,data:{id,…}}`
