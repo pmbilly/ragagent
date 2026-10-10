@@ -695,6 +695,7 @@ export function buildSecureServerNodeExample(channelId: string, opts?: { baseUrl
     `  if (!hasSession && !auth.startsWith('Bearer ')) {`,
     `    return res.status(401).json({ error: 'unauthorized' })`,
     `  }`,
+    // raw-fetch-ok: 以下 fetch 只是**生成给用户复制的代码片段**（模板字符串），不是本仓的调用
     `  const r = await fetch('${exchangeUrl}', {`,
     `    method: 'POST',`,
     `    headers: {`,

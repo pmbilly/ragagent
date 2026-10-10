@@ -1,4 +1,4 @@
-import { get, post, put } from '../../utils/request';
+import { get, post, put, unwrapEnvelope } from '../../utils/request';
 import i18n from '@/i18n'
 
 const t = (key: string) => i18n.global.t(key)
@@ -478,6 +478,7 @@ export function testMultimodalFunction(testData: {
         }
 
         // 使用原生fetch因为需要发送FormData
+        // raw-fetch-ok: FormData 上传必须裸 fetch；响应在下方用 unwrapEnvelope 解包（见 return 那段）。
         fetch('/api/v1/initialization/multimodal/test', {
             method: 'POST',
             headers,
@@ -492,9 +493,10 @@ export function testMultimodalFunction(testData: {
                             message: err?.message || err?.error?.message || t('error.initialization.testFailed') });
                     });
                 }
-                // 注意：后端成功体是外壳 {code,message,data}（B183 起），此处**刻意未解包** ——
-                // 本函数当前无调用方（潜伏面）；接入时若要载荷请自行取 `.data`，或届时在此统一解包。
-                return response.json().then((data: any) => resolve(data || {}));
+                // 裸 fetch（FormData 上传，必须）：**自己补解包** —— 后端成功体是外壳
+                // {code,message,data}（B183 起）；解包入口见 utils/request.ts 的 unwrapEnvelope
+                //（用键集精确判定，不会误伤业务对象自带的 data 字段）。
+                return response.json().then((body: any) => resolve(unwrapEnvelope(body) ?? {}));
             })
             .catch((error: any) => {
                 console.error('Failed multimodal test:', error);

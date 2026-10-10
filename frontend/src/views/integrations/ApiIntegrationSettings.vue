@@ -693,6 +693,7 @@ import {
 } from '@/api/tenant'
 import { listKnowledgeBases } from '@/api/knowledge-base'
 import { getApiBaseUrl } from '@/utils/api-base'
+import { unwrapEnvelope } from '@/utils/request'
 import {
   DEFAULT_TENANT_API_KEY_CAPABILITIES,
   KB_SCOPED_API_KEY_CAPABILITIES,
@@ -1645,6 +1646,7 @@ async function runPlayground() {
   try {
     await ensurePlaygroundSignedToken()
     const headers = buildPlaygroundHeaders(false).sessionHeaders
+    // raw-fetch-ok: 「请求演练」刻意裸 fetch 模拟外部调用方视角；响应在下方用 unwrapEnvelope 解包。
     const sessionResp = await fetch(`${apiBaseUrl.value}/sessions`, {
       method: 'POST',
       headers,
@@ -1670,13 +1672,17 @@ async function runPlayground() {
     // 旧注释「不再有 {data,success} 信封」描述的是外壳化**之前**的形态 ⇒ 直读 `sessionPayload.id`
     // 恒 undefined ⇒ 演练必然停在第一步（报 playgroundMissingSessionId），而失败文案分支恰好能读到
     // 外壳的 message，所以报错看起来"正常"，更难发现。两种形状都吃：外壳优先、裸对象兜底。
-    const sessionEnvelope: any = sessionPayload?.data ?? sessionPayload
+    // raw-fetch-ok: 本页是「请求演练」，刻意用裸 fetch 模拟**外部调用方**的真实视角
+    //（要原样展示收到的请求/响应）；响应仍必须自己解包 —— 见 unwrapEnvelope。
+    const sessionEnvelope: any = unwrapEnvelope(sessionPayload)
     const sessionID = sessionEnvelope?.id
     if (!sessionID) {
       throw new Error(t('integrations.api.playgroundMissingSessionId'))
     }
 
     playground.chat_status = 'running'
+    // raw-fetch-ok: 需要读取 **SSE 流**（chatResp.body 交给 consumeApiPlaygroundSSE）——
+    // axios 拿不到流，此处必须裸 fetch；流式响应无 JSON 信封面、无需 unwrapEnvelope。
     const chatResp = await fetch(`${apiBaseUrl.value}/agent-chat/${encodeURIComponent(sessionID)}`, {
       method: 'POST',
       headers: buildPlaygroundHeaders(false).chatHeaders,

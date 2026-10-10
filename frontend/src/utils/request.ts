@@ -134,6 +134,27 @@ function isApiEnvelope(d: any): d is { code: number; message?: string; data: any
     && Object.keys(d).every((k) => k === 'code' || k === 'message' || k === 'data');
 }
 
+/**
+ * 裸 fetch 的解包入口：把服务端响应还原成**唯一解包点**产出的形状。
+ *
+ * <p>为什么需要它：本文件的响应拦截器是**全前端唯一解包点**（2xx 时把 `{code,message,data}`
+ * 拆成 `data`）。但有些场景必须绕过 axios 直接 `fetch` —— FormData 上传、SSE 流、二进制下载、
+ * 独立发布物（widget，第三方页面不能带依赖）、以及刻意模拟外部调用方的"请求演练"。
+ * 这些调用点**必须自己补解包**，否则拿到的是外壳：读 `.id` / `.token` 之类恒 `undefined`，
+ * 而且**不报错**，只是"没数据"—— 排查成本极高。</p>
+ *
+ * <p>本仓已因此踩过三次（同型）：widget 浮标图标读不到（B226）、API 集成页请求演练必然
+ * 卡在第一步（B227）、initialization 多模态联调潜伏面。故成对提供本函数 + 源码扫描守卫
+ * （`src/utils/rawFetchEnvelope.test.ts`）：**新增裸 fetch 若不调用它、也没有豁免标记，测试当场变红**。</p>
+ *
+ * <p>形状判定复用拦截器的 {@link isApiEnvelope}（键集**精确**匹配 code/message/data），
+ * 因此业务载荷自带的 `data` 字段不会被误当信封 —— 这也正是裸 fetch 处不要手写
+ * `payload.data ?? payload` 的原因（那个写法会误伤业务字段）。</p>
+ */
+export function unwrapEnvelope<T = any>(payload: any): T {
+  return isApiEnvelope(payload) ? (payload.data as T) : (payload as T);
+}
+
 instance.interceptors.response.use(
   (response) => {
     // 根据业务状态码处理逻辑

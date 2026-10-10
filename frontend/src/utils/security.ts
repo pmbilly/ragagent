@@ -629,6 +629,7 @@ export async function hydrateProtectedFileImages(
     if (!loadTask) {
       loadTask = (async (): Promise<ProtectedFileLoadResult> => {
         try {
+          // raw-fetch-ok: 取的是**二进制**（blob/受保护文件流），响应体不是 JSON、无外壳
           const resp = await fetch(requestURL, {
             method: 'GET',
             headers,
