@@ -611,5 +611,9 @@ B116 搬家时已经搬过一批资源（`common/text/*.txt`），这类风险�
 **四刀计划**（每刀独立提交 + 独立全绿 ✓，沿用 §13/§14 SOP ✓）：
 1. ✅ **沉 DTO（B207 已完成）**：两个记录已迁 `com.ragagent.common.apikey` ✓；**映射工厂留属主**（新类 `TenantAPIKeyProjections` ✓ —— 记录依赖实体，直接搬会在 `:common` 造反向边 ✗）（边 1 ✓）：`TenantAPIKeyCreateResponse` / `TenantAPIKeyResponse`（+ 其引用的 `TenantAPIKeyRequest` 视需要 ✓）沉 `:common`；
 2. ✅ **管理口 port（B208 已完成）**：`:common` 新增 `ApiKeyAdminPort`（窄面 ✓ 四个方法：平台列表/建/撤 + 租户默认键 ✓），apikey 侧 `ApiKeyAdminAdapter` 实现（**脱敏逐字搬过去** ✓，调用方只看到 common 载荷 ✓）；顺带清掉 `TenantCatalogController` 的**死依赖** ✗ 与 `TenantCreateOps` 的**迪米特违规**（`service.apiKeyService.…` ✗）⇒ **main 侧边数 5 → 1** ✓（只剩 `AuthFilter → APIKeyAuthChannel`，第 3 刀 ✓）（边 2/3 ✓）：`:common` 定义（create/list/update/delete/rotate 需要的窄接口 ✓），apikey 的 service 实现 ✓，三处调用点改注入 port ✓；
-3. **认证通道 port**（边 4 ✓）+ **查询 port**（边 5 ✓）：`AuthFilter` 与 `TenantFilterGuard` 只依赖 port ✓；
-4. **验环**：`python3 scripts/check-package-cycles.py` + 全量闸门 ✓，随后即可建 `:channels`（`im` + `embedchannel` + `apikey`→`channels.api` ✓）。
+3. ✅ **认证通道 port（B209 已完成）**：`:common` 新增 `ApiKeyAuthPort`（签名与实现逐字一致，含 `throws IOException` ✓），
+   `APIKeyAuthChannel implements` 该口、`AuthFilter` 改依赖口 ✓ ⇒ **main 侧边数 1 → 0** ✓✓。
+   **⚠️ 边 5 更正（B209 实测）** ✗：`TenantFilterGuard` 并不引用 apikey 的 mapper **类型** —— 它持有的是
+   **MyBatis 语句名字符串白名单**（4 条 ✓：`…TenantAPIKeyMapper.listByPlaceholderHash` / `listPlatform` / `selectByHash` / `selectFirstPlaceholderHashId` ✓）
+   ⇒ **不是模块边** ✗（侦察正则误报 ✓，同 R-d 那类 ✓）；**但** apikey 改名 `channels.api` 时这 4 条字符串**必须同批更新** ✓（否则运行期守卫误判 ✓）。
+4. ✅ **验环（B209 一并完成）**：`check-package-cycles` ✓ · 九守卫 ✓ · 全量闸门 ✓（1m40s / 4858-0 ✓）⇒ 代码边归零 ✓。**下一步**：建 `:channels`（`im` + `embedchannel` + `apikey`→`channels.api` ✓）—— 前置已清 ✓。
