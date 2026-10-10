@@ -1,1 +1,5 @@
-{"error":{"code":1010,"message":"Invalid request data","details":"field 'name' must be a string, got number"}}
+{
+  "code": 1010,
+  "message": "Invalid request data",
+  "data": "field 'name' must be a string, got number"
+}

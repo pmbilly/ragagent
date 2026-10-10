@@ -153,7 +153,13 @@ class OidcContractTest {
         env.put("location", r.getResponse().getHeader("Location"));
         env.put("set_cookie", setCookie);
         env.put("status", 302);
-        assertEquals(golden(goldenName), MAPPER.writeValueAsString(env), goldenName);
+        // B201：统一外壳 —— 302 分支的「合成信封」整体进 data；语义比较避免键序/空白差异
+        Map<String, Object> outer = new LinkedHashMap<>();
+        outer.put("code", 0);
+        outer.put("message", "ok");
+        outer.put("data", env);
+        assertEquals(com.ragagent.support.ContractJson.semantic(golden(goldenName)),
+                com.ragagent.support.ContractJson.semantic(MAPPER.writeValueAsString(outer)), goldenName);
     }
 
     private static final com.fasterxml.jackson.databind.ObjectMapper RAW_SEMANTIC_MAPPER =

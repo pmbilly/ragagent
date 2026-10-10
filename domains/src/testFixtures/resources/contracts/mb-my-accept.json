@@ -1,1 +1,13 @@
-{"membership":{"joinedAt":"2026-09-19T10:23:52.902882+08:00","role":"contributor","status":"active","tenantId":10002},"tenantName":""}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "membership": {
+      "joinedAt": "2026-09-19T10:23:52.902882+08:00",
+      "role": "contributor",
+      "status": "active",
+      "tenantId": 10002
+    },
+    "tenantName": ""
+  }
+}

@@ -1,1 +1,12 @@
-{"embeddingTopK":0,"vectorThreshold":0,"keywordThreshold":0,"rerankTopK":0,"rerankThreshold":0,"rerankModelId":""}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "embeddingTopK": 0,
+    "vectorThreshold": 0,
+    "keywordThreshold": 0,
+    "rerankTopK": 0,
+    "rerankThreshold": 0,
+    "rerankModelId": ""
+  }
+}

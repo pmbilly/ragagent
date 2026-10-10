@@ -67,6 +67,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.ragagent.common.web.ApiResult;
+import com.ragagent.common.web.ApiResponse;
 
 /**
  * 认证端点（登录 / 注册 / 会话 / OIDC）。
@@ -89,6 +91,7 @@ import org.springframework.web.bind.annotation.RestController;
  * map 响应：键一律按字母序输出 → LinkedHashMap 按字母序构造。
  */
 @RestController
+@ApiResult
 @RequestMapping("/api/v1/auth")
 public class AuthController {
 
@@ -475,7 +478,7 @@ public class AuthController {
     // ── POST /change-password ──────────────────────────────────────────────
 
     @PostMapping("/change-password")
-    public ResponseEntity<Void> changePassword(
+    public ApiResponse<Void> changePassword(
             @Valid @RejectEmptyBody @NonNullBody @RequestBody(required = false)
                     ChangePasswordRequest req) {
         User user = currentUserOr401();
@@ -495,7 +498,7 @@ public class AuthController {
                         .withDetails(e.getMessage()));
             }
         }
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
 

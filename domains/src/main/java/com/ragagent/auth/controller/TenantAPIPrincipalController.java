@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.ragagent.common.web.ApiResult;
 
 /**
  * api-principal 三条路由（Owner+）：
@@ -42,6 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 密钥均 ≥32 字节，golden 未触及该分叉。</p>
  */
 @RestController
+@ApiResult
 public class TenantAPIPrincipalController {
 
     static final String DEFAULT_DIRECT_HEADER = "X-External-User-ID";

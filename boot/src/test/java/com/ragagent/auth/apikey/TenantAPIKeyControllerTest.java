@@ -156,7 +156,7 @@ class TenantAPIKeyControllerTest {
         String body = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
         assertThat(keyOrder(body)).startsWith("id", "scopeType");
 
-        JsonNode data = MAPPER.readTree(body);
+        JsonNode data = payload(body);
         // 字段声明序 + 末尾 token；lastUsedAt / expiresAt 显式 null（恒在）
         assertThat(fieldNames(data)).containsExactly(
                 "id", "scopeType", "name", "apiKey", "fullAccess",
@@ -190,7 +190,7 @@ class TenantAPIKeyControllerTest {
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        JsonNode data = MAPPER.readTree(result.getResponse().getContentAsString());
+        JsonNode data = payload(result.getResponse().getContentAsString());
         assertThat(data.get("fullAccess").asBoolean()).isTrue();
         // ★ 刻意的不对称：full-access 时 knowledgeBaseIds 是 **null**，
         //   而 capabilities 经 NormalizeAPIKeyCapabilities 变成 **[]**
@@ -206,10 +206,7 @@ class TenantAPIKeyControllerTest {
                         .contentType("application/json")
                         .content("{\"name\":\"no-caps\",\"fullAccess\":false}"))
                 .andExpect(status().isBadRequest())
-                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content().json(
-                        "{\"error\":{\"code\":1010,"
-                                + "\"message\":\"capabilities are required for scoped API keys\","
-                                + "\"details\":null}}"));
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content().json("{\"code\":1010,\"message\":\"capabilities are required for scoped API keys\",\"data\":null}"));
     }
 
     @Test
@@ -219,9 +216,7 @@ class TenantAPIKeyControllerTest {
                         .contentType("application/json")
                         .content("{\"name\":\"   \",\"fullAccess\":true}"))
                 .andExpect(status().isBadRequest())
-                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content().json(
-                        "{\"error\":{\"code\":1010,\"message\":\"name is required\","
-                                + "\"details\":null}}"));
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content().json("{\"code\":1010,\"message\":\"name is required\",\"data\":null}"));
     }
 
     @Test
@@ -231,10 +226,7 @@ class TenantAPIKeyControllerTest {
                         .contentType("application/json")
                         .content("{\"name\":\"x\",\"fullAccess\":false,\"capabilities\":[\"chat\",\"bogus\"]}"))
                 .andExpect(status().isBadRequest())
-                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content().json(
-                        "{\"error\":{\"code\":1010,"
-                                + "\"message\":\"capabilities contains an unknown capability\","
-                                + "\"details\":null}}"));
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content().json("{\"code\":1010,\"message\":\"capabilities contains an unknown capability\",\"data\":null}"));
     }
 
     @Test
@@ -245,9 +237,7 @@ class TenantAPIKeyControllerTest {
                         .contentType("application/json")
                         .content("{\"name\":\"x\",\"fullAccess\":true,\"expiresAtUnix\":" + past + "}"))
                 .andExpect(status().isBadRequest())
-                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content().json(
-                        "{\"error\":{\"code\":1010,"
-                                + "\"message\":\"expiresAtUnix must be in the future\"}}"));
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content().json("{\"code\":1010,\"message\":\"expiresAtUnix must be in the future\",\"data\":null}"));
     }
 
     @Test
@@ -259,7 +249,7 @@ class TenantAPIKeyControllerTest {
                         .content("{\"name\":\"ttl\",\"fullAccess\":true,\"expiresAtUnix\":" + future + "}"))
                 .andExpect(status().isCreated())
                 .andReturn();
-        JsonNode data = MAPPER.readTree(result.getResponse().getContentAsString());
+        JsonNode data = payload(result.getResponse().getContentAsString());
         // 建 Key 时 lastUsedAt 恒为 null → 空值省略；expiresAt 有值 → 出现在
         // createdAt 之前（字段声明序）
         assertThat(fieldNames(data)).containsExactly(
@@ -276,10 +266,7 @@ class TenantAPIKeyControllerTest {
                         .content("{\"name\":\"x\",\"fullAccess\":false,\"capabilities\":[\"retrieve\"],"
                                 + "\"knowledgeBaseIds\":[\"kb-foreign\"]}"))
                 .andExpect(status().isForbidden())
-                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content().json(
-                        "{\"error\":{\"code\":1002,"
-                                + "\"message\":\"knowledgeBaseIds contains a knowledge base outside this workspace\","
-                                + "\"details\":null}}"));
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content().json("{\"code\":1002,\"message\":\"knowledgeBaseIds contains a knowledge base outside this workspace\",\"data\":null}"));
     }
 
     @Test
@@ -290,10 +277,7 @@ class TenantAPIKeyControllerTest {
                         .content("{\"name\":\"x\",\"fullAccess\":false,\"capabilities\":[\"retrieve\"],"
                                 + "\"knowledgeBaseIds\":[\"kb-nope\"]}"))
                 .andExpect(status().isBadRequest())
-                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content().json(
-                        "{\"error\":{\"code\":1010,"
-                                + "\"message\":\"knowledgeBaseIds contains an unknown knowledge base\","
-                                + "\"details\":null}}"));
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content().json("{\"code\":1010,\"message\":\"knowledgeBaseIds contains an unknown knowledge base\",\"data\":null}"));
     }
 
     @Test
@@ -306,9 +290,7 @@ class TenantAPIKeyControllerTest {
                         .contentType("application/json")
                         .content("{\"name\":\"x\",\"fullAccess\":true}"))
                 .andExpect(status().isBadRequest())
-                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content().json(
-                        "{\"error\":{\"code\":1010,"
-                                + "\"message\":\"workspace id must be a positive integer\"}}"));
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content().json("{\"code\":1010,\"message\":\"workspace id must be a positive integer\",\"data\":null}"));
     }
 
     @Test
@@ -317,9 +299,7 @@ class TenantAPIKeyControllerTest {
                         .header("Authorization", "Bearer " + token)
                         .contentType("application/json"))
                 .andExpect(status().isBadRequest())
-                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content().json(
-                        "{\"error\":{\"code\":1010,\"message\":\"Invalid request data\","
-                                + "\"details\":\"No content to map due to end-of-input\"}}"));
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content().json("{\"code\":1010,\"message\":\"Invalid request data\",\"data\":\"No content to map due to end-of-input\"}"));
     }
 
     // ── 列表 ──
@@ -334,7 +314,7 @@ class TenantAPIKeyControllerTest {
                 .andReturn();
         String body = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        JsonNode data = MAPPER.readTree(body);
+        JsonNode data = payload(body);
         assertThat(data.isArray()).isTrue();
         assertThat(data).hasSize(1);
         JsonNode first = data.get(0);
@@ -352,9 +332,9 @@ class TenantAPIKeyControllerTest {
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andReturn();
-        JsonNode data = MAPPER.readTree(result.getResponse().getContentAsString());
+        JsonNode data = payload(result.getResponse().getContentAsString());
         assertThat(data.isArray()).isTrue();
-        assertThat(data).isEmpty();
+        assertThat(data.isEmpty()).isTrue();   // B201：外壳下钻后 data 就是载荷数组
     }
 
     // ── 更新 ──
@@ -371,7 +351,7 @@ class TenantAPIKeyControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        JsonNode data = MAPPER.readTree(result.getResponse().getContentAsString());
+        JsonNode data = payload(result.getResponse().getContentAsString());
         assertThat(fieldNames(data)).containsExactly(
                 "id", "scopeType", "name", "apiKey", "fullAccess",
                 "knowledgeBaseIds", "capabilities", "lastUsedAt", "expiresAt", "createdAt");
@@ -390,7 +370,7 @@ class TenantAPIKeyControllerTest {
                                 + "\"capabilities\":[\"retrieve\"],\"knowledgeBaseIds\":[\"kb-1\"]}"))
                 .andExpect(status().isOk())
                 .andReturn();
-        JsonNode data = MAPPER.readTree(result.getResponse().getContentAsString());
+        JsonNode data = payload(result.getResponse().getContentAsString());
         assertThat(data.get("fullAccess").asBoolean()).isTrue();
         assertThat(data.get("knowledgeBaseIds").isNull()).isTrue();
         assertThat(data.get("capabilities")).isEmpty();
@@ -416,9 +396,7 @@ class TenantAPIKeyControllerTest {
                         .contentType("application/json")
                         .content("{\"name\":\"x\",\"fullAccess\":true}"))
                 .andExpect(status().isNotFound())
-                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content().json(
-                        "{\"error\":{\"code\":1003,\"message\":\"API key not found\","
-                                + "\"details\":null}}"));
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content().json("{\"code\":1003,\"message\":\"API key not found\",\"data\":null}"));
     }
 
     @Test
@@ -428,8 +406,7 @@ class TenantAPIKeyControllerTest {
                         .contentType("application/json")
                         .content("{\"name\":\"x\",\"fullAccess\":true}"))
                 .andExpect(status().isBadRequest())
-                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content().json(
-                        "{\"error\":{\"code\":1000,\"message\":\"Invalid API key ID\"}}"));
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content().json("{\"code\":1000,\"message\":\"Invalid API key ID\",\"data\":null}"));
     }
 
     // ── 删除 ──
@@ -440,16 +417,18 @@ class TenantAPIKeyControllerTest {
 
         MvcResult result = mockMvc.perform(delete("/api/v1/tenants/" + TENANT_ID + "/api-keys/" + keyId)
                         .header("Authorization", "Bearer " + token))
-                .andExpect(status().isNoContent())
+                .andExpect(status().isOk())
                 .andReturn();
-        assertThat(result.getResponse().getContentAsString(StandardCharsets.UTF_8)).isEmpty();
+        // B201：200 + 统一外壳（原先 204 空体）
+        assertThat(result.getResponse().getContentAsString(StandardCharsets.UTF_8))
+                .isEqualTo("{\"code\":0,\"message\":\"ok\",\"data\":null}");
 
         // 撤销后从列表消失
         MvcResult list = mockMvc.perform(get("/api/v1/tenants/" + TENANT_ID + "/api-keys")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andReturn();
-        assertThat(MAPPER.readTree(list.getResponse().getContentAsString())).isEmpty();
+        assertThat(payload(list.getResponse().getContentAsString())).isEmpty();
     }
 
     @Test
@@ -457,9 +436,7 @@ class TenantAPIKeyControllerTest {
         mockMvc.perform(delete("/api/v1/tenants/" + TENANT_ID + "/api-keys/999999")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isNotFound())
-                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content().json(
-                        "{\"error\":{\"code\":1003,\"message\":\"API key not found\","
-                                + "\"details\":null}}"));
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content().json("{\"code\":1003,\"message\":\"API key not found\",\"data\":null}"));
     }
 
     @Test
@@ -490,7 +467,7 @@ class TenantAPIKeyControllerTest {
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andReturn();
-        assertThat(MAPPER.readTree(list.getResponse().getContentAsString())).hasSize(1);
+        assertThat(payload(list.getResponse().getContentAsString())).hasSize(1);
     }
 
     // ── 辅助 ──
@@ -504,12 +481,21 @@ class TenantAPIKeyControllerTest {
                                 + "\"capabilities\":[\"" + capability + "\"]}"))
                 .andExpect(status().isCreated())
                 .andReturn();
-        return MAPPER.readTree(result.getResponse().getContentAsString()).get("id").asText();
+        return payload(result.getResponse().getContentAsString()).get("id").asText();
     }
 
     /** 顶层 JSON 键序（契约：响应由 map 构造 → 字母序）。 */
+    /** B201：统一外壳下取 data 当载荷（旧形态无壳时原样 ✓）。 */
+    private static JsonNode payload(String json) throws Exception {
+        JsonNode node = MAPPER.readTree(json);
+        if (node.isObject() && node.has("code") && node.has("data")) {
+            node = node.get("data");
+        }
+        return node;
+    }
+
     private static List<String> keyOrder(String json) throws Exception {
-        return fieldNames(MAPPER.readTree(json));
+        return fieldNames(payload(json));
     }
 
     private static List<String> fieldNames(JsonNode node) {

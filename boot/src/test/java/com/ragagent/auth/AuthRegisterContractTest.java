@@ -254,7 +254,7 @@ class AuthRegisterContractTest {
                 400, "reg-chpw-weak.json");
         assertGolden(json(post("/api/v1/auth/change-password").header("Authorization", probe),
                 "{\"oldPassword\":\"" + PROBE_PW + "\",\"newPassword\":\"" + PROBE_PW_NEW + "\"}"),
-                204, "reg-chpw-success.json");
+                200, "reg-chpw-success.json");
 
         // 改密成功吊销全部会话
         assertGolden(get("/api/v1/auth/validate").header("Authorization", probe),
@@ -350,6 +350,10 @@ class AuthRegisterContractTest {
                 .header("Authorization", bearer)).andReturn();
         // PR4：键序归一后邻接正则不可靠 → Jackson 直取
         var __root = new com.fasterxml.jackson.databind.ObjectMapper().readTree(raw(me));
+        // B201：统一外壳下先下钻 data（旧形态无壳也通）
+        if (__root.isObject() && __root.has("code") && __root.has("data")) {
+            __root = __root.get("data");
+        }
         return __root.path("user").path("tenantId").asLong();
     }
 

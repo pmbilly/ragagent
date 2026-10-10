@@ -1,1 +1,5 @@
-{"error":{"code":1010,"message":"token is required","details":"field 'token' is required"}}
+{
+  "code": 1010,
+  "message": "token is required",
+  "data": "field 'token' is required"
+}

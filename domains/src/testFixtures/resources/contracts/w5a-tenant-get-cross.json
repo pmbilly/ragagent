@@ -1,1 +1,5 @@
-{"error":{"code":1002,"message":"Access denied: URL workspace does not match the active workspace","details":null}}
+{
+  "code": 1002,
+  "message": "Access denied: URL workspace does not match the active workspace",
+  "data": null
+}

@@ -1,1 +1,7 @@
-{"lastActiveTenantId":10099}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "lastActiveTenantId": 10099
+  }
+}

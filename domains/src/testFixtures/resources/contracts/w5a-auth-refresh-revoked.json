@@ -1,1 +1,5 @@
-{"error":{"code":1001,"message":"Token refresh failed","details":"refresh token is revoked"}}
+{
+  "code": 1001,
+  "message": "Token refresh failed",
+  "data": "refresh token is revoked"
+}

@@ -1,1 +1,5 @@
-{"error":{"code":1010,"message":"signed_token mode is required","details":null}}
+{
+  "code": 1010,
+  "message": "signed_token mode is required",
+  "data": null
+}

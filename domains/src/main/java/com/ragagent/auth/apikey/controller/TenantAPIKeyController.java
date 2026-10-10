@@ -29,6 +29,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.ragagent.common.web.ApiResult;
+import com.ragagent.common.web.ApiResponse;
 
 /**
  * 租户 API Key 管理端点（列表 / 创建 / 更新 / 删除）。
@@ -59,6 +61,7 @@ import org.springframework.web.bind.annotation.RestController;
  * </ul>
  */
 @RestController
+@ApiResult
 @RequestMapping("/api/v1/tenants/{id}/api-keys")
 public class TenantAPIKeyController {
 
@@ -169,7 +172,7 @@ public class TenantAPIKeyController {
 
     /** 删除：204，无响应体。 */
     @DeleteMapping("/{keyId}")
-    public ResponseEntity<Void> delete(@PathVariable("id") String rawId,
+    public ApiResponse<Void> delete(@PathVariable("id") String rawId,
                                        @PathVariable("keyId") String rawKeyId) {
         long tenantId = parseWorkspaceIdOrBadRequest(rawId);
         long keyId = parseKeyIdOrBadRequest(rawKeyId);
@@ -178,7 +181,7 @@ public class TenantAPIKeyController {
         } catch (TenantAPIKeyNotFoundException e) {
             throw new BizException(AppError.notFound("API key not found"));
         }
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
     // ── 辅助 ──

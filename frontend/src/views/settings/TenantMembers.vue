@@ -814,9 +814,11 @@ async function loadMembers() {
       pageSize: membersPageSize.value,
       q: memberSearchQ.value || undefined,
     })
-    if (resp.success && resp.data) {
-      const total = resp.data.total ?? 0
-      const ps = resp.data.pageSize ?? membersPageSize.value
+    // B201：统一外壳后 resp 即载荷；旧的 {data,success} 壳也容忍
+    const data: any = (resp as any)?.data ?? resp
+    if (data) {
+      const total = data.total ?? 0
+      const ps = data.pageSize ?? membersPageSize.value
       const safePs = Math.max(1, ps)
       const maxPage = Math.max(1, Math.ceil(total / safePs))
       if (membersPage.value > maxPage) {
@@ -825,17 +827,17 @@ async function loadMembers() {
         await loadMembers()
         return
       }
-      members.value = resp.data.members ?? []
+      members.value = data.members ?? []
       membersTotal.value = total
-      if (typeof resp.data.page === 'number' && resp.data.page > 0) {
-        membersPage.value = resp.data.page
+      if (typeof data.page === 'number' && data.page > 0) {
+        membersPage.value = data.page
       }
-      if (typeof resp.data.pageSize === 'number' && resp.data.pageSize > 0) {
-        membersPageSize.value = resp.data.pageSize
+      if (typeof data.pageSize === 'number' && data.pageSize > 0) {
+        membersPageSize.value = data.pageSize
       }
       rememberMembersForAudit(members.value)
     } else {
-      error.value = resp.message || t('tenantMember.errors.generic')
+      error.value = (resp as any)?.message || t('tenantMember.errors.generic')
     }
   } catch (err: any) {
     error.value = err?.message || t('tenantMember.errors.generic')
@@ -915,9 +917,11 @@ async function loadInvitations() {
       page: invitationsPage.value,
       pageSize: invitationsPageSize.value,
     })
-    if (resp.success && resp.data) {
-      const total = resp.data.total ?? 0
-      const ps = resp.data.pageSize ?? invitationsPageSize.value
+    // B201：统一外壳后 resp 即载荷；旧的 {data,success} 壳也容忍
+    const data: any = (resp as any)?.data ?? resp
+    if (data) {
+      const total = data.total ?? 0
+      const ps = data.pageSize ?? invitationsPageSize.value
       const safePs = Math.max(1, ps)
       const maxPage = Math.max(1, Math.ceil(total / safePs))
       if (invitationsPage.value > maxPage) {
@@ -926,16 +930,16 @@ async function loadInvitations() {
         await loadInvitations()
         return
       }
-      invitations.value = resp.data.invitations ?? []
+      invitations.value = data.invitations ?? []
       invitationsTotal.value = total
-      if (typeof resp.data.page === 'number' && resp.data.page > 0) {
-        invitationsPage.value = resp.data.page
+      if (typeof data.page === 'number' && data.page > 0) {
+        invitationsPage.value = data.page
       }
-      if (typeof resp.data.pageSize === 'number' && resp.data.pageSize > 0) {
-        invitationsPageSize.value = resp.data.pageSize
+      if (typeof data.pageSize === 'number' && data.pageSize > 0) {
+        invitationsPageSize.value = data.pageSize
       }
     } else {
-      invitationsError.value = resp.message || t('tenantInvitation.errors.generic')
+      invitationsError.value = (resp as any)?.message || t('tenantInvitation.errors.generic')
     }
   } catch (err: any) {
     invitationsError.value = err?.message || t('tenantInvitation.errors.generic')
@@ -955,11 +959,12 @@ function onInvitationsPageChange() {
 async function doRevokeInvitation(row: TenantInvitation) {
   try {
     const resp = await revokeInvitation(activeTenantId.value, row.id)
-    if (resp.success) {
+    // B201：拦截器已按 code 抛错；只在显式 success:false 时视为失败
+    if ((resp as any)?.success !== false) {
       await loadInvitations()
       MessagePlugin.success(t('tenantInvitation.revoke.success'))
     } else {
-      MessagePlugin.error(resp.message || t('tenantInvitation.errors.generic'))
+      MessagePlugin.error((resp as any)?.message || t('tenantInvitation.errors.generic'))
     }
   } catch (err: any) {
     const status = err?.status
@@ -1277,7 +1282,7 @@ async function submitShareLink() {
   try {
     const resp = await createInviteLink(activeTenantId.value, { role: shareLinkForm.role })
     if (!resp.success || !resp.data) {
-      MessagePlugin.error(resp.message || t('tenantInvitation.errors.generic'))
+      MessagePlugin.error((resp as any)?.message || t('tenantInvitation.errors.generic'))
       return
     }
     shareLinkResult.value = resp.data
@@ -1346,7 +1351,7 @@ async function sendInvitation(email: string, role: TenantRole) {
         MessagePlugin.success(t('tenantInvitation.inviteSuccess'))
       }
     } else {
-      MessagePlugin.error(resp.message || t('tenantInvitation.errors.generic'))
+      MessagePlugin.error((resp as any)?.message || t('tenantInvitation.errors.generic'))
     }
   } catch (err: any) {
     const status = err?.status

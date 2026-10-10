@@ -1,1 +1,5 @@
-{"error":{"code":1001,"message":"Account is disabled","details":null}}
+{
+  "code": 1001,
+  "message": "Account is disabled",
+  "data": null
+}

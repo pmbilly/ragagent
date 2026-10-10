@@ -1,1 +1,5 @@
-{"code":1000,"data":"page: 类型不正确","message":"分页参数不合法"}
+{
+  "code": 1000,
+  "data": "page: 类型不正确",
+  "message": "分页参数不合法"
+}

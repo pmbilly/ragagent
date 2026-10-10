@@ -1,1 +1,9 @@
-{"enabled":false,"embeddingModelId":"","knowledgeBaseId":""}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "enabled": false,
+    "embeddingModelId": "",
+    "knowledgeBaseId": ""
+  }
+}

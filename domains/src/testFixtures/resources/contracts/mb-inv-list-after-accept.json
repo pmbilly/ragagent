@@ -1,1 +1,51 @@
-{"invitations":[{"id":12,"tenantId":10002,"tenantName":null,"inviteeUserId":"","inviteeEmail":null,"inviteeName":null,"invitedBy":"11111111-2222-3333-4444-555555555501","inviterEmail":"java-phase1@weknora.test","inviterName":"phase1test","role":"owner","status":"pending","message":null,"expiresAt":"2026-09-26T10:23:53.131447+08:00","respondedAt":null,"createdAt":"2026-09-19T10:23:53.131752+08:00","inviteUrl":"/register?token=GMKfqY7opiPA5GreHC087EZgfH_n4wIWewwuy7WORX8","isShareLink":true,"acceptedCount":0},{"id":11,"tenantId":10002,"tenantName":null,"inviteeUserId":"","inviteeEmail":null,"inviteeName":null,"invitedBy":"11111111-2222-3333-4444-555555555501","inviterEmail":"java-phase1@weknora.test","inviterName":"phase1test","role":"contributor","status":"pending","message":"join us","expiresAt":"2026-09-26T10:23:53.093065+08:00","respondedAt":null,"createdAt":"2026-09-19T10:23:53.093856+08:00","inviteUrl":"/register?token=wYyRKsKBJMIH2pN-Si8Z-pkzYk7TduFrbHKKo8Ju1cU","isShareLink":true,"acceptedCount":1}],"page":1,"pageSize":20,"total":2}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "invitations": [
+      {
+        "id": 12,
+        "tenantId": 10002,
+        "tenantName": null,
+        "inviteeUserId": "",
+        "inviteeEmail": null,
+        "inviteeName": null,
+        "invitedBy": "11111111-2222-3333-4444-555555555501",
+        "inviterEmail": "java-phase1@weknora.test",
+        "inviterName": "phase1test",
+        "role": "owner",
+        "status": "pending",
+        "message": null,
+        "expiresAt": "2026-09-26T10:23:53.131447+08:00",
+        "respondedAt": null,
+        "createdAt": "2026-09-19T10:23:53.131752+08:00",
+        "inviteUrl": "/register?token=GMKfqY7opiPA5GreHC087EZgfH_n4wIWewwuy7WORX8",
+        "isShareLink": true,
+        "acceptedCount": 0
+      },
+      {
+        "id": 11,
+        "tenantId": 10002,
+        "tenantName": null,
+        "inviteeUserId": "",
+        "inviteeEmail": null,
+        "inviteeName": null,
+        "invitedBy": "11111111-2222-3333-4444-555555555501",
+        "inviterEmail": "java-phase1@weknora.test",
+        "inviterName": "phase1test",
+        "role": "contributor",
+        "status": "pending",
+        "message": "join us",
+        "expiresAt": "2026-09-26T10:23:53.093065+08:00",
+        "respondedAt": null,
+        "createdAt": "2026-09-19T10:23:53.093856+08:00",
+        "inviteUrl": "/register?token=wYyRKsKBJMIH2pN-Si8Z-pkzYk7TduFrbHKKo8Ju1cU",
+        "isShareLink": true,
+        "acceptedCount": 1
+      }
+    ],
+    "page": 1,
+    "pageSize": 20,
+    "total": 2
+  }
+}

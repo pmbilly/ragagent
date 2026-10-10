@@ -1,1 +1,5 @@
-{"code":1005,"data":null,"message":"标签名称已存在"}
+{
+  "code": 1005,
+  "data": null,
+  "message": "标签名称已存在"
+}

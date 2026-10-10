@@ -1,1 +1,17 @@
-{"enabled":true,"writeMode":"auto","extractModelId":"","maxItems":500,"extractDelaySeconds":30,"extractMinIntervalSeconds":60,"extractInstructions":"记笔记","interestThreshold":5,"embeddingModelId":"","vectorRecall":true,"retrievalConditioning":false}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "enabled": true,
+    "writeMode": "auto",
+    "extractModelId": "",
+    "maxItems": 500,
+    "extractDelaySeconds": 30,
+    "extractMinIntervalSeconds": 60,
+    "extractInstructions": "记笔记",
+    "interestThreshold": 5,
+    "embeddingModelId": "",
+    "vectorRecall": true,
+    "retrievalConditioning": false
+  }
+}

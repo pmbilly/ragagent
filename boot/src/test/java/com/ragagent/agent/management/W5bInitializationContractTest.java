@@ -339,7 +339,7 @@ class W5bInitializationContractTest {
                         .content("{\"email\":\"" + email + "\",\"password\":\"Passw0rd!\"}"))
                 .andReturn();
         return new com.fasterxml.jackson.databind.ObjectMapper()
-                .readTree(raw(r)).path("token").asText();
+                .readTree(raw(r)).path("data").path("token").asText();
     }
 
     private String viewerBearer() throws Exception {

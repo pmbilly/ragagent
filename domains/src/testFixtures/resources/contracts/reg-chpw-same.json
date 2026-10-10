@@ -1,1 +1,5 @@
-{"error":{"code":1010,"message":"New password must differ from current password","details":"same_password"}}
+{
+  "code": 1010,
+  "message": "New password must differ from current password",
+  "data": "same_password"
+}

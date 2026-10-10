@@ -1,1 +1,8 @@
-{"enabled":false,"providerDisplayName":"OIDC"}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "enabled": false,
+    "providerDisplayName": "OIDC"
+  }
+}

@@ -1,1 +1,15 @@
-{"embeddingTopK":20,"vectorThreshold":0.5,"keywordThreshold":0.4,"rerankTopK":5,"rerankThreshold":0.1,"rerankModelId":"rm-1","rrfK":60,"rrfVectorWeight":0.7,"rrfKeywordWeight":0.3}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "embeddingTopK": 20,
+    "vectorThreshold": 0.5,
+    "keywordThreshold": 0.4,
+    "rerankTopK": 5,
+    "rerankThreshold": 0.1,
+    "rerankModelId": "rm-1",
+    "rrfK": 60,
+    "rrfVectorWeight": 0.7,
+    "rrfKeywordWeight": 0.3
+  }
+}

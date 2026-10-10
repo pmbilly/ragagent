@@ -1,1 +1,5 @@
-{"error":{"code":1010,"message":"external_user_id is invalid","details":"error code: 1010, error message: external_user_id is too long"}}
+{
+  "code": 1010,
+  "message": "external_user_id is invalid",
+  "data": "error code: 1010, error message: external_user_id is too long"
+}

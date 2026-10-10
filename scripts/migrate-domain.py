@@ -186,14 +186,23 @@ def cmd_goldens(domains, prefixes=None):
         if not p.exists():
             skipped.append('%s（缺文件）' % name)
             continue
+        raw_text = p.read_text(encoding='utf-8').strip()
+        if raw_text == '':
+            # 空文件 = 旧的「204 无体」金片 ⇒ 新形态是成功外壳（B201 ✓）
+            p.write_text(json.dumps({'code': 0, 'message': 'ok', 'data': None},
+                                    ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+            changed += 1
+            continue
         try:
-            d = json.loads(p.read_text(encoding='utf-8'))
+            d = json.loads(raw_text)
         except Exception:
             skipped.append('%s（非 JSON）' % name)
             continue
         if isinstance(d, list):
             new = {'code': 0, 'message': 'ok', 'data': d}
-        elif isinstance(d, dict) and d.get('code') == 0:
+        elif isinstance(d, dict) and 'code' in d:
+            # 已是新形态（成功或**错误**体都算）⇒ 原样 ✓（B201：原来只跳过 code==0，
+            # 把 {code:1005,…} 这类错误体又包了一层 ⇒ 出现双层外壳 ✗）
             continue
         elif isinstance(d, dict) and set(d.keys()) == {'message', 'success'}:
             # 遗留「受理回执」壳 {"message":…,"success":true} ⇒ 文案进 message，data 为 null
@@ -219,6 +228,12 @@ def cmd_goldens(domains, prefixes=None):
                 skipped.append('%s（字符串错误但状态未知）' % name)
                 continue
         elif isinstance(d, dict):
+            new = {'code': 0, 'message': 'ok', 'data': d}
+        elif d is None:
+            # 裸 null = 端点返回 null 载荷 ⇒ 新形态 data:null（B201：ct-kv-ws-get-default 这类 ✓）
+            new = {'code': 0, 'message': 'ok', 'data': None}
+        elif isinstance(d, (str, int, float, bool)):
+            # 裸标量 = 载荷本来就是标量 ⇒ 放进 data（区别于 None：那是"无载荷"）
             new = {'code': 0, 'message': 'ok', 'data': d}
         else:
             skipped.append('%s（形状未识别）' % name)

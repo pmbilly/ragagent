@@ -1,1 +1,16 @@
-{"defaultProvider":"minio","minio":{"mode":"remote","endpoint":"http://minio.example.com","accessKeyId":"***","secretAccessKey":"***","bucketName":"b","useSsl":false,"pathPrefix":"p"}}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "defaultProvider": "minio",
+    "minio": {
+      "mode": "remote",
+      "endpoint": "http://minio.example.com",
+      "accessKeyId": "***",
+      "secretAccessKey": "***",
+      "bucketName": "b",
+      "useSsl": false,
+      "pathPrefix": "p"
+    }
+  }
+}

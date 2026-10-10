@@ -1,1 +1,5 @@
-{"error":{"code":1010,"message":"mode must be tenant, direct_header, or signed_token","details":null}}
+{
+  "code": 1010,
+  "message": "mode must be tenant, direct_header, or signed_token",
+  "data": null
+}

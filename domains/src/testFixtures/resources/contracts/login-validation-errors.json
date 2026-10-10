@@ -1,1 +1,5 @@
-{"error":{"code":1010,"message":"Invalid login parameters","details":"field 'email' is not a valid email address\nfield 'password' is below the minimum"}}
+{
+  "code": 1010,
+  "message": "Invalid login parameters",
+  "data": "field 'email' is not a valid email address\nfield 'password' is below the minimum"
+}

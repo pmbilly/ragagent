@@ -138,13 +138,15 @@ async function reload() {
   error.value = ''
   try {
     const resp = await listMyInvitations()
-    if (resp.success && resp.data) {
-      invitations.value = resp.data.invitations
+    // B201：统一外壳后 resp 即载荷；旧的 {data,success} 壳也容忍
+    const data: any = (resp as any)?.data ?? resp
+    if (data) {
+      invitations.value = data.invitations
       authStore.setPendingInvitationCount(
         invitations.value.filter((i) => i.status === 'pending').length,
       )
     } else {
-      error.value = resp.message || t('tenantInvitation.errors.generic')
+      error.value = (resp as any)?.message || t('tenantInvitation.errors.generic')
     }
   } catch (err: any) {
     error.value = err?.message || t('tenantInvitation.errors.generic')
@@ -157,7 +159,8 @@ async function onAccept(row: TenantInvitation) {
   acting.value = row.id
   try {
     const resp = await acceptInvitation(row.id)
-    if (resp.success) {
+    // B201：拦截器已按 code 抛错；只在显式 success:false 时视为失败
+    if ((resp as any)?.success !== false) {
       invitations.value = invitations.value.filter((x) => x.id !== row.id)
       authStore.setPendingInvitationCount(Math.max(0, authStore.pendingInvitationCount - 1))
       await authStore.refreshFromAuthMe()
@@ -167,7 +170,7 @@ async function onAccept(row: TenantInvitation) {
         }),
       )
     } else {
-      MessagePlugin.error(resp.message || t('tenantInvitation.errors.generic'))
+      MessagePlugin.error((resp as any)?.message || t('tenantInvitation.errors.generic'))
     }
   } catch (err: any) {
     const status = err?.status
@@ -184,12 +187,13 @@ async function onDecline(row: TenantInvitation) {
   acting.value = row.id
   try {
     const resp = await declineInvitation(row.id)
-    if (resp.success) {
+    // B201：拦截器已按 code 抛错；只在显式 success:false 时视为失败
+    if ((resp as any)?.success !== false) {
       invitations.value = invitations.value.filter((x) => x.id !== row.id)
       authStore.setPendingInvitationCount(Math.max(0, authStore.pendingInvitationCount - 1))
       MessagePlugin.success(t('tenantInvitation.myInbox.declineSuccess'))
     } else {
-      MessagePlugin.error(resp.message || t('tenantInvitation.errors.generic'))
+      MessagePlugin.error((resp as any)?.message || t('tenantInvitation.errors.generic'))
     }
   } catch (err: any) {
     const status = err?.status

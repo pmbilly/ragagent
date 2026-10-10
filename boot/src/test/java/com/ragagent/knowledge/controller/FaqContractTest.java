@@ -230,7 +230,7 @@ class FaqContractTest {
                     .andReturn();
             com.fasterxml.jackson.databind.JsonNode node = new com.fasterxml.jackson.databind.ObjectMapper()
                     .readTree(result.getResponse().getContentAsString());
-            return node.get("token").asText();
+            return node.path("data").get("token").asText();
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }

@@ -1,1 +1,5 @@
-{"error":{"code":1010,"message":"Invalid registration parameters","details":"field 'email' is not a valid email address"}}
+{
+  "code": 1010,
+  "message": "Invalid registration parameters",
+  "data": "field 'email' is not a valid email address"
+}

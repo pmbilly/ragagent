@@ -128,11 +128,13 @@ export async function refreshAccessTokenShared(
   try {
     const response = await refresh(storedRefreshToken)
 
-    if (!response.success || !response.data?.token) {
-      throw new Error(response.message || messages.tokenRefreshFailed)
+    // B201：统一外壳后 response 即载荷；旧的 {data,success} 壳也容忍
+    const data: any = (response as any)?.data ?? response
+    if (!data?.token) {
+      throw new Error((response as any)?.message || messages.tokenRefreshFailed)
     }
 
-    const { token, refreshToken: newRefreshToken } = response.data
+    const { token, refreshToken: newRefreshToken } = data
     localStorage.setItem('weknora_token', token)
     if (newRefreshToken) {
       localStorage.setItem('weknora_refreshToken', newRefreshToken)

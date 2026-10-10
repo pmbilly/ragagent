@@ -95,7 +95,7 @@ class ValidationContractTest {
                             .contentType("application/json")
                             .content("{\"email\":\"" + EMAIL + "\",\"password\":\"Passw0rd!\"}"))
                     .andReturn();
-            owner = "Bearer " + m.readTree(r.getResponse().getContentAsString()).get("token").asText();
+            owner = "Bearer " + m.readTree(r.getResponse().getContentAsString()).path("data").get("token").asText();
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }

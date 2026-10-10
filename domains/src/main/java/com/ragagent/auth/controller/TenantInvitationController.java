@@ -31,6 +31,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.ragagent.common.error.ErrorCode;
+import com.ragagent.common.web.ApiResult;
+import com.ragagent.common.web.ApiResponse;
 
 /**
  * 邀请相关的 9 条路由：租户侧 GET/POST /tenants/{id}/invitations、
@@ -47,6 +49,7 @@ import com.ragagent.common.error.ErrorCode;
  * 跨租户渲染成同款 "invitation not found"（不泄漏存在性）。</p>
  */
 @RestController
+@ApiResult
 public class TenantInvitationController {
 
     /** 前端基础地址两级查找（config 属性 → FRONTEND_BASE_URL env）。 */
@@ -162,7 +165,7 @@ public class TenantInvitationController {
 
     /** DELETE /tenants/{id}/invitations/{invId}（Owner+，撤销 pending） */
     @DeleteMapping("/api/v1/tenants/{id}/invitations/{invId}")
-    public ResponseEntity<Void> revokeInvitation(@PathVariable String id,
+    public ApiResponse<Void> revokeInvitation(@PathVariable String id,
             @PathVariable("invId") String invId) {
         long tenantId = TenantMemberController.parseTenantId(id);
         long invIdNum = TenantMemberController.parseInvitationId(invId);
@@ -185,7 +188,7 @@ public class TenantInvitationController {
                         .withDetails(e.getMessage()));
             }
         }
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
     /** POST /tenants/{id}/invite-links（Owner+，多用途共享链接；201 + 带 invite_url） */
@@ -271,7 +274,7 @@ public class TenantInvitationController {
 
     /** POST /me/invitations/{invId}/decline（拒绝；不建成员行） */
     @PostMapping("/api/v1/me/invitations/{invId}/decline")
-    public ResponseEntity<Void> declineMyInvitation(@PathVariable("invId") String invId) {
+    public ApiResponse<Void> declineMyInvitation(@PathVariable("invId") String invId) {
         String caller = TenantMemberController.requireCaller();
         long invIdNum = TenantMemberController.parseInvitationId(invId);
         try {
@@ -279,7 +282,7 @@ public class TenantInvitationController {
         } catch (TenantRbacException e) {
             throw acceptDeclineError(e, "failed to decline invitation");
         }
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
     /** POST /me/invitations/accept-by-token（已登录用户用共享链接 token 加入；幂等） */

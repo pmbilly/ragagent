@@ -1,1 +1,5 @@
-{"error":{"code":1002,"message":"Registration is invite-only","details":null}}
+{
+  "code": 1002,
+  "message": "Registration is invite-only",
+  "data": null
+}

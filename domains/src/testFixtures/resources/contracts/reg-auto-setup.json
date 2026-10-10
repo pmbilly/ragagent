@@ -1,1 +1,5 @@
-{"error":{"code":1002,"message":"auto-setup is only available in lite edition","details":null}}
+{
+  "code": 1002,
+  "message": "auto-setup is only available in lite edition",
+  "data": null
+}

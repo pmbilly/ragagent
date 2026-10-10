@@ -1,1 +1,5 @@
-{"error":{"code":1000,"message":"embeddingTopK must be between 0 and 200","details":null}}
+{
+  "code": 1000,
+  "message": "embeddingTopK must be between 0 and 200",
+  "data": null
+}

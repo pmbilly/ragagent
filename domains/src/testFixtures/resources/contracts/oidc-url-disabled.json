@@ -1,1 +1,5 @@
-{"error":{"code":1002,"message":"OIDC authorization unavailable","details":"OIDC login is disabled"}}
+{
+  "code": 1002,
+  "message": "OIDC authorization unavailable",
+  "data": "OIDC login is disabled"
+}

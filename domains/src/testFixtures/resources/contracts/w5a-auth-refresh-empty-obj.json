@@ -1,1 +1,5 @@
-{"error":{"code":1010,"message":"Invalid refresh token request","details":"field 'refreshToken' is required"}}
+{
+  "code": 1010,
+  "message": "Invalid refresh token request",
+  "data": "field 'refreshToken' is required"
+}

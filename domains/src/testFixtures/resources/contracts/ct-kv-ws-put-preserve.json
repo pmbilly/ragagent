@@ -1,1 +1,11 @@
-{"max_results":7,"include_date":false,"compression_method":"none","blacklist":[],"proxy_url":"***"}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "max_results": 7,
+    "include_date": false,
+    "compression_method": "none",
+    "blacklist": [],
+    "proxy_url": "***"
+  }
+}

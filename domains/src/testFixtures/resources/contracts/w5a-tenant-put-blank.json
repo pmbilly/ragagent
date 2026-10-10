@@ -1,1 +1,5 @@
-{"error":{"code":1010,"message":"name cannot be blank","details":null}}
+{
+  "code": 1010,
+  "message": "name cannot be blank",
+  "data": null
+}

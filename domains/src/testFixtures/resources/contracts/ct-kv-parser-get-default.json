@@ -1,1 +1,8 @@
-{"mineru_endpoint":"","mineru_api_key":""}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "mineru_endpoint": "",
+    "mineru_api_key": ""
+  }
+}

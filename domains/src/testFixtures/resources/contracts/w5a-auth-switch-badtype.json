@@ -1,1 +1,5 @@
-{"error":{"code":1010,"message":"Invalid workspace switch request","details":"field 'tenantId' must be an integer, got string"}}
+{
+  "code": 1010,
+  "message": "Invalid workspace switch request",
+  "data": "field 'tenantId' must be an integer, got string"
+}

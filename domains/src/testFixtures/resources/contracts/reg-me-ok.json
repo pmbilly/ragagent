@@ -1,1 +1,60 @@
-{"capabilities":{"autoAcceptInvitation":false,"canCreateTenant":true},"memberships":[{"tenantId":10099,"tenantName":"regprobe-user's Workspace","role":"owner"}],"preferenceDefaults":{},"tenant":{"id":10099,"name":"regprobe-user's Workspace","description":"Default workspace","status":"active","retrieverEngines":{"engines":[]},"business":"","storageQuota":10737418240,"storageUsed":0,"contextConfig":{"maxTokens":0,"compressionStrategy":"","recentMessageCount":0,"summarizeThreshold":0},"webSearchConfig":null,"parserEngineConfig":null,"credentials":null,"storageEngineConfig":null,"chatHistoryConfig":null,"retrievalConfig":null,"memoryConfig":null,"createdAt":"2026-09-19T14:45:43.431997+08:00","updatedAt":"2026-09-19T14:45:43.461129+08:00","deletedAt":null},"tenantRequired":false,"user":{"id":"52d616a5-0ea5-4861-bd76-e54e04c031fb","username":"regprobe-user","email":"reg-probe@weknora.test","avatar":"","tenantId":10099,"isActive":true,"canAccessAllTenants":false,"isSystemAdmin":false,"preferences":{},"createdAt":"2026-09-19T14:45:43.478114+08:00","updatedAt":"2026-09-19T14:45:43.478114+08:00"}}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "capabilities": {
+      "autoAcceptInvitation": false,
+      "canCreateTenant": true
+    },
+    "memberships": [
+      {
+        "tenantId": 10099,
+        "tenantName": "regprobe-user's Workspace",
+        "role": "owner"
+      }
+    ],
+    "preferenceDefaults": {},
+    "tenant": {
+      "id": 10099,
+      "name": "regprobe-user's Workspace",
+      "description": "Default workspace",
+      "status": "active",
+      "retrieverEngines": {
+        "engines": []
+      },
+      "business": "",
+      "storageQuota": 10737418240,
+      "storageUsed": 0,
+      "contextConfig": {
+        "maxTokens": 0,
+        "compressionStrategy": "",
+        "recentMessageCount": 0,
+        "summarizeThreshold": 0
+      },
+      "webSearchConfig": null,
+      "parserEngineConfig": null,
+      "credentials": null,
+      "storageEngineConfig": null,
+      "chatHistoryConfig": null,
+      "retrievalConfig": null,
+      "memoryConfig": null,
+      "createdAt": "2026-09-19T14:45:43.431997+08:00",
+      "updatedAt": "2026-09-19T14:45:43.461129+08:00",
+      "deletedAt": null
+    },
+    "tenantRequired": false,
+    "user": {
+      "id": "52d616a5-0ea5-4861-bd76-e54e04c031fb",
+      "username": "regprobe-user",
+      "email": "reg-probe@weknora.test",
+      "avatar": "",
+      "tenantId": 10099,
+      "isActive": true,
+      "canAccessAllTenants": false,
+      "isSystemAdmin": false,
+      "preferences": {},
+      "createdAt": "2026-09-19T14:45:43.478114+08:00",
+      "updatedAt": "2026-09-19T14:45:43.478114+08:00"
+    }
+  }
+}

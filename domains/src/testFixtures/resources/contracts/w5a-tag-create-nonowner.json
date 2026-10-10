@@ -1,1 +1,5 @@
-{"code":1002,"data":null,"message":"Forbidden: must own the resource or have the required role"}
+{
+  "code": 1002,
+  "data": null,
+  "message": "Forbidden: must own the resource or have the required role"
+}

@@ -1,1 +1,9 @@
-{"enabled":true,"embeddingModelId":"9aa07763-6b4f-4152-9f2b-3ad0e2d2f69f","knowledgeBaseId":"70ae0f0f-9fe3-4a42-a501-54ff7401c1ff"}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "enabled": true,
+    "embeddingModelId": "9aa07763-6b4f-4152-9f2b-3ad0e2d2f69f",
+    "knowledgeBaseId": "70ae0f0f-9fe3-4a42-a501-54ff7401c1ff"
+  }
+}

@@ -323,8 +323,10 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const { getMyPendingInvitationCount } = await import('@/api/tenant/invitations')
       const resp = await getMyPendingInvitationCount()
-      if (resp.success && resp.data) {
-        setPendingInvitationCount(resp.data.pendingCount)
+      // B201：统一外壳后 resp 即载荷；旧的 {data,success} 壳也容忍
+      const data: any = (resp as any)?.data ?? resp
+      if (data && typeof data.pendingCount === 'number') {
+        setPendingInvitationCount(data.pendingCount)
       }
     } catch {
       // best-effort; keep last known value
@@ -388,11 +390,13 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const { acceptInvitationByToken } = await import('@/api/tenant/invitations')
       const resp = await acceptInvitationByToken(token)
-      if (!resp.success || !resp.data?.membership) {
+      // B201：统一外壳后 resp 即载荷；旧的 {data,success} 壳也容忍
+      const data: any = (resp as any)?.data ?? resp
+      if (!data?.membership) {
         return { ok: false }
       }
-      const tenantId = resp.data.membership.tenantId
-      const tenantName = resp.data.tenantName
+      const tenantId = data.membership.tenantId
+      const tenantName = data.tenantName
       // 刷新成员关系，并切到刚加入的空间。
       await refreshFromAuthMe()
       setSelectedTenant(tenantId, tenantName ?? null)

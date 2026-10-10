@@ -1,1 +1,5 @@
-{"error":{"code":1007,"message":"Failed to create workspace","details":"workspace name cannot be empty"}}
+{
+  "code": 1007,
+  "message": "Failed to create workspace",
+  "data": "workspace name cannot be empty"
+}

@@ -1,1 +1,17 @@
-{"enabled":false,"writeMode":"explicit_only","extractModelId":"","maxItems":200,"extractDelaySeconds":90,"extractMinIntervalSeconds":300,"extractInstructions":"","interestThreshold":3,"embeddingModelId":"","vectorRecall":null,"retrievalConditioning":null}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "enabled": false,
+    "writeMode": "explicit_only",
+    "extractModelId": "",
+    "maxItems": 200,
+    "extractDelaySeconds": 90,
+    "extractMinIntervalSeconds": 300,
+    "extractInstructions": "",
+    "interestThreshold": 3,
+    "embeddingModelId": "",
+    "vectorRecall": null,
+    "retrievalConditioning": null
+  }
+}

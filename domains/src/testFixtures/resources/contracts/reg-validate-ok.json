@@ -1,1 +1,17 @@
-{"id":"52d616a5-0ea5-4861-bd76-e54e04c031fb","username":"regprobe-user","email":"reg-probe@weknora.test","avatar":"","tenantId":10099,"isActive":true,"canAccessAllTenants":false,"isSystemAdmin":false,"preferences":{},"createdAt":"2026-09-19T14:45:43.478114+08:00","updatedAt":"2026-09-19T14:45:43.478114+08:00"}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "id": "52d616a5-0ea5-4861-bd76-e54e04c031fb",
+    "username": "regprobe-user",
+    "email": "reg-probe@weknora.test",
+    "avatar": "",
+    "tenantId": 10099,
+    "isActive": true,
+    "canAccessAllTenants": false,
+    "isSystemAdmin": false,
+    "preferences": {},
+    "createdAt": "2026-09-19T14:45:43.478114+08:00",
+    "updatedAt": "2026-09-19T14:45:43.478114+08:00"
+  }
+}

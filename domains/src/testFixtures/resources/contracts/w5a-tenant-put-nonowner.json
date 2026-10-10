@@ -1,1 +1,1 @@
-{"error":"Forbidden: insufficient workspace role"}
+{"code":1002,"data":null,"message":"Forbidden: insufficient workspace role"}

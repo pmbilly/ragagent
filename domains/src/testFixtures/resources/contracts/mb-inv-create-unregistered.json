@@ -1,1 +1,5 @@
-{"error":{"code":1003,"message":"user with this email is not registered; ask them to sign up first","details":null}}
+{
+  "code": 1003,
+  "message": "user with this email is not registered; ask them to sign up first",
+  "data": null
+}

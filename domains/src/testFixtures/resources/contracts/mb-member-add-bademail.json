@@ -1,1 +1,5 @@
-{"error":{"code":1010,"message":"invalid request body","details":"field 'email' is not a valid email address"}}
+{
+  "code": 1010,
+  "message": "invalid request body",
+  "data": "field 'email' is not a valid email address"
+}

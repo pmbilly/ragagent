@@ -1,1 +1,9 @@
-{"complexPasswordEnabled":false,"edition":"standard","registrationMode":"invite_only"}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "complexPasswordEnabled": false,
+    "edition": "standard",
+    "registrationMode": "invite_only"
+  }
+}

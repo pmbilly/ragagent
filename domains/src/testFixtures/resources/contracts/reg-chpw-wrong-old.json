@@ -1,1 +1,5 @@
-{"error":{"code":1000,"message":"Current password is incorrect","details":"invalid_old_password"}}
+{
+  "code": 1000,
+  "message": "Current password is incorrect",
+  "data": "invalid_old_password"
+}

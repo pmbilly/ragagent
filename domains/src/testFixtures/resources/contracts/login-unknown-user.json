@@ -1,1 +1,5 @@
-{"error":{"code":1001,"message":"Invalid email or password","details":null}}
+{
+  "code": 1001,
+  "message": "Invalid email or password",
+  "data": null
+}

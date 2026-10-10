@@ -19,13 +19,14 @@ import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.ragagent.common.web.ApiResult;
+import com.ragagent.common.web.ApiResponse;
 
 /**
  * 租户成员管理的 5 条路由：
@@ -42,6 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 不做统一映射。</p>
  */
 @RestController
+@ApiResult
 public class TenantMemberController {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -128,7 +130,7 @@ public class TenantMemberController {
 
     /** PUT /tenants/{id}/members/{userId}（Owner+，改角色；ErrLastOwner → 409） */
     @PutMapping("/api/v1/tenants/{id}/members/{userId}")
-    public ResponseEntity<Void> updateMemberRole(@PathVariable String id,
+    public ApiResponse<Void> updateMemberRole(@PathVariable String id,
                                                 @PathVariable("userId") String userId,
                                                 HttpServletRequest request) {
         long tenantId = parseTenantId(id);
@@ -158,12 +160,12 @@ public class TenantMemberController {
                 }
             }
         }
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
     /** DELETE /tenants/{id}/members/{userId}（Owner+，软删；ErrLastOwner → 409） */
     @DeleteMapping("/api/v1/tenants/{id}/members/{userId}")
-    public ResponseEntity<Void> removeMember(@PathVariable String id,
+    public ApiResponse<Void> removeMember(@PathVariable String id,
                                             @PathVariable("userId") String userId) {
         long tenantId = parseTenantId(id);
         String targetUserId = trimToEmpty(userId);
@@ -183,12 +185,12 @@ public class TenantMemberController {
                 }
             }
         }
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
     /** POST /tenants/{id}/leave（Viewer+，自助退出；ErrMembershipNotFound → 404 专属文案） */
     @PostMapping("/api/v1/tenants/{id}/leave")
-    public ResponseEntity<Void> leaveTenant(@PathVariable String id) {
+    public ApiResponse<Void> leaveTenant(@PathVariable String id) {
         long tenantId = parseTenantId(id);
         String caller = requireCaller();
         try {
@@ -205,7 +207,7 @@ public class TenantMemberController {
                 }
             }
         }
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
     // ── 共享辅助（成员/邀请两组共用） ──────────────────────────────────────

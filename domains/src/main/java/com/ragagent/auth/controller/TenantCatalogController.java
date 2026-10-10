@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.ragagent.tenant.Tenant;
+import com.ragagent.common.web.ApiResult;
 
 /**
  * 跨空间租户目录 + KV 配置分发器（五条路由）：
@@ -41,6 +42,7 @@ import com.ragagent.tenant.Tenant;
  * 三条敏感 key 的 admin 门在本类 {@code canViewIntegrationSecrets()}。</p>
  */
 @RestController
+@ApiResult
 public class TenantCatalogController {
     final TenantService tenantService;
     final TenantMemberService memberService;

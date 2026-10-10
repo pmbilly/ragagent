@@ -1,1 +1,5 @@
-{"error":{"code":1010,"message":"Password policy violation","details":"password_policy"}}
+{
+  "code": 1010,
+  "message": "Password policy violation",
+  "data": "password_policy"
+}

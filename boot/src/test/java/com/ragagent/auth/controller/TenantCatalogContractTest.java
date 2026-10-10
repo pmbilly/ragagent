@@ -481,6 +481,8 @@ class TenantCatalogContractTest {
         org.junit.jupiter.api.Assertions.assertEquals(200, hit.getResponse().getStatus());
         var node = new com.fasterxml.jackson.databind.ObjectMapper()
                 .readTree(hit.getResponse().getContentAsString());
+        // B201：统一外壳下先下钻 data（旧形态无壳也通）
+        if (node.isObject() && node.has("code") && node.has("data")) { node = node.get("data"); }
         org.junit.jupiter.api.Assertions.assertTrue(node.has("items") && node.has("total")
                 && node.has("page") && node.has("pageSize"), "裸分页四键: " + node);
         org.junit.jupiter.api.Assertions.assertTrue(node.get("total").asInt() >= 1);
@@ -499,6 +501,8 @@ class TenantCatalogContractTest {
                 .andReturn();
         var missNode = new com.fasterxml.jackson.databind.ObjectMapper()
                 .readTree(miss.getResponse().getContentAsString());
+        // B201：统一外壳下先下钻 data（旧形态无壳也通）
+        if (missNode.isObject() && missNode.has("code") && missNode.has("data")) { missNode = missNode.get("data"); }
         org.junit.jupiter.api.Assertions.assertEquals(0, missNode.get("total").asInt());
         org.junit.jupiter.api.Assertions.assertTrue(missNode.get("items").isEmpty());
     }
@@ -512,6 +516,8 @@ class TenantCatalogContractTest {
         org.junit.jupiter.api.Assertions.assertEquals(200, res.getResponse().getStatus());
         var node = new com.fasterxml.jackson.databind.ObjectMapper()
                 .readTree(res.getResponse().getContentAsString());
+        // B201：统一外壳下先下钻 data（旧形态无壳也通）
+        if (node.isObject() && node.has("code") && node.has("data")) { node = node.get("data"); }
         org.junit.jupiter.api.Assertions.assertTrue(node.isArray(), "应为裸数组: " + node);
         org.junit.jupiter.api.Assertions.assertTrue(node.size() >= 1);
     }

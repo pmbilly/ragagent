@@ -56,6 +56,10 @@
 - **二进制 / 非 JSON**：`FileProxyController`（下载、Range）与任何 `produces` 非 `application/json` 的端点 —— advice 按 `selectedContentType` 跳过（B190 ✓）。
 - **API-Key 过滤器**：`SystemAdminController` 的 API-key 门禁（`X-API-Key`）在 **DispatcherServlet 之前**
   写出 `{"error":"Forbidden: …"}`（拿不到路由打标 ✗）⇒ 保持原样，`adm-guard-platformkey.json` 金片按实际旧形态定稿（B192 ✓）。与 AuthFilter 同类。
+- **auth 包的两个过滤器直写者**（B201 ✓）：`auth/filter/WsAuthSupport.java` 的 `writePlainError(403, "Forbidden: not a member of the target workspace")` 与
+  `auth/apikey/filter/APIKeyAuthChannel.java` 的 `X-Tenant-ID` 校验（400/403 手写）——都在 **DispatcherServlet 之前**写出，
+  形态保持旧样（`{"error":"…"}`）；对应金片（`x-tenant-id-forbidden-403` / `w5c-files-key-*` 等）**有意保持旧形态** ✓。
+  ⚠️ 注意区分：**RBAC 拦截器**（`RbacInterceptor`）在 handler 之后，能拿到路由打标 ⇒ 输出**新外壳** ✓（B201 里 converge 自纠过一个误判 ✓）。
 - **基础设施探针 `GET /health`**（`common/web/HealthController`）：k8s/docker healthcheck 与外部监控依赖
   `{"status":"ok"}` ⇒ **保持原样，不进外壳** ✗（B200 撤回了注解 ✓）。
 - **AuthFilter 的 401/403**：在 DispatcherServlet 之前写出，不进 advice（B189 ✓ 已实测：金片保持原样也匹配 ✓）。
@@ -111,9 +115,19 @@ grep -rnE 'error\\.(code|message|details)|\\.data\\.error\\b' frontend/src front
 
 | 位置 | 读法 | 何时出事 |
 |---|---|---|
-| `stores/auth.ts:326,391` · `utils/authRefresh.ts:131` · `utils/tenantSwitch.ts:92` · `api/tenant/members.ts:102` · `components/MyInvitationsDialog.vue:141` · `views/settings/TenantMembers.vue:817` · `App.vue:155` | `resp.success` / `resp.data`（**旧遗留壳**形状 ✗）| 迁 **auth / tenant** 时 |
+| ~~`stores/auth.ts:326,391` · `utils/authRefresh.ts:131` · `utils/tenantSwitch.ts:92` · `api/tenant/members.ts:102` · `components/MyInvitationsDialog.vue:141` · `views/settings/TenantMembers.vue:817`~~ | `resp.success` / `resp.data`（旧遗留壳形状）| ✅ **B201 已落地**：统一改为「外壳后 `resp` 即载荷 + 旧壳容忍」（`(resp as any)?.data ?? resp` / `success !== false`）|
+| ~~`App.vue:155`~~ | ~~`response.success`~~ | ❌ **误判更正（B201）**：那是 **OIDC 片段解码**（`decodeOIDCResult`），不是 HTTP 外壳 ⇒ **不要改** |
 | `views/settings/ChatHistorySettings.vue:89,160` · `views/settings/RetrievalSettings.vue:146,179` | `response.data` ✗（依赖 api 层的 `{data: resp}` 包装 ✓）| 迁 **tenant KV** 时核对 |
 | `components/McpMetadataPanel.vue:109` | `e?.response?.data?.error?.message` ✗（有 `e.message` 兜底 ⇒ 降级不崩 ✓）| 已迁 mcp ✓，可顺手清理 |
 | `api/web-search-provider.ts:101` | `response.data ?? response`（**刻意容忍** ✓）| 无需改 ✓ |
 
 **易混淆（不受影响 ✓，勿误改 ✗）**：载荷字段叫 `success` 的端点 —— `views/settings/StorageBackendSettings.vue:343`（`r.success`）✓、`views/settings/components/McpTestResultBody.vue` ✓、`composables/useEmbedCitationPopover.ts` ✓、以及所有 **SSE 事件**里的 `event.success` ✓（流不是 HTTP 外壳 ✓）。
+
+### 附：B201 的两条新经验（auth 批）
+
+1. **测试里的 login 助手必须下钻** ✗ —— 8 个契约测试各自从 `/api/v1/auth/login` 响应按**顶层**取 token（`node.get("token")`）；
+   外壳化后 token 在 `data` 里 ⇒ 取到 null ⇒ 后续全部 401/NPE（本轮实测 **48 例失败** ✗，跨 7 个看似无关的测试）。
+   取值点共 7 处（FaqContractTest / WebSearchProviderContractTest / W5cFileProxyContractTest / StorageBackendContractTest /
+   VectorStoreContractTest / W5bInitializationContractTest / ValidationContractTest）+ W5c 的 api-key 取值 1 处。
+2. **金片脚本只许跳过已含 `code` 的字典** ✗ —— 早先只跳过 `code == 0`，于是把 `{"code":1005,…}` 这类**错误体**又包了一层 ⇒
+   出现**双层外壳**金片（本轮拆了 8 个 ✓）。

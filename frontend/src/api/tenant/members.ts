@@ -99,9 +99,11 @@ export async function fetchAllTenantMembers(tenantId: number): Promise<TenantMem
   let total = Number.POSITIVE_INFINITY
   for (let guard = 0; guard < 500 && out.length < total; guard++) {
     const resp = await listMembers(tenantId, { page, pageSize: pageSize })
-    if (!resp.success || !resp.data) break
-    total = resp.data.total
-    const batch = resp.data.members || []
+    // B201：统一外壳后 resp 即载荷；旧的 {data,success} 壳也容忍
+    const data: any = (resp as any)?.data ?? resp
+    if (!data) break
+    total = data.total
+    const batch = data.members || []
     if (batch.length === 0 && page >= 2) break
     out.push(...batch)
     if (batch.length < pageSize) break

@@ -1,1 +1,5 @@
-{"error":{"code":1010,"message":"Invalid registration parameters","details":"field 'username' is below the minimum"}}
+{
+  "code": 1010,
+  "message": "Invalid registration parameters",
+  "data": "field 'username' is below the minimum"
+}
