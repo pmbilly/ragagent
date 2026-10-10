@@ -588,3 +588,28 @@ B116 搬家时已经搬过一批资源（`common/text/*.txt`），这类风险�
    （非 JPMS）下最容易低估的一条。
 2. **proto 生成源随消费者走**：`OtlpHttpExporter` 迁 `:common` ⇒ protobuf 插件 + `otlp-proto` srcDir
    + `spotless targetExclude("build/**")` 三件套一并迁（B161 在 `:engine` 已踩过一次同样的 spotless 坑）。
+
+## 12. B206 侦察：P4 前置（`auth ⇄ apikey` 的真实边清单，2026-10-10 实测）
+
+**动因**：`:channels` = `im` + `embedchannel` + **`channels.api`（即 `auth/apikey` 的 API-Key 通道 ✓）**。
+而 `im`/`embedchannel` 依赖 `session/knowledge/agent/auth…`（`:domains` ✓）⇒ 若 `auth`/`system` 反向
+依赖 `apikey`，则 `:domains ⇄ :channels` **成环** ✗。故 P4 前置 = **切断 `:domains → apikey` 的全部边** ✓。
+
+**旧读数作废**：文档此前写「`auth ⇄ apikey` 22 + 22」✗ —— 按符号/模块实测：**main 侧 6 处 + common 侧 4 处**
+（反向 4 处是 `:channels → :domains` 方向，**允许** ✓ 无需处理 ✓）。
+
+| # | 边（实测位置） | 方向 | 处置 |
+|---|---|---|---|
+| 1 | `system/controller/SystemAdminController:11,12 → apikey.domain.TenantAPIKeyCreateResponse / TenantAPIKeyResponse` | domains→channels | **沉载荷** ✓（两个 DTO 下沉 `:common` 的 api-key 载具位） |
+| 2 | `system/controller/SystemAdminController:13 → apikey.service.TenantAPIKeyService` | domains→channels | **反转接口** ✓（`:common` 定义管理口 port，apikey 实现 ✓） |
+| 3 | `auth/controller/TenantCatalogController:7`、`auth/controller/TenantCreateOps:11 → TenantAPIKeyService` | domains→channels | 同上（同一 port 复用 ✓） |
+| 4 | `auth/filter/AuthFilter:18 → apikey.filter.APIKeyAuthChannel` | domains→channels | **反转接口** ✓（`:common` 定义认证通道 port ✓） |
+| 5 | `common/…/TenantFilterGuard → apikey.mapper.TenantAPIKeyMapper.{listByPlaceholderHash,listPlatform,selectByHash,selectFirstPlaceholderHashId}`（4 处） | **common→channels** ✗ | **反转接口** ✓（`:common` 定义占位符/平台键查询 port ✓） |
+| 6 | 反向：`APIKeyAuthChannel → auth.service.TenantService / domain.User / service.UserService`、`TenantAPIKeyBootstrap → auth.dto.TenantResponse`（4 处） | channels→domains | **无需处理** ✓（方向合法 ✓） |
+| 7 | `boot` 侧：`WebConfig` 注册全部 apikey 过滤器/拦截器（7 类 ✓）+ 4 个契约测试断言 route policy 类 | boot→channels | **无需处理** ✓（`:boot` 依赖一切 ✓；测试同理 ✓） |
+
+**四刀计划**（每刀独立提交 + 独立全绿 ✓，沿用 §13/§14 SOP ✓）：
+1. **沉 DTO**（边 1 ✓）：`TenantAPIKeyCreateResponse` / `TenantAPIKeyResponse`（+ 其引用的 `TenantAPIKeyRequest` 视需要 ✓）沉 `:common`；
+2. **管理口 port**（边 2/3 ✓）：`:common` 定义（create/list/update/delete/rotate 需要的窄接口 ✓），apikey 的 service 实现 ✓，三处调用点改注入 port ✓；
+3. **认证通道 port**（边 4 ✓）+ **查询 port**（边 5 ✓）：`AuthFilter` 与 `TenantFilterGuard` 只依赖 port ✓；
+4. **验环**：`python3 scripts/check-package-cycles.py` + 全量闸门 ✓，随后即可建 `:channels`（`im` + `embedchannel` + `apikey`→`channels.api` ✓）。
