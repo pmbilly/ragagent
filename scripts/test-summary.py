@@ -16,11 +16,15 @@
 （**不带原因** ✓，属性与文本都空 ✓）⇒ 这类跳过在汇总里显示"无原因" ✓，请看用例名回源码查 guard 旁的注释 ✓
 （脚本仍会读 message 属性与文本：别的 JUnit 输出格式会带上原因 ✓）。
 
-用法：python3 scripts/test-summary.py       （找不到 XML 就安静退出 0，供 CI 的 always() 步用；
-                                             只报告，退出码恒 0 —— 红不红由 Gradle 决定）
+用法：python3 scripts/test-summary.py       （找不到 XML 就安静退出 0，供 CI 的 always() 步用）
+
+**B218 起会失败**：跳过清单已升级成**棘轮** —— 只有登记在 {@code ALLOWED_SKIPS} 里的跳过被放行，
+出现未登记的跳过 ⇒ 退出码 1（CI 红）。理由同"棘轮守卫"：覆盖的消失是累积性的，
+今天多跳一个不吭声，半年后就说不清哪些覆盖还在。**新增跳过必须在此登记并写明为什么可以跳**。
 """
 from __future__ import annotations
 
+import fnmatch
 import glob
 import os
 import sys
@@ -29,6 +33,17 @@ import xml.etree.ElementTree as ET
 MODULES = ("domains", "engine", "common", "boot")
 IN_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 MAX_ANNOTATE = 20
+
+# 允许的跳过（棘轮）：模式 → 为什么可以跳。
+# 判定用 fnmatch（`*` 通配），名字形如 `类名.方法名`。
+ALLOWED_SKIPS: tuple[tuple[str, str], ...] = (
+    ("SpringRedisPubSubTest.*",
+     "redis-server 不在 PATH（本地常见；CI 已装 ⇒ CI 真跑）"),
+    ("RemoteApiChatTest.liveRemoteApiChat*",
+     "需真实 provider API key（联网 + 计费），刻意不自动化"),
+    ("JiebaTokenizerDiffTest.*",
+     "需 Go sdkTokenize 的对照产物（不在本仓）"),
+)
 
 
 def main() -> int:
@@ -69,12 +84,23 @@ def main() -> int:
     for mod, n, m in skips:
         print("    ⏭ %s  %s\n         %s" % (mod, n, m))
 
+    # 跳过棘轮（B218）：未登记的跳过 = 覆盖无声消失，报红。
+    unregistered = [(mod, n, m) for mod, n, m in skips
+                    if not any(fnmatch.fnmatch(n, pat) for pat, _ in ALLOWED_SKIPS)]
+    if unregistered:
+        print("\n✗ 未登记的跳过 %d 条（覆盖无声消失）—— 补测，或在 test-summary.py 的 "
+              "ALLOWED_SKIPS 登记并写明理由：" % len(unregistered))
+        for mod, n, m in unregistered:
+            print("    %s  %s" % (mod, n))
+
     if IN_ACTIONS:
         for mod, n, m in fails[:MAX_ANNOTATE]:
             print("::error title=测试失败（%s）::%s — %s" % (mod, n, m))
         for mod, n, m in skips[:MAX_ANNOTATE]:
             print("::notice title=测试跳过（%s，覆盖未跑）::%s — %s" % (mod, n, m))
-    return 0
+        for mod, n, _ in unregistered[:MAX_ANNOTATE]:
+            print("::error title=未登记的跳过（%s）::%s" % (mod, n))
+    return 1 if unregistered else 0
 
 
 if __name__ == "__main__":

@@ -111,6 +111,8 @@ docker run --rm -p 8080:8080 --env-file .env ragagent-server
 | **架构规则** | `boot/src/test/.../arch/ArchitectureRulesTest.java`（ArchUnit，A1–A13） | 禁裸 getenv、禁双装配、禁分层倒挂、Mapper 必须在 `..mapper..`… |
 | **序列化卫生** | `domains/src/test/.../arch/JsonPropertyHygieneTest.java`（A14） | 基线 0：我们自己的面上不得有冗余 `@JsonProperty`（四类必要形态除外） |
 | **十守卫** | `bash scripts/run-guards.sh`（**已接入 `check`**，见下） | 包循环 / Go 锚点 / 契约键 / JSON 键大小写 / 事件面 / **文件规模棘轮** / 目录卫生 / 死成员 / 统一响应外壳 / **异常语义** |
+| **跳过棘轮** | `scripts/test-summary.py`（CI 每轮跑） | 跳过 = 这段覆盖没跑。未登记的跳过 ⇒ 报红；白名单里每条都写明"为什么可以跳" |
+| **覆盖率** | jacoco（**按需**：`-Pcoverage`） | `./gradlew :domains:jacocoTestReport -Pcoverage`。默认不插桩 —— 实测插桩让全量 +25%（1m24s→1m49s），本仓的 1.5 分钟闸门是刻意成果 |
 | **CI** | `.github/workflows/ci.yml` | 4 个 job：guards（十守卫）· backend（真 ParadeDB + 真 Redis + 灌基线 SQL + 全量测试）· docker（镜像构建 + 迁移自检）· frontend |
 
 守卫大多是**棘轮**（ratchet）：登记基线后只许减不许增，例外须写明理由。新增违规当场变红。
@@ -150,7 +152,8 @@ cd frontend && npx vue-tsc --build --force && npm test       # 前端
 - **停服用 `bash scripts/java-server-down.sh`**（`--stop` 兼容）⇒ 停完记得重启。**别再手敲通配符**：仓库里只有这一个 `*-down.sh`（B216 补的，此前文档引用的脚本并不存在，照文档停服会静默失败、端口一直被占）。起服脚本现在会在端口占用时**明确报错**，不再打到旧进程误报 "ready"。
 - **`LOCAL_STORAGE_BASE_DIR` 严禁 `/tmp`**：macOS 定期清理 ⇒ 入库文档原始文件丢失且**不可恢复**（列表正常、preview 全 500、无法重处理）。
 - **H2 绿 ≠ PG 绿**：jsonb 键序、NOT NULL、DDL 默认值只在真 PG 暴露 ⇒ 验收必须连真 PG（CI 的 backend job 就是干这个）。
-- **Redis 测试会静默跳过**：14 个测试用 `assumeTrue(redis != null)`，`redis-server` 不在 PATH 就无声不测。看到 skipped 别当"全绿"。
+- **Redis 测试会跳过 —— 但有棘轮兜着**：`redis-server` 不在 PATH 时相关用例跳过（本地常见；CI 已装 ⇒ 真跑）。**跳过已升级为棘轮**：未登记的跳过会让 `scripts/test-summary.py` 报红，新增跳过必须去它的 `ALLOWED_SKIPS` 登记并写明理由（覆盖的消失是累积性的）。
+- **`*IT` 不在默认构建里**：Milvus / Weaviate 的驱动集成测试需要真实服务，走独立任务 `./gradlew :engine:integrationTest`（env 门控：`WEKNORA_MILVUS_IT=true` 等）。此前它们**连手动都跑不了**（`*IT` 不匹配 Gradle 默认收集模式）。
 - **改契约要同 PR 带前端**：前端 TS 类型是**手写**的（无 codegen），后端改字段前端照样编译通过 ⇒ 靠 `scripts/check-fe-contract-keys.py` 兜。
 - **`Long != Long` 引用比较**：租户 id 超出 Long 缓存区，一律 `equals`。
 - **加依赖版本要进 catalog**：`gradle/libs.versions.toml` 是唯一来源（B214 起）。别在模块 build 文件里写 `group:artifact:version` —— 那正是本次收拢掉的形态。无覆盖率工具（jacoco）仍是缺口。

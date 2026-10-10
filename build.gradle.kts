@@ -1,4 +1,6 @@
 import org.gradle.external.javadoc.StandardJavadocDocletOptions
+import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
+import org.gradle.testing.jacoco.tasks.JacocoReport
 
 // 根构建脚本：公共配置（坐标/仓库）与插件版本统一声明；插件此处不应用（apply false），
 // 由各模块（domains/engine/common/boot）应用。
@@ -57,6 +59,40 @@ subprojects {
         // 接进 check ⇒ `./gradlew build`（CI backend job 跑的就是它）会连带执行 javadoc：
         // 注释里出现指向已不存在类型/成员/常量的 {@link}/{@value} 时**构建期就红**。
         tasks.named("check") { dependsOn(tasks.named("javadoc")) }
+
+        // ── 覆盖率报告（B218）────────────────────────────────────────────────
+        // 只**报告**、不设门：先让盲区可见（本仓长期"没有覆盖率工具"，薄弱区域只能靠
+        // 文件清单推断）。阈值等基线跑稳了再议 —— 过早设门会逼出一堆"为达标而写"的测试。
+        //   各模块：./gradlew :domains:jacocoTestReport -Pcoverage
+        //   报告位置：<模块>/build/reports/jacoco/test/html/index.html
+        //
+        // ⚠️ 默认**不插桩**：jacoco agent 实测让全量闸门从 1m24s 涨到 1m49s（+25%），
+        // 而"全量 1.5 分钟"是本仓刻意优化过的成果（B194），不该被无声回退。
+        // 需要覆盖率时显式 `-Pcoverage`；忘了加会由 jacocoTestReport 的 doFirst 拦下报错，
+        // 而不是安静地给出一份空报告。
+        apply(plugin = "jacoco")
+        val coverageEnabled = providers.gradleProperty("coverage").isPresent
+        tasks.withType<Test>().configureEach {
+            extensions.configure<JacocoTaskExtension> {
+                isEnabled = coverageEnabled
+            }
+        }
+        tasks.named<JacocoReport>("jacocoTestReport") {
+            dependsOn(tasks.named("test"))
+            reports {
+                xml.required.set(true)    // 供后续接 Codecov / 自建看板
+                html.required.set(true)
+                csv.required.set(false)
+            }
+            doFirst {
+                if (!coverageEnabled) {
+                    throw GradleException(
+                        "覆盖率数据未采集：本仓默认不插桩（省 25% 构建时间），请显式加 -Pcoverage\n"
+                                + "  例：./gradlew :domains:jacocoTestReport -Pcoverage"
+                    )
+                }
+            }
+        }
 
         // 测试并行（B194）：本仓 4800+ 用例单 JVM 串行约 3 分钟。这里只让 Gradle 按**测试类**分派到
         // 多个测试 JVM（同类内仍串行 ⇒ 不破坏类内夹具顺序）。分叉数取核数/4 并夹在 1..3：

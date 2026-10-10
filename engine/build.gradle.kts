@@ -87,3 +87,34 @@ tasks.withType<Test> {
     jvmArgs("-XX:+EnableDynamicAgentLoading")
     maxHeapSize = "1g"
 }
+
+// ── 集成测试任务（B218）─────────────────────────────────────────────────────
+// 起因：`*IT` 不匹配 Gradle 的默认收集模式（`*Test` / `Test*` / `*Tests` / `*TestCase`）
+// ⇒ 本职的两个类（MilvusDriverLocalIT / WeaviateDriverLocalIT）**从未被执行过**，
+// 连它们 javadoc 里写的 `--tests "*...IT*"` 也筛不出（候选集是空的 ⇒ 报 No tests found）。
+// 覆盖上的死代码比"低覆盖"更糟：它看起来存在。
+//
+// 这里给它们一个**显式的执行入口**，且**不接 check** —— 它们要真实外部服务（env 门控）：
+//   WEKNORA_MILVUS_IT=true ./gradlew :engine:integrationTest
+// 未设 env 时 JUnit 的 @EnabledIfEnvironmentVariable 会把类标为 disabled ⇒ 任务绿、零联网。
+val integrationTest = tasks.register<Test>("integrationTest") {
+    group = "verification"
+    description = "集成测试（*IT）：需真实外部服务，env 门控，默认不接 check"
+    useJUnitPlatform()
+    testClassesDirs = sourceSets["test"].output.classesDirs
+    classpath = sourceSets["test"].runtimeClasspath
+    include("**/*IT.class")
+    // 与 test 同口径的 JVM 设置（IT 同样用 Mockito / 需要 agent）
+    val byteBuddyAgent = configurations.testRuntimeClasspath.get().files
+        .firstOrNull { it.name.startsWith("byte-buddy-agent-") }
+    if (byteBuddyAgent != null) {
+        jvmArgs("-javaagent:$byteBuddyAgent")
+    }
+    jvmArgs("-XX:+EnableDynamicAgentLoading")
+    maxHeapSize = "1g"
+}
+
+// 反向显式化：默认 test 任务**不**收 `*IT`（今天靠默认模式排除，写出来免得将来被人改掉口径）。
+tasks.named<Test>("test") {
+    exclude("**/*IT.class")
+}

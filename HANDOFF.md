@@ -2,7 +2,7 @@
 
 > 本文档写给在 `~/ragagent` 打开的新会话/新成员。**一切背景以本文为准**；最近的执行细节在 `git log`。
 > 种子：自 `~/ragagent-java` @ `646aba7`（2026-09-28）分叉，git 历史完整保留。
-> **最近更新 2026-10-10（B217 边界条件不得降级：ES V7 空 filter 修复 + 第十守卫；B216 起停服脚本补齐；B215 序列化统一：自建 mapper 168→7 + A15 守卫；B214 工程化补齐：九守卫进 Gradle + version catalog；B213 仓储门面归位 `repository/` + A11b 防回流；B212 交付链路修复：Dockerfile 失效 + 镜像进 CI）**；上一次 2026-10-10（B204 文档瘦身：§15.1 批次表压成一行一批，432.9→171.9 KB）；再上一次 2026-10-02（B32 文档重组）：§14 域级作战/执行记录（2269 行）与 §15.1.1 逐批记录（442 行）
+> **最近更新 2026-10-10（B218 可测试性补强：tenant 脱敏单测 + 跳过棘轮 + `*IT` 执行入口 + jacoco 按需；**本轮架构评估 6 批全部完成**——B212~B218）。此前：B217 边界条件不得降级：ES V7 空 filter 修复 + 第十守卫；B216 起停服脚本补齐；B215 序列化统一：自建 mapper 168→7 + A15 守卫；B214 工程化补齐：九守卫进 Gradle + version catalog；B213 仓储门面归位 `repository/` + A11b 防回流；B212 交付链路修复：Dockerfile 失效 + 镜像进 CI）**；上一次 2026-10-10（B204 文档瘦身：§15.1 批次表压成一行一批，432.9→171.9 KB）；再上一次 2026-10-02（B32 文档重组）：§14 域级作战/执行记录（2269 行）与 §15.1.1 逐批记录（442 行）
 > **已移出本文件**——`docs/handoff/plans/`（索引见 §14.7+）与 `docs/handoff/records/batch-records.md`（索引见 §15.1.1）。
 > 本文件＝**常读面**：接手须知 / §2 决策 / §13 方法论 / §14.1~14.6 判据与坑 / §14.9 换锚总纲 / §15 批次总表与纪律。
 > **当前状态总账**见 §15 末（结构各轴完成 + 5 项已知边界）。
@@ -11,7 +11,7 @@
 ## ⭐ 接手须知（5 分钟版）
 
 0. **文档布局（2026-10-02 重组；2026-10-10 复理）**：本文件＝**常读面**（接手须知 / §2 决策 / §13 方法论 / §14.1~14.6 判据与坑 / §14.9 换锚总纲 / §15 批次表与纪律）；**查证面已移出**——域级作战与执行记录见 `docs/handoff/plans/`（索引见 §14.7+）、逐批执行记录见 `docs/handoff/records/batch-records.md`（索引见 §15.1.1）。
-1. **先验证基线全绿**（三条命令见 §9；session 域单域验证：`./gradlew :domains:test --tests "com.ragagent.session.*"`，当前 **4858 条 / 失败 0**（B202 实测 ✓））。
+1. **先验证基线全绿**（三条命令见 §9；session 域单域验证：`./gradlew :domains:test --tests "com.ragagent.session.*"`，当前 **4871 条 / 失败 0**（B218 实测 ✓））。
 2. **总目标**＝按 Java 标准提升可读性（§0）；**行为不变**是底线（测试是安全网）；已定决策见 §2（勿再讨论）。
 3. **项目主线的历史收束（一句话版）** ✓
    - 包结构治理 P0~P3 ✓、阶段 2 神类切片（session/wiki/im/retrieval/auth/llm/mcp/embed/chatpipeline/datasource/memory，含 m5）✓、
@@ -229,7 +229,8 @@
    - ✅ **已修（B213）分层不一致**：session(4) / wiki(4) / memory(1) 共 9 个 Repository 已从 `mapper/` 归位 `repository/`；**memory 域扩到 5 类**（门面 + 3 个包级私有 Store + `MemoryTxTemplate`，因紧耦合对不可拆）。新增 ArchUnit **A11b** 防回流（`mapper` 包禁 `*Repository`，棘轮基线 11 条 = 尚未归位的域）。**余 11 个域待逐域跟进**（audit 1 / auth-apikey 1 / datasource 2 / mcp 3 / storage 2 / vectorstore 1 / websearch 1；`:engine` 的 `retrieval/engine/**` 不适用本约定）。
    - ✅ **已修（B214）**：九守卫**已作为 `:guards` 任务接入 `check`**（本地 `./gradlew build` 与 CI 同口径；红态探针已验）· **version catalog 已建**（`gradle/libs.versions.toml`；30 处硬编码版本归零，BOM 5 处 → 1 处）。
      **⚠️ 评估误判更正**：`maxParallelForks` 的"两套冲突口径"**是刻意分层调参、不是缺陷** —— `domains:179` 的 `cores/2` 正是 B175 为修"4 fork × 2g 在 4 核 CI 抢内存 ⇒ worker 崩"而写成，统一它等于回退那个修复。**不要动**。
-   - ⬜ **P2 工程化债（余）**：`GoRecording45C.java` **单文件 3.61 MB**（全仓最大 Java 文件）· 14 个 Redis 测试 `assumeTrue` **静默跳过** · `tenant` 包（多租户安全关键）**零单测** · 无覆盖率工具（jacoco 未引入）· 2 个 `*IT` 永不执行（Gradle 默认只收集 `*Test`）· `:engine` 声明 `java-test-fixtures` 但只有 resources（非死配置，见 B213 核实）。
+   - ✅ **已修（B218）**：`tenant` 包补脱敏单测（13 用例，含"新增 provider 必红"的清单钉子）· Redis 跳过**升级为棘轮**（未登记跳过 ⇒ `test-summary.py` 报红）· **2 个 `*IT` 有了执行入口**（`:engine:integrationTest`，此前连手动都跑不了）· **jacoco 已引入**（按需 `-Pcoverage`；实测插桩 +25% ⇒ 默认不插桩）。
+   - ⬜ **P2 工程化债（余）**：`GoRecording45C.java` **单文件 3.61 MB**（全仓最大 Java 文件）· `:engine` 声明 `java-test-fixtures` 但只有 resources（非死配置，见 B213 核实）· 覆盖率基线**尚未建立阈值**（首测 common 仅 22.7% 行覆盖，但那是模块口径、跨模块间接使用不计入 ⇒ 要设门得先做聚合报告）。
    - ⬜ **P2 契约单一事实源**：无 OpenAPI/共享 schema，前端 TS 类型手写，一致性全靠正则文本扫描（`check-json-key-case.py` 自述 7 种写法扫不到）。
    - ⬜ **登记不动**：`docs/site/*.html` 是外部 Archify 产物、本仓无该工具无法重渲染（源 json 已修正，HTML 待外部重渲染）。**2026-10-09 遗留的 25 个 controller 包内协作类已于 B178 判定全部不是缺陷 ✓ 关闭。**
 
@@ -247,10 +248,10 @@
 
 ## 9. 测试与安全网
 
-- 434 个测试类 / 1,366 契约 fixture（**4,858 用例 / 0 失败**，2026-10-10 B202 实测 ✓；早前记录 4,670 / 4 skip 为 2026-10-01 ✓）是重构回归网，**每一步（哪怕纯移动）结束都必须全绿**——近两轮的工作方式就是"改一步 → 全量验证 → 提交"。这是"种子 fork + 渐进转型"优于重写的全部意义。
+- 435 个测试类 / 1,345 契约 fixture（**4,871 用例 / 0 失败**，2026-10-10 B218 实测 ✓；早前记录 4,670 / 4 skip 为 2026-10-01 ✓）是重构回归网，**每一步（哪怕纯移动）结束都必须全绿**——近两轮的工作方式就是"改一步 → 全量验证 → 提交"。这是"种子 fork + 渐进转型"优于重写的全部意义。
 - **三条验证命令（接手先跑一遍确认基线）**：
   ```bash
-  # 后端全量（约 1.5 分钟，B194 提速后；期望 BUILD SUCCESSFUL，4,858 用例 0 失败）
+  # 后端全量（约 1.5 分钟，B194 提速后；期望 BUILD SUCCESSFUL，4,871 用例 0 失败）
   cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home ./gradlew :domains:test
   # 前端类型检查（期望 0 错误）
   cd ~/ragagent/frontend && npx vue-tsc --build --force
@@ -634,7 +635,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 3. 端点/落库面**按清单逐域推进**：一个域一个 PR、同批带前端、重录 fixture。
 
 **验收（Acceptance）**
-- 全量测试绿（当前口径 **4,858 用例**，2026-10-10 ✓）；每一步"改一步 → 全量验证 → 提交"。
+- 全量测试绿（当前口径 **4,871 用例**，2026-10-10 B218 ✓）；每一步"改一步 → 全量验证 → 提交"。
 - 契约 fixture 重录后**语义对比**（键序/转义归一化）全过；200 路径 fixture 应零改动。
 - 前端同 PR；`docs/knowledge-api-contract-v1.md` 同步更新版本与差异表。
 
@@ -677,6 +678,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | **B215 序列化统一：自建 mapper 收编 + A15 守卫** | 架构评估 P1-①（本轮收益最大项）：**主源码 168 处自建 mapper** 绕过 §2-12 的统一策略。代价不是"多写一行"，而是**策略分叉**：裸 `new ObjectMapper()` 没注册 JSR-310（遇 `java.time` 字段直接抛 `InvalidDefinitionException`）、且 `FAIL_ON_UNKNOWN_PROPERTIES=true` —— 与"宽松读"政策恰好相反，且**只在特定数据到达时才炸** | **P1** | 中 | ✅ **完成（2026-10-10）**——**168 → 7 处**（6 处刻意保留 + 工厂自身）。**收编方法**：① 161 处裸 mapper 批量替换为 `JsonMappers.lenient()`（脚本按"`new` 后 6 行内无配置调用"判定 + 自动补 import）；② 31 处有配置但**等价/超集于 lenient** 的（只关 FOUP、或 JavaTimeModule+关时间戳）换成 lenient；③ 内联 `JsonMapper.builder().build()` 5 处（含**循环内每次 new**）收编并提为静态字段。**保留 6 处（每处类注释已有硬理由）**：`LangfuseAttributes`/`StreamJson`/`EventJson`（`ORDER_MAP_ENTRIES_BY_KEYS` 或零值时间序列化器 ⇒ **键序/时间字面量是线上字节面**）· `GitLabConnector`（落库 jsonb 字节须与既有 cursor 一致）· `NotionJson`（`ADJUST_DATES_TO_CONTEXT_TIME_ZONE=false`，**注释明言收编会让写回 cursor 的偏移字面量漂移**）· `JsonValues`（`FAIL_ON_TRAILING_TOKENS=true`，LLM 输出严格解析）。**新增 ArchUnit A15**（禁自建 ObjectMapper/JsonMapper.builder，棘轮基线 7）+ **红态探针已验**（注入 `favorite/ProbeMapper` ⇒ FAILED ✓ ⇒ 删除恢复绿 ✓）。**关键证据**：`./gradlew build` ✓ **1m31s** · **4860 / 失败 0 / 跳过 6** ✓ —— **1345 个契约金片逐字节比对全过 ⇒ 线格式未变**（这是本批唯一需要证明的事）· 九守卫 rc=0 ✓。 |
 | **B216 起停服脚本补齐（B215 收尾时踩出来的连环坑）** | B215 收尾重启 dev 后端做冒烟时，`register` 返回 **500**（`NoClassDefFoundError: PasswordPolicy`）——看起来像刚改的代码炸了。**真因是环境**：① 文档（HANDOFF §8 / README）与 up 脚本都引用 `scripts/*-down.sh --stop`，而**该脚本并不存在** ⇒ 每次"停服"静默失败、端口 8083 一直被旧进程占着；② `java-server-up.sh` 只等端口就绪、**不检查占用**，于是就绪探测**打到旧进程**上照样打印 "ready" ✗ —— 旧进程正处"陈旧 jar"状态（全端点 500）⇒ 差点把环境问题误判成代码 bug 并回滚提交 | **P1** | 小 | ✅ **完成（2026-10-10）**——① **新建 `scripts/java-server-down.sh`**（按端口找进程树，先 TERM 15 秒后 KILL；幂等；`--stop` 兼容文档旧写法）；**不**用 `gradlew --stop`（那会停掉所有 daemon、影响其他会话）。② `java-server-up.sh` **起服前挡端口占用**（`lsof -ti` 命中即列出 PID 并 exit 1）⇒ 杜绝"误报 ready"。**验证**：红态（服务在跑 ⇒ 明确报错 + 列 PID + rc=1，不再打印 ready ✓）· 停服三情形（正常停 ✓ / 幂等 ✓ / 停后再起 health 200 ✓）· **真实冒烟**：`register 201`（响应 `createdAt` 为 ISO-8601 带时区 ⇒ lenient 策略生效）+ `login 200` + `health 200`，日志 **ERROR 0 / 无 ClassNotFound** ✓。文档两处引用同步订正为具体脚本名。 |
 | **B217 边界条件不得降级：ES V7 空 filter + 第十守卫** | 架构评估 P1-②（**唯一带安全语义**的一项）：ES V7 家族三份复制的同款 —— `catch (Exception e) { filter = MAPPER.createObjectNode(); }`。`getBaseCondsJson` 产出的是**权限/范围边界**（租户/KB/tag 的 must、is_enabled 的 must_not），解析失败换成空对象 ⇒ ES 收到 `filter: [{}]` ⇒ **过滤条件丢失不报错，而是返回更宽的结果集**（可能捞出本该被挡掉的内容） | **P1** | 小 | ✅ **完成（2026-10-10）**——判定：该 JSON 由本仓 MAPPER 序列化产出，正常不可能解析失败；真失败时降级为"无边界"是最坏选择 ⇒ 改为**直接抛**（`V7SearchOps` 向量/关键词两路 + `V7WriteOps` 源索引批量读，三处方法本就 `throws Exception`）。`V8WriteOps` 同位置静默 return ⇒ 补 warn 日志（无日志时"部分失败未检视"与"确实没有失败"事后无法区分）。**新增第十守卫** `scripts/check-exception-semantics.py`（零基线纯禁令：扫 engine 检索引擎目录的 catch 块，内建状态机抹平注释/字符串后做大括号配对）⇒ 接入 `run-guards.sh`（**九守卫 → 十守卫**，11 处文案同步）；**红态探针已验**（还原修复前写法 ⇒ 精确命中 `ElasticsearchV7SearchOps.java:85` ✓）。**评审计数更正**：写入路径三处（V7 bulk/delete、V8 bulk 解析失败 return）**比我初评的风险低** —— 都先查状态码且会抛，解析失败只影响"部分失败检视"。**逐处审查后保留**：`classifyFailure` 的错误类型提取（缺失不影响按 status 判定）· `useKeywordSuffix` 探测降级（可用性权衡 + warn 留痕）· 三处读坏 jsonb 返回空对象（属 §2-12 宽松读）。**验证**：`./gradlew build` ✓ **1m27s** · **4860 / 失败 0 / 跳过 6** ✓（首跑 `EmbedRateLimiterTest` 红一次 = §9 登记的第三个已知偶发，单独重跑 3 次 + 全量复跑全绿 ⇒ 与本批无关）· 十守卫 rc=0 ✓。 |
+| **B218 可测试性补强：tenant 脱敏单测 + 跳过棘轮 + `*IT` 入口 + jacoco** | 架构评估 P2 可测试性四项（本轮评估的**最后一批**）：① `tenant` 包（多租户安全关键）**零单测**；② Redis 相关用例 `assumeTrue` **静默跳过**（覆盖可无声消失）；③ 2 个 `*IT` **永不执行**；④ 无覆盖率工具 | P2 | 中 | ✅ **完成（2026-10-10）**——① **`TenantConfigRedactionTest` 13 用例**：7 个云 provider 的密钥打码逐项断言 + S3 的"空串=切 IAM 链"例外语义 + WebSearch/ParserEngine 的响应面打码与更新面合并 + **反射清单钉子**（`providerFieldListIsPinned`：新增 `*EngineConfig` 字段必红 ⇒ 逼补打码与合并两条分支）。② **跳过棘轮**：`test-summary.py` 加 `ALLOWED_SKIPS`（模式→理由），**未登记跳过 ⇒ 退出码 1 ⇒ CI 红**；**红态探针已验**（清空白名单 ⇒ 2 条被逮住报红 ✓）。③ **`:engine:integrationTest` 任务**（显式 `include("**/*IT.class")`，不接 check）：此前 `*IT` 不匹配 Gradle 默认收集模式 ⇒ **连它们 javadoc 里写的 `--tests "*...IT*"` 也筛不出**（候选集为空）；现 `test` 显式 `exclude` + IT 独立入口（env 门控 ⇒ 未设时 disabled，任务绿）；两个 IT 的过时命令（`:server:test`）一并订正。④ **jacoco 引入但默认不插桩**：实测插桩让全量 1m24s → **1m49s（+25%）**，而"1.5 分钟闸门"是本仓刻意成果（B194）⇒ 改按需 `-Pcoverage`，并给 `jacocoTestReport` 加 doFirst **防呆**（忘了加参数时明确报错，而不是安静产出空报告）。**验证**：`./gradlew build` ✓ **1m31s** · **4871 用例 / 失败 0**（= 2885 domains + 545 engine + 127 common + 1314 boot；新增 13 用例、`*IT` 移出 test 2 条，逐项对上）· 十守卫 rc=0 ✓ · integrationTest 任务跑通（2 类 disabled ✓）· jacoco 三情形（不带参数报错 / 带参数出报告 / 默认回到 1m31s）全验 ✓。 |
 | **B209 P4 第 3 刀：API-Key 认证通道口 + 侦察更正** | 最后一条 main 边清零 | 架构 | 小 | ✅ **完成（2026-10-10）**——`:common` 新增 `ApiKeyAuthPort`（签名与实现逐字一致，含 `throws IOException` ✓ —— 第一版漏了它 ⇒ 编译错 ✓），`APIKeyAuthChannel implements` 该口、`AuthFilter` 改依赖口 ✓ ⇒ **`domains → apikey` 代码边 1 → 0** ✓✓。**侦察更正** ✗：`TenantFilterGuard` 引的是 **MyBatis 语句名字符串白名单**（4 条 ✓）而非 mapper 类型 ⇒ **边 5 是误报** ✓（同 R-d 那类 ✓）；但 apikey 改名 `channels.api` 时这 4 条字符串**必须同批更新** ✓（已写进 §12 ✓）。验证：`spotlessCheck build` ✓ 1m40s · **4858 / 0** ✓ · 九守卫 ✓ · 验环 ✓。 |
 | **B208 P4 第 2 刀：API-Key 管理口 port（:common）** | 窄口 + 脱敏搬移 + 清死依赖/迪米特 | 架构 | 小 | ✅ **完成（2026-10-10）**——`:common` 新增 `ApiKeyAdminPort`（平台列表/建/撤 + 租户默认键 ✓），apikey 侧 `ApiKeyAdminAdapter` 实现（脱敏 `masked()` **逐字搬** ✓）；`SystemAdminController` / `TenantCatalogController` / `TenantCreateOps` 改注入 port ✓（后者顺带修掉 `service.apiKeyService.…` 的迪米特违规 ✗ 与 Catalog 的死依赖 ✗）。**main 侧边数 5 → 1** ✓（只剩 `AuthFilter → APIKeyAuthChannel` ⇒ 第 3 刀 ✓）。验证：`spotlessCheck build` ✓ 1m37s · **4858 / 0** ✓ · 九守卫 ✓ · 验环 ✓。 |
 | **B207 P4 第 1 刀：API-Key 两个响应记录沉 :common** | 记录下沉 + 映射留属主 | 架构 | 小 | ✅ **完成（2026-10-10）**——`TenantAPIKeyResponse` / `TenantAPIKeyCreateResponse` → `com.ragagent.common.apikey` ✓；**关键**：`TenantAPIKeyResponse.from(TenantAPIKey)` 依赖实体 ⇒ **不搬**（搬了会在 `:common` 造反向边 ✗），改建 `auth.apikey.domain.TenantAPIKeyProjections`（语义逐字保留 ✓）。doclint 抓到 `TenantAPIKey` 的 `{@link}` 还指旧包 ✗（§10 沉淀③ 原文生效 ✓）⇒ 全仓修 javadoc 引用 ✓。边数 6 → 5（DTO 两处消失；`SystemAdminController` 改指 projections ⇒ 该边留给第 2 刀的管理口 port 一并消掉 ✓）。验证：`spotlessCheck build` ✓ 1m40s · **4858 / 0** ✓ · 验环 ✓ · 九守卫 ✓。 |

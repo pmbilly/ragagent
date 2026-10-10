@@ -38,7 +38,7 @@ import com.ragagent.common.vectorstore.IndexConfig;
  *   -e AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED=true -e ENABLE_TOKENIZER_GSE=true \
  *   semitechnologies/weaviate:1.28.4
  * # 跑本类
- * WEKNORA_WEAVIATE_IT=true ./gradlew :server:test --tests "*WeaviateDriverLocalIT*"
+ * WEKNORA_WEAVIATE_IT=true ./gradlew :engine:integrationTest
  * </pre>
  *
  * 覆盖：建类 → 批量写 → 向量检索（certainty）→ 关键词检索（BM25 + gse 分词）→

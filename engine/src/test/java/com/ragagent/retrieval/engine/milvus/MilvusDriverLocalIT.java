@@ -37,7 +37,7 @@ import com.ragagent.common.vectorstore.IndexConfig;
  *   -e ETCD_USE_EMBED=true -e ETCD_DATA_DIR=/var/lib/milvus/etcd \
  *   -e COMMON_STORAGETYPE=local -e DEPLOY_MODE=STANDALONE \
  *   milvusdb/milvus:v2.6.11 milvus run standalone
- * WEKNORA_MILVUS_IT=true ./gradlew :server:test --tests "*MilvusDriverLocalIT*"
+ * WEKNORA_MILVUS_IT=true ./gradlew :engine:integrationTest
  * </pre>
  *
  * 覆盖：建集合（BM25 函数 + 稀疏列 + 索引参数）→ 批量写 → 向量检索（distance 分数）→
