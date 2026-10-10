@@ -511,8 +511,10 @@ const onProviderTypeChange = () => {
 const loadProviderEntities = async () => {
   try {
     const response = await listWebSearchProviders()
-    if (response.data && Array.isArray(response.data)) {
-      providerEntities.value = response.data
+    // B190：拆掉 Go 遗留壳后，载荷本身就是数组；旧形态（{data,success:true}）也容忍，便于灰度。
+    const list = Array.isArray(response) ? response : (response as { data?: unknown } | null)?.data
+    if (Array.isArray(list)) {
+      providerEntities.value = list
     }
   } catch (error) {
     console.error('Failed to load provider entities:', error)
