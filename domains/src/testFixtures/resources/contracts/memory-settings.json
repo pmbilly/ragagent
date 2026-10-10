@@ -1,1 +1,12 @@
-{"workspaceEnabled":true,"userEnabled":true,"effective":true,"writeMode":"explicit_only","itemCount":0,"maxItems":200}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "workspaceEnabled": true,
+    "userEnabled": true,
+    "effective": true,
+    "writeMode": "explicit_only",
+    "itemCount": 0,
+    "maxItems": 200
+  }
+}

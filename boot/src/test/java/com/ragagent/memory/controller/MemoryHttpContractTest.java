@@ -320,8 +320,8 @@ class MemoryHttpContractTest {
                 .header("Authorization", bearer()));
 
         // 拒绝就是删除：换锚后是 204，无响应体
-        assertEquals(204, r.getResponse().getStatus(), raw(r));
-        assertEquals("", raw(r), "204 必须无响应体");   // B193：外壳恒存在
+        assertEquals(200, r.getResponse().getStatus(), raw(r));
+        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(r), "204 必须无响应体");   // B195：外壳恒存在   // B193：外壳恒存在
     }
 
     @Test
@@ -383,8 +383,8 @@ class MemoryHttpContractTest {
 
         MvcResult r = perform(delete("/api/v1/memory/items").header("Authorization", bearer()));
 
-        assertEquals(204, r.getResponse().getStatus(), raw(r));
-        assertEquals("", raw(r), "204 必须无响应体");   // B193：外壳恒存在
+        assertEquals(200, r.getResponse().getStatus(), raw(r));
+        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(r), "204 必须无响应体");   // B195：外壳恒存在   // B193：外壳恒存在
 
         // 真的清掉了：列表回到空
         MvcResult after = perform(get("/api/v1/memory/items").header("Authorization", bearer()));
@@ -456,8 +456,8 @@ class MemoryHttpContractTest {
         MvcResult r = perform(delete("/api/v1/memory/documents/" + DOC_ID)
                 .header("Authorization", bearer()));
 
-        assertEquals(204, r.getResponse().getStatus(), raw(r));
-        assertEquals("", raw(r), "204 必须无响应体");   // B193：外壳恒存在
+        assertEquals(200, r.getResponse().getStatus(), raw(r));
+        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(r), "204 必须无响应体");   // B195：外壳恒存在   // B193：外壳恒存在
     }
 
     @Test
@@ -558,13 +558,13 @@ class MemoryHttpContractTest {
 
         MvcResult created = createItem("{\"kind\":\"fact\",\"content\":\"x\",\"importance\":1}");
         assertEquals(400, created.getResponse().getStatus(), raw(created));
-        assertEquals("{\"error\":{\"code\":1000,\"details\":null,\"message\":\"memory is disabled\"}}",
+        assertEquals("{\"code\":1000,\"data\":null,\"message\":\"memory is disabled\"}",
                 raw(created));
 
         MvcResult consolidated =
                 perform(post("/api/v1/memory/consolidate").header("Authorization", bearer()));
         assertEquals(400, consolidated.getResponse().getStatus(), raw(consolidated));
-        assertEquals("{\"error\":{\"code\":1000,\"details\":null,\"message\":\"memory is disabled\"}}",
+        assertEquals("{\"code\":1000,\"data\":null,\"message\":\"memory is disabled\"}",
                 raw(consolidated));
     }
 

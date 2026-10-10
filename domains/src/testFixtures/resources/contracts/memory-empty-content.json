@@ -1,1 +1,5 @@
-{"error":{"code":1007,"message":"Failed to create memory","details":"memory: empty content"}}
+{
+  "code": 1007,
+  "message": "Failed to create memory",
+  "data": "memory: empty content"
+}

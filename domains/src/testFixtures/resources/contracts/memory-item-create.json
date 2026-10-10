@@ -1,1 +1,27 @@
-{"id":"c5b5aafd-ba44-4eb4-88f8-2ff097fda912","tenantId":10002,"subjectId":"web_user:11111111-2222-3333-4444-555555555501","kind":"fact","content":"我偏好用 PostgreSQL","topic":"","normalizedKey":"postgresql-偏-好-我-用","importance":4,"origin":"manual","status":"active","sourceSessionId":"","sourceMessageId":"","validFrom":"2026-09-18T13:25:52.019388+08:00","invalidAt":null,"expiresAt":null,"supersededBy":"","lastUsedAt":null,"useCount":0,"createdAt":"2026-09-18T05:25:52.022047Z","updatedAt":"2026-09-18T05:25:52.022047Z","replacesId":""}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "id": "c5b5aafd-ba44-4eb4-88f8-2ff097fda912",
+    "tenantId": 10002,
+    "subjectId": "web_user:11111111-2222-3333-4444-555555555501",
+    "kind": "fact",
+    "content": "我偏好用 PostgreSQL",
+    "topic": "",
+    "normalizedKey": "postgresql-偏-好-我-用",
+    "importance": 4,
+    "origin": "manual",
+    "status": "active",
+    "sourceSessionId": "",
+    "sourceMessageId": "",
+    "validFrom": "2026-09-18T13:25:52.019388+08:00",
+    "invalidAt": null,
+    "expiresAt": null,
+    "supersededBy": "",
+    "lastUsedAt": null,
+    "useCount": 0,
+    "createdAt": "2026-09-18T05:25:52.022047Z",
+    "updatedAt": "2026-09-18T05:25:52.022047Z",
+    "replacesId": ""
+  }
+}

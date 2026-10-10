@@ -35,6 +35,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.ragagent.common.web.ApiResult;
+import com.ragagent.common.web.ApiResponse;
 
 /**
  * 长期记忆的 HTTP 层。
@@ -95,6 +97,7 @@ import org.springframework.web.bind.annotation.RestController;
  * {@code offset} 为负归 0。实测 {@code ?limit=abc&offset=-5} 返回 200 而不是 400。</p>
  */
 @RestController
+@ApiResult
 public class MemoryController {
 
     private static final Logger log = LoggerFactory.getLogger(MemoryController.class);
@@ -219,13 +222,13 @@ public class MemoryController {
 
     /** 永久删除条目：<b>204</b>（§1.13）。 */
     @DeleteMapping("/api/v1/memory/items/{id}")
-    public ResponseEntity<Void> deleteItem(@PathVariable("id") String id) {
+    public ApiResponse<Void> deleteItem(@PathVariable("id") String id) {
         try {
             memoryService.deleteItem(id);
         } catch (RuntimeException e) {
             throw fail(e, "Failed to delete memory");
         }
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B195：204 退役（空体与「外壳恒存在」冲突）
     }
 
     /** 接受一条待确认的推断条目：200 + 裸条目。 */
@@ -244,13 +247,13 @@ public class MemoryController {
      * <p>拒绝就是删除，响应随 DeleteItem：<b>204</b>。</p>
      */
     @PostMapping("/api/v1/memory/items/{id}/reject")
-    public ResponseEntity<Void> rejectItem(@PathVariable("id") String id) {
+    public ApiResponse<Void> rejectItem(@PathVariable("id") String id) {
         try {
             memoryService.rejectItem(id);
         } catch (RuntimeException e) {
             throw fail(e, "Failed to reject memory");
         }
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B195：204 退役（空体与「外壳恒存在」冲突）
     }
 
     /**
@@ -263,13 +266,13 @@ public class MemoryController {
      * 计数随信封一并退役，不再下发（前端原样展示条数的 toast 一并去掉）。</p>
      */
     @DeleteMapping("/api/v1/memory/items")
-    public ResponseEntity<Void> clear() {
+    public ApiResponse<Void> clear() {
         try {
             memoryService.clear();
         } catch (RuntimeException e) {
             throw fail(e, "Failed to clear memories");
         }
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B195：204 退役（空体与「外壳恒存在」冲突）
     }
 
     // ══════════════════════════ 主题 ══════════════════════════
@@ -306,13 +309,13 @@ public class MemoryController {
 
     /** 停止跟踪一个主体：<b>204</b>。 */
     @DeleteMapping("/api/v1/memory/topics/{id}")
-    public ResponseEntity<Void> deleteTopic(@PathVariable("id") String id) {
+    public ApiResponse<Void> deleteTopic(@PathVariable("id") String id) {
         try {
             memoryService.deleteTopic(id);
         } catch (RuntimeException e) {
             throw fail(e, "Failed to delete topic");
         }
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B195：204 退役（空体与「外壳恒存在」冲突）
     }
 
     // ══════════════════════════ 文档亲和度 ══════════════════════════
@@ -334,13 +337,13 @@ public class MemoryController {
 
     /** 删除一个文档检索信号：<b>204</b>。 */
     @DeleteMapping("/api/v1/memory/documents/{id}")
-    public ResponseEntity<Void> deleteDocument(@PathVariable("id") String id) {
+    public ApiResponse<Void> deleteDocument(@PathVariable("id") String id) {
         try {
             memoryService.deleteDocument(id);
         } catch (RuntimeException e) {
             throw fail(e, "Failed to delete document affinity");
         }
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B195：204 退役（空体与「外壳恒存在」冲突）
     }
 
     // ══════════════════════════ 导出 / 整理 ══════════════════════════

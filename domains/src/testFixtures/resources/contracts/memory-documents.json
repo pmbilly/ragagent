@@ -1,1 +1,19 @@
-{"items":[{"id":"bbbbbbbb-1111-2222-3333-444444444401","knowledgeId":"cccccccc-1111-2222-3333-444444444401","knowledgeBaseId":"dddddddd-1111-2222-3333-444444444401","title":"架构设计文档","hits":5,"lastUsedAt":"2026-09-18T13:22:46.71525+08:00"}],"page":1,"pageSize":50,"total":1}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "items": [
+      {
+        "id": "bbbbbbbb-1111-2222-3333-444444444401",
+        "knowledgeId": "cccccccc-1111-2222-3333-444444444401",
+        "knowledgeBaseId": "dddddddd-1111-2222-3333-444444444401",
+        "title": "架构设计文档",
+        "hits": 5,
+        "lastUsedAt": "2026-09-18T13:22:46.71525+08:00"
+      }
+    ],
+    "page": 1,
+    "pageSize": 50,
+    "total": 1
+  }
+}
