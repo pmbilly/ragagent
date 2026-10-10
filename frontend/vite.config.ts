@@ -47,10 +47,14 @@ function embedHtmlDevFallback(): Plugin {
     },
   }
 }
+// 默认后端地址 = **本仓后端端口**（HANDOFF §8：本仓 dev 用 8083，避开旧仓 8082/Go 仓 8080）。
+// 2026-10-11 实测踩坑：这里原先继承 Go 仓时代的 8080，而本仓后端在 8083 ⇒ 忘设
+// VITE_DEV_PROXY_TARGET 时**所有 /api 请求打到空端口**（表现为"保存成功但重新打开是空的"、
+// 渠道配好后平台不回消息）—— 因为请求根本没到后端，且浏览器侧只有 XHR 失败、没有醒目提示。
 const DEV_PROXY_TARGET =
   process.env.VITE_DEV_PROXY_TARGET ||
   process.env.FRONTEND_BACKEND_URL ||
-  'http://localhost:8080'
+  'http://localhost:8083'
 
 function resolveVueOfficePptxEntry(): string {
   try {

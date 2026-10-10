@@ -62,7 +62,7 @@ docker compose up -d
 bash scripts/java-server-up.sh          # 或 ./gradlew :boot:bootRun
 
 # 4) 前端（:5173）
-cd frontend && npm ci && VITE_DEV_PROXY_TARGET=http://localhost:8083 npm run dev
+cd frontend && npm ci && npm run dev   # 代理默认指向本仓后端的 :8083（vite.config.ts 的 DEV_PROXY_TARGET 默认值）
 ```
 
 本仓独立库不含种子数据 —— 首次使用先注册账号（注册者即该租户 owner）：
@@ -149,6 +149,7 @@ cd frontend && npx vue-tsc --build --force && npm test       # 前端
 <summary>展开</summary>
 
 - **跑完 `./gradlew build` 必须重启后端**：构建会**就地重写** `bootRun` 正在用的 `build/classes` ⇒ 在线服务**全站 500 + NoClassDefFoundError**。看起来像业务炸了，其实是陈旧类 —— **重启即解，别去查代码**。
+- **前端"保存成功、重新打开却是空的"？先查代理指向**：`frontend/vite.config.ts` 的 `DEV_PROXY_TARGET` 默认值是**本仓后端的 :8083**（B222 修正）。此前它继承 Go 仓的 8080，而本仓后端在 8083 ⇒ 忘设 `VITE_DEV_PROXY_TARGET` 时**所有 `/api` 请求打到空端口**，浏览器侧只有 XHR 失败、**没有醒目提示**，症状就是"填了保存、重开为空"（数据根本没到后端）。
 - **停服用 `bash scripts/java-server-down.sh`**（`--stop` 兼容）⇒ 停完记得重启。**别再手敲通配符**：仓库里只有这一个 `*-down.sh`（B216 补的，此前文档引用的脚本并不存在，照文档停服会静默失败、端口一直被占）。起服脚本现在会在端口占用时**明确报错**，不再打到旧进程误报 "ready"。
 - **`LOCAL_STORAGE_BASE_DIR` 严禁 `/tmp`**：macOS 定期清理 ⇒ 入库文档原始文件丢失且**不可恢复**（列表正常、preview 全 500、无法重处理）。
 - **H2 绿 ≠ PG 绿**：jsonb 键序、NOT NULL、DDL 默认值只在真 PG 暴露 ⇒ 验收必须连真 PG（CI 的 backend job 就是干这个）。
