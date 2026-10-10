@@ -110,14 +110,14 @@ docker run --rm -p 8080:8080 --env-file .env ragagent-server
 | **契约测试** | `domains/src/testFixtures/resources/contracts/`（1,345 个金片）+ 30 个 `*ContractTest` | 逐字节钉死 HTTP 响应形状；改契约必须重录或改金片 |
 | **架构规则** | `boot/src/test/.../arch/ArchitectureRulesTest.java`（ArchUnit，A1–A13） | 禁裸 getenv、禁双装配、禁分层倒挂、Mapper 必须在 `..mapper..`… |
 | **序列化卫生** | `domains/src/test/.../arch/JsonPropertyHygieneTest.java`（A14） | 基线 0：我们自己的面上不得有冗余 `@JsonProperty`（四类必要形态除外） |
-| **十守卫** | `bash scripts/run-guards.sh`（**已接入 `check`**，见下） | 包循环 / Go 锚点 / 契约键 / JSON 键大小写 / 事件面 / **文件规模棘轮** / 目录卫生 / 死成员 / 统一响应外壳 / **异常语义** |
+| **十一守卫** | `bash scripts/run-guards.sh`（**已接入 `check`**，见下） | 包循环 / Go 锚点 / 契约键 / JSON 键大小写 / 事件面 / 文件规模棘轮 / 目录卫生 / 死成员 / 统一响应外壳 / 异常语义 / **契约同步** |
 | **跳过棘轮** | `scripts/test-summary.py`（CI 每轮跑） | 跳过 = 这段覆盖没跑。未登记的跳过 ⇒ 报红；白名单里每条都写明"为什么可以跳" |
 | **覆盖率** | jacoco（**按需**：`-Pcoverage`） | **聚合口径（推荐）**`./gradlew testCodeCoverageReport -Pcoverage` → **行 67.8% / 分支 54.0%**；单模块 `:domains:jacocoTestReport -Pcoverage`。默认不插桩 —— 实测插桩让全量 +25%（1m24s→1m49s），本仓的 1.5 分钟闸门是刻意成果 |
-| **CI** | `.github/workflows/ci.yml` | 4 个 job：guards（十守卫）· backend（真 ParadeDB + 真 Redis + 灌基线 SQL + 全量测试）· docker（镜像构建 + 迁移自检）· frontend |
+| **CI** | `.github/workflows/ci.yml` | 4 个 job：guards（十一守卫）· backend（真 ParadeDB + 真 Redis + 灌基线 SQL + 全量测试）· docker（镜像构建 + 迁移自检）· frontend |
 
 守卫大多是**棘轮**（ratchet）：登记基线后只许减不许增，例外须写明理由。新增违规当场变红。
 
-> 十守卫已作为 Gradle 任务 `:guards` **接入 `check`**（B214）⇒ 本地 `./gradlew build` 与 CI 同一口径，
+> 十一守卫已作为 Gradle 任务 `:guards` **接入 `check`**（B214）⇒ 本地 `./gradlew build` 与 CI 同一口径，
 > 不存在"本地绿、CI 红"。单独跑：`./gradlew guards`（迭代时 `./gradlew :domains:test --tests ...` 不会触发它）。
 > 需要 `python3` 在 PATH 上。CI 会跑两遍守卫（guards job + backend job），是刻意取舍：两边同口径优先。
 
@@ -125,8 +125,8 @@ docker run --rm -p 8080:8080 --env-file .env ragagent-server
 export JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home
 
 ./gradlew :domains:test --tests "com.ragagent.session.*"   # 定向（迭代用，10~30s）
-./gradlew build                                             # 全量闸门（spotless + 十守卫 + 测试 + javadoc）
-./gradlew guards                                            # 只跑十守卫（build 里已含）
+./gradlew build                                             # 全量闸门（spotless + 十一守卫 + 测试 + javadoc）
+./gradlew guards                                            # 只跑十一守卫（build 里已含）
 cd frontend && npx vue-tsc --build --force && npm test       # 前端
 ```
 
@@ -154,7 +154,8 @@ cd frontend && npx vue-tsc --build --force && npm test       # 前端
 - **H2 绿 ≠ PG 绿**：jsonb 键序、NOT NULL、DDL 默认值只在真 PG 暴露 ⇒ 验收必须连真 PG（CI 的 backend job 就是干这个）。
 - **Redis 测试会跳过 —— 但有棘轮兜着**：`redis-server` 不在 PATH 时相关用例跳过（本地常见；CI 已装 ⇒ 真跑）。**跳过已升级为棘轮**：未登记的跳过会让 `scripts/test-summary.py` 报红，新增跳过必须去它的 `ALLOWED_SKIPS` 登记并写明理由（覆盖的消失是累积性的）。
 - **`*IT` 不在默认构建里**：Milvus / Weaviate 的驱动集成测试需要真实服务，走独立任务 `./gradlew :engine:integrationTest`（env 门控：`WEKNORA_MILVUS_IT=true` 等）。此前它们**连手动都跑不了**（`*IT` 不匹配 Gradle 默认收集模式）。
-- **改契约要同 PR 带前端**：前端 TS 类型是**手写**的（无 codegen），后端改字段前端照样编译通过 ⇒ 靠 `scripts/check-fe-contract-keys.py` 兜。
+- **改契约要同 PR 带前端**：前端 TS 类型是**手写**的（无 codegen），后端改字段前端照样编译通过。两道守卫兜着：`check-fe-contract-keys.py`（扫前端源码的 snake 键）+ **`check-contract-sync.py`（契约金片的键签名变了必须签字）**。
+  ⇒ 改了后端响应字段后：核对 `frontend/src/api/**` 是否需要同步 → 跑 `python3 scripts/check-contract-sync.py --write` 签字（它会先打印改了什么）。
 - **`Long != Long` 引用比较**：租户 id 超出 Long 缓存区，一律 `equals`。
 - **加依赖版本要进 catalog**：`gradle/libs.versions.toml` 是唯一来源（B214 起）。别在模块 build 文件里写 `group:artifact:version` —— 那正是本次收拢掉的形态。无覆盖率工具（jacoco）仍是缺口。
 

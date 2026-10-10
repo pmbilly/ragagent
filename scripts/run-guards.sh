@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 十守卫的**单一入口**（B168；B183 加「统一响应外壳」）——CI 的 guards job 与本地都跑这一份，口径不可能漂移。
+# 十一守卫的**单一入口**（B168；B183 加「统一响应外壳」）——CI 的 guards job 与本地都跑这一份，口径不可能漂移。
 #
 # 为什么要有它：B168 实测漏检一次真失败 ✗——本地手敲 `python3 scripts/check-json-key-case.py`
 # 少了 CI 的 `--strict`（该守卫默认只**报告**并退出 0，加了 --strict 才是闸门）⇒ 本地全绿、
@@ -33,10 +33,11 @@ run '目录卫生（B124：游离目录 / 死包目录）' python3 scripts/check
 run '死成员守卫（B131）'             python3 scripts/check-dead-members.py
 run '统一响应外壳（B183：新控制器默认必须合规，清单只许减不许增）' python3 scripts/check-api-envelope.py
 run '异常语义（B217：检索引擎层不得在 catch 里清空条件——边界失败即抛）' python3 scripts/check-exception-semantics.py
+run '契约同步（B221：金片键签名变了必须签字，防"后端改契约前端不知情"）' python3 scripts/check-contract-sync.py
 
 echo
 if [ "$fail" -ne 0 ]; then
     echo '✗ 守卫未全绿（逐条结果见上）'
     exit 1
 fi
-echo '✓ 十守卫全绿'
+echo '✓ 十一守卫全绿'
