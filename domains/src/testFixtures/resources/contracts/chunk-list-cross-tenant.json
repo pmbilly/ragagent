@@ -1,1 +1,5 @@
-{"error":{"code":1002,"message":"Permission denied to access this knowledge base","details":null}}
+{
+  "code": 1002,
+  "message": "Permission denied to access this knowledge base",
+  "data": null
+}

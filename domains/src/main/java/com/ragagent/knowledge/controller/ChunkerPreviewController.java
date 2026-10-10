@@ -26,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import com.ragagent.common.web.ApiResult;
 
 /**
  * chunker 只读预览端点（分块配置预览：文本进、分块结果出）。无状态：不落库、不生成 embedding、不打日志正文。
@@ -50,6 +51,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 。</p>
  */
 @RestController
+@ApiResult
 public class ChunkerPreviewController {
 
     /** 64k 码点上限（防任务堆积的主缓解）。 */

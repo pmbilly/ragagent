@@ -1,15 +1,19 @@
-[
-  {
-    "id": "64b6a039-8ff1-4aff-9c8b-3e67cc8525c9",
-    "knowledgeBaseId": "e2a37a1d-28cb-43b0-8004-65b2475732e5",
-    "knowledgeId": "aaa00001-0000-0000-0000-000000000001",
-    "chunkId": "bbb00001-0000-0000-0000-000000000001",
-    "revision": 0,
-    "content": "第一段内容",
-    "enabled": true,
-    "editorId": null,
-    "editSource": "user",
-    "editedAt": "2026-09-18T21:59:46.938588+08:00",
-    "createdAt": "2026-09-18T21:59:47.32121+08:00"
-  }
-]
+{
+  "code": 0,
+  "message": "ok",
+  "data": [
+    {
+      "id": "64b6a039-8ff1-4aff-9c8b-3e67cc8525c9",
+      "knowledgeBaseId": "e2a37a1d-28cb-43b0-8004-65b2475732e5",
+      "knowledgeId": "aaa00001-0000-0000-0000-000000000001",
+      "chunkId": "bbb00001-0000-0000-0000-000000000001",
+      "revision": 0,
+      "content": "第一段内容",
+      "enabled": true,
+      "editorId": null,
+      "editSource": "user",
+      "editedAt": "2026-09-18T21:59:46.938588+08:00",
+      "createdAt": "2026-09-18T21:59:47.32121+08:00"
+    }
+  ]
+}

@@ -1,1 +1,5 @@
-{"error":{"code":1005,"message":"Chunk was modified by another user; refresh and retry","details":null}}
+{
+  "code": 1005,
+  "message": "Chunk was modified by another user; refresh and retry",
+  "data": null
+}

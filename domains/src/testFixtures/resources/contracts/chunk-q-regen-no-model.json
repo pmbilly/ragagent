@@ -1,1 +1,5 @@
-{"error":{"code":1000,"message":"summary model is required for question generation","details":null}}
+{
+  "code": 1000,
+  "message": "summary model is required for question generation",
+  "data": null
+}

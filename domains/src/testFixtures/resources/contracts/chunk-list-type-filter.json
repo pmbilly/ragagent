@@ -1,35 +1,39 @@
 {
-  "items": [
-    {
-      "id": "bbb00001-0000-0000-0000-000000000003",
-      "seqId": 100000970,
-      "knowledgeId": "aaa00001-0000-0000-0000-000000000001",
-      "knowledgeBaseId": "e2a37a1d-28cb-43b0-8004-65b2475732e5",
-      "tagId": null,
-      "content": "图一",
-      "contentRevision": 0,
-      "indexStatus": "ready",
-      "lastEditorId": null,
-      "chunkIndex": 2,
-      "enabled": true,
-      "flags": 1,
-      "status": 0,
-      "startAt": 12,
-      "endAt": 14,
-      "preChunkId": null,
-      "nextChunkId": null,
-      "chunkType": "image_ocr",
-      "parentChunkId": "bbb00001-0000-0000-0000-000000000001",
-      "relationChunks": null,
-      "indirectRelationChunks": null,
-      "metadata": null,
-      "contentHash": null,
-      "imageInfo": "[{\"url\":\"resource://img-1\",\"originalUrl\":\"\",\"start_pos\":0,\"end_pos\":0,\"caption\":\"图一\",\"ocrText\":\"OCR文字\"}]",
-      "createdAt": "2026-09-18T21:59:46.938588+08:00",
-      "updatedAt": "2026-09-18T21:59:46.938588+08:00"
-    }
-  ],
-  "page": 1,
-  "pageSize": 10,
-  "total": 1
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "items": [
+      {
+        "id": "bbb00001-0000-0000-0000-000000000003",
+        "seqId": 100000970,
+        "knowledgeId": "aaa00001-0000-0000-0000-000000000001",
+        "knowledgeBaseId": "e2a37a1d-28cb-43b0-8004-65b2475732e5",
+        "tagId": null,
+        "content": "图一",
+        "contentRevision": 0,
+        "indexStatus": "ready",
+        "lastEditorId": null,
+        "chunkIndex": 2,
+        "enabled": true,
+        "flags": 1,
+        "status": 0,
+        "startAt": 12,
+        "endAt": 14,
+        "preChunkId": null,
+        "nextChunkId": null,
+        "chunkType": "image_ocr",
+        "parentChunkId": "bbb00001-0000-0000-0000-000000000001",
+        "relationChunks": null,
+        "indirectRelationChunks": null,
+        "metadata": null,
+        "contentHash": null,
+        "imageInfo": "[{\"url\":\"resource://img-1\",\"originalUrl\":\"\",\"start_pos\":0,\"end_pos\":0,\"caption\":\"图一\",\"ocrText\":\"OCR文字\"}]",
+        "createdAt": "2026-09-18T21:59:46.938588+08:00",
+        "updatedAt": "2026-09-18T21:59:46.938588+08:00"
+      }
+    ],
+    "page": 1,
+    "pageSize": 10,
+    "total": 1
+  }
 }

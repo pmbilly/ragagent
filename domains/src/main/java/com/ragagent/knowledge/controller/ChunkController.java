@@ -36,6 +36,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.ragagent.common.web.ApiResult;
+import com.ragagent.common.web.ApiResponse;
 
 /**
  * chunk 路由：编辑/生成问题两服务与仓储读面的 HTTP 绑定层。
@@ -48,6 +50,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 形态刻意不同，异常映射按端点分开写。</p>
  */
 @RestController
+@ApiResult
 public class ChunkController {
 
     private static final Logger log = LoggerFactory.getLogger(ChunkController.class);
@@ -227,7 +230,7 @@ public class ChunkController {
      * 「Question ID is required」——body 可省，缺字段/空体统一走该固定文案。
      */
     @DeleteMapping("/api/v1/chunks/by-id/{id}/questions")
-    public ResponseEntity<Void> deleteGeneratedQuestion(
+    public ApiResponse<Void> deleteGeneratedQuestion(
             @PathVariable("id") String id,
             @RequestBody(required = false) DeleteGeneratedQuestionRequest req) {
         String chunkId = LogSanitizer.sanitize(id);
@@ -241,13 +244,13 @@ public class ChunkController {
         guard.requireOwnedChunkKbByChunk(chunkId);
         guard.requireKbAccess(guard.kbIdFromChunkParam(chunkId));
         chunkQuestion.deleteGeneratedQuestion(chunkId, questionId);
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B196：204 退役
     }
 
     // ══════════════════════════ 删除 ══════════════════════════
 
     @DeleteMapping("/api/v1/chunks/{knowledgeId}/{id}")
-    public ResponseEntity<Void> deleteChunk(
+    public ApiResponse<Void> deleteChunk(
             @PathVariable("knowledgeId") String knowledgeId,
             @PathVariable("id") String id) {
         Chunk chunk = fetchChunkAndVerifyOwnership(knowledgeId, id);
@@ -258,11 +261,11 @@ public class ChunkController {
         } catch (RuntimeException e) {
             throw new BizException(AppError.internal(errText(e)));
         }
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B196：204 退役
     }
 
     @DeleteMapping("/api/v1/chunks/{knowledgeId}")
-    public ResponseEntity<Void> deleteChunksByKnowledgeId(
+    public ApiResponse<Void> deleteChunksByKnowledgeId(
             @PathVariable("knowledgeId") String knowledgeId) {
         String kgId = LogSanitizer.sanitize(knowledgeId);
         if (kgId.isEmpty()) {
@@ -277,7 +280,7 @@ public class ChunkController {
         } catch (RuntimeException e) {
             throw new BizException(AppError.internal(errText(e)));
         }
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B196：204 退役
     }
 
     // ══════════════════════════ 共用 ══════════════════════════

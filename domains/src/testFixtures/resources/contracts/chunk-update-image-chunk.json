@@ -1,1 +1,5 @@
-{"error":{"code":1007,"message":"only text chunks can be edited","details":null}}
+{
+  "code": 1007,
+  "message": "only text chunks can be edited",
+  "data": null
+}

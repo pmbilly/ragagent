@@ -1,5 +1,9 @@
 {
-  "id": "5ced9b32-bdcc-4170-a631-bc0b77280e80",
-  "question": "新问题?",
-  "contentRevision": 0
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "id": "5ced9b32-bdcc-4170-a631-bc0b77280e80",
+    "question": "新问题?",
+    "contentRevision": 0
+  }
 }

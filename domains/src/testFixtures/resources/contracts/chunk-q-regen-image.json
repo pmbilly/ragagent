@@ -1,1 +1,5 @@
-{"error":{"code":1000,"message":"questions can only be generated for text chunks","details":null}}
+{
+  "code": 1000,
+  "message": "questions can only be generated for text chunks",
+  "data": null
+}

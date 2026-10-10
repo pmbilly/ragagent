@@ -582,7 +582,7 @@ class ChunkContractTest {
     void deleteFlowMatchesGo() throws Exception {
         MvcResult a = mockMvc.perform(delete("/api/v1/chunks/" + KG2 + "/" + C6)
                 .header("Authorization", owner)).andReturn();
-        assertEquals(204, a.getResponse().getStatus(), raw(a));
+        assertEquals(200, a.getResponse().getStatus(), raw(a));
         assertEquals(golden("chunk-delete.json"), raw(a));
 
         MvcResult b = mockMvc.perform(delete("/api/v1/chunks/" + KG2 + "/" + C6)
@@ -592,13 +592,13 @@ class ChunkContractTest {
 
         MvcResult c = mockMvc.perform(delete("/api/v1/chunks/" + KG2)
                 .header("Authorization", owner)).andReturn();
-        assertEquals(204, c.getResponse().getStatus(), raw(c));
+        assertEquals(200, c.getResponse().getStatus(), raw(c));
         assertEquals(golden("chunk-delete-all.json"), raw(c));
 
         // 知识仍在 → 幂等成功（loadKnowledgeWriteBatch 只校验 knowledge）。
         MvcResult d = mockMvc.perform(delete("/api/v1/chunks/" + KG2)
                 .header("Authorization", owner)).andReturn();
-        assertEquals(204, d.getResponse().getStatus(), raw(d));
+        assertEquals(200, d.getResponse().getStatus(), raw(d));
         assertEquals(golden("chunk-delete-all-again.json"), raw(d));
     }
 

@@ -1,1 +1,5 @@
-{"error":{"code":1002,"message":"No permission to access this chunk","details":null}}
+{
+  "code": 1002,
+  "message": "No permission to access this chunk",
+  "data": null
+}
