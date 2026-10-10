@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * <p>HTTP 状态码仍表达协议语义（400/401/403/404/409/500…）——本外壳不改状态码口径。
  * 字段序即记录组件声明序 ⇒ 线上键序恒为 code → message → data。</p>
  *
- * <p>构造只经 {@link #ok(Object)} / {@link #ok(Object, String)} / {@link #fail(int, String, Object)}，
+ * <p>构造只经 {@link #ok(Object)} / {@link #ok(Object, String)} / {@link #fail(int, String)} / {@link #fail(int, String, Object)}，
  * 保证「成功 ⇔ code == 0」不存在第二处真相。</p>
  *
  * @param <T> 载荷类型
@@ -44,8 +44,15 @@ public record ApiResponse<T>(int code, String message, T data) {
                 message == null || message.isEmpty() ? OK_MESSAGE : message, data);
     }
 
-    /** 失败（无明细；错误处理器的默认形态）。 */
-    public static ApiResponse<Object> fail(int code, String message) {
+    /**
+     * 失败（无明细；错误处理器与守卫的默认形态）。
+     *
+     * <p>返回 {@code ApiResponse<Void>} 与 {@link #ok()} / {@link #ok(Object)} 对称 ——
+     * 可直接塞进声明为 {@code ResponseEntity<ApiResponse<Void>>} 的 handler ✓
+     * （早先返回 {@code ApiResponse<Object>} 会逼出 {@code ApiResponse.<Void>fail(code, msg, null)}
+     * 这种显式泛型写法 ✗，B202 实测栽过一次 ✓）。带明细时用 {@link #fail(int, String, Object)} ✓。</p>
+     */
+    public static ApiResponse<Void> fail(int code, String message) {
         return new ApiResponse<>(code, message == null ? "" : message, null);
     }
 

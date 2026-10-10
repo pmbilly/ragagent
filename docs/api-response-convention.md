@@ -31,6 +31,8 @@
 ## 2. 三条铁律
 
 1. **`success ⇔ code == 0`**，不存在第二个真相 —— 外壳只经 `ApiResponse.ok(...)` / `ApiResponse.fail(...)`
+
+   **命名（B203 定的，别再来回改 ✓）**：工厂名保持 `ok` / `fail` ✗ 不改 `success` / `error` —— ① `ok` 与 Spring 的 `ResponseEntity.ok(...)` 是"一层之上"的同一概念 ✓；② `success` / `error` 在本仓是**刚退役的词** ✗（旧壳 `{"success":true}` / `{"error":…}` ✓，FE 还留着灰度容忍、守卫/文档仍用它们描述旧形态 ✓）⇒ 拿它们当新 API 名会让排查真假不分 ✗；③ `ApiResponse.error(...)` 会与 `DataSourceController` 遗留的私有 `error(int,msg)` 助手同名共存 ✗。**泛型对称**：`ok(...)` 系列与 `fail(int, String)` 都返回 `ApiResponse<Void>` 便于塞进 `ResponseEntity<ApiResponse<Void>>` ✓；带明细用 `fail(int, String, T)` ✓（早先 `fail(int,String)` 返回 `Object` ⇒ 逼出 `ApiResponse.<Void>fail(…, null)` ✗ 已修 ✓）。
    构造（record 的规范构造由工厂封装，物理上不给独立赋值的机会）。
 2. **HTTP 状态码仍表达协议语义**（401 / 404 / 409 / 500 …），body 里再给业务 `code`。
    不做"一律 200" —— 否则网关重试、监控告警、日志统计全部失明。

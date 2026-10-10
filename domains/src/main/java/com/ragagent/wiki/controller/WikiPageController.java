@@ -269,6 +269,6 @@ public class WikiPageController {
     @ExceptionHandler(RawJsonError.class)
     public ResponseEntity<ApiResponse<Void>> handleRawJsonError(RawJsonError ex) {
         AppError err = AppError.ofHttpStatus(ex.status(), ex.getMessage());
-        return ResponseEntity.status(ex.status()).body(ApiResponse.<Void>fail(err.code(), err.message(), null));
+        return ResponseEntity.status(ex.status()).body(ApiResponse.fail(err.code(), err.message()));
     }
 }
