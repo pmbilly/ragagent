@@ -523,3 +523,23 @@ test('B149 回归钉：2300 details 的键面（knowledgeBases）不得回流 sn
   forbidSnake('views/settings/ModelSettings.vue', '读 usageConflict.knowledgeBases')
   forbidSnake('views/settings/modelUsageDetails.test.ts', '源码扫描断言同上')
 })
+
+test('embed 用户气泡底色跟随渠道主题色（后台「外观展示」的 primaryColor）', () => {
+  // 需求（2026-10-10 点检）：embed 挂件里用户消息（.user_msg）的底色要用后台配置的主题色。
+  // 链路：渠道 config.primaryColor → EmbedPage 落成 --embed-primary（内联 style 挂在 .embed-page
+  // 根，自定义属性随子树继承，含 iframe/shadow 边界）→ 气泡侧必须 var(--embed-primary, 回落值)，
+  // 回落值 = 原写死的灰底，保证「未配置主题色」时行为与从前完全一致。
+  const bubble = readFileSync(join(SRC, 'views/embed/EmbedUserMessage.vue'), 'utf8')
+  assert.match(
+    bubble,
+    /background:\s*var\(--embed-primary,\s*var\(--td-gray-color-14\)\)/,
+    '亮色：用户气泡底色应为 var(--embed-primary, 原灰底)',
+  )
+  assert.match(
+    bubble,
+    /background:\s*var\(--embed-primary,\s*var\(--td-bg-color-secondarycontainer\)\)/,
+    '暗色：同上',
+  )
+  const page = readFileSync(join(SRC, 'views/embed/EmbedPage.vue'), 'utf8')
+  assert.match(page, /'--embed-primary':\s*color/, 'EmbedPage 必须把 primaryColor 落成 --embed-primary')
+})

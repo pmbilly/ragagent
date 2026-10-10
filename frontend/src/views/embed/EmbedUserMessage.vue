@@ -110,7 +110,9 @@ const formatFileSize = (bytes: number): string => {
   max-width: min(76%, 680px);
   padding: 12px;
   border-radius: 8px;
-  background: var(--td-gray-color-14);
+  /* 用户气泡底色跟随渠道主题色（后台「外观展示」的 primaryColor，由 EmbedPage 落成 --embed-primary ✓）；
+     未配置时回落到原灰底，行为不变。 */
+  background: var(--embed-primary, var(--td-gray-color-14));
   margin-left: auto;
   color: var(--td-text-color-anti);
   font-size: 14px;
@@ -170,7 +172,8 @@ const formatFileSize = (bytes: number): string => {
 }
 
 html[theme-mode='dark'] .user_msg {
-  background: var(--td-bg-color-secondarycontainer);
+  /* 暗色下同样跟随主题色（未配置时回落原中性底） */
+  background: var(--embed-primary, var(--td-bg-color-secondarycontainer));
   color: var(--td-text-color-primary);
 }
 </style>
