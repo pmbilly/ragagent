@@ -80,13 +80,13 @@
 - **新控制器默认必须合规**：守卫 `scripts/check-api-envelope.py`（九守卫之一）要求每个控制器
   要么标注 `@ApiResult`，要么在 `scripts/api-envelope.baseline.json` 的 `pending` 清单里；清单
   **只许减不许增**，`--write` 只清理已迁完 / 幽灵条目（不替你豁免新条目）。
-- 进度：**5 / 52 个控制器**（agent 17 端点 = 试点 B183；favorite 3 + vectorstore 8 = B185，2026-10-10）。
+- 进度：**50 / 52 个控制器**（B183–B203 ✓）；余 2 均为**登记例外**（`ImCallbackController` 外部平台回调 / `HealthController` 探针 ✓）——权威清单以 `scripts/api-envelope.baseline.json` 为准 ✓（守卫 `check-api-envelope.py` 每次核对 ✓）。
 
 | 步 | 内容 | 状态 |
 |---|---|---|
 | P0 | 本约定 + 现状盘点（52 控制器 / ~370 端点 / 4 种形状混装）| ✅ |
 | P1 | 设施：`ApiResponse` / `@ApiResult` / advice / 错误分派 / 前端解包点 / 守卫 | ✅ |
-| P2 | 按域迁移：**agent ✅ → favorite ✅ / vectorstore ✅** → knowledge → wiki → session → … | 进行中 |
+| P2 | 按域迁移（B183–B203）：agent ✅ / favorite ✅ / vectorstore ✅ / storage ✅ / websearch ✅ / system ✅ / session ✅ / knowledge ✅ / memory ✅ / datasource ✅ / model ✅ / audit ✅ / im ✅ / mcp ✅ / auth ✅ / wiki ✅ | **✅ 实质完成（50/52，余 2 例外）** |
 | P3 | **Filter 层**错误（AuthFilter / APIKeyAuthChannel / WsAuthSupport 的 401/403）与文件下载面的形态统一 | 待办 |
 
 ## 6. 已退役的旧规则（别再引用）

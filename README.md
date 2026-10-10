@@ -124,7 +124,7 @@ curl -s -X POST http://localhost:8083/api/v1/auth/register -H 'Content-Type: app
 | `JWT_SECRET` / `SYSTEM_AES_KEY` | — | 双侧必须一致（跨语言密文互操作） |
 | `SSRF_WHITELIST_EXTRA` | — | 额外 SSRF 白名单（逗号分隔，支持 `*.example.com`） |
 | `RETRIEVE_DRIVER` | — | 检索引擎选择（需真实导出，不从 .env 静默读） |
-| `VITE_DEV_PROXY_TARGET` | http://localhost:8080 | 前端代理目标（测 Java 用 8082） |
+| `VITE_DEV_PROXY_TARGET` | http://localhost:8080 | 前端代理目标（缺省 8080；**本仓 dev 用 8083**，见 HANDOFF §8） |
 
 运行时可调（DB 层即开即用，无需重启）：`system_settings`（沙箱 docker 开关、SSRF 白名单、并发上限 `model.max_concurrency` 等，经 `SystemSettingService` 推送）。
 

@@ -226,14 +226,16 @@
 - **后端端口改 8083**（避开旧仓 8082 本地走查环境）。
 - **PG 独立库名**（建议 `ragagent`）：基线合并会改 schema，不能与旧仓共用 dev 库；docker-compose 里 ParadeDB/Redis 实例可共用，建新库即可。
 - 前端开发代理：`VITE_DEV_PROXY_TARGET=http://localhost:8083`。
-- `.env` 已从旧仓原样复制（未入库，gitignore 正常），**待改** `SERVER_PORT` 与库名；`SYSTEM_AES_KEY` 可沿用。
+- `.env` 已从旧仓原样复制（未入库，gitignore 正常），**已改**（`SERVER_PORT=8083` 实测生效 ✓，B202 起后端就绪）；库名按本仓独立库 ✓，`SYSTEM_AES_KEY` 沿用 ✓。
 - **`LOCAL_STORAGE_BASE_DIR` 必须放持久目录、严禁 /tmp**（旧环境实测踩坑 2026-09-28：放在 `/tmp/weknora-java-files`，macOS 定期清理 /tmp 导致已入库文档原始文件丢失——文档列表正常、检索可能正常，但 preview 全 500、重处理报 "failed to read file"，原始文件不可恢复只能重传）。建议 `~/ragagent-data/files` 之类仓库外持久路径。
-- **CI（2026-10-09 现状，B157/B158）**：三 job —— **guards**（8 条 Python 守卫）· **backend**（spotless（ratchet 自 `seed` tag）+ 全量测试 + **把 `V1__baseline.sql` 灌进全新 ParadeDB**；两个连真 PG 的录测试在 CI 真跑）· **frontend**（type-check + test + build）。ArchUnit 规则随测试套件跑（B10），包级规则仍归 guards；ArchUnit **边界固化**属阶段 4。
+- **CI（2026-10-09 现状，B157/B158）**：三 job —— **guards**（9 条 Python 守卫，`bash scripts/run-guards.sh` 为准 ✓）· **backend**（spotless（ratchet 自 `seed` tag）+ 全量测试 + **把 `V1__baseline.sql` 灌进全新 ParadeDB**；两个连真 PG 的录测试在 CI 真跑）· **frontend**（type-check + test + build）。ArchUnit 规则随测试套件跑（B10），包级规则仍归 guards；ArchUnit **边界固化**属阶段 4。
 - **远程仓库（2026-09-30 起）**：`origin` = `https://github.com/pmbilly/ragagent.git`（**公开**）；首次推送只推了 `main`（`bbf7443`），**`seed` tag 已于 2026-10-09 推送**（B157——CI 的 spotless ratchet 需要它可达）；本地 wip 分支按需推；此后本地提交若要同步，记得 `git push`（并行会话在同一仓库提交、同样落在 main，也需推送）。
+
+- **⚠️ 跑完 `./gradlew build` / `test` 必须重启后端** ✗：构建会**就地重写** bootRun 正在用的 `build/classes` ⇒ 在线服务**全站 500 + NoClassDefFoundError**（看起来像业务炸了 ✗ 其实是陈旧类 ✓）。**重启即解，别去查代码** ✓（README「坑」一节同款记录 ✓）。顺带：`scripts/*-down.sh --stop` 也会把 bootRun 一起杀掉 ⇒ 停完记得重启 ✓。
 
 ## 9. 测试与安全网
 
-- 434 个测试类 / 1,366 契约 fixture（**4,670 用例 / 4 skip**，2026-10-01 实测）是重构回归网，**每一步（哪怕纯移动）结束都必须全绿**——近两轮的工作方式就是"改一步 → 全量验证 → 提交"。这是"种子 fork + 渐进转型"优于重写的全部意义。
+- 434 个测试类 / 1,366 契约 fixture（**4,858 用例 / 0 失败**，2026-10-10 B202 实测 ✓；早前记录 4,670 / 4 skip 为 2026-10-01 ✓）是重构回归网，**每一步（哪怕纯移动）结束都必须全绿**——近两轮的工作方式就是"改一步 → 全量验证 → 提交"。这是"种子 fork + 渐进转型"优于重写的全部意义。
 - **三条验证命令（接手先跑一遍确认基线）**：
   ```bash
   # 后端全量（约 3 分钟；期望 BUILD SUCCESSFUL，4,670 用例 0 失败）
