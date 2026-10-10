@@ -198,7 +198,7 @@ BASELINE: dict[str, set[str]] = {
     # 模型输出契约（LLM 载荷）
     # ── 读侧形态族（B143 落第 5 种形态时逐条复核；全是外部契约/数据值，非我们的 JSON 面）──
     # OIDC/JWT claim 名（IdP 定义，非我们的 JSON 面）
-    'channels/api/filter/APIKeyAuthChannel.java': {'tenant_id'},
+    'auth/apikey/filter/APIKeyAuthChannel.java': {'tenant_id'},
     # OAuth 响应字段（IdP 契约）
     'auth/controller/AuthSessionOps.java': {'refresh_token'},
     # JWT claim 名（IdP 契约）

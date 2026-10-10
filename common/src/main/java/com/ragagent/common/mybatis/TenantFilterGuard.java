@@ -87,10 +87,10 @@ public class TenantFilterGuard implements InnerInterceptor {
      */
     public static final Set<String> ALLOWED_STATEMENTS = Set.of(
             // ── 认证面 ──
-            "com.ragagent.channels.api.mapper.TenantAPIKeyMapper.listByPlaceholderHash",
-            "com.ragagent.channels.api.mapper.TenantAPIKeyMapper.listPlatform",
-            "com.ragagent.channels.api.mapper.TenantAPIKeyMapper.selectByHash",
-            "com.ragagent.channels.api.mapper.TenantAPIKeyMapper.selectFirstPlaceholderHashId",
+            "com.ragagent.auth.apikey.mapper.TenantAPIKeyMapper.listByPlaceholderHash",
+            "com.ragagent.auth.apikey.mapper.TenantAPIKeyMapper.listPlatform",
+            "com.ragagent.auth.apikey.mapper.TenantAPIKeyMapper.selectByHash",
+            "com.ragagent.auth.apikey.mapper.TenantAPIKeyMapper.selectFirstPlaceholderHashId",
             "com.ragagent.auth.mapper.UserMapper.selectById",
             "com.ragagent.auth.mapper.UserMapper.selectCount",
             "com.ragagent.auth.mapper.UserMapper.selectList",

@@ -36,7 +36,6 @@ dependencyManagement {
 
 dependencies {
     implementation(project(":domains"))
-    implementation(project(":channels"))
     // 组合根本身用到的 API（:domains 的 compileOnly/implementation 不会传递到编译面）
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
