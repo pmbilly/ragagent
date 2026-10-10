@@ -112,7 +112,7 @@ docker run --rm -p 8080:8080 --env-file .env ragagent-server
 | **序列化卫生** | `domains/src/test/.../arch/JsonPropertyHygieneTest.java`（A14） | 基线 0：我们自己的面上不得有冗余 `@JsonProperty`（四类必要形态除外） |
 | **十守卫** | `bash scripts/run-guards.sh`（**已接入 `check`**，见下） | 包循环 / Go 锚点 / 契约键 / JSON 键大小写 / 事件面 / **文件规模棘轮** / 目录卫生 / 死成员 / 统一响应外壳 / **异常语义** |
 | **跳过棘轮** | `scripts/test-summary.py`（CI 每轮跑） | 跳过 = 这段覆盖没跑。未登记的跳过 ⇒ 报红；白名单里每条都写明"为什么可以跳" |
-| **覆盖率** | jacoco（**按需**：`-Pcoverage`） | `./gradlew :domains:jacocoTestReport -Pcoverage`。默认不插桩 —— 实测插桩让全量 +25%（1m24s→1m49s），本仓的 1.5 分钟闸门是刻意成果 |
+| **覆盖率** | jacoco（**按需**：`-Pcoverage`） | **聚合口径（推荐）**`./gradlew testCodeCoverageReport -Pcoverage` → **行 67.8% / 分支 54.0%**；单模块 `:domains:jacocoTestReport -Pcoverage`。默认不插桩 —— 实测插桩让全量 +25%（1m24s→1m49s），本仓的 1.5 分钟闸门是刻意成果 |
 | **CI** | `.github/workflows/ci.yml` | 4 个 job：guards（十守卫）· backend（真 ParadeDB + 真 Redis + 灌基线 SQL + 全量测试）· docker（镜像构建 + 迁移自检）· frontend |
 
 守卫大多是**棘轮**（ratchet）：登记基线后只许减不许增，例外须写明理由。新增违规当场变红。

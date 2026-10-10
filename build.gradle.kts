@@ -1,4 +1,5 @@
 import org.gradle.external.javadoc.StandardJavadocDocletOptions
+import org.gradle.testing.jacoco.plugins.JacocoCoverageReport
 import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
 import org.gradle.testing.jacoco.tasks.JacocoReport
 
@@ -6,12 +7,42 @@ import org.gradle.testing.jacoco.tasks.JacocoReport
 // 由各模块（domains/engine/common/boot）应用。
 plugins {
     java
+    // 覆盖率聚合（B220）：跨模块合并 exec 数据 ⇒ 给出**整体**覆盖率。
+    id("jacoco-report-aggregation")
     // 插件版本统一在 gradle/libs.versions.toml（B214）
     alias(libs.plugins.spring.boot) apply false
-    alias(libs.plugins.spring.dependency.management) apply false
+    // dependency-management **实际应用**（不再 apply false）：聚合配置要解析子项目的依赖，
+    // 而它们的版本来自 Boot BOM —— BOM 原先只在各模块声明，根项目没有 ⇒
+    // 报 "Could not find org.springframework.boot:spring-boot-starter-web:."（版本为空）。
+    alias(libs.plugins.spring.dependency.management)
     alias(libs.plugins.protobuf) apply false
     alias(libs.plugins.spotless) apply false
 }
+
+dependencyManagement {
+    imports {
+        mavenBom(libs.spring.boot.dependencies.get().toString())
+    }
+}
+
+// ── 覆盖率聚合报告（B220）────────────────────────────────────────────────────
+// 为什么需要：单模块报告只统计**本模块的类**，而本仓大量类被其他模块的测试间接覆盖
+// （`:common` 的端口/工具被 `:domains` 的测试跑到、`:engine` 的被 `:boot` 的集成测试跑到）
+// ⇒ 模块口径会**系统性低估**（首测 common 行覆盖仅 22.7%，而它的类明明在别处被跑）。
+// 聚合把各模块 exec 合并后与全部类匹配，才是可信的整体数字。
+//
+// 用法：./gradlew testCodeCoverageReport -Pcoverage
+//   （-Pcoverage 会同时开启各模块插桩；忘了加会因缺 exec 数据而得到空报告 ⇒ 见下方防呆）
+// 产物：build/reports/jacoco/testCodeCoverageReport/html/index.html
+dependencies {
+    jacocoAggregation(project(":domains"))
+    jacocoAggregation(project(":engine"))
+    jacocoAggregation(project(":common"))
+    jacocoAggregation(project(":boot"))
+}
+
+// 报告本身由插件**自动创建**（Gradle 8：声明 jacocoAggregation 依赖即注册 testCodeCoverageReport）
+// ⇒ 不要手写 reporting{} 块（会撞名：ReportSpec 'testCodeCoverageReport' already exists）。
 
 // 各模块 Javadoc 共用一个门槛：**只启用 doclint 的「引用」检查组**。
 // 理由：本仓真实漂移过多次——改名/搬家后注释里的 {@link}/{@code}/{@see} 还指着旧类型
