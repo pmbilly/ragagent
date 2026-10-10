@@ -1,5 +1,5 @@
 /**
- * chat 管线的**插件实现**：{@link com.ragagent.chatpipeline.Plugin} 接口 + 18 个步骤实现
+ * chat 管线的**插件实现**：{@link Plugin} 接口 + 18 个步骤实现
  * （query_understand → search → merge → rerank → into_chat_message → chat_completion 等）。
  *
  * <p>装配在 {@link com.ragagent.chatpipeline.PipelineBuilder}（根包），
