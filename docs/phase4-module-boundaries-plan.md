@@ -609,7 +609,7 @@ B116 搬家时已经搬过一批资源（`common/text/*.txt`），这类风险�
 | 7 | `boot` 侧：`WebConfig` 注册全部 apikey 过滤器/拦截器（7 类 ✓）+ 4 个契约测试断言 route policy 类 | boot→channels | **无需处理** ✓（`:boot` 依赖一切 ✓；测试同理 ✓） |
 
 **四刀计划**（每刀独立提交 + 独立全绿 ✓，沿用 §13/§14 SOP ✓）：
-1. **沉 DTO**（边 1 ✓）：`TenantAPIKeyCreateResponse` / `TenantAPIKeyResponse`（+ 其引用的 `TenantAPIKeyRequest` 视需要 ✓）沉 `:common`；
+1. ✅ **沉 DTO（B207 已完成）**：两个记录已迁 `com.ragagent.common.apikey` ✓；**映射工厂留属主**（新类 `TenantAPIKeyProjections` ✓ —— 记录依赖实体，直接搬会在 `:common` 造反向边 ✗）（边 1 ✓）：`TenantAPIKeyCreateResponse` / `TenantAPIKeyResponse`（+ 其引用的 `TenantAPIKeyRequest` 视需要 ✓）沉 `:common`；
 2. **管理口 port**（边 2/3 ✓）：`:common` 定义（create/list/update/delete/rotate 需要的窄接口 ✓），apikey 的 service 实现 ✓，三处调用点改注入 port ✓；
 3. **认证通道 port**（边 4 ✓）+ **查询 port**（边 5 ✓）：`AuthFilter` 与 `TenantFilterGuard` 只依赖 port ✓；
 4. **验环**：`python3 scripts/check-package-cycles.py` + 全量闸门 ✓，随后即可建 `:channels`（`im` + `embedchannel` + `apikey`→`channels.api` ✓）。
