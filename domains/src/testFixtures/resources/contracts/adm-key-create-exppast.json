@@ -1,1 +1,5 @@
-{"error":{"code":1010,"message":"expiresAtUnix must be in the future","details":null}}
+{
+  "code": 1010,
+  "message": "expiresAtUnix must be in the future",
+  "data": null
+}

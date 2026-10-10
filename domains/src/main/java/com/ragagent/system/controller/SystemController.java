@@ -30,6 +30,7 @@ import com.ragagent.knowledge.config.DocReaderProperties;
 import com.ragagent.storage.domain.StorageBackend;
 import com.ragagent.storage.service.StorageBackendService;
 import com.ragagent.system.service.DeploymentCapabilitiesHolder;
+import com.ragagent.common.web.ApiResult;
 
 /**
  * /api/v1/system 组：读端（capabilities/info/parser-engines/storage-engine-status）Viewer+；
@@ -46,6 +47,7 @@ import com.ragagent.system.service.DeploymentCapabilitiesHolder;
  * （落地 handler 时一并恢复）。</p>
  */
 @RestController
+@ApiResult
 @RequestMapping("/api/v1/system")
 public class SystemController {
 

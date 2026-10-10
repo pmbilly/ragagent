@@ -1,1 +1,20 @@
-[{"id":25,"scopeType":"platform","name":"sys-golden-key","apiKey":"sk-MNaZ...O2xo","fullAccess":false,"knowledgeBaseIds":[],"capabilities":["chat"],"lastUsedAt":null,"expiresAt":"2100-01-01T08:00:00+08:00","createdAt":"2026-09-19T12:03:05.303275+08:00"}]
+{
+  "code": 0,
+  "message": "ok",
+  "data": [
+    {
+      "id": 25,
+      "scopeType": "platform",
+      "name": "sys-golden-key",
+      "apiKey": "sk-MNaZ...O2xo",
+      "fullAccess": false,
+      "knowledgeBaseIds": [],
+      "capabilities": [
+        "chat"
+      ],
+      "lastUsedAt": null,
+      "expiresAt": "2100-01-01T08:00:00+08:00",
+      "createdAt": "2026-09-19T12:03:05.303275+08:00"
+    }
+  ]
+}

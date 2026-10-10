@@ -1,1 +1,20 @@
-{"user":{"id":"451735ea-f5dd-4472-8e5c-b60fc2195bd6","username":"sysgolden1","email":"java-sys-golden-1@weknora.test","avatar":"","tenantId":10005,"isActive":true,"canAccessAllTenants":false,"isSystemAdmin":false,"preferences":{},"createdAt":"2026-09-19T12:03:05.001533+08:00","updatedAt":"2026-09-19T12:03:05.001533+08:00"},"generatedPassword":null}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "user": {
+      "id": "451735ea-f5dd-4472-8e5c-b60fc2195bd6",
+      "username": "sysgolden1",
+      "email": "java-sys-golden-1@weknora.test",
+      "avatar": "",
+      "tenantId": 10005,
+      "isActive": true,
+      "canAccessAllTenants": false,
+      "isSystemAdmin": false,
+      "preferences": {},
+      "createdAt": "2026-09-19T12:03:05.001533+08:00",
+      "updatedAt": "2026-09-19T12:03:05.001533+08:00"
+    },
+    "generatedPassword": null
+  }
+}

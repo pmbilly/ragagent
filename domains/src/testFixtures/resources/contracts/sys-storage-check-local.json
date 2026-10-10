@@ -1,1 +1,9 @@
-{"ok":true,"message":"本地存储无需检测","bucketCreated":false}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "ok": true,
+    "message": "本地存储无需检测",
+    "bucketCreated": false
+  }
+}

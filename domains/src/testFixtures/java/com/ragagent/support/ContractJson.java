@@ -34,6 +34,24 @@ public final class ContractJson {
     }
 
     /** 归一化入口：可解析 → 键排序紧凑 JSON；不可解析 → 原样（响应体尾随换行是内容，禁 trim）。 */
+    /**
+     * 统一响应外壳 ⇒ 取 {@code data}（B192）。非外壳（旧形态 / 裸载荷）原样返回。
+     *
+     * <p>用途：把"迁移前录的**裸载荷**期望"与迁移后的**外壳响应**对齐，不必改写那一大段内联期望 ✓。
+     * 与 {@link #semantic} 串联使用：{@code semantic(payload(raw))}。</p>
+     */
+    public static String payload(String text) {
+        try {
+            JsonNode node = DEFAULT_MAPPER.readTree(text);
+            if (node != null && node.isObject() && node.has("code") && node.has("data")) {
+                return DEFAULT_MAPPER.writeValueAsString(node.get("data"));
+            }
+        } catch (Exception ignored) {
+            // 解析失败 ⇒ 原样返回，交给 semantic 处理
+        }
+        return text;
+    }
+
     public static String semantic(ObjectMapper mapper, String text) {
         if (text == null) {
             return null;

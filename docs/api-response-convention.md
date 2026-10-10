@@ -54,6 +54,8 @@
 
 - **外部平台回调**：`ImCallbackController`（`/api/v1/im/callback/**`）全部端点 `void` + 直接写 `HttpServletResponse`（微信/云之家 ACK 等**平台协议原样**）。`ApiResultAdvice.supports()` 对 `void` 返回类型**直接跳过**（B191 ✓）⇒ 既不会包壳也不会双写。响应体形状是平台协议，不属于本仓 API 约定。
 - **二进制 / 非 JSON**：`FileProxyController`（下载、Range）与任何 `produces` 非 `application/json` 的端点 —— advice 按 `selectedContentType` 跳过（B190 ✓）。
+- **API-Key 过滤器**：`SystemAdminController` 的 API-key 门禁（`X-API-Key`）在 **DispatcherServlet 之前**
+  写出 `{"error":"Forbidden: …"}`（拿不到路由打标 ✗）⇒ 保持原样，`adm-guard-platformkey.json` 金片按实际旧形态定稿（B192 ✓）。与 AuthFilter 同类。
 - **AuthFilter 的 401/403**：在 DispatcherServlet 之前写出，不进 advice（B189 ✓ 已实测：金片保持原样也匹配 ✓）。
 
 - **Filter 写的 401/403**（`AuthFilter` / `APIKeyAuthChannel` / `WsAuthSupport`）：在 DispatcherServlet **之前**就写出响应，打标尚未发生 ⇒ 形态不变。（**自写响应的 HandlerInterceptor 不属此列** —— 它们跑在打标之后，须读打标：`RbacInterceptor` 已于 B185 改造 ✓。）

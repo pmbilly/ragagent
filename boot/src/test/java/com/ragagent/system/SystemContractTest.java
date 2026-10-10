@@ -155,6 +155,10 @@ class SystemContractTest {
         // PR4：外壳与键集改树断言（键序已归一）
         {
             var root = new com.fasterxml.jackson.databind.ObjectMapper().readTree(java);
+            // B192：统一外壳下先下钻 data（旧形态无壳时保持原样）
+            if (root.isObject() && root.has("code") && root.has("data")) {
+                root = root.get("data");
+            }
             assertThat(root.path("edition").asText()).isEqualTo("standard");
         }
         String goldenCaps = golden("sys-capabilities.json");
@@ -231,6 +235,10 @@ class SystemContractTest {
         // PR4：相邻键子串在键序归一后不可靠 → 树断言
         {
             var root = new com.fasterxml.jackson.databind.ObjectMapper().readTree(java);
+            // B192：统一外壳下先下钻 data
+            if (root.isObject() && root.has("code") && root.has("data")) {
+                root = root.get("data");
+            }
             var engines = root.path("engines");
             assertThat(engines.isArray()).isTrue();
             com.fasterxml.jackson.databind.JsonNode hit = null;
@@ -263,7 +271,7 @@ class SystemContractTest {
         MvcResult r = mockMvc.perform(jsonBody(post("/api/v1/system/parser-engines/check"), sysAdmin, "nope"))
                 .andReturn();
         assertEquals(400, r.getResponse().getStatus(), raw(r));
-        assertEquals("{\"error\":{\"code\":1000,\"details\":\"请求体格式不正确\",\"message\":\"请求参数不合法\"}}", raw(r));
+        assertEquals("{\"code\":1000,\"data\":\"请求体格式不正确\",\"message\":\"请求参数不合法\"}", raw(r));
     }
 
     /** viewer 打 check → 403（Admin 门）。 */
@@ -272,7 +280,7 @@ class SystemContractTest {
         MvcResult r = mockMvc.perform(jsonBody(post("/api/v1/system/parser-engines/check"), viewer, "{}"))
                 .andReturn();
         assertEquals(403, r.getResponse().getStatus(), raw(r));
-        assertEquals("{\"error\":\"Forbidden: insufficient workspace role\"}", raw(r));
+        assertEquals("{\"code\":1002,\"data\":null,\"message\":\"Forbidden: insufficient workspace role\"}", raw(r));
     }
 
     @Test
@@ -280,17 +288,17 @@ class SystemContractTest {
         MvcResult r = mockMvc.perform(jsonBody(post("/api/v1/system/docreader/reconnect"), sysAdmin, "{}"))
                 .andReturn();
         assertEquals(400, r.getResponse().getStatus(), raw(r));
-        assertEquals("{\"error\":{\"code\":1000,\"details\":null,\"message\":\"请提供 addr 参数\"}}", raw(r));
+        assertEquals("{\"code\":1000,\"data\":null,\"message\":\"请提供 addr 参数\"}", raw(r));
 
         MvcResult b = mockMvc.perform(jsonBody(post("/api/v1/system/docreader/reconnect"), sysAdmin,
                 "{\"addr\":\"   \"}")).andReturn();
         assertEquals(400, b.getResponse().getStatus(), raw(b));
-        assertEquals("{\"error\":{\"code\":1000,\"details\":null,\"message\":\"addr 不能为空\"}}", raw(b));
+        assertEquals("{\"code\":1000,\"data\":null,\"message\":\"addr 不能为空\"}", raw(b));
 
         MvcResult j = mockMvc.perform(jsonBody(post("/api/v1/system/docreader/reconnect"), sysAdmin, "nope"))
                 .andReturn();
         assertEquals(400, j.getResponse().getStatus(), raw(j));
-        assertEquals("{\"error\":{\"code\":1000,\"details\":null,\"message\":\"请提供 addr 参数\"}}", raw(j));
+        assertEquals("{\"code\":1000,\"data\":null,\"message\":\"请提供 addr 参数\"}", raw(j));
 
         MvcResult s = mockMvc.perform(jsonBody(post("/api/v1/system/docreader/reconnect"), sysAdmin,
                 "{\"addr\":\"http://169.254.169.254:50051\"}")).andReturn();
@@ -329,12 +337,12 @@ class SystemContractTest {
                 .header("Authorization", owner)
                 .contentType("application/json").content("{}")).andReturn();
         assertEquals(403, o.getResponse().getStatus(), raw(o));
-        assertEquals("{\"error\":\"Forbidden: system administrator required\"}", raw(o));
+        assertEquals("{\"code\":1002,\"data\":null,\"message\":\"Forbidden: system administrator required\"}", raw(o));
 
         MvcResult v = mockMvc.perform(get("/api/v1/system/admin/list")
                 .header("Authorization", viewer)).andReturn();
         assertEquals(403, v.getResponse().getStatus(), raw(v));
-        assertEquals("{\"error\":\"Forbidden: system administrator required\"}", raw(v));
+        assertEquals("{\"code\":1002,\"data\":null,\"message\":\"Forbidden: system administrator required\"}", raw(v));
 
         MvcResult n = mockMvc.perform(get("/api/v1/system/admin/list")).andReturn();
         assertEquals(401, n.getResponse().getStatus(), raw(n));
@@ -435,8 +443,8 @@ class SystemContractTest {
         // 成功（viewer 会话被吊销 → 重登可用；密码相同）
         MvcResult ok = mockMvc.perform(jsonBody(post("/api/v1/system/admin/users/reset-password"), sysAdmin,
                 "{\"email\":\"java-phase1-viewer@weknora.test\",\"newPassword\":\"Passw0rd!\"}")).andReturn();
-        assertEquals(204, ok.getResponse().getStatus(), raw(ok));
-        assertEquals("", raw(ok)); // 204 无响应体
+        assertEquals(200, ok.getResponse().getStatus(), raw(ok));   // B192：204 退役 ⇒ 200 + 外壳
+        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(ok)); // 204 无响应体
         // 被吊销的旧 token 401（AdminResetPassword 的 RevokeTokensByUserID）
         MvcResult revoked = mockMvc.perform(get("/api/v1/system/info")
                 .header("Authorization", viewer)).andReturn();
@@ -540,7 +548,7 @@ class SystemContractTest {
         // 平台 key 打 settings（无 platform 能力 → 403 门禁文案）
         // PR4：键序归一后邻接正则不可靠 → Jackson 直取
         String key = new com.fasterxml.jackson.databind.ObjectMapper()
-                .readTree(raw(created)).path("token").asText();
+                .readTree(raw(created)).path("data").path("token").asText();   // B192：外壳下钻
         assertThat(key).startsWith("sk-");
         MvcResult guard = mockMvc.perform(get("/api/v1/system/admin/settings")
                 .header("X-API-Key", key)).andReturn();
@@ -560,11 +568,11 @@ class SystemContractTest {
 
         // PR4：键序归一后邻接正则不可靠 → Jackson 直取
         long delId = new com.fasterxml.jackson.databind.ObjectMapper()
-                .readTree(raw(created)).path("id").asLong();
+                .readTree(raw(created)).path("data").path("id").asLong();   // B192：外壳下钻
         MvcResult del = mockMvc.perform(delete("/api/v1/system/admin/api-keys/" + delId)
                 .header("Authorization", sysAdmin)).andReturn();
-        assertEquals(204, del.getResponse().getStatus(), raw(del));
-        assertEquals("", raw(del)); // 204 无响应体
+        assertEquals(200, del.getResponse().getStatus(), raw(del));   // B192：204 退役 ⇒ 200 + 外壳
+        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(del)); // 204 无响应体
 
         MvcResult after = mockMvc.perform(get("/api/v1/system/admin/api-keys")
                 .header("Authorization", sysAdmin)).andReturn();
@@ -630,8 +638,8 @@ class SystemContractTest {
 
         MvcResult del = mockMvc.perform(delete("/api/v1/system/admin/settings/tenant.max_owned_per_user")
                 .header("Authorization", sysAdmin)).andReturn();
-        assertEquals(204, del.getResponse().getStatus(), raw(del));
-        assertEquals("", raw(del)); // 204 无响应体
+        assertEquals(200, del.getResponse().getStatus(), raw(del));   // B192：204 退役 ⇒ 200 + 外壳
+        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(del)); // 204 无响应体
 
         MvcResult delUnknown = mockMvc.perform(delete("/api/v1/system/admin/settings/nope.key")
                 .header("Authorization", sysAdmin)).andReturn();
@@ -671,8 +679,9 @@ class SystemContractTest {
         MvcResult queues = mockMvc.perform(get("/api/v1/system/admin/runtime/queues")
                 .header("Authorization", sysAdmin)).andReturn();
         assertEquals(200, queues.getResponse().getStatus(), raw(queues));
-        String body = ContractJson.semantic(
-                QUEUE_TS.matcher(raw(queues)).replaceAll("\"timestamp\":\"<ts>\""));
+        // B192：期望是迁移前录的裸载荷 ⇒ 先把外壳取 data 再归一比较
+        String body = ContractJson.semantic(ContractJson.payload(
+                QUEUE_TS.matcher(raw(queues)).replaceAll("\"timestamp\":\"<ts>\"")));
         assertEquals(ContractJson.semantic("{\"available\":false,\"upstreamConcurrency\":32,\"parseConcurrency\":32,"
                 + "\"wikiConcurrency\":8,\"pools\":["
                 + "{\"name\":\"core\",\"concurrency\":8,\"queueCount\":2,\"instances\":0,"
@@ -693,18 +702,19 @@ class SystemContractTest {
                 .header("Authorization", sysAdmin)).andReturn();
         assertEquals(200, tasks.getResponse().getStatus(), raw(tasks));
         assertEquals(ContractJson.semantic(
-                "{\"available\":false,\"tasks\":[],\"pageSize\":20,\"hasMore\":false,\"nextCursor\":null}"), raw(tasks));
+                "{\"available\":false,\"tasks\":[],\"pageSize\":20,\"hasMore\":false,\"nextCursor\":null}"),
+                ContractJson.payload(raw(tasks)));   // B192：外壳取 data
 
         MvcResult mutate = mockMvc.perform(
                 post("/api/v1/system/admin/runtime/queues/default/tasks/t1/actions/cancel")
                         .header("Authorization", sysAdmin)).andReturn();
         assertEquals(503, mutate.getResponse().getStatus(), raw(mutate));
-        assertEquals("{\"error\":{\"code\":1008,\"details\":null,\"message\":\"Task queue is unavailable\"}}", raw(mutate));
+        assertEquals("{\"code\":1008,\"data\":null,\"message\":\"Task queue is unavailable\"}", raw(mutate));
 
         MvcResult purge = mockMvc.perform(delete("/api/v1/system/admin/runtime/queues/default/archived")
                 .header("Authorization", sysAdmin)).andReturn();
         assertEquals(503, purge.getResponse().getStatus(), raw(purge));
-        assertEquals("{\"error\":{\"code\":1008,\"details\":null,\"message\":\"Task queue is unavailable\"}}", raw(purge));
+        assertEquals("{\"code\":1008,\"data\":null,\"message\":\"Task queue is unavailable\"}", raw(purge));
     }
 
     // ════════════════ /system/admin 组：配额批量应用 ════════════════

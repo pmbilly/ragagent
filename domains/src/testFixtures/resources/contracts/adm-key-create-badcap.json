@@ -1,1 +1,5 @@
-{"error":{"code":1010,"message":"valid capabilities are required","details":null}}
+{
+  "code": 1010,
+  "message": "valid capabilities are required",
+  "data": null
+}

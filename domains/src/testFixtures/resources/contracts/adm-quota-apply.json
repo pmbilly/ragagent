@@ -1,1 +1,9 @@
-{"affected":6,"quotaBytes":10737418240,"quotaGb":10}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "affected": 6,
+    "quotaBytes": 10737418240,
+    "quotaGb": 10
+  }
+}

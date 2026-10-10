@@ -1,1 +1,19 @@
-{"version":"0.8.0-test","edition":"standard","commitId":"testcommit","buildTime":"2026-01-01T00:00:00Z","javaVersion":"test-jvm","keywordIndexEngine":"未配置","vectorStoreEngine":"未配置","graphDatabaseEngine":"Not Enabled","dbVersion":"97","startedAt":"2026-09-18T08:40:50Z","uptimeSeconds":69733,"dbMigrationError":null,"minioEnabled":false}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "version": "0.8.0-test",
+    "edition": "standard",
+    "commitId": "testcommit",
+    "buildTime": "2026-01-01T00:00:00Z",
+    "javaVersion": "test-jvm",
+    "keywordIndexEngine": "未配置",
+    "vectorStoreEngine": "未配置",
+    "graphDatabaseEngine": "Not Enabled",
+    "dbVersion": "97",
+    "startedAt": "2026-09-18T08:40:50Z",
+    "uptimeSeconds": 69733,
+    "dbMigrationError": null,
+    "minioEnabled": false
+  }
+}

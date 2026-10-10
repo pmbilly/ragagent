@@ -1,1 +1,41 @@
-{"edition":"standard","capabilities":{"agents":{"supported":true,"reason":null},"integrations.api":{"supported":true,"reason":null},"integrations.embed":{"supported":true,"reason":null},"integrations.im":{"supported":true,"reason":null},"settings.mcp":{"supported":true,"reason":null},"settings.storage":{"supported":true,"reason":null},"settings.vectorstore":{"supported":true,"reason":null},"settings.websearch":{"supported":true,"reason":null}}}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "edition": "standard",
+    "capabilities": {
+      "agents": {
+        "supported": true,
+        "reason": null
+      },
+      "integrations.api": {
+        "supported": true,
+        "reason": null
+      },
+      "integrations.embed": {
+        "supported": true,
+        "reason": null
+      },
+      "integrations.im": {
+        "supported": true,
+        "reason": null
+      },
+      "settings.mcp": {
+        "supported": true,
+        "reason": null
+      },
+      "settings.storage": {
+        "supported": true,
+        "reason": null
+      },
+      "settings.vectorstore": {
+        "supported": true,
+        "reason": null
+      },
+      "settings.websearch": {
+        "supported": true,
+        "reason": null
+      }
+    }
+  }
+}

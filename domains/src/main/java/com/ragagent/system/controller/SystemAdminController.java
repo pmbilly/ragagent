@@ -40,6 +40,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.ragagent.system.domain.SystemSetting;
 import com.ragagent.system.service.SystemSettingService;
+import com.ragagent.common.web.ApiResult;
+import com.ragagent.common.web.ApiResponse;
 
 /**
  * /api/v1/system/admin 组：用户管理 / 平台 API Key / 系统设置 / 运行时队列 / 配额批量应用。
@@ -55,6 +57,7 @@ import com.ragagent.system.service.SystemSettingService;
  * available=false + queues=[]；mutate/purge → 503 "Task queue is unavailable"。</p>
  */
 @RestController
+@ApiResult
 @RequestMapping("/api/v1/system/admin")
 public class SystemAdminController {
 
@@ -180,7 +183,7 @@ public class SystemAdminController {
     }
 
     @PostMapping("/users/reset-password")
-    public ResponseEntity<Void> resetPassword(
+    public ApiResponse<Void> resetPassword(
             @Valid @RejectEmptyBody @NonNullBody @RequestBody(required = false)
                     ResetPasswordRequest req) {
         String email = req.email().trim();
@@ -204,7 +207,7 @@ public class SystemAdminController {
                 "target_email", user.getEmail(),
                 "target_username", user.getUsername(),
                 "sessions_revoked", true));
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B192：204 退役（空体与「外壳恒存在」冲突）
     }
 
     /** 创建用户请求（username 2-50 字符；password 缺省/为 null 时服务端生成）。 */
@@ -290,7 +293,7 @@ public class SystemAdminController {
     }
 
     @DeleteMapping("/api-keys/{keyId}")
-    public ResponseEntity<?> deletePlatformKey(@PathVariable("keyId") String keyId) {
+    public ApiResponse<Void> deletePlatformKey(@PathVariable("keyId") String keyId) {
         long id;
         try {
             id = Long.parseLong(keyId);
@@ -306,7 +309,7 @@ public class SystemAdminController {
             throw new BizException(AppError.notFound("Platform API key not found"));
         }
         emitAPIKeyAudit(AuditAction.SYSTEM_API_KEY_REVOKED, id, List.of());
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B192：204 退役（空体与「外壳恒存在」冲突）
     }
 
     /** 脱敏：<=12 位 → "***"；否则 first7 + "..." + last4。 */
@@ -379,13 +382,13 @@ public class SystemAdminController {
     }
 
     @DeleteMapping("/settings/{key}")
-    public ResponseEntity<Void> resetSetting(@PathVariable("key") String key) {
+    public ApiResponse<Void> resetSetting(@PathVariable("key") String key) {
         try {
             settings.reset(key);
         } catch (IllegalArgumentException e) {
             throw new BizException(AppError.badRequest(e.getMessage()));
         }
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B192：204 退役（空体与「外壳恒存在」冲突）
     }
 
     /** 虚拟行的 id 归一为 0（零值输出 0，不是 null）。 */

@@ -1,1 +1,5 @@
-{"error":{"code":1000,"message":"invalid value for \"asynq.core_concurrency\" (expected int): expected integer, got \"abc\"","details":null}}
+{
+  "code": 1000,
+  "message": "invalid value for \"asynq.core_concurrency\" (expected int): expected integer, got \"abc\"",
+  "data": null
+}

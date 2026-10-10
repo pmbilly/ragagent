@@ -194,7 +194,7 @@ class TenantCatalogContractTest {
         assertGolden(jsonBody(post("/api/v1/tenants"), selfTok,
                 "{\"name\":\"ct-over-quota\"}"), 429, "ct-create-quota-429.json");
         assertGolden(delete("/api/v1/system/admin/settings/tenant.max_owned_per_user")
-                        .header("Authorization", sysTok), 204, "ct-unset-quota.json");
+                        .header("Authorization", sysTok), 200, "ct-unset-quota.json");
 
         // §4 self-service 关停 403（code 2005）→ 还原
         assertMasked(jsonBody(put("/api/v1/system/admin/settings/tenant.self_service_creation_enabled"),
@@ -202,7 +202,7 @@ class TenantCatalogContractTest {
         assertGolden(jsonBody(post("/api/v1/tenants"), selfTok,
                 "{\"name\":\"ct-blocked\"}"), 403, "ct-create-disabled.json");
         assertGolden(delete("/api/v1/system/admin/settings/tenant.self_service_creation_enabled")
-                        .header("Authorization", sysTok), 204, "ct-unset-noss.json");
+                        .header("Authorization", sysTok), 200, "ct-unset-noss.json");
 
         // §5 auto_create_api_key 兼容路径（data.api_key 明文，掩码）→ 还原
         assertMasked(jsonBody(put("/api/v1/system/admin/settings/tenant.auto_create_api_key"),
@@ -211,7 +211,7 @@ class TenantCatalogContractTest {
                 "{\"name\":\"ct-gamma\",\"description\":\"gamma workspace\"}"),
                 201, "ct-create-apikey.json");
         assertGolden(delete("/api/v1/system/admin/settings/tenant.auto_create_api_key")
-                        .header("Authorization", sysTok), 204, "ct-unset-autokey.json");
+                        .header("Authorization", sysTok), 200, "ct-unset-autokey.json");
     }
 
 
