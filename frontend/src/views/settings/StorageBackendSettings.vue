@@ -340,11 +340,14 @@ async function testRaw() {
   rawTestResult.value = null
   try {
     const r: any = editing.value ? await testStorageBackendByID(editing.value.id) : await testStorageBackend(form)
-    if (r.success) { rawTestResult.value = 'ok'; MessagePlugin.success(t('settings.storageBackend.testSuccess')) }
-    else { rawTestResult.value = 'error'; MessagePlugin.error(r.error || t('settings.storageBackend.testFailed')) }
+    // 后端测试连接把结果放在**响应体内**：成功 {connected:true}、失败 {connected:false,error:…}，
+    // 两者都是 HTTP 200 + code 0（金片 sb-test-raw-local/ssrf 可证）⇒ 判 connected。
+    // 后端无 success 键，旧 `r.success` 恒 falsy ⇒ 任何真实可用的配置都被判失败。
+    if (r?.connected) { rawTestResult.value = 'ok'; MessagePlugin.success(t('settings.storageBackend.testSuccess')) }
+    else { rawTestResult.value = 'error'; MessagePlugin.error(r?.error || t('settings.storageBackend.testFailed')) }
   } finally { testing.value = false }
 }
-async function testSaved(backend: StorageBackend) { const r: any = await testStorageBackendByID(backend.id); r.success ? MessagePlugin.success(t('settings.storageBackend.testSuccess')) : MessagePlugin.error(r.error || t('settings.storageBackend.testFailed')) }
+async function testSaved(backend: StorageBackend) { const r: any = await testStorageBackendByID(backend.id); r?.connected ? MessagePlugin.success(t('settings.storageBackend.testSuccess')) : MessagePlugin.error(r?.error || t('settings.storageBackend.testFailed')) }
 async function save() {
   if (!form.name.trim()) { MessagePlugin.warning(t('settings.storageBackend.nameRequired')); return }
   saving.value = true

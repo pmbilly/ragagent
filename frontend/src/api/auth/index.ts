@@ -475,12 +475,6 @@ export interface InviteLookup {
   expiresAt: string
 }
 
-export interface InviteLookupResponse {
-  success: boolean
-  data?: InviteLookup
-  message?: string
-}
-
 export interface RegisterByInviteRequest {
   token: string
   email: string
@@ -496,13 +490,13 @@ export interface RegisterByInviteRequest {
  * Uses POST + body (rather than GET + path) so the plaintext token
  * never appears in access logs, browser history, or tracing spans.
  */
-export async function getInvitationByToken(token: string): Promise<InviteLookupResponse> {
-  try {
-    const response = await post(`/api/v1/auth/invitations/lookup`, { token })
-    return response as unknown as InviteLookupResponse
-  } catch (error: any) {
-    return { success: false, message: '' }
-  }
+export async function getInvitationByToken(token: string): Promise<InviteLookup> {
+  // 后端返回信封 {code,message,data}，**响应拦截器已就地解包** ⇒ 运行时拿到的是 InviteLookup 本身。
+  // 旧签名 Promise<InviteLookupResponse>（success+data）是同步契约残留：调用方据 `resp.success` 判定
+  // ⇒ 恒 falsy ⇒ 邀请链接永远显示"无效"、进不了注册模式（B225 修）。
+  // 失败（410 失效/过期等）由拦截器 reject，交由调用方 catch 处理。
+  const response = await post(`/api/v1/auth/invitations/lookup`, { token })
+  return response as unknown as InviteLookup
 }
 
 /**

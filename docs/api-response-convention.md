@@ -123,7 +123,18 @@ grep -rnE 'error\\.(code|message|details)|\\.data\\.error\\b' frontend/src front
 | `components/McpMetadataPanel.vue:109` | `e?.response?.data?.error?.message` ✗（有 `e.message` 兜底 ⇒ 降级不崩 ✓）| 已迁 mcp ✓，可顺手清理 |
 | `api/web-search-provider.ts:101` | `response.data ?? response`（**刻意容忍** ✓）| 无需改 ✓ |
 
-**易混淆（不受影响 ✓，勿误改 ✗）**：载荷字段叫 `success` 的端点 —— `views/settings/StorageBackendSettings.vue:343`（`r.success`）✓、`views/settings/components/McpTestResultBody.vue` ✓、`composables/useEmbedCitationPopover.ts` ✓、以及所有 **SSE 事件**里的 `event.success` ✓（流不是 HTTP 外壳 ✓）。
+**易混淆（**逐端点核实**，勿按同族推断）**：载荷字段叫 `success` 的端点 ——
+~~`views/settings/StorageBackendSettings.vue:343`（`r.success`）✓~~ —— **❌ 本判据已被证伪（B225）**：
+金片 `contracts/sb-test-raw-local.json` = `{code:0,…,data:{connected:true}}`、`sb-test-raw-ssrf.json` = `data:{connected:false,error:…}`
+（**两者都是 code 0**）⇒ 该端点**没有** `success` 键，旧判据 `r.success` 恒 falsy ⇒ 任何真实可用的存储配置都被判"测试失败"。
+同族还有 `views/settings/WebSearchSettings.vue:650,658`（`res.success`；成功体只有 `{connected:true}`）—— 两处均已改为判 `connected`。
+仍成立的部分：`views/settings/components/McpTestResultBody.vue` ✓（Java 侧 `McpTestResult.success` 确实恒输出）、
+`composables/useEmbedCitationPopover.ts` ✓（本地对象）、所有 **SSE 事件**里的 `event.success` ✓（流不是 HTTP 外壳 ✓）。
+
+> **通用判据（B224/B225 两次踩坑后确立）**：「载荷里到底有没有 `success` 键」是**逐端点的事实**，
+> 唯一权威是**契约金片或 controller 返回值**。本文件此前把 `StorageBackendSettings` 判成"安全 ✓"，
+> 后来者据此跳过同族排查 ⇒ `KnowledgeBase` 删除/重解析、`Login` 邀请/OIDC、storage/websearch 测试连接
+> 共 **10 处**长期误报（详见 HANDOFF B224/B225）。**新增此类判定前，先查金片。**
 
 ### 附：B201 的两条新经验（auth 批）
 

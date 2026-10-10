@@ -476,17 +476,15 @@ const confirmBatchReparse = async () => {
   }
   batchReparsing.value = true;
   try {
-    const res: any = await batchReparseKnowledge(kbId.value, ids);
-    if (res?.success) {
-      MessagePlugin.success(t('knowledgeBase.batchReparseSuccess', { count: ids.length }));
-      applyOptimisticBatchReparse(ids);
-      clearSelection();
-      batchMode.value = false;
-      scheduleWikiStatusProbes();
-      void awaitBatchReparseReflection(ids);
-    } else {
-      MessagePlugin.error(res?.message || t('knowledgeBase.batchReparseFailed'));
-    }
+    await batchReparseKnowledge(kbId.value, ids);
+    // 后端契约同删除：**202 + {reparseCount,taskId}**，响应体无 success 键（金片 kg-batch-reparse.json 可证）；
+    // 「受理成功」由 2xx + code 0 表达，其余 reject ⇒ 走 catch。旧 `res?.success` 恒 falsy ⇒ 每次重解析都误报失败。
+    MessagePlugin.success(t('knowledgeBase.batchReparseSuccess', { count: ids.length }));
+    applyOptimisticBatchReparse(ids);
+    clearSelection();
+    batchMode.value = false;
+    scheduleWikiStatusProbes();
+    void awaitBatchReparseReflection(ids);
   } catch (e: any) {
     MessagePlugin.error(e?.message || t('knowledgeBase.batchReparseFailed'));
   } finally {
@@ -1622,25 +1620,11 @@ const executeUploadBatch = async (
         uploadData.processConfig = options.processConfig;
       }
 
-      const responseData: any = await uploadKnowledgeFile(targetKbId, uploadData);
-      const isSuccess = responseData?.success || responseData?.code === 200 || responseData?.status === 'success' || (!responseData?.error && responseData);
-      if (isSuccess) {
-        successCount++;
-      } else {
-        failCount++;
-        if (totalCount === 1) {
-          let errorMessage = t('knowledgeBase.uploadFailed');
-          if (responseData?.error?.message) {
-            errorMessage = responseData.error.message;
-          } else if (responseData?.message) {
-            errorMessage = responseData.message;
-          }
-          if (responseData?.code === 'duplicate_file' || responseData?.error?.code === 'duplicate_file') {
-            errorMessage = t('knowledgeBase.fileExists');
-          }
-          MessagePlugin.error(errorMessage);
-        }
-      }
+      await uploadKnowledgeFile(targetKbId, uploadData);
+      // 后端 201 + 裸 KnowledgeResponse（无 success/code/status 键，且拦截器已解包掉 code）——
+      // 「上传成功」由 2xx 表达，失败一律 reject ⇒ 走下方 catch（那里的 error.code 才带 duplicate_file）。
+      // 旧的多条件兜底只是恰好有效（靠 `!error && truthy`），返回空体就会误判成失败。
+      successCount++;
     } catch (error: any) {
       failCount++;
       if (totalCount === 1) {
@@ -1676,7 +1660,7 @@ const executeUrlImport = async (
 
   const tagIdsToUpload = tagIds && tagIds.length > 0 ? [...tagIds] : undefined;
   try {
-    const responseData: any = await createKnowledgeFromURL(targetKbId, {
+    await createKnowledgeFromURL(targetKbId, {
       url,
       tagIds: tagIdsToUpload,
       processConfig: processConfig,
@@ -1684,21 +1668,9 @@ const executeUrlImport = async (
     window.dispatchEvent(new CustomEvent('knowledgeFileUploaded', {
       detail: { kbId: targetKbId },
     }));
-    const isSuccess = responseData?.success || responseData?.code === 200 || responseData?.status === 'success' || (!responseData?.error && responseData);
-    if (isSuccess) {
-      MessagePlugin.success(t('knowledgeBase.urlImportSuccess'));
-    } else {
-      let errorMessage = t('knowledgeBase.urlImportFailed');
-      if (responseData?.error?.message) {
-        errorMessage = responseData.error.message;
-      } else if (responseData?.message) {
-        errorMessage = responseData.message;
-      }
-      if (responseData?.code === 'duplicate_url' || responseData?.error?.code === 'duplicate_url') {
-        errorMessage = t('knowledgeBase.urlExists');
-      }
-      MessagePlugin.error(errorMessage);
-    }
+    // 与上传同型：后端 201 + 裸 KnowledgeResponse ⇒ 「已受理」由 2xx 表达，失败一律 reject
+    // ⇒ 走下方 catch（那里的 error.code 才带 duplicate_url）。旧多条件兜底只是恰好有效。
+    MessagePlugin.success(t('knowledgeBase.urlImportSuccess'));
   } catch (error: any) {
     let errorMessage = error?.error?.message || error?.message || t('knowledgeBase.urlImportFailed');
     if (error?.code === 'duplicate_url') {

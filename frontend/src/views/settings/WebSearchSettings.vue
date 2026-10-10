@@ -647,19 +647,23 @@ const testConnection = async () => {
     let ok = false
     if (editingProvider.value && !data.parameters.apiKey) {
       const res = await testWebSearchProvider(editingProvider.value.id!)
-      ok = !!res.success
-      if (res.success) {
+      // 后端测试连接结果在响应体内：成功 {connected:true}；后端**无 success 键**
+      //（控制器注释里的 success:false 是旧 Go 形态残留）⇒ 旧判据恒 falsy，真实可用配置一律被判失败。
+      ok = !!res?.connected
+      if (res?.connected) {
         MessagePlugin.success(t('webSearchSettings.toasts.testSuccess'))
       } else {
-        MessagePlugin.error(res.error || t('webSearchSettings.toasts.testFailed'))
+        MessagePlugin.error(res?.error || t('webSearchSettings.toasts.testFailed'))
       }
     } else {
       const res = await testWebSearchProvider(undefined, data)
-      ok = !!res.success
-      if (res.success) {
+      // 后端测试连接结果在响应体内：成功 {connected:true}；后端**无 success 键**
+      //（控制器注释里的 success:false 是旧 Go 形态残留）⇒ 旧判据恒 falsy，真实可用配置一律被判失败。
+      ok = !!res?.connected
+      if (res?.connected) {
         MessagePlugin.success(t('webSearchSettings.toasts.testSuccess'))
       } else {
-        MessagePlugin.error(res.error || t('webSearchSettings.toasts.testFailed'))
+        MessagePlugin.error(res?.error || t('webSearchSettings.toasts.testFailed'))
       }
     }
     lastTestOk.value = ok

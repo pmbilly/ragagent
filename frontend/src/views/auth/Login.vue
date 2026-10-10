@@ -512,8 +512,10 @@ const handleOIDCLogin = async () => {
     const response = await getOIDCAuthorizationURL(getBackendOIDCRedirectURI())
     const authorizationURL = response.authorizationUrl
 
-    if (!response.success || !authorizationURL) {
-      MessagePlugin.error(response.message || t('auth.oidcLoginFailed'))
+    // 后端 GET /auth/oidc/url 返回 {providerDisplayName, authorizationUrl, state}，**无 success 键**
+    //（2xx + code 0 即成功，其余由响应拦截器 reject ⇒ 走 catch）⇒ 只判 URL 本身。
+    if (!authorizationURL) {
+      MessagePlugin.error(t('auth.oidcLoginFailed'))
       return
     }
 
@@ -600,8 +602,10 @@ const handleRegister = async () => {
         email: registerData.email,
         password: registerData.password,
       })
-      if (!response.success) {
-        MessagePlugin.error(response.message || t('auth.registerFailed'))
+      // 后端 register-by-invite 返回 AuthLoginResponse{user,activeTenant,memberships,token,…}，
+      // **无 success 键** ⇒ 以 token 为成功判据（persistLoginResponse 正需要它）。
+      if (!response?.token) {
+        MessagePlugin.error(t('auth.registerFailed'))
         return
       }
       MessagePlugin.success(t('auth.registerSuccess'))
@@ -657,10 +661,12 @@ onMounted(async () => {
     // 1. 先校验 token：无效/过期则停在登录页报错，不进注册模式。
     try {
       const resp = await getInvitationByToken(tokenFromQuery)
-      if (resp.success && resp.data) {
-        inviteLookup.value = resp.data
+      // 后端 invitations/lookup 是信封 {code,message,data:{tenantId,…}} —— 拦截器**已就地解包**，
+      // 这里拿到的是 {tenantId,tenantName,role,expiresAt} 本身（既无 success 也无 data）⇒ 判业务字段。
+      if (resp?.tenantId) {
+        inviteLookup.value = resp
       } else {
-        inviteLookupError.value = resp.message || t('inviteRegister.invalidBody')
+        inviteLookupError.value = t('inviteRegister.invalidBody')
         loadOIDCConfig()
         loadAuthConfig()
         return
