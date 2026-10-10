@@ -11,6 +11,10 @@
   R-c ≥ 800 必须登记：超过「例外判据」行的文件必须在 baseline 的 `exempt` 里出现
   R-d 例外必须自述：`exempt` 标 `accepted` 的文件，源码里必须有「规模例外」标记与理由
       —— 直接执行 HANDOFF §14.5「例外必须在类 javadoc 写明理由」
+  R-f 单行长度硬门：任何源码行不得 > 64 KB（javac 常量池上限即 64 KB，超过必是数据块）
+  R-g 文件体积硬门：任何源码文件不得 > 512 KB（数据应外移到资源文件）
+      —— R-f/R-g 来自 B219 实测：`GoRecording45C` 一条常量单行 3.5 MB（占文件 95.5%），
+         而**按行数判的 R-a~R-e 全绿**（它 819 行），且原 scan() 只扫 main ⇒ 测试树不在视野。
   R-e 自述数字必须相符：标记里若写了行数（`>800 行` / `~810 行`），须与实测相符，
       且**低于例外判据的文件不得再自称例外**
       —— 判据来自 `knowledge/service/FaqImportService`：切片后已 566 行，
@@ -46,6 +50,10 @@ GROWTH_SLACK = 30          # 基线内文件允许的增长余量
 TOP_N = 12
 TOL_LOW, TOL_HIGH = 0.8, 1.25   # R-e 自述容差
 
+# R-f / R-g 源码形态阈值（B219）：按**字节**判，与上面的按行数判互补。
+MAX_LINE_BYTES = 64 * 1024      # javac 常量池单常量上限即 64 KB ⇒ 超过必是 StringBuilder 拼的数据块
+MAX_FILE_BYTES = 512 * 1024     # 单文件体积；超过应把数据外移到 src/test/resources/
+
 MARKER = re.compile(r"规模例外")
 MARKER_NUM = re.compile(r"(\d{3,})\s*行")   # 只认「数字 + 行」，避免把 §14.5 的节号当行数
 
@@ -74,6 +82,30 @@ def scan() -> dict[str, tuple[int, bool, int | None]]:
             break
         out[str(p.relative_to(_sr.REPO))] = (len(lines), marked, claim)
     return out
+
+
+def scan_shape(root_files) -> tuple[list[tuple[str, int]], list[tuple[str, int]]]:
+    """源码形态：返回（超长行, 超重文件）两份清单。
+
+    为什么单列一节：本脚本其余规则按**行数**判，而畸形文件可以是"行数正常、单行 3.5 MB"
+    ——`GoRecording45C` 实测 819 行、一路绿灯，直到 IDE 打不开、评审 diff 不出来才被发现（B219）。
+    另外原 scan() 只扫 main ⇒ **测试与夹具树整片不在视野里**，而这批畸形恰好都在那儿。
+    """
+    long_lines, heavy = [], []
+    for p in root_files:
+        rel = str(p.relative_to(_sr.REPO))
+        size = p.stat().st_size
+        if size > MAX_FILE_BYTES:
+            heavy.append((rel, size))
+        longest = 0
+        with p.open(encoding="utf-8", errors="ignore") as fh:
+            for line in fh:                       # 逐行读：避免把 3.5 MB 的行整个吞进内存再取长
+                n = len(line)
+                if n > longest:
+                    longest = n
+        if longest > MAX_LINE_BYTES:
+            long_lines.append((rel, longest))
+    return long_lines, heavy
 
 
 def main() -> int:
@@ -140,12 +172,22 @@ def main() -> int:
     if shrunk:
         print(f"  已低于阈值：{len(shrunk)} 个 → 请 --write 收紧基线")
 
+    long_lines, heavy = scan_shape(_sr.all_java_files(sources=("main", "test", "testFixtures")))
+    for f, n in long_lines:
+        problems.append(f"R-f 单行超长 {f}：最长行 {n} 字节（> {MAX_LINE_BYTES // 1024} KB）"
+                        f"—— javac 常量池上限即 64 KB，超过必是 StringBuilder 拼的数据块；"
+                        f"把数据外移到资源文件（参照 GoRecording45C 的处置）")
+    for f, n in heavy:
+        problems.append(f"R-g 文件超重 {f}：{n // 1024} KB（> {MAX_FILE_BYTES // 1024} KB）"
+                        f"—— 把数据外移到 src/test/resources/，源码里只留常量名与加载")
+
     if problems:
         print("\n✗ 守卫失败：")
         for p in problems:
             print("   " + p)
         return 1
-    print(f"\n✓ 守卫通过：未新增超大文件、无回涨超阈、≥{EXEMPT_LINE} 行均已登记、自称无漂移。")
+    print(f"\n✓ 守卫通过：未新增超大文件、无回涨超阈、≥{EXEMPT_LINE} 行均已登记、自称无漂移、"
+          f"无超长行（>{MAX_LINE_BYTES // 1024} KB）/超重文件（>{MAX_FILE_BYTES // 1024} KB）。")
     return 0
 
 
