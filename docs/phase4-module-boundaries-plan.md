@@ -610,6 +610,6 @@ B116 搬家时已经搬过一批资源（`common/text/*.txt`），这类风险�
 
 **四刀计划**（每刀独立提交 + 独立全绿 ✓，沿用 §13/§14 SOP ✓）：
 1. ✅ **沉 DTO（B207 已完成）**：两个记录已迁 `com.ragagent.common.apikey` ✓；**映射工厂留属主**（新类 `TenantAPIKeyProjections` ✓ —— 记录依赖实体，直接搬会在 `:common` 造反向边 ✗）（边 1 ✓）：`TenantAPIKeyCreateResponse` / `TenantAPIKeyResponse`（+ 其引用的 `TenantAPIKeyRequest` 视需要 ✓）沉 `:common`；
-2. **管理口 port**（边 2/3 ✓）：`:common` 定义（create/list/update/delete/rotate 需要的窄接口 ✓），apikey 的 service 实现 ✓，三处调用点改注入 port ✓；
+2. ✅ **管理口 port（B208 已完成）**：`:common` 新增 `ApiKeyAdminPort`（窄面 ✓ 四个方法：平台列表/建/撤 + 租户默认键 ✓），apikey 侧 `ApiKeyAdminAdapter` 实现（**脱敏逐字搬过去** ✓，调用方只看到 common 载荷 ✓）；顺带清掉 `TenantCatalogController` 的**死依赖** ✗ 与 `TenantCreateOps` 的**迪米特违规**（`service.apiKeyService.…` ✗）⇒ **main 侧边数 5 → 1** ✓（只剩 `AuthFilter → APIKeyAuthChannel`，第 3 刀 ✓）（边 2/3 ✓）：`:common` 定义（create/list/update/delete/rotate 需要的窄接口 ✓），apikey 的 service 实现 ✓，三处调用点改注入 port ✓；
 3. **认证通道 port**（边 4 ✓）+ **查询 port**（边 5 ✓）：`AuthFilter` 与 `TenantFilterGuard` 只依赖 port ✓；
 4. **验环**：`python3 scripts/check-package-cycles.py` + 全量闸门 ✓，随后即可建 `:channels`（`im` + `embedchannel` + `apikey`→`channels.api` ✓）。

@@ -8,9 +8,9 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.security.APIKeyCapability;
 import com.ragagent.common.security.APIKeyScopeType;
+import com.ragagent.common.apikey.ApiKeyAdminPort;
 import com.ragagent.common.apikey.TenantAPIKeyCreateResponse;
 import com.ragagent.common.apikey.TenantAPIKeyResponse;
-import com.ragagent.auth.apikey.service.TenantAPIKeyService;
 import com.ragagent.audit.domain.AuditAction;
 import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.audit.domain.AuditOutcome;
@@ -42,7 +42,6 @@ import com.ragagent.system.domain.SystemSetting;
 import com.ragagent.system.service.SystemSettingService;
 import com.ragagent.common.web.ApiResult;
 import com.ragagent.common.web.ApiResponse;
-import com.ragagent.auth.apikey.domain.TenantAPIKeyProjections;
 
 /**
  * /api/v1/system/admin 组：用户管理 / 平台 API Key / 系统设置 / 运行时队列 / 配额批量应用。
@@ -66,18 +65,18 @@ public class SystemAdminController {
 
     private final SystemAdminUserService users;
     private final SystemSettingService settings;
-    private final TenantAPIKeyService apiKeyService;
+    private final ApiKeyAdminPort apiKeyAdmin;
     private final TenantMapper tenantMapper;
     private final AuditLogService auditService;
 
     public SystemAdminController(SystemAdminUserService users,
                                  SystemSettingService settings,
-                                 TenantAPIKeyService apiKeyService,
+                                 ApiKeyAdminPort apiKeyAdmin,
                                  TenantMapper tenantMapper,
                                  AuditLogService auditService) {
         this.users = users;
         this.settings = settings;
-        this.apiKeyService = apiKeyService;
+        this.apiKeyAdmin = apiKeyAdmin;
         this.tenantMapper = tenantMapper;
         this.auditService = auditService;
     }
@@ -260,11 +259,7 @@ public class SystemAdminController {
 
     @GetMapping("/api-keys")
     public ResponseEntity<List<TenantAPIKeyResponse>> listPlatformKeys() {
-        List<TenantAPIKeyResponse> response = new ArrayList<>();
-        for (var key : apiKeyService.listPlatform()) {
-            response.add(masked(TenantAPIKeyProjections.from(key), key.getApiKey()));
-        }
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(apiKeyAdmin.listPlatformMasked());   // B208：脱敏在 port 实现侧 ✓
     }
 
     @PostMapping("/api-keys")
@@ -284,13 +279,9 @@ public class SystemAdminController {
                 throw validation("expiresAtUnix must be in the future");
             }
         }
-        var result = apiKeyService.create(new TenantAPIKeyService.TenantAPIKeyServiceCreateRequest(
-                0L, APIKeyScopeType.PLATFORM, req.name().trim(), false, null, normalized, expiresAt));
-        TenantAPIKeyResponse item = masked(TenantAPIKeyProjections.from(result.apiKey()), result.token());
-        emitAPIKeyAudit(AuditAction.SYSTEM_API_KEY_CREATED, result.apiKey().getId(),
-                result.apiKey().getCapabilities());
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(TenantAPIKeyCreateResponse.of(item, result.token()));
+        TenantAPIKeyCreateResponse created = apiKeyAdmin.createPlatformMasked(req.name().trim(), normalized, expiresAt);
+        emitAPIKeyAudit(AuditAction.SYSTEM_API_KEY_CREATED, created.id(), created.capabilities());
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);   // B208：脱敏/投影在 port 实现侧 ✓
     }
 
     @DeleteMapping("/api-keys/{keyId}")
@@ -305,7 +296,7 @@ public class SystemAdminController {
             throw new BizException(AppError.badRequest("Invalid API key ID"));
         }
         try {
-            apiKeyService.revokePlatform(id);
+            apiKeyAdmin.revokePlatform(id);
         } catch (RuntimeException e) {
             throw new BizException(AppError.notFound("Platform API key not found"));
         }
@@ -313,14 +304,6 @@ public class SystemAdminController {
         return ApiResponse.ok();   // B192：204 退役（空体与「外壳恒存在」冲突）
     }
 
-    /** 脱敏：<=12 位 → "***"；否则 first7 + "..." + last4。 */
-    private static TenantAPIKeyResponse masked(TenantAPIKeyResponse item, String token) {
-        String t = token == null ? "" : token.trim();
-        String masked = t.length() <= 12 ? "***" : t.substring(0, 7) + "..." + t.substring(t.length() - 4);
-        return new TenantAPIKeyResponse(item.id(), item.scopeType(), item.name(), masked,
-                item.fullAccess(), item.knowledgeBaseIds(), item.capabilities(),
-                item.lastUsedAt(), item.expiresAt(), item.createdAt());
-    }
 
     /** API-Key 审计（details: scopeType/capabilities；target_type=api_key）。 */
     private void emitAPIKeyAudit(String action, long keyId, List<String> capabilities) {

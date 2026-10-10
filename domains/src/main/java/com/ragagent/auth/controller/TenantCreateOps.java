@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ragagent.common.security.APIKeyScopeContext;
 import com.ragagent.common.security.TenantAPIKeyScope;
-import com.ragagent.auth.apikey.service.TenantAPIKeyService;
 import com.ragagent.tenant.Tenant;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.domain.User;
@@ -174,10 +173,8 @@ final class TenantCreateOps {
         if (!platformCaller && service.systemSettingService.getBool(
                 "tenant.auto_create_api_key", "WEKNORA_TENANT_AUTO_CREATE_API_KEY", false)) {
             try {
-                var result = service.apiKeyService.create(
-                        new TenantAPIKeyService.TenantAPIKeyServiceCreateRequest(
-                                created.getId(), null, "default", true, null, null, null));
-                data = tenantWithApiKey(created, result.token());
+                String token = service.apiKeyAdmin.createDefaultTenantKey(created.getId());   // B208：走管理口 ✓
+                data = tenantWithApiKey(created, token);
             } catch (RuntimeException e) {
                 log.warn("[tenant] auto-create default API key failed for tenant {}: {}",
                         created.getId(), e.toString());

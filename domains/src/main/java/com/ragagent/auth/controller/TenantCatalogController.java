@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.auth.apikey.service.TenantAPIKeyService;
+import com.ragagent.common.apikey.ApiKeyAdminPort;
 import com.ragagent.auth.service.TenantMemberService;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.auth.service.UserService;
@@ -48,7 +48,7 @@ public class TenantCatalogController {
     final TenantMemberService memberService;
     final UserService userService;
     final SystemSettingGateway systemSettingService;
-    final TenantAPIKeyService apiKeyService;
+    final ApiKeyAdminPort apiKeyAdmin;
     final KnowledgeBaseProvisioner knowledgeProvisioner;
     final TenantProperties tenantProperties;
     final SsrfGuard ssrfGuard;
@@ -70,7 +70,7 @@ public class TenantCatalogController {
                                    TenantMemberService memberService,
                                    UserService userService,
                                    SystemSettingGateway systemSettingService,
-                                   TenantAPIKeyService apiKeyService,
+                                   ApiKeyAdminPort apiKeyAdmin,
                                    KnowledgeBaseProvisioner knowledgeProvisioner,
                                    TenantProperties tenantProperties,
                                    SsrfGuard ssrfGuard,
@@ -80,7 +80,7 @@ public class TenantCatalogController {
         this.memberService = memberService;
         this.userService = userService;
         this.systemSettingService = systemSettingService;
-        this.apiKeyService = apiKeyService;
+        this.apiKeyAdmin = apiKeyAdmin;
         this.knowledgeProvisioner = knowledgeProvisioner;
         this.tenantProperties = tenantProperties;
         this.ssrfGuard = ssrfGuard;
