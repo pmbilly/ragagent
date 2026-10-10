@@ -78,7 +78,7 @@
 ## 4. 关键测量数据（**2026-09-30 复核**）
 
 - main：**1,535 文件 / 27.9 万行**；test：**401 文件 / 12.6 万行 / 1,366 契约 fixture**；frontend：**465 文件 / 20.0 万行**。
-- 后端测试：**4,681 用例全绿**（含 6 个 skip，2026-09-30 复核；2026-10-01 model 域收官批实测 **4,670 / 失败 0 / 跳过 4**，434 测试类）；前端 `vue-tsc` 0 错误 + **690 用例全绿**（§9 有命令）。
+- 后端测试：**4,681 用例全绿**（含 6 个 skip，2026-09-30 复核；2026-10-01 model 域收官批实测 **4,670 / 失败 0 / 跳过 4**，434 测试类）；前端 `vue-tsc` 0 错误 + **738 用例全绿**（2026-10-10 B202 实测 ✓；早前 690 为 2026-10-01）。
 - **≥800 行的类（main，全仓）**：AgentEngine 3,235、WikiIngestBatchHandler 2,268、WikiIngestService 2,182、InitializationController 1,981、DataSourceService 1,827、SessionKnowledgeQaService 1,764、MemoryService 1,660、OpenSearchRetrieveRepository 1,652、WikiPageServiceImpl 1,642、KnowledgeQaController 1,616……
   （**2026-09-30 历史快照，多数已过时**——活榜单以 §14.3 为准：2026-10-01 实测 36 个）
 - **knowledge 包（已整治，可作样板）**：**197 文件 / 25,264 行**；最大三个 = `FaqImportService` 1,234、`KnowledgeService` 850、`KnowledgeProcessWorker` 814；13 个子包见 §12；容器类/`*Util` 反模式命名已清零。
@@ -238,7 +238,7 @@
 - 434 个测试类 / 1,366 契约 fixture（**4,858 用例 / 0 失败**，2026-10-10 B202 实测 ✓；早前记录 4,670 / 4 skip 为 2026-10-01 ✓）是重构回归网，**每一步（哪怕纯移动）结束都必须全绿**——近两轮的工作方式就是"改一步 → 全量验证 → 提交"。这是"种子 fork + 渐进转型"优于重写的全部意义。
 - **三条验证命令（接手先跑一遍确认基线）**：
   ```bash
-  # 后端全量（约 3 分钟；期望 BUILD SUCCESSFUL，4,670 用例 0 失败）
+  # 后端全量（约 1.5 分钟，B194 提速后；期望 BUILD SUCCESSFUL，4,858 用例 0 失败）
   cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home ./gradlew :domains:test
   # 前端类型检查（期望 0 错误）
   cd ~/ragagent/frontend && npx vue-tsc --build --force
@@ -622,7 +622,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 3. 端点/落库面**按清单逐域推进**：一个域一个 PR、同批带前端、重录 fixture。
 
 **验收（Acceptance）**
-- 全量测试绿（当前口径 **4,670 用例**）；每一步"改一步 → 全量验证 → 提交"。
+- 全量测试绿（当前口径 **4,858 用例**，2026-10-10 ✓）；每一步"改一步 → 全量验证 → 提交"。
 - 契约 fixture 重录后**语义对比**（键序/转义归一化）全过；200 路径 fixture 应零改动。
 - 前端同 PR；`docs/knowledge-api-contract-v1.md` 同步更新版本与差异表。
 
