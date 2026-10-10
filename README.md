@@ -64,10 +64,14 @@ ragagent/
 ├── otlp-proto/           # OTLP 追踪 proto（tracing 用）
 ├── docs/                 # 31 份模块手册 + 专项规范 + 踩坑档案
 ├── gradle/libs.versions.toml  # 依赖版本唯一来源（模块 build 文件禁止写版本号）
+├── .github/workflows/    # CI：guards · backend · docker · frontend 四个 job
 ├── docker-compose.yml    # 本地基础设施：ParadeDB(15432) + Redis(16379) + docreader(50051)
 ├── Dockerfile            # 镜像（CI 有迁移路径自检）
+├── settings.gradle.kts   # 模块清单（4 个 include）
 └── HANDOFF.md            # 接手必读：已定决策、批次总表、逐包重构范式、踩坑史
 ```
+
+> 树中省略生成物与本地态：`build/`、`.gradle/`、`.env`、`.DS_Store` 等；根构建脚本还有 `build.gradle.kts` / `gradle.properties` / `gradlew`。
 
 ## 后端包结构
 
