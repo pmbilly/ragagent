@@ -321,7 +321,7 @@ class MemoryHttpContractTest {
 
         // 拒绝就是删除：换锚后是 204，无响应体
         assertEquals(204, r.getResponse().getStatus(), raw(r));
-        assertEquals("", raw(r), "204 必须无响应体");
+        assertEquals("", raw(r), "204 必须无响应体");   // B193：外壳恒存在
     }
 
     @Test
@@ -384,7 +384,7 @@ class MemoryHttpContractTest {
         MvcResult r = perform(delete("/api/v1/memory/items").header("Authorization", bearer()));
 
         assertEquals(204, r.getResponse().getStatus(), raw(r));
-        assertEquals("", raw(r), "204 必须无响应体");
+        assertEquals("", raw(r), "204 必须无响应体");   // B193：外壳恒存在
 
         // 真的清掉了：列表回到空
         MvcResult after = perform(get("/api/v1/memory/items").header("Authorization", bearer()));
@@ -457,7 +457,7 @@ class MemoryHttpContractTest {
                 .header("Authorization", bearer()));
 
         assertEquals(204, r.getResponse().getStatus(), raw(r));
-        assertEquals("", raw(r), "204 必须无响应体");
+        assertEquals("", raw(r), "204 必须无响应体");   // B193：外壳恒存在
     }
 
     @Test

@@ -28,6 +28,8 @@ import com.ragagent.agent.management.domain.CustomAgentEntity;
 import com.ragagent.common.web.ContentTypeByFilename;
 import com.ragagent.knowledge.support.ParserEngineRules;
 import com.ragagent.session.service.AgentResolver;
+import com.ragagent.common.web.ApiResult;
+import com.ragagent.common.web.ApiResponse;
 
 /**
  * 会话附件（临时文档）HTTP 层。
@@ -41,6 +43,7 @@ import com.ragagent.session.service.AgentResolver;
  * 列表/详情/预览是读 → 读可见性。
  */
 @RestController
+@ApiResult
 public class TemporaryDocumentController {
 
     private static final Logger log = LoggerFactory.getLogger(TemporaryDocumentController.class);
@@ -217,7 +220,7 @@ public class TemporaryDocumentController {
     /** 删除附件：204，幂等。 */
     @DeleteMapping({"/api/v1/sessions/{id}/attachments/{attachmentId}",
             "/api/v1/sessions/{sessionId}/attachments/{attachmentId}"})
-    public ResponseEntity<Void> delete(
+    public ApiResponse<Void> delete(
             @PathVariable(value = "id", required = false) String id,
             @PathVariable(value = "sessionId", required = false) String sessionIdFallback,
             @PathVariable("attachmentId") String attachmentId) {
@@ -234,7 +237,7 @@ public class TemporaryDocumentController {
         } catch (RuntimeException e) {
             throw BizException.internal(e.getMessage());
         }
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B193：204 退役（空体与「外壳恒存在」冲突）
     }
 
     // ── 辅助 ──────────────────────────────

@@ -1,1 +1,18 @@
-{"id":"70076aba-0c66-4880-8916-896bd85eb08e","title":"viewer-session","description":"","tenantId":10002,"userId":"11111111-2222-3333-4444-555555555504","pinned":false,"createdAt":"2026-09-18T16:41:07.656615+08:00","updatedAt":"2026-09-18T16:41:07.656615+08:00","deletedAt":null,"pinnedAt":null,"lastRequestState":null,"imPlatform":""}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "id": "70076aba-0c66-4880-8916-896bd85eb08e",
+    "title": "viewer-session",
+    "description": "",
+    "tenantId": 10002,
+    "userId": "11111111-2222-3333-4444-555555555504",
+    "pinned": false,
+    "createdAt": "2026-09-18T16:41:07.656615+08:00",
+    "updatedAt": "2026-09-18T16:41:07.656615+08:00",
+    "deletedAt": null,
+    "pinnedAt": null,
+    "lastRequestState": null,
+    "imPlatform": ""
+  }
+}

@@ -1,1 +1,7 @@
-{"status":"new_run"}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "status": "new_run"
+  }
+}

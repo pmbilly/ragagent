@@ -213,6 +213,26 @@ def cmd_goldens(domains):
           % (changed, len(kept), len(skipped), skipped[:6]))
 
 
+def cmd_lint():
+    """post-patch 自检（B189-B193 栽过 5 次 ✗）：扫**改动文件**里的"注释吞分号"。
+
+    模式：行尾出现 `//` 之后还有 `;` ⇒ 说明分号被吞进了注释（语法错）。
+    """
+    import subprocess
+    changed = subprocess.run(['git', 'diff', '--name-only'], capture_output=True, text=True).stdout.split()
+    bad = 0
+    for rel in changed:
+        p = ROOT / rel
+        if not p.exists() or p.suffix not in ('.java', '.ts', '.vue', '.py', '.sh'):
+            continue
+        for i, line in enumerate(p.read_text(encoding='utf-8', errors='replace').split('\n'), 1):
+            if re.search(r'//[^\n]*;\s*$', line) and 'http' not in line:
+                print('  ✗ %s:%d 注释里带分号（可能吞了语句）：%s' % (rel, i, line.strip()[:110]))
+                bad += 1
+    print('  %s' % ('✓ 无注释吞分号' if not bad else '✗ %d 处可疑' % bad))
+    return 1 if bad else 0
+
+
 def cmd_checklist(domains):
     for d in domains:
         print('  ## %s 剩余人工步骤' % d)
@@ -236,6 +256,8 @@ def main():
         cmd_annotate(domains)
     elif mode == 'goldens':
         cmd_goldens(domains)
+    elif mode == 'lint':
+        return cmd_lint()
     elif mode == 'checklist':
         cmd_checklist(domains)
     else:

@@ -1,1 +1,5 @@
-{"error":{"code":1000,"message":"question does not belong to suggestion set","details":null}}
+{
+  "code": 1000,
+  "message": "question does not belong to suggestion set",
+  "data": null
+}

@@ -234,7 +234,7 @@ final FileProxyService fileProxyService;
     }
 
     @PostMapping("/api/v1/embed/{channelId}/sessions/{sessionId}/stop")
-    public ResponseEntity<?> stop(@PathVariable("sessionId") String sessionId,
+    public ApiResponse<Void> stop(@PathVariable("sessionId") String sessionId,
                                   @RequestBody(required = false)
                                   StopSessionRequest body) {
         return delegateOps.stop(sessionId, body);
@@ -256,7 +256,7 @@ final FileProxyService fileProxyService;
     }
 
     @PostMapping("/api/v1/embed/{channelId}/sessions/{sessionId}/suggestion-events")
-    public ResponseEntity<?> suggestionEvents(@PathVariable("sessionId") String sessionId,
+    public ApiResponse<Void> suggestionEvents(@PathVariable("sessionId") String sessionId,
                                               @RequestBody(required = false) String rawBody) {
         return delegateOps.suggestionEvents(sessionId, rawBody);
     }

@@ -254,19 +254,19 @@ class MessageSuggestionContractTest {
                 + "/suggestion-events"),
                 "{\"suggestionSetId\":\"" + SET2 + "\",\"eventType\":\"impression\"}")
                 .header("Authorization", bearer));
-        assertEquals(HttpStatus.NO_CONTENT.value(), impression.getResponse().getStatus(),
+        assertEquals(HttpStatus.OK.value(), impression.getResponse().getStatus(),
                 raw(impression));
-        assertEquals("", raw(impression));
+        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(impression));   // B193：外壳恒存在
 
         MvcResult click = perform(jsonBody(post("/api/v1/sessions/" + sid + "/suggestion-events"),
                 "{\"suggestionSetId\":\"" + SET2 + "\",\"questionId\":\"q1\",\"eventType\":\"click\"}")
                 .header("Authorization", bearer));
-        assertEquals(HttpStatus.NO_CONTENT.value(), click.getResponse().getStatus(), raw(click));
+        assertEquals(HttpStatus.OK.value(), click.getResponse().getStatus(), raw(click));
 
         MvcResult dismiss = perform(jsonBody(post("/api/v1/sessions/" + sid + "/suggestion-events"),
                 "{\"suggestionSetId\":\"" + SET2 + "\",\"eventType\":\"dismiss\"}")
                 .header("Authorization", bearer));
-        assertEquals(HttpStatus.NO_CONTENT.value(), dismiss.getResponse().getStatus(), raw(dismiss));
+        assertEquals(HttpStatus.OK.value(), dismiss.getResponse().getStatus(), raw(dismiss));
 
         assertEquals(3, (int) jdbc.queryForObject(
                 "SELECT COUNT(*) FROM message_suggestion_events WHERE session_id = ?",

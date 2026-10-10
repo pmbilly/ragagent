@@ -1,1 +1,24 @@
-{"chunkCount":0,"createdAt":"<ts>","errorMessage":"","expiresAt":"<ts>","fileName":"note.txt","fileSize":48,"fileType":".txt","id":"<uuid>","imageRefs":[],"metadata":{},"mimeType":"text/plain","readyAt":null,"sessionId":"<uuid>","startedAt":null,"status":"uploaded","tenantId":10002,"tokenCount":0,"updatedAt":"<ts>"}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "chunkCount": 0,
+    "createdAt": "<ts>",
+    "errorMessage": "",
+    "expiresAt": "<ts>",
+    "fileName": "note.txt",
+    "fileSize": 48,
+    "fileType": ".txt",
+    "id": "<uuid>",
+    "imageRefs": [],
+    "metadata": {},
+    "mimeType": "text/plain",
+    "readyAt": null,
+    "sessionId": "<uuid>",
+    "startedAt": null,
+    "status": "uploaded",
+    "tenantId": 10002,
+    "tokenCount": 0,
+    "updatedAt": "<ts>"
+  }
+}

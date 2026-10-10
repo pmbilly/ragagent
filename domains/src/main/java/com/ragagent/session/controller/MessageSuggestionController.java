@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import com.ragagent.common.web.ApiResult;
+import com.ragagent.common.web.ApiResponse;
 
 /**
  * 追问建议 HTTP 层。
@@ -41,6 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
  * </ul>
  */
 @RestController
+@ApiResult
 public class MessageSuggestionController {
 
     private static final Logger log = LoggerFactory.getLogger(MessageSuggestionController.class);
@@ -116,7 +119,7 @@ public class MessageSuggestionController {
      * 解析失败（含空 body、required 字段缺失）→ 400 固定文案 "invalid request body"。
      */
     @PostMapping("/api/v1/sessions/{sessionId}/suggestion-events")
-    public ResponseEntity<Void> recordEvent(
+    public ApiResponse<Void> recordEvent(
             @PathVariable("sessionId") String sessionId,
             @RequestBody(required = false) String rawBody) {
         EventRequest request = null;
@@ -140,7 +143,7 @@ public class MessageSuggestionController {
         } catch (RuntimeException e) {
             throw writeError(e);
         }
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B193：204 退役（空体与「外壳恒存在」冲突）
     }
 
     /** 请求体键名＝Java 字段名（camelCase）。 */

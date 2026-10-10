@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.ragagent.common.llm.ResponseType;
+import com.ragagent.common.web.ApiResult;
 
 /**
  * 运行中轮次的中途消息（steer）HTTP 层。
@@ -46,6 +47,7 @@ import com.ragagent.common.llm.ResponseType;
  * 409=活轮已切换/steerId 被占用。
  */
 @RestController
+@ApiResult
 public class SteerController {
 
     private static final Logger log = LoggerFactory.getLogger(SteerController.class);

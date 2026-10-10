@@ -41,6 +41,7 @@ import com.ragagent.storage.support.FileService;
 import com.ragagent.storage.support.Mode;
 import com.ragagent.storage.support.StorageBackendResolver;
 import com.ragagent.tenant.Tenant;
+import com.ragagent.common.web.ApiResult;
 
 
 /**
@@ -78,6 +79,7 @@ import com.ragagent.tenant.Tenant;
  * </ul>
  */
 @RestController
+@ApiResult
 public class KnowledgeQaController {
 
 

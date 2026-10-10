@@ -20,6 +20,7 @@ import com.ragagent.storage.fileserve.FileAccessResolver.MessageFileLookup;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import com.ragagent.session.service.MessageService;
+import com.ragagent.common.web.ApiResult;
 
 /**
  * 消息作用域的资源代理。
@@ -37,6 +38,7 @@ import com.ragagent.session.service.MessageService;
  * 未实现——owner ≠ caller 恒 403，方向偏保守。</p>
  */
 @RestController
+@ApiResult
 public class MessageFileProxyController {
 
     private final MessageService messageService;

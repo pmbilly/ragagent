@@ -36,6 +36,8 @@ import com.ragagent.auth.service.TenantService;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.session.domain.ChatHistoryKbStats;
 import com.ragagent.tenant.Tenant;
+import com.ragagent.common.web.ApiResult;
+import com.ragagent.common.web.ApiResponse;
 
 /**
  * 消息 HTTP 层。
@@ -58,6 +60,7 @@ import com.ragagent.tenant.Tenant;
  * </ul>
  */
 @RestController
+@ApiResult
 public class MessageController {
 
     private static final Logger log = LoggerFactory.getLogger(MessageController.class);
@@ -164,7 +167,7 @@ public class MessageController {
      * 会话不可见是 "session not found"；消息不存在是 "record not found"。
      */
     @DeleteMapping("/api/v1/messages/{sessionId}/{id}")
-    public ResponseEntity<Void> deleteMessage(
+    public ApiResponse<Void> deleteMessage(
             @PathVariable("sessionId") String sessionId,
             @PathVariable("id") String messageId) {
         String sid = LogSanitizer.sanitize(sessionId);
@@ -180,7 +183,7 @@ public class MessageController {
         } catch (RuntimeException e) {
             throw toInternal(e);
         }
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B193：204 退役（空体与「外壳恒存在」冲突）
     }
 
     // ══════════════════════════ 搜索 ══════════════════════════

@@ -38,6 +38,7 @@ import com.ragagent.stream.StreamEvent;
 import com.ragagent.stream.StreamManager;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.common.context.TenantContext;
+import com.ragagent.common.web.ApiResult;
 
 /**
  * 继续接收活跃流。
@@ -68,6 +69,7 @@ import com.ragagent.common.context.TenantContext;
  * 差异有界且方向安全。</p>
  */
 @RestController
+@ApiResult
 public class SessionStreamController {
 
     private static final Logger log = LoggerFactory.getLogger(SessionStreamController.class);

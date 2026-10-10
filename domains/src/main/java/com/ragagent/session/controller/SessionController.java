@@ -45,6 +45,8 @@ import com.ragagent.session.domain.MessageNotFoundException;
 import com.ragagent.session.service.MessageService;
 import com.ragagent.stream.StreamEvent;
 import com.ragagent.stream.StreamManager;
+import com.ragagent.common.web.ApiResult;
+import com.ragagent.common.web.ApiResponse;
 
 /**
  * 会话 HTTP 层。
@@ -79,6 +81,7 @@ import com.ragagent.stream.StreamManager;
  * 这不只是日志卫生：批量删除会把 sanitize 后的 id 列表**当作真实入参**。</p>
  */
 @RestController
+@ApiResult
 public class SessionController {
 
     private static final Logger log = LoggerFactory.getLogger(SessionController.class);
@@ -275,7 +278,7 @@ public class SessionController {
 
     /** 删除会话：同步删除 → <b>204</b>（§1.13）。 */
     @DeleteMapping("/api/v1/sessions/{id}")
-    public ResponseEntity<Void> deleteSession(@PathVariable("id") String id) {
+    public ApiResponse<Void> deleteSession(@PathVariable("id") String id) {
         String sessionId = LogSanitizer.sanitize(id);
         if (sessionId.isEmpty()) {
             throw new BizException(AppError.badRequest("invalid session id"));
@@ -288,7 +291,7 @@ public class SessionController {
         } catch (RuntimeException e) {
             throw toInternal(e);
         }
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B193：204 退役（空体与「外壳恒存在」冲突）
     }
 
     /**
@@ -296,7 +299,7 @@ public class SessionController {
      * 否则要求非空 ids，逐个 sanitize 后丢弃空项。成功 → <b>204</b>（同步删除）。
      */
     @DeleteMapping("/api/v1/sessions/batch")
-    public ResponseEntity<Void> batchDeleteSessions(
+    public ApiResponse<Void> batchDeleteSessions(
             @RequestBody @Valid BatchDeleteSessionsRequest req) {
         if (Boolean.TRUE.equals(req.deleteAll())) {
             try {
@@ -304,7 +307,7 @@ public class SessionController {
             } catch (RuntimeException e) {
                 throw toInternal(e);
             }
-            return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B193：204 退役（空体与「外壳恒存在」冲突）
         }
 
         if (req.ids() == null || req.ids().isEmpty()) {
@@ -329,7 +332,7 @@ public class SessionController {
         } catch (RuntimeException e) {
             throw toInternal(e);
         }
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B193：204 退役（空体与「外壳恒存在」冲突）
     }
 
     // ══════════════════════════ 清空消息 ══════════════════════════
@@ -339,7 +342,7 @@ public class SessionController {
      * 会话不可见 → 404 "session not found"。
      */
     @DeleteMapping("/api/v1/sessions/{id}/messages")
-    public ResponseEntity<Void> clearSessionMessages(@PathVariable("id") String id) {
+    public ApiResponse<Void> clearSessionMessages(@PathVariable("id") String id) {
         String sessionId = LogSanitizer.sanitize(id);
         if (sessionId.isEmpty()) {
             throw new BizException(AppError.badRequest("invalid session id"));
@@ -352,7 +355,7 @@ public class SessionController {
         } catch (RuntimeException e) {
             throw toInternal(e);
         }
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B193：204 退役（空体与「外壳恒存在」冲突）
     }
 
     // ══════════════════════════ 置顶 ══════════════════════════
@@ -550,21 +553,21 @@ public class SessionController {
      * {@code types.ResponseType(event.EventStop)} 的字符串强转 "stop"。</p>
      */
     @PostMapping("/api/v1/sessions/{sessionId}/stop")
-    public ResponseEntity<?> stopSession(
+    public ApiResponse<Void> stopSession(
             @PathVariable("sessionId") String sessionId,
             @RequestBody(required = false) StopSessionRequest request) {
         String sid = LogSanitizer.sanitize(sessionId);
         if (sid == null || sid.isEmpty()) {
-            return errorBody(400, "Session ID is required");
+            throw new BizException(AppError.ofHttpStatus(400, "Session ID is required"));   // B193：返回位不可用 ⇒ 就地展开
         }
         if (request == null || isBlankStr(request.messageId())) {
-            return errorBody(400, "message_id is required");
+            throw new BizException(AppError.ofHttpStatus(400, "message_id is required"));   // B193：返回位不可用 ⇒ 就地展开
         }
         String assistantMessageId = LogSanitizer.sanitize(request.messageId());
 
         Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null) {
-            return errorBody(401, "Unauthorized");
+            throw new BizException(AppError.ofHttpStatus(401, "Unauthorized"));   // B193：返回位不可用 ⇒ 就地展开
         }
 
         // 消息可见性走 GetMessage（读路径），会话走严格 owner 范围（写路径）
@@ -572,25 +575,25 @@ public class SessionController {
         try {
             message = messageService.getMessage(sid, assistantMessageId);
         } catch (RuntimeException e) {
-            return errorBody(404, "Message not found");
+            throw new BizException(AppError.ofHttpStatus(404, "Message not found"));   // B193：返回位不可用 ⇒ 就地展开
         }
         if (message.getSessionId() == null || !message.getSessionId().equals(sid)) {
-            return errorBody(403, "Message does not belong to this session");
+            throw new BizException(AppError.ofHttpStatus(403, "Message does not belong to this session"));   // B193：返回位不可用 ⇒ 就地展开
         }
         Session session;
         try {
             session = sessionService.getOwnedSession(sid);
         } catch (RuntimeException e) {
-            return errorBody(404, "Session not found");
+            throw new BizException(AppError.ofHttpStatus(404, "Session not found"));   // B193：返回位不可用 ⇒ 就地展开
         }
         if (session.getTenantId() == null || session.getTenantId().longValue() != tenantId) {
             // ⚠️ Long 比较必须拆箱/equals（租户 id 超出 Integer 缓存区间时
             // 引用比较恒不等 → 会误判 "Access denied"）
-            return errorBody(403, "Access denied");
+            throw new BizException(AppError.ofHttpStatus(403, "Access denied"));   // B193：返回位不可用 ⇒ 就地展开
         }
         if (message.isCompleted()) {
             // 已经结束的消息是幂等的成功（不回 message 文案，§1.17）
-            return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B193：204 退役（空体与「外壳恒存在」冲突）
         }
 
         StreamEvent stopEvent = new StreamEvent(
@@ -605,9 +608,9 @@ public class SessionController {
         try {
             streamManager.appendEvent(sid, assistantMessageId, stopEvent);
         } catch (RuntimeException e) {
-            return errorBody(500, "Failed to write stop event");
+            throw new BizException(AppError.ofHttpStatus(500, "Failed to write stop event"));   // B193：返回位不可用 ⇒ 就地展开
         }
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B193：204 退役（空体与「外壳恒存在」冲突）
     }
 
     /**
@@ -617,9 +620,8 @@ public class SessionController {
      * 所以这里连成功响应也只能是 {@link ResponseEntity}{@code <?>}。</p>
      */
     private static ResponseEntity<Map<String, Object>> errorBody(int status, String message) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("error", message);
-        return ResponseEntity.status(status).body(body);
+        // B193：**恒抛** —— 保留原签名，调用点一行不动；统一错误体由全局处理器产出
+        throw new BizException(AppError.ofHttpStatus(status, message));
     }
 
     private static boolean isBlankStr(String v) {

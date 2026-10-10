@@ -1,1 +1,5 @@
-{"error":{"code":1003,"message":"artifact not accessible","details":null}}
+{
+  "code": 1003,
+  "message": "artifact not accessible",
+  "data": null
+}

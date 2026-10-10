@@ -1,1 +1,26 @@
-{"agentId":"","allowRegenerate":false,"assistantMessageId":"<uuid>","completionTokens":0,"configHash":"no-agent-config","createdAt":"<ts>","errorCode":"","generatedAt":"<ts>","id":"<uuid>","latencyMs":0,"locale":"zh-CN","modelId":"","placement":"after_answer","promptTokens":0,"questions":[],"sessionId":"<uuid>","status":"suppressed","suppressionReason":"disabled","tenantId":10002,"updatedAt":"<ts>"}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "agentId": "",
+    "allowRegenerate": false,
+    "assistantMessageId": "<uuid>",
+    "completionTokens": 0,
+    "configHash": "no-agent-config",
+    "createdAt": "<ts>",
+    "errorCode": "",
+    "generatedAt": "<ts>",
+    "id": "<uuid>",
+    "latencyMs": 0,
+    "locale": "zh-CN",
+    "modelId": "",
+    "placement": "after_answer",
+    "promptTokens": 0,
+    "questions": [],
+    "sessionId": "<uuid>",
+    "status": "suppressed",
+    "suppressionReason": "disabled",
+    "tenantId": 10002,
+    "updatedAt": "<ts>"
+  }
+}

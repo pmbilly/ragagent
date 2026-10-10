@@ -1,1 +1,19 @@
-{"items":[{"score":0.01639344262295082,"requestId":"bbb00001-0000-0000-0000-000000000001","sessionId":"8ae0293e-de6a-4871-a8ca-d19947c76e35","sessionTitle":"msg-golden-session","queryContent":"如何泡好一杯茶？","answerContent":"泡茶要先温杯。a&b<c>d","matchType":"hybrid","createdAt":"2026-09-18T17:30:00+08:00"}],"total":1}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "items": [
+      {
+        "score": 0.01639344262295082,
+        "requestId": "bbb00001-0000-0000-0000-000000000001",
+        "sessionId": "8ae0293e-de6a-4871-a8ca-d19947c76e35",
+        "sessionTitle": "msg-golden-session",
+        "queryContent": "如何泡好一杯茶？",
+        "answerContent": "泡茶要先温杯。a&b<c>d",
+        "matchType": "hybrid",
+        "createdAt": "2026-09-18T17:30:00+08:00"
+      }
+    ],
+    "total": 1
+  }
+}

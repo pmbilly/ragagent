@@ -142,7 +142,7 @@ final class EmbedChannelDelegateOps {
      * <p>请求体键名从 {@code message_id} 变成 {@code messageId}
      * ——embed 的其余键仍是下划线。</p>
      */
-    public ResponseEntity<?> stop(@PathVariable("sessionId") String sessionId,
+    public ApiResponse<Void> stop(@PathVariable("sessionId") String sessionId,
                                   @RequestBody(required = false)
                                   StopSessionRequest body) {
         ctrl.ensureSession(LogSanitizer.sanitize(sessionId));
@@ -177,7 +177,7 @@ final class EmbedChannelDelegateOps {
     }
 
     /** 建议事件上报：成功 204 无响应体。 */
-    public ResponseEntity<?> suggestionEvents(@PathVariable("sessionId") String sessionId,
+    public ApiResponse<Void> suggestionEvents(@PathVariable("sessionId") String sessionId,
                                               @RequestBody(required = false) String rawBody) {
         ctrl.ensureSession(LogSanitizer.sanitize(sessionId));
         return ctrl.suggestionController.recordEvent(LogSanitizer.sanitize(sessionId), rawBody);

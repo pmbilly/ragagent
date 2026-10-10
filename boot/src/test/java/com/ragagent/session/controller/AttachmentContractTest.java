@@ -267,8 +267,8 @@ class AttachmentContractTest {
 
         MvcResult r = perform(delete("/api/v1/sessions/" + sid + "/attachments/" + attId)
                 .header("Authorization", bearer));
-        assertEquals(204, r.getResponse().getStatus(), raw(r));
-        assertEquals("", raw(r));
+        assertEquals(200, r.getResponse().getStatus(), raw(r));
+        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(r));   // B193：外壳恒存在
 
         MvcResult list = perform(get("/api/v1/sessions/" + sid + "/attachments")
                 .header("Authorization", bearer));
@@ -277,7 +277,7 @@ class AttachmentContractTest {
         // 再删：幂等 204
         MvcResult again = perform(delete("/api/v1/sessions/" + sid + "/attachments/" + attId)
                 .header("Authorization", bearer));
-        assertEquals(204, again.getResponse().getStatus(), raw(again));
+        assertEquals(200, again.getResponse().getStatus(), raw(again));
     }
 
     // ════════ 工具 ════════

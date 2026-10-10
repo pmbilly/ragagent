@@ -1,1 +1,1 @@
-{"error":"message_id is required"}
+{"error":{"code":1000,"details":null,"message":"message_id is required"}}

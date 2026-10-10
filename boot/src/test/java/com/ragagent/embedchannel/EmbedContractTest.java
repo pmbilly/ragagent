@@ -376,8 +376,8 @@ class EmbedContractTest {
                 + "/stop", null, "{\"messageId\":\"" + MSG_DONE + "\"}")
                 .header("Authorization", ea).header("Origin", origin)
                 .header("X-Embed-Session", sigMain)).andReturn();
-        assertEquals(204, stopped.getResponse().getStatus(), raw(stopped));
-        assertEquals("", raw(stopped), "204 必须无响应体");
+        assertEquals(200, stopped.getResponse().getStatus(), raw(stopped));   // B193：委托 session ⇒ 200 + 外壳
+        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(stopped), "204 必须无响应体");   // B193：委托 session ⇒ 外壳
         assertGolden(postJson("/api/v1/embed/" + cid + "/sessions/" + SES_MAIN + "/stop", null,
                 "{\"messageId\":\"b6999999-0000-0000-0000-000000000001\"}")
                 .header("Authorization", ea).header("Origin", origin)
@@ -417,7 +417,7 @@ class EmbedContractTest {
                 null, "{\"suggestionSetId\":\"" + SSET + "\",\"questionId\":\"q1\","
                         + "\"eventType\":\"impression\"}")
                 .header("Authorization", ea).header("Origin", origin)
-                .header("X-Embed-Session", sigMain), 204, "emb-pub-suggestion-events.json");
+                .header("X-Embed-Session", sigMain), 200, "emb-pub-suggestion-events.json");   // B193：委托 session ⇒ 200 + 外壳
         assertGolden(postJson("/api/v1/embed/" + cid + "/sessions/" + SES_MAIN + "/suggestion-events",
                 null, "not-json")
                 .header("Authorization", ea).header("Origin", origin)
@@ -437,7 +437,7 @@ class EmbedContractTest {
                 .header("Authorization", ea).header("Origin", origin)
                 .header("X-Embed-Session", sigMain)).andReturn();
         assertEquals(204, evented.getResponse().getStatus(), raw(evented));
-        assertEquals("", raw(evented), "事件受理回执必须无响应体");
+        assertEquals("", raw(evented), "事件受理回执必须无响应体");   // 该路由自行构造 204 空体（未迁移 ✓）
 
         String svcOauth = "b8000000-0000-0000-0000-000000000601";
         assertGolden(post("/api/v1/embed/" + cid + "/sessions/" + SES_MAIN + "/mcp-services/"

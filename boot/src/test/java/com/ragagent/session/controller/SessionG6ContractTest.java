@@ -289,8 +289,8 @@ class SessionG6ContractTest {
     void stopCompletedMessageMatchesGo() throws Exception {
         MvcResult r = perform(jsonBody(post("/api/v1/sessions/" + sid + "/stop"),
                 "{\"messageId\":\"" + U1 + "\"}").header("Authorization", bearer));
-        assertEquals(204, r.getResponse().getStatus(), raw(r));
-        assertEquals("", raw(r), "204 必须无响应体");
+        assertEquals(200, r.getResponse().getStatus(), raw(r));
+        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(r), "204 必须无响应体");   // B193：外壳恒存在
     }
 
     /** 未完成消息：写 stop 事件（type=stop）→ 200 "Generation stopped"。 */
@@ -298,8 +298,8 @@ class SessionG6ContractTest {
     void stopRunningMessageMatchesGoAndWritesEvent() throws Exception {
         MvcResult r = perform(jsonBody(post("/api/v1/sessions/" + stopSid + "/stop"),
                 "{\"messageId\":\"" + A3 + "\"}").header("Authorization", bearer));
-        assertEquals(204, r.getResponse().getStatus(), raw(r));
-        assertEquals("", raw(r), "204 必须无响应体");
+        assertEquals(200, r.getResponse().getStatus(), raw(r));
+        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(r), "204 必须无响应体");   // B193：外壳恒存在
     }
 
     @Test

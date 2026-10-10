@@ -551,8 +551,8 @@ class SessionHttpContractTest {
         MvcResult r = perform(jsonBody(delete("/api/v1/sessions/batch"),
                 "{\"ids\":[\"" + UNKNOWN_ID + "\",\"aaaaaaa1-0000-0000-0000-000000000001\"]}")
                 .header("Authorization", bearer));
-        assertEquals(204, r.getResponse().getStatus(), raw(r));
-        assertEquals("", raw(r), "204 必须无响应体");
+        assertEquals(200, r.getResponse().getStatus(), raw(r));
+        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(r), "204 必须无响应体");   // B193：外壳恒存在
         // 可见的被软删、不可见的本来就不存在
         assertEquals(0, (int) jdbc.queryForObject(
                 "SELECT COUNT(*) FROM sessions WHERE id = ? AND deleted_at IS NULL",
@@ -565,8 +565,8 @@ class SessionHttpContractTest {
     void deleteMatchesGoAndIsNotIdempotent() throws Exception {
         String id = createSessionId();
         MvcResult r = perform(delete("/api/v1/sessions/" + id).header("Authorization", bearer));
-        assertEquals(204, r.getResponse().getStatus(), raw(r));
-        assertEquals("", raw(r), "204 必须无响应体");
+        assertEquals(200, r.getResponse().getStatus(), raw(r));
+        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(r), "204 必须无响应体");   // B193：外壳恒存在
 
         MvcResult again = perform(delete("/api/v1/sessions/" + id)
                 .header("Authorization", bearer));
@@ -593,8 +593,8 @@ class SessionHttpContractTest {
         seedListState();
         MvcResult r = perform(jsonBody(delete("/api/v1/sessions/batch"), "{\"deleteAll\":true}")
                 .header("Authorization", bearer));
-        assertEquals(204, r.getResponse().getStatus(), raw(r));
-        assertEquals("", raw(r), "204 必须无响应体");
+        assertEquals(200, r.getResponse().getStatus(), raw(r));
+        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(r), "204 必须无响应体");   // B193：外壳恒存在
 
         MvcResult after = perform(get("/api/v1/sessions").header("Authorization", bearer));
         assertEquals(golden("session-list-after-delete-all.json"), raw(after));
