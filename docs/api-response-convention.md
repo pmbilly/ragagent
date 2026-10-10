@@ -89,3 +89,29 @@
 - ~~"裸载荷 API 必须在 api 层适配成 `{data}`"~~ —— 解包点唯一化后作废
   （前端契约测试 `crossFaceKeyContract.test.ts` 已改写为"一处解包"）。
 - ~~在 `@ApiResult` 控制器里再手搓外壳~~ —— 守卫 R-d 抓"双壳"。
+
+## 五、FE 消费点排查（每批固定一步 ✓）
+
+**每批迁移后必跑这三条 grep**（覆盖 `frontend/src` + `frontend/packages` ✓，**不要**只按域名/文件名 grep ✗ —— 那会漏掉名字无关的调用方）：
+
+```bash
+grep -rnE '\\.success\\b' frontend/src frontend/packages --include='*.ts' --include='*.vue' | grep -vE 'MessagePlugin|\\.test\\.'
+grep -rnE '\\b(response|res|resp|r|result)\\.data\\b' frontend/src frontend/packages --include='*.ts' --include='*.vue' | grep -vE '\\.test\\.'
+grep -rnE 'error\\.(code|message|details)|\\.data\\.error\\b' frontend/src frontend/packages --include='*.ts' --include='*.vue'
+```
+
+**拦截器已双形态**（`frontend/src/utils/request.ts`）⇒ 大多数消费点**零改动** ✓：
+- 成功侧（L144-150）：`code` 是数字且 `!== 0` ⇒ 抛错；`=== 0` ⇒ `withHttpStatus(data.data)` **拆一层** ✓；旧形态原样放行 ✓
+- 错误侧（L216-226）：`error` 字符串 / `error.message` / **`data.message`** 依次兜底 ✓ ⇒ 新外壳的错误文案照常可用 ✓
+- 副作用：`err` 上**摊平**了 `data`（L230）⇒ `err.code` 在新形态下可读 ✓
+
+### ⚠️ 观察名单（迁移这些域时**必须**回改 FE ✗）
+
+| 位置 | 读法 | 何时出事 |
+|---|---|---|
+| `stores/auth.ts:326,391` · `utils/authRefresh.ts:131` · `utils/tenantSwitch.ts:92` · `api/tenant/members.ts:102` · `components/MyInvitationsDialog.vue:141` · `views/settings/TenantMembers.vue:817` · `App.vue:155` | `resp.success` / `resp.data`（**旧遗留壳**形状 ✗）| 迁 **auth / tenant** 时 |
+| `views/settings/ChatHistorySettings.vue:89,160` · `views/settings/RetrievalSettings.vue:146,179` | `response.data` ✗（依赖 api 层的 `{data: resp}` 包装 ✓）| 迁 **tenant KV** 时核对 |
+| `components/McpMetadataPanel.vue:109` | `e?.response?.data?.error?.message` ✗（有 `e.message` 兜底 ⇒ 降级不崩 ✓）| 已迁 mcp ✓，可顺手清理 |
+| `api/web-search-provider.ts:101` | `response.data ?? response`（**刻意容忍** ✓）| 无需改 ✓ |
+
+**易混淆（不受影响 ✓，勿误改 ✗）**：载荷字段叫 `success` 的端点 —— `views/settings/StorageBackendSettings.vue:343`（`r.success`）✓、`views/settings/components/McpTestResultBody.vue` ✓、`composables/useEmbedCitationPopover.ts` ✓、以及所有 **SSE 事件**里的 `event.success` ✓（流不是 HTTP 外壳 ✓）。
