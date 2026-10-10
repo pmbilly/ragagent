@@ -159,7 +159,7 @@ class EvaluationContractTest {
     void postViewerForbidden() throws Exception {
         MvcResult r = mockMvc.perform(json(post("/api/v1/evaluation"), viewer, "{}")).andReturn();
         assertEquals(403, r.getResponse().getStatus(), raw(r));
-        assertEquals("{\"error\":\"Forbidden: insufficient workspace role\"}", raw(r));
+        assertEquals("{\"code\":1002,\"data\":null,\"message\":\"Forbidden: insufficient workspace role\"}", raw(r));
     }
 
     @Test
@@ -219,6 +219,8 @@ class EvaluationContractTest {
                 .header("Authorization", owner)).andReturn();
         assertEquals(200, r.getResponse().getStatus(), raw(r));
         JsonNode node = MAPPER.readTree(raw(r));
+            // B200：统一外壳下先下钻 data（旧形态无壳也通）
+            if (node.isObject() && node.has("code") && node.has("data")) { node = node.get("data"); }
         JsonNode task = node.path("task");
         // 轮询上界原为 250 × 20ms = **5s**（同步手段，不是被测语义）。本仓把本用例登记为已知偶发：
         // 受限 runner 上后台任务略有排队就超 5s ⇒ 假红。改为 30s —— 断言一字未动 ⇒ 检测力不减
@@ -228,12 +230,16 @@ class EvaluationContractTest {
             r = mockMvc.perform(get("/api/v1/evaluation?taskId=" + taskId)
                     .header("Authorization", owner)).andReturn();
             node = MAPPER.readTree(raw(r));
+            // B200：统一外壳下先下钻 data
+            if (node.isObject() && node.has("code") && node.has("data")) { node = node.get("data"); }
             task = node.path("task");
         }
         assertEquals(3, task.path("status").asInt(), raw(r));
         // 失败点在 ChunkVectorIndexer.updateChunkVector（KB 无 embedding 模型）
         assertEquals("model ID cannot be empty", task.path("errMsg").asText());
         JsonNode createdNode = MAPPER.readTree(raw(created));
+        // B200：统一外壳下先下钻 data
+        if (createdNode.isObject() && createdNode.has("code") && createdNode.has("data")) { createdNode = createdNode.get("data"); }
         assertEquals(createdNode.path("params"), node.path("params"));
         // 失败早于指标记录 → metric 显式 null（键恒在）
         assertThat(node.has("metric")).isTrue();

@@ -1,1 +1,34 @@
-{"chunkIndex":0,"chunkType":"text","content":"允许读取的正文内容","contentHash":"","contentRevision":0,"createdAt":"<ts>","deletedAt":null,"endAt":8,"flags":1,"id":"<uuid>","imageInfo":"","indexStatus":"ready","indirectRelationChunks":null,"isEnabled":true,"knowledgeBaseId":"<uuid>","knowledgeId":"<uuid>","lastEditorId":"","metadata":{},"nextChunkId":"","parentChunkId":"","preChunkId":"","relationChunks":null,"seqId":990001,"startAt":0,"status":0,"tagId":"","tenantId":10006,"updatedAt":"<ts>"}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "chunkIndex": 0,
+    "chunkType": "text",
+    "content": "允许读取的正文内容",
+    "contentHash": "",
+    "contentRevision": 0,
+    "createdAt": "<ts>",
+    "deletedAt": null,
+    "endAt": 8,
+    "flags": 1,
+    "id": "<uuid>",
+    "imageInfo": "",
+    "indexStatus": "ready",
+    "indirectRelationChunks": null,
+    "isEnabled": true,
+    "knowledgeBaseId": "<uuid>",
+    "knowledgeId": "<uuid>",
+    "lastEditorId": "",
+    "metadata": {},
+    "nextChunkId": "",
+    "parentChunkId": "",
+    "preChunkId": "",
+    "relationChunks": null,
+    "seqId": 990001,
+    "startAt": 0,
+    "status": 0,
+    "tagId": "",
+    "tenantId": 10006,
+    "updatedAt": "<ts>"
+  }
+}

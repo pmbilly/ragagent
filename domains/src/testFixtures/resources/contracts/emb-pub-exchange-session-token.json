@@ -1,1 +1,5 @@
-{"error":"publish token required"}
+{
+  "code": 1002,
+  "message": "publish token required",
+  "data": null
+}

@@ -1,1 +1,1 @@
-{"error":{"code":1003,"message":"下载任务不存在","details":null}}
+{"code":1003,"data":null,"message":"下载任务不存在"}

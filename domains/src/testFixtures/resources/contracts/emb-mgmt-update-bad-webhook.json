@@ -1,1 +1,5 @@
-{"error":"invalid embed webhook URL: webhook URL must use http or https"}
+{
+  "code": 1000,
+  "message": "invalid embed webhook URL: webhook URL must use http or https",
+  "data": null
+}

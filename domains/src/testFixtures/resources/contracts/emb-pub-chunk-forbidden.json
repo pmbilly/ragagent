@@ -1,1 +1,5 @@
-{"error":"chunk not accessible"}
+{
+  "code": 1002,
+  "message": "chunk not accessible",
+  "data": null
+}

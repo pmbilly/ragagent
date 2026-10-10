@@ -1,1 +1,1 @@
-{"error":{"code":1000,"message":"MinIO配置信息不能为空","details":null}}
+{"code":1000,"data":null,"message":"MinIO配置信息不能为空"}

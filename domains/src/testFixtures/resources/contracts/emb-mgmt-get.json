@@ -1,1 +1,33 @@
-{"agentId":"<uuid>","allowFileUpload":true,"allowWebSearch":true,"allowedOrigins":["https://a.example.com","*.b.example.com"],"createdAt":"<ts>","defaultLocale":"zh-CN","enabled":true,"hasWebhookSecret":false,"headerTitleMode":"session","id":"<uuid>","launcherIcon":"","name":"emb-main","pageTitle":"帮助中心","primaryColor":"#0052d9","publishToken":"em_<token>","rateLimitPerDay":9000,"rateLimitPerMinute":500,"showSuggestedQuestions":true,"showThinking":true,"tenantId":10006,"updatedAt":"<ts>","webhookUrl":"","welcomeMessage":"你好","widgetPosition":"bottom-left"}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "agentId": "<uuid>",
+    "allowFileUpload": true,
+    "allowWebSearch": true,
+    "allowedOrigins": [
+      "https://a.example.com",
+      "*.b.example.com"
+    ],
+    "createdAt": "<ts>",
+    "defaultLocale": "zh-CN",
+    "enabled": true,
+    "hasWebhookSecret": false,
+    "headerTitleMode": "session",
+    "id": "<uuid>",
+    "launcherIcon": "",
+    "name": "emb-main",
+    "pageTitle": "帮助中心",
+    "primaryColor": "#0052d9",
+    "publishToken": "em_<token>",
+    "rateLimitPerDay": 9000,
+    "rateLimitPerMinute": 500,
+    "showSuggestedQuestions": true,
+    "showThinking": true,
+    "tenantId": 10006,
+    "updatedAt": "<ts>",
+    "webhookUrl": "",
+    "welcomeMessage": "你好",
+    "widgetPosition": "bottom-left"
+  }
+}

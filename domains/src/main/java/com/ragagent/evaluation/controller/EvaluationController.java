@@ -18,6 +18,7 @@ import com.ragagent.evaluation.dto.EvaluationRequest;
 import com.ragagent.evaluation.service.EvaluationService;
 
 import jakarta.validation.Valid;
+import com.ragagent.common.web.ApiResult;
 
 /**
  * 评估端点（POST = Admin：驱动 LLM+检索、跨 KB 读；GET = Viewer 读同租户任务）。
@@ -29,6 +30,7 @@ import jakarta.validation.Valid;
  * "tenant ID does not match" / "knowledge base not found"）。</p>
  */
 @RestController
+@ApiResult
 @RequestMapping("/api/v1/evaluation")
 public class EvaluationController {
 

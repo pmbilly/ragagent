@@ -1,4 +1,1 @@
-{
-  "available": true,
-  "message": "ASR连接成功，转写结果: stub-transcript"
-}
+{"code":0,"data":{"available":true,"message":"ASR连接成功，转写结果: stub-transcript"},"message":"ok"}

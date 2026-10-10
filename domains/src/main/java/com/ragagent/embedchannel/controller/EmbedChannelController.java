@@ -42,6 +42,8 @@ import com.ragagent.session.domain.Message;
 import com.ragagent.session.dto.StopSessionRequest;
 import com.ragagent.storage.fileserve.FileProxyService;
 import com.ragagent.common.web.ApiResponse;
+import com.ragagent.common.web.ApiResult;
+import com.ragagent.common.error.AppError;
 
 /**
  * embed 渠道 HTTP 层（管理面/公开面路由）。
@@ -70,6 +72,7 @@ import com.ragagent.common.web.ApiResponse;
  * </ul>
  */
 @RestController
+@ApiResult
 public class EmbedChannelController {
 
 static final ObjectMapper MAPPER = new ObjectMapper()
@@ -154,7 +157,7 @@ final FileProxyService fileProxyService;
     }
 
     @DeleteMapping("/api/v1/embed-channels/{channelId}")
-    public ResponseEntity<Void> delete(@PathVariable("channelId") String channelId) {
+    public ApiResponse<Void> delete(@PathVariable("channelId") String channelId) {
         return mgmtOps.delete(channelId);
     }
 
@@ -262,7 +265,7 @@ final FileProxyService fileProxyService;
     }
 
     @PostMapping("/api/v1/embed/{channelId}/sessions/{sessionId}/events")
-    public ResponseEntity<?> events(@PathVariable("sessionId") String sessionId,
+    public ApiResponse<Void> events(@PathVariable("sessionId") String sessionId,
                                     @RequestBody(required = false) String rawBody) {
         return delegateOps.events(sessionId, rawBody);
     }
@@ -457,9 +460,7 @@ void ensureSession(String sessionId) {
     }
 
     static ResponseEntity<Map<String, Object>> plainError(int status, String message) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("error", message);
-        return ResponseEntity.status(status).body(body);
+        throw new BizException(AppError.ofHttpStatus(status, message));   // 恒抛（调用点一行不动 ✓）
     }
 
     /** 管理面错误的分派（纯字符串错误信封）。 */

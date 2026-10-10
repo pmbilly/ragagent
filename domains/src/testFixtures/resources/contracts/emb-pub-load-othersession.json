@@ -1,1 +1,5 @@
-{"error":"session not allowed for this embed channel"}
+{
+  "code": 1002,
+  "message": "session not allowed for this embed channel",
+  "data": null
+}

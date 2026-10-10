@@ -1,1 +1,1 @@
-{"error":{"code":1000,"message":"LLM模型不存在","details":null}}
+{"code":1000,"data":null,"message":"LLM模型不存在"}

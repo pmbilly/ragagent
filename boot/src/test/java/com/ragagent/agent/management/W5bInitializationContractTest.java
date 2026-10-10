@@ -319,6 +319,8 @@ class W5bInitializationContractTest {
         org.junit.jupiter.api.Assertions.assertEquals(expected, masked);
         com.fasterxml.jackson.databind.JsonNode tags =
                 new com.fasterxml.jackson.databind.ObjectMapper().readTree(body)
+                // B201：统一外壳下取 data 后比较
+                .path("data")
                         .path("tags");
         assertTrue(tags.isArray() && !tags.isEmpty());
         Set<String> options = Set.of("Content", "Culture", "Person", "Event", "Time",
@@ -406,6 +408,10 @@ class W5bInitializationContractTest {
     private static String jsonPath(MvcResult r, String path) throws Exception {
         com.fasterxml.jackson.databind.JsonNode node =
                 new com.fasterxml.jackson.databind.ObjectMapper().readTree(raw(r));
+        // B201：统一外壳（有 code+data）且路径不以 data 开头时，先下钻 data
+        if (!path.startsWith("data") && node.isObject() && node.has("code") && node.has("data")) {
+            node = node.get("data");
+        }
         for (String seg : path.split("\\.")) {
             if (node.isArray() && seg.matches("\\d+")) {
                 node = node.get(Integer.parseInt(seg));

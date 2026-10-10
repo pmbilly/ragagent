@@ -1,4 +1,1 @@
-{
-  "available": true,
-  "message": "连接正常，模型可用"
-}
+{"code":0,"data":{"available":true,"message":"连接正常，模型可用"},"message":"ok"}

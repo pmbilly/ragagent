@@ -1,1 +1,5 @@
-{"error":{"code":1007,"message":"no default models found for evaluation","details":null}}
+{
+  "code": 1007,
+  "message": "no default models found for evaluation",
+  "data": null
+}

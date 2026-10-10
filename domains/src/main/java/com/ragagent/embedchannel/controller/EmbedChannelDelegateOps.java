@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.ragagent.session.domain.Message;
 import com.ragagent.session.dto.StopSessionRequest;
 import com.ragagent.common.web.ApiResponse;
+import com.ragagent.common.error.AppError;
 
 /**
  * embed 委托协作者（自 {@link EmbedChannelController} 拆出的
@@ -187,7 +188,7 @@ final class EmbedChannelDelegateOps {
      * webhook 事件转发：message_sent / message_received 之外全拒；
      * 下发是 best-effort 异步（渠道 webhook 为空 → no-op），响应恒 200。
      */
-    public ResponseEntity<?> events(@PathVariable("sessionId") String sessionId,
+    public ApiResponse<Void> events(@PathVariable("sessionId") String sessionId,
                                     @RequestBody(required = false) String rawBody) {
         // 调用即鉴权（取不到渠道会抛 unauthorized）；返回值本方法不用
         EmbedChannelController.channel(EmbedChannelController.request0());
@@ -201,15 +202,15 @@ final class EmbedChannelDelegateOps {
             }
         }
         if (req == null) {
-            return EmbedChannelController.plainError(400, "invalid request body");
+            throw new BizException(AppError.ofHttpStatus(400, "invalid request body"));   // 返回位不可用 ⇒ 就地展开
         }
         String eventType = EmbedChannelController.trim(req.type());
         if (!"message_sent".equals(eventType) && !"message_received".equals(eventType)) {
-            return EmbedChannelController.plainError(400, "unsupported event type");
+            throw new BizException(AppError.ofHttpStatus(400, "unsupported event type"));   // 返回位不可用 ⇒ 就地展开
         }
         // webhook_url 为空直接返回；golden 渠道未配 webhook → no-op。
         // 无响应体的受理回执 → 204（不回 {"success":true}）
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
     /** 访客事件上报体（键名＝组件名；S4 后请求面统一 camelCase）。 */

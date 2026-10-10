@@ -1,1 +1,1 @@
-{"modelName": "stub-model", "progress": 100, "status": "completed", "message": "模型已存在"}
+{"code":0,"data":{"message":"模型已存在","modelName":"stub-model","progress":100,"status":"completed"},"message":"ok"}

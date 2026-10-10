@@ -1,1 +1,5 @@
-{"error":"embed channel is disabled"}
+{
+  "code": 1002,
+  "message": "embed channel is disabled",
+  "data": null
+}

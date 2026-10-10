@@ -1,10 +1,1 @@
-{
-  "models": [
-    {
-      "name": "stub-model:latest",
-      "size": 4700000000,
-      "digest": "sha256:w5bdigest",
-      "modifiedAt": "2026-09-01T08:00:00Z"
-    }
-  ]
-}
+{"code":0,"data":{"models":[{"digest":"sha256:w5bdigest","modifiedAt":"<ts>","name":"stub-model:latest","size":4700000000}]},"message":"ok"}

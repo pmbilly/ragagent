@@ -237,7 +237,7 @@ def _java_unescape(s):
     return s.replace('\\"', '"').replace('\\\\', '\\').replace('\\n', '\n').replace('\\t', '\t')
 
 
-def cmd_converge(test_filters, rounds=25):
+def cmd_converge(test_filters, rounds=40):
     """失败驱动收敛（见模块 docstring）。test_filters 形如 '*ChunkContractTest'。"""
     env = dict(**__import__('os').environ)
     env.pop('SYSTEM_AES_KEY', None)
@@ -247,7 +247,14 @@ def cmd_converge(test_filters, rounds=25):
         cmd = ['./gradlew', ':boot:test', '--rerun']
         for f in test_filters:
             cmd += ['--tests', f]
-        subprocess.run(cmd, capture_output=True, text=True, env=env)
+        run = subprocess.run(cmd, capture_output=True, text=True, env=env)
+        if run.returncode != 0 and 'error:' in (run.stdout + run.stderr):
+            # 编译失败 ⇒ 没有测试结果 ⇒ 不能当成"全绿" ✗（B199 实测假绿一次 ✓）
+            print('  ✗ 编译失败（无测试结果，不能判绿）：')
+            for l in (run.stdout + run.stderr).split('\n'):
+                if 'error:' in l:
+                    print('     %s' % l.strip()[:150])
+            return 2
         fails = []
         for p in sorted(pathlib.Path(ROOT, 'boot/build/test-results/test').glob('TEST-*.xml')):
             import xml.etree.ElementTree as ET

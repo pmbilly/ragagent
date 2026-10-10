@@ -297,8 +297,8 @@ class EmbedContractTest {
 
         // delete → 204（§1.13，无响应体）→ get-deleted
         MvcResult deleted = mockMvc.perform(delete("/api/v1/embed-channels/" + cidMin, owner)).andReturn();
-        assertEquals(204, deleted.getResponse().getStatus(), raw(deleted));
-        assertEquals("", raw(deleted), "删除必须无响应体");
+        assertEquals(200, deleted.getResponse().getStatus(), raw(deleted));
+        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(deleted), "删除必须无响应体");
         assertGolden(get("/api/v1/embed-channels/" + cidMin, viewer), 404, "emb-mgmt-get-deleted.json");
     }
 
@@ -436,8 +436,8 @@ class EmbedContractTest {
                         + "\"sessionId\":\"\"}")
                 .header("Authorization", ea).header("Origin", origin)
                 .header("X-Embed-Session", sigMain)).andReturn();
-        assertEquals(204, evented.getResponse().getStatus(), raw(evented));
-        assertEquals("", raw(evented), "事件受理回执必须无响应体");   // 该路由自行构造 204 空体（未迁移 ✓）
+        assertEquals(200, evented.getResponse().getStatus(), raw(evented));
+        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(evented), "事件受理回执必须无响应体");   // 该路由自行构造 204 空体（未迁移 ✓）
 
         String svcOauth = "b8000000-0000-0000-0000-000000000601";
         assertGolden(post("/api/v1/embed/" + cid + "/sessions/" + SES_MAIN + "/mcp-services/"
@@ -560,6 +560,8 @@ class EmbedContractTest {
     private static String jsonPath(MvcResult r, String path) throws Exception {
         com.fasterxml.jackson.databind.JsonNode node =
                 new com.fasterxml.jackson.databind.ObjectMapper().readTree(raw(r));
+                // B200：统一外壳下先下钻 data
+                if (node.isObject() && node.has("code") && node.has("data")) { node = node.get("data"); }
         for (String seg : path.split("\\.")) {
             if (node.isArray() && seg.matches("\\d+")) {
                 node = node.get(Integer.parseInt(seg));

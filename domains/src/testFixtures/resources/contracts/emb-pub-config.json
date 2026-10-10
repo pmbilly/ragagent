@@ -1,1 +1,33 @@
-{"agentAvatar":"","agentId":"<uuid>","agentImageUploadEnabled":false,"agentName":"emb-agent","agentWebSearchEnabled":true,"allowFileUpload":true,"allowWebSearch":true,"allowedOrigins":["https://a.example.com","*.b.example.com","https://c.example.com"],"channelId":"<uuid>","defaultLocale":"zh-CN","displayTitle":"emb-main-renamed","headerTitleMode":"channel","knowledgeBaseIds":["<uuid>"],"launcherIcon":"","name":"emb-main-renamed","pageTitle":"","primaryColor":"#1177ee","showSuggestedQuestions":true,"showThinking":false,"welcomeMessage":"欢迎回来","widgetPosition":"bottom-left"}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "agentAvatar": "",
+    "agentId": "<uuid>",
+    "agentImageUploadEnabled": false,
+    "agentName": "emb-agent",
+    "agentWebSearchEnabled": true,
+    "allowFileUpload": true,
+    "allowWebSearch": true,
+    "allowedOrigins": [
+      "https://a.example.com",
+      "*.b.example.com",
+      "https://c.example.com"
+    ],
+    "channelId": "<uuid>",
+    "defaultLocale": "zh-CN",
+    "displayTitle": "emb-main-renamed",
+    "headerTitleMode": "channel",
+    "knowledgeBaseIds": [
+      "<uuid>"
+    ],
+    "launcherIcon": "",
+    "name": "emb-main-renamed",
+    "pageTitle": "",
+    "primaryColor": "#1177ee",
+    "showSuggestedQuestions": true,
+    "showThinking": false,
+    "welcomeMessage": "欢迎回来",
+    "widgetPosition": "bottom-left"
+  }
+}

@@ -1,4 +1,1 @@
-{
-  "available": true,
-  "message": "重排功能正常，返回1个结果"
-}
+{"code":0,"data":{"available":true,"message":"重排功能正常，返回1个结果"},"message":"ok"}

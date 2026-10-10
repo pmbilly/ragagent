@@ -1,1 +1,5 @@
-{"error":{"code":1003,"details":null,"message":"Message not found"}}
+{
+  "code": 1003,
+  "message": "Message not found",
+  "data": null
+}

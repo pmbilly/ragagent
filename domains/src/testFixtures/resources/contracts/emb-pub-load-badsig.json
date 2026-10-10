@@ -1,1 +1,5 @@
-{"error":"session signature invalid"}
+{
+  "code": 1002,
+  "message": "session signature invalid",
+  "data": null
+}

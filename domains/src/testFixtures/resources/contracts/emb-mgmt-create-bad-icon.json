@@ -1,1 +1,5 @@
-{"error":"invalid embed launcher icon: must be a base64 data URL of png/jpeg/svg/webp"}
+{
+  "code": 1000,
+  "message": "invalid embed launcher icon: must be a base64 data URL of png/jpeg/svg/webp",
+  "data": null
+}

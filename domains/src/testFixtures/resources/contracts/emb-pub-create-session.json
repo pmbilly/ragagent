@@ -1,1 +1,8 @@
-{"id":"<uuid>","sig":"<sig>"}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "id": "<uuid>",
+    "sig": "<sig>"
+  }
+}

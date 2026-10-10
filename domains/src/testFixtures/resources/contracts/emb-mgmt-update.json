@@ -1,1 +1,33 @@
-{"agentId":"<uuid>","allowFileUpload":true,"allowWebSearch":true,"allowedOrigins":["https://a.example.com","*.b.example.com","https://c.example.com"],"createdAt":"<ts>","defaultLocale":"zh-CN","enabled":true,"hasWebhookSecret":false,"headerTitleMode":"channel","id":"<uuid>","launcherIcon":"","name":"emb-main-renamed","pageTitle":"","primaryColor":"#1177ee","rateLimitPerDay":9000,"rateLimitPerMinute":500,"showSuggestedQuestions":true,"showThinking":false,"tenantId":10006,"updatedAt":"<ts>","webhookUrl":"","welcomeMessage":"欢迎回来","widgetPosition":"bottom-left"}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "agentId": "<uuid>",
+    "allowFileUpload": true,
+    "allowWebSearch": true,
+    "allowedOrigins": [
+      "https://a.example.com",
+      "*.b.example.com",
+      "https://c.example.com"
+    ],
+    "createdAt": "<ts>",
+    "defaultLocale": "zh-CN",
+    "enabled": true,
+    "hasWebhookSecret": false,
+    "headerTitleMode": "channel",
+    "id": "<uuid>",
+    "launcherIcon": "",
+    "name": "emb-main-renamed",
+    "pageTitle": "",
+    "primaryColor": "#1177ee",
+    "rateLimitPerDay": 9000,
+    "rateLimitPerMinute": 500,
+    "showSuggestedQuestions": true,
+    "showThinking": false,
+    "tenantId": 10006,
+    "updatedAt": "<ts>",
+    "webhookUrl": "",
+    "welcomeMessage": "欢迎回来",
+    "widgetPosition": "bottom-left"
+  }
+}

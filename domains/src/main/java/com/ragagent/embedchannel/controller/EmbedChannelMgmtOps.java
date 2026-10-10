@@ -12,6 +12,7 @@ import com.ragagent.embedchannel.EmbedError;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import com.ragagent.common.web.ApiResponse;
 
 /**
  * embed 渠道管理面协作者（自 {@link EmbedChannelController} 拆出的管理段）：
@@ -146,13 +147,13 @@ final class EmbedChannelMgmtOps {
     }
 
     /** 删除渠道 → **204**（同步完成的删除无响应体，不回 {"success":true}）。 */
-    public ResponseEntity<Void> delete(@PathVariable("channelId") String channelId) {
+    public ApiResponse<Void> delete(@PathVariable("channelId") String channelId) {
         try {
             ctrl.service.delete(EmbedChannelController.currentTenant(), EmbedChannelController.trim(channelId));
         } catch (EmbedError e) {
             throw EmbedChannelController.writeMgmtError(e);
         }
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
     /** 轮换发布令牌：200 + 含新 token 的行。 */

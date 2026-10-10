@@ -1,1 +1,5 @@
-{"error":"invalid allowed origin: \"not a url\""}
+{
+  "code": 1000,
+  "message": "invalid allowed origin: \"not a url\"",
+  "data": null
+}

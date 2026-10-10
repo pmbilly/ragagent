@@ -1,1 +1,5 @@
-{"error":"at least one allowed origin is required"}
+{
+  "code": 1000,
+  "message": "at least one allowed origin is required",
+  "data": null
+}

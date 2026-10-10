@@ -1,6 +1,1 @@
-{
-  "models": {
-    "absent-model": false,
-    "stub-model": true
-  }
-}
+{"code":0,"data":{"models":{"absent-model":false,"stub-model":true}},"message":"ok"}

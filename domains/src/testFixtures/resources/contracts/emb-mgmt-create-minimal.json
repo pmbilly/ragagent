@@ -1,1 +1,32 @@
-{"agentId":"<uuid>","allowFileUpload":false,"allowWebSearch":false,"allowedOrigins":["*"],"createdAt":"<ts>","defaultLocale":"","enabled":true,"hasWebhookSecret":false,"headerTitleMode":"channel","id":"<uuid>","launcherIcon":"","name":"emb-min","pageTitle":"","primaryColor":"","publishToken":"em_<token>","rateLimitPerDay":10000,"rateLimitPerMinute":30,"showSuggestedQuestions":true,"showThinking":false,"tenantId":10006,"updatedAt":"<ts>","webhookUrl":"","welcomeMessage":"","widgetPosition":"bottom-right"}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "agentId": "<uuid>",
+    "allowFileUpload": false,
+    "allowWebSearch": false,
+    "allowedOrigins": [
+      "*"
+    ],
+    "createdAt": "<ts>",
+    "defaultLocale": "",
+    "enabled": true,
+    "hasWebhookSecret": false,
+    "headerTitleMode": "channel",
+    "id": "<uuid>",
+    "launcherIcon": "",
+    "name": "emb-min",
+    "pageTitle": "",
+    "primaryColor": "",
+    "publishToken": "em_<token>",
+    "rateLimitPerDay": 10000,
+    "rateLimitPerMinute": 30,
+    "showSuggestedQuestions": true,
+    "showThinking": false,
+    "tenantId": 10006,
+    "updatedAt": "<ts>",
+    "webhookUrl": "",
+    "welcomeMessage": "",
+    "widgetPosition": "bottom-right"
+  }
+}

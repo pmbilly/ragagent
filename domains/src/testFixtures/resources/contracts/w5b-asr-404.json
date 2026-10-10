@@ -1,4 +1,1 @@
-{
-  "available": false,
-  "message": "API端点不存在，请检查Base URL：ASR transcription request failed: HTTP 404 Not Found: Not Found"
-}
+{"code":0,"data":{"available":false,"message":"API端点不存在，请检查Base URL：ASR transcription request failed: HTTP 404 Not Found: Not Found"},"message":"ok"}

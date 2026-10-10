@@ -1,11 +1,1 @@
-[
-  {
-    "id": "159a14ee-5f08-4d27-a9a3-093861490259",
-    "modelName": "fresh-model",
-    "status": "completed",
-    "progress": 100,
-    "message": "下载完成",
-    "startTime": "2026-09-21T09:30:35.106711+08:00",
-    "endTime": "2026-09-21T09:30:35.107938+08:00"
-  }
-]
+{"code":0,"data":[{"endTime":"<ts>","id":"<uuid>","message":"下载完成","modelName":"fresh-model","progress":100,"startTime":"<ts>","status":"completed"}],"message":"ok"}

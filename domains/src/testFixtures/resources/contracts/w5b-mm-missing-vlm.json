@@ -1,1 +1,1 @@
-{"error":{"code":1000,"message":"VLM模型名称和Base URL不能为空","details":null}}
+{"code":1000,"data":null,"message":"VLM模型名称和Base URL不能为空"}

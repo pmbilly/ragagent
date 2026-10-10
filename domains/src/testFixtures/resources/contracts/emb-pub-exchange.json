@@ -1,1 +1,8 @@
-{"expiresIn":1800,"sessionToken":"ems_<token>"}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "expiresIn": 1800,
+    "sessionToken": "ems_<token>"
+  }
+}

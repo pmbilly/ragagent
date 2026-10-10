@@ -29,6 +29,7 @@ import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.ollama.OllamaService;
 import com.ragagent.model.service.ModelService;
 import com.ragagent.knowledge.client.DocReaderClient;
+import com.ragagent.common.web.ApiResult;
 
 /**
  * initialization 路由。系统级端点（ollama 管理、模型连通性测试、抽取）
@@ -47,6 +48,7 @@ import com.ragagent.knowledge.client.DocReaderClient;
  * 现场景全走 provider 兼容投影；POST 建的 model 行 tenant_id=0（不回填租户）。</p>
  */
 @RestController
+@ApiResult
 public class InitializationController {
 
 

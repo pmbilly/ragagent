@@ -1,1 +1,1 @@
-{"error":{"code":1000,"message":"COS配置信息不能为空","details":null}}
+{"code":1000,"data":null,"message":"COS配置信息不能为空"}

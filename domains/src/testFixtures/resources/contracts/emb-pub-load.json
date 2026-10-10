@@ -1,1 +1,31 @@
-[{"agentDurationMs":0,"agentId":"","agentSteps":[],"artifacts":[],"attachments":[],"channel":"","completed":true,"content":"已完成回答","createdAt":"<ts>","deletedAt":null,"fallback":false,"id":"<uuid>","images":[],"knowledgeId":null,"knowledgeReferences":[],"mentionedItems":[],"modelId":"","requestId":"<uuid>","role":"assistant","sessionId":"<uuid>","updatedAt":"<ts>","usage":null,"usedMemories":null}]
+{
+  "code": 0,
+  "message": "ok",
+  "data": [
+    {
+      "agentDurationMs": 0,
+      "agentId": "",
+      "agentSteps": [],
+      "artifacts": [],
+      "attachments": [],
+      "channel": "",
+      "completed": true,
+      "content": "已完成回答",
+      "createdAt": "<ts>",
+      "deletedAt": null,
+      "fallback": false,
+      "id": "<uuid>",
+      "images": [],
+      "knowledgeId": null,
+      "knowledgeReferences": [],
+      "mentionedItems": [],
+      "modelId": "",
+      "requestId": "<uuid>",
+      "role": "assistant",
+      "sessionId": "<uuid>",
+      "updatedAt": "<ts>",
+      "usage": null,
+      "usedMemories": null
+    }
+  ]
+}

@@ -1,1 +1,7 @@
-{"sessionCount":1}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "sessionCount": 1
+  }
+}

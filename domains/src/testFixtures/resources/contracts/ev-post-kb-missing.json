@@ -1,1 +1,5 @@
-{"error":{"code":1007,"message":"knowledge base not found","details":null}}
+{
+  "code": 1007,
+  "message": "knowledge base not found",
+  "data": null
+}

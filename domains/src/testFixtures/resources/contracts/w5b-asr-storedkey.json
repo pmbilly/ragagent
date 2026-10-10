@@ -1,4 +1,1 @@
-{
-  "available": false,
-  "message": "认证失败，请检查API Key：ASR transcription request failed: HTTP 401 Unauthorized: invalid api key"
-}
+{"code":0,"data":{"available":false,"message":"认证失败，请检查API Key：ASR transcription request failed: HTTP 401 Unauthorized: invalid api key"},"message":"ok"}

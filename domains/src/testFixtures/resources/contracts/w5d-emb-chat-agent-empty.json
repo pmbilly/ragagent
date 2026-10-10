@@ -1,1 +1,1 @@
-{"error":{"code":1000,"message":"field 'query' is required","details":null}}
+{"code":1000,"message":"field 'query' is required","data":null}
