@@ -11,7 +11,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ragagent.common.context.TenantContext;
+import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
+import com.ragagent.common.web.ApiResponse;
+import com.ragagent.common.web.ApiResult;
 import com.ragagent.common.vectorstore.ConnectionConfig;
 import com.ragagent.vectorstore.domain.EnvVectorStores;
 import com.ragagent.common.vectorstore.IndexConfig;
@@ -29,7 +32,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 
 /**
  * 向量库管理端（8 条路由；读 Viewer+ / 写与测试 Admin+）。
@@ -38,11 +40,18 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
  * id 一律 400 readonly（即使该 id 不存在）；GET /test 则先查 env 表 → 404。
  * 本部署 RETRIEVE_DRIVER 未配置 → env 列表恒空（部署状态，golden 钉住）。</p>
  *
- * <p>错误形态：getOwned 404 → 纯字符串；test 失败 → **200** 纯字符串 +
- * AppError 双前缀；create/update/delete 的 service 失败 →
- * AppError 信封（code 随错误种类 1000/1005/1010）。</p>
+ * <p><b>响应形态（B185 起统一外壳 {@code {code,message,data}}，见 docs/api-response-convention.md）</b>：
+ * 成功体一律外壳（列表/对象进 {@code data}；201 保留、204 退役 ⇒ 删除返 200 + 外壳）；
+ * 错误体同形（{@code {code,message,data}}），**HTTP 状态码随语义**（404/400/401…）。</p>
+ *
+ * <p>本类此前有四处**私有错误形态**（{@code {"error":"…"}} 纯字符串 + test 失败返 **200**），
+ * 已全部退役：改由 {@code BizException(AppError…)} 走全局处理器 ⇒ 与其余域同形。
+ * 其中「test 失败返 200」是 Go 期产物 ✗（200 却带错误体，前端只能靠字符串嗅探）；
+ * 现在服务端错误就是真错误状态（400），前端用 resolve/reject 判断 ⇒ 顺带修掉
+ * {@code VectorStoreSettings.vue} 里「读 res.success 恒为 undefined、成功分支永不亮」的存量缺陷。</p>
  */
 @RestController
+@ApiResult
 @RequestMapping("/api/v1/vector-stores")
 public class VectorStoreController {
 
@@ -88,12 +97,9 @@ public class VectorStoreController {
         }
         // ConnectionConfig 的必填校验不在这里做（嵌套结构校验行为不触发），
         // 直接落到引擎必填校验。
-        try {
-            String version = service.testRawConnection(req.engineType(), req.connectionConfig());
-            return ResponseEntity.ok(versionBody(version));
-        } catch (BizException e) {
-            throw new TestFailure(e.getMessage());
-        }
+        // B185：不再包成 200 + 纯字符串错误体（Go 期形态）⇒ 让 BizException 带自己的码/状态出去
+        String version = service.testRawConnection(req.engineType(), req.connectionConfig());
+        return ResponseEntity.ok(versionBody(version));
     }
 
     @PostMapping
@@ -161,7 +167,7 @@ public class VectorStoreController {
             @RequestBody(required = false) String rawBody) {
         long tenantId = requireTenant();
         if (EnvVectorStores.isEnvStoreId(id)) {
-            throw new ReadonlyEnvStore();
+            throw readonlyEnv();
         }
         owned(tenantId, id);
         UpdateStoreRequest req = bind(rawBody, UpdateStoreRequest.class);
@@ -182,14 +188,14 @@ public class VectorStoreController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteStore(@PathVariable("id") String id) {
+    public ApiResponse<Void> deleteStore(@PathVariable("id") String id) {
         long tenantId = requireTenant();
         if (EnvVectorStores.isEnvStoreId(id)) {
-            throw new ReadonlyEnvStore();
+            throw readonlyEnv();
         }
         owned(tenantId, id);
         service.delete(tenantId, id);
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();
     }
 
     @PostMapping("/{id}/test")
@@ -200,20 +206,11 @@ public class VectorStoreController {
             if (env == null) {
                 throw notFoundPure();
             }
-            try {
-                String version = service.testConnection(env.getEngineType(), env.getConnectionConfig());
-                return ResponseEntity.ok(versionBody(version));
-            } catch (BizException e) {
-                throw new TestFailure(e.getMessage());
-            }
+            String version = service.testConnection(env.getEngineType(), env.getConnectionConfig());
+            return ResponseEntity.ok(versionBody(version));
         }
         VectorStore store = owned(tenantId, id);
-        String version;
-        try {
-            version = service.testConnection(store.getEngineType(), store.getConnectionConfig());
-        } catch (BizException e) {
-            throw new TestFailure(e.getMessage());
-        }
+        String version = service.testConnection(store.getEngineType(), store.getConnectionConfig());
         // 探测到版本且与存量不同 → 回存（SaveDetectedVersion）
         if (!version.isEmpty() && !version.equals(store.getConnectionConfig().version)) {
             try {
@@ -284,9 +281,14 @@ public class VectorStoreController {
     private static long requireTenant() {
         Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null || tenantId == 0) {
-            throw new TenantMissing();
+            throw BizException.unauthorized("unauthorized: workspace context missing");
         }
         return tenantId;
+    }
+
+    /** env store 只读 → 400（B185：原为私有 ReadonlyEnvStore + 纯字符串体）。 */
+    private static BizException readonlyEnv() {
+        return BizException.badRequest("environment-configured vector stores cannot be modified via API");
     }
 
     private static BizException validator(String... fields) {
@@ -311,8 +313,9 @@ public class VectorStoreController {
         }
     }
 
-    private static PureNotFound notFoundPure() {
-        return new PureNotFound();
+    /** 404 → BizException(AppError.notFound)（B185：原为私有 PureNotFound + 纯字符串体）。 */
+    private static BizException notFoundPure() {
+        return new BizException(AppError.notFound("vector store not found"));
     }
 
     /** 连通性测试成功体：{version}（探测不到为空串照写）。 */
@@ -323,50 +326,6 @@ public class VectorStoreController {
     }
 
 
-    private static Map<String, Object> errorEnvelope(String message) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("error", message);
-        return body;
-    }
-
-    // ── 本控制器私有的错误形态 ─────────────────────────────────────────
-
-    /** 404 场景：纯字符串体直写 */
-    public static class PureNotFound extends RuntimeException {}
-
-    /** env store 只读：400 纯字符串 */
-    public static class ReadonlyEnvStore extends RuntimeException {}
-
-    /** 租户缺失：401 纯字符串 */
-    public static class TenantMissing extends RuntimeException {}
-
-    /** test 端点失败：200 纯字符串（AppError 双前缀已在 message 里） */
-    public static class TestFailure extends RuntimeException {
-        public TestFailure(String message) {
-            super(message);
-        }
-    }
-
-    @ExceptionHandler(PureNotFound.class)
-    public ResponseEntity<?> handleNotFound(PureNotFound e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(errorEnvelope("vector store not found"));
-    }
-
-    @ExceptionHandler(ReadonlyEnvStore.class)
-    public ResponseEntity<?> handleReadonlyEnv() {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorEnvelope(
-                "environment-configured vector stores cannot be modified via API"));
-    }
-
-    @ExceptionHandler(TenantMissing.class)
-    public ResponseEntity<?> handleTenantMissing() {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(errorEnvelope("unauthorized: workspace context missing"));
-    }
-
-    @ExceptionHandler(TestFailure.class)
-    public ResponseEntity<?> handleTestFailure(TestFailure e) {
-        return ResponseEntity.ok(errorEnvelope(e.getMessage()));
-    }
+    // B185：本类原有的四处私有错误形态（{"error":"…"} 纯字符串 + test 失败 200）已退役 ——
+    // 统一走 BizException(AppError…) ⇒ 全局处理器按 @ApiResult 出 {code,message,data}。
 }

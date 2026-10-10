@@ -34,7 +34,9 @@ import com.ragagent.support.ContractJson;
 /**
  * 用户收藏 3 端点契约测试（对照 golden 逐字节比对）。
  *
- * golden 录制：scripts/record-fav-cprev-golden.sh（21 条 fav-*.json）。
+ * golden 录制：scripts/record-fav-cprev-golden.sh（fav-*.json）。B185 起响应走统一外壳
+ * {@code {code,message,data}}（docs/api-response-convention.md）：列表金片由裸数组改为
+ * 外壳包裹；add 的 201 与 remove 的 200 各有一条新金片（204/空体已退役）。
  *
  * 场景顺序严格按录制脚本（同请求序列有状态依赖）：
  * 空列表 → add ×2 + 重复 add → 列表回读 → remove 真实行 + 幽灵行 →
@@ -43,8 +45,9 @@ import com.ragagent.support.ContractJson;
  * H2 种子镜像录制身份：租户 10002 + owner 11111111-…-5501（java-phase1@weknora.test
  * / Passw0rd!）——收藏表无外键，resource_id 用固定假 id，两侧行集可逐字节对齐。
  *
- * 唯一动态值：created_at（服务器时钟），两侧同掩码；空列表形态（"data":[] 非 null）
- * 由 fav-list-empty-kb 静态钉住。
+ * 唯一动态值：created_at（服务器时钟），两侧同掩码；空列表形态（外壳内 data:[] 非 null）
+ * 由 fav-list-empty-kb 静态钉住。（注：这里的 data 是**载荷数组**，与外壳的 data 同名——
+ * 该金片外层即 {code:0,message:"ok",data:[]}。）
  */
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -120,12 +123,12 @@ class FavoriteContractTest {
     void addThenList() throws Exception {
         String owner = "Bearer " + login();
 
-        assertStatus(json(post("/api/v1/user/favorites").header("Authorization", owner),
-                "{\"type\":\"kb\",\"id\":\"fav-kb-fixed-0001\"}"), 201, "fav-add-kb");
-        assertStatus(json(post("/api/v1/user/favorites").header("Authorization", owner),
-                "{\"type\":\"agent\",\"id\":\"fav-agent-fixed-0001\"}"), 201, "fav-add-agent");
-        assertStatus(json(post("/api/v1/user/favorites").header("Authorization", owner),
-                "{\"type\":\"kb\",\"id\":\"fav-kb-fixed-0001\"}"), 201, "fav-add-dup");
+        assertGolden(json(post("/api/v1/user/favorites").header("Authorization", owner),
+                "{\"type\":\"kb\",\"id\":\"fav-kb-fixed-0001\"}"), 201, "fav-add-ok.json");
+        assertGolden(json(post("/api/v1/user/favorites").header("Authorization", owner),
+                "{\"type\":\"agent\",\"id\":\"fav-agent-fixed-0001\"}"), 201, "fav-add-ok.json");
+        assertGolden(json(post("/api/v1/user/favorites").header("Authorization", owner),
+                "{\"type\":\"kb\",\"id\":\"fav-kb-fixed-0001\"}"), 201, "fav-add-ok.json");
 
         assertMasked(get("/api/v1/user/favorites?type=kb").header("Authorization", owner),
                 200, "fav-list-kb-after.json");
@@ -145,10 +148,10 @@ class FavoriteContractTest {
         mockMvc.perform(json(post("/api/v1/user/favorites").header("Authorization", owner),
                 "{\"type\":\"agent\",\"id\":\"fav-agent-fixed-0001\"}")).andReturn();
 
-        assertStatus(delete("/api/v1/user/favorites/agent/fav-agent-fixed-0001")
-                .header("Authorization", owner), 204, "fav-remove-agent");
-        assertStatus(delete("/api/v1/user/favorites/agent/ghost-id-000")
-                .header("Authorization", owner), 204, "fav-remove-ghost");
+        assertGolden(delete("/api/v1/user/favorites/agent/fav-agent-fixed-0001")
+                .header("Authorization", owner), 200, "fav-remove-ok.json");
+        assertGolden(delete("/api/v1/user/favorites/agent/ghost-id-000")
+                .header("Authorization", owner), 200, "fav-remove-ok.json");
         assertGolden(get("/api/v1/user/favorites?type=agent").header("Authorization", owner),
                 200, "fav-list-agent-after-rm.json");
     }
@@ -209,15 +212,6 @@ class FavoriteContractTest {
         MvcResult r = mockMvc.perform(req).andReturn();
         assertEquals(status, r.getResponse().getStatus(), goldenName + " 状态码不符: " + raw(r));
         assertEquals(mask(golden(goldenName)), mask(raw(r)), goldenName);
-    }
-
-    /** 201/204 无体端点：只钉状态码与体为空。 */
-    private void assertStatus(MockHttpServletRequestBuilder req, int status, String label)
-            throws Exception {
-        MvcResult r = mockMvc.perform(req).andReturn();
-        assertEquals(status, r.getResponse().getStatus(), label + " 状态码不符: " + raw(r));
-        assertEquals("", r.getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8),
-                label + " 应无响应体");
     }
 
     private static MockHttpServletRequestBuilder json(MockHttpServletRequestBuilder req, String body) {

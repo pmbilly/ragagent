@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
+import com.ragagent.common.web.ApiResponse;
+import com.ragagent.common.web.ApiResult;
 import com.ragagent.favorite.domain.UserResourceFavorite;
 import com.ragagent.favorite.service.UserResourceFavoriteService;
 import org.springframework.http.ResponseEntity;
@@ -27,10 +29,11 @@ import org.springframework.web.bind.annotation.RestController;
  * favorites 属于<b>做收藏动作的人</b>而非资源创建者，不走 OwnedXOrAdmin。
  * Viewer+ 即可，API key 默认拒绝（路由未对 API key 声明）。</p>
  *
- * <h2>响应形态</h2>
+ * <h2>响应形态（B185 起统一外壳 {@code {code,message,data}}，见 docs/api-response-convention.md）</h2>
  * <ul>
- *   <li>列表：裸数组；空结果序列化为 {@code []} 而非 null</li>
- *   <li>add：201 无响应体；remove：204（幽灵删除也是 204）</li>
+ *   <li>列表：载荷是数组（空结果序列化为 {@code []} 而非 null），外面包外壳</li>
+ *   <li>add：**201 保留**（+ 外壳体）；remove：幽灵删除也是成功（200 + 外壳）</li>
+ *   <li>204 已退役（空体与「外壳恒存在」冲突）⇒ 成功统一 200/201 + 外壳</li>
  * </ul>
  *
  * <h2>错误形态：AppError + binding 细节进 details</h2>
@@ -43,6 +46,7 @@ import org.springframework.web.bind.annotation.RestController;
  * "workspace ID not found"）<b>不可达</b>；同位保留。</p>
  */
 @RestController
+@ApiResult
 public class UserFavoriteController {
 
     private static final ObjectMapper MAPPER = new ObjectMapper()
@@ -62,19 +66,19 @@ public class UserFavoriteController {
         return ResponseEntity.ok(service.list(userId, tenantId, type));
     }
 
-    /** 添加收藏：body 是 {type,id}，创建成功 201（§2.1；绑定文案见类注释）。 */
+    /** 添加收藏：body 是 {type,id}；创建成功 **201 + 外壳体**（绑定文案见类注释）。 */
     @PostMapping("/api/v1/user/favorites")
-    public ResponseEntity<Void> addFavorite(@RequestBody(required = false) String rawBody) {
+    public ResponseEntity<ApiResponse<Void>> addFavorite(@RequestBody(required = false) String rawBody) {
         AddFavoriteRequest req = bindBody(rawBody);
         service.add(favoriteUserId(), favoriteTenantId(), req.type, req.id);
-        return ResponseEntity.status(201).build();
+        return ResponseEntity.status(201).body(ApiResponse.ok());
     }
 
-    /** 移除收藏：类型/id 校验失败 400；删 0 行照样成功 → 204（§1.13）。 */
+    /** 移除收藏：类型/id 校验失败 400；删 0 行照样成功（200 + 外壳；204 已退役）。 */
     @DeleteMapping("/api/v1/user/favorites/{type}/{id}")
-    public ResponseEntity<Void> removeFavorite(@PathVariable String type, @PathVariable String id) {
+    public ApiResponse<Void> removeFavorite(@PathVariable String type, @PathVariable String id) {
         service.remove(favoriteUserId(), favoriteTenantId(), type, id);
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();
     }
 
     /** 请求体键为小写 {@code type}/{@code id}。 */

@@ -1,1 +1,1 @@
-{"error":"environment-configured vector stores cannot be modified via API"}
+{"code":1000,"message":"environment-configured vector stores cannot be modified via API","data":null}

@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.ragagent.common.tenant.TenantRole;
 import com.ragagent.common.context.TenantContext;
+import com.ragagent.common.error.ErrorCode;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.common.tenant.TenantProperties;
@@ -40,6 +41,10 @@ import com.ragagent.common.security.TenantAPIKeyScope;
  * 滑动窗口去重，所以被打的端点不会以线速刷表。</p>
  */
 public class RbacInterceptor implements HandlerInterceptor {
+
+    /** 外壳序列化用（消息为常量，序列化不会失败；失败有字符串回落兜底）。 */
+    private static final com.fasterxml.jackson.databind.ObjectMapper ENVELOPE_JSON =
+            new com.fasterxml.jackson.databind.ObjectMapper();
 
     private static final Logger log = LoggerFactory.getLogger(RbacInterceptor.class);
     private static final AntPathMatcher MATCHER = new AntPathMatcher();
@@ -165,10 +170,30 @@ public class RbacInterceptor implements HandlerInterceptor {
         // 两种守卫的文案不同，golden 钉住：
         // RequireRole → "Forbidden: insufficient workspace role"；
         // RequireSystemAdmin → "Forbidden: system administrator required"。
-        response.getWriter().write(rule.sysAdminOnly()
-                ? "{\"error\":\"Forbidden: system administrator required\"}"
-                : "{\"error\":\"Forbidden: insufficient workspace role\"}");
+        String message = rule.sysAdminOnly()
+                ? "Forbidden: system administrator required"
+                : "Forbidden: insufficient workspace role";
+        // 统一响应外壳（B185）：命中 @ApiResult 控制器时输出 {code,message,data}。
+        // 本拦截器注册在 ApiResultInterceptor（order=-100）**之后** ⇒ 打标已就位，直接读它即可；
+        // 非迁移路由（无打标）保持历史纯字符串形态不变。
+        // 反例（打标还没发生，形态注定不变）：AuthFilter 等 Filter 跑在 DispatcherServlet 之前，
+        // 见 docs/api-response-convention.md §4「已知例外」。
+        if (ApiResultSupport.isActive(request)) {
+            response.getWriter().write(forbiddenEnvelope(message));
+            return false;
+        }
+        response.getWriter().write("{\"error\":\"" + message + "\"}");
         return false;
+    }
+
+    /** 403 的统一外壳体（{@code {code:1002,message,data:null}}）；序列化失败回落到等价字符串。 */
+    private static String forbiddenEnvelope(String message) {
+        try {
+            return ENVELOPE_JSON.writeValueAsString(
+                    ApiResponse.fail(ErrorCode.FORBIDDEN.value(), message));
+        } catch (RuntimeException | com.fasterxml.jackson.core.JsonProcessingException e) {
+            return "{\"code\":1002,\"message\":\"" + message + "\",\"data\":null}";
+        }
     }
 
     /**

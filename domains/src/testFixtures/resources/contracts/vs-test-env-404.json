@@ -1,1 +1,1 @@
-{"error":"vector store not found"}
+{"code":1003,"message":"vector store not found","data":null}

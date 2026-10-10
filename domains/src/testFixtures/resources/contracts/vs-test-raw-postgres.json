@@ -1,1 +1,1 @@
-{"error":"error code: 1010, error message: connection test is not supported for engine type: postgres"}
+{"code":1010,"message":"connection test is not supported for engine type: postgres","data":null}

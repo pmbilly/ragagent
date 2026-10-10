@@ -1,1 +1,1 @@
-{"error":{"code":1010,"message":"unsupported engine type: sqlite","details":null}}
+{"code":1010,"message":"unsupported engine type: sqlite","data":null}

@@ -29,7 +29,11 @@ import org.springframework.test.web.servlet.MvcResult;
 
 /**
  * vector-stores 9 条的契约测试。golden：
- * scripts/record-infra-config-golden.sh（28 个 vs-* 文件）。
+ * scripts/record-infra-config-golden.sh（28 个 vs-* 文件，B185 起随统一外壳重录）。
+ *
+ * <p><b>B185 变化</b>：响应改走统一外壳 {@code {code,message,data}}（docs/api-response-convention.md）；
+ * 同时退役三处 Go 期私有错误形态 ⇒ <b>test 失败从「200 + {"error":…}」改为真 400</b>（4 条），
+ * <b>DELETE 从 204 改为 200 + 外壳</b>（1 条）。其余状态码不变。</p>
  *
  * <p>种子：ES 向量库一行（固定 hex id，connection_config 指向**环回死端口 19214**——
  * test-by-id 的连接拒绝分支确定性）。本部署 RETRIEVE_DRIVER 未配置 → env stores 恒空
@@ -231,19 +235,19 @@ class VectorStoreContractTest {
         String base = API + "/vector-stores";
         compareAndStatus("vs-get.json", 200, "GET", base + "/" + VS_ES, owner, null);
         compareAndStatus("vs-list-withdb.json", 200, "GET", base, owner, null);
-        compareAndStatus("vs-test-byid-connrefused.json", 200, "POST", base + "/" + VS_ES + "/test", owner, null);
+        compareAndStatus("vs-test-byid-connrefused.json", 400, "POST", base + "/" + VS_ES + "/test", owner, null);
         compareAndStatus("vs-put.json", 200, "PUT", base + "/" + VS_ES, owner,
                 "{\"name\":\"vs-golden-es-renamed\"}");
         compareAndStatus("vs-put-badjson.json", 400, "PUT", base + "/" + VS_ES, owner, "");
-        compareAndStatus("vs-test-raw-postgres.json", 200, "POST", base + "/test", owner,
+        compareAndStatus("vs-test-raw-postgres.json", 400, "POST", base + "/test", owner,
                 "{\"engineType\":\"postgres\",\"connectionConfig\":{\"use_default_connection\":true}}");
-        compareAndStatus("vs-test-raw-es-missing-addr.json", 200, "POST", base + "/test", owner,
+        compareAndStatus("vs-test-raw-es-missing-addr.json", 400, "POST", base + "/test", owner,
                 "{\"engineType\":\"elasticsearch\",\"connectionConfig\":{}}");
-        compareAndStatus("vs-test-raw-es-ssrf.json", 200, "POST", base + "/test", owner,
+        compareAndStatus("vs-test-raw-es-ssrf.json", 400, "POST", base + "/test", owner,
                 "{\"engineType\":\"elasticsearch\",\"connectionConfig\":{\"addr\":\"http://127.0.0.1:19200\"}}");
         compareAndStatus("vs-test-viewer-denied.json", 403, "POST", base + "/test", viewer,
                 "{\"engineType\":\"elasticsearch\",\"connectionConfig\":{\"addr\":\"http://127.0.0.1:19200\"}}");
-        compareAndStatus("vs-delete.json", 204, "DELETE", base + "/" + VS_ES, owner, null);
+        compareAndStatus("vs-delete.json", 200, "DELETE", base + "/" + VS_ES, owner, null);
         compareAndStatus("vs-get-after-delete.json", 404, "GET", base + "/" + VS_ES, owner, null);
     }
 }
