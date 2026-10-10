@@ -3,7 +3,7 @@ package com.ragagent.common.tenant;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
- * 租户配置的**只读端口**（B95/C6+C7）。
+ * 租户配置的**只读端口**。
  *
  * <p>检索域（{@code retrieval}）与模型域（{@code model}）只需要租户行里的三个 jsonb 配置，
  * 不需要认识 {@code auth} 的领域模型。端口定义在中性包 {@code common.tenant}，
@@ -23,12 +23,6 @@ public interface TenantConfigLookup {
 
     /** 记忆配置（{@code tenants.memory_config}：embeddingModelId / extractModelId 等）。 */
     JsonNode memoryConfig(long tenantId);
-
-    /**
-     * 按 id 取租户实体（不存在返回 {@code null}）。语义与 {@code TenantService.getTenantById}
-     * 完全一致：软删过滤 + 检索/上下文配置归一（B97b：实体已属 {@code common.tenant}，
-     * 因此非 auth 域经此端口取实体不再产生对 auth 的依赖）。
-     */
 
     /**
      * 存储域只读视图（id + 默认后端 + 存储引擎配置）。租户不存在返回 {@code null}

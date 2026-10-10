@@ -29,7 +29,7 @@ import com.ragagent.common.web.ApiResponse;
  * <p><b>响应形态（逐端点保持原样，不要"统一"它们）</b>：</p>
  * <ol>
  *   <li><b>实体直出</b>：直接序列化领域对象，
- *       键序 = 领域字段声明序（Jackson 默认序；B75 已摘键序注解，键序天然跟随声明），
+ *       键序 = 领域字段声明序（Jackson 默认序；已摘键序注解，键序天然跟随声明），
  *       <b>没有</b> {@code {data,success}} 信封。wiki 层几乎所有端点都是这个形态。</li>
  *   <li><b>raw JSON map 直出</b>：{@code {"message":...}}（UpdateIssueStatus / RebuildLinks）、
  *       {@code {"fixed":N,"message":...}}（AutoFix）、{@code {"pages":[...]}}（SearchPages）、
@@ -260,7 +260,7 @@ public class WikiPageController {
     }
 
     /**
-     * 裸错误（{@link RawJsonError}）→ <b>统一外壳</b>（B202）。
+     * 裸错误（{@link RawJsonError}）→ <b>统一外壳</b>。
      *
      * <p>退役记录：此前直写 {@code {"error": "…"}}（Go 迁移期与录制脚本对齐的产物 ✗）。
      * 现在码值取 {@link AppError#ofHttpStatus} 的通用段（400/403/404 ⇒ 1010/1002/1003 ✓），

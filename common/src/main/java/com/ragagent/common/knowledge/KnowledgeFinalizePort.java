@@ -3,7 +3,7 @@ package com.ragagent.common.knowledge;
 import java.time.OffsetDateTime;
 
 /**
- * 知识行收尾端口（B98/C2）：wiki 子任务归零时的递减与晋升。
+ * 知识行收尾端口：wiki 子任务归零时的递减与晋升。
  *
  * <p>实现留在 {@code knowledge} 侧（原 {@code DefaultWikiKnowledgeFinalizer} 的两条
  * {@code LambdaUpdateWrapper} 语句，含 try/catch 与告警日志），语义逐字保留：</p>

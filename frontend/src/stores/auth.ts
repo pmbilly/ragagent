@@ -323,7 +323,7 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const { getMyPendingInvitationCount } = await import('@/api/tenant/invitations')
       const resp = await getMyPendingInvitationCount()
-      // B201：统一外壳后 resp 即载荷；旧的 {data,success} 壳也容忍
+      // 统一外壳后 resp 即载荷；旧的 {data,success} 壳也容忍
       const data: any = (resp as any)?.data ?? resp
       if (data && typeof data.pendingCount === 'number') {
         setPendingInvitationCount(data.pendingCount)
@@ -390,7 +390,7 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const { acceptInvitationByToken } = await import('@/api/tenant/invitations')
       const resp = await acceptInvitationByToken(token)
-      // B201：统一外壳后 resp 即载荷；旧的 {data,success} 壳也容忍
+      // 统一外壳后 resp 即载荷；旧的 {data,success} 壳也容忍
       const data: any = (resp as any)?.data ?? resp
       if (!data?.membership) {
         return { ok: false }

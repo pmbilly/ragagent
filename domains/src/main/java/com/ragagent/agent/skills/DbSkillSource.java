@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 数据库技能源（B57）：宿主目录退役后，技能来自 {@code skills} 表。
+ * 数据库技能源：宿主目录退役后，技能来自 {@code skills} 表。
  *
  * <p><b>实例是「每次装配一份」</b>——{@code AgentEngineAssembler} 在装配技能管理器时新建，
  * 因此缓存生命周期＝一次问答装配：每轮对话天然重读数据库，新建/删除技能对下一轮生效，
@@ -68,7 +68,7 @@ public final class DbSkillSource implements SkillSource {
     @Override
     public List<String> listSkillFiles(String name) {
         require(name);
-        // 入库技能只有 SKILL.md 一个文件；附随文件（Level 3）留待后续批次。
+        // 入库技能只有 SKILL.md 一个文件；附随文件（Level 3）暂未支持。
         return List.of(Skill.SKILL_FILE_NAME);
     }
 

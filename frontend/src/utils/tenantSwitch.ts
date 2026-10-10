@@ -89,7 +89,7 @@ export function persistLastActiveTenantPreference(
   const payload = { lastActiveTenantId: tenantId == null ? 0 : tenantId }
   return updateMyPreferences(payload)
     .then((res) => {
-      // B201：非零 code 现在由拦截器抛错；这里只在显式 success:false 时告警
+      // 非零 code 现在由拦截器抛错；这里只在显式 success:false 时告警
       const body: any = res
       if (body?.success === false) {
         console.warn('persistLastActiveTenantPreference: server rejected update', body?.message)

@@ -17,11 +17,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
 /**
- * 启动期快照装配（B6 批 6 起）。
+ * 启动期快照装配。
  *
  * <p>本仓配置读取的优先顺序：能在 bean 里构造注入的就注入；只有**纯静态/手工 new 的工具类**
  * 才走「启动期快照」——值在这里写入一次，之后整进程只读。都是部署期确定的值
- * （语言默认值、上传限额、AES 密钥、SSRF 白名单；批 7 起含存储域的本地存储根与全局存储类型）。</p>
+ * （语言默认值、上传限额、AES 密钥、SSRF 白名单，以及存储域的本地存储根与全局存储类型）。</p>
  *
  * <p>注意两处例外通道：SSRF 白名单另有 {@code SsrfGuard.reloadWhitelist}（系统设置运行时
  * 调谐，既有能力，不受本装配影响）。若要在运行期改其它快照值，那不是配置而是状态，

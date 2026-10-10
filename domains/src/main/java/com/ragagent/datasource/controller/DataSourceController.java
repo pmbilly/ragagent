@@ -202,7 +202,7 @@ public class DataSourceController {
         return ResponseEntity.ok(DataSourceResponse.from(ds));
     }
 
-    /** 删除数据源：成功是 <b>204</b>，无响应体。 */
+    /** 删除数据源：成功回 200 + {@link ApiResponse} 外壳（204 已退役）。 */
     @DeleteMapping("/api/v1/datasource/{id}")
     public ApiResponse<Void> deleteDataSource(@PathVariable("id") String id) {
         Long tenantId = TenantContext.currentTenantId();
@@ -215,7 +215,7 @@ public class DataSourceController {
         } catch (RuntimeException e) {
             throw new BizException(AppError.ofHttpStatus(500, "failed to delete data source"));
         }
-        return ApiResponse.ok();   // B189：204 退役（空体与「外壳恒存在」冲突）
+        return ApiResponse.ok();   // 204 退役：空体与「外壳恒存在」冲突
     }
 
     // ══════════════════════════ 连接与资源 ══════════════════════════
@@ -517,12 +517,11 @@ public class DataSourceController {
     }
 
     /**
-     * 统一错误形态（B189）：**恒抛** {@link BizException} —— 走 GlobalExceptionHandler 出
+     * 统一错误形态：**恒抛** {@link BizException} —— 走 GlobalExceptionHandler 出
      * {@code {code,message,data}}。
      *
-     * <p>刻意保留原签名（返回类型仍是 {@code ResponseEntity<Map<String,Object>>}）：本类有 36 处
-     * {@code return error(...)}、还有 {@code new Owned(null, error(...))} 这类**值位置**调用，
-     * 改签名会连带改 40 处并踩"值位置不是语句"的坑（B188 因此翻车两次 ✗）。恒抛后调用点一行不动、
+     * <p>刻意保留原签名（返回类型仍是 {@code ResponseEntity<Map<String,Object>>}）：本类有 35 处
+     * {@code return error(...)} 调用，恒抛让这些调用点一行不动、
      * 语义一致（这些路径本来就只可能以错误结束）。</p>
      */
     static ResponseEntity<Map<String, Object>> error(int status, String message) {

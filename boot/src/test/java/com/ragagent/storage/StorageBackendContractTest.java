@@ -204,7 +204,7 @@ class StorageBackendContractTest {
         assertEquals(201, result.getResponse().getStatus(),
                 () -> "seed create failed: " + diag);
         return new com.fasterxml.jackson.databind.ObjectMapper()
-                .readTree(result.getResponse().getContentAsString()).path("data").get("id").asText();   // B190：外壳下钻
+                .readTree(result.getResponse().getContentAsString()).path("data").get("id").asText();   // 外壳下钻
     }
 
     private String latestId(String name) {

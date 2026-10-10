@@ -89,7 +89,7 @@ final class AgentConfigAssembler {
             }
         }
 
-        // 指令型技能（选项 B）：技能内容来自 skills 表（B57 入库），
+        // 指令型技能（选项 B）：技能内容来自 skills 表，
         // 装配期由 AgentEngineAssembler 建 DbSkillSource；allowedSkills 即 selectedSkills 过滤。
 
         // Resolve knowledge bases

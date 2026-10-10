@@ -27,7 +27,7 @@ import com.ragagent.im.runtime.QaQueue;
  * 渠道运行时：adapter 工厂注册表、渠道生命周期（起停 / 重载 / 按库重建 / 配置广播），
  * 以及 WS 长连接选主（leader 续期、抢锁重试、释放）。
  *
- * <p>B126 自 {@link ImService} 整块外提（原 221~532 行，逐字搬迁）。这 17 个方法是一条
+ * <p>自 {@link ImService} 整块外提（逐字搬迁）。这 17 个方法是一条
  * 完整链路：**选主决定哪台实例跑哪些渠道**，渠道起停又要读写 leader 锁——本就是同一关注点，
  * 与消息入口、停止链路、知识桥无关。整块在门面里本来就是连续的，故搬迁几乎零文本改动。</p>
  *
@@ -56,7 +56,7 @@ final class ImChannelRuntimeOps {
     /** 消息回流：适配器工厂拿到的 msgHandler 即门面的消息入口。 */
     private final BiConsumer<IncomingMessage, String> msgHandler;
 
-    // ── 随迁字段（B126 外提；门面不再持有） ───────────────────────────────
+    // ── 随迁字段（自门面外提；门面不再持有） ───────────────────────────────
     /** 渠道启动时必须注册的平台工厂。 */
     private final Map<String, ImService.AdapterFactory> adapterFactories = new ConcurrentHashMap<>();
     /** 实例标识：leader 锁的值 + 广播事件源过滤（随机 UUID）。 */
@@ -185,8 +185,8 @@ final class ImChannelRuntimeOps {
      * 应用就绪后从库拉起全部 enabled 渠道（否则重启后渠道全部沉默）。失败只 WARN，不阻塞启动。
      *
      * <p><b>本类不是 Spring bean</b>（由门面 `new` 出来）⇒ 触发入口（{@code @EventListener} /
-     * {@code @PreDestroy}）**必须挂在门面** {@link ImService} 上，这里只保留实现。B127 搬迁时
-     * 曾把注解一起搬进来 ⇒ 注解静默失效（渠道不再自动启动、停机不再清理），已在 B128 修回并加
+     * {@code @PreDestroy}）**必须挂在门面** {@link ImService} 上，这里只保留实现。外提时
+     * 曾把注解一起搬进来 ⇒ 注解静默失效（渠道不再自动启动、停机不再清理），已修回并加
      * ArchUnit A13 守卫这类问题。</p>
      */
     public void startChannelsOnReady() {

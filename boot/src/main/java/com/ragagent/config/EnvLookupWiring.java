@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
 /**
- * 向量库 env 族的查找面装配（B6 批 3）。
+ * 向量库 env 族的查找面装配。
  *
  * <p>原先调用方自传 {@code System::getenv}；改为由 Spring {@code Environment} 支撑——
  * 同一批键名（{@code OPENSEARCH_ADDR} / {@code QDRANT_HOST} / {@code MILVUS_ADDRESS} …）

@@ -497,7 +497,7 @@ const loadAuthConfig = async () => {
     registrationEnabled.value = response.registrationMode !== 'invite_only'
     complexPasswordEnabled.value = response.complexPasswordEnabled
     // 版本信号：非 lite 的后端对 /auth/auto-setup 恒 403，盲打只会在控制台留一条
-    // 掩盖真 403 的噪音（B13 残留⑤）。取不到时按 standard 处理（宁可少打一次）。
+    // 掩盖真 403 的噪音。取不到时按 standard 处理（宁可少打一次）。
     editionIsLite.value = response.edition === 'lite'
   } catch {
     registrationEnabled.value = true

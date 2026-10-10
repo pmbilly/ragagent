@@ -8,7 +8,7 @@ import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.common.llm.ToolResult;
 
 /**
- * {@link PipelinePorts.DataAnalysisSessionFactory} 的 agent 侧实现（B109 由 {@code chatpipeline} 搬入）。
+ * {@link PipelinePorts.DataAnalysisSessionFactory} 的 agent 侧实现（由 {@code chatpipeline} 搬入）。
  *
  * <p>原先这个适配器住在 L2 管线里 ⇒ 让 L2 直接依赖 {@code agent.tools.data.DataAnalysisTool}
  * 及其嵌套 record。现在：管线只认自己端口里的 {@code KnowledgeData}/{@code TableSchema}，

@@ -244,7 +244,7 @@ public class ChunkController {
         guard.requireOwnedChunkKbByChunk(chunkId);
         guard.requireKbAccess(guard.kbIdFromChunkParam(chunkId));
         chunkQuestion.deleteGeneratedQuestion(chunkId, questionId);
-        return ApiResponse.ok();   // B196：204 退役
+        return ApiResponse.ok();   // 204 退役 ⇒ 200 + 外壳
     }
 
     // ══════════════════════════ 删除 ══════════════════════════
@@ -261,7 +261,7 @@ public class ChunkController {
         } catch (RuntimeException e) {
             throw new BizException(AppError.internal(errText(e)));
         }
-        return ApiResponse.ok();   // B196：204 退役
+        return ApiResponse.ok();   // 204 退役 ⇒ 200 + 外壳
     }
 
     @DeleteMapping("/api/v1/chunks/{knowledgeId}")
@@ -280,7 +280,7 @@ public class ChunkController {
         } catch (RuntimeException e) {
             throw new BizException(AppError.internal(errText(e)));
         }
-        return ApiResponse.ok();   // B196：204 退役
+        return ApiResponse.ok();   // 204 退役 ⇒ 200 + 外壳
     }
 
     // ══════════════════════════ 共用 ══════════════════════════

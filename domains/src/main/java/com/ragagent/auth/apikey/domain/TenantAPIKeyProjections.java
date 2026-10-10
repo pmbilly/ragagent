@@ -5,7 +5,7 @@ import com.ragagent.common.security.APIKeyCapability;
 import com.ragagent.common.security.APIKeyScopeType;
 
 /**
- * 实体 → 响应投影（B207 迁出）。
+ * 实体 → 响应投影。
  *
  * <p>响应记录 {@link TenantAPIKeyResponse} 已下沉 {@code :common}（纯载荷 ✓，见
  * {@code docs/phase4-module-boundaries-plan.md} §12），而映射需要实体 {@link TenantAPIKey}

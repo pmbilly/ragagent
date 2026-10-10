@@ -268,7 +268,7 @@ class AttachmentContractTest {
         MvcResult r = perform(delete("/api/v1/sessions/" + sid + "/attachments/" + attId)
                 .header("Authorization", bearer));
         assertEquals(200, r.getResponse().getStatus(), raw(r));
-        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(r));   // B193：外壳恒存在
+        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(r));   // 外壳恒存在
 
         MvcResult list = perform(get("/api/v1/sessions/" + sid + "/attachments")
                 .header("Authorization", bearer));

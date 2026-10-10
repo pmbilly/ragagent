@@ -681,7 +681,7 @@ class PipelineLifecycleRecordingTest {
                 + "} ]\n"
                 + "```";
         org.assertj.core.api.Assertions.assertThat(ans).as("entity_format/example_answer").isEqualTo(ansExpected);
-        // B43：形态标准化（标准 Jackson）——期望锚定「本仓标准形态」基线（人工核验）。
+        // 形态标准化（标准 Jackson）——期望锚定「本仓标准形态」基线（人工核验）。
         String renderExpected = "[{\"content\":\"Extract entities and relations for [\\\"person\\\",\\\"org\\\"] from the text.\\n# Examples\\nQ: 张三在 北京大学 工作。\\nA: ```json\\n[ {\\n  \\\"entity\\\" : \\\"张三\\\",\\n  \\\"entity_attributes\\\" : [ \\\"人\\\" ]\\n}, {\\n  \\\"entity\\\" : \\\"北京大学\\\",\\n  \\\"entity_attributes\\\" : [ \\\"组织\\\" ]\\n}, {\\n  \\\"entity1\\\" : \\\"张三\\\",\\n  \\\"entity2\\\" : \\\"北京大学\\\",\\n  \\\"relation\\\" : \\\"works_at\\\"\\n} ]\\n```\\n\",\"images\":null,\"role\":\"system\"},{\"content\":\"# Question\\nQ: 问题正文\\nA: \",\"images\":null,\"role\":\"user\"}]";
         org.assertj.core.api.Assertions.assertThat(json(msgsJSON(qa.render("问题正文"))))
                 .as("entity_format/render").isEqualTo(renderExpected);

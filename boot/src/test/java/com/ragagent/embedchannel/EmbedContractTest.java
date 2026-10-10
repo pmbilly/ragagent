@@ -371,13 +371,13 @@ class EmbedContractTest {
                 .header("X-Embed-Session", "x"), 404, "emb-pub-load-404.json");
         // （emb-pub-load-badvisitor：容器层畸形头拒绝，MockMvc 不重放，A/B 验证）
 
-        // 停止已结束的消息：会话域换锚后是 204（无响应体）
+        // 停止已结束的消息：委托会话域 ⇒ 200 + 统一外壳（204 已退役）
         MvcResult stopped = mockMvc.perform(postJson("/api/v1/embed/" + cid + "/sessions/" + SES_MAIN
                 + "/stop", null, "{\"messageId\":\"" + MSG_DONE + "\"}")
                 .header("Authorization", ea).header("Origin", origin)
                 .header("X-Embed-Session", sigMain)).andReturn();
-        assertEquals(200, stopped.getResponse().getStatus(), raw(stopped));   // B193：委托 session ⇒ 200 + 外壳
-        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(stopped), "204 必须无响应体");   // B193：委托 session ⇒ 外壳
+        assertEquals(200, stopped.getResponse().getStatus(), raw(stopped));   // 委托 session ⇒ 200 + 外壳
+        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(stopped), "外壳恒存在（204 已退役）");
         assertGolden(postJson("/api/v1/embed/" + cid + "/sessions/" + SES_MAIN + "/stop", null,
                 "{\"messageId\":\"b6999999-0000-0000-0000-000000000001\"}")
                 .header("Authorization", ea).header("Origin", origin)
@@ -417,7 +417,7 @@ class EmbedContractTest {
                 null, "{\"suggestionSetId\":\"" + SSET + "\",\"questionId\":\"q1\","
                         + "\"eventType\":\"impression\"}")
                 .header("Authorization", ea).header("Origin", origin)
-                .header("X-Embed-Session", sigMain), 200, "emb-pub-suggestion-events.json");   // B193：委托 session ⇒ 200 + 外壳
+                .header("X-Embed-Session", sigMain), 200, "emb-pub-suggestion-events.json");   // 委托 session ⇒ 200 + 外壳
         assertGolden(postJson("/api/v1/embed/" + cid + "/sessions/" + SES_MAIN + "/suggestion-events",
                 null, "not-json")
                 .header("Authorization", ea).header("Origin", origin)
@@ -560,7 +560,7 @@ class EmbedContractTest {
     private static String jsonPath(MvcResult r, String path) throws Exception {
         com.fasterxml.jackson.databind.JsonNode node =
                 new com.fasterxml.jackson.databind.ObjectMapper().readTree(raw(r));
-                // B200：统一外壳下先下钻 data
+                // 统一外壳下先下钻 data
                 if (node.isObject() && node.has("code") && node.has("data")) { node = node.get("data"); }
         for (String seg : path.split("\\.")) {
             if (node.isArray() && seg.matches("\\d+")) {

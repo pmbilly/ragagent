@@ -40,7 +40,7 @@ class ToolJsonRecordingTest {
         }
     }
 
-    /** 键序铁律：所有层级 map 键按字母序（LLM 载荷的确定性前提，B42 起单独钉住）。 */
+    /** 键序铁律：所有层级 map 键按字母序（LLM 载荷的确定性前提，单独钉住）。 */
     @Test
     void keysAreSortedAlphabetically() {
         JsonNode tree = RecordingSupport.readTree("{\"b\":1,\"a\":{\"d\":2,\"c\":[3]}}");

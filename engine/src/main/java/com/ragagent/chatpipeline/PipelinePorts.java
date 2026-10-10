@@ -176,7 +176,7 @@ public final class PipelinePorts {
     /**
      * 一次数据装载/执行/清理会话。
      *
-     * <p>B109：签名原先直接用 {@code agent.tools.data.DataAnalysisTool} 的嵌套 record ⇒ L2 依赖 L3。
+     * <p>签名原先直接用 {@code agent.tools.data.DataAnalysisTool} 的嵌套 record ⇒ L2 依赖 L3。
      * 现改收本端口自有的三个 record（形状与工具侧一致），由 agent 侧适配器做转换。</p>
      */
     public interface DataAnalysisSession {

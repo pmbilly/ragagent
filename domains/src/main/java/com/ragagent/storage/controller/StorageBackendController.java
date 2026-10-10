@@ -134,13 +134,13 @@ public class StorageBackendController {
     @DeleteMapping("/{id}")
     public ApiResponse<Void> delete(@PathVariable("id") String id) {
         service.delete(tenantId(), id);
-        return ApiResponse.ok();   // B190：204 退役（空体与「外壳恒存在」冲突）
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
     @PutMapping("/{id}/default")
     public ApiResponse<Void> setDefault(@PathVariable("id") String id) {
         service.setDefault(tenantId(), id);
-        return ApiResponse.ok();   // B190：204 退役（空体与「外壳恒存在」冲突）
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
     @PostMapping("/{id}/test")

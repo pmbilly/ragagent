@@ -27,7 +27,7 @@ import com.ragagent.support.ContractJson;
  */
 class KnowledgeQaContractTest {
 
-    private static final Path CONTRACT_DIR = com.ragagent.support.ContractPaths.dir();   // B165：仓库根定位
+    private static final Path CONTRACT_DIR = com.ragagent.support.ContractPaths.dir();   // 仓库根定位
 
     private static final Pattern UUID = Pattern.compile(
             "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");

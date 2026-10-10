@@ -6,11 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 后端源码根（多模块、**仓库根定位**）的单一事实来源 —— B165 起是跨模块测试夹具。
+ * 后端源码根（多模块、**仓库根定位**）的单一事实来源 —— 跨模块测试夹具（testFixtures）。
  *
  * <p>为什么不用相对路径：测试的工作目录是本模块目录，而架构规则要同时扫
- * `server` / `common` / `engine` / `boot` 四个模块；写死 `src/…` + `../common/…`
- * 的写法在测试搬家后立刻失效（B164/B165 实测踩到）。这里从工作目录向上找
+ * `domains` / `common` / `engine` / `boot` 四个模块；写死 `src/…` + `../common/…`
+ * 的写法在测试搬家后立刻失效（实测踩到）。这里从工作目录向上找
  * `settings.gradle.kts` 定位仓库根，再枚举各模块。
  */
 public final class SourceRoots {

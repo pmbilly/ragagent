@@ -215,7 +215,7 @@ public class ModelController {
             throw new BizException(AppError.notFound("Model not found"));
         }
         log.info("Model deleted successfully, ID: {}", id);
-        return ApiResponse.ok();   // B188：204 退役（空体与「外壳恒存在」冲突）
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
     /** 模型提供方列表（Viewer+）；{@code modelType} 支持的取值由 ProviderRegistry 映射。 */

@@ -237,9 +237,10 @@ public final class AgentSuggestedQuestions {
     /**
      * metadata jsonb → generatedQuestions[0].question。
      *
-     * <p>键名 camel（写入侧 {@code DocumentChunkMetadata} 即 camel；B68 修复前这里读的是
+     * <p>键名 camel（写入侧 {@code DocumentChunkMetadata} 即 camel；修复前这里读的是
      * snake {@code generated_questions}，导致推荐问题恒空）。原为兼容历史存量行保留的 snake
-     * 回落**已删**（B144）：那段理由属 B92 已整体作废的"兼容历史数据"类，且回落分支实测不可达。</p>
+     * 回落**已删**：那段理由属已整体作废的"兼容历史数据"类，且回落分支实测不可达
+     * （产品未上线，全库无 snake 存量行）。</p>
      */
     static String firstGeneratedQuestion(String metadata) {
         if (metadata == null || metadata.isEmpty()) {

@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
  * 需求引导走 MCP）。本类只剩三级注入面：元数据目录（Level 1）、完整指令（Level 2）、
  * 附属文件（Level 3）。</p>
  *
- * <p><b>数据源抽象（B57）</b>：由 {@link SkillSource} 列表驱动——入库后生产实现是
+ * <p><b>数据源抽象</b>：由 {@link SkillSource} 列表驱动——入库后生产实现是
  * {@link DbSkillSource}（skills 表）；宿主目录扫描（{@code Loader}）已随“技能入库”退役。
  * 多源时按配置顺序取第一个命中（同名先到先得）。</p>
  *

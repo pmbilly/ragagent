@@ -4,7 +4,7 @@ import { dirname, join } from 'node:path'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
 
-// B63 回归守卫：渠道语言「跟随浏览器/宿主」必须真的跟随。
+// 回归守卫：渠道语言「跟随浏览器/宿主」必须真的跟随。
 // 实锤过的故障：embed 把**渠道默认语言**写进 localStorage（weknora-embed-locale），
 // 之后 resolveInitialEmbedLocale() 永远先读它 → 渠道改回「跟随」后访客仍停在旧语言。
 // 三条不变量：① 派生语言（渠道默认/URL/浏览器）不落持久值；② 跟随模式要清陈旧值；

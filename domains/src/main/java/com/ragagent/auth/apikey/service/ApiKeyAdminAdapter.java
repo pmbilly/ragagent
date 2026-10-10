@@ -14,7 +14,7 @@ import com.ragagent.common.apikey.TenantAPIKeyResponse;
 import com.ragagent.common.security.APIKeyScopeType;
 
 /**
- * {@link ApiKeyAdminPort} 的属主模块实现（B208 ✓）。
+ * {@link ApiKeyAdminPort} 的属主模块实现。
  *
  * <p>原先是 {@code SystemAdminController} 直接调 {@code TenantAPIKeyService} + 自己脱敏 ✗；
  * 现在脱敏与投影都收在这里，调用方只看到 common 载荷 ✓。</p>

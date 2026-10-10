@@ -43,7 +43,7 @@ import com.ragagent.common.web.ApiResult;
  *       授权地址与本次尝试 ID（RBAC：<b>Viewer+</b>）；</li>
  *   <li>{@code GET /mcp-services/{id}/oauth/status} —— 查询授权状态；带
  *       {@code authorizationAttempt} 时只认本次流程（RBAC：<b>Viewer+</b>）；</li>
- *   <li>{@code DELETE /mcp-services/{id}/oauth/token} —— 撤销当前用户的 token，返回 204
+ *   <li>{@code DELETE /mcp-services/{id}/oauth/token} —— 撤销当前用户的 token，成功回 200 + 外壳
  *       （RBAC：<b>Viewer+</b>）；</li>
  *   <li>{@code GET /mcp-oauth/callback} —— <b>公开、无鉴权</b>（授权服务器回跳不带 WeKnora
  *       bearer；靠一次性 state 自证）。该路径已在
@@ -234,7 +234,7 @@ public class McpOAuthController {
 
     // ── 4. 撤销 ────────────────────────────────────────────────────────
 
-    /** 撤销授权：204 + 回收缓存连接，让下一次调用重新走授权。 */
+    /** 撤销授权：200 + 外壳 + 回收缓存连接，让下一次调用重新走授权。 */
     @DeleteMapping("/mcp-services/{id}/oauth/token")
     public ApiResponse<Void> revoke(@PathVariable("id") String serviceId) {
         long tenantId = tenantIdOrZero();
@@ -248,7 +248,7 @@ public class McpOAuthController {
             throw BizException.internal("failed to revoke authorization: " + e.getMessage());
         }
         closeClient(serviceId);
-        return ApiResponse.ok();   // B191：204 退役
+        return ApiResponse.ok();   // 204 退役 ⇒ 200 + 外壳
     }
 
     // ── 5. 会话内 OAuth 挂起 / 取消 ─────────────────────────────────────
@@ -292,7 +292,7 @@ public class McpOAuthController {
         switch (decision) {
             case "cancel", "reject", "skip" -> {
                 resolveGate(approvalGate, tenantId, gateUserId, pendingId, Decision.deny("user canceled"));
-        return ApiResponse.ok();   // B191：204 退役
+        return ApiResponse.ok();   // 204 退役 ⇒ 200 + 外壳
             }
             case "authorize" -> {
                 // 继续往下走
@@ -312,7 +312,7 @@ public class McpOAuthController {
         }
 
         resolveGate(approvalGate, tenantId, gateUserId, pendingId, Decision.allow());
-        return ApiResponse.ok();   // B191：204 退役
+        return ApiResponse.ok();   // 204 退役 ⇒ 200 + 外壳
     }
 
     /**
@@ -330,7 +330,7 @@ public class McpOAuthController {
             throw BizException.internal("OAuth gate is not configured");
         }
         resolveGate(approvalGate, tenantId, gateUserId, pendingId, Decision.deny("user canceled"));
-        return ApiResponse.ok();   // B191：204 退役
+        return ApiResponse.ok();   // 204 退役 ⇒ 200 + 外壳
     }
 
     // ── 内部工具 ───────────────────────────────────────────────────────

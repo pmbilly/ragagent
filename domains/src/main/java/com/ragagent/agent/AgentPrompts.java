@@ -154,7 +154,7 @@ public final class AgentPrompts {
     public record PinnedSkillInfo(String name, String description) {
     }
 
-    /** 本轮 @ 指定的技能正文（B61）：随系统提示词注入，点名场景确定性优先于按需读取。 */
+    /** 本轮 @ 指定的技能正文：随系统提示词注入，点名场景确定性优先于按需读取。 */
     public record PinnedSkillInstructions(String name, String instructions) {
     }
 
@@ -319,11 +319,7 @@ public final class AgentPrompts {
     // ------------------------------------------------------------------
 
     /**
-     * 技能元数据格式化进系统提示词（Level 1 渐进披露）。
-     * 只含名称与描述的轻量表示。
-     */
-    /**
-     * 本轮点名的技能正文块（B61）。与 Level 1 的 {@code Available skills} 目录区分：
+     * 本轮点名的技能正文块。与 Level 1 的 {@code Available skills} 目录区分：
      * 目录是"有哪些技能"，这里是"这次要照做的指令"，因此明确写出 source 与用法。
      */
     public static String formatPinnedSkillInstructions(List<PinnedSkillInstructions> pinned) {
@@ -346,6 +342,10 @@ public final class AgentPrompts {
         return b.toString();
     }
 
+    /**
+     * 技能元数据格式化进系统提示词（Level 1 渐进披露）。
+     * 只含名称与描述的轻量表示。
+     */
     public static String formatSkillsMetadata(List<SkillMetadata> skillsMetadata) {
         if (skillsMetadata == null || skillsMetadata.isEmpty()) {
             return "";

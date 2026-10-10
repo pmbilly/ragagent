@@ -7,7 +7,7 @@ import com.ragagent.common.memory.MemoryItemView;
 import com.ragagent.memory.domain.MemoryItem;
 
 /**
- * 记忆实体 → L1 视图的投影（B106）：跨层出口只输出 {@link MemoryItemView}（id/kind/content），
+ * 记忆实体 → L1 视图的投影：跨层出口只输出 {@link MemoryItemView}（id/kind/content），
  * 实体本身（embedding、衰减、目录亲和等）不出记忆域。
  */
 public final class MemoryViews {

@@ -17,7 +17,7 @@ export const SETTINGS_SECTION_MIN_ROLE: Record<string, SettingsRoleKey> = {
   parser: 'admin',
   storage: 'admin',
   mcp: 'admin',
-  // B60：技能归属空间 → 空间 admin 可管（此前挂在平台 SystemAdmin 集合里）
+  // 技能归属空间 → 空间 admin 可管（此前挂在平台 SystemAdmin 集合里）
   'skill-management': 'admin',
   system: 'viewer',
   userprofile: 'viewer',

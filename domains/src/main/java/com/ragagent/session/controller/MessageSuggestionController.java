@@ -30,7 +30,7 @@ import com.ragagent.common.web.ApiResponse;
  * <ul>
  *   <li>Ensure：裸 {@code MessageSuggestionSet}，集合进入 generating 态时是 <b>202</b>；</li>
  *   <li>Get：同上恒 200；</li>
- *   <li>RecordEvent：<b>204 无响应体</b>。</li>
+ *   <li>RecordEvent：<b>200</b> + {@code ApiResponse} 外壳（无业务数据）。</li>
  * </ul>
  *
  * <h2>writeError 的子串映射（顺序有语义）</h2>
@@ -113,7 +113,7 @@ public class MessageSuggestionController {
     }
 
     /**
-     * 成功是 <b>204 无响应体</b>；
+     * 成功是 <b>200</b> + {@code ApiResponse} 外壳（无业务数据）；
      * 解析失败（含空 body、required 字段缺失）→ 400 固定文案 "invalid request body"。
      */
     @PostMapping("/api/v1/sessions/{sessionId}/suggestion-events")
@@ -141,7 +141,7 @@ public class MessageSuggestionController {
         } catch (RuntimeException e) {
             throw writeError(e);
         }
-        return ApiResponse.ok();   // B193：204 退役（空体与「外壳恒存在」冲突）
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
     /** 请求体键名＝Java 字段名（camelCase）。 */

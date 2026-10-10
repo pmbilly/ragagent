@@ -128,7 +128,7 @@ export async function refreshAccessTokenShared(
   try {
     const response = await refresh(storedRefreshToken)
 
-    // B201：统一外壳后 response 即载荷；旧的 {data,success} 壳也容忍
+    // 统一外壳后 response 即载荷；旧的 {data,success} 壳也容忍
     const data: any = (response as any)?.data ?? response
     if (!data?.token) {
       throw new Error((response as any)?.message || messages.tokenRefreshFailed)

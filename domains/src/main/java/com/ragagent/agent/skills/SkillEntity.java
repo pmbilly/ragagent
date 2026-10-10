@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 /**
- * 技能行（指令型技能入库，B57 起；B60 起为**租户级 + 平台内置层**）。
+ * 技能行（指令型技能入库；**租户级 + 平台内置层**）。
  *
  * <p>{@code content} 是**组装好的 SKILL.md 原文**（frontmatter + 正文），
  * 运行期由 {@link DbSkillSource} 交给 {@link Skill#parseSkillFile(String)} 解析——

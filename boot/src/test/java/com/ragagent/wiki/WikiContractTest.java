@@ -38,12 +38,15 @@ import com.ragagent.support.GoldenContract;
 /**
  * Wiki 契约测试。
  *
- * <p><b>Wiki 端点的响应形态与知识库/MCP 都不同</b>，这是本测试的核心价值：
+ * <p><b>Wiki 的载荷形态与知识库/MCP 都不同</b>，这是本测试的核心价值（统一外壳下
+ * 逐端点钉住载荷形状）：
  * <ul>
- *   <li>页面 CRUD 返回**裸实体**（无 success/data 信封）</li>
- *   <li>列表是自定义分页结构 {@code {"pages":[...],"total":N,"page":N,"pageSize":N,"total_pages":N}}</li>
- *   <li>错误是**纯字符串** {@code {"error":"Wiki page not found"}}（不是 AppError 信封）</li>
- *   <li>403 走路由守卫：{@code {"error":"Forbidden: must own the resource or have the required role"}}</li>
+ *   <li>页面 CRUD 的 data 是**裸实体**（直出实体，不再包一层容器）</li>
+ *   <li>列表 data 是自定义分页结构
+ *       {@code {"pages":[...],"total":N,"page":N,"pageSize":N,"totalPages":N}}</li>
+ *   <li>错误统一走 AppError 信封
+ *       {@code {"code":1003,"message":"Wiki page not found","data":null}}</li>
+ *   <li>403 由路由守卫产生，同走统一外壳（code 1002 + 固定的 must-own 文案）</li>
  * </ul>
  *
  * golden 录自启用了 wiki_enabled 的真实 dev server，掩码 UUID 与时间戳。
@@ -53,7 +56,7 @@ import com.ragagent.support.GoldenContract;
 class WikiContractTest {
 
 
-    /** B202：统一外壳下钻 —— 返回 data 的紧凑 JSON（序保持 ✓）；非外壳原样返回。 */
+    /** 统一外壳下钻：返回 data 的紧凑 JSON（序保持 ✓）；非外壳原样返回。 */
     private static String payload(String body) {
         try {
             var root = new com.fasterxml.jackson.databind.ObjectMapper().readTree(body);
@@ -157,7 +160,7 @@ class WikiContractTest {
         String token = login("java-phase1@weknora.test");
         String base = "/api/v1/knowledgebase/" + kbId + "/wiki";
 
-        // 1. create → 裸实体，掩码比对（钉住字段序与键名）
+        // 1. create → golden 掩码比对（钉住字段序与键名；data 直出裸实体）
         MvcResult created = mockMvc.perform(post(base + "/pages")
                         .header("Authorization", "Bearer " + token)
                         .contentType("application/json")
@@ -168,8 +171,8 @@ class WikiContractTest {
                 .andReturn();
         String createdBody = created.getResponse().getContentAsString(StandardCharsets.UTF_8);
         assertEquals(goldenChecked("wiki-page-create.json", createdBody), mask(createdBody),
-                "create 应返回裸实体且与 golden 一致（掩码后）");
-        assertFalse(createdBody.contains("\"success\""), "wiki 响应无 success/data 信封: " + createdBody);
+                "create 应与 golden 一致（掩码后；data 直出裸实体）");
+        assertFalse(createdBody.contains("\"success\""), "wiki 响应无 success 键: " + createdBody);
 
         // 2. list → 自定义分页结构
         MvcResult list = mockMvc.perform(get(base + "/pages")
@@ -178,26 +181,26 @@ class WikiContractTest {
                 .andReturn();
         String listBody = list.getResponse().getContentAsString(StandardCharsets.UTF_8);
         assertTrue(list.getResponse().getContentAsString(StandardCharsets.UTF_8).contains("\"data\""),
-                "list 应带统一外壳（B202）：" + listBody);
-        listBody = payload(listBody);   // B202：外壳下钻
+                "list 应带统一外壳：" + listBody);
+        listBody = payload(listBody);   // 外壳下钻
         for (String key : new String[]{"\"pages\"", "\"total\"", "\"page\"", "\"pageSize\"", "\"totalPages\""}) {
             assertTrue(listBody.contains(key), "list 应含分页键 " + key + ": " + listBody);
         }
         assertFalse(listBody.contains("\"code\""), "下钻后 listBody 应为载荷（无 code 键）: " + listBody);
 
-        // 3. get → 裸实体
+        // 3. get → 200（载荷形态由 golden 与 WikiHttpContractTest 覆盖）
         mockMvc.perform(get(base + "/pages/golden-page")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
 
-        // 4. 404 → 纯字符串错误（逐字节）
+        // 4. 404 → 统一外壳错误体（逐字节）
         MvcResult gb1 = mockMvc.perform(get(base + "/pages/no-such-page")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isNotFound())
             .andReturn();
         assertGolden(gb1, "wiki-page-not-found.json");
 
-        // 5. update → 裸实体 + version 自增
+        // 5. update → 掩码比对（含 version 自增）
         MvcResult updated = mockMvc.perform(put(base + "/pages/golden-page")
                         .header("Authorization", "Bearer " + token)
                         .contentType("application/json")
@@ -210,7 +213,7 @@ class WikiContractTest {
         assertEquals(goldenChecked("wiki-page-update.json", updatedBody), mask(updatedBody),
                 "update 应与 golden 一致（掩码后，含 version=2）");
 
-        // 6. revisions → {revisions,total,current_version}
+        // 6. revisions → {revisions,total,currentVersion}
         MvcResult revs = mockMvc.perform(get(base + "/revisions/golden-page")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
@@ -228,7 +231,7 @@ class WikiContractTest {
         String token = login("java-phase1@weknora.test");
         String base = "/api/v1/knowledgebase/" + kbId + "/wiki";
 
-        // 空列表 → 逐字节（{"parent_id":"","folders":[]}）
+        // 空列表 → 逐字节 golden（data = {"folders":[],"parentId":""}）
         MvcResult gb2 = mockMvc.perform(get(base + "/folders").header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
             .andReturn();
@@ -255,27 +258,27 @@ class WikiContractTest {
             assertTrue(idx.contains(key), "index 应含 " + key + ": " + idx);
         }
 
-        // graph → {nodes:[{slug,title,page_type,link_count}],edges,meta:{mode,total}}
+        // graph → {nodes:[{slug,title,pageType,linkCount}],edges,meta:{mode,total}}
         String graph = body(get(base + "/graph"), token);
         for (String key : new String[]{"\"nodes\"", "\"slug\"", "\"linkCount\"", "\"meta\"", "\"mode\""}) {
             assertTrue(graph.contains(key), "graph 应含 " + key + ": " + graph);
         }
 
-        // stats → {total_pages,pages_by_type,total_links,orphan_count,recent_updates}
+        // stats → {totalPages,pagesByType,totalLinks,orphanCount,recentUpdates}
         String stats = body(get(base + "/stats"), token);
         for (String key : new String[]{"\"totalPages\"", "\"pagesByType\"", "\"totalLinks\"",
                 "\"orphanCount\"", "\"recentUpdates\""}) {
             assertTrue(stats.contains(key), "stats 应含 " + key + ": " + stats);
         }
 
-        // lint → {knowledge_base_id,issues:[{type,severity,page_slug,description}]}
+        // lint → {knowledgeBaseId,issues:[{type,severity,pageSlug,description}]}
         String lint = body(get(base + "/lint"), token);
         assertTrue(lint.contains("\"issues\"") && lint.contains("\"knowledgeBaseId\""),
                 "lint 形态: " + lint);
 
-        // issues → 裸数组（无信封）
+        // issues → data 里是裸数组
         String issues = body(get(base + "/issues"), token);
-        issues = payload(issues);   // B202：外壳下钻（裸数组断言看载荷）
+        issues = payload(issues);   // 外壳下钻（裸数组断言看载荷）
         assertTrue(issues.trim().startsWith("["), "issues 应为裸数组: " + issues);
     }
 
@@ -348,7 +351,7 @@ class WikiContractTest {
     }
 
     private static String golden(String name) throws Exception {
-        // PR4 语义比较：键序/HTML 转义归一后返回（非 JSON 文本原样），断言侧不变
+        // 语义比较：键序/HTML 转义归一后返回（非 JSON 文本原样），断言侧不变
         var resource = new org.springframework.core.io.ClassPathResource("contracts/" + name);
         if (!resource.exists()) {
             resource = new org.springframework.core.io.ClassPathResource("contracts/" + name + ".json");
@@ -369,7 +372,7 @@ class WikiContractTest {
     }
 
     private static String mask(String s) {
-        // PR4 语义比较入口：键序/转义归一后再掩码
+        // 语义比较入口：键序/转义归一后再掩码
         s = ContractJson.semantic(s);
         String out = UUID_KEY_PATTERN.matcher(s).replaceAll("\"$1\":\"<id>\"");
         out = TS_PATTERN.matcher(out).replaceAll("\"<ts>\"");

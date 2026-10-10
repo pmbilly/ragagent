@@ -29,12 +29,11 @@ import java.util.Map;
  * <h2>未知实体行为一致</h2>
  * <p>对表里没有的名字，本实现原样返回（与参照实现的 {@code UnescapeString("&foo;")} 行为一致）
  * ——分叉只发生在"参照认识、本表没有"的那部分。</p>
- */
-/**
- * <p>B113 由 {@code datasource.connector.rss} 迁入 L1：本类与
+ *
+ * <p>由 {@code datasource.connector.rss} 迁入 L1：本类与
  * {@link JdkHtmlToMarkdown} 同为零域依赖的 HTML 工具，被 RSS 连接器与
  * {@code webfetch} 两侧共用；留在 {@code datasource} 会让 {@code webfetch}
- * 为了一个实体表而依赖整个 datasource 业务域（B113 实测：该边本来就在，
+ * 为了一个实体表而依赖整个 datasource 业务域（实测：该边本来就在，
  * 只是写成了内联全限定名，图里看不见）。</p>
  */
 public final class HtmlEntities {

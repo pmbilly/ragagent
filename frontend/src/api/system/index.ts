@@ -250,7 +250,7 @@ export async function getStorageEngineConfig(): Promise<{ data: StorageEngineCon
   return { data: resp }
 }
 
-// 注：KV 存储引擎配置的**写入**面随 StorageEngineSettings.vue 一起退役（B13 残留④）——
+// 注：KV 存储引擎配置的**写入**面随 StorageEngineSettings.vue 一起退役——
 // 提供者凭据/连通性/默认走 storage-backends 行；读面（getStorageEngineConfig）仍由
 // 编辑器资源 store 使用，故保留。
 

@@ -3,7 +3,7 @@ package com.ragagent.common.web;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
- * 统一响应外壳（B183 起；约定见 {@code docs/api-response-convention.md}）。
+ * 统一响应外壳（约定见 {@code docs/api-response-convention.md}）。
  *
  * <p>形态固定为 {@code {"code": 0, "message": "ok", "data": …}}：</p>
  * <ul>
@@ -50,7 +50,7 @@ public record ApiResponse<T>(int code, String message, T data) {
      * <p>返回 {@code ApiResponse<Void>} 与 {@link #ok()} / {@link #ok(Object)} 对称 ——
      * 可直接塞进声明为 {@code ResponseEntity<ApiResponse<Void>>} 的 handler ✓
      * （早先返回 {@code ApiResponse<Object>} 会逼出 {@code ApiResponse.<Void>fail(code, msg, null)}
-     * 这种显式泛型写法 ✗，B202 实测栽过一次 ✓）。带明细时用 {@link #fail(int, String, Object)} ✓。</p>
+     * 这种显式泛型写法 ✗，实测栽过一次 ✓）。带明细时用 {@link #fail(int, String, Object)} ✓。</p>
      */
     public static ApiResponse<Void> fail(int code, String message) {
         return new ApiResponse<>(code, message == null ? "" : message, null);

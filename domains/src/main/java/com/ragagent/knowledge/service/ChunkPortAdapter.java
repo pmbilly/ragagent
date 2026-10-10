@@ -17,10 +17,10 @@ import com.ragagent.retrieval.support.ImageInfoEnricher;
 import com.ragagent.common.knowledge.ChunkFacts;
 
 /**
- * {@link ChunkPort} 的 knowledge 侧实现（B98/C2）。
+ * {@link ChunkPort} 的 knowledge 侧实现。
  *
- * <p>{@link #view}/{@link #viewAll} 同时作为域内"实体 → L1 视图"的公用投影（B110：
- * {@code KnowledgeSummaryService} 调 {@code common.retrieval.SearchChunkMerge} 时复用）。
+ * <p>{@link #view}/{@link #viewAll} 同时作为域内"实体 → L1 视图"的公用投影
+ * （{@code KnowledgeSummaryService} 调 {@code common.retrieval.SearchChunkMerge} 时复用）。
  *
  * <p>四个方法的过滤条件/降级姿态与迁移前的 wiki 侧实现<b>逐字一致</b>：
  * {@code textChunks} 来自 {@code WikiIngestBatchHandler}、{@code chunksByIds} 来自
@@ -93,7 +93,7 @@ public class ChunkPortAdapter implements ChunkPort {
     }
 
     /**
-     * 实体 → L1 **facts** 投影（{@link ChunkFacts}，16 字段；B114 起作为"实体→facts"的
+     * 实体 → L1 **facts** 投影（{@link ChunkFacts}，16 字段；作为"实体→facts"的
      * 域内公用投影，供 chat 管线的 {@code PipelinePorts.ChunkRepository} 装配点复用，
      * 避免映射逻辑两处漂移）。仅带调用方真正读取的字段。
      */

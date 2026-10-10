@@ -14,8 +14,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * 提示词模板目录，供 {@code GET /api/v1/tenants/kv/prompt-templates} 消费。
  *
- * <p>B111 由 {@code agent} 域迁入 L1：本类 {@code com.ragagent.*} import 实测为 0
- * （纯 classpath 装载器 + Jackson 序列化），却只被 {@code auth} 消费 ⇒ 放在 agent 域
+ * <p>由 {@code agent} 域迁入 L1：本类除 {@code common.web.JsonMappers} 外无任何 {@code com.ragagent.*}
+ * 依赖（纯 classpath 装载器 + Jackson 序列化），却只被 {@code auth} 消费 ⇒ 放在 agent 域
  * 会让 {@code auth → agent} 平白多一条边（8 域间接环的源头之一）。</p>
  *
  * <p>模板文件 vendored 到 classpath {@code agent/management/prompt_templates/}，

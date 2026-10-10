@@ -3,7 +3,7 @@ package com.ragagent.common.knowledge;
 import java.util.List;
 
 /**
- * chunk 访问端口（B98/C2）：wiki ingest 对 chunk 的<b>读取、删除与图片富化</b>。
+ * chunk 访问端口：wiki ingest 对 chunk 的<b>读取、删除与图片富化</b>。
  *
  * <p>实现留在 {@code knowledge} 侧（{@code ChunkMapper}/{@code ChunkRepository}/
  * {@code ImageInfoEnricher}），过滤条件与迁移前的 wiki 直查逐字一致。</p>

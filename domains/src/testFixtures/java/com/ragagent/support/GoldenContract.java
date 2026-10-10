@@ -7,7 +7,7 @@ import java.util.function.UnaryOperator;
 import org.junit.jupiter.api.Assertions;
 
 /**
- * 契约金片对比的<b>共享基建</b>（B2，§15）——把各契约测试各自为政的
+ * 契约金片对比的<b>共享基建</b>（§15）——把各契约测试各自为政的
  * 「读夹具 + 掩码 + 断言 + {@code -Dcontract.refresh=true} 重录」四件套收拢为一份。
  *
  * <h2>对比语义</h2>
@@ -44,7 +44,7 @@ public final class GoldenContract {
      */
     public static void assertEquals(String contractsDir, String name,
             UnaryOperator<String> mask, String actual) throws Exception {
-        Path file = ContractPaths.resolveIn(contractsDir, name);   // B165：仓库根定位
+        Path file = ContractPaths.resolveIn(contractsDir, name);   // 仓库根定位
         String maskedActual = mask.apply(actual);
         if (REFRESH) {
             Files.writeString(file, maskedActual + "\n");

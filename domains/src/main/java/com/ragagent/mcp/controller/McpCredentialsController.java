@@ -106,7 +106,7 @@ public class McpCredentialsController {
     /**
      * 删除单个凭据字段。可识别的字段只有 {@code apiKey} 与 {@code token}（路径值与
      * JSON 键同为 camelCase——它镜像的是响应里 credentials 映射的键名）；
-     * 成功返回 204（即使该字段本来就是空的——幂等）— Admin+。
+     * 成功回 200 + {@code ApiResponse} 外壳（即使该字段本来就是空的——幂等）— Admin+。
      */
     @DeleteMapping("/{id}/credentials/{field}")
     public ApiResponse<Void> deleteField(@PathVariable("id") String id,
@@ -124,7 +124,7 @@ public class McpCredentialsController {
             log.error("failed to clear credential, service_id={}, field={}", serviceId, field, e);
             throw BizException.internal("failed to clear credential: " + rawMessage(e));
         }
-        return ApiResponse.ok();   // B191：204 退役
+        return ApiResponse.ok();   // 204 退役 ⇒ 200 + 外壳
     }
 
     /** 判定"已配置"：配置非 null 且对应字段非空串 */

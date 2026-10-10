@@ -210,7 +210,7 @@ public class WebSearchProviderController {
             log.warn("Failed to delete web search provider {}: {}", id, e.getMessage());
             throw BizException.internal(e.getMessage());
         }
-        return ApiResponse.ok();   // B190：204 退役（空体与「外壳恒存在」冲突）
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
     // ── POST /{id}/test（Admin+）：已存 provider 连通性 ─────────────────

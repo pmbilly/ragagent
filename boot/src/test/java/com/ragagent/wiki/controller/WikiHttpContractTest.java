@@ -59,7 +59,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 class WikiHttpContractTest {
 
 
-    /** B202：统一外壳下钻 —— 返回 data 的紧凑 JSON（序保持 ✓）；非外壳原样返回。 */
+    /** 统一外壳下钻：返回 data 的紧凑 JSON（序保持 ✓）；非外壳原样返回。 */
     private static String payload(String body) {
         try {
             var root = new com.fasterxml.jackson.databind.ObjectMapper().readTree(body);
@@ -211,8 +211,8 @@ class WikiHttpContractTest {
     }
 
     /**
-     * 被拒的读走<b>全局错误信封</b>（由全局 ErrorHandler 产生），
-     * 与 handler 直写的 {@code {"error":"..."}} 形态不同。
+     * 被拒的读走<b>全局错误信封</b>（由全局 ErrorHandler 产生，code=1002），
+     * 与 handler 直写文案的形态（如 wiki 未启用的 400）不同。
      */
     @Test
     void crossTenantKbDenialUsesGlobalErrorEnvelope() throws Exception {
@@ -220,9 +220,9 @@ class WikiHttpContractTest {
         String body = body(perform(get("/api/v1/knowledgebase/" + KB_FOREIGN + "/wiki/pages")
                 .header("Authorization", "Bearer " + token)));
 
-        assertTrue(body.startsWith("{\"code\":1002,\"message\":\""),   // B202：统一外壳
+        assertTrue(body.startsWith("{\"code\":1002,\"message\":\""),   // 统一外壳
                 "跨空间拒绝必须是统一错误体：" + body);
-        assertTrue(body.endsWith("\"data\":null}"), body);   // B202：外壳尾部
+        assertTrue(body.endsWith("\"data\":null}"), body);   // 外壳尾部
         assertTrue(body.contains("Permission denied to access this knowledge base"), body);
     }
 
@@ -287,12 +287,12 @@ class WikiHttpContractTest {
                 .header("Authorization", "Bearer " + token));
 
         assertEquals(400, r.getResponse().getStatus(), body(r));
-        assertEquals("{\"code\":1000,\"message\":\"error code: 400, error message: Wiki feature is not enabled for this knowledge base\",\"data\":null}", body(r));   // B202：统一外壳
+        assertEquals("{\"code\":1000,\"message\":\"error code: 400, error message: Wiki feature is not enabled for this knowledge base\",\"data\":null}", body(r));   // 统一外壳
     }
 
     // ══════════════════════════════ 页面 CRUD ══════════════════════════════
 
-    /** ListPages：<b>结构体直出</b>（无 data 信封），字段序 = 响应结构体声明序。 */
+    /** ListPages：data 里是<b>结构体直出</b>的分页载荷，字段序 = 响应结构体声明序。 */
     @Test
     void listPagesReturnsStructOrderWithoutEnvelope() throws Exception {
         String token = loginOwner();
@@ -300,7 +300,7 @@ class WikiHttpContractTest {
 
         String body = body(perform(get("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/pages")
                 .header("Authorization", "Bearer " + token)));
-        body = payload(body);   // B202：外壳下钻（形状/序断言看载荷）
+        body = payload(body);   // 外壳下钻（形状/序断言看载荷）
 
         assertTrue(body.startsWith("{\"pages\":["), body);
         int iPages = body.indexOf("\"pages\"");
@@ -309,7 +309,7 @@ class WikiHttpContractTest {
         int iPageSize = body.indexOf("\"pageSize\"");
         int iTotalPages = body.indexOf("\"totalPages\"");
         assertTrue(iPages < iTotal && iTotal < iPage && iPage < iPageSize && iPageSize < iTotalPages,
-                "字段序必须是 pages,total,page,page_size,total_pages：" + body);
+                "字段序必须是 pages,total,page,pageSize,totalPages：" + body);
         assertFalse(body.contains("\"success\""), "不应该是 data 信封：" + body);
     }
 
@@ -327,7 +327,7 @@ class WikiHttpContractTest {
         assertFalse(body.contains("concept/rag"), body);
     }
 
-    /** CreatePage → 201，响应是裸实体（键序 = 实体声明序）。 */
+    /** CreatePage → 201，data 里是裸实体（键序 = 实体声明序）。 */
     @Test
     void createPageReturns201EntityInDeclarationOrder() throws Exception {
         String token = loginOwner();
@@ -339,7 +339,7 @@ class WikiHttpContractTest {
 
         assertEquals(201, r.getResponse().getStatus(), body(r));
         String body = body(r);
-        body = payload(body);   // B202：外壳下钻（形状/序断言看载荷）
+        body = payload(body);   // 外壳下钻（形状/序断言看载荷）
         assertFalse(body.contains("\"success\""), "实体直出不得带 data/success 信封：" + body);
         int iId = body.indexOf("\"id\":\"");
         int iTenant = body.indexOf("\"tenantId\":");
@@ -463,8 +463,8 @@ class WikiHttpContractTest {
 
         MvcResult del = perform(delete("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/pages/entity/acme")
                 .header("Authorization", "Bearer " + token));
-        assertEquals(200, del.getResponse().getStatus(), body(del));   // B202：204 退役 ⇒ 200 + 外壳
-        assertEquals("{\"code\":0,\"message\":\"ok\",\"data\":null}", body(del));   // B202：200 + 外壳
+        assertEquals(200, del.getResponse().getStatus(), body(del));   // 204 退役 ⇒ 200 + 外壳
+        assertEquals("{\"code\":0,\"message\":\"ok\",\"data\":null}", body(del));   // 200 + 外壳
 
         assertEquals(404, status(get("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/pages/entity/acme")
                 .header("Authorization", "Bearer " + token)));
@@ -481,12 +481,12 @@ class WikiHttpContractTest {
 
         String body = body(perform(get("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/revisions/entity/acme")
                 .header("Authorization", "Bearer " + token)));
-        body = payload(body);   // B202：外壳下钻（形状断言看载荷）
+        body = payload(body);   // 外壳下钻（形状断言看载荷）
         int iRev = body.indexOf("\"revisions\"");
         int iTotal = body.indexOf("\"total\"");
         int iCur = body.indexOf("\"currentVersion\"");
         assertTrue(iRev == 1 && iRev < iTotal && iTotal < iCur,
-                "字段序必须是 revisions,total,current_version：" + body);
+                "字段序必须是 revisions,total,currentVersion：" + body);
         assertTrue(body.contains("\"currentVersion\":2"), body);
         assertTrue(body.contains("\"total\":1"), body);
     }
@@ -566,7 +566,7 @@ class WikiHttpContractTest {
                 .content("{}"));
 
         assertEquals(400, r.getResponse().getStatus(), body(r));
-                assertEquals("{\"code\":1000,\"message\":\"Invalid request body: field 'slug' is required\\nfield 'version' is required\",\"data\":null}", body(r));   // B202：统一外壳
+                assertEquals("{\"code\":1000,\"message\":\"Invalid request body: field 'slug' is required\\nfield 'version' is required\",\"data\":null}", body(r));   // 统一外壳
     }
 
     // ══════════════════════════════ 移动 / 文件夹 ══════════════════════════════
@@ -634,10 +634,10 @@ class WikiHttpContractTest {
         assertEquals(200, renamed.getResponse().getStatus(), body(renamed));
         assertTrue(body(renamed).contains("\"name\":\"人工智能\""), body(renamed));
 
-        // 空文件夹可删 → 204
+        // 空文件夹可删（204 已退役 ⇒ 200 + 外壳）
         MvcResult del = perform(delete("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/folders/" + folderId)
                 .header("Authorization", "Bearer " + token));
-        assertEquals(200, del.getResponse().getStatus(), body(del));   // B202：204 退役 ⇒ 200 + 外壳
+        assertEquals(200, del.getResponse().getStatus(), body(del));   // 204 退役 ⇒ 200 + 外壳
 
         // 未知文件夹 → 404
         MvcResult missing = perform(delete("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/folders/nope")
@@ -673,7 +673,7 @@ class WikiHttpContractTest {
 
         String body = body(perform(get("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/folders")
                 .header("Authorization", "Bearer " + token)));
-        body = payload(body);   // B202：外壳下钻（形状/序断言看载荷）
+        body = payload(body);   // 外壳下钻（形状/序断言看载荷）
         assertTrue(body.startsWith("{\"parentId\":\"\",\"folders\":["), body);
         assertTrue(body.contains("\"name\":\"AI\""), body);
         assertTrue(body.contains("\"path\":\"AI\""), body);
@@ -684,7 +684,7 @@ class WikiHttpContractTest {
         String children = body(perform(get("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/folders")
                 .param("parentId", parent)
                 .header("Authorization", "Bearer " + token)));
-        children = payload(children);   // B202：外壳下钻（形状/序断言看载荷）
+        children = payload(children);   // 外壳下钻（形状/序断言看载荷）
         assertTrue(children.contains("\"name\":\"LLM\""), children);
         assertTrue(children.contains("\"hasChildren\":false"), children);
     }
@@ -699,7 +699,7 @@ class WikiHttpContractTest {
 
         String body = body(perform(get("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/index")
                 .header("Authorization", "Bearer " + token)));
-        body = payload(body);   // B202：外壳下钻（形状/序断言看载荷）
+        body = payload(body);   // 外壳下钻（形状/序断言看载荷）
         int iIntro = body.indexOf("\"intro\"");
         int iVersion = body.indexOf("\"version\"");
         int iGroups = body.indexOf("\"groups\"");
@@ -751,7 +751,7 @@ class WikiHttpContractTest {
 
         String body = body(perform(get("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/graph")
                 .header("Authorization", "Bearer " + token)));
-        body = payload(body);   // B202：外壳下钻（形状/序断言看载荷）
+        body = payload(body);   // 外壳下钻（形状/序断言看载荷）
         assertTrue(body.startsWith("{\"nodes\":["), body);
         assertTrue(body.contains("\"mode\":\"overview\""), body);
         assertTrue(body.contains("\"slug\":\"entity/acme\""), body);
@@ -766,7 +766,7 @@ class WikiHttpContractTest {
 
         String body = body(perform(get("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/stats")
                 .header("Authorization", "Bearer " + token)));
-        body = payload(body);   // B202：外壳下钻（形状/序断言看载荷）
+        body = payload(body);   // 外壳下钻（形状/序断言看载荷）
         assertTrue(body.startsWith("{\"totalPages\":1"), body);
         int iPages = body.indexOf("\"totalPages\"");
         int iByType = body.indexOf("\"pagesByType\"");
@@ -811,7 +811,7 @@ class WikiHttpContractTest {
 
         String report = body(perform(get("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/lint")
                 .header("Authorization", "Bearer " + token)));
-        report = payload(report);   // B202：外壳下钻（形状/序断言看载荷）
+        report = payload(report);   // 外壳下钻（形状/序断言看载荷）
         int iKb = report.indexOf("\"knowledgeBaseId\"");
         int iIssues = report.indexOf("\"issues\"");
         int iScore = report.indexOf("\"healthScore\"");
@@ -822,20 +822,20 @@ class WikiHttpContractTest {
 
         String fix = body(perform(post("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/auto-fix")
                 .header("Authorization", "Bearer " + token)));
-        fix = payload(fix);   // B202：外壳下钻（形状/序断言看载荷）
+        fix = payload(fix);   // 外壳下钻（形状/序断言看载荷）
         // 响应键按字母序：fixed < message
         assertTrue(fix.startsWith("{\"fixed\":"), fix);
         assertTrue(fix.contains("\"message\":\"Auto-fixed "), fix);
     }
 
-    /** ListIssues 是<b>裸数组</b>（不是 data 信封、也不是 {pages:...}）。 */
+    /** ListIssues 的 data 是<b>裸数组</b>（不是 {pages:...} 包裹的载荷）。 */
     @Test
     void listIssuesReturnsBareArray() throws Exception {
         String token = loginOwner();
         MvcResult r = perform(get("/api/v1/knowledgebase/" + KB_WIKI + "/wiki/issues")
                 .header("Authorization", "Bearer " + token));
         assertEquals(200, r.getResponse().getStatus(), body(r));
-        assertTrue(payload(body(r)).startsWith("["), body(r));   // B202：外壳下钻
+        assertTrue(payload(body(r)).startsWith("["), body(r));   // 外壳下钻
     }
 
     @Test
@@ -862,7 +862,7 @@ class WikiHttpContractTest {
                 .contentType("application/json")
                 .content("{\"status\":\"ignored\"}"));
         assertEquals(200, ok.getResponse().getStatus(), body(ok));
-        assertEquals("{\"code\":0,\"message\":\"ok\",\"data\":{\"message\":\"Issue status updated successfully\"}}", body(ok));   // B202：统一外壳
+        assertEquals("{\"code\":0,\"message\":\"ok\",\"data\":{\"message\":\"Issue status updated successfully\"}}", body(ok));   // 统一外壳
     }
 
     // ══════════════════════════════ 测试工具 ══════════════════════════════

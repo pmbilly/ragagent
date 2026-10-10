@@ -153,7 +153,7 @@ class OidcContractTest {
         env.put("location", r.getResponse().getHeader("Location"));
         env.put("set_cookie", setCookie);
         env.put("status", 302);
-        // B201：统一外壳 —— 302 分支的「合成信封」整体进 data；语义比较避免键序/空白差异
+        // 统一外壳 —— 302 分支的「合成信封」整体进 data；语义比较避免键序/空白差异
         Map<String, Object> outer = new LinkedHashMap<>();
         outer.put("code", 0);
         outer.put("message", "ok");

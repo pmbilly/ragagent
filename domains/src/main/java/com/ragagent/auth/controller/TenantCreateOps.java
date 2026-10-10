@@ -173,7 +173,8 @@ final class TenantCreateOps {
         if (!platformCaller && service.systemSettingService.getBool(
                 "tenant.auto_create_api_key", "WEKNORA_TENANT_AUTO_CREATE_API_KEY", false)) {
             try {
-                String token = service.apiKeyAdmin.createDefaultTenantKey(created.getId());   // B208：走管理口 ✓
+                // 走管理口 ✓
+                String token = service.apiKeyAdmin.createDefaultTenantKey(created.getId());
                 data = tenantWithApiKey(created, token);
             } catch (RuntimeException e) {
                 log.warn("[tenant] auto-create default API key failed for tenant {}: {}",

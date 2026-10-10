@@ -37,11 +37,11 @@ import com.ragagent.common.web.ApiResult;
  * 组合……）。拆成字段会造出"配了一半、根本认证不了"的中间态，所以这里只有一个
  * {@code "credentials"}：PUT 整张替换、DELETE 整张清空。</p>
  *
- * <h2>错误形态（B189 起与 {@link DataSourceController} <b>一致</b>）</h2>
+ * <h2>错误形态（与 {@link DataSourceController} <b>一致</b>）</h2>
  * <p>两者都走<b>统一响应外壳</b> {@code {code,message,data}}（{@code @ApiResult} + 全局处理器），
  * 见 {@code docs/api-response-convention.md}。</p>
  * <p>退役记录：此前本类回 AppError 信封 {@code {"error":{…}}}、那边回纯字符串 {@code {"error":"…"}}，
- * 且文档写着"两种形态并存是有意为之，别统一" —— 那是 Go 迁移期产物 ✗；B188/B189 已统一
+ * 且文档写着"两种形态并存是有意为之，别统一" —— 那是 Go 迁移期产物 ✗；现已统一
  * （那边的纯字符串助手改为恒抛 {@code BizException}，本类的 code/details 语义不变）。</p>
  */
 @RestController
@@ -106,7 +106,8 @@ public class DataSourceCredentialsController {
     /**
      * 只认 {@code "credentials"} 这一个字段名。
      *
-     * <p>清空成功是 <b>204</b>；service 报错落 500（不是 400）——与 PUT 的映射刻意不同。</p>
+     * <p>清空成功回 200 + {@code ApiResponse} 外壳；service 报错落 500（不是 400）
+     * ——与 PUT 的映射刻意不同。</p>
      */
     @DeleteMapping("/api/v1/datasource/{id}/credentials/{field}")
     public ApiResponse<Void> deleteField(@PathVariable("id") String id,
@@ -122,7 +123,7 @@ public class DataSourceCredentialsController {
             throw new BizException(AppError.internal(
                     "failed to clear credentials: " + e.getMessage()));
         }
-        return ApiResponse.ok();   // B189：204 退役
+        return ApiResponse.ok();   // 204 退役 ⇒ 200 + 外壳
     }
 
     // ══════════════════════════ 归属判定 ══════════════════════════

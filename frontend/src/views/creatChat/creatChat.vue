@@ -190,7 +190,7 @@ const sendMsg = (value: string, modelId: string, mentionedItems: any[], imageFil
 }
 
 async function createNewSession(value: string, modelId: string, mentionedItems: any[] = [], imageFiles: any[] = [], attachmentFiles: any[] = []) {
-    // CreateSessionRequest 只收 title/description（B72 核实）；知识库选择随 QA 请求下发，
+    // CreateSessionRequest 只收 title/description；知识库选择随 QA 请求下发，
     // 此处曾拼 agent_config 整键被后端静默丢弃（Session 的 agent_config 列已改服务端自管）
     try {
         const res: any = await createSessions({});

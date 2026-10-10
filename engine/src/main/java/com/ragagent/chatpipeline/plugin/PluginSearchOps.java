@@ -324,7 +324,7 @@ final class PluginSearchOps {
 
         // 租户级 web 配置（ctx 里的租户信息；Java 侧从 TenantContext 取，探针/装配期可注入）
         WebSearchConfig tenantCfg = currentTenantWebSearchConfig();
-        // 先 copy：agent 级覆写绝不能改到租户配置缓存里的同一个对象（B106）
+        // 先 copy：agent 级覆写绝不能改到租户配置缓存里的同一个对象
         WebSearchConfig webConfig = tenantCfg == null ? null : tenantCfg.copy();
 
         // agent 级覆写

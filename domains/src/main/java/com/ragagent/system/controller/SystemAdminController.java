@@ -208,7 +208,7 @@ public class SystemAdminController {
                 "target_email", user.getEmail(),
                 "target_username", user.getUsername(),
                 "sessions_revoked", true));
-        return ApiResponse.ok();   // B192：204 退役（空体与「外壳恒存在」冲突）
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
     /** 创建用户请求（username 2-50 字符；password 缺省/为 null 时服务端生成）。 */
@@ -260,7 +260,7 @@ public class SystemAdminController {
 
     @GetMapping("/api-keys")
     public ResponseEntity<List<TenantAPIKeyResponse>> listPlatformKeys() {
-        return ResponseEntity.ok(apiKeyAdmin.listPlatformMasked());   // B208：脱敏在 port 实现侧 ✓
+        return ResponseEntity.ok(apiKeyAdmin.listPlatformMasked());   // 脱敏在 port 实现侧 ✓
     }
 
     @PostMapping("/api-keys")
@@ -282,7 +282,7 @@ public class SystemAdminController {
         }
         TenantAPIKeyCreateResponse created = apiKeyAdmin.createPlatformMasked(req.name().trim(), normalized, expiresAt);
         emitAPIKeyAudit(AuditAction.SYSTEM_API_KEY_CREATED, created.id(), created.capabilities());
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);   // B208：脱敏/投影在 port 实现侧 ✓
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);   // 脱敏/投影在 port 实现侧
     }
 
     @DeleteMapping("/api-keys/{keyId}")
@@ -302,7 +302,7 @@ public class SystemAdminController {
             throw new BizException(AppError.notFound("Platform API key not found"));
         }
         emitAPIKeyAudit(AuditAction.SYSTEM_API_KEY_REVOKED, id, List.of());
-        return ApiResponse.ok();   // B192：204 退役（空体与「外壳恒存在」冲突）
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
 
@@ -373,7 +373,7 @@ public class SystemAdminController {
         } catch (IllegalArgumentException e) {
             throw new BizException(AppError.badRequest(e.getMessage()));
         }
-        return ApiResponse.ok();   // B192：204 退役（空体与「外壳恒存在」冲突）
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
     /** 虚拟行的 id 归一为 0（零值输出 0，不是 null）。 */

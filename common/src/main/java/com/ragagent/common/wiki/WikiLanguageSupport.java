@@ -82,7 +82,7 @@ public final class WikiLanguageSupport {
      * 请求语言解析：{@code WEKNORA_LANGUAGE} env 优先 → {@code Accept-Language} 首个 tag
      * → {@code zh-CN}。<b>永不返回空串</b>。
      *
-     * <p>B111 由 {@code agent.management.service.BuiltinAgentRegistry} 上移至此：这是
+     * <p>由 {@code agent.management.service.BuiltinAgentRegistry} 上移至此：这是
      * "env + HTTP header → locale" 的纯解析，与 {@link #envLanguage()} 同一语义族；
      * 留在 agent 域会让 {@code auth} 为了一个 header 工具而依赖整个 agent 域。</p>
      */

@@ -342,7 +342,7 @@ watch([selectedAgentId, agentMCPSelectionMode, agentSkillsSelectionMode], ([newA
   }
 });
 
-// 从 KB 对象里抽能力位，优先用 backend 显式的 capabilities 字段；否则回退到 indexing_strategy，
+// 从 KB 对象里抽能力位，优先用 backend 显式的 capabilities 字段；否则回退到 indexingStrategy，
 // 最后拿 kb.type === 'faq' 兜底。shared / owned / agent-scope 三路的 KB 响应结构一致。
 const kbToScopeCaps = (kb: any): Partial<ScopeCapabilities> => {
   if (kb?.capabilities) {
@@ -415,7 +415,7 @@ const isModelLockedByAgent = computed(() => {
 const showMention = ref(false);
 const mentionQuery = ref("");
 const mentionItems = ref<MentionItem[]>([]);
-/** 文件 ID -> 知识库 ID（用于批量查询时传 kb_id，支持共享知识库下的文档） */
+/** 文件 ID -> 知识库 ID（用于批量查询时传 kbId，支持共享知识库下的文档） */
 const fileIdToKbId = ref<Record<string, string>>({});
 const mcpServices = ref<MCPService[]>([]);
 const mentionActiveIndex = ref(0);
@@ -662,7 +662,7 @@ const loadFiles = async () => {
   if (missingIds.length === 0) return;
 
   try {
-    // 按 kb_id 分组：共享知识库下的文档需带 kb_id 才能正确查询
+    // 按 kbId 分组：共享知识库下的文档需带 kbId 才能正确查询
     const byKbId = new Map<string, string[]>();
     const noKbId: string[] = [];
     missingIds.forEach((id: string) => {
@@ -1601,7 +1601,7 @@ onMounted(() => {
   ]);
   window.addEventListener(CHAT_FILE_DROP_EVENT, handleChatFileDrop as EventListener);
 
-  // 从持久化恢复 fileId -> kbId，刷新后共享知识库文件可带 kb_id 拉取（仅保留当前仍选中的文件）
+  // 从持久化恢复 fileId -> kbId，刷新后共享知识库文件可带 kbId 拉取（仅保留当前仍选中的文件）
   const persisted = settingsStore.settings.selectedFileKbMap;
   const ids = settingsStore.settings.selectedFiles || [];
   if (persisted && typeof persisted === 'object' && ids.length > 0) {
@@ -1777,7 +1777,7 @@ const createSession = async (val: string, delivery: 'inject' | 'after' = 'after'
   }
 
   // Images and non-embedded attachments both travel to the backend as
-  // `attachment_ids`, which enforces a combined cap (MaxTemporaryAttachmentsPerMessage).
+  // `attachmentIds`, which enforces a combined cap (MaxTemporaryAttachmentsPerMessage).
   // The per-picker limits (5 images / 5 attachments) are independent, so guard the
   // merged total here to avoid a late 400 after the files are already uploaded.
   const MAX_TOTAL_ATTACHMENTS = 5;
@@ -2034,7 +2034,7 @@ const handleSelectAgent = async (agent: CustomAgent) => {
 
   // Only the two "mode-entry" built-ins are re-branded as "Normal / Agent Mode"
   // in the dropdown — the switched-on/off toasts only make sense for them.
-  // Other built-ins (wiki researcher, data analyst, etc.) share `is_builtin`
+  // Other built-ins (wiki researcher, data analyst, etc.) share `builtin`
   // but should fall back to the generic agentSelected toast like custom agents,
   // otherwise selecting e.g. the Wiki Questioner incorrectly says
   // "Switched to Intelligent Reasoning".

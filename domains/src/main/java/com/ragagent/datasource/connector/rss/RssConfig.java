@@ -28,7 +28,7 @@ import com.ragagent.datasource.domain.DataSourceConfig;
  *
  * <p>历史上有过"把 feed 地址误存进 Credentials"的写入路径，现由
  * {@link DataSourceConfig#stripNonSecretCredentials} 在落库前清掉 ⇒ 本类不再需要
- * 任何"老位置回显"逻辑（B137：原 {@code enrichRssFeedUrlsInSettings} 已随之删除）。</p>
+ * 任何"老位置回显"逻辑（原 {@code enrichRssFeedUrlsInSettings} 已随之删除）。</p>
  *
  * <h2>为什么反序列化要用"不许标量强转"的 mapper</h2>
  * <p>{@code {"feedUrls": 12}} 必须报错，不能静默强转成 {@code "12"}——

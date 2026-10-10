@@ -25,23 +25,24 @@ import com.ragagent.datasource.domain.SyncLog;
  *    "status","conflictStrategy","syncDeletions","lastSyncAt","lastSyncCursor",
  *    "lastSyncResult","errorMessage","syncLogRetentionDays","createdAt","updatedAt",
  *    "totalItemsSynced","latestSyncLog","credentials"}
- *   ← B137 订正：本类字段全 camel、零注解（原注写 snake 是 Go 期残留）
+ *   ← 本类字段全 camel、零注解（原注写 snake 是 Go 期残留）
  * </pre>
  * <p>按字段声明序输出（不是字母序）——{@code config} 夹在 {@code type} 与
- * {@code sync_schedule} 之间、{@code credentials} 在最后。</p>
+ * {@code syncSchedule} 之间、{@code credentials} 在最后。</p>
  *
  * <h2>为空省略（逐字段）</h2>
  * <ul>
  *   <li>{@code config}：解析失败时为 {@code null} 并<b>省略整个键</b>；</li>
- *   <li>{@code last_sync_cursor} / {@code last_sync_result}：{@code NON_EMPTY}
+ *   <li>{@code lastSyncCursor} / {@code lastSyncResult}：{@code NON_EMPTY}
  *       （JsonNode 的 {@code null} 与空节点都省略）；</li>
- *   <li>{@code error_message}：空串省略（注意这与实体自身
+ *   <li>{@code errorMessage}：空串省略（注意这与实体自身
  *       "恒输出空串"的形态**不同**，只有 DTO 这一层省略）；</li>
- *   <li>{@code latest_sync_log}：{@code null} 省略；</li>
+ *   <li>{@code latestSyncLog}：{@code null} 省略；</li>
  *   <li>{@code credentials}：map + 为空省略 → 空 map 省略。但工厂方法**恒**塞一个
  *       {@code credentials} 键进去，所以线上永远出现；</li>
- *   <li>{@code last_sync_at} / {@code created_at} / {@code updated_at} / {@code total_items_synced}
- *       / {@code sync_deletions} / 四个字符串字段：<b>没有</b>为空省略 → 恒输出（null 照输出）。</li>
+ *   <li>{@code lastSyncAt} / {@code createdAt} / {@code updatedAt} / {@code totalItemsSynced}
+ *       / {@code syncDeletions} / 四个字符串字段：<b>没有</b>为空省略
+ *       → 恒输出（null 照输出）。</li>
  * </ul>
  *
  * <h2>持久化语义</h2>

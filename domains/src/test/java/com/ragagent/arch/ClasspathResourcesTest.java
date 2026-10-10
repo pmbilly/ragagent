@@ -15,15 +15,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * classpath 资源存在性断言（B118，对应 phase4 方案 §5.2 风险 #2）。
+ * classpath 资源存在性断言（对应 phase4 方案 §5.2 风险 #2）。
  *
  * <h2>为什么需要它</h2>
- * <p>主源码共 15 处 classpath 资源读取，其中 **13 处缺资源不报错**——写法是
+ * <p>主源码共 14 处 classpath 资源读取，其中 **9 处缺资源不报错**——写法是
  * {@code if (in == null) return/continue}。也就是说资源一旦"没跟着模块走"，症状不是异常而是
- * <b>功能悄悄降级</b>：模板为空、内置 agent 列表为空、jieba 分词退化、甚至
- * {@code META-INF/spring.factories} 里的 EnvironmentPostProcessor 不注册。</p>
+ * <b>功能悄悄降级</b>：模板目录字段为 null、内置 agent 列表/预设为空、QA 装配悄悄缺件。</p>
  *
- * <p>B116 把 {@code common}/{@code event} 抽成 {@code :common} 模块时已经搬过一批资源
+ * <p>把 {@code common}/{@code event} 抽成 {@code :common} 模块时已经搬过一批资源
  * （{@code common/text/*.txt}），这类"搬家没带上资源"的风险从此刻起是**真实**的。</p>
  *
  * <h2>两条断言</h2>
@@ -48,7 +47,7 @@ class ClasspathResourcesTest {
      *
      * <p>失败于本清单某一条时，先看消费方的读法：{@code Class.getResourceAsStream("…")}
      * 是类相对（容易被搬家打断），{@code getClassLoader().getResourceAsStream("…")} 是
-     * classloader 绝对（搬家无感）——B116 已逐个核实，本仓全部是后者（或 {@code "/…"} 绝对形式）。</p>
+     * classloader 绝对（搬家无感）——已逐个核实，本仓全部是后者（或 {@code "/…"} 绝对形式）。</p>
      */
     private static final Map<String, String> RESOURCES = new LinkedHashMap<>();
 

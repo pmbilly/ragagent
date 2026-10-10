@@ -3,7 +3,7 @@ package com.ragagent.retrieval.graph;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * Neo4j 图检索的部署配置（B6 批 9）。
+ * Neo4j 图检索的部署配置。
  *
  * <p>env 名保持原样：{@code NEO4J_ENABLE} / {@code NEO4J_URI} / {@code NEO4J_USERNAME} /
  * {@code NEO4J_PASSWORD} → {@code neo4j.*}（Spring 松散绑定）。</p>

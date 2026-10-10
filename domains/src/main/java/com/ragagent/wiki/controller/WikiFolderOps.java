@@ -132,7 +132,7 @@ final class WikiFolderOps {
         } catch (RuntimeException e) {
             throw WikiRequestSupport.mapFolderError(e);
         }
-        return ResponseEntity.ok(ApiResponse.ok());   // B202：204 退役（空体与「外壳恒存在」冲突）
+        return ResponseEntity.ok(ApiResponse.ok());   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
     /**

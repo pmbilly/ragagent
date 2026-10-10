@@ -384,7 +384,7 @@ public class ModelService implements ModelGateway  {
         if (config == null) {
             return bindings;
         }
-        // agent 配置树自 B18/B19 起键名 = Java 字段名（camel）——此处按 camel 读取
+        // agent 配置树键名 = Java 字段名（camel）——此处按 camel 读取
         if (modelId.equals(text(config.get("modelId")))) {
             bindings.add("chat_model");
         }

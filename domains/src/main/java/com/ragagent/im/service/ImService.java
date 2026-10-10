@@ -91,13 +91,13 @@ public class ImService implements AgentChannelCleaner {
     final ImSessionResolver sessionResolver;
     final ImQaRequests qaRequests;
     final ImAttachmentPreparer attachmentPreparer;
-    /** 跨实例 /stop 全链路（B123 自本类外提；与门面共享 inflight 表）。 */
+    /** 跨实例 /stop 全链路（自本类外提；与门面共享 inflight 表）。 */
     final ImStopOps stopOps;
-    /** 消息入口闸门：去重与限流（B125 自本类外提；两张进程内回落表随之搬家）。 */
+    /** 消息入口闸门：去重与限流（自本类外提；两张进程内回落表随之搬家）。 */
     final ImInboundGuardOps inboundGuard;
-    /** IM ↔ 知识库域接面：命令的 KB/检索读取 + 附件异步入库（B126 自本类外提）。 */
+    /** IM ↔ 知识库域接面：命令的 KB/检索读取 + 附件异步入库（自本类外提）。 */
     final ImKnowledgeBridgeOps knowledgeBridge;
-    /** 渠道运行时：adapter 注册表 + 生命周期 + 选主/配置广播（B126 自本类外提）。 */
+    /** 渠道运行时：adapter 注册表 + 生命周期 + 选主/配置广播（自本类外提）。 */
     final ImChannelRuntimeOps channelRuntime;
 
     private final CommandRegistry cmdRegistry = new CommandRegistry();
@@ -423,7 +423,7 @@ public class ImService implements AgentChannelCleaner {
                 cmd.name(), channel.getId(), msg.userId, result.action);
     }
 
-    // ── 跨实例 /stop 的对外面（B123：实现在 ImStopOps） ────────────────────
+    // ── 跨实例 /stop 的对外面（实现在 ImStopOps） ────────────────────
 
     /** 执行前 /stop 检查。实现见 {@link ImStopOps#checkAndClearStopMarker}。 */
     boolean checkAndClearStopMarker(String userKey) {
@@ -446,7 +446,7 @@ public class ImService implements AgentChannelCleaner {
         knowledgeBridge.ingestAttachmentToKnowledgeBase(channel, prepared);
     }
 
-    // ── 渠道运行时的对外面（B126：实现在 ImChannelRuntimeOps） ──────────────
+    // ── 渠道运行时的对外面（实现在 ImChannelRuntimeOps） ──────────────
 
     /** 注册平台工厂。实现见 {@link ImChannelRuntimeOps}。 */
     public void registerAdapterFactory(String platform, AdapterFactory factory) {
@@ -464,7 +464,7 @@ public class ImService implements AgentChannelCleaner {
     }
 
     /**
-     * 运行时就绪后启动渠道（B128 起此处的 {@code @EventListener} 是**唯一触发入口**：
+     * 运行时就绪后启动渠道（此处的 {@code @EventListener} 是**唯一触发入口**：
      * 实现在 {@link ImChannelRuntimeOps#startChannelsOnReady()}，而那个类不是 Spring bean）。
      */
     @EventListener(ApplicationReadyEvent.class)
@@ -473,7 +473,7 @@ public class ImService implements AgentChannelCleaner {
     }
 
     /**
-     * 运行时停止（队列 + 全部渠道 + leader 线程）。B128 起此处的 {@code @PreDestroy}
+     * 运行时停止（队列 + 全部渠道 + leader 线程）。此处的 {@code @PreDestroy}
      * 是**唯一触发入口**（实现在 {@link ImChannelRuntimeOps#stop()}）。
      */
     @PreDestroy

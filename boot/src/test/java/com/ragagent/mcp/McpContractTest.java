@@ -43,7 +43,7 @@ import com.ragagent.support.GoldenContract;
  * create（SSRF 拒绝 / 成功）→ list → get → 404 → update → tool-approvals（空/设置/有值）
  * → credentials（put/delete/非法 field）→ metadata → test → tools → viewer 403 → delete。
  *
- * 掩码：UUID（id / service_id）、时间戳。
+ * 掩码：UUID（id / serviceId）、时间戳。
  * `test` 与 `tools` 用结构化断言——前者的消息含随运行时不同的网络错误文案，
  * 后者依赖服务启用状态而非纯契约。
  */
@@ -59,7 +59,7 @@ class McpContractTest {
             "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})");
     /**
      * 掩码按键名匹配：**键改名必须同步这个正则**，否则夹具里会混进随机 UUID
-     * （S3 踩过：att-get 的 sessionId）。这里覆盖 id 与 serviceId（M1/M4 后的拼写）。
+     * （踩过：att-get 的 sessionId 混进过夹具）。这里覆盖 id 与 serviceId（换锚后的现行拼写）。
      */
     private static final Pattern UUID_KEY_PATTERN = Pattern.compile(
             "\"(id|service_id|serviceId)\":\"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\"");
@@ -182,14 +182,14 @@ class McpContractTest {
         mockMvc.perform(get("/api/v1/mcp-services/" + id + "/tool-approvals")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"code\":0,\"message\":\"ok\",\"data\":[]}"));   // B191：空数组也在 data 里
+                .andExpect(content().json("{\"code\":0,\"message\":\"ok\",\"data\":[]}"));   // 空数组也在 data 里
 
-        // 7. 设置审批策略 → 204 无响应体（§14.9n M4：不再回 {"success":true}）
+        // 7. 设置审批策略 → 200 + 统一外壳（§14.9n：不再回 {"success":true}）
         mockMvc.perform(put("/api/v1/mcp-services/" + id + "/tool-approvals/golden_tool")
                         .header("Authorization", "Bearer " + token)
                         .contentType("application/json")
                         .content("{\"requireApproval\":true}"))
-                .andExpect(status().isOk())   // B191：204 退役 ⇒ 200 + 外壳
+                .andExpect(status().isOk())   // 204 退役 ⇒ 200 + 外壳
                 .andExpect(content().json("{\"code\":0,\"message\":\"ok\",\"data\":null}"));
 
         // 8. tool-approvals 有 1 项 → 掩码比对（含生成的 id 与时间戳）
@@ -212,10 +212,10 @@ class McpContractTest {
                 credPut.getResponse().getContentAsString(StandardCharsets.UTF_8),
                 "凭据 PUT 应与 golden 一致（掩码后）");
 
-        // 10. credentials delete → 204（golden 是空响应体）
+        // 10. credentials delete → 200 + 外壳（204 已退役，golden 原是空响应体）
         mockMvc.perform(delete("/api/v1/mcp-services/" + id + "/credentials/apiKey")
                         .header("Authorization", "Bearer " + token))
-                .andExpect(status().isOk())   // B191：204 退役 ⇒ 200 + 外壳
+                .andExpect(status().isOk())   // 204 退役 ⇒ 200 + 外壳
                 .andExpect(content().json("{\"code\":0,\"message\":\"ok\",\"data\":null}"));
 
         // 11. 非法 field → 静态 golden（"unknown credential field: bogus"）
@@ -240,7 +240,7 @@ class McpContractTest {
                 .andExpect(status().isOk())
                 .andReturn();
         String testBody = tested.getResponse().getContentAsString(StandardCharsets.UTF_8);
-        // B191：外边是统一外壳，data 里是 McpTestResult；success=false 是**业务结论**
+        // 外边是统一外壳，data 里是 McpTestResult；success=false 是**业务结论**
         assertTrue(testBody.startsWith("{\"code\":0"), "应为统一外壳: " + testBody);
         assertTrue(testBody.contains("\"message\":"), testBody);
 
@@ -253,10 +253,10 @@ class McpContractTest {
         assertTrue(toolsBody.contains("\"code\":1007") && toolsBody.contains("is not enabled"),
                 "停用服务取工具应报 1007: " + toolsBody);
 
-        // 15. delete → 204（§1.13，无响应体）
+        // 15. delete → 200 + 外壳（§1.13 的 204 已退役）
         mockMvc.perform(delete("/api/v1/mcp-services/" + id)
                         .header("Authorization", "Bearer " + token))
-                .andExpect(status().isOk())   // B191：204 退役 ⇒ 200 + 外壳
+                .andExpect(status().isOk())   // 204 退役 ⇒ 200 + 外壳
                 .andExpect(content().json("{\"code\":0,\"message\":\"ok\",\"data\":null}"));
 
         // 16. 删除后列表为空
@@ -264,7 +264,7 @@ class McpContractTest {
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andReturn();
-        assertEquals("{\"code\":0,\"message\":\"ok\",\"data\":[]}", empty.getResponse().getContentAsString(StandardCharsets.UTF_8),   // B191：空数组在 data 里
+        assertEquals("{\"code\":0,\"message\":\"ok\",\"data\":[]}", empty.getResponse().getContentAsString(StandardCharsets.UTF_8),   // 空数组在 data 里
                 "§2.1：空列表就是裸 []");
     }
 
@@ -346,7 +346,7 @@ class McpContractTest {
 
     /**
      * 夹具重录开关（同 EmbedContractTest）：{@code -Dcontract.refresh=true} 时把掩码后的实际响应
-     * 写回夹具，用于换锚批（本次 M1 改键名/去信封/改状态码，一次影响 5 个 golden）。
+     * 写回夹具，用于换锚/改契约的批次（改键名、去信封、改状态码这类一次影响多个 golden 的变更）。
      */
     private static final boolean REFRESH_FIXTURES = Boolean.getBoolean("contract.refresh");
 
@@ -361,7 +361,7 @@ class McpContractTest {
     }
 
     private static String golden(String name) throws Exception {
-        // PR4 语义比较：键序/HTML 转义归一后返回（非 JSON 文本原样），断言侧不变
+        // 语义比较：键序/HTML 转义归一后返回（非 JSON 文本原样），断言侧不变
         var resource = new org.springframework.core.io.ClassPathResource("contracts/" + name);
         if (!resource.exists()) {
             resource = new org.springframework.core.io.ClassPathResource("contracts/" + name + ".json");
@@ -389,7 +389,7 @@ class McpContractTest {
     }
 
     private static String mask(String s) {
-        // PR4 语义比较入口：键序/转义归一后再掩码
+        // 语义比较入口：键序/转义归一后再掩码
         s = ContractJson.semantic(s);
         String out = UUID_KEY_PATTERN.matcher(s).replaceAll("\"$1\":\"<id>\"");
         return TS_PATTERN.matcher(out).replaceAll("\"<ts>\"");

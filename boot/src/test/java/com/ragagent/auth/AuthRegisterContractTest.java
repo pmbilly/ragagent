@@ -350,7 +350,7 @@ class AuthRegisterContractTest {
                 .header("Authorization", bearer)).andReturn();
         // PR4：键序归一后邻接正则不可靠 → Jackson 直取
         var __root = new com.fasterxml.jackson.databind.ObjectMapper().readTree(raw(me));
-        // B201：统一外壳下先下钻 data（旧形态无壳也通）
+        // 统一外壳下先下钻 data（旧形态无壳也通）
         if (__root.isObject() && __root.has("code") && __root.has("data")) {
             __root = __root.get("data");
         }

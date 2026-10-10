@@ -30,7 +30,7 @@ import com.ragagent.memory.domain.MemoryTopicStat;
  * （{@code applyInsertDefaults}/{@code stampForCreate}/{@code copyInto}，{@link MemoryItemStore}
  * 也在用）。
  *
- * <p><b>原「规模例外」已于 B130 解除</b>：当年理由是「六段同属『索引侧读写』一个关注点，再切不落在
+ * <p><b>原「规模例外」已解除</b>：当年理由是「六段同属『索引侧读写』一个关注点，再切不落在
  * 自然接缝上」——那是**层次**论点而非内聚论点。复核后按**表家族**切开：向量面（item_embeddings
  * + pgvector 列探测，含唯一一处裸 JDBC 元数据探测）独立为 {@link MemoryVectorStore}；
  * 抽取进度面另立（见后续刀）。与本类同处一类的，是同一批 mapper 上的**索引统计读写**。</p>

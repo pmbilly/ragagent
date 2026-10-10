@@ -15,13 +15,13 @@ import com.ragagent.im.runtime.ImRedisStore;
 /**
  * 消息入口的两道闸门：**去重**（同一 messageID 只处理一次）与**限流**（按渠道+用户+会话的滑动窗口配额）。
  *
- * <p>B125 自 {@link ImService} 原样外提（逐字搬迁，仅改依赖取用方式）。两者同属
+ * <p>自 {@link ImService} 原样外提（逐字搬迁，仅改依赖取用方式）。两者同属
  * 「入口闸门」这一关注点：都在 {@code runHandleMessage} 的最前面拦住不该进管线的消息，
  * 都优先走 Redis 面、故障时回落进程内形态——与停止链路、渠道生命周期无关。</p>
  *
  * <p>依赖面只收三项 + 一个随迁常量：Redis 面（{@code null} = 单实例形态）、窗口秒数、配额上限、
  * 去重 TTL。两个进程内回落表（{@code processedMsgs}/{@code rateWindows}）本簇独占，
- * **随之搬家**——门面不再持有（这与 B123 的停止链路不同：那里 `inflight` 表被协作者共享，
+ * **随之搬家**——门面不再持有（这与停止链路不同：那里 `inflight` 表被协作者共享，
  * 只能传引用）。</p>
  */
 final class ImInboundGuardOps {

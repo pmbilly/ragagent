@@ -294,7 +294,7 @@ class WikiIngestTextUtilsTest {
     // ═══════════════════════════════════════════════════════════════
 
     @Nested
-    @DisplayName("LLM JSON 清洗（对照 Go L3187-3246）")
+    @DisplayName("LLM JSON 清洗")
     class JsonCleaning {
 
         @Test
@@ -329,7 +329,7 @@ class WikiIngestTextUtilsTest {
     }
 
     @Nested
-    @DisplayName("SUMMARY 行解析（对照 Go splitSummaryLine L2217-2231）")
+    @DisplayName("SUMMARY 行解析（对照 Go splitSummaryLine）")
     class SummaryLine {
 
         @Test

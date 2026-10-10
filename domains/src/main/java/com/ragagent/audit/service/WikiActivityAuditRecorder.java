@@ -17,10 +17,10 @@ import org.springframework.stereotype.Component;
 /**
  * {@link WikiActivityAudit} 的生产实现——把 Wiki 的埋点真正落进 audit_logs。
  *
- * <p>Wiki 侧 6 处埋点（{@code WikiPageController.recordManualWikiActivity} 的
- * manual_create / manual_edit / manual_delete / revert / auto-fix 等，
- * 以及 {@code WikiIngestBatchHandler} 的 ingest / retract 批量摘要）此前因为没有实现
- * bean 而退化成 debug 日志；本类补上后它们才会真正落库。</p>
+ * <p>Wiki 侧埋点两类：{@code WikiPageOps} 经 {@code WikiActivityRecorder} 的 4 处人工埋点
+ * （manual_create / manual_edit / manual_delete / revert），
+ * 以及 {@code WikiIngestRunSupport} 在摄取收尾写入的 ingest / retract 批量摘要。
+ * 这些写入此前因为没有实现 bean 而退化成 debug 日志；本类补上后它们才会真正落库。</p>
  *
  * <h2>写入口径</h2>
  * <ul>

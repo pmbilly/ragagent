@@ -13,10 +13,10 @@ import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
 
 /**
- * {@link KnowledgeBaseLookup} 的 knowledge 侧实现（B98/C2）。
+ * {@link KnowledgeBaseLookup} 的 knowledge 侧实现。
  *
  * <p>过滤条件与迁移前的 wiki 侧直查<b>逐字一致</b>（软删过滤、{@code LIMIT 1}、
- * 解析状态判定、仓储缺位保守返回），保证 C2 只是"换依赖方向"而非改行为。</p>
+ * 解析状态判定、仓储缺位保守返回），保证这次端口化只是"换依赖方向"而非改行为。</p>
  */
 @Component
 public class KnowledgeBaseLookupAdapter implements KnowledgeBaseLookup {
@@ -96,7 +96,7 @@ public class KnowledgeBaseLookupAdapter implements KnowledgeBaseLookup {
     }
 
     /**
-     * 实体 → L1 视图的**域内公用投影**（B114 起转 public：装配层
+     * 实体 → L1 视图的**域内公用投影**（开放为 {@code public}：装配层
      * {@code session/service/QaWiring} 需要把 KB 交给 chat 管线，
      * 而实体不许越层 ⇒ 复用同一份投影，避免映射逻辑两处漂移）。
      */

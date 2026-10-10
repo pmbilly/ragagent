@@ -174,7 +174,7 @@ const { t } = useI18n()
 const authStore = useAuthStore()
 
 // "Owner" here mirrors the per-page guards: the original creator
-// (creator_id) — not "in my tenant". creator_id is unset for legacy
+// (creatorId) — not "in my tenant". creatorId is unset for legacy
 // KBs created before that gate existed; those fall through to the
 // role/share check.
 const isOwner = computed<boolean>(() => {
@@ -322,9 +322,9 @@ const statRows = computed<Array<{ key: string; label: string; value: number | st
   const kb: any = props.kbInfo
   if (!kb) return []
   const items: Array<{ key: string; label: string; value: number | string }> = []
-  // FAQ KBs store every Q/A pair as a chunk, so chunk_count is the
-  // user-facing entry total. Document KBs use knowledge_count for the
-  // file-level total (chunk_count there counts internal splits and is
+  // FAQ KBs store every Q/A pair as a chunk, so chunkCount is the
+  // user-facing entry total. Document KBs use knowledgeCount for the
+  // file-level total (chunkCount there counts internal splits and is
   // not meaningful to surface here). Mirrors the same branching used
   // by the list card.
   if (kb.type === 'faq') {

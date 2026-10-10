@@ -253,8 +253,8 @@ public class BuiltinAgentRegistry {
 
     /**
      * env → Accept-Language 首个 tag → zh-CN。
-     * B111 起实现上移 L1（{@link WikiLanguageSupport#localeFromRequest}），此处保留薄委托
-     * 以避免 {@code AgentController} 的 9 处调用点无谓改写。
+     * 实现上移 L1（{@link WikiLanguageSupport#localeFromRequest}），此处保留薄委托
+     * 以避免 {@code AgentController} 的 6 处调用点无谓改写。
      */
     public static String localeFromRequest(String acceptLanguage) {
         return WikiLanguageSupport.localeFromRequest(acceptLanguage);

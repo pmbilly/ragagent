@@ -48,19 +48,19 @@ import jakarta.annotation.PreDestroy;
 import org.springframework.stereotype.Service;
 
 /**
- * 全仓架构规则（B10：把几轮重构攒下的约定固化成 CI 红条）。
+ * 全仓架构规则（把几轮重构攒下的约定固化成 CI 红条）。
  *
  * <p><b>分工</b>：包级结构（包间环 / 分层 / 域依赖 {@code config}）由
  * {@code scripts/check-package-cycles.py}（CI 的 guards job，带基线棘轮）守；本类守
  * <b>代码级</b>规则——脚本表达不了、而这几轮真实踩过坑的：</p>
  *
  * <ol>
- *   <li><b>裸读环境变量</b>：B6 十批把 {@code System.getenv} 从 149 处清到 0，四类落点
+ *   <li><b>裸读环境变量</b>：裸 {@code System.getenv} 已从 149 处全仓清零，四类落点
  *       （{@code @ConfigurationProperties} / 域查找面 / 启动期值快照 / 全局查找面 + 启动钩子）
  *       已定型；本规则防止回流。</li>
  *   <li><b>{@code @ConfigurationProperties} 类必须被 {@code @ConfigurationPropertiesScan}
  *       名单覆盖</b>：漏一处的表现是<b>静默</b>的——不报错，只是值永远是默认值
- *       （B6 期间反复踩：新属性类放进未扫描的包）。</li>
+ *       （反复踩过：新属性类放进未扫描的包）。</li>
  *   <li><b>配置类不得同时是 {@code @Component}/{@code @Service}</b>：属性绑定 + 组件扫描
  *       双装配，语义含糊。</li>
  *   <li><b>{@code install*} 只许装配层调用</b>：查找面/快照类的 {@code install} 是启动期
@@ -96,14 +96,14 @@ class ArchitectureRulesTest {
      * 那些不是本规则的治理对象。</p>
      */
     private static final JavaClasses MAIN = new ClassFileImporter()
-            // B116 多模块：**不能用 location.asURI()** —— ArchUnit 对 jar 内的类求 asURI
-            // 会抛异常，而"抛异常的导入选项"被当作**排除**，于是 :common（在 :server 的
+            // 多模块布局：**不能用 location.asURI()** —— ArchUnit 对 jar 内的类求 asURI
+            // 会抛异常，而"抛异常的导入选项"被当作**排除**，于是 :common（在 :boot 的
             // 类路径上以 jar 形态出现）被整段排除，A7 基线条目随即报"已不再违例"（实测踩到，
             // 探针四变体定位：asURI 版命中 0、Location.contains 版命中 1）。
             // 改用 Location.contains 排除测试类。
-            // B161：testFixtures 也是测试基建（如 EmbeddedRedis 的 getenv 探测 redis-server）——
+            // testFixtures 也是测试基建（如 EmbeddedRedis 的 getenv 探测 redis-server）——
             // 拆分前它们在 src/test/java 下本就被排除，故一并排除，保持 A1 只盯 main 的语义。
-            // 注意：项目依赖在 ArchUnit 眼里是 **jar**（B116 实测）⇒ testFixtures 以
+            // 注意：项目依赖在 ArchUnit 眼里是 **jar**（实测）⇒ testFixtures 以
             // <模块>-test-fixtures.jar 形态出现，dir 与 jar 两种写法都要排。
             .withImportOption(location -> !location.contains("/classes/java/test/")
                     && !location.contains("/classes/java/testFixtures/")   // 本模块 testFixtures（dir 形态）
@@ -115,7 +115,7 @@ class ArchitectureRulesTest {
      *
      * <p>键是 {@code 属主全名#方法名}——<b>刻意不用 {@code JavaMethod.getFullName()}</b>：
      * 后者带参数类型（{@code ...install(java.util.function.Function)}），按它建集合会让规则
-     * <b>永远绿</b>（B10 实测：探针类照样通过，属"空转规则"）。</p>
+     * <b>永远绿</b>（实测：探针类照样通过，属"空转规则"）。</p>
      */
     private static final Set<String> INSTALL_TARGETS = Set.of(
             WikiLanguageSupport.class.getName() + "#installLanguage",
@@ -188,7 +188,7 @@ class ArchitectureRulesTest {
     @DisplayName("A4：install*（启动期写入查找面/快照）只许装配层（*.config 包）调用")
     void installOnlyFromWiring() {
         // 注意：这里必须是 classes().should(customCondition)，不能用 noClasses().should(...)
-        // ——后者会把条件取反，自定义条件里手写的 violation 会被反转成通过（B10 实测踩坑：
+        // ——后者会把条件取反，自定义条件里手写的 violation 会被反转成通过（实测踩坑：
         // 该规则曾一度「永远绿」，靠探针类才暴露）。
         classes()
                 .should(new ArchCondition<>("调用启动期 install* 且不在装配层") {
@@ -237,14 +237,14 @@ class ArchitectureRulesTest {
         }
         assertThat(offenders)
                 .as("裸 NUL（常见于把 \\0 哨兵直接写成字节）会让文本工具跳过整个文件，"
-                        + "审计因此静默漏文件；改写为 Java 的 \\0 八进制转义即可（B12 实测）")
+                        + "审计因此静默漏文件；改写为 Java 的 \\0 八进制转义即可（实测）")
                 .isEmpty();
     }
 
     // ── A6 禁 @Lazy 注入 ────────────────────────────────────────────────────
 
     /**
-     * 棘轮基线：已清空（2026-10-05，M2 解环专项落地）。拆法：
+     * 棘轮基线：已清空（2026-10-05 解环专项落地）。拆法：
      * 门面 helper 下沉 {@code KnowledgeAccessHelper}（子服务不再回注门面）；
      * enqueue 端口外提为 {@code KnowledgeProcessingQueue}（提交方不再依赖 worker 类型）；
      * worker 的摘要触发改同步领域事件 {@code KnowledgeProcessedEvent}（订阅方
@@ -297,7 +297,7 @@ class ArchitectureRulesTest {
      *   <li><b>非业务库引擎</b>——DuckDB / Doris / SQLite / pgvector，不在 MP 管辖；</li>
      *   <li><b>启动期修复</b>——StartupTaskRecovery。</li>
      * </ul>
-     * <p>方言探测类副本已于 B70 归一到 {@code DatabaseDialects.isPostgres}（原
+     * <p>方言探测类副本已归一到 {@code DatabaseDialects.isPostgres}（原
      * detectPostgres 八处复制清零，相应白名单条目随之摘除）。</p>
      */
     private static final Map<String, String> JDBC_BASELINE = Map.ofEntries(
@@ -415,13 +415,13 @@ class ArchitectureRulesTest {
     private static final Map<String, String> LAST_CONCAT_BASELINE = Map.of();
 
     /**
-     * 后端源码根（B116 多模块）：本类在 {@code :boot} 里运行（B165 迁入；P3b-3 后模块名为 {@code :domains}），
-     * 故共享内核（{@code common}/{@code event}，已抽到 {@code :common}）用相对路径指过去。
+     * 后端源码根：本类在组合根模块 {@code :boot} 里运行，共享内核（{@code common}/
+     * {@code event} 等，已抽到 {@code :common}）的根也一并枚举进去。
      * 不存在的根由调用方跳过 ⇒ 单模块布局下仍然可用。
-     * 包级可见：{@link ClasspathResourcesTest} 的反漂移扫描复用同一份根清单（B118）。
+     * 包级可见：{@link ClasspathResourcesTest} 的反漂移扫描复用同一份根清单。
      */
     static java.util.List<java.nio.file.Path> backendSourceRoots(String sourceSet) {
-        return SourceRoots.backend(sourceSet);   // B165：仓库根定位（多模块夹具）
+        return SourceRoots.backend(sourceSet);   // 仓库根定位（多模块夹具）
     }
 
     @Test
@@ -546,7 +546,7 @@ class ArchitectureRulesTest {
     }
 
 
-    // ── A10 分层倒挂 / A11 Mapper 包约定（2026-10-08 B91 补，当前零违例）─────────
+    // ── A10 分层倒挂 / A11 Mapper 包约定 ────────────────────────────────────
 
     @Test
     @DisplayName("A10：service 不得依赖 controller；domain 不得依赖 service/controller")
@@ -555,7 +555,7 @@ class ArchitectureRulesTest {
         noClasses().that().resideInAPackage("..service..")
                 .should().dependOnClassesThat().resideInAPackage("..controller..")
                 .because("依赖方向必须 controller → service → repository/mapper；"
-                        + "service 回头引用 controller 即分层倒挂（B91 实测为 0，保持住）")
+                        + "service 回头引用 controller 即分层倒挂")
                 .check(MAIN);
         noClasses().that().resideInAPackage("..domain..")
                 .should().dependOnClassesThat().resideInAnyPackage("..service..", "..controller..")
@@ -576,7 +576,7 @@ class ArchitectureRulesTest {
     }
 
     /**
-     * 棘轮基线（B213）：{@code :domains} 内 {@code mapper} 包里仍留着的 11 个仓储门面。
+     * 棘轮基线：{@code :domains} 内 {@code mapper} 包里仍留着的 11 个仓储门面。
      * 登记理由：本规则上线时 session / wiki / memory 三域已清零（9 类 + memory 协作者 4 类），
      * 余下域按「碰到哪域归哪域」逐域收敛，基线只许减不许增。
      * <p>口径不含 {@code :engine} 的 {@code retrieval/engine/**}——引擎适配仓储与检索是一套
@@ -612,7 +612,7 @@ class ArchitectureRulesTest {
     }
 
     /**
-     * 棘轮基线（B215）：仍有理由自建 mapper 的 7 处，每处都在类注释里写明了不能收编的原因。
+     * 棘轮基线：仍有理由自建 mapper 的 7 处，每处都在类注释里写明了不能收编的原因。
      * <ul>
      *   <li>{@code JsonMappers} —— 工厂自身（它就是 lenient 的实现处）；</li>
      *   <li>{@code LangfuseAttributes} / {@code StreamJson} / {@code EventJson} ——
@@ -622,7 +622,7 @@ class ArchitectureRulesTest {
      *       （收编会让写回 cursor 的偏移字面量漂移）；</li>
      *   <li>{@code JsonValues} —— {@code FAIL_ON_TRAILING_TOKENS=true}（LLM 输出的严格解析）。</li>
      * </ul>
-     * <p>本规则上线时全仓自建 mapper 已从 168 处收到 7 处（B215）：裸 {@code new ObjectMapper()}
+     * <p>全仓自建 mapper 已从 168 处收到 7 处：裸 {@code new ObjectMapper()}
      * 没注册 JSR-310、又开着严格模式，与 §2-12「宽松读统一策略」正好相反。</p>
      */
     private static final Set<String> SELF_MADE_MAPPER_BASELINE = Set.of(
@@ -665,7 +665,7 @@ class ArchitectureRulesTest {
     @Test
     @DisplayName("A13：@EventListener/@PostConstruct/@PreDestroy 方法必须声明在 Spring 扫描到的类上")
     void lifecycleHooksMustLiveOnScannedBeans() {
-        // 判据来自一次真实事故（B127 → B128）：把 @EventListener/@PreDestroy 随方法一起
+        // 判据来自一次真实事故：把 @EventListener/@PreDestroy 随方法一起
         // 搬进"由门面 new 出来的协作者类"——那个类不是 Spring bean ⇒ 注解**静默失效**
         // （渠道不再随应用启动、停机钩子不再执行），而编译与 4,700+ 全量测试**全部照绿**。
         // 这类失效没有任何运行期报错，只能靠本规则兜住。

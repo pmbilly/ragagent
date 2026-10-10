@@ -181,7 +181,8 @@ class DataSourceHttpContractTest {
      * ⚠️ 每个测试方法前都**重设**一次 loopback 白名单：@SpringBootTest 的上下文在
      * 首个测试方法时才懒加载，启动完成事件会按 DB 里的 ssrf.whitelist
      * （dev 库 = ["198.18.0.0/15"]）**覆盖**进程级静态白名单——若只在 @BeforeAll 设，
-     * 类顺序（谁先加载这个上下文）决定成败（known-issues W5a「SsrfGuard 互踩」家族）。
+     * 类顺序（谁先加载这个上下文）决定成败（known-issues/06-wave-5.md 的
+     * 「SsrfGuard 白名单互踩」家族）。
      */
     private static void reloadLoopbackWhitelist() {
         SsrfGuard guard = new SsrfGuard();
@@ -292,7 +293,7 @@ class DataSourceHttpContractTest {
         }
         com.fasterxml.jackson.databind.JsonNode actual = mapper.readTree(actualJson);
         com.fasterxml.jackson.databind.JsonNode golden = mapper.readTree(golden(goldenFile));
-        // B189：两侧都走统一外壳 ⇒ 比较载荷前先下钻 data
+        // 两侧都走统一外壳 ⇒ 比较载荷前先下钻 data
         if (actual.isObject() && actual.has("code") && actual.has("data")) {
             actual = actual.get("data");
         }
@@ -331,7 +332,7 @@ class DataSourceHttpContractTest {
         MvcResult r = perform(get("/api/v1/datasource?kbId=" + KB_EMPTY)
                 .header("Authorization", bearer));
         assertEquals(200, r.getResponse().getStatus(), raw(r));
-            // B189：空列表也走统一外壳（载荷仍为 []）；形态由金片钉住
+            // 空列表也走统一外壳（载荷仍为 []）；形态由金片钉住
         assertGoldenBody("ds-list-empty.json", raw(r));
     }
 
@@ -409,7 +410,7 @@ class DataSourceHttpContractTest {
         // PR4：键序归一后邻接子串不可靠 → 树断言
         {
             var root = new com.fasterxml.jackson.databind.ObjectMapper().readTree(raw(r));
-            root = root.path("data");   // B189：统一外壳下钻
+            root = root.path("data");   // 统一外壳下钻
             var cfg = root.path("config");
             org.assertj.core.api.Assertions.assertThat(cfg.path("type").asText()).isEqualTo("rss");
             org.assertj.core.api.Assertions.assertThat(
@@ -469,7 +470,7 @@ class DataSourceHttpContractTest {
         // config 里只剩 settings：credentials 被库里那份（null）整块替换掉了
         {
             var root = new com.fasterxml.jackson.databind.ObjectMapper().readTree(body);
-            root = root.path("data");   // B189：统一外壳下钻
+            root = root.path("data");   // 统一外壳下钻
             var cfg = root.path("config");
             org.assertj.core.api.Assertions.assertThat(cfg.path("type").asText()).isEqualTo("rss");
             org.assertj.core.api.Assertions.assertThat(
@@ -658,14 +659,14 @@ class DataSourceHttpContractTest {
 
         MvcResult first = perform(delete("/api/v1/datasource/" + id + "/credentials/credentials")
                 .header("Authorization", bearer));
-        assertEquals(200, first.getResponse().getStatus(), raw(first));   // B189：204 退役 ⇒ 200 + 外壳
+        assertEquals(200, first.getResponse().getStatus(), raw(first));   // 204 退役 ⇒ 200 + 外壳
         assertEquals(com.ragagent.support.ContractJson.semantic(
                 new com.fasterxml.jackson.databind.ObjectMapper(),
                 "{\"code\":0,\"message\":\"ok\",\"data\":null}"), raw(first));
 
         MvcResult second = perform(delete("/api/v1/datasource/" + id + "/credentials/credentials")
                 .header("Authorization", bearer));
-        assertEquals(200, second.getResponse().getStatus(), raw(second));   // B189：204 退役 ⇒ 200 + 外壳
+        assertEquals(200, second.getResponse().getStatus(), raw(second));   // 204 退役 ⇒ 200 + 外壳
 
         String after = raw(perform(get("/api/v1/datasource/" + id).header("Authorization", bearer)));
         assertThat(after).contains("\"configured\":false");
@@ -771,7 +772,7 @@ class DataSourceHttpContractTest {
     void deleteReturns204AndGetAfterwardsIs404() throws Exception {
         String id = createId();
         MvcResult r = perform(delete("/api/v1/datasource/" + id).header("Authorization", bearer));
-        assertEquals(200, r.getResponse().getStatus(), raw(r));   // B189：204 退役 ⇒ 200 + 外壳
+        assertEquals(200, r.getResponse().getStatus(), raw(r));   // 204 退役 ⇒ 200 + 外壳
             assertEquals(com.ragagent.support.ContractJson.semantic(
                     new com.fasterxml.jackson.databind.ObjectMapper(),
                     "{\"code\":0,\"message\":\"ok\",\"data\":null}"), raw(r));

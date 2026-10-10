@@ -334,7 +334,7 @@ class TenantAPIKeyControllerTest {
                 .andReturn();
         JsonNode data = payload(result.getResponse().getContentAsString());
         assertThat(data.isArray()).isTrue();
-        assertThat(data.isEmpty()).isTrue();   // B201：外壳下钻后 data 就是载荷数组
+        assertThat(data.isEmpty()).isTrue();   // 外壳下钻后 data 就是载荷数组
     }
 
     // ── 更新 ──
@@ -419,7 +419,7 @@ class TenantAPIKeyControllerTest {
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andReturn();
-        // B201：200 + 统一外壳（原先 204 空体）
+        // 200 + 统一外壳（原先 204 空体）
         assertThat(result.getResponse().getContentAsString(StandardCharsets.UTF_8))
                 .isEqualTo("{\"code\":0,\"message\":\"ok\",\"data\":null}");
 
@@ -484,8 +484,7 @@ class TenantAPIKeyControllerTest {
         return payload(result.getResponse().getContentAsString()).get("id").asText();
     }
 
-    /** 顶层 JSON 键序（契约：响应由 map 构造 → 字母序）。 */
-    /** B201：统一外壳下取 data 当载荷（旧形态无壳时原样 ✓）。 */
+    /** 统一外壳下取 data 当载荷（旧形态无壳时原样 ✓）。 */
     private static JsonNode payload(String json) throws Exception {
         JsonNode node = MAPPER.readTree(json);
         if (node.isObject() && node.has("code") && node.has("data")) {

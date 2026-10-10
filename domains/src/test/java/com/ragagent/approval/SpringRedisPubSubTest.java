@@ -50,7 +50,7 @@ class SpringRedisPubSubTest {
      * 真 Redis 才跑（跨实例 Subscribe/Publish 语义）。
      *
      * <p>用 {@code @BeforeAll + assumeTrue} 而非 {@code @EnabledIf}：后者**没有消息位** ✗，
-     * 跳过时在测试汇总里只能显示"无原因"（B171 的注解就长这样 ✓）；这里给出可读原因 ✓。</p>
+     * 跳过时在测试汇总里只能显示"无原因"；这里给出可读原因 ✓。</p>
      */
     @BeforeAll
     static void requireRealRedis() {

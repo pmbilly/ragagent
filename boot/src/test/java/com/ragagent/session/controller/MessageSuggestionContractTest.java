@@ -256,7 +256,7 @@ class MessageSuggestionContractTest {
                 .header("Authorization", bearer));
         assertEquals(HttpStatus.OK.value(), impression.getResponse().getStatus(),
                 raw(impression));
-        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(impression));   // B193：外壳恒存在
+        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(impression));   // 外壳恒存在
 
         MvcResult click = perform(jsonBody(post("/api/v1/sessions/" + sid + "/suggestion-events"),
                 "{\"suggestionSetId\":\"" + SET2 + "\",\"questionId\":\"q1\",\"eventType\":\"click\"}")

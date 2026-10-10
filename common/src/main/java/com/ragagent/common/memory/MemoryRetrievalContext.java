@@ -3,7 +3,7 @@ package com.ragagent.common.memory;
 import java.util.List;
 
 /**
- * 记忆检索上下文（B106）：给查询改写器用的背景/兴趣/文档词汇 + 背后条目视图。
+ * 记忆检索上下文：给查询改写器用的背景/兴趣/文档词汇 + 背后条目视图。
  *
  * <p>原在 {@code memory.service}，因 L2 {@code chatpipeline} 的端口签名要用它而下沉到 common；
  * 条目改为 {@link MemoryItemView}。</p>

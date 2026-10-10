@@ -287,10 +287,10 @@ test('信封读法：Java 后端是裸载荷，不得再按 Go 的 {success,data
 })
 
 test('统一响应外壳在 request.ts 一处解包（api 层直返载荷、store 读裸载荷）', () => {
-  // B183：后端 @ApiResult 路由的成功体统一 {code:0,message:"ok",data:…}
+  // 后端 @ApiResult 路由的成功体统一 {code:0,message:"ok",data:…}
   // （约定见 docs/api-response-convention.md）；解包点**唯一** = utils/request.ts 的响应拦截器
   // ⇒ api 层不再需要「裸载荷适配成 { data }」的补丁，消费端直接读载荷。
-  // 旧约定（B66）：「裸载荷 + 消费端要 { data } → 在 api 层 return { data: resp }」随外壳退役。
+  // 旧约定：「裸载荷 + 消费端要 { data } → 在 api 层 return { data: resp }」随外壳退役。
   const request = readFileSync(join(SRC, 'utils/request.ts'), 'utf8')
   assert.match(request, /function isApiEnvelope\(/, '外壳判定必须在 request.ts（唯一解包点）')
   assert.match(request, /return withHttpStatus\(data\.data, status\)/, '外壳要就地解包成 data')
@@ -313,7 +313,7 @@ test('统一响应外壳在 request.ts 一处解包（api 层直返载荷、stor
 })
 
 test('解析引擎规则两面：KB 配置面 camel / 覆盖与智能体面 snake（不得混读）', () => {
-  // B67 实锤：KB 配置 jsonb 键名 B3b 统一成 camel（V2 迁移 + 后端 ParserEngineRuleView），
+  // 实锤：KB 配置 jsonb 键名已统一成 camel（V2 迁移 + 后端 ParserEngineRuleView），
   // 但解析设置页仍按 snake 读 → 对 camel 数据 `undefined.some` 整页打崩（真机复现：
   // 解析分区 select 数 0 + Unhandled Vue error）；写入侧也因键名不符被后端丢弃
   // （库里出现 fileTypes: []）。
@@ -369,7 +369,7 @@ test('解析引擎规则两面：KB 配置面 camel / 覆盖与智能体面 snak
 })
 
 test('api 面 snake 记号棘轮：只许减不许增', () => {
-  // 2026-10-04 扩面冻结 → 同日逐条核实（B55）。
+  // 2026-10-04 扩面冻结 → 同日逐条核实。
   // 首轮扫描 api 面 40 处存量记号（32 个 file:token 键），先冻结成棘轮防新增；
   // 本轮对后端逐个核实（DTO 字段名 / 显式 put 的键 / JsonNode 读取 / 实测接口）后：
   //   · 13 键改 camel：偏好 lastActiveTenantId、oidcOnlyLogin，模型 isDefault，
@@ -385,7 +385,7 @@ test('api 面 snake 记号棘轮：只许减不许增', () => {
       + '本条目仅覆盖面内残留，规则见 HANDOFF §15.3',
     'api/system/index.ts': '系统设置 KV + 沙箱/任务引擎直出载荷（§15.2 纪律：冻结面不换；expires_at_unix 已于 B72 修 camel）',
   }
-  // —— B149：原「整文件白名单」api/model/modelUsage.ts 已删除（其理由「前后端一致」对任何线格式
+  // —— 原「整文件白名单」api/model/modelUsage.ts 已删除（其理由「前后端一致」对任何线格式
   //    键都成立 ⇒ 等于没有理由），改为逐键登记下方 10 条。该文件自此与其它 api 面同受
   //    「新增 snake 即红」约束。
   const BINDING_CODE_INTERNAL_MAP =
@@ -408,7 +408,7 @@ test('api 面 snake 记号棘轮：只许减不许增', () => {
     'api/knowledge-base/index.ts:tag_ids': '已核实：列表筛选查询参数（后端按 snake 接收）',
     'api/knowledge-base/index.ts:start_time': '已核实：同上',
     'api/knowledge-base/index.ts:end_time': '已核实：同上',
-    // —— B72 收口：api/initialization 移出整面白名单，余量逐条登记（均为 testMultimodalFunction
+    // —— 后续收口：api/initialization 移出整面白名单，余量逐条登记（均为 testMultimodalFunction
     //    的本地入参键，发送前逐一映射为 camel form 字段；InitializationController @RequestParam 全 camel）
     'api/initialization/index.ts:vlm_model': '已核实：多模态联调本地入参键（映射 vlmModel form 字段）',
     'api/initialization/index.ts:storage_type': '已核实：同上（映射 storageType）',
@@ -466,7 +466,7 @@ test('api 面 snake 记号棘轮：只许减不许增', () => {
 })
 
 test('B72 回归钉：DRIFT 修复面不得回流 snake（chunk 编辑/FAQ 标签/上传回显/图谱提取/Ollama 列表）', () => {
-  // 2026-10-05 全量排查（B72）修掉的 9 条「前端读/写 snake、后端发/收 camel」失配。
+  // 2026-10-05 全量排查修掉的 9 条「前端读/写 snake、后端发/收 camel」失配。
   // 后端 Jackson FAIL_ON_UNKNOWN=off，键名失配不报错、字段静默丢 —— 本用例钉住修复面防回流。
   const forbid = (rel: string, re: RegExp, why: string) => {
     assert.doesNotMatch(readFileSync(join(SRC, rel), 'utf8'), re, `${rel}: ${why}`)
@@ -497,8 +497,8 @@ test('B72 回归钉：DRIFT 修复面不得回流 snake（chunk 编辑/FAQ 标�
   // ⑤ 平台 API Key 有效期：PlatformAPIKeyCreateRequest.expiresAtUnix（潜伏断链）
   forbid('api/system/index.ts', /\bexpires_at_unix\b/, '平台 API Key 创建载荷用 expiresAtUnix')
   // ⑥ SSE 死读：后端无任何事件发平名 created_at —— agentQuery 的时间键是
-  //    userCreatedAt/assistantCreatedAt（QaSseOrchestrator；B135b2 收尾：
-  //    B93b 已把事件面翻转为 camel，这 3 键是漏扫尾巴），
+  //    userCreatedAt/assistantCreatedAt（QaSseOrchestrator；事件面已翻转为 camel，
+  //    这 3 键是漏扫尾巴），
   //    agentQuery 的绑定走 bindServerTurnTimestamps；userMessageInjected 无时间键。
   forbid('composables/useChatStreamHandler.ts', /data\.created_at/,
     'SSE 载荷无平名 created_at（读到的恒 undefined）')

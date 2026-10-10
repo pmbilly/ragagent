@@ -4,7 +4,7 @@ import { dirname, join } from 'node:path'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
 
-// B65 回归守卫：渠道发布密钥（publishToken）在**列表刷新**后不能丢。
+// 回归守卫：渠道发布密钥（publishToken）在**列表刷新**后不能丢。
 // 授权边界：列表行与 PUT 响应都不带 token，只有详情/创建/轮换带（api/embed 顶部注释）。
 // 因此面板必须把「本会话见过的 token」记住并在每次 load() 之后贴回——
 // 旧实现直接 `allChannels.value = res || []`，保存（PUT → load）后嵌入代码立刻

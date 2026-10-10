@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import com.ragagent.common.knowledge.KnowledgeFinalizePort;
 
 /**
- * {@link DefaultWikiKnowledgeFinalizer} 的行为测试（B98/C2）。
+ * {@link DefaultWikiKnowledgeFinalizer} 的行为测试。
  *
  * <p><b>职责已收窄</b>：两条 UPDATE 的形状、钳零守卫、吞异常语义随实现搬到
  * {@code KnowledgeFinalizeAdapter}，其断言在 {@code KnowledgeFinalizeAdapterTest}。

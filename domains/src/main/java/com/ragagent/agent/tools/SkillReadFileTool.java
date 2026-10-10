@@ -12,12 +12,13 @@ import com.ragagent.agent.skills.Skill;
 import com.ragagent.common.llm.ToolResult;
 
 /**
- * {@code read_file}：技能资源读取（B61；无沙箱部署下技能是唯一可读的"文件源"）。
+ * {@code read_file}：技能资源读取（无沙箱部署下技能是唯一可读的"文件源"）。
  *
  * <p><b>为什么需要它</b>：技能三级注入里，Level 1（名称+描述）进系统提示词，
  * Level 2/3（正文与附随文件）按需读取——而按需读取的唯一通道就是本工具
- * （提示词里给模型的路径是 {@code skill://<name>/SKILL.md}）。B57 入库后
- * {@link Manager} 的读面已就绪，但工具侧从未接上：模型看得到技能清单、却读不到正文。</p>
+ * （提示词里给模型的路径是 {@code skill://<name>/SKILL.md}）。技能入库时
+ * {@link Manager} 的读面已就绪，但工具侧一度缺位——模型看得到技能清单、却读不到正文，
+ * 本工具即为此而设。</p>
  *
  * <p><b>契约以回归录像为准</b>（{@code GoRecording45C} 的 {@code read_file/*} 31 条记录）：
  * schema、描述、输出格式（{@code === File: … === / size=… / ```内容```}）、data 键集合

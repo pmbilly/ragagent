@@ -15,7 +15,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.agent.skills.mapper.SkillMapper;
 
 /**
- * 技能目录（B57 入库；B60 起**租户级 + 平台内置层**）。
+ * 技能目录（技能已入库；**租户级 + 平台内置层**）。
  *
  * <p><b>可见性</b>：平台内置层（{@code tenant_id IS NULL}，官方预置，全员可见**只读**）
  * + 当前空间的技能。选任一处越权都会造成隔离缺陷，故所有读路径都必须带租户上下文，

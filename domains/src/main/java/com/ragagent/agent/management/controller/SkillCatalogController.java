@@ -34,7 +34,7 @@ import com.ragagent.common.web.ApiResult;
 /**
  * 技能管理（**空间级**，租户 admin）：查看 / 新建 / 编辑 / 删除。
  *
- * <p><b>B60 起技能归属空间</b>（此前为平台级）：列出与编辑的对象是
+ * <p><b>技能归属空间</b>（此前为平台级）：列出与编辑的对象是
  * 「平台内置层（只读）+ 当前空间」；写入只作用于当前空间，平台内置行返回 403。</p>
  *
  * <p><b>路径沿用裁剪前的 {@code /api/v1/skills/catalog}</b>（当年是沙箱期技能目录），
@@ -45,7 +45,7 @@ import com.ragagent.common.web.ApiResult;
  * 调用方只提供 slug/name/description/正文。删除是软删；被**本空间**智能体引用时拒绝，
  * {@code force=true} 才强删（引用清单进 details 与审计）。</p>
  *
- * <p>响应一律 camelCase，外壳统一 {@code {code,message,data}}（{@link ApiResult}，B183；
+ * <p>响应一律 camelCase，外壳统一 {@code {code,message,data}}（{@link ApiResult}；
  * 约定见 {@code docs/api-response-convention.md}）。</p>
  */
 @RestController
@@ -201,14 +201,14 @@ public class SkillCatalogController {
         }
         catalog.softDelete(row, tenant);
         audit(AuditAction.SKILL_DELETED, row, refs);
-        // B183：204 退役（空体与「外壳恒存在」冲突）⇒ 200 + {code:0,message:"ok",data:null}
+        // 204 退役（空体与「外壳恒存在」冲突）⇒ 200 + {code:0,message:"ok",data:null}
         return ApiResponse.ok();
     }
 
     @GetMapping("/api/v1/skills/catalog/{id}/files")
     public ResponseEntity<Map<String, Object>> listCatalogFiles(@PathVariable("id") String id) {
         requireRow(id, TenantContext.currentTenantId());
-        // 入库技能只有 SKILL.md（附随文件留待后续批次）；保持裁剪前的数组形状。
+        // 入库技能只有 SKILL.md（附随文件未支持）；保持裁剪前的数组形状。
         return ResponseEntity.ok(Map.of("files", List.of(new SkillFileEntry(Skill.SKILL_FILE_NAME, Skill.SKILL_FILE_NAME))));
     }
 

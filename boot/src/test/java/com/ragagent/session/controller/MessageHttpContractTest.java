@@ -159,7 +159,7 @@ class MessageHttpContractTest {
                 .header("Authorization", bearer));
         assertEquals(200, r.getResponse().getStatus(), raw(r));
         assertEquals(mask(golden("msg-load.json")), mask(raw(r)));
-        // B193：统一外壳 —— 集合端点的载荷在 data 里
+        // 统一外壳 —— 集合端点的载荷在 data 里
         assertThat(raw(r)).startsWith("{\"code\":0,").contains("\"data\":[{" ).doesNotContain("\"success\"");
 
     }
@@ -323,9 +323,9 @@ class MessageHttpContractTest {
     void deleteMessageMatchesGo() throws Exception {
         MvcResult r = perform(delete("/api/v1/messages/" + sid + "/" + M3)
                 .header("Authorization", bearer));
-        // 同步删除 → 204（§1.13；旧 {"message":…,"success":true} 退役）
+        // 同步删除 → 200 + 统一外壳（204 与更早的 {"message":…,"success":true} 形态均已退役）
         assertEquals(200, r.getResponse().getStatus(), raw(r));
-        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(r), "204 必须无响应体");   // B193：外壳恒存在
+        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(r), "外壳恒存在");
 
         MvcResult load = perform(get("/api/v1/messages/" + sid + "/load")
                 .header("Authorization", bearer));
@@ -356,19 +356,19 @@ class MessageHttpContractTest {
     void clearSessionMessagesMatchesGoAndIsIdempotent() throws Exception {
         MvcResult r = perform(delete("/api/v1/sessions/" + sid + "/messages")
                 .header("Authorization", bearer));
-        // 同步清空 → 204（§1.13；旧 {"message":…,"success":true} 退役）
+        // 同步清空 → 200 + 统一外壳（204 与更早的 {"message":…,"success":true} 形态均已退役）
         assertEquals(200, r.getResponse().getStatus(), raw(r));
-        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(r), "204 必须无响应体");   // B193：外壳恒存在
+        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(r), "外壳恒存在");
 
         MvcResult load = perform(get("/api/v1/messages/" + sid + "/load")
                 .header("Authorization", bearer));
         assertEquals(golden("msg-load-after-clear.json"), raw(load));
 
-        // 清空空会话也是 204（幂等）
+        // 清空空会话同样是 200 + 外壳（幂等）
         MvcResult again = perform(delete("/api/v1/sessions/" + sid + "/messages")
                 .header("Authorization", bearer));
         assertEquals(200, again.getResponse().getStatus(), raw(again));
-        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(again), "204 必须无响应体");   // B193：外壳恒存在
+        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(again), "外壳恒存在");
 
         // 软删：行还在
         assertEquals(4, (int) jdbc.queryForObject(

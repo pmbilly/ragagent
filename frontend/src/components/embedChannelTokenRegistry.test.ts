@@ -6,7 +6,7 @@ import {
   type EmbedChannelTokenCarrier,
 } from './embedChannelTokenRegistry.ts'
 
-// B65：渠道发布密钥的本会话记忆。
+// 渠道发布密钥的本会话记忆。
 // 故障背景（真机复现）：列表行与 PUT 响应都不带 publishToken（授权边界），
 // 而保存后 `load()` 用列表行整体重建数组 → 打开抽屉时合并的 token 被冲掉 →
 // 嵌入代码退化成「加载渠道密钥失败」。

@@ -102,7 +102,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
         }
     }
 
-    /** 批量向量化批大小（B6 批 5：走属性绑定，取代 BATCH_EMBED_SIZE 的 env 直读）。 */
+    /** 批量向量化批大小（走属性绑定，取代 BATCH_EMBED_SIZE 的 env 直读）。 */
     private final BatchEmbedProperties batchEmbedProperties;
 
     private final ExecutorService executor =
@@ -111,7 +111,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
     private final KnowledgeMapper knowledgeMapper;
     private final KnowledgeBaseMapper kbMapper;
     private final ChunkMapper chunkMapper;
-    /** A3-3 尾批：租户感知文件存储（读 provider 引用；本地契约不变）。 */
+    /** 租户感知文件存储（读 provider 引用；本地契约不变）。 */
     private final TenantFileStorage fileStorage;
     private final DocReaderClient docReader;
     private final EmbedderClient embedder;
@@ -121,7 +121,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
     private final ModelRuntimeFactory modelRuntimeFactory;
     private final ApplicationEventPublisher eventPublisher;
     private final SpanTracker spanTracker;
-    /** 图库仓储（D 批）：重处理前清旧图谱。 */
+    /** 图库仓储：重处理前清旧图谱。 */
     private final RetrieveGraphRepository graphRepository;
     /** wiki 交接；
      *  ObjectProvider 装配：wiki 域与 knowledge 域互不反向依赖，延迟解析更稳。 */
@@ -129,7 +129,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
             WikiIngestPort> wikiIngestService;
     private final ObjectProvider<
             WikiFinalizePort> wikiKnowledgeFinalizer;
-    /** 分块图抽取队列（D 批；未接线时 fan-out 直接释放槽位，行不搁浅）。 */
+    /** 分块图抽取队列（未接线时 fan-out 直接释放槽位，行不搁浅）。 */
     private final ObjectProvider<
             ChunkExtractTaskQueue> chunkExtractQueue;
     /** 问题生成批队列（W5γ5.19 导入后自动生成；未接线时 fan-out 直接释放槽位，行不搁浅）。 */

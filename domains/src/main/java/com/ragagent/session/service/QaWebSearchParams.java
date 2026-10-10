@@ -12,7 +12,7 @@ import com.ragagent.common.tenant.WebSearchConfig;
 /**
  * WebSearch / WebFetch 的**有效参数解析**：provider 选择、开关、fetch topN 与结果条数上限。
  *
- * <p>B129 自 {@link SessionKnowledgeQaService} 外提（逐字搬迁 + 依赖改为 {@code service.} 前缀）。
+ * <p>自 {@link SessionKnowledgeQaService} 外提（逐字搬迁 + 依赖改为 {@code service.} 前缀）。
  * 它是「检索参数解析」这一关注点的独立叶子：只读 agent 配置、租户配置与 provider 表，
  * 不碰会话/消息/事件——与本域既有的 {@code QaKbScope}/{@code QaModelSelection} 同形
  * （持门面引用，便于取共享依赖）。</p>

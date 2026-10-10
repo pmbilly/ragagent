@@ -211,7 +211,7 @@ import MemoryWorkspaceSettings from './MemoryWorkspaceSettings.vue'
 import VectorStoreSettings from './VectorStoreSettings.vue'
 import ParserEngineSettings from './ParserEngineSettings.vue'
 // 渲染的是**存储后端**管理页（原代码用同名别名 import 了 StorageBackendSettings，
-// 使真正的 StorageEngineSettings.vue 成了不可达孤儿——B13 残留④：该页是 Go 期
+// 使真正的 StorageEngineSettings.vue 成了不可达孤儿——该页是 Go 期
 // KV 引擎配置，已被后端行（含凭据 + 连通性测试 + 设默认）取代，故删除孤儿并正名。
 import StorageBackendSettings from './StorageBackendSettings.vue'
 import TenantMembers from './TenantMembers.vue'
@@ -401,7 +401,7 @@ const navGroups = computed<NavGroup[]>(() => {
         'storage',
         'websearch',
         'mcp',
-        // B60：技能归属空间（与 MCP 同为「扩展能力」）→ 空间 admin 可见
+        // 技能归属空间（与 MCP 同为「扩展能力」）→ 空间 admin 可见
         'skill-management',
       ]),
     },

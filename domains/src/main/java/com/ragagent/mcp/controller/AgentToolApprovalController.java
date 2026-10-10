@@ -93,8 +93,8 @@ public class AgentToolApprovalController {
                 }
             }
         }
-        // 无响应体的受理回执 → 204（不再返回 {"success":true}）
-        return ApiResponse.ok();   // B191：204 退役
+        // 无业务数据的受理回执（不再返回 {"success":true}）
+        return ApiResponse.ok();   // 204 退役 ⇒ 200 + 外壳
     }
 
     /**

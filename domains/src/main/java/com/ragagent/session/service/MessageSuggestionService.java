@@ -530,8 +530,8 @@ public class MessageSuggestionService {
     /**
      * ec.tagScopes（jsonb map 形态）→ AgentSuggestedQuestions.TagScope。
      *
-     * <p>内层键一律 camel（{@code knowledgeBaseId}/{@code tagIds}；B144 起不再双拼写读——
-     * （跨模块 TagScope 的透传面），而 Java 侧若有人用
+     * <p>内层键一律 camel（{@code knowledgeBaseId}/{@code tagIds}），不再双拼写读——
+     * 这里是跨模块 TagScope 的透传面，而 Java 侧若有人用
      * {@code QaSupport.TagScope} 的字段名写（camelCase）也读得出来——两种形状都不至于静默丢作用域。</p>
      */
     private static List<AgentSuggestedQuestions.TagScope> tagScopes(MessageExecutionContext ec) {

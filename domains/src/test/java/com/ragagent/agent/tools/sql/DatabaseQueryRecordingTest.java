@@ -34,7 +34,7 @@ import com.ragagent.agent.tools.RecordingSupport;
  * 语料的结果集里可见）。dev PG 不可达时测试显式失败（不允许跳过）。</p>
  *
  * <p><b>CI</b>：{@code .github/workflows/ci.yml} 起同镜像 ParadeDB 并灌 {@code V1__baseline.sql}
- * （B158）⇒ 本类在 CI 也真跑（顺带充当基线 schema 冒烟）。</p>
+ * ⇒ 本类在 CI 也真跑（顺带充当基线 schema 冒烟）。</p>
  */
 class DatabaseQueryRecordingTest {
 

@@ -22,7 +22,7 @@ public final class EnvVectorStores {
     }
 
     public static boolean isEnvStoreId(String id) {
-        // B107：谓词下沉 L1（L2 引擎工厂也要用），这里保留同名入口以兼容域内调用
+        // 谓词下沉 L1（L2 引擎工厂也要用），这里保留同名入口以兼容域内调用
         return EnvStoreIds.isEnvStoreId(id);
     }
 

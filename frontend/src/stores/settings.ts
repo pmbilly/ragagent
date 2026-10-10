@@ -14,7 +14,7 @@ interface Settings {
   agentConfig: AgentConfig;
   selectedKnowledgeBases: string[];  // 当前选中的知识库ID列表
   selectedFiles: string[]; // 当前选中的文件ID列表
-  selectedFileKbMap: Record<string, string>; // 文件ID -> 知识库ID，用于刷新后带 kb_id 拉取共享知识库文件
+  selectedFileKbMap: Record<string, string>; // 文件ID -> 知识库ID，用于刷新后带 kbId 拉取共享知识库文件
   selectedTags: Array<{ id: string; name: string; kbId: string; kbName?: string }>;
   selectedMCPServices: string[];
   selectedSkills: string[];
@@ -437,7 +437,7 @@ export const useSettingsStore = defineStore("settings", {
       }));
       return {
         // 标签的父 KB 只是归属提示、不是显式的整库选择。必须带上 tagScopes，
-        // 否则后端会把标签放大到该 KB 下的每个文档（B19：键名需与 api/agent 的
+        // 否则后端会把标签放大到该 KB 下的每个文档（键名需与 api/agent 的
         // camel 契约一致，此前写成 snake 被静默丢弃）。
         knowledgeBaseIds: selectedKBs.length > 0 ? selectedKBs : undefined,
         knowledgeIds: selectedFiles.length > 0 ? selectedFiles : undefined,

@@ -109,13 +109,13 @@ final class QaSseOrchestrator {
         // 独立 stop watcher（自终止：complete/终态错误）
         startStopWatcher(reqCtx.sessionId, reqCtx.assistantMessage.getId(), eventBus);
 
-        // AgentStreamBridge 订阅（17 种事件）
+        // AgentStreamBridge 订阅（16 种事件）
         AgentStreamBridge bridge = new AgentStreamBridge(reqCtx.sessionId, reqCtx.assistantMessage.getId(),
                 reqCtx.requestId, OffsetDateTime.now(), reqCtx.assistantMessage,
                 streamManager, eventBus);
         bridge.subscribe();
 
-        // title 生成（GenerateTitleAsync：session title 为空时；2026-09-23 走查批接线）
+        // title 生成（GenerateTitleAsync：session title 为空时）
         if (generateTitle && (reqCtx.session.getTitle() == null || reqCtx.session.getTitle().isEmpty())) {
             String modelId = "";
             if (reqCtx.agentConfig != null) {

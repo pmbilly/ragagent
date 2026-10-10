@@ -1,11 +1,11 @@
 package com.ragagent.common.knowledge;
 
 /**
- * 知识库 / 知识条目的**只读端口**（B98/C2）。
+ * 知识库 / 知识条目的**只读端口**。
  *
  * <p>{@code wiki} 域需要「按 id 取知识库」「按 id 取知识条目」「判断知识条目是否已不可用」，
  * 但不应依赖 {@code knowledge} 的领域模型与 mapper。端口定义在中性包 {@code common.knowledge}，
- * 由 {@code knowledge} 侧实现（B94/B96/B97b 同法：接口进 common、实现留业务域）。</p>
+ * 由 {@code knowledge} 侧实现（与本项目其他端口同法：接口进 common、实现留业务域）。</p>
  *
  * <p><b>本端口只覆盖读侧</b>：chunk 读写、知识行写、span、嵌入见
  * {@link ChunkPort}/{@link KnowledgeFinalizePort}/{@link KnowledgeSpanPort}/

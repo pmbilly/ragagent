@@ -9,7 +9,7 @@ import com.ragagent.common.knowledge.KnowledgeSpanPort;
 import com.ragagent.knowledge.domain.KnowledgeProcessingSpan;
 
 /**
- * {@link KnowledgeSpanPort} 的 knowledge 侧实现（B98/C2）。
+ * {@link KnowledgeSpanPort} 的 knowledge 侧实现。
  *
  * <p>逻辑整体搬自 wiki 侧的 {@code WikiBatchSupport.WikiSpans}（含
  * {@code latestAttempt → lookupStage(postprocess) → beginSubSpan} 的三步与 best-effort 语义），

@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 /**
- * 展示列表合并（B106 由 {@code memory.domain.MemoryText#mergeUsedMemories} 下沉到 L1）。
+ * 展示列表合并（由 {@code memory.domain.MemoryText#mergeUsedMemories} 下沉到 L1）。
  *
  * <p>为什么下沉：L2 {@code chatpipeline} 的 {@code MemoryUsedMemories} 也要用它来合并"已展示的记忆"，
  * 而它是**与领域无关的纯函数**（泛型 + 键函数）——留在记忆域会让管线依赖该域（L2→L3）。</p>

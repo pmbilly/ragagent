@@ -307,8 +307,8 @@ class ModelContractTest {
         return m.group(1);
     }
 
-    /** 与 golden 比对前对动态字段做同一种掩码（UUID + 时间戳） */
-    // ── 金片对比（B2 统一基建：语义归一 + strip + -Dcontract.refresh 重录） ──
+    // ── 金片对比（GoldenContract 统一基建：语义归一 + strip + -Dcontract.refresh 重录） ──
+    // 与 golden 比对前对动态字段做同一种掩码（UUID + 时间戳）
 
     private static void assertGolden(org.springframework.test.web.servlet.MvcResult r,
             String name) throws Exception {

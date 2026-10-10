@@ -138,7 +138,7 @@ async function reload() {
   error.value = ''
   try {
     const resp = await listMyInvitations()
-    // B201：统一外壳后 resp 即载荷；旧的 {data,success} 壳也容忍
+    // 统一外壳后 resp 即载荷；旧的 {data,success} 壳也容忍
     const data: any = (resp as any)?.data ?? resp
     if (data) {
       invitations.value = data.invitations
@@ -159,7 +159,7 @@ async function onAccept(row: TenantInvitation) {
   acting.value = row.id
   try {
     const resp = await acceptInvitation(row.id)
-    // B201：拦截器已按 code 抛错；只在显式 success:false 时视为失败
+    // 拦截器已按 code 抛错；只在显式 success:false 时视为失败
     if ((resp as any)?.success !== false) {
       invitations.value = invitations.value.filter((x) => x.id !== row.id)
       authStore.setPendingInvitationCount(Math.max(0, authStore.pendingInvitationCount - 1))
@@ -187,7 +187,7 @@ async function onDecline(row: TenantInvitation) {
   acting.value = row.id
   try {
     const resp = await declineInvitation(row.id)
-    // B201：拦截器已按 code 抛错；只在显式 success:false 时视为失败
+    // 拦截器已按 code 抛错；只在显式 success:false 时视为失败
     if ((resp as any)?.success !== false) {
       invitations.value = invitations.value.filter((x) => x.id !== row.id)
       authStore.setPendingInvitationCount(Math.max(0, authStore.pendingInvitationCount - 1))

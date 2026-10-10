@@ -34,7 +34,7 @@ import com.ragagent.support.ContractJson;
 /**
  * 用户收藏 3 端点契约测试（对照 golden 逐字节比对）。
  *
- * golden 录制：scripts/record-fav-cprev-golden.sh（fav-*.json）。B185 起响应走统一外壳
+ * golden 录制：scripts/record-fav-cprev-golden.sh（fav-*.json）。响应走统一外壳
  * {@code {code,message,data}}（docs/api-response-convention.md）：列表金片由裸数组改为
  * 外壳包裹；add 的 201 与 remove 的 200 各有一条新金片（204/空体已退役）。
  *

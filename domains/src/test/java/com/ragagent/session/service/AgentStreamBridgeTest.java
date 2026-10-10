@@ -39,7 +39,7 @@ import com.ragagent.stream.StreamManager;
  * {@code AgentStreamBridge} 的 SSE 载荷契约。
  *
  * <p>补测背景：该类此前**零直接测试**（只在 {@code KnowledgeQaController} 的 agent 流里构造），
- * 而它是 17 种事件订阅 + final_answer 分片重组的最高危面。本测试只钉"进 {@link StreamManager}
+ * 而它是 16 种事件订阅 + final_answer 分片重组的最高危面。本测试只钉"进 {@link StreamManager}
  * 的事件形状"（与前端 SSE 契约同源）与桥内累积状态的对外可见部分（
  * {@link AgentStreamBridge#composedFinalAnswer()}、{@code assistantMessage} 的落库字段），
  * 不碰持久化（那在调用方）。</p>

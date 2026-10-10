@@ -728,7 +728,7 @@ const onDrawerTest = async () => {
       engineType: form.value.engineType,
       connectionConfig: { ...form.value.connectionConfig },
     }
-    // B185：统一外壳由 request.ts 解包 ⇒ 走通即成功、失败一律 reject。
+    // 统一外壳由 request.ts 解包 ⇒ 走通即成功、失败一律 reject。
     // （此前读 res.success / res.error —— 后端从未返回过这两个键 ⇒ 成功分支永远不亮，
     //  是本次顺带修掉的存量缺陷。）
     await testVectorStoreRaw(data)

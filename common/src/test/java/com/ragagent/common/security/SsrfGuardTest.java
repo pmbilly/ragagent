@@ -9,7 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * SSRF 守卫的 scheme 校验（B223）。
+ * SSRF 守卫的 scheme 校验。
  *
  * <p>为什么单测值得钉在这里：这是**安全边界**与**功能可用性**的交点，
  * 两者的失效方向相反、且都很安静 ——

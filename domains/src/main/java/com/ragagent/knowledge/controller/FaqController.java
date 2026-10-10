@@ -203,7 +203,7 @@ public class FaqController {
         String kbId = LogSanitizer.sanitize(id);
         requireKbWrite(kbId);
         faqEntryCommand.updateEntryFieldsBatch(kbId, req);
-        return ApiResponse.ok();   // B197：204 退役
+        return ApiResponse.ok();   // 204 退役 ⇒ 200 + 外壳
     }
 
     @PutMapping("/api/v1/knowledge-bases/{id}/faq/entries/tags")
@@ -213,7 +213,7 @@ public class FaqController {
         String kbId = LogSanitizer.sanitize(id);
         requireKbWrite(kbId);
         faqEntryCommand.updateEntryTagBatch(kbId, req.updates());
-        return ApiResponse.ok();   // B197：204 退役
+        return ApiResponse.ok();   // 204 退役 ⇒ 200 + 外壳
     }
 
     @DeleteMapping("/api/v1/knowledge-bases/{id}/faq/entries")
@@ -223,7 +223,7 @@ public class FaqController {
         String kbId = LogSanitizer.sanitize(id);
         requireKbWrite(kbId);
         faqEntryCommand.deleteEntries(kbId, req.ids());
-        return ApiResponse.ok();   // B197：204 退役
+        return ApiResponse.ok();   // 204 退役 ⇒ 200 + 外壳
     }
 
     /** matchCount 先钳 [10,200]（service 再钳 50）。 */
@@ -247,7 +247,7 @@ public class FaqController {
         String kbId = LogSanitizer.sanitize(id);
         requireKbWrite(kbId);
         faqImport.updateLastImportResultDisplayStatus(kbId, req.displayStatus());
-        return ApiResponse.ok();   // B197：204 退役
+        return ApiResponse.ok();   // 204 退役 ⇒ 200 + 外壳
     }
 
     // ══════════════════════════ 路由守卫 ══════════════════════════

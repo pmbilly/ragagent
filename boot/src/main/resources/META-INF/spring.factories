@@ -1,4 +1,4 @@
-# B6 批 10：应用级 env 查找面的启动安装点。
+# 应用级 env 查找面的启动安装点。
 # 注意：Spring Boot 3.3 的 EnvironmentPostProcessor 仍由 META-INF/spring.factories 装载，
 # 不是 META-INF/spring/org.springframework.boot.env.EnvironmentPostProcessor.imports
 # （后者是 Spring Framework 的 Initializer/Listener 与 Boot 的 AutoConfiguration 用的机制）。

@@ -755,7 +755,7 @@ const credentialApi = computed<CredentialResourceApi<ModelCredentialField>>(() =
   const id = props.modelData?.id ?? ''
   return {
     save: async (patch) => {
-      // 字段标识符与 HTTP body 键同名（camel，B30 统一）
+      // 字段标识符与 HTTP body 键同名（camel）
       const meta = await putModelCredentials(id, {
         apiKey: patch.apiKey,
         appSecret: patch.appSecret,

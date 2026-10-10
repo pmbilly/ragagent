@@ -12,7 +12,7 @@ import com.ragagent.agent.skills.Skill;
 import com.ragagent.agent.skills.SkillSource;
 
 /**
- * B61 的装配层接线：@ 点名的技能正文被解析出来并随系统提示词注入；
+ * 装配层接线：@ 点名的技能正文被解析出来并随系统提示词注入；
  * must_use 的措辞随之切换（注入成功 → 直接照做；注入失败 → 回退按需 read_file）。
  *
  * <p>模型侧行为由 {@code SkillReadFileToolTest} 与录像契约覆盖；本类钉住装配层的取数与措辞。</p>

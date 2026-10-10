@@ -141,8 +141,8 @@ class ImContractTest {
         assertGolden(post("/api/v1/im-channels/b9999999-0000-0000-0000-000000000001/toggle", owner),
                 500, "imc-toggle-404.json");
 
-        // ── delete 家族（脚本删的是 mattermost 渠道 IMC3；成功 204 无体）──
-        // B191：204 退役 ⇒ 200 + 外壳（金片由 -Dcontract.refresh 重录）
+        // ── delete 家族（脚本删的是 mattermost 渠道 IMC3）──
+        // 204 退役 ⇒ 200 + 外壳（金片由 -Dcontract.refresh 重录）
         assertGolden(delete("/api/v1/im-channels/" + imc3, owner), 200,
                 "imc-delete.json");
         assertGolden(delete("/api/v1/im-channels/b9999999-0000-0000-0000-000000000001", owner),
@@ -233,7 +233,7 @@ class ImContractTest {
     private static String jsonPath(MvcResult r, String path) throws Exception {
         com.fasterxml.jackson.databind.JsonNode node =
                 new com.fasterxml.jackson.databind.ObjectMapper().readTree(raw(r));
-        // B191：统一外壳下先下钻 data（旧形态无壳时保持原样 ⇒ 两种都通）；
+        // 统一外壳下先下钻 data（旧形态无壳时保持原样 ⇒ 两种都通）；
         // 路径以 data 开头时不下钻（新旧壳都有 data 键，语义已对齐）
         if (!path.startsWith("data") && node.isObject() && node.has("code") && node.has("data")) {
             node = node.get("data");

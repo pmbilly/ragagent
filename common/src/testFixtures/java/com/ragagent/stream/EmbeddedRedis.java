@@ -72,7 +72,7 @@ public final class EmbeddedRedis implements AutoCloseable {
         }
         // 端口分配是 TOCTOU：freePort() 关掉探测 socket 到 redis-server 真正 bind 之间，
         // 另一个测试 JVM（maxParallelForks）可能选中同一端口——那时 awaitPort 会**成功**，
-        // 但连到的是别人家的 redis，且会被先跑完的那个 fork 一起杀掉（B142 实测
+        // 但连到的是别人家的 redis，且会被先跑完的那个 fork 一起杀掉（实测
         // "Unable to connect to Redis"）。所以：失败就换端口重试，且必须**确认自己起的进程还活着**。
         for (int attempt = 0; attempt < 5; attempt++) {
             int port = freePort();

@@ -25,7 +25,7 @@ public class ApiResultAdvice implements ResponseBodyAdvice<Object> {
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
         if (returnType.getParameterType() == void.class) {
             // void 端点自己写响应（外部平台回调 / 流式）⇒ 不能包：会把 null 包成外壳，
-            // 与端点已写入的裸响应**双写** ✗（B191：ImCallbackController 属于这一类）。
+            // 与端点已写入的裸响应**双写** ✗（{@code ImCallbackController} 属于这一类）。
             return false;
         }
         return ApiResultSupport.isAnnotated(returnType.getContainingClass());
@@ -42,7 +42,7 @@ public class ApiResultAdvice implements ResponseBodyAdvice<Object> {
             return body;
         }
         if (body instanceof byte[] || body instanceof org.springframework.core.io.Resource) {
-            // 二进制 / 资源载荷直接放行（B197）：导出类端点常把 JSON/CSV **文本**配成 application/json
+            // 二进制 / 资源载荷直接放行：导出类端点常把 JSON/CSV **文本**配成 application/json
             // 或 text/csv ✗ —— 内容类型判不出来，若包壳则 byte[] 转换器抛 ClassCastException ⇒ 500 ✗
             // （实测：FaqController.exportEntries 的 `?format=json` 分支，code 1007 ✓）
             return body;

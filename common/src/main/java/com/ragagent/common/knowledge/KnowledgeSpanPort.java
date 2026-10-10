@@ -3,7 +3,7 @@ package com.ragagent.common.knowledge;
 import java.util.Map;
 
 /**
- * 处理 span 端口（B98/C2）：wiki ingest 在知识处理追踪树上挂子 span。
+ * 处理 span 端口：wiki ingest 在知识处理追踪树上挂子 span。
  *
  * <p>迁移前为 wiki 侧 {@code WikiBatchSupport.WikiSpans} 对 {@code SpanTracker} 的包装——
  * 现在把<b>包装与 best-effort 语义整体搬到 knowledge 侧适配器</b>，wiki 只依赖本端口：

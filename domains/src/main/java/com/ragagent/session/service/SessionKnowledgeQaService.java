@@ -73,7 +73,7 @@ public class SessionKnowledgeQaService {
     /** 解析/降级协作者(构造期装配)。 */
     final SessionQaResolution resolution;
     final SessionQaFallback fallback;
-    /** WebSearch/WebFetch 有效参数解析（B129 自本类外提）。 */
+    /** WebSearch/WebFetch 有效参数解析（自本类外提）。 */
     final QaWebSearchParams webSearchParams;
 
     public SessionKnowledgeQaService(EventManager eventManager,

@@ -20,7 +20,7 @@ import com.ragagent.im.runtime.QaQueue;
 import com.ragagent.session.domain.Session;
 
 /**
- * {@link ImStopOps} 的语义钉子：B123 自 {@code ImService} 外提时逐字搬迁，
+ * {@link ImStopOps} 的语义钉子：自 {@code ImService} 外提时逐字搬迁，
  * 这里把原来只写在代码注释里的三条口径固化成断言——
  * <ul>
  *   <li>{@code doLocalStop} 第 4 步「本地没命中 ⇒ 写标记兜底」（给尚未创建 assistant

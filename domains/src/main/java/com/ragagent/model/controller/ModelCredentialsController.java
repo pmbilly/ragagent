@@ -87,6 +87,6 @@ public class ModelCredentialsController {
         } catch (ModelNotFoundException e) {
             throw new BizException(AppError.notFound("Model not found"));
         }
-        return ApiResponse.ok();   // B188：204 退役（空体与「外壳恒存在」冲突）
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 }

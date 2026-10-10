@@ -814,7 +814,7 @@ async function loadMembers() {
       pageSize: membersPageSize.value,
       q: memberSearchQ.value || undefined,
     })
-    // B201：统一外壳后 resp 即载荷；旧的 {data,success} 壳也容忍
+    // 统一外壳后 resp 即载荷；旧的 {data,success} 壳也容忍
     const data: any = (resp as any)?.data ?? resp
     if (data) {
       const total = data.total ?? 0
@@ -917,7 +917,7 @@ async function loadInvitations() {
       page: invitationsPage.value,
       pageSize: invitationsPageSize.value,
     })
-    // B201：统一外壳后 resp 即载荷；旧的 {data,success} 壳也容忍
+    // 统一外壳后 resp 即载荷；旧的 {data,success} 壳也容忍
     const data: any = (resp as any)?.data ?? resp
     if (data) {
       const total = data.total ?? 0
@@ -959,7 +959,7 @@ function onInvitationsPageChange() {
 async function doRevokeInvitation(row: TenantInvitation) {
   try {
     const resp = await revokeInvitation(activeTenantId.value, row.id)
-    // B201：拦截器已按 code 抛错；只在显式 success:false 时视为失败
+    // 拦截器已按 code 抛错；只在显式 success:false 时视为失败
     if ((resp as any)?.success !== false) {
       await loadInvitations()
       MessagePlugin.success(t('tenantInvitation.revoke.success'))

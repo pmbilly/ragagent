@@ -64,7 +64,7 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
         return t;
     }
 
-    // ── TenantConfigLookup（检索/模型域的只读端口实现，B95/C6+C7）─────────
+    // ── TenantConfigLookup（检索/模型域的只读端口实现）────────────────────
 
     @Override
     public JsonNode retrieverEngines(long tenantId) {

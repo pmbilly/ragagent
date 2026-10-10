@@ -233,18 +233,18 @@ public class ImChannelController {
         return ResponseEntity.ok(channelRow(channel));
     }
 
-    /** 删除渠道：任何失败都落 500 "failed to delete channel"；成功 204。 */
+    /** 删除渠道：任何失败都落 500 "failed to delete channel"；成功 200 + {@code ApiResponse} 外壳。 */
     @DeleteMapping("/api/v1/im-channels/{id}")
     public ApiResponse<Void> delete(@PathVariable("id") String channelId) {
         if (channelId == null || channelId.isEmpty()) {
-            throw new BizException(AppError.ofHttpStatus(400, "channel id is required"));   // B191：泛型助手在 ApiResponse 返回位不可用 ⇒ 就地展开
+            throw new BizException(AppError.ofHttpStatus(400, "channel id is required"));   // 泛型助手在 ApiResponse 返回位不可用 ⇒ 就地展开
         }
         try {
             service.deleteChannel(channelId, currentTenant());
         } catch (RuntimeException e) {
-            throw new BizException(AppError.ofHttpStatus(500, "failed to delete channel"));   // B191：泛型助手在 ApiResponse 返回位不可用 ⇒ 就地展开
+            throw new BizException(AppError.ofHttpStatus(500, "failed to delete channel"));   // 泛型助手在 ApiResponse 返回位不可用 ⇒ 就地展开
         }
-        return ApiResponse.ok();   // B191：204 退役
+        return ApiResponse.ok();   // 204 退役
     }
 
     /** 切换启用状态：任何失败都落 500 "failed to toggle channel"。 */

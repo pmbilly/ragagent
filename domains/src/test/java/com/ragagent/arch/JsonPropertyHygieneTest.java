@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
  *
  * <p>依据 {@code docs/knowledge-api-contract-v1.md} §1.1：<b>JSON 字段名 = Java 字段名（camelCase）；
  * 禁止逐字段 {@code @JsonProperty}</b>。键与隐式属性名相同时注解是纯噪音，而且注解<b>优先于</b>
- * 字段名——两者一旦漂移就是静默换键（B132/B149 的同类教训）。</p>
+ * 字段名——两者一旦漂移就是静默换键。</p>
  *
  * <p>但「键 = 字段名」<b>不充分</b>：注解有时是<b>唯一让 Jackson 看得见该属性</b>的东西。所以本守卫
  * 只在<b>同时满足</b>两条时才判红：</p>
@@ -25,22 +25,23 @@ import org.junit.jupiter.api.Test;
  *   <li>注解的键 = 该成员的隐式属性名（Jackson 规则）；</li>
  *   <li>Jackson <b>本来就会自动探测</b>该成员——record 分量 / {@code public} 字段 / 有 {@code public}
  *       访问器（{@code getX}/{@code isX}/{@code setX} 或同名 fluent 方法）。否则删掉注解会让属性直接
- *       消失（B151 实测踩过：{@code CreateTenantRequest} 的包级私有字段 → 请求体 400
+ *       消失（实测踩过：{@code CreateTenantRequest} 的包级私有字段 → 请求体 400
  *       「field 'name' is required」）。</li>
  * </ol>
  *
  * <p>必要形态只剩四类，规则见下：键≠隐式名（外部协议 / 关键字冲突等）· 键形如 {@code isXxx} 的布尔属性
  * （getter 的隐式名会丢 {@code is}）· Jackson 探测不到的成员 · 「字段序锚」——见
- * {@link #hasRenamedAnnotation}（混用改名注解的类型，整文件跳过）。<b>B152 起不再有面级放行表</b>：
+ * {@link #hasRenamedAnnotation}（混用改名注解的类型，整文件跳过）。<b>不再有面级放行表</b>：
  * 外部协议面的冗余注解（43 处）也已清掉，剩下的全是上面四类。</p>
  *
- * <p>基线 <b>0</b>（不是棘轮——B151 已把我们自己的面清零，从第一天起就是"新增即红"）。</p>
+ * <p>基线 <b>0</b>（不是棘轮——我们自己的面已清零，从第一天起就是"新增即红"）。</p>
  */
 class JsonPropertyHygieneTest {
 
     /**
-     * 短形式与<b>全限定</b>形式都要认——HANDOFF §14.6 的口径警告：只扫短名会漏（{@code QaRequests} 那批用
-     * {@code @com.fasterxml…JsonProperty}；当前仓里 {@code chatpipeline/Rec46cSupport} 仍是这种写法）。
+     * 短形式与<b>全限定</b>形式都要认——HANDOFF §14.6 的口径警告：只扫短名会漏
+     * （仓里仍有全限定写法，如 {@code chatpipeline/Rec46cSupport} 用的
+     * {@code @com.fasterxml…JsonProperty}）。
      */
     private static final String ANN =
             "@(?:com\\.fasterxml\\.jackson\\.annotation\\.)?JsonProperty";
@@ -75,7 +76,7 @@ class JsonPropertyHygieneTest {
                 .isEmpty();
     }
 
-    /** 把 {@code .../java/com/ragagent/xxx} 归一成 {@code xxx}（与 ALLOWED_FACES 的写法一致）。 */
+    /** 把 {@code .../java/com/ragagent/xxx} 归一成 {@code xxx}。 */
     private static String relative(Path file) {
         String s = file.toString().replace('\\', '/');
         int i = s.indexOf("com/ragagent/");
@@ -108,7 +109,7 @@ class JsonPropertyHygieneTest {
                 continue;
             }
             if (!jacksonAutoDetects(member, inRecordHeader[i], body)) {
-                continue;   // 注解是唯一可见性来源 ⇒ 必要（B151 实测：删了会 400）
+                continue;   // 注解是唯一可见性来源 ⇒ 必要（实测：删了会 400）
             }
             offenders.add(rel + ":" + (i + 1) + "  键 " + keyName
                     + " = 隐式属性名且 Jackson 自会探测（删掉注解即可，零行为变化）");
@@ -123,7 +124,7 @@ class JsonPropertyHygieneTest {
     /**
      * 该类型是否混用「键 ≠ 隐式名」的<b>改名注解</b>。混用时不得再删「键 = 隐式名」的注解：那会把它从
      * <b>显式命名</b>降级成<b>隐式命名</b>，Jackson 据此可能改变属性顺序 ⇒ 线格式<b>字段序</b>漂移
-     * （B151 实测：Go 队列载荷断言期望 {@code tenant_id…chat_model_id,language}，删后 {@code language}
+     * （Go 队列载荷断言期望 {@code tenant_id…chat_model_id,language}，删后 {@code language}
      * 跳到最前）。这类冗余注解实为「字段序锚」，一并保留。
      */
     private static boolean hasRenamedAnnotation(List<String> lines, boolean[] inRecordHeader) {

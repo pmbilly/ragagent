@@ -10,7 +10,7 @@ import com.ragagent.model.domain.Model;
 import com.ragagent.model.service.ModelService;
 
 /**
- * {@link EmbeddingModelPort} 的 knowledge 侧实现（B98/C2）。
+ * {@link EmbeddingModelPort} 的 knowledge 侧实现。
  *
  * <p>逻辑搬自 {@code DefaultWikiModelResolver#getEmbeddingModel}：取模型 → embedding 类型闸门 →
  * {@code EmbedderClient.configFrom} → 返回 {@code embedBatch} 的函数式客户端。

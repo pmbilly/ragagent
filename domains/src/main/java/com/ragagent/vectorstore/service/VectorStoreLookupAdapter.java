@@ -10,7 +10,7 @@ import com.ragagent.vectorstore.domain.VectorStore;
 import com.ragagent.vectorstore.mapper.VectorStoreRepository;
 
 /**
- * {@link VectorStoreLookup} 的 vectorstore 侧实现（B107）。
+ * {@link VectorStoreLookup} 的 vectorstore 侧实现。
  *
  * <p>直接委托既有仓储的 {@code getByID(tenantId, storeId)}（含其租户过滤与解密的
  * 类型处理器），不复制任何查询逻辑。</p>

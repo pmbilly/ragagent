@@ -5,11 +5,11 @@ import java.nio.file.Path;
 import java.util.List;
 
 /**
- * 契约金片的**唯一解析入口**（B165 定）。
+ * 契约金片的**唯一解析入口**。
  *
  * <p>为什么需要它：金片历史上用「模块相对路径 + {@code server/…} 兜底」两候选读**文件路径**
  * （{@code Path.of("src/test/resources/contracts/x.json")}），而集成测试从 {@code :server}
- * 迁到 {@code :boot} 后工作目录变成 {@code boot/} ⇒ 两个候选同时落空（B165 实测 97 处失败）。
+ * 迁到 {@code :boot} 后工作目录变成 {@code boot/} ⇒ 两个候选同时落空（迁移当时实测 97 处失败）。
  * 另有一大批调用点走**类路径**读（{@code ClassPathResource("contracts/…")}）。两套读法并存
  * 本身就是脆弱源 ✗，故统一到本类：从工作目录向上找 {@code settings.gradle.kts} 定位仓库根，
  * 再按候选目录顺序解析 —— 与模块、与 CWD 都无关。

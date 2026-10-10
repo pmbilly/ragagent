@@ -4,10 +4,10 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 /**
- * API-Key 管理口（B208 ✓）。
+ * API-Key 管理口。
  *
  * <p><b>动机</b>：{@code :domains} 侧的 system/auth 控制器原先直接依赖
- * {@code auth.apikey.service.TenantAPIKeyService} ✗ —— 建 {@code :channels}（P4）时该方向会成环 ✗
+ * {@code auth.apikey.service.TenantAPIKeyService} ✗ —— 拆出 {@code :channels} 模块时该方向会成环 ✗
  * （见 {@code docs/phase4-module-boundaries-plan.md} §12）。</p>
  *
  * <p><b>形状</b>：只暴露窄面 + 已定形的 common 载荷（{@link TenantAPIKeyResponse} /

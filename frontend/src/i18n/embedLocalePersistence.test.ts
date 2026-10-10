@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 
-// 语言持久化语义（B63）：只有**显式选择**（宿主 set_locale）才写持久值；
+// 语言持久化语义：只有**显式选择**（宿主 set_locale）才写持久值；
 // 派生语言（渠道默认 / 浏览器 / URL ?locale=）只作用于本次加载。
 // 旧实现把渠道默认语言也写进 localStorage → 渠道改回「跟随浏览器/宿主」后，
 // 访客仍读旧值 → 跟随永久失效（已用真机实验复现）。

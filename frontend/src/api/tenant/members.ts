@@ -99,7 +99,7 @@ export async function fetchAllTenantMembers(tenantId: number): Promise<TenantMem
   let total = Number.POSITIVE_INFINITY
   for (let guard = 0; guard < 500 && out.length < total; guard++) {
     const resp = await listMembers(tenantId, { page, pageSize: pageSize })
-    // B201：统一外壳后 resp 即载荷；旧的 {data,success} 壳也容忍
+    // 统一外壳后 resp 即载荷；旧的 {data,success} 壳也容忍
     const data: any = (resp as any)?.data ?? resp
     if (!data) break
     total = data.total

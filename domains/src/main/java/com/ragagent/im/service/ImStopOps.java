@@ -25,7 +25,7 @@ import com.ragagent.stream.StreamStopWatcher;
  * 跨实例 /stop 全链路：本地出队/在途取消、stop 事件写入 StreamManager、标记兜底、
  * 在途（inflight）映射的绑定与退场。
  *
- * <p>B123 自 {@link ImService} 原样外提（原 907~1012 行，逐字搬迁，仅改依赖取用方式）。
+ * <p>自 {@link ImService} 原样外提（逐字搬迁，仅改依赖取用方式）。
  * 这段是一条**完整的请求取消链路**（用户在一次问答的不同阶段按 /stop，会分别命中
  * 出队、在途、标记三条路径），与渠道生命周期、消息处理主管道同处一类只是历史堆积。</p>
  *

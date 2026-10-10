@@ -82,7 +82,7 @@ const displayText = computed(() => {
     case 'creator':
       // Section header already provides the「本空间」context, so we just
       // show who created it. Fall back to a generic label when the user
-      // can't be resolved (creator_name 缺失，例如已删除账号 / 老数据)。
+      // can't be resolved (creatorName 缺失，例如已删除账号 / 老数据)。
       return props.creatorName || t('resourceOrigin.tenant')
     case 'space':
       return props.spaceName || t('resourceOrigin.space')

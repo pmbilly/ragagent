@@ -218,7 +218,7 @@ import { ChevronRightIcon } from 'tdesign-icons-vue-next'
 import KBChunkingPreview from './KBChunkingPreview.vue'
 
 interface ParserEngineRule {
-  // KB 配置面是 camel（B3b：键名统一 camel + V2 迁移）；snake 那份是覆盖/智能体面
+  // KB 配置面是 camel（键名统一 camel + V2 迁移）；snake 那份是覆盖/智能体面
   fileTypes: string[]
   engine: string
   xlsxFirstRowAsHeader?: boolean

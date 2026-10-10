@@ -122,7 +122,7 @@ class GitLabCompatTest {
         assertThat(GitLabUrl.valuesEncode(null)).isEmpty();
     }
 
-    // ── base64（B44：GoBase64 退役后只留行为面）──────────────
+    // ── base64（GoBase64 退役后只留行为面）──────────────
 
     /** GitLab 的 base64 每 60 字符换行——解码必须跳过 \n/\r（Java 原生 JDK 解码器路径）。 */
     @Test
@@ -136,7 +136,7 @@ class GitLabCompatTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    // ── Whitespace（B45：GoStrings 收敛后的共享实现）───────────────────
+    // ── Whitespace（GoStrings 收敛后的共享实现）───────────────────
 
     /**
      * {@link com.ragagent.common.text.Whitespace#trimSpace} 比 Java 的

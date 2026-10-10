@@ -529,11 +529,10 @@ public class WebConfig implements WebMvcConfigurer {
         // GET /skills（指令型技能目录，agent/management/SkillsCatalogController）：选择器数据源，
         // Viewer+。
         rbac.addRule("GET", "/api/v1/skills", TenantRole.VIEWER, false);
-        // 技能管理面（agent/management/SkillCatalogController，B57 入库版）：技能是**平台级资源**
-        // （全库共享、影响所有空间的智能体），故仅系统管理员——租户角色再高也不放行。
-        // 静态段 /catalog 与 /catalog/* 的 files 子路径逐条登记（AntPathMatcher 取首个命中）。
-        // B60：技能归属空间 → 管理面由「空间 admin」掌控（此前是平台 SystemAdmin）。
-        // 列出/编辑的对象是「平台内置层（只读）+ 当前空间」，写入只作用于当前空间。
+        // 技能管理面（agent/management/SkillCatalogController）：技能归属空间（另有平台内置
+        // 只读层），管理面由「空间 admin」掌控。静态段 /catalog 与 /catalog/* 的 files
+        // 子路径逐条登记（AntPathMatcher 取首个命中）。列出/编辑的对象是
+        // 「平台内置层（只读）+ 当前空间」，写入只作用于当前空间。
         rbac.addRule("GET", "/api/v1/skills/catalog", TenantRole.ADMIN, false);
         rbac.addRule("POST", "/api/v1/skills/catalog", TenantRole.ADMIN, false);
         rbac.addRule("GET", "/api/v1/skills/catalog/*", TenantRole.ADMIN, false);
@@ -631,18 +630,18 @@ public class WebConfig implements WebMvcConfigurer {
                 "/api/v1/agents/**",
                 "/api/v1/initialization/**",
                 "/api/v1/embed-channels/**", "/api/v1/im-channels/**", "/api/v1/wechat/**",
-                // W5c：presigned-preview 的 ADMIN 规则要有 pattern 才能命中；
+                // presigned-preview 的 ADMIN 规则要有 pattern 才能命中；
                 // presigned 与 preview 的 GET/HEAD 也流经本拦截器，但无规则即放行
                 //（两条路由在引擎根注册、无 RBAC 中间件）。
                 "/api/v1/files/**");
-        // W5a 漂移修复补的 pattern：chunks/messages/faq/knowledge-chat/agent-chat/
+        // 漂移修复补的 pattern：chunks/messages/faq/knowledge-chat/agent-chat/
         // knowledge-search 六个前缀的 addRule 早已存在（chunks 读组、faq/import/progress、
         // chat 三入口），但拦截器此前不覆盖这些前缀 → 规则空转。im 的 engine 级回调
         // 路由（/api/v1/im/callback/**）刻意不在清单：注册在 Auth 之前、无 RBAC。
 
         // langfuse 请求级 trace。链序 Auth → langfuse → Audit。order=10 排在门禁之后：
         // 被 RBAC/API-Key 拒绝的请求不产生 trace（langfuse 在 Auth 的下游）。
-        // 统一响应外壳打标（B183）：order=-100 ⇒ 先于 API-Key / RBAC 门禁运行 ⇒
+        // 统一响应外壳打标：order=-100 ⇒ 先于 API-Key / RBAC 门禁运行 ⇒
         // 被门禁拒绝的 @ApiResult 路由同样拿到新错误形态（{code,message,data}）。
         // 约定与迁移进度见 docs/api-response-convention.md。
         registry.addInterceptor(new ApiResultInterceptor())

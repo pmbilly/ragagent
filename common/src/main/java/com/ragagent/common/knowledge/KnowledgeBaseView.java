@@ -5,7 +5,7 @@ import java.time.OffsetDateTime;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
- * 知识库只读视图（B98/C2：由 {@code KnowledgeBaseLookup} 内嵌类型提升为顶层类型，
+ * 知识库只读视图（由 {@code KnowledgeBaseLookup} 内嵌类型提升为顶层类型，
  * 便于 wiki 侧 20+ 调用点直接 import）。
  *
  * <p><b>为什么可写</b>：本视图是 DTO——{@code knowledge} 侧适配器要填充、测试夹具要构造

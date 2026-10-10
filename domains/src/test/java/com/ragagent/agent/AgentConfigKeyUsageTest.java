@@ -21,8 +21,8 @@ import org.junit.jupiter.api.Test;
  * "模型被谁引用"，键名不对 ⇒ 绑定**静默丢失**，而当时 4711 条测试全绿、毫无提示）。这类缺陷只有
  * 源码级扫描能兜住。</p>
  *
- * <p><b>键表来源</b>：直接解析 {@code migrations/versioned/V1__baseline.sql} 的【存档·V3 键映射】块
- * （原 {@code V3__agent_config_keys_camel.sql} 已于 B156 折叠进 V1）的映射 ——迁移与守卫共用一份键表，
+ * <p><b>键表来源</b>：直接解析 {@code migrations/versioned/V1__baseline.sql} 的【存档】原 V3 的键映射块
+ * （原 {@code V3__agent_config_keys_camel.sql} 已折叠进 V1）的映射——迁移与守卫共用一份键表，
  * 避免两处各自维护而漂移。</p>
  *
  * <p><b>白名单（合法使用 snake 的面，非"agent 配置键"）</b>：追踪/span 载荷、LLM 请求体、DB 列名与
@@ -35,8 +35,8 @@ class AgentConfigKeyUsageTest {
 
     /** 合法 snake 面（按路径前缀/片段排除）。 */
     private static final List<String> ALLOWED_PREFIXES = List.of(
-            "common/tenant/",            // B96：原 auth/domain/tenantconfig（租户配置视图，键名由 jsonb 决定）
-            "tenant/",                   // B104：租户域由 common/tenant 搬出（RetrievalConfig/ParserEngineConfig
+            "common/tenant/",            // 原 auth/domain/tenantconfig（租户配置视图，键名由 jsonb 决定）
+            "tenant/",                  // 租户域由 common/tenant 搬出（RetrievalConfig/ParserEngineConfig
                                          //       的 snake 字面量是 tenants 表 jsonb 列键，由 Go 侧与迁移决定）
             "event/payload", "llm/", "common/pipeline/SearchParams",
             "tracing/langfuse", "datasource/connector", "stream/", "mcp/oauth", "mcp/domain/McpService",
@@ -53,10 +53,10 @@ class AgentConfigKeyUsageTest {
             "session/mapper/MessageRepository");
 
     @Test
-    @DisplayName("主代码不许再以 snake 字面量读写 agent 配置键（键表取自 V3 迁移）")
+    @DisplayName("主代码不许再以 snake 字面量读写 agent 配置键（键表取自 V1 baseline 存档块）")
     void noSnakeAgentConfigKeysInMainCode() throws Exception {
         List<String> keys = mappingKeys();
-        assertThat(keys).as("V3 迁移里应解析出 agent 配置键表").hasSizeGreaterThan(50);
+        assertThat(keys).as("V1 baseline 存档块里应解析出 agent 配置键表").hasSizeGreaterThan(50);
 
         List<String> offenders = new ArrayList<>();
         try (Stream<Path> files = Files.walk(MAIN)) {
@@ -88,11 +88,11 @@ class AgentConfigKeyUsageTest {
             }
         }
         assertThat(offenders)
-                .as("agent 配置树自 B18 起键名 = Java 字段名（camel）；下列位置仍按 snake 读写 ⇒ 会静默取不到值")
+                .as("agent 配置树键名 = Java 字段名（camel），迁移与守卫共用一份键表；下列位置仍按 snake 读写 ⇒ 会静默取不到值")
                 .isEmpty();
     }
 
-    /** 从 V1 baseline 的存档块（原 V3 迁移，B156 折叠进去）的 {@code mapping jsonb := '...'} 取 snake 键集合。 */
+    /** 从 V1 baseline 的存档块（原 V3 迁移折叠并入）的 {@code mapping jsonb := '...'} 取 snake 键集合。 */
     private static List<String> mappingKeys() throws Exception {
         String sql = Files.readString(MIGRATION);
         Matcher m = Pattern.compile("mapping jsonb := '(\\{.*?\\})'::jsonb", Pattern.DOTALL).matcher(sql);

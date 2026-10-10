@@ -35,7 +35,7 @@ import com.ragagent.support.ContractJson;
  * <p>场景顺序与录制脚本严格一致（顺序敏感：logout 放最后——它吊销 java-phase1 的
  * 全部 token；refresh 的 sleep 是为了让轮换出的 refresh_token 与旧值不同，
  * 与录制脚本一致——同秒 JWT 会逐字节相同，令牌撤销检查会变成
- * 堆序掷硬币，见约定 §9「W5a 补充」）。</p>
+ * 堆序掷硬币，见 auth 手册 §7 坑 12）。</p>
  *
  * <p>掩码面：uuid / 时间戳 / JWT（access_token/refresh_token/token）/
  * 数字 "id"（tenant-create 的 PG 序列值）/ "seq_id"（tag 序列）。</p>
@@ -167,7 +167,7 @@ class W5aSundryRoutesContractTest {
                 "{\"name\":\"" + "a".repeat(129) + "\"}"), 400, "w5a-tenant-put-longname.json");
         assertGolden(putJson("/api/v1/tenants/10002", owner,
                 "{\"name\": 123}"), 400, "w5a-tenant-put-badjson.json");
-        // Viewer PUT → OWNER 角色门（W5a 拦截器规则的直击场景）
+        // Viewer PUT → OWNER 角色门（RbacInterceptor 规则的直击场景）
         assertGolden(putJson("/api/v1/tenants/10002", viewer,
                 "{\"name\":\"nope\"}"), 403, "w5a-tenant-put-nonowner.json");
         // 自助创建 → 删除。URL 里的新租户 id ≠ 活动租户 → PathTenantMatch 403
@@ -385,7 +385,7 @@ class W5aSundryRoutesContractTest {
     private static String jsonPath(MvcResult r, String path) throws Exception {
         com.fasterxml.jackson.databind.JsonNode node =
                 new com.fasterxml.jackson.databind.ObjectMapper().readTree(raw(r));
-        // B191：统一外壳（有 code+data）时先下钻 data；未迁移端点（旧形态）保持原样。
+        // 统一外壳（有 code+data）时先下钻 data；未迁移端点（旧形态）保持原样。
         // 路径本身以 data 开头时**不下钻**——旧壳 {data,…} 与新壳 {…,data:…} 都有 data 键，语义已对齐 ✓
         if (!path.startsWith("data") && node.isObject() && node.has("code") && node.has("data")) {
             node = node.get("data");

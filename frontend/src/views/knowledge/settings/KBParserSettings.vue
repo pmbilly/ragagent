@@ -332,7 +332,7 @@ watch(showSettingsModal, (open, wasOpen) => {
 
 watch(() => props.parserEngineRules, (v) => {
   // 宽容读取：接受 camel 或 snake（历史数据）——旧实现按 snake 直取，
-  // 遇到 B3b 迁移后的 camel 数据会 `undefined.some` 直接把整页打崩。
+  // 遇到迁移后的 camel 数据会 `undefined.some` 直接把整页打崩。
   localEngineRules.value = normalizeKbParserRules(v)
 }, { deep: true })
 </script>

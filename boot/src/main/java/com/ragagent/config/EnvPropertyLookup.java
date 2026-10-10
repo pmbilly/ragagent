@@ -6,7 +6,7 @@ import java.util.function.Function;
 import org.springframework.core.env.Environment;
 
 /**
- * {@code Environment} 支撑的查找函数（B6 批 8/9 共用）。
+ * {@code Environment} 支撑的查找函数。
  *
  * <p>语义：<b>键名原样优先</b>（系统环境变量风格 {@code MINIO_ENDPOINT} / {@code MILVUS_COLLECTION}
  * 本就是 Environment 的一个 property source），**再回落属性风格**（{@code minio.endpoint} /

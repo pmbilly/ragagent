@@ -25,7 +25,7 @@ import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
 
 /**
- * {@link KnowledgeFinalizeAdapter} 的行为测试（B98/C2：由 wiki 侧
+ * {@link KnowledgeFinalizeAdapter} 的行为测试（由 wiki 侧
  * {@code WikiKnowledgeFinalizerTest} 随实现搬来）。
  *
  * <p><b>为什么值得单测</b>：没有它，文档会永远停在 {@code finalizing}。它的正确性完全体现在

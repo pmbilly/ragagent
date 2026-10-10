@@ -30,7 +30,7 @@ import com.ragagent.initialization.service.OllamaDownloadTaskStore;
 import com.ragagent.support.ContractJson;
 
 /**
- * W5b 契约测试：initialization 系统级 14 条（ollama 管理 6 + 模型测试 5 +
+ * 契约测试：initialization 系统级 14 条（ollama 管理 6 + 模型测试 5 +
  * 抽取 3），对照 golden w5b-*.json（dev server 录制，
  * scripts/record-w5b-golden.sh）逐字节/掩码比对。
  *
@@ -319,7 +319,7 @@ class W5bInitializationContractTest {
         org.junit.jupiter.api.Assertions.assertEquals(expected, masked);
         com.fasterxml.jackson.databind.JsonNode tags =
                 new com.fasterxml.jackson.databind.ObjectMapper().readTree(body)
-                // B201：统一外壳下取 data 后比较
+                // 统一外壳下取 data 后比较
                 .path("data")
                         .path("tags");
         assertTrue(tags.isArray() && !tags.isEmpty());
@@ -408,7 +408,7 @@ class W5bInitializationContractTest {
     private static String jsonPath(MvcResult r, String path) throws Exception {
         com.fasterxml.jackson.databind.JsonNode node =
                 new com.fasterxml.jackson.databind.ObjectMapper().readTree(raw(r));
-        // B201：统一外壳（有 code+data）且路径不以 data 开头时，先下钻 data
+        // 统一外壳（有 code+data）且路径不以 data 开头时，先下钻 data
         if (!path.startsWith("data") && node.isObject() && node.has("code") && node.has("data")) {
             node = node.get("data");
         }

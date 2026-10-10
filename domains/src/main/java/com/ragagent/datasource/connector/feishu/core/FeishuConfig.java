@@ -16,8 +16,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  * 所以本类<b>不需要</b>{@code @JsonIgnore}/蛇形键名/往返测试那套契约治理
  * （只有会落 jsonb 或作响应体的类型才需要）。</p>
  *
- * <p>键名＝字段名（{@code appId}/{@code appSecret}/{@code baseUrl}/{@code timezone}）——B139 换锚口径：
- * <b>入参</b>是前端写进 credentials 的 JSON（同批已改），而**出网字段**（飞书 OAuth 的
+ * <p>键名＝字段名（{@code appId}/{@code appSecret}/{@code baseUrl}/{@code timezone}）：
+ * <b>入参</b>是前端写进 credentials 的 JSON，而**出网字段**（飞书 OAuth 的
  * {@code app_id}/{@code app_secret}）由 {@link FeishuTransport} 另建，与本类的键解耦。</p>
  *
  * <h2>落库行为清单</h2>

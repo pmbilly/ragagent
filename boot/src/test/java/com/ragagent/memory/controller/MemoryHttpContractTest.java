@@ -319,9 +319,9 @@ class MemoryHttpContractTest {
         MvcResult r = perform(post("/api/v1/memory/items/" + id + "/reject")
                 .header("Authorization", bearer()));
 
-        // 拒绝就是删除：换锚后是 204，无响应体
+        // 拒绝就是删除：200 + 统一外壳（204 已退役）
         assertEquals(200, r.getResponse().getStatus(), raw(r));
-        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(r), "204 必须无响应体");   // B195：外壳恒存在   // B193：外壳恒存在
+        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(r), "外壳恒存在");
     }
 
     @Test
@@ -384,7 +384,7 @@ class MemoryHttpContractTest {
         MvcResult r = perform(delete("/api/v1/memory/items").header("Authorization", bearer()));
 
         assertEquals(200, r.getResponse().getStatus(), raw(r));
-        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(r), "204 必须无响应体");   // B195：外壳恒存在   // B193：外壳恒存在
+        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(r), "外壳恒存在");
 
         // 真的清掉了：列表回到空
         MvcResult after = perform(get("/api/v1/memory/items").header("Authorization", bearer()));
@@ -457,7 +457,7 @@ class MemoryHttpContractTest {
                 .header("Authorization", bearer()));
 
         assertEquals(200, r.getResponse().getStatus(), raw(r));
-        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(r), "204 必须无响应体");   // B195：外壳恒存在   // B193：外壳恒存在
+        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(r), "外壳恒存在");
     }
 
     @Test

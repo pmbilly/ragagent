@@ -124,7 +124,7 @@ class QaRequestBindingTest {
                 .hasMessageContaining("field 'query' is required");
     }
 
-    /** 字段级类型错误用 Jackson 原生消息，json 名仍是 camelCase（B51：GoJsonBindError 退役）。 */
+    /** 字段级类型错误用 Jackson 原生消息，json 名仍是 camelCase（GoJsonBindError 已退役）。 */
     @Test
     void fieldTypeErrorUsesCamelCaseJsonName() {
         assertThatThrownBy(() -> QaRequestBinder.bindQaRequest(

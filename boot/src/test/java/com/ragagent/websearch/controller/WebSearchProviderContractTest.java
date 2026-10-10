@@ -202,7 +202,7 @@ class WebSearchProviderContractTest {
                 () -> "seed create failed: " + result.getResponse().getErrorMessage());
         com.fasterxml.jackson.databind.JsonNode node = new com.fasterxml.jackson.databind.ObjectMapper()
                 .readTree(result.getResponse().getContentAsString());
-        return node.path("data").get("id").asText();   // B190：统一外壳下钻
+        return node.path("data").get("id").asText();   // 统一外壳下钻
     }
 
     // ── 1) 静态元数据 ──────────────────────────────────────────────────

@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import com.ragagent.im.runtime.ImFormat;
 
 /**
- * {@link ImInboundGuardOps} 的语义钉子：B125 自 {@code ImService} 外提时逐字搬迁，
+ * {@link ImInboundGuardOps} 的语义钉子：自 {@code ImService} 外提时逐字搬迁，
  * 这里把「单实例回落形态」的口径固化成断言——去重（同一 messageID 只处理一次）与
  * 限流（窗口内配额）在**未接 Redis** 时走进程内形态（该分支此前无直接覆盖）。
  *

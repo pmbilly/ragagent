@@ -12,7 +12,7 @@ import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
 
 /**
- * {@link KnowledgeFinalizePort} 的 knowledge 侧实现（B98/C2）。
+ * {@link KnowledgeFinalizePort} 的 knowledge 侧实现。
  *
  * <p>两条语句、try/catch 与告警日志整体搬自 {@code DefaultWikiKnowledgeFinalizer}
  * （wiki 侧该类退化为薄壳，只做 {@code Result → Outcome} 映射）。</p>

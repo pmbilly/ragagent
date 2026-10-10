@@ -59,9 +59,8 @@ import com.ragagent.common.web.ApiResult;
  * <p>凭据子资源见 {@link McpCredentialsController}；{@code /agent/tool-approvals/{pendingId}}
  * 见 {@link AgentToolApprovalController}（挂在 /agent 组）。</p>
  *
- * <p><b>响应形态</b>：服务资源面（create/list/get/update/delete/test/
- * tools/resources/metadata/usage-instructions）返回<b>裸对象或裸数组</b>，创建 201、
- * 删除 204；仅<b>工具审批面</b>仍带 {@code {data,success}} 信封。</p>
+ * <p><b>响应形态</b>：全端点成功响应包统一外壳 {@code {code,message,data}}（{@code @ApiResult}），
+ * 创建保持 201（外壳只包 body、不碰状态码），删除无业务数据。</p>
  */
 @RestController
 @ApiResult
@@ -311,8 +310,8 @@ public class McpServiceController {
             }
             throw BizException.internal(rawMessage(e));
         }
-        // 策略写入是无响应体的受理回执 → 204
-        return ApiResponse.ok();   // B191：204 退役
+        // 策略写入是无业务数据的受理回执
+        return ApiResponse.ok();   // 204 退役 ⇒ 200 + 外壳
     }
 
     // ── 工具方法 ─────────────────────────────────────────────────────────

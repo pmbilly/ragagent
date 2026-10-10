@@ -36,7 +36,9 @@ class YuqueFormatsTest {
         assertThat(cfg.baseURL()).isEqualTo(want);
     }
 
-    /** {@code baseURL()} 是**方法**：不得成为 JSON 属性——键集＝字段（B139 换锚后 key 就是 {@code baseUrl}）。 */
+    /**
+     * {@code baseURL()} 是**方法**：不得成为 JSON 属性——键集＝字段（key 就是 {@code baseUrl}）。
+     */
     @Test
     void getBaseUrlIsNotAJsonProperty() throws Exception {
         YuqueConfig cfg = new YuqueConfig();

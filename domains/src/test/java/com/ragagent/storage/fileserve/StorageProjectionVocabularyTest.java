@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
  *       {@code dto/StorageConfig} 同族（{@code accessKeyId}/{@code bucketName}/{@code pathPrefix}…），
  *       消费者是 {@code storage_backends.config} 的读写两侧
  *       （{@code StorageBackendService.configOf/serializeConfig}，忽略未知键）。</li>
- *   <li><b>引擎面（camel，B133 起）</b>——{@code StorageFileResolver.toStorageEngineConfig} 的
+ *   <li><b>引擎面（camel）</b>——{@code StorageFileResolver.toStorageEngineConfig} 的
  *       {@code renameConfigKeys(provider)} 单点派生，消费者是 {@code StorageEngineConfig}
  *       各 provider 段与解析器的完备性自校验。落库面与引擎面现已同词汇，唯一的差是
  *       <b>凭据两键的 provider 分族命名</b>（见下）。</li>
@@ -46,10 +46,10 @@ class StorageProjectionVocabularyTest {
     /** 落库面（camel）：{@code StorageProviderEnv.*.writeConfig} 在全开输入下的键集合。 */
     private static final Map<String, List<String>> ROW_FACE_KEYS = new LinkedHashMap<>();
 
-    /** 引擎面（camel，B133 起）：经 {@code renameConfigKeys(provider)} 后的键集合。 */
+    /** 引擎面（camel）：经 {@code renameConfigKeys(provider)} 后的键集合。 */
     private static final Map<String, List<String>> ENGINE_FACE_KEYS = new LinkedHashMap<>();
 
-    /** 凭据键的两族写法：两面之差只会出现在这两族之间（B133 后两族都是 camel）。 */
+    /** 凭据键的两族写法：两面之差只会出现在这两族之间（两族都是 camel）。 */
     private static final List<String> CREDENTIAL_CAMEL = List.of("accessKeyId", "secretAccessKey");
     private static final List<String> CREDENTIAL_ENGINE = List.of(
             "accessKeyId", "secretAccessKey", "secretId", "secretKey", "accessKey");
@@ -113,7 +113,7 @@ class StorageProjectionVocabularyTest {
     }
 
     @Test
-    @DisplayName("两面之差只在凭据命名：其余键两面一致（B133 后引擎面也是 camel）")
+    @DisplayName("两面之差只在凭据命名：其余键两面一致（引擎面也是 camel）")
     void facesDifferOnlyInCredentials() {
         for (String provider : ROW_FACE_KEYS.keySet()) {
             List<String> nonCredentialCamel = ROW_FACE_KEYS.get(provider).stream()

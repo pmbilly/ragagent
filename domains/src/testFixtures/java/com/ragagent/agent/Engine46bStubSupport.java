@@ -233,7 +233,7 @@ final class Engine46bStubSupport {
         return mask(sb.append(']').toString());
     }
 
-    /** float64 的 JSON 形态（B50：GoDoubleSerializer 退役后即 Double.toString）。 */
+    /** float64 的 JSON 形态（GoDoubleSerializer 退役后即 Double.toString）。 */
     private static String doubleText(double v) {
         return Double.toString(v);
     }

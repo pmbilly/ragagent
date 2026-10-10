@@ -155,7 +155,7 @@ class SystemContractTest {
         // PR4：外壳与键集改树断言（键序已归一）
         {
             var root = new com.fasterxml.jackson.databind.ObjectMapper().readTree(java);
-            // B192：统一外壳下先下钻 data（旧形态无壳时保持原样）
+            // 统一外壳下先下钻 data（旧形态无壳时保持原样）
             if (root.isObject() && root.has("code") && root.has("data")) {
                 root = root.get("data");
             }
@@ -235,7 +235,7 @@ class SystemContractTest {
         // PR4：相邻键子串在键序归一后不可靠 → 树断言
         {
             var root = new com.fasterxml.jackson.databind.ObjectMapper().readTree(java);
-            // B192：统一外壳下先下钻 data
+            // 统一外壳下先下钻 data
             if (root.isObject() && root.has("code") && root.has("data")) {
                 root = root.get("data");
             }
@@ -443,8 +443,8 @@ class SystemContractTest {
         // 成功（viewer 会话被吊销 → 重登可用；密码相同）
         MvcResult ok = mockMvc.perform(jsonBody(post("/api/v1/system/admin/users/reset-password"), sysAdmin,
                 "{\"email\":\"java-phase1-viewer@weknora.test\",\"newPassword\":\"Passw0rd!\"}")).andReturn();
-        assertEquals(200, ok.getResponse().getStatus(), raw(ok));   // B192：204 退役 ⇒ 200 + 外壳
-        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(ok)); // 204 无响应体
+        assertEquals(200, ok.getResponse().getStatus(), raw(ok));   // 204 退役 ⇒ 200 + 外壳
+        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(ok)); // 外壳恒存在
         // 被吊销的旧 token 401（AdminResetPassword 的 RevokeTokensByUserID）
         MvcResult revoked = mockMvc.perform(get("/api/v1/system/info")
                 .header("Authorization", viewer)).andReturn();
@@ -548,7 +548,7 @@ class SystemContractTest {
         // 平台 key 打 settings（无 platform 能力 → 403 门禁文案）
         // PR4：键序归一后邻接正则不可靠 → Jackson 直取
         String key = new com.fasterxml.jackson.databind.ObjectMapper()
-                .readTree(raw(created)).path("data").path("token").asText();   // B192：外壳下钻
+                .readTree(raw(created)).path("data").path("token").asText();   // 外壳下钻
         assertThat(key).startsWith("sk-");
         MvcResult guard = mockMvc.perform(get("/api/v1/system/admin/settings")
                 .header("X-API-Key", key)).andReturn();
@@ -568,11 +568,11 @@ class SystemContractTest {
 
         // PR4：键序归一后邻接正则不可靠 → Jackson 直取
         long delId = new com.fasterxml.jackson.databind.ObjectMapper()
-                .readTree(raw(created)).path("data").path("id").asLong();   // B192：外壳下钻
+                .readTree(raw(created)).path("data").path("id").asLong();   // 外壳下钻
         MvcResult del = mockMvc.perform(delete("/api/v1/system/admin/api-keys/" + delId)
                 .header("Authorization", sysAdmin)).andReturn();
-        assertEquals(200, del.getResponse().getStatus(), raw(del));   // B192：204 退役 ⇒ 200 + 外壳
-        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(del)); // 204 无响应体
+        assertEquals(200, del.getResponse().getStatus(), raw(del));   // 204 退役 ⇒ 200 + 外壳
+        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(del)); // 外壳恒存在
 
         MvcResult after = mockMvc.perform(get("/api/v1/system/admin/api-keys")
                 .header("Authorization", sysAdmin)).andReturn();
@@ -638,8 +638,8 @@ class SystemContractTest {
 
         MvcResult del = mockMvc.perform(delete("/api/v1/system/admin/settings/tenant.max_owned_per_user")
                 .header("Authorization", sysAdmin)).andReturn();
-        assertEquals(200, del.getResponse().getStatus(), raw(del));   // B192：204 退役 ⇒ 200 + 外壳
-        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(del)); // 204 无响应体
+        assertEquals(200, del.getResponse().getStatus(), raw(del));   // 204 退役 ⇒ 200 + 外壳
+        assertEquals("{\"code\":0,\"data\":null,\"message\":\"ok\"}", raw(del)); // 外壳恒存在
 
         MvcResult delUnknown = mockMvc.perform(delete("/api/v1/system/admin/settings/nope.key")
                 .header("Authorization", sysAdmin)).andReturn();
@@ -679,7 +679,7 @@ class SystemContractTest {
         MvcResult queues = mockMvc.perform(get("/api/v1/system/admin/runtime/queues")
                 .header("Authorization", sysAdmin)).andReturn();
         assertEquals(200, queues.getResponse().getStatus(), raw(queues));
-        // B192：期望是迁移前录的裸载荷 ⇒ 先把外壳取 data 再归一比较
+        // 期望是迁移前录的裸载荷 ⇒ 先把外壳取 data 再归一比较
         String body = ContractJson.semantic(ContractJson.payload(
                 QUEUE_TS.matcher(raw(queues)).replaceAll("\"timestamp\":\"<ts>\"")));
         assertEquals(ContractJson.semantic("{\"available\":false,\"upstreamConcurrency\":32,\"parseConcurrency\":32,"
@@ -703,7 +703,7 @@ class SystemContractTest {
         assertEquals(200, tasks.getResponse().getStatus(), raw(tasks));
         assertEquals(ContractJson.semantic(
                 "{\"available\":false,\"tasks\":[],\"pageSize\":20,\"hasMore\":false,\"nextCursor\":null}"),
-                ContractJson.payload(raw(tasks)));   // B192：外壳取 data
+                ContractJson.payload(raw(tasks)));   // 外壳取 data
 
         MvcResult mutate = mockMvc.perform(
                 post("/api/v1/system/admin/runtime/queues/default/tasks/t1/actions/cancel")

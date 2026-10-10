@@ -66,7 +66,7 @@ class StartupTaskRecoveryTest {
         assertReset(deleting);
         assertThat(parseStatus(completed)).isEqualTo("completed");
         // wiki 独槽的 finalizing 行也复位：Lite 下队列在进程内、随重启消失，
-        // 没有任何组件会重建触发器（B0 走查实测该 op 一直躺着、文档永远 finalizing）
+        // 没有任何组件会重建触发器（实测该 op 一直躺着、文档永远 finalizing）
         assertReset(wikiOnlySlot);
     }
 

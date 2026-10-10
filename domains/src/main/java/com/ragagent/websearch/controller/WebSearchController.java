@@ -21,6 +21,6 @@ public class WebSearchController {
 
     @GetMapping("/api/v1/web-search/providers")
     public ResponseEntity<?> getProviders() {
-        return ResponseEntity.ok(WebSearchProviderTypes.all());   // B190：外壳交给 advice
+        return ResponseEntity.ok(WebSearchProviderTypes.all());   // 外壳交给 advice
     }
 }

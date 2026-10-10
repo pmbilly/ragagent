@@ -68,7 +68,7 @@ final class AgentEngineAssembler {
     private final ResourceCatalogService resourceCatalog;
     private final javax.sql.DataSource dataSource;
     private final VlmDescriberWiring vlmDescriberWiring;
-    /** 平台级技能目录（B57 入库版）：装配期建 {@code DbSkillSource} 读 skills 表。 */
+    /** 平台级技能目录（skills 表入库版）：装配期建 {@code DbSkillSource} 读 skills 表。 */
     private final SkillCatalogService skillCatalogService;
 
     AgentEngineAssembler(MemoryService memoryService, SessionKnowledgeQaService knowledgeQa, AgentToolBackends toolBackends, ArtifactCollectorWiring artifactCollectorWiring, KnowledgeService knowledgeService, FaqEntryQueryService faqService, McpServiceService mcpServiceService, McpMetadataService mcpMetadataService, McpClientManager mcpClientManager, Gate toolApprovalGate, ResourceCatalogService resourceCatalog, javax.sql.DataSource dataSource, VlmDescriberWiring vlmDescriberWiring, SkillCatalogService skillCatalogService) {
@@ -117,9 +117,9 @@ final class AgentEngineAssembler {
 
         // 指令型技能（选项 B）：Manager 只做 SKILL.md 三级注入（元数据/正文/资源），
         // 模型凭指令用现有工具执行；shell/文件注入与沙箱镜像源已随沙箱退役。
-        // B57：内容来自 skills 表——每轮装配新建 DbSkillSource（读一次表），
+        // 内容来自 skills 表——每轮装配新建 DbSkillSource（读一次表），
         // 因此新建/删除技能对下一轮对话生效，无需缓存失效机制。
-        // B60：读的是「平台内置层 + 当前空间」，缺租户上下文时只读平台层（fail closed）。
+        // 读的是「平台内置层 + 当前空间」，缺租户上下文时只读平台层（fail closed）。
         Manager skillsManager = null;
         if (config.isSkillsEnabled()) {
             try {

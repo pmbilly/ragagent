@@ -76,7 +76,7 @@ class EngineFactoryTest {
     }
 
     private VectorStoreView store(String engineType, ConnectionConfig cc, IndexConfig idx) {
-        // B107：引擎工厂改收 L1 视图；id 保持 null（env-store 判定 → false，与迁移前一致）
+        // 引擎工厂改收 L1 视图；id 保持 null（env-store 判定 → false，与迁移前一致）
         VectorStoreView store = new VectorStoreView(null, 0L, null, engineType, cc, idx);
         return store;
     }

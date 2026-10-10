@@ -7,8 +7,8 @@ import {
   toOverrideParserRules,
 } from './parserEngineRules.ts'
 
-// B67：解析引擎规则的「两面」互转。
-// KB 配置面是 camel（B3b 键名统一 + V2 迁移；后端 ParserEngineRuleView(fileTypes, …)），
+// 解析引擎规则的「两面」互转。
+// KB 配置面是 camel（键名统一 camel + V2 迁移；后端 ParserEngineRuleView(fileTypes, …)），
 // 覆盖/智能体面是 snake（后端运行时 ParserEngineRules.resolve 读 file_types）。
 // 旧实现按 snake 直读 KB 配置（camel）→ `undefined.some` 把整页打崩；写入侧也会因
 // 键名不对而被后端丢弃（库里出现 fileTypes: []）。

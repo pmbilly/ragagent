@@ -1,7 +1,7 @@
 package com.ragagent.common.vectorstore;
 
 /**
- * 向量库定义只读视图（B107）。
+ * 向量库定义只读视图。
  *
  * <p>字段取 L2 {@code retrieval} 的实际读取面（引擎工厂与注册表）：
  * {@code id} / {@code tenantId} / {@code name} / {@code engineType} +

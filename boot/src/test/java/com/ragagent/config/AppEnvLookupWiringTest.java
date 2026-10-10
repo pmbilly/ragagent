@@ -9,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.ragagent.common.deployment.AppEnvLookup;
 
 /**
- * 应用级 env 查找面的<b>装配守卫</b>（B16「静默失效」扫描产出）。
+ * 应用级 env 查找面的<b>装配守卫</b>（源于 env「静默失效」专项扫描的产出）。
  *
  * <p>背景：{@code AppEnvLookup} 由 {@code AppEnvLookupEnvironmentPostProcessor} 安装，而该 EPP
  * 只能由 {@code META-INF/spring.factories} 装载——写成
@@ -19,7 +19,7 @@ import com.ragagent.common.deployment.AppEnvLookup;
  *
  * <p>本测试因此做<b>运行时</b>断言：在真实 Spring 上下文里向 {@code AppEnvLookup} 取两个键——
  * 一个键名原样、一个走属性风格回落。若 EPP 未被装载，两次取值都是 {@code null}，此测试立刻变红。
- * 覆盖面：约 25 个散落读点（Ollama / OIDC / Gate / 邀请 TTL / 内置模型 / 启动恢复 / 临时文档 TTL
+ * 覆盖面：21 个散落读点（Ollama / OIDC / Gate / 邀请 TTL / 内置模型 / 启动恢复 / 临时文档 TTL
  * / vectorstore 副本数 …）。</p>
  */
 @SpringBootTest(properties = {

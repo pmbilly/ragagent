@@ -4,11 +4,11 @@ import java.util.Map;
 
 /**
  * 知识库活动流的 wiki 变更投影接缝（**端口**：定义在中性包 `common.audit`，
- * 实现由审计模块提供；B94/C8 把它从 `wiki.domain` 搬来，使 `audit` 不再依赖 `wiki`）。
+ * 实现由审计模块提供；本接口从 `wiki.domain` 搬来，使 `audit` 不再依赖 `wiki`）。
  *
- * <p>HTTP 层把人工页面变更写成一条 {@code wiki_content_changed} 审计事件。
- * 净效果是一条 {@code AuditLog}：Action={@code wiki_content_changed}、Scope={@code knowledgebase}、
- * Target={@code wiki}/{@code kbID}、Outcome={@code success}、
+ * <p>HTTP 层把人工页面变更写成一条 {@code wiki.content_changed} 审计事件。
+ * 净效果是一条 {@code AuditLog}：Action={@code wiki.content_changed}、ScopeType={@code knowledge_base}、
+ * TargetType={@code wiki}/TargetID={@code kbID}、Outcome={@code success}、
  * Details={@code {"count":N,"actions":{...}}}（只在 count &gt; 0 时写）。</p>
  *
  * <p><b>为什么是接缝而不是直接调用</b>：定义端口是为了固定埋点位置、
@@ -18,13 +18,13 @@ import java.util.Map;
  *
  * <p><b>实现已就位</b>：{@code com.ragagent.audit.service.WikiActivityAuditRecorder}
  * （审计模块提供）实现了本接口，@Component 自动装配，因此
- * WikiPageController 的 6 处人工埋点与 WikiIngestBatchHandler 的批量摘要
- * 现在都<b>真正落库</b>为 {@code wiki.content_changed} 审计行。</p>
+ * {@code WikiPageOps} 的 4 处人工埋点（经 {@code WikiActivityRecorder}）与 ingest 侧
+ * {@code WikiIngestRunSupport} 的批量摘要现在都<b>真正落库</b>为 {@code wiki.content_changed} 审计行。</p>
  */
 public interface WikiActivityAudit {
 
     /**
-     * 写入一条 {@code wiki_content_changed} 审计事件
+     * 写入一条 {@code wiki.content_changed} 审计事件
      * （Details 为 {@code {"count": sum(actions), "actions": actions}}）。
      *
      * @param tenantId        页面所属工作空间

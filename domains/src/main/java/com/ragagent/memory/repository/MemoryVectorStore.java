@@ -27,7 +27,7 @@ import com.ragagent.memory.domain.MemoryVectors;
  * 记忆**向量面**（item_embeddings 表 + pgvector 列）：写入/删除嵌入、按向量检索、
  * pgvector 列就绪探测与列缺失回退、库内/进程内两套排序，以及列存在性探测（JDBC 元数据）。
  *
- * <p>B130 自 {@link MemoryIndexStore} 外提（逐字搬迁）。复核判定：原「规模例外」的理由
+ * <p>自 {@link MemoryIndexStore} 外提（逐字搬迁）。复核判定：原「规模例外」的理由
  * （"六段同属索引侧读写一个关注点"）是**层次**论点而非**内聚**论点——向量面与话题统计、
  * 文档亲和、抽取进度分属**不同表家族**，天然接缝（本例印证：它是唯一带 JDBC 元数据探测的簇）。
  * 持有 {@link MemoryRepository} 回引以访问各 mapper 与方言判定；本类不得独立实例化。</p>

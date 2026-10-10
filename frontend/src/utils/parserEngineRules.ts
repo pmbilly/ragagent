@@ -2,7 +2,7 @@
  * 解析引擎规则的**两面**与显式互转。
  *
  * - **KB 配置面**（`knowledge_bases.chunking_config.parserEngineRules`）：**camelCase**
- *   —— B3b「KB 配置 jsonb 键名统一 camelCase + V2 存量迁移」，后端视图
+ *   —— KB 配置 jsonb 键名已统一 camelCase（V2 存量迁移），后端视图
  *   `ChunkingConfigView.ParserEngineRuleView(fileTypes, engine, xlsxFirstRowAsHeader)`。
  * - **覆盖 / 智能体面**（上传覆盖 `parser_engine_rules`、智能体 `chatParserEngineRules`）：
  *   **snake_case** —— 后端运行时 `ParserEngineRules.resolve` 读的是 `rule.file_types`
@@ -10,7 +10,7 @@
  *
  * 两面在 UI 里会互相搬运（上传确认对话框把 KB 配置搬进覆盖、再搬回 KB 配置），
  * 所以转换必须**显式**——直接透传会让「读侧按 snake 拿 camel 数据」崩掉
- * （B67 实锤：KBParserSettings 对 camel 数据读 `rule.file_types.some` → 整页白屏）。
+ * （实锤案例：KBParserSettings 对 camel 数据读 `rule.file_types.some` → 整页白屏）。
  */
 
 export interface KbParserEngineRule {

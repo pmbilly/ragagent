@@ -76,7 +76,7 @@ public class WebSearchProviderCredentialsController {
         } catch (RuntimeException e) {
             throw BizException.internal("failed to clear credential: " + e.getMessage());
         }
-        return ApiResponse.ok();   // B190：204 退役（HttpStatus.NO_CONTENT 形态）
+        return ApiResponse.ok();   // 204 退役（HttpStatus.NO_CONTENT 形态）
     }
 
     // ── 内部 ───────────────────────────────────────────────────────────

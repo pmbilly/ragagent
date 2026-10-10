@@ -17,27 +17,27 @@ import java.util.Set;
 /**
  * 租户过滤缺失<b>探测</b>（租户过滤单点化评估的 Step 2，fail-loud 路线）。
  *
- * <p>背景：手工租户条件散落各仓储，漏写一处就是数据面越权（B60 技能读全表跨租户可见
- * 即实证）。与 TenantLineInnerInterceptor（SQL 级自动改写）相比，本类<b>不改写 SQL</b>，
+ * <p>背景：手工租户条件散落各仓储，漏写一处就是数据面越权（曾有技能读全表跨租户可见的实证）。
+ * 与 TenantLineInnerInterceptor（SQL 级自动改写）相比，本类<b>不改写 SQL</b>，
  * 只检查「注册表的表在 SELECT 主查询里是否出现 {@code tenant_id} 谓词」，缺失按模式处置。
  * 这样避开了 TenantLine 的三个硬伤（见
- * {@code docs/persistence-tenant-filtering-evaluation.md}）：与 B60 的
- * {@code tenant_id IS NULL = 平台内置} 语义冲突、方言 SQL 解析失败即炸、ignore 表清单维护。</p>
+ * {@code docs/persistence-tenant-filtering-evaluation.md}）：与
+ * {@code tenant_id IS NULL = 平台内置} 的语义冲突、方言 SQL 解析失败即炸、ignore 表清单维护。</p>
  *
  * <p><b>三档模式</b>（{@code weknora.persistence.tenant-filter-guard}，默认 enforce）：
  * {@code off} 关闭；{@code alert} 只告警（盘面用）；{@code enforce} 抛
- * {@link MybatisPlusException}——B71 已完成逐表定性（72 条存量语句归入
+ * {@link MybatisPlusException}——已完成逐表定性（72 条存量语句归入
  * {@link #ALLOWED_STATEMENTS}），默认档自 2026-10-05 起为 enforce；未登记的新增
  * 无租户谓词查询会在执行期直接红。</p>
  *
- * <p><b>v1 边界（刻意从窄，减少告警噪音）</b>：只查 SELECT 主 from-item 表（B60 型
- * 「读全表」是主攻面），JOIN 的次表与 UNION 分支不查；WHERE 判定按渲染串包含
+ * <p><b>v1 边界（刻意从窄，减少告警噪音）</b>：只查 SELECT 主 from-item 表（「读全表」型越权是主攻面），
+ * JOIN 的次表与 UNION 分支不查；WHERE 判定按渲染串包含
  * {@code tenant_id}（子查询里出现也算过——宁漏勿误）；方言/动态 SQL 解析失败放行
  * （同 {@link FullTableWriteGuard} 的 fail-open）。这些边界收窄都登记在本注释里，
  * 收紧时改这里。</p>
  *
  * <p><b>表注册表</b>：由 migrations 推导（{@code V1__baseline.sql}：带 {@code tenant_id} 的 46 表
- * + {@code skills}；B156 起 V4/V5 已折叠进 V1）。解析脚本输出直接粘贴，新增带租户列的表时同步维护。</p>
+ * + {@code skills}；V4/V5 已折叠进 V1）。解析脚本输出直接粘贴，新增带租户列的表时同步维护。</p>
  */
 public class TenantFilterGuard implements InnerInterceptor {
 
@@ -48,7 +48,7 @@ public class TenantFilterGuard implements InnerInterceptor {
 
     /**
      * 查询时必须出现 {@code tenant_id} 谓词的表（2026-10-05 由 V1__baseline.sql +
-     * V5__skills_tenant.sql 推导；B156 起 V5 已折叠 ⇒ **只看 V1__baseline.sql 即可**，且 skills 的
+     * V5__skills_tenant.sql 推导；V5 已折叠 ⇒ **只看 V1__baseline.sql 即可**，且 skills 的
      * {@code tenant_id} 已直接写在 CREATE 里）。判定脚本是「CREATE TABLE 块内含 tenant_id 列」。
      * 已知误报面：按父键传递范围的查询（如 chunks 按 knowledge_id）也会命中告警——
      * alert 档盘面后，属传递范围的表迁出本表、改在调用面注释范围语义。
@@ -74,7 +74,7 @@ public class TenantFilterGuard implements InnerInterceptor {
     }
 
     /**
-     * 语句级白名单（B71 逐表定性，2026-10-05；首次盘面 72 条语句全部归类）。
+     * 语句级白名单（逐表定性，2026-10-05；首次盘面 72 条语句全部归类）。
      * 增删条目必须注明族别。族别口径：
      * <ul>
      *   <li><b>认证面</b>——按 hash/bot 身份/邮箱定位，请求期不存在租户上下文；</li>

@@ -37,7 +37,7 @@ import com.ragagent.common.web.ApiResponse;
  * 响应形态（§2.1：裸对象，无 {"data","success"} 信封）：上传 202 裸 doc
  * （status=uploaded，解析异步）；列表/详情 200 裸对象/裸数组（详情查不到
  * 404 "Attachment not found"）；预览是文件字节流（filetransport 语义）；
- * 删除 204（幂等）。表单字段名＝Java 参数名（camelCase）。
+ * 删除 200 + {@code ApiResponse} 外壳（幂等）。表单字段名＝Java 参数名（camelCase）。
  *
  * owner 范围：上传/删除改会话内容 → 严格 owner 范围；
  * 列表/详情/预览是读 → 读可见性。
@@ -217,7 +217,7 @@ public class TemporaryDocumentController {
         response.getOutputStream().write(opened.data());
     }
 
-    /** 删除附件：204，幂等。 */
+    /** 删除附件：200 + {@code ApiResponse} 外壳，幂等。 */
     @DeleteMapping({"/api/v1/sessions/{id}/attachments/{attachmentId}",
             "/api/v1/sessions/{sessionId}/attachments/{attachmentId}"})
     public ApiResponse<Void> delete(
@@ -237,7 +237,7 @@ public class TemporaryDocumentController {
         } catch (RuntimeException e) {
             throw BizException.internal(e.getMessage());
         }
-        return ApiResponse.ok();   // B193：204 退役（空体与「外壳恒存在」冲突）
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
     // ── 辅助 ──────────────────────────────

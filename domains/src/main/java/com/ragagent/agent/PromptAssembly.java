@@ -52,7 +52,7 @@ final class PromptAssembly {
     }
 
     /**
-     * 本轮点名技能的正文（B61）：读不到就不注入（该技能改走 read_file 按需读取），
+     * 本轮点名技能的正文：读不到就不注入（该技能改走 read_file 按需读取），
      * 不让技能读取失败拖垮整轮对话。
      */
     private List<AgentPrompts.PinnedSkillInstructions> pinnedSkillInstructions() {
@@ -107,12 +107,6 @@ final class PromptAssembly {
         }
         return AgentPrompts.renderSystemPromptSections(sections);
     }
-
-    /**
-     * 当前上下文 token 的最优估计：有上一轮 API 用量时以它为基线，只 BPE 估其后新增的
-     * 消息；否则纯按消息大小估。工具 schema 不加进来。
-     */
-
 
     static String indentLines(String s, String indent) {
         if (s.isEmpty()) {
@@ -231,7 +225,7 @@ final class PromptAssembly {
                 }
                 String name = sanitizeMustUseField(skill.name());
                 if (injectedSkillNames != null && injectedSkillNames.contains(skill.name())) {
-                    // B61：正文已随系统提示词注入 → 直接照做即可，不必再去读一遍
+                    // 正文已随系统提示词注入 → 直接照做即可，不必再去读一遍
                     lines.add("Apply the instructions of @Skill \"" + name
                             + "\" (provided in <skillInstructions>) to the task below.");
                 } else {

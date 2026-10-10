@@ -307,8 +307,8 @@ final class McpServiceCrudOps {
             throw BizException.internal("Failed to delete MCP service: " + McpServiceController.rawMessage(e));
         }
         log.info("MCP service deleted successfully: {}", serviceId);
-        // 同步完成的删除 → 204（无响应体）
-        return ApiResponse.ok();   // B191：204 退役
+        // 同步完成的删除，无业务数据
+        return ApiResponse.ok();   // 204 退役 ⇒ 200 + 外壳
     }
 
     // ── 连接测试 / 工具 / 资源 ────────────────────────────────────────────

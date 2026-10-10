@@ -1,7 +1,7 @@
 package com.ragagent.common.knowledge;
 
 /**
- * 文本 chunk 只读视图（B98/C2）。
+ * 文本 chunk 只读视图。
  *
  * <p>字段取 <b>消费方实际读取</b> 的投影（正文重建、引用分批、图片富化、清理）：
  * {@code id} / {@code content} / {@code chunkType} / {@code chunkIndex} /

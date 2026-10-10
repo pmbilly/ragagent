@@ -6,7 +6,7 @@
  * {@code memory}（域内主体）、{@code auth}（租户配置里的 {@code MemoryConfig} 字段，
  * 见 {@code TenantConfigOps}）、{@code datasource}；若放进 {@code memory} 域，
  * {@code auth → memory} 与既有的 {@code memory → auth}（{@code MemoryService} 用
- * {@code TenantService}）会立刻形成 SCC 环（B103 实测被守卫抓出并回退）。
+ * {@code TenantService}）会立刻形成 SCC 环（实测被守卫抓出并回退）。
  * 依赖方向因此是"消费域 → {@code common.memory} ← memory 域"。</p>
  */
 package com.ragagent.common.memory;

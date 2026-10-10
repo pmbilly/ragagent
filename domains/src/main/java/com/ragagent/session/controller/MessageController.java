@@ -46,7 +46,8 @@ import com.ragagent.common.web.ApiResponse;
  * <ul>
  *   <li>load → 裸 {@code [Message]}；search → 裸 {@link MessageSearchResult}；
  *       stats → 裸 {@code ChatHistoryKbStats}；</li>
- *   <li>删除 → <b>204</b>（§1.13；旧 {@code {"message":…,"success":true}} 退役）。</li>
+ *   <li>删除 → <b>200</b> + {@code ApiResponse} 外壳（§1.13；旧 {@code {"message":…,"success":true}}
+ *       裸文案与空体 204 均退役）。</li>
  * </ul>
  *
  * <h2>错误门槛</h2>
@@ -183,7 +184,7 @@ public class MessageController {
         } catch (RuntimeException e) {
             throw toInternal(e);
         }
-        return ApiResponse.ok();   // B193：204 退役（空体与「外壳恒存在」冲突）
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
     // ══════════════════════════ 搜索 ══════════════════════════

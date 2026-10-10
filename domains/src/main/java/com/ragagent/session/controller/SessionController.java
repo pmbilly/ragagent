@@ -51,17 +51,15 @@ import com.ragagent.common.web.ApiResponse;
 /**
  * 会话 HTTP 层。
  *
- * <p>本波（G1）只落会话 CRUD + 置顶 8 条；消息 / steer / 附件 / 产物随后续分组补。</p>
- *
  * <h2>响应形态（§2.1）</h2>
  * <ul>
  *   <li>创建 → <b>201</b> + 裸 {@link Session}；读取/更新 → 200 + 裸 {@link Session}；</li>
  *   <li>列表 → {@code {items,page,pageSize,total}}（{@link SessionListResponse}）；</li>
- *   <li>删除 / 批量删除 / 清空消息 → <b>204</b>（§1.13；旧 {@code {"message":…,"success":true}} 退役，
- *       前端不再解析服务端文案）；</li>
+ *   <li>删除 / 批量删除 / 清空消息 → <b>200</b> + {@code ApiResponse} 外壳（§1.13；旧
+ *       {@code {"message":…,"success":true}} 裸文案与空体 204 均退役，前端不再解析服务端文案）；</li>
  *   <li>置顶 → 200 + {@code {"pinned":bool}}（{@link SessionPinResponse}）；</li>
  *   <li>产物列表 → 裸数组 {@code [ArtifactView]}；生成标题 → {@code {"title":"…"}}；</li>
- *   <li>停止生成 → 成功 <b>204</b>（§1.17：操作类响应不带服务端文案）。</li>
+ *   <li>停止生成 → 成功 <b>200</b> + {@code ApiResponse} 外壳，无业务数据（§1.17）。</li>
  * </ul>
  *
  * <h2>错误门槛顺序</h2>
@@ -276,7 +274,7 @@ public class SessionController {
 
     // ══════════════════════════ 删除 ══════════════════════════
 
-    /** 删除会话：同步删除 → <b>204</b>（§1.13）。 */
+    /** 删除会话：同步删除 → <b>200</b> + {@code ApiResponse} 外壳（§1.13）。 */
     @DeleteMapping("/api/v1/sessions/{id}")
     public ApiResponse<Void> deleteSession(@PathVariable("id") String id) {
         String sessionId = LogSanitizer.sanitize(id);
@@ -291,12 +289,12 @@ public class SessionController {
         } catch (RuntimeException e) {
             throw toInternal(e);
         }
-        return ApiResponse.ok();   // B193：204 退役（空体与「外壳恒存在」冲突）
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
     /**
      * {@code deleteAll=true} 走全量删除；
-     * 否则要求非空 ids，逐个 sanitize 后丢弃空项。成功 → <b>204</b>（同步删除）。
+     * 否则要求非空 ids，逐个 sanitize 后丢弃空项。成功 → <b>200</b> + {@code ApiResponse} 外壳（同步删除）。
      */
     @DeleteMapping("/api/v1/sessions/batch")
     public ApiResponse<Void> batchDeleteSessions(
@@ -307,7 +305,7 @@ public class SessionController {
             } catch (RuntimeException e) {
                 throw toInternal(e);
             }
-        return ApiResponse.ok();   // B193：204 退役（空体与「外壳恒存在」冲突）
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
         }
 
         if (req.ids() == null || req.ids().isEmpty()) {
@@ -332,7 +330,7 @@ public class SessionController {
         } catch (RuntimeException e) {
             throw toInternal(e);
         }
-        return ApiResponse.ok();   // B193：204 退役（空体与「外壳恒存在」冲突）
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
     // ══════════════════════════ 清空消息 ══════════════════════════
@@ -355,7 +353,7 @@ public class SessionController {
         } catch (RuntimeException e) {
             throw toInternal(e);
         }
-        return ApiResponse.ok();   // B193：204 退役（空体与「外壳恒存在」冲突）
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
     // ══════════════════════════ 置顶 ══════════════════════════
@@ -558,16 +556,16 @@ public class SessionController {
             @RequestBody(required = false) StopSessionRequest request) {
         String sid = LogSanitizer.sanitize(sessionId);
         if (sid == null || sid.isEmpty()) {
-            throw new BizException(AppError.ofHttpStatus(400, "Session ID is required"));   // B193：返回位不可用 ⇒ 就地展开
+            throw new BizException(AppError.ofHttpStatus(400, "Session ID is required"));   // 返回位不可用 ⇒ 就地展开
         }
         if (request == null || isBlankStr(request.messageId())) {
-            throw new BizException(AppError.ofHttpStatus(400, "message_id is required"));   // B193：返回位不可用 ⇒ 就地展开
+            throw new BizException(AppError.ofHttpStatus(400, "message_id is required"));   // 返回位不可用 ⇒ 就地展开
         }
         String assistantMessageId = LogSanitizer.sanitize(request.messageId());
 
         Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null) {
-            throw new BizException(AppError.ofHttpStatus(401, "Unauthorized"));   // B193：返回位不可用 ⇒ 就地展开
+            throw new BizException(AppError.ofHttpStatus(401, "Unauthorized"));   // 返回位不可用 ⇒ 就地展开
         }
 
         // 消息可见性走 GetMessage（读路径），会话走严格 owner 范围（写路径）
@@ -575,25 +573,25 @@ public class SessionController {
         try {
             message = messageService.getMessage(sid, assistantMessageId);
         } catch (RuntimeException e) {
-            throw new BizException(AppError.ofHttpStatus(404, "Message not found"));   // B193：返回位不可用 ⇒ 就地展开
+            throw new BizException(AppError.ofHttpStatus(404, "Message not found"));   // 返回位不可用 ⇒ 就地展开
         }
         if (message.getSessionId() == null || !message.getSessionId().equals(sid)) {
-            throw new BizException(AppError.ofHttpStatus(403, "Message does not belong to this session"));   // B193：返回位不可用 ⇒ 就地展开
+            throw new BizException(AppError.ofHttpStatus(403, "Message does not belong to this session"));   // 返回位不可用 ⇒ 就地展开
         }
         Session session;
         try {
             session = sessionService.getOwnedSession(sid);
         } catch (RuntimeException e) {
-            throw new BizException(AppError.ofHttpStatus(404, "Session not found"));   // B193：返回位不可用 ⇒ 就地展开
+            throw new BizException(AppError.ofHttpStatus(404, "Session not found"));   // 返回位不可用 ⇒ 就地展开
         }
         if (session.getTenantId() == null || session.getTenantId().longValue() != tenantId) {
             // ⚠️ Long 比较必须拆箱/equals（租户 id 超出 Integer 缓存区间时
             // 引用比较恒不等 → 会误判 "Access denied"）
-            throw new BizException(AppError.ofHttpStatus(403, "Access denied"));   // B193：返回位不可用 ⇒ 就地展开
+            throw new BizException(AppError.ofHttpStatus(403, "Access denied"));   // 返回位不可用 ⇒ 就地展开
         }
         if (message.isCompleted()) {
             // 已经结束的消息是幂等的成功（不回 message 文案，§1.17）
-        return ApiResponse.ok();   // B193：204 退役（空体与「外壳恒存在」冲突）
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
         }
 
         StreamEvent stopEvent = new StreamEvent(
@@ -608,9 +606,9 @@ public class SessionController {
         try {
             streamManager.appendEvent(sid, assistantMessageId, stopEvent);
         } catch (RuntimeException e) {
-            throw new BizException(AppError.ofHttpStatus(500, "Failed to write stop event"));   // B193：返回位不可用 ⇒ 就地展开
+            throw new BizException(AppError.ofHttpStatus(500, "Failed to write stop event"));   // 返回位不可用 ⇒ 就地展开
         }
-        return ApiResponse.ok();   // B193：204 退役（空体与「外壳恒存在」冲突）
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
     private static boolean isBlankStr(String v) {

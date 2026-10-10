@@ -228,7 +228,7 @@ public class MemoryController {
         } catch (RuntimeException e) {
             throw fail(e, "Failed to delete memory");
         }
-        return ApiResponse.ok();   // B195：204 退役（空体与「外壳恒存在」冲突）
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
     /** 接受一条待确认的推断条目：200 + 裸条目。 */
@@ -253,7 +253,7 @@ public class MemoryController {
         } catch (RuntimeException e) {
             throw fail(e, "Failed to reject memory");
         }
-        return ApiResponse.ok();   // B195：204 退役（空体与「外壳恒存在」冲突）
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
     /**
@@ -272,7 +272,7 @@ public class MemoryController {
         } catch (RuntimeException e) {
             throw fail(e, "Failed to clear memories");
         }
-        return ApiResponse.ok();   // B195：204 退役（空体与「外壳恒存在」冲突）
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
     // ══════════════════════════ 主题 ══════════════════════════
@@ -315,7 +315,7 @@ public class MemoryController {
         } catch (RuntimeException e) {
             throw fail(e, "Failed to delete topic");
         }
-        return ApiResponse.ok();   // B195：204 退役（空体与「外壳恒存在」冲突）
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
     // ══════════════════════════ 文档亲和度 ══════════════════════════
@@ -343,7 +343,7 @@ public class MemoryController {
         } catch (RuntimeException e) {
             throw fail(e, "Failed to delete document affinity");
         }
-        return ApiResponse.ok();   // B195：204 退役（空体与「外壳恒存在」冲突）
+        return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
     // ══════════════════════════ 导出 / 整理 ══════════════════════════
