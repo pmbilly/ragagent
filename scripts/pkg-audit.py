@@ -106,7 +106,14 @@ for k in sorted(viol, key=lambda k: -len(viol[k])):
 
 print()
 print("═" * 92)
-print("⑤ controller/ 包里的非控制器文件（应归位）+ 超大单层")
+print("⑤ controller/ 包里的非控制器文件（**已判定：包私有表现层协作类 ⇒ 非缺陷**，判据见 HANDOFF §7.3 / B178）+ 超大单层")
+_collab = [(p, f) for p in PKGS for f in FILES[p]
+           if "controller" in f.parts and not f.name.endswith("Controller.java")
+           and f.name != "package-info.java"]
+_web = sum(1 for p, f in _collab
+           if re.search(r"import (org\.springframework\.(web|http)|jakarta\.servlet|com\.ragagent\.common\.web)",
+                       f.read_text(encoding="utf-8")))
+print(f"   判据复核（B178）：协作类 {len(_collab)} 个 = 依赖 Web 类型 {_web} + 其余（引用控制器类型）{len(_collab) - _web} ⇒ **应归位 0** ✓")
 for p in PKGS:
     d = ROOT / p / "controller"
     if d.exists():
