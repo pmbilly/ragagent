@@ -121,7 +121,7 @@ function isPublicAuthRequest(url?: string): boolean {
 }
 
 /**
- * 统一响应外壳判定（B169）：后端 `@ApiResult` 路由的成功体恒为
+ * 统一响应外壳判定（B183）：后端 `@ApiResult` 路由的成功体恒为
  * `{ code: 0, message: "ok", data: … }`（约定见 docs/api-response-convention.md）。
  *
  * 只认**恰好由这三个键构成**的对象（code 为数字）—— 避免把业务载荷里恰好叫
@@ -207,7 +207,7 @@ instance.interceptors.response.use(
 
     const { status, data } = error.response;
     // 将HTTP状态码一并抛出，方便上层判断401等场景
-    // 后端错误体两形态并存（B169 迁移期，见 docs/api-response-convention.md）：
+    // 后端错误体两形态并存（B183 迁移期，见 docs/api-response-convention.md）：
     //   - @ApiResult 路由：{ code, message, data }（data 承载 details）
     //   - 其余路由：{ error: { code, message, details } } 或 { error: "…" }
     // 这里按形态提取顶层 message；其余字段靠下面的 ...data 摊平

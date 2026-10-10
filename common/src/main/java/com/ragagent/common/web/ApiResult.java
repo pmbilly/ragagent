@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  * {@code GlobalExceptionHandler} 按同一形态输出（门禁类错误经
  * {@link ApiResultInterceptor} 打标识别）。
  *
- * <p>迁移期约定（B169）：未标注的控制器保持历史形状不变；新控制器**必须**标注，或进
+ * <p>迁移期约定（B183）：未标注的控制器保持历史形状不变；新控制器**必须**标注，或进
  * {@code scripts/api-envelope.baseline.json} 的待迁移清单 —— 由守卫 {@code check-api-envelope}
  * 强制，清单**只许减不许增**。</p>
  */

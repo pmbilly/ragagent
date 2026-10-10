@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""统一响应外壳守卫（B169 上线）。
+"""统一响应外壳守卫（B183 上线）。
 
-背景：B169 定了「一套外壳 + 一个解包点」——`@ApiResult` 控制器成功体统一
+背景：B183 定了「一套外壳 + 一个解包点」——`@ApiResult` 控制器成功体统一
 `{code,message,data}`（`common/web/ApiResponse`），错误体同形（`GlobalExceptionHandler`
 按请求打标分派）；前端唯一解包点 `frontend/src/utils/request.ts`。约定见
 `docs/api-response-convention.md`。
@@ -32,7 +32,7 @@ BASELINE = ROOT / "scripts" / "api-envelope.baseline.json"
 
 ANNOTATION = "@ApiResult"
 # 判定用正则：短名与全限定名（@com.ragagent.common.web.ApiResult）都算数——
-# 子串匹配曾在自检里漏判全限定写法（B169 实翻车一次 ✗）。
+# 子串匹配曾在自检里漏判全限定写法（B183 实翻车一次 ✗）。
 ANNOTATION_RE = re.compile(r"@(?:[\w.]+\.)?ApiResult\b")
 SUCCESS_LITERAL = re.compile(r'"success"\s*:')
 

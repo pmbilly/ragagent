@@ -243,7 +243,7 @@ export interface PlaceholdersResponse {
   fallbackPrompt: PlaceholderDefinition[];
 }
 
-// 获取占位符定义（B169：后端统一外壳 {code,message,data} ⇒ 解包在 utils/request.ts 一处完成，
+// 获取占位符定义（B183：后端统一外壳 {code,message,data} ⇒ 解包在 utils/request.ts 一处完成，
 // api 层直接返回载荷；此前的 { data: resp } 手工适配已退役）
 export function getPlaceholders() {
   return get<PlaceholdersResponse>('/api/v1/agents/placeholders');

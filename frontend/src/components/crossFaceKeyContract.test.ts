@@ -287,7 +287,7 @@ test('信封读法：Java 后端是裸载荷，不得再按 Go 的 {success,data
 })
 
 test('统一响应外壳在 request.ts 一处解包（api 层直返载荷、store 读裸载荷）', () => {
-  // B169：后端 @ApiResult 路由的成功体统一 {code:0,message:"ok",data:…}
+  // B183：后端 @ApiResult 路由的成功体统一 {code:0,message:"ok",data:…}
   // （约定见 docs/api-response-convention.md）；解包点**唯一** = utils/request.ts 的响应拦截器
   // ⇒ api 层不再需要「裸载荷适配成 { data }」的补丁，消费端直接读载荷。
   // 旧约定（B66）：「裸载荷 + 消费端要 { data } → 在 api 层 return { data: resp }」随外壳退役。

@@ -44,7 +44,7 @@ import com.ragagent.common.web.ApiResult;
  * 调用方只提供 slug/name/description/正文。删除是软删；被**本空间**智能体引用时拒绝，
  * {@code force=true} 才强删（引用清单进 details 与审计）。</p>
  *
- * <p>响应一律 camelCase，外壳统一 {@code {code,message,data}}（{@link ApiResult}，B169；
+ * <p>响应一律 camelCase，外壳统一 {@code {code,message,data}}（{@link ApiResult}，B183；
  * 约定见 {@code docs/api-response-convention.md}）。</p>
  */
 @RestController
@@ -200,7 +200,7 @@ public class SkillCatalogController {
         }
         catalog.softDelete(row, tenant);
         audit(AuditAction.SKILL_DELETED, row, refs);
-        // B169：204 退役（空体与「外壳恒存在」冲突）⇒ 200 + {code:0,message:"ok",data:null}
+        // B183：204 退役（空体与「外壳恒存在」冲突）⇒ 200 + {code:0,message:"ok",data:null}
         return ApiResponse.ok();
     }
 

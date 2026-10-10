@@ -44,7 +44,7 @@ import com.ragagent.agent.management.mapper.CustomAgentMapper;
  * 403 纯字符串；行不存在 → 放行给 handler 出 404）；读/列表 Viewer 下限由
  * RbacInterceptor 承担。</p>
  *
- * <p>响应外壳（B169）：本类标注 {@link ApiResult} ⇒ 成功体统一 {@code {code,message,data}}
+ * <p>响应外壳（B183）：本类标注 {@link ApiResult} ⇒ 成功体统一 {@code {code,message,data}}
  * （由 {@code ApiResultAdvice} 施加，方法只返回载荷）；错误体同形（{@code GlobalExceptionHandler}
  * 按请求打标分派）。约定见 {@code docs/api-response-convention.md}。</p>
  */
@@ -82,7 +82,7 @@ public class AgentController {
         for (var r : result.agents()) {
             rows.add(AgentResponses.agent(r));
         }
-        // 载荷形状不变（{agents, disabledOwnAgentIds}）；外壳由 @ApiResult 统一施加（B169）
+        // 载荷形状不变（{agents, disabledOwnAgentIds}）；外壳由 @ApiResult 统一施加（B183）
         return ResponseEntity.ok(AgentResponses.listEnvelope(rows, result.disabledOwnIds()));
     }
 

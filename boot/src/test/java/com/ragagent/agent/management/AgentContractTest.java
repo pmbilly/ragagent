@@ -26,7 +26,7 @@ import com.ragagent.support.ContractJson;
  * （对照 golden 逐字节/掩码比对）。
  *
  * golden 来源：dev server 录制（scripts/record-ag-golden.sh，
- * 42 条 ag-*.json + 17 条 init-*.json；ag 侧已按 B169 统一外壳重写）。
+ * 42 条 ag-*.json + 17 条 init-*.json；ag 侧已按 B183 统一外壳重写）。
  *
  * 场景顺序严格按录制脚本的请求序列（有状态依赖）：鉴权 → 静态面 → 空列表 →
  * 内建 get → CRUD → creator 筛选 → update → delete → copy → 内建 PUT（落 DB 行）→
@@ -202,7 +202,7 @@ class AgentContractTest {
                 404, "ag-update-missing.json");
 
         // ── 7) delete 家族 ──
-        // 2026-10-10（B169）：DELETE 由 204 改为 200 + 统一外壳
+        // 2026-10-10（B183）：DELETE 由 204 改为 200 + 统一外壳
         // {code:0,message:"Agent deleted successfully",data:null}（204 的空体与「外壳恒存在」冲突）；
         // 同时把此前**无任何引用的** ag-delete.json 钉进测试 ✓。
         assertGolden(delH("/api/v1/agents/" + agKbref, bearer), 200, "ag-delete.json");
