@@ -1,1 +1,36 @@
-{"ok":true,"elapsedMs":1,"error":null,"request":{"file":{"name":"tiny.mp3","size":14},"input":"","modelId":"b0000000-0000-0000-0000-000000000006","modelName":"md-asr","modelType":"ASR","options":{},"provider":"","source":"remote"},"rawResponse":{"text":"stub-transcript","segments":[{"start":0,"end":1.5,"text":"stub-transcript"}]},"observations":{"segmentCount":1,"textCharacters":15}}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "ok": true,
+    "elapsedMs": 1,
+    "error": null,
+    "request": {
+      "file": {
+        "name": "tiny.mp3",
+        "size": 14
+      },
+      "input": "",
+      "modelId": "b0000000-0000-0000-0000-000000000006",
+      "modelName": "md-asr",
+      "modelType": "ASR",
+      "options": {},
+      "provider": "",
+      "source": "remote"
+    },
+    "rawResponse": {
+      "text": "stub-transcript",
+      "segments": [
+        {
+          "start": 0,
+          "end": 1.5,
+          "text": "stub-transcript"
+        }
+      ]
+    },
+    "observations": {
+      "segmentCount": 1,
+      "textCharacters": 15
+    }
+  }
+}

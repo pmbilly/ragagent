@@ -292,6 +292,13 @@ class DataSourceHttpContractTest {
         }
         com.fasterxml.jackson.databind.JsonNode actual = mapper.readTree(actualJson);
         com.fasterxml.jackson.databind.JsonNode golden = mapper.readTree(golden(goldenFile));
+        // B189：两侧都走统一外壳 ⇒ 比较载荷前先下钻 data
+        if (actual.isObject() && actual.has("code") && actual.has("data")) {
+            actual = actual.get("data");
+        }
+        if (golden.isObject() && golden.has("code") && golden.has("data")) {
+            golden = golden.get("data");
+        }
 
         assertEquals(golden.size(), actual.size(), "连接器条数");
         java.util.Map<String, com.fasterxml.jackson.databind.JsonNode> byType = new java.util.HashMap<>();
@@ -324,7 +331,7 @@ class DataSourceHttpContractTest {
         MvcResult r = perform(get("/api/v1/datasource?kbId=" + KB_EMPTY)
                 .header("Authorization", bearer));
         assertEquals(200, r.getResponse().getStatus(), raw(r));
-        assertEquals("[]", raw(r));
+            // B189：空列表也走统一外壳（载荷仍为 []）；形态由金片钉住
         assertGoldenBody("ds-list-empty.json", raw(r));
     }
 
@@ -402,6 +409,7 @@ class DataSourceHttpContractTest {
         // PR4：键序归一后邻接子串不可靠 → 树断言
         {
             var root = new com.fasterxml.jackson.databind.ObjectMapper().readTree(raw(r));
+            root = root.path("data");   // B189：统一外壳下钻
             var cfg = root.path("config");
             org.assertj.core.api.Assertions.assertThat(cfg.path("type").asText()).isEqualTo("rss");
             org.assertj.core.api.Assertions.assertThat(
@@ -461,6 +469,7 @@ class DataSourceHttpContractTest {
         // config 里只剩 settings：credentials 被库里那份（null）整块替换掉了
         {
             var root = new com.fasterxml.jackson.databind.ObjectMapper().readTree(body);
+            root = root.path("data");   // B189：统一外壳下钻
             var cfg = root.path("config");
             org.assertj.core.api.Assertions.assertThat(cfg.path("type").asText()).isEqualTo("rss");
             org.assertj.core.api.Assertions.assertThat(
@@ -649,12 +658,14 @@ class DataSourceHttpContractTest {
 
         MvcResult first = perform(delete("/api/v1/datasource/" + id + "/credentials/credentials")
                 .header("Authorization", bearer));
-        assertEquals(204, first.getResponse().getStatus(), raw(first));
-        assertEquals("", raw(first));
+        assertEquals(200, first.getResponse().getStatus(), raw(first));   // B189：204 退役 ⇒ 200 + 外壳
+        assertEquals(com.ragagent.support.ContractJson.semantic(
+                new com.fasterxml.jackson.databind.ObjectMapper(),
+                "{\"code\":0,\"message\":\"ok\",\"data\":null}"), raw(first));
 
         MvcResult second = perform(delete("/api/v1/datasource/" + id + "/credentials/credentials")
                 .header("Authorization", bearer));
-        assertEquals(204, second.getResponse().getStatus(), raw(second));
+        assertEquals(200, second.getResponse().getStatus(), raw(second));   // B189：204 退役 ⇒ 200 + 外壳
 
         String after = raw(perform(get("/api/v1/datasource/" + id).header("Authorization", bearer)));
         assertThat(after).contains("\"configured\":false");
@@ -760,8 +771,10 @@ class DataSourceHttpContractTest {
     void deleteReturns204AndGetAfterwardsIs404() throws Exception {
         String id = createId();
         MvcResult r = perform(delete("/api/v1/datasource/" + id).header("Authorization", bearer));
-        assertEquals(204, r.getResponse().getStatus(), raw(r));
-        assertEquals("", raw(r));
+        assertEquals(200, r.getResponse().getStatus(), raw(r));   // B189：204 退役 ⇒ 200 + 外壳
+            assertEquals(com.ragagent.support.ContractJson.semantic(
+                    new com.fasterxml.jackson.databind.ObjectMapper(),
+                    "{\"code\":0,\"message\":\"ok\",\"data\":null}"), raw(r));
 
         MvcResult after = perform(get("/api/v1/datasource/" + id).header("Authorization", bearer));
         assertEquals(404, after.getResponse().getStatus(), raw(after));

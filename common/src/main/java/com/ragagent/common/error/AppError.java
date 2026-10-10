@@ -49,6 +49,25 @@ public record AppError(int code, String message, Object details, int httpCode) {
         return new AppError(ErrorCode.VALIDATION.value(), message, null, 400);
     }
 
+    /**
+     * 按 HTTP 状态造错（只有状态、没有业务码的场合：控制器私有的纯字符串错误改走全局处理器时）。
+     * 码值取 {@link ErrorCode} 通用段 —— 与 GlobalExceptionHandler 的分派口径一致。
+     */
+    public static AppError ofHttpStatus(int httpStatus, String message) {
+        int code = switch (httpStatus) {
+            case 400 -> ErrorCode.BAD_REQUEST.value();
+            case 401 -> ErrorCode.UNAUTHORIZED.value();
+            case 403 -> ErrorCode.FORBIDDEN.value();
+            case 404 -> ErrorCode.NOT_FOUND.value();
+            case 405 -> ErrorCode.METHOD_NOT_ALLOWED.value();
+            case 409 -> ErrorCode.CONFLICT.value();
+            case 429 -> ErrorCode.TOO_MANY_REQUESTS.value();
+            case 503 -> ErrorCode.SERVICE_UNAVAILABLE.value();
+            default -> ErrorCode.INTERNAL_SERVER.value();
+        };
+        return new AppError(code, message == null ? "" : message, null, httpStatus);
+    }
+
     public AppError withDetails(Object details) {
         return new AppError(code, message, details, httpCode);
     }

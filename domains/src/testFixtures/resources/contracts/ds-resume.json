@@ -1,1 +1,7 @@
-{"status":"active"}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "status": "active"
+  }
+}

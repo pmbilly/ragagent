@@ -1,1 +1,26 @@
-{"ok":true,"elapsedMs":2,"error":null,"request":{"input":"embed me","modelId":"b0000000-0000-0000-0000-000000000003","modelName":"md-emb","modelType":"Embedding","options":{},"provider":"","source":"remote"},"rawResponse":[0.1,0.2,0.3],"observations":{"dimension":3}}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "ok": true,
+    "elapsedMs": 2,
+    "error": null,
+    "request": {
+      "input": "embed me",
+      "modelId": "b0000000-0000-0000-0000-000000000003",
+      "modelName": "md-emb",
+      "modelType": "Embedding",
+      "options": {},
+      "provider": "",
+      "source": "remote"
+    },
+    "rawResponse": [
+      0.1,
+      0.2,
+      0.3
+    ],
+    "observations": {
+      "dimension": 3
+    }
+  }
+}

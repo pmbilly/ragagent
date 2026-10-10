@@ -1,1 +1,1 @@
-{"error":"kb_id is required"}
+{"code":1000,"data":null,"message":"kb_id is required"}

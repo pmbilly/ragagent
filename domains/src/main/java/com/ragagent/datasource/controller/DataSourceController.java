@@ -28,6 +28,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.ragagent.datasource.service.KnowledgeBridge;
+import com.ragagent.common.error.AppError;
+import com.ragagent.common.error.BizException;
+import com.ragagent.common.web.ApiResponse;
+import com.ragagent.common.web.ApiResult;
 
 /**
  * 数据源管理端点。
@@ -54,6 +58,7 @@ import com.ragagent.datasource.service.KnowledgeBridge;
  * {@code "unauthorized"}），抽公共方法反而要额外传参。</p>
  */
 @RestController
+@ApiResult
 public class DataSourceController {
 
     /**
@@ -130,9 +135,6 @@ public class DataSourceController {
             return error(401, "unauthorized");
         }
         Owned owned = ownDataSource(tenantId, id);
-        if (owned.error() != null) {
-            return owned.error();
-        }
         return ResponseEntity.ok(DataSourceResponse.from(owned.ds()));
     }
 
@@ -188,9 +190,6 @@ public class DataSourceController {
             return error(400, "invalid request");
         }
         Owned owned = ownDataSource(tenantId, id);
-        if (owned.error() != null) {
-            return owned.error();
-        }
         req.setId(id);
         req.setTenantId(owned.ds().getTenantId());
         req.setKnowledgeBaseId(owned.ds().getKnowledgeBaseId());
@@ -205,21 +204,18 @@ public class DataSourceController {
 
     /** 删除数据源：成功是 <b>204</b>，无响应体。 */
     @DeleteMapping("/api/v1/datasource/{id}")
-    public ResponseEntity<?> deleteDataSource(@PathVariable("id") String id) {
+    public ApiResponse<Void> deleteDataSource(@PathVariable("id") String id) {
         Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null || tenantId == 0L) {
-            return error(401, "unauthorized");
+            throw new BizException(AppError.ofHttpStatus(401, "unauthorized"));
         }
         Owned owned = ownDataSource(tenantId, id);
-        if (owned.error() != null) {
-            return owned.error();
-        }
         try {
             service.deleteDataSource(id);
         } catch (RuntimeException e) {
-            return error(500, "failed to delete data source");
+            throw new BizException(AppError.ofHttpStatus(500, "failed to delete data source"));
         }
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B189：204 退役（空体与「外壳恒存在」冲突）
     }
 
     // ══════════════════════════ 连接与资源 ══════════════════════════
@@ -232,9 +228,6 @@ public class DataSourceController {
             return error(401, "unauthorized");
         }
         Owned owned = ownDataSource(tenantId, id);
-        if (owned.error() != null) {
-            return owned.error();
-        }
         try {
             service.validateConnection(id);
         } catch (RuntimeException e) {
@@ -294,9 +287,6 @@ public class DataSourceController {
             return error(401, "unauthorized");
         }
         Owned owned = ownDataSource(tenantId, id);
-        if (owned.error() != null) {
-            return owned.error();
-        }
         List<Resource> resources;
         try {
             resources = service.listAvailableResources(id, parentId == null ? "" : parentId);
@@ -321,9 +311,6 @@ public class DataSourceController {
             return error(401, "unauthorized");
         }
         Owned owned = ownDataSource(tenantId, id);
-        if (owned.error() != null) {
-            return owned.error();
-        }
         ResolveAncestorsRequest req;
         try {
             req = rawBody == null || rawBody.isBlank()
@@ -362,9 +349,6 @@ public class DataSourceController {
             return error(401, "unauthorized");
         }
         Owned owned = ownDataSource(tenantId, id);
-        if (owned.error() != null) {
-            return owned.error();
-        }
         SyncLog syncLog;
         try {
             syncLog = service.manualSync(id);
@@ -382,9 +366,6 @@ public class DataSourceController {
             return error(401, "unauthorized");
         }
         Owned owned = ownDataSource(tenantId, id);
-        if (owned.error() != null) {
-            return owned.error();
-        }
         try {
             service.pauseDataSource(id);
         } catch (RuntimeException e) {
@@ -401,9 +382,6 @@ public class DataSourceController {
             return error(401, "unauthorized");
         }
         Owned owned = ownDataSource(tenantId, id);
-        if (owned.error() != null) {
-            return owned.error();
-        }
         try {
             service.resumeDataSource(id);
         } catch (RuntimeException e) {
@@ -430,9 +408,6 @@ public class DataSourceController {
             return error(401, "unauthorized");
         }
         Owned owned = ownDataSource(tenantId, id);
-        if (owned.error() != null) {
-            return owned.error();
-        }
 
         int limitValue = 10;
         if (limit != null && !limit.isEmpty()) {
@@ -480,15 +455,12 @@ public class DataSourceController {
             return error(404, "sync log not found");
         }
         Owned owned = ownDataSource(tenantId, syncLog.getDataSourceId());
-        if (owned.error() != null) {
-            return owned.error();
-        }
         return ResponseEntity.ok(syncLog);
     }
 
     // ══════════════════════════ 归属守卫 ══════════════════════════
 
-    private record Owned(DataSource ds, ResponseEntity<?> error) {
+    private record Owned(DataSource ds) {
     }
 
     /**
@@ -505,13 +477,10 @@ public class DataSourceController {
         try {
             ds = service.getDataSource(id);
         } catch (RuntimeException e) {
-            return new Owned(null, error(404, "data source not found"));
+            throw new BizException(AppError.ofHttpStatus(404, "data source not found"));
         }
-        ResponseEntity<?> kbError = kbGuard.check(tenantId, ds.getKnowledgeBaseId());
-        if (kbError != null) {
-            return new Owned(null, kbError);
-        }
-        return new Owned(ds, null);
+        kbGuard.check(tenantId, ds.getKnowledgeBaseId());
+        return new Owned(ds);
     }
 
     // ══════════════════════════ 工具 ══════════════════════════
@@ -547,11 +516,17 @@ public class DataSourceController {
         return body;
     }
 
-    /** 单键 {@code {"error": msg}}。 */
+    /**
+     * 统一错误形态（B189）：**恒抛** {@link BizException} —— 走 GlobalExceptionHandler 出
+     * {@code {code,message,data}}。
+     *
+     * <p>刻意保留原签名（返回类型仍是 {@code ResponseEntity<Map<String,Object>>}）：本类有 36 处
+     * {@code return error(...)}、还有 {@code new Owned(null, error(...))} 这类**值位置**调用，
+     * 改签名会连带改 40 处并踩"值位置不是语句"的坑（B188 因此翻车两次 ✗）。恒抛后调用点一行不动、
+     * 语义一致（这些路径本来就只可能以错误结束）。</p>
+     */
     static ResponseEntity<Map<String, Object>> error(int status, String message) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("error", message == null ? "" : message);
-        return ResponseEntity.status(status).body(body);
+        throw new BizException(AppError.ofHttpStatus(status, message));
     }
 
     /**

@@ -254,14 +254,14 @@ class ModelContractTest {
         // credentials DELETE → 204
         mockMvc.perform(delete("/api/v1/models/" + modelId + "/credentials/apiKey")
                         .header("Authorization", "Bearer " + token))
-                .andExpect(status().isNoContent())
-                .andExpect(content().string(""));
+                .andExpect(status().isOk())
+                .andExpect(content().json("{\"code\":0,\"message\":\"ok\",\"data\":null}"));
 
         // delete → 204 无响应体
         mockMvc.perform(delete("/api/v1/models/" + modelId)
                         .header("Authorization", "Bearer " + token))
-                .andExpect(status().isNoContent())
-                .andExpect(content().string(""));
+                .andExpect(status().isOk())
+                .andExpect(content().json("{\"code\":0,\"message\":\"ok\",\"data\":null}"));
     }
 
     // ── 工具 ──────────────────────────────────────────────────────────────

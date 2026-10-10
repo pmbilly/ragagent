@@ -1,1 +1,1 @@
-{"error":"connector type not found in registry"}
+{"code":1000,"data":null,"message":"connector type not found in registry"}

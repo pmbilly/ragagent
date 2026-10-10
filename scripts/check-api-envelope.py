@@ -37,6 +37,22 @@ ANNOTATION_RE = re.compile(r"@(?:[\w.]+\.)?ApiResult\b")
 SUCCESS_LITERAL = re.compile(r'"success"\s*:')
 
 
+def code_only(text):
+    """剥掉注释后的源码（R-a / R-d 判定用）。
+
+    起因（B189 实测）：javadoc 里述及 "@ApiResult" 或 "success":false 会让判定**误报**——
+    DataSourceCredentialsController 就因此在守卫下假红过一次 ✓。
+    """
+    text = re.sub(r'/\*.*?\*/', '', text, flags=re.S)
+    keep = []
+    for line in text.split('\n'):
+        s = line.strip()
+        if s.startswith('//') or s.startswith('*') or s.startswith('/*'):
+            continue
+        keep.append(line)
+    return '\n'.join(keep)
+
+
 def controllers():
     """{相对路径: 源文本}——全部 main 源集里的 *Controller.java。"""
     out = {}
@@ -57,7 +73,7 @@ def main():
     files = controllers()
     pending = load_pending()
 
-    annotated = {f for f, t in files.items() if ANNOTATION_RE.search(t)}
+    annotated = {f for f, t in files.items() if ANNOTATION_RE.search(code_only(t))}
     problems = []
 
     # R-a 未标注且未登记
@@ -80,7 +96,7 @@ def main():
 
     # R-d 双壳
     for f in sorted(annotated):
-        if SUCCESS_LITERAL.search(files[f]):
+        if SUCCESS_LITERAL.search(code_only(files[f])):
             problems.append(f"R-d 双壳 {f}：已标注 {ANNOTATION} 却仍手搓 \"success\" 键")
 
     total = len(files)

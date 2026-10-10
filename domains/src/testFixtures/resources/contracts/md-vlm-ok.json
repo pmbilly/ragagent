@@ -1,1 +1,26 @@
-{"ok":true,"elapsedMs":1,"error":null,"request":{"file":{"name":"tiny.png","size":70},"input":"描述这张图","modelId":"b0000000-0000-0000-0000-000000000005","modelName":"md-vlm","modelType":"VLLM","options":{},"provider":"","source":"remote"},"rawResponse":"你好，我是知识助手。","observations":{"answerCharacters":10}}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "ok": true,
+    "elapsedMs": 1,
+    "error": null,
+    "request": {
+      "file": {
+        "name": "tiny.png",
+        "size": 70
+      },
+      "input": "描述这张图",
+      "modelId": "b0000000-0000-0000-0000-000000000005",
+      "modelName": "md-vlm",
+      "modelType": "VLLM",
+      "options": {},
+      "provider": "",
+      "source": "remote"
+    },
+    "rawResponse": "你好，我是知识助手。",
+    "observations": {
+      "answerCharacters": 10
+    }
+  }
+}

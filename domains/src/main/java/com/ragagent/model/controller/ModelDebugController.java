@@ -46,6 +46,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import com.ragagent.model.service.ModelRuntimeConfigs;
+import com.ragagent.common.web.ApiResult;
 
 /**
  * 模型调试端点（POST /api/v1/models/{id}/debug）。
@@ -61,6 +62,7 @@ import com.ragagent.model.service.ModelRuntimeConfigs;
  * </ul>
  */
 @RestController
+@ApiResult
 @RequestMapping("/api/v1/models")
 public class ModelDebugController {
 

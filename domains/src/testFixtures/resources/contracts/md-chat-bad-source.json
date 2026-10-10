@@ -1,1 +1,20 @@
-{"ok":false,"elapsedMs":1,"error":"unsupported chat model source: bogus","request":{"input":"hi","modelId":"b0000000-0000-0000-0000-000000000008","modelName":"md-badsrc","modelType":"KnowledgeQA","options":{},"provider":"","source":"bogus"},"rawResponse":null,"observations":{}}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "ok": false,
+    "elapsedMs": 1,
+    "error": "unsupported chat model source: bogus",
+    "request": {
+      "input": "hi",
+      "modelId": "b0000000-0000-0000-0000-000000000008",
+      "modelName": "md-badsrc",
+      "modelType": "KnowledgeQA",
+      "options": {},
+      "provider": "",
+      "source": "bogus"
+    },
+    "rawResponse": null,
+    "observations": {}
+  }
+}

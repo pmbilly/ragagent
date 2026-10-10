@@ -1,1 +1,5 @@
-{"error":{"code":1000,"message":"input is too long","details":null}}
+{
+  "code": 1000,
+  "message": "input is too long",
+  "data": null
+}

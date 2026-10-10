@@ -1,1 +1,24 @@
-{"ok":false,"elapsedMs":1,"error":"ASR transcription request failed: HTTP 401 Unauthorized: invalid api key","request":{"file":{"name":"tiny.mp3","size":14},"input":"","modelId":"b0000000-0000-0000-0000-000000000007","modelName":"md-asr-nokey","modelType":"ASR","options":{},"provider":"","source":"remote"},"rawResponse":null,"observations":{}}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "ok": false,
+    "elapsedMs": 1,
+    "error": "ASR transcription request failed: HTTP 401 Unauthorized: invalid api key",
+    "request": {
+      "file": {
+        "name": "tiny.mp3",
+        "size": 14
+      },
+      "input": "",
+      "modelId": "b0000000-0000-0000-0000-000000000007",
+      "modelName": "md-asr-nokey",
+      "modelType": "ASR",
+      "options": {},
+      "provider": "",
+      "source": "remote"
+    },
+    "rawResponse": null,
+    "observations": {}
+  }
+}

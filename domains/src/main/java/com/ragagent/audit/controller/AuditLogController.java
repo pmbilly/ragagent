@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.ragagent.common.web.ApiResult;
 
 /**
  * 审计日志端点。
@@ -46,6 +47,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 空页为 0，前端见到 0 就停止翻页。</p>
  */
 @RestController
+@ApiResult
 public class AuditLogController {
 
     private final AuditLogService auditLogService;

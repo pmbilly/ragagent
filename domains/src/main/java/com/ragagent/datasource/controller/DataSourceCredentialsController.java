@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import com.ragagent.common.web.ApiResponse;
+import com.ragagent.common.web.ApiResult;
 
 /**
  * 数据源的凭据子资源（{@code PUT /datasource/:id/credentials} 与
@@ -35,21 +37,15 @@ import org.springframework.web.bind.annotation.RestController;
  * 组合……）。拆成字段会造出"配了一半、根本认证不了"的中间态，所以这里只有一个
  * {@code "credentials"}：PUT 整张替换、DELETE 整张清空。</p>
  *
- * <h2>⚠️ 错误形态与 {@link DataSourceController} <b>不同</b></h2>
- * <p>本类全走全局 ErrorHandler 的<b>AppError 信封</b>：
- * {@code {"error":{"code":N,"details":null,"message":"..."},"success":false}}。
- * 而 {@code DataSourceController} 那批全是纯字符串 {@code {"error":"..."}}。
- * 两种形态并存是有意为之，别统一。</p>
- *
- * <h2>与 {@code DataSourceController} 那份归属判定的两处刻意差异</h2>
- * <ol>
- *   <li>租户缺失时这里是 <b>400</b> {@code Workspace ID cannot be empty}，
- *       那边是 <b>401</b> {@code unauthorized}；</li>
- *   <li>"知识库不存在"与"知识库不属于本租户"都折叠成同一个 <b>404</b>
- *       {@code data source not found}（那边是 404/403 两种）。</li>
- * </ol>
+ * <h2>错误形态（B189 起与 {@link DataSourceController} <b>一致</b>）</h2>
+ * <p>两者都走<b>统一响应外壳</b> {@code {code,message,data}}（{@code @ApiResult} + 全局处理器），
+ * 见 {@code docs/api-response-convention.md}。</p>
+ * <p>退役记录：此前本类回 AppError 信封 {@code {"error":{…}}}、那边回纯字符串 {@code {"error":"…"}}，
+ * 且文档写着"两种形态并存是有意为之，别统一" —— 那是 Go 迁移期产物 ✗；B188/B189 已统一
+ * （那边的纯字符串助手改为恒抛 {@code BizException}，本类的 code/details 语义不变）。</p>
  */
 @RestController
+@ApiResult
 public class DataSourceCredentialsController {
 
     private static final Logger log = LoggerFactory.getLogger(DataSourceCredentialsController.class);
@@ -113,7 +109,7 @@ public class DataSourceCredentialsController {
      * <p>清空成功是 <b>204</b>；service 报错落 500（不是 400）——与 PUT 的映射刻意不同。</p>
      */
     @DeleteMapping("/api/v1/datasource/{id}/credentials/{field}")
-    public ResponseEntity<?> deleteField(@PathVariable("id") String id,
+    public ApiResponse<Void> deleteField(@PathVariable("id") String id,
                                          @PathVariable("field") String field) {
         DataSource ds = ownDataSource(id);
         if (!"credentials".equals(field)) {
@@ -126,7 +122,7 @@ public class DataSourceCredentialsController {
             throw new BizException(AppError.internal(
                     "failed to clear credentials: " + e.getMessage()));
         }
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B189：204 退役
     }
 
     // ══════════════════════════ 归属判定 ══════════════════════════

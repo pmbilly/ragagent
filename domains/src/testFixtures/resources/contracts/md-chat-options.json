@@ -1,1 +1,74 @@
-{"ok":true,"elapsedMs":1,"error":null,"request":{"input":"<<SCENARIO:chat>>你好","modelId":"b0000000-0000-0000-0000-000000000001","modelName":"md-chat","modelType":"KnowledgeQA","options":{"systemPrompt":"你是助手","temperature":0.5,"topP":0.9,"maxTokens":100,"thinking":true},"provider":"","source":"remote"},"rawResponse":{"content":"你好，我是知识助手。","finishReason":"stop","usage":{"prompt_tokens":12,"completion_tokens":9,"total_tokens":21,"cache_reported":false,"cache_status":"unsupported"},"streamEvents":[{"id":"","responseType":"answer","content":"你好，","done":false},{"id":"","responseType":"answer","content":"我是知识助手。","done":true,"finishReason":"stop"},{"id":"","responseType":"answer","content":"","done":true,"usage":{"prompt_tokens":12,"completion_tokens":9,"total_tokens":21,"cache_reported":false,"cache_status":"unsupported"}}],"reasoningContent":null,"toolCalls":null},"observations":{"answerCharacters":10,"reasoningCharacters":0,"reasoningReturned":false,"requestedThinking":true,"stream":true,"thinkingControl":"chat_template_kwargs","thinkingParameterSent":true}}
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "ok": true,
+    "elapsedMs": 1,
+    "error": null,
+    "request": {
+      "input": "<<SCENARIO:chat>>你好",
+      "modelId": "b0000000-0000-0000-0000-000000000001",
+      "modelName": "md-chat",
+      "modelType": "KnowledgeQA",
+      "options": {
+        "systemPrompt": "你是助手",
+        "temperature": 0.5,
+        "topP": 0.9,
+        "maxTokens": 100,
+        "thinking": true
+      },
+      "provider": "",
+      "source": "remote"
+    },
+    "rawResponse": {
+      "content": "你好，我是知识助手。",
+      "finishReason": "stop",
+      "usage": {
+        "prompt_tokens": 12,
+        "completion_tokens": 9,
+        "total_tokens": 21,
+        "cache_reported": false,
+        "cache_status": "unsupported"
+      },
+      "streamEvents": [
+        {
+          "id": "",
+          "responseType": "answer",
+          "content": "你好，",
+          "done": false
+        },
+        {
+          "id": "",
+          "responseType": "answer",
+          "content": "我是知识助手。",
+          "done": true,
+          "finishReason": "stop"
+        },
+        {
+          "id": "",
+          "responseType": "answer",
+          "content": "",
+          "done": true,
+          "usage": {
+            "prompt_tokens": 12,
+            "completion_tokens": 9,
+            "total_tokens": 21,
+            "cache_reported": false,
+            "cache_status": "unsupported"
+          }
+        }
+      ],
+      "reasoningContent": null,
+      "toolCalls": null
+    },
+    "observations": {
+      "answerCharacters": 10,
+      "reasoningCharacters": 0,
+      "reasoningReturned": false,
+      "requestedThinking": true,
+      "stream": true,
+      "thinkingControl": "chat_template_kwargs",
+      "thinkingParameterSent": true
+    }
+  }
+}

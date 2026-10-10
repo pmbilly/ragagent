@@ -1,1 +1,1 @@
-{"error":"invalid configuration: config is nil"}
+{"code":1000,"data":null,"message":"invalid configuration: config is nil"}

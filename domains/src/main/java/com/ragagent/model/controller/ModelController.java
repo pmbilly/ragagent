@@ -34,6 +34,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.ragagent.common.web.ApiResult;
+import com.ragagent.common.web.ApiResponse;
 
 /**
  * 模型配置端点（CRUD + providers；写操作 = Admin+，读 = Viewer+）。
@@ -43,6 +45,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 校验失败/空体/未找到/SSRF 拒绝统一走 AppError 信封。</p>
  */
 @RestController
+@ApiResult
 @RequestMapping("/api/v1/models")
 public class ModelController {
 
@@ -200,7 +203,7 @@ public class ModelController {
 
     /** 删除模型（Admin+）→ 204 无响应体。 */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteModel(@PathVariable("id") String id) {
+    public ApiResponse<Void> deleteModel(@PathVariable("id") String id) {
         log.info("Start deleting model");
         if (isBlank(id)) {
             throw new BizException(AppError.badRequest("Model ID cannot be empty"));
@@ -212,7 +215,7 @@ public class ModelController {
             throw new BizException(AppError.notFound("Model not found"));
         }
         log.info("Model deleted successfully, ID: {}", id);
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B188：204 退役（空体与「外壳恒存在」冲突）
     }
 
     /** 模型提供方列表（Viewer+）；{@code modelType} 支持的取值由 ProviderRegistry 映射。 */

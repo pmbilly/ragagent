@@ -1,1 +1,5 @@
-{"error":{"code":1007,"message":"model is currently downloading","details":null}}
+{
+  "code": 1007,
+  "message": "model is currently downloading",
+  "data": null
+}
