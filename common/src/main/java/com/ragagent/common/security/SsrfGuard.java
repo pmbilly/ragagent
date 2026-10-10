@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 /**
  * SSRF 校验守卫：URL 校验 / 错误格式化 / 白名单判定。
  *
- * 策略：用户提交的 URL 仅允许 http/https、禁止直连 IP（含八进制/十六进制/十进制混淆）、
+ * 策略：用户提交的 URL 仅允许 http/https/ws/wss、禁止直连 IP（含八进制/十六进制/十进制混淆）、
  * 禁止受限主机名/后缀/端口，DNS 解析后任一解析 IP 受限即拒绝；
  * SSRF_WHITELIST + SSRF_WHITELIST_EXTRA 白名单豁免（仅放宽主机/IP，不放松 scheme）。
  *
@@ -43,6 +43,15 @@ public class SsrfGuard {
     private static final Set<String> RESTRICTED_PORTS = Set.of(
             "22", "23", "25", "445", "3389", "5432", "3306", "6379", "27017", "9200",
             "2379", "2380", "8500", "4001");
+
+    /**
+     * 允许的 scheme。含 WebSocket 的两种形态：{@code wss}/{@code ws} 的风险与
+     * {@code https}/{@code http} 等价（分别为加密/明文），且 **IM 长连接只能走 wss**
+     * —— 此前只放行 http/https，导致飞书等平台的长连接 100% 建立失败
+     * （2026-10-11 实测：{@code SsrfException: invalid scheme: wss}，表现为
+     * "渠道配好了但发消息没回复"）。白名单仍只放宽主机/IP，不放松 scheme。
+     */
+    private static final Set<String> ALLOWED_SCHEMES = Set.of("http", "https", "ws", "wss");
 
     private static final List<Pattern> IP_LIKE_PATTERNS = List.of(
             Pattern.compile("^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"),
@@ -137,8 +146,9 @@ public class SsrfGuard {
             throw new SsrfException("URL has no hostname");
         }
         String scheme = uri.getScheme() == null ? "" : uri.getScheme().toLowerCase(Locale.ROOT);
-        if (!scheme.equals("http") && !scheme.equals("https")) {
-            throw new SsrfException("invalid scheme: " + scheme + " (only http/https allowed)");
+        if (!ALLOWED_SCHEMES.contains(scheme)) {
+            throw new SsrfException("invalid scheme: " + scheme
+                    + " (only http/https/ws/wss allowed)");
         }
         if (isWhitelisted(hostname)) {
             return;
