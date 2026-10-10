@@ -209,7 +209,7 @@ public class DataSourceController {
         if (tenantId == null || tenantId == 0L) {
             throw new BizException(AppError.ofHttpStatus(401, "unauthorized"));
         }
-        Owned owned = ownDataSource(tenantId, id);
+        ownDataSource(tenantId, id);
         try {
             service.deleteDataSource(id);
         } catch (RuntimeException e) {
@@ -227,7 +227,7 @@ public class DataSourceController {
         if (tenantId == null || tenantId == 0L) {
             return error(401, "unauthorized");
         }
-        Owned owned = ownDataSource(tenantId, id);
+        ownDataSource(tenantId, id);
         try {
             service.validateConnection(id);
         } catch (RuntimeException e) {
@@ -286,7 +286,7 @@ public class DataSourceController {
         if (tenantId == null || tenantId == 0L) {
             return error(401, "unauthorized");
         }
-        Owned owned = ownDataSource(tenantId, id);
+        ownDataSource(tenantId, id);
         List<Resource> resources;
         try {
             resources = service.listAvailableResources(id, parentId == null ? "" : parentId);
@@ -310,7 +310,7 @@ public class DataSourceController {
         if (tenantId == null || tenantId == 0L) {
             return error(401, "unauthorized");
         }
-        Owned owned = ownDataSource(tenantId, id);
+        ownDataSource(tenantId, id);
         ResolveAncestorsRequest req;
         try {
             req = rawBody == null || rawBody.isBlank()
@@ -348,7 +348,7 @@ public class DataSourceController {
         if (tenantId == null || tenantId == 0L) {
             return error(401, "unauthorized");
         }
-        Owned owned = ownDataSource(tenantId, id);
+        ownDataSource(tenantId, id);
         SyncLog syncLog;
         try {
             syncLog = service.manualSync(id);
@@ -365,7 +365,7 @@ public class DataSourceController {
         if (tenantId == null || tenantId == 0L) {
             return error(401, "unauthorized");
         }
-        Owned owned = ownDataSource(tenantId, id);
+        ownDataSource(tenantId, id);
         try {
             service.pauseDataSource(id);
         } catch (RuntimeException e) {
@@ -381,7 +381,7 @@ public class DataSourceController {
         if (tenantId == null || tenantId == 0L) {
             return error(401, "unauthorized");
         }
-        Owned owned = ownDataSource(tenantId, id);
+        ownDataSource(tenantId, id);
         try {
             service.resumeDataSource(id);
         } catch (RuntimeException e) {
@@ -407,7 +407,7 @@ public class DataSourceController {
         if (tenantId == null || tenantId == 0L) {
             return error(401, "unauthorized");
         }
-        Owned owned = ownDataSource(tenantId, id);
+        ownDataSource(tenantId, id);
 
         int limitValue = 10;
         if (limit != null && !limit.isEmpty()) {
@@ -454,7 +454,7 @@ public class DataSourceController {
         } catch (RuntimeException e) {
             return error(404, "sync log not found");
         }
-        Owned owned = ownDataSource(tenantId, syncLog.getDataSourceId());
+        ownDataSource(tenantId, syncLog.getDataSourceId());
         return ResponseEntity.ok(syncLog);
     }
 

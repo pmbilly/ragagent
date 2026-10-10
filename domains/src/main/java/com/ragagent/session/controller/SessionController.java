@@ -613,17 +613,6 @@ public class SessionController {
         return ApiResponse.ok();   // B193：204 退役（空体与「外壳恒存在」冲突）
     }
 
-    /**
-     * 纯字符串错误信封 {@code {"error": "..."}}。
-     *
-     * <p>⚠️ 只有 {@code stop} 端点用它；其余端点的错误都是 AppError 信封。
-     * 所以这里连成功响应也只能是 {@link ResponseEntity}{@code <?>}。</p>
-     */
-    private static ResponseEntity<Map<String, Object>> errorBody(int status, String message) {
-        // B193：**恒抛** —— 保留原签名，调用点一行不动；统一错误体由全局处理器产出
-        throw new BizException(AppError.ofHttpStatus(status, message));
-    }
-
     private static boolean isBlankStr(String v) {
         return v == null || v.trim().isEmpty();
     }

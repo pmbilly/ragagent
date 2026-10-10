@@ -196,15 +196,6 @@ class ImContractTest {
         return expect(201, req, goldenName);
     }
 
-    /** 204 无体端点：只钉状态码 + 空体。 */
-    private void assertNoBody(MockHttpServletRequestBuilder req, int status, String label)
-            throws Exception {
-        MvcResult r = mockMvc.perform(req).andReturn();
-        assertEquals(status, r.getResponse().getStatus(), label + " 状态码不符: " + raw(r));
-        assertEquals("", r.getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8),
-                label + " 应无响应体");
-    }
-
     private static MockHttpServletRequestBuilder get(String url, String bearer) {
         return org.springframework.test.web.servlet.request.MockMvcRequestBuilders
                 .get(url).header("Authorization", bearer);
