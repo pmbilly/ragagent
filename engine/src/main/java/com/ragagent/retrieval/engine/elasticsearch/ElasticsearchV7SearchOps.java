@@ -79,12 +79,9 @@ final class ElasticsearchV7SearchOps {
 
     /** 向量路（不在分派表里，可直呼）。 */
     List<RetrieveResult> vectorRetrieve(RetrieveParams params) throws Exception {
-        JsonNode filter;
-        try {
-            filter = ElasticsearchV7RetrieveRepository.MAPPER.readTree(getBaseCondsJson(params));
-        } catch (Exception e) {
-            filter = ElasticsearchV7RetrieveRepository.MAPPER.createObjectNode();
-        }
+        // 权限/范围边界条件：解析失败**不得**降级为空 filter（空条件 = 匹配全库）。
+        // 该 JSON 由本仓 MAPPER 产出，失败即抛——不把"过滤条件丢了"伪装成"没有过滤条件"。
+        JsonNode filter = ElasticsearchV7RetrieveRepository.MAPPER.readTree(getBaseCondsJson(params));
         ObjectNode scriptScore = ElasticsearchV7RetrieveRepository.MAPPER.createObjectNode();
         ObjectNode filterArrayBody = ElasticsearchV7RetrieveRepository.MAPPER.createObjectNode();
         filterArrayBody.putArray("filter").add(filter);
@@ -112,12 +109,9 @@ final class ElasticsearchV7SearchOps {
 
     /** 关键词路：{@code {"query":{"bool":{"must":[{"match":{"content":q}}],"filter":[<cond>]}}}}。 */
     List<RetrieveResult> keywordsRetrieve(RetrieveParams params) throws Exception {
-        JsonNode filter;
-        try {
-            filter = ElasticsearchV7RetrieveRepository.MAPPER.readTree(getBaseCondsJson(params));
-        } catch (Exception e) {
-            filter = ElasticsearchV7RetrieveRepository.MAPPER.createObjectNode();
-        }
+        // 权限/范围边界条件：解析失败**不得**降级为空 filter（空条件 = 匹配全库）。
+        // 该 JSON 由本仓 MAPPER 产出，失败即抛——不把"过滤条件丢了"伪装成"没有过滤条件"。
+        JsonNode filter = ElasticsearchV7RetrieveRepository.MAPPER.readTree(getBaseCondsJson(params));
         ObjectNode match = ElasticsearchV7RetrieveRepository.MAPPER.createObjectNode();
         match.putObject("match").putObject("content").put("query", params.query);
         ObjectNode bool = ElasticsearchV7RetrieveRepository.MAPPER.createObjectNode();

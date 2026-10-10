@@ -77,7 +77,7 @@
 ## 5. 迁移
 
 - 开关是**类级注解** `@ApiResult`；未标注的控制器行为**完全不变**（零风险增量迁移）。
-- **新控制器默认必须合规**：守卫 `scripts/check-api-envelope.py`（九守卫之一）要求每个控制器
+- **新控制器默认必须合规**：守卫 `scripts/check-api-envelope.py`（十守卫之一）要求每个控制器
   要么标注 `@ApiResult`，要么在 `scripts/api-envelope.baseline.json` 的 `pending` 清单里；清单
   **只许减不许增**，`--write` 只清理已迁完 / 幽灵条目（不替你豁免新条目）。
 - 进度：**50 / 52 个控制器**（B183–B203 ✓）；余 2 均为**登记例外**（`ImCallbackController` 外部平台回调 / `HealthController` 探针 ✓）——权威清单以 `scripts/api-envelope.baseline.json` 为准 ✓（守卫 `check-api-envelope.py` 每次核对 ✓）。

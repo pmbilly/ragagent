@@ -110,12 +110,12 @@ docker run --rm -p 8080:8080 --env-file .env ragagent-server
 | **契约测试** | `domains/src/testFixtures/resources/contracts/`（1,345 个金片）+ 30 个 `*ContractTest` | 逐字节钉死 HTTP 响应形状；改契约必须重录或改金片 |
 | **架构规则** | `boot/src/test/.../arch/ArchitectureRulesTest.java`（ArchUnit，A1–A13） | 禁裸 getenv、禁双装配、禁分层倒挂、Mapper 必须在 `..mapper..`… |
 | **序列化卫生** | `domains/src/test/.../arch/JsonPropertyHygieneTest.java`（A14） | 基线 0：我们自己的面上不得有冗余 `@JsonProperty`（四类必要形态除外） |
-| **九守卫** | `bash scripts/run-guards.sh`（**已接入 `check`**，见下） | 包循环 / Go 锚点 / 契约键 / JSON 键大小写 / 事件面 / **文件规模棘轮** / 目录卫生 / 死成员 / 统一响应外壳 |
-| **CI** | `.github/workflows/ci.yml` | 4 个 job：guards（九守卫）· backend（真 ParadeDB + 真 Redis + 灌基线 SQL + 全量测试）· docker（镜像构建 + 迁移自检）· frontend |
+| **十守卫** | `bash scripts/run-guards.sh`（**已接入 `check`**，见下） | 包循环 / Go 锚点 / 契约键 / JSON 键大小写 / 事件面 / **文件规模棘轮** / 目录卫生 / 死成员 / 统一响应外壳 / **异常语义** |
+| **CI** | `.github/workflows/ci.yml` | 4 个 job：guards（十守卫）· backend（真 ParadeDB + 真 Redis + 灌基线 SQL + 全量测试）· docker（镜像构建 + 迁移自检）· frontend |
 
 守卫大多是**棘轮**（ratchet）：登记基线后只许减不许增，例外须写明理由。新增违规当场变红。
 
-> 九守卫已作为 Gradle 任务 `:guards` **接入 `check`**（B214）⇒ 本地 `./gradlew build` 与 CI 同一口径，
+> 十守卫已作为 Gradle 任务 `:guards` **接入 `check`**（B214）⇒ 本地 `./gradlew build` 与 CI 同一口径，
 > 不存在"本地绿、CI 红"。单独跑：`./gradlew guards`（迭代时 `./gradlew :domains:test --tests ...` 不会触发它）。
 > 需要 `python3` 在 PATH 上。CI 会跑两遍守卫（guards job + backend job），是刻意取舍：两边同口径优先。
 
@@ -123,8 +123,8 @@ docker run --rm -p 8080:8080 --env-file .env ragagent-server
 export JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home
 
 ./gradlew :domains:test --tests "com.ragagent.session.*"   # 定向（迭代用，10~30s）
-./gradlew build                                             # 全量闸门（spotless + 九守卫 + 测试 + javadoc）
-./gradlew guards                                            # 只跑九守卫（build 里已含）
+./gradlew build                                             # 全量闸门（spotless + 十守卫 + 测试 + javadoc）
+./gradlew guards                                            # 只跑十守卫（build 里已含）
 cd frontend && npx vue-tsc --build --force && npm test       # 前端
 ```
 

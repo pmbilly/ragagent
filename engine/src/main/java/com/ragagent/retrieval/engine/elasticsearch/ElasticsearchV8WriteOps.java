@@ -81,7 +81,11 @@ final class ElasticsearchV8WriteOps {
         try {
             root = ElasticsearchV8RetrieveRepository.MAPPER.readTree(body);
         } catch (Exception e) {
-            return; // 非 JSON 响应不做逐项检视（状态码已过）
+            // 非 JSON 响应不做逐项检视（状态码已过）。对齐 V7：**留痕**，别静默吞 ——
+            // 无日志时"部分失败未检视"与"确实没有失败"在事后无法区分。
+            log.warn("[Elasticsearch] Could not parse bulk response, partial failures not inspected: {}",
+                    e.toString());
+            return;
         }
         if (!root.path("errors").asBoolean(false)) {
             return;

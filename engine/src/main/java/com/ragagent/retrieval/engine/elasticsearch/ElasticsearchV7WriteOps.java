@@ -225,12 +225,9 @@ final class ElasticsearchV7WriteOps {
 
     JsonNode querySourceBatch(RetrieveParams retrieveParams, int from, int batchSize)
             throws Exception {
-        JsonNode filter;
-        try {
-            filter = ElasticsearchV7RetrieveRepository.MAPPER.readTree(service.getBaseCondsJson(retrieveParams));
-        } catch (Exception e) {
-            filter = ElasticsearchV7RetrieveRepository.MAPPER.createObjectNode();
-        }
+        // 同上：范围边界不得降级为空 filter。
+        JsonNode filter =
+                ElasticsearchV7RetrieveRepository.MAPPER.readTree(service.getBaseCondsJson(retrieveParams));
         ObjectNode body = ElasticsearchV7RetrieveRepository.MAPPER.createObjectNode();
         body.set("query", filter);
         body.put("from", from);
