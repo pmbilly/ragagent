@@ -554,7 +554,7 @@ B116 搬家时已经搬过一批资源（`common/text/*.txt`），这类风险�
 |---|---|---|
 | P1 | `stream` 下沉 `:common`（含 `TokenUsage`/`PromptCacheStatus` 沉 `common.llm`、`EmbeddedRedis` 归 common testFixtures）| `stream → llm` 仅 **1 条边**；其余出边只有 `common` |
 | P2 | `model` + `vectorstore` 出 `:engine` | 引擎内 **0 条**入边 ⇒ 零解边；顺带修 L2 有 controller |
-| 待 P3 | `tracing` 下沉（`tracing → llm/embedding/rerank` **11 条边**）| 需逐边定性：沉载荷 or 反转接口 |
+| ✅ P3（**B163 已完成**）| `tracing` 按性质拆：core 20 文件 → `:common`；4 装饰器 + `LangfuseWiring`/`LangfuseVlm` → `:engine` 新包 `tracing.decorators` | 原「逐边定性 11 条」已在 B163 完成（见 §11 ✓）|
 | 待 P4 | `:channels` + `channels.*` 改名 | 前置：`auth ⇄ apikey` **22 + 22** 处互依 ✗ |
 
 **新沉淀（写给下一次拆模块 / 新建模块）**：
