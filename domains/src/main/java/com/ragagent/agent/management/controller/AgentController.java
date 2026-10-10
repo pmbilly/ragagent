@@ -1,5 +1,7 @@
 package com.ragagent.agent.management.controller;
 
+import com.ragagent.common.web.ApiResponse;
+import com.ragagent.common.web.ApiResult;
 import com.ragagent.common.web.RequestFields;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,8 +43,13 @@ import com.ragagent.agent.management.mapper.CustomAgentMapper;
  * <p>守卫层次：写路由在 controller 内做归属校验（行存在且非 Admin+ 且非创建者 →
  * 403 纯字符串；行不存在 → 放行给 handler 出 404）；读/列表 Viewer 下限由
  * RbacInterceptor 承担。</p>
+ *
+ * <p>响应外壳（B169）：本类标注 {@link ApiResult} ⇒ 成功体统一 {@code {code,message,data}}
+ * （由 {@code ApiResultAdvice} 施加，方法只返回载荷）；错误体同形（{@code GlobalExceptionHandler}
+ * 按请求打标分派）。约定见 {@code docs/api-response-convention.md}。</p>
  */
 @RestController
+@ApiResult
 public class AgentController {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -75,6 +82,7 @@ public class AgentController {
         for (var r : result.agents()) {
             rows.add(AgentResponses.agent(r));
         }
+        // 载荷形状不变（{agents, disabledOwnAgentIds}）；外壳由 @ApiResult 统一施加（B169）
         return ResponseEntity.ok(AgentResponses.listEnvelope(rows, result.disabledOwnIds()));
     }
 
@@ -129,12 +137,12 @@ public class AgentController {
 
     // ── DELETE /agents/:id ──
     @DeleteMapping("/api/v1/agents/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") String id,
-            HttpServletRequest req) {
+    public ApiResponse<Void> delete(@PathVariable("id") String id, HttpServletRequest req) {
         requireNonEmpty(id);
         checkAgentOwnership(id, req);
         service.deleteAgent(id);
-        return ResponseEntity.noContent().build();
+        // 成功也带文案：由外壳的 message 承担（200 + {code:0,message:"Agent deleted successfully",data:null}）
+        return ApiResponse.ok(null, "Agent deleted successfully");
     }
 
     // ── POST /agents/:id/copy ──

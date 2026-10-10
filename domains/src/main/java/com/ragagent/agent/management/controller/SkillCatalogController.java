@@ -27,6 +27,8 @@ import com.ragagent.audit.service.AuditLogService;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
+import com.ragagent.common.web.ApiResponse;
+import com.ragagent.common.web.ApiResult;
 
 /**
  * 技能管理（**空间级**，租户 admin）：查看 / 新建 / 编辑 / 删除。
@@ -42,9 +44,11 @@ import com.ragagent.common.error.BizException;
  * 调用方只提供 slug/name/description/正文。删除是软删；被**本空间**智能体引用时拒绝，
  * {@code force=true} 才强删（引用清单进 details 与审计）。</p>
  *
- * <p>响应一律 camelCase + 裸资源信封（契约 §2）；错误体走标准 {@code {error:{...}}}。</p>
+ * <p>响应一律 camelCase，外壳统一 {@code {code,message,data}}（{@link ApiResult}，B169；
+ * 约定见 {@code docs/api-response-convention.md}）。</p>
  */
 @RestController
+@ApiResult
 public class SkillCatalogController {
 
     private static final ObjectMapper AUDIT_MAPPER = new ObjectMapper();
@@ -178,7 +182,7 @@ public class SkillCatalogController {
     }
 
     @DeleteMapping("/api/v1/skills/catalog/{id}")
-    public ResponseEntity<Void> deleteCatalog(
+    public ApiResponse<Void> deleteCatalog(
             @PathVariable("id") String id,
             @RequestParam(value = "force", required = false) Boolean force) {
         Long tenant = TenantContext.currentTenantId();
@@ -196,7 +200,8 @@ public class SkillCatalogController {
         }
         catalog.softDelete(row, tenant);
         audit(AuditAction.SKILL_DELETED, row, refs);
-        return ResponseEntity.noContent().build();
+        // B169：204 退役（空体与「外壳恒存在」冲突）⇒ 200 + {code:0,message:"ok",data:null}
+        return ApiResponse.ok();
     }
 
     @GetMapping("/api/v1/skills/catalog/{id}/files")

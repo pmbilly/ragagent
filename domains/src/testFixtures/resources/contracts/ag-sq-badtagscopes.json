@@ -1,1 +1,5 @@
-{"error":{"code":1000,"message":"tagScopes must be valid JSON","details":null}}
+{
+  "code": 1000,
+  "message": "tagScopes must be valid JSON",
+  "data": null
+}

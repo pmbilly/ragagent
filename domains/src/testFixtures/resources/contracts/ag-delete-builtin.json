@@ -1,1 +1,5 @@
-{"error":{"code":1002,"message":"Cannot delete built-in agent","details":null}}
+{
+  "code": 1002,
+  "message": "Cannot delete built-in agent",
+  "data": null
+}

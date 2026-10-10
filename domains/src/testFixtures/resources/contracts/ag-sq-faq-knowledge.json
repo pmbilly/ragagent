@@ -1,1 +1,11 @@
-[{"question": "怎么 绑定 手机？", "source": "faq", "knowledgeBaseId": "a0000000-0000-0000-0000-000000000102"}]
+{
+  "code": 0,
+  "message": "ok",
+  "data": [
+    {
+      "question": "怎么 绑定 手机？",
+      "source": "faq",
+      "knowledgeBaseId": "a0000000-0000-0000-0000-000000000102"
+    }
+  ]
+}

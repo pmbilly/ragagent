@@ -1,1 +1,14 @@
-[{"question": "问题A", "source": "agent_config"}, {"question": "问题B", "source": "agent_config"}]
+{
+  "code": 0,
+  "message": "ok",
+  "data": [
+    {
+      "question": "问题A",
+      "source": "agent_config"
+    },
+    {
+      "question": "问题B",
+      "source": "agent_config"
+    }
+  ]
+}

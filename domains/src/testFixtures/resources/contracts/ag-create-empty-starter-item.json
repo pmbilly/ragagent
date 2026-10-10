@@ -1,1 +1,5 @@
-{"error":{"code":1000,"message":"starter suggestion 1 cannot be empty","details":null}}
+{
+  "code": 1000,
+  "message": "starter suggestion 1 cannot be empty",
+  "data": null
+}

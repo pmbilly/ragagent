@@ -28,9 +28,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      # 八守卫跑**同一份** scripts/run-guards.sh（B168）：本地 `bash scripts/run-guards.sh` 即 CI 同口径。
+      # 九守卫跑**同一份** scripts/run-guards.sh（B168 起）：本地 `bash scripts/run-guards.sh` 即 CI 同口径。
       # 起因：本地手敲守卫时漏了 check-json-key-case 的 --strict（默认只报告、退出 0）⇒ 本地绿而 CI 红。
-      - name: 八守卫（单一入口：包环 / Go 锚点 / 前端契约键 / 换锚 --strict / 事件面 / 大文件 / 目录卫生 / 死成员）
+      - name: 九守卫（单一入口：包环 / Go 锚点 / 前端契约键 / 换锚 --strict / 事件面 / 大文件 / 目录卫生 / 死成员 / 统一响应外壳）
         run: bash scripts/run-guards.sh
   backend:
     name: 后端 build + test + spotless

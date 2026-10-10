@@ -957,13 +957,10 @@ const handleDelete = (agent: AgentWithUI) => {
 
 const handleCopy = (agent: AgentWithUI) => {
   openMoreAgentId.value = null
-  copyAgent(agent.id).then((res: any) => {
-    if (res.data) {
-      MessagePlugin.success(t('agent.messages.copied'))
-      fetchList(true)
-    } else {
-      MessagePlugin.error(res.message || t('agent.messages.copyFailed'))
-    }
+  // B169：外壳已在 request.ts 解包 ⇒ 成功即拿到新建的 agent；失败一律走 catch
+  copyAgent(agent.id).then(() => {
+    MessagePlugin.success(t('agent.messages.copied'))
+    fetchList(true)
   }).catch((e: any) => {
     MessagePlugin.error(e?.message || t('agent.messages.copyFailed'))
   })
@@ -972,15 +969,12 @@ const handleCopy = (agent: AgentWithUI) => {
 const confirmDelete = () => {
   if (!deletingAgent.value) return
 
-  deleteAgent(deletingAgent.value.id).then((res: any) => {
-    if (res.success) {
-      MessagePlugin.success(t('agent.messages.deleted'))
-      deleteVisible.value = false
-      deletingAgent.value = null
-      fetchList(true)
-    } else {
-      MessagePlugin.error(res.message || t('agent.messages.deleteFailed'))
-    }
+  // B169：成功 ≡ 2xx + code 0（非 0 与 4xx/5xx 都会 reject）⇒ 不再判 res.success
+  deleteAgent(deletingAgent.value.id).then(() => {
+    MessagePlugin.success(t('agent.messages.deleted'))
+    deleteVisible.value = false
+    deletingAgent.value = null
+    fetchList(true)
   }).catch((e: any) => {
     MessagePlugin.error(e?.message || t('agent.messages.deleteFailed'))
   })

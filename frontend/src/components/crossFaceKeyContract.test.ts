@@ -286,42 +286,30 @@ test('信封读法：Java 后端是裸载荷，不得再按 Go 的 {success,data
   }
 })
 
-test('裸载荷 API 必须在 api 层适配成 { data }（漏适配 = 消费端恒 undefined）', () => {
-  // B66 实锤：/api/v1/agents/placeholders 与 /type-presets 返回**裸载荷**（无 data 键），
-  // 但 api 层声明成 `get<{ data: X }>` 又没适配 → 消费端（editorResources store）读
-  // `res?.data` 恒 undefined ⇒ Agent 编辑器「变量芯片」为空、输入 `{{` 唤不出列表、
-  // 类型预设下拉为空（真机复现：芯片 0 个）。
-  // 同仓既有约定：裸载荷 + 消费端要 { data } → 在 api 层 `return { data: resp }` 适配
-  // （见 api/system 的 KV 三兄弟、api/retrieval、api/web-search-provider）。
+test('统一响应外壳在 request.ts 一处解包（api 层直返载荷、store 读裸载荷）', () => {
+  // B169：后端 @ApiResult 路由的成功体统一 {code:0,message:"ok",data:…}
+  // （约定见 docs/api-response-convention.md）；解包点**唯一** = utils/request.ts 的响应拦截器
+  // ⇒ api 层不再需要「裸载荷适配成 { data }」的补丁，消费端直接读载荷。
+  // 旧约定（B66）：「裸载荷 + 消费端要 { data } → 在 api 层 return { data: resp }」随外壳退役。
+  const request = readFileSync(join(SRC, 'utils/request.ts'), 'utf8')
+  assert.match(request, /function isApiEnvelope\(/, '外壳判定必须在 request.ts（唯一解包点）')
+  assert.match(request, /return withHttpStatus\(data\.data, status\)/, '外壳要就地解包成 data')
+
   const agentApi = readFileSync(join(SRC, 'api/agent/index.ts'), 'utf8')
+  assert.doesNotMatch(agentApi, /\.then\(\(resp\) => \(\{ data: resp \}\)\)/,
+    'getPlaceholders：解包后不得再手工包 { data }')
+  assert.doesNotMatch(agentApi, /data: Array\.isArray\(resp\) \? resp : \[\]/,
+    'getAgentTypePresets：同上')
+  assert.match(agentApi, /return get<PlaceholdersResponse>\('\/api\/v1\/agents\/placeholders'\)/,
+    'getPlaceholders 直返载荷')
+  assert.match(agentApi, /return get<AgentTypePreset\[\]>\('\/api\/v1\/agents\/type-presets'\)/,
+    'getAgentTypePresets 直返载荷')
 
-  assert.doesNotMatch(
-    agentApi,
-    /return get<\{ data: PlaceholdersResponse \}>\('\/api\/v1\/agents\/placeholders'\)/,
-    'getPlaceholders：不得把裸载荷直接声明成 { data }——运行时没有那层包裹',
-  )
-  assert.match(
-    agentApi,
-    /get<PlaceholdersResponse>\('\/api\/v1\/agents\/placeholders'\)\.then\(\(resp\) => \(\{ data: resp \}\)\)/,
-    'getPlaceholders 必须显式适配成 { data: resp }',
-  )
-  assert.doesNotMatch(
-    agentApi,
-    /return get<\{ data: AgentTypePreset\[\] \}>\('\/api\/v1\/agents\/type-presets'\)/,
-    'getAgentTypePresets：同上，裸数组不得声明成 { data }',
-  )
-  assert.match(
-    agentApi,
-    /get<AgentTypePreset\[\]>\('\/api\/v1\/agents\/type-presets'\)\.then\(\(resp\) => \(\{\s*data: Array\.isArray\(resp\) \? resp : \[\],\s*\}\)\)/,
-    'getAgentTypePresets 必须适配成 { data: Array.isArray(resp) ? resp : [] }',
-  )
-
-  // 反向：editorResources store 的读侧契约不变（api 层适配后仍读 `?.data`）
   const store = readFileSync(join(SRC, 'stores/editorResources.ts'), 'utf8')
-  assert.match(store, /placeholders\.value = placeholdersRes\?\.data \?\? null/,
-    'store 读侧保持 { data } 契约（适配在 api 层做，别两边都改）')
-  assert.match(store, /agentTypePresets\.value = presetsRes\?\.data && Array\.isArray\(presetsRes\.data\)/,
-    'store 读侧保持 { data } 契约')
+  assert.match(store, /placeholders\.value = placeholdersRes \?\? null/,
+    'store 直接读载荷（解包在 request.ts 做，别两边都改）')
+  assert.match(store, /agentTypePresets\.value = Array\.isArray\(presetsRes\) \? presetsRes : \[\]/,
+    'store 直接读载荷')
 })
 
 test('解析引擎规则两面：KB 配置面 camel / 覆盖与智能体面 snake（不得混读）', () => {

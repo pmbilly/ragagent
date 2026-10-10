@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 八守卫的**单一入口**（B168）——CI 的 guards job 与本地都跑这一份，口径不可能漂移。
+# 九守卫的**单一入口**（B168；B169 加「统一响应外壳」）——CI 的 guards job 与本地都跑这一份，口径不可能漂移。
 #
 # 为什么要有它：B168 实测漏检一次真失败 ✗——本地手敲 `python3 scripts/check-json-key-case.py`
 # 少了 CI 的 `--strict`（该守卫默认只**报告**并退出 0，加了 --strict 才是闸门）⇒ 本地全绿、
@@ -31,10 +31,11 @@ run '事件面/路由面命名口径（B93b）'    python3 scripts/check-event-f
 run '大文件棘轮（B121：不得新增 >600 行主源码）' python3 scripts/check-file-size.py
 run '目录卫生（B124：游离目录 / 死包目录）' python3 scripts/check-stray-dirs.py
 run '死成员守卫（B131）'             python3 scripts/check-dead-members.py
+run '统一响应外壳（B169：新控制器默认必须合规，清单只许减不许增）' python3 scripts/check-api-envelope.py
 
 echo
 if [ "$fail" -ne 0 ]; then
     echo '✗ 守卫未全绿（逐条结果见上）'
     exit 1
 fi
-echo '✓ 八守卫全绿'
+echo '✓ 九守卫全绿'

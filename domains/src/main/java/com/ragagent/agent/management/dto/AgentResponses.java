@@ -46,7 +46,7 @@ public final class AgentResponses {
         return m;
     }
 
-    /** 列表信封（键按字母序：{@code data < disabled_own_agent_ids < success}）。 */
+    /** 列表载荷（B169 起它就是外壳 {@code data} 的内容；外壳不再由本类构造）。 */
     public static Map<String, Object> listEnvelope(List<?> agents,
             List<String> disabledOwnIds) {
         Map<String, Object> m = new LinkedHashMap<>();
@@ -56,6 +56,10 @@ public final class AgentResponses {
     }
 
 
+
+    // 旧的 {success,data} 手搓外壳已退役（B169）：成功体统一由 @ApiResult + ApiResultAdvice
+    // 施加为 {code:0,message:"ok",data:…}；DELETE 的自定义文案由控制器直接返回
+    // ApiResponse.ok(null, "Agent deleted successfully")。
 
     private static final com.fasterxml.jackson.databind.ObjectMapper MAPPER =
             new com.fasterxml.jackson.databind.ObjectMapper();

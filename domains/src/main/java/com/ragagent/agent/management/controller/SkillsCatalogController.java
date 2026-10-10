@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ragagent.agent.skills.SkillCatalogService;
 import com.ragagent.common.context.TenantContext;
+import com.ragagent.common.web.ApiResult;
 
 /**
  * 指令型技能选择器的数据源（智能体编辑器 → 技能区）。
@@ -21,8 +22,12 @@ import com.ragagent.common.context.TenantContext;
  *
  * <p>{@code skillsAvailable} 恒为 true：技能能力始终可用，列表为空由前端渲染
  * 「还没有技能」空态。管理面（新建/删除）见 {@link SkillCatalogController}。</p>
+ *
+ * <p>B169：外壳统一 {@code {code,message,data}}（{@link ApiResult}）——**载荷形状不变**，
+ * 只是外面多一层（前端在 utils/request.ts 一处解包）。</p>
  */
 @RestController
+@ApiResult
 public class SkillsCatalogController {
 
     private final SkillCatalogService catalog;

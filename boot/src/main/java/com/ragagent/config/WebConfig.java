@@ -7,6 +7,7 @@ import com.ragagent.common.tenant.TenantRole;
 import com.ragagent.auth.filter.AuthFilter;
 import com.ragagent.auth.service.UserService;
 import com.ragagent.common.filter.RequestIdFilter;
+import com.ragagent.common.web.ApiResultInterceptor;
 import com.ragagent.common.web.RbacInterceptor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -641,6 +642,13 @@ public class WebConfig implements WebMvcConfigurer {
 
         // langfuse 请求级 trace。链序 Auth → langfuse → Audit。order=10 排在门禁之后：
         // 被 RBAC/API-Key 拒绝的请求不产生 trace（langfuse 在 Auth 的下游）。
+        // 统一响应外壳打标（B169）：order=-100 ⇒ 先于 API-Key / RBAC 门禁运行 ⇒
+        // 被门禁拒绝的 @ApiResult 路由同样拿到新错误形态（{code,message,data}）。
+        // 约定与迁移进度见 docs/api-response-convention.md。
+        registry.addInterceptor(new ApiResultInterceptor())
+                .addPathPatterns("/api/v1/**")
+                .order(-100);
+
         registry.addInterceptor(new LangfuseHttpInterceptor())
                 .addPathPatterns("/api/v1/**")
                 .order(10);

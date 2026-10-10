@@ -26,7 +26,7 @@ import com.ragagent.support.ContractJson;
  * （对照 golden 逐字节/掩码比对）。
  *
  * golden 来源：dev server 录制（scripts/record-ag-golden.sh，
- * 43 条 ag-*.json + 17 条 init-*.json）。
+ * 42 条 ag-*.json + 17 条 init-*.json；ag 侧已按 B169 统一外壳重写）。
  *
  * 场景顺序严格按录制脚本的请求序列（有状态依赖）：鉴权 → 静态面 → 空列表 →
  * 内建 get → CRUD → creator 筛选 → update → delete → copy → 内建 PUT（落 DB 行）→
@@ -156,17 +156,17 @@ class AgentContractTest {
         MvcResult r = expect(201, postH("/api/v1/agents", bearer,
                 "{\"name\":\"ag-empty\",\"description\":\"empty config agent\",\"config\":{}}"),
                 "ag-create-empty.json");
-        agEmpty = jsonPath(r, "id");
+        agEmpty = jsonPath(r, "data.id");
         assertGolden(getH("/api/v1/agents/" + agEmpty, bearer), 200, "ag-get-created.json");
 
         r = expect(201, postH("/api/v1/agents", bearer, FULL_CONFIG), "ag-create-full.json");
-        agFull = jsonPath(r, "id");
+        agFull = jsonPath(r, "data.id");
 
         r = expect(201, postH("/api/v1/agents", bearer, "{\"name\":\"ag-kbref\","
                 + "\"description\":\"kb reference agent\",\"config\":{\"agentMode\":\"quick-answer\","
                 + "\"kbSelectionMode\":\"selected\",\"knowledgeBases\":[\"" + KB_FAQ + "\"]}}"),
                 "ag-create-kbref.json");
-        agKbref = jsonPath(r, "id");
+        agKbref = jsonPath(r, "data.id");
 
         assertGolden(postH("/api/v1/agents", bearer, "{\"description\":\"no name\"}"),
                 400, "ag-create-missing-name.json");
@@ -202,15 +202,17 @@ class AgentContractTest {
                 404, "ag-update-missing.json");
 
         // ── 7) delete 家族 ──
-                var delResp = mockMvc.perform(delH("/api/v1/agents/" + agKbref, bearer)).andReturn();
-        assertEquals(204, delResp.getResponse().getStatus());
+        // 2026-10-10（B169）：DELETE 由 204 改为 200 + 统一外壳
+        // {code:0,message:"Agent deleted successfully",data:null}（204 的空体与「外壳恒存在」冲突）；
+        // 同时把此前**无任何引用的** ag-delete.json 钉进测试 ✓。
+        assertGolden(delH("/api/v1/agents/" + agKbref, bearer), 200, "ag-delete.json");
         assertGolden(delH("/api/v1/agents/" + agKbref, bearer), 404, "ag-delete-again.json");
         assertGolden(delH("/api/v1/agents/builtin-quick-answer", bearer), 403,
                 "ag-delete-builtin.json");
 
         // ── 8) copy 家族 ──
         r = expect(201, postH("/api/v1/agents/" + agFull + "/copy", bearer, null), "ag-copy.json");
-        agCopy = jsonPath(r, "id");
+        agCopy = jsonPath(r, "data.id");
         assertGolden(getH("/api/v1/agents/" + agCopy, bearer), 200, "ag-get-copy.json");
         assertGolden(postH("/api/v1/agents/" + MISSING + "/copy", bearer, null), 404,
                 "ag-copy-missing.json");

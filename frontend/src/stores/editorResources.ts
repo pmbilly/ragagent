@@ -135,8 +135,8 @@ export const useEditorResourcesStore = defineStore('editorResources', () => {
 
   async function ensureAgentTypePresets(force = false): Promise<void> {
     return runOnce('agentTypePresets', force, async () => {
-      const presetsRes: any = await getAgentTypePresets()
-      agentTypePresets.value = presetsRes?.data && Array.isArray(presetsRes.data) ? presetsRes.data : []
+      const presetsRes = await getAgentTypePresets()
+      agentTypePresets.value = Array.isArray(presetsRes) ? presetsRes : []
       loadedAt.value.agentTypePresets = Date.now()
     })
   }
@@ -152,7 +152,7 @@ export const useEditorResourcesStore = defineStore('editorResources', () => {
   async function ensurePlaceholders(force = false): Promise<void> {
     return runOnce('placeholders', force, async () => {
       const placeholdersRes = await getPlaceholders()
-      placeholders.value = placeholdersRes?.data ?? null
+      placeholders.value = placeholdersRes ?? null
       loadedAt.value.placeholders = Date.now()
     })
   }

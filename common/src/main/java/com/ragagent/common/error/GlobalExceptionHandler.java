@@ -10,12 +10,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import com.ragagent.common.web.ApiResponse;
+import com.ragagent.common.web.ApiResultSupport;
 import com.ragagent.common.web.PageParams;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 /**
- * 统一错误形态：
- * - BizException → 其 HTTPCode + {@code {"error": {code, message, details}}}
- * - 其他异常 → 500 + {@code {"error": {1007, "Internal server error"}}}
+ * 统一错误形态（B169 迁移期**两形态并存**，按路由分派）：
+ * - 命中 {@code @ApiResult} 控制器 → {@code {"code": N, "message": "...", "data": details}}
+ * - 其余控制器 → 历史形态 {@code {"error": {code, message, details}}}
+ *
+ * <p>分派依据是 {@link ApiResultSupport#isActive} 读的请求属性（由 {@code ApiResultInterceptor}
+ * 在门禁之前打标）。有一种形态**无论哪种控制器都保持原样**：未映射路径的 404
+ * {@code text/plain "404 page not found"} —— 它没有 Handler，打不上标。</p>
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -23,9 +31,8 @@ public class GlobalExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(BizException.class)
-    public ResponseEntity<Map<String, Object>> handleBiz(BizException ex) {
-        AppError e = ex.appError();
-        return ResponseEntity.status(e.httpCode()).body(errorBody(e));
+    public ResponseEntity<Object> handleBiz(BizException ex, HttpServletRequest req) {
+        return respond(ex.appError(), req);
     }
 
     /**
@@ -36,8 +43,13 @@ public class GlobalExceptionHandler {
      * 详见 {@link GuardForbiddenException} 的类注释。</p>
      */
     @ExceptionHandler(GuardForbiddenException.class)
-    public ResponseEntity<String> handleGuardForbidden(GuardForbiddenException ex) {
+    public ResponseEntity<Object> handleGuardForbidden(GuardForbiddenException ex,
+            HttpServletRequest req) {
         String msg = ex.getMessage() == null ? "" : ex.getMessage();
+        if (ApiResultSupport.isActive(req)) {
+            return ResponseEntity.status(403)
+                    .body(ApiResponse.fail(ErrorCode.FORBIDDEN.value(), "Forbidden: " + msg));
+        }
         String escaped = msg.replace("\\", "\\\\").replace("\"", "\\\"");
         return ResponseEntity.status(403)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -47,12 +59,17 @@ public class GlobalExceptionHandler {
     /**
      * handler 直写的纯字符串错误形态（{@code {"error": msg}}），
      * 状态码随异常携带——system admin 组的 promote/revoke/reset-password 等大量使用。
-     * 与 {@link #handleGuardForbidden(GuardForbiddenException)} 同族（那边恒 403 且
+     * 与 {@link #handleGuardForbidden(GuardForbiddenException, HttpServletRequest)} 同族（那边恒 403 且
      * 消息带 "Forbidden: " 前缀），这边按消息原文原样输出。
      */
     @ExceptionHandler(PlainErrorException.class)
-    public ResponseEntity<String> handlePlainError(PlainErrorException ex) {
+    public ResponseEntity<Object> handlePlainError(PlainErrorException ex,
+            HttpServletRequest req) {
         String msg = ex.getMessage() == null ? "" : ex.getMessage();
+        if (ApiResultSupport.isActive(req)) {
+            return ResponseEntity.status(ex.status())
+                    .body(ApiResponse.fail(errorCodeFor(ex.status()), msg));
+        }
         String escaped = msg.replace("\\", "\\\\").replace("\"", "\\\"");
         return ResponseEntity.status(ex.status())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -75,7 +92,8 @@ public class GlobalExceptionHandler {
 
     /** 请求体约束校验失败（@Valid DTO）与 @ModelAttribute 绑定失败。 */
     @ExceptionHandler(org.springframework.validation.BindException.class)
-    public ResponseEntity<Map<String, Object>> handleBind(org.springframework.validation.BindException ex) {
+    public ResponseEntity<Object> handleBind(org.springframework.validation.BindException ex,
+            HttpServletRequest req) {
         boolean pagination = ex.getTarget() instanceof PageParams
                 || ex.getBindingResult().getFieldErrors().stream()
                         .allMatch(fe -> "page".equals(fe.getField()) || "pageSize".equals(fe.getField())
@@ -93,13 +111,14 @@ public class GlobalExceptionHandler {
         AppError e = new AppError(ErrorCode.BAD_REQUEST.value(),
                 pagination ? "分页参数不合法" : "请求参数不合法",
                 String.join("\n", lines), 400);
-        return ResponseEntity.status(400).body(errorBody(e));
+        return respond(e, req);
     }
 
     /** 方法级参数校验失败（Spring 6.1 内建方法校验，如 @ModelAttribute record 上的约束）。 */
     @ExceptionHandler(org.springframework.web.method.annotation.HandlerMethodValidationException.class)
-    public ResponseEntity<Map<String, Object>> handleMethodValidation(
-            org.springframework.web.method.annotation.HandlerMethodValidationException ex) {
+    public ResponseEntity<Object> handleMethodValidation(
+            org.springframework.web.method.annotation.HandlerMethodValidationException ex,
+            HttpServletRequest req) {
         java.util.List<String> lines = new java.util.ArrayList<>();
         ex.getAllValidationResults().forEach(r ->
                 r.getResolvableErrors().forEach(err -> {
@@ -112,25 +131,27 @@ public class GlobalExceptionHandler {
         }
         AppError e = new AppError(ErrorCode.BAD_REQUEST.value(), "请求参数不合法",
                 String.join("\n", lines), 400);
-        return ResponseEntity.status(400).body(errorBody(e));
+        return respond(e, req);
     }
 
     /** 单个 query 变量类型不匹配（如 page=abc）。 */
     @ExceptionHandler(org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<Map<String, Object>> handleTypeMismatch(
-            org.springframework.web.method.annotation.MethodArgumentTypeMismatchException ex) {
+    public ResponseEntity<Object> handleTypeMismatch(
+            org.springframework.web.method.annotation.MethodArgumentTypeMismatchException ex,
+            HttpServletRequest req) {
         String name = ex.getName();
         boolean pagination = "page".equals(name) || "page_size".equals(name);
         AppError e = new AppError(ErrorCode.BAD_REQUEST.value(),
                 pagination ? "分页参数不合法" : "请求参数不合法",
                 name + ": 类型不正确", 400);
-        return ResponseEntity.status(400).body(errorBody(e));
+        return respond(e, req);
     }
 
     /** 请求体不可读：空体 / 畸形 JSON / 字段类型错。 */
     @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
-    public ResponseEntity<Map<String, Object>> handleNotReadable(
-            org.springframework.http.converter.HttpMessageNotReadableException ex) {
+    public ResponseEntity<Object> handleNotReadable(
+            org.springframework.http.converter.HttpMessageNotReadableException ex,
+            HttpServletRequest req) {
         String details = "请求体格式不正确";
         Throwable cause = ex.getCause();
         if (ex.getMessage() != null && ex.getMessage().contains("Required request body")) {
@@ -143,7 +164,7 @@ public class GlobalExceptionHandler {
             }
         }
         AppError e = new AppError(ErrorCode.BAD_REQUEST.value(), "请求参数不合法", details, 400);
-        return ResponseEntity.status(400).body(errorBody(e));
+        return respond(e, req);
     }
 
     /** 约束违规文案的中文归一：自定义消息原样，框架默认英文文案统一为固定中文措辞。 */
@@ -205,10 +226,36 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, Object>> handleOther(Exception ex) {
+    public ResponseEntity<Object> handleOther(Exception ex, HttpServletRequest req) {
         log.error("unhandled exception", ex);
         AppError e = new AppError(ErrorCode.INTERNAL_SERVER.value(), "Internal server error", null, 500);
-        return ResponseEntity.status(500).body(errorBody(e));
+        return respond(e, req);
+    }
+
+    /**
+     * 错误体形态分派（B169 迁移期）：{@code @ApiResult} 路由 → 统一外壳
+     * {@code {code, message, data}}（data 承载 details）；其余路由 → 历史形态。
+     */
+    private ResponseEntity<Object> respond(AppError e, HttpServletRequest req) {
+        Object body = ApiResultSupport.isActive(req)
+                ? ApiResponse.fail(e.code(), e.message(), e.details())
+                : errorBody(e);
+        return ResponseEntity.status(e.httpCode()).body(body);
+    }
+
+    /** 只有 HTTP 状态、没有业务码的错误（PlainErrorException）→ 通用段码表。 */
+    private static int errorCodeFor(int httpStatus) {
+        return switch (httpStatus) {
+            case 400 -> ErrorCode.BAD_REQUEST.value();
+            case 401 -> ErrorCode.UNAUTHORIZED.value();
+            case 403 -> ErrorCode.FORBIDDEN.value();
+            case 404 -> ErrorCode.NOT_FOUND.value();
+            case 405 -> ErrorCode.METHOD_NOT_ALLOWED.value();
+            case 409 -> ErrorCode.CONFLICT.value();
+            case 429 -> ErrorCode.TOO_MANY_REQUESTS.value();
+            case 503 -> ErrorCode.SERVICE_UNAVAILABLE.value();
+            default -> ErrorCode.INTERNAL_SERVER.value();
+        };
     }
 
     /**

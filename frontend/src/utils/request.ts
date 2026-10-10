@@ -120,11 +120,33 @@ function isPublicAuthRequest(url?: string): boolean {
   return PUBLIC_AUTH_PATHS.some(p => url.includes(p));
 }
 
+/**
+ * 统一响应外壳判定（B169）：后端 `@ApiResult` 路由的成功体恒为
+ * `{ code: 0, message: "ok", data: … }`（约定见 docs/api-response-convention.md）。
+ *
+ * 只认**恰好由这三个键构成**的对象（code 为数字）—— 避免把业务载荷里恰好叫
+ * code/data 的对象误判成外壳。后端的 ApiResponse 若扩展键集，此处同步扩展。
+ */
+function isApiEnvelope(d: any): d is { code: number; message?: string; data: any } {
+  if (!d || typeof d !== 'object' || Array.isArray(d)) return false;
+  return typeof d.code === 'number'
+    && 'data' in d
+    && Object.keys(d).every((k) => k === 'code' || k === 'message' || k === 'data');
+}
+
 instance.interceptors.response.use(
   (response) => {
     // 根据业务状态码处理逻辑
     const { status, data } = response;
     if (status >= 200 && status < 300) {
+      // 统一外壳 → 就地解包成 data（全前端唯一解包点）；2xx 但 code!=0 也按失败处理
+      if (isApiEnvelope(data)) {
+        if (data.code !== 0) {
+          return Promise.reject(withHttpStatus(
+            { status, message: data.message, code: data.code, data: data.data }, status));
+        }
+        return withHttpStatus(data.data, status);
+      }
       return withHttpStatus(data, status);
     } else {
       return Promise.reject(withHttpStatus(data, status));
@@ -185,8 +207,11 @@ instance.interceptors.response.use(
 
     const { status, data } = error.response;
     // 将HTTP状态码一并抛出，方便上层判断401等场景
-    // 后端错误体统一为: { error: { code, message, details } }
-    // 提取 error.message 作为顶层 message，方便前端使用 error?.message 获取
+    // 后端错误体两形态并存（B169 迁移期，见 docs/api-response-convention.md）：
+    //   - @ApiResult 路由：{ code, message, data }（data 承载 details）
+    //   - 其余路由：{ error: { code, message, details } } 或 { error: "…" }
+    // 这里按形态提取顶层 message；其余字段靠下面的 ...data 摊平
+    // ⇒ 消费端 err.message 恒可用，err.code / err.error?.code 按后端形态各自可读
     let errorMessage: string | undefined;
     if (typeof data === 'object') {
       if (typeof data?.error === 'string') {

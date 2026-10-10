@@ -4397,10 +4397,10 @@ const handleSave = async () => {
   saving.value = true;
   try {
     if (editorMode.value === 'create') {
-      const result: any = await createAgent(payload);
-      const created = result?.data as CustomAgent | undefined;
+      // B169：外壳已在 request.ts 解包 ⇒ 这里拿到的就是 agent 本体（此前是 {success,data} 外壳）
+      const created = (await createAgent(payload)) as CustomAgent | undefined;
       if (!created?.id) {
-        throw new Error(result?.message || t('agent.messages.saveFailed'));
+        throw new Error(t('agent.messages.saveFailed'));
       }
       savedAgent.value = created;
       formData.value.id = created.id;

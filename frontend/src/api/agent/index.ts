@@ -243,11 +243,10 @@ export interface PlaceholdersResponse {
   fallbackPrompt: PlaceholderDefinition[];
 }
 
-// 获取占位符定义
-export function getPlaceholders(): Promise<{ data: PlaceholdersResponse }> {
-  // 后端 200 裸载荷（§2.1）；适配成消费端既有的 { data } 契约
-  // （漏了这层适配 → store 读 .data 恒 undefined → 编辑器变量芯片与 {{ 弹出列表全空）
-  return get<PlaceholdersResponse>('/api/v1/agents/placeholders').then((resp) => ({ data: resp }));
+// 获取占位符定义（B169：后端统一外壳 {code,message,data} ⇒ 解包在 utils/request.ts 一处完成，
+// api 层直接返回载荷；此前的 { data: resp } 手工适配已退役）
+export function getPlaceholders() {
+  return get<PlaceholdersResponse>('/api/v1/agents/placeholders');
 }
 
 // ===== 智能体类型预设 =====
@@ -293,12 +292,9 @@ export interface AgentTypePreset {
   kbFilter?: AgentTypeKBFilter;      // 为空表示所有 KB 可选
 }
 
-// 拉取类型预设列表（编辑器用）
-export function getAgentTypePresets(): Promise<{ data: AgentTypePreset[] }> {
-  // 后端 200 裸数组（§2.1）；适配成消费端既有的 { data } 契约（同 web-search-provider）
-  return get<AgentTypePreset[]>('/api/v1/agents/type-presets').then((resp) => ({
-    data: Array.isArray(resp) ? resp : [],
-  }));
+// 拉取类型预设列表（编辑器用）；解包同上（request.ts 一处）
+export function getAgentTypePresets() {
+  return get<AgentTypePreset[]>('/api/v1/agents/type-presets');
 }
 
 // ===== IM渠道 =====
