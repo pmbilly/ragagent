@@ -1,5 +1,6 @@
 package com.ragagent.storage.fileserve;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -19,7 +20,7 @@ import com.ragagent.storage.service.ResourceCatalogService;
 @Component
 public class FileAccessResolver {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final ResourceCatalogService catalog;
 

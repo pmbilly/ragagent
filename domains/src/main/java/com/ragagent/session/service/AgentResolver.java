@@ -1,5 +1,6 @@
 package com.ragagent.session.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.io.IOException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Component;
 public class AgentResolver {
 
     private static final Logger log = LoggerFactory.getLogger(AgentResolver.class);
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final CustomAgentService customAgentService;
 

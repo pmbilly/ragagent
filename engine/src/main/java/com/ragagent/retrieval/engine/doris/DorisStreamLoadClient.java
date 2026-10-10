@@ -1,5 +1,6 @@
 package com.ragagent.retrieval.engine.doris;
 
+import com.ragagent.common.web.JsonMappers;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -50,7 +51,7 @@ public final class DorisStreamLoadClient {
     private final String username;
     private final String password;
     private final SsrfGuard guard;
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = JsonMappers.lenient();
 
     public DorisStreamLoadClient(String feHttpBase, String database, String username, String password,
                                  SsrfGuard guard) {
@@ -132,7 +133,7 @@ public final class DorisStreamLoadClient {
     }
 
     /** 复用一份静态 ObjectMapper（chunkRows 是静态方法）。 */
-    private static final ObjectMapper JSON = new ObjectMapper();
+    private static final ObjectMapper JSON = JsonMappers.lenient();
 
     /** 发出一次 Stream Load HTTP 请求。 */
     private void streamLoadOnce(String table, List<String> columns,

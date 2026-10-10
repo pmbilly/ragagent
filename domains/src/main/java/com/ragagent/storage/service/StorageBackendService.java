@@ -1,5 +1,6 @@
 package com.ragagent.storage.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -8,7 +9,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.OffsetDateTime;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
@@ -54,8 +54,7 @@ public class StorageBackendService {
         return repo.getByID(tenantId, id).orElse(null);
     }
 
-    private static final ObjectMapper MAPPER = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
     /** 路径规范化：收敛 ../ 与 ..（近似语义，非完整实现），用于 path_prefix 规范化比较 */
 
     private final StorageBackendRepository repo;

@@ -1,5 +1,6 @@
 package com.ragagent.im.wechat;
 
+import com.ragagent.common.web.JsonMappers;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -42,7 +43,7 @@ import com.ragagent.im.runtime.IncomingMessage;
 public class WechatLongPollClient {
 
     private static final Logger log = LoggerFactory.getLogger(WechatLongPollClient.class);
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     static final long LONG_POLL_TIMEOUT_MS = 35_000L;
     static final long LONG_POLL_HTTP_TIMEOUT_MS = 40_000L;

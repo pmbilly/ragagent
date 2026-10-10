@@ -1,5 +1,6 @@
 package com.ragagent.im.telegram;
 
+import com.ragagent.common.web.JsonMappers;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -52,7 +53,7 @@ public class TelegramAdapter implements AdapterInterfaces.Adapter,
     /** 孤儿流 TTL。 */
     static final long STREAM_ORPHAN_TTL_MS = 5 * 60 * 1000L;
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /** 全局流表，key = {@code {chatId}:{msgId}}。 */
     static final Map<String, StreamState> STREAMS = new ConcurrentHashMap<>();

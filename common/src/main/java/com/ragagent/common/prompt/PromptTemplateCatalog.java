@@ -1,5 +1,6 @@
 package com.ragagent.common.prompt;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -33,7 +34,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public final class PromptTemplateCatalog {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /** 单个模板（i18n 只用于本地化，不进 JSON）。 */
     public record Template(String id, String name, String description, String content,

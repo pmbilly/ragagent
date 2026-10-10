@@ -1,5 +1,6 @@
 package com.ragagent.embedchannel.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +56,7 @@ public class EmbedChannelService {
             Set.of("bottom-left", "top-right", "top-left", "bottom-right");
     private static final int MAX_LAUNCHER_ICON_BYTES = 200 * 1024;
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final EmbedChannelMapper repo;
     private final CustomAgentMapper agentMapper;

@@ -1,5 +1,6 @@
 package com.ragagent.agent.management.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.io.InputStream;
 import com.ragagent.common.wiki.WikiLanguageSupport;
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Component
 public class BuiltinAgentRegistry {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /** 列表接口的固定展示序（wiki-fixer/skill-installer 刻意不在列）。 */
     private static final List<String> ORDERED_IDS = List.of(

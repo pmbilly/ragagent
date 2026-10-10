@@ -1,7 +1,7 @@
 package com.ragagent.wiki.domain;
 
+import com.ragagent.common.web.JsonMappers;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -34,9 +34,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class WikiConfig {
 
     /** 读路径宽容的 mapper（忽略未知字段） */
-    private static final ObjectMapper READER = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
+    private static final ObjectMapper READER = JsonMappers.lenient();
     /** 用于 wiki 页面生成与更新的 LLM 模型 ID */
     private String synthesisModelId = "";
 

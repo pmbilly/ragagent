@@ -1,5 +1,6 @@
 package com.ragagent.auth.controller;
 
+import com.ragagent.common.web.JsonMappers;
 import com.ragagent.common.web.RequestFields;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -46,7 +47,7 @@ import com.ragagent.common.web.ApiResponse;
 @ApiResult
 public class TenantMemberController {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /** "system-<tenantID>" 合成用户（API-Key 主体）不入 invited_by */
     private static final String SYNTHETIC_PREFIX = "system-";

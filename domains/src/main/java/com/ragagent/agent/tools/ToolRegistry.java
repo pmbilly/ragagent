@@ -1,5 +1,6 @@
 package com.ragagent.agent.tools;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -536,7 +537,7 @@ public class ToolRegistry {
     }
 
     private static final com.fasterxml.jackson.databind.ObjectMapper PLAIN_READER =
-            new com.fasterxml.jackson.databind.ObjectMapper();
+            JsonMappers.lenient();
 
     /**
      * UI/审计身份与模型的代理调用分离。原始调用名、参数、ID 与

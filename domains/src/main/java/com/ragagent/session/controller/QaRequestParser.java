@@ -1,6 +1,7 @@
 package com.ragagent.session.controller;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.common.web.JsonMappers;
 import java.util.List;
 import com.ragagent.agent.management.domain.CustomAgentEntity;
 import com.ragagent.agent.management.service.AgentConfigJson;
@@ -91,7 +92,7 @@ final class QaRequestParser {
         // 建议归因校验
         if (request.suggestionAttribution != null && !request.suggestionAttribution.isNull()) {
             try {
-                rc.suggestionAttribution = new com.fasterxml.jackson.databind.ObjectMapper()
+                rc.suggestionAttribution = JsonMappers.lenient()
                         .treeToValue(request.suggestionAttribution, SuggestionAttribution.class);
             } catch (Exception e) {
                 throw BizException.badRequest("invalid suggestion attribution");

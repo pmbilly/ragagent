@@ -1,5 +1,6 @@
 package com.ragagent.wiki.service.ingest;
 
+import com.ragagent.common.web.JsonMappers;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -64,7 +65,7 @@ public class WikiIngestBatchHandler implements WikiIngestTaskHandler {
 
     private static final Logger log = LoggerFactory.getLogger(WikiIngestBatchHandler.class);
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     final WikiIngestService ingestService;
     final WikiPageService wikiService;

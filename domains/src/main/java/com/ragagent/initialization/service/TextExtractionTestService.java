@@ -1,5 +1,6 @@
 package com.ragagent.initialization.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,7 @@ import com.ragagent.common.graph.GraphRelation;
  */
 public final class TextExtractionTestService {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final ExtractPrompts extractPrompts;
     private final ModelConnectivityTestService modelTest;

@@ -1,5 +1,6 @@
 package com.ragagent.session.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import com.ragagent.common.wiki.WikiLanguageSupport;
 import java.util.HashMap;
@@ -9,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.retrieval.SearchResult;
@@ -39,8 +39,7 @@ final class MessageSuggestionPipeline {
     private static final int SUGGESTION_HISTORY_MESSAGE_RUNE_LIMIT = 2500;
     private static final int SUGGESTION_EVIDENCE_MAX_ITEMS = 5;
     private static final int SUGGESTION_EVIDENCE_SNIPPET_RUNE_LIMIT = 500;
-    private static final ObjectMapper JSON_MAPPER = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    private static final ObjectMapper JSON_MAPPER = JsonMappers.lenient();
     private static final class ConversationTurn {
         String requestId = "";
         Message user;

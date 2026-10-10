@@ -1,5 +1,6 @@
 package com.ragagent.retrieval.engine.opensearch;
 
+import com.ragagent.common.web.JsonMappers;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -92,7 +93,7 @@ public class OpenSearchRetrieveRepository
         implements RetrieveEngineRepository, RetrieveEngineRepository.KnowledgeIndexMover {
 
     private static final Logger log = LoggerFactory.getLogger(OpenSearchRetrieveRepository.class);
-    static final ObjectMapper MAPPER = new ObjectMapper();
+    static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /** CopyIndices 分页批大小（受 max_result_window 10000 界）。 */
     static final int COPY_BATCH_SIZE = 500;

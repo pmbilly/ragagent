@@ -1,5 +1,6 @@
 package com.ragagent.agent;
 
+import com.ragagent.common.web.JsonMappers;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ final class ObservePhase {
 
     private static final Logger log = LoggerFactory.getLogger(ObservePhase.class);
 
-    private static final ObjectMapper JSON = new ObjectMapper();
+    private static final ObjectMapper JSON = JsonMappers.lenient();
 
     private final AgentEngine engine;
 

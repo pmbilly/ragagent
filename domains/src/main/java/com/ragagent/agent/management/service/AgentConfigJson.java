@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ragagent.common.web.JsonMappers;
 
 /**
  * CustomAgentConfig 的树级补默认 / 校验。
@@ -14,7 +15,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public final class AgentConfigJson {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     public static final String SUGGESTION_CURATED = "curated";
     public static final String SUGGESTION_KNOWLEDGE = "knowledge";

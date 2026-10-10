@@ -1,5 +1,6 @@
 package com.ragagent.llm.ollama;
 
+import com.ragagent.common.web.JsonMappers;
 import java.io.BufferedReader;
 import com.ragagent.common.deployment.AppEnvLookup;
 import java.io.IOException;
@@ -51,7 +52,7 @@ public class OllamaService {
     /** 单行 NDJSON 的最大字节数。 */
     private static final int MAX_NDJSON_LINE_BYTES = 8 * 1024 * 1024;
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /** 只保护 isAvailable 的读写。 */
     private final ReentrantLock mu = new ReentrantLock();

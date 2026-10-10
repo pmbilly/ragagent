@@ -1,5 +1,6 @@
 package com.ragagent.storage.fileserve;
 
+import com.ragagent.common.web.JsonMappers;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -431,10 +432,7 @@ public class StorageFileResolver {
     }
 
     private static final com.fasterxml.jackson.databind.ObjectMapper CONFIG_MAPPER =
-            new com.fasterxml.jackson.databind.ObjectMapper()
-                    .configure(com.fasterxml.jackson.databind.DeserializationFeature
-                            .FAIL_ON_UNKNOWN_PROPERTIES, false);
-
+            JsonMappers.lenient();
     private static String textOrNull(JsonNode n) {
         return n == null || n.isNull() ? null : n.asText();
     }
@@ -472,7 +470,7 @@ public class StorageFileResolver {
      */
     static JsonNode toStorageEngineConfig(StorageBackend b, CryptoService crypto) {
         var cfg = new com.fasterxml.jackson.databind.node.ObjectNode(
-                com.fasterxml.jackson.databind.json.JsonMapper.builder().build().getNodeFactory());
+                JsonMappers.lenient().getNodeFactory());
         cfg.put("defaultProvider", b.getProvider());
         JsonNode c = b.getConfig();
         switch (b.getProvider() == null ? "" : b.getProvider()) {
@@ -579,7 +577,7 @@ public class StorageFileResolver {
         b.setSource("env");
         b.setStatus("active");
         b.setLegacyAlias(true);
-        var cfg = new com.fasterxml.jackson.databind.ObjectMapper().createObjectNode();
+        var cfg = JsonMappers.lenient().createObjectNode();
         family.writeConfig(cfg);
         b.setConfig(cfg);
         return b;

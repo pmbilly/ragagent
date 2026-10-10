@@ -1,5 +1,6 @@
 package com.ragagent.system.controller;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -61,7 +62,7 @@ import com.ragagent.common.web.ApiResponse;
 @RequestMapping("/api/v1/system/admin")
 public class SystemAdminController {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final SystemAdminUserService users;
     private final SystemSettingService settings;

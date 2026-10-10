@@ -1,5 +1,6 @@
 package com.ragagent.model.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -60,7 +61,7 @@ public class ModelService implements ModelGateway  {
 
 
     private static final Logger log = LoggerFactory.getLogger(ModelService.class);
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
     private static final long USAGE_LIST_LIMIT = 50;
 
     public static final String SOURCE_REMOTE = "remote";

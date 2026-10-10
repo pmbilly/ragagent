@@ -1,5 +1,6 @@
 package com.ragagent.storage.support;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -154,10 +155,7 @@ public class FileServiceResolver implements Resolver {
     }
 
     private static final com.fasterxml.jackson.databind.ObjectMapper CONFIG_MAPPER =
-            new com.fasterxml.jackson.databind.ObjectMapper()
-                    .configure(com.fasterxml.jackson.databind.DeserializationFeature
-                            .FAIL_ON_UNKNOWN_PROPERTIES, false);
-
+            JsonMappers.lenient();
     /**
      * {@code resource://} 后必须恰好 22 个
      * {@code [A-Za-z0-9_-]} 字符。

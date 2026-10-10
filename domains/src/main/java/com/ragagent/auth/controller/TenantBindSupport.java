@@ -1,10 +1,10 @@
 package com.ragagent.auth.controller;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
+import com.ragagent.common.web.JsonMappers;
 import com.ragagent.common.web.ToolJson;
 import com.ragagent.common.web.RequestFields;
 
@@ -17,11 +17,7 @@ final class TenantBindSupport {
 
     /** 请求绑定 mapper：忽略未知字段（FAIL_ON_UNKNOWN off）；
      *  JavaTimeModule 供含 created_at 等时间字段的全路径往返 */
-    static final ObjectMapper MAPPER = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-            .registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule())
-            .configure(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-
+    static final ObjectMapper MAPPER = JsonMappers.lenient();
     /** string 字段类型检查；违规返回字段级类型文案，否则 null。 */
     static String stringFieldTypeError(com.fasterxml.jackson.databind.JsonNode root, String field) {
         com.fasterxml.jackson.databind.JsonNode node = root.get(field);

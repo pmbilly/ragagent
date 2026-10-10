@@ -1,5 +1,6 @@
 package com.ragagent.llm.chat;
 
+import com.ragagent.common.web.JsonMappers;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -45,7 +46,7 @@ public final class PromptCache {
     /** prompt_cache_key 的最大长度（码点数）。 */
     public static final int OPENAI_PROMPT_CACHE_KEY_MAX_LENGTH = 64;
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private PromptCache() {
     }

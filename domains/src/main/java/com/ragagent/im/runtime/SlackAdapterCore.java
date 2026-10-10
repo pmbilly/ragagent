@@ -1,5 +1,6 @@
 package com.ragagent.im.runtime;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,7 @@ public final class SlackAdapterCore {
     private SlackAdapterCore() {
     }
 
-    private static final ObjectMapper JSON = new ObjectMapper();
+    private static final ObjectMapper JSON = JsonMappers.lenient();
 
     /**
      * type=url_verification →

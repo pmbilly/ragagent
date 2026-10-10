@@ -1,5 +1,6 @@
 package com.ragagent.storage.fileserve;
 
+import com.ragagent.common.web.JsonMappers;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
@@ -44,7 +45,7 @@ import com.ragagent.common.web.ContentTypeByFilename;
 public class FileProxyService {
 
     private static final Logger log = LoggerFactory.getLogger(FileProxyService.class);
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final TenantLookup tenantConfigLookup;
     private final StorageFileResolver resolver;

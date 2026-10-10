@@ -1,5 +1,6 @@
 package com.ragagent.agent.tools;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -74,7 +75,7 @@ final class McpCatalogPagination {
             int offset = 0;
             try {
                 byte[] decoded = McpCatalog.b64UrlDecode(args.cursor());
-                JsonNode cursorNode = com.fasterxml.jackson.databind.json.JsonMapper.builder().build().readTree(decoded);
+                JsonNode cursorNode = JsonMappers.lenient().readTree(decoded);
                 String f = cursorNode.path("f").asText("");
                 int o = cursorNode.path("o").asInt(-1);
                 if (!f.equals(fingerprint) || o < 0) {

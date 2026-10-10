@@ -1,5 +1,6 @@
 package com.ragagent.agent;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -14,7 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public final class AgentPromptTemplates {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /** 单个提示词模板（content/mode/default 为主消费字段）。 */
     public record PromptTemplate(

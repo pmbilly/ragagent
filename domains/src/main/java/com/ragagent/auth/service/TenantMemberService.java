@@ -1,5 +1,6 @@
 package com.ragagent.auth.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -52,7 +53,7 @@ import org.springframework.stereotype.Service;
 public class TenantMemberService {
 
     private static final Logger log = LoggerFactory.getLogger(TenantMemberService.class);
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     public static final String STATUS_ACTIVE = "active";
     public static final int LIST_DEFAULT_PAGE_SIZE = 20;

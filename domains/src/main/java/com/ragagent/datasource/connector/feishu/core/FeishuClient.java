@@ -1,5 +1,6 @@
 package com.ragagent.datasource.connector.feishu.core;
 
+import com.ragagent.common.web.JsonMappers;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -11,7 +12,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.datasource.Connector;
 import com.ragagent.datasource.ConnectorException;
@@ -94,9 +94,7 @@ public class FeishuClient implements DocxMarkdown.SheetReader {
     /** @see #exportTimeout */
     public static volatile Duration exportPollInterval = Duration.ofSeconds(2);
 
-    static final ObjectMapper MAPPER = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
+    static final ObjectMapper MAPPER = JsonMappers.lenient();
     final String baseUrl;
     final String appId;
     final String appSecret;

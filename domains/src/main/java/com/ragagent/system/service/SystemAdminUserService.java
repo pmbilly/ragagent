@@ -1,5 +1,6 @@
 package com.ragagent.system.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
@@ -345,7 +346,7 @@ public class SystemAdminUserService {
         if (auditService == null) {
             return;
         }
-        var detailsNode = new com.fasterxml.jackson.databind.ObjectMapper().valueToTree(
+        var detailsNode = JsonMappers.lenient().valueToTree(
                 details == null ? Map.of() : details);
         AuditLog entry = new AuditLog();
         entry.setTenantId(0L);

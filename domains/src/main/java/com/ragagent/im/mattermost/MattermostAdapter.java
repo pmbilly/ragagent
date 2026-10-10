@@ -1,5 +1,6 @@
 package com.ragagent.im.mattermost;
 
+import com.ragagent.common.web.JsonMappers;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -50,7 +51,7 @@ public class MattermostAdapter implements AdapterInterfaces.Adapter,
         AdapterInterfaces.StreamSender, AdapterInterfaces.FileDownloader {
 
     private static final Logger log = LoggerFactory.getLogger(MattermostAdapter.class);
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     static final String EXTRA_THREAD_ROOT = "thread_root_id";
     static final String EXTRA_CHANNEL_ID = "channel_id";

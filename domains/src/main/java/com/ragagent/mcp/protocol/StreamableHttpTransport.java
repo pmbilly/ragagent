@@ -3,6 +3,7 @@ package com.ragagent.mcp.protocol;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.ragagent.common.web.JsonMappers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -38,7 +39,7 @@ import java.util.function.Consumer;
  */
 public final class StreamableHttpTransport implements McpTransport {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final URI serverUrl;
     private final Map<String, String> headers;

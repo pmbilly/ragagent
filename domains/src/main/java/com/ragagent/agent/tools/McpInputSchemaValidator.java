@@ -1,5 +1,6 @@
 package com.ragagent.agent.tools;
 
+import com.ragagent.common.web.JsonMappers;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -34,7 +35,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public final class McpInputSchemaValidator {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
     private static final String EXTERNAL_REF_MESSAGE =
             "no URLLoader set: reference is external and remote fetching is disabled";
     private static final int MAX_DEPTH = 64;

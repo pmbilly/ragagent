@@ -1,5 +1,6 @@
 package com.ragagent.im.wecom;
 
+import com.ragagent.common.web.JsonMappers;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.WebSocket;
@@ -41,7 +42,7 @@ import com.ragagent.im.runtime.IncomingMessage;
 public class WecomLongConnClient {
 
     private static final Logger log = LoggerFactory.getLogger(WecomLongConnClient.class);
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     static final String CMD_SUBSCRIBE = "aibot_subscribe";
     static final String CMD_PING = "ping";

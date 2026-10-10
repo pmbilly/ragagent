@@ -1,5 +1,6 @@
 package com.ragagent.auth.controller;
 
+import com.ragagent.common.web.JsonMappers;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
@@ -57,9 +58,7 @@ public class TenantAPIPrincipalController {
     /**
      * 请求绑定的 mapper：FAIL_ON_UNKNOWN_PROPERTIES 关掉（请求体带多余键不报错）。
      */
-    private static final ObjectMapper MAPPER = new ObjectMapper()
-            .configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
     private final TenantService tenantService;
 
     public TenantAPIPrincipalController(TenantService tenantService) {

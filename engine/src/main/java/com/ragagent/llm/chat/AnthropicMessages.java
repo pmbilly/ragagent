@@ -1,5 +1,6 @@
 package com.ragagent.llm.chat;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +24,7 @@ import com.ragagent.llm.domain.ToolCall;
  */
 final class AnthropicMessages {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private AnthropicMessages() {
     }

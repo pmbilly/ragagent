@@ -1,8 +1,8 @@
 package com.ragagent.favorite.controller;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.AppError;
@@ -49,9 +49,7 @@ import org.springframework.web.bind.annotation.RestController;
 @ApiResult
 public class UserFavoriteController {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper()
-            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
     private final UserResourceFavoriteService service;
 
     public UserFavoriteController(UserResourceFavoriteService service) {

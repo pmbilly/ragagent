@@ -1,5 +1,6 @@
 package com.ragagent.agent.management.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -22,7 +23,7 @@ import com.ragagent.common.wiki.WikiLanguageSupport;
  */
 public final class AgentSuggestedQuestions {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     static final int SUGGESTION_DEFAULT_LIMIT = 6;
     static final int SUGGESTION_MAX_LIMIT = 30;

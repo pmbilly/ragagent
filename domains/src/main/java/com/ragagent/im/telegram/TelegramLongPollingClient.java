@@ -1,5 +1,6 @@
 package com.ragagent.im.telegram;
 
+import com.ragagent.common.web.JsonMappers;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -28,7 +29,7 @@ import com.ragagent.im.runtime.IncomingMessage;
 public class TelegramLongPollingClient {
 
     private static final Logger log = LoggerFactory.getLogger(TelegramLongPollingClient.class);
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
     private static final long BACKOFF_MS = 3000;
     private static final int POLL_TIMEOUT_SECONDS = 30;
 

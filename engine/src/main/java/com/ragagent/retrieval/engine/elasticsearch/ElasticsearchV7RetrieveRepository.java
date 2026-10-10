@@ -1,5 +1,6 @@
 package com.ragagent.retrieval.engine.elasticsearch;
 
+import com.ragagent.common.web.JsonMappers;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -57,7 +58,7 @@ public class ElasticsearchV7RetrieveRepository
 
     private static final Logger log =
             LoggerFactory.getLogger(ElasticsearchV7RetrieveRepository.class);
-    static final ObjectMapper MAPPER = new ObjectMapper();
+    static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     static final int COPY_BATCH_SIZE = 500;
 

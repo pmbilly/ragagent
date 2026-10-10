@@ -1,5 +1,6 @@
 package com.ragagent.auth.apikey.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.LinkedHashMap;
 import com.ragagent.common.deployment.AppEnvLookup;
 import java.util.Map;
@@ -39,7 +40,7 @@ public final class TenantAPIKeyBootstrap {
     /** 自动建 Key 开关的环境变量名。 */
     public static final String AUTO_CREATE_ENV = "WEKNORA_TENANT_AUTO_CREATE_API_KEY";
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private TenantAPIKeyBootstrap() {
     }

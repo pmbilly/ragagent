@@ -1,5 +1,6 @@
 package com.ragagent.agent.tools;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -24,7 +25,7 @@ import com.ragagent.common.llm.ToolResult;
  */
 public class TodoWriteTool extends BaseTool {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /** 单个计划步骤（json 键序固定：id/description/status）。 */
 

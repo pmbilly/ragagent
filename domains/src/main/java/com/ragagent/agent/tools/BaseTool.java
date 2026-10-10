@@ -2,6 +2,7 @@ package com.ragagent.agent.tools;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.common.web.JsonMappers;
 
 /**
  * 工具基类。
@@ -9,7 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public abstract class BaseTool implements AgentTool {
 
-    private static final ObjectMapper SCHEMA_MAPPER = new ObjectMapper();
+    private static final ObjectMapper SCHEMA_MAPPER = JsonMappers.lenient();
 
     private final String name;
     private final String description;

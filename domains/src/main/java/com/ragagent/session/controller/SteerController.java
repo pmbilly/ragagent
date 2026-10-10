@@ -1,5 +1,6 @@
 package com.ragagent.session.controller;
 
+import com.ragagent.common.web.JsonMappers;
 import com.ragagent.common.web.RequestFields;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -9,7 +10,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
@@ -52,9 +52,7 @@ public class SteerController {
 
     private static final Logger log = LoggerFactory.getLogger(SteerController.class);
 
-    private static final ObjectMapper MAPPER = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
     static final String DELIVERY_INJECT = "inject";
     static final String DELIVERY_AFTER = "after";
     static final String DATA_CONSUMED = "consumed";

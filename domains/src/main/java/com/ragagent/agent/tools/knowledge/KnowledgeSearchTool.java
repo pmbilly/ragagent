@@ -1,5 +1,6 @@
 package com.ragagent.agent.tools.knowledge;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -579,6 +580,6 @@ public class KnowledgeSearchTool extends BaseTool {
 
     /** 重排：失败回落原序。 */
     public static final class RecordingSupportHolder {
-        public static final com.fasterxml.jackson.databind.ObjectMapper MAPPER = new com.fasterxml.jackson.databind.ObjectMapper();
+        public static final com.fasterxml.jackson.databind.ObjectMapper MAPPER = JsonMappers.lenient();
     }
 }

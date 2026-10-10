@@ -1,5 +1,6 @@
 package com.ragagent.auth.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.nio.charset.StandardCharsets;
 import com.ragagent.auth.config.JwtProperties;
 import java.security.MessageDigest;
@@ -37,7 +38,7 @@ public class OidcStateCodec {
     private static final long FUTURE_TOLERANCE_SECONDS = 60;
 
     private static final SecureRandom RANDOM = new SecureRandom();
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final byte[] signingKey;
 

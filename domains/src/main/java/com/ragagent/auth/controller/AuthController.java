@@ -1,5 +1,6 @@
 package com.ragagent.auth.controller;
 
+import com.ragagent.common.web.JsonMappers;
 import java.security.SecureRandom;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -112,7 +113,7 @@ public class AuthController {
                     + "|[a-zA-Z0-9-]*[a-zA-Z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]"
                     + "|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])$");
 
-    static final ObjectMapper MAPPER = new ObjectMapper();
+    static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     final UserService userService;
     final TenantService tenantService;

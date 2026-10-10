@@ -2,6 +2,7 @@ package com.ragagent.agent.management.controller;
 
 import com.ragagent.common.web.ApiResponse;
 import com.ragagent.common.web.ApiResult;
+import com.ragagent.common.web.JsonMappers;
 import com.ragagent.common.web.RequestFields;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +53,7 @@ import com.ragagent.agent.management.mapper.CustomAgentMapper;
 @ApiResult
 public class AgentController {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final CustomAgentService service;
     private final AgentPlaceholders placeholders;

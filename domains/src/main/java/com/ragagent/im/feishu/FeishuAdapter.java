@@ -1,5 +1,6 @@
 package com.ragagent.im.feishu;
 
+import com.ragagent.common.web.JsonMappers;
 import java.nio.charset.StandardCharsets;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -57,7 +58,7 @@ import com.ragagent.im.runtime.ReplyMessage;
 public class FeishuAdapter implements AdapterInterfaces.Adapter,
         AdapterInterfaces.FullOutputProgressSender, AdapterInterfaces.FileDownloader {
 
-    static final ObjectMapper MAPPER = new ObjectMapper();
+    static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /** 可回落错误码。 */
     static final Set<Integer> FALLBACK_ELIGIBLE = Set.of(230019, 230054, 230071);

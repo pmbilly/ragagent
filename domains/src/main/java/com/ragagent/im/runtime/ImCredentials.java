@@ -1,5 +1,6 @@
 package com.ragagent.im.runtime;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.Map;
 import com.ragagent.im.domain.ImChannelEntity;
 
@@ -17,7 +18,7 @@ public final class ImCredentials {
             return Map.of();
         }
         try {
-            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            com.fasterxml.jackson.databind.ObjectMapper mapper = JsonMappers.lenient();
             return mapper.readValue(data, new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {
             });
         } catch (Exception e) {

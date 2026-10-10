@@ -2,6 +2,7 @@ package com.ragagent.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.ragagent.common.web.JsonMappers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -26,7 +27,7 @@ import com.ragagent.retrieval.engine.opensearch.OpenSearchRetrieveRepository;
 public class OpenSearchAuditSinkAdapter implements OpenSearchRetrieveRepository.AuditSink {
 
     private static final Logger log = LoggerFactory.getLogger(OpenSearchAuditSinkAdapter.class);
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     static final String TARGET_TYPE_OPENSEARCH_INDEX = "opensearch_index";
 

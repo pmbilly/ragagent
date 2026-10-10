@@ -1,5 +1,6 @@
 package com.ragagent.im.feishu;
 
+import com.ragagent.common.web.JsonMappers;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -61,7 +62,7 @@ import com.ragagent.im.runtime.IncomingMessage;
 public class FeishuLongConnClient {
 
     private static final Logger log = LoggerFactory.getLogger(FeishuLongConnClient.class);
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     public static final String GEN_ENDPOINT_URI = "/callback/ws/endpoint";
     static final String DEVICE_ID = "device_id";

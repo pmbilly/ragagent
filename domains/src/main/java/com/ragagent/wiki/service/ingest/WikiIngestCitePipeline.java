@@ -1,5 +1,6 @@
 package com.ragagent.wiki.service.ingest;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -48,7 +49,7 @@ public class WikiIngestCitePipeline {
 
     private static final Logger log = LoggerFactory.getLogger(WikiIngestCitePipeline.class);
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final WikiIngestService ingestService;
     private final ChunkPort chunkPort;

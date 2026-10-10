@@ -1,5 +1,6 @@
 package com.ragagent.wiki.service.ingest;
 
+import com.ragagent.common.web.JsonMappers;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -57,7 +58,7 @@ public class RedisWikiIngestTaskQueue implements WikiIngestTaskQueue {
 
     private static final Logger log = LoggerFactory.getLogger(RedisWikiIngestTaskQueue.class);
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /** 就绪集合：成员 = 任务 JSON，score = 可执行时刻（毫秒）。 */
     static final String KEY_READY = "wiki:task:ready";

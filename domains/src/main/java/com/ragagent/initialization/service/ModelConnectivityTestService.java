@@ -1,5 +1,6 @@
 package com.ragagent.initialization.service;
 
+import com.ragagent.common.web.JsonMappers;
 import com.ragagent.common.web.RequestFields;
 import java.time.OffsetDateTime;
 import com.ragagent.common.deployment.AppEnvLookup;
@@ -45,7 +46,7 @@ import com.ragagent.llm.provider.ProviderRegistry;
  */
 public final class ModelConnectivityTestService {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final ModelService modelService;
     private final SsrfGuard ssrfGuard;

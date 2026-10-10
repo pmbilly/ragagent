@@ -1,5 +1,8 @@
 package com.ragagent.im.runtime;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.common.web.JsonMappers;
+
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -123,14 +126,15 @@ public interface CallbackExchange {
 
     /** 最小 JSON 编码（键序=插入序；复用全局 SortedMapSerializer 语义面）。 */
     final class ImJson {
+        /** 与全仓读侧同一策略（{@code JsonMappers.lenient}：未知属性不报错 + 时间按 ISO-8601）。 */
+        private static final ObjectMapper MAPPER = JsonMappers.lenient();
+
         private ImJson() {
         }
 
         public static String encode(Object o) {
             try {
-                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-                mapper.disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-                return mapper.writeValueAsString(o);
+                return MAPPER.writeValueAsString(o);
             } catch (Exception e) {
                 return "{}";
             }

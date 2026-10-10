@@ -1,5 +1,6 @@
 package com.ragagent.storage.fileserve;
 
+import com.ragagent.common.web.JsonMappers;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Locale;
@@ -313,7 +314,7 @@ public final class StoragePaths {
             char first = trimmed.charAt(0);
             if (first == '[' || first == '{' || first == '"') {
                 try {
-                    Object value = new com.fasterxml.jackson.databind.ObjectMapper().readValue(trimmed, Object.class);
+                    Object value = JsonMappers.lenient().readValue(trimmed, Object.class);
                     return containsStorageReferenceValue(value, reference);
                 } catch (Exception ignored) {
                     // JSON 解码失败 → 落回正则扫描

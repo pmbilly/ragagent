@@ -1,10 +1,10 @@
 package com.ragagent.storage.service;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.crypto.CryptoService;
 import com.ragagent.common.error.BizException;
+import com.ragagent.common.web.JsonMappers;
 import com.ragagent.storage.dto.StorageConfig;
 import org.springframework.stereotype.Component;
 
@@ -27,9 +27,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class StorageConfigCodec {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
     private final CryptoService crypto;
 
     public StorageConfigCodec(CryptoService crypto) {

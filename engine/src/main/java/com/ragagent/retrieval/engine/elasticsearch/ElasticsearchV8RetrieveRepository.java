@@ -1,5 +1,6 @@
 package com.ragagent.retrieval.engine.elasticsearch;
 
+import com.ragagent.common.web.JsonMappers;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -76,7 +77,7 @@ public class ElasticsearchV8RetrieveRepository
 
     private static final Logger log =
             LoggerFactory.getLogger(ElasticsearchV8RetrieveRepository.class);
-    static final ObjectMapper MAPPER = new ObjectMapper();
+    static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /** 索引名环境键与缺省值：{@code indexName > env ELASTICSEARCH_INDEX > xwrag_default}。 */
     public static final String ENV_INDEX_KEY = "ELASTICSEARCH_INDEX";

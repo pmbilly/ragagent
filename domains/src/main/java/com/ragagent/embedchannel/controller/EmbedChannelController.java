@@ -1,11 +1,11 @@
 package com.ragagent.embedchannel.controller;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.context.TenantContext;
@@ -75,9 +75,7 @@ import com.ragagent.common.error.AppError;
 @ApiResult
 public class EmbedChannelController {
 
-static final ObjectMapper MAPPER = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
+static final ObjectMapper MAPPER = JsonMappers.lenient();
     final EmbedChannelService service;
     final SessionService sessionService;
     final SessionRepository sessionRepository;

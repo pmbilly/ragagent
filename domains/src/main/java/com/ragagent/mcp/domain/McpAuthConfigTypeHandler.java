@@ -1,5 +1,6 @@
 package com.ragagent.mcp.domain;
 
+import com.ragagent.common.web.JsonMappers;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -31,9 +32,7 @@ public class McpAuthConfigTypeHandler extends BaseTypeHandler<McpAuthConfig> {
      * 读路径容忍未知属性：Jackson 默认对未知字段报错。
      * 历史行/未来新增字段都不该让整行读不出来。
      */
-    private static final ObjectMapper MAPPER = new ObjectMapper()
-            .configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
     private final CryptoService cryptoService;
 
     public McpAuthConfigTypeHandler() {

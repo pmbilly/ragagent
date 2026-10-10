@@ -1,5 +1,6 @@
 package com.ragagent.initialization.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import com.ragagent.common.deployment.AppEnvLookup;
 import java.util.List;
@@ -38,7 +39,7 @@ import com.ragagent.initialization.dto.InitResponses;
  */
 public final class InitializationConfigService {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final KnowledgeAccessGuard kbGuard;
     private final KnowledgeBaseService kbService;

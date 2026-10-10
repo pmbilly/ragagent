@@ -1,5 +1,6 @@
 package com.ragagent.agent.tools;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -305,7 +306,7 @@ public final class McpExposure {
         }
         if (result.getData() != null) {
             try {
-                String dataBytes = new com.fasterxml.jackson.databind.ObjectMapper()
+                String dataBytes = JsonMappers.lenient()
                         .writerWithDefaultPrettyPrinter()
                         .writeValueAsString(result.getData());
                 output += "\n\nStructured Data:\n" + dataBytes;

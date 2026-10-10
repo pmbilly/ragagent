@@ -1,5 +1,6 @@
 package com.ragagent.im.wechat;
 
+import com.ragagent.common.web.JsonMappers;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
@@ -49,7 +50,7 @@ public class WechatAdapter implements AdapterInterfaces.Adapter, AdapterInterfac
     public static final String CHANNEL_VERSION = "weknora-1.0.0";
     static final String UNSUPPORTED_CALLBACK = "WeChat adapter does not support webhook callbacks";
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
     private static final SecureRandom RANDOM = new SecureRandom();
 
     private final String botToken;

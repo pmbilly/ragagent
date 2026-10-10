@@ -1,5 +1,6 @@
 package com.ragagent.retrieval.engine.weaviate;
 
+import com.ragagent.common.web.JsonMappers;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -31,7 +32,7 @@ public final class WeaviateRestClient {
     /** JSON 小工具（本包内共用一套 ObjectMapper）。 */
     static final class Json {
 
-        private static final ObjectMapper MAPPER = new ObjectMapper();
+        private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
         private Json() {
         }

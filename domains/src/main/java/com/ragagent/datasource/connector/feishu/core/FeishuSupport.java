@@ -1,5 +1,6 @@
 package com.ragagent.datasource.connector.feishu.core;
 
+import com.ragagent.common.web.JsonMappers;
 import java.nio.charset.StandardCharsets;
 import java.time.DateTimeException;
 import java.time.Instant;
@@ -9,7 +10,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.web.ZeroTimeSerializer;
 import com.ragagent.datasource.ConnectorException;
@@ -63,9 +63,7 @@ public final class FeishuSupport {
      *
      * <p>必须容忍未知属性：credentials 里多一个前端留下的键也不能让整条配置读不出来。</p>
      */
-    private static final ObjectMapper MAPPER = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
     private FeishuSupport() {
     }
 

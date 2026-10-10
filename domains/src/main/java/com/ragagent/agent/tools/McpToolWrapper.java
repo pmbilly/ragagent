@@ -1,5 +1,6 @@
 package com.ragagent.agent.tools;
 
+import com.ragagent.common.web.JsonMappers;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -139,7 +140,7 @@ public class McpToolWrapper implements AgentTool {
                 return s;
             }
             try {
-                return new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(schema);
+                return JsonMappers.lenient().writeValueAsString(schema);
             } catch (Exception e) {
                 return "{}";
             }
@@ -487,6 +488,6 @@ public class McpToolWrapper implements AgentTool {
         return ToolJson.quoted(s);
     }
 
-    private static final com.fasterxml.jackson.databind.ObjectMapper MCP_JSON = new com.fasterxml.jackson.databind.ObjectMapper();
+    private static final com.fasterxml.jackson.databind.ObjectMapper MCP_JSON = JsonMappers.lenient();
 
 }

@@ -1,5 +1,6 @@
 package com.ragagent.model.domain;
 
+import com.ragagent.common.web.JsonMappers;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -21,7 +22,7 @@ import org.apache.ibatis.type.MappedTypes;
 @MappedTypes(ModelParameters.class)
 public class ModelParametersTypeHandler extends BaseTypeHandler<ModelParameters> {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final CryptoService cryptoService;
 

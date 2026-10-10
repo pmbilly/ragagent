@@ -1,5 +1,6 @@
 package com.ragagent.wiki.service.ingest;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -24,7 +25,7 @@ final class WikiIngestFinalizePhase {
 
     private static final Logger log = LoggerFactory.getLogger(WikiIngestFinalizePhase.class);
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final WikiIngestBatchHandler handler;
 

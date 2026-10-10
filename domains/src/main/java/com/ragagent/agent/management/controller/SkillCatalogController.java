@@ -1,5 +1,6 @@
 package com.ragagent.agent.management.controller;
 
+import com.ragagent.common.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +52,7 @@ import com.ragagent.common.web.ApiResult;
 @ApiResult
 public class SkillCatalogController {
 
-    private static final ObjectMapper AUDIT_MAPPER = new ObjectMapper();
+    private static final ObjectMapper AUDIT_MAPPER = JsonMappers.lenient();
 
     private final SkillCatalogService catalog;
     private final AuditLogService auditService;

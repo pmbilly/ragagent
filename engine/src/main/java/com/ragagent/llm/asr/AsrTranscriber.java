@@ -1,5 +1,6 @@
 package com.ragagent.llm.asr;
 
+import com.ragagent.common.web.JsonMappers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -77,7 +78,7 @@ public interface AsrTranscriber {
         /** 300s 超时（audio transcription can be slow）。 */
         private static final Duration ASR_DEFAULT_TIMEOUT = Duration.ofSeconds(300);
 
-        private static final ObjectMapper MAPPER = new ObjectMapper();
+        private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
         private final SsrfGuard ssrfGuard;
 

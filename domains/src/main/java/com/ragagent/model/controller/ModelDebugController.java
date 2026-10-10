@@ -1,5 +1,6 @@
 package com.ragagent.model.controller;
 
+import com.ragagent.common.web.JsonMappers;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -72,7 +73,7 @@ public class ModelDebugController {
     /** documents 上限。 */
     private static final int MAX_DOCUMENTS = 100;
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final ModelService modelService;
     private final ModelRuntimeFactory runtimeFactory;

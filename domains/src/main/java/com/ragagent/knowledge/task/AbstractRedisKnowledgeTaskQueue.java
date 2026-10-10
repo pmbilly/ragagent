@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.task;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -30,7 +31,7 @@ abstract class AbstractRedisKnowledgeTaskQueue {
 
     static final int MAX_RETRY = 3;
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final RedisTaskQueueCore core;
 

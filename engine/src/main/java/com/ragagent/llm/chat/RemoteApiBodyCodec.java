@@ -1,5 +1,7 @@
 package com.ragagent.llm.chat;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -23,8 +25,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 final class RemoteApiBodyCodec {
 
     /** 出站请求体序列化器（标准 JSON 转义）。 */
-    static final com.fasterxml.jackson.databind.json.JsonMapper REQUEST_BODY_JSON =
-            com.fasterxml.jackson.databind.json.JsonMapper.builder().build();
+    static final ObjectMapper REQUEST_BODY_JSON = JsonMappers.lenient();
 
     /**
      * 按键的 UTF-8 字节序重排请求体：<b>每一层对象</b>都按字母序输出。

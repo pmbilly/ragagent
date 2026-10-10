@@ -1,5 +1,6 @@
 package com.ragagent.audit.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -232,7 +233,7 @@ public class AuditLogService {
     // ── 内部工具 ─────────────────────────────────────────────────────────
 
     /** 纯 JDK 映射器（只用来造 details 的 ObjectNode，不读配置）。 */
-    private static final ObjectMapper AUDIT_DETAILS_MAPPER = new ObjectMapper();
+    private static final ObjectMapper AUDIT_DETAILS_MAPPER = JsonMappers.lenient();
 
     /** 组装一条审计行的样板。 */
     static AuditLog newAuditLog(long tenantId, String actorUserId, String actorRole,

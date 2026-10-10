@@ -1,5 +1,6 @@
 package com.ragagent.agent.tools;
 
+import com.ragagent.common.web.JsonMappers;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.ArrayList;
@@ -587,7 +588,7 @@ public final class McpCatalog {
      * （不做 HTML 转义。）
      */
     static final com.fasterxml.jackson.databind.ObjectMapper STRUCT_JSON =
-            new com.fasterxml.jackson.databind.ObjectMapper();
+            JsonMappers.lenient();
 
     /** 结果 JSON（插入序键序；序列化失败走 error 页）。 */
     static ToolResult mcpJsonResult(Object value) {
@@ -612,7 +613,7 @@ public final class McpCatalog {
             return raw;
         }
         try {
-            com.fasterxml.jackson.databind.ObjectMapper plain = new com.fasterxml.jackson.databind.ObjectMapper();
+            com.fasterxml.jackson.databind.ObjectMapper plain = JsonMappers.lenient();
             JsonNode schema = plain.readTree(raw);
             ((com.fasterxml.jackson.databind.node.ObjectNode) schema.path("properties").path(key))
                     .set("enum", plain.valueToTree(values));

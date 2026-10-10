@@ -1,5 +1,6 @@
 package com.ragagent.auth.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.security.SecureRandom;
 import com.ragagent.common.deployment.AppEnvLookup;
 import java.time.Duration;
@@ -52,7 +53,7 @@ import org.springframework.stereotype.Service;
 public class TenantInvitationService {
 
     private static final Logger log = LoggerFactory.getLogger(TenantInvitationService.class);
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
     private static final SecureRandom RANDOM = new SecureRandom();
 
     /** 邀请有效期缺省 7 天。env 覆盖见 {@link #invitationTtl()} */

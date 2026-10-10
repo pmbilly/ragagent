@@ -1,5 +1,6 @@
 package com.ragagent.agent;
 
+import com.ragagent.common.web.JsonMappers;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -50,7 +51,7 @@ final class ActPhase {
 
     private static final Logger log = LoggerFactory.getLogger(ActPhase.class);
 
-    private static final ObjectMapper JSON = new ObjectMapper();
+    private static final ObjectMapper JSON = JsonMappers.lenient();
 
     /** 工具输出进 Langfuse 前的预览截断长度。 */
     private static final int LANGFUSE_TOOL_OUTPUT_PREVIEW = 4000;

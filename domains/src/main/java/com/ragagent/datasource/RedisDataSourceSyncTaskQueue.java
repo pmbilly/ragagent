@@ -1,5 +1,6 @@
 package com.ragagent.datasource;
 
+import com.ragagent.common.web.JsonMappers;
 import java.time.Duration;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -56,7 +57,7 @@ public class RedisDataSourceSyncTaskQueue implements DataSourceSyncTaskQueue {
 
     private static final Logger log = LoggerFactory.getLogger(RedisDataSourceSyncTaskQueue.class);
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /** 任务观测的 span/根名。 */
     static final String TASK_TYPE_DATASOURCE_SYNC = "datasource:sync";

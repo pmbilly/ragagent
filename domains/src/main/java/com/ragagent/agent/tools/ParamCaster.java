@@ -1,5 +1,6 @@
 package com.ragagent.agent.tools;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -196,6 +197,6 @@ public final class ParamCaster {
 
     private static final class ObjectMapperHolder {
         private static final com.fasterxml.jackson.databind.ObjectMapper MAPPER =
-                new com.fasterxml.jackson.databind.ObjectMapper();
+                JsonMappers.lenient();
     }
 }

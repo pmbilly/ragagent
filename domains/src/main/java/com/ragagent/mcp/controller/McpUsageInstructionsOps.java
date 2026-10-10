@@ -1,5 +1,6 @@
 package com.ragagent.mcp.controller;
 
+import com.ragagent.common.web.JsonMappers;
 import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -51,7 +52,7 @@ final class McpUsageInstructionsOps {
         this.ctrl = ctrl;
     }
 
-    private static final ObjectMapper JSON = new ObjectMapper();
+    private static final ObjectMapper JSON = JsonMappers.lenient();
 
     /** 整个生成过程的 60 秒上限 */
     private static final Duration USAGE_INSTRUCTIONS_TIMEOUT = Duration.ofSeconds(60);

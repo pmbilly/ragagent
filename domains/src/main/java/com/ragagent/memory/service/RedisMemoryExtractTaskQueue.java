@@ -1,5 +1,6 @@
 package com.ragagent.memory.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.time.Duration;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -35,7 +36,7 @@ public class RedisMemoryExtractTaskQueue implements MemoryExtractTaskQueue {
 
     private static final Logger log = LoggerFactory.getLogger(RedisMemoryExtractTaskQueue.class);
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /** 每个任务最多重试 2 次，之后放弃（与进程内实现同值）。 */
     static final int MAX_RETRY = 2;

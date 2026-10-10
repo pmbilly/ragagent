@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -27,9 +28,7 @@ import com.ragagent.embedding.Embedder;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.knowledge.task.KnowledgeTaskProgressStore;
 import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
@@ -45,10 +44,7 @@ public class KnowledgeCloneService {
 
     /** duplicate 的配置克隆用：知识实体带 OffsetDateTime，往返 mapper 必须挂 JSR310（本仓约定 步 3 教训）。 */
     private static final ObjectMapper CLONE_MAPPER =
-            new ObjectMapper()
-                    .registerModule(new JavaTimeModule())
-                    .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-
+            JsonMappers.lenient();
     private final KnowledgeMapper knowledgeMapper;
     private final KnowledgeBaseMapper kbMapper;
     private final ChunkMapper chunkMapper;

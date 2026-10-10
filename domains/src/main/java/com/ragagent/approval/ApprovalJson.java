@@ -1,9 +1,8 @@
 package com.ragagent.approval;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.ragagent.common.web.JsonMappers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 
 /**
  * 本包的 JSON 工具。
@@ -14,10 +13,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
  */
 final class ApprovalJson {
 
-    private static final ObjectMapper MAPPER = JsonMapper.builder()
-            // 未知字段被忽略（跨版本滚动升级时新旧实例互不报错）
-            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-            .build();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private ApprovalJson() {
     }

@@ -1,11 +1,11 @@
 package com.ragagent.mcp.oauth;
 
+import com.ragagent.common.web.JsonMappers;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.ragagent.mcp.protocol.McpContext;
@@ -36,11 +36,7 @@ public class OAuthHandler {
     /** state 不匹配时的固定错误文案（CSRF 防线）。 */
     public static final String INVALID_STATE_MESSAGE = "invalid state parameter, possible CSRF attack";
 
-    static final ObjectMapper MAPPER = new ObjectMapper()
-            .registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule())
-            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-            .disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
+    static final ObjectMapper MAPPER = JsonMappers.lenient();
     final OAuthConfig config;
 
     /** 元数据发现协作者。 */

@@ -1,5 +1,6 @@
 package com.ragagent.retrieval.engine.tencentvectordb;
 
+import com.ragagent.common.web.JsonMappers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -16,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * 腾讯 VectorDB 稀疏向量的默认分词器——对齐腾讯 SDK（tcvdbtext）内置 jieba 分词的
@@ -310,7 +310,7 @@ final class JiebaTokenizer implements TencentVectorDbBm25.Tokenizer {
                         "jieba hmm model resource missing: /jieba/hmm_model.json"
                                 + " (regenerate with scripts/gen-jieba-hmm.py)");
             }
-            JsonNode root = new ObjectMapper().readTree(in);
+            JsonNode root = JsonMappers.lenient().readTree(in);
             double minFloat = root.path("minFloat").asDouble();
 
             double[] probStart = new double[STATES.length];

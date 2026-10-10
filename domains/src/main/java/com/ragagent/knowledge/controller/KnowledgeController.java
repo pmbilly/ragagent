@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.controller;
 
+import com.ragagent.common.web.JsonMappers;
 import java.io.IOException;
 import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -64,7 +65,7 @@ import com.ragagent.common.web.ApiResponse;
 public class KnowledgeController {
 
     private static final Logger log = LoggerFactory.getLogger(KnowledgeController.class);
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final KnowledgeService knowledgeService;
     private final KnowledgeRouteGuards guards;

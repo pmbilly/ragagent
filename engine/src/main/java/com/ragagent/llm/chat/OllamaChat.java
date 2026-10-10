@@ -1,5 +1,6 @@
 package com.ragagent.llm.chat;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -57,7 +58,7 @@ public class OllamaChat implements LlmChatClient {
 
     private static final Logger log = LoggerFactory.getLogger(OllamaChat.class);
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final String modelName;
     private final String modelId;

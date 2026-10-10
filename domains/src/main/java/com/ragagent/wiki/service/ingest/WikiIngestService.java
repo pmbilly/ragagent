@@ -1,5 +1,6 @@
 package com.ragagent.wiki.service.ingest;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -66,7 +67,7 @@ public class WikiIngestService implements WikiIngestPort {
 
     private static final Logger log = LoggerFactory.getLogger(WikiIngestService.class);
 
-    static final ObjectMapper MAPPER = new ObjectMapper();
+    static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /** 旧版默认索引导语；现有导语为空或等于它时按"首次生成"处理。 */
     static final String LEGACY_INDEX_PLACEHOLDER = "Wiki index - table of contents";

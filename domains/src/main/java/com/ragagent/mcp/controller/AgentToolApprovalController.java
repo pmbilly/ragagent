@@ -1,5 +1,6 @@
 package com.ragagent.mcp.controller;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.Optional;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -38,7 +39,7 @@ public class AgentToolApprovalController {
 
     private static final Logger log = LoggerFactory.getLogger(AgentToolApprovalController.class);
 
-    private static final ObjectMapper JSON = new ObjectMapper();
+    private static final ObjectMapper JSON = JsonMappers.lenient();
 
     /** 工具审批门；未接线时为 empty */
     private final Optional<Gate> toolApprovalGate;

@@ -1,5 +1,6 @@
 package com.ragagent.im.mattermost;
 
+import com.ragagent.common.web.JsonMappers;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -22,7 +23,7 @@ import com.ragagent.common.security.SsrfGuard;
  */
 public class MattermostClient {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
     static final int ERR_BODY_LIMIT = 512;
 
     /** 平台文件元信息。 */

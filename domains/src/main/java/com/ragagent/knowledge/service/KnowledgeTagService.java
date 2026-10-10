@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +60,7 @@ import org.springframework.beans.factory.ObjectProvider;
 public class KnowledgeTagService {
 
     private static final Logger log = LoggerFactory.getLogger(KnowledgeTagService.class);
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
     /** 未打标签的 FAQ 条目统一显示名。 */
     public static final String UNTAGGED_TAG_NAME = "未分类";
 

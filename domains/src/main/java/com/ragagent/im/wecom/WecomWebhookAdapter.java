@@ -1,5 +1,6 @@
 package com.ragagent.im.wecom;
 
+import com.ragagent.common.web.JsonMappers;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -52,7 +53,7 @@ public class WecomWebhookAdapter implements AdapterInterfaces.Adapter,
     public static final String DEFAULT_API_BASE_URL = "https://qyapi.weixin.qq.com";
     private static final int PKCS7_BLOCK_SIZE = 32;
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final String corpId;
     private final String token;

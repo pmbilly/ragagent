@@ -1,5 +1,6 @@
 package com.ragagent.im.runtime;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -18,7 +19,7 @@ public final class ToolDisplay {
     private ToolDisplay() {
     }
 
-    private static final ObjectMapper JSON = new ObjectMapper();
+    private static final ObjectMapper JSON = JsonMappers.lenient();
 
     /** 一个工具调用的 IM 显示状态。 */
     public static final class IMToolStep {

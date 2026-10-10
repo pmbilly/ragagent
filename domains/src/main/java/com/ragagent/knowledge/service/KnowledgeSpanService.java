@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -21,7 +22,7 @@ import java.util.LinkedHashMap;
 @Service
 public class KnowledgeSpanService {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final KnowledgeSpanRepository spanRepository;
 

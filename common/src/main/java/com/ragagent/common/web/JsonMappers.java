@@ -14,7 +14,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
  * 统一由本工厂（以及 Spring MVC 侧的 {@code spring.jackson} 配置）承担。
  *
  * <p><b>java.time 为什么必须在本工厂注册</b>：jsonb 读路径用的是这里造的 mapper，
- * 而裸 {@code new ObjectMapper()} 未注册 JSR-310 模块，遇到 {@code java.time} 字段会抛
+ * 而裸 {@code JsonMappers.lenient()} 未注册 JSR-310 模块，遇到 {@code java.time} 字段会抛
  * {@code InvalidDefinitionException}。时间类型由本工厂统一按 ISO-8601 处理
  * （{@code WRITE_DATES_AS_TIMESTAMPS} 关闭，输出带偏移的字符串而非 epoch 数字）。</p>
  */

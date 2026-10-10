@@ -1,5 +1,6 @@
 package com.ragagent.session.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
@@ -295,7 +296,7 @@ final class AgentConfigAssembler {
         return out;
     }
     private static final com.fasterxml.jackson.databind.ObjectMapper YAML_JSON =
-            new com.fasterxml.jackson.databind.ObjectMapper();
+            JsonMappers.lenient();
     private static String templateContentByIdAndFile(String id, String file) {
         try (java.io.InputStream in = SessionAgentQaService.class.getClassLoader()
                 .getResourceAsStream("agent/management/prompt_templates/" + file)) {

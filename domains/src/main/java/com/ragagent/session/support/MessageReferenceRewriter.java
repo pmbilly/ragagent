@@ -1,12 +1,10 @@
 package com.ragagent.session.support;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.List;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import com.ragagent.agent.domain.AgentStep;
 import com.ragagent.agent.domain.ToolCall;
@@ -43,10 +41,7 @@ public class MessageReferenceRewriter {
      * 时间格式无所谓——但 {@code JavaTimeModule} 不能少，
      * 否则 {@code created_at} 这类字段直接抛 {@code InvalidDefinitionException}。</p>
      */
-    private static final ObjectMapper CLONE_MAPPER = JsonMapper.builder()
-            .addModule(new JavaTimeModule())
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-            .build();
+    private static final ObjectMapper CLONE_MAPPER = JsonMappers.lenient();
 
     /**
      * 返回重写后的消息**副本**，

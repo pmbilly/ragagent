@@ -1,5 +1,6 @@
 package com.ragagent.common.knowledge;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -7,11 +8,9 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ragagent.common.text.TextConv;
 import com.fasterxml.jackson.core.JacksonException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -35,11 +34,7 @@ public class FaqChunkMetadata {
      * 本仓约定 第 6 条——历史行/新增字段不能让整行读不出来）。
      */
     public static final ObjectMapper JSON =
-            new ObjectMapper()
-                    .registerModule(new JavaTimeModule())
-                    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
-                            false);
-
+            JsonMappers.lenient();
     /** 从 chunks.metadata 的 JsonNode 解析；null/空 → null。 */
     public static FaqChunkMetadata fromJson(JsonNode node) {
         if (node == null || node.isNull() || node.isMissingNode() || node.isEmpty()) {

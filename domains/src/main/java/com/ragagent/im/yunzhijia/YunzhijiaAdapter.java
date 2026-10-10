@@ -1,5 +1,6 @@
 package com.ragagent.im.yunzhijia;
 
+import com.ragagent.common.web.JsonMappers;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -64,7 +65,7 @@ public class YunzhijiaAdapter implements AdapterInterfaces.Adapter,
         AdapterInterfaces.FileDownloader {
 
     private static final Logger log = LoggerFactory.getLogger(YunzhijiaAdapter.class);
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     public static final int TEXT_MESSAGE_TYPE = 2;
     public static final String MARKDOWN_FORMAT_TYPE = "markdown";

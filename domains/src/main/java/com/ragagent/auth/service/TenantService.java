@@ -1,5 +1,6 @@
 package com.ragagent.auth.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Collection;
@@ -36,7 +37,7 @@ import com.ragagent.common.error.BizException;
 public class TenantService implements TenantConfigLookup, TenantLookup {
 
     private static final Logger log = LoggerFactory.getLogger(TenantService.class);
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final TenantMapper tenantMapper;
     private final TenantMemberMapper memberMapper;

@@ -1,5 +1,6 @@
 package com.ragagent.agent.management.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +22,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Component
 public class AgentTypePresets {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /** YAML 声明序。 */
     private final List<ObjectNode> entries = new ArrayList<>();

@@ -1,5 +1,6 @@
 package com.ragagent.auth.apikey.filter;
 
+import com.ragagent.common.web.JsonMappers;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
@@ -18,7 +19,7 @@ import org.springframework.http.MediaType;
  */
 final class APIKeyGateResponses {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /** gate / file-serve 的 403 文案。 */
     static final String SCOPE_FORBIDDEN = "Forbidden: API key scope does not allow this operation";

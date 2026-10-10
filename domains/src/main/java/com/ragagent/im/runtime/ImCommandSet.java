@@ -1,5 +1,6 @@
 package com.ragagent.im.runtime;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -64,7 +65,7 @@ public final class ImCommandSet {
             JsonNode parsed = null;
             if (agent != null && agent.getConfig() != null && !agent.getConfig().isEmpty()) {
                 try {
-                    parsed = new com.fasterxml.jackson.databind.ObjectMapper()
+                    parsed = JsonMappers.lenient()
                             .readTree(agent.getConfig());
                 } catch (Exception ignored) {
                     parsed = null;

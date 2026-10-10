@@ -1,5 +1,6 @@
 package com.ragagent.im.qqbot;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -28,7 +29,7 @@ public class QqBotAdapter implements AdapterInterfaces.Adapter {
     static final String EXTRA_KEY_MESSAGE_ID = "message_id";
     static final String EXTRA_KEY_CHAT_KIND = "chat_kind";
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final QqBotClient client;
 

@@ -1,12 +1,12 @@
 package com.ragagent.im.controller;
 
+import com.ragagent.common.web.JsonMappers;
 import com.ragagent.common.web.RequestFields;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.context.TenantContext;
@@ -45,9 +45,7 @@ import com.ragagent.common.web.ApiResult;
 @ApiResult
 public class ImChannelController {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
     private final ImChannelService service;
 
     public ImChannelController(ImChannelService service) {

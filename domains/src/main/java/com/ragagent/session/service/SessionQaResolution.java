@@ -1,5 +1,6 @@
 package com.ragagent.session.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,7 +20,7 @@ import com.ragagent.agent.management.domain.CustomAgentEntity;
 final class SessionQaResolution {
 
 
-    private static final ObjectMapper JSON = new ObjectMapper();
+    private static final ObjectMapper JSON = JsonMappers.lenient();
 
     /** agent 覆盖簇。 */
     private final QaSearchTargets searchTargets;

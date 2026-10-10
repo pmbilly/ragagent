@@ -1,5 +1,6 @@
 package com.ragagent.session.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -99,7 +100,7 @@ public class QaWiring {
 
     private static final Logger log = LoggerFactory.getLogger(QaWiring.class);
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     public QaWiring() {
     }
@@ -166,7 +167,7 @@ public class QaWiring {
                             || tenant.getWebSearchConfig().isNull()) {
                         return null;
                     }
-                    return new ObjectMapper().treeToValue(tenant.getWebSearchConfig(),
+                    return JsonMappers.lenient().treeToValue(tenant.getWebSearchConfig(),
                             WebSearchConfig.class);
                 } catch (RuntimeException | JsonProcessingException e) {
                     return null;

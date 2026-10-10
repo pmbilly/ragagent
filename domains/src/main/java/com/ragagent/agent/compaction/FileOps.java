@@ -1,5 +1,6 @@
 package com.ragagent.agent.compaction;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +22,7 @@ import com.ragagent.llm.domain.ToolCall;
  */
 final class FileOps {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private static final String READ_FILES_TAG = "read-files";
     private static final String MODIFIED_FILES_TAG = "modified-files";

@@ -1,11 +1,11 @@
 package com.ragagent.session.controller;
 
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.common.security.LogSanitizer;
+import com.ragagent.common.web.JsonMappers;
 import com.ragagent.session.domain.MessageNotFoundException;
 import com.ragagent.session.domain.MessageSuggestionSet;
 import com.ragagent.session.domain.MessageSuggestionSetNotFoundException;
@@ -48,9 +48,7 @@ public class MessageSuggestionController {
 
     private static final Logger log = LoggerFactory.getLogger(MessageSuggestionController.class);
 
-    private static final ObjectMapper MAPPER = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
     private final MessageSuggestionService suggestionService;
 
     public MessageSuggestionController(MessageSuggestionService suggestionService) {

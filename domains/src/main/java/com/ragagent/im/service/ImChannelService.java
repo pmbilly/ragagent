@@ -1,5 +1,6 @@
 package com.ragagent.im.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,7 @@ public class ImChannelService {
             "platform must be one of: 'dingtalk', 'feishu', 'lark', 'mattermost', 'qqbot', "
                     + "'slack', 'telegram', 'wechat', 'wecom', 'yunzhijia'";
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final ImChannelMapper mapper;
     private final CustomAgentMapper agentMapper;

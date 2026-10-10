@@ -1,5 +1,6 @@
 package com.ragagent.vectorstore.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -53,7 +54,7 @@ import com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbRetrieveRepo
 public class VectorStoreConfigService {
 
     private static final Logger log = LoggerFactory.getLogger(VectorStoreConfigService.class);
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
     private static final Duration TEST_TIMEOUT = Duration.ofSeconds(10);
     private static final int MAX_SHARDS = 64;
     private static final int MAX_REPLICAS = 10;

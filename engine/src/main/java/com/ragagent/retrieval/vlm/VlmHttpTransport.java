@@ -1,5 +1,6 @@
 package com.ragagent.retrieval.vlm;
 
+import com.ragagent.common.web.JsonMappers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -28,7 +29,7 @@ import com.ragagent.retrieval.config.RetrievalEnvLookup;
 public class VlmHttpTransport implements VlmClient.Transport {
 
     private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(180);
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     @Override
     public String post(String url, String apiKey, Object jsonBody) throws Exception {

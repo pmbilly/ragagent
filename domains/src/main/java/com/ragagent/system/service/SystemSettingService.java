@@ -1,5 +1,6 @@
 package com.ragagent.system.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -54,7 +55,7 @@ import org.springframework.stereotype.Service;
 public class SystemSettingService implements SystemSettingGateway {
 
     private static final Logger log = LoggerFactory.getLogger(SystemSettingService.class);
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final SystemSettingMapper mapper;
     private final UserMapper userMapper;

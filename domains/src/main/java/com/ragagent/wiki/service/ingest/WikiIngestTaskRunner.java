@@ -1,5 +1,6 @@
 package com.ragagent.wiki.service.ingest;
 
+import com.ragagent.common.web.JsonMappers;
 import java.time.Duration;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -25,7 +26,7 @@ final class WikiIngestTaskRunner {
 
     private static final Logger log = LoggerFactory.getLogger(WikiIngestTaskRunner.class);
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /**
      * 锁冲突（{@code ErrWikiIngestConcurrent}）的重试延迟——短到用户无感，

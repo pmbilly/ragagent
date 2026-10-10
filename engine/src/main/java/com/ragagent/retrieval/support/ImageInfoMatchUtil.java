@@ -1,5 +1,6 @@
 package com.ragagent.retrieval.support;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -189,7 +190,7 @@ public final class ImageInfoMatchUtil {
      * HTML/控制字符转义走共用 JSON 工具）。
      */
     static String marshalOne(ImageInfo info) {
-        var node = com.fasterxml.jackson.databind.json.JsonMapper.builder().build().createObjectNode();
+        var node = JsonMappers.lenient().createObjectNode();
         node.put("url", info.getUrl());
         node.put("originalUrl", info.getOriginalUrl());
         node.put("start_pos", info.getStartPos());

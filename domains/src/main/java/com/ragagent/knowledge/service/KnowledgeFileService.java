@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ import java.time.temporal.ChronoUnit;
 public class KnowledgeFileService {
 
     private static final Logger log = LoggerFactory.getLogger(KnowledgeFileService.class);
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final ChunkMapper chunkMapper;
     private final ChunkVectorIndexer chunkVectorIndexer;

@@ -1,5 +1,6 @@
 package com.ragagent.wiki.repository;
 
+import com.ragagent.common.web.JsonMappers;
 import com.ragagent.wiki.mapper.WikiPageIssueMapper;
 import com.ragagent.wiki.mapper.WikiPageMapper;
 import com.ragagent.wiki.mapper.WikiPageRevisionMapper;
@@ -58,7 +59,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 public class WikiPageRepository {
 
-    private static final ObjectMapper JSON = new ObjectMapper();
+    private static final ObjectMapper JSON = JsonMappers.lenient();
 
     /** 游标分页的 limit 上下界 */
     private static final int CURSOR_DEFAULT_LIMIT = 100;

@@ -1,5 +1,6 @@
 package com.ragagent.mcp.oauth;
 
+import com.ragagent.common.web.JsonMappers;
 import java.time.Duration;
 import com.ragagent.common.deployment.AppEnvLookup;
 import java.time.Instant;
@@ -10,7 +11,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,9 +40,7 @@ public class OAuthStateStore {
 
     private static final String KEY_PREFIX = "weknora:mcp_oauth_state:";
 
-    private static final ObjectMapper MAPPER = new ObjectMapper()
-            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
     /** 旧 blob 的键名 → 新键名（仅用于 {@link #migrateLegacyKeys}，窗口过后连同该方法删除）。 */
     private static final Map<String, String> LEGACY_KEY_RENAMES = Map.of(
             "tenant_id", "tenantId",

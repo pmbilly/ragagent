@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.client;
 
+import com.ragagent.common.web.JsonMappers;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -23,7 +24,7 @@ import com.ragagent.common.model.ModelFacts;
 @Service
 public class EmbedderClient implements EmbeddingGateway {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final HttpClient http = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(30))

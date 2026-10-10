@@ -1,5 +1,6 @@
 package com.ragagent.wiki.service.ingest;
 
+import com.ragagent.common.web.JsonMappers;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +35,7 @@ final class WikiIngestLlmSupport {
 
     private static final Logger log = LoggerFactory.getLogger(WikiIngestLlmSupport.class);
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final WikiIngestService service;
 

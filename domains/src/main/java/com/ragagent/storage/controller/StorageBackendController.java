@@ -1,5 +1,6 @@
 package com.ragagent.storage.controller;
 
+import com.ragagent.common.web.JsonMappers;
 import com.ragagent.common.web.RequestFields;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -44,7 +45,7 @@ import com.ragagent.common.web.ApiResponse;
 @RequestMapping("/api/v1/storage-backends")
 public class StorageBackendController {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final StorageBackendService service;
     private final StorageAllowList allowList;

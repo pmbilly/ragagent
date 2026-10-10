@@ -1,11 +1,11 @@
 package com.ragagent.vectorstore.domain;
 
+import com.ragagent.common.web.JsonMappers;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.crypto.CryptoService;
 import org.apache.ibatis.type.BaseTypeHandler;
@@ -23,9 +23,7 @@ import com.ragagent.common.vectorstore.ConnectionConfig;
  */
 public class ConnectionConfigTypeHandler extends BaseTypeHandler<ConnectionConfig> {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
     private final CryptoService cryptoService;
 
     public ConnectionConfigTypeHandler() {

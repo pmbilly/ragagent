@@ -1,5 +1,6 @@
 package com.ragagent.system.controller;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -51,7 +52,7 @@ import com.ragagent.common.web.ApiResult;
 @RequestMapping("/api/v1/system")
 public class SystemController {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
     /** cosFieldPattern/ossFieldPattern（同一正则）。 */
     private static final Pattern FIELD_PATTERN = Pattern.compile("^[a-zA-Z0-9][a-zA-Z0-9._-]{0,62}$");
 
@@ -499,7 +500,7 @@ public class SystemController {
             return null;
         }
         try {
-            JsonNode node = new ObjectMapper().readTree(rawBody);
+            JsonNode node = JsonMappers.lenient().readTree(rawBody);
             return node == null || !node.isObject() ? null : node;
         } catch (Exception e) {
             return null;

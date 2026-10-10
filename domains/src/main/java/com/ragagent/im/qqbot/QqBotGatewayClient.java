@@ -1,5 +1,6 @@
 package com.ragagent.im.qqbot;
 
+import com.ragagent.common.web.JsonMappers;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.WebSocket;
@@ -32,7 +33,7 @@ import com.ragagent.im.runtime.IncomingMessage;
 public class QqBotGatewayClient {
 
     private static final Logger log = LoggerFactory.getLogger(QqBotGatewayClient.class);
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     static final int OP_DISPATCH = 0;
     static final int OP_HEARTBEAT = 1;

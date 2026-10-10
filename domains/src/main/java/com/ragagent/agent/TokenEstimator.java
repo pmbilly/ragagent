@@ -1,5 +1,6 @@
 package com.ragagent.agent;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.List;
 
 import com.knuddels.jtokkit.Encodings;
@@ -149,7 +150,7 @@ public final class TokenEstimator {
                 return "";
             }
             try {
-                return new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(node);
+                return JsonMappers.lenient().writeValueAsString(node);
             } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
                 return "";
             }

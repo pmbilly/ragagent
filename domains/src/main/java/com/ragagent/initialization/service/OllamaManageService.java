@@ -1,5 +1,6 @@
 package com.ragagent.initialization.service;
 
+import com.ragagent.common.web.JsonMappers;
 import com.ragagent.common.web.RequestFields;
 import java.time.OffsetDateTime;
 import com.ragagent.common.deployment.AppEnvLookup;
@@ -27,7 +28,7 @@ import com.ragagent.llm.ollama.OllamaModelInfo;
  */
 public final class OllamaManageService {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final OllamaService ollamaService;
     private final OllamaDownloadTaskStore downloadTasks;

@@ -1,5 +1,6 @@
 package com.ragagent.tenant;
 
+import com.ragagent.common.web.JsonMappers;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -29,7 +30,7 @@ import org.apache.ibatis.type.MappedTypes;
 @MappedTypes(APIPrincipalConfig.class)
 public class APIPrincipalConfigTypeHandler extends BaseTypeHandler<APIPrincipalConfig> {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final CryptoService cryptoService;
 

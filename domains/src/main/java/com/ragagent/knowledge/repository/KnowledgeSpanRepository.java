@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.repository;
 
+import com.ragagent.common.web.JsonMappers;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -40,7 +41,7 @@ import com.ragagent.common.jdbc.DatabaseDialects;
 @Repository
 public class KnowledgeSpanRepository {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
     private static final TypeReference<Map<String, Object>> MAP_TYPE =
             new TypeReference<>() {
             };

@@ -1,5 +1,6 @@
 package com.ragagent.im.wechat;
 
+import com.ragagent.common.web.JsonMappers;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
@@ -40,7 +41,7 @@ public class WechatQRCodeService {
     static final String QRCODE_PATH = "/ilink/bot/get_bot_qrcode";
     static final String QRCODE_STATUS_PATH = "/ilink/bot/get_qrcode_status";
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /** 扫码结果。 */
     public record QRCodeResult(String qrcodeUrl, String qrcode) {

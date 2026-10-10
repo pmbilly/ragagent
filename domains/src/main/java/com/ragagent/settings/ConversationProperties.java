@@ -1,5 +1,6 @@
 package com.ragagent.settings;
 
+import com.ragagent.common.web.JsonMappers;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -18,7 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @org.springframework.boot.context.properties.ConfigurationProperties(prefix = "conversation")
 public class ConversationProperties {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /** 模板 yaml 文件清单（FindTemplateByID 的查找序）。 */
     private static final String[] TEMPLATE_FILES = {

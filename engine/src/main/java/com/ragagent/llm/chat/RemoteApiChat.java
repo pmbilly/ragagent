@@ -1,5 +1,6 @@
 package com.ragagent.llm.chat;
 
+import com.ragagent.common.web.JsonMappers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.http.HttpResponse;
@@ -69,7 +70,7 @@ public class RemoteApiChat implements LlmChatClient {
 
     private static final Logger log = LoggerFactory.getLogger(RemoteApiChat.class);
 
-    static final ObjectMapper MAPPER = new ObjectMapper();
+    static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /** extra_config 键：remote_model_name / api_version。 */
     private static final String EXTRA_REMOTE_MODEL_NAME = "remote_model_name";

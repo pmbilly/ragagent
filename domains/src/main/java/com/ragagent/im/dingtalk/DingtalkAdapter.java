@@ -1,5 +1,6 @@
 package com.ragagent.im.dingtalk;
 
+import com.ragagent.common.web.JsonMappers;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -79,7 +80,7 @@ public class DingtalkAdapter implements AdapterInterfaces.Adapter,
         AdapterInterfaces.StreamSender, AdapterInterfaces.FileDownloader {
 
     private static final Logger log = LoggerFactory.getLogger(DingtalkAdapter.class);
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     public static final String DEFAULT_API_BASE_URL = "https://api.dingtalk.com";
     /** 群聊判据。 */

@@ -1,5 +1,6 @@
 package com.ragagent.auth.apikey.domain;
 
+import com.ragagent.common.web.JsonMappers;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
@@ -42,9 +42,7 @@ import org.apache.ibatis.type.JdbcType;
 public class APIKeyStringListTypeHandler extends BaseTypeHandler<List<String>> {
 
     /** jsonb 回读必须容忍未知属性（FAIL_ON_UNKNOWN_PROPERTIES 关闭）。 */
-    private static final ObjectMapper MAPPER = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
     private static final TypeReference<List<String>> TYPE = new TypeReference<>() {};
 
     @Override

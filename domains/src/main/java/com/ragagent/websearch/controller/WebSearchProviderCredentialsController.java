@@ -1,5 +1,6 @@
 package com.ragagent.websearch.controller;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -33,7 +34,7 @@ import com.ragagent.common.web.ApiResponse;
 @RequestMapping("/api/v1/web-search-providers")
 public class WebSearchProviderCredentialsController {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final WebSearchProviderService service;
 

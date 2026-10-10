@@ -1,5 +1,6 @@
 package com.ragagent.retrieval.vlm;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.LinkedHashMap;
@@ -141,7 +142,7 @@ public final class VlmClient {
 
         com.fasterxml.jackson.databind.JsonNode root;
         try {
-            root = new com.fasterxml.jackson.databind.ObjectMapper().readTree(respBody);
+            root = JsonMappers.lenient().readTree(respBody);
         } catch (Exception e) {
             throw new VlmException("OpenAI VLM request: " + e.getMessage());
         }

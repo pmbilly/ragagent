@@ -1,5 +1,6 @@
 package com.ragagent.mcp.domain;
 
+import com.ragagent.common.web.JsonMappers;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -24,10 +25,7 @@ import org.apache.ibatis.type.JdbcType;
  */
 public class McpToolListTypeHandler extends BaseTypeHandler<List<McpTool>> {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper()
-            .configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
-                    false);
-
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
     private static final TypeReference<List<McpTool>> TYPE = new TypeReference<>() {};
 
     @Override

@@ -1,5 +1,6 @@
 package com.ragagent.im.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
@@ -70,7 +71,7 @@ import com.ragagent.storage.support.Resolver;
 public class ImService implements AgentChannelCleaner {
 
     private static final Logger log = LoggerFactory.getLogger(ImService.class);
-    static final ObjectMapper JSON = new ObjectMapper();
+    static final ObjectMapper JSON = JsonMappers.lenient();
 
 
     final ImChannelMapper channels;

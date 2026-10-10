@@ -1,5 +1,6 @@
 package com.ragagent.retrieval.support;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -16,7 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public final class ChunkSearchUtil {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /**
      * * {@code !\[([^\]]*)\]\(([^)]+)\)} —— Markdown 图片链接，分组 2 是 URL。

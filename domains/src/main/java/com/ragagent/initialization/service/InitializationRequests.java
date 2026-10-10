@@ -1,5 +1,6 @@
 package com.ragagent.initialization.service;
 
+import com.ragagent.common.web.JsonMappers;
 import com.ragagent.common.web.RequestFields;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +13,7 @@ import com.ragagent.knowledge.domain.KnowledgeBaseChunkingConfig;
 /** initialization 端点的原始请求体绑定器（record + 手写绑定,契约换锚时一并 DTO 化）。 */
 public final class InitializationRequests {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private InitializationRequests() {
     }

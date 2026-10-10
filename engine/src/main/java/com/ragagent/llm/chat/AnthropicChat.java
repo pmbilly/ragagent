@@ -1,5 +1,6 @@
 package com.ragagent.llm.chat;
 
+import com.ragagent.common.web.JsonMappers;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -72,7 +73,7 @@ public class AnthropicChat implements LlmChatClient {
             "authorization", "api-key", "x-api-key", "x-goog-api-key", "content-type",
             "content-length", "accept-encoding", "host", "connection", "transfer-encoding");
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final String modelName;
     private final String modelId;

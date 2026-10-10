@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ import java.util.Set;
 @Service
 public class KnowledgeFolderService {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final KnowledgeMapper knowledgeMapper;
     private final KnowledgeBaseMapper kbMapper;

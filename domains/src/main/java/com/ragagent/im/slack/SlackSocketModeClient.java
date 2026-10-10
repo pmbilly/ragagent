@@ -1,5 +1,6 @@
 package com.ragagent.im.slack;
 
+import com.ragagent.common.web.JsonMappers;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -30,7 +31,7 @@ import com.ragagent.im.runtime.SlackAdapterCore;
 public class SlackSocketModeClient {
 
     private static final Logger log = LoggerFactory.getLogger(SlackSocketModeClient.class);
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
     private static final long RECONNECT_BACKOFF_MS = 3000;
 
     private final String appToken;

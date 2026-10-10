@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -68,7 +69,7 @@ public class KnowledgeService implements KnowledgeDocumentGateway {
     // 规模例外（~830 行）：文档主链路的门面与共享工具（常量/静态助手/直创建路径），
     // 已按能力拆出 ProcessWorker/Summary/File/Parse/BatchOps 等专项服务，本类保持聚合面。
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /** duplicate 的配置克隆用：知识实体带 OffsetDateTime，往返 mapper 必须挂 JSR310（本仓约定 步 3 教训）。 */
 

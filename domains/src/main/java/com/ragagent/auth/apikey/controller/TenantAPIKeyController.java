@@ -1,5 +1,6 @@
 package com.ragagent.auth.apikey.controller;
 
+import com.ragagent.common.web.JsonMappers;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -67,7 +68,7 @@ import com.ragagent.auth.apikey.domain.TenantAPIKeyProjections;
 public class TenantAPIKeyController {
 
     private static final Logger log = LoggerFactory.getLogger(TenantAPIKeyController.class);
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final TenantAPIKeyService apiKeyService;
     private final KnowledgeBaseGateway knowledgeBaseGateway;

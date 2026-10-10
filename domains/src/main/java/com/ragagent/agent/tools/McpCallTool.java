@@ -1,5 +1,6 @@
 package com.ragagent.agent.tools;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +39,7 @@ public class McpCallTool extends BaseTool {
 
     private static JsonNode parseTree(String json) {
         try {
-            return new com.fasterxml.jackson.databind.ObjectMapper().readTree(json);
+            return JsonMappers.lenient().readTree(json);
         } catch (Exception e) {
             throw new IllegalStateException("invalid mcp call schema", e);
         }

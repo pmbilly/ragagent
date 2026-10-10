@@ -2,6 +2,7 @@ package com.ragagent.mcp.protocol;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.common.web.JsonMappers;
 import com.ragagent.mcp.domain.McpAdvancedConfig;
 import com.ragagent.mcp.domain.McpResource;
 import com.ragagent.mcp.domain.McpService;
@@ -36,7 +37,7 @@ import java.util.function.Supplier;
 public final class DefaultMcpClient implements McpClient {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultMcpClient.class);
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final McpService service;
     private final McpTransport transport;

@@ -44,7 +44,7 @@ public class RbacInterceptor implements HandlerInterceptor {
 
     /** 外壳序列化用（消息为常量，序列化不会失败；失败有字符串回落兜底）。 */
     private static final com.fasterxml.jackson.databind.ObjectMapper ENVELOPE_JSON =
-            new com.fasterxml.jackson.databind.ObjectMapper();
+            JsonMappers.lenient();
 
     private static final Logger log = LoggerFactory.getLogger(RbacInterceptor.class);
     private static final AntPathMatcher MATCHER = new AntPathMatcher();

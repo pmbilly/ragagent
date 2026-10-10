@@ -3,6 +3,7 @@ package com.ragagent.storage.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.common.storage.StorageBackendProvisioner;
+import com.ragagent.common.web.JsonMappers;
 import com.ragagent.storage.config.StorageProviderEnv;
 import com.ragagent.storage.domain.StorageBackend;
 import com.ragagent.storage.mapper.StorageBackendRepository;
@@ -27,7 +28,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DefaultStorageBackendProvisioner implements StorageBackendProvisioner {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final StorageBackendRepository repository;
     private final StorageConfigCodec codec;

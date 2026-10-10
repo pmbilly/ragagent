@@ -1,5 +1,6 @@
 package com.ragagent.session.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.time.OffsetDateTime;
 import com.ragagent.common.deployment.AppEnvLookup;
 import java.time.ZoneId;
@@ -13,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.llm.asr.AsrTranscriber;
 import com.ragagent.auth.service.TenantService;
@@ -43,9 +43,7 @@ public class TemporaryDocumentService {
 
     private static final Logger log = LoggerFactory.getLogger(TemporaryDocumentService.class);
 
-    static final ObjectMapper MAPPER = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
+    static final ObjectMapper MAPPER = JsonMappers.lenient();
     /** 附件扩展名白名单（带点——service 的 ext 不去点）。 */
     private static final Set<String> SUPPORTED_EXTENSIONS = Set.of(
             ".docx", ".doc", ".pdf", ".ppt", ".pptx", ".epub", ".mhtml",

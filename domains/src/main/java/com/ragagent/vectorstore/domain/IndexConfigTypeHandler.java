@@ -1,11 +1,11 @@
 package com.ragagent.vectorstore.domain;
 
+import com.ragagent.common.web.JsonMappers;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
@@ -16,9 +16,7 @@ import com.ragagent.common.vectorstore.IndexConfig;
  */
 public class IndexConfigTypeHandler extends BaseTypeHandler<IndexConfig> {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
     @Override
     public void setNonNullParameter(PreparedStatement ps, int i, IndexConfig parameter, JdbcType jdbcType)
             throws SQLException {

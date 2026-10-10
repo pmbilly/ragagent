@@ -1,5 +1,6 @@
 package com.ragagent.im.feishu;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +24,7 @@ import com.ragagent.im.runtime.IncomingMessage;
  */
 public final class LarkEventConverter {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
     static final String EVENT_TYPE_MESSAGE_RECEIVE = "im.message.receive_v1";
 
     private LarkEventConverter() {

@@ -1,6 +1,7 @@
 package com.ragagent.knowledge.service;
 
 import com.ragagent.common.knowledge.KnowledgeBaseFacts;
+import com.ragagent.common.web.JsonMappers;
 import com.ragagent.storage.config.StorageEnvLookup;
 import com.ragagent.common.retrieval.RetrievalDriverProperties;
 import com.ragagent.common.knowledge.KnowledgeBaseGateway;
@@ -550,7 +551,7 @@ public class KnowledgeBaseService
             kb.setIndexingStrategy(strategy);
             // wiki/graph 联动
             if (kb.getWikiConfig() == null && strategy.isWikiEnabled()) {
-                ObjectMapper m = new ObjectMapper();
+                ObjectMapper m = JsonMappers.lenient();
                 kb.setWikiConfig(m.createObjectNode());
             }
             if (kb.getExtractConfig() != null && kb.getExtractConfig().isObject()) {

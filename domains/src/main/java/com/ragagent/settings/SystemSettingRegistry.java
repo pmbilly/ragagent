@@ -1,5 +1,6 @@
 package com.ragagent.settings;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -27,7 +28,7 @@ public final class SystemSettingRegistry {
                        String description, boolean requiresRestart) {
     }
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /** auth.registration_mode 的配置兜底常量。 */
     public static final String AUTH_REGISTRATION_MODE_DEFAULT = "self_serve";

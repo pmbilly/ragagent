@@ -1,5 +1,6 @@
 package com.ragagent.retrieval.engine.qdrant;
 
+import com.ragagent.common.web.JsonMappers;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -26,7 +27,7 @@ import com.ragagent.common.security.SsrfGuard;
  */
 public final class QdrantRestClient {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final HttpClient http;
     private final String baseUrl;

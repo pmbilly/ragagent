@@ -1,5 +1,6 @@
 package com.ragagent.im.yunzhijia;
 
+import com.ragagent.common.web.JsonMappers;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.WebSocket;
@@ -51,7 +52,7 @@ import com.ragagent.im.runtime.IncomingMessage;
 public class YunzhijiaLongConnClient {
 
     private static final Logger log = LoggerFactory.getLogger(YunzhijiaLongConnClient.class);
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     static final long HEARTBEAT_INTERVAL_MS = 15_000L;
     static final long READ_TIMEOUT_MS = 45_000L;

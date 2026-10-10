@@ -1,5 +1,6 @@
 package com.ragagent.vectorstore.controller;
 
+import com.ragagent.common.web.JsonMappers;
 import com.ragagent.common.web.RequestFields;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -55,7 +56,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/vector-stores")
 public class VectorStoreController {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final VectorStoreConfigService service;
 

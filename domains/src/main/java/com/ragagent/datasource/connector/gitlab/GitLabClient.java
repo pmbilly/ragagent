@@ -1,5 +1,6 @@
 package com.ragagent.datasource.connector.gitlab;
 
+import com.ragagent.common.web.JsonMappers;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -8,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.datasource.ConnectorException;
@@ -45,9 +45,7 @@ public final class GitLabClient {
      * <b>容忍未知属性</b>（GitLab 的响应字段只多不少，
      * 严格模式会让新版本 GitLab 加的字段直接把同步打挂）。
      */
-    private static final ObjectMapper MAPPER = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
     private final String baseUrl;
     private final String token;
     private final ConnectorHttp.Client http;

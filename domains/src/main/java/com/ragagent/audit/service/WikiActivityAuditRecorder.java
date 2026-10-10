@@ -1,5 +1,6 @@
 package com.ragagent.audit.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +43,7 @@ public class WikiActivityAuditRecorder implements WikiActivityAudit {
     static final String SCOPE_KNOWLEDGE_BASE = "knowledge_base";
     static final String TARGET_TYPE_WIKI = "wiki";
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final AuditLogService auditLogService;
 

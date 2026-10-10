@@ -1,5 +1,6 @@
 package com.ragagent.session.domain;
 
+import com.ragagent.common.web.JsonMappers;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -7,7 +8,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
@@ -36,10 +36,7 @@ public abstract class AbstractJsonListTypeHandler<T> extends BaseTypeHandler<Lis
      * （mod_time/created_at），缺模块时读回即抛 "Java 8 date/time type not supported"
      * 让整列不可用（G6 契约测试抓到的真缺陷）。
      */
-    private static final ObjectMapper MAPPER = new ObjectMapper()
-            .registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule())
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
     protected abstract TypeReference<List<T>> typeReference();
 
     @Override

@@ -1,5 +1,6 @@
 package com.ragagent.session.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -215,7 +216,7 @@ final class AgentHistoryAssembler {
     }
     private static String toJsonString(Object args) {
         try {
-            return new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(
+            return JsonMappers.lenient().writeValueAsString(
                     args == null ? Map.of() : args);
         } catch (Exception e) {
             return "{}";

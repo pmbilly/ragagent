@@ -1,5 +1,6 @@
 package com.ragagent.session.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -269,7 +270,7 @@ public final class AgentStreamBridge {
     // ── 审批 / OAuth ─────────────────────────────────────────────────────────
 
     private static final com.fasterxml.jackson.databind.ObjectMapper CAST_MAPPER =
-            new com.fasterxml.jackson.databind.ObjectMapper();
+            JsonMappers.lenient();
 
     private static Map<String, Object> toolApprovalDataToMap(Object v) {
         try {

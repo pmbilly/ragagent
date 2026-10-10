@@ -9,6 +9,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.ragagent.RagAgentApplication;
 import com.ragagent.common.crypto.CryptoService;
 import com.ragagent.common.security.SsrfGuard;
@@ -607,6 +609,57 @@ class ArchitectureRulesTest {
             }
         }
         ratchet("A11b mapper 包里的仓储门面", REPOSITORY_IN_MAPPER_BASELINE, actual);
+    }
+
+    /**
+     * 棘轮基线（B215）：仍有理由自建 mapper 的 7 处，每处都在类注释里写明了不能收编的原因。
+     * <ul>
+     *   <li>{@code JsonMappers} —— 工厂自身（它就是 lenient 的实现处）；</li>
+     *   <li>{@code LangfuseAttributes} / {@code StreamJson} / {@code EventJson} ——
+     *       {@code ORDER_MAP_ENTRIES_BY_KEYS} 或零值时间序列化器，**键序/时间字面量是线上字节面**；</li>
+     *   <li>{@code GitLabConnector} —— 落库 jsonb 字节必须与既有 cursor 一致；</li>
+     *   <li>{@code NotionJson} —— {@code ADJUST_DATES_TO_CONTEXT_TIME_ZONE=false}
+     *       （收编会让写回 cursor 的偏移字面量漂移）；</li>
+     *   <li>{@code JsonValues} —— {@code FAIL_ON_TRAILING_TOKENS=true}（LLM 输出的严格解析）。</li>
+     * </ul>
+     * <p>本规则上线时全仓自建 mapper 已从 168 处收到 7 处（B215）：裸 {@code new ObjectMapper()}
+     * 没注册 JSR-310、又开着严格模式，与 §2-12「宽松读统一策略」正好相反。</p>
+     */
+    private static final Set<String> SELF_MADE_MAPPER_BASELINE = Set.of(
+            "com.ragagent.common.web.JsonMappers",
+            "com.ragagent.tracing.langfuse.LangfuseAttributes",
+            "com.ragagent.stream.StreamJson",
+            "com.ragagent.event.EventJson",
+            "com.ragagent.datasource.connector.gitlab.GitLabConnector",
+            "com.ragagent.datasource.connector.notion.NotionJson",
+            "com.ragagent.modelcontext.JsonValues");
+
+    @Test
+    @DisplayName("A15：JSON mapper 必须来自 JsonMappers 工厂（不得自建 ObjectMapper / JsonMapper.builder）")
+    void jsonMappersComeFromTheFactory() {
+        // 判据（§2-12）：读落库/外部 JSON 统一忽略未知属性，JsonMappers.lenient() 是唯一工厂。
+        // 自建 mapper 的代价不是"多写一行"，而是**策略分叉**：裸 new ObjectMapper() 没注册 JSR-310
+        // （遇 java.time 字段直接抛 InvalidDefinitionException），且 FAIL_ON_UNKNOWN_PROPERTIES 为 true
+        // ——与政策恰好相反，且只在特定数据到达时才炸。
+        Set<String> actual = new TreeSet<>();
+        for (JavaClass clazz : MAIN) {
+            boolean selfMade = false;
+            for (JavaConstructorCall call : clazz.getConstructorCallsFromSelf()) {
+                if (call.getTarget().getOwner().isEquivalentTo(ObjectMapper.class)) {
+                    selfMade = true;
+                }
+            }
+            for (JavaCall<?> call : clazz.getMethodCallsFromSelf()) {
+                if (call.getTarget().getOwner().isEquivalentTo(JsonMapper.class)
+                        && "builder".equals(call.getTarget().getName())) {
+                    selfMade = true;
+                }
+            }
+            if (selfMade) {
+                actual.add(topLevel(clazz).getName());
+            }
+        }
+        ratchet("A15 自建 mapper", SELF_MADE_MAPPER_BASELINE, actual);
     }
 
     @Test

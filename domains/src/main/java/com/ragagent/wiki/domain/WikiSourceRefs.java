@@ -1,6 +1,7 @@
 package com.ragagent.wiki.domain;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.common.web.JsonMappers;
 
 /**
  * {@code source_refs} 的匹配谓词构造。
@@ -16,7 +17,7 @@ public final class WikiSourceRefs {
 
     private WikiSourceRefs() {}
 
-    private static final ObjectMapper JSON = new ObjectMapper();
+    private static final ObjectMapper JSON = JsonMappers.lenient();
 
     /**
      * 转义 LIKE / ILIKE 元字符，

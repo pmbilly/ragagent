@@ -1,5 +1,6 @@
 package com.ragagent.session.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.LongSupplier;
@@ -76,7 +77,7 @@ import com.ragagent.websearch.service.WebSearchService;
 @Component
 public class AgentToolBackends {
 
-    static final ObjectMapper JSON = new ObjectMapper();
+    static final ObjectMapper JSON = JsonMappers.lenient();
 
 
     private final KnowledgeService knowledgeService;

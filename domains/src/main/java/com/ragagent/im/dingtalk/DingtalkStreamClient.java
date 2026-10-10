@@ -1,5 +1,6 @@
 package com.ragagent.im.dingtalk;
 
+import com.ragagent.common.web.JsonMappers;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -62,7 +63,7 @@ import com.ragagent.im.runtime.IncomingMessage;
 public class DingtalkStreamClient {
 
     private static final Logger log = LoggerFactory.getLogger(DingtalkStreamClient.class);
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /** 机器人消息统一回调 topic。 */
     public static final String BOT_MESSAGE_TOPIC = "/v1.0/im/bot/messages/get";

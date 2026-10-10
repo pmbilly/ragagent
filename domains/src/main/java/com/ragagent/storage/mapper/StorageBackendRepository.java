@@ -1,5 +1,6 @@
 package com.ragagent.storage.mapper;
 
+import com.ragagent.common.web.JsonMappers;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
@@ -28,7 +29,7 @@ public class StorageBackendRepository {
 
     private static final String COLS = "id, tenant_id, name, provider, config, source, status, "
             + "legacy_alias, created_at, updated_at, deleted_at";
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final JdbcClient jdbc;
     private final boolean postgres;

@@ -1,5 +1,6 @@
 package com.ragagent.agent.tools.web;
 
+import com.ragagent.common.web.JsonMappers;
 import com.ragagent.common.web.ToolJson;
 import java.net.URI;
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ import com.ragagent.webfetch.Fetcher;
  */
 public class WebFetchTool extends BaseTool {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /** 页面快照 LRU 缓存上限。 */
     static final int WEB_PAGE_CACHE_LIMIT = 8;

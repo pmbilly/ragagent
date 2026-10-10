@@ -1,5 +1,6 @@
 package com.ragagent.agent.management.dto;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.TreeMap;
@@ -62,7 +63,7 @@ public final class AgentResponses {
     // ApiResponse.ok(null, "Agent deleted successfully")。
 
     private static final com.fasterxml.jackson.databind.ObjectMapper MAPPER =
-            new com.fasterxml.jackson.databind.ObjectMapper();
+            JsonMappers.lenient();
 
     private static com.fasterxml.jackson.databind.JsonNode asTree(Object config) {
         if (config instanceof com.fasterxml.jackson.databind.JsonNode n) {

@@ -1,5 +1,6 @@
 package com.ragagent.wiki.service.ingest;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -45,7 +46,7 @@ public class WikiIngestTaxonomy {
 
     private static final Logger log = LoggerFactory.getLogger(WikiIngestTaxonomy.class);
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final WikiPageService wikiService;
     private final WikiModelResolver modelResolver;

@@ -1,5 +1,6 @@
 package com.ragagent.mcp.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
@@ -58,7 +59,7 @@ public class McpMetadataService {
     /** 调试日志里最多列出的工具数 */
     private static final int MAX_LOGGED_TOOLS = 30;
 
-    private static final ObjectMapper JSON = new ObjectMapper();
+    private static final ObjectMapper JSON = JsonMappers.lenient();
 
     /** 整个刷新的 30 秒超时 */
     private static final Duration REFRESH_TIMEOUT = Duration.ofSeconds(30);

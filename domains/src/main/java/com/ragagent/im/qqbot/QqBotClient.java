@@ -1,5 +1,6 @@
 package com.ragagent.im.qqbot;
 
+import com.ragagent.common.web.JsonMappers;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -28,7 +29,7 @@ public class QqBotClient {
     public static final String APP_TOKEN_URL = "https://bots.qq.com/app/getAppAccessToken";
     public static final String DEFAULT_GATEWAY_URL = "https://api.sgroup.qq.com/gateway";
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
     private static final long EXPIRY_MARGIN_SECONDS = 60;
     private static final int DEFAULT_EXPIRES_IN = 7200;
 

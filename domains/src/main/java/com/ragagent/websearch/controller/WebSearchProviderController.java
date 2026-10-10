@@ -1,5 +1,6 @@
 package com.ragagent.websearch.controller;
 
+import com.ragagent.common.web.JsonMappers;
 import com.ragagent.common.web.RequestFields;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -59,7 +60,7 @@ import com.ragagent.common.web.ApiResponse;
 public class WebSearchProviderController {
 
     private static final Logger log = LoggerFactory.getLogger(WebSearchProviderController.class);
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final WebSearchProviderService service;
     private final WebSearchProviderRegistry registry;

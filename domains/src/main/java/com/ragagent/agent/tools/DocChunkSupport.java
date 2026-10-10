@@ -1,5 +1,6 @@
 package com.ragagent.agent.tools;
 
+import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -86,7 +87,7 @@ public final class DocChunkSupport {
     /** 独立 ObjectMapper（主源码不可依赖测试侧的 RecordingSupport）。 */
     private static final class ImageJson {
         static final com.fasterxml.jackson.databind.ObjectMapper PLAIN =
-                new com.fasterxml.jackson.databind.ObjectMapper();
+                JsonMappers.lenient();
 
         private ImageJson() {
         }

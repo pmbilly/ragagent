@@ -1,5 +1,6 @@
 package com.ragagent.auth.apikey.filter;
 
+import com.ragagent.common.web.JsonMappers;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
@@ -52,10 +53,7 @@ public class APIKeyAuthChannel implements ApiKeyAuthPort {
     private static final long MAX_EXTERNAL_USER_TOKEN_TTL_SECONDS = 24 * 3600L;
 
     private static final com.fasterxml.jackson.databind.ObjectMapper JSON_MAPPER =
-            new com.fasterxml.jackson.databind.ObjectMapper()
-                    .configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
-                            false);
-
+            JsonMappers.lenient();
     private final TenantAPIKeyService apiKeyService;
     private final TenantService tenantService;
 

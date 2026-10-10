@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public final class ToolJson {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private static final ObjectWriter PRETTY = MAPPER.writerWithDefaultPrettyPrinter();
 

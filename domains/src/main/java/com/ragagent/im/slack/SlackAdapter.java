@@ -1,5 +1,6 @@
 package com.ragagent.im.slack;
 
+import com.ragagent.common.web.JsonMappers;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -58,7 +59,7 @@ public class SlackAdapter implements AdapterInterfaces.Adapter,
     /** 签名时间戳容忍窗（5 分钟）。 */
     static final long SIGNATURE_MAX_AGE_SECONDS = 300;
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /** 全局流表，key = {@code {channel}:{ts}}。 */
     static final Map<String, StreamState> STREAMS = new ConcurrentHashMap<>();

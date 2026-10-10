@@ -1,5 +1,6 @@
 package com.ragagent.session.service;
 
+import com.ragagent.common.web.JsonMappers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +20,7 @@ import com.ragagent.common.tenant.WebSearchConfig;
 final class QaWebSearchParams {
 
     private static final Logger log = LoggerFactory.getLogger(QaWebSearchParams.class);
-    private static final ObjectMapper JSON = new ObjectMapper();
+    private static final ObjectMapper JSON = JsonMappers.lenient();
 
     private final SessionKnowledgeQaService service;
 

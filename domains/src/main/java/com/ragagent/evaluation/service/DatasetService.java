@@ -1,5 +1,6 @@
 package com.ragagent.evaluation.service;
 
+import com.ragagent.common.web.JsonMappers;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -31,7 +32,7 @@ public class DatasetService {
 
     private static final Logger log = LoggerFactory.getLogger(DatasetService.class);
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /** 数据集结构（5 张表；键序 = 转换 JSON 键序，即数值升序）。 */
     private record Dataset(Map<Long, String> queries, Map<Long, String> corpus,

@@ -1,5 +1,6 @@
 package com.ragagent.agent.compaction;
 
+import com.ragagent.common.web.JsonMappers;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +19,7 @@ import com.ragagent.llm.domain.ToolCall;
  */
 public final class ConversationSerializer {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /**
      * 摘要请求里单个工具结果的字符上限。工具输出是上下文

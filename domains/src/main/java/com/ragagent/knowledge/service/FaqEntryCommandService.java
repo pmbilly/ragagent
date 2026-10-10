@@ -9,9 +9,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
+import com.ragagent.common.web.JsonMappers;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.FaqChunkMetadata;
 import com.ragagent.knowledge.domain.Knowledge;
@@ -37,7 +39,6 @@ import com.ragagent.knowledge.dto.faq.FaqEntryPayload;
 import com.ragagent.knowledge.dto.faq.FaqEntryFieldsBatchUpdate;
 import com.ragagent.knowledge.dto.faq.FaqEntryFieldsUpdate;
 import com.ragagent.retrieval.engine.VectorStoreService;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -52,6 +53,9 @@ import java.security.NoSuchAlgorithmException;
 public class FaqEntryCommandService {
 
     private static final Logger log = LoggerFactory.getLogger(FaqEntryCommandService.class);
+
+    /** 审计 details 的节点构造走统一策略（此前在循环内每次 {@code JsonMapper.builder().build()}）。 */
+    private static final ObjectMapper JSON = JsonMappers.lenient();
 
     private final ChunkRepository chunkRepository;
     private final FaqChunkRepository faqChunkRepository;
@@ -670,12 +674,11 @@ public class FaqEntryCommandService {
         entry.setTargetType(targetType);
         entry.setTargetId(targetId);
         entry.setOutcome(AuditOutcome.SUCCESS);
-        ObjectNode detailsNode =
-                JsonMapper.builder().build().createObjectNode();
+        ObjectNode detailsNode = JSON.createObjectNode();
         details.entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())
                 .forEachOrdered(e -> detailsNode.set(e.getKey(),
-                        JsonMapper.builder().build().valueToTree(e.getValue())));
+                        JSON.valueToTree(e.getValue())));
         entry.setDetails(detailsNode);
         auditService.logBestEffort(entry);
     }

@@ -1,5 +1,6 @@
 package com.ragagent.retrieval.engine.tencentvectordb;
 
+import com.ragagent.common.web.JsonMappers;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -40,7 +41,7 @@ public final class TencentVectorDbRestClient {
 
     static final class Json {
 
-        private static final ObjectMapper MAPPER = new ObjectMapper();
+        private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
         private Json() {
         }

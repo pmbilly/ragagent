@@ -1,5 +1,6 @@
 package com.ragagent.session.controller;
 
+import com.ragagent.common.web.JsonMappers;
 import com.ragagent.common.web.RequestFields;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,7 @@ final class QaRequestBinder {
     private QaRequestBinder() {}
 
     static final com.fasterxml.jackson.databind.ObjectMapper BIND_JSON =
-            new com.fasterxml.jackson.databind.ObjectMapper();
+            JsonMappers.lenient();
     static CreateKnowledgeQARequest bindQaRequest(String rawBody) {
         CreateKnowledgeQARequest r = parseOrBindError(rawBody, CreateKnowledgeQARequest.class);
         if (r.query == null || r.query.isEmpty()) {
