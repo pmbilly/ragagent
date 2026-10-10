@@ -35,6 +35,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
+import com.ragagent.common.web.ApiResult;
+import com.ragagent.common.web.ApiResponse;
 
 /**
  * web 搜索 provider 管理面（10 条路由；角色门：读 Viewer+ / 写 Admin+）。
@@ -52,6 +54,7 @@ import org.springframework.web.bind.annotation.RestController;
  * </ul>
  */
 @RestController
+@ApiResult
 @RequestMapping("/api/v1/web-search-providers")
 public class WebSearchProviderController {
 
@@ -197,7 +200,7 @@ public class WebSearchProviderController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteProvider(@PathVariable("id") String id) {
+    public ApiResponse<Void> deleteProvider(@PathVariable("id") String id) {
         long tenantId = requireTenant();
         owned(tenantId, id);
         try {
@@ -206,7 +209,7 @@ public class WebSearchProviderController {
             log.warn("Failed to delete web search provider {}: {}", id, e.getMessage());
             throw BizException.internal(e.getMessage());
         }
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B190：204 退役（空体与「外壳恒存在」冲突）
     }
 
     // ── POST /{id}/test（Admin+）：已存 provider 连通性 ─────────────────
@@ -390,13 +393,6 @@ public class WebSearchProviderController {
         }
     }
 
-    /** 响应体：{"data":..., "success":true}（键按字母序，data < success） */
-    static Map<String, Object> envelopeData(Object data) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("data", data);
-        body.put("success", true);
-        return body;
-    }
 
 
     /** 连通性测试成功体：{connected:true}（与失败体 {connected:false,error} 同形对称）。 */

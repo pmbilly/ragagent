@@ -202,7 +202,7 @@ class WebSearchProviderContractTest {
                 () -> "seed create failed: " + result.getResponse().getErrorMessage());
         com.fasterxml.jackson.databind.JsonNode node = new com.fasterxml.jackson.databind.ObjectMapper()
                 .readTree(result.getResponse().getContentAsString());
-        return node.get("id").asText();
+        return node.path("data").get("id").asText();   // B190：统一外壳下钻
     }
 
     // ── 1) 静态元数据 ──────────────────────────────────────────────────
@@ -301,7 +301,7 @@ class WebSearchProviderContractTest {
         compareAndStatus("wsp-cred-put-404.json", 404, "PUT", base + "/" + UNKNOWN + "/credentials", owner, "{}");
         compareAndStatus("wsp-cred-delete-badfield.json", 400, "DELETE",
                 base + "/" + ddg + "/credentials/notkey", owner, null);
-        compareAndStatus("wsp-cred-delete.json", 204, "DELETE",
+        compareAndStatus("wsp-cred-delete.json", 200, "DELETE",
                 base + "/" + ddg + "/credentials/apiKey", owner, null);
         compareAndStatus("wsp-get-after-clear.json", 200, "GET", base + "/" + ddg, owner, null);
         compareAndStatus("wsp-cred-delete-404.json", 500, "DELETE",
@@ -327,7 +327,7 @@ class WebSearchProviderContractTest {
         compareAndStatus("wsp-test-viewer-denied.json", 403, "POST", base + "/test", viewer,
                 "{\"provider\":\"zhipu\"}");
         compareAndStatus("wsp-test-byid-404.json", 404, "POST", base + "/" + UNKNOWN + "/test", owner, null);
-        compareAndStatus("wsp-delete.json", 204, "DELETE", base + "/" + ddg, owner, null);
+        compareAndStatus("wsp-delete.json", 200, "DELETE", base + "/" + ddg, owner, null);
         compareAndStatus("wsp-delete-404.json", 404, "DELETE", base + "/" + UNKNOWN, owner, null);
         compareAndStatus("wsp-get-after-delete.json", 404, "GET", base + "/" + ddg, owner, null);
     }

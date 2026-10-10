@@ -1,1 +1,1 @@
-{"error":{"code":1010,"message":"bucket_name is required","details":null}}
+{"code":1010,"message":"bucket_name is required","data":null}

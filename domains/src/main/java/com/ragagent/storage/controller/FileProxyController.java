@@ -16,6 +16,7 @@ import com.ragagent.storage.fileserve.FileProxyService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import com.ragagent.common.web.ApiResult;
 
 /**
  * 文件代理面的引擎级路由。
@@ -41,6 +42,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * 故这三处需显式 HEAD 映射按该形态回 404。</p>
  */
 @RestController
+@ApiResult
 public class FileProxyController {
 
     private final FileProxyService proxy;

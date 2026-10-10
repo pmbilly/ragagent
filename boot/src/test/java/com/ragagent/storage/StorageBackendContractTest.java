@@ -204,7 +204,7 @@ class StorageBackendContractTest {
         assertEquals(201, result.getResponse().getStatus(),
                 () -> "seed create failed: " + diag);
         return new com.fasterxml.jackson.databind.ObjectMapper()
-                .readTree(result.getResponse().getContentAsString()).get("id").asText();
+                .readTree(result.getResponse().getContentAsString()).path("data").get("id").asText();   // B190：外壳下钻
     }
 
     private String latestId(String name) {
@@ -302,10 +302,10 @@ class StorageBackendContractTest {
                         + "\"status\":\"disabled\"}");
 
         compareAndStatus("sb-setdefault-disabled.json", 400, "PUT", base + "/" + local + "/default", owner, null);
-        compareAndStatus("sb-setdefault.json", 204, "PUT", base + "/" + local2 + "/default", owner, null);
+        compareAndStatus("sb-setdefault.json", 200, "PUT", base + "/" + local2 + "/default", owner, null);
         compareAndStatus("sb-list-after-default.json", 200, "GET", base, owner, null);
         compareAndStatus("sb-delete-default.json", 400, "DELETE", base + "/" + local2, owner, null);
-        compareAndStatus("sb-setdefault-restore.json", 204, "PUT", base + "/" + SYS_LOCAL + "/default", owner, null);
+        compareAndStatus("sb-setdefault-restore.json", 200, "PUT", base + "/" + SYS_LOCAL + "/default", owner, null);
         compareAndStatus("sb-test-raw-local.json", 200, "POST", base + "/test", owner,
                 "{\"name\":\"t\",\"provider\":\"local\",\"config\":{\"pathPrefix\":\"sbgolden\"}}");
         compareAndStatus("sb-test-raw-badprovider.json", 400, "POST", base + "/test", owner,
@@ -324,8 +324,8 @@ class StorageBackendContractTest {
         compareAndStatus("sb-delete-enabled.json", 200, "PUT", base + "/" + local, owner,
                 "{\"name\":\"sb-golden-local\",\"provider\":\"local\",\"config\":{\"pathPrefix\":\"sbgolden\"},"
                         + "\"status\":\"active\"}");
-        compareAndStatus("sb-delete.json", 204, "DELETE", base + "/" + local, owner, null);
+        compareAndStatus("sb-delete.json", 200, "DELETE", base + "/" + local, owner, null);
         compareAndStatus("sb-delete-404.json", 404, "DELETE", base + "/" + UNKNOWN, owner, null);
-        compareAndStatus("sb-delete-seed.json", 204, "DELETE", base + "/" + SB_MINIO, owner, null);
+        compareAndStatus("sb-delete-seed.json", 200, "DELETE", base + "/" + SB_MINIO, owner, null);
     }
 }

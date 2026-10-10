@@ -1,1 +1,1 @@
-{"error":{"code":1000,"message":"endpoint, region, bucket and path prefix are immutable; use storage migration instead","details":null}}
+{"code":1000,"message":"endpoint, region, bucket and path prefix are immutable; use storage migration instead","data":null}

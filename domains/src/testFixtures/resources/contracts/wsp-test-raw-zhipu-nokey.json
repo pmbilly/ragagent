@@ -1,1 +1,1 @@
-{"error":"failed to create provider: API key is required for Zhipu provider"}
+{"code":0,"message":"ok","data":{"error":"failed to create provider: API key is required for Zhipu provider"}}

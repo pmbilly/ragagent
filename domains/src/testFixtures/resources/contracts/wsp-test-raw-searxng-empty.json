@@ -1,1 +1,1 @@
-{"error":"failed to create provider: base_url is required for SearXNG provider"}
+{"code":0,"message":"ok","data":{"error":"failed to create provider: base_url is required for SearXNG provider"}}

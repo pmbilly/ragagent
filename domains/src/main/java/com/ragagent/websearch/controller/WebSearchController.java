@@ -1,11 +1,11 @@
 package com.ragagent.websearch.controller;
 
-import java.util.Map;
 
 import com.ragagent.websearch.dto.WebSearchProviderTypes;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.ragagent.common.web.ApiResult;
 
 /**
  * GET /api/v1/web-search/providers 的处理器（本控制器唯一路由）。
@@ -16,10 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
  * （刻意不登记进 APIKeyRoutePolicies）。</p>
  */
 @RestController
+@ApiResult
 public class WebSearchController {
 
     @GetMapping("/api/v1/web-search/providers")
-    public ResponseEntity<Map<String, Object>> getProviders() {
-        return ResponseEntity.ok(WebSearchProviderController.envelopeData(WebSearchProviderTypes.all()));
+    public ResponseEntity<?> getProviders() {
+        return ResponseEntity.ok(WebSearchProviderTypes.all());   // B190：外壳交给 advice
     }
 }

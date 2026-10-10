@@ -25,6 +25,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.ragagent.common.web.ApiResult;
+import com.ragagent.common.web.ApiResponse;
 
 /**
  * 存储后端管理面：9 条路由；读 Viewer+ / 写与测试 Admin+。
@@ -38,6 +40,7 @@ import org.springframework.web.bind.annotation.RestController;
  * get 404）。</p>
  */
 @RestController
+@ApiResult
 @RequestMapping("/api/v1/storage-backends")
 public class StorageBackendController {
 
@@ -128,15 +131,15 @@ public class StorageBackendController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable("id") String id) {
+    public ApiResponse<Void> delete(@PathVariable("id") String id) {
         service.delete(tenantId(), id);
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B190：204 退役（空体与「外壳恒存在」冲突）
     }
 
     @PutMapping("/{id}/default")
-    public ResponseEntity<?> setDefault(@PathVariable("id") String id) {
+    public ApiResponse<Void> setDefault(@PathVariable("id") String id) {
         service.setDefault(tenantId(), id);
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();   // B190：204 退役（空体与「外壳恒存在」冲突）
     }
 
     @PostMapping("/{id}/test")

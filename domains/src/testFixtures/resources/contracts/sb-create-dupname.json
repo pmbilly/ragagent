@@ -1,1 +1,1 @@
-{"error":{"code":1005,"message":"a storage backend with this name already exists","details":null}}
+{"code":1005,"message":"a storage backend with this name already exists","data":null}

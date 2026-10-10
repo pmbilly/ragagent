@@ -70,7 +70,7 @@ def private_error_forms(text):
             hits.append((i, '手搓错误助手（int status ⇒ {"error":…}）'))
         if re.search(r'(?:Map\.of|\bput)\(\s*"success"', line):
             hits.append((i, '手搓 success 外壳'))
-        if re.search(r'return\s+ResponseEntity\.noContent\(\)', line):
+        if re.search(r'noContent\(\)|HttpStatus\.NO_CONTENT|status\(204\)', line):
             hits.append((i, '204（迁移时改 200 + 外壳）'))
     return hits
 
@@ -174,6 +174,9 @@ def cmd_goldens(domains):
             new = {'code': 0, 'message': 'ok', 'data': d}
         elif isinstance(d, dict) and d.get('code') == 0:
             continue
+        elif isinstance(d, dict) and set(d.keys()) == {'data', 'success'}:
+            # Go 迁移期的遗留成功壳 {"data":…,"success":true} ⇒ 拆壳：载荷就是原 data
+            new = {'code': 0, 'message': 'ok', 'data': d['data']}
         elif isinstance(d, dict) and isinstance(d.get('error'), dict):
             e = d['error']
             new = {'code': e['code'], 'message': e['message'], 'data': e.get('details')}

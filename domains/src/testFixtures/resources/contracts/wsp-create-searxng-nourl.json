@@ -1,1 +1,1 @@
-{"error":{"code":1007,"message":"base_url is required for SearXNG provider","details":null}}
+{"code":1007,"message":"base_url is required for SearXNG provider","data":null}

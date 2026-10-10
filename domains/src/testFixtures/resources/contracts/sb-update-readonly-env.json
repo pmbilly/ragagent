@@ -1,1 +1,1 @@
-{"error":{"code":1000,"message":"environment storage backend is read-only","details":null}}
+{"code":1000,"message":"environment storage backend is read-only","data":null}

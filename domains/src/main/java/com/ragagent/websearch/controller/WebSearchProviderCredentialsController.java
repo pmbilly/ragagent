@@ -9,7 +9,6 @@ import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.BizException;
 import com.ragagent.websearch.domain.WebSearchProvider;
 import com.ragagent.websearch.service.WebSearchProviderService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +16,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.ragagent.common.web.ApiResult;
+import com.ragagent.common.web.ApiResponse;
 
 /**
  * web 搜索 provider 凭据面（两路由 Admin+）。
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
  * "failed to clear credential: ..."——service 的普通 error 被包成 internal，非 404）。</p>
  */
 @RestController
+@ApiResult
 @RequestMapping("/api/v1/web-search-providers")
 public class WebSearchProviderCredentialsController {
 
@@ -62,7 +64,7 @@ public class WebSearchProviderCredentialsController {
     }
 
     @DeleteMapping("/{id}/credentials/{field}")
-    public ResponseEntity<?> deleteField(@PathVariable("id") String id,
+    public ApiResponse<Void> deleteField(@PathVariable("id") String id,
             @PathVariable("field") String field) {
         long tenantId = tenantId();
         if (!"apiKey".equals(field)) {
@@ -73,7 +75,7 @@ public class WebSearchProviderCredentialsController {
         } catch (RuntimeException e) {
             throw BizException.internal("failed to clear credential: " + e.getMessage());
         }
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ApiResponse.ok();   // B190：204 退役（HttpStatus.NO_CONTENT 形态）
     }
 
     // ── 内部 ───────────────────────────────────────────────────────────

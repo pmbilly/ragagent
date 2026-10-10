@@ -32,13 +32,8 @@
     "domains/src/main/java/com/ragagent/session/controller/SessionStreamController.java": "待迁移（存量控制器；B183 起新控制器请直接标注 @ApiResult）",
     "domains/src/main/java/com/ragagent/session/controller/SteerController.java": "待迁移（存量控制器；B183 起新控制器请直接标注 @ApiResult）",
     "domains/src/main/java/com/ragagent/session/controller/TemporaryDocumentController.java": "待迁移（存量控制器；B183 起新控制器请直接标注 @ApiResult）",
-    "domains/src/main/java/com/ragagent/storage/controller/FileProxyController.java": "待迁移（存量控制器；B183 起新控制器请直接标注 @ApiResult）",
-    "domains/src/main/java/com/ragagent/storage/controller/StorageBackendController.java": "待迁移（存量控制器；B183 起新控制器请直接标注 @ApiResult）",
     "domains/src/main/java/com/ragagent/system/controller/SystemAdminController.java": "待迁移（存量控制器；B183 起新控制器请直接标注 @ApiResult）",
     "domains/src/main/java/com/ragagent/system/controller/SystemController.java": "待迁移（存量控制器；B183 起新控制器请直接标注 @ApiResult）",
-    "domains/src/main/java/com/ragagent/websearch/controller/WebSearchController.java": "待迁移（存量控制器；B183 起新控制器请直接标注 @ApiResult）",
-    "domains/src/main/java/com/ragagent/websearch/controller/WebSearchProviderController.java": "待迁移（存量控制器；B183 起新控制器请直接标注 @ApiResult）",
-    "domains/src/main/java/com/ragagent/websearch/controller/WebSearchProviderCredentialsController.java": "待迁移（存量控制器；B183 起新控制器请直接标注 @ApiResult）",
     "domains/src/main/java/com/ragagent/wiki/controller/WikiPageController.java": "待迁移（存量控制器；B183 起新控制器请直接标注 @ApiResult）",
     "common/src/main/java/com/ragagent/common/web/HealthController.java": "待迁移（存量控制器；B183 起新控制器请直接标注 @ApiResult）"
   }
