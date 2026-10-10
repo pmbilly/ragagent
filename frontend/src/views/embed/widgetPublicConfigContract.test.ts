@@ -35,6 +35,9 @@ test('widget 兼容服务端两种外壳形状（裸对象 / {code,message,data}
 })
 
 test('widget 内层键名不带 snake（永久禁止的旧读法）', () => {
-  assert.doesNotMatch(widgetSource, /cfg\.launcher_icon/)
-  assert.doesNotMatch(widgetSource, /cfg\.primary_color/)
+  // 用**通用 snake 模式**断言，而不是逐个列举键名 —— 两个原因：
+  // ① 本守卫是源码扫描，"列举"会把 snake 字面量本身写进源码，反过来触发
+  //    「前端契约键棘轮」守卫（B226 首版即踩，B230 修正）；
+  // ② 通用模式更严格：任何 `cfg.xxx_yyy` 形态（不止列举的那几个）都拦得住。
+  assert.doesNotMatch(widgetSource, /cfg\.[A-Za-z]+_[A-Za-z]+/)
 })

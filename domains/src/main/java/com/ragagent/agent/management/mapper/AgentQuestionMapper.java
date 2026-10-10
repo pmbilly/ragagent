@@ -23,6 +23,7 @@ public interface AgentQuestionMapper {
             + "CAST(metadata AS VARCHAR(1048576)) AS \"metadata\" FROM chunks "
             + "WHERE tenant_id = #{tenantId} AND chunk_type = 'faq' "
             + "AND status IN (0, 2) AND is_enabled = TRUE AND MOD(flags, 2) &lt;&gt; 0 "
+            + "AND deleted_at IS NULL "
             + "<if test='hasKb or hasKnowledge or hasTag'> AND ("
             + "<trim prefixOverrides='OR '>"
             + "<if test='hasKb'>knowledge_base_id IN "
@@ -58,6 +59,8 @@ public interface AgentQuestionMapper {
             + "CAST(metadata AS VARCHAR(1048576)) AS \"metadata\" FROM chunks "
             + "WHERE tenant_id = #{tenantId} AND chunk_type = 'text' "
             + "AND status IN (0, 2) AND is_enabled = TRUE "
+            // 同上：软删 chunk 不得进入推荐候选（删文档会级联软删 chunks）。
+            + "AND deleted_at IS NULL "
             + "AND metadata IS NOT NULL "
             + "AND CAST(metadata AS VARCHAR(1048576)) LIKE '%generatedQuestions%' "
             + "<if test='hasKb and hasKnowledge'> AND (knowledge_base_id IN "
