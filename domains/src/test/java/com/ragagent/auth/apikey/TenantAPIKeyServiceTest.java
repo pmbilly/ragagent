@@ -283,10 +283,14 @@ class TenantAPIKeyServiceTest {
         }
         assertThat(attempts.get()).isEqualTo(1);
 
-        // 节流标记已清除 → 立即重试一次（不等 1 分钟）
-        service.authenticate("sk-1");
+        // 节流标记已清除 → 立即重试一次（不等 1 分钟）。
+        // ⚠️ 不能只"等 attempts"：写失败发生在**虚拟线程**里，清除标记（catch → remove）是异步的 ✗，
+        // 而 attempts 在抛异常**之前**就 +1 ✗ ⇒ 只盯它会抢跑（CI 2026-10-10 实测：第二次 authenticate
+        // 落在"标记未清"窗口里 ⇒ 1 >= 2 假红 ✓）。改为**每轮都重试 authenticate**：标记一清掉，
+        // 这一轮就会真的写 ✓（断言不变 ⇒ 若标记永不清理，照旧失败 ✓）。
         deadline = System.currentTimeMillis() + 2000;
         while (attempts.get() < 2 && System.currentTimeMillis() < deadline) {
+            service.authenticate("sk-1");
             Thread.sleep(10);
         }
         assertThat(attempts.get()).isGreaterThanOrEqualTo(2);

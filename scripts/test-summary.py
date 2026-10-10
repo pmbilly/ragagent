@@ -12,6 +12,10 @@
      既在 job 页可见，也能用**公开 API** 读到（`/check-runs/{id}/annotations`）⇒ 不必再让人
      去日志里捞信息。
 
+**已知边界（B174 实测）**：Gradle 的 XML 对 `assumeTrue` 型跳过只写 `<skipped/>` ✗
+（**不带原因** ✓，属性与文本都空 ✓）⇒ 这类跳过在汇总里显示"无原因" ✓，请看用例名回源码查 guard 旁的注释 ✓
+（脚本仍会读 message 属性与文本：别的 JUnit 输出格式会带上原因 ✓）。
+
 用法：python3 scripts/test-summary.py       （找不到 XML 就安静退出 0，供 CI 的 always() 步用；
                                              只报告，退出码恒 0 —— 红不红由 Gradle 决定）
 """
@@ -46,7 +50,9 @@ def main() -> int:
                     fails.append((mod, name, msg))
                 sk = tc.find("skipped")
                 if sk is not None:
-                    skips.append((mod, name, (sk.get("message") or "无原因").strip()[:160]))
+                    # JUnit 把跳过消息放在**元素文本**里（属性常为空 ✗）⇒ 两处都要读。
+                    msg = sk.get("message") or (sk.text or "") or "无原因"
+                    skips.append((mod, name, msg.strip()[:160]))
         if t or f or s:
             rows.append((mod, t, f, s))
     if not found_any:

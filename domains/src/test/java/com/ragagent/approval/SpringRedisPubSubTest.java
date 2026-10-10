@@ -17,10 +17,11 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.ragagent.common.llm.ResponseType;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
-import org.junit.jupiter.api.condition.EnabledIf;
 import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
@@ -43,8 +44,19 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
  * 以及两个 Gate 真实经 Redis 完成“广播投递 + ack 回执”的全链路。</p>
  */
 @Timeout(30)
-@EnabledIf("redisAvailable")
 class SpringRedisPubSubTest {
+
+    /**
+     * 真 Redis 才跑（跨实例 Subscribe/Publish 语义）。
+     *
+     * <p>用 {@code @BeforeAll + assumeTrue} 而非 {@code @EnabledIf}：后者**没有消息位** ✗，
+     * 跳过时在测试汇总里只能显示"无原因"（B171 的注解就长这样 ✓）；这里给出可读原因 ✓。</p>
+     */
+    @BeforeAll
+    static void requireRealRedis() {
+        Assumptions.assumeTrue(redisAvailable(),
+                "需要真 Redis（设 REDIS_TEST_ADDR 指向可用实例；仓库无 embedded redis）⇒ 跳过，跨实例场景由 FakeRedisPubSub 覆盖");
+    }
 
     private static final String HOST = "localhost";
     private static final int PORT = 16379;
