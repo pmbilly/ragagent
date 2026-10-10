@@ -147,7 +147,7 @@ cd frontend && npx vue-tsc --build --force && npm test       # 前端
 <summary>展开</summary>
 
 - **跑完 `./gradlew build` 必须重启后端**：构建会**就地重写** `bootRun` 正在用的 `build/classes` ⇒ 在线服务**全站 500 + NoClassDefFoundError**。看起来像业务炸了，其实是陈旧类 —— **重启即解，别去查代码**。
-- **`scripts/*-down.sh --stop` 会把 bootRun 一起杀掉** ⇒ 停完记得重启。
+- **停服用 `bash scripts/java-server-down.sh`**（`--stop` 兼容）⇒ 停完记得重启。**别再手敲通配符**：仓库里只有这一个 `*-down.sh`（B216 补的，此前文档引用的脚本并不存在，照文档停服会静默失败、端口一直被占）。起服脚本现在会在端口占用时**明确报错**，不再打到旧进程误报 "ready"。
 - **`LOCAL_STORAGE_BASE_DIR` 严禁 `/tmp`**：macOS 定期清理 ⇒ 入库文档原始文件丢失且**不可恢复**（列表正常、preview 全 500、无法重处理）。
 - **H2 绿 ≠ PG 绿**：jsonb 键序、NOT NULL、DDL 默认值只在真 PG 暴露 ⇒ 验收必须连真 PG（CI 的 backend job 就是干这个）。
 - **Redis 测试会静默跳过**：14 个测试用 `assumeTrue(redis != null)`，`redis-server` 不在 PATH 就无声不测。看到 skipped 别当"全绿"。

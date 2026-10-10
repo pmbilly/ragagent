@@ -30,6 +30,19 @@ echo "    SSRF extra whitelist = ${SSRF_WHITELIST_EXTRA:-<none>}"
 echo "    log      = ${LOG}"
 
 cd "${RAGAGENT_ROOT}"
+
+# 起服前挡一道（B216，2026-10-10 实测踩到）：端口被**旧进程**占用时，新 bootRun 会启动失败
+# 退出，而下面的 wait_for_port 会**打到旧进程**上 ⇒ 脚本照样打印 "ready" ✗。
+# 后果比"起不来"更坏：旧进程正处在 §上文的陈旧 jar 状态（全端点 500），于是
+# `curl` 拿到的 500 会被误读成"刚改的代码炸了"——B215 实测把一次环境问题误判成代码 bug。
+if lsof -ti :"${JAVA_PORT}" >/dev/null 2>&1; then
+    echo "✗ 端口 ${JAVA_PORT} 已被占用 —— 旧服务仍在跑，本次启动会被它挡住："
+    lsof -ti :"${JAVA_PORT}" | sed 's/^/      pid /'
+    echo "  先停再起：bash scripts/java-server-down.sh --stop"
+    echo "  （或强制：lsof -ti :${JAVA_PORT} | xargs kill -9；README「高频坑」同款记录）"
+    exit 1
+fi
+
 SERVER_PORT="${JAVA_PORT}" \
 JWT_SECRET="${JWT_SECRET}" \
 SYSTEM_AES_KEY="${SYSTEM_AES_KEY}" \
