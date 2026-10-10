@@ -5,6 +5,13 @@
 #   scripts/java-server-up.sh
 #   SSRF_WHITELIST_EXTRA=mcp.example.com scripts/java-server-up.sh
 #
+# ⚠️ **改完代码必须重启本脚本起的服务**（2026-10-10 实测，B184）：`:boot:bootRun` 的类路径里是
+# **模块 jar**（`domains-0.0.1-SNAPSHOT.jar` 等，栈里显示为 `~[domains-…jar:na]`），而构建会
+# **就地重写**这些 jar ⇒ 运行中的 JVM 已加载的类走旧视图、**惰性加载的类直接加载不到** ⇒
+# 症状：**全端点 500** + 日志 `unhandled exception: … ClassNotFoundException /
+# NoClassDefFoundError / TypeNotPresentException`（全是本仓自己的类）。与业务代码无关，
+# 停掉重启即可；在服务运行中跑 `gradlew build` / `--rerun` 会稳定触发。
+#
 # 与 Go 版**共用同一个 dev 数据库**——这正是 e2e 的价值：H2 测不出的差异
 # （NOT NULL 零值、jsonb 键序、DDL 默认值）只会在真 PG 上暴露。
 set -euo pipefail
