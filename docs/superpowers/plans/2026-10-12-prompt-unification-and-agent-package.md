@@ -122,16 +122,25 @@ enum Position { PRE_BASE, POST_BASE, PRE_PROTOCOL, POST_PROTOCOL }
 
 ## F2（P2）：文案消副本
 
-**现状同文三处**：`EvaluationPromptDefaults`（Java 常量）与 `prompt_templates/rewrite.yaml` 逐句同文；`PluginQueryUnderstand` 内嵌改写文案；`SessionQaFallback` 第三次拼接 `SOURCE_DATA_BOUNDARY`。
+**盘点修正（2026-10-12 实测，覆盖方案初稿的判断）**：
+
+| 初稿说法 | 实测结论 |
+|---|---|
+| `EvaluationPromptDefaults` 与 yaml 逐句同文 | ✅ 成立，且是 **4 个常量**：`SUMMARY_PROMPT`≡`system_prompt.yaml#default_kb.content`、`SUMMARY_CONTEXT_TEMPLATE`≡`context_template.yaml#default_context.content`、`REWRITE_PROMPT_SYSTEM/USER`≡`rewrite.yaml#default_rewrite.content/user` |
+| `PluginQueryUnderstand:299-333` 内嵌改写文案 | ❌ **误报**：该处只做占位符渲染，文案来自 `PipelineConfig`（YAML 装载）/会话覆写，无副本 |
+| `EvaluationPromptDefaults.FALLBACK_RESPONSE`、`SUMMARY_NO_MATCH_PREFIX` 是模板副本 | ❌ **不是**：仓库内无同文模板，两者是评估专用语义（固定兜底句 / 摘要调用约定），保留常量 |
+| `SessionQaFallback:110-111` 第三次拼接 boundary | ✅ 成立，但那是**组装重复**而非文案重复 → 并入 **F5** 一次做（引入 `PromptComposer` 时消掉），F2 不动它以免制造二次搬迁 |
 
 **Files:**
-- Modify: `domains/.../evaluation/service/EvaluationPromptDefaults.java`（改为引用 `PromptSource.read("rewrite.yaml")` 同 id，删除内嵌正文）
-- Modify: `engine/.../chatpipeline/plugin/PluginQueryUnderstand.java:299-333`（内嵌文案 → 取 id）
-- Modify: `domains/.../session/service/SessionQaFallback.java:110-111`（走同一渲染器/常量，不再手工 `+ "\n\n" +`）
+- Create: `common/src/main/java/com/ragagent/common/prompt/PromptTemplates.java`（按 id 取 content/user，L1 唯一 YAML 解析点，按文件缓存）
+- Modify: `domains/src/main/java/com/ragagent/evaluation/service/EvaluationPromptDefaults.java`（4 个常量改为模板取值）
+- Create: `domains/src/test/java/com/ragagent/evaluation/service/EvaluationPromptDefaultsTest.java`（非空守门：模板改名/缺失即红）
 
-- [ ] **Step 1**: 逐处替换为"单一来源引用"，**文本逐字不变**（`diff` 逐字节核对）。
-- [ ] **Step 2**: 评估口径用例 + fallback 用例全绿。
-- [ ] **Step 3**: 全量测试 + 闸门绿 → Commit `refactor(prompt): 消三处同文副本（评估/改写/fallback 引用单一来源）`。
+- [x] **Step 1**: 逐处替换为"单一来源引用"（文本逐字不变，已用 pyyaml 逐字比对确认同文）。
+- [x] **Step 2**: `EvaluationPromptDefaultsTest` + `EvaluationContractTest`（golden `ev-post.json`）全绿 → 响应体字节不变。
+- [x] **Step 3**: `:common:test` + `spotlessCheck` 绿 → 提交见执行记录。
+
+**执行记录（2026-10-12）**：`git rev-parse` 见提交 `refactor(prompt): 评估默认值改取单一模板源`。验证：`:common:test`、`:domains:test --tests '*EvaluationPromptDefaultsTest*'`、`:boot:test --tests '*EvaluationContractTest*'`、`:common/:domains:spotlessCheck` 全绿。
 
 ## F3（P0）：守门测试（含三链路 golden 录制）
 
