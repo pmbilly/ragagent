@@ -46,8 +46,7 @@ public final class Registry {
     static final String RESOURCE_HANDLE_PROTOCOL_PROMPT = "\n\n## Resource handle protocol (system-owned)\n"
             + "Some durable resources and high-entropy Wiki slugs are represented by request-local res://NNNN handles. Wiki issues may use iN handles.\n"
             + "- Copy supplied handles exactly in links, images, and tool arguments; they refer only to the supplied resource versions.\n"
-            + "never reuse or invent a resource handle. This download convention does not apply to "
-            + "editing installed skill files.";
+            + "- Never reuse or invent a resource handle: a handle that was not supplied with this request is not valid.";
 
     final SourceRegistry sources;
     final ResourceRegistry resources;
