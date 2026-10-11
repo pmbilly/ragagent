@@ -63,6 +63,7 @@ import com.ragagent.common.tenant.WebSearchConfig;
 import com.ragagent.knowledge.storage.TenantFileStorage;
 import com.ragagent.tenant.Tenant;
 import com.ragagent.websearch.service.WebSearchService;
+import com.ragagent.retrieval.domain.WebSearchRequest;
 
 /**
  * agent 引擎检索工具族的接缝适配（2026-09-23 接线批）。
@@ -356,10 +357,25 @@ public class AgentToolBackends {
         };
     }
 
-    /** 执行配置直传的检索后端。 */
+    /** 执行后端：把 L2 请求载荷适配成 websearch 域的执行配置（域边界适配，方向 = 域 → L2）。 */
     public WebSearchTool.WebSearchBackend webSearchBackend() {
-        return (tenantId, providerId, config, query) ->
-                webSearchService.search(tenantId, providerId, config, query);
+        return (tenantId, providerId, request, query) ->
+                webSearchService.search(tenantId, providerId, toServiceConfig(request), query);
+    }
+
+    /** L2 {@link WebSearchRequest} → websearch 域执行配置（域内形状不外泄给工具）。 */
+    private static WebSearchService.WebSearchConfig toServiceConfig(WebSearchRequest request) {
+        WebSearchService.WebSearchConfig cfg = new WebSearchService.WebSearchConfig();
+        cfg.provider = request.provider();
+        cfg.apiKey = request.apiKey();
+        cfg.maxResults = request.maxResults();
+        cfg.includeDate = request.includeDate();
+        cfg.blacklist = new ArrayList<>(request.blacklist());
+        cfg.embeddingModelId = request.embeddingModelId();
+        cfg.documentFragments = request.documentFragments();
+        cfg.proxyUrl = request.proxyUrl();
+        cfg.filters = request.filters();
+        return cfg;
     }
 
     /**
@@ -368,7 +384,7 @@ public class AgentToolBackends {
      * 归一化（applyEffective）：maxResults≤0→10、
      * blacklist null→[]。
      */
-    private WebSearchService.WebSearchConfig loadTenantWebSearchConfig() {
+    private WebSearchConfig loadTenantWebSearchConfig() {
         Long tid = TenantContext.currentTenantId();
         if (tid == null || tid == 0) {
             return null;
@@ -383,18 +399,7 @@ public class AgentToolBackends {
                     tenant.getWebSearchConfig(),
                     WebSearchConfig.class);
             cfg.applyEffective();
-            WebSearchService.WebSearchConfig out =
-                    new WebSearchService.WebSearchConfig();
-            out.provider = cfg.getProvider();
-            out.apiKey = cfg.getApiKey();
-            out.maxResults = cfg.getMaxResults();
-            out.includeDate = cfg.isIncludeDate();
-            out.blacklist = cfg.getBlacklist() == null
-                    ? new ArrayList<>() : new ArrayList<>(cfg.getBlacklist());
-            out.embeddingModelId = cfg.getEmbeddingModelId();
-            out.documentFragments = cfg.getDocumentFragments();
-            out.proxyUrl = cfg.getProxyUrl();
-            return out;
+            return cfg;
         } catch (RuntimeException | com.fasterxml.jackson.core.JacksonException e) {
             // 租户/配置不可得即走缺省
             return null;

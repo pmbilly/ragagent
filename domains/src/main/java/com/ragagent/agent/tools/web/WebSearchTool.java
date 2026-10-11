@@ -19,7 +19,8 @@ import com.ragagent.agent.tools.BaseTool;
 import com.ragagent.agent.tools.ToolDefinitions;
 import com.ragagent.agent.tools.ToolOutput;
 import com.ragagent.agent.tools.ToolRequest;
-import com.ragagent.websearch.service.WebSearchService;
+import com.ragagent.common.tenant.WebSearchConfig;
+import com.ragagent.retrieval.domain.WebSearchRequest;
 
 /**
  * web_search 工具。
@@ -82,15 +83,14 @@ public class WebSearchTool extends BaseTool {
             - Do not include private source content or credentials in public search queries.""";
 
     /**
-     * 搜索执行接缝。config 用
-     * {@link com.ragagent.websearch.service.WebSearchService.WebSearchConfig}——
-     * 租户配置的执行形状（含 per-call 的 filters 字段）。
+     * 搜索执行接缝：请求用 L2 的 {@link WebSearchRequest}（租户段 + per-call 的
+     * {@link WebSearchFilters}）；执行配置的域内形状留在 websearch 域，工具不反向依赖业务域。
      */
     @FunctionalInterface
     public interface WebSearchBackend {
         /** 失败抛 RuntimeException（工具折叠为 success=false + "web search failed: …"）。 */
         List<WebSearchResult> search(long tenantId, String providerId,
-                WebSearchService.WebSearchConfig config,
+                WebSearchRequest request,
                 String query);
     }
 
@@ -98,12 +98,12 @@ public class WebSearchTool extends BaseTool {
     private final int maxResults;
     private final String providerId;
     private final LongSupplier tenantId;
-    private final WebSearchService.WebSearchConfig tenantConfig;
+    private final WebSearchConfig tenantConfig;
     private WebFetchTool pages;
 
     public WebSearchTool(WebSearchBackend webSearchService, int maxResults, String providerId,
             LongSupplier tenantId,
-            WebSearchService.WebSearchConfig tenantConfig) {
+            WebSearchConfig tenantConfig) {
         super(ToolDefinitions.TOOL_WEB_SEARCH,
                 formatDescription(maxResults), SCHEMA_JSON);
         int effective = maxResults <= 0 ? DEFAULT_MAX_RESULTS : maxResults;
@@ -112,9 +112,7 @@ public class WebSearchTool extends BaseTool {
         this.maxResults = effective;
         this.providerId = providerId == null ? "" : providerId;
         this.tenantId = tenantId;
-        this.tenantConfig = tenantConfig == null
-                ? new WebSearchService.WebSearchConfig()
-                : tenantConfig;
+        this.tenantConfig = tenantConfig == null ? new WebSearchConfig() : tenantConfig;
         // 构造内嵌的页面抓取器（可用 withPageReader 共享 web_fetch 的实例）
         this.pages = new WebFetchTool();
     }
@@ -172,24 +170,23 @@ public class WebSearchTool extends BaseTool {
             return fail("workspace ID not found in context");
         }
 
-        // 生效配置：EffectiveWebSearchConfig 拷贝（租户为 null → 缺省），再覆写
-        // maxResults/filters；压缩强制 none——agent 显式读页，RAG 压缩属快答管线
+        // 生效请求：租户段（L1 配置，null → 缺省）+ 本次覆写的 maxResults/filters；
+        // 压缩强制 none——agent 显式读页，RAG 压缩属快答管线
         // （CompressionMethod 在 search 执行路径不被消费，仅声明）。
-        WebSearchService.WebSearchConfig searchConfig =
-                new WebSearchService.WebSearchConfig();
-        searchConfig.provider = tenantConfig.provider;
-        searchConfig.apiKey = tenantConfig.apiKey;
-        searchConfig.includeDate = tenantConfig.includeDate;
-        searchConfig.blacklist = new ArrayList<>(tenantConfig.blacklist);
-        searchConfig.embeddingModelId = tenantConfig.embeddingModelId;
-        searchConfig.documentFragments = tenantConfig.documentFragments;
-        searchConfig.proxyUrl = tenantConfig.proxyUrl;
-        searchConfig.maxResults = effectiveMax;
-        searchConfig.filters = filters;
+        WebSearchRequest searchRequest = new WebSearchRequest(
+                tenantConfig.getProvider(),
+                tenantConfig.getApiKey(),
+                effectiveMax,
+                tenantConfig.isIncludeDate(),
+                tenantConfig.getBlacklist(),
+                tenantConfig.getEmbeddingModelId(),
+                tenantConfig.getDocumentFragments(),
+                tenantConfig.getProxyUrl(),
+                filters);
 
         List<WebSearchResult> webResults;
         try {
-            webResults = webSearchService.search(tenant, providerId, searchConfig, query);
+            webResults = webSearchService.search(tenant, providerId, searchRequest, query);
         } catch (RuntimeException e) {
             String message = e.getMessage() == null ? e.toString() : e.getMessage();
             return fail("web search failed: " + message);
