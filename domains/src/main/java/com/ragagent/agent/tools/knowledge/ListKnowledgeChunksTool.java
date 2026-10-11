@@ -14,7 +14,7 @@ import com.ragagent.agent.tools.DocChunkSupport.ImageInfoView;
 import com.ragagent.agent.tools.DocChunkSupport.KnowledgeInfoReader;
 import com.ragagent.agent.tools.DocChunkSupport.KnowledgeInfoView;
 import com.ragagent.agent.tools.DocChunkSupport.PagedChunks;
-import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.agent.tools.BaseTool;
 import com.ragagent.agent.tools.DocChunkSupport;
 import com.ragagent.agent.tools.runtime.SearchAuth;
@@ -79,13 +79,13 @@ public class ListKnowledgeChunksTool extends BaseTool {
                     + "Full chunk content. FAQ entries include <faq> with <answer> from metadata.";
 
     private final KnowledgeInfoReader knowledgeReader;
-    private final Function<String, Chunk> chunkById;
+    private final Function<String, ChunkFacts> chunkById;
     private final PagedChunks pagedChunks;
     private final ImageInfoCollector imageCollector;
     private final SearchTarget.SearchTargets searchTargets;
 
     public ListKnowledgeChunksTool(KnowledgeInfoReader knowledgeReader,
-            Function<String, Chunk> chunkById, PagedChunks pagedChunks,
+            Function<String, ChunkFacts> chunkById, PagedChunks pagedChunks,
             ImageInfoCollector imageCollector, SearchTarget.SearchTargets searchTargets) {
         super(ToolDefinitions.TOOL_LIST_KNOWLEDGE_CHUNKS, DESCRIPTION, SCHEMA_JSON);
         this.knowledgeReader = knowledgeReader;
@@ -151,7 +151,7 @@ public class ListKnowledgeChunksTool extends BaseTool {
         if (result == null || result.chunks() == null) {
             return failure("chunk query returned no data");
         }
-        List<Chunk> chunks = result.chunks();
+        List<ChunkFacts> chunks = result.chunks();
         long totalChunks = result.total();
         int fetched = chunks.size();
 
@@ -187,23 +187,23 @@ public class ListKnowledgeChunksTool extends BaseTool {
 
         List<Map<String, Object>> formattedChunks = new ArrayList<>();
         for (int idx = 0; idx < chunks.size(); idx++) {
-            Chunk c = chunks.get(idx);
+            ChunkFacts c = chunks.get(idx);
             Map<String, Object> chunkData = new LinkedHashMap<>();
             chunkData.put("seq", idx + 1);
-            chunkData.put("chunkId", c.getId());
-            chunkData.put("chunkIndex", c.getChunkIndex());
-            chunkData.put("content", nz(c.getContent()));
-            chunkData.put("chunkType", c.getChunkType());
-            chunkData.put("knowledgeId", nz(c.getKnowledgeId()));
-            chunkData.put("knowledgeBase", nz(c.getKnowledgeBaseId()));
-            chunkData.put("startAt", c.getStartAt());
-            chunkData.put("endAt", c.getEndAt());
-            chunkData.put("parentChunkId", nz(c.getParentChunkId()));
+            chunkData.put("chunkId", c.id());
+            chunkData.put("chunkIndex", c.chunkIndex());
+            chunkData.put("content", nz(c.content()));
+            chunkData.put("chunkType", c.chunkType());
+            chunkData.put("knowledgeId", nz(c.knowledgeId()));
+            chunkData.put("knowledgeBase", nz(c.knowledgeBaseId()));
+            chunkData.put("startAt", c.startAt());
+            chunkData.put("endAt", c.endAt());
+            chunkData.put("parentChunkId", nz(c.parentChunkId()));
 
             FaqSnippet.appendFaqChunkData(chunkData, c);
             FaqSnippet.normalizeFaqChunkDataMap(chunkData, c);
 
-            String imageInfo = c.getImageInfo();
+            String imageInfo = c.imageInfo();
             if (imageInfo != null && !imageInfo.isEmpty()) {
                 List<ImageInfoView> imageInfos = DocChunkSupport.parseImageInfoList(imageInfo);
                 if (imageInfos != null && !imageInfos.isEmpty()) {
@@ -250,7 +250,7 @@ public class ListKnowledgeChunksTool extends BaseTool {
 
     /** faq_id / chunk_id 单块路径。 */
     private ToolResult executeByChunkID(String chunkID) {
-        Chunk chunk;
+        ChunkFacts chunk;
         try {
             chunk = SearchAuth.authorizeDomainChunkInSearchTargets(searchTargets, chunkID,
                     chunkById, DocChunkSupport.asScopeReader(knowledgeReader));
@@ -261,48 +261,51 @@ public class ListKnowledgeChunksTool extends BaseTool {
             return failure("chunk is not accessible: chunk " + chunkID + " not found: empty result");
         }
 
-        List<Chunk> chunks = List.of(chunk);
-        String imageInfo = chunk.getImageInfo();
+        List<ChunkFacts> chunks = List.of(chunk);
+        String imageInfo = chunk.imageInfo();
         if (imageInfo == null || imageInfo.isEmpty()) {
             long effectiveTenantID = searchTargets == null
                     ? 0
-                    : searchTargets.getTenantIdForKb(chunk.getKnowledgeBaseId());
+                    : searchTargets.getTenantIdForKb(chunk.knowledgeBaseId());
             if (effectiveTenantID > 0 && imageCollector != null) {
                 Map<String, String> infoMap = imageCollector.collect(effectiveTenantID,
-                        List.of(chunk.getId()));
+                        List.of(chunk.id()));
                 if (infoMap != null) {
-                    String merged = infoMap.get(chunk.getId());
+                    String merged = infoMap.get(chunk.id());
                     if (merged != null && !merged.isEmpty()) {
-                        chunk.setImageInfo(merged);
+                        // L1 载荷不可变：富化 = 复制-替换
+                        chunk = DocChunkSupport.withImageInfo(chunk, merged);
+                        chunks = List.of(chunk);
                     }
                 }
-            }        }
+            }
+        }
 
-        String knowledgeTitle = lookupKnowledgeTitle(chunk.getKnowledgeId());
-        String output = buildOutput(chunk.getKnowledgeId(), knowledgeTitle, 1, 1, chunks);
+        String knowledgeTitle = lookupKnowledgeTitle(chunk.knowledgeId());
+        String output = buildOutput(chunk.knowledgeId(), knowledgeTitle, 1, 1, chunks);
 
         Map<String, Object> chunkData = new LinkedHashMap<>();
         chunkData.put("seq", 1);
-        chunkData.put("chunkId", chunk.getId());
-        chunkData.put("chunkIndex", chunk.getChunkIndex());
-        chunkData.put("content", nz(chunk.getContent()));
-        chunkData.put("chunkType", chunk.getChunkType());
-        chunkData.put("knowledgeId", nz(chunk.getKnowledgeId()));
-        chunkData.put("knowledgeBase", nz(chunk.getKnowledgeBaseId()));
+        chunkData.put("chunkId", chunk.id());
+        chunkData.put("chunkIndex", chunk.chunkIndex());
+        chunkData.put("content", nz(chunk.content()));
+        chunkData.put("chunkType", chunk.chunkType());
+        chunkData.put("knowledgeId", nz(chunk.knowledgeId()));
+        chunkData.put("knowledgeBase", nz(chunk.knowledgeBaseId()));
         FaqSnippet.appendFaqChunkData(chunkData, chunk);
         FaqSnippet.normalizeFaqChunkDataMap(chunkData, chunk);
         List<Map<String, Object>> formattedChunks = List.of(chunkData);
 
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("displayType", "knowledge_chunks_list");
-        data.put("knowledgeId", chunk.getKnowledgeId());
+        data.put("knowledgeId", chunk.knowledgeId());
         data.put("knowledgeTitle", knowledgeTitle);
         data.put("totalChunks", 1L);
         data.put("fetchedChunks", 1);
         data.put("page", 1);
         data.put("pageSize", 1);
         data.put("chunks", formattedChunks);
-        data.put("faqId", chunk.getId());
+        data.put("faqId", chunk.id());
         data.put("singleChunk", true);
         String q = FaqSnippet.faqStandardQuestion(chunk);
         if (q != null && !q.isEmpty()) {
@@ -335,7 +338,7 @@ public class ListKnowledgeChunksTool extends BaseTool {
 
     /** XML 输出。 */
     private String buildOutput(String knowledgeID, String knowledgeTitle, long total,
-            int fetched, List<Chunk> chunks) {
+            int fetched, List<ChunkFacts> chunks) {
         StringBuilder b = new StringBuilder();
 
         String titleAttr = "";
@@ -350,8 +353,8 @@ public class ListKnowledgeChunksTool extends BaseTool {
             return b.toString();
         }
 
-        for (Chunk c : chunks) {
-            if ("faq".equals(c.getChunkType())) {
+        for (ChunkFacts c : chunks) {
+            if ("faq".equals(c.chunkType())) {
                 FaqSnippet.writeFaqEntryXml(b, c);
                 writeChunkImagesMarkdown(b, c);
                 continue;
@@ -360,12 +363,12 @@ public class ListKnowledgeChunksTool extends BaseTool {
             String q = FaqSnippet.faqStandardQuestion(c);
             if (q != null && !q.isEmpty()) {
                 b.append(String.format("<chunk chunkId=\"%s\" chunkIndex=\"%d\" type=\"%s\" question=\"%s\">\n",
-                        c.getId(), c.getChunkIndex(), c.getChunkType(), FaqSnippet.xmlEscape(q)));
+                        c.id(), c.chunkIndex(), c.chunkType(), FaqSnippet.xmlEscape(q)));
             } else {
                 b.append(String.format("<chunk chunkId=\"%s\" chunkIndex=\"%d\" type=\"%s\">\n",
-                        c.getId(), c.getChunkIndex(), c.getChunkType()));
+                        c.id(), c.chunkIndex(), c.chunkType()));
             }
-            b.append(String.format("<content>%s</content>\n", summarizeContent(c.getContent())));
+            b.append(String.format("<content>%s</content>\n", summarizeContent(c.content())));
             writeChunkImagesMarkdown(b, c);
             b.append("</chunk>\n");
         }
@@ -379,11 +382,11 @@ public class ListKnowledgeChunksTool extends BaseTool {
     }
 
     /** 逐图 markdown + "\n"。 */
-    private static void writeChunkImagesMarkdown(StringBuilder b, Chunk c) {
+    private static void writeChunkImagesMarkdown(StringBuilder b, ChunkFacts c) {
         if (c == null) {
             return;
         }
-        String imageInfo = c.getImageInfo();
+        String imageInfo = c.imageInfo();
         if (imageInfo == null || imageInfo.isEmpty()) {
             return;
         }

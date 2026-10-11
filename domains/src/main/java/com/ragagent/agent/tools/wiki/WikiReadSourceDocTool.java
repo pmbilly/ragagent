@@ -15,7 +15,7 @@ import com.ragagent.agent.tools.DocChunkSupport.ImageInfoCollector;
 import com.ragagent.agent.tools.DocChunkSupport.KnowledgeInfoReader;
 import com.ragagent.agent.tools.DocChunkSupport.KnowledgeInfoView;
 import com.ragagent.agent.tools.DocChunkSupport.PagedChunks;
-import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.agent.tools.BaseTool;
 import com.ragagent.agent.tools.DocChunkSupport;
 import com.ragagent.agent.tools.runtime.SearchAuth;
@@ -148,7 +148,7 @@ public class WikiReadSourceDocTool extends BaseTool {
         long totalChunks = 0;
         boolean reachedMax = false;
 
-        Chunk prevChunk = null;
+        ChunkFacts prevChunk = null;
         boolean forceOutputNext = false;
         Set<Integer> outputtedIndices = new HashSet<>();
 
@@ -156,14 +156,14 @@ public class WikiReadSourceDocTool extends BaseTool {
         final String knowledgeBaseId = knowledge.knowledgeBaseId();
         final long tenantId = knowledge.tenantId();
 
-        java.util.function.BiConsumer<Chunk, String> appendFormattedChunk = (chunk, content) -> {
+        java.util.function.BiConsumer<ChunkFacts, String> appendFormattedChunk = (chunk, content) -> {
             if (chunk == null) {
                 return;
             }
             Map<String, Object> m = new LinkedHashMap<>();
-            m.put("chunkId", chunk.getId());
-            m.put("chunkIndex", chunk.getChunkIndex());
-            m.put("chunkType", chunk.getChunkType());
+            m.put("chunkId", chunk.id());
+            m.put("chunkIndex", chunk.chunkIndex());
+            m.put("chunkType", chunk.chunkType());
             m.put("content", content);
             m.put("knowledgeId", knowledgeID);
             m.put("knowledgeBase", knowledgeBaseId);
@@ -184,7 +184,7 @@ public class WikiReadSourceDocTool extends BaseTool {
             } catch (RuntimeException e) {
                 return failure("Failed to list chunks: " + e.getMessage());
             }
-            List<Chunk> chunks = result == null ? null : result.chunks();
+            List<ChunkFacts> chunks = result == null ? null : result.chunks();
             long total = result == null ? 0 : result.total();
 
             if (page == 1) {
@@ -197,8 +197,8 @@ public class WikiReadSourceDocTool extends BaseTool {
 
             DocChunkSupport.enrichChunkImageInfo(imageCollector, tenantId, chunks);
 
-            for (Chunk c : chunks) {
-                int chunkNum = c.getChunkIndex() + 1;
+            for (ChunkFacts c : chunks) {
+                int chunkNum = c.chunkIndex() + 1;
                 String chunkContent = DocChunkSupport.enrichChunkContent(c);
 
                 if (hasRangeFinal) {
@@ -222,34 +222,34 @@ public class WikiReadSourceDocTool extends BaseTool {
                     matchCount++;
 
                     if (reFinal != null && prevChunk != null
-                            && !outputtedIndices.contains(prevChunk.getChunkIndex())) {
+                            && !outputtedIndices.contains(prevChunk.chunkIndex())) {
                         String prevContent = DocChunkSupport.enrichChunkContent(prevChunk);
-                        chunksOutput.append("<chunk index=\"").append(prevChunk.getChunkIndex() + 1)
+                        chunksOutput.append("<chunk index=\"").append(prevChunk.chunkIndex() + 1)
                                 .append("\" type=\"context_before\">\n").append(prevContent)
                                 .append("\n</chunk>\n");
                         appendFormattedChunk.accept(prevChunk, prevContent);
-                        outputtedIndices.add(prevChunk.getChunkIndex());
+                        outputtedIndices.add(prevChunk.chunkIndex());
                     }
 
-                    if (!outputtedIndices.contains(c.getChunkIndex())) {
+                    if (!outputtedIndices.contains(c.chunkIndex())) {
                         String matchAttr = reFinal != null ? " type=\"match\"" : "";
-                        chunksOutput.append("<chunk index=\"").append(c.getChunkIndex() + 1)
+                        chunksOutput.append("<chunk index=\"").append(c.chunkIndex() + 1)
                                 .append("\"").append(matchAttr).append(">\n")
                                 .append(chunkContent).append("\n</chunk>\n");
                         appendFormattedChunk.accept(c, chunkContent);
-                        outputtedIndices.add(c.getChunkIndex());
+                        outputtedIndices.add(c.chunkIndex());
                     }
 
                     if (reFinal != null) {
                         forceOutputNext = true;
                     }
                 } else if (forceOutputNext) {
-                    if (!outputtedIndices.contains(c.getChunkIndex())) {
-                        chunksOutput.append("<chunk index=\"").append(c.getChunkIndex() + 1)
+                    if (!outputtedIndices.contains(c.chunkIndex())) {
+                        chunksOutput.append("<chunk index=\"").append(c.chunkIndex() + 1)
                                 .append("\" type=\"context_after\">\n").append(chunkContent)
                                 .append("\n</chunk>\n");
                         appendFormattedChunk.accept(c, chunkContent);
-                        outputtedIndices.add(c.getChunkIndex());
+                        outputtedIndices.add(c.chunkIndex());
                     }
                     forceOutputNext = false;
                 }

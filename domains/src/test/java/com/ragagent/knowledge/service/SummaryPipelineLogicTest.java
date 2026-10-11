@@ -71,7 +71,7 @@ class SummaryPipelineLogicTest {
     /** 本测试只读 id/parentChunkId/chunkType/enabled/imageInfo 五个字段。 */
     private static ChunkFacts chunk(String id, String parentId, String type,
                                     boolean enabled, String imageInfoJson) {
-        return new ChunkFacts(id, null, null, type, null, enabled, 0, 0, 0, 0,
+        return new ChunkFacts(id, null, null, null, type, null, enabled, 0, 0, 0, 0,
                 parentId, null, null, null, null, imageInfoJson);
     }
 

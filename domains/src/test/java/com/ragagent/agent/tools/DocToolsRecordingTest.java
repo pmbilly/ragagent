@@ -22,6 +22,8 @@ import com.ragagent.agent.tools.knowledge.GetDocumentInfoTool;
 import com.ragagent.agent.tools.knowledge.ListKnowledgeChunksTool;
 import com.ragagent.agent.tools.wiki.WikiReadSourceDocTool;
 import com.ragagent.common.retrieval.SearchTarget;
+import com.ragagent.common.knowledge.ChunkFacts;
+import com.ragagent.knowledge.service.ChunkPortAdapter;
 
 /**
  * 4.5b 回放：wiki_read_source_doc / get_document_info / list_knowledge_chunks
@@ -78,7 +80,7 @@ class DocToolsRecordingTest {
                 return new ChunkPage(List.of(), total);
             }
             int end = Math.min(start + pageSize, all.size());
-            return new ChunkPage(new ArrayList<>(all.subList(start, end)), total);
+            return new ChunkPage(ChunkPortAdapter.factsAll(all.subList(start, end)), total);
         }
     }
 
@@ -329,9 +331,9 @@ class DocToolsRecordingTest {
         repo.byKnowledge.put("ds3", List.of());
         repo.totals.put("ds3", 3L);
 
-        Map<String, Chunk> byID = new LinkedHashMap<>();
-        byID.put("c1", c1);
-        byID.put("c2", c2);
+        Map<String, ChunkFacts> byID = new LinkedHashMap<>();
+        byID.put("c1", ChunkPortAdapter.factsOf(c1));
+        byID.put("c2", ChunkPortAdapter.factsOf(c2));
 
         GetDocumentInfoTool tool = new GetDocumentInfoTool(kn, byID::get, repo, kb1Targets());
 
@@ -372,9 +374,9 @@ class DocToolsRecordingTest {
         repo.byKnowledge.put("d0", List.of());
         repo.totals.put("d0", 0L);
 
-        Map<String, Chunk> byID = new LinkedHashMap<>();
-        byID.put("c1", c1);
-        byID.put("g9", textChunk("g9", "d1", "kb1", 5, "单块内容"));
+        Map<String, ChunkFacts> byID = new LinkedHashMap<>();
+        byID.put("c1", ChunkPortAdapter.factsOf(c1));
+        byID.put("g9", ChunkPortAdapter.factsOf(textChunk("g9", "d1", "kb1", 5, "单块内容")));
 
         ListKnowledgeChunksTool tool = new ListKnowledgeChunksTool(kn, byID::get, repo,
                 new FakeImageCollector(), kb1Targets());

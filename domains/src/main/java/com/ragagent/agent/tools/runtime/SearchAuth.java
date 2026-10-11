@@ -8,7 +8,7 @@ import java.util.function.Function;
 
 import com.ragagent.common.retrieval.SearchTarget;
 import com.ragagent.common.retrieval.SearchTarget.SearchTargets;
-import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.ChunkFacts;
 
 /**
  * scope 授权。
@@ -195,26 +195,26 @@ public final class SearchAuth {
     }
 
     /**
-     * chunk 授权（knowledge 域 Chunk 重载；FAQ 元数据等
+     * chunk 授权（knowledge 域 ChunkFacts 重载；FAQ 元数据等
      * 需要完整 chunk 的工具用）。chunkById 返回 null = 未找到（empty result）。
      */
-    public static Chunk authorizeDomainChunkInSearchTargets(
+    public static ChunkFacts authorizeDomainChunkInSearchTargets(
             SearchTargets searchTargets, String chunkId,
-            java.util.function.Function<String, Chunk> chunkById,
+            java.util.function.Function<String, ChunkFacts> chunkById,
             KnowledgeScopeReader knowledgeService) {
-        Chunk[] holder = new Chunk[1];
+        ChunkFacts[] holder = new ChunkFacts[1];
         authorizeChunkIdentity(searchTargets, chunkId,
                 () -> {
                     if (chunkById == null) {
                         return null;
                     }
-                    Chunk c = chunkById.apply(chunkId);
+                    ChunkFacts c = chunkById.apply(chunkId);
                     if (c == null) {
                         return null;
                     }
                     holder[0] = c;
-                    return new ChunkIdentity(c.getId(), c.getKnowledgeId(), c.getKnowledgeBaseId(),
-                            c.isIsEnabled());
+                    return new ChunkIdentity(c.id(), c.knowledgeId(), c.knowledgeBaseId(),
+                            c.enabled());
                 },
                 chunkById == null, knowledgeService);
         return holder[0];

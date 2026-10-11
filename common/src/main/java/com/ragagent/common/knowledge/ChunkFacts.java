@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 public record ChunkFacts(
         String id,
         String knowledgeId,
+        String knowledgeBaseId,
         String content,
         String chunkType,
         String indexStatus,

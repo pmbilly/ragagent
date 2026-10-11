@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
 
-import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.FaqChunkMetadata;
 
 /**
@@ -117,7 +117,7 @@ public final class FaqSnippet {
      * 顶层 FAQ 条目（list_knowledge_chunks 用，不包 <chunk>）。
      * 元数据缺失时若有标准问题则作为 question 属性 + <question> 子元素呈现。
      */
-    public static void writeFaqEntryXml(StringBuilder b, Chunk c) {
+    public static void writeFaqEntryXml(StringBuilder b, ChunkFacts c) {
         if (c == null || !isFaqChunk(c)) {
             return;
         }
@@ -128,8 +128,8 @@ public final class FaqSnippet {
         if (!q.isEmpty()) {
             questionAttr = " question=\"" + xmlEscape(q) + "\"";
         }
-        b.append("<faq faqId=\"").append(xmlEscape(c.getId())).append("\" index=\"")
-                .append(c.getChunkIndex()).append("\"").append(questionAttr).append(">\n");
+        b.append("<faq faqId=\"").append(xmlEscape(c.id())).append("\" index=\"")
+                .append(c.chunkIndex()).append("\"").append(questionAttr).append(">\n");
 
         if (!faqFieldsEmpty(meta)) {
             writeFaqFieldsXml(b, meta);
@@ -144,18 +144,18 @@ public final class FaqSnippet {
      * JSON 载荷里用 faq_id / index 代替 chunk_id / chunk_index
      * （非 FAQ chunk 或 map 为 null 时不做）。
      */
-    public static void normalizeFaqChunkDataMap(java.util.Map<String, Object> chunkData, Chunk c) {
+    public static void normalizeFaqChunkDataMap(java.util.Map<String, Object> chunkData, ChunkFacts c) {
         if (c == null || !isFaqChunk(c) || chunkData == null) {
             return;
         }
-        chunkData.put("faqId", c.getId());
-        chunkData.put("index", c.getChunkIndex());
+        chunkData.put("faqId", c.id());
+        chunkData.put("index", c.chunkIndex());
         chunkData.remove("chunkId");
         chunkData.remove("chunkIndex");
     }
 
     /** FAQ 元数据附加进结构化结果 map。 */
-    public static void appendFaqChunkData(java.util.Map<String, Object> chunkData, Chunk c) {
+    public static void appendFaqChunkData(java.util.Map<String, Object> chunkData, ChunkFacts c) {
         if (c == null || !isFaqChunk(c)) {
             return;
         }
@@ -192,7 +192,7 @@ public final class FaqSnippet {
     /**
      * grep_chunks 正则命中的 "Q: … | A: …" 摘要（compiled 与 patterns 一一对应，null 元素跳过）。
      */
-    public static String faqMatchSnippet(Chunk chunk, List<java.util.regex.Pattern> compiled) {
+    public static String faqMatchSnippet(ChunkFacts chunk, List<java.util.regex.Pattern> compiled) {
         if (chunk == null) {
             return "";
         }
@@ -341,21 +341,21 @@ public final class FaqSnippet {
 
     // ---- 依赖 knowledge 域的适配 ----
 
-    static boolean isFaqChunk(Chunk c) {
-        return "faq".equals(c.getChunkType());
+    static boolean isFaqChunk(ChunkFacts c) {
+        return "faq".equals(c.chunkType());
     }
 
     /**
      * chunk 元数据解析（空 metadata → null；解析失败 → null；
      * 解析后做基础清理）。
      */
-    static FaqChunkMetadata faqMetadata(Chunk c) {
+    static FaqChunkMetadata faqMetadata(ChunkFacts c) {
         JsonNodeLikeAdapter adapter = new JsonNodeLikeAdapter();
         return adapter.read(c);
     }
 
     /** 标准问题（trim 后；非 FAQ/无元数据为空串）。 */
-    public static String faqStandardQuestion(Chunk c) {
+    public static String faqStandardQuestion(ChunkFacts c) {
         if (c == null || !isFaqChunk(c)) {
             return "";
         }
@@ -407,8 +407,8 @@ public final class FaqSnippet {
 
     /** chunk.metadata(JsonNode) → FaqChunkMetadata 的适配（isolated 以隔离 knowledge 域类型）。 */
     private static final class JsonNodeLikeAdapter {
-        FaqChunkMetadata read(Chunk c) {
-            com.fasterxml.jackson.databind.JsonNode node = c.getMetadata();
+        FaqChunkMetadata read(ChunkFacts c) {
+            com.fasterxml.jackson.databind.JsonNode node = c.metadata();
             if (node == null || node.isNull() || node.isMissingNode() || node.isEmpty()) {
                 return null;
             }

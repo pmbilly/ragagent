@@ -100,7 +100,7 @@ class AgentToolBackendsDbTest {
     void pagedChunksAndTotals() {
         var page = backends.pagedChunks().listPaged(TENANT, "atb-k1", 1, 10);
         assertThat(page.total()).isEqualTo(1);
-        assertThat(page.chunks()).extracting(c -> c.getId()).containsExactly("atb-c1");
+        assertThat(page.chunks()).extracting(c -> c.id()).containsExactly("atb-c1");
         assertThat(backends.chunkInfoBackend().totalChunks(TENANT, "atb-k1")).isEqualTo(1);
         assertThat(backends.chunkInfoBackend().faqChunkById("atb-c1")).isNotNull();
     }

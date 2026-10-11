@@ -7,7 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.ChunkFacts;
 
 /**
  * wiki_read_source_doc / get_document_info / list_knowledge_chunks 三工具共享的
@@ -66,7 +66,7 @@ public final class DocChunkSupport {
     }
 
     /** 一页 chunk 结果。 */
-    public record ChunkPage(List<Chunk> chunks, long total) {
+    public record ChunkPage(List<ChunkFacts> chunks, long total) {
     }
 
     /** 分页取 chunk 接缝（为 null = 服务不可用）。 */
@@ -192,9 +192,9 @@ public final class DocChunkSupport {
     }
 
     /** 内容富化：content + 每个非空图片 markdown（各前置 "\n"）。 */
-    public static String enrichChunkContent(Chunk c) {
-        String content = c.getContent() == null ? "" : c.getContent();
-        String imageInfo = c.getImageInfo();
+    public static String enrichChunkContent(ChunkFacts c) {
+        String content = c.content() == null ? "" : c.content();
+        String imageInfo = c.imageInfo();
         if (imageInfo != null && !imageInfo.isEmpty()) {
             List<ImageInfoView> infos = parseImageInfoList(imageInfo);
             if (infos != null && !infos.isEmpty()) {
@@ -215,15 +215,15 @@ public final class DocChunkSupport {
      * 给 ImageInfo 为空的父 chunk 补图（已有非空的跳过）。
      * collector 为 null → 直接返回（服务不可用语义）。
      */
-    public static void enrichChunkImageInfo(ImageInfoCollector collector, long tenantId, List<Chunk> chunks) {
+    public static void enrichChunkImageInfo(ImageInfoCollector collector, long tenantId, List<ChunkFacts> chunks) {
         if (chunks == null || chunks.isEmpty() || collector == null) {
             return;
         }
         List<String> ids = new ArrayList<>();
-        for (Chunk c : chunks) {
-            String info = c.getImageInfo();
-            if ((info == null || info.isEmpty()) && c.getId() != null && !c.getId().isEmpty()) {
-                ids.add(c.getId());
+        for (ChunkFacts c : chunks) {
+            String info = c.imageInfo();
+            if ((info == null || info.isEmpty()) && c.id() != null && !c.id().isEmpty()) {
+                ids.add(c.id());
             }
         }
         if (ids.isEmpty()) {
@@ -233,16 +233,25 @@ public final class DocChunkSupport {
         if (infoMap == null || infoMap.isEmpty()) {
             return;
         }
-        for (Chunk c : chunks) {
-            String info = c.getImageInfo();
+        for (int i = 0; i < chunks.size(); i++) {
+            ChunkFacts c = chunks.get(i);
+            String info = c.imageInfo();
             if (info != null && !info.isEmpty()) {
                 continue;
             }
-            String merged = infoMap.get(c.getId());
+            String merged = infoMap.get(c.id());
             if (merged != null && !merged.isEmpty()) {
-                c.setImageInfo(merged);
+                chunks.set(i, withImageInfo(c, merged));
             }
         }
+    }
+
+    /** 复制并替换 imageInfo（L1 载荷不可变，富化走"复制-替换"）。 */
+    public static ChunkFacts withImageInfo(ChunkFacts c, String imageInfo) {
+        return new ChunkFacts(c.id(), c.knowledgeId(), c.knowledgeBaseId(), c.content(), c.chunkType(),
+                c.indexStatus(), c.enabled(), c.chunkIndex(), c.startAt(), c.endAt(), c.contentRevision(),
+                c.parentChunkId(), c.preChunkId(), c.nextChunkId(), c.relationChunks(), c.metadata(),
+                imageInfo);
     }
 
     /** metadata 视图：空 metadata → 空 map；非字符串值按标量形态转文本；解析失败 → null。 */

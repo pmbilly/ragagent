@@ -18,7 +18,7 @@ import com.ragagent.agent.tools.knowledge.KnowledgeSearchTool.KnowledgeSearchBac
 import com.ragagent.agent.tools.knowledge.KnowledgeSearchTool.RankResult;
 import com.ragagent.agent.tools.knowledge.KnowledgeSearchTool.RerankerModel;
 import com.ragagent.agent.tools.knowledge.KnowledgeSearchTool.SearchResultView;
-import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.common.retrieval.SearchTarget;
 import com.ragagent.agent.tools.ToolRequest;
 import com.ragagent.agent.tools.GoRecording45B;
@@ -88,11 +88,11 @@ class KnowledgeSearchRecordingTest {
     }
 
     static final class FakeChunks implements ChunkInfoBackend {
-        final Map<String, Chunk> byID = new LinkedHashMap<>();
+        final Map<String, ChunkFacts> byID = new LinkedHashMap<>();
         final Map<String, Long> totals = new LinkedHashMap<>();
 
         @Override
-        public Chunk faqChunkById(String chunkId) {
+        public ChunkFacts faqChunkById(String chunkId) {
             return byID.get(chunkId);
         }
 
@@ -165,13 +165,11 @@ class KnowledgeSearchRecordingTest {
         FakeChunks c = new FakeChunks();
         c.totals.put("skd1", 4L);
         c.totals.put("skd2", 3L);
-        Chunk faq = new Chunk();
-        faq.setId("sf1");
-        faq.setKnowledgeId("skd2");
-        faq.setChunkType("faq");
-        faq.setMetadata(readNode("{\"standardQuestion\":\"How do I reset the pipeline?\","
+        ChunkFacts faq = new ChunkFacts("sf1", "skd2", "", "", "faq", "", true, 0, 0, 0, 0,
+                null, null, null, null,
+                readNode("{\"standardQuestion\":\"How do I reset the pipeline?\","
                 + "\"similarQuestions\":[\"pipeline reset steps\"],"
-                + "\"answers\":[\"Press the red button.\",\"Wait ten seconds.\"]}"));
+                + "\"answers\":[\"Press the red button.\",\"Wait ten seconds.\"]}"), null);
         c.byID.put("sf1", faq);
         return c;
     }

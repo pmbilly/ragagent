@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.llm.ToolResult;
 import com.ragagent.agent.tools.DocChunkSupport.ImageInfoView;
 import com.ragagent.common.knowledge.FaqChunkMetadata;
-import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.ChunkFacts;
 
 import com.ragagent.agent.tools.knowledge.KnowledgeSearchTool.ResultWithMeta;
 import com.ragagent.agent.tools.DocChunkSupport;
@@ -35,7 +35,7 @@ final class KnowledgeSearchOutputFormatter {
         if (cache.containsKey(chunkID)) {
             return cache.get(chunkID);
         }
-        Chunk chunk;
+        ChunkFacts chunk;
         try {
             chunk = tool.chunkBackend.faqChunkById(chunkID);
         } catch (RuntimeException e) {

@@ -10,7 +10,7 @@ import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.llm.ToolResult;
-import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.ChunkFacts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ragagent.agent.tools.BaseTool;
@@ -208,7 +208,7 @@ public class KnowledgeSearchTool extends BaseTool {
     /** chunk 信息后端。 */
     public interface ChunkInfoBackend {
         /** 按 ID 取 chunk（FAQ 元数据路径）。null=未找到。 */
-        Chunk faqChunkById(String chunkId);
+        ChunkFacts faqChunkById(String chunkId);
 
         /** 文档总块数（text+faq, enabled）。 */
         long totalChunks(long tenantId, String knowledgeId);

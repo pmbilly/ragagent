@@ -11,7 +11,7 @@ import java.util.regex.PatternSyntaxException;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.llm.ToolResult;
-import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.agent.tools.BaseTool;
 import com.ragagent.agent.tools.runtime.SearchAuth;
 import com.ragagent.common.retrieval.SearchTarget;
@@ -96,18 +96,11 @@ public class GrepChunksTool extends BaseTool {
             return v == null ? "" : v;
         }
 
-        /** 转 domain Chunk 以复用 FaqSnippet（FAQ 元数据/标准问题路径）。 */
-        Chunk toChunk() {
-            Chunk c = new Chunk();
-            c.setId(nz(id));
-            c.setContent(content);
-            c.setChunkIndex(chunkIndex);
-            c.setKnowledgeId(nz(knowledgeId));
-            c.setKnowledgeBaseId(nz(knowledgeBaseId));
-            c.setChunkType(chunkType == null ? "" : chunkType);
-            c.setMetadata(metadata);
-            c.setParentChunkId(parentChunkId);
-            return c;
+        /** 转 L1 载荷以复用 FaqSnippet（FAQ 元数据/标准问题路径）。 */
+        ChunkFacts toChunk() {
+            return new ChunkFacts(nz(id), nz(knowledgeId), nz(knowledgeBaseId), content,
+                    chunkType == null ? "" : chunkType, "", false, chunkIndex, 0, 0, 0,
+                    parentChunkId, "", "", null, metadata, "");
         }
     }
 
@@ -514,8 +507,8 @@ public class GrepChunksTool extends BaseTool {
 
     /** 命中摘要提取（FAQ 走 faqMatchSnippet，其他走 extractSnippetRegex）。 */
     static String extractChunkMatchSnippet(GrepChunkView chunk, List<Pattern> compiled) {
-        Chunk c = chunk.toChunk();
-        if ("faq".equals(c.getChunkType())) {
+        ChunkFacts c = chunk.toChunk();
+        if ("faq".equals(c.chunkType())) {
             String s = FaqSnippet.faqMatchSnippet(c, compiled);
             if (!s.isEmpty()) {
                 return s;

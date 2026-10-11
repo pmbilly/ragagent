@@ -37,12 +37,14 @@
 - `WebSearchTool`：`WebSearchBackend.search(long, String, WebSearchRequest, String)`；租户配置改用 L1 `common.tenant.WebSearchConfig`。
 - `AgentToolBackends`：`loadTenantWebSearchConfig()` 直接返回 L1 形状；新增 `toServiceConfig(L2 → 域内配置)` 适配。
 
-### A-2 待做：`Chunk` 边（9 条）
+### A-2 ✅ 已完成（提交见执行记录）：`Chunk` 边（9 条）
 - 目标：agent 侧不再 import `com.ragagent.knowledge.domain.Chunk`。
 - 路径：`FaqSnippet.faqStandardQuestion(Chunk)` → 改收 L1 `FaqChunkMetadata`；各检索工具内部构造的 `Chunk` → 改 L1 `ChunkView`（字段：id/content/chunkType/chunkIndex/startAt/endAt）。
   - ⚠️ `common/knowledge/package-info` 明确"需要更多字段时先改载荷，别把实体漏出去"——**按此口径扩载荷，不要下沉实体**。
 - 影响面：`tools/knowledge/{FaqSnippet,GetDocumentInfoTool,GrepChunksTool,KnowledgeSearchOutputFormatter,KnowledgeSearchTool,ListKnowledgeChunksTool}`、`tools/DocChunkSupport`、`tools/runtime/SearchAuth`、`tools/wiki/WikiReadSourceDocTool` + 相关测试/实录。
-- 验证：`*RecordingTest`（knowledge 工具族）逐字节 + 全量。
+- **执行结果**：agent 侧 9 文件类型置换为 L1 `ChunkFacts`（含补 `knowledgeBaseId` 字段）；域侧接缝在 `AgentToolKbBackends` 用现成映射 `ChunkPortAdapter.factsOf/factsAll` 转换；富化改"复制-替换"（`DocChunkSupport.withImageInfo`）。
+  - 踩坑留痕：① 批量正则 `\bChunk\b→ChunkFacts` 会误伤**用户可见字符串**（`GetDocumentInfoTool` 的 `"Chunk Count:"` 被改成 `"ChunkFacts Count:"`）——被实录抓出，已修回；② record 不可变 ⇒ `enrichChunkImageInfo` 改为替换列表元素、单块路径改为重新赋值。
+  - 验证：`DocToolsRecordingTest` / `KnowledgeSearchRecordingTest` / `FaqSnippetRecordingTest` / wiki 实录全绿 + 全量后端测试 + `spotlessCheck` 绿。
 
 ### A-3 待做：MCP 适配层外移（42 条，最大一刀）
 **结论（已核）**：MCP 族本质是"工具注册表 ↔ MCP 域"的**适配器**，应整体搬出引擎；引擎侧只留窄端口。

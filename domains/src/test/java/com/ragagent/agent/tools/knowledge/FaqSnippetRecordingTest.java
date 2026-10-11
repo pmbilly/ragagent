@@ -9,7 +9,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.FaqChunkMetadata;
 import com.ragagent.agent.tools.GoRecording45A;
 import com.ragagent.agent.tools.RecordingSupport;
@@ -51,7 +51,7 @@ class FaqSnippetRecordingTest {
     @Test
     void entryXmlMatchesGoRecording() {
         JsonNode r = RecordingSupport.rec(field("R_FAQ_ENTRY_XML"));
-        Chunk chunk = faqChunk();
+        ChunkFacts chunk = faqChunk();
         StringBuilder b = new StringBuilder();
         FaqSnippet.writeFaqEntryXml(b, chunk);
         assertThat(b.toString()).isEqualTo(r.get("out").asText());
@@ -107,19 +107,13 @@ class FaqSnippetRecordingTest {
     }
 
     /** 对照探针的 chunkFaq（metadata 由 FaqChunkMetadata.toJsonNode 落进 chunk.metadata）。 */
-    private static Chunk faqChunk() {
+    private static ChunkFacts faqChunk() {
         FaqChunkMetadata meta = new FaqChunkMetadata();
         meta.standardQuestion = "如何创建知识库？";
         meta.similarQuestions = List.of("怎么创建知识库？");
         meta.answers = List.of("在控制台点击新建知识库。");
-        Chunk chunk = new Chunk();
-        chunk.setId("faq-chunk-1");
-        chunk.setChunkType("faq");
-        chunk.setChunkIndex(0);
-        chunk.setKnowledgeId("kb-doc-1");
-        chunk.setContent("Q: test\nSimilar Questions:\n- alt");
-        chunk.setMetadata(meta.toJsonNode());
-        return chunk;
+        return new ChunkFacts("faq-chunk-1", "kb-doc-1", "", "Q: test\nSimilar Questions:\n- alt",
+                "faq", "", true, 0, 0, 0, 0, null, null, null, null, meta.toJsonNode(), null);
     }
 
     private static String field(String name) {

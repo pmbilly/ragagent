@@ -101,7 +101,7 @@ public class ChunkPortAdapter implements ChunkPort {
         if (c == null) {
             return null;
         }
-        return new ChunkFacts(c.getId(), c.getKnowledgeId(), c.getContent(), c.getChunkType(),
+        return new ChunkFacts(c.getId(), c.getKnowledgeId(), c.getKnowledgeBaseId(), c.getContent(), c.getChunkType(),
                 c.getIndexStatus(), c.isIsEnabled(), c.getChunkIndex(), c.getStartAt(),
                 c.getEndAt(), c.getContentRevision(), c.getParentChunkId(), c.getPreChunkId(),
                 c.getNextChunkId(), c.getRelationChunks(), c.getMetadata(), c.getImageInfo());

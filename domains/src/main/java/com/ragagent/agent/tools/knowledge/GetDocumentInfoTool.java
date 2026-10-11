@@ -15,7 +15,7 @@ import com.ragagent.agent.tools.DocChunkSupport.KnowledgeInfoReader;
 import com.ragagent.agent.tools.DocChunkSupport.KnowledgeInfoView;
 import com.ragagent.agent.tools.DocChunkSupport.PagedChunks;
 import com.ragagent.agent.tools.knowledge.FaqSnippet.SimilarQuestionsDisplay;
-import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.FaqChunkMetadata;
 import com.ragagent.agent.tools.BaseTool;
 import com.ragagent.agent.tools.DocChunkSupport;
@@ -83,11 +83,11 @@ public class GetDocumentInfoTool extends BaseTool {
                     + "- faq_ids: individual FAQ entries, using the short cN chunk IDs. Returns the standard question and answers, not the container title.";
 
     private final KnowledgeInfoReader knowledgeReader;
-    private final Function<String, Chunk> chunkById;
+    private final Function<String, ChunkFacts> chunkById;
     private final PagedChunks pagedChunks;
     private final SearchTarget.SearchTargets searchTargets;
 
-    public GetDocumentInfoTool(KnowledgeInfoReader knowledgeReader, Function<String, Chunk> chunkById,
+    public GetDocumentInfoTool(KnowledgeInfoReader knowledgeReader, Function<String, ChunkFacts> chunkById,
             PagedChunks pagedChunks, SearchTarget.SearchTargets searchTargets) {
         super(ToolDefinitions.TOOL_GET_DOCUMENT_INFO, DESCRIPTION, SCHEMA_JSON);
         this.knowledgeReader = knowledgeReader;
@@ -98,7 +98,7 @@ public class GetDocumentInfoTool extends BaseTool {
 
     private static final class DocInfo {
         KnowledgeInfoView knowledge;
-        Chunk chunk;
+        ChunkFacts chunk;
         FaqChunkMetadata faqMeta;
         int chunkCount;
         String err;
@@ -122,7 +122,7 @@ public class GetDocumentInfoTool extends BaseTool {
                 continue;
             }
             DocInfo info = new DocInfo();
-            Chunk chunk;
+            ChunkFacts chunk;
             try {
                 chunk = SearchAuth.authorizeDomainChunkInSearchTargets(searchTargets, faqID,
                         chunkById, DocChunkSupport.asScopeReader(knowledgeReader));
@@ -132,7 +132,7 @@ public class GetDocumentInfoTool extends BaseTool {
                 continue;
             }
             FaqChunkMetadata meta = null;
-            if (chunk != null && "faq".equals(chunk.getChunkType())) {
+            if (chunk != null && "faq".equals(chunk.chunkType())) {
                 meta = FaqSnippet.faqMetadata(chunk);
             }
             info.chunk = chunk;
@@ -302,7 +302,7 @@ public class GetDocumentInfoTool extends BaseTool {
         return toolResult;
     }
 
-    private static Map<String, Object> formatFAQEntryInfo(StringBuilder output, Chunk chunk,
+    private static Map<String, Object> formatFAQEntryInfo(StringBuilder output, ChunkFacts chunk,
             FaqChunkMetadata meta) {
         String title = FaqSnippet.faqStandardQuestion(chunk);
         if ((title == null || title.isEmpty()) && meta != null) {
@@ -312,10 +312,10 @@ public class GetDocumentInfoTool extends BaseTool {
             title = "FAQ Entry";
         }
 
-        output.append(String.format("  FAQ ID:       %s\n", chunk.getId()));
+        output.append(String.format("  FAQ ID:       %s\n", chunk.id()));
         output.append(String.format("  Question:     %s\n", title));
-        if (chunk.getKnowledgeId() != null && !chunk.getKnowledgeId().isEmpty()) {
-            output.append(String.format("  Container ID: %s\n", chunk.getKnowledgeId()));
+        if (chunk.knowledgeId() != null && !chunk.knowledgeId().isEmpty()) {
+            output.append(String.format("  Container ID: %s\n", chunk.knowledgeId()));
         }
         if (meta != null && meta.answers != null && !meta.answers.isEmpty()) {
             output.append("  Answers:\n");
@@ -337,8 +337,8 @@ public class GetDocumentInfoTool extends BaseTool {
         output.append('\n');
 
         Map<String, Object> entry = new LinkedHashMap<>();
-        entry.put("faqId", chunk.getId());
-        entry.put("knowledgeId", chunk.getKnowledgeId());
+        entry.put("faqId", chunk.id());
+        entry.put("knowledgeId", chunk.knowledgeId());
         entry.put("title", title);
         entry.put("faqQuestion", title);
         entry.put("type", "faq");
