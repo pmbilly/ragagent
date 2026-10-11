@@ -298,8 +298,8 @@ final class AgentConfigAssembler {
     private static final com.fasterxml.jackson.databind.ObjectMapper YAML_JSON =
             JsonMappers.lenient();
     private static String templateContentByIdAndFile(String id, String file) {
-        try (java.io.InputStream in = SessionAgentQaService.class.getClassLoader()
-                .getResourceAsStream("agent/management/prompt_templates/" + file)) {
+        try (java.io.InputStream in =
+                com.ragagent.common.prompt.PromptSource.open(file)) {
             if (in == null) {
                 return null;
             }

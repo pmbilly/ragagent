@@ -9,8 +9,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * agent 系统提示词模板的选取与装载。
  *
- * <p>模板文件 vendored 到 {@code agent/management/prompt_templates/agent_system_prompt.yaml}，
- * 启动时从 classpath 装载。yaml 解析沿用 agent.management BuiltinAgentRegistry 的
+ * <p>模板文件由 {@link com.ragagent.common.prompt.PromptSource} 装载
+ * （{@code agent_system_prompt.yaml}，classpath {@code prompts/}）。
+ * yaml 解析沿用 agent.management BuiltinAgentRegistry 的
  * snakeyaml → ObjectNode 组合（classpath 无 jackson-dataformat-yaml）。</p>
  */
 public final class AgentPromptTemplates {
@@ -38,6 +39,9 @@ public final class AgentPromptTemplates {
     /** 模板配置（只消费 agentSystemPrompt 列表）。 */
     public record TemplatesConfig(List<PromptTemplate> agentSystemPrompt) {
     }
+
+    /** agent 系统提示词模板文件名（{@code PromptSource} 清单内）。 */
+    private static final String AGENT_SYSTEM_PROMPT_FILE = "agent_system_prompt.yaml";
 
     private AgentPromptTemplates() {
     }
@@ -77,8 +81,7 @@ public final class AgentPromptTemplates {
      * 文件缺失/损坏返回空列表。
      */
     public static List<PromptTemplate> loadAgentSystemPromptTemplates() {
-        try (var in = AgentPromptTemplates.class.getClassLoader()
-                .getResourceAsStream("agent/management/prompt_templates/agent_system_prompt.yaml")) {
+        try (var in = com.ragagent.common.prompt.PromptSource.open(AGENT_SYSTEM_PROMPT_FILE)) {
             if (in == null) {
                 return List.of();
             }

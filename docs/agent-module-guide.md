@@ -371,7 +371,7 @@ flowchart TD
 | 改 cN/dN/res:// 句柄协议 | `modelcontext/`（`Registry` / `SourceRegistry` / `ResourceRegistry` / `ToolPolicy`） | 协议提示词**字节即契约**；句柄绝不持久化、出 registry 不被接受；source 与 resource 句柄不能乱序编解码 |
 | 改 agents HTTP 契约 | `management/controller/AgentController` + `management/dto/AgentResponses` | 重录 `ag-*.json`（`scripts/record-ag-golden.sh`）后**结构化复核差异**；键别回 snake |
 | 改技能语义 | `skills/`（`Skill.parseSkillFile` 自校验 + `SkillCatalogService` 引用检查） | `content` 是组装好的 SKILL.md：编辑草稿要剥/装 frontmatter（严格可逆）；引用清单进 409 details 与审计 |
-| 改提示词 | 根 `AgentPrompts` / `AgentPromptTemplates` / `PromptTemplateCatalog` + `resources/agent/management/prompt_templates/*.yaml` | classpath 无 jackson-dataformat-yaml（snakeyaml→ObjectNode 手接）；`EngineRecordingTest` 钉输出 |
+| 改提示词 | 根 `AgentPrompts` / `AgentPromptTemplates` / `PromptTemplateCatalog`；模板正文在 `:common` 的 `resources/prompts/*.yaml`（经 `common.prompt.PromptSource` 单一装载） | 文案字节即契约（golden/实录钉住）；classpath 无 jackson-dataformat-yaml（snakeyaml→ObjectNode 手接） |
 | 改网页抓取 | `support/Fetcher`（两工厂）+ `BrowserRenderer` 接缝 | agent 用 2MB/60s/markdown，chat 管线用 100KB/15s/纯文本——**别混用**；SSRF 校验在发送前 + 每跳重定向前 |
 | 改 ReAct 循环节奏 | 根 `ReActIteration`（停止条件→走向映射）+ `AgentEngine.executeLoop`（steer overrun / 取消） | 事件 emit 顺序 = SSE 帧序；错误 message 逐字稳定 |
 | 改 agent 事件载荷 | `event/payload/*` + session 域 `AgentStreamBridge` | SSE 载荷是**外部权威面**（B72：集成页按原始帧解析），camel 化需协议版本化（§9） |

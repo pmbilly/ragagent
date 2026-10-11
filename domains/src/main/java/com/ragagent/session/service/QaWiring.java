@@ -392,8 +392,8 @@ public class QaWiring {
 
     private static Map<String, String> loadIntentPrompts() {
         Map<String, String> out = new LinkedHashMap<>();
-        try (java.io.InputStream in = QaWiring.class.getClassLoader()
-                .getResourceAsStream("agent/management/prompt_templates/intent_prompts.yaml")) {
+        try (java.io.InputStream in =
+                com.ragagent.common.prompt.PromptSource.open("intent_prompts.yaml")) {
             if (in == null) {
                 return out;
             }

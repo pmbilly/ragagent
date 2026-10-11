@@ -107,12 +107,18 @@ enum Position { PRE_BASE, POST_BASE, PRE_PROTOCOL, POST_PROTOCOL }
 - Modify: `domains/src/test/java/com/ragagent/arch/ClasspathResourcesTest.java:60`（资源路径表）
 - Create: `common/src/test/java/com/ragagent/common/prompt/PromptSourceTest.java`（清单 ⇄ 目录双向一致）
 
-- [ ] **Step 1**: 新增 `PromptSource`：唯一清单 `FILES`（11 项，顺序即 `FindTemplateByID` 查找序）+ `Optional<InputStream> open(String)` + `String read(String)` + `Map<String, String> readAll()`；资源根 `prompts/`。
-- [ ] **Step 2**: `git mv` 资源目录到 `common/src/main/resources/prompts/`，逐处改 7 个消费方为 `PromptSource`，删除各自的文件名清单（`ConversationProperties.TEMPLATE_FILES` 等）。
-- [ ] **Step 3**: 新增 `PromptSourceTest`：断言 `FILES` 与 `src/main/resources/prompts/` 实际文件双向一致（新增/改名模板不登记即红）。
-- [ ] **Step 4**: 全量测试 + `spotlessCheck` 绿（重点：`ct-kv-get-prompt-templates.json` 契约用例字节不变）→ Commit `refactor(prompt): 模板装载收敛为 PromptSource 单入口 + 资源下沉 :common`。
+- [x] **Step 1**: 新增 `PromptSource`：唯一清单 `files()`（11 项，顺序即 `FindTemplateByID` 查找序）+ `InputStream open(String)`（缺失 → null，与 ClassLoader 语义一致）+ `String read(String)`（UTF-8，缺失 → ""）；资源根 `prompts/`。
+- [x] **Step 2**: `git mv` 资源目录到 `common/src/main/resources/prompts/`，逐处改 7 个消费方为 `PromptSource`，删除各自清单（`ConversationProperties.TEMPLATE_FILES`、`BuiltinAgentRegistry.TEMPLATE_FILES`、`PromptTemplateCatalog.DIR`）。
+- [x] **Step 3**: 新增 `PromptSourceTest`：清单 ⇄ 目录双向一致、每份可读非空、**模板 id 跨文件唯一**（保证查找序无关）。
+- [x] **Step 4**: 编译 + `spotlessCheck` + F1 定向用例（`AgentPromptsTest` / `BuiltinAgentRegistry*` / `AgentConfigAssembler*` / `SessionQaResolution*` / `AgentConfigKeyUsageTest` / `ClasspathResourcesTest`）全绿；**`TenantCatalogContractTest`（42KB `ct-kv-get-prompt-templates.json`）字节不变通过** → 提交见执行记录。
 
-**验证**：`./gradlew :common:test :engine:test :domains:test :boot:test`；契约用例 `ab-ct.sh`/`AcceptanceContract` 相关全绿。
+**执行记录（2026-10-12）**
+- API 落地为 `files()` / `open()` / `read()`（未做 `readAll()`：现有消费方都是逐文件解析 snakeyaml，多一个聚合方法反而无消费者）。
+- 统一清单后**行为等价**已证：11 份模板的 `id` 跨文件唯一（`PromptSourceTest` 长期守门），因此 `ConversationProperties`（11 项序）与 `BuiltinAgentRegistry`（原为另一顺序）合并到同一清单不改变任何 `FindTemplateByID` 取值。
+- 域侧清单同步：`ClasspathResourcesTest` 的 11 条资源路径改为 `prompts/*.yaml`（消费方标注 `common.prompt.PromptSource`）；`docs/agent-module-guide.md` §5 口径同步。
+- ⚠️ **基线已知红（与本批无关，已用 `git stash` 对照复现）**：`EngineRecordingTest`(5) + `PipelineLifecycleRecordingTest`(3) + `ModelContextRecordingTest`(1) 共 9 个实录断言红——根因是并行会话提交 `3e4dd368` 从 `Registry.RESOURCE_HANDLE_PROTOCOL_PROMPT` 删掉了 `sandbox:<file name>` 下载约定那一行，实录仍钉旧文案。修法二选一（需产品决策）：**重录实录** 或 **恢复该行**。
+
+**验证**：`./gradlew --no-daemon :common:test :engine:test :domains:test :boot:test`；契约用例 `TenantCatalogContractTest` 全绿。（注意：跑测试前 `unset SSRF_WHITELIST_EXTRA`，否则 `ct-kv-parser-put-ssrf.json` 会因 127.0.0.1 被放行而红。）
 
 ## F2（P2）：文案消副本
 

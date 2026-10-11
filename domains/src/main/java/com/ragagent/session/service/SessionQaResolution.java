@@ -129,8 +129,8 @@ final class SessionQaResolution {
     }
 
     static String templateContentByIdAndFile(String id, String file) {
-        try (java.io.InputStream in = SessionKnowledgeQaService.class.getClassLoader()
-                .getResourceAsStream("agent/management/prompt_templates/" + file)) {
+        try (java.io.InputStream in =
+                com.ragagent.common.prompt.PromptSource.open(file)) {
             if (in == null) {
                 return null;
             }

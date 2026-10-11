@@ -52,13 +52,15 @@ class ClasspathResourcesTest {
     private static final Map<String, String> RESOURCES = new LinkedHashMap<>();
 
     static {
-        // ── 提示词模板：三处文件列表都在读同一个目录（ConversationProperties 11 /
-        //    BuiltinAgentRegistry 11 / PromptTemplateCatalog 9），任一缺失都是静默降级 ──
+        // ── 提示词模板：单一装载器 PromptSource（:common，resources/prompts/），
+        //    消费方 ConversationProperties/BuiltinAgentRegistry/PromptTemplateCatalog/
+        //    QaWiring/SessionQaResolution/AgentConfigAssembler/AgentPromptTemplates 等；
+        //    任一缺失都是静默降级，故逐份登记存在性 ──
         for (String f : List.of("agent_system_prompt", "system_prompt", "context_template",
                 "fallback", "generate_summary", "generate_session_title", "rewrite",
                 "graph_extraction", "generate_questions", "keywords_extraction", "intent_prompts")) {
-            RESOURCES.put("agent/management/prompt_templates/" + f + ".yaml",
-                    "ConversationProperties/BuiltinAgentRegistry/PromptTemplateCatalog/QaWiring 等");
+            RESOURCES.put("prompts/" + f + ".yaml",
+                    "common.prompt.PromptSource（11 份模板清单）");
         }
         RESOURCES.put("agent/management/builtin_agents.yaml", "BuiltinAgentRegistry#load");
         RESOURCES.put("agent/management/agent_type_presets.yaml", "AgentTypePresets 构造器");

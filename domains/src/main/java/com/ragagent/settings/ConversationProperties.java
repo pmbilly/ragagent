@@ -1,5 +1,6 @@
 package com.ragagent.settings;
 
+import com.ragagent.common.prompt.PromptSource;
 import com.ragagent.common.web.JsonMappers;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
@@ -12,21 +13,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * config.yaml 的 conversation 段 + prompt_templates 回填（缺省值取自 dev 配置）。
  *
  * <p>经 {@code @ConfigurationProperties(prefix="conversation")}
- * 绑定 application.yml 的 {@code conversation.*}；vendor 模板从
- * classpath agent/management/prompt_templates/ 装载。
- * FindTemplateByID 语义：按 11 个模板文件的注册顺序首个 id 命中即返回 content。</p>
+ * 绑定 application.yml 的 {@code conversation.*}；vendor 模板经
+ * {@link com.ragagent.common.prompt.PromptSource}（classpath {@code prompts/}）装载。
+ * FindTemplateByID 语义：按 {@code PromptSource.files()} 的顺序首个 id 命中即返回 content。</p>
  */
 @org.springframework.boot.context.properties.ConfigurationProperties(prefix = "conversation")
 public class ConversationProperties {
 
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
-
-    /** 模板 yaml 文件清单（FindTemplateByID 的查找序）。 */
-    private static final String[] TEMPLATE_FILES = {
-            "agent_system_prompt.yaml", "system_prompt.yaml", "context_template.yaml",
-            "fallback.yaml", "generate_summary.yaml", "generate_session_title.yaml",
-            "rewrite.yaml", "graph_extraction.yaml", "generate_questions.yaml",
-            "keywords_extraction.yaml", "intent_prompts.yaml"};
 
     // ---- config.yaml conversation 段（dev 缺省值逐项对照） ----
     private int maxRounds = 5;
@@ -113,9 +107,8 @@ public class ConversationProperties {
     /** FindTemplateByID：id → [content, user]。 */
     private Map<String, String[]> loadTemplates() {
         Map<String, String[]> byId = new LinkedHashMap<>();
-        for (String file : TEMPLATE_FILES) {
-            try (InputStream in = getClass().getClassLoader()
-                    .getResourceAsStream("agent/management/prompt_templates/" + file)) {
+        for (String file : PromptSource.files()) {
+            try (InputStream in = PromptSource.open(file)) {
                 if (in == null) {
                     continue;
                 }

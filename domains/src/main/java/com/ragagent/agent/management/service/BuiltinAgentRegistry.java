@@ -1,5 +1,6 @@
 package com.ragagent.agent.management.service;
 
+import com.ragagent.common.prompt.PromptSource;
 import com.ragagent.common.web.JsonMappers;
 import java.io.InputStream;
 import com.ragagent.common.wiki.WikiLanguageSupport;
@@ -15,7 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * 内建 agent 注册表（config/builtin_agents.yaml + config/prompt_templates/*.yaml 的启动装载）。
+ * 内建 agent 注册表（config/builtin_agents.yaml + {@code PromptSource} 提示词模板的启动装载）。
  *
  * <p>三个要点：</p>
  * <ol>
@@ -60,13 +61,6 @@ public class BuiltinAgentRegistry {
             "enableQueryExpansion", "enableRewrite", "rewritePromptSystem", "rewritePromptUser",
             "queryUnderstandModelId", "fallbackStrategy", "fallbackResponse", "fallbackPrompt",
             "intentPrompts", "questionSuggestions");
-
-    /** 模板文件固定装载序（模板查找顺序）。 */
-    private static final List<String> TEMPLATE_FILES = List.of(
-            "system_prompt.yaml", "context_template.yaml", "rewrite.yaml", "fallback.yaml",
-            "generate_session_title.yaml", "generate_summary.yaml", "keywords_extraction.yaml",
-            "agent_system_prompt.yaml", "graph_extraction.yaml", "generate_questions.yaml",
-            "intent_prompts.yaml");
 
     /** entry 的 i18n（name/description）与（过滤后的）config 树。 */
     public record Entry(String id, String avatar, boolean isBuiltin,
@@ -152,9 +146,8 @@ public class BuiltinAgentRegistry {
     /** 按固定模板列表顺序查找，首个 id 命中即返回 content。 */
     private Map<String, String> loadTemplates() {
         Map<String, String> byId = new LinkedHashMap<>();
-        for (String file : TEMPLATE_FILES) {
-            try (InputStream in = getClass().getClassLoader()
-                    .getResourceAsStream("agent/management/prompt_templates/" + file)) {
+        for (String file : PromptSource.files()) {
+            try (InputStream in = PromptSource.open(file)) {
                 if (in == null) {
                     continue;
                 }
