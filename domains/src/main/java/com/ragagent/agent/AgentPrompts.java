@@ -12,6 +12,11 @@ import com.ragagent.agent.compaction.ConversationSerializer;
 import com.ragagent.common.prompt.PromptConstants;
 import com.ragagent.agent.prompt.AgentPromptTemplates;
 import com.ragagent.agent.prompt.GroundingPrompt;
+import com.ragagent.agent.prompt.KnowledgeBaseInfo;
+import com.ragagent.agent.prompt.PinnedSkillInstructions;
+import com.ragagent.agent.prompt.PlaceholderDefinition;
+import com.ragagent.agent.prompt.RecentDocInfo;
+import com.ragagent.agent.prompt.SystemPromptSection;
 
 /**
  * agent 系统提示词合成。
@@ -102,95 +107,8 @@ public final class AgentPrompts {
     // 提示词数据类型
     // ------------------------------------------------------------------
 
-    /** 最近加入的文档的简要信息。 */
-    public record RecentDocInfo(
-            String chunkId,
-            String knowledgeBaseId,
-            String knowledgeId,
-            String title,
-            String description,
-            String fileName,
-            long fileSize,
-            String type,
-            String createdAt,
-            String faqStandardQuestion,
-            List<String> faqSimilarQuestions,
-            List<String> faqAnswers) {
-
-        public RecentDocInfo {
-            chunkId = chunkId == null ? "" : chunkId;
-            knowledgeBaseId = knowledgeBaseId == null ? "" : knowledgeBaseId;
-            knowledgeId = knowledgeId == null ? "" : knowledgeId;
-            title = title == null ? "" : title;
-            description = description == null ? "" : description;
-            fileName = fileName == null ? "" : fileName;
-            type = type == null ? "" : type;
-            createdAt = createdAt == null ? "" : createdAt;
-            faqStandardQuestion = faqStandardQuestion == null ? "" : faqStandardQuestion;
-            faqSimilarQuestions = faqSimilarQuestions == null ? List.of() : faqSimilarQuestions;
-            faqAnswers = faqAnswers == null ? List.of() : faqAnswers;
-        }
-
-        /** 全默认（零值）。 */
-        public static RecentDocInfo empty() {
-            return new RecentDocInfo(null, null, null, null, null, null, 0, null, null, null, null, null);
-        }
-    }
-
-    /** 用户 @ 选中的文档摘要信息。 */
-    public record SelectedDocumentInfo(
-            String knowledgeId,
-            String knowledgeBaseId,
-            String title,
-            String fileName,
-            String fileType) {
-    }
-
-    /** 本轮 @ 指定的 MCP 服务。 */
-    public record PinnedMCPServiceInfo(
-            boolean discoverable,
-            String id,
-            String name,
-            String description,
-            List<String> toolNames) {
-    }
-
-    /** 本轮 @ 指定的技能。 */
-    public record PinnedSkillInfo(String name, String description) {
-    }
-
-    /** 本轮 @ 指定的技能正文：随系统提示词注入，点名场景确定性优先于按需读取。 */
-    public record PinnedSkillInstructions(String name, String instructions) {
-    }
-
-    /** agent 提示词用的知识库要点信息。 */
-    public record KnowledgeBaseInfo(
-            String id,
-            String name,
-            String type,
-            String description,
-            int docCount,
-            List<String> capabilities,
-            List<RecentDocInfo> recentDocs) {
-
-        public KnowledgeBaseInfo {
-            id = id == null ? "" : id;
-            name = name == null ? "" : name;
-            type = type == null ? "" : type;
-            description = description == null ? "" : description;
-            capabilities = capabilities == null ? List.of() : capabilities;
-            recentDocs = recentDocs == null ? List.of() : recentDocs;
-        }
-
-        /** 便捷最小构造（只有 ID，其余全空）。 */
-        public static KnowledgeBaseInfo minimal(String id) {
-            return new KnowledgeBaseInfo(id, "", "", "", 0, List.of(), List.of());
-        }
-    }
-
-    /** 暴露给 UI/配置的占位符定义。 */
-    public record PlaceholderDefinition(String name, String label, String description) {
-    }
+    // 值类型（RecentDocInfo / SelectedDocumentInfo / Pinned*Info / KnowledgeBaseInfo /
+    // PlaceholderDefinition）已外提至 com.ragagent.agent.prompt（F5b-2）。
 
     /** UI 提示用：列出的全部提示词占位符（agent 模式子集）。 */
     public static List<PlaceholderDefinition> availablePlaceholders() {
@@ -405,9 +323,7 @@ public final class AgentPrompts {
     // 系统提示词组装
     // ------------------------------------------------------------------
 
-    /** 每个小节的来源标识。 */
-    public record SystemPromptSection(String name, String content) {
-    }
+    // SystemPromptSection 已外提至 com.ragagent.agent.prompt（F5b-2）。
 
     /** 系统提示词构建的可选参数。 */
     public static final class BuildSystemPromptOptions {

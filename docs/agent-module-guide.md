@@ -2,7 +2,7 @@
 
 > **面向读者**：第一次接手 `com.ragagent.agent` 的架构师 / 高级开发者。
 > **目标**：30 分钟建立全局观 → 能定位改动点 → 能安全迭代（本模块有 334 个后端 `@Test`（含挂在 `:boot` 的全栈契约测试）+ 42 个管理面契约金片兜底，改错会立刻红）。
-> **数据口径**：2026-10-12 实测（`wc -l` 口径）：**171 个 java 文件 / 30,766 行 / 7 个带码一级子包（19 份 package-info）**（本轮新增 `budget/`、`prompt/`、`tools/runtime/`，删除空壳 `support/`）。注意：`modelcontext/` 与抓取支撑（`Fetcher` 族）已迁 `:engine` 模块（`com.ragagent.modelcontext` / `com.ragagent.webfetch`），仍是本域引擎的组成部分，只是物理位置在 `:engine`。
+> **数据口径**：2026-10-12 实测（`wc -l` 口径）：**179 个 java 文件 / 30,812 行 / 7 个带码一级子包（19 份 package-info）**（本轮新增 `budget/`、`prompt/`、`tools/runtime/`，删除空壳 `support/`；另有 8 个提示词值类型从根包 `AgentPrompts` 外提到 `prompt/`）。注意：`modelcontext/` 与抓取支撑（`Fetcher` 族）已迁 `:engine` 模块（`com.ragagent.modelcontext` / `com.ragagent.webfetch`），仍是本域引擎的组成部分，只是物理位置在 `:engine`。
 > **本文档的地位**：模块级导览；仓库级作业规范见仓库根 `HANDOFF.md`（§12 结构地图、§13 踩坑清单、§14 逐包重构范式）。
 
 ---
@@ -88,8 +88,8 @@ graph TB
 
 | 子包 | 文件/行数 | 放什么 | **不放什么** |
 |---|---|---|---|
-| 根（引擎面） | 18 / 4,676 | `AgentEngine` 门面（713 行）+ 八段协作者（`ThinkPhase` 574 / `ActPhase` 763 / `ObservePhase` 418 / `PromptAssembly` 428 / `ReActIteration` 283 / `FinalizePhase` 178 / `SteerIntake` 103 / `ContextDebugEmitter` 77）+ 提示词族（`AgentPrompts` 段表 + 值类型）+ `AgentToolNames`；**八段与门面共享包内 seam，故留根包**（搬出需先把 ~38 处包内成员改 public，属独立评审项） | Spring 装配（无 `@Component`，由 session 装配）、HTTP |
-| `prompt/` | 3 / 216 | agent 侧提示词构件：`AgentPromptTemplates`（模板选取）、`GroundingPrompt`（内容接地指引）；`AgentPrompts`/`PromptAssembly` 待 F5b-2 归位 | 文案本体与装载（→ `:common`：`PromptSource` + `resources/prompts/*.yaml`） |
+| 根（引擎面） | 18 / 4,607 | `AgentEngine` 门面（713 行）+ 八段协作者（`ThinkPhase` 574 / `ActPhase` 763 / `ObservePhase` 418 / `ConversationAssembler` 428 / `ReActIteration` 283 / `FinalizePhase` 178 / `SteerIntake` 103 / `ContextDebugEmitter` 77）+ 提示词段表（`AgentPrompts`：`SECTION_SPECS` + `BuildSystemPromptOptions`）+ `AgentToolNames`；**八段与门面共享包内 seam，故留根包**（搬出需先把 ~38 处包内成员改 public，属独立评审项） | Spring 装配（无 `@Component`，由 session 装配）、HTTP |
+| `prompt/` | 11 / 331 | agent 侧提示词构件与值类型：`AgentPromptTemplates`（模板选取）、`GroundingPrompt`（内容接地指引）+ 8 个外提值类型（`KnowledgeBaseInfo` / `RecentDocInfo` / `SelectedDocumentInfo` / `Pinned*Info` / `PinnedSkillInstructions` / `PlaceholderDefinition` / `SystemPromptSection`）；`BuildSystemPromptOptions` 留根（引用根包 `SkillMetadata`） | 文案本体与装载（→ `:common`：`PromptSource` + `resources/prompts/*.yaml`）、段选择（→ 根 `AgentPrompts` 段表） |
 | `budget/` | 4 / 355 | token 预算与上下文占用：`TokenEstimator`（压缩/裁剪共用）、`AgentBudgets`、`ContextDiagnostics` | 预算决策的触发方（→ 根 `ObservePhase` / `ReActIteration`、`compaction/`） |
 | `tools/`（根） | 32 / 6,022 | 工具框架（`AgentTool` / `BaseTool` / `ToolRegistry` / 参数校验 / 输出限额）+ 通用单件（todo_write / thinking / read_file=技能资源读取）+ 跨族接缝（`DocChunkSupport` / `SearchTarget`）+ **MCP 族 10 类**（`McpCatalog`，因与 `ToolRegistry` 包私有互访暂留根） | 各能力域的业务逻辑（→ 五个能力子包）、横切件（→ `tools/runtime/`） |
 | `tools/runtime/` | 9 / 1,814 | 工具运行时横切件：`SearchAuth`（检索范围鉴权）、`ToolResultPersist`（客户端/存储投影）、`MessageSanitizer` / `ThinkBlocks` / `ThinkStreamSplitter`（消息与思考块清洗切分）、`NormalizeToolCallId`、`JsonRepair`、`PythonSyntax` | 具体工具（→ 能力子包）、工具注册表与 MCP 族 |
@@ -274,7 +274,7 @@ sequenceDiagram
 
     SES->>ENG: execute(sessionId, messageId, query, llmContext, images)
     Note over ENG: 无状态跨轮——历史由调用方从 DB 重建传入
-    ENG->>ENG: buildSystemPrompt / buildMessagesWithLLMContext（PromptAssembly）
+    ENG->>ENG: buildSystemPrompt / buildMessagesWithLLMContext（ConversationAssembler）
     ENG->>ENG: registry.refreshMcpTools() + buildToolsForLLM()（排序 + 句柄编码）
     loop 每轮（≤ MaxIterations；负数 = 无上限）
         ENG->>ENG: 轮首取消探测（已取消且有工具结果 → 先合成答案再抛）

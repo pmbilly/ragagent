@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import com.ragagent.agent.skills.Manager;
 import com.ragagent.agent.skills.Skill;
 import com.ragagent.agent.skills.SkillSource;
+import com.ragagent.agent.prompt.PinnedSkillInfo;
+import com.ragagent.agent.prompt.PinnedSkillInstructions;
 
 /**
  * 装配层接线：@ 点名的技能正文被解析出来并随系统提示词注入；
@@ -71,14 +73,14 @@ class SkillPinnedInstructionsTest {
         return manager;
     }
 
-    private static List<AgentPrompts.PinnedSkillInfo> pinned() {
-        return List.of(new AgentPrompts.PinnedSkillInfo("kb-faq-curator", "整理 FAQ"));
+    private static List<PinnedSkillInfo> pinned() {
+        return List.of(new PinnedSkillInfo("kb-faq-curator", "整理 FAQ"));
     }
 
     @Test
     void pinnedSkillBodyIsResolvedFromCatalog() {
-        List<AgentPrompts.PinnedSkillInstructions> resolved =
-                PromptAssembly.resolvePinnedSkillInstructions(manager(true, false), pinned());
+        List<PinnedSkillInstructions> resolved =
+                ConversationAssembler.resolvePinnedSkillInstructions(manager(true, false), pinned());
 
         assertThat(resolved).hasSize(1);
         assertThat(resolved.get(0).name()).isEqualTo("kb-faq-curator");
@@ -94,21 +96,21 @@ class SkillPinnedInstructionsTest {
     @Test
     void unreadablePinnedSkillIsSkippedNotFatal() {
         // 技能在提问后被删/改名：不注入、不抛错（该条回退按需读取）
-        assertThat(PromptAssembly.resolvePinnedSkillInstructions(manager(true, true), pinned())).isEmpty();
+        assertThat(ConversationAssembler.resolvePinnedSkillInstructions(manager(true, true), pinned())).isEmpty();
         // 技能关着：同样不注入
-        assertThat(PromptAssembly.resolvePinnedSkillInstructions(manager(false, false), pinned())).isEmpty();
-        assertThat(PromptAssembly.resolvePinnedSkillInstructions(null, pinned())).isEmpty();
-        assertThat(PromptAssembly.resolvePinnedSkillInstructions(manager(true, false), null)).isEmpty();
+        assertThat(ConversationAssembler.resolvePinnedSkillInstructions(manager(false, false), pinned())).isEmpty();
+        assertThat(ConversationAssembler.resolvePinnedSkillInstructions(null, pinned())).isEmpty();
+        assertThat(ConversationAssembler.resolvePinnedSkillInstructions(manager(true, false), null)).isEmpty();
     }
 
     @Test
     void mustUseWordingFollowsInjectionResult() {
-        String injected = PromptAssembly.buildMustUseBlock(List.of(), pinned(), List.of("kb-faq-curator"));
+        String injected = ConversationAssembler.buildMustUseBlock(List.of(), pinned(), List.of("kb-faq-curator"));
         assertThat(injected)
                 .contains("Apply the instructions of @Skill \"kb-faq-curator\" (provided in <skillInstructions>)")
                 .doesNotContain("Must call read_file");
 
-        String fallback = PromptAssembly.buildMustUseBlock(List.of(), pinned(), List.of());
+        String fallback = ConversationAssembler.buildMustUseBlock(List.of(), pinned(), List.of());
         assertThat(fallback)
                 .contains("Must call read_file(path=\"skill://kb-faq-curator/SKILL.md\")");
     }

@@ -329,7 +329,8 @@ wiki/service 分包（P2）、knowledge/dto 分包（P2）、embedding/rerank �
 | F5a | L1 `PromptComposer` 统一三条链路拼法（`joinSections` / `SOURCES_AND_OUTPUT_SUFFIX` / `appendProtocol` / `rightTrim`），删两处逐字节重复的私有实现 | `bf9c796a` |
 | F5b-1 | agent 段表声明式化（`SectionSpec` + 只读 `SectionContext`，10 段一张 `SECTION_SPECS` 表） | `9689c590` |
 
-**降级与遗留（均有实测依据）**：① **`loop/` 归位不可行**——8 个段协作者全量读写 `AgentEngine` 的 33 个包内字段 / 约 17 个包内方法 / 4 个包内嵌套类型，搬出需约 38 处改 `public`；且 `boot/EngineRecordingTest` 与 `domains/Engine46bStubSupport` 靠**跨模块 split package** 直取 `*ForTest` seam ⇒ 应单独立"engine seam 打开"波并单独评审。② `AgentPrompts` 值类型外提（约 157 处跨文件改名，会动 `AgentEngine`/`AgentEngineAssembler` 公开签名）留 F5b-2。③ MCP 族搬 `tools/mcp/` 需先解与 `ToolRegistry` 的包私有耦合。
+**降级与遗留（均有实测依据）**：① **`loop/` 归位不可行**——8 个段协作者全量读写 `AgentEngine` 的 33 个包内字段 / 约 17 个包内方法 / 4 个包内嵌套类型，搬出需约 38 处改 `public`；且 `boot/EngineRecordingTest` 与 `domains/Engine46bStubSupport` 靠**跨模块 split package** 直取 `*ForTest` seam ⇒ 应单独立"engine seam 打开"波并单独评审。② MCP 族搬 `tools/mcp/` 需先解与 `ToolRegistry` 的包私有耦合。
+**F5b-2 已完成**：`AgentPrompts` 的 8 个值类型（`RecentDocInfo` / `SelectedDocumentInfo` / `PinnedMCPServiceInfo` / `PinnedSkillInfo` / `PinnedSkillInstructions` / `KnowledgeBaseInfo` / `PlaceholderDefinition` / `SystemPromptSection`）外提到 `agent/prompt/`；`PromptAssembly` → `ConversationAssembler`（职责收窄为会话消息装配，系统提示词选段归段表）。唯一留根的是 `BuildSystemPromptOptions`——它引用根包 `SkillMetadata`，搬出会形成 `prompt → root` 包边，待该类型归位后再搬。
 **实录更新说明**：`GoRecording46A/46B/46C` 因协议提示词文案变更（含派生字段 `prompt_len`）同步更新；Go 录制源已下线、仓内无重录程序（见 `docs/handoff/records/batch-records.md` B39），故按当前实现更新常量，属**显式基线变更**。
 
 

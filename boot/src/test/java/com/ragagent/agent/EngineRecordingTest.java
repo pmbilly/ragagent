@@ -20,6 +20,11 @@ import com.ragagent.agent.compaction.CompactionSettings;
 import com.ragagent.llm.domain.ChatTool;
 import com.ragagent.llm.domain.FunctionCall;
 import com.ragagent.agent.budget.TokenEstimator;
+import com.ragagent.agent.prompt.RecentDocInfo;
+import com.ragagent.agent.prompt.SelectedDocumentInfo;
+import com.ragagent.agent.prompt.PinnedMCPServiceInfo;
+import com.ragagent.agent.prompt.PinnedSkillInfo;
+import com.ragagent.agent.prompt.KnowledgeBaseInfo;
 
 /**
  * 引擎录制回放：Java 引擎用同一脚本驱动，事件序列 / AgentState 快照 /
@@ -422,16 +427,16 @@ class EngineRecordingTest {
         Engine46bStubSupport.StubChat chat = new Engine46bStubSupport.StubChat(List.of());
         AgentEngine engine = Engine46bStubSupport.newEngine(chat);
         engine.setKnowledgeBasesInfoForTest(List.of(
-                new AgentPrompts.KnowledgeBaseInfo("kb-1", "工程文档", "document", "engine docs", 3,
+                new KnowledgeBaseInfo("kb-1", "工程文档", "document", "engine docs", 3,
                         List.of("wiki", "chunks"), List.of(
-                                new AgentPrompts.RecentDocInfo("ch-1", "kb-1", "doc-1", "Doc One", "",
+                                new RecentDocInfo("ch-1", "kb-1", "doc-1", "Doc One", "",
                                         "", 0L, "text", "", null, null, null)))));
         engine.setSelectedDocsForTest(List.of(
-                new AgentPrompts.SelectedDocumentInfo("doc-9", "kb-1", "", "a.pdf", "pdf")));
+                new SelectedDocumentInfo("doc-9", "kb-1", "", "a.pdf", "pdf")));
         engine.setPinnedMentions(
-                List.of(new AgentPrompts.PinnedMCPServiceInfo(true, "svc-1", "iwiki", "",
+                List.of(new PinnedMCPServiceInfo(true, "svc-1", "iwiki", "",
                         List.of("mcp_iwiki_get", "mcp_iwiki_put"))),
-                List.of(new AgentPrompts.PinnedSkillInfo("writer", "writes")));
+                List.of(new PinnedSkillInfo("writer", "writes")));
 
         String withAll = mask(EventJson.write(engine.renderUserTurnContent("sess-1", "什么是 WeKnora？")));
         assertRecording(withAll, GoRecording46B.R_RENDER_USER_TURN_WITH_ALL);

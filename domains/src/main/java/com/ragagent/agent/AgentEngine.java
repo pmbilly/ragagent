@@ -43,6 +43,10 @@ import com.ragagent.common.context.TenantContext;
 import com.ragagent.agent.budget.AgentBudgets;
 import com.ragagent.agent.budget.TokenEstimator;
 import com.ragagent.agent.prompt.AgentPromptTemplates;
+import com.ragagent.agent.prompt.SelectedDocumentInfo;
+import com.ragagent.agent.prompt.PinnedMCPServiceInfo;
+import com.ragagent.agent.prompt.PinnedSkillInfo;
+import com.ragagent.agent.prompt.KnowledgeBaseInfo;
 
 /**
  * ReAct agent 引擎。
@@ -89,13 +93,13 @@ public class AgentEngine {
     final LlmChatClient chatModel;
     final EventBus eventBus;
     /** 绑定知识库详情（提示词用）；测试需要直改 → 包内可见。 */
-    List<AgentPrompts.KnowledgeBaseInfo> knowledgeBasesInfo;
+    List<KnowledgeBaseInfo> knowledgeBasesInfo;
     /** 用户 @ 选中的文档。 */
-    List<AgentPrompts.SelectedDocumentInfo> selectedDocs;
+    List<SelectedDocumentInfo> selectedDocs;
     /** 本轮 @ 指定的 MCP 服务。 */
-    List<AgentPrompts.PinnedMCPServiceInfo> pinnedMCPServices = List.of();
+    List<PinnedMCPServiceInfo> pinnedMCPServices = List.of();
     /** 本轮 @ 指定的技能。 */
-    List<AgentPrompts.PinnedSkillInfo> pinnedSkills = List.of();
+    List<PinnedSkillInfo> pinnedSkills = List.of();
     /** 引擎自己的 session id（emitContextCompacted 用它，不是执行入口的入参）。 */
     final String sessionId;
     String systemPromptTemplate;
@@ -129,7 +133,7 @@ public class AgentEngine {
     final ThinkPhase think;
     final ActPhase act;
     final ObservePhase observe;
-    final PromptAssembly prompts;
+    final ConversationAssembler prompts;
     final FinalizePhase finalize;
     final SteerIntake steer;
     final ReActIteration iteration;
@@ -147,8 +151,8 @@ public class AgentEngine {
     // ==================================================================
 
     public AgentEngine(AgentConfig config, LlmChatClient chatModel, ToolRegistry toolRegistry,
-            EventBus eventBus, List<AgentPrompts.KnowledgeBaseInfo> knowledgeBasesInfo,
-            List<AgentPrompts.SelectedDocumentInfo> selectedDocs, String sessionId,
+            EventBus eventBus, List<KnowledgeBaseInfo> knowledgeBasesInfo,
+            List<SelectedDocumentInfo> selectedDocs, String sessionId,
             String systemPromptTemplate) {
         if (eventBus == null) {
             eventBus = new EventBus();
@@ -172,7 +176,7 @@ public class AgentEngine {
         this.think = new ThinkPhase(this);
         this.act = new ActPhase(this);
         this.observe = new ObservePhase(this);
-        this.prompts = new PromptAssembly(this);
+        this.prompts = new ConversationAssembler(this);
         this.finalize = new FinalizePhase(this);
         this.steer = new SteerIntake(this);
         this.iteration = new ReActIteration(this);
@@ -182,8 +186,8 @@ public class AgentEngine {
     /** 带技能管理器的构造变体。 */
     public static AgentEngine withSkills(AgentConfig config, LlmChatClient chatModel,
             ToolRegistry toolRegistry, EventBus eventBus,
-            List<AgentPrompts.KnowledgeBaseInfo> knowledgeBasesInfo,
-            List<AgentPrompts.SelectedDocumentInfo> selectedDocs, String sessionId,
+            List<KnowledgeBaseInfo> knowledgeBasesInfo,
+            List<SelectedDocumentInfo> selectedDocs, String sessionId,
             String systemPromptTemplate, Manager skillsManager) {
         AgentEngine engine = new AgentEngine(config, chatModel, toolRegistry, eventBus,
                 knowledgeBasesInfo, selectedDocs, sessionId, systemPromptTemplate);
@@ -192,8 +196,8 @@ public class AgentEngine {
     }
 
     /** 本轮 @mention 范围。 */
-    public void setPinnedMentions(List<AgentPrompts.PinnedMCPServiceInfo> mcpServices,
-            List<AgentPrompts.PinnedSkillInfo> skills) {
+    public void setPinnedMentions(List<PinnedMCPServiceInfo> mcpServices,
+            List<PinnedSkillInfo> skills) {
         this.pinnedMCPServices = mcpServices == null ? List.of() : mcpServices;
         this.pinnedSkills = skills == null ? List.of() : skills;
     }
@@ -247,11 +251,11 @@ public class AgentEngine {
         return eventBus;
     }
 
-    void setKnowledgeBasesInfoForTest(List<AgentPrompts.KnowledgeBaseInfo> v) {
+    void setKnowledgeBasesInfoForTest(List<KnowledgeBaseInfo> v) {
         this.knowledgeBasesInfo = v;
     }
 
-    void setSelectedDocsForTest(List<AgentPrompts.SelectedDocumentInfo> v) {
+    void setSelectedDocsForTest(List<SelectedDocumentInfo> v) {
         this.selectedDocs = v;
     }
 
@@ -405,7 +409,7 @@ public class AgentEngine {
         int imgCount = imageURLs == null ? 0 : imageURLs.size();
         List<String> kbIds = new ArrayList<>();
         if (knowledgeBasesInfo != null) {
-            for (AgentPrompts.KnowledgeBaseInfo kb : knowledgeBasesInfo) {
+            for (KnowledgeBaseInfo kb : knowledgeBasesInfo) {
                 if (kb != null) {
                     kbIds.add(kb.id());
                 }
@@ -670,7 +674,7 @@ public class AgentEngine {
     }
 
     /**
-     * 渲染本轮用户消息内容（含 runtime_context / must_use 注入块；实现见 {@link PromptAssembly}）。
+     * 渲染本轮用户消息内容（含 runtime_context / must_use 注入块；实现见 {@link ConversationAssembler}）。
      */
     public String renderUserTurnContent(String sessionId, String query) {
         return prompts.renderUserTurnContent(sessionId, query);

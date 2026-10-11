@@ -8,7 +8,6 @@ import com.ragagent.knowledge.dto.faq.FaqEntryPage;
 import com.ragagent.knowledge.service.FaqEntryQueryService;
 import com.ragagent.agent.AgentConfig;
 import com.ragagent.agent.AgentEngine;
-import com.ragagent.agent.AgentPrompts;
 import com.ragagent.agent.tools.McpExposure;
 import com.ragagent.agent.tools.ToolDefinitions;
 import com.ragagent.agent.tools.wiki.WikiRouteResolver;
@@ -42,6 +41,11 @@ import com.ragagent.mcp.service.McpServiceService;
 import com.ragagent.session.domain.SessionOwnerIds;
 import com.ragagent.storage.service.ResourceCatalogService;
 import com.ragagent.agent.prompt.AgentPromptTemplates;
+import com.ragagent.agent.prompt.RecentDocInfo;
+import com.ragagent.agent.prompt.SelectedDocumentInfo;
+import com.ragagent.agent.prompt.PinnedMCPServiceInfo;
+import com.ragagent.agent.prompt.PinnedSkillInfo;
+import com.ragagent.agent.prompt.KnowledgeBaseInfo;
 
 /**
  * {@code SessionAgentQaService} 的**引擎/工具装配簇**（§14.9c 刀 3）：创建 agent 引擎（LLM/记忆/审批门/
@@ -144,8 +148,8 @@ final class AgentEngineAssembler {
         toolRegistry.prepareMcpTools();
 
         // 3. Resolve KB / selected doc metadata（resolveKBAndDocInfos；失败回落 IDs-only）
-        List<AgentPrompts.KnowledgeBaseInfo> kbInfos = getKnowledgeBaseInfos(config);
-        List<AgentPrompts.SelectedDocumentInfo> selectedDocs = getSelectedDocumentInfos(config);
+        List<KnowledgeBaseInfo> kbInfos = getKnowledgeBaseInfos(config);
+        List<SelectedDocumentInfo> selectedDocs = getSelectedDocumentInfos(config);
 
         // 4. System prompt template
         String systemPromptTemplate = "";
@@ -162,15 +166,15 @@ final class AgentEngineAssembler {
         engine.setAppConfig(new AgentPromptTemplates.TemplatesConfig(
                 AgentPromptTemplates.loadAgentSystemPromptTemplates()));
         // pinned mentions（resolvePinnedMCPServiceInfos / resolvePinnedSkillInfos）
-        List<AgentPrompts.PinnedMCPServiceInfo> pinnedMcp = new ArrayList<>();
+        List<PinnedMCPServiceInfo> pinnedMcp = new ArrayList<>();
         if (config.getPinnedMcpServiceIds() != null) {
             for (String id : config.getPinnedMcpServiceIds()) {
                 if (id != null && !id.isEmpty()) {
-                    pinnedMcp.add(new AgentPrompts.PinnedMCPServiceInfo(false, id, id, "", new ArrayList<>()));
+                    pinnedMcp.add(new PinnedMCPServiceInfo(false, id, id, "", new ArrayList<>()));
                 }
             }
         }
-        List<AgentPrompts.PinnedSkillInfo> pinnedSkills = new ArrayList<>();
+        List<PinnedSkillInfo> pinnedSkills = new ArrayList<>();
         if (config.getPinnedSkillNames() != null) {
             // 描述取自已装配的技能元数据（此前给空串 → @ 引用处拿不到任何展示信息）
             java.util.Map<String, String> descByName = new java.util.HashMap<>();
@@ -183,7 +187,7 @@ final class AgentEngineAssembler {
             }
             for (String name : config.getPinnedSkillNames()) {
                 if (name != null && !name.isEmpty()) {
-                    pinnedSkills.add(new AgentPrompts.PinnedSkillInfo(name, descByName.getOrDefault(name, "")));
+                    pinnedSkills.add(new PinnedSkillInfo(name, descByName.getOrDefault(name, "")));
                 }
             }
         }
@@ -301,12 +305,12 @@ final class AgentEngineAssembler {
      * capabilities）进 system prompt 与 runtime_context。单库失败回落 ID-only 占位；
      * 临时库（__chat_history__ 等）跳过。
      */
-    private List<AgentPrompts.KnowledgeBaseInfo> getKnowledgeBaseInfos(QaAgentConfig config) {
+    private List<KnowledgeBaseInfo> getKnowledgeBaseInfos(QaAgentConfig config) {
         KbScopes scopes = knowledgeBaseScopesForPrompt(config);
         if (scopes.kbIds().isEmpty()) {
             return new ArrayList<>();
         }
-        List<AgentPrompts.KnowledgeBaseInfo> kbInfos = new ArrayList<>();
+        List<KnowledgeBaseInfo> kbInfos = new ArrayList<>();
         for (String kbId : scopes.kbIds()) {
             KnowledgeBase kb;
             try {
@@ -316,7 +320,7 @@ final class AgentEngineAssembler {
             }
             if (kb == null) {
                 log.warn("Failed to get knowledge base {}, using IDs only for prompt", kbId);
-                kbInfos.add(new AgentPrompts.KnowledgeBaseInfo(kbId, kbId, "document", "", 0,
+                kbInfos.add(new KnowledgeBaseInfo(kbId, kbId, "document", "", 0,
                         List.of(), List.of()));
                 continue;
             }
@@ -326,7 +330,7 @@ final class AgentEngineAssembler {
                 continue;
             }
             int docCount = 0;
-            List<AgentPrompts.RecentDocInfo> recentDocs = new ArrayList<>();
+            List<RecentDocInfo> recentDocs = new ArrayList<>();
             // FAQ 库：条目列表；否则/失败回落通用 knowledge 列表（completed 过滤，top 10）
             if ("faq".equals(kb.getType())) {
                 try {
@@ -339,7 +343,7 @@ final class AgentEngineAssembler {
                             if (recentDocs.size() >= 10) {
                                 break;
                             }
-                            recentDocs.add(new AgentPrompts.RecentDocInfo(
+                            recentDocs.add(new RecentDocInfo(
                                     entry.chunkId(), entry.knowledgeBaseId(), entry.knowledgeId(),
                                     entry.standardQuestion(), "", "", 0, "faq",
                                     entry.createdAt() == null ? ""
@@ -362,7 +366,7 @@ final class AgentEngineAssembler {
                             if (k == null || recentDocs.size() >= 10) {
                                 break;
                             }
-                            recentDocs.add(new AgentPrompts.RecentDocInfo(
+                            recentDocs.add(new RecentDocInfo(
                                     "", kb.getId(), nz(k.getId()), nz(k.getTitle()), nz(k.getDescription()),
                                     nz(k.getFileName()), k.getFileSize() == null ? 0 : k.getFileSize(),
                                     nz(k.getFileType()),
@@ -376,7 +380,7 @@ final class AgentEngineAssembler {
                 }
             }
             String kbType = kb.getType() == null || kb.getType().isEmpty() ? "document" : kb.getType();
-            kbInfos.add(new AgentPrompts.KnowledgeBaseInfo(kb.getId(), nz(kb.getName()), kbType,
+            kbInfos.add(new KnowledgeBaseInfo(kb.getId(), nz(kb.getName()), kbType,
                     nz(kb.getDescription()), docCount, kbRetrievalCapabilities(kb), recentDocs));
         }
         return kbInfos;
@@ -395,12 +399,12 @@ final class AgentEngineAssembler {
         return caps;
     }
     /** @ 提及文档的元数据（缺失逐条跳过）。 */
-    private List<AgentPrompts.SelectedDocumentInfo> getSelectedDocumentInfos(QaAgentConfig config) {
+    private List<SelectedDocumentInfo> getSelectedDocumentInfos(QaAgentConfig config) {
         List<String> ids = config.getKnowledgeIds();
         if (ids == null || ids.isEmpty()) {
             return new ArrayList<>();
         }
-        List<AgentPrompts.SelectedDocumentInfo> selectedDocs = new ArrayList<>();
+        List<SelectedDocumentInfo> selectedDocs = new ArrayList<>();
         for (String kid : ids) {
             Knowledge k;
             try {
@@ -412,7 +416,7 @@ final class AgentEngineAssembler {
                 log.warn("Selected knowledge {} not found", kid);
                 continue;
             }
-            selectedDocs.add(new AgentPrompts.SelectedDocumentInfo(nz(k.getId()),
+            selectedDocs.add(new SelectedDocumentInfo(nz(k.getId()),
                     nz(k.getKnowledgeBaseId()), nz(k.getTitle()), nz(k.getFileName()), nz(k.getFileType())));
         }
         return selectedDocs;

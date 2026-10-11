@@ -12,24 +12,35 @@ import com.ragagent.agent.skills.Skill;
 import com.ragagent.agent.tools.ToolDefinitions;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.common.wiki.WikiLanguageSupport;
+import com.ragagent.agent.prompt.RecentDocInfo;
+import com.ragagent.agent.prompt.SelectedDocumentInfo;
+import com.ragagent.agent.prompt.PinnedMCPServiceInfo;
+import com.ragagent.agent.prompt.PinnedSkillInfo;
+import com.ragagent.agent.prompt.PinnedSkillInstructions;
+import com.ragagent.agent.prompt.KnowledgeBaseInfo;
+import com.ragagent.agent.prompt.SystemPromptSection;
 
 /**
- * 引擎提示词装配协作者：系统提示词构建、runtime_context / must_use 注入块、
- * 用户轮内容渲染与历史消息组装（含 KB 工具结果的历史净化）。
+ * 会话装配协作者（原 {@code PromptAssembly}）：把"这次要发给模型的消息"组装出来——
+ * runtime_context / must_use 注入块、用户轮内容渲染、历史消息与 KB 工具结果净化，
+ * 以及系统提示词（**段选择委托 {@link AgentPrompts} 的段表**，本类只负责取出并拼接）。
  *
  * <p>持有 {@link AgentEngine} 回引以访问引擎绑定面（知识库/文档/MCP/技能）；
  * 本类不得独立实例化。</p>
+ *
+ * <p>更名理由：本类的主要职责是 messages 数组的装配，系统提示词文本的"选段"已经
+ * 归段表（F5b-1），"怎么拼"归 L1 {@code PromptComposer}（F5a）。</p>
  */
-final class PromptAssembly {
+final class ConversationAssembler {
 
-    private static final Logger log = LoggerFactory.getLogger(PromptAssembly.class);
+    private static final Logger log = LoggerFactory.getLogger(ConversationAssembler.class);
 
     private final AgentEngine engine;
 
     /** pinned 技能正文的每轮缓存（引擎每轮新建 → 天然每轮失效）。 */
-    private List<AgentPrompts.PinnedSkillInstructions> pinnedSkillInstructions;
+    private List<PinnedSkillInstructions> pinnedSkillInstructions;
 
-    PromptAssembly(AgentEngine engine) {
+    ConversationAssembler(AgentEngine engine) {
         this.engine = engine;
     }
 
@@ -55,7 +66,7 @@ final class PromptAssembly {
      * 本轮点名技能的正文：读不到就不注入（该技能改走 read_file 按需读取），
      * 不让技能读取失败拖垮整轮对话。
      */
-    private List<AgentPrompts.PinnedSkillInstructions> pinnedSkillInstructions() {
+    private List<PinnedSkillInstructions> pinnedSkillInstructions() {
         if (pinnedSkillInstructions == null) {
             pinnedSkillInstructions = resolvePinnedSkillInstructions(engine.skillsManager, engine.pinnedSkills);
         }
@@ -66,19 +77,19 @@ final class PromptAssembly {
      * pinned 技能正文解析（静态便于单测）：技能关着或读不到就不注入该条
      * （该技能改走 read_file 按需读取），不让技能读取失败拖垮整轮对话。
      */
-    static List<AgentPrompts.PinnedSkillInstructions> resolvePinnedSkillInstructions(
-            Manager manager, List<AgentPrompts.PinnedSkillInfo> pinned) {
-        List<AgentPrompts.PinnedSkillInstructions> out = new ArrayList<>();
+    static List<PinnedSkillInstructions> resolvePinnedSkillInstructions(
+            Manager manager, List<PinnedSkillInfo> pinned) {
+        List<PinnedSkillInstructions> out = new ArrayList<>();
         if (manager == null || !manager.isEnabled() || pinned == null) {
             return out;
         }
-        for (AgentPrompts.PinnedSkillInfo item : pinned) {
+        for (PinnedSkillInfo item : pinned) {
             if (item == null || item.name() == null || item.name().isEmpty()) {
                 continue;
             }
             try {
                 Skill skill = manager.loadSkill(item.name());
-                out.add(new AgentPrompts.PinnedSkillInstructions(item.name(), skill.instructions));
+                out.add(new PinnedSkillInstructions(item.name(), skill.instructions));
             } catch (Exception e) {
                 log.warn("[Agent][Prompt] pinned skill \"{}\" not injected: {}", item.name(), e.getMessage());
             }
@@ -98,10 +109,10 @@ final class PromptAssembly {
     }
 
     String buildSystemPrompt() {
-        List<AgentPrompts.SystemPromptSection> sections = AgentPrompts.buildSystemPromptSections(
+        List<SystemPromptSection> sections = AgentPrompts.buildSystemPromptSections(
                 engine.knowledgeBasesInfo, engine.config != null && engine.config.isWebSearchEnabled(),
                 systemPromptOptions(), LocalDate.now(), engine.systemPromptTemplate);
-        for (AgentPrompts.SystemPromptSection section : sections) {
+        for (SystemPromptSection section : sections) {
             log.debug("[Agent][Prompt] section={} bytes={}", section.name(),
                     section.content() == null ? 0 : section.content().length());
         }
@@ -137,8 +148,8 @@ final class PromptAssembly {
      * 注入当前 user 消息、不落历史——回放的用户轮
      * 保持裸 Content，过期的范围快照不会误导追问。
      */
-    static String buildRuntimeContextBlock(String sessionId, List<AgentPrompts.KnowledgeBaseInfo> kbs,
-            List<AgentPrompts.SelectedDocumentInfo> docs) {
+    static String buildRuntimeContextBlock(String sessionId, List<KnowledgeBaseInfo> kbs,
+            List<SelectedDocumentInfo> docs) {
         StringBuilder sb = new StringBuilder();
         sb.append("<runtimeContext scope=\"this_turn\">\n");
         sb.append("  <currentTime>").append(LocalDate.now().toString()).append("</currentTime>\n");
@@ -153,7 +164,7 @@ final class PromptAssembly {
 
         if (docs != null && !docs.isEmpty()) {
             sb.append("  <pinnedDocuments scope=\"authoritative_for_this_turn\">\n");
-            for (AgentPrompts.SelectedDocumentInfo d : docs) {
+            for (SelectedDocumentInfo d : docs) {
                 if (d == null) {
                     continue;
                 }
@@ -182,11 +193,11 @@ final class PromptAssembly {
     }
 
     /** @mention 的短提示（工具名已在 schema 里，此处不列）。 */
-    static String buildMustUseBlock(List<AgentPrompts.PinnedMCPServiceInfo> mcpServices,
-            List<AgentPrompts.PinnedSkillInfo> skills, List<String> injectedSkillNames) {
+    static String buildMustUseBlock(List<PinnedMCPServiceInfo> mcpServices,
+            List<PinnedSkillInfo> skills, List<String> injectedSkillNames) {
         List<String> lines = new ArrayList<>();
         if (mcpServices != null) {
-            for (AgentPrompts.PinnedMCPServiceInfo svc : mcpServices) {
+            for (PinnedMCPServiceInfo svc : mcpServices) {
                 if (svc == null) {
                     continue;
                 }
@@ -219,7 +230,7 @@ final class PromptAssembly {
             }
         }
         if (skills != null) {
-            for (AgentPrompts.PinnedSkillInfo skill : skills) {
+            for (PinnedSkillInfo skill : skills) {
                 if (skill == null || skill.name().isEmpty()) {
                     continue;
                 }
@@ -255,7 +266,7 @@ final class PromptAssembly {
      * mcp_{service}_{tool}，service slug 自己可能带下划线——取最长公共前缀再缩回最后
      * 一个段边界，而不是在第一个下划线处傻切。
      */
-    static String mcpToolNamePrefix(AgentPrompts.PinnedMCPServiceInfo svc) {
+    static String mcpToolNamePrefix(PinnedMCPServiceInfo svc) {
         if (svc == null || svc.toolNames() == null || svc.toolNames().isEmpty()) {
             return "";
         }
@@ -301,14 +312,14 @@ final class PromptAssembly {
         String runtimeCtx = buildRuntimeContextBlock(sessionId, engine.knowledgeBasesInfo, engine.selectedDocs);
         runtimeCtx = engine.modelContext.compactKnownText(runtimeCtx);
         String mustUse = buildMustUseBlock(engine.pinnedMCPServices, engine.pinnedSkills,
-                pinnedSkillInstructions().stream().map(AgentPrompts.PinnedSkillInstructions::name).toList());
+                pinnedSkillInstructions().stream().map(PinnedSkillInstructions::name).toList());
         return composeUserTurnContent(List.of(runtimeCtx, mustUse, query));
     }
 
     /** 绑定 KB / 钉住文档 / 近期 chunk 注册成请求内句柄。 */
     void registerRuntimeReferences() {
         if (engine.knowledgeBasesInfo != null) {
-            for (AgentPrompts.KnowledgeBaseInfo kb : engine.knowledgeBasesInfo) {
+            for (KnowledgeBaseInfo kb : engine.knowledgeBasesInfo) {
                 if (kb == null) {
                     continue;
                 }
@@ -316,7 +327,7 @@ final class PromptAssembly {
                 if (kb.recentDocs() == null) {
                     continue;
                 }
-                for (AgentPrompts.RecentDocInfo doc : kb.recentDocs()) {
+                for (RecentDocInfo doc : kb.recentDocs()) {
                     engine.modelContext.registerDocument(doc.knowledgeId());
                     if (doc.chunkId() != null && !doc.chunkId().isEmpty()) {
                         String title = doc.title();
@@ -330,7 +341,7 @@ final class PromptAssembly {
             }
         }
         if (engine.selectedDocs != null) {
-            for (AgentPrompts.SelectedDocumentInfo doc : engine.selectedDocs) {
+            for (SelectedDocumentInfo doc : engine.selectedDocs) {
                 if (doc == null) {
                     continue;
                 }
