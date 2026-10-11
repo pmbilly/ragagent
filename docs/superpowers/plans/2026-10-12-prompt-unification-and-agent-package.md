@@ -148,15 +148,25 @@ enum Position { PRE_BASE, POST_BASE, PRE_PROTOCOL, POST_PROTOCOL }
 
 **执行记录（2026-10-12）**：`git rev-parse` 见提交 `refactor(prompt): 评估默认值改取单一模板源`。验证：`:common:test`、`:domains:test --tests '*EvaluationPromptDefaultsTest*'`、`:boot:test --tests '*EvaluationContractTest*'`、`:common/:domains:spotlessCheck` 全绿。
 
-## F3（P0）：守门测试（含三链路 golden 录制）
+## F3（P0）：守门测试
+
+**落点调整（2026-10-12 执行时定）**：初稿把守卫放 `boot` 的 ClassGraph arch 层、并另写一条"三链路 golden"。实际：
+
+- 归属规则的判定依据是**源码文本**（不是类图），放 ClassGraph 反而绕 → 落在 `domains/.../arch/PromptOwnershipTest`（与既有 `ClasspathResourcesTest` 同层，且沿用其"源码扫描 + 清单"手法；跨模块根用 `Path.of("..")` 定位仓库根）。
+- **不另造三链路 golden**：既有实录已经逐字节钉住三条链路的 messages（agent → `GoRecording46B`/`EngineRecordingTest`；快答 → `GoRecording46C`/`PipelineLifecycleRecordingTest`；句柄协议 → `GoRecording46A`/`ModelContextRecordingTest`），另有 `EvaluationContractTest` 钉评估响应体。再造一份 golden = 重复安全网，故 F5 的保护网就是这些既有实录。
 
 **Files:**
-- Create: `boot/src/test/java/com/ragagent/arch/PromptOwnershipTest.java`（①只有 `PromptSource` 打开模板目录 ②新增文案字面量必须登记）
-- Create: `domains/src/test/java/com/ragagent/agent/prompt/SystemPromptGoldenTest.java`（录制 agent/快答/fallback 三条链路的 system 文本 golden，F5 必须原样通过）
+- Create: `domains/src/test/java/com/ragagent/arch/PromptOwnershipTest.java`（A1 归属 / A2 残迹 / A3 装载方式）
+- Modify: `common/.../prompt/PromptSource.java`（11 个模板文件名升为 public 常量，成为全仓唯一字面量来源）
+- Modify: 6 处消费方改引常量（`PromptTemplateCatalog` / `AgentPromptTemplates` / `EvaluationPromptDefaults` / `QaWiring` / `AgentConfigAssembler` / `QaChatManageOverrides`）
 
-- [ ] **Step 1**: 写装载边界 arch 规则（ClassGraph 扫 `agent/management/prompt_templates`、`prompts/` 字面量的引用方，白名单仅 `PromptSource`）。
-- [ ] **Step 2**: 录制三链路 golden（sha256 + 全文对照）；对现有 `GoRecording*` 做一次核对，确保未覆盖链路。
-- [ ] **Step 3**: 全量测试绿 → Commit `test(prompt): 提示词单源守门（装载边界 / 文案登记 / 三链路 golden）`。
+- [x] **Step 1**: A1 = 11 个模板文件名字面量只允许出现在 `common/prompt`；A2 = 旧目录 `agent/management/prompt_templates` 零残留；A3 = 禁止任何自拼模板路径的 `getResourceAsStream`（只能走 `PromptSource`）。守门测试自身用 `isSelf` 跳过（其说明文字必然含被禁串）。
+- [x] **Step 2**: 严格 A1 的前提是"消费方不再自写文件名" → 已把 11 个名字升为 `PromptSource` 常量并改掉 6 个消费点（含 `AGENT_SYSTEM_PROMPT_FILE` 本地常量删除）。
+- [x] **Step 3**: 全量后端测试 + `spotlessCheck` 绿 → 提交见执行记录。
+
+**执行记录（2026-10-12）**
+- 验证：`PromptOwnershipTest`（A1/A2/A3）+ `ClasspathResourcesTest` + `EvaluationPromptDefaultsTest` + `:common:test` 全绿；`:common:test :engine:test :domains:test :boot:test` + 三模块 `spotlessCheck` 全绿（domains 2,890 用例）。
+- 已知偶发（与本批无关）：`EmbedRateLimiterTest` 的时间窗用例会偶发单条红（连跑两次可复现"不同用例失败 / 全绿"），属限流时间敏感，非确定性失败。
 
 ## F4（P5）：agent 包纯移动归位
 

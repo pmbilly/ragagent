@@ -41,9 +41,6 @@ public final class AgentPromptTemplates {
     public record TemplatesConfig(List<PromptTemplate> agentSystemPrompt) {
     }
 
-    /** agent 系统提示词模板文件名（{@code PromptSource} 清单内）。 */
-    private static final String AGENT_SYSTEM_PROMPT_FILE = "agent_system_prompt.yaml";
-
     private AgentPromptTemplates() {
     }
 
@@ -82,7 +79,7 @@ public final class AgentPromptTemplates {
      * 文件缺失/损坏返回空列表。
      */
     public static List<PromptTemplate> loadAgentSystemPromptTemplates() {
-        try (var in = PromptSource.open(AGENT_SYSTEM_PROMPT_FILE)) {
+        try (var in = PromptSource.open(PromptSource.AGENT_SYSTEM_PROMPT)) {
             if (in == null) {
                 return List.of();
             }

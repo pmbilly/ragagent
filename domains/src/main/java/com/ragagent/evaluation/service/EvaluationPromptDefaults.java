@@ -1,5 +1,6 @@
 package com.ragagent.evaluation.service;
 
+import com.ragagent.common.prompt.PromptSource;
 import com.ragagent.common.prompt.PromptTemplates;
 
 /**
@@ -15,16 +16,16 @@ import com.ragagent.common.prompt.PromptTemplates;
 public final class EvaluationPromptDefaults {
 
     public static final String SUMMARY_PROMPT =
-            PromptTemplates.content("system_prompt.yaml", "default_kb");
+            PromptTemplates.content(PromptSource.SYSTEM_PROMPT, "default_kb");
 
     public static final String SUMMARY_CONTEXT_TEMPLATE =
-            PromptTemplates.content("context_template.yaml", "default_context");
+            PromptTemplates.content(PromptSource.CONTEXT_TEMPLATE, "default_context");
 
     public static final String REWRITE_PROMPT_SYSTEM =
-            PromptTemplates.content("rewrite.yaml", "default_rewrite");
+            PromptTemplates.content(PromptSource.REWRITE, "default_rewrite");
 
     public static final String REWRITE_PROMPT_USER =
-            PromptTemplates.user("rewrite.yaml", "default_rewrite");
+            PromptTemplates.user(PromptSource.REWRITE, "default_rewrite");
 
     /** 评估专用：无命中时给摘要模型的固定前缀（非模板副本）。 */
     public static final String SUMMARY_NO_MATCH_PREFIX = "<think>\n</think>\nNO_MATCH";

@@ -22,12 +22,25 @@ public final class PromptSource {
     /** 模板目录的 classpath 前缀。 */
     public static final String DIR = "prompts/";
 
+    // ── 模板文件名：全仓唯一字面量来源（消费方引用常量，别再写字面量）──
+    public static final String AGENT_SYSTEM_PROMPT = "agent_system_prompt.yaml";
+    public static final String SYSTEM_PROMPT = "system_prompt.yaml";
+    public static final String CONTEXT_TEMPLATE = "context_template.yaml";
+    public static final String REWRITE = "rewrite.yaml";
+    public static final String FALLBACK = "fallback.yaml";
+    public static final String GENERATE_SUMMARY = "generate_summary.yaml";
+    public static final String GENERATE_SESSION_TITLE = "generate_session_title.yaml";
+    public static final String KEYWORDS_EXTRACTION = "keywords_extraction.yaml";
+    public static final String GRAPH_EXTRACTION = "graph_extraction.yaml";
+    public static final String GENERATE_QUESTIONS = "generate_questions.yaml";
+    public static final String INTENT_PROMPTS = "intent_prompts.yaml";
+
     /** 模板文件清单（顺序 = FindTemplateByID 查找序，共 11 份）。 */
     private static final List<String> FILES = List.of(
-            "agent_system_prompt.yaml", "system_prompt.yaml", "context_template.yaml",
-            "fallback.yaml", "generate_summary.yaml", "generate_session_title.yaml",
-            "rewrite.yaml", "graph_extraction.yaml", "generate_questions.yaml",
-            "keywords_extraction.yaml", "intent_prompts.yaml");
+            AGENT_SYSTEM_PROMPT, SYSTEM_PROMPT, CONTEXT_TEMPLATE,
+            FALLBACK, GENERATE_SUMMARY, GENERATE_SESSION_TITLE,
+            REWRITE, GRAPH_EXTRACTION, GENERATE_QUESTIONS,
+            KEYWORDS_EXTRACTION, INTENT_PROMPTS);
 
     private PromptSource() {
     }

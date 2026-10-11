@@ -151,7 +151,7 @@ final class AgentConfigAssembler {
             String id = c.path("systemPromptId").asText("");
             if (!id.isEmpty()) {
                 String resolved = templateContentByIdAndFile(id,
-                        agentMode ? "agent_system_prompt.yaml" : "system_prompt.yaml");
+                        agentMode ? PromptSource.AGENT_SYSTEM_PROMPT : PromptSource.SYSTEM_PROMPT);
                 if (resolved != null) {
                     system = resolved;
                 }
@@ -160,7 +160,7 @@ final class AgentConfigAssembler {
         if (context.isEmpty()) {
             String id = c.path("contextTemplateId").asText("");
             if (!id.isEmpty()) {
-                String resolved = templateContentByIdAndFile(id, "context_template.yaml");
+                String resolved = templateContentByIdAndFile(id, PromptSource.CONTEXT_TEMPLATE);
                 if (resolved != null) {
                     context = resolved;
                 }

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.agent.management.service.AgentConfigJson;
 import com.ragagent.chatpipeline.ChatManage;
+import com.ragagent.common.prompt.PromptSource;
 import com.ragagent.agent.management.domain.CustomAgentEntity;
 
 /**
@@ -131,14 +132,14 @@ final class QaChatManageOverrides {
         String systemId = c.path("systemPromptId").asText("");
         if (system.isEmpty() && !systemId.isEmpty()) {
             String content = SessionQaResolution.templateContentByIdAndFile(systemId,
-                    agentMode ? "agent_system_prompt.yaml" : "system_prompt.yaml");
+                    agentMode ? PromptSource.AGENT_SYSTEM_PROMPT : PromptSource.SYSTEM_PROMPT);
             if (content != null) {
                 system = content;
             }
         }
         String contextId = c.path("contextTemplateId").asText("");
         if (context.isEmpty() && !contextId.isEmpty()) {
-            String content = SessionQaResolution.templateContentByIdAndFile(contextId, "context_template.yaml");
+            String content = SessionQaResolution.templateContentByIdAndFile(contextId, PromptSource.CONTEXT_TEMPLATE);
             if (content != null) {
                 context = content;
             }

@@ -394,7 +394,7 @@ public class QaWiring {
 
     private static Map<String, String> loadIntentPrompts() {
         Map<String, String> out = new LinkedHashMap<>();
-        try (InputStream in = PromptSource.open("intent_prompts.yaml")) {
+        try (InputStream in = PromptSource.open(PromptSource.INTENT_PROMPTS)) {
             if (in == null) {
                 return out;
             }

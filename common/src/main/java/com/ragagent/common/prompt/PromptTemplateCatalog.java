@@ -77,15 +77,15 @@ public final class PromptTemplateCatalog {
             synchronized (PromptTemplateCatalog.class) {
                 if (cached == null) {
                     cached = new Config(
-                            loadFile("system_prompt.yaml"),
-                            loadFile("context_template.yaml"),
-                            loadFile("rewrite.yaml"),
-                            loadFile("fallback.yaml"),
-                            loadFile("generate_session_title.yaml"),
-                            loadFile("generate_summary.yaml"),
-                            loadFile("keywords_extraction.yaml"),
-                            loadFile("agent_system_prompt.yaml"),
-                            loadFile("intent_prompts.yaml"));
+                            loadFile(PromptSource.SYSTEM_PROMPT),
+                            loadFile(PromptSource.CONTEXT_TEMPLATE),
+                            loadFile(PromptSource.REWRITE),
+                            loadFile(PromptSource.FALLBACK),
+                            loadFile(PromptSource.GENERATE_SESSION_TITLE),
+                            loadFile(PromptSource.GENERATE_SUMMARY),
+                            loadFile(PromptSource.KEYWORDS_EXTRACTION),
+                            loadFile(PromptSource.AGENT_SYSTEM_PROMPT),
+                            loadFile(PromptSource.INTENT_PROMPTS));
                 }
                 c = cached;
             }
