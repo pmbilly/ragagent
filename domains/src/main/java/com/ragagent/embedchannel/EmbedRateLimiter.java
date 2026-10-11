@@ -32,8 +32,9 @@ import org.springframework.stereotype.Component;
  * （{@code embed:ratelimit:{windowMs}:{key}}）——同 key 的 1 分钟窗与 24 小时窗
  * 互不污染。</p>
  *
- * <p><b>成员唯一性</b>：ZSET 成员为 {@code nowMs-序号}——防同一毫秒多次命中时
- * 共用成员互相覆盖、同毫秒连击少计一次。</p>
+ * <p><b>成员唯一性</b>：ZSET 成员为 {@code nowMs-实例ID-序号}——防同一毫秒多次命中
+ * 共用成员互相覆盖（同毫秒连击少计一次）；实例 ID 是必需的，否则**两个副本在同一毫秒**
+ * 会算出同一个成员，{@code zadd} 变成改分而非新增，跨实例共享预算就会少计一次。</p>
  */
 @Component
 public class EmbedRateLimiter {
@@ -64,8 +65,14 @@ public class EmbedRateLimiter {
     /** Redis 面缺席（单实例 / 未开开关）时为 null，全部走本地滑窗。 */
     private final StringRedisTemplate template;
 
-    /** 限流成员序号：防同一毫秒多次命中共用 ZSET 成员。 */
-    private final AtomicLong memberSeq = new AtomicLong();
+    /** 本实例标识：跨副本同毫秒命中不共用 ZSET 成员（多副本共享预算的主场景）。 */
+    private static final String INSTANCE_ID = java.util.UUID.randomUUID().toString().substring(0, 8);
+
+    /**
+     * 成员序号（**JVM 全局**，不是每实例）：成员唯一性 = 毫秒 + 实例 ID + 本序号。
+     * 若序号是每实例的，同 JVM 内两个实例在同一毫秒仍会算出同一成员（各自从 1 开始）。
+     */
+    private static final AtomicLong MEMBER_SEQ = new AtomicLong();
 
     private final Map<String, Deque<Long>> hits = new ConcurrentHashMap<>();
     private long calls;
@@ -113,10 +120,17 @@ public class EmbedRateLimiter {
         return allowLocal(windowKey, windowMillis, max);
     }
 
+    /**
+     * 生成窗口成员：{@code 毫秒-实例ID-序号}。包内可见供测试直接断言唯一性。
+     */
+    String memberFor(long nowMs) {
+        return nowMs + "-" + INSTANCE_ID + "-" + MEMBER_SEQ.incrementAndGet();
+    }
+
     /** Redis 路径：true/false = 判定结果；null = 后端故障（调用方回落本地）。 */
     private Boolean allowRedis(String windowKey, long windowMillis, int max) {
         long now = System.currentTimeMillis();
-        String member = now + "-" + memberSeq.incrementAndGet();
+        String member = memberFor(now);
         try {
             Long result = template.execute(ALLOW, List.of(REDIS_KEY_PREFIX + windowKey),
                     String.valueOf(now), String.valueOf(windowMillis),

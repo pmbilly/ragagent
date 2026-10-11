@@ -90,4 +90,22 @@ class EmbedRateLimiterTest {
         assertThat(limiter.allow("k", EmbedRateLimiter.MINUTE_MILLIS, 1))
                 .as("本地滑窗继续计数").isFalse();
     }
+
+    /**
+     * 回归：成员唯一性必须**跨实例**成立。只带"毫秒+实例内序号"时，两个副本在同一毫秒
+     * 会算出同一个 ZSET 成员，{@code zadd} 变成改分 ⇒ 共享预算少计一次
+     * （这正是 {@code redisPathSharesBudgetAcrossInstances} 偶发红的原因）。
+     */
+    @Test
+    void redisMembersAreUniqueAcrossInstances() {
+        EmbedRateLimiter a = new EmbedRateLimiter(redis.template());
+        EmbedRateLimiter b = new EmbedRateLimiter(redis.template());
+        long sameMs = System.currentTimeMillis();
+        assertThat(a.memberFor(sameMs))
+                .as("同毫秒的两实例成员必须不同")
+                .isNotEqualTo(b.memberFor(sameMs));
+        assertThat(a.memberFor(sameMs))
+                .as("同实例同毫秒的连续命中也不能共用成员")
+                .isNotEqualTo(a.memberFor(sameMs));
+    }
 }
