@@ -13,7 +13,7 @@ import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ToolCall;
 import com.ragagent.session.domain.Message;
 import com.ragagent.session.support.PipelineViews;
-import com.ragagent.agent.tools.ToolResultPersist;
+import com.ragagent.agent.tools.runtime.ToolResultPersist;
 import com.ragagent.llm.domain.FunctionCall;
 
 /**
