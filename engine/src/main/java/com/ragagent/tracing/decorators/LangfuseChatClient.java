@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
@@ -111,13 +112,21 @@ public final class LangfuseChatClient implements LlmChatClient {
             List<ToolCall> toolCalls = null;
             String finishReason = "";
             boolean firstToken = false;
+            boolean terminalSeen = false;
             try {
                 while (true) {
                     StreamResponse resp;
                     try {
-                        resp = innerQueue.take();
+                        // 终态之后仍可能有尾随分片（用量常在独立 chunk 里到达），
+                        // 短宽限窗口排空后再收 generation。
+                        resp = terminalSeen
+                                ? innerQueue.poll(500, TimeUnit.MILLISECONDS)
+                                : innerQueue.take();
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
+                        break;
+                    }
+                    if (resp == null) {
                         break;
                     }
                     ResponseType type = resp.getResponseType();
@@ -150,8 +159,11 @@ public final class LangfuseChatClient implements LlmChatClient {
                         Thread.currentThread().interrupt();
                         break;
                     }
-                    if (resp.isDone()) {
-                        break;
+                    // thinking 的 done=true 只是"思考结束"标记，其后流仍开着（答案分片随后来）
+                    // ——只有非 thinking 的终态才算收尾，提前 break 会把答案与用量丢掉、
+                    // 并让消费方永久阻塞。
+                    if (resp.isDone() && type != ResponseType.THINKING) {
+                        terminalSeen = true;
                     }
                 }
             } finally {

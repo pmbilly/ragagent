@@ -8,6 +8,10 @@ import {
   isEmbedPage,
   refreshAccessTokenShared,
 } from './authRefresh';
+import {
+  hasEmbedTokenRefresher,
+  refreshEmbedTokenShared,
+} from './embedTokenRefresh';
 
 export { forceReloginRedirect, refreshAccessTokenShared };
 
@@ -180,12 +184,28 @@ instance.interceptors.response.use(
       return Promise.reject({ message: t('error.networkError') });
     }
     
-    // 公开接口（auto-setup / login / register / oidc）的 401 不走 refresh 逻辑，直接返回错误
+    // 公开接口（auto-setup / login / register / oidc）的 401 不走 JWT refresh 逻辑，
+    // 直接返回错误——但嵌入会话票（ems_，30 分钟 TTL）过期要先换票 + 原请求重放一次。
     if ((error.response.status === 401 || error.response.status === 403) && isPublicAuthRequest(originalRequest?.url)) {
       const { status, data } = error.response;
       const msg = typeof data === 'object'
         ? (typeof data?.error === 'string' ? data.error : (data?.error?.message || data?.message))
         : data;
+      const embedAuth = String(originalRequest?.headers?.Authorization ?? originalRequest?.headers?.authorization ?? '');
+      // /exchange 是换票动作本身，排除它避免与单飞的换票调用互等。
+      const canRetryEmbed = status === 401
+        && embedAuth.startsWith('Embed ')
+        && !originalRequest._embedRetry
+        && !String(originalRequest?.url || '').includes('/exchange')
+        && hasEmbedTokenRefresher();
+      if (canRetryEmbed) {
+        originalRequest._embedRetry = true;
+        const fresh = await refreshEmbedTokenShared();
+        if (fresh) {
+          originalRequest.headers['Authorization'] = 'Embed ' + fresh;
+          return instance(originalRequest);
+        }
+      }
       return Promise.reject(withHttpStatus({ status, message: msg || t('error.invalidCredentials') }, status));
     }
 

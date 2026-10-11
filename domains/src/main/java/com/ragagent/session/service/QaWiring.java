@@ -58,6 +58,8 @@ import com.ragagent.session.support.PipelineViews;
 import com.ragagent.websearch.service.WebSearchService;
 import com.ragagent.model.service.ModelRuntimeConfigs;
 import com.ragagent.chatpipeline.PipelinePorts;
+import com.ragagent.tracing.decorators.LangfuseChatClient;
+import com.ragagent.tracing.decorators.LangfuseReranker;
 import com.ragagent.agent.tools.data.DataAnalysisSessionFactoryAdapter;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.chatpipeline.plugin.PluginDataAnalysis;
@@ -129,7 +131,9 @@ public class QaWiring {
                 ChatConfig config = ModelRuntimeConfigs.chatConfig(model,
                         p == null ? null : p.getAppId(),
                         p == null ? null : p.getAppSecret());
-                return LlmChatClients.create(config, ollamaService.getIfAvailable(), concurrencyGovernor);
+                // langfuse generation 装饰（未启用时原样返回）
+                return LangfuseChatClient.wrap(
+                        LlmChatClients.create(config, ollamaService.getIfAvailable(), concurrencyGovernor));
             }
 
             @Override
@@ -142,7 +146,8 @@ public class QaWiring {
                 RerankerConfig config = ModelRuntimeConfigs.rerankerConfig(model,
                         p == null ? null : p.getAppId(),
                         p == null ? null : p.getAppSecret());
-                return RerankerFactory.newReranker(config);
+                // langfuse generation 装饰（未启用时原样返回）
+                return LangfuseReranker.wrap(RerankerFactory.newReranker(config));
             }
         };
     }

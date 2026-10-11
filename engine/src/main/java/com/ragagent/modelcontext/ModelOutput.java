@@ -102,6 +102,9 @@ final class ModelOutput {
     }
 
     private static String modelDatabaseQueryOutput(SourceRegistry r, List<Map<String, JsonNode>> rows, String fallback) {
+        if (rows == null) {
+            return r.compactKnownText(fallback);
+        }
         for (Map<String, JsonNode> row : rows) {
             for (Map.Entry<String, JsonNode> e : row.entrySet()) {
                 if (e.getValue().isTextual()) {
@@ -113,7 +116,7 @@ final class ModelOutput {
     }
 
     private static String modelDocumentInfoOutput(SourceRegistry r, List<Map<String, JsonNode>> rows, String fallback) {
-        if (rows.isEmpty()) {
+        if (rows == null || rows.isEmpty()) {
             return r.compactKnownText(fallback);
         }
         StringBuilder b = new StringBuilder();
@@ -197,6 +200,10 @@ final class ModelOutput {
     }
 
     private static String modelKnowledgeOutput(SourceRegistry r, String mode, List<Map<String, JsonNode>> rows, String fallback) {
+        // 空结果按输出契约序列化为 null（grep 零命中时的 chunkResults 等）——与"零行"同路回落。
+        if (rows == null) {
+            return r.compactKnownText(fallback);
+        }
         List<ModelChunk> chunks = new ArrayList<>(rows.size());
         for (int idx = 0; idx < rows.size(); idx++) {
             Map<String, JsonNode> row = rows.get(idx);
@@ -260,6 +267,10 @@ final class ModelOutput {
 
     private static String modelKnowledgeChunksOutput(SourceRegistry r, Map<String, Object> data, String fallback) {
         List<Map<String, JsonNode>> rows = mapsValue(data.get("chunks"));
+        // chunks 缺失（持久化投影会剥离该键）或为空：与"零行"同路回落，别让渲染 NPE 打死整轮。
+        if (rows == null) {
+            return r.compactKnownText(fallback);
+        }
         String title = stringValue(data, "knowledgeTitle");
         String knowledgeId = stringValue(data, "knowledgeId");
         for (Map<String, JsonNode> row : rows) {
@@ -372,7 +383,7 @@ final class ModelOutput {
     }
 
     private static String modelWebSearchOutput(SourceRegistry r, List<Map<String, JsonNode>> rows, String fallback) {
-        if (rows.isEmpty()) {
+        if (rows == null || rows.isEmpty()) {
             return r.compactKnownText(fallback);
         }
         StringBuilder b = new StringBuilder();
@@ -435,7 +446,7 @@ final class ModelOutput {
     }
 
     private static String modelWebFetchOutput(SourceRegistry r, List<Map<String, JsonNode>> rows, String fallback) {
-        if (rows.isEmpty()) {
+        if (rows == null || rows.isEmpty()) {
             return r.compactKnownText(fallback);
         }
         StringBuilder b = new StringBuilder();

@@ -5,6 +5,7 @@ import com.ragagent.tracing.decorators.LangfuseReranker;
 import com.ragagent.tracing.decorators.LangfuseEmbedder;
 import com.ragagent.tracing.decorators.LangfuseChatClient;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import com.ragagent.embedding.Embedder;
 import com.ragagent.llm.LlmChatClient;
@@ -120,6 +122,9 @@ class LangfuseModelDecoratorsTest {
     @DisplayName("chat 流式：累积 content/reasoning、TTFT、用量，流结束收 generation")
     void chatStreamAccumulates() throws Exception {
         StreamResponse thinking = streamChunk(ResponseType.THINKING, "let me think");
+        // 思考结束标记 done=true，但流仍开着（真实流式里在首个答案 token 前发出）
+        StreamResponse thinkingDone = streamChunk(ResponseType.THINKING, "");
+        thinkingDone.setDone(true);
         StreamResponse answer1 = streamChunk(ResponseType.ANSWER, "hello");
         StreamResponse answer2 = streamChunk(ResponseType.ANSWER, " world");
         TokenUsage usage = new TokenUsage();
@@ -127,24 +132,30 @@ class LangfuseModelDecoratorsTest {
         usage.setCompletionTokens(3);
         usage.setTotalTokens(10);
         StreamResponse last = streamChunk(ResponseType.ANSWER, "");
-        last.setUsage(usage);
         last.setFinishReason("stop");
         last.setDone(true);
+        // 生产者的真实收尾顺序：终态 answer（无用量）→ 尾随分片才带 usage
+        StreamResponse trailingUsage = streamChunk(ResponseType.ANSWER, "");
+        trailingUsage.setUsage(usage);
+        trailingUsage.setDone(true);
 
         FakeChatClient inner = new FakeChatClient(null);
-        inner.streamChunks = List.of(thinking, answer1, answer2, last);
+        inner.streamChunks = List.of(thinking, thinkingDone, answer1, answer2, last, trailingUsage);
 
         BlockingQueue<StreamResponse> wrapped = LangfuseChatClient.wrap(inner)
                 .chatStream(List.of(), new ChatOptions());
         List<StreamResponse> consumed = new ArrayList<>();
         while (true) {
-            StreamResponse resp = wrapped.take();
+            // 带超时取件：转发被提前终止时在此失败，而不是把测试挂死
+            StreamResponse resp = wrapped.poll(2, TimeUnit.SECONDS);
+            assertNotNull(resp, "转发线程提前收尾：消费方在流未结束时就阻塞了");
             consumed.add(resp);
-            if (resp.isDone()) {
+            // 与真实消费方同款收尾判据：thinking 的 done 只是思考结束标记
+            if (resp.isDone() && resp.getResponseType() != ResponseType.THINKING) {
                 break;
             }
         }
-        assertEquals(4, consumed.size());
+        assertEquals(5, consumed.size());
 
         for (int i = 0; i < 200 && exported.size() < 2; i++) {
             Thread.sleep(10);

@@ -27,6 +27,7 @@ import {
   resolveBrowserEmbedLocale,
   syncEmbedLocaleFromUrl,
 } from '@/i18n/embed'
+import { registerEmbedTokenRefresher } from '@/utils/embedTokenRefresh'
 
 // Persist the chat session id per channel so a page refresh resumes the same
 // conversation (and its history) instead of silently starting a new session.
@@ -105,6 +106,10 @@ export function useEmbedBridge(channelId: Ref<string>) {
   let removeLocaleListener: (() => void) | null = null
   let removeTokenListener: (() => void) | null = null
   let bootstrapped = false
+  // 宿主推来的发布票（长期有效）：换过会话票后仍要留存——会话票 30 分钟过期时靠它再换。
+  let hostPublishToken = ''
+  // 正在等待"向宿主重新要票"的回调（换票用，见 waitForHostToken）。
+  let pendingHostToken: ((token: string) => void) | null = null
   let hostLocalePinned = false
   if (typeof window !== 'undefined') {
     hostLocalePinned = Boolean(readEmbedLocaleFromUrl())
@@ -115,7 +120,13 @@ export function useEmbedBridge(channelId: Ref<string>) {
 
   const bootstrap = async (embedToken: string) => {
     const id = channelId.value
-    if (!id || !embedToken || bootstrapped) return
+    if (!id || !embedToken) return
+    if (bootstrapped) {
+      // 已启动：宿主后续推来的票只做换票/更新，不重跑配置与会话装配
+      // —— 安全模式（tokenEndpoint）的自动续期就落在这一支。
+      await adoptHostToken(embedToken)
+      return
+    }
     bootstrapped = true
     awaitingToken.value = false
     bootstrapping.value = true
@@ -128,6 +139,8 @@ export function useEmbedBridge(channelId: Ref<string>) {
       // (minted server-side from the publish token). Use it directly — the
       // exchange endpoint only accepts publish tokens and would reject this.
       if (!isEmbedSessionToken(embedToken)) {
+        // 留一份发布票：会话票过期时用它再换（不依赖宿主再推一次）。
+        hostPublishToken = embedToken
         try {
           const exchangeRes = await exchangeEmbedSession(id, embedToken)
           if (exchangeRes?.sessionToken) {
@@ -212,6 +225,64 @@ export function useEmbedBridge(channelId: Ref<string>) {
     }
   }
 
+  // 宿主再次推票（安全模式自动续期）或我方主动换票都走这里：只更新票，
+  // 不重跑配置与会话装配——会话签名绑的是发布票，换它会话不受影响。
+  const adoptHostToken = async (provided: string) => {
+    const id = channelId.value
+    if (!id || !provided) return
+    if (isEmbedSessionToken(provided)) {
+      hostPublishToken = ''
+      token.value = provided
+      return
+    }
+    hostPublishToken = provided
+    try {
+      const res = await exchangeEmbedSession(id, provided)
+      const next = String(res?.sessionToken || '').trim()
+      if (next) token.value = next
+    } catch {
+      // 换票失败保持旧票：不打断当前会话，下一次 401 会再触发一轮。
+    }
+  }
+
+  // 安全模式（宿主 tokenEndpoint）：票由宿主短票通道供给，向宿主重新要一张。
+  const waitForHostToken = (timeoutMs = 8000): Promise<string | null> => {
+    const id = channelId.value
+    if (!id || typeof window === 'undefined' || window.parent === window) {
+      return Promise.resolve(null)
+    }
+    return new Promise((resolve) => {
+      let settled = false
+      const finish = (value: string | null) => {
+        if (settled) return
+        settled = true
+        pendingHostToken = null
+        resolve(value)
+      }
+      pendingHostToken = (provided: string) => {
+        void adoptHostToken(provided).then(() => finish(token.value || null))
+      }
+      window.setTimeout(() => finish(null), timeoutMs)
+      postEmbedBootstrapRequest(id)
+    })
+  }
+
+  // 会话票过期时的换票入口：axios 与 SSE 两条平面在 401 时调用（单飞在外层）。
+  const refreshToken = async (): Promise<string | null> => {
+    if (hostPublishToken) {
+      try {
+        const res = await exchangeEmbedSession(channelId.value, hostPublishToken)
+        const next = String(res?.sessionToken || '').trim()
+        if (!next) return null
+        token.value = next
+        return next
+      } catch {
+        return null
+      }
+    }
+    return await waitForHostToken()
+  }
+
   // Discard the current conversation and start a fresh signed session. Backing
   // the "新建对话" affordance — also the privacy escape hatch on shared devices.
   const startNewSession = async () => {
@@ -233,6 +304,9 @@ export function useEmbedBridge(channelId: Ref<string>) {
   }
 
   const start = async () => {
+    // 会话票过期时，axios 与 SSE 两条平面都回调这里换票（单飞在外层）。
+    registerEmbedTokenRefresher(refreshToken)
+
     removeHostListener = onEmbedHostContext((payload) => {
       hostContext.value = { ...hostContext.value, ...payload }
     })
@@ -244,7 +318,13 @@ export function useEmbedBridge(channelId: Ref<string>) {
 
     removeTokenListener = onEmbedHostToken((providedToken, providedChannelId) => {
       if (providedChannelId && providedChannelId !== channelId.value) return
-      bootstrap(providedToken)
+      const waiter = pendingHostToken
+      if (waiter) {
+        // 换票流程正等宿主回推：交给等待者，避免重复换票。
+        waiter(providedToken)
+        return
+      }
+      void bootstrap(providedToken)
     })
 
     if (!channelId.value) {
@@ -272,6 +352,7 @@ export function useEmbedBridge(channelId: Ref<string>) {
   })
 
   onUnmounted(() => {
+    registerEmbedTokenRefresher(null)
     removeHostListener?.()
     removeLocaleListener?.()
     removeTokenListener?.()

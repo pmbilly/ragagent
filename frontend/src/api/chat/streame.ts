@@ -14,6 +14,7 @@ import {
   refreshAccessTokenShared,
   runStreamWithAuthRetry,
 } from '@/utils/authRefresh';
+import { refreshEmbedTokenShared } from '@/utils/embedTokenRefresh';
 
 interface StreamOptions {
   // 请求方法 (默认POST)
@@ -163,7 +164,8 @@ export function useStream() {
         method: params.method,
         headers: {
           "Content-Type": "application/json",
-          "Authorization": embedToken ? `Embed ${embedToken}` : `Bearer ${authToken}`,
+          // 嵌入平面：authToken 即会话票（重放时是换回来的新票）
+          "Authorization": embedToken ? `Embed ${authToken}` : `Bearer ${authToken}`,
           "Accept-Language": i18n.global.locale?.value || localStorage.getItem('locale') || 'zh-CN',
           "X-Request-ID": requestID,
           ...(!embedToken && tenantIdHeader ? { "X-Tenant-ID": tenantIdHeader } : {}),
@@ -223,6 +225,8 @@ export function useStream() {
             tokenRefreshFailed: i18n.global.t('error.tokenRefreshFailed'),
           },
         }),
+        // 嵌入访客：会话票过期 → 换票 + 重放一次（无宿主时该函数返回 null，按原错误上抛）
+        refreshEmbedToken: embedToken ? () => refreshEmbedTokenShared() : undefined,
         reloginMessage: i18n.global.t('error.pleaseRelogin'),
       });
     } catch (err) {

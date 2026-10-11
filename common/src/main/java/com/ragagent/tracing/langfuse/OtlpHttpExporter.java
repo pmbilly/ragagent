@@ -42,7 +42,10 @@ final class OtlpHttpExporter {
 
     OtlpHttpExporter(LangfuseConfig cfg) {
         this.cfg = cfg;
+        // 固定 HTTP/1.1：JDK HttpClient 默认 HTTP/2，对明文 http 会先发 h2c 升级请求，
+        // 自建 Langfuse（Next.js）在这种请求上直接断连 → 导出恒失败。
         this.http = HttpClient.newBuilder()
+                .version(HttpClient.Version.HTTP_1_1)
                 .connectTimeout(Duration.ofMillis(Math.max(cfg.requestTimeoutMs(), 1000)))
                 .build();
     }

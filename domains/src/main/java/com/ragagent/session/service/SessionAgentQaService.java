@@ -32,6 +32,8 @@ import com.ragagent.knowledge.service.KnowledgeService;
 import com.ragagent.llm.chat.LlmChatClients;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.ollama.OllamaService;
+import com.ragagent.tracing.decorators.LangfuseChatClient;
+import com.ragagent.tracing.decorators.LangfuseReranker;
 import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.service.McpMetadataService;
 import com.ragagent.mcp.service.McpServiceService;
@@ -268,7 +270,8 @@ public class SessionAgentQaService {
             try {
                 engine.execute(sessionId, req.assistantMessageId, agentQuery, llmContext, agentImageUrls);
             } catch (RuntimeException e) {
-                log.error("Agent execution failed: {}", e.toString());
+                // 带栈：只打 e.toString() 会让这类"回答为空"的事故无从定位。
+                log.error("Agent execution failed: {}", e.toString(), e);
                 Event evt = new Event();
                 evt.setType(EventType.EVENT_ERROR);
                 evt.setSessionId(sessionId);
@@ -314,8 +317,9 @@ public class SessionAgentQaService {
                 p == null ? null : p.getAppId(), p == null ? null : p.getAppSecret());
         // ⚠️ 2026-09-23 修复：governor/ollama 曾传 null——并发闸门装配（95a49c4）后
         // ConcurrencyChatClient 必调 gateNamedN，agent 路径任何 LLM 调用都会 NPE。
-        return LlmChatClients.create(config,
-                ollamaService.getIfAvailable(), concurrencyGovernor);
+        // langfuse generation 装饰（未启用时原样返回）
+        return LangfuseChatClient.wrap(LlmChatClients.create(config,
+                ollamaService.getIfAvailable(), concurrencyGovernor));
     }
 
     private Reranker rerankModel(String modelId) {
@@ -323,7 +327,8 @@ public class SessionAgentQaService {
         var p = model == null ? null : model.getParameters();
         var config = ModelRuntimeConfigs.rerankerConfig(model,
                 p == null ? null : p.getAppId(), p == null ? null : p.getAppSecret());
-        return RerankerFactory.newReranker(config);
+        // langfuse generation 装饰（未启用时原样返回）
+        return LangfuseReranker.wrap(RerankerFactory.newReranker(config));
     }
 
     // ==================================================================

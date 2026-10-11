@@ -152,6 +152,67 @@ test('embed visitors are not refreshed or redirected', async () => {
   assert.equal(refreshed, 0)
 })
 
+test('embed visitors replay once with a freshly exchanged session token', async () => {
+  const tokens: string[] = []
+  const result = await runStreamWithAuthRetry({
+    initialToken: 'ems_expired',
+    isEmbed: true,
+    isCurrent: () => true,
+    refreshAccessToken: async () => 'never-used',
+    refreshEmbedToken: async () => 'ems_fresh',
+    reloginMessage: 'please-relogin',
+    run: async (token) => {
+      tokens.push(token)
+      if (token === 'ems_expired') throw new StreamAuthError(401)
+      return `ok:${token}`
+    },
+  })
+  assert.deepEqual(tokens, ['ems_expired', 'ems_fresh'])
+  assert.equal(result, 'ok:ems_fresh')
+})
+
+test('embed visitors surface the original 401 when no session token can be minted', async () => {
+  let runs = 0
+  await assert.rejects(
+    () => runStreamWithAuthRetry({
+      initialToken: 'ems_expired',
+      isEmbed: true,
+      isCurrent: () => true,
+      refreshAccessToken: async () => 'never-used',
+      refreshEmbedToken: async () => null,
+      reloginMessage: 'please-relogin',
+      run: async () => {
+        runs += 1
+        throw new StreamAuthError(401)
+      },
+    }),
+    (err: unknown) => err instanceof StreamAuthError,
+  )
+  assert.equal(runs, 1)
+})
+
+test('a superseded embed send skips the replay after exchanging', async () => {
+  let runs = 0
+  let current = true
+  const result = await runStreamWithAuthRetry({
+    initialToken: 'ems_expired',
+    isEmbed: true,
+    isCurrent: () => current,
+    refreshAccessToken: async () => 'never-used',
+    refreshEmbedToken: async () => {
+      current = false
+      return 'ems_fresh'
+    },
+    reloginMessage: 'please-relogin',
+    run: async () => {
+      runs += 1
+      throw new StreamAuthError(401)
+    },
+  })
+  assert.equal(runs, 1)
+  assert.equal(result, undefined)
+})
+
 test('a second handshake 401 after a successful refresh does not wipe tokens', async () => {
   const { store, location } = installBrowser()
   store.weknora_token = 'expired'

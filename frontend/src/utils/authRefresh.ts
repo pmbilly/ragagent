@@ -156,6 +156,10 @@ export async function refreshAccessTokenShared(
  * redirected; a second 401 after a successful refresh is surfaced to the
  * caller without wiping the newly minted session (axios does the same).
  *
+ * <p>Embed 访客没有 JWT：给 {@link refreshEmbedToken} 时按"换会话票 + 重放一次"
+ * 处理（票 30 分钟过期，页面开久了必然遇到）；不给则维持旧行为（直接上抛）。
+ * JWT 平面与嵌入平面的刷新互不串门——嵌入访客既不会被跳登录页，也不会用到 JWT 刷新。</p>
+ *
  * Returns undefined when a newer send or an abort superseded the replay.
  */
 export async function runStreamWithAuthRetry<T>(options: {
@@ -164,12 +168,21 @@ export async function runStreamWithAuthRetry<T>(options: {
   isEmbed: boolean
   isCurrent: () => boolean
   refreshAccessToken: () => Promise<string>
+  /** 嵌入平面：换一张会话票；返回 null 表示换不到（按原 401 上抛）。 */
+  refreshEmbedToken?: () => Promise<string | null>
   reloginMessage: string
 }): Promise<T | undefined> {
   try {
     return await options.run(options.initialToken)
   } catch (err) {
-    if (!isStreamAuthError(err) || options.isEmbed) throw err
+    if (!isStreamAuthError(err)) throw err
+    if (options.isEmbed) {
+      if (!options.refreshEmbedToken) throw err
+      const fresh = await options.refreshEmbedToken().catch(() => null)
+      if (!fresh) throw err
+      if (!options.isCurrent()) return undefined
+      return await options.run(fresh)
+    }
 
     let refreshedToken: string
     try {

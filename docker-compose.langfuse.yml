@@ -1,0 +1,186 @@
+# Langfuse 可观测自建栈（dev 专用）
+#
+# 用法（在仓库根目录执行，自动读取 .env 里的 DB_*/REDIS_*）：
+#   docker compose -f docker-compose.langfuse.yml up -d      # 启动
+#   docker compose -f docker-compose.langfuse.yml ps         # 查看状态
+#   docker compose -f docker-compose.langfuse.yml down       # 停掉（保留数据卷）
+#
+# UI: http://localhost:3000    预置管理员: admin@ragagent.local / Ragagent-dev-2026
+#     预置项目 langfuse 的密钥:  pk-lf-ragagent-dev / sk-lf-ragagent-dev（已写进 .env）
+#
+# 与 dev 基础设施的关系：
+#   - 复用 WeKnora-postgres-dev：新建独立 "langfuse" 库（一次性 db-init 容器，幂等）
+#   - 复用 WeKnora-redis-dev：占用 DB 1
+#   - 新增容器仅 4 个常驻：clickhouse / s3(rustfs) / worker / web
+#   - 对象存储用 rustfs（S3 兼容，镜像本机已有；docker.io 的 minio 整仓被镜像源屏蔽）
+#     —— 首次启动后需建桶：curl -X PUT http://localhost:9100/langfuse \
+#        --aws-sigv4 "aws:amz:us-east-1:s3" --user "langfuseminio:langfuseminiosecret"
+#   - 本栈不暴露 clickhouse；S3 暴露 9100(S3 API)/9101(控制台) 供浏览器上传媒体
+
+name: ragagent-langfuse
+
+services:
+  langfuse-db-init:
+    image: paradedb/paradedb:v0.22.2-pg17
+    container_name: ragagent-langfuse-db-init
+    environment:
+      PGPASSWORD: ${DB_PASSWORD}
+    entrypoint: ["sh", "-c"]
+    command:
+      - |
+        set -e
+        echo "[langfuse-db-init] ensuring database '${LANGFUSE_DB_NAME:-langfuse}' exists..."
+        psql -h WeKnora-postgres-dev -U ${DB_USER} -d postgres -v ON_ERROR_STOP=0 -c "ALTER DATABASE template1 REFRESH COLLATION VERSION;" >/dev/null 2>&1 || true
+        psql -h WeKnora-postgres-dev -U ${DB_USER} -d postgres -v ON_ERROR_STOP=0 -c "ALTER DATABASE postgres REFRESH COLLATION VERSION;" >/dev/null 2>&1 || true
+        if psql -h WeKnora-postgres-dev -U ${DB_USER} -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='${LANGFUSE_DB_NAME:-langfuse}'" | grep -q 1; then
+          echo "[langfuse-db-init] database already exists, skipping."
+        else
+          psql -h WeKnora-postgres-dev -U ${DB_USER} -d postgres -v ON_ERROR_STOP=1 -c "CREATE DATABASE \"${LANGFUSE_DB_NAME:-langfuse}\" TEMPLATE template0;"
+          echo "[langfuse-db-init] database created."
+        fi
+        echo "[langfuse-db-init] done."
+    networks: [devnet]
+    restart: "no"
+
+  langfuse-clickhouse:
+    image: clickhouse/clickhouse-server:24.8
+    container_name: ragagent-langfuse-clickhouse
+    restart: unless-stopped
+    user: "101:101"
+    environment:
+      CLICKHOUSE_DB: default
+      CLICKHOUSE_USER: clickhouse
+      CLICKHOUSE_PASSWORD: clickhouse
+    volumes:
+      - langfuse_clickhouse_data:/var/lib/clickhouse
+      - langfuse_clickhouse_logs:/var/log/clickhouse-server
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:8123/ping || exit 1
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks: [devnet]
+
+  langfuse-s3:
+    image: rustfs/rustfs:1.0.0-alpha.72
+    container_name: ragagent-langfuse-s3
+    restart: unless-stopped
+    command: ["--address", ":9000", "--console-enable", "--access-key", "langfuseminio", "--secret-key", "langfuseminiosecret", "/data"]
+    environment:
+      RUSTFS_ADDRESS: ":9000"
+      RUSTFS_CONSOLE_ADDRESS: ":9001"
+      RUSTFS_CONSOLE_ENABLE: "true"
+      RUSTFS_ACCESS_KEY: langfuseminio
+      RUSTFS_SECRET_KEY: langfuseminiosecret
+      RUSTFS_VOLUMES: /data
+      RUST_LOG: warn
+      RUSTFS_OBS_LOG_DIRECTORY: /logs
+    ports:
+      - "9100:9000"   # S3 API（浏览器上传媒体直连）
+      - "9101:9001"   # 控制台（可选排障）
+    volumes:
+      - langfuse_s3_data:/data
+      - langfuse_s3_logs:/logs
+    networks: [devnet]
+
+  langfuse-worker:
+    image: langfuse/langfuse-worker:3
+    container_name: ragagent-langfuse-worker
+    restart: unless-stopped
+    depends_on: &langfuse-depends-on
+      langfuse-db-init:
+        condition: service_completed_successfully
+      langfuse-clickhouse:
+        condition: service_healthy
+      langfuse-s3:
+        condition: service_started
+    # wrapper entrypoint：启动时对 DB/REDIS 口令做 URL 编码，避免 '@' '#' 破坏连接串解析
+    entrypoint:
+      - /bin/sh
+      - -ec
+      - |
+        _enc() { node -e 'process.stdout.write(encodeURIComponent(process.argv[1]))' "$$1"; }
+        DU=$$(_enc "$$_LF_DB_USER")
+        DP=$$(_enc "$$_LF_DB_PASSWORD")
+        RP=$$(_enc "$$_LF_REDIS_PASSWORD")
+        export DATABASE_URL="postgresql://$$DU:$$DP@WeKnora-postgres-dev:5432/$$_LF_DB_NAME"
+        export REDIS_CONNECTION_STRING="redis://:$$RP@WeKnora-redis-dev:6379/$$_LF_REDIS_DB"
+        unset _LF_DB_USER _LF_DB_PASSWORD _LF_REDIS_PASSWORD
+        exec dumb-init -- ./worker/entrypoint.sh node worker/dist/index.js
+    environment: &langfuse-env
+      _LF_DB_USER: ${DB_USER}
+      _LF_DB_PASSWORD: ${DB_PASSWORD}
+      _LF_DB_NAME: ${LANGFUSE_DB_NAME:-langfuse}
+      _LF_REDIS_PASSWORD: ${REDIS_PASSWORD}
+      _LF_REDIS_DB: ${LANGFUSE_REDIS_DB:-1}
+      SALT: ${LANGFUSE_SALT:-weknora-langfuse-dev-salt-change-me}
+      ENCRYPTION_KEY: ${LANGFUSE_ENCRYPTION_KEY:-0000000000000000000000000000000000000000000000000000000000000000}
+      NEXTAUTH_URL: ${LANGFUSE_NEXTAUTH_URL:-http://localhost:3000}
+      NEXTAUTH_SECRET: ${LANGFUSE_NEXTAUTH_SECRET:-weknora-langfuse-dev-nextauth-secret-change-me}
+      TELEMETRY_ENABLED: "false"
+      LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES: "false"
+      CLICKHOUSE_URL: http://langfuse-clickhouse:8123
+      CLICKHOUSE_MIGRATION_URL: clickhouse://langfuse-clickhouse:9000
+      CLICKHOUSE_USER: clickhouse
+      CLICKHOUSE_PASSWORD: clickhouse
+      CLICKHOUSE_CLUSTER_ENABLED: "false"
+      LANGFUSE_S3_EVENT_UPLOAD_BUCKET: langfuse
+      LANGFUSE_S3_EVENT_UPLOAD_REGION: auto
+      LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID: langfuseminio
+      LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY: langfuseminiosecret
+      LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT: http://langfuse-s3:9000
+      LANGFUSE_S3_EVENT_UPLOAD_FORCE_PATH_STYLE: "true"
+      LANGFUSE_S3_EVENT_UPLOAD_PREFIX: events/
+      LANGFUSE_S3_MEDIA_UPLOAD_BUCKET: langfuse
+      LANGFUSE_S3_MEDIA_UPLOAD_REGION: auto
+      LANGFUSE_S3_MEDIA_UPLOAD_ACCESS_KEY_ID: langfuseminio
+      LANGFUSE_S3_MEDIA_UPLOAD_SECRET_ACCESS_KEY: langfuseminiosecret
+      LANGFUSE_S3_MEDIA_UPLOAD_ENDPOINT: http://localhost:9100
+      LANGFUSE_S3_MEDIA_UPLOAD_FORCE_PATH_STYLE: "true"
+      LANGFUSE_S3_MEDIA_UPLOAD_PREFIX: media/
+    networks: [devnet]
+
+  langfuse-web:
+    image: langfuse/langfuse:3
+    container_name: ragagent-langfuse-web
+    restart: unless-stopped
+    depends_on: *langfuse-depends-on
+    ports:
+      - "3000:3000"
+    entrypoint:
+      - /bin/sh
+      - -ec
+      - |
+        _enc() { node -e 'process.stdout.write(encodeURIComponent(process.argv[1]))' "$$1"; }
+        DU=$$(_enc "$$_LF_DB_USER")
+        DP=$$(_enc "$$_LF_DB_PASSWORD")
+        RP=$$(_enc "$$_LF_REDIS_PASSWORD")
+        export DATABASE_URL="postgresql://$$DU:$$DP@WeKnora-postgres-dev:5432/$$_LF_DB_NAME"
+        export REDIS_CONNECTION_STRING="redis://:$$RP@WeKnora-redis-dev:6379/$$_LF_REDIS_DB"
+        unset _LF_DB_USER _LF_DB_PASSWORD _LF_REDIS_PASSWORD
+        exec dumb-init -- ./web/entrypoint.sh node ./web/server.js --keepAliveTimeout 110000
+    environment:
+      <<: *langfuse-env
+      # 首次启动自动建组织/项目/管理员（仅 web 需要）
+      LANGFUSE_INIT_ORG_ID: ragagent
+      LANGFUSE_INIT_ORG_NAME: RagAgent
+      LANGFUSE_INIT_PROJECT_ID: ragagent-dev
+      LANGFUSE_INIT_PROJECT_NAME: ragagent-dev
+      LANGFUSE_INIT_PROJECT_PUBLIC_KEY: pk-lf-ragagent-dev
+      LANGFUSE_INIT_PROJECT_SECRET_KEY: sk-lf-ragagent-dev
+      LANGFUSE_INIT_USER_EMAIL: admin@ragagent.local
+      LANGFUSE_INIT_USER_NAME: Admin
+      LANGFUSE_INIT_USER_PASSWORD: Ragagent-dev-2026
+    networks: [devnet]
+
+networks:
+  devnet:
+    external: true
+    name: weknora_WeKnora-network-dev
+
+volumes:
+  langfuse_clickhouse_data:
+  langfuse_clickhouse_logs:
+  langfuse_s3_data:
+  langfuse_s3_logs:
