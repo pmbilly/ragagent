@@ -116,7 +116,13 @@ enum Position { PRE_BASE, POST_BASE, PRE_PROTOCOL, POST_PROTOCOL }
 - API 落地为 `files()` / `open()` / `read()`（未做 `readAll()`：现有消费方都是逐文件解析 snakeyaml，多一个聚合方法反而无消费者）。
 - 统一清单后**行为等价**已证：11 份模板的 `id` 跨文件唯一（`PromptSourceTest` 长期守门），因此 `ConversationProperties`（11 项序）与 `BuiltinAgentRegistry`（原为另一顺序）合并到同一清单不改变任何 `FindTemplateByID` 取值。
 - 域侧清单同步：`ClasspathResourcesTest` 的 11 条资源路径改为 `prompts/*.yaml`（消费方标注 `common.prompt.PromptSource`）；`docs/agent-module-guide.md` §5 口径同步。
-- ⚠️ **基线已知红（与本批无关，已用 `git stash` 对照复现）**：`EngineRecordingTest`(5) + `PipelineLifecycleRecordingTest`(3) + `ModelContextRecordingTest`(1) 共 9 个实录断言红——根因是并行会话提交 `3e4dd368` 从 `Registry.RESOURCE_HANDLE_PROTOCOL_PROMPT` 删掉了 `sandbox:<file name>` 下载约定那一行，实录仍钉旧文案。修法二选一（需产品决策）：**重录实录** 或 **恢复该行**。
+- ⚠️ **基线曾红（与本批无关，已用 `git stash` 对照复现）**：`EngineRecordingTest`(5) + `PipelineLifecycleRecordingTest`(3) + `ModelContextRecordingTest`(1) 共 9 个实录断言红——根因是并行会话提交 `3e4dd368` 从 `Registry.RESOURCE_HANDLE_PROTOCOL_PROMPT` 删掉了 `sandbox:<file name>` 下载约定那一行，实录仍钉旧文案。修法二选一（需产品决策）：**重录实录** 或 **恢复该行**。
+
+**基线同步（2026-10-12，用户决策：重录）**
+- **现实约束**：仓库内没有可用的重录程序（`GoRecording*` 的录制源是已下线的 Go 服务，见 `docs/handoff/records/batch-records.md:501`「无法重录」；`-Dcontract.refresh=true` 只管 `contracts/*.json`）⇒ 实操 = **按当前实现更新实录常量**，属显式基线变更，须在 F6 回填 HANDOFF 留痕。
+- **改动**：`GoRecording46A`（2 处）/ `GoRecording46B`（5 处）/ `GoRecording46C`（7 处）删除被删子串 `- For downloadable deliverables generated in the session workspace, use sandbox:<file name>; `；另 `GoRecording46C` 的派生字段 `prompt_len` 1494 → 1401（差值 93 = 该子串长度，与断言差值逐字吻合）。
+- **结果**：9 个实录用例全绿；`:common:test :engine:test :domains:test :boot:test` 全量 BUILD SUCCESSFUL。
+- **遗留待决**：`Registry.java` 删行后该段变成小写开头、失去列表项前缀（`never reuse or invent a resource handle. …`），模型可见文案观感问题——若调整需再同步一次上述三份实录。
 
 **验证**：`./gradlew --no-daemon :common:test :engine:test :domains:test :boot:test`；契约用例 `TenantCatalogContractTest` 全绿。（注意：跑测试前 `unset SSRF_WHITELIST_EXTRA`，否则 `ct-kv-parser-put-ssrf.json` 会因 127.0.0.1 被放行而红。）
 
