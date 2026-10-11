@@ -19,7 +19,7 @@ import com.ragagent.common.prompt.MessageAttachmentsPrompt;
 import com.ragagent.common.session.PipelineMessageAttachmentView;
 import com.ragagent.common.session.PipelineMessageImageView;
 import com.ragagent.common.session.PipelineMessageView;
-import com.ragagent.common.prompt.PromptConstants;
+import com.ragagent.common.prompt.PromptComposer;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.prompt.AgentPromptPlaceholders;
 import com.ragagent.event.TenantContextSnapshot;
@@ -104,8 +104,7 @@ public final class PipelineCommon {
         vals.put("language", chatManage.getLanguage());
         vals.put("contexts", chatManage.getRenderedContexts());
         String systemPrompt = AgentPromptPlaceholdersHolder.render(base, vals);
-        systemPrompt += "\n\n" + PromptConstants.SOURCE_DATA_BOUNDARY_PROMPT
-                + "\n\n" + PromptConstants.SOURCED_ANSWER_OUTPUT_PROMPT;
+        systemPrompt += PromptComposer.SOURCES_AND_OUTPUT_SUFFIX;
         systemPrompt += chatManage.getMemoryPrompt();
 
         List<ChatMessage> chatMessages = new ArrayList<>();

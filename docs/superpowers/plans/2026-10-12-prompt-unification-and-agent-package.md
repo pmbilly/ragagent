@@ -211,10 +211,17 @@ enum Position { PRE_BASE, POST_BASE, PRE_PROTOCOL, POST_PROTOCOL }
 - Modify: `domains/.../session/service/SessionQaFallback.java`（第三链路并入）
 - Modify: `modelcontext/Registry.protocolPrompt()` 的注入方式（登记为 section 提供者，不再各自拼接）
 
-- [ ] **Step 1**: 落 `SectionSpec` + `PromptComposer`（输入段表 + 上下文，输出 system 文本），先用**等价改造**：agent 链路 10 段按现顺序声明。
-- [ ] **Step 2**: 快答链路（3 段）与 fallback 链路并入；删除两处手工拼接。
-- [ ] **Step 3**: `AgentPrompts` 拆分（文案 / 值类型），`AgentEngine` 公开签名同步。
-- [ ] **Step 4**: **F3 golden 必须逐字节通过**；全量测试 + 闸门绿 → Commit `refactor(prompt): 组装收口 PromptComposer（三链路单入口，文本零变化）`。
+**执行拆成两步（2026-10-12 执行时拆分——"拼法"与"段表"分开做，各自可验证）：**
+
+- [x] **F5a（已做）**：落 L1 `common.prompt.PromptComposer`，把"怎么拼"收成唯一实现：
+  - `joinSections`（逐段 trim / 跳空段 / `\n\n` 连接）← 取代 `AgentPrompts.renderSystemPromptSections` 的内联循环；
+  - `SOURCES_AND_OUTPUT_SUFFIX`（源数据边界 + 有据作答尾巴，含前导空行）← 取代 `PipelineCommon` 与 `SessionQaFallback` 各自的手拼；
+  - `appendProtocol`（右侧裁剪 + 协议段直连）← 取代 `ReferencesSupport` 与 `SessionQaFallback` 各自的"裁剪+拼接"；
+  - `rightTrim`：**两处逐字节重复**的私有实现（`ReferencesSupport.trimRightWhitespace`、`SessionQaFallback.trailTrim`）已删除。
+  - 新增 `PromptComposerTest` 钉规则语义（跳空段 / 右裁 / 尾巴字节形状）。
+- [ ] **F5b（未做，独立一轮）**：`SectionSpec` 声明式段表（agent 10 段 / 快答 3 段 / fallback 收成同一张表的不同子集）+ `AgentPrompts` 拆"文案常量 / 值类型 record" + `PromptAssembly` → `ConversationAssembler`（只管 messages 数组）+ `modelcontext.protocolPrompt()` 登记为 section 提供者。保护网 = 既有实录（46A/46B/46C）+ `EvaluationContractTest`。
+
+**F5a 执行记录（2026-10-12）**：主代码 4 文件（`AgentPrompts` / `PipelineCommon` / `ReferencesSupport` / `SessionQaFallback`）+ L1 一类一测。验证：`EngineRecordingTest`(5) + `PipelineLifecycleRecordingTest`(3) + `ModelContextRecordingTest`(1) 全绿 —— **三链路 system 文本逐字节不变**；全量后端测试 + `spotlessCheck` 绿。
 
 ## F6（P6）：文档回填与验收
 

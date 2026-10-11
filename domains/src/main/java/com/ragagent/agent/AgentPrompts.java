@@ -1,6 +1,7 @@
 package com.ragagent.agent;
 
 import com.ragagent.common.prompt.AgentPromptPlaceholders;
+import com.ragagent.common.prompt.PromptComposer;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -461,12 +462,9 @@ public final class AgentPrompts {
     public static String renderSystemPromptSections(List<SystemPromptSection> sections) {
         List<String> contents = new ArrayList<>(sections.size());
         for (SystemPromptSection section : sections) {
-            String content = section.content() == null ? "" : section.content().trim();
-            if (!content.isEmpty()) {
-                contents.add(content);
-            }
+            contents.add(section.content());
         }
-        return String.join("\n\n", contents);
+        return PromptComposer.joinSections(contents);
     }
 
     /**

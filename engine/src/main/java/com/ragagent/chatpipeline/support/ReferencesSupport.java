@@ -8,6 +8,7 @@ import java.util.Map;
 import com.ragagent.chatpipeline.ChatManage;
 import com.ragagent.chatpipeline.PipelineCommon;
 import com.ragagent.common.llm.ToolResult;
+import com.ragagent.common.prompt.PromptComposer;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.modelcontext.Registry;
@@ -42,8 +43,8 @@ public final class ReferencesSupport {
         }
         List<ChatMessage> messages = PipelineCommon.prepareMessagesWithHistory(chatManage);
         if (!messages.isEmpty()) {
-            String trimmed = trimRightWhitespace(messages.get(0).getContent());
-            messages.get(0).setContent(trimmed + registry.protocolPrompt());
+            messages.get(0).setContent(
+                    PromptComposer.appendProtocol(messages.get(0).getContent(), registry.protocolPrompt()));
         }
         if (chatManage.getMergeResult() == null || chatManage.getMergeResult().isEmpty()
                 || messages.isEmpty()) {
@@ -129,23 +130,6 @@ public final class ReferencesSupport {
 
     /** (messages, registry) 组装结果。 */
     public record Assembly(List<ChatMessage> messages, Registry registry) {}
-
-    /** 去除尾部空白（空格/制表/回车/换行）。 */
-    static String trimRightWhitespace(String s) {
-        if (s == null) {
-            return "";
-        }
-        int end = s.length();
-        while (end > 0) {
-            char c = s.charAt(end - 1);
-            if (c == ' ' || c == '\t' || c == '\r' || c == '\n') {
-                end--;
-            } else {
-                break;
-            }
-        }
-        return s.substring(0, end);
-    }
 
     static boolean isPipelineWebReference(SearchResult result) {
         if (result == null) {

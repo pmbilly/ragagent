@@ -12,7 +12,7 @@ import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.StreamResponse;
 import com.ragagent.modelcontext.Registry;
 import com.ragagent.chatpipeline.PipelineCommon;
-import com.ragagent.common.prompt.PromptConstants;
+import com.ragagent.common.prompt.PromptComposer;
 import com.ragagent.llm.domain.ChatResponse;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -107,8 +107,7 @@ final class SessionQaFallback {
         if (!promptContent.trim().isEmpty()) {
             ChatMessage system = new ChatMessage();
             system.setRole("system");
-            system.setContent(promptContent + "\n\n" + PromptConstants.SOURCE_DATA_BOUNDARY_PROMPT
-                    + "\n\n" + PromptConstants.SOURCED_ANSWER_OUTPUT_PROMPT);
+            system.setContent(promptContent + PromptComposer.SOURCES_AND_OUTPUT_SUFFIX);
             messages.add(system);
         }
         PipelineCommon.appendHistoryMessages(messages, chatManage.getHistory());
@@ -128,7 +127,7 @@ final class SessionQaFallback {
         Registry registry = new Registry(citationsEnabled);
         if (!messages.isEmpty() && "system".equals(messages.get(0).getRole())) {
             ChatMessage first = messages.get(0);
-            first.setContent(trailTrim(first.getContent()) + registry.protocolPrompt());
+            first.setContent(PromptComposer.appendProtocol(first.getContent(), registry.protocolPrompt()));
         } else {
             ChatMessage system = new ChatMessage();
             system.setRole("system");
@@ -145,19 +144,6 @@ final class SessionQaFallback {
     // ==================================================================
     // fallback
     // ==================================================================
-
-    static String trailTrim(String s) {
-        int end = s.length();
-        while (end > 0) {
-            char c = s.charAt(end - 1);
-            if (c == ' ' || c == '\t' || c == '\r' || c == '\n') {
-                end--;
-            } else {
-                break;
-            }
-        }
-        return s.substring(0, end);
-    }
 
     /** 渲染 fallback prompt。 */
     String renderFallbackPrompt(ChatManage chatManage) {
