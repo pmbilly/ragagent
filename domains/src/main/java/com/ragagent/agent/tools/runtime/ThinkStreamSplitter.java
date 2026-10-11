@@ -1,4 +1,4 @@
-package com.ragagent.agent.tools;
+package com.ragagent.agent.tools.runtime;
 
 /**
  * 流式 {@code <think>} 分离器。

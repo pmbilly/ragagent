@@ -1,4 +1,4 @@
-package com.ragagent.agent.tools;
+package com.ragagent.agent.tools.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -12,12 +12,14 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.agent.tools.SearchAuth.ChunkView;
-import com.ragagent.agent.tools.SearchAuth.KnowledgeView;
-import com.ragagent.agent.tools.SearchAuth.ScopeAuthException;
-import com.ragagent.agent.tools.SearchAuth.TagView;
+import com.ragagent.agent.tools.runtime.SearchAuth.ChunkView;
+import com.ragagent.agent.tools.runtime.SearchAuth.KnowledgeView;
+import com.ragagent.agent.tools.runtime.SearchAuth.ScopeAuthException;
+import com.ragagent.agent.tools.runtime.SearchAuth.TagView;
 import com.ragagent.common.retrieval.SearchTarget.SearchTargets;
 import com.ragagent.common.retrieval.SearchTarget;
+import com.ragagent.agent.tools.RecordingSupport;
+import com.ragagent.agent.tools.GoRecording45B;
 
 /**
  * SearchAuth/SearchTargets 的录制回放（26 条）。错误文案逐字比对；

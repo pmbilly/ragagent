@@ -16,7 +16,7 @@ import com.ragagent.agent.tools.DocChunkSupport.ImageInfoCollector;
 import com.ragagent.agent.tools.DocChunkSupport.KnowledgeInfoReader;
 import com.ragagent.agent.tools.DocChunkSupport.KnowledgeInfoView;
 import com.ragagent.agent.tools.DocChunkSupport.PagedChunks;
-import com.ragagent.agent.tools.SearchAuth.TagView;
+import com.ragagent.agent.tools.runtime.SearchAuth.TagView;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.agent.tools.knowledge.GetDocumentInfoTool;
 import com.ragagent.agent.tools.knowledge.ListKnowledgeChunksTool;

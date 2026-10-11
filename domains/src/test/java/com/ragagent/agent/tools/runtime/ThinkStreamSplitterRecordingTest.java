@@ -1,10 +1,12 @@
-package com.ragagent.agent.tools;
+package com.ragagent.agent.tools.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.agent.tools.RecordingSupport;
+import com.ragagent.agent.tools.GoRecording45A;
 
 /**
  * ThinkStreamSplitter 的录制语料（13 组逐 chunk 语料）。标签跨 chunk 切分/未闭合

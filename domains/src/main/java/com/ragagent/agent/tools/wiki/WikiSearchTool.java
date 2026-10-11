@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.llm.ToolResult;
-import com.ragagent.agent.tools.SearchAuth.KnowledgeTagsFetcher;
+import com.ragagent.agent.tools.runtime.SearchAuth.KnowledgeTagsFetcher;
 import com.ragagent.agent.tools.BaseTool;
 import com.ragagent.agent.tools.ToolDefinitions;
 import com.ragagent.agent.tools.ToolRequest;

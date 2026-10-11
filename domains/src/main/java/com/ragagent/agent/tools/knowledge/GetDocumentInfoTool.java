@@ -19,7 +19,7 @@ import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.FaqChunkMetadata;
 import com.ragagent.agent.tools.BaseTool;
 import com.ragagent.agent.tools.DocChunkSupport;
-import com.ragagent.agent.tools.SearchAuth;
+import com.ragagent.agent.tools.runtime.SearchAuth;
 import com.ragagent.common.retrieval.SearchTarget;
 import com.ragagent.agent.tools.ToolDefinitions;
 import com.ragagent.agent.tools.ToolRequest;

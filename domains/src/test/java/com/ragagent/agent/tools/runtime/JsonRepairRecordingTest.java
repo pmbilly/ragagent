@@ -1,10 +1,12 @@
-package com.ragagent.agent.tools;
+package com.ragagent.agent.tools.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.agent.tools.RecordingSupport;
+import com.ragagent.agent.tools.GoRecording45A;
 
 /**
  * JsonRepair 的录制语料（31 条）。含历史用例全集 + 刻意探测的

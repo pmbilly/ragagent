@@ -1,4 +1,4 @@
-package com.ragagent.agent.tools;
+package com.ragagent.agent.tools.runtime;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.ragagent.agent.domain.AgentStep;
 import com.ragagent.agent.domain.ToolCall;
+import com.ragagent.agent.tools.ToolDefinitions;
 import com.ragagent.common.llm.ToolResult;
 
 /**

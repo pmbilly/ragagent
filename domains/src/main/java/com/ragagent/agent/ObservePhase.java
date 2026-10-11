@@ -17,7 +17,7 @@ import com.ragagent.agent.compaction.NothingToCompactException;
 import com.ragagent.agent.domain.AgentStep;
 import com.ragagent.agent.domain.ToolCall;
 import com.ragagent.agent.tools.ToolDefinitions;
-import com.ragagent.agent.tools.ThinkBlocks;
+import com.ragagent.agent.tools.runtime.ThinkBlocks;
 import com.ragagent.event.payload.AgentFinalAnswerData;
 import com.ragagent.event.payload.ContextCompactedData;
 import com.ragagent.event.Event;

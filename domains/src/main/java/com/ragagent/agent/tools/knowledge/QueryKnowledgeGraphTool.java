@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.llm.ToolResult;
 import com.ragagent.common.retrieval.SearchTarget.SearchTargets;
 import com.ragagent.agent.tools.BaseTool;
-import com.ragagent.agent.tools.SearchAuth;
+import com.ragagent.agent.tools.runtime.SearchAuth;
 import com.ragagent.agent.tools.ToolDefinitions;
 import com.ragagent.agent.tools.ToolRequest;
 

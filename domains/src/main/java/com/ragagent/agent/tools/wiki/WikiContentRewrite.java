@@ -2,7 +2,7 @@ package com.ragagent.agent.tools.wiki;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.ragagent.agent.tools.SearchAuth;
+import com.ragagent.agent.tools.runtime.SearchAuth;
 
 /** wiki 链接突变：入站内容重写、失败回滚、错误聚合。 */
     public interface WikiContentRewrite {

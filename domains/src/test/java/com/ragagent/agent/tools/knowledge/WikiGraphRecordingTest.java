@@ -17,8 +17,8 @@ import com.ragagent.agent.tools.knowledge.QueryKnowledgeGraphTool.GraphRelationV
 import com.ragagent.agent.tools.knowledge.QueryKnowledgeGraphTool.GraphSearch;
 import com.ragagent.agent.tools.knowledge.QueryKnowledgeGraphTool.KnowledgeBaseView;
 import com.ragagent.agent.tools.knowledge.QueryKnowledgeGraphTool.SearchResultView;
-import com.ragagent.agent.tools.SearchAuth.KnowledgeTagsFetcher;
-import com.ragagent.agent.tools.SearchAuth.TagView;
+import com.ragagent.agent.tools.runtime.SearchAuth.KnowledgeTagsFetcher;
+import com.ragagent.agent.tools.runtime.SearchAuth.TagView;
 import com.ragagent.common.retrieval.SearchTarget;
 import com.ragagent.agent.tools.ToolRequest;
 import com.ragagent.agent.tools.GoRecording45B;

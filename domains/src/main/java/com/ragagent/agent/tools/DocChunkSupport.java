@@ -1,5 +1,6 @@
 package com.ragagent.agent.tools;
 
+import com.ragagent.agent.tools.runtime.SearchAuth;
 import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
