@@ -5,6 +5,8 @@ import com.ragagent.common.prompt.PromptComposer;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import com.ragagent.agent.compaction.ConversationSerializer;
 import com.ragagent.common.prompt.PromptConstants;
@@ -478,57 +480,112 @@ public final class AgentPrompts {
             BuildSystemPromptOptions options,
             LocalDate today,
             String... systemPromptTemplate) {
-        String template;
-
-        // 决定用哪个模板
-        if (systemPromptTemplate != null && systemPromptTemplate.length > 0
-                && systemPromptTemplate[0] != null && !systemPromptTemplate[0].isEmpty()) {
-            template = systemPromptTemplate[0];
-        } else if (knowledgeBases == null || knowledgeBases.isEmpty()) {
-            var cfg = options == null ? null : options.getConfig();
-            template = getPureAgentSystemPrompt(cfg);
-        } else {
-            var cfg = options == null ? null : options.getConfig();
-            template = getProgressiveRAGSystemPrompt(cfg);
-        }
-
-        String currentTime = today.format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE);
-        String language = "";
-        if (options != null) {
-            language = options.getLanguage();
-            webSearchEnabled = options.getSelectedTools() != null
-                    && options.getSelectedTools().contains("web_search");
-        }
+        SectionContext ctx = SectionContext.of(knowledgeBases, webSearchEnabled, options, today, systemPromptTemplate);
         List<SystemPromptSection> sections = new ArrayList<>();
-        sections.add(new SystemPromptSection("base",
-                renderPromptPlaceholdersWithStatus(template, knowledgeBases, webSearchEnabled, currentTime, language)));
-        sections.add(new SystemPromptSection("steering", STEER_GUIDANCE));
-        String runtime = PromptConstants.SOURCE_DATA_BOUNDARY_PROMPT + "\n\n" + RUNTIME_PROMPT_CONTRACT_TAIL;
-        if (!language.isEmpty()) {
-            runtime += "\nUse " + language
-                    + " by default; follow the user's explicit language and output-format requests.";
-        }
-        sections.add(new SystemPromptSection("runtime_contract", runtime));
-
-        List<String> names = options == null ? null : options.getSelectedTools();
-        List<String> safeNames = names == null ? List.of() : names;
-        String sources = GroundingPrompt.formatGroundingGuidance(safeNames);
-        sections.add(new SystemPromptSection("sources", sources));
-        sections.add(new SystemPromptSection("tools", formatToolGuidance(safeNames)));
-        sections.add(new SystemPromptSection("output", PromptConstants.SOURCED_ANSWER_OUTPUT_PROMPT));
-        if (options != null) {
-            if (options.getSkillsMetadata() != null && !options.getSkillsMetadata().isEmpty()) {
-                sections.add(new SystemPromptSection("skills",
-                        formatSkillsMetadata(options.getSkillsMetadata())));
+        for (SectionSpec spec : SECTION_SPECS) {
+            if (spec.enabled().test(ctx)) {
+                sections.add(new SystemPromptSection(spec.id(), spec.content().apply(ctx)));
             }
-            if (options.getPinnedSkillInstructions() != null && !options.getPinnedSkillInstructions().isEmpty()) {
-                sections.add(new SystemPromptSection("skill_instructions",
-                        formatPinnedSkillInstructions(options.getPinnedSkillInstructions())));
-            }
-            sections.add(new SystemPromptSection("memory", options.getMemoryPrompt()));
-            sections.add(new SystemPromptSection("protocol", options.getProtocolPrompt()));
         }
         return sections;
+    }
+
+    /**
+     * 段表：段 id、顺序、启用条件与内容提供者的**唯一声明处**。
+     *
+     * <p>顺序即渲染顺序（{@link #renderSystemPromptSections} 只负责连接）。要加/删/换段，
+     * 只改这张表——三条链路里 agent 这条"选哪些段"由此一处可见；快答与 fallback 的段选择在
+     * chatpipeline / session 侧，共用的是 L1 {@code PromptComposer} 的拼接原语。</p>
+     *
+     * <p>{@code enabled} 语义与历史实现逐字对齐：条件不成立时该段**不产生**（不是产空段），
+     * 这一点由实录逐字节钉住。</p>
+     */
+    private static final List<SectionSpec> SECTION_SPECS = List.of(
+            new SectionSpec("base", AgentPrompts::baseSection),
+            new SectionSpec("steering", ctx -> steeringGuidance()),
+            new SectionSpec("runtime_contract", AgentPrompts::runtimeContractSection),
+            new SectionSpec("sources", ctx -> GroundingPrompt.formatGroundingGuidance(ctx.selectedTools())),
+            new SectionSpec("tools", ctx -> formatToolGuidance(ctx.selectedTools())),
+            new SectionSpec("output", ctx -> PromptConstants.SOURCED_ANSWER_OUTPUT_PROMPT),
+            new SectionSpec("skills", ctx -> formatSkillsMetadata(ctx.options().getSkillsMetadata()),
+                    ctx -> ctx.options() != null && ctx.options().getSkillsMetadata() != null
+                            && !ctx.options().getSkillsMetadata().isEmpty()),
+            new SectionSpec("skill_instructions",
+                    ctx -> formatPinnedSkillInstructions(ctx.options().getPinnedSkillInstructions()),
+                    ctx -> ctx.options() != null && ctx.options().getPinnedSkillInstructions() != null
+                            && !ctx.options().getPinnedSkillInstructions().isEmpty()),
+            new SectionSpec("memory", ctx -> ctx.options().getMemoryPrompt(), ctx -> ctx.options() != null),
+            new SectionSpec("protocol", ctx -> ctx.options().getProtocolPrompt(), ctx -> ctx.options() != null));
+
+    /** 段声明：id + 内容提供者 + 启用条件（缺省恒启用）。 */
+    private record SectionSpec(String id, Function<SectionContext, String> content,
+                               Predicate<SectionContext> enabled) {
+
+        SectionSpec(String id, Function<SectionContext, String> content) {
+            this(id, content, ctx -> true);
+        }
+    }
+
+    /** 一次组装的只读上下文：模板决策与派生开关在构造时冻结，段提供者只读。 */
+    private record SectionContext(List<KnowledgeBaseInfo> knowledgeBases, boolean webSearchEnabled,
+                                  BuildSystemPromptOptions options, LocalDate today,
+                                  String template, String language) {
+
+        static SectionContext of(List<KnowledgeBaseInfo> knowledgeBases, boolean webSearchEnabled,
+                BuildSystemPromptOptions options, LocalDate today, String... systemPromptTemplate) {
+            boolean effectiveWebSearch = webSearchEnabled;
+            String language = "";
+            if (options != null) {
+                language = options.getLanguage();
+                effectiveWebSearch = options.getSelectedTools() != null
+                        && options.getSelectedTools().contains("web_search");
+            }
+            return new SectionContext(knowledgeBases, effectiveWebSearch, options, today,
+                    resolveTemplate(knowledgeBases, options, systemPromptTemplate), language);
+        }
+
+        /** 选中工具（无选项 / 未设置 → 空表），供 sources 与 tools 段使用。 */
+        List<String> selectedTools() {
+            if (options == null || options.getSelectedTools() == null) {
+                return List.of();
+            }
+            return options.getSelectedTools();
+        }
+
+        /** 模板优先级：显式模板 > 纯 agent 模板（无知识库）> 渐进 RAG 模板。 */
+        private static String resolveTemplate(List<KnowledgeBaseInfo> knowledgeBases,
+                BuildSystemPromptOptions options, String... systemPromptTemplate) {
+            if (systemPromptTemplate != null && systemPromptTemplate.length > 0
+                    && systemPromptTemplate[0] != null && !systemPromptTemplate[0].isEmpty()) {
+                return systemPromptTemplate[0];
+            }
+            var cfg = options == null ? null : options.getConfig();
+            return knowledgeBases == null || knowledgeBases.isEmpty()
+                    ? getPureAgentSystemPrompt(cfg)
+                    : getProgressiveRAGSystemPrompt(cfg);
+        }
+    }
+
+    /** steering 段文本（常量声明在类尾，经方法取以避开静态字段前向引用）。 */
+    private static String steeringGuidance() {
+        return STEER_GUIDANCE;
+    }
+
+    /** base 段：模板 + 占位符渲染（当前时间 / 语言 / web_search 状态）。 */
+    private static String baseSection(SectionContext ctx) {
+        String currentTime = ctx.today().format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE);
+        return renderPromptPlaceholdersWithStatus(ctx.template(), ctx.knowledgeBases(),
+                ctx.webSearchEnabled(), currentTime, ctx.language());
+    }
+
+    /** runtime_contract 段：源数据边界 + 运行时契约，按需追加语言要求。 */
+    private static String runtimeContractSection(SectionContext ctx) {
+        String runtime = PromptConstants.SOURCE_DATA_BOUNDARY_PROMPT + "\n\n" + RUNTIME_PROMPT_CONTRACT_TAIL;
+        if (!ctx.language().isEmpty()) {
+            runtime += "\nUse " + ctx.language()
+                    + " by default; follow the user's explicit language and output-format requests.";
+        }
+        return runtime;
     }
 
     /**

@@ -219,7 +219,12 @@ enum Position { PRE_BASE, POST_BASE, PRE_PROTOCOL, POST_PROTOCOL }
   - `appendProtocol`（右侧裁剪 + 协议段直连）← 取代 `ReferencesSupport` 与 `SessionQaFallback` 各自的"裁剪+拼接"；
   - `rightTrim`：**两处逐字节重复**的私有实现（`ReferencesSupport.trimRightWhitespace`、`SessionQaFallback.trailTrim`）已删除。
   - 新增 `PromptComposerTest` 钉规则语义（跳空段 / 右裁 / 尾巴字节形状）。
-- [ ] **F5b（未做，独立一轮）**：`SectionSpec` 声明式段表（agent 10 段 / 快答 3 段 / fallback 收成同一张表的不同子集）+ `AgentPrompts` 拆"文案常量 / 值类型 record" + `PromptAssembly` → `ConversationAssembler`（只管 messages 数组）+ `modelcontext.protocolPrompt()` 登记为 section 提供者。保护网 = 既有实录（46A/46B/46C）+ `EvaluationContractTest`。
+- [x] **F5b-1（已做，2026-10-12）**：**agent 段表声明式化**——`AgentPrompts` 内新增 `SectionSpec`（id + 内容提供者 + 启用条件，缺省恒启用）与只读 `SectionContext`（模板决策与派生开关在构造时冻结），10 段收成一张 `SECTION_SPECS` 表；`buildSystemPromptSections` 退化为"遍历表 → 条件过滤 → 产出段"的 5 行循环。**等价性证明**：`AgentPromptsTest`（含段顺序/内容的 golden 断言）+ `SkillPinnedInstructionsTest` + `EngineRecordingTest`(5) 全绿 → 段落 id/顺序/条件/文本逐字节不变。
+  - 途中修掉一个编译约束：段表是静态字段初始化，直接引用类尾的 `STEER_GUIDANCE` 会触发 `illegal forward reference` → 经 `steeringGuidance()` 方法取文本（已注明原因）。
+  - 快答 / fallback 的"段选择"仍在各自链路（`PipelineCommon` / `SessionQaFallback`），但**拼接原语已统一在 L1 `PromptComposer`**（F5a）——跨模块共享的表只能落 L1（engine 不能依赖 domains），故不把三条链路的段表物理合并，保持"L1 定拼法、各链路定选段"。
+- [ ] **F5b-2（未做，独立一批，已量化影响面）**：`AgentPrompts` 值类型外提 + `PromptAssembly` 职责收窄。
+  - 实测引用面：`KnowledgeBaseInfo` 47 处/9 文件、`SystemPromptSection` 23/4、`BuildSystemPromptOptions` 20/3、`PinnedSkillInstructions` 15/4、`SelectedDocumentInfo` 13/5、`RecentDocInfo` 13/5、`PinnedSkillInfo` 12/6、`PinnedMCPServiceInfo` 9/5、`PlaceholderDefinition` 5/2 → 合计约 **157 处**跨文件改名（`AgentPrompts.X` → 裸名 + import），且会改到 `AgentEngine` / `AgentEngineAssembler` 的公开签名，**不宜与段表同批**。
+  - 同批一并做：`PromptAssembly` → `ConversationAssembler`（职责收窄为 messages 数组；`buildSystemPrompt` 委托段表）、`modelcontext.protocolPrompt()` 登记为显式 section 提供者（当前已由段表 `protocol` 段承载，只需在 javadoc/契约文档显式标注）。
 
 **F5a 执行记录（2026-10-12）**：主代码 4 文件（`AgentPrompts` / `PipelineCommon` / `ReferencesSupport` / `SessionQaFallback`）+ L1 一类一测。验证：`EngineRecordingTest`(5) + `PipelineLifecycleRecordingTest`(3) + `ModelContextRecordingTest`(1) 全绿 —— **三链路 system 文本逐字节不变**；全量后端测试 + `spotlessCheck` 绿。
 
