@@ -26,8 +26,8 @@ import com.ragagent.rerank.RankResult;
 import com.ragagent.rerank.Reranker;
 import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.common.pipeline.ChunkTypes;
-import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.service.ChunkPortAdapter;
+import com.ragagent.common.knowledge.ChunkFacts;
 
 /**
  * {@code AgentToolBackends} 的**知识库检索簇**：知识库检索 / chunk 列举 /
@@ -147,8 +147,8 @@ final class AgentToolKbBackends {
     public KnowledgeSearchTool.ChunkInfoBackend chunkInfoBackend() {
         return new KnowledgeSearchTool.ChunkInfoBackend() {
             @Override
-            public Chunk faqChunkById(String chunkId) {
-                return chunkRepository.getChunkByIdOnly(chunkId);
+            public ChunkFacts faqChunkById(String chunkId) {
+                return ChunkPortAdapter.factsOf(chunkRepository.getChunkByIdOnly(chunkId));
             }
 
             @Override
@@ -435,9 +435,9 @@ final class AgentToolKbBackends {
             }
         };
     }
-    /** 工具侧的 chunkById 回调。 */
-    public java.util.function.Function<String, Chunk> chunkById() {
-        return chunkRepository::getChunkByIdOnly;
+    /** 工具侧的 chunkById 回调（域内实体 → L1 载荷）。 */
+    public java.util.function.Function<String, ChunkFacts> chunkById() {
+        return id -> ChunkPortAdapter.factsOf(chunkRepository.getChunkByIdOnly(id));
     }
     public DocChunkSupport.PagedChunks pagedChunks() {
         return (tenantId, knowledgeId, page, pageSize) -> {
@@ -445,7 +445,7 @@ final class AgentToolKbBackends {
             ChunkRepository.ChunkPage page1 = chunkRepository.listPagedChunksByKnowledgeId(
                     tenantId, knowledgeId, offset, pageSize,
                     TEXT_FAQ_TYPES, null, "", "", "", "", Boolean.TRUE);
-            return new DocChunkSupport.ChunkPage(page1.items(), page1.total());
+            return new DocChunkSupport.ChunkPage(ChunkPortAdapter.factsAll(page1.items()), page1.total());
         };
     }
     /** text+faq + enabled 过滤的 count 段（{@code listPagedChunksByKnowledgeId}）。 */

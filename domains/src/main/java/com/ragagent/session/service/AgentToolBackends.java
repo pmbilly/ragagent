@@ -64,6 +64,7 @@ import com.ragagent.knowledge.storage.TenantFileStorage;
 import com.ragagent.tenant.Tenant;
 import com.ragagent.websearch.service.WebSearchService;
 import com.ragagent.retrieval.domain.WebSearchRequest;
+import com.ragagent.common.knowledge.ChunkFacts;
 
 /**
  * agent 引擎检索工具族的接缝适配（2026-09-23 接线批）。
@@ -259,7 +260,7 @@ public class AgentToolBackends {
         return kbBackends.knowledgeInfoReader();
     }
 
-    public java.util.function.Function<String, Chunk> chunkById() {
+    public java.util.function.Function<String, ChunkFacts> chunkById() {
         return kbBackends.chunkById();
     }
 
