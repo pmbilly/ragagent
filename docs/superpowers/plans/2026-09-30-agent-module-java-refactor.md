@@ -112,9 +112,11 @@
 - Modify: agent 根包 17 文件中非引擎核心类的 package 语句与其全部 import 方
 - Create: `agent/{prompt,...}/package-info.java`、`agent/tools|approval|compaction|domain|skills/package-info.java`、`agentm/{controller,service,dto,mapper,domain}/package-info.java`
 
-- [ ] **Step 1**: 归位方案：`agent/` 根只留引擎门面族（AgentEngine、AgentEngineException、AgentConfig、AgentConsts）；提示词族（AgentPrompts、AgentPromptTemplates、AgentPromptPlaceholders、PromptTemplateCatalog、PromptInstructions、GroundingPrompt）→ 新子包 `agent/prompt/`；其余支撑类（TokenEstimator、ContextDiagnostics、ToolImages、SteerSink、AgentToolNames、SkillMetadata、AgentBudgets）按使用方归入既有子包或 `agent/prompt`/`agent/support`，逐一判断。移动用 `git mv`，import 修复用编译器枚举（§13.9），**禁全仓文本替换**（§13.2）。
+- [ ] **Step 1**: 归位方案：`agent/` 根只留引擎门面族（AgentEngine、AgentEngineException、AgentConfig、AgentConsts）；提示词族（AgentPrompts、AgentPromptTemplates、GroundingPrompt）→ 新子包 `agent/prompt/`；**`AgentPromptPlaceholders` / `PromptTemplateCatalog` / `PromptInstructions` 留 `:common`**（engine 侧引用 9/0/0 处，搬入 domains 即依赖成环；详见 F 波计划 `docs/superpowers/plans/2026-10-12-prompt-unification-and-agent-package.md`）；其余支撑类（TokenEstimator、ContextDiagnostics、ToolImages、SteerSink、AgentToolNames、SkillMetadata、AgentBudgets）按使用方归入既有子包或 `agent/prompt`/`agent/support`，逐一判断。移动用 `git mv`，import 修复用编译器枚举（§13.9），**禁全仓文本替换**（§13.2）。
 - [ ] **Step 2**: 每个 agent/agentm 子包补 `package-info.java` 职责地图（对齐 §12 样式）；`git grep -n ' {@link AgentPrompts}'` 类死链清查。
 - [ ] **Step 3**: 全量测试 + 闸门绿 → Commit `refactor(agent): 包结构归位 + 全部子包 package-info 导览`。
+
+> **与 F 波的关系**：本 Task 的提示词族归位与"提示词单源化"（`PromptSource` / 消副本 / `PromptComposer` / 守门测试）同属一条线，执行顺序与拆环三刀见 `docs/superpowers/plans/2026-10-12-prompt-unification-and-agent-package.md`（F1~F6）；两边不得并行改同一批文件。
 
 ## C 波：契约 Java 化（同批带前端，一次一个域面）
 
