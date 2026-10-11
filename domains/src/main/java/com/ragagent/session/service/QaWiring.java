@@ -53,7 +53,9 @@ import com.ragagent.model.service.ModelService;
 import com.ragagent.rerank.Reranker;
 import com.ragagent.rerank.RerankerConfig;
 import com.ragagent.rerank.RerankerFactory;
+import com.ragagent.common.prompt.PromptSource;
 import com.ragagent.common.retrieval.SearchResult;
+import java.io.InputStream;
 import com.ragagent.session.support.PipelineViews;
 import com.ragagent.websearch.service.WebSearchService;
 import com.ragagent.model.service.ModelRuntimeConfigs;
@@ -392,8 +394,7 @@ public class QaWiring {
 
     private static Map<String, String> loadIntentPrompts() {
         Map<String, String> out = new LinkedHashMap<>();
-        try (java.io.InputStream in =
-                com.ragagent.common.prompt.PromptSource.open("intent_prompts.yaml")) {
+        try (InputStream in = PromptSource.open("intent_prompts.yaml")) {
             if (in == null) {
                 return out;
             }

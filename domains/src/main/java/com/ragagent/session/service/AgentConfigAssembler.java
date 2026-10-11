@@ -1,6 +1,8 @@
 package com.ragagent.session.service;
 
+import com.ragagent.common.prompt.PromptSource;
 import com.ragagent.common.web.JsonMappers;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
@@ -298,8 +300,7 @@ final class AgentConfigAssembler {
     private static final com.fasterxml.jackson.databind.ObjectMapper YAML_JSON =
             JsonMappers.lenient();
     private static String templateContentByIdAndFile(String id, String file) {
-        try (java.io.InputStream in =
-                com.ragagent.common.prompt.PromptSource.open(file)) {
+        try (InputStream in = PromptSource.open(file)) {
             if (in == null) {
                 return null;
             }

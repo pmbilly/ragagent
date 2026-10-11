@@ -1,6 +1,8 @@
 package com.ragagent.session.service;
 
+import com.ragagent.common.prompt.PromptSource;
 import com.ragagent.common.web.JsonMappers;
+import java.io.InputStream;
 import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -129,8 +131,7 @@ final class SessionQaResolution {
     }
 
     static String templateContentByIdAndFile(String id, String file) {
-        try (java.io.InputStream in =
-                com.ragagent.common.prompt.PromptSource.open(file)) {
+        try (InputStream in = PromptSource.open(file)) {
             if (in == null) {
                 return null;
             }
