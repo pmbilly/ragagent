@@ -19,6 +19,7 @@ import com.ragagent.support.ContractJson;
 import com.ragagent.agent.compaction.CompactionSettings;
 import com.ragagent.llm.domain.ChatTool;
 import com.ragagent.llm.domain.FunctionCall;
+import com.ragagent.agent.budget.TokenEstimator;
 
 /**
  * 引擎录制回放：Java 引擎用同一脚本驱动，事件序列 / AgentState 快照 /

@@ -20,7 +20,7 @@ import com.ragagent.llm.LlmChatClient;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.memory.service.MemoryService;
 import com.ragagent.rerank.Reranker;
-import com.ragagent.agent.AgentPromptTemplates;
+import com.ragagent.agent.prompt.AgentPromptTemplates;
 import com.ragagent.agent.skills.DbSkillSource;
 import com.ragagent.agent.skills.Manager;
 import com.ragagent.agent.skills.Skill;
@@ -41,6 +41,7 @@ import com.ragagent.mcp.service.McpMetadataService;
 import com.ragagent.mcp.service.McpServiceService;
 import com.ragagent.session.domain.SessionOwnerIds;
 import com.ragagent.storage.service.ResourceCatalogService;
+import com.ragagent.agent.prompt.AgentPromptTemplates;
 
 /**
  * {@code SessionAgentQaService} 的**引擎/工具装配簇**（§14.9c 刀 3）：创建 agent 引擎（LLM/记忆/审批门/

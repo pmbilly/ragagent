@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import com.ragagent.agent.TokenEstimator;
+import com.ragagent.agent.budget.TokenEstimator;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ToolCall;
 import com.ragagent.llm.domain.FunctionCall;

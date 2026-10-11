@@ -170,36 +170,37 @@ enum Position { PRE_BASE, POST_BASE, PRE_PROTOCOL, POST_PROTOCOL }
 
 ## F4（P5）：agent 包纯移动归位
 
-**前置拆环三刀（`git mv` 前必须完成，否则子包反向依赖根包）：**
+> ⚠️ **执行前盘点把本波降级了（2026-10-12，very thorough 盘点，结论有据）**：
+>
+> 1. **`loop/` 归位不可行（最大降级点）**：8 个段协作者（`ThinkPhase`/`ActPhase`/`ObservePhase`/`FinalizePhase`/`ReActIteration`/`SteerIntake`/`ContextDebugEmitter`/`PromptAssembly`）**全部是 `AgentEngine` 包内状态的直读者/写者**——实测涉及 33 个字段中约 21 个 + 约 17 个包内方法 + 4 个包内嵌套类型（`MsgRef`/`IterOutcome`/`WindowOutcome`/`TrimOutcome`）。搬进子包至少要把这 ~38 处改 `public`（封装代价 + 触碰 59 个同包测试），**"纯移动、零语义变化"不成立** → 应另立一波「engine seam 打开」并单独评审。
+> 2. **`AgentEngine` 必须留根**：`boot/src/test/java/com/ragagent/agent/EngineRecordingTest.java` 与 `domains/src/testFixtures/java/com/ragagent/agent/Engine46bStubSupport.java` 以**跨模块 split package** 直取 `*ForTest` seam（29 处），`AgentEngine` 一动这两个工件必须跟着改包。
+> 3. **`SkillMetadata → skills/` 降级**：`skills/Skill.java` 内已有同名嵌套 `Skill.SkillMetadata`，搬过去同包同名易混，收益（解根⇄skills 环）在本波并不需要 → 留根。
+> 4. **`tools/` 横切 8 件**（`SearchAuth`/`MessageSanitizer`/`NormalizeToolCallId`/`ThinkBlocks`/`ThinkStreamSplitter`/`JsonRepair`/`PythonSyntax`/`ToolResultPersist`）实测全部 `public final`、被跨包以 public 调用，**与 `ToolRegistry`/`Mcp*` 零耦合** → 可整体搬 `tools/runtime/`，但它属"tools 包治理"而非根包治理，**拆成独立一批**做。
+> 5. 口径修正：根包实际是 **22 类（23 文件含 package-info）**，不是 17；原定验收"根包 23 → ≤10"因 loop/ 降级不适用（见验收标准的新口径）。
 
-1. `SkillMetadata`(18 行) → `skills/`（切断 根 ⇄ `skills` 环）；
-2. `TokenEstimator`(164) → `budget/`、`AgentToolNames`(38) → `compaction/`（切断 根 ⇄ `compaction` 环）；
-3. `ToolRegistry` ⇄ `McpCatalog/McpExposure/McpCatalogPagination` 包私有互访**本波不解耦**——MCP 族留 `tools/` 根。
+**本波实际执行（保守版，零语义损失）：**
 
-**目标树：**
+| 动作 | 内容 |
+|---|---|
+| 新建 `budget/` | `TokenEstimator`、`ContextDiagnostics`、`AgentBudgets`（三者已 public，零可见性改动） |
+| 新建 `prompt/` | `GroundingPrompt`、`AgentPromptTemplates`（agent 侧提示词构件；`AgentPrompts`/`PromptAssembly` 留给 F5 一步到位，避免同文件改两次） |
+| 删除 `support/` | 空壳（仅 package-info） |
+| 测试随类走 | `TokenEstimatorTest`、`ContextDiagnosticsTest` → `agent/budget/` |
+| import 同步 | 主代码 10 文件 + 测试 4 文件（编译驱动枚举，非全仓替换）；`boot/EngineRecordingTest` 补 1 处 |
+| package-info | 根包改写（子包清单 + seam 降级说明）；新增 `budget/`、`prompt/` 两份 |
 
-```
-com.ragagent.agent
-├─ AgentEngine / AgentEngineException / AgentConfig / AgentConsts
-├─ loop/        ThinkPhase ActPhase ObservePhase FinalizePhase ReActIteration SteerIntake SteerSink ToolImages
-├─ prompt/      PromptComposer(F5 落地) AgentSectionSpecs AgentPromptTexts
-│               RuntimeContextBlock MustUseBlock GroundingPrompt AgentPromptTemplates ConversationAssembler
-├─ budget/      TokenEstimator AgentBudgets ContextDiagnostics ContextDebugEmitter
-├─ compaction/ domain/ management/ skills/   （不动）
-├─ tools/       根=框架件；mcp/ 暂缓；runtime/=横切件（SearchAuth MessageSanitizer
-│               NormalizeToolCallId ThinkBlocks ThinkStreamSplitter JsonRepair PythonSyntax）
-└─ support/     → 删除（空壳）
-```
+- [x] **Step 1**: 三簇搬迁（`git mv` + 包声明 + 编译驱动的 import 修复）。
+- [x] **Step 2**: `support/` 删除，根包 `package-info` 过时表述清理。
+- [x] **Step 3**: 测试同步（2 个测试随类搬包；4 个测试补 import）；`AgentConfigKeyUsageTest` 路径白名单与 `ArchitectureRulesTest` FQCN 白名单**本波无需改**（`ArchitectureRulesTest:306-307` 指向 `skills.SkillCatalogService` 与 `tools.data.AnalysisDuckDbJdbc`，与根包搬迁无关——Task 9 把它列为本波同步项属误列）。
+- [x] **Step 4**: `budget/`、`prompt/` 补 `package-info`；根包 `package-info` 增 seam 说明。
+- [x] **Step 5**: 全量测试 + `spotlessCheck` 绿 → 提交见执行记录。
 
-**Files:** agent 根包 17 文件 + `support/`；同步：`domains/src/test/java/com/ragagent/agent/**`（55）、`domains/src/testFixtures/java/com/ragagent/agent/**`（6）、`boot/src/test/java/com/ragagent/agent/**`（3，跨模块 split package）。
+**执行记录（2026-10-12）**
+- 结果：根包 22 类 → **17 类**（含 package-info 18 文件）；新增 `budget/`(3) 与 `prompt/`(2)。
+- 验证：`:common / :engine / :domains / :boot` 全量测试 + 三模块 `spotlessCheck` 全绿（`spotlessApply` 只动了 import 顺序）。
+- 未做（明确留待后续）：`loop/` 归位（需先开 seam，独立评审）、`SkillMetadata` 归位（同名易混，收益不成立）、`tools/runtime/` 8 件（属 tools 包治理，独立一批）、`AgentPrompts`/`PromptAssembly` 归位（F5 一并做）。
 
-- [ ] **Step 1**: 拆环三刀（纯移动 + import 修复，编译驱动）。
-- [ ] **Step 2**: `git mv` 归位（仅移动，无编辑）；`support/` 删除并清理 `package-info` 过时表述。
-- [ ] **Step 3**: 同步测试 package 声明 + `AgentConfigKeyUsageTest:44-51` 路径白名单 + `ArchitectureRulesTest:306-307` FQCN 白名单 + `ArchitectureRulesTest` 同包夹具。
-- [ ] **Step 4**: 每个 agent/agentm 子包补 `package-info.java`；`git grep '{@link 旧名}'` 清死链。
-- [ ] **Step 5**: 全量测试 + `spotlessCheck` 绿 → Commit `refactor(agent): 包结构归位（提示词/循环/预算/工具四簇 + 拆环三刀）`。
-
-> 同步修正既有计划 Task 9 的清单：`AgentPromptPlaceholders / PromptTemplateCatalog / PromptInstructions` **不搬**（留 L1）。
+> 同步修正既有计划 Task 9 的清单：① `AgentPromptPlaceholders / PromptTemplateCatalog / PromptInstructions` **不搬**（留 L1，engine 引用会成环）；② `loop/` 归位降级为独立评审项；③ `SkillMetadata` 留根。
 
 ## F5（P4）：组装收口（PromptComposer）
 
@@ -236,7 +237,7 @@ com.ragagent.agent
 
 - 打开模板目录的生产代码：**7 → 1**；文件名清单：**3 套 → 1 份**
 - 同文副本：**3 → 0**；system 提示词组装入口：**3 → 1**
-- agent 根包文件：**23 → ≤10**；`tools/` 根：**40 → ≤25**；空壳 `support/` 删除
+- agent 根包文件：**23 → ≤10**（**口径修正**：loop/ 降级后本波实际 **22 类 → 17 类**；≤10 需先完成「engine seam 打开」独立波）；空壳 `support/` 删除；`tools/runtime/` 8 件与 `tools/` 根瘦身归后续批
 - 新增守门测试 ≥3（装载边界 / 文案登记 / 三链路 golden）；全量测试 + `spotlessCheck` 绿；契约夹具字节零变化
 
 ## 明确不在本计划内（防止顺手扩散）

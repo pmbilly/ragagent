@@ -7,6 +7,7 @@ import com.ragagent.agent.compaction.CompactionSettings;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatTool;
 import com.ragagent.common.llm.TokenUsage;
+import com.ragagent.agent.budget.ContextDiagnostics;
 
 /**
  * 上下文诊断日志协作者：每轮的请求成本预估分解（prediction）与用量漂移（drift）。

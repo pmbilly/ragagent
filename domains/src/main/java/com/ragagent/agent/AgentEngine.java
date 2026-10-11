@@ -40,6 +40,9 @@ import com.ragagent.modelcontext.Registry;
 import com.ragagent.tracing.langfuse.LangfuseManager;
 import com.ragagent.tracing.langfuse.Span;
 import com.ragagent.common.context.TenantContext;
+import com.ragagent.agent.budget.AgentBudgets;
+import com.ragagent.agent.budget.TokenEstimator;
+import com.ragagent.agent.prompt.AgentPromptTemplates;
 
 /**
  * ReAct agent 引擎。

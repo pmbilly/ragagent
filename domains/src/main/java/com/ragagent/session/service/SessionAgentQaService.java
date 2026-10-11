@@ -25,7 +25,7 @@ import com.ragagent.rerank.Reranker;
 
 import com.ragagent.model.service.ModelRuntimeConfigs;
 import com.ragagent.session.support.PipelineViews;
-import com.ragagent.agent.AgentBudgets;
+import com.ragagent.agent.budget.AgentBudgets;
 import com.ragagent.agent.skills.SkillCatalogService;
 import com.ragagent.approval.Gate;
 import com.ragagent.knowledge.service.KnowledgeService;
@@ -39,6 +39,7 @@ import com.ragagent.mcp.service.McpMetadataService;
 import com.ragagent.mcp.service.McpServiceService;
 import com.ragagent.rerank.RerankerFactory;
 import com.ragagent.storage.service.ResourceCatalogService;
+import com.ragagent.agent.budget.AgentBudgets;
 
 /**
  * agent 问答 service 面。

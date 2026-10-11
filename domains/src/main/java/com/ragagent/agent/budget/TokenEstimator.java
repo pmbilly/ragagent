@@ -1,4 +1,4 @@
-package com.ragagent.agent;
+package com.ragagent.agent.budget;
 
 import com.ragagent.common.web.JsonMappers;
 import java.util.List;

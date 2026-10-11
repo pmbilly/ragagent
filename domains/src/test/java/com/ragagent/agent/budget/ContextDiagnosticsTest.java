@@ -1,4 +1,4 @@
-package com.ragagent.agent;
+package com.ragagent.agent.budget;
 
 import static com.ragagent.agent.GoRecording.STR_BD0_STRING;
 import static com.ragagent.agent.GoRecording.STR_BD_STRING;

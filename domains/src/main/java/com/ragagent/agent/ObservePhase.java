@@ -28,6 +28,8 @@ import com.ragagent.llm.domain.ChatResponse;
 import com.ragagent.common.llm.TokenUsage;
 import com.ragagent.common.web.ToolJson;
 import com.ragagent.llm.domain.FunctionCall;
+import com.ragagent.agent.budget.ContextDiagnostics;
+import com.ragagent.agent.budget.TokenEstimator;
 
 /**
  * ReAct「Observe」段的协作者：上下文窗口管理与响应分析——上下文预算估算与

@@ -14,7 +14,7 @@ import java.util.concurrent.BlockingQueue;
 
 import org.junit.jupiter.api.Test;
 
-import com.ragagent.agent.TokenEstimator;
+import com.ragagent.agent.budget.TokenEstimator;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;

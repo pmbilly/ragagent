@@ -3,12 +3,13 @@ package com.ragagent.agent.compaction;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ragagent.agent.TokenEstimator;
+import com.ragagent.agent.budget.TokenEstimator;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.CacheRetention;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
+import com.ragagent.agent.budget.TokenEstimator;
 
 /**
  * 压缩器：把会话历史收进一份检查点摘要。

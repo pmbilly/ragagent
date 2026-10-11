@@ -1,4 +1,4 @@
-package com.ragagent.agent;
+package com.ragagent.agent.prompt;
 
 import com.ragagent.common.prompt.PromptSource;
 import com.ragagent.common.web.JsonMappers;

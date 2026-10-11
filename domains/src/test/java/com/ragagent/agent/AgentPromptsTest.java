@@ -48,6 +48,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import com.ragagent.common.prompt.PromptConstants;
+import com.ragagent.agent.prompt.AgentPromptTemplates;
+import com.ragagent.agent.prompt.GroundingPrompt;
 
 /**
  * 提示词合成的录制常量断言（时间参数化为固定日期 2026-09-20）。

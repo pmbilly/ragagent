@@ -7,6 +7,8 @@ import java.util.List;
 
 import com.ragagent.agent.compaction.ConversationSerializer;
 import com.ragagent.common.prompt.PromptConstants;
+import com.ragagent.agent.prompt.AgentPromptTemplates;
+import com.ragagent.agent.prompt.GroundingPrompt;
 
 /**
  * agent 系统提示词合成。

@@ -6,6 +6,7 @@ import java.time.Duration;
 
 import org.junit.jupiter.api.Test;
 import com.ragagent.event.EventIds;
+import com.ragagent.agent.budget.AgentBudgets;
 
 /**
  * 常量与预算族纯逻辑的录制断言（{@code AgentConsts}）。

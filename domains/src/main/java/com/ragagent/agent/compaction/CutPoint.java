@@ -3,8 +3,9 @@ package com.ragagent.agent.compaction;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ragagent.agent.TokenEstimator;
+import com.ragagent.agent.budget.TokenEstimator;
 import com.ragagent.llm.domain.ChatMessage;
+import com.ragagent.agent.budget.TokenEstimator;
 
 /**
  * 切点选择。

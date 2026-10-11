@@ -1,4 +1,4 @@
-package com.ragagent.agent;
+package com.ragagent.agent.budget;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
