@@ -26,7 +26,12 @@ public class McpCallTool extends BaseTool {
     @Override
     public JsonNode getParameters() {
         List<String> refs = new ArrayList<>();
-        List<McpRegisteredTool> registered = registry.mcpRegisteredTools();
+        List<McpRegisteredTool> registered = new ArrayList<>();
+        for (AgentTool candidate : registry.port().tools()) {
+            if (candidate instanceof McpRegisteredTool mcpTool) {
+                registered.add(mcpTool);
+            }
+        }
         if (registry.isMcpPrepared()) {
             for (McpRegisteredTool tool : registered) {
                 refs.add(tool.ref());

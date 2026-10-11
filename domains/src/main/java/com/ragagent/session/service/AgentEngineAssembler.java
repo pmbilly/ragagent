@@ -46,6 +46,7 @@ import com.ragagent.agent.prompt.SelectedDocumentInfo;
 import com.ragagent.agent.prompt.PinnedMCPServiceInfo;
 import com.ragagent.agent.prompt.PinnedSkillInfo;
 import com.ragagent.agent.prompt.KnowledgeBaseInfo;
+import com.ragagent.agent.tools.McpTooling;
 
 /**
  * {@code SessionAgentQaService} 的**引擎/工具装配簇**（§14.9c 刀 3）：创建 agent 引擎（LLM/记忆/审批门/
@@ -116,6 +117,8 @@ final class AgentEngineAssembler {
             toolRegistry.setMaxToolOutputSize(config.getMaxToolOutputChars());
         }
         registerTools(toolRegistry, config, rerankModel, sessionId);
+        // MCP 编排端口注入：引擎只持端口，MCP 目录逻辑（原 ToolRegistry 内）在 McpTooling
+        toolRegistry.setMcpTooling(new McpTooling(toolRegistry.port()));
         // registerMcpTools：按 agent 配置的
         // mcp_selection_mode 注册受限 MCP 目录（按需发现，不连上游、不广告完整 schema）
         registerMcpTools(toolRegistry, config);

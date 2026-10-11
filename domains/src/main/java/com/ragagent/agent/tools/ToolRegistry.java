@@ -1,6 +1,5 @@
 package com.ragagent.agent.tools;
 
-import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -19,8 +18,8 @@ import com.ragagent.common.web.ToolJson;
 import com.ragagent.agent.domain.ToolCallTarget;
 import com.ragagent.common.error.BizException;
 import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.llm.domain.ToolCall;
-import com.ragagent.mcp.domain.McpService;
+import com.ragagent.agent.tools.spi.McpToolingGateway;
+import com.ragagent.agent.tools.spi.ToolRegistryPort;
 
 /**
  * 工具注册表。
@@ -46,13 +45,14 @@ public class ToolRegistry {
     private final Map<String, AgentTool> tools = new HashMap<>();
     private final Map<String, Boolean> deferred = new HashMap<>();
     /** 完整暴露是显式兼容路径。 */
-    private boolean mcpDirect;
-    private boolean mcpPrepared;
+    /** MCP 编排端口（逻辑在 MCP 适配层，装配期注入）。 */
+    private McpToolingGateway mcpTooling;
     /** 工具输出上限（字符数）；0 = 用 DefaultMaxToolOutput。 */
     private int maxToolOutputSize;
 
     // ---- 校验失败的追加提示（文本属于各工具文件，registry 拼接点先就位）----
-    static final String MCP_CALL_ARGUMENTS_HINT = " Pass arguments as a JSON object, not a JSON-encoded string. "
+    /** MCP 调用参数提示（MCP 适配层也复用，故 public；**文本属契约，不得改字**）。 */
+    public static final String MCP_CALL_ARGUMENTS_HINT = " Pass arguments as a JSON object, not a JSON-encoded string. "
             + "For a tool with no parameters use {\"toolRef\":\"<describe reference>\",\"arguments\":{}}; "
             + "otherwise match its inputSchema. If the definition is unavailable, use "
             + "discover_mcp_tools(mode=\"describe\", serverId=..., toolName=...).";
@@ -315,36 +315,32 @@ public class ToolRegistry {
     }
 
     // =====================================================================
-    // MCP 目录方法
+    // MCP 编排端口（逻辑在 MCP 适配层 McpTooling，装配期注入）
     // =====================================================================
 
-    /** 已安装的 MCP 目录（discover_mcp_tools 持有；无则 null）。 */
-    public synchronized McpCatalog mcpCatalog() {
-        if (tools.get(ToolDefinitions.TOOL_DISCOVER_MCP_TOOLS) instanceof McpDiscoverTool discovery) {
-            return discovery.catalog();
-        }
-        return null;
+    /** 注入 MCP 编排端口（未接线时所有 MCP 调用为空操作 / null）。 */
+    public void setMcpTooling(McpToolingGateway gateway) {
+        this.mcpTooling = gateway;
     }
 
-    /** 目录是否已 Prepare 过。 */
-    public synchronized boolean isMcpPrepared() {
-        return mcpPrepared;
+    /**
+     * 注册表端口：MCP 适配层注册/摘除工具与共享执行管线的唯一通道。
+     * 实现是包内匿名类，注册表的包内封装不被打开。
+     */
+    public ToolRegistryPort port() {
+        return registryPort;
     }
 
-    /** 完整暴露是否开启。 */
-    public synchronized boolean isMcpDirect() {
-        return mcpDirect;
+    /** 目录是否已 Prepare 过（转发）。 */
+    public boolean isMcpPrepared() {
+        McpToolingGateway gateway = mcpTooling;
+        return gateway != null && gateway.isPrepared();
     }
 
-    /** 当前注册的 MCPRegisteredTool 快照（MCPCallTool 的 refs 广告用）。 */
-    public synchronized List<McpRegisteredTool> mcpRegisteredTools() {
-        List<McpRegisteredTool> out = new ArrayList<>();
-        for (AgentTool tool : tools.values()) {
-            if (tool instanceof McpRegisteredTool registered) {
-                out.add(registered);
-            }
-        }
-        return out;
+    /** 完整暴露是否开启（转发）。 */
+    public boolean isMcpDirect() {
+        McpToolingGateway gateway = mcpTooling;
+        return gateway != null && gateway.isDirect();
     }
 
     /** 目录解析后的共享执行管线入口。 */
@@ -352,269 +348,99 @@ public class ToolRegistry {
         return execute(cancellation, meta, tool, args);
     }
 
-    /**
-     * 预先广告来源，describe 之后才加载完整函数。
-     * 这是应用层的"按需加载"——生产 reader 用持久化元数据，不做上游发现。
-     */
+    /** 预先广告来源，describe 之后才加载完整函数（转发 MCP 编排；未接线忽略）。 */
     public void prepareMcpTools() {
-        prepareMcpToolsWithMode(McpExposure.MCP_STARTUP_GRACE, false);
+        McpToolingGateway gateway = mcpTooling;
+        if (gateway != null) {
+            gateway.prepare(false);
+        }
     }
 
     /** 完整暴露的兼容路径。 */
     public void prepareMcpToolsDirect() {
-        prepareMcpToolsWithMode(McpExposure.MCP_STARTUP_GRACE, true);
-    }
-
-    private void prepareMcpToolsWithMode(java.time.Duration grace, boolean direct) {
-        McpCatalog c = mcpCatalog();
-        if (c == null || c.authorizeExecution() != null) {
-            return;
-        }
-        mcpPrepared = true;
-        mcpDirect = direct;
-        if (tools.get(ToolDefinitions.TOOL_DISCOVER_MCP_TOOLS) instanceof McpDiscoverTool discovery) {
-            discovery.setExposure(direct, true);
-        }
-        synchronized (c.preloadLock) {
-            if (!c.preloadStarted) {
-                c.preloadStarted = true;
-                // 引擎准备阶段不安装 ToolExecContext——此路径无法为每个服务打开会话内 OAuth 提示。
-                Thread.ofVirtual().start(() -> {
-                    List<String> ids = new ArrayList<>(c.servers.keySet());
-                    java.util.Collections.sort(ids);
-                    int workers = Math.min(8, ids.size());
-                    if (workers <= 0) {
-                        return;
-                    }
-                    java.util.concurrent.ExecutorService pool =
-                            java.util.concurrent.Executors.newFixedThreadPool(workers,
-                                    Thread.ofVirtual().factory());
-                    java.util.concurrent.BlockingQueue<String> jobs =
-                            new java.util.concurrent.LinkedBlockingQueue<>(ids);
-                    for (int i = 0; i < workers; i++) {
-                        pool.submit(() -> {
-                            String id;
-                            while ((id = jobs.poll()) != null) {
-                                c.snapshot(id, false);
-                            }
-                        });
-                    }
-                    pool.shutdown();
-                });
-            }
-        }
-        long deadline = System.nanoTime() + grace.toNanos();
-        while (System.nanoTime() < deadline) {
-            boolean allSettled = true;
-            for (McpCatalog.McpCatalogServer entry : c.servers.values()) {
-                if (!"ready".equals(entry.status) && !"error".equals(entry.status)
-                        && !"needs_auth".equals(entry.status) && !"unavailable".equals(entry.status)
-                        && !"disabled".equals(entry.status)) {
-                    // not_loaded/loading 都算未安顿
-                    if (!"not_loaded".equals(entry.status) && !"loading".equals(entry.status)) {
-                        continue;
-                    }
-                    allSettled = false;
-                    break;
-                }
-            }
-            if (allSettled) {
-                break;
-            }
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                break;
-            }
-        }
-        refreshMcpTools();
-    }
-
-    /**
-     * 在模型请求之间发布就绪定义：包括经发现/OAuth 加载的目录
-     * 与初始请求后刷新的目录。这里不做网络发现。定义缓存时策略检查依然新鲜。
-     * 只在并行工具执行空闲时调用。
-     */
-    public synchronized void refreshMcpTools() {
-        if (!mcpPrepared) {
-            return;
-        }
-        McpCatalog c = mcpCatalog();
-        if (c == null) {
-            return;
-        }
-        // 为历史保留代理的可执行性，但不向模型提供空 call 面。只在有可用的完整定义时发布。
-        deferred.put(ToolDefinitions.TOOL_CALL_MCP_TOOL, true);
-        for (java.util.Iterator<Map.Entry<String, AgentTool>> it = tools.entrySet().iterator(); it.hasNext(); ) {
-            Map.Entry<String, AgentTool> e = it.next();
-            if (e.getValue() instanceof McpRegisteredTool) {
-                it.remove();
-                deferred.remove(e.getKey());
-            }
-        }
-        if (c.authorizeExecution() != null) {
-            return;
-        }
-        List<String> ids = new ArrayList<>(c.servers.keySet());
-        java.util.Collections.sort(ids);
-        for (String id : ids) {
-            McpCatalog.McpCatalogServer entry = c.servers.get(id);
-            entry.mu.lock();
-            McpService service = entry.service;
-            List<McpToolWrapper> cached = entry.tools;
-            String status = entry.status;
-            entry.mu.unlock();
-            if (!"ready".equals(status)) {
-                continue;
-            }
-            if (c.lookup != null) {
-                McpService current;
-                try {
-                    current = c.lookup.lookup(c.tenantId, id);
-                } catch (Exception err) {
-                    continue;
-                }
-                if (current == null || current.getId() == null || !current.getId().equals(id)
-                        || !current.isEnabled()
-                        || !McpCatalog.sameInstantPublic(current.getUpdatedAt(), service == null ? null : service.getUpdatedAt())) {
-                    continue;
-                }
-            }
-            List<McpToolWrapper> visible;
-            try {
-                visible = c.visibleTools(id, cached == null ? List.of() : cached);
-            } catch (Exception err) {
-                continue;
-            }
-            for (McpToolWrapper tool : visible) {
-                if (!mcpDirect && !c.advertised(tool)) {
-                    continue;
-                }
-                c.rememberAdvertised(tool);
-                McpToolWrapper bound = new McpToolWrapper(tool.service, tool.mcpTool, tool.mcpManager,
-                        tool.gate, tool.authWaitTimeoutSeconds, tool.tenantId);
-                bound.registeredName = McpCatalog.mcpRegisteredName(tool);
-                bound.serverInstructions = tool.serverInstructions;
-                bound.withOAuthWaiter(tool.oauthWaiter());
-                registerTool(new McpRegisteredTool(bound, c, McpCatalog.mcpToolRef(tool)));
-                deferred.put(ToolDefinitions.TOOL_CALL_MCP_TOOL, false);
-            }
+        McpToolingGateway gateway = mcpTooling;
+        if (gateway != null) {
+            gateway.prepare(true);
         }
     }
 
-    /**
-     * 把本会话已 describe 或调用过的工具重新发布，新引擎无需再 describe 一轮。
-     */
+    /** 在模型请求之间发布就绪定义（转发 MCP 编排）。 */
+    public void refreshMcpTools() {
+        McpToolingGateway gateway = mcpTooling;
+        if (gateway != null) {
+            gateway.refresh();
+        }
+    }
+
+    /** 把本会话已 describe 或调用过的工具重新发布（转发 MCP 编排）。 */
     public void rememberMcpHistory(List<ChatMessage> messages) {
-        McpCatalog c = mcpCatalog();
-        if (c == null || messages == null) {
-            return;
-        }
-        for (ChatMessage msg : messages) {
-            if (msg == null || msg.getToolCalls() == null) {
-                continue;
-            }
-            for (ToolCall call : msg.getToolCalls()) {
-                String name = call.getFunction() == null ? "" : call.getFunction().getName();
-                if (ToolDefinitions.TOOL_CALL_MCP_TOOL.equals(name)) {
-                    try {
-                        JsonNode args = PLAIN_READER.readTree(call.getFunction().getArguments());
-                        String ref = args.path("toolRef").asText("");
-                        if (!ref.isEmpty()) {
-                            c.historyRefs.put(ref, Boolean.TRUE);
-                        }
-                    } catch (Exception ignored) {
-                        // 解析失败即忽略该条历史
-                    }
-                    continue;
-                }
-                if (name.startsWith("mcp_") && !ToolDefinitions.TOOL_DISCOVER_MCP_TOOLS.equals(name)) {
-                    c.historyNames.put(name, Boolean.TRUE);
-                }
-            }
+        McpToolingGateway gateway = mcpTooling;
+        if (gateway != null) {
+            gateway.rememberHistory(messages);
         }
     }
 
-    private static final com.fasterxml.jackson.databind.ObjectMapper PLAIN_READER =
-            JsonMappers.lenient();
 
-    /**
-     * UI/审计身份与模型的代理调用分离。原始调用名、参数、ID 与
-     * provider 元数据保持可回放。
-     */
-    public synchronized ToolCallTarget mcpCallTarget(String name, JsonNode raw) {
-        AgentTool registered;
-        try {
-            registered = getTool(name);
-        } catch (ToolNotFoundException e) {
-            return null;
-        }
-        if (registered instanceof McpRegisteredTool direct) {
-            if (direct.authorizeCatalog() != null) {
-                return null;
-            }
-            Map<String, Object> args;
-            try {
-                args = PLAIN_READER.convertValue(raw,
-                        PLAIN_READER.getTypeFactory().constructMapType(LinkedHashMap.class, String.class, Object.class));
-            } catch (Exception e) {
-                return null;
-            }
-            ToolCallTarget target = new ToolCallTarget();
-            target.setName(name);
-            target.setArgs(args);
-            target.setServiceName(direct.service.getName());
-            target.setToolName(direct.mcpTool.getName());
-            return target;
-        }
-        if (!(registered instanceof McpCallTool proxy)) {
-            return null;
-        }
-        // 展示层不得在引擎发出调用事件、装好执行/审批上下文之前连接或等 OAuth。
-        if (proxy.authorizeForPresentation() != null) {
-            return null;
-        }
-        McpCatalog.DecodeResult decoded;
-        try {
-            decoded = McpCatalog.decodeMcpCall(raw);
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
-        McpToolWrapper tool = proxy.cachedToolForPresentation(decoded.toolRef());
-        if (tool == null || !proxy.knownCallableForPresentation(decoded.toolRef())) {
-            // 列举会缓存目标，但在 describe 返回这个确切的 schema 引用之前，展示层保持在 call_mcp_tool。
-            return null;
-        }
-        Map<String, Object> input;
-        try {
-            input = PLAIN_READER.convertValue(decoded.arguments(),
-                    PLAIN_READER.getTypeFactory().constructMapType(LinkedHashMap.class, String.class, Object.class));
-        } catch (Exception e) {
-            return null;
-        }
-        ToolCallTarget target = new ToolCallTarget();
-        target.setName(tool.getName());
-        target.setArgs(input);
-        target.setServiceName(tool.service.getName());
-        target.setToolName(tool.mcpTool.getName());
-        return target;
+    /** 展示层的调用目标解析（转发 MCP 编排；未接线返回 null）。 */
+    public ToolCallTarget mcpCallTarget(String name, JsonNode raw) {
+        McpToolingGateway gateway = mcpTooling;
+        return gateway == null ? null : gateway.callTarget(name, raw);
     }
 
-    /**
-     * 让提示词绑定显式服务提及而无需为了生成工具名前缀急着发现。
-     */
-    public synchronized boolean hasMcpServer(String id) {
-        if (!(tools.get(ToolDefinitions.TOOL_DISCOVER_MCP_TOOLS) instanceof McpDiscoverTool discovery)) {
-            return false;
-        }
-        return discovery.catalog().servers.containsKey(id);
-    }
 
     /** 双引号字符串形态（registry 侧 MCP 文案需要，标准 Jackson 转义，经 {@link ToolJson#quoted}）。 */
     static String quotedGo(String s) {
         return ToolJson.quoted(s);
     }
+
+
+    /** 注册表端口的包内实现：外部只能看到这些动作，工具表本身仍是私有。 */
+    private final ToolRegistryPort registryPort = new ToolRegistryPort() {
+        @Override
+        public AgentTool get(String name) {
+            synchronized (ToolRegistry.this) {
+                return tools.get(name);
+            }
+        }
+
+        @Override
+        public List<AgentTool> tools() {
+            synchronized (ToolRegistry.this) {
+                return new ArrayList<>(tools.values());
+            }
+        }
+
+        @Override
+        public void registerTool(AgentTool tool) {
+            ToolRegistry.this.registerTool(tool);
+        }
+
+        @Override
+        public void registerDeferredTool(AgentTool tool) {
+            ToolRegistry.this.registerDeferredTool(tool);
+        }
+
+        @Override
+        public void remove(String name) {
+            synchronized (ToolRegistry.this) {
+                tools.remove(name);
+                deferred.remove(name);
+            }
+        }
+
+        @Override
+        public void setDeferred(String name, boolean deferredFlag) {
+            synchronized (ToolRegistry.this) {
+                deferred.put(name, deferredFlag);
+            }
+        }
+
+        @Override
+        public ToolResult executeInternal(ToolCancellation cancellation, ToolExecContext meta,
+                AgentTool tool, JsonNode args) {
+            return ToolRegistry.this.executeInternal(cancellation, meta, tool, args);
+        }
+    };
 
     private static void logExecution(String stage, ToolExecContext meta, Map<String, String> fields) {
         logExecution(stage, meta, fields, "execute_failed".equals(stage) || "validation_failed".equals(stage));
