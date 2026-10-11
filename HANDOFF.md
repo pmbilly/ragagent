@@ -314,7 +314,25 @@ wiki/service 分包（P2）、knowledge/dto 分包（P2）、embedding/rerank �
 ### 11.4 阶段 2 批次清单的历史版本
 原 §14.9b / §14.9 / §14.9c（session 批次清单与刀序）已全部执行完毕，内容并入上表；不再保留独立章节。
 
-## 12. knowledge 包结构地图（样板，其余域照此靠拢）
+### 11.5 提示词统一与 agent 包归位（F 波，2026-10-12 执行）
+
+**目标**：提示词的"文案源 / 装载 / 组装"三层收敛为单权威；agent 包按职责归位。**零文案字节变化、零对外契约变化**（由实录 `GoRecording46A/46B/46C` + `ct-kv-get-prompt-templates.json`（42KB）兜底）。
+**计划与执行记录**：`docs/superpowers/plans/2026-10-12-prompt-unification-and-agent-package.md`。
+
+| 刀 | 内容 | 提交 |
+|---|---|---|
+| F1 | 模板装载收敛为 `common.prompt.PromptSource` 单入口（7 处消费方、3 份重复清单清零）；11 份模板下沉 `common/src/main/resources/prompts/` | `ef46785b` |
+| F2 | 评估默认值改取单一模板源（消 4 个 Java 字面量副本；新增 L1 `PromptTemplates`） | `787c91d2` |
+| F3 | 单源守门 `PromptOwnershipTest`（A1 归属 / A2 残迹 / A3 装载方式）+ 11 个模板名升为 `PromptSource` 常量 | `2ea489f8` |
+| 文案 | 资源句柄协议残留句规范化（`3e4dd368` 删行副产物）+ 同步 46A/46B/46C 实录 | `96ecb540` / `33ff65b9` |
+| F4 | 包归位两刀：新设 `budget/`(3) + `prompt/`(2)、删空壳 `support/`；`tools/` 横切 8 件 → `tools/runtime/`（含 5 个实录测试搬包） | `f4bb1ca2` / `d30e4b51` |
+| F5a | L1 `PromptComposer` 统一三条链路拼法（`joinSections` / `SOURCES_AND_OUTPUT_SUFFIX` / `appendProtocol` / `rightTrim`），删两处逐字节重复的私有实现 | `bf9c796a` |
+| F5b-1 | agent 段表声明式化（`SectionSpec` + 只读 `SectionContext`，10 段一张 `SECTION_SPECS` 表） | `9689c590` |
+
+**降级与遗留（均有实测依据）**：① **`loop/` 归位不可行**——8 个段协作者全量读写 `AgentEngine` 的 33 个包内字段 / 约 17 个包内方法 / 4 个包内嵌套类型，搬出需约 38 处改 `public`；且 `boot/EngineRecordingTest` 与 `domains/Engine46bStubSupport` 靠**跨模块 split package** 直取 `*ForTest` seam ⇒ 应单独立"engine seam 打开"波并单独评审。② `AgentPrompts` 值类型外提（约 157 处跨文件改名，会动 `AgentEngine`/`AgentEngineAssembler` 公开签名）留 F5b-2。③ MCP 族搬 `tools/mcp/` 需先解与 `ToolRegistry` 的包私有耦合。
+**实录更新说明**：`GoRecording46A/46B/46C` 因协议提示词文案变更（含派生字段 `prompt_len`）同步更新；Go 录制源已下线、仓内无重录程序（见 `docs/handoff/records/batch-records.md` B39），故按当前实现更新常量，属**显式基线变更**。
+
+
 > **全后端分包地图与体检结论见 `docs/backend-package-map.md`**（2026-09-30：34 顶层包 / 1,599 文件 / 284k 行；P0 包间成环 32 组、P1 扁平包 10 个、P2 超大单层 4 个、P3 顶层 package-info 仅 5/34；复测 `python3 scripts/pkg-audit.py`）。
 
 > **模块手册**：`docs/knowledge-module-guide.md`（架构师接手版，500 行 / 8 张 Mermaid 图：全景 · 分层 · ER · 入库时序 · 检索 · FAQ 状态机 · 任务 span · 守卫）——它讲「结构 + 接口 + 实体 + 链路 + 改哪里」，新人先读手册、再读本节地图。

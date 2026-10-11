@@ -2,7 +2,7 @@
 
 > **面向读者**：第一次接手 `com.ragagent.agent` 的架构师 / 高级开发者。
 > **目标**：30 分钟建立全局观 → 能定位改动点 → 能安全迭代（本模块有 334 个后端 `@Test`（含挂在 `:boot` 的全栈契约测试）+ 42 个管理面契约金片兜底，改错会立刻红）。
-> **数据口径**：2026-10-11 实测（`wc -l` 口径）：**169 个 java 文件 / 30,666 行 / 6 个带码一级子包（17 份 package-info）**。注意：`modelcontext/` 与抓取支撑（`Fetcher` 族）已迁 `:engine` 模块（`com.ragagent.modelcontext` / `com.ragagent.webfetch`），仍是本域引擎的组成部分，只是物理位置在 `:engine`。
+> **数据口径**：2026-10-12 实测（`wc -l` 口径）：**171 个 java 文件 / 30,766 行 / 7 个带码一级子包（19 份 package-info）**（本轮新增 `budget/`、`prompt/`、`tools/runtime/`，删除空壳 `support/`）。注意：`modelcontext/` 与抓取支撑（`Fetcher` 族）已迁 `:engine` 模块（`com.ragagent.modelcontext` / `com.ragagent.webfetch`），仍是本域引擎的组成部分，只是物理位置在 `:engine`。
 > **本文档的地位**：模块级导览；仓库级作业规范见仓库根 `HANDOFF.md`（§12 结构地图、§13 踩坑清单、§14 逐包重构范式）。
 
 ---
@@ -88,8 +88,11 @@ graph TB
 
 | 子包 | 文件/行数 | 放什么 | **不放什么** |
 |---|---|---|---|
-| 根（引擎面） | 23 / 5,157 | `AgentEngine` 门面（713 行）+ 八段协作者（`ThinkPhase` 574 / `ActPhase` 763 / `ObservePhase` 418 / `PromptAssembly` 428 / `ReActIteration` 283 / `FinalizePhase` 178 / `SteerIntake` 103 / `ContextDebugEmitter` 77）+ 提示词族 + 预算/取消/令牌估算 + `AgentToolNames`（compaction 用工具名常量） | Spring 装配（无 `@Component`，由 session 装配）、HTTP |
-| `tools/`（根） | 40 / 7,820 | 工具框架（`AgentTool` / `BaseTool` / `ToolRegistry` 634 / 参数校验 / 输出限额 / `ToolResultPersist`）+ 通用单件（todo_write / thinking / read_file=技能资源读取）+ 跨族接缝（`DocChunkSupport` / `SearchAuth` / `SearchTarget`）+ **MCP 族 10 类**（`McpCatalog` 723，全包第二大类） | 各能力域的业务逻辑（→ 五个能力子包） |
+| 根（引擎面） | 18 / 4,676 | `AgentEngine` 门面（713 行）+ 八段协作者（`ThinkPhase` 574 / `ActPhase` 763 / `ObservePhase` 418 / `PromptAssembly` 428 / `ReActIteration` 283 / `FinalizePhase` 178 / `SteerIntake` 103 / `ContextDebugEmitter` 77）+ 提示词族（`AgentPrompts` 段表 + 值类型）+ `AgentToolNames`；**八段与门面共享包内 seam，故留根包**（搬出需先把 ~38 处包内成员改 public，属独立评审项） | Spring 装配（无 `@Component`，由 session 装配）、HTTP |
+| `prompt/` | 3 / 216 | agent 侧提示词构件：`AgentPromptTemplates`（模板选取）、`GroundingPrompt`（内容接地指引）；`AgentPrompts`/`PromptAssembly` 待 F5b-2 归位 | 文案本体与装载（→ `:common`：`PromptSource` + `resources/prompts/*.yaml`） |
+| `budget/` | 4 / 355 | token 预算与上下文占用：`TokenEstimator`（压缩/裁剪共用）、`AgentBudgets`、`ContextDiagnostics` | 预算决策的触发方（→ 根 `ObservePhase` / `ReActIteration`、`compaction/`） |
+| `tools/`（根） | 32 / 6,022 | 工具框架（`AgentTool` / `BaseTool` / `ToolRegistry` / 参数校验 / 输出限额）+ 通用单件（todo_write / thinking / read_file=技能资源读取）+ 跨族接缝（`DocChunkSupport` / `SearchTarget`）+ **MCP 族 10 类**（`McpCatalog`，因与 `ToolRegistry` 包私有互访暂留根） | 各能力域的业务逻辑（→ 五个能力子包）、横切件（→ `tools/runtime/`） |
+| `tools/runtime/` | 9 / 1,814 | 工具运行时横切件：`SearchAuth`（检索范围鉴权）、`ToolResultPersist`（客户端/存储投影）、`MessageSanitizer` / `ThinkBlocks` / `ThinkStreamSplitter`（消息与思考块清洗切分）、`NormalizeToolCallId`、`JsonRepair`、`PythonSyntax` | 具体工具（→ 能力子包）、工具注册表与 MCP 族 |
 | `tools/wiki/` | 31 / 3,276 | wiki 页面工具十件 + 内容重写 / 路由解析 / 视图类型 | wiki 域的页面存储与摄取 |
 | `tools/knowledge/` | 12 / 4,372 | 知识检索七件（knowledge_search / grep_chunks / list_knowledge_chunks / query_knowledge_graph / get_document_info / search_conversations / search_memory）+ 排序 / 格式化协作者 + FAQ 投影 | 检索引擎与索引（→ `retrieval` / `knowledge`） |
 | `tools/sql/` | 6 / 1,916 | `database_query` + 手写 SQL 安全守卫（`SqlGuard` + tokenizer / 深检查 / 注入分析） | 真连接管理（datasource 域） |
@@ -99,7 +102,6 @@ graph TB
 | `compaction/` | 12 / 1,430 | `Compactor`、溢出判定、截断点选择、序列化器、原因类型、`FileOps`（沙箱文件操作在压缩中的存续） | 上下文窗口策略（→ 根 `ObservePhase`） |
 | `skills/` | 9 / 1,349 | 指令型技能：`Skill` 解析、`Manager` 三级注入、`SkillCatalogService`、`DbSkillSource`、`SkillEntity` + mapper | 安装管线 / 镜像源（已随沙箱裁撤） |
 | `domain/` | 5 / 354 | 引擎值类型：`AgentState` / `AgentStep` / `ToolCall` / `ToolCallTarget`——落库 jsonb 与消息响应共用 | 请求/响应形状（管理面的在 `management/dto/`） |
-| `support/`（空壳） | 1 | 只剩一份内容已过时的 `package-info`（抓取栈已迁 `:engine` `webfetch/`：`Fetcher` 两工厂 / `BrowserRenderer` / `AgentMarkdown` / `FetchException`，4 文件）；包待清 | 任何新代码（别往这放） |
 
 > 跨模块成员：`modelcontext/` 13 文件 / 4,064 行现居 `:engine`（`com.ragagent.modelcontext`：`Registry` 643 / `ModelOutput` 734 / `ToolPolicy` 653 / 流解码 / 工具策略），import 面不变、测试仍在 `domains` 测试树；物理位置以 `:engine` 为准。
 
@@ -119,7 +121,7 @@ graph LR
         ENG2["根（引擎）"]
         TL2["tools/"]
         MG2["management/"]
-        MC3["modelcontext / compaction / skills / domain / support"]
+        MC3["modelcontext / compaction / skills / domain / budget / prompt / tools-runtime"]
     end
 
     subgraph 被依赖域_import行数
@@ -365,14 +367,15 @@ flowchart TD
 | 加/改 agent 配置键 | `management/service/AgentConfigJson`（补默认/校验）+ `BuiltinAgentRegistry.CONFIG_KEYS`（已知键全集）+ `management/dto/AgentResponses.agentConfigMap`（响应声明序） | **三处同改**；YAML 未知键会被静默丢弃；前端同批（camel）；补 `ag-*` 金片 |
 | 改内建智能体 | `domains/src/main/resources/agent/management/builtin_agents.yaml` + `BuiltinAgentRegistry`（展示序 / 模板解析） | prompt 引用按 11 个模板文件固定顺序查找；`builtin_agents.yaml` 里的 snake 键（如 `reflection_enabled`）会被丢弃 |
 | 加一个新工具 | `tools/`（或能力子包）实现 `AgentTool` + `tools/ToolDefinitions` 加名常量 + 注册点 + `ToolCapabilities` 声明 KB 能力 | 工具输出是**自有 schema**（§11 边界，别当 REST 契约改）；补实录或单测 |
-| 改知识检索工具行为 | `tools/knowledge/`（`KnowledgeSearchTool` + `KnowledgeSearchRanking` / `KnowledgeSearchOutputFormatter`） | 跨族接缝 `DocChunkSupport` / `SearchAuth` / `SearchTarget` 在 `tools/` 根；分页参数 `page_size` 两侧都在用（B73 翻案例） |
+| 改知识检索工具行为 | `tools/knowledge/`（`KnowledgeSearchTool` + `KnowledgeSearchRanking` / `KnowledgeSearchOutputFormatter`） | 跨族接缝：`DocChunkSupport` / `SearchTarget` 在 `tools/` 根，`SearchAuth` 在 `tools/runtime/`；分页参数 `page_size` 两侧都在用（B73 翻案例） |
 | 改 database_query 安全语义 | `tools/sql/SqlGuard` + tokenizer / 深检查 / 注入分析协作者 | 校验 Phase 顺序与错误三元组（type/message/details）固定；`DatabaseQueryRecordingTest` 钉住 |
 | 改压缩行为 | `compaction/`（`Compactor` / `CutPoint` / `CompactionSettings`）+ 根 `ObservePhase.manageContextWindow` + `AgentBudgets` | 摘要 prompt 在 `CompactionPrompts`（实录钉住）；溢出修复每请求只有一次 |
 | 改 cN/dN/res:// 句柄协议 | `modelcontext/`（`Registry` / `SourceRegistry` / `ResourceRegistry` / `ToolPolicy`） | 协议提示词**字节即契约**；句柄绝不持久化、出 registry 不被接受；source 与 resource 句柄不能乱序编解码 |
 | 改 agents HTTP 契约 | `management/controller/AgentController` + `management/dto/AgentResponses` | 重录 `ag-*.json`（`scripts/record-ag-golden.sh`）后**结构化复核差异**；键别回 snake |
 | 改技能语义 | `skills/`（`Skill.parseSkillFile` 自校验 + `SkillCatalogService` 引用检查） | `content` 是组装好的 SKILL.md：编辑草稿要剥/装 frontmatter（严格可逆）；引用清单进 409 details 与审计 |
-| 改提示词 | 根 `AgentPrompts` / `AgentPromptTemplates` / `PromptTemplateCatalog`；模板正文在 `:common` 的 `resources/prompts/*.yaml`（经 `common.prompt.PromptSource` 单一装载） | 文案字节即契约（golden/实录钉住）；classpath 无 jackson-dataformat-yaml（snakeyaml→ObjectNode 手接） |
-| 改网页抓取 | `support/Fetcher`（两工厂）+ `BrowserRenderer` 接缝 | agent 用 2MB/60s/markdown，chat 管线用 100KB/15s/纯文本——**别混用**；SSRF 校验在发送前 + 每跳重定向前 |
+| 改提示词 | 段落选择与文案：根 `AgentPrompts`（**段表 `SECTION_SPECS`** + 值类型）；模板选取与接地：`agent/prompt/`（`AgentPromptTemplates` / `GroundingPrompt`）；模板正文在 `:common` 的 `resources/prompts/*.yaml`（经 `common.prompt.PromptSource` 单一装载）；拼接原语在 `:common` 的 `PromptComposer` | 文案字节即契约（golden/实录钉住）；模板名只允许用 `PromptSource` 常量（`PromptOwnershipTest` A1/A3 守门）；classpath 无 jackson-dataformat-yaml（snakeyaml→ObjectNode 手接） |
+| 改 token 预算 / 上下文占用 | `budget/`（`TokenEstimator` / `AgentBudgets` / `ContextDiagnostics`） | 预算决策触发方在根 `ObservePhase` / `ReActIteration` 与 `compaction/`；注意工具结果裁剪历史上存在两套实现（F 波遗留项） |
+| 改网页抓取 | `:engine` 的 `webfetch/Fetcher`（两工厂）+ `BrowserRenderer` 接缝（本域只剩调用方与 `tools/web/` 两个工具） | agent 用 2MB/60s/markdown，chat 管线用 100KB/15s/纯文本——**别混用**；SSRF 校验在发送前 + 每跳重定向前 |
 | 改 ReAct 循环节奏 | 根 `ReActIteration`（停止条件→走向映射）+ `AgentEngine.executeLoop`（steer overrun / 取消） | 事件 emit 顺序 = SSE 帧序；错误 message 逐字稳定 |
 | 改 agent 事件载荷 | `event/payload/*` + session 域 `AgentStreamBridge` | SSE 载荷是**外部权威面**（B72：集成页按原始帧解析），camel 化需协议版本化（§9） |
 
@@ -464,5 +467,5 @@ cd frontend && npx vue-tsc --build --force && npm test
 | 技能怎么进提示词 | `skills/Manager` 三级注入 + `DbSkillSource`（每轮重读）+ `tools/SkillReadFileTool`（Level 3） |
 | 历史步骤落在哪、长什么样 | `domain/AgentStep` → session 域 `messages.agent_steps` jsonb（零值哨兵 §7.5） |
 | 工具输出为什么是这个字节序 | `GoRecording*` 实录 + `common/web/ToolJson`（Go 字节形态工具面，§11 边界别删） |
-| 网页抓取的两套参数 | `support/Fetcher` 两工厂（§7.12） |
+| 网页抓取的两套参数 | `:engine` `webfetch/Fetcher` 两工厂（§7.12） |
 | 目录为什么长这样 | 本文 §1 + 每个包的 `package-info.java`（共 18 份，都是职责地图；`management/` 那份有一处过时说法见 §9） |

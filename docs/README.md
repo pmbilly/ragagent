@@ -11,7 +11,7 @@
 | 包 | 手册 | 规模（文件/行） | 一句话 |
 |---|---|---|---|
 | knowledge | [knowledge-module-guide](knowledge-module-guide.md) | 218 / 2.60 万 | KB 域：文档入库 → 分块/抽取/向量化 → 检索与 FAQ 供给（**样板篇**） |
-| agent | [agent-module-guide](agent-module-guide.md) | 169 / 3.07 万 | agent 引擎：执行循环、工具族（36 个工具）、管理面；`modelcontext/`（:engine）协议解析随册讲 |
+| agent | [agent-module-guide](agent-module-guide.md) | 171 / 3.08 万 | agent 引擎：执行循环、工具族（36 个工具）、管理面、`budget/` 预算与 `prompt/` 构件；单源提示词装载在 `:common` `PromptSource`；`modelcontext/`（:engine）协议解析随册讲 |
 | wiki | [wiki-module-guide](wiki-module-guide.md) | 156 / 2.37 万 | wiki 域：页面摄取管线（ingest/）+ 页面/文件夹/链接图 |
 | datasource | [datasource-module-guide](datasource-module-guide.md) | 125 / 2.68 万 | 外部数据源连接器族（feishu/gitlab/notion/rss/yuque/ima…，入向耦合近零） |
 | session | [session-module-guide](session-module-guide.md) | 114 / 2.22 万 | 会话域：会话/消息 CRUD + SSE 问答流（REST 与事件面键全 camel） |
