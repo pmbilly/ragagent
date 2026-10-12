@@ -85,6 +85,16 @@ export JWT_SECRET="${JWT_SECRET:-java-e2e-jwt-secret-key-0123456789abcdef}"
 # 严禁默认 /tmp：macOS 定期清 /tmp 会丢已入库文档的原始文件（preview 500、不可恢复，实测踩坑 2026-09-28）
 export LOCAL_STORAGE_BASE_DIR="${LOCAL_STORAGE_BASE_DIR:-$(env_value LOCAL_STORAGE_BASE_DIR)}"
 
+# Langfuse 可观测（B228 自建栈起）。**不注入 = 静默 disabled**：启动日志只有一行
+# "[Langfuse] disabled (no LANGFUSE_PUBLIC_KEY/SECRET_KEY)"，之后所有链路都无记录
+# ⇒ 走查/调试时表现为"明明提了问，Langfuse 里什么都没有"（2026-10-12 实测踩到）。
+# 按 key 取（沿用坑 1：不整份 source .env，避免覆盖 localhost 地址）。
+export LANGFUSE_HOST="${LANGFUSE_HOST:-$(env_value LANGFUSE_HOST)}"
+export LANGFUSE_PUBLIC_KEY="${LANGFUSE_PUBLIC_KEY:-$(env_value LANGFUSE_PUBLIC_KEY)}"
+export LANGFUSE_SECRET_KEY="${LANGFUSE_SECRET_KEY:-$(env_value LANGFUSE_SECRET_KEY)}"
+export LANGFUSE_ENVIRONMENT="${LANGFUSE_ENVIRONMENT:-$(env_value LANGFUSE_ENVIRONMENT)}"
+export LANGFUSE_DEBUG="${LANGFUSE_DEBUG:-$(env_value LANGFUSE_DEBUG)}"   # true 时打导出成功日志
+
 # 注：指令型技能自 B57 起**入库**（skills 表，平台级），宿主技能目录
 # （weknora.skills.host-dirs / WEKNORA_SKILLS_HOST_DIRS）已退役，不再注入。
 
