@@ -12,7 +12,7 @@ import com.ragagent.llm.domain.ChatTool;
  * 比较它们。reasoning_content 就是这样漏记了足够久，把 130k 的上下文量成 26k——
  * 压缩不停触发、切错位置、什么也腾不出来，而每一行日志单看都合理。</p>
  *
- * <p>引擎侧由 {@link ContextDebugEmitter} 消费（读 compactor 与 lastUsage、
+ * <p>引擎侧由 {@link com.ragagent.agent.ContextDebugEmitter} 消费（读 compactor 与 lastUsage、
  * 写日志）；漂移判定的纯数学（ratio &gt; 1.5 或 &lt; 0.67 警告、
  * 漂移百分比 &lt; -25% / &gt; 50% 警告）留在调用方展开。</p>
  */

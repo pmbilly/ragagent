@@ -39,7 +39,6 @@ import com.ragagent.mcp.service.McpMetadataService;
 import com.ragagent.mcp.service.McpServiceService;
 import com.ragagent.rerank.RerankerFactory;
 import com.ragagent.storage.service.ResourceCatalogService;
-import com.ragagent.agent.budget.AgentBudgets;
 
 /**
  * agent 问答 service 面。

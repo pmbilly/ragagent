@@ -40,7 +40,6 @@ import com.ragagent.mcp.service.McpMetadataService;
 import com.ragagent.mcp.service.McpServiceService;
 import com.ragagent.session.domain.SessionOwnerIds;
 import com.ragagent.storage.service.ResourceCatalogService;
-import com.ragagent.agent.prompt.AgentPromptTemplates;
 import com.ragagent.agent.prompt.RecentDocInfo;
 import com.ragagent.agent.prompt.SelectedDocumentInfo;
 import com.ragagent.agent.prompt.PinnedMCPServiceInfo;
