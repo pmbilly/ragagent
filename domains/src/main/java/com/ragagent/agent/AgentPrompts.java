@@ -15,7 +15,6 @@ import com.ragagent.agent.prompt.GroundingPrompt;
 import com.ragagent.agent.prompt.KnowledgeBaseInfo;
 import com.ragagent.agent.prompt.PinnedSkillInstructions;
 import com.ragagent.agent.prompt.PlaceholderDefinition;
-import com.ragagent.agent.prompt.RecentDocInfo;
 import com.ragagent.agent.prompt.SystemPromptSection;
 
 /**
@@ -148,27 +147,6 @@ public final class AgentPrompts {
                 b.append("<description>%s</description>\n"
                         .formatted(escapeXMLAttr(formatDocSummary(kb.description(), 240))));
             }
-            if (!kb.recentDocs().isEmpty()) {
-                b.append("<recentDocuments>\n");
-                int shown = 0;
-                for (RecentDocInfo doc : kb.recentDocs()) {
-                    if (shown >= 2) {
-                        break;
-                    }
-                    shown++;
-                    String name = doc.title();
-                    if ("faq".equals(kbType)) {
-                        name = doc.faqStandardQuestion();
-                    }
-                    if (name == null || name.isEmpty()) {
-                        name = doc.fileName();
-                    }
-                    b.append("<document knowledgeId=\"%s\" chunkId=\"%s\" type=\"%s\"><name>%s</name></document>\n"
-                            .formatted(escapeXMLAttr(doc.knowledgeId()), escapeXMLAttr(doc.chunkId()),
-                                    escapeXMLAttr(doc.type()), escapeXMLAttr(formatDocSummary(name, 160))));
-                }
-                b.append("</recentDocuments>\n");
-            }
             b.append("</knowledgeBase>\n");
         }
         b.append("</knowledgeBases>");
@@ -298,21 +276,18 @@ public final class AgentPrompts {
             return "";
         }
         StringBuilder b = new StringBuilder();
-        b.append("\n\nTool execution: use only the tools provided for this turn. Plan internally; "
-                + "use a planning tool only when it helps. Read known paths directly. Batch independent reads; "
-                + "keep dependent operations in order. Inspect results before claiming completion.\n");
-        b.append("For long-running operations, prefer a documented asynchronous mode when available. "
-                + "Use the returned task ID to wait or poll at the recommended interval and retrieve the "
-                + "completed result; after a timeout, check the existing task before resubmitting.\n");
-        b.append("On failure, use the reported cause to correct the input or environment. Retry only "
-                + "after something relevant changes. Do not bypass permission or policy denials. For missing "
-                + "capabilities, an authorized equivalent tool may be used if it respects the user's source "
-                + "selection. Report a blocker only when it cannot be resolved within the task.\n");
+        b.append("\n\nTool execution: use only this turn's tools. Plan internally; read known paths "
+                + "directly; batch independent reads and keep dependent ones ordered; inspect results before "
+                + "claiming completion.\n");
+        b.append("For long-running operations prefer a documented asynchronous mode and poll the returned "
+                + "task ID at the recommended interval; after a timeout, check the existing task before "
+                + "resubmitting. On failure, fix the reported cause before retrying, and never bypass permission "
+                + "or policy denials; report a blocker only when it cannot be resolved within the task.\n");
         if (names.contains("discover_mcp_tools")) {
-            b.append("For MCP tools, use already offered functions directly. Otherwise inspect the "
-                    + "relevant listed server, describe the exact tool, and wait for its definition before making "
-                    + "a dependent call. Use the returned tool_ref with call_mcp_tool only when that function is "
-                    + "offered; never guess tool names, server IDs, arguments, or references.\n");
+            b.append("For MCP tools, use offered functions directly; otherwise inspect the listed server, "
+                    + "describe the exact tool, and wait for its definition before a dependent call. Use the "
+                    + "returned tool_ref with call_mcp_tool only when offered; never guess names, server IDs, "
+                    + "arguments, or references.\n");
         }
 
         return b.toString();

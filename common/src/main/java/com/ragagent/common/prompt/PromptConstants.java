@@ -25,17 +25,16 @@ public final class PromptConstants {
      * 发现一张图绝不能捏造另一条用户请求。
      */
     public static final String SOURCED_ANSWER_OUTPUT_PROMPT = "Answer presentation:\n"
-            + "- Follow the user's requested language, length, and output format. Choose headings, lists, "
-            + "tables, or prose when they help; do not impose Markdown on a requested JSON, code-only, "
-            + "or other exact-format response.\n"
-            + "- If retrieved images directly help answer the question and the requested format supports "
-            + "images, include relevant ones near the text they support. Do not include decorative or "
-            + "unrelated images merely because they were retrieved. Honor text-only requests.\n"
-            + "- Preserve the complete Markdown image syntax and URL exactly when reusing a source image. "
-            + "Use ASCII half-width parentheses as ![alt](url); never invent, shorten, or replace its URL.\n"
-            + "- Before finishing, silently verify that the answer follows the requested format, supports "
-            + "its factual claims, and accurately distinguishes completed actions from remaining work. "
-            + "Source citation formatting is controlled by the runtime protocol.";
+            + "- Follow the requested language, length, and format; choose headings, lists, tables, or prose "
+            + "when they help, and do not impose Markdown on a requested JSON, code-only, or other exact-format "
+            + "response.\n"
+            + "- Include retrieved images near the text they support when they help and the format allows it; "
+            + "honor text-only requests and skip decorative or unrelated images.\n"
+            + "- Reuse a source image's Markdown syntax and URL exactly (![alt](url), ASCII parentheses); "
+            + "never invent, shorten, or replace its URL.\n"
+            + "- Before finishing, silently verify the format and the support of factual claims, and "
+            + "distinguish completed actions from remaining work. Citation formatting is controlled by the "
+            + "runtime protocol.";
 
     private PromptConstants() {
     }
