@@ -1,6 +1,7 @@
 package com.ragagent.session.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.ragagent.session.domain.EmbedVisitorSessionRow;
 import com.ragagent.session.domain.Session;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -204,4 +205,25 @@ public interface SessionMapper extends BaseMapper<Session> {
             @Param("skillMarker") String skillMarker,
             @Param("limit") int limit,
             @Param("offset") int offset);
+
+    /**
+     * embed 访客的历史会话：渠道（description 等值）+ 访客 id，只列**有消息**的会话，
+     * 按最后活动倒序，上限 {@code limit}。
+     *
+     * <p>{@code EXISTS messages} 走 {@code idx_messages_session_id}；会话侧过滤
+     * （tenant + visitor + channel）选择性强，走 {@code idx_sessions_tenant_embed_visitor}。
+     * 从未发言的空会话由此查询直接排除，调用方无需再筛。</p>
+     */
+    @Select("SELECT s.id AS id, s.title AS title, s.updated_at AS updatedAt "
+            + "FROM sessions AS s "
+            + "WHERE s.tenant_id = #{tenantId} AND s.deleted_at IS NULL "
+            + "AND s.description = #{description} AND s.embed_visitor_id = #{visitorId} "
+            + "AND EXISTS (SELECT 1 FROM messages m "
+            + "WHERE m.session_id = s.id AND m.deleted_at IS NULL) "
+            + "ORDER BY s.updated_at DESC, s.id DESC LIMIT #{limit}")
+    java.util.List<EmbedVisitorSessionRow> listEmbedVisitorSessions(
+            @Param("tenantId") long tenantId,
+            @Param("description") String description,
+            @Param("visitorId") String visitorId,
+            @Param("limit") int limit);
 }

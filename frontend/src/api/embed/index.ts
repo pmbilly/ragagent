@@ -71,6 +71,14 @@ export interface EmbedCreatedSession {
   sig: string
 }
 
+/** 访客历史会话列表项：列表接口逐条附会话签名（读消息时必须出示）。 */
+export interface EmbedVisitorSessionSummary {
+  id: string
+  sig: string
+  title: string
+  updatedAt: string
+}
+
 export type EmbedLocaleTag = 'zh-CN' | 'en-US' | 'ko-KR' | 'ja-JP' | 'ru-RU' | ''
 
 export interface EmbedChannelStats {
@@ -314,12 +322,32 @@ export async function getEmbedConfig(channelId: string, token: string) {
   )
 }
 
-export async function createEmbedSession(channelId: string, token: string) {
+export async function createEmbedSession(channelId: string, token: string, visitorId?: string) {
+  const headers: Record<string, string> = { Authorization: `Embed ${token}` }
+  const visitor = visitorId?.trim()
+  // 访客 id 随创建落库，供"历史会话列表"按访客聚合。
+  if (visitor) headers['X-Embed-Visitor'] = visitor
   return post<EmbedCreatedSession>(
     `/api/v1/embed/${channelId}/sessions`,
     {},
-    { headers: { Authorization: `Embed ${token}` } },
+    { headers },
   )
+}
+
+/**
+ * 本访客在本渠道的历史会话：只含说过话的会话，按最后活动倒序（后端上限 50 条）。
+ * 逐条附会话签名——读消息时必须出示。
+ */
+export async function listEmbedVisitorSessions(
+  channelId: string,
+  token: string,
+  visitorId: string,
+): Promise<EmbedVisitorSessionSummary[]> {
+  const data = await get<{ sessions?: EmbedVisitorSessionSummary[] }>(
+    `/api/v1/embed/${channelId}/sessions`,
+    { headers: { Authorization: `Embed ${token}`, 'X-Embed-Visitor': visitorId } },
+  )
+  return Array.isArray(data?.sessions) ? data.sessions : []
 }
 
 export async function exchangeEmbedSession(channelId: string, publishToken: string) {

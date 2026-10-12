@@ -2125,6 +2125,7 @@ export default {
     deleted: '削除しました',
     copied: '埋め込みコードをコピーしました',
     loadError: '読み込みに失敗しました',
+    refresh: '再読み込み',
     missingChannel: '埋め込みチャネルまたはトークンがありません',
     invalidChannel: '無効な埋め込みチャネルです',
     sessionFailed: 'チャットセッションの作成に失敗しました。再試行してください',

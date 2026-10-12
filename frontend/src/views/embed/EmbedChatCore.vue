@@ -158,11 +158,14 @@ const props = defineProps<{
   agentImageUploadEnabled?: boolean
   useSessionHeaderTitle?: boolean
   hostContext?: Record<string, unknown>
+  /** 懒创建：发送前确保会话已存在（来自 useEmbedBridge）。 */
+  ensureSession?: () => Promise<boolean>
 }>()
 
 const emit = defineEmits<{
   (e: 'session-title', title: string): void
   (e: 'messages-state', hasMessages: boolean): void
+  (e: 'streaming-state', streaming: boolean): void
 }>()
 
 const { t } = useI18n()
@@ -294,6 +297,8 @@ const {
   },
   onTurnComplete: (message) => { void loadFollowUpSuggestions(message, true) },
   onMessagesLoaded: loadPersistedFollowUps,
+  ensureSession: props.ensureSession,
+  onStreamingChange: (streaming) => emit('streaming-state', streaming),
 })
 
 const welcomeText = computed(() => props.welcomeMessage?.trim() || '')

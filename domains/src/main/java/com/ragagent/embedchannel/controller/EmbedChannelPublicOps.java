@@ -2,6 +2,7 @@ package com.ragagent.embedchannel.controller;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.ragagent.common.security.LogSanitizer;
@@ -10,6 +11,7 @@ import com.ragagent.embedchannel.EmbedError;
 import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 import com.ragagent.embedchannel.service.EmbedChannelService;
 import com.ragagent.knowledge.domain.Chunk;
+import com.ragagent.session.domain.EmbedVisitorSessionRow;
 import com.ragagent.session.domain.Session;
 import com.ragagent.session.domain.SessionOwnerIds;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,9 @@ import org.springframework.web.bind.annotation.RequestParam;
  * 响应组构件经门面类名调用。
  */
 final class EmbedChannelPublicOps {
+
+    /** 历史会话列表上限。 */
+    private static final int MAX_HISTORY_SESSIONS = 50;
 
     private final EmbedChannelController ctrl;
 
@@ -112,15 +117,20 @@ final class EmbedChannelPublicOps {
         }
     }
 
-    /** 创建访客会话：201 {id, sig}。 */
+    /** 创建访客会话：201 {id, sig}。访客 id（可选）随会话落库，供历史会话列表。 */
     public ResponseEntity<Map<String, Object>> createSession(
             @PathVariable("channelId") String channelId) {
         EmbedChannelEntity ch = EmbedChannelController.channel(EmbedChannelController.request0());
         long tenantId = EmbedChannelController.currentTenant();
+        String visitor = EmbedChannelController.trim(
+                EmbedChannelController.request0().getHeader("X-Embed-Visitor"));
+        if (!visitor.isEmpty() && !EmbedChannelController.validVisitor(visitor)) {
+            return EmbedChannelController.plainError(400, "invalid embed visitor id");
+        }
         Session created;
         try {
             created = ctrl.sessionService.createSession(
-                    EmbedChannelService.newEmbedSession(tenantId, ch.getId()));
+                    EmbedChannelService.newEmbedSession(tenantId, ch.getId(), visitor));
         } catch (RuntimeException e) {
             return EmbedChannelController.plainError(500, "failed to create session");
         }
@@ -137,5 +147,43 @@ final class EmbedChannelPublicOps {
         data.put("id", created.getId());
         data.put("sig", sig);
         return ResponseEntity.status(201).body(data);
+    }
+
+    /**
+     * 访客历史会话列表：{@code {sessions:[{id, title, updatedAt, sig}]}}。
+     *
+     * <p>只含本渠道 + 本访客、**说过话**的会话（空会话不进列表）；按最后活动倒序，
+     * 上限 {@value #MAX_HISTORY_SESSIONS} 条。逐条附会话句柄签名——读消息时必须出示，
+     * 而前端只在创建会话时领过一次。</p>
+     */
+    public ResponseEntity<Map<String, Object>> listSessions(
+            @PathVariable("channelId") String channelId) {
+        EmbedChannelEntity ch = EmbedChannelController.channel(EmbedChannelController.request0());
+        long tenantId = EmbedChannelController.currentTenant();
+        String visitor = EmbedChannelController.trim(
+                EmbedChannelController.request0().getHeader("X-Embed-Visitor"));
+        if (!EmbedChannelController.validVisitor(visitor)) {
+            return EmbedChannelController.plainError(400, "invalid embed visitor id");
+        }
+        List<EmbedVisitorSessionRow> rows;
+        try {
+            rows = ctrl.sessionRepository.listEmbedVisitorSessions(tenantId,
+                    EmbedChannelService.embedSessionDescription(ch.getId()), visitor,
+                    MAX_HISTORY_SESSIONS);
+        } catch (RuntimeException e) {
+            return EmbedChannelController.plainError(500, "failed to load sessions");
+        }
+        List<Map<String, Object>> sessions = new ArrayList<>(rows.size());
+        for (EmbedVisitorSessionRow row : rows) {
+            Map<String, Object> item = new LinkedHashMap<>();
+            item.put("id", row.getId());
+            item.put("title", row.getTitle() == null ? "" : row.getTitle());
+            item.put("updatedAt", row.getUpdatedAt());
+            item.put("sig", EmbedTokens.signHandle(ch, row.getId()));
+            sessions.add(item);
+        }
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("sessions", sessions);
+        return ResponseEntity.ok(data);
     }
 }

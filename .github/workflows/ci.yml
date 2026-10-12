@@ -67,12 +67,14 @@ jobs:
       # 复现出同样的 4 skipped，而 CI 只报 '4 skipped' 看不出丢了什么覆盖）。与 B158「CI 起真 PG」同一精神。
       - name: 装 redis-server（让 Redis 测试在 CI 真跑，不再静默跳过）
         run: sudo apt-get update -qq && sudo apt-get install -y -qq redis-server
-      - name: 灌基线（全新库守卫：V1__baseline.sql 必须能灌进空 ParadeDB）
+      - name: 灌迁移（全新库守卫：versioned 下全部迁移必须按序灌进空 ParadeDB）
         env:
           PGPASSWORD: 'postgres123!@#'
-        run: >-
-          psql -h localhost -p 15432 -U postgres -d WeKnora -v ON_ERROR_STOP=1 -q
-          -f migrations/versioned/V1__baseline.sql
+        run: |
+          for f in migrations/versioned/V*.sql; do
+            echo "applying $f"
+            psql -h localhost -p 15432 -U postgres -d WeKnora -v ON_ERROR_STOP=1 -q -f "$f"
+          done
       - name: Spotless check（ratchet 自 seed，仅检查触碰过的文件）
         run: ./gradlew spotlessCheck
       - name: Build & test（PG 走默认 localhost:15432 + dev 同口令 ⇒ 两个录测试真跑）

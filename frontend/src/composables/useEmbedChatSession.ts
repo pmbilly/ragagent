@@ -37,6 +37,10 @@ export function useEmbedChatSession(options: {
   onSessionTitle?: (title: string) => void
   onTurnComplete?: (message: Record<string, unknown>) => void
   onMessagesLoaded?: (messages: Record<string, unknown>[]) => void
+  /** 懒创建：发送前确保会话已存在（访客会话按需创建）。 */
+  ensureSession?: () => Promise<boolean>
+  /** 流式回答状态变化：父级据此决定切换会话前是否需要确认。 */
+  onStreamingChange?: (streaming: boolean) => void
 }) {
   const { t } = useI18n()
   const { onChunk, error, startStream, stopStream } = useStream()
@@ -248,6 +252,14 @@ export function useEmbedChatSession(options: {
     value: string,
     opts: { webSearchEnabled?: boolean; imageFiles?: File[]; attachmentFiles?: File[] } = {},
   ) => {
+    // 懒创建：首条消息发送前才把会话落库；失败时不产生本地消息半成品。
+    if (options.ensureSession) {
+      const ready = await options.ensureSession()
+      if (!ready) {
+        embedToast(t('embedPublish.sessionFailed'))
+        return
+      }
+    }
     stopStream()
     prepareForNewOutgoingMessage()
     const outboundQuery = buildQueryWithHostContext(value, options.hostContext?.value)
@@ -331,6 +343,8 @@ export function useEmbedChatSession(options: {
     })
   }
 
+  watch(isReplying, (streaming) => options.onStreamingChange?.(streaming))
+
   watch(error, (newError) => {
     if (newError) {
       embedToast(newError)
@@ -352,6 +366,8 @@ export function useEmbedChatSession(options: {
   })
 
   const resetAndLoad = (sid: string) => {
+    // 切换会话先断掉旧流：否则上一会话的 chunk 会写进新会话的消息列表。
+    stopStream()
     messagesList.splice(0)
     historyLoading.value = true
     historyLoadingMore.value = false

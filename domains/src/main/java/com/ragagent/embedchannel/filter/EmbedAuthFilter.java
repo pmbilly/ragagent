@@ -114,11 +114,11 @@ public class EmbedAuthFilter extends OncePerRequestFilter {
         if (!limiter.allow(perMinuteKey, EmbedRateLimiter.MINUTE_MILLIS, ch.getRateLimitPerMinute())
                 || !limiter.allow(channelId + ":__global", EmbedRateLimiter.MINUTE_MILLIS,
                         EmbedRateLimiter.globalPerMinute(ch.getRateLimitPerMinute()))) {
-            writePlain(response, 429, "rate limit exceeded");
+            writePlain(response, 429, "rate limit exceeded, please try again later");
             return;
         }
         if (!limiter.allow(channelId, EmbedRateLimiter.DAY_MILLIS, ch.getRateLimitPerDay())) {
-            writePlain(response, 429, "daily request limit exceeded");
+            writePlain(response, 429, "daily request limit exceeded, please try again later");
             return;
         }
 

@@ -392,6 +392,7 @@ public final class TestSchema {
                 "title VARCHAR(255)," +
                 "description TEXT," +
                 "user_id VARCHAR(512)," +
+                "embed_visitor_id VARCHAR(128)," +
                 "is_pinned BOOLEAN NOT NULL DEFAULT FALSE," +
                 "pinned_at TIMESTAMP WITH TIME ZONE," +
                 "agent_config VARCHAR," +

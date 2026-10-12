@@ -197,6 +197,12 @@ final FileProxyService fileProxyService;
         return publicOps.chunk(chunkId);
     }
 
+    @GetMapping("/api/v1/embed/{channelId}/sessions")
+    public ResponseEntity<Map<String, Object>> listSessions(
+            @PathVariable("channelId") String channelId) {
+        return publicOps.listSessions(channelId);
+    }
+
     @PostMapping("/api/v1/embed/{channelId}/sessions")
     public ResponseEntity<Map<String, Object>> createSession(
             @PathVariable("channelId") String channelId) {
@@ -379,7 +385,7 @@ void ensureSession(String sessionId) {
     }
 
     /** 访客 ID 校验：非空、≤128、无控制字符。 */
-    private static boolean validVisitor(String id) {
+    static boolean validVisitor(String id) {
         if (id.isEmpty() || id.length() > 128) {
             return false;
         }

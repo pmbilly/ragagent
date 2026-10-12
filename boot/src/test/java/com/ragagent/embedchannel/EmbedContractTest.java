@@ -70,6 +70,14 @@ class EmbedContractTest {
     private static final String SES_OFF = "b5000000-0000-0000-0000-000000000603";
     private static final String MSG_DONE = "b6000000-0000-0000-0000-000000000601";
     private static final String SSET = "b7000000-0000-0000-0000-000000000601";
+    // 历史会话列表场景（第二/三条 embed 会话 + 访客 id）
+    private static final String SES_A2 = "b5000000-0000-0000-0000-000000000604";
+    private static final String SES_EMPTY = "b5000000-0000-0000-0000-000000000605";
+    private static final String SES_VB = "b5000000-0000-0000-0000-000000000606";
+    private static final String MSG_A2 = "b6000000-0000-0000-0000-000000000602";
+    private static final String MSG_VB = "b6000000-0000-0000-0000-000000000603";
+    private static final String VISITOR_A = "visitor-a-9f31";
+    private static final String VISITOR_B = "visitor-b-4c72";
 
     private static final String AG_CONFIG = "{\"kbSelectionMode\":\"selected\",\"knowledgeBases\":"
             + "[\"" + KB_A + "\"],\"webSearchEnabled\":true,\"imageUploadEnabled\":false,"
@@ -243,9 +251,9 @@ class EmbedContractTest {
                 "{\"showSuggestedQuestions\":false,\"allowedOrigins\":[\"*\"]}"), 200,
                 "emb-mgmt-update-sugg-off.json");
 
-        // 渠道标记回填（对照脚本的 SQL UPDATE）
-        jdbc.update("UPDATE sessions SET description = ?, user_id = ? WHERE id = ?",
-                "embed_channel:" + cid, "embed_session:10006:" + cid + ":" + SES_MAIN, SES_MAIN);
+        // 渠道标记回填（对照脚本的 SQL UPDATE；SES_MAIN 带访客 id，供历史会话列表）
+        jdbc.update("UPDATE sessions SET description = ?, user_id = ?, embed_visitor_id = ? WHERE id = ?",
+                "embed_channel:" + cid, "embed_session:10006:" + cid + ":" + SES_MAIN, VISITOR_A, SES_MAIN);
         jdbc.update("UPDATE sessions SET description = ?, user_id = ? WHERE id = ?",
                 "embed_channel:" + cidMin, "embed_session:10006:" + cidMin + ":" + SES_OTHER, SES_OTHER);
         jdbc.update("UPDATE sessions SET description = ?, user_id = ? WHERE id = ?",
@@ -354,6 +362,41 @@ class EmbedContractTest {
 
         assertGolden(post("/api/v1/embed/" + cid + "/sessions", null, null)
                 .header("Authorization", ea).header("Origin", origin), 201, "emb-pub-create-session.json");
+
+        // 历史会话场景数据：A2（有消息、更晚）+ EMPTY（无消息）+ VB（别的访客、有消息）
+        jdbc.update("INSERT INTO sessions (id, tenant_id, title, description, user_id, "
+                + "embed_visitor_id, created_at, updated_at) VALUES "
+                + "(?, 10006, '订单问题', ?, ?, ?, '2026-09-02 09:00:00+00', '2026-09-02 09:00:00+00'), "
+                + "(?, 10006, '', ?, ?, NULL, '2026-09-02 09:00:00+00', '2026-09-02 09:00:00+00'), "
+                + "(?, 10006, '', ?, ?, ?, '2026-09-03 09:00:00+00', '2026-09-03 09:00:00+00')",
+                SES_A2, "embed_channel:" + cid, "embed_session:10006:" + cid + ":" + SES_A2, VISITOR_A,
+                SES_EMPTY, "embed_channel:" + cid, "embed_session:10006:" + cid + ":" + SES_EMPTY,
+                SES_VB, "embed_channel:" + cid, "embed_session:10006:" + cid + ":" + SES_VB, VISITOR_B);
+        jdbc.update("INSERT INTO messages (id, request_id, session_id, role, content, is_completed, "
+                + "agent_duration_ms, channel, rendered_content, agent_id, agent_tenant_id, model_id, "
+                + "execution_context, knowledge_references, mentioned_items, images, attachments, "
+                + "artifacts, created_at, updated_at) VALUES "
+                + "(?, 'b6f00000-0000-0000-0000-000000000602', ?, 'user', '我要查订单', TRUE, 0, "
+                + "'', '', '', 0, '', '{}', '[]', '[]', '[]', '[]', '[]', "
+                + "'2026-09-02 09:00:00+00', '2026-09-02 09:00:00+00'), "
+                + "(?, 'b6f00000-0000-0000-0000-000000000603', ?, 'assistant', '订单在运送中', TRUE, 0, "
+                + "'', '', '', 0, '', '{}', '[]', '[]', '[]', '[]', '[]', "
+                + "'2026-09-03 09:00:00+00', '2026-09-03 09:00:00+00')",
+                MSG_A2, SES_A2, MSG_VB, SES_VB);
+
+        // 历史会话列表：只含本渠道 + 本访客 + 有消息；A2 更晚 ⇒ 排在 MAIN 前；EMPTY 不出现
+        assertGolden(get("/api/v1/embed/" + cid + "/sessions", null)
+                .header("Authorization", ea).header("Origin", origin)
+                .header("X-Embed-Visitor", VISITOR_A), 200, "emb-pub-sessions-list.json");
+        assertGolden(get("/api/v1/embed/" + cid + "/sessions", null)
+                .header("Authorization", ea).header("Origin", origin)
+                .header("X-Embed-Visitor", VISITOR_B), 200, "emb-pub-sessions-list-visitor-b.json");
+        assertGolden(get("/api/v1/embed/" + cid + "/sessions", null)
+                .header("Authorization", ea).header("Origin", origin)
+                .header("X-Embed-Visitor", "visitor-c-empty"), 200, "emb-pub-sessions-list-empty.json");
+        assertGolden(get("/api/v1/embed/" + cid + "/sessions", null)
+                .header("Authorization", ea).header("Origin", origin), 400,
+                "emb-pub-sessions-list-novisitor.json");
 
         assertGolden(get("/api/v1/embed/" + cid + "/messages/" + SES_MAIN + "/load", null)
                 .header("Authorization", ea).header("Origin", origin)

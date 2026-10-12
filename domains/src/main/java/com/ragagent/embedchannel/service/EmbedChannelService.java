@@ -749,12 +749,13 @@ public class EmbedChannelService {
         return items.total();
     }
 
-    /** 建 embed 会话（空标题 + 描述标记）。 */
-    public static Session newEmbedSession(long tenantId, String channelId) {
+    /** 建 embed 会话（空标题 + 描述标记 + 访客 id 落库；访客为空时存 NULL）。 */
+    public static Session newEmbedSession(long tenantId, String channelId, String visitorId) {
         Session session = new Session();
         session.setTenantId(tenantId);
         session.setTitle("");
         session.setDescription(embedSessionDescription(channelId));
+        session.setEmbedVisitorId(visitorId);
         return session;
     }
 

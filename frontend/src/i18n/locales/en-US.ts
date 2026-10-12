@@ -2125,6 +2125,7 @@ export default {
     deleted: 'Deleted',
     copied: 'Embed code copied',
     loadError: 'Failed to load',
+    refresh: 'Refresh',
     missingChannel: 'Missing embed channel or token',
     invalidChannel: 'Invalid embed channel',
     sessionFailed: 'Failed to create chat session, please try again',

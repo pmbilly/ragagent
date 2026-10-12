@@ -3944,6 +3944,7 @@ export default {
     deleted: '삭제됨',
     copied: '임베드 코드가 복사되었습니다',
     loadError: '로드 실패',
+    refresh: '새로고침',
     missingChannel: '임베드 채널 또는 토큰 없음',
     invalidChannel: '잘못된 임베드 채널',
     sessionFailed: '대화 세션을 생성할 수 없습니다. 나중에 다시 시도하세요',

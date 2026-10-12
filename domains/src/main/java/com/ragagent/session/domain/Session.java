@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ragagent.common.web.PgJsonTypeHandler;
 
 /**
@@ -63,6 +64,16 @@ public class Session {
      * （见 {@code SessionRepository.applyUserScope}）。</p>
      */
     private String userId = "";
+
+    /**
+     * 创建该会话的 embed 访客 id（浏览器本地随机串，非登录身份）。
+     *
+     * <p>只有 embed 会话有值；Web/API/IM 会话为 NULL。供"按访客列历史会话"使用
+     * （{@code SessionRepository.listEmbedVisitorSessions}）。**任何响应都不输出**
+     * （{@code @JsonIgnore}，同时挡住反序列化）——会话接口的响应契约不含访客身份。</p>
+     */
+    @JsonIgnore
+    private String embedVisitorId;
 
     /**
      * <b>字段名不带 {@code is} 前缀是刻意的</b>，两个地方都依赖这一点：
@@ -212,6 +223,14 @@ public class Session {
 
     public void setUserId(String v) {
         this.userId = v;
+    }
+
+    public String getEmbedVisitorId() {
+        return embedVisitorId;
+    }
+
+    public void setEmbedVisitorId(String v) {
+        this.embedVisitorId = v == null || v.isEmpty() ? null : v;
     }
 
     public boolean isPinned() {

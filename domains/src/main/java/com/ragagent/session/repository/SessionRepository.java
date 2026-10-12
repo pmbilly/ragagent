@@ -12,6 +12,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.common.jdbc.DatabaseDialects;
 import com.ragagent.common.mybatis.PageRequests;
+import com.ragagent.session.domain.EmbedVisitorSessionRow;
 import com.ragagent.session.domain.Session;
 import com.ragagent.session.domain.SessionLastRequestState;
 import com.ragagent.session.domain.SessionListItem;
@@ -315,6 +316,17 @@ public class SessionRepository {
                 embedLike, apiTenantLike, apiExternalLike, skillMarker, size, (page - 1) * size);
 
         return new SessionPage(items, total, page, size);
+    }
+
+    /**
+     * embed 访客的历史会话（只列有消息的；{@code updated_at} 倒序，上限 {@code limit}）。
+     *
+     * <p>{@code description} 由调用方（embed 域）拼好传入——session 包不反向依赖
+     * embedchannel 包。</p>
+     */
+    public List<EmbedVisitorSessionRow> listEmbedVisitorSessions(long tenantId, String description,
+                                                                 String visitorId, int limit) {
+        return mapper.listEmbedVisitorSessions(tenantId, description, visitorId, limit);
     }
 
     /** {@code GetPagedByTenantID} 的返回：一页数据 + 总数。 */

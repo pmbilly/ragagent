@@ -1,8 +1,14 @@
 <template>
   <div class="embed-page" :style="pageStyle">
-    <div v-if="loadError" class="embed-error">{{ loadError }}</div>
+    <div v-if="loadError" class="embed-error">
+      <img class="embed-error__icon" :src="errorIcon" alt="" />
+      <p class="embed-error__text">{{ loadError }}</p>
+      <t-button theme="primary" @click="handleReload">
+        {{ $t('embedPublish.refresh') }}
+      </t-button>
+    </div>
     <template v-else-if="config">
-      <header v-if="sessionId" class="embed-header">
+      <header class="embed-header">
         <span class="embed-header__badge" :style="badgeStyle">
           <img v-if="headerAvatarImage" class="embed-header__avatar-img" :src="headerAvatarImage" alt="" />
           <span v-else-if="config.agentAvatar" class="embed-header__avatar">{{ config.agentAvatar }}</span>
@@ -12,6 +18,17 @@
           <h1 class="embed-header__title">{{ headerTitle }}</h1>
           <p v-if="headerSubtitle" class="embed-header__subtitle">{{ headerSubtitle }}</p>
         </div>
+        <t-button
+          variant="text"
+          shape="square"
+          size="small"
+          class="embed-header__action"
+          :title="$t('embedPublish.historyTitle')"
+          :aria-label="$t('embedPublish.historyTitle')"
+          @click="openHistory"
+        >
+          <template #icon><t-icon name="history" /></template>
+        </t-button>
         <t-button
           variant="text"
           shape="square"
@@ -27,7 +44,6 @@
       </header>
 
       <EmbedChatView
-        v-if="sessionId"
         :session-id="sessionId"
         :session-sig="sessionSig"
         :visitor-id="visitorId"
@@ -44,13 +60,32 @@
         :agent-image-upload-enabled="config.agentImageUploadEnabled === true"
         :use-session-header-title="useSessionHeaderTitle"
         :host-context="hostContext"
+        :ensure-session="ensureSession"
         @session-title="sessionTitle = $event"
         @messages-state="chatHasMessages = $event"
+        @streaming-state="streaming = $event"
       />
-      <div v-else class="embed-loading">{{ $t('embedPublish.loading') }}</div>
     </template>
     <div v-else-if="awaitingToken" class="embed-loading">{{ $t('embedPublish.awaitingToken') }}</div>
     <div v-else-if="bootstrapping" class="embed-loading">{{ $t('embedPublish.loading') }}</div>
+
+    <EmbedHistoryDrawer
+      :open="historyOpen"
+      :loading="historyLoading"
+      :sessions="historySessions"
+      :current-session-id="sessionId"
+      @close="historyOpen = false"
+      @select="handleSelectSession"
+    />
+
+    <t-dialog
+      v-model:visible="switchConfirmVisible"
+      :header="$t('embedPublish.historySwitchTitle')"
+      :body="$t('embedPublish.historySwitchBody')"
+      :confirm-btn="$t('embedPublish.historySwitchOk')"
+      :cancel-btn="$t('common.cancel')"
+      @confirm="confirmSwitchSession"
+    />
   </div>
 </template>
 
@@ -59,8 +94,12 @@ import { computed, onUnmounted, ref, watch, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import EmbedChatView from '@/views/embed/EmbedChatView.vue'
+import EmbedHistoryDrawer from '@/views/embed/EmbedHistoryDrawer.vue'
+import errorIcon from '@/assets/img/error.svg'
+import { listEmbedVisitorSessions, type EmbedVisitorSessionSummary } from '@/api/embed'
 import { useEmbedBridge } from '@/composables/useEmbedBridge'
 import { setDefaultProtectedFileAccess } from '@/utils/protectedFileAccess'
+import { embedToast } from '@/utils/embedToast'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -78,6 +117,8 @@ const {
   awaitingToken,
   bootstrapping,
   hostContext,
+  ensureSession,
+  selectSession,
   startNewSession,
 } = useEmbedBridge(channelId)
 
@@ -95,12 +136,75 @@ watchEffect(() => {
 
 onUnmounted(() => setDefaultProtectedFileAccess(null))
 
+// 错误态下的一键重试：整页重载，重新走宿主握手与配置拉取（widget iframe 内
+// 宿主会再次 provideToken）。
+const handleReload = () => {
+  window.location.reload()
+}
+
 const handleNewChat = () => {
-  // The current session is already empty — reuse it instead of spawning yet
-  // another blank session (which would otherwise pile up server-side).
+  // 懒创建：无消息时按钮本就禁用；有消息才回到"未创建"空白态（首条消息才落库）。
   if (!chatHasMessages.value) return
   sessionTitle.value = ''
   startNewSession()
+}
+
+// ── 历史会话抽屉 ──────────────────────────────────────────────
+
+const streaming = ref(false)
+const historyOpen = ref(false)
+const historyLoading = ref(false)
+const historySessions = ref<EmbedVisitorSessionSummary[]>([])
+const switchConfirmVisible = ref(false)
+let pendingSession: EmbedVisitorSessionSummary | null = null
+
+const loadHistorySessions = async () => {
+  if (!channelId.value || !token.value || !visitorId.value) return
+  historyLoading.value = true
+  try {
+    historySessions.value = await listEmbedVisitorSessions(
+      channelId.value,
+      token.value,
+      visitorId.value,
+    )
+  } catch (e) {
+    console.error('Failed to load embed session history:', e)
+    historySessions.value = []
+    embedToast(t('embedPublish.historyLoadFailed'))
+  } finally {
+    historyLoading.value = false
+  }
+}
+
+const openHistory = () => {
+  historyOpen.value = true
+  void loadHistorySessions()
+}
+
+const applySelectSession = (item: EmbedVisitorSessionSummary) => {
+  historyOpen.value = false
+  switchConfirmVisible.value = false
+  pendingSession = null
+  selectSession(item.id, item.sig)
+}
+
+const handleSelectSession = (item: EmbedVisitorSessionSummary) => {
+  if (item.id === sessionId.value) {
+    // 点当前会话：只收起抽屉，不重载。
+    historyOpen.value = false
+    return
+  }
+  if (streaming.value) {
+    // 回答中切换会中断本次回答：先确认。
+    pendingSession = item
+    switchConfirmVisible.value = true
+    return
+  }
+  applySelectSession(item)
+}
+
+const confirmSwitchSession = () => {
+  if (pendingSession) applySelectSession(pendingSession)
 }
 
 const kbIds = computed(() => config.value?.knowledgeBaseIds ?? [])
@@ -192,16 +296,7 @@ watch(headerTitle, (title) => {
   flex-direction: column;
   background: var(--td-bg-color-container, #fff);
   overflow: hidden;
-  /* 子组件（含 AgentStreamDisplay）内凡用 --td-brand-color 的 loading / 强调色均跟随渠道主题 */
-  --td-brand-color: var(--embed-primary, var(--td-brand-color));
-  --td-brand-color-hover: var(--embed-primary, var(--td-brand-color-hover));
-  --td-brand-color-active: var(--embed-primary, var(--td-brand-color-active));
-
-  :deep(.t-button--theme-primary) {
-    --td-brand-color: var(--embed-primary, var(--td-brand-color));
-    --td-brand-color-hover: var(--embed-primary, var(--td-brand-color-hover));
-    --td-brand-color-active: var(--embed-primary, var(--td-brand-color-active));
-  }
+  /* 渠道主题色由 pageStyle 内联写入 --td-brand-color*；未配置时继承全局主题色。 */
 
   :deep(.embed-input-box:focus-within) {
     border-color: var(--embed-primary, var(--td-brand-color));
@@ -282,7 +377,31 @@ watch(headerTitle, (title) => {
   }
 }
 
-.embed-error,
+.embed-error {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 24px;
+  text-align: center;
+
+  &__icon {
+    width: 160px;
+    max-width: 60%;
+    height: auto;
+  }
+
+  &__text {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--td-text-color-secondary);
+    word-break: break-word;
+  }
+}
+
 .embed-loading {
   padding: 24px;
   text-align: center;

@@ -198,11 +198,20 @@ erDiagram
 | Origin 白名单模式 | 精确（大小写不敏感）/ `*`（全放，**生产拒绝**）/ `*.后缀` / 空清单（**全拒**） | `EmbedAuthFilter.originAllowed` |
 | token 形态 | `em_`（publish，32B base64url）/ `ems_`（session，Redis 键 `embed:session:<token>`，TTL 30 分钟）/ 会话签名 HMAC-SHA256(publish_token, "cid\|sid") | `EmbedTokens`（前缀即形态判定） |
 
+### 2.4 访客归属与历史会话（B231）
+
+`sessions` 上只有 embed 会话会写 **`embed_visitor_id`**（varchar(128)，V2 迁移）：创建会话时取 `X-Embed-Visitor` 头落库，是"按访客列历史会话"的唯一依据。两条硬约定：
+
+- **懒创建**：访客会话由**首条消息发送前**的前端 `ensureSession` 落库——打开面板不再自动建空会话（此前每次页面浏览都会留一条空行，随访客数线性膨胀）。
+- **不输出**：`embed_visitor_id` 标 `@JsonIgnore`——会话管理接口的既定响应契约（`SessionHttpContractTest` 金片）不含访客身份。
+
+历史会话列表只返回**说过话**（messages 有行）的会话；从未发言的空会话不入列表，可由运维按 `NOT EXISTS(messages)` 软删清理。
+
 ---
 
 ## 3. HTTP 接口面
 
-### 3.1 端点分组（1 个 controller / 28 个端点）
+### 3.1 端点分组（1 个 controller / 29 个端点）
 
 **管理面**（`EmbedChannelMgmtOps`，JWT + RBAC，9 个）
 
@@ -226,7 +235,8 @@ erDiagram
 | GET | `.../config` | 公开配置（20 键**恒输出**：空集合写 `[]`、空串照写） |
 | GET | `.../suggested-questions` | 推荐问题（渠道开关关 → 空 `{questions:[]}`；limit 上限 12） |
 | GET | `.../chunks/{chunk_id}` | 公开分块读（404 优先；跨租户/不在 agent 的 KB 白名单 → 403） |
-| POST | `.../sessions` | 建访客会话：201，`{id, sig}` 进 `data`（sig = HMAC 句柄签名） |
+| GET | `.../sessions` | 访客历史会话列表：`{sessions:[{id, title, updatedAt, sig}]}`，按 `X-Embed-Visitor` 过滤、只含**有消息**的会话、`updated_at` 倒序、上限 50；缺/非法 visitor → 400（逐条附 sig = 读该会话所必需） |
+| POST | `.../sessions` | 建访客会话：201，`{id, sig}` 进 `data`（sig = HMAC 句柄签名；`X-Embed-Visitor` 可选、随会话落库供历史列表） |
 
 **委托面**（`EmbedChannelDelegateOps`，先 `ensureSession` 再透传，14 个）
 
@@ -408,6 +418,7 @@ cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Cont
 | widget↔host `postMessage` 协议用下划线键（`channel_id`/`session_id`/`type`） | 非 HTTP 契约，登记为 **SDK 边界** | 不动（14.9m 刻意不改项）；改它 = SDK 版本化 |
 | `/embed/.../load` 的查询参数仍是 `before_time`（登录面已改 `beforeTime`） | embed 域自有键（S4 登记遗留） | 属同一"访客面键名换锚"候选批，与上一条同批考虑 |
 | `backend-package-map.md` 记 `embed`(12 文件) | 计数过期 | 实测 16（14.7.12 拆出 3 个 Ops + package-info 在其后）；以本手册 2026-10-08 口径为准 |
+| **存量空会话**（懒创建前的历史数据：打开面板即建的空行） | 数据清理（运维动作，B231 登记） | `sessions` 中 `description like 'embed_channel:%' AND embed_visitor_id IS NULL` 且无 messages 的行可软删（逐条 `deleted_at`；勿硬删——`im_channel_sessions` 有 ON DELETE CASCADE）；历史列表已过滤空会话，不清理只影响统计口径（渠道 stats 计数） |
 
 ---
 

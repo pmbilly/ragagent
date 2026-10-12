@@ -3946,6 +3946,7 @@ export default {
     deleted: '已删除',
     copied: '已复制嵌入代码',
     loadError: '加载失败',
+    refresh: '刷新',
     missingChannel: '缺少嵌入渠道或 Token',
     invalidChannel: '无效的嵌入渠道',
     sessionFailed: '无法创建对话会话，请稍后重试',

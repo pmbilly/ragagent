@@ -16,8 +16,10 @@
     :agent-image-upload-enabled="agentImageUploadEnabled"
     :use-session-header-title="useSessionHeaderTitle"
     :host-context="hostContext"
+    :ensure-session="ensureSession"
     @session-title="(title: string) => emit('session-title', title)"
     @messages-state="(has: boolean) => emit('messages-state', has)"
+    @streaming-state="(streaming: boolean) => emit('streaming-state', streaming)"
   />
 </template>
 
@@ -43,10 +45,13 @@ defineProps<{
   agentImageUploadEnabled?: boolean
   useSessionHeaderTitle?: boolean
   hostContext?: Record<string, unknown>
+  /** 懒创建：发送前确保会话已存在（来自 useEmbedBridge）。 */
+  ensureSession?: () => Promise<boolean>
 }>()
 
 const emit = defineEmits<{
   (e: 'session-title', title: string): void
   (e: 'messages-state', hasMessages: boolean): void
+  (e: 'streaming-state', streaming: boolean): void
 }>()
 </script>

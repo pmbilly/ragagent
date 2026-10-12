@@ -1313,6 +1313,22 @@
    "11f9578d05e6",
    1
   ],
+  "emb-pub-sessions-list-empty.json": [
+   "c61c91afea97",
+   4
+  ],
+  "emb-pub-sessions-list-novisitor.json": [
+   "f9d434d42098",
+   3
+  ],
+  "emb-pub-sessions-list-visitor-b.json": [
+   "27ae4bce73b5",
+   8
+  ],
+  "emb-pub-sessions-list.json": [
+   "27ae4bce73b5",
+   8
+  ],
   "emb-pub-stop-404.json": [
    "f9d434d42098",
    3

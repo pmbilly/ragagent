@@ -186,28 +186,18 @@ export function useEmbedBridge(channelId: Ref<string>) {
         }
       }
 
-      // Resume a persisted session when still valid and still bound to the same
-      // agent; otherwise create a fresh one (e.g. after rebinding the channel).
+      // 懒创建：只恢复仍有效且仍绑同一 agent 的存量会话；没有（或已失效）就停在
+      // "未创建"态——首条消息发送前由 ensureSession 落库，不再打开即建空会话。
       const configAgentId = String(res.agentId || '').trim()
-      let resolved: StoredSession | null = null
       const stored = readStoredSession(id)
       const agentMatches = !stored?.agentId || !configAgentId || stored.agentId === configAgentId
       if (stored && agentMatches && (await isStoredSessionValid(id, apiToken, stored))) {
-        resolved = { ...stored, agentId: configAgentId || stored.agentId }
+        sessionId.value = stored.id
+        sessionSig.value = stored.sig
+        writeStoredSession(id, { ...stored, agentId: configAgentId || stored.agentId })
       } else {
-        const sessionRes = await createEmbedSession(id, apiToken)
-        const newId = sessionRes?.id || ''
-        if (newId) {
-          resolved = { id: newId, sig: sessionRes?.sig || '', agentId: configAgentId }
-        }
+        writeStoredSession(id, null)
       }
-      if (!resolved) {
-        loadError.value = t('embedPublish.sessionFailed')
-        return
-      }
-      sessionId.value = resolved.id
-      sessionSig.value = resolved.sig
-      writeStoredSession(id, resolved)
       token.value = apiToken
       postEmbedReady(id)
     } catch (e: unknown) {
@@ -215,8 +205,6 @@ export function useEmbedBridge(channelId: Ref<string>) {
       const msg = String((e as { message?: string })?.message || '')
       if (msg.includes('disabled')) {
         loadError.value = t('embedPublish.channelDisabled')
-      } else if (msg.includes('failed to create session')) {
-        loadError.value = t('embedPublish.sessionFailed')
       } else {
         loadError.value = msg || t('embedPublish.loadError')
       }
@@ -283,24 +271,51 @@ export function useEmbedBridge(channelId: Ref<string>) {
     return await waitForHostToken()
   }
 
-  // Discard the current conversation and start a fresh signed session. Backing
-  // the "新建对话" affordance — also the privacy escape hatch on shared devices.
-  const startNewSession = async () => {
-    const id = channelId.value
-    const apiToken = token.value
-    if (!id || !apiToken) return
-    try {
-      const sessionRes = await createEmbedSession(id, apiToken)
-      const newId = sessionRes?.id || ''
-      if (!newId) return
-      const agentId = String(config.value?.agentId || '').trim()
-      const next: StoredSession = { id: newId, sig: sessionRes?.sig || '', agentId }
-      sessionSig.value = next.sig
-      sessionId.value = next.id
-      writeStoredSession(id, next)
-    } catch {
-      // Non-fatal: keep the current session if creating a new one fails.
-    }
+  // 懒创建的会话句柄：首条消息发送前调用；并发调用共享同一次创建。
+  let sessionCreating: Promise<boolean> | null = null
+  const ensureSession = async (): Promise<boolean> => {
+    if (sessionId.value) return true
+    if (sessionCreating) return sessionCreating
+    sessionCreating = (async () => {
+      const id = channelId.value
+      const apiToken = token.value
+      if (!id || !apiToken) return false
+      try {
+        const res = await createEmbedSession(id, apiToken, visitorId.value)
+        const newId = String(res?.id || '')
+        if (!newId) return false
+        const agentId = String(config.value?.agentId || '').trim()
+        sessionId.value = newId
+        sessionSig.value = res?.sig || ''
+        writeStoredSession(id, { id: newId, sig: res?.sig || '', ...(agentId ? { agentId } : {}) })
+        return true
+      } catch {
+        return false
+      } finally {
+        sessionCreating = null
+      }
+    })()
+    return sessionCreating
+  }
+
+  /** 切到历史会话（抽屉点击）：换句柄并持久化为"当前会话"。 */
+  const selectSession = (id: string, sig: string) => {
+    const channel = channelId.value
+    const nextId = String(id || '').trim()
+    const nextSig = String(sig || '').trim()
+    if (!channel || !nextId || !nextSig) return
+    const agentId = String(config.value?.agentId || '').trim()
+    sessionId.value = nextId
+    sessionSig.value = nextSig
+    writeStoredSession(channel, { id: nextId, sig: nextSig, ...(agentId ? { agentId } : {}) })
+  }
+
+  // 新建对话：回到"未创建"空白态（懒创建，首条消息才落库）；
+  // 也是共用设备的隐私出口（localStorage 里的会话句柄一并清掉）。
+  const startNewSession = () => {
+    writeStoredSession(channelId.value, null)
+    sessionId.value = ''
+    sessionSig.value = ''
   }
 
   const start = async () => {
@@ -368,6 +383,8 @@ export function useEmbedBridge(channelId: Ref<string>) {
     awaitingToken,
     bootstrapping,
     hostContext,
+    ensureSession,
+    selectSession,
     startNewSession,
   }
 }
