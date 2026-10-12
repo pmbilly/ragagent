@@ -17,6 +17,7 @@ import com.ragagent.agent.prompt.PinnedSkillInstructions;
 import com.ragagent.agent.prompt.PlaceholderDefinition;
 import com.ragagent.agent.prompt.RecentDocInfo;
 import com.ragagent.agent.prompt.SystemPromptSection;
+import com.ragagent.agent.tools.ToolDefinitions;
 
 /**
  * agent 系统提示词合成。
@@ -416,6 +417,37 @@ public final class AgentPrompts {
      * <p>{@code enabled} 语义与历史实现逐字对齐：条件不成立时该段**不产生**（不是产空段），
      * 这一点由实录逐字节钉住。</p>
      */
+    /** 会产出模型可见句柄（cN/dN/bN/wN/msN/mtN）的工具：选中其中之一才需要句柄协议。 */
+    private static final List<String> SOURCE_PRODUCING_TOOLS = List.of(
+            ToolDefinitions.TOOL_KNOWLEDGE_SEARCH, ToolDefinitions.TOOL_GREP_CHUNKS,
+            ToolDefinitions.TOOL_LIST_KNOWLEDGE_CHUNKS, ToolDefinitions.TOOL_QUERY_KNOWLEDGE_GRAPH,
+            ToolDefinitions.TOOL_GET_DOCUMENT_INFO, ToolDefinitions.TOOL_WEB_SEARCH,
+            ToolDefinitions.TOOL_WEB_FETCH, ToolDefinitions.TOOL_DISCOVER_MCP_TOOLS,
+            ToolDefinitions.TOOL_CALL_MCP_TOOL);
+
+    /**
+     * 句柄协议按需注入（S1，2026-10-12）：只在"本轮可能出现句柄"时注入——
+     * 绑定了知识库（目录会编码成 dN/bN），或选中了会产出源的工具（cN/dN/wN/msN/mtN），
+     * 或开启了 web 检索。无句柄的轮次（纯对话/创作/翻译）省下这约 1.3k 字符。
+     */
+    static boolean protocolNeeded(SectionContext ctx) {
+        if (ctx.options() == null || ctx.options().getProtocolPrompt().isEmpty()) {
+            return false;
+        }
+        if (ctx.knowledgeBases() != null && !ctx.knowledgeBases().isEmpty()) {
+            return true;
+        }
+        if (ctx.webSearchEnabled()) {
+            return true;
+        }
+        for (String name : ctx.selectedTools()) {
+            if (SOURCE_PRODUCING_TOOLS.contains(name) || name.startsWith("mcp_")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static final List<SectionSpec> SECTION_SPECS = List.of(
             new SectionSpec("base", AgentPrompts::baseSection),
             new SectionSpec("steering", ctx -> steeringGuidance()),
@@ -431,7 +463,8 @@ public final class AgentPrompts {
                     ctx -> ctx.options() != null && ctx.options().getPinnedSkillInstructions() != null
                             && !ctx.options().getPinnedSkillInstructions().isEmpty()),
             new SectionSpec("memory", ctx -> ctx.options().getMemoryPrompt(), ctx -> ctx.options() != null),
-            new SectionSpec("protocol", ctx -> ctx.options().getProtocolPrompt(), ctx -> ctx.options() != null));
+            new SectionSpec("protocol", ctx -> ctx.options().getProtocolPrompt(),
+                    AgentPrompts::protocolNeeded));
 
     /** 段声明：id + 内容提供者 + 启用条件（缺省恒启用）。 */
     private record SectionSpec(String id, Function<SectionContext, String> content,

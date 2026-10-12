@@ -67,6 +67,16 @@ public final class Registry {
         return sources;
     }
 
+    /**
+     * 本轮是否真的存在模型可见句柄（源 cN/dN/bN/wN、资源 res://、MCP msN/mtN）。
+     *
+     * <p>句柄协议（{@link #protocolPrompt()}）按需注入的判据（S1，2026-10-12）：无句柄的轮次
+     * 不需要这套语法，省略可省下约 1.1–1.3k 字符/轮。</p>
+     */
+    public boolean hasAnyHandle() {
+        return sources.hasAnyHandle() || resources.table().size() > 0 || mcpServers.store().size() > 0;
+    }
+
     /** 系统私有的模型句柄与引用协议（字节即契约）。 */
     public String protocolPrompt() {
         return sources.protocolPrompt() + RESOURCE_HANDLE_PROTOCOL_PROMPT

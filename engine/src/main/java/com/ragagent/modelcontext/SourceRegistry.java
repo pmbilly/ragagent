@@ -137,6 +137,11 @@ final class SourceRegistry {
         return sourceProtocolPrompt(citationsEnabled);
     }
 
+    /** 是否注册过任何 source 句柄（cN/dN/bN/wN）——句柄协议按需注入的判据（S1）。 */
+    boolean hasAnyHandle() {
+        return chunks.size() > 0 || docs.size() > 0 || kbs.size() > 0 || webs.size() > 0;
+    }
+
     // ---- 注册 ----
 
     /** handle 形状输入的共享守卫：模型回显的句柄仅当已存在时才回显，绝不当作新持久身份。 */
