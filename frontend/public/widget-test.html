@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Widget 测试页 — GAC AI 客服</title>
+  <title>Widget 测试页 — AI 小埃</title>
   <style>
     body {
       margin: 0;
@@ -40,13 +40,33 @@
   <main>
     <div class="card">
       <h2>验收清单</h2>
+      <p>依据：该渠道公共配置 <code>GET /api/v1/embed/{channel}/config</code> + widget 的 <code>data-*</code>，与 2026-10-12 实测一致。</p>
+      <p><strong>A. 外观与启动</strong></p>
       <ul>
-        <li>右下角应出现 <strong>黑色</strong> 圆形启动按钮（primary color #000000）</li>
-        <li>点击展开聊天窗，默认尺寸 <code>420 × 720</code></li>
-        <li>标题为「GAC AI 客服」</li>
-        <li>发消息测试用户消息气泡样式（<strong>主题色底</strong> + 白字 14px；底色取渠道配置的 primaryColor，未配置时回落灰底）</li>
-        <li>渠道「显示思考过程」<strong>关闭</strong>时：思考中只见三点闪烁</li>
-        <li>渠道「显示思考过程」<strong>打开</strong>时：「思考中」折叠卡片，展开为 markdown</li>
+        <li>右下角圆形启动按钮，底色 = 渠道主色 <code>#31ccd3</code>（<strong>渠道配置优先</strong>于 <code>data-primary-color</code>；该属性只负责首帧绘制与请求失败兜底）</li>
+        <li>按钮用渠道自定义图标 <code>launcherIcon</code>（当前为 webp）；未配置时才回落默认白色气泡 SVG</li>
+        <li>点击展开面板，默认尺寸 <code>420 × 720</code>（可用 <code>data-width</code> / <code>data-height</code> 覆盖）</li>
+        <li>面板标题 = 渠道 <code>displayTitle</code>「AI 小埃」（<code>headerTitleMode=channel</code>，与本页 <code>data-title</code> 一致）</li>
+        <li>欢迎语：当前渠道 <code>welcomeMessage</code> 为空 ⇒ <strong>不应</strong>出现欢迎气泡（后台配置后应在首条消息前显示）</li>
+      </ul>
+      <p><strong>B. 问答主链路（该渠道已绑定 Agent）</strong></p>
+      <ul>
+        <li>用户消息气泡：<strong>主题色底 + 白字</strong>（底色取渠道 <code>primaryColor</code>，未配置时回落灰底）</li>
+        <li>回答<strong>流式</strong>输出；完成后按 markdown 渲染（标题/列表/表格/代码），图片经安全渲染显示</li>
+        <li>思考中：渠道「显示思考过程」<strong>关</strong>（当前）⇒ 只见三点闪烁；<strong>开</strong> ⇒ 「思考中」折叠卡片、展开为 markdown</li>
+        <li>引用：点击正文引用标记 → 浮层显示来源（取自 <code>/api/v1/embed/{channel}/chunks/{chunkId}</code>），浮层链接新窗口打开</li>
+        <li>猜问：渠道开关<strong>开</strong>（当前）⇒ 打开面板显示建议问题网格、点击直接提问；回答后出现追问建议且可「换一批」</li>
+      </ul>
+      <p><strong>C. 按渠道开关应「不出现」的入口</strong></p>
+      <ul>
+        <li>联网搜索开关：<code>allowWebSearch=false</code> ⇒ 输入区不得出现（渠道打开后才出现，且切换状态在刷新后保持）</li>
+        <li>文件 / 图片上传：<code>allowFileUpload=false</code> 且 Agent 图片上传关闭 ⇒ 输入区不得出现（两者都开时才出现）</li>
+      </ul>
+      <p><strong>D. 会话与异常</strong></p>
+      <ul>
+        <li>首次打开：历史加载中显示骨架，不白屏；历史经 <code>/api/v1/embed/{channel}/messages/{sessionId}/load</code> 拉取，顺序正确、不重复</li>
+        <li>页面 origin 未列入渠道 <code>allowedOrigins</code> 时请求被拒（<code>origin not allowed</code>）；当前已含 <code>http://localhost:5173</code></li>
+        <li>安全模式（<code>data-token-endpoint</code>）：经 <code>POST /api/v1/embed/{channel}/exchange</code> 换取会话 token 并到期刷新；本页用的是静态 publish token</li>
       </ul>
     </div>
     <div class="card">
@@ -54,6 +74,13 @@
       <p>本页与 widget 脚本同源（均来自 vite dev server），页面 origin 为
       <code>http://localhost:5173</code>，需已加入渠道的 Allowed Origins，
       否则会报 <code>origin not allowed</code>。</p>
+      <p>widget 支持的全部 <code>data-*</code>：
+      <code>channel</code>、<code>token</code>、<code>token-endpoint</code>、<code>base-url</code>、
+      <code>position</code>、<code>width</code>、<code>height</code>、<code>primary-color</code>、
+      <code>title</code>、<code>locale</code>、<code>sandbox</code>。</p>
+      <p>渠道配置复核（token 取本页 <code>data-token</code>）：<br>
+      <code>curl -s -H 'Origin: http://localhost:5173' -H 'Authorization: Embed &lt;publish token&gt;'
+      http://localhost:8083/api/v1/embed/045bfd4b-81f6-4810-afdd-4df1256cb0de/config</code></p>
     </div>
   </main>
 
