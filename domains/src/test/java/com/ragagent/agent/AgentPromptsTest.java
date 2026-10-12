@@ -46,7 +46,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.LocalDate;
 import java.util.List;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import com.ragagent.common.prompt.PromptConstants;
 import com.ragagent.agent.prompt.AgentPromptTemplates;
@@ -360,19 +359,15 @@ class AgentPromptsTest {
     void pureAndRagPathsFromConfig() {
         AgentPrompts.BuildSystemPromptOptions pureOpts = new AgentPrompts.BuildSystemPromptOptions()
                 .setSelectedTools(List.of("web_search"))
-                .setProtocolPrompt("PROTOCOL")   // S1：协议段按需注入，需提供文本才出现
                 .setConfig(CFG);
         List<SystemPromptSection> secs =
                 AgentPrompts.buildSystemPromptSections(null, false, pureOpts, TODAY);
         assertThat(secs.get(0).content()).isEqualTo("PURE TEMPLATE KB=" + AgentPrompts.renderPromptPlaceholders(
                 "{{knowledge_bases}}", List.of()) + " WEB=Enabled");
         assertThat(secs).hasSize(8);
-        // S1：选中 web_search ⇒ 本轮可能产出 wN 句柄 ⇒ 协议段在位
-        assertThat(secs).extracting(SystemPromptSection::name).contains("protocol");
 
         AgentPrompts.BuildSystemPromptOptions ragOpts = new AgentPrompts.BuildSystemPromptOptions()
                 .setSelectedTools(List.of("knowledge_search"))
-                .setProtocolPrompt("PROTOCOL")
                 .setConfig(CFG);
         List<SystemPromptSection> secsRag =
                 AgentPrompts.buildSystemPromptSections(
@@ -383,45 +378,14 @@ class AgentPromptsTest {
     }
 
     @Test
-    void nilConfigLeavesEmptyBaseAndOmitsProtocol() {
+    void nilConfigLeavesEmptyBaseButEightSections() {
         List<SystemPromptSection> secs =
                 AgentPrompts.buildSystemPromptSections(null, false, new AgentPrompts.BuildSystemPromptOptions(), TODAY);
-        // S1：无协议文本、无 KB、无源型工具 ⇒ protocol 段不注入（8 → 7）
-        assertThat(secs).hasSize(7);
-        assertThat(secs).extracting(SystemPromptSection::name).doesNotContain("protocol");
+        assertThat(secs).hasSize(8);
         assertThat(secs.get(0).content()).isEmpty();
         // 渲染时过滤空小节
         assertThat(AgentPrompts.renderSystemPromptSections(secs))
                 .doesNotContain("PURE TEMPLATE").doesNotContain("RAG TEMPLATE");
-    }
-
-    @Test
-    @DisplayName("S1：无 KB 且无源型工具时 protocol 段省略；出现源型工具即注入")
-    void protocolSectionOnlyWhenHandlesPossible() {
-        AgentPrompts.BuildSystemPromptOptions localOnly = new AgentPrompts.BuildSystemPromptOptions()
-                .setProtocolPrompt("PROTOCOL")
-                .setSelectedTools(List.of("todo_write", "thinking"))
-                .setConfig(CFG);
-        assertThat(AgentPrompts.buildSystemPromptSections(null, false, localOnly, TODAY))
-                .extracting(SystemPromptSection::name)
-                .doesNotContain("protocol");
-
-        AgentPrompts.BuildSystemPromptOptions withSourceTool = new AgentPrompts.BuildSystemPromptOptions()
-                .setProtocolPrompt("PROTOCOL")
-                .setSelectedTools(List.of("knowledge_search"))
-                .setConfig(CFG);
-        assertThat(AgentPrompts.buildSystemPromptSections(null, false, withSourceTool, TODAY))
-                .extracting(SystemPromptSection::name)
-                .contains("protocol");
-
-        AgentPrompts.BuildSystemPromptOptions kbBound = new AgentPrompts.BuildSystemPromptOptions()
-                .setProtocolPrompt("PROTOCOL")
-                .setSelectedTools(List.of("todo_write"))
-                .setConfig(CFG);
-        assertThat(AgentPrompts.buildSystemPromptSections(
-                List.of(KnowledgeBaseInfo.minimal("kb")), false, kbBound, TODAY))
-                .extracting(SystemPromptSection::name)
-                .contains("protocol");
     }
 
     @Test
