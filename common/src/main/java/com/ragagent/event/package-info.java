@@ -35,7 +35,7 @@
  *   <tr><td>19</td><td>agent/ActPhase</td><td>tool_call</td><td>AgentToolCallData</td><td>&lt;toolCallID&gt;-tool-hint</td></tr>
  *   <tr><td>20</td><td>agent/AgentEngine</td><td>error</td><td>ErrorData</td><td>generateEventID("error")</td></tr>
  *   <tr><td>21</td><td>agent/FinalizePhase.closeAnswerStream</td><td>final_answer</td><td>AgentFinalAnswerData</td><td>既有 answerID，Done=true</td></tr>
- *   <tr><td>22</td><td>agent/tools/McpOAuthSupport</td><td>mcp_oauth_required</td><td>MCPOAuthRequiredData</td><td>"mcp-oauth-notice-" + serviceID（仅提示，timeout_seconds=0）</td></tr>
+ *   <tr><td>22</td><td>mcp/tools/McpOAuthPromptSupport</td><td>mcp_oauth_required</td><td>MCPOAuthRequiredData</td><td>"mcp-oauth-notice-" + serviceID（仅提示，timeout_seconds=0）</td></tr>
  *   <tr><td>23</td><td>agent/SteerIntake</td><td>user_message_injected</td><td>UserMessageInjectedData</td><td>generateEventID("injected")</td></tr>
  * </table>
  *
@@ -63,7 +63,7 @@
  * <h2>对接点（本包不实现、不 import）</h2>
  * <ul>
  *   <li>{@code approval} 域：{@code com.ragagent.approval.EventBus}
- *       最小面（{@code void emit(Event)}）由接线层（agent/tools/ApprovalBridge）适配到本包的
+ *       最小面（{@code void emit(Event)}）由接线层（approval/ApprovalBridge）适配到本包的
  *       {@link com.ragagent.event.EventBus}。</li>
  *   <li>{@code session.sse.StreamEventEmitter} / {@code StreamManager.appendEvent}：
  *       AgentStreamBridge（session/service）订阅本包事件并转发进流。</li>

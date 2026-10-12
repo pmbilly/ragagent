@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 /**
  * 会话内 MCP OAuth 授权提示事件体。
  * emit 点：common/approval/Gate（{@code <pendingID>-mcp-oauth-required}）与
- * agent/tools/McpOAuthSupport（{@code mcp-oauth-notice-<serviceID>}，仅提示形态、
+ * mcp/tools/McpOAuthPromptSupport（{@code mcp-oauth-notice-<serviceID>}，仅提示形态、
  * {@code timeout_seconds=0}），见包注释 emit 表 #12/#22。
  *
  * <p>对话中调用了带 OAuth 的 MCP 服务但当前用户尚未授权时发出；UI 弹"授权"卡片，

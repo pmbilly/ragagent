@@ -14,7 +14,7 @@
 - 总线机制（根 13 类）：同步 / 异步 / emitAndWait 三种发射语义、中间件链、全局单例、租户上下文快照
 - 事件载荷（`payload/` 26 个 `*Data`）：每个 payload 的键名 / 键序 / 字段省略边界都是**线上契约**（经 SSE 帧到达前端）
 - 事件 ID 生成：`generateEventID`（uuid 前 8 位 + 类型后缀）供流式分片重组
-- 23 个 emit 点表固化在本包 `package-info.java`（agent 根 18 + `agent/tools/McpOAuthSupport` 1 + `common/approval/Gate` 4）
+- 23 个 emit 点表固化在本包 `package-info.java`（agent 根 18 + `mcp/tools/McpOAuthPromptSupport` 1 + `common/approval/Gate` 4）
 
 **它不是什么**（别在这里改）：
 
@@ -194,7 +194,7 @@ sequenceDiagram
 
 ```mermaid
 flowchart LR
-    G["common/approval/Gate<br/>（只发不订，用它自己包内的<br/>最小 EventBus 接口）"] -->|"emit(自己的 Event)"| AB["agent/tools/ApprovalBridge<br/>接线层：toPayloadData<br/>四对 DTO 映射"]
+    G["common/approval/Gate<br/>（只发不订，用它自己包内的<br/>最小 EventBus 接口）"] -->|"emit(自己的 Event)"| AB["approval/ApprovalBridge<br/>接线层：toPayloadData<br/>四对 DTO 映射"]
     AB -->|"转成 event 包的 Event<br/>+ payload 四类型"| BUS["event 包 EventBus"]
     BUS --> ASB["AgentStreamBridge<br/>handleToolApprovalRequired / Resolved<br/>handleMCPOAuthRequired / Resolved"]
     ASB --> SSE["审批卡 SSE 帧"]
@@ -310,7 +310,7 @@ cd ~/ragagent/frontend && npx vue-tsc --build --force && npm test
 | 事件类型有哪些、订阅键是什么 | `EventType`（38 常量，唯一权威；流式子集与 `common/llm/ResponseType` wire 值逐字相同） |
 | 每个事件从哪发出 | 根 `package-info.java` 的 23 个 emit 点表（含 payload 类型与 event id 形态） |
 | 事件怎么变成 SSE 帧 | §4.1 + `session/service/AgentStreamBridge`（16 handler 全订阅集）+ `stream/StreamManager` |
-| 审批事件怎么进总线 | §4.2 + `common/approval/Gate`（发）→ `agent/tools/ApprovalBridge.toPayloadData`（映射，B52 事故现场） |
+| 审批事件怎么进总线 | §4.2 + `common/approval/Gate`（发）→ `approval/ApprovalBridge.toPayloadData`（映射，B52 事故现场） |
 | payload 的 JSON 长什么样 | `payload/XxxData` 的 javadoc（恒输出 / 缺省省略逐字段写明）+ `EventPayloadJsonTest` 的录制真值 |
 | 序列化为什么长这样 | `EventJson`（map 键序 / 零值时间哨兵 / 浮点格式）+ §7.1–§7.2 |
 | 三种发射语义差异 | §4.3 表 + `EventBus` 类注释 + `EventBusTest` |
