@@ -22,6 +22,7 @@ import com.ragagent.approval.ToolApprovalResolvedData;
 import com.ragagent.common.llm.ResponseType;
 import com.ragagent.event.payload.MCPOAuthRequiredData;
 import com.ragagent.event.payload.MCPOAuthResolvedData;
+import com.ragagent.approval.ApprovalBridge;
 
 /**
  * ApprovalBridge 的总线桥：gate 发出的 approval 域 DTO 必须以

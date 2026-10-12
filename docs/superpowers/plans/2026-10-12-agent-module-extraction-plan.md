@@ -46,7 +46,7 @@
   - 踩坑留痕：① 批量正则 `\bChunk\b→ChunkFacts` 会误伤**用户可见字符串**（`GetDocumentInfoTool` 的 `"Chunk Count:"` 被改成 `"ChunkFacts Count:"`）——被实录抓出，已修回；② record 不可变 ⇒ `enrichChunkImageInfo` 改为替换列表元素、单块路径改为重新赋值。
   - 验证：`DocToolsRecordingTest` / `KnowledgeSearchRecordingTest` / `FaqSnippetRecordingTest` / wiki 实录全绿 + 全量后端测试 + `spotlessCheck` 绿。
 
-### A-3 待做：MCP 适配层外移（42 条，最大一刀）
+### A-3 ✅ 已完成（两小步，见执行记录）：MCP 适配层外移（42 条，最大一刀）
 **结论（已核）**：MCP 族本质是"工具注册表 ↔ MCP 域"的**适配器**，应整体搬出引擎；引擎侧只留窄端口。
 
 **搬迁（`com.ragagent.agent.tools` → `com.ragagent.mcp.tools`）**：

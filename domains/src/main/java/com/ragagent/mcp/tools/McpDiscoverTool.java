@@ -1,10 +1,12 @@
-package com.ragagent.agent.tools;
+package com.ragagent.mcp.tools;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.llm.ToolResult;
+import com.ragagent.agent.tools.BaseTool;
+import com.ragagent.agent.tools.ToolRequest;
 
 /**
  * discover_mcp_tools：暴露授权目录与精确工具定义。描述与来源摘要伴随 direct 工具

@@ -1,7 +1,10 @@
-package com.ragagent.agent.tools;
+package com.ragagent.mcp.tools;
 
 
 import com.ragagent.common.llm.ToolResult;
+import com.ragagent.agent.tools.McpCatalogGuardedTool;
+import com.ragagent.agent.tools.ToolRequest;
+import com.ragagent.common.web.ToolJson;
 
 /**
  * 绑定一个授权目录与 schema 的模型可见定义。它的定义虽然预先广告过，也<b>不得</b>
@@ -32,9 +35,9 @@ public class McpRegisteredTool extends McpToolWrapper implements McpCatalogGuard
     @Override
     public String getDescription() {
         return String.format("[MCP service %s, server_id=%s, tool=%s (external)] %s",
-                ToolRegistry.quotedGo(service.getName()),
-                ToolRegistry.quotedGo(service.getId()),
-                ToolRegistry.quotedGo(mcpTool.getName()),
+                ToolJson.quoted(service.getName()),
+                ToolJson.quoted(service.getId()),
+                ToolJson.quoted(mcpTool.getName()),
                 mcpTool.getDescription());
     }
 

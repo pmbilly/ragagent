@@ -1,4 +1,4 @@
-package com.ragagent.agent.tools;
+package com.ragagent.mcp.tools;
 
 import com.ragagent.common.web.JsonMappers;
 import java.math.BigDecimal;

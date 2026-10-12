@@ -1,14 +1,10 @@
-package com.ragagent.agent.tools;
+package com.ragagent.approval;
 
 import com.ragagent.event.Event;
 import com.ragagent.event.EventBus;
-import com.ragagent.approval.Cancellation;
-import com.ragagent.approval.McpOauthRequiredData;
-import com.ragagent.approval.McpOauthResolvedData;
-import com.ragagent.approval.ToolApprovalRequiredData;
-import com.ragagent.approval.ToolApprovalResolvedData;
 import com.ragagent.event.payload.MCPOAuthRequiredData;
 import com.ragagent.event.payload.MCPOAuthResolvedData;
+import com.ragagent.agent.tools.ToolCancellation;
 
 /**
  * tools 包 ↔ approval 域的类型桥（两个包面之间的显式适配）。
@@ -75,7 +71,7 @@ public final class ApprovalBridge {
         };
     }
 
-    static com.ragagent.approval.EventBus toEventBus(EventBus bus) {
+    public static com.ragagent.approval.EventBus toEventBus(EventBus bus) {
         if (bus == null) {
             return null;
         }

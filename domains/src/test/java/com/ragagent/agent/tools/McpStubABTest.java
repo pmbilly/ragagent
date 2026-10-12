@@ -26,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.ragagent.mcp.domain.McpTool;
 import com.ragagent.mcp.protocol.McpContext;
 import com.ragagent.mcp.protocol.McpServiceUrls;
+import com.ragagent.mcp.tools.McpToolWrapper;
 
 /**
  * MCP stub A/B：双端同打同一形态的 stub MCP server（JSON-RPC over streamable HTTP），

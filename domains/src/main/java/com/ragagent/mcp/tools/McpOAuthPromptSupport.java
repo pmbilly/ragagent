@@ -1,4 +1,4 @@
-package com.ragagent.agent.tools;
+package com.ragagent.mcp.tools;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -18,6 +18,9 @@ import com.ragagent.common.web.ToolJson;
 import com.ragagent.mcp.protocol.McpClient;
 import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.protocol.McpContext;
+import com.ragagent.agent.tools.ToolCancellation;
+import com.ragagent.agent.tools.ToolExecContext;
+import com.ragagent.approval.ApprovalBridge;
 
 /**
  * MCP OAuth 的会话挂载与重试。
@@ -29,12 +32,12 @@ import com.ragagent.mcp.protocol.McpContext;
  * <p><b>显式参数</b>：等待所需的 tenant/user/requestID 身份由调用方
  * （工具，引擎内嵌）显式传入，成功重试直接回到原调用点。</p>
  */
-public final class McpOAuthSupport {
+public final class McpOAuthPromptSupport {
 
     /** 工具执行的缺省超时。 */
     static final Duration DEFAULT_MCP_TOOL_EXEC_TIMEOUT = Duration.ofSeconds(60);
 
-    private McpOAuthSupport() {
+    private McpOAuthPromptSupport() {
     }
 
     /**

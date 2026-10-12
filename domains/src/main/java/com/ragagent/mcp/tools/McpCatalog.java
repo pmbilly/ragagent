@@ -1,4 +1,4 @@
-package com.ragagent.agent.tools;
+package com.ragagent.mcp.tools;
 
 import com.ragagent.common.web.JsonMappers;
 import java.nio.charset.StandardCharsets;
@@ -23,6 +23,8 @@ import com.ragagent.approval.Cancellation;
 import com.ragagent.mcp.oauth.OAuthReauthorizationRequiredException;
 import com.ragagent.mcp.protocol.McpAuthorizationRequiredException;
 import com.ragagent.mcp.protocol.McpOAuthRequiredException;
+import com.ragagent.agent.tools.ToolDefinitions;
+import com.ragagent.agent.tools.ToolRegistry;
 
 /**
  * MCP 目录：一个 Agent 引擎、一个授权主体独有。只有 server 快照可变；可执行的
@@ -420,7 +422,7 @@ public final class McpCatalog {
                     if (e instanceof McpOAuthRequiredException
                             || e instanceof McpAuthorizationRequiredException
                             || e instanceof OAuthReauthorizationRequiredException
-                            || McpOAuthSupport.isAuthorizationRequired(e)) {
+                            || McpOAuthPromptSupport.isAuthorizationRequired(e)) {
                         errStatus = "needs_auth";
                     }
                     entry.store(service, null, errStatus);

@@ -1,4 +1,4 @@
-package com.ragagent.agent.tools;
+package com.ragagent.mcp.tools;
 
 import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
@@ -6,6 +6,11 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.llm.ToolResult;
+import com.ragagent.agent.tools.BaseTool;
+import com.ragagent.agent.tools.ToolRegistry;
+import com.ragagent.agent.tools.ToolRequest;
+import com.ragagent.agent.tools.AgentTool;
+import com.ragagent.common.web.ToolJson;
 
 /**
  * call_mcp_tool：解析目录引用并调用其 MCP 目标。Parameters 只广告完整定义已在
@@ -57,7 +62,7 @@ public class McpCallTool extends BaseTool {
         if (resolved.error() != null) {
             return McpCatalog.mcpDiscoveryFailure(resolved.error(), "unavailable");
         }
-        return registry.executeInternal(request.cancellation(), request.execMeta(), resolved.tool(), resolved.argsNode());
+        return registry.port().executeInternal(request.cancellation(), request.execMeta(), resolved.tool(), resolved.argsNode());
     }
 
     record ResolveResult(McpToolWrapper tool, JsonNode argsNode, String error) {
@@ -98,8 +103,8 @@ public class McpCallTool extends BaseTool {
                         return new ResolveResult(null, null, String.format(
                                 "tool schema has not been described; use discover_mcp_tools(mode=\"describe\", "
                                         + "serverId=%s, tool_name=%s) before calling",
-                                ToolRegistry.quotedGo(tool.service.getId()),
-                                ToolRegistry.quotedGo(tool.mcpTool.getName())));
+                                ToolJson.quoted(tool.service.getId()),
+                                ToolJson.quoted(tool.mcpTool.getName())));
                     }
                     return new ResolveResult(tool, decoded.arguments(), null);
                 }

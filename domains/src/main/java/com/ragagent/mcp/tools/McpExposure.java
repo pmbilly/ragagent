@@ -1,4 +1,4 @@
-package com.ragagent.agent.tools;
+package com.ragagent.mcp.tools;
 
 import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
@@ -15,6 +15,9 @@ import com.ragagent.mcp.domain.McpMetadata;
 import com.ragagent.mcp.protocol.McpClient;
 import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.protocol.McpContext;
+import com.ragagent.agent.tools.ToolRegistry;
+import com.ragagent.agent.tools.AgentTool;
+import com.ragagent.agent.tools.ToolDefinitions;
 
 /**
  * MCP 目录装载与注册入口（持久化元数据读写、目录加载、工具注册、
@@ -72,12 +75,12 @@ public final class McpExposure {
             McpService service,
             McpClientManager mcpManager,
             McpApproval gate,
-            McpOAuthSupport.McpOAuthSession oauthSess,
+            McpOAuthPromptSupport.McpOAuthSession oauthSess,
             McpMetadataIO metadata,
             boolean live,
             boolean hasToolExecContext,
-            McpOAuthSupport.OAuthWaiter waiter,
-            McpOAuthSupport.CallerIdentity caller) throws Exception {
+            McpOAuthPromptSupport.OAuthWaiter waiter,
+            McpOAuthPromptSupport.CallerIdentity caller) throws Exception {
         if (metadata == null || metadata.get == null) {
             return new LoadedDirectory(loadMcpServiceTools(service, mcpManager, gate, oauthSess,
                     waiter, caller), "");
@@ -115,15 +118,15 @@ public final class McpExposure {
             McpService service,
             McpClientManager mcpManager,
             McpApproval gate,
-            McpOAuthSupport.McpOAuthSession oauthSess,
-            McpOAuthSupport.OAuthWaiter waiter,
-            McpOAuthSupport.CallerIdentity caller) throws Exception {
+            McpOAuthPromptSupport.McpOAuthSession oauthSess,
+            McpOAuthPromptSupport.OAuthWaiter waiter,
+            McpOAuthPromptSupport.CallerIdentity caller) throws Exception {
         String serviceId = service.getId();
         String toolCallId = "mcp-discover-" + serviceId;
         boolean isStdio = "stdio".equals(service.getTransportType());
         McpClient client;
         try {
-            client = McpOAuthSupport.getOrCreateMcpClientWithOAuthRetry(
+            client = McpOAuthPromptSupport.getOrCreateMcpClientWithOAuthRetry(
                     mcpManager, service, waiter, oauthSess, "", toolCallId, caller);
         } catch (RuntimeException e) {
             throw e;
@@ -160,12 +163,12 @@ public final class McpExposure {
     private record McpClientRetry(
             McpClientManager manager,
             McpService service,
-            McpOAuthSupport.OAuthWaiter waiter,
-            McpOAuthSupport.McpOAuthSession oauthSess,
+            McpOAuthPromptSupport.OAuthWaiter waiter,
+            McpOAuthPromptSupport.McpOAuthSession oauthSess,
             String toolCallId,
-            McpOAuthSupport.CallerIdentity caller) {
+            McpOAuthPromptSupport.CallerIdentity caller) {
         McpClient fresh() {
-            return McpOAuthSupport.getOrCreateMcpClientWithOAuthRetry(
+            return McpOAuthPromptSupport.getOrCreateMcpClientWithOAuthRetry(
                     manager, service, waiter, oauthSess, "", toolCallId(), caller);
         }
     }
@@ -184,11 +187,11 @@ public final class McpExposure {
             McpCatalog.McpServiceLookup lookup,
             McpMetadataIO metadata,
             boolean hasToolExecContext,
-            McpOAuthSupport.OAuthWaiter waiter) throws Exception {
+            McpOAuthPromptSupport.OAuthWaiter waiter) throws Exception {
         McpCatalog.McpCatalogLoader loader = (service, live) -> {
-            McpOAuthSupport.McpOAuthSession oauthSess = new McpOAuthSupport.McpOAuthSession(
+            McpOAuthPromptSupport.McpOAuthSession oauthSess = new McpOAuthPromptSupport.McpOAuthSession(
                     null, "", "", "", "", null, java.time.Duration.ZERO, authWaitTimeoutSeconds);
-            McpOAuthSupport.CallerIdentity caller = new McpOAuthSupport.CallerIdentity(
+            McpOAuthPromptSupport.CallerIdentity caller = new McpOAuthPromptSupport.CallerIdentity(
                     tenantId, "", "", false);
             LoadedDirectory dir = loadMcpDirectory(service, mcpManager, gate, oauthSess, metadata,
                     live, hasToolExecContext, waiter, caller);

@@ -8,7 +8,7 @@ import com.ragagent.knowledge.dto.faq.FaqEntryPage;
 import com.ragagent.knowledge.service.FaqEntryQueryService;
 import com.ragagent.agent.AgentConfig;
 import com.ragagent.agent.AgentEngine;
-import com.ragagent.agent.tools.McpExposure;
+import com.ragagent.mcp.tools.McpExposure;
 import com.ragagent.agent.tools.ToolDefinitions;
 import com.ragagent.agent.tools.wiki.WikiRouteResolver;
 import com.ragagent.agent.tools.wiki.WikiScope;
@@ -46,7 +46,7 @@ import com.ragagent.agent.prompt.SelectedDocumentInfo;
 import com.ragagent.agent.prompt.PinnedMCPServiceInfo;
 import com.ragagent.agent.prompt.PinnedSkillInfo;
 import com.ragagent.agent.prompt.KnowledgeBaseInfo;
-import com.ragagent.agent.tools.McpTooling;
+import com.ragagent.mcp.tools.McpTooling;
 
 /**
  * {@code SessionAgentQaService} 的**引擎/工具装配簇**（§14.9c 刀 3）：创建 agent 引擎（LLM/记忆/审批门/

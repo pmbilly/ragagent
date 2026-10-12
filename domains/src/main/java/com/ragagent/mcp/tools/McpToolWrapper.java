@@ -1,4 +1,4 @@
-package com.ragagent.agent.tools;
+package com.ragagent.mcp.tools;
 
 import com.ragagent.common.web.JsonMappers;
 import java.time.Duration;
@@ -21,6 +21,11 @@ import com.ragagent.mcp.protocol.McpContext;
 import com.ragagent.common.web.ToolJson;
 import com.ragagent.approval.Decision;
 import com.ragagent.approval.PendingRequest;
+import com.ragagent.agent.tools.AgentTool;
+import com.ragagent.agent.tools.ToolRequest;
+import com.ragagent.agent.tools.ToolDefinitions;
+import com.ragagent.agent.tools.ToolExecContext;
+import com.ragagent.approval.ApprovalBridge;
 
 /**
  * MCP 工具的动态包装。
@@ -53,15 +58,15 @@ public class McpToolWrapper implements AgentTool {
     /** schema 编译一次按工具快照缓存（见 McpInputSchemaValidator）。 */
     private final McpInputSchemaValidator schemaValidator;
     /** OAuth 等待门（装配层传 gate::requestOAuthAndWait）。 */
-    private volatile McpOAuthSupport.OAuthWaiter oauthWaiter;
+    private volatile McpOAuthPromptSupport.OAuthWaiter oauthWaiter;
 
     /** 子类读取当前等待门。 */
-    protected McpOAuthSupport.OAuthWaiter oauthWaiter() {
+    protected McpOAuthPromptSupport.OAuthWaiter oauthWaiter() {
         return oauthWaiter;
     }
 
     /** 挂 OAuth 等待门（null = 该 gate 不支持等待）。 */
-    public McpToolWrapper withOAuthWaiter(McpOAuthSupport.OAuthWaiter waiter) {
+    public McpToolWrapper withOAuthWaiter(McpOAuthPromptSupport.OAuthWaiter waiter) {
         this.oauthWaiter = waiter;
         return this;
     }
@@ -263,8 +268,8 @@ public class McpToolWrapper implements AgentTool {
         }
 
         boolean isStdio = "stdio".equals(service.getTransportType());
-        McpOAuthSupport.McpOAuthSession oauthSess = null;
-        McpOAuthSupport.McpOAuthSession tmpSess = McpOAuthSupport.oauthSessionFromToolExec(meta);
+        McpOAuthPromptSupport.McpOAuthSession oauthSess = null;
+        McpOAuthPromptSupport.McpOAuthSession tmpSess = McpOAuthPromptSupport.oauthSessionFromToolExec(meta);
         if (tmpSess != null) {
             oauthSess = tmpSess.withAuthWaitTimeout(authWaitTimeoutSeconds);
         }
@@ -272,8 +277,8 @@ public class McpToolWrapper implements AgentTool {
         long policyTenant = tenantId;
         String principalUser = meta != null ? meta.userId() : "";
         String requestId = meta != null ? meta.requestId() : "";
-        McpOAuthSupport.CallerIdentity caller =
-                new McpOAuthSupport.CallerIdentity(policyTenant, principalUser, requestId, false);
+        McpOAuthPromptSupport.CallerIdentity caller =
+                new McpOAuthPromptSupport.CallerIdentity(policyTenant, principalUser, requestId, false);
         Duration callWindow = callToolTimeout(meta != null ? Duration.ofMillis(meta.execTimeoutMillis()) : Duration.ZERO);
 
         final Map<String, Object> effectiveInput = input;
@@ -287,7 +292,7 @@ public class McpToolWrapper implements AgentTool {
         } catch (Exception err) {
             ToolResult r = new ToolResult();
             r.setSuccess(false);
-            r.setError(McpOAuthSupport.oauthAwareConnectError(service, err));
+            r.setError(McpOAuthPromptSupport.oauthAwareConnectError(service, err));
             return r;
         }
 
@@ -320,10 +325,10 @@ public class McpToolWrapper implements AgentTool {
 
     /** 连接并调用；非 stdio 失败时断开重连一次。 */
     private CallToolResult connectAndCall(McpContext callCtx, boolean isStdio,
-            McpOAuthSupport.McpOAuthSession oauthSess, String toolName, String toolCallId,
-            McpOAuthSupport.CallerIdentity caller, Map<String, Object> input) throws Exception {
-        McpOAuthSupport.OAuthWaiter waiter = this.oauthWaiter;
-        McpClient client = McpOAuthSupport.getOrCreateMcpClientWithOAuthRetry(
+            McpOAuthPromptSupport.McpOAuthSession oauthSess, String toolName, String toolCallId,
+            McpOAuthPromptSupport.CallerIdentity caller, Map<String, Object> input) throws Exception {
+        McpOAuthPromptSupport.OAuthWaiter waiter = this.oauthWaiter;
+        McpClient client = McpOAuthPromptSupport.getOrCreateMcpClientWithOAuthRetry(
                 mcpManager, service, waiter, oauthSess, toolName, toolCallId, caller);
         if (isStdio) {
             try {
@@ -345,7 +350,7 @@ public class McpToolWrapper implements AgentTool {
             } catch (Exception ignored) {
                 // 显式忽略
             }
-            McpClient fresh = McpOAuthSupport.getOrCreateMcpClientWithOAuthRetry(
+            McpClient fresh = McpOAuthPromptSupport.getOrCreateMcpClientWithOAuthRetry(
                     mcpManager, service, waiter, oauthSess, toolName, toolCallId, caller);
             return fresh.callTool(toolName, input, callCtx);
         }

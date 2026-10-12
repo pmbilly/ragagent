@@ -1,4 +1,4 @@
-package com.ragagent.agent.tools;
+package com.ragagent.mcp.tools;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,6 +19,8 @@ import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ToolCall;
 import com.ragagent.common.web.JsonMappers;
 import com.ragagent.mcp.domain.McpService;
+import com.ragagent.agent.tools.AgentTool;
+import com.ragagent.agent.tools.ToolDefinitions;
 
 /**
  * MCP 工具编排（原 {@link ToolRegistry} 的 MCP 目录方法与状态，逐行搬出）。
