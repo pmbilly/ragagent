@@ -406,12 +406,13 @@ class AgentPromptsTest {
                 new AgentPrompts.BuildSystemPromptOptions().setConfig(CFG),
                 "Create the requested slides using the selected skill.");
         for (String prompt : new String[] {pure, rag, custom}) {
-            assertThat(prompt).contains("consult relevant available sources before drafting unsupported content");
-            assertThat(prompt).contains("presentations, reports, tutorials, and technical instructions");
-            assertThat(prompt).contains(
-                    "Reading a generator's instructions or successfully running its script does not verify the subject matter");
-            assertThat(prompt).contains("translation or formatting of supplied content do not require research");
+            assertThat(prompt).contains("Content grounding (answers and deliverables):");
+            // 文案精简（2026-10-12）：删 3 条解释性 bullet，保留的 3 条底线仍必须在位
+            assertThat(prompt).contains("Follow the user's current source restrictions");
+            assertThat(prompt).contains("navigation hints, not proof of detailed claims");
+            assertThat(prompt).contains("Do not invent sources, claim a search you did not perform");
             assertThat(prompt).contains("If relevant sources are unavailable or searches leave gaps");
+            assertThat(prompt).contains("a generated file's existence only verifies generation");
         }
         assertThat(custom).startsWith("Create the requested slides using the selected skill.");
         // legacy builder 推断不了工具，但证据策略仍在

@@ -21,19 +21,10 @@ public final class GroundingPrompt {
     public static String formatGroundingGuidance(List<String> names) {
         StringBuilder b = new StringBuilder();
         b.append("\n\nContent grounding (answers and deliverables):\n");
-        b.append("- Decide what evidence the task needs. User-provided content and sufficient tool "
-                + "results already obtained for the current task can be used directly; do not search merely to "
-                + "satisfy a workflow. For current facts, source-specific claims, or factual deliverables such as "
-                + "presentations, reports, tutorials, and technical instructions, consult relevant available "
-                + "sources before drafting unsupported content.\n");
         b.append("- Follow the user's current source restrictions and explicit selections. Otherwise "
                 + "choose relevant bound knowledge bases or connected sources. A selected source does not exclude "
                 + "complementary sources unless the user says so. Directory entries, titles, and summaries are "
                 + "navigation hints, not proof of detailed claims.\n");
-        b.append("- Skills describe how to perform work. Reading a generator's instructions or "
-                + "successfully running its script does not verify the subject matter. Gather needed factual "
-                + "evidence before supplying content to a generator; no extra lookup is needed if the supplied "
-                + "material already supports that content.\n");
 
         List<String> safeNames = names == null ? List.of() : names;
         List<String> kbTools = new ArrayList<>();
@@ -78,11 +69,6 @@ public final class GroundingPrompt {
                 + "affects the answer and distinguish unverified background knowledge from supported claims. Do "
                 + "not invent sources, claim a search you did not perform, or treat a failed/empty lookup as "
                 + "verification. Ask for missing material only when needed to complete the task accurately.\n");
-        b.append("- Direct conversation, creative writing, and translation or formatting of supplied "
-                + "content do not require research unless you add factual claims. Stable general explanations "
-                + "need no lookup unless the task depends on specific source content or uncertain details. If "
-                + "the user explicitly limits sources or requests no research, respect that and identify "
-                + "material uncertainty. Stop searching once evidence is sufficient.\n");
         b.append("- Check both content support and artifact execution before reporting completion. "
                 + "Preserve source titles/URLs and relevant limitations in factual deliverables where "
                 + "appropriate; a generated file's existence only verifies generation, not its accuracy. Treat "
