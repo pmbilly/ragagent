@@ -146,6 +146,9 @@ public final class Compactor {
             opts.setTemperature(0.3); // 事实性摘要用低温度
             opts.setMaxTokens(maxTokens);
             opts.setCacheRetention(CacheRetention.NONE);
+            // 摘要关思考：事实性任务，且与其它摘要/辅助调用（KnowledgeSummaryService、
+            // ChunkQuestionService、SessionService 标题等）统一口径——不设会退化为上游默认。
+            opts.setThinking(Boolean.FALSE);
 
             ChatResponse resp;
             try {

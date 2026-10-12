@@ -77,6 +77,9 @@ final class FinalizePhase {
         opts.setMaxCompletionTokens(budget);
         opts.setPromptCacheKey(sessionId);
         opts.setToolChoice("none");
+        // 兜底终答关思考：此路径的 thinking 分片本就被丢弃（只发答案）；不显式关闭时，
+        // 模型的 thinking_control 策略（如 enable_thinking 且 alwaysSend=false）会退化为上游默认。
+        opts.setThinking(Boolean.FALSE);
 
         ThinkPhase.StreamLLMResult llmResult = engine.think.streamLLMToEventBus(messages, opts, (chunk, fullContent) -> {
             // 防御过滤：只发答案内容，跳过思考分片。
