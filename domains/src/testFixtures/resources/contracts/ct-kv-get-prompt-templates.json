@@ -142,7 +142,7 @@
         "id": "default_session_title",
         "name": "Standard Title",
         "description": "Generate a concise session title from user's question",
-        "content": "Generate a short session title based on the user's question.\n\nRequirements:\n- 4-10 words\n- Only extract the intent of the user's question, don't answer about it\n- Output only the title, no explanation needed\n- IMPORTANT: Use {{language}} for the title",
+        "content": "Generate a short session title based on the user's question.\n\nRequirements:\n- 4-10 words\n- Only extract the intent of the user's question, don't answer about it\n- Output only the title, no explanation needed\n- IMPORTANT: Write the title in the same language as the user's question",
         "default": true
       }
     ],

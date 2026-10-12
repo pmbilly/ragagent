@@ -11,4 +11,4 @@ templates:
       - 4-10 words
       - Only extract the intent of the user's question, don't answer about it
       - Output only the title, no explanation needed
-      - IMPORTANT: Use {{language}} for the title
+      - IMPORTANT: Write the title in the same language as the user's question
