@@ -2,6 +2,8 @@
 .gradle/
 build/
 server/build/
+# IDE 的 Java 语言服务器（jdt.ls）编译输出
+bin/
 *.class
 *.jar
 !gradle/wrapper/gradle-wrapper.jar
