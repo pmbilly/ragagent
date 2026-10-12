@@ -283,6 +283,12 @@ public final class LangfuseChatClient implements LlmChatClient {
         if (options.getToolChoice() != null && !options.getToolChoice().isEmpty()) {
             params.put("tool_choice", options.getToolChoice());
         }
+        // thinking 三态：true/false 记录"要求了什么"；null（调用点没设）时键省略——
+        // 出站是否注入 enable_thinking 还取决于模型的 thinking_control 策略，
+        // 故此处只反映请求侧意图，但足以在 trace 里一眼看出"漏传"。
+        if (options.getThinking() != null) {
+            params.put("thinking", options.getThinking());
+        }
         return params.isEmpty() ? null : params;
     }
 }

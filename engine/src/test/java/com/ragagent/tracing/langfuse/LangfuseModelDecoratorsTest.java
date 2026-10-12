@@ -119,6 +119,33 @@ class LangfuseModelDecoratorsTest {
     }
 
     @Test
+    @DisplayName("chat：thinking 只在非 null 时进 model parameters（null = 键省略，可反推漏传）")
+    void modelParamsCarryThinking() {
+        ChatResponse response = new ChatResponse();
+        response.setContent("ok");
+        LlmChatClient wrapped = LangfuseChatClient.wrap(new FakeChatClient(response));
+
+        ChatMessage message = new ChatMessage();
+        message.setRole("user");
+        message.setContent("hello");
+
+        ChatOptions off = new ChatOptions();
+        off.setTemperature(0.7);
+        off.setThinking(Boolean.FALSE);
+        wrapped.chat(List.of(message), off);
+        assertEquals("{\"temperature\":0.7,\"thinking\":false}",
+                byName("chat.completion").attributes.get(LangfuseAttributes.ATTR_OBS_MODEL_PARAMS));
+
+        // 调用点没设 thinking（如 FinalizePhase/Compactor）→ 键省略
+        exported.clear();
+        ChatOptions unset = new ChatOptions();
+        unset.setTemperature(0.7);
+        wrapped.chat(List.of(message), unset);
+        assertEquals("{\"temperature\":0.7}",
+                byName("chat.completion").attributes.get(LangfuseAttributes.ATTR_OBS_MODEL_PARAMS));
+    }
+
+    @Test
     @DisplayName("chat 流式：累积 content/reasoning、TTFT、用量，流结束收 generation")
     void chatStreamAccumulates() throws Exception {
         StreamResponse thinking = streamChunk(ResponseType.THINKING, "let me think");
