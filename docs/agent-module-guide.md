@@ -88,7 +88,7 @@ graph TB
 
 | 子包 | 文件/行数 | 放什么 | **不放什么** |
 |---|---|---|---|
-| 根（引擎面） | 18 / 4,607 | `AgentEngine` 门面（713 行）+ 八段协作者（`ThinkPhase` 574 / `ActPhase` 763 / `ObservePhase` 418 / `ConversationAssembler` 428 / `ReActIteration` 283 / `FinalizePhase` 178 / `SteerIntake` 103 / `ContextDebugEmitter` 77）+ 提示词段表（`AgentPrompts`：`SECTION_SPECS` + `BuildSystemPromptOptions`）+ `AgentToolNames`；**八段与门面共享包内 seam，故留根包**（搬出需先把 ~38 处包内成员改 public，属独立评审项） | Spring 装配（无 `@Component`，由 session 装配）、HTTP |
+| 根（引擎面） | 18 / 4,644 | `AgentEngine` 门面（734 行，含类头「主循环地图」）+ 八段协作者（`ThinkPhase` 574 / `ActPhase` 763 / `ObservePhase` 420 / `ConversationAssembler` 439 / `ReActIteration` 283 / `FinalizePhase` 178 / `SteerIntake` 103 / `ContextDebugEmitter` 78）+ 提示词段表（`AgentPrompts`：`SECTION_SPECS` + `BuildSystemPromptOptions`）+ `AgentToolNames`；**八段与门面共享包内 seam，故留根包**（搬出需先把 ~38 处包内成员改 public）；**2026-10-12 定案：不做 `loop/` 归位**（包不构成编译边界、无强制力），可读性由根 `package-info`「一轮的时序 / 想改 X 去哪」+ `AgentEngine` 类头「主循环地图」承担 | Spring 装配（无 `@Component`，由 session 装配）、HTTP |
 | `prompt/` | 11 / 331 | agent 侧提示词构件与值类型：`AgentPromptTemplates`（模板选取）、`GroundingPrompt`（内容接地指引）+ 8 个外提值类型（`KnowledgeBaseInfo` / `RecentDocInfo` / `SelectedDocumentInfo` / `Pinned*Info` / `PinnedSkillInstructions` / `PlaceholderDefinition` / `SystemPromptSection`）；`BuildSystemPromptOptions` 留根（引用根包 `SkillMetadata`） | 文案本体与装载（→ `:common`：`PromptSource` + `resources/prompts/*.yaml`）、段选择（→ 根 `AgentPrompts` 段表） |
 | `budget/` | 4 / 355 | token 预算与上下文占用：`TokenEstimator`（压缩/裁剪共用）、`AgentBudgets`、`ContextDiagnostics` | 预算决策的触发方（→ 根 `ObservePhase` / `ReActIteration`、`compaction/`） |
 | `tools/`（根） | 32 / 6,022 | 工具框架（`AgentTool` / `BaseTool` / `ToolRegistry` / 参数校验 / 输出限额）+ 通用单件（todo_write / thinking / read_file=技能资源读取）+ 跨族接缝（`DocChunkSupport` / `SearchTarget`）+ **MCP 族 10 类**（`McpCatalog`，因与 `ToolRegistry` 包私有互访暂留根） | 各能力域的业务逻辑（→ 五个能力子包）、横切件（→ `tools/runtime/`） |
@@ -376,6 +376,7 @@ flowchart TD
 | 改提示词 | 段落选择与文案：根 `AgentPrompts`（**段表 `SECTION_SPECS`** + 值类型）；模板选取与接地：`agent/prompt/`（`AgentPromptTemplates` / `GroundingPrompt`）；模板正文在 `:common` 的 `resources/prompts/*.yaml`（经 `common.prompt.PromptSource` 单一装载）；拼接原语在 `:common` 的 `PromptComposer` | 文案字节即契约（golden/实录钉住）；模板名只允许用 `PromptSource` 常量（`PromptOwnershipTest` A1/A3 守门）；classpath 无 jackson-dataformat-yaml（snakeyaml→ObjectNode 手接） |
 | 改 token 预算 / 上下文占用 | `budget/`（`TokenEstimator` / `AgentBudgets` / `ContextDiagnostics`） | 预算决策触发方在根 `ObservePhase` / `ReActIteration` 与 `compaction/`；注意工具结果裁剪历史上存在两套实现（F 波遗留项） |
 | 改网页抓取 | `:engine` 的 `webfetch/Fetcher`（两工厂）+ `BrowserRenderer` 接缝（本域只剩调用方与 `tools/web/` 两个工具） | agent 用 2MB/60s/markdown，chat 管线用 100KB/15s/纯文本——**别混用**；SSRF 校验在发送前 + 每跳重定向前 |
+| 看懂一轮怎么跑 | 根 `AgentEngine` 类头「主循环地图」+ 根 `package-info`「一轮的时序」 | — |
 | 改 ReAct 循环节奏 | 根 `ReActIteration`（停止条件→走向映射）+ `AgentEngine.executeLoop`（steer overrun / 取消） | 事件 emit 顺序 = SSE 帧序；错误 message 逐字稳定 |
 | 改 agent 事件载荷 | `event/payload/*` + session 域 `AgentStreamBridge` | SSE 载荷是**外部权威面**（B72：集成页按原始帧解析），camel 化需协议版本化（§9） |
 

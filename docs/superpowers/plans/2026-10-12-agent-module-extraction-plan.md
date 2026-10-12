@@ -87,6 +87,14 @@ public interface ToolRegistryGateway {         // 由 ToolRegistry 实现（方�
 
 ## 2. 阶段 B：建 `:agent` 模块
 
+> **定案（2026-10-12 用户决策）：阶段 B 暂不做，`agent` 保留在 `:domains`。**
+>
+> - 判据（本仓"抽模块三问"，见 `docs/phase4-module-boundaries-plan.md:640`）：① 不依赖 `:domains` ✅（阶段 A 已达成 0 边）；② 金片与测试基建能随迁 ✅（夹具 0 外部依赖；agent 测试仅 5 文件/6 条引用非引擎侧包）；③ 迁移成本 ×2 < 强制力 ⚠️ —— 约 **235 文件搬迁 + 登记面 ≥10 处**（`settings.gradle.kts` / `scripts/{_source_roots,pkg-audit,check-stray-dirs,test-summary,route-recon,check-fe-contract-keys,generate-api-docs}.py` / `file-size.baseline.json` / `api-envelope.baseline.json` / `dev-stale-check.sh` / 守卫模块清单如 `PromptOwnershipTest.MODULES` / 包地图）。
+> - 另两条架构代价：中部竖切（§5.3「`:app` 内部 15 域仍是软的，因为中部无缝」）与模块引力（`:agent` 会被当成可依赖的公共物）。
+> - **替代方案（已评估，暂不采用）**：agent 并入 `:engine` —— 可白拿 engine 既有编译边界（engine 只有 `api(project(":common"))`，永远看不见 domains），但引入两条新代价：`engine` 语义从"通用能力"扩为"能力 + 应用编排"；engine 内部通用包与 agent 包之间失去强制（需自建 ArchUnit 守卫）。
+> - **阶段 A 成果全部保留**（0 边 + 去实体/服务泄漏 + MCP 族/ApprovalBridge 内聚归位），与"是否建模块"正交；回退无收益（见 A-3 结论）。
+> - 若将来重提：本节步序 + 三问成本表仍适用；同批必须登记上面全部 10+ 处（漏一处＝该守卫对新模块静默失明，B116 前科）。
+
 1. `settings.gradle.kts` 加 `include("agent")`；新建 `agent/build.gradle.kts`（`api(project(":engine"))` + `api(project(":common"))`，测试依赖照 `domains` 现有口径）。
 2. `git mv` 主代码 179 文件 → `agent/src/main/java/com/ragagent/agent/**`（`management/` **除外**，留 domains）。
 3. 测试树：`domains/src/test/java/com/ragagent/agent/**`（55）+ `domains/src/testFixtures/java/com/ragagent/agent/**`（6）随迁；`boot/src/test/java/com/ragagent/agent/{EngineRecordingTest,management/**}` 中依赖同包 seam 的随迁（split package）。

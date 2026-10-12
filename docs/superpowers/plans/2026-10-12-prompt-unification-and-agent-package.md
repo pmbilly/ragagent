@@ -199,7 +199,8 @@ enum Position { PRE_BASE, POST_BASE, PRE_PROTOCOL, POST_PROTOCOL }
 - 第一刀：根包 22 类 → **17 类**（含 package-info 18 文件）；新增 `budget/`(3) 与 `prompt/`(2)。
 - **第二刀（独立提交）**：`tools/` 横切 8 件 → **`tools/runtime/`**（`SearchAuth` / `ToolResultPersist` / `MessageSanitizer` / `NormalizeToolCallId` / `ThinkBlocks` / `ThinkStreamSplitter` / `JsonRepair` / `PythonSyntax`）；**5 个随类实录测试同步搬包**（`ScopeAuthRecordingTest` / `ThinkStreamSplitterRecordingTest` / `JsonRepairRecordingTest` / `StripThinkRecordingTest` / `NormalizeToolCallIdRecordingTest`）；新增 `tools/runtime/package-info`。盘点已证这 8 件全 `public`、与 `ToolRegistry`/MCP 族零耦合；`tools/` 根由 40 文件降到 32。
 - 验证：`:common / :engine / :domains / :boot` 全量测试 + 三模块 `spotlessCheck` 全绿（`spotlessApply` 只动 import 顺序）；搬走的 5 个实录定向跑过确认"真的在跑"。
-- 未做（明确留待后续）：`loop/` 归位（需先开 seam，独立评审）、`SkillMetadata` 归位（同名易混，收益不成立）、MCP 族搬 `tools/mcp/`（需先解 `ToolRegistry` 包私有耦合）、`AgentPrompts` 值类型外提 + `PromptAssembly` 改名（F5b-2）。
+- **`loop/` 归位：2026-10-12 用户定案 —— 不做**（判据：包不构成编译边界、无强制力；搬包需先开 ~38 处包内 seam 并牵动跨模块 split-package 测试）。可读性改由 ① 承担：`AgentEngine` 类头「主循环地图」+ 根 `package-info`「一轮的时序（loop）」「想改 X 去哪」。
+- 未做（明确留待后续）：`SkillMetadata` 归位（同名易混，收益不成立）、MCP 族搬 `tools/mcp/`（需先解 `ToolRegistry` 包私有耦合）、`AgentPrompts` 值类型外提 + `PromptAssembly` 改名（F5b-2）。
 
 > 同步修正既有计划 Task 9 的清单：① `AgentPromptPlaceholders / PromptTemplateCatalog / PromptInstructions` **不搬**（留 L1，engine 引用会成环）；② `loop/` 归位降级为独立评审项；③ `SkillMetadata` 留根。
 

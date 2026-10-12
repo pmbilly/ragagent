@@ -74,6 +74,20 @@ import com.ragagent.agent.prompt.KnowledgeBaseInfo;
  *       {@code usage instanceof TokenUsage} 判别。</li>
  *   <li><b>LLM 瞬态重试</b>的 sleep（1s/2s）保留。</li>
  * </ul>
+ *
+ * <h2>主循环地图</h2>
+ * <p>一轮 = 一个 {@link ReActIteration}，由 {@code execute} → {@code executeLoop} 驱动。每轮时序：</p>
+ * <ol>
+ *   <li>裁剪 / 压缩上下文（{@code ObservePhase.manageContextWindow} + {@code compaction/}）</li>
+ *   <li>注入用户中途插话（{@code SteerIntake.drainSteerMessages}）</li>
+ *   <li>调模型（{@code ThinkPhase.callLLMWithRetry}；消息与提示词由 {@code ConversationAssembler} 装配）</li>
+ *   <li>判定响应：终答 / 继续 / 中断（{@code ObservePhase.analyzeResponse} → {@code ResponseVerdict}）</li>
+ *   <li>执行工具（{@code ActPhase.executeToolCalls}，工具定义在 {@code tools/}）</li>
+ *   <li>回灌结果与图片（{@code ObservePhase.appendToolResults} / {@code appendToolImages}）</li>
+ * </ol>
+ * <p>出口三种：终答、迭代预算用尽（{@code withinIterationBudget} → {@code FinalizePhase.handleMaxIterations} 兜底）、
+ * 取消探测命中（{@code pollCancellation}）。想改某一段，见 {@link ThinkPhase} / {@link ActPhase} /
+ * {@link ObservePhase} / {@link FinalizePhase} / {@link SteerIntake} 的类头。</p>
  */
 public class AgentEngine {
 
