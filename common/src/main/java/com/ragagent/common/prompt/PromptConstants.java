@@ -25,9 +25,6 @@ public final class PromptConstants {
      * 发现一张图绝不能捏造另一条用户请求。
      */
     public static final String SOURCED_ANSWER_OUTPUT_PROMPT = "Answer presentation:\n"
-            + "- Follow the requested language, length, and format; choose headings, lists, tables, or prose "
-            + "when they help, and do not impose Markdown on a requested JSON, code-only, or other exact-format "
-            + "response.\n"
             + "- Include retrieved images near the text they support when they help and the format allows it; "
             + "honor text-only requests and skip decorative or unrelated images.\n"
             + "- Reuse a source image's Markdown syntax and URL exactly (![alt](url), ASCII parentheses); "

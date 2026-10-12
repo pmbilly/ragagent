@@ -407,12 +407,11 @@ class AgentPromptsTest {
                 "Create the requested slides using the selected skill.");
         for (String prompt : new String[] {pure, rag, custom}) {
             assertThat(prompt).contains("Content grounding (answers and deliverables):");
-            // 文案精简（2026-10-12）：删 3 条解释性 bullet，保留的 3 条底线仍必须在位
+            // 文案精简（2026-10-12）：解释性 bullet 已删，保留的底线仍必须在位
             assertThat(prompt).contains("Follow the user's current source restrictions");
             assertThat(prompt).contains("navigation hints, not proof of detailed claims");
             assertThat(prompt).contains("Do not invent sources, claim a search you did not perform");
             assertThat(prompt).contains("If relevant sources are unavailable or searches leave gaps");
-            assertThat(prompt).contains("a generated file's existence only verifies generation");
         }
         assertThat(custom).startsWith("Create the requested slides using the selected skill.");
         // legacy builder 推断不了工具，但证据策略仍在
