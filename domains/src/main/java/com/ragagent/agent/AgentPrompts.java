@@ -473,8 +473,9 @@ public final class AgentPrompts {
     private static String runtimeContractSection(SectionContext ctx) {
         String runtime = PromptConstants.SOURCE_DATA_BOUNDARY_PROMPT + "\n\n" + RUNTIME_PROMPT_CONTRACT_TAIL;
         if (!ctx.language().isEmpty()) {
-            runtime += "\nUse " + ctx.language()
-                    + " by default; follow the user's explicit language and output-format requests.";
+            runtime += "\nAnswer in the language of the user's latest message. Use " + ctx.language()
+                    + " only when that message gives no clear language;"
+                    + " follow the user's explicit language and output-format requests.";
         }
         return runtime;
     }
