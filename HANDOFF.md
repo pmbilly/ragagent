@@ -525,7 +525,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B247 | 3 | K6：主任务恢复口径统一（**拍板点②**：判据分裂已修＝按面判据；持久化主任务另立项） | ✅ 2026-10-13 |
 | B248 | 4 索引/配置 | K10a：embedding 响应对齐校验（`index` 消费 + 数量/维度校验 + 乱序拒绝） | ✅ 2026-10-13 |
 | B249 | 4 索引/配置 | K10b：索引执行收敛（worker 委托索引器唯一实现 + 数量断言） | ✅ 2026-10-13 |
-| B250 | 4 | K7：事务外副作用（revision + outbox；事务内不调远程模型） | ⬜ |
+| B250 | 4 索引/配置 | K7：事务外副作用（`KnowledgeFileService` `@Transactional` 内同步重建向量） | ✅ 2026-10-13 |
 | B251 | 4 | K8：配置能力矩阵（parser rules / parent-child 显式拒绝或实现；不静默回落） | ⬜ |
 | B252 | 5 结构收敛 | K9：跨 store 融合（RRF 按 store 内 rank；context expansion 修正） | ⬜ |
 | B253 | 5 | A4：并发工具状态提交顺序（`seenChunks` 单一 writer / 按调用序回填） | ⬜ |
@@ -743,6 +743,13 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **六处语义差异的实测处置**：① 索引器多一次 `deleteByChunkId`（worker 前置 `preCleanKnowledge` 后为 no-op）✓；② 生成问题行——摄取期块无 `generatedQuestions` ⇒ **实际不写**（K8 落地后才有意义）；③ `parent_text` 过滤——当前 worker 只产 text 块（K8）⇒ **no-op**，K8 落地后自动获得"父块不向量化"语义；④ 按块 `enabled`——新块默认 true ⇒ **no-op**；⑤ 错误语义已包回原契约 ✓；⑥ 批大小统一到 `BatchEmbedProperties` ✓（本批正收益）。
 - **验证**：全量 `spotlessCheck build` ✓ **1m47s** ✓ · **4947 / 失败 0 / 跳过 4** ✓——**含知识操作合约金片**（端到端摄取路径，kg-* 系列）全绿，即委托在当前配置下行为等价；十一守卫 ✓。数量断言部分另有 2 例新测试；委托化本身无新增单测（worker 无测试基建，靠合约金片覆盖）。
 - **登记**：K8（配置能力矩阵）落地后，②③④ 会从 no-op 变为**生效语义**——到那时需补一条明确回归（"父块不入库 / 问题行由索引器写"）；阶段 6 仍建议把该政策移入 `retrieval-engine/execution` 的 `IndexService`。
+
+**✅ B250（2026-10-13，K7 事务外副作用）**
+- **缺口**（方案 K7）：`KnowledgeFileService.updateImageInfo`（`@Transactional`）在**事务内**调 `chunkVectorIndexer.updateChunkVector`——绑定引擎路径会**先删旧索引再 batchIndex** ⇒ 本地事务回滚时外部索引已删/写了一半（脏索引，且本地事务回滚不了它）。
+- **修复**：① 索引器拆出 `assertIndexable(kbId)`（KB 可解析 + 模型非空且存在；复用既有错误映射 ⇒ 1007/404 文案与契约样例一致）与 `resolveEmbeddingModel(kb)` 单一实现（`updateChunkVector` / `indexChunks` 共用）；② `KnowledgeFileService`：**写库前**先 `assertIndexable`（失败在事务内抛且**一行都不写**），真正的 `updateChunkVector` 经新增 `afterCommit(Runnable)` 排到**提交后**执行（`TransactionSynchronization` 注册；无事务上下文内联执行 ⇒ 直调/单测行为不变）；③ 提交后失败**只记日志**——DB 已提交，不能把成功请求变成 500；幂等重试 / 索引意图 outbox 化登记为后续（方案 §9.1）。
+- **测试**：新增 `KnowledgeFileServicePostCommitTest` 4 例（无事务内联 / 回滚零副作用 / 提交恰好一次 / 提交后失败不抛）；**知识合约金片（`kg-image-*` 端到端）全绿** ⇒ 校验前置 + 索引后移未改变对外契约。
+- **顺带修复（诚实记入本批）**：本批闸门抓到 B241 测试的**竞态假红**——建议生成跑在虚拟线程上而断言未等待；改为 `timeout(5s).times(1)` 轮询断言。
+- **闸门**：`spotlessCheck build` ✓ **1m33s** ✓ · **4951 / 失败 0 / 跳过 4** ✓（+4）· 十一守卫 ✓。
 
 ## 附：文档地图与归档追溯
 

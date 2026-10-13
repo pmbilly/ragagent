@@ -96,18 +96,37 @@ public class ChunkVectorIndexer {
         if (!needsEmbeddingServiceLayer(kb)) {
             return;
         }
+        indexAndStore(kb, resolveEmbeddingModel(kb), chunks);
+    }
+
+    /**
+     * 索引前校验（K7）：KB 可解析 + 模型非空且存在——**写库前**调用，失败在事务内抛
+     * （1007 "model ID cannot be empty" / 404 "Model not found" 文案与既有契约样例一致），
+     * 借此把真正的外部索引（删旧行 + batchIndex）安全后移到事务提交之后。
+     */
+    public void assertIndexable(String kbId) {
+        KnowledgeBase kb = findKbRow(kbId);
+        if (kb == null) {
+            throw BizException.notFound("knowledge base not found");
+        }
+        if (!needsEmbeddingServiceLayer(kb)) {
+            return;
+        }
+        resolveEmbeddingModel(kb);
+    }
+
+    /** 模型解析（含既有错误映射）：空 ID → 1007 internal；模型缺失 → 404。 */
+    private Model resolveEmbeddingModel(KnowledgeBase kb) {
         // handler 包 1007 internal 原文；契约样例 kg-image-update/again/mismatch 钉住）
         String modelId = kb.getEmbeddingModelId() == null ? "" : kb.getEmbeddingModelId();
         if (modelId.isEmpty()) {
             throw new BizException(AppError.internal("model ID cannot be empty"));
         }
-        Model embeddingModel;
         try {
-            embeddingModel = modelService.getModelByID(modelId);
+            return modelService.getModelByID(modelId);
         } catch (ModelNotFoundException e) {
             throw new BizException(AppError.notFound("Model not found"));
         }
-        indexAndStore(kb, embeddingModel, chunks);
     }
 
     /**
@@ -118,17 +137,7 @@ public class ChunkVectorIndexer {
         if (kb == null || chunks == null || chunks.isEmpty()) {
             return;
         }
-        String modelId = kb.getEmbeddingModelId() == null ? "" : kb.getEmbeddingModelId();
-        if (modelId.isEmpty()) {
-            throw new BizException(AppError.internal("model ID cannot be empty"));
-        }
-        Model embeddingModel;
-        try {
-            embeddingModel = modelService.getModelByID(modelId);
-        } catch (ModelNotFoundException e) {
-            throw new BizException(AppError.notFound("Model not found"));
-        }
-        indexAndStore(kb, embeddingModel, chunks);
+        indexAndStore(kb, resolveEmbeddingModel(kb), chunks);
     }
 
     /**

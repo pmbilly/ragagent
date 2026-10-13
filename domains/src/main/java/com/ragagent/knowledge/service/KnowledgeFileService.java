@@ -25,6 +25,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import com.ragagent.storage.fileserve.FileTransport.OpenedFile;
 import com.ragagent.knowledge.storage.LocalStorageService;
 import com.ragagent.knowledge.storage.TenantFileStorage;
@@ -340,6 +342,9 @@ public class KnowledgeFileService {
         if (!hasOcr && !ocrText.isEmpty()) {
             addChunks.add(newImageChunk(knowledge, chunk, "image_ocr", ocrText, imageInfo));
         }
+        // K7：外部索引副作用移出事务——写库前先过"可索引"校验（1007/404 仍在事务内抛，且
+        // 一行都不写），真正的 delete+batchIndex 排到提交后执行，回滚则一次都不执行。
+        chunkVectorIndexer.assertIndexable(chunk.getKnowledgeBaseId());
         for (Chunk c : addChunks) {
             chunkMapper.insert(c);
         }
@@ -352,7 +357,8 @@ public class KnowledgeFileService {
         List<Chunk> vectorChunks = new ArrayList<>(updateChunks.size() + addChunks.size());
         vectorChunks.addAll(updateChunks);
         vectorChunks.addAll(addChunks);
-        chunkVectorIndexer.updateChunkVector(chunk.getKnowledgeBaseId(), vectorChunks);
+        // K7：提交后执行（本地事务回滚不了外部索引的 delete/batchIndex）。
+        afterCommit(() -> chunkVectorIndexer.updateChunkVector(chunk.getKnowledgeBaseId(), vectorChunks));
         // 对照：knowledge.file_hash = calculateStr(knowledgeID, fileHash, imageInfo)
         Knowledge fresh = knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
                 .eq(Knowledge::getId, knowledgeId)
@@ -386,5 +392,31 @@ public class KnowledgeFileService {
         c.setImageInfo(imageInfo);
         c.setIsEnabled(true);
         return c;
+    }
+
+    /**
+     * K7：把外部副作用排到**事务提交后**执行——回滚时一次都不执行。无事务上下文（直调 /
+     * 单测）内联执行，行为不变。提交后失败只记日志：DB 已提交，不能把成功请求变成 500；
+     * 幂等重试 / 索引意图 outbox 化见 K7 后续（方案 §9.1）。
+     */
+    static void afterCommit(Runnable externalEffect) {
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            runQuietly(externalEffect);
+            return;
+        }
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                runQuietly(externalEffect);
+            }
+        });
+    }
+
+    private static void runQuietly(Runnable effect) {
+        try {
+            effect.run();
+        } catch (RuntimeException e) {
+            log.error("[K7] post-commit external index failed: {}", e.toString(), e);
+        }
     }
 }
