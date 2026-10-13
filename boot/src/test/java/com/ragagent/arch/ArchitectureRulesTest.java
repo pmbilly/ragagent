@@ -630,7 +630,7 @@ class ArchitectureRulesTest {
     private static final Set<String> SELF_MADE_MAPPER_BASELINE = Set.of(
             "com.ragagent.common.web.JsonMappers",
             "com.ragagent.tracing.langfuse.LangfuseAttributes",
-            "com.ragagent.stream.StreamJson",
+            "com.ragagent.platform.stream.StreamJson",
             "com.ragagent.event.EventJson",
             "com.ragagent.datasource.connector.gitlab.GitLabConnector",
             "com.ragagent.datasource.connector.notion.NotionJson",

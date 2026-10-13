@@ -9,7 +9,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.Duration;
 
-import com.ragagent.stream.EmbeddedRedis;
+import com.ragagent.platform.stream.EmbeddedRedis;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

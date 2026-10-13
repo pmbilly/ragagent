@@ -15,7 +15,7 @@ import com.ragagent.im.qqbot.QqBotAdapterFactory;
 import com.ragagent.im.wechat.WechatAdapterFactory;
 import com.ragagent.im.wecom.WecomAdapterFactory;
 import com.ragagent.im.yunzhijia.YunzhijiaAdapterFactory;
-import com.ragagent.stream.StreamManager;
+import com.ragagent.platform.stream.StreamManager;
 
 /**
  * IM 适配器工厂的装配。

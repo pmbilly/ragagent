@@ -40,8 +40,8 @@ import com.ragagent.common.llm.TokenUsage;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.session.domain.Message;
 import com.ragagent.session.support.PipelineViews;
-import com.ragagent.stream.StreamEvent;
-import com.ragagent.stream.StreamManager;
+import com.ragagent.platform.stream.StreamEvent;
+import com.ragagent.platform.stream.StreamManager;
 
 /**
  * agent 事件订阅桥。

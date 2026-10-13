@@ -17,9 +17,9 @@ import com.ragagent.im.runtime.ImRedisStore;
 import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.QaQueue;
-import com.ragagent.stream.StreamEvent;
-import com.ragagent.stream.StreamManager;
-import com.ragagent.stream.StreamStopWatcher;
+import com.ragagent.platform.stream.StreamEvent;
+import com.ragagent.platform.stream.StreamManager;
+import com.ragagent.platform.stream.StreamStopWatcher;
 
 /**
  * 跨实例 /stop 全链路：本地出队/在途取消、stop 事件写入 StreamManager、标记兜底、

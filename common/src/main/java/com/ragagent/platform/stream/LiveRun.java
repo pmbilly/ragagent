@@ -1,4 +1,4 @@
-package com.ragagent.stream;
+package com.ragagent.platform.stream;
 
 /**
  * 某会话当前正在生成的 assistant 消息。

@@ -1,4 +1,4 @@
-package com.ragagent.stream;
+package com.ragagent.platform.stream;
 
 /**
  * 会话已有另一个 assistant 在生成。

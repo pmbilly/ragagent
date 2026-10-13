@@ -12,9 +12,9 @@ import org.slf4j.LoggerFactory;
 import com.ragagent.agent.SteerSink;
 import com.ragagent.session.domain.Message;
 import com.ragagent.session.domain.MentionedItem;
-import com.ragagent.stream.StreamBatch;
-import com.ragagent.stream.StreamEvent;
-import com.ragagent.stream.StreamManager;
+import com.ragagent.platform.stream.StreamBatch;
+import com.ragagent.platform.stream.StreamEvent;
+import com.ragagent.platform.stream.StreamManager;
 import com.ragagent.event.TenantContextSnapshot;
 
 /**

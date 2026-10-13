@@ -17,7 +17,7 @@ import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.limiter.LocalLimiter;
 import com.ragagent.llm.limiter.ModelConcurrencyLimiter;
 import com.ragagent.llm.limiter.RedisLimiter;
-import com.ragagent.stream.EmbeddedRedis;
+import com.ragagent.platform.stream.EmbeddedRedis;
 import com.ragagent.system.service.SystemSettingService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

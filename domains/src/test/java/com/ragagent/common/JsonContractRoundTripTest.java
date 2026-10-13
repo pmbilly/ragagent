@@ -81,8 +81,8 @@ import com.ragagent.session.domain.SessionLastRequestState;
 import com.ragagent.session.domain.SessionListItem;
 import com.ragagent.session.domain.SuggestionAttribution;
 import com.ragagent.session.domain.UsedMemory;
-import com.ragagent.stream.LiveRunPayload;
-import com.ragagent.stream.StreamEvent;
+import com.ragagent.platform.stream.LiveRunPayload;
+import com.ragagent.platform.stream.StreamEvent;
 import com.ragagent.wiki.domain.WikiConfig;
 import com.ragagent.wiki.service.ingest.CombinedExtraction;
 import com.ragagent.common.wiki.ExtractedItem;
@@ -667,7 +667,7 @@ class JsonContractRoundTripTest {
      * 所以同样纳入这道防线。</p>
      *
      * <p>timestamp 留空：本工具用的是**裸** ObjectMapper（未注册 JSR-310），
-     * 非空值会在这里炸；其真实字节形状由 {@code com.ragagent.stream.StreamJsonTest} 钉住。</p>
+     * 非空值会在这里炸；其真实字节形状由 {@code com.ragagent.platform.stream.StreamJsonTest} 钉住。</p>
      */
     @Test
     void streamEventContractsRoundTrip() {

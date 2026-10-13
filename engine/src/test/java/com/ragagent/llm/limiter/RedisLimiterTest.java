@@ -10,7 +10,7 @@ import static org.mockito.Mockito.mock;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.ragagent.stream.EmbeddedRedis;
+import com.ragagent.platform.stream.EmbeddedRedis;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

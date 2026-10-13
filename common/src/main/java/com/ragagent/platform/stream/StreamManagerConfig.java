@@ -1,4 +1,4 @@
-package com.ragagent.stream;
+package com.ragagent.platform.stream;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;

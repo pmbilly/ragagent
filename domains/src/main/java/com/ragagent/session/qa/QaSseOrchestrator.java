@@ -26,9 +26,9 @@ import com.ragagent.session.service.SteerSinkBridge;
 import com.ragagent.session.sse.SseContract;
 import com.ragagent.session.sse.StreamEventEmitter;
 import com.ragagent.storage.support.StreamRewriter;
-import com.ragagent.stream.StreamBatch;
-import com.ragagent.stream.StreamEvent;
-import com.ragagent.stream.StreamManager;
+import com.ragagent.platform.stream.StreamBatch;
+import com.ragagent.platform.stream.StreamEvent;
+import com.ragagent.platform.stream.StreamManager;
 import jakarta.servlet.http.HttpServletResponse;
 import com.ragagent.agent.domain.AgentToolCall;
 import com.ragagent.common.llm.ToolResult;
@@ -36,7 +36,7 @@ import com.ragagent.event.TenantContextSnapshot;
 import com.ragagent.event.payload.StopData;
 import com.ragagent.llm.domain.StreamResponse;
 import com.ragagent.session.sse.SseFrameWriter;
-import com.ragagent.stream.LiveRunExistsException;
+import com.ragagent.platform.stream.LiveRunExistsException;
 
 /**
  * {@code KnowledgeQaController} 的**SSE 编排簇**：建立 SSE 流上下文、写

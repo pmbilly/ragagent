@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.ragagent.stream.EmbeddedRedis;
+import com.ragagent.platform.stream.EmbeddedRedis;
 import com.ragagent.wiki.service.ingest.InProcessWikiFinalizeLock;
 import com.ragagent.wiki.service.ingest.InProcessWikiIdentityClaimStore;
 import com.ragagent.wiki.service.ingest.InProcessWikiInflightLimiter;

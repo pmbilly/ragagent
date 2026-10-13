@@ -1,4 +1,4 @@
-package com.ragagent.stream;
+package com.ragagent.platform.stream;
 
 /**
  * 流存储读写失败（底层 I/O / Redis 错误的包装）。

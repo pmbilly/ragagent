@@ -32,8 +32,8 @@ import com.ragagent.event.payload.AgentToolResultData;
 import com.ragagent.event.payload.MemoryRecalledData;
 import com.ragagent.common.llm.TokenUsage;
 import com.ragagent.session.domain.Message;
-import com.ragagent.stream.StreamEvent;
-import com.ragagent.stream.StreamManager;
+import com.ragagent.platform.stream.StreamEvent;
+import com.ragagent.platform.stream.StreamManager;
 
 /**
  * {@code AgentStreamBridge} 的 SSE 载荷契约。

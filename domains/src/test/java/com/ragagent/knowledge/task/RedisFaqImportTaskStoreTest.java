@@ -7,7 +7,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 import com.ragagent.knowledge.dto.faq.FaqImportProgress;
-import com.ragagent.stream.EmbeddedRedis;
+import com.ragagent.platform.stream.EmbeddedRedis;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

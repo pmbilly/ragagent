@@ -534,7 +534,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B256 | 6 包结构 | §10 改名清算：10 组同名歧义 + 3 组域前缀（纯改名） | ✅ 2026-10-13 |
 | B257 | 6 | §7 命名与边界：`agent/tools`→`agenttools`、`agent/management`→`agentmanagement` + 边界规则 | ✅ 2026-10-13 |
 | B258 | 6 | contracts 包边界（模块 DAG + 跨域边界规则） | ✅ 2026-10-13 |
-| B259 | 6 | platform 包边界（`:common` 其余收拢） | ⬜ |
+| B259 | 6 | platform 包边界（`:common` 其余收拢） | ✅ 2026-10-13 |
 | B260 | 6 | agent-engine 包边界（`com.ragagent.agent` 运行面收拢） | ⬜ |
 | B261 | 6 | retrieval-engine 包边界（`retrieval.*` 收拢 + policy 归位） | ⬜ |
 | B262 | 6 | model-runtime 包边界（模型调用 / provider / 流生命周期） | ⬜ |
@@ -821,6 +821,16 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **测试**：**4974 / 失败 0 / 跳过 4** ✓（+3 规则；domains 计数未变 ⇒ 无覆盖丢失）；契约金片零变化。
 - **闸门**：`spotlessCheck build` ✓ **1m42s** ✓ · 十一守卫 ✓。
 - **登记（未做）**：① `AppError` 去 Jackson 入契约面；② §8.1 其余契约（约 200 型）按 B259~B266 逐簇收纳；③ "业务域之间只经 contracts"要等契约面成形后再收紧（本轮只覆盖已存在的坏味道面）。
+
+**✅ B259（2026-10-13，§8.2 platform 包边界）**
+- **平台面落地**：新建 `com.ragagent.platform`（`:common` 内）+ `package-info` 写明边界（框架适配/可靠执行/通用技术能力，**不含业务状态机**；依赖方向 `platform → contracts`）。**首簇落位**：`com.ragagent.stream`（14 文件：`StreamManager`/`StreamEvent`/`LiveRun`/`RedisStreamManager`/`MemoryStreamManager`/`StreamStopWatcher`/`TurnStreamStore`…）→ `com.ragagent.platform.stream`；测试目录（4 个测试类）随包迁移；前缀替换 **39 + 21 文件**（第二遍补 `package` 声明——第一遍模式带尾点，漏掉了包声明行）。
+- **新增规则 R4**（`ContractBoundaryRulesTest`）：**platform 面不得依赖业务域与三个 runtime 的实现**（runtime 清单：`agent`/`llm`/`retrieval`/`modelcontext`/`rerank`/`webfetch`/`embedding`/`chatpipeline`/`tracing.decorators`/`agenttools`/`agentmanagement`）+ 棘轮（现基线 **0**）。同时把 `platform` 并入 R3 的"底座侧"分类（`isCommonSide`）——底座/引擎层反向依赖业务域一律红。
+- **规则探针（验收达成）**：R4 用配置变体注入（`:common` 看不见 engine/domains 的类型，无法编译出真实越界引用）→ **当场转红** → 还原后四条规则全绿。
+- **守卫联动**：`check-package-cycles.py` 的 `L1`/`L1_CORE` 加入 `platform`（平台面属底座）——环/分层/SCC 基线**无需改动**即通过（`stream` 本来就是 L1，属位置平移）。
+- **验收（方案要求的"每步启动测试"）**：显式跑 `:boot:test --tests com.ragagent.datasource.DataSourceRepositoryTest`（`@SpringBootTest` 真启动 Spring 上下文）→ **25 例全绿** ✓。
+- **测试**：**4975 / 失败 0 / 跳过 4** ✓（boot +1 = R4；common 仍 139 ⇒ 搬走的 4 个测试类未丢，已按 B257 教训 `--rerun-tasks` 核对）。
+- **闸门**：`spotlessCheck build` ✓ **1m46s** ✓ · 十一守卫 ✓。
+- **登记（未做）**：平台面**其余簇**继续收拢（`event` 40 文件 → `platform.event`、`tracing` 19 → `platform.tracing.*`、`common.*` 149 → `platform.{access,config,http,persistence,prompt,security,storage,text,execution,outbox,parsing,task,model}` 各面）；本批只按阶段 6 纪律"一次一簇"落位首个簇，**未动**其余包名。
 
 ## 附：文档地图与归档追溯
 

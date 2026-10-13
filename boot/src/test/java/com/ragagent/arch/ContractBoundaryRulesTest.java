@@ -152,6 +152,41 @@ class ContractBoundaryRulesTest {
         return n;
     }
 
+    /**
+     * R4 · 平台面（B259 起收纳 `com.ragagent.platform`）不得依赖业务域与三个 runtime 的实现。
+     *
+     * <p>§8 的 DAG：`platform → contracts`。平台放的是事件/流/任务/HTTP/持久化助手/文本与解析
+     * 等**技术底座**；一旦它反向依赖业务域或 runtime，模块提取与"顶层不依赖具体实现"就同时破产。</p>
+     */
+    @Test
+    @DisplayName("B259-R4：platform 面不得依赖业务域与 runtime 实现")
+    void platformFaceStaysBelowBusiness() {
+        List<String> violations = new ArrayList<>();
+        for (JavaClass clazz : MAIN) {
+            if (!clazz.getPackageName().startsWith("com.ragagent.platform")) {
+                continue;
+            }
+            for (var dep : clazz.getDirectDependenciesFromSelf()) {
+                String pkg = dep.getTargetClass().getPackageName();
+                if (isBusinessDomain(pkg) || isRuntimeImplementation(pkg)) {
+                    violations.add(clazz.getName() + " → " + dep.getTargetClass().getName());
+                }
+            }
+        }
+        ratchet("B259-R4 platform→业务域/运行时", Set.of(), new TreeSet<>(violations));
+    }
+
+    /** 三个 runtime 的实现包面（含 engine 模块内与领域侧同名包）。 */
+    private static boolean isRuntimeImplementation(String packageName) {
+        for (String r : List.of("agent", "llm", "retrieval", "modelcontext", "rerank", "webfetch",
+                "embedding", "chatpipeline", "tracing.decorators", "agenttools", "agentmanagement")) {
+            if (packageName.equals("com.ragagent." + r) || packageName.startsWith("com.ragagent." + r + ".")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static String domainOf(String packageName) {
         String[] parts = packageName.split("\\.");
         return parts.length >= 3 ? parts[2] : packageName;
@@ -160,9 +195,10 @@ class ContractBoundaryRulesTest {
     /** `:common` 侧的包面（B258 起含契约面）。 */
     private static boolean isCommonSide(String packageName) {
         return packageName.startsWith("com.ragagent.contract")
+                || packageName.startsWith("com.ragagent.platform")
                 || packageName.startsWith("com.ragagent.common")
                 || packageName.startsWith("com.ragagent.event")
-                || packageName.startsWith("com.ragagent.stream")
+                || packageName.startsWith("com.ragagent.platform.stream")
                 || packageName.startsWith("com.ragagent.tracing.langfuse");
     }
 

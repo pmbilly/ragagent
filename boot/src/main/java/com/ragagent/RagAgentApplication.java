@@ -15,7 +15,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
         "com.ragagent.common.deployment", "com.ragagent.knowledge.config",
         "com.ragagent.common.crypto", "com.ragagent.common.security", "com.ragagent.common.storage",
         "com.ragagent.common.wiki", "com.ragagent.auth.config", "com.ragagent.retrieval.graph",
-        "com.ragagent.stream"})
+        "com.ragagent.platform.stream"})
 public class RagAgentApplication {
 
     public static void main(String[] args) {

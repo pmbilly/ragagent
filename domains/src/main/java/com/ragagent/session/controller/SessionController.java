@@ -43,8 +43,8 @@ import com.ragagent.common.llm.ResponseType;
 import com.ragagent.session.domain.MessageArtifact;
 import com.ragagent.session.domain.MessageNotFoundException;
 import com.ragagent.session.service.MessageService;
-import com.ragagent.stream.StreamEvent;
-import com.ragagent.stream.StreamManager;
+import com.ragagent.platform.stream.StreamEvent;
+import com.ragagent.platform.stream.StreamManager;
 import com.ragagent.common.web.ApiResult;
 import com.ragagent.common.web.ApiResponse;
 

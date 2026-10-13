@@ -24,7 +24,7 @@ import com.ragagent.session.service.QaSupport.QaRequestContext;
 import com.ragagent.session.service.QaSupport.SseStreamContext;
 import com.ragagent.session.service.SessionAgentQaService;
 import com.ragagent.session.service.SessionKnowledgeQaService;
-import com.ragagent.stream.StreamManager;
+import com.ragagent.platform.stream.StreamManager;
 import jakarta.servlet.http.HttpServletResponse;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.event.TenantContextSnapshot;

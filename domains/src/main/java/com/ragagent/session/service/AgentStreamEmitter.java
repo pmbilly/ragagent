@@ -8,8 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ragagent.common.llm.ResponseType;
-import com.ragagent.stream.StreamEvent;
-import com.ragagent.stream.StreamManager;
+import com.ragagent.platform.stream.StreamEvent;
+import com.ragagent.platform.stream.StreamManager;
 
 /**
  * {@code AgentStreamBridge} 的 SSE 发射缝：组装 {@link StreamEvent}（时间戳取当前时刻）并追加到

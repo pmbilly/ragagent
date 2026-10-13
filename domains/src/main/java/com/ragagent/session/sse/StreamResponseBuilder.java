@@ -8,7 +8,7 @@ import java.util.Map;
 import com.ragagent.common.llm.ResponseType;
 import com.ragagent.llm.domain.StreamResponse;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.stream.StreamEvent;
+import com.ragagent.platform.stream.StreamEvent;
 
 /**
  * 把流事件翻成 SSE 响应体。

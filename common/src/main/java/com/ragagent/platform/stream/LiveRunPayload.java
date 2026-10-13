@@ -1,4 +1,4 @@
-package com.ragagent.stream;
+package com.ragagent.platform.stream;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 

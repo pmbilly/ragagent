@@ -34,9 +34,9 @@ import com.ragagent.session.sse.SseFrameWriter;
 import com.ragagent.session.sse.StreamEventEmitter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.session.service.SessionService;
-import com.ragagent.stream.StreamBatch;
-import com.ragagent.stream.StreamEvent;
-import com.ragagent.stream.StreamManager;
+import com.ragagent.platform.stream.StreamBatch;
+import com.ragagent.platform.stream.StreamEvent;
+import com.ragagent.platform.stream.StreamManager;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.tenant.Tenant;
 

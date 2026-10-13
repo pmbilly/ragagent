@@ -13,7 +13,7 @@ import com.ragagent.common.llm.ResponseType;
 import com.ragagent.llm.domain.StreamResponse;
 import com.ragagent.storage.support.Rewriter;
 import com.ragagent.storage.support.StreamRewriter;
-import com.ragagent.stream.StreamEvent;
+import com.ragagent.platform.stream.StreamEvent;
 
 /**
  * 把流事件重写后发到 SSE 线缆上。

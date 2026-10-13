@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.stream.EmbeddedRedis;
+import com.ragagent.platform.stream.EmbeddedRedis;
 import com.ragagent.wiki.domain.TaskDeadLetter;
 import com.ragagent.wiki.repository.TaskDeadLetterRepository;
 import org.junit.jupiter.api.AfterEach;
