@@ -930,6 +930,17 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **结果**：`KnowledgeService` **748 → 726 行**（B263⑦+⑧ 累计 **799 → 726**，-73）；新增 `repository/KnowledgeRepository`、`support/KnowledgePaths`。
 - **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m38s** ✓ 十一守卫 ✓（包级 SCC 仍 13 组、`{service, task}` 2 成员）。
 - **登记（余步）**：`KnowledgeService` 726 行继续抽（`service.management/*` use-case、剩余 mapper 直连 8 处）；`KnowledgeFileService`(422/2)、`KnowledgeBaseService`(626/18)；`normalizeKnowledgeFolderPath` 真实现随 `KnowledgeFolderService` 归位；`task ⇄ service` 余 7 处。
+
+**🔶 B263 第⑨步（2026-10-14，`KnowledgeService` 的 mapper 直连归零）**
+- **最后 9 处直连分归三个仓储**：
+  - `KnowledgeRepository` +3：`selectPage(Page, wrapper)`（薄转发：**查询构建仍在用例侧**，登记为后续归位点）、`findByIdOnly(String id)`、`softDelete(id, now)`；
+  - `ChunkRepository` +2：`insert(Chunk)`、`softDeleteByKnowledgeId(knowledgeId, now)`；
+  - `KnowledgeTagRepository` +4：`listTagsWithKnowledgeId`、`listTagsByIds`、`deleteRelations`、`insertRelation`。
+- **连带清理（死成员守卫的功劳）**：枢纽内 mapper 使用归零后，三个 `*Mapper` 字段 + 构造参数 + 赋值 + import 全成死成员 ⇒ 一并删除 ⇒ **`KnowledgeService` 不再注入任何 Mapper**（A16"service 直连 mapper"这条债在它身上清空；A17 仍因 `LambdaQueryWrapper`（分页条件构建）在册）。
+- **模块约定拦下的写法（新经验）**：`KnowledgeCodeConventionsTest`（知识库模块**禁止代码体内内联全限定类名**，比仓级 R8 更严）抓到我新仓储方法里的 `com.baomidou…` / `java.time…` 全限定名 ✗ ⇒ 改 import ✓。**该模块内写新代码时默认走 import。**
+- **结果**：`KnowledgeService` **726 → 719 行**（B263⑦⑧⑨ 累计 **799 → 719**，-80）；mapper 直连 **0**。
+- **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m40s** ✓ 十一守卫 ✓（SCC 13 组 / `{service, task}` 2 成员未变）。
+- **登记（余步）**：`KnowledgeService` 719 行余部（`service.management/*` 用例归位需**配套断边**——B263① 已实测"先拆面会扩大 SCC"）；`selectPage` 的**查询构建**搬入仓储；`KnowledgeFileService`(422/2)、`KnowledgeBaseService`(626/18)；`normalizeKnowledgeFolderPath` 真实现随 `KnowledgeFolderService` 归位；`task ⇄ service` 余 7 处。
 - **登记（余步）**：⑦ `KnowledgeService`(799 行/28 引用) 拆分（**优先级最高：行数已到阈值边缘**）；⑧ `KnowledgeFileService`(422/2)、`KnowledgeParseService` 余部、`KnowledgeBaseService`(626/18)；⑨ 最后一对 `task ⇄ service`（`task→service` 现余 **7**：`ChunkExtractService`3 / `QuestionGenerationService`3 / `SpanTracker`）；⑩ `service` 七子面、`domain.{document,task,graph}`、`mapper` 目标名对齐。
 - **登记（余步）**：按最轻优先继续——`ChunkVectorIndexer`(386/2)、`KnowledgeFileService`(422/2)、`KnowledgeParseService` 余部、`KnowledgeBaseService`(626/18)、`KnowledgeService`(796/28)；一律"切分而非整搬"。`task → service` 现余 8 处（`ChunkExtractService`3 / `QuestionGenerationService`3 / `SpanTracker` / `ChunkVectorIndexer`）。
 

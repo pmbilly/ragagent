@@ -1,5 +1,9 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.repository.KnowledgeTagRepository;
+
+import com.ragagent.knowledge.repository.ChunkRepository;
+
 import com.ragagent.knowledge.support.KnowledgePaths;
 
 import com.ragagent.knowledge.repository.KnowledgeRepository;
@@ -17,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,9 +36,6 @@ import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeTag;
-import com.ragagent.knowledge.mapper.ChunkMapper;
-import com.ragagent.knowledge.mapper.KnowledgeMapper;
-import com.ragagent.knowledge.mapper.KnowledgeTagMapper;
 import com.ragagent.knowledge.task.KnowledgeProcessingQueue;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -79,10 +79,9 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
     public static final List<String> ALL_STAGES =
             List.of("docreader", "chunking", "embedding", "multimodal", "postprocess");
 
-    private final KnowledgeMapper knowledgeMapper;
     private final KnowledgeRepository knowledgeRepository;
-    private final ChunkMapper chunkMapper;
-    private final KnowledgeTagMapper tagMapper;
+    private final ChunkRepository chunkRepository;
+    private final KnowledgeTagRepository tagRepository;
     /** A3-3 尾批：租户感知文件存储（本地契约不变；云 provider 租户真正落对象存储）。 */
     private final TenantFileStorage fileStorage;
     private final KnowledgeProcessingQueue knowledgeQueue;
@@ -100,10 +99,9 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
     private final KnowledgeParseService knowledgeParseService;
     private final KnowledgeBatchOpsService batchOpsService;
 
-    public KnowledgeService(KnowledgeMapper knowledgeMapper,
-                            KnowledgeRepository knowledgeRepository,
-                            ChunkMapper chunkMapper,
-                            KnowledgeTagMapper tagMapper,
+    public KnowledgeService(                            KnowledgeRepository knowledgeRepository,
+                            ChunkRepository chunkRepository,
+                            KnowledgeTagRepository tagRepository,
                             TenantFileStorage fileStorage,
                             KnowledgeProcessingQueue knowledgeQueue,
                             KnowledgeAccessHelper access,
@@ -117,10 +115,9 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
                             KnowledgeFileService knowledgeFileService,
                             KnowledgeParseService knowledgeParseService,
                             KnowledgeBatchOpsService batchOpsService) {
-        this.knowledgeMapper = knowledgeMapper;
         this.knowledgeRepository = knowledgeRepository;
-        this.chunkMapper = chunkMapper;
-        this.tagMapper = tagMapper;
+        this.chunkRepository = chunkRepository;
+        this.tagRepository = tagRepository;
         this.fileStorage = fileStorage;
         this.knowledgeQueue = knowledgeQueue;
         this.access = access;
@@ -316,7 +313,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
             if (i + 1 < chunks.size()) {
                 chunks.get(i).setNextChunkId(chunks.get(i + 1).getId());
             }
-            chunkMapper.insert(chunks.get(i));
+            chunkRepository.insert(chunks.get(i));
         }
         if (!chunks.isEmpty()) {
             chunkVectorIndexer.updateChunkVector(kb.getId(), chunks);
@@ -382,7 +379,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
         if (folderPresent) {
             qw.eq(Knowledge::getFolderPath, folderPath == null ? "" : folderPath);
         }
-        return knowledgeMapper.selectPage(new Page<>(page, pageSize), qw);
+        return knowledgeRepository.selectPage(new Page<>(page, pageSize), qw);
     }
 
     public Knowledge getKnowledge(String id) {
@@ -391,10 +388,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
 
     /** 无租户过滤（守卫/权限解析用）。 */
     public Knowledge getKnowledgeByIdOnly(String id) {
-        return knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getId, id)
-                .isNull(Knowledge::getDeletedAt)
-                .last("LIMIT 1"));
+        return knowledgeRepository.findByIdOnly(id);
     }
 
     /** 调用者空间内的可空读取。 */
@@ -436,7 +430,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
         if (k == null) {
             return;
         }
-        List<KnowledgeTag> rows = tagMapper.selectTagsWithKnowledgeId(List.of(k.getId()));
+        List<KnowledgeTag> rows = tagRepository.listTagsWithKnowledgeId(k.getId());
         if (!rows.isEmpty()) {
             k.setTags(new ArrayList<>(rows.stream().map(KnowledgeProjectionAdapter::tagView).toList()));
         }
@@ -471,10 +465,8 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
     public String deleteKnowledge(String id) {
         Knowledge k = getKnowledge(id);
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
-        knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
-                .eq(Knowledge::getId, k.getId()).set(Knowledge::getDeletedAt, now));
-        chunkMapper.update(null, new LambdaUpdateWrapper<Chunk>()
-                .eq(Chunk::getKnowledgeId, k.getId()).set(Chunk::getDeletedAt, now));
+        knowledgeRepository.softDelete(k.getId(), now);
+        chunkRepository.softDeleteByKnowledgeId(k.getId(), now);
         fileStorage.delete(tenantId(), k.getId(), k.getFilePath());
         return UUID.randomUUID().toString();
     }
@@ -591,7 +583,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
         }
         Map<String, KnowledgeTag> tagMap = new HashMap<>();
         if (!tagIDSet.isEmpty()) {
-            List<KnowledgeTag> tags = tagMapper.selectByTenantAndIds(tenantId, List.copyOf(tagIDSet));
+            List<KnowledgeTag> tags = tagRepository.listTagsByIds(tenantId, List.copyOf(tagIDSet));
             for (KnowledgeTag tag : tags) {
                 tagMap.put(tag.getId(), tag);
             }
@@ -622,14 +614,14 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
 
     /** 删旧 + 插新（空/重复 id 跳过）。 */
     private void setKnowledgeTags(String knowledgeId, List<String> tagIDs) {
-        tagMapper.deleteRelations(knowledgeId);
+        tagRepository.deleteRelations(knowledgeId);
         if (tagIDs == null || tagIDs.isEmpty()) {
             return;
         }
         Set<String> seen = new LinkedHashSet<>();
         for (String tagID : tagIDs) {
             if (tagID != null && !tagID.isEmpty() && seen.add(tagID)) {
-                tagMapper.insertRelation(knowledgeId, tagID);
+                tagRepository.insertRelation(knowledgeId, tagID);
             }
         }
     }

@@ -1,5 +1,11 @@
 package com.ragagent.knowledge.repository;
 
+import java.time.OffsetDateTime;
+
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
@@ -42,6 +48,27 @@ public class KnowledgeRepository {
     /** 插入新行。 */
     public void insert(Knowledge k) {
         knowledgeMapper.insert(k);
+    }
+
+    /** 分页查询（条件由调用方以 wrapper 传入：查询构建仍在用例侧，本层只执行）。 */
+    public Page<Knowledge> selectPage(
+            Page<Knowledge> page,
+            LambdaQueryWrapper<Knowledge> qw) {
+        return knowledgeMapper.selectPage(page, qw);
+    }
+
+    /** 仅按 id 取未软删行（无租户过滤；守卫/权限解析用）。 */
+    public Knowledge findByIdOnly(String id) {
+        return knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
+                .eq(Knowledge::getId, id)
+                .isNull(Knowledge::getDeletedAt)
+                .last("LIMIT 1"));
+    }
+
+    /** 软删 knowledge 行（置 deleted_at）。 */
+    public void softDelete(String id, OffsetDateTime now) {
+        knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, id).set(Knowledge::getDeletedAt, now));
     }
 
     /** 按主键整行更新。 */

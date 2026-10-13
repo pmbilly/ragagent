@@ -80,6 +80,26 @@ public class KnowledgeTagRepository {
      * （knowledge / repository/knowledge）：
      * 携带任一指定标签的文档 id（DISTINCT）。标签删除时用它列出待清理的文档。
      */
+    /** 单条 knowledge 的标签行（B263⑨：由 service 直连 tagMapper 归位）。 */
+    public List<KnowledgeTag> listTagsWithKnowledgeId(String knowledgeId) {
+        return tagMapper.selectTagsWithKnowledgeId(List.of(knowledgeId));
+    }
+
+    /** 按 id 集合 + 租户取标签（B263⑨）。 */
+    public List<KnowledgeTag> listTagsByIds(long tenantId, List<String> ids) {
+        return tagMapper.selectByTenantAndIds(tenantId, ids);
+    }
+
+    /** 删除该 knowledge 的标签关系（B263⑨）。 */
+    public void deleteRelations(String knowledgeId) {
+        tagMapper.deleteRelations(knowledgeId);
+    }
+
+    /** 建立标签关系（B263⑨）。 */
+    public void insertRelation(String knowledgeId, String tagId) {
+        tagMapper.insertRelation(knowledgeId, tagId);
+    }
+
     public List<String> listKnowledgeIdsByTagIds(long tenantId, String kbId, List<String> tagIds) {
         if (tagIds == null || tagIds.isEmpty()) {
             return List.of();
