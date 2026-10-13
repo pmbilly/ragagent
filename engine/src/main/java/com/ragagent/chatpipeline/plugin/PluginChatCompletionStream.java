@@ -147,9 +147,11 @@ public final class PluginChatCompletionStream implements Plugin {
         while (true) {
             StreamResponse response = takeQuietly(responseQueue);
             if (response == null) {
-                // 队列已关闭：流结束，flush + closeThinking
-                flushDecoders(eventBus, chatManage, thinkingID, answerID, thinkingDecoder, answerDecoder);
-                closeThinking(eventBus, chatManage, thinkingID, thinkingOpen);
+                // 队列结束（生产者关闭 / 120s 无新 chunk / 线程中断）：收束。
+                // 终态帧必须补：轮侧只认「答案 done」完成消息并发 COMPLETE，缺了它
+                // assistant 会停在未完成、SSE 永远轮询（A1：超时与断流路径实测如此）。
+                endStream(eventBus, chatManage, thinkingID, answerID,
+                        thinkingDecoder, answerDecoder, thinkingOpen, answerCompleted);
                 Map<String, Object> f = new LinkedHashMap<>();
                 f.put("sessionId", chatManage.getSessionId());
                 PipelineLog.info("Stream", "channel_close", f);
@@ -176,9 +178,9 @@ public final class PluginChatCompletionStream implements Plugin {
                     // 发送失败忽略
                 }
                 if (response.isDone()) {
-                    // ERROR+done 是终态元素：收束并退出
-                    flushDecoders(eventBus, chatManage, thinkingID, answerID, thinkingDecoder, answerDecoder);
-                    closeThinking(eventBus, chatManage, thinkingID, thinkingOpen);
+                    // ERROR+done 是终态元素：收束并退出（错误事件已先发；终态帧同样要补）
+                    endStream(eventBus, chatManage, thinkingID, answerID,
+                            thinkingDecoder, answerDecoder, thinkingOpen, answerCompleted);
                     return;
                 }
                 continue;
@@ -241,6 +243,42 @@ public final class PluginChatCompletionStream implements Plugin {
                     return;
                 }
             }
+        }
+    }
+
+    /**
+     * 异常收束的统一出口：flush 尾帧 → **补终态答案帧**（done=true，幂等） → 关思考块。
+     *
+     * <p>A1：轮的生命周期挂在「答案 done」上（QaTurnExecutor 的 FINAL_ANSWER 处理器只在
+     * done 时完成消息并发 COMPLETE）。异常收束（队列关闭 / 空闲超时 / ERROR+done）原先
+     * 只 flush 不补终态 ⇒ assistant 停在未完成、SSE 永远轮询。</p>
+     */
+    private static void endStream(EventBusInterface eventBus, ChatManage chatManage,
+                                  String thinkingID, String answerID,
+                                  StreamDecoder thinkingDecoder, StreamDecoder answerDecoder,
+                                  AtomicBoolean thinkingOpen, AtomicBoolean answerCompleted) {
+        flushDecoders(eventBus, chatManage, thinkingID, answerID, thinkingDecoder, answerDecoder);
+        emitTerminalAnswer(eventBus, chatManage, answerID, answerCompleted);
+        closeThinking(eventBus, chatManage, thinkingID, thinkingOpen);
+    }
+
+    /** 补一帧终态答案（空内容 + done=true）；已终态则不重复发。 */
+    private static void emitTerminalAnswer(EventBusInterface eventBus, ChatManage chatManage,
+                                           String answerID, AtomicBoolean answerCompleted) {
+        if (!answerCompleted.compareAndSet(false, true)) {
+            return;
+        }
+        Event evt = new Event();
+        evt.setId(answerID);
+        evt.setType(EventType.EVENT_AGENT_FINAL_ANSWER);
+        evt.setSessionId(chatManage.getSessionId());
+        AgentFinalAnswerData data = new AgentFinalAnswerData();
+        data.setContent("");
+        data.setDone(true);
+        evt.setData(data);
+        try {
+            eventBus.emit(evt);
+        } catch (RuntimeException ignored) {
         }
     }
 

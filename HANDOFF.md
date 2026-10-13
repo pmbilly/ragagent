@@ -514,7 +514,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B236 | 1 | K3：`DocReaderClient` 流错误传播（onError 捕获 + await 超时 + 异步 UNIMPLEMENTED 走 unary） | ✅ 2026-10-13 |
 | B237 | 1 | K1：worker→向量店显式传租户（`KnowledgeVectorWrites` 收 tenantId，消除 ThreadLocal+0L） | ✅ 2026-10-13 |
 | B238 | 1 | K2：URL 摄取统一（**拍板点①**：同步下载 vs worker 下载） | ✅ 2026-10-13（拍板 A：同步下载） |
-| B239 | 2 会话终态 | A1-NORMAL：流错误/超时轮终态一致收口 | ⬜ |
+| B239 | 2 会话终态 | A1-NORMAL：流错误/超时轮终态一致收口 | ✅ 2026-10-13（建流前失败兜底→登记待办） |
 | B240 | 2 | A1-AGENT：`AgentEngine` finally/COMPLETE 与外层 catch/ERROR 收口 + `FinalizePhase` 失败 outcome | ⬜ |
 | B241 | 2 | A2：全轮一次性提交门（CAS）+ 消息更新失败不启动索引/建议/记忆 | ⬜ |
 | B242 | 2 | A3：可关闭模型流（句柄 + `ThinkPhase` 取消 probe + 装饰器队列关闭语义） | ⬜ |
@@ -653,6 +653,13 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **测试**：新增 `MapperKnowledgeBridgeUrlIngestTest` 3 例（真实 HTTP 回环 + mock 数据面）——URL 落行同形（filePath/hash/size/source/type/parseStatus 全断言）/ SSRF 受限主机抓取前被拒（不落行、不入队）/ `createFromFile` 回归。**红态探针**：还原"URL 行不落文件"形态 ⇒ 精确 1 红 + 2 绿 ⇒ 还原复绿。
 - **守卫连带（棘轮真实生效）**：`KnowledgeService` 830 → **796 行**跌破 800 ⇒ 文件大小守卫 **R-e 触发**（"规模例外 ~830 行"自称过期）⇒ 删自称 + `check-file-size.py --write` 清理失效 exempt；`--write` 顺带刷新 `limits` 历史漂移 29 处（均在 30 行 slack 内，非新增违例）。
 - **闸门**：`spotlessCheck build` ✓ **2m03s** ✓ · **4919 / 失败 0 / 跳过 4** ✓（+3 = 新测试）。
+
+**✅ B239（2026-10-13，A1-NORMAL：流终态收口）**
+- **缺口**（方案 A1）：NORMAL 轮的生命周期挂在「答案 done」上（`QaTurnExecutor` 的 FINAL_ANSWER 处理器只在 `done=true` 时完成消息并发 COMPLETE）；异常收束（生产者关闭 / 120s 空闲超时 / 线程中断 / `ERROR+done`）原先只 `flush + closeThinking` 就返回 ⇒ assistant 停在未完成、SSE（只认 STOP/COMPLETE）永远轮询。
+- **修复**：`PluginChatCompletionStream` 新增统一收束出口 `endStream()` = flush 尾帧 → **补一帧终态答案（done=true，幂等；已终态不重复发）** → 关思考块；两条异常出口（队列结束/超时、ERROR+done）都改走它。错误事件仍**先于**终态帧（客户先见错误、轮再收口）。
+- **测试**：新增 `PluginChatCompletionStreamTerminalTest` 3 例——① 无终态帧（用"poll 立即返回 null"的队列桩瞬时驱动，与 120s 超时同一代码路径）⇒ 终态帧恰好一帧；② `ERROR+done` ⇒ 错误事件先于终态帧且仍补终态；③ 正常 `ANSWER+done` 回归（只一帧、不追加空终态帧）。**红态探针**：注释终态帧调用 ⇒ 精确 2 红（两个 A1 场景）+ 1 绿 ⇒ 还原复绿。chatpipeline 全包金片回放（`PipelineLifecycleRecordingTest` 8/0 等）不受影响。
+- **登记待办（同族，已实测确认）**：**建流前失败**的兜底收口未做——管线在 `CHAT_COMPLETION_STREAM` 之前抛错时，`QaTurnExecutor` 的 catch 只发 EVENT_ERROR、不发 COMPLETE ⇒ SSE 仍会轮询。安全性条件已核：`CHAT_COMPLETION_STREAM` 是 NORMAL 两条链的**末段**（纯聊天 / RAG 均如此）⇒ 该 catch 触发时流必未启动，兜底"立即完成 + 发 COMPLETE"不会截断在途答案。未实现原因 = `QaTurnExecutor` 全类**零测试基建**，按"先失败测试再改实现"纪律需先建挂点（并入 B253 controller 剥离的前置）。
+- **闸门**：`spotlessCheck build` ✓ **2m08s** ✓ · **4922 / 失败 0 / 跳过 4** ✓（+3 = 新测试）。
 
 ## 附：文档地图与归档追溯
 
