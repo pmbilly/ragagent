@@ -511,7 +511,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B233 | 0 | ArchUnit A16 边界层引用禁令（76）+ A17 service 技术依赖禁令（61） | ✅ 2026-10-13 |
 | B234 | 1 正确性 | A6 同 ID 去重保最高分（`KnowledgeSearchRanking`） | ✅ 2026-10-13 |
 | B235 | — 文档 | HANDOFF 换版 v0.2.0（v0.1.0 全文归档）+ 实施计划展开（阶段 6 明细 + 4 处缺口） | ✅ 2026-10-13 |
-| B236 | 1 | K3：`DocReaderClient` 流错误传播（onError 捕获 + await 超时 + 异步 UNIMPLEMENTED 走 unary） | ⬜ |
+| B236 | 1 | K3：`DocReaderClient` 流错误传播（onError 捕获 + await 超时 + 异步 UNIMPLEMENTED 走 unary） | ✅ 2026-10-13 |
 | B237 | 1 | K1：worker→向量店显式传租户（`KnowledgeVectorWrites` 收 tenantId，消除 ThreadLocal+0L） | ⬜ |
 | B238 | 1 | K2：URL 摄取统一（**拍板点①**：同步下载 vs worker 下载） | ⬜ |
 | B239 | 2 会话终态 | A1-NORMAL：流错误/超时轮终态一致收口 | ⬜ |
@@ -631,6 +631,13 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **计划展开**：阶段 6 由 3 行伞状批展开为 **12 批**（B256 改名清算 → B257 §7 命名 → B258 contracts → B259 platform → B260~B262 三 runtime → B263~B266 domains 域内重排 → B267 门禁收紧）；**补录 4 处缺口**（方案 §7 命名 / §10 改名 / §12.2 两条规则 / §12.5 复杂度指标）；批次号顺延（文档批 = B235）⇒ R 系列共 **36 批（B232~B267）**。
 - **实测补录**：方案 §10.1 十组改名**大多未做**（旧名 7 个仍在：`ToolPolicy`/`TokenUsage`/`ModelResponse`/`ProviderRegistry`/`FileService`/`WebSearchProvider`/`Event`+`EventBus`；仅 `AgentToolCall` 已存在）⇒ 入 B256。
 - **验证**：文档批零代码改动（参照 B204 先例不跑全量闸门）；十一守卫 rc=0 作底线 ✓。
+
+**✅ B236（2026-10-13，K3：DocReader 流错误传播）**
+- **缺口**（方案 K3）：`DocReaderClient.readStream` 的 `onError` 只 `latch.countDown()` 丢弃 `Throwable` ⇒ ① 异步 UNIMPLEMENTED 不回退 unary（外层 catch 只覆盖同步抛）；② meta 之后的错误被当"成功"返回部分结果；③ deadline 到期伪装成 "first frame missing meta"；`latch.await` 返回值同样被忽略。
+- **修复**：`AtomicReference<Throwable>` 留证 + `await` 结果判定（真超时显式报错）+ 失败原样传播（`StatusRuntimeException` 直抛 ⇒ UNIMPLEMENTED 走既有 unary 回退；DEADLINE/传输错误上报调用方）。
+- **测试接缝**：包级构造器注入短超时（生产 = 30 分钟常量）——⚠️ 多构造器立即触发 Spring 装配歧义（`No default constructor found`）⇒ 按仓内惯例给公开构造器加 `@Autowired` 显式指定。**这一步是"先跑定向（绿）→ 再跑全量"才暴露的**（`:boot:test` 上下文全炸）：**`@Service` 类的构造器改动，定向测试不足以作证，必须全量**。
+- **测试**：新增 `DocReaderClientTest` 5 例（真实 Netty 回环端口 + 假 DocReader 服务；正常流 / 异步 UNIMPLEMENTED 回退 / meta 后错误 / deadline 真实状态 / 空流拒绝）。**红态探针**：还原"丢错误"形态 ⇒ 精确 3 红（三个缺陷场景）+ 2 绿（回归面）⇒ 还原修复复绿。
+- **闸门**：`spotlessCheck build` ✓ **1m46s** ✓ · **4913 / 失败 0 / 跳过 4** ✓（+5 = 新测试）。
 
 ## 附：文档地图与归档追溯
 

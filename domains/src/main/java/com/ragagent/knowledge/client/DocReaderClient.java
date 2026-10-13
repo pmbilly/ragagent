@@ -14,10 +14,12 @@ import docreader.DocReaderGrpc;
 import docreader.Docreader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.google.protobuf.ByteString;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * DocReader gRPC 客户端。
@@ -42,10 +44,21 @@ public class DocReaderClient {
     private volatile boolean connected;
     private final Object reconnectLock = new Object();
 
+    /** 单次调用超时（生产 = 30 分钟；测试注入短超时以覆盖超时路径）。 */
+    private final Duration callTimeout;
+
     /**
      * 地址/传输走 {@link DocReaderProperties} 绑定（env 名与语义未变）。
+     * 多构造器（含测试接缝）⇒ 显式 @Autowired 指定装配用的这一个。
      */
+    @Autowired
     public DocReaderClient(DocReaderProperties properties) {
+        this(properties, CALL_TIMEOUT);
+    }
+
+    /** 包级可见：测试注入短超时（不改变生产路径行为）。 */
+    DocReaderClient(DocReaderProperties properties, Duration callTimeout) {
+        this.callTimeout = callTimeout;
         String addr = properties.addrOrDefault();
         String host = addr;
         int port = 50051;
@@ -118,6 +131,9 @@ public class DocReaderClient {
     private ParseResult readStream(Docreader.ReadRequest request) throws Exception {
         List<Docreader.ReadStreamResponse> frames = new ArrayList<>();
         CountDownLatch latch = new CountDownLatch(1);
+        // 失败必须留证：原实现 onError 丢弃 Throwable ⇒ UNIMPLEMENTED 不回退 unary、
+        // deadline 到期被伪装成 "first frame missing meta"、meta 之后的错误被当成功返回。
+        AtomicReference<Throwable> failure = new AtomicReference<>();
         StreamObserver<Docreader.ReadStreamResponse> observer =
                 new StreamObserver<>() {
                     @Override
@@ -127,6 +143,7 @@ public class DocReaderClient {
 
                     @Override
                     public void onError(Throwable t) {
+                        failure.set(t);
                         latch.countDown();
                     }
 
@@ -135,9 +152,19 @@ public class DocReaderClient {
                         latch.countDown();
                     }
                 };
-        asyncStub.withDeadlineAfter(CALL_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS)
+        asyncStub.withDeadlineAfter(callTimeout.toMillis(), TimeUnit.MILLISECONDS)
                 .readStream(request, observer);
-        latch.await(CALL_TIMEOUT.toMillis() + 10_000, TimeUnit.MILLISECONDS);
+        if (!latch.await(callTimeout.toMillis() + 10_000, TimeUnit.MILLISECONDS)) {
+            throw new IllegalStateException("docreader ReadStream: timeout waiting for completion");
+        }
+        Throwable error = failure.get();
+        if (error != null) {
+            // 原样传播：UNIMPLEMENTED ⇒ 外层回退 unary；其余（DEADLINE / 传输错误等）⇒ 上报调用方。
+            if (error instanceof StatusRuntimeException statusError) {
+                throw statusError;
+            }
+            throw new IllegalStateException("docreader ReadStream failed: " + error, error);
+        }
 
         if (frames.isEmpty() || !frames.get(0).hasMeta()) {
             throw new IllegalStateException("docreader ReadStream: first frame missing meta");
@@ -157,7 +184,7 @@ public class DocReaderClient {
     }
 
     private ParseResult readUnary(Docreader.ReadRequest request) {
-        Docreader.ReadResponse resp = blocking.withDeadlineAfter(CALL_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS)
+        Docreader.ReadResponse resp = blocking.withDeadlineAfter(callTimeout.toMillis(), TimeUnit.MILLISECONDS)
                 .read(request);
         if (!resp.getError().isEmpty()) {
             throw new IllegalStateException("docreader parse error: " + resp.getError());
