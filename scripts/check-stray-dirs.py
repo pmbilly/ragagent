@@ -13,6 +13,7 @@
      且**不在白名单**里 ⇒ 红。（被忽略的 `build/`、`.gradle/`、`node_modules/` 不算。）
   S2 死包目录：源码树里**整棵子树不含任何 .java 文件**的目录 ⇒ 红。
      （搬迁把文件全搬走后留下的空包目录，同样对 git 不可见。）
+     扫描根含 `testFixtures`（B263㉖ 实测：漏枚举源码集会让空包目录与"包/路径错配"同时溜过）。
 
 白名单只放「有正当理由存在的未忽略本地目录」，每项须写理由——与其它守卫同口径：
 **要放过必须说明为什么，而不是静默跳过。**
@@ -34,12 +35,16 @@ MODULE_ALLOW: dict[str, str] = {}
 SOURCE_ROOTS = (
     "domains/src/main/java",
     "domains/src/test/java",
+    "domains/src/testFixtures/java",
     "common/src/main/java",
     "common/src/test/java",
+    "common/src/testFixtures/java",
     "engine/src/main/java",
     "engine/src/test/java",
+    "engine/src/testFixtures/java",
     "boot/src/main/java",
     "boot/src/test/java",
+    "boot/src/testFixtures/java",
 )
 
 

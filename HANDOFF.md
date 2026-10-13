@@ -921,6 +921,14 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **偶发测试（记录）**：全量跑时 `RedisWikiDeletedTombstoneStoreTest.clearRemovesTombstone` 失败一次，**单跑即过** ⇒ Redis 依赖型偶发，与本步改动无关（本步未触碰 wiki/Redis 路径）。
 - **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m34s** ✓ 十一守卫 ✓（13 组 SCC 未变）。
 - **登记（余步）**：
+**🔴 B263㉖（2026-10-14，用户报 IDE 报错 ⇒ 修「改包不搬目录」+ 补第十二守卫「路径/包对应」）**
+- **现象**：用户贴来 20+ 个测试文件的 IDE 报错——`EmbeddedRedis cannot be resolved`（连带 `withBean(...)`/`await(...)` 级联），而**`./gradlew build` 一直全绿**。
+- **根因（B259 漏搬 testFixtures）**：`common/src/testFixtures/java/com/ragagent/stream/EmbeddedRedis.java` 的包声明在 B259 被改成 `com.ragagent.platform.stream`，但**文件留在旧目录**——当时脚本只枚举了 `src/main` 与 `src/test` 两个源码集，**漏了 `src/testFixtures`**。`javac` **不校验**目录/包对应（照样编到新包名下），所以构建、测试、闸门全绿，**只有 IDE（jdt）报** "declared package does not match the expected package"。
+- **为什么后来连测试都红了**：`git mv` 后 Gradle 的 fixtures 产物目录里**缺该类**（任务被判 UP-TO-DATE ✗）⇒ `:common/:engine/:domains:compileTestJava` 找不到同包符号 ⇒ 强制重编（`--rerun-tasks`）后产物回到 `build/classes/java/testFixtures/com/ragagent/platform/stream/EmbeddedRedis.class` ✓。
+- **修复**：`git mv` 到 `common/src/testFixtures/java/com/ragagent/platform/stream/EmbeddedRedis.java` + 删旧空目录（B124 目录卫生）。**全仓审计**：路径与包不一致的文件**恰为这 1 个**（脚本先自查出 2454 的假阳，是审计脚本自己漏了 `src/` 段，修正后为 1）。
+- **新守卫（十二守卫）**：`scripts/check-package-dirs.py`——`*/src/*/java/**` 下每个 `.java` 的**相对包根目录必须等于包名**（零容忍、无基线；排除 `build/`）；接入 `run-guards.sh`（**十一 → 十二**，活文档/README/CI 注释同步，历史归档不动）；**探针已验红**（临时造 `package com.ragagent.probe.wrong;` 的文件 ⇒ 精确报 P2 + 处置指引 ⇒ 删除即绿）。同时把 `check-stray-dirs.py` 的 `SOURCE_ROOTS` **补上 `testFixtures`**（死包目录同样会从这类漏枚举里溜过）。
+- **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m27s** ✓ **十二守卫** ✓。
+- **经验（换锚族长新成员）**：**「改包」必须同时「搬目录」，且要枚举所有源码集（main/test/testFixtures）**；`javac` 不报错 ⇒ 必须靠守卫（`check-package-dirs.py`）。
 **🔶 B263 第㉕步（2026-10-14，`KnowledgeBaseLookupAdapter`：**service 包 mapper 直连收尾**）**
 - **本步的关键判断是"不搬"**：该类持 `ObjectProvider<KnowledgeMapper>` 并用 `getIfAvailable()` 保守返回，是**刻意的装配裁剪容忍**（注释原文："无知识仓储可查（装配裁剪）——无法判定，保守地当作'还在'"）。若换成 `KnowledgeRepository`（无条件 Bean、构造期就要求 mapper），"缺 mapper"会从**保守返回**变成**上下文启动失败** ⇒ **语义退化**，故**保留**该可选依赖（与 R6 禁 `@Lazy` 规避环无关），并在类 javadoc 写明这条理由（防后人误"清理"）。
 - **能搬的都搬了**：两处 KB 读取 → `KnowledgeBaseRepository.findByIdOnly(kbId)`（带软删过滤）与 **`findByIdAny(kbId)`**（`knowledgeBaseByIdIncludingDeleted`，⑱ 新增的"不过滤软删"读法，正好同形）。

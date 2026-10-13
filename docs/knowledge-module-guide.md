@@ -506,7 +506,7 @@ flowchart TD
 # 每次改动后必跑（约 3 分钟）
 cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
   ./gradlew :domains:test :domains:spotlessCheck
-# 结构/契约类守卫（包环、键名口径、外壳合规等十一守卫）可单跑：
+# 结构/契约类守卫（包环、键名口径、外壳合规等十二守卫）可单跑：
 ./gradlew :guards
 # 若动了前端可见契约（字段名/信封/状态码），同批带前端：
 cd frontend && npx vue-tsc --build --force && npm test
