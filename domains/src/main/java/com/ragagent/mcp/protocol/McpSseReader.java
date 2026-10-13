@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * MCP 的 SSE 消息流解析器。
  *
- * <p><b>与 {@code com.ragagent.llm.chat.SseReader} 的关键差别</b>（别把两者当同一个东西用）：</p>
+ * <p><b>与 {@code com.ragagent.modelruntime.adapter.provider.chat.common.SseReader} 的关键差别</b>（别把两者当同一个东西用）：</p>
  * <ul>
  *   <li>LLM 聊天流只关心 {@code data:} 的文本载荷，且一条 data 就是一个 chunk；
  *       MCP 的 SSE 是 <b>JSON-RPC 消息流</b>，必须同时识别 {@code event:}

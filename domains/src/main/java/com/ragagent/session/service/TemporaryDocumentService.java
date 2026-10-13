@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.llm.asr.AsrTranscriber;
+import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.knowledge.client.DocReaderClient;
 import com.ragagent.model.service.ModelRuntimeFactory;

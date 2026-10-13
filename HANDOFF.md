@@ -537,7 +537,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B259 | 6 | platform 包边界（`:common` 其余收拢） | ✅ 2026-10-13 |
 | B260 | 6 | agent-engine 包边界（`com.ragagent.agent` 运行面收拢） | ✅ 2026-10-13 |
 | B261 | 6 | retrieval-engine 包边界（`retrieval.*` 收拢 + policy 归位） | ⬜ |
-| B262 | 6 | model-runtime 包边界（模型调用 / provider / 流生命周期） | ⬜ |
+| B262 | 6 | model-runtime 包边界（模型调用 / provider / 流生命周期） | ✅ 2026-10-13 |
 | B263 | 6 | domains 域内重排①：knowledge（29 包 248 文件；SCC 拆解 + mapper/repository 主战场） | ⬜ |
 | B264 | 6 | ②：session（21 包 183 文件）+ agenttools/agentmanagement 落位 | ⬜ |
 | B265 | 6 | ③：wiki（17 包 147）+ datasource（16 包 124）+ mcp（9 包 125） | ⬜ |
@@ -852,6 +852,16 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **第一版被守卫拦下的写法**：`FaqSnippet` 委托时我写了内联 FQN `com.ragagent.retrieval.support.SearchTextUtil.regexMatchesAny(...)` ⇒ **R8 内联全限定名**守卫点名（`agenttools/knowledge/FaqSnippet.java:393`）⇒ 改为 import ✓（这条守卫的存在价值现场可见）。
 - **测试**：**4977 / 失败 0 / 跳过 4** ✓（boot +1 = B261 规则；engine 561 / domains 2949 均未丢）；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m39s** ✓ 十一守卫 ✓。
 - **登记（未做）**：① **两份 `buildContentSignature` 语义有别**（`GrepChunksScoring` 用 `\s+` 折叠、`SearchTextUtil` 用 Unicode 空白感知的 `trimUnicodeWhitespace`+`splitFields`）⇒ **未合并**，需先评估对去重/签名的影响再统一；② `KnowledgeSearchRanking` **仍留工具面**——它的构造器吃整个 `KnowledgeSearchTool`（读 `tool.reranker` / `tool.searchTargets`）⇒ 归位到 `retrieval.policy` 必须先做**状态外提**（reranker/threshold/targets 参数化）重构，属独立批次；③ 因此 **`retrieval.policy` 面本批未创建**（避免死包目录，B124 守卫）；④ `retrieval.engine`(69 文件) → `retrieval.application.engine`、`retrieval.vlm`/`graph`/`domain` 的最终归位仍未做。
+
+**✅ B262（2026-10-13，§8.5 model-runtime 包边界；三 runtime 收口）**
+- **搬迁**：① `llm.chat`(37) 按 §8.5 拆成三子面——`adapter.provider.chat`(12：`RemoteApi*`/`RemoteHttpOps`/`SseReader` 之外的远端家族)、`adapter.provider.chat.anthropic`(11 Anthropic 族)、`adapter.provider.chat.common`(11 底座 + 流三件 `Sync/Queued/StreamLifecycle`)；② `llm.asr`(1) → `adapter.provider.asr`；③ `LlmChatClients` → `modelruntime.application`（见下）；④ 新建 6 个面的 `package-info` + 同步 `llm/package-info`（chat 已迁出）。
+- **本批解掉两处真环（都是搬迁过程逼出来的）**：① **`llm ⇄ modelruntime`**——反向边只有**一个文件**（`llm/asr/AsrTranscriber` → chat 的 `LlmTransport`），按 §8.5 把 asr 归位 `adapter.provider.asr` 即解；② 拆分后**新造**的包级 SCC `{chat, chat.anthropic, chat.common}`——罪魁是**装配类** `LlmChatClients`（在 `common` 里引用全部 provider 实现 ⇒ 三面互指），按"装配层在适配器之上"归位 `modelruntime.application` 即解 ⇒ **包级 SCC 回到基线 13（零增长）**。
+- **新规则**（`ContractBoundaryRulesTest`）：「**B262：modelruntime 面不得依赖业务域与工具实现面**」（零容忍）；探针用**配置变体**（engine 看不见 domains，同 B261），当场转红 ✓ 还原 ✓。
+- **纪律点（本批最重要）**：环守卫第一次 `--write` 把 **"新增 1 对环 + L2→L3 5 条"**也记进了基线 ✗ —— `--write` 不是"消红按钮"，那条命令当场被**回退基线和自查**纠正：真正的两处修法是 ① 给守卫 `L2` 分类补 `"modelruntime"`（新面属运行时，不是业务域 ⇒ 消除 `tracing→modelruntime`、`L1 底座→业务域` 误报）、② 修上面两处真环。**最终带环基线零变化。**
+- **换锚四处（B168/B169/B121 教训）**：① `check-json-key-case.py` 的 `FROZEN_PREFIXES` 补 `'modelruntime/'`；② 冻结覆盖快照 `--write`（diff = 24 行**纯路径迁移**：`llm/chat/**` → `modelruntime/**`）；③ `scripts/file-size.baseline.json` 的 `llm/chat/AnthropicChat.java`(769) → 新路径（**同一个文件**，773 行）；④ 环守卫 `L2` 分类。空目录 `llm/chat`、`llm/asr` 已清（B124）。
+- **其他守卫现场拦截**：`ProviderAdapters.trimRightSlash` 非 public（跨子面用）⇒ 提 public；`ProviderAdapterRegistryTest` 测的是 `RemoteApiChat` 的包内 API ⇒ 测试随目标子面归位（不硬提可见性）；**`:engine:javadoc` 三处 `{@link SseReader|ThinkingStrategy|ProviderAdapter}` 失链** ⇒ 改**全限定 `{@link}`**（仓内既有风格，见 `chatpipeline/plugin/package-info.java`）。
+- **测试**：**4978 / 失败 0 / 跳过 4** ✓（boot +1 = B262 规则；engine 561 未丢）；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m43s** ✓ 十一守卫 ✓。
+- **登记（未做）**：§8.5 其余面未搬——`adapter.provider.{ollama(7), registry(34), rerank(7), vlm(2), embedding(10)}`、`adapter.access/api`、`application{,.port,.rerank}`（`Reranker` 族/`Embedder` 族/`EmbeddingHttp`/`TranscriptionExecution`）、`domain.stream`（`StreamResponse`）、`policy{,.concurrency}`（limiter 9）、`stream`（`ManagedModelStream`/`StreamAccumulator`/`StreamLifecycle` —— 本批 `StreamLifecycle` 暂在 `chat.common`）。
 
 ## 附：文档地图与归档追溯
 

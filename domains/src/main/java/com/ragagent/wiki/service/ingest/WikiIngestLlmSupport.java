@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.llm.LlmChatClient;
-import com.ragagent.llm.chat.PromptCache;
+import com.ragagent.modelruntime.adapter.provider.chat.PromptCache;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;

@@ -30,7 +30,7 @@ import com.ragagent.agent.budget.AgentBudgets;
 import com.ragagent.agent.skills.SkillCatalogService;
 import com.ragagent.approval.Gate;
 import com.ragagent.knowledge.service.KnowledgeService;
-import com.ragagent.llm.chat.LlmChatClients;
+import com.ragagent.modelruntime.application.LlmChatClients;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.ollama.OllamaService;
 import com.ragagent.tracing.decorators.LangfuseChatClient;

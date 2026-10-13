@@ -9,7 +9,7 @@ import java.time.Duration;
 import java.util.Map;
 
 import com.ragagent.common.security.SsrfGuard;
-import com.ragagent.llm.chat.LlmTransport;
+import com.ragagent.modelruntime.adapter.provider.chat.common.LlmTransport;
 
 /**
  * embedding 包共享的 SSRF 安全 HTTP 设施。

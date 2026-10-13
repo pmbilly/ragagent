@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 import com.ragagent.tenant.Tenant;
 import com.ragagent.tenant.TenantLookup;
-import com.ragagent.llm.chat.ImageResolver;
+import com.ragagent.modelruntime.adapter.provider.chat.ImageResolver;
 import com.ragagent.storage.domain.StoredResource;
 import com.ragagent.storage.service.ResourceCatalogService;
 

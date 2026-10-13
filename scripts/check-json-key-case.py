@@ -87,7 +87,7 @@ FROZEN_PREFIXES = (
     'datasource/connector/notion/NotionMarkdown',
     'datasource/connector/notion/NotionProperties',
     'datasource/connector/yuque/YuqueApiTypes',
-    'llm/', 'common/llm', 'common/tenant',
+    'llm/', 'modelruntime/', 'common/llm', 'common/tenant',
     'common/pipeline/SearchParams', 'mcp/oauth', 'memory/service/MemoryExtractionLlm',
     'memory/service/MemoryExtractPayload', 'docreader', 'rerank/RankResult',
     'tracing/langfuse', 'tracing/decorators', 'retrieval/engine/doris', 'retrieval/domain/ImageInfo',

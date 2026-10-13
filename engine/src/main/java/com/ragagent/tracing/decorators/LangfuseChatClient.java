@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.ragagent.llm.ChatStream;
-import com.ragagent.llm.chat.QueuedChatStream;
+import com.ragagent.modelruntime.adapter.provider.chat.common.QueuedChatStream;
 
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;

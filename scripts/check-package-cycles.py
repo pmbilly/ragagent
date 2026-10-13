@@ -65,7 +65,7 @@ def rel(f):
 
 
 BASELINE = pathlib.Path("scripts/package-cycles.baseline.json")
-L2 = {"llm", "retrieval", "embedding", "rerank", "chatpipeline", "modelcontext",
+L2 = {"llm", "modelruntime", "retrieval", "embedding", "rerank", "chatpipeline", "modelcontext",
       "searchutil", "storageurl", "webfetch"}
 L1 = {"common", "event", "stream", "tracing", "config", "contract", "platform"}  # B258 契约面 / B259 平台面 属底座
 L3 = sorted(set(DOMAIN_FILES) - L2 - L1)

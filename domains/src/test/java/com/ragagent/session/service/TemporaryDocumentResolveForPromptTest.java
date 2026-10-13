@@ -18,8 +18,8 @@ import com.ragagent.session.domain.MessageAttachment;
 import com.ragagent.session.domain.TemporaryDocument;
 import com.ragagent.session.repository.TemporaryDocumentRepository;
 import com.ragagent.auth.service.TenantService;
-import com.ragagent.llm.asr.AsrTranscriber;
-import com.ragagent.llm.chat.ImageResolver;
+import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
+import com.ragagent.modelruntime.adapter.provider.chat.ImageResolver;
 import com.ragagent.model.service.ModelRuntimeFactory;
 
 /**

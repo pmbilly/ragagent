@@ -22,7 +22,7 @@ import com.ragagent.knowledge.chunker.SplitterConfig;
 import com.ragagent.knowledge.chunker.Tokens;
 import com.ragagent.knowledge.client.DocReaderClient;
 import com.ragagent.knowledge.support.ParserEngineRules;
-import com.ragagent.llm.asr.AsrTranscriber;
+import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
 import com.ragagent.model.service.ModelRuntimeFactory;
 import com.ragagent.session.domain.TemporaryDocument;
 import com.ragagent.session.repository.TemporaryDocumentRepository;

@@ -202,6 +202,32 @@ class ContractBoundaryRulesTest {
         ratchet("B261 retrieval→业务域/工具面", Set.of(), new TreeSet<>(violations));
     }
 
+    /**
+     * B262（§8.5）：模型运行时面（`com.ragagent.modelruntime..`，本批由 `llm.chat` 落位）
+     * 只管模型调用/provider/流生命周期——不得依赖业务域或工具实现面。
+     *
+     * <p>同 B261：`:engine` 看不见 `:domains`，"反向依赖"会直接编译不过；本规则的职责是
+     * 把"已经证明不存在"的方向**锁死**，防止日后把域/工具类型塞进 provider 适配。</p>
+     */
+    @Test
+    @DisplayName("B262：modelruntime 面不得依赖业务域与工具实现面（零容忍）")
+    void modelRuntimeFaceStaysBelowBusiness() {
+        List<String> violations = new ArrayList<>();
+        for (JavaClass clazz : MAIN) {
+            if (!clazz.getPackageName().startsWith("com.ragagent.modelruntime")) {
+                continue;
+            }
+            for (var dep : clazz.getDirectDependenciesFromSelf()) {
+                String pkg = dep.getTargetClass().getPackageName();
+                if (isBusinessDomain(pkg) || pkg.startsWith("com.ragagent.agenttools")
+                        || pkg.startsWith("com.ragagent.agentmanagement")) {
+                    violations.add(clazz.getName() + " → " + dep.getTargetClass().getName());
+                }
+            }
+        }
+        ratchet("B262 modelruntime→业务域/工具面", Set.of(), new TreeSet<>(violations));
+    }
+
     private static boolean isRuntimeImplementation(String packageName) {
         for (String r : List.of("agent", "llm", "retrieval", "modelcontext", "rerank", "webfetch",
                 "embedding", "chatpipeline", "tracing.decorators", "agenttools", "agentmanagement")) {

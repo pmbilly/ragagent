@@ -7,7 +7,7 @@ import com.ragagent.common.security.SsrfGuard;
 import com.ragagent.embedding.Embedder;
 import com.ragagent.embedding.EmbedderFactory;
 import com.ragagent.llm.LlmChatClient;
-import com.ragagent.llm.chat.LlmChatClients;
+import com.ragagent.modelruntime.application.LlmChatClients;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.ollama.OllamaService;
 import com.ragagent.model.domain.Model;

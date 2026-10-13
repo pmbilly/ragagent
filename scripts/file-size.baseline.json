@@ -61,7 +61,7 @@
     "domains/src/main/java/com/ragagent/wiki/service/page/WikiPageServiceImpl.java": 729,
     "engine/src/main/java/com/ragagent/chatpipeline/plugin/PluginMerge.java": 661,
     "engine/src/main/java/com/ragagent/chatpipeline/plugin/PluginRerank.java": 683,
-    "engine/src/main/java/com/ragagent/llm/chat/AnthropicChat.java": 769,
+    "engine/src/main/java/com/ragagent/modelruntime/adapter/provider/chat/anthropic/AnthropicChat.java": 769,
     "engine/src/main/java/com/ragagent/modelcontext/ModelOutput.java": 745,
     "engine/src/main/java/com/ragagent/modelcontext/Registry.java": 641,
     "engine/src/main/java/com/ragagent/modelcontext/ToolPolicy.java": 653,

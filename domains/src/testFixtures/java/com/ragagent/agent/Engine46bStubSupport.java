@@ -15,7 +15,7 @@ import com.ragagent.event.EventJson;
 import com.ragagent.event.EventType;
 import com.ragagent.llm.ChatStream;
 import com.ragagent.llm.LlmChatClient;
-import com.ragagent.llm.chat.QueuedChatStream;
+import com.ragagent.modelruntime.adapter.provider.chat.common.QueuedChatStream;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;

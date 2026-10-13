@@ -10,8 +10,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.llm.asr.AsrTranscriber;
-import com.ragagent.llm.chat.LlmTransport;
+import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
+import com.ragagent.modelruntime.adapter.provider.chat.common.LlmTransport;
 import com.ragagent.retrieval.config.RetrievalEnvLookup;
 
 /**

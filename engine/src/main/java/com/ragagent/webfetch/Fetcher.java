@@ -13,7 +13,7 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.ragagent.llm.chat.LlmTransport;
+import com.ragagent.modelruntime.adapter.provider.chat.common.LlmTransport;
 import com.ragagent.common.security.IpClass;
 import com.ragagent.common.security.SsrfGuard;
 

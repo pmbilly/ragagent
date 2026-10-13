@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.tenant.Tenant;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.storage.domain.StorageBackend;
-import com.ragagent.llm.chat.ImageResolver;
+import com.ragagent.modelruntime.adapter.provider.chat.ImageResolver;
 import com.ragagent.storage.domain.StoredResource;
 import com.ragagent.storage.mapper.ResourceRepository;
 import com.ragagent.storage.mapper.StorageBackendRepository;

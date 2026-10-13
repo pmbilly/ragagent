@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.ragagent.knowledge.client.EmbedderClient;
 import com.ragagent.llm.LlmChatClient;
-import com.ragagent.llm.chat.LlmChatClients;
+import com.ragagent.modelruntime.application.LlmChatClients;
 import com.ragagent.llm.domain.ChatConfig;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.ollama.OllamaService;
