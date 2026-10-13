@@ -25,6 +25,7 @@ import com.tngtech.archunit.core.domain.JavaAnnotation;
 import com.tngtech.archunit.core.domain.JavaCall;
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaMethod;
+import com.tngtech.archunit.core.domain.JavaModifier;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.domain.JavaConstructor;
 import com.tngtech.archunit.core.domain.JavaConstructorCall;
@@ -943,5 +944,86 @@ class ArchitectureRulesTest {
             }
         }
         ratchet("A17 service 依赖具体技术", SERVICE_TECH_BASELINE, actual);
+    }
+
+    // ── A18 状态所有权：协作者不回引引擎 / 运行态无公共可变字段 ──────────────────
+
+    /** {@code AgentEngine} 全限定名（判据用字符串，测试不直接依赖引擎类型）。 */
+    private static final String AGENT_ENGINE_NAME = "com.ragagent.agent.AgentEngine";
+
+    /**
+     * A18a 棘轮基线（状态所有权）：{@code com.ragagent.agent} 包内**回引 {@code AgentEngine}**
+     * 的协作者（phase / assembler / emitter 形态）。
+     *
+     * <p>登记理由（方案 §9.1 / §12.2「状态所有权」）：协作者只许接自己需要的窄端口——
+     * 回引整个引擎会让运行态变成"谁都能写"，单测也被迫整机装配。实测存量 8 类入基线：
+     * 只许减、新增即红，随阶段 6（domains 重排）按状态所有权逐域消化。</p>
+     */
+    private static final Set<String> AGENT_ENGINE_BACKREF_BASELINE = Set.of(
+            "com.ragagent.agent.ActPhase",
+            "com.ragagent.agent.ContextDebugEmitter",
+            "com.ragagent.agent.ConversationAssembler",
+            "com.ragagent.agent.FinalizePhase",
+            "com.ragagent.agent.ObservePhase",
+            "com.ragagent.agent.ReActIteration",
+            "com.ragagent.agent.SteerIntake",
+            "com.ragagent.agent.ThinkPhase");
+
+    /**
+     * A18b 棘轮基线：运行态包（agent / chatpipeline / session.controller）里仍带
+     * **公共可变实例字段**的类。
+     *
+     * <p>登记理由（方案 §12.2「状态所有权」）：公共可变字段 = 多个写入者，无法回答
+     * "这个字段的 writer 是谁"；运行态应单一 writer。实测存量见下（只许减、新增即红）。
+     * 注：内嵌 DTO/视图载体（解析结果、工具结果行）不在本规则治理范围
+     * （只查顶层类）——它们是数据形状，不是运行态。</p>
+     */
+    private static final Set<String> RUNTIME_PUBLIC_FIELD_BASELINE = Set.of(
+            // skill 定义载体：带 loaded / frontmatterRepaired 运行标记——收编为不可变 model +
+            // 独立状态容器的候选（阶段 6 消化）。其余命中都在内嵌 DTO（不在治理范围）。
+            "com.ragagent.agent.skills.Skill");
+
+    /** A18b 作用域：运行态与编排协作者所在包。 */
+    private static boolean isRuntimePackage(String packageName) {
+        return packageName.startsWith("com.ragagent.agent")
+                || packageName.startsWith("com.ragagent.chatpipeline")
+                || packageName.startsWith("com.ragagent.session.controller");
+    }
+
+    @Test
+    @DisplayName("A18：agent 协作者不得回引 AgentEngine（状态所有权：只接窄端口）")
+    void agentCollaboratorsDoNotHoldTheEngine() {
+        Set<String> actual = new TreeSet<>();
+        for (JavaClass clazz : MAIN) {
+            if (!clazz.getPackageName().startsWith("com.ragagent.agent")
+                    || AGENT_ENGINE_NAME.equals(clazz.getName())) {
+                continue;
+            }
+            boolean holds = clazz.getFields().stream()
+                    .anyMatch(f -> AGENT_ENGINE_NAME.equals(f.getRawType().getName()));
+            if (holds) {
+                actual.add(topLevel(clazz).getName());
+            }
+        }
+        ratchet("A18 agent 协作者回引 AgentEngine", AGENT_ENGINE_BACKREF_BASELINE, actual);
+    }
+
+    @Test
+    @DisplayName("A18：运行态类不得有公共可变实例字段（状态所有权：单一 writer）")
+    void runtimeClassesHaveNoPublicMutableFields() {
+        Set<String> actual = new TreeSet<>();
+        for (JavaClass clazz : MAIN) {
+            if (!isRuntimePackage(clazz.getPackageName()) || !clazz.isTopLevelClass()) {
+                continue;
+            }
+            boolean hit = clazz.getFields().stream().anyMatch(f ->
+                    f.getModifiers().contains(JavaModifier.PUBLIC)
+                            && !f.getModifiers().contains(JavaModifier.STATIC)
+                            && !f.getModifiers().contains(JavaModifier.FINAL));
+            if (hit) {
+                actual.add(clazz.getName());
+            }
+        }
+        ratchet("A18 运行态公共可变字段", RUNTIME_PUBLIC_FIELD_BASELINE, actual);
     }
 }

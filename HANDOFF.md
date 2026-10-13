@@ -519,7 +519,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B241 | 2 | A2：全轮一次性提交门（CAS）+ 消息更新失败不启动索引/建议/记忆 | ✅ 2026-10-13 |
 | B242 | 2 | A3：可关闭模型流（句柄 + `ThinkPhase` 取消 probe + 装饰器队列关闭语义） | ✅ 2026-10-13 |
 | B243 | 2 | A5：跨线程上下文传播（NORMAL 消费线程 / STOP watcher replay） | ✅ 2026-10-13 |
-| B244 | 2 | A18 状态所有权规则（phase 不回引 runner / 无公共可变运行态字段） | ⬜ |
+| B244 | 2 | A18 状态所有权规则（phase 不回引 runner / 无公共可变运行态字段） | ✅ 2026-10-13 |
 | B245 | 3 任务可靠 | K4：CAS 保护整轮数据（失败清场限本代；`KnowledgeParseService` 排斥处理中） | ⬜ |
 | B246 | 3 | K5：图任务失败/重试/计数同一契约（`finalAttempt` 消费、异常不吞、任务级去重） | ⬜ |
 | B247 | 3 | K6：主任务恢复口径统一（**拍板点②**：判据分裂先修；持久化深度待定） | ⬜ |
@@ -693,6 +693,14 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **红态探针**：把补齐退化回旧语义（`identity = prev`）⇒ 新线程用例实测失败、另两例不受影响 ⇒ 还原后绿。
 - **顺带核对（无改动）**：`SessionService.generateTitleAsync` 已显式 set(tenantId/requestId/userId)；`TemporaryDocumentService` 的清理 ticker 是系统级无身份设计 ✓ 均无本类缺口。
 - **闸门**：`spotlessCheck build` ✓ **1m53s** ✓ · **4932 / 失败 0 / 跳过 4** ✓（+4 = 新测试）· 十一守卫 ✓。
+
+**✅ B244（2026-10-13，A18 状态所有权规则 + 失败上报唯一所有者）**
+- **规则 A18a「agent 协作者不得回引 `AgentEngine`」**：`com.ragagent.agent` 包内（引擎自身除外）声明引擎字段的类入基线 **8 类**（ActPhase / ContextDebugEmitter / ConversationAssembler / FinalizePhase / ObservePhase / ReActIteration / SteerIntake / ThinkPhase）。口径据方案 §9.1 / §12.2：协作者只接自己需要的窄端口——回引整个引擎会让运行态"谁都能写"、单测被迫整机装配；存量随阶段 6（domains 重排）逐域消化。
+- **规则 A18b「运行态类不得有公共可变实例字段」**：作用域 = agent / chatpipeline / session.controller 的**顶层类**（内嵌 DTO/视图载体不治理——它们是数据形状而非运行态，实测该类共 39 处 public 字段全在内嵌载体）。实测存量 **1 类**：`agent.skills.Skill`（带 `loaded` / `frontmatterRepaired` 运行标记）已登记并注明收编方向（不可变 model + 独立状态容器）。
+- **红态探针 ×2（真实注入）**：`ProbeEngineBackref`（agent 包内持引擎字段）⇒ A18a 精确点名且**不误报基线**；`ProbeMutableField`（public 可变字段）⇒ A18b 精确点名；移除后复绿。
+- **失败上报唯一所有者**（清理 B240 登记的观察项）：`AgentEngine` 的 catch 把闸门内**非契约异常**统一收编为 `AgentEngineException`（新增 `(message, state, cause)` 重载；消息沿用 `BizException.wireText` 口径，保留 state 与 cause）；`SessionAgentQaService` 按类型分流——引擎异常只留带栈日志（**不再补发第二份 error**），其他 `RuntimeException`（引擎入口自身失败：建 span / 组装 prompt / 建工具集）仍兜底上报。原先两条路径都发，客户端会看到两次报错。
+- **验证口径**：两条规则以首跑实测为准（空基线 → 报告回填，同 B233）；失败上报分流无直接单测（会话层装配重），由全量套件 + B240 的"恰好一份 error + 一份终态"引擎测试共同约束。
+- **闸门**：`spotlessCheck build` ✓ **1m40s** ✓ · **4934 / 失败 0 / 跳过 4** ✓（+2 = 新规则）· 十一守卫 ✓。
 
 ## 附：文档地图与归档追溯
 

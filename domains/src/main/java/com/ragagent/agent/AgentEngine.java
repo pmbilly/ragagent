@@ -40,6 +40,7 @@ import com.ragagent.modelcontext.Registry;
 import com.ragagent.tracing.langfuse.LangfuseManager;
 import com.ragagent.tracing.langfuse.Span;
 import com.ragagent.common.context.TenantContext;
+import com.ragagent.common.error.BizException;
 import com.ragagent.agent.budget.AgentBudgets;
 import com.ragagent.agent.budget.TokenEstimator;
 import com.ragagent.agent.prompt.AgentPromptTemplates;
@@ -392,7 +393,9 @@ public class AgentEngine {
      * 执行 agent：带会话历史与流式输出。
      *
      * @param imageURLs 多模态输入图片
-     * @throws AgentEngineException 失败时（error 事件已在抛出前发出）
+     * @throws AgentEngineException 失败时（**error 事件已在抛出前发出**，终态帧随后补；A18：
+     *     引擎是失败上报的唯一所有者——闸门内的非契约异常也统一收编成本类型，调用方
+     *     据类型判定"已上报"、不再补发第二份 error）
      */
     public AgentState execute(String sessionId, String messageId, String query,
             List<ChatMessage> llmContext, List<String> imageURLs) {
@@ -488,7 +491,12 @@ public class AgentEngine {
             if (completionEmitted.compareAndSet(false, true)) {
                 finalize.emitCompletionEvent(state, sessionId, messageId, startTime, e.getMessage());
             }
-            throw e;
+            // A18：失败上报的**唯一所有者**在引擎侧——非契约异常统一收编为
+            // AgentEngineException（消息沿用既有 wireText 口径、保留 state 与 cause），
+            // 调用方据此判定"已上报"、不再补发第二份 error。
+            throw e instanceof AgentEngineException aee
+                    ? aee
+                    : new AgentEngineException(BizException.wireText(e), state, e);
         }
 
         log.info("[Agent] Completed: {} rounds, {} steps, complete={}",

@@ -11,6 +11,7 @@ import com.ragagent.common.prompt.MessageAttachmentsPrompt;
 import com.ragagent.common.session.PipelineUsedMemoryView;
 import com.ragagent.knowledge.service.FaqEntryQueryService;
 import com.ragagent.agent.AgentEngine;
+import com.ragagent.agent.AgentEngineException;
 import com.ragagent.agent.management.service.AgentConfigJson;
 import com.ragagent.event.Event;
 import com.ragagent.event.EventBus;
@@ -269,9 +270,15 @@ public class SessionAgentQaService {
             // 执行（失败 emit error 事件后返回）
             try {
                 engine.execute(sessionId, req.assistantMessageId, agentQuery, llmContext, agentImageUrls);
-            } catch (RuntimeException e) {
+            } catch (AgentEngineException e) {
+                // A18：引擎是失败上报的**唯一所有者**——error 事件已在抛出前发出（含 event id、
+                // stage=agent_execution），这里只留带栈日志；再补一份会让客户端看到两次报错。
                 // 带栈：只打 e.toString() 会让这类"回答为空"的事故无从定位。
                 log.error("Agent execution failed: {}", e.toString(), e);
+            } catch (RuntimeException e) {
+                // 兜底：引擎入口自身（建 span / 组装 prompt / 建工具集）失败不在引擎的 catch 范围内，
+                // 这类异常没有对应 error 事件，仍需本层补发（避免静默失败）。
+                log.error("Agent execution failed before engine error channel: {}", e.toString(), e);
                 Event evt = new Event();
                 evt.setType(EventType.EVENT_ERROR);
                 evt.setSessionId(sessionId);

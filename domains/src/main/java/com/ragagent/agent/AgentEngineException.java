@@ -37,6 +37,15 @@ public class AgentEngineException extends RuntimeException {
         this.state = null;
     }
 
+    /**
+     * 状态 + cause 都要的重载（A18）：引擎把非本类型的失败统一收编成契约异常时用——
+     * 调用方仍能读 {@link #getState()} 拿部分状态，cause 保留原异常便于排障。
+     */
+    public AgentEngineException(String message, AgentState state, Throwable cause) {
+        super(message, cause);
+        this.state = state;
+    }
+
     /** 取消/失败路径上已抢救出的部分状态（可为 null）。 */
     public AgentState getState() {
         return state;
