@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -20,8 +18,8 @@ import com.ragagent.common.error.BizException;
 import com.ragagent.common.security.InputSanitizer;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
-import com.ragagent.knowledge.mapper.KnowledgeMapper;
+import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
+import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,15 +41,15 @@ public class KnowledgeFolderService {
 
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
-    private final KnowledgeMapper knowledgeMapper;
-    private final KnowledgeBaseMapper kbMapper;
+    private final KnowledgeRepository knowledgeRepository;
+    private final KnowledgeBaseRepository kbRepository;
     private final KnowledgeAccessHelper access;
 
-    public KnowledgeFolderService(KnowledgeMapper knowledgeMapper,
-                                  KnowledgeBaseMapper kbMapper,
+    public KnowledgeFolderService(KnowledgeRepository knowledgeRepository,
+                                  KnowledgeBaseRepository kbRepository,
                                   KnowledgeAccessHelper access) {
-        this.knowledgeMapper = knowledgeMapper;
-        this.kbMapper = kbMapper;
+        this.knowledgeRepository = knowledgeRepository;
+        this.kbRepository = kbRepository;
         this.access = access;
     }
 
@@ -64,12 +62,8 @@ public class KnowledgeFolderService {
         access.requireKb(kbId);
         // GROUP BY folder_path（Java 侧取列后内存聚合，
         // 语义一致：tenant+kb+parse_status<>'deleting'+deleted_at IS NULL）
-        List<Knowledge> docs = knowledgeMapper.selectList(new LambdaQueryWrapper<Knowledge>()
-                .select(Knowledge::getFolderPath)
-                .eq(Knowledge::getKnowledgeBaseId, kbId)
-                .eq(Knowledge::getTenantId, KnowledgeService.tenantId())
-                .isNull(Knowledge::getDeletedAt)
-                .ne(Knowledge::getParseStatus, Knowledge.PARSE_DELETING));
+        List<Knowledge> docs = knowledgeRepository.listFolderPathsForTree(
+                KnowledgeService.tenantId(), kbId);
         Map<String, Long> counts = new TreeMap<>();
         for (Knowledge d : docs) {
             counts.merge(d.getFolderPath() == null ? "" : d.getFolderPath(), 1L, Long::sum);
@@ -197,12 +191,8 @@ public class KnowledgeFolderService {
             checkedIds.add(row.getId());
         }
         long tenantId = rows.get(0).getTenantId();
-        return knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
-                .eq(Knowledge::getTenantId, tenantId)
-                .eq(Knowledge::getKnowledgeBaseId, kbId)
-                .in(Knowledge::getId, checkedIds)
-                .set(Knowledge::getFolderPath, normalized)
-                .set(Knowledge::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC)));
+        return knowledgeRepository.updateFolderPath(tenantId, kbId, checkedIds, normalized,
+                OffsetDateTime.now(ZoneOffset.UTC));
     }
 
     /**
@@ -225,20 +215,13 @@ public class KnowledgeFolderService {
         if (target.startsWith(source + "/")) {
             throw BizException.badRequest("不能将文件夹移动到它自己的子目录下");
         }
-        KnowledgeBase kb = kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getId, kbId)
-                .isNull(KnowledgeBase::getDeletedAt)
-                .last("LIMIT 1"));
+        KnowledgeBase kb = kbRepository.findByIdOnly(kbId);
         if (kb == null || !kb.getId().equals(kbId)) {
             throw BizException.notFound("knowledge base not found");
         }
         // 行级重写（folder_path = source 或 source+"/%"），
-        List<Knowledge> rows = knowledgeMapper.selectList(new LambdaQueryWrapper<Knowledge>()
-                .select(Knowledge::getId, Knowledge::getFolderPath)
-                .eq(Knowledge::getTenantId, kb.getTenantId())
-                .eq(Knowledge::getKnowledgeBaseId, kbId)
-                .and(w -> w.eq(Knowledge::getFolderPath, source)
-                        .or().likeRight(Knowledge::getFolderPath, source + "/")));
+        List<Knowledge> rows = knowledgeRepository.listByFolderPathPrefix(
+                kb.getTenantId(), kbId, source);
         if (rows.isEmpty()) {
             return 0;
         }
@@ -252,12 +235,8 @@ public class KnowledgeFolderService {
         long affected = 0;
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
         for (Map.Entry<String, List<String>> e : byTarget.entrySet()) {
-            affected += knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
-                    .eq(Knowledge::getTenantId, kb.getTenantId())
-                    .eq(Knowledge::getKnowledgeBaseId, kbId)
-                    .in(Knowledge::getId, e.getValue())
-                    .set(Knowledge::getFolderPath, e.getKey())
-                    .set(Knowledge::getUpdatedAt, now));
+            affected += knowledgeRepository.updateFolderPath(
+                    kb.getTenantId(), kbId, e.getValue(), e.getKey(), now);
         }
         return affected;
     }
@@ -323,20 +302,12 @@ public class KnowledgeFolderService {
     }
 
     public Knowledge loadKnowledgeWrite(String id) {
-        Knowledge k = knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getId, id)
-                .eq(Knowledge::getTenantId, KnowledgeService.tenantId())
-                .isNull(Knowledge::getDeletedAt)
-                .last("LIMIT 1"));
+        Knowledge k = knowledgeRepository.findById(KnowledgeService.tenantId(), id);
         if (k == null) {
             throw BizException.notFound("knowledge not found");
         }
         ChunkAccessGuard.rejectMovingKnowledge(k);
-        KnowledgeBase kb = kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getId, k.getKnowledgeBaseId())
-                .eq(KnowledgeBase::getTenantId, k.getTenantId())
-                .isNull(KnowledgeBase::getDeletedAt)
-                .last("LIMIT 1"));
+        KnowledgeBase kb = kbRepository.findById(k.getTenantId(), k.getKnowledgeBaseId());
         if (kb == null || !kb.getId().equals(k.getKnowledgeBaseId())
                 || !kb.getTenantId().equals(k.getTenantId())) {
             throw BizException.forbidden("knowledge does not belong to its knowledge base");

@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.repository;
 
+import java.util.List;
+
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -126,6 +128,37 @@ public class KnowledgeRepository {
     public void softDeleteByKnowledgeBaseId(String knowledgeBaseId, OffsetDateTime now) {
         knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
                 .eq(Knowledge::getKnowledgeBaseId, knowledgeBaseId).set(Knowledge::getDeletedAt, now));
+    }
+
+    /** 文件夹树计数用：取该 KB 下未软删、非 deleting 的行（只选 folder_path）。 */
+    public List<Knowledge> listFolderPathsForTree(long tenantId, String knowledgeBaseId) {
+        return knowledgeMapper.selectList(new LambdaQueryWrapper<Knowledge>()
+                .select(Knowledge::getFolderPath)
+                .eq(Knowledge::getKnowledgeBaseId, knowledgeBaseId)
+                .eq(Knowledge::getTenantId, tenantId)
+                .isNull(Knowledge::getDeletedAt)
+                .ne(Knowledge::getParseStatus, Knowledge.PARSE_DELETING));
+    }
+
+    /** 行级改写 folder_path（给定 id 集合；返回影响行数）。 */
+    public int updateFolderPath(long tenantId, String knowledgeBaseId, List<String> ids,
+                                String folderPath, OffsetDateTime now) {
+        return knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getTenantId, tenantId)
+                .eq(Knowledge::getKnowledgeBaseId, knowledgeBaseId)
+                .in(Knowledge::getId, ids)
+                .set(Knowledge::getFolderPath, folderPath)
+                .set(Knowledge::getUpdatedAt, now));
+    }
+
+    /** 取 folder_path = prefix 或 prefix/… 的行（只选 id 与 folder_path；租户 + KB 内、未软删）。 */
+    public List<Knowledge> listByFolderPathPrefix(long tenantId, String knowledgeBaseId, String prefix) {
+        return knowledgeMapper.selectList(new LambdaQueryWrapper<Knowledge>()
+                .select(Knowledge::getId, Knowledge::getFolderPath)
+                .eq(Knowledge::getTenantId, tenantId)
+                .eq(Knowledge::getKnowledgeBaseId, knowledgeBaseId)
+                .and(w -> w.eq(Knowledge::getFolderPath, prefix)
+                        .or().likeRight(Knowledge::getFolderPath, prefix + "/")));
     }
 
     /** 插入新行。 */
