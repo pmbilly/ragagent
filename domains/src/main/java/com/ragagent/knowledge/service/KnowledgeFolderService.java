@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.support.KnowledgePaths;
+
 import com.ragagent.common.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -23,7 +25,6 @@ import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -82,7 +83,7 @@ public class KnowledgeFolderService {
         for (Map.Entry<String, Long> e : counts.entrySet()) {
             long count = e.getValue();
             totalCount += count;
-            String path = normalizeKnowledgeFolderPath(e.getKey());
+            String path = KnowledgePaths.normalizeKnowledgeFolderPath(e.getKey());
             if (path.isEmpty()) {
                 rootCount += count;
                 continue;
@@ -170,51 +171,9 @@ public class KnowledgeFolderService {
         return n;
     }
 
-    /**
-     * * \ → /、分段 trim、去尾部 ". "、跳过空/./.. 段、单段 ≤128 字节、深度 ≤16、总长 ≤1024。
-     */
-    public static String normalizeKnowledgeFolderPath(String raw) {
-        if (raw == null || raw.isEmpty()) {
-            return "";
-        }
-        raw = raw.replace('\\', '/');
-        List<String> segments = new ArrayList<>(8);
-        for (String segment : raw.split("/", -1)) {
-            segment = segment.trim();
-            segment = stripTrailing(segment, ". ");
-            if (segment.isEmpty() || segment.equals(".") || segment.equals("..")) {
-                continue;
-            }
-            if (segment.getBytes(StandardCharsets.UTF_8).length > 128) {
-                byte[] bytes = segment.getBytes(StandardCharsets.UTF_8);
-                int cut = 128;
-                while (cut > 0 && (bytes[cut] & 0xC0) == 0x80) {
-                    cut--; // 回退到 rune 起点
-                }
-                segment = new String(bytes, 0, cut, StandardCharsets.UTF_8).trim();
-            }
-            if (segment.isEmpty()) {
-                continue;
-            }
-            segments.add(segment);
-            if (segments.size() >= 16) {
-                break;
-            }
-        }
-        String path = String.join("/", segments);
-        while (path.getBytes(StandardCharsets.UTF_8).length > 1024 && !segments.isEmpty()) {
-            segments = segments.subList(0, segments.size() - 1);
-            path = String.join("/", segments);
-        }
-        return path;
-    }
 
-    private static String stripTrailing(String s, String cutset) {
-        while (!s.isEmpty() && cutset.indexOf(s.charAt(s.length() - 1)) >= 0) {
-            s = s.substring(0, s.length() - 1);
-        }
-        return s;
-    }
+
+
 
     // ── 文件夹移动 / 重命名 ──────────────────────────────────────
 
@@ -252,7 +211,7 @@ public class KnowledgeFolderService {
      */
     @Transactional
     public long renameKnowledgeFolder(String kbId, String from, String to) {
-        String source = normalizeKnowledgeFolderPath(from);
+        String source = KnowledgePaths.normalizeKnowledgeFolderPath(from);
         if (source.isEmpty()) {
             throw BizException.badRequest("源文件夹路径不能为空");
         }
@@ -287,7 +246,7 @@ public class KnowledgeFolderService {
         for (Knowledge row : rows) {
             String suffix = row.getFolderPath().startsWith(source)
                     ? row.getFolderPath().substring(source.length()) : row.getFolderPath();
-            byTarget.computeIfAbsent(normalizeKnowledgeFolderPath(target + suffix), k -> new ArrayList<>())
+            byTarget.computeIfAbsent(KnowledgePaths.normalizeKnowledgeFolderPath(target + suffix), k -> new ArrayList<>())
                     .add(row.getId());
         }
         long affected = 0;
@@ -313,7 +272,7 @@ public class KnowledgeFolderService {
         if (safe == null) {
             throw new BizException(AppError.validation("文件夹路径包含非法字符"));
         }
-        return normalizeKnowledgeFolderPath(safe);
+        return KnowledgePaths.normalizeKnowledgeFolderPath(safe);
     }
 
     /**

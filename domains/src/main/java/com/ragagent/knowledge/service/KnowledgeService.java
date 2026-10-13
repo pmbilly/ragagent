@@ -476,9 +476,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
     public JsonNode folderTree(String kbId) {
         return folderService.folderTree(kbId);
     }
-    public static String normalizeKnowledgeFolderPath(String raw) {
-        return KnowledgeFolderService.normalizeKnowledgeFolderPath(raw);
-    }
+
 
     @Transactional
     public long moveKnowledgeToFolder(String kbId, List<String> ids, String folderPath) {

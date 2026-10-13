@@ -965,6 +965,13 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **⚠️ 本步最大的坑（值得记住）**：我新建的 `StorageBackendRepository` 与 **`storage` 域既有同名类**（`storage.mapper.StorageBackendRepository`，基于 JdbcClient）**撞名** ✗ ⇒ Spring **Bean 名冲突**（默认取简单名）⇒ **整个应用上下文起不来**，boot **1211 / 1329** 条测试全挂 ✗。改名为 `KnowledgeStorageBackendRepository`（类头注释写明原因）后全部恢复 ✓。**教训：新建 `@Component` 仓储前先全仓查同名类——Bean 名默认取简单名，跨包同名一样冲突。**
 - **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m38s** ✓ 十一守卫 ✓（SCC 13 组 / `{service, task}` 2 成员未变）。
 - **登记（余步）**：`KnowledgeService`(719) 余部 → `service.management/*`（需配套断边）；`selectPage` 查询构建搬入仓储；`normalizeKnowledgeFolderPath` 真实现随 `KnowledgeFolderService` 归位；`task ⇄ service` 余 7 处。
+
+**🔶 B263 第⑬步（2026-10-14，文件夹路径规则统一进 `support/KnowledgePaths`）**
+- **统一**：`normalizeKnowledgeFolderPath` 的**真实现**（35 行 + `stripTrailing` 私有助手）由 `KnowledgeFolderService` 迁到环外的 **`support/KnowledgePaths`**（该类的第三个成员，前两个是 B263⑧ 的 `ensureManualFileName` / `extractFileNameFromUrl`）；`KnowledgeService` 里那个 **2 行转发层删除**；调用点全部换指（controller ×2 + `KnowledgeFolderService` 内部 ×3），死 import 清掉。
+- **结果**：`KnowledgeService` 719 → **716 行**；`KnowledgeFolderService` ≈387 → **347 行**（约 -40）；规则只剩一份实现（§9.2）。
+- **⚠️ 过程教训（值得记住）**：第一个脚本一次性预算了**两个**块的偏移 ✗ ⇒ 删掉第一块后第二个偏移失效，切**坏了另一个方法**（编译当场报 odd 错）✗。恢复方式：`git checkout` 还原两个受损文件 ✓ + 改为**"抽一块 → 重读文件 → 再抽下一块"**的顺序式抽取 ✓；追加锚点写错时，用 `git show HEAD:<path>` 把已删除的块**原样取回**再补 ✓。**结论：同一文件多处抽取绝不预排偏移；被删块可从 HEAD 取回，不必重写。**
+- **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m41s** ✓ 十一守卫 ✓（SCC 13 组 / `{service, task}` 2 成员未变）。
+- **登记（余步）**：`KnowledgeService`(716) 余部 → `service.management/*`（需配套断边）；`selectPage` 查询构建搬入仓储；`task ⇄ service` 余 7 处。
 - **登记（余步）**：⑦ `KnowledgeService`(799 行/28 引用) 拆分（**优先级最高：行数已到阈值边缘**）；⑧ `KnowledgeFileService`(422/2)、`KnowledgeParseService` 余部、`KnowledgeBaseService`(626/18)；⑨ 最后一对 `task ⇄ service`（`task→service` 现余 **7**：`ChunkExtractService`3 / `QuestionGenerationService`3 / `SpanTracker`）；⑩ `service` 七子面、`domain.{document,task,graph}`、`mapper` 目标名对齐。
 - **登记（余步）**：按最轻优先继续——`ChunkVectorIndexer`(386/2)、`KnowledgeFileService`(422/2)、`KnowledgeParseService` 余部、`KnowledgeBaseService`(626/18)、`KnowledgeService`(796/28)；一律"切分而非整搬"。`task → service` 现余 8 处（`ChunkExtractService`3 / `QuestionGenerationService`3 / `SpanTracker` / `ChunkVectorIndexer`）。
 

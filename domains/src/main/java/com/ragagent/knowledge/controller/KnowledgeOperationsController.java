@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.controller;
 
+import com.ragagent.knowledge.support.KnowledgePaths;
+
 import java.util.ArrayList;
 import java.util.List;
 import com.ragagent.common.error.AppError;
@@ -252,7 +254,7 @@ public class KnowledgeOperationsController {
         guards.requireKnowledgeInKb(kbId, ids);
         long affected = knowledgeService.moveKnowledgeToFolder(kbId, ids, folderPath);
         return ResponseEntity.ok(new FolderMoveResponse(
-                KnowledgeService.normalizeKnowledgeFolderPath(folderPath), affected));
+                KnowledgePaths.normalizeKnowledgeFolderPath(folderPath), affected));
     }
 
     /** 路由 ownership（纯字符串，KB 缺失放行）→ KB 访问 + ownership（信封）→ service。 */
@@ -268,7 +270,7 @@ public class KnowledgeOperationsController {
         guards.batchAccessChecks(kbId);
         long affected = knowledgeService.renameKnowledgeFolder(kbId, req.from(), req.to());
         return ResponseEntity.ok(new FolderMoveResponse(
-                KnowledgeService.normalizeKnowledgeFolderPath(req.to()), affected));
+                KnowledgePaths.normalizeKnowledgeFolderPath(req.to()), affected));
     }
 
     // ── 跨 KB 搬移 ───────────────────────────────────────────────────────
