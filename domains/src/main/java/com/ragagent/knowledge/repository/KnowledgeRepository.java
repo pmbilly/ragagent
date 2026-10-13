@@ -328,6 +328,47 @@ public class KnowledgeRepository {
                 .eq(Knowledge::getId, id).set(Knowledge::getDeletedAt, now));
     }
 
+    /**
+     * 软删（**仅当尚未软删**：带 {@code isNull(deleted_at)}，返回影响行数）。
+     *
+     * <p>与 {@link #softDelete(String, OffsetDateTime)} 的区别就在这个条件——批量删除路径
+     * 逐条调用它（B263㉑ 由 service 直连归位）。</p>
+     */
+    public int softDeleteIfActive(String id, OffsetDateTime now) {
+        return knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, id)
+                .isNull(Knowledge::getDeletedAt)
+                .set(Knowledge::getDeletedAt, now));
+    }
+
+    /** 批量置 {@code parse_status='deleting'} 并推 updated_at（清空知识库用，B263㉑）。 */
+    public int setParseStatusDeleting(List<String> ids, OffsetDateTime now) {
+        return knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .in(Knowledge::getId, ids)
+                .set(Knowledge::getParseStatus, Knowledge.PARSE_DELETING)
+                .set(Knowledge::getUpdatedAt, now));
+    }
+
+    /**
+     * 状态列更新（worker 用）：{@code errorMessage} / {@code enable} 为 {@code null} 表示**不更新该列**；
+     * {@code enable} 非空时同时写 {@code enable_status} 与 {@code processed_at}（B263㉑ 由 service 直连归位，条件语义逐字保留）。
+     */
+    public int updateStatusColumns(String id, String parseStatus, String errorMessage, Boolean enable,
+                                   OffsetDateTime now) {
+        LambdaUpdateWrapper<Knowledge> uw = new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, id);
+        uw.set(Knowledge::getParseStatus, parseStatus);
+        uw.set(Knowledge::getUpdatedAt, now);
+        if (errorMessage != null) {
+            uw.set(Knowledge::getErrorMessage, errorMessage);
+        }
+        if (enable != null) {
+            uw.set(Knowledge::getEnableStatus, enable ? "enabled" : "disabled");
+            uw.set(Knowledge::getProcessedAt, now);
+        }
+        return knowledgeMapper.update(null, uw);
+    }
+
     /** 按主键整行更新。 */
     public void updateById(Knowledge k) {
         knowledgeMapper.updateById(k);

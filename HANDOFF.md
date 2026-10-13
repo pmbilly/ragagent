@@ -921,6 +921,12 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **偶发测试（记录）**：全量跑时 `RedisWikiDeletedTombstoneStoreTest.clearRemovesTombstone` 失败一次，**单跑即过** ⇒ Redis 依赖型偶发，与本步改动无关（本步未触碰 wiki/Redis 路径）。
 - **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m34s** ✓ 十一守卫 ✓（13 组 SCC 未变）。
 - **登记（余步）**：
+**🔶 B263 第㉑步（2026-10-14，`KnowledgeBatchOpsService` 归仓储：148 → 126 行）**
+- **新增 3 个仓储方法**（都是"条件/批量"形态，逐字搬 SQL）：`softDeleteIfActive(id, now)`（**带 `isNull(deleted_at)`** 的软删——与既有 `softDelete(id, now)` 的区别就在这个条件，故**不复用**、单列并写明差异）、`setParseStatusDeleting(ids, now)`、`updateStatusColumns(id, parseStatus, errorMessage, enable, now)`（把 worker 的**条件列更新**语义整块搬进仓储：`errorMessage`/`enable` 为 `null` 表示不更新该列）。
+- **复用既有**：`chunkMapper.update(...set deleted_at)` → `ChunkRepository.softDeleteByKnowledgeId`（实现逐字相同，已核对）；两处 `selectList(kbId + tenant + 未软删)` → `listByTenantAndKb`；`selectById(id)` → `findByIdAny`（⑱ 新增的"不过滤软删"读法，正好用于 worker 跨请求线程加载）。
+- **连带**：A17 删 1 条（该类仍依赖 `KnowledgeProcessingQueue` ⇒ A16 条目**保留**）；死成员守卫点名的 3 个未使用 import 清掉。
+- **测试**：4978 / 失败 0 / 跳过 4 ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ 十一守卫 ✓（环 0 / SCC 13 组未变）。
+- **登记（余步）**：
 **🔶 B263 第⑳步（2026-10-14，`FaqEntryQueryService` + `FaqEntryCommandService` 归仓储）**
 - **FAQ 对的查询全在 tag 侧 + 知识行读取**：`KnowledgeTagRepository` +2——`listTagsByKbPage(tenantId, kbId, limit, offset)`（原样透传，分页归一与关键词过滤仍归 {@code listByKb}）、`listTagsBySeqIds(tenantId, seqIds)`；其余全部复用既有：`getBySeqId`（= `selectByTenantAndSeqId`，已核对逐字同形）、`listTagsByIds`（= `selectByTenantAndIds`）、`KnowledgeRepository.findById(tenantId, id)`（Command 的 3 处知识行读取同形，批量替换）。
 - **替换顺序有讲究**：`tagMapper.selectByTenantAndSeqId(` 是 `…AndSeqIds(` 的**前缀** ⇒ 必须先替换复数、再替换单数，否则单数规则会把复数调用改坏（本步按此顺序执行）。

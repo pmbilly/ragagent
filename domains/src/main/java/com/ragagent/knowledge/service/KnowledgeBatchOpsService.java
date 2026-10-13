@@ -1,17 +1,15 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.repository.ChunkRepository;
+import com.ragagent.knowledge.repository.KnowledgeRepository;
+
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.knowledge.task.KnowledgeProcessingQueue;
-import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.mapper.ChunkMapper;
-import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,19 +23,19 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class KnowledgeBatchOpsService {
 
-    private final KnowledgeMapper knowledgeMapper;
-    private final ChunkMapper chunkMapper;
+    private final KnowledgeRepository knowledgeRepository;
+    private final ChunkRepository chunkRepository;
     private final KnowledgeProcessingQueue worker;
     private final KnowledgeFileService knowledgeFileService;
     private final KnowledgeAccessHelper access;
 
-    public KnowledgeBatchOpsService(KnowledgeMapper knowledgeMapper,
-                                    ChunkMapper chunkMapper,
+    public KnowledgeBatchOpsService(KnowledgeRepository knowledgeRepository,
+                                    ChunkRepository chunkRepository,
                                     KnowledgeProcessingQueue worker,
                                     KnowledgeFileService knowledgeFileService,
                                     KnowledgeAccessHelper access) {
-        this.knowledgeMapper = knowledgeMapper;
-        this.chunkMapper = chunkMapper;
+        this.knowledgeRepository = knowledgeRepository;
+        this.chunkRepository = chunkRepository;
         this.worker = worker;
         this.knowledgeFileService = knowledgeFileService;
         this.access = access;
@@ -53,13 +51,8 @@ public class KnowledgeBatchOpsService {
     public String batchDeleteKnowledge(String kbId, List<String> ids) {
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
         for (String id : ids) {
-            knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
-                    .eq(Knowledge::getId, id)
-                    .isNull(Knowledge::getDeletedAt)
-                    .set(Knowledge::getDeletedAt, now));
-            chunkMapper.update(null, new LambdaUpdateWrapper<Chunk>()
-                    .eq(Chunk::getKnowledgeId, id)
-                    .set(Chunk::getDeletedAt, now));
+            knowledgeRepository.softDeleteIfActive(id, now);
+            chunkRepository.softDeleteByKnowledgeId(id, now);
         }
         return UUID.randomUUID().toString();
     }
@@ -87,10 +80,7 @@ public class KnowledgeBatchOpsService {
      */
     public int rebuildKnowledgeBaseIndex(String kbId) {
         KnowledgeBase kb = access.requireKb(kbId);
-        List<Knowledge> rows = knowledgeMapper.selectList(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getKnowledgeBaseId, kbId)
-                .eq(Knowledge::getTenantId, KnowledgeService.tenantId())
-                .isNull(Knowledge::getDeletedAt));
+        List<Knowledge> rows = knowledgeRepository.listByTenantAndKb(KnowledgeService.tenantId(), kbId);
         for (Knowledge k : rows) {
             KnowledgeParseService.resetKnowledgeForReparse(k, kb);
             knowledgeFileService.updateKnowledgeRow(k, k.getMetadata());
@@ -108,10 +98,7 @@ public class KnowledgeBatchOpsService {
      */
     @Transactional
     public int clearKnowledgeBaseContents(String kbId) {
-        List<Knowledge> rows = knowledgeMapper.selectList(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getKnowledgeBaseId, kbId)
-                .eq(Knowledge::getTenantId, KnowledgeService.tenantId())
-                .isNull(Knowledge::getDeletedAt));
+        List<Knowledge> rows = knowledgeRepository.listByTenantAndKb(KnowledgeService.tenantId(), kbId);
         for (Knowledge row : rows) {
             ChunkAccessGuard.rejectMovingKnowledge(row);
         }
@@ -119,30 +106,17 @@ public class KnowledgeBatchOpsService {
             return 0;
         }
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
-        knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
-                .in(Knowledge::getId, rows.stream().map(Knowledge::getId).toList())
-                .set(Knowledge::getParseStatus, Knowledge.PARSE_DELETING)
-                .set(Knowledge::getUpdatedAt, now));
+        knowledgeRepository.setParseStatusDeleting(rows.stream().map(Knowledge::getId).toList(), now);
         return rows.size();
     }
 
     /** 内部：worker 使用的按 id 加载（无租户条件，任务可能跨请求线程） */
     public Knowledge loadById(String id) {
-        return knowledgeMapper.selectById(id);
+        return knowledgeRepository.findByIdAny(id);
     }
 
     public void updateStatus(String id, String parseStatus, String errorMessage, Boolean enable) {
-        LambdaUpdateWrapper<Knowledge> uw = new LambdaUpdateWrapper<Knowledge>()
-                .eq(Knowledge::getId, id);
-        uw.set(Knowledge::getParseStatus, parseStatus);
-        uw.set(Knowledge::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC));
-        if (errorMessage != null) {
-            uw.set(Knowledge::getErrorMessage, errorMessage);
-        }
-        if (enable != null) {
-            uw.set(Knowledge::getEnableStatus, enable ? "enabled" : "disabled");
-            uw.set(Knowledge::getProcessedAt, OffsetDateTime.now(ZoneOffset.UTC));
-        }
-        knowledgeMapper.update(null, uw);
+        knowledgeRepository.updateStatusColumns(id, parseStatus, errorMessage, enable,
+                OffsetDateTime.now(ZoneOffset.UTC));
     }
 }
