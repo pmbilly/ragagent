@@ -376,6 +376,37 @@ public class KnowledgeRepository {
                 .set(Knowledge::getSummaryStatus, summaryStatus));
     }
 
+    /**
+     * 搬行到目标 KB：改 {@code knowledge_base_id} + 落终态 completed + 清 error_message + 推 updated_at
+     * （原样搬 {@code reuse_vectors} 分支的直连语句，B263㉓）。
+     */
+    public int moveRowToKnowledgeBase(String id, String targetKbId, OffsetDateTime now) {
+        return knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, id)
+                .set(Knowledge::getKnowledgeBaseId, targetKbId)
+                .set(Knowledge::getParseStatus, Knowledge.PARSE_COMPLETED)
+                .set(Knowledge::getErrorMessage, "")
+                .set(Knowledge::getUpdatedAt, now));
+    }
+
+    /**
+     * 搬行到目标 KB 的**待解析态**（{@code reparse} 模式：改 KB/嵌入模型 + pending + disabled + 清描述/时间/容量，B263㉓）。
+     */
+    public int resetRowForReparseInKnowledgeBase(String id, String targetKbId, String embeddingModelId,
+                                                 OffsetDateTime now) {
+        return knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, id)
+                .set(Knowledge::getKnowledgeBaseId, targetKbId)
+                .set(Knowledge::getEmbeddingModelId, embeddingModelId)
+                .set(Knowledge::getParseStatus, Knowledge.PARSE_PENDING)
+                .set(Knowledge::getErrorMessage, "")
+                .set(Knowledge::getEnableStatus, "disabled")
+                .set(Knowledge::getDescription, "")
+                .set(Knowledge::getProcessedAt, null)
+                .set(Knowledge::getStorageSize, 0L)
+                .set(Knowledge::getUpdatedAt, now));
+    }
+
     /** 按主键整行更新。 */
     public void updateById(Knowledge k) {
         knowledgeMapper.updateById(k);

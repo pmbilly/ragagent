@@ -1,23 +1,20 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
+import com.ragagent.knowledge.repository.KnowledgeRepository;
+import com.ragagent.knowledge.repository.KnowledgeTagRepository;
+
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.knowledge.task.KnowledgeProcessingQueue;
 import com.ragagent.common.context.TenantContext;
-import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.retrieval.graph.RetrieveGraphRepository;
 import com.ragagent.knowledge.dto.doc.KnowledgeMoveProgress;
-import com.ragagent.knowledge.mapper.ChunkMapper;
 import com.ragagent.knowledge.repository.ChunkRepository;
-import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
-import com.ragagent.knowledge.mapper.KnowledgeMapper;
-import com.ragagent.knowledge.mapper.KnowledgeTagMapper;
 import com.ragagent.model.service.ModelRuntimeFactory;
 import com.ragagent.retrieval.engine.PgVectorEngineRepository;
 import org.springframework.stereotype.Service;
@@ -39,11 +36,10 @@ import com.ragagent.knowledge.index.KnowledgeVectorWrites;
 public class KnowledgeMoveService {
 
 
-    private final KnowledgeMapper knowledgeMapper;
-    private final KnowledgeBaseMapper kbMapper;
-    private final ChunkMapper chunkMapper;
+    private final KnowledgeRepository knowledgeRepository;
+    private final KnowledgeBaseRepository kbRepository;
     private final ChunkRepository chunkRepo;
-    private final KnowledgeTagMapper tagMapper;
+    private final KnowledgeTagRepository tagRepository;
     private final TenantStorageService tenantStorage;
     private final ModelRuntimeFactory modelRuntimeFactory;
     private final KnowledgeProcessingQueue worker;
@@ -55,11 +51,10 @@ public class KnowledgeMoveService {
     private final KnowledgeTaskExecutor taskExecutor;
 
 
-    public KnowledgeMoveService(KnowledgeTaskExecutor taskExecutor, KnowledgeMapper knowledgeMapper,
-            KnowledgeBaseMapper kbMapper,
-            ChunkMapper chunkMapper,
+    public KnowledgeMoveService(KnowledgeTaskExecutor taskExecutor, KnowledgeRepository knowledgeRepository,
+            KnowledgeBaseRepository kbRepository,
             ChunkRepository chunkRepo,
-            KnowledgeTagMapper tagMapper,
+            KnowledgeTagRepository tagRepository,
             TenantStorageService tenantStorage,
             ModelRuntimeFactory modelRuntimeFactory,
             KnowledgeProcessingQueue worker,
@@ -69,11 +64,10 @@ public class KnowledgeMoveService {
             RetrieveGraphRepository graphRepository) {
 
         this.taskExecutor = taskExecutor;
-        this.knowledgeMapper = knowledgeMapper;
-        this.kbMapper = kbMapper;
-        this.chunkMapper = chunkMapper;
+        this.knowledgeRepository = knowledgeRepository;
+        this.kbRepository = kbRepository;
         this.chunkRepo = chunkRepo;
-        this.tagMapper = tagMapper;
+        this.tagRepository = tagRepository;
         this.tenantStorage = tenantStorage;
         this.modelRuntimeFactory = modelRuntimeFactory;
         this.worker = worker;
@@ -165,11 +159,7 @@ public class KnowledgeMoveService {
      */
     private void moveOneKnowledgeRow(long tenantId, String knowledgeId, String sourceKbId,
                                      String targetKbId, String mode) {
-        Knowledge row = knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getId, knowledgeId)
-                .eq(Knowledge::getTenantId, tenantId)
-                .isNull(Knowledge::getDeletedAt)
-                .last("LIMIT 1"));
+        Knowledge row = knowledgeRepository.findById(tenantId, knowledgeId);
         if (row == null) {
             throw new IllegalStateException("not found");
         }
@@ -179,20 +169,11 @@ public class KnowledgeMoveService {
         }
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
         String actualSourceKbId = row.getKnowledgeBaseId();
-        knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
-                .eq(Knowledge::getId, knowledgeId)
-                .set(Knowledge::getKnowledgeBaseId, targetKbId)
-                // 搬走后行落在终态 completed、错误清空
-                .set(Knowledge::getParseStatus, Knowledge.PARSE_COMPLETED)
-                .set(Knowledge::getErrorMessage, "")
-                .set(Knowledge::getUpdatedAt, now));
+        knowledgeRepository.moveRowToKnowledgeBase(knowledgeId, targetKbId, now);
         // 标签是 KB 作用域的：搬走后源 KB 的标签不该继续挂着该文档
         //
-        tagMapper.deleteRelations(knowledgeId);
-        chunkMapper.update(null, new LambdaUpdateWrapper<Chunk>()
-                .eq(Chunk::getKnowledgeId, knowledgeId)
-                .set(Chunk::getKnowledgeBaseId, targetKbId)
-                .set(Chunk::getUpdatedAt, now));
+        tagRepository.deleteRelations(knowledgeId);
+        chunkRepo.moveToKnowledgeBase(knowledgeId, targetKbId, now);
         // 搬走后源 KB 的命名空间不得继续
         // 暴露该文档（失败上抛——移动任务据此重试；命名空间删除可重复执行）
         graphRepository.delGraph(List.of(
@@ -223,14 +204,8 @@ public class KnowledgeMoveService {
     private void moveKnowledgeReparse(long tenantId, Knowledge row, String targetKbId) {
         String knowledgeId = row.getId();
         String sourceKbId = row.getKnowledgeBaseId();
-        KnowledgeBase sourceKb = kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getId, sourceKbId)
-                .isNull(KnowledgeBase::getDeletedAt)
-                .last("LIMIT 1"));
-        KnowledgeBase targetKb = kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getId, targetKbId)
-                .isNull(KnowledgeBase::getDeletedAt)
-                .last("LIMIT 1"));
+        KnowledgeBase sourceKb = kbRepository.findByIdOnly(sourceKbId);
+        KnowledgeBase targetKb = kbRepository.findByIdOnly(targetKbId);
         if (sourceKb == null || targetKb == null) {
             throw new IllegalStateException("knowledge base not found");
         }
@@ -242,19 +217,10 @@ public class KnowledgeMoveService {
             throw new IllegalStateException("failed to clean up source: " + e.getMessage(), e);
         }
         // 2) 标签关联（标签是 KB 作用域的）
-        tagMapper.deleteRelations(knowledgeId);
+        tagRepository.deleteRelations(knowledgeId);
         // 3) 行改写到目标 KB 的待解析态
-        knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
-                .eq(Knowledge::getId, knowledgeId)
-                .set(Knowledge::getKnowledgeBaseId, targetKbId)
-                .set(Knowledge::getEmbeddingModelId, targetKb.getEmbeddingModelId())
-                .set(Knowledge::getParseStatus, Knowledge.PARSE_PENDING)
-                .set(Knowledge::getErrorMessage, "")
-                .set(Knowledge::getEnableStatus, "disabled")
-                .set(Knowledge::getDescription, "")
-                .set(Knowledge::getProcessedAt, null)
-                .set(Knowledge::getStorageSize, 0L)
-                .set(Knowledge::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC)));
+        knowledgeRepository.resetRowForReparseInKnowledgeBase(knowledgeId, targetKbId,
+                targetKb.getEmbeddingModelId(), OffsetDateTime.now(ZoneOffset.UTC));
         if (storageSize > 0) {
             tenantStorage.adjustStorageUsed(tenantId, -storageSize);
         }
@@ -324,19 +290,9 @@ public class KnowledgeMoveService {
      */
     private void moveKnowledgeVectors(long tenantId, String knowledgeId, String sourceKbId,
                                       String targetKbId) {
-        Knowledge row = knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getId, knowledgeId)
-                .eq(Knowledge::getTenantId, tenantId)
-                .isNull(Knowledge::getDeletedAt)
-                .last("LIMIT 1"));
-        KnowledgeBase sourceKb = kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getId, sourceKbId)
-                .isNull(KnowledgeBase::getDeletedAt)
-                .last("LIMIT 1"));
-        KnowledgeBase targetKb = kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getId, targetKbId)
-                .isNull(KnowledgeBase::getDeletedAt)
-                .last("LIMIT 1"));
+        Knowledge row = knowledgeRepository.findById(tenantId, knowledgeId);
+        KnowledgeBase sourceKb = kbRepository.findByIdOnly(sourceKbId);
+        KnowledgeBase targetKb = kbRepository.findByIdOnly(targetKbId);
         if (row == null || sourceKb == null || targetKb == null) {
             return;
         }

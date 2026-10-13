@@ -110,6 +110,14 @@ public class ChunkRepository implements ChunkSearchGateway {
         chunkMapper.insert(chunk);
     }
 
+    /** 搬 KB：改 {@code knowledge_base_id} + 推 updated_at（B263㉓ 由 service 直连归位）。 */
+    public int moveToKnowledgeBase(String knowledgeId, String targetKbId, OffsetDateTime now) {
+        return chunkMapper.update(null, new LambdaUpdateWrapper<Chunk>()
+                .eq(Chunk::getKnowledgeId, knowledgeId)
+                .set(Chunk::getKnowledgeBaseId, targetKbId)
+                .set(Chunk::getUpdatedAt, now));
+    }
+
     /** 按主键整行更新（B263⑩：由 service 直连 chunkMapper 归位）。 */
     public void updateById(Chunk chunk) {
         chunkMapper.updateById(chunk);
