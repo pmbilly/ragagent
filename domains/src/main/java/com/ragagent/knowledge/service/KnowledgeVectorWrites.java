@@ -1,6 +1,5 @@
 package com.ragagent.knowledge.service;
 
-import com.ragagent.common.context.TenantContext;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.retrieval.engine.RetrieveEngineFactories;
@@ -33,16 +32,20 @@ public class KnowledgeVectorWrites {
     /**
      * 绑定 store 的 KB → 复合引擎；未绑定 → {@code null}（调用方保持 pg 直连路径）。
      * 解析失败（跨租户 FORBIDDEN / 店不可用 UNAVAILABLE / 店未注册 NOT_FOUND）原样抛
-     * {@link com.ragagent.retrieval.engine.RetrieveEngineException}——调用方按各自的
+     * {@link com.ragagent.retrieval.engine.RetrieveEngineException}——调用方按各自的可重试策略处理。
+     *
+     * <p><b>租户必须由调用方显式给出</b>：原实现在此读 {@code TenantContext} 的 ThreadLocal，
+     * 但处理队列的 executor 线程不携带上下文 ⇒ null 兜成 0，非零租户的绑定 store 被误判
+     * 跨租户 FORBIDDEN（预清理还会先删掉 chunks）。同步调用点传当前租户，异步 worker 传
+     * 任务行的 {@code tenantId}；{@code null} 仍按 0 处理（无上下文调用的旧语义）。</p>
      */
-    public CompositeRetrieveEngine boundEngine(KnowledgeBase kb) {
+    public CompositeRetrieveEngine boundEngine(KnowledgeBase kb, Long tenantId) {
         if (kb == null || !kb.hasVectorStore()) {
             return null;
         }
-        Long tid = TenantContext.currentTenantId();
-        long tenantId = tid == null ? 0L : tid;
+        long tid = tenantId == null ? 0L : tenantId;
         // storeId 非空时 createForKb 走 resolveBoundEngine（tenantEngines 不参与）
         return RetrieveEngineFactories.createForKb(retrieveEngineRegistry, storeOwnership,
-                tenantId, kb.getVectorStoreId(), null);
+                tid, kb.getVectorStoreId(), null);
     }
 }

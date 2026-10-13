@@ -315,7 +315,7 @@ public class KnowledgeCloneService {
         }
         try {
             CompositeRetrieveEngine engine =
-                    vectorWrites.boundEngine(srcKb);
+                    vectorWrites.boundEngine(srcKb, TenantContext.currentTenantId());
             if (engine != null) {
                 Embedder emb =
                         modelRuntimeFactory.getEmbeddingModel(dst.getEmbeddingModelId());

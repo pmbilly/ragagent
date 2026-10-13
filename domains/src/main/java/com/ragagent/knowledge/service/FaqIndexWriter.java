@@ -166,7 +166,7 @@ public class FaqIndexWriter {
             }
         }
         CompositeRetrieveEngine boundEngine =
-                vectorWrites.boundEngine(kb);
+                vectorWrites.boundEngine(kb, tid);
         if (boundEngine != null) {
             try {
                 Embedder emb =
@@ -235,7 +235,7 @@ public class FaqIndexWriter {
         }
         long size = VectorStoreService.estimateStorageSize(rows, embeddingDimensions(embeddingModel));
         CompositeRetrieveEngine boundEngine =
-                vectorWrites.boundEngine(kb);
+                vectorWrites.boundEngine(kb, tid);
         if (boundEngine != null) {
             try {
                 Embedder emb =

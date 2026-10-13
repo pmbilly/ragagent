@@ -522,7 +522,7 @@ public class FaqEntryCommandService {
         // 绑定 store 的 KB 走引擎口（deleteByChunkIdList + batchIndex）
         CompositeRetrieveEngine boundEngine =
                 (!enabledUpdates.isEmpty() || !tagUpdates.isEmpty())
-                        ? vectorWrites.boundEngine(kb) : null;
+                        ? vectorWrites.boundEngine(kb, tid) : null;
         if (boundEngine != null) {
             try {
                 if (!enabledUpdates.isEmpty()) {

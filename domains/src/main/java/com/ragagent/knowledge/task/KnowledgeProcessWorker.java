@@ -359,7 +359,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
                         "model_id", k.getEmbeddingModelId() == null
                                 ? "" : k.getEmbeddingModelId()));
         CompositeRetrieveEngine boundEngine =
-                vectorWrites.boundEngine(kb);
+                vectorWrites.boundEngine(kb, k.getTenantId());
         if (boundEngine != null) {
             Embedder embedderRuntime =
                     modelRuntimeFactory.getEmbeddingModel(kb.getEmbeddingModelId());
@@ -503,7 +503,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
      */
     private void deleteKnowledgeVectors(Knowledge k, KnowledgeBase kb,
                                         EmbedderClient.EmbedConfig embedConfig, String knowledgeId) {
-        CompositeRetrieveEngine boundEngine = vectorWrites.boundEngine(kb);
+        CompositeRetrieveEngine boundEngine = vectorWrites.boundEngine(kb, k.getTenantId());
         if (boundEngine != null) {
             try {
                 Embedder emb =

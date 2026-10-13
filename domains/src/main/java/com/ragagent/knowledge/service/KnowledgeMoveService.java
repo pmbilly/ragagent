@@ -300,7 +300,7 @@ public class KnowledgeMoveService {
      */
     private void deleteKnowledgeVectorRows(Knowledge row, KnowledgeBase kb, String embeddingModelId) {
         try {
-            if (vectorWrites.boundEngine(kb) instanceof
+            if (vectorWrites.boundEngine(kb, TenantContext.currentTenantId()) instanceof
                     CompositeRetrieveEngine engine) {
                 Embedder emb =
                         modelRuntimeFactory.getEmbeddingModel(embeddingModelId);
@@ -352,7 +352,7 @@ public class KnowledgeMoveService {
                     "knowledge " + knowledgeId + " uses a different embedding model");
         }
         try {
-            if (vectorWrites.boundEngine(sourceKb) instanceof
+            if (vectorWrites.boundEngine(sourceKb, TenantContext.currentTenantId()) instanceof
                     CompositeRetrieveEngine engine) {
                 Embedder emb =
                         modelRuntimeFactory.getEmbeddingModel(row.getEmbeddingModelId());

@@ -8,6 +8,7 @@ import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.knowledge.domain.Chunk;
@@ -142,7 +143,7 @@ public class ChunkVectorIndexer {
         // updateChunkVector 的 CreateRetrieveEngineForKB → DeleteByChunkIDList →
         // BatchIndex；未绑定保持 pg 直连，契约样例锁定行为不变）
         CompositeRetrieveEngine boundEngine =
-                vectorWrites.boundEngine(kb);
+                vectorWrites.boundEngine(kb, TenantContext.currentTenantId());
         if (boundEngine != null) {
             indexAndStoreViaEngine(kb, boundEngine, chunks);
             return;

@@ -346,7 +346,7 @@ public class KnowledgeTagService {
         CompositeRetrieveEngine boundEngine = null;
         int dim = 0;
         try {
-            boundEngine = vectorWrites.boundEngine(kb);
+            boundEngine = vectorWrites.boundEngine(kb, TenantContext.currentTenantId());
             if (boundEngine != null) {
                 dim = modelRuntimeFactory.getEmbeddingModel(kb.getEmbeddingModelId()).getDimensions();
             }
