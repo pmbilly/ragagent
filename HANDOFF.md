@@ -520,7 +520,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B242 | 2 | A3：可关闭模型流（句柄 + `ThinkPhase` 取消 probe + 装饰器队列关闭语义） | ✅ 2026-10-13 |
 | B243 | 2 | A5：跨线程上下文传播（NORMAL 消费线程 / STOP watcher replay） | ✅ 2026-10-13 |
 | B244 | 2 | A18 状态所有权规则（phase 不回引 runner / 无公共可变运行态字段） | ✅ 2026-10-13 |
-| B245 | 3 任务可靠 | K4：CAS 保护整轮数据（失败清场限本代；`KnowledgeParseService` 排斥处理中） | ⬜ |
+| B245 | 3 任务可靠 | K4：CAS 保护整轮数据（终态写入按尝试守卫 + 失败清场限本代；接管语义保留） | ✅ 2026-10-13 |
 | B246 | 3 | K5：图任务失败/重试/计数同一契约（`finalAttempt` 消费、异常不吞、任务级去重） | ⬜ |
 | B247 | 3 | K6：主任务恢复口径统一（**拍板点②**：判据分裂先修；持久化深度待定） | ⬜ |
 | B248 | 4 索引/配置 | K10a：embedding 响应对齐校验（`index` 消费 + 数量/维度校验 + 乱序拒绝） | ⬜ |
@@ -701,6 +701,13 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **失败上报唯一所有者**（清理 B240 登记的观察项）：`AgentEngine` 的 catch 把闸门内**非契约异常**统一收编为 `AgentEngineException`（新增 `(message, state, cause)` 重载；消息沿用 `BizException.wireText` 口径，保留 state 与 cause）；`SessionAgentQaService` 按类型分流——引擎异常只留带栈日志（**不再补发第二份 error**），其他 `RuntimeException`（引擎入口自身失败：建 span / 组装 prompt / 建工具集）仍兜底上报。原先两条路径都发，客户端会看到两次报错。
 - **验证口径**：两条规则以首跑实测为准（空基线 → 报告回填，同 B233）；失败上报分流无直接单测（会话层装配重），由全量套件 + B240 的"恰好一份 error + 一份终态"引擎测试共同约束。
 - **闸门**：`spotlessCheck build` ✓ **1m40s** ✓ · **4934 / 失败 0 / 跳过 4** ✓（+2 = 新规则）· 十一守卫 ✓。
+
+**✅ B245（2026-10-13，K4 按尝试划界：终态写入 CAS + 失败清场限本代）**
+- **缺口**（方案 K4）：pending→processing 有 CAS，但**整轮数据**没有——① `failOrComplete` 终态写入只按 ID 更新（cancel/delete/接管后的行会被旧尝试翻状态）；② 失败清场按 `knowledgeId` 删全部 chunks/向量（接管后连坐删掉新尝试的数据）。
+- **修复**：① 两处终态写入加 CAS 守卫——完成要求行仍为 `processing` **或** `finalizing`（后者=本次 `promoteFinalizing` 原子晋升过）、失败要求行仍为 `processing`；被抢走的行不再被旧尝试覆盖（**旧 generation 不覆盖**），跳过时打日志。② 失败清场改为**按本次尝试的 chunk 清单**精确删（`attemptChunkIds`）；清单未知（落行阶段自身抛错、可能已部分落行）才退回知识粒度兜底（warn 标注）。
+- **范围决定（重要，已撤销原计划的"排斥处理中"）**：**重解析的接管语义保留**——Go 合约金片 `kg-reparse-null-config` 期望连点两次第二次 **200**，且实测该行的 processing 状态由进程内 worker 时序决定（改判 400 会让金片随机红）。方案 K4 标题即"CAS 只保护接管、**不保护整轮数据**"⇒ 根治方向是"按尝试划界"而非拒绝接管；本批据此改口径（批次表行已同步）。
+- **登记（后续）**：① **向量行仍是知识粒度**（现有 API 只有 `DeleteByKnowledgeIDList` / `deleteByKnowledgeId`）——接管场景下旧尝试仍可能删掉新尝试刚写的向量行；完整按代隔离需给 chunks 加代次列（`parse_attempt`）或补 chunk 粒度删除 API。② 批量重解析 / 重建索引仍会在处理中 reset（与单条同源，需上面的代次列才能统一）。③ `KnowledgeFileService` 的 `pending_subtasks_count` 归 B246（K5 计数契约）。
+- **验证**：知识操作合约测试（含 6 条 reparse 金片）✓ · 全量 **4934 / 失败 0 / 跳过 4** ✓ · 十一守卫 ✓（含模块代码约定：内联全限定名；大文件棘轮：本文件 871 行 = 基线 847 + 24，仍在 +30 余量内——论证细节在本记录，代码里只留要点）。**本批无新增单测**（worker 无测试基建；改动为守卫与清场范围，已登记）。
 
 ## 附：文档地图与归档追溯
 

@@ -235,20 +235,20 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
             }
             EmbedderClient.EmbedConfig embedConfig = resolveEmbedConfig(k, kb);
             preCleanKnowledge(k, kb, embedConfig, knowledgeId);
+            // K4：记下本次尝试的 chunk id——失败清场只删它们（见 cleanupFailedAttempt）。
+            List<String> attemptChunkIds = List.of();
             try {
                 String markdown = extractMarkdown(k, attempt, knowledgeId);
                 if (knowledgeMapper.selectById(knowledgeId).isAborted()) {
                     return; // 中途取消检查点
                 }
                 List<Chunk> chunks = chunkAndPersist(k, kb, knowledgeId, markdown, attempt);
+                attemptChunkIds = chunks.stream().map(Chunk::getId).toList();
                 embedChunks(k, kb, embedConfig, chunks, knowledgeId, attempt);
                 skipStageSpan(attempt, knowledgeId, KnowledgeProcessingSpan.STAGE_MULTIMODAL, "skipped");
                 finalizeProcessing(k, kb, knowledgeId, attempt, chunks);
             } catch (Exception inner) {
-                // 失败清场：本次 chunks + 向量行（向量化未启用时只清 chunks）
-                chunkMapper.delete(new LambdaQueryWrapper<Chunk>()
-                        .eq(Chunk::getKnowledgeId, knowledgeId));
-                deleteKnowledgeVectors(k, kb, embedConfig, knowledgeId);
+                cleanupFailedAttempt(knowledgeId, attemptChunkIds, k, kb, embedConfig);
                 throw inner;
             }
         } catch (Exception e) {
@@ -258,6 +258,19 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
             log.warn("process knowledge {} failed: {}", knowledgeId, e.toString());
             failOrComplete(knowledgeId, attempt, message);
         }
+    }
+
+    /** 失败清场（K4：按尝试划界——只删本次产出的 chunks；清单未知时退回知识粒度兜底；向量仍知识粒度）。 */
+    private void cleanupFailedAttempt(String knowledgeId, List<String> attemptChunkIds,
+            Knowledge k, KnowledgeBase kb, EmbedderClient.EmbedConfig embedConfig) {
+        if (attemptChunkIds.isEmpty()) {
+            log.warn("[KnowledgeProcess] no enumerable chunks; knowledge-wide cleanup for {}", knowledgeId);
+            chunkMapper.delete(new LambdaQueryWrapper<Chunk>()
+                    .eq(Chunk::getKnowledgeId, knowledgeId));
+        } else {
+            chunkMapper.deleteBatchIds(attemptChunkIds);
+        }
+        deleteKnowledgeVectors(k, kb, embedConfig, knowledgeId);
     }
 
     /** 预清理：删旧 chunks 行（无条件）+ 该知识全部向量行（仅向量化启用且模型可用）+ 旧图谱（失败仅告警）。 */
@@ -773,6 +786,9 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
             boolean summaryModelConfigured = hasSummaryModel(rowKb);
             LambdaUpdateWrapper<Knowledge> completeUpdate = new LambdaUpdateWrapper<Knowledge>()
                     .eq(Knowledge::getId, knowledgeId)
+                    // K4 CAS：只有仍由本次尝试占用的行（processing / finalizing）才许翻终态。
+                    .in(Knowledge::getParseStatus,
+                            List.of(Knowledge.PARSE_PROCESSING, Knowledge.PARSE_FINALIZING))
                     .set(Knowledge::getParseStatus, Knowledge.PARSE_COMPLETED)
                     .set(Knowledge::getEnableStatus, "enabled")
                     .set(Knowledge::getProcessedAt, OffsetDateTime.now(ZoneOffset.UTC))
@@ -780,7 +796,10 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
             if (summaryModelConfigured) {
                 completeUpdate.set(Knowledge::getSummaryStatus, "none");
             }
-            knowledgeMapper.update(null, completeUpdate);
+            int completedRows = knowledgeMapper.update(null, completeUpdate);
+            if (completedRows == 0) {
+                log.info("[KnowledgeProcess] completion write skipped for {}: row not owned", knowledgeId);
+            }
             if (summaryModelConfigured) {
                 spawnSummaryFanOut(knowledgeId);
             }
@@ -791,11 +810,16 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
                         KnowledgeProcessingSpan.STATUS_DONE, null, "", "");
             }
         } else {
-            knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+            // K4 CAS：只有仍由本次处理占用的行（processing）才许翻 failed。
+            int failedRows = knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
                     .eq(Knowledge::getId, knowledgeId)
+                    .eq(Knowledge::getParseStatus, Knowledge.PARSE_PROCESSING)
                     .set(Knowledge::getParseStatus, Knowledge.PARSE_FAILED)
                     .set(Knowledge::getErrorMessage, abbreviate(error))
                     .set(Knowledge::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC)));
+            if (failedRows == 0) {
+                log.info("[KnowledgeProcess] failure write skipped for {}: row not processing", knowledgeId);
+            }
             // 非阶段失败（模型解析/预清理等）没有 failSpan 收口 → 显式 finalize（幂等）
             if (attempt > 0) {
                 spanTracker.finalizeAttempt(knowledgeId, attempt,

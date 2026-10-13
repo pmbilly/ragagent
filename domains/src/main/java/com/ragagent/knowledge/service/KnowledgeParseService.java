@@ -40,6 +40,16 @@ public class KnowledgeParseService {
         this.worker = worker;
     }
 
+    /**
+     * 重解析（reset + 入队）。
+     *
+     * <p>K4 说明：**接管语义保留**（Go 合约：连点两次重解析第二次返回 200 ——
+     * {@code kg-reparse-null-config} 金片；对用户而言"再点一次就再跑一遍"也合理）。
+     * 危险不在接管本身，而在"接管后旧尝试仍能写终态 / 清场到新尝试的数据"——那两处
+     * 已按尝试划界（见 {@code KnowledgeProcessWorker.failOrComplete} 的 CAS 守卫与
+     * 失败清场范围说明）；若要改成"处理中拒绝重解析"，需先有代次列（parse_attempt）才能
+     * 把清场与终态写入完全按代隔离（登记在 HANDOFF §15.4 B245）。</p>
+     */
     public Knowledge reparseKnowledge(String id) {
         Knowledge existing = folderService.loadKnowledgeWrite(id);
         KnowledgeBase kb = access.requireKb(existing.getKnowledgeBaseId());
