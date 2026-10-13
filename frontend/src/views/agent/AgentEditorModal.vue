@@ -5222,7 +5222,7 @@ const handleSave = async () => {
 }
 
 .content-wrapper::-webkit-scrollbar-thumb {
-  background: var(--td-gray-color-5);
+  background: transparent;
   border-radius: 3px;
 }
 

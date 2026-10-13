@@ -1625,12 +1625,12 @@ watch(() => chatResources.allModels, (list) => {
 
 .close-btn {
   position: absolute;
-  top: 20px;
-  right: 20px;
+  top: 16px;
+  right: 16px;
   width: 32px;
   height: 32px;
   border: none;
-  background: var(--td-bg-color-secondarycontainer);
+  background: transparent;
   border-radius: 6px;
   cursor: pointer;
   display: flex;
@@ -2012,6 +2012,38 @@ watch(() => chatResources.allModels, (list) => {
   display: flex;
   gap: 12px;
   flex-shrink: 0;
+}
+
+/* 滚动条：与设置弹窗一致 */
+.settings-nav::-webkit-scrollbar,
+.content-wrapper::-webkit-scrollbar {
+  width: 6px;
+}
+
+.settings-nav::-webkit-scrollbar-track {
+  background: var(--td-bg-color-secondarycontainer);
+}
+
+.settings-nav::-webkit-scrollbar-thumb {
+  background: var(--td-gray-color-5);
+  border-radius: 3px;
+}
+
+.settings-nav::-webkit-scrollbar-thumb:hover {
+  background: var(--td-gray-color-6);
+}
+
+.content-wrapper::-webkit-scrollbar-track {
+  background: var(--td-bg-color-container);
+}
+
+.content-wrapper::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 3px;
+}
+
+.content-wrapper::-webkit-scrollbar-thumb:hover {
+  background: var(--td-gray-color-6);
 }
 
 // 过渡动画
