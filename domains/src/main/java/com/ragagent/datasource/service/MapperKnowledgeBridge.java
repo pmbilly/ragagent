@@ -1,5 +1,7 @@
 package com.ragagent.datasource.service;
 
+import com.ragagent.knowledge.support.KnowledgePaths;
+
 import com.ragagent.knowledge.service.DuplicateKnowledgeException;
 
 import com.ragagent.common.jdbc.DatabaseDialects;
@@ -378,19 +380,9 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
 
     /**
      * 从 URL 提取文件名（去 query 串、取最后一段；空则 {@code "download"}）。
-     */
+     */    /** B263⑧：与 {@code knowledge.support.KnowledgePaths} 逐字等价，改为委托（§9.2 单一实现）。 */
     static String extractFileNameFromUrl(String url) {
-        if (url == null) {
-            return "download";
-        }
-        String path = url;
-        int q = path.indexOf('?');
-        if (q >= 0) {
-            path = path.substring(0, q);
-        }
-        int slash = path.lastIndexOf('/');
-        String name = slash >= 0 ? path.substring(slash + 1) : path;
-        return name.isEmpty() ? "download" : name;
+        return KnowledgePaths.extractFileNameFromUrl(url);
     }
 
     /** 取最后一个点之后的小写扩展名（无点则空串）。 */

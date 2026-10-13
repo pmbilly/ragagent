@@ -1,5 +1,9 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.support.KnowledgePaths;
+
+import com.ragagent.knowledge.repository.KnowledgeRepository;
+
 
 import com.ragagent.knowledge.support.KnowledgeProjectionAdapter;
 
@@ -76,6 +80,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
             List.of("docreader", "chunking", "embedding", "multimodal", "postprocess");
 
     private final KnowledgeMapper knowledgeMapper;
+    private final KnowledgeRepository knowledgeRepository;
     private final ChunkMapper chunkMapper;
     private final KnowledgeTagMapper tagMapper;
     /** A3-3 尾批：租户感知文件存储（本地契约不变；云 provider 租户真正落对象存储）。 */
@@ -96,6 +101,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
     private final KnowledgeBatchOpsService batchOpsService;
 
     public KnowledgeService(KnowledgeMapper knowledgeMapper,
+                            KnowledgeRepository knowledgeRepository,
                             ChunkMapper chunkMapper,
                             KnowledgeTagMapper tagMapper,
                             TenantFileStorage fileStorage,
@@ -112,6 +118,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
                             KnowledgeParseService knowledgeParseService,
                             KnowledgeBatchOpsService batchOpsService) {
         this.knowledgeMapper = knowledgeMapper;
+        this.knowledgeRepository = knowledgeRepository;
         this.chunkMapper = chunkMapper;
         this.tagMapper = tagMapper;
         this.fileStorage = fileStorage;
@@ -155,11 +162,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
         }
         String hash = LocalStorageService.md5Hex(fileContent);
         // 重复文件检查
-        Knowledge dup = knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getKnowledgeBaseId, kbId)
-                .eq(Knowledge::getFileHash, hash)
-                .isNull(Knowledge::getDeletedAt)
-                .last("LIMIT 1"));
+        Knowledge dup = knowledgeRepository.findDuplicateByHash(kbId, hash);
         if (dup != null) {
             throw new DuplicateKnowledgeException(dup, ErrorCode.KNOWLEDGE_DUPLICATE_FILE,
                     "文件已存在（相同内容）");
@@ -175,7 +178,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
         k.setFileHash(hash);
         k.setFilePath(fileStorage.save(tenantId(), k.getId(), fileName, fileContent));
         k.setCustomMetadata(mergeCustomMetadata(customMetadata));
-        knowledgeMapper.insert(k);
+        knowledgeRepository.insert(k);
         knowledgeQueue.enqueue(k.getId());
         return k;
     }
@@ -186,16 +189,12 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
         KnowledgeBase kb = requireKb(kbId);
         byte[] content = UrlBytesFetcher.fetch(url);
         String hash = LocalStorageService.md5Hex(content);
-        Knowledge dup = knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getKnowledgeBaseId, kbId)
-                .eq(Knowledge::getSource, url)
-                .isNull(Knowledge::getDeletedAt)
-                .last("LIMIT 1"));
+        Knowledge dup = knowledgeRepository.findDuplicateBySource(kbId, url);
         if (dup != null) {
             throw new DuplicateKnowledgeException(dup, ErrorCode.KNOWLEDGE_DUPLICATE_URL,
                     "URL 已存在");
         }
-        String fname = fileName != null && !fileName.isEmpty() ? fileName : extractFileNameFromUrl(url);
+        String fname = fileName != null && !fileName.isEmpty() ? fileName : KnowledgePaths.extractFileNameFromUrl(url);
         Knowledge k = newKnowledge(kb, "file", title != null && !title.isEmpty() ? title : fname, channel);
         k.setSource(url);
         k.setFileName(fname);
@@ -205,7 +204,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
         k.setFileHash(hash);
         k.setFilePath(fileStorage.save(tenantId(), k.getId(), fname, content));
         k.setCustomMetadata(mergeCustomMetadata(null));
-        knowledgeMapper.insert(k);
+        knowledgeRepository.insert(k);
         knowledgeQueue.enqueue(k.getId());
         return k;
     }
@@ -219,7 +218,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
         }
         Knowledge k = newKnowledge(kb, "manual", title, channel);
         k.setSource("manual");
-        k.setFileName(ensureManualFileName(title));
+        k.setFileName(KnowledgePaths.ensureManualFileName(title));
         k.setFilePath("");
         k.setFileType("manual");
         k.setFileSize(0L);
@@ -236,7 +235,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
         if ("draft".equals(status)) {
             k.setParseStatus("draft");
         }
-        knowledgeMapper.insert(k);
+        knowledgeRepository.insert(k);
         if ("publish".equals(status)) {
             knowledgeQueue.enqueue(k.getId());
         }
@@ -267,12 +266,12 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
         }
 
         Knowledge k = newKnowledge(kb, "passage", "", channel);
-        knowledgeMapper.insert(k);
+        knowledgeRepository.insert(k);
 
         // 先原子翻 processing 再处理
         k.setParseStatus(Knowledge.PARSE_PROCESSING);
         k.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
-        knowledgeMapper.updateById(k);
+        knowledgeRepository.updateById(k);
 
         processPassagesSync(kb, k, safePassages);
         return k;
@@ -328,7 +327,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
         k.setEnableStatus("enabled");
         k.setProcessedAt(now);
         k.setUpdatedAt(now);
-        knowledgeMapper.updateById(k);
+        knowledgeRepository.updateById(k);
     }
 
     private Knowledge newKnowledge(KnowledgeBase kb, String type, String title, String channel) {
@@ -358,24 +357,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
     }
 
     /** 同包开放（KnowledgeSummaryPipelineService.updateManualKnowledge 复用）。 */
-    static String ensureManualFileName(String title) {
-        String base = title == null || title.isBlank() ? "manual" : title.trim();
-        return base.endsWith(".md") ? base : base + ".md";
-    }
 
-    static String extractFileNameFromUrl(String url) {
-        if (url == null) {
-            return "download";
-        }
-        String path = url;
-        int q = path.indexOf('?');
-        if (q >= 0) {
-            path = path.substring(0, q);
-        }
-        int slash = path.lastIndexOf('/');
-        String name = slash >= 0 ? path.substring(slash + 1) : path;
-        return name.isEmpty() ? "download" : name;
-    }
 
     // ── 查询 / 更新 / 删除 ────────────────────────────────────────────────
 
@@ -482,7 +464,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
             }
         }
         k.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
-        knowledgeMapper.updateById(k);
+        knowledgeRepository.updateById(k);
         return getKnowledge(id);
     }
 

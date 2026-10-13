@@ -921,6 +921,15 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **偶发测试（记录）**：全量跑时 `RedisWikiDeletedTombstoneStoreTest.clearRemovesTombstone` 失败一次，**单跑即过** ⇒ Redis 依赖型偶发，与本步改动无关（本步未触碰 wiki/Redis 路径）。
 - **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m34s** ✓ 十一守卫 ✓（13 组 SCC 未变）。
 - **登记（余步）**：`KnowledgeService` 仍有 748 行/60 方法，继续按目标树抽（`service.management/*` use-case、`repository/KnowledgeRepository`）；`KnowledgeFileService`(422/2)、`KnowledgeBaseService`(626/18)；最后一对 `task ⇄ service` 余 7 处。
+
+**🔶 B263 第⑧步（2026-10-14，`repository/KnowledgeRepository` 落位 + §9.2 重复实现合并）**
+- **`repository/KnowledgeRepository`（§8.8.2 目标类）**：从 `KnowledgeService` 抽出 4 个行级操作——`findDuplicateByHash(kbId, hash)` / `findDuplicateBySource(kbId, url)`（未软删 + `LIMIT 1`）/ `insert(Knowledge)` / `updateById(Knowledge)`；**契约写进类头**：本层只做数据访问、**不抛业务异常**（重复冲突仍由 service 侧判定并抛 `DuplicateKnowledgeException`）、不依赖任何 service 类型，方向恒为 repository ← service（避免复活 B263② 断掉的边）。改走仓储的调用点 **9 处**（2 处重复查询 + 7 处 insert/updateById）⇒ 枢纽内 `knowledgeMapper.insert/updateById` 归零。
+- **`support/KnowledgePaths` + 一次 §9.2 合并**：`ensureManualFileName` / `extractFileNameFromUrl` 由 `KnowledgeService` 迁出；同时发现 `datasource/service/MapperKnowledgeBridge` 有一份**同名私有实现**——逐字比对（各 13 行、规范化后 diff 为空 ✓）**确认等价**后合并为单一实现，datasource 侧改为**委托**调用（这是本批次第一次主动收掉"同一规则两份实现"）。
+- **顺带查明**：`KnowledgeService.normalizeKnowledgeFolderPath` 只是**转发**（真实现在 `KnowledgeFolderService`，附带 `stripTrailing`/UTF-8 截断等逻辑）⇒ 本步不动，登记随 `KnowledgeFolderService` 的归位一起处理（避免把 60+ 行文件夹路径规则塞进 support 再迁一次）。
+- **自查一坑**：`MapperKnowledgeBridge` 的委托第一版写成内联 FQN（R8 守卫的典型目标）⇒ 在跑守卫前先改成 import 化 ✓。
+- **结果**：`KnowledgeService` **748 → 726 行**（B263⑦+⑧ 累计 **799 → 726**，-73）；新增 `repository/KnowledgeRepository`、`support/KnowledgePaths`。
+- **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m38s** ✓ 十一守卫 ✓（包级 SCC 仍 13 组、`{service, task}` 2 成员）。
+- **登记（余步）**：`KnowledgeService` 726 行继续抽（`service.management/*` use-case、剩余 mapper 直连 8 处）；`KnowledgeFileService`(422/2)、`KnowledgeBaseService`(626/18)；`normalizeKnowledgeFolderPath` 真实现随 `KnowledgeFolderService` 归位；`task ⇄ service` 余 7 处。
 - **登记（余步）**：⑦ `KnowledgeService`(799 行/28 引用) 拆分（**优先级最高：行数已到阈值边缘**）；⑧ `KnowledgeFileService`(422/2)、`KnowledgeParseService` 余部、`KnowledgeBaseService`(626/18)；⑨ 最后一对 `task ⇄ service`（`task→service` 现余 **7**：`ChunkExtractService`3 / `QuestionGenerationService`3 / `SpanTracker`）；⑩ `service` 七子面、`domain.{document,task,graph}`、`mapper` 目标名对齐。
 - **登记（余步）**：按最轻优先继续——`ChunkVectorIndexer`(386/2)、`KnowledgeFileService`(422/2)、`KnowledgeParseService` 余部、`KnowledgeBaseService`(626/18)、`KnowledgeService`(796/28)；一律"切分而非整搬"。`task → service` 现余 8 处（`ChunkExtractService`3 / `QuestionGenerationService`3 / `SpanTracker` / `ChunkVectorIndexer`）。
 

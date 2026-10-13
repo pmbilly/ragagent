@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.support.KnowledgePaths;
+
 import com.ragagent.common.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -125,7 +127,7 @@ public class KnowledgeFileService {
             existing.setTitle("手工知识-" + DateTimeFormatter
                     .ofPattern("yyyyMMdd-HHmmss").format(OffsetDateTime.now()));
         }
-        existing.setFileName(KnowledgeService.ensureManualFileName(existing.getTitle()));
+        existing.setFileName(KnowledgePaths.ensureManualFileName(existing.getTitle()));
         existing.setFileType("manual");
         existing.setType("manual");
         existing.setSource("manual");
