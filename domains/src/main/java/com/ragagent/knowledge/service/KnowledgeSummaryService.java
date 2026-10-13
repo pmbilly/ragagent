@@ -1,5 +1,8 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
+import com.ragagent.knowledge.repository.KnowledgeRepository;
+
 import com.ragagent.knowledge.support.ChunkProjectionAdapter;
 
 import java.time.OffsetDateTime;
@@ -9,8 +12,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.AppError;
@@ -21,10 +22,7 @@ import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.mapper.ChunkMapper;
 import com.ragagent.knowledge.repository.ChunkRepository;
-import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
-import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import com.ragagent.knowledge.task.KnowledgeProcessedEvent;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
@@ -53,9 +51,8 @@ public class KnowledgeSummaryService {
 
     private static final Logger log = LoggerFactory.getLogger(KnowledgeSummaryService.class);
 
-    private final KnowledgeMapper knowledgeMapper;
-    private final KnowledgeBaseMapper kbMapper;
-    private final ChunkMapper chunkMapper;
+    private final KnowledgeRepository knowledgeRepository;
+    private final KnowledgeBaseRepository kbRepository;
     private final ChunkRepository chunkRepo;
     private final ModelRuntimeFactory modelRuntimeFactory;
     private final ChunkVectorIndexer chunkVectorIndexer;
@@ -67,9 +64,8 @@ public class KnowledgeSummaryService {
 
     public KnowledgeSummaryService(
         KnowledgeTaskExecutor taskExecutor,
-                            KnowledgeMapper knowledgeMapper,
-                            KnowledgeBaseMapper kbMapper,
-                            ChunkMapper chunkMapper,
+                            KnowledgeRepository knowledgeRepository,
+                            KnowledgeBaseRepository kbRepository,
                             ChunkRepository chunkRepo,
                             ModelRuntimeFactory modelRuntimeFactory,
                             ChunkVectorIndexer chunkVectorIndexer,
@@ -78,9 +74,8 @@ public class KnowledgeSummaryService {
                             KnowledgeAccessHelper access) {
 
         this.taskExecutor = taskExecutor;
-        this.knowledgeMapper = knowledgeMapper;
-        this.kbMapper = kbMapper;
-        this.chunkMapper = chunkMapper;
+        this.knowledgeRepository = knowledgeRepository;
+        this.kbRepository = kbRepository;
         this.chunkRepo = chunkRepo;
         this.modelRuntimeFactory = modelRuntimeFactory;
         this.chunkVectorIndexer = chunkVectorIndexer;
@@ -124,11 +119,7 @@ public class KnowledgeSummaryService {
     }
 
     private Knowledge doRegenerateKnowledgeSummary(String id, boolean willRetry) {
-        Knowledge knowledge = knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getId, id)
-                .eq(Knowledge::getTenantId, KnowledgeService.tenantId())
-                .isNull(Knowledge::getDeletedAt)
-                .last("LIMIT 1"));
+        Knowledge knowledge = knowledgeRepository.findById(KnowledgeService.tenantId(), id);
         if (knowledge == null) {
             throw BizException.notFound("record not found");
         }
@@ -207,7 +198,7 @@ public class KnowledgeSummaryService {
                 chunk.setSourceContent(chunk.getContent());
                 chunk.setIsEnabled(true);
                 chunk.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
-                chunkMapper.updateById(chunk);
+                chunkRepo.updateById(chunk);
                 summaryChunks.add(chunk);
             }
             if (summaryChunks.isEmpty()) {
@@ -225,7 +216,7 @@ public class KnowledgeSummaryService {
                 summaryChunk.setParentChunkId(textChunks.get(0).getId());
                 summaryChunk.setCreatedAt(now);
                 summaryChunk.setUpdatedAt(now);
-                chunkMapper.insert(summaryChunk);
+                chunkRepo.insert(summaryChunk);
                 summaryChunks.add(summaryChunk);
             }
             chunkVectorIndexer.updateChunkVector(knowledge.getKnowledgeBaseId(), summaryChunks);
@@ -316,11 +307,7 @@ public class KnowledgeSummaryService {
      */
     private boolean summarySourceChanged(long tenantId, String knowledgeId,
                                          String metadataVersion, List<Chunk> sourceChunks) {
-        Knowledge latest = knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getId, knowledgeId)
-                .eq(Knowledge::getTenantId, tenantId)
-                .isNull(Knowledge::getDeletedAt)
-                .last("LIMIT 1"));
+        Knowledge latest = knowledgeRepository.findById(tenantId, knowledgeId);
         if (latest == null) {
             throw BizException.notFound("record not found");
         }
@@ -552,10 +539,7 @@ public class KnowledgeSummaryService {
      * TenantContext（worker 线程无上下文）。</p>
      */
     public void requestPostProcessSummaryGeneration(String knowledgeId) {
-        Knowledge k = knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getId, knowledgeId)
-                .isNull(Knowledge::getDeletedAt)
-                .last("LIMIT 1"));
+        Knowledge k = knowledgeRepository.findByIdOnly(knowledgeId);
         if (k == null) {
             return;
         }
@@ -564,10 +548,7 @@ public class KnowledgeSummaryService {
                 || Knowledge.PARSE_DELETING.equals(parseStatus)) {
             return;
         }
-        KnowledgeBase kb = kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getId, k.getKnowledgeBaseId())
-                .isNull(KnowledgeBase::getDeletedAt)
-                .last("LIMIT 1"));
+        KnowledgeBase kb = kbRepository.findByIdOnly(k.getKnowledgeBaseId());
         if (kb == null) {
             return;
         }
@@ -577,9 +558,7 @@ public class KnowledgeSummaryService {
             return;
         }
         // pending 先落库再异步执行
-        knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
-                .eq(Knowledge::getId, knowledgeId)
-                .set(Knowledge::getSummaryStatus, SUMMARY_PENDING));
+        knowledgeRepository.setSummaryStatus(knowledgeId, SUMMARY_PENDING);
         spawnSummaryRefreshWorker(knowledgeId, k.getTenantId());
     }
 
@@ -595,11 +574,7 @@ public class KnowledgeSummaryService {
      * 进程内虚拟线程执行刷新，重试上限 MaxRetry(3)。
      */
     public void requestKnowledgeSummaryRefresh(String id) {
-        Knowledge k = knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getId, id)
-                .eq(Knowledge::getTenantId, KnowledgeService.tenantId())
-                .isNull(Knowledge::getDeletedAt)
-                .last("LIMIT 1"));
+        Knowledge k = knowledgeRepository.findById(KnowledgeService.tenantId(), id);
         if (k == null) {
             throw BizException.notFound("record not found");
         }
@@ -613,16 +588,12 @@ public class KnowledgeSummaryService {
             throw new BizException(AppError.badRequest("summary model is not configured"));
         }
         // pending 必须先落库
-        knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
-                .eq(Knowledge::getId, k.getId())
-                .set(Knowledge::getSummaryStatus, SUMMARY_PENDING));
+        knowledgeRepository.setSummaryStatus(k.getId(), SUMMARY_PENDING);
         spawnSummaryRefreshWorker(k.getId(), k.getTenantId());
     }
 
     private void markSummaryFailed(String knowledgeId) {
-        knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
-                .eq(Knowledge::getId, knowledgeId)
-                .set(Knowledge::getSummaryStatus, SUMMARY_FAILED));
+        knowledgeRepository.setSummaryStatus(knowledgeId, SUMMARY_FAILED);
     }
 
     /**

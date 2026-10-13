@@ -921,6 +921,11 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **偶发测试（记录）**：全量跑时 `RedisWikiDeletedTombstoneStoreTest.clearRemovesTombstone` 失败一次，**单跑即过** ⇒ Redis 依赖型偶发，与本步改动无关（本步未触碰 wiki/Redis 路径）。
 - **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m34s** ✓ 十一守卫 ✓（13 组 SCC 未变）。
 - **登记（余步）**：
+**🔶 B263 第㉒步（2026-10-14，`KnowledgeSummaryService` 归仓储：687 → 661 行）**
+- **只新增 1 个仓储方法**：`KnowledgeRepository.setSummaryStatus(id, status)`（pending/failed 两态共用，5 处调用点收敛）；其余 9 处**全部复用**——`findById(tenantId, id)`（2 处）、`findByIdOnly(id)`（**无租户**的 post-process 读，语义正合）、`KnowledgeBaseRepository.findByIdOnly(id)`、以及类里**本来就有的** `chunkRepo`（`chunkMapper` 是历史遗留的第二个入口 ⇒ 删掉，`updateById`/`insert` 改走 `chunkRepo`）。
+- **连带**：A17 删 1 条（A16 条目保留——仍依赖 task 面）；死成员守卫点名的 2 个未使用 import 清掉；构造器去掉 `ChunkMapper` 参数。
+- **测试**：4978 / 失败 0 / 跳过 4 ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m41s** ✓ 十一守卫 ✓（环 0 / SCC 13 组未变）。
+- **登记（余步）**：
 **🔶 B263 第㉑步（2026-10-14，`KnowledgeBatchOpsService` 归仓储：148 → 126 行）**
 - **新增 3 个仓储方法**（都是"条件/批量"形态，逐字搬 SQL）：`softDeleteIfActive(id, now)`（**带 `isNull(deleted_at)`** 的软删——与既有 `softDelete(id, now)` 的区别就在这个条件，故**不复用**、单列并写明差异）、`setParseStatusDeleting(ids, now)`、`updateStatusColumns(id, parseStatus, errorMessage, enable, now)`（把 worker 的**条件列更新**语义整块搬进仓储：`errorMessage`/`enable` 为 `null` 表示不更新该列）。
 - **复用既有**：`chunkMapper.update(...set deleted_at)` → `ChunkRepository.softDeleteByKnowledgeId`（实现逐字相同，已核对）；两处 `selectList(kbId + tenant + 未软删)` → `listByTenantAndKb`；`selectById(id)` → `findByIdAny`（⑱ 新增的"不过滤软删"读法，正好用于 worker 跨请求线程加载）。

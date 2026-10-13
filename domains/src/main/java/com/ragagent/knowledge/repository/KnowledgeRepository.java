@@ -369,6 +369,13 @@ public class KnowledgeRepository {
         return knowledgeMapper.update(null, uw);
     }
 
+    /** 只写 {@code summary_status}（pending/failed 等；B263㉒ 由 service 直连归位）。 */
+    public int setSummaryStatus(String id, String summaryStatus) {
+        return knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, id)
+                .set(Knowledge::getSummaryStatus, summaryStatus));
+    }
+
     /** 按主键整行更新。 */
     public void updateById(Knowledge k) {
         knowledgeMapper.updateById(k);

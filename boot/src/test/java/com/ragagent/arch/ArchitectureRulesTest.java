@@ -803,7 +803,6 @@ class ArchitectureRulesTest {
             "com.ragagent.knowledge.service.KnowledgeCloneService",
             "com.ragagent.knowledge.service.KnowledgeMoveService",
             "com.ragagent.knowledge.service.KnowledgeService",
-            "com.ragagent.knowledge.service.KnowledgeSummaryService",
             "com.ragagent.knowledge.service.QuestionGenerationService",
             "com.ragagent.memory.service.InProcessMemoryExtractTaskQueue",
             "com.ragagent.memory.service.MemoryExtractionService",
