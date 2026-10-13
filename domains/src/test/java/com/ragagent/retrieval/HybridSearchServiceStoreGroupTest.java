@@ -73,7 +73,7 @@ class HybridSearchServiceStoreGroupTest {
         registry = mock(RetrieveEngineRegistry.class);
         ownership = mock(TenantStoreOwnership.class);
         service = new HybridSearchService(kbGateway, documentGateway, chunkGateway, modelGateway,
-                tenantService, embeddingGateway, pgRepository, registry, ownership,
+                tenantService, embeddingGateway, registry, ownership,
                 new RetrievalDriverProperties(null)); // 与改前一致：未配置驱动 → 有效引擎为空
     }
 

@@ -1,5 +1,6 @@
 package com.ragagent.retrieval;
 
+import com.ragagent.retrieval.engine.EngineTypes;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -16,7 +17,6 @@ import com.ragagent.common.error.BizException;
 import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.KnowledgeBaseSearchFacts;
 import com.ragagent.common.pipeline.SearchParams;
-import com.ragagent.retrieval.engine.PgVectorRetrieveRepository;
 
 import com.ragagent.retrieval.HybridSearchService.RetrievalConfigView;
 import com.ragagent.retrieval.HybridSearchService.StoreGroup;
@@ -40,9 +40,9 @@ final class HybridFusionOps {
 
     // ── 融合 ─────────────────────────────────────────────────────────────
 
-    static List<PgVectorRetrieveRepository.IndexHit> fuseOrDeduplicate(
-            List<List<PgVectorRetrieveRepository.IndexHit>> vectorStores,
-            List<List<PgVectorRetrieveRepository.IndexHit>> keywordStores, RetrievalConfigView rc) {
+    static List<EngineTypes.IndexWithScore> fuseOrDeduplicate(
+            List<List<EngineTypes.IndexWithScore>> vectorStores,
+            List<List<EngineTypes.IndexWithScore>> keywordStores, RetrievalConfigView rc) {
         if (keywordStores.isEmpty()) {
             return deduplicateByScore(vectorStores);
         }
@@ -53,7 +53,7 @@ final class HybridFusionOps {
     }
 
 
-    static final Comparator<PgVectorRetrieveRepository.IndexHit> SCORE_DESC = (a, b) -> {
+    static final Comparator<EngineTypes.IndexWithScore> SCORE_DESC = (a, b) -> {
         int c = Double.compare(b.score, a.score);
         return c;
     };
@@ -64,23 +64,23 @@ final class HybridFusionOps {
      * <p>RRF 分数大量并列（不同 store 的同一名次同权），若只按分排序，并列项的顺序就由
      * 插入顺序决定 ⇒ 交换 store / KB 顺序结果会漂移（K9 验收：交换顺序结果稳定）。</p>
      */
-    static final Comparator<PgVectorRetrieveRepository.IndexHit> SCORE_THEN_ID =
+    static final Comparator<EngineTypes.IndexWithScore> SCORE_THEN_ID =
             SCORE_DESC.thenComparing(h -> h.chunkId);
 
 
     /** 单一来源（另一侧为空）：按分降序；同分保持来源顺序——同一来源内即来源名次。 */
-    static List<PgVectorRetrieveRepository.IndexHit> deduplicateByScore(
-            List<List<PgVectorRetrieveRepository.IndexHit>> stores) {
-        Map<String, PgVectorRetrieveRepository.IndexHit> chunkInfoMap = new LinkedHashMap<>();
-        for (List<PgVectorRetrieveRepository.IndexHit> store : stores) {
-            for (PgVectorRetrieveRepository.IndexHit r : store) {
-                PgVectorRetrieveRepository.IndexHit existing = chunkInfoMap.get(r.chunkId);
+    static List<EngineTypes.IndexWithScore> deduplicateByScore(
+            List<List<EngineTypes.IndexWithScore>> stores) {
+        Map<String, EngineTypes.IndexWithScore> chunkInfoMap = new LinkedHashMap<>();
+        for (List<EngineTypes.IndexWithScore> store : stores) {
+            for (EngineTypes.IndexWithScore r : store) {
+                EngineTypes.IndexWithScore existing = chunkInfoMap.get(r.chunkId);
                 if (existing == null || r.score > existing.score) {
                     chunkInfoMap.put(r.chunkId, r);
                 }
             }
         }
-        List<PgVectorRetrieveRepository.IndexHit> deduped = new ArrayList<>(chunkInfoMap.values());
+        List<EngineTypes.IndexWithScore> deduped = new ArrayList<>(chunkInfoMap.values());
         deduped.sort(SCORE_DESC);
         return deduped;
     }
@@ -92,9 +92,9 @@ final class HybridFusionOps {
      * {@code addAll} 成一个大列表，rank 退化成"拼接位置"，第二个 store 的本地第一名会被
      * 系统性降级，且结果随 store 顺序漂移。</p>
      */
-    static List<PgVectorRetrieveRepository.IndexHit> fuseWithRRF(
-            List<List<PgVectorRetrieveRepository.IndexHit>> vectorStores,
-            List<List<PgVectorRetrieveRepository.IndexHit>> keywordStores,
+    static List<EngineTypes.IndexWithScore> fuseWithRRF(
+            List<List<EngineTypes.IndexWithScore>> vectorStores,
+            List<List<EngineTypes.IndexWithScore>> keywordStores,
             RetrievalConfigView rc) {
         int rrfK = rc.effectiveRrfK();
         double vectorWeight = rc.effectiveVectorWeight();
@@ -103,24 +103,24 @@ final class HybridFusionOps {
         Map<String, Integer> vectorRanks = ranksByStore(vectorStores);
         Map<String, Integer> keywordRanks = ranksByStore(keywordStores);
 
-        Map<String, PgVectorRetrieveRepository.IndexHit> chunkInfoMap = new LinkedHashMap<>();
-        for (List<PgVectorRetrieveRepository.IndexHit> store : vectorStores) {
-            for (PgVectorRetrieveRepository.IndexHit r : store) {
-                PgVectorRetrieveRepository.IndexHit existing = chunkInfoMap.get(r.chunkId);
+        Map<String, EngineTypes.IndexWithScore> chunkInfoMap = new LinkedHashMap<>();
+        for (List<EngineTypes.IndexWithScore> store : vectorStores) {
+            for (EngineTypes.IndexWithScore r : store) {
+                EngineTypes.IndexWithScore existing = chunkInfoMap.get(r.chunkId);
                 if (existing == null || r.score > existing.score) {
                     chunkInfoMap.put(r.chunkId, r);
                 }
             }
         }
-        for (List<PgVectorRetrieveRepository.IndexHit> store : keywordStores) {
-            for (PgVectorRetrieveRepository.IndexHit r : store) {
+        for (List<EngineTypes.IndexWithScore> store : keywordStores) {
+            for (EngineTypes.IndexWithScore r : store) {
                 chunkInfoMap.putIfAbsent(r.chunkId, r);
             }
         }
 
-        List<PgVectorRetrieveRepository.IndexHit> result = new ArrayList<>(chunkInfoMap.size());
-        for (Map.Entry<String, PgVectorRetrieveRepository.IndexHit> e : chunkInfoMap.entrySet()) {
-            PgVectorRetrieveRepository.IndexHit info = e.getValue();
+        List<EngineTypes.IndexWithScore> result = new ArrayList<>(chunkInfoMap.size());
+        for (Map.Entry<String, EngineTypes.IndexWithScore> e : chunkInfoMap.entrySet()) {
+            EngineTypes.IndexWithScore info = e.getValue();
             double rrfScore = 0.0;
             Integer vRank = vectorRanks.get(e.getKey());
             if (vRank != null) {
@@ -139,9 +139,9 @@ final class HybridFusionOps {
 
     /** 每店名次（1-indexed）：同一 chunk 命中多个 store 时取**最好**名次。 */
     private static Map<String, Integer> ranksByStore(
-            List<List<PgVectorRetrieveRepository.IndexHit>> stores) {
+            List<List<EngineTypes.IndexWithScore>> stores) {
         Map<String, Integer> ranks = new HashMap<>();
-        for (List<PgVectorRetrieveRepository.IndexHit> store : stores) {
+        for (List<EngineTypes.IndexWithScore> store : stores) {
             for (int i = 0; i < store.size(); i++) {
                 ranks.merge(store.get(i).chunkId, i + 1, Math::min);
             }
@@ -151,9 +151,9 @@ final class HybridFusionOps {
 
     // ── FAQ 后处理（按 storeGroups 扇出） ─────────────────────────────────
 
-    List<PgVectorRetrieveRepository.IndexHit> applyFaqPostProcessing(
-            KnowledgeBaseSearchFacts primary, List<PgVectorRetrieveRepository.IndexHit> chunks,
-            List<PgVectorRetrieveRepository.IndexHit> vectorResults, List<StoreGroup> groups,
+    List<EngineTypes.IndexWithScore> applyFaqPostProcessing(
+            KnowledgeBaseSearchFacts primary, List<EngineTypes.IndexWithScore> chunks,
+            List<EngineTypes.IndexWithScore> vectorResults, List<StoreGroup> groups,
             SearchParams params, int matchCount) {
         if (!"faq".equals(primary.type())) {
             return chunks;
@@ -168,8 +168,8 @@ final class HybridFusionOps {
 
 
     static boolean needsIterativeRetrieval(SearchParams params, int matchCount,
-            List<PgVectorRetrieveRepository.IndexHit> chunks,
-            List<PgVectorRetrieveRepository.IndexHit> vectorResults) {
+            List<EngineTypes.IndexWithScore> chunks,
+            List<EngineTypes.IndexWithScore> vectorResults) {
         // 触发条件：唯一 chunk 不足 且 首轮向量结果打满 over-retrieval 池。
         return chunks.size() < params.getMatchCount() && vectorResults.size() == matchCount;
     }
@@ -178,11 +178,11 @@ final class HybridFusionOps {
      * 迭代取回去重：只涨各组的 TopK，
      * 引擎与分组在上游算好复用；类型化失败（2201）上抛，瞬时故障 WARN 后带部分结果退出。
      */
-    List<PgVectorRetrieveRepository.IndexHit> iterativeRetrieveWithDeduplication(
+    List<EngineTypes.IndexWithScore> iterativeRetrieveWithDeduplication(
             List<StoreGroup> groups, int matchCount, String queryText) {
         final int maxIterations = 5;
         int currentTopK = Math.min(matchCount * 3, HybridSearchService.MAX_RETRIEVAL_POOL_SIZE);
-        Map<String, PgVectorRetrieveRepository.IndexHit> uniqueChunks = new LinkedHashMap<>();
+        Map<String, EngineTypes.IndexWithScore> uniqueChunks = new LinkedHashMap<>();
         Map<String, ChunkFacts> chunkDataCache = new HashMap<>();
         Set<String> filteredOutChunks = new HashSet<>();
         String queryTextLower = queryText == null ? "" : queryText.strip().toLowerCase();
@@ -192,9 +192,9 @@ final class HybridFusionOps {
             for (StoreGroup grp : groups) {
                 grp.topK = currentTopK;
             }
-            List<PgVectorRetrieveRepository.IndexHit> iterationResults = new ArrayList<>();
+            List<EngineTypes.IndexWithScore> iterationResults = new ArrayList<>();
             try {
-                iterationResults = HybridSearchService.toPgShape(service.retrieveFromStores(groups)).stream()
+                iterationResults = service.retrieveFromStores(groups).stream()
                         .flatMap(rr -> rr.results().stream())
                         .collect(java.util.stream.Collectors.toList());
             } catch (BizException e) {
@@ -211,7 +211,7 @@ final class HybridFusionOps {
             }
 
             List<String> newChunkIds = new ArrayList<>();
-            for (PgVectorRetrieveRepository.IndexHit result : iterationResults) {
+            for (EngineTypes.IndexWithScore result : iterationResults) {
                 if (!chunkDataCache.containsKey(result.chunkId)
                         && !filteredOutChunks.contains(result.chunkId)) {
                     newChunkIds.add(result.chunkId);
@@ -227,7 +227,7 @@ final class HybridFusionOps {
                     log.warn("Failed to fetch chunks at iteration {}: {}", i + 1, e.getMessage());
                 }
             }
-            for (PgVectorRetrieveRepository.IndexHit result : iterationResults) {
+            for (EngineTypes.IndexWithScore result : iterationResults) {
                 if (filteredOutChunks.contains(result.chunkId)) {
                     continue;
                 }
@@ -238,7 +238,7 @@ final class HybridFusionOps {
                     uniqueChunks.remove(result.chunkId);
                     continue;
                 }
-                PgVectorRetrieveRepository.IndexHit existing = uniqueChunks.get(result.chunkId);
+                EngineTypes.IndexWithScore existing = uniqueChunks.get(result.chunkId);
                 if (existing == null || result.score > existing.score) {
                     uniqueChunks.put(result.chunkId, result);
                 }
@@ -248,7 +248,7 @@ final class HybridFusionOps {
             }
             currentTopK = Math.min(currentTopK * 2, HybridSearchService.MAX_RETRIEVAL_POOL_SIZE);
         }
-        List<PgVectorRetrieveRepository.IndexHit> out = new ArrayList<>(uniqueChunks.values());
+        List<EngineTypes.IndexWithScore> out = new ArrayList<>(uniqueChunks.values());
         out.sort(SCORE_DESC);
         return out;
     }
@@ -286,8 +286,8 @@ final class HybridFusionOps {
     }
 
 
-    List<PgVectorRetrieveRepository.IndexHit> filterByNegativeQuestions(
-            List<PgVectorRetrieveRepository.IndexHit> chunks, String queryText) {
+    List<EngineTypes.IndexWithScore> filterByNegativeQuestions(
+            List<EngineTypes.IndexWithScore> chunks, String queryText) {
         if (chunks.isEmpty()) {
             return chunks;
         }
@@ -306,8 +306,8 @@ final class HybridFusionOps {
             log.warn("Failed to fetch chunks for negative question filtering: {}", e.getMessage());
             return chunks;
         }
-        List<PgVectorRetrieveRepository.IndexHit> result = new ArrayList<>();
-        for (PgVectorRetrieveRepository.IndexHit hit : chunks) {
+        List<EngineTypes.IndexWithScore> result = new ArrayList<>();
+        for (EngineTypes.IndexWithScore hit : chunks) {
             ChunkFacts chunkData = cache.get(hit.chunkId);
             if (chunkData != null && "faq".equals(chunkData.chunkType())
                     && matchesNegativeQuestions(queryTextLower, faqNegativeQuestions(chunkData))) {

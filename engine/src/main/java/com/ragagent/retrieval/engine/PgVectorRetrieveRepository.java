@@ -70,8 +70,6 @@ public class PgVectorRetrieveRepository {
     }
 
     public static final String ENGINE_POSTGRES = "postgres";
-    public static final String RETRIEVER_VECTOR = "vector";
-    public static final String RETRIEVER_KEYWORDS = "keywords";
     /** 命中类型常量。 */
     public static final int MATCH_EMBEDDING = 0;
     public static final int MATCH_KEYWORDS = 1;
@@ -131,7 +129,7 @@ public class PgVectorRetrieveRepository {
                 rs.getString("content"),
                 rs.getDouble("score"),
                 MATCH_KEYWORDS), vars.toArray());
-        return RetrieveResult.of(results, ENGINE_POSTGRES, RETRIEVER_KEYWORDS);
+        return RetrieveResult.of(results, ENGINE_POSTGRES, EngineTypes.RETRIEVER_KEYWORDS);
     }
 
     /**
@@ -204,7 +202,7 @@ public class PgVectorRetrieveRepository {
         for (IndexHit h : results) {
             h.matchType = MATCH_EMBEDDING;
         }
-        return RetrieveResult.of(results, ENGINE_POSTGRES, RETRIEVER_VECTOR);
+        return RetrieveResult.of(results, ENGINE_POSTGRES, EngineTypes.RETRIEVER_VECTOR);
     }
 
     /** 向量查询 + HNSW GUC 事务（GUC 不可用时降级为事务外直查）。 */

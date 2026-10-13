@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ragagent.retrieval.HybridSearchService.RetrievalConfigView;
-import com.ragagent.retrieval.engine.PgVectorRetrieveRepository.IndexHit;
+import com.ragagent.retrieval.engine.EngineTypes.IndexWithScore;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -25,11 +25,11 @@ class HybridFusionOpsStoreRankTest {
     @Test
     @DisplayName("每个 store 的本地第一名等权：第二组的 #1 不被拼接位置降级")
     void secondStoreTopHitKeepsRankOne() {
-        List<IndexHit> storeA = List.of(hit("a-1", 1.0), hit("a-2", 0.9));
-        List<IndexHit> storeB = List.of(hit("b-1", 1.0), hit("b-2", 0.9));
-        List<IndexHit> keyword = List.of(hit("k-1", 1.0));
+        List<IndexWithScore> storeA = List.of(hit("a-1", 1.0), hit("a-2", 0.9));
+        List<IndexWithScore> storeB = List.of(hit("b-1", 1.0), hit("b-2", 0.9));
+        List<IndexWithScore> keyword = List.of(hit("k-1", 1.0));
 
-        List<IndexHit> fused = HybridFusionOps.fuseOrDeduplicate(
+        List<IndexWithScore> fused = HybridFusionOps.fuseOrDeduplicate(
                 List.of(storeA, storeB), List.of(keyword), RC);
 
         assertThat(scoreOf(fused, "b-1"))
@@ -43,9 +43,9 @@ class HybridFusionOpsStoreRankTest {
     @Test
     @DisplayName("交换 store 顺序结果稳定（含同分定序）")
     void storeOrderDoesNotChangeResult() {
-        List<IndexHit> storeA = List.of(hit("a-1", 1.0), hit("a-2", 0.9));
-        List<IndexHit> storeB = List.of(hit("b-1", 1.0), hit("b-2", 0.9));
-        List<IndexHit> keyword = List.of(hit("k-1", 1.0));
+        List<IndexWithScore> storeA = List.of(hit("a-1", 1.0), hit("a-2", 0.9));
+        List<IndexWithScore> storeB = List.of(hit("b-1", 1.0), hit("b-2", 0.9));
+        List<IndexWithScore> keyword = List.of(hit("k-1", 1.0));
 
         List<String> forward = ids(HybridFusionOps.fuseOrDeduplicate(
                 List.of(storeA, storeB), List.of(keyword), RC));
@@ -59,8 +59,8 @@ class HybridFusionOpsStoreRankTest {
     @DisplayName("同分按 chunkId 定序：不靠插入顺序（交换 store 也稳）")
     void tiesBreakByChunkIdNotInsertionOrder() {
         // z-vec：向量店 rank1；a-kw：关键词店 rank1 ⇒ 同分（权重 1:1、k 相同）
-        List<IndexHit> vector = List.of(hit("z-vec", 1.0));
-        List<IndexHit> keyword = List.of(hit("a-kw", 1.0));
+        List<IndexWithScore> vector = List.of(hit("z-vec", 1.0));
+        List<IndexWithScore> keyword = List.of(hit("a-kw", 1.0));
 
         List<String> ids = ids(HybridFusionOps.fuseOrDeduplicate(
                 List.of(vector), List.of(keyword), RC));
@@ -72,8 +72,8 @@ class HybridFusionOpsStoreRankTest {
     @Test
     @DisplayName("单一来源（无关键词店）保持按分降序与来源顺序——既有语义不变")
     void singleSourceKeepsScoreOrder() {
-        List<IndexHit> storeA = List.of(hit("a-1", 1.0), hit("a-2", 0.9));
-        List<IndexHit> storeB = List.of(hit("b-1", 0.95));
+        List<IndexWithScore> storeA = List.of(hit("a-1", 1.0), hit("a-2", 0.9));
+        List<IndexWithScore> storeB = List.of(hit("b-1", 0.95));
 
         List<String> ids = ids(HybridFusionOps.fuseOrDeduplicate(
                 List.of(storeA, storeB), List.of(), RC));
@@ -81,8 +81,8 @@ class HybridFusionOpsStoreRankTest {
         assertThat(ids).containsExactly("a-1", "b-1", "a-2");
     }
 
-    private static IndexHit hit(String chunkId, double score) {
-        IndexHit h = new IndexHit();
+    private static IndexWithScore hit(String chunkId, double score) {
+        IndexWithScore h = new IndexWithScore();
         h.chunkId = chunkId;
         h.id = chunkId;
         h.knowledgeId = "doc-" + chunkId;
@@ -90,14 +90,14 @@ class HybridFusionOpsStoreRankTest {
         return h;
     }
 
-    private static double scoreOf(List<IndexHit> hits, String chunkId) {
+    private static double scoreOf(List<IndexWithScore> hits, String chunkId) {
         return hits.stream().filter(h -> chunkId.equals(h.chunkId)).findFirst()
                 .orElseThrow(() -> new AssertionError("缺少命中: " + chunkId)).score;
     }
 
-    private static List<String> ids(List<IndexHit> hits) {
+    private static List<String> ids(List<IndexWithScore> hits) {
         List<String> out = new ArrayList<>(hits.size());
-        for (IndexHit h : hits) {
+        for (IndexWithScore h : hits) {
             out.add(h.chunkId);
         }
         return out;

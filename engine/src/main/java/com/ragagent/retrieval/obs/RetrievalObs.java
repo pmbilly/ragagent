@@ -1,12 +1,12 @@
 package com.ragagent.retrieval.obs;
 
+import com.ragagent.retrieval.engine.EngineTypes;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.retrieval.engine.PgVectorRetrieveRepository;
 
 /**
  * 检索观测的纯函数族：码点截断、命中预览、分数汇总、段落预览。
@@ -146,15 +146,15 @@ public final class RetrievalObs {
      * 空结果序列化为 null 的语义）。</p>
      */
     public static Map<String, Object> summarizeRetrieveOutput(
-            List<PgVectorRetrieveRepository.RetrieveResult> results) {
+            List<EngineTypes.RetrieveResult> results) {
         int groupCount = results == null ? 0 : results.size();
         int totalHits = 0;
         int vectorHits = 0;
         int keywordHits = 0;
         List<Map<String, Object>> byRetriever = new ArrayList<>();
-        List<PgVectorRetrieveRepository.IndexHit> all = new ArrayList<>();
+        List<EngineTypes.IndexWithScore> all = new ArrayList<>();
         if (results != null) {
-            for (PgVectorRetrieveRepository.RetrieveResult rr : results) {
+            for (EngineTypes.RetrieveResult rr : results) {
                 if (rr == null) {
                     continue;
                 }
@@ -187,11 +187,11 @@ public final class RetrievalObs {
 
     /** 分数降序、chunk_id 决序，截前 limit 条（空 → null）。 */
     public static List<Map<String, Object>> summarizeIndexHits(
-            List<PgVectorRetrieveRepository.IndexHit> hits, int limit) {
+            List<EngineTypes.IndexWithScore> hits, int limit) {
         if (hits == null || hits.isEmpty()) {
             return null;
         }
-        List<PgVectorRetrieveRepository.IndexHit> sorted =
+        List<EngineTypes.IndexWithScore> sorted =
                 new ArrayList<>(hits);
         sorted.sort((a, b) -> {
             if (a.score != b.score) {
@@ -202,7 +202,7 @@ public final class RetrievalObs {
         int n = Math.min(limit, sorted.size());
         List<Map<String, Object>> out = new ArrayList<>(n);
         for (int i = 0; i < n; i++) {
-            PgVectorRetrieveRepository.IndexHit hit = sorted.get(i);
+            EngineTypes.IndexWithScore hit = sorted.get(i);
             Map<String, Object> row = new LinkedHashMap<>();
             row.put("rank", i + 1);
             row.put("chunk_id", hit.chunkId);

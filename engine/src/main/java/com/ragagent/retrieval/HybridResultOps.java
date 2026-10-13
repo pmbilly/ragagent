@@ -1,5 +1,6 @@
 package com.ragagent.retrieval;
 
+import com.ragagent.retrieval.engine.EngineTypes;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.ArrayList;
@@ -13,7 +14,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.retrieval.engine.PgVectorRetrieveRepository;
 import com.ragagent.common.context.TenantContext;
 
 /**
@@ -31,7 +31,7 @@ final class HybridResultOps {
     // ── 结果装配 ─────────────────────────────────────────────────────────
 
     List<SearchResult> processSearchResults(
-            List<PgVectorRetrieveRepository.IndexHit> chunks, boolean skipEnrichment) {
+            List<EngineTypes.IndexWithScore> chunks, boolean skipEnrichment) {
         if (chunks.isEmpty()) {
             return null;
         }
@@ -42,7 +42,7 @@ final class HybridResultOps {
         Map<String, Double> scores = new HashMap<>();
         Map<String, Integer> matchTypes = new HashMap<>();
         Map<String, String> matchedContents = new HashMap<>();
-        for (PgVectorRetrieveRepository.IndexHit c : chunks) {
+        for (EngineTypes.IndexWithScore c : chunks) {
             knowledgeIds.add(c.knowledgeId);
             chunkIds.add(c.chunkId);
             scores.put(c.chunkId, c.score);
@@ -124,7 +124,7 @@ final class HybridResultOps {
         // 装配：按输入顺序；每个命中后紧随其上下文扩展块。
         List<SearchResult> out = new ArrayList<>();
         Set<String> added = new HashSet<>();
-        for (PgVectorRetrieveRepository.IndexHit input : chunks) {
+        for (EngineTypes.IndexWithScore input : chunks) {
             ChunkFacts chunk = chunkMap.get(input.chunkId);
             if (chunk == null || !isSearchableChunk(chunk) || !added.add(chunk.id())) {
                 continue;

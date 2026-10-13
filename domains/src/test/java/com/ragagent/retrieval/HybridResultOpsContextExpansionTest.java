@@ -25,7 +25,7 @@ import com.ragagent.common.model.ModelGateway;
 import com.ragagent.common.retrieval.RetrievalDriverProperties;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.common.web.JsonMappers;
-import com.ragagent.retrieval.engine.PgVectorRetrieveRepository;
+import com.ragagent.retrieval.engine.EngineTypes;
 import com.ragagent.retrieval.engine.RetrieveEngineRegistry;
 import com.ragagent.retrieval.engine.TenantStoreOwnership;
 import org.junit.jupiter.api.BeforeEach;
@@ -64,7 +64,7 @@ class HybridResultOpsContextExpansionTest {
         HybridSearchService service = new HybridSearchService(
                 kbGateway, documentGateway, chunkGateway,
                 mock(ModelGateway.class), mock(TenantService.class), mock(EmbeddingGateway.class),
-                mock(PgVectorRetrieveRepository.class), mock(RetrieveEngineRegistry.class),
+                mock(RetrieveEngineRegistry.class),
                 mock(TenantStoreOwnership.class), new RetrievalDriverProperties(null));
         ops = new HybridResultOps(service);
     }
@@ -144,9 +144,9 @@ class HybridResultOpsContextExpansionTest {
 
     // ── 夹具 ──────────────────────────────────────────────────────────────
 
-    private static PgVectorRetrieveRepository.IndexHit hit(String chunkId, String knowledgeId,
+    private static EngineTypes.IndexWithScore hit(String chunkId, String knowledgeId,
             double score) {
-        PgVectorRetrieveRepository.IndexHit h = new PgVectorRetrieveRepository.IndexHit();
+        EngineTypes.IndexWithScore h = new EngineTypes.IndexWithScore();
         h.chunkId = chunkId;
         h.id = chunkId;
         h.knowledgeId = knowledgeId;

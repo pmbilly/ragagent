@@ -35,7 +35,6 @@ import com.ragagent.retrieval.engine.EngineAwareNormalizer;
 import com.ragagent.retrieval.engine.EngineTypes;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
-import com.ragagent.retrieval.engine.PgVectorRetrieveRepository;
 import com.ragagent.retrieval.engine.RetrieveEngineFactories;
 import com.ragagent.retrieval.engine.RetrieveEngineRegistry;
 import com.ragagent.retrieval.engine.TenantStoreOwnership;
@@ -104,7 +103,6 @@ public class HybridSearchService {
     private final ModelGateway modelGateway;
     private final TenantConfigLookup tenantConfigLookup;
     private final EmbeddingGateway embeddingGateway;
-    final PgVectorRetrieveRepository pgRepository;
     final RetrieveEngineRegistry engineRegistry;
 
     final HybridFusionOps fusionOps;
@@ -114,7 +112,7 @@ public class HybridSearchService {
     public HybridSearchService(KnowledgeBaseSearchGateway kbGateway,
             KnowledgeDocumentGateway documentGateway, ChunkSearchGateway chunkGateway,
             ModelGateway modelGateway, TenantConfigLookup tenantConfigLookup, EmbeddingGateway embeddingGateway,
-            PgVectorRetrieveRepository pgRepository, RetrieveEngineRegistry engineRegistry,
+            RetrieveEngineRegistry engineRegistry,
             TenantStoreOwnership storeOwnership, RetrievalDriverProperties driverProperties) {
         this.kbGateway = kbGateway;
         this.documentGateway = documentGateway;
@@ -122,14 +120,13 @@ public class HybridSearchService {
         this.modelGateway = modelGateway;
         this.tenantConfigLookup = tenantConfigLookup;
         this.embeddingGateway = embeddingGateway;
-        this.pgRepository = pgRepository;
         this.engineRegistry = engineRegistry;
         this.fusionOps = new HybridFusionOps(this);
         this.storeGroupOps = new HybridStoreGroupOps(this, storeOwnership, driverProperties.driver());
         this.resultOps = new HybridResultOps(this);
     }
 
-    // ── 检索命中（复用引擎仓库的 PgVectorRetrieveRepository.IndexHit） ────
+    // ── 检索命中（复用引擎仓库的 EngineTypes.IndexWithScore） ────
 
     /** 检索失败（运行时异常；message 沿用 AppError 文案口径）。 */
     public static final class RetrievalException extends RuntimeException {
@@ -248,10 +245,9 @@ public class HybridSearchService {
                 LangfuseManager.get().startSpan(
                         new LangfuseManager.SpanOptions(
                                 "retrieve", retrieveInput, retrieveMeta));
-        List<PgVectorRetrieveRepository.RetrieveResult> results;
+        List<EngineTypes.RetrieveResult> results;
         try {
-            List<RetrieveResult> retrieveResults = retrieveFromStores(groups);
-            results = toPgShape(retrieveResults);
+            results = retrieveFromStores(groups);
         } catch (RuntimeException retrieveErr) {
             // 检索失败：span 带错误收尾后再抛出。
             retrieveSpan.finish(null, null, retrieveErr.toString());
@@ -268,13 +264,13 @@ public class HybridSearchService {
         // 分类：按 **每个 store 的返回列表** 分组保序（K9：RRF 的 rank 是"店内名次"）——
         // 此前先 addAll 成一个大列表，rank 退化成拼接位置，第二个 store 的本地第一名被
         // 系统性降级，且结果随 groups 顺序漂移（交换 KB/store 顺序结果就变）。
-        List<List<PgVectorRetrieveRepository.IndexHit>> vectorStores = new ArrayList<>();
-        List<List<PgVectorRetrieveRepository.IndexHit>> keywordStores = new ArrayList<>();
-        for (PgVectorRetrieveRepository.RetrieveResult rr : results) {
+        List<List<EngineTypes.IndexWithScore>> vectorStores = new ArrayList<>();
+        List<List<EngineTypes.IndexWithScore>> keywordStores = new ArrayList<>();
+        for (EngineTypes.RetrieveResult rr : results) {
             if (rr.results().isEmpty()) {
                 continue;
             }
-            if (PgVectorRetrieveRepository.RETRIEVER_VECTOR.equals(rr.retrieverType())) {
+            if (EngineTypes.RETRIEVER_VECTOR.equals(rr.retrieverType())) {
                 vectorStores.add(rr.results());
             } else {
                 keywordStores.add(rr.results());
@@ -284,7 +280,7 @@ public class HybridSearchService {
             return null;
         }
         var rc = currentRetrievalConfig();
-        List<PgVectorRetrieveRepository.IndexHit> deduped =
+        List<EngineTypes.IndexWithScore> deduped =
                 fuseOrDeduplicate(vectorStores, keywordStores, rc);
 
         // FAQ 后处理（按 storeGroups 扇出——迭代 TopK 对全部绑定店统一生长）。
@@ -681,25 +677,6 @@ public class HybridSearchService {
      * 引擎结果 → 既有 pg 形态（IndexHit）。下游融合/FAQ/富化代码按 pg 形态写就且已被
      * golden 锁定——在扇出出口做一次逐字段拷贝，下游零改动。
      */
-    static List<PgVectorRetrieveRepository.RetrieveResult> toPgShape(
-            List<RetrieveResult> engineResults) {
-        List<PgVectorRetrieveRepository.RetrieveResult> out = new ArrayList<>(engineResults.size());
-        for (RetrieveResult rr : engineResults) {
-            List<PgVectorRetrieveRepository.IndexHit> hits = new ArrayList<>(
-                    rr.results() == null ? 0 : rr.results().size());
-            if (rr.results() != null) {
-                for (EngineTypes.IndexWithScore s : rr.results()) {
-                    PgVectorRetrieveRepository.IndexHit h = PgVectorRetrieveRepository.IndexHit.of(
-                            s.id, s.sourceId, s.sourceType, s.chunkId, s.knowledgeId,
-                            s.knowledgeBaseId, s.tagId, s.content, s.score, s.matchType);
-                    hits.add(h);
-                }
-            }
-            out.add(PgVectorRetrieveRepository.RetrieveResult.of(hits,
-                    rr.retrieverEngineType(), rr.retrieverType()));
-        }
-        return out;
-    }
 
     private static KnowledgeBaseSearchFacts pickPrimary(List<KnowledgeBaseSearchFacts> kbs, String id) {
         for (KnowledgeBaseSearchFacts kb : kbs) {
@@ -756,17 +733,17 @@ public class HybridSearchService {
             return rrfKeywordWeight <= 0 ? 0.3 : rrfKeywordWeight;
         }
     }
-    static List<PgVectorRetrieveRepository.IndexHit> fuseOrDeduplicate(
-            List<List<PgVectorRetrieveRepository.IndexHit>> vectorStores,
-            List<List<PgVectorRetrieveRepository.IndexHit>> keywordStores, RetrievalConfigView rc) {
+    static List<EngineTypes.IndexWithScore> fuseOrDeduplicate(
+            List<List<EngineTypes.IndexWithScore>> vectorStores,
+            List<List<EngineTypes.IndexWithScore>> keywordStores, RetrievalConfigView rc) {
         return HybridFusionOps.fuseOrDeduplicate(vectorStores, keywordStores, rc);
     }
 
     /** 展平店内列表（FAQ 后处理等按扁平向量命中工作的既有接口用）。 */
-    static List<PgVectorRetrieveRepository.IndexHit> flattenStores(
-            List<List<PgVectorRetrieveRepository.IndexHit>> stores) {
-        List<PgVectorRetrieveRepository.IndexHit> flat = new ArrayList<>();
-        for (List<PgVectorRetrieveRepository.IndexHit> store : stores) {
+    static List<EngineTypes.IndexWithScore> flattenStores(
+            List<List<EngineTypes.IndexWithScore>> stores) {
+        List<EngineTypes.IndexWithScore> flat = new ArrayList<>();
+        for (List<EngineTypes.IndexWithScore> store : stores) {
             flat.addAll(store);
         }
         return flat;
@@ -775,7 +752,7 @@ public class HybridSearchService {
 
 
     private List<SearchResult> processSearchResults(
-            List<PgVectorRetrieveRepository.IndexHit> chunks, boolean skipEnrichment) {
+            List<EngineTypes.IndexWithScore> chunks, boolean skipEnrichment) {
         return resultOps.processSearchResults(chunks, skipEnrichment);
     }
 

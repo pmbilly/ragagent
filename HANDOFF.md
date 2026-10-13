@@ -530,7 +530,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B252 | 5 结构收敛 | K9：跨 store 融合（RRF 按 store 内 rank；context expansion 修正） | ✅ 2026-10-13 |
 | B253 | 5 | A4：并发工具状态提交顺序（`seenChunks` 单一 writer / 按调用序回填） | ✅ 2026-10-13 |
 | B254 | 5 | controller 剥离编排（`KnowledgeQaController` 14 构造参数、`QaRequestParser` 拆分） | ✅ 2026-10-13 |
-| B255 | 5 | 检索中立 `SearchHit`（去上层对 `PgVectorRetrieveRepository` 内部类型依赖） | ⬜ |
+| B255 | 5 | 检索中立 `SearchHit`（去上层对 `PgVectorRetrieveRepository` 内部类型依赖） | ✅ 2026-10-13 |
 | B256 | 6 包结构 | §10 改名清算：10 组同名歧义 + 3 组域前缀（纯改名） | ⬜ |
 | B257 | 6 | §7 命名与边界：`agent/tools`→`agenttools`、`agent/management`→`agentmanagement` + 边界规则 | ⬜ |
 | B258 | 6 | contracts 包边界（模块 DAG + 跨域边界规则） | ⬜ |
@@ -791,6 +791,14 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **闸门**：`spotlessCheck build` ✓ **1m30s** ✓ · **4969 / 失败 0 / 跳过 4** ✓（+1）· 十一守卫 ✓。
 - **登记（未做）**：① `KnowledgeQaController` 构造参数仍 **14 个**（编排类虽已迁出，控制器仍直接注入它们与 4 个 `ObjectProvider`）——真正减参需要"QA 轮门面/Facade"一层，列入后续；② `QaRequestParser`（295 行）内部拆分未做（验收只要包规则）；③ `QaAttachmentResolver` 的附件编排与 `QaRequestBinder` 的绑定逻辑仍可再向内收。
 - **观察（非本批引入，flake）**：本次全量闸门首跑 `ModelConcurrencyGovernorWiringTest.settingsFailureLeavesGovernorUnwired` 偶发失败，**重跑 4/4 全绿**（并发/环境时序），已登记观察。
+
+**✅ B255（2026-10-13，阶段 5 收口：检索中立类型）**
+- **勘察结论（修正了方案的一句话）**："上层（domains/boot）依赖 `PgVectorRetrieveRepository` 内部类型"其实**已不成立**（实测 domains/boot main 源零引用）；真正的泄漏在**引擎内部**：编排层（`HybridSearchService` / `HybridFusionOps` / `HybridResultOps` / `RetrievalObs`）说的是 `PgVectorRetrieveRepository.IndexHit`/`RetrieveResult`——**具体向量库适配器**的行形状，而不是引擎契约里早就存在的 `EngineTypes.IndexWithScore`/`EngineTypes.RetrieveResult`，于是每次取回都要过一次 `toPgShape` 转换。
+- **修复**：编排层整体切到中立类型（`EngineTypes.*`，字段形状同形 ⇒ 纯类型替换）；**删掉 `toPgShape` 转换层**（两处调用点：主检索 + FAQ 迭代取回）；删掉 `HybridSearchService` 的 `pgRepository` **死依赖**（只赋值不使用）；`PgVectorRetrieveRepository` 里重复的 `RETRIEVER_VECTOR`/`RETRIEVER_KEYWORDS` 常量删除（`EngineTypes` 已有同值常量，全仓本就用它）。
+- **验收（实测）**：`PgVectorRetrieveRepository` 的 main 源引用**只剩 `retrieval.engine` 适配层**（`EngineTypes` / `RetrieveEngineRepository` / `EngineFactory` / `VectorStoreService` / `PgVector*`）+ `boot` 装配根 `RetrievalEngineWiringConfig`（组装 pg 引擎 bean，属组合根）。
+- **测试**：新增 `RetrievalNeutralTypesTest`（**先红**：实测违规清单 = `HybridFusionOps` / `HybridResultOps` / `HybridSearchService` / …；只扫编排层本层、不含 `retrieval.engine`）——防"再退回 pg 行形状"；既有引擎测试（各向量库仓库测试、`EngineFactoryTest`、store-group 测试）全绿 ⇒ 类型切换无行为变化。
+- **闸门**：`spotlessCheck build` ✓ **1m37s** ✓ · **4970 / 失败 0 / 跳过 4** ✓（+1）· 十一守卫 ✓。
+- **登记（未做）**：`PgVectorRetrieveRepository.IndexHit`（含 `sourceId`/`sourceType`/`tagId`）与 `EngineTypes.IndexWithScore` 仍有字段重叠，长期可给中立类型加"构造自适配器行"的映射方法（现在映射在 `PgVectorEngineRepository.mapHits`，位置已正确）；`IndexWithScore` 的 `isEnabled` 在编排侧未消费。
 
 ## 附：文档地图与归档追溯
 
