@@ -20,6 +20,7 @@ import com.ragagent.common.deployment.AppEnvLookup;
 import com.ragagent.retrieval.config.RetrievalEnvLookup;
 import com.ragagent.storage.config.StorageEnvLookup;
 import com.ragagent.common.storage.StorageRuntimeEnv;
+import com.tngtech.archunit.core.domain.Dependency;
 import com.tngtech.archunit.core.domain.JavaAnnotation;
 import com.tngtech.archunit.core.domain.JavaCall;
 import com.tngtech.archunit.core.domain.JavaClass;
@@ -692,5 +693,255 @@ class ArchitectureRulesTest {
                 .as("A13 钩子方法不在 Spring 扫描到的类上 ⇒ 注解静默失效（无报错、测试也绿）。"
                         + "修法：把钩子挪到 bean（如域门面）上，或把该类变成 bean")
                 .isEmpty();
+    }
+
+    // ── A16 边界层不得被用例层引用 / A17 service 不得依赖具体技术 ──────────────
+
+    /**
+     * A16 棘轮基线：{@code ..service..} 包内仍直接依赖边界层
+     * （{@code controller} / {@code mapper} / {@code task} / {@code client} / {@code channel}）的类。
+     *
+     * <p>登记理由（2026-10-13 整改立项，方案 §12.1 第 1 条）：边界层由装配层与外部调用，
+     * 用例层经 repository / 端口使用外部能力。实测存量 <b>76 类</b>入基线
+     * （mapper / task / client 混合命中；controller 与 channel 已为 0）——
+     * 只许减、新增即红，存量随结构收敛批次逐域消化。</p>
+     */
+    private static final Set<String> SERVICE_BOUNDARY_BASELINE =
+            Set.of(
+            "com.ragagent.agent.management.service.AgentSuggestedQuestions",
+            "com.ragagent.agent.management.service.CustomAgentService",
+            "com.ragagent.audit.service.AuditLogService",
+            "com.ragagent.auth.apikey.service.TenantAPIKeyService",
+            "com.ragagent.auth.service.TenantInvitationService",
+            "com.ragagent.auth.service.TenantMemberService",
+            "com.ragagent.auth.service.TenantService",
+            "com.ragagent.auth.service.UserService",
+            "com.ragagent.auth.service.UserSessionOps",
+            "com.ragagent.datasource.service.DataSourceService",
+            "com.ragagent.datasource.service.DataSourceSupport",
+            "com.ragagent.datasource.service.DataSourceSyncExecutor",
+            "com.ragagent.datasource.service.DataSourceSyncResultOps",
+            "com.ragagent.datasource.service.DataSourceWiring",
+            "com.ragagent.datasource.service.MapperKnowledgeBridge",
+            "com.ragagent.embedchannel.service.EmbedChannelService",
+            "com.ragagent.evaluation.service.EvaluationService",
+            "com.ragagent.favorite.service.UserResourceFavoriteService",
+            "com.ragagent.im.service.ImAttachmentPreparer",
+            "com.ragagent.im.service.ImChannelRuntimeOps",
+            "com.ragagent.im.service.ImChannelService",
+            "com.ragagent.im.service.ImService",
+            "com.ragagent.im.service.ImSessionResolver",
+            "com.ragagent.initialization.service.InitializationConfigService",
+            "com.ragagent.initialization.service.ModelConnectivityTestService",
+            "com.ragagent.knowledge.service.ChunkEditService",
+            "com.ragagent.knowledge.service.ChunkExtractService",
+            "com.ragagent.knowledge.service.ChunkPortAdapter",
+            "com.ragagent.knowledge.service.ChunkQuestionService",
+            "com.ragagent.knowledge.service.ChunkReadService",
+            "com.ragagent.knowledge.service.ChunkVectorIndexer",
+            "com.ragagent.knowledge.service.EmbeddingModelAdapter",
+            "com.ragagent.knowledge.service.FaqBatchOps",
+            "com.ragagent.knowledge.service.FaqEntryCommandService",
+            "com.ragagent.knowledge.service.FaqEntryQueryService",
+            "com.ragagent.knowledge.service.FaqImportService",
+            "com.ragagent.knowledge.service.FaqIndexWriter",
+            "com.ragagent.knowledge.service.FaqValidateOps",
+            "com.ragagent.knowledge.service.HousekeepingService",
+            "com.ragagent.knowledge.service.KnowledgeAccessHelper",
+            "com.ragagent.knowledge.service.KnowledgeBaseLookupAdapter",
+            "com.ragagent.knowledge.service.KnowledgeBaseService",
+            "com.ragagent.knowledge.service.KnowledgeBatchOpsService",
+            "com.ragagent.knowledge.service.KnowledgeCloneService",
+            "com.ragagent.knowledge.service.KnowledgeFileService",
+            "com.ragagent.knowledge.service.KnowledgeFinalizeAdapter",
+            "com.ragagent.knowledge.service.KnowledgeFolderService",
+            "com.ragagent.knowledge.service.KnowledgeMoveService",
+            "com.ragagent.knowledge.service.KnowledgeParseService",
+            "com.ragagent.knowledge.service.KnowledgeSearchService",
+            "com.ragagent.knowledge.service.KnowledgeService",
+            "com.ragagent.knowledge.service.KnowledgeSummaryService",
+            "com.ragagent.knowledge.service.KnowledgeTagService",
+            "com.ragagent.knowledge.service.QuestionGenerationService",
+            "com.ragagent.knowledge.service.SpanTracker",
+            "com.ragagent.mcp.service.McpMetadataService",
+            "com.ragagent.mcp.service.McpServiceService",
+            "com.ragagent.mcp.service.McpToolApprovalService",
+            "com.ragagent.memory.service.DefaultMemoryModelResolver",
+            "com.ragagent.model.service.BuiltinModelsReconciler",
+            "com.ragagent.model.service.ModelService",
+            "com.ragagent.session.service.QaWebSearchParams",
+            "com.ragagent.session.service.SessionKnowledgeQaService",
+            "com.ragagent.session.service.TemporaryDocumentProcessor",
+            "com.ragagent.session.service.TemporaryDocumentService",
+            "com.ragagent.storage.service.DefaultStorageBackendProvisioner",
+            "com.ragagent.storage.service.ResourceCatalogService",
+            "com.ragagent.storage.service.StorageBackendService",
+            "com.ragagent.system.service.ParserEngineRegistry",
+            "com.ragagent.system.service.SystemAdminUserService",
+            "com.ragagent.system.service.SystemInfoService",
+            "com.ragagent.system.service.SystemSettingService",
+            "com.ragagent.vectorstore.service.VectorStoreConfigService",
+            "com.ragagent.vectorstore.service.VectorStoreLookupAdapter",
+            "com.ragagent.websearch.service.WebSearchProviderService",
+            "com.ragagent.websearch.service.WebSearchService");
+
+    /**
+     * A17 棘轮基线：{@code ..service..} 包内仍直接依赖具体技术实现
+     * （MyBatis / Redis / Servlet / Langfuse）的类。
+     *
+     * <p>登记理由（方案 §12.1 第 2 条）：service 只做用例与政策编排，技术实现归
+     * repository / client / task 等边界类。实测存量 <b>61 类</b>入基线
+     * （MyBatis / Redis / Langfuse 混合命中）——只许减、新增即红。</p>
+     */
+    private static final Set<String> SERVICE_TECH_BASELINE =
+            Set.of(
+            "com.ragagent.auth.service.TenantInvitationService",
+            "com.ragagent.auth.service.TenantMemberService",
+            "com.ragagent.auth.service.TenantService",
+            "com.ragagent.auth.service.UserService",
+            "com.ragagent.auth.service.UserSessionOps",
+            "com.ragagent.datasource.service.DataSourceService",
+            "com.ragagent.datasource.service.MapperKnowledgeBridge",
+            "com.ragagent.embedchannel.service.RedisEmbedTokenStore",
+            "com.ragagent.im.service.ImService",
+            "com.ragagent.initialization.service.InitializationConfigService",
+            "com.ragagent.knowledge.service.ChunkEditService",
+            "com.ragagent.knowledge.service.ChunkExtractService",
+            "com.ragagent.knowledge.service.ChunkPortAdapter",
+            "com.ragagent.knowledge.service.ChunkQuestionService",
+            "com.ragagent.knowledge.service.ChunkReadService",
+            "com.ragagent.knowledge.service.ChunkVectorIndexer",
+            "com.ragagent.knowledge.service.FaqBatchOps",
+            "com.ragagent.knowledge.service.FaqEntryCommandService",
+            "com.ragagent.knowledge.service.FaqImportService",
+            "com.ragagent.knowledge.service.FaqIndexWriter",
+            "com.ragagent.knowledge.service.KnowledgeAccessHelper",
+            "com.ragagent.knowledge.service.KnowledgeBaseLookupAdapter",
+            "com.ragagent.knowledge.service.KnowledgeBaseService",
+            "com.ragagent.knowledge.service.KnowledgeBatchOpsService",
+            "com.ragagent.knowledge.service.KnowledgeCloneService",
+            "com.ragagent.knowledge.service.KnowledgeFileService",
+            "com.ragagent.knowledge.service.KnowledgeFinalizeAdapter",
+            "com.ragagent.knowledge.service.KnowledgeFolderService",
+            "com.ragagent.knowledge.service.KnowledgeMoveService",
+            "com.ragagent.knowledge.service.KnowledgeParseService",
+            "com.ragagent.knowledge.service.KnowledgeSearchService",
+            "com.ragagent.knowledge.service.KnowledgeService",
+            "com.ragagent.knowledge.service.KnowledgeSummaryService",
+            "com.ragagent.knowledge.service.QuestionGenerationService",
+            "com.ragagent.knowledge.service.SpanTracker",
+            "com.ragagent.memory.service.InProcessMemoryExtractTaskQueue",
+            "com.ragagent.memory.service.MemoryExtractionService",
+            "com.ragagent.memory.service.MemoryTaskQueueWiring",
+            "com.ragagent.memory.service.MemoryTrace",
+            "com.ragagent.memory.service.RedisMemoryExtractTaskQueue",
+            "com.ragagent.model.service.BuiltinModelsReconciler",
+            "com.ragagent.model.service.ModelRuntimeFactory",
+            "com.ragagent.model.service.ModelService",
+            "com.ragagent.session.service.AgentEngineAssembler",
+            "com.ragagent.session.service.MessageSuggestionService",
+            "com.ragagent.session.service.QaWiring",
+            "com.ragagent.session.service.SessionAgentQaService",
+            "com.ragagent.session.service.SessionKnowledgeQaService",
+            "com.ragagent.session.service.SessionQaFallback",
+            "com.ragagent.session.service.VlmDescriberWiring",
+            "com.ragagent.system.service.SystemAdminUserService",
+            "com.ragagent.system.service.SystemSettingService",
+            "com.ragagent.websearch.service.WebSearchTempKbStateService",
+            "com.ragagent.wiki.service.ingest.RedisWikiDeletedTombstoneStore",
+            "com.ragagent.wiki.service.ingest.RedisWikiFinalizeLock",
+            "com.ragagent.wiki.service.ingest.RedisWikiIdentityClaimStore",
+            "com.ragagent.wiki.service.ingest.RedisWikiInflightLimiter",
+            "com.ragagent.wiki.service.ingest.RedisWikiIngestTaskQueue",
+            "com.ragagent.wiki.service.ingest.WikiIngestEnqueueOps",
+            "com.ragagent.wiki.service.ingest.WikiIngestTaskRunner",
+            "com.ragagent.wiki.service.page.RedisWikiSlugLock");
+
+    /** service 层判据：包名任一段等于 {@code service}（对齐 ArchUnit {@code ..service..} 语义）。 */
+    private static boolean isServicePackage(String packageName) {
+        for (String part : packageName.split("\\.")) {
+            if ("service".equals(part)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** 包名任一段等于给定边界层名（{@code ..mapper..} 形态）。 */
+    private static boolean packageHasComponent(String packageName, String component) {
+        for (String part : packageName.split("\\.")) {
+            if (component.equals(part)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** 直接依赖的目标是否命中给定前缀（技术实现面）。 */
+    private static boolean dependsOnTechPrefix(JavaClass clazz, List<String> prefixes) {
+        for (Dependency dependency : clazz.getDirectDependenciesFromSelf()) {
+            String target = dependency.getTargetClass().getName();
+            for (String prefix : prefixes) {
+                if (target.startsWith(prefix)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 边界层名单：边界类由装配层/外部调用；用例层（service）经 repository / 端口使用能力。
+     * 注：同包依赖不算跨层（边界类若与用例同类同包，是落点问题、由 Mapper 包约定等规则管）。
+     */
+    private static final List<String> SERVICE_FORBIDDEN_BOUNDARY =
+            List.of("controller", "mapper", "task", "client", "channel");
+
+    /** 具体技术实现前缀：MyBatis / Redis / Servlet / Langfuse（厂商 SDK 碰到再加）。 */
+    private static final List<String> SERVICE_FORBIDDEN_TECH = List.of(
+            "com.baomidou.",
+            "org.springframework.data.redis.",
+            "redis.clients.",
+            "jakarta.servlet.",
+            "com.ragagent.tracing.langfuse.",
+            "com.ragagent.tracing.decorators.");
+
+    @Test
+    @DisplayName("A16：service 不得直接依赖边界层（controller/mapper/task/client/channel）")
+    void servicesDoNotDependOnBoundaryLayers() {
+        Set<String> actual = new TreeSet<>();
+        for (JavaClass clazz : MAIN) {
+            if (!isServicePackage(clazz.getPackageName())) {
+                continue;
+            }
+            for (Dependency dependency : clazz.getDirectDependenciesFromSelf()) {
+                String target = dependency.getTargetClass().getPackageName();
+                if (target.equals(clazz.getPackageName())) {
+                    continue;
+                }
+                boolean hit = SERVICE_FORBIDDEN_BOUNDARY.stream()
+                        .anyMatch(component -> packageHasComponent(target, component));
+                if (hit) {
+                    actual.add(topLevel(clazz).getName());
+                    break;
+                }
+            }
+        }
+        ratchet("A16 service 依赖边界层", SERVICE_BOUNDARY_BASELINE, actual);
+    }
+
+    @Test
+    @DisplayName("A17：service 不得依赖具体技术（MyBatis/Redis/Servlet/Langfuse）")
+    void servicesDoNotDependOnConcreteTech() {
+        Set<String> actual = new TreeSet<>();
+        for (JavaClass clazz : MAIN) {
+            if (!isServicePackage(clazz.getPackageName())) {
+                continue;
+            }
+            if (dependsOnTechPrefix(clazz, SERVICE_FORBIDDEN_TECH)) {
+                actual.add(topLevel(clazz).getName());
+            }
+        }
+        ratchet("A17 service 依赖具体技术", SERVICE_TECH_BASELINE, actual);
     }
 }

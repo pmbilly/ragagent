@@ -1093,7 +1093,7 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 | 批 | 阶段 | 范围 | 状态 |
 |---|---|---|---|
 | B232 | 0 边界固化 | 守卫修复（`check-package-cycles.py` PERSIST_RE 缩进）+ R9 包级 SCC 棘轮（基线 13 组） | ✅ **完成（2026-10-13）** |
-| B233 | 0 | ArchUnit A16 边界层引用禁令（基线 81）+ A17 service 技术依赖禁令（基线 55） | ⬜ |
+| B233 | 0 | ArchUnit A16 边界层引用禁令（基线 76）+ A17 service 技术依赖禁令（基线 61） | ✅ **完成（2026-10-13）** |
 | B234 | 1 正确性 | A6 同 ID 去重保最高分（`KnowledgeSearchRanking`） | ⬜ |
 | B235 | 1 | K3 DocReader 流错误传播 | ⬜ |
 | B236 | 1 | K1 租户显式路由（worker→向量店） | ⬜ |
@@ -1126,4 +1126,12 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **Tarjan 抽取**：顶层域与完整包共用一份 `sccs_of()`（同政策一份实现）；包图**两趟收边**（先登记全部包再收边——探针开发期实测：单趟版把 13 组看成 9 组，漏了"目标包尚未读到"的边）。
 - **基线 diff 干净**：`package-cycles.baseline.json` 仅新增 `package_sccs`（+71 行），其余键零变化。**闸门**：十一守卫全绿 ✓ · `spotlessCheck build` ✓ **1m31s** ✓（脚本批，Java 零改动，未重启 dev）。
 - **同时登记**：R 系列批次表（本节）+ 实施计划 `outputs/java-remediation-implementation-plan-2026-10-13.md`（含勘察证据与两个拍板点）。
+
+**✅ B233（2026-10-13，ArchUnit A16/A17 两条硬规则）**
+- **A16「边界层不得被用例层引用」**：`..service..` 不得直接依赖 `controller/mapper/task/client/channel`（同包依赖除外——同包是落点问题，归 Mapper 包约定等规则管）；**ArchUnit 语义实测基线 76 类**（import 口径 81 文件——ArchUnit 含签名/注解/泛型面；**以 ArchUnit 实测为准**）。
+- **A17「service 不得依赖具体技术」**：禁 `com.baomidou` / `spring-data-redis` / `redis.clients` / `jakarta.servlet` / `tracing.langfuse` / `tracing.decorators`；**基线 61 类**。
+- **基线生成口径（写进类注释）**：空基线首跑 → 从测试报告 XML 取实际集合 → 回填（不做手抄近似）；棘轮双断言（新增即红 + 基线过期也红）沿用既有 `ratchet()`。
+- **红态探针**：注入 `knowledge.service.ProbeBoundaryDeps`（import `ChunkMapper` + `LambdaQueryWrapper`）⇒ A16/A17 **双红且 fresh 集合精确只含探针**；删除后复绿。
+- **闸门**：`spotlessCheck build` ✓ **1m25s** ✓ · **4903 / 失败 0 / 跳过 4** ✓（+2 = 本批新规则；跳过为既有环境性）· 十一守卫（在 build 内）✓。
+- **后续**：这两条基线主要靠 R 系列阶段 5/6 的落点搬移（`Redis*`/`*Wiring` 混在 service、`service` 里的边界类）逐域消减，基线只许减。
 
