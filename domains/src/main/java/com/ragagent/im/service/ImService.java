@@ -21,8 +21,8 @@ import org.springframework.stereotype.Service;
 import com.ragagent.common.agent.AgentChannelCleaner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.agent.management.domain.CustomAgentEntity;
-import com.ragagent.agent.management.service.CustomAgentService;
+import com.ragagent.agentmanagement.domain.CustomAgentEntity;
+import com.ragagent.agentmanagement.service.CustomAgentService;
 import com.ragagent.approval.RedisPubSub;
 import com.ragagent.approval.SpringRedisPubSub;
 import com.ragagent.common.context.TenantContext;

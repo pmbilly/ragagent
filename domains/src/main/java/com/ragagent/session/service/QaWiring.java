@@ -62,7 +62,7 @@ import com.ragagent.model.service.ModelRuntimeConfigs;
 import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.tracing.decorators.LangfuseChatClient;
 import com.ragagent.tracing.decorators.LangfuseReranker;
-import com.ragagent.agent.tools.data.DataAnalysisSessionFactoryAdapter;
+import com.ragagent.agenttools.data.DataAnalysisSessionFactoryAdapter;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.chatpipeline.plugin.PluginDataAnalysis;
 import com.ragagent.chatpipeline.plugin.PluginSearch;

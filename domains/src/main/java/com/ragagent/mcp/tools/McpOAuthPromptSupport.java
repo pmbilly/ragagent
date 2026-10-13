@@ -18,8 +18,8 @@ import com.ragagent.common.web.ToolJson;
 import com.ragagent.mcp.protocol.McpClient;
 import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.protocol.McpContext;
-import com.ragagent.agent.tools.ToolCancellation;
-import com.ragagent.agent.tools.ToolExecContext;
+import com.ragagent.agenttools.ToolCancellation;
+import com.ragagent.agenttools.ToolExecContext;
 import com.ragagent.approval.ApprovalBridge;
 
 /**

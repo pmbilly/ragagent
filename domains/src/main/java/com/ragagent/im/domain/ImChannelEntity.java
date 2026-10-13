@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ragagent.agent.management.mapper.JsonbRawStringTypeHandler;
+import com.ragagent.agentmanagement.mapper.JsonbRawStringTypeHandler;
 
 /**
  * IM 渠道。

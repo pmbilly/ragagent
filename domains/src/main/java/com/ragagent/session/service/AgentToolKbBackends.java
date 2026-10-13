@@ -7,11 +7,11 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.jdbc.core.JdbcTemplate;
-import com.ragagent.agent.tools.DocChunkSupport;
-import com.ragagent.agent.tools.knowledge.GrepChunksTool;
-import com.ragagent.agent.tools.knowledge.KnowledgeSearchTool;
-import com.ragagent.agent.tools.knowledge.QueryKnowledgeGraphTool;
-import com.ragagent.agent.tools.runtime.SearchAuth;
+import com.ragagent.agenttools.DocChunkSupport;
+import com.ragagent.agenttools.knowledge.GrepChunksTool;
+import com.ragagent.agenttools.knowledge.KnowledgeSearchTool;
+import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool;
+import com.ragagent.agenttools.runtime.SearchAuth;
 import com.ragagent.common.retrieval.SearchTarget;
 import com.ragagent.common.pipeline.SearchParams;
 import com.ragagent.common.retrieval.SearchResult;

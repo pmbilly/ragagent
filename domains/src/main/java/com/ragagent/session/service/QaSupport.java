@@ -15,7 +15,7 @@ import com.ragagent.storage.support.StreamRewriter;
 import com.ragagent.stream.StreamEvent;
 import com.ragagent.event.EventBus;
 import com.ragagent.agent.SteerSink;
-import com.ragagent.agent.management.domain.CustomAgentEntity;
+import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.common.llm.ResponseType;
 import com.ragagent.event.TenantContextSnapshot;
 import com.ragagent.session.domain.MessageAttachment;

@@ -37,7 +37,7 @@ import com.ragagent.common.retrieval.SearchResult;
 import static com.ragagent.session.service.QaSupport.TagScope;
 import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.session.support.PipelineViews;
-import com.ragagent.agent.management.domain.CustomAgentEntity;
+import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.common.retrieval.SearchTarget;
 import com.ragagent.tracing.langfuse.LangfuseManager;

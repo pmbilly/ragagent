@@ -6,7 +6,7 @@ import com.ragagent.event.EventBus;
 import com.ragagent.event.Event;
 import com.ragagent.event.payload.MCPOAuthRequiredData;
 import com.ragagent.event.payload.MCPOAuthResolvedData;
-import com.ragagent.agent.tools.ToolCancellation;
+import com.ragagent.agenttools.ToolCancellation;
 
 /**
  * tools 包 ↔ approval 域的类型桥（两个包面之间的显式适配）。

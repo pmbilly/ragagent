@@ -6,12 +6,12 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.agent.tools.ToolCapabilities;
+import com.ragagent.agenttools.ToolCapabilities;
 import com.ragagent.im.runtime.Commands.CommandContext;
 import com.ragagent.im.runtime.Commands.CommandRegistry;
 import com.ragagent.im.runtime.Commands.CommandResult;
 import com.ragagent.im.runtime.Commands.ImCommand;
-import com.ragagent.agent.management.domain.CustomAgentEntity;
+import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 
 /**
  * 五个斜杠命令。注册序固定：help → info → search → stop → clear。

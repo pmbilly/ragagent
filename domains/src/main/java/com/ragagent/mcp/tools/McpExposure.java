@@ -15,9 +15,9 @@ import com.ragagent.mcp.domain.McpMetadata;
 import com.ragagent.mcp.protocol.McpClient;
 import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.protocol.McpContext;
-import com.ragagent.agent.tools.ToolRegistry;
-import com.ragagent.agent.tools.AgentTool;
-import com.ragagent.agent.tools.ToolDefinitions;
+import com.ragagent.agenttools.ToolRegistry;
+import com.ragagent.agenttools.AgentTool;
+import com.ragagent.agenttools.ToolDefinitions;
 
 /**
  * MCP 目录装载与注册入口（持久化元数据读写、目录加载、工具注册、

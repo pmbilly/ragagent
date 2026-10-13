@@ -7,7 +7,7 @@ import javax.sql.DataSource;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.ragagent.agent.tools.web.WebFetchTool;
+import com.ragagent.agenttools.web.WebFetchTool;
 import com.ragagent.storage.service.ResourceCatalogService;
 
 /**

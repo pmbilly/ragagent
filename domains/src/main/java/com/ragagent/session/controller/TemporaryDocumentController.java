@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartFile;
-import com.ragagent.agent.management.domain.CustomAgentEntity;
+import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.common.web.ContentTypeByFilename;
 import com.ragagent.knowledge.support.ParserEngineRules;
 import com.ragagent.session.service.AgentResolver;

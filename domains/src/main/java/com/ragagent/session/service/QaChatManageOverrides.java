@@ -4,10 +4,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.agent.management.service.AgentConfigJson;
+import com.ragagent.agentmanagement.service.AgentConfigJson;
 import com.ragagent.chatpipeline.ChatManage;
 import com.ragagent.common.prompt.PromptSource;
-import com.ragagent.agent.management.domain.CustomAgentEntity;
+import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 
 /**
  * {@code SessionQaResolution} 的**agent 覆盖簇**：把 custom agent 的配置

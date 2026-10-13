@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.agent.management.domain.CustomAgentEntity;
+import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.common.security.TenantAPIKeyScope;
 
 /**

@@ -6,10 +6,10 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.llm.ToolResult;
-import com.ragagent.agent.tools.BaseTool;
-import com.ragagent.agent.tools.ToolRegistry;
-import com.ragagent.agent.tools.ToolRequest;
-import com.ragagent.agent.tools.AgentTool;
+import com.ragagent.agenttools.BaseTool;
+import com.ragagent.agenttools.ToolRegistry;
+import com.ragagent.agenttools.ToolRequest;
+import com.ragagent.agenttools.AgentTool;
 import com.ragagent.common.web.ToolJson;
 
 /**

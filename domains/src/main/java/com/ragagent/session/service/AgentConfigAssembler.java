@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ragagent.agent.tools.ToolDefinitions;
-import com.ragagent.agent.management.service.AgentConfigJson;
+import com.ragagent.agenttools.ToolDefinitions;
+import com.ragagent.agentmanagement.service.AgentConfigJson;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;

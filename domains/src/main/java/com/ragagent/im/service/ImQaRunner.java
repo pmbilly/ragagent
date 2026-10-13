@@ -3,7 +3,7 @@ package com.ragagent.im.service;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.ragagent.agent.management.domain.CustomAgentEntity;
+import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.event.EventBus;
 import com.ragagent.event.EventType;

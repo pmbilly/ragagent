@@ -38,7 +38,7 @@ import org.junit.jupiter.api.Test;
 import com.ragagent.agent.GoRecording;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ToolCall;
-import com.ragagent.agent.tools.RecordingSupport;
+import com.ragagent.agenttools.RecordingSupport;
 import com.ragagent.llm.domain.FunctionCall;
 
 /**

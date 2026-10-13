@@ -532,7 +532,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B254 | 5 | controller 剥离编排（`KnowledgeQaController` 14 构造参数、`QaRequestParser` 拆分） | ✅ 2026-10-13 |
 | B255 | 5 | 检索中立 `SearchHit`（去上层对 `PgVectorRetrieveRepository` 内部类型依赖） | ✅ 2026-10-13 |
 | B256 | 6 包结构 | §10 改名清算：10 组同名歧义 + 3 组域前缀（纯改名） | ✅ 2026-10-13 |
-| B257 | 6 | §7 命名与边界：`agent/tools`→`agenttools`、`agent/management`→`agentmanagement` + 边界规则 | ⬜ |
+| B257 | 6 | §7 命名与边界：`agent/tools`→`agenttools`、`agent/management`→`agentmanagement` + 边界规则 | ✅ 2026-10-13 |
 | B258 | 6 | contracts 包边界（模块 DAG + 跨域边界规则） | ⬜ |
 | B259 | 6 | platform 包边界（`:common` 其余收拢） | ⬜ |
 | B260 | 6 | agent-engine 包边界（`com.ragagent.agent` 运行面收拢） | ⬜ |
@@ -801,6 +801,18 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **闸门**：`spotlessCheck build` ✓ **1m38s** ✓ · 十一守卫 ✓。
 - **教训（写入 §15.4 方法论，务必遵守）**：整仓"简单名替换"会连坐同前缀类（`ToolCall`→`ToolCallTarget`）、误伤**字符串字面量 / javadoc 提及 / `package` 声明 / 包名前缀**，还会因 span 截断产出"包名当类型"的半截 FQN——本批第一次尝试因此产生 4 次大规模误伤（1405 文件 / 2094 处包声明 / 39 文件），全部 stash 撤销。**正确姿势**：① 按 import 判据限定作用域；② 只替换"匹配文本本身即完整类型"的 FQN（绝不按前缀切）；③ 占用判据必须含"本文件已声明的内嵌类型"；④ **每改一批立刻编译 + 跑守卫**（本次最终只动 12+1 个文件、逐条验证即收口）。
 - **登记（未做）**：方案 §10.1 里的 `ModelResponse`（只剩 1 份，无歧义）未改名；`ToolResult` 已在早期统一（1 份）。
+
+**✅ B257（2026-10-13，§7 命名与边界）**
+- **包改名（§7.1 采纳 `agenttools`）**：`com.ragagent.agent.tools` → **`com.ragagent.agenttools`**（91 文件 / 7 子包）、`com.ragagent.agent.management` → **`com.ragagent.agentmanagement`**（21 文件 / 5 子包）；理由是方案 §7.1 的四条（名字与内容一致、避开 "integration" 既有语义、不再与 `agent-engine` 的 `com.ragagent.agent.*` 命名空间混淆、与 `agentmanagement` 对称）。
+- **改动面**：前缀替换 **560 处 / 214 文件**（纯包前缀替换 ⇒ 无同前缀类连坐风险）；测试/夹具随包归位 **40 个文件**（`domains` + `boot` 两侧）；**非 Java 文件零改动**——实测无 Spring 扫描/yaml/MyBatis 别名引用旧包名（`@SpringBootApplication` 从 `com.ragagent` 扫，天然覆盖）。
+- **新增边界规则（B257 验收）**：`ArchitectureRulesTest.agentAdapterPackagesDoNotTouchDomainServices`——`agenttools`/`agentmanagement` 不得依赖**各业务域的 service/mapper**（域清单显式列举，避免自身 `agentmanagement.service/mapper` 假阳性）。**规则先按严格版跑 ⇒ 当场抓到 3 处真实越界**（`SkillCatalogController`→audit、`CustomAgentService`→knowledge/auth、`AgentSuggestedQuestions`），按本仓棘轮纪律登记为基线（**只许减**；落位批 **B264** 负责清零）。
+- **连带同步（结构批既定处置，非掩盖）**：① 环/SCC 基线随包名刷新（"新增/已消除"两组**逐名同构**＝纯改名产物）；② 大文件基线随路径刷新（`GrepChunksTool`/`WebFetchTool` 行数未变、仅路径变）；③ 换锚棘轮 BASELINE 键随路径更新（历史注释保留旧路径并注明改名）；④ 空包目录清理（S2）。
+- **测试侧守卫同步**：`AgentEngineBoundaryTest`（`MANAGEMENT_SEGMENT`/`ENGINE_ROOT` 指到新位置；`agenttools` 加入 `ALLOWED_TOP_LEVEL`——原名因同属 `agent.*` 隐式通过，改名后需显式允许，真正解耦见 B260/B264；`MIN_SCANNED_FILES` 140→55，因 91 个工具文件迁出引擎面）、`AgentConfigKeyUsageTest`（豁免路径随包名更新）。
+- **测试**：**4971 / 失败 0 / 跳过 4** ✓（+1 新规则）；契约金片零变化（纯包子树搬迁，wire 未动）。
+- **闸门**：`spotlessCheck build` ✓ **1m34s** ✓ · 十一守卫 ✓。
+- **踩坑记录（重要，写入方法论）**：`git mv` 保留时间戳 ⇒ **Gradle 增量/VFS 快照认为搬走的文件"已编译"**，于是 `domains` 少跑 **166** 个测试、`boot` 少 6 个（首跑全绿但测试数悄悄下降）。**识别信号**：测试汇总里 `domains/boot` 计数下降或 `--tests "新包.*"` 报 "No tests found"。**处置**：`./gradlew :<模块>:test --rerun-tasks`（或清 `build/classes/java/test`）后复跑；**结构批的闸门必须对照测试总数**，否则会以"全绿"掩盖覆盖丢失。
+
+## 附：文档地图与归档追溯
 
 **✅ B255（2026-10-13，阶段 5 收口：检索中立类型）**
 - **勘察结论（修正了方案的一句话）**："上层（domains/boot）依赖 `PgVectorRetrieveRepository` 内部类型"其实**已不成立**（实测 domains/boot main 源零引用）；真正的泄漏在**引擎内部**：编排层（`HybridSearchService` / `HybridFusionOps` / `HybridResultOps` / `RetrievalObs`）说的是 `PgVectorRetrieveRepository.IndexHit`/`RetrieveResult`——**具体向量库适配器**的行形状，而不是引擎契约里早就存在的 `EngineTypes.IndexWithScore`/`EngineTypes.RetrieveResult`，于是每次取回都要过一次 `toPgShape` 转换。

@@ -4,7 +4,7 @@ package com.ragagent.agent;
  * 工具名常量。
  *
  * <p>此处只收名字（compaction 的 fileops 与 grounding prompt 用）；
- * 注册表/工具定义本体在 {@code com.ragagent.agent.tools}。</p>
+ * 注册表/工具定义本体在 {@code com.ragagent.agenttools}。</p>
  */
 public final class AgentToolNames {
 

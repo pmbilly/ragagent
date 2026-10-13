@@ -23,8 +23,8 @@ import com.ragagent.approval.Cancellation;
 import com.ragagent.mcp.oauth.OAuthReauthorizationRequiredException;
 import com.ragagent.mcp.protocol.McpAuthorizationRequiredException;
 import com.ragagent.mcp.protocol.McpOAuthRequiredException;
-import com.ragagent.agent.tools.ToolDefinitions;
-import com.ragagent.agent.tools.ToolRegistry;
+import com.ragagent.agenttools.ToolDefinitions;
+import com.ragagent.agenttools.ToolRegistry;
 
 /**
  * MCP 目录：一个 Agent 引擎、一个授权主体独有。只有 server 快照可变；可执行的

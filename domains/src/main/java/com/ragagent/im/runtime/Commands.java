@@ -2,7 +2,7 @@ package com.ragagent.im.runtime;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.ragagent.agent.management.domain.CustomAgentEntity;
+import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.im.domain.ChannelSessionEntity;
 
 /**

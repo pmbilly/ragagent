@@ -115,7 +115,7 @@ public class TenantFilterGuard implements InnerInterceptor {
             "com.ragagent.knowledge.mapper.KnowledgeBaseMapper.selectById",
             "com.ragagent.knowledge.mapper.KnowledgeBaseMapper.selectList",
             "com.ragagent.knowledge.mapper.KnowledgeTagMapper.maxSeqId",
-            "com.ragagent.agent.management.mapper.AgentQuestionMapper.findKbs",
+            "com.ragagent.agentmanagement.mapper.AgentQuestionMapper.findKbs",
             "com.ragagent.memory.mapper.MemoryItemEmbeddingMapper.selectByItemId",
             "com.ragagent.session.mapper.SessionMapper.selectList",
             "com.ragagent.datasource.mapper.DataSourceMapper.selectByIdOrNull",

@@ -45,7 +45,7 @@ class AgentEngineBoundaryTest {
     private static final Path ENGINE_ROOT = REPO.resolve("domains/src/main/java/com/ragagent/agent");
 
     /** 按例外排除的管理面子树（其内部依赖由 B2 单独守）。 */
-    private static final String MANAGEMENT_SEGMENT = "/management/";
+    private static final String MANAGEMENT_SEGMENT = "/agentmanagement/"; // B257 改名自 /management/
 
     /**
      * 引擎底座允许清单（L1 / L2 的顶层包名）+ 自身。
@@ -55,6 +55,9 @@ class AgentEngineBoundaryTest {
      * 任何新出现的顶层包都要被当作业务域审视一次（这正是本守卫的棘轮作用）。</p>
      */
     private static final Set<String> ALLOWED_TOP_LEVEL = Set.of(
+            // B257：工具适配包改名后与 agent 平级（原 agent.tools 因同属 agent.* 隐式通过）；
+            // 真正的解耦（引擎不反向依赖工具实现）见 B260/B264。
+            "agenttools",
             "agent",        // 自身
             "common",       // L1（:common 主包）
             "event",        // L1（:common 的 event 包）
@@ -72,8 +75,13 @@ class AgentEngineBoundaryTest {
     private static final Pattern RAGAGENT_IMPORT =
             Pattern.compile("^import\\s+(?:static\\s+)?com\\.ragagent\\.([a-zA-Z0-9_]+)\\.");
 
-    /** 扫描面下限（引擎侧现有 ≈150 文件；低于此值说明路径漂移，守卫在空转）。 */
-    private static final int MIN_SCANNED_FILES = 140;
+    /**
+     * 扫描面下限（低于此值说明路径漂移，守卫在空转）。
+     *
+     * <p>B257 改名后 `agent/tools` 迁出为平级 `agenttools/`（91 文件），引擎侧本面
+     * 从 ≈150 降到 ≈60；阈值随之收紧到 55。</p>
+     */
+    private static final int MIN_SCANNED_FILES = 55;
 
     @Test
     @DisplayName("B0：扫描面自检（防止路径漂移导致守卫静默空转）")
@@ -105,7 +113,7 @@ class AgentEngineBoundaryTest {
     @DisplayName("B2：management/ 例外仍必要（不再依赖业务域时应转红、把管理面纳入 B1）")
     void managementExceptionStillJustified() throws IOException {
         List<String> domainImports = new ArrayList<>();
-        Path management = ENGINE_ROOT.resolve("management");
+        Path management = ENGINE_ROOT.resolve("../agentmanagement").normalize(); // B257：已迁出 agent/ 子树
         if (Files.isDirectory(management)) {
             try (Stream<Path> walk = Files.walk(management)) {
                 for (Path file : walk.filter(p -> p.toString().endsWith(".java")).toList()) {

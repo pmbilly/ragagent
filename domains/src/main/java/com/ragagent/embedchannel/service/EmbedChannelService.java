@@ -13,9 +13,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.agent.management.mapper.CustomAgentMapper;
-import com.ragagent.agent.management.service.CustomAgentService;
-import com.ragagent.agent.management.domain.CustomAgentEntity;
+import com.ragagent.agentmanagement.mapper.CustomAgentMapper;
+import com.ragagent.agentmanagement.service.CustomAgentService;
+import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.embedchannel.EmbedError;
 import com.ragagent.embedchannel.EmbedTokens;
@@ -27,7 +27,7 @@ import com.ragagent.session.domain.Session;
 import com.ragagent.session.domain.SessionListQuery;
 import com.ragagent.session.domain.SessionPage;
 import com.ragagent.session.repository.SessionRepository;
-import com.ragagent.agent.management.service.BuiltinAgentRegistry;
+import com.ragagent.agentmanagement.service.BuiltinAgentRegistry;
 
 /**
  * embed 渠道 service（含 session token/签名段）。

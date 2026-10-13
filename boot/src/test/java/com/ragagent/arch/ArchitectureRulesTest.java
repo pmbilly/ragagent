@@ -306,7 +306,7 @@ class ArchitectureRulesTest {
             Map.entry("com.ragagent.common.jdbc.DatabaseDialects", "方言探测（收敛点）"),
             Map.entry("com.ragagent.config.StartupTaskRecovery", "启动期任务修复"),
             Map.entry("com.ragagent.agent.skills.SkillCatalogService", "PG 专有 SQL（技能目录）"),
-            Map.entry("com.ragagent.agent.tools.data.AnalysisDuckDbJdbc", "非业务库引擎（DuckDB）"),
+            Map.entry("com.ragagent.agenttools.data.AnalysisDuckDbJdbc", "非业务库引擎（DuckDB）"),
             Map.entry("com.ragagent.knowledge.repository.KnowledgeSpanRepository", "PG 专有 SQL（span 批量写）"),
             Map.entry("com.ragagent.knowledge.service.HousekeepingService", "PG 专有 SQL（超时清理）"),
             Map.entry("com.ragagent.knowledge.storage.TenantStorageService", "PG 专有 SQL（存储用量）"),
@@ -709,8 +709,8 @@ class ArchitectureRulesTest {
      */
     private static final Set<String> SERVICE_BOUNDARY_BASELINE =
             Set.of(
-            "com.ragagent.agent.management.service.AgentSuggestedQuestions",
-            "com.ragagent.agent.management.service.CustomAgentService",
+            "com.ragagent.agentmanagement.service.AgentSuggestedQuestions",
+            "com.ragagent.agentmanagement.service.CustomAgentService",
             "com.ragagent.audit.service.AuditLogService",
             "com.ragagent.auth.apikey.service.TenantAPIKeyService",
             "com.ragagent.auth.service.TenantInvitationService",
@@ -1025,5 +1025,66 @@ class ArchitectureRulesTest {
             }
         }
         ratchet("A18 运行态公共可变字段", RUNTIME_PUBLIC_FIELD_BASELINE, actual);
+    }
+
+    // ── B257 工具/管理适配包不得直连业务域 service/mapper ───────────────────
+
+    /**
+     * B257（§7.3）：`agenttools` / `agentmanagement` 是 domains 侧对 Agent 的**适配包**
+     * （工具实现 / Agent 定义管理），只能依赖 contracts/platform 与各域**公开用例**；
+     * 直接 import 业务域的 `service` / `mapper` 会绕过域边界，把域内部结构（事务边界、
+     * 持久层）纳入 Agent 面——这正是阶段 6 要消除的一类耦合。
+     *
+     * <p>域清单**显式列举**（单段域包的 service/mapper）：不用 `com.ragagent.*.service..`
+     * 通配——那会把适配包**自己的** `agentmanagement.service/mapper` 也算成违规（假阳性）。</p>
+     */
+    private static final String[] FORBIDDEN_DOMAIN_PACKAGES = {
+            "session", "knowledge", "wiki", "memory", "datasource", "model", "im", "storage",
+            "websearch", "vectorstore", "settings", "auth", "mcp", "audit", "approval",
+            "embedchannel", "evaluation", "favorite", "initialization", "skill", "system", "tenant"
+    };
+
+    /**
+     * B257 基线（棘轮：只许减不许增）：现存越界点。
+     *
+     * <p>`SkillCatalogController`（audit）/ `CustomAgentService`（knowledge、auth）/
+     * `AgentSuggestedQuestions` —— 它们直连各域 service；**落位批次 B264
+     * （agenttools/agentmanagement 落位）负责把它们改走公开用例并清零本条基线**。</p>
+     */
+    private static final Set<String> AGENT_ADAPTER_DOMAIN_SERVICE_BASELINE = Set.of(
+            "com.ragagent.agentmanagement.controller.SkillCatalogController",
+            "com.ragagent.agentmanagement.service.AgentSuggestedQuestions",
+            "com.ragagent.agentmanagement.service.CustomAgentService");
+
+    @Test
+    @DisplayName("B257：agenttools / agentmanagement 不得依赖业务域 service/mapper（棘轮）")
+    void agentAdapterPackagesDoNotTouchDomainServices() {
+        Set<String> actual = new TreeSet<>();
+        for (JavaClass clazz : MAIN) {
+            String pkg = clazz.getPackageName();
+            if (!pkg.startsWith("com.ragagent.agenttools")
+                    && !pkg.startsWith("com.ragagent.agentmanagement")) {
+                continue;
+            }
+            boolean hit = clazz.getDirectDependenciesFromSelf().stream()
+                    .anyMatch(dep -> isDomainServiceOrMapper(dep.getTargetClass().getPackageName()));
+            if (hit) {
+                actual.add(clazz.getName());
+            }
+        }
+        ratchet("B257 适配包→域 service/mapper", AGENT_ADAPTER_DOMAIN_SERVICE_BASELINE, actual);
+    }
+
+    /** 目标包是否落在「业务域 service / mapper」面上（域清单显式列举，避免自身子包假阳性）。 */
+    private static boolean isDomainServiceOrMapper(String packageName) {
+        for (String domain : FORBIDDEN_DOMAIN_PACKAGES) {
+            for (String face : List.of("service", "mapper")) {
+                String prefix = "com.ragagent." + domain + "." + face;
+                if (packageName.equals(prefix) || packageName.startsWith(prefix + ".")) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

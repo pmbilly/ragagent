@@ -13,17 +13,17 @@ import java.util.concurrent.LinkedBlockingQueue;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.agent.domain.ToolCallTarget;
-import com.ragagent.agent.tools.spi.McpToolingGateway;
-import com.ragagent.agent.tools.spi.ToolRegistryPort;
+import com.ragagent.agenttools.spi.McpToolingGateway;
+import com.ragagent.agenttools.spi.ToolRegistryPort;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ToolCall;
 import com.ragagent.common.web.JsonMappers;
 import com.ragagent.mcp.domain.McpService;
-import com.ragagent.agent.tools.AgentTool;
-import com.ragagent.agent.tools.ToolDefinitions;
+import com.ragagent.agenttools.AgentTool;
+import com.ragagent.agenttools.ToolDefinitions;
 
 /**
- * MCP 工具编排（原 {@link com.ragagent.agent.tools.ToolRegistry} 的 MCP 目录方法与状态，逐行搬出）。
+ * MCP 工具编排（原 {@link com.ragagent.agenttools.ToolRegistry} 的 MCP 目录方法与状态，逐行搬出）。
  *
  * <p>存在意义：这些逻辑必须依赖 {@code com.ragagent.mcp.*} 与审批栈（业务域类型），
  * 留在引擎里会让 agent 无法独立成模块。抽到本类后，引擎只通过
