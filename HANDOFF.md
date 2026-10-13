@@ -921,6 +921,12 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **偶发测试（记录）**：全量跑时 `RedisWikiDeletedTombstoneStoreTest.clearRemovesTombstone` 失败一次，**单跑即过** ⇒ Redis 依赖型偶发，与本步改动无关（本步未触碰 wiki/Redis 路径）。
 - **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m34s** ✓ 十一守卫 ✓（13 组 SCC 未变）。
 - **登记（余步）**：
+**🔶 B263 第⑳步（2026-10-14，`FaqEntryQueryService` + `FaqEntryCommandService` 归仓储）**
+- **FAQ 对的查询全在 tag 侧 + 知识行读取**：`KnowledgeTagRepository` +2——`listTagsByKbPage(tenantId, kbId, limit, offset)`（原样透传，分页归一与关键词过滤仍归 {@code listByKb}）、`listTagsBySeqIds(tenantId, seqIds)`；其余全部复用既有：`getBySeqId`（= `selectByTenantAndSeqId`，已核对逐字同形）、`listTagsByIds`（= `selectByTenantAndIds`）、`KnowledgeRepository.findById(tenantId, id)`（Command 的 3 处知识行读取同形，批量替换）。
+- **替换顺序有讲究**：`tagMapper.selectByTenantAndSeqId(` 是 `…AndSeqIds(` 的**前缀** ⇒ 必须先替换复数、再替换单数，否则单数规则会把复数调用改坏（本步按此顺序执行）。
+- **连带**：A16 删 1 条（`FaqEntryQueryService`）/ A17 删 1 条（`FaqEntryCommandService`）；两个类的字段/构造器/import 换仓储；`FaqEntryCommandService` 784 → 773 行。
+- **测试**：4978 / 失败 0 / 跳过 4 ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m39s** ✓ 十一守卫 ✓（环 0 / SCC 13 组未变）。
+- **登记（余步）**：
 **🔶 B263 第⑲步（2026-10-14，`SpanTracker` + `FaqBatchOps` + `FaqImportService` 归仓储）**
 - **修掉一处包内字段直取坏味道**：`FaqBatchOps` 原本是 `service.knowledgeMapper` / `service.tagMapper` 直取 `FaqImportService` 的**包内字段**（这也是那两个字段不能收紧为 private 的原因）⇒ 改为 `FaqBatchOps` 自己注入 `KnowledgeRepository` / `KnowledgeTagRepository`（构造器在包内 `new` 出来，一处调用点同步），并把 `FaqImportService` 的这两个字段**收紧为 private**。
 - **新增两个仓储方法**：`KnowledgeRepository.touchUpdatedAt(id, now)`（心跳——**不按租户、不看软删**，与 SpanTracker 原直连语句逐字一致）；`KnowledgeTagRepository.deleteUnusedTags(tenantId, kbId)`（replace 导入后清未引用标签）。

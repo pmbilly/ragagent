@@ -95,6 +95,20 @@ public class KnowledgeTagRepository {
         return tagMapper.deleteUnusedTags(tenantId, kbId);
     }
 
+    /**
+     * KB 内标签分页（limit/offset 原样透传；分页归一与关键词过滤见 {@link #listByKb}）。
+     *
+     * <p>B263⑳ 由 service 直连 {@code tagMapper.listByKB} 归位。</p>
+     */
+    public List<KnowledgeTag> listTagsByKbPage(long tenantId, String kbId, int limit, int offset) {
+        return tagMapper.listByKB(tenantId, kbId, limit, offset);
+    }
+
+    /** 按 seqId 集合取标签（B263⑳ 由 service 直连归位）。 */
+    public List<KnowledgeTag> listTagsBySeqIds(long tenantId, List<Long> seqIds) {
+        return tagMapper.selectByTenantAndSeqIds(tenantId, seqIds);
+    }
+
     /** 删除该 knowledge 的标签关系（B263⑨）。 */
     public void deleteRelations(String knowledgeId) {
         tagMapper.deleteRelations(knowledgeId);

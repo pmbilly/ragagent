@@ -1,5 +1,8 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.repository.KnowledgeRepository;
+import com.ragagent.knowledge.repository.KnowledgeTagRepository;
+
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -8,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.AppError;
@@ -27,8 +29,6 @@ import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.audit.domain.AuditOutcome;
 import com.ragagent.audit.service.AuditLogService;
 import com.ragagent.model.domain.Model;
-import com.ragagent.knowledge.mapper.KnowledgeMapper;
-import com.ragagent.knowledge.mapper.KnowledgeTagMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -60,8 +60,8 @@ public class FaqEntryCommandService {
 
     private final ChunkRepository chunkRepository;
     private final FaqChunkRepository faqChunkRepository;
-    private final KnowledgeMapper knowledgeMapper;
-    private final KnowledgeTagMapper tagMapper;
+    private final KnowledgeRepository knowledgeRepository;
+    private final KnowledgeTagRepository tagRepository;
     private final FaqImportTaskStore taskStore;
     private final VectorStoreService vectorStore;
     private final KnowledgeVectorWrites vectorWrites;
@@ -71,8 +71,8 @@ public class FaqEntryCommandService {
     private final FaqIndexWriter faqIndexWriter;
 
     public FaqEntryCommandService(ChunkRepository chunkRepository,
-                                  KnowledgeMapper knowledgeMapper,
-                                  KnowledgeTagMapper tagMapper,
+                                  KnowledgeRepository knowledgeRepository,
+                                  KnowledgeTagRepository tagRepository,
                                   FaqImportTaskStore taskStore,
                                   VectorStoreService vectorStore,
                                   KnowledgeVectorWrites vectorWrites,
@@ -83,8 +83,8 @@ public class FaqEntryCommandService {
                                   FaqChunkRepository faqChunkRepository) {
         this.chunkRepository = chunkRepository;
         this.faqChunkRepository = faqChunkRepository;
-        this.knowledgeMapper = knowledgeMapper;
-        this.tagMapper = tagMapper;
+        this.knowledgeRepository = knowledgeRepository;
+        this.tagRepository = tagRepository;
         this.taskStore = taskStore;
         this.vectorStore = vectorStore;
         this.vectorWrites = vectorWrites;
@@ -168,7 +168,7 @@ public class FaqEntryCommandService {
 
             Map<String, Long> tagSeqIdMap = new LinkedHashMap<>();
             if (!chunk.getTagId().isEmpty()) {
-                KnowledgeTag tag = tagMapper.selectByTenantAndIds(tid, List.of(chunk.getTagId()))
+                KnowledgeTag tag = tagRepository.listTagsByIds(tid, List.of(chunk.getTagId()))
                         .stream().findFirst().orElse(null);
                 if (tag != null) {
                     tagSeqIdMap.put(tag.getId(), tag.getSeqId());
@@ -176,7 +176,7 @@ public class FaqEntryCommandService {
             }
             FaqEntry entry = faqChunkCodec.chunkToFAQEntry(chunk, kb, tagSeqIdMap);
             if (!chunk.getTagId().isEmpty()) {
-                KnowledgeTag tag = tagMapper.selectByTenantAndIds(tid, List.of(chunk.getTagId()))
+                KnowledgeTag tag = tagRepository.listTagsByIds(tid, List.of(chunk.getTagId()))
                         .stream().findFirst().orElse(null);
                 if (tag != null) {
                     entry = entry.withTagName(tag.getName());
@@ -228,7 +228,7 @@ public class FaqEntryCommandService {
         chunk.setContent(faqChunkCodec.buildFAQChunkContent(meta, indexMode));
 
         if (payload.tagId() > 0) {
-            KnowledgeTag tag = tagMapper.selectByTenantAndSeqId(tid, payload.tagId());
+            KnowledgeTag tag = tagRepository.getBySeqId(tid, payload.tagId());
             if (tag == null) {
                 throw new BizException(AppError.notFound("标签不存在"));
             }
@@ -249,11 +249,7 @@ public class FaqEntryCommandService {
         chunk.setUpdatedAt(OffsetDateTime.now());
         chunkRepository.updateChunk(chunk);
 
-        Knowledge faqKnowledge = knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getId, chunk.getKnowledgeId())
-                .eq(Knowledge::getTenantId, tid)
-                .isNull(Knowledge::getDeletedAt)
-                .last("LIMIT 1"));
+        Knowledge faqKnowledge = knowledgeRepository.findById(tid, chunk.getKnowledgeId());
         if (faqKnowledge == null) {
             throw new IllegalStateException("failed to get knowledge: record not found");
         }
@@ -266,7 +262,7 @@ public class FaqEntryCommandService {
 
         Map<String, Long> tagSeqIdMap = new LinkedHashMap<>();
         if (!chunk.getTagId().isEmpty()) {
-            KnowledgeTag tag = tagMapper.selectByTenantAndIds(tid, List.of(chunk.getTagId()))
+            KnowledgeTag tag = tagRepository.listTagsByIds(tid, List.of(chunk.getTagId()))
                     .stream().findFirst().orElse(null);
             if (tag != null) {
                 tagSeqIdMap.put(tag.getId(), tag.getSeqId());
@@ -274,7 +270,7 @@ public class FaqEntryCommandService {
         }
         FaqEntry entry = faqChunkCodec.chunkToFAQEntry(chunk, kb, tagSeqIdMap);
         if (!chunk.getTagId().isEmpty()) {
-            KnowledgeTag tag = tagMapper.selectByTenantAndIds(tid, List.of(chunk.getTagId()))
+            KnowledgeTag tag = tagRepository.listTagsByIds(tid, List.of(chunk.getTagId()))
                     .stream().findFirst().orElse(null);
             if (tag != null) {
                 entry = entry.withTagName(tag.getName());
@@ -330,7 +326,7 @@ public class FaqEntryCommandService {
 
         Map<String, Long> tagSeqIdMap = new LinkedHashMap<>();
         if (!chunk.getTagId().isEmpty()) {
-            KnowledgeTag tag = tagMapper.selectByTenantAndIds(tid, List.of(chunk.getTagId()))
+            KnowledgeTag tag = tagRepository.listTagsByIds(tid, List.of(chunk.getTagId()))
                     .stream().findFirst().orElse(null);
             if (tag != null) {
                 tagSeqIdMap.put(tag.getId(), tag.getSeqId());
@@ -362,11 +358,7 @@ public class FaqEntryCommandService {
         chunk.setUpdatedAt(OffsetDateTime.now());
         chunkRepository.updateChunk(chunk);
 
-        Knowledge faqKnowledge = knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getId, chunk.getKnowledgeId())
-                .eq(Knowledge::getTenantId, tid)
-                .isNull(Knowledge::getDeletedAt)
-                .last("LIMIT 1"));
+        Knowledge faqKnowledge = knowledgeRepository.findById(tid, chunk.getKnowledgeId());
         if (faqKnowledge == null) {
             throw new IllegalStateException("failed to get knowledge: record not found");
         }
@@ -376,7 +368,7 @@ public class FaqEntryCommandService {
 
         FaqEntry entry = faqChunkCodec.chunkToFAQEntry(chunk, kb, tagSeqIdMap);
         if (!chunk.getTagId().isEmpty()) {
-            KnowledgeTag tag = tagMapper.selectByTenantAndIds(tid, List.of(chunk.getTagId()))
+            KnowledgeTag tag = tagRepository.listTagsByIds(tid, List.of(chunk.getTagId()))
                     .stream().findFirst().orElse(null);
             if (tag != null) {
                 entry = entry.withTagName(tag.getName());
@@ -576,11 +568,7 @@ public class FaqEntryCommandService {
         for (Long id : FaqGuard.sortedIds(selected.keySet())) {
             Chunk chunk = selected.get(id);
             if (!knowledges.containsKey(chunk.getKnowledgeId())) {
-                Knowledge knowledge = knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                        .eq(Knowledge::getId, chunk.getKnowledgeId())
-                        .eq(Knowledge::getTenantId, tid)
-                        .isNull(Knowledge::getDeletedAt)
-                        .last("LIMIT 1"));
+                Knowledge knowledge = knowledgeRepository.findById(tid, chunk.getKnowledgeId());
                 if (knowledge == null || knowledge.getTenantId() == null
                         || knowledge.getTenantId() != tid
                         || !kb.getId().equals(knowledge.getKnowledgeBaseId())

@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.repository.KnowledgeTagRepository;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -23,7 +25,6 @@ import com.ragagent.common.security.LogSanitizer;
 import com.ragagent.common.pipeline.SearchParams;
 import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.knowledge.mapper.KnowledgeTagMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -43,14 +44,14 @@ public class FaqEntryQueryService {
 
     private final ChunkRepository chunkRepository;
     private final FaqChunkRepository faqChunkRepository;
-    private final KnowledgeTagMapper tagMapper;
+    private final KnowledgeTagRepository tagRepository;
     private final HybridSearchService hybridSearchService;
     private final FaqGuard faqGuard;
     private final FaqChunkCodec faqChunkCodec;
     private final FaqIndexWriter faqIndexWriter;
 
     public FaqEntryQueryService(ChunkRepository chunkRepository,
-                                KnowledgeTagMapper tagMapper,
+                                KnowledgeTagRepository tagRepository,
                                 HybridSearchService hybridSearchService,
                                 FaqGuard faqGuard,
                                 FaqChunkCodec faqChunkCodec,
@@ -58,7 +59,7 @@ public class FaqEntryQueryService {
                                 FaqChunkRepository faqChunkRepository) {
         this.chunkRepository = chunkRepository;
         this.faqChunkRepository = faqChunkRepository;
-        this.tagMapper = tagMapper;
+        this.tagRepository = tagRepository;
         this.hybridSearchService = hybridSearchService;
         this.faqGuard = faqGuard;
         this.faqChunkCodec = faqChunkCodec;
@@ -90,7 +91,7 @@ public class FaqEntryQueryService {
         if (faqKnowledge != null) {
             List<String> tags = tagUuids == null ? new ArrayList<>() : new ArrayList<>(tagUuids);
             if (tags.isEmpty() && legacyTagSeqId > 0) {
-                KnowledgeTag tag = tagMapper.selectByTenantAndSeqId(effectiveTenant, legacyTagSeqId);
+                KnowledgeTag tag = tagRepository.getBySeqId(effectiveTenant, legacyTagSeqId);
                 if (tag == null) {
                     throw new BizException(AppError.notFound("标签不存在"));
                 }
@@ -110,7 +111,7 @@ public class FaqEntryQueryService {
                 }
             }
             if (!tagIds.isEmpty()) {
-                List<KnowledgeTag> tags2 = tagMapper.selectByTenantAndIds(effectiveTenant, new ArrayList<>(tagIds));
+                List<KnowledgeTag> tags2 = tagRepository.listTagsByIds(effectiveTenant, new ArrayList<>(tagIds));
                 for (KnowledgeTag t : tags2) {
                     tagNameMap.put(t.getId(), t.getName());
                     tagSeqIdMap.put(t.getId(), t.getSeqId());
@@ -151,7 +152,7 @@ public class FaqEntryQueryService {
         }
         Map<String, Long> tagSeqIdMap = new LinkedHashMap<>();
         if (!chunk.getTagId().isEmpty()) {
-            KnowledgeTag tag = tagMapper.selectByTenantAndIds(tid, List.of(chunk.getTagId()))
+            KnowledgeTag tag = tagRepository.listTagsByIds(tid, List.of(chunk.getTagId()))
                     .stream().findFirst().orElse(null);
             if (tag != null) {
                 tagSeqIdMap.put(tag.getId(), tag.getSeqId());
@@ -159,7 +160,7 @@ public class FaqEntryQueryService {
         }
         FaqEntry entry = faqChunkCodec.chunkToFAQEntry(chunk, kb, tagSeqIdMap);
         if (!chunk.getTagId().isEmpty()) {
-            KnowledgeTag tag = tagMapper.selectByTenantAndIds(tid, List.of(chunk.getTagId()))
+            KnowledgeTag tag = tagRepository.listTagsByIds(tid, List.of(chunk.getTagId()))
                     .stream().findFirst().orElse(null);
             if (tag != null) {
                 entry = entry.withTagName(tag.getName());
@@ -197,7 +198,7 @@ public class FaqEntryQueryService {
         Map<String, String> tagMap = new LinkedHashMap<>();
         int pageSize = 1000;
         for (int pageNum = 1; ; pageNum++) {
-            List<KnowledgeTag> tags = tagMapper.listByKB(tenantId, kbId, pageSize, (pageNum - 1) * pageSize);
+            List<KnowledgeTag> tags = tagRepository.listTagsByKbPage(tenantId, kbId, pageSize, (pageNum - 1) * pageSize);
             for (KnowledgeTag tag : tags) {
                 tagMap.put(tag.getId(), tag.getName());
             }
@@ -308,14 +309,14 @@ public class FaqEntryQueryService {
         Set<Long> firstPrioritySeqIdSet = new LinkedHashSet<>();
         Set<Long> secondPrioritySeqIdSet = new LinkedHashSet<>();
         if (req.firstPriorityTagIds() != null && !req.firstPriorityTagIds().isEmpty()) {
-            List<KnowledgeTag> tags = tagMapper.selectByTenantAndSeqIds(tid, req.firstPriorityTagIds());
+            List<KnowledgeTag> tags = tagRepository.listTagsBySeqIds(tid, req.firstPriorityTagIds());
             for (KnowledgeTag tag : tags) {
                 firstPriorityTagUuids.add(tag.getId());
                 firstPrioritySeqIdSet.add(tag.getSeqId());
             }
         }
         if (req.secondPriorityTagIds() != null && !req.secondPriorityTagIds().isEmpty()) {
-            List<KnowledgeTag> tags = tagMapper.selectByTenantAndSeqIds(tid, req.secondPriorityTagIds());
+            List<KnowledgeTag> tags = tagRepository.listTagsBySeqIds(tid, req.secondPriorityTagIds());
             for (KnowledgeTag tag : tags) {
                 secondPriorityTagUuids.add(tag.getId());
                 secondPrioritySeqIdSet.add(tag.getSeqId());
@@ -361,7 +362,7 @@ public class FaqEntryQueryService {
             if (!tagSeqIds.isEmpty()) {
                 Map<Long, String> tagNameMap = new LinkedHashMap<>();
                 try {
-                    for (KnowledgeTag tag : tagMapper.selectByTenantAndSeqIds(tid, tagSeqIds)) {
+                    for (KnowledgeTag tag : tagRepository.listTagsBySeqIds(tid, tagSeqIds)) {
                         tagNameMap.put(tag.getSeqId(), tag.getName());
                     }
                 } catch (RuntimeException e) {
@@ -448,7 +449,7 @@ public class FaqEntryQueryService {
             }
         }
         if (!tagIds.isEmpty()) {
-            for (KnowledgeTag t : tagMapper.selectByTenantAndIds(tid, new ArrayList<>(tagIds))) {
+            for (KnowledgeTag t : tagRepository.listTagsByIds(tid, new ArrayList<>(tagIds))) {
                 tagSeqIdMap.put(t.getId(), t.getSeqId());
             }
         }
