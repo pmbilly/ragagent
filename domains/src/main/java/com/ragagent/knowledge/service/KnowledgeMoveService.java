@@ -29,6 +29,7 @@ import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
 import com.ragagent.knowledge.storage.TenantStorageService;
 import java.time.Instant;
 import java.util.Objects;
+import com.ragagent.knowledge.index.KnowledgeVectorWrites;
 
 /**
  * 知识库 Move（跨库搬移）worker 面。HTTP 契约 = 立即返回 + 进度查询；

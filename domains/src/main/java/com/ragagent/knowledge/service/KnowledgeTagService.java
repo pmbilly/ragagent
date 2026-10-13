@@ -32,6 +32,7 @@ import com.ragagent.retrieval.engine.VectorStoreService;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import org.springframework.beans.factory.ObjectProvider;
+import com.ragagent.knowledge.index.KnowledgeVectorWrites;
 
 /**
  * <h2>路由链与 Java 落地</h2>

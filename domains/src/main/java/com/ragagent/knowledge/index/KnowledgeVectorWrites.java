@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.service;
+package com.ragagent.knowledge.index;
 
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;

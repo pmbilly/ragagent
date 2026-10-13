@@ -39,7 +39,7 @@ import com.ragagent.tracing.langfuse.LangfuseTracing;
 import com.ragagent.knowledge.domain.ExtractChunkPayload;
 import com.ragagent.knowledge.domain.QuestionBatchPayload;
 import com.ragagent.knowledge.support.GraphChunkSelector;
-import com.ragagent.knowledge.service.KnowledgeVectorWrites;
+import com.ragagent.knowledge.index.KnowledgeVectorWrites;
 import com.ragagent.knowledge.support.QuestionBatchPlanner;
 import com.ragagent.knowledge.service.ChunkVectorIndexer;
 import com.ragagent.knowledge.service.SpanTracker;

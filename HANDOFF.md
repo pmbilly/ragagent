@@ -896,6 +896,15 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m28s** ✓ 十一守卫 ✓。
 - **登记（枢纽拆分余步）**：按"最轻优先"继续——`KnowledgeVectorWrites`(51 行/1 引用)、`KnowledgeFinalizeAdapter`(71/1)、`ChunkVectorIndexer`(386/2)、`KnowledgeFileService`(422/2)、`KnowledgeParseService` 余部、`KnowledgeBaseService`(626/18)、`KnowledgeService`(796/28)；每个都按"切分而非搬家"处理（避免复活 `repository → service` 与 `service → task` 边）。
 
+**🔶 B263 第⑤步（2026-10-13，两个最轻枢纽归位：`api/` 与 `index/` 面）**
+- **`KnowledgeFinalizeAdapter`(71 行) → `knowledge/api/`**：它 `implements KnowledgeFinalizePort`（`common.knowledge` 的**跨域端口**）⇒ 与 B263② 的 `ChunkPortAdapter` 同一条规则——跨域端口实现归 `api/` 适配面（§8.8.2）。测试 `KnowledgeFinalizeAdapterTest` 随迁。
+- **`KnowledgeVectorWrites`(51 行) → `knowledge/index/`**：它按 KB 解析"已绑定引擎"（依赖 `:engine` 的 `retrieval.engine.*`：registry / ownership / CompositeRetrieveEngine），属 §8.8.2 的 `index/` 面（本步顺带建了 `index/package-info`）。**副作用（有益）**：它原是 `task → service` 9 处引用之一 ⇒ 归位后该腿变为 `task → index`。
+- **规则收紧**：A16/A17 里 `KnowledgeFinalizeAdapter` 的条目标签随搬迁变成 `com.ragagent.knowledge.api.KnowledgeFinalizeAdapter`，而它已**整体离开 `..service..`** ⇒ 两条均按守卫提示删除（这类"条目过期"在本批次已出现 5 次，都是搬迁带来的**债务减少**）。
+- **SCC 复核**：13 组不变、`{service, task}` 2 成员不变（结构面未造新环）。
+- **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m43s** ✓ 十一守卫 ✓。
+- **操作小坑**：`git mv` 迁测试文件前需先建目标目录（首次因目录不存在报 "No such file or directory"，已补 `mkdir` 重跑）。
+- **登记（余步）**：按最轻优先继续——`ChunkVectorIndexer`(386/2)、`KnowledgeFileService`(422/2)、`KnowledgeParseService` 余部、`KnowledgeBaseService`(626/18)、`KnowledgeService`(796/28)；一律"切分而非整搬"。`task → service` 现余 8 处（`ChunkExtractService`3 / `QuestionGenerationService`3 / `SpanTracker` / `ChunkVectorIndexer`）。
+
 ## 附：文档地图与归档追溯
 
 **✅ B255（2026-10-13，阶段 5 收口：检索中立类型）**

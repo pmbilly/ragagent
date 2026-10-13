@@ -36,6 +36,7 @@ import com.ragagent.knowledge.client.EmbedderClient;
 import com.ragagent.retrieval.engine.VectorStoreService;
 import com.ragagent.retrieval.support.ChunkSearchUtil;
 import com.ragagent.knowledge.support.KnowledgeIndexContent;
+import com.ragagent.knowledge.index.KnowledgeVectorWrites;
 
 /**
  * chunk 向量行的重建执行体（2026-09-22 走查批：把「路由在、执行体占位」的两处
