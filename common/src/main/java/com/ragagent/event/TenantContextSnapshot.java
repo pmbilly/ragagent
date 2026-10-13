@@ -32,6 +32,14 @@ public record TenantContextSnapshot(
                 TenantContext.currentRequestId());
     }
 
+    /**
+     * 是否带**身份**（principal 或 userId）——A5：新起的虚拟线程
+     * {@link #capture()} 拿到的是空身份，据此决定要不要用调用方快照补齐。
+     */
+    public boolean hasIdentity() {
+        return principal != null || (userId != null && !userId.isEmpty());
+    }
+
     /** 在工作线程调用：把快照值写入该线程的 TenantContext（线程私有，无共享）。 */
     public void replay() {
         TenantContext.set(tenantId, principal, role, systemAdmin, userId, canAccessAllTenants);

@@ -55,11 +55,29 @@ final class QaTurnFinalizer {
      * 线程上，身份被抹后同线程后续的 owner/权限判定全部失真。</p>
      */
     void runWithTenant(Long tenantId, Runnable body) {
+        runWithTenant(tenantId, null, body);
+    }
+
+    /**
+     * 同 {@link #runWithTenant(Long, Runnable)}，但允许调用方传入**身份补齐快照**。
+     *
+     * <p>A5：调用点包含新起的虚拟线程（STOP watcher / 消费线程）——那些线程的
+     * TenantContext 是空的，{@code capture()} 只拿到空身份；只做 save/restore 等于把
+     * "没有身份"照搬回去（owner 推导成 {@code ""}、下游索引/建议/记忆全部
+     * SessionNotFound）。这里：当前线程身份缺失时用 {@code fallback} 补齐；当前线程
+     * 已有身份则以它为准（调用方身份优先）。</p>
+     */
+    void runWithTenant(Long tenantId, TenantContextSnapshot fallback, Runnable body) {
         TenantContextSnapshot prev =
                 TenantContextSnapshot.capture();
+        TenantContextSnapshot identity =
+                prev.hasIdentity() || fallback == null ? prev : fallback;
         try {
             if (tenantId != null) {
-                prev.withTenantId(tenantId).replay();
+                identity.withTenantId(tenantId).replay();
+            } else if (identity != prev) {
+                // 新线程 + 未指定执行租户：至少把身份装回来，否则 owner/权限判定失真
+                identity.replay();
             }
             body.run();
         } finally {

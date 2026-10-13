@@ -518,7 +518,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B240 | 2 | A1-AGENT：`AgentEngine` finally/COMPLETE 与外层 catch/ERROR 收口 + `FinalizePhase` 失败 outcome | ✅ 2026-10-13 |
 | B241 | 2 | A2：全轮一次性提交门（CAS）+ 消息更新失败不启动索引/建议/记忆 | ✅ 2026-10-13 |
 | B242 | 2 | A3：可关闭模型流（句柄 + `ThinkPhase` 取消 probe + 装饰器队列关闭语义） | ✅ 2026-10-13 |
-| B243 | 2 | A5：跨线程上下文传播（NORMAL 消费线程 / STOP watcher replay） | ⬜ |
+| B243 | 2 | A5：跨线程上下文传播（NORMAL 消费线程 / STOP watcher replay） | ✅ 2026-10-13 |
 | B244 | 2 | A18 状态所有权规则（phase 不回引 runner / 无公共可变运行态字段） | ⬜ |
 | B245 | 3 任务可靠 | K4：CAS 保护整轮数据（失败清场限本代；`KnowledgeParseService` 排斥处理中） | ⬜ |
 | B246 | 3 | K5：图任务失败/重试/计数同一契约（`finalAttempt` 消费、异常不吞、任务级去重） | ⬜ |
@@ -685,6 +685,14 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **适配面**：接口改返句柄波及 4 家 provider + 2 个装饰器 + 8 个测试桩（机械适配为 `ChatStream`/`QueuedChatStream`）。
 - **闸门**：`spotlessCheck build` ✓ **1m55s** ✓（含 javadoc 任务：修掉 2 处类型变更导致的失效引用）· **4928 / 失败 0 / 跳过 4** ✓（+1 = 新测试）· 十一守卫 ✓。
 - **残留（登记）**：① **建立连接阶段**的取消仍由 transport deadline 约束（建流调用同步返回前无法响应 probe，与方案 §A3 第 2 条同源）——留待 A3 后续或 B243 上下文批次一并评估；② `OllamaChat` 的上游中止依赖既有"线程中断"约定（第三方库若不响应中断，中止弱于 HTTP provider）。
+
+**✅ B243（2026-10-13，A5 跨线程上下文传播）**
+- **缺口**（方案 A5）：ThreadLocal 不跨线程，而三条路径没有显式传递——① NORMAL 流消费线程（`PluginChatCompletionStream` 起虚拟线程直接消费）；② STOP watcher 虚拟线程（`QaSseOrchestrator.startStopWatcher`）；③ `QaTurnFinalizer.runWithTenant` 只 capture → withTenantId → replay → **restore**：新线程 capture 到的是**空身份**，save/restore 等于把"没有身份"照搬回去 ⇒ owner 推导成 `""`、下游索引/建议/记忆 SessionNotFound（历史事故的根因形态）。
+- **修复**：① `PluginChatCompletionStream` 与 `SessionQaFallback` 的消费线程：本线程 `capture()` → 消费线程 `replay()` + `finally clear()`；② `QaSseOrchestrator`：STOP 处理器在**注册时**（身份完整）捕获快照，触发时作为 fallback 传入；stop watcher 循环抽成 `watchStopEvents()`，线程内 replay/clear；③ `TenantContextSnapshot` 新增 `hasIdentity()` + `runWithTenant(tenantId, fallback, body)` 重载：**当前线程身份缺失时用 fallback 补齐，已有身份则以调用方为准**（授权面永远看调用方），"只换执行租户"语义不变。
+- **测试（先红）**：`PluginChatCompletionStreamIdentityTest`——在**消费线程**首次读取分片时探针身份：修复前实测 `userId=null`（红），修复后 `u-777` + principal + 执行租户齐备；`QaTurnFinalizerTenantContextTest` 3 例（新线程 fallback 补齐 / 调用方身份优先 / 无 fallback 保持既有语义 + 收尾恢复）。
+- **红态探针**：把补齐退化回旧语义（`identity = prev`）⇒ 新线程用例实测失败、另两例不受影响 ⇒ 还原后绿。
+- **顺带核对（无改动）**：`SessionService.generateTitleAsync` 已显式 set(tenantId/requestId/userId)；`TemporaryDocumentService` 的清理 ticker 是系统级无身份设计 ✓ 均无本类缺口。
+- **闸门**：`spotlessCheck build` ✓ **1m53s** ✓ · **4932 / 失败 0 / 跳过 4** ✓（+4 = 新测试）· 十一守卫 ✓。
 
 ## 附：文档地图与归档追溯
 

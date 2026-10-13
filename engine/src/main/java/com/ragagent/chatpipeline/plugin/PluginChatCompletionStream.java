@@ -12,9 +12,11 @@ import com.ragagent.chatpipeline.PipelineEventType;
 import com.ragagent.chatpipeline.PipelineLog;
 import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.chatpipeline.support.ReferencesSupport;
+import com.ragagent.common.context.TenantContext;
 import com.ragagent.event.Event;
 import com.ragagent.event.EventBusInterface;
 import com.ragagent.event.EventType;
+import com.ragagent.event.TenantContextSnapshot;
 import com.ragagent.event.payload.AgentFinalAnswerData;
 import com.ragagent.event.payload.AgentThoughtData;
 import com.ragagent.event.payload.ErrorData;
@@ -127,10 +129,20 @@ public final class PluginChatCompletionStream implements Plugin {
         PipelineLog.info("Stream", "model_started", ms);
 
         // 消费线程（虚拟线程）
+        // 纪律 #1（A5）：ThreadLocal 不跨线程——必须在本线程 capture、在消费线程 replay，
+        // 否则消费线程看到空身份（owner 推导成 ""、下游索引/建议/记忆全部 SessionNotFound）。
         final ChatManage cm = chatManage;
         final ChatStream queue = responseQueue;
         final Registry modelContext = assembly.registry();
-        Thread.ofVirtual().start(() -> consumeStream(cm, eventBus, modelContext, queue));
+        final TenantContextSnapshot identity = TenantContextSnapshot.capture();
+        Thread.ofVirtual().start(() -> {
+            identity.replay();
+            try {
+                consumeStream(cm, eventBus, modelContext, queue);
+            } finally {
+                TenantContext.clear();
+            }
+        });
 
         return next.next();
     }

@@ -5,7 +5,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ragagent.chatpipeline.ChatManage;
+import com.ragagent.common.context.TenantContext;
 import com.ragagent.event.EventBusInterface;
+import com.ragagent.event.TenantContextSnapshot;
 import com.ragagent.llm.ChatStream;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
@@ -97,7 +99,17 @@ final class SessionQaFallback {
             handleFixedFallback(chatManage);
             return;
         }
-        Thread.ofVirtual().start(() -> consumeFallbackStream(chatManage, responseQueue, prepared.registry()));
+        // 纪律 #1（A5）：消费线程跑在独立虚拟线程上——本线程 capture、消费线程 replay/clear，
+        // 否则索引/追问的 owner 推导成 ""（SessionNotFound）。
+        TenantContextSnapshot identity = TenantContextSnapshot.capture();
+        Thread.ofVirtual().start(() -> {
+            identity.replay();
+            try {
+                consumeFallbackStream(chatManage, responseQueue, prepared.registry());
+            } finally {
+                TenantContext.clear();
+            }
+        });
     }
 
     record FallbackPrepared(List<ChatMessage> messages, Registry registry) {}

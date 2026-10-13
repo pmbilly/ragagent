@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import com.ragagent.common.context.TenantContext;
 import com.ragagent.event.Event;
 import com.ragagent.event.EventBus;
 import com.ragagent.event.EventType;
@@ -98,11 +99,14 @@ final class QaSseOrchestrator {
 
         // stop 事件处理器
         long sessionTenantId = reqCtx.session.getTenantId();
+        // A5：处理器可能跑在 stop watcher 的虚拟线程上（那里身份为空）——注册时在本线程
+        // （身份完整）捕获快照，触发时用它补齐；否则收尾的索引/建议/记忆 SessionNotFound。
+        TenantContextSnapshot stopIdentity = TenantContextSnapshot.capture();
         eventBus.on(EventType.EVENT_STOP, evt -> {
             log.info("Received stop event, cancelling async operations for session: {}", reqCtx.sessionId);
             streamCtx.cancelled = true;
             // 停止时保住已流出内容；用 session 租户落库
-            turnFinalizer.runWithTenant(sessionTenantId, () -> turnFinalizer.completeAssistantMessage(
+            turnFinalizer.runWithTenant(sessionTenantId, stopIdentity, () -> turnFinalizer.completeAssistantMessage(
                     streamCtx.assistantMessage, "", "", sessionTenantId));
         });
 
@@ -156,47 +160,60 @@ final class QaSseOrchestrator {
         }
     }
     private void startStopWatcher(String sessionId, String assistantMessageId, EventBus eventBus) {
+        // A5：watcher 跑在自己的虚拟线程上（ThreadLocal 不跨线程，身份为空）——读流事件与
+        // 会话范围判定都需要完整身份，因此在本线程 capture、watcher 里 replay 后清理。
+        TenantContextSnapshot identity = TenantContextSnapshot.capture();
         Thread.ofVirtual().start(() -> {
-            int offset = 0;
-            long deadline = System.currentTimeMillis() + 2 * 60 * 60 * 1000L; // stopWatcherMaxDuration
-            while (System.currentTimeMillis() < deadline) {
-                try {
-                    Thread.sleep(300);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    return;
-                }
-                StreamBatch batch;
-                try {
-                    batch = streamManager.getEvents(sessionId, assistantMessageId, offset);
-                } catch (RuntimeException e) {
-                    continue; // 瞬态读错误，下一 tick 重试
-                }
-                offset = batch.nextOffset();
-                for (StreamEvent evt : batch.events()) {
-                    if (evt.getType() == ResponseType.STOP) {
-                        log.info("Stop watcher detected stop event, cancelling generation for session={}, message={}",
-                                sessionId, assistantMessageId);
-                        Event stopEvt = new Event();
-                        stopEvt.setType(EventType.EVENT_STOP);
-                        stopEvt.setSessionId(sessionId);
-                        StopData data = new StopData();
-                        data.setSessionId(sessionId);
-                        data.setMessageId(assistantMessageId);
-                        data.setReason("user_requested");
-                        stopEvt.setData(data);
-                        eventBus.emit(stopEvt);
-                        return;
-                    }
-                    if (evt.getType() == ResponseType.COMPLETE) {
-                        return;
-                    }
-                    if (evt.getType() == ResponseType.ERROR && evt.isDone()) {
-                        return;
-                    }
-                }
+            identity.replay();
+            try {
+                watchStopEvents(sessionId, assistantMessageId, eventBus);
+            } finally {
+                TenantContext.clear();
             }
         });
+    }
+
+    /** stop watcher 主循环（独立虚拟线程；身份由 {@link #startStopWatcher} 显式传递）。 */
+    private void watchStopEvents(String sessionId, String assistantMessageId, EventBus eventBus) {
+        int offset = 0;
+        long deadline = System.currentTimeMillis() + 2 * 60 * 60 * 1000L; // stopWatcherMaxDuration
+        while (System.currentTimeMillis() < deadline) {
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return;
+            }
+            StreamBatch batch;
+            try {
+                batch = streamManager.getEvents(sessionId, assistantMessageId, offset);
+            } catch (RuntimeException e) {
+                continue; // 瞬态读错误，下一 tick 重试
+            }
+            offset = batch.nextOffset();
+            for (StreamEvent evt : batch.events()) {
+                if (evt.getType() == ResponseType.STOP) {
+                    log.info("Stop watcher detected stop event, cancelling generation for session={}, message={}",
+                            sessionId, assistantMessageId);
+                    Event stopEvt = new Event();
+                    stopEvt.setType(EventType.EVENT_STOP);
+                    stopEvt.setSessionId(sessionId);
+                    StopData data = new StopData();
+                    data.setSessionId(sessionId);
+                    data.setMessageId(assistantMessageId);
+                    data.setReason("user_requested");
+                    stopEvt.setData(data);
+                    eventBus.emit(stopEvt);
+                    return;
+                }
+                if (evt.getType() == ResponseType.COMPLETE) {
+                    return;
+                }
+                if (evt.getType() == ResponseType.ERROR && evt.isDone()) {
+                    return;
+                }
+            }
+        }
     }
     void handleAgentEventsForSSE(HttpServletResponse response, String sessionId,
             String assistantMessageId, String requestId, SseStreamContext streamCtx,
