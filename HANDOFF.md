@@ -903,6 +903,15 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **SCC 复核**：13 组不变、`{service, task}` 2 成员不变（结构面未造新环）。
 - **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m43s** ✓ 十一守卫 ✓。
 - **操作小坑**：`git mv` 迁测试文件前需先建目标目录（首次因目录不存在报 "No such file or directory"，已补 `mkdir` 重跑）。
+
+**🔶 B263 第⑥步（2026-10-14，`ChunkVectorIndexer` → `index/`；并触发 `KnowledgeService` 的行数刹车信号）**
+- **`ChunkVectorIndexer`(386 行) → `knowledge/index/`**：实测它**零 service 同胞依赖**（只靠 `KnowledgeBaseMapper`/`KnowledgeMapper`、`model.*`、`embedding.Embedder`、`vectorstore`、`repository.ChunkRepository`、以及 B263⑤ 刚归位的 `index.KnowledgeVectorWrites`）⇒ 本步是**整搬**（不是切分），与"切分而非整搬"的规矩不冲突（规矩针对的是"带 service 依赖的类"）。
+- **副作用（有益）**：它原是 `task → service` 的引用之一 ⇒ 现为 `task → index`（`task → service` 9→8→**7 处**）。
+- **可见性一处**：`FaqIndexWriter`（service）调 `ChunkVectorIndexer.embedBatchSize(String)`（原同包）⇒ 该方法是**纯静态解析**（空/null→5、非法→IllegalState），提为 `public` 并写明理由（两处共用一份规则，不复制）。
+- **规则收紧**：A16/A17 的 `ChunkVectorIndexer` 条目（搬迁后标签已是 `knowledge.index.ChunkVectorIndexer`）因整体离开 `..service..` 而不再违例 ⇒ 删两条（本批次第 6 次）。
+- **⚑ 刹车信号（下一步必须处理）**：本步给 `KnowledgeService` 补的必需 import 把它从 796 行推到 **正好 800 行**，撞上大文件棘轮的 **≥800 登记阈值**（守卫当场报 "≥800 行 2 个"）。我先把**自己造成**的 `implements` 折行消掉（回归 **799 行**，≥800 重新只剩已登记的 `KnowledgeProcessWorker`），闸门复原全绿——**但这只是止血**：`KnowledgeService` 已贴近阈值，**下一步（B263⑦）必须先拆它**（抽 `repository/KnowledgeRepository` + use-case），否则任何一行变化都会再撞红线。
+- **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m44s** ✓ 十一守卫 ✓（≥800 计数回到 1）。
+- **登记（余步）**：⑦ `KnowledgeService`(799 行/28 引用) 拆分（**优先级最高：行数已到阈值边缘**）；⑧ `KnowledgeFileService`(422/2)、`KnowledgeParseService` 余部、`KnowledgeBaseService`(626/18)；⑨ 最后一对 `task ⇄ service`（`task→service` 现余 **7**：`ChunkExtractService`3 / `QuestionGenerationService`3 / `SpanTracker`）；⑩ `service` 七子面、`domain.{document,task,graph}`、`mapper` 目标名对齐。
 - **登记（余步）**：按最轻优先继续——`ChunkVectorIndexer`(386/2)、`KnowledgeFileService`(422/2)、`KnowledgeParseService` 余部、`KnowledgeBaseService`(626/18)、`KnowledgeService`(796/28)；一律"切分而非整搬"。`task → service` 现余 8 处（`ChunkExtractService`3 / `QuestionGenerationService`3 / `SpanTracker` / `ChunkVectorIndexer`）。
 
 ## 附：文档地图与归档追溯

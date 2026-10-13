@@ -42,6 +42,7 @@ import org.springframework.stereotype.Service;
 import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
 import com.ragagent.knowledge.task.KnowledgeProcessWorker;
 import java.util.Collections;
+import com.ragagent.knowledge.index.ChunkVectorIndexer;
 
 /**
  * 知识摘要生成管线：同步重生（含 fallback/重试状态机）与异步刷新入队；

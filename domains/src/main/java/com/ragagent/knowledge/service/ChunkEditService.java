@@ -21,6 +21,7 @@ import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
 import com.ragagent.retrieval.support.ChunkSearchUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import java.nio.charset.StandardCharsets;
+import com.ragagent.knowledge.index.ChunkVectorIndexer;
 
 /**
  * chunk 版本化编辑面：乐观锁更新的编辑/回滚/修订历史、软删除、图片子块联动与父内容重建，

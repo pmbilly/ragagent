@@ -35,6 +35,7 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import com.ragagent.knowledge.index.ChunkVectorIndexer;
 
 /**
  * 知识文件/行写面：manual 知识更新（全列写语义）、文件下载流、图片信息更新与

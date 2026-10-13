@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.service;
+package com.ragagent.knowledge.index;
 
 import java.util.ArrayList;
 import com.ragagent.knowledge.config.BatchEmbedProperties;
@@ -36,7 +36,6 @@ import com.ragagent.knowledge.client.EmbedderClient;
 import com.ragagent.retrieval.engine.VectorStoreService;
 import com.ragagent.retrieval.support.ChunkSearchUtil;
 import com.ragagent.knowledge.support.KnowledgeIndexContent;
-import com.ragagent.knowledge.index.KnowledgeVectorWrites;
 
 /**
  * chunk 向量行的重建执行体（2026-09-22 走查批：把「路由在、执行体占位」的两处
@@ -372,7 +371,13 @@ public class ChunkVectorIndexer {
         }
     }
 
-    static int embedBatchSize(String raw) {
+    /**
+     * 解析批量向量化批大小（空/null → 5；非法值 → {@code IllegalStateException}）。
+     *
+     * <p>B263⑥：本类由 `service/` 归位 `index/` 后，{@code service.FaqIndexWriter} 仍需要同一份
+     * 解析语义 ⇒ 提为 public（纯静态解析，无状态；两处调用共用一份规则，不复制）。</p>
+     */
+    public static int embedBatchSize(String raw) {
         String env = raw;
         if (env == null || env.isEmpty()) {
             return 5;

@@ -26,6 +26,7 @@ import com.ragagent.knowledge.client.EmbedderClient;
 import com.ragagent.knowledge.storage.TenantStorageService;
 import com.ragagent.retrieval.engine.VectorStoreService;
 import com.ragagent.knowledge.index.KnowledgeVectorWrites;
+import com.ragagent.knowledge.index.ChunkVectorIndexer;
 
 /**
  * FAQ 条目的落库与向量索引写路径：FAQ 容器 knowledge 的查找/惰性创建、嵌入模型
