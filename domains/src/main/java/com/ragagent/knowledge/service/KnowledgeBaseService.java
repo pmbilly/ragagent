@@ -19,7 +19,6 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.common.security.UserNameLookup;
 import com.ragagent.common.context.TenantContext;
@@ -31,8 +30,8 @@ import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.storage.domain.StorageBackend;
 import com.ragagent.knowledge.domain.UserKbPin;
-import com.ragagent.knowledge.mapper.StorageBackendMapper;
-import com.ragagent.knowledge.mapper.UserKbPinMapper;
+import com.ragagent.knowledge.repository.KnowledgeStorageBackendRepository;
+import com.ragagent.knowledge.repository.UserKbPinRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -62,8 +61,8 @@ public class KnowledgeBaseService
     private final KnowledgeBaseRepository kbRepository;
     private final KnowledgeRepository knowledgeRepository;
     private final ChunkRepository chunkRepository;
-    private final UserKbPinMapper pinMapper;
-    private final StorageBackendMapper storageBackendMapper;
+    private final UserKbPinRepository pinRepository;
+    private final KnowledgeStorageBackendRepository storageBackendRepository;
     private final TenantConfigLookup tenantConfigLookup;
     private final UserNameLookup userNameLookup;
     private final String retrieveDriver;
@@ -73,8 +72,8 @@ public class KnowledgeBaseService
     public KnowledgeBaseService(KnowledgeBaseRepository kbRepository,
                                 KnowledgeRepository knowledgeRepository,
                                 ChunkRepository chunkRepository,
-                                UserKbPinMapper pinMapper,
-                                StorageBackendMapper storageBackendMapper,
+                                UserKbPinRepository pinRepository,
+                                KnowledgeStorageBackendRepository storageBackendRepository,
                                 TenantConfigLookup tenantConfigLookup,
                                 UserNameLookup userNameLookup,
                                 RetrieveEngineRegistry retrieveEngineRegistry,
@@ -83,8 +82,8 @@ public class KnowledgeBaseService
         this.kbRepository = kbRepository;
         this.knowledgeRepository = knowledgeRepository;
         this.chunkRepository = chunkRepository;
-        this.pinMapper = pinMapper;
-        this.storageBackendMapper = storageBackendMapper;
+        this.pinRepository = pinRepository;
+        this.storageBackendRepository = storageBackendRepository;
         this.tenantConfigLookup = tenantConfigLookup;
         this.userNameLookup = userNameLookup;
         this.retrieveEngineRegistry = retrieveEngineRegistry;
@@ -264,23 +263,14 @@ public class KnowledgeBaseService
         }
         StorageBackend backend = null;
         if (!id.isEmpty()) {
-            backend = storageBackendMapper.selectOne(new LambdaQueryWrapper<StorageBackend>()
-                    .eq(StorageBackend::getId, id)
-                    .eq(StorageBackend::getTenantId, tenantId())
-                    .isNull(StorageBackend::getDeletedAt)
-                    .last("LIMIT 1"));
+            backend = storageBackendRepository.findById(tenantId(), id);
             if (backend == null) {
                 throw new BizException(AppError.badRequest("storage backend is unavailable"));
             }
         } else {
             String provider = kb.getStorageProvider();
             if (!provider.isEmpty()) {
-                backend = storageBackendMapper.selectOne(new LambdaQueryWrapper<StorageBackend>()
-                        .eq(StorageBackend::getTenantId, tenantId())
-                        .eq(StorageBackend::getProvider, provider)
-                        .eq(StorageBackend::isLegacyAlias, true)
-                        .isNull(StorageBackend::getDeletedAt)
-                        .last("LIMIT 1"));
+                backend = storageBackendRepository.findLegacyAliasByProvider(tenantId(), provider);
             }
         }
         if (backend == null) {
@@ -457,10 +447,7 @@ public class KnowledgeBaseService
         if (uid == null || uid.isEmpty()) {
             return;
         }
-        UserKbPin pin = pinMapper.selectOne(new LambdaQueryWrapper<UserKbPin>()
-                .eq(UserKbPin::getUserId, uid)
-                .eq(UserKbPin::getKnowledgeBaseId, kb.getId())
-                .last("LIMIT 1"));
+        UserKbPin pin = pinRepository.findByUserAndKb(uid, kb.getId());
         if (pin != null) {
             kb.setIsPinned(true);
             kb.setPinnedAt(pin.getPinnedAt());
@@ -540,8 +527,7 @@ public class KnowledgeBaseService
         kbRepository.softDelete(id, now);
         knowledgeRepository.softDeleteByKnowledgeBaseId(id, now);
         chunkRepository.softDeleteByKnowledgeBaseId(id, now);
-        pinMapper.delete(new LambdaQueryWrapper<UserKbPin>()
-                .eq(UserKbPin::getKnowledgeBaseId, id));
+        pinRepository.deleteByKnowledgeBaseId(id);
         log.info("Knowledge base deleted: {}", id);
     }
 
@@ -552,20 +538,15 @@ public class KnowledgeBaseService
             throw new BizException(AppError.notFound("knowledge base not found"));
         }
         String uid = TenantContext.currentUserId();
-        UserKbPin existing = pinMapper.selectOne(new LambdaQueryWrapper<UserKbPin>()
-                .eq(UserKbPin::getUserId, uid)
-                .eq(UserKbPin::getKnowledgeBaseId, id)
-                .last("LIMIT 1"));
+        UserKbPin existing = pinRepository.findByUserAndKb(uid, id);
         if (existing != null) {
-            pinMapper.delete(new LambdaQueryWrapper<UserKbPin>()
-                    .eq(UserKbPin::getUserId, uid)
-                    .eq(UserKbPin::getKnowledgeBaseId, id));
+            pinRepository.deleteByUserAndKb(uid, id);
         } else {
             UserKbPin pin = new UserKbPin();
             pin.setUserId(uid);
             pin.setKnowledgeBaseId(id);
             pin.setPinnedAt(OffsetDateTime.now(ZoneOffset.UTC));
-            pinMapper.insert(pin);
+            pinRepository.insert(pin);
         }
         fillCounts(kb);
         fillPin(kb, uid);
