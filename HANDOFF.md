@@ -921,6 +921,11 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **偶发测试（记录）**：全量跑时 `RedisWikiDeletedTombstoneStoreTest.clearRemovesTombstone` 失败一次，**单跑即过** ⇒ Redis 依赖型偶发，与本步改动无关（本步未触碰 wiki/Redis 路径）。
 - **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m34s** ✓ 十一守卫 ✓（13 组 SCC 未变）。
 - **登记（余步）**：
+**🔶 B263 第㉔步（2026-10-14，`KnowledgeCloneService` 归仓储：480 → 451 行）**
+- **只新增 1 个方法**：`ChunkRepository.listActiveByKnowledgeId(tenantId, knowledgeId)`（租户 + knowledge_id + 未软删）；其余 15 处全复用——`findById`（3 处租户内 KB 读，含 `TenantContext.currentTenantId()` 变体）、`findByIdOnly`、`knowledgeRepository.listByTenantAndKb`（源/目标两列表）、`kbRepository.listByTenant`（重名探测的 KB 列表）、`softDeleteIfActive`（㉑ 新增，正好同形）、`ChunkRepository.softDeleteByKnowledgeId`、三处 `insert`（KB/knowledge/chunk）。
+- **连带**：A17 删 1 条（A16 保留）；死成员守卫点名 2 个未使用 import 清掉；`ChunkMapper` 字段换成 `ChunkRepository`。
+- **测试**：4978 / 失败 0 / 跳过 4 ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m42s** ✓ 十一守卫 ✓（环 0 / SCC 13 组未变）。
+- **登记（余步）**：
 **🔶 B263 第㉓步（2026-10-14，`KnowledgeMoveService` 归仓储：383 → 343 行）**
 - **新增 3 个"搬行"形态方法**：`KnowledgeRepository.moveRowToKnowledgeBase(id, targetKbId, now)`（reuse_vectors 终态：改 KB + 落 completed + 清 error + 推 updated_at）、`resetRowForReparseInKnowledgeBase(id, targetKbId, embeddingModelId, now)`（reparse 待解析态：改 KB/嵌入模型 + pending + disabled + 清描述/时间/容量）、`ChunkRepository.moveToKnowledgeBase(knowledgeId, targetKbId, now)`。
 - **复用既有**：两处租户内按 id 读行 → `findById(tenantId, id)`；**四处** KB 读取（source/target 两变量名 × 两方法）→ `KnowledgeBaseRepository.findByIdOnly(id)`；两处标签关联清理 → `KnowledgeTagRepository.deleteRelations(knowledgeId)`（⑨ 已落位）。

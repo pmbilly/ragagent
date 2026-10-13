@@ -800,7 +800,6 @@ class ArchitectureRulesTest {
             "com.ragagent.knowledge.service.ChunkExtractService",
             "com.ragagent.knowledge.service.FaqIndexWriter",
             "com.ragagent.knowledge.service.KnowledgeBaseLookupAdapter",
-            "com.ragagent.knowledge.service.KnowledgeCloneService",
             "com.ragagent.knowledge.service.KnowledgeService",
             "com.ragagent.knowledge.service.QuestionGenerationService",
             "com.ragagent.memory.service.InProcessMemoryExtractTaskQueue",

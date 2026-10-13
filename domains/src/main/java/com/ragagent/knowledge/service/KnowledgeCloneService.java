@@ -1,5 +1,9 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.repository.ChunkRepository;
+import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
+import com.ragagent.knowledge.repository.KnowledgeRepository;
+
 import com.ragagent.common.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -8,8 +12,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
@@ -18,9 +20,6 @@ import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.dto.kb.KBCloneProgress;
-import com.ragagent.knowledge.mapper.ChunkMapper;
-import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
-import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import com.ragagent.model.service.ModelRuntimeFactory;
 import com.ragagent.retrieval.engine.PgVectorEngineRepository;
 import org.springframework.stereotype.Service;
@@ -46,9 +45,9 @@ public class KnowledgeCloneService {
     /** duplicate 的配置克隆用：知识实体带 OffsetDateTime，往返 mapper 必须挂 JSR310（本仓约定 步 3 教训）。 */
     private static final ObjectMapper CLONE_MAPPER =
             JsonMappers.lenient();
-    private final KnowledgeMapper knowledgeMapper;
-    private final KnowledgeBaseMapper kbMapper;
-    private final ChunkMapper chunkMapper;
+    private final KnowledgeRepository knowledgeRepository;
+    private final KnowledgeBaseRepository kbRepository;
+    private final ChunkRepository chunkRepo;
     private final KnowledgeBaseService knowledgeBaseService;
     private final KnowledgeTaskProgressStore progressStore;
     private final KnowledgeVectorWrites vectorWrites;
@@ -58,9 +57,9 @@ public class KnowledgeCloneService {
     private final KnowledgeTaskExecutor taskExecutor;
 
 
-    public KnowledgeCloneService(KnowledgeTaskExecutor taskExecutor, KnowledgeMapper knowledgeMapper,
-            KnowledgeBaseMapper kbMapper,
-            ChunkMapper chunkMapper,
+    public KnowledgeCloneService(KnowledgeTaskExecutor taskExecutor, KnowledgeRepository knowledgeRepository,
+            KnowledgeBaseRepository kbRepository,
+            ChunkRepository chunkRepo,
             KnowledgeBaseService knowledgeBaseService,
             KnowledgeTaskProgressStore progressStore,
             KnowledgeVectorWrites vectorWrites,
@@ -68,9 +67,9 @@ public class KnowledgeCloneService {
             ModelRuntimeFactory modelRuntimeFactory) {
 
         this.taskExecutor = taskExecutor;
-        this.knowledgeMapper = knowledgeMapper;
-        this.kbMapper = kbMapper;
-        this.chunkMapper = chunkMapper;
+        this.knowledgeRepository = knowledgeRepository;
+        this.kbRepository = kbRepository;
+        this.chunkRepo = chunkRepo;
         this.knowledgeBaseService = knowledgeBaseService;
         this.progressStore = progressStore;
         this.vectorWrites = vectorWrites;
@@ -105,11 +104,7 @@ public class KnowledgeCloneService {
 
     private void runKBClone(long tenantId, String taskId, String sourceId, String targetId,
                             boolean createTarget, String creatorId) {
-        KnowledgeBase source = kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getId, sourceId)
-                .eq(KnowledgeBase::getTenantId, tenantId)
-                .isNull(KnowledgeBase::getDeletedAt)
-                .last("LIMIT 1"));
+        KnowledgeBase source = kbRepository.findById(tenantId, sourceId);
         if (source == null) {
             progressStore.saveClone(new KBCloneProgress(
                     taskId, sourceId, targetId, "failed", 0, 0, 0, "Clone preflight failed",
@@ -124,15 +119,9 @@ public class KnowledgeCloneService {
             KnowledgeBase dst = targetRowForClone(tenantId, targetId, createTarget, creatorId, source);
             // preflight：add = 源里 target 没有的（file_hash+completed 二次匹配）；
             // remove = target 里的多余行；源里未完成的行报错
-            List<Knowledge> srcRows = knowledgeMapper.selectList(new LambdaQueryWrapper<Knowledge>()
-                    .eq(Knowledge::getKnowledgeBaseId, sourceId)
-                    .eq(Knowledge::getTenantId, tenantId)
-                    .isNull(Knowledge::getDeletedAt));
+            List<Knowledge> srcRows = knowledgeRepository.listByTenantAndKb(tenantId, sourceId);
             List<Knowledge> dstRows = createTarget ? new ArrayList<>()
-                    : knowledgeMapper.selectList(new LambdaQueryWrapper<Knowledge>()
-                            .eq(Knowledge::getKnowledgeBaseId, targetId)
-                            .eq(Knowledge::getTenantId, tenantId)
-                            .isNull(Knowledge::getDeletedAt));
+                    : knowledgeRepository.listByTenantAndKb(tenantId, targetId);
             List<Knowledge> toAdd = new ArrayList<>();
             Set<String> matched = new HashSet<>();
             for (Knowledge k : srcRows) {
@@ -197,11 +186,7 @@ public class KnowledgeCloneService {
     private KnowledgeBase targetRowForClone(long tenantId, String targetId, boolean create,
                                             String creatorId, KnowledgeBase source) {
         if (!create) {
-            return kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
-                    .eq(KnowledgeBase::getId, targetId)
-                    .eq(KnowledgeBase::getTenantId, tenantId)
-                    .isNull(KnowledgeBase::getDeletedAt)
-                    .last("LIMIT 1"));
+            return kbRepository.findById(tenantId, targetId);
         }
         KnowledgeBase kb = new KnowledgeBase();
         kb.setId(targetId);
@@ -225,20 +210,15 @@ public class KnowledgeCloneService {
         kb.setCreatedAt(now);
         kb.setUpdatedAt(now);
         kb.normalizeVectorStoreId();
-        kbMapper.insert(kb);
+        kbRepository.insert(kb);
         return kb;
     }
 
     /** knowledge 软删 + chunk 软删。 */
     private void removeKnowledgeRow(String knowledgeId) {
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
-        knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
-                .eq(Knowledge::getId, knowledgeId)
-                .isNull(Knowledge::getDeletedAt)
-                .set(Knowledge::getDeletedAt, now));
-        chunkMapper.update(null, new LambdaUpdateWrapper<Chunk>()
-                .eq(Chunk::getKnowledgeId, knowledgeId)
-                .set(Chunk::getDeletedAt, now));
+        knowledgeRepository.softDeleteIfActive(knowledgeId, now);
+        chunkRepo.softDeleteByKnowledgeId(knowledgeId, now);
     }
 
     /** 行级克隆：新 knowledge id + 新 chunk id（向量/文件对象不复制，见 startKBClone 差异）。 */
@@ -268,11 +248,8 @@ public class KnowledgeCloneService {
         copy.setCreatedAt(now);
         copy.setUpdatedAt(now);
         copy.setErrorMessage(src.getErrorMessage());
-        knowledgeMapper.insert(copy);
-        List<Chunk> chunks = chunkMapper.selectList(new LambdaQueryWrapper<Chunk>()
-                .eq(Chunk::getKnowledgeId, src.getId())
-                .eq(Chunk::getTenantId, src.getTenantId())
-                .isNull(Chunk::getDeletedAt));
+        knowledgeRepository.insert(copy);
+        List<Chunk> chunks = chunkRepo.listActiveByKnowledgeId(src.getTenantId(), src.getId());
         Map<String, String> srcToDstChunkIds = new LinkedHashMap<>();
         for (Chunk c : chunks) {
             Chunk nc = new Chunk();
@@ -289,7 +266,7 @@ public class KnowledgeCloneService {
             nc.setEndAt(c.getEndAt());
             nc.setCreatedAt(now);
             nc.setUpdatedAt(now);
-            chunkMapper.insert(nc);
+            chunkRepo.insert(nc);
             srcToDstChunkIds.put(c.getId(), nc.getId());
         }
         copyKnowledgeVectors(src, dst, newId, srcToDstChunkIds);
@@ -307,10 +284,7 @@ public class KnowledgeCloneService {
                 || dst.getEmbeddingModelId().isEmpty()) {
             return;
         }
-        KnowledgeBase srcKb = kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getId, src.getKnowledgeBaseId())
-                .isNull(KnowledgeBase::getDeletedAt)
-                .last("LIMIT 1"));
+        KnowledgeBase srcKb = kbRepository.findByIdOnly(src.getKnowledgeBaseId());
         if (srcKb == null) {
             return;
         }
@@ -350,11 +324,7 @@ public class KnowledgeCloneService {
      * 计数/置顶/临时全清零，EnsureDefaults + Normalize 后落库。**只复制设置**——
      */
     public KnowledgeBase duplicateKnowledgeBase(String sourceId) {
-        KnowledgeBase source = kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getId, sourceId)
-                .eq(KnowledgeBase::getTenantId, TenantContext.currentTenantId())
-                .isNull(KnowledgeBase::getDeletedAt)
-                .last("LIMIT 1"));
+        KnowledgeBase source = kbRepository.findById(TenantContext.currentTenantId(), sourceId);
         if (source == null) {
             throw new BizException(AppError.notFound("knowledge base not found"));
         }
@@ -393,7 +363,7 @@ public class KnowledgeCloneService {
         if (target.hasVectorStore()) {
             knowledgeBaseService.validateVectorStoreBinding(TenantContext.currentTenantId(), target.getVectorStoreId());
         }
-        kbMapper.insert(target);
+        kbRepository.insert(target);
         return target;
     }
 
@@ -405,9 +375,7 @@ public class KnowledgeCloneService {
         }
         String suffix = " 副本";
         Set<String> existing = new HashSet<>();
-        for (KnowledgeBase kb : kbMapper.selectList(new LambdaQueryWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getTenantId, tid)
-                .isNull(KnowledgeBase::getDeletedAt))) {
+        for (KnowledgeBase kb : kbRepository.listByTenant(tid)) {
             existing.add(kb.getName());
         }
         String candidate = baseName + suffix;

@@ -118,6 +118,14 @@ public class ChunkRepository implements ChunkSearchGateway {
                 .set(Chunk::getUpdatedAt, now));
     }
 
+    /** 该 knowledge 下未软删的 chunk（租户 + knowledge_id + 未软删；B263㉔ 由 service 直连归位）。 */
+    public List<Chunk> listActiveByKnowledgeId(long tenantId, String knowledgeId) {
+        return chunkMapper.selectList(new LambdaQueryWrapper<Chunk>()
+                .eq(Chunk::getKnowledgeId, knowledgeId)
+                .eq(Chunk::getTenantId, tenantId)
+                .isNull(Chunk::getDeletedAt));
+    }
+
     /** 按主键整行更新（B263⑩：由 service 直连 chunkMapper 归位）。 */
     public void updateById(Chunk chunk) {
         chunkMapper.updateById(chunk);
