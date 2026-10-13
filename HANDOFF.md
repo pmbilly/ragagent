@@ -1,239 +1,99 @@
-# ragagent 交接文档（新仓起步）
+# ragagent 交接文档（v0.2.0 全面整改版）
 
-> 本文档写给在 `~/ragagent` 打开的新会话/新成员。**一切背景以本文为准**；最近的执行细节在 `git log`。
-> 种子：自 `~/ragagent-java` @ `646aba7`（2026-09-28）分叉，git 历史完整保留。
-> **最近更新 2026-10-11（B224 注释治理第三专项：注释批次/工作包代号清零——207 Java 文件 413 处 + 前端 65 处；过时事实 ~60 处修正：「17 种事件」第二处引用方、204 退役族注释对齐 200+外壳、悬空 javadoc 与死引用；机械对比器核验代码零变化）。上一次 2026-10-11（B223 SSRF 放行 wss/ws 修 IM 长连接 + B222 前端代理默认值 8083）**；再上次 2026-10-10（B221 契约同步守卫：契约变更必须显式签字；B220 覆盖率聚合：可信整体数字 行 67.8%/分支 54.0% + 定位 QA 链路盲区；B219 消除全仓最大 Java 文件 3.78 MB→170 KB + 守卫扩面按字节判；B218 可测试性补强：tenant 脱敏单测 + 跳过棘轮 + `*IT` 执行入口 + jacoco 按需；**本轮架构评估 6 批及后续收尾全部完成**——B212~B219）。此前：B217 边界条件不得降级：ES V7 空 filter 修复 + 第十守卫；B216 起停服脚本补齐；B215 序列化统一：自建 mapper 168→7 + A15 守卫；B214 工程化补齐：九守卫进 Gradle + version catalog；B213 仓储门面归位 `repository/` + A11b 防回流；B212 交付链路修复：Dockerfile 失效 + 镜像进 CI）**；上一次 2026-10-10（B204 文档瘦身：§15.1 批次表压成一行一批，432.9→171.9 KB）；再上一次 2026-10-02（B32 文档重组）：§14 域级作战/执行记录（2269 行）与 §15.1.1 逐批记录（442 行）
-> **已移出本文件**——`docs/handoff/plans/`（索引见 §14.7+）与 `docs/handoff/records/batch-records.md`（索引见 §15.1.1）。
-> 本文件＝**常读面**：接手须知 / §2 决策 / §13 方法论 / §14.1~14.6 判据与坑 / §14.9 换锚总纲 / §15 批次总表与纪律。
-> **当前状态总账**见 §15 末（结构各轴完成 + 5 项已知边界）。
+> **换版说明（2026-10-13，B235）**：本文件以 v0.2.0 全面整改为新起点重写。
+> v0.1.0 迭代全文（建仓/裁剪/神类拆分/契约换锚/统一外壳/守卫建设等批次史）已归档为
+> **`docs/handoff/archive/HANDOFF-v0.1.0-2026-10-13.md`**；历史细节仍可用 `git log --grep="(B###)"` 取回。
+> **外部引用注意**：§8 / §9 / §10 / §13 / §14 / §15.2 / §15.3 **编号与语义保持不动**（docs/ 与源码注释有 40+ 处按号引用）；
+> §11 压缩为指针；**§12 为新建**（原多处引用"§12 结构地图"长期悬空，此次补齐）；§0/§2/§4/§5/§7 重写；§15.1 换为 R 系列批次表。
+> 方案与计划：`outputs/java-remediation-plan-2026-10-13.md`（整改方案）· `outputs/java-remediation-implementation-plan-2026-10-13.md`（具体实施计划）。
 
+## ⭐ 接手须知（v0.2.0 版，5 分钟）
 
-## ⭐ 接手须知（5 分钟版）
+0. **本版是什么**：v0.1.0 的"脱 Go / 提可读性"各轴已收官（见 §7）；**v0.2.0 = 按整改方案做全面整改**（正确性修复 → 结构收敛 → 整体包结构整改），批次表见 §15.1。
+1. **开工顺序**：读 §7 现状 → §15.1 挑批次（按 ⬜ 顺序）→ §15.2 纪律 → 干活 → 回填 §15.1 状态 + §15.4 记录。
+2. **第一步永远先验基线**：`env -u SYSTEM_AES_KEY JAVA_HOME=/opt/homebrew/opt/openjdk@21 ./gradlew spotlessCheck build`（期望 **4,908 用例 / 0 失败 / 跳过 4**）＋ 十一守卫（已接入 build）。
+3. **行为不变是底线**：一切整改以测试套件为安全网；契约变更走显式签字（B221 守卫）。
+4. **两个拍板点**在 §15.1 标注（B238 K2 语义 / B247 K6 深度），到批前找用户定。
+5. **环境三件套**（起服/停服/端口）见 §8；⚠️ 跑完 build 必须重启后端（陈旧类全站 500）。
+6. **历史考古**：v0.1.0 全文在 `docs/handoff/archive/`；批次详情 `git log --grep="(B###)"`。
 
-0. **文档布局（2026-10-02 重组；2026-10-10 复理）**：本文件＝**常读面**（接手须知 / §2 决策 / §13 方法论 / §14.1~14.6 判据与坑 / §14.9 换锚总纲 / §15 批次表与纪律）；**查证面已移出**——域级作战与执行记录见 `docs/handoff/plans/`（索引见 §14.7+）、逐批执行记录见 `docs/handoff/records/batch-records.md`（索引见 §15.1.1）。
-1. **先验证基线全绿**（三条命令见 §9；session 域单域验证：`./gradlew :domains:test --tests "com.ragagent.session.*"`，当前 **4871 条 / 失败 0**（B218 实测 ✓））。
-2. **总目标**＝按 Java 标准提升可读性（§0）；**行为不变**是底线（测试是安全网）；已定决策见 §2（勿再讨论）。
-3. **项目主线的历史收束（一句话版）** ✓
-   - 包结构治理 P0~P3 ✓、阶段 2 神类切片（session/wiki/im/retrieval/auth/llm/mcp/embed/chatpipeline/datasource/memory，含 m5）✓、
-     阶段 3 契约换锚（evaluation 打样 → model/system/auth/memory/session/embed/mcp/datasource → wiki ingest ✓）——**均已收官** ✓；
-   - **P2「统一响应外壳」线（B183–B203）已实质完成** ✓：**50/52 控制器**（pending 2 = `ImCallbackController` 外部平台协议 / `HealthController` 探针，均为**登记例外** ✓），
-     约定见 `docs/api-response-convention.md` ✓、批次明细见 §15.1 索引 + `git log --grep="(B19"`~`"(B20"` ✓；
-   - 端口/起服：**后端 :8083**（`bash scripts/java-server-up.sh` ✓ 读 `.env` 的 `SERVER_PORT`）+ **前端 :5173** ✓；⚠️ 跑完 `gradle build` 记得**重启后端**（构建就地重写 jar ⇒ 在线服务全站 500 ✓ README 有记 ✓）。
-4. **下一步（2026-10-02 更新）**：§15 计划已完成 **B0 端到端真实走查（P0，2026-10-02 收官，修 15 处断点）/
-   B1 契约文档 v1.1 / B2 金片对比器统一（GoldenContract 上线，字节级对比清零）/ B3 `@JsonInclude` 恒输出化
-   （真面 68 处；yunzhijia 第三方回退）/ **B3b KB 配置 jsonb 键名统一（camelCase + V2 存量迁移，2026-10-02 收官）** /
-   B4 零值哨兵（结论：不改，已知例外）/ B7 死成员 19 处 / B8 FQ 注解 177→0**（✅ 记录见 §15.1 各行与 §15.1.1）。
-   **剩余待做**：~~B5 载具嵌套化~~（✅）/ ~~B9 Go 锚点~~（✅ 机制落地，清扫随触碰）/ **~~B6 getenv 收敛~~（✅ 已结项：十批清完，代码内裸 getenv 149→0；四种落点形态与踩坑见 §15.1.1）** /
-   ~~B10 ArchUnit 进 CI~~（✅ 2026-10-02）/ ~~B11 多模块~~（✅ 判定：不做，理由与重访条件见 15.1.1）。**B0 登记残留见 §15.1.1**（B3b′ 已修；wiki 死信槽位（②）与孤儿 op 重放（③）已由 **B12** 修；其余两项已由 **B13** 处理：④ 判定为 Go 期 KV 页、已被后端行取代 → 删孤儿；⑤ 加 `edition` 信号前置跳过。**B0 残留全部清完**；**`process_overrides` 移植缺口**：用户 2026-10-02 定调——**保留现状（不删、界面控件不动），未来补后端**（见 15.1.1；「逐文档参数不生效且无提示」是已知并接受的现状）。
-   **新会话接手**：直接读 §15.1 批次表（状态列）+ §15.1.1 执行记录 + §15.2 纪律五条（开工前必读）+
-   §15.3 非目标冻结清单；做完一批把 ✅ 与记录写回 §15.1。
-5. **落刀方法论**：§13 是**必读**（判据 + harness 流水线 + 守卫口径 + 忠实性核验手法），
-   harness 模板已入库：`scripts/refactor-harness.sh`；切片产物排版闸门：`scripts/normalize-blank-lines.py`（§13.8）。
-6. **全仓存量**：≥800 行的类只剩 **4 个登记例外**（§14.3，真单类已清零）；**检索 / auth controller / wiki / im / mcp / embed / chatpipeline / datasource / evaluation 域 ≥800 全为零**，memory 域已出榜 3/3（2026-10-01 m5 后仅剩 `MemoryIndexStore` 929，登记例外）。
+## 0. 总目标
 
-## 0. 总目标（2026-09-29 用户定稿）
+**v0.2.0：按整改方案完成全面整改，达到三问验收。**
 
-**根据 Java 的标准和思想，全面提升代码的可读性。**
+- 三问（总验收）：**用例可读**（顺主线能读完） / **状态可控**（任一状态字段写入者唯一） / **政策可复用**（同一规则全仓一份实现 + 契约测试）。
+- 手段分层：先正确性（阶段 1~3，修真实缺陷）→ 再结构收敛（阶段 4~5）→ 最后整体包结构整改（阶段 6：改名清算 → contracts/platform → 三 runtime → domains 重排 → 门禁收紧）。
+- 底线：行为不变；搬迁与行为修改拆成不同提交/批次；守卫不许用刷新 baseline 掩盖违例。
+- v0.1.0 的目标（按 Java 标准提升可读性）已被本目标吸收，不再单列。
 
-- 这是从翻译期（"忠实复刻 Go"）到 Java 本位期的目标切换：以 Java 生态的主流标准与惯用法为尺度——标准 Jackson 序列化、DTO + `@Valid` 请求绑定、`@ConfigurationProperties` 配置、Spring 装配惯例、常规类规模与命名——让代码读起来像一个原生 Java 项目，而不是 Go 的 Java 转写。
-- 可读性是唯一主线：§5 路线图的各阶段（神类拆分、序列化换锚、DTO 化、注释清洗等）都是达成它的手段，规划优先级以"对可读性的收益"衡量。
-- 行为不变仍是底线（4,600+ 测试是安全网）；可读性改造不得改变对外契约与业务语义，契约形态的显式变更走 §2 第 4 条。
-- **下一步规划由用户在另一个新会话进行**——那个会话应以本文档为唯一背景，围绕本目标展开（候选工作面见 §5 阶段 2/3/4 与 §4 的存量数据）。
+## 1. 仓库身份与分界（保留）
 
-## 1. 仓库身份与分界
+- 本仓 = 原 WeKnora Go 后端的 Java 翻译版的**后续演进线**；自 seed 起**不承担与 Go 仓的任何契约对齐义务**。
+- 旧仓 `~/ragagent-java` 已冻结零修改，仅作考古参照（§10）。不要往旧仓推任何代码。
+- **origin 已建立**：`https://github.com/pmbilly/ragagent.git`（公开）；**v0.2.0 分支** 2026-10-13 自 main（`53266b03`）新建，R 系列提交落在该分支（本地 ahead；推送需显式执行）。
 
-- 本仓 = 原 WeKnora Go 后端的 Java 翻译版（ragagent-java）的**后续演进线**。
-- 自 seed 起：**不再承担与 Go 仓的任何契约对齐义务**——字节级一致、双端 A/B 对拍、Go 错误文案复刻、GORM 行为复刻注释等全部退役。
-- 旧仓 `~/ragagent-java` 已冻结零修改，仅作考古参照（翻译方法论、坑史在那边，见 §10）。不要往旧仓推任何代码。
-- 本仓 git origin 未设置（本地 clone 后已摘除，避免误推旧仓）；远端建好后：`git remote add origin <url> && git push -u origin main --tags`。
+## 2. 已定决策（勿再重新讨论）——v0.2.0 修订版
 
-## 2. 已定决策（勿再重新讨论）
+> 本节 = 仍然承重的决策；v0.1.0 中被后续执行取代的条目已改写（全文见归档）。
 
-0. **总目标 = 按 Java 标准全面提升可读性**（见 §0）：后续所有重构规划的出发点与优先级尺度。
-1. **旧仓零修改**：没有冻结过渡期、没有 fix 回流，本仓即唯一工作仓。
-2. **产品未上线，无数据连续性负担**：schema 可直接做基线合并（见 §5 阶段 1）。
-3. **前端随后端逐步调整**：改契约的后端 PR 同 PR 带前端修改，不设集中适配期。
-4. **契约标准（2026-09-29 用户改定，取代本文档早前"保留 snake_case + RFC 7807"版本；细则见 `docs/knowledge-api-contract-v1.md` v1.0）**：
-   - **字段命名 = camelCase，且 JSON 字段名 = Java 字段名**（禁止逐字段 `@JsonProperty`、禁止 `@JsonNaming` 下划线转换）；布尔字段不带 `is` 前缀（`pinned`/`enabled`）。
-   - **成功响应不再包 `{data, success}` 信封**：单资源直接返回对象、列表直接返回数组；分页统一 `{"items","page","pageSize","total"}`；删除类接口返回 **HTTP 204**。
-   - **错误响应统一** `{"error":{"code","message","details"}}`（保留数值 code，前端分支不变）。
-   - 时间 ISO-8601 带时区；**可空字段显式输出 `null`**（不用 NON_NULL 省略、不用空串/0 代替）；不使用 `Problem Details`。
-   - 落地范围（**2026-09-30 更新**）：知识库域**已完成**；并已按同标准扩展到 **检索域**（`SearchResult` + `hybrid-search`）、**会话/消息/附件/建议/steer/knowledge-search**、**chunker/preview**（均同批带前端）。其余域（wiki/agent/auth/memory/mcp 等）尚未跟进，按"域接域、同 PR 带前端"继续。
-5. **功能裁剪（2026-09-28 用户定稿，第一批）**：移除「**浏览器连接、沙箱、CLI、Chrome 插件、Claw Skill**」五项——对应后端 `browserskill` + `sandbox` 两包（沙箱执行面：installer agent、镜像快照、shell_exec、沙箱文件四件套、PTY 终端；**技能体系保留但降级为指令型**，见第 9 条）与前端 integrations 设置的 `cli`/`chrome`/`claw` 三个纯展示 tab（精确清单见 §6.1）。裁完后**聚焦知识库与 Agent 两个域的重构**（§5 阶段 2）。以下为**待排期可选项**（不在第一批，勿主动动手）：`org`（共享空间/跨租户授予）、`im`（九渠道）、`datasource`（连接器，28.3k 行零耦合）、`evaluation`、`favorite`；多引擎检索是否裁到 postgres 单引擎待议。保留：mcp、memory、embed、wiki、知识库/检索/会话主链路。
-6. **自研基础设施保留**：EventBus、StreamManager（Redis Stream）、chatpipeline 插件管线、ToolRegistry、各 Bridge——是架构不是技术债；阶段 4 只做多模块边界固化，不替换。
-7. **Go 兼容序列化层退役（可读性主线的一环）——线上对齐面已于 2026-09-30（`0ac456e`）执行完毕**：摘除逐字段 Go 注解 **156 处 + 全限定写法 5 处**（42 文件），删除 `JacksonConfig`（4 个 bean：全局时区归一 / HTML 转义 / writer 工厂 / `float[]`）与 `GoTimeDeserializer`、`GoNaiveTimeSerializer`、`GoWriterJsonFactory`、`GoFloatArraySerializer`；**保留工具面**（仍是字节契约的 §11 边界路径）：`GoDoubleSerializer`/`GoTimeSerializer`/`GoMapSerializer`/`GoJsonEscapes`/`GoJson`——chatpipeline 手搓载荷、agent 工具输出、事件总线、Redis 流事件、provider 客户端仍依赖其 Go 字节形态，**别再当遗产删**。原描述：Controller 里大量手搓 `ObjectNode` 一并收敛为 DTO 序列化——DTO 化是 Java 本位可读性的核心工作面。**注意**：这是唯一被红线要求"一次性全仓完成"的动作（半删状态最危险），见 §3 与 §5 阶段 3。
-8. **神类拆分有现成地图**：41 个千行大类的分段注释就是原 Go 文件边界，沿注释拆即可，不需要重新设计边界。
-9. **Agent 能力取舍已接受**：裁沙箱与浏览器连接后，Agent 剩余工具面 = 知识检索族 + wiki 十件 + web 两件 + MCP + DuckDB 数据分析（DataAnalysisTool 走独立 DuckDB 会话，初步判断不依赖沙箱，动手时验证）；browser skill 工具随 `browserskill` 一并消失。
-10. **技能降级为指令型（2026-09-28 定稿，选项 B）**：技能 = playbook——保留 SKILL.md 提示词注入路径（`agent/skills` 的 Skill/Loader/Manager + `AgentEngine.setSkillsManager` + agent config 的 `skills_selection_mode/selected_skills` 字段 + 前端技能选择器），模型凭指令执行；**删除**镜像源（TenantSkillSource）、安装管线、shell/文件注入（范围见 §6.1③）；执行型扩展需求引导走 MCP。
-11. **落库格式（jsonb / 会话引用的存储）同样走 Java 字段名**（2026-09-29 用户改定）：产品未上线、**无历史包袱**，所以落库 JSON 不再保留 snake——直接去 `@JsonProperty`，**不加兼容别名**（曾加过的 `@JsonAlias` 已删）。范围：knowledge 落库类型（`Knowledge`/`KnowledgeBase`/`Chunk`/`ChunkRevision`/`GeneratedQuestion`/7 个 `KnowledgeBase*Config`/`*Metadata`/`Payload`/`FaqImportResult`）+ `retrieval.domain.SearchResult`。
-12. **宽松读统一策略**（不要再逐类挂注解）：读落库/外部 JSON 一律忽略未知属性——`common/web/JsonMappers.lenient()` 是唯一工厂（jsonb 读写 `PgJsonTypeHandler`、chatpipeline 的 mapper、配置类型工厂都接它），Spring MVC 绑定侧由 `application.yml` 的 `spring.jackson.deserialization.fail-on-unknown-properties: false` 承担。**新增 mapper 必须接工厂**；旧域尚存的 44 个逐类 `@JsonIgnoreProperties` 属未接工厂的域，勿直接批量删。
-13. **包结构约定（knowledge 包已示范，其余域照此靠拢）**：`mapper/` 只放 MyBatis-Plus 接口；`repository/` 放仓储门面（软删/乐观锁/方言分支）；`service/` 只放 Spring 服务（用例）与 `@Component`；`support/` 放无状态零依赖的算法与规则；`task/`、`client/`、`storage/`、`security/` 按角色。**一类型一文件**——禁 `*Dtos`/`*Enums`/`*Jsons`/`*Util` 这类复数容器与收集器类（已清理，别再造）。
-14. **命名政策**：类型名**全词**（禁 `Kb`/`Ops` 等缩写；例外：实体类名可跟随表名，如 `UserKbPin` ↔ `user_kb_pins`）；请求侧布尔字段不带 `is` 前缀；Go 术语清零（`Runes`→`CodePoints`、`runeSlicesEqual`→`codePointSlicesEqual`）；抽象接口后缀用 `Gateway`（非旧 `Bridge`）。
+1. **旧仓零修改**；本仓即唯一工作仓。
+2. **产品未上线，无数据连续性负担**：schema 基线化管理（`V1__baseline.sql`），不写存量兼容迁移；前端随后端同批调整。
+3. **契约标准（现行 = B183 统一响应外壳）**：`{code,message,data}` 一套外壳 + 前端唯一解包点（`utils/request.ts`），约定见 `docs/api-response-convention.md`；错误体摊平到顶层；**取代** v0.1.0 早期"删除 204 / 错误体三段式"版本（已退役）。例外仅 `ImCallbackController`（外部平台协议）与 `HealthController`（探针），登记在守卫里。
+4. **字段命名 = camelCase，JSON 名 = Java 字段名**（禁逐字段 `@JsonProperty`，`A14` 硬门守）；落库 jsonb 同走 Java 字段名；宽松读统一 `JsonMappers.lenient()`（`A15` 硬门守）。
+5. **功能裁剪五件套（2026-09-28 定稿）**：浏览器连接 / 沙箱 / CLI / Chrome 插件 / Claw Skill 已移除；技能降级为指令型（playbook），执行型扩展走 MCP。
+6. **自研基础设施保留**：EventBus / StreamManager（Redis Stream）/ chatpipeline 管线 / ToolRegistry / 各 Bridge——是架构不是技术债，整改不替换。
+7. **Go 兼容层已全部退役**：逐字段 Go 注解 0、`Go*` 序列化器 0（provider 面由 `ProviderJson`、事件/流面由 `EventJson`/`StreamJson` 承接）、Go 锚点注释 0（棘轮守）。工具面 schema 键已按 Java 标准 camel。
+8. **包结构约定**：`mapper/` 只放 MyBatis-Plus 接口、`repository/` 放仓储门面（`A11b` 守）；`service/` 不得依赖边界层与具体技术（`A16/A17` 守，基线只减）；**v0.2.0 目标结构**见整改方案 §6（域内十一层）与 §5（七模块），执行见 §15.1 阶段 6。
+9. **命名政策**：类型名全词（禁 `Kb`/`Ops` 缩写；实体可跟随表名）；请求侧布尔不带 `is` 前缀；抽象接口后缀 `Gateway`。
+10. **v0.2.0 整改的硬约束**（整改方案 §13/§14）：不重写、不拆微服务；不按行数机械拆类；不造空层；**不刷新 baseline 掩盖违例**；**不用 `@Lazy` 掩盖环**；搬迁 PR 不夹带行为变更。
 
-## 3. 两条红线
+## 3. 三条红线
 
-1. **一次只动一个轴**：裁剪期不改结构、换锚期不拆类、拆类期不动架构；每阶段结束必须全绿可运行。一旦开始"顺手把 X 也重构了"，就退化成大爆炸重写。
-2. **裁剪手术期单工作流**：缝合点文件高度重叠，PR 串行合入；阶段 3 起可按包分线并行。
+1. **一次只动一个轴**：正确性批不动结构、搬迁批不改行为；每批结束必须全绿可运行。
+2. **裁剪/大改期单工作流**：缝合点文件高度重叠时串行合入；其余按批并行。
+3. **先失败测试再改实现**（v0.2.0 新增）：每条正确性修复必须先有能红的测试/反例；守卫类改动必配红态探针（§15.2 第 6 条）。
 
-## 4. 关键测量数据（**2026-09-30 复核**）
+## 4. 关键测量数据（2026-10-13 实测）
 
-- main：**1,535 文件 / 27.9 万行**；test：**401 文件 / 12.6 万行 / 1,366 契约 fixture**；frontend：**465 文件 / 20.0 万行**。
-- 后端测试：**4,681 用例全绿**（含 6 个 skip，2026-09-30 复核；2026-10-01 model 域收官批实测 **4,670 / 失败 0 / 跳过 4**，434 测试类）；前端 `vue-tsc` 0 错误 + **738 用例全绿**（2026-10-10 B202 实测 ✓；早前 690 为 2026-10-01）。
-- **≥800 行的类（main，全仓）**：AgentEngine 3,235、WikiIngestBatchHandler 2,268、WikiIngestService 2,182、InitializationController 1,981、DataSourceService 1,827、SessionKnowledgeQaService 1,764、MemoryService 1,660、OpenSearchRetrieveRepository 1,652、WikiPageServiceImpl 1,642、KnowledgeQaController 1,616……
-  （**2026-09-30 历史快照，多数已过时**——活榜单以 §14.3 为准：2026-10-01 实测 36 个）
-- **knowledge 包（已整治，可作样板）**：**197 文件 / 25,264 行**；最大三个 = `FaqImportService` 1,234、`KnowledgeService` 850、`KnowledgeProcessWorker` 814；13 个子包见 §12；容器类/`*Util` 反模式命名已清零。
-- **agent 域（2026-09-30 A/B/E 波后）**：agent 145 文件 / 24,438 行 + agentm 30 文件 / 5,614 行；**≥800 行类 0 个**（A 波前 8 个）；**Go 锚点 0**（479 处/186 文件已清扫,§13.11/13.13 判据,真实不变量改中性陈述保留）；12 个子包全有 package-info；`@JsonProperty` 余 30 处已随落库换锚清零（§11.1）。
-- **Go 遗留面（阶段 3 的存量，均为本仓 grep 口径）**：Go 兼容序列化器**线上引用 0 处**（2026-09-30 退役完成，`0ac456e`）；~~工具面保留 5 个类~~（**B227 复核订正：5 类已全部退役，main 零文件**——provider 面字节约束由 `RemoteApiBodyCodec.byteOrderSorted` 与 `common/web/ProviderJson`、事件/流面由 `EventJson`/`StreamJson` 承接，见 §11 边界）；"对照 Go / GORM"类注释锚点 **6,157 处**（阶段 3 随触碰清洗，先摘不变量信息再删锚点，不搞专项大扫除）；裸 `System.getenv()` **151 处**（收敛进 `@ConfigurationProperties`）。
-- **注释卫生（knowledge 包实测，2026-09-30，可作其余域标准）**：Go 锚点注释 **0 处**、注释掉的代码 **0 处**、TODO **1 处**、注释占比 12.1%、13 个包全有 `package-info`；坏 `{@link}` 0 处。Javadoc 覆盖：**public 类型 91%**（201/221，未写的 20 处是纯 CRUD 请求体——有意留白，名字即语义）、public 方法 33%（**分布是对的**：逻辑密集类 90%+，POJO 访问器 7%）。
-- **import 卫生（实测 2026-09-30）**：主干 11,557 条 import，Spotless 闸门清掉 **295 处未使用**（其中 276 处在 `knowledge/dto`——**抽类时继承原文件 import 列表**留下的）+ **13 处重复**；剩 64 处未使用在 `seed` 后未触碰过的文件里，改到即被闸门清掉（这是 ratchet 的设计，不是遗漏）。**死 logger（声明却未使用）**：主干 15 处 / 测试 0 处；knowledge 已清零（`88c8054`，-24 行），**agent/agentm 已清零**（2026-09-30，含死 `ObjectMapper` 3 处），余 **5 处**散在 `model/controller`（3）、`auth/service`（1）、`wiki/service`（1），随各自批次清。**死成员**：knowledge 已清零（logger 8 + MAPPER 5 + 死局部变量 4 + 死方法 1 + 死依赖 16 + 遮蔽 import 2）；全仓候选 **66 处**（字段 51 / 私有方法 14 / 遮蔽 import 1，`7bf963e` 口径，**含误报类**，需逐条人工确认；口径**不含未使用局部变量**——那类目前只有 IDE 能发现）；`agentm/ModelConnectivityTestService` 3 处死依赖**已清**（2026-09-30）；**agent/agentm 死成员亦清零**（死成员 7 = 死 `ObjectMapper` 3 / 死 logger 2 / 死私有方法 2，另重复 import 6 条——Spotless 不去重）。**注意一个已知口径缺口**：字段级扫描"构造函数里赋值算引用"，所以**只注入不读取的依赖**要用依赖级口径单独扫（`agentm` 那 3 处就是这么漏到后来的）。
-- **`@JsonInclude` 处置完毕（2026-09-30，批次 A/B = `dc62ef7` + `7f1b2a7`）**：knowledge 原 38 处（Go `omitempty` 直译）→ **全域清零**；响应面 3 处按「可空显式 null」改（7 个 cprev fixture 同步），落库/LLM 载荷 35 处删注解（键恒输出；`path(x).asDefault()` 容错，全仓无「依赖键缺席」判断）。**当时暴露的缺口已补**：KB 配置 jsonb（`config` 列）形状原本无任何契约测试（改了 4 个 config 类型的输出却零 fixture 变化）→ 2026-09-30 新增 `knowledge/domain/KnowledgeBaseConfigJsonContractTest`（5 用例：键集合钉死、空值/假值必须显式输出、7 个配置类型 round-trip、读取容错与「旧 snake 键不再映射」防回流，`cd153c3`）。
-- **全限定名注解**：knowledge 已清零（22 处 → import + 短名，`4735348`）；全仓余 **177 处**（jackson annotation 138 / databind 15 / spring 9+4+2+1 / mybatis-plus 3 …），随各域批次清理。
-- 历史对照（2026-09-28 裁剪前）：main 1,608 文件 / 32.4 万行、test 448 / 14 万 / 1,783 fixture、frontend 533 / 23.6 万；千行大类 41 个（含 KnowledgeService 3,392 行 / 153 方法、FaqService 3,089、KnowledgeController 1,312——**这些数字均已过时**，knowledge 域已完成拆分）。
+- 后端测试：**4,908 用例 / 0 失败 / 跳过 4**（B234 收尾实测；全量闸门口径）。
+- 结构规模：后端 **254 个生产包**；`:domains` **204 包 / 1,363 文件**（整改方案 §8.7 口径）；四 Gradle 模块 common/engine/domains/boot。
+- 守卫面：**11 个 Python 守卫**（`scripts/run-guards.sh` 单一入口，已接入 `./gradlew build`）＋ **ArchUnit A1~A17** ＋ **R9 包级 SCC 棘轮**。
+- 棘轮基线（只许减）：A16=**76** 类 · A17=**61** 类 · R9=**13** 组 · A11b=**11** 域 · 大文件登记例外 4 个 · 外壳 50/52。
+- 覆盖率（B220 聚合口径）：行 **67.8%** / 分支 54.0%（`-Pcoverage`）；盲区 = session 49.3% / vectorstore 49.1%。
+- 前端：`vue-tsc` 0 错误；`npm test` **753/0**（B231）。
 
-## 5. 转型路线图
+## 5. 转型路线图（v0.2.0 六阶段）
 
-> 各阶段均为 §0 总目标的手段；具体下一刀的取舍与排序由用户在新会话规划——下表是存量工作面的盘点，不是既定排期。
-
-| 阶段 | 内容 | 量级 |
+| 阶段 | 内容 | 批次 |
 |---|---|---|
-| 0 起步 | 建仓/环境隔离/CI 骨架/裁剪清单签字（本文档即阶段 0 产物） | 已完成 |
-| 1 五功能移除 | 按 §6.1 清单逐 PR 拆除浏览器连接/沙箱(含技能体系)/CLI/Chrome插件/Claw Skill；schema dump → `V1__baseline.sql`（减裁剪表，196 个增量迁移退役）；测试对比器从字节对比改 **JSON 语义对比**（键序/转义归一化后再比）+ fixture 重录 | **已完成（2026-09-29）**：ba04157（CI+环境）→ f073c88（PR1 三 tab）→ 0f72b0f（PR2 浏览器连接）→ caef9d5（PR3 沙箱+技能降级）→ fba0e7a（PR4 基线+语义比较器）；累计净删 ~8.3 万行，4,685 后端测试全绿 |
-| 2 **知识库 + Agent 聚焦重构** | knowledge 四神类 + agent 五神类拆分（沿注释边界）；Controller rawBody → DTO + `@Valid`；GORM 复刻层改写为自有数据访问契约 | ✅ **knowledge 与 agent 域均已完成**（2026-09-29/30，见 §11）：knowledge 神类全拆（最大 1,234 行）、34 个 rawBody 端点 DTO 化、目录整治 13 子包；**agent 域 A/B 波**（AgentEngine 3,235→712、SqlGuard 1,590→442、KnowledgeSearchTool 1,178→585、WikiSupport 1,148 行容器→19 类型等八神类）——≥800 行清零（§14.5）、Go 锚点 479→0、12 子包 package-info 全覆盖。GORM 复刻层随阶段 3 换锚全仓收口 |
-| 3 契约换锚（全仓一次性） | 删 Go 序列化层（408 处引用 / 94 文件）、Problem Details、jsr310、NON_NULL（§2 第 4 条）；每个端点改完同 PR 带前端 | **部分已执行**：knowledge / retrieval / 会话-消息-附件-建议 / chunker-preview 的前端可见契约已换锚（§11），**落库格式也已去 snake（§2 第 11 条）**；**Go 序列化器本体删除已执行（2026-09-30，`0ac456e`）**——按红线一次性全仓完成（线上对齐面清零，工具面按 §11 边界保留） |
-| 4 其余域标准化 + 架构调整 | **按 §14 逐包重构范式推进**（knowledge 为范本）：session/wiki/retrieval/memory/llm 等其余神类；getenv 收敛（B6 ✅）；注释清洗（B9 机制 ✅）；可选裁剪（im/datasource，见 §6.2——org 已清账）；**边界固化 = ArchUnit 规则（B10 ✅）+ 包级棘轮脚本；Gradle 多模块经 B11 判定不做（见 15.1.1）** | ✅ **各轴已完成（2026-10-02）**：神类——全仓 ≥800 行只剩 **4 个登记例外**（§14.3）；getenv——十批清零；注释——B9 机制落地；边界——B10 + 包级棘轮。余量＝§15.1 批次表 + §14.3 例外复核（非"重构未完成"，见现状总账） |
+| 0 边界固化 | 守卫修复 + R9 + A16/A17 两条硬规则 | B232~B233 ✅ |
+| 1 最小正确性 | K1 / K2 / K3 / A6 | B234 ✅、B236~B238 |
+| 2 会话终态 | A1 / A2 / A3 / A5 / A18 | B239~B244 |
+| 3 任务可靠性 | K4 / K5 / K6 | B245~B247 |
+| 4 索引与配置 | K7 / K8 / K10 | B248~B251 |
+| 5 检索与结构收敛 | K9 / A4 / controller 剥离 / 中立 SearchHit | B252~B255 |
+| 6 整体包结构整改 | 改名清算 → contracts/platform → 三 runtime → domains 重排 → 门禁收紧 | B256~B267 |
 
-总量约 5–8 人月；2 人并行日历约 2.5–4 个月。阶段 2/3 顺序可对调（语义对比落地后换锚对已拆分代码同样安全），但**序列化层删除必须一次性全仓完成**——半删状态（一部分端点走 Go 格式、一部分走标准 Jackson）最危险。
+## 6. 缝合点（历史段，已执行完毕）
 
-## 6. 缝合点（精确文件清单，2026-09-28 import grep 实测）
+> 原"五功能移除 + 浏览器/CLI 陆地页 + browserskill"缝合点清单已全部落地、不再维护；复看用 `git log --grep="缝合" --grep="五功能"` 或归档 §6。
 
-> **历史段（已执行完毕 ✓，2026-10-10 压缩）**：这里原列的是"五功能移除 + CLI/Chrome/Claw 陆地页 + browserskill 3.3k 行"等跨包缝合点清单 ✗。
-> 该批已全部落地 ✓ ⇒ 清单**不再维护**；要复看当时的文件级脉络，用 `git log --grep="缝合" --grep="五功能"` 或在旧仓查考古（见 §10）✓。
+## 7. 当前状态（v0.2.0 起点，2026-10-13）
 
-### 6.1 第一批移除：五功能（§2 第 5 条）
+**v0.1.0 已收官的各轴**（细节见归档；均全绿交付）：
+- 裁剪五功能（净删 ~8.3 万行）；schema 基线化（V1 单文件，60 表）；
+- 神类拆分全仓收官（≥800 行只剩 4 个登记例外；`AgentEngine` 3,235→712、`FaqService` 3,086→七协作者等）；
+- 契约换锚 + 统一响应外壳（50/52 控制器；jsonb 全 camel；Go 兼容序列化层全退役）；
+- getenv 149→0；Go 锚点注释 0（棘轮）；批次代号注释 0；
+- 多模块（common/engine/domains/boot）+ Dockerfile 进 CI（4 job）；
+- 守卫体系：11 Python 守卫 + ArchUnit A1~A17 + R9（本版新增）；覆盖率聚合口径建立（行 67.8%）。
 
-> 已执行完毕 ✓（清单不再维护；复看用 `git log --grep="五功能"`）。
+**v0.2.0 已开工**：B232（守卫修复 + R9）· B233（A16/A17）· B234（A6 去重）· B235（本文档换版）。
 
-### 6.2 可选裁剪项状态
+**已知边界与登记例外（摘录，全量见归档 §15）**：
+① 外壳例外 2 个（ImCallback / Health）；② A11b 余 11 个域 mapper 包里有仓储门面（只许减）；③ 大文件登记例外 4 个；④ session / vectorstore 覆盖率盲区（QA 主链路）；⑤ `docs/site/*.html` 陈旧（需 Archify 重渲染）；⑥ IM 真机联调与 embed 已发布副本残留（第三方页面旧脚本）；⑦ `process_overrides` 保留现状（前端控件在、后端不做）；⑧ 存量空 embed 会话可运维软删。
 
-> 已执行完毕 ✓（原表所列可选裁剪项均已处置）。
-
-## 7. 当前状态（初版 2026-10-01；节内含 10-08 / 10-09 复核注，以正文日期为准 ✓）
-
-### 7.1 已完成
-
-| 阶段 | 范围 | 结果 |
-|---|---|---|
-| P0 包间解环 | 全仓包间环 / 依赖 config 包 | **环 0 组**、依赖 config 仅 1 包、L2→L3 6 条（方向合法，属阶段 4）——守卫 `python3 scripts/check-package-cycles.py`；⚠️ **2026-10-08 B111 修正**：这是"只解析 import 行"的代理读数，真读数为 **R1 2 组 / R1b 1 组（8 域）/ L2→L3 2 条**——见 `docs/phase4-module-boundaries-plan.md` §3 |
-| P1 扁平包 / P2 分包 / P3 归位 | chatpipeline·event·wiki/service·knowledge/dto·embedding·rerank 等 | 全部完成（§11.11~§11.14、§11.10） |
-| 阶段 2 神类切片（session 域） | AgentQaService / QaController / Resolution / 其余神类 | **全部出榜**（§11 总览表；15 个同包协作者；4 条契约测试） |
-| 阶段 2 神类切片（wiki 域，2026-10-01） | WikiPageController / WikiIngestService | **全部出榜**（10 刀 → 10 个包内协作者；1,311→272、1,208→509；§14.7.2） |
-| 阶段 2 神类切片（im 域，2026-10-01） | ImService | **出榜**（5 刀 → 5 个包内协作者；1,445→664；§14.7.4） |
-| 阶段 2 适配器批（retrieval，2026-10-01） | 9 个引擎仓 | **全部出榜**（sqlite 2 刀 + 6 仓 12 刀 + 尾仓 opensearch 3 刀/doris 3 刀，23 个协作者；≥800 引擎清零；§14.7.5） |
-| 阶段 2 收官（HybridSearchService，2026-10-01） | 非引擎族检索编排 | **出榜**（3 刀 → FusionOps/ResultOps/StoreGroupOps；1,260→775；检索域清零；§14.7.6） |
-| 阶段 2（AuthController，2026-10-01） | auth 域控制器 | **出榜**（3 刀 → OidcOps/SessionOps/BindingSupport；1,167→704；auth controller 清零；§14.7.7） |
-| 阶段 2（llm RemoteApiChat，2026-10-01） | llm 域聊天客户端 | **出榜**（5 刀 → RequestOps/BodyCodec/HttpOps/StreamOps/ResponseOps；1,366→513；llm 清零；§14.7.8） |
-| 阶段 2（TenantCatalogController，2026-10-01） | auth 域租户目录/KV 配置控制器 | **出榜**（4 刀 → BindSupport/CreateOps/CrudOps/ConfigOps；980→133；§14.7.9） |
-| 阶段 2（mcp 域双类，2026-10-01） | McpServiceController + OAuthHandler | **出榜，mcp 清零**（4 刀 → UsageInstructionsOps/CrudOps/Discovery/TokenOps；937→372、825→220；§14.7.10） |
-| 阶段 2（FeishuAdapter，2026-10-01） | im 域飞书适配器 | **出榜，im 清零**（4 刀 → CallbackOps/SendOps/CardStreamOps/MediaOps；926→331；§14.7.11） |
-| 阶段 2（EmbedChannelController，2026-10-01） | embed 域渠道控制器 | **出榜，embed 清零**（3 刀 → MgmtOps/PublicOps/DelegateOps；925→561；§14.7.12） |
-| 阶段 2（PluginSearch，2026-10-01） | chatpipeline 检索插件 | **出榜，chatpipeline 清零**（3 刀 → QueryTextOps/ExpansionOps/SearchOps；899→278；§14.7.13） |
-| 阶段 2（wiki page 面，2026-10-01） | WikiPageServiceImpl / WikiPageRepository / WikiIngestDedupService / WikiPageFolderSupport | **出榜，wiki 域 ≥800 清零**（w1~w5 + 两个卫生刀 → RevisionOps/LinkOps/FolderRepository/IdentityDedup；1,008→732、858→708、851→468、822→383；§14.7.14） |
-| 阶段 2（DataSourceService，2026-10-01） | datasource 域最长类 | **出榜**（d1~d3 → ResultOps/Support/ItemOps/SyncExecutor 四协作者；1,828→666，-63.6%；§14.7.15） |
-| 阶段 2（datasource 连接器批，2026-10-01） | FeishuClient + NotionConnector | **双出榜，datasource 域 ≥800 清零**（f1~f3 + n1 → Transport/WikiTreeOps/DriveOps/FetchOps；1,155→709、1,093→625；§14.7.16） |
-| 阶段 2（memory 域，2026-10-01 起） | MemoryExtractionService / MemoryRepository / MemoryService | **四刀落定**（m1 1,217→718 出榜；m2 1,515→1,200 出 `MemoryItemStore`；m3 1,200→**458** 出 `MemoryIndexStore`；m4 1,663→**965** 出 `MemoryCatalogOps`+`MemoryInsightOps`；⚠️ `MemoryIndexStore` 929 登记**已知例外**、`MemoryService` 965 待 m5 评估——用户 2026-10-01 定调「不硬切」，判据见 §14.7.17） |
-| 阶段 3 打样（evaluation 域，2026-10-01） | 小域契约换锚打样（§14.9b） | **流水线跑通**：POST/GET 去信封 + camelCase + 标准 DTO 绑定；10 个 fixture（含新增空体用例）；前端零调用面；**真实服务冒烟 8 路通过** |
-| 阶段 3（model 域，2026-10-01） | 模型域契约换锚四块（§14.9c + §14.9e） | **收官**：主资源 + debug + weknoracloud + 落库 jsonb 全部换锚；`@JsonProperty` **87→0**；**前端 15 文件同批**（首次前后端同 PR）；真实服务冒烟 11 路（§14.9c） |
-| 阶段 3（system 域 S1，2026-10-01） | /system 读端与探测端 7 端点（§14.9f） | **完成**：去 `code/data/msg` 信封 + camelCase + 错误语义化（503/403/400）；`SystemDtos` 85 处清零（99→14）；前端 10 文件同批；契约 19/19 绿 |
-| 阶段 3（system 域 S2/S3/S4，2026-10-01） | /system/admin 全部端点 + SystemSetting（§14.9g） | **收官**：账号面/平台密钥/设置/runtime+配额四组换锚（rawBody→DTO、PlainError→AppError、动作 204）；`@JsonProperty` 14→**0**；前端 5 文件同批；auth 域波及 fixture 4 个同批 |
-| 阶段 3（auth 域 A1，2026-10-01） | 登录/会话/用户信息面 + User/Tenant/UserPreferences（§14.9h） | **完成**：成功裸 DTO / 失败 AppError / 动作 204；`@JsonProperty` 370→约 250（余 A2 租户成员邀请 + B apikey + 边界 tenantconfig 130）；前端 19 文件同批；**共享实体链条**牵动 4 测试类 ~50 fixture |
-| 阶段 3（auth 域 A2，2026-10-01） | 租户/成员/邀请/配置面（§14.9i） | **完成**：成员/邀请列表去信封、租户 CRUD 裸 DTO + 删除 204、KV 配置裸对象、动作 204、三个手搓封装辅助删除；前端 20 文件同批；183 用例绿 |
-| 阶段 3（auth 域 B，2026-10-01） | API 密钥面（§14.9j） | **收官**：4 文件去注解 + 四端点去信封/204 + 请求体 camelCase；波及平台密钥与 4 个外域测试；前端 5 文件同批；**auth 域 @JsonProperty 仅余边界** |
-| 阶段 3（memory 域 M1，2026-10-01） | HTTP 响应面 16 路由（§14.9k） | **完成**（前三次尝试回滚后第四次成功）：6 响应实体去注解 + 去信封/camelCase + 创建 201 / 删除类 204 + 分页 `{items,page,pageSize,total}`；fixture JSON 解析改写 + Java 断言逐处手改；前端 8 文件同批（含修 A2 漏改的 KV 解包）；全域 339 用例绿 / 全量 4670 绿；**真实服务冒烟 21 路通过** |
-| 阶段 3（memory 域 M2，2026-10-01） | 落库/内部 JSON 面（§14.9k） | **完成**：7 个落库实体 + `MemoryConfig` 去注解 60 处 → **memory 域 @JsonProperty 137→22**（余者 LLM 载荷，登记保留）；**真落库的两处 jsonb**（`memory_subjects.extraction_state`、`tenants.memory_config`）跑存量迁移 SQL；顺手修 `ModelService` 按旧键读 memory config 的运行时依赖 + KV 校验文案改 camelCase；前端 2 文件同批；全量 4670 绿；**真实服务冒烟 11 路通过（含迁移后存量行读回）** |
-| 阶段 3（memory 域 M3，2026-10-01） | 请求侧绑定收尾（§14.9k） | **完成**：三个请求 DTO 进 `memory/dto` + `@Valid`，手写 `rawBody+parse()`/`MAPPER` 退役；错误形态统一到全局处理器（空体/null→请求体不能为空、畸形→请求体格式不正确、类型错→`<字段>: 类型不正确`、缺 enabled→`enabled: 不能为空`）；LLM 载荷 22 处**登记保留**；新增 5 条测试 + 2 个夹具、清 1 个孤儿夹具；**真实服务冒烟 12 路通过** |
-| 阶段 2（memory 域 m5，2026-10-01） | 召回段外提（§14.7.17） | **完成**：`MemoryService` 965→**768**（出榜）、新协作者 `MemoryRecallOps` 252 行；忠实性逐字核验通过；memory 域 ≥800 只剩 `MemoryIndexStore` 929（登记例外）；跨域回归（memory/chatpipeline/session）+ 全量 4673 绿；**真实服务冒烟 7 路通过** |
-
-### 7.2 当前存量（实测）
-
-- session 域：**100 文件 / 22,734 行**（空行折叠后）；最大类 `SessionKnowledgeQaService` 1,036（例外）→ 其后 `SessionController` 791 / `AgentStreamBridge` 696 / `SessionService` 650。
-- wiki 域（2026-10-01 page 面批次后）：**148 文件 / 22,964 行**；**≥800 = 0**（最大 `WikiIngestCitePipeline` 760，其后 `WikiPageServiceImpl` 732 / `WikiPageRepository` 708）。
-- llm 域（2026-10-01 批次后）：chat 包 `RemoteApiChat` 家族 6 类全部 <800（最大 `RemoteApiStreamOps` 365）。
-- auth 域 controller（2026-10-01 批次后）：`TenantCatalogController` 980→133，包内最大 `TenantInvitationController` 519。
-- mcp 域（2026-10-01 批次后）：controller/oauth 两神类出榜，包内最大 `OAuthDiscovery` 439。
-- im 域（2026-10-01 批次后）：`FeishuAdapter` 926→331，feishu 包最大协作者 `FeishuCardStreamOps` 256。
-- embed 域（2026-10-01 批次后）：`EmbedChannelController` 925→561，controller 包最大协作者 `EmbedChannelDelegateOps` 279。
-- chatpipeline 域（2026-10-01 批次后）：plugin 包 24 类全部 <800（最大 `PluginRerank` 686）。
-- datasource 域（2026-10-01 全批后）：**115 文件 / 26,723 行**；`DataSourceService` 1,828→**666**、`FeishuClient` 1,155→**709**、`NotionConnector` 1,093→**625** —— **域内 ≥800 清零**（原三个：1,828 / 1,155 / 1,093）。
-- memory 域（2026-10-01 m1~m5 + M1~M3 换锚后）：`MemoryExtractionService` 1,217→**718**（出榜）、`MemoryRepository` 1,515→**458**（出榜）、`MemoryService` 1,663→965→**768**（出榜，m5）；`MemoryItemStore` 462 / `MemoryCatalogOps` 517 / `MemoryInsightOps` 412 / `MemoryRecallOps` 252 / `MemoryIndexStore` 929；**≥800 只剩 `MemoryIndexStore` 929**（**登记例外**：同属索引侧一个关注点，§14.7.17）。
-  **`@JsonProperty` 137→22**（HTTP 面 63 处 + 落库/内部面 52 处清零）：余 22 处**全是 LLM 载荷**
-  （`MemoryExtractionLlm` 11 + `MemoryExtractPayload` 11，**保留**：模型输出 schema，§14.9k 三分法）；
-  `common.settings.MemoryConfig` 12 处已清零（tenants.memory_config jsonb 换锚，M2）。
-- evaluation 域（2026-10-01 打样后）：**`@JsonProperty` 66→0、`@JsonInclude` 12→0**；POST/GET 两端点契约已换锚（§14.9b）；`dto` 包 2 文件（`EvaluationDtos` 容器待拆分，另立批次）。
-- model 域（2026-10-01 收官）：**`@JsonProperty` 87→0**、`@JsonInclude`/`Go*` 序列化引用清零；主资源（M1）+ debug（M2）+ weknoracloud（M3）+ 落库 jsonb 四块全部换锚（§14.9c/§14.9e）；前端 15 文件同批改；dev 库旧 jsonb 行已用迁移 SQL 改写。
-- system 域（2026-10-01 收官）：**`@JsonProperty` 99→0**（S1 的 `SystemDtos` 85 + S3 的 `SystemSetting` 14）；`/system` 7 端点 + `/system/admin` 全部端点 + settings 实体均已换锚（§14.9f/§14.9g）；前端 16 文件同批；权威细节见 §14.9g（含"审计 details 有意保留"清单）。
-- 全仓 ≥800 行的类：**7 个**（清单与分域建议见 §14.3）。
-- 测试：session 域 388 条 / wiki 域 542 条，失败 0（本轮实测）；全量闸门命令见 §9。
-
-### 7.3 未完成 / 待办
-
-1. **阶段 2 其余域**：wiki（含 page 面）/ im / retrieval / auth controller / llm / mcp / embed / chatpipeline / knowledge(FaqImportService) **均已出榜**；
-   `datasource` **全域出榜**（service §14.7.15；两个连接器 §14.7.16）——域内 ≥800 清零；
-   memory 域**两条线都已走完**（切片 m1~m5 + 换锚 M1~M3）。
-   **2026-10-09 复核：本节所列尾巴已全部清空**（实测行数）——`MemoryIndexStore` 929→**628**、`SourceRegistry` 878→**528**、
-   `UserService` 876→**757**、`SessionKnowledgeQaService` 1,036→**753**（§14.5 例外复核见 B129）、`QaSearchTargets` 706→**190**；
-   wiki 域的 Go 期措辞（原 ORM／原实现 一族）与 datasource 域 Go 锚点**均实测 0 处**
-   （`scripts/check-go-anchors.py` 基线里 datasource 条目 0）⇒ **阶段 2 无在办项**。
-2. **阶段 3 契约换锚**：**部分已执行** —— knowledge / retrieval / chunker-preview / evaluation / model / system /
-   auth（A1+A2+B）/ **memory M1+M2+M3** / **session 全域收官（S1 会话主资源 → S2 消息面 → S3 附件·建议·steer → S4 QA 请求面 → S5 收尾，前四批前后端同批）** / **embed 域 E1（渠道管理 + 公开面，前后端同批）** / **mcp 域 M1（服务资源 + 凭据面）+ M4（工具审批 + OAuth 用户面，均前后端同批）** 已完成（同批带前端）；
-   **mcp 域已收官（M1 + M4 + M5，仅剩第三方协议面 22 处永久冻结）**。
-   **datasource 域已收官（D1 + D2 + D3，仅剩 connector 第三方线格式与 `lf_*` 共享载具，均冻结）**。
-   **2026-10-08 复核**：域级换锚已完成——全仓剩余 `@JsonProperty` **426 处全部落在已登记冻结面**（datasource connector 126 / event 载荷 92 / auth tenantconfig 89 / llm provider 62 / SearchParams 19 / mcp oauth 18 / memory·stream·retrieval·tracing·wiki·rerank 25），无在办候选；工具面另已于 **B88（JSON 键）+ B89（XML 形态）** 全量换锚。
-   **2026-10-09 订正**：上条"剩余 426 处全部冻结"**已过期**——**B151 清 235 处**（我们自己的面）+ **B152 清 43 处**（外部协议面，**面级放行表已撤**）⇒ 现余 **576 处**全部落在 A14 守卫认定的**四类必要形态**里：键≠隐式名 · 键形如 `isXxx`（getter 会丢 is）· Jackson 探测不到的成员（B151 实测：删了请求体 400）· **字段序锚**（同文件混用改名注解者，整文件跳过；删了会改线格式字段序，B151 实测）。硬门 `JsonPropertyHygieneTest`（A14）**基线 0**，新增即红 ✓。
-   硬约束：**序列化层删除必须一次性全仓完成**，半删状态最危险（§5 阶段 3）；时机由用户定，可与阶段 2 对调。
-   **入场前先做**：§14.9 的"端点 × 前端"清单盘点。
-3. **阶段 4 架构调整（Gradle 多模块 + ArchUnit 边界固化）**：**已执行大半** ✓
-   （执行记录即 `docs/phase4-module-boundaries-plan.md`，含 B110~B120 各批）。
-   **2026-10-09 实测**：包图 **DAG**（环 0 组 ✓ · `L2 → L3` 0 条 ✓ · 内联全限定名 0 处 ✓）；`:common` 模块已落地
-   （175 文件 / 13.7k 行，**编译期硬边界已用探针验证**：往 `:common` 注入业务域 import ⇒ `:common:compileJava` FAILED ✓）；
-   守卫已多模块化（R1/R1b/R2/R3/R5/R6/R7/R8/R11/R12a/R12b + A14 + `ClasspathResourcesTest` ✓）。
-   **✅ `:engine` 已落地（B161）+ 边界按分层校准（B162）**：现 = `llm` `retrieval` `embedding` `rerank` `chatpipeline`
-   `modelcontext` `webfetch`（**7 域**）；`tracing` 已**按层次拆分**（B163）：core（20 文件，含 `OtlpHttpExporter`）进 `:common` ✓、
-   装饰侧（`LangfuseChatClient`/`LangfuseEmbedder`/`LangfuseReranker`/`LangfusePayloads`/`LangfuseVlm`/`LangfuseWiring` = 6 文件）
-   留 `:engine` 的新包 `tracing.decorators` ✓（那 11 条边全在这 6 个文件里 ✗ —— tracing **不是纯 L1** ✓）；
-   `stream` 已按 L1 下沉 `:common` ✓、`model`/`vectorstore` 已回业务侧 ✓（引擎内无人依赖它们 ✓，顺带修掉 L2 里有 controller ✗）。
-   **模块图（用户 2026-10-09 定案）**：`:common` / `:engine` / `:domains` / `:channels` / `:boot`（**5 模块**）——
-   `datasource` 与 `:misc` 四域**并进 `:domains`**（不单列 ✓）；`:channels` = `im` + `embedchannel` + `channels.api`（API key 通道，
-   **前置：解 `auth ⇄ apikey` 22+22 处互依** ✗）；`:boot` = `RagAgentApplication` + `config` + 装配/扫描 + `application.yml`
-   + `spring.factories` + `syncMigrations`（Flyway 走**相对工作目录**的 `./build/generated-migrations` ✗ ⇒ Copy 目标必须在本模块）+ bootJar ✓；
-   `channels.*` 包改名与模块目录改名（`domains/`→`domains/`）**合并成一次命名对齐批** ✓（`server/src` 波及 7 脚本 · 1 基线 · 30 文档 ✓）。
-   **`:app` 不建议拆**（中部无缝：界上暴露 178~268 类型，文档结论"它们不是模块，是应用"）。
-   **该步 5 条已知风险**（文档 §5.2，均有对治先例）：装配面绑定单根包（入口类 + R2/R3/R11 须同步）·
-   13 处 classpath 资源静默 null（B118 已补存在性断言 ✓）· 路径硬编码（proto / migrations / 5 守卫 / `GoldenContract`）·
-   spotless `ratchetFrom("seed")` 遇大搬家会放大 diff · 测试归属（单测随域、集成测试集中 `:boot`、共享基座走 `java-test-fixtures`）。
-   **长尾（2026-10-09 实测，可选排期）**：① `controller/` 包内的**切片协作者 25 个**（auth 7 / wiki 7 / session 6 / embedchannel 3 / mcp 2；
-   `*Ops`/`*Support`/`Qa*`——**是既定形态** ✓：`docs/auth-module-guide.md:405` 明文"端点方法留 controller、逻辑进协作者"；
-   `pkg-audit.py` 只按文件名判、会误标"应归位" ✗，package-map §2 认的"真放错"只有 2 个）；② **>600 行文件 67 个**（B121 冻结面，含 2 个已核准例外；按"自然接缝"判据拆、不硬切）；③ **分层倒挂 `controller → domain` 57 文件**（审计抽样：多为响应装配，待拍板）；④ 超大单层包（`agent/tools` 98 · `wiki/service` 91 · `knowledge/dto` 80）；⑤ **真机联调**（IM 面 + 多实例 Redis 面，不可自动化）；⑥ 两个已知偶发测试（`WebToolsRecordingTest` 全量并发下 · `EvaluationContractTest.getTerminalRunsExecution`）；
-   **2026-10-10 B178 实测判定（比上条更硬）**：这 25 个**逐个核过，全部不是缺陷** ✓ —— 21 个直接依赖 Web/MVC 类型 （`org.springframework.web`/`jakarta.servlet`/`com.ragagent.common.web`）⇒ 属表现层；余 4 个（`QaAttachmentResolver`/`QaTurnFinalizer`/`WikiActivityRecorder`/`WikiKbAccessGuard`；**B224 复核订正**：`QaRequestParser` 现已带 Web 依赖退出"零 Web"名单，补进 `WikiKbAccessGuard`）零 Web 依赖乍看可疑 ✗，但加做**反向依赖检查**后发现**全都引用控制器自身类型** （`KnowledgeQaController`/`QaRequestBinder`/`SessionStreamController`/`WikiRequestSupport`）⇒ 搬到 service 会造 `service → controller` **真倒挂** ✗，比原问题更糟 ✓。**已固化**：5 个 controller 包写入 `package-info`（列名协作类 + 判据 + "若将来要迁先复核" ✓）；`pkg-audit.py` ⑤ 改为**自证输出**（`协作类 25 = 依赖 Web 21 + 引用控制器 4 ⇒ 应归位 0` ✓）⇒ 此条待办**关闭** ✓。
-   ⑦ **两处"包已并入"的登记与实况不符** ✗：`docs/backend-package-map.md` §3.5 表称 `webfetch`→`agent/support`、`modelcontext`→`agent/modelcontext` **均已并入** ✗，实测两者**仍是顶层包**（4 / 13 文件；`agent/support/` 只有 `package-info`）✓ ⇒ 疑似该并入计划已被 §5.1-③ 的模块方案取代（两者都归 `:engine`）⇒ **待拍板**：并入 agent 还是留给 `:engine`。
-   **待拍板**：**P3**（`tracing` 11 条边专题下沉 `:common` + 拆 `:boot`/`:domains` 目录）· **P4**（`:channels` + 命名对齐批）·
-   或长尾 ①②（清洁件）。
-4. **编号对照（防混淆）**：§5 用**阶段 0-4**；§14.2 用**步骤 0-4**（单域 SOP）。神类切片属「阶段 2 / 步骤 2」，
-   契约换锚属「阶段 3 / 步骤 4」——两套编号并存，引用时写全称。
-5. ~~可选尾巴~~：`QaSearchTargets`（706→**190**）内部细分与 `SessionKnowledgeQaService`（1,036→**753**）的 §14.5 例外复核**均已完成**（2026-10-09 实测；后者见 B129）。
-6. **全仓架构评估遗留（2026-10-10 评估 ⇒ B212 已修第 1 项，其余待用户排期）**。评估结论与逐条证据见本节，**动手前先核实测**：
-   - ✅ **已修（B212）**：根 `Dockerfile` 失效（引用已裁撤的 `:server` + 漏拷 3 模块与 2 个 proto 源目录，**`docker build` 必然失败且从未进 CI**）· Flyway 迁移目录未进镜像（容器启动无 schema 且不报错）· 健康检查只探 TCP · README/api-docs/architecture.json 的已删功能残留。
-   - ✅ **已修（B215）序列化失控**：**168 处自建 mapper → 7 处**（6 处刻意保留 + 工厂自身），新增 ArchUnit **A15** 棘轮守卫防回流（红态探针已验）。**关键证据：1345 个契约金片全过 ⇒ 线格式未变**。保留的 6 处各有类注释说明的硬理由（键序字节面 / 落库 cursor 字节 / 时区不调整 / 严格解析），见 §15.1 B215 行与 A15 的基线 javadoc。
-   - ✅ **已修（B217）异常吞咽中的"边界降级"**：ES V7 三处同款（`V7SearchOps` 向量/关键词两路 + `V7WriteOps` 拷贝索引时读源索引）`catch → filter = createObjectNode()` ⇒ **空条件 = 匹配全库**，过滤丢失**不报错而是返回更宽结果集**（可能捞出本该被租户/KB/启用状态挡掉的内容）。改为**直接抛**（三个方法本就 `throws Exception`）；`V8WriteOps` 同位置静默 return 补 warn。新增**第十守卫** `check-exception-semantics.py`（零基线纯禁令，扫 engine 检索引擎目录的 catch 块）+ 红态探针已验。
-     **评审计数更正**：写入路径那三处（V7 bulk/delete、V8 bulk 的"解析失败 return"）**比我初评的风险低** —— 它们都先查状态码且会抛，解析失败只影响"部分失败检视"。
-     **余量**：569 处 `catch(Exception|Throwable)` 的结构性扫除**不做**（严格空 catch 全仓 0 处 ✓）；其余降级逐处判为合理并就地留痕（`OpenSearchRetrieveRepository.classifyFailure` 的错误类型提取、`useKeywordSuffix` 探测降级、三处读坏 jsonb 返回空对象）。
-   - ✅ **已修（B213）分层不一致**：session(4) / wiki(4) / memory(1) 共 9 个 Repository 已从 `mapper/` 归位 `repository/`；**memory 域扩到 5 类**（门面 + 3 个包级私有 Store + `MemoryTxTemplate`，因紧耦合对不可拆）。新增 ArchUnit **A11b** 防回流（`mapper` 包禁 `*Repository`，棘轮基线 11 条 = 尚未归位的域）。**余 11 个域待逐域跟进**（audit 1 / auth-apikey 1 / datasource 2 / mcp 3 / storage 2 / vectorstore 1 / websearch 1；`:engine` 的 `retrieval/engine/**` 不适用本约定）。
-   - ✅ **已修（B214）**：九守卫**已作为 `:guards` 任务接入 `check`**（本地 `./gradlew build` 与 CI 同口径；红态探针已验）· **version catalog 已建**（`gradle/libs.versions.toml`；30 处硬编码版本归零，BOM 5 处 → 1 处）。
-     **⚠️ 评估误判更正**：`maxParallelForks` 的"两套冲突口径"**是刻意分层调参、不是缺陷** —— `domains:179` 的 `cores/2` 正是 B175 为修"4 fork × 2g 在 4 核 CI 抢内存 ⇒ worker 崩"而写成，统一它等于回退那个修复。**不要动**。
-   - ✅ **已修（B218）**：`tenant` 包补脱敏单测（13 用例，含"新增 provider 必红"的清单钉子）· Redis 跳过**升级为棘轮**（未登记跳过 ⇒ `test-summary.py` 报红）· **2 个 `*IT` 有了执行入口**（`:engine:integrationTest`，此前连手动都跑不了）· **jacoco 已引入**（按需 `-Pcoverage`；实测插桩 +25% ⇒ 默认不插桩）。
-   - ✅ **已修（B219）**：`GoRecording45C.java` **3.78 MB → 170 KB**（删除 5 个无引用的超大常量，占原文件 95.5%）· `check-file-size.py` 扩 **R-f（单行 > 64 KB）/ R-g（文件 > 512 KB）**，并把扫描面从 main 扩到 **main + test + testFixtures**。
-   - ⬜ **P2 工程化债（余）**：`:engine` 声明 `java-test-fixtures` 但只有 resources（非死配置，见 B213 核实）· **`GoRecording45C` 另有 260 个常量无任何引用**（SANDBOX 84 / MCP 69 / SHELL 52 / READ 31 / SKILL 23 —— 多为已裁撤功能的录制残留；因存在**动态构造名字**的反射路径（`rec45c(group,id)`），整族清理需逐组核对调用面，登记待办）· 覆盖率**已可信**（B220 聚合口径：**行 67.8% / 分支 54.0% / 类 91.4%**）但**尚未设阈值**；**最大盲区已定位**：`session` 49.3%（9,536 行）—— 集中在 **QA 问答链路的装配/编排类**（`service/` 40.7%、`controller/` 41.5%；`QaSupport` 0/192、`SessionKnowledgeQaService` 40/365、`AgentEngineAssembler` 18/324、`QaTurnExecutor` 13/241、`QaSseOrchestrator` 11/230），`vectorstore` 49.1%（738 行）。这些类耦合重（Spring 装配 + 多协作者）⇒ 补测需先设计接缝，**留给后续批次**。
-   - ⬜ **P2 契约单一事实源**：无 OpenAPI/共享 schema，前端 TS 类型手写，一致性全靠正则文本扫描（`check-json-key-case.py` 自述 7 种写法扫不到）。
-   - ⬜ **登记不动**：`docs/site/*.html` 是外部 Archify 产物、本仓无该工具无法重渲染（源 json 已修正，HTML 待外部重渲染）。**2026-10-09 遗留的 25 个 controller 包内协作类已于 B178 判定全部不是缺陷 ✓ 关闭。**
+**下一步**：§15.1 批次表，B236（K3 DocReader 流错误传播）起连续推进。
 
 ## 8. 环境与运行
 
@@ -245,18 +105,18 @@
 - 前端开发代理：`VITE_DEV_PROXY_TARGET=http://localhost:8083`；**`vite.config.ts` 的默认值已改为 8083**（B222：此前继承 Go 仓的 8080，而本仓后端在 8083 ⇒ 忘设环境变量时所有 `/api` 请求打到**空端口**，浏览器侧只有 XHR 失败、无醒目提示，实测症状是"填了保存、重开为空"）。
 - `.env` 已从旧仓原样复制（未入库，gitignore 正常），**已改**（`SERVER_PORT=8083` 实测生效 ✓，B202 起后端就绪）；库名按本仓独立库 ✓，`SYSTEM_AES_KEY` 沿用 ✓。
 - **`LOCAL_STORAGE_BASE_DIR` 必须放持久目录、严禁 /tmp**（旧环境实测踩坑 2026-09-28：放在 `/tmp/weknora-java-files`，macOS 定期清理 /tmp 导致已入库文档原始文件丢失——文档列表正常、检索可能正常，但 preview 全 500、重处理报 "failed to read file"，原始文件不可恢复只能重传）。建议 `~/ragagent-data/files` 之类仓库外持久路径。
-- **CI（2026-10-09 现状，B157/B158）**：三 job —— **guards**（**11 条** Python 守卫（B221 起），`bash scripts/run-guards.sh` 为准 ✓；B214 起该脚本也接入 Gradle `check`）· **backend**（spotless（ratchet 自 `seed` tag）+ 全量测试 + **把 `V1__baseline.sql` 灌进全新 ParadeDB**；两个连真 PG 的录测试在 CI 真跑）· **frontend**（type-check + test + build）。ArchUnit 规则随测试套件跑（B10），包级规则仍归 guards；ArchUnit **边界固化**属阶段 4。
-- **远程仓库（2026-09-30 起）**：`origin` = `https://github.com/pmbilly/ragagent.git`（**公开**）；首次推送只推了 `main`（`bbf7443`），**`seed` tag 已于 2026-10-09 推送**（B157——CI 的 spotless ratchet 需要它可达）；本地 wip 分支按需推；此后本地提交若要同步，记得 `git push`（并行会话在同一仓库提交、同样落在 main，也需推送）。
+- **CI（2026-10-09 现状，B157/B158）**：三 job —— **guards**（**11 条** Python 守卫（B221 起），`bash scripts/run-guards.sh` 为准 ✓；B214 起该脚本也接入 Gradle `check`）· **backend**（spotless（ratchet 自 `seed` tag）+ 全量测试 + **把 `V1__baseline.sql` 灌进全新 ParadeDB**；两个连真 PG 的录测试在 CI 真跑）· **frontend**（type-check + test + build）。ArchUnit 规则随测试套件跑（B10），包级规则仍归 guards；ArchUnit 边界规则在 v0.2.0 阶段 0 已落 A16/A17（见 §12.3）。
+- **远程仓库（2026-09-30 起）**：`origin` = `https://github.com/pmbilly/ragagent.git`（**公开**）；首次推送只推了 `main`（`bbf7443`），**`seed` tag 已于 2026-10-09 推送**（B157——CI 的 spotless ratchet 需要它可达）；本地 wip 分支按需推；此后本地提交若要同步，记得 `git push`。**2026-10-13 起：`v0.2.0` 分支为整改工作分支**（自 main `53266b03` 新建），R 系列提交落在该分支（本地 ahead，未推送）。
 
 - **⚠️ 跑完 `./gradlew build` / `test` 必须重启后端** ✗：构建会**就地重写** bootRun 正在用的 `build/classes` ⇒ 在线服务**全站 500 + NoClassDefFoundError**（看起来像业务炸了 ✗ 其实是陈旧类 ✓）。**重启即解，别去查代码** ✓（README「坑」一节同款记录 ✓）。顺带：**停服用 `bash scripts/java-server-down.sh`**（B216 补：此前文档引用的 `scripts/*-down.sh` **并不存在** ⇒ 照文档停服静默失败、端口一直被占，进而触发"up 打到旧进程误报 ready"的连环坑 ✗）⇒ 停完记得重启 ✓。**up 脚本现已自挡端口占用**（B216）✓。
 
 ## 9. 测试与安全网
 
-- 435 个测试类 / 1,345 契约 fixture（**4,871 用例 / 0 失败**，2026-10-10 B218 实测 ✓；早前记录 4,670 / 4 skip 为 2026-10-01 ✓）是重构回归网，**每一步（哪怕纯移动）结束都必须全绿**——近两轮的工作方式就是"改一步 → 全量验证 → 提交"。这是"种子 fork + 渐进转型"优于重写的全部意义。
+- 435 个测试类 / 1,349 契约金片（**4,908 用例 / 0 失败 / 跳过 4**，2026-10-13 B234 实测 ✓；早前记录 4,871 为 2026-10-10 ✓）是重构回归网，**每一步（哪怕纯移动）结束都必须全绿**——近两轮的工作方式就是"改一步 → 全量验证 → 提交"。这是"种子 fork + 渐进转型"优于重写的全部意义。
 - **三条验证命令（接手先跑一遍确认基线）**：
   ```bash
-  # 后端全量（约 1.5 分钟，B194 提速后；期望 BUILD SUCCESSFUL，4,871 用例 0 失败）
-  cd ~/ragagent && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home ./gradlew :domains:test
+  # 后端全量（约 1.5 分钟；期望 BUILD SUCCESSFUL，4,908 用例 / 0 失败 / 跳过 4；同 CI 口径）
+  cd ~/ragagent && env -u SYSTEM_AES_KEY JAVA_HOME=/opt/homebrew/opt/openjdk@21 ./gradlew spotlessCheck build
   # 前端类型检查（期望 0 错误）
   cd ~/ragagent/frontend && npx vue-tsc --build --force
   # 前端单测（期望 pass 690 / fail 0）
@@ -279,89 +139,48 @@
 - 某行代码来历：直接在本仓 `git blame`（seed 前历史完整保留）。
 - 架构总览（裁剪前状态）：`docs/site/` 门户、`architecture.html` / `agent-workflow.html` 交互图、`api/` 452 路由清单——阶段 1 后按新形态重生成。
 
-### 7.1 存档：知识库域 Java 本位重构完成（2026-09-29）
+## 11. v0.1.0 里程碑总览（压缩为指针）
 
-**一句话**：knowledge 域完成神类拆分（FaqService 3,086→七协作者）、34 个 rawBody 端点 DTO 化、Go 锚点清零、FAQ 仓储独立 ✓
-**详情**：`git log --grep="(B10" --grep="knowledge"`；方案见 `docs/superpowers/plans/2026-09-29-knowledge-module-java-refactor.md` ✓
+- 全文归档：**`docs/handoff/archive/HANDOFF-v0.1.0-2026-10-13.md`**（含 §11.1~11.5 全部批次表与旧"边界清单"）。
+- 取回 recipe：`git log --oneline | grep -E "\(B[0-9]+"`；提交信息一律带 `(B###)`。
+- 旧引用"§11 边界清单"涉及的手搓/蛇形载荷口径，现行权威见 **§15.3 冻结面**与 `check-json-key-case.py` 冻结快照。
 
-## 11. 已完成批次总览（细节见 `git log` 与历史版本；判据与手法见 §13）
+## 12. 结构地图与包约定（v0.2.0 新建；对齐整改方案 §5/§6）
 
-### 11.1 契约换锚 / 落库 de-Go / knowledge 目录整治（2026-09-29~30）
-（原 §11、§11.1、§11.5~§11.7 压缩）agent 域 A/B 波 + approval 换锚；知识库域 Java 本位重构完成（§7.1 存档）；
-分支与残留清理；agent/agentm §14.5 复验与卫生清零；顶层包归并决策。
+### 12.1 Gradle 模块与依赖方向（实测 build.gradle.kts）
 
-### 11.2 P0~P3 包结构治理（2026-09-30）
-配置/工具类归位（批 1）、端口化（批 2）、放错包/倒挂清零（P3）、chatpipeline+event 分包（P1）、
-wiki/service 分包（P2）、knowledge/dto 分包（P2）、embedding/rerank 拆 provider（P1 收尾）。
-**结果**：环 0 组 / 依赖 config 1 包 / L2→L3 6 条（守卫长期绿）。
+```
+boot      → domains, engine, common   （唯一组合根；不执行业务 SQL）
+domains   → engine, common            （业务域；34 顶层包）
+engine    → common（api 暴露）         （检索 / LLM / chatpipeline 能力层）
+common    → JDK（+ 工具链）            （平台与契约底座）
+```
 
-### 11.3 session 域阶段 2 神类批次（2026-09-30~10-01，本批主体）
+- `:engine` 的包根是 `com.ragagent.llm` / `retrieval` / `chatpipeline` 等（**无 `engine.` 中缀**）——模块边界靠 ArchUnit 与脚本规则强制，不靠包名前缀。
+- v0.2.0 阶段 6：`common` 收敛为 `contracts` + `platform` 两个面、`engine` 收敛为 agent-engine / retrieval-engine / model-runtime 三个面（**先包边界 + 规则，后 Gradle 模块**，见整改方案 §5.2）。
 
-| # | 类 | 前 → 后 | 切片（协作者） | 记录 |
-|---|---|---|---|---|
-| 1 | `TemporaryDocumentService` | 1,075 → **498** | prompt 切片（`TemporaryDocumentPromptResolver` 271）+ 解析/落盘管线（`TemporaryDocumentProcessor` 423） | §11.15 / §11.20 |
-| 2 | `AgentStreamBridge` | 856 → **697** | 先补 9 例契约测试（`AgentStreamBridgeTest`），再抽发射器 `AgentStreamEmitter` 94 | §11.16 |
-| 3 | `MessageService` | 1,028 → **510** | 聊天历史检索簇（`MessageSearch` 596） | §11.17 |
-| 4 | `MessageSuggestionService` | 1,088 → **601** | 无状态管道（`MessageSuggestionPipeline` 513） | §11.18 |
-| 5 | `AgentToolBackends` | 1,264 → **590** | 知识库检索簇（538）+ wiki 簇 | §11.21 / §11.22 |
-| 6 | `SessionAgentQaService` | 1,430 → **364** | 历史装配（`AgentHistoryAssembler` 268）→ 配置装配（`AgentConfigAssembler` 324）→ 引擎/工具装配（`AgentEngineAssembler` 585） | §11.23~§11.25 |
-| 7 | `KnowledgeQaController` | 1,614 → **328** | 静态解析助手（`QaRequestBinder` 105）→ 解析主体（`QaRequestParser` 331）→ 收尾簇（`QaTurnFinalizer` 161）→ SSE 编排（`QaSseOrchestrator` ~370）→ 附件解析（`QaAttachmentResolver` ~165）→ 执行/落库（`QaTurnExecutor` 418） | §11.26~§11.32 |
-| 8 | `SessionQaResolution` | 2,906 → **706** | 模型选择（`QaModelSelection` 420）→ KB 范围（`QaKbScope` 341）→ mention/tag 收敛（`QaMentionTagScope` 422）→ 巨型方法项目三步（`QaChatManageOverrides` 540 + `QaSearchTargets` 706） | §11.33~§11.39 |
+### 12.2 域内分层约定（整改方案 §6 表）
 
-**批次口径（可复用）**：一次侦察定边界 → 按清单连续落刀，**每刀自带编译自检 + 独立提交**，共用收尾闸门；
-不混改、不合并提交。会话域该批的实测结论：**"先落被依赖方"是解决受阻刀的关键**（见 §13）。
+`controller/`（绑定与帧写出）· `service/`（用例与政策）· `domain/`（状态与不变量）· `mapper/`（MyBatis 接口）· `repository/`（仓储端口与实现）· `dto/` · `client/` · `task/`（队列消费者与恢复）· `api/`（实现 contract）· `support/` · `config/`（只装配）。
 
-### 11.4 阶段 2 批次清单的历史版本
-原 §14.9b / §14.9 / §14.9c（session 批次清单与刀序）已全部执行完毕，内容并入上表；不再保留独立章节。
+禁止项（逐条有守卫，见 §12.3）：`service` import 边界层或具体技术（A16/A17）· `domain` 引 Spring/Mapper（阶段 6 规则）· `repository` 回引 service（阶段 6 规则）· `controller` 跑编排/解析/落盘（B254）· `mapper` 放仓储门面（A11b）。
 
-### 11.5 提示词统一与 agent 包归位（F 波，2026-10-12 执行）
+### 12.3 守卫与规则总表（防回流面；新增规则前先查这里）
 
-**目标**：提示词的"文案源 / 装载 / 组装"三层收敛为单权威；agent 包按职责归位。**零文案字节变化、零对外契约变化**（由实录 `GoRecording46A/46B/46C` + `ct-kv-get-prompt-templates.json`（42KB）兜底）。
-**计划与执行记录**：`docs/superpowers/plans/2026-10-12-prompt-unification-and-agent-package.md`。
-
-| 刀 | 内容 | 提交 |
+| 守卫 | 语义 | 基线 |
 |---|---|---|
-| F1 | 模板装载收敛为 `common.prompt.PromptSource` 单入口（7 处消费方、3 份重复清单清零）；11 份模板下沉 `common/src/main/resources/prompts/` | `ef46785b` |
-| F2 | 评估默认值改取单一模板源（消 4 个 Java 字面量副本；新增 L1 `PromptTemplates`） | `787c91d2` |
-| F3 | 单源守门 `PromptOwnershipTest`（A1 归属 / A2 残迹 / A3 装载方式）+ 11 个模板名升为 `PromptSource` 常量 | `2ea489f8` |
-| 文案 | 资源句柄协议残留句规范化（`3e4dd368` 删行副产物）+ 同步 46A/46B/46C 实录 | `96ecb540` / `33ff65b9` |
-| F4 | 包归位两刀：新设 `budget/`(3) + `prompt/`(2)、删空壳 `support/`；`tools/` 横切 8 件 → `tools/runtime/`（含 5 个实录测试搬包） | `f4bb1ca2` / `d30e4b51` |
-| F5a | L1 `PromptComposer` 统一三条链路拼法（`joinSections` / `SOURCES_AND_OUTPUT_SUFFIX` / `appendProtocol` / `rightTrim`），删两处逐字节重复的私有实现 | `bf9c796a` |
-| F5b-1 | agent 段表声明式化（`SectionSpec` + 只读 `SectionContext`，10 段一张 `SECTION_SPECS` 表） | `9689c590` |
-
-**降级与遗留（均有实测依据）**：① **`loop/` 归位不可行**——8 个段协作者全量读写 `AgentEngine` 的 33 个包内字段 / 约 17 个包内方法 / 4 个包内嵌套类型，搬出需约 38 处改 `public`；且 `boot/EngineRecordingTest` 与 `domains/Engine46bStubSupport` 靠**跨模块 split package** 直取 `*ForTest` seam ⇒ 应单独立"engine seam 打开"波并单独评审。② MCP 族搬 `tools/mcp/` 需先解与 `ToolRegistry` 的包私有耦合。
-**F5b-2 已完成**：`AgentPrompts` 的 8 个值类型（`RecentDocInfo` / `SelectedDocumentInfo` / `PinnedMCPServiceInfo` / `PinnedSkillInfo` / `PinnedSkillInstructions` / `KnowledgeBaseInfo` / `PlaceholderDefinition` / `SystemPromptSection`）外提到 `agent/prompt/`；`PromptAssembly` → `ConversationAssembler`（职责收窄为会话消息装配，系统提示词选段归段表）。唯一留根的是 `BuildSystemPromptOptions`——它引用根包 `SkillMetadata`，搬出会形成 `prompt → root` 包边，待该类型归位后再搬。
-**实录更新说明**：`GoRecording46A/46B/46C` 因协议提示词文案变更（含派生字段 `prompt_len`）同步更新；Go 录制源已下线、仓内无重录程序（见 `docs/handoff/records/batch-records.md` B39），故按当前实现更新常量，属**显式基线变更**。
-
-
-> **全后端分包地图与体检结论见 `docs/backend-package-map.md`**（2026-09-30：34 顶层包 / 1,599 文件 / 284k 行；P0 包间成环 32 组、P1 扁平包 10 个、P2 超大单层 4 个、P3 顶层 package-info 仅 5/34；复测 `python3 scripts/pkg-audit.py`）。
-
-> **模块手册**：`docs/knowledge-module-guide.md`（架构师接手版，500 行 / 8 张 Mermaid 图：全景 · 分层 · ER · 入库时序 · 检索 · FAQ 状态机 · 任务 span · 守卫）——它讲「结构 + 接口 + 实体 + 链路 + 改哪里」，新人先读手册、再读本节地图。
-
-```
-knowledge/
-  controller/ (9)   只放 @RestController：Chunk / ChunkerPreview / Faq / KnowledgeBase /
-                    KnowledgeBaseFileProxy / Knowledge / KnowledgeOperations / KnowledgeTag
-  service/ (29)     Spring 服务（用例）与 @Component —— 含 FaqImportService(1,234)、
-                    KnowledgeService(850 门面)、SpanTracker(700，knowledge/wiki 共用)
-  support/ (5)      无状态零依赖的算法与规则：GraphChunkSelector / QuestionBatchPlanner /
-                    KnowledgeIndexContent / ParserEngineRules
-  task/ (10)        异步任务：队列接口 + InProcess 实现 + KnowledgeProcessWorker +
-                    KnowledgeTaskExecutor / KnowledgeTaskIdCodec / 进度 store
-  client/ (3)       出站依赖薄封装：DocReaderClient / EmbedderClient
-  storage/ (4)      LocalStorageService / TenantFileStorage / TenantStorageService
-  security/ (5)     KnowledgeRouteGuards + Knowledge/Chunk AccessGuard + FaqGuard
-  repository/ (6)   仓储门面（软删三面孔/乐观锁/方言分支）：ChunkRepository /
-                    FaqChunkRepository / KnowledgeTagRepository / KnowledgeSpanRepository
-                    + ChunkTxTemplate
-  mapper/ (8)       只放 MyBatis-Plus 接口（7 个 *Mapper）
-  domain/ (27)      实体（@TableName 跟随表名）+ jsonb 值类型 + WireValued/ParseStatus/
-                    EnableStatus/SummaryStatus
-  dto/ (75)         一类型一文件（请求/响应/view 分离命名）
-  chunker/ (15)     分块子域：Chunker 接口 + Heading/Heuristic/Legacy(Tier3) Splitter +
-                    CodePoints/TextNormalizer/ChunkPatterns 等
-```
-**注**：`datasource/mapper`、`memory/mapper` 里仍各有 `XxxTxTemplate`（历史约定），其批次跟随 `repository/` 分层；`chunker/LegacySplitter` 的 "legacy" 指 **Tier 3 算法分档**（与 `HeadingSplitter`/`HeuristicSplitter` 同族），**不是**待删的遗留代码。
+| `check-package-cycles.py` | R1/R1b 环 · R2 依赖 config · R3/R3b L2→L3 · R4 解耦对回流 · R5 L1 底座 · R6 common 实现痕迹 · R7 声明↔路径 · R8 内联 FQN · **R9 包级 SCC** | `scripts/package-cycles.baseline.json`（只许减） |
+| `check-go-anchors.py` | Go 锚点注释棘轮 | 0 |
+| `check-fe-contract-keys.py` | 前端契约键棘轮（前端 snake / 后端 camel） | 只许减 |
+| `check-json-key-case.py --strict` | 换锚棘轮 + 冻结覆盖快照 | 冻结面登记 |
+| `check-event-face-case.py` | 事件面/路由面命名口径 | — |
+| `check-file-size.py` | 大文件棘轮（行数 + 单行 64KB + 文件 512KB） | 4 个登记例外 |
+| `check-stray-dirs.py` | 游离目录 / 死包目录 | 0 |
+| `check-dead-members.py` | 死成员（main + test） | 0 |
+| `check-api-envelope.py` | 统一响应外壳（清单只许减） | 50/52 |
+| `check-exception-semantics.py` | 检索引擎 catch 不得清空边界条件 | 0 |
+| `check-contract-sync.py` | 契约金片键签名变化必须显式签字 | 1,349 金片 |
+| ArchUnit `ArchitectureRulesTest` 等 | A1 裸 env · A2 属性扫描 · A3 双装配 · A4 install 面 · A5 裸 NUL · A6 @Lazy · A7 裸 JDBC · A8 字符串 wrapper · A9 `.last` 拼接 · A10 分层倒挂 · A11/A11b Mapper 包约定 · A13 生命周期钩子 · A14 JsonProperty 卫生 · A15 序列化工厂 · **A16 边界层引用禁令（76 类）** · **A17 service 技术依赖禁令（61 类）** | 各基线只许减 |
 
 ## 13. 落刀方法论（新 Agent 必读；全部是踩坑换来的）
 
@@ -679,349 +498,51 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 
 > 在这些计划文件里按**节号 Ctrl-F**（如 `14.7.2`、`14.9l`）即可定位原节。
 
-## 15. 全面修复计划（2026-10-02 立项；批次由用户排期，本文档即排期输入）
+## 15. 整改计划与纪律（v0.2.0）
 
-> **输入与现状**：阶段 2（神类切片）与阶段 3（契约换锚）已收官（§14.3/§14.9s）——≥800 只剩
-> 4 个登记例外，`@JsonProperty` 913 处全部是登记冻结面。本计划覆盖**全部已知残留**：
-> 两轮复查暴露的"实况断点"类别（视图层读取漂移）、登记在案的尾巴（`@JsonInclude` 288 处、
-> Go 零值时间哨兵、lf_* 载具）、以及 §5 阶段 4 既定面。**批次表就是排期输入**，做完一批
-> 勾一批、把执行记录写回本节。
+> 本版 §15 重写：v0.1.0 批次表（205 条）已归档（见 §11）；现行 = **R 系列批次表（§15.1）**，执行记录见 §15.4。
+> 方案与详细计划：`outputs/java-remediation-plan-2026-10-13.md` / `outputs/java-remediation-implementation-plan-2026-10-13.md`。
 
-### 15.1 批次总表（状态：✅ 完成 / ⬜ 待做；执行记录见 15.1.1）
+### 15.1 R 系列批次总表（B232~B267，共 36 批；状态 ✅ 完成 / ⬜ 待做；记录见 §15.4）
 
-> **本表＝索引（2026-10-10 压缩：205 条批次说明 → 一行一批，省 263 KB）**：每行保留 批号 / 范围 / 优先级 / 量级 / 状态+日期 ✓。
-> **详情取回**：每批提交信息都带 `(B###)` 号 ⇒ `git log --grep="(B201)"` 精确取回；`git log --oneline | grep B20` 看列表 ✓。
-
-| 批 | 内容 | 优先级 | 量级 | 状态 |
-|---|---|---|---|---|
-| **B0 端到端真实走查** | 起服（后端 8083 + 前端 dev）按域走查 14 条链路：注册/登录/**令牌刷新**/登出 → 空间创建/切换/成员邀请/**审计页** → KB 创建/摄取/**处理时间线**/预览 → 检索/对话（SSE）→ wiki 浏览/编辑 → datasource（RSS 桩）同步/凭据 → im 渠道 CRUD → vectorstore/storage 设置 → 收藏/技能目录/模型调试/系统运行时页。每条记录 API 形状 × 视图渲染 × 控制台报错 | **P0** | 1-2 天 | ✅ **完成（2026-10-02）**——14 条链路全走通，修 15 处断点（前端 12：裸体未适配 8 + 字段漂移 4 族； |
-| **B211 P4 回退：`:channels` 试切撤销** | 试切当天判定不划算 ⇒ 整批 revert | P2 | 小 | ✅ **完成（2026-10-10）**——回退 B210 + 2 补丁（`git revert '4950df34^..HEAD'` ✓ **零冲突** ✓；32 改名回迁 + 15 改回 + 2 删 ✓）；`domains/auth/apikey` ✓ 复原、`settings`/`boot` 接线 ✓ 撤、`TenantFilterGuard` 4 条语句名 ✓ 回 `com.ragagent.auth.apikey.mapper`；B210 外提的 API-Key JSON 往返断言**已回迁** `domains/.../JsonContractRoundTripTest` ✓（覆盖不丢 ✓）。**理由（实测，见 plan §13）**：① 平行而非下沉 ✗（`channels → domains` ✓ + auth 4/tenant 2 引用 ✓）；② 金片边界切不净 ✗（apikey 契约仍在 `domains/testFixtures` ✓）；③ 破坏"模块名不进包名"惯例 ✗（`channels.*` 全仓唯一 ✓）；④ 基建登记永久面 ✗（守卫模块清单/基线/包地图 ✓）；⑤ 紧耦合对（22+22 ✓）内聚优于拆分 ✓。**保留**：B206–B209 切边成果 ✓ + 44 边清单 ✓ + 新增模块"三问"判据 ✓。**验证**：`spotlessCheck build` ✓ **1m27s** ✓ · **4858 / 0** ✓（与 B209 基线逐条一致 ✓）· 九守卫 rc=0 ✓ · 外壳 **50/52** ✓（不受模块位置影响 ✓）。 |
-| **B212 交付链路修复：Dockerfile + 镜像进 CI** | 架构评估发现的最高优先级项：**根 Dockerfile 引用 B167 已裁撤的 `:server` 模块名、漏拷 3 个 Gradle 模块与 2 个 proto 源目录 ⇒ `docker build` 必然失败**；而它从未进任何 CI job ⇒ 腐化长期不可见。连带两个运行期缺陷：① Flyway 迁移目录（`filesystem:./build/generated-migrations`，**相对工作目录**）没进镜像 ⇒ 全新容器启动即无 schema 且**不报错**，直到第一条查询才炸；② 健康检查只探 TCP 端口 ⇒ Spring 上下文未起即判健康。同批修文档可信度：README 重写（原文仍在首页宣传已删除的 sandbox / docker-java / 196 迁移 / 37 领域包）、api-docs 重跑（sandbox 残留 **64 → 0**，379 条路由）、`architecture.json` 源数据移除沙箱节点 | **P0** | 小 | ✅ **完成（2026-10-10）**——Dockerfile 改 `:boot:bootJar` + COPY 四模块 + `otlp-proto`/`docreader` 源目录；迁移落 `/app/build/generated-migrations`；健康检查改打 `/health`（装 curl，JRE 镜像无）；**显式 `-x spotlessCheck`**（ratchet 需 `.git`，而 `.dockerignore` 排除之；格式检查归 `spotlessCheck`）。CI 新增第 4 个 job `docker`（构建 + 迁移目录自检）⇒ **路径腐化从此当场变红**。**验证**：`docker build` 成功 **3m21s** ✓ · CI 自检步骤逐字复现通过 ✓ · 非 root uid 1001 ✓ · 九守卫 rc=0 ✓ · `spotlessCheck :domains:test` ✓ **4858 / 0 / 跳过 4** ✓ · **本批零 Java 源码改动**（四模块编译已由 docker build 内 `:boot:bootJar` 全程验证 ✓）。**留待拍板**：`docs/site/*.html` 是外部 Archify 工具产物、本仓无该工具无法重渲染，已在 `docs/README.md` 标注陈旧（源 json 已修正）。 |
-| **B213 仓储门面归位 `repository/` + A11b 防回流** | 架构评估 P1-③：约定"`mapper/` 只放 MyBatis-Plus 接口、`repository/` 放仓储门面"，实测 **session(4)/wiki(4)/memory(1) 共 9 个仓储门面塞在 `mapper/`**（knowledge 守约 6 个 ✓）。分层约定就是这样一点点失效的——按域类比写代码的人会继续放错 | 架构 | 中 | ✅ **完成（2026-10-10）**——13 个文件纯移动（9 门面 + memory 4 协作者）+ 68 处引用同步。**memory 域扩到 5 类的判据**：3 个 Store 是**包级私有** `final class`、与门面构成紧耦合对，只搬门面会逼迫放宽可见性或留反向倒挂 ⇒ 按「紧耦合对内聚优先」整簇搬；`VectorHitRow` 留 mapper（被 `MemoryItemEmbeddingMapper` 用）。迁后 session/mapper 剩 4 接口、wiki/mapper 剩 6、memory/mapper 剩 7+`VectorHitRow`，**三域 mapper 包只剩 MyBatis 接口** ✓。**新增 ArchUnit A11b**（`mapper` 禁 `*Repository`，A11 的镜像面）+ 棘轮基线 11 条 = 尚未归位的域（audit 1/auth-apikey 1/datasource 2/mcp 3/storage 2/vectorstore 1/websearch 1；**`:engine` 的 `retrieval/engine/**` 不适用本约定**）；**红态探针已验**（注入 `audit/mapper/ProbeRepository` ⇒ FAILED ✓ ⇒ 删除恢复绿 ✓）。**四道基线同步**（皆路径漂移，非真违规）：A8 字符串 wrapper · A7 裸 JDBC（`memory.mapper.MemoryVectorStore`）· `check-json-key-case` 键级 BASELINE · `file-size`（706→709；顺带校正 5 处**既有滞后**）。**javadoc 逮到 7 处跨包 `{@link}`** ⇒ 改全限定。**验证**：`./gradlew build` ✓ **1m34s** · **4859 / 失败 0 / 跳过 6** ✓（+1 = 新增 A11b；跳过为既有环境性：Redis×2、`*IT` 不被 Gradle 收集×2、真实 API key×1、Go 差分×1）· 九守卫 rc=0 ✓ · **dev 后端重启正常**（:8083 HTTP 401 ⇒ **包移动未影响组件扫描** ✓）。**余 11 个域待逐域跟进**（碰到哪域归哪域，A11b 基线只许减）。 |
-| **B214 工程化补齐：九守卫进 Gradle + version catalog** | 架构评估 P2 工程化债：① 九守卫**只存在于 CI 的 guards job** ⇒ 本地 `./gradlew build` 全绿 ≠ CI 绿（B168 实测漏检过一次真失败）；② 依赖版本散落 4 个模块 —— `spring-boot-dependencies:3.3.5` 写 4 遍、`mybatis-plus:3.5.7` 3 遍、protobuf/neo4j/sqlite/archunit 各 2 遍（升级漏改一处即模块间版本漂移，且只在运行期暴露） | P2 | 小 | ✅ **完成（2026-10-10）**——① 根 `build.gradle.kts` 注册 `:guards`（Exec，`isIgnoreExitValue=false`）并让各模块 `check` 依赖它 ⇒ **`./gradlew build` 与 CI 同口径**；**红态探针已验**（注入游离目录 ⇒ `Task :guards FAILED` ⇒ `BUILD FAILED` ✓ ⇒ 删除恢复绿 ✓）；实测单次 build 内守卫**脚本只执行 1 次**（`> Task :guards` 重复打印是 Gradle 多项目控制台行为，非重复执行 ✓）；CI 会跑两遍（guards job + backend job）——刻意取舍，两边同口径优先。② 建 `gradle/libs.versions.toml`（19 个 version / 19 个 library / 4 个 plugin），**30 处硬编码版本归零**、BOM 5 处 → 1 处；范围刻意只收"带显式版本"的坐标（BOM 管的 starter-* 等不登记，避免制造"这里也要改"的错觉）。**catalog 别名前缀冲突踩坑**（首次配置期即红）：`protobuf` 是叶子 version ⇒ 不能有 `protobuf-plugin` 兄弟（需为分组）；同款 `grpc`/`grpc-client-starter`、`protoc`/`protoc-gen-grpc-java` ⇒ 分别改名 `protobufPlugin`/`grpcClientStarter`/`grpc-protoc-gen-java`。**依赖漂移已抽查**：protobuf-java 3.25.5 / mybatis-plus 3.5.7 / sqlite-jdbc 3.46.1.3 解析值与迁移前一致 ✓。顺手订正 3 份构建脚本的过期事实（engine 头部"11 域 368 文件"实为 **8 域 295 文件**、common "135/175 文件"实为 146/219、多处"与 server 同口径"）。**验证**：`./gradlew build` ✓ **1m24s** · **4859 / 失败 0 / 跳过 6** ✓（与 B213 逐条一致 ⇒ catalog 迁移零影响）· 九守卫 rc=0 ✓。**⚠️ 评估误判更正**：`maxParallelForks` 两套值**是刻意分层调参**（`domains:179` 的 `cores/2` 正是 B175 修 worker OOM 的产物）⇒ **本批未动、也不该动**。 |
-| **B215 序列化统一：自建 mapper 收编 + A15 守卫** | 架构评估 P1-①（本轮收益最大项）：**主源码 168 处自建 mapper** 绕过 §2-12 的统一策略。代价不是"多写一行"，而是**策略分叉**：裸 `new ObjectMapper()` 没注册 JSR-310（遇 `java.time` 字段直接抛 `InvalidDefinitionException`）、且 `FAIL_ON_UNKNOWN_PROPERTIES=true` —— 与"宽松读"政策恰好相反，且**只在特定数据到达时才炸** | **P1** | 中 | ✅ **完成（2026-10-10）**——**168 → 7 处**（6 处刻意保留 + 工厂自身）。**收编方法**：① 161 处裸 mapper 批量替换为 `JsonMappers.lenient()`（脚本按"`new` 后 6 行内无配置调用"判定 + 自动补 import）；② 31 处有配置但**等价/超集于 lenient** 的（只关 FOUP、或 JavaTimeModule+关时间戳）换成 lenient；③ 内联 `JsonMapper.builder().build()` 5 处（含**循环内每次 new**）收编并提为静态字段。**保留 6 处（每处类注释已有硬理由）**：`LangfuseAttributes`/`StreamJson`/`EventJson`（`ORDER_MAP_ENTRIES_BY_KEYS` 或零值时间序列化器 ⇒ **键序/时间字面量是线上字节面**）· `GitLabConnector`（落库 jsonb 字节须与既有 cursor 一致）· `NotionJson`（`ADJUST_DATES_TO_CONTEXT_TIME_ZONE=false`，**注释明言收编会让写回 cursor 的偏移字面量漂移**）· `JsonValues`（`FAIL_ON_TRAILING_TOKENS=true`，LLM 输出严格解析）。**新增 ArchUnit A15**（禁自建 ObjectMapper/JsonMapper.builder，棘轮基线 7）+ **红态探针已验**（注入 `favorite/ProbeMapper` ⇒ FAILED ✓ ⇒ 删除恢复绿 ✓）。**关键证据**：`./gradlew build` ✓ **1m31s** · **4860 / 失败 0 / 跳过 6** ✓ —— **1345 个契约金片逐字节比对全过 ⇒ 线格式未变**（这是本批唯一需要证明的事）· 九守卫 rc=0 ✓。 |
-| **B216 起停服脚本补齐（B215 收尾时踩出来的连环坑）** | B215 收尾重启 dev 后端做冒烟时，`register` 返回 **500**（`NoClassDefFoundError: PasswordPolicy`）——看起来像刚改的代码炸了。**真因是环境**：① 文档（HANDOFF §8 / README）与 up 脚本都引用 `scripts/*-down.sh --stop`，而**该脚本并不存在** ⇒ 每次"停服"静默失败、端口 8083 一直被旧进程占着；② `java-server-up.sh` 只等端口就绪、**不检查占用**，于是就绪探测**打到旧进程**上照样打印 "ready" ✗ —— 旧进程正处"陈旧 jar"状态（全端点 500）⇒ 差点把环境问题误判成代码 bug 并回滚提交 | **P1** | 小 | ✅ **完成（2026-10-10）**——① **新建 `scripts/java-server-down.sh`**（按端口找进程树，先 TERM 15 秒后 KILL；幂等；`--stop` 兼容文档旧写法）；**不**用 `gradlew --stop`（那会停掉所有 daemon、影响其他会话）。② `java-server-up.sh` **起服前挡端口占用**（`lsof -ti` 命中即列出 PID 并 exit 1）⇒ 杜绝"误报 ready"。**验证**：红态（服务在跑 ⇒ 明确报错 + 列 PID + rc=1，不再打印 ready ✓）· 停服三情形（正常停 ✓ / 幂等 ✓ / 停后再起 health 200 ✓）· **真实冒烟**：`register 201`（响应 `createdAt` 为 ISO-8601 带时区 ⇒ lenient 策略生效）+ `login 200` + `health 200`，日志 **ERROR 0 / 无 ClassNotFound** ✓。文档两处引用同步订正为具体脚本名。 |
-| **B217 边界条件不得降级：ES V7 空 filter + 第十守卫** | 架构评估 P1-②（**唯一带安全语义**的一项）：ES V7 家族三份复制的同款 —— `catch (Exception e) { filter = MAPPER.createObjectNode(); }`。`getBaseCondsJson` 产出的是**权限/范围边界**（租户/KB/tag 的 must、is_enabled 的 must_not），解析失败换成空对象 ⇒ ES 收到 `filter: [{}]` ⇒ **过滤条件丢失不报错，而是返回更宽的结果集**（可能捞出本该被挡掉的内容） | **P1** | 小 | ✅ **完成（2026-10-10）**——判定：该 JSON 由本仓 MAPPER 序列化产出，正常不可能解析失败；真失败时降级为"无边界"是最坏选择 ⇒ 改为**直接抛**（`V7SearchOps` 向量/关键词两路 + `V7WriteOps` 源索引批量读，三处方法本就 `throws Exception`）。`V8WriteOps` 同位置静默 return ⇒ 补 warn 日志（无日志时"部分失败未检视"与"确实没有失败"事后无法区分）。**新增第十守卫** `scripts/check-exception-semantics.py`（零基线纯禁令：扫 engine 检索引擎目录的 catch 块，内建状态机抹平注释/字符串后做大括号配对）⇒ 接入 `run-guards.sh`（**九守卫 → 十守卫**，11 处文案同步）；**红态探针已验**（还原修复前写法 ⇒ 精确命中 `ElasticsearchV7SearchOps.java:85` ✓）。**评审计数更正**：写入路径三处（V7 bulk/delete、V8 bulk 解析失败 return）**比我初评的风险低** —— 都先查状态码且会抛，解析失败只影响"部分失败检视"。**逐处审查后保留**：`classifyFailure` 的错误类型提取（缺失不影响按 status 判定）· `useKeywordSuffix` 探测降级（可用性权衡 + warn 留痕）· 三处读坏 jsonb 返回空对象（属 §2-12 宽松读）。**验证**：`./gradlew build` ✓ **1m27s** · **4860 / 失败 0 / 跳过 6** ✓（首跑 `EmbedRateLimiterTest` 红一次 = §9 登记的第三个已知偶发，单独重跑 3 次 + 全量复跑全绿 ⇒ 与本批无关）· 十守卫 rc=0 ✓。 |
-| **B218 可测试性补强：tenant 脱敏单测 + 跳过棘轮 + `*IT` 入口 + jacoco** | 架构评估 P2 可测试性四项（本轮评估的**最后一批**）：① `tenant` 包（多租户安全关键）**零单测**；② Redis 相关用例 `assumeTrue` **静默跳过**（覆盖可无声消失）；③ 2 个 `*IT` **永不执行**；④ 无覆盖率工具 | P2 | 中 | ✅ **完成（2026-10-10）**——① **`TenantConfigRedactionTest` 13 用例**：7 个云 provider 的密钥打码逐项断言 + S3 的"空串=切 IAM 链"例外语义 + WebSearch/ParserEngine 的响应面打码与更新面合并 + **反射清单钉子**（`providerFieldListIsPinned`：新增 `*EngineConfig` 字段必红 ⇒ 逼补打码与合并两条分支）。② **跳过棘轮**：`test-summary.py` 加 `ALLOWED_SKIPS`（模式→理由），**未登记跳过 ⇒ 退出码 1 ⇒ CI 红**；**红态探针已验**（清空白名单 ⇒ 2 条被逮住报红 ✓）。③ **`:engine:integrationTest` 任务**（显式 `include("**/*IT.class")`，不接 check）：此前 `*IT` 不匹配 Gradle 默认收集模式 ⇒ **连它们 javadoc 里写的 `--tests "*...IT*"` 也筛不出**（候选集为空）；现 `test` 显式 `exclude` + IT 独立入口（env 门控 ⇒ 未设时 disabled，任务绿）；两个 IT 的过时命令（`:server:test`）一并订正。④ **jacoco 引入但默认不插桩**：实测插桩让全量 1m24s → **1m49s（+25%）**，而"1.5 分钟闸门"是本仓刻意成果（B194）⇒ 改按需 `-Pcoverage`，并给 `jacocoTestReport` 加 doFirst **防呆**（忘了加参数时明确报错，而不是安静产出空报告）。**验证**：`./gradlew build` ✓ **1m31s** · **4871 用例 / 失败 0**（= 2885 domains + 545 engine + 127 common + 1314 boot；新增 13 用例、`*IT` 移出 test 2 条，逐项对上）· 十守卫 rc=0 ✓ · integrationTest 任务跑通（2 类 disabled ✓）· jacoco 三情形（不带参数报错 / 带参数出报告 / 默认回到 1m31s）全验 ✓。 |
-| **B219 消除全仓最大 Java 文件 + 守卫扩面（按字节）** | 评估余项：`GoRecording45C.java` **3.78 MB**（全仓最大 Java 文件，IDE 打不开、评审无法 diff） | P2 | 小 | ✅ **完成（2026-10-10）**——**根因**：819 行里有一条**单行 3.5 MB**（116 个 `.append()` 的 StringBuilder 链，装 base64 占位图；用 StringBuilder 是为绕开 javac 常量池 64 KB 上限）。**处置**：该常量（`R_MCP_TOOL_EXTRACT_IMAGES_SKIPPED`）连同 4 个同族（`R_SHELL_EXEC_*`）**确认为死数据**（沙箱功能 2026-09-28 已裁撤；无直接引用，唯一反射点 `Tools45cFakes.rec45c` 的全部 5 个调用都只取 `mcp_stub` 组）⇒ **删除 5 组常量（3.78 MB → 170 KB，-95.5%）**，类 javadoc 留痕说明这次手改。**守卫扩面**：`check-file-size.py` 原按**行数**判且**只扫 main** ⇒ 该文件 819 行一路绿灯、测试树整片不在视野；新加 **R-f 单行 > 64 KB**（javac 常量池上限即客观边界）与 **R-g 文件 > 512 KB**，扫描面扩到 **main + test + testFixtures**；**两个红态探针已验**（70 KB 单行 ⇒ 只红 R-f ✓；707 KB 文件、每行 1 KB ⇒ 只红 R-g ✓，互不误报）。**验证**：`./gradlew build` ✓ **1m22s** · **4871 用例 / 失败 0** ✓ · 十守卫 rc=0 ✓。**登记待办**：该文件另有 **260 个常量无任何引用**（SANDBOX/MCP/SHELL/READ/SKILL 族，多为裁撤功能残留）—— 因存在动态构造名字的反射路径，整族清理需逐组核对调用面，**不在本批范围**。 |
-| **B221 契约同步守卫：契约变更必须显式签字** | 架构评估遗留的"契约单一事实源"（方向①）的**第一步**：前端类型是手写的（31 个 api 文件 / 265 个 interface / 7,831 行），后端改字段前端照样编译通过 ⇒ 只有运行时才炸。现有 `check-fe-contract-keys.py` 用正则扫前端源码，**脚本自己写明有七种写法扫不到** —— 在错误的层（文本）上找，永远补不齐 | P2 | 小 | ✅ **完成（2026-10-10）**——**先实测否决了朴素方案**：把"前端声明的字段名"与"金片键全集（854 个）"做全局差集 ⇒ **221 个不在其中（35%）**，全是前端本地字段（`active`/`pending`）、请求体字段与已登记的第三方协议面 ⇒ 直接做成守卫必然漫天误报。**换信号源**：契约金片（1,429 个）是**期望值**，只在契约**有意变更**时更新（`-Dcontract.refresh=true` 重录）⇒ **金片变了 = 契约变了**。据此把"悄悄变"改成"**必须签字**"：金片键集合与基线不符 ⇒ 红 ⇒ 人核对 `frontend/src/api/**` 是否需同步 ⇒ `--write` 更新基线。**指纹口径**：键名用**正则提取**（`"key":`）而**不解析 JSON** —— 金片里有 204 空响应与掩码破坏语法的文件，解析会在它们身上失败而正则对两者都稳健；指纹 = 排序去重键名的 SHA1 前 12 位 + 键数（基线 80 KB / 1345 项，紧凑）；**`--write` 先打印本次全部差异再落盘**（签字的人要看得见签的是什么）。**红态探针已验**：给 `adm-create-badbody.json` 加一个字段 ⇒ 精确报"键集合变化 1（键数 3 → 4）" + 处置指引 ⇒ 还原恢复绿 ✓。接入 `run-guards.sh`（**十守卫 → 十一守卫**，11 处文案同步）。**验证**：`./gradlew build` ✓ **1m26s** · **4871 用例 / 失败 0** ✓ · 十一守卫 rc=0 ✓。**边界（诚实声明）**：本守卫保证的是"**契约变更必被看见并签字**"，**不是**"前端已同步"（后者要靠第二步：springdoc + codegen 才能做到机器保证）。 |
-| **B222 前端代理默认值修正（用户实测暴露）** | 用户实测报告：在 IM 设置页**添加飞书渠道后重新打开，AppID/Secret 为空**，且飞书发消息无回复 | **P1** | 小 | ✅ **完成（2026-10-11）**——**根因＝配置不一致，非代码 bug**：`frontend/vite.config.ts` 的 `DEV_PROXY_TARGET` 默认值是 `http://localhost:8080`（**Go 仓时代遗留**，旧后端起在 8080），而本仓后端自 HANDOFF §8 起就在 **:8083** —— 前端进程无 `VITE_*` 环境变量、`frontend/` 下也无 `.env` ⇒ 实际代理到 **8080（空端口）** ⇒ **所有 `/api` 请求根本没到后端**。**症状为何伪装成"保存了但读到空"**：浏览器侧只有 XHR 失败、**没有醒目提示** ⇒ 用户以为填了保存了；实测 `im_channels` 表 **0 行**（数据从未落库）⇒ 飞书不回复是同一根因。**修复**：默认值改 `http://localhost:8083`（本仓后端端口），并留注释说明踩坑链路。**端到端验证（经前端代理复现用户路径）**：`login → 拿 token → GET /api/v1/im-channels` ⇒ **200 `{"code":0,"data":[]}`** ✓；修复前同路径是**连接失败**（8080 无监听）。**连带纠正一个误判**：IM 凭据**不脱敏**（响应原样回显）⇒ 空就是没保存，不是打码。**教训（评估盲区）**：本次全仓评估只覆盖后端与脚本，**前端启动链没看** —— 这类"两处约定不一致、靠人工记得加环境变量绕过"的问题，正是只有真实使用才能暴露的。README 坑速查与 §8 已补记。 |
-| **B223 IM 长连接被 SSRF 守卫挡死（用户实测暴露）** | 用户实测报告：飞书 IM 渠道配好后「重新打开 AppID/Secret 为空」且「发消息没有回复」 | **P0** | 小 | ✅ **完成（2026-10-11）**——**根因（一个，但被两层表象掩盖）**：`SsrfGuard` 的 scheme 检查**只认 `http`/`https`**，而 IM 长连接（飞书等）走 **`wss`** ⇒ `SsrfException: invalid scheme: wss` ⇒ **渠道 100% 拉不起来**（日志只有一行 WARN）。**两个表象的真相**：① 「重新打开为空」是**设计如此**（读回接口只给 `credentialsConfigured:true`，明文密钥不回显；库里凭据完整）；② 「需要重启才生效」是**假象** —— `ImChannelService:293` 本就会在写操作后调 `onChannelChanged` 自动拉起，只是每次拉起都被 SSRF 挡掉，重启也一样被挡。**修复**：`ALLOWED_SCHEMES = {http,https,ws,wss}`（`wss`/`ws` 的风险与 `https`/`http` 等价；**白名单仍只放宽主机/IP、不放松 scheme**）+ 类文档同步。**回归测试**：新增 `SsrfGuardTest`（5 用例：wss/ws 放行 · http/https 回归 · **ftp/file/gopher/data 即使主机在白名单也拒**（安全断言）· wss 不绕过主机限制）⇒ 全量 **4876 用例 / 失败 0**（+5）。**验证**：重启后日志 `[Feishu] long connection established: channel=b78da5e2-… conn=7695078728748424374` ✓ —— **用户的真实渠道连上了**。**排查代价的教训（已写进 §8）**：我前几轮一直用 `psql -d WeKnora` 查（**旧仓的库**），得到"表 0 行"⇒ 误判为"数据从未落库"，白跑一轮；本仓库名是 `ragagent`（`.env` 的 `DB_NAME`）。**正确姿势＝看后端启动日志的 jdbc URL**。**IM 不回复的排查顺序（供后续）**：① 查对库确认渠道行在；② 看日志 `[IM] Channel started`；③ 看 `[Feishu] long connection established/failed`；④ 凭据不回显是正常的，别往"没保存"方向查。 |
-| **B224 修「删除文档提示失败、刷新后其实已删」** | 用户实测暴露（知识库文档删除）+ `KnowledgeBase.vue` 判定逻辑 | P1 | 极小 | ✅ **完成（2026-10-11）**——**根因**：前端 `KnowledgeBase.vue:2061` 的 `if (!res?.success)` 是**同步时代的契约残留**；后端删除早已改为**异步受理**（单删 `DELETE /knowledge/{id}` → **202 + `{taskId}`**；批删 `POST /knowledge/batch-delete` → **202 + `{count,taskId}`**），两个响应体**都没有 success 键** ⇒ 该判定**恒为真** ⇒ 每次删除都先弹「删除失败」并 `return`（连"已提交"的 info 与轮询都不执行），而请求其实已被后端受理并执行 ⇒ 现象就是**提示失败 + 刷新后文档没了**。**证据链**：① 后端日志**零异常**（不是后端错）；② 查对库（`ragagent`）该行 `deleted_at` 已设、`parse_status` 仍 `completed`（⇒ 排除"轮询判 failed"路径 —— 那条要求先见 `deleting` 再见 `failed`）；③ `TaskIdResponse`/`BatchTaskData` 定义确认无 success 键；④ **同族已有两处修过**（`AgentList.vue:972`「成功 ≡ 2xx + code 0…不再判 res.success」、`VectorStoreSettings.vue:732`「后端从未返回过这两个键」）⇒ 本处是漏网的一处。**修复**：按同族既有判据去掉 `res.success` 判定（2xx + code 0 由响应拦截器保证，其余 reject ⇒ 走 catch 分支）。**验证**：`npm run type-check` ✓ · `npm test` **738 / 0** ✓（含 `knowledgeDeletion` 轮询单测）。~~**待办（同族未核）**~~ **已由 B225 结清**：`UserProfile.vue:308`（changePassword）与 `TenantMembers.vue:1284`（createInviteLink）经核实**合法**（那两个 api 函数在 **api 层显式合成** `success`）；`WebSearchSettings.vue:650` 是真 bug，已在 B225 连同另外 9 处一并修完。 |
-| **B225 前端「响应字段判定」同族 bug 全仓清算（用户要求）** | 用户：前端还有同类问题吗？查询确认后修复 | P1 | 中 | ✅ **完成（2026-10-11）**——**方法**：全仓扫描（每个判定追到 `api/**` 函数 → 后端 URL）+ **逐条以契约金片核实**（不按"同族"推断）；**共修 10 处判定 + 1 处类型/实现**，全部是「**响应体字段不存在 ⇒ 成功分支永不亮**」同型。**① Login.vue × 3**：`:515` OIDC（`!response.success` ⇒ 点 OIDC 登录恒报失败、永不跳 IdP）改为判 `authorizationUrl`；`:603` register-by-invite（分享链接注册：**账号已建、token 已发**，界面恒报失败且不落会话，重试还撞 409）改为判 `token`；`:660` 邀请链接落地页（`resp.success && resp.data` **双重错** —— 拦截器已把信封解包，两键都不在）改为判 `resp.tenantId`。**② KnowledgeBase.vue × 3**：`:480` 批量重解析（202 + `{reparseCount,taskId}`）· `:1626` 上传（201 + 裸 `KnowledgeResponse`）· `:1687` URL 导入 —— 后两处旧代码是 4 条件兜底（`success||code===200||status||(!error&&truthy)`），**前 3 个条件恒 falsy**、仅靠最后一个"恰好有效"，返回空体即误判 ⇒ 一并改为「2xx 即受理，失败必 reject」。**③ StorageBackendSettings × 2**：`:343`/`:347` 测试连接。**④ WebSearchSettings × 2**：`:650`/`:658` 测试连接。③④ 的关键细节：后端把结果放在**响应体内**（成功 `{connected:true}`、失败 `{connected:false,error:…}`）**且两者都是 HTTP 200 + code 0**（金片 `sb-test-raw-local/ssrf.json` 可证）⇒ 判据必须是 `connected`，**不是**"删掉判定"（那样失败会被当成功）。**⑤ `api/auth/index.ts`**：`InviteLookupResponse{success,data}` 是**旧契约类型**、运行时不符（`getInvitationByToken` 还吞异常返回 `{success:false}`）⇒ 类型与实现一并对齐真实契约（`Promise<InviteLookup>`，失败直接 reject 交调用方 catch）。**证伪并订正**：`docs/api-response-convention.md` 原把 `StorageBackendSettings:343` 列为"载荷字段叫 success ⇒ **勿误改** ✓" —— 金片证明该端点**无** success 键，**该结论是漏检根源**（后来者据此跳过同族）⇒ 已订正并写下通用判据：「载荷有没有 success 键」是**逐端点事实**，权威=金片/controller，**新增此类判定前先查金片**。**核实为合法（勿再报）**：`UserProfile.vue:308`、`TenantMembers.vue:1284`（api 层合成 success）· `Login.vue:483/567/625/708`（同上）· `McpTestResultBody.vue`（Java 侧恒输出 success）· SSE 事件的 `event.success`（流不是 HTTP 外壳）。**登记未改（死读取但有无害兜底）**：`McpOAuthCard.vue:164,241,251` · `ToolApprovalCard.vue:239` · `McpMetadataPanel.vue:109`（`e?.response?.data?.error?.message` ⇒ 首段恒 undefined，有 `e.message` 兜底）· `KnowledgeBaseEditorModal.vue:1489`（同上，第二段 `error.code` 可读 ⇒ 功能仍对）。**验证**：`npm run type-check` ✓ · `npm test` **738 / 0** ✓ · 6 个契约金片逐条核对 ✓。**注意**：用户报的那处（删除文档）是 B224 修的，本批是**同族清算**。 |
-| **B226 修「Widget 浮标不显示配置的图片」（用户实测暴露）** | `public/weknora-widget.js` 读公开 config 的外壳形状 | P1 | 小 | ✅ **完成（2026-10-11）**——**现象**：`widget-test.html` 浮标回落默认气泡，渠道里配好的图标不显示。**根因**：`GET /api/v1/embed/{channelId}/config` 在 **B200（2026-10-10 全仓 API 外壳化）**被包成 `{code,message,data}`，而 widget 仍直读裸对象 `cfg.launcherIcon` ⇒ undefined ⇒ 静默回落默认气泡（**颜色看不出问题**：`data-primary-color` 属性恰好兜住，只有图片露馅）。**金片历史是铁证**：`emb-pub-config.json` 原为裸对象（`df6a61ed` 前），`c7fce4e1`（B200）改成信封 —— 而 2026-10-03 那次"换锚为裸对象"当时是对的，B200 之后 widget 就成了唯一的落伍消费方。**判据**：`api-response-convention.md` 的登记例外只有 `ImCallbackController`（外部平台回调）与 `HealthController`（探针），**embed 不在例外里** ⇒ 后端按全仓约定返回信封是**有意的** ⇒ **修 widget 而非后端**。**修复**：`var cfg = payload && payload.data ? payload.data : payload;`（**外壳优先、裸对象兜底** —— 嵌入脚本一旦发布就散落在第三方页面、无法统一升级，必须容忍两侧的契约调整）。**实测**：在真实响应上复刻读法 —— 修复后 `launcherIcon` **25,039 字符**（base64 webp）✓、修复前 `undefined` ✗。**守卫反讽（重要教训）**：旧守卫 `assert.doesNotMatch(widgetSource, /payload\.data/)`（2026-10-03 立的）**恰好会拦住这次正确的修法** ——守卫跟着过时契约走、反过来钉死了错误形状。已按**真不变量**重写：**外壳形状可变（两种都吃）· 内层键名恒 camelCase**；顺带发现守卫会把**注释里的字面量**也扫到（我第一版注释写了 `cfg.snake` 形态的键名 ⇒ 自测红 ✓ 已改成不含字面量的措辞）。**验证**：守卫 3/3 ✓ · `npm test` **739 / 0** ✓（+1 = 新增"兼容两种外壳形状"）· `npm run type-check` ✓。**⚠️ 残留风险（不在本仓范围）**：**已嵌入第三方页面的旧 `weknora-widget.js` 仍会坏**（它们读裸对象形状）——需要重新发布/重新拷贝嵌入代码；本仓 `frontend/public/` 是唯一源（`dist/` 是 gitignore 的构建产物）。**同类前科**：该端点吃过两次方向相反的亏（2026-10-03 snake→camel；2026-10-11 裸对象→信封），记一次教训：**公开端点的契约变更要评估"已发布消费方"**，这是 B200 批量外壳化时未覆盖的维度。 |
-| **B227 「外壳化落伍消费方」专项清算（用户追问"还有没有同类"）** | 维度：**响应层级 + 键名**（区别于 B225 的"字段存在性"）| P1 | 小 | ✅ **完成（2026-10-11）**——**方法**：全仓扫描（专查 ① 在已解包响应上再取 `.data` / 漏取一层；② snake 键读 camelCase 字段；③ 形状假设），逐条对金片/controller 核实。**共修 3 处 + 订正 1 处文档**，全部是**同一根因**：**B183–B203 全仓外壳化时的「落伍消费方」**（外壳化是批量改造，落伍方只能事后逐个发现 —— 这是本批最大的结构性观察）。**① 真 bug · `views/integrations/ApiIntegrationSettings.vue:1669`**：API 集成页「请求演练」用**裸 fetch**（绕过拦截器）打 `POST /api/v1/sessions`，按注释「§14.9l S1b 起不再有 {data,success} 信封」（**外壳化前的形态**）直读 `sessionPayload.id` ⇒ **恒 undefined** ⇒ 演练必然停在第一步（抛 `playgroundMissingSessionId`）；而失败分支恰好能读到外壳的 `message`，所以报错**看起来正常**、更难发现。修法：`const sessionEnvelope = sessionPayload?.data ?? sessionPayload`（两形状都吃）。**② 潜伏面 · `api/initialization/index.ts:481`**（multimodal/test 裸 fetch）：成功体原样 resolve 外壳（**无调用方**，故不改语义、只加警示注释）；失败读 `err?.error?.message` 是退役形态 ⇒ 恒落通用文案 ⇒ 补 `err?.message` 兜底。**③ 缺口 · `public/weknora-widget.js`**：secure 模式 token 读法只有 `token`/`session_token`，而**本仓 exchange 契约键是 `sessionToken`** （金片 `emb-pub-exchange.json`）⇒ 集成方若直接转发本仓响应就读不到；补为三键名兼容。**④ 文档订正**：`docs/embedchannel-module-guide.md` §3.2 原文「config **裸 20 键**…都在 `data` 内」**歧义**（易读成"config 是裸对象"，B226 的误读可能就源于此）；已改为「**外壳恒存在**：20 个键**裸放在 `data` 内** ⇒ 消费方先取 `data` 再取键」，并追加"**公开面端点被第三方直接消费，契约变更须评估已发布的消费方**"。**核实安全（勿再报）**：widget 的 exchange 读法（`d.data || d` 双形态 ✓）· widget↔iframe 的 postMessage 协议（`provide_token`+`token`+`channel_id` **两侧键名一致** ✓）· `api/embed/index.ts:769`（`e.data` 是 MessageEvent ✓）· **20 处**双形态兜底（`res?.data || res`）与 api 层显式 `{data: resp}` 适配器 ✓。**登记未改（低危有兜底）**：`views/system/SystemAuditLog.vue:330` 读 `details.task_id`（审计行自由 map；Java 侧查无写入方，疑 Go/Python 队列遗留；有 `row.targetId` 兜底 ⇒ 最坏退化为显示 targetId）。**验证**：`npm run type-check` ✓ · `npm test` **739 / 0** ✓ · widget 守卫 3/3 ✓。**结构性建议**：外壳化（B183–B203）的"消费方清单"应显式核过一遍 —— **裸 fetch 面**（绕过唯一解包点）是重灾区，已发现 3 处（widget / 演练 / multimodal），建议后续给"裸 fetch 读响应"加一条源码扫描守卫。 |
-| **B228 裸 fetch 解包工具 + 源码守卫（"让忘记变成变红"）** | 用户问"裸 fetch 读后端是不是不规范" ⇒ 答：不是 fetch 的错，是**绕过唯一解包点、又不补它做的事** | P2 | 小 | ✅ **完成（2026-10-11）**——**判断**：`utils/request.ts` 的响应拦截器是**全前端唯一解包点**，替调用方承担 6 件事（baseURL / 超时 / `X-Tenant-ID` / 401 自动刷新 / **信封解包** / 错误归一化）。裸 fetch = 从后门出去，这 6 件得自己补，**且没有任何东西提醒你漏了哪件** —— 本仓已漏 3 次、全在第 5 件（B226 widget 图标 / B227 演练卡第一步 / initialization 潜伏）。**① 新增 `unwrapEnvelope(payload)`**（`utils/request.ts` 导出）：复用拦截器私有的 `isApiEnvelope`（键集**精确**匹配 code/message/data）⇒ **不会误伤业务对象自带的 `data` 字段** —— 这正是裸 fetch 处不该手写 `payload.data ?? payload` 的原因。**② 新增源码守卫 `src/utils/rawFetchEnvelope.test.ts`**：裸 `fetch(` 必须在**就近 ±3 行**内出现 `unwrapEnvelope(` 或 `raw-fetch-ok: <理由>` 标记，否则测试**当场变红**并列出位置。**窗口刻意只有 ±3（"就地交代"）** ——首版设 ±6 时，两处"解包在 12~19 行之外"的既存代码直接报红；这恰好证明真问题：**从调用点看不出这里有没有处理外壳**（读数难看懂、守卫也判不准）⇒ 改为要求在调用处留一句话。**③ 改造 5 处**：`api/initialization`（FormData 上传 ⇒ 解包 + 就近标记）· `ApiIntegrationSettings` 演练 session（解包 + 标记）与 chat（SSE 流 ⇒ 标记）· `utils/security.ts`（blob 二进制 ⇒ 标记）· `api/embed/index.ts`（**模板字符串里的示例代码** ⇒ 标记）。**边界（有意为之）**：守卫**只扫 `src/`** —— `public/` 的独立发布物不能 import 本仓工具（第三方页面没有依赖），它的契约由 `widgetPublicConfigContract.test.ts` 单独守（要求"两种外壳形状都吃"）。**验证**：守卫正常态绿 ✓ · **红态探针**（注入未解包的裸 fetch ⇒ 精确报出 `__probeRawFetch.ts:2` ⇒ 删除恢复绿 ✓）· `npm run type-check` ✓ · `npm test` **740 / 0** ✓（+1 = 新守卫）。**意义**：把"外壳化的落伍消费方"从"靠一轮轮人工扫描去挖"变成"**新增即红**" —— 这是 B225/B226/B227 三次踩坑后的收口。 |
-| **B229 第三轮扫描（header / 状态码 / 错误体形状）** | 用户"扫一轮" —— 换第三组维度 | P2 | 小 | ✅ **完成（2026-10-11）**——**方法**：全仓扫描 + 逐条对后端证据核实（`ErrorCode` / `@ApiResult` / 拦截器摊平逻辑 / 金片）。**两组正面结论（值得记，避免后人重复怀疑）**：① **header 全仓无错配** —— 8 个自定义头（`Authorization` / `X-API-Key` / `X-Tenant-ID` / `X-Embed-Session` / `X-Embed-Visitor` / `Accept-Language` / `X-Request-ID` / `Range`）前后端**逐一对得上**，含裸 fetch 处手工补齐的 `X-Tenant-ID`；`X-Request-ID` 后端确有 `RequestIdFilter` 消费（回写响应头 + 写 MDC）。② **状态码基本干净** —— 唯一显式判码处 `$httpStatus === 201` 与后端一致；201/202/204 面前端一律走 `2xx` 或按 **body 字段**判定（设计正确）。**问题集中在「错误体形状」：共修 7 处**（全部同型：拦截器把错误体**摊平到顶层** `{status,message,code,data}`，而前端按 **axios 残留形态**读 `.error.*` / `.response.*` / 字符串码）：**🔴 ① `api/model/modelUsage.ts:101`（唯一「无兜底」）**：读 `error.error.code` / `error.error.details` ⇒ 恒 undefined ⇒ **「模型被引用」的结构化用量弹窗永不出现**（用户只见通用 toast，`instanceof ModelInUseError` 永不成立）。改为读顶层 `code`/`data` + 保留兼容分支。**② 同文件的测试夹具也是旧形态** ⇒ **测试照着实现写、两边一起错**，让 ① 长期常绿 —— 这是本轮最值得记的教训：**夹具必须来自真实响应**（已改为摊平形态 + 补一条兼容性测试）。**③ `KnowledgeBase.vue:1632/1676`**：`error?.code === 'duplicate_file'` 字符串比较，而真实码是**数字 2400/2401**（`ErrorCode.KNOWLEDGE_DUPLICATE_FILE/_URL`）⇒ "文件已存在"本地化分支**从未生效**（有 message 兜底，故只丢 i18n）。改常量。**④ `hooks/useKnowledgeBase.ts:145`** 同族（`err.error?.code === 2400` —— 嵌套层错）· **⑤ `FAQEntryManager.vue:2119,2228`**（`error?.response?.status === 404` —— 拦截器产出的错误对象**没有** `.response`）⇒ 改判顶层 `status`（保留文案兜底）· **⑥ `ApiIntegrationSettings.vue:1667`**：**过滤器层**错误体是 `{code:string, error:string}`（`error` 是**字符串**，实测 `{"error":"origin not allowed"}`）⇒ 取 `.error.message` 得 undefined，把最有用的人话换成 `HTTP 409`；两种形状都读 · **⑦ `RuntimeQueues.vue:804`**：`err?.code === 'runtime_task_cursor_expired'` 是**死分支**（后端该端点无 cursor 语义、无此码）⇒ 移除 + 留说明。**登记待定（产品语义）**：演练页对**平台级** API-Key 不带 `X-Tenant-ID`（页面底部自己打印了 Tenant ID 却不放进 header）⇒ 平台级 Key 演练必 409；租户级 Key 完全正确（刻意模拟外部调用方）。**另一条线索**：后端 409 明细 `data.existingKnowledgeId`（`DuplicateKnowledgeDetails`）前端**0 消费** —— "跳转到已存在文档"能力闲置。**验证**：`npm run type-check` ✓ · `npm test` **741 / 0** ✓（+1 = 新增兼容性测试）。 |
-| **B231 embed 历史会话抽屉 + 会话懒创建（用户立项）** | widget 面板标题栏加「历史会话」入口（左侧滑出抽屉、时间分区、点击切换）；访客会话改为**懒创建**（首条消息才落库，终结"打开即建空会话"） | **P1** | 中 | ✅ **完成（2026-10-12）**——**需求**（用户评审确认 8 项交互）：抽屉左侧滑出可关闭／列表按 今天/昨天/近7天/近30天/近一年/更早 分区（**复用首页** `components/sessionGrouping.ts` 纯函数）／点击会话收起抽屉并显示／列表只读（无删除重命名）／回答中点切换需确认／最近 50 条按最后活动倒序／当前会话高亮／共用浏览器可见他人历史属未登录固有边界（不处理）。**后端**：V2 迁移（`sessions.embed_visitor_id` + `(tenant_id, embed_visitor_id, updated_at DESC)` 部分索引）＋ 新公开路由 `GET /api/v1/embed/{cid}/sessions`（按 `X-Embed-Visitor` 过滤、只含**有消息**的会话、逐条附句柄 sig——读消息必需）＋ 创建会话落库 visitor；`embed_visitor_id` 标 `@JsonIgnore`（**保住会话管理接口金片**——首跑全量 9 条 `SessionHttpContractTest` 红即此，修复后复绿）。**前端**：`ensureSession`（懒创建、并发单飞、带 visitor）／`selectSession`／`sendMsg` 前置 ensure（失败不留半成品消息）／`resetAndLoad` 先 `stopStream`（防旧流串新会话）／新组件 `EmbedHistoryDrawer.vue`／EmbedPage：header 常显（不再 `v-if=sessionId`）、历史图标＋新建图标、流式状态上报＋切换确认弹窗／5 语言文案。**测试**：契约新增 4 金片（list／visitor-b／empty／无 visitor 400）＋ `contract-signature` 已签字（1349）；前端新增 `embedHistorySessionGuard.test.ts`（懒创建不变量＋五语言键齐全＋分区复用；**红态探针已验**：注入无条件建会话 ⇒ 红 ⇒ 恢复绿）。**验证**：`spotlessCheck build` ✓（0 失败，含 guards；⚠️ 闸门须 `PATH=/opt/homebrew/bin:...` 在前——`/usr/bin/python3`(3.9) 会让 file-size 守卫 TypeError **假红**）· `npm test` **753/0** ✓ · `vue-tsc` ✓ · 前端 build ✓ · **真实冒烟**（dev 5173+8083，渠道 045bfd4b）：打开 widget 页 **0 新会话**（懒创建）→ 发消息 → 会话 47→48（visitor 落库、标题自动生成、2 消息）→ 刷新恢复 ✓ → 抽屉（"今天"分区、当前标记、17:55／14:55 排序）✓ → 点击切换加载另一会话 ✓。**登记**：存量空会话（`embed_visitor_id IS NULL` 且无消息）可运维软删（列表已过滤，只影响统计口径）；widget iframe 预加载（未打开也加载）属独立优化项、未做。 |
-| **B230 修「推荐问题显示已删文档内容」（用户实测暴露）+ 契约键守卫反噬** | `AgentQuestionMapper` 的两个候选 chunk 查询漏删除态过滤 | **P0** | 小 | ✅ **完成（2026-10-11）**——**现象**：用户报 `/platform/creatChat` 的开场推荐问题里出现**已删文档**生成的问题（"ragent与WeKnora在意图树持久化…"），并怀疑是 agent 作用域串了。**根因（唯一）**：`agent/management/mapper/AgentQuestionMapper` 的两个候选 SQL（`chunk_type IN (faq/text)`）**漏了 `deleted_at IS NULL`** ⇒ 软删 chunk 仍进推荐候选。**决定性证据**：① 推荐问题文本逐字等于 chunk `29ca744f` 的 `metadata.generatedQuestions[0].question`；② 该 chunk 与其文档 `d3269aab` **均已软删**（`deleted_at` 有值），但 `status=0`/`is_enabled=true` 完整满足旧条件；③ **SQL 对照：旧条件命中 23 条（全部是已删的）/ 新条件 0 条**；④ **全仓其他 chunks 查询都带此条件**（`ChunkMapper` / `AgentToolKbBackends`（还额外 JOIN `knowledges` 双检查）/ `KnowledgeTagMapper`）⇒ **证明是遗漏，不是设计**。**作用域澄清（回答用户第 2 问）**：`custom_agents` 里 "AI 小埃" 的 `config.knowledgeBases` **确实包含**该知识库（`bc2a8d00`＝AION知识库）⇒ **没有串作用域**，唯一真因就是删除态未过滤。**修复**：两条 SQL 各加 `AND deleted_at IS NULL`（不额外 JOIN knowledges —— 删文档会**级联软删其 chunks**，已实测成立；与全仓既有写法一致）。**安全性质**：属**内容泄露级** —— 用户删文档常因内容敏感，而推荐问题仍在暴露其内容片段。**影响面**：推荐问题是**实时生成**的（非持久化）⇒ 修复后**立即生效**、无需数据清理 ✓；但同租户该 agent 下曾有 **23 条**已删 chunk 在候选池里。**连带修复（有趣的自我反噬）**：B226 那条 widget 守卫测试为"禁止 snake 键"把 **snake 字面量写进了源码** ⇒ 触发「前端契约键棘轮」守卫红（源码扫描类守卫的通病：**禁止模式的字面量本身也是字面量**）⇒ 改用**通用 snake 模式** `cfg\.[A-Za-z]+_[A-Za-z]+`（更严格、不含具体键名，B230 修正）。**验证**：十一守卫全绿 ✓ · `./gradlew build` ✓ **1m43s** · `npm test` **741 / 0** ✓ · 后端已重启（`build` 重写 jar 必须重启）✓ · **SQL 对照 23 → 0** ✓。**登记待查（同族）**：`message_suggestion_sets`（**消息级**追问建议，与开场推荐不同 —— 它是**持久化**的）是否也会留存已删文档来源的建议，留待后续按同思路核对（本批只修用户报的开场推荐）。 |
-| **B224 注释治理第三专项：批次代号清零 + 过时事实核查** | §14.5 判据「批次与阶段代号 0」的存量清算（B48/B76 后注释线第三轮，用户 2026-10-11 立项"全面分析代码备注：过时、Go 翻译遗留、正确规范易懂"）：校准实测 main 源码 Go 提法 **0**、注释掉的代码 **0**、Go 锚点棘轮 **0/0**——真正的存量是 **207 个 Java 文件注释里残留批次/工作包代号 413 处**（B43、B144…指向 §15.1，脱语境不可读），前端另有 65 处 | P2 | 中 | ✅ **完成（2026-10-11）**——**规模**：按模块分 8 个并行 agent + 主控统一裁决，约 250 文件 / 550+ 处。**口径（继承 B48「先摘不变量再删锚点」）**：代号承载的事实必须留下——「B144 起不再容忍 snake 存量」→「不再容忍（产品未上线、全库 0 行 snake）」；纯出处型（「B61 的装配层接线」）删码重写到独立成立；只讲批次史的整句删。**保留例外**：HANDOFF §引用、ArchUnit A 号、棘轮 R 号、`TINY_PNG_B64` 类常量名；test 侧 Go 规格性提法（「Go 实录」「Go struct 声明序」等线字节证据）按 B48 口径保留，Go 行号指针（`Go L3187-3246`）删。**过时事实修正 ~60 处（全部 grep/读代码实数后落笔）**：数字——「17 种事件」的第二处引用方 `QaSseOrchestrator`（上轮只修了本体）、common 依赖包 30→150+、TenantRole 在用包 13→18、wiki 埋点 6→4 并改指向 `WikiPageOps`/`WikiIngestRunSupport`、ClasspathResourcesTest 15/13→14/9、`AgentController` 调用点 9→6；「204 无响应体」族 ~40 处注释与断言 message 对齐 200+统一外壳现状（多处原文与自己的断言自相矛盾）；golden 键名 snake→camel 的注释漂移；悬空/孤儿 javadoc 归位或删除 6 处；死引用（`:server`→`:boot`、V3 迁移→V1 baseline 存档块、`ALLOWED_FACES`、`api-response-convention` 不存在的 §9）；前端注释按后端现状改 camel 键 21 处。**越界抓漏（机械核验的价值）**：自建「去注释 + 字符串占位归一」对比器扫全部 207 文件 ⇒ 抓到 1 处 agent 把 `FeishuCardStreamOps` 活代码注释掉（已还原）+ 1 处跨包 `{@link}`（javadoc 守卫红 ⇒ 改 `{@code}`）⇒ 终态**代码结构零变化**（字符串差异全部是 DisplayName/`.as()`/断言 message）。**闸门**：代号终扫 = 0（仅剩「文档 409」类正则误报）；十一守卫 rc=0 ✓；`./gradlew build` ✓ **1m43s** · **4876 / 失败 0 / 跳过 4** ✓。**诚实边界**：scripts/ 守卫脚本里的批次号是 B147 已裁决的出处指针（保留）；`docs/knowledge-api-contract-v1.md` §1.13 仍写「204 定稿」与现状矛盾（契约文档，留契约批处理）；5 个测试**方法名**带 204（`deletePageReturns204ThenGetReturns404` 等）名实不符——改名属代码变更未动。 |
-| **B227 文档全量对齐：README 架构化重写 + 31 份手册/专项文档更新** | B48–B226 的大改造（神类拆分、统一外壳、repository/、序列化统一、十一守卫、SSE 事件面 camel 化、settings/tenant 拆包）之后，README 与 docs/ 全面落后；用户立项"README 重点讲架构与目录/包结构，docs 各业务模块全面更新"。另：批次号 B224/B225/B226 已被用户并行会话占用（本批跳号） | P1 | 中 | ✅ **完成（2026-10-11）**——**README**：架构与目录/包结构升为主体——四模块图（数字实测：22/8/4 包、1,383/295/219/13 文件）、仓库根目录树、34 顶层包三张分组表、域内分层约定、一次 RAG 问答链路图；新增**「包根共享、边界靠规则不靠前缀」**关键事实（`:engine` 的包是 `com.ragagent.llm` 等，无 `engine.` 中缀，模块边界靠 ArchUnit 强制）；技术栈修正（向量库 8→**9 家**补腾讯 VectoDB）；质量门禁数字刷新（49 ContractTest/1,429 金片/A1–A15）。**docs/README**：34 包全表 + settings/tenant 新册收录 + 口径统一 2026-10-11。**31 份手册**：23 处口径行实数化、**~50 处信封/204 陈旧教条对齐统一外壳**（含 embedchannel/agent/favorite/evaluation/initialization/im/memory/model/system/websearch/auth——多处与自己的 golden 断言矛盾）、**session 手册「SSE snake 别统一」反向陷阱拔除**（B93b/B135b2 已 camel）、**死引用 8 组清零**（datasource 三协作者全名、im CustomAgentEntity、llm 五刀全名 + `goSorted`→`byteOrderSorted`、**Go 工具面 5 类已退役但四册仍当现役**——chatpipeline/llm/embedding/stream 连 HANDOFF §4 一起订正）。**专项文档**：backend-package-map 头部/分类表/分层树/冻结清单 6 处；knowledge-api-contract-v1 升 **v1.2**（§1.13「204 定稿」作废 → 200+外壳，§2.1/决策表 B/D 行标注被取代）；persistence-architecture-rules 复核（@Lazy 基线 0、域数 34）；api-response-convention 本身即现行权威未动。**新建** settings/tenant 两册。**验证**：死链 0；终扫 204/无信封/SSE snake 残留 0（仅存历史标注）；死引用检测器（类型声明全索引）复核通过；测试规模重数（agent 56/306、im 28/156 等 8 册更新）；十一守卫——**前端契约键棘轮红 1 条为 B226（用户并行批）遗留的新 snake 键 `primary_color`，非本批引入**，其余十守卫绿。**诚实边界**：脚本守卫批次号（B147 裁决保留）；`docs/site/` 陈旧 HTML 重建仍挂账（需 Archify 重渲染）。 |
-| **B220 覆盖率聚合：给出可信的整体数字 + 定位真实盲区** | 评估余项：B218 引入的 jacoco 是**模块口径**，而单模块报告只统计本模块的类 ⇒ 系统性低估（首测 common 22.7%，但它的类被 :domains 的测试大量跑到）。**没有可信的覆盖率数字，就无法判断"测试够不够"** | P2 | 小 | ✅ **完成（2026-10-10）**——根项目引 `jacoco-report-aggregation`，声明四个模块的 `jacocoAggregation` 依赖 ⇒ 插件**自动**注册 `testCodeCoverageReport`（**不要手写 `reporting{}` 块**，会撞名 `ReportSpec already exists`）。**踩坑**：聚合配置在**根项目**解析子项目依赖，而 Boot BOM 原先只在各模块的 `dependencyManagement` 里 ⇒ 报 `Could not find spring-boot-starter-web:.`（版本为空）；解法＝根项目**实际应用** `io.spring.dependency-management` 并 import 同一 BOM（原为 `apply false`）。**产出（聚合口径，全仓）**：行 **67.8%**（87866/129536）· 分支 **54.0%** · 指令 69.1% · 方法 75.6% · 类 **91.4%** —— **模块口径的"common 仅 22.7%"被证明是误读** ✓。**分域**：audit 96.6 · config 87.8 · datasource 84.5 · stream 84.1 · **common 83.7** · tracing 83.7 · llm 82.8 · approval 82.1 · tenant 82.3 · auth 79.8 · chatpipeline 79.1 · retrieval 76.8 · embedchannel 76.6 · event 77.2 · mcp 74.2 · websearch 74.5 · memory 73.7 · agent 71.6 · model 71.5 · evaluation 70.9 · wiki 69.9 · **knowledge 69.8** · system 67.5 · storage 66.8 · im 66.7 · initialization 68.5 · embedding 64.1 · **session 49.3** · **vectorstore 49.1**。**最大盲区＝ session 的 QA 链路**（`service/` 40.7%、`controller/` 41.5%；单类：`QaSupport` **0/192**、`SessionKnowledgeQaService` 40/365、`AgentEngineAssembler` 18/324、`QaTurnExecutor` 13/241、`QaSseOrchestrator` 11/230、`SessionQaFallback` 4/216）—— 恰是**用户最常走的主链路**；这些类耦合重（Spring 装配 + 多协作者），补测需先设计接缝，**登记为后续批次**。**用法**：`./gradlew testCodeCoverageReport -Pcoverage`（因默认不插桩，忘了 `-Pcoverage` 会得到空报告）。**验证**：`BUILD SUCCESSFUL` **1m33s**（含插桩全量测试）· 报告产出并可解析 ✓。 |
-| **B209 P4 第 3 刀：API-Key 认证通道口 + 侦察更正** | 最后一条 main 边清零 | 架构 | 小 | ✅ **完成（2026-10-10）**——`:common` 新增 `ApiKeyAuthPort`（签名与实现逐字一致，含 `throws IOException` ✓ —— 第一版漏了它 ⇒ 编译错 ✓），`APIKeyAuthChannel implements` 该口、`AuthFilter` 改依赖口 ✓ ⇒ **`domains → apikey` 代码边 1 → 0** ✓✓。**侦察更正** ✗：`TenantFilterGuard` 引的是 **MyBatis 语句名字符串白名单**（4 条 ✓）而非 mapper 类型 ⇒ **边 5 是误报** ✓（同 R-d 那类 ✓）；但 apikey 改名 `channels.api` 时这 4 条字符串**必须同批更新** ✓（已写进 §12 ✓）。验证：`spotlessCheck build` ✓ 1m40s · **4858 / 0** ✓ · 九守卫 ✓ · 验环 ✓。 |
-| **B208 P4 第 2 刀：API-Key 管理口 port（:common）** | 窄口 + 脱敏搬移 + 清死依赖/迪米特 | 架构 | 小 | ✅ **完成（2026-10-10）**——`:common` 新增 `ApiKeyAdminPort`（平台列表/建/撤 + 租户默认键 ✓），apikey 侧 `ApiKeyAdminAdapter` 实现（脱敏 `masked()` **逐字搬** ✓）；`SystemAdminController` / `TenantCatalogController` / `TenantCreateOps` 改注入 port ✓（后者顺带修掉 `service.apiKeyService.…` 的迪米特违规 ✗ 与 Catalog 的死依赖 ✗）。**main 侧边数 5 → 1** ✓（只剩 `AuthFilter → APIKeyAuthChannel` ⇒ 第 3 刀 ✓）。验证：`spotlessCheck build` ✓ 1m37s · **4858 / 0** ✓ · 九守卫 ✓ · 验环 ✓。 |
-| **B207 P4 第 1 刀：API-Key 两个响应记录沉 :common** | 记录下沉 + 映射留属主 | 架构 | 小 | ✅ **完成（2026-10-10）**——`TenantAPIKeyResponse` / `TenantAPIKeyCreateResponse` → `com.ragagent.common.apikey` ✓；**关键**：`TenantAPIKeyResponse.from(TenantAPIKey)` 依赖实体 ⇒ **不搬**（搬了会在 `:common` 造反向边 ✗），改建 `auth.apikey.domain.TenantAPIKeyProjections`（语义逐字保留 ✓）。doclint 抓到 `TenantAPIKey` 的 `{@link}` 还指旧包 ✗（§10 沉淀③ 原文生效 ✓）⇒ 全仓修 javadoc 引用 ✓。边数 6 → 5（DTO 两处消失；`SystemAdminController` 改指 projections ⇒ 该边留给第 2 刀的管理口 port 一并消掉 ✓）。验证：`spotlessCheck build` ✓ 1m40s · **4858 / 0** ✓ · 验环 ✓ · 九守卫 ✓。 |
-| **B206 P4 前置侦察：auth ⇄ apikey 的真实边清单** | 只读侦察 + 四刀计划（未动代码） | 架构 | 小 | ✅ **完成（2026-10-10）**——实测推翻旧读数「22 + 22」✗：真实阻塞 = **main 侧 6 处 + common 侧 4 处** ✓（反向 4 处方向合法 ✓；boot 侧 7 类注册 + 4 个测试引用无害 ✓）。清单与四刀计划写进 `docs/phase4-module-boundaries-plan.md` §12 ✓（沉 2 个 DTO + 3 个 port：管理口 / 认证通道口 / 占位符查询口 ✓）。顺带更正：P3 早于 B163 完成 ✓（该文档「待 P3」行同批改 ✅ ✓）。 |
-| **B205 收尾最后一个 ⬜：落库 jsonb 存量键** | 逐键判定 + dev 库一次性修数 | 数据 | 小 | ✅ **完成（2026-10-10）**——**批次表 ⬜ 清零** ✓。判定：落库面已全 camel，残留 snake 全在冻结面；dev 库实测 4 列 6 行旧键（chat_history 1 / retrieval 1 / storage_engine 1 / context 3）⇒ 备份后一次性修数（六列 + memory 两列旧键行数全 0 ✓）。三条踩坑：① `jsonb_set` 与嵌套 `(col->a - k)` 的类型解析会翻车（unknown→jsonb）；② psql `-c` 里 `:'var'` 不插值 ⇒ 改美元引号；③ `printf` 会转义 `$` ⇒ 改用 python 写 SQL 文件。 |
-| **B204 交接文档梳理（HANDOFF 瘦身）** | §15.1 批次表压成一行一批 + 过期段清理 | 文档 | 小 | ✅ **完成（2026-10-10）**——**432.9 KB → 170.3 KB（-61%，省 263 KB）**：① `§15.1` 205 条批次说明逐行压成「批号 / 范围 / 优先级 / 量级 / 状态+日期」一行 ✓，**详情取回 recipe** 写进表头（每批 commit 带 `(B###)` ⇒ `git log --grep="(B201)"` ✓）；② `§15.1.1` 索引行去重复前缀 + 截断（正文早已在 `docs/handoff/records/batch-records.md` ✓）；③ 压掉三段明确过期的：`§6 缝合点`（2026-09-28 清单，已执行完毕 ✓，6.1/6.2 降为 stub 且**编号保留** ✓）、`7.1 存档`（knowledge 域重构，16 行 → 5 行 ✓）、`§11.4` 历史版本 ✓；④ 接手须知：过期的「session 388 条」→ **4858 条** ✓，「已完成」长段 → 一句话版（含 P2 统一外壳 50/52 + 起服端口/踩坑 ✓）；⑤ `§7` 标题日期误导改正（正文含 10-08/10-09 复核 ✓）。**纪律**：外部按 `§编号` 引用（§1.6/§2/§7/§9/§12/§13/§14.6/§14.9/§15.3…）⇒ **编号一律不动** ✓（改前/改后小节号集合逐一对账 ✓）。**过程翻车（记一条 ✓）**：三段替换**没自底向上**执行 ⇒ `§11.4` 那步打偏、吞掉 `### 13.1` ✗（有 `/tmp` 备份 + 标题集合对账才发现 ✓）。**验证**：小节号集合与备份**完全一致** ✓ · 表格 0 行未闭合 ✓ · 九守卫全绿 ✓（纯文档 ✓ 代码零改动 ⇒ 未跑全量闸门 ✓）。 |
-| **B198 P2 第九批 C：knowledge 子批 C（5 控制器）→ knowledge 全完** | converge 六条规则成形 + 贪婪取值/换行两坑 | P2 | 大 | ✅ **完成（2026-10-10）**——**外壳进度 35/52 → 40/52**（pending 12 ✓）。子批 C = `KnowledgeBase` + `Knowledge` + `KnowledgeOperations` + `KnowledgeTag` + `KnowledgeBaseFileProxy`（44 端点 ✓）；**4 处 204** 退役 ✓ + 金片改写 194 ✓；`kb-*` 那 **17 文件**的跨域面实测只炸 **2 个测试** ✓（`W5aSundryRoutes` + `W5cFileProxy` ✓）⇒ 全部由 converge 吃掉 ✓。**新增 `retire204` 子命令** ✓（walk-up 改签名 + 换返回 + 补 import ✓，本批 4 处一次过 ✓ 无需就地展开 ✓）。**converge 这轮长到六条规则 ✓**：① 消息点名金片 ✓ ①b 栈行点名 ✓ ①c **另一种失败格式**（`golden mismatch: X | expected: … | actual: …` ✓）✓ ② 状态双向 ✓ ②b 空体 ✓ ③ JSON 字面量回填 ✓。 |
-| **B197 P2 第九批 B：knowledge 子批 B（Faq）** | 修 advice 二进制缺口（真 500）| P2 | 中 | ✅ **完成（2026-10-10）**——**外壳进度 34/52 → 35/52**（pending 17 ✓）。 |
-| **B196 P2 第九批 A：knowledge 子批 A（ChunkerPreview + Chunk）** | 新增 converge 失败驱动收敛器 | P2 | 中 | ✅ **完成（2026-10-10）**——**外壳进度 32/52 → 34/52**（pending 18 ✓）。 |
-| **B195 P2 第八批：memory（1 控制器）** | 5×204 + 首次"零跨域连带" | P2 | 小 | ✅ **完成（2026-10-10）**——**外壳进度 31/52 → 32/52**（pending 20 ✓）。 |
-| **B194 构建提速：parallel + caching + 测试分叉** | 半天全量的时间账 + 两遍验证 | 基建 | ✅ **完成（2026-10-10）**。 |
-| **B193 P2 第七批：session（8 控制器，最大一批）** | 失败驱动收敛工具链 + 只改"确证已迁移"的断言 | P2 | 大 | ✅ **完成（2026-10-10）**——**外壳进度 23/52 → 31/52**（pending 21 ✓）。 |
-| **B192 P2 第六批：system（2 控制器）+ 逐字面量断言工具链 + 后端起服事故** | 按栈行号回填 + ContractJson.payload + 例外清单第 4 类 | P2 | 中 | ✅ **完成（2026-10-10）**——**外壳进度 21/52 → 23/52**（pending 29 ✓）。 |
-| **B191 P2 第五批：im + mcp（5 控制器）+ void 例外与跨测试金片** | 8×204 退役 + 内联形状断言 + 条件下钻 | P2 | 中 | ✅ **完成（2026-10-10）**——**外壳进度 16/52 → 21/52**（pending 31 ✓）。 |
-| **B190 P2 第四批：storage + websearch（5 控制器）** | 204 退役 + Go 遗留壳拆壳 + 私有 handler 归一 | P2 | 中 | ✅ **完成（2026-10-10）**——**外壳进度 11/52 → 16/52**（pending 36 ✓）。 |
-| **B189 P2 第三批：datasource + model + audit（7 控制器）+ 迁移工具脚本** | `scripts/migrate-domain.py` + 恒抛式错误助手 + 守卫去注释误报 | P2 | 中 | ✅ **完成（2026-10-10）**——**外壳进度 5/52 → 11/52**（pending 41 ✓）。 |
-| **B188 多域批量迁移的边界与配方（尝试-回退，主分支保持绿）** | 18 控制器批量尝试 → 定位 5 类阻塞 → 回退 + 配方 | P2 | 中 | ⚠️ **尝试后回退（2026-10-10）**——**做法**：一脚本把 `common/audit/evaluation/model/mcp/memory/datasource/embedchannel/storag… |
-| **B187 embed 挂件：用户消息气泡底色跟随后台「外观展示」主题色** | `EmbedUserMessage.vue` 两处 + 契约测试 + 验收清单 | P2 | 极小 | ✅ **完成（2026-10-10）**——**需求**：`/widget-test.html` 里用户消息（`.user_msg`）底色要用后台配置的主题色 ✓。 |
-| **B186 修「wiki 搜索一直卡住」+ 给 dev server 陈旧加构建期提醒（B184 同族第三次）** | `dev-stale-check.sh` + 根 build 收尾钩子 | P1 | 小 | ✅ **完成（2026-10-10）**——**症状**：`/platform/chat/<sid>` 里「搜索 wiki」的卡片**一直转圈** ✗（前端等不到工具结果 ✓）。 |
-| **B185 P2 按域迁移第二批：favorite + vectorstore（11 端点）** | 2 域外壳迁移 + 自写响应中间件读打标 + 3 处存量缺陷 | P2 | 中 | ✅ **完成（2026-10-10）**——机制与 B183 相同（`@ApiResult` 加在 3 个控制器上 ✓），本批补的是「按域迁移」的**模板与边界** ✓。 |
-| **B184 记录并防住 dev server 的「jar 热重写」陷阱（全端点 500 的真因）** | `java-server-up.sh` 警示 + 复现证据 | P2 | 极小 | ✅ **完成（2026-10-10）**——**症状**：点检时浏览器控制台**全端点 500** ✗（`/models` `/agents` `/system/info` `/knowledge-bases` `/se… |
-| **B181 把开发环境起起来（点检就绪）+ 修启动链 4 处坑** | `java-server-up.sh` / `dev-env.sh` / `token.sh` / README 凭据段 / Flyway 历史 | P2 | 中 | ✅ **完成（2026-10-10）**——**现状**：三件套容器在跑 ✓（`WeKnora-postgres-dev` :15432 / `redis-dev` :16379 / `docreader-dev` :5… |
-| **B180 CI 注解清零：action 版本升到最新大版本** | ci.yml 6 处 `@v4` → 最新（checkout v7 / setup-java v6 / setup-node v7 / setup-gradle v6）| P3 | 极小 | ✅ **完成（2026-10-10）**——**起因**：用户贴来一串 CI 注解 ✗，**全是 GitHub 侧弃用提醒**（Node20→Node24、`setup-java@v4` 弃用、`ubuntu-lates… |
-| **B179 钉紧 `EvaluationContractTest.postSuccess` 的竞态断言（CI 第 5 条长尾偶发）** | status 两侧归一 + 二值断言；注解截断 200→800 | P2 | 小 | ✅ **完成（2026-10-10）**——**病根就写在用例自己的注释里** ✓✓：`// status=0（创建快照； |
-| **B178 判定并关掉长尾①「controller 包内 25 个非控制器文件」** | 5 个 package-info + 审计脚本自证 | P3 | 小 | ✅ **完成（2026-10-10）—— 结论：非缺陷，不搬** ✓（先核判据，避免一次会做错的搬家 ✗）。 |
-| **B177 清 B165 的残渣：两个孤儿局部变量（IDE 先发现）** | 2 处 `golden()` 收敛为单行 return | P3 | 极小 | ✅ **完成（2026-10-10）**——**起因**：用户贴来 IDE 诊断 ✗「The value of the local variable file is not used」（`W5dTerminalEmbed… |
-| **B176 修 CI 唯一阻塞：一处搬家后未跟上的 `{@link}`（javadoc 引用漂移）** | 1 行文档修正 | P1 | 小 | ✅ **完成（2026-10-10）**——**病根由 B175 的注解一次给出** ✓✓：`> Task :engine:javadoc FAILED` ✓ + `engine/…/chatpipeline/plugi… |
-| **B175 修 CI「任务失败但零失败用例」：fork 自适应 + 构建失败也自证** | `min(4,核数/2)` fork + `tee` 日志 + 注解步 | P1 | 小 | ✅ **完成（2026-10-10）**——**症状**：CI 的 `Build & test` 失败 ✗ 而**测试汇总一条失败用例都没有** ✗（B174 之后的 run ✓）⇒ 失败**不在断言里** ✓；本地全量 `spotlessCheck build`（TZ=UTC）**4858 / 0** ✓ ⇒ 排除编译类原因 ✗ ⇒ 判为 **CI 环境性**：runner 只有 4 核 ✗，而 `4 fork × maxHeapSize 2g = 8g` 与 daemon / PG 容器 / 新装的 Redis 抢内存 ⇒ worker 崩 ✓（其表现正是"任务失败但零失败用例" ✓，且完整日志要鉴权才看得见 ✗）。**修**：① **fork 数按核数自适应** ✓ —— `maxParallelForks = maxOf(1, minOf(4, cores / 2))` ✓：本地 10 核 ⇒ 仍是 **4** ✓（与 B142 的调参完全一致 ✓），CI 4 核 ⇒ **2** ✓；② **构建失败也自证** ✓ —— 新增 `scripts/ci-log-annotate.py` ✓ + CI 用 `set -o pipefail; ./gradlew build 2>&1 | tee /tmp/build.log` ✓ + 失败时把关键行（`* What went wrong:` / `OutOfMemoryError` / `Gradle Test Executor` / `Executio… |
-| **B174 修 domains 最后 1 条（节流竞态）+ 跳过原因可读性** | 等待循环内重试 + `assumeTrue` 带原因 | P1 | 小 | ✅ **完成（2026-10-10）**——**① 竞态（CI 最后 1 条 ✗）**：`TenantAPIKeyServiceTest.lastUsedWriteFailureClearsThrottle` ✓； |
-| **B173 修 CI 的 domains 10 条：时区写死 + DuckDB 扩展自足** | Test 钉 `user.timezone` + 测试自装扩展 | P1 | 小 | ✅ **完成（2026-10-10）**——**两条均由 B171 的注解读出** ✓✓（第二次立刻回本 ✓）。 |
-| **B1 契约文档同步** | `docs/knowledge-api-contract-v1.md` v1.0→v1.1：错误体、裸信封/裸数组、游标分页、恒输出、204 语义、七域差异表 | P0 | 小 | ✅ |
-| **B2 金片对比器统一** | `support/GoldenContract` 共享基建（deep 归一 + strip + 单一 refresh 开关）；字节级（`goldenBytes`/裸 compare）与语义级双轨并存 → 语义单轨，存量字节级测试逐个迁移 | P0 | 中 | ✅ |
-| **B3 `@JsonInclude` 恒输出化** | 真面 68 处（19 文件：wiki domain 全家 + websearch 三 DTO + VectorStoreTypes）；冻结面豁免（tenantconfig/LLM 载荷/event/tracing/common/agent/stream + connector + lf_*）；每域重录夹具 + 前端键集合核对 | P1 | 中 | ✅（**B3b 已登记并已执行**——见下行） |
-| **B3b KB 配置 jsonb 键名统一（camelCase）** | 由 B0 走查升格为真实缺陷：`knowledge_bases` 的 `*_config` 列三方咬合面（前端 payload / 服务端读取器 / 落库 jsonb）键名分裂，导致界面上的 wiki 合成模型、问题生成参数、索引开关被静默忽略。服务端读取器 + 更新路径 dispatch 键 + 前端 payload/读取/类型 + V2 存量迁移 + 列默认值（连带修掉「编辑弹窗恒打不开」的裸资源读取） | **P1** | 中 | ✅ **完成（2026-10-02）**——详见 15.1.1 |
-| **B4 Go 零值时间哨兵 → null** | `0001-01-01T00:00:00Z`（AgentStep / agentm GO_ZERO_TIME / init goTime 系） | P1 | 小-中 | ✅ **结论：不改**（调查后判已知例外，见 15.1.1） |
-| **B5 lf_* 载具嵌套化** | 四域队列载荷的 `lf_*` 平铺键 → 嵌套 `tracing` 键 | P1 | 判定小 | ✅ **完成（2026-10-02）——判定：做**（载荷只在进程内队列流动、无外部消费面）； |
-| **B6 getenv 收敛 151 处** | 裸 `System.getenv()` → `@ConfigurationProperties`，按域分批 | P1 | 中 | ✅ **完成（2026-10-02，批 1~10）**：storage 装配 / langfuse / 检索驱动 / 系统部署面（含 `GIN_MODE`→`WEKNORA_DEPLOYMENT_MODE`）/ 知识域单… |
-| **B7 死成员清扫** | 只注入不读取依赖（依赖级口径）+ 死 logger/`ObjectMapper`/`Pattern`/私有方法/冗余 import | P1 | 小-中 | ✅ |
-| **B8 注解形态收尾** | 全限定名注解 → import 短名；`@JsonIgnoreProperties` 44 处接工厂评估 | P2 | 小 | ✅（FQ 177→0； |
-| **B9 Go 锚点注释清洗** | ~6,000 处；按 §4 既定"随触碰清洗"继续；若专项则按域分批 | P2 | 大（专项）/零（随批） | ✅ **机制已落地（2026-10-02）**——政策不变（随触碰、先摘不变量再删锚点、不立专项）； |
-| **B10 ArchUnit 边界规则进 CI** | 环 0 组基线 + 包依赖白名单固化（§5 阶段 4） | P2 | 中 | ✅ **完成（2026-10-02）**——包级部分已于 2026-09-30 在 CI（脚本棘轮 guards job）； |
-| **B11 Gradle 多模块** | 按域拆模块（§5 阶段 4 尾） | P2 | 大 | ✅ **判定：不做（2026-10-02 搁置）**——立项目的（边界固化）已由 B10 + 包级棘轮达成； |
-| **B12 B0 残留批 1** | wiki 任务级死信释放槽位（②）+ 孤儿 op 启动重放（③）+ 裸 NUL 审计盲区（R5） | P1 | 小 | ✅ **完成（2026-10-02）**——详见 15.1.1 |
-| **B13 B0 残留批 2** | 孤儿存储组件判定与删除（④）+ `/auth/config` 版本信号消除登录 403 噪音（⑤）+ `process_overrides` 移植缺口判定 | P2 | 小 | ✅ **完成（2026-10-02）**——详见 15.1.1 |
-| **B14 存储读侧投影合并** | 引擎面 env 回落行 vs 落库面类型化记录（两套词汇） | P2 | 中 | ✅ **完成（2026-10-02）**——合并为「一面一源」（落库面 camel、引擎面由唯一次名器派生）+ 修掉两个同源静默 bug（① 非 minio 行凭据被丢； |
-| **B15 供给行明文落库** | 供给器绕过加密直写 jsonb | P2 | 小 | ✅ **完成（2026-10-02）**——抽出唯一读写口 `StorageConfigCodec`（存储服务与供给器共用），真机 A/B 证明凭据由明文转为 `enc:v1:`； |
-| **B170 CI `:boot: 2 failed / 4 skipped` 的排查（B169 后首次 CI 全量）** | CI 装 redis-server + 钉紧一条偶发轮询 | P1 | 小 | 🟡 **部分完成（2026-10-10）**——**症状**：CI backend job 的 `:boot:test` = 1312 / **2 failed** / **4 skipped** ✗（本地 1312/0… |
-| **B171 让 CI 失败自证：测试汇总步（失败用例名 + 跳过原因 + 注解）** | `scripts/test-summary.py` + ci.yml `always()` 步 | P1 | 小 | ✅ **完成（2026-10-10）**——**起因**：排查 CI 红时**两次都缺关键信息** ✗（贴来的日志只有尾巴 ✓； |
-| **B172 修 CI 的 2 个失败：纳秒时钟 vs 微秒列的精确回环（移植性缺陷）** | 2 处输入 `.truncatedTo(MICROS)` | P1 | 小 | ✅ **完成（2026-10-10）**——**病例名由 B171 的注解机制直接取得** ✓✓（投入立刻回本 ✓）：`MemoryRepositoryTest.createItemKeepsCallerSupplied… |
-| **B183 统一响应外壳：`{code,message,data}` 一套外壳 + 一个解包点（P0+P1+agent 试点）** | 外壳/注解/advice/错误分派/前端解包点/第 9 条守卫 | P1 | 大 | ✅ **完成（2026-10-10）**——**决策**：脱离 Go 后不再以 Go 线格式为准 ✓，改按 Java/Spring 通行做法：**一套外壳 + 一个解包点**（约定文档 `docs/api-respons… |
-| **B169 给守卫加"冻结覆盖快照"（换包打断冻结 ⇒ 同一提交内抓住）** | `check-json-key-case.py` +`freeze_coverage`/+`--write`；新快照 149 文件 | P2 | 小 | ✅ **完成（2026-10-10）**——B168 的坑（**换包使前缀冻结静默失效** ✗，只在 CI 才暴露 ✓）的**机制性预防** ✓。 |
-| **B168 修 CI guards 红 + 堵住我自己的验证流程漏洞（本地守卫少带 `--strict`）** | 冻结前缀修复 + 八守卫单一入口 | P1 | 小 | ✅ **完成（2026-10-10，`cda99767`）**——**症状**：CI 的 guards job 红 ✗（6 文件 / 45 键：`common/llm/TokenUsage` 与 `tracing/dec… |
-| **B167 P3b-3：`server/` → `domains/` 模块更名** | 目录 + settings + boot 引用 + 2 处中央模块表 + 5 脚本默认路径 + 194 处文档 | P2 | 中 | ✅ **完成（2026-10-10，`wip/p3b-2-boot` 分支）**——**理由**：拆分后 `:server` 名字失真（它装业务域 ✓，组合根已独立为 `:boot` ✓）⇒ 四模块名各安其位：**boo… |
-| **B166 修 main 存量红：`KnowledgeFinalizeAdapterTest` 6 例** | 测试自预热 MP lambda 缓存 | P1 | 小 | ✅ **完成（2026-10-10）**——**症状**：6 例红 ✗（3 例 `Wanted but not invoked: knowledgeMapper.update(isNull(), <any>)` （"ze… |
-| **B165 P3b-2：`:boot` 拆分跑通（组合根独立 + 集成测试归位）** | boot 模块 + config/入口/资源迁入 + 87+6 集成测试迁入 + 3 个卡点修复 | P1 | 大 | ✅ **完成（2026-10-10，`wip/p3b-2-boot` 分支）**——从 1192 失败一路收到 **0**（`boot` 1312 / `engine` 547 / `common` 127 全绿）。 |
-| **B16 静默失效定向扫描** | 枚举「静默丢数据」机制点并逐对核写读词汇 | P1 | 中 | ✅ **完成（2026-10-02）**——未发现新缺陷（负面结果如实记录）； |
-| **B17 换锚收尾** | 残余逐字段 `@JsonProperty`（我方 ≈57）按「零风险 / 动形状 / 冻结」判定后分批清 | P2 | 小~中 | ✅ **完成（2026-10-02）**——判定批（三类 + 承重注解判据）+ 安全子集 6 处 + **websearch 请求键 camel 收口**（真机 A/B 实证）； |
-| **B18 agent 配置面换锚** | agent 配置键（~60 个）+ 前端同批 | P1 | 大 | ✅ **完成**——键面清单系统性低估纠缠度（前端命中 42 文件 / 850 处）； |
-| **B19 前端契约键收口 + 守卫** | 前端 snake 契约键排查 + 嵌套层 + 双侧守卫进 CI | P2 | 中 | ✅ **完成（2026-10-02）**——修掉两处静默缺陷（B18 的 ModelService 回归、前端 tagScopes 链路断）+ 嵌套 7 键 camel + V3 扩到 66 键（并修 WHERE 漏行）… |
-| **B203 约定加固：工厂命名定论 + `fail` 泛型对称** | `ApiResponse.fail(int,String)` → `ApiResponse<Void>` | P2 | 小 | ✅ **完成（2026-10-10）**——用户问"改成 `success` / `error` 会不会更好" ⇒ 评估后**定论保持 `ok` / `fail`** ✓（理由写进 `docs/api-response-… |
-| **B202 P2 第十二批（收尾）：wiki（1 控制器 / 21 端点）** | 私有 handler 收口 + 字节级断言下钻 | P2 | 小 | ✅ **完成（2026-10-10）**——**外壳进度 49/52 → 50/52**（pending **2** = `ImCallbackController` + `HealthController`，两者都是*… |
-| **B201 P2 第十一批：auth（6 控制器 / 47 端点 / 264 金片 / 7×204）** | 最后一域 + FE 观察名单落地 | P2 | 大 | ✅ **完成（2026-10-10）**——**外壳进度 43/52 → 49/52**（pending **3** = `wiki` + 两个已知例外 ✓）。 |
-| **B200 P2 第十批：misc 4 域（health / embedchannel / evaluation / initialization）** | /health 判为例外 + converge 假绿修复 | P2 | 中 | ✅ **完成（2026-10-10）**——**外壳进度 40/52 → 43/52**（pending 9 ✓）。 |
-| **B20 占位符令牌回归** | 批量改名误伤数据值（模板令牌）+ 缺跨面对照守卫 | P2 | 小 | ✅ **完成（2026-10-02）**——修回 `knowledge_bases` 令牌（夹具曾被同步改掉=假绿），新增「HTTP 面 ↔ 渲染面令牌一致」守卫（含红态证明）； |
-| **B21 占位符组键收口 + 同类排查** | 只改一半的「混搭面」与被误伤的数据值 | P2 | 小 | ✅ **完成（2026-10-02）**——3 组键收口 camel（模板面有意不动）； |
-| **B22 模板面 4 键 + api_key 收口** | 混搭面续清（只读派生视图，无写回副作用） | P2 | 小 | ✅ **完成（2026-10-02）**——模板面 4 键与 `api_key` 改 camel（含 FE 映射/读者/夹具/测试侧归一化），删死模块 `api/web-search.ts`； |
-| **B23 孤儿夹具审计** | 夹具「真被引用」判定（行为式，不按名猜） | P3 | 小 | ✅ **工具 + 首审完成（2026-10-02）**——1344 个夹具中 115 个为孤儿（≈8.6%，聚类见 15.1.1）； |
-| **B24 换锚长尾回头扫** | 注解面清零；新增 payload 键面盘点与棘轮 | P3 | 中 | ✅ **完成（2026-10-02）**——盘点 + 逐族判定收口（B25~B29）：注解真债 0； |
-| **B25 批甲（首面）** | 模板标志位收口 + 引用/进度载荷判冻结 | P3 | 小 | ✅ **完成（2026-10-02）**——`hasKnowledgeBase`/`hasWebSearch` 收口（YAML 输入面未动）； |
-| **B26 批甲续（websearch 凭据面）** | 逐面看消费者链 | P2 | 中 | ✅ 🐞 **修掉真 bug 并收官（2026-10-02）**——凭据面三处键名错位（保存静默失效 / 删除 400 / 徽标恒「未配置」），金鹰记录的缺陷态一并纠正； |
-| **B27 批甲续 2** | 推荐问题键收口 + 6 类面判冻结 | P3 | 小 | ✅ **完成（2026-10-02）**——`knowledgeBaseId` 收口； |
-| **B28 批甲续 3** | websearch provider-types 字段面收口 | P3 | 小 | ✅ **完成（2026-10-02）**——`labelKey`/`descriptionKey` 收口（只改键、不动 i18n 值）； |
-| **B29 批甲/批乙收口** | 换锚待判清单清空 | P3 | 小 | ✅ **完成（2026-10-02）**——66→0：按族判定（MyBatis 列名/观测面/引擎 DSL/存量配置 jsonb/模板令牌），model 凭据面登记为例外待拍板； |
-| **B30 凭据面统一** | model ↔ MCP/websearch 统一 camel | P3 | 小 | ✅ **完成（2026-10-02）**——只动 API 层（存量存储层与第三方载荷未动）； |
-| **B31 B23 处置** | 孤儿夹具该不该删 | P3 | 小 | ✅ ⚠️ **结论修正并收官（2026-10-02）**——115 个里 102 个是录制脚本清单（证据链）； |
-| **B33 包结构守卫修复** | B6 批 10 引入的 5 组环（工具放错层）归位到底层 | P2 | 小 | ✅ **完成（2026-10-02）**——`AppEnvLookup` → `common/deployment`、`StorageRuntimeEnv` → `common/storage`，`ImageResolv… |
-| **B34 agent/tools 分包** | 94 文件单层 → 根（框架/共享/通用）+ 5 能力子包（wiki/knowledge/sql/data/web） | P2 | 中 | ✅ **完成（2026-10-02）**——MCP 族因与 `ToolRegistry` 同包紧耦合（含 protected 互访，实测约 40 处）暂留根并登记； |
-| **B53 知识面卡片模型键收口** | 内部视图模型键 snake→camel + 失败原因接上 `errorMessage` + 防回流守卫 | P2 | 小 | ✅ **完成（2026-10-04）**——点检触发：三键定性后用户拍板「收口 + 接线」。 |
-| **B54 api 面 snake 键收口** | 12 处真断链修复（改密/邀请/auth 时间/wiki/KB 复制）+ 裁撤死参数收尾 + 守卫扩面棘轮 | P1 | 中 | ✅ **完成（2026-10-04）**——由 B53「内部键收口」追问扩展到 api 线格式面。 |
-| **B55 api 面 snake 记号逐条核实** | B54 挂起的 32 键全定性：13 改 camel / 6 删死字段 / 13 已核实合法 | P1 | 中 | ✅ **完成（2026-10-04）**——逐键查「后端 DTO 字段名 / 显式 `put` 的键 / `JsonNode.path` 读取 / 接口实测」。 |
-| **B56 技能区文案/死键/宿主技能目录** | 技能区文案改指令型口径 + 删 19 死键 ×5 语言 + dev 宿主技能目录 | P3 | 小 | ✅ **完成（2026-10-04）**——点检追问「技能管理为何没了」查实＝2026-09-28 定稿的功能裁剪第一批（PR3 `caef9d5`：移除沙箱 + 技能降级为指令型，删 30 前端文件）。 |
-| **B57 技能管理回归（入库）** | 指令型技能入库 + 平台级 CRUD（复用原 catalog 路径）+ 宿主目录退役 | P1 | 大 | ✅ **完成（2026-10-04）**——点检追问「技能管理为何没了」→ 方案三稿收敛（v2「复用原接口」→ v3「入库」），用户拍板：平台级 SystemAdmin / camel / 只在线填写 / 硬拒+forc… |
-| **B58 旧信封读法清剿** | Go `{success,data}` 残留 → Java 裸载荷（8 处消费点 / 6 文件） | P1 | 小 | ✅ **完成（2026-10-04）**——触发：点检 `?section=integration-api` 报「加载 API 集成设置失败」。 |
-| **B59 技能编辑** | 「查看内容」→「编辑」：PUT 更新 + 改名保护 + 编辑弹窗 | P1 | 中 | ✅ **完成（2026-10-04）**——用户要求编辑弹窗与新建一致。 |
-| **B60 技能租户化** | 平台级 → 空间级（含平台内置只读层）+ 菜单并入「数据与扩展」 | P1 | 中 | ✅ **完成（2026-10-04）**——触发：用户提「技能配租户配置 + 菜单移到数据与拓展」，核实为**修隔离缺陷**（选择器读全表 → 任何成员可见别家技能； |
-| **B61 技能按需读取 + 点名注入** | `read_file` 的 `skill://` 支持（A）+ @点名注入正文（B） | P1 | 中 | ✅ **完成（2026-10-04）**——用户追问「先注入名称描述、按需加载正文？」→ 核查发现**只有 Level 1 通**：`skill://` 无解析器、`read_file` 是沙箱绑定工具（无实现类）、`M… |
-| **B62 WeKnora Cloud 整功能裁撤** | 设置页 + 提供商 + 解析引擎 + VLM/embedding/rerank 适配器 | P1 | 大 | ✅ **完成（2026-10-04）**——用户要求「去掉 WeKnora Cloud 设置」； |
-| **B63 embed 语言跟随失效** | 派生语言被写进 localStorage → 覆盖「跟随浏览器/宿主」 | P1 | 小 | ✅ **完成（2026-10-04）**——点检 `widget-test.html` 报「默认语言设跟随但没生效」。 |
-| **B64 「跟随宿主」补上页面语言** | widget 转发宿主页 `<html lang>`（弱信号 `?hostLocale=`） | P1 | 小 | ✅ **完成（2026-10-04）**——用户追问「页面浏览器语言是 zh-CN 吗、为什么跟随还是英文」。 |
-| **B65 嵌入渠道保存后密钥丢失** | `publishToken` 被 `load()` 的列表行冲掉 → 嵌入代码退化成"加载密钥失败" | P1 | 小 | ✅ **完成（2026-10-04）**——用户报「保存后嵌入代码变成 `<!-- 加载渠道密钥失败 -->`」。 |
-| **B66 Agent 编辑器变量全空** | `placeholders`/`type-presets` 裸载荷漏 api 层适配 | P1 | 小 | ✅ **完成（2026-10-04）**——用户问「点击插入 / 输入 `{{` 唤起列表」为何不工作。 |
-| **B67 KB 解析设置整页崩** | 解析规则读 snake 而 KB 配置面是 camel（B3b 漏改读侧） | P1 | 中 | ✅ **完成（2026-10-04）**——用户贴 `getEngineForGroup` 的 `undefined.some` 报错。 |
-| **B68 智能体推荐问题恒空** | 读取侧查 snake `generated_questions`，写入侧/库是 camel | P1 | 小 | ✅ **完成（2026-10-04）**——用户问「GACI 库有没有自动生成问题」（答：**有**，enabled + 23/24 chunk 各 4 个），顺带查出：推荐问题的读取侧（`listRecentDocum… |
-| **B69 持久层治理（架构师四条落地）** | 全表改删防护拦截器 + R6-R9 棘轮 + 分页拼接归零 + 字符串 wrapper Lambda 化 + knowledge 域 @Lazy 解环 + 租户过滤评估 | P1 | 大 | ✅ **完成（2026-10-05）**——架构师四条意见逐条转为机器强制面。 |
-| **B70 M3 落地：方言探测归一 + 租户过滤缺失探测（alert）** | detectPostgres 八处归一 + TenantFilterGuard 拦截器 + 首次盘面 | P2 | 中 | ✅ **完成（2026-10-05）**——按 B69 评估报告的路线落地 Step1/2。 |
-| **B71 租户探测切 enforce（逐表定性收口）** | 72 条语句五族归入白名单 + 默认档 enforce | P1 | 小 | ✅ **完成（2026-10-05）**——B70 盘面的 72 条去探针语句全部定性：**认证面 7**（hash/bot 身份/邮箱定位，请求期无租户上下文）/ **调度面 4**（IM 投递、数据源同步轮询全表=设… |
-| **B72 前端契约键失配收口（snake 全量排查·修复批）** | 9 条「前端读/写 snake、后端发 camel」DRIFT 修复 + created_at 死读删除 + 预览串对齐 + 守卫收口 | **P0** | 中 | ✅ **完成（2026-10-05）**——全量排查 2,979 处/699 词/182 文件定谳：95%+ 是冻结契约面不动（SSE 载荷显式 @JsonProperty、工具名、设置 KV、连接器凭据、embed 协… |
-| **B73 前端死键清理（snake 全量排查·清理批）** | 前后端都不认的 snake 记号逐个验证后删除 | P2 | 小 | ✅ **完成（2026-10-05）**——creatChat 的 agent_config 整块（CreateSessionRequest 只收 title/description）、doc-content 的 get… |
-| **B74 守卫基线精确化 + 前端 Go 锚点注释换锚（snake 排查·收尾批）** | python 基线 41 条全量去「B19 整包话术」+ 16 文件 Go 文件名注释换 Java 锚点 | P3 | 小 | ✅ **完成（2026-10-05）**——① python 基线 41 条理由逐条核实重写（六类：守卫/测试自引用、注释引用、BEM CSS、i18n 值、上传覆盖冻结面〔B13 缺口〕、死参数链），**通用话术归零*… |
-| **B75 @JsonPropertyOrder 遗产摘除（snake 排查·注解卫生批）** | 66 文件键序注解盘点：60 文件摘除 861 行，7 承重者保留+原地理由 | P2 | 小-中 | ✅ **完成（2026-10-05）**——字节稳定依赖全量盘点定谳：①主代码 8 处摘要/签名输入全是纯字符串/文件字节（MCP 指纹是手写 canonicalJson 键序自带，不过 Jackson）； |
-| **B76 方法级 Go 名收口（去名 + 死代码 + 常量/局部名）** | 31 个 `go*` 方法名全去 + 死代码 2 处 + 常量/内部类/局部名去 Go | P2 | 中 | ✅ **完成（2026-10-07）**——档 3（2026-10-03）只裁类级（`Go*` 类 25 → 0），方法级 31 名 / ~150 引用从未裁决。 |
-| **B77 方法级 Go 复刻换实现（保输出）** | `Registry.goQuote`→`ToolJson.quoted`；`ParamCaster` 手写指数展开→BigDecimal | P2 | 小 | ✅ **完成（2026-10-07）**——① `Registry.goQuote` 删除，改标准 `ToolJson.quoted`：实录 `routing_text`（`GoRecording46A`，测试**逐字比… |
-| **B78 压缩/观测渲染换 Java 标准** | 手写 JSON writer 退役 → `ToolJson.write`；`ObservePhase.goMarshal`→`argsJson` | P2 | 小 | ✅ **完成（2026-10-07）**——① `ConversationSerializer` 删手写 `goMarshal`/`goMarshalInto`/`goEscapeString`（HTML 转义/U+20… |
-| **B79 Notion 数字换 Java 标准** | `goFormatG`/`shortestRoundTrip` 删除 → `Double.toString` | P2 | 小 | ✅ **完成（2026-10-07）**——手写 `%g`（~80 行：指数至少两位/最短往返压缩）退役； |
-| **B80 契约文案换锚·第一部分（类型名）** | `jsonTypeLabel` 词表 → JSON 类型名（null/boolean/number/array/object）+ 补钉子 | P2 | 小 | ✅ **完成（2026-10-08，余项并入 B81/B82/B83）**——只做无金片面：`SystemSettingRegistry.jsonTypeLabel` 换 Java/JSON 标准词表（`<nil>→nu… |
-| **B81 盲区孪生文案换 Java 标准 + 补钉** | wiki/mcp/ollama 三处 `non-object into Go value` → `expected JSON object, got <类型名>` + 三处新钉子 | P3 | 小 | ✅ **完成（2026-10-07）**——① 新增共享 `ToolJson.nodeTypeLabel`（Jackson 节点类型小写：null/boolean/number/string/array/object），… |
-| **B82 gin 校验文案换锚** | 17 文件生成点收敛到 `RequestFields` + 32 金片重锚（8 域） | P2 | 中 | ✅ **完成（2026-10-07）**——旧文案 `Key: '<Struct>.<Field>' Error:Field validation for '…' failed on the '…' tag`（gin 味… |
-| **B83 auth 类型错 + ASR/VLM 错误文本换锚** | `json: cannot unmarshal …` 族退役 → 字段级文案；ASR 错误文案 → `HTTP <状态行>: <详情>` | P2 | 中 | ✅ **完成（2026-10-07）**——① auth：`TenantBindSupport.stringFieldTypeError`（原 `stringFieldValue`）、`TenantCrudOps` 非对… |
-| **B84 最后三处盲区文案换锚 + 补钉** | web 工具 5 处 / 技能 frontmatter 2 处 / Notion 4 处 → Java 标准文案 | P3 | 中 | ✅ **完成（2026-10-08）**——① web 工具面（LLM 可见）：`WebSearchTool` 五处类型错收敛到 `RequestFields.wrongType`（query/count/country… |
-| **B85 escapeHtml 四副本收敛 + 测试侧 go* 局部名清理** | 五字符 HTML 转义单一实现 `common/web/HtmlText`；7 个测试文件局部名去 Go | P3 | 小 | ✅ **完成（2026-10-08）**——① 盘点出 **4 份同表实现**（`MessageSanitizer`/`common/prompt/MessageAttachmentsPrompt`/`memory/do… |
-| **B86 structName 死形参清理** | 8 个 helper 去 `structName`（~31 调用点）+ AgentController 判别改布尔 | P3 | 小 | ✅ **完成（2026-10-08）**——B82 换锚后 `structName` 只服务被删掉的旧前缀，全部成死参。 |
-| **B88 工具面 schema 按 Java 标准 camel 化** | 142 键（30 输入 + 107 输出 + 5 字符串拼接键）跨后端/实录/前端全量换锚 | P1 | 大 | ✅ **完成（2026-10-08）**——用户拍板「只动键、整体一批」。 |
-| **B89 模型输出契约 XML 面** | 自有序列化标记（工具输出 + runtime_context）的属性/元素名 → camel | P2 | 中 | ✅ **完成（2026-10-08）**——B88 的延续：JSON 键之外，「我们自己的 XML 形态字段名」也换 camel。 |
-| **B90 自有标记的多词标签名 camel 化** | 工具输出/提示词标记里的 snake 标签名（33 个）→ camel | P2 | 中 | ✅ **完成（2026-10-08）**——B89 只覆盖「与 JSON 键同名的属性/元素」，多词 snake **标签名**（`<wiki_page>`/`<links_to>`/`<linked_from>`/`<… |
-| **B92 双读清除 + 冻结清单按理由重排** | 用户确认「不再考虑历史数据」后的兼容分支清算 | P2 | 中 | ✅ **完成（2026-10-08）**——① **双读全清**：前端 `wikiToolReferences`（`firstTag` 兜底/`wiki_page` 分支）、`mcpToolDisplay`（`legac… |
-| **B91 阶段 4 起步（C1 破环 + 架构规则）** | `StreamProperties` 搬家解 SCC-B + 守卫补间接环棘轮 + ArchUnit R10/R11 | P2 | 小 | ✅ **完成（2026-10-08）**——① **C1**：`config/StreamProperties` → `com.ragagent.stream`（`@ConfigurationPropertiesScan… |
-| **B93a wiki 图片标记 camel 化** | `<image_caption>`/`<image_ocr>`/`<image_original>` → camel（标记名，值不动） | P3 | 小 | ✅ **完成（2026-10-08）**——B93 三面中的第一面（§15.3「已解除」表）。 |
-| **B35 modelcontext 并入 agent** | 顶层包 31 → 30（用户 2026-10-02 拍板） | P2 | 小 | ✅ **完成（2026-10-02）**——13 文件 → `agent/modelcontext/`（test 3 同移），23 文件改包路径零残留； |
-| **B93b 事件面 camel 化（SSE/Redis 流）** | 载荷类删冗余注解 + SSE 事件体/信封键 + 事件名与响应类型值 + 前端事件消费 + 实录 | P2 | 大 | ✅ **完成（2026-10-08）**——§15.3「已解除」第二面，全仓一并（后端 + 前端 + 实录 + golden）。 |
-| **B93b-2 路径/查询参数名 camel 化** | URL 路径变量 + 自有查询参数名 + 防回流守卫 | P3 | 小 | ✅ **完成（2026-10-08）**——决策点 2。 |
-| **B93b-3 事件/流收尾 + 面登记** | `EventMiddleware` 事件元数据键、`LiveRunPayload`（Redis live-run 标记）、换锚守卫冻结节流清理 | P3 | 小 | ✅ **完成（2026-10-08）**——① **摘掉换锚守卫的过期冻结节流**（`event/`、`stream/` 已 camel 化）后立即暴露 3 处真残留：`event/EventMiddleware` 的事… |
-| **B93c 落库 jsonb 键收尾** | jsonb 列内层键（表列名与 SQL 不动） | P3 | 小 | ✅ **完成（2026-10-08）**——侦察后发现**该面的主体早已完成**：`V2__kb_config_keys_camel`（KB 配置 45 条映射）与 `V3__agent_config_keys_came… |
-| **B94 阶段 4 解环收口（C8）** | `WikiActivityAudit` 端口搬入中性包 ⇒ SCC-A 瓦解、包图成 DAG | P1 | 小 | ✅ **完成（2026-10-08）**——**阶段 4 的前置条件达成**。 |
-| **B36 agentm 并入 agent** | 顶层包 30 → 29（用户 2026-10-03 拍板） | P2 | 小 | ✅ **完成（2026-10-03）**——`agentm`（20 文件）→ `agent/management/`（先例 `auth/apikey/`），含资源目录改名 + 61 文件包路径 + 10 处 loader… |
-| **B95 阶段 4 端口化（C6+C7）** | `retrieval → auth` / `model → auth` 清零（中性只读端口 `TenantConfigLookup`） | P2 | 小 | ✅ **完成（2026-10-08）**——① **端口**：新增 `common/tenant/TenantConfigLookup`（`retrieverEngines`/`retrievalConfig`/`mem… |
-| **B96 共享词汇下沉（C4/C5 前置）** | 租户配置视图 + API Key 作用域词汇搬入 `common`（auth 不再被跨域引用） | P2 | 中 | ✅ **完成（2026-10-08）**——C4/C5 的**共同前置**：把"跨域共享词汇"按 B94 同法搬进中性包，auth 只留实现与端点。 |
-| **B97a C4/C5 收口（可转换子集）** | 端口补 `storageView` + 两个纯配置读取点换端口 | P3 | 小 | ✅ **完成（2026-10-08）**——① **端口扩展**：`TenantConfigLookup` 增 `TenantStorageView storageView(long)`（`tenantId`/`defa… |
-| **B97b C4/C5 归零（实体下沉 + 端口补全）** | `Tenant` 实体/mapper/类型处理器搬入 `common.tenant` + 端口补 `tenantById` + `UserNameLookup` | P1 | 中 | ✅ **完成（2026-10-08）**——按**路 B**（实体下沉，用户拍板）。 |
-| **B98 C2-a：wiki→knowledge 只读门面** | `common.knowledge.KnowledgeBaseLookup` 端口 + 3 处换端口（43 → 36） | P2 | 中 | ✅ **完成（2026-10-08）**——① **端口**：`common/knowledge/KnowledgeBaseLookup`，四个只读方法（`kbById` 软删过滤 / `kbByIdIncludingD… |
-| **B99 C2-b 侦察 + KB 读再收口** | 17 文件方法级需求分组 + `WikiPageServiceImpl` 换端口（36 → 34） | P2 | 中 | ✅ **完成（2026-10-08）**——① **方法级侦察**（`/tmp` 脚本产出，结论已入方案文档）：把剩余 36 处按**能力**分成 7 组（KB 读 ✅ / Knowledge 读 / Knowledge… |
-| **B100 C2 归零：wiki→knowledge 完全端口化** | 7 个 common 类型 + 4 个适配器 + wiki 全量换端口（43 → 0） | P2 | 大 | ✅ **完成（2026-10-08）**——① **端口/视图（`common/knowledge`）**：`ChunkPort`（textChunks / chunksByIds / deleteChunk / enr… |
-| **B101 common 纪律：R5/R6 守卫 + 载荷收窄** | 两条新守卫（含红态探针）+ `ChunkView` 12 → 6 字段 | P2 | 小 | ✅ **完成（2026-10-08）**——① **R5 底座不得依赖业务域**（绝对禁止）：`common`/`event`/`stream`/`tracing` 不得 import 任何 L3 域（实测 **0 条*… |
-| **B102 common 减重：approval 域归位** | `common/approval` 1,758 行 / 24 文件 → 顶层 `com.ragagent.approval` | P2 | 中 | ✅ **完成（2026-10-08）**——① **判定依据**（先量后动）：`approval` 出向依赖 **只有 common**（零业务域 ⇒ 独立成域不引入环）； |
-| **B103 common 减重②：settings 归位 + Memory 词汇判定** | `common/settings` → 顶层 `settings` 域；`Memory*` 经守卫抓环后回退 `common/memory` | P2 | 中 | ✅ **完成（2026-10-08）**——① **`settings` 归位**：`ConversationProperties`/`SystemSettingGateway`/`SystemSettingRegist… |
-| **B104 common 减重③：tenant 拆分 + R6 第三条** | `common/tenant` 拆分（实体/mapper 归域）+ R6 增"common 不得自带 mapper 子包" | P2 | 中 | ✅ **完成（2026-10-08）**——① **先量后动**：`TenantRole` 被 **13 个包**消费（含 `common/web` 自身）⇒ 必须留 common； |
-| **B105 搬家副作用修复 + R7 守卫** | 补搬 2 个测试目录（声明↔路径一致）+ 新增 R7 守卫 | P2 | 小 | ✅ **完成（2026-10-08）**——① **问题**：B102/B103 的全仓改名把<b>测试文件里的 `package` 声明</b>也改了（`com.ragagent.approval` / `com.ra… |
-| **B106 L2→L3 清零①：websearch + memory（5 → 3 条）** | 端口收 L1 配置 + 记忆词汇下沉 + 通用去重下沉 | P2 | 中 | ✅ **完成（2026-10-08）**——① **websearch（1 处）**：`PipelinePorts.WebSearch.search` 改收 `common.tenant.WebSearchConfig`… |
-| **B107 L2→L3 清零②：retrieval → vectorstore（3 → 2 条）** | 值对象下沉 L1 + 实体/mapper 端口化 | P2 | 中 | ✅ **完成（2026-10-08）**——① **性质先判**：`vectorstore` 含 `domain`(7)/`mapper`/`controller`/`service` ⇒ 是**业务域**（驱动在 `r… |
-| **B108 L2→L3 清零③：chatpipeline→agent 词汇归位（15 → 4 处）** | modelcontext 子系统搬 L2 + SearchTarget/PromptConstants 落 L1 | P2 | 中 | ✅ **完成（2026-10-08）**——① **`agent.modelcontext.**`（13 文件子系统：Registry/StreamDecoder/SourceRegistry/HandleStore/…… |
-| **B109 L2→L3 清零④：chatpipeline→agent 归零（4 → 0）** | Fetcher 集群搬 L2 webfetch + DataAnalysis 端口化 | P2 | 中 | ✅ **完成（2026-10-08）**——① **`webfetch` 落地**：`Fetcher`/`FetchException`/`BrowserRenderer`/`AgentMarkdown`（4 文件，实测… |
-| **B110 L2→L3 清零⑤：载荷+算法下沉（17 → 12 处）+ R3b 处数棘轮** | 3 载荷 → common.knowledge；SearchChunkMerge → common.retrieval | P2 | 中 | ✅ **完成（2026-10-08）**——① **元数据载荷下沉**：`FaqChunkMetadata`(291 行)/`DocumentChunkMetadata`(40)/`GeneratedQuestion`(… |
-| **B111 内联全限定名清算 + R8 守卫（依赖图完整性）** | 1,331 行内联 FQ → import（保留 49 处必要消歧）；R8 守卫上线 | P2 | 大 | ✅ **完成（2026-10-08）**——① **发现**：`check-package-cycles.py` 的 R1/R1b/R3/R3b 只解析 `import` 行 ⇒ 代码里写成 `com.ragagent.… |
-| **B112 解环收官：包图成为 DAG** | 最小反馈边集 3 处（`auth→agent` 2 + `agent→im` 1）⇒ R1 2→0 组、R1b 1→0 组 | P2 | 小 | ✅ **完成（2026-10-08）**——① **方法论（本批最大收获）**：环的体积要看**割**不看**成员数**——8 域间接环看着比 SCC-A（7 域）大，但按"删边最少"暴力枚举拓扑序求最小反馈边集，只有… |
-| **B113 L2→L3 清零⑥：webfetch → datasource（2 → 0）** | 四个零域依赖的 HTML 工具下沉 `common/web` | P2 | 小 | ✅ **完成（2026-10-08）**——① **性质判定（先量后动）**：`HtmlToMarkdown`（接缝，32 行）/`JdkHtmlToMarkdown`（有界实现，544 行）/`HtmlConversi… |
-| **B114 L2→L3 清零⑦：chatpipeline → knowledge 归零（15 → 0）⇒ R3 全清** | 3 类载荷换成 L1 facts/视图 + `ImageInfoEnricher` 归位 retrieval | P2 | 大 | ✅ **完成（2026-10-08）**——① **载荷换形状**（`PipelinePorts` 9 个签名）：`KnowledgeBase` → **`KnowledgeBaseView`**（+3 字段 vecto… |
-| **B115 M1 可行性侦察（Gradle 多模块）** | 带权包图 + 拓扑最优切分 + 装配/资源面清点（仅侦察，未动构建） | P2 | 中 | ✅ **完成（2026-10-08）**——**三条结论**：① **包图已是 DAG ⇒ 拆模块零业务代码改动**（只需搬文件 + 每模块一行 `project()`，`import` 全不动）； |
-| **B116 M1 第一步：`:contracts` 抽取（编译期硬边界）** | `common`+`event`(175 文件/LOC 13.8k) → 零 project 依赖模块；5 个守卫多模块化；2 个 ArchUnit 坑 | P2 | 大 | ✅ **完成（2026-10-08）**——① **只做零成本切点**（按 B115 §5.3 策略）：新增 `:contracts`（`java-library` + dependency-management + s… |
-| **B117 模块定名：`:contracts` → `:common`** | 改名 7 处；门槛移入 build 注释 | P2 | 小 | ✅ **完成（2026-10-08）**——① **定名理由（硬）**：本仓 `contracts` 已被占用——`server/src/test/resources/contracts/**` **1,426 个**… |
-| **B118 classpath 资源存在性断言（R12a/R12b）** | `ClasspathResourcesTest`：20 条资源清单 + 反漂移扫描 | P2 | 小 | ✅ **完成（2026-10-08）**——对应 B115 §5.2 风险 #2：主源码 **15 处资源读取里 13 处"缺资源不报错"**（`if (in == null) return/continue`）⇒ 症状… |
-| **B119 javadoc 引用漂移守卫（`-Xdoclint:reference` 接进 check）** | 首轮清算 44 error + 19 warning 行；抓出 4 处真缺陷 | P2 | 中 | ✅ **完成（2026-10-08）**——对应本会话反复人工修的同一问题（改名/搬家/神类切片后注释里的 `{@link}` 还指着旧目标）。 |
-| **B120 契约层命名规范 + 5 组改名** | 盘点 26 个契约接口；定 5 条规范；改名 20 文件 | P2 | 小 | ✅ **完成（2026-10-08）**——① **盘点**（26 个契约接口）暴露的真分歧：`KnowledgeBaseLookup` 同接口里 **`kbById`（知识库）与 `knowledgeById`（知识条… |
-| **B121 大文件棘轮（`check-file-size.py`）** | 68 个 >600 行文件入基线；不得新增 | P2 | 小 | ✅ **完成（2026-10-08）**——① **盘点**：主源码 1,888 文件里 **>600 行 68 个**（400~600 行另有 120 个）； |
-| **B122 大文件守卫执行 §14.5 + 首次例外复核** | 政策从散文变可执行规则；登记表入 JSON | P2 | 小 | ✅ **完成（2026-10-08）**——① **取证（本批核心）**：`git log` 逐版本量行数发现 **`ImService` 2026-10-01 切片到 664 行「出榜」后，7 天内被 im 域功能批次… |
-| **B123 `ImService` 第一刀（停止链路外提）** | 1091→995；新协作者 `ImStopOps` + 4 条钉子测试 | P2 | 中 | ✅ **完成（2026-10-08）**——① **刀口选在「跨实例 /stop 全链路」**（原 907~1012 行）：本地出队/在途取消 → Redis 在途映射补 IDs → 写 stop 事件到 StreamM… |
-| **B124 三项卫生：游离目录守卫 + `embed→embedchannel` + 编号解冲突** | 新增 S1/S2 守卫；包改名；ArchUnit 标签 R*→A* | P2 | 小 | ✅ **完成（2026-10-08）**——起因：发现仓库根有个**空的** `webfetch/` 目录，追查得实情：① **它为什么看不见**：git **对空目录完全无感**（不入 `status`、不入提交、`g… |
-| **B125 `ImService` 第二刀（入口闸门外提）+ 端口判据修正** | 995→936；新协作者 `ImInboundGuardOps` + 4 条钉子测试 | P2 | 小 | ✅ **完成（2026-10-08）**——① **先纠正上一轮的判断**：B124 把「`PipelinePorts` 没进 `common`」列为"第 1 号不一致"，侦察后发现**判断过重**：它引用了 4 个 *… |
-| **B126 `ImService` 第三刀（知识库桥接外提）+ 删重复映射** | 936→856；新协作者 `ImKnowledgeBridgeOps`；删 `imPlatformToChannel` 副本 | P2 | 小 | ✅ **完成（2026-10-08）**——① **刀口**：IM 与知识库域的**全部接面**合成一刀——命令面的 KB 清单/检索读取（`kbLister`/`knowledgeSearcher`）+ 附件异步入库（… |
-| **B127 `ImService` 第四刀（渠道运行时外提）⇒ 出榜** | 856→554；新协作者 `ImChannelRuntimeOps`（17 方法 / 313 行整块）| P2 | 中 | ✅ **完成（2026-10-08）**——① **刀口**：adapter 工厂注册表 + 渠道生命周期（起停/重载/按库重建/配置广播）+ WS 长连接选主（续期/抢锁重试/释放），17 个方法； |
-| **B128 修回归 + A13 守卫（钩子不能在非 bean 上）** | 钩子挂回门面；新 ArchUnit A13；接线契约测试 3 条 | **P0** | 小 | ✅ **完成（2026-10-08）**——① **事故**：B127 把「渠道运行时」整块外提时，`@EventListener(ApplicationReadyEvent)` 与 `@jakarta.annotati… |
-| **B129 `SessionKnowledgeQaService` 例外复核 + 两刀出榜** | 1041→756；两刀（兜底流并入既有协作者 + WebSearch 解析新叶子）| P2 | 中 | ✅ **完成（2026-10-08）**——① **复核结论：例外不成立，且"无接缝"是误判**——真正的情况是**上一次拆分没搬完**：本域早已切出深协作者树（`QaSearchTargets`/`QaChatMana… |
-| **B130 `MemoryIndexStore` 例外复核 + 向量面外提（出榜）** | 919→636；新协作者 `MemoryVectorStore`(318)；A7 白名单随簇迁移 | P2 | 中 | ✅ **完成（2026-10-08）**——① **复核结论：例外不成立**，且属 **B129 同型误判**：原理由「六段同属『索引侧读写』一个关注点」是**层次**论点（"都在哪一层"），不是**内聚**论点； |
-| **B131 死成员清账 + 新守卫 `check-dead-members.py`** | 40 条 IDE 警告 → 单一根因；八守卫 | P2 | 小 | ✅ **完成（2026-10-08）**——① **根因（本会话自己造的）**：40 条警告里 **24 条"未使用 import"实为「重复 import」** ✗——**B111 的「内联全限定名 → import」… |
-| **B132 租户 KV 配置面换锚（第一段：chat-history / retrieval）** | 12 键去逐字段 `@JsonProperty`；动态读路径 + 前端 + 金片 + 记录脚本同批 | P2 | 小 | ✅ **完成（2026-10-09）**——① **先核对冻结理由，再动手**：`check-json-key-case.py` 口径把「租户配置 jsonb」列为冻结面，§14.9b/system-module-gui… |
-| **B133 租户 KV 配置换锚（第二段：storage-engine）+ parser 逐键判定** | 14 键去 `@JsonProperty`（63 处）；两面一源合并；parser 27 键登记冻结 | P2 | 中 | ✅ **完成（2026-10-09）**——① **先出判定表再动手**（承 B132 的「先核对理由」纪律）：41 个"零理由"键里，**parser 27 键经逐键复核实为「外部决定」**——`SystemContr… |
-| **B134 事件/进度载荷收口（`PipelineProgress`）+ 摘两处空冻结** | 5 键 → camel（前后端 + 夹具）；摘 `PipelineProgress`/`ReferencesSupport` 冻结条目 | P2 | 小 | ✅ **完成（2026-10-09）**——① **承接 B93b 没做完的那一角**：`event/` 与 `stream/` 当时已 camel 化并从冻结名单摘除，但 `chatpipeline/PipelineP… |
-| **B135 存量族清算·第一片（审计 details 8 键）+ 三处理由订正** | `rawPath`/`requiredRole`/`scopeType`/`quotaBytes`/`quotaGb`/`valueType`/`oldValue`/`newValue` | P2 | 小 | ✅ **完成（2026-10-09）**——① **先做逐文件判定表再动手**（承 B132/B133 纪律）：枚举审计 details 的**全部**写入键后发现该面**本就是 camel**（`tenantId`/`… |
-| **B135c mention/steer 载荷换锚（8 键）** | `mentionedItems`/`steerId`/`kbId`/`kbName`/`kbType`/`serviceId`/`skillName` | P2 | 小 | ✅ **完成（2026-10-09）**——① **判定表发现"只改了一半"的真相**：FE 侧 `types/mention.ts` 的 javadoc 早写着「提及项**单一形状**…camelCase…请求面 /… |
-| **B135d1 `context_config` 4 键换锚 + 一处数据源面矛盾入册** | `maxTokens`/`compressionStrategy`/`recentMessageCount`/`summarizeThreshold` | P2 | 小 | ✅ **完成（2026-10-09）**——① **先查消费者再动**（承纪律）：这 4 键在 main 里只有 `TenantService.normalizeContextConfig`（读取路径与响应输出共用的归一… |
-| **B135b1 引用载荷回放路径的静默缺陷修复（判缺陷，非换锚）** | `searchResultFromMap` 11 键按生产者形状读；加结构化断言 + 红态证明 | P2 | 小 | ✅ **完成（2026-10-09）**——① **判定链**（承"先核对理由"纪律）：`AgentStreamBridge` 的 19 键基线**整条过期**（16 个键文件里根本不存在，其余是日志占位符 ✗），真站点… |
-| **B136 wiki 摄取 36 键「结案」——判观测面，不改（负结果）+ 第 4 处误标订正** | 逐站复核 3 文件 36 键；基线理由订正；13 个模型输出标签仍为拍板项 | P3 | 小 | ✅ **完成（2026-10-09，结论为"不改"）**——① **逐站取证**：三个文件的键站点**全部**是 span/stage 的 input/output（`extractInput`/`extractOut`… |
-| **B135b2 SSE 事件载荷收尾（3 键）+ 两道陈账销号 + 新守卫 ⑤** | `finalContent`/`userCreatedAt`/`assistantCreatedAt`；立项稿与 FE 白名单订正 | P2 | 小 | ✅ **完成（2026-10-09）**——① **前提复核（§14.6 纪律）推翻了三条"冻结"依据**：（a）§14.9l 前提判定 2 写"**已实测后端无这些键**"⇒ **事实错误**（`QaSseOrches… |
-| **B137 datasource 面判定表·头两片（d-a 过期注释 + d-b RSS 配置换锚）** | 3 处 javadoc 订正；`feedUrls`/`authHeaders`（去命名策略 + 删"老位置回显"）| P2 | 小 | ✅ **完成（2026-10-09）**——**先出判定表**（该面在 §14.9q 的结论是"可换锚面 **0**"，复核后**大体成立但有三处漏判**）：① **真外部约 140 处**（`*ApiTypes`/`*… |
-| **B138 datasource 面·d-c + d-d（游标族 + item metadata + resource_ids）** | 15 键换锚 + 6 处 Go 期残留 javadoc 订正 | P2 | 中 | ✅ **完成（2026-10-09）**——**d-c 游标族 8 键**：`lastSyncTime`（rss/ima/yuque/feishu 四处共用）· `feedItems`/`feedSignals` · `… |
-| **B139 datasource 面·d-e（*Config 自有键 7 个）** | 7 键换锚 + 2 条未覆盖文案 + 2 个测试重写 | P2 | 中 | ✅ **完成（2026-10-09）**——**判定表的核心是一句话**：这些键**看着像外部词，实际是我们自己的**。 |
-| **B140 datasource 面·d-g（connector 侧 metadata 29 键）** | 29 键换锚 + FE 连带 2 面 + 守卫基线 1 条 | P2 | 中 | ✅ **完成（2026-10-09）**——**起因是 d-f 的收窄预演**：把 `datasource/connector` 从整目录冻结前缀摘掉后，立刻露出 **26 文件 /134 键**（此前全被"整目录豁免"… |
-| **B141 datasource 面·d-f（守卫收网）** | 整目录豁免 → 文件级 16 条 + 清 4 条失效基线 | P2 | 小 | ✅ **完成（2026-10-09）**——把 `datasource/connector` 从**整目录冻结前缀**改为**文件级 16 条**（`DocxBlocks`/`FeishuApiTypes`/`Feish… |
-| **B142 测试并行化（全量闸门提速）** | gradle 测试 4 fork + 修 EmbeddedRedis 端口竞态 | P2 | 小 | ✅ **完成（2026-10-09）**——**起因**：全量闸门 ≈5 分钟，拆开量账发现 Java 测试 **213.9s（81%）**，而 `server/build.gradle.kts` 的 test 块**没… |
-| **B143 键名守卫加"读侧形态" + 观察单** | 第 5 种形态 + A 桶 12 文件登记 + 29 键观察单 | P2 | 小 | ✅ **完成（2026-10-09）**——**动机**：B132/B138/B140 三次真实事故是**同一形态**：写侧改成 camel、**读侧仍 snake** ⇒ 静默失效； |
-| **B144 C 桶追清 + 第 6 种形态 + B 桶换锚** | 3 处活缺陷 + 1 处 B138 遗留 + 11 键换锚 + 8 文件登记 | P1 | 中 | ✅ **完成（2026-10-09）**——**C 桶追清了，结论不是"待拍板"而是三处活缺陷** ✗：写侧 `FaqChunkMetadata`（common 模块、**零注解**）经 `JSON.valueToTre… |
-| **B145 第 7 种形态（集合字面量）+ 审计两键换锚** | Map.of/Map.entry 形态 + 12 文件登记 + 2 键 | P2 | 小 | ✅ **完成（2026-10-09）**——**预演**：`Map.of("snake", …)` / `Map.entry("snake", …)` 全仓增量 **43 键 / 13 文件**，但结构极不均匀：**31… |
-| **B146 审计 details 面换锚** | 3 键（+2 死标签）+ FE 字典 5 语言 | P2 | 小 | ✅ **完成（2026-10-09）**——**枚举源用的是 FE 的 `detailFields` 字典**（活动页渲染 `detailFields.${key}`，所以它天然是"审计 details 键"的权威清单）… |
-| **B147 守卫注释账 + 自定义 helper 族换锚** | 2 条孤儿注释 + 1 条错理由 + 2 键 | P3 | 小 | ✅ **完成（2026-10-09）**——**a）注释账**：守卫里三条"存量面"理由经复核只剩三种命运——① `# 读取 SQL/检索行键（存量面）` 与 ② `# 工具结果/附件载荷（存量面，同 tool-resu… |
-| **B147c 快照清账（脏键 + 失效统计）** | 1 个脏键 + 32 键失效台账 | P3 | 小 | ✅ **完成（2026-10-09）**——**收尾快照**（`--list` 汇总）当场抓出一处**我自己引入的脏数据** ✗：`SystemController` 条目的键表里混进了**文件路径本身**（`'syst… |
-| **B148 基线瘦身（棘轮只许减）** | 32 失效键 + 3 脏键 ⇒ 294→262 | P3 | 小 | ✅ **完成（2026-10-09）**——**先出逐键三态表**（不只看"守卫有没有命中"，而是逐键回源码查**残留**，因为 B144 的 `tag_ids` 教训表明"不再命中"可能是**换了形态**而非消失 ✗）… |
-| **B149 两处「像外部词、实为我们自己」的换锚** | modelUsage 的 2300 details + agent 预设 kbFilter 谓词 | P3 | 小 | ✅ **完成（2026-10-09）**——用户问"这些 snake 正常吗"，逐处定性后收掉**两处真债**（另两处判正常 ✓）：**① `knowledge_bases` → `knowledgeBases`**：`… |
-| **B151 逐字段 @JsonProperty 清算 + A14 硬门（B150 的 Step 1）** | 清 235 处纯冗余；新增守卫 | P2 | 中 | ✅ **完成（2026-10-09）**——起因：用户问"全仓还有大量的 `@JsonProperty`，是否都有必要"。 |
-| **B152 外部协议面冗余注解清算（B150 Step 2）** | 清 43 处；守卫撤掉面级放行表 | P3 | 小 | ✅ **完成（2026-10-09）**——用户选「也清掉」。 |
-| **B154 IDE 告警收口（三类死物）** | 自 import 7 · 重复 import 4（test 侧）· 死方法 2 · 冗余 import 1 | P3 | 小 | ✅ **完成（2026-10-09）**——IDE 报 9 条，逐条核实后扩到全仓同类（8 文件 −41 行）：① **自 import 7 处**（`StorageEngineConfig` 导入**自己的嵌套类**… |
-| **B155 死成员守卫扩面（D-d + main/test 全扫 + D-c 收紧）** | 守卫三改；零代码改动 | P3 | 小 | ✅ **完成（2026-10-09）**——B154 顺出的两个盲区 + 一处规则漏洞：① **新增 D-d 自 import** ✗（`import` 的 FQN = 本文件 package + 本文件顶层类 ⇒ 必然… |
-| **B156 迁移折叠：V1~V6 → 单文件 `V1__baseline.sql`** **补记（开发库重建实测，2026-10-09）**：① **折叠块漏了 `SET search_path`** ✗ —— pg_dump 的语句是全限定的（`public.xxx`）且开头把 `search_path` 置空 ✗，而折叠块用了**未限定名** ⇒ 灌入在第一条 `CREATE TABLE skills` 上失败 ✓（**换任何一台新库都灌不进去** ✓ —— 幸好先在开发库上试 ✓；教训：**迁移折叠必须真灌一次** ✓，单测跑 Flyway=false ⇒ 覆盖不到 ✓）。② 重建后核对：**60 表** ✓ / `skills`+`tenant_id`+三索引 ✓ / 两列 jsonb 默认值 **camel** ✓ / 对 tenants 的 4 个外键与 V1 计数一致 ✓。③ **表集比对（旧库 71 vs 新基线 56）**：差集**全是应删物** ✓ —— `flyway_schema_history`+`schema_migrations`（簿记表 ✓ 重建后 Flyway 自建）· **15 张已移除/取代的功能表**（share/organization 系 + `browser_*` 系 + `tenant_sandbox_configs` + `tenant_user_env_vars` + Go 时代 `tenant_skill*`）✓ ⇒ **旧开发库本就停留在 Go 时代 schema、从没跟过 Java 侧的移除** ✓ ⇒ 重建顺带对齐了 ✓。④ 备份在 `/tmp/weknora-dev-20261009-1801.dump`（20M ✓ `pg_restore -Fc` 可还原 ✓）。 | 6 文件 → 1；活引用 9 处 | P3 | 中 | ✅ **完成（2026-10-09）**——用户确认"只有开发库"后，按 V1 那次（`fba0e7ae` PR4 基线合并）的先例做**终态折叠**（非拼接 ✓）：① **V6 → 折进建表**（`chunking_c… |
-| **B157 CI 首次跑暴露的两处（seed tag 未推 + 录测试无 CI 排除）** | tag 推送 + 两类打标签排除 | P1 | 小 | ✅ **完成（2026-10-09）**——push 后首次跑 CI，在 spotless 步就红 ✗：`No such reference 'seed'`。 |
-| **B158 CI 起真 PG（基线灌库守卫 + 录测试回归真跑）** | `.github/workflows/ci.yml` 服务容器 + 灌基线步；撤 B157 权宜排除 | P2 | 中 | ✅ **完成（2026-10-09）**——B157 记的那个缺口（CI 不灌基线 ⇒ B156 那类"只有真库才暴露"的缺陷无人守 ✗）在此收掉 ✓。 |
-| **B159 订正 HANDOFF §7.3/§8 的过期内容** | 待办区清空 + CI/tag 行订正 | P2 | 小 | ✅ **完成（2026-10-09）**——**起因是一次真实的踩坑** ✗：本会话按"摘要 + 待办区"宣称「剩余待办 B150 Step 1」✗，遂重跑 B150 期的旧清单脚本 ⇒ 它按**旧口径**（不认识 A1… |
-| **B163 P3a：`tracing` 按层次拆分（core 进 `:common` = L1 对齐）** | 25 文件归位（20 core → common / 6 装饰留 engine 换包）+ OTLP proto 移交 | P2 | 中 | ✅ **完成（2026-10-09）**——承用户"`tracing` 归 `:common`"的设计，先做**逐边定性** ✓：11 条边（`llm` 7 / `rerank` 3 / `embedding` 1）**… |
-| **B162 P1+P2：L1 对齐（`stream` 下沉）+ `:engine` 边界校准（`model`/`vectorstore` 回业务侧）** | 2 文件下沉 + 18 文件回迁 + 共享测试基座归 `:common` | P2 | 中 | ✅ **完成（2026-10-09）**——用户定案 5 模块图（`:common` / `:engine` / `:domains` / `:channels` / `:boot`）后的前两步。 |
-| **B161 M1 第二步：`:engine` 抽取（第二条编译期硬边界）** | 368 主源码 + 65 测试迁入；守卫多模块化；新模块 build | P2 | 大 | ✅ **完成（2026-10-09）**——把「能力层不得依赖业务域（L2→L3）」从脚本规则**升格为编译规则** ✓（B116 拆 `:common` 的同法）。 |
-| **B160 项目现状重析 + §7.3 重写（反映 B110~B120 实际进度）** | §7.3 item 3 重写；零代码改动 | P2 | 小 | ✅ **完成（2026-10-09）**——用户要求「重新分析项目现状，梳理方案」⇒ **全部现场实测、不引用摘要** ✓。 |
-| **B37 档 3 第一刀（provider 请求面）** | Go 字节兼容层退役起步：三份 provider GoJson 去 HTML 转义复刻 | P2 | 小 | 🚧 **完成第一刀（2026-10-03）**——字节流向盘点（四类）+ 三份副本退役（探针先行：embedding 单跑绿后同批改 rerank/websearch）； |
-| **B38 档 3 第二刀（stream/langfuse/LLM 请求体）** | Go 版确认下线 → Redis 事件等三面退役 Go 转义 | P2 | 小 | ✅ **完成（2026-10-03）**——`stream/StreamJson`（保留键序=内部 CAS 需稳定字节）、`RemoteApiBodyCodec`（保留键序归一）、`LangfuseAttributes`… |
-| **B39 档 3 第三刀（工具面）+ 实录约束发现** | MCP/待办/检索三处退役；发现「Go 形态实录」为档 3 硬边界 | P2 | 小 | ✅ **完成（2026-10-03）**——三处退役； |
-| **B40 实录基线重建（GoJsonEscapes 全量退役）** | 实录比对「逐字节」→「ContractJson.deep 语义比较」；删 GoJsonEscapes 类 | P2 | 中 | ✅ **完成（2026-10-03）**——解法＝不改实录（禁止手改）而改比对方式（收编漏网的字节级对比）； |
-| **B41 provider JSON 四副本收敛** | 4 份 GoJson/GoJsonUtil → `common/web/ProviderJson`；删零引用 GoFloatSerializer | P2 | 小 | ✅ **完成（2026-10-03）**——embedding 版为超集； |
-| **B42 档 3 第五刀（工具协议面）** | 转义退役 + 四类去 Go 名（HtmlEntities/JsonValues/ToolJson/JsonQuoting） | P2 | 小 | ✅ **完成（2026-10-03）**——先分类后落刀（真复刻 vs 只是名字带 Go）； |
-| **B43 档 3 第六刀（真退役）** | 工具协议面换 Java 原生：删 JsonQuoting/GoValueStr/GoJsonMarshal + ToolJson 手写 writer 退役 | P2 | 小 | ✅ **完成（2026-10-03）**——用户拍板「不要只是改名」； |
-| **B44 档 3 第七刀（connector 面）** | 删 GoBase64 / yuque GoDuration / common.time GoDuration（Java 原生替换） | P2 | 小 | ✅ **完成（2026-10-03）**——`java.util.Base64`（去换行）+ `Double.parseDouble`（与 Feishu 收敛）+ `Duration.toString()`（ISO-86… |
-| **B45 档 3 第八刀（GoStrings 收敛）** | 两份 GoStrings → common/text/Whitespace + CodePointOrder（Unicode 空白统一） | P2 | 中 | ✅ **完成（2026-10-03）**——16 文件 / 45 处改写； |
-| **B46 档 3 第九刀（验证驱动裁决）** | GoUrl / GoPath×2 / GoStyleErrorReportValve 逐类裁决 | P2 | 小 | ✅ **完成（2026-10-03）**——`GoUrl` 保留（95 位全表实测 7+2 处转义差异、无真实环境可验证）； |
-| **B47 保留类改名** | 契约保留类修标签（GitLabUrl/GitLabPath/PosixPath/PlainTextErrorReportValve） | P3 | 小 | ✅ **完成（2026-10-03）**——用户拍板：保留类的 `Go*` 名误导后人； |
-| **B48 注释大清洗专项** | 全仓注释去 Go 锚点/翻译腔/过期引用（用户 2026-10-03 立项，B9 专项化；main+test） | P2 | 大 | ✅ **完成（2026-10-03）**——11,932 匹配行/1,723 文件起步 → 棘轮基线 3,999→**0**（`--write` 已刷新）； |
-| **B52 B48 排查批** | 审批事件流断链修复 + 三项待复核疑点闭环 | P1 | 小 | ✅ **完成（2026-10-04）**——实锤修复：`ApprovalBridge` 原样转投使三类审批事件 instanceof 失配、聊天流审批卡静默消失（审批面板路径幸存故冒烟未抓到），补 `toPayloadD… |
-
-### 15.1.1 执行记录（索引：正文已移出，按批号 Ctrl-F）
-
-逐批执行记录在 `docs/handoff/records/batch-records.md`（442 行）。
-
-| 批 | 摘要 |
-|---|---|
-| ✅ B2 | `support/GoldenContract` 共享基建上线（`ContractJson.deep` 归一 + strip + 单一 `-Dcontract.refresh` 开关）； |
-| ✅ B1 | `docs/knowledge-api-contract-v1.md` v1.0→v1.1——升格全服务端标准； |
-| ✅ B3 | 真面 68 处（19 文件）`@JsonInclude` 退役——wiki domain 全家（10 文件）+ websearch 三 DTO + VectorStoreTypes； |
-| ✅ B4（结论：不改） | 哨兵不是债——① datasource 域零值=「从未同步」的**业务信号**（`lastSyncTime` 进调度比较，改 null 要动调度语义）； |
-| ✅ B7 | 依赖级口径（声明+构造赋值 ≤2 次）实锤断成员 19 处全清——只注入不读取字段 3（`PluginSearchParallel`）+ 死 logger 8 + 死 `ObjectMapper` 3 |
-| ✅ B8 | 全限定名注解 177+6 → 0（14 文件，注入前逐文件同名符号冲突扫描）； |
-| ✅ B0（2026-10-02，走查批收官） | 后端 8083（postgres 驱动）+ 前端 5173 + 桩 LLM（127.0.0.1:18090，`b0-stub-chat`）+ 桩 RSS（127.0. |
-| ✅ B3b（2026-10-02，由 B0 走查升格） | 知识库配置 jsonb 键名统一到 Java 字段名（camelCase）——前端 payload / 服务端读取器 / 落库列三方咬合面同批对齐。 |
-| 🚧 B6 批 1（2026-10-02，storage 装配） | `storage/service/DefaultStorageBackendProvisioner` 单文件 **46 处 `System.gete |
-| 🚧 B6 批 2（2026-10-02，langfuse） | `tracing/langfuse` 12 处清零（全仓 149→93，代码内 88）。 |
-| B6 余量口径（下一批动手前先定，2026-10-02 侦察结论） | 剩 88 处代码内读取，按上下文分两类—— |
-| 🚧 B6 批 3（2026-10-02，检索驱动 + 向量库 env 查找面） | `RETRIEVE_DRIVER` 的 7 个读取点清零（全仓 93→86，代码内 81）。 |
-| 🚧 B6 批 4（2026-10-02，系统/部署面 + `GIN_MODE` 改名） | 15 处清零（全仓 86→75，代码内 68）——`system` 域代码内 getenv 归零。 |
-| 🚧 B6 批 5（2026-10-02，知识域单值：docreader / 批大小 / 清理开关） | 6 处清零（全仓 75→69，代码内 62）。 |
-| 🚧 B6 批 7（2026-10-02，存储静态单值族 + JWT 密钥） | 8 处清零（全仓 64→57，代码内 50）。 |
-| 🚧 B6 批 8（2026-10-02，存储 provider 环境族查找面） | 3 处清零（全仓 57→53，代码内 46； |
-| 🚧 B6 批 9（2026-10-02，检索域：引擎命名/开关/超时族） | 18 处清零（全仓 53→35，代码内 46→28； |
-| ✅ B6 批 10（2026-10-02，收尾批——裸 `getenv` 代码内清零，B6 结项） | 28 处清零（代码内 46→**0**； |
-| B6 结项小结（149 → 0） | 十批分别是 storage 装配 46 / langfuse 12 / 检索驱动 7 / 系统部署面 15 / 知识域单值 6 / common 静态族 5 / 存储单值+JWT |
-| ✅ B12（2026-10-02，B0 残留批 1：wiki 槽位与孤儿任务） | **✅ B12（2026-10-02，B0 残留批 1：wiki 槽位与孤儿任务）** |
-| ✅ B13（2026-10-02，B0 残留批 2） | **✅ B13（2026-10-02，B0 残留批 2）** |
-| ✅ B5（2026-10-02，lf_* 载具嵌套化：判定 + 执行） | **✅ B5（2026-10-02，lf_* 载具嵌套化：判定 + 执行）** |
-| ✅ B9（2026-10-02，Go 锚点：政策 + 执行机制落地；清扫仍"随触碰"，不立专项） | **✅ B9（2026-10-02，Go 锚点：政策 + 执行机制落地； |
-| ✅ B11 判定（2026-10-02，Gradle 多模块）——结论：不做，正式搁置 | **✅ B11 判定（2026-10-02，Gradle 多模块）——结论：不做，正式搁置** |
-| 🐞 B14 修复（2026-10-02，真 bug：非 minio 的「行配置」云凭据被静默丢弃） | **🐞 B14 修复（2026-10-02，真 bug：非 minio 的「行配置」云凭据被静默丢弃）** |
-| ✅ B14 合并完成（2026-10-02，两套词汇收成「一面一源」） | **✅ B14 合并完成（2026-10-02，两套词汇收成「一面一源」）** |
-| ✅ B15（2026-10-02，供给行明文落库——登记项闭环） | **✅ B15（2026-10-02，供给行明文落库——登记项闭环）** |
-| ✅ B16「静默失效」定向扫描（2026-10-02，用户拍板方案 A） | **✅ B16「静默失效」定向扫描（2026-10-02，用户拍板方案 A）** |
-| 🚧 B17 换锚收尾·判定批（2026-10-02） | **🚧 B17 换锚收尾·判定批（2026-10-02）**——把「残余 @JsonProperty」逐条判定为三类，本批**无代码变更**（实验性删除已回退，全量复绿）。 |
-| ✅ B17② websearch 请求键收口（2026-10-02） | **✅ B17② websearch 请求键收口（2026-10-02）**——`is_default` → camel `isDefault`（§2 第 4 条），**不留兼容别名**。 |
-| 🔎 B17① agent 配置面：判定「暂不做」（建议，待用户拍板） | **🔎 B17① agent 配置面：判定「暂不做」（建议，待用户拍板）** |
-| ✅ B18 agent 配置面 camel 换锚（专项，2026-10-02 完成） | **✅ B18 agent 配置面 camel 换锚（专项，2026-10-02 完成）**——§2 第 11 条"落库格式走 Java 字段名"的最后一块大口子。 |
-| ✅ B19 前端契约键收口 + 双侧守卫（2026-10-02） | **✅ B19 前端契约键收口 + 双侧守卫（2026-10-02）** |
-| ✅ B21（2026-10-02，占位符组键收口 + 「同类情况」定向排查） | **✅ B21（2026-10-02，占位符组键收口 + 「同类情况」定向排查）** |
-| ✅ B22（2026-10-02，模板面 4 键 + `api_key` 收口 + 删死模块） | **✅ B22（2026-10-02，模板面 4 键 + `api_key` 收口 + 删死模块）** |
-| 🧰 B23（2026-10-02，孤儿夹具审计：工具 + 首次结论） | **🧰 B23（2026-10-02，孤儿夹具审计：工具 + 首次结论）** |
-| 🔎 B24（2026-10-02，换锚长尾回头扫：注解面清零 + 真实残留面盘点） | **🔎 B24（2026-10-02，换锚长尾回头扫：注解面清零 + 真实残留面盘点）** |
-| ✅ B25（2026-10-02，批甲：模板标志位收口；引用/进度载荷判为冻结） | **✅ B25（2026-10-02，批甲：模板标志位收口； |
-| 🐞 B26（2026-10-02，批甲续：websearch 凭据面全链修复 + 其余四面判冻结） | **🐞 B26（2026-10-02，批甲续：websearch 凭据面全链修复 + 其余四面判冻结）** |
-| ✅ B27（2026-10-02，批甲续 2：推荐问题键收口 + 6 类面判冻结） | **✅ B27（2026-10-02，批甲续 2：推荐问题键收口 + 6 类面判冻结）** |
-| ✅ B28（2026-10-02，批甲续 3：websearch provider-types 配置字段面收口） | **✅ B28（2026-10-02，批甲续 3：websearch provider-types 配置字段面收口）** |
-| ✅ B29（2026-10-02，批甲/批乙收口：换锚待判清单 66 → 0） | **✅ B29（2026-10-02，批甲/批乙收口：换锚待判清单 66 → 0）** |
-| 🔧 B29 订正（2026-10-02） | B29 的 BASELINE 插入代码多写了一个提前闭合字典的 `}`，脚本出现 `IndentationError`； |
-| ✅ B30（2026-10-02，model 凭据面与 MCP/websearch 统一为 camel） | **✅ B30（2026-10-02，model 凭据面与 MCP/websearch 统一为 camel）** |
-| ⚠️ B31（2026-10-02，B23 处置：结论修正 + 一次失败尝试的完整记录） | **⚠️ B31（2026-10-02，B23 处置：结论修正 + 一次失败尝试的完整记录）** |
-| ✅ B33（2026-10-02，包结构守卫红灯修复：两个工具类归位到最低层） | **✅ B33（2026-10-02，包结构守卫红灯修复：两个工具类归位到最低层）**——B6 批 10 引入的环 5 组 / 依赖 config 1→11 全清：`AppEnvLookup` → `common/deployment`、`StorageRun… |
-| ✅ B34（2026-10-02，agent/tools 分包：根 + 5 能力子包） | **✅ B34（2026-10-02，agent/tools 分包）**——94 文件 → wiki 30 / knowledge 11 / sql 5 / data 4 / web 2 + 根 42（框架 + 跨族共享 + 通用单件 + MCP 族）； |
-| ✅ B35（2026-10-02，modelcontext 并入 agent） | **✅ B35（2026-10-02，modelcontext 并入 agent）**——顶层包 31 → **30**：13 文件 → `agent/modelcontext/`（test 3 同移）+ 23 文件改包路径（含 FQN/javadoc，零残留… |
-| ✅ B36（2026-10-03，agentm 并入 agent） | **✅ B36（2026-10-03，agentm 并入 agent）**——顶层包 30 → **29**：`agentm`（20 文件）→ `agent/management/`（子域形态，先例 `auth/apikey/`）； |
-| 🚧 B37（2026-10-03，档 3 第一刀：provider 请求面退役 Go 转义） | **🚧 B37（2026-10-03，档 3 起步：provider 请求面）**——字节流向盘点（四类：provider 请求 / Redis 事件 / 落库响应 / 工具协议）+ 三份 provider `GoJson` 去 `GoJsonEscapes`… |
-| ✅ B38（2026-10-03，档 3 第二刀：stream/langfuse/LLM 请求体） | **✅ B38（2026-10-03，档 3 第二刀）**——用户确认「Go 版已下线、不再双跑」（关键决策登记）； |
-| ✅ B39（2026-10-03，档 3 第三刀：工具面 + 实录约束发现） | **✅ B39（2026-10-03，档 3 第三刀）**——`McpCatalog`/`TodoWriteTool`/`GoJsonUtil` 去 escapes + 两处测试侧清理； |
-| ✅ B40（2026-10-03，实录基线重建：GoJsonEscapes 全量退役） | **✅ B40（2026-10-03，实录基线重建）**——不改实录、改比对方式（`ContractJson.deep` 语义比较，B2 方针的收编）； |
-| ✅ B41（2026-10-03，provider JSON 四副本收敛 + 删零引用） | **✅ B41（2026-10-03，四副本收敛）**——`embedding/rerank/websearch/retrieval` 四份副本 → `common/web/ProviderJson`（超集）； |
-| ✅ B42（2026-10-03，档 3 第五刀：工具协议面） | **✅ B42（2026-10-03，工具协议面）**——`GoHtml`/`GoJsonValues` 改名（非 Go 语义）+ `GoJsonCodec`→`ToolJson`（去 HTML 转义、保键序）+ `GoQuoting`→`JsonQuotin… |
-| ✅ B43（2026-10-03，档 3 第六刀：真退役） | **✅ B43（2026-10-03，工具协议面换 Java 原生）**——删 `JsonQuoting`（→ `ToolJson.quoted`，收敛 WeaviateGql 第 5 份拷贝）/`GoValueStr`（→ 原生 `valueStr`，`<n… |
-| ✅ B44（2026-10-03，档 3 第七刀：connector 面） | **✅ B44（2026-10-03，connector 三刀）**——删 `GoBase64`（→ JDK Base64，GitLab 换行处理保留）/yuque `GoDuration`（→ `Double.parseDouble`，与 Feishu 收敛… |
-| ✅ B45（2026-10-03，档 3 第八刀：GoStrings 收敛） | **✅ B45（2026-10-03，空白实现统一）**——两份 `GoStrings`（wiki 96 行 + gitlab 82 行）删除 → `common/text/Whitespace`（`isSpaceChar`+6 = White_Space 精… |
-| ✅ B46（2026-10-03，档 3 第九刀：验证驱动裁决） | **✅ B46（2026-10-03）**——`GoUrl`/`GoPath`×2 **保留**（探针实测：转义 7+2 处差异 / 路径 21/24 一致但空结果差异含安全退步； |
-| ✅ B47（2026-10-03，保留类改名） | **✅ B47（2026-10-03）**——保留类修标签：`GoUrl`→`GitLabUrl`、`GoPath`→`GitLabPath`/`PosixPath`（归位 common/text）、`GoStyleErrorReportValve`→`Pla… |
-| ✅ B48（2026-10-03，注释大清洗专项：Go 锚点/翻译腔/过期引用归零） | **✅ B48（2026-10-03，B9 专项化收官）**——main+test 11,932 匹配行/1,723 文件起步 → 棘轮基线 3,999→**0**（`--write` 已刷新）； |
-| ✅ B52（2026-10-04，B48 排查批：审批事件流断链修复） | **✅ B52（2026-10-04）**——`ApprovalBridge` 原样转投致三类审批事件 instanceof 失配、聊天流审批卡静默消失； |
-| ✅ B53（2026-10-04，知识面卡片模型键收口 + 失败原因接线） | **✅ B53（2026-10-04）**——三键定性：`original_file_name`/`display_name` = 内部视图模型键（写读同套、功能正常但属 Go 时代遗留）、`error_message` = 死字段（接口给 camel `er… |
-| ✅ B54（2026-10-04，api 面 snake 键收口 + 裁撤死参数收尾 + 守卫扩面） | **✅ B54（2026-10-04）**——由 B53 追问扩展到 api 线格式面：修 12 处「接口 camel / 前端 snake」断链，其中**改密实测恒失败**（snake body → 400 `oldPassword/newPassword:… |
-| ✅ B55（2026-10-04，api 面 snake 记号逐条核实） | **✅ B55（2026-10-04）**——B54 挂起的 32 键全定性：**13 改 camel**（偏好 `lastActiveTenantId` 探针证实「回到上次空间」此前永不生效、`oidcOnlyLogin` 门禁、wiki 六键→页数恒 0/… |
-| ✅ B56（2026-10-04，技能区文案/死键/宿主技能目录） | **✅ B56（2026-10-04）**——点检追问「技能管理为何没了」查实＝功能裁剪第一批（PR3 `caef9d5`，技能降级为指令型）。 |
-| ✅ B57（2026-10-04，技能管理回归：入库 + 平台级 CRUD + 宿主目录退役） | **✅ B57（2026-10-04）**——方案三稿收敛（复用原 `/api/v1/skills/catalog` 路径 → 改指令型 → 入库）。 |
-| ✅ B58（2026-10-04，旧信封读法清剿：Go `{success,data}` 残留 → Java 裸载荷） | **✅ B58（2026-10-04）**——用户点检 `?section=integration-api` 报「加载 API 集成设置失败」：`/auth/me` 裸信封（tenant 在顶层）而页面读 `userResp.data.tenant` → 恒… |
-| ✅ B59（2026-10-04，技能编辑：PUT 更新 + 改名保护 + 编辑弹窗） | **✅ B59（2026-10-04）**——用户要求「查看内容」改「编辑」、弹窗同新建。 |
-
-| ✅ B60（2026-10-04，技能租户化：平台级 → 空间级 + 菜单并入「数据与扩展」） | **✅ B60（2026-10-04）**——用户提「技能配租户配置 + 菜单挪到数据与扩展」，核实为修隔离缺陷（`GET /api/v1/skills` 读全表 → 跨租户可见； |
-
-| ✅ B61（2026-10-04，技能按需读取打通 + @点名注入正文） | **✅ B61（2026-10-04）**——用户追问「如何加载 skill」→ 实证**Level 1 通、Level 2/3 断**（`skill://` 无解析器 / `read_file` 无实现 / Manager 读面零调用者）。 |
-
-| ✅ B62（2026-10-04，WeKnora Cloud 整功能裁撤） | **✅ B62（2026-10-04）**——用户：「去掉 WeKnora Cloud 设置」。 |
-
-| ✅ B63（2026-10-04，embed 语言「跟随浏览器/宿主」失效） | **✅ B63（2026-10-04）**——用户点检 `widget-test.html`。 |
-
-| ✅ B64（2026-10-04，「跟随宿主」补上宿主页面语言） | **✅ B64（2026-10-04）**——用户追问「为什么配置跟随还是英文」。 |
-
-| ✅ B65（2026-10-04，嵌入渠道保存后发布密钥丢失） | **✅ B65（2026-10-04）**——用户报「嵌入代码原来正常，点保存后变成 `<!-- 加载渠道密钥失败… -->`」。 |
-
-| ✅ B66（2026-10-04，Agent 编辑器提示词变量全空） | **✅ B66（2026-10-04）**——用户问 `/platform/agents` 的变量「点击插入 / `{{` 唤起列表」。 |
-
-| ✅ B67（2026-10-04，KB 解析设置整页崩：规则键名错面） | **✅ B67（2026-10-04）**——用户贴 `getEngineForGroup` 的 `undefined.some`。 |
-
-| ✅ B68（2026-10-04，智能体「推荐问题」恒空） | **✅ B68（2026-10-04）**——用户问某库有无自动生成问题（**有**：enabled + 每块 4 个、23/24 chunk 已生成）。 |
+| 批 | 阶段 | 范围 | 状态 |
+|---|---|---|---|
+| B232 | 0 边界固化 | 守卫修复（`check-package-cycles.py` PERSIST_RE 缩进）+ R9 包级 SCC 棘轮（基线 13 组） | ✅ 2026-10-13 |
+| B233 | 0 | ArchUnit A16 边界层引用禁令（76）+ A17 service 技术依赖禁令（61） | ✅ 2026-10-13 |
+| B234 | 1 正确性 | A6 同 ID 去重保最高分（`KnowledgeSearchRanking`） | ✅ 2026-10-13 |
+| B235 | — 文档 | HANDOFF 换版 v0.2.0（v0.1.0 全文归档）+ 实施计划展开（阶段 6 明细 + 4 处缺口） | ✅ 2026-10-13 |
+| B236 | 1 | K3：`DocReaderClient` 流错误传播（onError 捕获 + await 超时 + 异步 UNIMPLEMENTED 走 unary） | ⬜ |
+| B237 | 1 | K1：worker→向量店显式传租户（`KnowledgeVectorWrites` 收 tenantId，消除 ThreadLocal+0L） | ⬜ |
+| B238 | 1 | K2：URL 摄取统一（**拍板点①**：同步下载 vs worker 下载） | ⬜ |
+| B239 | 2 会话终态 | A1-NORMAL：流错误/超时轮终态一致收口 | ⬜ |
+| B240 | 2 | A1-AGENT：`AgentEngine` finally/COMPLETE 与外层 catch/ERROR 收口 + `FinalizePhase` 失败 outcome | ⬜ |
+| B241 | 2 | A2：全轮一次性提交门（CAS）+ 消息更新失败不启动索引/建议/记忆 | ⬜ |
+| B242 | 2 | A3：可关闭模型流（句柄 + `ThinkPhase` 取消 probe + 装饰器队列关闭语义） | ⬜ |
+| B243 | 2 | A5：跨线程上下文传播（NORMAL 消费线程 / STOP watcher replay） | ⬜ |
+| B244 | 2 | A18 状态所有权规则（phase 不回引 runner / 无公共可变运行态字段） | ⬜ |
+| B245 | 3 任务可靠 | K4：CAS 保护整轮数据（失败清场限本代；`KnowledgeParseService` 排斥处理中） | ⬜ |
+| B246 | 3 | K5：图任务失败/重试/计数同一契约（`finalAttempt` 消费、异常不吞、任务级去重） | ⬜ |
+| B247 | 3 | K6：主任务恢复口径统一（**拍板点②**：判据分裂先修；持久化深度待定） | ⬜ |
+| B248 | 4 索引/配置 | K10a：embedding 响应对齐校验（`index` 消费 + 数量/维度校验 + 乱序拒绝） | ⬜ |
+| B249 | 4 | K10b：索引分批政策收敛（worker 与 `ChunkVectorIndexer` 共用执行） | ⬜ |
+| B250 | 4 | K7：事务外副作用（revision + outbox；事务内不调远程模型） | ⬜ |
+| B251 | 4 | K8：配置能力矩阵（parser rules / parent-child 显式拒绝或实现；不静默回落） | ⬜ |
+| B252 | 5 结构收敛 | K9：跨 store 融合（RRF 按 store 内 rank；context expansion 修正） | ⬜ |
+| B253 | 5 | A4：并发工具状态提交顺序（`seenChunks` 单一 writer / 按调用序回填） | ⬜ |
+| B254 | 5 | controller 剥离编排（`KnowledgeQaController` 14 构造参数、`QaRequestParser` 拆分） | ⬜ |
+| B255 | 5 | 检索中立 `SearchHit`（去上层对 `PgVectorRetrieveRepository` 内部类型依赖） | ⬜ |
+| B256 | 6 包结构 | §10 改名清算：10 组同名歧义 + 3 组域前缀（纯改名） | ⬜ |
+| B257 | 6 | §7 命名与边界：`agent/tools`→`agenttools`、`agent/management`→`agentmanagement` + 边界规则 | ⬜ |
+| B258 | 6 | contracts 包边界（模块 DAG + 跨域边界规则） | ⬜ |
+| B259 | 6 | platform 包边界（`:common` 其余收拢） | ⬜ |
+| B260 | 6 | agent-engine 包边界（`com.ragagent.agent` 运行面收拢） | ⬜ |
+| B261 | 6 | retrieval-engine 包边界（`retrieval.*` 收拢 + policy 归位） | ⬜ |
+| B262 | 6 | model-runtime 包边界（模型调用 / provider / 流生命周期） | ⬜ |
+| B263 | 6 | domains 域内重排①：knowledge（29 包 248 文件；SCC 拆解 + mapper/repository 主战场） | ⬜ |
+| B264 | 6 | ②：session（21 包 183 文件）+ agenttools/agentmanagement 落位 | ⬜ |
+| B265 | 6 | ③：wiki（17 包 147）+ datasource（16 包 124）+ mcp（9 包 125） | ⬜ |
+| B266 | 6 | ④：im/memory/auth/storage/websearch/model + 其余小域 | ⬜ |
+| B267 | 6 | 门禁收紧收尾：§12.2「分层方向」「装配契约」两规则 + A11b 清零核查 + 复杂度指标（可选） | ⬜ |
 
 ### 15.2 批次纪律（每批通用，违者必翻车——全是本轮实锤）
 
@@ -1083,61 +604,44 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 | wiki 内容图片标记（`<image_caption>`/`<image_ocr>`/`<image_original>`） | ✅ 已完成（B93a：标记名 → `<imageCaption>`/`<imageOcr>`/`<imageOriginal>`；**chunk_type 值 `image_ocr`/`image_caption` 是枚举值，保留**） |
 | 落库 jsonb 存量键（agent_steps payload、memory 抽取状态、租户配置内容） | ✅ **完成（2026-10-10 B205）**——**判定**：落库面键已全 camel ✓（B132/B133/B135a/B135d1 ✓）；残留 snake 字符串**全在登记冻结面**（provider 请求体 / DB 列名 / MCP 枚举值 / LLM 载荷 ✓）。**实测**：dev 库 `tenants` 六列 + `memory_subjects` 两列，仅 4 列共 6 行还有旧键 ✗ ⇒ 按口径「开发库可清，不写迁移脚本」**一次性就地修数** ✓（先备份 → 事务 → 幂等 ✓；修后旧键行数**全 0** ✓）。修数 SQL 是 dev 一次性操作，**不入库** ✗（要点在提交 `(B205)` ✓）。 |
 
-### 15.4 架构整改批次（R 系列，2026-10-13 立项）
-
-> 方案：`outputs/java-remediation-plan-2026-10-13.md`（架构审查 + 目标结构 + 阶段路线）；
-> 实施计划与勘察证据：`outputs/java-remediation-implementation-plan-2026-10-13.md`（批次表原件）。
-> 口径：先正确性（阶段 1~3）→ 结构收敛（阶段 4~5）→ 模块提取（阶段 6）；**每批独立提交独立全绿**；
-> 守卫/规则类改动必配红态探针；结构搬迁不夹带行为变更。两条硬规则基线（实测）：A16=81 类、A17=55 类，只许减。
-
-| 批 | 阶段 | 范围 | 状态 |
-|---|---|---|---|
-| B232 | 0 边界固化 | 守卫修复（`check-package-cycles.py` PERSIST_RE 缩进）+ R9 包级 SCC 棘轮（基线 13 组） | ✅ **完成（2026-10-13）** |
-| B233 | 0 | ArchUnit A16 边界层引用禁令（基线 76）+ A17 service 技术依赖禁令（基线 61） | ✅ **完成（2026-10-13）** |
-| B234 | 1 正确性 | A6 同 ID 去重保最高分（`KnowledgeSearchRanking`） | ✅ **完成（2026-10-13）** |
-| B235 | 1 | K3 DocReader 流错误传播 | ⬜ |
-| B236 | 1 | K1 租户显式路由（worker→向量店） | ⬜ |
-| B237 | 1 | K2 URL 摄取统一（拍板点：同步下载路径） | ⬜ |
-| B238 | 2 会话终态 | A1-NORMAL 终态收口 | ⬜ |
-| B239 | 2 | A1-AGENT 终态收口 | ⬜ |
-| B240 | 2 | A2 全轮一次性提交门 | ⬜ |
-| B241 | 2 | A3 可关闭模型流 | ⬜ |
-| B242 | 2 | A5 跨线程上下文传播 | ⬜ |
-| B243 | 2 | A18 状态所有权规则（随 B238-240 收敛） | ⬜ |
-| B244 | 3 任务可靠 | K4 CAS 保护整轮数据 | ⬜ |
-| B245 | 3 | K5 图任务契约统一 | ⬜ |
-| B246 | 3 | K6 恢复口径统一（拍板点：持久化深度） | ⬜ |
-| B247 | 4 索引一致 | K10a embedding 响应校验 | ⬜ |
-| B248 | 4 | K10b 索引执行收敛 | ⬜ |
-| B249 | 4 | K7 事务外副作用 | ⬜ |
-| B250 | 4 | K8 配置能力矩阵 | ⬜ |
-| B251 | 5 结构收敛 | K9 跨 store 融合 | ⬜ |
-| B252 | 5 | A4 并发工具状态提交 | ⬜ |
-| B253 | 5 | controller 剥离编排 | ⬜ |
-| B254 | 5 | 检索中立 SearchHit | ⬜ |
-| B255 | 6 模块提取 | contracts/platform 包边界 | ⬜ |
-| B256 | 6 | 三 runtime 包边界 | ⬜ |
-| B257 | 6 | domains 重排 + A11b 清零 | ⬜ |
+### 15.4 R 系列执行记录
 
 **✅ B232（2026-10-13，守卫修复 + R9 包级 SCC 棘轮）**
 - **R6 持久层引用检查修复**：`check-package-cycles.py` 的 `PERSIST_RE` 检查原在内层循环**之外** ⇒ 每个 common 根目录只检查最后读到的 1 个文件（可静默漏检）。修复后全量重扫实测 **0 命中 ⇒ 读数不变**（纯漏检面修复，无基线 churn）。
-- **R9 包级 SCC 棘轮上线**：按完整包（`com.ragagent.a.b`）聚合 import 边求 SCC，**13 组**入基线（只许减；**新增与已消除/变形都红** ⇒ 刷新须 `--write` 并在说明里写明原因）。R1b 只看顶层域，这 13 组此前完全不可见；方案 §2.2 的"13 个包级强连通分量"由此**精确复现**（含 `knowledge.repository/security/service/task`、`agent/compaction/prompt`、`retrieval.engine.*` 9 组等）。
-- **三个红态探针全验**：① 注入 `common/probe` 持久层引用 ⇒ 修前 R6 计数 **0**（漏检）、修后 `持久层 ['probe']`；② 注入子包环 `probe.a ⇄ probe.b` ⇒ R9 `14 组（基线 13）；✗ 新增` + rc=1（同时 R1/R1b 保持 0 ⇒ 证明看到了顶层域看不见的环）；③ 基线塞假 SCC ⇒ `已消除/变形（请 --write 刷新基线）` + rc=1。探针全删后复绿。
-- **Tarjan 抽取**：顶层域与完整包共用一份 `sccs_of()`（同政策一份实现）；包图**两趟收边**（先登记全部包再收边——探针开发期实测：单趟版把 13 组看成 9 组，漏了"目标包尚未读到"的边）。
-- **基线 diff 干净**：`package-cycles.baseline.json` 仅新增 `package_sccs`（+71 行），其余键零变化。**闸门**：十一守卫全绿 ✓ · `spotlessCheck build` ✓ **1m31s** ✓（脚本批，Java 零改动，未重启 dev）。
-- **同时登记**：R 系列批次表（本节）+ 实施计划 `outputs/java-remediation-implementation-plan-2026-10-13.md`（含勘察证据与两个拍板点）。
+- **R9 包级 SCC 棘轮上线**：按完整包（`com.ragagent.a.b`）聚合 import 边求 SCC，**13 组**入基线（只许减；**新增与已消除/变形都红** ⇒ 刷新须 `--write` 并在说明里写明原因）。R1b 只看顶层域，这 13 组此前完全不可见；方案 §2.2 的"13 个包级强连通分量"由此**精确复现**。
+- **三个红态探针全验**：① 注入 `common/probe` 持久层引用 ⇒ 修前 R6 计数 **0**（漏检）、修后 `持久层 ['probe']`；② 注入子包环 `probe.a ⇄ probe.b` ⇒ R9 `14 组（基线 13）；✗ 新增` + rc=1（同时 R1/R1b 保持 0）；③ 基线塞假 SCC ⇒ `已消除/变形（请 --write 刷新基线）` + rc=1。探针全删后复绿。
+- **Tarjan 抽取**：顶层域与完整包共用一份 `sccs_of()`；包图**两趟收边**（单趟版把 13 组看成 9 组，漏"目标包尚未读到"的边）。
+- **闸门**：十一守卫全绿 ✓ · `spotlessCheck build` ✓ **1m31s** ✓（脚本批，Java 零改动）。
 
 **✅ B233（2026-10-13，ArchUnit A16/A17 两条硬规则）**
-- **A16「边界层不得被用例层引用」**：`..service..` 不得直接依赖 `controller/mapper/task/client/channel`（同包依赖除外——同包是落点问题，归 Mapper 包约定等规则管）；**ArchUnit 语义实测基线 76 类**（import 口径 81 文件——ArchUnit 含签名/注解/泛型面；**以 ArchUnit 实测为准**）。
+- **A16「边界层不得被用例层引用」**：`..service..` 不得直接依赖 `controller/mapper/task/client/channel`（同包依赖除外）；**ArchUnit 语义实测基线 76 类**（import 口径 81 文件——ArchUnit 含签名/注解/泛型面，以实测为准）。
 - **A17「service 不得依赖具体技术」**：禁 `com.baomidou` / `spring-data-redis` / `redis.clients` / `jakarta.servlet` / `tracing.langfuse` / `tracing.decorators`；**基线 61 类**。
-- **基线生成口径（写进类注释）**：空基线首跑 → 从测试报告 XML 取实际集合 → 回填（不做手抄近似）；棘轮双断言（新增即红 + 基线过期也红）沿用既有 `ratchet()`。
-- **红态探针**：注入 `knowledge.service.ProbeBoundaryDeps`（import `ChunkMapper` + `LambdaQueryWrapper`）⇒ A16/A17 **双红且 fresh 集合精确只含探针**；删除后复绿。
-- **闸门**：`spotlessCheck build` ✓ **1m25s** ✓ · **4903 / 失败 0 / 跳过 4** ✓（+2 = 本批新规则；跳过为既有环境性）· 十一守卫（在 build 内）✓。
-- **后续**：这两条基线主要靠 R 系列阶段 5/6 的落点搬移（`Redis*`/`*Wiring` 混在 service、`service` 里的边界类）逐域消减，基线只许减。
+- **基线生成口径**：空基线首跑 → 测试报告 XML 取实际集合 → 回填（不做手抄近似）；棘轮双断言（新增即红 + 过期也红）。
+- **红态探针**：注入 `knowledge.service.ProbeBoundaryDeps` ⇒ 双红且 fresh 集合精确只含探针；删除后复绿。
+- **闸门**：`spotlessCheck build` ✓ **1m25s** ✓ · **4903 / 失败 0 / 跳过 4** ✓（+2 = 本批新规则）。
 
 **✅ B234（2026-10-13，A6 同 ID 去重保最高分）**
-- **缺口**（方案 A6，源码事实）：`KnowledgeSearchRanking.deduplicateResults` 第一遍按 id 键登记先到者后 `continue`，第二遍"留最高分"只能看到幸存项 ⇒ 反例（x: 0.1 先到、0.9 被丢）成为终值。
-- **修复**：同 ID 保最高分**前移为第一遍**（`LinkedHashMap` 保该 ID 首次出现位置、替换不改次序；同分保留先到者 = 确定 tie-break）；多键（parent / kb#index）+ 内容签名去重保持"留先"语义不变。
-- **测试**：新增 `KnowledgeSearchRankingDedupTest` 5 例——2 例反例先红（低分先到 / 替换不改位置）、3 例回归守卫（高分先到 / 同分留先 / parent·kb#index·签名留先）；录制回放 `KnowledgeSearchRecordingTest` 15/0 未受影响（语料本就不含跨 query 同 ID）。
-- **闸门**：`spotlessCheck build` ✓ **1m50s** ✓ · **4908 / 失败 0 / 跳过 4** ✓（+5 = 新测试）；十一守卫（在 build 内）✓。
+- **缺口**（方案 A6）：`KnowledgeSearchRanking.deduplicateResults` 第一遍按 id 键登记先到者后 `continue`，第二遍"留最高分"只能看到幸存项 ⇒ 反例（x: 0.1 先到、0.9 被丢）成为终值。
+- **修复**：同 ID 保最高分**前移为第一遍**（`LinkedHashMap` 保首次出现位置、替换不改次序；同分保留先到者 = 确定 tie-break）；多键 + 内容签名去重保持"留先"语义不变。
+- **测试**：新增 `KnowledgeSearchRankingDedupTest` 5 例（2 反例先红 + 3 回归守卫）；录制回放 `KnowledgeSearchRecordingTest` 15/0 未受影响。
+- **闸门**：`spotlessCheck build` ✓ **1m50s** ✓ · **4908 / 失败 0 / 跳过 4** ✓（+5 = 新测试）。
 
+**✅ B235（2026-10-13，文档换版：HANDOFF → v0.2.0 + 实施计划展开）**
+- **换版口径**：v0.1.0 全文归档 `docs/handoff/archive/HANDOFF-v0.1.0-2026-10-13.md`（150 KB 快照 + 归档头）；新 HANDOFF 以 v0.2.0 整改为主体；**§8/§9/§10/§13/§14/§15.2/§15.3 编号与内容保持不动**（外部 40+ 处按号引用不断：docs 手册 + Java 注释）；§11 压缩为指针；**新建 §12 结构地图**（补齐长期悬空的"§12"引用：模块图 + 域内十一层 + 守卫总表）；§0/§2/§4/§5/§7 重写为 v0.2.0 口径。
+- **计划展开**：阶段 6 由 3 行伞状批展开为 **12 批**（B256 改名清算 → B257 §7 命名 → B258 contracts → B259 platform → B260~B262 三 runtime → B263~B266 domains 域内重排 → B267 门禁收紧）；**补录 4 处缺口**（方案 §7 命名 / §10 改名 / §12.2 两条规则 / §12.5 复杂度指标）；批次号顺延（文档批 = B235）⇒ R 系列共 **36 批（B232~B267）**。
+- **实测补录**：方案 §10.1 十组改名**大多未做**（旧名 7 个仍在：`ToolPolicy`/`TokenUsage`/`ModelResponse`/`ProviderRegistry`/`FileService`/`WebSearchProvider`/`Event`+`EventBus`；仅 `AgentToolCall` 已存在）⇒ 入 B256。
+- **验证**：文档批零代码改动（参照 B204 先例不跑全量闸门）；十一守卫 rc=0 作底线 ✓。
+
+## 附：文档地图与归档追溯
+
+| 文档 | 用途 |
+|---|---|
+| `HANDOFF.md`（本文） | v0.2.0 常读面：现状 / 批次表 / 纪律 / 环境 / 方法论 |
+| `docs/handoff/archive/HANDOFF-v0.1.0-2026-10-13.md` | v0.1.0 全文归档（历史追溯，勿作现行依据） |
+| `outputs/java-remediation-plan-2026-10-13.md` | 整改方案（设计产物，gitignored） |
+| `outputs/java-remediation-implementation-plan-2026-10-13.md` | 具体实施计划（含批次表原件与勘察证据） |
+| `docs/handoff/records/batch-records.md` | v0.1.0 早期逐批记录（~B110，历史） |
+| `docs/backend-package-map.md` · `docs/*-module-guide.md` | 包地图与 34 域模块手册 |
+| `docs/api-response-convention.md` | 统一响应外壳约定（权威） |
+
+批次详情取回：`git log --oneline | grep "B2xx"`；提交信息一律带 `(B###)` 与验证方式。
