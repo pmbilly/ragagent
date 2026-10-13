@@ -103,7 +103,7 @@ FROZEN_PREFIXES = (
     'embedding/provider', 'im/', 'websearch/provider', 'rerank/', 'asr/', 'vlm/',
     'retrieval/vlm', 'storage/provider',
     # 检索引擎适配器族（ES/OpenSearch/Milvus/Qdrant 的 DSL 字段）与检索观测面
-    'retrieval/engine/', 'retrieval/obs/',
+    'retrieval/engine/', 'retrieval/telemetry/',
     # 2026-10-09 B134：`ReferencesSupport`（0 蛇键）与 `PipelineProgress`（5 键已换锚）摘除。
     # 原先的冻结理由＝「存量回放面」（B25 判定：引用随 messages.knowledge_references 落库、
     # 前端 rag-pipeline-history 以同形键重建）⇒ 该理由属 B92 已整体作废的「兼容历史数据」类；

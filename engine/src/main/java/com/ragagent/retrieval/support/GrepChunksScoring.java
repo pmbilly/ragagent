@@ -1,4 +1,4 @@
-package com.ragagent.agenttools.knowledge;
+package com.ragagent.retrieval.support;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -8,18 +8,18 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import com.ragagent.agenttools.knowledge.GrepChunksTool.GrepChunkView;
+
 
 /**
  * grep 检索结果的评分协作者：内容签名去重、正则命中评分（含标题命中）、
  * MMR 多样性重排，以及轻量分词与 Jaccard 相似度。
  */
-final class GrepChunksScoring {
+public final class GrepChunksScoring {
 
     private GrepChunksScoring() {
     }
 
-    static List<GrepChunkView> deduplicateChunks(List<GrepChunkView> results) {
+    public static List<GrepChunkView> deduplicateChunks(List<GrepChunkView> results) {
         LinkedHashSet<String> seen = new LinkedHashSet<>();
         LinkedHashSet<String> contentSig = new LinkedHashSet<>();
         List<GrepChunkView> uniqueResults = new ArrayList<>();
@@ -65,7 +65,7 @@ final class GrepChunksScoring {
     }
 
     /** 内容签名：小写+trim+折叠空白后 MD5 hex。 */
-    static String buildContentSignature(String content) {
+    public static String buildContentSignature(String content) {
         String c = GrepChunkView.nz(content).toLowerCase(Locale.ROOT).trim();
         if (c.isEmpty()) {
             return "";
@@ -86,7 +86,7 @@ final class GrepChunksScoring {
     }
 
     /** 命中评分：title 命中 +0.5 cap 1.0、patternCount 0 时置 1。 */
-    static List<GrepChunkView> scoreChunks(List<GrepChunkView> results, List<Pattern> compiled) {
+    public static List<GrepChunkView> scoreChunks(List<GrepChunkView> results, List<Pattern> compiled) {
         List<GrepChunkView> scored = new ArrayList<>(results.size());
         for (GrepChunkView r : results) {
             double score;
@@ -125,7 +125,7 @@ final class GrepChunksScoring {
                 }
             }
             String title = GrepChunkView.nz(r.knowledgeTitle);
-            if (FaqSnippet.regexMatchesAny(title, compiled)) {
+            if (SearchTextUtil.regexMatchesAny(title, compiled)) {
                 r.titleMatch = true;
                 score = Math.min(score + 0.5, 1.0);
                 if (patternCount == 0) {
@@ -140,7 +140,7 @@ final class GrepChunksScoring {
     }
 
     /** MMR 多样性重排：swap-remove，并列取先出现者（严格 &gt;）。 */
-    static List<GrepChunkView> applyMMR(List<GrepChunkView> results, int k, double lambda) {
+    public static List<GrepChunkView> applyMMR(List<GrepChunkView> results, int k, double lambda) {
         if (k <= 0 || results.isEmpty()) {
             return List.of();
         }
@@ -188,7 +188,7 @@ final class GrepChunksScoring {
      * 轻量空白分词。已知差异：对含中文文本无词典分词，
      * 一律走空白分词（英文/纯空白场景逐位一致）。
      */
-    static Map<String, Boolean> tokenizeSimple(String text) {
+    public static Map<String, Boolean> tokenizeSimple(String text) {
         String t = GrepChunkView.nz(text).toLowerCase(Locale.ROOT).trim();
         if (t.isEmpty()) {
             return Map.of();
@@ -205,7 +205,7 @@ final class GrepChunksScoring {
     }
 
     /** 全部字符都是标点/空白/符号。 */
-    static boolean isAllPunct(String s) {
+    public static boolean isAllPunct(String s) {
         for (int i = 0; i < s.length();) {
             int cp = s.codePointAt(i);
             i += Character.charCount(cp);
@@ -227,7 +227,7 @@ final class GrepChunksScoring {
     }
 
     /** Jaccard 相似度（token 集合交并比）。 */
-    static double jaccard(Map<String, Boolean> a, Map<String, Boolean> b) {
+    public static double jaccard(Map<String, Boolean> a, Map<String, Boolean> b) {
         if (a.isEmpty() && b.isEmpty()) {
             return 0;
         }

@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.llm.ToolResult;
 import com.ragagent.agenttools.knowledge.GrepChunksTool.GrepChunkSearch;
-import com.ragagent.agenttools.knowledge.GrepChunksTool.GrepChunkView;
+import com.ragagent.retrieval.support.GrepChunkView;
 import com.ragagent.common.retrieval.SearchTarget;
 import com.ragagent.agent.tool.ToolRequest;
 import com.ragagent.agenttools.GoRecording45B;

@@ -1,5 +1,7 @@
 package com.ragagent.agenttools.knowledge;
 
+import com.ragagent.retrieval.support.GrepChunksScoring;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;

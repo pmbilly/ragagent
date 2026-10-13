@@ -9,7 +9,7 @@ import com.ragagent.llm.extract.ExtractPrompts;
 import com.ragagent.llm.extract.EntityExtraction;
 import com.ragagent.llm.extract.PipelineConfig;
 import com.ragagent.retrieval.graph.RetrieveGraphRepository;
-import com.ragagent.retrieval.obs.RetrievalObs;
+import com.ragagent.retrieval.telemetry.RetrievalObs;
 import com.ragagent.common.prompt.PromptInstructions;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;

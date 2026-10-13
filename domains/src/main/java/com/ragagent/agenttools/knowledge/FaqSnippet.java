@@ -1,5 +1,6 @@
 package com.ragagent.agenttools.knowledge;
 
+import com.ragagent.retrieval.support.SearchTextUtil;
 import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
@@ -388,17 +389,9 @@ public final class FaqSnippet {
         return s.substring(0, end) + "...";
     }
 
-    /** 正则命中判定（空文本/空表 false，null 模式跳过）。 */
+    /** 正则命中判定（B261：实现归位 {@code SearchTextUtil}，此处仅委托；空文本/空表 false，null 模式跳过）。 */
     public static boolean regexMatchesAny(String text, List<java.util.regex.Pattern> compiled) {
-        if (text == null || text.isEmpty() || compiled == null || compiled.isEmpty()) {
-            return false;
-        }
-        for (java.util.regex.Pattern re : compiled) {
-            if (re != null && re.matcher(text).find()) {
-                return true;
-            }
-        }
-        return false;
+        return SearchTextUtil.regexMatchesAny(text, compiled);
     }
 
     private static boolean isEmpty(String s) {

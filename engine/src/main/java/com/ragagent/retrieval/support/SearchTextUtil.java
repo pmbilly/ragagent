@@ -3,6 +3,7 @@ package com.ragagent.retrieval.support;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -244,6 +245,25 @@ public final class SearchTextUtil {
     }
 
     /** 钳到 [minV, maxV]。 */
+    /**
+     * 正则命中判定（空文本/空表 false，null 模式跳过）。
+     *
+     * <p>B261 由 {@code agenttools.knowledge.FaqSnippet} 归位（原为工具侧私有助手，被
+     * {@code GrepChunksScoring} 借用 ⇒ 工具实现面↔检索面互为依赖）。{@code FaqSnippet}
+     * 现委托到本方法，语义逐字保留。</p>
+     */
+    public static boolean regexMatchesAny(String text, List<java.util.regex.Pattern> compiled) {
+        if (text == null || text.isEmpty() || compiled == null || compiled.isEmpty()) {
+            return false;
+        }
+        for (java.util.regex.Pattern re : compiled) {
+            if (re != null && re.matcher(text).find()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static double clampFloat(double v, double minV, double maxV) {
         if (v < minV) {
             return minV;

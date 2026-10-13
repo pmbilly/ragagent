@@ -844,6 +844,15 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **测试**：**4976 / 失败 0 / 跳过 4** ✓（boot +1 = B260 规则；domains 仍 2949 ⇒ 搬走的 11 个测试类未丢，`--rerun-tasks` 核对过）；`spotlessCheck build` ✓ **1m29s** ✓ 十一守卫 ✓。
 - **登记（未做）**：`agentmanagement → agent`（2 文件，方向正确，保留）；`agent` 与 8 个业务域间接环仍在（属 B263~B266 域内重排的范围）；`agent` 根包与八个段协作者的 seam（2026-10-12 定案：不做 `loop/` 归位）**本批未触碰**。
 
+**✅ B261（2026-10-13，§8.4 retrieval-engine 包边界）**
+- **实测到的真缠绕**：① grep 的**结果视图** `GrepChunkView` 藏在业务工具类 `GrepChunksTool` 内 ✗；② **检索政策** `GrepChunksScoring`（内容签名 / 打分 / 去重 / MMR）住在工具实现面 `agenttools.knowledge` ✗；③ 它还要借用工具侧 `FaqSnippet.regexMatchesAny` ✗ ⇒ **工具实现面 ↔ 检索面互为依赖**的雏形（engine 根本看不见 domains，`GrepChunksScoring` 一旦要进引擎就编译不过——本批正是这样暴露的）；④ `retrieval.obs`(1 文件) 与 §8.4 的 `telemetry` 面名字不一致。
+- **归位**：`GrepChunkView` 由嵌套提为**顶层** `com.ragagent.retrieval.support.GrepChunkView`（`nz`/`toChunk` 提 public，补 `ChunkFacts` import）；`GrepChunksScoring` → `com.ragagent.retrieval.support`（类与方法 public 化，删旧 import）；`regexMatchesAny` → `com.ragagent.retrieval.support.SearchTextUtil`（`FaqSnippet` 改为**委托**，语义逐字保留）；`retrieval.obs` → `retrieval.telemetry`（1 文件 + 8 处引用，测试目录随迁）；调用方 `GrepChunksTool` / `KnowledgeSearchRanking` / `AgentToolKbBackends`(session) / `GrepChunksRecordingTest` 同步。
+- **新规则**（`ContractBoundaryRulesTest`）：「**B261：retrieval 面不得依赖业务域与工具实现面**」（`retrieval..` → 业务域 / `agenttools` / `agentmanagement`，基线 **0 = 零容忍**；实测搬迁前后全域均为 0 ⇒ 这条锁的是"不许再缠回去"）。**探针**：配置变体注入当场转红 ✓ 还原 ✓——这里**不能**用真实代码探针：`:engine` 看不见 `:domains`，越界引用根本编译不过（B260 是反向情形，故用真实字节码依赖）。
+- **换锚两处（B168/B169 既有教训，B261 又踩）**：① `check-json-key-case.py` 的 `FROZEN_PREFIXES`：`retrieval/obs/` → `retrieval/telemetry/`；② **冻结覆盖快照** `scripts/json-key-freeze.baseline.json` 同行更新（diff 恰一行：`retrieval/obs/RetrievalObs.java` → `retrieval/telemetry/RetrievalObs.java`）。③ 空目录 `retrieval/obs/` 触发「目录卫生 B124：死包目录」⇒ 删除（`git mv` 只搬文件、不删目录）。
+- **第一版被守卫拦下的写法**：`FaqSnippet` 委托时我写了内联 FQN `com.ragagent.retrieval.support.SearchTextUtil.regexMatchesAny(...)` ⇒ **R8 内联全限定名**守卫点名（`agenttools/knowledge/FaqSnippet.java:393`）⇒ 改为 import ✓（这条守卫的存在价值现场可见）。
+- **测试**：**4977 / 失败 0 / 跳过 4** ✓（boot +1 = B261 规则；engine 561 / domains 2949 均未丢）；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m39s** ✓ 十一守卫 ✓。
+- **登记（未做）**：① **两份 `buildContentSignature` 语义有别**（`GrepChunksScoring` 用 `\s+` 折叠、`SearchTextUtil` 用 Unicode 空白感知的 `trimUnicodeWhitespace`+`splitFields`）⇒ **未合并**，需先评估对去重/签名的影响再统一；② `KnowledgeSearchRanking` **仍留工具面**——它的构造器吃整个 `KnowledgeSearchTool`（读 `tool.reranker` / `tool.searchTargets`）⇒ 归位到 `retrieval.policy` 必须先做**状态外提**（reranker/threshold/targets 参数化）重构，属独立批次；③ 因此 **`retrieval.policy` 面本批未创建**（避免死包目录，B124 守卫）；④ `retrieval.engine`(69 文件) → `retrieval.application.engine`、`retrieval.vlm`/`graph`/`domain` 的最终归位仍未做。
+
 ## 附：文档地图与归档追溯
 
 **✅ B255（2026-10-13，阶段 5 收口：检索中立类型）**

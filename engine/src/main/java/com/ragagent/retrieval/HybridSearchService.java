@@ -42,7 +42,7 @@ import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.security.LogSanitizer;
 import com.ragagent.event.TenantContextSnapshot;
 import com.ragagent.retrieval.config.RetrievalEnvLookup;
-import com.ragagent.retrieval.obs.RetrievalObs;
+import com.ragagent.retrieval.telemetry.RetrievalObs;
 import com.ragagent.tracing.langfuse.LangfuseManager;
 import com.ragagent.tracing.langfuse.Span;
 

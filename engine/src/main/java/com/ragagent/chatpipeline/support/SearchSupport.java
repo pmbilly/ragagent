@@ -12,7 +12,7 @@ import com.ragagent.chatpipeline.plugin.PluginSearch;
 import com.ragagent.common.retrieval.SearchChunkMerge;
 import com.ragagent.retrieval.support.SearchTextUtil;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.retrieval.obs.RetrievalObs;
+import com.ragagent.retrieval.telemetry.RetrievalObs;
 
 /**
  * 检索的纯函数辅助：

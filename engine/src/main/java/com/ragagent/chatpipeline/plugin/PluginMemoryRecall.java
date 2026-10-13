@@ -15,7 +15,7 @@ import com.ragagent.event.EventType;
 import com.ragagent.event.payload.MemoryRecalledData;
 import com.ragagent.common.memory.MemoryItemView;
 import com.ragagent.common.session.PipelineUsedMemoryView;
-import com.ragagent.retrieval.obs.RetrievalObs;
+import com.ragagent.retrieval.telemetry.RetrievalObs;
 import com.ragagent.event.EventBusInterface;
 
 /**

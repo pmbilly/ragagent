@@ -177,6 +177,31 @@ class ContractBoundaryRulesTest {
     }
 
     /** 三个 runtime 的实现包面（含 engine 模块内与领域侧同名包）。 */
+    /**
+     * B261（§8.4）：检索面（`:engine` 的 `com.ragagent.retrieval..`）属运行时底座的一部分，
+     * 只依赖 contracts / platform / common 与自身。反向依赖业务域或工具实现面，会让检索与业务
+     * 编排再次互相缠绕——B261 之前 `GrepChunksScoring` 借用工具侧 `FaqSnippet`、`GrepChunkView`
+     * 藏在工具类里，就是这么缠起来的（前者已归位 {@code SearchTextUtil}）。
+     */
+    @Test
+    @DisplayName("B261：retrieval 面不得依赖业务域与工具实现面（零容忍）")
+    void retrievalFaceStaysBelowBusiness() {
+        List<String> violations = new ArrayList<>();
+        for (JavaClass clazz : MAIN) {
+            if (!clazz.getPackageName().startsWith("com.ragagent.retrieval")) {
+                continue;
+            }
+            for (var dep : clazz.getDirectDependenciesFromSelf()) {
+                String pkg = dep.getTargetClass().getPackageName();
+                if (isBusinessDomain(pkg) || pkg.startsWith("com.ragagent.agenttools")
+                        || pkg.startsWith("com.ragagent.agentmanagement")) {
+                    violations.add(clazz.getName() + " → " + dep.getTargetClass().getName());
+                }
+            }
+        }
+        ratchet("B261 retrieval→业务域/工具面", Set.of(), new TreeSet<>(violations));
+    }
+
     private static boolean isRuntimeImplementation(String packageName) {
         for (String r : List.of("agent", "llm", "retrieval", "modelcontext", "rerank", "webfetch",
                 "embedding", "chatpipeline", "tracing.decorators", "agenttools", "agentmanagement")) {

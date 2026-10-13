@@ -27,7 +27,7 @@ import com.ragagent.common.knowledge.GeneratedQuestion;
 import com.ragagent.tracing.langfuse.LangfuseManager;
 import com.ragagent.common.web.JsonMappers;
 import com.ragagent.common.pipeline.ChunkTypes;
-import com.ragagent.retrieval.obs.RetrievalObs;
+import com.ragagent.retrieval.telemetry.RetrievalObs;
 
 /**
  * CHUNK_RERANK 阶段插件。

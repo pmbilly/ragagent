@@ -1,4 +1,4 @@
-package com.ragagent.retrieval.obs;
+package com.ragagent.retrieval.telemetry;
 
 import com.ragagent.retrieval.engine.EngineTypes;
 import java.util.ArrayList;

@@ -1,5 +1,7 @@
 package com.ragagent.agenttools.knowledge;
 
+import com.ragagent.retrieval.support.GrepChunkView;
+import com.ragagent.retrieval.support.GrepChunksScoring;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -75,34 +77,7 @@ public class GrepChunksTool extends BaseTool {
     static final int SNIPPET_MAX_TOTAL_RUNES = 800;
 
     /** DB 行视图（chunks 列 + knowledge_title + total_chunk_count）。 */
-    public static final class GrepChunkView {
-        public String id;
-        public String content;
-        public int chunkIndex;
-        public String knowledgeId;
-        public String knowledgeBaseId;
-        public String chunkType;
-        public JsonNode metadata;
-        public String parentChunkId;
-        public String knowledgeTitle;
-        public int totalChunkCount;
-        // 打分阶段回填（MatchScore/MatchedPatterns/TitleMatch）。
-        public double matchScore;
-        public int matchedPatterns;
-        public boolean titleMatch;
 
-        /** null 视为 ""（零值语义）。 */
-        static String nz(String v) {
-            return v == null ? "" : v;
-        }
-
-        /** 转 L1 载荷以复用 FaqSnippet（FAQ 元数据/标准问题路径）。 */
-        ChunkFacts toChunk() {
-            return new ChunkFacts(nz(id), nz(knowledgeId), nz(knowledgeBaseId), content,
-                    chunkType == null ? "" : chunkType, "", false, chunkIndex, 0, 0, 0,
-                    parentChunkId, "", "", null, metadata, "");
-        }
-    }
 
     /**
      * DB 直查 seam。

@@ -133,7 +133,7 @@
     "retrieval/engine/qdrant/QdrantRetrieveRepository.java": "retrieval/engine/",
     "retrieval/engine/qdrant/QdrantSearchOps.java": "retrieval/engine/",
     "retrieval/engine/qdrant/QdrantWriteOps.java": "retrieval/engine/",
-    "retrieval/obs/RetrievalObs.java": "retrieval/obs/",
+    "retrieval/telemetry/RetrievalObs.java": "retrieval/telemetry/",
     "retrieval/vlm/VlmClient.java": "retrieval/vlm/VlmClient",
     "tracing/decorators/LangfuseChatClient.java": "tracing/decorators",
     "tracing/decorators/LangfuseEmbedder.java": "tracing/decorators",
