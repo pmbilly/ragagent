@@ -12,12 +12,12 @@
           <t-button
             variant="text"
             shape="square"
-            size="small"
+            size="medium"
             :title="t('common.close')"
             :aria-label="t('common.close')"
             @click="emit('close')"
           >
-            <template #icon><t-icon name="close" /></template>
+            <template #icon><t-icon name="close" size="18px"/></template>
           </t-button>
         </header>
 

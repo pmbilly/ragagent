@@ -16,30 +16,29 @@
         </span>
         <div class="embed-header__text">
           <h1 class="embed-header__title">{{ headerTitle }}</h1>
-          <p v-if="headerSubtitle" class="embed-header__subtitle">{{ headerSubtitle }}</p>
         </div>
         <t-button
           variant="text"
           shape="square"
-          size="small"
+          size="medium"
           class="embed-header__action"
           :title="$t('embedPublish.historyTitle')"
           :aria-label="$t('embedPublish.historyTitle')"
           @click="openHistory"
         >
-          <template #icon><t-icon name="history" /></template>
+          <template #icon><t-icon name="history" size="18px"/></template>
         </t-button>
         <t-button
           variant="text"
           shape="square"
-          size="small"
+          size="medium"
           class="embed-header__action"
           :disabled="!chatHasMessages"
           :title="$t('embedPublish.newChat')"
           :aria-label="$t('embedPublish.newChat')"
           @click="handleNewChat"
         >
-          <template #icon><t-icon name="add" /></template>
+          <template #icon><t-icon name="add" size="18px"/></template>
         </t-button>
       </header>
 
@@ -250,21 +249,6 @@ const headerTitle = computed(() => {
     return sessionTitle.value.trim()
   }
   return channelDisplayTitle.value
-})
-
-const headerSubtitle = computed(() => {
-  const cfg = config.value
-  if (!cfg?.agentName) return ''
-  if (useSessionHeaderTitle.value && sessionTitle.value.trim()) {
-    const fallback = channelDisplayTitle.value
-    if (fallback && fallback !== sessionTitle.value.trim()) {
-      return fallback
-    }
-    return cfg.agentName
-  }
-  const channelName = cfg.name?.trim()
-  if (!channelName || channelName === channelDisplayTitle.value) return ''
-  return cfg.agentName
 })
 
 const headerIcon = computed(() => {

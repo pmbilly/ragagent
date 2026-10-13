@@ -71,7 +71,7 @@ test('embed 历史文案：五个语言键齐全且非空', () => {
     const bag = (EMBED_MESSAGES[locale] as { embedPublish?: Record<string, unknown> }).embedPublish
     assert.ok(bag, `${locale}: 缺 embedPublish`)
     for (const key of flatKeys) {
-      const value = bag[key]
+      const value: unknown = bag[key]
       assert.equal(typeof value, 'string', `${locale}: embedPublish.${key} 缺失`)
       assert.notEqual(String(value).trim(), '', `${locale}: embedPublish.${key} 不得为空`)
     }
