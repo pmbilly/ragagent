@@ -1,12 +1,15 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.repository.KnowledgeTagRepository;
+
+import com.ragagent.knowledge.repository.KnowledgeRepository;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.AppError;
@@ -20,8 +23,6 @@ import com.ragagent.knowledge.dto.faq.FaqImportResult;
 import com.ragagent.knowledge.dto.faq.FaqSuccessEntry;
 import com.ragagent.model.domain.Model;
 import com.ragagent.knowledge.repository.FaqChunkRepository;
-import com.ragagent.knowledge.mapper.KnowledgeMapper;
-import com.ragagent.knowledge.mapper.KnowledgeTagMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -52,8 +53,8 @@ public class FaqImportService {
     final FaqChunkRepository faqChunkRepository;
     final FaqValidateOps validateOps;
     final FaqBatchOps batchOps;
-    final KnowledgeMapper knowledgeMapper;
-    final KnowledgeTagMapper tagMapper;
+    private final KnowledgeRepository knowledgeRepository;
+    private final KnowledgeTagRepository tagRepository;
     final FaqImportTaskStore taskStore;
     final LocalStorageService storage;
     final TenantFileStorage fileStorage;
@@ -65,8 +66,8 @@ public class FaqImportService {
 
 
     public FaqImportService(KnowledgeTaskExecutor taskExecutor,
-                            KnowledgeMapper knowledgeMapper,
-                            KnowledgeTagMapper tagMapper,
+                            KnowledgeRepository knowledgeRepository,
+                            KnowledgeTagRepository tagRepository,
                             FaqImportTaskStore taskStore,
                             LocalStorageService storage,
                             TenantFileStorage fileStorage,
@@ -77,10 +78,10 @@ public class FaqImportService {
 
         this.taskExecutor = taskExecutor;
         this.validateOps = new FaqValidateOps(this);
-        this.batchOps = new FaqBatchOps(this);
+        this.batchOps = new FaqBatchOps(this, knowledgeRepository, tagRepository);
         this.faqChunkRepository = faqChunkRepository;
-        this.knowledgeMapper = knowledgeMapper;
-        this.tagMapper = tagMapper;
+        this.knowledgeRepository = knowledgeRepository;
+        this.tagRepository = tagRepository;
         this.taskStore = taskStore;
         this.storage = storage;
         this.fileStorage = fileStorage;
@@ -191,11 +192,7 @@ public class FaqImportService {
                 log.warn("FAQ import task {} aborted: KB invalid: {}", job.taskId(), e.getMessage());
                 return;
             }
-            Knowledge knowledge = knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                    .eq(Knowledge::getId, job.knowledgeId())
-                    .eq(Knowledge::getTenantId, job.tenantId())
-                    .isNull(Knowledge::getDeletedAt)
-                    .last("LIMIT 1"));
+            Knowledge knowledge = knowledgeRepository.findById(job.tenantId(), job.knowledgeId());
             if (knowledge == null || knowledge.getTenantId() == null
                     || knowledge.getTenantId() != job.tenantId()
                     || !job.kbId().equals(knowledge.getKnowledgeBaseId())
@@ -323,7 +320,7 @@ public class FaqImportService {
         if (!job.dryRun()) {
             batchOps.saveImportResultToDatabase(job, progress, originalTotalEntries);
             if ("replace".equals(job.mode())) {
-                int deleted = tagMapper.deleteUnusedTags(job.tenantId(), job.kbId());
+                int deleted = tagRepository.deleteUnusedTags(job.tenantId(), job.kbId());
                 if (deleted > 0) {
                     log.info("FAQ import task {}: cleaned up {} unused tags after replace import",
                             job.taskId(), deleted);
@@ -457,11 +454,7 @@ public class FaqImportService {
         }
         if ("completed".equals(progress.status()) && progress.knowledgeId() != null
                 && !progress.knowledgeId().isEmpty()) {
-            Knowledge knowledge = knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                    .eq(Knowledge::getId, progress.knowledgeId())
-                    .eq(Knowledge::getTenantId, tenantId())
-                    .isNull(Knowledge::getDeletedAt)
-                    .last("LIMIT 1"));
+            Knowledge knowledge = knowledgeRepository.findById(tenantId(), progress.knowledgeId());
             if (knowledge != null) {
                 FaqImportResult result = parseImportResult(knowledge.getLastFaqImportResult());
                 if (result != null) {
@@ -493,10 +486,7 @@ public class FaqImportService {
         KnowledgeBase kb = faqGuard.writableFAQKnowledgeBase(kbId);
         long tid = kb.getTenantId() == null ? tenantId() : kb.getTenantId();
 
-        List<Knowledge> knowledgeList = knowledgeMapper.selectList(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getTenantId, tid)
-                .eq(Knowledge::getKnowledgeBaseId, kbId)
-                .isNull(Knowledge::getDeletedAt));
+        List<Knowledge> knowledgeList = knowledgeRepository.listByTenantAndKb(tid, kbId);
         Knowledge faqKnowledge = null;
         for (Knowledge k : knowledgeList) {
             if ("faq".equals(k.getType())) {
@@ -516,7 +506,7 @@ public class FaqImportService {
                 result.mergedCount(), result.addedCount(), result.importMode(), result.importedAt(),
                 result.taskId(), result.failedEntriesUrl(), displayStatus, result.processingTime());
         faqKnowledge.setLastFaqImportResult(FaqChunkMetadata.JSON.valueToTree(updated));
-        knowledgeMapper.updateById(faqKnowledge);
+        knowledgeRepository.updateById(faqKnowledge);
     }
     private void validateFAQImportTags(KnowledgeBase kb, List<FaqEntryPayload> entries) {
         Map<Long, FaqEntryFieldsUpdate> byTag = new LinkedHashMap<>();

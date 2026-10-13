@@ -921,6 +921,13 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **偶发测试（记录）**：全量跑时 `RedisWikiDeletedTombstoneStoreTest.clearRemovesTombstone` 失败一次，**单跑即过** ⇒ Redis 依赖型偶发，与本步改动无关（本步未触碰 wiki/Redis 路径）。
 - **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m34s** ✓ 十一守卫 ✓（13 组 SCC 未变）。
 - **登记（余步）**：
+**🔶 B263 第⑲步（2026-10-14，`SpanTracker` + `FaqBatchOps` + `FaqImportService` 归仓储）**
+- **修掉一处包内字段直取坏味道**：`FaqBatchOps` 原本是 `service.knowledgeMapper` / `service.tagMapper` 直取 `FaqImportService` 的**包内字段**（这也是那两个字段不能收紧为 private 的原因）⇒ 改为 `FaqBatchOps` 自己注入 `KnowledgeRepository` / `KnowledgeTagRepository`（构造器在包内 `new` 出来，一处调用点同步），并把 `FaqImportService` 的这两个字段**收紧为 private**。
+- **新增两个仓储方法**：`KnowledgeRepository.touchUpdatedAt(id, now)`（心跳——**不按租户、不看软删**，与 SpanTracker 原直连语句逐字一致）；`KnowledgeTagRepository.deleteUnusedTags(tenantId, kbId)`（replace 导入后清未引用标签）。
+- **复用既有方法**：`FaqBatchOps` 的 tag 读取 → `KnowledgeTagRepository.listTagsByIds`（与 `tagMapper.selectByTenantAndIds(List.of(id))` 同形）；`FaqImportService` 三处按 id 读行 → `KnowledgeRepository.findById(tenantId, id)`（含 `tenantId()` 与 `job.tenantId()` 两个变体）、FAQ 容器列表 → `listByTenantAndKb`、`updateById` → 仓储。
+- **连带**：A16 删 1 条 / A17 删 3 条；死成员守卫点名的 3 个未使用 import 清掉；`FaqImportService` 566 → 558 行、`SpanTracker` 702 → 700 行（**超大文件基线内**，路径未变故无需换锚）。
+- **测试**：4978 / 失败 0 / 跳过 4 ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ 十一守卫 ✓（环 0 / SCC 13 组未变）。
+- **登记（余步）**：
 **🔶 B263 第⑱步（2026-10-14，5 个小块类归仓储：`ChunkExtractService`/`ChunkQuestionService`/`ChunkEditService`/`QuestionGenerationService`/`ChunkReadService`）**
 - **关键语义判断（本步最花心思处）**：两处 `mapper.selectById(...)` 与三个 `selectOne(...)` 看似都能用现成仓储方法，实则**不等价**——`Knowledge( Base)Repository.findByIdOnly(id)` **过滤软删**，而 `selectById` **不过滤**；管线任务（图抽取/问题生成）正是要**看到已软删行**才能判定 aborted 并跳过 ⇒ 新增 `findByIdAny(id)`（Knowledge 与 KB 各一，javadoc 写明"与 `findByIdOnly` 的区别"），**不复用**。
 - **其余三处复用既有方法**：`ChunkReadService.findForSummaryReload` → `KnowledgeRepository.findById(tenantId, id)`（`LogSanitizer.sanitize` 保留在服务侧、参数位置不变）；`ChunkEditService.findKnowledgeRow` → 同上；`ChunkQuestionService.findKbRow` → `KnowledgeBaseRepository.findByIdOnly(kbId)`（原查询本就带 `isNull(deletedAt)` + `LIMIT 1`，逐字等价）。

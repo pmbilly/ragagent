@@ -90,6 +90,11 @@ public class KnowledgeTagRepository {
         return tagMapper.selectByTenantAndIds(tenantId, ids);
     }
 
+    /** 清理该 KB 下未引用的标签，返回删除行数（B263⑲ 由 service 直连归位）。 */
+    public int deleteUnusedTags(long tenantId, String kbId) {
+        return tagMapper.deleteUnusedTags(tenantId, kbId);
+    }
+
     /** 删除该 knowledge 的标签关系（B263⑨）。 */
     public void deleteRelations(String knowledgeId) {
         tagMapper.deleteRelations(knowledgeId);

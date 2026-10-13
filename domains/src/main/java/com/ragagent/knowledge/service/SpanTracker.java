@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.repository.KnowledgeRepository;
+
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.OffsetDateTime;
@@ -13,13 +15,10 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import com.ragagent.knowledge.domain.KnowledgeProcessingSpan;
-import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import com.ragagent.knowledge.repository.KnowledgeSpanRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import com.ragagent.knowledge.domain.Knowledge;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 
 /**
  * 处理管道面向的
@@ -69,14 +68,14 @@ public class SpanTracker {
     }
 
     private final KnowledgeSpanRepository repo;
-    private final KnowledgeMapper knowledgeMapper;
+    private final KnowledgeRepository knowledgeRepository;
 
     /** span_id → started_at（进程内 duration 缓存）。 */
     private final Map<String, OffsetDateTime> starts = new ConcurrentHashMap<>();
 
-    public SpanTracker(KnowledgeSpanRepository repo, KnowledgeMapper knowledgeMapper) {
+    public SpanTracker(KnowledgeSpanRepository repo, KnowledgeRepository knowledgeRepository) {
         this.repo = repo;
-        this.knowledgeMapper = knowledgeMapper;
+        this.knowledgeRepository = knowledgeRepository;
     }
 
     /**
@@ -162,10 +161,7 @@ public class SpanTracker {
             return;
         }
         try {
-            knowledgeMapper.update(null,
-                    new LambdaUpdateWrapper<Knowledge>()
-                            .eq(Knowledge::getId, knowledgeId)
-                            .set(Knowledge::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC)));
+            knowledgeRepository.touchUpdatedAt(knowledgeId, OffsetDateTime.now(ZoneOffset.UTC));
         } catch (RuntimeException e) {
             log.warn("[SpanTracker] heartbeat update failed kid={}: {}", knowledgeId, e.toString());
         }

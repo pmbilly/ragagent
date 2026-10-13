@@ -1,5 +1,8 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.repository.KnowledgeRepository;
+import com.ragagent.knowledge.repository.KnowledgeTagRepository;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -21,7 +24,6 @@ import com.ragagent.knowledge.dto.faq.FaqFailedEntry;
 import com.ragagent.knowledge.dto.faq.FaqImportProgress;
 import com.ragagent.knowledge.dto.faq.FaqImportResult;
 import com.ragagent.knowledge.service.FaqImportService.ImportJob;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.model.domain.Model;
 import com.ragagent.knowledge.storage.TenantFileStorage;
 import org.slf4j.Logger;
@@ -37,9 +39,14 @@ final class FaqBatchOps {
     static final int FAQ_IMPORT_BATCH_SIZE = 50;
 
     private final FaqImportService service;
+    private final KnowledgeRepository knowledgeRepository;
+    private final KnowledgeTagRepository tagRepository;
 
-    FaqBatchOps(FaqImportService service) {
+    FaqBatchOps(FaqImportService service, KnowledgeRepository knowledgeRepository,
+                KnowledgeTagRepository tagRepository) {
         this.service = service;
+        this.knowledgeRepository = knowledgeRepository;
+        this.tagRepository = tagRepository;
     }
 
     /**
@@ -143,8 +150,8 @@ final class FaqBatchOps {
                 long tagID = 0;
                 String tagName = "";
                 if (chunk.getTagId() != null && !chunk.getTagId().isEmpty()) {
-                    KnowledgeTag tag = service.tagMapper
-                            .selectByTenantAndIds(job.tenantId(), List.of(chunk.getTagId()))
+                    KnowledgeTag tag = tagRepository
+                            .listTagsByIds(job.tenantId(), List.of(chunk.getTagId()))
                             .stream().findFirst().orElse(null);
                     if (tag != null) {
                         tagID = tag.getSeqId();
@@ -235,11 +242,7 @@ final class FaqBatchOps {
 
 
     void saveImportResultToDatabase(ImportJob job, FaqImportProgress progress, int originalTotalEntries) {
-        Knowledge knowledge = service.knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getId, job.knowledgeId())
-                .eq(Knowledge::getTenantId, job.tenantId())
-                .isNull(Knowledge::getDeletedAt)
-                .last("LIMIT 1"));
+        Knowledge knowledge = knowledgeRepository.findById(job.tenantId(), job.knowledgeId());
         if (knowledge == null) {
             log.warn("FAQ import task {}: knowledge not found for result save", job.taskId());
             return;
@@ -259,7 +262,7 @@ final class FaqBatchOps {
                 "open", processingTime);
         knowledge.setLastFaqImportResult(FaqChunkMetadata.JSON.valueToTree(result));
         knowledge.setUpdatedAt(OffsetDateTime.now());
-        service.knowledgeMapper.updateById(knowledge);
+        knowledgeRepository.updateById(knowledge);
         log.info("Saved FAQ import result to database: knowledge_id={}, task={}, total={}, success={}, failed={}",
                 job.knowledgeId(), job.taskId(), originalTotalEntries, progress.successCount(),
                 progress.failedCount());
