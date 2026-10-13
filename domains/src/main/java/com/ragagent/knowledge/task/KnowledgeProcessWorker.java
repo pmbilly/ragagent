@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import com.ragagent.common.error.BizException;
 import com.ragagent.common.graph.NameSpace;
 import com.ragagent.retrieval.graph.RetrieveGraphRepository;
 import com.ragagent.common.context.TracingContext;
@@ -32,17 +33,15 @@ import com.ragagent.embedding.Embedder;
 import com.ragagent.knowledge.domain.KnowledgeBaseChunkingConfig;
 import com.ragagent.model.service.ModelRuntimeFactory;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
-import com.ragagent.retrieval.engine.EngineTypes;
-import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
 import com.ragagent.tracing.langfuse.LangfuseTaskScope;
 
 import com.ragagent.tracing.langfuse.LangfuseTracing;
 import com.ragagent.knowledge.domain.ExtractChunkPayload;
 import com.ragagent.knowledge.domain.QuestionBatchPayload;
 import com.ragagent.knowledge.support.GraphChunkSelector;
-import com.ragagent.knowledge.support.KnowledgeIndexContent;
 import com.ragagent.knowledge.service.KnowledgeVectorWrites;
 import com.ragagent.knowledge.support.QuestionBatchPlanner;
+import com.ragagent.knowledge.service.ChunkVectorIndexer;
 import com.ragagent.knowledge.service.SpanTracker;
 import com.ragagent.retrieval.engine.VectorStoreService;
 import com.ragagent.knowledge.client.DocReaderClient;
@@ -118,6 +117,8 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
     private final VectorStoreService vectorStore;
     private final ModelService modelService;
     private final KnowledgeVectorWrites vectorWrites;
+    /** K10b 收敛：索引执行的唯一实现（worker 不再自建分批/IndexRow/IndexInfo）。 */
+    private final ChunkVectorIndexer chunkVectorIndexer;
     private final ModelRuntimeFactory modelRuntimeFactory;
     private final ApplicationEventPublisher eventPublisher;
     private final SpanTracker spanTracker;
@@ -145,6 +146,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
                                   VectorStoreService vectorStore,
                                   ModelService modelService,
                                   KnowledgeVectorWrites vectorWrites,
+                                  ChunkVectorIndexer chunkVectorIndexer,
                                   ModelRuntimeFactory modelRuntimeFactory,
                                   ApplicationEventPublisher eventPublisher,
                                   SpanTracker spanTracker,
@@ -167,6 +169,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
         this.vectorStore = vectorStore;
         this.modelService = modelService;
         this.vectorWrites = vectorWrites;
+        this.chunkVectorIndexer = chunkVectorIndexer;
         this.modelRuntimeFactory = modelRuntimeFactory;
         this.eventPublisher = eventPublisher;
         this.spanTracker = spanTracker;
@@ -371,50 +374,14 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
                         "chunks_to_embed", chunks.size(),
                         "model_id", k.getEmbeddingModelId() == null
                                 ? "" : k.getEmbeddingModelId()));
-        CompositeRetrieveEngine boundEngine =
-                vectorWrites.boundEngine(kb, k.getTenantId());
-        if (boundEngine != null) {
-            Embedder embedderRuntime =
-                    modelRuntimeFactory.getEmbeddingModel(kb.getEmbeddingModelId());
-            List<IndexInfo> items =
-                    new ArrayList<>(chunks.size());
-            for (Chunk c : chunks) {
-                IndexInfo item =
-                        new IndexInfo();
-                item.sourceId = c.getId();
-                item.sourceType = EngineTypes.SOURCE_TYPE_FILE;
-                item.chunkId = c.getId();
-                item.knowledgeId = k.getId();
-                item.knowledgeBaseId = k.getKnowledgeBaseId();
-                item.knowledgeType = kb.getType();
-                item.tagId = ""; // 不设 TagID（零值语义）
-                item.content = KnowledgeIndexContent.build(k, c.embeddingContent());
-                item.isEnabled = true;
-                items.add(item);
-            }
-            try {
-                boundEngine.batchIndex(embedderRuntime, items);
-            } catch (RuntimeException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new IllegalStateException(
-                        e.getMessage() == null ? String.valueOf(e) : e.getMessage(), e);
-            }
-        } else {
-            List<VectorStoreService.IndexRow> rows = new ArrayList<>(chunks.size());
-            List<String> texts = new ArrayList<>(chunks.size());
-            for (Chunk c : chunks) {
-                String text = KnowledgeIndexContent.build(k, c.embeddingContent());
-                texts.add(text);
-                rows.add(new VectorStoreService.IndexRow(
-                        c.getId(), c.getId(), k.getId(), k.getKnowledgeBaseId(), text, true, ""));
-            }
-            int embedBatch = embedBatchSize();
-            for (int from = 0; from < rows.size(); from += embedBatch) {
-                int to = Math.min(from + embedBatch, rows.size());
-                List<float[]> vectors = embedder.embedBatch(embedConfig, texts.subList(from, to));
-                vectorStore.saveIndexRows(rows.subList(from, to), vectors);
-            }
+        // K10b（B249）：索引执行收敛——委托索引器的唯一实现（分批 / IndexRow·IndexInfo 构造 /
+        // 引擎口 / 问题行 / parent_text 过滤 / 按块 enabled 全在那儿）。worker 只保留：
+        // span 埋点、embedConfig 空即跳过、失败不吞（外层失败清场与终态契约依赖 RuntimeException）。
+        try {
+            chunkVectorIndexer.indexChunks(kb, chunks);
+        } catch (BizException e) {
+            throw new IllegalStateException(
+                    e.getMessage() == null ? e.toString() : e.getMessage(), e);
         }
         endStageSpan(embedSpan, Map.of(
                 "chunks_embedded", chunks.size()));

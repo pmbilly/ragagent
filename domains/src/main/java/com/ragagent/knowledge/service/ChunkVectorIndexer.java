@@ -111,6 +111,27 @@ public class ChunkVectorIndexer {
     }
 
     /**
+     * 摄取路径（worker）入口：与 {@link #updateChunkVector(String, List)} **同一实现**
+     * （K10b 收敛），只是调用方已持有 KB 行、不必按 id 再查；模型仍按 KB 配置解析。
+     */
+    public void indexChunks(KnowledgeBase kb, List<Chunk> chunks) {
+        if (kb == null || chunks == null || chunks.isEmpty()) {
+            return;
+        }
+        String modelId = kb.getEmbeddingModelId() == null ? "" : kb.getEmbeddingModelId();
+        if (modelId.isEmpty()) {
+            throw new BizException(AppError.internal("model ID cannot be empty"));
+        }
+        Model embeddingModel;
+        try {
+            embeddingModel = modelService.getModelByID(modelId);
+        } catch (ModelNotFoundException e) {
+            throw new BizException(AppError.notFound("Model not found"));
+        }
+        indexAndStore(kb, embeddingModel, chunks);
+    }
+
+    /**
      * KB 缺失/模型
      * 缺失的错误形态是 500 面（{@link IllegalStateException}，调用方
      * UpdateDocumentChunk 吞成 index_status=failed）；删除旧行后按 enabled 决定是否重建。

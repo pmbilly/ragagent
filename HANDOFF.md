@@ -524,7 +524,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B246 | 3 | K5：图任务失败/重试/计数同一契约（`finalAttempt` 消费、异常不吞、任务级去重） | ✅ 2026-10-13 |
 | B247 | 3 | K6：主任务恢复口径统一（**拍板点②**：判据分裂已修＝按面判据；持久化主任务另立项） | ✅ 2026-10-13 |
 | B248 | 4 索引/配置 | K10a：embedding 响应对齐校验（`index` 消费 + 数量/维度校验 + 乱序拒绝） | ✅ 2026-10-13 |
-| B249 | 4 索引/配置 | K10b：索引执行收敛（worker 委托化；**拍板：语义目标**） | 🟡 部分（数量断言 ✅；委托化待拍板） |
+| B249 | 4 索引/配置 | K10b：索引执行收敛（worker 委托索引器唯一实现 + 数量断言） | ✅ 2026-10-13 |
 | B250 | 4 | K7：事务外副作用（revision + outbox；事务内不调远程模型） | ⬜ |
 | B251 | 4 | K8：配置能力矩阵（parser rules / parent-child 显式拒绝或实现；不静默回落） | ⬜ |
 | B252 | 5 结构收敛 | K9：跨 store 融合（RRF 按 store 内 rank；context expansion 修正） | ⬜ |
@@ -737,6 +737,12 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **本批已做（无争议部分）**：`VectorStoreService.saveIndexRows` 增加 `rows.size() == vectors.size()` **数量断言**（按位置配行的最后一道闸，B248 登记项）；新增 `VectorStoreServiceIndexRowArityTest` 2 例（数量不符 / null ⇒ 抛且一行 SQL 都不发）。
 - **待拍板（委托化的语义目标）**：直接让 worker 委托索引器会**静默改变索引行为**——实测两条路径**语义不等价**：① 索引器先 `deleteByChunkIdList`（worker 靠前置 `preCleanKnowledge`，效果等价）；② 索引器 pg 分支**会一并索引生成问题行**（worker 不写）；③ 索引器**过滤 `parent_text` 块**（worker 全索引）；④ 索引器按块 `enabled` 判定（worker 硬编码 `true`）；⑤ 错误语义：索引器包成 `BizException(badRequest)`，worker 裸抛（B245/B246 的重试/终态契约依赖后者）；⑥ 批大小来源不同（`BatchEmbedProperties.embedSize()` vs worker 自有 `embedBatchSize()`）。⇒ 委托化属**行为变更批**（父块是否入库 / 问题行谁写 / 禁用块如何处理 / 失败文案），建议独立一批并先定目标语义（推荐：一律采用索引器语义、worker 变薄壳），到批前给逐条对照与回归面。
 - **闸门**：`spotlessCheck build` ✓ **2m05s** ✓ · **4947 / 失败 0 / 跳过 4** ✓（+2）· 十一守卫 ✓。
+
+**✅ B249 收口（2026-10-13，K10b 委托化——采用索引器语义，worker 变薄壳）**
+- **实施**：① `ChunkVectorIndexer` 新增摄取入口 `indexChunks(kb, chunks)`（与 `updateChunkVector` **同一实现**，只是调用方已持有 KB 行）；② worker 的 `embedChunks` 删除双分支（~55 行：内联 `IndexInfo` 构造 + 自建 `texts/rows` + 自有分批）→ 变薄壳：span 埋点 + `embedConfig` 空跳过 + `BizException`→`IllegalStateException`（保住 B245/B246 依赖的"失败不吞"契约）。
+- **六处语义差异的实测处置**：① 索引器多一次 `deleteByChunkId`（worker 前置 `preCleanKnowledge` 后为 no-op）✓；② 生成问题行——摄取期块无 `generatedQuestions` ⇒ **实际不写**（K8 落地后才有意义）；③ `parent_text` 过滤——当前 worker 只产 text 块（K8）⇒ **no-op**，K8 落地后自动获得"父块不向量化"语义；④ 按块 `enabled`——新块默认 true ⇒ **no-op**；⑤ 错误语义已包回原契约 ✓；⑥ 批大小统一到 `BatchEmbedProperties` ✓（本批正收益）。
+- **验证**：全量 `spotlessCheck build` ✓ **1m47s** ✓ · **4947 / 失败 0 / 跳过 4** ✓——**含知识操作合约金片**（端到端摄取路径，kg-* 系列）全绿，即委托在当前配置下行为等价；十一守卫 ✓。数量断言部分另有 2 例新测试；委托化本身无新增单测（worker 无测试基建，靠合约金片覆盖）。
+- **登记**：K8（配置能力矩阵）落地后，②③④ 会从 no-op 变为**生效语义**——到那时需补一条明确回归（"父块不入库 / 问题行由索引器写"）；阶段 6 仍建议把该政策移入 `retrieval-engine/execution` 的 `IndexService`。
 
 ## 附：文档地图与归档追溯
 
