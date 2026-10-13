@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.service;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -10,6 +11,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -197,6 +199,41 @@ class ChunkExtractServiceTest {
         assertEquals("kb-1", graphRepo.addedNamespaces.get(0).knowledgeBase());
         assertEquals("kn-1", graphRepo.addedNamespaces.get(0).knowledge());
         verify(finalizer).finalizeWikiSubtask("kn-1");
+    }
+
+    @Test
+    @DisplayName("K5：失败且未到终态 —— 不释放槽位（留给重试的终态释放）")
+    void failureWithoutTerminalDoesNotDrain() {
+        when(chunkRepository.getChunkById(anyLong(), anyString())).thenReturn(null);
+
+        assertThatThrownBy(() -> service.handle(payload(), false))
+                .isInstanceOf(IllegalStateException.class);
+
+        verify(finalizer, never()).finalizeWikiSubtask(anyString());
+    }
+
+    @Test
+    @DisplayName("K5：失败且到终态 —— 释放一次（放弃重试后槽位必须归还，否则父知识卡在 finalizing）")
+    void terminalFailureDrainsOnce() {
+        when(chunkRepository.getChunkById(anyLong(), anyString())).thenReturn(null);
+
+        assertThatThrownBy(() -> service.handle(payload(), true))
+                .isInstanceOf(IllegalStateException.class);
+
+        verify(finalizer, times(1)).finalizeWikiSubtask("kn-1");
+    }
+
+    @Test
+    @DisplayName("K5：失败重试链（非终态 → 终态）合计只释放一次槽位")
+    void retryChainDrainsExactlyOnce() {
+        when(chunkRepository.getChunkById(anyLong(), anyString())).thenReturn(null);
+
+        assertThatThrownBy(() -> service.handle(payload(), false))
+                .isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> service.handle(payload(), true))
+                .isInstanceOf(IllegalStateException.class);
+
+        verify(finalizer, times(1)).finalizeWikiSubtask("kn-1");
     }
 
     @Test

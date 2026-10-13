@@ -54,7 +54,7 @@ public class InProcessChunkExtractTaskQueue implements ChunkExtractTaskQueue {
 
     private void run(String body, int attempt) {
         try {
-            service.handleJson(body);
+            service.handleJson(body, attempt > MAX_RETRY);
         } catch (RuntimeException e) {
             if (attempt > MAX_RETRY) {
                 log.warn("chunk extract task gave up after {} attempts: {}", attempt, e.toString());

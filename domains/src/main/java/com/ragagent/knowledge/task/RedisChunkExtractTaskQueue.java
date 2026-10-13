@@ -36,7 +36,7 @@ public class RedisChunkExtractTaskQueue extends AbstractRedisKnowledgeTaskQueue
 
     @Override
     void execute(String body, boolean finalAttempt) {
-        service.handleJson(body);
+        service.handleJson(body, finalAttempt);
     }
 
     @Override

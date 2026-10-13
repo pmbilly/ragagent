@@ -103,17 +103,31 @@ public class ChunkExtractService {
         this.extractPrompts = extractPrompts;
     }
 
-    /** 队列入口：JSON 载荷 → 任务作用域→ 处理。 */
+    /** 队列入口：JSON 载荷 → 任务作用域→ 处理（默认按终态处理）。 */
     public void handleJson(String payloadJson) {
+        handleJson(payloadJson, true);
+    }
+
+    /**
+     * @param terminal 本次是否是该任务的**最后一次**尝试（队列侧按 {@code attempt > MAX_RETRY} 传入）。
+     *                 与 {@link QuestionGenerationService} 同款契约（K5）：失败且还会重试时**不**递减
+     *                 槽位——否则重试链/重复投递会把槽位扣穿、父知识在富化落库前就提前完成。
+     */
+    public void handleJson(String payloadJson, boolean terminal) {
         ExtractChunkPayload p = ExtractChunkPayload.fromJson(payloadJson);
         try (LangfuseTaskScope scope = LangfuseTaskScope.start(TASK_TYPE_CHUNK_EXTRACT, p.tracing(),
                 Map.of("chunk_id", p.chunkId(), "knowledge_id", p.knowledgeId()),
                 LangfuseTaskScope.previewPayload(payloadJson))) {
-            handle(p);
+            handle(p, terminal);
         }
     }
 
     public void handle(ExtractChunkPayload p) {
+        handle(p, true);
+    }
+
+    /** @param terminal 见 {@link #handleJson(String, boolean)}。 */
+    public void handle(ExtractChunkPayload p, boolean terminal) {
         // 1) supersede 跳过
         if (spanTracker.isAttemptSuperseded(p.knowledgeId(), p.attempt())) {
             log.info("graph extract: attempt {} superseded for {}, skipping stale enrichment",
@@ -139,14 +153,18 @@ public class ChunkExtractService {
 
         Map<String, Object> graphOut = new LinkedHashMap<>();
         String handleErr = null;
+        boolean succeeded = false;
         try {
             handleErr = runExtract(p, graphOut);
+            succeeded = true;
         } catch (RuntimeException e) {
             handleErr = e.getMessage() == null ? e.toString() : e.getMessage();
             throw e;
         } finally {
-            // 3) 终态释放槽位
-            drainSubtask(p.knowledgeId(), "graph_chunk[" + p.chunkIndex() + "]");
+            // 3) 终态释放槽位（K5：成功或最后一次尝试才递减——重试链只释放一次）
+            if (succeeded || terminal) {
+                drainSubtask(p.knowledgeId(), "graph_chunk[" + p.chunkIndex() + "]");
+            }
             // 4) 子 span 收尾
             if (gSpan != null) {
                 if (handleErr != null) {
@@ -173,8 +191,8 @@ public class ChunkExtractService {
 
         Chunk chunk = chunkRepository.getChunkById(p.tenantId(), p.chunkId());
         if (chunk == null) {
-            log.error("failed to get chunk: {}", p.chunkId());
-            return "failed to get chunk: " + p.chunkId();
+            // K5：失败必须抛出——返回字符串会被队列当成成功 ack（既不重试也不按终态释放槽位）
+            throw new IllegalStateException("failed to get chunk: " + p.chunkId());
         }
         // 内容形态：让 trace 回答"这次 LLM 调用看到了什么"
         graphOut.put("chunk_chars", chunk.getContent().codePointCount(0, chunk.getContent().length()));
@@ -182,8 +200,7 @@ public class ChunkExtractService {
 
         KnowledgeBase kb = kbMapper.selectById(chunk.getKnowledgeBaseId());
         if (kb == null) {
-            log.error("failed to get knowledge base: {}", chunk.getKnowledgeBaseId());
-            return "failed to get knowledge base: " + chunk.getKnowledgeBaseId();
+            throw new IllegalStateException("failed to get knowledge base: " + chunk.getKnowledgeBaseId());
         }
 
         JsonNode extractCfg = kb.getExtractConfig();
@@ -197,8 +214,7 @@ public class ChunkExtractService {
         try {
             chatModel = modelRuntimeFactory.getChatModel(p.modelId());
         } catch (RuntimeException e) {
-            log.error("failed to get chat model: {}", e.toString());
-            return "failed to get chat model: " + e.getMessage();
+            throw new IllegalStateException("failed to get chat model: " + e.getMessage(), e);
         }
 
         EntityExtraction.EntityGraph graph;
@@ -206,8 +222,7 @@ public class ChunkExtractService {
             graph = new EntityExtraction.Extractor(chatModel, buildTemplate(extractCfg))
                     .extract(chunk.getContent());
         } catch (RuntimeException e) {
-            log.error("failed to extract entities: {}", e.toString());
-            return "failed to extract entities: " + e.getMessage();
+            throw new IllegalStateException("failed to extract entities: " + e.getMessage(), e);
         }
 
         Chunk again = chunkRepository.getChunkById(p.tenantId(), p.chunkId());
@@ -229,8 +244,7 @@ public class ChunkExtractService {
                     new NameSpace(again.getKnowledgeBaseId(), again.getKnowledgeId()),
                     List.of(new GraphData(nodes, relations)));
         } catch (RuntimeException e) {
-            log.error("failed to add graph: {}", e.toString());
-            return "failed to add graph: " + e.getMessage();
+            throw new IllegalStateException("failed to add graph: " + e.getMessage(), e);
         }
 
         graphOut.put("nodes_added", nodes.size());

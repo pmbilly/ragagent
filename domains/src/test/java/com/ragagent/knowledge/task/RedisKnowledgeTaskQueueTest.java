@@ -85,7 +85,7 @@ class RedisKnowledgeTaskQueueTest {
         doAnswer(inv -> {
             calls.incrementAndGet();
             return null;
-        }).when(service).handleJson(anyString());
+        }).when(service).handleJson(anyString(), anyBoolean());
 
         chunkQueue = new RedisChunkExtractTaskQueue(redis.template(), service);
         chunkQueue.enqueue(chunkPayload());
@@ -103,7 +103,7 @@ class RedisKnowledgeTaskQueueTest {
         doAnswer(inv -> {
             calls.incrementAndGet();
             throw new RuntimeException("boom");
-        }).when(service).handleJson(anyString());
+        }).when(service).handleJson(anyString(), anyBoolean());
 
         chunkQueue = new RedisChunkExtractTaskQueue(redis.template(), service);
         chunkQueue.setRetryDelayOverrideSeconds(0L);
@@ -114,6 +114,33 @@ class RedisKnowledgeTaskQueueTest {
         assertThat(calls.get()).as("预算耗尽后不得再尝试").isEqualTo(4);
         await(() -> redis.template().opsForZSet()
                 .size("knowledge:task:chunk:proc") == 0);
+    }
+
+    @Test
+    void chunkTaskPassesFinalAttemptFlag() throws Exception {
+        List<Boolean> finalFlags = new ArrayList<>();
+        ChunkExtractService service = mock(ChunkExtractService.class);
+        doAnswer(inv -> {
+            synchronized (finalFlags) {
+                finalFlags.add(inv.getArgument(1));
+            }
+            throw new RuntimeException("boom");
+        }).when(service).handleJson(anyString(), anyBoolean());
+
+        chunkQueue = new RedisChunkExtractTaskQueue(redis.template(), service);
+        chunkQueue.setRetryDelayOverrideSeconds(0L);
+        chunkQueue.enqueue(chunkPayload());
+        await(() -> {
+            synchronized (finalFlags) {
+                return finalFlags.size() == 4;
+            }
+        });
+        Thread.sleep(600);
+        synchronized (finalFlags) {
+            assertThat(finalFlags)
+                    .as("K5：前 3 次可重试（terminal=false），第 4 次终态（terminal=true）")
+                    .containsExactly(false, false, false, true);
+        }
     }
 
     @Test
@@ -148,7 +175,7 @@ class RedisKnowledgeTaskQueueTest {
         doAnswer(inv -> {
             calls.incrementAndGet();
             return null;
-        }).when(service).handleJson(anyString());
+        }).when(service).handleJson(anyString(), anyBoolean());
 
         RedisChunkExtractTaskQueue other = new RedisChunkExtractTaskQueue(redis.template(), service);
         chunkQueue = new RedisChunkExtractTaskQueue(redis.template(), service);
@@ -168,7 +195,7 @@ class RedisKnowledgeTaskQueueTest {
         doAnswer(inv -> {
             calls.incrementAndGet();
             return null;
-        }).when(service).handleJson(anyString());
+        }).when(service).handleJson(anyString(), anyBoolean());
 
         chunkQueue = new RedisChunkExtractTaskQueue(redis.template(), service);
         // 手工模拟"另一个实例取走后崩溃"：proc 里一个租约已过期的成员

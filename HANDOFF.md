@@ -521,7 +521,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B243 | 2 | A5：跨线程上下文传播（NORMAL 消费线程 / STOP watcher replay） | ✅ 2026-10-13 |
 | B244 | 2 | A18 状态所有权规则（phase 不回引 runner / 无公共可变运行态字段） | ✅ 2026-10-13 |
 | B245 | 3 任务可靠 | K4：CAS 保护整轮数据（终态写入按尝试守卫 + 失败清场限本代；接管语义保留） | ✅ 2026-10-13 |
-| B246 | 3 | K5：图任务失败/重试/计数同一契约（`finalAttempt` 消费、异常不吞、任务级去重） | ⬜ |
+| B246 | 3 | K5：图任务失败/重试/计数同一契约（`finalAttempt` 消费、异常不吞、任务级去重） | ✅ 2026-10-13 |
 | B247 | 3 | K6：主任务恢复口径统一（**拍板点②**：判据分裂先修；持久化深度待定） | ⬜ |
 | B248 | 4 索引/配置 | K10a：embedding 响应对齐校验（`index` 消费 + 数量/维度校验 + 乱序拒绝） | ⬜ |
 | B249 | 4 | K10b：索引分批政策收敛（worker 与 `ChunkVectorIndexer` 共用执行） | ⬜ |
@@ -708,6 +708,14 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **范围决定（重要，已撤销原计划的"排斥处理中"）**：**重解析的接管语义保留**——Go 合约金片 `kg-reparse-null-config` 期望连点两次第二次 **200**，且实测该行的 processing 状态由进程内 worker 时序决定（改判 400 会让金片随机红）。方案 K4 标题即"CAS 只保护接管、**不保护整轮数据**"⇒ 根治方向是"按尝试划界"而非拒绝接管；本批据此改口径（批次表行已同步）。
 - **登记（后续）**：① **向量行仍是知识粒度**（现有 API 只有 `DeleteByKnowledgeIDList` / `deleteByKnowledgeId`）——接管场景下旧尝试仍可能删掉新尝试刚写的向量行；完整按代隔离需给 chunks 加代次列（`parse_attempt`）或补 chunk 粒度删除 API。② 批量重解析 / 重建索引仍会在处理中 reset（与单条同源，需上面的代次列才能统一）。③ `KnowledgeFileService` 的 `pending_subtasks_count` 归 B246（K5 计数契约）。
 - **验证**：知识操作合约测试（含 6 条 reparse 金片）✓ · 全量 **4934 / 失败 0 / 跳过 4** ✓ · 十一守卫 ✓（含模块代码约定：内联全限定名；大文件棘轮：本文件 871 行 = 基线 847 + 24，仍在 +30 余量内——论证细节在本记录，代码里只留要点）。**本批无新增单测**（worker 无测试基建；改动为守卫与清场范围，已登记）。
+
+**✅ B246（2026-10-13，K5 图任务失败/重试/计数同一契约）**
+- **缺口**（方案 K5）：① `ChunkExtractService` 的 `finally` **每次尝试**都递减槽位（重试链把槽位扣穿 ⇒ 父知识在富化落库前提前完成）；② 两个 chunk-extract 队列**丢弃** `finalAttempt`（只调 1 参 `handleJson`）；③ `runExtract` 把 5 处失败（取块 / 取 KB / 取模型 / 抽取 / 写图）转成**返回字符串** ⇒ 队列当成成功 ack（既不重试也不按终态释放）。**不是"所有失败都重复扣槽"**：常见错误在此之前直接 ack 成功，只有 drain 后再抛异常/重复投递才会二次扣槽——方案此处的克制描述已核实。
+- **修复（对齐仓库既有先例）**：问题生成路径早已实现正确契约（`QuestionGenerationService.handleJson(payload, terminal)` + "成功或终态才递减"）——本批把 chunk-extract **对齐到同一形态**：新增 `handleJson(String, boolean terminal)` / `handle(p, terminal)`（1 参重载默认 `terminal=true` 保兼容）+ `if (succeeded || terminal) drainSubtask(...)`；5 处失败改为**抛出**（`IllegalStateException`，消息原文不变）；两个队列分别传 `finalAttempt` / `attempt > MAX_RETRY`。
+- **契约**：同一任务的重试链**只释放一次**槽位（终态那次）；失败可重试（退避）、预算耗尽才放弃并释放；成功即释放。
+- **测试**：`ChunkExtractServiceTest` +3（未到终态不释放 / 终态释放一次 / 重试链合计一次）；`RedisKnowledgeTaskQueueTest` +1（`chunkTaskPassesFinalAttemptFlag`：terminal 序列 `[false,false,false,true]`，与既有 question 侧同款断言）+ 4 处夹具由 1 参改 2 参（旧夹具把"每次尝试都递减"当契约）。**红态探针**：终态门退化回 `if (true)` ⇒ 两条"未到终态不释放"用例实测失败 ⇒ 还原后绿。
+- **登记（后续）**：真正的**重复投递去重**（同一任务被 Redis 重投两次仍会释放两次）需任务级幂等键（`(knowledgeId, attempt, chunkIndex)` 唯一行 / seen 集）——本批只保证"重试链 + 单次投递"的 exactly-once；`KnowledgeFinalizeAdapter` 的 `count>0` 仍只防负数（其调用时机已由上述契约保证）。
+- **闸门**：`spotlessCheck build` ✓ **1m32s** ✓ · **4938 / 失败 0 / 跳过 4** ✓（+4 = 新测试）· 十一守卫 ✓。
 
 ## 附：文档地图与归档追溯
 
