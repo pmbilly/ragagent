@@ -1,6 +1,7 @@
 package com.ragagent.knowledge.controller;
 
 import com.ragagent.knowledge.support.KnowledgePaths;
+import com.ragagent.knowledge.domain.KnowledgeSearchScope;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -121,10 +122,10 @@ public class KnowledgeOperationsController {
         var scope = APIKeyScopeContext.current();
         if (scope != null && scope.isKnowledgeBaseRestricted()) {
             // 受限 API Key 的搜索范围 = 白名单 KB（本租户）
-            List<KnowledgeSearchService.KnowledgeSearchScope> scopes = new ArrayList<>();
+            List<KnowledgeSearchScope> scopes = new ArrayList<>();
             long tid = KnowledgeRouteGuards.tenantId();
             for (String kbId : scope.knowledgeBaseIds()) {
-                scopes.add(new KnowledgeSearchService.KnowledgeSearchScope(tid, kbId));
+                scopes.add(new KnowledgeSearchScope(tid, kbId));
             }
             outcome = knowledgeService.searchKnowledgeInScopes(scopes, keyword, offset, limit, fileTypes);
         } else {

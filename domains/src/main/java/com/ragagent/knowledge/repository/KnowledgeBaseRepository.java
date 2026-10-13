@@ -25,6 +25,18 @@ public class KnowledgeBaseRepository {
     }
 
     /** 插入新行。 */
+    /**
+     * 同租户 + 未软删的全部 KB（**含临时库、不排序**）。
+     *
+     * <p>与 {@link #listActiveByTenant(long)} 的区别是后者额外排除临时库并按 created_at 倒序；
+     * 检索面要的是"租户下所有库"（B263⑯ 由 {@code KnowledgeSearchService} 的直连搬入）。</p>
+     */
+    public List<KnowledgeBase> listByTenant(long tenantId) {
+        return kbMapper.selectList(new LambdaQueryWrapper<KnowledgeBase>()
+                .eq(KnowledgeBase::getTenantId, tenantId)
+                .isNull(KnowledgeBase::getDeletedAt));
+    }
+
     public void insert(KnowledgeBase kb) {
         kbMapper.insert(kb);
     }

@@ -1,6 +1,11 @@
 package com.ragagent.knowledge.repository;
 
+import java.util.Set;
+import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
+import com.ragagent.knowledge.domain.KnowledgeSearchScope;
+import com.ragagent.common.mybatis.PageRequests;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 
@@ -170,6 +175,104 @@ public class KnowledgeRepository {
                 .eq(Knowledge::getTenantId, tenantId)
                 .in(Knowledge::getId, ids)
                 .isNull(Knowledge::getDeletedAt));
+    }
+
+    /**
+     * 检索主查询（B263⑯ 由 {@code KnowledgeSearchService} 的查询构建整体搬入）。
+     *
+     * <p>语义逐字保留：未软删 + 作用域 OR 组（每对 tenant/kb 一组）+ keyword 对
+     * {@code LOWER(file_name)}/{@code LOWER(title)} LIKE（转义后）+ 文件类型别名模式
+     * （{@code <<url>>} 走 {@code type='url'} 分支）；created_at DESC；取 {@code limit+1} 行用于
+     * 探测 has_more，total 是过滤后的全量计数（由调用方切分）。</p>
+     */
+    public SearchRows searchScopedRows(List<KnowledgeSearchScope> scopes, String keyword,
+                                       List<String> fileTypes, int offset, int limit) {
+        LambdaQueryWrapper<Knowledge> qw = new LambdaQueryWrapper<Knowledge>().isNull(Knowledge::getDeletedAt);
+        qw.and(w -> {
+            for (KnowledgeSearchScope s : scopes) {
+                w.or(i -> i.eq(Knowledge::getTenantId, s.tenantId())
+                        .eq(Knowledge::getKnowledgeBaseId, s.kbId()));
+            }
+        });
+        String kw = keyword == null ? "" : keyword;
+        if (!kw.isEmpty()) {
+            String pat = "%" + escapeLikeKeyword(kw.toLowerCase()) + "%";
+            qw.and(w -> w.apply("LOWER(file_name) LIKE {0}", pat)
+                    .or()
+                    .apply("LOWER(title) LIKE {0}", pat));
+        }
+        List<String> patterns = fileTypePatterns(fileTypes);
+        boolean includeUrl = patterns.remove("<<url>>");
+        if (!patterns.isEmpty() || includeUrl) {
+            qw.and(w -> {
+                for (int i = 0; i < patterns.size(); i++) {
+                    if (i > 0) {
+                        w.or();
+                    }
+                    w.apply("LOWER(file_name) LIKE {0}", patterns.get(i));
+                }
+                if (includeUrl) {
+                    if (!patterns.isEmpty()) {
+                        w.or();
+                    }
+                    w.eq(Knowledge::getType, "url");
+                }
+            });
+        }
+        long total = knowledgeMapper.selectCount(qw);
+        List<Knowledge> rows = knowledgeMapper.selectList(PageRequests.atOffset(offset, (long) limit + 1),
+                qw.orderByDesc(Knowledge::getCreatedAt));
+        return new SearchRows(rows, total);
+    }
+
+    /** 检索查询结果：{@code rows} 含 limit+1 探测行，{@code total} 为过滤后全量计数。 */
+    public record SearchRows(List<Knowledge> rows, long total) {}
+
+    private static String escapeLikeKeyword(String keyword) {
+        return keyword.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
+    }
+
+    private static List<String> fileTypePatterns(List<String> fileTypes) {
+        List<String> patterns = new ArrayList<>();
+        if (fileTypes == null) {
+            return patterns;
+        }
+        Set<String> seen = new HashSet<>();
+        for (String ft : fileTypes) {
+            String f = ft == null ? "" : ft.toLowerCase();
+            while (f.startsWith(".")) {
+                f = f.substring(1);
+            }
+            if ("url".equals(f) || "html".equals(f)) {
+                if (!seen.contains("<<url>>")) {
+                    seen.add("<<url>>");
+                    patterns.add("<<url>>");
+                }
+                continue;
+            }
+            String pat = "%." + f;
+            if (!seen.contains(pat)) {
+                seen.add(pat);
+                patterns.add(pat);
+            }
+            List<String> aliases = switch (f) {
+                case "xlsx" -> List.of("%.xls");
+                case "xls" -> List.of("%.xlsx");
+                case "docx" -> List.of("%.doc");
+                case "doc" -> List.of("%.docx");
+                case "jpg" -> List.of("%.jpeg", "%.png");
+                case "jpeg" -> List.of("%.jpg", "%.png");
+                case "png" -> List.of("%.jpg", "%.jpeg");
+                default -> List.<String>of();
+            };
+            for (String alias : aliases) {
+                if (!seen.contains(alias)) {
+                    seen.add(alias);
+                    patterns.add(alias);
+                }
+            }
+        }
+        return patterns;
     }
 
     /** 插入新行。 */

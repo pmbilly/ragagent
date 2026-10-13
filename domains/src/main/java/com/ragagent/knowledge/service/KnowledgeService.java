@@ -1,6 +1,7 @@
 package com.ragagent.knowledge.service;
 
 import com.ragagent.knowledge.repository.KnowledgeTagRepository;
+import com.ragagent.knowledge.domain.KnowledgeSearchScope;
 
 import com.ragagent.knowledge.repository.ChunkRepository;
 
@@ -660,7 +661,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
     }
 
     public KnowledgeSearchService.SearchOutcome searchKnowledgeInScopes(
-            List<KnowledgeSearchService.KnowledgeSearchScope> scopes, String keyword,
+            List<KnowledgeSearchScope> scopes, String keyword,
             int offset, int limit, List<String> fileTypes) {
         return searchService.searchKnowledgeInScopes(scopes, keyword, offset, limit, fileTypes);
     }
