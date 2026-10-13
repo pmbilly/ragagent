@@ -9,7 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.Semaphore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -20,7 +19,6 @@ import com.ragagent.agent.domain.ToolCall;
 import com.ragagent.agent.domain.ToolCallTarget;
 import com.ragagent.common.llm.ToolResult;
 import com.ragagent.agent.tools.ToolDefinitions;
-import com.ragagent.agent.tools.ExecutionPolicy;
 import com.ragagent.agent.tools.runtime.JsonRepair;
 import com.ragagent.agent.tools.runtime.NormalizeToolCallId;
 import com.ragagent.agent.tools.ToolExecContext;
@@ -202,86 +200,24 @@ final class ActPhase {
     }
 
     /**
-     * 并发执行（读并行、写屏障、并发上限 8）。
+     * 并发执行（读并行、写屏障、并发上限 8、中断取消+等齐——语义都在 {@link ToolBatchExecutor}）。
      * 租户/主体在引擎线程解析成显式值传入虚拟线程——不共享 ThreadLocal。
      */
     private void executeToolCallsParallel(ChatResponse response, AgentStep step, int iteration,
             String sessionId, String assistantMessageID) {
         int round = iteration + 1;
         List<com.ragagent.llm.domain.ToolCall> calls = response.getToolCalls();
-        int n = calls.size();
-        log.info("[Agent][Round-{}] Parallel execution of {} tool calls", round, n);
-
-        ToolCall[] results = new ToolCall[n];
         TenantContextSnapshot tenant = TenantContextSnapshot.capture();
-        int i = 0;
-        while (i < n) {
-            if (!ExecutionPolicy.canRunConcurrently(calls.get(i).getFunction().getName())) {
-                // 突变是屏障：先等之前的读全部落地，突变完成后再开后面的读。
-                results[i] = runToolCall(calls.get(i), i, iteration, round, sessionId,
-                        assistantMessageID, tenant);
-                i++;
-                continue;
-            }
-            int batchStart = i;
-            while (i < n && ExecutionPolicy.canRunConcurrently(calls.get(i).getFunction().getName())) {
-                i++;
-            }
-            int batchSize = i - batchStart;
-            Semaphore permits = new Semaphore(Math.min(8, batchSize));
-            List<Thread> threads = new ArrayList<>(batchSize);
-            for (int k = batchStart; k < i; k++) {
-                final int idx = k;
-                Thread t = Thread.ofVirtual().unstarted(() -> {
-                    tenant.replay();
-                    try {
-                        permits.acquire();
-                        results[idx] = runToolCall(calls.get(idx), idx, iteration, round, sessionId,
-                                assistantMessageID, null);
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        log.warn("[Agent][Round-{}] tool call interrupted", round);
-                        results[idx] = crashedToolCall(calls.get(idx), "tool call interrupted");
-                        // 结果槽不允许留 null：留空会让收集循环 emitToolOutcome(null) NPE
-                    } catch (Throwable fatal) {
-                        // 外围（engine.modelContext 解码/langfuse span/engine.eventBus emit）抛错会让
-                        // 线程死亡、results[idx] 保持 null，收集循环直接 NPE 炸掉整轮。兜底落失败结果。
-                        log.warn("[Agent][Round-{}] tool call crashed: {}", round, fatal.toString());
-                        results[idx] = crashedToolCall(calls.get(idx),
-                                BizException.wireText(fatal));
-                    } finally {
-                        permits.release();
-                        TenantContext.clear();
-                    }
-                });
-                threads.add(t);
-                t.start();
-            }
-            for (Thread t : threads) {
-                try {
-                    t.join();
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            }
-        }
+
+        // 结果按调用序返回（乱序完成也稳定回填）；屏障调用借快照在引擎线程执行。
+        List<ToolCall> results = ToolBatchExecutor.execute(calls, round,
+                tenant, (idx, call, inWorker) -> runToolCall(call, idx, iteration, round, sessionId,
+                        assistantMessageID, inWorker ? null : tenant));
 
         for (ToolCall toolCall : results) {
             step.getToolCalls().add(toolCall);
             emitToolOutcome(toolCall, iteration, sessionId);
         }
-    }
-
-    /** 崩溃/中断的工具调用的失败占位结果（保证结果槽非 null）。 */
-    private static ToolCall crashedToolCall(com.ragagent.llm.domain.ToolCall tc, String error) {
-        ToolCall crashed = new ToolCall();
-        crashed.setId(tc.getId());
-        crashed.setName(tc.getToolName());
-        ToolResult r = new ToolResult();
-        r.setSuccess(false);
-        r.setError(error);
-        crashed.setResult(r);
-        return crashed;
     }
 
     /** 一个完成工具调用的结果/动作事件（所有路径共用）。 */

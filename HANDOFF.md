@@ -528,7 +528,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B250 | 4 索引/配置 | K7：事务外副作用（`KnowledgeFileService` `@Transactional` 内同步重建向量） | ✅ 2026-10-13 |
 | B251 | 4 | K8：配置能力矩阵（parser rules / parent-child 显式拒绝或实现；不静默回落） | ✅ 2026-10-13 |
 | B252 | 5 结构收敛 | K9：跨 store 融合（RRF 按 store 内 rank；context expansion 修正） | ✅ 2026-10-13 |
-| B253 | 5 | A4：并发工具状态提交顺序（`seenChunks` 单一 writer / 按调用序回填） | ⬜ |
+| B253 | 5 | A4：并发工具状态提交顺序（`seenChunks` 单一 writer / 按调用序回填） | ✅ 2026-10-13 |
 | B254 | 5 | controller 剥离编排（`KnowledgeQaController` 14 构造参数、`QaRequestParser` 拆分） | ⬜ |
 | B255 | 5 | 检索中立 `SearchHit`（去上层对 `PgVectorRetrieveRepository` 内部类型依赖） | ⬜ |
 | B256 | 6 包结构 | §10 改名清算：10 组同名歧义 + 3 组域前缀（纯改名） | ⬜ |
@@ -770,6 +770,16 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **对外行为变更（本批未改金片，因无金片覆盖该端点）**：搜索响应现在**会带上下文扩展块**（紧随命中、带 `matchType` 2/4/5）；这正是 `skipContextEnrichment=false` 的既有契约语义。如需"只出不扩展"的旧行为，调用方传 `skipContextEnrichment=true` 即可；若产品要求默认不扩展，改默认值即可（单点）。
 - **闸门**：`spotlessCheck build` ✓ **1m49s** ✓ · **4965 / 失败 0 / 跳过 4** ✓（+9）· 十一守卫 ✓。
 - **登记（未做）**：单一来源多店的**同分跨店**仍按来源顺序（同引擎同分时"店自身顺序"才是权威）；跨引擎刻度可比性（归一化只在混合引擎时发生）属检索质量议题，未在本批动。
+
+**✅ B253（2026-10-13，A4 并发工具状态提交顺序）**
+- **缺口一（白名单与状态自相矛盾）**：`knowledge_search` / `grep_chunks` 在并发读白名单里，但输出带 `already_seen`，依据是工具实例上的**会话级 `seenChunks`**（`KnowledgeSearchTool:256` / `GrepChunksTool:125`，由渲染代码写）⇒ 并发时多线程写同一个**非线程安全** `LinkedHashSet`：① 数据竞争；② 谁算"已见"取决于**完成顺序**而非**调用顺序** ⇒ 同一轮乱序完成得到不同输出。
+- **修复一**：两个有状态读工具**移出并发白名单**（成为执行屏障）——`seenChunks` 由此只有**单一 writer**（渲染永远在引擎线程、按调用序），白名单注释写明"要恢复并发得先把取数与渲染+标记拆两段（渲染交给单 writer 按调用序）"。其余读工具不受影响（`WebFetchTool` 自带锁，`web_search`/`read_file` 等无状态）。
+- **缺口二（中断语义）**：① 子线程 `permits.acquire()` 被中断后仍在 `finally` 里 `release()` ⇒ 许可数虚增、后续批次并发上限被悄悄放宽；② 父线程 `join()` 被中断就**跳过**继续收集结果 ⇒ 子线程还在跑，"本轮收集/下一批启动/下一轮工具写"与它们并发（跨越写屏障）。
+- **修复二**：`ToolBatchExecutor`（**新拆**，见下）里：acquire 成功才 release；父线程中断 ⇒ **先中断全部子线程、再逐个等齐**，恢复中断标志后**按取消收束**（剩余调用不再启动、槽位补 `tool call canceled` 失败占位——结果槽不许留 null）。
+- **结构收益（棘轮要求"拆一刀"）**：并发+屏障+中断语义从 `ActPhase` 抽到 `domains/.../agent/ToolBatchExecutor.java`（164 行）——`ActPhase` **803 → 699 行**（退出 ≥800 登记面、回落到基线以下）；入口只剩"调用执行器 + 结果按调用序回填 + 发事件"三行。
+- **测试**：`ExecutionPolicyStatefulReadTest` 2 例（有状态读工具是屏障 / 无状态读工具仍在白名单）+ `ActPhaseInterruptJoinTest` 1 例（**join 被打断 ⇒ 取消全部子线程 + 等齐后才返回 + 恢复中断标志**；**先红**：白名单测试实测 `knowledge_search` 可并发；中断测试在 helper 缺位时编译红）。
+- **闸门**：`spotlessCheck build` ✓ **1m51s** ✓ · **4968 / 失败 0 / 跳过 4** ✓（+3）· 十一守卫 ✓（棘轮：大文件 ≥800 从 2 个回到 1 个）。
+- **登记（未做）**：① 恢复 `knowledge_search`/`grep_chunks` 并发需要"取数与渲染分离（渲染单 writer 按调用序）"或"同类有序、异类可并行"的批次策略；② 多 query 场景本就可以一次调用传 `queries[]`，故当前串行代价有限。
 
 ## 附：文档地图与归档追溯
 
