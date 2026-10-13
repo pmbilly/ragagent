@@ -30,7 +30,9 @@ import org.springframework.stereotype.Component;
 import com.ragagent.common.error.ErrorCode;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
+import com.ragagent.common.security.SsrfGuard;
 import com.ragagent.common.web.PgJsonTypeHandler;
+import com.ragagent.common.web.UrlBytesFetcher;
 import com.ragagent.knowledge.storage.TenantFileStorage;
 
 /**
@@ -79,6 +81,8 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
     /** A3-3 尾批：租户感知文件存储（本地契约不变；云 provider 租户落对象存储）。 */
     private final TenantFileStorage fileStorage;
     private final KnowledgeProcessingQueue worker;
+    /** SSRF 守卫：同步线程没有 controller 兜底，URL 抓取前必须自己校验。 */
+    private final SsrfGuard ssrfGuard;
     private final boolean postgres;
 
     public MapperKnowledgeBridge(KnowledgeMapper knowledgeMapper,
@@ -86,12 +90,14 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
                                  ChunkMapper chunkMapper,
                                  TenantFileStorage fileStorage,
                                  KnowledgeProcessingQueue worker,
+                                 SsrfGuard ssrfGuard,
                                  DataSource dataSource) {
         this.knowledgeMapper = knowledgeMapper;
         this.kbMapper = kbMapper;
         this.chunkMapper = chunkMapper;
         this.fileStorage = fileStorage;
         this.worker = worker;
+        this.ssrfGuard = ssrfGuard;
         this.postgres = DatabaseDialects.isPostgres(dataSource);
     }
 
@@ -180,34 +186,16 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
                     AppError.notFound("knowledge base not found"));
         }
         String safeName = fileName == null || fileName.isEmpty() ? "untitled" : fileName;
-        String fileType = fileTypeOf(safeName);
-        String hash = LocalStorageService.md5Hex(content);
-
-        // 重复检测：同库同哈希同类型即重复
-        Knowledge dup = knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getKnowledgeBaseId, kbId)
-                .eq(Knowledge::getFileHash, hash)
-                .eq(Knowledge::getFileType, fileType)
-                .isNull(Knowledge::getDeletedAt)
-                .last("LIMIT 1"));
-        if (dup != null) {
-            throw new KnowledgeService.DuplicateKnowledgeException(
-                    dup, ErrorCode.KNOWLEDGE_DUPLICATE_FILE,
-                    "文件已存在（相同内容）");
-        }
-
-        Knowledge k = newKnowledge(tenantId, kb, safeName, fileType, channel);
-        k.setFileSize((long) content.length);
-        k.setFileHash(hash);
-        k.setFilePath(fileStorage.save(tenantId, k.getId(), safeName, content));
-        k.setMetadata(metadataNode(metadata));
-        knowledgeMapper.insert(k);
-        worker.enqueue(k.getId());
-        return k;
+        return insertFileRow(tenantId, kb, content, safeName, safeName, null, metadata, channel);
     }
 
     /**
-     * URL 写入的<b>最小闭环</b>：让知识库自己下载。
+     * URL 写入：**同步抓取后与文件同形**（B238）。
+     *
+     * <p>历史缺口：原实现只写 {@code source=url} + {@code filePath=""} 就入队，指望处理队列
+     * 下载——但 worker 对非 manual 只读 {@code filePath}，空路径必被存储层拒绝（这条链是死的）。
+     * 现在：SSRF 校验 → 抓取（{@link UrlBytesFetcher}，含大小上限）→ 与
+     * {@link #createFromFile} 同一条落行闭环（hash / 落 Storage / 入队），行形态与普通文件一致。</p>
      *
      * <p>⚠️ <b>返回的行没有 datasource 的 metadata</b>——调用方在"新建"
      * 分支上再补一次（重复分支复用已有行，不该被重新打标）。</p>
@@ -220,15 +208,47 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
             throw new BizException(
                     AppError.notFound("knowledge base not found"));
         }
+        byte[] content = UrlBytesFetcher.fetch(url, ssrfGuard::validateURLForSSRF);
         String name = fileName != null && !fileName.isEmpty()
                 ? fileName
                 : extractFileNameFromUrl(url);
-        Knowledge k = newKnowledge(tenantId, kb, title != null && !title.isEmpty() ? title : name,
-                fileTypeOf(name), channel);
-        k.setSource(url);
-        k.setFileName(name);
-        // URL 型文档先不落 Storage：真正的下载/解析由处理队列异步做（见下方 enqueue）
-        k.setFilePath("");
+        String rowTitle = title != null && !title.isEmpty() ? title : name;
+        return insertFileRow(tenantId, kb, content, name, rowTitle, url, null, channel);
+    }
+
+    /**
+     * 文件/URL 共用的落行闭环：重复内容检测 → 落 Storage → 落 knowledges 行 → 交给处理队列。
+     *
+     * @param source URL 型条目写原始 URL；文件型传 {@code null}（不写 source）
+     */
+    private Knowledge insertFileRow(long tenantId, KnowledgeBase kb, byte[] content, String fileName,
+                                    String rowTitle, String source, Map<String, String> metadata,
+                                    String channel) {
+        String fileType = fileTypeOf(fileName);
+        String hash = LocalStorageService.md5Hex(content);
+
+        // 重复检测：同库同哈希同类型即重复
+        Knowledge dup = knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
+                .eq(Knowledge::getKnowledgeBaseId, kb.getId())
+                .eq(Knowledge::getFileHash, hash)
+                .eq(Knowledge::getFileType, fileType)
+                .isNull(Knowledge::getDeletedAt)
+                .last("LIMIT 1"));
+        if (dup != null) {
+            throw new KnowledgeService.DuplicateKnowledgeException(
+                    dup, ErrorCode.KNOWLEDGE_DUPLICATE_FILE,
+                    "文件已存在（相同内容）");
+        }
+
+        Knowledge k = newKnowledge(tenantId, kb, rowTitle, fileType, channel);
+        k.setFileName(fileName);
+        if (source != null) {
+            k.setSource(source);
+        }
+        k.setFileSize((long) content.length);
+        k.setFileHash(hash);
+        k.setFilePath(fileStorage.save(tenantId, k.getId(), fileName, content));
+        k.setMetadata(metadataNode(metadata));
         knowledgeMapper.insert(k);
         worker.enqueue(k.getId());
         return k;

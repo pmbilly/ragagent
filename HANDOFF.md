@@ -513,7 +513,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B235 | — 文档 | HANDOFF 换版 v0.2.0（v0.1.0 全文归档）+ 实施计划展开（阶段 6 明细 + 4 处缺口） | ✅ 2026-10-13 |
 | B236 | 1 | K3：`DocReaderClient` 流错误传播（onError 捕获 + await 超时 + 异步 UNIMPLEMENTED 走 unary） | ✅ 2026-10-13 |
 | B237 | 1 | K1：worker→向量店显式传租户（`KnowledgeVectorWrites` 收 tenantId，消除 ThreadLocal+0L） | ✅ 2026-10-13 |
-| B238 | 1 | K2：URL 摄取统一（**拍板点①**：同步下载 vs worker 下载） | ⬜ |
+| B238 | 1 | K2：URL 摄取统一（**拍板点①**：同步下载 vs worker 下载） | ✅ 2026-10-13（拍板 A：同步下载） |
 | B239 | 2 会话终态 | A1-NORMAL：流错误/超时轮终态一致收口 | ⬜ |
 | B240 | 2 | A1-AGENT：`AgentEngine` finally/COMPLETE 与外层 catch/ERROR 收口 + `FinalizePhase` 失败 outcome | ⬜ |
 | B241 | 2 | A2：全轮一次性提交门（CAS）+ 消息更新失败不启动索引/建议/记忆 | ⬜ |
@@ -645,6 +645,14 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **调用点 9 处（两族）**：异步族（worker ×2）传任务行的 `k.getTenantId()`；同步族（move ×2 / tag / clone / chunk-indexer / faq ×2）传当前租户（`TenantContext.currentTenantId()` 或方法内已有的显式 `tid`）——同步族与旧行为逐字一致，**唯一行为变更点 = worker 线程**。
 - **测试**：新增 `KnowledgeVectorWritesTest` 3 例——真实虚拟线程（无上下文）+ 非零租户绑定 store 解析成功（K1 验收口径）/ 显式传错租户仍被拒（纵深防御不放松）/ 未绑定与 null KB 返 null 且不触碰注册表（回归）。**红态探针**：还原 ThreadLocal+0L 形态 ⇒ 精确 1 红（K1 场景）+ 2 绿 ⇒ 还原复绿。
 - **闸门**：`spotlessCheck build` ✓ **1m57s** ✓ · **4916 / 失败 0 / 跳过 4** ✓（+3 = 新测试）。
+
+**✅ B238（2026-10-13，K2：URL 摄取统一——用户拍板 A：同步下载）**
+- **缺口**（方案 K2）：数据源侧 URL 条目（真实来源 = IMA 连接器的"无扩展名媒体"裸 URL，源码注释明写"交给 ingest 层去抓"）由 `MapperKnowledgeBridge.createFromUrl` 只写 `source=url` + `filePath=""` 就入队，而 worker 对非 manual 只读 filePath ⇒ **空路径必被存储层拒绝（死链）**。
+- **拍板**：A = 同步下载、与文件行同形（2026-10-13 用户定）。理由：知识库侧 URL 导入本就是"同步下载"语义，A 让两侧统一到一份实现；行形态与普通文件一致（worker / K4 的 CAS 与清场无需特判）；失败落同步报告（可观测性好）。B（worker 下载）的唯一优势是同步更快，但 IMA 连接器本来就在同步期下载大多数媒体（口径一致）。
+- **实现**：① 新建 **`common/web/UrlBytesFetcher`**（口径自 `KnowledgeService.fetchUrl` 原样搬入：30s 连接 / 2min 读 / NORMAL 重定向 / 非 2xx 与**超限**文案同文；SSRF 由调用方注入）；② `KnowledgeService.createFromUrl` 改用它（私有 `fetchUrl` 删除、URL 路径的尺寸复检并入组件 ⇒ 同一政策一份实现）；③ `MapperKnowledgeBridge` 注入 `SsrfGuard`，`createFromUrl` = **SSRF 校验 → 抓取 → 与 `createFromFile` 共用 `insertFileRow` 闭环**（hash / 落 Storage / 入队）——URL 与文件自此一行形态。
+- **测试**：新增 `MapperKnowledgeBridgeUrlIngestTest` 3 例（真实 HTTP 回环 + mock 数据面）——URL 落行同形（filePath/hash/size/source/type/parseStatus 全断言）/ SSRF 受限主机抓取前被拒（不落行、不入队）/ `createFromFile` 回归。**红态探针**：还原"URL 行不落文件"形态 ⇒ 精确 1 红 + 2 绿 ⇒ 还原复绿。
+- **守卫连带（棘轮真实生效）**：`KnowledgeService` 830 → **796 行**跌破 800 ⇒ 文件大小守卫 **R-e 触发**（"规模例外 ~830 行"自称过期）⇒ 删自称 + `check-file-size.py --write` 清理失效 exempt；`--write` 顺带刷新 `limits` 历史漂移 29 处（均在 30 行 slack 内，非新增违例）。
+- **闸门**：`spotlessCheck build` ✓ **2m03s** ✓ · **4919 / 失败 0 / 跳过 4** ✓（+3 = 新测试）。
 
 ## 附：文档地图与归档追溯
 

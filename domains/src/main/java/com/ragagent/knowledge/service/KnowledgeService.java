@@ -36,11 +36,7 @@ import com.ragagent.knowledge.dto.kb.KBCloneProgress;
 import com.ragagent.knowledge.dto.doc.KnowledgeMoveProgress;
 import com.ragagent.knowledge.storage.LocalStorageService;
 import com.ragagent.knowledge.storage.TenantFileStorage;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Duration;
+import com.ragagent.common.web.UrlBytesFetcher;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -66,8 +62,8 @@ import java.util.TreeSet;
 @Service
 public class KnowledgeService implements KnowledgeDocumentGateway {
 
-    // 规模例外（~830 行）：文档主链路的门面与共享工具（常量/静态助手/直创建路径），
-    // 已按能力拆出 ProcessWorker/Summary/File/Parse/BatchOps 等专项服务，本类保持聚合面。
+    // 文档主链路的门面与共享工具（常量/静态助手/直创建路径）；
+    // 专项能力已拆出 ProcessWorker/Summary/File/Parse/BatchOps 等协作者，本类保持聚合面。
 
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
@@ -181,16 +177,11 @@ public class KnowledgeService implements KnowledgeDocumentGateway {
         return k;
     }
 
-    /** 拉取 URL 内容按文件入库（SSRF 校验在 controller） */
+    /** 拉取 URL 内容按文件入库（SSRF 在 controller；抓取口径与大小上限见 {@link UrlBytesFetcher}） */
     public Knowledge createFromUrl(String kbId, String url, String fileName, String fileType,
                                    String title, String channel) {
         KnowledgeBase kb = requireKb(kbId);
-        byte[] content = fetchUrl(url);
-        long maxBytes = LocalStorageService.maxFileSizeBytes();
-        if (content.length > maxBytes) {
-            throw new BizException(AppError.badRequest(
-                    String.format("文件大小不能超过%dMB", LocalStorageService.maxFileSizeMb())));
-        }
+        byte[] content = UrlBytesFetcher.fetch(url);
         String hash = LocalStorageService.md5Hex(content);
         Knowledge dup = knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
                 .eq(Knowledge::getKnowledgeBaseId, kbId)
@@ -381,29 +372,6 @@ public class KnowledgeService implements KnowledgeDocumentGateway {
         int slash = path.lastIndexOf('/');
         String name = slash >= 0 ? path.substring(slash + 1) : path;
         return name.isEmpty() ? "download" : name;
-    }
-
-    private static byte[] fetchUrl(String url) {
-        try {
-            HttpClient client = HttpClient.newBuilder()
-                    .followRedirects(HttpClient.Redirect.NORMAL)
-                    .connectTimeout(Duration.ofSeconds(30))
-                    .build();
-            HttpRequest req = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .timeout(Duration.ofMinutes(2))
-                    .GET()
-                    .build();
-            var resp = client.send(req, HttpResponse.BodyHandlers.ofByteArray());
-            if (resp.statusCode() / 100 != 2) {
-                throw new BizException(AppError.badRequest("failed to fetch URL: HTTP " + resp.statusCode()));
-            }
-            return resp.body();
-        } catch (BizException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new BizException(AppError.badRequest("failed to fetch URL: " + e.getMessage()));
-        }
     }
 
     // ── 查询 / 更新 / 删除 ────────────────────────────────────────────────
