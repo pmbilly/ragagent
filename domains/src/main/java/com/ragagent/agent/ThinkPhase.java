@@ -18,6 +18,7 @@ import com.ragagent.event.payload.AgentToolCallData;
 import com.ragagent.event.Event;
 import com.ragagent.event.EventIds;
 import com.ragagent.event.EventType;
+import com.ragagent.llm.ChatStream;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
@@ -76,7 +77,7 @@ final class ThinkPhase {
 
         // Model-context 编码独占 codec 顺序与临时句柄生命周期。
         List<ChatMessage> encoded = engine.modelContext.encodeMessages(messages);
-        java.util.concurrent.BlockingQueue<StreamResponse> stream;
+        ChatStream stream;
         try {
             stream = engine.chatModel.chatStream(encoded, opts);
         } catch (RuntimeException e) {
@@ -97,9 +98,19 @@ final class ThinkPhase {
         AtomicBoolean stalled = new AtomicBoolean(false);
 
         while (true) {
+            // A3：用户取消 ⇒ 停止消费并**关流**（在 finally）——"停止消费"不等于"取消模型"：
+            // 不关会让 provider 连接继续读、并发 permit 继续被占。
+            if (engine.pollCancellation() != null) {
+                log.info("[Agent][Stream] canceled; closing model stream");
+                stream.close();
+                break;
+            }
             StreamResponse chunk = pollChunk(stream, stallTimeout, lastChunkAt, stalled);
             if (chunk == null) {
-                break; // 停顿看门狗触发：流已被"取消"。
+                // 停顿看门狗触发：提前离开消费循环 ⇒ 关流（正常读到 done 时不关，
+                // 那时生产者已自己收尾）。
+                stream.close();
+                break;
             }
             lastChunkAt.set(System.nanoTime());
             chunkCount[0]++;
@@ -217,7 +228,7 @@ final class ThinkPhase {
      * 停顿看门狗语义：超过 stallTimeout 无输出 → 置位 stalled
      * 并结束消费。刻意不限制总时长：流大参数的轮次会连续产出走很久。
      */
-    private StreamResponse pollChunk(java.util.concurrent.BlockingQueue<StreamResponse> stream,
+    private StreamResponse pollChunk(ChatStream stream,
             Duration stallTimeout, AtomicLong lastChunkAt, AtomicBoolean stalled) {
         while (true) {
             long idle = System.nanoTime() - lastChunkAt.get();
@@ -233,6 +244,8 @@ final class ThinkPhase {
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
+                // A3：中断同样属于"提前离开"，关流让上游 provider 调用终止。
+                stream.close();
                 throw new AgentEngineException("context canceled");
             }
             if (chunk == null) {

@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Pattern;
 
 import com.ragagent.chatpipeline.plugin.Plugin;
@@ -20,6 +19,7 @@ import com.ragagent.event.EventHandler;
 import com.ragagent.event.EventJson;
 import com.ragagent.event.EventBusInterface;
 import com.ragagent.llm.LlmChatClient;
+import com.ragagent.llm.chat.QueuedChatStream;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
@@ -428,9 +428,8 @@ final class Rec46cSupport {
         }
 
         @Override
-        public LinkedBlockingQueue<StreamResponse> chatStream(List<ChatMessage> messages,
-                                                              ChatOptions options) {
-            LinkedBlockingQueue<StreamResponse> ch = new LinkedBlockingQueue<>();
+        public QueuedChatStream chatStream(List<ChatMessage> messages, ChatOptions options) {
+            QueuedChatStream ch = new QueuedChatStream(null);
             synchronized (lock) {
                 calls.add(callJson(messages, options));
             }

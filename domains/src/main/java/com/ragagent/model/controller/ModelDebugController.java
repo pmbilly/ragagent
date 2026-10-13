@@ -7,10 +7,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.BlockingQueue;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.llm.ChatStream;
 import com.ragagent.llm.asr.AsrTranscriber;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
@@ -199,7 +199,7 @@ public class ModelDebugController {
         observations.put("thinkingControl", thinkingControl);
         observations.put("thinkingParameterSent", opts.thinking != null && !"none".equals(thinkingControl));
 
-        BlockingQueue<StreamResponse> stream;
+        ChatStream stream;
         try {
             stream = instance.chatStream(messages, chatOpts);
         } catch (RuntimeException e) {
@@ -252,6 +252,9 @@ public class ModelDebugController {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             streamError = "interrupted";
+        } finally {
+            // A3：排空窗口结束 = 不再消费，关流终止上游（调试端点也要守消费者纪律）。
+            stream.close();
         }
         // resp 恒非 null（consume 出错也返回部分结果）
         String reasoning = resp.getReasoningContent() == null ? "" : resp.getReasoningContent();

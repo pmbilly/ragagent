@@ -10,16 +10,15 @@ import static com.ragagent.agent.GoRecording.STR_SUMMARYFORMAT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
 
 import org.junit.jupiter.api.Test;
 
 import com.ragagent.agent.budget.TokenEstimator;
+import com.ragagent.llm.ChatStream;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
-import com.ragagent.llm.domain.StreamResponse;
 import com.ragagent.llm.domain.CacheRetention;
 
 /**
@@ -60,7 +59,7 @@ class CompactorTest {
         }
 
         @Override
-        public BlockingQueue<StreamResponse> chatStream(List<ChatMessage> messages, ChatOptions options) {
+        public ChatStream chatStream(List<ChatMessage> messages, ChatOptions options) {
             return null;
         }
 

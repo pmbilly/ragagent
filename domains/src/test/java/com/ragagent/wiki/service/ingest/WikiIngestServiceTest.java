@@ -12,7 +12,6 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -25,11 +24,11 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.context.TenantContext;
+import com.ragagent.llm.ChatStream;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
-import com.ragagent.llm.domain.StreamResponse;
 import com.ragagent.wiki.domain.TaskPendingOp;
 import com.ragagent.wiki.repository.TaskPendingOpsRepository;
 import com.ragagent.wiki.prompt.WikiPrompts;
@@ -98,7 +97,7 @@ class WikiIngestServiceTest {
         }
 
         @Override
-        public BlockingQueue<StreamResponse> chatStream(List<ChatMessage> messages, ChatOptions options) {
+        public ChatStream chatStream(List<ChatMessage> messages, ChatOptions options) {
             return null;
         }
 
@@ -134,7 +133,7 @@ class WikiIngestServiceTest {
         }
 
         @Override
-        public BlockingQueue<StreamResponse> chatStream(List<ChatMessage> messages, ChatOptions options) {
+        public ChatStream chatStream(List<ChatMessage> messages, ChatOptions options) {
             return null;
         }
 

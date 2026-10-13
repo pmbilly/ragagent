@@ -16,7 +16,6 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.BlockingQueue;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.retrieval.graph.RetrieveGraphRepository;
@@ -26,11 +25,11 @@ import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
+import com.ragagent.llm.ChatStream;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
-import com.ragagent.llm.domain.StreamResponse;
 import com.ragagent.model.service.ModelRuntimeFactory;
 import com.ragagent.common.wiki.WikiFinalizePort;
 import org.junit.jupiter.api.BeforeEach;
@@ -82,7 +81,7 @@ class ChunkExtractServiceTest {
             }
 
             @Override
-            public BlockingQueue<StreamResponse> chatStream(List<ChatMessage> messages,
+            public ChatStream chatStream(List<ChatMessage> messages,
                                                             ChatOptions options) {
                 throw new UnsupportedOperationException();
             }

@@ -17,7 +17,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+
+import com.ragagent.llm.ChatStream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.llm.LlmChatClient;
@@ -173,7 +174,7 @@ public class AnthropicChat implements LlmChatClient {
      * 再返回由虚拟线程填充的响应队列。队列以 done=true 的元素收尾。
      */
     @Override
-    public BlockingQueue<StreamResponse> chatStream(List<ChatMessage> messages, ChatOptions options) {
+    public ChatStream chatStream(List<ChatMessage> messages, ChatOptions options) {
         AnthropicRequest request = buildRequest(messages, options);
         request.setStream(true);
         byte[] jsonData = serialize(request);
@@ -199,8 +200,15 @@ public class AnthropicChat implements LlmChatClient {
                     + ": " + new String(body, StandardCharsets.UTF_8));
         }
 
-        BlockingQueue<StreamResponse> streamQueue = new LinkedBlockingQueue<>();
         InputStream streamBody = resp.body();
+        // A3：句柄可关闭——关闭即关连接（读取循环立刻退出），取消不必再等 provider 自己收尾。
+        QueuedChatStream streamQueue = new QueuedChatStream(() -> {
+            try {
+                streamBody.close();
+            } catch (IOException e) {
+                log.debug("[anthropic-stream] close body failed: {}", e.toString());
+            }
+        });
         String model = modelName;
         Thread.ofVirtual().name("anthropic-chat-stream").start(() -> {
             try (streamBody) {

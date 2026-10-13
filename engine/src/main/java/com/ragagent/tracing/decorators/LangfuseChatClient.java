@@ -7,9 +7,11 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+
+import com.ragagent.llm.ChatStream;
+import com.ragagent.llm.chat.QueuedChatStream;
 
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
@@ -80,7 +82,7 @@ public final class LangfuseChatClient implements LlmChatClient {
     }
 
     @Override
-    public BlockingQueue<StreamResponse> chatStream(List<ChatMessage> messages, ChatOptions options) {
+    public ChatStream chatStream(List<ChatMessage> messages, ChatOptions options) {
         LangfuseManager manager = LangfuseManager.get();
         if (!manager.enabled()) {
             return inner.chatStream(messages, options);
@@ -90,7 +92,7 @@ public final class LangfuseChatClient implements LlmChatClient {
                 buildChatMetadata(inner.getModelId(), true, options),
                 buildModelParams(options)));
 
-        BlockingQueue<StreamResponse> innerQueue;
+        ChatStream innerQueue;
         try {
             innerQueue = inner.chatStream(messages, options);
         } catch (RuntimeException e) {
@@ -104,8 +106,17 @@ public final class LangfuseChatClient implements LlmChatClient {
 
         // 转发线程：累积 content/reasoning/usage/
         // tool_calls/finish_reason，首 token 到达时调 markCompletionStart，流结束收 generation。
-        BlockingQueue<StreamResponse> wrapped = new LinkedBlockingQueue<>();
-        Thread.ofVirtual().name("langfuse-chat-stream").start(() -> {
+        // A3：句柄可关闭——关闭即中断转发线程（generation 在它的 finally 收尾）并向上游
+        // 传播关闭；重新投终态帧解阻塞，消费者不必再靠"无界队列里的堆积"感知放弃。
+        AtomicReference<Thread> forwarderRef = new AtomicReference<>();
+        QueuedChatStream wrapped = new QueuedChatStream(() -> {
+            Thread forwarder = forwarderRef.get();
+            if (forwarder != null) {
+                forwarder.interrupt();
+            }
+            innerQueue.close();
+        });
+        forwarderRef.set(Thread.ofVirtual().name("langfuse-chat-stream").start(() -> {
             StringBuilder content = new StringBuilder();
             StringBuilder reasoning = new StringBuilder();
             com.ragagent.common.llm.TokenUsage usage = null;
@@ -115,6 +126,9 @@ public final class LangfuseChatClient implements LlmChatClient {
             boolean terminalSeen = false;
             try {
                 while (true) {
+                    if (wrapped.isClosed()) {
+                        break; // 消费者已关流：generation 交给 finally 收
+                    }
                     StreamResponse resp;
                     try {
                         // 终态之后仍可能有尾随分片（用量常在独立 chunk 里到达），
@@ -170,7 +184,7 @@ public final class LangfuseChatClient implements LlmChatClient {
                 gen.finish(buildGenerationOutput(content.toString(), reasoning.toString(),
                         finishReason, toolCalls), LangfusePayloads.convertUsage(usage), null);
             }
-        });
+        }));
         return wrapped;
     }
 

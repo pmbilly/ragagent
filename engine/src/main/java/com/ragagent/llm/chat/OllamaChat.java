@@ -6,7 +6,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicReference;
+
+import com.ragagent.llm.ChatStream;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -137,15 +139,22 @@ public class OllamaChat implements LlmChatClient {
      * 之后由虚拟线程把块推进队列，出错时补一个 ERROR + done=true。
      */
     @Override
-    public BlockingQueue<StreamResponse> chatStream(List<ChatMessage> messages, ChatOptions opts) {
+    public ChatStream chatStream(List<ChatMessage> messages, ChatOptions opts) {
         ensureModelAvailable();
 
         OllamaChatRequest chatReq = buildChatRequest(messages, opts, true);
         log.info("发送流式聊天请求到模型 {}", modelName);
 
-        BlockingQueue<StreamResponse> streamQueue = new LinkedBlockingQueue<>();
-
-        Thread.ofVirtual().name("ollama-chat-stream").start(() -> {
+        // A3：句柄可关闭——关闭即中断生产线程（回调里的 isInterrupted() 检查会提前退出，
+        // 阻塞中的 put 也会立刻解除），消费者取消不再只能靠"线程被中断"这条隐性约定。
+        AtomicReference<Thread> producerRef = new AtomicReference<>();
+        QueuedChatStream streamQueue = new QueuedChatStream(() -> {
+            Thread producer = producerRef.get();
+            if (producer != null) {
+                producer.interrupt();
+            }
+        });
+        producerRef.set(Thread.ofVirtual().name("ollama-chat-stream").start(() -> {
             // thinking 的记账跨回调实例存活（"还欠一个 thinking-done"）
             ThinkingEmitter thinking = new ThinkingEmitter();
             try {
@@ -220,7 +229,7 @@ public class OllamaChat implements LlmChatClient {
                 log.error("流式聊天请求失败: {}", e.toString());
                 put(streamQueue, StreamResponse.of(ResponseType.ERROR, e.getMessage(), true));
             }
-        });
+        }));
 
         return streamQueue;
     }

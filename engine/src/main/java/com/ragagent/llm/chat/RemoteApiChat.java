@@ -10,13 +10,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.common.error.BizException;
+import com.ragagent.llm.ChatStream;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.CacheRetention;
 import com.ragagent.llm.domain.ChatConfig;
@@ -337,7 +337,7 @@ public class RemoteApiChat implements LlmChatClient {
     // ------------------------------------------------------------------
 
     @Override
-    public BlockingQueue<StreamResponse> chatStream(List<ChatMessage> messages, ChatOptions opts) {
+    public ChatStream chatStream(List<ChatMessage> messages, ChatOptions opts) {
         return chatStream(messages, opts, null, null);
     }
 
@@ -347,8 +347,8 @@ public class RemoteApiChat implements LlmChatClient {
      *
      * <p>消费者以 {@code done=true} 的元素作为流结束标记（队列不关闭）。</p>
      */
-    public BlockingQueue<StreamResponse> chatStream(List<ChatMessage> messages, ChatOptions opts,
-                                                    Instant callerDeadline, String sessionId) {
+    public ChatStream chatStream(List<ChatMessage> messages, ChatOptions opts,
+                                 Instant callerDeadline, String sessionId) {
         Duration timeout = LlmTransport.withLlmTimeout(callerDeadline, LlmTransport.DEFAULT_STREAM_TIMEOUT);
 
         Outbound out = buildOutbound(messages, opts, true, sessionId);
@@ -370,12 +370,23 @@ public class RemoteApiChat implements LlmChatClient {
             }
         }
 
-        BlockingQueue<StreamResponse> streamChan = new LinkedBlockingQueue<>();
         InputStream body = resp.body();
+        // A3：返回带 close 的句柄——关闭时把 provider 连接关掉，读取循环随之中止
+        // （"停止消费"不再等于"模型继续跑"）。
+        QueuedChatStream streamChan = new QueuedChatStream(() -> closeBodyQuietly(body));
         boolean rawPath = out.rawPath();
         Thread.ofVirtual().name("llm-stream-" + modelName)
                 .start(() -> processRawHttpStream(body, streamChan, rawPath));
         return streamChan;
+    }
+
+    /** 关连接是尽力而为：关失败只记日志（流已在取消/收尾路径上）。 */
+    private void closeBodyQuietly(InputStream body) {
+        try {
+            body.close();
+        } catch (IOException e) {
+            log.debug("[LLM Stream] close body failed for model={}: {}", modelName, e.toString());
+        }
     }
 
     /** 薄委托：SSE 消费循环见 {@link RemoteApiStreamOps#processRawHttpStream}。 */

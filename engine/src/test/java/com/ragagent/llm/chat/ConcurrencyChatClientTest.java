@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import com.ragagent.llm.LlmChatClient;
@@ -15,6 +14,7 @@ import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
 import com.ragagent.common.llm.ResponseType;
+import com.ragagent.llm.ChatStream;
 import com.ragagent.llm.domain.StreamResponse;
 import com.ragagent.llm.limiter.BackgroundTaskContext;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
@@ -40,6 +40,8 @@ class ConcurrencyChatClientTest {
     private static class FakeChat implements LlmChatClient {
         private final String id;
         private final boolean streamForever;
+        /** 上游被关（A3：close 必须传播到 provider 侧）。 */
+        final CountDownLatch aborted = new CountDownLatch(1);
 
         FakeChat(String id, boolean streamForever) {
             this.id = id;
@@ -52,8 +54,8 @@ class ConcurrencyChatClientTest {
         }
 
         @Override
-        public BlockingQueue<StreamResponse> chatStream(List<ChatMessage> messages, ChatOptions options) {
-            BlockingQueue<StreamResponse> q = new LinkedBlockingQueue<>();
+        public ChatStream chatStream(List<ChatMessage> messages, ChatOptions options) {
+            QueuedChatStream q = new QueuedChatStream(aborted::countDown);
             Thread.ofVirtual().start(() -> {
                 try {
                     if (streamForever) {
@@ -130,5 +132,33 @@ class ConcurrencyChatClientTest {
         // 放弃：不再读取 out。转发线程应在放弃阈值后释放槽位并排干内层队列
         assertTrue(acquired.await(15, TimeUnit.SECONDS),
                 "流槽位泄漏：消费者放弃后未释放");
+    }
+
+    /**
+     * A3：句柄 {@code close()} 后槽位**立即**归还（不等放弃阈值），且关闭传播到上游。
+     */
+    @Test
+    void closeReleasesSlotImmediatelyAndAbortsUpstream() throws Exception {
+        // 记录型 limiter：直接观察 permit 归还时机，避免真实信号量 + 线程调度引起的假红。
+        CountDownLatch permitReleased = new CountDownLatch(1);
+        ConcurrencyGovernor governor = new ConcurrencyGovernor();
+        governor.setGovernor((key, limit) -> permitReleased::countDown, 1);
+        FakeChat inner = new FakeChat("model-z", true);
+        // 放弃阈值刻意设大：归还必须来自 close，而不是"猜消费者已走"的超时兜底
+        ConcurrencyChatClient w = new ConcurrencyChatClient(inner, 0, governor, 60);
+
+        ChatStream out;
+        try (BackgroundTaskContext.Scope ignored = BackgroundTaskContext.mark()) {
+            out = w.chatStream(List.of(), new ChatOptions());
+        }
+        assertTrue(out.poll(5, TimeUnit.SECONDS) != null, "应能取到第一块");
+
+        out.close();
+
+        // 阈值 60s：15s 内归还即可判定"来自 close 而非超时兜底"。
+        assertTrue(permitReleased.await(15, TimeUnit.SECONDS),
+                "close 后槽位必须立即归还（否则要等 60s 放弃阈值）");
+        assertTrue(inner.aborted.await(15, TimeUnit.SECONDS), "close 必须传播到上游 provider 侧");
+        assertTrue(out.isClosed(), "句柄状态可查（幂等 close 的依据）");
     }
 }

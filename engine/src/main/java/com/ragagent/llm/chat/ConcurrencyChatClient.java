@@ -3,7 +3,9 @@ package com.ragagent.llm.chat;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
+import com.ragagent.llm.ChatStream;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
@@ -86,9 +88,9 @@ public class ConcurrencyChatClient implements LlmChatClient {
     }
 
     @Override
-    public BlockingQueue<StreamResponse> chatStream(List<ChatMessage> messages, ChatOptions options) {
+    public ChatStream chatStream(List<ChatMessage> messages, ChatOptions options) {
         Release release = gate();
-        BlockingQueue<StreamResponse> inner;
+        ChatStream inner;
         try {
             inner = delegate.chatStream(messages, options);
         } catch (RuntimeException e) {
@@ -105,11 +107,24 @@ public class ConcurrencyChatClient implements LlmChatClient {
         //
         // out 必须是 SynchronousQueue（无缓冲语义）：有界队列会让 offer
         // 在消费者不读时仍然成功，放弃检测就永远不触发。
-        BlockingQueue<StreamResponse> out = new java.util.concurrent.SynchronousQueue<>();
-        Thread.ofVirtual().name("llm-concurrency-" + delegate.getModelId()).start(() -> {
+        //
+        // A3：句柄可关闭——关闭即中断转发线程（permit 在它的 finally 归还）并向上游
+        // 传播关闭（让 provider 连接真停），不再靠 120s 放弃阈值猜"消费者已走"。
+        AtomicReference<Thread> forwarderRef = new AtomicReference<>();
+        SyncChatStream out = new SyncChatStream(() -> {
+            Thread forwarder = forwarderRef.get();
+            if (forwarder != null) {
+                forwarder.interrupt();
+            }
+            inner.close();
+        });
+        forwarderRef.set(Thread.ofVirtual().name("llm-concurrency-" + delegate.getModelId()).start(() -> {
             boolean released = false;
             try {
                 for (;;) {
+                    if (out.isClosed()) {
+                        return; // 消费者已关流：permit 交给 finally 归还
+                    }
                     StreamResponse resp = inner.take();
                     boolean accepted;
                     try {
@@ -146,7 +161,7 @@ public class ConcurrencyChatClient implements LlmChatClient {
                     release.close();
                 }
             }
-        });
+        }));
         return out;
     }
 

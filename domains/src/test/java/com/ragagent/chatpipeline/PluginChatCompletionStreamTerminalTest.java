@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.DisplayName;
@@ -15,6 +14,8 @@ import com.ragagent.common.llm.ResponseType;
 import com.ragagent.event.Event;
 import com.ragagent.event.EventType;
 import com.ragagent.event.payload.AgentFinalAnswerData;
+import com.ragagent.llm.ChatStream;
+import com.ragagent.llm.chat.QueuedChatStream;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
@@ -101,9 +102,9 @@ class PluginChatCompletionStreamTerminalTest {
         }
 
         @Override
-        public LinkedBlockingQueue<StreamResponse> chatStream(List<ChatMessage> messages,
+        public ChatStream chatStream(List<ChatMessage> messages,
                                                               ChatOptions options) {
-            return new LinkedBlockingQueue<>() {
+            return new QueuedChatStream(null) {
                 @Override
                 public StreamResponse poll(long timeout, TimeUnit unit) {
                     return null;

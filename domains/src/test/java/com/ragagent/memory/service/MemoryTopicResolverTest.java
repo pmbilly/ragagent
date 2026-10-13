@@ -7,13 +7,12 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
 
+import com.ragagent.llm.ChatStream;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
-import com.ragagent.llm.domain.StreamResponse;
 import com.ragagent.common.memory.MemoryKeys;
 import com.ragagent.memory.domain.MemoryTopicStat;
 import com.ragagent.memory.repository.MemoryRepository;
@@ -240,7 +239,7 @@ class MemoryTopicResolverTest {
         }
 
         @Override
-        public BlockingQueue<StreamResponse> chatStream(List<ChatMessage> messages, ChatOptions options) {
+        public ChatStream chatStream(List<ChatMessage> messages, ChatOptions options) {
             throw new UnsupportedOperationException();
         }
 

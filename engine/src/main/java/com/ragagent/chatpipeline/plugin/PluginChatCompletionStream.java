@@ -3,7 +3,6 @@ package com.ragagent.chatpipeline.plugin;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -19,6 +18,7 @@ import com.ragagent.event.EventType;
 import com.ragagent.event.payload.AgentFinalAnswerData;
 import com.ragagent.event.payload.AgentThoughtData;
 import com.ragagent.event.payload.ErrorData;
+import com.ragagent.llm.ChatStream;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.common.llm.ResponseType;
@@ -39,10 +39,12 @@ import com.ragagent.modelcontext.Registry;
  *       done=true 后后续 ANSWER 重复完成被丢弃（complete 之后不得再出答案）。</li>
  * </ul>
  *
- * <p>流终止约定：BlockingQueue 无关闭语义——消费在
- * 「done=true 且非 THINKING」的元素处理完处收束（生产者的终态元素恒
+ * <p>流终止约定：消费在「done=true 且非 THINKING」的元素处理完处收束（生产者的终态元素恒
  * ANSWER/ERROR+done；THINKING+done 是生产者中途补的 thinking-done 标记，其后仍有
  * 分片，须继续消费）。收束路径 flushDecoders + closeThinking（悬挂句柄尾巴不能丢）。</p>
+ *
+ * <p>提前离开（120s 无新 chunk / 中断）时 {@code close()} 句柄——A3：不关会让 provider
+ * 连接继续读、并发 permit 继续被占。</p>
  */
 public final class PluginChatCompletionStream implements Plugin {
 
@@ -99,7 +101,7 @@ public final class PluginChatCompletionStream implements Plugin {
         PipelineLog.info("Stream", "eventbus_ready", er);
 
         // 建流（建立失败立即抛错）
-        BlockingQueue<StreamResponse> responseQueue;
+        ChatStream responseQueue;
         Map<String, Object> mc = new LinkedHashMap<>();
         mc.put("chat_model", chatManage.getChatModelId());
         PipelineLog.info("Stream", "model_call", mc);
@@ -126,7 +128,7 @@ public final class PluginChatCompletionStream implements Plugin {
 
         // 消费线程（虚拟线程）
         final ChatManage cm = chatManage;
-        final BlockingQueue<StreamResponse> queue = responseQueue;
+        final ChatStream queue = responseQueue;
         final Registry modelContext = assembly.registry();
         Thread.ofVirtual().start(() -> consumeStream(cm, eventBus, modelContext, queue));
 
@@ -136,7 +138,7 @@ public final class PluginChatCompletionStream implements Plugin {
     /** 流消费循环（独立虚拟线程上执行）。 */
     private static void consumeStream(ChatManage chatManage, EventBusInterface eventBus,
                                       Registry modelContext,
-                                      BlockingQueue<StreamResponse> responseQueue) {
+                                      ChatStream responseQueue) {
         StreamDecoder answerDecoder = modelContext.streamDecoder();
         StreamDecoder thinkingDecoder = modelContext.streamDecoder();
         String thinkingID = String.format("%s-thinking", UUID.randomUUID().toString().substring(0, 8));
@@ -150,6 +152,9 @@ public final class PluginChatCompletionStream implements Plugin {
                 // 队列结束（生产者关闭 / 120s 无新 chunk / 线程中断）：收束。
                 // 终态帧必须补：轮侧只认「答案 done」完成消息并发 COMPLETE，缺了它
                 // assistant 会停在未完成、SSE 永远轮询（A1：超时与断流路径实测如此）。
+                //
+                // A3：这是"提前离开"（不是读到终态）⇒ 关流，让 provider 调用与 permit 一起停。
+                responseQueue.close();
                 endStream(eventBus, chatManage, thinkingID, answerID,
                         thinkingDecoder, answerDecoder, thinkingOpen, answerCompleted);
                 Map<String, Object> f = new LinkedHashMap<>();
@@ -283,7 +288,7 @@ public final class PluginChatCompletionStream implements Plugin {
     }
 
     /** 阻塞取队列元素（2 分钟无新 chunk 视为收束）。 */
-    private static StreamResponse takeQuietly(BlockingQueue<StreamResponse> queue) {
+    private static StreamResponse takeQuietly(ChatStream queue) {
         try {
             return queue.poll(120, TimeUnit.SECONDS);
         } catch (InterruptedException e) {

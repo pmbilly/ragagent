@@ -3,7 +3,6 @@ package com.ragagent.agent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -14,7 +13,9 @@ import com.ragagent.agent.tools.ToolRegistry;
 import com.ragagent.event.EventBus;
 import com.ragagent.event.EventJson;
 import com.ragagent.event.EventType;
+import com.ragagent.llm.ChatStream;
 import com.ragagent.llm.LlmChatClient;
+import com.ragagent.llm.chat.QueuedChatStream;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
@@ -160,8 +161,7 @@ final class Engine46bStubSupport {
         }
 
         @Override
-        public java.util.concurrent.BlockingQueue<StreamResponse> chatStream(
-                List<ChatMessage> messages, ChatOptions options) {
+        public ChatStream chatStream(List<ChatMessage> messages, ChatOptions options) {
             if (callCount >= responses.size()) {
                 throw new AgentEngineException("unexpected ChatStream call #" + callCount
                         + " (only " + responses.size() + " responses prepared)");
@@ -177,7 +177,7 @@ final class Engine46bStubSupport {
             callJson.add(mask(sb.toString()));
             opts.add(options);
             callCount++;
-            LinkedBlockingQueue<StreamResponse> queue = new LinkedBlockingQueue<>();
+            QueuedChatStream queue = new QueuedChatStream(null);
             queue.addAll(responses.get(callCount - 1));
             return queue;
         }

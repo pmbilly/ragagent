@@ -517,7 +517,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B239 | 2 会话终态 | A1-NORMAL：流错误/超时轮终态一致收口 | ✅ 2026-10-13（建流前失败兜底→登记待办） |
 | B240 | 2 | A1-AGENT：`AgentEngine` finally/COMPLETE 与外层 catch/ERROR 收口 + `FinalizePhase` 失败 outcome | ✅ 2026-10-13 |
 | B241 | 2 | A2：全轮一次性提交门（CAS）+ 消息更新失败不启动索引/建议/记忆 | ✅ 2026-10-13 |
-| B242 | 2 | A3：可关闭模型流（句柄 + `ThinkPhase` 取消 probe + 装饰器队列关闭语义） | ⬜ |
+| B242 | 2 | A3：可关闭模型流（句柄 + `ThinkPhase` 取消 probe + 装饰器队列关闭语义） | ✅ 2026-10-13 |
 | B243 | 2 | A5：跨线程上下文传播（NORMAL 消费线程 / STOP watcher replay） | ⬜ |
 | B244 | 2 | A18 状态所有权规则（phase 不回引 runner / 无公共可变运行态字段） | ⬜ |
 | B245 | 3 任务可靠 | K4：CAS 保护整轮数据（失败清场限本代；`KnowledgeParseService` 排斥处理中） | ⬜ |
@@ -675,6 +675,16 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **测试**：`QaTurnFinalizerCommitGateTest` 2 例——双收尾下游只跑一次（**先红证据**：修复前索引实测 **2 次**）/ 提交失败短路（先红：修复前下游仍被调用）；`MessageRepositoryTest` 增 1 例真实 SQL——首次 `completeOnce` true、再次 false、输家不覆盖、富列与 `update` 同形落库。
 - **语义**（已写进注释）：CAS 门只管**下游** exactly-once；行写入保持幂等 last-writer-wins（同一 `Message` 实例，后到的内存态可能更全——STOP 之后桥可能又补最终答案），故输家仍补一次落库。
 - **闸门**：`spotlessCheck build` ✓ **1m43s** ✓ · **4927 / 失败 0 / 跳过 4** ✓（+3 = 新测试）。
+
+**✅ B242（2026-10-13，A3 可关闭模型流）**
+- **缺口**（方案 A3）：流接口只返回 `BlockingQueue`——"停止消费"≠"取消模型"：用户取消后上游仍读 SSE、并发 permit 继续被占（只能等 120s 放弃阈值靠猜释放）；`ThinkPhase` 的 poll 不读用户取消 probe；langfuse 用无界队列，消费者放弃无从感知。
+- **A3 句柄**：新增 `ChatStream extends BlockingQueue<StreamResponse>`（`close()` / `isClosed()`），`LlmChatClient.chatStream` 改返句柄；契约写进接口注释：① 终止上游 ② 释放挂载资源（permit / 转发线程 / 观测收尾）③ **解阻塞**（补终态帧，消费者不再靠超时）④ 幂等。实现：`QueuedChatStream`（无界）+ `SyncChatStream`（无缓冲，保住放弃检测语义）+ `StreamLifecycle`（close-once；关流钩子异常不穿透）。
+- **四家 provider**：`RemoteApiChat` / `AnthropicChat` 关闭即关 provider 连接（读取循环随之中止）；`OllamaChat` 关闭即中断生产线程（回调的 `isInterrupted()` 检查生效、阻塞 `put` 解除）；两个装饰器：`ConcurrencyChatClient`（关闭 ⇒ 中断转发 ⇒ permit 在 finally 归还 + 向上游传播，不再等 120s）、`LangfuseChatClient`（关闭 ⇒ 中断转发 ⇒ generation 在 finally 收尾 + 向上游传播）。
+- **消费者纪律接线**：`ThinkPhase`（poll 前置用户取消 probe；取消 / 停顿 / 中断三条提前离开路径 close）、`PluginChatCompletionStream`（120s 无 chunk 的收束路径 close）、`SessionQaFallback`（提前收束 close）、`ModelDebugController`（排空窗口结束 close）。正常读到 done **不关**（生产者已自己收尾；关会中断 langfuse 尾窗的 usage 收集）。
+- **测试**：`ConcurrencyChatClientTest.closeReleasesSlotImmediatelyAndAbortsUpstream`——记录型 limiter 直读 permit 归还时机（60s 放弃阈值 vs 15s 内归还，判别力明确）+ 关闭传播到上游 + `isClosed()`。**红态探针**：注释掉 `forwarder.interrupt()` ⇒ 该测试实测失败（归还落回 60s 超时兜底）⇒ 还原后绿。
+- **适配面**：接口改返句柄波及 4 家 provider + 2 个装饰器 + 8 个测试桩（机械适配为 `ChatStream`/`QueuedChatStream`）。
+- **闸门**：`spotlessCheck build` ✓ **1m55s** ✓（含 javadoc 任务：修掉 2 处类型变更导致的失效引用）· **4928 / 失败 0 / 跳过 4** ✓（+1 = 新测试）· 十一守卫 ✓。
+- **残留（登记）**：① **建立连接阶段**的取消仍由 transport deadline 约束（建流调用同步返回前无法响应 probe，与方案 §A3 第 2 条同源）——留待 A3 后续或 B243 上下文批次一并评估；② `OllamaChat` 的上游中止依赖既有"线程中断"约定（第三方库若不响应中断，中止弱于 HTTP provider）。
 
 ## 附：文档地图与归档追溯
 

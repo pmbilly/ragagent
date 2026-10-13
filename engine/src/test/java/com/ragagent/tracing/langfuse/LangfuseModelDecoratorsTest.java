@@ -13,11 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import com.ragagent.embedding.Embedder;
+import com.ragagent.llm.ChatStream;
 import com.ragagent.llm.LlmChatClient;
+import com.ragagent.llm.chat.QueuedChatStream;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
@@ -310,9 +311,9 @@ class LangfuseModelDecoratorsTest {
         }
 
         @Override
-        public BlockingQueue<StreamResponse> chatStream(List<ChatMessage> messages,
-                                                        ChatOptions options) {
-            BlockingQueue<StreamResponse> queue = new LinkedBlockingQueue<>(streamChunks);
+        public ChatStream chatStream(List<ChatMessage> messages, ChatOptions options) {
+            QueuedChatStream queue = new QueuedChatStream(null);
+            queue.addAll(streamChunks);
             return queue;
         }
 

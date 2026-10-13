@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ragagent.chatpipeline.ChatManage;
 import com.ragagent.event.EventBusInterface;
+import com.ragagent.llm.ChatStream;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
@@ -83,7 +84,7 @@ final class SessionQaFallback {
         opt.setMaxCompletionTokens(chatManage.getSummaryConfig().getMaxCompletionTokens());
         opt.setThinking(Boolean.FALSE);
         var prepared = prepareFallbackMessages(chatManage, promptContent);
-        java.util.concurrent.BlockingQueue<StreamResponse> responseQueue;
+        ChatStream responseQueue;
         try {
             responseQueue = chatModel.chatStream(prepared.messages(), opt);
         } catch (RuntimeException e) {
@@ -232,7 +233,7 @@ final class SessionQaFallback {
 
     /** 消费 fallback 流。 */
     void consumeFallbackStream(ChatManage chatManage,
-            java.util.concurrent.BlockingQueue<StreamResponse> responseChan, Registry modelContext) {
+            ChatStream responseChan, Registry modelContext) {
         String fallbackId = EventIds.generateEventID("fallback");
         EventBusInterface eventBus = chatManage.getEventBus();
         StringBuilder finalContent = new StringBuilder();
@@ -288,6 +289,8 @@ final class SessionQaFallback {
             }
         }
         if (!streamCompleted) {
+            // A3：提前收束（中断 / 120s 空转）⇒ 关流，终止上游 provider 调用与 permit。
+            responseChan.close();
             log.warn("Fallback stream closed without completion, emitting final event with fixed response");
             emitFallbackAnswer(chatManage, chatManage.getFallbackResponse());
         }

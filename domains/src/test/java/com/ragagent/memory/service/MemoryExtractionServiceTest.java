@@ -16,13 +16,12 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
 
+import com.ragagent.llm.ChatStream;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
-import com.ragagent.llm.domain.StreamResponse;
 import com.ragagent.common.memory.MemoryConfig;
 import com.ragagent.memory.domain.MemoryExtractionBatch;
 import com.ragagent.memory.domain.MemoryExtractionFailure;
@@ -703,7 +702,7 @@ class MemoryExtractionServiceTest {
         }
 
         @Override
-        public BlockingQueue<StreamResponse> chatStream(List<ChatMessage> messages, ChatOptions options) {
+        public ChatStream chatStream(List<ChatMessage> messages, ChatOptions options) {
             throw new UnsupportedOperationException();
         }
 
