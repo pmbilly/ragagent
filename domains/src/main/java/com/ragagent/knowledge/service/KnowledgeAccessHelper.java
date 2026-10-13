@@ -5,16 +5,15 @@ import com.ragagent.knowledge.support.KnowledgeProjectionAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.common.security.TenantAPIKeyScope;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
+import com.ragagent.knowledge.repository.KnowledgeRepository;
+import com.ragagent.knowledge.repository.KnowledgeTagRepository;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeTag;
-import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
-import com.ragagent.knowledge.mapper.KnowledgeMapper;
-import com.ragagent.knowledge.mapper.KnowledgeTagMapper;
 import org.springframework.stereotype.Component;
 
 /**
@@ -28,35 +27,28 @@ import org.springframework.stereotype.Component;
 @Component
 public class KnowledgeAccessHelper {
 
-    private final KnowledgeMapper knowledgeMapper;
-    private final KnowledgeBaseMapper kbMapper;
-    private final KnowledgeTagMapper tagMapper;
+    private final KnowledgeRepository knowledgeRepository;
+    private final KnowledgeBaseRepository kbRepository;
+    private final KnowledgeTagRepository tagRepository;
 
-    public KnowledgeAccessHelper(KnowledgeMapper knowledgeMapper,
-                                 KnowledgeBaseMapper kbMapper,
-                                 KnowledgeTagMapper tagMapper) {
-        this.knowledgeMapper = knowledgeMapper;
-        this.kbMapper = kbMapper;
-        this.tagMapper = tagMapper;
+    public KnowledgeAccessHelper(KnowledgeRepository knowledgeRepository,
+                                 KnowledgeBaseRepository kbRepository,
+                                 KnowledgeTagRepository tagRepository) {
+        this.knowledgeRepository = knowledgeRepository;
+        this.kbRepository = kbRepository;
+        this.tagRepository = tagRepository;
     }
 
     /** 按 id 查 KB（软删不可见）。 */
     public KnowledgeBase findKb(String kbId) {
-        return kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getId, kbId)
-                .isNull(KnowledgeBase::getDeletedAt)
-                .last("LIMIT 1"));
+        return kbRepository.findByIdOnly(kbId);
     }
 
     public KnowledgeBase requireKb(String kbId) {
         // KB 受限的 API Key 不能触碰白名单外的库。
         TenantAPIKeyScope.authorizeKnowledgeBases(
                 kbId == null ? List.of() : List.of(kbId));
-        KnowledgeBase kb = kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getId, kbId)
-                .eq(KnowledgeBase::getTenantId, KnowledgeService.tenantId())
-                .isNull(KnowledgeBase::getDeletedAt)
-                .last("LIMIT 1"));
+        KnowledgeBase kb = kbRepository.findById(KnowledgeService.tenantId(), kbId);
         if (kb == null) {
             throw new BizException(AppError.notFound("knowledge base not found"));
         }
@@ -64,11 +56,7 @@ public class KnowledgeAccessHelper {
     }
 
     public Knowledge getKnowledge(String id) {
-        Knowledge k = knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getId, id)
-                .eq(Knowledge::getTenantId, KnowledgeService.tenantId())
-                .isNull(Knowledge::getDeletedAt)
-                .last("LIMIT 1"));
+        Knowledge k = knowledgeRepository.findById(KnowledgeService.tenantId(), id);
         if (k == null) {
             throw new BizException(AppError.notFound("Knowledge not found"));
         }
@@ -84,11 +72,7 @@ public class KnowledgeAccessHelper {
 
     /** 调用者空间内的可空读取。 */
     public Knowledge getKnowledgeInTenant(long tenantId, String id) {
-        return knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getId, id)
-                .eq(Knowledge::getTenantId, tenantId)
-                .isNull(Knowledge::getDeletedAt)
-                .last("LIMIT 1"));
+        return knowledgeRepository.findById(tenantId, id);
     }
 
     /**
@@ -98,10 +82,7 @@ public class KnowledgeAccessHelper {
         if (ids == null || ids.isEmpty()) {
             return new ArrayList<>();
         }
-        return knowledgeMapper.selectList(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getTenantId, tenantId)
-                .in(Knowledge::getId, ids)
-                .isNull(Knowledge::getDeletedAt));
+        return knowledgeRepository.listByIds(tenantId, ids);
     }
 
     /**
@@ -116,7 +97,7 @@ public class KnowledgeAccessHelper {
         if (k == null) {
             return;
         }
-        List<KnowledgeTag> rows = tagMapper.selectTagsWithKnowledgeId(List.of(k.getId()));
+        List<KnowledgeTag> rows = tagRepository.listTagsWithKnowledgeId(k.getId());
         if (!rows.isEmpty()) {
             k.setTags(new ArrayList<>(rows.stream().map(KnowledgeProjectionAdapter::tagView).toList()));
         }

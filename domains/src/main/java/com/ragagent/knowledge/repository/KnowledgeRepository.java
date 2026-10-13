@@ -161,6 +161,17 @@ public class KnowledgeRepository {
                         .or().likeRight(Knowledge::getFolderPath, prefix + "/")));
     }
 
+    /** 按 (tenant, ids) 批量取未软删行（不回填 tags）。 */
+    public List<Knowledge> listByIds(long tenantId, List<String> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        return knowledgeMapper.selectList(new LambdaQueryWrapper<Knowledge>()
+                .eq(Knowledge::getTenantId, tenantId)
+                .in(Knowledge::getId, ids)
+                .isNull(Knowledge::getDeletedAt));
+    }
+
     /** 插入新行。 */
     public void insert(Knowledge k) {
         knowledgeMapper.insert(k);

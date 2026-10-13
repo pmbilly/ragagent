@@ -979,6 +979,13 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **过程教训（新）**：整块**精确字符串替换失败**（`return knowledgeMapper.update(...)` 那段有肉眼看不出的空白/字符差异）✗ ⇒ 改用**正则 + `re.S` 非贪婪到 `));`** 的写法（多行语句更稳）✓；同时把仓储方法追加写成**幂等**（先查存在再追加 ✓）——因为脚本中途 assert 失败时，前一半改动可能已经落盘。
 - **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m42s** ✓ 十一守卫 ✓（SCC 13 组 / `{service, task}` 2 成员未变）。
 - **登记（余步）**：继续按"一次一类"归仓储（上列 18 类）；`KnowledgeService`(716) 余部与 `service.management/*` 归位（需配套断边）；`task ⇄ service` 余 7 处。
+
+**🔶 B263 第⑮步（2026-10-14，`KnowledgeAccessHelper` 归仓储：124 → 106 行）**
+- **为什么挑它**：它是**访问原语**（`findKb`/`requireKb`/`getKnowledge`/`getKnowledgeInTenant`/`getKnowledgeBatch`/`attachTags`），被 `KnowledgeService` / `KnowledgeFileService` / `KnowledgeParseService` / `KnowledgeSummaryService` 等共用 ⇒ 清掉它的 mapper 依赖，等于把"域内所有读路径都经仓储"这件事一次覆盖一大片（**杠杆比按行数算更高**）。
+- **归位**：`KnowledgeRepository` 只 +1 个方法 `listByIds(tenantId, ids)`（tenant + `id IN` + 未软删；空集合返回 `List.of()`，与调用方原短路语义一致）；其余 5 处**全部复用既有方法**——`KnowledgeBaseRepository.findByIdOnly(id)`（`findKb`）、`KnowledgeBaseRepository.findById(tenantId, id)`（`requireKb`）、`KnowledgeRepository.findById(tenantId, id)`（`getKnowledge` / `getKnowledgeInTenant`）、`KnowledgeTagRepository.listTagsWithKnowledgeId(id)`（`attachTags`，原本是 `tagMapper.selectTagsWithKnowledgeId(List.of(k.getId()))` ⇒ 仓储方法实现逐字相同，已现场核对）。
+- **连带**：字段与构造器换成 3 个仓储（`@Component` 构造注入、仓内无 `new KnowledgeAccessHelper(...)` 调用点 ⇒ 无需改调用方）；A16/A17 条目双双过期 ⇒ 各删一条；未使用 import（`LambdaQueryWrapper` + 3 个 mapper）清掉。
+- **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m43s** ✓ 十一守卫 ✓（环 0 / SCC 13 组未变）。
+- **登记（余步）**：`KnowledgeSearchService`(7) / `FaqIndexWriter`(8) / `KnowledgeBaseLookupAdapter`(9) / `FaqEntryQueryService`(9) / `KnowledgeBatchOpsService`(10) / `FaqEntryCommandService`(12) / `KnowledgeSummaryService`(12) / `KnowledgeMoveService`(13) / `KnowledgeCloneService`(16) 等仍待归仓储；`KnowledgeService`(716) 余部与 `service.management/*` 归位（需配套断边）；`task ⇄ service` 余 7 处。
 - **登记（余步）**：⑦ `KnowledgeService`(799 行/28 引用) 拆分（**优先级最高：行数已到阈值边缘**）；⑧ `KnowledgeFileService`(422/2)、`KnowledgeParseService` 余部、`KnowledgeBaseService`(626/18)；⑨ 最后一对 `task ⇄ service`（`task→service` 现余 **7**：`ChunkExtractService`3 / `QuestionGenerationService`3 / `SpanTracker`）；⑩ `service` 七子面、`domain.{document,task,graph}`、`mapper` 目标名对齐。
 - **登记（余步）**：按最轻优先继续——`ChunkVectorIndexer`(386/2)、`KnowledgeFileService`(422/2)、`KnowledgeParseService` 余部、`KnowledgeBaseService`(626/18)、`KnowledgeService`(796/28)；一律"切分而非整搬"。`task → service` 现余 8 处（`ChunkExtractService`3 / `QuestionGenerationService`3 / `SpanTracker` / `ChunkVectorIndexer`）。
 
