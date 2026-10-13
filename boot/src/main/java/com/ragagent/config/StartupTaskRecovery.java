@@ -8,10 +8,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import com.ragagent.common.deployment.AppEnvLookup;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.repository.KnowledgeSpanRepository;
 
@@ -20,7 +20,7 @@ import com.ragagent.knowledge.repository.KnowledgeSpanRepository;
  *
  * <p>应用重启后把卡在处理态的任务复位为失败，让前端不再显示永远转圈的行：</p>
  * <ol>
- *   <li><b>知识解析</b>（仅 Lite——REDIS_ADDR 未配置）：parse_status ∈
+ *   <li><b>知识解析</b>（仅未装配知识 Redis 面时）：parse_status ∈
  *       {pending, processing, finalizing, deleting} 的行 → failed +
  *       "Task interrupted due to application restart" + pending_subtasks_count=0。
  *       分布式实现另有「finalizing 且唯一未决子槽是持久化 wiki op」的 NOT-EXISTS 排除
@@ -34,9 +34,14 @@ import com.ragagent.knowledge.repository.KnowledgeSpanRepository;
  *       未开 span 的积压任务，只有明显陈旧的才敢判死。</li>
  * </ol>
  *
- * <p><b>分布式模式（REDIS_ADDR 已配置）刻意不复位知识/摘要行</b>：
- * 队列任务持久化、且另一副本可能仍在执行同一知识，启动钩子无法区分孤儿与积压——
- * 那是 HousekeepingService 的职责（检查 span 活动与真队列）。</p>
+ * <p><b>知识/摘要行的跳过判据 = {@code knowledge.redis-enabled}</b>（K6：与
+ * {@code KnowledgeRedisWiring} 同一开关）。旧实现用 {@code REDIS_ADDR} 非空判断：
+ * 只把 Redis 用于 IM/embed 等其它面的部署会被误判成分布式，卡住的知识行**永不复位**
+ * （前端永远转圈，HousekeepingService 只判 failed 不重投）。同理数据源同步日志按
+ * {@code datasource.redis-enabled} 判断——三个开关各管各的任务基础设施。</p>
+ *
+ * <p>判死仍需谨慎：知识 Redis 面装配时另一副本可能仍在处理同一知识，启动钩子无法区分
+ * 孤儿与积压——那是 HousekeepingService 的职责（检查 span 活动与真队列）。</p>
  *
  * <p>失败只 WARN 不阻塞启动。此处写下的
  * "Task interrupted due to application restart" 文案即 {@code KnowledgeService}
@@ -60,40 +65,54 @@ public class StartupTaskRecovery {
 
     private final JdbcTemplate jdbc;
     private final KnowledgeSpanRepository spanRepository;
+    /** 知识 Redis 面是否装配（= {@code KnowledgeRedisWiring} 的同一开关）。 */
+    private final boolean knowledgeRedisEnabled;
+    /** 数据源任务队列是否装配 Redis 版（= {@code DataSourceTaskQueueWiring} 的同一开关）。 */
+    private final boolean datasourceRedisEnabled;
 
-    public StartupTaskRecovery(JdbcTemplate jdbc, KnowledgeSpanRepository spanRepository) {
+    public StartupTaskRecovery(JdbcTemplate jdbc, KnowledgeSpanRepository spanRepository,
+            @Value("${knowledge.redis-enabled:false}") boolean knowledgeRedisEnabled,
+            @Value("${datasource.redis-enabled:false}") boolean datasourceRedisEnabled) {
         this.jdbc = jdbc;
         this.spanRepository = spanRepository;
+        this.knowledgeRedisEnabled = knowledgeRedisEnabled;
+        this.datasourceRedisEnabled = datasourceRedisEnabled;
     }
 
     @EventListener(ApplicationReadyEvent.class)
     public void resetPendingTasks() {
-        resetPendingTasks(distributed());
+        resetPendingTasks(knowledgeRedisEnabled, datasourceRedisEnabled);
     }
 
-    /** 包内可见重载（测试直传 distributed，绕开进程环境）。 */
+    /** 测试便捷重载：两面同值（生产路径走 {@link #resetPendingTasks()} 的注入开关）。 */
     void resetPendingTasks(boolean distributed) {
+        resetPendingTasks(distributed, distributed);
+    }
+
+    /**
+     * 三种复位各自按**自己守护的任务基础设施**决定是否跳过（K6：口径必须与装配一致）。
+     *
+     * @param knowledgeDistributed 知识 Redis 面已装配（{@code knowledge.redis-enabled}）——
+     *                             此时另一副本可能仍在处理同一知识，启动钩子不敢判死
+     * @param syncDistributed      数据源同步队列已装配 Redis 版（{@code datasource.redis-enabled}）
+     */
+    void resetPendingTasks(boolean knowledgeDistributed, boolean syncDistributed) {
         try {
-            resetStuckKnowledge(distributed);
+            resetStuckKnowledge(knowledgeDistributed);
         } catch (RuntimeException e) {
             log.warn("resetPendingTasks: reset stuck knowledge failed: {}", e.getMessage());
         }
         try {
-            resetStuckSummary(distributed);
+            resetStuckSummary(knowledgeDistributed);
         } catch (RuntimeException e) {
             log.warn("resetPendingTasks: reset pending summary tasks failed: {}", e.getMessage());
         }
         try {
-            resetStuckSyncLogs(distributed);
+            resetStuckSyncLogs(syncDistributed);
         } catch (RuntimeException e) {
             log.warn("resetPendingTasks: reset pending data source sync tasks failed: {}",
                     e.getMessage());
         }
-    }
-
-    boolean distributed() {
-        String addr = AppEnvLookup.get("REDIS_ADDR");
-        return addr != null && !addr.isEmpty();
     }
 
     /**

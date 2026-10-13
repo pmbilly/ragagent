@@ -522,7 +522,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B244 | 2 | A18 状态所有权规则（phase 不回引 runner / 无公共可变运行态字段） | ✅ 2026-10-13 |
 | B245 | 3 任务可靠 | K4：CAS 保护整轮数据（终态写入按尝试守卫 + 失败清场限本代；接管语义保留） | ✅ 2026-10-13 |
 | B246 | 3 | K5：图任务失败/重试/计数同一契约（`finalAttempt` 消费、异常不吞、任务级去重） | ✅ 2026-10-13 |
-| B247 | 3 | K6：主任务恢复口径统一（**拍板点②**：判据分裂先修；持久化深度待定） | ⬜ |
+| B247 | 3 | K6：主任务恢复口径统一（**拍板点②**：判据分裂已修＝按面判据；持久化主任务另立项） | ✅ 2026-10-13 |
 | B248 | 4 索引/配置 | K10a：embedding 响应对齐校验（`index` 消费 + 数量/维度校验 + 乱序拒绝） | ⬜ |
 | B249 | 4 | K10b：索引分批政策收敛（worker 与 `ChunkVectorIndexer` 共用执行） | ⬜ |
 | B250 | 4 | K7：事务外副作用（revision + outbox；事务内不调远程模型） | ⬜ |
@@ -716,6 +716,13 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **测试**：`ChunkExtractServiceTest` +3（未到终态不释放 / 终态释放一次 / 重试链合计一次）；`RedisKnowledgeTaskQueueTest` +1（`chunkTaskPassesFinalAttemptFlag`：terminal 序列 `[false,false,false,true]`，与既有 question 侧同款断言）+ 4 处夹具由 1 参改 2 参（旧夹具把"每次尝试都递减"当契约）。**红态探针**：终态门退化回 `if (true)` ⇒ 两条"未到终态不释放"用例实测失败 ⇒ 还原后绿。
 - **登记（后续）**：真正的**重复投递去重**（同一任务被 Redis 重投两次仍会释放两次）需任务级幂等键（`(knowledgeId, attempt, chunkIndex)` 唯一行 / seen 集）——本批只保证"重试链 + 单次投递"的 exactly-once；`KnowledgeFinalizeAdapter` 的 `count>0` 仍只防负数（其调用时机已由上述契约保证）。
 - **闸门**：`spotlessCheck build` ✓ **1m32s** ✓ · **4938 / 失败 0 / 跳过 4** ✓（+4 = 新测试）· 十一守卫 ✓。
+
+**✅ B247（2026-10-13，K6 主任务恢复口径统一——判据按面分离）**
+- **缺口**（方案 K6）：`StartupTaskRecovery` 用 `REDIS_ADDR` 非空统一代理"分布式"⇒ ① 只把 Redis 用于 IM/embed 等其它面（知识 Redis 面未装配）的部署被误判成分布式 ⇒ 卡住的知识/摘要行**永不复位**（前端永远转圈；`HousekeepingService` 只判 failed 不重投）；② 真实装配由 `knowledge.redis-enabled`（`KnowledgeRedisWiring`）与 `datasource.redis-enabled`（`DataSourceTaskQueueWiring`）分别控制——**两个开关 + 一个环境变量三方不一致**。
+- **修复（判据按面分离：各跟随自己守护的任务基础设施）**：构造注入两个开关（`@Value`）；`@EventListener` 路径传 `(knowledgeRedisEnabled, datasourceRedisEnabled)`——知识/摘要行复位跟 `knowledge.redis-enabled`（与知识 Redis 面装配同一开关），同步日志复位跟 `datasource.redis-enabled`；删除 `AppEnvLookup.get("REDIS_ADDR")` 代理与类注释旧口径（改写为"三个开关各管各的任务基础设施"）。测试便捷重载 `resetPendingTasks(boolean)`（两面同值）保留，既有 5 处调用不变。
+- **测试**：新增 `StartupTaskRecoverySplitTest` 2 例——① 知识面跳过时**同步日志面仍复位**（断言"一行 `knowledges` 查询都不发 + `sync_logs` 的 UPDATE 照发"）；② 知识面未装配时知识行照常被挑出复位。**红态探针**：让生产路径忽略知识面开关 ⇒ 用例①实测失败 ⇒ 还原后绿。
+- **登记（拍板点②的"大改"，本期不做）**：**主任务持久化**始终缺位——唯一 `KnowledgeProcessingQueue` 实现是进程内 executor（重启丢在途主任务，`HousekeepingService` 只判 failed 不重投）。做成可重领/lease 属基建改造（新表/字段、续约、与 span/attempt 配合），建议独立立项（阶段 4/5 之后）；届时本批的按面判据就是"单机 vs 多实例"的统一入口。
+- **闸门**：`spotlessCheck build` ✓ **1m26s** ✓ · **4940 / 失败 0 / 跳过 4** ✓（+2 = 新测试）· 十一守卫 ✓。
 
 ## 附：文档地图与归档追溯
 
