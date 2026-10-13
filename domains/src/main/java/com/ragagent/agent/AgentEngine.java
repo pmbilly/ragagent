@@ -470,14 +470,24 @@ public class AgentEngine {
                 messages.size(), tools.size(), toolListStr, mcpCatalogDescriptionLen(tools),
                 imgs == null ? 0 : imgs.size());
 
+        // 终态门（A1-AGENT）：成功由 executeLoop 的 finally 收口；失败由下面 catch 补终态——
+        // 两者共用这道门 ⇒ 恰好一次。
+        AtomicBoolean completionEmitted = new AtomicBoolean(false);
+        Instant startTime = Instant.now();
         try {
-            executeLoop(state, query, new MsgRef(messages), tools, sessionId, messageId);
-        } catch (AgentEngineException e) {
+            executeLoop(state, query, new MsgRef(messages), tools, sessionId, messageId,
+                    completionEmitted, startTime);
+        } catch (RuntimeException e) {
             log.error("[Agent] Execution failed: {}", e.getMessage());
+            // 顺序契约：终态帧（agentComplete）是 SSE 的退出条件——必须先发错误事件，
+            // 否则错误帧落在流关闭之后（客户端只看到"成功收尾"）。
             eventBus.emit(new Event(EventIds.generateEventID("error"), EventType.EVENT_ERROR,
                     sessionId, new ErrorData(e.getMessage(), "", "agent_execution", sessionId,
                             "", null), null, ""));
             finishAgentSpan(agentSpan, state, e.getMessage());
+            if (completionEmitted.compareAndSet(false, true)) {
+                finalize.emitCompletionEvent(state, sessionId, messageId, startTime, e.getMessage());
+            }
             throw e;
         }
 
@@ -546,11 +556,11 @@ public class AgentEngine {
     }
 
     private void executeLoop(AgentState state, String query, MsgRef messagesRef,
-            List<ChatTool> tools, String sessionId, String messageId) {
-        Instant startTime = Instant.now();
+            List<ChatTool> tools, String sessionId, String messageId,
+            AtomicBoolean completionEmitted, Instant startTime) {
         log.info("[PIPELINE] stage=Agent action=loop_start max_iterations={}", config.getMaxIterations());
 
-        AtomicBoolean completionEmitted = new AtomicBoolean(false);
+        boolean loopCompleted = false;
         try {
             AtomicInteger emptyRetries = new AtomicInteger();
             AtomicInteger consecutiveSameContent = new AtomicInteger();
@@ -598,8 +608,11 @@ public class AgentEngine {
             if (!state.isComplete() && pollCancellation() == null) {
                 finalize.handleMaxIterations(query, state, sessionId, messagesRef.items);
             }
+            loopCompleted = true;
         } finally {
-            if (completionEmitted.compareAndSet(false, true)) {
+            // 只有循环自己走完才在这里收口；失败路径的终态由 executeInner 的 catch 在
+            // **错误事件之后**补（顺序契约：错误帧在前、终态帧在后）。
+            if (loopCompleted && completionEmitted.compareAndSet(false, true)) {
                 finalize.emitCompletionEvent(state, sessionId, messageId, startTime);
             }
         }

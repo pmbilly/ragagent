@@ -44,7 +44,8 @@ public class AgentCompleteData {
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private String requestId = "";
 
-    /** null 或空省略 */
+    /** null 或空省略；**失败收束**时显式携带 {@code {"outcome":"failed","error":<msg>}}
+     *  （A1-AGENT：客户端据此区分"正常收尾"与"失败收尾"；成功不带 = 缺省即成功）。 */
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, Object> extra;
 

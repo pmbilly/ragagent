@@ -515,7 +515,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B237 | 1 | K1：worker→向量店显式传租户（`KnowledgeVectorWrites` 收 tenantId，消除 ThreadLocal+0L） | ✅ 2026-10-13 |
 | B238 | 1 | K2：URL 摄取统一（**拍板点①**：同步下载 vs worker 下载） | ✅ 2026-10-13（拍板 A：同步下载） |
 | B239 | 2 会话终态 | A1-NORMAL：流错误/超时轮终态一致收口 | ✅ 2026-10-13（建流前失败兜底→登记待办） |
-| B240 | 2 | A1-AGENT：`AgentEngine` finally/COMPLETE 与外层 catch/ERROR 收口 + `FinalizePhase` 失败 outcome | ⬜ |
+| B240 | 2 | A1-AGENT：`AgentEngine` finally/COMPLETE 与外层 catch/ERROR 收口 + `FinalizePhase` 失败 outcome | ✅ 2026-10-13 |
 | B241 | 2 | A2：全轮一次性提交门（CAS）+ 消息更新失败不启动索引/建议/记忆 | ⬜ |
 | B242 | 2 | A3：可关闭模型流（句柄 + `ThinkPhase` 取消 probe + 装饰器队列关闭语义） | ⬜ |
 | B243 | 2 | A5：跨线程上下文传播（NORMAL 消费线程 / STOP watcher replay） | ⬜ |
@@ -660,6 +660,14 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **测试**：新增 `PluginChatCompletionStreamTerminalTest` 3 例——① 无终态帧（用"poll 立即返回 null"的队列桩瞬时驱动，与 120s 超时同一代码路径）⇒ 终态帧恰好一帧；② `ERROR+done` ⇒ 错误事件先于终态帧且仍补终态；③ 正常 `ANSWER+done` 回归（只一帧、不追加空终态帧）。**红态探针**：注释终态帧调用 ⇒ 精确 2 红（两个 A1 场景）+ 1 绿 ⇒ 还原复绿。chatpipeline 全包金片回放（`PipelineLifecycleRecordingTest` 8/0 等）不受影响。
 - **登记待办（同族，已实测确认）**：**建流前失败**的兜底收口未做——管线在 `CHAT_COMPLETION_STREAM` 之前抛错时，`QaTurnExecutor` 的 catch 只发 EVENT_ERROR、不发 COMPLETE ⇒ SSE 仍会轮询。安全性条件已核：`CHAT_COMPLETION_STREAM` 是 NORMAL 两条链的**末段**（纯聊天 / RAG 均如此）⇒ 该 catch 触发时流必未启动，兜底"立即完成 + 发 COMPLETE"不会截断在途答案。未实现原因 = `QaTurnExecutor` 全类**零测试基建**，按"先失败测试再改实现"纪律需先建挂点（并入 B253 controller 剥离的前置）。
 - **闸门**：`spotlessCheck build` ✓ **2m08s** ✓ · **4922 / 失败 0 / 跳过 4** ✓（+3 = 新测试）。
+
+**✅ B240（2026-10-13，A1-AGENT：终态顺序与失败 outcome）**
+- **缺口**（方案 A1）：`executeLoop` 的 `finally` **无条件**先发终态帧（`agentComplete`），外层 catch 再发错误——而终态帧正是 SSE 的退出条件 ⇒ **错误帧落在流关闭之后**（客户端只看到"成功收尾"）；完成载荷也没有显式失败 outcome（`FinalizePhase`）⇒ 消费者无法区分"正常收尾"与"失败收尾"。
+- **修复**：① 终态门（`AtomicBoolean`）上提到 `executeInner`——成功（`loopCompleted`）由 `executeLoop` 的 finally 收口、失败由 catch 在**错误事件之后**补终态，两条路径共用门 ⇒ 恰好一次；② catch 由 `AgentEngineException` 放宽到 `RuntimeException`（非引擎异常也有终态，不再只靠会话层兜底）；③ `FinalizePhase` 新增 `failureError` 重载：失败时载荷带 `extra={"outcome":"failed","error":<msg>}`（键序固定；成功不带 = 缺省即成功，不改既有线格式；语义已写进 `AgentCompleteData` 字段注释）。
+- **测试**：新增 `AgentEngineFailureTerminalTest` 2 例——失败序列必须 `[error, agentComplete]` 且 `extra.outcome=failed`（**先红证据**：修复前实测 `["agentComplete","error"]`）/ 成功回归（恰好一帧终态、不带 outcome）。
+- **金片签名变更（已评审）**：`GoRecording46B.R_EXECUTE_STREAM_ERROR_EVENTS` 由"终态→错误"改为"错误→终态 + extra"（方案 §14 风险表的既定处置：旧 golden 把缺陷当契约 ⇒ 经评审同步常量），常量上方写明原因；`EngineRecordingTest` 20/20 全绿。
+- **闸门**：`spotlessCheck build` ✓ **1m45s** ✓ · **4924 / 失败 0 / 跳过 4** ✓（+2 = 新测试）。
+- **登记观察（本批未改）**：`SessionAgentQaService` 的 catch 仍会**再发一份** `stage=agent_execution` 错误事件（引擎已发一份）⇒ 生产链路失败时会出现 **2 条错误事件**。属"重复上报"而非终态缺口，归入后续（B244 A18 状态所有权 / 阶段 5 controller 剥离）。
 
 ## 附：文档地图与归档追溯
 

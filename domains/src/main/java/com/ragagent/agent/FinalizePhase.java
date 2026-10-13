@@ -3,7 +3,9 @@ package com.ragagent.agent;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.node.NullNode;
@@ -132,9 +134,21 @@ final class FinalizePhase {
         state.setComplete(true);
     }
 
-    /** 完成事件（由 executeLoop 的 finally 保证恰好一次）。 */
+    /** 完成事件（成功收尾；由 executeLoop 的 finally 保证恰好一次）。 */
     void emitCompletionEvent(AgentState state, String sessionId, String messageId,
             Instant startTime) {
+        emitCompletionEvent(state, sessionId, messageId, startTime, null);
+    }
+
+    /**
+     * 完成事件（失败收尾由执行入口在**错误事件之后**补发；两者共用终态门 ⇒ 恰好一次）。
+     *
+     * @param failureError 非 null ⇒ 失败收束：载荷显式携带
+     *                     {@code extra={"outcome":"failed","error":<msg>}}，客户端可区分
+     *                     "正常收尾"与"失败收尾"；成功传 null（缺省即成功，不改既有线格式）
+     */
+    void emitCompletionEvent(AgentState state, String sessionId, String messageId,
+            Instant startTime, String failureError) {
         List<AgentStep> steps = state.getRoundSteps();
         if (state.getPendingSteerMessages() != null && !state.getPendingSteerMessages().isEmpty()) {
             // 停止/模型失败可能发生在投递后、下一响应前；保住边界，不虚构答案。
@@ -152,10 +166,22 @@ final class FinalizePhase {
                 sessionId, new AgentCompleteData("", state.getRoundSteps().size(),
                         state.getFinalAnswer(), knowledgeRefsInterface, alwaysPresentList(steps),
                         turnUsageOf(state),
-                        Duration.between(startTime, Instant.now()).toMillis(), messageId, "", null),
+                        Duration.between(startTime, Instant.now()).toMillis(), messageId, "",
+                        failureExtra(failureError)),
                 null, ""));
 
         log.info("Agent execution completed in {} rounds", state.getCurrentRound());
+    }
+
+    /** 失败 outcome 载荷：键序固定（outcome → error），保证录制/快照可比。 */
+    private static Map<String, Object> failureExtra(String failureError) {
+        if (failureError == null) {
+            return null;
+        }
+        Map<String, Object> extra = new LinkedHashMap<>();
+        extra.put("outcome", "failed");
+        extra.put("error", failureError);
+        return extra;
     }
 
     /**
