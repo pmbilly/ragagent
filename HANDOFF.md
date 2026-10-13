@@ -529,7 +529,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B251 | 4 | K8：配置能力矩阵（parser rules / parent-child 显式拒绝或实现；不静默回落） | ✅ 2026-10-13 |
 | B252 | 5 结构收敛 | K9：跨 store 融合（RRF 按 store 内 rank；context expansion 修正） | ✅ 2026-10-13 |
 | B253 | 5 | A4：并发工具状态提交顺序（`seenChunks` 单一 writer / 按调用序回填） | ✅ 2026-10-13 |
-| B254 | 5 | controller 剥离编排（`KnowledgeQaController` 14 构造参数、`QaRequestParser` 拆分） | ⬜ |
+| B254 | 5 | controller 剥离编排（`KnowledgeQaController` 14 构造参数、`QaRequestParser` 拆分） | ✅ 2026-10-13 |
 | B255 | 5 | 检索中立 `SearchHit`（去上层对 `PgVectorRetrieveRepository` 内部类型依赖） | ⬜ |
 | B256 | 6 包结构 | §10 改名清算：10 组同名歧义 + 3 组域前缀（纯改名） | ⬜ |
 | B257 | 6 | §7 命名与边界：`agent/tools`→`agenttools`、`agent/management`→`agentmanagement` + 边界规则 | ⬜ |
@@ -780,6 +780,17 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **测试**：`ExecutionPolicyStatefulReadTest` 2 例（有状态读工具是屏障 / 无状态读工具仍在白名单）+ `ActPhaseInterruptJoinTest` 1 例（**join 被打断 ⇒ 取消全部子线程 + 等齐后才返回 + 恢复中断标志**；**先红**：白名单测试实测 `knowledge_search` 可并发；中断测试在 helper 缺位时编译红）。
 - **闸门**：`spotlessCheck build` ✓ **1m51s** ✓ · **4968 / 失败 0 / 跳过 4** ✓（+3）· 十一守卫 ✓（棘轮：大文件 ≥800 从 2 个回到 1 个）。
 - **登记（未做）**：① 恢复 `knowledge_search`/`grep_chunks` 并发需要"取数与渲染分离（渲染单 writer 按调用序）"或"同类有序、异类可并行"的批次策略；② 多 query 场景本就可以一次调用传 `queries[]`，故当前串行代价有限。
+
+**✅ B254（2026-10-13，阶段 5 controller 剥离编排）**
+- **验收达标**：`session/controller` 包内**不再有** `Executor` / `Parser` / `Orchestrator` 类——新增守卫 `SessionControllerPackagingTest`（**先红**：实测违规清单 = `QaSseOrchestrator.java` / `QaTurnExecutor.java` / `QaRequestParser.java`）。
+- **搬迁**：`QaRequestParser`（295 行）/ `QaSseOrchestrator`（380）/ `QaTurnExecutor`（417）/ `QaTurnFinalizer` 与协作件 `QaRequestBinder` / `QaAttachmentResolver` → **新包 `com.ragagent.session.qa`**（含 `package-info`）；测试随类迁移（`QaRequestBindingTest` / `QaTurnFinalizerCommitGateTest` / `QaTurnFinalizerTenantContextTest` → `session/qa`）。
+- **控制器内嵌件提出**（否则搬迁会造出 `qa → controller` 倒挂 ✗）：`stringListOf` / `ensureQuickAnswerStep` / `appendQuickAnswerReasoning` / `maxFileBytes` → `session.qa.QaTurnSupport`；`record ParsedRequest` → `session.qa.ParsedRequest`；`Base64Support` → `session.qa.Base64Support`；`SessionStreamController.sanitizeForLog`（两侧都在用）→ 中立 `session.support.LogSanitizer`。现依赖方向只有 `controller → qa / support`，`qa` 包内**零** `controller` 引用。
+- **可见性**：迁移类的编排面（类/构造器/被跨包调用的方法）由包私有改为 `public`；`SessionStreamController.sanitizeForLog` 与 `QaRequestBinder` 的静态入口随之公开或在调用点改助手。
+- **文档口径纠正（如实记）**：`session/controller/package-info.java` 原写"协作类属表现层、不是放错位置（2026-10-10 判据）"，本批按阶段 5 目标改写并说明差异与做法（把静态助手/内嵌类型一起提出⇒不再有倒挂）；auth / wiki / embedchannel 三处 `package-info` 中以本包为例的引用加了迁移注记。
+- **守卫联动**：`check-event-face-case.py` 的 `EVENT_MAP_FILES` 键需随文件搬家（`session/controller/QaSseOrchestrator.java` → `session/qa/...`），已同步。
+- **闸门**：`spotlessCheck build` ✓ **1m30s** ✓ · **4969 / 失败 0 / 跳过 4** ✓（+1）· 十一守卫 ✓。
+- **登记（未做）**：① `KnowledgeQaController` 构造参数仍 **14 个**（编排类虽已迁出，控制器仍直接注入它们与 4 个 `ObjectProvider`）——真正减参需要"QA 轮门面/Facade"一层，列入后续；② `QaRequestParser`（295 行）内部拆分未做（验收只要包规则）；③ `QaAttachmentResolver` 的附件编排与 `QaRequestBinder` 的绑定逻辑仍可再向内收。
+- **观察（非本批引入，flake）**：本次全量闸门首跑 `ModelConcurrencyGovernorWiringTest.settingsFailureLeavesGovernorUnwired` 偶发失败，**重跑 4/4 全绿**（并发/环境时序），已登记观察。
 
 ## 附：文档地图与归档追溯
 

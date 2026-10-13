@@ -1,4 +1,4 @@
-package com.ragagent.session.controller;
+package com.ragagent.session.qa;
 
 import com.ragagent.common.web.JsonMappers;
 import com.ragagent.common.web.RequestFields;
@@ -8,7 +8,6 @@ import com.ragagent.common.error.BizException;
 import com.ragagent.session.dto.QaRequests.AttachmentUpload;
 import com.ragagent.session.dto.QaRequests.CreateKnowledgeQARequest;
 import com.ragagent.session.dto.QaRequests.SearchKnowledgeRequest;
-import com.ragagent.session.controller.KnowledgeQaController.Base64Support;
 
 /**
  * {@code KnowledgeQaController} 的**静态解析助手簇**：请求体绑定
@@ -18,20 +17,20 @@ import com.ragagent.session.controller.KnowledgeQaController.Base64Support;
  * <p>共享项留控制器：{@code stringListOf}（附件解析也在用）、
  * {@code tenantServiceField}/{@code currentTenant}（{@code executeQA} 720 在用）。</p>
  */
-final class QaRequestBinder {
+public final class QaRequestBinder {
 
     private QaRequestBinder() {}
 
     static final com.fasterxml.jackson.databind.ObjectMapper BIND_JSON =
             JsonMappers.lenient();
-    static CreateKnowledgeQARequest bindQaRequest(String rawBody) {
+    public static CreateKnowledgeQARequest bindQaRequest(String rawBody) {
         CreateKnowledgeQARequest r = parseOrBindError(rawBody, CreateKnowledgeQARequest.class);
         if (r.query == null || r.query.isEmpty()) {
             throw BizException.badRequest(bindingError("Query", "required"));
         }
         return r;
     }
-    static SearchKnowledgeRequest bindSearchRequest(String rawBody) {
+    public static SearchKnowledgeRequest bindSearchRequest(String rawBody) {
         SearchKnowledgeRequest r = parseOrBindError(rawBody, SearchKnowledgeRequest.class);
         if (r.query == null || r.query.isEmpty()) {
             throw BizException.badRequest(bindingError("Query", "required"));
@@ -51,16 +50,16 @@ final class QaRequestBinder {
             throw BizException.badRequest(e.getMessage());
         }
     }
-    static String bindingError(String field, String tag) {
+    public static String bindingError(String field, String tag) {
         return RequestFields.message(field, tag);
     }
-    static List<String> appendAll(List<String> base, List<String> extra) {
+    public static List<String> appendAll(List<String> base, List<String> extra) {
         List<String> out = new ArrayList<>(base == null ? List.of() : base);
         out.addAll(extra == null ? List.of() : extra);
         return out;
     }
     /** 附件上传的解码与单文件/总量大小校验。 */
-    static void decodeAndValidateAttachmentUploads(List<AttachmentUpload> uploads,
+    public static void decodeAndValidateAttachmentUploads(List<AttachmentUpload> uploads,
             int maxCount, long maxFileBytes, long maxTotalBytes) {
         if (uploads.size() > maxCount) {
             throw new IllegalArgumentException(

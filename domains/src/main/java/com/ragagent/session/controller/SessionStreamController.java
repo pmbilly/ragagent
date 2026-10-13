@@ -1,5 +1,6 @@
 package com.ragagent.session.controller;
 
+import com.ragagent.session.support.LogSanitizer;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -155,11 +156,11 @@ public class SessionStreamController {
             HttpServletResponse response) throws IOException {
 
         // 日志消毒：去掉换行/制表/控制字符，防日志注入。
-        String sessionId = sanitizeForLog(rawSessionId);
+        String sessionId = LogSanitizer.sanitizeForLog(rawSessionId);
         if (sessionId.isEmpty()) {
             throw BizException.badRequest("invalid session id");
         }
-        String messageId = sanitizeForLog(rawMessageId);
+        String messageId = LogSanitizer.sanitizeForLog(rawMessageId);
         if (messageId.isEmpty()) {
             throw BizException.badRequest("Missing message ID");
         }
@@ -331,23 +332,6 @@ public class SessionStreamController {
         response.getOutputStream().flush();
     }
 
-    /** 日志消毒：去换行/制表/控制字符，防日志注入。 */
-    static String sanitizeForLog(String input) {
-        if (input == null || input.isEmpty()) {
-            return "";
-        }
-        StringBuilder builder = new StringBuilder(input.length());
-        for (int i = 0; i < input.length(); i++) {
-            char c = input.charAt(i);
-            // 换行/制表先归一成空格；其余控制字符直接丢弃
-            if (c == '\n' || c == '\r' || c == '\t') {
-                builder.append(' ');
-            } else if (c >= 32) {
-                builder.append(c);
-            }
-        }
-        return builder.toString();
-    }
 
     private static String escapeJsonString(String s) {
         StringBuilder out = new StringBuilder(s.length() + 8);

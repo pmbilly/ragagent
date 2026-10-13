@@ -1,4 +1,4 @@
-package com.ragagent.session.controller;
+package com.ragagent.session.qa;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
@@ -47,7 +47,7 @@ import com.ragagent.stream.LiveRunExistsException;
  * {@link QaTurnFinalizer}，本类**持有它**转发（不回调控制器）；{@code ensureQuickAnswerStep}
  * 是 static 且执行簇也在用 → 留控制器，按类名引用。</p>
  */
-final class QaSseOrchestrator {
+public final class QaSseOrchestrator {
 
     private static final org.slf4j.Logger log =
             org.slf4j.LoggerFactory.getLogger(QaSseOrchestrator.class);
@@ -59,7 +59,7 @@ final class QaSseOrchestrator {
     private final SseFrameWriter sseFrameWriter;
     private final QaTurnFinalizer turnFinalizer;
 
-    QaSseOrchestrator(StreamManager streamManager, StreamEventEmitter emitter, SessionService sessionService, MessageService messageService, SseFrameWriter sseFrameWriter, QaTurnFinalizer turnFinalizer) {
+    public QaSseOrchestrator(StreamManager streamManager, StreamEventEmitter emitter, SessionService sessionService, MessageService messageService, SseFrameWriter sseFrameWriter, QaTurnFinalizer turnFinalizer) {
         this.streamManager = streamManager;
         this.emitter = emitter;
         this.sessionService = sessionService;
@@ -68,7 +68,7 @@ final class QaSseOrchestrator {
         this.turnFinalizer = turnFinalizer;
     }
 
-    SseStreamContext setupSSEStream(QaRequestContext reqCtx, boolean generateTitle, QaMode mode) {
+    public SseStreamContext setupSSEStream(QaRequestContext reqCtx, boolean generateTitle, QaMode mode) {
         SseStreamContext streamCtx = new SseStreamContext();
         streamCtx.assistantMessage = reqCtx.assistantMessage;
         streamCtx.tenantSnapshot = TenantContextSnapshot.capture();
@@ -215,7 +215,7 @@ final class QaSseOrchestrator {
             }
         }
     }
-    void handleAgentEventsForSSE(HttpServletResponse response, String sessionId,
+    public void handleAgentEventsForSSE(HttpServletResponse response, String sessionId,
             String assistantMessageId, String requestId, SseStreamContext streamCtx,
             boolean waitForTitle, StreamRewriter resourceRewriter) throws IOException {
         SseContract.setSSEHeaders(response);
@@ -319,7 +319,7 @@ final class QaSseOrchestrator {
     }
     private static final Set<String> QUICK_ANSWER_TIMELINE_TOOLS = Set.of(
             "query_understand", "knowledge_search", "attachment_parsing", "image_analysis");
-    void registerQuickAnswerTimelineRecorder(EventBus bus, Message msg) {
+    public void registerQuickAnswerTimelineRecorder(EventBus bus, Message msg) {
         if (bus == null || msg == null) {
             return;
         }
@@ -363,7 +363,7 @@ final class QaSseOrchestrator {
         });
     }
     private static void appendQuickAnswerToolCall(Message msg, ToolCall call) {
-        AgentStep step = KnowledgeQaController.ensureQuickAnswerStep(msg);
+        AgentStep step = QaTurnSupport.ensureQuickAnswerStep(msg);
         if (step.getToolCalls() != null) {
             for (int i = 0; i < step.getToolCalls().size(); i++) {
                 if (step.getToolCalls().get(i).getId().equals(call.getId())) {

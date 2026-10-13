@@ -1,5 +1,6 @@
 package com.ragagent.session.controller;
 
+import com.ragagent.session.support.LogSanitizer;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -269,13 +270,13 @@ class SessionStreamControllerTest {
     /** {@code sanitizeForLog}：换行/制表归一成空格，其余控制字符丢弃。 */
     @Test
     void sanitizeForLogMatchesGo() {
-        assertThat(SessionStreamController.sanitizeForLog("a\nb")).isEqualTo("a b");
-        assertThat(SessionStreamController.sanitizeForLog("a\r\nb")).isEqualTo("a  b");
-        assertThat(SessionStreamController.sanitizeForLog("a\tb")).isEqualTo("a b");
-        assertThat(SessionStreamController.sanitizeForLog("ab")).isEqualTo("ab");
-        assertThat(SessionStreamController.sanitizeForLog("正常 id")).isEqualTo("正常 id");
-        assertThat(SessionStreamController.sanitizeForLog(null)).isEmpty();
-        assertThat(SessionStreamController.sanitizeForLog("")).isEmpty();
+        assertThat(LogSanitizer.sanitizeForLog("a\nb")).isEqualTo("a b");
+        assertThat(LogSanitizer.sanitizeForLog("a\r\nb")).isEqualTo("a  b");
+        assertThat(LogSanitizer.sanitizeForLog("a\tb")).isEqualTo("a b");
+        assertThat(LogSanitizer.sanitizeForLog("ab")).isEqualTo("ab");
+        assertThat(LogSanitizer.sanitizeForLog("正常 id")).isEqualTo("正常 id");
+        assertThat(LogSanitizer.sanitizeForLog(null)).isEmpty();
+        assertThat(LogSanitizer.sanitizeForLog("")).isEmpty();
     }
 
     /** 手写信封的字节：对象体键按字母序，所以 {@code error} 在前。 */

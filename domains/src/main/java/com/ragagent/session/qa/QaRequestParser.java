@@ -1,5 +1,6 @@
-package com.ragagent.session.controller;
+package com.ragagent.session.qa;
 
+import com.ragagent.session.support.LogSanitizer;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.common.web.JsonMappers;
 import java.util.List;
@@ -20,7 +21,6 @@ import com.ragagent.session.service.TemporaryDocumentService;
 import com.ragagent.storage.support.ResourceModeException;
 import com.ragagent.storage.support.StreamRewriter;
 import static com.ragagent.session.service.QaSupport.KnowledgeTargets;
-import com.ragagent.session.controller.KnowledgeQaController.Base64Support;
 import com.ragagent.common.security.TenantAPIKeyScope;
 import com.ragagent.session.domain.MessageExecutionContext;
 import com.ragagent.session.domain.SessionNotFoundException;
@@ -40,7 +40,7 @@ import com.ragagent.tenant.Tenant;
  * （控制器侧的 {@code currentTenant()} 依赖 {@code tenantServiceField}）。共享静态助手
  * {@code KnowledgeQaController.stringListOf} 与嵌套类型 {@code ParsedRequest} 按包内可见引用。</p>
  */
-final class QaRequestParser {
+public final class QaRequestParser {
 
     private static final org.slf4j.Logger log =
             org.slf4j.LoggerFactory.getLogger(QaRequestParser.class);
@@ -50,20 +50,20 @@ final class QaRequestParser {
     private final FileService fileService;
     private final StorageBackendResolver storageBackendResolver;
 
-    QaRequestParser(SessionService sessionService, TemporaryDocumentService temporaryDocuments, FileService fileService, StorageBackendResolver storageBackendResolver) {
+    public QaRequestParser(SessionService sessionService, TemporaryDocumentService temporaryDocuments, FileService fileService, StorageBackendResolver storageBackendResolver) {
         this.sessionService = sessionService;
         this.temporaryDocuments = temporaryDocuments;
         this.fileService = fileService;
         this.storageBackendResolver = storageBackendResolver;
     }
 
-    KnowledgeQaController.ParsedRequest parseQARequest(String rawSessionId, CreateKnowledgeQARequest request,
+    public ParsedRequest parseQARequest(String rawSessionId, CreateKnowledgeQARequest request,
             String resourceUrls, String logPrefix,
             AgentResolver agentResolver,
             Tenant readerTenant) {
         QaRequestContext rc = new QaRequestContext();
 
-        String sessionId = SessionStreamController.sanitizeForLog(rawSessionId);
+        String sessionId = LogSanitizer.sanitizeForLog(rawSessionId);
         if (sessionId.isEmpty()) {
             throw BizException.badRequest("invalid session id");
         }
@@ -160,9 +160,9 @@ final class QaRequestParser {
                     if (bytes.length == 0) {
                         throw BizException.badRequest("image decode failed: empty payload");
                     }
-                    if (bytes.length > KnowledgeQaController.maxFileBytes()) {
+                    if (bytes.length > QaTurnSupport.maxFileBytes()) {
                         throw BizException.badRequest(
-                                "image exceeds size limit of " + KnowledgeQaController.maxFileBytes() + " bytes");
+                                "image exceeds size limit of " + QaTurnSupport.maxFileBytes() + " bytes");
                     }
                     try {
                         view.url = temporaryDocuments.saveInlineImageBytes(tenantId, bytes);
@@ -178,7 +178,7 @@ final class QaRequestParser {
         if (!request.attachmentUploads().isEmpty()) {
             QaRequestBinder.decodeAndValidateAttachmentUploads(request.attachmentUploads(),
                     QaSupport.MAX_ATTACHMENT_UPLOADS_PER_REQUEST,
-                    KnowledgeQaController.maxFileBytes(),
+                    QaTurnSupport.maxFileBytes(),
                     QaSupport.MAX_ATTACHMENT_UPLOAD_TOTAL_BYTES);
             long tenantId = rc.session.getTenantId();
             int i = 1;
@@ -215,11 +215,11 @@ final class QaRequestParser {
                 }
                 if (doc == null) {
                     throw BizException.badRequest(
-                            "attachment " + SessionStreamController.sanitizeForLog(id)
+                            "attachment " + LogSanitizer.sanitizeForLog(id)
                                     + " was not found in this session");
                 }
                 if (rc.agentConfig != null) {
-                    List<String> supported = KnowledgeQaController.stringListOf(rc.agentConfig.get("supportedFileTypes"));
+                    List<String> supported = QaTurnSupport.stringListOf(rc.agentConfig.get("supportedFileTypes"));
                     if (!supported.isEmpty()) {
                         String ext = doc.getFileType() == null ? ""
                                 : (doc.getFileType().startsWith(".")
@@ -290,6 +290,6 @@ final class QaRequestParser {
         rc.channel = request.channel;
         rc.reqAgentEnabled = request.agentEnabled;
         rc.reqAgentID = request.agentId;
-        return new KnowledgeQaController.ParsedRequest(rc, request);
+        return new ParsedRequest(rc, request);
     }
 }

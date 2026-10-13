@@ -9,5 +9,7 @@
  * {@code SessionStreamController} / {@code WikiRequestSupport}）⇒ 搬到 service 会造出
  * {@code service → controller} 的**真倒挂** ✗，比原问题更糟。故一律**保持原位** ✓（它们全部是
  * {@code package-private}，封装本就在 ✓）。若将来要迁：先按此判据复核，并同步搬迁测试。</p>
+ * <p>注：{@code QaRequestBinder} / {@code QaAttachmentResolver} 与 QA 编排类已随阶段 5
+ * （2026-10-13，B254）迁到 {@code com.ragagent.session.qa}；本段保留的是 2026-10-10 的核对记录。</p>
  */
 package com.ragagent.embedchannel.controller;

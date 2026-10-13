@@ -1,7 +1,8 @@
 package com.ragagent.session.controller;
 
+import com.ragagent.session.qa.QaRequestBinder;
+import com.ragagent.session.qa.QaAttachmentResolver;
 import java.io.IOException;
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,8 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ragagent.common.error.BizException;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.agent.domain.AgentStep;
-import com.ragagent.session.domain.Message;
+import com.ragagent.session.qa.ParsedRequest;
+import com.ragagent.session.qa.QaRequestParser;
+import com.ragagent.session.qa.QaSseOrchestrator;
+import com.ragagent.session.qa.QaTurnExecutor;
+import com.ragagent.session.qa.QaTurnFinalizer;
 import com.ragagent.session.dto.QaRequests.CreateKnowledgeQARequest;
 import com.ragagent.session.dto.QaRequests.SearchKnowledgeRequest;
 import com.ragagent.session.service.AgentResolver;
@@ -235,11 +239,6 @@ public class KnowledgeQaController {
     // ── 请求体绑定（绑定错误文案逐字对齐） ───────────────────────────────
 
 
-    // ── parseQARequest ────────────────────────────────────────────────────────
-
-    record ParsedRequest(QaRequestContext reqCtx, CreateKnowledgeQARequest request) {}
-
-
     /** 共享/自有 agent 解析（与附件上传入口共用同一组件）。 */
     @org.springframework.beans.factory.annotation.Autowired
     private AgentResolver agentResolverField;
@@ -260,64 +259,9 @@ public class KnowledgeQaController {
         }
     }
 
-    static List<String> stringListOf(com.fasterxml.jackson.databind.JsonNode arr) {
-        List<String> out = new ArrayList<>();
-        if (arr != null && arr.isArray()) {
-            for (com.fasterxml.jackson.databind.JsonNode n : arr) {
-                if (n.isTextual()) {
-                    out.add(n.asText());
-                }
-            }
-        }
-        return out;
-    }
-
-
     // ── executeQA ─────────────────────────────────────────────────────────────
 
 
     // 曾有的 errorEventText（剥 BizException 取 appError().message()）已删除：
     // 其前提被线上 A/B 推翻（W5γ5.12），现统一走 BizException.wireText，理由见上面的调用点注释。
-
-
-    static AgentStep ensureQuickAnswerStep(Message msg) {
-        if (msg.getAgentSteps() == null || msg.getAgentSteps().isEmpty()) {
-            AgentStep step = new AgentStep();
-            step.setIteration(0);
-            step.setTimestamp(OffsetDateTime.now());
-            step.setToolCalls(new ArrayList<>());
-            List<AgentStep> steps = new ArrayList<>();
-            steps.add(step);
-            msg.setAgentSteps(steps);
-        }
-        return msg.getAgentSteps().get(0);
-    }
-
-
-    static void appendQuickAnswerReasoning(Message msg, String content) {
-        if (content == null || content.isEmpty()) {
-            return;
-        }
-        AgentStep step = ensureQuickAnswerStep(msg);
-        step.setReasoningContent(QaSupport.orEmpty(step.getReasoningContent()) + content);
-    }
-
-    // ── 附件 / 完成 / 状态 ────────────────────────────────────────────────────
-
-
-    /** dev 缺省（100MB 上传闸门同形）。 */
-    static long maxFileBytes() {
-        return 100L * 1024 * 1024;
-    }
-
-    static final class Base64Support {
-        static byte[] decode(String data) {
-            String payload = data == null ? "" : data;
-            int comma = payload.indexOf(',');
-            if (payload.startsWith("data:") && comma > 0) {
-                payload = payload.substring(comma + 1);
-            }
-            return java.util.Base64.getDecoder().decode(payload);
-        }
-    }
 }

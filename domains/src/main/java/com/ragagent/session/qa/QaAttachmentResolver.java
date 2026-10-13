@@ -1,4 +1,4 @@
-package com.ragagent.session.controller;
+package com.ragagent.session.qa;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -22,7 +22,7 @@ import com.ragagent.session.service.TemporaryDocumentService;
  * {@code KnowledgeQaController} 的**附件解析簇**：临时文档/内联图片的解析与
  * 等待、解析结果的持久化；SSE 侧只负责经它拿结果。
  */
-final class QaAttachmentResolver {
+public final class QaAttachmentResolver {
 
     private static final org.slf4j.Logger log =
             org.slf4j.LoggerFactory.getLogger(QaAttachmentResolver.class);
@@ -31,14 +31,14 @@ final class QaAttachmentResolver {
     private final TemporaryDocumentService temporaryDocuments;
     private final QaTurnFinalizer turnFinalizer;
 
-    QaAttachmentResolver(MessageService messageService, TemporaryDocumentService temporaryDocuments, QaTurnFinalizer turnFinalizer) {
+    public QaAttachmentResolver(MessageService messageService, TemporaryDocumentService temporaryDocuments, QaTurnFinalizer turnFinalizer) {
         this.messageService = messageService;
         this.temporaryDocuments = temporaryDocuments;
         this.turnFinalizer = turnFinalizer;
     }
 
     /** 等待附件就绪 → 解析为提示词内容 → 注入本回合。 */
-    void resolveTemporaryAttachments(SseStreamContext streamCtx, QaRequestContext reqCtx) {
+    public void resolveTemporaryAttachments(SseStreamContext streamCtx, QaRequestContext reqCtx) {
         if (reqCtx.attachmentIDs.isEmpty()) {
             return;
         }
@@ -123,7 +123,7 @@ final class QaAttachmentResolver {
         List<MessageAttachment> attachments = resolved.attachments();
         // agent 配置的 supported_file_types 再过滤一层（不支持的附件不进提示词）
         if (reqCtx.agentConfig != null && !attachments.isEmpty()) {
-            List<String> supported = KnowledgeQaController.stringListOf(reqCtx.agentConfig.get("supportedFileTypes"));
+            List<String> supported = QaTurnSupport.stringListOf(reqCtx.agentConfig.get("supportedFileTypes"));
             if (!supported.isEmpty()) {
                 attachments.removeIf(att -> {
                     String ext = att.getFileType() == null
@@ -204,7 +204,7 @@ final class QaAttachmentResolver {
                     reqCtx.userMessageID, e.getMessage());
         }
     }
-    void waitForAttachments(long tenantId, String sessionId, List<String> ids, long timeoutMs) {
+    public void waitForAttachments(long tenantId, String sessionId, List<String> ids, long timeoutMs) {
         long deadline = System.currentTimeMillis() + timeoutMs;
         try {
             while (turnFinalizer.hasPendingAttachments(tenantId, sessionId, ids) && System.currentTimeMillis() < deadline) {

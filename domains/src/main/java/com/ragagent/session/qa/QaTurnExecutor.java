@@ -1,4 +1,4 @@
-package com.ragagent.session.controller;
+package com.ragagent.session.qa;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
@@ -39,7 +39,7 @@ import com.ragagent.session.service.SteerRunCoordinator;
  * <p>共享项处理：{@code turnFinalizer}/{@code sseOrchestrator}/{@code attachmentResolver}
  * 均为已建协作者，直接持有转发；{@code appendQuickAnswerReasoning} 是 static → 留控制器按类名引用。</p>
  */
-final class QaTurnExecutor {
+public final class QaTurnExecutor {
 
     private static final org.slf4j.Logger log =
             org.slf4j.LoggerFactory.getLogger(QaTurnExecutor.class);
@@ -54,7 +54,7 @@ final class QaTurnExecutor {
     private final QaAttachmentResolver attachmentResolver;
     private final TenantService tenantService;
 
-    QaTurnExecutor(MessageService messageService, StreamManager streamManager, SessionKnowledgeQaService knowledgeQaService, SessionAgentQaService agentQaService, SteerRunCoordinator steerCoordinator, QaSseOrchestrator sseOrchestrator, QaTurnFinalizer turnFinalizer, QaAttachmentResolver attachmentResolver, TenantService tenantService) {
+    public QaTurnExecutor(MessageService messageService, StreamManager streamManager, SessionKnowledgeQaService knowledgeQaService, SessionAgentQaService agentQaService, SteerRunCoordinator steerCoordinator, QaSseOrchestrator sseOrchestrator, QaTurnFinalizer turnFinalizer, QaAttachmentResolver attachmentResolver, TenantService tenantService) {
         this.messageService = messageService;
         this.streamManager = streamManager;
         this.knowledgeQaService = knowledgeQaService;
@@ -66,7 +66,7 @@ final class QaTurnExecutor {
         this.tenantService = tenantService;
     }
 
-    void executeQA(QaRequestContext reqCtx, QaMode mode, boolean generateTitle,
+    public void executeQA(QaRequestContext reqCtx, QaMode mode, boolean generateTitle,
             HttpServletResponse response) throws IOException {
         executeQA(reqCtx, mode, generateTitle, response, null);
     }
@@ -139,7 +139,7 @@ final class QaTurnExecutor {
             sseOrchestrator.registerQuickAnswerTimelineRecorder(streamCtx.eventBus, streamCtx.assistantMessage);
             streamCtx.eventBus.on(EventType.EVENT_AGENT_THOUGHT, evt -> {
                 if (evt.getData() instanceof AgentThoughtData data && !data.getContent().isEmpty()) {
-                    KnowledgeQaController.appendQuickAnswerReasoning(streamCtx.assistantMessage, data.getContent());
+                    QaTurnSupport.appendQuickAnswerReasoning(streamCtx.assistantMessage, data.getContent());
                 }
             });
             final boolean[] completionHandled = {false};

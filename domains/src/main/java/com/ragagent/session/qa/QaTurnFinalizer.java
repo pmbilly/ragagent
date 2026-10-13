@@ -1,4 +1,4 @@
-package com.ragagent.session.controller;
+package com.ragagent.session.qa;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -25,7 +25,7 @@ import com.ragagent.session.service.SessionLookupScope;
  * <p>{@code runWithTenant} 与 {@code completeAssistantMessage} 集中在本类，
  * SSE 编排协作者持有本类即可转发这两件事，不必回调控制器。</p>
  */
-final class QaTurnFinalizer {
+public final class QaTurnFinalizer {
 
     private static final org.slf4j.Logger log =
             org.slf4j.LoggerFactory.getLogger(QaTurnFinalizer.class);
@@ -36,7 +36,7 @@ final class QaTurnFinalizer {
     private final TemporaryDocumentService temporaryDocuments;
     private final MemoryExtractionService memoryExtraction;
 
-    QaTurnFinalizer(SessionService sessionService, MessageService messageService, MessageSuggestionService suggestionService, TemporaryDocumentService temporaryDocuments, MemoryExtractionService memoryExtraction) {
+    public QaTurnFinalizer(SessionService sessionService, MessageService messageService, MessageSuggestionService suggestionService, TemporaryDocumentService temporaryDocuments, MemoryExtractionService memoryExtraction) {
         this.sessionService = sessionService;
         this.messageService = messageService;
         this.suggestionService = suggestionService;
@@ -54,7 +54,7 @@ final class QaTurnFinalizer {
      * （723 的 AGENT_FINAL_ANSWER、1006 的 STOP），handler 跑在引擎/流水线/HTTP
      * 线程上，身份被抹后同线程后续的 owner/权限判定全部失真。</p>
      */
-    void runWithTenant(Long tenantId, Runnable body) {
+    public void runWithTenant(Long tenantId, Runnable body) {
         runWithTenant(tenantId, null, body);
     }
 
@@ -67,7 +67,7 @@ final class QaTurnFinalizer {
      * SessionNotFound）。这里：当前线程身份缺失时用 {@code fallback} 补齐；当前线程
      * 已有身份则以它为准（调用方身份优先）。</p>
      */
-    void runWithTenant(Long tenantId, TenantContextSnapshot fallback, Runnable body) {
+    public void runWithTenant(Long tenantId, TenantContextSnapshot fallback, Runnable body) {
         TenantContextSnapshot prev =
                 TenantContextSnapshot.capture();
         TenantContextSnapshot identity =
@@ -85,7 +85,7 @@ final class QaTurnFinalizer {
             prev.replay();
         }
     }
-    boolean hasPendingAttachments(long tenantId, String sessionId, List<String> ids) {
+    public boolean hasPendingAttachments(long tenantId, String sessionId, List<String> ids) {
         for (String id : ids) {
             TemporaryDocument doc;
             try {
@@ -99,7 +99,7 @@ final class QaTurnFinalizer {
         }
         return false;
     }
-    void persistLastRequestState(QaRequestContext reqCtx, QaMode mode) {
+    public void persistLastRequestState(QaRequestContext reqCtx, QaMode mode) {
         boolean agentEnabled = reqCtx.reqAgentEnabled;
         if (mode == QaMode.AGENT && reqCtx.agentConfig != null) {
             agentEnabled = SessionKnowledgeQaService.isAgentMode(reqCtx.agentConfig);
@@ -131,7 +131,7 @@ final class QaTurnFinalizer {
      * 并产生孤立产物；② 提交本身失败时短路——原先只 warning 后照样启动下游，
      * "消息未完成、索引已建"的孤立产物仍然存在。</p>
      */
-    void completeAssistantMessage(Message assistantMessage, String userQuery,
+    public void completeAssistantMessage(Message assistantMessage, String userQuery,
             String userMessageId, Long tenantId) {
         assistantMessage.setUpdatedAt(OffsetDateTime.now());
         assistantMessage.setCompleted(true);

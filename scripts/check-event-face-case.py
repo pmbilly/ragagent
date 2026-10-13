@@ -113,7 +113,7 @@ def check_routes() -> None:
 # 消费文件，键写在 `put/set/get/path/containsKey/getString(...)` 或 helper 二参形态里
 # （B93b 的"机制二"：`mapString(chunk.getData(), "tool_call_id")` 曾被四类键位模式全部漏掉）。
 EVENT_MAP_FILES = {
-    'session/controller/QaSseOrchestrator.java':
+    'session/qa/QaSseOrchestrator.java':
         'agentQuery/data 载荷生产侧（手工 put；B135b2 收尾 3 键）',
     'session/service/AgentStreamBridge.java':
         'SSE 事件桥（手工 put；B93b 已 camel 38 处键位，B135b2 收尾 finalContent）',
