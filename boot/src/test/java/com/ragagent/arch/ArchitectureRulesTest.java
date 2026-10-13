@@ -821,7 +821,6 @@ class ArchitectureRulesTest {
             "com.ragagent.knowledge.service.KnowledgeBaseService",
             "com.ragagent.knowledge.service.KnowledgeBatchOpsService",
             "com.ragagent.knowledge.service.KnowledgeCloneService",
-            "com.ragagent.knowledge.service.KnowledgeFileService",
             "com.ragagent.knowledge.service.KnowledgeFolderService",
             "com.ragagent.knowledge.service.KnowledgeMoveService",
             "com.ragagent.knowledge.service.KnowledgeSearchService",

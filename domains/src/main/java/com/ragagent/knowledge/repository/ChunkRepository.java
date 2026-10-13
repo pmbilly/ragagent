@@ -96,10 +96,31 @@ public class ChunkRepository implements ChunkSearchGateway {
         chunkMapper.insert(chunk);
     }
 
+    /** 按主键整行更新（B263⑩：由 service 直连 chunkMapper 归位）。 */
+    public void updateById(Chunk chunk) {
+        chunkMapper.updateById(chunk);
+    }
+
     /** 按 knowledgeId 软删该知识下全部 chunk 行（B263⑨）。 */
     public void softDeleteByKnowledgeId(String knowledgeId, OffsetDateTime now) {
         chunkMapper.update(null, new LambdaUpdateWrapper<Chunk>()
                 .eq(Chunk::getKnowledgeId, knowledgeId).set(Chunk::getDeletedAt, now));
+    }
+
+    /**
+     * 与 {@link #getChunkById} 同查询，但**找不到返回 {@code null}**（不抛）。
+     *
+     * <p>B263⑩：图片信息更新路径的原契约是"null → 调用方抛
+     * {@code AppError.internal(\"chunk not found\")}（500）"——复用会抛
+     * {@link ChunkNotFoundException} 的版本会改变对外错误形状（契约测试
+     * {@code KnowledgeOperationsContractTest} 当场抓住）。</p>
+     */
+    public Chunk findByIdOrNull(long tenantId, String id) {
+        return chunkMapper.selectOne(new LambdaQueryWrapper<Chunk>()
+                .eq(Chunk::getTenantId, tenantId)
+                .eq(Chunk::getId, id)
+                .isNull(Chunk::getDeletedAt)
+                .last("LIMIT 1"));
     }
 
     public Chunk getChunkById(long tenantId, String id) {

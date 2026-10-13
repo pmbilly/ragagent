@@ -1,7 +1,6 @@
 package com.ragagent.knowledge.repository;
 
 import java.time.OffsetDateTime;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
@@ -19,18 +18,17 @@ import org.springframework.stereotype.Component;
 public class DocumentParser {
 
     private final KnowledgeMapper knowledgeMapper;
+    private final KnowledgeRepository knowledgeRepository;
 
-    public DocumentParser(KnowledgeMapper knowledgeMapper) {
+    public DocumentParser(KnowledgeMapper knowledgeMapper, KnowledgeRepository knowledgeRepository) {
         this.knowledgeMapper = knowledgeMapper;
+        this.knowledgeRepository = knowledgeRepository;
     }
 
     /** 按 id 取租户内未软删行（软删不可见；找不到返回 {@code null}）。 */
     public Knowledge findById(long tenantId, String id) {
-        return knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getId, id)
-                .eq(Knowledge::getTenantId, tenantId)
-                .isNull(Knowledge::getDeletedAt)
-                .last("LIMIT 1"));
+        // B263⑩：与 KnowledgeRepository.findById 同一查询 ⇒ 委托，保持单一实现。
+        return knowledgeRepository.findById(tenantId, id);
     }
 
     /** 落"用户取消解析"终态：状态 + 错误文案 + 子任务计数归零 + updated_at。 */

@@ -1,5 +1,11 @@
 package com.ragagent.knowledge.repository;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+
+import com.fasterxml.jackson.databind.JsonNode;
+
+import java.time.ZoneOffset;
+
 import java.time.OffsetDateTime;
 
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -43,6 +49,60 @@ public class KnowledgeRepository {
                 .eq(Knowledge::getSource, source)
                 .isNull(Knowledge::getDeletedAt)
                 .last("LIMIT 1"));
+    }
+
+    /** 按 id 取租户内未软删行（找不到返回 {@code null}）。 */
+    public Knowledge findById(long tenantId, String id) {
+        return knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
+                .eq(Knowledge::getId, id)
+                .eq(Knowledge::getTenantId, tenantId)
+                .isNull(Knowledge::getDeletedAt)
+                .last("LIMIT 1"));
+    }
+
+    /** 摘要列写（B263⑩：由 {@code service.KnowledgeFileService} 归位；只写摘要自己那几列）。 */
+    public void updateSummaryColumns(Knowledge k) {
+        knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, k.getId())
+                .set(Knowledge::getDescription, k.getDescription())
+                .set(Knowledge::getSummaryStatus, k.getSummaryStatus())
+                .set(Knowledge::getMetadata, k.getMetadata() == null
+                                ? JsonNodeFactory.instance.objectNode()
+                                : k.getMetadata(),
+                        "typeHandler=com.ragagent.common.web.PgJsonTypeHandler")
+                .set(Knowledge::getUpdatedAt, k.getUpdatedAt() == null ? OffsetDateTime.now(ZoneOffset.UTC) : k.getUpdatedAt()));
+    }
+
+    /** 全列写（DeletedAt/PendingSubtasksCount 除外；零值也落库）——B263⑩ 由 KnowledgeFileService 归位。 */
+    public void updateRow(Knowledge k, JsonNode metadata) {
+        knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, k.getId())
+                .set(Knowledge::getType, k.getType())
+                .set(Knowledge::getTitle, k.getTitle())
+                .set(Knowledge::getDescription, k.getDescription())
+                .set(Knowledge::getSource, k.getSource())
+                .set(Knowledge::getParseStatus, k.getParseStatus())
+                .set(Knowledge::getSummaryStatus, k.getSummaryStatus())
+                .set(Knowledge::getEnableStatus, k.getEnableStatus())
+                .set(Knowledge::getEmbeddingModelId, k.getEmbeddingModelId())
+                .set(Knowledge::getFileName, k.getFileName())
+                .set(Knowledge::getFileType, k.getFileType())
+                .set(Knowledge::getFileSize, k.getFileSize() == null ? 0L : k.getFileSize())
+                .set(Knowledge::getFileHash, k.getFileHash())
+                .set(Knowledge::getFilePath, k.getFilePath())
+                .set(Knowledge::getMetadata, metadata,
+                        "typeHandler=com.ragagent.common.web.PgJsonTypeHandler")
+                .set(Knowledge::getUpdatedAt, k.getUpdatedAt())
+                .set(Knowledge::getProcessedAt, k.getProcessedAt())
+                .set(Knowledge::getErrorMessage, k.getErrorMessage()));
+    }
+
+    /** 只刷 file_hash + updated_at（图片信息更新后的对照哈希）——B263⑩ 归位。 */
+    public void updateFileHash(String id, String fileHash, OffsetDateTime now) {
+        knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, id)
+                .set(Knowledge::getFileHash, fileHash)
+                .set(Knowledge::getUpdatedAt, now));
     }
 
     /** 插入新行。 */

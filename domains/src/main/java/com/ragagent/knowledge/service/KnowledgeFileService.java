@@ -1,5 +1,9 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.repository.KnowledgeRepository;
+
+import com.ragagent.knowledge.repository.ChunkRepository;
+
 import com.ragagent.knowledge.support.KnowledgePaths;
 
 import com.ragagent.common.web.JsonMappers;
@@ -8,8 +12,6 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -21,8 +23,6 @@ import com.ragagent.common.security.InputSanitizer;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.mapper.ChunkMapper;
-import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -32,7 +32,6 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import com.ragagent.storage.fileserve.FileTransport.OpenedFile;
 import com.ragagent.knowledge.storage.LocalStorageService;
 import com.ragagent.knowledge.storage.TenantFileStorage;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
@@ -49,28 +48,28 @@ public class KnowledgeFileService {
     private static final Logger log = LoggerFactory.getLogger(KnowledgeFileService.class);
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
-    private final ChunkMapper chunkMapper;
     private final ChunkVectorIndexer chunkVectorIndexer;
     private final KnowledgeAccessHelper access;
     private final KnowledgeFolderService folderService;
     private final TenantFileStorage fileStorage;
-    private final KnowledgeMapper knowledgeMapper;
+    private final KnowledgeRepository knowledgeRepository;
+    private final ChunkRepository chunkRepository;
     private final KnowledgeProcessingQueue worker;
 
     public KnowledgeFileService(
-                            ChunkMapper chunkMapper,
+                            KnowledgeRepository knowledgeRepository,
+                            ChunkRepository chunkRepository,
                             ChunkVectorIndexer chunkVectorIndexer,
                             KnowledgeAccessHelper access,
                             KnowledgeFolderService folderService,
                             TenantFileStorage fileStorage,
-                            KnowledgeMapper knowledgeMapper,
                             KnowledgeProcessingQueue worker) {
-        this.chunkMapper = chunkMapper;
+        this.chunkRepository = chunkRepository;
         this.chunkVectorIndexer = chunkVectorIndexer;
         this.access = access;
         this.folderService = folderService;
         this.fileStorage = fileStorage;
-        this.knowledgeMapper = knowledgeMapper;
+        this.knowledgeRepository = knowledgeRepository;
         this.worker = worker;
     }
 
@@ -165,42 +164,16 @@ public class KnowledgeFileService {
      * 绝不碰 parse_status、enable_status、pending_subtasks_count。</p>
      */
    public void updateSummaryColumns(Knowledge k) {
-        knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
-                .eq(Knowledge::getId, k.getId())
-                .set(Knowledge::getDescription, k.getDescription())
-                .set(Knowledge::getSummaryStatus, k.getSummaryStatus())
-                .set(Knowledge::getMetadata, k.getMetadata() == null
-                                ? JsonNodeFactory.instance.objectNode()
-                                : k.getMetadata(),
-                        "typeHandler=com.ragagent.common.web.PgJsonTypeHandler")
-                .set(Knowledge::getUpdatedAt, k.getUpdatedAt() == null ? OffsetDateTime.now(ZoneOffset.UTC) : k.getUpdatedAt()));
+        knowledgeRepository.updateSummaryColumns(k);
     }
 
     /**
      * 全列写（DeletedAt/PendingSubtasksCount 除外）：
      * description=""/processed_at=NULL 这类零值也必须落库，不能走 MP 默认的跳空列。
      */
+    /** B263⑩：语句体已归位 {@code repository.KnowledgeRepository#updateRow}，此处保留薄委托（调用方不变）。 */
     void updateKnowledgeRow(Knowledge k, JsonNode metadata) {
-        knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
-                .eq(Knowledge::getId, k.getId())
-                .set(Knowledge::getType, k.getType())
-                .set(Knowledge::getTitle, k.getTitle())
-                .set(Knowledge::getDescription, k.getDescription())
-                .set(Knowledge::getSource, k.getSource())
-                .set(Knowledge::getParseStatus, k.getParseStatus())
-                .set(Knowledge::getSummaryStatus, k.getSummaryStatus())
-                .set(Knowledge::getEnableStatus, k.getEnableStatus())
-                .set(Knowledge::getEmbeddingModelId, k.getEmbeddingModelId())
-                .set(Knowledge::getFileName, k.getFileName())
-                .set(Knowledge::getFileType, k.getFileType())
-                .set(Knowledge::getFileSize, k.getFileSize() == null ? 0L : k.getFileSize())
-                .set(Knowledge::getFileHash, k.getFileHash())
-                .set(Knowledge::getFilePath, k.getFilePath())
-                .set(Knowledge::getMetadata, metadata,
-                        "typeHandler=com.ragagent.common.web.PgJsonTypeHandler")
-                .set(Knowledge::getUpdatedAt, k.getUpdatedAt())
-                .set(Knowledge::getProcessedAt, k.getProcessedAt())
-                .set(Knowledge::getErrorMessage, k.getErrorMessage()));
+        knowledgeRepository.updateRow(k, metadata);
     }
 
     /** 下载文件名清洗：换行/制表删除、斜杠转连字符、引号转单引号、
@@ -228,11 +201,7 @@ public class KnowledgeFileService {
      * （本地可 seek → 支持 Range；云按 provider 能力）。不整份读入内存。
      */
     public KnowledgeFileStream openKnowledgeFile(String id) {
-        Knowledge knowledge = knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getId, id)
-                .eq(Knowledge::getTenantId, KnowledgeService.tenantId())
-                .isNull(Knowledge::getDeletedAt)
-                .last("LIMIT 1"));
+        Knowledge knowledge = knowledgeRepository.findById(KnowledgeService.tenantId(), id);
         if (knowledge == null) {
             throw BizException.notFound("record not found");
         }
@@ -276,11 +245,7 @@ public class KnowledgeFileService {
         }
         JsonNode image = images.get(0);
 
-        Chunk chunk = chunkMapper.selectOne(new LambdaQueryWrapper<Chunk>()
-                .eq(Chunk::getId, chunkId)
-                .eq(Chunk::getTenantId, KnowledgeService.tenantId())
-                .isNull(Chunk::getDeletedAt)
-                .last("LIMIT 1"));
+        Chunk chunk = chunkRepository.findByIdOrNull(KnowledgeService.tenantId(), chunkId);
         if (chunk == null) {
             // 父块缺失 "chunk not found"（handler 包 500）
             throw new BizException(AppError.internal("chunk not found"));
@@ -292,10 +257,7 @@ public class KnowledgeFileService {
         }
         chunk.setImageInfo(imageInfo);
         long tenantId = KnowledgeService.tenantId();
-        List<Chunk> chunkChildren = chunkMapper.selectList(new LambdaQueryWrapper<Chunk>()
-                .eq(Chunk::getParentChunkId, chunkId)
-                .eq(Chunk::getTenantId, tenantId)
-                .isNull(Chunk::getDeletedAt));
+        List<Chunk> chunkChildren = chunkRepository.listChunkByParentId(tenantId, chunkId);
 
         List<Chunk> updateChunks = new ArrayList<>();
         updateChunks.add(chunk);
@@ -349,10 +311,10 @@ public class KnowledgeFileService {
         // 一行都不写），真正的 delete+batchIndex 排到提交后执行，回滚则一次都不执行。
         chunkVectorIndexer.assertIndexable(chunk.getKnowledgeBaseId());
         for (Chunk c : addChunks) {
-            chunkMapper.insert(c);
+            chunkRepository.insert(c);
         }
         for (Chunk c : updateChunks) {
-            chunkMapper.updateById(c);
+            chunkRepository.updateById(c);
         }
         // 向量同步（更新既有 + 新增图片子块两批）：
         // 内部过 NeedsEmbedding（策略判定在 ChunkVectorIndexer）→ GetEmbeddingModel；
@@ -363,19 +325,12 @@ public class KnowledgeFileService {
         // K7：提交后执行（本地事务回滚不了外部索引的 delete/batchIndex）。
         afterCommit(() -> chunkVectorIndexer.updateChunkVector(chunk.getKnowledgeBaseId(), vectorChunks));
         // 对照：knowledge.file_hash = calculateStr(knowledgeID, fileHash, imageInfo)
-        Knowledge fresh = knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getId, knowledgeId)
-                .eq(Knowledge::getTenantId, tenantId)
-                .isNull(Knowledge::getDeletedAt)
-                .last("LIMIT 1"));
+        Knowledge fresh = knowledgeRepository.findById(tenantId, knowledgeId);
         if (fresh != null) {
             String fileHash = LocalStorageService.md5Hex((knowledgeId + (fresh.getFileHash() == null
                     ? "" : fresh.getFileHash()) + imageInfo)
                     .getBytes(StandardCharsets.UTF_8));
-            knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
-                    .eq(Knowledge::getId, fresh.getId())
-                    .set(Knowledge::getFileHash, fileHash)
-                    .set(Knowledge::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC)));
+            knowledgeRepository.updateFileHash(fresh.getId(), fileHash, OffsetDateTime.now(ZoneOffset.UTC));
         }
     }
 

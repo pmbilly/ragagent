@@ -941,6 +941,15 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **结果**：`KnowledgeService` **726 → 719 行**（B263⑦⑧⑨ 累计 **799 → 719**，-80）；mapper 直连 **0**。
 - **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m40s** ✓ 十一守卫 ✓（SCC 13 组 / `{service, task}` 2 成员未变）。
 - **登记（余步）**：`KnowledgeService` 719 行余部（`service.management/*` 用例归位需**配套断边**——B263① 已实测"先拆面会扩大 SCC"）；`selectPage` 的**查询构建**搬入仓储；`KnowledgeFileService`(422/2)、`KnowledgeBaseService`(626/18)；`normalizeKnowledgeFolderPath` 真实现随 `KnowledgeFolderService` 归位；`task ⇄ service` 余 7 处。
+
+**🔶 B263 第⑩步（2026-10-14，`KnowledgeFileService` 归仓储：422 → 380 行）**
+- **仓储扩面**：`KnowledgeRepository` +4（`findById(tenantId,id)` / `updateSummaryColumns(k)` / `updateRow(k,metadata)` / `updateFileHash(id,hash,now)`），`ChunkRepository` +2（`updateById(Chunk)`、**`findByIdOrNull(tenantId,id)`**）；**复用**既有 `listChunkByParentId`（语义核对等价 ✓）。
+- **保留薄委托**：service 侧 `updateSummaryColumns` / `updateKnowledgeRow` 变成一行委托 ⇒ 全部调用方（`KnowledgeParseService`/`KnowledgeSummaryService`/`KnowledgeService`/controller）**零改动**。
+- **连带清理**：mapper 使用归零 ⇒ 两个 `*Mapper` 字段/构造参数/赋值/import 删除；死成员守卫点名 2 个未使用 import（`DocumentParser` 的 `LambdaQueryWrapper`、本类的 `JsonNodeFactory`）⇒ 清；A17 基线里 `KnowledgeFileService` 条目**已不再违例** ⇒ 按提示删除（A16 保留：仍依赖 `task` 队列）。
+- **单一实现**：`DocumentParser.findById` 改为**委托** `KnowledgeRepository.findById`（同一查询不再两份）。
+- **⚠️ 契约测试现场抓错（本步最值钱的教训）**：`updateImageInfo` 里的 chunk 查询我复用了既有 `ChunkRepository.getChunkById` ✗ —— 它找不到时**抛 `ChunkNotFoundException`**，而原契约是"返回 null → 调用方抛 `AppError.internal("chunk not found")`（**500**）"✗ ⇒ `KnowledgeOperationsContractTest.imageInfoMatchesGo` **当场失败** ✓ ⇒ 新增 `findByIdOrNull(tenantId,id)` 保留 null 语义并改回 ✓。**结论：复用仓储方法前要读语义（异常 vs 空值），不能只看签名。**
+- **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m42s** ✓ 十一守卫 ✓（SCC 13 组 / `{service, task}` 2 成员未变）。
+- **登记（余步）**：`KnowledgeBaseService`(626/18)；`KnowledgeService`(719) 余部（往 `service.<子面>` 搬需配套断边）；`selectPage` 的查询构建搬入仓储；`normalizeKnowledgeFolderPath` 真实现随 `KnowledgeFolderService` 归位；`task ⇄ service` 余 7 处。
 - **登记（余步）**：⑦ `KnowledgeService`(799 行/28 引用) 拆分（**优先级最高：行数已到阈值边缘**）；⑧ `KnowledgeFileService`(422/2)、`KnowledgeParseService` 余部、`KnowledgeBaseService`(626/18)；⑨ 最后一对 `task ⇄ service`（`task→service` 现余 **7**：`ChunkExtractService`3 / `QuestionGenerationService`3 / `SpanTracker`）；⑩ `service` 七子面、`domain.{document,task,graph}`、`mapper` 目标名对齐。
 - **登记（余步）**：按最轻优先继续——`ChunkVectorIndexer`(386/2)、`KnowledgeFileService`(422/2)、`KnowledgeParseService` 余部、`KnowledgeBaseService`(626/18)、`KnowledgeService`(796/28)；一律"切分而非整搬"。`task → service` 现余 8 处（`ChunkExtractService`3 / `QuestionGenerationService`3 / `SpanTracker` / `ChunkVectorIndexer`）。
 
