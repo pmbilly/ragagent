@@ -1094,7 +1094,7 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 |---|---|---|---|
 | B232 | 0 边界固化 | 守卫修复（`check-package-cycles.py` PERSIST_RE 缩进）+ R9 包级 SCC 棘轮（基线 13 组） | ✅ **完成（2026-10-13）** |
 | B233 | 0 | ArchUnit A16 边界层引用禁令（基线 76）+ A17 service 技术依赖禁令（基线 61） | ✅ **完成（2026-10-13）** |
-| B234 | 1 正确性 | A6 同 ID 去重保最高分（`KnowledgeSearchRanking`） | ⬜ |
+| B234 | 1 正确性 | A6 同 ID 去重保最高分（`KnowledgeSearchRanking`） | ✅ **完成（2026-10-13）** |
 | B235 | 1 | K3 DocReader 流错误传播 | ⬜ |
 | B236 | 1 | K1 租户显式路由（worker→向量店） | ⬜ |
 | B237 | 1 | K2 URL 摄取统一（拍板点：同步下载路径） | ⬜ |
@@ -1134,4 +1134,10 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **红态探针**：注入 `knowledge.service.ProbeBoundaryDeps`（import `ChunkMapper` + `LambdaQueryWrapper`）⇒ A16/A17 **双红且 fresh 集合精确只含探针**；删除后复绿。
 - **闸门**：`spotlessCheck build` ✓ **1m25s** ✓ · **4903 / 失败 0 / 跳过 4** ✓（+2 = 本批新规则；跳过为既有环境性）· 十一守卫（在 build 内）✓。
 - **后续**：这两条基线主要靠 R 系列阶段 5/6 的落点搬移（`Redis*`/`*Wiring` 混在 service、`service` 里的边界类）逐域消减，基线只许减。
+
+**✅ B234（2026-10-13，A6 同 ID 去重保最高分）**
+- **缺口**（方案 A6，源码事实）：`KnowledgeSearchRanking.deduplicateResults` 第一遍按 id 键登记先到者后 `continue`，第二遍"留最高分"只能看到幸存项 ⇒ 反例（x: 0.1 先到、0.9 被丢）成为终值。
+- **修复**：同 ID 保最高分**前移为第一遍**（`LinkedHashMap` 保该 ID 首次出现位置、替换不改次序；同分保留先到者 = 确定 tie-break）；多键（parent / kb#index）+ 内容签名去重保持"留先"语义不变。
+- **测试**：新增 `KnowledgeSearchRankingDedupTest` 5 例——2 例反例先红（低分先到 / 替换不改位置）、3 例回归守卫（高分先到 / 同分留先 / parent·kb#index·签名留先）；录制回放 `KnowledgeSearchRecordingTest` 15/0 未受影响（语料本就不含跨 query 同 ID）。
+- **闸门**：`spotlessCheck build` ✓ **1m50s** ✓ · **4908 / 失败 0 / 跳过 4** ✓（+5 = 新测试）；十一守卫（在 build 内）✓。
 

@@ -102,11 +102,23 @@ final class KnowledgeSearchRanking {
 
     /** 多键 + 内容签名去重；同 ID 保留最高分（与 grep 的留先不同）。 */
     static List<ResultWithMeta> deduplicateResults(List<ResultWithMeta> results) {
+        // 第一遍：同 ID 只留最高分。必须在多键去重**之前**——否则同 ID 的低分先到
+        // 会按 id 键把高分版本 continue 掉，后面的"留最高分"永远看不到它。
+        // LinkedHashMap 保该 ID **首次出现**的位置（替换不改变次序）；同分保留先到者（确定 tie-break）。
+        Map<String, ResultWithMeta> bestByID = new LinkedHashMap<>();
+        for (ResultWithMeta r : results) {
+            ResultWithMeta existing = bestByID.get(nz(r.sr.id));
+            if (existing == null || r.sr.score > existing.sr.score) {
+                bestByID.put(nz(r.sr.id), r);
+            }
+        }
+
+        // 第二遍：多键（parent / kb#index）+ 内容签名去重（留先）。
         Set<String> seen = new LinkedHashSet<>();
         Set<String> contentSig = new LinkedHashSet<>();
         List<ResultWithMeta> uniqueResults = new ArrayList<>();
 
-        for (ResultWithMeta r : results) {
+        for (ResultWithMeta r : bestByID.values()) {
             List<String> keys = new ArrayList<>();
             keys.add(nz(r.sr.id));
             if (!nz(r.sr.parentChunkId).isEmpty()) {
@@ -135,20 +147,7 @@ final class KnowledgeSearchRanking {
             seen.addAll(keys);
             uniqueResults.add(r);
         }
-
-        // 同 ID 不同分：留最高分。
-        Map<String, ResultWithMeta> seenByID = new LinkedHashMap<>();
-        for (ResultWithMeta r : uniqueResults) {
-            ResultWithMeta existing = seenByID.get(nz(r.sr.id));
-            if (existing != null) {
-                if (r.sr.score > existing.sr.score) {
-                    seenByID.put(nz(r.sr.id), r);
-                }
-            } else {
-                seenByID.put(nz(r.sr.id), r);
-            }
-        }
-        return new ArrayList<>(seenByID.values());
+        return uniqueResults;
     }
 
     /** composite 打分：0.6 模型分 + 0.3 基础分 + 0.1 来源权重，位置先验乘子，[0,1] 截断。 */
