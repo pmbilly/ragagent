@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.repository;
 
+import com.ragagent.knowledge.support.ChunkProjectionAdapter;
+
 import java.util.List;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -20,7 +22,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import javax.sql.DataSource;
-import com.ragagent.knowledge.service.ChunkPortAdapter;
 
 /**
  * chunk 仓储（文档与 FAQ 的 chunk 行读写，方法式门面）。数据访问契约如下，
@@ -135,7 +136,7 @@ public class ChunkRepository implements ChunkSearchGateway {
      */
     @Override
     public List<ChunkFacts> findChunks(long tenantId, List<String> chunkIds) {
-        return ChunkPortAdapter.factsAll(listChunksById(tenantId, chunkIds));
+        return ChunkProjectionAdapter.factsAll(listChunksById(tenantId, chunkIds));
     }
 
     /**

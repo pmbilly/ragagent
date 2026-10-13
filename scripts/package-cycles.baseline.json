@@ -41,7 +41,6 @@
     ],
     [
       "com.ragagent.knowledge.domain.access",
-      "com.ragagent.knowledge.repository",
       "com.ragagent.knowledge.service",
       "com.ragagent.knowledge.task"
     ],

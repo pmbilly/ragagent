@@ -1,5 +1,6 @@
 package com.ragagent.arch;
 
+
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -741,7 +742,6 @@ class ArchitectureRulesTest {
             "com.ragagent.initialization.service.ModelConnectivityTestService",
             "com.ragagent.knowledge.service.ChunkEditService",
             "com.ragagent.knowledge.service.ChunkExtractService",
-            "com.ragagent.knowledge.service.ChunkPortAdapter",
             "com.ragagent.knowledge.service.ChunkQuestionService",
             "com.ragagent.knowledge.service.ChunkReadService",
             "com.ragagent.knowledge.service.ChunkVectorIndexer",
@@ -813,7 +813,6 @@ class ArchitectureRulesTest {
             "com.ragagent.initialization.service.InitializationConfigService",
             "com.ragagent.knowledge.service.ChunkEditService",
             "com.ragagent.knowledge.service.ChunkExtractService",
-            "com.ragagent.knowledge.service.ChunkPortAdapter",
             "com.ragagent.knowledge.service.ChunkQuestionService",
             "com.ragagent.knowledge.service.ChunkReadService",
             "com.ragagent.knowledge.service.ChunkVectorIndexer",

@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.service;
+package com.ragagent.knowledge.api;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,15 +12,17 @@ import com.ragagent.common.knowledge.ChunkView;
 import com.ragagent.common.pipeline.ChunkTypes;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.mapper.ChunkMapper;
+import com.ragagent.knowledge.support.ChunkProjectionAdapter;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
-import com.ragagent.common.knowledge.ChunkFacts;
 
 /**
  * {@link ChunkPort} 的 knowledge 侧实现。
  *
- * <p>{@link #view}/{@link #viewAll} 同时作为域内"实体 → L1 视图"的公用投影
- * （{@code KnowledgeSummaryService} 调 {@code common.retrieval.SearchChunkMerge} 时复用）。
+ * <p>"实体 → L1 载荷"的公用投影已抽到
+ * {@link com.ragagent.knowledge.support.ChunkProjectionAdapter#view}
+ * /{@link com.ragagent.knowledge.support.ChunkProjectionAdapter#viewAll}
+ * （B263②：原先作为静态助手挂在本类，令 `repository` 反向依赖 `service` ⇒ 现落环外 `support/`）。
  *
  * <p>四个方法的过滤条件/降级姿态与迁移前的 wiki 侧实现<b>逐字一致</b>：
  * {@code textChunks} 来自 {@code WikiIngestBatchHandler}、{@code chunksByIds} 来自
@@ -45,7 +47,7 @@ public class ChunkPortAdapter implements ChunkPort {
                 .eq(Chunk::getKnowledgeId, knowledgeId)
                 .eq(Chunk::getChunkType, ChunkTypes.TEXT)
                 .orderByAsc(Chunk::getChunkIndex));
-        return viewAll(rows);
+        return ChunkProjectionAdapter.viewAll(rows);
     }
 
     @Override
@@ -56,7 +58,7 @@ public class ChunkPortAdapter implements ChunkPort {
         List<Chunk> rows = chunkMapper.selectList(new LambdaQueryWrapper<Chunk>()
                 .eq(Chunk::getTenantId, tenantId)
                 .in(Chunk::getId, ids));
-        return viewAll(rows);
+        return ChunkProjectionAdapter.viewAll(rows);
     }
 
     @Override
@@ -82,7 +84,7 @@ public class ChunkPortAdapter implements ChunkPort {
             return content;
         }
         Map<String, String> imageInfoMap = ImageInfoEnricher.collectImageInfoByChunkIds(
-                (tid, pids) -> factsAll(chunkRepository.listChunksByParentIDs(tid, pids)),
+                (tid, pids) -> ChunkProjectionAdapter.factsAll(chunkRepository.listChunksByParentIDs(tid, pids)),
                 tenantId, ids);
         String mergedImageInfo = ImageInfoEnricher.mergeImageInfoJson(imageInfoMap);
         if (mergedImageInfo == null || mergedImageInfo.isEmpty()) {
@@ -90,53 +92,5 @@ public class ChunkPortAdapter implements ChunkPort {
             return content;
         }
         return ImageInfoEnricher.enrichContentWithImageInfo(content, mergedImageInfo);
-    }
-
-    /**
-     * 实体 → L1 **facts** 投影（{@link ChunkFacts}，16 字段；作为"实体→facts"的
-     * 域内公用投影，供 chat 管线的 {@code PipelinePorts.ChunkRepository} 装配点复用，
-     * 避免映射逻辑两处漂移）。仅带调用方真正读取的字段。
-     */
-    public static ChunkFacts factsOf(Chunk c) {
-        if (c == null) {
-            return null;
-        }
-        return new ChunkFacts(c.getId(), c.getKnowledgeId(), c.getKnowledgeBaseId(), c.getContent(), c.getChunkType(),
-                c.getIndexStatus(), c.isIsEnabled(), c.getChunkIndex(), c.getStartAt(),
-                c.getEndAt(), c.getContentRevision(), c.getParentChunkId(), c.getPreChunkId(),
-                c.getNextChunkId(), c.getRelationChunks(), c.getMetadata(), c.getImageInfo());
-    }
-
-    /** 批量投影（保持入参顺序；{@code null} 元素原样保留）。 */
-    public static List<ChunkFacts> factsAll(List<Chunk> rows) {
-        List<ChunkFacts> out = new ArrayList<>();
-        for (Chunk c : rows) {
-            out.add(factsOf(c));
-        }
-        return out;
-    }
-
-    public static ChunkView view(Chunk c) {
-        if (c == null) {
-            return null;
-        }
-        ChunkView v = new ChunkView();
-        v.setId(c.getId());
-        v.setContent(c.getContent());
-        v.setChunkType(c.getChunkType());
-        v.setChunkIndex(c.getChunkIndex());
-        v.setStartAt(c.getStartAt());
-        v.setEndAt(c.getEndAt());
-        return v;
-    }
-
-    public static List<ChunkView> viewAll(List<Chunk> rows) {
-        List<ChunkView> out = new ArrayList<>(rows == null ? 0 : rows.size());
-        if (rows != null) {
-            for (Chunk c : rows) {
-                out.add(view(c));
-            }
-        }
-        return out;
     }
 }

@@ -1,5 +1,7 @@
 package com.ragagent.chatpipeline;
 
+import com.ragagent.knowledge.support.ChunkProjectionAdapter;
+
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -47,7 +49,6 @@ import com.ragagent.support.ContractJson;
 import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.KnowledgeBaseView;
 import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
-import com.ragagent.knowledge.service.ChunkPortAdapter;
 import com.ragagent.knowledge.service.KnowledgeBaseLookupAdapter;
 import com.ragagent.knowledge.service.KnowledgeService;
 
@@ -676,7 +677,7 @@ final class Rec46cSupport {
                     out.add(chunk);
                 }
             }
-            return ChunkPortAdapter.factsAll(out);
+            return ChunkProjectionAdapter.factsAll(out);
         }
 
         @Override
@@ -688,7 +689,7 @@ final class Rec46cSupport {
                     out.add(c);
                 }
             }
-            return ChunkPortAdapter.factsAll(out);
+            return ChunkProjectionAdapter.factsAll(out);
         }
     }
 

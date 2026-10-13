@@ -1,5 +1,6 @@
 package com.ragagent.retrieval.support;
 
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -77,7 +78,7 @@ public final class ImageInfoEnricher {
      * <p>{@code lister} 的元素类型由实体 {@code Chunk} 改为 L1 的
      * {@link ChunkFacts}——本方法是 {@code chatpipeline} 唯一还需要 chunk 实体的入口
      * （插件侧的 {@code ChunkRepository} 端口现在返回 facts），实体不再越层。
-     * 知识域内部调用方用 {@code ChunkPortAdapter.factsAll(...)} 投影后再传入。</p>
+     * 知识域内部调用方用 {@code ChunkProjectionAdapter.factsAll(...)} 投影后再传入。</p>
      */
     public static Map<String, String> collectImageInfoByChunkIds(
             BiFunction<Long, List<String>, List<ChunkFacts>> lister,

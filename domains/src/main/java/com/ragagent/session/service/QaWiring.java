@@ -1,5 +1,7 @@
 package com.ragagent.session.service;
 
+import com.ragagent.knowledge.support.ChunkProjectionAdapter;
+
 import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -76,7 +78,6 @@ import com.ragagent.tenant.Tenant;
 import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.KnowledgeBaseView;
 import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
-import com.ragagent.knowledge.service.ChunkPortAdapter;
 import com.ragagent.knowledge.service.KnowledgeBaseLookupAdapter;
 
 /**
@@ -274,7 +275,7 @@ public class QaWiring {
         return new PipelinePorts.ChunkRepository() {
             @Override
             public List<ChunkFacts> listChunksById(long tenantId, List<String> ids) {
-                return ChunkPortAdapter.factsAll(chunkRepository.listChunksById(tenantId, ids));
+                return ChunkProjectionAdapter.factsAll(chunkRepository.listChunksById(tenantId, ids));
             }
 
             @Override
@@ -283,7 +284,7 @@ public class QaWiring {
                 for (String parentId : parentIds) {
                     out.addAll(chunkRepository.listChunkByParentId(tenantId, parentId));
                 }
-                return ChunkPortAdapter.factsAll(out);
+                return ChunkProjectionAdapter.factsAll(out);
             }
         };
     }

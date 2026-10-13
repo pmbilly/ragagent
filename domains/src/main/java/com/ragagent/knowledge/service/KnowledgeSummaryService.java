@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.support.ChunkProjectionAdapter;
+
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -399,14 +401,14 @@ public class KnowledgeSummaryService {
             }
             chunkContents = String.join("\n\n", parts);
         } else {
-            chunkContents = SearchChunkMerge.mergeTextChunks(ChunkPortAdapter.viewAll(sortedChunks), "");
+            chunkContents = SearchChunkMerge.mergeTextChunks(ChunkProjectionAdapter.viewAll(sortedChunks), "");
         }
         List<String> chunkIds = new ArrayList<>(sortedChunks.size());
         for (Chunk chunk : sortedChunks) {
             chunkIds.add(chunk.getId());
         }
         Map<String, String> imageInfoMap = ImageInfoEnricher.collectImageInfoByChunkIds(
-                (tid, pids) -> ChunkPortAdapter.factsAll(chunkRepo.listChunksByParentIDs(tid, pids)),
+                (tid, pids) -> ChunkProjectionAdapter.factsAll(chunkRepo.listChunksByParentIDs(tid, pids)),
                 knowledge.getTenantId(), chunkIds);
         String mergedImageInfo = ImageInfoEnricher.mergeImageInfoJson(imageInfoMap);
         if (mergedImageInfo != null && !mergedImageInfo.isEmpty()) {

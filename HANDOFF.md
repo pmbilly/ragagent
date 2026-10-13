@@ -872,6 +872,14 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **测试**：**4978 / 失败 0 / 跳过 4** ✓（domains 2949 `--rerun-tasks` 重编核对未丢）；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m34s** ✓ 十一守卫 ✓。
 - **B263 余步（登记，按依赖排）**：② 拆 `KnowledgeService`(796)/`KnowledgeBaseService`/`KnowledgeFileService`/`KnowledgeParseService` 为 `repository/*`（`KnowledgeRepository`/`KnowledgeBaseRepository`/`DocumentParser`/`KnowledgeChunker`/`KnowledgeOutbox`…）+ use-case（`service.ingest|process|management|query|index/*` 的目标类名）；③ 8 枢纽消失**之后**再拆 `service` 七子面（本次已实测：提前拆 = 环扩大 ✗）；④ `domain.{document,task,graph}`（`graph` 的 `EntityExtraction`/`ExtractPrompts`/`PipelineConfig` 目前在 `:engine` 的 `llm.extract`，属跨模块归位）；⑤ `api/`(4 适配器)、`index/RetrievalIndexAdapter`、`client/EmbeddingExecutionClient`、`mapper/repository` 目标名对齐（`KnowledgeBaseMapper`/`StorageBackendMapper` 已在位）。
 
+**🔶 B263 第②步（2026-10-13，断掉 knowledge SCC 的真实成环边）**
+- **发现**：4 节点 SCC `{domain.access, repository, service, task}` 里，`repository → service` 只有**一处**：`ChunkRepository.findChunks` 调用 `ChunkPortAdapter.factsAll(...)`（借的是**静态投影助手**，不是适配器实例）。
+- **修法（抽到环外 + 落目标面）**：① 把 `ChunkPortAdapter` 的四个静态投影 `factsOf/factsAll/view/viewAll` 抽到 **`knowledge/support/ChunkProjectionAdapter`**（环外；`support/` 也是 §8.8.2 的目标面）；② 适配器本体 `service/ChunkPortAdapter` → **`knowledge/api/ChunkPortAdapter`**（§8.8.2 的 `api/` 适配面）。
+- **结果（验收达成）**：**`repository` 退出该 SCC** ⇒ 老组 4 成员 → 新组 `{domain.access, service, task}` **3 成员**；包级 SCC 组数 **13 不变**、`--write` 后基线 diff **恰为删除一行**（`"com.ragagent.knowledge.repository"`）⇒ 纯减少 ✓。
+- **踩到并修掉的两个"我自己的脚本坑"**：① 补 import 的启发式把 **javadoc 文本**里的 `ChunkPortAdapter` 当成代码引用，给 `support/ChunkProjectionAdapter` 与 `ChunkRepository` 各加了一条**多余 import** ⇒ 立刻形成新 SCC `{api, repository, support}`（组数 13→14 ✗）——按"分组/成员只许减"**当场清掉**，SCC 回到 13 组；② 同一启发式给 **engine** 的 `ImageInfoEnricher`（只有 javadoc 提到该类）加了 domains 的 import ⇒ 编译报 "package does not exist"（engine 看不见 domains）⇒ 改为 javadoc 文本用全限定名。
+- **守卫现场拦截（都是"基线变好要收紧"）**：A16/A17 基线里的 `com.ragagent.knowledge.service.ChunkPortAdapter` 随搬迁改名后**已不再违例** ⇒ 按守卫提示**删除两条基线**（规则自带的收紧机制）；`:domains:javadoc` 两处 `{@link #view}/{#viewAll}` 锚点随静态方法搬走而失链 ⇒ 指向新类并写明原因。
+- **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m39s** ✓ 十一守卫 ✓。
+
 ## 附：文档地图与归档追溯
 
 **✅ B255（2026-10-13，阶段 5 收口：检索中立类型）**

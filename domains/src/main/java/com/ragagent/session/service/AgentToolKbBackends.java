@@ -1,5 +1,7 @@
 package com.ragagent.session.service;
 
+import com.ragagent.knowledge.support.ChunkProjectionAdapter;
+
 import com.ragagent.retrieval.support.GrepChunkView;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -27,7 +29,6 @@ import com.ragagent.rerank.RankResult;
 import com.ragagent.rerank.Reranker;
 import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.common.pipeline.ChunkTypes;
-import com.ragagent.knowledge.service.ChunkPortAdapter;
 import com.ragagent.common.knowledge.ChunkFacts;
 
 /**
@@ -149,7 +150,7 @@ final class AgentToolKbBackends {
         return new KnowledgeSearchTool.ChunkInfoBackend() {
             @Override
             public ChunkFacts faqChunkById(String chunkId) {
-                return ChunkPortAdapter.factsOf(chunkRepository.getChunkByIdOnly(chunkId));
+                return ChunkProjectionAdapter.factsOf(chunkRepository.getChunkByIdOnly(chunkId));
             }
 
             @Override
@@ -180,7 +181,7 @@ final class AgentToolKbBackends {
                 return;
             }
             Map<String, String> infoMap = ImageInfoEnricher.collectImageInfoByChunkIds(
-                    (tid, pids) -> ChunkPortAdapter.factsAll(chunkRepository.listChunksByParentIDs(tid, pids)),
+                    (tid, pids) -> ChunkProjectionAdapter.factsAll(chunkRepository.listChunksByParentIDs(tid, pids)),
                     tenantId, chunkIDs);
             if (infoMap == null || infoMap.isEmpty()) {
                 return;
@@ -438,7 +439,7 @@ final class AgentToolKbBackends {
     }
     /** 工具侧的 chunkById 回调（域内实体 → L1 载荷）。 */
     public java.util.function.Function<String, ChunkFacts> chunkById() {
-        return id -> ChunkPortAdapter.factsOf(chunkRepository.getChunkByIdOnly(id));
+        return id -> ChunkProjectionAdapter.factsOf(chunkRepository.getChunkByIdOnly(id));
     }
     public DocChunkSupport.PagedChunks pagedChunks() {
         return (tenantId, knowledgeId, page, pageSize) -> {
@@ -446,7 +447,7 @@ final class AgentToolKbBackends {
             ChunkRepository.ChunkPage page1 = chunkRepository.listPagedChunksByKnowledgeId(
                     tenantId, knowledgeId, offset, pageSize,
                     TEXT_FAQ_TYPES, null, "", "", "", "", Boolean.TRUE);
-            return new DocChunkSupport.ChunkPage(ChunkPortAdapter.factsAll(page1.items()), page1.total());
+            return new DocChunkSupport.ChunkPage(ChunkProjectionAdapter.factsAll(page1.items()), page1.total());
         };
     }
     /** text+faq + enabled 过滤的 count 段（{@code listPagedChunksByKnowledgeId}）。 */
@@ -457,7 +458,7 @@ final class AgentToolKbBackends {
     }
     public DocChunkSupport.ImageInfoCollector imageInfoCollector() {
         return (tenantId, chunkIds) -> ImageInfoEnricher.collectImageInfoByChunkIds(
-                (tid, pids) -> ChunkPortAdapter.factsAll(chunkRepository.listChunksByParentIDs(tid, pids)),
+                (tid, pids) -> ChunkProjectionAdapter.factsAll(chunkRepository.listChunksByParentIDs(tid, pids)),
                 tenantId, chunkIds);
     }
     public QueryKnowledgeGraphTool.GraphSearch graphSearch() {
