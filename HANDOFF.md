@@ -950,6 +950,14 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **⚠️ 契约测试现场抓错（本步最值钱的教训）**：`updateImageInfo` 里的 chunk 查询我复用了既有 `ChunkRepository.getChunkById` ✗ —— 它找不到时**抛 `ChunkNotFoundException`**，而原契约是"返回 null → 调用方抛 `AppError.internal("chunk not found")`（**500**）"✗ ⇒ `KnowledgeOperationsContractTest.imageInfoMatchesGo` **当场失败** ✓ ⇒ 新增 `findByIdOrNull(tenantId,id)` 保留 null 语义并改回 ✓。**结论：复用仓储方法前要读语义（异常 vs 空值），不能只看签名。**
 - **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m42s** ✓ 十一守卫 ✓（SCC 13 组 / `{service, task}` 2 成员未变）。
 - **登记（余步）**：`KnowledgeBaseService`(626/18)；`KnowledgeService`(719) 余部（往 `service.<子面>` 搬需配套断边）；`selectPage` 的查询构建搬入仓储；`normalizeKnowledgeFolderPath` 真实现随 `KnowledgeFolderService` 归位；`task ⇄ service` 余 7 处。
+
+**🔶 B263 第⑪步（2026-10-14，`KnowledgeBaseService` 归仓储：626 → 585 行）**
+- **`repository/KnowledgeBaseRepository` 落位（§8.8.2 目标类）**，7 个方法：`insert` / `findById(tenantId,id)` / **`findByIdOnly(id)`**（**无租户过滤**——move/copy/duplicate 的 403/404 分歧前提，注释里写明）/ `listActiveByTenant(tenantId)`（**两处同形列表查询合并为一份**）/ `listMoveTargets(tenantId,type,embeddingModelId,excludeId)` / `updateById` / `softDelete(id,now)`。
+- **`KnowledgeRepository` +3**：`countByKnowledgeBaseId`、**`countByParseStatuses(kbId, String... statuses)`**（参数化，同时覆盖"列表口径 2 个状态 / 摘要口径 3 个状态"两处差异）、`softDeleteByKnowledgeBaseId`；**`ChunkRepository` +2**：`countByKnowledgeBaseId`、`softDeleteByKnowledgeBaseId`。
+- **结果**：`kbMapper` / `knowledgeMapper` / `chunkMapper` 直连**全部归零** ⇒ 三个 mapper 的字段/构造参数/赋值/import 删除（含 `kbMapper` 整个字段）。**保留并登记**：`storageBackendMapper`(266/277) 与 `pinMapper`(491/577) 共 7 处——目标树未给这两张表列仓储类，留待后续命名。
+- **模块约定第二次抓错**：新仓储里写了内联 `java.util.List<≠>` ⇒ `KnowledgeCodeConventionsTest`（禁代码体内内联 FQN）当场失败 ✗ ⇒ 改 import ✓。**该模块写新代码一律先 import。**
+- **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m40s** ✓ 十一守卫 ✓（SCC 13 组 / `{service, task}` 2 成员未变）。
+- **登记（余步）**：`storageBackendMapper`/`pinMapper` 的仓储化（需先定名）；`KnowledgeService`(719) 余部 → `service.management/*`（需配套断边）；`selectPage` 查询构建搬入仓储；`normalizeKnowledgeFolderPath` 真实现随 `KnowledgeFolderService` 归位；`task ⇄ service` 余 7 处。
 - **登记（余步）**：⑦ `KnowledgeService`(799 行/28 引用) 拆分（**优先级最高：行数已到阈值边缘**）；⑧ `KnowledgeFileService`(422/2)、`KnowledgeParseService` 余部、`KnowledgeBaseService`(626/18)；⑨ 最后一对 `task ⇄ service`（`task→service` 现余 **7**：`ChunkExtractService`3 / `QuestionGenerationService`3 / `SpanTracker`）；⑩ `service` 七子面、`domain.{document,task,graph}`、`mapper` 目标名对齐。
 - **登记（余步）**：按最轻优先继续——`ChunkVectorIndexer`(386/2)、`KnowledgeFileService`(422/2)、`KnowledgeParseService` 余部、`KnowledgeBaseService`(626/18)、`KnowledgeService`(796/28)；一律"切分而非整搬"。`task → service` 现余 8 处（`ChunkExtractService`3 / `QuestionGenerationService`3 / `SpanTracker` / `ChunkVectorIndexer`）。
 

@@ -1,5 +1,11 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.repository.ChunkRepository;
+
+import com.ragagent.knowledge.repository.KnowledgeRepository;
+
+import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
+
 import com.ragagent.common.knowledge.KnowledgeBaseFacts;
 import com.ragagent.common.web.JsonMappers;
 import com.ragagent.storage.config.StorageEnvLookup;
@@ -14,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.common.security.UserNameLookup;
 import com.ragagent.common.context.TenantContext;
@@ -26,15 +31,11 @@ import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.storage.domain.StorageBackend;
 import com.ragagent.knowledge.domain.UserKbPin;
-import com.ragagent.knowledge.mapper.ChunkMapper;
-import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
-import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import com.ragagent.knowledge.mapper.StorageBackendMapper;
 import com.ragagent.knowledge.mapper.UserKbPinMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.retrieval.engine.RetrieveEngineException;
 import com.ragagent.retrieval.engine.RetrieveEngineRegistry;
 import com.ragagent.retrieval.engine.TenantStoreOwnership;
@@ -58,9 +59,9 @@ public class KnowledgeBaseService
 
     private static final Logger log = LoggerFactory.getLogger(KnowledgeBaseService.class);
 
-    private final KnowledgeBaseMapper kbMapper;
-    private final KnowledgeMapper knowledgeMapper;
-    private final ChunkMapper chunkMapper;
+    private final KnowledgeBaseRepository kbRepository;
+    private final KnowledgeRepository knowledgeRepository;
+    private final ChunkRepository chunkRepository;
     private final UserKbPinMapper pinMapper;
     private final StorageBackendMapper storageBackendMapper;
     private final TenantConfigLookup tenantConfigLookup;
@@ -69,9 +70,9 @@ public class KnowledgeBaseService
     private final RetrieveEngineRegistry retrieveEngineRegistry;
     private final TenantStoreOwnership storeOwnership;
 
-    public KnowledgeBaseService(KnowledgeBaseMapper kbMapper,
-                                KnowledgeMapper knowledgeMapper,
-                                ChunkMapper chunkMapper,
+    public KnowledgeBaseService(KnowledgeBaseRepository kbRepository,
+                                KnowledgeRepository knowledgeRepository,
+                                ChunkRepository chunkRepository,
                                 UserKbPinMapper pinMapper,
                                 StorageBackendMapper storageBackendMapper,
                                 TenantConfigLookup tenantConfigLookup,
@@ -79,9 +80,9 @@ public class KnowledgeBaseService
                                 RetrieveEngineRegistry retrieveEngineRegistry,
                                 TenantStoreOwnership storeOwnership,
                                 RetrievalDriverProperties driverProperties) {
-        this.kbMapper = kbMapper;
-        this.knowledgeMapper = knowledgeMapper;
-        this.chunkMapper = chunkMapper;
+        this.kbRepository = kbRepository;
+        this.knowledgeRepository = knowledgeRepository;
+        this.chunkRepository = chunkRepository;
         this.pinMapper = pinMapper;
         this.storageBackendMapper = storageBackendMapper;
         this.tenantConfigLookup = tenantConfigLookup;
@@ -126,7 +127,7 @@ public class KnowledgeBaseService
         if (kb.hasVectorStore()) {
             validateVectorStoreBinding(tenantId(), kb.getVectorStoreId());
         }
-        kbMapper.insert(kb);
+        kbRepository.insert(kb);
         log.info("Knowledge base created successfully, ID: {}, name: {}", kb.getId(), kb.getName());
         return kb;
     }
@@ -293,11 +294,7 @@ public class KnowledgeBaseService
 
     /** 本租户 + 未删除 */
     public KnowledgeBase getById(long tid, String id) {
-        return kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getId, id)
-                .eq(KnowledgeBase::getTenantId, tid)
-                .isNull(KnowledgeBase::getDeletedAt)
-                .last("LIMIT 1"));
+        return kbRepository.findById(tid, id);
     }
 
     /**
@@ -325,10 +322,7 @@ public class KnowledgeBaseService
      */
     @Override
     public KnowledgeBaseFacts findFacts(String knowledgeBaseId) {
-        KnowledgeBase kb = kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getId, knowledgeBaseId)
-                .isNull(KnowledgeBase::getDeletedAt)
-                .last("LIMIT 1"));
+        KnowledgeBase kb = kbRepository.findByIdOnly(knowledgeBaseId);
         return kb == null ? null : new KnowledgeBaseFacts(kb.getTenantId(), kb.getCreatorId());
     }
 
@@ -361,10 +355,7 @@ public class KnowledgeBaseService
      * 403/404 分歧的前提，不能提前按租户收敛。
      */
     public KnowledgeBase getAllTenantById(String id) {
-        KnowledgeBase kb = kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getId, id)
-                .isNull(KnowledgeBase::getDeletedAt)
-                .last("LIMIT 1"));
+        KnowledgeBase kb = kbRepository.findByIdOnly(id);
         if (kb != null) {
             ensureDefaults(kb);
         }
@@ -388,12 +379,7 @@ public class KnowledgeBaseService
      * knowledge_count\u3001faq\u2192chunk_count\uff09\uff0cprocessing \u72b6\u6001\u53ea\u7b97 pending/processing\u3002
      */
     public List<KnowledgeBase> listKnowledgeBasesByTenantId(long tenantId) {
-        List<KnowledgeBase> all = kbMapper.selectList(
-                new LambdaQueryWrapper<KnowledgeBase>()
-                        .eq(KnowledgeBase::getTenantId, tenantId)
-                        .eq(KnowledgeBase::isIsTemporary, false)
-                        .isNull(KnowledgeBase::getDeletedAt)
-                        .orderByDesc(KnowledgeBase::getCreatedAt));
+        List<KnowledgeBase> all = kbRepository.listActiveByTenant(tenantId);
         for (KnowledgeBase kb : all) {
             // 对零值策略原样返回（capabilities 全假），见 W5sSharedAgentContractTest.kbListAgentBranch。
             fillCountsForSharedList(kb);
@@ -404,20 +390,14 @@ public class KnowledgeBaseService
     /** 只覆盖类型相关计数字段，另一个保留库表原值。 */
     private void fillCountsForSharedList(KnowledgeBase kb) {
         if ("document".equals(kb.getType())) {
-            Long kc = knowledgeMapper.selectCount(new LambdaQueryWrapper<Knowledge>()
-                    .eq(Knowledge::getKnowledgeBaseId, kb.getId())
-                    .isNull(Knowledge::getDeletedAt));
+            Long kc = knowledgeRepository.countByKnowledgeBaseId(kb.getId());
             kb.setKnowledgeCount(kc == null ? 0 : kc);
         } else if ("faq".equals(kb.getType())) {
-            Long cc = chunkMapper.selectCount(new LambdaQueryWrapper<Chunk>()
-                    .eq(Chunk::getKnowledgeBaseId, kb.getId())
-                    .isNull(Chunk::getDeletedAt));
+            Long cc = chunkRepository.countByKnowledgeBaseId(kb.getId());
             kb.setChunkCount(cc == null ? 0 : cc);
         }
-        Long pc = knowledgeMapper.selectCount(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getKnowledgeBaseId, kb.getId())
-                .isNull(Knowledge::getDeletedAt)
-                .in(Knowledge::getParseStatus, Knowledge.PARSE_PENDING, Knowledge.PARSE_PROCESSING));
+        Long pc = knowledgeRepository.countByParseStatuses(kb.getId(),
+                Knowledge.PARSE_PENDING, Knowledge.PARSE_PROCESSING);
         kb.setProcessingCount(pc == null ? 0 : pc);
         kb.setIsProcessing(pc != null && pc > 0);
     }
@@ -432,11 +412,7 @@ public class KnowledgeBaseService
      */
     public List<KnowledgeBase> listKnowledgeBases(String creator) {
         // Order("created_at DESC") 最新在前
-        List<KnowledgeBase> all = kbMapper.selectList(new LambdaQueryWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getTenantId, tenantId())
-                .eq(KnowledgeBase::isIsTemporary, false)
-                .isNull(KnowledgeBase::getDeletedAt)
-                .orderByDesc(KnowledgeBase::getCreatedAt));
+        List<KnowledgeBase> all = kbRepository.listActiveByTenant(tenantId());
         String uid = TenantContext.currentUserId();
         List<KnowledgeBase> out = new ArrayList<>(all.size());
         for (KnowledgeBase kb : all) {
@@ -466,17 +442,10 @@ public class KnowledgeBaseService
 
     /** knowledge_count/chunk_count/is_processing/processing_count */
     private void fillCounts(KnowledgeBase kb) {
-        Long kc = knowledgeMapper.selectCount(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getKnowledgeBaseId, kb.getId())
-                .isNull(Knowledge::getDeletedAt));
-        Long cc = chunkMapper.selectCount(new LambdaQueryWrapper<Chunk>()
-                .eq(Chunk::getKnowledgeBaseId, kb.getId())
-                .isNull(Chunk::getDeletedAt));
-        Long pc = knowledgeMapper.selectCount(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getKnowledgeBaseId, kb.getId())
-                .isNull(Knowledge::getDeletedAt)
-                .in(Knowledge::getParseStatus,
-                        Knowledge.PARSE_PENDING, Knowledge.PARSE_PROCESSING, Knowledge.PARSE_FINALIZING));
+        Long kc = knowledgeRepository.countByKnowledgeBaseId(kb.getId());
+        Long cc = chunkRepository.countByKnowledgeBaseId(kb.getId());
+        Long pc = knowledgeRepository.countByParseStatuses(kb.getId(),
+                Knowledge.PARSE_PENDING, Knowledge.PARSE_PROCESSING, Knowledge.PARSE_FINALIZING);
         kb.setKnowledgeCount(kc == null ? 0 : kc);
         kb.setChunkCount(cc == null ? 0 : cc);
         kb.setProcessingCount(pc == null ? 0 : pc);
@@ -513,7 +482,7 @@ public class KnowledgeBaseService
             applyUpdateConfig(existing, config);
         }
         existing.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
-        kbMapper.updateById(existing);
+        kbRepository.updateById(existing);
         fillCounts(existing);
         fillPin(existing, TenantContext.currentUserId());
         return existing;
@@ -568,12 +537,9 @@ public class KnowledgeBaseService
             throw new BizException(AppError.notFound("knowledge base not found"));
         }
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
-        kbMapper.update(null, new LambdaUpdateWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getId, id).set(KnowledgeBase::getDeletedAt, now));
-        knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
-                .eq(Knowledge::getKnowledgeBaseId, id).set(Knowledge::getDeletedAt, now));
-        chunkMapper.update(null, new LambdaUpdateWrapper<Chunk>()
-                .eq(Chunk::getKnowledgeBaseId, id).set(Chunk::getDeletedAt, now));
+        kbRepository.softDelete(id, now);
+        knowledgeRepository.softDeleteByKnowledgeBaseId(id, now);
+        chunkRepository.softDeleteByKnowledgeBaseId(id, now);
         pinMapper.delete(new LambdaQueryWrapper<UserKbPin>()
                 .eq(UserKbPin::getKnowledgeBaseId, id));
         log.info("Knowledge base deleted: {}", id);
@@ -612,15 +578,7 @@ public class KnowledgeBaseService
         if (source == null) {
             throw new BizException(AppError.notFound("knowledge base not found"));
         }
-        return kbMapper.selectList(new LambdaQueryWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getTenantId, tenantId())
-                .eq(KnowledgeBase::getType, source.getType())
-                .eq(KnowledgeBase::getEmbeddingModelId,
-                        source.getEmbeddingModelId() == null ? "" : source.getEmbeddingModelId())
-                .eq(KnowledgeBase::isIsTemporary, false)
-                .ne(KnowledgeBase::getId, id)
-                .isNull(KnowledgeBase::getDeletedAt)
-                // created_at DESC
-                .orderByDesc(KnowledgeBase::getCreatedAt));
+        return kbRepository.listMoveTargets(tenantId(), source.getType(),
+                source.getEmbeddingModelId() == null ? "" : source.getEmbeddingModelId(), id);
     }
 }

@@ -91,6 +91,20 @@ public class ChunkRepository implements ChunkSearchGateway {
     /**
      * tenant + id，软删行不可见；
      */
+    /** 该 KB 下未软删的 chunk 计数（null 视为 0）。 */
+    public long countByKnowledgeBaseId(String knowledgeBaseId) {
+        Long c = chunkMapper.selectCount(new LambdaQueryWrapper<Chunk>()
+                .eq(Chunk::getKnowledgeBaseId, knowledgeBaseId)
+                .isNull(Chunk::getDeletedAt));
+        return c == null ? 0 : c;
+    }
+
+    /** 级联软删：该 KB 下全部 chunk 行（B263⑪：删库路径归位）。 */
+    public void softDeleteByKnowledgeBaseId(String knowledgeBaseId, OffsetDateTime now) {
+        chunkMapper.update(null, new LambdaUpdateWrapper<Chunk>()
+                .eq(Chunk::getKnowledgeBaseId, knowledgeBaseId).set(Chunk::getDeletedAt, now));
+    }
+
     /** 插入新 chunk 行（B263⑨：由 service 直连 chunkMapper 归位）。 */
     public void insert(Chunk chunk) {
         chunkMapper.insert(chunk);

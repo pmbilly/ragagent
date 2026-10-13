@@ -105,6 +105,29 @@ public class KnowledgeRepository {
                 .set(Knowledge::getUpdatedAt, now));
     }
 
+    /** 该 KB 下未软删的 knowledge 计数（null 视为 0）。 */
+    public long countByKnowledgeBaseId(String knowledgeBaseId) {
+        Long c = knowledgeMapper.selectCount(new LambdaQueryWrapper<Knowledge>()
+                .eq(Knowledge::getKnowledgeBaseId, knowledgeBaseId)
+                .isNull(Knowledge::getDeletedAt));
+        return c == null ? 0 : c;
+    }
+
+    /** 该 KB 下处于给定解析状态的计数（状态集由调用方给：列表口径 2 个、摘要口径 3 个）。 */
+    public long countByParseStatuses(String knowledgeBaseId, String... parseStatuses) {
+        Long c = knowledgeMapper.selectCount(new LambdaQueryWrapper<Knowledge>()
+                .eq(Knowledge::getKnowledgeBaseId, knowledgeBaseId)
+                .isNull(Knowledge::getDeletedAt)
+                .in(Knowledge::getParseStatus, (Object[]) parseStatuses));
+        return c == null ? 0 : c;
+    }
+
+    /** 级联软删：该 KB 下全部 knowledge 行（B263⑪：删库路径归位）。 */
+    public void softDeleteByKnowledgeBaseId(String knowledgeBaseId, OffsetDateTime now) {
+        knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getKnowledgeBaseId, knowledgeBaseId).set(Knowledge::getDeletedAt, now));
+    }
+
     /** 插入新行。 */
     public void insert(Knowledge k) {
         knowledgeMapper.insert(k);
