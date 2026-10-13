@@ -526,7 +526,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B248 | 4 索引/配置 | K10a：embedding 响应对齐校验（`index` 消费 + 数量/维度校验 + 乱序拒绝） | ✅ 2026-10-13 |
 | B249 | 4 索引/配置 | K10b：索引执行收敛（worker 委托索引器唯一实现 + 数量断言） | ✅ 2026-10-13 |
 | B250 | 4 索引/配置 | K7：事务外副作用（`KnowledgeFileService` `@Transactional` 内同步重建向量） | ✅ 2026-10-13 |
-| B251 | 4 | K8：配置能力矩阵（parser rules / parent-child 显式拒绝或实现；不静默回落） | ⬜ |
+| B251 | 4 | K8：配置能力矩阵（parser rules / parent-child 显式拒绝或实现；不静默回落） | ✅ 2026-10-13 |
 | B252 | 5 结构收敛 | K9：跨 store 融合（RRF 按 store 内 rank；context expansion 修正） | ⬜ |
 | B253 | 5 | A4：并发工具状态提交顺序（`seenChunks` 单一 writer / 按调用序回填） | ⬜ |
 | B254 | 5 | controller 剥离编排（`KnowledgeQaController` 14 构造参数、`QaRequestParser` 拆分） | ⬜ |
@@ -750,6 +750,16 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **测试**：新增 `KnowledgeFileServicePostCommitTest` 4 例（无事务内联 / 回滚零副作用 / 提交恰好一次 / 提交后失败不抛）；**知识合约金片（`kg-image-*` 端到端）全绿** ⇒ 校验前置 + 索引后移未改变对外契约。
 - **顺带修复（诚实记入本批）**：本批闸门抓到 B241 测试的**竞态假红**——建议生成跑在虚拟线程上而断言未等待；改为 `timeout(5s).times(1)` 轮询断言。
 - **闸门**：`spotlessCheck build` ✓ **1m33s** ✓ · **4951 / 失败 0 / 跳过 4** ✓（+4）· 十一守卫 ✓。
+
+**✅ B251（2026-10-13，K8 配置能力矩阵）**
+- **口径（用户拍板，2026-10-13）**：**"接受 + 显式标注未生效"**（选项 b）——不改既有保存契约；未接能力不硬拒，但每处都不许再静默。
+- **能力矩阵（实测，勘察中修正过一处）**：`chunkingConfig` 11 键中，**已生效 6**：`chunkSize`/`chunkOverlap`/`separators`（`worker.toSplitterConfig:526-529`）+ `strategy`/`tokenLimit`/`languages`（`:530-532` → `Chunker:273/314-319`，此前误判为未接线）；**未生效 5**：`enableParentChild`/`parentChunkSize`/`childChunkSize`（worker 只出 `text` 块，`Chunker.splitParentChildWithDiagnostics` 仅预览侧用）、`parserEngineRules`（worker 固定 `docReader.read(..., null)`）、`tableMetadataInstructions`（全仓无消费点，仅初始化请求写入）。
+- **修复**：① `KnowledgeBaseChunkingConfig.from()`——`null`/缺省对象仍回落默认（"没配"合法），**形状损坏改为 `BizException.badRequest` 明确报错**（原先静默回落 512/80 ⇒ 配置坏了摄取照跑、用户以为生效）；② 新增 `ingestionInactiveKeys()`（固定顺序的能力矩阵，注释写明"接进 worker 时请同步删项"）；③ `ChunkingConfigView` 增 `inactiveFeatures` 钉在响应里（**恒输出、空数组 = 全部生效**——知识库模块约定禁 `@JsonInclude`，`KnowledgeCodeConventionsTest` 挡住了我第一版的 NON_EMPTY 写法）；④ worker 分块 span 记 `inactive_config_keys`（结构化可观测，摄取侧同类不静默）。
+- **现实影响面**：`InitializationConfigService:203-208` 确实在写 `enableParentChild`/父子尺寸 ⇒ 经 `agent.management` 初始化建的 KB 现在会在响应里看到 `inactiveFeatures`（这正是 K8 要暴露的"以为生效"）。
+- **测试**：新增 `KnowledgeBaseChunkingConfigCapabilityTest` 5 例（**先红证据**：损坏配置不抛错 / 未生效键标注为空）+ 既有容错与契约测试全绿。
+- **金片签名变更（已评审 + B221 签字）**：12 个 KB 响应金片 `chunkingConfig` 增 `inactiveFeatures`（键集合 66→67 等，**纯新增**）；前端 API 层该字段为 `any`（`frontend/src/api/knowledge-base/index.ts:83,135`）⇒ 非破坏，无需同步；`python3 scripts/check-contract-sync.py --write` 已更新基线（1349 金片）。
+- **未做（登记）**：真实现**父子块摄取**与**解析器引擎选择**（chunker/doc-reader 管道改造，与 K10b 索引策略统一联动）；`parserEngineRules` 若要接，须先定"KB 规则 vs agent/租户 chat 规则"的优先级语义。
+- **闸门**：`spotlessCheck build` ✓ **1m33s** ✓ · **4956 / 失败 0 / 跳过 4** ✓（+5）· 十一守卫 ✓。
 
 ## 附：文档地图与归档追溯
 

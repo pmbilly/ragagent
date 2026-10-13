@@ -10,6 +10,7 @@
       "description": null,
       "creatorId": "11111111-2222-3333-4444-555555555501",
       "chunkingConfig": {
+        "inactiveFeatures": [],
         "chunkSize": 0,
         "chunkOverlap": 0,
         "separators": null,
@@ -87,6 +88,7 @@
       "description": null,
       "creatorId": "11111111-2222-3333-4444-555555555501",
       "chunkingConfig": {
+        "inactiveFeatures": [],
         "chunkSize": 0,
         "chunkOverlap": 0,
         "separators": null,

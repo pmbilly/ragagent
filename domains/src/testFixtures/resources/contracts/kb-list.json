@@ -18,6 +18,7 @@
       },
       "chunkCount": 0,
       "chunkingConfig": {
+        "inactiveFeatures": [],
         "chunkSize": 0,
         "chunkOverlap": 0,
         "separators": null,
@@ -95,6 +96,7 @@
       },
       "chunkCount": 0,
       "chunkingConfig": {
+        "inactiveFeatures": [],
         "chunkSize": 0,
         "chunkOverlap": 0,
         "separators": null,

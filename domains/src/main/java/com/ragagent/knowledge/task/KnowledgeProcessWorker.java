@@ -315,8 +315,13 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
     /** 分块并落库（KB 配置 0 值回退默认 512/80；行间 pre/next 双向链；阶段 span 记录写出量）。 */
     private List<Chunk> chunkAndPersist(Knowledge k, KnowledgeBase kb, String knowledgeId,
             String markdown, int attempt) {
+        // K8：未生效的配置键进 span（结构化可观测）——摄取侧不静默忽略。
+        List<String> inactiveKeys = kb.getChunkingConfig() == null ? List.of()
+                : kb.getChunkingConfig().ingestionInactiveKeys();
         SpanTracker.SpanHandle chunkSpan = beginStageSpan(attempt, knowledgeId,
-                KnowledgeProcessingSpan.STAGE_CHUNKING, null);
+                KnowledgeProcessingSpan.STAGE_CHUNKING,
+                inactiveKeys.isEmpty() ? null
+                        : Map.of("inactive_config_keys", String.join(",", inactiveKeys)));
         SplitterConfig cfg = toSplitterConfig(kb.getChunkingConfig());
         List<ParsedChunk> parsedChunks = Chunker.split(markdown, cfg);
         List<Chunk> chunks = new ArrayList<>(parsedChunks.size());

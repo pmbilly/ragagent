@@ -15,7 +15,13 @@ public record ChunkingConfigView(
         String strategy,
         int tokenLimit,
         List<String> languages,
-        String tableMetadataInstructions) {
+        String tableMetadataInstructions,
+        /**
+         * 主摄取（worker）**未消费**的键（K8 能力矩阵；空 list = 全部生效）——"接受但未生效"的
+         * 显式告知，不再让用户以为配置已生效。语义与来源见
+         * {@link KnowledgeBaseChunkingConfig#ingestionInactiveKeys()}。
+         */
+        List<String> inactiveFeatures) {
 
     /** 按扩展名指定解析引擎的规则（如 xlsx 用哪个引擎、首行是否表头）。 */
     public record ParserEngineRuleView(List<String> fileTypes, String engine,
@@ -59,6 +65,6 @@ public record ChunkingConfigView(
         return new ChunkingConfigView(c.getChunkSize(), c.getChunkOverlap(), c.getSeparators(),
                 rules, c.isEnableParentChild(), c.getParentChunkSize(), c.getChildChunkSize(),
                 c.getStrategy(), c.getTokenLimit(), c.getLanguages(),
-                c.getTableMetadataInstructions());
+                c.getTableMetadataInstructions(), c.ingestionInactiveKeys());
     }
 }
