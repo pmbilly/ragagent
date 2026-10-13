@@ -84,23 +84,6 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
     /** 任务观测的 span/根名。 */
     static final String TASK_TYPE_DOCUMENT_PROCESS = "document:process";
 
-    /**
-     * 批大小来自 BATCH_EMBED_SIZE env，空 → 5，非法值 → 报错。
-     * strconv.Atoi 文案——会落进 knowledge 的 error_message）。走查实案：
-     */
-    private int embedBatchSize() {
-        String env = batchEmbedProperties.embedSize();
-        if (env == null || env.isEmpty()) {
-            return 5;
-        }
-        try {
-            return Integer.parseInt(env.trim());
-        } catch (NumberFormatException e) {
-            throw new IllegalStateException(
-                    "strconv.Atoi: parsing \"" + env + "\": invalid syntax");
-        }
-    }
-
     /** 批量向量化批大小（走属性绑定，取代 BATCH_EMBED_SIZE 的 env 直读）。 */
     private final BatchEmbedProperties batchEmbedProperties;
 
@@ -113,7 +96,6 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
     /** 租户感知文件存储（读 provider 引用；本地契约不变）。 */
     private final TenantFileStorage fileStorage;
     private final DocReaderClient docReader;
-    private final EmbedderClient embedder;
     private final VectorStoreService vectorStore;
     private final ModelService modelService;
     private final KnowledgeVectorWrites vectorWrites;
@@ -142,7 +124,6 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
                                   ChunkMapper chunkMapper,
                                   TenantFileStorage fileStorage,
                                   DocReaderClient docReader,
-                                  EmbedderClient embedder,
                                   VectorStoreService vectorStore,
                                   ModelService modelService,
                                   KnowledgeVectorWrites vectorWrites,
@@ -165,7 +146,6 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
         this.chunkMapper = chunkMapper;
         this.fileStorage = fileStorage;
         this.docReader = docReader;
-        this.embedder = embedder;
         this.vectorStore = vectorStore;
         this.modelService = modelService;
         this.vectorWrites = vectorWrites;

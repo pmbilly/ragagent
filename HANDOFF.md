@@ -929,6 +929,7 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **新守卫（十二守卫）**：`scripts/check-package-dirs.py`——`*/src/*/java/**` 下每个 `.java` 的**相对包根目录必须等于包名**（零容忍、无基线；排除 `build/`）；接入 `run-guards.sh`（**十一 → 十二**，活文档/README/CI 注释同步，历史归档不动）；**探针已验红**（临时造 `package com.ragagent.probe.wrong;` 的文件 ⇒ 精确报 P2 + 处置指引 ⇒ 删除即绿）。同时把 `check-stray-dirs.py` 的 `SOURCE_ROOTS` **补上 `testFixtures`**（死包目录同样会从这类漏枚举里溜过）。
 - **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m27s** ✓ **十二守卫** ✓。
 - **经验（换锚族长新成员）**：**「改包」必须同时「搬目录」，且要枚举所有源码集（main/test/testFixtures）**；`javac` 不报错 ⇒ 必须靠守卫（`check-package-dirs.py`）。
+- **连带清理（同一份 IDE 诊断里的 main 代码警告）**：`KnowledgeProcessWorker` 的死成员——`private int embedBatchSize()`（无人调用）与 `private final EmbedderClient embedder`（只赋值、从不读）⇒ 删字段/构造参数/赋值与死方法（构造点只有 Spring 一处、无测试构造，安全）；`KnowledgeProcessWorker` **844 → 824 行**。**登记**：同一处还有 `chunkMapper.deleteBatchIds(...)` 已废弃（IDE 提示）——它正落在下一步 ㉗（`task/KnowledgeProcessWorker` 归仓储）的范围内，届时一并处理。
 **🔶 B263 第㉕步（2026-10-14，`KnowledgeBaseLookupAdapter`：**service 包 mapper 直连收尾**）**
 - **本步的关键判断是"不搬"**：该类持 `ObjectProvider<KnowledgeMapper>` 并用 `getIfAvailable()` 保守返回，是**刻意的装配裁剪容忍**（注释原文："无知识仓储可查（装配裁剪）——无法判定，保守地当作'还在'"）。若换成 `KnowledgeRepository`（无条件 Bean、构造期就要求 mapper），"缺 mapper"会从**保守返回**变成**上下文启动失败** ⇒ **语义退化**，故**保留**该可选依赖（与 R6 禁 `@Lazy` 规避环无关），并在类 javadoc 写明这条理由（防后人误"清理"）。
 - **能搬的都搬了**：两处 KB 读取 → `KnowledgeBaseRepository.findByIdOnly(kbId)`（带软删过滤）与 **`findByIdAny(kbId)`**（`knowledgeBaseByIdIncludingDeleted`，⑱ 新增的"不过滤软删"读法，正好同形）。
