@@ -295,6 +295,20 @@ public class MessageService {
         messageRepository.update(message);
     }
 
+    /**
+     * 完成态 CAS（全轮一次性提交门，A2）：严格 owner 范围校验后按"未完成 → 完成"条件更新。
+     *
+     * <p>收尾可能被多处并发触发（STOP watcher / HTTP 消费 / runner finally），
+     * 只有赢家（返回 true）才许启动 KB 索引 / 追问建议 / 记忆蒸馏等下游副作用。</p>
+     *
+     * @return true = 本次是提交赢家；false = 已被其它收尾路径提交过
+     */
+    public boolean completeMessageOnce(Message message) {
+        long tenantId = requireTenantId();
+        sessionRepository.get(tenantId, SessionService.sessionUserIDForLookup(), message.getSessionId());
+        return messageRepository.completeOnce(message);
+    }
+
     /** 只写 images 列。 */
     public void updateMessageImages(String sessionId, String messageId, List<MessageImage> images) {
         messageRepository.updateImages(sessionId, messageId, images);

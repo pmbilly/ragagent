@@ -104,15 +104,38 @@ final class QaTurnFinalizer {
             log.warn("persist last_request_state failed for session {}: {}", reqCtx.sessionId, e.toString());
         }
     }
-    /** 收尾 assistant 消息：置完成态落库，并异步排 KB 索引 / 追问建议 / 记忆蒸馏。 */
+    /**
+     * 收尾 assistant 消息：**CAS 置完成态**（全轮一次性提交门），只有赢家才异步排
+     * KB 索引 / 追问建议 / 记忆蒸馏。
+     *
+     * <p>A2：收尾可能被多处并发触发（STOP watcher / HTTP 消费 / runner finally）。
+     * ① 输家（已被别的路径提交过）直接返回——原先每处都排一遍下游，会重复建 knowledge
+     * 并产生孤立产物；② 提交本身失败时短路——原先只 warning 后照样启动下游，
+     * "消息未完成、索引已建"的孤立产物仍然存在。</p>
+     */
     void completeAssistantMessage(Message assistantMessage, String userQuery,
             String userMessageId, Long tenantId) {
         assistantMessage.setUpdatedAt(OffsetDateTime.now());
         assistantMessage.setCompleted(true);
+        final boolean won;
         try {
-            messageService.updateMessage(assistantMessage);
+            won = messageService.completeMessageOnce(assistantMessage);
         } catch (RuntimeException e) {
             log.warn("complete assistant message update failed: {}", e.toString());
+            return;
+        }
+        if (!won) {
+            // 输家：别的收尾路径已提交过。**下游只许赢家启动**（重复索引会新建 knowledge
+            // 产生孤立产物）；但这行消息仍要补一次幂等落库——终态写入是内容/refs/steps 的
+            // 唯一落库点，后到的内存态可能更全（如 STOP 之后桥又补了最终答案）。
+            log.info("[QA] assistant message {} already committed elsewhere; persist only, skip index/suggestion/memory",
+                    assistantMessage.getId());
+            try {
+                messageService.updateMessage(assistantMessage);
+            } catch (RuntimeException e) {
+                log.warn("complete assistant message re-persist failed: {}", e.toString());
+            }
+            return;
         }
         final String content = assistantMessage.getContent();
         final String amId = assistantMessage.getId();

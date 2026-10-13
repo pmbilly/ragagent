@@ -97,14 +97,39 @@ public class MessageRepository implements SessionMessagePort {
      * {@code updated_at} 在这里显式补上。</p>
      */
     public void update(Message m) {
+        UpdateWrapper<Message> w = updateWhere(m);
+        boolean any = applyMutableColumns(w, m);
+        if (m.isCompleted()) {
+            // 完成位不进共用列清单（completeOnce 要自己无条件写它，重复 set 会拼出
+            // "is_completed = ?, is_completed = ?" 的非法 SET）。
+            w.set("is_completed", true);
+            any = true;
+        }
+        if (!any) {
+            // 全部字段为零时没有可更新的列（硬拼会生成非法 UPDATE 语句）；
+            // 这里直接跳过，语义等价于"没有可更新的列"。
+            return;
+        }
+        w.set("updated_at", OffsetDateTime.now());
+        mapper.update(null, w);
+    }
+
+    /** 更新条件（id + session + 未删）。 */
+    private static UpdateWrapper<Message> updateWhere(Message m) {
         // 用字符串列名的 UpdateWrapper 而不是 Lambda：jsonb 列必须靠 3 参 set 显式挂
         // typeHandler，而 lambda 形式的 set 拿不到列映射、会退化成 Java 序列化
         // （H2 报 "Data conversion error converting CAST(X'aced0005...)"）。
-        UpdateWrapper<Message> w = new UpdateWrapper<Message>()
+        return new UpdateWrapper<Message>()
                 .eq("id", m.getId())
                 .eq("session_id", m.getSessionId())
                 .isNull("deleted_at");
+    }
 
+    /**
+     * 可变列写入（零值跳过）；返回是否有列可写。{@link #update} 与 {@link #completeOnce}
+     * 共用一份实现——**不含完成位**（两个调用方各自显式写它）。
+     */
+    private static boolean applyMutableColumns(UpdateWrapper<Message> w, Message m) {
         boolean any = false;
 
         if (nonEmpty(m.getRequestId())) {
@@ -125,10 +150,6 @@ public class MessageRepository implements SessionMessagePort {
         any |= setJson(w, "images", m.getImages(), IMAGES);
         any |= setJson(w, "attachments", m.getAttachments(), ATTACHMENTS);
         any |= setJson(w, "artifacts", m.getArtifacts(), ARTIFACTS);
-        if (m.isCompleted()) {
-            w.set("is_completed", true);
-            any = true;
-        }
         if (m.isFallback()) {
             w.set("is_fallback", true);
             any = true;
@@ -165,13 +186,27 @@ public class MessageRepository implements SessionMessagePort {
         }
         any |= setJson(w, "used_memories", m.getUsedMemories(), USED_MEMORIES);
 
-        if (!any) {
-            // 全部字段为零时没有可更新的列（硬拼会生成非法 UPDATE 语句）；
-            // 这里直接跳过，语义等价于"没有可更新的列"。
-            return;
-        }
+        return any;
+    }
+
+    /**
+     * 完成态 CAS（A2 全轮一次性提交门）：仅当该行**尚未完成**时把 {@code is_completed} 置 true。
+     *
+     * <p>完成收尾有多个并发调用方（STOP watcher / HTTP 消费 / runner finally），
+     * 只有"0 行 → 1 行"的赢家才许启动下游（KB 索引 / 追问建议 / 记忆蒸馏）——
+     * 否则同一轮会重复建 knowledge 并产生孤立产物。</p>
+     *
+     * <p>写入与 {@link #update} 同形：agent 轮的内存态（knowledge_references / agent_steps /
+     * usage / 时长）只有这一次落库机会，少写一列就是丢数据。</p>
+     *
+     * @return true = 本次是提交赢家；false = 已被其它收尾路径提交过（或行不存在/已删除）
+     */
+    public boolean completeOnce(Message m) {
+        UpdateWrapper<Message> w = updateWhere(m).eq("is_completed", false);
+        applyMutableColumns(w, m);
+        w.set("is_completed", true);
         w.set("updated_at", OffsetDateTime.now());
-        mapper.update(null, w);
+        return mapper.update(null, w) > 0;
     }
 
     /** 零值判定：string 的非零就是非空。 */

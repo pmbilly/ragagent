@@ -516,7 +516,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B238 | 1 | K2：URL 摄取统一（**拍板点①**：同步下载 vs worker 下载） | ✅ 2026-10-13（拍板 A：同步下载） |
 | B239 | 2 会话终态 | A1-NORMAL：流错误/超时轮终态一致收口 | ✅ 2026-10-13（建流前失败兜底→登记待办） |
 | B240 | 2 | A1-AGENT：`AgentEngine` finally/COMPLETE 与外层 catch/ERROR 收口 + `FinalizePhase` 失败 outcome | ✅ 2026-10-13 |
-| B241 | 2 | A2：全轮一次性提交门（CAS）+ 消息更新失败不启动索引/建议/记忆 | ⬜ |
+| B241 | 2 | A2：全轮一次性提交门（CAS）+ 消息更新失败不启动索引/建议/记忆 | ✅ 2026-10-13 |
 | B242 | 2 | A3：可关闭模型流（句柄 + `ThinkPhase` 取消 probe + 装饰器队列关闭语义） | ⬜ |
 | B243 | 2 | A5：跨线程上下文传播（NORMAL 消费线程 / STOP watcher replay） | ⬜ |
 | B244 | 2 | A18 状态所有权规则（phase 不回引 runner / 无公共可变运行态字段） | ⬜ |
@@ -668,6 +668,13 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **金片签名变更（已评审）**：`GoRecording46B.R_EXECUTE_STREAM_ERROR_EVENTS` 由"终态→错误"改为"错误→终态 + extra"（方案 §14 风险表的既定处置：旧 golden 把缺陷当契约 ⇒ 经评审同步常量），常量上方写明原因；`EngineRecordingTest` 20/20 全绿。
 - **闸门**：`spotlessCheck build` ✓ **1m45s** ✓ · **4924 / 失败 0 / 跳过 4** ✓（+2 = 新测试）。
 - **登记观察（本批未改）**：`SessionAgentQaService` 的 catch 仍会**再发一份** `stage=agent_execution` 错误事件（引擎已发一份）⇒ 生产链路失败时会出现 **2 条错误事件**。属"重复上报"而非终态缺口，归入后续（B244 A18 状态所有权 / 阶段 5 controller 剥离）。
+
+**✅ B241（2026-10-13，A2 全轮一次性提交门）**
+- **缺口**（方案 A2）：收尾有多个并发入口（STOP watcher / HTTP 消费 / runner finally，共 5 处调用 `completeAssistantMessage`），而 `QaTurnFinalizer` 无一次性门 ⇒ 每处各排一遍下游（KB 索引会**新建 knowledge**、追问建议、记忆蒸馏）——重复索引与孤立产物；且消息更新失败只 warning，之后照样启动下游（"消息未完成、索引已建"）。
+- **修复**：① 完成态 **CAS**：`MessageRepository.completeOnce`（`UPDATE … WHERE id/session/未删 AND is_completed = false`，0 行→1 行的赢家返回 true）经 `MessageService.completeMessageOnce`（含 owner 范围校验）暴露；`completeAssistantMessage` 改为 CAS 先行——**输家**只补一次幂等落库、**不启动**下游；**提交失败短路**（不落库、不启动下游）。② `update` 与 `completeOnce` 共用一份"where 条件 + 可变列清单"（`updateWhere` / `applyMutableColumns`），CAS 写入与 `update` **同形**——agent 轮的内存态（refs/steps/usage/时长）只有终态这一次落库机会，少写一列就是丢数据（重构中识别并规避的回归面）。完成位**不进**共用清单（否则拼出重复 SET 列，H2 报 `Duplicate column name`）。
+- **测试**：`QaTurnFinalizerCommitGateTest` 2 例——双收尾下游只跑一次（**先红证据**：修复前索引实测 **2 次**）/ 提交失败短路（先红：修复前下游仍被调用）；`MessageRepositoryTest` 增 1 例真实 SQL——首次 `completeOnce` true、再次 false、输家不覆盖、富列与 `update` 同形落库。
+- **语义**（已写进注释）：CAS 门只管**下游** exactly-once；行写入保持幂等 last-writer-wins（同一 `Message` 实例，后到的内存态可能更全——STOP 之后桥可能又补最终答案），故输家仍补一次落库。
+- **闸门**：`spotlessCheck build` ✓ **1m43s** ✓ · **4927 / 失败 0 / 跳过 4** ✓（+3 = 新测试）。
 
 ## 附：文档地图与归档追溯
 

@@ -151,6 +151,32 @@ class MessageRepositoryTest {
         assertThat(repo.getMessage(sessionId, m.getId()).getContent()).isEqualTo("original");
     }
 
+    @Test
+    void completeOnceOnlyFirstCallerWinsAndWritesTheRichColumns() {
+        // A2 全轮一次性提交门：第二次收尾（STOP watcher / runner finally 并发）不许拿到门。
+        Message m = message(Message.ROLE_ASSISTANT, "partial", "r1");
+
+        Message winner = new Message();
+        winner.setId(m.getId());
+        winner.setSessionId(sessionId);
+        winner.setContent("final answer");
+        winner.setCompleted(true);
+        winner.setAgentDurationMs(321);
+        assertThat(repo.completeOnce(winner)).as("第一次调用是赢家").isTrue();
+
+        Message loser = new Message();
+        loser.setId(m.getId());
+        loser.setSessionId(sessionId);
+        loser.setContent("ignored");
+        loser.setCompleted(true);
+        assertThat(repo.completeOnce(loser)).as("第二次调用拿不到门").isFalse();
+
+        Message after = repo.getMessage(sessionId, m.getId());
+        assertThat(after.isCompleted()).isTrue();
+        assertThat(after.getContent()).as("输家不覆盖赢家的写入").isEqualTo("final answer");
+        assertThat(after.getAgentDurationMs()).as("agent 轮内存态与 update 同形落库").isEqualTo(321);
+    }
+
     // ── 读 ──────────────────────────────────────────────────────────────────
 
     @Test
