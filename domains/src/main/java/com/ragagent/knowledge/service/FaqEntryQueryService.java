@@ -27,7 +27,7 @@ import com.ragagent.knowledge.mapper.KnowledgeTagMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import com.ragagent.knowledge.security.FaqGuard;
+import com.ragagent.knowledge.domain.access.FaqGuard;
 import com.ragagent.knowledge.dto.faq.FaqSearchRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.nio.charset.StandardCharsets;

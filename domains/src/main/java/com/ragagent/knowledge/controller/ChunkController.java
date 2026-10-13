@@ -20,7 +20,7 @@ import com.ragagent.knowledge.dto.chunk.ChunkResponse;
 import com.ragagent.knowledge.dto.faq.UpsertGeneratedQuestionRequest;
 import com.ragagent.knowledge.domain.ChunkNotFoundException;
 import com.ragagent.knowledge.domain.ChunkRevisionConflictException;
-import com.ragagent.knowledge.security.ChunkAccessGuard;
+import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
 import com.ragagent.knowledge.service.ChunkEditService;
 import com.ragagent.knowledge.service.ChunkReadService;
 import com.ragagent.knowledge.service.ChunkQuestionService;

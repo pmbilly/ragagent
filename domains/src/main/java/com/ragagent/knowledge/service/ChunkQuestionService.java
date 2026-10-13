@@ -43,7 +43,7 @@ import com.ragagent.retrieval.engine.TenantStoreOwnership;
 import com.ragagent.retrieval.engine.EffectiveEngines;
 import com.ragagent.retrieval.engine.RetrieveEngineFactories;
 import com.ragagent.common.web.JsonMappers;
-import com.ragagent.knowledge.security.ChunkAccessGuard;
+import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
 import com.ragagent.retrieval.support.ChunkSearchUtil;
 
 /**
@@ -360,7 +360,7 @@ public class ChunkQuestionService {
      * 。</p>
      * @return 写入的问题数；0 = 跳过（内容空 / 生成失败 / revision 变化 / 分块已删）
      */
-    int generateAndStoreQuestionsForWorker(KnowledgeBase kb, Knowledge knowledge, Chunk chunk,
+   int generateAndStoreQuestionsForWorker(KnowledgeBase kb, Knowledge knowledge, Chunk chunk,
             String prevContent, String nextContent, int questionCount, String customInstructions) {
         int generationRevision = chunk.getContentRevision();
         LlmChatClient chatModel;

@@ -17,7 +17,7 @@ import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import com.ragagent.knowledge.security.ChunkAccessGuard;
+import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
 import com.ragagent.retrieval.support.ChunkSearchUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import java.nio.charset.StandardCharsets;

@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.knowledge.task.FaqImportTaskStore;
-import com.ragagent.knowledge.security.FaqGuard;
+import com.ragagent.knowledge.domain.access.FaqGuard;
 import com.ragagent.knowledge.dto.faq.FaqEntryPayload;
 import com.ragagent.knowledge.dto.faq.FaqEntryFieldsBatchUpdate;
 import com.ragagent.knowledge.dto.faq.FaqEntryFieldsUpdate;

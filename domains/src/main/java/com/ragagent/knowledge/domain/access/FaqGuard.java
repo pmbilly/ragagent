@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.security;
+package com.ragagent.knowledge.domain.access;
 
 import java.util.ArrayList;
 import java.util.Comparator;

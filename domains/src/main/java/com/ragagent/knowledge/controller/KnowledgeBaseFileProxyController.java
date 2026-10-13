@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import com.ragagent.common.error.BizException;
 import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.security.ChunkAccessGuard;
+import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
 import com.ragagent.storage.controller.FileProxyController;
 import com.ragagent.storage.fileserve.FileAccess;
 import com.ragagent.storage.fileserve.FileAccessException;

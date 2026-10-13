@@ -30,7 +30,7 @@ import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
 import com.ragagent.knowledge.task.KnowledgeTaskIdCodec;
 import com.ragagent.knowledge.storage.LocalStorageService;
 import com.ragagent.knowledge.storage.TenantFileStorage;
-import com.ragagent.knowledge.security.FaqGuard;
+import com.ragagent.knowledge.domain.access.FaqGuard;
 import com.ragagent.knowledge.dto.faq.FaqEntryPayload;
 import com.ragagent.knowledge.dto.faq.FaqBatchUpsertPayload;
 import com.ragagent.knowledge.dto.faq.FaqEntryFieldsBatchUpdate;

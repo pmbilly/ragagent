@@ -559,9 +559,14 @@ class ArchitectureRulesTest {
                 .because("依赖方向必须 controller → service → repository/mapper；"
                         + "service 回头引用 controller 即分层倒挂")
                 .check(MAIN);
+        // `..domain.access..`（B263 落位，方案 §8.8.2）：**访问守卫**面——`ChunkAccessGuard` /
+        // `FaqGuard` / `KnowledgeAccessGuard` 的职责就是"代表域校验访问"，必须查 service 侧状态；
+        // 它是守卫/适配面而非数据模型，故从本规则的域模型面中排除（其余 `..domain..` 不变）。
         noClasses().that().resideInAPackage("..domain..")
+                .and().resideOutsideOfPackage("..domain.access..")
                 .should().dependOnClassesThat().resideInAnyPackage("..service..", "..controller..")
-                .because("domain 是数据/领域模型，不得反向依赖 service/controller")
+                .because("domain 是数据/领域模型，不得反向依赖 service/controller"
+                        + "（domain.access 访问守卫面除外，见 §8.8.2）")
                 .check(MAIN);
     }
 

@@ -115,7 +115,7 @@ public class KnowledgeBaseService
         if (uid != null && !uid.startsWith("system-")) {
             kb.setCreatorId(uid);
         }
-        ensureDefaults(kb);
+      ensureDefaults(kb);
         // 下面两行是 null → "" 规整：setter 承担归一，读回再写回即完成（非冗余赋值）
         kb.setEmbeddingModelId(kb.getEmbeddingModelId());
         kb.setSummaryModelId(kb.getSummaryModelId());

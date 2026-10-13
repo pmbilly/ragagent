@@ -11,7 +11,7 @@ import com.ragagent.knowledge.dto.tag.DeleteTagRequest;
 import com.ragagent.knowledge.dto.tag.KnowledgeTagResponse;
 import com.ragagent.knowledge.dto.tag.TagPageResult;
 import com.ragagent.knowledge.dto.tag.UpdateTagRequest;
-import com.ragagent.knowledge.security.ChunkAccessGuard;
+import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
 import com.ragagent.knowledge.service.KnowledgeTagService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;

@@ -44,7 +44,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import com.ragagent.common.tenant.TenantRole;
 import com.ragagent.common.context.TenantContext;
-import com.ragagent.knowledge.security.KnowledgeRouteGuards;
+import com.ragagent.knowledge.domain.access.KnowledgeRouteGuards;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.common.web.ApiResult;

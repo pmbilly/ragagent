@@ -32,7 +32,7 @@ import com.ragagent.knowledge.dto.doc.KnowledgeMoveProgress;
 import com.ragagent.knowledge.dto.doc.MoveKnowledgeResponse;
 import com.ragagent.common.security.APIKeyScopeContext;
 import com.ragagent.common.security.TenantAPIKeyScope;
-import com.ragagent.knowledge.security.KnowledgeRouteGuards;
+import com.ragagent.knowledge.domain.access.KnowledgeRouteGuards;
 import com.ragagent.knowledge.dto.chunk.BatchReparseRequest;
 import com.ragagent.knowledge.dto.chunk.BatchTaskData;
 import com.ragagent.knowledge.dto.doc.FolderMoveResponse;

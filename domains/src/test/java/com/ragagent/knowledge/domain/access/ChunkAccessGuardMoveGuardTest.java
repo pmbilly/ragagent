@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.security;
+package com.ragagent.knowledge.domain.access;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;

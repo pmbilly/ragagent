@@ -3,4 +3,4 @@
  * KnowledgeAccessGuard（知识库读写权限）+ ChunkAccessGuard（chunk 写守卫）+
  * FaqGuard（FAQ 域校验与批量写计划）。守卫只做判定与装载，不落库。
  */
-package com.ragagent.knowledge.security;
+package com.ragagent.knowledge.domain.access;

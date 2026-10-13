@@ -137,7 +137,7 @@ public class KnowledgeFileService {
             existing.setParseStatus("draft");
             existing.setDescription("");
             existing.setProcessedAt(null);
-            updateKnowledgeRow(existing, meta);
+          updateKnowledgeRow(existing, meta);
             existing.setMetadata(meta);
             return existing;
         }
@@ -161,7 +161,7 @@ public class KnowledgeFileService {
      * <p>本方法只写摘要自己那几列（description / summary_status / metadata / updated_at），
      * 绝不碰 parse_status、enable_status、pending_subtasks_count。</p>
      */
-    void updateSummaryColumns(Knowledge k) {
+   public void updateSummaryColumns(Knowledge k) {
         knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
                 .eq(Knowledge::getId, k.getId())
                 .set(Knowledge::getDescription, k.getDescription())
