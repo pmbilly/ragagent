@@ -1,4 +1,4 @@
-package com.ragagent.common.error;
+package com.ragagent.contract.error;
 
 /**
  * 全局错误码表（前端按 code 分支）。

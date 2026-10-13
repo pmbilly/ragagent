@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.error.ErrorCode;
+import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.common.knowledge.KnowledgeDocumentGateway;
 import com.ragagent.knowledge.dto.kb.DuplicateKnowledgeDetails;

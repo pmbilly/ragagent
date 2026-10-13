@@ -8,7 +8,7 @@ import com.ragagent.auth.mapper.UserMapper;
 import com.ragagent.tenant.Tenant;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.tenant.mapper.TenantMapper;
-import com.ragagent.common.error.ErrorCode;
+import com.ragagent.contract.error.ErrorCode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;

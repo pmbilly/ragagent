@@ -533,7 +533,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B255 | 5 | 检索中立 `SearchHit`（去上层对 `PgVectorRetrieveRepository` 内部类型依赖） | ✅ 2026-10-13 |
 | B256 | 6 包结构 | §10 改名清算：10 组同名歧义 + 3 组域前缀（纯改名） | ✅ 2026-10-13 |
 | B257 | 6 | §7 命名与边界：`agent/tools`→`agenttools`、`agent/management`→`agentmanagement` + 边界规则 | ✅ 2026-10-13 |
-| B258 | 6 | contracts 包边界（模块 DAG + 跨域边界规则） | ⬜ |
+| B258 | 6 | contracts 包边界（模块 DAG + 跨域边界规则） | ✅ 2026-10-13 |
 | B259 | 6 | platform 包边界（`:common` 其余收拢） | ⬜ |
 | B260 | 6 | agent-engine 包边界（`com.ragagent.agent` 运行面收拢） | ⬜ |
 | B261 | 6 | retrieval-engine 包边界（`retrieval.*` 收拢 + policy 归位） | ⬜ |
@@ -811,6 +811,16 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **测试**：**4971 / 失败 0 / 跳过 4** ✓（+1 新规则）；契约金片零变化（纯包子树搬迁，wire 未动）。
 - **闸门**：`spotlessCheck build` ✓ **1m34s** ✓ · 十一守卫 ✓。
 - **踩坑记录（重要，写入方法论）**：`git mv` 保留时间戳 ⇒ **Gradle 增量/VFS 快照认为搬走的文件"已编译"**，于是 `domains` 少跑 **166** 个测试、`boot` 少 6 个（首跑全绿但测试数悄悄下降）。**识别信号**：测试汇总里 `domains/boot` 计数下降或 `--tests "新包.*"` 报 "No tests found"。**处置**：`./gradlew :<模块>:test --rerun-tasks`（或清 `build/classes/java/test`）后复跑；**结构批的闸门必须对照测试总数**，否则会以"全绿"掩盖覆盖丢失。
+
+**✅ B258（2026-10-13，§8.1/§12.2 contracts 包边界）**
+- **契约面落地**：新建 `com.ragagent.contract`（`:common` 内）+ `package-info` 写明硬约束（**只依赖 JDK**；零 Spring/MyBatis/Redis/Jackson/Langfuse/云 SDK；wire 序列化归 controller/dto）；**首片收纳**方案点名的 `contract.error.ErrorCode`（纯 JDK；11 文件 FQN 替换 + 同包引用者补 import）。`AppError` 带 `@JsonInclude` ⇒ 按"零 Jackson"口径留待后续（去注解属 wire 变更，需与金片同批动）——**登记为契约面下一片**。
+- **三条规则**（新类 `ContractBoundaryRulesTest`，避免把 1000+ 行的 `ArchitectureRulesTest` 继续撑大）：**R1** 契约面只依赖 JDK 与自身；**R2** `client` 不得引用**他域** `mapper`（同域允许；`domainOf` 取第 3 段判域）；**R3** 模块 DAG 方向（`:common` 侧与 engine 侧不得依赖业务域）+ 棘轮（只许减，现基线 **0**）。
+- **规则探针（验收达成）**：三条各自注入违例**全部转红**——R1 用 `contract.probe` 沾 Jackson、R2 用 `wiki.client` 直连 `session.mapper`、R3 用配置变体（engine 侧无法编译出对 domains 的引用，故以"把 engine 包临时算作业务域"验证判定逻辑）；清理后三条全绿。
+- **起草期自我纠错（值得记）**：R3 初稿把 `com.ragagent.embedding` 当业务域，误判 `CompositeRetrieveEngine`/`LangfuseEmbedder` 等 **4 处违例**；查实 `embedding` 是 **engine 模块自己的包**（与 domains 侧同名包不是一回事）⇒ 业务域清单改为**按模块实际目录派生**（domains 有、engine 无），R3 基线随之**归零**（engine→domains 本就干净）。
+- **守卫联动**：`check-package-cycles.py` 的 `L1`/`L1_CORE` 加入 `contract`（契约面在 `:common` 内、属 L1 底座）——否则守卫把 `retrieval→contract`、`common→contract` 误判成"新增分层违例"。
+- **测试**：**4974 / 失败 0 / 跳过 4** ✓（+3 规则；domains 计数未变 ⇒ 无覆盖丢失）；契约金片零变化。
+- **闸门**：`spotlessCheck build` ✓ **1m42s** ✓ · 十一守卫 ✓。
+- **登记（未做）**：① `AppError` 去 Jackson 入契约面；② §8.1 其余契约（约 200 型）按 B259~B266 逐簇收纳；③ "业务域之间只经 contracts"要等契约面成形后再收紧（本轮只覆盖已存在的坏味道面）。
 
 ## 附：文档地图与归档追溯
 

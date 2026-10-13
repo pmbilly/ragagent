@@ -7,7 +7,7 @@ import java.util.Map;
 
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.error.ErrorCode;
+import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.common.knowledge.KnowledgeBaseSearchFacts;
 import com.ragagent.common.pipeline.SearchParams;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;

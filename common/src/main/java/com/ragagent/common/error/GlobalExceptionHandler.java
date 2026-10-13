@@ -1,5 +1,6 @@
 package com.ragagent.common.error;
 
+import com.ragagent.contract.error.ErrorCode;
 import java.util.LinkedHashMap;
 import java.util.Map;
 

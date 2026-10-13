@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.error.ErrorCode;
+import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.common.web.NonNullBody;
 import com.ragagent.knowledge.dto.chunk.PreviewPayload;
 import com.ragagent.knowledge.dto.chunk.PreviewRequest;

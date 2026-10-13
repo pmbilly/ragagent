@@ -7,7 +7,7 @@ import java.util.List;
 
 import com.ragagent.common.tenant.TenantRole;
 import com.ragagent.common.context.TenantContext;
-import com.ragagent.common.error.ErrorCode;
+import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.common.tenant.TenantProperties;

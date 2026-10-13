@@ -17,7 +17,7 @@ import com.ragagent.chatpipeline.plugin.PluginSearch;
 import com.ragagent.chatpipeline.plugin.PluginSearchParallel;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.error.ErrorCode;
+import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.common.retrieval.SearchTarget;
 
 /**

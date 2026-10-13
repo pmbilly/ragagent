@@ -27,7 +27,7 @@ import com.ragagent.knowledge.service.KnowledgeService;
 import com.ragagent.knowledge.task.KnowledgeProcessingQueue;
 import com.ragagent.knowledge.storage.LocalStorageService;
 import org.springframework.stereotype.Component;
-import com.ragagent.common.error.ErrorCode;
+import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.common.security.SsrfGuard;

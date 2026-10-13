@@ -13,7 +13,7 @@ import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.domain.User;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.error.ErrorCode;
+import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.common.tenant.TenantRole;
 
 import org.slf4j.Logger;
