@@ -1083,3 +1083,47 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 | wiki 内容图片标记（`<image_caption>`/`<image_ocr>`/`<image_original>`） | ✅ 已完成（B93a：标记名 → `<imageCaption>`/`<imageOcr>`/`<imageOriginal>`；**chunk_type 值 `image_ocr`/`image_caption` 是枚举值，保留**） |
 | 落库 jsonb 存量键（agent_steps payload、memory 抽取状态、租户配置内容） | ✅ **完成（2026-10-10 B205）**——**判定**：落库面键已全 camel ✓（B132/B133/B135a/B135d1 ✓）；残留 snake 字符串**全在登记冻结面**（provider 请求体 / DB 列名 / MCP 枚举值 / LLM 载荷 ✓）。**实测**：dev 库 `tenants` 六列 + `memory_subjects` 两列，仅 4 列共 6 行还有旧键 ✗ ⇒ 按口径「开发库可清，不写迁移脚本」**一次性就地修数** ✓（先备份 → 事务 → 幂等 ✓；修后旧键行数**全 0** ✓）。修数 SQL 是 dev 一次性操作，**不入库** ✗（要点在提交 `(B205)` ✓）。 |
 
+### 15.4 架构整改批次（R 系列，2026-10-13 立项）
+
+> 方案：`outputs/java-remediation-plan-2026-10-13.md`（架构审查 + 目标结构 + 阶段路线）；
+> 实施计划与勘察证据：`outputs/java-remediation-implementation-plan-2026-10-13.md`（批次表原件）。
+> 口径：先正确性（阶段 1~3）→ 结构收敛（阶段 4~5）→ 模块提取（阶段 6）；**每批独立提交独立全绿**；
+> 守卫/规则类改动必配红态探针；结构搬迁不夹带行为变更。两条硬规则基线（实测）：A16=81 类、A17=55 类，只许减。
+
+| 批 | 阶段 | 范围 | 状态 |
+|---|---|---|---|
+| B232 | 0 边界固化 | 守卫修复（`check-package-cycles.py` PERSIST_RE 缩进）+ R9 包级 SCC 棘轮（基线 13 组） | ✅ **完成（2026-10-13）** |
+| B233 | 0 | ArchUnit A16 边界层引用禁令（基线 81）+ A17 service 技术依赖禁令（基线 55） | ⬜ |
+| B234 | 1 正确性 | A6 同 ID 去重保最高分（`KnowledgeSearchRanking`） | ⬜ |
+| B235 | 1 | K3 DocReader 流错误传播 | ⬜ |
+| B236 | 1 | K1 租户显式路由（worker→向量店） | ⬜ |
+| B237 | 1 | K2 URL 摄取统一（拍板点：同步下载路径） | ⬜ |
+| B238 | 2 会话终态 | A1-NORMAL 终态收口 | ⬜ |
+| B239 | 2 | A1-AGENT 终态收口 | ⬜ |
+| B240 | 2 | A2 全轮一次性提交门 | ⬜ |
+| B241 | 2 | A3 可关闭模型流 | ⬜ |
+| B242 | 2 | A5 跨线程上下文传播 | ⬜ |
+| B243 | 2 | A18 状态所有权规则（随 B238-240 收敛） | ⬜ |
+| B244 | 3 任务可靠 | K4 CAS 保护整轮数据 | ⬜ |
+| B245 | 3 | K5 图任务契约统一 | ⬜ |
+| B246 | 3 | K6 恢复口径统一（拍板点：持久化深度） | ⬜ |
+| B247 | 4 索引一致 | K10a embedding 响应校验 | ⬜ |
+| B248 | 4 | K10b 索引执行收敛 | ⬜ |
+| B249 | 4 | K7 事务外副作用 | ⬜ |
+| B250 | 4 | K8 配置能力矩阵 | ⬜ |
+| B251 | 5 结构收敛 | K9 跨 store 融合 | ⬜ |
+| B252 | 5 | A4 并发工具状态提交 | ⬜ |
+| B253 | 5 | controller 剥离编排 | ⬜ |
+| B254 | 5 | 检索中立 SearchHit | ⬜ |
+| B255 | 6 模块提取 | contracts/platform 包边界 | ⬜ |
+| B256 | 6 | 三 runtime 包边界 | ⬜ |
+| B257 | 6 | domains 重排 + A11b 清零 | ⬜ |
+
+**✅ B232（2026-10-13，守卫修复 + R9 包级 SCC 棘轮）**
+- **R6 持久层引用检查修复**：`check-package-cycles.py` 的 `PERSIST_RE` 检查原在内层循环**之外** ⇒ 每个 common 根目录只检查最后读到的 1 个文件（可静默漏检）。修复后全量重扫实测 **0 命中 ⇒ 读数不变**（纯漏检面修复，无基线 churn）。
+- **R9 包级 SCC 棘轮上线**：按完整包（`com.ragagent.a.b`）聚合 import 边求 SCC，**13 组**入基线（只许减；**新增与已消除/变形都红** ⇒ 刷新须 `--write` 并在说明里写明原因）。R1b 只看顶层域，这 13 组此前完全不可见；方案 §2.2 的"13 个包级强连通分量"由此**精确复现**（含 `knowledge.repository/security/service/task`、`agent/compaction/prompt`、`retrieval.engine.*` 9 组等）。
+- **三个红态探针全验**：① 注入 `common/probe` 持久层引用 ⇒ 修前 R6 计数 **0**（漏检）、修后 `持久层 ['probe']`；② 注入子包环 `probe.a ⇄ probe.b` ⇒ R9 `14 组（基线 13）；✗ 新增` + rc=1（同时 R1/R1b 保持 0 ⇒ 证明看到了顶层域看不见的环）；③ 基线塞假 SCC ⇒ `已消除/变形（请 --write 刷新基线）` + rc=1。探针全删后复绿。
+- **Tarjan 抽取**：顶层域与完整包共用一份 `sccs_of()`（同政策一份实现）；包图**两趟收边**（先登记全部包再收边——探针开发期实测：单趟版把 13 组看成 9 组，漏了"目标包尚未读到"的边）。
+- **基线 diff 干净**：`package-cycles.baseline.json` 仅新增 `package_sccs`（+71 行），其余键零变化。**闸门**：十一守卫全绿 ✓ · `spotlessCheck build` ✓ **1m31s** ✓（脚本批，Java 零改动，未重启 dev）。
+- **同时登记**：R 系列批次表（本节）+ 实施计划 `outputs/java-remediation-implementation-plan-2026-10-13.md`（含勘察证据与两个拍板点）。
+
