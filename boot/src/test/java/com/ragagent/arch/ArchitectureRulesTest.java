@@ -828,7 +828,6 @@ class ArchitectureRulesTest {
             "com.ragagent.knowledge.service.KnowledgeFinalizeAdapter",
             "com.ragagent.knowledge.service.KnowledgeFolderService",
             "com.ragagent.knowledge.service.KnowledgeMoveService",
-            "com.ragagent.knowledge.service.KnowledgeParseService",
             "com.ragagent.knowledge.service.KnowledgeSearchService",
             "com.ragagent.knowledge.service.KnowledgeService",
             "com.ragagent.knowledge.service.KnowledgeSummaryService",

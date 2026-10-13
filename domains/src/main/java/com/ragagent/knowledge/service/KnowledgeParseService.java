@@ -2,13 +2,11 @@ package com.ragagent.knowledge.service;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.knowledge.task.KnowledgeProcessingQueue;
 import com.ragagent.common.error.BizException;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.mapper.KnowledgeMapper;
+import com.ragagent.knowledge.repository.DocumentParser;
 import org.springframework.stereotype.Service;
 
 /**
@@ -21,7 +19,7 @@ public class KnowledgeParseService {
     private final KnowledgeAccessHelper access;
     private final KnowledgeFolderService folderService;
     private final KnowledgeFileService fileService;
-    private final KnowledgeMapper knowledgeMapper;
+    private final DocumentParser documentParser;
     private final SpanTracker spanTracker;
     private final KnowledgeProcessingQueue worker;
 
@@ -29,13 +27,13 @@ public class KnowledgeParseService {
                             KnowledgeAccessHelper access,
                             KnowledgeFolderService folderService,
                             KnowledgeFileService fileService,
-                            KnowledgeMapper knowledgeMapper,
+                            DocumentParser documentParser,
                             SpanTracker spanTracker,
                             KnowledgeProcessingQueue worker) {
         this.access = access;
         this.folderService = folderService;
         this.fileService = fileService;
-        this.knowledgeMapper = knowledgeMapper;
+        this.documentParser = documentParser;
         this.spanTracker = spanTracker;
         this.worker = worker;
     }
@@ -74,11 +72,7 @@ public class KnowledgeParseService {
      * 无法取消解析"、其余状态（含 unknown）放行改 cancelled。
      */
     public Knowledge cancelKnowledgeParse(String id) {
-        Knowledge existing = knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getId, id)
-                .eq(Knowledge::getTenantId, KnowledgeService.tenantId())
-                .isNull(Knowledge::getDeletedAt)
-                .last("LIMIT 1"));
+        Knowledge existing = documentParser.findById(KnowledgeService.tenantId(), id);
         if (existing == null) {
             throw BizException.notFound("knowledge not found");
         }
@@ -94,12 +88,7 @@ public class KnowledgeParseService {
             }
         }
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
-        knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
-                .eq(Knowledge::getId, existing.getId())
-                .set(Knowledge::getParseStatus, Knowledge.PARSE_CANCELLED)
-                .set(Knowledge::getErrorMessage, "用户已取消解析")
-                .set(Knowledge::getPendingSubtasksCount, 0)
-                .set(Knowledge::getUpdatedAt, now));
+        documentParser.markCancelled(existing.getId(), now, "用户已取消解析");
         existing.setParseStatus(Knowledge.PARSE_CANCELLED);
         existing.setErrorMessage("用户已取消解析");
         existing.setPendingSubtasksCount(0);

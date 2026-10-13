@@ -888,6 +888,14 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **守卫现场拦截**：① **R8 内联全限定名** 抓到我第一版 `implements com.ragagent.knowledge.domain.access.KnowledgeReadPort` ✗ ⇒ 改 import；② **A16** 的基线条目 `evaluation.service.EvaluationService` 因编解码器迁出 `task/` 边界而**不再违例** ⇒ 按规则提示删除条目收紧基线。
 - **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m31s** ✓ 十一守卫 ✓。
 
+**🔶 B263 第④步（2026-10-13，枢纽拆分起步：`repository/DocumentParser` 落位）**
+- **为什么不能"整个搬"**：最轻的枢纽 `KnowledgeParseService`（124 行 / 仅 1 处引用）直接搬 `repository/` 会**复活 B263② 刚断掉的 `repository → service`**（它依赖 `KnowledgeAccessHelper`/`KnowledgeFolderService`/`KnowledgeFileService`/`SpanTracker` 四个 service 类）⇒ 按目标树应当是**切分**，不是搬家。
+- **切法**：① 新增 **`knowledge/repository/DocumentParser`**——把两处行级读写抽成方法 `findById(tenantId, id)`（未软删、租户内、LIMIT 1）与 `markCancelled(id, now, message)`（状态+文案+子任务归零+updated_at）；本类**零 service 依赖**（方向恒为 repository ← service）；② `KnowledgeParseService` 保留编排与状态机判定（cancelled 幂等 / completed|failed→400 / deleting→400）+ span 收口 + 入队，行级 IO 全部改走 `DocumentParser` ⇒ **service 侧不再直接持有 MyBatis 语句**。
+- **规则收紧（守卫现场拦截）**：A17 的基线条目 `com.ragagent.knowledge.service.KnowledgeParseService` **已不再违例**（MyBatis 迁出）⇒ 删除该条目；**A16 的同名条目保留**（它仍依赖 `task` 边界的 `KnowledgeProcessingQueue` ⇒ 仍属 A16 范围）。两条基线同名易混，按行号区分（A16 在 764、A17 在 831）。
+- **SCC 复核**：13 组不变、`{service, task}` 2 成员不变（新 `DocumentParser` 未造新环 ✓）。
+- **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m28s** ✓ 十一守卫 ✓。
+- **登记（枢纽拆分余步）**：按"最轻优先"继续——`KnowledgeVectorWrites`(51 行/1 引用)、`KnowledgeFinalizeAdapter`(71/1)、`ChunkVectorIndexer`(386/2)、`KnowledgeFileService`(422/2)、`KnowledgeParseService` 余部、`KnowledgeBaseService`(626/18)、`KnowledgeService`(796/28)；每个都按"切分而非搬家"处理（避免复活 `repository → service` 与 `service → task` 边）。
+
 ## 附：文档地图与归档追溯
 
 **✅ B255（2026-10-13，阶段 5 收口：检索中立类型）**
