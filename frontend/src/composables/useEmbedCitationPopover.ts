@@ -93,7 +93,7 @@ export function useEmbedCitationPopover(
       setCitationChunkCache(scope, chunkId, { content })
       float.value.content = content
     } catch {
-      const msg = 'Failed to load'
+      const msg = 'Failed to load, please try again later'
       setCitationChunkCache(scope, chunkId, { content: '', error: msg })
       float.value.error = msg
     } finally {

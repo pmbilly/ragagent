@@ -1234,7 +1234,7 @@ const messages = {
       "deleted": "Deleted",
       "tokenRotated": "Token rotated",
       "copied": "Embed code copied",
-      "loadError": "Failed to load",
+      "loadError": "Failed to load, please try again later",
       "refresh": "Refresh",
       "historyTitle": "Chat history",
       "historyEmpty": "No past conversations yet",
@@ -1647,7 +1647,7 @@ const messages = {
       "citation": {
         "loading": "Loading...",
         "notFound": "Content not found",
-        "loadFailed": "Failed to load",
+        "loadFailed": "Failed to load, please try again later",
         "chunkId": "Chunk ID",
         "noKbForWiki": "Unable to identify associated knowledge base. Cannot open Wiki."
       },

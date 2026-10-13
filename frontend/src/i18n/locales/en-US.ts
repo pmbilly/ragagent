@@ -1244,7 +1244,7 @@ export default {
       console: 'Console',
       docs: 'Docs',
       testConnection: 'Test Connection',
-      loadFailed: 'Failed to load',
+      loadFailed: 'Failed to load, please try again later',
       saveSuccess: 'Saved successfully',
       saveFailed: 'Save failed',
       unknownError: 'Unknown error',
@@ -2124,7 +2124,7 @@ export default {
     saveFailed: 'Save failed',
     deleted: 'Deleted',
     copied: 'Embed code copied',
-    loadError: 'Failed to load',
+    loadError: 'Failed to load, please try again later',
     refresh: 'Refresh',
     missingChannel: 'Missing embed channel or token',
     invalidChannel: 'Invalid embed channel',
@@ -4801,7 +4801,7 @@ export default {
     },
     citation: {
       notFound: 'Content not found',
-      loadFailed: 'Failed to load',
+      loadFailed: 'Failed to load, please try again later',
       noKbForWiki: 'Unable to identify associated knowledge base. Cannot open Wiki.'
     },
     toolSummary: {
