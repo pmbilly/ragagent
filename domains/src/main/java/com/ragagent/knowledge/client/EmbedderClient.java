@@ -26,9 +26,16 @@ public class EmbedderClient implements EmbeddingGateway {
 
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
-    private final HttpClient http = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(30))
-            .build();
+    private final HttpClient http;
+
+    public EmbedderClient() {
+        this(HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(30)).build());
+    }
+
+    /** 测试缝：注入桩 HttpClient 以覆盖响应校验路径（生产装配走无参构造）。 */
+    EmbedderClient(HttpClient http) {
+        this.http = http;
+    }
 
     /** base_url/api_key 来自模型参数 */
     public record EmbedConfig(String baseUrl, String apiKey, String modelName) {}
@@ -101,16 +108,44 @@ public class EmbedderClient implements EmbeddingGateway {
         if (data == null || !data.isArray()) {
             throw new IllegalStateException("embedding response missing data: " + abbreviate(resp.body()));
         }
-        List<float[]> out = new ArrayList<>(data.size());
+        List<float[]> out = new ArrayList<>(texts.size());
+        // K10a：按响应声明的 index 归位并校验数量/维度。下游 VectorStoreService.saveIndexRows
+        // 是 rows[i] ↔ vectors[i] 按位置配行——顺序错/少条/混维都会静默写错向量（比报错危险）。
+        float[][] ordered = new float[texts.size()][];
+        int seen = 0;
+        int dimension = -1;
         for (JsonNode item : data) {
             JsonNode emb = item.get("embedding");
-            if (emb == null || !emb.isArray()) {
+            if (emb == null || !emb.isArray() || emb.isEmpty()) {
                 throw new IllegalStateException("embedding item missing vector");
             }
             float[] vector = new float[emb.size()];
             for (int i = 0; i < emb.size(); i++) {
                 vector[i] = (float) emb.get(i).asDouble();
             }
+            if (dimension < 0) {
+                dimension = vector.length;
+            } else if (dimension != vector.length) {
+                throw new IllegalStateException("embedding dimension mismatch within batch: expected "
+                        + dimension + " but got " + vector.length);
+            }
+            JsonNode idxNode = item.get("index");
+            int index = idxNode != null && idxNode.isInt() ? idxNode.asInt() : seen;
+            if (index < 0 || index >= ordered.length) {
+                throw new IllegalStateException("embedding index out of range: " + index
+                        + " (batch size " + ordered.length + ")");
+            }
+            if (ordered[index] != null) {
+                throw new IllegalStateException("embedding index duplicated: " + index);
+            }
+            ordered[index] = vector;
+            seen++;
+        }
+        if (seen != texts.size()) {
+            throw new IllegalStateException("embedding response size mismatch: expected "
+                    + texts.size() + " vector(s) but got " + seen);
+        }
+        for (float[] vector : ordered) {
             out.add(vector);
         }
         return out;

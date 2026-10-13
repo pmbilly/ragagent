@@ -523,7 +523,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B245 | 3 任务可靠 | K4：CAS 保护整轮数据（终态写入按尝试守卫 + 失败清场限本代；接管语义保留） | ✅ 2026-10-13 |
 | B246 | 3 | K5：图任务失败/重试/计数同一契约（`finalAttempt` 消费、异常不吞、任务级去重） | ✅ 2026-10-13 |
 | B247 | 3 | K6：主任务恢复口径统一（**拍板点②**：判据分裂已修＝按面判据；持久化主任务另立项） | ✅ 2026-10-13 |
-| B248 | 4 索引/配置 | K10a：embedding 响应对齐校验（`index` 消费 + 数量/维度校验 + 乱序拒绝） | ⬜ |
+| B248 | 4 索引/配置 | K10a：embedding 响应对齐校验（`index` 消费 + 数量/维度校验 + 乱序拒绝） | ✅ 2026-10-13 |
 | B249 | 4 | K10b：索引分批政策收敛（worker 与 `ChunkVectorIndexer` 共用执行） | ⬜ |
 | B250 | 4 | K7：事务外副作用（revision + outbox；事务内不调远程模型） | ⬜ |
 | B251 | 4 | K8：配置能力矩阵（parser rules / parent-child 显式拒绝或实现；不静默回落） | ⬜ |
@@ -723,6 +723,14 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **测试**：新增 `StartupTaskRecoverySplitTest` 2 例——① 知识面跳过时**同步日志面仍复位**（断言"一行 `knowledges` 查询都不发 + `sync_logs` 的 UPDATE 照发"）；② 知识面未装配时知识行照常被挑出复位。**红态探针**：让生产路径忽略知识面开关 ⇒ 用例①实测失败 ⇒ 还原后绿。
 - **登记（拍板点②的"大改"，本期不做）**：**主任务持久化**始终缺位——唯一 `KnowledgeProcessingQueue` 实现是进程内 executor（重启丢在途主任务，`HousekeepingService` 只判 failed 不重投）。做成可重领/lease 属基建改造（新表/字段、续约、与 span/attempt 配合），建议独立立项（阶段 4/5 之后）；届时本批的按面判据就是"单机 vs 多实例"的统一入口。
 - **闸门**：`spotlessCheck build` ✓ **1m26s** ✓ · **4940 / 失败 0 / 跳过 4** ✓（+2 = 新测试）· 十一守卫 ✓。
+
+**✅ B248（2026-10-13，K10a：embedding 响应校验）**
+- **缺口**（方案 K10a）：`EmbedderClient.embedBatch` 按响应**数组顺序**拼装 vectors——不消费每条声明的 `index`、不校验数量（vs 输入条数）、不校验维度（批内混维也照收）；而下游 `VectorStoreService.saveIndexRows` 是 `rows[i] ↔ vectors[i]` **按位置配行** ⇒ 顺序错位 / 少条 / 混维都会**静默写错向量**（比报错危险）。
+- **修复**：按 `index` 归位（缺 `index` 时退回数组序 + 数量校验兜底）；数量必须等于输入条数；批内维度必须一致；`index` 越界 / 重复、空向量一并抛 `IllegalStateException`（文案含 size mismatch / dimension / out of range / duplicated，便于定位）。
+- **测试缝**：`EmbedderClient` 的 `HttpClient` 由硬编码字段改为**可注入**（新增包内可见构造；生产装配走无参构造）——响应校验因此可在单测里直接覆盖。
+- **测试（先红）**：新增 `EmbedderClientResponseValidationTest` 5 例（乱序归位 / 少条抛 / 混维抛 / 越界与重复抛 / 回归照常）。修复前实测 **4 红 1 绿**（乱序把 `[9.0,9.0]` 放首位、三处"该抛未抛"），修复后全绿。
+- **登记（后续）**：① 与 store 的**声明维度交叉校验**——`EmbedConfig` 只有 `(baseUrl, apiKey, modelName)`，无声明维度，批内一致性是当前上限；② `saveIndexRows` 可补 `rows.size() == vectors.size()` 断言（并入 B249 K10b）。
+- **闸门**：`spotlessCheck build` ✓ **1m41s** ✓ · **4945 / 失败 0 / 跳过 4** ✓（+5 = 新测试；**无既有测试因"变严格"失败**——既有桩本就自洽）· 十一守卫 ✓。
 
 ## 附：文档地图与归档追溯
 
