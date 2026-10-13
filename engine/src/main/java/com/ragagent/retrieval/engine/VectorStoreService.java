@@ -53,6 +53,12 @@ public class VectorStoreService {
      * （{@link #deleteByChunkId} / {@link #deleteByKnowledgeId} / {@link #deleteBySourceId}），
      */
     public void saveIndexRows(List<IndexRow> rows, List<float[]> vectors) {
+        // K10b（B248 登记）：按位置配行的最后一道闸——错位/少条到此为止，不静默写错行。
+        if (rows == null || vectors == null || rows.size() != vectors.size()) {
+            throw new IllegalStateException("index rows/vectors size mismatch: rows="
+                    + (rows == null ? "null" : rows.size()) + " vectors="
+                    + (vectors == null ? "null" : vectors.size()));
+        }
         String sql = postgres
                 ? "INSERT INTO embeddings (created_at, updated_at, source_id, source_type, chunk_id, "
                   + "knowledge_id, knowledge_base_id, tag_id, content, is_enabled, dimension, embedding) "

@@ -524,7 +524,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B246 | 3 | K5：图任务失败/重试/计数同一契约（`finalAttempt` 消费、异常不吞、任务级去重） | ✅ 2026-10-13 |
 | B247 | 3 | K6：主任务恢复口径统一（**拍板点②**：判据分裂已修＝按面判据；持久化主任务另立项） | ✅ 2026-10-13 |
 | B248 | 4 索引/配置 | K10a：embedding 响应对齐校验（`index` 消费 + 数量/维度校验 + 乱序拒绝） | ✅ 2026-10-13 |
-| B249 | 4 | K10b：索引分批政策收敛（worker 与 `ChunkVectorIndexer` 共用执行） | ⬜ |
+| B249 | 4 索引/配置 | K10b：索引执行收敛（worker 委托化；**拍板：语义目标**） | 🟡 部分（数量断言 ✅；委托化待拍板） |
 | B250 | 4 | K7：事务外副作用（revision + outbox；事务内不调远程模型） | ⬜ |
 | B251 | 4 | K8：配置能力矩阵（parser rules / parent-child 显式拒绝或实现；不静默回落） | ⬜ |
 | B252 | 5 结构收敛 | K9：跨 store 融合（RRF 按 store 内 rank；context expansion 修正） | ⬜ |
@@ -731,6 +731,12 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **测试（先红）**：新增 `EmbedderClientResponseValidationTest` 5 例（乱序归位 / 少条抛 / 混维抛 / 越界与重复抛 / 回归照常）。修复前实测 **4 红 1 绿**（乱序把 `[9.0,9.0]` 放首位、三处"该抛未抛"），修复后全绿。
 - **登记（后续）**：① 与 store 的**声明维度交叉校验**——`EmbedConfig` 只有 `(baseUrl, apiKey, modelName)`，无声明维度，批内一致性是当前上限；② `saveIndexRows` 可补 `rows.size() == vectors.size()` 断言（并入 B249 K10b）。
 - **闸门**：`spotlessCheck build` ✓ **1m41s** ✓ · **4945 / 失败 0 / 跳过 4** ✓（+5 = 新测试；**无既有测试因"变严格"失败**——既有桩本就自洽）· 十一守卫 ✓。
+
+**🟡 B249（2026-10-13，K10b 索引执行收敛——数量断言已上；委托化待拍板）**
+- **测绘结论（三条路径）**：① `ChunkVectorIndexer.indexAndStore` 的 pg 直连分支（`BatchEmbedProperties.embedSize()` 分批 → `embedBatch` → `saveIndexRows`）；② 同一索引器的引擎分支（`indexInfo()` 助手建 `IndexInfo` → `deleteByChunkIdList` → `engine.batchIndex`）；③ **worker 的 `embedChunks` 把 ①② 各重写了一遍**（内联 `IndexInfo` 字段赋值 + 自建 `texts/rows` + 自己分批）——即方案所称"重复分批与构造"。
+- **本批已做（无争议部分）**：`VectorStoreService.saveIndexRows` 增加 `rows.size() == vectors.size()` **数量断言**（按位置配行的最后一道闸，B248 登记项）；新增 `VectorStoreServiceIndexRowArityTest` 2 例（数量不符 / null ⇒ 抛且一行 SQL 都不发）。
+- **待拍板（委托化的语义目标）**：直接让 worker 委托索引器会**静默改变索引行为**——实测两条路径**语义不等价**：① 索引器先 `deleteByChunkIdList`（worker 靠前置 `preCleanKnowledge`，效果等价）；② 索引器 pg 分支**会一并索引生成问题行**（worker 不写）；③ 索引器**过滤 `parent_text` 块**（worker 全索引）；④ 索引器按块 `enabled` 判定（worker 硬编码 `true`）；⑤ 错误语义：索引器包成 `BizException(badRequest)`，worker 裸抛（B245/B246 的重试/终态契约依赖后者）；⑥ 批大小来源不同（`BatchEmbedProperties.embedSize()` vs worker 自有 `embedBatchSize()`）。⇒ 委托化属**行为变更批**（父块是否入库 / 问题行谁写 / 禁用块如何处理 / 失败文案），建议独立一批并先定目标语义（推荐：一律采用索引器语义、worker 变薄壳），到批前给逐条对照与回归面。
+- **闸门**：`spotlessCheck build` ✓ **2m05s** ✓ · **4947 / 失败 0 / 跳过 4** ✓（+2）· 十一守卫 ✓。
 
 ## 附：文档地图与归档追溯
 
