@@ -64,50 +64,69 @@ final class HybridResultOps {
             chunkMap.put(c.id(), c);
         }
 
+        // 上下文扩展（K9）：父块 / 相邻块 / 关系块——**取回后必须输出**（此前只读不输出，
+        // 请求里 skipContextEnrichment=false 也拿不到任何上下文块，那些读取全是白读）。
+        // 扩展块登记到来源命中名下，装配时紧随其后。
+        Map<String, List<String>> extrasBySource = new LinkedHashMap<>();
+        Map<String, Integer> extraMatchTypes = new HashMap<>();
         if (!skipEnrichment) {
             Set<String> processed = new HashSet<>();
-            List<String> additional = new ArrayList<>();
             for (ChunkFacts c : allChunks) {
                 processed.add(c.id());
             }
+            Set<String> extraKnowledgeIds = new LinkedHashSet<>();
             for (ChunkFacts c : allChunks) {
-                if (!c.parentChunkId().isEmpty() && !processed.contains(c.parentChunkId())) {
-                    additional.add(c.parentChunkId());
-                    processed.add(c.parentChunkId());
-                    scores.put(c.parentChunkId(), scores.getOrDefault(c.id(), 0.0));
-                    matchTypes.put(c.parentChunkId(), HybridSearchService.MATCH_PARENT_CHUNK);
+                List<String> extras = new ArrayList<>();
+                if (!c.parentChunkId().isEmpty() && processed.add(c.parentChunkId())) {
+                    extras.add(c.parentChunkId());
+                    extraMatchTypes.put(c.parentChunkId(), HybridSearchService.MATCH_PARENT_CHUNK);
                 }
                 for (String rel : relatedChunkIds(c, processed)) {
-                    additional.add(rel);
-                    matchTypes.put(rel, HybridSearchService.MATCH_RELATION_CHUNK);
+                    extras.add(rel);
+                    extraMatchTypes.put(rel, HybridSearchService.MATCH_RELATION_CHUNK);
                 }
                 if ("text".equals(c.chunkType())) {
-                    if (!c.nextChunkId().isEmpty() && !processed.contains(c.nextChunkId())) {
-                        additional.add(c.nextChunkId());
-                        processed.add(c.nextChunkId());
-                        matchTypes.put(c.nextChunkId(), HybridSearchService.MATCH_NEAR_BY_CHUNK);
+                    if (!c.nextChunkId().isEmpty() && processed.add(c.nextChunkId())) {
+                        extras.add(c.nextChunkId());
+                        extraMatchTypes.put(c.nextChunkId(), HybridSearchService.MATCH_NEAR_BY_CHUNK);
                     }
-                    if (!c.preChunkId().isEmpty() && !processed.contains(c.preChunkId())) {
-                        additional.add(c.preChunkId());
-                        processed.add(c.preChunkId());
-                        matchTypes.put(c.preChunkId(), HybridSearchService.MATCH_NEAR_BY_CHUNK);
+                    if (!c.preChunkId().isEmpty() && processed.add(c.preChunkId())) {
+                        extras.add(c.preChunkId());
+                        extraMatchTypes.put(c.preChunkId(), HybridSearchService.MATCH_NEAR_BY_CHUNK);
+                    }
+                }
+                if (extras.isEmpty()) {
+                    continue;
+                }
+                extrasBySource.put(c.id(), extras);
+                for (String aid : extras) {
+                    ChunkFacts extra = fetchChunk(tenantId, aid);
+                    if (extra == null) {
+                        continue;
+                    }
+                    chunkMap.put(extra.id(), extra);
+                    // 扩展块继承来源命中的分数（同源上下文；父块原有语义推广到全部扩展块）。
+                    scores.put(aid, scores.getOrDefault(c.id(), 0.0));
+                    if (!knowledgeMap.containsKey(extra.knowledgeId())) {
+                        extraKnowledgeIds.add(extra.knowledgeId());
                     }
                 }
             }
-            for (String aid : additional) {
-                ChunkFacts extra = fetchChunk(tenantId, aid);
-                if (extra != null) {
-                    chunkMap.put(extra.id(), extra);
+            // 关系块可能跨文档：其文档同样要过可访问性闸门（与主命中同一道）。
+            if (!extraKnowledgeIds.isEmpty()) {
+                for (KnowledgeDocumentFacts k : service.documentGateway.findAccessibleDocuments(
+                        tenantId, new ArrayList<>(extraKnowledgeIds))) {
+                    knowledgeMap.put(k.id(), k);
                 }
             }
         }
 
-        // 首轮：按输入顺序装配。
+        // 装配：按输入顺序；每个命中后紧随其上下文扩展块。
         List<SearchResult> out = new ArrayList<>();
         Set<String> added = new HashSet<>();
         for (PgVectorRetrieveRepository.IndexHit input : chunks) {
             ChunkFacts chunk = chunkMap.get(input.chunkId);
-            if (chunk == null || !isSearchableChunk(chunk) || added.contains(chunk.id())) {
+            if (chunk == null || !isSearchableChunk(chunk) || !added.add(chunk.id())) {
                 continue;
             }
             KnowledgeDocumentFacts knowledge = knowledgeMap.get(chunk.knowledgeId());
@@ -118,7 +137,18 @@ final class HybridResultOps {
                     scores.getOrDefault(chunk.id(), 0.0),
                     matchTypes.getOrDefault(chunk.id(), HybridSearchService.MATCH_EMBEDDING),
                     matchedContents.getOrDefault(chunk.id(), "")));
-            added.add(chunk.id());
+            for (String aid : extrasBySource.getOrDefault(chunk.id(), List.of())) {
+                ChunkFacts extra = chunkMap.get(aid);
+                if (extra == null || !isSearchableChunk(extra) || !added.add(extra.id())) {
+                    continue;
+                }
+                KnowledgeDocumentFacts extraKnowledge = knowledgeMap.get(extra.knowledgeId());
+                if (extraKnowledge == null) {
+                    continue;
+                }
+                out.add(buildSearchResult(extra, extraKnowledge, scores.getOrDefault(aid, 0.0),
+                        extraMatchTypes.getOrDefault(aid, HybridSearchService.MATCH_EMBEDDING), ""));
+            }
         }
         return out;
     }

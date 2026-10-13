@@ -265,25 +265,31 @@ public class HybridSearchService {
             return null;
         }
 
-        // 分类 + 融合。
-        List<PgVectorRetrieveRepository.IndexHit> vectorResults = new ArrayList<>();
-        List<PgVectorRetrieveRepository.IndexHit> keywordResults = new ArrayList<>();
+        // 分类：按 **每个 store 的返回列表** 分组保序（K9：RRF 的 rank 是"店内名次"）——
+        // 此前先 addAll 成一个大列表，rank 退化成拼接位置，第二个 store 的本地第一名被
+        // 系统性降级，且结果随 groups 顺序漂移（交换 KB/store 顺序结果就变）。
+        List<List<PgVectorRetrieveRepository.IndexHit>> vectorStores = new ArrayList<>();
+        List<List<PgVectorRetrieveRepository.IndexHit>> keywordStores = new ArrayList<>();
         for (PgVectorRetrieveRepository.RetrieveResult rr : results) {
+            if (rr.results().isEmpty()) {
+                continue;
+            }
             if (PgVectorRetrieveRepository.RETRIEVER_VECTOR.equals(rr.retrieverType())) {
-                vectorResults.addAll(rr.results());
+                vectorStores.add(rr.results());
             } else {
-                keywordResults.addAll(rr.results());
+                keywordStores.add(rr.results());
             }
         }
-        if (vectorResults.isEmpty() && keywordResults.isEmpty()) {
+        if (vectorStores.isEmpty() && keywordStores.isEmpty()) {
             return null;
         }
         var rc = currentRetrievalConfig();
-        List<PgVectorRetrieveRepository.IndexHit> deduped = fuseOrDeduplicate(vectorResults, keywordResults, rc);
+        List<PgVectorRetrieveRepository.IndexHit> deduped =
+                fuseOrDeduplicate(vectorStores, keywordStores, rc);
 
         // FAQ 后处理（按 storeGroups 扇出——迭代 TopK 对全部绑定店统一生长）。
-        deduped = fusionOps.applyFaqPostProcessing(primary, deduped, vectorResults, groups, params,
-                overMatchCount);
+        deduped = fusionOps.applyFaqPostProcessing(primary, deduped, flattenStores(vectorStores),
+                groups, params, overMatchCount);
 
         // 截断到主匹配上限。
         if (deduped.size() > matchCount) {
@@ -751,14 +757,19 @@ public class HybridSearchService {
         }
     }
     static List<PgVectorRetrieveRepository.IndexHit> fuseOrDeduplicate(
-            List<PgVectorRetrieveRepository.IndexHit> vectorResults,
-            List<PgVectorRetrieveRepository.IndexHit> keywordResults, RetrievalConfigView rc) {
-        return HybridFusionOps.fuseOrDeduplicate(vectorResults, keywordResults, rc);
+            List<List<PgVectorRetrieveRepository.IndexHit>> vectorStores,
+            List<List<PgVectorRetrieveRepository.IndexHit>> keywordStores, RetrievalConfigView rc) {
+        return HybridFusionOps.fuseOrDeduplicate(vectorStores, keywordStores, rc);
     }
 
-    static List<PgVectorRetrieveRepository.IndexHit> deduplicateByScore(
-            List<PgVectorRetrieveRepository.IndexHit> hits) {
-        return HybridFusionOps.deduplicateByScore(hits);
+    /** 展平店内列表（FAQ 后处理等按扁平向量命中工作的既有接口用）。 */
+    static List<PgVectorRetrieveRepository.IndexHit> flattenStores(
+            List<List<PgVectorRetrieveRepository.IndexHit>> stores) {
+        List<PgVectorRetrieveRepository.IndexHit> flat = new ArrayList<>();
+        for (List<PgVectorRetrieveRepository.IndexHit> store : stores) {
+            flat.addAll(store);
+        }
+        return flat;
     }
 
 

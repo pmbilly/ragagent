@@ -527,7 +527,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B249 | 4 索引/配置 | K10b：索引执行收敛（worker 委托索引器唯一实现 + 数量断言） | ✅ 2026-10-13 |
 | B250 | 4 索引/配置 | K7：事务外副作用（`KnowledgeFileService` `@Transactional` 内同步重建向量） | ✅ 2026-10-13 |
 | B251 | 4 | K8：配置能力矩阵（parser rules / parent-child 显式拒绝或实现；不静默回落） | ✅ 2026-10-13 |
-| B252 | 5 结构收敛 | K9：跨 store 融合（RRF 按 store 内 rank；context expansion 修正） | ⬜ |
+| B252 | 5 结构收敛 | K9：跨 store 融合（RRF 按 store 内 rank；context expansion 修正） | ✅ 2026-10-13 |
 | B253 | 5 | A4：并发工具状态提交顺序（`seenChunks` 单一 writer / 按调用序回填） | ⬜ |
 | B254 | 5 | controller 剥离编排（`KnowledgeQaController` 14 构造参数、`QaRequestParser` 拆分） | ⬜ |
 | B255 | 5 | 检索中立 `SearchHit`（去上层对 `PgVectorRetrieveRepository` 内部类型依赖） | ⬜ |
@@ -760,6 +760,16 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **金片签名变更（已评审 + B221 签字）**：12 个 KB 响应金片 `chunkingConfig` 增 `inactiveFeatures`（键集合 66→67 等，**纯新增**）；前端 API 层该字段为 `any`（`frontend/src/api/knowledge-base/index.ts:83,135`）⇒ 非破坏，无需同步；`python3 scripts/check-contract-sync.py --write` 已更新基线（1349 金片）。
 - **未做（登记）**：真实现**父子块摄取**与**解析器引擎选择**（chunker/doc-reader 管道改造，与 K10b 索引策略统一联动）；`parserEngineRules` 若要接，须先定"KB 规则 vs agent/租户 chat 规则"的优先级语义。
 - **闸门**：`spotlessCheck build` ✓ **1m33s** ✓ · **4956 / 失败 0 / 跳过 4** ✓（+5）· 十一守卫 ✓。
+
+**✅ B252（2026-10-13，K9 跨 store 融合）**
+- **缺口一（排名退化）**：`HybridSearchService` 把同类型的多个 store 命中先 `addAll` 成一个大列表，RRF 只能按"拼接位置"算 rank ⇒ 第二个 store（另一个 KB / 跨租户组 / 另一个引擎）的**本地第一名被系统性降级**，且结果随 groups 顺序漂移（交换 KB/store 顺序结果就变）。
+- **缺口二（扩展白读）**：`HybridResultOps` 收集父块 / 相邻块 / 关系块并逐条 `fetchChunk` 取回，但装配循环只遍历原命中 ⇒ 这些读取全是白读：请求里 `skipContextEnrichment=false`（= 明确要求扩展）也拿不到任何上下文块。
+- **修复一**：融合改为**按店分组保序**——`HybridSearchService` 按 `RetrieveResult`（每 store 一个列表）分成 `vectorStores`/`keywordStores`，`HybridFusionOps` 的 `fuseWithRRF`/`deduplicateByScore` 改收 `List<List<IndexHit>>`，rank 在**店内**计算（同一 chunk 命中多店取最好名次）；并列名次新增**同分定序 = chunkId 升序**（否则并列项顺序由插入顺序决定 ⇒ 交换顺序即漂移）。单一来源路径保持"按分降序 + 同分保持来源顺序"（既有语义不变）。FAQ 后处理需要扁平向量命中 ⇒ 新增 `flattenStores` 展平（原转发缝合并到新签名）。
+- **修复二**：扩展块**取回即输出**——按来源命中登记（`extrasBySource`），装配时**紧随其来源命中**；不可检索（`processing`/停用）或文档不可访问的扩展块丢弃；分数继承来源命中（父块原有语义推广到相邻/关系块）；**关系块可能跨文档** ⇒ 其文档也要过同一道可访问性闸门（补一次 `findAccessibleDocuments`）。`skipContextEnrichment=true` 语义不变（只有原命中）。
+- **测试**：`HybridFusionOpsStoreRankTest` 4 例（第二组 #1 等权 / 交换 store 顺序稳定 / 同分按 chunkId / 单一来源顺序不变）+ `HybridResultOpsContextExpansionTest` 5 例（父块、相邻块、跨文档关系块输出 + 开关与不可检索过滤）。**先红证据**：扩展侧 3 条实测只输出 `["c-1"]`（白读现场）；排名侧用探针把 rank 退回拼接口径 ⇒ 2 条必红（已还原，源码无残留）。
+- **对外行为变更（本批未改金片，因无金片覆盖该端点）**：搜索响应现在**会带上下文扩展块**（紧随命中、带 `matchType` 2/4/5）；这正是 `skipContextEnrichment=false` 的既有契约语义。如需"只出不扩展"的旧行为，调用方传 `skipContextEnrichment=true` 即可；若产品要求默认不扩展，改默认值即可（单点）。
+- **闸门**：`spotlessCheck build` ✓ **1m49s** ✓ · **4965 / 失败 0 / 跳过 4** ✓（+9）· 十一守卫 ✓。
+- **登记（未做）**：单一来源多店的**同分跨店**仍按来源顺序（同引擎同分时"店自身顺序"才是权威）；跨引擎刻度可比性（归一化只在混合引擎时发生）属检索质量议题，未在本批动。
 
 ## 附：文档地图与归档追溯
 

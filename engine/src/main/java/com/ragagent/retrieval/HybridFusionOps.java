@@ -41,15 +41,15 @@ final class HybridFusionOps {
     // ── 融合 ─────────────────────────────────────────────────────────────
 
     static List<PgVectorRetrieveRepository.IndexHit> fuseOrDeduplicate(
-            List<PgVectorRetrieveRepository.IndexHit> vectorResults,
-            List<PgVectorRetrieveRepository.IndexHit> keywordResults, RetrievalConfigView rc) {
-        if (keywordResults.isEmpty()) {
-            return deduplicateByScore(vectorResults);
+            List<List<PgVectorRetrieveRepository.IndexHit>> vectorStores,
+            List<List<PgVectorRetrieveRepository.IndexHit>> keywordStores, RetrievalConfigView rc) {
+        if (keywordStores.isEmpty()) {
+            return deduplicateByScore(vectorStores);
         }
-        if (vectorResults.isEmpty()) {
-            return deduplicateByScore(keywordResults);
+        if (vectorStores.isEmpty()) {
+            return deduplicateByScore(keywordStores);
         }
-        return fuseWithRRF(vectorResults, keywordResults, rc);
+        return fuseWithRRF(vectorStores, keywordStores, rc);
     }
 
 
@@ -58,14 +58,26 @@ final class HybridFusionOps {
         return c;
     };
 
+    /**
+     * 同分定序：分数相同再按 chunkId 升序。
+     *
+     * <p>RRF 分数大量并列（不同 store 的同一名次同权），若只按分排序，并列项的顺序就由
+     * 插入顺序决定 ⇒ 交换 store / KB 顺序结果会漂移（K9 验收：交换顺序结果稳定）。</p>
+     */
+    static final Comparator<PgVectorRetrieveRepository.IndexHit> SCORE_THEN_ID =
+            SCORE_DESC.thenComparing(h -> h.chunkId);
 
+
+    /** 单一来源（另一侧为空）：按分降序；同分保持来源顺序——同一来源内即来源名次。 */
     static List<PgVectorRetrieveRepository.IndexHit> deduplicateByScore(
-            List<PgVectorRetrieveRepository.IndexHit> results) {
+            List<List<PgVectorRetrieveRepository.IndexHit>> stores) {
         Map<String, PgVectorRetrieveRepository.IndexHit> chunkInfoMap = new LinkedHashMap<>();
-        for (PgVectorRetrieveRepository.IndexHit r : results) {
-            PgVectorRetrieveRepository.IndexHit existing = chunkInfoMap.get(r.chunkId);
-            if (existing == null || r.score > existing.score) {
-                chunkInfoMap.put(r.chunkId, r);
+        for (List<PgVectorRetrieveRepository.IndexHit> store : stores) {
+            for (PgVectorRetrieveRepository.IndexHit r : store) {
+                PgVectorRetrieveRepository.IndexHit existing = chunkInfoMap.get(r.chunkId);
+                if (existing == null || r.score > existing.score) {
+                    chunkInfoMap.put(r.chunkId, r);
+                }
             }
         }
         List<PgVectorRetrieveRepository.IndexHit> deduped = new ArrayList<>(chunkInfoMap.values());
@@ -73,33 +85,37 @@ final class HybridFusionOps {
         return deduped;
     }
 
-    /** RRF 融合：vW/(k+vRank) + kW/(k+kRank)，rank 1-indexed。 */
+    /**
+     * RRF 融合：vW/(k+vRank) + kW/(k+kRank)，rank 1-indexed，**每个 store 列表各自算名次**。
+     *
+     * <p>K9：rank 是"店内名次"——各 store 各自保序。此前调用方把同类型的多个 store 命中先
+     * {@code addAll} 成一个大列表，rank 退化成"拼接位置"，第二个 store 的本地第一名会被
+     * 系统性降级，且结果随 store 顺序漂移。</p>
+     */
     static List<PgVectorRetrieveRepository.IndexHit> fuseWithRRF(
-            List<PgVectorRetrieveRepository.IndexHit> vectorResults,
-            List<PgVectorRetrieveRepository.IndexHit> keywordResults,
+            List<List<PgVectorRetrieveRepository.IndexHit>> vectorStores,
+            List<List<PgVectorRetrieveRepository.IndexHit>> keywordStores,
             RetrievalConfigView rc) {
         int rrfK = rc.effectiveRrfK();
         double vectorWeight = rc.effectiveVectorWeight();
         double keywordWeight = rc.effectiveKeywordWeight();
 
-        Map<String, Integer> vectorRanks = new HashMap<>();
-        for (int i = 0; i < vectorResults.size(); i++) {
-            vectorRanks.putIfAbsent(vectorResults.get(i).chunkId, i + 1);
-        }
-        Map<String, Integer> keywordRanks = new HashMap<>();
-        for (int i = 0; i < keywordResults.size(); i++) {
-            keywordRanks.putIfAbsent(keywordResults.get(i).chunkId, i + 1);
-        }
+        Map<String, Integer> vectorRanks = ranksByStore(vectorStores);
+        Map<String, Integer> keywordRanks = ranksByStore(keywordStores);
 
         Map<String, PgVectorRetrieveRepository.IndexHit> chunkInfoMap = new LinkedHashMap<>();
-        for (PgVectorRetrieveRepository.IndexHit r : vectorResults) {
-            PgVectorRetrieveRepository.IndexHit existing = chunkInfoMap.get(r.chunkId);
-            if (existing == null || r.score > existing.score) {
-                chunkInfoMap.put(r.chunkId, r);
+        for (List<PgVectorRetrieveRepository.IndexHit> store : vectorStores) {
+            for (PgVectorRetrieveRepository.IndexHit r : store) {
+                PgVectorRetrieveRepository.IndexHit existing = chunkInfoMap.get(r.chunkId);
+                if (existing == null || r.score > existing.score) {
+                    chunkInfoMap.put(r.chunkId, r);
+                }
             }
         }
-        for (PgVectorRetrieveRepository.IndexHit r : keywordResults) {
-            chunkInfoMap.putIfAbsent(r.chunkId, r);
+        for (List<PgVectorRetrieveRepository.IndexHit> store : keywordStores) {
+            for (PgVectorRetrieveRepository.IndexHit r : store) {
+                chunkInfoMap.putIfAbsent(r.chunkId, r);
+            }
         }
 
         List<PgVectorRetrieveRepository.IndexHit> result = new ArrayList<>(chunkInfoMap.size());
@@ -117,8 +133,20 @@ final class HybridFusionOps {
             info.score = rrfScore;
             result.add(info);
         }
-        result.sort(SCORE_DESC);
+        result.sort(SCORE_THEN_ID);
         return result;
+    }
+
+    /** 每店名次（1-indexed）：同一 chunk 命中多个 store 时取**最好**名次。 */
+    private static Map<String, Integer> ranksByStore(
+            List<List<PgVectorRetrieveRepository.IndexHit>> stores) {
+        Map<String, Integer> ranks = new HashMap<>();
+        for (List<PgVectorRetrieveRepository.IndexHit> store : stores) {
+            for (int i = 0; i < store.size(); i++) {
+                ranks.merge(store.get(i).chunkId, i + 1, Math::min);
+            }
+        }
+        return ranks;
     }
 
     // ── FAQ 后处理（按 storeGroups 扇出） ─────────────────────────────────
