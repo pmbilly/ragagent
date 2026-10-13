@@ -44,3 +44,9 @@ mcp-server/.venv/
 __pycache__/
 *.egg-info/
 .zcode/
+
+# IDE 本地 AI 数据（.workbuddy-ai）
+.workbuddy-ai/
+
+# 本地工具输出（outputs）
+/outputs/
