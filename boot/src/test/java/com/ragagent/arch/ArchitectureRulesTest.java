@@ -731,7 +731,6 @@ class ArchitectureRulesTest {
             "com.ragagent.datasource.service.DataSourceWiring",
             "com.ragagent.datasource.service.MapperKnowledgeBridge",
             "com.ragagent.embedchannel.service.EmbedChannelService",
-            "com.ragagent.evaluation.service.EvaluationService",
             "com.ragagent.favorite.service.UserResourceFavoriteService",
             "com.ragagent.im.service.ImAttachmentPreparer",
             "com.ragagent.im.service.ImChannelRuntimeOps",

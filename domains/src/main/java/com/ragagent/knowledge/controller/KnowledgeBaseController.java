@@ -42,7 +42,7 @@ import com.ragagent.storage.support.PublicModeForbiddenException;
 import com.ragagent.storage.support.ResourceModeException;
 import com.ragagent.common.security.APIKeyScopeContext;
 import com.ragagent.common.security.TenantAPIKeyScope;
-import com.ragagent.knowledge.task.KnowledgeTaskIdCodec;
+import com.ragagent.knowledge.support.KnowledgeTaskIdCodec;
 import com.ragagent.storage.support.Mode;
 import java.util.UUID;
 import com.ragagent.common.web.ApiResult;

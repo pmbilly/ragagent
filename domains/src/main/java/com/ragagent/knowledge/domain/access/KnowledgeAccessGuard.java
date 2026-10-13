@@ -6,7 +6,6 @@ import com.ragagent.knowledge.domain.KnowledgeBase;
 import org.springframework.stereotype.Component;
 import com.ragagent.common.tenant.TenantRole;
 import com.ragagent.common.context.TenantContext;
-import com.ragagent.knowledge.service.KnowledgeService;
 
 /**
  * knowledge 文档操作面路由（第二批）的守卫入口——语义与 {@link ChunkAccessGuard}
@@ -56,7 +55,7 @@ public class KnowledgeAccessGuard {
      * handler 内的兜底加载：按调用者租户取 knowledge，缺失 → 404 "Knowledge not found"
      * （code 1003，契约样例锁定）；附带 API-Key KB 白名单收口（getKnowledge 内置）。
      */
-    public Knowledge requireKnowledgeInCallerSpace(KnowledgeService knowledgeService, String id) {
+    public Knowledge requireKnowledgeInCallerSpace(KnowledgeReadPort knowledgeService, String id) {
         return knowledgeService.getKnowledge(id);
     }
 

@@ -9,8 +9,7 @@ import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.service.KnowledgeService;
-import com.ragagent.knowledge.task.KnowledgeTaskIdCodec;
+import com.ragagent.knowledge.support.KnowledgeTaskIdCodec;
 import org.springframework.stereotype.Component;
 import com.ragagent.common.security.TenantAPIKeyScope;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,10 +25,10 @@ import java.util.Set;
 @Component
 public class KnowledgeRouteGuards {
 
-    private final KnowledgeService knowledgeService;
+    private final KnowledgeReadPort knowledgeService;
     private final KnowledgeAccessGuard guard;
 
-    public KnowledgeRouteGuards(KnowledgeService knowledgeService, KnowledgeAccessGuard guard) {
+    public KnowledgeRouteGuards(KnowledgeReadPort knowledgeService, KnowledgeAccessGuard guard) {
         this.knowledgeService = knowledgeService;
         this.guard = guard;
     }

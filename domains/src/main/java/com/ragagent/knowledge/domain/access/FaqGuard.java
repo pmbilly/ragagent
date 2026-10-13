@@ -18,7 +18,6 @@ import com.ragagent.knowledge.repository.FaqChunkRepository;
 import com.ragagent.knowledge.mapper.KnowledgeTagMapper;
 import com.ragagent.knowledge.repository.KnowledgeTagRepository;
 import org.springframework.stereotype.Component;
-import com.ragagent.knowledge.service.KnowledgeService;
 import com.ragagent.knowledge.dto.faq.FaqEntryPayload;
 import com.ragagent.knowledge.dto.faq.FaqEntryFieldsBatchUpdate;
 import com.ragagent.knowledge.dto.faq.FaqEntryFieldsUpdate;
@@ -32,12 +31,12 @@ import com.ragagent.knowledge.dto.faq.FaqEntry;
 @Component
 public class FaqGuard {
 
-    private final KnowledgeService knowledgeService;
+    private final KnowledgeReadPort knowledgeService;
     private final KnowledgeTagMapper tagMapper;
     private final KnowledgeTagRepository tagRepository;
     private final FaqChunkRepository faqChunkRepository;
 
-    public FaqGuard(KnowledgeService knowledgeService,
+    public FaqGuard(KnowledgeReadPort knowledgeService,
                     KnowledgeTagMapper tagMapper,
                     KnowledgeTagRepository tagRepository,
                     FaqChunkRepository faqChunkRepository) {

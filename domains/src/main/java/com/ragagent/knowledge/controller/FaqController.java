@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
-import com.ragagent.knowledge.task.KnowledgeTaskIdCodec;
+import com.ragagent.knowledge.support.KnowledgeTaskIdCodec;
 import com.ragagent.common.web.ApiResult;
 import com.ragagent.common.web.ApiResponse;
 

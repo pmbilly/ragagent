@@ -880,6 +880,14 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **守卫现场拦截（都是"基线变好要收紧"）**：A16/A17 基线里的 `com.ragagent.knowledge.service.ChunkPortAdapter` 随搬迁改名后**已不再违例** ⇒ 按守卫提示**删除两条基线**（规则自带的收紧机制）；`:domains:javadoc` 两处 `{@link #view}/{#viewAll}` 锚点随静态方法搬走而失链 ⇒ 指向新类并写明原因。
 - **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m39s** ✓ 十一守卫 ✓。
 
+**🔶 B263 第③步（2026-10-13，SCC 组成员 3→2）**
+- **选边（先测后选）**：两条候选边对里，`service → domain.access` 的 7 处分散在 7 个类（守卫调用点，天然合法），而反向 `domain.access → service` 只有 **3 处且全在守卫类**（把整个 `KnowledgeService` 当字段/参数）⇒ 断反向更划算。
+- **修法一（窄接口反转）**：新增 `domain.access.KnowledgeReadPort`（守卫真正用到的 4 个读方法：`findKb` / `getKnowledge` / `getKnowledgeByIdOnly` / `getKnowledgeBatch`），`KnowledgeService implements KnowledgeReadPort`，三个守卫（`FaqGuard` / `KnowledgeAccessGuard` / `KnowledgeRouteGuards`）改依赖端口 ⇒ **`domain.access ↛ service`**（端口与守卫同包，不产生新包边；Spring 按类型注入，端口只有一个实现）。
+- **修法二（三角环的另一条腿）**：断掉 service 边后环仍在——手工核算 SCC 显示真正的回路是 **`service → domain.access → task → service`**：守卫 `KnowledgeRouteGuards` 调 `KnowledgeTaskIdCodec.taskTenantId(...)` 做任务路由鉴权，而编解码器在 `task/` 里。该编解码是**纯值编解码** ⇒ 迁到环外的 **`knowledge/support/KnowledgeTaskIdCodec`**（6 处引用换锚）⇒ 环断。
+- **结果（验收达成）**：SCC 组 **3 成员 → 2 成员**（`{service, task}`）；组数 13 不变；`--write` 后基线 diff **恰为删除一行**（`"com.ragagent.knowledge.domain.access"`）⇒ 纯减少 ✓。B263 累计：4 → 3 → **2** 成员。
+- **守卫现场拦截**：① **R8 内联全限定名** 抓到我第一版 `implements com.ragagent.knowledge.domain.access.KnowledgeReadPort` ✗ ⇒ 改 import；② **A16** 的基线条目 `evaluation.service.EvaluationService` 因编解码器迁出 `task/` 边界而**不再违例** ⇒ 按规则提示删除条目收紧基线。
+- **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m31s** ✓ 十一守卫 ✓。
+
 ## 附：文档地图与归档追溯
 
 **✅ B255（2026-10-13，阶段 5 收口：检索中立类型）**

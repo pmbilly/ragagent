@@ -40,7 +40,6 @@
       "com.ragagent.embedding.provider"
     ],
     [
-      "com.ragagent.knowledge.domain.access",
       "com.ragagent.knowledge.service",
       "com.ragagent.knowledge.task"
     ],

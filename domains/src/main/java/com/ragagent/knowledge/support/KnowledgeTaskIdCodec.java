@@ -1,8 +1,12 @@
-package com.ragagent.knowledge.task;
+package com.ragagent.knowledge.support;
 
 import java.util.UUID;
 
 /**
+ * B263③ 由 {@code task/} 迁到环外的 {@code support/}：它是**纯值编解码**（任务 id 的
+ * 类型/租户/时间戳/随机段），却被访问守卫（{@code domain.access.KnowledgeRouteGuards}）
+ * 用于任务路由鉴权——留在 task 包会构成 `service → domain.access → task → service` 环。
+ *
  * 任务 ID 编解码：生成与反解 {@code <type>_<tenant>_<millis>_<8hex>[_<biz>]}。纯静态、零依赖。
  */
 public final class KnowledgeTaskIdCodec {

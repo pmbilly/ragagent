@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.domain.access.KnowledgeReadPort;
+
 import com.ragagent.common.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -60,7 +62,8 @@ import java.util.TreeSet;
  *    含真 embedding 与生成问题行重建）。</p>
  */
 @Service
-public class KnowledgeService implements KnowledgeDocumentGateway {
+public class KnowledgeService
+        implements KnowledgeReadPort, KnowledgeDocumentGateway {
 
     // 文档主链路的门面与共享工具（常量/静态助手/直创建路径）；
     // 专项能力已拆出 ProcessWorker/Summary/File/Parse/BatchOps 等协作者，本类保持聚合面。
