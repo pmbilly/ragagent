@@ -275,6 +275,14 @@ public class KnowledgeRepository {
         return patterns;
     }
 
+    /** 同租户 + 同 KB 的未软删行（**不排序、不筛 type**；FAQ 容器由调用方自行判定）。 */
+    public List<Knowledge> listByTenantAndKb(long tenantId, String knowledgeBaseId) {
+        return knowledgeMapper.selectList(new LambdaQueryWrapper<Knowledge>()
+                .eq(Knowledge::getTenantId, tenantId)
+                .eq(Knowledge::getKnowledgeBaseId, knowledgeBaseId)
+                .isNull(Knowledge::getDeletedAt));
+    }
+
     /** 插入新行。 */
     public void insert(Knowledge k) {
         knowledgeMapper.insert(k);

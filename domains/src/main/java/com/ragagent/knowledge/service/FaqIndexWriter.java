@@ -1,5 +1,8 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.repository.ChunkRepository;
+import com.ragagent.knowledge.repository.KnowledgeRepository;
+
 import java.time.OffsetDateTime;
 import com.ragagent.knowledge.config.BatchEmbedProperties;
 import java.util.ArrayList;
@@ -10,8 +13,6 @@ import com.ragagent.common.context.TenantContext;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.mapper.ChunkMapper;
-import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import com.ragagent.model.domain.Model;
 import com.ragagent.model.mapper.ModelMapper;
 import com.ragagent.model.service.ModelRuntimeFactory;
@@ -40,9 +41,9 @@ import com.ragagent.knowledge.index.ChunkVectorIndexer;
 @Component
 public class FaqIndexWriter {
 
-    private final KnowledgeMapper knowledgeMapper;
+    private final KnowledgeRepository knowledgeRepository;
     private final ModelMapper modelMapper;
-    private final ChunkMapper chunkMapper;
+    private final ChunkRepository chunkRepository;
     private final TenantStorageService tenantStorage;
     private final KnowledgeVectorWrites vectorWrites;
     private final VectorStoreService vectorStore;
@@ -51,18 +52,18 @@ public class FaqIndexWriter {
     /** 批量向量化批大小（属性绑定）。 */
     private final BatchEmbedProperties batchEmbedProperties;
 
-    public FaqIndexWriter(KnowledgeMapper knowledgeMapper,
+    public FaqIndexWriter(KnowledgeRepository knowledgeRepository,
                           ModelMapper modelMapper,
-                          ChunkMapper chunkMapper,
+                          ChunkRepository chunkRepository,
                           TenantStorageService tenantStorage,
                           KnowledgeVectorWrites vectorWrites,
                           VectorStoreService vectorStore,
                           EmbedderClient embedder,
                           ModelRuntimeFactory modelRuntimeFactory,
                           BatchEmbedProperties batchEmbedProperties) {
-        this.knowledgeMapper = knowledgeMapper;
+        this.knowledgeRepository = knowledgeRepository;
         this.modelMapper = modelMapper;
-        this.chunkMapper = chunkMapper;
+        this.chunkRepository = chunkRepository;
         this.tenantStorage = tenantStorage;
         this.vectorWrites = vectorWrites;
         this.vectorStore = vectorStore;
@@ -80,10 +81,7 @@ public class FaqIndexWriter {
      * 查找 KB 下的 FAQ 容器 knowledge（每 KB 至多一条 type='faq'），无则 null。
      */
     public Knowledge findFAQKnowledge(long tenantId, String kbId) {
-        List<Knowledge> knowledges = knowledgeMapper.selectList(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getTenantId, tenantId)
-                .eq(Knowledge::getKnowledgeBaseId, kbId)
-                .isNull(Knowledge::getDeletedAt));
+        List<Knowledge> knowledges = knowledgeRepository.listByTenantAndKb(tenantId, kbId);
         for (Knowledge knowledge : knowledges) {
             if ("faq".equals(knowledge.getType())) {
                 return knowledge;
@@ -117,7 +115,7 @@ public class FaqIndexWriter {
         OffsetDateTime now = OffsetDateTime.now();
         knowledge.setCreatedAt(now);
         knowledge.setUpdatedAt(now);
-        knowledgeMapper.insert(knowledge);
+        knowledgeRepository.insert(knowledge);
         return knowledge;
     }
 
@@ -188,7 +186,7 @@ public class FaqIndexWriter {
             OffsetDateTime nowIndexed = OffsetDateTime.now();
             knowledge.setUpdatedAt(nowIndexed);
             knowledge.setProcessedAt(nowIndexed);
-            knowledgeMapper.updateById(knowledge);
+            knowledgeRepository.updateById(knowledge);
             return;
         }
         vectorStore.deleteByChunkId(chunkIds);
@@ -216,7 +214,7 @@ public class FaqIndexWriter {
         OffsetDateTime now = OffsetDateTime.now();
         knowledge.setUpdatedAt(now);
         knowledge.setProcessedAt(now);
-        knowledgeMapper.updateById(knowledge);
+        knowledgeRepository.updateById(knowledge);
     }
 
     /**
@@ -257,7 +255,7 @@ public class FaqIndexWriter {
             knowledge.setStorageSize(Math.max(0, knowledge.getStorageSize() - size));
         }
         knowledge.setUpdatedAt(OffsetDateTime.now());
-        knowledgeMapper.updateById(knowledge);
+        knowledgeRepository.updateById(knowledge);
     }
 
     /**
@@ -266,7 +264,7 @@ public class FaqIndexWriter {
      */
     public void createChunks(List<Chunk> chunks) {
         for (Chunk c : chunks) {
-            chunkMapper.insert(c);
+            chunkRepository.insert(c);
         }
     }
 
