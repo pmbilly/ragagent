@@ -21,7 +21,7 @@ import com.ragagent.common.llm.ToolResult;
 import com.ragagent.agenttools.knowledge.GrepChunksTool.GrepChunkSearch;
 import com.ragagent.agenttools.knowledge.GrepChunksTool.GrepChunkView;
 import com.ragagent.common.retrieval.SearchTarget;
-import com.ragagent.agenttools.ToolRequest;
+import com.ragagent.agent.tool.ToolRequest;
 import com.ragagent.agenttools.GoRecording45B;
 import com.ragagent.agenttools.RecordingSupport;
 import com.ragagent.support.ContractJson;

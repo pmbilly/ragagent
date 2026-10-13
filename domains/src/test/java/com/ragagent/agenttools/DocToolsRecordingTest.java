@@ -11,12 +11,12 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.llm.ToolResult;
-import com.ragagent.agenttools.DocChunkSupport.ChunkPage;
-import com.ragagent.agenttools.DocChunkSupport.ImageInfoCollector;
-import com.ragagent.agenttools.DocChunkSupport.KnowledgeInfoReader;
-import com.ragagent.agenttools.DocChunkSupport.KnowledgeInfoView;
-import com.ragagent.agenttools.DocChunkSupport.PagedChunks;
-import com.ragagent.agenttools.runtime.SearchAuth.TagView;
+import com.ragagent.agent.tool.DocChunkSupport.ChunkPage;
+import com.ragagent.agent.tool.DocChunkSupport.ImageInfoCollector;
+import com.ragagent.agent.tool.DocChunkSupport.KnowledgeInfoReader;
+import com.ragagent.agent.tool.DocChunkSupport.KnowledgeInfoView;
+import com.ragagent.agent.tool.DocChunkSupport.PagedChunks;
+import com.ragagent.agent.tool.runtime.SearchAuth.TagView;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.agenttools.knowledge.GetDocumentInfoTool;
 import com.ragagent.agenttools.knowledge.ListKnowledgeChunksTool;
@@ -24,6 +24,7 @@ import com.ragagent.agenttools.wiki.WikiReadSourceDocTool;
 import com.ragagent.common.retrieval.SearchTarget;
 import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.knowledge.service.ChunkPortAdapter;
+import com.ragagent.agent.tool.ToolRequest;
 
 /**
  * 4.5b 回放：wiki_read_source_doc / get_document_info / list_knowledge_chunks

@@ -29,7 +29,7 @@ Map / MyBatis 列名等非 JSON 键**（如 `*Repository` 的 `deleted_at`），
 清单**而非违规清单；棘轮模式（默认）只有在基线外**新增**命中时才失败，不会因为既有噪音而红。
 判定某键是真债还是冻结/数据值时，**必须看消费者**（FE 读？夹具断言？第三方 API？）。
 
-**2026-10-08（B88）**：工具面（`agent/tools/**`，B257 后改名 `agenttools/**`）已全量 camel 化，
+**2026-10-08（B88）**：工具面（`agent/tools/**`；B257 改名 `agenttools/**`，B260 工具框架迁 `agent/tool/**`）已全量 camel 化，
 **已知盲区**：自定义 key-value helper（如 `KnowledgeTagService.details(Object... keyValues)`）里的键名**七种形态都扫不到** ⇒ B147b 用一次性 grep 复核过 `grep -rnE "details\\(\" server/src/main`；新增此类 helper 时请照做。
 
 原先整目录的 `agent/tools/` 冻结豁免已摘除；2026-10-09 B141 又摘除 `datasource/connector` 的整目录豁免（改为文件级，见 FROZEN_PREFIXES 内注释——该豁免曾让 134 个键静默逃逸）；该目录残留的 snake 仅限三类并逐条登记在本脚本 BASELINE：
@@ -117,7 +117,7 @@ BASELINE: dict[str, set[str]] = {
     # 模板令牌（数据值，非 JSON 键）
     'agent/AgentPrompts.java': {'current_time', 'web_search_status'},
     # 工具名（模型可见的函数名；§2.4 只管字段名，B88 决策：工具名与 enum 值保留 snake）
-    'agenttools/ToolCapabilities.java': {'data_analysis', 'data_schema', 'database_query', 'get_document_info', 'grep_chunks', 'knowledge_search', 'list_knowledge_chunks', 'query_knowledge_graph', 'todo_write', 'wiki_delete_page', 'wiki_flag_issue', 'wiki_read_issue', 'wiki_read_page', 'wiki_read_source_doc', 'wiki_rename_page', 'wiki_replace_text', 'wiki_search', 'wiki_update_issue', 'wiki_write_page'},
+    'agent/tool/ToolCapabilities.java': {'data_analysis', 'data_schema', 'database_query', 'get_document_info', 'grep_chunks', 'knowledge_search', 'list_knowledge_chunks', 'query_knowledge_graph', 'todo_write', 'wiki_delete_page', 'wiki_flag_issue', 'wiki_read_issue', 'wiki_read_page', 'wiki_read_source_doc', 'wiki_rename_page', 'wiki_replace_text', 'wiki_search', 'wiki_update_issue', 'wiki_write_page'},
     # MyBatis 列名/参数（非 JSON 键）
     'auth/service/TenantInvitationService.java': {'invitation_id'},
     # MyBatis 列名/参数（非 JSON 键）
@@ -247,7 +247,7 @@ BASELINE: dict[str, set[str]] = {
     'memory/service/MemoryRecallOps.java': {'block_runes', 'candidate_count', 'fused_candidates', 'interest_injected', 'interest_relevant', 'interest_total', 'lexical_hits', 'matched_count', 'prompt_runes', 'ranking_mode', 'resident_count', 'subject_id', 'tenant_id', 'used_count', 'vector_hits', 'vector_outside', 'vector_skip'},
     # Langfuse 任务 span 载荷（同上，观测面）
     'memory/service/RedisMemoryExtractTaskQueue.java': {'subject_id'},
-    # 工具名（模型可见的函数名；§2.4 只管字段名，B88 决策：工具名与 enum 值保留 snake。同族见 agenttools/ToolCapabilities.java 的登记（B257 改名自 agent/tools/））
+    # 工具名（模型可见的函数名；§2.4 只管字段名，B88 决策：工具名与 enum 值保留 snake。同族见 agent/tool/ToolCapabilities.java 的登记（B257 改名自 agent/tools/，B260 迁入 agent/tool/））
     'modelcontext/ToolPolicy.java': {'call_mcp_tool', 'data_schema', 'discover_mcp_tools', 'edit_sandbox_file', 'edit_skill_file', 'execute_skill_script', 'get_document_info', 'grep_chunks', 'knowledge_search', 'list_knowledge_chunks', 'list_sandbox_files', 'query_knowledge_graph', 'read_file', 'read_sandbox_file', 'read_skill', 'search_conversations', 'search_memory', 'shell_exec', 'todo_write', 'web_fetch', 'web_search', 'wiki_delete_page', 'wiki_flag_issue', 'wiki_read_page', 'wiki_read_source_doc', 'wiki_rename_page', 'wiki_replace_text', 'wiki_search', 'wiki_write_page', 'write_sandbox_file', 'write_skill_file'},
     # span 观测面（followUpSpan.finish 的 metadata）
     'session/service/MessageSuggestionService.java': {'question_count'},

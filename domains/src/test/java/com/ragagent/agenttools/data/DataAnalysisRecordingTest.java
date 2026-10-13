@@ -29,7 +29,7 @@ import com.ragagent.agenttools.data.DataAnalysisTool.KnowledgeFileMaterializer;
 import com.ragagent.agenttools.data.DataAnalysisTool.KnowledgeLoader;
 import com.ragagent.agenttools.data.DataAnalysisTool.QueryResult;
 import com.ragagent.common.retrieval.SearchTarget;
-import com.ragagent.agenttools.ToolRequest;
+import com.ragagent.agent.tool.ToolRequest;
 import com.ragagent.agenttools.GoRecording45B;
 import com.ragagent.agenttools.RecordingSupport;
 

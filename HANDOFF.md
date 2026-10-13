@@ -535,7 +535,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B257 | 6 | §7 命名与边界：`agent/tools`→`agenttools`、`agent/management`→`agentmanagement` + 边界规则 | ✅ 2026-10-13 |
 | B258 | 6 | contracts 包边界（模块 DAG + 跨域边界规则） | ✅ 2026-10-13 |
 | B259 | 6 | platform 包边界（`:common` 其余收拢） | ✅ 2026-10-13 |
-| B260 | 6 | agent-engine 包边界（`com.ragagent.agent` 运行面收拢） | ⬜ |
+| B260 | 6 | agent-engine 包边界（`com.ragagent.agent` 运行面收拢） | ✅ 2026-10-13 |
 | B261 | 6 | retrieval-engine 包边界（`retrieval.*` 收拢 + policy 归位） | ⬜ |
 | B262 | 6 | model-runtime 包边界（模型调用 / provider / 流生命周期） | ⬜ |
 | B263 | 6 | domains 域内重排①：knowledge（29 包 248 文件；SCC 拆解 + mapper/repository 主战场） | ⬜ |
@@ -831,6 +831,18 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **测试**：**4975 / 失败 0 / 跳过 4** ✓（boot +1 = R4；common 仍 139 ⇒ 搬走的 4 个测试类未丢，已按 B257 教训 `--rerun-tasks` 核对）。
 - **闸门**：`spotlessCheck build` ✓ **1m46s** ✓ · 十一守卫 ✓。
 - **登记（未做）**：平台面**其余簇**继续收拢（`event` 40 文件 → `platform.event`、`tracing` 19 → `platform.tracing.*`、`common.*` 149 → `platform.{access,config,http,persistence,prompt,security,storage,text,execution,outbox,parsing,task,model}` 各面）；本批只按阶段 6 纪律"一次一簇"落位首个簇，**未动**其余包名。
+
+**✅ B260（2026-10-13，§8.3 agent-engine 包边界）**
+- **口径**：§8.3 把工具**框架**（`AgentTool`/`BaseTool`/`ToolDefinitions`/`ToolRegistry`/参数校验/执行上下文与预算/输出持久化/流式修正）归 **Agent 运行面**（`agent.tool/` + `agent.tool.runtime/` + `agent.tool.spi/`），§7.3 把工具**实现**（按能力分族）留在适配面 `agenttools`。B260 落前者，**不动**业务工具。
+- **实测到的真环（本批的意外收获）**：搬迁前 `com.ragagent.agent ⇄ com.ragagent.agenttools` **本身就是一对双环**（运行面 7 文件反向 import 工具实现面：`ToolDefinitions`×4、`agenttools.runtime.*`×5、`ToolRegistry`/`ToolExecContext`/`ExecutionPolicy`；工具实现面 4 文件反向 import 运行面）——即 `agent` 与 `agenttools` 同属一个 SCC。这解释了"引擎为何看起来认识具体工具"。
+- **搬迁**：21 个框架类（`AgentTool`/`ArgumentValidator`/`BaseTool`/`Cleanable`/`DocChunkSupport`/`ExecutionPolicy`/`McpCatalogGuardedTool`/`OutputBudgets`/`OutputLimitProvider`/`ParamCaster`/`ParamValidator`/`SequentialThinkingTool`/`SkillReadFileTool`/`TodoWriteTool`/`ToolCancellation`/`ToolCapabilities`/`ToolDefinitions`/`ToolExecContext`/`ToolOutput`/`ToolRegistry`/`ToolRequest`）+ `runtime/`(8) + `spi/`(2) → `com.ragagent.agent.tool{,.runtime,.spi}`；测试 6 个 + `runtime/`(5 个) 随包迁移；FQN 替换 73 文件 + 迭代补 import（`RecordingSupport`/`GoRecording45A` 是 **testFixtures** 的助手，**留在** `agenttools` 面 ⇒ 搬走的测试补 import 即可，不动可见性）。
+- **新规则**（`ArchitectureRulesTest`）：「**B260：Agent 运行面不得依赖工具实现面**」（`agent..` → `agenttools..`，基线 **0 = 零容忍**）。
+- **规则探针（验收达成，且踩到一个坑）**：第一次用**纯 import** 注入探针 ⇒ **没红** ✗——ArchUnit 读**字节码**，未被使用的 import 会被擦除；改为真实引用（`AgentEngine` 内 `KnowledgeSearchTool.class` 字段）⇒ **当场转红** ✓，还原后零残留 ✓。**经验：ArchUnit 探针必须制造真实字节码依赖。**
+- **环守卫刷新（只减）**：`--write` 后基线 diff **只有删除**——两两环 `agent⇄agenttools` 消除、SCC `{agent,agenttools}` 消除；包级 SCC 13 组不变（`agenttools{,runtime,spi}` 组**改名**为 `agent.tool{,runtime,spi}`）。**B260 因此消掉了仓内一对双环**。
+- **换锚（守卫文档 B168 的既有教训，本批踩到并照办）**：`check-json-key-case.py` 里「模型可见工具名保留 snake」的键级豁免锚在 `agenttools/ToolCapabilities.java`，搬迁后锚失效 ⇒ 更新为 `agent/tool/ToolCapabilities.java`（19 个键与理由**均不变**）+ 脚本注释里的路径说法同步（`agent/tools`→`agenttools`→`agent/tool` 三段迁移史）。
+- **验收（"每步启动测试"）**：`:boot:test --tests com.ragagent.datasource.DataSourceRepositoryTest`（`@SpringBootTest`）25 例全绿 ✓。
+- **测试**：**4976 / 失败 0 / 跳过 4** ✓（boot +1 = B260 规则；domains 仍 2949 ⇒ 搬走的 11 个测试类未丢，`--rerun-tasks` 核对过）；`spotlessCheck build` ✓ **1m29s** ✓ 十一守卫 ✓。
+- **登记（未做）**：`agentmanagement → agent`（2 文件，方向正确，保留）；`agent` 与 8 个业务域间接环仍在（属 B263~B266 域内重排的范围）；`agent` 根包与八个段协作者的 seam（2026-10-12 定案：不做 `loop/` 归位）**本批未触碰**。
 
 ## 附：文档地图与归档追溯
 

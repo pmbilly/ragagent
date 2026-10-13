@@ -7,9 +7,9 @@ import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.llm.ToolResult;
-import com.ragagent.agenttools.BaseTool;
-import com.ragagent.agenttools.ToolRequest;
-import com.ragagent.agenttools.ToolRegistry;
+import com.ragagent.agent.tool.BaseTool;
+import com.ragagent.agent.tool.ToolRequest;
+import com.ragagent.agent.tool.ToolRegistry;
 import com.ragagent.event.EventBus;
 import com.ragagent.event.EventJson;
 import com.ragagent.event.EventType;

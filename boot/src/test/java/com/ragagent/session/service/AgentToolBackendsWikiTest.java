@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.List;
 
 import com.ragagent.TestSchema;
-import com.ragagent.agenttools.ToolDefinitions;
+import com.ragagent.agent.tool.ToolDefinitions;
 import com.ragagent.agenttools.wiki.IndexOverviewView;
 import com.ragagent.agenttools.wiki.WikiIndexOverview;
 import com.ragagent.agenttools.wiki.IssueView;

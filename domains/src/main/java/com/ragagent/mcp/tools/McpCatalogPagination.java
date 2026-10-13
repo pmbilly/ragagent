@@ -12,8 +12,8 @@ import com.ragagent.mcp.tools.McpCatalog.McpServerSummary;
 import com.ragagent.mcp.tools.McpCatalog.McpToolSummary;
 import com.ragagent.mcp.tools.McpCatalog.McpDiscoveryPage;
 import com.ragagent.mcp.domain.McpService;
-import com.ragagent.agenttools.ToolRegistry;
-import com.ragagent.agenttools.ToolDefinitions;
+import com.ragagent.agent.tool.ToolRegistry;
+import com.ragagent.agent.tool.ToolDefinitions;
 
 /**
  * MCP 目录的分页与安装：游标分页（绑定查询与可见行）、快照浅拷贝、

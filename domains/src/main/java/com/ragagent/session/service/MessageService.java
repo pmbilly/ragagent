@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.tenant.Tenant;
 import com.ragagent.tenant.ChatHistoryConfig;
 import com.ragagent.auth.service.TenantService;
-import com.ragagent.agenttools.runtime.ThinkBlocks;
+import com.ragagent.agent.tool.runtime.ThinkBlocks;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.service.KnowledgeService;

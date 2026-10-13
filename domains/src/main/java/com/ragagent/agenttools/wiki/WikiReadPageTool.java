@@ -9,11 +9,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.llm.ToolResult;
-import com.ragagent.agenttools.runtime.SearchAuth.KnowledgeTagsFetcher;
-import com.ragagent.agenttools.BaseTool;
-import com.ragagent.agenttools.runtime.SearchAuth;
-import com.ragagent.agenttools.ToolDefinitions;
-import com.ragagent.agenttools.ToolRequest;
+import com.ragagent.agent.tool.runtime.SearchAuth.KnowledgeTagsFetcher;
+import com.ragagent.agent.tool.BaseTool;
+import com.ragagent.agent.tool.runtime.SearchAuth;
+import com.ragagent.agent.tool.ToolDefinitions;
+import com.ragagent.agent.tool.ToolRequest;
 
 /**
  * wiki_read_page 工具。

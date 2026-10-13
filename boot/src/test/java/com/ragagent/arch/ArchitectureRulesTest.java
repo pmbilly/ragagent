@@ -1075,6 +1075,35 @@ class ArchitectureRulesTest {
         ratchet("B257 适配包→域 service/mapper", AGENT_ADAPTER_DOMAIN_SERVICE_BASELINE, actual);
     }
 
+    // ── B260 运行面不得依赖工具实现面 ────────────────────────────────────────
+
+    /**
+     * B260（§8.3 / §7.3）：工具**框架**（{@code AgentTool} / {@code BaseTool} / {@code ToolDefinitions} /
+     * {@code ToolRegistry} / 执行上下文与预算 / 参数校验 / 输出持久化 / 流式修正 —— 现落
+     * {@code com.ragagent.agent.tool*}）属 **Agent 运行面**；工具**实现**（按能力分族的业务工具 ——
+     * {@code com.ragagent.agenttools}）属 **适配面**。
+     *
+     * <p>运行面反向依赖实现面，等于把"引擎 → 具体工具"写成硬编码依赖：引擎只该看框架与注册表，
+     * 具体工具经注册/契约进入。B260 已把基础设施由 {@code agenttools} 迁入 {@code agent.tool*}，
+     * 本规则把该方向**锁死**（基线 0 = 零容忍：运行面新增任何一条 {@code agenttools} import 即越界）。</p>
+     */
+    @Test
+    @DisplayName("B260：Agent 运行面不得依赖工具实现面（agent → agenttools = 0）")
+    void agentRuntimeDoesNotDependOnToolImplementations() {
+        Set<String> violations = new TreeSet<>();
+        for (JavaClass clazz : MAIN) {
+            String pkg = clazz.getPackageName();
+            if (!pkg.equals("com.ragagent.agent") && !pkg.startsWith("com.ragagent.agent.")) {
+                continue;
+            }
+            clazz.getDirectDependenciesFromSelf().stream()
+                    .filter(dep -> dep.getTargetClass().getPackageName()
+                            .startsWith("com.ragagent.agenttools"))
+                    .forEach(dep -> violations.add(clazz.getName() + " → " + dep.getTargetClass().getName()));
+        }
+        ratchet("B260 运行面→工具实现面", Set.of(), violations);
+    }
+
     /** 目标包是否落在「业务域 service / mapper」面上（域清单显式列举，避免自身子包假阳性）。 */
     private static boolean isDomainServiceOrMapper(String packageName) {
         for (String domain : FORBIDDEN_DOMAIN_PACKAGES) {

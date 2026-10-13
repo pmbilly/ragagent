@@ -15,10 +15,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.llm.ToolResult;
 import com.ragagent.retrieval.domain.WebSearchFilters;
 import com.ragagent.retrieval.domain.WebSearchResult;
-import com.ragagent.agenttools.BaseTool;
-import com.ragagent.agenttools.ToolDefinitions;
-import com.ragagent.agenttools.ToolOutput;
-import com.ragagent.agenttools.ToolRequest;
+import com.ragagent.agent.tool.BaseTool;
+import com.ragagent.agent.tool.ToolDefinitions;
+import com.ragagent.agent.tool.ToolOutput;
+import com.ragagent.agent.tool.ToolRequest;
 import com.ragagent.common.tenant.WebSearchConfig;
 import com.ragagent.retrieval.domain.WebSearchRequest;
 

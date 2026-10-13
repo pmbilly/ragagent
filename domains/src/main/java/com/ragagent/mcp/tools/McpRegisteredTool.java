@@ -2,8 +2,8 @@ package com.ragagent.mcp.tools;
 
 
 import com.ragagent.common.llm.ToolResult;
-import com.ragagent.agenttools.McpCatalogGuardedTool;
-import com.ragagent.agenttools.ToolRequest;
+import com.ragagent.agent.tool.McpCatalogGuardedTool;
+import com.ragagent.agent.tool.ToolRequest;
 import com.ragagent.common.web.ToolJson;
 
 /**

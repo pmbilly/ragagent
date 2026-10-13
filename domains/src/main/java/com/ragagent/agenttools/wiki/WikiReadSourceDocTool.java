@@ -10,17 +10,17 @@ import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.llm.ToolResult;
-import com.ragagent.agenttools.DocChunkSupport.ChunkPage;
-import com.ragagent.agenttools.DocChunkSupport.ImageInfoCollector;
-import com.ragagent.agenttools.DocChunkSupport.KnowledgeInfoReader;
-import com.ragagent.agenttools.DocChunkSupport.KnowledgeInfoView;
-import com.ragagent.agenttools.DocChunkSupport.PagedChunks;
+import com.ragagent.agent.tool.DocChunkSupport.ChunkPage;
+import com.ragagent.agent.tool.DocChunkSupport.ImageInfoCollector;
+import com.ragagent.agent.tool.DocChunkSupport.KnowledgeInfoReader;
+import com.ragagent.agent.tool.DocChunkSupport.KnowledgeInfoView;
+import com.ragagent.agent.tool.DocChunkSupport.PagedChunks;
 import com.ragagent.common.knowledge.ChunkFacts;
-import com.ragagent.agenttools.BaseTool;
-import com.ragagent.agenttools.DocChunkSupport;
-import com.ragagent.agenttools.runtime.SearchAuth;
-import com.ragagent.agenttools.ToolDefinitions;
-import com.ragagent.agenttools.ToolRequest;
+import com.ragagent.agent.tool.BaseTool;
+import com.ragagent.agent.tool.DocChunkSupport;
+import com.ragagent.agent.tool.runtime.SearchAuth;
+import com.ragagent.agent.tool.ToolDefinitions;
+import com.ragagent.agent.tool.ToolRequest;
 import com.ragagent.common.retrieval.SearchTarget;
 
 /**

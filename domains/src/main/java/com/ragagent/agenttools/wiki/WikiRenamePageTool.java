@@ -5,9 +5,9 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.llm.ToolResult;
-import com.ragagent.agenttools.BaseTool;
-import com.ragagent.agenttools.ToolDefinitions;
-import com.ragagent.agenttools.ToolRequest;
+import com.ragagent.agent.tool.BaseTool;
+import com.ragagent.agent.tool.ToolDefinitions;
+import com.ragagent.agent.tool.ToolRequest;
 
 /**
  * wiki_rename_page 工具。

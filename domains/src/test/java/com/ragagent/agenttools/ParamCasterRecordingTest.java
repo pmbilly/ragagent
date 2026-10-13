@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.web.ToolJson;
 import com.ragagent.support.ContractJson;
+import com.ragagent.agent.tool.ParamCaster;
 
 /**
  * ParamCaster 的录制判定表（29 条）。

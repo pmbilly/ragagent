@@ -5,12 +5,12 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.llm.ToolResult;
-import com.ragagent.agenttools.runtime.SearchAuth.KnowledgeScopeReader;
+import com.ragagent.agent.tool.runtime.SearchAuth.KnowledgeScopeReader;
 import com.ragagent.common.retrieval.SearchTarget.SearchTargets;
-import com.ragagent.agenttools.BaseTool;
-import com.ragagent.agenttools.runtime.SearchAuth;
-import com.ragagent.agenttools.ToolDefinitions;
-import com.ragagent.agenttools.ToolRequest;
+import com.ragagent.agent.tool.BaseTool;
+import com.ragagent.agent.tool.runtime.SearchAuth;
+import com.ragagent.agent.tool.ToolDefinitions;
+import com.ragagent.agent.tool.ToolRequest;
 
 /**
  * wiki_flag_issue 工具。

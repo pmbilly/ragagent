@@ -8,9 +8,10 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.agenttools.ToolCapabilities.KbCapability;
-import com.ragagent.agenttools.ToolCapabilities.KbCaps;
-import com.ragagent.agenttools.ToolCapabilities.KbFilter;
+import com.ragagent.agent.tool.ToolCapabilities.KbCapability;
+import com.ragagent.agent.tool.ToolCapabilities.KbCaps;
+import com.ragagent.agent.tool.ToolCapabilities.KbFilter;
+import com.ragagent.agent.tool.ToolCapabilities;
 
 /**
  * ToolCapabilities 的录制判定（12 组：{@code deriveKbFilter*}

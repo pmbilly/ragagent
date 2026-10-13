@@ -2,7 +2,8 @@
  * ReAct 引擎域：AgentEngine 门面与八个段协作者（think/act/observe/prompt/finalize/steer/context-debug/ReAct 迭代）、
  * 提示词装配、token 预算与取消探测。对外入口 = {@code AgentEngine.execute}。
  *
- * <p>子包：{@code tools/}（工具族，按能力分 wiki / knowledge / sql / data / web）、{@code compaction/}（上下文压缩）、
+ * <p>子包：{@code tool/}（工具框架：契约/定义/注册/校验/执行上下文/运行时修正，B260 由 {@code agenttools} 迁入；
+ * 业务工具**实现**在 {@code com.ragagent.agenttools}）、{@code compaction/}（上下文压缩）、
  * {@code skills/}（技能装载）、{@code domain/}（引擎值类型）、{@code budget/}（token 预算与上下文占用诊断）、
  * {@code prompt/}（提示词模板选取与接地指引）、{@code modelcontext/}（模型输出上下文协议：来源注册表 /
  * 句柄表 / 流解码 / 工具策略，物理位置在 {@code :engine}）、
@@ -25,7 +26,7 @@
  * <p>一轮怎么跑 → {@code AgentEngine.executeLoop} + {@code ReActIteration}；模型调用/重试/思考块 → {@code ThinkPhase}；
  * 工具执行与审批 → {@code ActPhase}（+ {@code tools/}）；上下文窗口与压缩触发 → {@code ObservePhase} + {@code compaction/}；
  * 系统提示词与消息装配 → {@code AgentPrompts} + {@code ConversationAssembler} + {@code prompt/}；
- * token 预算与占用诊断 → {@code budget/}；终答与最大迭代兜底 → {@code FinalizePhase}；
+ * token 预算与占用诊断 → {@code budget/}；工具框架与注册 → {@code tool/}；终答与最大迭代兜底 → {@code FinalizePhase}；
  * 中途插话 → {@code SteerIntake} / {@code SteerSink}。</p>
  *
  * <p>注：八个段协作者与 {@code AgentEngine} 共享包内可见状态（seam），故仍留根包。跨包搬迁（{@code loop/}）

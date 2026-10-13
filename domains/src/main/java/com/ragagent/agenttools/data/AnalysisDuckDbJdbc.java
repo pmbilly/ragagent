@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import com.ragagent.agenttools.Cleanable;
+import com.ragagent.agent.tool.Cleanable;
 
 /**
  * {@link DataAnalysisTool.AnalysisDuckDb} 的生产实现。

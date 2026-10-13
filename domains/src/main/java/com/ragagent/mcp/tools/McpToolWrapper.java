@@ -21,10 +21,10 @@ import com.ragagent.mcp.protocol.McpContext;
 import com.ragagent.common.web.ToolJson;
 import com.ragagent.approval.Decision;
 import com.ragagent.approval.PendingRequest;
-import com.ragagent.agenttools.AgentTool;
-import com.ragagent.agenttools.ToolRequest;
-import com.ragagent.agenttools.ToolDefinitions;
-import com.ragagent.agenttools.ToolExecContext;
+import com.ragagent.agent.tool.AgentTool;
+import com.ragagent.agent.tool.ToolRequest;
+import com.ragagent.agent.tool.ToolDefinitions;
+import com.ragagent.agent.tool.ToolExecContext;
 import com.ragagent.approval.ApprovalBridge;
 
 /**

@@ -20,7 +20,7 @@ import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.RerankerModel;
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.SearchResultView;
 import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.common.retrieval.SearchTarget;
-import com.ragagent.agenttools.ToolRequest;
+import com.ragagent.agent.tool.ToolRequest;
 import com.ragagent.agenttools.GoRecording45B;
 import com.ragagent.agenttools.RecordingSupport;
 

@@ -1,16 +1,6 @@
 {
-  "cycles": [
-    [
-      "agent",
-      "agenttools"
-    ]
-  ],
-  "sccs": [
-    [
-      "agent",
-      "agenttools"
-    ]
-  ],
+  "cycles": [],
+  "sccs": [],
   "package_sccs": [
     [
       "com.ragagent.agent",
@@ -22,13 +12,13 @@
       "com.ragagent.agent.skills.mapper"
     ],
     [
-      "com.ragagent.agentmanagement.domain",
-      "com.ragagent.agentmanagement.mapper"
+      "com.ragagent.agent.tool",
+      "com.ragagent.agent.tool.runtime",
+      "com.ragagent.agent.tool.spi"
     ],
     [
-      "com.ragagent.agenttools",
-      "com.ragagent.agenttools.runtime",
-      "com.ragagent.agenttools.spi"
+      "com.ragagent.agentmanagement.domain",
+      "com.ragagent.agentmanagement.mapper"
     ],
     [
       "com.ragagent.chatpipeline",
