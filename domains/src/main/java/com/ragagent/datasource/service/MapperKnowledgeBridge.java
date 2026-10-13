@@ -1,5 +1,7 @@
 package com.ragagent.datasource.service;
 
+import com.ragagent.knowledge.service.DuplicateKnowledgeException;
+
 import com.ragagent.common.jdbc.DatabaseDialects;
 import com.ragagent.common.web.JsonMappers;
 import java.time.OffsetDateTime;
@@ -23,7 +25,6 @@ import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.mapper.ChunkMapper;
 import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
-import com.ragagent.knowledge.service.KnowledgeService;
 import com.ragagent.knowledge.task.KnowledgeProcessingQueue;
 import com.ragagent.knowledge.storage.LocalStorageService;
 import org.springframework.stereotype.Component;
@@ -235,7 +236,7 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
                 .isNull(Knowledge::getDeletedAt)
                 .last("LIMIT 1"));
         if (dup != null) {
-            throw new KnowledgeService.DuplicateKnowledgeException(
+            throw new DuplicateKnowledgeException(
                     dup, ErrorCode.KNOWLEDGE_DUPLICATE_FILE,
                     "文件已存在（相同内容）");
         }

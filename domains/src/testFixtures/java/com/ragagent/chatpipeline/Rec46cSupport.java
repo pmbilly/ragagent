@@ -1,5 +1,7 @@
 package com.ragagent.chatpipeline;
 
+import com.ragagent.knowledge.support.KnowledgeProjectionAdapter;
+
 import com.ragagent.knowledge.support.ChunkProjectionAdapter;
 
 import java.time.Instant;
@@ -50,7 +52,6 @@ import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.KnowledgeBaseView;
 import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.knowledge.service.KnowledgeBaseLookupAdapter;
-import com.ragagent.knowledge.service.KnowledgeService;
 
 /**
  * 4.6c 录制回放的替身与掩码工具。
@@ -562,7 +563,7 @@ final class Rec46cSupport {
             k.setFileName(id + ".csv");
             k.setDescription("描述");
             // B114：端口载荷是 facts，实体只在替身内部（镜像生产侧 QaWiring 的投影）。
-            return KnowledgeService.factsOf(k);
+            return KnowledgeProjectionAdapter.factsOf(k);
         }
 
         @Override
@@ -595,7 +596,7 @@ final class Rec46cSupport {
                     out.add(k);
                 }
             }
-            return KnowledgeService.factsOf(out);
+            return KnowledgeProjectionAdapter.factsOf(out);
         }
     }
 

@@ -1,5 +1,8 @@
 package com.ragagent.knowledge.service;
 
+
+import com.ragagent.knowledge.support.KnowledgeProjectionAdapter;
+
 import com.ragagent.knowledge.domain.access.KnowledgeReadPort;
 
 import com.ragagent.common.web.JsonMappers;
@@ -21,7 +24,6 @@ import com.ragagent.common.error.BizException;
 import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.common.knowledge.KnowledgeDocumentGateway;
-import com.ragagent.knowledge.dto.kb.DuplicateKnowledgeDetails;
 import com.ragagent.common.security.InputSanitizer;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
@@ -39,8 +41,6 @@ import com.ragagent.knowledge.dto.doc.KnowledgeMoveProgress;
 import com.ragagent.knowledge.storage.LocalStorageService;
 import com.ragagent.knowledge.storage.TenantFileStorage;
 import com.ragagent.common.web.UrlBytesFetcher;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -438,33 +438,13 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
      * 跨域只读端口的实现（{@link KnowledgeDocumentGateway}）：检索结果装配按 id 批量取
      * 文档元数据，语义与 {@link #getKnowledgeBatchWithSharedAccess} 一致。
      */
-    /**
-     * 实体 → L1 facts 投影（域内公用：端口实现与装配层共用一份映射，避免漂移）。
-     * 仅带调用方真正读取的字段。
-     */
-    /** 批量投影（保持入参顺序）。 */
-    public static List<KnowledgeDocumentFacts> factsOf(List<Knowledge> rows) {
-        List<KnowledgeDocumentFacts> out = new ArrayList<>();
-        for (Knowledge k : rows) {
-            out.add(factsOf(k));
-        }
-        return out;
-    }
 
-    public static KnowledgeDocumentFacts factsOf(Knowledge k) {
-        if (k == null) {
-            return null;
-        }
-        return new KnowledgeDocumentFacts(k.getId(), k.getTitle(), k.getMetadata(),
-                k.getFileName(), k.getSource(), k.getChannel(), k.getDescription(),
-                k.getKnowledgeBaseId(), k.getTenantId(), k.getFileType(), k.getFilePath());
-    }
 
     @Override
     public List<KnowledgeDocumentFacts> findAccessibleDocuments(long tenantId, List<String> knowledgeIds) {
         List<KnowledgeDocumentFacts> out = new ArrayList<>();
         for (Knowledge k : getKnowledgeBatchWithSharedAccess(tenantId, knowledgeIds)) {
-            out.add(factsOf(k));
+            out.add(KnowledgeProjectionAdapter.factsOf(k));
         }
         return out;
     }
@@ -476,29 +456,13 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
         }
         List<KnowledgeTag> rows = tagMapper.selectTagsWithKnowledgeId(List.of(k.getId()));
         if (!rows.isEmpty()) {
-            k.setTags(new ArrayList<>(rows.stream().map(KnowledgeService::tagView).toList()));
+            k.setTags(new ArrayList<>(rows.stream().map(KnowledgeProjectionAdapter::tagView).toList()));
         }
     }
 
-    /** 标签视图（时间序列化与全局 Jackson 配置同式）。 */
-    public static ObjectNode tagView(KnowledgeTag t) {
-        ObjectNode n = MAPPER.createObjectNode();
-        n.put("id", t.getId());
-        n.put("seqId", t.getSeqId() == null ? 0L : t.getSeqId());
-        n.put("knowledgeBaseId", t.getKnowledgeBaseId());
-        n.put("name", t.getName());
-        n.put("color", t.getColor() == null ? "" : t.getColor());
-        n.put("sortOrder", t.getSortOrder() == null ? 0 : t.getSortOrder());
-        n.put("createdAt", t.getCreatedAt() == null ? null : timeString(t.getCreatedAt()));
-        n.put("updatedAt", t.getUpdatedAt() == null ? null : timeString(t.getUpdatedAt()));
-        return n;
-    }
 
-    /** 同包开放（KnowledgeSpanService 渲染 span 时间戳复用，不各自复制）。 */
-    static String timeString(OffsetDateTime v) {
-        return v.atZoneSameInstant(ZoneId.systemDefault()).toOffsetDateTime()
-                .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-    }
+
+
 
     /** title/description(指针)/custom_metadata 部分更新 */
     public Knowledge updateKnowledge(String id, UpdateKnowledgeRequest req) {
@@ -772,26 +736,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
         KnowledgeCloneService.validateCloneCompatibility(source, target);
     }
 
-    /**
-     * 上传内容与库内已有文档重复（409）。
-     *
-     * <p>继承 {@link BizException}：错误体由全局异常处理器统一产出
-     * （{@code {error:{code,message,details}, success:false}}），已存在文档的 ID 放
-     * {@code details.existingKnowledgeId} 供前端跳转——取代历史上的特殊信封
-     * （{@code {code,data,message,success}}）。</p>
-     */
-    public static class DuplicateKnowledgeException extends BizException {
-        private final Knowledge existing;
 
-        public DuplicateKnowledgeException(Knowledge existing, ErrorCode code, String message) {
-            super(new AppError(code.value(), message, null, 409)
-                    .withDetails(existing == null ? null
-                            : new DuplicateKnowledgeDetails(existing.getId())));
-            this.existing = existing;
-        }
-
-        public Knowledge existing() { return existing; }
-    }
 
     /** 入队端口外提为 {@link com.ragagent.knowledge.task.KnowledgeProcessingQueue}
      *  （实现：KnowledgeProcessWorker）——原嵌套接口让全部提交方反向依赖门面类型，

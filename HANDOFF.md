@@ -911,6 +911,16 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **规则收紧**：A16/A17 的 `ChunkVectorIndexer` 条目（搬迁后标签已是 `knowledge.index.ChunkVectorIndexer`）因整体离开 `..service..` 而不再违例 ⇒ 删两条（本批次第 6 次）。
 - **⚑ 刹车信号（下一步必须处理）**：本步给 `KnowledgeService` 补的必需 import 把它从 796 行推到 **正好 800 行**，撞上大文件棘轮的 **≥800 登记阈值**（守卫当场报 "≥800 行 2 个"）。我先把**自己造成**的 `implements` 折行消掉（回归 **799 行**，≥800 重新只剩已登记的 `KnowledgeProcessWorker`），闸门复原全绿——**但这只是止血**：`KnowledgeService` 已贴近阈值，**下一步（B263⑦）必须先拆它**（抽 `repository/KnowledgeRepository` + use-case），否则任何一行变化都会再撞红线。
 - **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m44s** ✓ 十一守卫 ✓（≥800 计数回到 1）。
+
+**🔶 B263 第⑦步（2026-10-14，拆 `KnowledgeService`：投影抽 `support/` + 嵌套异常提顶层；刹车信号解除）**
+- **触发**：第⑥步把 `KnowledgeService` 顶到 **799/800 行**（撞大文件棘轮 ≥800 登记阈值）⇒ 本步必须先拆它。
+- **抽取一：`support/KnowledgeProjectionAdapter`**（4 个静态投影逐字迁出 + `MAPPER` 字段）：`factsOf(List<Knowledge>)` / `factsOf(Knowledge)` → `KnowledgeDocumentFacts`、`tagView(KnowledgeTag)` → 标签 JSON 视图、`timeString(OffsetDateTime)` → 线格式时间。与 B263② 的 `ChunkProjectionAdapter` 同一条思路（"实体 → 载荷"只留一份映射）。调用点全部换锚，含**两处方法引用** `KnowledgeService::tagView` → `KnowledgeProjectionAdapter::tagView`（全局字符串替换抓不到 `::` 形式，是编译错误逼出来的）。
+- **抽取二：嵌套类 `DuplicateKnowledgeException` → 顶层类型**：它被 `datasource`(3)/`im`(1) 等域以 `KnowledgeService.DuplicateKnowledgeException` 形式引用 ⇒ 嵌套在门面里会让这些域反向依赖近 800 行的枢纽类。
+- **⚠️ 一个必须记住的实测**：第一版把它放进 **`domain/`** ⇒ 守卫**当场报新环** `{knowledge.domain, knowledge.dto.kb}`（包级 SCC 13→14 ✗）——因为该异常携带 `dto.kb.DuplicateKnowledgeDetails` 负载，`domain → dto.kb` 与既有的 `dto.kb → domain` 形成双环。改放 **`service/` 顶层**（零新包边，仍达成"不再嵌套在枢纽里"）⇒ 守卫回到 13 组 ✓。**结论："提为顶层类型"不等于"必须放 domain/"——要看它的载荷在哪个包。**
+- **结果**：`KnowledgeService` **799 → 748 行** ✓（≥800 阈值彻底解除，不再是一行之差）；新增 `support/KnowledgeProjectionAdapter`、`service/DuplicateKnowledgeException` 两个顶层类型。
+- **偶发测试（记录）**：全量跑时 `RedisWikiDeletedTombstoneStoreTest.clearRemovesTombstone` 失败一次，**单跑即过** ⇒ Redis 依赖型偶发，与本步改动无关（本步未触碰 wiki/Redis 路径）。
+- **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m34s** ✓ 十一守卫 ✓（13 组 SCC 未变）。
+- **登记（余步）**：`KnowledgeService` 仍有 748 行/60 方法，继续按目标树抽（`service.management/*` use-case、`repository/KnowledgeRepository`）；`KnowledgeFileService`(422/2)、`KnowledgeBaseService`(626/18)；最后一对 `task ⇄ service` 余 7 处。
 - **登记（余步）**：⑦ `KnowledgeService`(799 行/28 引用) 拆分（**优先级最高：行数已到阈值边缘**）；⑧ `KnowledgeFileService`(422/2)、`KnowledgeParseService` 余部、`KnowledgeBaseService`(626/18)；⑨ 最后一对 `task ⇄ service`（`task→service` 现余 **7**：`ChunkExtractService`3 / `QuestionGenerationService`3 / `SpanTracker`）；⑩ `service` 七子面、`domain.{document,task,graph}`、`mapper` 目标名对齐。
 - **登记（余步）**：按最轻优先继续——`ChunkVectorIndexer`(386/2)、`KnowledgeFileService`(422/2)、`KnowledgeParseService` 余部、`KnowledgeBaseService`(626/18)、`KnowledgeService`(796/28)；一律"切分而非整搬"。`task → service` 现余 8 处（`ChunkExtractService`3 / `QuestionGenerationService`3 / `SpanTracker` / `ChunkVectorIndexer`）。
 

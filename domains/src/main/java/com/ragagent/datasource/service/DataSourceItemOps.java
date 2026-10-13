@@ -14,9 +14,9 @@ import com.ragagent.datasource.domain.SubtreeChildIds;
 import com.ragagent.datasource.domain.SyncItemError;
 import com.ragagent.datasource.domain.SyncResult;
 import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.service.KnowledgeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.ragagent.knowledge.service.DuplicateKnowledgeException;
 
 /**
  * 同步条目的灌入：新增/更新/删除的判定与落地、冲突消解（同节点判等）、
@@ -81,7 +81,7 @@ final class DataSourceItemOps {
         boolean isUpdate;
         try {
             isUpdate = ingestItem(ds, item, tagIDs);
-        } catch (KnowledgeService.DuplicateKnowledgeException dup) {
+        } catch (DuplicateKnowledgeException dup) {
             // 重复的文件/URL 不算失败——计入 skipped
             log.info("[datasource] item \"{}\" (external_id={}) already exists, skipping",
                     item.getTitle(), item.getExternalId());
@@ -232,7 +232,7 @@ final class DataSourceItemOps {
             try {
                 service.knowledge.createFromFile(ds.getTenantId(), ds.getKnowledgeBaseId(),
                         item.getContent(), item.getFileName(), metadata, tagIDs, channel);
-            } catch (KnowledgeService.DuplicateKnowledgeException dup) {
+            } catch (DuplicateKnowledgeException dup) {
                 if (dupIsSameNode(dup, item)) {
                     sweepStaleSubtree(ds, item);
                 }
@@ -247,7 +247,7 @@ final class DataSourceItemOps {
             try {
                 created = service.knowledge.createFromUrl(ds.getTenantId(), ds.getKnowledgeBaseId(),
                         item.getUrl(), item.getFileName(), item.getTitle(), tagIDs, channel);
-            } catch (KnowledgeService.DuplicateKnowledgeException dup) {
+            } catch (DuplicateKnowledgeException dup) {
                 if (dupIsSameNode(dup, item)) {
                     sweepStaleSubtree(ds, item);
                 }
@@ -273,7 +273,7 @@ final class DataSourceItemOps {
      * 知识哈希相同"是可能的——那种情况下这条节点的父行刚被删、还没重建，
      * 若照旧清扫子树，就会把子项删掉却没有父行来替换。</p>
      */
-    static boolean dupIsSameNode(KnowledgeService.DuplicateKnowledgeException dup, FetchedItem item) {
+    static boolean dupIsSameNode(DuplicateKnowledgeException dup, FetchedItem item) {
         if (dup == null || dup.existing() == null) {
             return false;
         }

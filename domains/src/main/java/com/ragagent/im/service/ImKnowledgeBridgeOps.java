@@ -11,7 +11,7 @@ import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.runtime.ImCommandSet;
 import com.ragagent.im.runtime.ImFormat;
 import com.ragagent.knowledge.service.KnowledgeService;
-import com.ragagent.knowledge.service.KnowledgeService.DuplicateKnowledgeException;
+import com.ragagent.knowledge.service.DuplicateKnowledgeException;
 
 /**
  * IM 与知识库域的全部接面：命令面的 KB 清单/检索读取，以及附件异步入库。

@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.support.KnowledgeProjectionAdapter;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -116,7 +118,7 @@ public class KnowledgeAccessHelper {
         }
         List<KnowledgeTag> rows = tagMapper.selectTagsWithKnowledgeId(List.of(k.getId()));
         if (!rows.isEmpty()) {
-            k.setTags(new ArrayList<>(rows.stream().map(KnowledgeService::tagView).toList()));
+            k.setTags(new ArrayList<>(rows.stream().map(KnowledgeProjectionAdapter::tagView).toList()));
         }
     }
 }

@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.support.KnowledgeProjectionAdapter;
+
 import com.ragagent.common.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -183,17 +185,17 @@ public class KnowledgeSpanService {
             n.put("errorMessage", r.getErrorMessage());
         }
         if (r.getStartedAt() != null) {
-            n.put("startedAt", KnowledgeService.timeString(r.getStartedAt()));
+            n.put("startedAt", KnowledgeProjectionAdapter.timeString(r.getStartedAt()));
         }
         if (r.getFinishedAt() != null) {
-            n.put("finishedAt", KnowledgeService.timeString(r.getFinishedAt()));
+            n.put("finishedAt", KnowledgeProjectionAdapter.timeString(r.getFinishedAt()));
         }
         if (r.getDurationMs() != 0) {
             n.put("durationMs", r.getDurationMs());
         }
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
-        n.put("createdAt", KnowledgeService.timeString(r.getCreatedAt() == null ? now : r.getCreatedAt()));
-        n.put("updatedAt", KnowledgeService.timeString(r.getUpdatedAt() == null ? now : r.getUpdatedAt()));
+        n.put("createdAt", KnowledgeProjectionAdapter.timeString(r.getCreatedAt() == null ? now : r.getCreatedAt()));
+        n.put("updatedAt", KnowledgeProjectionAdapter.timeString(r.getUpdatedAt() == null ? now : r.getUpdatedAt()));
         return n;
     }
 
@@ -210,8 +212,8 @@ public class KnowledgeSpanService {
         n.put("name", name);
         n.put("kind", kind);
         n.put("status", status);
-        n.put("createdAt", KnowledgeService.timeString(now));
-        n.put("updatedAt", KnowledgeService.timeString(now));
+        n.put("createdAt", KnowledgeProjectionAdapter.timeString(now));
+        n.put("updatedAt", KnowledgeProjectionAdapter.timeString(now));
         return n;
     }
 
@@ -232,7 +234,7 @@ public class KnowledgeSpanService {
             if (spanFailure.getFinishedAt() == null) {
                 e.putNull("finished_at");
             } else {
-                e.put("finishedAt", KnowledgeService.timeString(spanFailure.getFinishedAt()));
+                e.put("finishedAt", KnowledgeProjectionAdapter.timeString(spanFailure.getFinishedAt()));
             }
             e.put("message", spanFailure.getErrorMessage());
             e.put("name", spanFailure.getName());
@@ -257,7 +259,7 @@ public class KnowledgeSpanService {
         e.put("errorCode", errorCode);
         e.put("errorMessage", message);
         e.put("finishedAt", knowledge.getUpdatedAt() == null
-                ? null : KnowledgeService.timeString(knowledge.getUpdatedAt()));
+                ? null : KnowledgeProjectionAdapter.timeString(knowledge.getUpdatedAt()));
         e.put("message", message);
         e.put("name", "knowledge_processing");
         e.put("stage", "knowledge_processing");

@@ -1,5 +1,7 @@
 package com.ragagent.session.service;
 
+import com.ragagent.knowledge.support.KnowledgeProjectionAdapter;
+
 import com.ragagent.knowledge.support.ChunkProjectionAdapter;
 
 import com.ragagent.common.web.JsonMappers;
@@ -251,19 +253,19 @@ public class QaWiring {
             @Override
             public KnowledgeDocumentFacts getKnowledgeById(String id) {
                 // 知识查询带租户过滤（从 TenantContext 取）
-                return KnowledgeService.factsOf(
+                return KnowledgeProjectionAdapter.factsOf(
                         knowledgeService.getKnowledgeInTenant(TenantContext.currentTenantId(), id));
             }
 
             @Override
             public List<KnowledgeDocumentFacts> getKnowledgeBatch(long tenantId, List<String> ids) {
-                return KnowledgeService.factsOf(knowledgeService.getKnowledgeBatch(tenantId, ids));
+                return KnowledgeProjectionAdapter.factsOf(knowledgeService.getKnowledgeBatch(tenantId, ids));
             }
 
             @Override
             public List<KnowledgeDocumentFacts> getKnowledgeBatchWithSharedAccess(
                     long tenantId, List<String> ids) {
-                return KnowledgeService.factsOf(
+                return KnowledgeProjectionAdapter.factsOf(
                         knowledgeService.getKnowledgeBatchWithSharedAccess(tenantId, ids));
             }
         };
@@ -295,7 +297,7 @@ public class QaWiring {
         return new PipelinePorts.KnowledgeRepository() {
             @Override
             public List<KnowledgeDocumentFacts> getKnowledgeBatch(long tenantId, List<String> ids) {
-                return KnowledgeService.factsOf(knowledgeService.getKnowledgeBatch(tenantId, ids));
+                return KnowledgeProjectionAdapter.factsOf(knowledgeService.getKnowledgeBatch(tenantId, ids));
             }
         };
     }
