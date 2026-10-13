@@ -275,7 +275,7 @@ class McpServiceResponseTest {
     /** credentials 映射的键序（apiKey < token 插入序）；§14.9n M1 起无信封 */
     @Test
     void credentialsResponseFieldOrder() throws Exception {
-        String body = JSON.writeValueAsString(CredentialsResponse.of(true, false));
+        String body = JSON.writeValueAsString(McpCredentialsResponse.of(true, false));
         assertEquals("{\"fields\":{\"apiKey\":{\"configured\":true},\"token\":{\"configured\":false}}}",
                 body);
     }

@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
  * 消费面：List / ListByModelType / DetectProvider / ValidateConfig。
  */
 @Component
-public class ProviderRegistry {
+public class ModelProviderCatalog {
 
     /** 后端类型 → 前端字符串 */
     public static String toFrontend(String backendType) {
@@ -181,14 +181,14 @@ public class ProviderRegistry {
 
     /** 全量（注册表顺序）。 */
     public List<ModelProviderDTO> list() {
-        return ENTRIES.stream().map(ProviderRegistry::toDTO).toList();
+        return ENTRIES.stream().map(ModelProviderCatalog::toDTO).toList();
     }
 
     /** 按后端类型过滤，保持注册表顺序。 */
     public List<ModelProviderDTO> listByModelType(String backendType) {
         return ENTRIES.stream()
                 .filter(e -> e.backendTypes().contains(backendType))
-                .map(ProviderRegistry::toDTO)
+                .map(ModelProviderCatalog::toDTO)
                 .toList();
     }
 

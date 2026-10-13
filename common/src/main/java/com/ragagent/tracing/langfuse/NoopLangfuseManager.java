@@ -41,7 +41,7 @@ final class NoopLangfuseManager implements LangfuseManager {
         }
 
         @Override
-        public void finish(Object output, TokenUsage usage, String err) {
+        public void finish(Object output, LangfuseTokenUsage usage, String err) {
             // no-op
         }
 

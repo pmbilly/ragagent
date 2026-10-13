@@ -5,7 +5,7 @@ import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.BizException;
 import com.ragagent.common.security.LogSanitizer;
 import com.ragagent.mcp.domain.McpService;
-import com.ragagent.mcp.dto.CredentialsResponse;
+import com.ragagent.mcp.dto.McpCredentialsResponse;
 import com.ragagent.mcp.service.McpServiceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,7 +88,7 @@ public class McpCredentialsController {
             if (service == null) {
                 throw BizException.notFound("MCP service not found");
             }
-            return ok(CredentialsResponse.of(
+            return ok(McpCredentialsResponse.of(
                     configured(service, true), configured(service, false)));
         }
 
@@ -99,7 +99,7 @@ public class McpCredentialsController {
             log.error("failed to update credentials, service_id={}", serviceId, e);
             throw BizException.internal("failed to update credentials: " + rawMessage(e));
         }
-        return ok(CredentialsResponse.of(
+        return ok(McpCredentialsResponse.of(
                 configured(updated, true), configured(updated, false)));
     }
 

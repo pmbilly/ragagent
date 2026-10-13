@@ -1,5 +1,6 @@
 package com.ragagent.websearch.service;
 
+import com.ragagent.websearch.provider.WebSearchProvider;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -13,7 +14,7 @@ import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.retrieval.domain.WebSearchFilters;
 import com.ragagent.retrieval.domain.WebSearchResult;
 import com.ragagent.retrieval.support.WebResultConverter;
-import com.ragagent.websearch.domain.WebSearchProvider;
+import com.ragagent.websearch.domain.WebSearchProviderEntity;
 import com.ragagent.websearch.domain.WebSearchProviderParams;
 import com.ragagent.websearch.mapper.WebSearchProviderRepository;
 import com.ragagent.websearch.provider.WebSearchProviderRegistry;
@@ -63,7 +64,7 @@ public class WebSearchService {
         if (config == null) {
             throw new IllegalStateException("web search config is required");
         }
-        com.ragagent.websearch.provider.WebSearchProvider searchProvider =
+        WebSearchProvider searchProvider =
                 resolveProvider(tenantId, providerId, config);
 
         List<WebSearchResult> results;
@@ -84,10 +85,10 @@ public class WebSearchService {
     }
 
     /** resolveProvider：优先显式 providerId，回落默认 provider。 */
-    private com.ragagent.websearch.provider.WebSearchProvider resolveProvider(
+    private WebSearchProvider resolveProvider(
             long tenantId, String providerId, WebSearchConfig cfg) {
         if (providerId != null && !providerId.isEmpty()) {
-            WebSearchProvider entity = providerRepo.getByID(tenantId, providerId);
+            WebSearchProviderEntity entity = providerRepo.getByID(tenantId, providerId);
             if (entity == null) {
                 throw new IllegalStateException("web search provider not found: " + providerId);
             }

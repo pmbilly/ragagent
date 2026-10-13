@@ -1,5 +1,6 @@
 package com.ragagent.agent;
 
+import com.ragagent.llm.domain.ToolCall;
 import com.ragagent.common.web.JsonMappers;
 import java.time.Duration;
 import java.time.Instant;
@@ -15,7 +16,7 @@ import com.ragagent.agent.compaction.CompactionResult;
 import com.ragagent.agent.compaction.CompactionSettings;
 import com.ragagent.agent.compaction.NothingToCompactException;
 import com.ragagent.agent.domain.AgentStep;
-import com.ragagent.agent.domain.ToolCall;
+import com.ragagent.agent.domain.AgentToolCall;
 import com.ragagent.agent.tools.ToolDefinitions;
 import com.ragagent.agent.tools.runtime.ThinkBlocks;
 import com.ragagent.event.payload.AgentFinalAnswerData;
@@ -358,9 +359,9 @@ final class ObservePhase {
             assistantMsg.setReasoningContent(step.getReasoningContent());
 
             if (step.getToolCalls() != null && !step.getToolCalls().isEmpty()) {
-                List<com.ragagent.llm.domain.ToolCall> llmCalls = new ArrayList<>(step.getToolCalls().size());
-                for (ToolCall tc : step.getToolCalls()) {
-                    com.ragagent.llm.domain.ToolCall c = new com.ragagent.llm.domain.ToolCall();
+                List<ToolCall> llmCalls = new ArrayList<>(step.getToolCalls().size());
+                for (AgentToolCall tc : step.getToolCalls()) {
+                    ToolCall c = new ToolCall();
                     c.setId(tc.getId());
                     c.setType("function");
                     c.setProviderMetadata(tc.getProviderMetadata());
@@ -374,7 +375,7 @@ final class ObservePhase {
         }
 
         if (step.getToolCalls() != null) {
-            for (ToolCall toolCall : step.getToolCalls()) {
+            for (AgentToolCall toolCall : step.getToolCalls()) {
                 String resultContent = engine.modelContext.modelToolResultForTool(toolCall.getName(),
                         toolCall.getResult());
                 messages.add(ChatMessage.tool(toolCall.getId(), toolCall.getName(), resultContent));

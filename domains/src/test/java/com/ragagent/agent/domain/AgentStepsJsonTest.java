@@ -67,7 +67,7 @@ class AgentStepsJsonTest {
         result.setData(Map.of("k", "v"));
         result.setImages(List.of("i"));
 
-        ToolCall call = new ToolCall();
+        AgentToolCall call = new AgentToolCall();
         call.setTarget(target);
         call.setId("call-1");
         call.setName("search");
@@ -132,7 +132,7 @@ class AgentStepsJsonTest {
     /** {@code result} 键恒出现：null 也要输出 {@code "result":null}。 */
     @Test
     void nilResultStillEmitsTheKey() throws Exception {
-        ToolCall call = new ToolCall();
+        AgentToolCall call = new AgentToolCall();
         call.setId("c");
 
         AgentStep step = new AgentStep();
@@ -153,7 +153,7 @@ class AgentStepsJsonTest {
      */
     @Test
     void derivedAccessorsNeverLeakIntoJson() throws Exception {
-        ToolCall call = new ToolCall();
+        AgentToolCall call = new AgentToolCall();
         call.setId("c");
         call.setName("n");
         call.setArgs(Map.of("a", "1"));
@@ -172,11 +172,11 @@ class AgentStepsJsonTest {
     void observationsFlattensOutputsAndReflections() {
         ToolResult withOutput = new ToolResult();
         withOutput.setOutput("out");
-        ToolCall first = new ToolCall();
+        AgentToolCall first = new AgentToolCall();
         first.setResult(withOutput);
         first.setReflection("ref");
 
-        ToolCall second = new ToolCall();
+        AgentToolCall second = new AgentToolCall();
         second.setResult(new ToolResult()); // 空输出 → 不计入
         second.setReflection("");
 
@@ -189,7 +189,7 @@ class AgentStepsJsonTest {
     /** {@code ExecutionName/A rgs} 有 target 时走 target，否则回落模型发出的原始值。 */
     @Test
     void executionNameAndArgsPreferTarget() {
-        ToolCall call = new ToolCall();
+        AgentToolCall call = new AgentToolCall();
         call.setName("model-name");
         call.setArgs(Map.of("from", "model"));
         assertThat(call.getExecutionName()).isEqualTo("model-name");
@@ -252,7 +252,7 @@ class AgentStepsJsonTest {
     @Test
     void providerMetadataValuesAreInlined() throws Exception {
         JsonNode raw = MAPPER.readTree("{\"x\":1}");
-        ToolCall call = new ToolCall();
+        AgentToolCall call = new AgentToolCall();
         call.setProviderMetadata(Map.of("gemini", raw));
 
         AgentStep step = new AgentStep();

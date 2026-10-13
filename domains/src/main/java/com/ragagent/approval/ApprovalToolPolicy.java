@@ -11,9 +11,9 @@ import java.util.concurrent.CancellationException;
  * <p><b>缺行 = 启用</b>：逐个查先给每个名字填默认 true，
  * 批量路径再用策略表覆盖——策略表只存覆盖值，未覆盖即默认启用。</p>
  */
-public final class ToolPolicy {
+public final class ApprovalToolPolicy {
 
-    private ToolPolicy() {
+    private ApprovalToolPolicy() {
     }
 
     /**

@@ -22,8 +22,8 @@ class RewriterTest {
 
     // ── 测试替身 ──
 
-    /** 只关心 {@code getFileURL} 的 FileService 替身；{@code calls} 用于钉"只解析一次"。 */
-    static final class StubFileService implements FileService {
+    /** 只关心 {@code getFileURL} 的 FileUrlPort 替身；{@code calls} 用于钉"只解析一次"。 */
+    static final class StubFileService implements FileUrlPort {
         private final java.util.function.Function<String, String> behavior;
         final AtomicInteger calls = new AtomicInteger();
 
@@ -42,10 +42,10 @@ class RewriterTest {
         }
     }
 
-    /** 对每条引用都返回同一个 FileService。 */
-    record FixedResolver(FileService svc) implements Resolver {
+    /** 对每条引用都返回同一个 FileUrlPort。 */
+    record FixedResolver(FileUrlPort svc) implements Resolver {
         @Override
-        public FileService resolveFileService(String ref) {
+        public FileUrlPort resolveFileService(String ref) {
             return svc;
         }
     }
@@ -297,7 +297,7 @@ class RewriterTest {
     }
 
     /**
-     * <b>未接线的存储后端在此处显形</b>：既没有 provider 级 FileService、
+     * <b>未接线的存储后端在此处显形</b>：既没有 provider 级 FileUrlPort、
      * 也没有进程级默认服务时，{@code minio://} 之类引用解析不出 HTTP URL，
      * 于是被原样保留成 handle——正是 {@link Rewriter} "绝不发出取不到的 URL"的降级。
      * 与未配置 {@code APP_EXTERNAL_URL} 的部署表现一致。
@@ -376,8 +376,8 @@ class RewriterTest {
         tenant.setId(10002L);
 
         FileServiceResolver resolver = new FileServiceResolver(tenant, null, backendResolver);
-        FileService first = resolver.resolveFileService("minio://bucket/10000/a.png");
-        FileService second = resolver.resolveFileService("minio://bucket/10000/b.png");
+        FileUrlPort first = resolver.resolveFileService("minio://bucket/10000/a.png");
+        FileUrlPort second = resolver.resolveFileService("minio://bucket/10000/b.png");
 
         assertThat(second).isSameAs(first);
         assertThat(resolved.get()).isEqualTo(1);

@@ -8,7 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import com.ragagent.agent.domain.AgentStep;
-import com.ragagent.agent.domain.ToolCall;
+import com.ragagent.agent.domain.AgentToolCall;
 import com.ragagent.common.llm.ToolResult;
 import com.ragagent.llm.domain.ChatMessage;
 
@@ -20,7 +20,7 @@ import com.ragagent.llm.domain.ChatMessage;
 class ToolImagesTest {
 
     private static AgentStep stepWithImages() {
-        ToolCall shot = new ToolCall();
+        AgentToolCall shot = new AgentToolCall();
         shot.setId("shot");
         shot.setName("local_browser");
         ToolResult shotResult = new ToolResult();
@@ -29,7 +29,7 @@ class ToolImagesTest {
         shotResult.setImages(List.of("data:image/png;base64,YQ=="));
         shot.setResult(shotResult);
 
-        ToolCall read = new ToolCall();
+        AgentToolCall read = new AgentToolCall();
         read.setId("read");
         read.setName("local_browser");
         ToolResult readResult = new ToolResult();
@@ -45,7 +45,7 @@ class ToolImagesTest {
     /** 两个成功工具的 tool 消息（图片测试的前置形态）。 */
     private static List<ChatMessage> toolMessages(AgentStep step) {
         List<ChatMessage> messages = new ArrayList<>();
-        for (ToolCall call : step.getToolCalls()) {
+        for (AgentToolCall call : step.getToolCalls()) {
             messages.add(ChatMessage.tool(call.getId(), call.getName(), call.getResult().getOutput()));
         }
         return messages;
@@ -109,7 +109,7 @@ class ToolImagesTest {
 
     @Test
     void failedToolResultsAreSkipped() {
-        ToolCall failed = new ToolCall();
+        AgentToolCall failed = new AgentToolCall();
         failed.setId("f1");
         failed.setName("local_browser");
         ToolResult result = new ToolResult();

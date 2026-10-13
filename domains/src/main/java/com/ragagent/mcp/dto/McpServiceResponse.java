@@ -58,7 +58,7 @@ public class McpServiceResponse {
     /** 逐字段"是否已配置"；内置服务不返回（它们没有按租户的凭据） */
     // 多键 map 的输出键序需保持稳定（与既有响应/落库形态一致）
 
-    private Map<String, CredentialFieldMetadata> credentials;
+    private Map<String, McpCredentialFieldMetadata> credentials;
     /** 列表卡片用的已保存目录摘要；从未同步过时省略 */
     private McpCatalogSummary catalog;
 
@@ -108,10 +108,10 @@ public class McpServiceResponse {
             resp.stdioConfig = null;
             resp.authConfig = null;
         } else {
-            Map<String, CredentialFieldMetadata> creds = new LinkedHashMap<>();
-            creds.put("apiKey", new CredentialFieldMetadata(
+            Map<String, McpCredentialFieldMetadata> creds = new LinkedHashMap<>();
+            creds.put("apiKey", new McpCredentialFieldMetadata(
                     svc.getAuthConfig() != null && !nullToEmpty(svc.getAuthConfig().getApiKey()).isEmpty()));
-            creds.put("token", new CredentialFieldMetadata(
+            creds.put("token", new McpCredentialFieldMetadata(
                     svc.getAuthConfig() != null && !nullToEmpty(svc.getAuthConfig().getToken()).isEmpty()));
             resp.credentials = creds;
         }
@@ -181,6 +181,6 @@ public class McpServiceResponse {
     public boolean isBuiltin() { return builtin; }
     public OffsetDateTime getCreatedAt() { return createdAt; }
     public OffsetDateTime getUpdatedAt() { return updatedAt; }
-    public Map<String, CredentialFieldMetadata> getCredentials() { return credentials; }
+    public Map<String, McpCredentialFieldMetadata> getCredentials() { return credentials; }
     public McpCatalogSummary getCatalog() { return catalog; }
 }

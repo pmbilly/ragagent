@@ -41,7 +41,7 @@ import com.ragagent.common.security.TenantAPIKeyScope;
 import com.ragagent.memory.service.MemoryExtractionService;
 import com.ragagent.session.service.SteerRunCoordinator;
 import com.ragagent.session.sse.SseFrameWriter;
-import com.ragagent.storage.support.FileService;
+import com.ragagent.storage.support.FileUrlPort;
 import com.ragagent.storage.support.Mode;
 import com.ragagent.storage.support.StorageBackendResolver;
 import com.ragagent.tenant.Tenant;
@@ -115,7 +115,7 @@ public class KnowledgeQaController {
     private final SteerRunCoordinator steerCoordinator;
     private final StreamEventEmitter emitter;
     private final SseFrameWriter sseFrameWriter;
-    private final FileService fileService;
+    private final FileUrlPort fileService;
     private final StorageBackendResolver storageBackendResolver;
     private final MemoryExtractionService memoryExtraction;
 
@@ -129,7 +129,7 @@ public class KnowledgeQaController {
             SteerRunCoordinator steerCoordinator,
             StreamEventEmitter emitter,
             SseFrameWriter sseFrameWriter,
-            org.springframework.beans.factory.ObjectProvider<FileService> fileService,
+            org.springframework.beans.factory.ObjectProvider<FileUrlPort> fileService,
             org.springframework.beans.factory.ObjectProvider<StorageBackendResolver> storageBackendResolver,
             org.springframework.beans.factory.ObjectProvider<MemoryExtractionService> memoryExtraction,
             org.springframework.beans.factory.ObjectProvider<TenantService> tenantServiceProvider) {

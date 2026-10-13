@@ -14,7 +14,7 @@ public interface StorageBackendResolver {
     /**
      * 解析结果。中间的 provider 名本包的两处调用点都没被使用，故不建模。
      */
-    record Resolved(FileService fileService) {
+    record Resolved(FileUrlPort fileService) {
     }
 
     /**

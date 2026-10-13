@@ -9,7 +9,7 @@ import com.ragagent.approval.ApprovalException;
 import com.ragagent.approval.BulkEnabledChecker;
 import com.ragagent.approval.Cancellation;
 import com.ragagent.approval.Checker;
-import com.ragagent.approval.ToolPolicy;
+import com.ragagent.approval.ApprovalToolPolicy;
 
 /**
  * 把 MCP 工具策略服务适配成 {@link Checker}，使 gate 不必 import 服务层包。
@@ -62,12 +62,12 @@ public class Adapter implements Checker, BulkEnabledChecker {
         // svc 为 null 时 instanceof 恒为 false，自然落入退化路径。
         if (!(svc instanceof McpToolPolicySource lister)) {
             // 传 this（Adapter）：svc 为 null 时 isEnabled 恒 true，铺出“默认全启用”
-            return ToolPolicy.enabledToolsIndividually(ctx, this, tenantId, serviceId, names);
+            return ApprovalToolPolicy.enabledToolsIndividually(ctx, this, tenantId, serviceId, names);
         }
         List<McpToolApproval> rows = lister.listByService(tenantId, serviceId);
         // 先铺默认全 true，再由策略表覆盖
         Map<String, Boolean> result =
-                ToolPolicy.enabledToolsIndividually(ctx, null, tenantId, serviceId, names);
+                ApprovalToolPolicy.enabledToolsIndividually(ctx, null, tenantId, serviceId, names);
         if (rows == null) {
             return result;
         }

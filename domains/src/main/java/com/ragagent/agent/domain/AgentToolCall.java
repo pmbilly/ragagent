@@ -30,7 +30,7 @@ import com.ragagent.common.llm.ToolResult;
  *       {@code "result":null}（实测确认，见 {@code AgentStepsJsonTest}）。</li>
  * </ul>
  */
-public class ToolCall {
+public class AgentToolCall {
 
     /** 解析后的实际目标。null 时省略。 */
     @JsonInclude(JsonInclude.Include.NON_NULL)

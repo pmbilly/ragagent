@@ -12,9 +12,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * {@code argsJson} 是原始 JSON 串（给回填）。</p>
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record ToolApprovalRequiredData( String pendingId, long tenantId, String sessionId, String assistantMessageId, String serviceId, String serviceName, String mcpToolName, String registeredToolName, String description, Object args, String argsJson, int timeoutSeconds, long requestedAtUnix, String toolCallId, String requestId) {
+public record ApprovalRequiredNotice( String pendingId, long tenantId, String sessionId, String assistantMessageId, String serviceId, String serviceName, String mcpToolName, String registeredToolName, String description, Object args, String argsJson, int timeoutSeconds, long requestedAtUnix, String toolCallId, String requestId) {
 
-    public ToolApprovalRequiredData {
+    public ApprovalRequiredNotice {
         if (argsJson != null && argsJson.isEmpty()) {
             argsJson = null;   // 空串归一为 null，配合 NON_NULL 不序列化该字段
         }

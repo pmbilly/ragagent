@@ -14,26 +14,26 @@ import com.ragagent.common.llm.ResponseType;
  * <p>同步语义：handler 在 emit 的调用线程里顺序执行；
  * handler 抛异常会上抛，被 {@link Gate} 包装成 emit 失败。</p>
  */
-class RecordingEventBus implements EventBus {
+class RecordingEventBus implements ApprovalEventBus {
 
-    private final Map<ResponseType, List<Consumer<Event>>> handlers = new ConcurrentHashMap<>();
-    private final List<Event> emitted = new CopyOnWriteArrayList<>();
+    private final Map<ResponseType, List<Consumer<ApprovalEvent>>> handlers = new ConcurrentHashMap<>();
+    private final List<ApprovalEvent> emitted = new CopyOnWriteArrayList<>();
 
     /** 注册 handler（同类型可多个，顺序执行） */
-    RecordingEventBus on(ResponseType type, Consumer<Event> handler) {
+    RecordingEventBus on(ResponseType type, Consumer<ApprovalEvent> handler) {
         handlers.computeIfAbsent(type, k -> new CopyOnWriteArrayList<>()).add(handler);
         return this;
     }
 
     @Override
-    public void emit(Event event) {
+    public void emit(ApprovalEvent event) {
         emitted.add(event);
-        for (Consumer<Event> handler : handlers.getOrDefault(event.type(), List.of())) {
+        for (Consumer<ApprovalEvent> handler : handlers.getOrDefault(event.type(), List.of())) {
             handler.accept(event);
         }
     }
 
-    List<Event> emitted() {
+    List<ApprovalEvent> emitted() {
         return emitted;
     }
 }

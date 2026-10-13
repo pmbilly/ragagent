@@ -12,7 +12,7 @@ import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.datasource.domain.DataSource;
 import com.ragagent.datasource.domain.DataSourceConfig;
-import com.ragagent.datasource.dto.CredentialsResponse;
+import com.ragagent.datasource.dto.DatasourceCredentialsResponse;
 import com.ragagent.datasource.service.DataSourceService;
 import com.ragagent.datasource.service.KnowledgeBridge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
@@ -100,7 +100,7 @@ public class DataSourceCredentialsController {
         } catch (RuntimeException ignored) {
             // 解析失败或结果为 null 都按"未配置"处理
         }
-        return ResponseEntity.ok(CredentialsResponse.credentials(configured));
+        return ResponseEntity.ok(DatasourceCredentialsResponse.credentials(configured));
     }
 
     /**

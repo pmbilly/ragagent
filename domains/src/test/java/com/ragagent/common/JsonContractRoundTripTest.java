@@ -14,7 +14,7 @@ import com.ragagent.audit.dto.AuditLogListResponse;
 import com.ragagent.audit.domain.AuditAction;
 import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.agent.domain.AgentStep;
-import com.ragagent.agent.domain.ToolCall;
+import com.ragagent.agent.domain.AgentToolCall;
 import com.ragagent.agent.domain.ToolCallTarget;
 import com.ragagent.common.llm.ToolResult;
 import com.ragagent.audit.domain.AuditOutcome;
@@ -29,8 +29,8 @@ import com.ragagent.datasource.domain.SyncItemError;
 import com.ragagent.datasource.domain.SyncLog;
 import com.ragagent.datasource.domain.SyncResult;
 import com.ragagent.datasource.domain.TaskInitiator;
-import com.ragagent.datasource.dto.CredentialFieldMetadata;
-import com.ragagent.datasource.dto.CredentialsResponse;
+import com.ragagent.datasource.dto.DatasourceCredentialFieldMetadata;
+import com.ragagent.datasource.dto.DatasourceCredentialsResponse;
 import com.ragagent.datasource.dto.DataSourceResponse;
 import com.ragagent.common.apikey.TenantAPIKeyResponse;
 import com.ragagent.knowledge.domain.Chunk;
@@ -503,7 +503,7 @@ class JsonContractRoundTripTest {
         result.setImages(List.of("i"));
         assertRoundTrips(result, ToolResult.class, "types.ToolResult ← ToolResult");
 
-        ToolCall call = new ToolCall();
+        AgentToolCall call = new AgentToolCall();
         call.setTarget(target);
         call.setId("call-1");
         call.setName("search");
@@ -512,7 +512,7 @@ class JsonContractRoundTripTest {
         call.setReflection("ref");
         call.setDuration(42);
         call.setProviderMetadata(Map.of("gemini", MAPPER.createObjectNode().put("x", 1)));
-        assertRoundTrips(call, ToolCall.class, "types.ToolCall ← agent.domain.ToolCall");
+        assertRoundTrips(call, AgentToolCall.class, "types.AgentToolCall ← agent.domain.AgentToolCall");
 
         AgentStep step = new AgentStep();
         step.setIteration(1);
@@ -941,10 +941,10 @@ class JsonContractRoundTripTest {
         assertRoundTrips(new TaskInitiator("", ""), TaskInitiator.class, "types.TaskInitiator ← {}");
 
         // ── HTTP 出参 DTO ───────────────────────────────────────────────
-        assertRoundTrips(CredentialsResponse.credentials(true), CredentialsResponse.class,
-                "dto.CredentialsResponse ← CredentialsResponse");
-        assertRoundTrips(new CredentialFieldMetadata(true), CredentialFieldMetadata.class,
-                "dto.CredentialFieldMetadata ← CredentialFieldMetadata");
+        assertRoundTrips(DatasourceCredentialsResponse.credentials(true), DatasourceCredentialsResponse.class,
+                "dto.DatasourceCredentialsResponse ← DatasourceCredentialsResponse");
+        assertRoundTrips(new DatasourceCredentialFieldMetadata(true), DatasourceCredentialFieldMetadata.class,
+                "dto.DatasourceCredentialFieldMetadata ← DatasourceCredentialFieldMetadata");
 
         DataSource entity = new DataSource();
         entity.setId("d1");

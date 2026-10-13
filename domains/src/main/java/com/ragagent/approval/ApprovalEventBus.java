@@ -13,8 +13,8 @@ package com.ragagent.approval;
  * {@link Gate} 会包装成 {@link ApprovalException.Kind#INTERNAL}。</p>
  */
 @FunctionalInterface
-public interface EventBus {
+public interface ApprovalEventBus {
 
     /** 发布事件；实现失败时抛运行时异常。 */
-    void emit(Event event);
+    void emit(ApprovalEvent event);
 }

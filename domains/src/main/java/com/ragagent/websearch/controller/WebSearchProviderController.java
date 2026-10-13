@@ -1,5 +1,6 @@
 package com.ragagent.websearch.controller;
 
+import com.ragagent.websearch.provider.WebSearchProvider;
 import com.ragagent.common.web.JsonMappers;
 import com.ragagent.common.web.RequestFields;
 import java.util.LinkedHashMap;
@@ -16,7 +17,7 @@ import com.ragagent.common.tenant.TenantRole;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.BizException;
 import com.ragagent.retrieval.domain.WebSearchResult;
-import com.ragagent.websearch.domain.WebSearchProvider;
+import com.ragagent.websearch.domain.WebSearchProviderEntity;
 import com.ragagent.websearch.domain.WebSearchProviderParams;
 import com.ragagent.websearch.dto.WebSearchProviderResponse;
 import com.ragagent.websearch.dto.WebSearchProviderTypes;
@@ -115,7 +116,7 @@ public class WebSearchProviderController {
         if (!missing.isEmpty()) {
             throw validatorError(missing.toArray(new String[0]));
         }
-        WebSearchProvider providerEntity = new WebSearchProvider();
+        WebSearchProviderEntity providerEntity = new WebSearchProviderEntity();
         providerEntity.setId(UUID.randomUUID().toString());
         providerEntity.setTenantId(tenantId);
         providerEntity.setName(sanitize(name));
@@ -136,7 +137,7 @@ public class WebSearchProviderController {
     @GetMapping
     public ResponseEntity<?> listProviders() {
         long tenantId = requireTenant();
-        List<WebSearchProvider> providers = service.list(tenantId);
+        List<WebSearchProviderEntity> providers = service.list(tenantId);
         return ResponseEntity.ok(
                 WebSearchProviderResponse.listOf(providers, canViewIntegrationSecrets()));
     }
@@ -144,7 +145,7 @@ public class WebSearchProviderController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getProvider(@PathVariable("id") String id) {
         long tenantId = requireTenant();
-        WebSearchProvider provider = owned(tenantId, id);
+        WebSearchProviderEntity provider = owned(tenantId, id);
         return ResponseEntity.ok(WebSearchProviderResponse.from(provider, canViewIntegrationSecrets()));
     }
 
@@ -161,7 +162,7 @@ public class WebSearchProviderController {
             @RequestBody(required = false) String rawBody) {
         long tenantId = requireTenant();
         // ownership 检查先于 body 反序列化（未知 id + 坏 body 都是 404）
-        WebSearchProvider existing = owned(tenantId, id);
+        WebSearchProviderEntity existing = owned(tenantId, id);
         UpdateProviderRequest req = bind(rawBody, UpdateProviderRequest.class);
 
         // api_key 绝不从本端点流动：强制保留存量（deprecated 告警仅日志）
@@ -178,7 +179,7 @@ public class WebSearchProviderController {
         String mergedDescription = req.description() == null || req.description().isEmpty()
                 ? existing.getDescription() : req.description();
 
-        WebSearchProvider updated = new WebSearchProvider();
+        WebSearchProviderEntity updated = new WebSearchProviderEntity();
         updated.setId(id);
         updated.setTenantId(tenantId);
         updated.setName(sanitize(mergedName));
@@ -193,7 +194,7 @@ public class WebSearchProviderController {
             throw BizException.internal(e.getMessage());
         }
         // Re-fetch to get the full stored state
-        WebSearchProvider refreshed = service.getByID(tenantId, id);
+        WebSearchProviderEntity refreshed = service.getByID(tenantId, id);
         if (refreshed != null) {
             return ResponseEntity.ok(WebSearchProviderResponse.from(refreshed, canViewIntegrationSecrets()));
         }
@@ -218,7 +219,7 @@ public class WebSearchProviderController {
     @PostMapping("/{id}/test")
     public ResponseEntity<?> testProviderByID(@PathVariable("id") String id) {
         long tenantId = requireTenant();
-        WebSearchProvider provider = owned(tenantId, id);
+        WebSearchProviderEntity provider = owned(tenantId, id);
         doTestSearch(provider.getProvider(), provider.getParameters());
         return ResponseEntity.ok(connectedBody());
     }
@@ -233,7 +234,7 @@ public class WebSearchProviderController {
      */
     private void doTestSearch(String providerType, WebSearchProviderParams params) {
         log.info("[WebSearch][Test] testing provider type={}", providerType);
-        com.ragagent.websearch.provider.WebSearchProvider provider;
+        WebSearchProvider provider;
         try {
             provider = registry.createProvider(providerType, params);
         } catch (RuntimeException e) {
@@ -266,8 +267,8 @@ public class WebSearchProviderController {
         }
     }
 
-    private WebSearchProvider owned(long tenantId, String id) {
-        WebSearchProvider provider;
+    private WebSearchProviderEntity owned(long tenantId, String id) {
+        WebSearchProviderEntity provider;
         try {
             provider = service.getByID(tenantId, id);
         } catch (RuntimeException e) {

@@ -4,7 +4,7 @@ package com.ragagent.llm.provider;
  * 模型类型枚举。
  *
  * 字面量与既有 model 模块的字符串（models.type、ModelParameters.provider 等，
- * 见 com.ragagent.model.service.ProviderRegistry 的 toFrontend/queryToBackend）逐字对应。
+ * 见 com.ragagent.model.service.ModelProviderCatalog 的 toFrontend/queryToBackend）逐字对应。
  *
  * 声明序固定（Embedding, Rerank, KnowledgeQA, VLLM, ASR）。
  */

@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.ragagent.common.security.SsrfGuard;
-import com.ragagent.websearch.domain.WebSearchProvider;
+import com.ragagent.websearch.domain.WebSearchProviderEntity;
 import com.ragagent.websearch.domain.WebSearchProviderParams;
 import com.ragagent.websearch.mapper.WebSearchProviderRepository;
 import org.springframework.stereotype.Service;
@@ -38,16 +38,16 @@ public class WebSearchProviderService {
         this.ssrfGuard = ssrfGuard;
     }
 
-    public WebSearchProvider getByID(long tenantId, String id) {
+    public WebSearchProviderEntity getByID(long tenantId, String id) {
         return repo.getByID(tenantId, id);
     }
 
-    public List<WebSearchProvider> list(long tenantId) {
+    public List<WebSearchProviderEntity> list(long tenantId) {
         return repo.list(tenantId);
     }
 
     /** 创建 provider：校验（失败=普通 error）→ 清默认（失败仅告警）→ 落库 */
-    public void create(WebSearchProvider provider) {
+    public void create(WebSearchProviderEntity provider) {
         if (provider.getTenantId() == null || provider.getTenantId() == 0) {
             throw failed("tenant ID is required");
         }
@@ -71,7 +71,7 @@ public class WebSearchProviderService {
     }
 
     /** 更新：注意 is_default 无条件覆盖（false 也会清除其它默认语义见 clearDefault 排除自身） */
-    public void update(WebSearchProvider provider) {
+    public void update(WebSearchProviderEntity provider) {
         if (provider.getTenantId() == null || provider.getTenantId() == 0) {
             throw failed("tenant ID is required");
         }
@@ -93,8 +93,8 @@ public class WebSearchProviderService {
     }
 
     /** 更新凭据：key 缺失/为空/与现值相同 → 不写库，直接返回现有行 */
-    public WebSearchProvider updateCredentials(long tenantId, String id, String apiKey) {
-        WebSearchProvider existing = repo.getByID(tenantId, id);
+    public WebSearchProviderEntity updateCredentials(long tenantId, String id, String apiKey) {
+        WebSearchProviderEntity existing = repo.getByID(tenantId, id);
         if (existing == null) {
             throw failed("web search provider not found");
         }
@@ -112,7 +112,7 @@ public class WebSearchProviderService {
         if (!"apiKey".equals(field)) {
             throw failed("unknown credential field: " + field);
         }
-        WebSearchProvider existing = repo.getByID(tenantId, id);
+        WebSearchProviderEntity existing = repo.getByID(tenantId, id);
         if (existing == null) {
             throw failed("web search provider not found");
         }

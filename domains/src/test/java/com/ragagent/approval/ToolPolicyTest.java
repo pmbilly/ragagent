@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Timeout;
 import com.ragagent.mcp.service.Adapter;
 
 /**
- * 工具批量策略判定（{@code Gate} 与 {@code ToolPolicy} 的 enabledTools）。
+ * 工具批量策略判定（{@code Gate} 与 {@code ApprovalToolPolicy} 的 enabledTools）。
  *
  * <p>覆盖点：批量只读一次、行按 (tenant, service) 过滤、只覆盖被请求的名字、
  * 身份缺失与取消信号在**查询之前**短路、底层异常原样上抛、
@@ -97,7 +97,7 @@ class ToolPolicyTest {
         assertEquals(Map.of("a", true), adapter.enabledTools(Cancellation.none(), 7, "svc", List.of("a")));
     }
 
-    /** 补充用例：静态入口（{@code ToolPolicy.enabledTools}）在 bulk checker 上走批量。 */
+    /** 补充用例：静态入口（{@code ApprovalToolPolicy.enabledTools}）在 bulk checker 上走批量。 */
     @Test
     void freeFunctionUsesBulkCheckerWhenAvailable() {
         StubChecker.BatchPolicyService svc = new StubChecker.BatchPolicyService();
@@ -105,7 +105,7 @@ class ToolPolicyTest {
         Adapter adapter = new Adapter(svc);
 
         Map<String, Boolean> viaFreeFunction =
-                ToolPolicy.enabledTools(Cancellation.none(), adapter, 7, "svc", List.of("a", "b"));
+                ApprovalToolPolicy.enabledTools(Cancellation.none(), adapter, 7, "svc", List.of("a", "b"));
         assertEquals(Map.of("a", false, "b", true), viaFreeFunction);
         assertEquals(1, svc.reads, "自由函数把批量能力转发给 Adapter，仍然只读一次");
     }

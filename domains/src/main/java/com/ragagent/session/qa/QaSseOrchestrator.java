@@ -30,7 +30,7 @@ import com.ragagent.stream.StreamBatch;
 import com.ragagent.stream.StreamEvent;
 import com.ragagent.stream.StreamManager;
 import jakarta.servlet.http.HttpServletResponse;
-import com.ragagent.agent.domain.ToolCall;
+import com.ragagent.agent.domain.AgentToolCall;
 import com.ragagent.common.llm.ToolResult;
 import com.ragagent.event.TenantContextSnapshot;
 import com.ragagent.event.payload.StopData;
@@ -346,7 +346,7 @@ public final class QaSseOrchestrator {
                     if (duration == 0 && started != null) {
                         duration = System.currentTimeMillis() - started;
                     }
-                    ToolCall call = new ToolCall();
+                    AgentToolCall call = new AgentToolCall();
                     call.setId("pipeline:" + data.getToolCallId());
                     call.setName(data.getToolName());
                     call.setArgs(args);
@@ -362,7 +362,7 @@ public final class QaSseOrchestrator {
             }
         });
     }
-    private static void appendQuickAnswerToolCall(Message msg, ToolCall call) {
+    private static void appendQuickAnswerToolCall(Message msg, AgentToolCall call) {
         AgentStep step = QaTurnSupport.ensureQuickAnswerStep(msg);
         if (step.getToolCalls() != null) {
             for (int i = 0; i < step.getToolCalls().size(); i++) {

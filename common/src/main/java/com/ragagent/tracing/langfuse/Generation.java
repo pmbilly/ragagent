@@ -10,7 +10,7 @@ public interface Generation {
     String getId();
 
     /** 记终态。 */
-    void finish(Object output, TokenUsage usage, String err);
+    void finish(Object output, LangfuseTokenUsage usage, String err);
 
     /** 记首个 token 到达时刻（TTFT 用）。 */
     void markCompletionStart();

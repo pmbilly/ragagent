@@ -37,7 +37,7 @@ class ApprovalWireFormatTest {
 
     @Test
     void toolApprovalRequiredWireFormat() {
-        ToolApprovalRequiredData data = new ToolApprovalRequiredData(
+        ApprovalRequiredNotice data = new ApprovalRequiredNotice(
                 "p1", 7, "s1", "m1", "svc", "svcname", "tool", "mcp_tool",
                 "desc", Map.of("a", 1), "{\"a\":1}", 60, 1700000000L, "tc1", "r1");
 
@@ -59,7 +59,7 @@ class ApprovalWireFormatTest {
         assertEquals("r1", node.get("requestId").asText());
 
         // 空值省略：args/argsJson/request_id
-        String minimal = ApprovalJson.write(new ToolApprovalRequiredData(
+        String minimal = ApprovalJson.write(new ApprovalRequiredNotice(
                 "p1", 7, "s1", "m1", "svc", "svcname", "tool", "mcp_tool",
                 "desc", null, "", 60, 1700000000L, "tc1", ""));
         assertFalse(minimal.contains("argsJson"));
@@ -70,7 +70,7 @@ class ApprovalWireFormatTest {
     @Test
     void toolApprovalResolvedWireFormat() {
         JsonNode node = parse(ApprovalJson.write(
-                new ToolApprovalResolvedData("p1", false, "no", true, false)));
+                new ApprovalResolvedNotice("p1", false, "no", true, false)));
         assertEquals("p1", node.get("pendingId").asText());
         assertFalse(node.get("approved").asBoolean());
         assertEquals("no", node.get("reason").asText());
@@ -78,7 +78,7 @@ class ApprovalWireFormatTest {
         assertFalse(node.get("canceled").asBoolean());
 
         // reason 为空 → 键缺席
-        assertFalse(ApprovalJson.write(new ToolApprovalResolvedData("p1", true, "", false, false))
+        assertFalse(ApprovalJson.write(new ApprovalResolvedNotice("p1", true, "", false, false))
                 .contains("reason"));
     }
 
@@ -163,8 +163,8 @@ class ApprovalWireFormatTest {
         assertEquals("mcpOauthRequired", ResponseType.MCP_OAUTH_REQUIRED.value());
         assertEquals("mcpOauthResolved", ResponseType.MCP_OAUTH_RESOLVED.value());
 
-        Event evt = Event.of("id-1", ResponseType.TOOL_APPROVAL_REQUIRED, "s1",
-                new ToolApprovalResolvedData("p1", true, "", false, false),
+        ApprovalEvent evt = ApprovalEvent.of("id-1", ResponseType.TOOL_APPROVAL_REQUIRED, "s1",
+                new ApprovalResolvedNotice("p1", true, "", false, false),
                 Map.of("pendingId", "p1"), "r1");
         assertEquals("id-1", evt.id());
         assertEquals("s1", evt.sessionId());

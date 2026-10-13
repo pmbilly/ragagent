@@ -8,7 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import com.ragagent.agent.domain.AgentState;
-import com.ragagent.agent.domain.ToolCall;
+import com.ragagent.agent.domain.AgentToolCall;
 import com.ragagent.event.EventBus;
 import com.ragagent.event.EventJson;
 import com.ragagent.llm.domain.ChatMessage;
@@ -67,7 +67,7 @@ class EngineRecordingTest {
         return mask(sb.append(']').toString());
     }
 
-    private static String toolCallJson(ToolCall call) {
+    private static String toolCallJson(AgentToolCall call) {
         return mask(EventJson.write(call));
     }
 
@@ -274,7 +274,7 @@ class EngineRecordingTest {
                 tc.setUnresolvedHandles(List.of("d99"));
             }
 
-            ToolCall got = engine.runToolCall(tc, 0, 0, 1, "sess-1", "msg-1", null);
+            AgentToolCall got = engine.runToolCall(tc, 0, 0, 1, "sess-1", "msg-1", null);
             String groupPrefix = "R_RUN_TOOL_CALL_ARGS_" + c.name().toUpperCase(java.util.Locale.ROOT);
             if ("unrepairable".equals(c.name())) {
                 // 已知通道差异：参数解析的历史错误文案（

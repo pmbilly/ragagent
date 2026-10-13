@@ -10,7 +10,7 @@ package com.ragagent.approval;
  * {@link Gate#isEnabled} 直接向上抛）。</p>
  *
  * <p>{@code isEnabled} 由父接口 {@link EnabledChecker} 提供——
- * 目录批量校验 {@link ToolPolicy} 只要求这一个方法，
+ * 目录批量校验 {@link ApprovalToolPolicy} 只要求这一个方法，
  * 用继承表达这一关系，免得同一个签名要在两个不相干接口里各写一遍。</p>
  */
 public interface Checker extends EnabledChecker {

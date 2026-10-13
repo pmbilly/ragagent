@@ -288,7 +288,7 @@ final class DefaultLangfuseManager implements LangfuseManager {
         }
 
         @Override
-        public void finish(Object output, TokenUsage usage, String err) {
+        public void finish(Object output, LangfuseTokenUsage usage, String err) {
             if (!enabled()) {
                 return;
             }

@@ -15,13 +15,13 @@ import java.util.Map;
  * 拆成一个个具名字段会造出「配了一半、根本认证不了」的中间态。
  * 所以 PUT 整张替换、DELETE 整张清空，不做单字段增删。</p>
  */
-public record CredentialsResponse(
-        Map<String, CredentialFieldMetadata> fields) {
+public record DatasourceCredentialsResponse(
+        Map<String, DatasourceCredentialFieldMetadata> fields) {
 
     /** 单字段形态：{@code {"credentials": {configured}}}。 */
-    public static CredentialsResponse credentials(boolean configured) {
-        Map<String, CredentialFieldMetadata> fields = new LinkedHashMap<>();
-        fields.put("credentials", new CredentialFieldMetadata(configured));
-        return new CredentialsResponse(fields);
+    public static DatasourceCredentialsResponse credentials(boolean configured) {
+        Map<String, DatasourceCredentialFieldMetadata> fields = new LinkedHashMap<>();
+        fields.put("credentials", new DatasourceCredentialFieldMetadata(configured));
+        return new DatasourceCredentialsResponse(fields);
     }
 }

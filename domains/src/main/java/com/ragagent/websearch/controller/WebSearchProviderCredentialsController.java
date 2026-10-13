@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.BizException;
-import com.ragagent.websearch.domain.WebSearchProvider;
+import com.ragagent.websearch.domain.WebSearchProviderEntity;
 import com.ragagent.websearch.service.WebSearchProviderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -49,13 +49,13 @@ public class WebSearchProviderCredentialsController {
         long tenantId = tenantId();
         String apiKey = parseApiKey(rawBody);
         if (apiKey == null) {
-            WebSearchProvider provider = safeGet(tenantId, id);
+            WebSearchProviderEntity provider = safeGet(tenantId, id);
             if (provider == null) {
                 throw BizException.notFound("web search provider not found");
             }
             return ResponseEntity.ok(fieldsBody(configured(provider)));
         }
-        WebSearchProvider updated;
+        WebSearchProviderEntity updated;
         try {
             updated = service.updateCredentials(tenantId, id, apiKey);
         } catch (RuntimeException e) {
@@ -90,7 +90,7 @@ public class WebSearchProviderCredentialsController {
         return tenantId;
     }
 
-    private WebSearchProvider safeGet(long tenantId, String id) {
+    private WebSearchProviderEntity safeGet(long tenantId, String id) {
         try {
             return service.getByID(tenantId, id);
         } catch (RuntimeException e) {
@@ -98,7 +98,7 @@ public class WebSearchProviderCredentialsController {
         }
     }
 
-    private static boolean configured(WebSearchProvider row) {
+    private static boolean configured(WebSearchProviderEntity row) {
         return row != null && row.getParameters() != null && !row.getParameters().getApiKey().isEmpty();
     }
 

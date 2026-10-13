@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.ragagent.storage.support.FileService;
+import com.ragagent.storage.support.FileUrlPort;
 
 /**
  * 把 {@code storageurl} 包的两个端口接到生产实现（A3-3 接线）：
@@ -14,7 +14,7 @@ import com.ragagent.storage.support.FileService;
  * <ul>
  *   <li>{@link com.ragagent.storage.support.StorageBackendResolver} → 见
  *       {@link FileserveStorageBackendResolver}（{@code @Component}）；</li>
- *   <li>{@link com.ragagent.storage.support.FileService}（进程级默认）→ 本类的 bean：
+ *   <li>{@link com.ragagent.storage.support.FileUrlPort}（进程级默认）→ 本类的 bean：
  *       恒 local 基座 + resource
  *       catalog 装饰（于是 {@code resource://} 手柄在 {@code APP_EXTERNAL_URL} 在位时
  *       能派生出 {@code /r/<token>} 能力链接，此前该分支恒不可达）。</li>
@@ -34,7 +34,7 @@ public class StorageUrlWiringConfig {
      * {@code /data/files}），避免两处对"根在哪"有分歧。</p>
      */
     @Bean
-    public FileService storageUrlDefaultFileService(
+    public FileUrlPort storageUrlDefaultFileService(
             StorageFileResolver resolver,
             @Value("${weknora.storage.local-base-dir:${LOCAL_STORAGE_BASE_DIR:/data/files}}")
                     String localBaseDir) {
@@ -42,7 +42,7 @@ public class StorageUrlWiringConfig {
     }
 
     /** 窄口（只有 GetFileURL）→ fileserve 读取面的适配；失败按契约转 RuntimeException。 */
-    private record UrlPort(FileContentService inner) implements FileService {
+    private record UrlPort(FileContentService inner) implements FileUrlPort {
 
         @Override
         public String getFileURL(String filePath) {

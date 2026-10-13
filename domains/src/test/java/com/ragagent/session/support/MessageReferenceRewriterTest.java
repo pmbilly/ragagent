@@ -9,12 +9,12 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import com.ragagent.agent.domain.AgentStep;
-import com.ragagent.agent.domain.ToolCall;
+import com.ragagent.agent.domain.AgentToolCall;
 import com.ragagent.common.llm.ToolResult;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.session.domain.Message;
 import com.ragagent.session.domain.MessageImage;
-import com.ragagent.storage.support.FileService;
+import com.ragagent.storage.support.FileUrlPort;
 import com.ragagent.storage.support.Rewriter;
 import com.ragagent.storage.support.Mode;
 
@@ -32,7 +32,7 @@ class MessageReferenceRewriterTest {
     }
 
     /** 固定解析：任何输入都返回同一 URL（与原 storage 侧用例的 StubFileService 等价）。 */
-    private static final class StubFileService implements FileService {
+    private static final class StubFileService implements FileUrlPort {
         private final String url;
 
         StubFileService(String url) {
@@ -132,7 +132,7 @@ class MessageReferenceRewriterTest {
 
         ToolResult toolResult = new ToolResult();
         toolResult.setOutput("chart ![o](resource://xifDo7NTSL300Lp1goVutw)");
-        ToolCall call = new ToolCall();
+        AgentToolCall call = new AgentToolCall();
         call.setReflection("saw ![r](resource://xifDo7NTSL300Lp1goVutw)");
         call.setResult(toolResult);
 

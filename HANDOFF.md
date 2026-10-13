@@ -531,7 +531,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B253 | 5 | A4：并发工具状态提交顺序（`seenChunks` 单一 writer / 按调用序回填） | ✅ 2026-10-13 |
 | B254 | 5 | controller 剥离编排（`KnowledgeQaController` 14 构造参数、`QaRequestParser` 拆分） | ✅ 2026-10-13 |
 | B255 | 5 | 检索中立 `SearchHit`（去上层对 `PgVectorRetrieveRepository` 内部类型依赖） | ✅ 2026-10-13 |
-| B256 | 6 包结构 | §10 改名清算：10 组同名歧义 + 3 组域前缀（纯改名） | ⬜ |
+| B256 | 6 包结构 | §10 改名清算：10 组同名歧义 + 3 组域前缀（纯改名） | ✅ 2026-10-13 |
 | B257 | 6 | §7 命名与边界：`agent/tools`→`agenttools`、`agent/management`→`agentmanagement` + 边界规则 | ⬜ |
 | B258 | 6 | contracts 包边界（模块 DAG + 跨域边界规则） | ⬜ |
 | B259 | 6 | platform 包边界（`:common` 其余收拢） | ⬜ |
@@ -791,6 +791,16 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **闸门**：`spotlessCheck build` ✓ **1m30s** ✓ · **4969 / 失败 0 / 跳过 4** ✓（+1）· 十一守卫 ✓。
 - **登记（未做）**：① `KnowledgeQaController` 构造参数仍 **14 个**（编排类虽已迁出，控制器仍直接注入它们与 4 个 `ObjectProvider`）——真正减参需要"QA 轮门面/Facade"一层，列入后续；② `QaRequestParser`（295 行）内部拆分未做（验收只要包规则）；③ `QaAttachmentResolver` 的附件编排与 `QaRequestBinder` 的绑定逻辑仍可再向内收。
 - **观察（非本批引入，flake）**：本次全量闸门首跑 `ModelConcurrencyGovernorWiringTest.settingsFailureLeavesGovernorUnwired` 偶发失败，**重跑 4/4 全绿**（并发/环境时序），已登记观察。
+
+**✅ B256（2026-10-13，§10 改名清算：16 组，纯改名零行为变更）**
+- **改名映射（§10.1 十组）**：agent 侧 `ToolCall`→`AgentToolCall`；approval 侧 `ToolPolicy`→`ApprovalToolPolicy`；langfuse 侧 `TokenUsage`→`LangfuseTokenUsage`；model.service 侧 `ProviderRegistry`→`ModelProviderCatalog`；storage.support 侧 `FileService`→`FileUrlPort`；websearch **实体** `WebSearchProvider`→`WebSearchProviderEntity`；approval 侧 `Event`/`EventBus`→`ApprovalEvent`/`ApprovalEventBus`；approval 侧 `ToolApprovalRequiredData`/`ToolApprovalResolvedData`→`ApprovalRequiredNotice`/`ApprovalResolvedNotice`。
+- **§10.2 域前缀（三份 wire DTO）**：`datasource|mcp|model` 各自加前缀 → `Datasource|Mcp|Model` + `CredentialsResponse` / `CredentialFieldMetadata`（类名变了、**JSON 字段不变** ⇒ 金片零变化）；`FeishuRegion` / `ZhipuProvider` 按方案"可保留（不同域/不同能力）"未动。
+- **顺带收敛**：改名带出的 **R8 内联全限定名 30 处清零**（`check-package-cycles.py` R8：4 允许 / 0 违规）——改回"import + 短名"，不新增任何依赖边；**环 0 / 包级 SCC 13=基线 / R7 0 不一致**，`已解耦包对`未回增。
+- **基线同步（按结构批纪律，非掩盖）**：`scripts/json-key-freeze.baseline.json` 随 `tracing/langfuse/TokenUsage.java → LangfuseTokenUsage.java` 搬家同步（离开 1 进入 1，守卫自身指引 `--write`；前缀 `tracing/langfuse` 覆盖未变）。
+- **测试**：**4970 / 失败 0 / 跳过 4**（纯改名，无新增测试）；契约金片（1349 个）**键签名零变化** ⇒ 对外线格式未变。
+- **闸门**：`spotlessCheck build` ✓ **1m38s** ✓ · 十一守卫 ✓。
+- **教训（写入 §15.4 方法论，务必遵守）**：整仓"简单名替换"会连坐同前缀类（`ToolCall`→`ToolCallTarget`）、误伤**字符串字面量 / javadoc 提及 / `package` 声明 / 包名前缀**，还会因 span 截断产出"包名当类型"的半截 FQN——本批第一次尝试因此产生 4 次大规模误伤（1405 文件 / 2094 处包声明 / 39 文件），全部 stash 撤销。**正确姿势**：① 按 import 判据限定作用域；② 只替换"匹配文本本身即完整类型"的 FQN（绝不按前缀切）；③ 占用判据必须含"本文件已声明的内嵌类型"；④ **每改一批立刻编译 + 跑守卫**（本次最终只动 12+1 个文件、逐条验证即收口）。
+- **登记（未做）**：方案 §10.1 里的 `ModelResponse`（只剩 1 份，无歧义）未改名；`ToolResult` 已在早期统一（1 份）。
 
 **✅ B255（2026-10-13，阶段 5 收口：检索中立类型）**
 - **勘察结论（修正了方案的一句话）**："上层（domains/boot）依赖 `PgVectorRetrieveRepository` 内部类型"其实**已不成立**（实测 domains/boot main 源零引用）；真正的泄漏在**引擎内部**：编排层（`HybridSearchService` / `HybridFusionOps` / `HybridResultOps` / `RetrievalObs`）说的是 `PgVectorRetrieveRepository.IndexHit`/`RetrieveResult`——**具体向量库适配器**的行形状，而不是引擎契约里早就存在的 `EngineTypes.IndexWithScore`/`EngineTypes.RetrieveResult`，于是每次取回都要过一次 `toPgShape` 转换。

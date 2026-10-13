@@ -4,7 +4,7 @@ import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.model.domain.Model;
-import com.ragagent.model.dto.CredentialsResponse;
+import com.ragagent.model.dto.ModelCredentialsResponse;
 import com.ragagent.model.dto.ModelCredentialsPutRequest;
 import com.ragagent.model.service.ModelService;
 import com.ragagent.model.service.ModelService.ModelNotFoundException;
@@ -40,7 +40,7 @@ public class ModelCredentialsController {
 
     /** 写入/清除凭据（Admin+）；两字段均缺省时返回已配置状态。 */
     @PutMapping("/{id}/credentials")
-    public ResponseEntity<CredentialsResponse> put(@PathVariable("id") String id,
+    public ResponseEntity<ModelCredentialsResponse> put(@PathVariable("id") String id,
             @RequestBody(required = false) ModelCredentialsPutRequest req) {
         Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null || tenantId == 0) {
@@ -56,7 +56,7 @@ public class ModelCredentialsController {
             } catch (ModelNotFoundException e) {
                 throw new BizException(AppError.notFound("Model not found"));
             }
-            return ResponseEntity.ok(CredentialsResponse.of(
+            return ResponseEntity.ok(ModelCredentialsResponse.of(
                     !m.getParameters().getApiKey().isEmpty(),
                     !m.getParameters().getAppSecret().isEmpty()));
         }
@@ -66,7 +66,7 @@ public class ModelCredentialsController {
         } catch (ModelNotFoundException e) {
             throw new BizException(AppError.notFound("Model not found"));
         }
-        return ResponseEntity.ok(CredentialsResponse.of(
+        return ResponseEntity.ok(ModelCredentialsResponse.of(
                 !updated.getParameters().getApiKey().isEmpty(),
                 !updated.getParameters().getAppSecret().isEmpty()));
     }

@@ -145,7 +145,7 @@ public class Rewriter {
     }
 
     private String resolve(String ref) {
-        FileService fileService = resolver.resolveFileService(ref);
+        FileUrlPort fileService = resolver.resolveFileService(ref);
         if (fileService == null) {
             log.warn("[{}] storage URL rewrite: no file service for src={}", logPrefix, ref);
             return ref;
@@ -185,7 +185,7 @@ public class Rewriter {
      * 调用方**本来就有权收到**的响应，所以是**服务端**而非客户端决定哪些资源拿到 URL。</p>
      */
     public static Rewriter forRequest(Mode mode, Tenant tenant,
-                                      FileService defaultSvc,
+                                      FileUrlPort defaultSvc,
                                       StorageBackendResolver storageResolver) {
         if (mode != Mode.PUBLIC) {
             return new Rewriter(null, "API");

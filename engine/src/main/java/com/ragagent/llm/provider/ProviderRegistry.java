@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 服务商注册表 + DetectProvider。
  *
- * ⚠️ 与 com.ragagent.model.service.ProviderRegistry 不是一回事：那个是模型模块的 HTTP 目录
+ * ⚠️ 与 com.ragagent.model.service.ModelProviderCatalog 不是一回事：那个是模型模块的 HTTP 目录
  * 响应（golden 数据 + 前端字符串映射），本类供运行时路由与校验使用。
  *
  * 注册由本类静态块按 {@link #allProviders()} 的顺序显式完成

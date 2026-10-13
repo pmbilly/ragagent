@@ -13,7 +13,7 @@ import com.ragagent.session.domain.MessageSearchResult;
 import com.ragagent.session.domain.SessionNotFoundException;
 import com.ragagent.session.dto.SearchMessagesRequest;
 import com.ragagent.session.service.MessageService;
-import com.ragagent.storage.support.FileService;
+import com.ragagent.storage.support.FileUrlPort;
 import com.ragagent.storage.support.Mode;
 import com.ragagent.storage.support.PublicModeForbiddenException;
 import com.ragagent.storage.support.ResourceModeException;
@@ -70,17 +70,17 @@ public class MessageController {
     private static final String RECORD_NOT_FOUND = "record not found";
 
     private final MessageService messageService;
-    private final FileService fileService;
+    private final FileUrlPort fileService;
     private final StorageBackendResolver storageBackendResolver;
     private final TenantService tenantService;
 
     public MessageController(MessageService messageService,
-                             ObjectProvider<FileService> fileService,
+                             ObjectProvider<FileUrlPort> fileService,
                              ObjectProvider<StorageBackendResolver> storageBackendResolver,
                              TenantService tenantService) {
         this.messageService = messageService;
         // 两个端口按 ObjectProvider 取（A3-3 起 StorageBackendResolver 有生产实现；
-        // FileService 的进程级实现仍属装配项），缺 bean 时按未装配分支降级。
+        // FileUrlPort 的进程级实现仍属装配项），缺 bean 时按未装配分支降级。
         this.fileService = fileService.getIfAvailable();
         this.storageBackendResolver = storageBackendResolver.getIfAvailable();
         this.tenantService = tenantService;

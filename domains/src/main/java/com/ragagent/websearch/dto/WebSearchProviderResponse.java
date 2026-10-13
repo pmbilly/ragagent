@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.ragagent.websearch.domain.WebSearchProvider;
+import com.ragagent.websearch.domain.WebSearchProviderEntity;
 
 /**
  * provider 响应 DTO。api_key **按构造摘除**；
@@ -27,7 +27,7 @@ public class WebSearchProviderResponse {
     public OffsetDateTime updatedAt;
     public Map<String, CredentialFieldMetadata> credentials;
 
-    public static WebSearchProviderResponse from(WebSearchProvider e, boolean canViewIntegrationSecrets) {
+    public static WebSearchProviderResponse from(WebSearchProviderEntity e, boolean canViewIntegrationSecrets) {
         WebSearchProviderResponse r = new WebSearchProviderResponse();
         r.id = e.getId();
         r.tenantId = e.getTenantId() == null ? 0L : e.getTenantId();
@@ -55,11 +55,11 @@ public class WebSearchProviderResponse {
         return r;
     }
 
-    public static List<WebSearchProviderResponse> listOf(List<WebSearchProvider> es, boolean canViewSecrets) {
+    public static List<WebSearchProviderResponse> listOf(List<WebSearchProviderEntity> es, boolean canViewSecrets) {
         // 空仓库序列化为 []（非 null）
         java.util.ArrayList<WebSearchProviderResponse> out = new java.util.ArrayList<>();
         if (es != null) {
-            for (WebSearchProvider e : es) {
+            for (WebSearchProviderEntity e : es) {
                 out.add(from(e, canViewSecrets));
             }
         }

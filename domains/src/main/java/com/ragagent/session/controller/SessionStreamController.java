@@ -32,7 +32,7 @@ import com.ragagent.storage.support.PublicModeForbiddenException;
 import com.ragagent.storage.support.ResourceModeException;
 import com.ragagent.storage.support.Rewriter;
 import com.ragagent.storage.support.StorageBackendResolver;
-import com.ragagent.storage.support.FileService;
+import com.ragagent.storage.support.FileUrlPort;
 import com.ragagent.storage.support.StreamRewriter;
 import com.ragagent.stream.StreamBatch;
 import com.ragagent.stream.StreamEvent;
@@ -85,7 +85,7 @@ public class SessionStreamController {
     private final MessageService messageService;
     private final StreamManager streamManager;
     private final StreamEventEmitter emitter;
-    private final FileService fileService;
+    private final FileUrlPort fileService;
     private final StorageBackendResolver storageBackendResolver;
     private final TenantService tenantService;
 
@@ -94,14 +94,14 @@ public class SessionStreamController {
             MessageService messageService,
             StreamManager streamManager,
             StreamEventEmitter emitter,
-            ObjectProvider<FileService> fileService,
+            ObjectProvider<FileUrlPort> fileService,
             ObjectProvider<StorageBackendResolver> storageBackendResolver,
             TenantService tenantService) {
         this.sessionService = sessionService;
         this.messageService = messageService;
         this.streamManager = streamManager;
         this.emitter = emitter;
-        // A3-3 起 StorageBackendResolver 有生产实现（fileserve 桥）；FileService 的
+        // A3-3 起 StorageBackendResolver 有生产实现（fileserve 桥）；FileUrlPort 的
         // 进程级实现仍属装配项。缺 bean 时按未装配分支降级：引用原样保留成 handle。
         this.fileService = fileService.getIfAvailable();
         this.storageBackendResolver = storageBackendResolver.getIfAvailable();
@@ -130,7 +130,7 @@ public class SessionStreamController {
     }
 
     /**
-     * 当前租户的实体，供 {@link com.ragagent.storage.support.FileServiceResolver} 读
+     * 当前租户的实体，供 {@link com.ragagent.storage.support.FileUrlPortResolver} 读
      * {@code storage_engine_config.default_provider}。
      *
      * <p><b>A3-3 接线</b>：{@code TenantContext} 只存 tenantId、不存租户实体，

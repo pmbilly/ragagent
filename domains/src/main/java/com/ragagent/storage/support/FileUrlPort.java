@@ -20,7 +20,7 @@ package com.ragagent.storage.support;
  * provider 级服务由 {@code FileServiceResolver} 经工厂按租户配置取用。
  * 端口仍可为空（缺 bean / 解析失败）——那时引用按 handle 保留。</p>
  */
-public interface FileService {
+public interface FileUrlPort {
 
     /** 解析为可被外部客户端直接加载的 http(s) URL。 */
     String getFileURL(String filePath);

@@ -1,7 +1,9 @@
 package com.ragagent.approval;
 
-import com.ragagent.event.Event;
+import com.ragagent.event.payload.ToolApprovalResolvedData;
+import com.ragagent.event.payload.ToolApprovalRequiredData;
 import com.ragagent.event.EventBus;
+import com.ragagent.event.Event;
 import com.ragagent.event.payload.MCPOAuthRequiredData;
 import com.ragagent.event.payload.MCPOAuthResolvedData;
 import com.ragagent.agent.tools.ToolCancellation;
@@ -12,7 +14,7 @@ import com.ragagent.agent.tools.ToolCancellation;
  * <ul>
  *   <li>{@code ToolCancellation}（ctx.Err() 语义）→ {@code approval.Cancellation}
  *       （isCancelled + onCancel 最小面；工具侧没有"取消时回调"的注册点，实现为 no-op）；</li>
- *   <li>{@code event.EventBus / event.Event} → {@code approval.EventBus / approval.Event}
+ *   <li>{@code event.ApprovalEventBus / event.ApprovalEvent} → {@code approval.ApprovalEventBus / approval.ApprovalEvent}
  *       （gate 只发不订——逐字段转投真实总线）；</li>
  *   <li>{@code approval.*} 门内 DTO → {@code event.payload.*} 线格式 DTO（见 {@link #toPayloadData}）。</li>
  * </ul>
@@ -71,7 +73,7 @@ public final class ApprovalBridge {
         };
     }
 
-    public static com.ragagent.approval.EventBus toEventBus(EventBus bus) {
+    public static ApprovalEventBus toEventBus(EventBus bus) {
         if (bus == null) {
             return null;
         }
@@ -91,15 +93,15 @@ public final class ApprovalBridge {
      * 未知形态原样透传（向后兼容）。
      */
     private static Object toPayloadData(Object data) {
-        if (data instanceof ToolApprovalRequiredData d) {
-            return new com.ragagent.event.payload.ToolApprovalRequiredData(
+        if (data instanceof ApprovalRequiredNotice d) {
+            return new ToolApprovalRequiredData(
                     d.pendingId(), d.tenantId(), d.sessionId(), d.assistantMessageId(),
                     d.serviceId(), d.serviceName(), d.mcpToolName(), d.registeredToolName(),
                     d.description(), d.args(), d.argsJson(), d.timeoutSeconds(),
                     d.requestedAtUnix(), d.toolCallId(), d.requestId());
         }
-        if (data instanceof ToolApprovalResolvedData d) {
-            return new com.ragagent.event.payload.ToolApprovalResolvedData(
+        if (data instanceof ApprovalResolvedNotice d) {
+            return new ToolApprovalResolvedData(
                     d.pendingId(), d.approved(), d.reason(), d.timedOut(), d.canceled());
         }
         if (data instanceof McpOauthRequiredData d) {

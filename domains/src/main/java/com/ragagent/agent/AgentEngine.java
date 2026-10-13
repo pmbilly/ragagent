@@ -1,5 +1,6 @@
 package com.ragagent.agent;
 
+import com.ragagent.llm.domain.ToolCall;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ import com.fasterxml.jackson.databind.node.NullNode;
 import com.ragagent.agent.compaction.CompactionSettings;
 import com.ragagent.agent.compaction.Compactor;
 import com.ragagent.agent.domain.AgentState;
-import com.ragagent.agent.domain.ToolCall;
+import com.ragagent.agent.domain.AgentToolCall;
 import com.ragagent.event.TenantContextSnapshot;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatResponse;
@@ -289,7 +290,7 @@ public class AgentEngine {
 
     // ---- 包内测试/跨段 seam 委托（实现随 ReAct 各段协作者）----
 
-    ToolCall runToolCall(com.ragagent.llm.domain.ToolCall tc, int i, int iteration, int round,
+    AgentToolCall runToolCall(ToolCall tc, int i, int iteration, int round,
             String sessionId, String assistantMessageID, TenantContextSnapshot tenant) {
         return act.runToolCall(tc, i, iteration, round, sessionId, assistantMessageID, tenant);
     }

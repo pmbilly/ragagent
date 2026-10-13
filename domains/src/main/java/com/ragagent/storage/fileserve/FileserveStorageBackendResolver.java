@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 import com.ragagent.tenant.Tenant;
 import com.ragagent.tenant.TenantLookup;
-import com.ragagent.storage.support.FileService;
+import com.ragagent.storage.support.FileUrlPort;
 import com.ragagent.storage.support.StorageBackendResolver;
 
 /**
@@ -55,7 +55,7 @@ public class FileserveStorageBackendResolver implements StorageBackendResolver {
     }
 
     /** storageurl 窄口（只有 GetFileURL）→ fileserve 读取面的适配。 */
-    private record ContentServiceUrlPort(FileContentService inner) implements FileService {
+    private record ContentServiceUrlPort(FileContentService inner) implements FileUrlPort {
 
         @Override
         public String getFileURL(String filePath) {

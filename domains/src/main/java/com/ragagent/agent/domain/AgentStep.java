@@ -60,7 +60,7 @@ public class AgentStep {
     private String reasoningContent;
 
     /** 本轮 Act 阶段调用的工具。**恒输出**：null → {@code null}。 */
-    private List<ToolCall> toolCalls;
+    private List<AgentToolCall> toolCalls;
 
     /**
      * 本步发生的时间。零值输出 {@code 0001-01-01T00:00:00Z}，见类注释。
@@ -89,8 +89,8 @@ public class AgentStep {
     /** 字符串零值约定为 ""：传入 null 归一为 ""。 */
     public void setReasoningContent(String v) { reasoningContent = v == null ? "" : v; }
 
-    public List<ToolCall> getToolCalls() { return toolCalls; }
-    public void setToolCalls(List<ToolCall> v) { toolCalls = v; }
+    public List<AgentToolCall> getToolCalls() { return toolCalls; }
+    public void setToolCalls(List<AgentToolCall> v) { toolCalls = v; }
 
     /**
      * ⚠️ 返回的是**值类型语义**：未设置时给的是零值时间（{@code 0001-01-01T00:00:00Z}），
@@ -116,7 +116,7 @@ public class AgentStep {
         if (toolCalls == null) {
             return observations;
         }
-        for (ToolCall call : toolCalls) {
+        for (AgentToolCall call : toolCalls) {
             if (call.getResult() != null && !call.getResult().getOutput().isEmpty()) {
                 observations.add(call.getResult().getOutput());
             }

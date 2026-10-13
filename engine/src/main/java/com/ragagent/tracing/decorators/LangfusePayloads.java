@@ -1,6 +1,7 @@
 package com.ragagent.tracing.decorators;
 
-import com.ragagent.tracing.langfuse.TokenUsage;
+import com.ragagent.common.llm.TokenUsage;
+import com.ragagent.tracing.langfuse.LangfuseTokenUsage;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -127,7 +128,7 @@ final class LangfusePayloads {
     }
 
     /** embedding 用量估算：Σ(码点数/4 + 1)，空 → null。 */
-    static TokenUsage approxEmbeddingUsage(List<String> texts) {
+    static LangfuseTokenUsage approxEmbeddingUsage(List<String> texts) {
         int total = 0;
         for (String t : texts) {
             int runes = codePointCount(t);
@@ -143,7 +144,7 @@ final class LangfusePayloads {
     }
 
     /** rerank 用量估算：query + 各文档的 (码点数/4 + 1)。 */
-    static TokenUsage approxRerankUsage(String query, List<String> documents) {
+    static LangfuseTokenUsage approxRerankUsage(String query, List<String> documents) {
         int total = codePointCount(query) / 4 + 1;
         for (String d : documents) {
             total += codePointCount(d) / 4 + 1;
@@ -154,8 +155,8 @@ final class LangfusePayloads {
         return inputTokens(total);
     }
 
-    private static TokenUsage inputTokens(int total) {
-        TokenUsage usage = new TokenUsage();
+    private static LangfuseTokenUsage inputTokens(int total) {
+        LangfuseTokenUsage usage = new LangfuseTokenUsage();
         usage.input = total;
         usage.total = total;
         usage.unit = "TOKENS";
@@ -167,10 +168,10 @@ final class LangfusePayloads {
      * promptTokens=prompt 码点数/4+1、outputTokens=输出码点数/4 估算
      * （空输出 → 0；总数为两者之和）。
      */
-    static TokenUsage approxVlmUsage(String prompt, String result) {
+    static LangfuseTokenUsage approxVlmUsage(String prompt, String result) {
         int input = codePointCount(prompt) / 4 + 1;
         int output = codePointCount(result) / 4;
-        TokenUsage usage = new TokenUsage();
+        LangfuseTokenUsage usage = new LangfuseTokenUsage();
         usage.input = input;
         usage.output = output;
         usage.total = input + output;
@@ -179,7 +180,7 @@ final class LangfusePayloads {
     }
 
     /** chat 用量换算：三值全零 → null（不上报）；否则映射 + unit=TOKENS。 */
-    static TokenUsage convertUsage(com.ragagent.common.llm.TokenUsage usage) {
+    static LangfuseTokenUsage convertUsage(TokenUsage usage) {
         if (usage == null) {
             return null;
         }
@@ -187,7 +188,7 @@ final class LangfusePayloads {
                 && usage.getTotalTokens() == 0) {
             return null;
         }
-        TokenUsage out = new TokenUsage();
+        LangfuseTokenUsage out = new LangfuseTokenUsage();
         out.input = usage.getPromptTokens();
         out.output = usage.getCompletionTokens();
         out.total = usage.getTotalTokens();

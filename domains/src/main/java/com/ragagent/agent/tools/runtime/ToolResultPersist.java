@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.ragagent.agent.domain.AgentStep;
-import com.ragagent.agent.domain.ToolCall;
+import com.ragagent.agent.domain.AgentToolCall;
 import com.ragagent.agent.tools.ToolDefinitions;
 import com.ragagent.common.llm.ToolResult;
 
@@ -135,9 +135,9 @@ public final class ToolResultPersist {
                 out.add(copy);
                 continue;
             }
-            List<ToolCall> toolCalls = new java.util.ArrayList<>(step.getToolCalls().size());
-            for (ToolCall tc : step.getToolCalls()) {
-                ToolCall copyTc = new ToolCall();
+            List<AgentToolCall> toolCalls = new java.util.ArrayList<>(step.getToolCalls().size());
+            for (AgentToolCall tc : step.getToolCalls()) {
+                AgentToolCall copyTc = new AgentToolCall();
                 copyTc.setId(tc.getId());
                 copyTc.setName(tc.getName());
                 copyTc.setArgs(tc.getArgs());

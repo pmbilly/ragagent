@@ -5,7 +5,7 @@ import java.io.IOException;
 /**
  * 文件服务的读取面（{@code GetFile / GetFileURL} 两个方法——文件代理面消费的最小端口）。
  *
- * <p>与 storageurl 包的 {@link com.ragagent.storage.support.FileService}（只有
+ * <p>与 storageurl 包的 {@link com.ragagent.storage.support.FileUrlPort}（只有
  * GetFileURL 的重写器端口）刻意分开：本端口是 HTTP 流式面，归属
  * {@code com.ragagent.storage} 的实现。八种 provider 都有真实实现
  * （local 走 {@link LocalFileContentService}；云 provider 经

@@ -1,5 +1,6 @@
 package com.ragagent.session.service;
 
+import com.ragagent.agent.domain.AgentToolCall;
 import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -175,7 +176,7 @@ final class AgentHistoryAssembler {
         return msgs;
     }
     private static List<ChatMessage> buildAgentStepMessages(AgentStep step) {
-        List<com.ragagent.agent.domain.ToolCall> nonTerminalCalls = filterNonTerminalToolCalls(step.getToolCalls());
+        List<AgentToolCall> nonTerminalCalls = filterNonTerminalToolCalls(step.getToolCalls());
         if (nonTerminalCalls.isEmpty()) {
             if (step.isIntermediateAnswer() && step.getThought() != null && !step.getThought().isBlank()) {
                 ChatMessage msg = new ChatMessage();
@@ -236,9 +237,9 @@ final class AgentHistoryAssembler {
         msg.setContent(content);
         return msg;
     }
-    private static List<com.ragagent.agent.domain.ToolCall> filterNonTerminalToolCalls(
-            List<com.ragagent.agent.domain.ToolCall> calls) {
-        List<com.ragagent.agent.domain.ToolCall> out = new ArrayList<>();
+    private static List<AgentToolCall> filterNonTerminalToolCalls(
+            List<AgentToolCall> calls) {
+        List<AgentToolCall> out = new ArrayList<>();
         if (calls == null) {
             return out;
         }

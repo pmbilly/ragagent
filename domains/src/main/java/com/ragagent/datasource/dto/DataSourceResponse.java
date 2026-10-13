@@ -100,7 +100,7 @@ public class DataSourceResponse {
      * 而这里只有一个键——排序本身无所谓，但挂上它同时保证 {@code NON_EMPTY} 的语义
      * （自定义序列化器会让 {@code @JsonInclude(NON_EMPTY)} 失效）。
      */
-    private Map<String, CredentialFieldMetadata> credentials;
+    private Map<String, DatasourceCredentialFieldMetadata> credentials;
 
     /** 工厂：null 入参回 null。 */
     public static DataSourceResponse from(DataSource ds) {
@@ -141,7 +141,7 @@ public class DataSourceResponse {
         out.updatedAt = ds.getUpdatedAt();
         out.totalItemsSynced = ds.getTotalItemsSynced() == null ? 0L : ds.getTotalItemsSynced();
         out.latestSyncLog = ds.getLatestSyncLog();
-        out.credentials = CredentialsResponse.credentials(configured).fields();
+        out.credentials = DatasourceCredentialsResponse.credentials(configured).fields();
         return out;
     }
 
@@ -205,6 +205,6 @@ public class DataSourceResponse {
     public SyncLog getLatestSyncLog() { return latestSyncLog; }
     public void setLatestSyncLog(SyncLog v) { latestSyncLog = v; }
 
-    public Map<String, CredentialFieldMetadata> getCredentials() { return credentials; }
-    public void setCredentials(Map<String, CredentialFieldMetadata> v) { credentials = v; }
+    public Map<String, DatasourceCredentialFieldMetadata> getCredentials() { return credentials; }
+    public void setCredentials(Map<String, DatasourceCredentialFieldMetadata> v) { credentials = v; }
 }

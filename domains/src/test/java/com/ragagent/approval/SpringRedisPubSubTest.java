@@ -158,7 +158,7 @@ class SpringRedisPubSubTest {
         AtomicReference<ApprovalException> callerResult = new AtomicReference<>();
         AtomicReference<Boolean> callerDone = new AtomicReference<>(false);
         bus.on(ResponseType.TOOL_APPROVAL_REQUIRED, evt -> {
-            String pendingId = ((ToolApprovalRequiredData) evt.data()).pendingId();
+            String pendingId = ((ApprovalRequiredNotice) evt.data()).pendingId();
             Thread.ofVirtual().start(() -> {
                 callerResult.set(resolveQuietly(gateA, pendingId));
                 callerDone.set(true);

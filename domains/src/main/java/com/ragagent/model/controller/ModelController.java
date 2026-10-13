@@ -18,7 +18,7 @@ import com.ragagent.model.dto.ModelResponse;
 import com.ragagent.model.dto.UpdateModelRequest;
 import com.ragagent.model.service.ModelService;
 import com.ragagent.model.service.ModelService.ModelNotFoundException;
-import com.ragagent.model.service.ProviderRegistry;
+import com.ragagent.model.service.ModelProviderCatalog;
 
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -52,10 +52,10 @@ public class ModelController {
     private static final Logger log = LoggerFactory.getLogger(ModelController.class);
 
     private final ModelService modelService;
-    private final ProviderRegistry providerRegistry;
+    private final ModelProviderCatalog providerRegistry;
     private final SsrfGuard ssrfGuard;
 
-    public ModelController(ModelService modelService, ProviderRegistry providerRegistry,
+    public ModelController(ModelService modelService, ModelProviderCatalog providerRegistry,
                            SsrfGuard ssrfGuard) {
         this.modelService = modelService;
         this.providerRegistry = providerRegistry;
@@ -218,14 +218,14 @@ public class ModelController {
         return ApiResponse.ok();   // 204 退役（空体与「外壳恒存在」冲突）
     }
 
-    /** 模型提供方列表（Viewer+）；{@code modelType} 支持的取值由 ProviderRegistry 映射。 */
+    /** 模型提供方列表（Viewer+）；{@code modelType} 支持的取值由 ModelProviderCatalog 映射。 */
     @GetMapping("/providers")
     public ResponseEntity<List<ModelProviderDTO>> listModelProviders(
             @RequestParam(name = "modelType", required = false) String modelType) {
         log.info("Listing model providers for type: {}", modelType);
         List<ModelProviderDTO> providers;
         if (modelType != null && !modelType.isEmpty()) {
-            providers = providerRegistry.listByModelType(ProviderRegistry.queryToBackend(modelType));
+            providers = providerRegistry.listByModelType(ModelProviderCatalog.queryToBackend(modelType));
         } else {
             providers = providerRegistry.list();
         }

@@ -34,7 +34,7 @@ class FileServiceResolverWiringTest {
         tenant.setStorageEngineConfig(sec);
 
         FileServiceResolver resolver = new FileServiceResolver(tenant, null, null);
-        FileService svc = resolver.resolveFileService("cos://bk-125/ap-guangzhou/a/b.png");
+        FileUrlPort svc = resolver.resolveFileService("cos://bk-125/ap-guangzhou/a/b.png");
         assertNotNull(svc, "cos 配置完备时应解析出真 provider 服务");
 
         // 同一 (backendId, provider) 第二次命中缓存（同一实例）
@@ -62,7 +62,7 @@ class FileServiceResolverWiringTest {
         assertEquals(fallback, partialResolver.resolveFileService("cos://bk/r/a.png"));
     }
 
-    private static final class StubUrlFileService implements FileService {
+    private static final class StubUrlFileService implements FileUrlPort {
         @Override
         public String getFileURL(String filePath) {
             return "local://" + filePath;

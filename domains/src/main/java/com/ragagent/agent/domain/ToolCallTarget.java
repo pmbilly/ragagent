@@ -7,8 +7,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 /**
  * 解析后的实际调用目标。
  *
- * <p>它记录"真正被调用的那个东西是谁"，而 {@link ToolCall#getName()} /
- * {@link ToolCall#getArgs()} 保留**模型发出的原始调用**——后者必须原样留着供历史回放与
+ * <p>它记录"真正被调用的那个东西是谁"，而 {@link AgentToolCall#getName()} /
+ * {@link AgentToolCall#getArgs()} 保留**模型发出的原始调用**——后者必须原样留着供历史回放与
  * 厂商状态复原，改写它会把"模型说过什么"和"服务端实际做了什么"抹平。</p>
  *
  * <p>四个字段都<b>恒输出</b>（字符串为空串、args 为 {@code null}）。</p>

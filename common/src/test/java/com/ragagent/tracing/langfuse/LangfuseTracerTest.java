@@ -59,7 +59,7 @@ class LangfuseTracerTest {
         Span span = manager.startSpan(SpanOptions.of("rerank"));
         Generation gen = manager.startGeneration(GenerationOptions.of("chat.completion", "qwen"));
 
-        gen.finish(Map.of("content", "hi"), TokenUsage.of(10, 5, 15), null);
+        gen.finish(Map.of("content", "hi"), LangfuseTokenUsage.of(10, 5, 15), null);
         span.finish(Map.of("kept", 1), null, null);
         trace.finish(null, null);
 

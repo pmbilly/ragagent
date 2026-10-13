@@ -3,7 +3,7 @@ package com.ragagent.websearch.mapper;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-import com.ragagent.websearch.domain.WebSearchProvider;
+import com.ragagent.websearch.domain.WebSearchProviderEntity;
 import com.ragagent.websearch.domain.WebSearchParamsTypeHandler;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
@@ -34,7 +34,7 @@ public interface WebSearchProviderRepository {
             @Result(column = "parameters", property = "parameters",
                     typeHandler = WebSearchParamsTypeHandler.class)
     })
-    WebSearchProvider getByID(@Param("tenantId") long tenantId, @Param("id") String id);
+    WebSearchProviderEntity getByID(@Param("tenantId") long tenantId, @Param("id") String id);
 
     /** 列表查询：created_at ASC */
     @Select("SELECT " + COLS + " FROM web_search_providers "
@@ -43,13 +43,13 @@ public interface WebSearchProviderRepository {
             @Result(column = "parameters", property = "parameters",
                     typeHandler = WebSearchParamsTypeHandler.class)
     })
-    List<WebSearchProvider> list(@Param("tenantId") long tenantId);
+    List<WebSearchProviderEntity> list(@Param("tenantId") long tenantId);
 
     @Insert("INSERT INTO web_search_providers (" + COLS + ") VALUES ("
             + "#{p.id}, #{p.tenantId}, #{p.name}, #{p.provider}, #{p.description}, "
             + "#{p.parameters,typeHandler=" + PARAMS_TH + "}, #{p.isDefault}, "
             + "#{now}, #{now}, NULL)")
-    int create(@Param("p") WebSearchProvider provider, @Param("now") OffsetDateTime now);
+    int create(@Param("p") WebSearchProviderEntity provider, @Param("now") OffsetDateTime now);
 
     /**
      * 全列覆盖更新：created_at 写 SQL NULL（见实体注释）、
@@ -61,7 +61,7 @@ public interface WebSearchProviderRepository {
             + "is_default = #{p.isDefault}, created_at = NULL, deleted_at = NULL, "
             + "updated_at = #{now} "
             + "WHERE id = #{p.id} AND tenant_id = #{p.tenantId}")
-    int update(@Param("p") WebSearchProvider provider, @Param("now") OffsetDateTime now);
+    int update(@Param("p") WebSearchProviderEntity provider, @Param("now") OffsetDateTime now);
 
     @Update("UPDATE web_search_providers SET deleted_at = NOW() "
             + "WHERE id = #{id} AND tenant_id = #{tenantId} AND deleted_at IS NULL")

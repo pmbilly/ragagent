@@ -7,7 +7,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.ragagent.agent.domain.AgentStep;
-import com.ragagent.agent.domain.ToolCall;
+import com.ragagent.agent.domain.AgentToolCall;
 import com.ragagent.session.domain.Message;
 import com.ragagent.session.domain.MessageImage;
 import com.ragagent.storage.support.Rewriter;
@@ -119,7 +119,7 @@ public class MessageReferenceRewriter {
             if (step.getToolCalls() == null) {
                 continue;
             }
-            for (ToolCall call : step.getToolCalls()) {
+            for (AgentToolCall call : step.getToolCalls()) {
                 if (call == null) {
                     continue;
                 }

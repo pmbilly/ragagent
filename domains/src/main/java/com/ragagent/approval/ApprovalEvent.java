@@ -16,7 +16,7 @@ import com.ragagent.common.llm.ResponseType;
  *
  * <p>{@code id} 必须非空：gate 传入的 ID 形如 {@code pendingID + "-approval-required"}。</p>
  */
-public record Event(
+public record ApprovalEvent(
         String id,
         ResponseType type,
         String sessionId,
@@ -24,14 +24,14 @@ public record Event(
         Map<String, Object> metadata,
         String requestId) {
 
-    public Event {
+    public ApprovalEvent {
         sessionId = sessionId == null ? "" : sessionId;
         requestId = requestId == null ? "" : requestId;
         metadata = metadata == null ? Collections.emptyMap() : Collections.unmodifiableMap(new LinkedHashMap<>(metadata));
     }
 
-    public static Event of(String id, ResponseType type, String sessionId, Object data,
+    public static ApprovalEvent of(String id, ResponseType type, String sessionId, Object data,
                            Map<String, Object> metadata, String requestId) {
-        return new Event(id, type, sessionId, data, metadata, requestId);
+        return new ApprovalEvent(id, type, sessionId, data, metadata, requestId);
     }
 }

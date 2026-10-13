@@ -1,5 +1,6 @@
 package com.ragagent.agent;
 
+import com.ragagent.llm.domain.ToolCall;
 import com.ragagent.common.web.JsonMappers;
 import java.time.Duration;
 import java.time.Instant;
@@ -15,7 +16,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.agent.domain.AgentStep;
-import com.ragagent.agent.domain.ToolCall;
+import com.ragagent.agent.domain.AgentToolCall;
 import com.ragagent.agent.domain.ToolCallTarget;
 import com.ragagent.common.llm.ToolResult;
 import com.ragagent.agent.tools.ToolDefinitions;
@@ -180,10 +181,10 @@ final class ActPhase {
 
     private void failTruncatedToolCalls(ChatResponse response, AgentStep step, int iteration,
             String sessionId) {
-        List<com.ragagent.llm.domain.ToolCall> calls = response.getToolCalls();
+        List<ToolCall> calls = response.getToolCalls();
         for (int i = 0; i < calls.size(); i++) {
-            com.ragagent.llm.domain.ToolCall tc = calls.get(i);
-            ToolCall toolCall = new ToolCall();
+            ToolCall tc = calls.get(i);
+            AgentToolCall toolCall = new AgentToolCall();
             toolCall.setId(NormalizeToolCallId.normalize(tc.getId(), tc.getFunction().getName(), i));
             toolCall.setName(tc.getFunction().getName());
             Map<String, Object> rawArgs = new LinkedHashMap<>();
@@ -206,22 +207,22 @@ final class ActPhase {
     private void executeToolCallsParallel(ChatResponse response, AgentStep step, int iteration,
             String sessionId, String assistantMessageID) {
         int round = iteration + 1;
-        List<com.ragagent.llm.domain.ToolCall> calls = response.getToolCalls();
+        List<ToolCall> calls = response.getToolCalls();
         TenantContextSnapshot tenant = TenantContextSnapshot.capture();
 
         // 结果按调用序返回（乱序完成也稳定回填）；屏障调用借快照在引擎线程执行。
-        List<ToolCall> results = ToolBatchExecutor.execute(calls, round,
+        List<AgentToolCall> results = ToolBatchExecutor.execute(calls, round,
                 tenant, (idx, call, inWorker) -> runToolCall(call, idx, iteration, round, sessionId,
                         assistantMessageID, inWorker ? null : tenant));
 
-        for (ToolCall toolCall : results) {
+        for (AgentToolCall toolCall : results) {
             step.getToolCalls().add(toolCall);
             emitToolOutcome(toolCall, iteration, sessionId);
         }
     }
 
     /** 一个完成工具调用的结果/动作事件（所有路径共用）。 */
-    private void emitToolOutcome(ToolCall toolCall, int iteration, String sessionId) {
+    private void emitToolOutcome(AgentToolCall toolCall, int iteration, String sessionId) {
         ToolResult result = toolCall.getResult();
         if (result == null) {
             result = new ToolResult();
@@ -246,9 +247,9 @@ final class ActPhase {
                 null, ""));
     }
 
-    private void executeSingleToolCall(com.ragagent.llm.domain.ToolCall tc, int i, AgentStep step,
+    private void executeSingleToolCall(ToolCall tc, int i, AgentStep step,
             int iteration, int round, String sessionId, String assistantMessageID) {
-        ToolCall toolCall = runToolCall(tc, i, iteration, round, sessionId, assistantMessageID, null);
+        AgentToolCall toolCall = runToolCall(tc, i, iteration, round, sessionId, assistantMessageID, null);
         step.getToolCalls().add(toolCall);
         emitToolOutcome(toolCall, iteration, sessionId);
     }
@@ -257,7 +258,7 @@ final class ActPhase {
      * 单个工具调用：参数解析、执行、日志。可从多线程调用；
      * tenant 为 null 时用当前线程上下文（顺序路径）。
      */
-    ToolCall runToolCall(com.ragagent.llm.domain.ToolCall tc, int i, int iteration, int round,
+    AgentToolCall runToolCall(ToolCall tc, int i, int iteration, int round,
             String sessionId, String assistantMessageID, TenantContextSnapshot tenant) {
         if (tenant == null) {
             // 顺序路径：直接用当前线程上下文（引擎线程）
@@ -275,7 +276,7 @@ final class ActPhase {
         }
     }
 
-    private ToolCall runToolCallInner(com.ragagent.llm.domain.ToolCall tc, int i, int iteration,
+    private AgentToolCall runToolCallInner(ToolCall tc, int i, int iteration,
             int round, String sessionId, String assistantMessageID) {
         log.info("[Agent][Round-{}][Tool {}] tenantId={}", round, tc.getFunction().getName(),
                 TenantContext.currentTenantId());
@@ -303,7 +304,7 @@ final class ActPhase {
             }
             if (!repairOk) {
                 log.error("{} Failed to parse arguments (repair failed): {}", toolTag, argsError.getMessage());
-                ToolCall c = new ToolCall();
+                AgentToolCall c = new AgentToolCall();
                 c.setId(tc.getId());
                 c.setName(tc.getFunction().getName());
                 Map<String, Object> rawArgs = new LinkedHashMap<>();
@@ -324,7 +325,7 @@ final class ActPhase {
             if (repaired.truncated()) {
                 log.warn("{} Arguments were cut off mid-emission ({} bytes); refusing to execute",
                         toolTag, argsStr == null ? 0 : argsStr.length());
-                ToolCall c = new ToolCall();
+                AgentToolCall c = new AgentToolCall();
                 c.setId(tc.getId());
                 c.setName(tc.getFunction().getName());
                 Map<String, Object> rawArgs = new LinkedHashMap<>();
@@ -340,7 +341,7 @@ final class ActPhase {
             log.warn("{} Repaired malformed JSON arguments", toolTag);
             // 首趟 model-context 扫不动坏 JSON：执行前解码修复后的 payload，
             // 同时保留 tc.ModelArguments 里的原始 provider 载荷。
-            com.ragagent.llm.domain.ToolCall decoded = new com.ragagent.llm.domain.ToolCall();
+            ToolCall decoded = new ToolCall();
             decoded.setId(tc.getId());
             decoded.setType(tc.getType());
             decoded.setModelArguments("");
@@ -354,7 +355,7 @@ final class ActPhase {
             try {
                 args = parseArgsMap(tc.getFunction().getArguments());
             } catch (Exception e) {
-                ToolCall c = new ToolCall();
+                AgentToolCall c = new AgentToolCall();
                 c.setId(tc.getId());
                 c.setName(tc.getFunction().getName());
                 Map<String, Object> rawArgs = new LinkedHashMap<>();
@@ -452,7 +453,7 @@ final class ActPhase {
         }
         long duration = Duration.between(toolCallStartTime, Instant.now()).toMillis();
 
-        ToolCall toolCall = new ToolCall();
+        AgentToolCall toolCall = new AgentToolCall();
         toolCall.setTarget(target);
         toolCall.setId(tc.getId());
         toolCall.setName(tc.getFunction().getName());
@@ -514,7 +515,7 @@ final class ActPhase {
     }
 
     /** Langfuse 工具 span 收尾。 */
-    private static void finishToolSpan(Span span, ToolCall tc, RuntimeException execErr, long durationMs) {
+    private static void finishToolSpan(Span span, AgentToolCall tc, RuntimeException execErr, long durationMs) {
         if (span == null) {
             return;
         }
@@ -605,7 +606,7 @@ final class ActPhase {
     }
 
     /** Langfuse 入参双面（model_arguments + resolved_arguments）。 */
-    private static Map<String, Object> buildToolSpanInput(com.ragagent.llm.domain.ToolCall tc,
+    private static Map<String, Object> buildToolSpanInput(ToolCall tc,
             Map<String, Object> resolvedArgs, boolean sensitive) {
         String modelArguments = tc.getModelArguments();
         if (modelArguments == null || modelArguments.isEmpty()) {

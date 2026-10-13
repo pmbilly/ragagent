@@ -50,7 +50,7 @@ class GateTest {
     }
 
     private static List<ResponseType> types(RecordingEventBus bus) {
-        return bus.emitted().stream().map(Event::type).toList();
+        return bus.emitted().stream().map(ApprovalEvent::type).toList();
     }
 
     private static void assertJsonEq(String expected, String actual) {
@@ -82,7 +82,7 @@ class GateTest {
         AtomicReference<Integer> seenTimeoutSeconds = new AtomicReference<>();
         AtomicReference<String> seenArgsJson = new AtomicReference<>();
         bus.on(ResponseType.TOOL_APPROVAL_REQUIRED, evt -> {
-            ToolApprovalRequiredData data = (ToolApprovalRequiredData) evt.data();
+            ApprovalRequiredNotice data = (ApprovalRequiredNotice) evt.data();
             assertFalse(data.pendingId().isEmpty());
             seenPendingId.set(data.pendingId());
             seenTimeoutSeconds.set(data.timeoutSeconds());
@@ -115,8 +115,8 @@ class GateTest {
         // 事件序列 required → resolved；resolved 事件体回带用户决策
         assertEquals(List.of(ResponseType.TOOL_APPROVAL_REQUIRED, ResponseType.TOOL_APPROVAL_RESOLVED),
                 types(bus));
-        ToolApprovalResolvedData resolved =
-                (ToolApprovalResolvedData) bus.emitted().get(1).data();
+        ApprovalResolvedNotice resolved =
+                (ApprovalResolvedNotice) bus.emitted().get(1).data();
         assertEquals(seenPendingId.get(), resolved.pendingId());
         assertTrue(resolved.approved());
     }
@@ -149,7 +149,7 @@ class GateTest {
 
         AtomicReference<String> pendingId = new AtomicReference<>();
         bus.on(ResponseType.TOOL_APPROVAL_REQUIRED, evt -> {
-            pendingId.set(((ToolApprovalRequiredData) evt.data()).pendingId());
+            pendingId.set(((ApprovalRequiredNotice) evt.data()).pendingId());
             Thread.ofVirtual().start(() -> {
                 try {
                     Thread.sleep(50);
@@ -224,7 +224,7 @@ class GateTest {
 
         AtomicReference<ApprovalException> mismatch = new AtomicReference<>();
         bus.on(ResponseType.TOOL_APPROVAL_REQUIRED, evt -> {
-            String pendingId = ((ToolApprovalRequiredData) evt.data()).pendingId();
+            String pendingId = ((ApprovalRequiredNotice) evt.data()).pendingId();
             Thread.ofVirtual().start(() -> {
                 mismatch.set(captureResolve(gate, 999, "", pendingId, Decision.allow()));
                 gate.resolve(1, "", pendingId, Decision.deny("no"));
@@ -248,7 +248,7 @@ class GateTest {
 
         AtomicReference<ApprovalException> mismatch = new AtomicReference<>();
         bus.on(ResponseType.TOOL_APPROVAL_REQUIRED, evt -> {
-            String pendingId = ((ToolApprovalRequiredData) evt.data()).pendingId();
+            String pendingId = ((ApprovalRequiredNotice) evt.data()).pendingId();
             Thread.ofVirtual().start(() -> {
                 mismatch.set(captureResolve(gate, 1, "bob", pendingId, Decision.allow()));
                 gate.resolve(1, "alice", pendingId, Decision.allow());
@@ -275,7 +275,7 @@ class GateTest {
 
         AtomicReference<ApprovalException> mismatch = new AtomicReference<>();
         bus.on(ResponseType.TOOL_APPROVAL_REQUIRED, evt -> {
-            String pendingId = ((ToolApprovalRequiredData) evt.data()).pendingId();
+            String pendingId = ((ApprovalRequiredNotice) evt.data()).pendingId();
             Thread.ofVirtual().start(() -> {
                 mismatch.set(captureResolve(gate, 1, "", pendingId, Decision.allow()));
                 gate.resolve(1, "alice", pendingId, Decision.deny("no"));
@@ -299,7 +299,7 @@ class GateTest {
         RecordingEventBus bus = new RecordingEventBus();
 
         AtomicReference<String> pendingId = new AtomicReference<>();
-        bus.on(ResponseType.TOOL_APPROVAL_REQUIRED, evt -> pendingId.set(((ToolApprovalRequiredData) evt.data()).pendingId()));
+        bus.on(ResponseType.TOOL_APPROVAL_REQUIRED, evt -> pendingId.set(((ApprovalRequiredNotice) evt.data()).pendingId()));
 
         AtomicReference<ApprovalException> lateResolve = new AtomicReference<>();
         Thread resolver = Thread.ofVirtual().start(() -> {
@@ -335,7 +335,7 @@ class GateTest {
         AtomicReference<ApprovalException> second = new AtomicReference<>();
         AtomicReference<Boolean> done = new AtomicReference<>(false);
         bus.on(ResponseType.TOOL_APPROVAL_REQUIRED, evt -> {
-            String pendingId = ((ToolApprovalRequiredData) evt.data()).pendingId();
+            String pendingId = ((ApprovalRequiredNotice) evt.data()).pendingId();
             Thread.ofVirtual().start(() -> {
                 first.set(captureResolve(gate, 1, "", pendingId, Decision.allow()));
                 second.set(captureResolve(gate, 1, "", pendingId, Decision.deny("")));
@@ -409,7 +409,7 @@ class GateTest {
         assertTrue(d.approved());
     }
 
-    /** 补充用例：EventBus 缺失是内部错误（"EventBus is nil"）。 */
+    /** 补充用例：ApprovalEventBus 缺失是内部错误（"ApprovalEventBus is nil"）。 */
     @Test
     void requestAndWaitWithoutEventBusFails() {
         Gate gate = track(new Gate(options(1), new StubChecker(true), null));
@@ -417,14 +417,14 @@ class GateTest {
                 Cancellation.none(),
                 PendingRequest.builder().tenantId(1).sessionId("s").serviceId("svc").mcpToolName("t").build()));
         assertTrue(err.is(ApprovalException.Kind.INTERNAL));
-        assertTrue(err.getMessage().contains("EventBus is nil"));
+        assertTrue(err.getMessage().contains("ApprovalEventBus is nil"));
     }
 
     /** 补充用例：emit 失败必须上抛（包装为 "emit tool approval required: ..."）。 */
     @Test
     void requestAndWaitEmitFailurePropagates() {
         Gate gate = track(new Gate(options(1), new StubChecker(true), null));
-        EventBus failing = event -> {
+        ApprovalEventBus failing = event -> {
             throw new IllegalStateException("sse closed");
         };
         ApprovalException err = assertThrows(ApprovalException.class, () -> gate.requestAndWait(

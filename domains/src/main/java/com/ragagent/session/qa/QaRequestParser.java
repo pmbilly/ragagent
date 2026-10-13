@@ -24,7 +24,7 @@ import static com.ragagent.session.service.QaSupport.KnowledgeTargets;
 import com.ragagent.common.security.TenantAPIKeyScope;
 import com.ragagent.session.domain.MessageExecutionContext;
 import com.ragagent.session.domain.SessionNotFoundException;
-import com.ragagent.storage.support.FileService;
+import com.ragagent.storage.support.FileUrlPort;
 import com.ragagent.storage.support.Mode;
 import com.ragagent.storage.support.PublicModeForbiddenException;
 import com.ragagent.storage.support.Rewriter;
@@ -47,10 +47,10 @@ public final class QaRequestParser {
 
     private final SessionService sessionService;
     private final TemporaryDocumentService temporaryDocuments;
-    private final FileService fileService;
+    private final FileUrlPort fileService;
     private final StorageBackendResolver storageBackendResolver;
 
-    public QaRequestParser(SessionService sessionService, TemporaryDocumentService temporaryDocuments, FileService fileService, StorageBackendResolver storageBackendResolver) {
+    public QaRequestParser(SessionService sessionService, TemporaryDocumentService temporaryDocuments, FileUrlPort fileService, StorageBackendResolver storageBackendResolver) {
         this.sessionService = sessionService;
         this.temporaryDocuments = temporaryDocuments;
         this.fileService = fileService;

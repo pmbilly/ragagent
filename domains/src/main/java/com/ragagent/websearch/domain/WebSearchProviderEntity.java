@@ -15,7 +15,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
  * 响应里呈现 {@code 0001-01-01T00:00:00Z}。</p>
  */
 @TableName(value = "web_search_providers", autoResultMap = true)
-public class WebSearchProvider {
+public class WebSearchProviderEntity {
 
     @TableId(type = IdType.INPUT)
     private String id;

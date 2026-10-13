@@ -15,7 +15,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.approval.EnabledChecker;
 import com.ragagent.approval.McpApproval;
-import com.ragagent.approval.ToolPolicy;
+import com.ragagent.approval.ApprovalToolPolicy;
 import com.ragagent.common.web.ToolJson;
 import com.ragagent.common.llm.ToolResult;
 import com.ragagent.mcp.domain.McpService;
@@ -467,7 +467,7 @@ public final class McpCatalog {
         EnabledChecker checker = gate == null ? null
                 : (ctx, t, s, n) -> gate.isEnabled(ctx, t, s, n);
         try {
-            policies = ToolPolicy.enabledTools(Cancellation.none(),
+            policies = ApprovalToolPolicy.enabledTools(Cancellation.none(),
                     checker, tenantId, id, names);
         } catch (Exception e) {
             throw new IllegalStateException("MCP tool permissions are temporarily unavailable");

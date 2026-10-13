@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import com.ragagent.common.security.SsrfGuard;
 import com.ragagent.retrieval.domain.WebSearchFilters;
 import com.ragagent.retrieval.domain.WebSearchResult;
-import com.ragagent.websearch.domain.WebSearchProvider;
+import com.ragagent.websearch.domain.WebSearchProviderEntity;
 import com.ragagent.websearch.domain.WebSearchProviderParams;
 import com.ragagent.websearch.mapper.WebSearchProviderRepository;
 import com.ragagent.websearch.provider.WebSearchProviderRegistry;
@@ -41,8 +41,8 @@ class WebSearchServiceExecTest {
         SsrfGuard.restoreWhitelist(whitelistSnapshot);
     }
 
-    private static WebSearchProvider entity(String id, String type) {
-        WebSearchProvider e = new WebSearchProvider();
+    private static WebSearchProviderEntity entity(String id, String type) {
+        WebSearchProviderEntity e = new WebSearchProviderEntity();
         e.setId(id);
         e.setProvider(type);
         e.setName("my " + type);
@@ -53,7 +53,7 @@ class WebSearchServiceExecTest {
     @Test
     void searchByIdUsesEntityAndMergesProxyOverride() {
         WebSearchProviderRepository repo = mock(WebSearchProviderRepository.class);
-        WebSearchProvider stored = entity("prov-1", "bocha");
+        WebSearchProviderEntity stored = entity("prov-1", "bocha");
         stored.getParameters().setApiKey("stored-key");
         when(repo.getByID(anyLong(), anyString())).thenReturn(stored);
 

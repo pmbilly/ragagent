@@ -1,5 +1,6 @@
 package com.ragagent.storage.support;
 
+import com.ragagent.storage.provider.FileService;
 import com.ragagent.common.web.JsonMappers;
 import java.util.HashMap;
 import java.util.Locale;
@@ -15,7 +16,7 @@ import com.ragagent.common.storage.StorageRuntimeEnv;
 import com.ragagent.storage.provider.FileServiceFactory;
 
 /**
- * 按存储 provider 解析并缓存 FileService。
+ * 按存储 provider 解析并缓存 FileUrlPort。
  *
  * <p>缓存的作用域是**单个请求或单条出站消息**，这样一条有很多图的长回答不会为每条引用
  * 重建一次 SDK 客户端。</p>
@@ -54,22 +55,22 @@ public class FileServiceResolver implements Resolver {
     }
 
     private final Tenant tenant;
-    private final FileService defaultSvc;
+    private final FileUrlPort defaultSvc;
     private final StorageBackendResolver storageResolver;
-    private final Map<String, FileService> cache = new HashMap<>();
+    private final Map<String, FileUrlPort> cache = new HashMap<>();
 
     /**
-     * <p>{@code defaultSvc} 是进程级 FileService，用于 {@code resource://} 手柄，
+     * <p>{@code defaultSvc} 是进程级 FileUrlPort，用于 {@code resource://} 手柄，
      * 以及租户存储配置缺失时的兜底。</p>
      */
-    public FileServiceResolver(Tenant tenant, FileService defaultSvc, StorageBackendResolver storageResolver) {
+    public FileServiceResolver(Tenant tenant, FileUrlPort defaultSvc, StorageBackendResolver storageResolver) {
         this.tenant = tenant;
         this.defaultSvc = defaultSvc;
         this.storageResolver = storageResolver;
     }
 
     @Override
-    public FileService resolveFileService(String filePath) {
+    public FileUrlPort resolveFileService(String filePath) {
         if (parseResourcePath(filePath)) {
             return defaultSvc;
         }
@@ -90,7 +91,7 @@ public class FileServiceResolver implements Resolver {
         }
 
         String cacheKey = backendId + ":" + provider;
-        FileService cached = cache.get(cacheKey);
+        FileUrlPort cached = cache.get(cacheKey);
         if (cached != null) {
             return cached;
         }
@@ -107,7 +108,7 @@ public class FileServiceResolver implements Resolver {
                         backendId, provider, e.toString());
             }
         }
-        FileService service = buildFileServiceForProvider(provider, defaultSvc);
+        FileUrlPort service = buildFileServiceForProvider(provider, defaultSvc);
         if (service != null) {
             cache.put(cacheKey, service);
         }
@@ -127,7 +128,7 @@ public class FileServiceResolver implements Resolver {
      *   <li>其余失败 → 回落 {@code defaultSvc}（可能为 null → 引用原样保留）。</li>
      * </ol>
      */
-    private FileService buildFileServiceForProvider(String provider, FileService defaultSvc) {
+    private FileUrlPort buildFileServiceForProvider(String provider, FileUrlPort defaultSvc) {
         try {
             JsonNode sec = tenant == null ? null : tenant.getStorageEngineConfig();
             StorageEngineConfig typed = sec == null ? new StorageEngineConfig()
@@ -145,8 +146,8 @@ public class FileServiceResolver implements Resolver {
     }
 
     /** storageurl 窄口（只有 GetFileURL）到 A3 provider 服务的适配。 */
-    private record ProviderUrlFileService(com.ragagent.storage.provider.FileService inner)
-            implements FileService {
+    private record ProviderUrlFileService(FileService inner)
+            implements FileUrlPort {
 
         @Override
         public String getFileURL(String filePath) {

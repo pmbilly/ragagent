@@ -142,7 +142,7 @@
     "tracing/decorators/LangfuseVlm.java": "tracing/decorators",
     "tracing/langfuse/LangfuseHttpInterceptor.java": "tracing/langfuse",
     "tracing/langfuse/LangfuseTaskScope.java": "tracing/langfuse",
-    "tracing/langfuse/TokenUsage.java": "tracing/langfuse",
+    "tracing/langfuse/LangfuseTokenUsage.java": "tracing/langfuse",
     "websearch/provider/BaiduProvider.java": "websearch/provider",
     "websearch/provider/BraveProvider.java": "websearch/provider",
     "websearch/provider/KeenableProvider.java": "websearch/provider",

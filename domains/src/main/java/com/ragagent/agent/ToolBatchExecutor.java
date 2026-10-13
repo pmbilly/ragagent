@@ -1,5 +1,6 @@
 package com.ragagent.agent;
 
+import com.ragagent.llm.domain.ToolCall;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -9,7 +10,7 @@ import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.BizException;
 import com.ragagent.common.llm.ToolResult;
 import com.ragagent.event.TenantContextSnapshot;
-import com.ragagent.agent.domain.ToolCall;
+import com.ragagent.agent.domain.AgentToolCall;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +40,7 @@ final class ToolBatchExecutor {
          * @param inWorker true = 运行在并发子线程（身份已 replay，按子线程上下文执行）；
          *                 false = 运行在引擎线程（执行屏障）
          */
-        ToolCall run(int index, com.ragagent.llm.domain.ToolCall call, boolean inWorker);
+        AgentToolCall run(int index, ToolCall call, boolean inWorker);
     }
 
     /**
@@ -47,11 +48,11 @@ final class ToolBatchExecutor {
      *
      * @param tenant 身份快照（子线程自行 replay/clear；null = 在当前线程上下文里执行）
      */
-    static List<ToolCall> execute(List<com.ragagent.llm.domain.ToolCall> calls, int round,
+    static List<AgentToolCall> execute(List<ToolCall> calls, int round,
             TenantContextSnapshot tenant, CallRunner runner) {
         int n = calls.size();
         log.info("[Agent][Round-{}] Parallel execution of {} tool calls", round, n);
-        ToolCall[] results = new ToolCall[n];
+        AgentToolCall[] results = new AgentToolCall[n];
 
         int i = 0;
         while (i < n) {
@@ -110,7 +111,7 @@ final class ToolBatchExecutor {
             }
         }
 
-        List<ToolCall> ordered = new ArrayList<>(n);
+        List<AgentToolCall> ordered = new ArrayList<>(n);
         for (int k = 0; k < n; k++) {
             ordered.add(results[k] == null
                     ? crashed(calls.get(k), "tool call not executed") : results[k]);
@@ -151,8 +152,8 @@ final class ToolBatchExecutor {
     }
 
     /** 崩溃/中断/未执行的工具调用的失败占位结果（保证结果槽非 null）。 */
-    private static ToolCall crashed(com.ragagent.llm.domain.ToolCall tc, String error) {
-        ToolCall crashed = new ToolCall();
+    private static AgentToolCall crashed(ToolCall tc, String error) {
+        AgentToolCall crashed = new AgentToolCall();
         crashed.setId(tc.getId());
         crashed.setName(tc.getToolName());
         ToolResult r = new ToolResult();

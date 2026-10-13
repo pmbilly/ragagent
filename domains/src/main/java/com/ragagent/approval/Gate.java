@@ -166,7 +166,7 @@ public class Gate implements McpApproval, AutoCloseable {
     /** 目录枚举用的批量启用查询。 */
     public Map<String, Boolean> enabledTools(
             Cancellation ctx, long tenantId, String serviceId, List<String> names) {
-        return ToolPolicy.enabledTools(ctx, checker, tenantId, serviceId, names);
+        return ApprovalToolPolicy.enabledTools(ctx, checker, tenantId, serviceId, names);
     }
 
     // ------------------------------------------------------------------
@@ -184,7 +184,7 @@ public class Gate implements McpApproval, AutoCloseable {
             return Decision.allow();
         }
         if (req.eventBus() == null) {
-            throw ApprovalException.internal("tool approval: EventBus is nil");
+            throw ApprovalException.internal("tool approval: ApprovalEventBus is nil");
         }
 
         String pendingId = UUID.randomUUID().toString();
@@ -198,12 +198,12 @@ public class Gate implements McpApproval, AutoCloseable {
             Object argsObj = ApprovalJson.parseLoose(req.args());
             int timeoutSec = timeoutSeconds(timeout);
 
-            ToolApprovalRequiredData data = new ToolApprovalRequiredData(
+            ApprovalRequiredNotice data = new ApprovalRequiredNotice(
                     pendingId, req.tenantId(), req.sessionId(), req.assistantMessageId(),
                     req.serviceId(), req.serviceName(), req.mcpToolName(), req.registeredToolName(),
                     req.description(), argsObj, req.args(), timeoutSec,
                     Instant.now().getEpochSecond(), req.toolCallId(), req.requestId());
-            Event evt = Event.of(
+            ApprovalEvent evt = ApprovalEvent.of(
                     pendingId + "-approval-required",
                     ResponseType.TOOL_APPROVAL_REQUIRED,
                     req.sessionId(),
@@ -249,7 +249,7 @@ public class Gate implements McpApproval, AutoCloseable {
      */
     public Decision requestOAuthAndWait(Cancellation ctx, OAuthPendingRequest req) {
         if (req.eventBus() == null) {
-            throw ApprovalException.internal("oauth gate: EventBus is nil");
+            throw ApprovalException.internal("oauth gate: ApprovalEventBus is nil");
         }
 
         String pendingId = UUID.randomUUID().toString();
@@ -269,7 +269,7 @@ public class Gate implements McpApproval, AutoCloseable {
                     pendingId, req.tenantId(), req.sessionId(), req.assistantMessageId(),
                     req.serviceId(), req.serviceName(), req.mcpToolName(), timeoutSec,
                     Instant.now().getEpochSecond(), req.toolCallId(), req.requestId());
-            Event evt = Event.of(
+            ApprovalEvent evt = ApprovalEvent.of(
                     pendingId + "-mcp-oauth-required",
                     ResponseType.MCP_OAUTH_REQUIRED,
                     req.sessionId(),
@@ -523,11 +523,11 @@ public class Gate implements McpApproval, AutoCloseable {
     /** 发结果事件（失败只吞掉） */
     private void emitResolved(PendingRequest req, String pendingId, Decision d) {
         try {
-            req.eventBus().emit(Event.of(
+            req.eventBus().emit(ApprovalEvent.of(
                     pendingId + "-approval-resolved",
                     ResponseType.TOOL_APPROVAL_RESOLVED,
                     req.sessionId(),
-                    new ToolApprovalResolvedData(pendingId, d.approved(), d.reason(), d.timedOut(),
+                    new ApprovalResolvedNotice(pendingId, d.approved(), d.reason(), d.timedOut(),
                             d.contextCanceled()),
                     Map.of("assistantMessageId", req.assistantMessageId()),
                     req.requestId()));
@@ -539,7 +539,7 @@ public class Gate implements McpApproval, AutoCloseable {
     /** 发 OAuth 结果事件（失败只吞掉） */
     private void emitOAuthResolved(OAuthPendingRequest req, String pendingId, Decision d) {
         try {
-            req.eventBus().emit(Event.of(
+            req.eventBus().emit(ApprovalEvent.of(
                     pendingId + "-mcp-oauth-resolved",
                     ResponseType.MCP_OAUTH_RESOLVED,
                     req.sessionId(),

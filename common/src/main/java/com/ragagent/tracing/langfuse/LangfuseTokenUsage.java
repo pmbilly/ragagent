@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  * <p>零值字段省略：逐字段 {@code @JsonInclude(NON_DEFAULT)}（unit 走 NON_EMPTY）。</p>
  */
-public final class TokenUsage {
+public final class LangfuseTokenUsage {
 
     @JsonProperty("input")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
@@ -39,12 +39,12 @@ public final class TokenUsage {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public String unit = "";
 
-    public TokenUsage() {
+    public LangfuseTokenUsage() {
     }
 
     /** 三值便利构造（input/output/total）。 */
-    public static TokenUsage of(int input, int output, int total) {
-        TokenUsage u = new TokenUsage();
+    public static LangfuseTokenUsage of(int input, int output, int total) {
+        LangfuseTokenUsage u = new LangfuseTokenUsage();
         u.input = input;
         u.output = output;
         u.total = total;

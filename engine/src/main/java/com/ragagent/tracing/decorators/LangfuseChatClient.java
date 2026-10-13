@@ -1,6 +1,7 @@
 package com.ragagent.tracing.decorators;
 
-import com.ragagent.tracing.langfuse.TokenUsage;
+import com.ragagent.common.llm.TokenUsage;
+import com.ragagent.tracing.langfuse.LangfuseTokenUsage;
 import com.ragagent.tracing.langfuse.LangfuseManager;
 import com.ragagent.tracing.langfuse.Generation;
 import java.util.ArrayList;
@@ -71,7 +72,7 @@ public final class LangfuseChatClient implements LlmChatClient {
             throw e;
         } finally {
             Object output = null;
-            TokenUsage usage = null;
+            LangfuseTokenUsage usage = null;
             if (response != null) {
                 usage = LangfusePayloads.convertUsage(response.getUsage());
                 output = buildGenerationOutput(response.getContent(), response.getReasoningContent(),
@@ -119,7 +120,7 @@ public final class LangfuseChatClient implements LlmChatClient {
         forwarderRef.set(Thread.ofVirtual().name("langfuse-chat-stream").start(() -> {
             StringBuilder content = new StringBuilder();
             StringBuilder reasoning = new StringBuilder();
-            com.ragagent.common.llm.TokenUsage usage = null;
+            TokenUsage usage = null;
             List<ToolCall> toolCalls = null;
             String finishReason = "";
             boolean firstToken = false;

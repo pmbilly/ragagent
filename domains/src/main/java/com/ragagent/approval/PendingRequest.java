@@ -13,7 +13,7 @@ public record PendingRequest(
         String sessionId,
         String assistantMessageId,
         String requestId,
-        EventBus eventBus,
+        ApprovalEventBus eventBus,
         String serviceId,
         String serviceName,
         String mcpToolName,
@@ -51,7 +51,7 @@ public record PendingRequest(
         private String sessionId = "";
         private String assistantMessageId = "";
         private String requestId = "";
-        private EventBus eventBus;
+        private ApprovalEventBus eventBus;
         private String serviceId = "";
         private String serviceName = "";
         private String mcpToolName = "";
@@ -85,7 +85,7 @@ public record PendingRequest(
             return this;
         }
 
-        public Builder eventBus(EventBus v) {
+        public Builder eventBus(ApprovalEventBus v) {
             this.eventBus = v;
             return this;
         }
