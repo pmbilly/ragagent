@@ -58,6 +58,13 @@ public class KnowledgeBaseRepository {
                 .last("LIMIT 1"));
     }
 
+    /**
+     * 按 id 取 KB，**不过滤软删**（与 {@code mapper.selectById} 一致；对比 {@link #findByIdOnly(String)}）。
+     */
+    public KnowledgeBase findByIdAny(String id) {
+        return kbMapper.selectById(id);
+    }
+
     /** 租户内非临时库，created_at DESC（两处列表查询同形，合并为一份）。 */
     public List<KnowledgeBase> listActiveByTenant(long tenantId) {
         return kbMapper.selectList(new LambdaQueryWrapper<KnowledgeBase>()

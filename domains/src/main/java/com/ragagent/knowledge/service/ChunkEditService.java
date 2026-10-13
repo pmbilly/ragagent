@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.repository.KnowledgeRepository;
+
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -13,13 +15,11 @@ import com.ragagent.knowledge.domain.ChunkRevision;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.domain.ChunkRevisionConflictException;
-import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
 import com.ragagent.retrieval.support.ChunkSearchUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import java.nio.charset.StandardCharsets;
 import com.ragagent.knowledge.index.ChunkVectorIndexer;
 
@@ -39,18 +39,18 @@ public class ChunkEditService {
     private static final String SUMMARY_STATUS_NONE = "none";
 
     private final ChunkRepository chunkRepository;
-    private final KnowledgeMapper knowledgeMapper;
+    private final KnowledgeRepository knowledgeRepository;
     private final ChunkVectorIndexer chunkVectorIndexer;
     private final KnowledgeService knowledgeService;
     private final ChunkAccessGuard guard;
 
     public ChunkEditService(ChunkRepository chunkRepository,
-                            KnowledgeMapper knowledgeMapper,
+                            KnowledgeRepository knowledgeRepository,
                             ChunkVectorIndexer chunkVectorIndexer,
                             KnowledgeService knowledgeService,
                             ChunkAccessGuard guard) {
         this.chunkRepository = chunkRepository;
-        this.knowledgeMapper = knowledgeMapper;
+        this.knowledgeRepository = knowledgeRepository;
         this.chunkVectorIndexer = chunkVectorIndexer;
         this.knowledgeService = knowledgeService;
         this.guard = guard;
@@ -398,11 +398,7 @@ public class ChunkEditService {
 
     /** 未软删的 knowledge 行（租户过滤）。 */
     private Knowledge findKnowledgeRow(long tenantId, String id) {
-        return knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getId, id)
-                .eq(Knowledge::getTenantId, tenantId)
-                .isNull(Knowledge::getDeletedAt)
-                .last("LIMIT 1"));
+        return knowledgeRepository.findById(tenantId, id);
     }
 
     /** null（H2 可空列）按空串处理。 */

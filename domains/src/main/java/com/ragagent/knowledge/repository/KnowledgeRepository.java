@@ -303,6 +303,16 @@ public class KnowledgeRepository {
                 .last("LIMIT 1"));
     }
 
+    /**
+     * 按 id 取行，**不过滤软删**（与 {@code mapper.selectById} 一致）。
+     *
+     * <p>与 {@link #findByIdOnly(String)} 的区别：后者排除软删行。管线任务（图抽取/问题生成）
+     * 需要看到已软删行以判定 aborted 并跳过，故单列此法（B263⑱）。</p>
+     */
+    public Knowledge findByIdAny(String id) {
+        return knowledgeMapper.selectById(id);
+    }
+
     /** 软删 knowledge 行（置 deleted_at）。 */
     public void softDelete(String id, OffsetDateTime now) {
         knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()

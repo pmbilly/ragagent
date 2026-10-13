@@ -25,8 +25,8 @@ import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.repository.ChunkRepository;
-import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
-import com.ragagent.knowledge.mapper.KnowledgeMapper;
+import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
+import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.llm.ChatStream;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
@@ -102,8 +102,8 @@ class ChunkExtractServiceTest {
 
     private ModelRuntimeFactory modelRuntimeFactory;
     private ChunkRepository chunkRepository;
-    private KnowledgeMapper knowledgeMapper;
-    private KnowledgeBaseMapper kbMapper;
+    private KnowledgeRepository knowledgeRepository;
+    private KnowledgeBaseRepository kbRepository;
     private SpanTracker spanTracker;
     private WikiFinalizePort finalizer;
     private RecordingGraphRepo graphRepo;
@@ -115,8 +115,8 @@ class ChunkExtractServiceTest {
     void setUp() throws Exception {
         modelRuntimeFactory = mock(ModelRuntimeFactory.class);
         chunkRepository = mock(ChunkRepository.class);
-        knowledgeMapper = mock(KnowledgeMapper.class);
-        kbMapper = mock(KnowledgeBaseMapper.class);
+        knowledgeRepository = mock(KnowledgeRepository.class);
+        kbRepository = mock(KnowledgeBaseRepository.class);
         spanTracker = mock(SpanTracker.class);
         finalizer = mock(WikiFinalizePort.class);
         graphRepo = new RecordingGraphRepo();
@@ -130,8 +130,8 @@ class ChunkExtractServiceTest {
         when(modelRuntimeFactory.getChatModel("m-1")).thenReturn(emptyGraphClient());
         when(chunkRepository.getChunkById(7L, "ck-1")).thenReturn(chunk);
 
-        service = new ChunkExtractService(modelRuntimeFactory, chunkRepository, knowledgeMapper,
-                kbMapper, spanTracker, graphRepo, finalizer);
+        service = new ChunkExtractService(modelRuntimeFactory, chunkRepository, knowledgeRepository,
+                kbRepository, spanTracker, graphRepo, finalizer);
     }
 
     private KnowledgeBase kbWithExtractConfig(String json) throws Exception {
@@ -164,7 +164,7 @@ class ChunkExtractServiceTest {
         Knowledge k = new Knowledge();
         k.setId("kn-1");
         k.setParseStatus(Knowledge.PARSE_CANCELLED);
-        when(knowledgeMapper.selectById("kn-1")).thenReturn(k);
+        when(knowledgeRepository.findByIdAny("kn-1")).thenReturn(k);
 
         service.handle(payload());
 
@@ -176,7 +176,7 @@ class ChunkExtractServiceTest {
     @Test
     @DisplayName("抽取配置未启用：读块后闸门拦下，仍释放槽位")
     void extractDisabledSkips() throws Exception {
-        when(kbMapper.selectById("kb-1")).thenReturn(kbWithExtractConfig("{\"enabled\":false}"));
+        when(kbRepository.findByIdAny("kb-1")).thenReturn(kbWithExtractConfig("{\"enabled\":false}"));
 
         service.handle(payload());
 
@@ -188,7 +188,7 @@ class ChunkExtractServiceTest {
     @Test
     @DisplayName("正常路径：抽取（空图）→ AddGraph 命名空间 = 块所属 KB/知识 → 释放槽位")
     void happyPathWritesGraph() throws Exception {
-        when(kbMapper.selectById("kb-1")).thenReturn(kbWithExtractConfig(
+        when(kbRepository.findByIdAny("kb-1")).thenReturn(kbWithExtractConfig(
                 "{\"enabled\":true,\"text\":\"示例\",\"nodes\":[{\"name\":\"张三\"}],"
                 + "\"relations\":[{\"node1\":\"张三\",\"node2\":\"腾讯\",\"type\":\"works_at\"}],"
                 + "\"tags\":[\"人物\"],\"customInstructions\":\"只抽人物\"}"));
@@ -273,7 +273,7 @@ class ChunkExtractServiceTest {
     @Test
     @DisplayName("Map 记录：空图时 nodes_added/relations_added 均为 0（span 输出契约）")
     void graphOutAccounting() throws Exception {
-        when(kbMapper.selectById("kb-1")).thenReturn(kbWithExtractConfig("{\"enabled\":true}"));
+        when(kbRepository.findByIdAny("kb-1")).thenReturn(kbWithExtractConfig("{\"enabled\":true}"));
         // 捕获 endSpan 的输出（子 span 存在时才会调用 → 让 lookupStage 返回非空）
         SpanTracker.SpanHandle parent = new SpanTracker.SpanHandle();
         when(spanTracker.lookupStage("kn-1", 3, "postprocess")).thenReturn(parent);

@@ -1,12 +1,12 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.repository.KnowledgeRepository;
+
 import java.util.List;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.common.security.LogSanitizer;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.repository.ChunkRepository;
-import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import org.springframework.stereotype.Service;
 
 /**
@@ -20,11 +20,11 @@ import org.springframework.stereotype.Service;
 public class ChunkReadService {
 
     private final ChunkRepository chunkRepository;
-    private final KnowledgeMapper knowledgeMapper;
+    private final KnowledgeRepository knowledgeRepository;
 
-    public ChunkReadService(ChunkRepository chunkRepository, KnowledgeMapper knowledgeMapper) {
+    public ChunkReadService(ChunkRepository chunkRepository, KnowledgeRepository knowledgeRepository) {
         this.chunkRepository = chunkRepository;
-        this.knowledgeMapper = knowledgeMapper;
+        this.knowledgeRepository = knowledgeRepository;
     }
 
     /** 分页结果（items 恒非 null）。 */
@@ -57,10 +57,6 @@ public class ChunkReadService {
      * 摘要状态重载用：取文档行；异常交给调用方处理（调用点只 WARN，不阻断主流程）。
      */
     public Knowledge findForSummaryReload(String knowledgeId, long tenantId) {
-        return knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getId, LogSanitizer.sanitize(knowledgeId))
-                .eq(Knowledge::getTenantId, tenantId)
-                .isNull(Knowledge::getDeletedAt)
-                .last("LIMIT 1"));
+        return knowledgeRepository.findById(tenantId, LogSanitizer.sanitize(knowledgeId));
     }
 }

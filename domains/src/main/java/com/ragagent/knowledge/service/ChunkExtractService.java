@@ -1,5 +1,8 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
+import com.ragagent.knowledge.repository.KnowledgeRepository;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -16,8 +19,6 @@ import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeProcessingSpan;
 import com.ragagent.knowledge.repository.ChunkRepository;
-import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
-import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.model.service.ModelRuntimeFactory;
 import com.ragagent.tracing.langfuse.LangfuseTaskScope;
@@ -64,8 +65,8 @@ public class ChunkExtractService {
 
     private final ModelRuntimeFactory modelRuntimeFactory;
     private final ChunkRepository chunkRepository;
-    private final KnowledgeMapper knowledgeMapper;
-    private final KnowledgeBaseMapper kbMapper;
+    private final KnowledgeRepository knowledgeRepository;
+    private final KnowledgeBaseRepository kbRepository;
     private final SpanTracker spanTracker;
     private final RetrieveGraphRepository graphRepository;
     private final WikiFinalizePort finalizer;
@@ -75,28 +76,28 @@ public class ChunkExtractService {
     @Autowired
     public ChunkExtractService(ModelRuntimeFactory modelRuntimeFactory,
                                ChunkRepository chunkRepository,
-                               KnowledgeMapper knowledgeMapper,
-                               KnowledgeBaseMapper kbMapper,
+                               KnowledgeRepository knowledgeRepository,
+                               KnowledgeBaseRepository kbRepository,
                                SpanTracker spanTracker,
                                RetrieveGraphRepository graphRepository,
                                WikiFinalizePort finalizer) {
-        this(modelRuntimeFactory, chunkRepository, knowledgeMapper, kbMapper, spanTracker,
+        this(modelRuntimeFactory, chunkRepository, knowledgeRepository, kbRepository, spanTracker,
                 graphRepository, finalizer, new ExtractPrompts());
     }
 
     /** 测试可注入模板来源。 */
     ChunkExtractService(ModelRuntimeFactory modelRuntimeFactory,
                         ChunkRepository chunkRepository,
-                        KnowledgeMapper knowledgeMapper,
-                        KnowledgeBaseMapper kbMapper,
+                        KnowledgeRepository knowledgeRepository,
+                        KnowledgeBaseRepository kbRepository,
                         SpanTracker spanTracker,
                         RetrieveGraphRepository graphRepository,
                         WikiFinalizePort finalizer,
                         ExtractPrompts extractPrompts) {
         this.modelRuntimeFactory = modelRuntimeFactory;
         this.chunkRepository = chunkRepository;
-        this.knowledgeMapper = knowledgeMapper;
-        this.kbMapper = kbMapper;
+        this.knowledgeRepository = knowledgeRepository;
+        this.kbRepository = kbRepository;
         this.spanTracker = spanTracker;
         this.graphRepository = graphRepository;
         this.finalizer = finalizer;
@@ -180,7 +181,7 @@ public class ChunkExtractService {
     private String runExtract(ExtractChunkPayload p, Map<String, Object> graphOut) {
         // 取消/删除短路：图抽取是管线里最贵的富化 fan-out，取消即跳
         if (!p.knowledgeId().isEmpty()) {
-            Knowledge k = knowledgeMapper.selectById(p.knowledgeId());
+            Knowledge k = knowledgeRepository.findByIdAny(p.knowledgeId());
             if (k != null && k.isAborted()) {
                 log.info("graph extract: knowledge {} aborted ({}), skipping chunk {}",
                         p.knowledgeId(), k.getParseStatus(), p.chunkId());
@@ -198,7 +199,7 @@ public class ChunkExtractService {
         graphOut.put("chunk_chars", chunk.getContent().codePointCount(0, chunk.getContent().length()));
         graphOut.put("chunk_preview", RetrievalObs.truncateRunes(chunk.getContent(), CHUNK_PREVIEW_RUNES));
 
-        KnowledgeBase kb = kbMapper.selectById(chunk.getKnowledgeBaseId());
+        KnowledgeBase kb = kbRepository.findByIdAny(chunk.getKnowledgeBaseId());
         if (kb == null) {
             throw new IllegalStateException("failed to get knowledge base: " + chunk.getKnowledgeBaseId());
         }

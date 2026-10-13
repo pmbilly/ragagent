@@ -1,5 +1,8 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
+import com.ragagent.knowledge.repository.KnowledgeRepository;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -16,8 +19,6 @@ import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.repository.ChunkRepository;
-import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
-import com.ragagent.knowledge.mapper.KnowledgeMapper;
 
 import com.ragagent.knowledge.domain.QuestionBatchPayload;
 import com.ragagent.common.wiki.WikiFinalizePort;
@@ -38,22 +39,22 @@ public class QuestionGenerationService {
     private static final Logger log = LoggerFactory.getLogger(QuestionGenerationService.class);
 
     private final ChunkRepository chunkRepository;
-    private final KnowledgeMapper knowledgeMapper;
-    private final KnowledgeBaseMapper kbMapper;
+    private final KnowledgeRepository knowledgeRepository;
+    private final KnowledgeBaseRepository kbRepository;
     private final SpanTracker spanTracker;
     private final WikiFinalizePort finalizer;
     private final ChunkQuestionService chunkService;
 
     @Autowired
     public QuestionGenerationService(ChunkRepository chunkRepository,
-                                     KnowledgeMapper knowledgeMapper,
-                                     KnowledgeBaseMapper kbMapper,
+                                     KnowledgeRepository knowledgeRepository,
+                                     KnowledgeBaseRepository kbRepository,
                                      SpanTracker spanTracker,
                                      WikiFinalizePort finalizer,
                                      ChunkQuestionService chunkService) {
         this.chunkRepository = chunkRepository;
-        this.knowledgeMapper = knowledgeMapper;
-        this.kbMapper = kbMapper;
+        this.knowledgeRepository = knowledgeRepository;
+        this.kbRepository = kbRepository;
         this.spanTracker = spanTracker;
         this.finalizer = finalizer;
         this.chunkService = chunkService;
@@ -126,7 +127,7 @@ public class QuestionGenerationService {
             return 0;
         }
 
-        Knowledge k = knowledgeMapper.selectById(p.knowledgeId());
+        Knowledge k = knowledgeRepository.findByIdAny(p.knowledgeId());
         if (k == null) {
             log.warn("question generation: knowledge {} not found (old in-flight task?)", p.knowledgeId());
             return 0;
@@ -139,7 +140,7 @@ public class QuestionGenerationService {
             return 0;
         }
 
-        KnowledgeBase kb = kbMapper.selectById(p.knowledgeBaseId());
+        KnowledgeBase kb = kbRepository.findByIdAny(p.knowledgeBaseId());
         if (kb == null) {
             log.warn("question generation: knowledge base {} not found", p.knowledgeBaseId());
             return 0;

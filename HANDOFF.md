@@ -920,6 +920,13 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **结果**：`KnowledgeService` **799 → 748 行** ✓（≥800 阈值彻底解除，不再是一行之差）；新增 `support/KnowledgeProjectionAdapter`、`service/DuplicateKnowledgeException` 两个顶层类型。
 - **偶发测试（记录）**：全量跑时 `RedisWikiDeletedTombstoneStoreTest.clearRemovesTombstone` 失败一次，**单跑即过** ⇒ Redis 依赖型偶发，与本步改动无关（本步未触碰 wiki/Redis 路径）。
 - **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m34s** ✓ 十一守卫 ✓（13 组 SCC 未变）。
+- **登记（余步）**：
+**🔶 B263 第⑱步（2026-10-14，5 个小块类归仓储：`ChunkExtractService`/`ChunkQuestionService`/`ChunkEditService`/`QuestionGenerationService`/`ChunkReadService`）**
+- **关键语义判断（本步最花心思处）**：两处 `mapper.selectById(...)` 与三个 `selectOne(...)` 看似都能用现成仓储方法，实则**不等价**——`Knowledge( Base)Repository.findByIdOnly(id)` **过滤软删**，而 `selectById` **不过滤**；管线任务（图抽取/问题生成）正是要**看到已软删行**才能判定 aborted 并跳过 ⇒ 新增 `findByIdAny(id)`（Knowledge 与 KB 各一，javadoc 写明"与 `findByIdOnly` 的区别"），**不复用**。
+- **其余三处复用既有方法**：`ChunkReadService.findForSummaryReload` → `KnowledgeRepository.findById(tenantId, id)`（`LogSanitizer.sanitize` 保留在服务侧、参数位置不变）；`ChunkEditService.findKnowledgeRow` → 同上；`ChunkQuestionService.findKbRow` → `KnowledgeBaseRepository.findByIdOnly(kbId)`（原查询本就带 `isNull(deletedAt)` + `LIMIT 1`，逐字等价）。
+- **连带**：5 个类的字段/构造器全换仓储（其中 `ChunkExtractService` 有**委托构造器**、`ChunkReadService` 是**单行参数表** ⇒ 第一版精确串替换漏了两处，改用灵活正则补齐）；**A16 删 5 条 / A17 删 3 条**（条目清单直接从 ArchUnit 失败信息里解析出来，逐条核对后删）；死成员守卫点名的 2 个未使用 import 清掉；`ChunkExtractServiceTest` 的 mock 由 mapper 改为仓储（桩改 `findByIdAny`）。
+- **测试**：4978 / 失败 0 / 跳过 4 ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ 十一守卫 ✓（环 0 / SCC 13 组未变）。
+- **经验（已存记忆）**：搬包/换依赖时，**"同名不同义"最危险**——`selectById` vs `findByIdOnly` 这种只差一个软删过滤的方法，必须逐个读实现再决定复用还是新增。
 - **登记（余步）**：`KnowledgeService` 仍有 748 行/60 方法，继续按目标树抽（`service.management/*` use-case、`repository/KnowledgeRepository`）；`KnowledgeFileService`(422/2)、`KnowledgeBaseService`(626/18)；最后一对 `task ⇄ service` 余 7 处。
 
 **🔶 B263 第⑧步（2026-10-14，`repository/KnowledgeRepository` 落位 + §9.2 重复实现合并）**

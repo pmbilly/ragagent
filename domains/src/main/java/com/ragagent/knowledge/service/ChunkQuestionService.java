@@ -1,12 +1,13 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
+
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,7 +25,6 @@ import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.ChunkNotFoundException;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.domain.ChunkRevisionConflictException;
-import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
@@ -57,7 +57,7 @@ public class ChunkQuestionService {
     private static final Logger log = LoggerFactory.getLogger(ChunkQuestionService.class);
 
     private final ChunkRepository chunkRepository;
-    private final KnowledgeBaseMapper kbMapper;
+    private final KnowledgeBaseRepository kbRepository;
     private final ChunkVectorIndexer chunkVectorIndexer;
     private final ModelRuntimeFactory modelRuntimeFactory;
     private final RetrieveEngineRegistry retrieveEngineRegistry;
@@ -69,7 +69,7 @@ public class ChunkQuestionService {
     private final RetrievalDriverProperties driverProperties;
 
     public ChunkQuestionService(ChunkRepository chunkRepository,
-                                KnowledgeBaseMapper kbMapper,
+                                KnowledgeBaseRepository kbRepository,
                                 ChunkVectorIndexer chunkVectorIndexer,
                                 ModelRuntimeFactory modelRuntimeFactory,
                                 RetrieveEngineRegistry retrieveEngineRegistry,
@@ -79,7 +79,7 @@ public class ChunkQuestionService {
                                 ChunkAccessGuard guard,
                                 RetrievalDriverProperties driverProperties) {
         this.chunkRepository = chunkRepository;
-        this.kbMapper = kbMapper;
+        this.kbRepository = kbRepository;
         this.chunkVectorIndexer = chunkVectorIndexer;
         this.modelRuntimeFactory = modelRuntimeFactory;
         this.retrieveEngineRegistry = retrieveEngineRegistry;
@@ -571,10 +571,7 @@ public class ChunkQuestionService {
      */
 
     private KnowledgeBase findKbRow(String kbId) {
-        return kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getId, kbId)
-                .isNull(KnowledgeBase::getDeletedAt)
-                .last("LIMIT 1"));
+        return kbRepository.findByIdOnly(kbId);
     }
 
 
