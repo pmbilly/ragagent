@@ -921,6 +921,12 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **偶发测试（记录）**：全量跑时 `RedisWikiDeletedTombstoneStoreTest.clearRemovesTombstone` 失败一次，**单跑即过** ⇒ Redis 依赖型偶发，与本步改动无关（本步未触碰 wiki/Redis 路径）。
 - **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m34s** ✓ 十一守卫 ✓（13 组 SCC 未变）。
 - **登记（余步）**：
+**🔶 B263 第㉕步（2026-10-14，`KnowledgeBaseLookupAdapter`：**service 包 mapper 直连收尾**）**
+- **本步的关键判断是"不搬"**：该类持 `ObjectProvider<KnowledgeMapper>` 并用 `getIfAvailable()` 保守返回，是**刻意的装配裁剪容忍**（注释原文："无知识仓储可查（装配裁剪）——无法判定，保守地当作'还在'"）。若换成 `KnowledgeRepository`（无条件 Bean、构造期就要求 mapper），"缺 mapper"会从**保守返回**变成**上下文启动失败** ⇒ **语义退化**，故**保留**该可选依赖（与 R6 禁 `@Lazy` 规避环无关），并在类 javadoc 写明这条理由（防后人误"清理"）。
+- **能搬的都搬了**：两处 KB 读取 → `KnowledgeBaseRepository.findByIdOnly(kbId)`（带软删过滤）与 **`findByIdAny(kbId)`**（`knowledgeBaseByIdIncludingDeleted`，⑱ 新增的"不过滤软删"读法，正好同形）。
+- **结果**：`service` 包 mapper 直连**清零**（唯一保留项即上面这条刻意的可选 mapper，A16/A17 条目**保留**且已注明理由）。
+- **测试**：4978 / 失败 0 / 跳过 4 ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ 十一守卫 ✓（环 0 / SCC 13 组未变）。
+- **登记（余步）**：
 **🔶 B263 第㉔步（2026-10-14，`KnowledgeCloneService` 归仓储：480 → 451 行）**
 - **只新增 1 个方法**：`ChunkRepository.listActiveByKnowledgeId(tenantId, knowledgeId)`（租户 + knowledge_id + 未软删）；其余 15 处全复用——`findById`（3 处租户内 KB 读，含 `TenantContext.currentTenantId()` 变体）、`findByIdOnly`、`knowledgeRepository.listByTenantAndKb`（源/目标两列表）、`kbRepository.listByTenant`（重名探测的 KB 列表）、`softDeleteIfActive`（㉑ 新增，正好同形）、`ChunkRepository.softDeleteByKnowledgeId`、三处 `insert`（KB/knowledge/chunk）。
 - **连带**：A17 删 1 条（A16 保留）；死成员守卫点名 2 个未使用 import 清掉；`ChunkMapper` 字段换成 `ChunkRepository`。

@@ -1,19 +1,25 @@
 package com.ragagent.knowledge.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.common.knowledge.KnowledgeBaseLookup;
 import com.ragagent.common.knowledge.KnowledgeBaseView;
 import com.ragagent.common.knowledge.KnowledgeView;
 import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
 
 /**
  * {@link KnowledgeBaseLookup} 的 knowledge 侧实现。
+ *
+ * <p><b>本类为何仍持有一个可选 mapper</b>（B263㉕）：{@code ObjectProvider<KnowledgeMapper>} 是
+ * **刻意的装配裁剪容忍**——某些装配/测试裁剪下知识表 mapper 不存在，此时保守返回（与迁移前一致）；
+ * 而 {@code KnowledgeRepository} 是无条件 Bean、构造期就要求 mapper，换成它会让"缺 mapper"从
+ * "保守返回"变成"上下文启动失败"。故保留该可选依赖（与 R6 禁 {@code @Lazy} 规避环无关），
+ * 其余行读取已改走 {@code KnowledgeBaseRepository}。</p>
  *
  * <p>过滤条件与迁移前的 wiki 侧直查<b>逐字一致</b>（软删过滤、{@code LIMIT 1}、
  * 解析状态判定、仓储缺位保守返回），保证这次端口化只是"换依赖方向"而非改行为。</p>
@@ -21,29 +27,24 @@ import com.ragagent.knowledge.mapper.KnowledgeMapper;
 @Component
 public class KnowledgeBaseLookupAdapter implements KnowledgeBaseLookup {
 
-    private final KnowledgeBaseMapper kbMapper;
+    private final KnowledgeBaseRepository kbRepository;
     private final ObjectProvider<KnowledgeMapper> knowledgeMapper;
 
-    public KnowledgeBaseLookupAdapter(KnowledgeBaseMapper kbMapper,
+    public KnowledgeBaseLookupAdapter(KnowledgeBaseRepository kbRepository,
                                       ObjectProvider<KnowledgeMapper> knowledgeMapper) {
-        this.kbMapper = kbMapper;
+        this.kbRepository = kbRepository;
         this.knowledgeMapper = knowledgeMapper;
     }
 
     @Override
     public KnowledgeBaseView knowledgeBaseById(String kbId) {
-        KnowledgeBase kb = kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getId, kbId)
-                .isNull(KnowledgeBase::getDeletedAt)
-                .last("LIMIT 1"));
+        KnowledgeBase kb = kbRepository.findByIdOnly(kbId);
         return view(kb);
     }
 
     @Override
     public KnowledgeBaseView knowledgeBaseByIdIncludingDeleted(String kbId) {
-        KnowledgeBase kb = kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getId, kbId)
-                .last("LIMIT 1"));
+        KnowledgeBase kb = kbRepository.findByIdAny(kbId);
         return view(kb);
     }
 
