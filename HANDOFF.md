@@ -539,7 +539,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B261 | 6 | retrieval-engine 包边界（`retrieval.*` 收拢 + policy 归位） | ✅ 2026-10-13 |
 | B262 | 6 | model-runtime 包边界（模型调用 / provider / 流生命周期） | ✅ 2026-10-13 |
 | B263 | 6 | domains 域内重排①：knowledge（29 包 248 文件；SCC 拆解 + mapper/repository 主战场） | ✅ ①~㊸（mapper 归零 / `{service,task}` SCC 消除 / 门面 + 4 用例类归位 `service.management` / 五个子面切出；§8.8.2 包重排面到位；余三项属重构级，见收口记录） |
-| B264 | 6 | ②：session（21 包 183 文件）+ agenttools/agentmanagement 落位 | 🔶 进行中（①：agentmanagement `service.config`/`service.builtin` 落位；余 B257 基线清零 / agenttools `data→datasource` / session §8.8.1） |
+| B264 | 6 | ②：session + agenttools/agentmanagement 落位 | ✅ ①~⑦（agentmanagement `service.{config,builtin}` / **B257 基线清零** / agenttools 四面对齐 `datasource` / session `controller.sse`+`domain` 三簇+`service.suggestion`；session 余项属重构级，见收口记录） |
 | B265 | 6 | ③：wiki（17 包 147）+ datasource（16 包 124）+ mcp（9 包 125） | ⬜ |
 | B266 | 6 | ④：im/memory/auth/storage/websearch/model + 其余小域 | ⬜ |
 | B267 | 6 | 门禁收紧收尾：§12.2「分层方向」「装配契约」两规则 + A11b 清零核查 + 复杂度指标（可选） | ⬜ |
@@ -1100,6 +1100,11 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **换锚**：`check-json-key-case.py` 键级豁免路径（`{'question_count'}`）；`file-size.baseline.json` 键换锚（**601 → 601**，路径变、体量不变）；A17 基线 FQN 换名（由通用替换同步）。
 - **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 ✓；`spotlessCheck build` ✓ **1m49s** ✓ **十二守卫** ✓（环 0 / 包级 SCC 12 组）；`:domains:javadoc` ✓；定向 `--rerun-tasks` ✓。
 - **登记（session 余下）**：`service.attachment` / `service.history` / `service.turn`（及 `service.rag` / `rag.stage` / `enrichment` 的目标类）**需先做断边重构**；`api/`(4) / `event/`(2) / `task/`(1) 同为**待创建**。
+
+**✅ B264 收口（2026-10-14，①~⑦）**
+- **落位成果**：`agentmanagement`→`service.{config(3),builtin(1)}`；**B257 基线清零**（audit/auth/knowledge 三处债改走 `common/<域>/XxxPort` + 域内 `api/` 适配器，`AGENT_ADAPTER_DOMAIN_SERVICE_BASELINE` = `Set.of()`）；`agenttools` 四面（`datasource`/`sql`/`web`/`wiki`）**与 §8.8.3 目标树逐名对齐**；session 切出 `controller.sse`(4)、`domain.{conversation(8),document(1),message(16)}`、`service.suggestion`(2)，测试全部随迁。
+- **登记为"重构级"（非包重排）**：① session `service.{attachment,history,turn,rag,rag.stage,enrichment}`——实测与 `service` 及彼此**互有引用**（`attachment ⇄ turn`、`history ⇄ turn`、`turn ⇄ service`）⇒ 需先做定向断边/端口化；② §8.8.1 这些子面的**多数类名今日不存在**（`ChatManage`/`Plugin*`/`SubmitTurnUseCase`…）⇒ 属"把 rag pipeline 与 turn 用例落位"的重构；③ `session.{api,event,task}` 与 §8.8.3 的 `agenttools.knowledge` 待创建类（`KnowledgeToolFormatter`/`ReadKnowledgeTool`/`SearchArguments`）；④ `agenttools.knowledge.KnowledgeSearchRanking` 归位需先做"工具状态外提"。
+- **本批留下的通用资产**：跨域端口模式定型（`common/<域>/XxxPort` + 域内 `api/` 适配器，含 JDK 视图记录写法）；"同名包"四形态清单（boot 测试树 / 改包未搬目录 / **同模块测试树** / **裸名反向边**——后者 import 判据不可见，**编译是终审**）；换锚清单再添两项（**按路径的覆盖清单**如 `EVENT_MAP_FILES`、**基线条目在多个基线里文本相同**需按声明定位）。
 
 **🔶 B263 第㉟步（2026-10-14，第二个子面 `service.chunk` 切出）**
 - **动前断言（把"可测"变成"可证"）**：脚本**先断言** `ChunkEditService`/`ChunkExtractService`/`ChunkReadService` 三者在 `service` 包内**入度为零**（无人引用，`package-info` 除外），断言不过就 abort —— 这样"切出只产生单向外边"不再靠推理。`ChunkQuestionService` **故意留在** `service`：它被 `QuestionGenerationService` 引用，单独搬会造出 `service ⇄ service.chunk` 环（已在子面 package-info 写明）。
