@@ -48,7 +48,7 @@ class AgentConfigKeyUsageTest {
             "common/prompt/AgentPromptPlaceholders", "knowledge/domain/KnowledgeBase",
             // HTTP 面占位符定义：此处的 snake 是**模板令牌**（数据值，如 {{knowledge_bases}}），
             // 不是 agent 配置键；两面一致性由 AgentPlaceholdersTest 单独守。
-            "agentmanagement/service/AgentPlaceholders",
+            "agentmanagement/service/config/AgentPlaceholders",
             "session/mapper/MessageSuggestionRepository", "session/mapper/MessageMapper",
             "session/mapper/MessageRepository");
 

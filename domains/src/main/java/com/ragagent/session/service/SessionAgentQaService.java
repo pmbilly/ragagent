@@ -12,7 +12,7 @@ import com.ragagent.common.session.PipelineUsedMemoryView;
 import com.ragagent.knowledge.service.faq.FaqEntryQueryService;
 import com.ragagent.agent.AgentEngine;
 import com.ragagent.agent.AgentEngineException;
-import com.ragagent.agentmanagement.service.AgentConfigJson;
+import com.ragagent.agentmanagement.service.config.AgentConfigJson;
 import com.ragagent.event.Event;
 import com.ragagent.event.EventBus;
 import com.ragagent.event.payload.ErrorData;

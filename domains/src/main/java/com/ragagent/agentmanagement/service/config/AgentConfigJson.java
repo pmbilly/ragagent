@@ -1,4 +1,4 @@
-package com.ragagent.agentmanagement.service;
+package com.ragagent.agentmanagement.service.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

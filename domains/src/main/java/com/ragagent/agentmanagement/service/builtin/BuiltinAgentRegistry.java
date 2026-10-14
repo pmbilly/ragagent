@@ -1,4 +1,6 @@
-package com.ragagent.agentmanagement.service;
+package com.ragagent.agentmanagement.service.builtin;
+
+import com.ragagent.agentmanagement.service.config.AgentConfigJson;
 
 import com.ragagent.common.prompt.PromptSource;
 import com.ragagent.common.web.JsonMappers;

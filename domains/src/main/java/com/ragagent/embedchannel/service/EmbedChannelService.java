@@ -27,7 +27,7 @@ import com.ragagent.session.domain.Session;
 import com.ragagent.session.domain.SessionListQuery;
 import com.ragagent.session.domain.SessionPage;
 import com.ragagent.session.repository.SessionRepository;
-import com.ragagent.agentmanagement.service.BuiltinAgentRegistry;
+import com.ragagent.agentmanagement.service.builtin.BuiltinAgentRegistry;
 
 /**
  * embed 渠道 service（含 session token/签名段）。

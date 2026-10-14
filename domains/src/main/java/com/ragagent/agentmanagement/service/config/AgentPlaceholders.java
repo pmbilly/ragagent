@@ -1,4 +1,4 @@
-package com.ragagent.agentmanagement.service;
+package com.ragagent.agentmanagement.service.config;
 
 import com.ragagent.common.web.JsonMappers;
 import java.util.List;

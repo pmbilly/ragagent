@@ -539,7 +539,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B261 | 6 | retrieval-engine 包边界（`retrieval.*` 收拢 + policy 归位） | ✅ 2026-10-13 |
 | B262 | 6 | model-runtime 包边界（模型调用 / provider / 流生命周期） | ✅ 2026-10-13 |
 | B263 | 6 | domains 域内重排①：knowledge（29 包 248 文件；SCC 拆解 + mapper/repository 主战场） | ✅ ①~㊸（mapper 归零 / `{service,task}` SCC 消除 / 门面 + 4 用例类归位 `service.management` / 五个子面切出；§8.8.2 包重排面到位；余三项属重构级，见收口记录） |
-| B264 | 6 | ②：session（21 包 183 文件）+ agenttools/agentmanagement 落位 | ⬜ |
+| B264 | 6 | ②：session（21 包 183 文件）+ agenttools/agentmanagement 落位 | 🔶 进行中（①：agentmanagement `service.config`/`service.builtin` 落位；余 B257 基线清零 / agenttools `data→datasource` / session §8.8.1） |
 | B265 | 6 | ③：wiki（17 包 147）+ datasource（16 包 124）+ mcp（9 包 125） | ⬜ |
 | B266 | 6 | ④：im/memory/auth/storage/websearch/model + 其余小域 | ⬜ |
 | B267 | 6 | 门禁收紧收尾：§12.2「分层方向」「装配契约」两规则 + A11b 清零核查 + 复杂度指标（可选） | ⬜ |
@@ -1033,6 +1033,14 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **结构目标全部兑现**：mapper 直连归零 ✓ · `{service,task}` 包级 SCC 消除 ✓ · 门面归位 `service.management` ✓ · 五个子面 `{faq(8),chunk(4),query(3),management(10),enrichment(2)}` 切出 ✓ · 顶层只剩 `KnowledgeAccessHelper`（㊷ 登记）+ `HousekeepingService`/`EmbeddingModelAdapter`（§8.8.2 本就留顶层）+ `DuplicateKnowledgeException`（⑦ 实测放 `domain` 会造环）⇒ **§8.8.2 的包重排面到位**。
 - **剩余三项（登记为"重构级"、非包重排，留待独立立项/后续批次）**：① `KnowledgeAccessHelper` 归属（搬 `management` 会造 `enrichment ⇄ management` 环；`requireKb` 与 `domain.access` 守卫**语义不等价** ⇒ 不能换用）；② `domain.{document,task,graph}` 需先造类型（12 个类型仓库里不存在）；③ §8.8.2 的 use-case 目标名（`ManageKnowledgeBase`/`SummarizeKnowledge`/`ProcessKnowledgeUseCase` …）属**改名/重构**级。
 - **本批留下的通用资产**：环守卫"唯一权威读数"的两次现场（㊷ 三元环、㊴ 断言升级）；"换包连带清单"四件套（javadoc `{@link}` 失链 · `FROZEN_PREFIXES`/键级豁免按路径 · 别的测试树同名包 · file-size 键换锚）；**CRLF 会让 `^import...$` 正则全漏判 ⇒ 一律用子串判据**；"同名包"三形态（boot 测试树 / 改包未搬目录 / **同模块测试树**）。
+
+**🔶 B264 第①步（2026-10-14，agentmanagement 落位：`service.config` + `service.builtin`）**
+- **按 §8.8.3 切子面**：`AgentConfigJson`/`AgentPlaceholders`/`AgentTypePresets` → `service.config`；`BuiltinAgentRegistry` → `service.builtin`。
+- **动前断言第一次"自己漏边"**：脚本只按 **import** 查反向边 ⇒ 断言通过；**编译当场揭穿**——`AgentSuggestedQuestions` 以**裸名**（同包免 import）反向持有 `CustomAgentService` ✗ ⇒ 搬进 `config` 会造 `service ⇄ service.config` 环（**同包裸名引用对 import 判据不可见**，本仓 SCC 守卫同样基于 import/类型边 ⇒ **编译是最硬的判据**；"同名包/裸名"家族第 4 形态）。
+- **定案**：`AgentSuggestedQuestions` **退回 `service`**（它本质是**用例**——推荐问题的 KB scope 解析要读 agent 定义）+ 其测试随迁回；其余 4 类落位 ✓（重跑动前断言：对 `service` 零反向边）。`config/package-info` 写明"为什么它没进来"。
+- **连带**：`CustomAgentService`/`BuiltinAgentRegistry`/`AgentSuggestedQuestions` 补 `service.config`/`service.builtin` import（原同包免 import）；全仓 FQN 替换 **10 文件**（含 ArchUnit 两处基线 FQN、`ClasspathResourcesTest`、以及 `AgentConfigKeyUsageTest` 的**豁免路径锚** `agentmanagement/service/AgentPlaceholders` → `…/service/config/AgentPlaceholders`）；三份 package-info（2 新建 + `service` 更新）。
+- **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 ✓；`spotlessCheck build` ✓ **1m48s** ✓ **十二守卫** ✓（环 0 / 包级 SCC **12 组**不变）；`:domains:javadoc` ✓；定向 `--rerun-tasks` ✓。
+- **登记（B264 余步）**：① **B257 基线清零**——勘察发现三处里 `AgentSuggestedQuestions` 的条目**已过期**（它现只 import `knowledge.domain.KnowledgeBase`，规则只禁 `service`/`mapper` 面 ⇒ 应**删条目**），另两处是真债（`SkillCatalogController` → `audit.service.AuditLogService`；`CustomAgentService` → `knowledge.service.management.KnowledgeBaseService` + `auth.service.UserService`）；② agenttools `data/` → `datasource/` 改名（§8.8.3）；③ session 21 包重构（§8.8.1：`domain.{conversation,document,message}`、`service.{attachment,enrichment,history,rag,rag.stage,suggestion,turn}`、`controller.sse`、`event`、`task`）。
 
 **🔶 B263 第㉟步（2026-10-14，第二个子面 `service.chunk` 切出）**
 - **动前断言（把"可测"变成"可证"）**：脚本**先断言** `ChunkEditService`/`ChunkExtractService`/`ChunkReadService` 三者在 `service` 包内**入度为零**（无人引用，`package-info` 除外），断言不过就 abort —— 这样"切出只产生单向外边"不再靠推理。`ChunkQuestionService` **故意留在** `service`：它被 `QuestionGenerationService` 引用，单独搬会造出 `service ⇄ service.chunk` 环（已在子面 package-info 写明）。

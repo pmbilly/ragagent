@@ -14,7 +14,7 @@ import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.mapper.ImChannelMapper;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.agentmanagement.mapper.CustomAgentMapper;
-import com.ragagent.agentmanagement.service.BuiltinAgentRegistry;
+import com.ragagent.agentmanagement.service.builtin.BuiltinAgentRegistry;
 
 /**
  * IM 渠道 service（CRUD + 渠道行钩子：兜底、session_mode 校验、bot_identity 计算）。

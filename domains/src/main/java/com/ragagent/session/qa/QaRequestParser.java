@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.common.web.JsonMappers;
 import java.util.List;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
-import com.ragagent.agentmanagement.service.AgentConfigJson;
+import com.ragagent.agentmanagement.service.config.AgentConfigJson;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.BizException;
 import com.ragagent.session.domain.Message;

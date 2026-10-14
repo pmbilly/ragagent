@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
-import com.ragagent.agentmanagement.service.AgentConfigJson;
+import com.ragagent.agentmanagement.service.config.AgentConfigJson;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.ImFormat;
 import com.ragagent.im.service.ImService.InflightEntry;
