@@ -330,10 +330,6 @@
       "SystemDtos",
       "SystemSettingService"
     ],
-    "system→knowledge": [
-      "ParserEngineRegistry",
-      "SystemController"
-    ],
     "system→storage": [
       "SystemController",
       "SystemInfoService"

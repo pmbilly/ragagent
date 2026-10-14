@@ -16,7 +16,7 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.knowledge.client.DocReaderClient;
+import com.ragagent.contract.doc.DocReaderAdminPort;
 import com.ragagent.system.dto.SystemDtos;
 import com.ragagent.system.service.ParserEngineRegistry;
 import com.ragagent.system.service.SystemInfoService;
@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.knowledge.config.DocReaderProperties;
 import com.ragagent.storage.domain.StorageBackend;
 import com.ragagent.storage.service.StorageBackendService;
 import com.ragagent.system.service.DeploymentCapabilitiesHolder;
@@ -59,24 +58,21 @@ public class SystemController {
     private final SystemInfoService infoService;
     private final ParserEngineRegistry parserEngines;
     private final TenantService tenantService;
-    private final DocReaderClient docReader;
+    private final DocReaderAdminPort docReader;
     private final SsrfGuard ssrfGuard;
     private final DeploymentCapabilitiesHolder capabilitiesHolder;
     private final StorageBackendService storageBackendService;
     /** env 读取面（不读裸 System.getenv；含 DOCREADER_* 与存储 env 可用性探测）。 */
     private final Environment environment;
-    /** DocReader 连接信息（走属性绑定，不直读 DOCREADER_* env）。 */
-    private final DocReaderProperties docReaderProperties;
 
     public SystemController(SystemInfoService infoService,
                             ParserEngineRegistry parserEngines,
                             TenantService tenantService,
-                            DocReaderClient docReader,
+                            DocReaderAdminPort docReader,
                             SsrfGuard ssrfGuard,
                             DeploymentCapabilitiesHolder capabilitiesHolder,
                             StorageBackendService storageBackendService,
-                            Environment environment,
-                            DocReaderProperties docReaderProperties) {
+                            Environment environment) {
         this.infoService = infoService;
         this.parserEngines = parserEngines;
         this.tenantService = tenantService;
@@ -85,7 +81,6 @@ public class SystemController {
         this.capabilitiesHolder = capabilitiesHolder;
         this.storageBackendService = storageBackendService;
         this.environment = environment;
-        this.docReaderProperties = docReaderProperties;
     }
 
     // ── GET /capabilities ─────────────────────────────────────────────────
@@ -181,7 +176,7 @@ public class SystemController {
                 true, engineOverrides(),
                 parserEngines.fetchRemoteEngines(true, engineOverrides()));
         return ResponseEntity.ok(new SystemDtos.ParserEnginesResponse(
-                true, addr, docreaderTransport(), engines));
+                true, addr, docReader.config().transport(), engines));
     }
 
     // ── GET /storage-engine-status ────────────────────────────────────────
@@ -680,16 +675,7 @@ public class SystemController {
         List<SystemDtos.ParserEngineInfo> engines =
                 parserEngines.listAllEngines(connected, overrides, remote);
         return new SystemDtos.ParserEnginesResponse(
-                connected, docReaderAddr(), docreaderTransport(), engines);
-    }
-
-    private String docReaderAddr() {
-        return docReaderProperties.addr() == null ? "" : docReaderProperties.addr().trim();
-    }
-
-    /** transport 缺省 grpc（小写归一）。 */
-    private String docreaderTransport() {
-        return docReaderProperties.transportOrDefault();
+                connected, docReader.config().addr(), docReader.config().transport(), engines);
     }
 
     private String orEnv(String value, String envName) {

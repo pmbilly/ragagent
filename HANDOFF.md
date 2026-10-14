@@ -1319,6 +1319,14 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **A③ 累计（十七刀）**：边 **64 → 42（−22）**、类 **317 → 243（−74）**；三档 **① 34 条 / 157 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
 - **下一步（①档余量按性价比）**：`mcp→approval`(7) → `session` 能力边（`knowledge` 17 / `storage` 14 / `model` 12 … 共 63 类）→ `embedchannel→session` 余 2（**已拍板：转"实体→视图 + 流式契约"K 级，不建 servlet seam** ✓）
 
+**🔶 A③ 第二十二刀：DocReader 管理面端口化 ⇒ `system→knowledge` 整条边清零（2026-10-14，R10 边 35 → 34、类 223 → 221）**
+- **接缝选择**：DocReader 消费面分两种——**管理面**（连接态 / 重连 / 远端引擎清单 / 连接配置：system 2 类）与**解析面**（`read`：im / session / initialization 共 6 类）。本刀只做管理面（小且独立），解析面留下刀
+- **契约新增**：`contract.doc.DocReaderAdminPort`（`isConnected` / `reconnect` / `listEngines` / `config` + 两个视图 record `RemoteEngineView` / `DocReaderConfigView`）+ `contract.doc` package-info；knowledge 侧实现 `knowledge/api/DocReaderAdminAdapter`（配置成形口径与 `SystemController` 原私有辅助逐字一致：addr 去空白、transport 走 `transportOrDefault()`）
+- **迁移 2 类**：`ParserEngineRegistry`（`DocReaderClient` → 端口、`RemoteEngine` → 视图）、`SystemController`（`DocReaderClient` + `DocReaderProperties` → 端口一处，**构造参数 9 → 8**，两个私有辅助方法删除）⇒ **`system→knowledge` 整条边清零** ✓
+- **⚠️ 一处守卫红态与正解（写入方法论）**：adapter 首版落在 `knowledge/service/management/` ⇒ **A16 报"基线外新增违例"**（service 包不得依赖边界层 client）——正解不是登记基线，而是**把适配器放 `knowledge/api/`**（该包已有 3 个同类 adapter，且 A16 只扫 `..service..` 包）："连接边界层与端口"本就是 api 层的职责 ✓；随后 A16 报出**过期条目** `ParserEngineRegistry` ⇒ 按提示删除、存量 75 → 74 ✓
+- **验证**：**13 守卫全绿** ✓；`spotlessCheck build` ✓ **1m42s** ✓；**4990 / 失败 0 / 跳过 4**（boot 1331 ✓）；定向 system+knowledge **152 条** ✓；dev 重启 ready ✓ + 冒烟（**`/api/v1/system/parser-engines` 200** ✓ 端到端走新端口、capabilities / info / knowledge-bases 200 ✓）
+- **A③ 累计（二十二刀）**：边 **64 → 34（−30）**、类 **317 → 221（−96）**；三档 **① 26 条 / 135 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
+- **下一步**：DocReader 解析面（`im→knowledge` 余 2 类 · `session→knowledge` 余 15 · `initialization→knowledge` 4——`read` 面端口 + `ParseResultView`）→ model 族（7 条边 37 类，拆 2-3 刀）→ storage 族（`session→storage` 14 / `knowledge→storage` 9 等）
 **🔶 A③ 第二十一刀：settings 族一次性收口 ⇒ 4 条边全清、`settings` 域退役（2026-10-14，R10 边 39 → 35、类 234 → 223）**
 - **判定依据（"1 类边"的第二种形态：端口/配置本来就该在 L1）**：`SystemSettingGateway` 的 javadoc **自己写着"端口放在 {@code common}"**（实际漂移在 `settings` 域）——本刀把漂移纠正，不是新造抽象 ✓
 - **三件上提 L1**：

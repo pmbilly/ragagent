@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.ragagent.knowledge.client.DocReaderClient;
+import com.ragagent.contract.doc.DocReaderAdminPort;
 import com.ragagent.system.dto.SystemDtos;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,9 +33,9 @@ public class ParserEngineRegistry {
 
     private static final Logger log = LoggerFactory.getLogger(ParserEngineRegistry.class);
 
-    private final DocReaderClient docReader;
+    private final DocReaderAdminPort docReader;
 
-    public ParserEngineRegistry(DocReaderClient docReader) {
+    public ParserEngineRegistry(DocReaderAdminPort docReader) {
         this.docReader = docReader;
     }
 
@@ -163,13 +163,13 @@ public class ParserEngineRegistry {
             return null;
         }
         try {
-            List<DocReaderClient.RemoteEngine> engines = docReader.listEngines(
+            List<DocReaderAdminPort.RemoteEngineView> engines = docReader.listEngines(
                     overrides == null ? Map.of() : overrides);
             if (engines == null) {
                 return null;
             }
             List<SystemDtos.ParserEngineInfo> mapped = new ArrayList<>(engines.size());
-            for (DocReaderClient.RemoteEngine e : engines) {
+            for (DocReaderAdminPort.RemoteEngineView e : engines) {
                 mapped.add(new SystemDtos.ParserEngineInfo(e.name(), e.description(),
                         e.fileTypes() == null ? List.of() : e.fileTypes(),
                         e.available(), e.unavailableReason() == null ? "" : e.unavailableReason()));
