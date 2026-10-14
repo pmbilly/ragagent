@@ -21,7 +21,7 @@ import com.ragagent.model.service.ModelRuntimeAssembler;
 import com.ragagent.model.service.ModelService;
 import com.ragagent.session.repository.MessageRepository;
 import com.ragagent.session.repository.MessageSuggestionRepository;
-import com.ragagent.settings.ConversationProperties;
+import com.ragagent.common.settings.ConversationProperties;
 import com.ragagent.websearch.service.WebSearchTempKbStateService;
 
 /**

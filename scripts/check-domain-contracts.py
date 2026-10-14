@@ -55,7 +55,7 @@ BASELINE = os.path.join(ROOT, 'scripts/domain-contracts.baseline.json')
 DOMAINS = [
     'agent', 'agentmanagement', 'agenttools', 'approval', 'audit', 'auth', 'datasource',
     'embedchannel', 'evaluation', 'favorite', 'im', 'initialization', 'knowledge', 'mcp',
-    'memory', 'model', 'session', 'settings', 'storage', 'system', 'tenant', 'vectorstore',
+    'memory', 'model', 'session', 'storage', 'system', 'tenant', 'vectorstore',
     'websearch', 'wiki',
 ]
 

@@ -27,7 +27,7 @@ import com.ragagent.chatpipeline.SummaryConfig;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
-import com.ragagent.settings.ConversationProperties;
+import com.ragagent.common.settings.ConversationProperties;
 import com.ragagent.platform.event.EventBus;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.service.management.KnowledgeBaseService;

@@ -1319,6 +1319,19 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **A③ 累计（十七刀）**：边 **64 → 42（−22）**、类 **317 → 243（−74）**；三档 **① 34 条 / 157 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
 - **下一步（①档余量按性价比）**：`mcp→approval`(7) → `session` 能力边（`knowledge` 17 / `storage` 14 / `model` 12 … 共 63 类）→ `embedchannel→session` 余 2（**已拍板：转"实体→视图 + 流式契约"K 级，不建 servlet seam** ✓）
 
+**🔶 A③ 第二十一刀：settings 族一次性收口 ⇒ 4 条边全清、`settings` 域退役（2026-10-14，R10 边 39 → 35、类 234 → 223）**
+- **判定依据（"1 类边"的第二种形态：端口/配置本来就该在 L1）**：`SystemSettingGateway` 的 javadoc **自己写着"端口放在 {@code common}"**（实际漂移在 `settings` 域）——本刀把漂移纠正，不是新造抽象 ✓
+- **三件上提 L1**：
+  - `ConversationProperties`（`@ConfigurationProperties`，"conversation.*" + prompt 模板回填）⇒ `common.settings`（**先在 `platform.config` 试放 ⇒ R9 包级 SCC 立刻报新环**：`platform.config ↔ platform.prompt/web` ——该包已被 L1 内部依赖（`AppEnvLookup`），不能再吃"依赖 prompt/web 的配置类"⇒ 改放 `common.settings`，环消失 ✓ **一次真实的包级环红态探针**）
+  - `SystemSettingGateway`（只读端口，3 个 get 方法）+ `SystemSettingRegistry`（key 元数据/编解码，纯静态）⇒ `common.settings`
+- **settings 域退役**：目录删除（`package-info` 一并删）+ `check-domain-contracts.py` 的 `DOMAINS` 去 `'settings'` + boot `@ConfigurationPropertiesScan` 由 `com.ragagent.settings` 换 `com.ragagent.common.settings`（**扫描清单必须同步，否则 `ConversationProperties` 静默不绑定**）
+- **4 条边全清**（auth 3 类 / session 5 类 / knowledge 2 类 / system 1 类）：`auth→settings` · `session→settings` · `knowledge→settings` · `system→settings` ✓；`SystemSettingService` **留在 system 域**（它只是接口的实现方，implements 搬去 L1 的端口 ✓ 不必搬）
+- **R6 未触**：三件均无 `@Component/@Service` 注解（`ConversationProperties` 是 `@ConfigurationProperties`，不在 BEAN_RE 内）⇒ common 内 bean 计数不变 ✓
+- **测试搬迁**：`SystemSettingRegistryTest` 随类入 `common/src/test/.../common/settings`（domains 2954 → 2952、common 144 → 146，**账目平** ✓）
+- **验证**：**13 守卫全绿** ✓（R10 35 边 / 223 类；R9 包级 SCC 回到 10 组基线）；`spotlessCheck build` ✓；**4990 / 失败 0 / 跳过 4**（boot 1331 ✓）；定向 auth/session/knowledge/system + common ✓；dev 重启 ready ✓（**配置绑定验证**：`ConversationProperties` 换包后 8 个注入方仍装配成功）+ 冒烟（sessions / knowledge-bases 200 ✓、`/api/v1/system/admin/settings` 403 鉴权正常非 500 ✓）
+- **⚠️ 一次瞬时失败（已按纪律连跑两遍）**：首次全量构建 FAILED 且未留痕；紧随的一次全量 + `--rerun-tasks` 真全量（65 tasks 全执行）**均绿** ⇒ 判为瞬时；若下批再现，需固定证据（`--stacktrace` + 报告留存）
+- **A③ 累计（二十一刀）**：边 **64 → 35（−29）**、类 **317 → 223（−94）**；三档 **① 27 条 / 137 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
+- **下一步（按能力域分组）**：DocReader 族（`system→knowledge` 2 + im/session 各 2——契约面加 DocReader 管理/解析端口）→ model 族（7 条边 37 类，拆 2-3 刀）→ storage 族（`session→storage` 14 / `knowledge→storage` 9 等）
 **🔶 A③ 第二十刀：小边双清 ⇒ `memory→knowledge` + `websearch→knowledge`（2026-10-14，R10 边 41 → 39、类 236 → 234）**
 - **负面发现（写入方法论）**：① 档"1 类边"多**不是零碎边**，而是"某能力域的一个消费方"——本次实测三类：`EvaluationService`（1 类吃 3 条边，但用知识/模型**实体 + 域服务**，需整刀端口化）· `DefaultWikiModelResolver`/`DefaultMemoryModelResolver`（吃 model 边，属"model 能力端口化"这一族）· `SystemSettingService`（**它就是 settings 网关的实现方**，本质是归属问题而非消费）。⇒ 后续按"能力域端口化"分组作业（settings 4 条边 / model 7 条边 / storage 多条），不按"边的大小"切
 - **本刀两处（真·小边）**：

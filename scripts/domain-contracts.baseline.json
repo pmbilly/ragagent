@@ -102,11 +102,6 @@
       "UserSessionOps",
       "WsAuthSupport"
     ],
-    "auth→settings": [
-      "AuthController",
-      "TenantCatalogController",
-      "UserService"
-    ],
     "datasource→knowledge": [
       "DataSourceController",
       "DataSourceCredentialsController",
@@ -194,10 +189,6 @@
       "KnowledgeProcessWorker",
       "KnowledgeSummaryService",
       "KnowledgeTagService"
-    ],
-    "knowledge→settings": [
-      "ChunkQuestionService",
-      "KnowledgeSummaryService"
     ],
     "mcp→model": [
       "McpServiceController",
@@ -310,13 +301,6 @@
       "TemporaryDocumentService",
       "VlmDescriberWiring"
     ],
-    "session→settings": [
-      "AgentToolBackends",
-      "AgentToolKbBackends",
-      "QaWiring",
-      "SessionKnowledgeQaService",
-      "SessionService"
-    ],
     "session→websearch": [
       "AgentToolBackends",
       "QaWiring",
@@ -357,9 +341,6 @@
     "system→tenant": [
       "SystemAdminController",
       "SystemAdminUserService"
-    ],
-    "system→settings": [
-      "SystemSettingService"
     ],
     "wiki→model": [
       "DefaultWikiModelResolver"

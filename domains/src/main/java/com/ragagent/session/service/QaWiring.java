@@ -40,7 +40,7 @@ import com.ragagent.chatpipeline.plugin.PluginWebFetch;
 import com.ragagent.chatpipeline.plugin.PluginWikiBoost;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.retrieval.HybridSearchService;
-import com.ragagent.settings.ConversationProperties;
+import com.ragagent.common.settings.ConversationProperties;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.repository.ChunkRepository;

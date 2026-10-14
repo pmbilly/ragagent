@@ -1,4 +1,4 @@
-package com.ragagent.settings;
+package com.ragagent.common.settings;
 
 import com.ragagent.platform.web.JsonMappers;
 import java.util.List;
