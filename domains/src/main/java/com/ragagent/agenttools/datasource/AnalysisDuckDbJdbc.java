@@ -1,4 +1,4 @@
-package com.ragagent.agenttools.data;
+package com.ragagent.agenttools.datasource;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

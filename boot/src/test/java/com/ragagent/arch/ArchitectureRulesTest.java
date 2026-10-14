@@ -307,7 +307,7 @@ class ArchitectureRulesTest {
             Map.entry("com.ragagent.common.jdbc.DatabaseDialects", "方言探测（收敛点）"),
             Map.entry("com.ragagent.config.StartupTaskRecovery", "启动期任务修复"),
             Map.entry("com.ragagent.agent.skills.SkillCatalogService", "PG 专有 SQL（技能目录）"),
-            Map.entry("com.ragagent.agenttools.data.AnalysisDuckDbJdbc", "非业务库引擎（DuckDB）"),
+            Map.entry("com.ragagent.agenttools.datasource.AnalysisDuckDbJdbc", "非业务库引擎（DuckDB）"),
             Map.entry("com.ragagent.knowledge.repository.KnowledgeSpanRepository", "PG 专有 SQL（span 批量写）"),
             Map.entry("com.ragagent.knowledge.service.HousekeepingService", "PG 专有 SQL（超时清理）"),
             Map.entry("com.ragagent.knowledge.storage.TenantStorageService", "PG 专有 SQL（存储用量）"),

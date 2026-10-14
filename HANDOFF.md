@@ -1060,6 +1060,14 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 **26s 实跑**（两个新 `@Component` 装配正常）；`spotlessCheck build` ✓ **3m15s** ✓ **十二守卫** ✓（环 0 / 包级 SCC 12 组）；`:domains:javadoc` ✓。
 - **登记（B264 余下）**：agenttools `data/` → `datasource/`（§8.8.3）；session §8.8.1 大重构（21 包）。
 
+**🔶 B264 第④步（2026-10-14，agenttools `data/` → `datasource/` 改名；§8.8.3 差集盘点）**
+- **改名**：`agenttools.data` → `agenttools.datasource`（5 类 + package-info）——类集与 §8.8.3 的 `datasource/` 目标**逐名一致** ⇒ **纯改名**（无搬迁、无新增边）；测试树 `domains/src/test/.../agenttools/data/DataAnalysisRecordingTest.java` **随迁** mirror 包（"同名包"老办法）；两处空目录删除（`check-stray-dirs` 扫"游离/死包目录"）。
+- **连带**：FQN 替换 4 文件（`session/service/QaWiring`、`session/service/AgentToolBackends`、`ArchitectureRulesTest` 的 `Map.entry("…agenttools.data.AnalysisDuckDbJdbc", "非业务库引擎（DuckDB）")` 白名单键、测试自身）；`datasource/package-info` 写明改名缘由。
+- **锚点复核**：`scripts/*` 无 `agenttools/data` 路径锚 ✓；file-size 的 agenttools 条目在 `knowledge/`/`web/`（未动）✓；json 键豁免在 `agenttools/sql/`（未动）✓。
+- **§8.8.3 差集盘点（本步顺带做完）**：`datasource` 5/5 ✓ · `sql` 5/5 ✓ · `web` 2/2 ✓ · `wiki` 30/30 ✓ —— **四面已完全对齐目标树**；`knowledge` 10/12：目标待创建 3 个（`KnowledgeToolFormatter` / `ReadKnowledgeTool` / `SearchArguments`），现有 `KnowledgeSearchRanking` 不在目标树（B261 已登记：归位需先做"工具状态外提"重构）⇒ **属重构级**，登记不硬搬。
+- **测试**：**4980 / 失败 0 / 跳过 4** ✓（首轮一次 `ImRedisStoreTest` Redis 型偶发，按约定重跑即绿）；启动测试 ✓；`spotlessCheck build` ✓ **1m39s** ✓ **十二守卫** ✓（环 0 / 包级 SCC 12 组）；`:domains:javadoc` ✓；定向 `--rerun-tasks` ✓。
+- **登记（B264 余下）**：session §8.8.1 大重构（21 包 / 120 文件）。
+
 **🔶 B263 第㉟步（2026-10-14，第二个子面 `service.chunk` 切出）**
 - **动前断言（把"可测"变成"可证"）**：脚本**先断言** `ChunkEditService`/`ChunkExtractService`/`ChunkReadService` 三者在 `service` 包内**入度为零**（无人引用，`package-info` 除外），断言不过就 abort —— 这样"切出只产生单向外边"不再靠推理。`ChunkQuestionService` **故意留在** `service`：它被 `QuestionGenerationService` 引用，单独搬会造出 `service ⇄ service.chunk` 环（已在子面 package-info 写明）。
 - **切出**：3 类 → `com.ragagent.knowledge.service.chunk`（`git mv` + 包声明 + 全仓 FQN 替换 3 文件）；测试面 `ChunkExtractServiceTest` 随迁；新建 `service/chunk/package-info`；`service/package-info` 同步。

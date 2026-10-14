@@ -1,4 +1,4 @@
-package com.ragagent.agenttools.data;
+package com.ragagent.agenttools.datasource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,11 +23,11 @@ import org.junit.jupiter.api.io.TempDir;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.llm.ToolResult;
-import com.ragagent.agenttools.data.DataAnalysisTool.AnalysisDuckDb;
-import com.ragagent.agenttools.data.DataAnalysisTool.KnowledgeData;
-import com.ragagent.agenttools.data.DataAnalysisTool.KnowledgeFileMaterializer;
-import com.ragagent.agenttools.data.DataAnalysisTool.KnowledgeLoader;
-import com.ragagent.agenttools.data.DataAnalysisTool.QueryResult;
+import com.ragagent.agenttools.datasource.DataAnalysisTool.AnalysisDuckDb;
+import com.ragagent.agenttools.datasource.DataAnalysisTool.KnowledgeData;
+import com.ragagent.agenttools.datasource.DataAnalysisTool.KnowledgeFileMaterializer;
+import com.ragagent.agenttools.datasource.DataAnalysisTool.KnowledgeLoader;
+import com.ragagent.agenttools.datasource.DataAnalysisTool.QueryResult;
 import com.ragagent.common.retrieval.SearchTarget;
 import com.ragagent.agent.tool.ToolRequest;
 import com.ragagent.agenttools.GoRecording45B;
