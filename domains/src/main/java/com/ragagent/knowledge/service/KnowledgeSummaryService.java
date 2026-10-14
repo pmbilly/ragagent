@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.domain.KnowledgeTenants;
+
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 
@@ -119,7 +121,7 @@ public class KnowledgeSummaryService {
     }
 
     private Knowledge doRegenerateKnowledgeSummary(String id, boolean willRetry) {
-        Knowledge knowledge = knowledgeRepository.findById(KnowledgeService.tenantId(), id);
+        Knowledge knowledge = knowledgeRepository.findById(KnowledgeTenants.tenantId(), id);
         if (knowledge == null) {
             throw BizException.notFound("record not found");
         }
@@ -127,7 +129,7 @@ public class KnowledgeSummaryService {
         if (kb.getSummaryModelId() == null || kb.getSummaryModelId().isEmpty()) {
             throw new BizException(AppError.badRequest("summary model is not configured"));
         }
-        List<Chunk> allChunks = chunkRepo.listChunksByKnowledgeID(KnowledgeService.tenantId(), id);
+        List<Chunk> allChunks = chunkRepo.listChunksByKnowledgeID(KnowledgeTenants.tenantId(), id);
         List<Chunk> textChunks = new ArrayList<>();
         for (Chunk chunk : allChunks) {
             if ("text".equals(chunk.getChunkType()) && chunk.isIsEnabled()) {
@@ -191,7 +193,7 @@ public class KnowledgeSummaryService {
             // allChunks 是 text-only，永远不含已有 summary chunk——必须按类型另查
             //
             List<Chunk> existingSummaries = chunkRepo.listChunksByKnowledgeIDAndTypes(
-                    KnowledgeService.tenantId(), id, List.of("summary"));
+                    KnowledgeTenants.tenantId(), id, List.of("summary"));
             List<Chunk> summaryChunks = new ArrayList<>();
             for (Chunk chunk : existingSummaries) {
                 chunk.setContent("# Summary\n" + summary);
@@ -205,7 +207,7 @@ public class KnowledgeSummaryService {
                 OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
                 Chunk summaryChunk = new Chunk();
                 summaryChunk.setId(UUID.randomUUID().toString());
-                summaryChunk.setTenantId(KnowledgeService.tenantId());
+                summaryChunk.setTenantId(KnowledgeTenants.tenantId());
                 summaryChunk.setKnowledgeId(knowledge.getId());
                 summaryChunk.setKnowledgeBaseId(knowledge.getKnowledgeBaseId());
                 summaryChunk.setContent("# Summary\n" + summary);
@@ -574,7 +576,7 @@ public class KnowledgeSummaryService {
      * 进程内虚拟线程执行刷新，重试上限 MaxRetry(3)。
      */
     public void requestKnowledgeSummaryRefresh(String id) {
-        Knowledge k = knowledgeRepository.findById(KnowledgeService.tenantId(), id);
+        Knowledge k = knowledgeRepository.findById(KnowledgeTenants.tenantId(), id);
         if (k == null) {
             throw BizException.notFound("record not found");
         }

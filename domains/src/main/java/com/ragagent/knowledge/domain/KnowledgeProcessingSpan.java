@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.domain;
 
+
 import java.util.List;
 
 import java.time.OffsetDateTime;
@@ -37,7 +38,7 @@ public class KnowledgeProcessingSpan {
      * 5 个 canonical 阶段名（顺序即展示顺序）。
      *
      * <p>B263㉜ 由 {@code service.KnowledgeService} 上移至此——{@code domain.span.SpanTracker} 也要用它，
-     * 而 {@code domain → service} 是不能有的反向边；{@code KnowledgeService.ALL_STAGES} 现委任本常量
+     * 而 {@code domain → service} 是不能有的反向边；{@code KnowledgeProcessingSpan.ALL_STAGES} 现委任本常量
      * （对外公共常量不变）。</p>
      */
     public static final List<String> ALL_STAGES =

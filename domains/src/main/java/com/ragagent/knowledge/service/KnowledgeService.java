@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.domain.KnowledgeTenants;
+
 import com.ragagent.knowledge.domain.KnowledgeProcessingSpan;
 
 import com.ragagent.knowledge.repository.KnowledgeTagRepository;
@@ -28,7 +30,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.contract.error.ErrorCode;
@@ -136,10 +137,12 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
         this.batchOpsService = batchOpsService;
     }
 
-    /** 同包开放（拆分出的子服务经门面复用，不各自复制）。 */
+    /**
+     * 同包开放的历史入口：B263㉝ 起**委任** {@link KnowledgeTenants#tenantId()}（实现已上移到 domain，
+     * 供不再依赖门面的子服务复用）。
+     */
     static long tenantId() {
-        Long tid = TenantContext.currentTenantId();
-        return tid == null ? 0 : tid;
+        return KnowledgeTenants.tenantId();
     }
 
     /** 按 id 查 KB（软删不可见）。实现下沉在 {@link KnowledgeAccessHelper}。 */

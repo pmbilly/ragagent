@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.domain.KnowledgeTenants;
+
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 
 import com.ragagent.knowledge.repository.ChunkRepository;
@@ -201,7 +203,7 @@ public class KnowledgeFileService {
      * （本地可 seek → 支持 Range；云按 provider 能力）。不整份读入内存。
      */
     public KnowledgeFileStream openKnowledgeFile(String id) {
-        Knowledge knowledge = knowledgeRepository.findById(KnowledgeService.tenantId(), id);
+        Knowledge knowledge = knowledgeRepository.findById(KnowledgeTenants.tenantId(), id);
         if (knowledge == null) {
             throw BizException.notFound("record not found");
         }
@@ -217,7 +219,7 @@ public class KnowledgeFileService {
         }
         String filePath = knowledge.getFilePath() == null ? "" : knowledge.getFilePath();
         return new KnowledgeFileStream(knowledge.getFileName(),
-                fileStorage.open(KnowledgeService.tenantId(), filePath), false);
+                fileStorage.open(KnowledgeTenants.tenantId(), filePath), false);
     }
 
     /**
@@ -245,7 +247,7 @@ public class KnowledgeFileService {
         }
         JsonNode image = images.get(0);
 
-        Chunk chunk = chunkRepository.findByIdOrNull(KnowledgeService.tenantId(), chunkId);
+        Chunk chunk = chunkRepository.findByIdOrNull(KnowledgeTenants.tenantId(), chunkId);
         if (chunk == null) {
             // 父块缺失 "chunk not found"（handler 包 500）
             throw new BizException(AppError.internal("chunk not found"));
@@ -256,7 +258,7 @@ public class KnowledgeFileService {
             throw BizException.forbidden("chunk does not belong to its knowledge document");
         }
         chunk.setImageInfo(imageInfo);
-        long tenantId = KnowledgeService.tenantId();
+        long tenantId = KnowledgeTenants.tenantId();
         List<Chunk> chunkChildren = chunkRepository.listChunkByParentId(tenantId, chunkId);
 
         List<Chunk> updateChunks = new ArrayList<>();

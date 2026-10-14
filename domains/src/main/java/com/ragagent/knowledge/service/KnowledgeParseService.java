@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.domain.KnowledgeTenants;
+
 import com.ragagent.knowledge.domain.span.SpanTracker;
 
 import java.time.OffsetDateTime;
@@ -74,7 +76,7 @@ public class KnowledgeParseService {
      * 无法取消解析"、其余状态（含 unknown）放行改 cancelled。
      */
     public Knowledge cancelKnowledgeParse(String id) {
-        Knowledge existing = documentParser.findById(KnowledgeService.tenantId(), id);
+        Knowledge existing = documentParser.findById(KnowledgeTenants.tenantId(), id);
         if (existing == null) {
             throw BizException.notFound("knowledge not found");
         }

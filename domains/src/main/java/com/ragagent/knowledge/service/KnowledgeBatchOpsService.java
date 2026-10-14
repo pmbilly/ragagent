@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.domain.KnowledgeTenants;
+
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 
@@ -80,7 +82,7 @@ public class KnowledgeBatchOpsService {
      */
     public int rebuildKnowledgeBaseIndex(String kbId) {
         KnowledgeBase kb = access.requireKb(kbId);
-        List<Knowledge> rows = knowledgeRepository.listByTenantAndKb(KnowledgeService.tenantId(), kbId);
+        List<Knowledge> rows = knowledgeRepository.listByTenantAndKb(KnowledgeTenants.tenantId(), kbId);
         for (Knowledge k : rows) {
             KnowledgeParseService.resetKnowledgeForReparse(k, kb);
             knowledgeFileService.updateKnowledgeRow(k, k.getMetadata());
@@ -98,7 +100,7 @@ public class KnowledgeBatchOpsService {
      */
     @Transactional
     public int clearKnowledgeBaseContents(String kbId) {
-        List<Knowledge> rows = knowledgeRepository.listByTenantAndKb(KnowledgeService.tenantId(), kbId);
+        List<Knowledge> rows = knowledgeRepository.listByTenantAndKb(KnowledgeTenants.tenantId(), kbId);
         for (Knowledge row : rows) {
             ChunkAccessGuard.rejectMovingKnowledge(row);
         }

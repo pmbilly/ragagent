@@ -139,7 +139,7 @@ public class KnowledgeSpanService {
         }
 
         // 缺失 stage 合成（AllStages 序，保证 5 段布局确定性）
-        for (String stage : KnowledgeService.ALL_STAGES) {
+        for (String stage : KnowledgeProcessingSpan.ALL_STAGES) {
             if (stageRowByName.containsKey(stage)) {
                 continue;
             }

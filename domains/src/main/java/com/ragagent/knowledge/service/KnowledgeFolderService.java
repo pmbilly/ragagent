@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.domain.KnowledgeTenants;
+
 import com.ragagent.knowledge.support.KnowledgePaths;
 
 import com.ragagent.common.web.JsonMappers;
@@ -63,7 +65,7 @@ public class KnowledgeFolderService {
         // GROUP BY folder_path（Java 侧取列后内存聚合，
         // 语义一致：tenant+kb+parse_status<>'deleting'+deleted_at IS NULL）
         List<Knowledge> docs = knowledgeRepository.listFolderPathsForTree(
-                KnowledgeService.tenantId(), kbId);
+                KnowledgeTenants.tenantId(), kbId);
         Map<String, Long> counts = new TreeMap<>();
         for (Knowledge d : docs) {
             counts.merge(d.getFolderPath() == null ? "" : d.getFolderPath(), 1L, Long::sum);
@@ -272,7 +274,7 @@ public class KnowledgeFolderService {
                 cleaned.add(id);
             }
         }
-        List<Knowledge> rows = access.getKnowledgeBatch(KnowledgeService.tenantId(), cleaned);
+        List<Knowledge> rows = access.getKnowledgeBatch(KnowledgeTenants.tenantId(), cleaned);
         Map<String, Knowledge> byId = new HashMap<>();
         for (Knowledge row : rows) {
             byId.put(row.getId(), row);
@@ -302,7 +304,7 @@ public class KnowledgeFolderService {
     }
 
     public Knowledge loadKnowledgeWrite(String id) {
-        Knowledge k = knowledgeRepository.findById(KnowledgeService.tenantId(), id);
+        Knowledge k = knowledgeRepository.findById(KnowledgeTenants.tenantId(), id);
         if (k == null) {
             throw BizException.notFound("knowledge not found");
         }

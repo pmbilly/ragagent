@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.domain.KnowledgeTenants;
+
 import com.ragagent.knowledge.support.KnowledgeProjectionAdapter;
 
 import java.util.ArrayList;
@@ -48,7 +50,7 @@ public class KnowledgeAccessHelper {
         // KB 受限的 API Key 不能触碰白名单外的库。
         TenantAPIKeyScope.authorizeKnowledgeBases(
                 kbId == null ? List.of() : List.of(kbId));
-        KnowledgeBase kb = kbRepository.findById(KnowledgeService.tenantId(), kbId);
+        KnowledgeBase kb = kbRepository.findById(KnowledgeTenants.tenantId(), kbId);
         if (kb == null) {
             throw new BizException(AppError.notFound("knowledge base not found"));
         }
@@ -56,7 +58,7 @@ public class KnowledgeAccessHelper {
     }
 
     public Knowledge getKnowledge(String id) {
-        Knowledge k = knowledgeRepository.findById(KnowledgeService.tenantId(), id);
+        Knowledge k = knowledgeRepository.findById(KnowledgeTenants.tenantId(), id);
         if (k == null) {
             throw new BizException(AppError.notFound("Knowledge not found"));
         }
