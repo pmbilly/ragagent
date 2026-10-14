@@ -1319,6 +1319,17 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **A③ 累计（十七刀）**：边 **64 → 42（−22）**、类 **317 → 243（−74）**；三档 **① 34 条 / 157 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
 - **下一步（①档余量按性价比）**：`mcp→approval`(7) → `session` 能力边（`knowledge` 17 / `storage` 14 / `model` 12 … 共 63 类）→ `embedchannel→session` 余 2（**已拍板：转"实体→视图 + 流式契约"K 级，不建 servlet seam** ✓）
 
+**🔶 A③ 第二十五刀：`memory→model` 清零 ⇒ model 目录端口复用（2026-10-15，R10 边 33 → 32、类 218 → 215）**
+- **零新增契约面（直接复用上刀成果）**：`common.model.ModelCatalogPort`（`listModels`/`findModel` + `ModelRowView`）+ L2 的 `ChatConfigs`（chat 映射）+ L1 的 `EmbeddingGateway`（嵌入）
+- **迁移 3 类**：
+  - `MemoryModelResolver`（域内端口）：`List<Model>` → `List<ModelRowView>`；跨域口径写进 javadoc（只出现 L1 载荷 + L2 客户端类型）
+  - `DefaultMemoryModelResolver`：`ModelService` → `ModelCatalogPort`；`getChatModel` 走 **L2 `ChatConfigs`**（原 `ModelRuntimeConfigs` + `ModelRowViews.of()` 两级调用简化为一步）；`embed` 的 `ModelFacts` 改由视图字段拼装（与实体字段逐一对应）；`listModels` 直转端口
+  - `MemoryService.workspaceChatModelId`：`model.getType()/getStatus()/getId()` → `model.type()/status()/id()`；字面量 `"active"` → `ModelCatalogPort.ACTIVE_STATUS`（值同为 `active`）
+- **失败语义对齐（本刀关键等价点）**：`getModelByID` 对 id 空 / 不可见 / 状态异常抛 `BizException` / `ModelNotFoundException`（均运行时）⇒ 端口 `findModel` **去掉上刀加的 null/空短路、改为直接委托**（端口 javadoc 同步写为"失败即抛、与模型域同语义"），调用方既有 `catch (RuntimeException)` 降级路径逐字不变 ✓
+- **验证**：**13 守卫全绿** ✓；`spotlessCheck build` ✓ **1m57s** ✓；**4990 / 失败 0 / 跳过 4**（boot 1331 ✓）；定向 memory/model/wiki **550 条** ✓；dev 重启 ready ✓（新构造依赖装配通过）+ 冒烟（`/api/v1/models`、`/api/v1/agents`、`/api/v1/sessions` 均 200 ✓）
+- **⚠️ 一次瞬时失败（累计两次，与 ⑳ 同类）**：定向首跑 `wiki.service.ingest.RedisWikiDeletedTombstoneStoreTest` 报 "Unable to connect to Redis"；单跑 + 复跑均绿、6379 已确认可达 ⇒ 判瞬时；若第三次再现，需查 Redis 容器/端口竞态而非放过
+- **A③ 累计（二十五刀）**：边 **64 → 32（−32）**、类 **317 → 215（−102）**；三档 **① 24 条 / 129 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
+- **下一步（按"同款改造"优先）**：`wiki→model`(1，`DefaultWikiModelResolver` 与 memory 的 resolver 同款 ⇒ 直接照搬本刀) → `initialization→model`(4) → model 族大块（`session→model` 12 / `knowledge→model` 14，须逐类枚举剩余跨域 import 再判能否整条清零）→ 其余 ★半清边（`system→storage` / `embedchannel→storage` 各差 1 类，另有 `im→storage` 3 类中 1 类可清）→ storage 族与 session 能力边
 **🔶 A③ 第二十四刀：model 目录端口化（第一批）⇒ `mcp→model` 清零 + 载荷/配置分层就位（2026-10-15，R10 边 34 → 33、类 220 → 218）**
 - **前置测量（上刀教训的直接应用）**：逐类枚举 10 条候选边的**全部**跨域 import ⇒ 找出"所有类都只依赖该一条边"的边：`mcp→model`(2) 与 `memory→model`(3) 都是 **★可整条清零**（memory 留下刀）；`embedchannel→storage` / `system→storage` / `im→storage` / `session→memory` 各有 1–2 类另有他域 ⇒ 本刀不清
 - **分层改造（本刀核心；两次守卫红态逼出的正解）**：

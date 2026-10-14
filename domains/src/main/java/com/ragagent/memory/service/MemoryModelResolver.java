@@ -2,16 +2,19 @@ package com.ragagent.memory.service;
 
 import java.util.List;
 
+import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.llm.LlmChatClient;
-import com.ragagent.model.domain.Model;
 
 /**
  * memory 管线按模型 ID 取运行时模型实例的端口。
  *
  * <h2>为什么是端口</h2>
- * <p>与 {@code wiki.service.WikiModelResolver} 同一个理由：{@code ModelService}
- * 只实现了配置 CRUD，运行时工厂方法收在这里，
- * 将来若把工厂并回 {@code ModelService}，换掉实现 bean 即可。</p>
+ * <p>与 {@code wiki.service.WikiModelResolver} 同一个理由：模型配置 CRUD 只实现了配置面，
+ * 运行时工厂方法收在这里，将来若把工厂并回模型域，换掉实现 bean 即可。</p>
+ *
+ * <h2>跨域口径</h2>
+ * <p>本端口只出现 L1 载荷（{@link ModelRowView}）与 L2 客户端类型（{@link LlmChatClient}），
+ * 不出现模型域实体——目录读取由实现类经 {@code common.model.ModelCatalogPort} 完成。</p>
  *
  * <h2>失败语义</h2>
  * <p>取模型失败**抛异常**；调用方按各自语义降级：</p>
@@ -32,6 +35,6 @@ public interface MemoryModelResolver {
     /** 取嵌入模型并对文本嵌入。 */
     float[] embed(String modelId, String text) throws Exception;
 
-    /** 抽取模型回落时用来挑工作区的问答模型。 */
-    List<Model> listModels();
+    /** 抽取模型回落时用来挑工作区的问答模型（顺序与模型目录一致）。 */
+    List<ModelRowView> listModels();
 }

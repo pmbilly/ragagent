@@ -38,9 +38,6 @@ public class ModelCatalogAdapter implements ModelCatalogPort {
 
     @Override
     public ModelRowView findModel(String modelId) {
-        if (modelId == null || modelId.isEmpty()) {
-            return null;
-        }
         return ModelRowViews.of(modelService.getModelByID(modelId));
     }
 

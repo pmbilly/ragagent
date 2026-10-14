@@ -35,7 +35,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import com.ragagent.contract.memory.MemoryRecall;
 import com.ragagent.contract.memory.MemoryRetrievalContext;
-import com.ragagent.model.domain.Model;
+import com.ragagent.common.model.ModelCatalogPort;
+import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
 
 /**
  * 跨会话长期记忆的写入、召回与记忆管理器。
@@ -710,7 +711,7 @@ public class MemoryService {
      * 这个工作区希望后台工作用哪个模型，而**悄悄**挑一个只有在事后可见时才可接受。</p>
      */
     String workspaceChatModelId() {
-        List<Model> models;
+        List<ModelRowView> models;
         try {
             models = modelResolver.listModels();
         } catch (RuntimeException e) {
@@ -720,15 +721,15 @@ public class MemoryService {
         if (models == null) {
             return "";
         }
-        for (Model model : models) {
-            if (model == null || !"KnowledgeQA".equals(model.getType())) {
+        for (ModelRowView model : models) {
+            if (model == null || !"KnowledgeQA".equals(model.type())) {
                 continue;
             }
-            if (!model.getStatus().isEmpty() && !"active".equals(model.getStatus())) {
+            if (!model.status().isEmpty() && !ModelCatalogPort.ACTIVE_STATUS.equals(model.status())) {
                 continue;
             }
-            log.info("memory: no extraction model configured, using workspace model {}", model.getId());
-            return model.getId();
+            log.info("memory: no extraction model configured, using workspace model {}", model.id());
+            return model.id();
         }
         return "";
     }

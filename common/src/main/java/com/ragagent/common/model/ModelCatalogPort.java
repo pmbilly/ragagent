@@ -21,7 +21,10 @@ public interface ModelCatalogPort {
     /** 全部模型行（顺序与迁移前 {@code ModelService.listModels()} 一致）。 */
     List<ModelRowView> listModels();
 
-    /** 按 id 取模型行；不存在 ⇒ {@code null}。 */
+    /**
+     * 按 id 取模型行；**失败语义与模型域 {@code ModelService.getModelByID} 一致**
+     * （id 空 / 不可见 / 状态异常 ⇒ 抛运行时异常）——调用方按既有"取模型失败即降级"处理。
+     */
     ModelRowView findModel(String modelId);
 
     /**

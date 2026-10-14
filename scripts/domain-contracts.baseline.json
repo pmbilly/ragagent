@@ -200,11 +200,6 @@
       "McpToolWrapper",
       "McpTooling"
     ],
-    "memory→model": [
-      "DefaultMemoryModelResolver",
-      "MemoryModelResolver",
-      "MemoryService"
-    ],
     "session→memory": [
       "AgentEngineAssembler",
       "AgentToolBackends",
