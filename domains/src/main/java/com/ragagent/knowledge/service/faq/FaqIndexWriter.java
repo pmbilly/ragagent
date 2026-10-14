@@ -17,14 +17,13 @@ import com.ragagent.model.domain.Model;
 import com.ragagent.model.mapper.ModelMapper;
 import com.ragagent.model.service.ModelRuntimeAssembler;
 import org.springframework.stereotype.Component;
-import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.embedding.Embedder;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.retrieval.engine.EngineTypes;
 import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
 import com.ragagent.common.knowledge.FaqChunkMetadata;
 import com.ragagent.knowledge.client.EmbedderClient;
-import com.ragagent.knowledge.storage.TenantStorageService;
+import com.ragagent.common.tenant.TenantStorageQuotaPort;
 import com.ragagent.retrieval.engine.VectorStoreService;
 import com.ragagent.knowledge.index.KnowledgeVectorWrites;
 import com.ragagent.knowledge.index.ChunkVectorIndexer;
@@ -44,7 +43,7 @@ public class FaqIndexWriter {
     private final KnowledgeRepository knowledgeRepository;
     private final ModelMapper modelMapper;
     private final ChunkRepository chunkRepository;
-    private final TenantStorageService tenantStorage;
+    private final TenantStorageQuotaPort tenantStorage;
     private final KnowledgeVectorWrites vectorWrites;
     private final VectorStoreService vectorStore;
     private final EmbedderClient embedder;
@@ -55,7 +54,7 @@ public class FaqIndexWriter {
     public FaqIndexWriter(KnowledgeRepository knowledgeRepository,
                           ModelMapper modelMapper,
                           ChunkRepository chunkRepository,
-                          TenantStorageService tenantStorage,
+                          TenantStorageQuotaPort tenantStorage,
                           KnowledgeVectorWrites vectorWrites,
                           VectorStoreService vectorStore,
                           EmbedderClient embedder,
@@ -156,11 +155,9 @@ public class FaqIndexWriter {
         long size = 0;
         if (adjustStorage) {
             size = VectorStoreService.estimateStorageSize(rows, dimensions);
-            Tenant tenantInfo = tenantStorage.getTenant(tid);
-            long quota = tenantInfo == null || tenantInfo.getStorageQuota() == null
-                    ? 0 : tenantInfo.getStorageQuota();
-            long used = tenantInfo == null || tenantInfo.getStorageUsed() == null
-                    ? 0 : tenantInfo.getStorageUsed();
+            TenantStorageQuotaPort.TenantQuotaView tenantInfo = tenantStorage.quotaView(tid);
+            long quota = tenantInfo == null ? 0 : tenantInfo.quota();
+            long used = tenantInfo == null ? 0 : tenantInfo.used();
             if (quota > 0 && used + size > quota) {
                 throw new IllegalStateException("Storage quota exceeded");
             }
@@ -180,7 +177,7 @@ public class FaqIndexWriter {
                         e.getMessage() == null ? String.valueOf(e) : e.getMessage(), e);
             }
             if (adjustStorage && size > 0) {
-                tenantStorage.adjustStorageUsed(tid, size);
+                tenantStorage.adjustUsed(tid, size);
                 knowledge.setStorageSize(knowledge.getStorageSize() + size);
             }
             OffsetDateTime nowIndexed = OffsetDateTime.now();
@@ -208,7 +205,7 @@ public class FaqIndexWriter {
             vectorStore.saveIndexRows(batchRows, vectors);
         }
         if (adjustStorage && size > 0) {
-            tenantStorage.adjustStorageUsed(tid, size);
+            tenantStorage.adjustUsed(tid, size);
             knowledge.setStorageSize(knowledge.getStorageSize() + size);
         }
         OffsetDateTime now = OffsetDateTime.now();
@@ -219,7 +216,7 @@ public class FaqIndexWriter {
 
     /**
      * 删除 chunks 的向量索引并回退存储配额（storage_used 钳 0 语义在
-     * TenantStorageService 内；knowledge.storage_size 本方法下钳 0）。
+     * 租户域 TenantStorageQuotaAdapter 内；knowledge.storage_size 本方法下钳 0）。
      */
     public void deleteFAQChunkVectors(KnowledgeBase kb, Knowledge knowledge, List<Chunk> chunks) {
         if (chunks == null || chunks.isEmpty()) {
@@ -251,7 +248,7 @@ public class FaqIndexWriter {
             vectorStore.deleteByChunkId(chunkIds);
         }
         if (size > 0) {
-            tenantStorage.adjustStorageUsed(tid, -size);
+            tenantStorage.adjustUsed(tid, -size);
             knowledge.setStorageSize(Math.max(0, knowledge.getStorageSize() - size));
         }
         knowledge.setUpdatedAt(OffsetDateTime.now());

@@ -23,7 +23,7 @@ import com.ragagent.embedding.Embedder;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.knowledge.task.KnowledgeTaskProgressStore;
 import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
-import com.ragagent.knowledge.storage.TenantStorageService;
+import com.ragagent.common.tenant.TenantStorageQuotaPort;
 import java.time.Instant;
 import java.util.Objects;
 import com.ragagent.knowledge.index.KnowledgeVectorWrites;
@@ -40,7 +40,7 @@ public class KnowledgeMoveService {
     private final KnowledgeBaseRepository kbRepository;
     private final ChunkRepository chunkRepo;
     private final KnowledgeTagRepository tagRepository;
-    private final TenantStorageService tenantStorage;
+    private final TenantStorageQuotaPort tenantStorage;
     private final ModelRuntimeAssembler modelRuntimeAssembler;
     private final KnowledgeProcessingQueue worker;
     private final KnowledgeTaskProgressStore progressStore;
@@ -55,7 +55,7 @@ public class KnowledgeMoveService {
             KnowledgeBaseRepository kbRepository,
             ChunkRepository chunkRepo,
             KnowledgeTagRepository tagRepository,
-            TenantStorageService tenantStorage,
+            TenantStorageQuotaPort tenantStorage,
             ModelRuntimeAssembler modelRuntimeAssembler,
             KnowledgeProcessingQueue worker,
             KnowledgeTaskProgressStore progressStore,
@@ -222,7 +222,7 @@ public class KnowledgeMoveService {
         knowledgeRepository.resetRowForReparseInKnowledgeBase(knowledgeId, targetKbId,
                 targetKb.getEmbeddingModelId(), OffsetDateTime.now(ZoneOffset.UTC));
         if (storageSize > 0) {
-            tenantStorage.adjustStorageUsed(tenantId, -storageSize);
+            tenantStorage.adjustUsed(tenantId, -storageSize);
         }
         // 4) 重新解析入队（目标 KB 的配置在 worker 按行上的 KB 现读）
         worker.enqueue(knowledgeId);
