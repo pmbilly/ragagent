@@ -327,9 +327,6 @@
     "system→tenant": [
       "SystemAdminController",
       "SystemAdminUserService"
-    ],
-    "wiki→model": [
-      "DefaultWikiModelResolver"
     ]
   }
 }

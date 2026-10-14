@@ -1319,6 +1319,13 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **A③ 累计（十七刀）**：边 **64 → 42（−22）**、类 **317 → 243（−74）**；三档 **① 34 条 / 157 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
 - **下一步（①档余量按性价比）**：`mcp→approval`(7) → `session` 能力边（`knowledge` 17 / `storage` 14 / `model` 12 … 共 63 类）→ `embedchannel→session` 余 2（**已拍板：转"实体→视图 + 流式契约"K 级，不建 servlet seam** ✓）
 
+**🔶 A③ 第二十六刀：`wiki→model` 清零 ⇒ 双胞胎解析器同款收口（2026-10-15，R10 边 32 → 31、类 215 → 214）**
+- **同款照搬（model 族最小一刀）**：`DefaultWikiModelResolver.getChatModel` 与 memory 版逐字同构 ⇒ `ModelService` → `ModelCatalogPort`、`ModelRuntimeConfigs` + `ModelRowViews.of()` 两级调用 → **L2 `ChatConfigs` 一步到位**、实体 → `ModelRowView`
+- **只改实现类**：`WikiModelResolver` 接口本就只暴露 `LlmChatClient` / `WikiEmbeddingModel`（不含实体）⇒ 接口与测试（`WikiIngestTaxonomyTest` mock 接口）**零改动** ✓；embedding 支路早已走 L1 `EmbeddingModelPort` ✓
+- **失败语义**：`findModel` 与模型域同为"失败即抛（含 downloading / 异常状态 → 500）"（上刀已对齐端口语义）⇒ 调用方降级路径不变 ✓
+- **验证**：**13 守卫全绿** ✓；`spotlessCheck build` ✓ **1m49s** ✓；**4990 / 失败 0 / 跳过 4**（boot 1331 ✓）；定向 wiki/memory/model **550 条** ✓（含上刀瞬时的 `RedisWikiDeletedTombstoneStoreTest`——本轮直接绿 ✓）；dev 重启 ready ✓ + 冒烟（`/api/v1/knowledge-bases`、`/api/v1/models` 200 ✓；`/api/v1/knowledgebase/{id}/wiki/pages` 返回**业务级 404** "knowledge base not found" ✓ 路由与鉴权链路正常、非 500）
+- **A③ 累计（二十六刀）**：边 **64 → 31（−33）**、类 **317 → 214（−103）**；三档 **① 23 条 / 128 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
+- **下一步**：`initialization→model`(4——`InitResponses` / `InitializationConfigService` / `InitializationController` / `ModelConnectivityTestService`，须逐类枚举剩余跨域 import 再判能否整条清零) → model 族大块（`session→model` 12 / `knowledge→model` 14）→ ★半清边（`system→storage` / `embedchannel→storage` 各差 1 类）→ storage 族与 session 能力边
 **🔶 A③ 第二十五刀：`memory→model` 清零 ⇒ model 目录端口复用（2026-10-15，R10 边 33 → 32、类 218 → 215）**
 - **零新增契约面（直接复用上刀成果）**：`common.model.ModelCatalogPort`（`listModels`/`findModel` + `ModelRowView`）+ L2 的 `ChatConfigs`（chat 映射）+ L1 的 `EmbeddingGateway`（嵌入）
 - **迁移 3 类**：
