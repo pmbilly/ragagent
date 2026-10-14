@@ -921,6 +921,15 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **偶发测试（记录）**：全量跑时 `RedisWikiDeletedTombstoneStoreTest.clearRemovesTombstone` 失败一次，**单跑即过** ⇒ Redis 依赖型偶发，与本步改动无关（本步未触碰 wiki/Redis 路径）。
 - **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m34s** ✓ 十一守卫 ✓（13 组 SCC 未变）。
 - **登记（余步）**：
+**🔶 B263 第㉗步（2026-10-14，包外 3 类归仓储）**
+- **范围**：`api/KnowledgeFinalizeAdapter`（wiki 收尾适配器）、`index/ChunkVectorIndexer`、`domain/access/ChunkAccessGuard` ⇒ 三者 mapper 直连**全部清零**（`ChunkAccessGuard` 404 → 373 行、`ChunkVectorIndexer` 392 → 386 行）。
+- **动前先查环（本步第一步）**：`domain.access → repository` 会新增一条包间边 ⇒ 先确认 `repository/*` **不引用** `ChunkAccessGuard`/`domain.access`（实测空 ✓）⇒ 改完 SCC 仍 13 组、环 0 ✓（R9 复核在场）。
+- **新增 3 个仓储方法**（都是"条件/原子"形态，逐字搬 SQL）：`KnowledgeRepository.decrementPendingSubtasks(id, now)`（**原子递减并钳在零**：`gt(pendingSubtasksCount, 0)` + `setSql(...)`）、`promoteFinalizingToCompleted(id, now)`（带守卫晋升：`finalizing` + 计数为 0 ⇒ completed）、`ChunkRepository.findByIdAny(id)`（**不过滤软删**，与 `selectById` 等价——调用方自己判 `deleted_at`）。
+- **复用既有**：租户内/仅 id 的 knowledge/KB 读取共 10 处 → `KnowledgeRepository.findById(tenantId, id)`/`findByIdOnly(id)`、`KnowledgeBaseRepository.findById(tenantId, id)`/`findByIdOnly(id)`；`ChunkAccessGuard` 里**同时存在的** `chunkMapper` 与 `chunkRepository` 两个入口合并为一个（删 `chunkMapper`）。
+- **测试跟着改（保留值钱的断言）**：`KnowledgeFinalizeAdapterTest` 的桩是**wrapper 级**（captor 抓 `LambdaUpdateWrapper` 断言 SQL 文本与守卫条件）⇒ **不改成 mock 仓储**（那会丢掉 SQL 断言），而是让**真实仓储包住 mock mapper**（`new KnowledgeFinalizeAdapter(new KnowledgeRepository(knowledgeMapper))`）⇒ 全部桩/断言原样保留 ✓。
+- **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m36s** ✓ **十二守卫** ✓。
+- **偶发（环境，已按约定先重跑）**：本轮两次全量中出现两个**不同**的计时/Redis 型偶发——`RedisWikiFinalizeLockTest.redisErrorFailsClosed`、`QaQueueTest.workerDrainsQueueAndExitsOnStop` ⇒ 各自**强制单跑均绿**、随后全量复跑 4978/0 ✓。**与本次改动无关**（改动只是仓储间接层）。
+- **登记（余步）**：`task/KnowledgeProcessWorker`（**824 行超大文件**）——含 `delete`/`deleteBatchIds`（**已废弃 API**）/`insert` ⇒ 需加删除类仓储方法，**下一批（㉘）**；其后 `KnowledgeService`(716) 余部 → `service.management/*`（需配套断边）、`task ⇄ service` 余 7 处、`escapeLikeKeyword` 多副本统一到 `common`。
 **🔴 B263㉖（2026-10-14，用户报 IDE 报错 ⇒ 修「改包不搬目录」+ 补第十二守卫「路径/包对应」）**
 - **现象**：用户贴来 20+ 个测试文件的 IDE 报错——`EmbeddedRedis cannot be resolved`（连带 `withBean(...)`/`await(...)` 级联），而**`./gradlew build` 一直全绿**。
 - **根因（B259 漏搬 testFixtures）**：`common/src/testFixtures/java/com/ragagent/stream/EmbeddedRedis.java` 的包声明在 B259 被改成 `com.ragagent.platform.stream`，但**文件留在旧目录**——当时脚本只枚举了 `src/main` 与 `src/test` 两个源码集，**漏了 `src/testFixtures`**。`javac` **不校验**目录/包对应（照样编到新包名下），所以构建、测试、闸门全绿，**只有 IDE（jdt）报** "declared package does not match the expected package"。

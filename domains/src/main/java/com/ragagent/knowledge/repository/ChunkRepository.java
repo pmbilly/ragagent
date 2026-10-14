@@ -126,6 +126,11 @@ public class ChunkRepository implements ChunkSearchGateway {
                 .isNull(Chunk::getDeletedAt));
     }
 
+    /** 按 id 取 chunk，**不过滤软删**（与 {@code chunkMapper.selectById} 一致；调用方自行判 deleted_at）。 */
+    public Chunk findByIdAny(String id) {
+        return chunkMapper.selectById(id);
+    }
+
     /** 按主键整行更新（B263⑩：由 service 直连 chunkMapper 归位）。 */
     public void updateById(Chunk chunk) {
         chunkMapper.updateById(chunk);

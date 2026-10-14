@@ -1,15 +1,14 @@
 package com.ragagent.knowledge.api;
 
+import com.ragagent.knowledge.repository.KnowledgeRepository;
+
 import java.time.OffsetDateTime;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.common.knowledge.KnowledgeFinalizePort;
-import com.ragagent.knowledge.domain.Knowledge;
-import com.ragagent.knowledge.mapper.KnowledgeMapper;
 
 /**
  * {@link KnowledgeFinalizePort} 的 knowledge 侧实现。
@@ -22,10 +21,10 @@ public class KnowledgeFinalizeAdapter implements KnowledgeFinalizePort {
 
     private static final Logger log = LoggerFactory.getLogger(KnowledgeFinalizeAdapter.class);
 
-    private final KnowledgeMapper knowledgeMapper;
+    private final KnowledgeRepository knowledgeRepository;
 
-    public KnowledgeFinalizeAdapter(KnowledgeMapper knowledgeMapper) {
-        this.knowledgeMapper = knowledgeMapper;
+    public KnowledgeFinalizeAdapter(KnowledgeRepository knowledgeRepository) {
+        this.knowledgeRepository = knowledgeRepository;
     }
 
     @Override
@@ -37,11 +36,7 @@ public class KnowledgeFinalizeAdapter implements KnowledgeFinalizePort {
         // 1) 原子递减、钳在零
         boolean decremented;
         try {
-            int rows = knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
-                    .eq(Knowledge::getId, knowledgeId)
-                    .gt(Knowledge::getPendingSubtasksCount, 0)
-                    .setSql("pending_subtasks_count = pending_subtasks_count - 1")
-                    .set(Knowledge::getUpdatedAt, now));
+            int rows = knowledgeRepository.decrementPendingSubtasks(knowledgeId, now);
             decremented = rows > 0;
         } catch (RuntimeException e) {
             log.warn("finalize subtask decrement failed source=wiki knowledge={} err={}",
@@ -52,14 +47,7 @@ public class KnowledgeFinalizeAdapter implements KnowledgeFinalizePort {
         // 2) 带守卫的晋升（无条件尝试，见端口注释）
         boolean promoted;
         try {
-            int rows = knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
-                    .eq(Knowledge::getId, knowledgeId)
-                    .eq(Knowledge::getParseStatus, Knowledge.PARSE_FINALIZING)
-                    .eq(Knowledge::getPendingSubtasksCount, 0)
-                    .set(Knowledge::getParseStatus, Knowledge.PARSE_COMPLETED)
-                    .set(Knowledge::getErrorMessage, "")
-                    .set(Knowledge::getProcessedAt, now)
-                    .set(Knowledge::getUpdatedAt, now));
+            int rows = knowledgeRepository.promoteFinalizingToCompleted(knowledgeId, now);
             promoted = rows > 0;
         } catch (RuntimeException e) {
             log.warn("finalize subtask promote failed source=wiki knowledge={} err={}",

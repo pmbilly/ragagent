@@ -1,9 +1,11 @@
 package com.ragagent.knowledge.domain.access;
 
+import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
+import com.ragagent.knowledge.repository.KnowledgeRepository;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.security.TenantAPIKeyScope;
 import com.ragagent.common.tenant.TenantRole;
@@ -13,11 +15,8 @@ import com.ragagent.common.error.GuardForbiddenException;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.mapper.ChunkMapper;
 import com.ragagent.knowledge.domain.ChunkNotFoundException;
 import com.ragagent.knowledge.repository.ChunkRepository;
-import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
-import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import org.springframework.stereotype.Component;
 
 /**
@@ -48,18 +47,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class ChunkAccessGuard {
 
-    private final KnowledgeMapper knowledgeMapper;
-    private final KnowledgeBaseMapper kbMapper;
-    private final ChunkMapper chunkMapper;
+    private final KnowledgeRepository knowledgeRepository;
+    private final KnowledgeBaseRepository kbRepository;
     private final ChunkRepository chunkRepository;
 
-    public ChunkAccessGuard(KnowledgeMapper knowledgeMapper,
-                            KnowledgeBaseMapper kbMapper,
-                            ChunkMapper chunkMapper,
+    public ChunkAccessGuard(KnowledgeRepository knowledgeRepository,
+                            KnowledgeBaseRepository kbRepository,
                             ChunkRepository chunkRepository) {
-        this.knowledgeMapper = knowledgeMapper;
-        this.kbMapper = kbMapper;
-        this.chunkMapper = chunkMapper;
+        this.knowledgeRepository = knowledgeRepository;
+        this.kbRepository = kbRepository;
         this.chunkRepository = chunkRepository;
     }
 
@@ -68,10 +64,7 @@ public class ChunkAccessGuard {
      * knowledge 缺失 → 404 {@code "Knowledge not found"}（AppError 信封）。
      */
     public String kbIdFromKnowledgeParam(String knowledgeId) {
-        Knowledge k = knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getId, knowledgeId)
-                .isNull(Knowledge::getDeletedAt)
-                .last("LIMIT 1"));
+        Knowledge k = knowledgeRepository.findByIdOnly(knowledgeId);
         if (k == null) {
             throw BizException.notFound("Knowledge not found");
         }
@@ -84,7 +77,7 @@ public class ChunkAccessGuard {
      * ⚠️ 这里<b>不</b>校验租户——跨租户 chunk 解析出外部 KB，由
      */
     public String kbIdFromChunkParam(String chunkId) {
-        Chunk c = chunkMapper.selectById(chunkId);
+        Chunk c = chunkRepository.findByIdAny(chunkId);
         if (c == null || c.getDeletedAt() != null) {
             throw BizException.notFound("Chunk not found");
         }
@@ -104,10 +97,7 @@ public class ChunkAccessGuard {
     public KnowledgeBase requireKbAccess(String kbId) {
         TenantAPIKeyScope.authorizeKnowledgeBases(
                 kbId == null ? List.of() : List.of(kbId));
-        KnowledgeBase kb = kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getId, kbId)
-                .isNull(KnowledgeBase::getDeletedAt)
-                .last("LIMIT 1"));
+        KnowledgeBase kb = kbRepository.findByIdOnly(kbId);
         if (kb == null) {
             throw BizException.notFound("knowledge base not found");
         }
@@ -123,19 +113,11 @@ public class ChunkAccessGuard {
      * knowledge 在调用者空间不存在 → <b>放行</b>；存在但调用者既非 Admin+ 也非创建者 → 403 纯字符串。
      */
     public void requireOwnedChunkKbByKnowledge(String knowledgeId) {
-        Knowledge k = knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getId, knowledgeId)
-                .eq(Knowledge::getTenantId, TenantContext.currentTenantId())
-                .isNull(Knowledge::getDeletedAt)
-                .last("LIMIT 1"));
+        Knowledge k = knowledgeRepository.findById(TenantContext.currentTenantId(), knowledgeId);
         if (k == null) {
             return; // ErrResourceNotFound → 中间件放行
         }
-        KnowledgeBase kb = kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getId, k.getKnowledgeBaseId())
-                .eq(KnowledgeBase::getTenantId, k.getTenantId())
-                .isNull(KnowledgeBase::getDeletedAt)
-                .last("LIMIT 1"));
+        KnowledgeBase kb = kbRepository.findById(k.getTenantId(), k.getKnowledgeBaseId());
         if (kb == null) {
             return; // ErrKnowledgeBaseNotFound → 同上
         }
@@ -146,7 +128,7 @@ public class ChunkAccessGuard {
      * 链路 chunk_id → chunk.KnowledgeID → KB.CreatorID。chunk 无空间过滤，
      */
     public void requireOwnedChunkKbByChunk(String chunkId) {
-        Chunk c = chunkMapper.selectById(chunkId);
+        Chunk c = chunkRepository.findByIdAny(chunkId);
         if (c == null || c.getDeletedAt() != null) {
             return;
         }
@@ -154,11 +136,7 @@ public class ChunkAccessGuard {
         if (tenantId == null || c.getTenantId() == null || !tenantId.equals(c.getTenantId())) {
             return; // 跨租户撞库挡在 ownership（显式重校验租户）
         }
-        KnowledgeBase kb = kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getId, c.getKnowledgeBaseId())
-                .eq(KnowledgeBase::getTenantId, tenantId)
-                .isNull(KnowledgeBase::getDeletedAt)
-                .last("LIMIT 1"));
+        KnowledgeBase kb = kbRepository.findById(tenantId, c.getKnowledgeBaseId());
         if (kb == null) {
             return;
         }
@@ -192,11 +170,7 @@ public class ChunkAccessGuard {
      * FAQ 的写路由（POST /entry 等）用这条；判定顺序 契约样例依赖，不能重排。
      */
     public void requireOwnedKbInCallerSpace(String kbId) {
-        KnowledgeBase kb = kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getId, kbId)
-                .eq(KnowledgeBase::getTenantId, TenantContext.currentTenantId())
-                .isNull(KnowledgeBase::getDeletedAt)
-                .last("LIMIT 1"));
+        KnowledgeBase kb = kbRepository.findById(TenantContext.currentTenantId(), kbId);
         if (kb == null) {
             return; // ErrResourceNotFound → 中间件放行
         }
@@ -387,18 +361,11 @@ public class ChunkAccessGuard {
 
     /** 未软删的 knowledge 行（租户过滤）。 */
     private Knowledge findKnowledgeRow(long tenantId, String id) {
-        return knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                .eq(Knowledge::getId, id)
-                .eq(Knowledge::getTenantId, tenantId)
-                .isNull(Knowledge::getDeletedAt)
-                .last("LIMIT 1"));
+        return knowledgeRepository.findById(tenantId, id);
     }
 
     /** 未软删的 KB 行（按 id 直查，无租户过滤——跨租户判定在其后）。 */
     private KnowledgeBase findKbRow(String kbId) {
-        return kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getId, kbId)
-                .isNull(KnowledgeBase::getDeletedAt)
-                .last("LIMIT 1"));
+        return kbRepository.findByIdOnly(kbId);
     }
 }

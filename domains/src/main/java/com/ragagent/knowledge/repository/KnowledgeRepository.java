@@ -407,6 +407,33 @@ public class KnowledgeRepository {
                 .set(Knowledge::getUpdatedAt, now));
     }
 
+    /**
+     * 子任务收尾：原子递减 {@code pending_subtasks_count} 并**钳在零**（{@code > 0} 才减），
+     * 返回影响行数（0 = 已经是零）。B263㉗ 由 wiki finalize 适配器直连语句原样搬入。
+     */
+    public int decrementPendingSubtasks(String id, OffsetDateTime now) {
+        return knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, id)
+                .gt(Knowledge::getPendingSubtasksCount, 0)
+                .setSql("pending_subtasks_count = pending_subtasks_count - 1")
+                .set(Knowledge::getUpdatedAt, now));
+    }
+
+    /**
+     * 带守卫的晋升：仅当 {@code parse_status = finalizing} 且 {@code pending_subtasks_count = 0}
+     * 时置 completed（清 error、写 processed_at）。返回影响行数（0 = 未满足条件）。B263㉗ 搬入。
+     */
+    public int promoteFinalizingToCompleted(String id, OffsetDateTime now) {
+        return knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, id)
+                .eq(Knowledge::getParseStatus, Knowledge.PARSE_FINALIZING)
+                .eq(Knowledge::getPendingSubtasksCount, 0)
+                .set(Knowledge::getParseStatus, Knowledge.PARSE_COMPLETED)
+                .set(Knowledge::getErrorMessage, "")
+                .set(Knowledge::getProcessedAt, now)
+                .set(Knowledge::getUpdatedAt, now));
+    }
+
     /** 按主键整行更新。 */
     public void updateById(Knowledge k) {
         knowledgeMapper.updateById(k);

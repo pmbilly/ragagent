@@ -1,11 +1,14 @@
 package com.ragagent.knowledge.index;
 
+import com.ragagent.knowledge.repository.KnowledgeRepository;
+
+import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
+
 import java.util.ArrayList;
 import com.ragagent.knowledge.config.BatchEmbedProperties;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.context.TenantContext;
@@ -18,8 +21,6 @@ import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.repository.ChunkRepository;
-import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
-import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import com.ragagent.model.domain.Model;
 import com.ragagent.model.service.ModelRuntimeFactory;
 import com.ragagent.model.service.ModelService;
@@ -56,8 +57,8 @@ public class ChunkVectorIndexer {
 
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
-    private final KnowledgeBaseMapper kbMapper;
-    private final KnowledgeMapper knowledgeMapper;
+    private final KnowledgeBaseRepository kbRepository;
+    private final KnowledgeRepository knowledgeRepository;
     private final ModelService modelService;
     private final EmbedderClient embedder;
     private final VectorStoreService vectorStore;
@@ -66,16 +67,16 @@ public class ChunkVectorIndexer {
     /** 批量向量化批大小（属性绑定）。 */
     private final BatchEmbedProperties batchEmbedProperties;
 
-    public ChunkVectorIndexer(KnowledgeBaseMapper kbMapper,
-                              KnowledgeMapper knowledgeMapper,
+    public ChunkVectorIndexer(KnowledgeBaseRepository kbRepository,
+                              KnowledgeRepository knowledgeRepository,
                               ModelService modelService,
                               EmbedderClient embedder,
                               VectorStoreService vectorStore,
                               KnowledgeVectorWrites vectorWrites,
                               ModelRuntimeFactory modelRuntimeFactory,
                               BatchEmbedProperties batchEmbedProperties) {
-        this.kbMapper = kbMapper;
-        this.knowledgeMapper = knowledgeMapper;
+        this.kbRepository = kbRepository;
+        this.knowledgeRepository = knowledgeRepository;
         this.modelService = modelService;
         this.embedder = embedder;
         this.vectorStore = vectorStore;
@@ -194,11 +195,7 @@ public class ChunkVectorIndexer {
             }
             Knowledge knowledge = knowledgeCache.get(chunk.getKnowledgeId());
             if (knowledge == null) {
-                knowledge = knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                        .eq(Knowledge::getId, chunk.getKnowledgeId())
-                        .eq(Knowledge::getTenantId, chunk.getTenantId())
-                        .isNull(Knowledge::getDeletedAt)
-                        .last("LIMIT 1"));
+                knowledge = knowledgeRepository.findById(chunk.getTenantId(), chunk.getKnowledgeId());
                 if (knowledge == null) {
                     throw BizException.notFound("record not found");
                 }
@@ -268,11 +265,7 @@ public class ChunkVectorIndexer {
             }
             Knowledge knowledge = knowledgeCache.get(chunk.getKnowledgeId());
             if (knowledge == null) {
-                knowledge = knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
-                        .eq(Knowledge::getId, chunk.getKnowledgeId())
-                        .eq(Knowledge::getTenantId, chunk.getTenantId())
-                        .isNull(Knowledge::getDeletedAt)
-                        .last("LIMIT 1"));
+                knowledge = knowledgeRepository.findById(chunk.getTenantId(), chunk.getKnowledgeId());
                 if (knowledge == null) {
                     throw BizException.notFound("record not found");
                 }
@@ -353,10 +346,7 @@ public class ChunkVectorIndexer {
     }
 
     private KnowledgeBase findKbRow(String kbId) {
-        return kbMapper.selectOne(new LambdaQueryWrapper<KnowledgeBase>()
-                .eq(KnowledgeBase::getId, kbId)
-                .isNull(KnowledgeBase::getDeletedAt)
-                .last("LIMIT 1"));
+        return kbRepository.findByIdOnly(kbId);
     }
 
     private static DocumentChunkMetadata chunkDocumentMetadata(Chunk chunk) {
