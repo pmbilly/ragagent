@@ -13,7 +13,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import com.ragagent.knowledge.client.DocReaderClient;
+import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.session.domain.message.MessageAttachment;
 import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.repository.TemporaryDocumentRepository;
@@ -41,7 +41,7 @@ class TemporaryDocumentResolveForPromptTest {
     Path tempDir;
 
     private final TemporaryDocumentRepository repo = mock(TemporaryDocumentRepository.class);
-    private final DocReaderClient docReader = mock(DocReaderClient.class);
+    private final DocReaderParsePort docReader = mock(DocReaderParsePort.class);
     private AttachmentFileStore fileStore;
     private TemporaryDocumentService service;
 
@@ -293,7 +293,7 @@ class TemporaryDocumentResolveForPromptTest {
         byte[] png = pngBytes(200, 150);
         TemporaryDocument doc = document("d1", "gac.png", ".png", TemporaryDocument.STATUS_READY,
                 "", "[]", 0, "[]");
-        DocReaderClient.ImageRef ref = new DocReaderClient.ImageRef(
+        DocReaderParsePort.ImageRefView ref = new DocReaderParsePort.ImageRefView(
                 "gac.png", "images/gac.png", "image/png", png);
 
         TemporaryDocumentProcessor.StoredImages stored = processor()
@@ -316,7 +316,7 @@ class TemporaryDocumentResolveForPromptTest {
         byte[] icon = pngBytes(48, 48);
         TemporaryDocument doc = document("d1", "report.pdf", ".pdf", TemporaryDocument.STATUS_READY,
                 "", "[]", 0, "[]");
-        DocReaderClient.ImageRef ref = new DocReaderClient.ImageRef(
+        DocReaderParsePort.ImageRefView ref = new DocReaderParsePort.ImageRefView(
                 "icon.png", "images/icon.png", "image/png", icon);
 
         TemporaryDocumentProcessor.StoredImages stored = processor()
@@ -332,7 +332,7 @@ class TemporaryDocumentResolveForPromptTest {
         byte[] small = pngBytes(32, 32);
         TemporaryDocument doc = document("d1", "tiny.png", ".png", TemporaryDocument.STATUS_READY,
                 "", "[]", 0, "[]");
-        DocReaderClient.ImageRef ref = new DocReaderClient.ImageRef(
+        DocReaderParsePort.ImageRefView ref = new DocReaderParsePort.ImageRefView(
                 "tiny.png", "images/tiny.png", "image/png", small);
 
         TemporaryDocumentProcessor.StoredImages stored = processor()
@@ -361,8 +361,8 @@ class TemporaryDocumentResolveForPromptTest {
     void referenceWithoutInlineBytesIsKeptAsIs() {
         TemporaryDocument doc = document("d1", "a.pdf", ".pdf", TemporaryDocument.STATUS_READY,
                 "", "[]", 0, "[]");
-        DocReaderClient.ImageRef ref =
-                new DocReaderClient.ImageRef("a.png", "images/a.png", "image/png", new byte[0]);
+        DocReaderParsePort.ImageRefView ref =
+                new DocReaderParsePort.ImageRefView("a.png", "images/a.png", "image/png", new byte[0]);
 
         TemporaryDocumentProcessor.StoredImages stored = processor()
                 .storeDocumentImages(TENANT, doc, List.of(ref), "![a](images/a.png)");
@@ -376,8 +376,8 @@ class TemporaryDocumentResolveForPromptTest {
         byte[] png = pngBytes(120, 120);
         TemporaryDocument doc = document("d1", "chart.png", ".png", TemporaryDocument.STATUS_READY,
                 "", "[]", 0, "[]");
-        DocReaderClient.ImageRef ref =
-                new DocReaderClient.ImageRef("chart.png", "images/chart.png", "image/png", png);
+        DocReaderParsePort.ImageRefView ref =
+                new DocReaderParsePort.ImageRefView("chart.png", "images/chart.png", "image/png", png);
 
         TemporaryDocumentProcessor.StoredImages stored = processor().storeDocumentImages(
                 TENANT, doc, List.of(ref), "![图片](images/chart.png \"标题\")");

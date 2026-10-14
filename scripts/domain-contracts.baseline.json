@@ -147,7 +147,6 @@
       "ImTurnOrchestrator"
     ],
     "im→knowledge": [
-      "ImAttachmentPreparer",
       "ImKnowledgeBridgeOps",
       "ImTurnOrchestrator"
     ],

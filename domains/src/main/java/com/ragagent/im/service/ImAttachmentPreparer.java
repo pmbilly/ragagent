@@ -16,7 +16,7 @@ import com.ragagent.im.runtime.AdapterInterfaces;
 import com.ragagent.im.runtime.AdapterInterfaces.Adapter;
 import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
-import com.ragagent.knowledge.client.DocReaderClient;
+import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.session.domain.message.MessageAttachment;
 import com.ragagent.session.service.QaSupport;
 
@@ -50,9 +50,9 @@ final class ImAttachmentPreparer {
     private static final Set<String> IMAGE_EXTENSIONS = Set.of(
             "png", "jpg", "jpeg", "gif", "webp", "bmp");
 
-    private final ObjectProvider<DocReaderClient> docReaders;
+    private final ObjectProvider<DocReaderParsePort> docReaders;
 
-    ImAttachmentPreparer(ObjectProvider<DocReaderClient> docReaders) {
+    ImAttachmentPreparer(ObjectProvider<DocReaderParsePort> docReaders) {
         this.docReaders = docReaders;
     }
 
@@ -152,12 +152,12 @@ final class ImAttachmentPreparer {
     /** docreader 不可用或解析失败时返回 null（只 WARN，不阻断）。 */
     private String tryReadWithDocReader(byte[] content, String fileName, String ext,
             String warnPrefix) {
-        DocReaderClient client = docReaders.getIfAvailable();
+        DocReaderParsePort client = docReaders.getIfAvailable();
         if (client == null) {
             return null;
         }
         try {
-            DocReaderClient.ParseResult result = client.read(content, fileName, ext, fileName, "");
+            DocReaderParsePort.ParsedDocumentView result = client.parse(content, fileName, ext, fileName, "");
             return result == null ? null : result.markdown();
         } catch (Exception e) {
             log.warn("[IM] {}: {}", warnPrefix, e.getMessage());

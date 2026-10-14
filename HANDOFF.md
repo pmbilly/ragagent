@@ -1319,6 +1319,14 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **A③ 累计（十七刀）**：边 **64 → 42（−22）**、类 **317 → 243（−74）**；三档 **① 34 条 / 157 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
 - **下一步（①档余量按性价比）**：`mcp→approval`(7) → `session` 能力边（`knowledge` 17 / `storage` 14 / `model` 12 … 共 63 类）→ `embedchannel→session` 余 2（**已拍板：转"实体→视图 + 流式契约"K 级，不建 servlet seam** ✓）
 
+**🔶 A③ 第二十三刀：DocReader 解析面端口化 ⇒ 4 类脱离 client 依赖（A16 −4）（2026-10-15，R10 类 221 → 220）**
+- **动机与实测收益的落差（写入方法论）**：本刀原估"−5 类"，实际 **R10 只减 1 类**——因为 `TemporaryDocumentProcessor`（另依赖 `knowledge.chunker.*` / `support.ParserEngineRules`）· `TemporaryDocumentService`（`knowledge.storage.LocalStorageService`）· `InitializationController`（mapper / domain / Guard / Service）· `ModelConnectivityTestService`（`LocalStorageService`）**清了 DocReader 项后仍有其他 knowledge 依赖**，边与类都留着 ⇒ **"清一类依赖"不等于"清一个类"**：判收益前必须逐类枚举**全部**跨域 import（本次只测了边，没逐类枚举剩余项）
+- **本刀动作**：契约新增 `contract.doc.DocReaderParsePort`（`parse` 5 参 + `ParsedDocumentView` / `ImageRefView` 两视图 + 便捷 2 参构造，与客户端记录同形）；knowledge 侧 `knowledge/api/DocReaderParseAdapter`（映射口径：markdown / imageCount 透传、imageRefs null → 空列表——调用方对两者同判 ✓）
+- **迁移 4 消费类 + 2 转发类**：`ImAttachmentPreparer`（`ObjectProvider<DocReaderParsePort>`）· `ImTurnOrchestrator`（仅换 provider 类型，`KnowledgeService` 面本刀不动）· `TemporaryDocumentProcessor` · `TemporaryDocumentService` · `InitializationController` · `ModelConnectivityTestService`；消费侧 catch 语义逐字保留（受检异常在端口保留 `throws Exception`）
+- **真实结构改善（A16 读数）**：4 类（`ImAttachmentPreparer` / `ModelConnectivityTestService` / `TemporaryDocumentProcessor` / `TemporaryDocumentService`）**从此不再直连他域 client 边界层** ⇒ 按守卫提示从 A16 棘轮删除，存量 **74 → 70** ✓（比 R10 的类计数更能反映本刀价值）
+- **验证**：**13 守卫全绿** ✓；`spotlessCheck build` ✓ **1m31s** ✓；**4990 / 失败 0 / 跳过 4**（boot 1331 ✓）；定向 im+session+initialization+knowledge **477 条** ✓；dev 重启 ready ✓ + 冒烟（parser-engines / knowledge-bases / sessions 均 200 ✓）
+- **A③ 累计（二十三刀）**：边 **64 → 34（−30）**、类 **317 → 220（−97）**；三档 **① 26 条 / 134 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
+- **下一步（按"边清零"重新排序，附本刀教训）**：`mcp→model`(2) · `embedchannel→storage`(2，`StorageUrlContext` 可上提 L1 + `FileProxyService` 面待测) · `system→storage`(2) · `session→wiki`(2) · `session→mcp`(2) —— **每条先逐类枚举剩余跨域 import 再判能否整条清零**；model 族（7 条边 37 类）与 storage 族留大块。另记：`embedchannel→knowledge`(2) 因"实体整个序列化回前端"（`Chunk` 线格式）归 **K 级**，与 `embedchannel→session` 同批拍板
 **🔶 A③ 第二十二刀：DocReader 管理面端口化 ⇒ `system→knowledge` 整条边清零（2026-10-14，R10 边 35 → 34、类 223 → 221）**
 - **接缝选择**：DocReader 消费面分两种——**管理面**（连接态 / 重连 / 远端引擎清单 / 连接配置：system 2 类）与**解析面**（`read`：im / session / initialization 共 6 类）。本刀只做管理面（小且独立），解析面留下刀
 - **契约新增**：`contract.doc.DocReaderAdminPort`（`isConnected` / `reconnect` / `listEngines` / `config` + 两个视图 record `RemoteEngineView` / `DocReaderConfigView`）+ `contract.doc` package-info；knowledge 侧实现 `knowledge/api/DocReaderAdminAdapter`（配置成形口径与 `SystemController` 原私有辅助逐字一致：addr 去空白、transport 走 `transportOrDefault()`）

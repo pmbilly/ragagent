@@ -34,7 +34,7 @@ import com.ragagent.embedding.Embedder;
 import com.ragagent.embedding.EmbedderConfig;
 import com.ragagent.embedding.EmbedderFactory;
 import com.ragagent.model.service.ModelRuntimeConfigs;
-import com.ragagent.knowledge.client.DocReaderClient;
+import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.knowledge.storage.LocalStorageService;
 import com.ragagent.llm.provider.ProviderName;
 import com.ragagent.llm.provider.ProviderRegistry;
@@ -54,9 +54,9 @@ public final class ModelConnectivityTestService {
     private final ConcurrencyGovernor concurrencyGovernor;
     private final CryptoService cryptoService;
     private final AsrTranscriber asrTranscriber;
-    private final DocReaderClient documentReader;
+    private final DocReaderParsePort documentReader;
 
-    public ModelConnectivityTestService(ModelService modelService, SsrfGuard ssrfGuard, OllamaService ollamaService, ConcurrencyGovernor concurrencyGovernor, CryptoService cryptoService, AsrTranscriber asrTranscriber, DocReaderClient documentReader) {
+    public ModelConnectivityTestService(ModelService modelService, SsrfGuard ssrfGuard, OllamaService ollamaService, ConcurrencyGovernor concurrencyGovernor, CryptoService cryptoService, AsrTranscriber asrTranscriber, DocReaderParsePort documentReader) {
         this.modelService = modelService;
         this.ssrfGuard = ssrfGuard;
         this.ollamaService = ollamaService;
@@ -354,7 +354,7 @@ public final class ModelConnectivityTestService {
             fileExt = filename.substring(idx + 1).toLowerCase(Locale.ROOT);
         }
         try {
-            documentReader.read(imageContent, filename, fileExt, null, null);
+            documentReader.parse(imageContent, filename, fileExt, null, null);
         } catch (RuntimeException e) {
             String msg = e.getMessage() == null ? "" : e.getMessage();
             if (msg.startsWith("docreader parse error: ")) {

@@ -28,7 +28,7 @@ import com.ragagent.knowledge.service.management.KnowledgeBaseService;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.ollama.OllamaService;
 import com.ragagent.model.service.ModelService;
-import com.ragagent.knowledge.client.DocReaderClient;
+import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.platform.web.ApiResult;
 
 /**
@@ -63,7 +63,7 @@ public class InitializationController {
             OllamaService ollamaService, OllamaDownloadTaskStore downloadTasks,
             AsrTranscriber asrTranscriber, ExtractPrompts extractPrompts,
             ConcurrencyGovernor concurrencyGovernor,
-            DocReaderClient documentReader,
+            DocReaderParsePort documentReader,
             CryptoService cryptoService) {
         this.configService = new InitializationConfigService(kbGuard, kbService, kbMapper, knowledgeMapper, modelService, ssrfGuard);
         this.ollamaManage = new OllamaManageService(ollamaService, downloadTasks);

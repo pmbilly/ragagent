@@ -22,7 +22,7 @@ import com.ragagent.knowledge.chunker.Chunker;
 import com.ragagent.knowledge.chunker.ParsedChunk;
 import com.ragagent.knowledge.chunker.SplitterConfig;
 import com.ragagent.knowledge.chunker.Tokens;
-import com.ragagent.knowledge.client.DocReaderClient;
+import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.knowledge.support.ParserEngineRules;
 import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
 import com.ragagent.model.service.ModelRuntimeAssembler;
@@ -55,14 +55,14 @@ final class TemporaryDocumentProcessor {
 
     private final TemporaryDocumentRepository repo;
     private final AttachmentFileStore fileStore;
-    private final DocReaderClient docReader;
+    private final DocReaderParsePort docReader;
     private final ModelRuntimeAssembler modelRuntimeAssembler;
     private final AsrTranscriber asrTranscriber;
     private final TenantConfigLookup tenantService;
 
     TemporaryDocumentProcessor(TemporaryDocumentRepository repo,
                                AttachmentFileStore fileStore,
-                               DocReaderClient docReader,
+                               DocReaderParsePort docReader,
                                ModelRuntimeAssembler modelRuntimeAssembler,
                                AsrTranscriber asrTranscriber,
                                TenantConfigLookup tenantService) {
@@ -150,7 +150,7 @@ final class TemporaryDocumentProcessor {
                 imageRefs = "null";
             } else {
                 // 传给 docreader 的 fileType 去掉点
-                DocReaderClient.ParseResult parsed = docReader.read(data, document.getFileName(),
+                DocReaderParsePort.ParsedDocumentView parsed = docReader.parse(data, document.getFileName(),
                         extNoDot, document.getFileName(), "auto".equals(engine) ? "" : engine);
                 // docreader
                 // 直出的 inline ImageRef 落盘并把 markdown 引用改写成可服务 URL；列表写进
@@ -278,12 +278,12 @@ final class TemporaryDocumentProcessor {
      * gRPC 侧拿不到上游"原图"标记，以"来源文件本身是图片格式"等价判定。</p>
      */
     StoredImages storeDocumentImages(long tenantId, TemporaryDocument document,
-            List<DocReaderClient.ImageRef> refs, String markdown) {
+            List<DocReaderParsePort.ImageRefView> refs, String markdown) {
         if (refs == null || refs.isEmpty()) {
             return new StoredImages(markdown, "[]");
         }
-        Map<String, DocReaderClient.ImageRef> refMap = new LinkedHashMap<>();
-        for (DocReaderClient.ImageRef ref : refs) {
+        Map<String, DocReaderParsePort.ImageRefView> refMap = new LinkedHashMap<>();
+        for (DocReaderParsePort.ImageRefView ref : refs) {
             if (ref.originalRef() != null && !ref.originalRef().isEmpty()) {
                 refMap.put(ref.originalRef(), ref);
             }
@@ -302,7 +302,7 @@ final class TemporaryDocumentProcessor {
             String rawPath = m.group(2);
             String path = rawPath.startsWith("<") && rawPath.endsWith(">")
                     ? rawPath.substring(1, rawPath.length() - 1) : rawPath;
-            DocReaderClient.ImageRef ref = refMap.get(path);
+            DocReaderParsePort.ImageRefView ref = refMap.get(path);
             if (ref == null || ref.imageData() == null || ref.imageData().length == 0) {
                 continue; // 无内联字节 → 原样保留
             }

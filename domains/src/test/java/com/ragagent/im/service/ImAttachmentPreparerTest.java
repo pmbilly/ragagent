@@ -18,7 +18,7 @@ import com.ragagent.im.runtime.CallbackExchange;
 import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.ReplyMessage;
-import com.ragagent.knowledge.client.DocReaderClient;
+import com.ragagent.contract.doc.DocReaderParsePort;
 
 /**
  * IM 附件解析：
@@ -91,8 +91,8 @@ class ImAttachmentPreparerTest {
     }
 
     @SuppressWarnings("unchecked")
-    private static ObjectProvider<DocReaderClient> providerOf(DocReaderClient client) {
-        ObjectProvider<DocReaderClient> provider = mock(ObjectProvider.class);
+    private static ObjectProvider<DocReaderParsePort> providerOf(DocReaderParsePort client) {
+        ObjectProvider<DocReaderParsePort> provider = mock(ObjectProvider.class);
         when(provider.getIfAvailable()).thenReturn(client);
         return provider;
     }
@@ -224,9 +224,9 @@ class ImAttachmentPreparerTest {
 
     @Test
     void documentGoesThroughDocReaderWhenAvailable() throws Exception {
-        DocReaderClient client = mock(DocReaderClient.class);
-        when(client.read(any(), any(), any(), any(), any()))
-                .thenReturn(new DocReaderClient.ParseResult("# parsed body", 0));
+        DocReaderParsePort client = mock(DocReaderParsePort.class);
+        when(client.parse(any(), any(), any(), any(), any()))
+                .thenReturn(new DocReaderParsePort.ParsedDocumentView("# parsed body", 0));
         ImAttachmentPreparer preparer = new ImAttachmentPreparer(providerOf(client));
 
         DownloadingAdapter adapter = new DownloadingAdapter();

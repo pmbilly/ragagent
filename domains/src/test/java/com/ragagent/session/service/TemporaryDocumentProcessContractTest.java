@@ -22,7 +22,7 @@ import org.mockito.ArgumentCaptor;
 import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
 import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.knowledge.client.DocReaderClient;
+import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.model.domain.Model;
 import com.ragagent.model.domain.ModelParameters;
 import com.ragagent.model.service.ModelRuntimeAssembler;
@@ -41,7 +41,7 @@ class TemporaryDocumentProcessContractTest {
 
     private TemporaryDocumentRepository repo;
     private AttachmentFileStore fileStore;
-    private DocReaderClient docReader;
+    private DocReaderParsePort docReader;
     private ModelRuntimeAssembler modelRuntimeAssembler;
     private AsrTranscriber asrTranscriber;
     private TenantConfigLookup tenantService;
@@ -51,7 +51,7 @@ class TemporaryDocumentProcessContractTest {
     void setUp() {
         repo = mock(TemporaryDocumentRepository.class);
         fileStore = mock(AttachmentFileStore.class);
-        docReader = mock(DocReaderClient.class);
+        docReader = mock(DocReaderParsePort.class);
         modelRuntimeAssembler = mock(ModelRuntimeAssembler.class);
         asrTranscriber = mock(AsrTranscriber.class);
         tenantService = mock(TenantConfigLookup.class);
@@ -132,12 +132,12 @@ class TemporaryDocumentProcessContractTest {
         when(repo.getById(TENANT, "d-1")).thenReturn(document("report.pdf", ".pdf", "{}"));
         when(fileStore.getFile("local://1/exports/d-1")).thenReturn(new byte[] {1});
         when(tenantService.parserEngineConfig(TENANT)).thenReturn(parserEngineConfigWithRule("pdf", "mineru"));
-        when(docReader.read(any(), anyString(), anyString(), anyString(), eq("mineru")))
-                .thenReturn(new DocReaderClient.ParseResult("# md", 0, List.of()));
+        when(docReader.parse(any(), anyString(), anyString(), anyString(), eq("mineru")))
+                .thenReturn(new DocReaderParsePort.ParsedDocumentView("# md", 0, List.of()));
 
         service.processNow(TENANT, "d-1");
 
-        verify(docReader).read(any(), eq("report.pdf"), eq("pdf"), eq("report.pdf"),
+        verify(docReader).parse(any(), eq("report.pdf"), eq("pdf"), eq("report.pdf"),
                 eq("mineru"));
     }
 
@@ -148,12 +148,12 @@ class TemporaryDocumentProcessContractTest {
         when(fileStore.getFile("local://1/exports/d-1")).thenReturn(new byte[] {1});
         when(tenantService.parserEngineConfig(42L))
                 .thenReturn(parserEngineConfigWithRule("pdf", "paddleocr_vl"));
-        when(docReader.read(any(), anyString(), anyString(), anyString(), eq("paddleocr_vl")))
-                .thenReturn(new DocReaderClient.ParseResult("# md", 0, List.of()));
+        when(docReader.parse(any(), anyString(), anyString(), anyString(), eq("paddleocr_vl")))
+                .thenReturn(new DocReaderParsePort.ParsedDocumentView("# md", 0, List.of()));
 
         service.processNow(TENANT, "d-1");
 
-        verify(docReader).read(any(), eq("report.pdf"), eq("pdf"), eq("report.pdf"),
+        verify(docReader).parse(any(), eq("report.pdf"), eq("pdf"), eq("report.pdf"),
                 eq("paddleocr_vl"));
     }
 
@@ -162,12 +162,12 @@ class TemporaryDocumentProcessContractTest {
         when(repo.getById(TENANT, "d-1")).thenReturn(document("report.pdf", ".pdf",
                 "{\"parserEngine\":\"simple\"}"));
         when(fileStore.getFile("local://1/exports/d-1")).thenReturn(new byte[] {1});
-        when(docReader.read(any(), anyString(), anyString(), anyString(), eq("simple")))
-                .thenReturn(new DocReaderClient.ParseResult("# md", 0, List.of()));
+        when(docReader.parse(any(), anyString(), anyString(), anyString(), eq("simple")))
+                .thenReturn(new DocReaderParsePort.ParsedDocumentView("# md", 0, List.of()));
 
         service.processNow(TENANT, "d-1");
 
-        verify(docReader).read(any(), eq("report.pdf"), eq("pdf"), eq("report.pdf"),
+        verify(docReader).parse(any(), eq("report.pdf"), eq("pdf"), eq("report.pdf"),
                 eq("simple"));
     }
 }

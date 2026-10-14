@@ -732,7 +732,7 @@ class ArchitectureRulesTest {
      * （{@code controller} / {@code mapper} / {@code task} / {@code client} / {@code channel}）的类。
      *
      * <p>登记理由（2026-10-13 整改立项，方案 §12.1 第 1 条）：边界层由装配层与外部调用，
-     * 用例层经 repository / 端口使用外部能力。实测存量 <b>74 类</b>入基线
+     * 用例层经 repository / 端口使用外部能力。实测存量 <b>70 类</b>入基线
      * （mapper / task / client 混合命中；controller 与 channel 已为 0）——
      * 只许减、新增即红，存量随结构收敛批次逐域消化。</p>
      */
@@ -755,13 +755,11 @@ class ArchitectureRulesTest {
             "com.ragagent.datasource.service.MapperKnowledgeBridge",
             "com.ragagent.embedchannel.service.EmbedChannelService",
             "com.ragagent.favorite.service.UserResourceFavoriteService",
-            "com.ragagent.im.service.ImAttachmentPreparer",
             "com.ragagent.im.service.ImChannelRuntimeOps",
             "com.ragagent.im.service.ImChannelService",
             "com.ragagent.im.service.ImTurnOrchestrator",
             "com.ragagent.im.service.ImSessionResolver",
             "com.ragagent.initialization.service.InitializationConfigService",
-            "com.ragagent.initialization.service.ModelConnectivityTestService",
             "com.ragagent.knowledge.service.EmbeddingModelAdapter",
             "com.ragagent.knowledge.service.faq.FaqBatchOps",
             "com.ragagent.knowledge.service.faq.FaqEntryCommandService",
@@ -785,8 +783,6 @@ class ArchitectureRulesTest {
             "com.ragagent.model.service.ModelService",
             "com.ragagent.session.service.QaWebSearchParams",
             "com.ragagent.session.service.SessionKnowledgeQaService",
-            "com.ragagent.session.service.TemporaryDocumentProcessor",
-            "com.ragagent.session.service.TemporaryDocumentService",
             "com.ragagent.storage.service.DefaultStorageBackendProvisioner",
             "com.ragagent.storage.service.ResourceCatalogService",
             "com.ragagent.storage.service.StorageBackendService",
