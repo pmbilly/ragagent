@@ -1261,6 +1261,20 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **测试**：**4982 / 失败 0 / 跳过 4**（boot **1329 → 1331**，正是新增 2 条规则 ✓）；启动测试 ✓；`spotlessCheck build` ✓ **1m36s** ✓ **十二守卫** ✓（环 0 / 包级 SCC 12 组）。
 - **阶段 6 收官**：B263 ✅ · B264 ✅ · B265 ✅ · B266 ✅ · B267 ✅。
 
+**✅ 缺陷修复（2026-10-14，knowledge 处理链租户作用域缺失 ⇒ 1003 "Model not found"）**
+- **现场**：上传文档后 `parse_status=failed`、`error_message=error code: 1003, error message: Model not found`；`knowledge_processing_spans` 显示 docreader / chunking **done**、**embedding 阶段**失败（两次自动重试同点失败）；`chunks=0` 是 K4 失败清场的结果。
+- **根因（实测坐实，非本批引入）**：KB（租户 11）的 embedding/summary 模型是该租户**自建**（`is_builtin=false`）；`ModelService.getModelByID` 按可见性过滤 `tenant_id = 当前租户 OR is_builtin`，而"当前租户"读 `TenantContext`（ThreadLocal）——**worker 虚拟线程没有 HTTP Filter 链填它** ⇒ 按 0 查 ⇒ **0 行**（同一过滤式按 11 查 **1 行**，已现场对照）。wiki 摄取早有 `enterTenantScope` 修过同款，knowledge 侧没有；K10b 之前的旧路径同样走 `ModelRuntimeAssembler → getModelByID` ⇒ 旧缺陷。
+- **根治（五处）**：
+  1. **新共享助手** `common/context/TenantScopes`（把 wiki 的局部实现提上来；`close` 恢复**全部 8 个字段**，含访客 / 请求 id）+ `TenantScopesTest`（3 例）。
+  2. **knowledge 解析链**：`KnowledgeProcessWorker.enqueue` 在**提交线程**捕获租户（与 traceparent 同一套"跨线程显式传值"），`process` 进作用域；捕获不到（后台入队 / 回放）回落 **`KnowledgeTenantResolver`** 读知识行租户；都无 ⇒ `enterCaptured(null)` 保持原行为。
+  3. **富化队列**：`ChunkExtractService` / `QuestionGenerationService` 的 `handleJson` 按 payload 已携带的租户进作用域 —— 该 KB `question_generation_config={"enabled":true}` ⇒ 不修就是"下一个 1003"。
+  4. **memory**：`MemoryExtractionService.handle` 进 payload 租户作用域（主体→`handleInScope`）；`MemoryVectorService.embedText` 的**嵌套虚拟线程**改为"提交线程 capture + 任务体 enter"。
+  5. **wiki 去重**：`WikiBatchSupport.enterTenantScope` 委托共享助手（调用点仅换类型）。
+- **探针（可证伪）**：`KnowledgeProcessWorkerTenantScopeTest`（2 例）——把 `process` 里的 `TenantScopes.enterCaptured(...)` 临时换成 `null` ⇒ **2 例当场转红** ✓，还原 ⇒ 绿 ✓。
+- **守卫两处现场修正**：① 新测试带 2 个未用 import ⇒ **B131 死成员守卫**点名 ⇒ 删；② worker 824 行越过 **≥800 需登记**线 ⇒ 抽 `KnowledgeTenantResolver`（解释随逻辑落座）+ 精简 javadoc ⇒ **797 行**；`file-size.baseline.json` 用**外科式收紧**（worker 789→797 + 删过期条目 `KnowledgeBaseService 565`），**拒绝 `--write`**（它会把 `GitLabConnector 602→603` 这类**回涨**一起吞掉）。
+- **测试**：**4987 / 失败 0 / 跳过 4**（domains 2949→**2951**、common 141→**144**，+5 = 新测试）；启动测试 ✓；`spotlessCheck build` ✓ **1m55s** ✓ **十二守卫** ✓；`:domains:javadoc` / `:common:javadoc` ✓；`arch.*`（含 A19/A20）28 条 ✓（包级 SCC 12 组不变）。
+- **登记（同族未做，均核实无需）**：`MemoryRunBudget.CALLS`（body 不查模型）、`MemoryService` 的 `memory-touch` 后台线程（仅 DB touch）、`WikiBatchSupport.runParallel` 仍用裸 `TenantContext.set/clear`（语义等价，未换助手）。
+
 **🔶 B263 第㉟步（2026-10-14，第二个子面 `service.chunk` 切出）**
 - **动前断言（把"可测"变成"可证"）**：脚本**先断言** `ChunkEditService`/`ChunkExtractService`/`ChunkReadService` 三者在 `service` 包内**入度为零**（无人引用，`package-info` 除外），断言不过就 abort —— 这样"切出只产生单向外边"不再靠推理。`ChunkQuestionService` **故意留在** `service`：它被 `QuestionGenerationService` 引用，单独搬会造出 `service ⇄ service.chunk` 环（已在子面 package-info 写明）。
 - **切出**：3 类 → `com.ragagent.knowledge.service.chunk`（`git mv` + 包声明 + 全仓 FQN 替换 3 文件）；测试面 `ChunkExtractServiceTest` 随迁；新建 `service/chunk/package-info`；`service/package-info` 同步。

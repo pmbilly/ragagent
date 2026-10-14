@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.wiki.WikiLanguageSupport;
+import com.ragagent.common.context.TenantScopes;
 
 /**
  * 批次执行用到的零散工具：错误分类、正文清洗、有界并发扇出、span 门面。
@@ -181,57 +182,10 @@ public final class WikiBatchSupport {
     /**
      * 为 wiki 批次建立租户上下文作用域。
      *
-     * <p><b>为什么必须有</b>：wiki 批次跑在队列的虚拟线程上，那里没有 HTTP 请求的
-     * Filter 链，因此 {@link TenantContext} 是空的。而
-     * {@code WikiModelResolver.getChatModel} 要走
-     * {@code ModelService.getModelByID}（按租户可见性过滤），空租户会让用户自建的模型
-     * 查不到——批次直接以 {@code get_chat_model_failed} 失败。</p>
-     *
-     * <p>返回句柄必须在 {@code finally} 里 {@link TenantScope#close()}：它会<b>恢复</b>
-     * 调用线程原本的会话（而不是粗暴清空），这样在请求线程上同步重放任务
-     * （测试、运维工具）也不会把请求上下文弄丢。</p>
+     * <p>实现在共享助手 {@link TenantScopes#enter(long)}（knowledge 处理链 / 富化队列 /
+     * memory 抽取同款需求 ⇒ 收敛一份）；本名保留是为了不动调用点。</p>
      */
-    public static TenantScope enterTenantScope(long tenantId) {
-        Long prevTenant = TenantContext.currentTenantId();
-        TenantContext.Principal prevPrincipal = TenantContext.currentPrincipal();
-        String prevRole = TenantContext.currentRole();
-        boolean prevSysAdmin = TenantContext.isSystemAdmin();
-        String prevUser = TenantContext.currentUserId();
-        boolean prevAccessAll = TenantContext.canAccessAllTenants();
-        if (tenantId > 0) {
-            TenantContext.set(tenantId, null, null, false, null, false);
-        }
-        return new TenantScope(prevTenant, prevPrincipal, prevRole, prevSysAdmin,
-                prevUser, prevAccessAll);
-    }
-
-    /** {@link #enterTenantScope(long)} 的作用域句柄：close 时恢复调用线程原会话。 */
-    public static final class TenantScope implements AutoCloseable {
-        private final Long prevTenant;
-        private final TenantContext.Principal prevPrincipal;
-        private final String prevRole;
-        private final boolean prevSysAdmin;
-        private final String prevUser;
-        private final boolean prevAccessAll;
-
-        TenantScope(Long prevTenant, TenantContext.Principal prevPrincipal, String prevRole,
-                    boolean prevSysAdmin, String prevUser, boolean prevAccessAll) {
-            this.prevTenant = prevTenant;
-            this.prevPrincipal = prevPrincipal;
-            this.prevRole = prevRole;
-            this.prevSysAdmin = prevSysAdmin;
-            this.prevUser = prevUser;
-            this.prevAccessAll = prevAccessAll;
-        }
-
-        @Override
-        public void close() {
-            TenantContext.clear();
-            if (prevTenant != null || prevPrincipal != null || prevRole != null
-                    || prevUser != null || prevSysAdmin || prevAccessAll) {
-                TenantContext.set(prevTenant, prevPrincipal, prevRole, prevSysAdmin,
-                        prevUser, prevAccessAll);
-            }
-        }
+    public static TenantScopes.TenantScope enterTenantScope(long tenantId) {
+        return TenantScopes.enter(tenantId);
     }
 }

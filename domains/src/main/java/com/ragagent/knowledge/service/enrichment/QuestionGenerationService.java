@@ -28,6 +28,7 @@ import com.ragagent.knowledge.repository.ChunkRepository;
 
 import com.ragagent.knowledge.domain.QuestionBatchPayload;
 import com.ragagent.common.wiki.WikiFinalizePort;
+import com.ragagent.common.context.TenantScopes;
 
 /**
  * 问题生成**批** worker。
@@ -78,7 +79,9 @@ public class QuestionGenerationService implements QuestionGenerationConsumer {
      */
     public void handleJson(String payloadJson, boolean terminal) {
         QuestionBatchPayload p = QuestionBatchPayload.fromJson(payloadJson);
-        try (LangfuseTaskScope scope = LangfuseTaskScope.start(TASK_TYPE_QUESTION_GENERATION, p.tracing(),
+        // 同 ChunkExtractService：队列线程无租户上下文，而问题生成要按租户可见性解析 chat 模型。
+        try (TenantScopes.TenantScope ignoredScope = TenantScopes.enter(p.tenantId());
+                LangfuseTaskScope scope = LangfuseTaskScope.start(TASK_TYPE_QUESTION_GENERATION, p.tracing(),
                 Map.of("knowledge_id", p.knowledgeId(),
                         "batch_index", String.valueOf(p.batchIndex())),
                 LangfuseTaskScope.previewPayload(payloadJson))) {

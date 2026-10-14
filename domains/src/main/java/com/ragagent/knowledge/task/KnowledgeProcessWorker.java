@@ -53,6 +53,8 @@ import java.util.concurrent.ExecutorService;
 import org.springframework.beans.factory.ObjectProvider;
 import com.ragagent.common.wiki.WikiFinalizePort;
 import com.ragagent.common.wiki.WikiIngestPort;
+import com.ragagent.common.context.TenantContext;
+import com.ragagent.common.context.TenantScopes;
 
 /**
  * 知识处理后台 worker：虚拟线程队列消费 knowledge 的解析主链路
@@ -166,26 +168,32 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
         // （HTTP 请求线程）capture 当前 traceparent，随任务带到 worker 线程续接同一棵树。
         TracingContext tracing =
                 LangfuseTracing.inject();
-        executor.submit(() -> process(knowledgeId, tracing));
+        // 租户同理在提交线程 capture（worker 线程查不到自建模型 ⇒ 1003，见 KnowledgeTenantResolver）。
+        Long tenantId = TenantContext.currentTenantId();
+        executor.submit(() -> process(knowledgeId, tracing, tenantId));
     }
 
-    /**
-     * 任务入口：续接上游 trace（无则开独立根）
-     * + 包一个 document:process span；worker 线程归还前由 scope.close() 清上下文。
-     */
-    private void process(String knowledgeId,
-                         TracingContext tracing) {
+    /** 任务入口：接 trace + 包 document:process span；并进入知识行租户作用域（见
+     * {@link KnowledgeTenantResolver}）。包级可见以供同包回归测试驱动。 */
+    void process(String knowledgeId,
+                 TracingContext tracing,
+                 Long capturedTenantId) {
         LangfuseTaskScope scope =
                 LangfuseTaskScope.start(
                         TASK_TYPE_DOCUMENT_PROCESS, tracing,
                         Map.of("knowledge_id", knowledgeId),
                         LangfuseTaskScope.previewPayload(knowledgeId));
         try {
-            processInner(knowledgeId, scope);
+            try (TenantScopes.TenantScope ignored =
+                         TenantScopes.enterCaptured(KnowledgeTenantResolver.resolve(
+                         knowledgeRepository, knowledgeId, capturedTenantId))) {
+                processInner(knowledgeId, scope);
+            }
         } finally {
             scope.close();
         }
     }
+
 
     private void processInner(String knowledgeId,
                               LangfuseTaskScope scope) {

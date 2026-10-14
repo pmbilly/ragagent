@@ -37,6 +37,7 @@ import com.ragagent.common.graph.GraphNode;
 import com.ragagent.common.graph.GraphRelation;
 import com.ragagent.common.graph.NameSpace;
 import com.ragagent.common.wiki.WikiFinalizePort;
+import com.ragagent.common.context.TenantScopes;
 
 /**
  * 分块图抽取任务：
@@ -120,7 +121,10 @@ public class ChunkExtractService implements ChunkExtractConsumer {
      */
     public void handleJson(String payloadJson, boolean terminal) {
         ExtractChunkPayload p = ExtractChunkPayload.fromJson(payloadJson);
-        try (LangfuseTaskScope scope = LangfuseTaskScope.start(TASK_TYPE_CHUNK_EXTRACT, p.tracing(),
+        // 富化跑在队列虚拟线程上：没有 HTTP Filter 填 TenantContext，而模型解析按租户可见性
+        // 过滤（payload 已显式携带租户）⇒ 这里进入作用域，别让自建模型查不到。
+        try (TenantScopes.TenantScope ignoredScope = TenantScopes.enter(p.tenantId());
+                LangfuseTaskScope scope = LangfuseTaskScope.start(TASK_TYPE_CHUNK_EXTRACT, p.tracing(),
                 Map.of("chunk_id", p.chunkId(), "knowledge_id", p.knowledgeId()),
                 LangfuseTaskScope.previewPayload(payloadJson))) {
             handle(p, terminal);

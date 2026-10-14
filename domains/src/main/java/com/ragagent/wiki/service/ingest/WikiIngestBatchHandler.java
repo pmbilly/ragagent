@@ -30,6 +30,7 @@ import com.ragagent.common.wiki.SlugUpdate;
 import com.ragagent.wiki.service.WikiModelResolver;
 import com.ragagent.wiki.service.page.WikiPageService;
 import com.ragagent.wiki.service.page.WikiTextUtils;
+import com.ragagent.common.context.TenantScopes;
 
 /**
  * wiki 生成管线的批次执行体：Map（逐文档抽取/摘要/引用）→ Reduce（逐 slug 落页）→
@@ -422,7 +423,7 @@ public class WikiIngestBatchHandler implements WikiIngestTaskHandler {
         try {
             // 批次跑在队列线程上，没有 HTTP Filter 链填过 TenantContext，而模型解析
             // （ModelService.getModelByID 按租户可见性过滤）需要它——这里显式进入租户作用域。
-            try (WikiBatchSupport.TenantScope ignored =
+            try (TenantScopes.TenantScope ignored =
                          WikiBatchSupport.enterTenantScope(payload.tenantId())) {
                 run.runIngest(payload, stats);
             }

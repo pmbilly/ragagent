@@ -30,6 +30,8 @@ import com.ragagent.memory.repository.MemoryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import com.ragagent.common.context.TenantContext;
+import com.ragagent.common.context.TenantScopes;
 
 /**
  * 向量侧的全部动作。
@@ -120,7 +122,13 @@ public class MemoryVectorService {
         if (modelId == null || modelId.isEmpty() || text == null || text.isEmpty()) {
             return null;
         }
-        Future<float[]> future = EMBEDS.submit((Callable<float[]>) () -> modelResolver.embed(modelId, text));
+        // 提交线程 capture、嵌套虚拟线程 enter：模型解析按租户可见性过滤，ThreadLocal 不跨线程继承。
+        Long tenantId = TenantContext.currentTenantId();
+        Future<float[]> future = EMBEDS.submit((Callable<float[]>) () -> {
+            try (TenantScopes.TenantScope ignored = TenantScopes.enterCaptured(tenantId)) {
+                return modelResolver.embed(modelId, text);
+            }
+        });
         try {
             return future.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
         } catch (TimeoutException e) {

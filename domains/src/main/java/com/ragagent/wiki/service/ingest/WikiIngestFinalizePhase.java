@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ragagent.common.wiki.WikiLanguageSupport;
 import com.ragagent.wiki.service.page.WikiCrossLinker;
+import com.ragagent.common.context.TenantScopes;
 
 /**
  * wiki 批次摄取的 Finalize 阶段协作者:终稿落库与批次收尾(从 RunSupport 分解)。
@@ -62,7 +63,7 @@ final class WikiIngestFinalizePhase {
         }
         try {
             // 同 processWikiIngest：队列线程上没有 HTTP Filter 链填过 TenantContext
-            try (WikiBatchSupport.TenantScope ignored =
+            try (TenantScopes.TenantScope ignored =
                          WikiBatchSupport.enterTenantScope(payload.tenantId())) {
                 runFinalize(payload, startedAt);
             }

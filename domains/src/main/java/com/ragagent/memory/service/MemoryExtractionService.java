@@ -34,6 +34,7 @@ import com.ragagent.common.session.SessionMessagePort;
 import com.ragagent.common.memory.MemoryKeys;
 import com.ragagent.memory.domain.MemoryConflictException;
 import com.ragagent.tracing.langfuse.LangfuseTracing;
+import com.ragagent.common.context.TenantScopes;
 
 /**
  * 后台蒸馏：把一段对话变成记忆。
@@ -256,7 +257,21 @@ public class MemoryExtractionService {
      * <p>负载由 {@link MemoryExtractPayload} 承载。
      * 抛异常 = 任务失败（队列按重试预算重试）；正常返回 = 完成，不重试。</p>
      */
+    /**
+     * 抽取入口：先进入 payload 的租户作用域再走主体。
+     *
+     * <p>抽取跑在队列虚拟线程上（没有 HTTP Filter 填 {@code TenantContext}），而抽取链要按
+     * <b>租户可见性</b>解析模型（{@code DefaultMemoryModelResolver} → {@code getModelByID}）
+     * ——空租户会让用户自建模型查不到。payload 已显式携带租户，故在此进入作用域。</p>
+     */
     public void handle(MemoryExtractPayload payload) {
+        try (TenantScopes.TenantScope ignored = TenantScopes.enter(payload.tenantId())) {
+            handleInScope(payload);
+        }
+    }
+
+    /** 抽取主体（必须在租户作用域内执行）。 */
+    private void handleInScope(MemoryExtractPayload payload) {
         MemoryScope scope = payload.scope();
         if (!scope.valid()) {
             // 没有作用域的负载无法归因到任何人。重试永远修不好它，所以丢掉，
