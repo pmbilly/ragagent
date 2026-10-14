@@ -1,10 +1,13 @@
 package com.ragagent.knowledge.task;
 
+import com.ragagent.knowledge.repository.ChunkRepository;
+import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
+import com.ragagent.knowledge.repository.KnowledgeRepository;
+
 import java.util.ArrayList;
 import com.ragagent.knowledge.config.BatchEmbedProperties;
 import java.util.concurrent.Executors;
 import java.util.List;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
@@ -13,9 +16,6 @@ import com.ragagent.knowledge.domain.KnowledgeProcessingSpan;
 import com.ragagent.knowledge.chunker.Chunker;
 import com.ragagent.knowledge.chunker.ParsedChunk;
 import com.ragagent.knowledge.chunker.SplitterConfig;
-import com.ragagent.knowledge.mapper.ChunkMapper;
-import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
-import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import com.ragagent.model.domain.Model;
 import com.ragagent.model.service.ModelService;
 import org.slf4j.Logger;
@@ -47,7 +47,6 @@ import com.ragagent.retrieval.engine.VectorStoreService;
 import com.ragagent.knowledge.client.DocReaderClient;
 import com.ragagent.knowledge.client.EmbedderClient;
 import com.ragagent.knowledge.storage.TenantFileStorage;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -74,8 +73,8 @@ import com.ragagent.common.wiki.WikiIngestPort;
  *       由 DefaultWikiKnowledgeFinalizer 递减并晋升 completed。</li>
  * </ol>
  *
- * <p>规模例外（§14.5）：~810 行——摄取 worker 的状态机与补偿面同生命周期，
- * 再切不落在自然接缝上，登记不硬切。</p> */
+ * <p>规模：B263㉘ 把仓储访问外提后本类已降到 800 行以下（超 600 行仍在大文件棘轮基线内，
+ * 只许减不许增）。</p> */
 @Service
 public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
 
@@ -90,9 +89,9 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
     private final ExecutorService executor =
             Executors.newVirtualThreadPerTaskExecutor();
 
-    private final KnowledgeMapper knowledgeMapper;
-    private final KnowledgeBaseMapper kbMapper;
-    private final ChunkMapper chunkMapper;
+    private final KnowledgeRepository knowledgeRepository;
+    private final KnowledgeBaseRepository kbRepository;
+    private final ChunkRepository chunkRepository;
     /** 租户感知文件存储（读 provider 引用；本地契约不变）。 */
     private final TenantFileStorage fileStorage;
     private final DocReaderClient docReader;
@@ -119,9 +118,9 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
     private final ObjectProvider<
             QuestionGenerationTaskQueue> questionGenerationQueue;
 
-    public KnowledgeProcessWorker(KnowledgeMapper knowledgeMapper,
-                                  KnowledgeBaseMapper kbMapper,
-                                  ChunkMapper chunkMapper,
+    public KnowledgeProcessWorker(KnowledgeRepository knowledgeRepository,
+                                  KnowledgeBaseRepository kbRepository,
+                                  ChunkRepository chunkRepository,
                                   TenantFileStorage fileStorage,
                                   DocReaderClient docReader,
                                   VectorStoreService vectorStore,
@@ -141,9 +140,9 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
                                   ObjectProvider<
                                           QuestionGenerationTaskQueue> questionGenerationQueue,
                                   BatchEmbedProperties batchEmbedProperties) {
-        this.knowledgeMapper = knowledgeMapper;
-        this.kbMapper = kbMapper;
-        this.chunkMapper = chunkMapper;
+        this.knowledgeRepository = knowledgeRepository;
+        this.kbRepository = kbRepository;
+        this.chunkRepository = chunkRepository;
         this.fileStorage = fileStorage;
         this.docReader = docReader;
         this.vectorStore = vectorStore;
@@ -191,11 +190,8 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
     private void processInner(String knowledgeId,
                               LangfuseTaskScope scope) {
         // CAS pending → processing：被抢/已取消则静默退出
-        int updated = knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
-                .eq(Knowledge::getId, knowledgeId)
-                .eq(Knowledge::getParseStatus, Knowledge.PARSE_PENDING)
-                .set(Knowledge::getParseStatus, Knowledge.PARSE_PROCESSING)
-                .set(Knowledge::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC)));
+        int updated = knowledgeRepository.casPendingToProcessing(knowledgeId,
+                OffsetDateTime.now(ZoneOffset.UTC));
         if (updated == 0) {
             return;
         }
@@ -208,11 +204,11 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
             log.warn("[SpanTracker] openAttempt failed kid={}: {}", knowledgeId, e.toString());
         }
         try {
-            Knowledge k = knowledgeMapper.selectById(knowledgeId);
+            Knowledge k = knowledgeRepository.findByIdAny(knowledgeId);
             if (k == null || k.isAborted()) {
                 return;
             }
-            KnowledgeBase kb = kbMapper.selectById(k.getKnowledgeBaseId());
+            KnowledgeBase kb = kbRepository.findByIdAny(k.getKnowledgeBaseId());
             if (kb == null) {
                 throw new IllegalStateException("knowledge base not found");
             }
@@ -222,7 +218,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
             List<String> attemptChunkIds = List.of();
             try {
                 String markdown = extractMarkdown(k, attempt, knowledgeId);
-                if (knowledgeMapper.selectById(knowledgeId).isAborted()) {
+                if (knowledgeRepository.findByIdAny(knowledgeId).isAborted()) {
                     return; // 中途取消检查点
                 }
                 List<Chunk> chunks = chunkAndPersist(k, kb, knowledgeId, markdown, attempt);
@@ -248,10 +244,9 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
             Knowledge k, KnowledgeBase kb, EmbedderClient.EmbedConfig embedConfig) {
         if (attemptChunkIds.isEmpty()) {
             log.warn("[KnowledgeProcess] no enumerable chunks; knowledge-wide cleanup for {}", knowledgeId);
-            chunkMapper.delete(new LambdaQueryWrapper<Chunk>()
-                    .eq(Chunk::getKnowledgeId, knowledgeId));
+            chunkRepository.deleteByKnowledgeId(knowledgeId);
         } else {
-            chunkMapper.deleteBatchIds(attemptChunkIds);
+            chunkRepository.deleteByIds(attemptChunkIds);
         }
         deleteKnowledgeVectors(k, kb, embedConfig, knowledgeId);
     }
@@ -259,8 +254,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
     /** 预清理：删旧 chunks 行（无条件）+ 该知识全部向量行（仅向量化启用且模型可用）+ 旧图谱（失败仅告警）。 */
     private void preCleanKnowledge(Knowledge k, KnowledgeBase kb,
             EmbedderClient.EmbedConfig embedConfig, String knowledgeId) {
-        chunkMapper.delete(new LambdaQueryWrapper<Chunk>()
-                .eq(Chunk::getKnowledgeId, knowledgeId));
+        chunkRepository.deleteByKnowledgeId(knowledgeId);
         deleteKnowledgeVectors(k, kb, embedConfig, knowledgeId);
         deleteGraphData(k.getKnowledgeBaseId(), knowledgeId);
     }
@@ -331,7 +325,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
             if (i + 1 < chunks.size()) {
                 chunks.get(i).setNextChunkId(chunks.get(i + 1).getId());
             }
-            chunkMapper.insert(chunks.get(i));
+            chunkRepository.insert(chunks.get(i));
         }
         int totalChars = 0;
         for (Chunk c : chunks) {
@@ -420,10 +414,8 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
         SpanTracker.SpanHandle postSpan = beginStageSpan(attempt, knowledgeId,
                 KnowledgeProcessingSpan.STAGE_POST_PROCESS, null);
         if (hasSummaryModel(kb)) {
-            knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
-                    .eq(Knowledge::getId, knowledgeId)
-                    .set(Knowledge::getSummaryStatus, "none")
-                    .set(Knowledge::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC)));
+            knowledgeRepository.setSummaryStatus(knowledgeId, "none",
+                    OffsetDateTime.now(ZoneOffset.UTC));
             spawnSummaryFanOut(knowledgeId);
         }
         int pendingSubtasks = (plan.wiki() ? 1 : 0) + plan.questionBatchCount()
@@ -548,10 +540,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
      * （Java 进程内 worker 会真实处理，无条件派发会污染契约测试的 HTTP 快照）。
      */
     private void spawnSummaryFanOut(String knowledgeId) {
-        long textChunkCount = chunkMapper.selectCount(
-                new LambdaQueryWrapper<Chunk>()
-                        .eq(Chunk::getKnowledgeId, knowledgeId)
-                        .eq(Chunk::getChunkType, "text"));
+        long textChunkCount = chunkRepository.countByKnowledgeIdAndChunkType(knowledgeId, "text");
         if (textChunkCount <= 0) {
             return;
         }
@@ -571,11 +560,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
      * + {@code processed_at}。{@code storage_size} 的 Java 侧计算未接线，保持既有形态。
      */
     private void markIndexedEnabled(String knowledgeId) {
-        knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
-                .eq(Knowledge::getId, knowledgeId)
-                .set(Knowledge::getEnableStatus, "enabled")
-                .set(Knowledge::getProcessedAt, OffsetDateTime.now(ZoneOffset.UTC))
-                .set(Knowledge::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC)));
+        knowledgeRepository.markIndexedEnabled(knowledgeId, OffsetDateTime.now(ZoneOffset.UTC));
     }
 
     /**
@@ -586,12 +571,8 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
      * 富化且不得覆盖状态。</p>
      */
     private boolean promoteFinalizing(String knowledgeId, int pendingSubtasks) {
-        int promoted = knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
-                .eq(Knowledge::getId, knowledgeId)
-                .eq(Knowledge::getParseStatus, Knowledge.PARSE_PROCESSING)
-                .set(Knowledge::getParseStatus, Knowledge.PARSE_FINALIZING)
-                .set(Knowledge::getPendingSubtasksCount, pendingSubtasks)
-                .set(Knowledge::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC)));
+        int promoted = knowledgeRepository.promoteToFinalizing(knowledgeId, pendingSubtasks,
+                OffsetDateTime.now(ZoneOffset.UTC));
         if (promoted > 0) {
             log.info("[KnowledgePostProcess] Knowledge {} entered finalizing ({} subtask(s) pending)",
                     knowledgeId, pendingSubtasks);
@@ -732,23 +713,12 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
             // 进程内 worker 在契约测试里会真实处理：
             // 录制进程内；无条件推进会让异步副作用污染 HTTP 快照断言（kg-manual-draft
             // 等 3 例实测红）。无 summary model 的 KB 因此不做 none/failed 中间态
-            Knowledge row = knowledgeMapper.selectById(knowledgeId);
+            Knowledge row = knowledgeRepository.findByIdAny(knowledgeId);
             KnowledgeBase rowKb = row == null ? null
-                    : kbMapper.selectById(row.getKnowledgeBaseId());
+                    : kbRepository.findByIdAny(row.getKnowledgeBaseId());
             boolean summaryModelConfigured = hasSummaryModel(rowKb);
-            LambdaUpdateWrapper<Knowledge> completeUpdate = new LambdaUpdateWrapper<Knowledge>()
-                    .eq(Knowledge::getId, knowledgeId)
-                    // K4 CAS：只有仍由本次尝试占用的行（processing / finalizing）才许翻终态。
-                    .in(Knowledge::getParseStatus,
-                            List.of(Knowledge.PARSE_PROCESSING, Knowledge.PARSE_FINALIZING))
-                    .set(Knowledge::getParseStatus, Knowledge.PARSE_COMPLETED)
-                    .set(Knowledge::getEnableStatus, "enabled")
-                    .set(Knowledge::getProcessedAt, OffsetDateTime.now(ZoneOffset.UTC))
-                    .set(Knowledge::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC));
-            if (summaryModelConfigured) {
-                completeUpdate.set(Knowledge::getSummaryStatus, "none");
-            }
-            int completedRows = knowledgeMapper.update(null, completeUpdate);
+            int completedRows = knowledgeRepository.completeIfOwned(knowledgeId, summaryModelConfigured,
+                    OffsetDateTime.now(ZoneOffset.UTC));
             if (completedRows == 0) {
                 log.info("[KnowledgeProcess] completion write skipped for {}: row not owned", knowledgeId);
             }
@@ -763,12 +733,8 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
             }
         } else {
             // K4 CAS：只有仍由本次处理占用的行（processing）才许翻 failed。
-            int failedRows = knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
-                    .eq(Knowledge::getId, knowledgeId)
-                    .eq(Knowledge::getParseStatus, Knowledge.PARSE_PROCESSING)
-                    .set(Knowledge::getParseStatus, Knowledge.PARSE_FAILED)
-                    .set(Knowledge::getErrorMessage, abbreviate(error))
-                    .set(Knowledge::getUpdatedAt, OffsetDateTime.now(ZoneOffset.UTC)));
+            int failedRows = knowledgeRepository.failIfProcessing(knowledgeId, abbreviate(error),
+                    OffsetDateTime.now(ZoneOffset.UTC));
             if (failedRows == 0) {
                 log.info("[KnowledgeProcess] failure write skipped for {}: row not processing", knowledgeId);
             }

@@ -131,6 +131,27 @@ public class ChunkRepository implements ChunkSearchGateway {
         return chunkMapper.selectById(id);
     }
 
+    /** 硬删该 knowledge 的全部 chunk 行（{@code delete} 语义；B263㉘ 由 worker 直连搬入）。 */
+    public int deleteByKnowledgeId(String knowledgeId) {
+        return chunkMapper.delete(new LambdaQueryWrapper<Chunk>()
+                .eq(Chunk::getKnowledgeId, knowledgeId));
+    }
+
+    /** 按 id 集合硬删（用非废弃的 {@code deleteByIds}；B263㉘ 由 worker 直连 {@code deleteBatchIds} 归位）。 */
+    public int deleteByIds(List<String> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return 0;
+        }
+        return chunkMapper.deleteByIds(ids);
+    }
+
+    /** 计数：该 knowledge 下指定 chunk_type 的行数（B263㉘ 由 worker 直连归位）。 */
+    public long countByKnowledgeIdAndChunkType(String knowledgeId, String chunkType) {
+        return chunkMapper.selectCount(new LambdaQueryWrapper<Chunk>()
+                .eq(Chunk::getKnowledgeId, knowledgeId)
+                .eq(Chunk::getChunkType, chunkType));
+    }
+
     /** 按主键整行更新（B263⑩：由 service 直连 chunkMapper 归位）。 */
     public void updateById(Chunk chunk) {
         chunkMapper.updateById(chunk);

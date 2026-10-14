@@ -434,6 +434,71 @@ public class KnowledgeRepository {
                 .set(Knowledge::getUpdatedAt, now));
     }
 
+    /** CAS：{@code pending → processing}（被抢/取消则 0 行）。B263㉘ 由 worker 直连搬入。 */
+    public int casPendingToProcessing(String id, OffsetDateTime now) {
+        return knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, id)
+                .eq(Knowledge::getParseStatus, Knowledge.PARSE_PENDING)
+                .set(Knowledge::getParseStatus, Knowledge.PARSE_PROCESSING)
+                .set(Knowledge::getUpdatedAt, now));
+    }
+
+    /** 写 {@code summary_status} 并推 updated_at（B263㉘；无 updated_at 的旧重载见 {@link #setSummaryStatus(String, String)}）。 */
+    public int setSummaryStatus(String id, String summaryStatus, OffsetDateTime now) {
+        return knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, id)
+                .set(Knowledge::getSummaryStatus, summaryStatus)
+                .set(Knowledge::getUpdatedAt, now));
+    }
+
+    /** 索引完成的无条件推进：{@code enable_status=enabled} + {@code processed_at} + updated_at（B263㉘）。 */
+    public int markIndexedEnabled(String id, OffsetDateTime now) {
+        return knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, id)
+                .set(Knowledge::getEnableStatus, "enabled")
+                .set(Knowledge::getProcessedAt, now)
+                .set(Knowledge::getUpdatedAt, now));
+    }
+
+    /** CAS：{@code processing → finalizing} 并写子任务计数（0 行 = 行已被 cancel/delete 抢走）。B263㉘。 */
+    public int promoteToFinalizing(String id, int pendingSubtasks, OffsetDateTime now) {
+        return knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, id)
+                .eq(Knowledge::getParseStatus, Knowledge.PARSE_PROCESSING)
+                .set(Knowledge::getParseStatus, Knowledge.PARSE_FINALIZING)
+                .set(Knowledge::getPendingSubtasksCount, pendingSubtasks)
+                .set(Knowledge::getUpdatedAt, now));
+    }
+
+    /**
+     * K4 CAS：只有仍由本次尝试占用的行（{@code processing}/{@code finalizing}）才许翻终态 completed
+     * （顺带 enabled + processed_at + updated_at）；{@code resetSummaryStatus} 为真时额外写
+     * {@code summary_status=none}（仅当 KB 配了 summary model）。返回影响行数（0 = 不归本次所有）。B263㉘。
+     */
+    public int completeIfOwned(String id, boolean resetSummaryStatus, OffsetDateTime now) {
+        LambdaUpdateWrapper<Knowledge> uw = new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, id)
+                .in(Knowledge::getParseStatus, List.of(Knowledge.PARSE_PROCESSING, Knowledge.PARSE_FINALIZING))
+                .set(Knowledge::getParseStatus, Knowledge.PARSE_COMPLETED)
+                .set(Knowledge::getEnableStatus, "enabled")
+                .set(Knowledge::getProcessedAt, now)
+                .set(Knowledge::getUpdatedAt, now);
+        if (resetSummaryStatus) {
+            uw.set(Knowledge::getSummaryStatus, "none");
+        }
+        return knowledgeMapper.update(null, uw);
+    }
+
+    /** K4 CAS：只有仍 {@code processing} 的行才许翻 failed 并写 error_message。返回影响行数。B263㉘。 */
+    public int failIfProcessing(String id, String errorMessage, OffsetDateTime now) {
+        return knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
+                .eq(Knowledge::getId, id)
+                .eq(Knowledge::getParseStatus, Knowledge.PARSE_PROCESSING)
+                .set(Knowledge::getParseStatus, Knowledge.PARSE_FAILED)
+                .set(Knowledge::getErrorMessage, errorMessage)
+                .set(Knowledge::getUpdatedAt, now));
+    }
+
     /** 按主键整行更新。 */
     public void updateById(Knowledge k) {
         knowledgeMapper.updateById(k);

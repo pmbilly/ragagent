@@ -921,6 +921,12 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **偶发测试（记录）**：全量跑时 `RedisWikiDeletedTombstoneStoreTest.clearRemovesTombstone` 失败一次，**单跑即过** ⇒ Redis 依赖型偶发，与本步改动无关（本步未触碰 wiki/Redis 路径）。
 - **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m34s** ✓ 十一守卫 ✓（13 组 SCC 未变）。
 - **登记（余步）**：
+**🔶 B263 第㉘步（2026-10-14，`KnowledgeProcessWorker` 归仓储：824 → 792 行）**
+- **本步 16 处 + 9 个新仓储方法**（都是"CAS / 条件 / 硬删"形态，SQL 逐字搬入）：`casPendingToProcessing`、`setSummaryStatus(id, status, now)`（带 updated_at 的重载）、`markIndexedEnabled`、`promoteToFinalizing`（processing→finalizing + 子任务计数）、`completeIfOwned(id, resetSummaryStatus, now)`（**K4 CAS**：只有 processing/finalizing 才许翻 completed，`resetSummaryStatus` 为真时额外写 `summary_status=none`）、`failIfProcessing`（只许 processing → failed）、`ChunkRepository.deleteByKnowledgeId`、`deleteByIds`、`countByKnowledgeIdAndChunkType`。
+- **顺手清掉一个已废弃 API**：`chunkMapper.deleteBatchIds(...)`（**MyBatis-Plus 已标 deprecated**，IDE 一直在提示）⇒ 仓储内改用非废弃的 `chunkMapper.deleteByIds(...)` ✓（外部调用方只看到 `deleteByIds(List<String>)`）。
+- **本步的"意外收获"（守卫自己抓出来的）**：文件降到 **789 行（<800）** 后，`check-file-size.py` 立刻报 **R-e 过期自称**——源码 javadoc 里还写着「规模例外（~810 行）」✗ ⇒ 三处同步：① javadoc 改为现状陈述（并且**不再出现"规模例外"字样**——第一版我写成"曾长期…并登记规模例外"，守卫仍判为活跃自称 ✗ ⇒ 干脆不写这个词 ✓）；② `file-size.baseline.json` 的 `limits` 收紧 **843 → 789**；③ 删掉 `exempt` 条目（**该文件从此不再是规模例外** ✓）。**这条守卫的价值现场可见：它比人更早发现"例外已随切片解除"。**
+- **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m42s** ✓ **十二守卫** ✓（环 0 / SCC 13 组未变）。
+- **登记（余步）**：`KnowledgeService`(716) 余部 → `service.management/*`（需配套断边）、`task ⇄ service` 余 7 处、`escapeLikeKeyword` 多副本统一到 `common`、`service` 七子面与 `domain.{document,task,graph}` 归位。
 **🔶 B263 第㉗步（2026-10-14，包外 3 类归仓储）**
 - **范围**：`api/KnowledgeFinalizeAdapter`（wiki 收尾适配器）、`index/ChunkVectorIndexer`、`domain/access/ChunkAccessGuard` ⇒ 三者 mapper 直连**全部清零**（`ChunkAccessGuard` 404 → 373 行、`ChunkVectorIndexer` 392 → 386 行）。
 - **动前先查环（本步第一步）**：`domain.access → repository` 会新增一条包间边 ⇒ 先确认 `repository/*` **不引用** `ChunkAccessGuard`/`domain.access`（实测空 ✓）⇒ 改完 SCC 仍 13 组、环 0 ✓（R9 复核在场）。

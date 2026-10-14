@@ -37,7 +37,7 @@
     "domains/src/main/java/com/ragagent/knowledge/service/KnowledgeService.java": 796,
     "domains/src/main/java/com/ragagent/knowledge/service/KnowledgeSummaryService.java": 684,
     "domains/src/main/java/com/ragagent/knowledge/service/SpanTracker.java": 702,
-    "domains/src/main/java/com/ragagent/knowledge/task/KnowledgeProcessWorker.java": 843,
+    "domains/src/main/java/com/ragagent/knowledge/task/KnowledgeProcessWorker.java": 789,
     "domains/src/main/java/com/ragagent/mcp/service/McpServiceService.java": 605,
     "domains/src/main/java/com/ragagent/mcp/tools/McpCatalog.java": 725,
     "domains/src/main/java/com/ragagent/memory/repository/MemoryIndexStore.java": 628,
@@ -69,11 +69,5 @@
     "engine/src/main/java/com/ragagent/retrieval/engine/milvus/MilvusRetrieveRepository.java": 610,
     "engine/src/main/java/com/ragagent/retrieval/engine/tencentvectordb/TencentVectorDbRetrieveRepository.java": 651
   },
-  "exempt": {
-    "domains/src/main/java/com/ragagent/knowledge/task/KnowledgeProcessWorker.java": {
-      "status": "accepted",
-      "since": "2026-10-01",
-      "reason": "摄取 worker 的状态机与补偿面同生命周期，再切不落在自然接缝上（已在类 javadoc 自述）"
-    }
-  }
+  "exempt": {}
 }
