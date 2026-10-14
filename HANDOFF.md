@@ -538,7 +538,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B260 | 6 | agent-engine 包边界（`com.ragagent.agent` 运行面收拢） | ✅ 2026-10-13 |
 | B261 | 6 | retrieval-engine 包边界（`retrieval.*` 收拢 + policy 归位） | ✅ 2026-10-13 |
 | B262 | 6 | model-runtime 包边界（模型调用 / provider / 流生命周期） | ✅ 2026-10-13 |
-| B263 | 6 | domains 域内重排①：knowledge（29 包 248 文件；SCC 拆解 + mapper/repository 主战场） | 🔶 进行中（①~㊵：mapper 归零 / `{service,task}` SCC 消除 / 门面归位 `service.management` / 四个子面切出 `{faq,chunk,query,management}` + `enrichment`；余 §8.8 目标树细分可选） |
+| B263 | 6 | domains 域内重排①：knowledge（29 包 248 文件；SCC 拆解 + mapper/repository 主战场） | 🔶 进行中（①~㊸：mapper 归零 / `{service,task}` SCC 消除 / 门面 + 4 用例类归位 `service.management` / 五个子面 `{faq,chunk,query,management,enrichment}` 切出；顶层只剩访问原语与支撑；余 §8.8 目标树细分可选） |
 | B264 | 6 | ②：session（21 包 183 文件）+ agenttools/agentmanagement 落位 | ⬜ |
 | B265 | 6 | ③：wiki（17 包 147）+ datasource（16 包 124）+ mcp（9 包 125） | ⬜ |
 | B266 | 6 | ④：im/memory/auth/storage/websearch/model + 其余小域 | ⬜ |
