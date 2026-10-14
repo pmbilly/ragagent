@@ -42,7 +42,6 @@
       "ApprovalBridge"
     ],
     "auth→tenant": [
-      "APIKeyAuthChannel",
       "AuthBindingSupport",
       "AuthController",
       "LoginResult",

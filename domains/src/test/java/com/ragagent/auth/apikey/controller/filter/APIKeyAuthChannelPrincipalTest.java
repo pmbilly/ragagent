@@ -17,7 +17,6 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.auth.apikey.service.TenantAPIKeyService;
-import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.contract.tenant.APIPrincipalConfig;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.auth.service.UserService;
@@ -47,9 +46,8 @@ class APIKeyAuthChannelPrincipalTest {
         tenantService = mock(TenantService.class);
         userService = mock(UserService.class);
         channel = new APIKeyAuthChannel(apiKeyService, tenantService, userService);
-        Tenant tenant = new Tenant();
-        tenant.setId(TENANT);
-        when(tenantService.getTenantById(TENANT)).thenReturn(tenant);
+        // 自 A③ 起只读走 L1 端口：存在性 + 主体配置分别 stub（不再造实体）
+        when(tenantService.exists(TENANT)).thenReturn(true);
     }
 
     @AfterEach
@@ -82,8 +80,7 @@ class APIKeyAuthChannelPrincipalTest {
         request.addHeader("X-Tenant-ID", String.valueOf(TENANT));
         request.setRequestURI("/api/v1/agents");
         if (config != null) {
-            Tenant bound = tenantService.getTenantById(TENANT);
-            bound.setApiPrincipalConfig(config);
+            when(tenantService.apiPrincipalConfig(TENANT)).thenReturn(config);
         }
         MockHttpServletResponse response = new MockHttpServletResponse();
         boolean ok = channel.authenticate(request, response);
@@ -225,8 +222,7 @@ class APIKeyAuthChannelPrincipalTest {
         if (token != null) {
             request.addHeader("X-External-User-Token", token);
         }
-        Tenant bound = tenantService.getTenantById(TENANT);
-        bound.setApiPrincipalConfig(config);
+        when(tenantService.apiPrincipalConfig(TENANT)).thenReturn(config);
 
         MockHttpServletResponse response = new MockHttpServletResponse();
         channel.authenticate(request, response);

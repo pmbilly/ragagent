@@ -1308,6 +1308,17 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **A② 全批提交**：`a7d3b13e`（第①批 42 类）· `37b5fbb8`（第②批 去框架化 37 类）· `2ee75327`（第②批 补：解锁 11 类）· 本批（第③批 9 类 + 收口）。
 - **A 的下一步**：**③ 立「域间只经契约」**（A20 已守"契约唯一实现"；还差"业务域之间只经 `contract`"这条规则——应先测现状再决定硬规则 vs 棘轮基线）。可选后续：① 的 K 级重设计（`JsonNode` → typed records）另立项。
 
+**🔶 A③ 第七刀：`auth→tenant` 分档裁定（2026-10-14，类 285 → 284；**该边判定为"属主边，不追求清零"**）**
+- **实测分档（15 类）**：**属主 4 类**（`TenantService`（mapper 13 次 + 实体 setter 12 次）/`TenantConfigOps`/`TenantCreateOps`/`UserService` —— 读写租户实体）；**管理/响应成形 11 类**（`TenantResponse` 26 次 getter、`AuthController` 10、`TenantCatalogController` 直接 `List<Tenant>` 出参 …）。
+- **关键结构结论（写进 R10 基线 note 的"边分级"）**：计划 §8.9 给 `tenant/` 定的面是 **3 包 / 10 文件**（根包配置类 + `mapper/TenantMapper` + `repository/{Tenant,TenantConfigRedaction,TenantLookup}`）——**租户的"管理面"计划上就留在 auth** ✗ ⇒ `auth→tenant` 是**域属主边**：
+  - 清零路径 A＝把管理面（服务/控制器/响应成形）搬进 `tenant/` ⇒ **与计划的面清单相悖** ✗；
+  - 清零路径 B＝把 API 出参从实体改成视图 ⇒ **改公开 API 形状**（需前端适配 + 金片验证 ✗）；
+  ⇒ **需拍板**；在读侧已"能走的都走 L1 端口" ✓。
+- **本刀实做（读侧净化，零形状变化）**：端口补 **`apiPrincipalConfig(long)`（返回契约类型 ✓）** 与 **`exists(long)`**（存在性探针，避免为此拉实体 ✓）；`auth/apikey/.../APIKeyAuthChannel` 迁到端口 ✓（其 stub 测试同步改造 ✓）⇒ `auth→tenant` **15 → 14 类**。
+- **⚠️ 两处守卫现场**：① 我用内联全限定名写 `com.ragagent.contract.tenant.APIPrincipalConfig` ✗ ⇒ **R8 判红** ✓（改 import + 简名 ✓ —— R8 第二次抓到我的内联 FQN ✓）；② 判"死 import"时被**字符串字面量/注释里的 `X-Tenant-ID`** 骗过 ✗ ⇒ 最终以**编译器为判据**（删了能编译即确为死 ✓）。
+- **验证**：**4987 / 失败 0 / 跳过 4** ✓；`spotlessCheck build` ✓ **2m06s** ✓ **13 守卫** ✓（环 0 / SCC 11 组）；定向（APIKey/Auth 族 ✓）全绿。
+- **A③ 累计（七刀）**：基线 **317 → 284 类（−33）**、**边 64 → 60（−4）**；**已清零边 4 条**（`storage→tenant`/`session→auth`/`session→tenant`/`knowledge→tenant` ✓）；**判定为属主边 1 条**（`auth→tenant` 14 类 ✗ 待拍板）；余量小边：`system→tenant` 3 · `datasource`/`embedchannel`/`memory→tenant` 各 1（合计 6 类 ⇒ 可再消 4 条边 ✓）。
+
 **🔶 A③ 收敛第六刀：`knowledge→tenant` 清零（2026-10-14，R10 **边 61 → 60**、类 287 → 285）**
 - **发现的问题（比"多一条 import"严重）**：knowledge 的 FAQ 索引写入链 **直连他域持久层** —— `knowledge/storage/TenantStorageService` 注入 `TenantMapper`（读租户行）+ **裸 SQL `UPDATE tenants SET storage_used=…`**（写租户表 ✗✗）。
 - **做法**：立 **L1 端口 `common.tenant.TenantStorageQuotaPort`**（读 `quotaView` / 写 `adjustUsed` + 嵌套 record `TenantQuotaView(tenantId, quota, used)` ✓），实现落在**属主域** `tenant/api/TenantStorageQuotaAdapter`（**SQL 一并从 knowledge 收回租户域** ✓）；**删除** knowledge 侧门面 `TenantStorageService` ✓，两个调用方（`FaqIndexWriter` 4 处、`KnowledgeMoveService` 1 处）改注入端口 ✓。

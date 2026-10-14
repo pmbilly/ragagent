@@ -1,5 +1,7 @@
 package com.ragagent.auth.service;
 
+import com.ragagent.contract.tenant.APIPrincipalConfig;
+
 import com.ragagent.platform.persistence.LikeEscapes;
 
 import com.ragagent.platform.web.JsonMappers;
@@ -89,6 +91,17 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
     @Override
     public Tenant tenantById(long tenantId) {
         return getTenantById(tenantId);
+    }
+
+    @Override
+    public boolean exists(long tenantId) {
+        return getTenantById(tenantId) != null;
+    }
+
+    @Override
+    public APIPrincipalConfig apiPrincipalConfig(long tenantId) {
+        Tenant t = getTenantById(tenantId);
+        return t == null ? null : t.getApiPrincipalConfig();
     }
 
     @Override

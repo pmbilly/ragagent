@@ -9,7 +9,6 @@ import com.ragagent.auth.apikey.domain.TenantAPIKey;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.auth.apikey.mapper.TenantAPIKeyNotFoundException;
 import com.ragagent.auth.apikey.service.TenantAPIKeyService;
-import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.platform.access.TenantContext;
 import jakarta.servlet.http.HttpServletRequest;
@@ -148,8 +147,7 @@ public class APIKeyAuthChannel implements ApiKeyAuthPort {
     /** 租户身份 + 首位用户（或合成用户）+ API 主体模式解析。 */
     private boolean attachTenantKey(HttpServletRequest request, HttpServletResponse response,
                                     long tenantId, TenantAPIKey key) throws IOException {
-        Tenant tenant = tenantService.getTenantById(tenantId);
-        if (tenant == null) {
+        if (!tenantService.exists(tenantId)) {
             // 统一 401 invalid API key（不泄露"租户不存在"）
             writeJson(response, 401, "{\"error\":\"Unauthorized: invalid API key\"}");
             return false;
@@ -170,7 +168,7 @@ public class APIKeyAuthChannel implements ApiKeyAuthPort {
             // 按租户 API principal
             // 模式解析主体；配置缺失/tenant 模式回落 api_tenant/<tenantId>。
             ApiPrincipalResolutionOut resolution = resolveApiPrincipal(tenantId,
-                    tenant.getApiPrincipalConfig(), request);
+                    tenantService.apiPrincipalConfig(tenantId), request);
             if (resolution.error() != null) {
                 writeJson(response, 401,
                         "{\"error\":\"" + resolution.error() + "\"}");

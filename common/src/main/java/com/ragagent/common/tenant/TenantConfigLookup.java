@@ -1,5 +1,7 @@
 package com.ragagent.common.tenant;
 
+import com.ragagent.contract.tenant.APIPrincipalConfig;
+
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
@@ -23,6 +25,16 @@ public interface TenantConfigLookup {
 
     /** 记忆配置（{@code tenants.memory_config}：embeddingModelId / extractModelId 等）。 */
     JsonNode memoryConfig(long tenantId);
+
+    /** 租户是否存在（存在性探针；避免为此读整行/拉实体）。 */
+    boolean exists(long tenantId);
+
+    /**
+     * API 主体配置（{@code tenants.api_principal_config}，**契约类型**；租户不存在返回 {@code null}）。
+     *
+     * <p>只读侧专用：写侧仍在租户管理面（auth 的 {@code TenantAPIPrincipalController}）。</p>
+     */
+    APIPrincipalConfig apiPrincipalConfig(long tenantId);
 
     /** 网络搜索配置（{@code tenants.web_search_config}；租户不存在或配置为空返回 {@code null}）。 */
     JsonNode webSearchConfig(long tenantId);
