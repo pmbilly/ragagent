@@ -1,4 +1,4 @@
-package com.ragagent.mcp.tools;
+package com.ragagent.mcp.tool;
 
 import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.llm.ToolResult;
-import com.ragagent.mcp.tools.McpCatalog.McpDiscoveryArgs;
-import com.ragagent.mcp.tools.McpCatalog.McpServerSummary;
-import com.ragagent.mcp.tools.McpCatalog.McpToolSummary;
-import com.ragagent.mcp.tools.McpCatalog.McpDiscoveryPage;
+import com.ragagent.mcp.tool.McpCatalog.McpDiscoveryArgs;
+import com.ragagent.mcp.tool.McpCatalog.McpServerSummary;
+import com.ragagent.mcp.tool.McpCatalog.McpToolSummary;
+import com.ragagent.mcp.tool.McpCatalog.McpDiscoveryPage;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.agent.tool.ToolRegistry;
 import com.ragagent.agent.tool.ToolDefinitions;

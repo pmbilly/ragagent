@@ -1,4 +1,4 @@
-package com.ragagent.mcp.tools;
+package com.ragagent.mcp.tool;
 
 import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;

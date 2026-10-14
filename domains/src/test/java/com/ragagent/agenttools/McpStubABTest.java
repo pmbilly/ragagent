@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.ragagent.mcp.domain.McpTool;
 import com.ragagent.mcp.protocol.McpContext;
 import com.ragagent.mcp.protocol.McpServiceUrls;
-import com.ragagent.mcp.tools.McpToolWrapper;
+import com.ragagent.mcp.tool.McpToolWrapper;
 import com.ragagent.agent.tool.ToolRequest;
 
 /**

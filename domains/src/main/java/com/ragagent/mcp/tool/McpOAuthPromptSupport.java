@@ -1,4 +1,4 @@
-package com.ragagent.mcp.tools;
+package com.ragagent.mcp.tool;
 
 import java.time.Duration;
 import java.time.Instant;

@@ -1,4 +1,4 @@
-package com.ragagent.mcp.tools;
+package com.ragagent.mcp.tool;
 
 import java.util.ArrayList;
 import java.util.Collections;

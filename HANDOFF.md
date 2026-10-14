@@ -540,7 +540,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B262 | 6 | model-runtime 包边界（模型调用 / provider / 流生命周期） | ✅ 2026-10-13 |
 | B263 | 6 | domains 域内重排①：knowledge（29 包 248 文件；SCC 拆解 + mapper/repository 主战场） | ✅ ①~㊸（mapper 归零 / `{service,task}` SCC 消除 / 门面 + 4 用例类归位 `service.management` / 五个子面切出；§8.8.2 包重排面到位；余三项属重构级，见收口记录） |
 | B264 | 6 | ②：session + agenttools/agentmanagement 落位 | ✅ ①~⑦（agentmanagement `service.{config,builtin}` / **B257 基线清零** / agenttools 四面对齐 `datasource` / session `controller.sse`+`domain` 三簇+`service.suggestion`；session 余项属重构级，见收口记录） |
-| B265 | 6 | ③：wiki（17 包 147）+ datasource（16 包 124）+ mcp（9 包 125） | ⬜ |
+| B265 | 6 | ③：wiki（17 包 147）+ datasource（16 包 124）+ mcp（9 包 125） | 🔶 进行中（⑧：mcp `tools`→`tool`；三域差集盘点完成 ⇒ wiki 两处拆簇 / datasource 待重测） |
 | B266 | 6 | ④：im/memory/auth/storage/websearch/model + 其余小域 | ⬜ |
 | B267 | 6 | 门禁收紧收尾：§12.2「分层方向」「装配契约」两规则 + A11b 清零核查 + 复杂度指标（可选） | ⬜ |
 
@@ -1105,6 +1105,16 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **落位成果**：`agentmanagement`→`service.{config(3),builtin(1)}`；**B257 基线清零**（audit/auth/knowledge 三处债改走 `common/<域>/XxxPort` + 域内 `api/` 适配器，`AGENT_ADAPTER_DOMAIN_SERVICE_BASELINE` = `Set.of()`）；`agenttools` 四面（`datasource`/`sql`/`web`/`wiki`）**与 §8.8.3 目标树逐名对齐**；session 切出 `controller.sse`(4)、`domain.{conversation(8),document(1),message(16)}`、`service.suggestion`(2)，测试全部随迁。
 - **登记为"重构级"（非包重排）**：① session `service.{attachment,history,turn,rag,rag.stage,enrichment}`——实测与 `service` 及彼此**互有引用**（`attachment ⇄ turn`、`history ⇄ turn`、`turn ⇄ service`）⇒ 需先做定向断边/端口化；② §8.8.1 这些子面的**多数类名今日不存在**（`ChatManage`/`Plugin*`/`SubmitTurnUseCase`…）⇒ 属"把 rag pipeline 与 turn 用例落位"的重构；③ `session.{api,event,task}` 与 §8.8.3 的 `agenttools.knowledge` 待创建类（`KnowledgeToolFormatter`/`ReadKnowledgeTool`/`SearchArguments`）；④ `agenttools.knowledge.KnowledgeSearchRanking` 归位需先做"工具状态外提"。
 - **本批留下的通用资产**：跨域端口模式定型（`common/<域>/XxxPort` + 域内 `api/` 适配器，含 JDK 视图记录写法）；"同名包"四形态清单（boot 测试树 / 改包未搬目录 / **同模块测试树** / **裸名反向边**——后者 import 判据不可见，**编译是终审**）；换锚清单再添两项（**按路径的覆盖清单**如 `EVENT_MAP_FILES`、**基线条目在多个基线里文本相同**需按声明定位）。
+
+**🔶 B265 第⑧步（2026-10-14，B265 起步：mcp `tools/` → `tool/`；三域差集盘点）**
+- **B265 = ③：wiki（17 包 147）+ datasource（16 包 124）+ mcp（9 包 125）**。本步先做**三域 vs 目标树差集盘点**，再切第一刀。
+- **盘点结论**：
+  - **mcp 几乎已对齐**：`controller`(6/6) / `domain`(20/20) / `mapper`(8/8) / `oauth`(33/33) / `protocol`(32/32) **逐名一致** ✓；差异三处——`tools/`→目标 `tool/`（本步改名）、`service.McpServiceService` vs 目标 `McpServiceManagement`（改名，重构级）、两个 DTO 名（`McpCredentialsResponse`/`McpCredentialFieldMetadata` vs 目标泛名——**有意偏离**：域前缀是防跨域同名混淆的既定决定）。
+  - **wiki 缺两处拆簇（算术精确闭合）**：`domain/`(38) → `domain`(11) + `domain.folder`(8) + `domain.page`(13) + `domain.index`(3) + `domain.issue`(2) + `domain.graph`(1)；`service/ingest/`(57) → `service.ingest`(12) + `service.ingest.pipeline`(21) + `service.ingest.task`(22) + `service.ingest.graph`(1)。其余面（`controller` 8/8、`service/page` 21/21、`mapper` 6/6、`prompt` 2/2、`repository` 4/4、`service` 11/11）**已对齐** ✓。
+  - **datasource**：本步差集脚本对该段边界取错（把 §8.9 后续域一并算了）⇒ **下次按 §8.9 段精确边界重测**（登记）。
+- **本步改名**：`mcp.tools` → **`mcp.tool`**（10 类逐名一致 ⇒ 纯改名）；`file-size` 键换锚（**725 → 725**）；新面 package-info 记录成员与方案 §8.9 的对应。
+- **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 ✓；`spotlessCheck build` ✓ **1m45s** ✓ **十二守卫** ✓（环 0 / 包级 SCC 12 组）；`:domains:javadoc` ✓；定向 `--rerun-tasks` ✓。
+- **登记（B265 余下）**：wiki 两处拆簇（`domain` 五簇、`service/ingest` 四簇，各自先做动前图分析；后者含 task/队列/锁，注意与 Redis 面）；datasource 差集重测后按面推进；mcp 两项改名留给命名批。
 
 **🔶 B263 第㉟步（2026-10-14，第二个子面 `service.chunk` 切出）**
 - **动前断言（把"可测"变成"可证"）**：脚本**先断言** `ChunkEditService`/`ChunkExtractService`/`ChunkReadService` 三者在 `service` 包内**入度为零**（无人引用，`package-info` 除外），断言不过就 abort —— 这样"切出只产生单向外边"不再靠推理。`ChunkQuestionService` **故意留在** `service`：它被 `QuestionGenerationService` 引用，单独搬会造出 `service ⇄ service.chunk` 环（已在子面 package-info 写明）。
