@@ -541,7 +541,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B263 | 6 | domains 域内重排①：knowledge（29 包 248 文件；SCC 拆解 + mapper/repository 主战场） | ✅ ①~㊸（mapper 归零 / `{service,task}` SCC 消除 / 门面 + 4 用例类归位 `service.management` / 五个子面切出；§8.8.2 包重排面到位；余三项属重构级，见收口记录） |
 | B264 | 6 | ②：session + agenttools/agentmanagement 落位 | ✅ ①~⑦（agentmanagement `service.{config,builtin}` / **B257 基线清零** / agenttools 四面对齐 `datasource` / session `controller.sse`+`domain` 三簇+`service.suggestion`；session 余项属重构级，见收口记录） |
 | B265 | 6 | ③：wiki（17 包 147）+ datasource（16 包 124）+ mcp（9 包 125） | ✅ ⑧~⑫（mcp 对齐 `tool`+改名 / wiki `domain` 五簇+`ingest.graph` / datasource `domain.connector`+`task`；余项属重构级与命名级，见收口记录） |
-| B266 | 6 | ④：im/memory/auth/storage/websearch/model + 其余小域 | 🔶 进行中（①：memory `domain` 三簇；六域差集盘点完成 ⇒ im `channel.*` / auth 两处 filter / model 改名 / storage·websearch 待定性） |
+| B266 | 6 | ④：im/memory/auth/storage/websearch/model + 其余小域 | ✅ ①~⑤（memory `domain` 三簇 / im `channel.*` + 改名 / auth 两处 filter 归位 / model+im 命名对齐 / tenant `repository` + embedchannel `controller.filter`；余项属重构/模块级，见收口记录） |
 | B267 | 6 | 门禁收紧收尾：§12.2「分层方向」「装配契约」两规则 + A11b 清零核查 + 复杂度指标（可选） | ⬜ |
 
 ### 15.2 批次纪律（每批通用，违者必翻车——全是本轮实锤）
@@ -1186,6 +1186,18 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **三处现场纠错**：① 脚本把一个面的**源路径写成域根** ⇒ `git mv` 前断言中止（tenant 已搬、包声明未改）⇒ 写**续跑脚本**补齐（教训：目标目录先建、源路径写全）；② 搬包后**原同包免 import** 的类需补 import——`TenantConfigRedaction` 补 `ParserEngineConfig`/`StorageEngineConfig`、`Tenant` 补 `APIPrincipalConfig`(+`TypeHandler`)、随迁测试补 2 个，**编译三轮才收敛**；③ **SCC 基线"成员换名"**：既有组 `{embedchannel, embedchannel.filter, embedchannel.service}` 成员路径变了（组结构不变）⇒ `package-cycles.baseline.json` 成员换名 **1 处**（组数仍 12）；守卫从"新增/变形"↔"已消除/变形"两侧同时报警 ⇒ 精确定位后**外科式改**，未用 `--write`（避免吞别处漂移）。
 - **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 ✓；`spotlessCheck build` ✓ **1m39s** ✓ **十二守卫** ✓（环 0 / 包级 SCC 12 组）；`:domains:javadoc` ✓。
 - **登记（B266 余下）**：① approval `24` → 4 面（root 8 + domain 7 + redis 2 + service 7，**算术闭合**）；② skill 域（现类在 `agent/skills`，目标 `skill/`，**域级**）；③ storage `provider/`(11) + `StoragePathGuard` → 计划归 **`platform.storage.*`**（现 `platform.*` 只在 `:common` 有 `stream/`）⇒ **模块级**；④ websearch `fetch/`(4) 已在 **`:engine` 的 `com.ragagent.webfetch`**（分层有意偏离）；⑤ auth `apikey.dto`(2) 待创建。
+
+**✅ B266 收口（2026-10-14，①~⑤）**
+- **成果**：memory `domain` 三簇（item/scope/vector，留 17）· im 九渠道面加 `channel.` 前缀 + `ImService`→`ImTurnOrchestrator` · auth 两处 filter 面归位（`controller.filter` / `apikey.controller.filter`）· model `ModelResponse`→`ModelDetailResponse`、`ModelRuntimeFactory`→`ModelRuntimeAssembler` · tenant 三根包类 → `repository/` · embedchannel `filter` → `controller.filter`。
+- **六域 + 11 个小域盘点结论**：**完全对齐**的有 vectorstore / audit / evaluation / favorite / settings / system / initialization / storage（除下述两项）/ websearch（除下述一项）/ model / memory / auth / im（除下述各项）。
+- **登记为"重构级 / 模块级 / 命名级"**：
+  ① **approval**：目标 4 面（root 8 + domain 7 + redis 2 + service 7，算术闭合）**实测三对互引**（`service ⇄ domain`、`service ⇄ root`、`domain ⇄ root`）⇒ 拆分被阻断；且两个测试助手（`TestCancellation`/`FakeRedisPubSub`）是**包私有**、被跨面测试共用 ⇒ 同样需先重构（提公开或收敛用法）。
+  ② **skill 域**：目标 `skill/{mapper,service}` 的 7+1 类现居 `agent/skills`（`SkillCatalogService` 等）⇒ **域级迁移**（涉及 agent 与 skill 的边界决策）。
+  ③ **storage `provider/`(11) + `StoragePathGuard`**：计划归 **`platform.storage.*`**（`platform.*` 现只有 `:common` 的 `stream/`）⇒ **模块级迁移**。
+  ④ **websearch `fetch/`(4)**：已在 **`:engine` 的 `com.ragagent.webfetch`** ⇒ 分层**有意偏离**（fetcher 属运行时底座）。
+  ⑤ **auth `apikey.dto`(2)**：`TenantAPIKeyCreateResponse`/`TenantAPIKeyResponse` 全仓不存在 ⇒ 待创建。
+  ⑥ `audit/api`(1)、`auth/api`(1)：本批跨域端口模式的**自愿增面**（`AuditWriteAdapter`/`UserLookupAdapter`）。
+- **本批资产（三条新经验）**：① **动前断言从"零反向边"升级为"面级图 DAG 检查"**（`scope → domain` 这类单向边合法，硬套零引用会误杀）；② **改名要连小写标识符一起改**（`modelRuntimeFactory` 92 处 / `imService` 25 处）并**预检 Strings/Bean 名**（`@Qualifier`/`getBean`/配置键零命中才动）；③ **按路径冻结的基线共三处**（`json-key-freeze.files` 两层结构、`file-size.limits` 键、`package-cycles` 组成员）——搬包/改名必须逐处换锚，其中 SCC 基线要**外科式成员换名**（别用 `--write`，会吞别处漂移）。
 
 **🔶 B263 第㉟步（2026-10-14，第二个子面 `service.chunk` 切出）**
 - **动前断言（把"可测"变成"可证"）**：脚本**先断言** `ChunkEditService`/`ChunkExtractService`/`ChunkReadService` 三者在 `service` 包内**入度为零**（无人引用，`package-info` 除外），断言不过就 abort —— 这样"切出只产生单向外边"不再靠推理。`ChunkQuestionService` **故意留在** `service`：它被 `QuestionGenerationService` 引用，单独搬会造出 `service ⇄ service.chunk` 环（已在子面 package-info 写明）。
