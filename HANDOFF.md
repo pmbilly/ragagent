@@ -544,6 +544,58 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B266 | 6 | ④：im/memory/auth/storage/websearch/model + 其余小域 | ✅ ①~⑤（memory `domain` 三簇 / im `channel.*` + 改名 / auth 两处 filter 归位 / model+im 命名对齐 / tenant `repository` + embedchannel `controller.filter`；余项属重构/模块级，见收口记录） |
 | B267 | 6 | 门禁收紧收尾：§12.2「分层方向」「装配契约」两规则 + A11b 清零核查 + 复杂度指标（可选） | ✅ A19/A20 两规则落地 + A11b 注解判据收紧（基线 11→9）+ 复杂度报告脚本 |
 
+#### 15.1.1 结项对账（2026-10-14，v0.2.0 R 系列收官；**硬读数全为当日实测**）
+
+**总量**：R 系列 **36 批（B232~B267）全 ✅**；阶段 6（12 批，B256~B267）收官；两处拍板点闭合（B238 拍板 A：同步下载 / B247：按面判据 + 持久化另立项）。
+
+**验收硬读数**
+
+| 面 | 读数 |
+|---|---|
+| 测试 | **4982 / 失败 0 / 跳过 4**（domains 2949 · engine 561 · common 141 · boot 1331） |
+| 守卫 | **12**（`bash scripts/run-guards.sh` ⇒ 退出码 0；汇总结论已改**自计数**） |
+| 包级 | 环 **0** · 包级 SCC **12 组**（基线 12）· 依赖 `config` 0 · L2→L3 0 |
+| 代码级规则 | ArchUnit **28 条**测试（A1~A20 + B257/B260 命名规则） |
+| 行数棘轮 | `file-size.limits` **65** 条（阈值 600） |
+| JSON 键 | snake 基线 **262** 条（逐条复核）+ 冻结覆盖 **149** 文件 |
+| 其它棘轮 | Go 锚点 **48** 条 · 前端契约键无新增 |
+| 契约证据 | `*ContractTest*` **49** 个文件 · 金片键签名 **1349** 个与基线一致 |
+
+**三问对账**
+
+1. **用例可读（顺主线能读完）** ✅ —— 主线 `controller → service.{query,faq,chunk,management,enrichment} → repository/mapper` 成型（B263 ①~㊸）；**`service` 直连 mapper 归零**（㉓）；`{service,task}` SCC 消除（㉛/㉜）；大件拆分有**行数刹车信号**机制（㉖ 触发 → ㉗ 解除）。
+   余量：复杂度候选 **270 处**方法分支 >15、**2 处**构造依赖 >8（报告级，未立门）。
+2. **状态可控（任一状态字段写入者唯一）** ✅ —— **A18**（运行态禁公共可变实例字段：基线 **1**；agent 协作者不得回引 `AgentEngine`：基线 **8**）；**A4**（`install*` 只许装配层，白名单 **8** 个目标）；任务恢复口径按面判据（K4~K6：B245~B247）；**A20**（契约提供方唯一 **12/12**）。
+   余量：A18 两条基线共 **9** 条。
+3. **政策可复用（同一规则全仓一份实现 + 契约测试）** ✅ —— 三副本合一：`escapeLikeKeyword` → `common.mybatis.LikeEscapes`（B263 ㉚）、`ImFormat` 去重（B264）、`FeishuWecomCrypt` 归 `runtime`（B265）；跨域调用统一走 **12 个 `common/**Port` 契约**（A20 守唯一实现）；契约测试 **49** 个；金片 **1349** 键签名受 `check-contract-sync.py` 守。
+   余量：`SELF_MADE_MAPPER_BASELINE` **7** 条（每处类注释写明不能收编的理由）。
+
+**基线余量总表（棘轮只许减，逐条可核）**
+
+| 规则 | 余量 | 起点 → 现 | 说明 |
+|---|---|---|---|
+| A16 边界层引用 | 61 | 76（B233）→ 61 | 已降 15 |
+| A17 service 技术依赖 | 41 | 61（B233）→ 41 | 已降 20 |
+| A11b 门面留 mapper 包 | 9 | 11 → 9（B267 收紧） | 剔 2 条命名巧合假阳性，余 9 逐域收敛 |
+| A19 domain 技术依赖 | 10 | B267 新立 | 4 实体 import 他域 mapper + 6 个 `@Component` 守卫/接线 |
+| A18a agent 回引 engine | 8 | — | 状态所有权 |
+| SELF_MADE_MAPPER | 7 | — | 有理由的自建 mapper |
+| A18b 运行态可变字段 / A8 字符串列名 | 1 / 1 | — | |
+| file-size >600 行 | 65 | — | 主源码 |
+| json snake 键 / Go 锚点 | 262 / 48 | — | 均已逐条复核 |
+| A6 `@Lazy` · A9 `.last(`拼接 · B257 · B260 | **0** | — | 零容忍 |
+
+**有意偏离台账（正文明说过的，不算遗留问题）**：knowledge `service.faq` 单列 · `SpanTracker` 留 `domain.span`（否则复活 `task ⇄ service` 环）· `KnowledgeAccessHelper` 留顶层（语义不等价 + 环）· `auth/api`、`audit/api` 为端口模式**自愿增面** · websearch `fetch/` 4 类在 **`:engine` 的 `webfetch`**（分层有意）· storage `provider/`(11)+`StoragePathGuard` 计划归 `platform.storage.*`（**模块级，未迁**）· approval 四簇拆分**被互引阻断**（`service ⇄ domain ⇄ root` + 包私有测试助手跨面共用）· skill 目标面现居 `agent/skills`（域级未迁）· model 两个 DTO 泛名保留 · A19 判据**有意不收** `org.apache.ibatis.type`（49 实体注解约定）。
+
+**未闭环（开放项，不谎报为已完成）**
+
+1. **主任务持久化（K6 大改）**：B247 登记"另立项"，**未启动**，待拍板；
+2. **覆盖率基线（`-Pcoverage`）未执行** ⇒ 本项目**不声称任何覆盖率数字**（对齐计划 §12.4"不能声称通过"）；
+3. **计划 §12.3 八类测试场景**（终态矩阵 / 幂等 / 并发 / 租户 / 摄取 / 任务 / 外部索引 / 检索）**未逐条核账** —— 候选下一批；
+4. 复杂度三条线**只落了报告脚本**，增量门槛未立（计划 §12.5 本就定"候选审查线，不是立即生效的全库硬门"）。
+
+**本批顺手修的漂移**：`scripts/run-guards.sh` 成功汇总行硬编码「十一守卫全绿」而实际跑 12 个（加守卫时头注释 / README / CI 都改了、漏了这行）⇒ 改为 **`ran` 自计数**，并写入 §15.2 第 12 条。
+
 ### 15.2 批次纪律（每批通用，违者必翻车——全是本轮实锤）
 
 1. §14.2 七步 SOP：一次只动一个轴、独立提交独立全绿、双端闸门（后端全量+spotless；触前端契约则 vue-tsc+npm test）。
@@ -557,6 +609,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 9. **动包/类落点的批次，包结构守卫是必跑闸门（与测试同级）**：`python3 scripts/check-package-cycles.py`——B6 批 10 只跑了测试、漏跑守卫，把 5 组环带进 main（B33 才修复）；B34 分包批每步都用它自检。**反向用法**：新类该放哪个包，先跑一次守卫看红灯，比事后解环便宜一个量级。
 10. **跨进程 JSON 键名按「权威」分桶，不按风格统一**（B72 定谳）：REST DTO=Java 字段名 camel（默认、零注解）；**SSE 事件载荷=对外权威面**（agent-chat 是集成页文档化 API，playground 按 snake `response_type` 解析——别当纯内部面翻转）；MCP OAuth/OIDC 连接器键=RFC/厂商规范原文；工具名/枚举值/错误码=词表不是字段。判据口诀仍是 B19 的「这个键是不是我们定义的、跨进程 JSON 字段」，外加一句「这个面有没有已发布的外部消费者」。两道棘轮（`scripts/check-fe-contract-keys.py` 41 条 + `crossFaceKeyContract.test.ts`）是执行面；python 守卫四个结构性盲区（TS 只盖 api 面/后端 camel 只认带引号字面量/后端 snake 全仓点亮/api-system-initialization 曾整面豁免）见 B72 记录。
 11. **闸门的退出码必须显式取用——任何 `| grep | head` 都不能替它作证**（B162 实锤 ✗）：把 `./gradlew … build | grep … | head` 接进 `&&` 链时，管道退出码来自最后一段（`head`）⇒ **红着的构建照样提交并推送了**。正解：`cmd > log 2>&1; rc=$?; grep … log; [ $rc -eq 0 ] || exit 1`。与第 6 条同族：**闸门/规则必须能自证**。
+12. **"看得见的数字"要自计数**（B267 结项对账实测 ✗）：加第 12 个守卫时，头注释 / README / CI 三处都改了，唯独 `run-guards.sh` **成功汇总行**的硬编码「十一守卫全绿」没人读（绿行的文案不会引起注意）⇒ 数字漂了一个批次。凡"数量/清单"类文案，**能自计数就自计数**（`ran=$((ran+1))` ⇒ `echo "✓ ${ran} 守卫全绿"`），不能就纳入守卫扫描面。与第 6/11 条同族：**判据必须自证，不靠人手同步**。
 
 **✅ B10（2026-10-02，代码级架构规则进 CI）**
 - **前提核对**：B10 原描述「环 0 组基线 + 包依赖白名单固化」**已于 2026-09-30 在 CI**（`scripts/check-package-cycles.py` 挂 guards job，环/分层/域依赖 `config` 三项带基线棘轮）。本批的真实缺口是 **ArchUnit 级（代码级）规则**。

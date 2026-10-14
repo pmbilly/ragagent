@@ -12,9 +12,11 @@ set -uo pipefail
 cd "$(dirname "$0")/.." || exit 1
 
 fail=0
+ran=0
 run() {
     local name="$1"
     shift
+    ran=$((ran + 1))
     printf '\n▶ %s\n' "$name"
     if "$@"; then
         return 0
@@ -37,8 +39,11 @@ run '契约同步（B221：金片键签名变了必须签字，防"后端改契�
 run '路径/包对应（B263㉖：源码目录必须与 package 声明一致，防"改包不搬目录"）' python3 scripts/check-package-dirs.py
 
 echo
+# 汇总行**自计数**（B267 结项实测的漂移）：加第 12 个守卫时头注释/README/CI 都改了，唯独这里
+# 的硬编码「十一守卫全绿」没人看（绿行的文案没人读）⇒ 数字漂了一个批次。此后 count 由 run()
+# 自增，加守卫只需在下面加一行 run 调用，文案不用动。
 if [ "$fail" -ne 0 ]; then
     echo '✗ 守卫未全绿（逐条结果见上）'
     exit 1
 fi
-echo '✓ 十一守卫全绿'
+echo "✓ ${ran} 守卫全绿"
