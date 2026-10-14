@@ -25,6 +25,10 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.event.payload.MCPOAuthRequiredData;
+import com.ragagent.contract.event.payload.MCPOAuthResolvedData;
+import com.ragagent.contract.event.payload.ToolApprovalRequiredData;
+import com.ragagent.contract.event.payload.ToolApprovalResolvedData;
 import com.ragagent.contract.model.ResponseType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -94,12 +98,12 @@ class GateTest {
         AtomicReference<Integer> seenTimeoutSeconds = new AtomicReference<>();
         AtomicReference<String> seenArgsJson = new AtomicReference<>();
         bus.on(ResponseType.TOOL_APPROVAL_REQUIRED, evt -> {
-            ApprovalRequiredNotice data = (ApprovalRequiredNotice) evt.data();
-            assertFalse(data.pendingId().isEmpty());
-            seenPendingId.set(data.pendingId());
-            seenTimeoutSeconds.set(data.timeoutSeconds());
-            seenArgsJson.set(data.argsJson());
-            Thread.ofVirtual().start(() -> gate.resolve(1, "", data.pendingId(),
+            ToolApprovalRequiredData data = (ToolApprovalRequiredData) evt.data();
+            assertFalse(data.getPendingId().isEmpty());
+            seenPendingId.set(data.getPendingId());
+            seenTimeoutSeconds.set(data.getTimeoutSeconds());
+            seenArgsJson.set(data.getArgsJson());
+            Thread.ofVirtual().start(() -> gate.resolve(1, "", data.getPendingId(),
                     Decision.allowWith("{\"a\":2}")));
         });
 
@@ -127,10 +131,10 @@ class GateTest {
         // 事件序列 required → resolved；resolved 事件体回带用户决策
         assertEquals(List.of(ResponseType.TOOL_APPROVAL_REQUIRED, ResponseType.TOOL_APPROVAL_RESOLVED),
                 types(bus));
-        ApprovalResolvedNotice resolved =
-                (ApprovalResolvedNotice) bus.emitted().get(1).data();
-        assertEquals(seenPendingId.get(), resolved.pendingId());
-        assertTrue(resolved.approved());
+        ToolApprovalResolvedData resolved =
+                (ToolApprovalResolvedData) bus.emitted().get(1).data();
+        assertEquals(seenPendingId.get(), resolved.getPendingId());
+        assertTrue(resolved.isApproved());
     }
 
     /** 无人 Resolve → 超时且不批准。 */
@@ -161,7 +165,7 @@ class GateTest {
 
         AtomicReference<String> pendingId = new AtomicReference<>();
         bus.on(ResponseType.TOOL_APPROVAL_REQUIRED, evt -> {
-            pendingId.set(((ApprovalRequiredNotice) evt.data()).pendingId());
+            pendingId.set(((ToolApprovalRequiredData) evt.data()).getPendingId());
             Thread.ofVirtual().start(() -> {
                 try {
                     Thread.sleep(50);
@@ -236,7 +240,7 @@ class GateTest {
 
         AtomicReference<ApprovalException> mismatch = new AtomicReference<>();
         bus.on(ResponseType.TOOL_APPROVAL_REQUIRED, evt -> {
-            String pendingId = ((ApprovalRequiredNotice) evt.data()).pendingId();
+            String pendingId = ((ToolApprovalRequiredData) evt.data()).getPendingId();
             Thread.ofVirtual().start(() -> {
                 mismatch.set(captureResolve(gate, 999, "", pendingId, Decision.allow()));
                 gate.resolve(1, "", pendingId, Decision.deny("no"));
@@ -260,7 +264,7 @@ class GateTest {
 
         AtomicReference<ApprovalException> mismatch = new AtomicReference<>();
         bus.on(ResponseType.TOOL_APPROVAL_REQUIRED, evt -> {
-            String pendingId = ((ApprovalRequiredNotice) evt.data()).pendingId();
+            String pendingId = ((ToolApprovalRequiredData) evt.data()).getPendingId();
             Thread.ofVirtual().start(() -> {
                 mismatch.set(captureResolve(gate, 1, "bob", pendingId, Decision.allow()));
                 gate.resolve(1, "alice", pendingId, Decision.allow());
@@ -287,7 +291,7 @@ class GateTest {
 
         AtomicReference<ApprovalException> mismatch = new AtomicReference<>();
         bus.on(ResponseType.TOOL_APPROVAL_REQUIRED, evt -> {
-            String pendingId = ((ApprovalRequiredNotice) evt.data()).pendingId();
+            String pendingId = ((ToolApprovalRequiredData) evt.data()).getPendingId();
             Thread.ofVirtual().start(() -> {
                 mismatch.set(captureResolve(gate, 1, "", pendingId, Decision.allow()));
                 gate.resolve(1, "alice", pendingId, Decision.deny("no"));
@@ -311,7 +315,7 @@ class GateTest {
         RecordingEventBus bus = new RecordingEventBus();
 
         AtomicReference<String> pendingId = new AtomicReference<>();
-        bus.on(ResponseType.TOOL_APPROVAL_REQUIRED, evt -> pendingId.set(((ApprovalRequiredNotice) evt.data()).pendingId()));
+        bus.on(ResponseType.TOOL_APPROVAL_REQUIRED, evt -> pendingId.set(((ToolApprovalRequiredData) evt.data()).getPendingId()));
 
         AtomicReference<ApprovalException> lateResolve = new AtomicReference<>();
         Thread resolver = Thread.ofVirtual().start(() -> {
@@ -347,7 +351,7 @@ class GateTest {
         AtomicReference<ApprovalException> second = new AtomicReference<>();
         AtomicReference<Boolean> done = new AtomicReference<>(false);
         bus.on(ResponseType.TOOL_APPROVAL_REQUIRED, evt -> {
-            String pendingId = ((ApprovalRequiredNotice) evt.data()).pendingId();
+            String pendingId = ((ToolApprovalRequiredData) evt.data()).getPendingId();
             Thread.ofVirtual().start(() -> {
                 first.set(captureResolve(gate, 1, "", pendingId, Decision.allow()));
                 second.set(captureResolve(gate, 1, "", pendingId, Decision.deny("")));
@@ -452,11 +456,11 @@ class GateTest {
         RecordingEventBus bus = new RecordingEventBus();
         Gate gate = track(new Gate(options(30), new StubChecker(false), null));
 
-        AtomicReference<McpOauthRequiredData> required = new AtomicReference<>();
+        AtomicReference<MCPOAuthRequiredData> required = new AtomicReference<>();
         bus.on(ResponseType.MCP_OAUTH_REQUIRED, evt -> {
-            McpOauthRequiredData data = (McpOauthRequiredData) evt.data();
+            MCPOAuthRequiredData data = (MCPOAuthRequiredData) evt.data();
             required.set(data);
-            Thread.ofVirtual().start(() -> gate.resolve(1, "alice", data.pendingId(), Decision.allow()));
+            Thread.ofVirtual().start(() -> gate.resolve(1, "alice", data.getPendingId(), Decision.allow()));
         });
 
         Decision d = gate.requestOAuthAndWait(Cancellation.none(), OAuthPendingRequest.builder()
@@ -467,11 +471,11 @@ class GateTest {
         assertTrue(d.approved());
         assertNotNull(required.get());
         // WaitTimeout 覆盖后再转成秒（至少 1）
-        assertEquals(5, required.get().timeoutSeconds());
+        assertEquals(5, required.get().getTimeoutSeconds());
         assertEquals(List.of(ResponseType.MCP_OAUTH_REQUIRED, ResponseType.MCP_OAUTH_RESOLVED), types(bus));
-        McpOauthResolvedData resolved = (McpOauthResolvedData) bus.emitted().get(1).data();
-        assertTrue(resolved.authorized());
-        assertEquals("svc", resolved.serviceId());
+        MCPOAuthResolvedData resolved = (MCPOAuthResolvedData) bus.emitted().get(1).data();
+        assertTrue(resolved.isAuthorized());
+        assertEquals("svc", resolved.getServiceId());
     }
 
     /** 无人授权 → 授权超时。 */

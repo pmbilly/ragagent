@@ -1319,6 +1319,17 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **A③ 累计（十七刀）**：边 **64 → 42（−22）**、类 **317 → 243（−74）**；三档 **① 34 条 / 157 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
 - **下一步（①档余量按性价比）**：`mcp→approval`(7) → `session` 能力边（`knowledge` 17 / `storage` 14 / `model` 12 … 共 63 类）→ `embedchannel→session` 余 2（**已拍板：转"实体→视图 + 流式契约"K 级，不建 servlet seam** ✓）
 
+**🔶 A③ 第十八刀：`mcp→approval` 第一拆（事件/取消桥）⇒ 7 类清零其 2（2026-10-14，R10 类 243 → 241）**
+- **接缝选择**：`mcp→approval` 7 类的用面是一整条装配链，按自然接缝拆两刀——本刀先清**运行期事件/取消桥**（`McpToolWrapper` + `McpOAuthPromptSupport`），装配/策略/异常面（`McpWiring`/`Adapter`/`McpCatalog`/两 controller）留下一步（三者共享"契约 checker + 契约异常 + 工厂"改造，硬切会造无效中间态）
+- **核心改造：Gate 事件改发 payload 契约 DTO**（`contract.event.payload.*`，构造即线格式）——原先 approval 内部构造 4 个域内 Notice DTO，靠 `ApprovalBridge.toPayloadData` 在 mcp 侧转 payload 才能进 SSE 流；现在 Gate 直接构造 payload ⇒ **Notice→payload 映射层消失**（删 4 个 Notice DTO + `ApprovalBridge`）
+- **行为等价证据**：① payload 无 Jackson 注解（键=camel）+ `ApprovalJson` mapper 统一省略空值 ⇒ 到达前端的 JSON 与"Notice→toPayloadData→payload"时代**逐字节一致**（`ApprovalWireFormatTest` 金片断言原样迁移即过——仅 resolved 的 `canceled=false` 从"输出 false"修正为"省略"，payload 类注释本就如此、前端收到的也一直是这个形态）；② `requestAndWait` 全仓唯一调用方是 `McpToolWrapper`（已核）
+- **契约面新增 1 个**：`contract.tool.ApprovalCancellations.toCancellation`（轮询式 `ToolCancellation` → 回调式 `Cancellation` 的探测线程桥，从 ApprovalBridge 原样搬）
+- **mcp 侧新增 1 个**：`mcp/tool/ApprovalEventBuses.toEventBus`（平台 EventBus → 契约 ApprovalEventBus，data 透传——package-private，同包两处消费）
+- **删除 5 个 approval 类**：`ApprovalBridge` + 4 个 Notice DTO（`ApprovalRequiredNotice`/`ApprovalResolvedNotice`/`McpOauthRequiredData`/`McpOauthResolvedData`）
+- **测试**：`GateTest`/`GateCrossInstanceTest`/`SpringRedisPubSubTest` 的 Notice cast 断言迁 payload getter（~15 处）；`ApprovalWireFormatTest` 三个线格式测试迁 payload（键名不变、省略规则不变）；`ApprovalBridgeTest`（agenttools 包）删 ⇒ 新建 `mcp/tool/ApprovalEventBusesTest`（信封映射 + data 透传 + null bus，3 条）
+- **验证**：**13 守卫全绿** ✓；`spotlessCheck build` ✓ **1m51s** ✓；**4990 / 失败 0 / 跳过 4**（boot 1331 ✓，账目：4991 − 删 ApprovalBridgeTest 4 条 + 新 ApprovalEventBusesTest 3 条）；定向 approval+mcp **224 条** ✓；dev 重启 ready ✓ + 冒烟（`/api/v1/mcp-services`、`/api/v1/im-channels` 均 200 ✓）
+- **A③ 累计（十八刀）**：边 **64 → 42（−22）**、类 **317 → 241（−76）**；三档 **① 34 条 / 155 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
+- **下一步（mcp→approval 收官 5 类）**：契约 checker 三件套（`ToolPolicyChecker`/`ToolEnabledChecker`/`ToolBulkEnabledChecker` + `ToolEnabledChecks` 静态工具）+ **契约异常 `ToolApprovalException`**（Kind 五态搬 contract，approval 内部统一改抛、删 `ApprovalException`）+ `ToolApprovalGateFactory`（装配面：mcp 只传 checker + 超时秒，Redis 由 approval 工厂内部取）⇒ `McpWiring`/`Adapter`/`McpCatalog`/两 controller 清零，边收口
 **🔶 A③ 第十六刀：audit 族收官 ⇒ `knowledge→audit` + `system→audit` 双清（2026-10-14，R10 边 45 → 43、类 255 → 250）**
 - **迁移 5 类**（前置已由刀十四/十五就位 ✓）：
   - knowledge：`FaqEntryCommandService`、`KnowledgeTagService`（**均带 scope** ✓；details 用 `ObjectNode.toString()` 过端口 ✓，适配器已有 parse 容错 ✓）

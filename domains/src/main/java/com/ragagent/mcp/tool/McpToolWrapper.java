@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.ragagent.contract.tool.ApprovalCancellations;
 import com.ragagent.contract.tool.ToolApprovalGate;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.mcp.domain.McpService;
@@ -25,7 +26,6 @@ import com.ragagent.agent.tool.AgentTool;
 import com.ragagent.agent.tool.ToolRequest;
 import com.ragagent.agent.tool.ToolDefinitions;
 import com.ragagent.agent.tool.ToolExecContext;
-import com.ragagent.approval.ApprovalBridge;
 
 /**
  * MCP 工具的动态包装。
@@ -190,7 +190,7 @@ public class McpToolWrapper implements AgentTool {
             }
             boolean enabled;
             try {
-                enabled = gate.isEnabled(ApprovalBridge.toCancellation(request.cancellation()), tenantId, service.getId(), mcpTool.getName());
+                enabled = gate.isEnabled(ApprovalCancellations.toCancellation(request.cancellation()), tenantId, service.getId(), mcpTool.getName());
             } catch (Exception policyErr) {
                 return disabledMcpToolResult(policyErr.getMessage());
             }
@@ -214,16 +214,16 @@ public class McpToolWrapper implements AgentTool {
 
         // 人工审批门（issue #1173）
         if (gate != null && meta != null && meta.eventBus() != null) {
-            if (gate.needsApproval(ApprovalBridge.toCancellation(request.cancellation()), tenantId, service.getId(), mcpTool.getName())) {
+            if (gate.needsApproval(ApprovalCancellations.toCancellation(request.cancellation()), tenantId, service.getId(), mcpTool.getName())) {
                 Decision decision = gate.requestAndWait(
-                        ApprovalBridge.toCancellation(request.cancellation()),
+                        ApprovalCancellations.toCancellation(request.cancellation()),
                         PendingRequest.builder()
                                 .tenantId(tenantId)
                                 .userId(meta.userId())
                                 .sessionId(meta.sessionId())
                                 .assistantMessageId(meta.assistantMessageId())
                                 .requestId(meta.requestId())
-                                .eventBus(ApprovalBridge.toEventBus(meta.eventBus()))
+                                .eventBus(ApprovalEventBuses.toEventBus(meta.eventBus()))
                                 .serviceId(service.getId())
                                 .serviceName(service.getName())
                                 .mcpToolName(mcpTool.getName())

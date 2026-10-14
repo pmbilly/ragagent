@@ -20,7 +20,6 @@ import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.protocol.McpContext;
 import com.ragagent.contract.tool.ToolCancellation;
 import com.ragagent.agent.tool.ToolExecContext;
-import com.ragagent.approval.ApprovalBridge;
 
 /**
  * MCP OAuth 的会话挂载与重试。
@@ -146,7 +145,7 @@ public final class McpOAuthPromptSupport {
                     .sessionId(sess.sessionId())
                     .assistantMessageId(sess.assistantMessageId())
                     .requestId(requestId)
-                    .eventBus(ApprovalBridge.toEventBus(sess.eventBus()))
+                    .eventBus(ApprovalEventBuses.toEventBus(sess.eventBus()))
                     .serviceId(service.getId())
                     .serviceName(service.getName())
                     .mcpToolName(mcpToolName)

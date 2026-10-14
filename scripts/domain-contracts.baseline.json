@@ -204,8 +204,6 @@
       "AgentToolApprovalController",
       "McpCatalog",
       "McpOAuthController",
-      "McpOAuthPromptSupport",
-      "McpToolWrapper",
       "McpWiring"
     ],
     "mcp→model": [

@@ -5,6 +5,10 @@ import com.ragagent.contract.tool.ApprovalEvent;
 import com.ragagent.contract.tool.OAuthPendingRequest;
 
 import com.ragagent.contract.tool.Decision;
+import com.ragagent.contract.event.payload.MCPOAuthRequiredData;
+import com.ragagent.contract.event.payload.MCPOAuthResolvedData;
+import com.ragagent.contract.event.payload.ToolApprovalRequiredData;
+import com.ragagent.contract.event.payload.ToolApprovalResolvedData;
 import com.ragagent.contract.tool.ToolApprovalGate;
 
 import com.ragagent.contract.tool.PendingRequest;
@@ -211,7 +215,7 @@ public class Gate implements ToolApprovalGate, AutoCloseable {
             Object argsObj = ApprovalJson.parseLoose(req.args());
             int timeoutSec = timeoutSeconds(timeout);
 
-            ApprovalRequiredNotice data = new ApprovalRequiredNotice(
+            ToolApprovalRequiredData data = new ToolApprovalRequiredData(
                     pendingId, req.tenantId(), req.sessionId(), req.assistantMessageId(),
                     req.serviceId(), req.serviceName(), req.mcpToolName(), req.registeredToolName(),
                     req.description(), argsObj, req.args(), timeoutSec,
@@ -278,7 +282,7 @@ public class Gate implements ToolApprovalGate, AutoCloseable {
             }
             int timeoutSec = timeoutSeconds(waitTimeout);
 
-            McpOauthRequiredData data = new McpOauthRequiredData(
+            MCPOAuthRequiredData data = new MCPOAuthRequiredData(
                     pendingId, req.tenantId(), req.sessionId(), req.assistantMessageId(),
                     req.serviceId(), req.serviceName(), req.mcpToolName(), timeoutSec,
                     Instant.now().getEpochSecond(), req.toolCallId(), req.requestId());
@@ -540,7 +544,7 @@ public class Gate implements ToolApprovalGate, AutoCloseable {
                     pendingId + "-approval-resolved",
                     ResponseType.TOOL_APPROVAL_RESOLVED,
                     req.sessionId(),
-                    new ApprovalResolvedNotice(pendingId, d.approved(), d.reason(), d.timedOut(),
+                    new ToolApprovalResolvedData(pendingId, d.approved(), d.reason(), d.timedOut(),
                             d.contextCanceled()),
                     Map.of("assistantMessageId", req.assistantMessageId()),
                     req.requestId()));
@@ -556,7 +560,7 @@ public class Gate implements ToolApprovalGate, AutoCloseable {
                     pendingId + "-mcp-oauth-resolved",
                     ResponseType.MCP_OAUTH_RESOLVED,
                     req.sessionId(),
-                    new McpOauthResolvedData(pendingId, req.serviceId(), d.approved(), d.reason(),
+                    new MCPOAuthResolvedData(pendingId, req.serviceId(), d.approved(), d.reason(),
                             d.timedOut(), d.contextCanceled()),
                     Map.of("assistantMessageId", req.assistantMessageId()),
                     req.requestId()));

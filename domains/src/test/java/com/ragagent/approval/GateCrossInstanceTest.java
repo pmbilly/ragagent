@@ -16,6 +16,7 @@ import java.time.Duration;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.contract.event.payload.ToolApprovalRequiredData;
 import com.ragagent.contract.model.ResponseType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -88,7 +89,7 @@ class GateCrossInstanceTest {
         AtomicReference<ApprovalException> callerResult = new AtomicReference<>();
         AtomicReference<Boolean> callerDone = new AtomicReference<>(false);
         bus.on(ResponseType.TOOL_APPROVAL_REQUIRED, evt -> {
-            String pendingId = ((ApprovalRequiredNotice) evt.data()).pendingId();
+            String pendingId = ((ToolApprovalRequiredData) evt.data()).getPendingId();
             Thread.ofVirtual().start(() -> {
                 // 打到“另一个实例”：本地没有该 pending，只能靠广播
                 callerResult.set(captureResolve(gateA, 1, "", pendingId, Decision.allowWith("{\"a\":2}")));
@@ -120,7 +121,7 @@ class GateCrossInstanceTest {
         AtomicReference<ApprovalException> userErr = new AtomicReference<>();
         AtomicReference<Boolean> done = new AtomicReference<>(false);
         bus.on(ResponseType.TOOL_APPROVAL_REQUIRED, evt -> {
-            String pendingId = ((ApprovalRequiredNotice) evt.data()).pendingId();
+            String pendingId = ((ToolApprovalRequiredData) evt.data()).getPendingId();
             Thread.ofVirtual().start(() -> {
                 tenantErr.set(captureResolve(gateA, 999, "", pendingId, Decision.allow()));
                 userErr.set(captureResolve(gateA, 1, "mallory", pendingId, Decision.allow()));
@@ -185,7 +186,7 @@ class GateCrossInstanceTest {
         AtomicReference<ApprovalException> callerResult = new AtomicReference<>();
         AtomicReference<Boolean> callerDone = new AtomicReference<>(false);
         bus.on(ResponseType.TOOL_APPROVAL_REQUIRED, evt -> {
-            String pendingId = ((ApprovalRequiredNotice) evt.data()).pendingId();
+            String pendingId = ((ToolApprovalRequiredData) evt.data()).getPendingId();
             String replyChannel = Gate.pubsubChannel() + ":reply:" + pendingId;
             // 独立线程：等 A 订阅上回复频道后，抢先塞入一条 nonce 不匹配的假 ack
             // （必须与调用 resolve 的线程分开——等待订阅的动作发生在 resolve 内部）

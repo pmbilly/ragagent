@@ -25,6 +25,7 @@ import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
+import com.ragagent.contract.event.payload.ToolApprovalRequiredData;
 import com.ragagent.contract.model.ResponseType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -168,7 +169,7 @@ class SpringRedisPubSubTest {
         AtomicReference<ApprovalException> callerResult = new AtomicReference<>();
         AtomicReference<Boolean> callerDone = new AtomicReference<>(false);
         bus.on(ResponseType.TOOL_APPROVAL_REQUIRED, evt -> {
-            String pendingId = ((ApprovalRequiredNotice) evt.data()).pendingId();
+            String pendingId = ((ToolApprovalRequiredData) evt.data()).getPendingId();
             Thread.ofVirtual().start(() -> {
                 callerResult.set(resolveQuietly(gateA, pendingId));
                 callerDone.set(true);

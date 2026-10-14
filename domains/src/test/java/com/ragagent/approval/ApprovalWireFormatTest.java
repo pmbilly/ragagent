@@ -1,5 +1,9 @@
 package com.ragagent.approval;
 
+import com.ragagent.contract.event.payload.MCPOAuthRequiredData;
+import com.ragagent.contract.event.payload.MCPOAuthResolvedData;
+import com.ragagent.contract.event.payload.ToolApprovalRequiredData;
+import com.ragagent.contract.event.payload.ToolApprovalResolvedData;
 import com.ragagent.contract.tool.ApprovalEvent;
 
 import com.ragagent.contract.tool.Decision;
@@ -41,7 +45,7 @@ class ApprovalWireFormatTest {
 
     @Test
     void toolApprovalRequiredWireFormat() {
-        ApprovalRequiredNotice data = new ApprovalRequiredNotice(
+        ToolApprovalRequiredData data = new ToolApprovalRequiredData(
                 "p1", 7, "s1", "m1", "svc", "svcname", "tool", "mcp_tool",
                 "desc", Map.of("a", 1), "{\"a\":1}", 60, 1700000000L, "tc1", "r1");
 
@@ -62,8 +66,8 @@ class ApprovalWireFormatTest {
         assertEquals("tc1", node.get("toolCallId").asText());
         assertEquals("r1", node.get("requestId").asText());
 
-        // 空值省略：args/argsJson/request_id
-        String minimal = ApprovalJson.write(new ApprovalRequiredNotice(
+        // 空值省略：args/argsJson/request_id（ApprovalJson 的序列化规则，payload 与旧 Notice 同）
+        String minimal = ApprovalJson.write(new ToolApprovalRequiredData(
                 "p1", 7, "s1", "m1", "svc", "svcname", "tool", "mcp_tool",
                 "desc", null, "", 60, 1700000000L, "tc1", ""));
         assertFalse(minimal.contains("argsJson"));
@@ -74,21 +78,22 @@ class ApprovalWireFormatTest {
     @Test
     void toolApprovalResolvedWireFormat() {
         JsonNode node = parse(ApprovalJson.write(
-                new ApprovalResolvedNotice("p1", false, "no", true, false)));
+                new ToolApprovalResolvedData("p1", false, "no", true, false)));
         assertEquals("p1", node.get("pendingId").asText());
         assertFalse(node.get("approved").asBoolean());
         assertEquals("no", node.get("reason").asText());
         assertTrue(node.get("timedOut").asBoolean());
-        assertFalse(node.get("canceled").asBoolean());
+        // canceled=false → 键缺席（payload 契约：false 省略，与到达前端的形态一致）
+        assertFalse(node.has("canceled"));
 
         // reason 为空 → 键缺席
-        assertFalse(ApprovalJson.write(new ApprovalResolvedNotice("p1", true, "", false, false))
+        assertFalse(ApprovalJson.write(new ToolApprovalResolvedData("p1", true, "", false, false))
                 .contains("reason"));
     }
 
     @Test
     void oauthPayloadsWireFormat() {
-        JsonNode required = parse(ApprovalJson.write(new McpOauthRequiredData(
+        JsonNode required = parse(ApprovalJson.write(new MCPOAuthRequiredData(
                 "p1", 7, "s1", "m1", "svc", "svcname", "tool", 30, 1700000000L, "tc1", "r1")));
         assertEquals("p1", required.get("pendingId").asText());
         assertTrue(required.has("mcpToolName"));
@@ -96,7 +101,7 @@ class ApprovalWireFormatTest {
         assertTrue(required.has("timeoutSeconds"));
 
         JsonNode resolved = parse(ApprovalJson.write(
-                new McpOauthResolvedData("p1", "svc", true, "ok", false, false)));
+                new MCPOAuthResolvedData("p1", "svc", true, "ok", false, false)));
         assertEquals("svc", resolved.get("serviceId").asText());
         assertTrue(resolved.get("authorized").asBoolean());
     }
@@ -168,7 +173,7 @@ class ApprovalWireFormatTest {
         assertEquals("mcpOauthResolved", ResponseType.MCP_OAUTH_RESOLVED.value());
 
         ApprovalEvent evt = ApprovalEvent.of("id-1", ResponseType.TOOL_APPROVAL_REQUIRED, "s1",
-                new ApprovalResolvedNotice("p1", true, "", false, false),
+                new ToolApprovalResolvedData("p1", true, "", false, false),
                 Map.of("pendingId", "p1"), "r1");
         assertEquals("id-1", evt.id());
         assertEquals("s1", evt.sessionId());
