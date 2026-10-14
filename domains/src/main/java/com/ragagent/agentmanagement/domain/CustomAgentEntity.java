@@ -5,7 +5,7 @@ import java.time.OffsetDateTime;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.ragagent.agentmanagement.mapper.JsonbRawStringTypeHandler;
+import com.ragagent.platform.persistence.JsonbRawStringTypeHandler;
 
 /**
  * custom_agents 行实体。

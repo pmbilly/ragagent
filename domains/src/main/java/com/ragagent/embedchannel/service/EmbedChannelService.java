@@ -13,9 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.agentmanagement.mapper.CustomAgentMapper;
-import com.ragagent.agentmanagement.service.CustomAgentService;
-import com.ragagent.agentmanagement.domain.CustomAgentEntity;
+import com.ragagent.common.agent.AgentLookup;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.embedchannel.EmbedError;
 import com.ragagent.embedchannel.EmbedTokens;
@@ -27,7 +25,6 @@ import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.domain.conversation.SessionListQuery;
 import com.ragagent.session.domain.conversation.SessionPage;
 import com.ragagent.session.repository.SessionRepository;
-import com.ragagent.agentmanagement.service.builtin.BuiltinAgentRegistry;
 
 /**
  * embed 渠道 service（含 session token/签名段）。
@@ -59,22 +56,19 @@ public class EmbedChannelService {
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final EmbedChannelMapper repo;
-    private final CustomAgentMapper agentMapper;
-    private final CustomAgentService agentService;
+    private final AgentLookup agentLookup;
     private final ChunkRepository chunkRepository;
     private final EmbedTokenStore tokenStore;
     /** 部署形态（是否生产影响 embed 渠道来源白名单校验）。 */
     private final DeploymentProperties deploymentProperties;
 
     public EmbedChannelService(EmbedChannelMapper repo,
-                               CustomAgentMapper agentMapper,
-                               CustomAgentService agentService,
+                               AgentLookup agentLookup,
                                ChunkRepository chunkRepository,
                                EmbedTokenStore tokenStore,
                                DeploymentProperties deploymentProperties) {
         this.repo = repo;
-        this.agentMapper = agentMapper;
-        this.agentService = agentService;
+        this.agentLookup = agentLookup;
         this.chunkRepository = chunkRepository;
         this.tokenStore = tokenStore;
         this.deploymentProperties = deploymentProperties;
@@ -226,33 +220,15 @@ public class EmbedChannelService {
     /**
      * agent 归属校验：未知/跨租户 agent 一律归一为 500 "operation failed"
      * （不区分 404/400，golden 钉死）。空 agent_id 同样落 500。
+     *
+     * <p>读路径在属主域（{@code agentmanagement/api/AgentLookupAdapter}：mapper 查询 + 内建注册表兜底），
+     * 本方法只负责 embed 的错误语义。</p>
      */
-    public CustomAgentEntity ensureAgentOwned(long tenantId, String agentId) {
+    public void ensureAgentOwned(long tenantId, String agentId) {
         String id = agentId == null ? "" : agentId.trim();
-        if (id.isEmpty()) {
+        if (id.isEmpty() || !agentLookup.isAgentOwned(tenantId, id)) {
             throw EmbedError.operationFailed();
         }
-        CustomAgentEntity row;
-        try {
-            row = agentMapper.getByIDAndTenant(id, tenantId);
-        } catch (RuntimeException e) {
-            throw EmbedError.operationFailed();
-        }
-        if (row == null && BuiltinAgentRegistry.isBuiltinAgentID(id)) {
-            // 内建注册表兜底：内建 agent 视为存在（租户内）
-            return virtualBuiltin(id, tenantId);
-        }
-        if (row == null) {
-            throw EmbedError.operationFailed();
-        }
-        return row;
-    }
-
-    private static CustomAgentEntity virtualBuiltin(String id, long tenantId) {
-        CustomAgentEntity virtual = new CustomAgentEntity();
-        virtual.setId(id);
-        virtual.setTenantId(tenantId);
-        return virtual;
     }
 
     // ═══════════════════ CRUD ═══════════════════
@@ -557,7 +533,7 @@ public class EmbedChannelService {
         String agentAvatar = meta[2];
         boolean agentWebSearch = false;
         boolean agentImageUpload = false;
-        CustomAgentEntity agent = tryAgent(ch.getAgentId());
+        AgentLookup.AgentView agent = tryAgent(ch.getAgentId());
         if (agent != null) {
             JsonNode cfg = parseConfig(agent);
             agentWebSearch = cfg.path("webSearchEnabled").asBoolean(false);
@@ -629,7 +605,7 @@ public class EmbedChannelService {
         if (!allowedKbs.isEmpty()) {
             return allowedKbs.contains(chunk.getKnowledgeBaseId());
         }
-        CustomAgentEntity agent = tryAgent(ch.getAgentId());
+        AgentLookup.AgentView agent = tryAgent(ch.getAgentId());
         if (agent == null) {
             return false;
         }
@@ -647,7 +623,7 @@ public class EmbedChannelService {
             return null;
         }
         List<String> kbIds = resolveKnowledgeBaseIDs(ch);
-        return agentService.getSuggestedQuestions(ch.getAgentId(), kbIds, null, null, limit, null);
+        return agentLookup.suggestedQuestions(ch.getAgentId(), kbIds, limit);
     }
 
     /** 展示标题与 agent 元信息：pageTitle → 名称 → 空串。 */
@@ -664,10 +640,10 @@ public class EmbedChannelService {
         }
         String agentName = "";
         String agentAvatar = "";
-        CustomAgentEntity agent = tryAgent(ch.getAgentId());
+        AgentLookup.AgentView agent = tryAgent(ch.getAgentId());
         if (agent != null) {
-            agentName = trim(agent.getName());
-            agentAvatar = trim(agent.getAvatar());
+            agentName = trim(agent.name());
+            agentAvatar = trim(agent.avatar());
             if (displayTitle.isEmpty() && !agentName.isEmpty()) {
                 displayTitle = agentName;
             }
@@ -680,7 +656,7 @@ public class EmbedChannelService {
 
     /** KB 约束回填：仅 agent 的 selected 模式回填所选 KB。 */
     private List<String> resolveKnowledgeBaseIDs(EmbedChannelEntity ch) {
-        CustomAgentEntity agent = tryAgent(ch.getAgentId());
+        AgentLookup.AgentView agent = tryAgent(ch.getAgentId());
         if (agent == null) {
             return List.of();
         }
@@ -698,18 +674,14 @@ public class EmbedChannelService {
         return ids;
     }
 
-    /** agent 查询主路径（配置已归一化的 Result）；失败返回 null。 */
-    public CustomAgentEntity tryAgent(String agentId) {
-        try {
-            return agentService.getAgentByID(agentId, null).row();
-        } catch (RuntimeException e) {
-            return null;
-        }
+    /** agent 查询主路径（视图；失败返回 null —— 属主域适配器已收口异常）。 */
+    public AgentLookup.AgentView tryAgent(String agentId) {
+        return agentLookup.view(agentId);
     }
 
-    private static JsonNode parseConfig(CustomAgentEntity agent) {
+    private static JsonNode parseConfig(AgentLookup.AgentView agent) {
         try {
-            return MAPPER.readTree(agent.getConfig() == null ? "{}" : agent.getConfig());
+            return MAPPER.readTree(agent.configJson() == null ? "{}" : agent.configJson());
         } catch (Exception e) {
             return MAPPER.createObjectNode();
         }

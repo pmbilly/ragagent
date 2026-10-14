@@ -1308,6 +1308,16 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **A② 全批提交**：`a7d3b13e`（第①批 42 类）· `37b5fbb8`（第②批 去框架化 37 类）· `2ee75327`（第②批 补：解锁 11 类）· 本批（第③批 9 类 + 收口）。
 - **A 的下一步**：**③ 立「域间只经契约」**（A20 已守"契约唯一实现"；还差"业务域之间只经 `contract`"这条规则——应先测现状再决定硬规则 vs 棘轮基线）。可选后续：① 的 K 级重设计（`JsonNode` → typed records）另立项。
 
+**🔶 A③ 第十刀：共用 type handler 归位 L1 + `embedchannel→agentmanagement` 清零（2026-10-14，R10 边 52 → 51、类 274 → 270）**
+- **A段（共用件归位，正踩 ArchUnit A19 登记的收敛方向）**：`JsonbRawStringTypeHandler` 由 `agentmanagement/mapper` 移入 **L1 `platform.persistence`**（与 `NaiveOffsetDateTimeTypeHandler` 同处）—— 它在 **3 个域共用**（agentmanagement / im / embedchannel）。⇒ 4 个实体（`CustomAgentEntity` / `EmbedChannelEntity` / `ChannelSessionEntity` / `ImChannelEntity`）只留 `@TableField` 注解读引用；**A19 棘轮当场点名"基线已不再违例，请删除条目收紧基线"** ⇒ 基线 10 → **6** ✓（守卫在行使"**改善也要显式登记**"的纪律 ✓）；**包环 SCC 基线随之消解刷新 11 → 10 组** ✓（`agentmanagement.domain ⇄ mapper` 那个环没了）
+  - 细节：3 个 mapper 只在 **SQL 字符串**里引用该 handler（`#{e.config, typeHandler=com.…}`）⇒ 无 import、**只在运行期解析** ✗⇒ FQN 替换必须连字符串一起改 ✓（本刀已改）；`CustomAgentMapper` 的 javadoc `{@link}` 改全限定 ✓
+- **B段（L1 端口吃余量）**：新建 **`common.agent.AgentLookup`**（`isAgentOwned` / `view`（含 `configJson`）/ `suggestedQuestions`）+ 属主域实现 **`agentmanagement/api/AgentLookupAdapter`**；`EmbedChannelService` 由"直连 `CustomAgentMapper`（持久层 ✗）+ `CustomAgentService`（域服务 ✗）+ 传 `CustomAgentEntity` 实体出域（✗）"改为只注入端口 ⇒ **`embedchannel→agentmanagement` 整条清零** ✓（`ensureAgentOwned` 改 `void`——错误语义留在调用方；`tryAgent` 返回视图；`parseConfig` 读 `configJson()`）
+- **架构依据（为何落 L1 而非 `contract.agent`）**：端口签名含 `ArrayNode` 与 `configJson`（Jackson ✗ R1 不允许）⇒ 与 `TenantConfigLookup`（返回 `JsonNode`）同族先例；**终态仍是方案 §8.1 的 `contract.agent.AgentCatalog`（typed records），待「`JsonNode` 载体」K 级重设计后上提**（已写进 `common/agent/package-info`）✓
+- **⚠️ R10 的一处口径盲点（新发现，登记）**：R10 按 **import** 计边 ⇒ 用 **`var` 接他域返回值**的调用点**不产生 import、不进边** ✗（im 的 `ImTurnOrchestrator:304` `var result = agentService.getAgentByID(...)` 即此形态；该类因另有 import 仍在边内，但若整个类只有这种写法就整体逃逸）⇒ **下一刀迁 im 时必须按"调用点"扫，不能只看边清单** ✓
+- **⚠️ 自伤一处（断言拦停，未落盘）**：迁移脚本里 `tryAgent(` 的数量断言我写成 3（此前 grep 结果被 `head` 截断 ✗）⇒ 实为 **4 处** ⇒ 断言先于写入触发，文件未改 ✓ ⇒ **"数量断言必须来自完整列举，不能来自被截断的输出"** ✓
+- **验证**：`spotlessCheck build` ✓ **2m18s** ✓；**4987 / 失败 0 / 跳过 4** ✓；**13 守卫全绿** ✓；`arch.*` 28 条 ✓（A19 收紧 4 条后绿）；embedchannel 定向（`EmbedChatPayloadPatchTest` / `EmbedRateLimiterTest` / `EmbedContractTest`）✓
+- **A③ 累计（十刀）**：边 **64 → 51（−13）**、类 **317 → 270（−47）**；三档 **① 43 条 / 184 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
+- **下一步**：`embedchannel` 余 2 条（`→mcp` 2 类：直用 `AgentToolApprovalController`/`McpOAuthController` 并解析其嵌套 DTO ✗；`→session` 4 类：直用 4 个 controller + repository + 实体 ✗）⇒ 各需一族端口（approval+MCP OAuth / session QA·消息·会话列表），已按刀登记进基线 `focus` ✓
 **🔶 A④-1：`:contract` 契约面提取为独立 Gradle 模块（2026-10-14，阶段 6 第一步）**
 - **动因**：把"契约面纯 JDK"从 **ArchUnit R1 的静态规则**升格为**编译期硬约束** —— 新模块的 `build.gradle.kts` **没有任何 dependencies 块**，一沾框架/其他模块就编译不过（R1 只能事后再扫，这个扫不动）。
 - **命名（登记一处与方案的差异）**：模块名取**单数 `contract`**（＝顶层包 `com.ragagent.contract`），不取方案 §5.1 字面的 `contracts`：① 本仓约定「模块名 = 顶层包名」（B117 给 `:common` 定名时的首要理由）；② `contracts` 在本仓**已被占用** —— `domains/src/testFixtures/resources/contracts` 有 1,426 金片 + 49 个 `*ContractTest`（B117 原话："再叫 contracts 会语义撞车"）。**§8.1 的面清单不变** ✓

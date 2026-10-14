@@ -1,4 +1,4 @@
-package com.ragagent.agentmanagement.mapper;
+package com.ragagent.platform.persistence;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
@@ -17,6 +17,9 @@ import org.apache.ibatis.type.MappedTypes;
  * 读路径原样 getString——键序重排交给响应层，不做规范化模拟。</p>
  */
 @MappedTypes(String.class)
+// 归位说明（A③-⑩）：原在 agentmanagement/mapper，但 im / embedchannel / agentmanagement 三方共用
+// ⇒ 移入 L1 平台持久化面（与 NaiveOffsetDateTimeTypeHandler 同处）。ArchUnit A19 的基线注释
+// 早已把「下沉到使用方域或提到 common」写为收敛方向；实体只留 @TableField 注解读引用。
 public class JsonbRawStringTypeHandler extends BaseTypeHandler<String> {
 
     @Override

@@ -1035,12 +1035,14 @@ class ArchitectureRulesTest {
     // ── A19 分层方向（domain 不碰技术栈 / repository 不回引 service）──────
 
     /**
-     * 棘轮基线：{@code domain} 面里仍依赖 Spring 构造型 / {@code ..mapper..} 包 的 10 个类。
+     * 棘轮基线：{@code domain} 面里仍依赖 Spring 构造型 / {@code ..mapper..} 包 的 **6 个类**
+     * （A19 立规时 10 个 —— 其中 4 个实体的那条已于 A③-⑩ 收口）。
      *
-     * <p>两类登记理由：① **4 个实体**直接 import 其他域 {@code mapper} 里的
+     * <p>两类登记理由：① ~~4 个实体直接 import 其他域 {@code mapper} 里的
      * {@code JsonbRawStringTypeHandler}（{@code CustomAgentEntity} / {@code EmbedChannelEntity} /
-     * {@code ChannelSessionEntity} / {@code ImChannelEntity}）——收敛方向＝把该处理器下沉到
-     * 使用方域（或提到 {@code common}），实体只留注解引用；② **6 个 {@code @Component} 的领域
+     * {@code ChannelSessionEntity} / {@code ImChannelEntity}）~~ —— **2026-10-14 A③-⑩ 已收口**：
+     * 该处理器归位 L1 {@code com.ragagent.platform.persistence}（三方共用），实体只留
+     * {@code @TableField} 注解引用 ⇒ 基线相应收紧 4 条；② **6 个 {@code @Component} 的领域
      * 守卫 / 接线类**（knowledge 的 4 个 guard + {@code SpanTracker} + {@code ConnectorHttpWiring}）
      * ——收敛方向＝改由装配层注入，或搬去域外的接线面。**基线只许减不许增**。</p>
      *
@@ -1050,11 +1052,7 @@ class ArchitectureRulesTest {
      * 若将来实体注解下沉出 domain，再把该判据加进来。</p>
      */
     private static final Set<String> DOMAIN_TECH_DEPENDENCY_BASELINE = Set.of(
-            "com.ragagent.agentmanagement.domain.CustomAgentEntity",
             "com.ragagent.datasource.domain.connector.ConnectorHttpWiring",
-            "com.ragagent.embedchannel.domain.EmbedChannelEntity",
-            "com.ragagent.im.domain.ChannelSessionEntity",
-            "com.ragagent.im.domain.ImChannelEntity",
             "com.ragagent.knowledge.domain.access.ChunkAccessGuard",
             "com.ragagent.knowledge.domain.access.FaqGuard",
             "com.ragagent.knowledge.domain.access.KnowledgeAccessGuard",

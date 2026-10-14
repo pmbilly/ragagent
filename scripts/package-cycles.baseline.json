@@ -17,10 +17,6 @@
       "com.ragagent.agent.tool.spi"
     ],
     [
-      "com.ragagent.agentmanagement.domain",
-      "com.ragagent.agentmanagement.mapper"
-    ],
-    [
       "com.ragagent.chatpipeline",
       "com.ragagent.chatpipeline.plugin",
       "com.ragagent.chatpipeline.support"
@@ -63,11 +59,7 @@
   "depend_on_config": [],
   "l2_to_l3": [],
   "l2_to_l3_sites": {},
-  "common_beans": {
-    "crypto": 1,
-    "security": 1,
-    "storage": 1
-  },
+  "common_beans": {},
   "common_persistence": {
     "(mapper/repository 子包)": 0
   }

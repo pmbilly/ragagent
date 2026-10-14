@@ -14,7 +14,7 @@ import com.ragagent.agentmanagement.domain.CustomAgentEntity;
  * custom_agents CRUD。
  *
  * <p>软删以 {@code deleted_at IS NULL} 过滤表达。写路径走显式 SQL，
- * config 列经 {@link JsonbRawStringTypeHandler}（setObject(OTHER)→PG 按列类型强转、
+ * config 列经 {@link com.ragagent.platform.persistence.JsonbRawStringTypeHandler}（setObject(OTHER)→PG 按列类型强转、
  * H2 落 VARCHAR，一套语句两侧通用）；读路径显式 CAST 成文本（org 包 AgentRowMapper 同款）。</p>
  */
 public interface CustomAgentMapper extends BaseMapper<CustomAgentEntity> {
@@ -36,14 +36,14 @@ public interface CustomAgentMapper extends BaseMapper<CustomAgentEntity> {
     @Insert("INSERT INTO custom_agents (id, name, description, avatar, is_builtin, tenant_id, "
             + "created_by, config, created_at, updated_at, deleted_at) VALUES "
             + "(#{e.id}, #{e.name}, #{e.description}, #{e.avatar}, #{e.isBuiltin}, #{e.tenantId}, "
-            + "#{e.createdBy}, #{e.config, typeHandler=com.ragagent.agentmanagement.mapper.JsonbRawStringTypeHandler}, "
+            + "#{e.createdBy}, #{e.config, typeHandler=com.ragagent.platform.persistence.JsonbRawStringTypeHandler}, "
             + "#{e.createdAt}, #{e.updatedAt}, NULL)")
     void insertAgent(@Param("e") CustomAgentEntity e);
 
     /** 全列更新。 */
     @Update("UPDATE custom_agents SET name = #{e.name}, description = #{e.description}, "
             + "avatar = #{e.avatar}, is_builtin = #{e.isBuiltin}, created_by = #{e.createdBy}, "
-            + "config = #{e.config, typeHandler=com.ragagent.agentmanagement.mapper.JsonbRawStringTypeHandler}, "
+            + "config = #{e.config, typeHandler=com.ragagent.platform.persistence.JsonbRawStringTypeHandler}, "
             + "created_at = #{e.createdAt}, updated_at = #{e.updatedAt} "
             + "WHERE id = #{e.id} AND tenant_id = #{e.tenantId}")
     int updateAgent(@Param("e") CustomAgentEntity e);

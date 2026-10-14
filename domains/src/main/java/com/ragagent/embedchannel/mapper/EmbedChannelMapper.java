@@ -44,7 +44,7 @@ public interface EmbedChannelMapper extends BaseMapper<EmbedChannelEntity> {
             + "widget_position, allow_web_search, allow_file_upload, default_locale, webhook_url, "
             + "webhook_secret, launcher_icon, created_at, updated_at) VALUES "
             + "(#{e.id}, #{e.tenantId}, #{e.agentId}, #{e.name}, #{e.enabled}, #{e.publishToken}, "
-            + "#{e.allowedOrigins,typeHandler=com.ragagent.agentmanagement.mapper.JsonbRawStringTypeHandler}, "
+            + "#{e.allowedOrigins,typeHandler=com.ragagent.platform.persistence.JsonbRawStringTypeHandler}, "
             + "#{e.welcomeMessage}, #{e.rateLimitPerMinute}, #{e.rateLimitPerDay}, "
             + "#{e.primaryColor}, #{e.pageTitle}, #{e.headerTitleMode}, #{e.showSuggestedQuestions}, "
             + "#{e.showThinking}, #{e.widgetPosition}, #{e.allowWebSearch}, #{e.allowFileUpload}, "
@@ -55,7 +55,7 @@ public interface EmbedChannelMapper extends BaseMapper<EmbedChannelEntity> {
     /** 全列更新（含零值）。 */
     @Update("UPDATE embed_channels SET agent_id = #{e.agentId}, name = #{e.name}, "
             + "enabled = #{e.enabled}, publish_token = #{e.publishToken}, "
-            + "allowed_origins = #{e.allowedOrigins,typeHandler=com.ragagent.agentmanagement.mapper.JsonbRawStringTypeHandler}, "
+            + "allowed_origins = #{e.allowedOrigins,typeHandler=com.ragagent.platform.persistence.JsonbRawStringTypeHandler}, "
             + "welcome_message = #{e.welcomeMessage}, rate_limit_per_minute = #{e.rateLimitPerMinute}, "
             + "rate_limit_per_day = #{e.rateLimitPerDay}, primary_color = #{e.primaryColor}, "
             + "page_title = #{e.pageTitle}, header_title_mode = #{e.headerTitleMode}, "
