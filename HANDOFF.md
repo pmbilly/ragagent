@@ -927,7 +927,14 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **连带**：`ChunkTypes` 常量其实在 `:common` 的 `com.ragagent.common.pipeline`（放仓储里引用它是对的：仓储本就依赖 common 常量）⇒ import 修正；死成员守卫点名的 1 个未使用 import 清掉；`ChunkPortAdapter` **96 → 85 行**、`FaqGuard` **299 → 296 行**。
 - **里程碑**：**`knowledge` 域内 mapper 直连归零** —— 全域只剩 `repository/` 8 个文件（数据层，合法持有）与 `service/KnowledgeBaseLookupAdapter` 那一处**刻意**的可选 mapper（㉕ 已写明理由）。
 - **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m41s** ✓ **十二守卫** ✓（环 0 / SCC 13 组未变）。
-- **登记（收尾三项，B263 余步）**：① `KnowledgeService`(716) 余部 → `service.management/*`（**需配套断边**：B263① 已实测"往子面搬会让 SCC 扩大"）；② **`task ⇄ service` 环**（现测：task→service **6** 文件 / service→task **11** 文件）；③ `escapeLikeKeyword` **多副本统一到 `common`**（§9.2 式，⑯ 登记）。
+- **登记（收尾三项，B263 余步）**：
+**🔶 B263 第㉚步（2026-10-14，`escapeLikeKeyword` 三副本合一 ⇒ `common.mybatis.LikeEscapes`）**
+- **实测先行**：先把三处实现逐个读出来对比——`auth/service/TenantService`（private）、`session/repository/SessionRepository`（static，且被 `MessageRepository` 借用）、`knowledge/repository/KnowledgeRepository`（⑯ 由检索查询搬入）——**三份逐字相同** ✓ ⇒ 才动手合一（不同的就只登记不合并，如 ⑯ 那两份 `buildContentSignature`）。
+- **归位点选择**：`com.ragagent.common.mybatis`（`PageRequests` / `TenantFilterGuard` 的邻居，同属"数据层小助手"），名为 **`LikeEscapes.escape(...)`**；类注释写明出处清单与**契约**（入参非 null、出参是可直接拼进 LIKE 的裸转义文本、PG LIKE 默认 `ESCAPE` 就是反斜杠）。
+- **调用方改造**：三处本地实现删除，2 + 1 + 1 个调用点改为 `LikeEscapes.escape(...)`，`MessageRepository` 的跨类借用（`SessionRepository.escapeLikeKeyword`）也一并改指新助手；`TenantService` 注释里的旧名同步（javadoc 指向 {@code LikeEscapes.escape}）。
+- **补聚焦单测**：`common/src/test/java/com/ragagent/common/mybatis/LikeEscapesTest`（2 例：三条元字符各自转义；纯 `%` 不退化成"匹配一切"、普通文本原样）——**common 139 → 141** ✓（建文件前先 `mkdir -p` 目标包目录，正是记忆里那条小坑）。
+- **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m44s** ✓ **十二守卫** ✓（环 0 / SCC 13 组未变）。
+- **登记（B263 剩余两项收尾）**：① `KnowledgeService`(716) 余部 → `service.management/*`（**需配套断边**）；② **`task ⇄ service` 环**（task→service 6 文件 / service→task 11 文件）。① `KnowledgeService`(716) 余部 → `service.management/*`（**需配套断边**：B263① 已实测"往子面搬会让 SCC 扩大"）；② **`task ⇄ service` 环**（现测：task→service **6** 文件 / service→task **11** 文件）；③ `escapeLikeKeyword` **多副本统一到 `common`**（§9.2 式，⑯ 登记）。
 **🔶 B263 第㉘步（2026-10-14，`KnowledgeProcessWorker` 归仓储：824 → 792 行）**
 - **本步 16 处 + 9 个新仓储方法**（都是"CAS / 条件 / 硬删"形态，SQL 逐字搬入）：`casPendingToProcessing`、`setSummaryStatus(id, status, now)`（带 updated_at 的重载）、`markIndexedEnabled`、`promoteToFinalizing`（processing→finalizing + 子任务计数）、`completeIfOwned(id, resetSummaryStatus, now)`（**K4 CAS**：只有 processing/finalizing 才许翻 completed，`resetSummaryStatus` 为真时额外写 `summary_status=none`）、`failIfProcessing`（只许 processing → failed）、`ChunkRepository.deleteByKnowledgeId`、`deleteByIds`、`countByKnowledgeIdAndChunkType`。
 - **顺手清掉一个已废弃 API**：`chunkMapper.deleteBatchIds(...)`（**MyBatis-Plus 已标 deprecated**，IDE 一直在提示）⇒ 仓储内改用非废弃的 `chunkMapper.deleteByIds(...)` ✓（外部调用方只看到 `deleteByIds(List<String>)`）。

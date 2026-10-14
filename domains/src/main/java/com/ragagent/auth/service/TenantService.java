@@ -1,5 +1,7 @@
 package com.ragagent.auth.service;
 
+import com.ragagent.common.mybatis.LikeEscapes;
+
 import com.ragagent.common.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -131,7 +133,7 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
      * 租户搜索：
      * tenant_id>0 且 keyword 非空 → (id=? OR name LIKE OR description LIKE)；
      * 仅 tenant_id → id=?；仅 keyword → name/description LIKE。
-     * LIKE 参数先过 escapeLikeKeyword（\ % _ 反斜杠转义，PG LIKE 默认 ESCAPE 就是反斜杠）。
+     * LIKE 参数先过 {@code LikeEscapes.escape}（\ % _ 反斜杠转义，PG LIKE 默认 ESCAPE 就是反斜杠）。
      * 先 Count 再 Offset/Limit，恒 created_at DESC。
      */
     public record TenantSearchPage(List<Tenant> tenants, long total) {}
@@ -140,7 +142,7 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
         String kw = keyword == null ? "" : keyword;
         var wrapper = new LambdaQueryWrapper<Tenant>().isNull(Tenant::getDeletedAt);
         if (tenantId > 0 && !kw.isEmpty()) {
-            String like = escapeLikeKeyword(kw);
+            String like = LikeEscapes.escape(kw);
             final long id = tenantId;
             wrapper.and(w -> w.eq(Tenant::getId, id)
                     .or().like(Tenant::getName, like)
@@ -148,7 +150,7 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
         } else if (tenantId > 0) {
             wrapper.eq(Tenant::getId, tenantId);
         } else if (!kw.isEmpty()) {
-            String like = escapeLikeKeyword(kw);
+            String like = LikeEscapes.escape(kw);
             wrapper.and(w -> w.like(Tenant::getName, like)
                     .or().like(Tenant::getDescription, like));
         }
@@ -166,10 +168,6 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
     }
 
     /** LIKE 转义：\ → \\、% → \%、_ → \_（顺序敏感，先转义反斜杠） */
-    private static String escapeLikeKeyword(String kw) {
-        return kw.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
-    }
-
     /**
      * 更新租户：先做存储桶唯一性校验
      * （KV storage PUT / api-principal PUT 共用这条 service 路径），

@@ -1,5 +1,7 @@
 package com.ragagent.session.repository;
 
+import com.ragagent.common.mybatis.LikeEscapes;
+
 import com.ragagent.session.mapper.SessionMapper;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -83,10 +85,6 @@ public class SessionRepository {
     }
 
     /** LIKE 关键词转义：反斜杠、百分号、下划线。 */
-    static String escapeLikeKeyword(String keyword) {
-        return keyword.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
-    }
-
     // ── 写 ──────────────────────────────────────────────────────────────────
 
     /** 显式写时间戳 + 无条件生成新 UUID。 */
@@ -297,7 +295,7 @@ public class SessionRepository {
         }
 
         String kw = q.keyword() == null ? "" : q.keyword().trim();
-        String keywordLike = kw.isEmpty() ? null : "%" + escapeLikeKeyword(kw) + "%";
+        String keywordLike = kw.isEmpty() ? null : "%" + LikeEscapes.escape(kw) + "%";
 
         // 四个 LIKE 用的前缀串（拼好传参）
         String skillMarker = Session.SKILL_MAINTENANCE_SESSION_MARKER + "%";

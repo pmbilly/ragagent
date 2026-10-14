@@ -1,5 +1,7 @@
 package com.ragagent.session.repository;
 
+import com.ragagent.common.mybatis.LikeEscapes;
+
 import com.ragagent.session.mapper.MessageMapper;
 import com.ragagent.session.mapper.SessionMapper;
 import java.time.OffsetDateTime;
@@ -469,7 +471,7 @@ public class MessageRepository implements SessionMessagePort {
      * <p>owner 范围：{@code (user_id = ? OR user_id IS NULL OR user_id = '')}；
      * 大小写不敏感匹配在 PG 用 {@code ILIKE}、H2 用 {@code LOWER} 对
      * {@code LOWER}（方言开关与 SessionMapper 同款）；LIKE 转义复用
-     * {@code SessionRepository.escapeLikeKeyword}。</p>
+     * {@code LikeEscapes.escape}。</p>
      */
     public List<MessageWithSession> searchMessagesByKeyword(long tenantId, String ownerId,
             String keyword, List<String> sessionIds, int limit) {
@@ -502,7 +504,7 @@ public class MessageRepository implements SessionMessagePort {
             mw.in(Message::getSessionId, sessionIds);
         }
         mw.apply(postgres ? "content ILIKE {0}" : "LOWER(content) LIKE LOWER({0})",
-                "%" + SessionRepository.escapeLikeKeyword(keyword) + "%");
+                "%" + LikeEscapes.escape(keyword) + "%");
         return withSessionTitles(mapper.selectList(PageRequests.cap(limit), mw));
     }
 

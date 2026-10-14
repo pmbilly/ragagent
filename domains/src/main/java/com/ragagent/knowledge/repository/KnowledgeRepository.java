@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.repository;
 
+import com.ragagent.common.mybatis.LikeEscapes;
+
 import java.util.Set;
 import java.util.HashSet;
 import java.util.ArrayList;
@@ -196,7 +198,7 @@ public class KnowledgeRepository {
         });
         String kw = keyword == null ? "" : keyword;
         if (!kw.isEmpty()) {
-            String pat = "%" + escapeLikeKeyword(kw.toLowerCase()) + "%";
+            String pat = "%" + LikeEscapes.escape(kw.toLowerCase()) + "%";
             qw.and(w -> w.apply("LOWER(file_name) LIKE {0}", pat)
                     .or()
                     .apply("LOWER(title) LIKE {0}", pat));
@@ -227,10 +229,6 @@ public class KnowledgeRepository {
 
     /** 检索查询结果：{@code rows} 含 limit+1 探测行，{@code total} 为过滤后全量计数。 */
     public record SearchRows(List<Knowledge> rows, long total) {}
-
-    private static String escapeLikeKeyword(String keyword) {
-        return keyword.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
-    }
 
     private static List<String> fileTypePatterns(List<String> fileTypes) {
         List<String> patterns = new ArrayList<>();
