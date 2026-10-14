@@ -1,4 +1,6 @@
-package com.ragagent.session.domain;
+package com.ragagent.session.domain.message;
+
+import com.ragagent.session.domain.SuggestionAttribution;
 
 import java.util.List;
 import java.util.Map;

@@ -6,8 +6,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import com.ragagent.session.domain.MessageAttachment;
-import com.ragagent.session.domain.TemporaryDocument;
+import com.ragagent.session.domain.message.MessageAttachment;
+import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.repository.TemporaryDocumentRepository;
 
 /**

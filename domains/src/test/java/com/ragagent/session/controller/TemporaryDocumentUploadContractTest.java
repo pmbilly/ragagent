@@ -20,7 +20,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.BizException;
-import com.ragagent.session.domain.TemporaryDocument;
+import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.service.AgentResolver;
 import com.ragagent.session.service.SessionService;
 import com.ragagent.session.service.TemporaryDocumentService;

@@ -1,4 +1,4 @@
-package com.ragagent.session.domain;
+package com.ragagent.session.domain.conversation;
 
 import java.time.OffsetDateTime;
 

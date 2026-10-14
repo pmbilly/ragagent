@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.retrieval.support.SearchTextUtil;
-import com.ragagent.session.domain.Message;
+import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.SuggestionItem;
 import com.ragagent.session.service.MessageSuggestionService.Evidence;
 import com.ragagent.session.service.MessageSuggestionService.GenerationContext;

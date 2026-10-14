@@ -12,9 +12,9 @@ import java.util.regex.Pattern;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.ragagent.session.domain.Session;
-import com.ragagent.session.domain.SessionLastRequestState;
-import com.ragagent.session.domain.SessionListItem;
+import com.ragagent.session.domain.conversation.Session;
+import com.ragagent.session.domain.conversation.SessionLastRequestState;
+import com.ragagent.session.domain.conversation.SessionListItem;
 import org.junit.jupiter.api.Test;
 
 /**

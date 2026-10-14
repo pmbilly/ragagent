@@ -12,7 +12,7 @@ import com.ragagent.agent.domain.AgentStep;
 import com.ragagent.common.prompt.MessageAttachmentsPrompt;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ToolCall;
-import com.ragagent.session.domain.Message;
+import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.support.PipelineViews;
 import com.ragagent.agent.tool.runtime.ToolResultPersist;
 import com.ragagent.llm.domain.FunctionCall;

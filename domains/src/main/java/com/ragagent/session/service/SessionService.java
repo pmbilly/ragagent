@@ -27,18 +27,18 @@ import com.ragagent.llm.domain.ChatResponse;
 import com.ragagent.model.service.ModelRuntimeFactory;
 import com.ragagent.model.service.ModelService;
 import com.ragagent.common.wiki.WikiLanguageSupport;
-import com.ragagent.session.domain.Message;
-import com.ragagent.session.domain.Session;
-import com.ragagent.session.domain.SessionListQuery;
-import com.ragagent.session.domain.SessionNotFoundException;
-import com.ragagent.session.domain.SessionOwnerIds;
-import com.ragagent.session.domain.SessionPage;
+import com.ragagent.session.domain.message.Message;
+import com.ragagent.session.domain.conversation.Session;
+import com.ragagent.session.domain.conversation.SessionListQuery;
+import com.ragagent.session.domain.conversation.SessionNotFoundException;
+import com.ragagent.session.domain.conversation.SessionOwnerIds;
+import com.ragagent.session.domain.conversation.SessionPage;
 import com.ragagent.session.repository.MessageRepository;
 import com.ragagent.session.repository.MessageSuggestionRepository;
 import com.ragagent.session.repository.SessionRepository;
 import com.ragagent.common.security.LogSanitizer;
 import com.ragagent.model.domain.Model;
-import com.ragagent.session.domain.SessionLastRequestState;
+import com.ragagent.session.domain.conversation.SessionLastRequestState;
 import com.ragagent.websearch.service.WebSearchTempKbStateService;
 
 /**

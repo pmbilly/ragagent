@@ -15,7 +15,7 @@ import com.ragagent.event.payload.AgentToolCallData;
 import com.ragagent.event.payload.AgentToolResultData;
 import com.ragagent.common.llm.ResponseType;
 import com.ragagent.agent.domain.AgentStep;
-import com.ragagent.session.domain.Message;
+import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.service.AgentStreamBridge;
 import com.ragagent.session.service.MessageService;
 import com.ragagent.session.service.QaSupport.QaMode;

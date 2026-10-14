@@ -7,7 +7,7 @@ import com.ragagent.im.domain.ChannelSessionEntity;
 import com.ragagent.im.runtime.ImFormat;
 import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
-import com.ragagent.session.domain.Session;
+import com.ragagent.session.domain.conversation.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

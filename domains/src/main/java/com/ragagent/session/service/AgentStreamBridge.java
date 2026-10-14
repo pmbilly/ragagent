@@ -38,7 +38,7 @@ import com.ragagent.event.payload.UserMessageInjectedData;
 import com.ragagent.common.llm.ResponseType;
 import com.ragagent.common.llm.TokenUsage;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.session.domain.Message;
+import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.support.PipelineViews;
 import com.ragagent.platform.stream.StreamEvent;
 import com.ragagent.platform.stream.StreamManager;

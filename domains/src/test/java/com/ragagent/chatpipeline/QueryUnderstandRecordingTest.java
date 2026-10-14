@@ -19,11 +19,11 @@ import org.junit.jupiter.api.Test;
 import com.ragagent.chatpipeline.plugin.PluginError;
 import com.ragagent.chatpipeline.plugin.PluginQueryUnderstand;
 import com.ragagent.common.session.PipelineMessageAttachmentView;
-import com.ragagent.session.domain.Message;
-import com.ragagent.session.domain.MessageAttachment;
+import com.ragagent.session.domain.message.Message;
+import com.ragagent.session.domain.message.MessageAttachment;
 import com.ragagent.llm.extract.PipelineConfig;
 import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.session.domain.MessageImage;
+import com.ragagent.session.domain.message.MessageImage;
 
 /**
  * 录制回放：query_understand 族 + load_history + history_messages

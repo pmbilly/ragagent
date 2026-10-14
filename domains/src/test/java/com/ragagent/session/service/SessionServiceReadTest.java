@@ -13,8 +13,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.ragagent.common.context.TenantContext;
-import com.ragagent.session.domain.Session;
-import com.ragagent.session.domain.SessionNotFoundException;
+import com.ragagent.session.domain.conversation.Session;
+import com.ragagent.session.domain.conversation.SessionNotFoundException;
 import com.ragagent.session.repository.SessionRepository;
 import com.ragagent.knowledge.service.management.KnowledgeService;
 import com.ragagent.model.service.ModelRuntimeFactory;

@@ -1,4 +1,4 @@
-package com.ragagent.session.domain;
+package com.ragagent.session.domain.message;
 
 /**
  * 消息 + 所属会话标题。

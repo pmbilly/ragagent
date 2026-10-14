@@ -14,14 +14,14 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.common.jdbc.DatabaseDialects;
 import com.ragagent.common.mybatis.PageRequests;
-import com.ragagent.session.domain.EmbedVisitorSessionRow;
-import com.ragagent.session.domain.Session;
-import com.ragagent.session.domain.SessionLastRequestState;
-import com.ragagent.session.domain.SessionListItem;
-import com.ragagent.session.domain.SessionListQuery;
-import com.ragagent.session.domain.SessionNotFoundException;
-import com.ragagent.session.domain.SessionOwnerIds;
-import com.ragagent.session.domain.SessionPage;
+import com.ragagent.session.domain.conversation.EmbedVisitorSessionRow;
+import com.ragagent.session.domain.conversation.Session;
+import com.ragagent.session.domain.conversation.SessionLastRequestState;
+import com.ragagent.session.domain.conversation.SessionListItem;
+import com.ragagent.session.domain.conversation.SessionListQuery;
+import com.ragagent.session.domain.conversation.SessionNotFoundException;
+import com.ragagent.session.domain.conversation.SessionOwnerIds;
+import com.ragagent.session.domain.conversation.SessionPage;
 import org.springframework.stereotype.Component;
 
 /**

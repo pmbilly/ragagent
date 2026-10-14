@@ -23,10 +23,10 @@ import com.ragagent.model.service.ModelRuntimeFactory;
 import com.ragagent.rerank.RankResult;
 import com.ragagent.rerank.Reranker;
 import com.ragagent.retrieval.HybridSearchService;
-import com.ragagent.session.domain.MessageSearchGroupItem;
-import com.ragagent.session.domain.MessageSearchResult;
-import com.ragagent.session.domain.MessageWithSession;
-import com.ragagent.session.domain.SessionOwnerIds;
+import com.ragagent.session.domain.message.MessageSearchGroupItem;
+import com.ragagent.session.domain.message.MessageSearchResult;
+import com.ragagent.session.domain.message.MessageWithSession;
+import com.ragagent.session.domain.conversation.SessionOwnerIds;
 import com.ragagent.session.repository.MessageRepository;
 
 

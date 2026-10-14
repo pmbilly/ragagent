@@ -5,12 +5,12 @@ import java.util.List;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ragagent.common.web.PgJsonTypeHandler;
 import com.ragagent.session.domain.AgentStepListTypeHandler;
-import com.ragagent.session.domain.Message;
-import com.ragagent.session.domain.MessageArtifact;
-import com.ragagent.session.domain.MessageArtifactListTypeHandler;
-import com.ragagent.session.domain.MessageAttachment;
-import com.ragagent.session.domain.MessageAttachmentListTypeHandler;
-import com.ragagent.session.domain.MessageImageListTypeHandler;
+import com.ragagent.session.domain.message.Message;
+import com.ragagent.session.domain.message.MessageArtifact;
+import com.ragagent.session.domain.message.MessageArtifactListTypeHandler;
+import com.ragagent.session.domain.message.MessageAttachment;
+import com.ragagent.session.domain.message.MessageAttachmentListTypeHandler;
+import com.ragagent.session.domain.message.MessageImageListTypeHandler;
 import com.ragagent.session.domain.MentionedItemListTypeHandler;
 import com.ragagent.session.domain.SearchResultListTypeHandler;
 import com.ragagent.session.domain.UsedMemoryListTypeHandler;
@@ -78,7 +78,7 @@ public interface MessageMapper extends BaseMapper<Message> {
 
     /** 只写 {@code images} 列。 */
     @Update("UPDATE messages SET images = "
-            + "#{images, typeHandler=com.ragagent.session.domain.MessageImageListTypeHandler, "
+            + "#{images, typeHandler=com.ragagent.session.domain.message.MessageImageListTypeHandler, "
             + "jdbcType=OTHER} "
             + "WHERE id = #{messageId} AND session_id = #{sessionId}")
     int updateImages(@Param("sessionId") String sessionId,

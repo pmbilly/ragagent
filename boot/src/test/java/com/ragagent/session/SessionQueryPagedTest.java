@@ -5,10 +5,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import com.ragagent.TestSchema;
-import com.ragagent.session.domain.Session;
-import com.ragagent.session.domain.SessionListItem;
-import com.ragagent.session.domain.SessionListQuery;
-import com.ragagent.session.domain.SessionPage;
+import com.ragagent.session.domain.conversation.Session;
+import com.ragagent.session.domain.conversation.SessionListItem;
+import com.ragagent.session.domain.conversation.SessionListQuery;
+import com.ragagent.session.domain.conversation.SessionPage;
 import com.ragagent.session.repository.SessionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

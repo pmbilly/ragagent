@@ -27,7 +27,7 @@ import com.ragagent.knowledge.client.DocReaderClient;
 import com.ragagent.model.domain.Model;
 import com.ragagent.model.domain.ModelParameters;
 import com.ragagent.model.service.ModelRuntimeFactory;
-import com.ragagent.session.domain.TemporaryDocument;
+import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.repository.TemporaryDocumentRepository;
 
 /**

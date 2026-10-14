@@ -22,7 +22,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.ragagent.memory.service.MemoryExtractionService;
-import com.ragagent.session.domain.Message;
+import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.service.MessageService;
 import com.ragagent.session.service.MessageSuggestionService;
 import com.ragagent.session.service.SessionService;

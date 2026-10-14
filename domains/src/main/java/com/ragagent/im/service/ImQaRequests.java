@@ -8,10 +8,10 @@ import com.ragagent.agentmanagement.service.config.AgentConfigJson;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.ImFormat;
 import com.ragagent.im.service.ImService.InflightEntry;
-import com.ragagent.session.domain.Message;
-import com.ragagent.session.domain.Session;
+import com.ragagent.session.domain.message.Message;
+import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.service.QaSupport;
-import com.ragagent.session.domain.MessageAttachment;
+import com.ragagent.session.domain.message.MessageAttachment;
 
 /**
  * QA 管线的共享底座：agent 模式判定、IM 请求构造（含 agent config 缺省补全）、

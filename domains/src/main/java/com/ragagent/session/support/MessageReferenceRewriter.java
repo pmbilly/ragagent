@@ -8,8 +8,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.ragagent.agent.domain.AgentStep;
 import com.ragagent.agent.domain.AgentToolCall;
-import com.ragagent.session.domain.Message;
-import com.ragagent.session.domain.MessageImage;
+import com.ragagent.session.domain.message.Message;
+import com.ragagent.session.domain.message.MessageImage;
 import com.ragagent.storage.support.Rewriter;
 
 /**

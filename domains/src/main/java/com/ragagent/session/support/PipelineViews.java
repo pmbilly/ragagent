@@ -7,9 +7,9 @@ import com.ragagent.common.session.PipelineMessageAttachmentView;
 import com.ragagent.common.session.PipelineMessageImageView;
 import com.ragagent.common.session.PipelineMessageView;
 import com.ragagent.common.session.PipelineUsedMemoryView;
-import com.ragagent.session.domain.Message;
-import com.ragagent.session.domain.MessageAttachment;
-import com.ragagent.session.domain.MessageImage;
+import com.ragagent.session.domain.message.Message;
+import com.ragagent.session.domain.message.MessageAttachment;
+import com.ragagent.session.domain.message.MessageImage;
 import com.ragagent.session.domain.UsedMemory;
 
 /**

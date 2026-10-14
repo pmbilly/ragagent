@@ -23,9 +23,9 @@ import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 import com.ragagent.embedchannel.mapper.EmbedChannelMapper;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.repository.ChunkRepository;
-import com.ragagent.session.domain.Session;
-import com.ragagent.session.domain.SessionListQuery;
-import com.ragagent.session.domain.SessionPage;
+import com.ragagent.session.domain.conversation.Session;
+import com.ragagent.session.domain.conversation.SessionListQuery;
+import com.ragagent.session.domain.conversation.SessionPage;
 import com.ragagent.session.repository.SessionRepository;
 import com.ragagent.agentmanagement.service.builtin.BuiltinAgentRegistry;
 

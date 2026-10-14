@@ -1,8 +1,8 @@
 package com.ragagent.session.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ragagent.session.domain.EmbedVisitorSessionRow;
-import com.ragagent.session.domain.Session;
+import com.ragagent.session.domain.conversation.EmbedVisitorSessionRow;
+import com.ragagent.session.domain.conversation.Session;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;
@@ -10,8 +10,8 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import com.ragagent.common.web.PgJsonTypeHandler;
-import com.ragagent.session.domain.SessionListItem;
-import com.ragagent.session.domain.SessionListQuery;
+import com.ragagent.session.domain.conversation.SessionListItem;
+import com.ragagent.session.domain.conversation.SessionListQuery;
 
 /**
  * sessions 的 MyBatis-Plus 基础仓储。

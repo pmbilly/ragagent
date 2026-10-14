@@ -1,4 +1,11 @@
-package com.ragagent.session.domain;
+package com.ragagent.session.domain.message;
+
+import com.ragagent.session.domain.AgentStepListTypeHandler;
+import com.ragagent.session.domain.MentionedItem;
+import com.ragagent.session.domain.MentionedItemListTypeHandler;
+import com.ragagent.session.domain.SearchResultListTypeHandler;
+import com.ragagent.session.domain.UsedMemory;
+import com.ragagent.session.domain.UsedMemoryListTypeHandler;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -91,7 +98,7 @@ public class Message {
     /**
      * 是否生成完毕。恒输出（线格式键是 {@code completed}，§1.24 不带 is 前缀）。
      *
-     * <p>字段名不带 {@code is} 前缀——理由见 {@link Session} 上同名字段的注释。</p>
+     * <p>字段名不带 {@code is} 前缀——理由见 {@link com.ragagent.session.domain.conversation.Session} 上同名字段的注释。</p>
      */
     @TableField("is_completed")
     private boolean completed;

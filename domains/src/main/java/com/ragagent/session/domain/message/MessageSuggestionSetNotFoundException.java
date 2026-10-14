@@ -1,4 +1,4 @@
-package com.ragagent.session.domain;
+package com.ragagent.session.domain.message;
 
 /**
  * 消息建议集合不存在（仓储查不到行时抛出，控制器按类型分派 404）。

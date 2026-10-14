@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agent.domain.AgentStep;
-import com.ragagent.session.domain.Message;
+import com.ragagent.session.domain.message.Message;
 
 /** QA 编排的共享小工具（阶段 5 从 {@code KnowledgeQaController} 的静态助手迁出）。 */
 public final class QaTurnSupport {

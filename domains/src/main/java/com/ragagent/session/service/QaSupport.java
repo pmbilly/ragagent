@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.ragagent.session.domain.MentionedItem;
-import com.ragagent.session.domain.Message;
-import com.ragagent.session.domain.Session;
+import com.ragagent.session.domain.message.Message;
+import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.dto.QaRequests.MentionedItemRequest;
 import com.ragagent.storage.support.StreamRewriter;
 import com.ragagent.platform.stream.StreamEvent;
@@ -18,7 +18,7 @@ import com.ragagent.agent.SteerSink;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.common.llm.ResponseType;
 import com.ragagent.event.TenantContextSnapshot;
-import com.ragagent.session.domain.MessageAttachment;
+import com.ragagent.session.domain.message.MessageAttachment;
 import com.ragagent.session.domain.SuggestionAttribution;
 
 /**

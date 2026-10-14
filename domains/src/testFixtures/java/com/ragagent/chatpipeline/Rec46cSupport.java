@@ -35,7 +35,7 @@ import com.ragagent.rerank.RankResult;
 import com.ragagent.retrieval.support.SearchTextUtil;
 import com.ragagent.rerank.Reranker;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.session.domain.Message;
+import com.ragagent.session.domain.message.Message;
 import com.ragagent.common.graph.GraphData;
 import com.ragagent.common.graph.NameSpace;
 import com.ragagent.retrieval.graph.RetrieveGraphRepository;

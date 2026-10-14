@@ -19,13 +19,13 @@ import com.ragagent.common.jdbc.DatabaseDialects;
 import com.ragagent.common.mybatis.PageRequests;
 import com.ragagent.common.web.ZeroTimeSerializer;
 import com.ragagent.memory.domain.MemoryMessageCursor;
-import com.ragagent.session.domain.Message;
-import com.ragagent.session.domain.MessageImage;
-import com.ragagent.session.domain.MessageArtifact;
-import com.ragagent.session.domain.MessageAttachment;
-import com.ragagent.session.domain.MessageNotFoundException;
-import com.ragagent.session.domain.Session;
-import com.ragagent.session.domain.MessageWithSession;
+import com.ragagent.session.domain.message.Message;
+import com.ragagent.session.domain.message.MessageImage;
+import com.ragagent.session.domain.message.MessageArtifact;
+import com.ragagent.session.domain.message.MessageAttachment;
+import com.ragagent.session.domain.message.MessageNotFoundException;
+import com.ragagent.session.domain.conversation.Session;
+import com.ragagent.session.domain.message.MessageWithSession;
 import org.springframework.stereotype.Component;
 import com.ragagent.common.session.SessionMessagePort;
 
@@ -57,11 +57,11 @@ public class MessageRepository implements SessionMessagePort {
     private static final String PG_JSON = "com.ragagent.common.web.PgJsonTypeHandler";
     private static final String MENTIONED_ITEMS =
             "com.ragagent.session.domain.MentionedItemListTypeHandler";
-    private static final String IMAGES = "com.ragagent.session.domain.MessageImageListTypeHandler";
+    private static final String IMAGES = "com.ragagent.session.domain.message.MessageImageListTypeHandler";
     private static final String ATTACHMENTS =
-            "com.ragagent.session.domain.MessageAttachmentListTypeHandler";
+            "com.ragagent.session.domain.message.MessageAttachmentListTypeHandler";
     private static final String ARTIFACTS =
-            "com.ragagent.session.domain.MessageArtifactListTypeHandler";
+            "com.ragagent.session.domain.message.MessageArtifactListTypeHandler";
     private static final String USED_MEMORIES =
             "com.ragagent.session.domain.UsedMemoryListTypeHandler";
 

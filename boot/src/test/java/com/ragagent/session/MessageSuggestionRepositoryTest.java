@@ -7,9 +7,9 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 import com.ragagent.TestSchema;
-import com.ragagent.session.domain.MessageSuggestionEvent;
-import com.ragagent.session.domain.MessageSuggestionSet;
-import com.ragagent.session.domain.MessageSuggestionSetNotFoundException;
+import com.ragagent.session.domain.message.MessageSuggestionEvent;
+import com.ragagent.session.domain.message.MessageSuggestionSet;
+import com.ragagent.session.domain.message.MessageSuggestionSetNotFoundException;
 import com.ragagent.session.domain.SuggestionItem;
 import com.ragagent.session.repository.MessageSuggestionRepository;
 import org.junit.jupiter.api.BeforeEach;

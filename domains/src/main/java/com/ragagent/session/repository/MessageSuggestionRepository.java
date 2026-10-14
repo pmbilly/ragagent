@@ -10,9 +10,9 @@ import javax.sql.DataSource;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.common.jdbc.DatabaseDialects;
-import com.ragagent.session.domain.MessageSuggestionEvent;
-import com.ragagent.session.domain.MessageSuggestionSet;
-import com.ragagent.session.domain.MessageSuggestionSetNotFoundException;
+import com.ragagent.session.domain.message.MessageSuggestionEvent;
+import com.ragagent.session.domain.message.MessageSuggestionSet;
+import com.ragagent.session.domain.message.MessageSuggestionSetNotFoundException;
 import org.springframework.stereotype.Component;
 
 /**

@@ -1,8 +1,8 @@
 package com.ragagent.session.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ragagent.session.domain.MessageSuggestionEvent;
-import com.ragagent.session.domain.MessageSuggestionSet;
+import com.ragagent.session.domain.message.MessageSuggestionEvent;
+import com.ragagent.session.domain.message.MessageSuggestionSet;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

@@ -1,4 +1,4 @@
-package com.ragagent.session.domain;
+package com.ragagent.session.domain.conversation;
 
 /**
  * 会话列表查询参数。

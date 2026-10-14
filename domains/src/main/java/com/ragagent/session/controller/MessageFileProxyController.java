@@ -1,7 +1,7 @@
 package com.ragagent.session.controller;
 
 import java.util.List;
-import com.ragagent.session.domain.Message;
+import com.ragagent.session.domain.message.Message;
 import java.io.IOException;
 
 import org.springframework.web.bind.annotation.GetMapping;

@@ -19,18 +19,18 @@ import com.ragagent.knowledge.service.management.KnowledgeService;
 import com.ragagent.model.service.ModelRuntimeFactory;
 import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.session.domain.ChatHistoryKbStats;
-import com.ragagent.session.domain.Message;
-import com.ragagent.session.domain.MessageArtifact;
-import com.ragagent.session.domain.MessageAttachment;
-import com.ragagent.session.domain.MessageImage;
-import com.ragagent.session.domain.MessageSearchResult;
+import com.ragagent.session.domain.message.Message;
+import com.ragagent.session.domain.message.MessageArtifact;
+import com.ragagent.session.domain.message.MessageAttachment;
+import com.ragagent.session.domain.message.MessageImage;
+import com.ragagent.session.domain.message.MessageSearchResult;
 import com.ragagent.session.repository.MessageRepository;
 import com.ragagent.session.repository.MessageSuggestionRepository;
 import com.ragagent.session.repository.SessionRepository;
 import com.ragagent.common.wiki.WikiLanguageSupport;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.service.management.KnowledgeBaseService;
-import com.ragagent.session.domain.ArtifactVersions;
+import com.ragagent.session.domain.message.ArtifactVersions;
 
 /**
  * 消息服务。

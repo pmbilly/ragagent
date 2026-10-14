@@ -1076,6 +1076,14 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 ✓；`spotlessCheck build` ✓ **1m38s** ✓ **十二守卫** ✓（环 0 / 包级 SCC 12 组）；`:domains:javadoc` ✓。
 - **登记（session 余下，按零风险优先）**：① `domain/`(36) 拆 `domain.conversation`(8) / `domain.document`(1) / `domain.message`(15)；② `qa/`(10) 拆入 `service.turn` / `service.rag`；③ `service/`(37) 拆入 `service.{attachment,enrichment,history,rag,rag.stage,suggestion,turn}`；④ 新增 `api/`(4 适配器) / `event/`(2) / `task/`(1)。
 
+**🔶 B264 第⑥步（2026-10-14，`session/domain` 拆三簇：conversation(8) / document(1) / message(16)）**
+- **映射**：`domain.conversation` = Session 族 8；`domain.document` = `TemporaryDocument` 1；`domain.message` = Message 族 15 **+ `ArtifactVersions`**；留 `domain` 11（`AbstractJsonListTypeHandler` 与三个 `*ListTypeHandler`、`MentionedItem`/`SuggestionItem`/`UsedMemory` 族、`ChatHistoryKbStats`）。
+- **本步最值钱的一刀（动前图分析）**：裸名引用图测出**唯一反向边** `ArtifactVersions → MessageArtifact` ⇒ 照搬会造 `domain ⇄ domain.message` **双环** ✗；让 `ArtifactVersions` 随 message 族走（实测其外部引用者仅 `session/service/MessageService` + 同名包测试）⇒ 簇间边成为 `conversation → domain`、`message → domain` **单向** ✓（SCC 仍 12 组）。
+- **搬迁**：25 文件 `git mv` + 包声明；**智能补 import**（原同包免 import）；FQN 替换 **75 文件**（session 域内 43 + 跨域 `im`/`chatpipeline`/测试/fixtures）；测试 `ArtifactVersionsTest` 随迁 `domain/message/`；**新建 4 份 package-info**（三新簇 + 原本缺失的 `session.domain`）。
+- **两处现场纠错**：① 首版"补 import"把 body 截断在**第一个 `{`** ⇒ 类声明头部（`extends AbstractJsonListTypeHandler`）被切掉、三个 `*ListTypeHandler` 漏补 ✗ ⇒ 改整文扫描（并先清"同包自 import"）；② `:domains:javadoc` 报 2 处 `{@link Session}` 失链（㉟ 同款）⇒ 按仓内风格改**全限定**（不加"javadoc 专用"import，避免死成员守卫判未使用）。
+- **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 ✓；`spotlessCheck build` ✓ **1m43s** ✓ **十二守卫** ✓（环 0 / 包级 SCC 12 组）；`:domains:javadoc` ✓。
+- **登记（session 余下）**：`qa/`(10) 拆入 `service.turn`/`service.rag`；`service/`(37) 拆入 `service.{attachment,enrichment,history,rag,rag.stage,suggestion,turn}`；新增 `api/`(4)/`event/`(2)/`task/`(1)；顶层 1 文件。
+
 **🔶 B263 第㉟步（2026-10-14，第二个子面 `service.chunk` 切出）**
 - **动前断言（把"可测"变成"可证"）**：脚本**先断言** `ChunkEditService`/`ChunkExtractService`/`ChunkReadService` 三者在 `service` 包内**入度为零**（无人引用，`package-info` 除外），断言不过就 abort —— 这样"切出只产生单向外边"不再靠推理。`ChunkQuestionService` **故意留在** `service`：它被 `QuestionGenerationService` 引用，单独搬会造出 `service ⇄ service.chunk` 环（已在子面 package-info 写明）。
 - **切出**：3 类 → `com.ragagent.knowledge.service.chunk`（`git mv` + 包声明 + 全仓 FQN 替换 3 文件）；测试面 `ChunkExtractServiceTest` 随迁；新建 `service/chunk/package-info`；`service/package-info` 同步。

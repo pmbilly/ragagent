@@ -7,7 +7,7 @@ import java.util.List;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.common.mybatis.PageRequests;
-import com.ragagent.session.domain.TemporaryDocument;
+import com.ragagent.session.domain.document.TemporaryDocument;
 import org.springframework.stereotype.Component;
 
 /**
