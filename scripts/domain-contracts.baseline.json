@@ -116,9 +116,6 @@
       "EmbedChannelController",
       "EmbedChannelDelegateOps"
     ],
-    "embedchannel→storage": [
-      "EmbedChannelController"
-    ],
     "embedchannel→knowledge": [
       "EmbedChannelPublicOps",
       "EmbedChannelService"
@@ -157,7 +154,6 @@
       "ModelConnectivityTestService"
     ],
     "knowledge→storage": [
-      "KnowledgeBaseFileProxyController",
       "TenantFileStorage"
     ],
     "knowledge→model": [

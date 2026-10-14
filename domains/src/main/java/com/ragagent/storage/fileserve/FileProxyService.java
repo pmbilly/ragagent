@@ -1,12 +1,11 @@
 package com.ragagent.storage.fileserve;
 
 import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.contract.error.BizException;
 
 import com.ragagent.common.tenant.TenantConfigLookup;
 
-import com.ragagent.platform.web.JsonMappers;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -14,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.storage.domain.StoredResource;
 import com.ragagent.storage.service.ResourceCatalogService;
@@ -22,6 +20,8 @@ import com.ragagent.storage.service.ResourceCatalogService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import com.ragagent.platform.text.ContentTypeByFilename;
+import com.ragagent.common.storage.fileserve.FileProxyPort;
+import com.ragagent.common.storage.fileserve.FileServeHttp;
 import com.ragagent.common.storage.fileserve.FileTransport;
 
 /**
@@ -45,15 +45,15 @@ import com.ragagent.common.storage.fileserve.FileTransport;
  * presigned-preview 的多键 JSON 对象体按<b>字母序</b>插入 LinkedHashMap。</p>
  */
 @Service
-public class FileProxyService {
+public class FileProxyService implements FileProxyPort {
 
     private static final Logger log = LoggerFactory.getLogger(FileProxyService.class);
-    private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final TenantConfigLookup tenantConfigLookup;
     private final StorageFileResolver resolver;
     private final ResourceCatalogService catalog;
     private final FileContentService globalFileService;
+    private final FileAccessResolver accessResolver;
 
     /** 本地存储根目录（{@code LOCAL_STORAGE_BASE_DIR}，经 Spring 属性带 env 缺省，测试期可注入）。 */
     private final String localBaseDir;
@@ -61,6 +61,7 @@ public class FileProxyService {
 
     public FileProxyService(TenantConfigLookup tenantConfigLookup, StorageFileResolver resolver,
             ResourceCatalogService catalog,
+            FileAccessResolver accessResolver,
             @org.springframework.beans.factory.annotation.Value(
                     "${weknora.storage.local-base-dir:${LOCAL_STORAGE_BASE_DIR:/data/files}}")
             String localBaseDir) {
@@ -70,6 +71,7 @@ public class FileProxyService {
         this.localBaseDir = localBaseDir;
         this.absDir = java.nio.file.Path.of(localBaseDir).toAbsolutePath().normalize().toString();
         this.globalFileService = resolver.globalFileService(localBaseDir);
+        this.accessResolver = accessResolver;
     }
 
     /** 进程级默认文件服务（沙箱附件 staging 等共享消费方读取；恒 local 基座+装饰视图）。 */
@@ -85,17 +87,7 @@ public class FileProxyService {
      */
     public static String requireFilePathQuery(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        String filePath = trimToEmpty(request.getParameter("file_path"));
-        if (filePath.isEmpty()) {
-            writeErrorJson(response, HttpServletResponse.SC_BAD_REQUEST,
-                    "missing required parameter: file_path");
-            return null;
-        }
-        if (filePath.contains("..")) {
-            writeErrorJson(response, HttpServletResponse.SC_BAD_REQUEST, "invalid file path");
-            return null;
-        }
-        return filePath;
+        return FileServeHttp.requireFilePathQuery(request, response);
     }
 
     /**
@@ -342,6 +334,32 @@ public class FileProxyService {
      * 解析失败 → 400、对象缺失 → 404；成功以 private, no-store 直出
      * （Content-Type/inline 由 filename 在 Serve 内派生，无 ContentType 选项）。
      */
+    /**
+     * 知识库作用域 handler 体（自 {@code KnowledgeBaseFileProxyController.files} 原样搬入）：
+     * 解析 {@code file_path} → 按 KB 授权解析 → 错误信封 → 直出。
+     * KB 访问闸门（{@code ChunkAccessGuard}）由调用方先过，本方法只吃其产物（属主租户）。
+     */
+    @Override
+    public void serveKbFile(Long kbOwnerTenantId, String kbId,
+            HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String reference = requireFilePathQuery(request, response);
+        if (reference == null) {
+            return;
+        }
+        FileAccess file;
+        try {
+            file = accessResolver.resolveKbFile(kbOwnerTenantId, kbId, reference);
+        } catch (FileAccessException e) {
+            fileAccessError(response, e);
+            return;
+        } catch (BizException e) {
+            // IsAppError 支路：{"error": message}（非全局信封）
+            writeErrorJson(response, e.appError().httpCode(), e.appError().message());
+            return;
+        }
+        serveAuthorizedFile(response, request, file, "KB files");
+    }
+
     public void serveAuthorizedFile(HttpServletResponse response, HttpServletRequest request,
             FileAccess file, String tag) throws IOException {
         TenantStorageView tenant;
@@ -406,21 +424,13 @@ public class FileProxyService {
      * setContentLength(0)+flush 提交空响应后阀门跳过，保证响应体为空。
      */
     public static void plainStatus(HttpServletResponse response, int status) {
-        response.setStatus(status);
-        response.setContentLength(0);
-        try {
-            response.flushBuffer();
-        } catch (IOException ignored) {
-            // 连接已断，写不出去也无处可达
-        }
+        FileServeHttp.plainStatus(response, status);
     }
 
     /** 错误信封：{@code {"error": msg}}。 */
     public static void writeErrorJson(HttpServletResponse response, int status, String message)
             throws IOException {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("error", message);
-        writeJson(response, status, body);
+        FileServeHttp.writeErrorJson(response, status, message);
     }
 
     /**
@@ -430,10 +440,7 @@ public class FileProxyService {
      */
     public static void writeJson(HttpServletResponse response, int status, Object body)
             throws IOException {
-        response.setStatus(status);
-        response.setHeader("Content-Type", "application/json; charset=utf-8");
-        response.getOutputStream()
-                .write(MAPPER.writeValueAsString(body).getBytes(StandardCharsets.UTF_8));
+        FileServeHttp.writeJson(response, status, body);
     }
 
     private static String trimToEmpty(String s) {

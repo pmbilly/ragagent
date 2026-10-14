@@ -36,7 +36,7 @@ import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.session.controller.KnowledgeQaController;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.dto.StopSessionRequest;
-import com.ragagent.storage.fileserve.FileProxyService;
+import com.ragagent.common.storage.fileserve.FileProxyPort;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.contract.error.AppError;
@@ -80,7 +80,7 @@ static final ObjectMapper MAPPER = JsonMappers.lenient();
     /** MCP OAuth 授权与工具审批解析（L1 端口；实现由 mcp 提供）。 */
     final McpApprovalOps mcpApprovalOps;
 final KnowledgeQaController knowledgeQaController;
-final FileProxyService fileProxyService;
+final FileProxyPort fileProxyService;
 
     /** 管理面协作者。 */
     final EmbedChannelMgmtOps mgmtOps;
@@ -98,7 +98,7 @@ final FileProxyService fileProxyService;
                                   MessageSuggestionController suggestionController,
                                   McpApprovalOps mcpApprovalOps,
                                   KnowledgeQaController knowledgeQaController,
-                                  FileProxyService fileProxyService) {
+                                  FileProxyPort fileProxyService) {
         this.service = service;
         this.embedSessionOps = embedSessionOps;
         this.messageController = messageController;

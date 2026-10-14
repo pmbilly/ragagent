@@ -5,7 +5,6 @@ import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.common.tenant.TenantConfigLookup;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +18,7 @@ import com.ragagent.storage.fileserve.FileProxyService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import com.ragagent.platform.web.ApiResult;
+import com.ragagent.common.storage.fileserve.FileServeHttp;
 
 /**
  * 文件代理面的引擎级路由。
@@ -113,10 +113,7 @@ public class FileProxyController {
 
     /** gin NoRoute 形态（供 GET-only 路由的 HEAD 处理复用）。 */
     public static void writeGinNoRoute(HttpServletResponse response) throws IOException {
-        response.setStatus(404);
-        response.setContentLength("404 page not found".length());
-        response.setContentType("text/plain");
-        response.getOutputStream().write("404 page not found".getBytes(StandardCharsets.US_ASCII));
+        FileServeHttp.writeGinNoRoute(response);
     }
 
     /**
@@ -126,12 +123,6 @@ public class FileProxyController {
      */
     public static boolean notFoundForHead(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        if (!"HEAD".equals(request.getMethod())) {
-            return false;
-        }
-        response.setContentLength("404 page not found".length());
-        response.setContentType("text/plain");
-        response.getOutputStream().write("404 page not found".getBytes(StandardCharsets.US_ASCII));
-        return true;
+        return FileServeHttp.notFoundForHead(request, response);
     }
 }

@@ -7,14 +7,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.contract.error.BizException;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
-import com.ragagent.storage.controller.FileProxyController;
-import com.ragagent.storage.fileserve.FileAccess;
-import com.ragagent.storage.fileserve.FileAccessException;
-import com.ragagent.storage.fileserve.FileAccessResolver;
-import com.ragagent.storage.fileserve.FileProxyService;
+import com.ragagent.common.storage.fileserve.FileProxyPort;
+import com.ragagent.common.storage.fileserve.FileServeHttp;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -34,20 +30,17 @@ import com.ragagent.platform.web.ApiResult;
 public class KnowledgeBaseFileProxyController {
 
     private final ChunkAccessGuard kbGuard;
-    private final FileAccessResolver accessResolver;
-    private final FileProxyService proxy;
+    private final FileProxyPort fileProxy;
 
-    public KnowledgeBaseFileProxyController(ChunkAccessGuard kbGuard, FileAccessResolver accessResolver,
-            FileProxyService proxy) {
+    public KnowledgeBaseFileProxyController(ChunkAccessGuard kbGuard, FileProxyPort fileProxy) {
         this.kbGuard = kbGuard;
-        this.accessResolver = accessResolver;
-        this.proxy = proxy;
+        this.fileProxy = fileProxy;
     }
 
     @RequestMapping(value = "/api/v1/knowledge-bases/{id}/files", method = RequestMethod.HEAD)
     public void filesHead(@PathVariable("id") String id, HttpServletResponse response)
             throws IOException {
-        FileProxyController.writeGinNoRoute(response);
+        FileServeHttp.writeGinNoRoute(response);
     }
 
     @GetMapping("/api/v1/knowledge-bases/{id}/files")
@@ -55,23 +48,8 @@ public class KnowledgeBaseFileProxyController {
             HttpServletResponse response) throws IOException {
         // AllowFileServeAPIKey 由 AllowFileServeAPIKeyInterceptor 承担（WebConfig 接线，
         // found" / 403 "Permission denied..." 信封（ChunkAccessGuard 内逐字实现）
+        // 闸门异常**不**在此吞掉：它走全局信封（黄金契约 w5c-kbfiles-missing-kb.json 锁定形态）
         KnowledgeBase kb = kbGuard.requireKbAccess(id);
-        String reference = FileProxyService.requireFilePathQuery(request, response);
-        if (reference == null) {
-            return;
-        }
-        FileAccess file;
-        try {
-            file = accessResolver.resolveKbFile(kb == null ? null : kb.getTenantId(), id, reference);
-        } catch (FileAccessException e) {
-            FileProxyService.fileAccessError(response, e);
-            return;
-        } catch (BizException e) {
-            // IsAppError 支路：{"error": message}（非全局信封）。requireKbAccess
-            FileProxyService.writeErrorJson(response, e.appError().httpCode(),
-                    e.appError().message());
-            return;
-        }
-        proxy.serveAuthorizedFile(response, request, file, "KB files");
+        fileProxy.serveKbFile(kb == null ? null : kb.getTenantId(), id, request, response);
     }
 }
