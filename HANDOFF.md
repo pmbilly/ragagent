@@ -1068,6 +1068,14 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **测试**：**4980 / 失败 0 / 跳过 4** ✓（首轮一次 `ImRedisStoreTest` Redis 型偶发，按约定重跑即绿）；启动测试 ✓；`spotlessCheck build` ✓ **1m39s** ✓ **十二守卫** ✓（环 0 / 包级 SCC 12 组）；`:domains:javadoc` ✓；定向 `--rerun-tasks` ✓。
 - **登记（B264 余下）**：session §8.8.1 大重构（21 包 / 120 文件）。
 
+**🔶 B264 第⑤步（2026-10-14，session 起步：`sse/` → `controller.sse/`）**
+- **首个最小簇**：`session.sse`（`SseContract` / `SseFrameWriter` / `StreamEventEmitter` / `StreamResponseBuilder`）→ `session.controller.sse`——类集与 §8.8.1 的 `controller.sse/` 目标**逐名一致** ✓；动前断言：四类对 session 域内包**零依赖**（出边只到 `common`/`llm`/`storage`/`platform`）⇒ 只产生 `controller → controller.sse`、`qa → controller.sse` 单向边。
+- **两树测试随迁**：`domains/src/test/.../session/sse/StreamResponseBuilderTest` + `boot/src/test/.../session/sse/SseFrameWriterTest` → `session/controller/sse/`（"同名包"两处一起处理）；三处空目录删除。
+- **锚点**：`scripts/check-event-face-case.py` 的 **`EVENT_MAP_FILES` 路径锚**（`session/sse/StreamResponseBuilder.java`，SSE 帧键位覆盖清单）换新路径——**这类"按路径的覆盖清单"漏换就静默丢覆盖**（与 `FROZEN_PREFIXES` 同族）。
+- **新增** `controller/sse/package-info`（写明迁入依据）。
+- **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 ✓；`spotlessCheck build` ✓ **1m38s** ✓ **十二守卫** ✓（环 0 / 包级 SCC 12 组）；`:domains:javadoc` ✓。
+- **登记（session 余下，按零风险优先）**：① `domain/`(36) 拆 `domain.conversation`(8) / `domain.document`(1) / `domain.message`(15)；② `qa/`(10) 拆入 `service.turn` / `service.rag`；③ `service/`(37) 拆入 `service.{attachment,enrichment,history,rag,rag.stage,suggestion,turn}`；④ 新增 `api/`(4 适配器) / `event/`(2) / `task/`(1)。
+
 **🔶 B263 第㉟步（2026-10-14，第二个子面 `service.chunk` 切出）**
 - **动前断言（把"可测"变成"可证"）**：脚本**先断言** `ChunkEditService`/`ChunkExtractService`/`ChunkReadService` 三者在 `service` 包内**入度为零**（无人引用，`package-info` 除外），断言不过就 abort —— 这样"切出只产生单向外边"不再靠推理。`ChunkQuestionService` **故意留在** `service`：它被 `QuestionGenerationService` 引用，单独搬会造出 `service ⇄ service.chunk` 环（已在子面 package-info 写明）。
 - **切出**：3 类 → `com.ragagent.knowledge.service.chunk`（`git mv` + 包声明 + 全仓 FQN 替换 3 文件）；测试面 `ChunkExtractServiceTest` 随迁；新建 `service/chunk/package-info`；`service/package-info` 同步。

@@ -31,7 +31,7 @@ import com.ragagent.session.service.SessionAgentQaService;
 import com.ragagent.session.service.SessionKnowledgeQaService;
 import com.ragagent.session.service.SessionService;
 import com.ragagent.session.service.TemporaryDocumentService;
-import com.ragagent.session.sse.StreamEventEmitter;
+import com.ragagent.session.controller.sse.StreamEventEmitter;
 import com.ragagent.platform.stream.StreamManager;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -40,7 +40,7 @@ import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.security.TenantAPIKeyScope;
 import com.ragagent.memory.service.MemoryExtractionService;
 import com.ragagent.session.service.SteerRunCoordinator;
-import com.ragagent.session.sse.SseFrameWriter;
+import com.ragagent.session.controller.sse.SseFrameWriter;
 import com.ragagent.storage.support.FileUrlPort;
 import com.ragagent.storage.support.Mode;
 import com.ragagent.storage.support.StorageBackendResolver;

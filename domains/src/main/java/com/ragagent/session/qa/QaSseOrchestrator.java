@@ -23,8 +23,8 @@ import com.ragagent.session.service.QaSupport.QaRequestContext;
 import com.ragagent.session.service.QaSupport.SseStreamContext;
 import com.ragagent.session.service.SessionService;
 import com.ragagent.session.service.SteerSinkBridge;
-import com.ragagent.session.sse.SseContract;
-import com.ragagent.session.sse.StreamEventEmitter;
+import com.ragagent.session.controller.sse.SseContract;
+import com.ragagent.session.controller.sse.StreamEventEmitter;
 import com.ragagent.storage.support.StreamRewriter;
 import com.ragagent.platform.stream.StreamBatch;
 import com.ragagent.platform.stream.StreamEvent;
@@ -35,7 +35,7 @@ import com.ragagent.common.llm.ToolResult;
 import com.ragagent.event.TenantContextSnapshot;
 import com.ragagent.event.payload.StopData;
 import com.ragagent.llm.domain.StreamResponse;
-import com.ragagent.session.sse.SseFrameWriter;
+import com.ragagent.session.controller.sse.SseFrameWriter;
 import com.ragagent.platform.stream.LiveRunExistsException;
 
 /**

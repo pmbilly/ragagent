@@ -1,4 +1,4 @@
-package com.ragagent.session.sse;
+package com.ragagent.session.controller.sse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
