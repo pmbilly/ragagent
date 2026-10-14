@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.ragagent.TestSchema;
-import com.ragagent.audit.service.AuditLogService;
+import com.ragagent.contract.audit.AuditWritePort;
 import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.tenant.mapper.TenantMapper;
 import com.ragagent.auth.service.TenantService;
@@ -85,7 +85,7 @@ class DataSourceServiceTest {
     @Autowired
     private TenantService tenantService;
     @Autowired
-    private AuditLogService auditLogService;
+    private AuditWritePort auditWriter;
     @Autowired
     private TenantMapper tenantMapper;
 
@@ -302,7 +302,7 @@ class DataSourceServiceTest {
         Scheduler scheduler = new Scheduler(dsRepo, syncLogRepo, queue, cron);
 
         service = new DataSourceService(dsRepo, syncLogRepo, bridge, queue, registry, scheduler,
-                tenantService, auditLogService, (kbId, name) -> null);
+                tenantService, auditWriter, (kbId, name) -> null);
     }
 
     private KnowledgeBase newKnowledgeBase() {

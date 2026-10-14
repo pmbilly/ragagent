@@ -288,6 +288,8 @@ public class SkillCatalogController {
                 "skill",
                 "",
                 "",
+                "",
+                "",
                 AuditOutcome.SUCCESS,
                 details.toString()));
     }

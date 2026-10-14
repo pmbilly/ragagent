@@ -1308,6 +1308,14 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **A② 全批提交**：`a7d3b13e`（第①批 42 类）· `37b5fbb8`（第②批 去框架化 37 类）· `2ee75327`（第②批 补：解锁 11 类）· 本批（第③批 9 类 + 收口）。
 - **A 的下一步**：**③ 立「域间只经契约」**（A20 已守"契约唯一实现"；还差"业务域之间只经 `contract`"这条规则——应先测现状再决定硬规则 vs 棘轮基线）。可选后续：① 的 K 级重设计（`JsonNode` → typed records）另立项。
 
+**🔶 A③ 第十五刀：审计端口扩展 + `auth`/`datasource` 双清（2026-10-14，R10 边 47 → 45、类 259 → 255）**
+- **前置（刀十四登记的）**：`AuditWritePort.AuditRecord` **+`scopeType`/`scopeId`** ✓ —— 既有构造点仅 **1 处**（`SkillCatalogController` ⇒ 补两个空串 ✓）；适配器补 `setScopeType/setScopeId` ✓（`nullSafe` ⇒ `""`，与实体 varchar 默认 `""` 一致 ✓ 无行为变化 ✓）
+- **迁移 4 类**（helper 由"建 `AuditLog` 实体 + `auditService.logBestEffort`" ⇒ "建 `AuditRecord` + `auditWriter.logBestEffort`"）：`auth/TenantInvitationService`、`auth/TenantMemberService`、`datasource/DataSourceSupport`（**带 scope** ✓）、`datasource/DataSourceService`（字段 `audit` → `auditWriter` ✓，供 `DataSourceSupport` 用 ✓）⇒ **`auth→audit` 与 `datasource→audit` 双双清零** ✓
+- **⚠️ 一个"看起来没清"的原因（值得记）**：改完后 R10 只减 **1** 类 ✗ —— 因为 4 个文件的 **`AuditLog` import 已无用但仍在** ✗，而 **R10 按 import 计边** ⇒ 死 import 让边留着 ✓ ⇒ 清掉后四条类同时落出边 ✓ ⇒ **"改实现"必须与"清 import"同步，否则 R10 与死成员守卫会各自报账** ✓（本次两边一致指出 ✓）
+- **测试改动**：`DataSourceServiceTest` 的 mock 由 `AuditLogService` ⇒ `AuditWritePort` ✓（该处无 verify，纯构造参数 ✓）
+- **验证**：**13 守卫全绿** ✓；`arch.*` + `DataSource*`/`Auth*`/`Invitation*`/`Member*` 定向 ✓；`spotlessCheck build` ✓ **2m04s** ✓；**4987 / 失败 0 / 跳过 4**（boot **1331** ✓）
+- **A③ 累计（十五刀）**：边 **64 → 45（−19）**、类 **317 → 255（−62）**；三档 **① 37 条 / 169 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
+- **余量（同族收官，前置已就位 ✓）**：`knowledge→audit`（2：`FaqEntryCommandService`/`KnowledgeTagService`，**均带 scope** ✓）+ `system→audit`（3：`SystemAdminController` **2 处构造** / `SystemAdminUserService` / `SystemSettingService` —— 后两者有 `auditService == null` **空守卫** ✗ ⇒ 端口须保留同语义）⇒ 应再清 **2 条边**
 **🔶 A③ 第十四刀：审计常量入契约 ⇒ `agentmanagement→audit` 清零（2026-10-14，R10 边 48 → 47、类 261 → 259）**
 - **刀法**：`audit.domain.AuditAction` + `AuditOutcome`（**纯 JDK 常量类** ✓ 纯度断言先过）→ **`contract.audit`** ⇒ 只依赖常量的两个类（`SkillCatalogController`、`DataSourceSyncResultOps`）**落出边**：**`agentmanagement→audit` 整条清零** ✓、`datasource→audit` 3 → 2 ✓；FQN 替换 **22 文件**（编译一次通过 ✓ —— 无同包裸引用残留 ✓）
 - **⚠️ 计划修正（重要，登记）**：我原以为"`AuditWritePort` 已在 ⇒ 一笔清 5 条边 / 11 类"，**实测不成立**：

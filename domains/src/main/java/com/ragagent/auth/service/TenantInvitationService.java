@@ -15,9 +15,8 @@ import com.ragagent.platform.persistence.PageRequests;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.contract.audit.AuditAction;
-import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.contract.audit.AuditOutcome;
-import com.ragagent.audit.service.AuditLogService;
+import com.ragagent.contract.audit.AuditWritePort;
 import com.ragagent.auth.domain.TenantInvitation;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.contract.tenant.TenantRole;
@@ -69,14 +68,14 @@ public class TenantInvitationService {
 
     private final TenantInvitationMapper invitationMapper;
     private final TenantMemberService memberService;
-    private final AuditLogService auditService;
+    private final AuditWritePort auditWriter;
 
     public TenantInvitationService(TenantInvitationMapper invitationMapper,
                                    TenantMemberService memberService,
-                                   AuditLogService auditService) {
+            AuditWritePort auditWriter) {
         this.invitationMapper = invitationMapper;
         this.memberService = memberService;
-        this.auditService = auditService;
+        this.auditWriter = auditWriter;
     }
 
     // ── TTL / 开关 ─────────────────────────────────────────────────────────
@@ -522,16 +521,17 @@ public class TenantInvitationService {
         ObjectNode details = MAPPER.createObjectNode();
         details.put("invitation_id", Long.parseLong(invId));
         details.put("role", role);
-        AuditLog entry = new AuditLog();
-        entry.setTenantId(tenantId);
-        entry.setActorUserId(TenantContext.currentUserId() == null ? "" : TenantContext.currentUserId());
-        entry.setActorRole(TenantContext.currentRole() == null ? "" : TenantContext.currentRole());
-        entry.setAction(action);
-        entry.setTargetType("tenant_invitation");
-        entry.setTargetId(invId);
-        entry.setTargetUserId(targetUserId);
-        entry.setOutcome(AuditOutcome.SUCCESS);
-        entry.setDetails(details);
-        auditService.logBestEffort(entry);
+        auditWriter.logBestEffort(new AuditWritePort.AuditRecord(
+                tenantId,
+                TenantContext.currentUserId() == null ? "" : TenantContext.currentUserId(),
+                TenantContext.currentRole() == null ? "" : TenantContext.currentRole(),
+                action,
+                "tenant_invitation",
+                invId,
+                targetUserId,
+                "",
+                "",
+                AuditOutcome.SUCCESS,
+                details == null ? null : details.toString()));
     }
 }

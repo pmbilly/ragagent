@@ -13,9 +13,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.contract.audit.AuditAction;
-import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.contract.audit.AuditOutcome;
-import com.ragagent.audit.service.AuditLogService;
+import com.ragagent.contract.audit.AuditWritePort;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.auth.domain.AuthToken;
@@ -62,16 +61,16 @@ public class TenantMemberService {
     private final TenantMemberMapper memberMapper;
     private final UserMapper userMapper;
     private final AuthTokenMapper authTokenMapper;
-    private final AuditLogService auditService;
+    private final AuditWritePort auditWriter;
 
     public TenantMemberService(TenantMemberMapper memberMapper,
                                UserMapper userMapper,
                                AuthTokenMapper authTokenMapper,
-                               AuditLogService auditService) {
+            AuditWritePort auditWriter) {
         this.memberMapper = memberMapper;
         this.userMapper = userMapper;
         this.authTokenMapper = authTokenMapper;
-        this.auditService = auditService;
+        this.auditWriter = auditWriter;
     }
 
     // ── 登录链 ────────────────────────────────────────────────────────────
@@ -362,16 +361,18 @@ public class TenantMemberService {
 
     /** best-effort 审计（审计失败绝不拖垮业务操作） */
     private void emitAudit(long tenantId, String action, String targetUserId, ObjectNode details) {
-        AuditLog entry = new AuditLog();
-        entry.setTenantId(tenantId);
-        entry.setActorUserId(TenantContext.currentUserId() == null ? "" : TenantContext.currentUserId());
-        entry.setActorRole(TenantContext.currentRole() == null ? "" : TenantContext.currentRole());
-        entry.setAction(action);
-        entry.setTargetType("tenant_member");
-        entry.setTargetUserId(targetUserId);
-        entry.setOutcome(AuditOutcome.SUCCESS);
-        entry.setDetails(details);
-        auditService.logBestEffort(entry);
+        auditWriter.logBestEffort(new AuditWritePort.AuditRecord(
+                tenantId,
+                TenantContext.currentUserId() == null ? "" : TenantContext.currentUserId(),
+                TenantContext.currentRole() == null ? "" : TenantContext.currentRole(),
+                action,
+                "tenant_member",
+                "",
+                targetUserId,
+                "",
+                "",
+                AuditOutcome.SUCCESS,
+                details == null ? null : details.toString()));
     }
 
     /** 角色变更审计：old_role/new_role 进 Details 供审计 UI 渲染 */

@@ -1,5 +1,7 @@
 package com.ragagent.datasource.service;
 
+import com.ragagent.contract.audit.AuditWritePort;
+
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +10,6 @@ import java.util.Objects;
 import java.util.TreeMap;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.datasource.domain.connector.Connector;
@@ -267,18 +268,18 @@ final class DataSourceSupport {
         String actorId = nullToEmpty(TenantContext.currentUserId());
         String actorRole = actorId.isEmpty() ? "" : nullToEmpty(TenantContext.currentRole());
 
-        AuditLog entry = new AuditLog();
-        entry.setTenantId(tid);
-        entry.setActorUserId(actorId);
-        entry.setActorRole(actorRole);
-        entry.setAction(action);
-        entry.setScopeType("knowledge_base");
-        entry.setScopeId(kbId);
-        entry.setTargetType(targetType);
-        entry.setTargetId(targetId);
-        entry.setOutcome(effOutcome);
-        entry.setDetails(detailsNode);
-        service.audit.logBestEffort(entry);
+        service.auditWriter.logBestEffort(new AuditWritePort.AuditRecord(
+                tid,
+                actorId,
+                actorRole,
+                action,
+                targetType,
+                targetId,
+                "",
+                "knowledge_base",
+                kbId,
+                effOutcome,
+                detailsNode == null ? null : detailsNode.toString()));
     }
 
     static String nullToEmpty(String v) {

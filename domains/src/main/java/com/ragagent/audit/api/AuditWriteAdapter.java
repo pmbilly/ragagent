@@ -33,6 +33,8 @@ public class AuditWriteAdapter implements AuditWritePort {
         entry.setTargetType(nullSafe(record.targetType()));
         entry.setTargetId(nullSafe(record.targetId()));
         entry.setTargetUserId(nullSafe(record.targetUserId()));
+        entry.setScopeType(nullSafe(record.scopeType()));
+        entry.setScopeId(nullSafe(record.scopeId()));
         entry.setOutcome(nullSafe(record.outcome()));
         entry.setDetails(parseDetails(record.detailsJson()));
         auditLogService.logBestEffort(entry);

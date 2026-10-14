@@ -13,7 +13,7 @@ import java.util.UUID;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.audit.AuditAction;
 import com.ragagent.contract.audit.AuditOutcome;
-import com.ragagent.audit.service.AuditLogService;
+import com.ragagent.contract.audit.AuditWritePort;
 import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.datasource.domain.connector.Connector;
 import com.ragagent.datasource.domain.connector.ConnectorRegistry;
@@ -118,7 +118,7 @@ public class DataSourceService implements DataSourceSyncHandler {
     final ConnectorRegistry connectorRegistry;
     final Scheduler scheduler;
     final TenantConfigLookup tenantService;
-    final AuditLogService audit;
+    final AuditWritePort auditWriter;
     final AutoTagProvider autoTagProvider;
 
     /** 结果落库协作者（构造期装配）。 */
@@ -140,7 +140,7 @@ public class DataSourceService implements DataSourceSyncHandler {
                              ConnectorRegistry connectorRegistry,
                              Scheduler scheduler,
                              TenantConfigLookup tenantService,
-                             AuditLogService audit,
+                             AuditWritePort auditWriter,
                              AutoTagProvider autoTagProvider) {
         this.dsRepo = dsRepo;
         this.syncLogRepo = syncLogRepo;
@@ -149,7 +149,7 @@ public class DataSourceService implements DataSourceSyncHandler {
         this.connectorRegistry = connectorRegistry;
         this.scheduler = scheduler;
         this.tenantService = tenantService;
-        this.audit = audit;
+        this.auditWriter = auditWriter;
         this.autoTagProvider = autoTagProvider;
         this.resultOps = new DataSourceSyncResultOps(this);
         this.support = new DataSourceSupport(this);

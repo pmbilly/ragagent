@@ -20,12 +20,14 @@ public interface AuditWritePort {
      * @param targetType   目标类型（如 {@code "skill"}）
      * @param targetId     目标 id（可空串）
      * @param targetUserId 目标用户 id（RBAC 动作用，可空串）
+     * @param scopeType    作用域类型（如 {@code "knowledge_base"}；无作用域传空串——与实体默认值一致）
+     * @param scopeId      作用域 id（无作用域传空串）
      * @param outcome      {@code audit.domain.AuditOutcome} 的 String 常量
      * @param detailsJson  详情 JSON（null/空 = 无详情）
      */
     record AuditRecord(long tenantId, String actorUserId, String actorRole, String action,
-            String targetType, String targetId, String targetUserId, String outcome,
-            String detailsJson) {
+            String targetType, String targetId, String targetUserId, String scopeType, String scopeId,
+            String outcome, String detailsJson) {
     }
 
     /** 尽力而为写一条审计（实现内吞异常，与迁移前 {@code logBestEffort} 同语义）。 */
