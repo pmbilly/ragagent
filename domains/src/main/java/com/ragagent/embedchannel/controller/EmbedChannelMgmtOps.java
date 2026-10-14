@@ -190,7 +190,7 @@ final class EmbedChannelMgmtOps {
         } catch (EmbedError e) {
             throw EmbedChannelController.writeMgmtError(e);
         }
-        long total = ctrl.service.countEmbedSessions(EmbedChannelController.currentTenant(), EmbedChannelController.trim(channelId), ctrl.sessionRepository);
+        long total = ctrl.embedSessionOps.countSessions(EmbedChannelController.currentTenant(), EmbedChannelController.trim(channelId));
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("sessionCount", total);
         return ResponseEntity.ok(data);

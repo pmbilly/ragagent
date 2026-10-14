@@ -12,6 +12,7 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.web.error.PlainErrorException;
 import com.ragagent.common.mcp.McpApprovalOps;
+import com.ragagent.common.session.EmbedSessionOps;
 import com.ragagent.embedchannel.EmbedError;
 import com.ragagent.embedchannel.EmbedTokens;
 import com.ragagent.embedchannel.domain.EmbedChannelEntity;
@@ -20,10 +21,6 @@ import com.ragagent.embedchannel.service.EmbedChannelService;
 import com.ragagent.session.controller.MessageController;
 import com.ragagent.session.controller.MessageSuggestionController;
 import com.ragagent.session.controller.SessionController;
-import com.ragagent.session.domain.conversation.Session;
-import com.ragagent.session.domain.conversation.SessionOwnerIds;
-import com.ragagent.session.repository.SessionRepository;
-import com.ragagent.session.service.SessionService;
 import com.ragagent.storage.support.StorageUrlContext;
 
 import org.springframework.http.ResponseEntity;
@@ -76,8 +73,7 @@ public class EmbedChannelController {
 
 static final ObjectMapper MAPPER = JsonMappers.lenient();
     final EmbedChannelService service;
-    final SessionService sessionService;
-    final SessionRepository sessionRepository;
+    final EmbedSessionOps embedSessionOps;
     final MessageController messageController;
     final SessionController sessionController;
     final MessageSuggestionController suggestionController;
@@ -96,8 +92,7 @@ final FileProxyService fileProxyService;
     final EmbedChannelDelegateOps delegateOps;
 
     public EmbedChannelController(EmbedChannelService service,
-                                  SessionService sessionService,
-                                  SessionRepository sessionRepository,
+                                  EmbedSessionOps embedSessionOps,
                                   MessageController messageController,
                                   SessionController sessionController,
                                   MessageSuggestionController suggestionController,
@@ -105,8 +100,7 @@ final FileProxyService fileProxyService;
                                   KnowledgeQaController knowledgeQaController,
                                   FileProxyService fileProxyService) {
         this.service = service;
-        this.sessionService = sessionService;
-        this.sessionRepository = sessionRepository;
+        this.embedSessionOps = embedSessionOps;
         this.messageController = messageController;
         this.sessionController = sessionController;
         this.suggestionController = suggestionController;
@@ -320,28 +314,17 @@ void ensureSession(String sessionId) {
         if (sessionId == null || sessionId.isEmpty()) {
             throw new PlainErrorException(400, "session_id is required");
         }
-        Session sess;
-        try {
-            sess = sessionService.getSessionById(tenantId, sessionId);
-        } catch (RuntimeException e) {
-            sess = null;
-        }
+        EmbedSessionOps.OwnershipView sess = embedSessionOps.ownership(tenantId, sessionId);
         if (sess == null) {
             throw new PlainErrorException(404, "session not found");
         }
         String marker = EmbedChannelService.embedSessionDescription(ch.getId());
-        if (sess.getTenantId() == null || sess.getTenantId().longValue() != tenantId
-                || !marker.equals(sess.getDescription())) {
+        if (sess.tenantId() == null || sess.tenantId().longValue() != tenantId
+                || !marker.equals(sess.description())) {
             throw new PlainErrorException(403, "session not allowed for this embed channel");
         }
-        String owner = SessionOwnerIds.EMBED_SESSION_PREFIX + tenantId + ":" + ch.getId()
-                + ":" + sessionId;
-        if (sess.getUserId() == null || sess.getUserId().trim().isEmpty()) {
-            try {
-                sessionRepository.setOwnerId(tenantId, sessionId, owner);
-            } catch (RuntimeException e) {
-                // 失败仅记 warn 后继续
-            }
+        if (sess.userId() == null || sess.userId().trim().isEmpty()) {
+            embedSessionOps.attachOwner(tenantId, ch.getId(), sessionId);
         }
         String sig = trim(request0().getHeader("X-Embed-Session"));
         if (!EmbedTokens.verifyHandle(ch, sessionId, sig)) {

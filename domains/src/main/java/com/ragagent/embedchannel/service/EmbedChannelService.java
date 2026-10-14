@@ -21,10 +21,6 @@ import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 import com.ragagent.embedchannel.mapper.EmbedChannelMapper;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.repository.ChunkRepository;
-import com.ragagent.session.domain.conversation.Session;
-import com.ragagent.session.domain.conversation.SessionListQuery;
-import com.ragagent.session.domain.conversation.SessionPage;
-import com.ragagent.session.repository.SessionRepository;
 
 /**
  * embed 渠道 service（含 session token/签名段）。
@@ -711,24 +707,6 @@ public class EmbedChannelService {
     /** embed 会话描述标记：前缀 + 渠道 id。 */
     public static String embedSessionDescription(String channelId) {
         return EMBED_SESSION_MARKER_PREFIX + channelId;
-    }
-
-    /** embed 来源的会话计数（source=embed:cid；渠道来源丢弃按人裁剪）。 */
-    public long countEmbedSessions(long tenantId, String channelId,
-                                   SessionRepository sessionRepository) {
-        SessionListQuery query = SessionListQuery.of(null, "embed:" + channelId, null, 1, 1);
-        SessionPage items = sessionRepository.queryPaged(query.withScope(tenantId, ""));
-        return items.total();
-    }
-
-    /** 建 embed 会话（空标题 + 描述标记 + 访客 id 落库；访客为空时存 NULL）。 */
-    public static Session newEmbedSession(long tenantId, String channelId, String visitorId) {
-        Session session = new Session();
-        session.setTenantId(tenantId);
-        session.setTitle("");
-        session.setDescription(embedSessionDescription(channelId));
-        session.setEmbedVisitorId(visitorId);
-        return session;
     }
 
     private static String trim(String s) {

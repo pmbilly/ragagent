@@ -1308,6 +1308,18 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **A② 全批提交**：`a7d3b13e`（第①批 42 类）· `37b5fbb8`（第②批 去框架化 37 类）· `2ee75327`（第②批 补：解锁 11 类）· 本批（第③批 9 类 + 收口）。
 - **A 的下一步**：**③ 立「域间只经契约」**（A20 已守"契约唯一实现"；还差"业务域之间只经 `contract`"这条规则——应先测现状再决定硬规则 vs 棘轮基线）。可选后续：① 的 K 级重设计（`JsonNode` → typed records）另立项。
 
+**🔶 A③ 第十三刀（服务侧段）：`common.session.EmbedSessionOps` 收回会话读写（2026-10-14，`embedchannel→session` **4 → 2 类**；R10 类 263 → 261）**
+- **本刀范围（刻意分段）**：`embedchannel→session` 是 embed 最大的一块（4 类 / 17 import）。本段先吃掉**服务侧**：`EmbedChannelService`（`newEmbedSession` 工厂 + `countEmbedSessions(…, SessionRepository)` ✗ 把持久层当参数传）与 `EmbedChannelPublicOps`（建访客会话 + 历史列表 + 自己拼 `SessionOwnerIds.EMBED_SESSION_PREFIX` owner 串 ✗），再把 `EmbedChannelController.ensureSession` 的归属查询/补 owner 一并改端口 ⇒ **两类清零** ✓（余 2 类见下）
+- **端口**：**L1 `common.session.EmbedSessionOps`**（6 方法，**全类型化** ✓）——`ownership(tenantId, sessionId)`（record `OwnershipView(Long tenantId, String description, String userId)`）、`createVisitorSession(tenantId, channelId, marker, visitorId)`、`attachOwner(tenantId, channelId, sessionId)`、`countSessions(tenantId, channelId)`、`visitorSessions(…, limit)`（record `VisitorSessionRow(id, title, updatedAt)`）
+- **适配器**：**`session/api/EmbedSessionOpsAdapter`** —— **owner 串规则**（`EMBED_SESSION_PREFIX`）与 **查询口径**（`SessionListQuery`/`queryPaged`/`listEmbedVisitorSessions` 投影映射）全部**留在会话域** ✓，embed 侧不再拼 owner ✗、不再见 `Session`/`EmbedVisitorSessionRow` 实体 ✗
+- **关键约束（本刀最重要的发现）**：**L1 端口不能引用域实体** ✗（`common` 不得依赖业务域 ⇒ `Message`/`Session`/`EmbedVisitorSessionRow` 都出不去）⇒ 服务侧能**类型化**（视图 record ✓），而 **delegate 侧另一类**：
+  - **QA 两入口是 `servlet + SSE`**（`void agentQA/knowledgeQA(..., HttpServletResponse)` ✗ 直接写响应）⇒ 端口只能是 **servlet 形态的 seam**（与 A② 登记的 `ApiKeyAuthPort` 同族 K 级 ✗），或改流式契约（`contract.session.TurnStreams` 方向，K 级）
+  - **`loadMessages` 返回 `ResponseEntity<List<Message>>`**（**实体列表** ✗）⇒ 需 `Message` 实体 → 视图的 K 级重设计（与 `PipelineMessageView` 同族，但那已是契约类型 ✓）
+  ⇒ **下一刀前需拍板形态**（① servlet seam 立即可做、零行为变化；② 视图化是正解但要动金片）
+- **⚠️ 一处设计自纠（当场改）**：我最初让适配器从 marker **反推** channelId（`lastIndexOf(':')`）✗ —— 标记格式由 embed 侧定、不含分隔符也成立 ⇒ 改为 **端口显式传 `channelId`** ✓（签名 `createVisitorSession(tenantId, channelId, marker, visitorId)`）⇒ **不要从"人读字符串"里反推结构化字段** ✓
+- **验证**：**`EmbedContractTest`（金片）+ `EmbedChatPayloadPatchTest` + `EmbedRateLimiterTest` + `arch.*` 全绿** ✓（行为等价的直接证据：访客会话创建/历史列表/归属校验三条路径的响应体与状态码未变 ✓）；**13 守卫全绿** ✓；`spotlessCheck build` ✓ **1m56s** ✓；**4987 / 失败 0 / 跳过 4**（**boot 1331** ✓）
+- **A③ 累计（十三刀）**：边 **64 → 48**（本刀未再清边，类 **317 → 261（−56）**）；三档 **① 40 条 / 175 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
+- **下一步**：① **拍板** delegate 侧形态（servlet seam ⇄ 视图化）；② `mcp→approval` 余 7（构造/策略面再分一层）；③ `im→agentmanagement` 余 7（扩 `AgentLookup`，按调用点扫 ✓）；④ `session` 能力边 63 类
 **🔶 A③ 第十二刀：MCP OAuth/审批操作面端口化 ⇒ `embedchannel→mcp` 清零（2026-10-14，R10 边 49 → 48、类 265 → 263）**
 - **问题形态（最严重的一类）**：embedchannel 直接注入 mcp 的**两个 controller**（`McpOAuthController` / `AgentToolApprovalController`）✗（违反 §12.1 规则 1「controller 只被装配层与外部调用」），并把访客请求体**解析成 mcp 的嵌套 DTO**（`McpOAuthController.AuthorizeRequest` / `.ResolveRequest` / `ResolveToolApprovalRequest`）✗ —— 共 5 个操作：`authorizeUrl` / `status` / `resolveMcpOAuth` / `cancelMcpOAuth` / `resolveToolApproval`
 - **设计（两条关键取舍）**：

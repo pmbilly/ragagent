@@ -1,5 +1,7 @@
 package com.ragagent.embedchannel.controller;
 
+import com.ragagent.common.session.EmbedSessionOps;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -11,9 +13,6 @@ import com.ragagent.embedchannel.EmbedError;
 import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 import com.ragagent.embedchannel.service.EmbedChannelService;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.session.domain.conversation.EmbedVisitorSessionRow;
-import com.ragagent.session.domain.conversation.Session;
-import com.ragagent.session.domain.conversation.SessionOwnerIds;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -127,24 +126,16 @@ final class EmbedChannelPublicOps {
         if (!visitor.isEmpty() && !EmbedChannelController.validVisitor(visitor)) {
             return EmbedChannelController.plainError(400, "invalid embed visitor id");
         }
-        Session created;
+        String createdId;
         try {
-            created = ctrl.sessionService.createSession(
-                    EmbedChannelService.newEmbedSession(tenantId, ch.getId(), visitor));
+            createdId = ctrl.embedSessionOps.createVisitorSession(tenantId, ch.getId(),
+                    EmbedChannelService.embedSessionDescription(ch.getId()), visitor);
         } catch (RuntimeException e) {
             return EmbedChannelController.plainError(500, "failed to create session");
         }
-        String owner = SessionOwnerIds.EMBED_SESSION_PREFIX + tenantId + ":" + ch.getId()
-                + ":" + created.getId();
-        try {
-            ctrl.sessionRepository.setOwnerId(tenantId, created.getId(), owner);
-            created.setUserId(owner);
-        } catch (RuntimeException e) {
-            // 失败仅记 warn 后继续
-        }
-        String sig = EmbedTokens.signHandle(ch, created.getId());
+        String sig = EmbedTokens.signHandle(ch, createdId);
         Map<String, Object> data = new LinkedHashMap<>();
-        data.put("id", created.getId());
+        data.put("id", createdId);
         data.put("sig", sig);
         return ResponseEntity.status(201).body(data);
     }
@@ -165,21 +156,21 @@ final class EmbedChannelPublicOps {
         if (!EmbedChannelController.validVisitor(visitor)) {
             return EmbedChannelController.plainError(400, "invalid embed visitor id");
         }
-        List<EmbedVisitorSessionRow> rows;
+        List<EmbedSessionOps.VisitorSessionRow> rows;
         try {
-            rows = ctrl.sessionRepository.listEmbedVisitorSessions(tenantId,
+            rows = ctrl.embedSessionOps.visitorSessions(tenantId,
                     EmbedChannelService.embedSessionDescription(ch.getId()), visitor,
                     MAX_HISTORY_SESSIONS);
         } catch (RuntimeException e) {
             return EmbedChannelController.plainError(500, "failed to load sessions");
         }
         List<Map<String, Object>> sessions = new ArrayList<>(rows.size());
-        for (EmbedVisitorSessionRow row : rows) {
+        for (EmbedSessionOps.VisitorSessionRow row : rows) {
             Map<String, Object> item = new LinkedHashMap<>();
-            item.put("id", row.getId());
-            item.put("title", row.getTitle() == null ? "" : row.getTitle());
-            item.put("updatedAt", row.getUpdatedAt());
-            item.put("sig", EmbedTokens.signHandle(ch, row.getId()));
+            item.put("id", row.id());
+            item.put("title", row.title() == null ? "" : row.title());
+            item.put("updatedAt", row.updatedAt());
+            item.put("sig", EmbedTokens.signHandle(ch, row.id()));
             sessions.add(item);
         }
         Map<String, Object> data = new LinkedHashMap<>();
