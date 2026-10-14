@@ -22,7 +22,7 @@ import com.ragagent.knowledge.dto.doc.UpdateKnowledgeRequest;
 import com.ragagent.knowledge.dto.TaskIdResponse;
 import com.ragagent.knowledge.dto.doc.UpdateManualRequest;
 import com.ragagent.knowledge.service.KnowledgeFileService;
-import com.ragagent.knowledge.service.KnowledgeService;
+import com.ragagent.knowledge.service.management.KnowledgeService;
 import com.ragagent.knowledge.storage.LocalStorageService;
 import com.ragagent.storage.fileserve.FileTransport;
 import jakarta.servlet.http.HttpServletRequest;

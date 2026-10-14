@@ -12,7 +12,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.ragagent.knowledge.service.KnowledgeBaseService;
-import com.ragagent.knowledge.service.KnowledgeService;
+import com.ragagent.knowledge.service.management.KnowledgeService;
 
 /**
  * web 搜索临时 KB 的 Redis 状态（Get/Save/Delete 三方法，键

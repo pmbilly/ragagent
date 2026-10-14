@@ -19,7 +19,7 @@ import java.util.LinkedHashMap;
 
 /**
  * 知识处理 spans 合成树。静态 canonical 时间线复用门面公开常量
- * {@link KnowledgeService#ALL_STAGES}；时间渲染复用门面同包 helper {@code timeString}。
+ * {@link com.ragagent.knowledge.service.management.KnowledgeService KnowledgeService#ALL_STAGES}；时间渲染复用门面同包 helper {@code timeString}。
  */
 @Service
 public class KnowledgeSpanService {

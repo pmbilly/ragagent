@@ -34,7 +34,7 @@
     "domains/src/main/java/com/ragagent/knowledge/chunker/LegacySplitter.java": 614,
     "domains/src/main/java/com/ragagent/knowledge/service/faq/FaqEntryCommandService.java": 772,
     "domains/src/main/java/com/ragagent/knowledge/service/KnowledgeBaseService.java": 626,
-    "domains/src/main/java/com/ragagent/knowledge/service/KnowledgeService.java": 796,
+    "domains/src/main/java/com/ragagent/knowledge/service/management/KnowledgeService.java": 717,
     "domains/src/main/java/com/ragagent/knowledge/service/KnowledgeSummaryService.java": 684,
     "domains/src/main/java/com/ragagent/knowledge/domain/span/SpanTracker.java": 698,
     "domains/src/main/java/com/ragagent/knowledge/task/KnowledgeProcessWorker.java": 789,

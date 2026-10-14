@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.service;
+package com.ragagent.knowledge.service.management;
 
 import com.ragagent.knowledge.domain.KnowledgeTenants;
 
@@ -54,6 +54,17 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 import com.ragagent.knowledge.index.ChunkVectorIndexer;
+import com.ragagent.knowledge.service.KnowledgeAccessHelper;
+import com.ragagent.knowledge.service.KnowledgeMoveService;
+import com.ragagent.knowledge.service.KnowledgeCloneService;
+import com.ragagent.knowledge.service.KnowledgeFolderService;
+import com.ragagent.knowledge.service.KnowledgeBatchOpsService;
+import com.ragagent.knowledge.service.KnowledgeParseService;
+import com.ragagent.knowledge.service.KnowledgeSummaryService;
+import com.ragagent.knowledge.service.KnowledgeSearchService;
+import com.ragagent.knowledge.service.KnowledgeSpanService;
+import com.ragagent.knowledge.service.KnowledgeFileService;
+import com.ragagent.knowledge.service.DuplicateKnowledgeException;
 
 /**
  * （覆盖 file/url/manual 创建、分页列表、get/update/delete、folders；

@@ -19,7 +19,7 @@ import com.ragagent.event.EventBus;
 import com.ragagent.event.EventIds;
 import com.ragagent.event.EventType;
 import com.ragagent.event.payload.SessionTitleData;
-import com.ragagent.knowledge.service.KnowledgeService;
+import com.ragagent.knowledge.service.management.KnowledgeService;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;

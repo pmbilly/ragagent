@@ -976,7 +976,17 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **实测证明它是残留**：① 它只用门面**一个**方法 `batchDeleteKnowledge`；② 门面里那方法是**纯转派** `return batchOpsService.batchDeleteKnowledge(...)`；③ **门面根本不依赖本类**（ctor 里没有它）⇒ **无环可绕**。⇒ 改为**直接依赖真正的实现者** `KnowledgeBatchOpsService`，删掉 Provider 与 null 分支（连带清 `ObjectProvider` import）。
 - **可测量的结果**：`service` 包内**代码级**引用 `KnowledgeService` 的类 = **0 个**（去 javadoc/行注释后统计）⇒ 门面归位（`service.management`）不再被钉住，且它的 11 条出边全是单向（`service.management → service`），SCC 不会扩大。**登记**：R6 目前只禁 `@Lazy`，`ObjectProvider` 型绕环在仓内已有先例（B263㉕ 那处是**刻意**的装配裁剪容忍，本处是**残留**）⇒ 可考虑加一条"ObjectProvider 需自述理由"的守卫（待评估，不在本批）。
 - **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ 十一守卫+新守卫 ✓（环 0 / 包级 SCC 12 组）。
-- **下一步**：`KnowledgeService`（+ 视需要 `DuplicateKnowledgeException`）→ `service.management`（门面归位，B263 结构目标的收口）。`service.chunk` 现 4 类；`KnowledgeTagService`（零入度，可作 `service.tag`，单类面偏薄）；**门面归位的最后一关**是 `KnowledgeService` 的 6 个引用者。
+- **下一步**：`KnowledgeService`（+ 视需要 `DuplicateKnowledgeException`）→ `service.management`（门面归位，B263 结构目标的收口）。
+- **下一步**：`KnowledgeService`（+ 视需要 `DuplicateKnowledgeException`）→ `service.management`（门面归位，B263 结构目标的收口）。
+
+**🔶 B263 第㊳步（2026-10-14，**门面归位 `service.management`** ⇒ B263 结构收口）**
+- **动前断言**：脚本先断言 `service` 包内**代码级**（去 javadoc/行注释）**无一处**引用 `KnowledgeService` ——不过即 abort。断言通过 ⇒ 搬迁只会产生 `service.management → service` 与 `service.{chunk,faq} → service.management` 这类**单向边**。
+- **搬迁**：`KnowledgeService` → `com.ragagent.knowledge.service.management`（`git mv` + 包声明 + **全仓 FQN 替换 23 文件**）；javadoc 简单名失链修复 1 处（`KnowledgeSpanService` 的 `{@link KnowledgeService}` ⇒ 全限定）；新建 `management/package-info`（写明"为何现在能搬"）；`service/package-info` 子面清单补 `management/`。
+- **跨模块复核（避免误伤同名类型）**：`engine`/`common`/`boot` 里出现的 `KnowledgeService` **都不是**本门面——`chatpipeline.PipelinePorts.KnowledgeService` 是**同名嵌套接口**、另有纯 javadoc 提及 ⇒ FQN 替换用精确模式（`com.ragagent.knowledge.service.KnowledgeService`）因而**零误伤** ✓。
+- **两处换锚**：`file-size.baseline.json` 的 `limits`（**796 → 717**，换锚 + 收紧）、`check-json-key-case.py` 的键级豁免 `{'updated_at'}`（路径换锚，键与理由不变）。
+- **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m41s** ✓ **十二守卫** ✓ —— **包级 SCC 仍 12 组**（门面归位未造环，㉝/㊲ 的断边工作在此兑现）。
+- **B263 结构目标至此收口**：mapper 直连归零 · `{service, task}` SCC 消除 · 门面归位（`service.management`）· 两个子面（`service.faq` 8 类 / `service.chunk` 4 类）已切出。
+- **登记（后续可选，非 B263 必需）**：`service` 其余子面继续细分（`KnowledgeTagService` 可作 `service.tag`；`DuplicateKnowledgeException`/`KnowledgeAccessHelper`/`KnowledgeSpanService` 与 11 个协作者面）；"ObjectProvider 需自述理由"守卫（㊲ 登记）。`service.chunk` 现 4 类；`KnowledgeTagService`（零入度，可作 `service.tag`，单类面偏薄）；**门面归位的最后一关**是 `KnowledgeService` 的 6 个引用者。
 **🔶 B263 第㉟步（2026-10-14，第二个子面 `service.chunk` 切出）**
 - **动前断言（把"可测"变成"可证"）**：脚本**先断言** `ChunkEditService`/`ChunkExtractService`/`ChunkReadService` 三者在 `service` 包内**入度为零**（无人引用，`package-info` 除外），断言不过就 abort —— 这样"切出只产生单向外边"不再靠推理。`ChunkQuestionService` **故意留在** `service`：它被 `QuestionGenerationService` 引用，单独搬会造出 `service ⇄ service.chunk` 环（已在子面 package-info 写明）。
 - **切出**：3 类 → `com.ragagent.knowledge.service.chunk`（`git mv` + 包声明 + 全仓 FQN 替换 3 文件）；测试面 `ChunkExtractServiceTest` 随迁；新建 `service/chunk/package-info`；`service/package-info` 同步。

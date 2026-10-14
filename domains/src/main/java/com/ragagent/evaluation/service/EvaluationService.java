@@ -29,7 +29,7 @@ import com.ragagent.event.TenantContextSnapshot;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.service.KnowledgeBaseService;
-import com.ragagent.knowledge.service.KnowledgeService;
+import com.ragagent.knowledge.service.management.KnowledgeService;
 import com.ragagent.knowledge.support.KnowledgeTaskIdCodec;
 import com.ragagent.model.domain.Model;
 import com.ragagent.model.service.ModelService;

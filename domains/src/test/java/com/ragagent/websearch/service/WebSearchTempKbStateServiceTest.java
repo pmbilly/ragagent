@@ -17,7 +17,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
 import com.ragagent.knowledge.service.KnowledgeBaseService;
-import com.ragagent.knowledge.service.KnowledgeService;
+import com.ragagent.knowledge.service.management.KnowledgeService;
 
 /**
  * web 搜索临时 KB 状态服务。

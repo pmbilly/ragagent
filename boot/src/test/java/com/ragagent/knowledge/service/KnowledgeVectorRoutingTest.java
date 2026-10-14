@@ -19,6 +19,7 @@ import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import com.ragagent.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.service.management.KnowledgeService;
 
 /**
  * 写链改道的 H2 钉子：move 的 reuse_vectors 模式把 embeddings 行

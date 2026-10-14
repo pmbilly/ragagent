@@ -36,7 +36,7 @@ import com.ragagent.knowledge.dto.kb.KBCloneProgress;
 import com.ragagent.knowledge.dto.kb.CopyKnowledgeBaseResponse;
 import com.ragagent.knowledge.dto.kb.DuplicateKnowledgeBaseResponse;
 import com.ragagent.knowledge.domain.access.KnowledgeAccessGuard;
-import com.ragagent.knowledge.service.KnowledgeService;
+import com.ragagent.knowledge.service.management.KnowledgeService;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.storage.support.PublicModeForbiddenException;
 import com.ragagent.storage.support.ResourceModeException;

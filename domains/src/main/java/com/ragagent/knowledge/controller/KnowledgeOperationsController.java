@@ -16,7 +16,7 @@ import com.ragagent.knowledge.dto.tag.KnowledgeTagBatchRequest;
 import com.ragagent.knowledge.dto.doc.MoveKnowledgeRequest;
 import com.ragagent.knowledge.dto.doc.MoveToFolderRequest;
 import com.ragagent.knowledge.dto.doc.RenameFolderRequest;
-import com.ragagent.knowledge.service.KnowledgeService;
+import com.ragagent.knowledge.service.management.KnowledgeService;
 import com.ragagent.knowledge.service.KnowledgeSearchService;
 import com.ragagent.knowledge.support.KnowledgeTaskIdCodec;
 import jakarta.validation.Valid;

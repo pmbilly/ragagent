@@ -12,7 +12,7 @@ import com.ragagent.knowledge.domain.KnowledgeBase;
  * （{@code domain.access → service}）。改为依赖本端口后，守卫只看见 4 个读方法，依赖方向变为
  * **service 实现端口**（{@code service → domain.access}，本已存在），反向边消失 ⇒ 环断开。</p>
  *
- * <p>实现方：{@code com.ragagent.knowledge.service.KnowledgeService}（Spring 按类型注入，
+ * <p>实现方：{@code com.ragagent.knowledge.service.management.KnowledgeService}（Spring 按类型注入，
  * 端口只有这一个实现）。若日后读取面归位到 {@code repository/}，实现随之替换即可。</p>
  */
 public interface KnowledgeReadPort {

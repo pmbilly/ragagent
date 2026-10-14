@@ -20,7 +20,7 @@ import com.ragagent.common.retrieval.SearchTarget;
 import com.ragagent.settings.ConversationProperties;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.service.KnowledgeBaseService;
-import com.ragagent.knowledge.service.KnowledgeService;
+import com.ragagent.knowledge.service.management.KnowledgeService;
 import com.ragagent.memory.domain.MemoryItem;
 import com.ragagent.memory.service.MemorySearchResult;
 import com.ragagent.memory.service.MemoryService;

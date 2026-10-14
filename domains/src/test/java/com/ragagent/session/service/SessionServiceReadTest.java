@@ -16,7 +16,7 @@ import com.ragagent.common.context.TenantContext;
 import com.ragagent.session.domain.Session;
 import com.ragagent.session.domain.SessionNotFoundException;
 import com.ragagent.session.repository.SessionRepository;
-import com.ragagent.knowledge.service.KnowledgeService;
+import com.ragagent.knowledge.service.management.KnowledgeService;
 import com.ragagent.model.service.ModelRuntimeFactory;
 import com.ragagent.model.service.ModelService;
 import com.ragagent.session.repository.MessageRepository;

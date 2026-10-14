@@ -149,7 +149,7 @@ BASELINE: dict[str, set[str]] = {
     # MyBatis 列名/参数（非 JSON 键）
     # MyBatis 列名/参数（非 JSON 键）
     # MyBatis 列名/参数（非 JSON 键）
-    'knowledge/service/KnowledgeService.java': {'updated_at'},
+    'knowledge/service/management/KnowledgeService.java': {'updated_at'},  # B263㊳ 换锚：门面迁 management/
     # MyBatis 列名/参数（非 JSON 键）
     # langfuse 面
     'knowledge/domain/span/SpanTracker.java': {'langfuse_trace_id'},  # B263㉜ 由 service/ 搬到 domain/span/（换锚，键与理由不变）
