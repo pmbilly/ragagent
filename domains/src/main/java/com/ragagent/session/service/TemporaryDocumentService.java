@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
-import com.ragagent.auth.service.TenantService;
+import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.knowledge.client.DocReaderClient;
 import com.ragagent.model.service.ModelRuntimeAssembler;
 import com.ragagent.session.domain.message.MessageAttachment;
@@ -82,7 +82,7 @@ public class TemporaryDocumentService {
                                     DocReaderClient docReader,
                                     ModelRuntimeAssembler modelRuntimeAssembler,
                                     AsrTranscriber asrTranscriber,
-                                    TenantService tenantService) {
+                                    TenantConfigLookup tenantService) {
         this.repo = repo;
         this.fileStore = fileStore;
         this.processor = new TemporaryDocumentProcessor(repo, fileStore, docReader,

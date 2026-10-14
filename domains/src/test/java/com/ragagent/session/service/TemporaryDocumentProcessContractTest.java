@@ -20,8 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
-import com.ragagent.tenant.repository.Tenant;
-import com.ragagent.auth.service.TenantService;
+import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.knowledge.client.DocReaderClient;
 import com.ragagent.model.domain.Model;
@@ -45,7 +44,7 @@ class TemporaryDocumentProcessContractTest {
     private DocReaderClient docReader;
     private ModelRuntimeAssembler modelRuntimeAssembler;
     private AsrTranscriber asrTranscriber;
-    private TenantService tenantService;
+    private TenantConfigLookup tenantService;
     private TemporaryDocumentService service;
 
     @BeforeEach
@@ -55,7 +54,7 @@ class TemporaryDocumentProcessContractTest {
         docReader = mock(DocReaderClient.class);
         modelRuntimeAssembler = mock(ModelRuntimeAssembler.class);
         asrTranscriber = mock(AsrTranscriber.class);
-        tenantService = mock(TenantService.class);
+        tenantService = mock(TenantConfigLookup.class);
         service = new TemporaryDocumentService(repo, fileStore, docReader,
                 modelRuntimeAssembler, asrTranscriber, tenantService);
         TenantContext.set(TENANT, null, null, false, "u-1", false);
@@ -89,16 +88,14 @@ class TemporaryDocumentProcessContractTest {
         return m;
     }
 
-    /** 租户的 chat 解析规则（pdf → engine）。 */
-    private static Tenant tenantWithRule(String ext, String engine) {
-        Tenant t = new Tenant();
+    /** 租户的 chat 解析规则节点（pdf → engine）；自 A③ 起经 L1 端口读配置，不再取实体。 */
+    private static ObjectNode parserEngineConfigWithRule(String ext, String engine) {
         ObjectNode cfg = MAPPER.createObjectNode();
         ArrayNode rules = cfg.putArray("chatParserEngineRules");
         ObjectNode rule = rules.addObject();
         rule.putArray("file_types").add(ext);
         rule.put("engine", engine);
-        t.setParserEngineConfig(cfg);
-        return t;
+        return cfg;
     }
 
     @Test
@@ -134,7 +131,7 @@ class TemporaryDocumentProcessContractTest {
     void tenantRuleFillsEngineWhenOptionsLackOne() throws Exception {
         when(repo.getById(TENANT, "d-1")).thenReturn(document("report.pdf", ".pdf", "{}"));
         when(fileStore.getFile("local://1/exports/d-1")).thenReturn(new byte[] {1});
-        when(tenantService.getTenantById(TENANT)).thenReturn(tenantWithRule("pdf", "mineru"));
+        when(tenantService.parserEngineConfig(TENANT)).thenReturn(parserEngineConfigWithRule("pdf", "mineru"));
         when(docReader.read(any(), anyString(), anyString(), anyString(), eq("mineru")))
                 .thenReturn(new DocReaderClient.ParseResult("# md", 0, List.of()));
 
@@ -149,8 +146,8 @@ class TemporaryDocumentProcessContractTest {
         when(repo.getById(TENANT, "d-1")).thenReturn(document("report.pdf", ".pdf",
                 "{\"resourceTenantId\":42}"));
         when(fileStore.getFile("local://1/exports/d-1")).thenReturn(new byte[] {1});
-        when(tenantService.getTenantById(42L))
-                .thenReturn(tenantWithRule("pdf", "paddleocr_vl"));
+        when(tenantService.parserEngineConfig(42L))
+                .thenReturn(parserEngineConfigWithRule("pdf", "paddleocr_vl"));
         when(docReader.read(any(), anyString(), anyString(), anyString(), eq("paddleocr_vl")))
                 .thenReturn(new DocReaderClient.ParseResult("# md", 0, List.of()));
 

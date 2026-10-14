@@ -40,7 +40,7 @@ import static com.ragagent.session.service.QaSupport.TagScope;
 import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.session.support.PipelineViews;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
-import com.ragagent.auth.service.TenantService;
+import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.platform.tracing.langfuse.LangfuseManager;
 import com.ragagent.platform.tracing.langfuse.Span;
@@ -68,7 +68,7 @@ public class SessionKnowledgeQaService {
     final KnowledgeService knowledgeService;
     final KnowledgeBaseService knowledgeBaseService;
     final PipelinePorts.ModelService pipelineModelService;
-    final TenantService tenantService;
+    final TenantConfigLookup tenantService;
     final WebSearchProviderRepository webSearchProviderRepository;
     final javax.sql.DataSource dataSource;
 
@@ -84,7 +84,7 @@ public class SessionKnowledgeQaService {
             KnowledgeService knowledgeService,
             KnowledgeBaseService knowledgeBaseService,
             PipelinePorts.ModelService pipelineModelService,
-            TenantService tenantService,
+            TenantConfigLookup tenantService,
             WebSearchProviderRepository webSearchProviderRepository,
             javax.sql.DataSource dataSource) {
         this.eventManager = eventManager;
@@ -476,9 +476,9 @@ public class SessionKnowledgeQaService {
         String userId = SessionService.sessionUserIDForLookup();
         RetrievalConfigView rc = new RetrievalConfigView(null);
         try {
-            var tenant = tenantService.getTenantById(tenantId);
-            if (tenant != null) {
-                rc = new RetrievalConfigView(tenant.getRetrievalConfig());
+            JsonNode retrieval = tenantService.retrievalConfig(tenantId);
+            if (retrieval != null) {
+                rc = new RetrievalConfigView(retrieval);
             }
         } catch (RuntimeException e) {
             // 获取失败 → 保持 null（由 GetEffective* 兜底）

@@ -1,5 +1,7 @@
 package com.ragagent.session.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
@@ -15,7 +17,7 @@ import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ragagent.auth.service.TenantService;
+import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.knowledge.chunker.Chunker;
 import com.ragagent.knowledge.chunker.ParsedChunk;
 import com.ragagent.knowledge.chunker.SplitterConfig;
@@ -56,14 +58,14 @@ final class TemporaryDocumentProcessor {
     private final DocReaderClient docReader;
     private final ModelRuntimeAssembler modelRuntimeAssembler;
     private final AsrTranscriber asrTranscriber;
-    private final TenantService tenantService;
+    private final TenantConfigLookup tenantService;
 
     TemporaryDocumentProcessor(TemporaryDocumentRepository repo,
                                AttachmentFileStore fileStore,
                                DocReaderClient docReader,
                                ModelRuntimeAssembler modelRuntimeAssembler,
                                AsrTranscriber asrTranscriber,
-                               TenantService tenantService) {
+                               TenantConfigLookup tenantService) {
         this.repo = repo;
         this.fileStore = fileStore;
         this.docReader = docReader;
@@ -199,12 +201,11 @@ final class TemporaryDocumentProcessor {
     /** 未显式指定 engine 时用资源租户的 chat 解析规则兜底。 */
     private String tenantParserEngine(long resourceTenantId, String ext) {
         try {
-            var tenant = tenantService.getTenantById(resourceTenantId);
-            if (tenant == null || tenant.getParserEngineConfig() == null) {
+            JsonNode cfg = tenantService.parserEngineConfig(resourceTenantId);
+            if (cfg == null) {
                 return "";
             }
-            return ParserEngineRules.resolve(
-                    tenant.getParserEngineConfig().get("chatParserEngineRules"), ext);
+            return ParserEngineRules.resolve(cfg.get("chatParserEngineRules"), ext);
         } catch (RuntimeException e) {
             log.warn("failed to resolve tenant parser engine: {}", e.toString());
             return "";

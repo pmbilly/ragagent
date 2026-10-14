@@ -372,15 +372,6 @@
       "AgentWebPages",
       "QaWiring"
     ],
-    "session→auth": [
-      "QaWiring",
-      "SessionKnowledgeQaService",
-      "TemporaryDocumentProcessor",
-      "TemporaryDocumentService"
-    ],
-    "session→tenant": [
-      "QaWiring"
-    ],
     "session→wiki": [
       "AgentToolBackends",
       "AgentToolWikiBackends"

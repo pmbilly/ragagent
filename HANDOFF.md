@@ -1308,6 +1308,19 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **A② 全批提交**：`a7d3b13e`（第①批 42 类）· `37b5fbb8`（第②批 去框架化 37 类）· `2ee75327`（第②批 补：解锁 11 类）· 本批（第③批 9 类 + 收口）。
 - **A 的下一步**：**③ 立「域间只经契约」**（A20 已守"契约唯一实现"；还差"业务域之间只经 `contract`"这条规则——应先测现状再决定硬规则 vs 棘轮基线）。可选后续：① 的 K 级重设计（`JsonNode` → typed records）另立项。
 
+**🔶 A③ 收敛第五刀：`session→auth` / `session→tenant` 收尾（2026-10-14，R10 **边 63 → 61**、类 292 → 287）**
+- **迁移 4 类**：`session/service/{QaWiring, SessionKnowledgeQaService, TemporaryDocumentProcessor, TemporaryDocumentService}` —— 一律由**具体类** `auth.service.TenantService` ✗ 换成 **L1 端口** `TenantConfigLookup` ✓：
+  - `QaWiring`：`PipelinePorts.TenantService`（chatpipeline 的**契约化**嵌套端口 ✓，只声明 `currentWebSearchConfig()` ✓）的实现源改为端口调用 `webSearchConfig(tid)` ✓ ⇒ 不再 import 实体 ✓；
+  - `SessionKnowledgeQaService`：`RetrievalConfigView(tenant.getRetrievalConfig())` → `RetrievalConfigView(tenantService.retrievalConfig(id))` ✓；
+  - `TemporaryDocumentProcessor`：`tenant.getParserEngineConfig().get("chatParserEngineRules")` → `tenantService.parserEngineConfig(id).get(...)` ✓；
+  - `TemporaryDocumentService`：仅构造透传 ⇒ 换类型即可 ✓。
+- **收益（两条边同时清零）**：**`session→auth` 4 → 0** ✓、**`session→tenant` 1 → 0** ✓ ⇒ **边 63 → 61**；类 **292 → 287**。
+- **⚠️ 又栽在同一个坑（第 2 次）**：`s.replace('TenantService tenantService,', …)` 这类**无前缀排除**的整词替换，把 `PipelinePorts.TenantService tenantService,` 也改成了 `PipelinePorts.TenantConfigLookup` ✗ ⇒ 编译报错定位后修回 ✓。**教训升级**：替换类型名必须带**左边界排除**（`(?<![\w.])TenantService`），否则会穿透 `X.TenantService` 这种**限定名**；仓内已有 R8（内联全限定名）同族守卫，但**限定名做前缀**这一形态仍需人工小心 ✓。
+- **测试**：`TemporaryDocumentProcessContractTest` 的 stub 由"造实体 + `getTenantById`"改为"造配置节点 + `parserEngineConfig`" ✓（helper 改名 `parserEngineConfigWithRule` ✓）。
+- **验证**：**4987 / 失败 0 / 跳过 4** ✓；`spotlessCheck build` ✓ **2m03s** ✓ **13 守卫** ✓（环 0 / SCC 11 组）；定向（QaWebSearch/TemporaryDocument/SessionKnowledgeQa/QaWiring ✓）全绿。
+- **A③ 累计（五刀）**：基线 **317 → 287 类（−30）**、**边 64 → 61（−3）**；已清零的边：`storage→tenant` ✗ ✅、`auth→tenant` ✅、`session→auth` ✅、`session→tenant` ✅；余量：`knowledge→tenant` 2 类。
+- **下一步**：`knowledge→tenant`（2 类：`FaqIndexWriter`/`TenantStorageService` —— 引 `tenant.services.*` 或实体 ✗，同手法可清）；或换向 `knowledge→storage`(21) / `agenttools→agent`(114，最大边，需"族"级拍板) / v0.3.0 收尾对账。
+
 **🔶 A③ 收敛第四刀（D）：`tenant` 类型族入契约面（2026-10-14，R10 基线 298 → 292 类，**边 64 → 63**）**
 - **动机**：前几刀的余量多卡在"引 `tenant` 的**类型**"（`StorageEngineConfig`/`ChatHistoryConfig`/`RetrievalConfig`/`APIPrincipalConfig`）⇒ 把这一族入契约面可**一次解锁多处** ✓（与 A② 的类型级残留同族问题，但这一族**可解**：注解可分离、无 `JsonNode` ✓）。
 - **落位**：4 类 → `contract.tenant`（`StorageEngineConfig` 含 **8 个嵌套 provider 子结构**：Local/Minio/Cos/Tos/S3/Oss/Ks3/Obs ✓ 随外层一起走）；**新增 `platform/web/ContractJsonMixinsTenant`**（4 个 mixin ✓，注册进 `ContractJsonModule` ✓——嵌套子结构**无注解**故不需要 mixin ✓，`@JsonInclude(NON_NULL)` 由 mixin 承载 ⇒ golden `ct-kv-storage-*` 形态不变 ✓）。

@@ -67,7 +67,7 @@ import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.tracing.decorators.LangfuseChatClient;
 import com.ragagent.tracing.decorators.LangfuseReranker;
 import com.ragagent.agenttools.datasource.DataAnalysisSessionFactoryAdapter;
-import com.ragagent.auth.service.TenantService;
+import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.chatpipeline.plugin.PluginDataAnalysis;
 import com.ragagent.chatpipeline.plugin.PluginSearch;
 import com.ragagent.chatpipeline.plugin.PluginSearchEntity;
@@ -76,7 +76,6 @@ import com.ragagent.contract.memory.MemoryRetrievalContext;
 import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.contract.tenant.WebSearchConfig;
 import com.ragagent.retrieval.domain.WebSearchResult;
-import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.KnowledgeBaseView;
 import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
@@ -163,7 +162,7 @@ public class QaWiring {
      */
     @Bean
     public PipelinePorts.TenantService qaPipelineTenantService(
-            TenantService tenantService) {
+            TenantConfigLookup tenantService) {
         return new PipelinePorts.TenantService() {
             @Override
             public WebSearchConfig currentWebSearchConfig() {
@@ -172,13 +171,11 @@ public class QaWiring {
                     return null;
                 }
                 try {
-                    Tenant tenant = tenantService.getTenantById(tid);
-                    if (tenant == null || tenant.getWebSearchConfig() == null
-                            || tenant.getWebSearchConfig().isNull()) {
+                    JsonNode webSearch = tenantService.webSearchConfig(tid);
+                    if (webSearch == null || webSearch.isNull()) {
                         return null;
                     }
-                    return JsonMappers.lenient().treeToValue(tenant.getWebSearchConfig(),
-                            WebSearchConfig.class);
+                    return JsonMappers.lenient().treeToValue(webSearch, WebSearchConfig.class);
                 } catch (RuntimeException | JsonProcessingException e) {
                     return null;
                 }
