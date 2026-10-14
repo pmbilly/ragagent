@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.domain;
 
+import java.util.List;
+
 import java.time.OffsetDateTime;
 import java.util.Map;
 
@@ -30,6 +32,16 @@ public class KnowledgeProcessingSpan {
     public static final String STAGE_EMBEDDING = "embedding";
     public static final String STAGE_MULTIMODAL = "multimodal";
     public static final String STAGE_POST_PROCESS = "postprocess";
+
+    /**
+     * 5 个 canonical 阶段名（顺序即展示顺序）。
+     *
+     * <p>B263㉜ 由 {@code service.KnowledgeService} 上移至此——{@code domain.span.SpanTracker} 也要用它，
+     * 而 {@code domain → service} 是不能有的反向边；{@code KnowledgeService.ALL_STAGES} 现委任本常量
+     * （对外公共常量不变）。</p>
+     */
+    public static final List<String> ALL_STAGES =
+            List.of(STAGE_DOC_READER, STAGE_CHUNKING, STAGE_EMBEDDING, STAGE_MULTIMODAL, STAGE_POST_PROCESS);
 
     private long id;
     private String knowledgeId = "";

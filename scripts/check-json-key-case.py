@@ -152,7 +152,7 @@ BASELINE: dict[str, set[str]] = {
     'knowledge/service/KnowledgeService.java': {'updated_at'},
     # MyBatis 列名/参数（非 JSON 键）
     # langfuse 面
-    'knowledge/service/SpanTracker.java': {'langfuse_trace_id'},
+    'knowledge/domain/span/SpanTracker.java': {'langfuse_trace_id'},  # B263㉜ 由 service/ 搬到 domain/span/（换锚，键与理由不变）
     # 提示词模板变量（数据值，模板里是 {{server_name}} 等）
     'mcp/controller/McpUsageInstructionsOps.java': {'omitted_tools', 'server_description', 'server_instructions', 'server_name'},
     # 8 MiB 门禁的体积度量形态（B135 复核改标：镜像 metadata 表列，属 §15.3 ③ DDL 面）

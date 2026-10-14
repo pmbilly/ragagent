@@ -10,6 +10,9 @@
  * 「写得进、查出来是 null」的静默故障（wrapper 的 {@code set()} 亦不套实体 typeHandler，
  * 需三参写法，见 ChunkMapper 注释）。
  *
+ * <p>子包：{@code access/}（访问守卫，如 ChunkAccessGuard/FaqGuard）、{@code span/}（处理进度 span 树
+ * SpanTracker，B263㉜ 由 service 迁入）；其余为实体与载荷 record。
+ *
  * <p>FaqChunkMetadata/DocumentChunkMetadata 等 metadata 结构有独立序列化契约
  * （见 JsonContractRoundTripTest）。
  */

@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.domain.span.SpanTracker;
+
 import com.ragagent.knowledge.domain.ChunkExtractConsumer;
 
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;

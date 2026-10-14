@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.domain.KnowledgeProcessingSpan;
+
 import com.ragagent.knowledge.repository.KnowledgeTagRepository;
 import com.ragagent.knowledge.domain.KnowledgeSearchScope;
 
@@ -77,8 +79,8 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
 
     /** duplicate 的配置克隆用：知识实体带 OffsetDateTime，往返 mapper 必须挂 JSR310（本仓约定 步 3 教训）。 */
 
-    public static final List<String> ALL_STAGES =
-            List.of("docreader", "chunking", "embedding", "multimodal", "postprocess");
+    /** 5 个 canonical 阶段名（B263㉜ 委任 {@link KnowledgeProcessingSpan#ALL_STAGES}，公共常量不变）。 */
+    public static final List<String> ALL_STAGES = KnowledgeProcessingSpan.ALL_STAGES;
 
     private final KnowledgeRepository knowledgeRepository;
     private final ChunkRepository chunkRepository;

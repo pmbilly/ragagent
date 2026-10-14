@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.service;
+package com.ragagent.knowledge.domain.span;
 
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 
@@ -120,7 +120,7 @@ public class SpanTracker {
         List<String> frontier = new ArrayList<>(List.of(stage));
         while (!frontier.isEmpty()) {
             List<String> next = new ArrayList<>();
-            for (String candidate : KnowledgeService.ALL_STAGES) {
+            for (String candidate : KnowledgeProcessingSpan.ALL_STAGES) {
                 if (seen.contains(candidate)) {
                     continue;
                 }
@@ -141,7 +141,7 @@ public class SpanTracker {
 
     /** 5 个 canonical 阶段之一。 */
     static boolean isMainPipelineStage(String name) {
-        return KnowledgeService.ALL_STAGES.contains(name);
+        return KnowledgeProcessingSpan.ALL_STAGES.contains(name);
     }
 
     private static String newSpanId() {

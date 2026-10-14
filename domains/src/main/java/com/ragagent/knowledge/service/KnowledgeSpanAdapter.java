@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.domain.span.SpanTracker;
+
 import java.util.Map;
 
 import org.springframework.beans.factory.ObjectProvider;

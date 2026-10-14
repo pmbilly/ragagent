@@ -40,10 +40,6 @@
       "com.ragagent.embedding.provider"
     ],
     [
-      "com.ragagent.knowledge.service",
-      "com.ragagent.knowledge.task"
-    ],
-    [
       "com.ragagent.rerank",
       "com.ragagent.rerank.provider"
     ],

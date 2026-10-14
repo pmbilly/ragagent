@@ -36,7 +36,7 @@
     "domains/src/main/java/com/ragagent/knowledge/service/KnowledgeBaseService.java": 626,
     "domains/src/main/java/com/ragagent/knowledge/service/KnowledgeService.java": 796,
     "domains/src/main/java/com/ragagent/knowledge/service/KnowledgeSummaryService.java": 684,
-    "domains/src/main/java/com/ragagent/knowledge/service/SpanTracker.java": 702,
+    "domains/src/main/java/com/ragagent/knowledge/domain/span/SpanTracker.java": 698,
     "domains/src/main/java/com/ragagent/knowledge/task/KnowledgeProcessWorker.java": 789,
     "domains/src/main/java/com/ragagent/mcp/service/McpServiceService.java": 605,
     "domains/src/main/java/com/ragagent/mcp/tools/McpCatalog.java": 725,

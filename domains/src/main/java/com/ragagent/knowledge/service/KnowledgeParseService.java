@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.domain.span.SpanTracker;
+
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import com.ragagent.knowledge.task.KnowledgeProcessingQueue;

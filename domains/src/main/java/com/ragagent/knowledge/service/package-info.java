@@ -10,8 +10,9 @@
  *   <li><b>知识库与检索</b>：KnowledgeBaseService / KnowledgeTagService / KnowledgeSearchService /
  *       KnowledgeBatchOpsService / KnowledgeCloneService / KnowledgeMoveService /
  *       KnowledgeFolderService；</li>
- *   <li><b>支撑</b>：HousekeepingService（定时清理）+ SpanTracker（处理进度 span 树，
- *       被 knowledge/wiki 两域共用）+ KnowledgeVectorWrites（向量写路由网关）。</li>
+ *   <li><b>支撑</b>：HousekeepingService（定时清理）+ KnowledgeVectorWrites（向量写路由网关）。
+ *       <b>已迁出</b>（B263㉜）：SpanTracker（处理进度 span 树）→ {@code domain.span}
+ *       —— 它被 {@code task} 侧 worker 使用，留在本包会形成 {@code task → service} 环。</li>
  * </ul>
  */
 package com.ragagent.knowledge.service;

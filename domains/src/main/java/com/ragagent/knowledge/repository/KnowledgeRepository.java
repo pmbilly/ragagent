@@ -312,7 +312,7 @@ public class KnowledgeRepository {
     }
 
     /**
-     * 心跳：只把 updated_at 推到 now（**不按租户、不看软删**——与原直连语句逐字一致，供 SpanTracker 用）。
+     * 心跳：只把 updated_at 推到 now（**不按租户、不看软删**——与原直连语句逐字一致，供 domain.span.SpanTracker 用）。
      */
     public int touchUpdatedAt(String id, OffsetDateTime now) {
         return knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
