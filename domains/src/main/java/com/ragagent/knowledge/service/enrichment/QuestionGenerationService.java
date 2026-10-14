@@ -1,4 +1,6 @@
-package com.ragagent.knowledge.service;
+package com.ragagent.knowledge.service.enrichment;
+
+import com.ragagent.knowledge.service.ChunkQuestionPort;
 
 import com.ragagent.knowledge.domain.span.SpanTracker;
 

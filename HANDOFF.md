@@ -538,7 +538,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B260 | 6 | agent-engine 包边界（`com.ragagent.agent` 运行面收拢） | ✅ 2026-10-13 |
 | B261 | 6 | retrieval-engine 包边界（`retrieval.*` 收拢 + policy 归位） | ✅ 2026-10-13 |
 | B262 | 6 | model-runtime 包边界（模型调用 / provider / 流生命周期） | ✅ 2026-10-13 |
-| B263 | 6 | domains 域内重排①：knowledge（29 包 248 文件；SCC 拆解 + mapper/repository 主战场） | 🔶 进行中（①~㊳：mapper 归零 / `{service,task}` SCC 消除 / 门面归位 `service.management` / 两个子面切出；余 §8.8 目标树细分可选） |
+| B263 | 6 | domains 域内重排①：knowledge（29 包 248 文件；SCC 拆解 + mapper/repository 主战场） | 🔶 进行中（①~㊵：mapper 归零 / `{service,task}` SCC 消除 / 门面归位 `service.management` / 四个子面切出 `{faq,chunk,query,management}` + `enrichment`；余 §8.8 目标树细分可选） |
 | B264 | 6 | ②：session（21 包 183 文件）+ agenttools/agentmanagement 落位 | ⬜ |
 | B265 | 6 | ③：wiki（17 包 147）+ datasource（16 包 124）+ mcp（9 包 125） | ⬜ |
 | B266 | 6 | ④：im/memory/auth/storage/websearch/model + 其余小域 | ⬜ |
@@ -996,6 +996,14 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **顺带修 3 处跨包可见性**：搬出顶层包后，`KnowledgeFileService.updateKnowledgeRow`、`KnowledgeBaseService.ensureDefaults`、`KnowledgeParseService.resetKnowledgeForReparse` 变成"跨包调用包内方法" ✗ ⇒ 提为 `public` ✓（它们本就是跨面协作者）。为此写了一个**按编译错误自动提可见性**的小工具（正则首版漏了**返回类型** ✗ ⇒ 补上后一次改净）。
 - **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m56s** ✓ **十二守卫** ✓（环 0 / 包级 SCC 12 组）。
 - **登记（§8.8.2 剩余）**：`service.enrichment/`（`KnowledgeSummaryService`/`QuestionGenerationService` 可并入——本仓 FAQ 已单列 `service.faq`，属**有意偏离**）、`service.process/`（本仓等价物是 `service.chunk`）、`service.index/ingest/`（目标类型不存在）；`domain.{document,task,graph}`（需先造类型）。`service` 其余子面继续细分（`KnowledgeTagService` 可作 `service.tag`；`DuplicateKnowledgeException`/`KnowledgeAccessHelper`/`KnowledgeSpanService` 与 11 个协作者面）；"ObjectProvider 需自述理由"守卫（㊲ 登记）。`service.chunk` 现 4 类；`KnowledgeTagService`（零入度，可作 `service.tag`，单类面偏薄）；**门面归位的最后一关**是 `KnowledgeService` 的 6 个引用者。
+**🔶 B263 第㊵步（2026-10-14，`service.enrichment` 切出；**对齐 §8.8.2 命名**）**
+- **动前断言（把"可测"变成"可证"）**：脚本先扫全仓 FQN 引用面并与白名单比对——`KnowledgeSummaryService` 2 处（门面 import + ArchUnit 基线）、`QuestionGenerationService` 3 处（自身 + `ChunkExtractService` 的 javadoc FQN + 一处测试 import）⇒ 断言通过才搬。其中 **QGS 在主代码里引用为零**（队列/装配侧早由 B263㉛ 端口反转、㊱ 又断掉它对 `ChunkQuestionService` 的边）⇒ 这是"零入度可切"的教科书样本。
+- **切出**：2 类 → `com.ragagent.knowledge.service.enrichment`（`git mv` + 包声明 + **补 import**：SummaryService 需补 `KnowledgeAccessHelper`/`KnowledgeFileService`（原同包免 import ⇒ 搬包后编译才会暴露）、QGS 补 `ChunkQuestionPort`）；新建 `service/enrichment/package-info.java`（写明切出依据与新边方向：`management → enrichment → service`，单向）。
+- **引用者 3 处更新**：门面 `management.KnowledgeService` 的 import、`RedisKnowledgeTaskQueueTest`（domains 测试树）的 import、`ChunkExtractService` javadoc 的 **FQN `{@link ...}`**（㉟ 教训：简单名 `{@link}` 会失链，FQN 形式要跟着换）。
+- **守卫换锚（照㉟/㊳ 清单逐项核）**：A16/A17 基线**各一条 FQN 换名**（`...service.KnowledgeSummaryService` → `...service.enrichment.…`；QGS 同——两者仍违约，是换名不是删除）；`file-size.baseline.json` 键换锚 + **收紧 684 → 663**（不用 `--write`：它会连别处的漂移一起吞）；`check-json-key-case.py` 键级豁免路径换锚（`knowledge/service/enrichment/QuestionGenerationService.java`）；`:domains:javadoc` ✓ 无失链；`check-package-dirs.py` ✓（目录与包一致）。
+- **测试**：**4980 / 失败 0 / 跳过 4** ✓（domains 2949 / engine 561 / common 141 / boot 1329）；启动测试 ✓；`spotlessCheck build` ✓ **1m47s** ✓ **十二守卫** ✓（环 0 / 包级 SCC **12 组不变**）。
+- **登记（§8.8.2 剩余）**：`service.management/` 还差 `KnowledgeAccessHelper`/`KnowledgeFolderService`（二在顶层**仍有多个引用者** ⇒ 需先断边，同㉝/㊲ 的做法）；`KnowledgeBaseService`/`KnowledgeFileService`/`KnowledgeParseService` 未切面——§8.8.2 给它们的是 use-case 目标名（`ManageKnowledgeBase` 等）⇒ 属**改名级重构**，不在"包重排"范围内；`HousekeepingService`/`EmbeddingModelAdapter` 按目标树**本就留在顶层** ✓。
+
 **🔶 B263 第㉟步（2026-10-14，第二个子面 `service.chunk` 切出）**
 - **动前断言（把"可测"变成"可证"）**：脚本**先断言** `ChunkEditService`/`ChunkExtractService`/`ChunkReadService` 三者在 `service` 包内**入度为零**（无人引用，`package-info` 除外），断言不过就 abort —— 这样"切出只产生单向外边"不再靠推理。`ChunkQuestionService` **故意留在** `service`：它被 `QuestionGenerationService` 引用，单独搬会造出 `service ⇄ service.chunk` 环（已在子面 package-info 写明）。
 - **切出**：3 类 → `com.ragagent.knowledge.service.chunk`（`git mv` + 包声明 + 全仓 FQN 替换 3 文件）；测试面 `ChunkExtractServiceTest` 随迁；新建 `service/chunk/package-info`；`service/package-info` 同步。

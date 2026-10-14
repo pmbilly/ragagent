@@ -238,7 +238,7 @@ BASELINE: dict[str, set[str]] = {
     # 飞书 OAuth 请求体字段名（对方契约；值与 typed 字段解耦，见 §15.1.1 B137/B139）
     'datasource/connector/feishu/core/FeishuTransport.java': {'app_id'},
     # Langfuse 任务 span 载荷（LangfuseTaskScope.start 的 metadata，观测面）
-    'knowledge/service/QuestionGenerationService.java': {'knowledge_id'},
+    'knowledge/service/enrichment/QuestionGenerationService.java': {'knowledge_id'},
     # Langfuse 任务 span 载荷（同上，观测面）
     'memory/service/InProcessMemoryExtractTaskQueue.java': {'subject_id'},
     # span 观测面（同本文件既有条目）

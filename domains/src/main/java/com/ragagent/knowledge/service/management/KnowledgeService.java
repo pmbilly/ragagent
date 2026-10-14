@@ -57,7 +57,7 @@ import com.ragagent.knowledge.index.ChunkVectorIndexer;
 import com.ragagent.knowledge.service.KnowledgeAccessHelper;
 import com.ragagent.knowledge.service.KnowledgeFolderService;
 import com.ragagent.knowledge.service.KnowledgeParseService;
-import com.ragagent.knowledge.service.KnowledgeSummaryService;
+import com.ragagent.knowledge.service.enrichment.KnowledgeSummaryService;
 import com.ragagent.knowledge.service.query.KnowledgeSearchService;
 import com.ragagent.knowledge.service.query.KnowledgeSpanService;
 import com.ragagent.knowledge.service.KnowledgeFileService;

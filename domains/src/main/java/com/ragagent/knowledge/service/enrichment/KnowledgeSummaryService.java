@@ -1,4 +1,7 @@
-package com.ragagent.knowledge.service;
+package com.ragagent.knowledge.service.enrichment;
+
+import com.ragagent.knowledge.service.KnowledgeAccessHelper;
+import com.ragagent.knowledge.service.KnowledgeFileService;
 
 import com.ragagent.knowledge.domain.KnowledgeTenants;
 
