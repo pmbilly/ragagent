@@ -1,5 +1,11 @@
 package com.ragagent.approval;
 
+import com.ragagent.contract.tool.PendingRequest;
+
+import com.ragagent.contract.tool.Cancellation;
+
+import com.ragagent.contract.tool.Decision;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

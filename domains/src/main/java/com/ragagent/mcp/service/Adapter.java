@@ -7,7 +7,7 @@ import java.util.concurrent.CancellationException;
 import com.ragagent.mcp.domain.McpToolApproval;
 import com.ragagent.approval.ApprovalException;
 import com.ragagent.approval.BulkEnabledChecker;
-import com.ragagent.approval.Cancellation;
+import com.ragagent.contract.tool.Cancellation;
 import com.ragagent.approval.Checker;
 import com.ragagent.approval.ApprovalToolPolicy;
 

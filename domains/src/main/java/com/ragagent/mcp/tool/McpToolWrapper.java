@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.ragagent.approval.McpApproval;
+import com.ragagent.contract.tool.ToolApprovalGate;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.domain.McpTool;
@@ -19,8 +19,8 @@ import com.ragagent.mcp.protocol.McpClient;
 import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.protocol.McpContext;
 import com.ragagent.platform.web.ToolJson;
-import com.ragagent.approval.Decision;
-import com.ragagent.approval.PendingRequest;
+import com.ragagent.contract.tool.Decision;
+import com.ragagent.contract.tool.PendingRequest;
 import com.ragagent.agent.tool.AgentTool;
 import com.ragagent.agent.tool.ToolRequest;
 import com.ragagent.agent.tool.ToolDefinitions;
@@ -48,7 +48,7 @@ public class McpToolWrapper implements AgentTool {
     protected final McpService service;
     protected final McpTool mcpTool;
     protected final McpClientManager mcpManager;
-    protected final McpApproval gate;
+    protected final ToolApprovalGate gate;
     /** agent 级 OAuth 等待超时（秒）；≤0 用 gate 缺省。 */
     protected final int authWaitTimeoutSeconds;
     protected volatile String registeredName = "";
@@ -72,7 +72,7 @@ public class McpToolWrapper implements AgentTool {
     }
 
     public McpToolWrapper(McpService service, McpTool mcpTool, McpClientManager mcpManager,
-            McpApproval gate, int authWaitTimeoutSeconds, long tenantId) {
+            ToolApprovalGate gate, int authWaitTimeoutSeconds, long tenantId) {
         this.service = service;
         this.mcpTool = mcpTool;
         this.mcpManager = mcpManager;

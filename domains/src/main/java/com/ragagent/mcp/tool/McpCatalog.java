@@ -14,12 +14,12 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.approval.EnabledChecker;
-import com.ragagent.approval.McpApproval;
+import com.ragagent.contract.tool.ToolApprovalGate;
 import com.ragagent.approval.ApprovalToolPolicy;
 import com.ragagent.platform.web.ToolJson;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.mcp.domain.McpService;
-import com.ragagent.approval.Cancellation;
+import com.ragagent.contract.tool.Cancellation;
 import com.ragagent.mcp.oauth.OAuthReauthorizationRequiredException;
 import com.ragagent.mcp.protocol.McpAuthorizationRequiredException;
 import com.ragagent.mcp.protocol.McpOAuthRequiredException;
@@ -158,7 +158,7 @@ public final class McpCatalog {
     final Object preloadLock = new Object();
     final McpCatalogLoader load;
     final McpServiceLookup lookup;
-    final McpApproval gate;
+    final ToolApprovalGate gate;
 
     /** 一台授权服务的快照槽。 */
     static final class McpCatalogServer {
@@ -310,7 +310,7 @@ public final class McpCatalog {
 
     /** 捕获引擎身份，enabled 且有 ID 的服务入目录（first-wins）。 */
     public McpCatalog(long tenantId, String principalStorageId, String oauthPrincipalStorageId,
-            List<McpService> services, McpApproval gate, McpCatalogLoader load, McpServiceLookup lookup) {
+            List<McpService> services, ToolApprovalGate gate, McpCatalogLoader load, McpServiceLookup lookup) {
         this.tenantId = tenantId;
         this.principal = principalStorageId == null ? "" : principalStorageId;
         this.oauthPrincipal = oauthPrincipalStorageId == null ? "" : oauthPrincipalStorageId;

@@ -1,5 +1,18 @@
 package com.ragagent.approval;
 
+import com.ragagent.contract.tool.ApprovalEvent;
+
+import com.ragagent.contract.tool.OAuthPendingRequest;
+
+import com.ragagent.contract.tool.Decision;
+import com.ragagent.contract.tool.ToolApprovalGate;
+
+import com.ragagent.contract.tool.PendingRequest;
+
+import com.ragagent.contract.tool.Cancellation;
+
+import com.ragagent.platform.redis.RedisPubSub;
+
 import java.time.Duration;
 import com.ragagent.platform.config.AppEnvLookup;
 import java.time.Instant;
@@ -39,7 +52,7 @@ import org.slf4j.LoggerFactory;
  * 均可注入，便于测试不必真等 3 秒、可在同一 JVM 模拟多实例；
  * 并新增 {@link #close()} 用于停止订阅线程（容器关闭/测试隔离需要确定出口）。</p>
  */
-public class Gate implements McpApproval, AutoCloseable {
+public class Gate implements ToolApprovalGate, AutoCloseable {
 
     private static final Logger log = LoggerFactory.getLogger(Gate.class);
 

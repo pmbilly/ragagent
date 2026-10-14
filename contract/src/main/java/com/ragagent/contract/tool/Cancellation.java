@@ -1,10 +1,10 @@
-package com.ragagent.approval;
+package com.ragagent.contract.tool;
 
 /**
  * 审批流程内用到的**取消面**（只保留“是否已取消 + 取消回调”语义）。
  *
- * <p>审批门用它做两件事：{@link Gate#requestAndWait} / {@link Gate#requestOAuthAndWait}
- * 的“请求被取消 → 返回取消决策”分支、{@link ApprovalToolPolicy#enabledTools}
+ * <p>审批门用它做两件事：{@code Gate#requestAndWait} / {@code Gate#requestOAuthAndWait}
+ * 的“请求被取消 → 返回取消决策”分支、{@code ApprovalToolPolicy#enabledTools}
  * 每个名字前的短路。不引入隐式的全局上下文，改为显式传入一个可被取消的信号。</p>
  *
  * <p><b>接线提示</b>：SSE 断连 / 用户点“停止生成”时把该信号置为已取消即可；

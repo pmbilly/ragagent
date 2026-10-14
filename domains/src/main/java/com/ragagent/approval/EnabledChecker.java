@@ -1,5 +1,7 @@
 package com.ragagent.approval;
 
+import com.ragagent.contract.tool.Cancellation;
+
 /**
  * 目录批量校验用的单工具查询面。
  *

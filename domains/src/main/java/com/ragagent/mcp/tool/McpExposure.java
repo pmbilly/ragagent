@@ -9,7 +9,7 @@ import java.util.Map;
 
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.domain.McpTool;
-import com.ragagent.approval.McpApproval;
+import com.ragagent.contract.tool.ToolApprovalGate;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.mcp.domain.McpMetadata;
 import com.ragagent.mcp.protocol.McpClient;
@@ -74,7 +74,7 @@ public final class McpExposure {
     public static LoadedDirectory loadMcpDirectory(
             McpService service,
             McpClientManager mcpManager,
-            McpApproval gate,
+            ToolApprovalGate gate,
             McpOAuthPromptSupport.McpOAuthSession oauthSess,
             McpMetadataIO metadata,
             boolean live,
@@ -117,7 +117,7 @@ public final class McpExposure {
     public static List<McpTool> loadMcpServiceTools(
             McpService service,
             McpClientManager mcpManager,
-            McpApproval gate,
+            ToolApprovalGate gate,
             McpOAuthPromptSupport.McpOAuthSession oauthSess,
             McpOAuthPromptSupport.OAuthWaiter waiter,
             McpOAuthPromptSupport.CallerIdentity caller) throws Exception {
@@ -181,7 +181,7 @@ public final class McpExposure {
             ToolRegistry registry,
             List<McpService> services,
             McpClientManager mcpManager,
-            McpApproval gate,
+            ToolApprovalGate gate,
             int authWaitTimeoutSeconds,
             long tenantId,
             McpCatalog.McpServiceLookup lookup,

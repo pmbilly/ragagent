@@ -1,5 +1,7 @@
 package com.ragagent.approval;
 
+import com.ragagent.contract.tool.Cancellation;
+
 /**
  * 逐工具的 MCP 策略查询口。
  *

@@ -1,5 +1,7 @@
 package com.ragagent.approval;
 
+import com.ragagent.contract.tool.Cancellation;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

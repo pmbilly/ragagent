@@ -1,4 +1,4 @@
-package com.ragagent.approval;
+package com.ragagent.contract.tool;
 
 /**
  * 一次待决审批的结果。

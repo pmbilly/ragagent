@@ -14,7 +14,7 @@ import java.util.function.BiConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ragagent.approval.RedisPubSub;
+import com.ragagent.platform.redis.RedisPubSub;
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.mapper.ImChannelMapper;
 import com.ragagent.im.runtime.AdapterInterfaces.Adapter;

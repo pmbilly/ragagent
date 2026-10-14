@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.ragagent.approval.ApprovalException;
-import com.ragagent.approval.Decision;
+import com.ragagent.contract.tool.Decision;
 import com.ragagent.approval.Gate;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.BizException;

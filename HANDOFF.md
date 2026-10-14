@@ -1308,6 +1308,20 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **A② 全批提交**：`a7d3b13e`（第①批 42 类）· `37b5fbb8`（第②批 去框架化 37 类）· `2ee75327`（第②批 补：解锁 11 类）· 本批（第③批 9 类 + 收口）。
 - **A 的下一步**：**③ 立「域间只经契约」**（A20 已守"契约唯一实现"；还差"业务域之间只经 `contract`"这条规则——应先测现状再决定硬规则 vs 棘轮基线）。可选后续：① 的 K 级重设计（`JsonNode` → typed records）另立项。
 
+**🔶 A③ 第十一刀：approval 协议入契约 + 工具审批闸门端口（2026-10-14，R10 边 51 → 49、类 270 → 265）**
+- **A段（共用设施归位）**：`RedisPubSub`（纯接口）+ `SpringRedisPubSub`（Spring Redis 适配）由 `approval/` 迁**新 platform 面 `platform.redis`**（§8.2 未列此面 ⇒ 登记：跨进程 pub/sub 抽象 + Redis 适配属"通用技术适配"）⇒ **`im→approval` 整条清零** ✓（im 此前只用这两个类）
+- **B段（审批协议入契约 + 闸门端口）**：
+  - **6 个纯 JDK 协议类型 → `contract.tool`**：`Cancellation`（取消面）、`Decision`（审批决定）、`PendingRequest`/`OAuthPendingRequest`（待决请求）、`ApprovalEventBus`/`ApprovalEvent`（事件面 —— 闭包随 `PendingRequest` 的字段 `ApprovalEventBus` 走 ✓）
+  - **新端口 `contract.tool.ToolApprovalGate`**（6 方法 ＝ Gate 的公开审批 API：`needsApproval`/`isEnabled`/`enabledTools`/`requestAndWait`/`requestOAuthAndWait`/`resolve`）；**删 `approval.McpApproval`**（域内接口被契约端口取代）；`Gate implements ToolApprovalGate` ✓
+  - 消费方换型：**session 2 类**（`AgentEngineAssembler`/`SessionAgentQaService` 注入类型 `Gate` → 端口）⇒ **`session→approval` 整条清零** ✓；**mcp 3 类**（`McpCatalog`/`McpToolWrapper`/`McpExposure`）换端口 ⇒ `mcp→approval` **8 → 7**（余量＝`Gate` 构造面 + 策略查询面：`GateOptions`/`Checker`/`EnabledChecker`/`BulkEnabledChecker`/`ApprovalToolPolicy`/`ApprovalBridge`/`ApprovalException` ⇒ "A 域**实现**审批策略"的深度消费，单独立刀）
+- **⚠️ 三处自伤 / 教训（全部当场修）**：
+  1. **冗余二次替换叠字**：对 `Gate toolApprovalGate` 先跑正则（已覆盖），又补了一次字面替换 ⇒ `ToolApprovalToolApprovalGate` ✗（3 处，编译当场抓）⇒ **正则已覆盖的情形不要再补字面替换**
+  2. **测试树是第三类"同包裸引用"盲区**：`testFixtures/approval/RecordingEventBus` 等 6 个测试件同包裸引用搬走的类型 ✗ —— 我的编译驱动循环初始只覆盖 `*/src/main/java` + 只编译 main ✗ ⇒ 扩到 `compileTestJava`+`compileTestFixturesJava` 后补齐 **21 处** import ✓；另有一处形态不同（`package RedisPubSub does not exist` ＝限定名缺 import）需手修 ⇒ **修补器要覆盖 `symbol: class` 之外的报错形态**
+  3. **⚠️ 闸门假绿（最值钱的一条）**：javadoc 失败时 build 停在该阶段 ⇒ **boot 测试根本没跑**，而 `test-summary.py` 显示的是**上一次 `--tests arch.*` 的旧结果**（`boot tests=28`）✗ —— 我当时只看了摘要前几行、没看出 28 ≠ 1331 ⇒ **判闸门必须同时核 `BUILD SUCCESSFUL` 与各模块 counts（boot 应为 1331）**，不能只看摘要 ✓（修完重跑：**1m51s / 4987 ✓**）
+- **javadoc 第 2 次当模块边界探针**：搬入 `:contract` 的 `Cancellation`/`ApprovalEventBus` 里的 `{@link Gate}`/`{@link ApprovalToolPolicy#enabledTools}`/`{@link ApprovalException.Kind#INTERNAL}` 在独立模块内解析不到 ✗ ⇒ 改 `{@code}` ✓（与 A④-1 同一课 ⇒ 结论：**搬家前先扫 javadoc 里的 `{@link}` 目标是否跨模块**，可省一轮）
+- **验证**：`spotlessCheck build` ✓ **1m51s** ✓；**4987 / 失败 0 / 跳过 4** ✓（boot **1331** ✓）；**13 守卫全绿** ✓；`arch.*` 28 条 ✓
+- **A③ 累计（十一刀）**：边 **64 → 49（−15）**、类 **317 → 265（−52）**；三档 **① 41 条 / 179 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
+- **下一步**：`embedchannel→mcp`（需 **MCP OAuth 端口**；审批 resolve 已可由 `ToolApprovalGate.resolve` 承担 ✓）→ `embedchannel→session`（会话族端口）→ `mcp→approval` 余 7（构造/策略面）→ `im→agentmanagement` 余 7
 **🔶 A③ 第十刀：共用 type handler 归位 L1 + `embedchannel→agentmanagement` 清零（2026-10-14，R10 边 52 → 51、类 274 → 270）**
 - **A段（共用件归位，正踩 ArchUnit A19 登记的收敛方向）**：`JsonbRawStringTypeHandler` 由 `agentmanagement/mapper` 移入 **L1 `platform.persistence`**（与 `NaiveOffsetDateTimeTypeHandler` 同处）—— 它在 **3 个域共用**（agentmanagement / im / embedchannel）。⇒ 4 个实体（`CustomAgentEntity` / `EmbedChannelEntity` / `ChannelSessionEntity` / `ImChannelEntity`）只留 `@TableField` 注解读引用；**A19 棘轮当场点名"基线已不再违例，请删除条目收紧基线"** ⇒ 基线 10 → **6** ✓（守卫在行使"**改善也要显式登记**"的纪律 ✓）；**包环 SCC 基线随之消解刷新 11 → 10 组** ✓（`agentmanagement.domain ⇄ mapper` 那个环没了）
   - 细节：3 个 mapper 只在 **SQL 字符串**里引用该 handler（`#{e.config, typeHandler=com.…}`）⇒ 无 import、**只在运行期解析** ✗⇒ FQN 替换必须连字符串一起改 ✓（本刀已改）；`CustomAgentMapper` 的 javadoc `{@link}` 改全限定 ✓

@@ -3,9 +3,9 @@ package com.ragagent.mcp.tool;
 import java.time.Duration;
 import java.time.Instant;
 
-import com.ragagent.approval.Cancellation;
-import com.ragagent.approval.Decision;
-import com.ragagent.approval.OAuthPendingRequest;
+import com.ragagent.contract.tool.Cancellation;
+import com.ragagent.contract.tool.Decision;
+import com.ragagent.contract.tool.OAuthPendingRequest;
 import com.ragagent.platform.event.Event;
 import com.ragagent.platform.event.EventBus;
 import com.ragagent.platform.event.EventType;

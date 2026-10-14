@@ -1,5 +1,9 @@
 package com.ragagent.approval;
 
+import com.ragagent.contract.tool.ApprovalEvent;
+
+import com.ragagent.contract.tool.ApprovalEventBus;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

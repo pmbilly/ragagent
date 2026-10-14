@@ -28,7 +28,7 @@ import com.ragagent.model.service.ModelRuntimeConfigs;
 import com.ragagent.session.support.PipelineViews;
 import com.ragagent.agent.budget.AgentBudgets;
 import com.ragagent.agent.skills.SkillCatalogService;
-import com.ragagent.approval.Gate;
+import com.ragagent.contract.tool.ToolApprovalGate;
 import com.ragagent.knowledge.service.management.KnowledgeService;
 import com.ragagent.modelruntime.application.LlmChatClients;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
@@ -96,7 +96,7 @@ public class SessionAgentQaService {
             McpServiceManagement mcpServiceService,
             McpMetadataService mcpMetadataService,
             McpClientManager mcpClientManager,
-            Gate toolApprovalGate,
+            ToolApprovalGate toolApprovalGate,
             VlmDescriberWiring vlmDescriberWiring,
             SkillCatalogService skillCatalogService) {
         this.concurrencyGovernor = concurrencyGovernor;

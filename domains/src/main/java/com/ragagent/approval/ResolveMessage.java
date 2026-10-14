@@ -1,5 +1,7 @@
 package com.ragagent.approval;
 
+import com.ragagent.contract.tool.Decision;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 

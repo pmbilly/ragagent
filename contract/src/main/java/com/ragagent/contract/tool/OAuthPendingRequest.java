@@ -1,13 +1,16 @@
-package com.ragagent.approval;
+package com.ragagent.contract.tool;
+
+import java.time.Duration;
 
 /**
- * 一次待决审批所需的全部上下文。
+ * 一次 OAuth 授权等待所需的全部上下文。
  *
- * <p>{@code args} 是原始 JSON 字符串。构造用 {@link #builder()}（项目约定不使用 Lombok）。</p>
+ * <p>用于“会话中途调用了需 OAuth 的 MCP 服务，弹卡片让用户授权并阻塞等待”的场景。</p>
  *
- * <p><b>userId</b>：发起调用的会话属主，用于 {@code Resolve} 鉴权；为空表示跳过用户校验。</p>
+ * <p>{@code waitTimeout}：&gt; 0 时覆盖 gate 默认等待时长。等待**总是**有界的
+ * （该值 / gate 默认值 / ctx 取消三者之一），因此被阻塞的线程不会泄漏。</p>
  */
-public record PendingRequest(
+public record OAuthPendingRequest(
         long tenantId,
         String userId,
         String sessionId,
@@ -17,12 +20,10 @@ public record PendingRequest(
         String serviceId,
         String serviceName,
         String mcpToolName,
-        String registeredToolName,
-        String description,
-        String args,
-        String toolCallId) {
+        String toolCallId,
+        Duration waitTimeout) {
 
-    public PendingRequest {
+    public OAuthPendingRequest {
         userId = nz(userId);
         sessionId = nz(sessionId);
         assistantMessageId = nz(assistantMessageId);
@@ -30,9 +31,6 @@ public record PendingRequest(
         serviceId = nz(serviceId);
         serviceName = nz(serviceName);
         mcpToolName = nz(mcpToolName);
-        registeredToolName = nz(registeredToolName);
-        description = nz(description);
-        args = nz(args);
         toolCallId = nz(toolCallId);
     }
 
@@ -55,10 +53,8 @@ public record PendingRequest(
         private String serviceId = "";
         private String serviceName = "";
         private String mcpToolName = "";
-        private String registeredToolName = "";
-        private String description = "";
-        private String args = "";
         private String toolCallId = "";
+        private Duration waitTimeout;
 
         public Builder tenantId(long v) {
             this.tenantId = v;
@@ -105,30 +101,20 @@ public record PendingRequest(
             return this;
         }
 
-        public Builder registeredToolName(String v) {
-            this.registeredToolName = v;
-            return this;
-        }
-
-        public Builder description(String v) {
-            this.description = v;
-            return this;
-        }
-
-        /** 原始 JSON。 */
-        public Builder args(String v) {
-            this.args = v;
-            return this;
-        }
-
         public Builder toolCallId(String v) {
             this.toolCallId = v;
             return this;
         }
 
-        public PendingRequest build() {
-            return new PendingRequest(tenantId, userId, sessionId, assistantMessageId, requestId, eventBus,
-                    serviceId, serviceName, mcpToolName, registeredToolName, description, args, toolCallId);
+        /** 覆盖 gate 默认等待时长。 */
+        public Builder waitTimeout(Duration v) {
+            this.waitTimeout = v;
+            return this;
+        }
+
+        public OAuthPendingRequest build() {
+            return new OAuthPendingRequest(tenantId, userId, sessionId, assistantMessageId, requestId, eventBus,
+                    serviceId, serviceName, mcpToolName, toolCallId, waitTimeout);
         }
     }
 }

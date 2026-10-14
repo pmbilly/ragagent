@@ -36,8 +36,8 @@ class ApprovalBridgeTest {
         EventBus bus = new EventBus();
         AtomicReference<Event> received = new AtomicReference<>();
         bus.on(EventType.EVENT_TOOL_APPROVAL_REQUIRED, received::set);
-        com.ragagent.approval.ApprovalEventBus bridged = ApprovalBridge.toEventBus(bus);
-        bridged.emit(new com.ragagent.approval.ApprovalEvent(
+        com.ragagent.contract.tool.ApprovalEventBus bridged = ApprovalBridge.toEventBus(bus);
+        bridged.emit(new com.ragagent.contract.tool.ApprovalEvent(
                 "pending-1-approval-required",
                 ResponseType.TOOL_APPROVAL_REQUIRED,
                 "sess-1",
@@ -75,7 +75,7 @@ class ApprovalBridgeTest {
         EventBus bus = new EventBus();
         AtomicReference<Event> resolved = new AtomicReference<>();
         bus.on(EventType.EVENT_TOOL_APPROVAL_RESOLVED, resolved::set);
-        ApprovalBridge.toEventBus(bus).emit(new com.ragagent.approval.ApprovalEvent(
+        ApprovalBridge.toEventBus(bus).emit(new com.ragagent.contract.tool.ApprovalEvent(
                 "pending-1-approval-resolved",
                 ResponseType.TOOL_APPROVAL_RESOLVED,
                 "sess-1",
@@ -91,7 +91,7 @@ class ApprovalBridgeTest {
         // oauth required
         AtomicReference<Event> oauth = new AtomicReference<>();
         bus.on(EventType.EVENT_MCP_OAUTH_REQUIRED, oauth::set);
-        ApprovalBridge.toEventBus(bus).emit(new com.ragagent.approval.ApprovalEvent(
+        ApprovalBridge.toEventBus(bus).emit(new com.ragagent.contract.tool.ApprovalEvent(
                 "pending-2-mcp-oauth",
                 ResponseType.MCP_OAUTH_REQUIRED,
                 "sess-1",
@@ -106,7 +106,7 @@ class ApprovalBridgeTest {
         // oauth resolved（approval 侧叫 approved，payload 侧叫 authorized）
         AtomicReference<Event> oauthResolved = new AtomicReference<>();
         bus.on(EventType.EVENT_MCP_OAUTH_RESOLVED, oauthResolved::set);
-        ApprovalBridge.toEventBus(bus).emit(new com.ragagent.approval.ApprovalEvent(
+        ApprovalBridge.toEventBus(bus).emit(new com.ragagent.contract.tool.ApprovalEvent(
                 "pending-2-mcp-oauth-resolved",
                 ResponseType.MCP_OAUTH_RESOLVED,
                 "sess-1",
@@ -125,7 +125,7 @@ class ApprovalBridgeTest {
         AtomicReference<Event> received = new AtomicReference<>();
         bus.on(EventType.EVENT_TOOL_APPROVAL_REQUIRED, received::set);
         Object unknown = List.of("raw");
-        ApprovalBridge.toEventBus(bus).emit(new com.ragagent.approval.ApprovalEvent(
+        ApprovalBridge.toEventBus(bus).emit(new com.ragagent.contract.tool.ApprovalEvent(
                 "id", ResponseType.TOOL_APPROVAL_REQUIRED,
                 "sess-1", unknown, Map.of(), "req-5"));
         assertSame(unknown, received.get().getData());

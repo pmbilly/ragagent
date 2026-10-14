@@ -1,4 +1,4 @@
-package com.ragagent.approval;
+package com.ragagent.platform.redis;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;

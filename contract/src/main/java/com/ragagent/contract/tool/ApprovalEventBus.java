@@ -1,4 +1,4 @@
-package com.ragagent.approval;
+package com.ragagent.contract.tool;
 
 /**
  * 事件总线在本包内的最小面。
@@ -10,7 +10,7 @@ package com.ragagent.approval;
  *
  * <p><b>线程语义</b>：实现应**同步**执行——顺序调用 handler，
  * 任一 handler 失败即抛运行时异常，
- * {@link Gate} 会包装成 {@link ApprovalException.Kind#INTERNAL}。</p>
+ * {@code Gate} 会包装成 {@code ApprovalException.Kind#INTERNAL}。</p>
  */
 @FunctionalInterface
 public interface ApprovalEventBus {
