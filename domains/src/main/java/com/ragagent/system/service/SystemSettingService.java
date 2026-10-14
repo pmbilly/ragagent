@@ -13,9 +13,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.ragagent.contract.audit.AuditAction;
-import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.contract.audit.AuditOutcome;
-import com.ragagent.audit.service.AuditLogService;
+import com.ragagent.contract.audit.AuditWritePort;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.mapper.UserMapper;
 import com.ragagent.platform.access.TenantContext;
@@ -59,7 +58,7 @@ public class SystemSettingService implements SystemSettingGateway {
 
     private final SystemSettingMapper mapper;
     private final UserMapper userMapper;
-    private final AuditLogService auditService;
+    private final AuditWritePort auditWriter;
     /** 白名单是进程级静态——注入任意实例即可（reloadWhitelist 改的是静态字段）。 */
     private final SsrfGuard ssrfGuard;
     /** 三层解析的 ENV 层（Spring Environment，不读裸 System.getenv；键名由调用方给）。 */
@@ -70,12 +69,12 @@ public class SystemSettingService implements SystemSettingGateway {
 
     public SystemSettingService(SystemSettingMapper mapper,
                                 UserMapper userMapper,
-                                AuditLogService auditService,
+                                AuditWritePort auditWriter,
                                 SsrfGuard ssrfGuard,
                                 Environment environment) {
         this.mapper = mapper;
         this.userMapper = userMapper;
-        this.auditService = auditService;
+        this.auditWriter = auditWriter;
         this.ssrfGuard = ssrfGuard;
         this.environment = environment;
     }
@@ -445,7 +444,7 @@ public class SystemSettingService implements SystemSettingGateway {
 
     /** tenant_id=0 + oldValue/newValue（RawMessage 直嵌）。 */
     private void emitChangeAudit(String key, String valueType, JsonNode oldValue, JsonNode newValue) {
-        if (auditService == null) {
+        if (auditWriter == null) {
             return;
         }
         var details = MAPPER.createObjectNode();
@@ -453,17 +452,19 @@ public class SystemSettingService implements SystemSettingGateway {
         details.put("valueType", valueType);
         details.set("oldValue", oldValue == null ? MAPPER.nullNode() : oldValue);
         details.set("newValue", newValue == null ? MAPPER.nullNode() : newValue);
-        AuditLog entry = new AuditLog();
-        entry.setTenantId(0L);
-        entry.setActorUserId(auditActor());
-        entry.setActorRole("system_admin");
-        entry.setAction(AuditAction.SYSTEM_SETTING_CHANGED);
-        entry.setTargetType("system_setting");
-        entry.setTargetId(key);
-        entry.setOutcome(AuditOutcome.SUCCESS);
-        entry.setDetails(details);
         try {
-            auditService.logBestEffort(entry);
+            auditWriter.logBestEffort(new AuditWritePort.AuditRecord(
+                    0L,
+                    auditActor(),
+                    "system_admin",
+                    AuditAction.SYSTEM_SETTING_CHANGED,
+                    "system_setting",
+                    key,
+                    "",
+                    "",
+                    "",
+                    AuditOutcome.SUCCESS,
+                    details == null ? null : details.toString()));
         } catch (RuntimeException e) {
             log.warn("[system_settings] audit write failed (ignored): {}", e.toString());
         }

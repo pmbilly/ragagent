@@ -11,7 +11,8 @@
         "✅ 已做（A③-⑩）：`JsonbRawStringTypeHandler` 归位 L1 + `common.agent.AgentLookup` ⇒ 清 `embedchannel→agentmanagement` ✓",
         "✅ 已做（A③-⑪）：`RedisPubSub`/`SpringRedisPubSub` → `platform.redis` ⇒ 清 `im→approval` ✓；6 个审批协议类型 → `contract.tool` + 端口 `ToolApprovalGate`（删 `McpApproval`）⇒ 清 `session→approval` ✓、`mcp→approval` 8 → 7 ✓",
         "✅ 已做（A③-⑫）：L1 端口 `common.mcp.McpApprovalOps`（5 操作，实现 `mcp/api/McpApprovalOpsAdapter`）⇒ 清 `embedchannel→mcp` ✓（金片验证零行为变化 ✓）",
-        "⏸ **audit 族余 2 条边**（`knowledge→audit`2：`FaqEntryCommandService`/`KnowledgeTagService` 带 scope ✓；`system→audit`3：`SystemAdminController`（**2 处构造**）/`SystemAdminUserService`/`SystemSettingService` —— 后两者有 `auditService == null` **空守卫** ✗ ⇒ 端口要保留同语义）—— 前置（扩 `AuditRecord` + 适配器 + 既有构造点）已于 A③-⑮ 完成 ✓，逐类替换 helper 即可",
+        "✅ 已做（A③-⑭⑮⑯）：**`*→audit` 族 5 条边全部清零** ✓（agentmanagement/auth/datasource/knowledge/system）——路径＝常量入契约（⑭）→ 扩 `AuditRecord`+scope、auth/datasource（⑮）→ knowledge/system（⑯）",
+        "⏸ ①档余量按性价比：`im→agentmanagement`(7，扩 `AgentLookup`，**按调用点扫** ✓) → `mcp→approval`(7，`Gate` 构造/策略面再分一层) → `session` 能力边（`knowledge`17 · `storage`14 · `model`12 · `memory`7 · `settings`5 · `websearch`4 · `wiki`2 ＝ 63 类）→ `embedchannel→session` 余 2（**已拍板：转\"实体→视图 + 流式契约\"K 级，不建 servlet seam** ✓）",
         "⏸ `embedchannel→session`（**余 2 类**：`EmbedChannelController` + `EmbedChannelDelegateOps` 的 **HTTP 委托** ✗）—— 服务侧段已做（A③-⑬：`common.session.EmbedSessionOps` 拿走 `EmbedChannelService`/`EmbedChannelPublicOps` 两类 + 归属校验 ✓）。余下 7 个操作：QA（**servlet + SSE** ✗）、`loadMessages`（返回**实体列表** ✗）、`stopSession`、建议三连 ⇒ **需要先拍板形态**：① servlet/SSE 形态的 seam 端口（同已登记的 `ApiKeyAuthPort` K 级），或 ② 会话实体 → 视图（`Message`/`Session` typed records）的 K 级重设计",
         "⏸ `mcp→approval`（余 7 类）：`Gate` 构造面 + 策略查询面（`GateOptions`/`Checker`/`EnabledChecker`/`BulkEnabledChecker`/`ApprovalToolPolicy`/`ApprovalBridge`/`ApprovalException`）＝\"A 域实现审批策略\"的深度消费 ⇒ 需再分一层（构造/策略端口 vs 闸门端口）",
         "⏸ `mcp→agent`（9 类）：工具 SPI 主体 = Jackson `JsonNode` / `EventBus` / `llm.domain.ChatMessage` / `ToolCallTarget`(jsonb) ⇒ 属 A②「JsonNode 载体」K 级重设计",
@@ -207,10 +208,6 @@
       "ChunkQuestionService",
       "KnowledgeSummaryService"
     ],
-    "knowledge→audit": [
-      "FaqEntryCommandService",
-      "KnowledgeTagService"
-    ],
     "mcp→approval": [
       "Adapter",
       "AgentToolApprovalController",
@@ -377,11 +374,6 @@
     "system→storage": [
       "SystemController",
       "SystemInfoService"
-    ],
-    "system→audit": [
-      "SystemAdminController",
-      "SystemAdminUserService",
-      "SystemSettingService"
     ],
     "system→tenant": [
       "SystemAdminController",

@@ -14,9 +14,8 @@ import com.ragagent.contract.apikey.ApiKeyAdminPort;
 import com.ragagent.contract.apikey.TenantAPIKeyCreateResponse;
 import com.ragagent.contract.apikey.TenantAPIKeyResponse;
 import com.ragagent.contract.audit.AuditAction;
-import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.contract.audit.AuditOutcome;
-import com.ragagent.audit.service.AuditLogService;
+import com.ragagent.contract.audit.AuditWritePort;
 import com.ragagent.auth.domain.User;
 import com.ragagent.tenant.mapper.TenantMapper;
 import com.ragagent.platform.access.TenantContext;
@@ -69,18 +68,18 @@ public class SystemAdminController {
     private final SystemSettingService settings;
     private final ApiKeyAdminPort apiKeyAdmin;
     private final TenantMapper tenantMapper;
-    private final AuditLogService auditService;
+    private final AuditWritePort auditWriter;
 
     public SystemAdminController(SystemAdminUserService users,
                                  SystemSettingService settings,
                                  ApiKeyAdminPort apiKeyAdmin,
                                  TenantMapper tenantMapper,
-                                 AuditLogService auditService) {
+                                 AuditWritePort auditWriter) {
         this.users = users;
         this.settings = settings;
         this.apiKeyAdmin = apiKeyAdmin;
         this.tenantMapper = tenantMapper;
-        this.auditService = auditService;
+        this.auditWriter = auditWriter;
     }
 
     // ── P0：系统管理员升降级 ──────────────────────────────────────────────
@@ -312,16 +311,18 @@ public class SystemAdminController {
         var details = new LinkedHashMap<String, Object>();
         details.put("scopeType", APIKeyScopeType.PLATFORM);
         details.put("capabilities", capabilities);
-        AuditLog entry = new AuditLog();
-        entry.setTenantId(0L);
-        entry.setActorUserId(TenantContext.currentUserId() == null ? "" : TenantContext.currentUserId());
-        entry.setActorRole(SystemAdminUserService.systemAuditActorRole());
-        entry.setAction(action);
-        entry.setTargetType("api_key");
-        entry.setTargetId(String.valueOf(keyId));
-        entry.setOutcome(AuditOutcome.SUCCESS);
-        entry.setDetails(MAPPER.valueToTree(details));
-        auditService.logBestEffort(entry);
+        auditWriter.logBestEffort(new AuditWritePort.AuditRecord(
+                0L,
+                TenantContext.currentUserId() == null ? "" : TenantContext.currentUserId(),
+                SystemAdminUserService.systemAuditActorRole(),
+                action,
+                "api_key",
+                String.valueOf(keyId),
+                "",
+                "",
+                "",
+                AuditOutcome.SUCCESS,
+                MAPPER.valueToTree(details).toString()));
     }
 
     /** validation 工厂：code 1010 信封；message 取传入原文、details 为 null。 */
@@ -495,16 +496,18 @@ public class SystemAdminController {
         details.put("quotaBytes", quotaBytes);
         details.put("quotaGb", gb);
         details.put("affected", affected);
-        AuditLog entry = new AuditLog();
-        entry.setTenantId(0L);
-        entry.setActorUserId(TenantContext.currentUserId() == null ? "" : TenantContext.currentUserId());
-        entry.setActorRole(SystemAdminUserService.systemAuditActorRole());
-        entry.setAction(AuditAction.SYSTEM_SETTING_CHANGED);
-        entry.setTargetType("tenant_storage_quota");
-        entry.setTargetId("all");
-        entry.setOutcome(AuditOutcome.SUCCESS);
-        entry.setDetails(MAPPER.valueToTree(details));
-        auditService.logBestEffort(entry);
+        auditWriter.logBestEffort(new AuditWritePort.AuditRecord(
+                0L,
+                TenantContext.currentUserId() == null ? "" : TenantContext.currentUserId(),
+                SystemAdminUserService.systemAuditActorRole(),
+                AuditAction.SYSTEM_SETTING_CHANGED,
+                "tenant_storage_quota",
+                "all",
+                "",
+                "",
+                "",
+                AuditOutcome.SUCCESS,
+                MAPPER.valueToTree(details).toString()));
         return ResponseEntity.ok(new StorageQuotaApplyResponse(affected, quotaBytes, gb));
     }
 }

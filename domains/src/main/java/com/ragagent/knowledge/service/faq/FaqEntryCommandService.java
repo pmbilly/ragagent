@@ -25,9 +25,8 @@ import com.ragagent.knowledge.dto.faq.FaqEntry;
 import com.ragagent.knowledge.repository.FaqChunkRepository;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.contract.audit.AuditAction;
-import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.contract.audit.AuditOutcome;
-import com.ragagent.audit.service.AuditLogService;
+import com.ragagent.contract.audit.AuditWritePort;
 import com.ragagent.model.domain.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +64,7 @@ public class FaqEntryCommandService {
     private final FaqImportTaskStore taskStore;
     private final VectorStoreService vectorStore;
     private final KnowledgeVectorWrites vectorWrites;
-    private final AuditLogService auditService;
+    private final AuditWritePort auditWriter;
     private final FaqGuard faqGuard;
     private final FaqChunkCodec faqChunkCodec;
     private final FaqIndexWriter faqIndexWriter;
@@ -76,7 +75,7 @@ public class FaqEntryCommandService {
                                   FaqImportTaskStore taskStore,
                                   VectorStoreService vectorStore,
                                   KnowledgeVectorWrites vectorWrites,
-                                  AuditLogService auditService,
+                                  AuditWritePort auditWriter,
                                   FaqGuard faqGuard,
                                   FaqChunkCodec faqChunkCodec,
                                   FaqIndexWriter faqIndexWriter,
@@ -88,7 +87,7 @@ public class FaqEntryCommandService {
         this.taskStore = taskStore;
         this.vectorStore = vectorStore;
         this.vectorWrites = vectorWrites;
-        this.auditService = auditService;
+        this.auditWriter = auditWriter;
         this.faqGuard = faqGuard;
         this.faqChunkCodec = faqChunkCodec;
         this.faqIndexWriter = faqIndexWriter;
@@ -653,23 +652,23 @@ public class FaqEntryCommandService {
                 : TenantContext.currentRole() == null
                 ? "" : TenantContext.currentRole();
 
-        AuditLog entry = new AuditLog();
-        entry.setTenantId(tid);
-        entry.setActorUserId(actorId);
-        entry.setActorRole(actorRole);
-        entry.setAction(action);
-        entry.setScopeType("knowledge_base");
-        entry.setScopeId(kbId);
-        entry.setTargetType(targetType);
-        entry.setTargetId(targetId);
-        entry.setOutcome(AuditOutcome.SUCCESS);
         ObjectNode detailsNode = JSON.createObjectNode();
         details.entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())
                 .forEachOrdered(e -> detailsNode.set(e.getKey(),
                         JSON.valueToTree(e.getValue())));
-        entry.setDetails(detailsNode);
-        auditService.logBestEffort(entry);
+        auditWriter.logBestEffort(new AuditWritePort.AuditRecord(
+                tid,
+                actorId,
+                actorRole,
+                action,
+                targetType,
+                targetId,
+                "",
+                "knowledge_base",
+                kbId,
+                AuditOutcome.SUCCESS,
+                detailsNode.toString()));
     }
 
 

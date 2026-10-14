@@ -8,9 +8,8 @@ import java.util.UUID;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.platform.persistence.PageRequests;
-import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.contract.audit.AuditOutcome;
-import com.ragagent.audit.service.AuditLogService;
+import com.ragagent.contract.audit.AuditWritePort;
 import com.ragagent.auth.domain.AuthToken;
 import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.auth.domain.User;
@@ -62,7 +61,7 @@ public class SystemAdminUserService {
     private final AuthTokenMapper authTokenMapper;
     private final TenantService tenantService;
     private final TenantMemberService memberService;
-    private final AuditLogService auditService;
+    private final AuditWritePort auditWriter;
     private final SystemSettingService settingService;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -70,13 +69,13 @@ public class SystemAdminUserService {
                                   AuthTokenMapper authTokenMapper,
                                   TenantService tenantService,
                                   TenantMemberService memberService,
-                                  AuditLogService auditService,
+                                  AuditWritePort auditWriter,
                                   SystemSettingService settingService) {
         this.userMapper = userMapper;
         this.authTokenMapper = authTokenMapper;
         this.tenantService = tenantService;
         this.memberService = memberService;
-        this.auditService = auditService;
+        this.auditWriter = auditWriter;
         this.settingService = settingService;
     }
 
@@ -343,25 +342,25 @@ public class SystemAdminUserService {
 
     /** tenant_id=0 + target user。details 可空 → {}。 */
     public void emitAdminAudit(String action, User target, Map<String, Object> details) {
-        if (auditService == null) {
+        if (auditWriter == null) {
             return;
         }
         var detailsNode = JsonMappers.lenient().valueToTree(
                 details == null ? Map.of() : details);
-        AuditLog entry = new AuditLog();
-        entry.setTenantId(0L);
-        entry.setActorUserId(TenantContext.currentUserId() == null ? "" : TenantContext.currentUserId());
-        entry.setActorRole(systemAuditActorRole());
-        entry.setAction(action);
-        entry.setTargetType("user");
-        entry.setOutcome(AuditOutcome.SUCCESS);
-        entry.setDetails(detailsNode);
-        if (target != null) {
-            entry.setTargetId(target.getId());
-            entry.setTargetUserId(target.getId());
-        }
+        String targetId = target == null ? "" : target.getId();
         try {
-            auditService.logBestEffort(entry);
+            auditWriter.logBestEffort(new AuditWritePort.AuditRecord(
+                    0L,
+                    TenantContext.currentUserId() == null ? "" : TenantContext.currentUserId(),
+                    systemAuditActorRole(),
+                    action,
+                    "user",
+                    targetId,
+                    targetId,
+                    "",
+                    "",
+                    AuditOutcome.SUCCESS,
+                    detailsNode.toString()));
         } catch (RuntimeException e) {
             log.warn("system admin audit write failed (ignored): {}", e.toString());
         }

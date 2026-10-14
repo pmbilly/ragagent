@@ -8,9 +8,8 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.contract.audit.AuditAction;
-import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.contract.audit.AuditOutcome;
-import com.ragagent.audit.service.AuditLogService;
+import com.ragagent.contract.audit.AuditWritePort;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.knowledge.domain.KnowledgeBase;
@@ -70,7 +69,7 @@ public class KnowledgeTagService {
     private final KnowledgeTagRepository tagRepo;
     private final FaqChunkRepository faqChunkRepository;
     private final ChunkRepository chunkRepo;
-    private final AuditLogService auditService;
+    private final AuditWritePort auditWriter;
     /** 向量索引回收。 */
     private final VectorStoreService vectorStore;
     /** 绑定 store 的向量写路由（绑定 KB 的索引清理走引擎口）。 */
@@ -96,7 +95,7 @@ public class KnowledgeTagService {
                                KnowledgeTaskExecutor taskExecutor, KnowledgeBaseService kbService,
                                KnowledgeTagRepository tagRepo,
                                ChunkRepository chunkRepo,
-                               AuditLogService auditService,
+                               AuditWritePort auditWriter,
                                VectorStoreService vectorStore,
                                KnowledgeVectorWrites vectorWrites,
                                ModelRuntimeAssembler modelRuntimeAssembler,
@@ -107,7 +106,7 @@ public class KnowledgeTagService {
         this.kbService = kbService;
         this.tagRepo = tagRepo;
         this.chunkRepo = chunkRepo;
-        this.auditService = auditService;
+        this.auditWriter = auditWriter;
         this.vectorStore = vectorStore;
         this.vectorWrites = vectorWrites;
         this.modelRuntimeAssembler = modelRuntimeAssembler;
@@ -437,22 +436,22 @@ public class KnowledgeTagService {
         String actorRole = actorId.isEmpty() ? "" : TenantContext.currentRole() == null
                 ? "" : TenantContext.currentRole();
 
-        AuditLog entry = new AuditLog();
-        entry.setTenantId(tid);
-        entry.setActorUserId(actorId);
-        entry.setActorRole(actorRole);
-        entry.setAction(action);
-        entry.setScopeType(SCOPE_KNOWLEDGE_BASE);
-        entry.setScopeId(kbId);
-        entry.setTargetType(targetType);
-        entry.setTargetId(targetId);
-        entry.setOutcome(AuditOutcome.SUCCESS);
         ObjectNode detailsNode = MAPPER.createObjectNode();
         details.entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())
                 .forEachOrdered(e -> detailsNode.set(e.getKey(), MAPPER.valueToTree(e.getValue())));
-        entry.setDetails(detailsNode);
-        auditService.logBestEffort(entry);
+        auditWriter.logBestEffort(new AuditWritePort.AuditRecord(
+                tid,
+                actorId,
+                actorRole,
+                action,
+                targetType,
+                targetId,
+                "",
+                SCOPE_KNOWLEDGE_BASE,
+                kbId,
+                AuditOutcome.SUCCESS,
+                detailsNode.toString()));
     }
 
     /**

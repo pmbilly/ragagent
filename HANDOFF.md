@@ -1308,6 +1308,16 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **A② 全批提交**：`a7d3b13e`（第①批 42 类）· `37b5fbb8`（第②批 去框架化 37 类）· `2ee75327`（第②批 补：解锁 11 类）· 本批（第③批 9 类 + 收口）。
 - **A 的下一步**：**③ 立「域间只经契约」**（A20 已守"契约唯一实现"；还差"业务域之间只经 `contract`"这条规则——应先测现状再决定硬规则 vs 棘轮基线）。可选后续：① 的 K 级重设计（`JsonNode` → typed records）另立项。
 
+**🔶 A③ 第十六刀：audit 族收官 ⇒ `knowledge→audit` + `system→audit` 双清（2026-10-14，R10 边 45 → 43、类 255 → 250）**
+- **迁移 5 类**（前置已由刀十四/十五就位 ✓）：
+  - knowledge：`FaqEntryCommandService`、`KnowledgeTagService`（**均带 scope** ✓；details 用 `ObjectNode.toString()` 过端口 ✓，适配器已有 parse 容错 ✓）
+  - system：`SystemAdminController`（**2 处块**：api-key / tenant_storage_quota）、`SystemAdminUserService`（`emitAdminAudit`：**保留 `auditWriter == null` 空守卫语义** ✓、`target` 可空 ⇒ `targetId` 取空串 ✓）、`SystemSettingService`（**保留空守卫 + 自定义 warn** ✓）
+  ⇒ **两条边清零** ✓
+- **audit 族收官读数**：**`*→audit` 5 条边全部清零** ✓（agentmanagement / auth / datasource / knowledge / system）—— 从刀十四"以为一笔清完"的修正 ✗，到**三批收口**：⑭ 常量入契约 → ⑮ 扩 `AuditRecord`（+scope）+ auth/datasource → ⑯ knowledge/system ✓
+- **机制复用（本批一次编译通过、边一次清干净）**：① **编译驱动修补**；② **"改实现"与"清 import"同步**（刀十五教训直接复用 ✓ —— `clean_imports` 一并处理 ✓）
+- **验证**：**13 守卫全绿** ✓；`arch.*` + `System*`/`Knowledge*`/`Faq*`/`Tag*` 定向 ✓；`spotlessCheck build` ✓ **1m51s** ✓；**4987 / 失败 0 / 跳过 4**（boot **1331** ✓）
+- **A③ 累计（十六刀）**：边 **64 → 43（−21）**、类 **317 → 250（−67）**；三档 **① 35 条 / 164 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
+- **下一步（①档余量按性价比）**：`im→agentmanagement`(7) → `mcp→approval`(7) → `session` 能力边（`knowledge` 17 / `storage` 14 / `model` 12 … 共 63 类）→ `embedchannel→session` 余 2（**已拍板：转"实体→视图 + 流式契约"K 级，不建 servlet seam** ✓）
 **🔶 A③ 第十五刀：审计端口扩展 + `auth`/`datasource` 双清（2026-10-14，R10 边 47 → 45、类 259 → 255）**
 - **前置（刀十四登记的）**：`AuditWritePort.AuditRecord` **+`scopeType`/`scopeId`** ✓ —— 既有构造点仅 **1 处**（`SkillCatalogController` ⇒ 补两个空串 ✓）；适配器补 `setScopeType/setScopeId` ✓（`nullSafe` ⇒ `""`，与实体 varchar 默认 `""` 一致 ✓ 无行为变化 ✓）
 - **迁移 4 类**（helper 由"建 `AuditLog` 实体 + `auditService.logBestEffort`" ⇒ "建 `AuditRecord` + `auditWriter.logBestEffort`"）：`auth/TenantInvitationService`、`auth/TenantMemberService`、`datasource/DataSourceSupport`（**带 scope** ✓）、`datasource/DataSourceService`（字段 `audit` → `auditWriter` ✓，供 `DataSourceSupport` 用 ✓）⇒ **`auth→audit` 与 `datasource→audit` 双双清零** ✓
