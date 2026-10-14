@@ -6,9 +6,9 @@ import java.util.List;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ragagent.common.web.PgJsonTypeHandler;
 import com.ragagent.wiki.domain.SourceRefNeedle;
-import com.ragagent.wiki.domain.WikiIndexEntry;
-import com.ragagent.wiki.domain.WikiPage;
-import com.ragagent.wiki.domain.WikiPageLite;
+import com.ragagent.wiki.domain.index.WikiIndexEntry;
+import com.ragagent.wiki.domain.page.WikiPage;
+import com.ragagent.wiki.domain.page.WikiPageLite;
 import com.ragagent.wiki.domain.WikiStringListTypeHandler;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -17,7 +17,7 @@ import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
-import com.ragagent.wiki.domain.WikiPageListRequest;
+import com.ragagent.wiki.domain.page.WikiPageListRequest;
 
 /**
  * wiki_pages 仓储语句（{@link com.ragagent.wiki.repository.WikiPageRepository} 的配套 SQL）。

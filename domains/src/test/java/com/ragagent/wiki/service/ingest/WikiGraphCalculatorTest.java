@@ -10,8 +10,8 @@ import java.util.Set;
 
 import com.ragagent.wiki.domain.WikiConstants;
 import com.ragagent.wiki.domain.WikiException;
-import com.ragagent.wiki.domain.WikiGraph;
-import com.ragagent.wiki.domain.WikiPage;
+import com.ragagent.wiki.domain.graph.WikiGraph;
+import com.ragagent.wiki.domain.page.WikiPage;
 import org.junit.jupiter.api.Test;
 
 /**

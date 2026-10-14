@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.ragagent.wiki.domain.WikiConstants;
-import com.ragagent.wiki.domain.WikiPageLite;
+import com.ragagent.wiki.domain.page.WikiPageLite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

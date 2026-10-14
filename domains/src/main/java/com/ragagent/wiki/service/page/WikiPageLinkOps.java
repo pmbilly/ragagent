@@ -12,7 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.ragagent.wiki.domain.WikiConstants;
-import com.ragagent.wiki.domain.WikiPage;
+import com.ragagent.wiki.domain.page.WikiPage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

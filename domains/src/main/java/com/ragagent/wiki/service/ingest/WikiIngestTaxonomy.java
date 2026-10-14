@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.knowledge.KnowledgeBaseView;
 import com.ragagent.llm.LlmChatClient;
-import com.ragagent.wiki.domain.WikiCategoryPaths;
+import com.ragagent.wiki.domain.index.WikiCategoryPaths;
 import com.ragagent.wiki.prompt.WikiPrompts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

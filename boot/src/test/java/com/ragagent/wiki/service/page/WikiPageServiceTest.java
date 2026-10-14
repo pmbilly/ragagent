@@ -11,17 +11,17 @@ import java.util.UUID;
 import com.ragagent.TestSchema;
 import com.ragagent.wiki.domain.WikiConstants;
 import com.ragagent.wiki.domain.WikiException;
-import com.ragagent.wiki.domain.WikiFolder;
-import com.ragagent.wiki.domain.WikiFolderConflictException;
-import com.ragagent.wiki.domain.WikiFolderNode;
-import com.ragagent.wiki.domain.WikiFolderNotEmptyException;
-import com.ragagent.wiki.domain.WikiIndex;
-import com.ragagent.wiki.domain.WikiIndexEntry;
-import com.ragagent.wiki.domain.WikiPage;
-import com.ragagent.wiki.domain.WikiPageIssue;
-import com.ragagent.wiki.domain.WikiPageLite;
-import com.ragagent.wiki.domain.WikiPageListRequest;
-import com.ragagent.wiki.domain.WikiStats;
+import com.ragagent.wiki.domain.folder.WikiFolder;
+import com.ragagent.wiki.domain.folder.WikiFolderConflictException;
+import com.ragagent.wiki.domain.folder.WikiFolderNode;
+import com.ragagent.wiki.domain.folder.WikiFolderNotEmptyException;
+import com.ragagent.wiki.domain.index.WikiIndex;
+import com.ragagent.wiki.domain.index.WikiIndexEntry;
+import com.ragagent.wiki.domain.page.WikiPage;
+import com.ragagent.wiki.domain.page.WikiPageIssue;
+import com.ragagent.wiki.domain.page.WikiPageLite;
+import com.ragagent.wiki.domain.page.WikiPageListRequest;
+import com.ragagent.wiki.domain.page.WikiStats;
 import com.ragagent.wiki.repository.WikiPageRepository;
 import com.ragagent.wiki.repository.WikiFolderRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +31,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-import com.ragagent.wiki.domain.WikiFolderNotFoundException;
+import com.ragagent.wiki.domain.folder.WikiFolderNotFoundException;
 
 /**
  * Wiki 页面服务的测试。

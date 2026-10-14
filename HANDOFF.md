@@ -1116,6 +1116,13 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 ✓；`spotlessCheck build` ✓ **1m45s** ✓ **十二守卫** ✓（环 0 / 包级 SCC 12 组）；`:domains:javadoc` ✓；定向 `--rerun-tasks` ✓。
 - **登记（B265 余下）**：wiki 两处拆簇（`domain` 五簇、`service/ingest` 四簇，各自先做动前图分析；后者含 task/队列/锁，注意与 Redis 面）；datasource 差集重测后按面推进；mcp 两项改名留给命名批。
 
+**🔶 B265 第⑨步（2026-10-14，wiki `domain/` 拆五簇：folder 8 / page 14（含 `WikiStats`）/ index 3 / issue 2 / graph 1）**
+- **动前图分析**：38 类按目标树映射为 8+1+3+2+13 = 27 + 留 10（**算术闭合**）。簇间边实测只有**一条反向边**：`domain → page`（`WikiStats.recentUpdates: List<WikiPage>`）⇒ 照搬会造 `domain ⇄ domain.page` **双环** ✗ ⇒ **`WikiStats` 随 page 簇走**（它本就是"页面统计"，其引用者 controller/`service.page`×4 也都在 page 侧）⇒ 留 domain 后 `子面 → domain` 单向、`page → index` 单向 ⇒ 无环（SCC 12 组）。
+- **搬迁**：28 文件 `git mv` + 包声明；FQN 替换 **43 文件**；**智能补 import 14 文件**（原同包免 import）；测试 `WikiDomainTest`（跨簇）**留原包 + 补 import**；5 份新 package-info + `wiki/domain/package-info` 重写（记录五子面与"`WikiStats` 为何在 page"）。
+- **javadoc 失链 4 处**（㉟ 同款）⇒ 改**全限定**：`WikiFolder → WikiPage#getFolderId()` / `WikiConstants#FOLDER_ROOT_ID`、`WikiRevisionPruneRequest → WikiConstants#PRUNABLE_EDIT_SOURCES`（不加 javadoc 专用 import，避免死成员守卫判未使用）。
+- **测试**：**4980 / 失败 0 / 跳过 4** ✓（首轮一次 `RedisWikiSlugLockTest` Redis 型偶发，按约定重跑即绿）；启动测试 ✓；`spotlessCheck build` ✓ **1m37s** ✓ **十二守卫** ✓（环 0 / 包级 SCC 12 组）；`:domains:javadoc` ✓。
+- **登记（B265 余下）**：`wiki/service/ingest/`(57) 拆四簇（12/21/22/1，含 task/队列/Redis 面，需核 `FROZEN_PREFIXES` 与 json 键锚）；datasource 差集按 §8.9 精确边界重测。
+
 **🔶 B263 第㉟步（2026-10-14，第二个子面 `service.chunk` 切出）**
 - **动前断言（把"可测"变成"可证"）**：脚本**先断言** `ChunkEditService`/`ChunkExtractService`/`ChunkReadService` 三者在 `service` 包内**入度为零**（无人引用，`package-info` 除外），断言不过就 abort —— 这样"切出只产生单向外边"不再靠推理。`ChunkQuestionService` **故意留在** `service`：它被 `QuestionGenerationService` 引用，单独搬会造出 `service ⇄ service.chunk` 环（已在子面 package-info 写明）。
 - **切出**：3 类 → `com.ragagent.knowledge.service.chunk`（`git mv` + 包声明 + 全仓 FQN 替换 3 文件）；测试面 `ChunkExtractServiceTest` 随迁；新建 `service/chunk/package-info`；`service/package-info` 同步。

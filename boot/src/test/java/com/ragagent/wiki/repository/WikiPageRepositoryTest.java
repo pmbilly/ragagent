@@ -9,23 +9,23 @@ import java.util.UUID;
 
 import com.ragagent.TestSchema;
 import com.ragagent.wiki.domain.WikiConstants;
-import com.ragagent.wiki.domain.WikiFolder;
-import com.ragagent.wiki.domain.WikiFolderNotEmptyException;
-import com.ragagent.wiki.domain.WikiFolderNotFoundException;
-import com.ragagent.wiki.domain.WikiPage;
-import com.ragagent.wiki.domain.WikiPageConflictException;
-import com.ragagent.wiki.domain.WikiPageListRequest;
-import com.ragagent.wiki.domain.WikiPageNotFoundException;
-import com.ragagent.wiki.domain.WikiPageRevision;
-import com.ragagent.wiki.domain.WikiRevisionPruneRequest;
+import com.ragagent.wiki.domain.folder.WikiFolder;
+import com.ragagent.wiki.domain.folder.WikiFolderNotEmptyException;
+import com.ragagent.wiki.domain.folder.WikiFolderNotFoundException;
+import com.ragagent.wiki.domain.page.WikiPage;
+import com.ragagent.wiki.domain.page.WikiPageConflictException;
+import com.ragagent.wiki.domain.page.WikiPageListRequest;
+import com.ragagent.wiki.domain.page.WikiPageNotFoundException;
+import com.ragagent.wiki.domain.page.WikiPageRevision;
+import com.ragagent.wiki.domain.page.WikiRevisionPruneRequest;
 import com.ragagent.wiki.mapper.WikiPageRevisionMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-import com.ragagent.wiki.domain.WikiPageIssue;
-import com.ragagent.wiki.domain.WikiPageLite;
+import com.ragagent.wiki.domain.page.WikiPageIssue;
+import com.ragagent.wiki.domain.page.WikiPageLite;
 
 /**
  * Wiki 页面仓储测试（H2 内存库，见 {@code src/test/resources/application.yml}），

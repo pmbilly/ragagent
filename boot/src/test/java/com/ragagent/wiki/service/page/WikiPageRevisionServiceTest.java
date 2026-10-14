@@ -5,10 +5,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.ragagent.TestSchema;
 import com.ragagent.wiki.domain.WikiConstants;
-import com.ragagent.wiki.domain.WikiPage;
-import com.ragagent.wiki.domain.WikiPageNotFoundException;
-import com.ragagent.wiki.domain.WikiPageRevision;
-import com.ragagent.wiki.domain.WikiPageRevisionListResponse;
+import com.ragagent.wiki.domain.page.WikiPage;
+import com.ragagent.wiki.domain.page.WikiPageNotFoundException;
+import com.ragagent.wiki.domain.page.WikiPageRevision;
+import com.ragagent.wiki.domain.page.WikiPageRevisionListResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

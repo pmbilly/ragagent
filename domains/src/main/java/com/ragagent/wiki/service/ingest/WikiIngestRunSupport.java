@@ -14,7 +14,7 @@ import com.ragagent.llm.LlmChatClient;
 import com.ragagent.common.audit.WikiActivityAudit;
 import com.ragagent.wiki.domain.WikiConfig;
 import com.ragagent.wiki.domain.WikiConstants;
-import com.ragagent.wiki.domain.WikiPage;
+import com.ragagent.wiki.domain.page.WikiPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ragagent.common.wiki.SlugUpdate;

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.ragagent.wiki.domain.WikiPageLite;
+import com.ragagent.wiki.domain.page.WikiPageLite;
 import com.ragagent.common.wiki.ExtractedItem;
 
 /**

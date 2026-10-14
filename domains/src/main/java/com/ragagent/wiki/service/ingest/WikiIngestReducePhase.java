@@ -10,7 +10,7 @@ import java.util.UUID;
 import com.ragagent.common.knowledge.KnowledgeSpanPort;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.wiki.domain.WikiConstants;
-import com.ragagent.wiki.domain.WikiPage;
+import com.ragagent.wiki.domain.page.WikiPage;
 import com.ragagent.wiki.prompt.WikiPrompts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

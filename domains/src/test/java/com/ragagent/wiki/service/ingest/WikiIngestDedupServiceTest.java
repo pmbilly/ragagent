@@ -20,8 +20,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import com.ragagent.wiki.domain.WikiConstants;
-import com.ragagent.wiki.domain.WikiPage;
-import com.ragagent.wiki.domain.WikiPageLite;
+import com.ragagent.wiki.domain.page.WikiPage;
+import com.ragagent.wiki.domain.page.WikiPageLite;
 import com.ragagent.common.wiki.ExtractedItem;
 import com.ragagent.common.wiki.SlugUpdate;
 import com.ragagent.wiki.service.page.WikiPageService;

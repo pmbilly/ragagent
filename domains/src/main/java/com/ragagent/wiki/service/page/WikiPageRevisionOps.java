@@ -7,11 +7,11 @@ import java.util.UUID;
 
 import com.ragagent.wiki.domain.WikiConstants;
 import com.ragagent.wiki.domain.WikiException;
-import com.ragagent.wiki.domain.WikiPage;
-import com.ragagent.wiki.domain.WikiPageIssue;
-import com.ragagent.wiki.domain.WikiPageRevision;
-import com.ragagent.wiki.domain.WikiPageRevisionListResponse;
-import com.ragagent.wiki.domain.WikiRevisionPruneRequest;
+import com.ragagent.wiki.domain.page.WikiPage;
+import com.ragagent.wiki.domain.page.WikiPageIssue;
+import com.ragagent.wiki.domain.page.WikiPageRevision;
+import com.ragagent.wiki.domain.page.WikiPageRevisionListResponse;
+import com.ragagent.wiki.domain.page.WikiRevisionPruneRequest;
 import com.ragagent.wiki.repository.WikiPageRepository;
 
 import org.slf4j.Logger;

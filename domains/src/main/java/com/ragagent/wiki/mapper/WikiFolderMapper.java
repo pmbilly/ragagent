@@ -4,7 +4,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ragagent.wiki.domain.WikiFolder;
+import com.ragagent.wiki.domain.folder.WikiFolder;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;
