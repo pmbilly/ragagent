@@ -53,6 +53,17 @@ public class AgentResolver {
         return new ResolvedAgent(customAgent, effectiveTenantId, false);
     }
 
+    /**
+     * 给未带实体的请求补 {@code agentRow}（im 面：请求只带 agentId）。
+     * 已解析（web 面已填实体）或 id 为空 ⇒ 不动；解析失败 ⇒ 保持 null（与 {@link #resolve} 的宽松语义一致）。
+     */
+    public void resolveInto(QaSupport.QaRequest req) {
+        if (req.agentRow != null || req.agentId == null || req.agentId.isEmpty()) {
+            return;
+        }
+        req.agentRow = resolve(req.agentId, 0).row();
+    }
+
     /** config 列（jsonb 文本）→ ObjectNode；非法 → RuntimeException。 */
     public static ObjectNode parseAgentConfig(CustomAgentEntity row) {
         try {

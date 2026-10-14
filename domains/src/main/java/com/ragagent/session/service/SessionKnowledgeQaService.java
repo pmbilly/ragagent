@@ -71,6 +71,8 @@ public class SessionKnowledgeQaService {
     final TenantConfigLookup tenantService;
     final WebSearchProviderRepository webSearchProviderRepository;
     final javax.sql.DataSource dataSource;
+    /** agent 解析（im 面请求只带 agentId：入口按需补 agentRow）。 */
+    final AgentResolver agentResolver;
 
     /** 解析/降级协作者(构造期装配)。 */
     final SessionQaResolution resolution;
@@ -86,7 +88,8 @@ public class SessionKnowledgeQaService {
             PipelinePorts.ModelService pipelineModelService,
             TenantConfigLookup tenantService,
             WebSearchProviderRepository webSearchProviderRepository,
-            javax.sql.DataSource dataSource) {
+            javax.sql.DataSource dataSource,
+            AgentResolver agentResolver) {
         this.eventManager = eventManager;
         this.cfg = cfg;
         this.modelService = modelService;
@@ -96,6 +99,7 @@ public class SessionKnowledgeQaService {
         this.tenantService = tenantService;
         this.webSearchProviderRepository = webSearchProviderRepository;
         this.dataSource = dataSource;
+        this.agentResolver = agentResolver;
         this.resolution = new SessionQaResolution(this);
         this.fallback = new SessionQaFallback(this);
         this.webSearchParams = new QaWebSearchParams(this);
@@ -172,6 +176,7 @@ public class SessionKnowledgeQaService {
     // ==================================================================
 
     public void knowledgeQA(QaSupport.QaRequest req, EventBus eventBus) {
+        agentResolver.resolveInto(req);
         String sessionId = req.session.getId();
         log.info("Knowledge base question answering parameters, session ID: {}, query: {}, webSearchEnabled: {}",
                 sessionId, req.query, req.webSearchEnabled);

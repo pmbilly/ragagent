@@ -2,7 +2,7 @@ package com.ragagent.im.runtime;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.ragagent.agentmanagement.domain.CustomAgentEntity;
+import com.ragagent.common.agent.AgentLookup;
 import com.ragagent.im.domain.ChannelSessionEntity;
 
 /**
@@ -47,8 +47,8 @@ public final class Commands {
         public long tenantId;
         /** 绑定 agent 的显示名（未绑定为空）。 */
         public String agentName = "";
-        /** 绑定的 agent 配置（可为 null；/search 读 KBSelectionMode）。 */
-        public CustomAgentEntity customAgent;
+        /** 绑定的 agent 视图（可为 null；/search 读 KBSelectionMode）。 */
+        public AgentLookup.AgentView agent;
         /** 渠道级输出模式（"stream"/"full"）。 */
         public String channelOutputMode = "";
     }

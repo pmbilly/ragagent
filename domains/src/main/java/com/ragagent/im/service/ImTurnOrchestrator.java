@@ -22,8 +22,7 @@ import org.springframework.stereotype.Service;
 import com.ragagent.contract.agent.AgentChannelCleaner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.agentmanagement.domain.CustomAgentEntity;
-import com.ragagent.agentmanagement.service.CustomAgentService;
+import com.ragagent.common.agent.AgentLookup;
 import com.ragagent.platform.redis.RedisPubSub;
 import com.ragagent.platform.redis.SpringRedisPubSub;
 import com.ragagent.platform.access.TenantContext;
@@ -79,7 +78,7 @@ public class ImTurnOrchestrator implements AgentChannelCleaner {
     final ChannelSessionMapper channelSessions;
     final SessionService sessionService;
     final MessageService messageService;
-    private final CustomAgentService agentService;
+    final AgentLookup agentLookup;
     final SessionKnowledgeQaService knowledgeQaService;
     final SessionAgentQaService agentQaService;
     final Resolver storageResolver;
@@ -129,7 +128,7 @@ public class ImTurnOrchestrator implements AgentChannelCleaner {
 
     public ImTurnOrchestrator(ImChannelMapper channels, ChannelSessionMapper channelSessions,
             SessionService sessionService, MessageService messageService,
-            CustomAgentService agentService,
+            AgentLookup agentLookup,
             SessionKnowledgeQaService knowledgeQaService, SessionAgentQaService agentQaService,
             java.util.Optional<Resolver> storageResolver,
             ObjectProvider<StringRedisTemplate> redisTemplates,
@@ -146,7 +145,7 @@ public class ImTurnOrchestrator implements AgentChannelCleaner {
         this.channelSessions = channelSessions;
         this.sessionService = sessionService;
         this.messageService = messageService;
-        this.agentService = agentService;
+        this.agentLookup = agentLookup;
         this.knowledgeQaService = knowledgeQaService;
         this.agentQaService = agentQaService;
         this.storageResolver = storageResolver.orElse(null);
@@ -298,20 +297,13 @@ public class ImTurnOrchestrator implements AgentChannelCleaner {
         // 会话解析（租户已在上下文；ChannelSession/Session 另带显式租户列）。
         ChannelSessionEntity channelSession =
                 resolveSession(msg, tenantId, agentId, channelId, channel.getSessionMode());
-        CustomAgentEntity customAgent = null;
-        if (!agentId.isEmpty()) {
-            try {
-                var result = agentService.getAgentByID(agentId, "zh-CN");
-                customAgent = result == null ? null : result.row();
-            } catch (Exception e) {
-                log.warn("[IM] Failed to get agent {}: {}, using default", agentId, e.getMessage());
-            }
-        }
+        AgentLookup.AgentView agent = agentId.isEmpty() ? null
+                : agentLookup.view(agentId, "zh-CN");
 
         Commands.ParseResult cmd = cmdRegistry.parse(msg.content);
         if (cmd.matched()) {
             handleCommand(cmd.command(), cmd.args(), msg, adapter, channel, channelSession,
-                    customAgent);
+                    agent);
             return;
         }
         if (Commands.looksLikeCommand(msg.content)) {
@@ -335,7 +327,7 @@ public class ImTurnOrchestrator implements AgentChannelCleaner {
 
         String userKey = ImFormat.makeUserKey(channelId, msg.userId, msg.chatId, threadId);
         QaQueue.QaRequest req = new QaQueue.QaRequest(userKey, msg);
-        QaTask task = new QaTask(msg, session, customAgent, adapter, channel, channelId, userKey);
+        QaTask task = new QaTask(msg, session, agent, adapter, channel, channelId, userKey);
         task.bind(req);
         req.attach(task);
         try {
@@ -381,13 +373,13 @@ public class ImTurnOrchestrator implements AgentChannelCleaner {
 
     void handleCommand(Commands.ImCommand cmd, List<String> args, IncomingMessage msg,
             Adapter adapter, ImChannelEntity channel, ChannelSessionEntity channelSession,
-            CustomAgentEntity customAgent) {
+            AgentLookup.AgentView agent) {
         CommandContext cmdCtx = new CommandContext();
         cmdCtx.incoming = msg;
         cmdCtx.session = channelSession;
         cmdCtx.tenantId = channel.getTenantId();
-        cmdCtx.agentName = customAgent == null ? "" : customAgent.getName();
-        cmdCtx.customAgent = customAgent;
+        cmdCtx.agentName = agent == null ? "" : agent.name();
+        cmdCtx.agent = agent;
         cmdCtx.channelOutputMode = channel.getOutputMode() == null ? "" : channel.getOutputMode();
 
         CommandResult result;
@@ -509,7 +501,7 @@ public class ImTurnOrchestrator implements AgentChannelCleaner {
         }
         final IncomingMessage msg;
         final Session session;
-        final CustomAgentEntity agent;
+        final AgentLookup.AgentView agent;
         final Adapter adapter;
         final ImChannelEntity channel;
         final String channelId;
@@ -519,7 +511,7 @@ public class ImTurnOrchestrator implements AgentChannelCleaner {
             this.queueReq = r;
         }
 
-        QaTask(IncomingMessage msg, Session session, CustomAgentEntity agent,
+        QaTask(IncomingMessage msg, Session session, AgentLookup.AgentView agent,
                 Adapter adapter, ImChannelEntity channel, String channelId, String userKey) {
 
             this.msg = msg;
@@ -545,7 +537,7 @@ public class ImTurnOrchestrator implements AgentChannelCleaner {
     void runFallbackNonStream(QaAttach attach, ImAttachmentPreparer.Prepared prepared) {
         qaRunner.runFallbackNonStream(attach, prepared);
     }
-    record QaAttach(IncomingMessage msg, Session session, CustomAgentEntity agent,
+    record QaAttach(IncomingMessage msg, Session session, AgentLookup.AgentView agent,
             Adapter adapter, ImChannelEntity channel, String channelId, String userKey,
             InflightEntry inflight) {
     }

@@ -513,6 +513,8 @@ public final class QaSupport {
         public String assistantMessageId = "";
         public String summaryModelId = "";
         public CustomAgentEntity agentRow;
+        /** 未带实体的调用面（im）只传 agent id；服务入口经 {@code AgentResolver#resolveInto} 补 {@link #agentRow}。 */
+        public String agentId = "";
         public com.fasterxml.jackson.databind.node.ObjectNode agentConfig;
         public boolean sharedAgentReadOnly;
         public List<String> knowledgeBaseIds = new ArrayList<>();

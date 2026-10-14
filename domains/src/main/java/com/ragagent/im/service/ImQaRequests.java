@@ -3,8 +3,7 @@ package com.ragagent.im.service;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.agentmanagement.domain.CustomAgentEntity;
-import com.ragagent.agentmanagement.service.config.AgentConfigJson;
+import com.ragagent.common.agent.AgentLookup;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.ImFormat;
 import com.ragagent.im.service.ImTurnOrchestrator.InflightEntry;
@@ -26,13 +25,13 @@ final class ImQaRequests {
     }
 
 
-    static boolean isAgentMode(CustomAgentEntity agent) {
+    static boolean isAgentMode(String configJson) {
         // agentMode == "smart-reasoning" 即智能推理
-        if (agent == null || agent.getConfig() == null || agent.getConfig().isEmpty()) {
+        if (configJson == null || configJson.isEmpty()) {
             return false;
         }
         try {
-            JsonNode cfg = ImTurnOrchestrator.JSON.readTree(agent.getConfig());
+            JsonNode cfg = ImTurnOrchestrator.JSON.readTree(configJson);
             return "smart-reasoning".equals(cfg.path("agentMode").asText(""));
         } catch (Exception e) {
             return false;
@@ -41,24 +40,19 @@ final class ImQaRequests {
 
     /** 构造 QA 请求（含 agent config 缺省补全与 /stop 取消探针）。 */
     QaSupport.QaRequest buildIMQARequest(Session session, String query,
-            String assistantMessageId, String userMessageId, CustomAgentEntity agent,
+            String assistantMessageId, String userMessageId, AgentLookup.AgentView agent,
             IncomingMessage.QuotedMessage quote, InflightEntry inflight) {
         QaSupport.QaRequest req = new QaSupport.QaRequest();
         req.session = session;
         req.query = query;
         req.assistantMessageId = assistantMessageId;
         req.userMessageId = userMessageId;
-        req.agentRow = agent;
-        if (agent != null && agent.getConfig() != null && !agent.getConfig().isEmpty()) {
-            try {
-                req.agentConfig = (com.fasterxml.jackson.databind.node.ObjectNode)
-                        ImTurnOrchestrator.JSON.readTree(agent.getConfig());
-                AgentConfigJson.ensureDefaults(req.agentConfig);
-            } catch (Exception ignored) {
-                req.agentConfig = null;
-            }
+        // agent 实体由 session 面按 id 解析；装配面只传 id + 归一化配置（域间只经契约）
+        req.agentId = agent == null ? "" : agent.id();
+        if (agent != null) {
+            req.agentConfig = service.agentLookup.defaultedConfig(agent.configJson());
         }
-        req.webSearchEnabled = agent != null && req.agentConfig != null
+        req.webSearchEnabled = req.agentConfig != null
                 && req.agentConfig.path("webSearchEnabled").asBoolean(false);
         req.quotedContext = ImFormat.formatQuotedContext(quote);
         if (inflight != null) {

@@ -1308,6 +1308,17 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **A② 全批提交**：`a7d3b13e`（第①批 42 类）· `37b5fbb8`（第②批 去框架化 37 类）· `2ee75327`（第②批 补：解锁 11 类）· 本批（第③批 9 类 + 收口）。
 - **A 的下一步**：**③ 立「域间只经契约」**（A20 已守"契约唯一实现"；还差"业务域之间只经 `contract`"这条规则——应先测现状再决定硬规则 vs 棘轮基线）。可选后续：① 的 K 级重设计（`JsonNode` → typed records）另立项。
 
+**🔶 A③ 第十七刀：`im→agentmanagement` 清零 ⇒ `AgentLookup` 扩 4 面 + QA 实体改 id 解析（2026-10-14，R10 边 43 → 42、类 250 → 243）**
+- **迁移 7 类**（im 侧全部改走 L1 端口 `common.agent.AgentLookup` + 视图 `AgentView`，不再出现实体）：`ImTurnOrchestrator` · `ImChannelService` · `ImQaRequests` · `ImQaRunner` · `ImStreamPipeline` · `ImCommandSet` · `Commands` ⇒ **整条边清零** ✓
+- **端口扩展（4 面）**：① `view(agentId, locale)`（原 1 参降为 default ⇒ `view(id, null)`，embedchannel **零改动** ✓；im 命令面按 "zh-CN" 读）；② `hasAgentRow(tenantId, agentId)` —— 仅数据行、**无**内建兜底（im 换绑判存，与 `isAgentOwned` 显式分道）；③ `builtinAgentIds()`（渠道列表 SQL 判"行存活或内建"）；④ `defaultedConfig(configJson)` —— `AgentConfigJson.ensureDefaults` 收回属主域（im 的 readTree+defaults 装配面）
+- **QA 主线的实体问题（本刀核心设计）**：im 不再解析/持有实体 ⇒ `QaSupport.QaRequest` **+`agentId`** 字段（未带实体的调用面传 id）+ `AgentResolver.resolveInto(req)`（`agentRow==null` 且 id 非空才解析，幂等）挂在 `agentQA` / `knowledgeQA` **两个服务入口**（web 面已填实体 ⇒ 不动 ✓）——实体解析回归 agent-runtime 族内（session），im 只传 id + 归一化配置
+- **行为等价链（逐点核对）**：① 解析点由 `handleMessage` 移到 QA 入口，两处租户上下文同为渠道租户（已核 `runHandleMessage` 与 `ImQaRunner`/`ImStreamPipeline` 的 `TenantContext.set`）✓；② locale "zh-CN"→null 只影响 name/description/avatar，QA 链仅消费 id/tenantId/config（已全量 grep 核实）✓；③ 失败⇒null 语义由端口契约承担（`view` 内部 catch，少一条 warn 日志）✓；④ `hasAgentRow` 逐条复刻原"查行 + tenant 相等"两道防御检查 ✓
+- **测试（新增 4 条）**：`AgentLookupAdapterTest`（`hasAgentRow` 与 `isAgentOwned` 分道 + `defaultedConfig` 四边界）· `ImChannelServiceTest`（换绑三路径：落 id / `AgentNotFoundException`（404 "agent not found"）/ 空 id `IllegalArgumentException`（400））
+- **⚠️ 读数陷阱（记一次）**：R10 的"可收紧"清单打印 `v[:4]` 截断——本刀 7 类全清也只显示 4 个 ⇒ 判"清没清"看**边数与三档计数**（43→42）、必要时 `--list`，别数清单长度 ✓
+- **验证**：**13 守卫全绿** ✓；`spotlessCheck build` ✓ **1m42s** ✓；**4991 / 失败 0 / 跳过 4**（boot **1331** ✓）；dev 后端重启 ready ✓ + 冒烟（`/api/v1/im-channels`、`/api/v1/agents` 均 200 ✓，覆盖 `builtinAgentIds` 路径）
+- **A③ 累计（十七刀）**：边 **64 → 42（−22）**、类 **317 → 243（−74）**；三档 **① 34 条 / 157 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
+- **下一步（①档余量按性价比）**：`mcp→approval`(7) → `session` 能力边（`knowledge` 17 / `storage` 14 / `model` 12 … 共 63 类）→ `embedchannel→session` 余 2（**已拍板：转"实体→视图 + 流式契约"K 级，不建 servlet seam** ✓）
+
 **🔶 A③ 第十六刀：audit 族收官 ⇒ `knowledge→audit` + `system→audit` 双清（2026-10-14，R10 边 45 → 43、类 255 → 250）**
 - **迁移 5 类**（前置已由刀十四/十五就位 ✓）：
   - knowledge：`FaqEntryCommandService`、`KnowledgeTagService`（**均带 scope** ✓；details 用 `ObjectNode.toString()` 过端口 ✓，适配器已有 parse 容错 ✓）

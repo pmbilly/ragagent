@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.ragagent.agentmanagement.domain.CustomAgentEntity;
+import com.ragagent.common.agent.AgentLookup;
 import com.ragagent.platform.event.Event;
 import com.ragagent.platform.event.EventBus;
 import com.ragagent.platform.event.EventType;
@@ -60,8 +60,8 @@ final class ImStreamPipeline {
         java.util.concurrent.CountDownLatch done = new java.util.concurrent.CountDownLatch(1);
         java.util.concurrent.CountDownLatch complete = new java.util.concurrent.CountDownLatch(1);
 
-        CustomAgentEntity agent = attach.agent();
-        boolean useAgent = ImQaRequests.isAgentMode(agent);
+        AgentLookup.AgentView agent = attach.agent();
+        boolean useAgent = agent != null && ImQaRequests.isAgentMode(agent.configJson());
 
         subscribeStreamEvents(eventBus, buf, done, complete, useAgent);
 

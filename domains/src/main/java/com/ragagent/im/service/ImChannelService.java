@@ -12,9 +12,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.mapper.ImChannelMapper;
-import com.ragagent.agentmanagement.domain.CustomAgentEntity;
-import com.ragagent.agentmanagement.mapper.CustomAgentMapper;
-import com.ragagent.agentmanagement.service.builtin.BuiltinAgentRegistry;
+import com.ragagent.common.agent.AgentLookup;
 
 /**
  * IM 渠道 service（CRUD + 渠道行钩子：兜底、session_mode 校验、bot_identity 计算）。
@@ -38,17 +36,14 @@ public class ImChannelService {
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final ImChannelMapper mapper;
-    private final CustomAgentMapper agentMapper;
-    private final BuiltinAgentRegistry registry;
+    private final AgentLookup agentLookup;
     private final ObjectProvider<ImTurnOrchestrator> imTurnOrchestrator;
 
     public ImChannelService(ImChannelMapper mapper,
-                            CustomAgentMapper agentMapper,
-                            BuiltinAgentRegistry registry,
+                            AgentLookup agentLookup,
                             ObjectProvider<ImTurnOrchestrator> imTurnOrchestrator) {
         this.mapper = mapper;
-        this.agentMapper = agentMapper;
-        this.registry = registry;
+        this.agentLookup = agentLookup;
         this.imTurnOrchestrator = imTurnOrchestrator;
     }
 
@@ -241,17 +236,9 @@ public class ImChannelService {
         if (trimmed.isEmpty()) {
             throw new IllegalArgumentException("agent_id is required");
         }
-        // agent 不存在或 tenant 不匹配 → "agent not found"
-        CustomAgentEntity agent;
-        try {
-            agent = agentMapper.getByIDAndTenant(trimmed, channel.getTenantId() == null
-                    ? 0 : channel.getTenantId());
-        } catch (RuntimeException e) {
-            throw new AgentNotFoundException();
-        }
-        if (agent == null || agent.getTenantId() == null
-                || agent.getTenantId().longValue() != (channel.getTenantId() == null
-                        ? 0 : channel.getTenantId())) {
+        // agent 不存在或 tenant 不匹配 → "agent not found"（仅判数据行，内建 id 未落行不可绑定）
+        long tenantId = channel.getTenantId() == null ? 0 : channel.getTenantId();
+        if (!agentLookup.hasAgentRow(tenantId, trimmed)) {
             throw new AgentNotFoundException();
         }
         channel.setAgentId(trimmed);
@@ -300,7 +287,7 @@ public class ImChannelService {
 
     public List<Map<String, Object>> listChannelsByTenant(long tenantId) {
         return mapper.listByTenantWithAgent(tenantId,
-                registry.orderedIds());
+                agentLookup.builtinAgentIds());
     }
 
     // ── IM 回调面 ──

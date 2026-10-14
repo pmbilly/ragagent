@@ -3,7 +3,7 @@ package com.ragagent.im.service;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.ragagent.agentmanagement.domain.CustomAgentEntity;
+import com.ragagent.common.agent.AgentLookup;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.event.EventBus;
 import com.ragagent.platform.event.EventType;
@@ -203,7 +203,7 @@ final class ImQaRunner {
             log.info("[IM] MCP OAuth required: {}", evt.getData());
         });
 
-        CustomAgentEntity agent = attach.agent();
+        AgentLookup.AgentView agent = attach.agent();
         Session session = attach.session();
         String requestId = UUID.randomUUID().toString();
 
@@ -242,7 +242,7 @@ final class ImQaRunner {
             // 同步执行（QA 服务内部为虚拟线程管线，事件经 eventBus 回流到上面的订阅）。
             Exception runErr;
             try {
-                if (agent != null && ImQaRequests.isAgentMode(agent)) {
+                if (agent != null && ImQaRequests.isAgentMode(agent.configJson())) {
                     service.agentQaService.agentQA(qaReq, eventBus);
                 } else {
                     service.knowledgeQaService.knowledgeQA(qaReq, eventBus);
@@ -261,7 +261,7 @@ final class ImQaRunner {
                     if (!done.await(10, java.util.concurrent.TimeUnit.MINUTES)) {
                         qaErr.compareAndSet(null, new java.util.concurrent.TimeoutException("IM QA wait"));
                     }
-                    if (ImQaRequests.isAgentMode(agent)) {
+                    if (agent != null && ImQaRequests.isAgentMode(agent.configJson())) {
                         complete.await(10, java.util.concurrent.TimeUnit.SECONDS);
                     }
                 } catch (InterruptedException e) {

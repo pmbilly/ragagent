@@ -138,15 +138,6 @@
     "evaluation→session": [
       "EvaluationService"
     ],
-    "im→agentmanagement": [
-      "Commands",
-      "ImChannelService",
-      "ImCommandSet",
-      "ImQaRequests",
-      "ImQaRunner",
-      "ImStreamPipeline",
-      "ImTurnOrchestrator"
-    ],
     "im→storage": [
       "ImFormat",
       "ImOutboundFormatter",

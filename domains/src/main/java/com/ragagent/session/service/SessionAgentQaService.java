@@ -79,6 +79,8 @@ public class SessionAgentQaService {
     private final ConcurrencyGovernor concurrencyGovernor;
     private final org.springframework.beans.factory.ObjectProvider<OllamaService>
             ollamaService;
+    /** agent 解析（im 面请求只带 agentId：入口按需补 agentRow）。 */
+    private final AgentResolver agentResolver;
 
     public SessionAgentQaService(MessageService messageService,
             ModelService modelService,
@@ -98,8 +100,10 @@ public class SessionAgentQaService {
             McpClientManager mcpClientManager,
             ToolApprovalGate toolApprovalGate,
             VlmDescriberWiring vlmDescriberWiring,
-            SkillCatalogService skillCatalogService) {
+            SkillCatalogService skillCatalogService,
+            AgentResolver agentResolver) {
         this.concurrencyGovernor = concurrencyGovernor;
+        this.agentResolver = agentResolver;
         this.ollamaService = ollamaService;
         this.modelService = modelService;
         this.memoryService = memoryService;
@@ -129,6 +133,7 @@ public class SessionAgentQaService {
     // ==================================================================
 
     public void agentQA(QaSupport.QaRequest req, EventBus eventBus) {
+        agentResolver.resolveInto(req);
         String sessionId = req.session.getId();
         if (req.agentConfig == null) {
             log.warn("Custom agent not provided for session: {}", sessionId);

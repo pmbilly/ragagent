@@ -11,7 +11,7 @@ import com.ragagent.im.runtime.Commands.CommandContext;
 import com.ragagent.im.runtime.Commands.CommandRegistry;
 import com.ragagent.im.runtime.Commands.CommandResult;
 import com.ragagent.im.runtime.Commands.ImCommand;
-import com.ragagent.agentmanagement.domain.CustomAgentEntity;
+import com.ragagent.common.agent.AgentLookup;
 
 /**
  * 五个斜杠命令。注册序固定：help → info → search → stop → clear。
@@ -61,12 +61,12 @@ public final class ImCommandSet {
     public static final class AgentCfgView {
         private final JsonNode cfg;
 
-        public AgentCfgView(CustomAgentEntity agent) {
+        public AgentCfgView(AgentLookup.AgentView agent) {
             JsonNode parsed = null;
-            if (agent != null && agent.getConfig() != null && !agent.getConfig().isEmpty()) {
+            if (agent != null && agent.configJson() != null && !agent.configJson().isEmpty()) {
                 try {
                     parsed = JsonMappers.lenient()
-                            .readTree(agent.getConfig());
+                            .readTree(agent.configJson());
                 } catch (Exception ignored) {
                     parsed = null;
                 }
@@ -252,13 +252,13 @@ public final class ImCommandSet {
                 name = "未命名智能体";
             }
             sb.append("🤖 **").append(name).append("**\n");
-            AgentCfgView cfgView = new AgentCfgView(cmdCtx.customAgent);
-            if (cmdCtx.customAgent != null && cmdCtx.customAgent.getDescription() != null
-                    && !cmdCtx.customAgent.getDescription().isEmpty()) {
-                sb.append("> ").append(cmdCtx.customAgent.getDescription()).append('\n');
+            AgentCfgView cfgView = new AgentCfgView(cmdCtx.agent);
+            if (cmdCtx.agent != null && cmdCtx.agent.description() != null
+                    && !cmdCtx.agent.description().isEmpty()) {
+                sb.append("> ").append(cmdCtx.agent.description()).append('\n');
             }
 
-            if (cmdCtx.customAgent == null) {
+            if (cmdCtx.agent == null) {
                 sb.append("\n未绑定智能体，发送 `/help` 查看可用指令。");
                 return new CommandResult(sb.toString());
             }
@@ -380,8 +380,8 @@ public final class ImCommandSet {
             // 解析要搜的 KB，镜像 QA 管线的 resolveKnowledgeBasesFromAgent，
             // 让 /search 与 agent 工具实际可达范围一致。
             List<String> kbIds = new ArrayList<>();
-            AgentCfgView cfgView = new AgentCfgView(cmdCtx.customAgent);
-            if (cmdCtx.customAgent != null) {
+            AgentCfgView cfgView = new AgentCfgView(cmdCtx.agent);
+            if (cmdCtx.agent != null) {
                 switch (cfgView.kbSelectionMode()) {
                     case "all" -> {
                         List<KnowledgeBaseLister.KbView> allKBs = kbService == null ? List.of()
