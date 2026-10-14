@@ -1308,6 +1308,16 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **A② 全批提交**：`a7d3b13e`（第①批 42 类）· `37b5fbb8`（第②批 去框架化 37 类）· `2ee75327`（第②批 补：解锁 11 类）· 本批（第③批 9 类 + 收口）。
 - **A 的下一步**：**③ 立「域间只经契约」**（A20 已守"契约唯一实现"；还差"业务域之间只经 `contract`"这条规则——应先测现状再决定硬规则 vs 棘轮基线）。可选后续：① 的 K 级重设计（`JsonNode` → typed records）另立项。
 
+**🔶 A③ 第十二刀：MCP OAuth/审批操作面端口化 ⇒ `embedchannel→mcp` 清零（2026-10-14，R10 边 49 → 48、类 265 → 263）**
+- **问题形态（最严重的一类）**：embedchannel 直接注入 mcp 的**两个 controller**（`McpOAuthController` / `AgentToolApprovalController`）✗（违反 §12.1 规则 1「controller 只被装配层与外部调用」），并把访客请求体**解析成 mcp 的嵌套 DTO**（`McpOAuthController.AuthorizeRequest` / `.ResolveRequest` / `ResolveToolApprovalRequest`）✗ —— 共 5 个操作：`authorizeUrl` / `status` / `resolveMcpOAuth` / `cancelMcpOAuth` / `resolveToolApproval`
+- **设计（两条关键取舍）**：
+  1. **为什么不直接走 `ToolApprovalGate.resolve`**：mcp 的审批 controller 在闸门之前还做**租户/主体校验 + `BizException` 错误映射** —— embed 路由依赖这套校验 ✗，绕过去等于**削安全边界** ⇒ 端口按"**操作语义**（＝controller 对外语义）"暴露，不按闸门原语 ✓
+  2. **为什么端口收"原始 body 字符串"**：embed 端点被金片钉住（`EmbedContractTest` ✓）⇒ **零行为变化优先**：解析步骤由 embed **移回 mcp 适配器**（同一 DTO、同一 `badRequest` 语义 ✓），返回值与 controller 响应体一致（恒 200 + body ✓）⇒ 不新开旁路 ✓
+- **落位**：**L1 端口 `common.mcp.McpApprovalOps`**（5 方法）+ 实现 **`mcp/api/McpApprovalOpsAdapter`**（解析 + 调既有 controller ⇒ 零行为变化 ✓）；`EmbedChannelController` 的两个 controller 字段 → 一个端口字段；`EmbedChannelDelegateOps` 5 处委托收敛为"传原始 body" ✓
+- **顺带修正**：适配器里 `BizException` 我按计划写成 `platform.web.error` ✗ ⇒ 实际在 **`contract.error`**（A② 已迁；计划该处未落，登记中）⇒ 编译当场抓 ✓
+- **验证**：**`EmbedContractTest`（金片）+ `EmbedChatPayloadPatchTest` + `EmbedRateLimiterTest` 全绿** ✓（"零行为变化"的直接证据）；**13 守卫全绿** ✓；`spotlessCheck build` ✓ **1m58s** ✓；**4987 / 失败 0 / 跳过 4**（**boot 1331** ✓ —— 按刀十一新判据同时核了 `BUILD SUCCESSFUL` 与各模块 counts ✓）
+- **A③ 累计（十二刀）**：边 **64 → 48（−16）**、类 **317 → 263（−54）**；三档 **① 40 条 / 177 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
+- **下一步**：`embedchannel→session`（4 类 / 17 import：直用 4 个 controller + repository + 实体 ✗ ⇒ 会话族端口；embed 最后也是最大一块，同样要过金片）；`mcp→approval` 余 7；`im→agentmanagement` 余 7；`session` 能力边 63 类
 **🔶 A③ 第十一刀：approval 协议入契约 + 工具审批闸门端口（2026-10-14，R10 边 51 → 49、类 270 → 265）**
 - **A段（共用设施归位）**：`RedisPubSub`（纯接口）+ `SpringRedisPubSub`（Spring Redis 适配）由 `approval/` 迁**新 platform 面 `platform.redis`**（§8.2 未列此面 ⇒ 登记：跨进程 pub/sub 抽象 + Redis 适配属"通用技术适配"）⇒ **`im→approval` 整条清零** ✓（im 此前只用这两个类）
 - **B段（审批协议入契约 + 闸门端口）**：

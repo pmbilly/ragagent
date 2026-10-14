@@ -8,8 +8,6 @@ import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.web.error.PlainErrorException;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.embedchannel.domain.EmbedChannelEntity;
-import com.ragagent.mcp.controller.McpOAuthController;
-import com.ragagent.mcp.dto.ResolveToolApprovalRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -223,16 +221,7 @@ final class EmbedChannelDelegateOps {
             @PathVariable("svcId") String serviceId,
             @RequestBody(required = false) String rawBody) {
         ctrl.ensureSession(LogSanitizer.sanitize(sessionId));
-        McpOAuthController.AuthorizeRequest req = null;
-        if (rawBody != null && !rawBody.isEmpty()) {
-            try {
-                req = EmbedChannelController.MAPPER.readValue(rawBody, McpOAuthController.AuthorizeRequest.class);
-            } catch (Exception e) {
-                throw BizException.badRequest(
-                        (e.getMessage() == null ? "" : e.getMessage()));
-            }
-        }
-        return ctrl.mcpOAuthController.authorizeUrl(serviceId, req);
+        return ResponseEntity.ok(ctrl.mcpApprovalOps.authorizeUrl(serviceId, rawBody));
     }
 
     /** MCP OAuth 状态查询（委托 McpOAuthController）。 */
@@ -240,7 +229,7 @@ final class EmbedChannelDelegateOps {
             @PathVariable("sessionId") String sessionId,
             @PathVariable("svcId") String serviceId) {
         ctrl.ensureSession(LogSanitizer.sanitize(sessionId));
-        return ctrl.mcpOAuthController.status(serviceId, null);
+        return ResponseEntity.ok(ctrl.mcpApprovalOps.authorizationStatus(serviceId, null));
     }
 
     /** MCP OAuth 解析（gate 依赖分支；Gate 未接线时 500——已知差异）。 */
@@ -249,16 +238,8 @@ final class EmbedChannelDelegateOps {
             @PathVariable("pendingId") String pendingId,
             @RequestBody(required = false) String rawBody) {
         ctrl.ensureSession(LogSanitizer.sanitize(sessionId));
-        McpOAuthController.ResolveRequest req = null;
-        if (rawBody != null && !rawBody.isEmpty()) {
-            try {
-                req = EmbedChannelController.MAPPER.readValue(rawBody, McpOAuthController.ResolveRequest.class);
-            } catch (Exception e) {
-                throw BizException.badRequest(
-                        (e.getMessage() == null ? "" : e.getMessage()));
-            }
-        }
-        return ctrl.mcpOAuthController.resolveMcpOAuth(pendingId, req);
+        ctrl.mcpApprovalOps.resolveAuthorization(pendingId, rawBody);
+        return ApiResponse.ok();
     }
 
     /** 取消待决的 MCP OAuth 工具授权。 */
@@ -266,7 +247,8 @@ final class EmbedChannelDelegateOps {
             @PathVariable("sessionId") String sessionId,
             @PathVariable("pendingId") String pendingId) {
         ctrl.ensureSession(LogSanitizer.sanitize(sessionId));
-        return ctrl.mcpOAuthController.cancelMcpOAuth(pendingId);
+        ctrl.mcpApprovalOps.cancelAuthorization(pendingId);
+        return ApiResponse.ok();
     }
 
     /** 工具审批受理（gate 依赖分支；Gate 未接线时 500 = 已知差异）。 */
@@ -274,15 +256,7 @@ final class EmbedChannelDelegateOps {
                                            @PathVariable("pendingId") String pendingId,
                                            @RequestBody(required = false) String rawBody) {
         ctrl.ensureSession(LogSanitizer.sanitize(sessionId));
-        ResolveToolApprovalRequest req = null;
-        if (rawBody != null && !rawBody.isEmpty()) {
-            try {
-                req = EmbedChannelController.MAPPER.readValue(rawBody, ResolveToolApprovalRequest.class);
-            } catch (Exception e) {
-                throw BizException.badRequest(
-                        (e.getMessage() == null ? "" : e.getMessage()));
-            }
-        }
-        return ctrl.toolApprovalController.resolveToolApproval(pendingId, req);
+        ctrl.mcpApprovalOps.resolveToolApproval(pendingId, rawBody);
+        return ApiResponse.ok();
     }
 }

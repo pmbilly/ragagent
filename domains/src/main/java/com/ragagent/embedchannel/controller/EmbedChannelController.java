@@ -11,13 +11,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.web.error.PlainErrorException;
+import com.ragagent.common.mcp.McpApprovalOps;
 import com.ragagent.embedchannel.EmbedError;
 import com.ragagent.embedchannel.EmbedTokens;
 import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 import com.ragagent.embedchannel.controller.filter.EmbedAuthFilter;
 import com.ragagent.embedchannel.service.EmbedChannelService;
-import com.ragagent.mcp.controller.AgentToolApprovalController;
-import com.ragagent.mcp.controller.McpOAuthController;
 import com.ragagent.session.controller.MessageController;
 import com.ragagent.session.controller.MessageSuggestionController;
 import com.ragagent.session.controller.SessionController;
@@ -82,8 +81,8 @@ static final ObjectMapper MAPPER = JsonMappers.lenient();
     final MessageController messageController;
     final SessionController sessionController;
     final MessageSuggestionController suggestionController;
-    final McpOAuthController mcpOAuthController;
-    final AgentToolApprovalController toolApprovalController;
+    /** MCP OAuth 授权与工具审批解析（L1 端口；实现由 mcp 提供）。 */
+    final McpApprovalOps mcpApprovalOps;
 final KnowledgeQaController knowledgeQaController;
 final FileProxyService fileProxyService;
 
@@ -102,8 +101,7 @@ final FileProxyService fileProxyService;
                                   MessageController messageController,
                                   SessionController sessionController,
                                   MessageSuggestionController suggestionController,
-                                  McpOAuthController mcpOAuthController,
-                                  AgentToolApprovalController toolApprovalController,
+                                  McpApprovalOps mcpApprovalOps,
                                   KnowledgeQaController knowledgeQaController,
                                   FileProxyService fileProxyService) {
         this.service = service;
@@ -112,8 +110,7 @@ final FileProxyService fileProxyService;
         this.messageController = messageController;
         this.sessionController = sessionController;
         this.suggestionController = suggestionController;
-        this.mcpOAuthController = mcpOAuthController;
-        this.toolApprovalController = toolApprovalController;
+        this.mcpApprovalOps = mcpApprovalOps;
         this.knowledgeQaController = knowledgeQaController;
         this.fileProxyService = fileProxyService;
         this.mgmtOps = new EmbedChannelMgmtOps(this);
