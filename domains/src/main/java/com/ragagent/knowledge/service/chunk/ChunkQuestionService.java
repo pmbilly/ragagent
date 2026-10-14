@@ -1,6 +1,7 @@
 package com.ragagent.knowledge.service.chunk;
 
-import com.ragagent.knowledge.service.ChunkQuestionPort;
+import com.ragagent.knowledge.domain.ChunkQuestionPort;
+
 
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 
