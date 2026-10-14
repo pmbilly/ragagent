@@ -1,4 +1,4 @@
-package com.ragagent.storage.support;
+package com.ragagent.common.storage.support;
 
 /**
  * 按租户配置解析存储后端。
@@ -7,7 +7,7 @@ package com.ragagent.storage.support;
  * {@code com.ragagent.storage.fileserve.FileserveStorageBackendResolver}（{@code @Component}）
  * ——按 tenantId 取租户实体后走 {@code StorageFileResolver} 的完整语义
  * （backend 优先 / legacy alias / 环境回落 / resource 装饰）。解析不出时回传空，
- * {@link FileServiceResolver} 即回落到进程级默认服务。</p>
+ * {@code FileServiceResolver} 即回落到进程级默认服务。</p>
  */
 public interface StorageBackendResolver {
 

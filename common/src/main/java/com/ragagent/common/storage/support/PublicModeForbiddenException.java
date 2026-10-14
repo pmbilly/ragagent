@@ -1,4 +1,4 @@
-package com.ragagent.storage.support;
+package com.ragagent.common.storage.support;
 
 /**
  * 调用方要求 {@code public} 模式，但凭据不允许。

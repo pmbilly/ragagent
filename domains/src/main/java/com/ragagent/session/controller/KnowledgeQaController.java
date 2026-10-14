@@ -41,11 +41,12 @@ import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.memory.service.MemoryExtractionService;
 import com.ragagent.session.service.SteerRunCoordinator;
 import com.ragagent.session.controller.sse.SseFrameWriter;
-import com.ragagent.storage.support.FileUrlPort;
-import com.ragagent.storage.support.Mode;
-import com.ragagent.storage.support.StorageBackendResolver;
+import com.ragagent.common.storage.support.FileUrlPort;
+import com.ragagent.common.storage.support.Mode;
+import com.ragagent.common.storage.support.StorageBackendResolver;
 import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.platform.web.ApiResult;
+import com.ragagent.common.storage.support.FileResolverFactory;
 
 
 /**
@@ -132,7 +133,8 @@ public class KnowledgeQaController {
             org.springframework.beans.factory.ObjectProvider<FileUrlPort> fileService,
             org.springframework.beans.factory.ObjectProvider<StorageBackendResolver> storageBackendResolver,
             org.springframework.beans.factory.ObjectProvider<MemoryExtractionService> memoryExtraction,
-            org.springframework.beans.factory.ObjectProvider<TenantConfigLookup> tenantServiceProvider) {
+            org.springframework.beans.factory.ObjectProvider<TenantConfigLookup> tenantServiceProvider,
+            FileResolverFactory fileResolverFactory) {
         this.sessionService = sessionService;
         this.messageService = messageService;
         this.streamManager = streamManager;
@@ -148,7 +150,8 @@ public class KnowledgeQaController {
         this.fileService = fileService.getIfAvailable();
         this.storageBackendResolver = storageBackendResolver.getIfAvailable();
         this.memoryExtraction = memoryExtraction.getIfAvailable();
-            this.qaRequestParser = new QaRequestParser(sessionService, temporaryDocuments, this.fileService, this.storageBackendResolver);
+            this.qaRequestParser = new QaRequestParser(sessionService, temporaryDocuments,
+                    this.fileService, this.storageBackendResolver, fileResolverFactory);
         this.turnFinalizer = new QaTurnFinalizer(this.sessionService, this.messageService, this.suggestionService, this.temporaryDocuments, this.memoryExtraction);
         this.sseOrchestrator = new QaSseOrchestrator(this.streamManager, this.emitter, this.sessionService, this.messageService, this.sseFrameWriter, this.turnFinalizer);
         this.attachmentResolver = new QaAttachmentResolver(this.messageService, this.temporaryDocuments, this.turnFinalizer);

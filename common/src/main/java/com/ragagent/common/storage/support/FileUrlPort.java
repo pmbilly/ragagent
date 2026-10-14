@@ -1,4 +1,4 @@
-package com.ragagent.storage.support;
+package com.ragagent.common.storage.support;
 
 /**
  * 本包对"文件服务"的最小需求：<b>只有 {@code GetFileURL} 一个方法</b>。

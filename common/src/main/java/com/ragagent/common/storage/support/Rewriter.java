@@ -1,4 +1,4 @@
-package com.ragagent.storage.support;
+package com.ragagent.common.storage.support;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,7 +11,6 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.common.retrieval.SearchResult;
 
 /**
@@ -129,7 +128,7 @@ public class Rewriter {
     /**
      * 解析单条引用。
      *
-     * <p>锁<b>横跨整个 resolve</b>——因为 Resolver 实现（尤其 {@link FileServiceResolver}）
+     * <p>锁<b>横跨整个 resolve</b>——因为 Resolver 实现（尤其 {@code FileServiceResolver}）
      * 带着一份未同步的按 provider 缓存，而且这样能把并发重复请求合并成一次签名而不是两次。</p>
      */
     private String ref(String ref) {
@@ -184,13 +183,11 @@ public class Rewriter {
      * {@code /files} 接受调用方给的任意路径、无法绑定到 KB 白名单；而这里的引用来自
      * 调用方**本来就有权收到**的响应，所以是**服务端**而非客户端决定哪些资源拿到 URL。</p>
      */
-    public static Rewriter forRequest(Mode mode, TenantStorageView tenant,
-                                      FileUrlPort defaultSvc,
-                                      StorageBackendResolver storageResolver) {
+    public static Rewriter forRequest(Mode mode, Resolver resolver) {
         if (mode != Mode.PUBLIC) {
             return new Rewriter(null, "API");
         }
-        return new Rewriter(new FileServiceResolver(tenant, defaultSvc, storageResolver), "API");
+        return new Rewriter(resolver, "API");
     }
 
     // ── 整块到达、不需要扣留的流字段 ────────────────────────────────────────

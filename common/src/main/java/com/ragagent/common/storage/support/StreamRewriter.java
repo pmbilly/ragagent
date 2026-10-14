@@ -1,4 +1,4 @@
-package com.ragagent.storage.support;
+package com.ragagent.common.storage.support;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;

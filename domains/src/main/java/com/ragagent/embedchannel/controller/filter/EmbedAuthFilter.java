@@ -20,7 +20,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import com.ragagent.contract.tenant.TenantRole;
-import com.ragagent.storage.support.StorageUrlContext;
+import com.ragagent.common.storage.support.StorageUrlContext;
 
 /**
  * embed 公开面的认证过滤器（publish token 门）。

@@ -18,18 +18,19 @@ import com.ragagent.session.service.QaSupport;
 import com.ragagent.session.service.QaSupport.QaRequestContext;
 import com.ragagent.session.service.SessionService;
 import com.ragagent.session.service.TemporaryDocumentService;
-import com.ragagent.storage.support.ResourceModeException;
-import com.ragagent.storage.support.StreamRewriter;
+import com.ragagent.common.storage.support.ResourceModeException;
+import com.ragagent.common.storage.support.StreamRewriter;
 import static com.ragagent.session.service.QaSupport.KnowledgeTargets;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.session.domain.message.MessageExecutionContext;
 import com.ragagent.session.domain.conversation.SessionNotFoundException;
-import com.ragagent.storage.support.FileUrlPort;
-import com.ragagent.storage.support.Mode;
-import com.ragagent.storage.support.PublicModeForbiddenException;
-import com.ragagent.storage.support.Rewriter;
-import com.ragagent.storage.support.StorageBackendResolver;
+import com.ragagent.common.storage.support.FileUrlPort;
+import com.ragagent.common.storage.support.Mode;
+import com.ragagent.common.storage.support.PublicModeForbiddenException;
+import com.ragagent.common.storage.support.Rewriter;
+import com.ragagent.common.storage.support.StorageBackendResolver;
 import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.common.storage.support.FileResolverFactory;
 
 /**
  * {@code KnowledgeQaController} 的**请求解析主体**：把 HTTP 请求（会话 id、
@@ -49,12 +50,16 @@ public final class QaRequestParser {
     private final TemporaryDocumentService temporaryDocuments;
     private final FileUrlPort fileService;
     private final StorageBackendResolver storageBackendResolver;
+    private final FileResolverFactory fileResolverFactory;
 
-    public QaRequestParser(SessionService sessionService, TemporaryDocumentService temporaryDocuments, FileUrlPort fileService, StorageBackendResolver storageBackendResolver) {
+    public QaRequestParser(SessionService sessionService, TemporaryDocumentService temporaryDocuments,
+            FileUrlPort fileService, StorageBackendResolver storageBackendResolver,
+            FileResolverFactory fileResolverFactory) {
         this.sessionService = sessionService;
         this.temporaryDocuments = temporaryDocuments;
         this.fileService = fileService;
         this.storageBackendResolver = storageBackendResolver;
+        this.fileResolverFactory = fileResolverFactory;
     }
 
     public ParsedRequest parseQARequest(String rawSessionId, CreateKnowledgeQARequest request,
@@ -78,8 +83,8 @@ public final class QaRequestParser {
         // 先解析存储引用形态：SSE 起流后非法值不能再落 400
         try {
             Mode mode = Mode.resolve(resourceUrls);
-            Rewriter rw = Rewriter.forRequest(
-                    mode, readerTenant, fileService, storageBackendResolver);
+            Rewriter rw = Rewriter.forRequest(mode,
+                    fileResolverFactory.create(readerTenant, fileService, storageBackendResolver));
             rc.resourceRewriter = new StreamRewriter(rw);
         } catch (PublicModeForbiddenException e) {
             log.warn("Rejected resource URL mode: {}", e.getMessage());

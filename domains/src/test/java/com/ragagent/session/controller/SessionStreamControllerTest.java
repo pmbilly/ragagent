@@ -82,7 +82,9 @@ class SessionStreamControllerTest {
                     public Tenant getTenantById(long id) {
                         return null;
                     }
-                });
+                },
+                // 解析器工厂桩：本测试不覆盖 resource_urls 重写路径
+                (tenant, svc, resolver) -> null);
         TenantContext.set(10002L, null, "viewer", false, "u-1", false);
     }
 

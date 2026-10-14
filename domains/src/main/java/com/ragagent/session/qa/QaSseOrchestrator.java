@@ -26,7 +26,7 @@ import com.ragagent.session.service.SessionService;
 import com.ragagent.session.service.SteerSinkBridge;
 import com.ragagent.session.controller.sse.SseContract;
 import com.ragagent.session.controller.sse.StreamEventEmitter;
-import com.ragagent.storage.support.StreamRewriter;
+import com.ragagent.common.storage.support.StreamRewriter;
 import com.ragagent.platform.stream.StreamBatch;
 import com.ragagent.platform.stream.StreamEvent;
 import com.ragagent.platform.stream.StreamManager;

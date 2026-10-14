@@ -13,13 +13,13 @@ import com.ragagent.session.domain.message.MessageSearchResult;
 import com.ragagent.session.domain.conversation.SessionNotFoundException;
 import com.ragagent.session.dto.SearchMessagesRequest;
 import com.ragagent.session.service.MessageService;
-import com.ragagent.storage.support.FileUrlPort;
-import com.ragagent.storage.support.Mode;
-import com.ragagent.storage.support.PublicModeForbiddenException;
-import com.ragagent.storage.support.ResourceModeException;
+import com.ragagent.common.storage.support.FileUrlPort;
+import com.ragagent.common.storage.support.Mode;
+import com.ragagent.common.storage.support.PublicModeForbiddenException;
+import com.ragagent.common.storage.support.ResourceModeException;
 import com.ragagent.session.support.MessageReferenceRewriter;
-import com.ragagent.storage.support.Rewriter;
-import com.ragagent.storage.support.StorageBackendResolver;
+import com.ragagent.common.storage.support.Rewriter;
+import com.ragagent.common.storage.support.StorageBackendResolver;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +38,7 @@ import com.ragagent.session.domain.ChatHistoryKbStats;
 import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.common.storage.support.FileResolverFactory;
 
 /**
  * 消息 HTTP 层。
@@ -72,18 +73,21 @@ public class MessageController {
     private final MessageService messageService;
     private final FileUrlPort fileService;
     private final StorageBackendResolver storageBackendResolver;
+    private final FileResolverFactory fileResolverFactory;
     private final TenantConfigLookup tenantService;
 
     public MessageController(MessageService messageService,
                              ObjectProvider<FileUrlPort> fileService,
                              ObjectProvider<StorageBackendResolver> storageBackendResolver,
-                             TenantConfigLookup tenantService) {
+                             TenantConfigLookup tenantService,
+                             FileResolverFactory fileResolverFactory) {
         this.messageService = messageService;
         // 两个端口按 ObjectProvider 取（A3-3 起 StorageBackendResolver 有生产实现；
         // FileUrlPort 的进程级实现仍属装配项），缺 bean 时按未装配分支降级。
         this.fileService = fileService.getIfAvailable();
         this.storageBackendResolver = storageBackendResolver.getIfAvailable();
         this.tenantService = tenantService;
+        this.fileResolverFactory = fileResolverFactory;
     }
 
     // ══════════════════════════ 加载消息历史 ══════════════════════════
@@ -241,7 +245,8 @@ public class MessageController {
             log.warn("Rejected resource URL mode: {}", e.getMessage());
             throw BizException.badRequest(e.getMessage());
         }
-        return Rewriter.forRequest(mode, currentTenant(), fileService, storageBackendResolver);
+        return Rewriter.forRequest(mode,
+                fileResolverFactory.create(currentTenant(), fileService, storageBackendResolver));
     }
 
     /**

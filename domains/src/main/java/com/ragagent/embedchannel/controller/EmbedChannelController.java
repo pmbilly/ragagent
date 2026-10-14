@@ -21,7 +21,7 @@ import com.ragagent.embedchannel.service.EmbedChannelService;
 import com.ragagent.session.controller.MessageController;
 import com.ragagent.session.controller.MessageSuggestionController;
 import com.ragagent.session.controller.SessionController;
-import com.ragagent.storage.support.StorageUrlContext;
+import com.ragagent.common.storage.support.StorageUrlContext;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;

@@ -1,4 +1,4 @@
-package com.ragagent.storage.support;
+package com.ragagent.common.storage.support;
 
 /**
  * {@code resource_urls} 的取值不合法。

@@ -48,8 +48,7 @@
     [
       "com.ragagent.storage.fileserve",
       "com.ragagent.storage.provider",
-      "com.ragagent.storage.service",
-      "com.ragagent.storage.support"
+      "com.ragagent.storage.service"
     ],
     [
       "com.ragagent.wiki.service.ingest",

@@ -52,7 +52,7 @@ import com.ragagent.session.service.SessionKnowledgeQaService;
 import com.ragagent.session.service.SessionService;
 import com.ragagent.platform.stream.StreamManager;
 import com.ragagent.platform.access.TenantContextSnapshot;
-import com.ragagent.storage.support.Resolver;
+import com.ragagent.common.storage.support.Resolver;
 
 /**
  * IM 执行体核心。

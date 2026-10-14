@@ -1,4 +1,4 @@
-package com.ragagent.storage.support;
+package com.ragagent.common.storage.support;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -7,8 +7,6 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
-import com.ragagent.storage.support.RewriterTest.FixedResolver;
-import com.ragagent.storage.support.RewriterTest.StubFileService;
 
 /**
  * {@link StreamRewriter} 的对等测试。
@@ -202,8 +200,8 @@ class StreamRewriterTest {
     /** 两条流共用同一个 resolver，所以解析必须串行。 */
     @Test
     void concurrentPushIsSafe() throws Exception {
-        StubFileService svc = new StubFileService();
-        StreamRewriter sr = new StreamRewriter(new Rewriter(new FixedResolver(svc), "TEST"));
+        RewriterTest.StubFileService svc = new RewriterTest.StubFileService();
+        StreamRewriter sr = new StreamRewriter(new Rewriter(new RewriterTest.FixedResolver(svc), "TEST"));
 
         Thread[] threads = new Thread[8];
         for (int i = 0; i < threads.length; i++) {

@@ -14,6 +14,10 @@ import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.contract.tenant.StorageEngineConfig;
 import com.ragagent.platform.storage.config.StorageRuntimeEnv;
 import com.ragagent.storage.provider.FileServiceFactory;
+import com.ragagent.common.storage.support.Rewriter;
+import com.ragagent.common.storage.support.StorageBackendResolver;
+import com.ragagent.common.storage.support.FileUrlPort;
+import com.ragagent.common.storage.support.Resolver;
 
 /**
  * 按存储 provider 解析并缓存 FileUrlPort。

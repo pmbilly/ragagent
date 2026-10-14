@@ -1,4 +1,4 @@
-package com.ragagent.storage.support;
+package com.ragagent.common.storage.support;
 
 /**
  * 把一个存储引用映射到拥有它的 {@link FileUrlPort}。

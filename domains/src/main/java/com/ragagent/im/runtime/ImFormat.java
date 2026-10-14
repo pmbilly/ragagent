@@ -3,7 +3,7 @@ package com.ragagent.im.runtime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
-import com.ragagent.storage.support.StreamRewriter;
+import com.ragagent.common.storage.support.StreamRewriter;
 
 
 /**

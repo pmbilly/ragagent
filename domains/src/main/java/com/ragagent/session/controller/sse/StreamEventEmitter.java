@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.llm.domain.StreamResponse;
-import com.ragagent.storage.support.Rewriter;
-import com.ragagent.storage.support.StreamRewriter;
+import com.ragagent.common.storage.support.Rewriter;
+import com.ragagent.common.storage.support.StreamRewriter;
 import com.ragagent.platform.stream.StreamEvent;
 
 /**

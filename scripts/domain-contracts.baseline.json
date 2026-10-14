@@ -117,7 +117,6 @@
       "EmbedChannelDelegateOps"
     ],
     "embedchannel→storage": [
-      "EmbedAuthFilter",
       "EmbedChannelController"
     ],
     "embedchannel→knowledge": [
@@ -132,11 +131,6 @@
     ],
     "evaluation→session": [
       "EvaluationService"
-    ],
-    "im→storage": [
-      "ImFormat",
-      "ImOutboundFormatter",
-      "ImTurnOrchestrator"
     ],
     "im→session": [
       "ImAttachmentPreparer",
@@ -163,7 +157,6 @@
       "ModelConnectivityTestService"
     ],
     "knowledge→storage": [
-      "KnowledgeBaseController",
       "KnowledgeBaseFileProxyController",
       "TenantFileStorage"
     ],
@@ -222,22 +215,6 @@
       "SteerSinkBridge",
       "VlmDescriberWiring"
     ],
-    "session→storage": [
-      "AgentEngineAssembler",
-      "AgentWebPages",
-      "ArtifactCollectorWiring",
-      "ArtifactVersions",
-      "KnowledgeQaController",
-      "MessageController",
-      "MessageFileProxyController",
-      "MessageReferenceRewriter",
-      "QaRequestParser",
-      "QaSseOrchestrator",
-      "QaSupport",
-      "SessionAgentQaService",
-      "SessionStreamController",
-      "StreamEventEmitter"
-    ],
     "session→agentmanagement": [
       "AgentConfigAssembler",
       "AgentResolver",
@@ -251,6 +228,14 @@
       "SessionKnowledgeQaService",
       "SessionQaResolution",
       "TemporaryDocumentController"
+    ],
+    "session→storage": [
+      "AgentEngineAssembler",
+      "AgentWebPages",
+      "ArtifactCollectorWiring",
+      "ArtifactVersions",
+      "MessageFileProxyController",
+      "SessionAgentQaService"
     ],
     "session→knowledge": [
       "AgentEngineAssembler",

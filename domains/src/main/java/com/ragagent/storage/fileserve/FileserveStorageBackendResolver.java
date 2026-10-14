@@ -8,11 +8,11 @@ import java.io.IOException;
 
 import org.springframework.stereotype.Component;
 
-import com.ragagent.storage.support.FileUrlPort;
-import com.ragagent.storage.support.StorageBackendResolver;
+import com.ragagent.common.storage.support.FileUrlPort;
+import com.ragagent.common.storage.support.StorageBackendResolver;
 
 /**
- * {@code com.ragagent.storage.support.StorageBackendResolver} 的生产实现（A3-3 接线）。
+ * {@code com.ragagent.common.storage.support.StorageBackendResolver} 的生产实现（A3-3 接线）。
  *
  * <p>此前该端口<b>没有实现</b>：HTTP 面的三处调用点（{@code SessionStreamController} /
  * {@code KnowledgeQaController} / {@code MessageController}）都按

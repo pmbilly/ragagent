@@ -1319,6 +1319,18 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **A③ 累计（十七刀）**：边 **64 → 42（−22）**、类 **317 → 243（−74）**；三档 **① 34 条 / 157 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
 - **下一步（①档余量按性价比）**：`mcp→approval`(7) → `session` 能力边（`knowledge` 17 / `storage` 14 / `model` 12 … 共 63 类）→ `embedchannel→session` 余 2（**已拍板：转"实体→视图 + 流式契约"K 级，不建 servlet seam** ✓）
 
+**🔶 A③ 第二十八刀：存储工具/接口面整体上提 L1 ⇒ `im→storage` 清零 + 4 条存储边共清 11 类（2026-10-15，R10 边 31 → 30、类 206 → 195）**
+- **本刀发现的"可机械上提"批次**：`storage.support` 里除 `FileServiceResolver`（依赖 provider 工厂）外，其余全是**纯工具/纯接口** ⇒ 一次性上提 `common.storage.support`：`Mode` + `PublicModeForbiddenException` + `ResourceModeException` + `StorageUrlContext` + `Resolver` + `StreamRewriter` + `FileUrlPort` + `StorageBackendResolver` + `Rewriter`（9 件）
+- **唯一的一处依赖反转（`Rewriter`）**：`Rewriter.forRequest` 原先自建 `FileServiceResolver`（域内类）⇒ 收窄为 L1 签名 `forRequest(Mode, Resolver)`，新增 L1 函数面 **`FileResolverFactory`** + 域内实现 `storage/support/FileResolverFactoryAdapter`；**4 个调用方**（`MessageController` / `SessionStreamController` / `QaRequestParser` / `KnowledgeQaController`）各注入工厂并把 `forRequest(mode, factory.create(...))` 接上 ⇒ 行为逐字等价（`FileServiceResolver` 的装配动作原样搬进适配器）
+- **读数**：`im→storage` **3 → 0 整条边清零** ✓；`session→storage` 14 → 6；`knowledge→storage` 6 → 2（余 `KnowledgeBaseFileProxyController` / `TenantFileStorage`）；`embedchannel→storage` 2 → 1（余 `EmbedChannelController`，其 `FileProxyService` 面留下刀）；①档 **120 → 109 类**，边 **31 → 30**
+- **⚠️ 三次守卫红态（都逼出真问题，全部记入方法论）**：
+  1. **前缀替换误伤**：`com.ragagent.storage.support.Rewriter` → `common...` 的批量替换把同包测试类 `RewriterTest` / `StreamRewriterTest` 也改成了 `common...RewriterTest`（前缀碰撞）⇒ 改为**按类型名精确替换**或替换后 grep 校验后缀变体
+  2. **补 import 脚本误注入 → 造出真实包环**：`TenantFilterGuard` 自带同名嵌套 `enum Mode`，脚本给它加了 `import common.storage.support.Mode` ⇒ 产生 `platform → common` 反向边，与既有 `common → platform` 闭合成环（守卫报 **`common⇄platform`**）⇒ 修法：删误注入 import；**判据沉淀**：批量补 import 后须校验"该文件是否已声明同名类型"
+  3. **A20 契约悬空**：`FileUrlPort` 上提 L1 后，其实现均为**私有嵌套 record**（`StorageUrlWiringConfig.UrlPort` / `FileserveStorageBackendResolver.ContentServiceUrlPort`）不被 A20 计数 ⇒ 报"0 个实现：契约悬空"⇒ 修法：把进程级默认实现提升为**顶层类** `storage/fileserve/DefaultFileUrlPort`（A20 恰一个实现 ✓），而非登记基线
+- **测试随类搬迁与拆分**：`RewriterTest` / `StreamRewriterTest` / `ModeTest` + `FileTransportTest`（上刀）入 common 测试源集；其中**依赖域内实现的 8 个用例**（`forRequest*` / `FileServiceResolver` 解析族）拆到域侧新测试 `storage/support/RewriterForRequestTest`（并新增适配器用例）⇒ 覆盖不丢 ✓；`MessageReferenceRewriterTest` 改用函数式 `Resolver`（不再引域类型）
+- **验证**：**13 守卫全绿** ✓（环 0 组、R9 包级 SCC 基线按提示刷新后仍 10 组、L1→域 0 条、R6 不变）；`spotlessCheck build` ✓ **1m38s** ✓；**4991 / 失败 0 / 跳过 4**（boot 1331 ✓）；dev 重启 ready ✓ + 冒烟（`/api/v1/storage-backends`、`/api/v1/knowledge-bases` 200 ✓；`/api/v1/messages/{id}/load` 业务级 404 "session not found" ✓ 路由/鉴权/新注入链路正常）
+- **A③ 累计（二十八刀）**：边 **64 → 30（−34）**、类 **317 → 195（−122）**；三档 **① 22 条 / 109 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
+- **下一步候选**：`knowledge→storage` 第三刀（余 2 类：`KnowledgeBaseFileProxyController` 需文件代理端口、`TenantFileStorage` 需 provider 存储端口）· `embedchannel→storage`（余 1 类）· **待拍板** `mcp→agent`(9) · **K 级** `im→session`(6) · `datasource→knowledge`(8) · **大块** `knowledge→model`(14) · `session→knowledge`(17) · `session→storage`(6 余)
 **🔶 A③ 第二十七刀：`knowledge→storage` 第一刀（存储载荷 + 文件传输上提 L1）⇒ 9 → 6 类（2026-10-15，R10 类 214 → 208）**
 - **⚠️ 拍板记录（先于本刀，承上刀测量）**：`im→session`(6 类) 经**成员级**核实为 **K 级** —— im 会 `new Session()` / `new Message()` / `new MessageAttachment()`（**跨域造实体**）、填 `QaSupport.QaRequest`（会话域内部 QA 请求容器，~10 字段）、并注入 4 个会话服务；与已拍板的 `embedchannel→session` 同类 ⇒ **立 K 级**（"实体→视图 + QA 载荷"设计），不按常规刀处理。**方法论修正**：上刀"5/6 可清"只统计了"该类是否还依赖别的域"，未衡量**依赖的性质**（读能力 vs 造实体/传内部容器）⇒ 后续判收益须两者并看
 - **本刀（`knowledge→storage` 实测亦非单一端口面，分 3 子面）**：① 存储后端实体面 ② 文件传输/服务栈 ③ 模式与异常面。本刀先落前两面可机械上提的件：

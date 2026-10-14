@@ -1,4 +1,4 @@
-package com.ragagent.storage.support;
+package com.ragagent.common.storage.support;
 
 /**
  * 把「本请求必须走 handle 模式」钉住的请求级标记。
