@@ -6,7 +6,7 @@ import com.ragagent.common.error.BizException;
 import com.ragagent.common.security.LogSanitizer;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.dto.McpCredentialsResponse;
-import com.ragagent.mcp.service.McpServiceService;
+import com.ragagent.mcp.service.McpServiceManagement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +31,7 @@ import com.ragagent.common.web.ApiResult;
  *       不需要额外的 GET 端点——这里只有 PUT 和 DELETE。</li>
  * </ol>
  *
- * <p><b>攻击面收敛</b>：本控制器<b>只</b>持有 {@link McpServiceService}，
+ * <p><b>攻击面收敛</b>：本控制器<b>只</b>持有 {@link McpServiceManagement}，
  * 构造签名刻意不接受任何其它依赖。</p>
  *
  * <p>路由（WebConfig 注册，均 Admin+）：
@@ -45,9 +45,9 @@ public class McpCredentialsController {
 
     private static final Logger log = LoggerFactory.getLogger(McpCredentialsController.class);
 
-    private final McpServiceService svc;
+    private final McpServiceManagement svc;
 
-    public McpCredentialsController(McpServiceService svc) {
+    public McpCredentialsController(McpServiceManagement svc) {
         this.svc = svc;
     }
 

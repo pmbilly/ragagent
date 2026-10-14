@@ -36,7 +36,7 @@ import com.ragagent.mcp.oauth.FakeOAuthRepository;
 import com.ragagent.mcp.oauth.OAuthServerStub;
 import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.protocol.McpServiceUrls;
-import com.ragagent.mcp.service.McpServiceService;
+import com.ragagent.mcp.service.McpServiceManagement;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -65,7 +65,7 @@ class McpOAuthControllerTest {
 
     private OAuthServerStub server;
     private FakeOAuthRepository repo;
-    private McpServiceService svc;
+    private McpServiceManagement svc;
     private McpService service;
     private OAuthManager manager;
     /** 进入本方法时的进程级白名单（SsrfGuard 是 static，改后必须还原）。 */
@@ -89,7 +89,7 @@ class McpOAuthControllerTest {
         when(serviceMapper.getByIdForTenant(TENANT_ID, SERVICE_ID)).thenReturn(service);
         manager = new OAuthManager(repo, serviceMapper, new OAuthStateStore(null));
 
-        svc = mock(McpServiceService.class);
+        svc = mock(McpServiceManagement.class);
         // 用 doXxx().when(...) 而不是 when(...)：when(...) 会真的调用 mock 方法，
         // 若该方法已被"抛异常"的桩命中，桩注册本身就会抛。
         // 另：宽匹配的桩先注册，具体桩后注册才能覆盖它（Mockito 后注册者优先）。

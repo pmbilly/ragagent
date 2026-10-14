@@ -38,7 +38,7 @@ import org.springframework.stereotype.Service;
 import com.ragagent.common.security.LogSanitizer;
 
 /**
- * MCP 目录快照应用层（依赖方向单向：{@link McpServiceService} → 本类）。
+ * MCP 目录快照应用层（依赖方向单向：{@link McpServiceManagement} → 本类）。
  *
  * <p>设计要点：</p>
  * <ul>

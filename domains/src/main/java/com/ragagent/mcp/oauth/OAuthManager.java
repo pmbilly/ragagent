@@ -24,8 +24,8 @@ import com.ragagent.mcp.domain.McpOAuthToken;
  *
  * <p><b>依赖说明</b>：服务加载直接依赖
  * {@link McpServiceMapper#getByIdForTenant}（同一个查询：租户自有 + 内置 + 未软删）。
- * 刻意<b>不</b>依赖 {@code McpServiceService}——那会在 Spring 里形成
- * "McpServiceService → Optional&lt;McpOAuthSupport&gt; → OAuthManager → McpServiceService"
+ * 刻意<b>不</b>依赖 {@code McpServiceManagement}——那会在 Spring 里形成
+ * "McpServiceManagement → Optional&lt;McpOAuthSupport&gt; → OAuthManager → McpServiceManagement"
  * 的循环依赖。</p>
  */
 public class OAuthManager {

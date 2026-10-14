@@ -54,7 +54,7 @@ class McpServiceServiceTest {
     private SsrfGuard ssrfGuard;
 
     private McpClientManager clientManager;
-    private McpServiceService svc;
+    private McpServiceManagement svc;
     /** 进入本方法时的进程级白名单（SsrfGuard 是 static，改后必须还原）。 */
     private SsrfGuard.Whitelist whitelistSnapshot;
 
@@ -66,7 +66,7 @@ class McpServiceServiceTest {
         whitelistSnapshot = SsrfGuard.snapshotWhitelist();
         ssrfGuard.reloadWhitelist("example.com,127.0.0.1");
         clientManager = mock(McpClientManager.class);
-        svc = new McpServiceService(mcpServiceMapper, metadataService, ssrfGuard,
+        svc = new McpServiceManagement(mcpServiceMapper, metadataService, ssrfGuard,
                 Optional.of(clientManager), Optional.empty());
     }
 

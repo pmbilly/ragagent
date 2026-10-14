@@ -20,7 +20,7 @@ import com.ragagent.mcp.dto.McpToolApprovalPolicyRequest;
 import com.ragagent.mcp.dto.RoleVisibility;
 import com.ragagent.mcp.service.McpMetadataException;
 import com.ragagent.mcp.service.McpMetadataService;
-import com.ragagent.mcp.service.McpServiceService;
+import com.ragagent.mcp.service.McpServiceManagement;
 import com.ragagent.mcp.service.McpToolApprovalService;
 import com.ragagent.model.service.ModelService;
 import org.slf4j.Logger;
@@ -70,7 +70,7 @@ public class McpServiceController {
     private static final Logger log = LoggerFactory.getLogger(McpServiceController.class);
 
 
-    final McpServiceService mcpServiceService;
+    final McpServiceManagement mcpServiceService;
     final McpMetadataService mcpMetadataService;
     final McpToolApprovalService mcpToolApprovalService;
     final SsrfGuard ssrfGuard;
@@ -84,7 +84,7 @@ public class McpServiceController {
     /** MCP 服务 CRUD 协作者。 */
     final McpServiceCrudOps crudOps;
 
-    public McpServiceController(McpServiceService mcpServiceService,
+    public McpServiceController(McpServiceManagement mcpServiceService,
                                 McpMetadataService mcpMetadataService,
                                 McpToolApprovalService mcpToolApprovalService,
                                 SsrfGuard ssrfGuard,

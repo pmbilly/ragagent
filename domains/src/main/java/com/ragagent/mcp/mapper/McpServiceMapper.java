@@ -90,7 +90,7 @@ public interface McpServiceMapper extends BaseMapper<McpService> {
      * 因此 <b>无法通过本方法把 url 置为 NULL</b>（置空只能写空串）。
      *
      * <p>密钥语义：本方法会写 auth_config（若非 null），但 **service 层保证
-     * main PUT 路径不会把 apiKey/token 合进来**——见 {@code McpServiceService#updateMCPService}。</p>
+     * main PUT 路径不会把 apiKey/token 合进来**——见 {@code McpServiceManagement#updateMCPService}。</p>
      */
     @Update("<script>"
             + "UPDATE mcp_services SET updated_at = #{updatedAt}, enabled = #{enabled}"

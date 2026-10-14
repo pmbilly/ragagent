@@ -58,9 +58,9 @@ import org.springframework.stereotype.Service;
  * 只有真的去连 MCP 服务时才会报"not available"。</p>
  */
 @Service
-public class McpServiceService {
+public class McpServiceManagement {
 
-    private static final Logger log = LoggerFactory.getLogger(McpServiceService.class);
+    private static final Logger log = LoggerFactory.getLogger(McpServiceManagement.class);
 
     /** 测试连接的 30 秒超时 */
     private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(30);
@@ -74,7 +74,7 @@ public class McpServiceService {
     private final Optional<McpClientManager> clientManager;
     private final Optional<McpOAuthSupport> oauthSupport;
 
-    public McpServiceService(McpServiceMapper mcpServiceMapper,
+    public McpServiceManagement(McpServiceMapper mcpServiceMapper,
                              McpMetadataService metadataService,
                              SsrfGuard ssrfGuard,
                              Optional<McpClientManager> clientManager,

@@ -67,7 +67,7 @@ class McpMetadataServiceTest {
     @Autowired
     private SsrfGuard ssrfGuard;
 
-    private McpServiceService svc;
+    private McpServiceManagement svc;
     private McpMetadataService metadata;
     /** 进入本方法时的进程级白名单（SsrfGuard 是 static，改后必须还原）。 */
     private SsrfGuard.Whitelist whitelistSnapshot;
@@ -78,7 +78,7 @@ class McpMetadataServiceTest {
         TestSchema.resetData(jdbc);
         whitelistSnapshot = SsrfGuard.snapshotWhitelist();
         ssrfGuard.reloadWhitelist("127.0.0.1,example.com");
-        svc = new McpServiceService(mcpServiceMapper, null, ssrfGuard,
+        svc = new McpServiceManagement(mcpServiceMapper, null, ssrfGuard,
                 Optional.empty(), Optional.empty());
         metadata = new McpMetadataService(mcpServiceMapper, metadataRepo, Optional.empty());
     }
@@ -137,7 +137,7 @@ class McpMetadataServiceTest {
 
         // 改文档不改上游身份
         svc.updateMCPService(serviceFixture("svc", "Edited overview", "Edited guidance"),
-                McpServiceService.updateFields("description", "usageInstructions"));
+                McpServiceManagement.updateFields("description", "usageInstructions"));
         got = metadata.getMCPMetadata(1, "svc");
         assertFalse(got.isStale(), "文档编辑不能让快照变陈旧");
         assertEquals("Edited guidance", svc.getMCPServiceByID(1, "svc").getUsageInstructions());

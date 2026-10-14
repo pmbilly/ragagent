@@ -25,8 +25,8 @@ import org.springframework.data.redis.core.StringRedisTemplate;
  *     redis-state-store: true   # 多副本部署必须打开，否则回调落到别的副本会找不到 state
  * }</pre>
  *
- * <h3>刻意不依赖 McpServiceService</h3>
- * <p>{@code OAuthManager} 用 {@link McpServiceMapper} 而非 {@code McpServiceService}
+ * <h3>刻意不依赖 McpServiceManagement</h3>
+ * <p>{@code OAuthManager} 用 {@link McpServiceMapper} 而非 {@code McpServiceManagement}
  * 加载服务——后者依赖 {@code Optional<McpOAuthSupport>}，直接依赖会形成 Spring 循环。
  * 查询语义相同（租户自有 + 内置 + 未软删）。</p>
  */
@@ -65,7 +65,7 @@ public class McpOAuthWiring {
     }
 
     /**
-     * <b>接上协议层注入点</b>：{@code McpClientFactory} / {@code McpServiceService} /
+     * <b>接上协议层注入点</b>：{@code McpClientFactory} / {@code McpServiceManagement} /
      * {@code McpMetadataService} 都通过 {@code Optional<McpOAuthSupport>} 消费本 bean。
      */
     @Bean

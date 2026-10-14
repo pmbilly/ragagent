@@ -756,7 +756,7 @@ class ArchitectureRulesTest {
             "com.ragagent.knowledge.service.enrichment.KnowledgeSummaryService",
             "com.ragagent.knowledge.service.management.KnowledgeTagService",
             "com.ragagent.mcp.service.McpMetadataService",
-            "com.ragagent.mcp.service.McpServiceService",
+            "com.ragagent.mcp.service.McpServiceManagement",
             "com.ragagent.mcp.service.McpToolApprovalService",
             "com.ragagent.memory.service.DefaultMemoryModelResolver",
             "com.ragagent.model.service.BuiltinModelsReconciler",

@@ -17,7 +17,7 @@ import com.ragagent.mcp.oauth.OAuthAuthorizationStatus;
 import com.ragagent.mcp.oauth.OAuthCallbackException;
 import com.ragagent.mcp.oauth.OAuthManager;
 import com.ragagent.mcp.protocol.McpClientManager;
-import com.ragagent.mcp.service.McpServiceService;
+import com.ragagent.mcp.service.McpServiceManagement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
@@ -74,11 +74,11 @@ public class McpOAuthController {
     static final String FALLBACK_REDIRECT = "/";
 
     private final OAuthManager oauth;
-    private final McpServiceService svc;
+    private final McpServiceManagement svc;
     private final ObjectProvider<McpClientManager> mcpManager;
     private final ObjectProvider<Gate> gate;
 
-    public McpOAuthController(OAuthManager oauth, McpServiceService svc,
+    public McpOAuthController(OAuthManager oauth, McpServiceManagement svc,
                               ObjectProvider<McpClientManager> mcpManager,
                               ObjectProvider<Gate> gate) {
         this.oauth = oauth;

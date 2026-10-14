@@ -1137,6 +1137,11 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **连带**：FQN 替换 **60 文件**；**测试随迁**按主体类归位（`ConnectorFrameworkTest`/`ConnectorHttpTest` → `domain/connector`；`SchedulerTest`/`InProcess…Test`/`Redis…Test` → `task`——首版按"引用面启发式"把后两个错投到 domain/connector，编译揪出包内私有访问 `Scheduler.triggerSync`/`ConnectorHttp.statusText` ⇒ 改按主体归位）；清两处空目录（目录卫生守卫抓到）；**snake 键路径锚 ×2 换新**（`datasource/task/…`，FROZEN 覆盖按路径）；javadoc 失链 3 处改全限定 + 1 处 `@throws` 类型改全限定（**javadoc-only 引用的类型不会进 import 扫描**⇒ 必须显式写全）。
 - **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 ✓；`spotlessCheck build` ✓ **1m47s** ✓ **十二守卫** ✓（环 0 / SCC 12 组）；`:domains:javadoc` ✓；定向 `--rerun-tasks` ✓。
 
+**🔶 B265 第⑫步（2026-10-14，mcp `McpServiceService` → `McpServiceManagement`，对齐 §8.9 命名）**
+- **改名**：`com.ragagent.mcp.service.McpServiceService` → **`McpServiceManagement`**（目标树名）；`git mv` + 全仓标识符替换 **14 文件**（含 1 个测试的 `mock(...)` 与若干 javadoc 提及）。
+- **换锚**：`file-size.baseline.json` 键随路径改名（**605 → 605**，体量与旧 `ServiceService` 的 605 行一致 ⇒ 顺带去掉"叠词"命名）。
+- **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 ✓；`spotlessCheck build` ✓ **1m45s** ✓ **十二守卫** ✓（环 0 / SCC 12 组）；`:domains:javadoc` ✓。
+
 **🔶 B263 第㉟步（2026-10-14，第二个子面 `service.chunk` 切出）**
 - **动前断言（把"可测"变成"可证"）**：脚本**先断言** `ChunkEditService`/`ChunkExtractService`/`ChunkReadService` 三者在 `service` 包内**入度为零**（无人引用，`package-info` 除外），断言不过就 abort —— 这样"切出只产生单向外边"不再靠推理。`ChunkQuestionService` **故意留在** `service`：它被 `QuestionGenerationService` 引用，单独搬会造出 `service ⇄ service.chunk` 环（已在子面 package-info 写明）。
 - **切出**：3 类 → `com.ragagent.knowledge.service.chunk`（`git mv` + 包声明 + 全仓 FQN 替换 3 文件）；测试面 `ChunkExtractServiceTest` 随迁；新建 `service/chunk/package-info`；`service/package-info` 同步。

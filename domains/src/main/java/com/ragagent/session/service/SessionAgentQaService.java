@@ -37,7 +37,7 @@ import com.ragagent.tracing.decorators.LangfuseChatClient;
 import com.ragagent.tracing.decorators.LangfuseReranker;
 import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.service.McpMetadataService;
-import com.ragagent.mcp.service.McpServiceService;
+import com.ragagent.mcp.service.McpServiceManagement;
 import com.ragagent.rerank.RerankerFactory;
 import com.ragagent.storage.service.ResourceCatalogService;
 
@@ -93,7 +93,7 @@ public class SessionAgentQaService {
             ConcurrencyGovernor concurrencyGovernor,
             org.springframework.beans.factory.ObjectProvider<OllamaService>
                     ollamaService,
-            McpServiceService mcpServiceService,
+            McpServiceManagement mcpServiceService,
             McpMetadataService mcpMetadataService,
             McpClientManager mcpClientManager,
             Gate toolApprovalGate,
