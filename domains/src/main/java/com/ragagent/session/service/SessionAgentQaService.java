@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.ragagent.common.prompt.MessageAttachmentsPrompt;
 import com.ragagent.common.session.PipelineUsedMemoryView;
-import com.ragagent.knowledge.service.FaqEntryQueryService;
+import com.ragagent.knowledge.service.faq.FaqEntryQueryService;
 import com.ragagent.agent.AgentEngine;
 import com.ragagent.agent.AgentEngineException;
 import com.ragagent.agentmanagement.service.AgentConfigJson;

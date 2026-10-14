@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import com.ragagent.knowledge.dto.faq.FaqEntry;
 import com.ragagent.knowledge.dto.faq.FaqEntryPage;
-import com.ragagent.knowledge.service.FaqEntryQueryService;
+import com.ragagent.knowledge.service.faq.FaqEntryQueryService;
 import com.ragagent.agent.AgentConfig;
 import com.ragagent.agent.AgentEngine;
 import com.ragagent.mcp.tools.McpExposure;

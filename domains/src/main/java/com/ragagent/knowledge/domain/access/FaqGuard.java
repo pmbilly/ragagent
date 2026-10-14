@@ -86,7 +86,7 @@ public class FaqGuard {
 
     /**
      * FAQ 配置缺省补全的读路径形态：本仓不改 KB 行，缺省值由
-     * {@link com.ragagent.knowledge.service.FaqChunkCodec#faqIndexMode}/{@link com.ragagent.knowledge.service.FaqChunkCodec#faqQuestionIndexMode}
+     * {@link com.ragagent.knowledge.service.faq.FaqChunkCodec#faqIndexMode}/{@link com.ragagent.knowledge.service.faq.FaqChunkCodec#faqQuestionIndexMode}
      * 在读取时兜底，因此这里是显式空操作。
      */
     public void ensureDefaults(KnowledgeBase kb) {

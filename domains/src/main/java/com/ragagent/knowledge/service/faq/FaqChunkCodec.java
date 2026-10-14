@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.service;
+package com.ragagent.knowledge.service.faq;
 
 import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;

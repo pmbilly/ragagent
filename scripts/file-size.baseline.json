@@ -32,7 +32,7 @@
     "domains/src/main/java/com/ragagent/im/yunzhijia/YunzhijiaAdapter.java": 645,
     "domains/src/main/java/com/ragagent/initialization/service/InitializationConfigService.java": 710,
     "domains/src/main/java/com/ragagent/knowledge/chunker/LegacySplitter.java": 614,
-    "domains/src/main/java/com/ragagent/knowledge/service/FaqEntryCommandService.java": 783,
+    "domains/src/main/java/com/ragagent/knowledge/service/faq/FaqEntryCommandService.java": 772,
     "domains/src/main/java/com/ragagent/knowledge/service/KnowledgeBaseService.java": 626,
     "domains/src/main/java/com/ragagent/knowledge/service/KnowledgeService.java": 796,
     "domains/src/main/java/com/ragagent/knowledge/service/KnowledgeSummaryService.java": 684,

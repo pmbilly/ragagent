@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.service;
+package com.ragagent.knowledge.service.faq;
 
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.repository.KnowledgeTagRepository;
@@ -23,7 +23,7 @@ import com.ragagent.knowledge.dto.faq.FaqSuccessEntry;
 import com.ragagent.knowledge.dto.faq.FaqFailedEntry;
 import com.ragagent.knowledge.dto.faq.FaqImportProgress;
 import com.ragagent.knowledge.dto.faq.FaqImportResult;
-import com.ragagent.knowledge.service.FaqImportService.ImportJob;
+import com.ragagent.knowledge.service.faq.FaqImportService.ImportJob;
 import com.ragagent.model.domain.Model;
 import com.ragagent.knowledge.storage.TenantFileStorage;
 import org.slf4j.Logger;

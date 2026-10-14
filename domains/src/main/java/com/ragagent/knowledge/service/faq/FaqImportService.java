@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.service;
+package com.ragagent.knowledge.service.faq;
 
 import com.ragagent.knowledge.repository.KnowledgeTagRepository;
 
