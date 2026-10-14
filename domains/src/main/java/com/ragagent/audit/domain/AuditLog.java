@@ -39,7 +39,7 @@ import com.ragagent.platform.persistence.PgJsonTypeHandler;
  *             注意这与 Wiki 的 {@code page_metadata} 不同：那一列可空且写入时显式给 NULL，
  *             这里 NOT NULL 且省略。</li>
  *         <li>{@code outcome VARCHAR(16) NOT NULL DEFAULT 'success'}：service 层把 "" 归一为
- *             {@link AuditOutcome#SUCCESS} 后显式写入。</li>
+ *             {@link com.ragagent.contract.audit.AuditOutcome#SUCCESS} 后显式写入。</li>
  *         <li>其余 varchar 列 {@code NOT NULL DEFAULT ''}：字段默认 "" + 归一化 getter，
  *             写入时也不会是 null（详见各 getter）。</li>
  *       </ul>

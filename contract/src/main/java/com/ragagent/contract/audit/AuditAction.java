@@ -1,4 +1,4 @@
-package com.ragagent.audit.domain;
+package com.ragagent.contract.audit;
 
 /**
  * 审计动作常量。
@@ -26,7 +26,7 @@ public final class AuditAction {
     public static final String MEMBER_LEFT = "rbac.member_left";
     /**
      * RBAC 守卫拒绝请求时写（EnableRBAC=true 下角色/归属校验失败）。
-     * 受 1 分钟滑动窗口去重保护——见 {@link com.ragagent.audit.service.AuditLogService#logDenied}。
+     * 受 1 分钟滑动窗口去重保护——见 {@code AuditLogService#logDenied}（audit 侧实现）。
      */
     public static final String ACCESS_DENIED = "rbac.access_denied";
     public static final String INVITATION_SENT = "rbac.invitation_sent";

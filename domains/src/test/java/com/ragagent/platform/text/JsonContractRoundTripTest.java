@@ -1,6 +1,6 @@
 package com.ragagent.platform.text;
 
-import com.ragagent.audit.domain.AuditOutcome;
+import com.ragagent.contract.audit.AuditOutcome;
 
 import com.ragagent.audit.dto.AuditLogListResponse;
 
@@ -16,7 +16,7 @@ import java.util.Set;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.auth.apikey.domain.TenantAPIKey;
-import com.ragagent.audit.domain.AuditAction;
+import com.ragagent.contract.audit.AuditAction;
 import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.agent.domain.AgentStep;
 import com.ragagent.agent.domain.AgentToolCall;

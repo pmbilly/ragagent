@@ -1,4 +1,4 @@
-package com.ragagent.audit.domain;
+package com.ragagent.contract.audit;
 
 /**
  * 审计结果常量。

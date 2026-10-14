@@ -14,10 +14,10 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.ragagent.audit.controller.AuditLogController;
-import com.ragagent.audit.domain.AuditAction;
+import com.ragagent.contract.audit.AuditAction;
 import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.audit.domain.AuditLogQuery;
-import com.ragagent.audit.domain.AuditOutcome;
+import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.audit.service.AuditLogService;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.error.GlobalExceptionHandler;

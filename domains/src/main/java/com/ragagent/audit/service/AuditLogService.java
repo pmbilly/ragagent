@@ -9,10 +9,10 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.audit.domain.AuditAction;
+import com.ragagent.contract.audit.AuditAction;
 import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.audit.domain.AuditLogQuery;
-import com.ragagent.audit.domain.AuditOutcome;
+import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.audit.mapper.AuditLogRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

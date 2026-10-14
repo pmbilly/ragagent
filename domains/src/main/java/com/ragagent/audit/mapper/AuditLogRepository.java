@@ -7,7 +7,7 @@ import java.util.List;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.audit.domain.AuditLogQuery;
-import com.ragagent.audit.domain.AuditOutcome;
+import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.platform.persistence.PageRequests;
 import org.springframework.stereotype.Component;
 

@@ -11,6 +11,7 @@
         "✅ 已做（A③-⑩）：`JsonbRawStringTypeHandler` 归位 L1 + `common.agent.AgentLookup` ⇒ 清 `embedchannel→agentmanagement` ✓",
         "✅ 已做（A③-⑪）：`RedisPubSub`/`SpringRedisPubSub` → `platform.redis` ⇒ 清 `im→approval` ✓；6 个审批协议类型 → `contract.tool` + 端口 `ToolApprovalGate`（删 `McpApproval`）⇒ 清 `session→approval` ✓、`mcp→approval` 8 → 7 ✓",
         "✅ 已做（A③-⑫）：L1 端口 `common.mcp.McpApprovalOps`（5 操作，实现 `mcp/api/McpApprovalOpsAdapter`）⇒ 清 `embedchannel→mcp` ✓（金片验证零行为变化 ✓）",
+        "⏸ **audit 族余 4 条边**（`auth→audit`2 / `datasource→audit`2 / `knowledge→audit`2 / `system→audit`3）—— **前置＝扩 `AuditWritePort.AuditRecord`（+`scopeType`/`scopeId`）**：端口当初只为 agenttools/agentmanagement 设计，而 `DataSourceSupport`/`FaqEntryCommandService`/`KnowledgeTagService` 三处都用 scope ✗；扩完还要更新既有构造点（record 位置参数 ✗），再逐类把\"建 `AuditLog` + `auditService.logBestEffort`\"的 helper 改写成端口调用（9 个 helper；`details` 走 `toString()` 往返，适配器已有 parse 容错 ✓）",
         "⏸ `embedchannel→session`（**余 2 类**：`EmbedChannelController` + `EmbedChannelDelegateOps` 的 **HTTP 委托** ✗）—— 服务侧段已做（A③-⑬：`common.session.EmbedSessionOps` 拿走 `EmbedChannelService`/`EmbedChannelPublicOps` 两类 + 归属校验 ✓）。余下 7 个操作：QA（**servlet + SSE** ✗）、`loadMessages`（返回**实体列表** ✗）、`stopSession`、建议三连 ⇒ **需要先拍板形态**：① servlet/SSE 形态的 seam 端口（同已登记的 `ApiKeyAuthPort` K 级），或 ② 会话实体 → 视图（`Message`/`Session` typed records）的 K 级重设计",
         "⏸ `mcp→approval`（余 7 类）：`Gate` 构造面 + 策略查询面（`GateOptions`/`Checker`/`EnabledChecker`/`BulkEnabledChecker`/`ApprovalToolPolicy`/`ApprovalBridge`/`ApprovalException`）＝\"A 域实现审批策略\"的深度消费 ⇒ 需再分一层（构造/策略端口 vs 闸门端口）",
         "⏸ `mcp→agent`（9 类）：工具 SPI 主体 = Jackson `JsonNode` / `EventBus` / `llm.domain.ChatMessage` / `ToolCallTarget`(jsonb) ⇒ 属 A②「JsonNode 载体」K 级重设计",
@@ -53,9 +54,6 @@
     "agentmanagement→agent": [
       "SkillCatalogController",
       "SkillsCatalogController"
-    ],
-    "agentmanagement→audit": [
-      "SkillCatalogController"
     ],
     "agenttools→agent": [
       "DataAnalysisSessionBridge",
@@ -124,8 +122,7 @@
     ],
     "datasource→audit": [
       "DataSourceService",
-      "DataSourceSupport",
-      "DataSourceSyncResultOps"
+      "DataSourceSupport"
     ],
     "embedchannel→session": [
       "EmbedChannelController",

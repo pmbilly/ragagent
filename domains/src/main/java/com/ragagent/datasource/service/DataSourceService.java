@@ -11,8 +11,8 @@ import java.util.Objects;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.audit.domain.AuditAction;
-import com.ragagent.audit.domain.AuditOutcome;
+import com.ragagent.contract.audit.AuditAction;
+import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.audit.service.AuditLogService;
 import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.datasource.domain.connector.Connector;

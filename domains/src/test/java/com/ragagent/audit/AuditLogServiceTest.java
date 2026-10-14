@@ -21,9 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.ragagent.audit.domain.AuditAction;
+import com.ragagent.contract.audit.AuditAction;
 import com.ragagent.audit.domain.AuditLog;
-import com.ragagent.audit.domain.AuditOutcome;
+import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.audit.mapper.AuditLogRepository;
 import com.ragagent.audit.service.AuditLogService;
 import org.junit.jupiter.api.Test;

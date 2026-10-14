@@ -2,9 +2,9 @@ package com.ragagent.audit;
 
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
 
-import com.ragagent.audit.domain.AuditOutcome;
+import com.ragagent.contract.audit.AuditOutcome;
 
-import com.ragagent.audit.domain.AuditAction;
+import com.ragagent.contract.audit.AuditAction;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;

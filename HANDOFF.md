@@ -1308,6 +1308,17 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **A② 全批提交**：`a7d3b13e`（第①批 42 类）· `37b5fbb8`（第②批 去框架化 37 类）· `2ee75327`（第②批 补：解锁 11 类）· 本批（第③批 9 类 + 收口）。
 - **A 的下一步**：**③ 立「域间只经契约」**（A20 已守"契约唯一实现"；还差"业务域之间只经 `contract`"这条规则——应先测现状再决定硬规则 vs 棘轮基线）。可选后续：① 的 K 级重设计（`JsonNode` → typed records）另立项。
 
+**🔶 A③ 第十四刀：审计常量入契约 ⇒ `agentmanagement→audit` 清零（2026-10-14，R10 边 48 → 47、类 261 → 259）**
+- **刀法**：`audit.domain.AuditAction` + `AuditOutcome`（**纯 JDK 常量类** ✓ 纯度断言先过）→ **`contract.audit`** ⇒ 只依赖常量的两个类（`SkillCatalogController`、`DataSourceSyncResultOps`）**落出边**：**`agentmanagement→audit` 整条清零** ✓、`datasource→audit` 3 → 2 ✓；FQN 替换 **22 文件**（编译一次通过 ✓ —— 无同包裸引用残留 ✓）
+- **⚠️ 计划修正（重要，登记）**：我原以为"`AuditWritePort` 已在 ⇒ 一笔清 5 条边 / 11 类"，**实测不成立**：
+  - 端口的 `AuditRecord` **没有 `scopeType`/`scopeId`** ✗，而 `DataSourceSupport` / `FaqEntryCommandService` / `KnowledgeTagService` 三处都在 `setScopeType(…)/setScopeId(…)` ✗ ⇒ **端口当初只为 agenttools/agentmanagement 设计**（那两个消费方不用 scope ✓）
+  - 其余 9 类的 helper 都是"建 `AuditLog` 实体 + `auditService.logBestEffort`" ✗（`setDetails(ObjectNode)` ⇒ 走端口的 `detailsJson` 需 `toString()` 往返 ✓，适配器已有 parse 容错 ✓）
+  ⇒ **下一刀前置＝扩 `AuditRecord`（+scopeType/scopeId）+ 更新既有构造点**（record 是位置参数 ✗），再逐类改写（9 个 helper）
+- **javadoc 第 3 次当模块边界探针** ✓：`AuditAction` 里的 `{@link com.ragagent.audit.service.AuditLogService#logDenied}` ✗ 与 `AuditLog` 里的 `{@link AuditOutcome#SUCCESS}` ✗（常量搬走后同包解析不到）⇒ 分别改 `{@code …}` / 全限定 `{@link com.ragagent.contract.audit.AuditOutcome#SUCCESS}` ✓
+- **⚠️ 闸门判据再次立功（A③-⑪ 立的）**：javadoc 失败 ⇒ build 停在 javadoc ⇒ `test-summary` 又显示 `boot=28`（上次 arch 的旧值）⇒ **当场识别 28 ≠ 1331** ✓ ⇒ 修完重跑 **1m56s / boot 1331** ✓
+- **验证**：**13 守卫全绿** ✓；`arch.*` 28 条 ✓；`spotlessCheck build` ✓ **1m56s** ✓；**4987 / 失败 0 / 跳过 4**（boot **1331** ✓）
+- **A③ 累计（十四刀）**：边 **64 → 47（−17）**、类 **317 → 259（−58）**；三档 **① 39 条 / 173 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
+- **下一刀（按登记）**：扩 `AuditRecord`（+scope）⇒ 应一次清 **4 条边**（`auth→audit` 2 / `datasource→audit` 2 / `knowledge→audit` 2 / `system→audit` 3 ＝ 9 类）
 **🔶 A③ 第十三刀（服务侧段）：`common.session.EmbedSessionOps` 收回会话读写（2026-10-14，`embedchannel→session` **4 → 2 类**；R10 类 263 → 261）**
 - **本刀范围（刻意分段）**：`embedchannel→session` 是 embed 最大的一块（4 类 / 17 import）。本段先吃掉**服务侧**：`EmbedChannelService`（`newEmbedSession` 工厂 + `countEmbedSessions(…, SessionRepository)` ✗ 把持久层当参数传）与 `EmbedChannelPublicOps`（建访客会话 + 历史列表 + 自己拼 `SessionOwnerIds.EMBED_SESSION_PREFIX` owner 串 ✗），再把 `EmbedChannelController.ensureSession` 的归属查询/补 owner 一并改端口 ⇒ **两类清零** ✓（余 2 类见下）
 - **端口**：**L1 `common.session.EmbedSessionOps`**（6 方法，**全类型化** ✓）——`ownership(tenantId, sessionId)`（record `OwnershipView(Long tenantId, String description, String userId)`）、`createVisitorSession(tenantId, channelId, marker, visitorId)`、`attachOwner(tenantId, channelId, sessionId)`、`countSessions(tenantId, channelId)`、`visitorSessions(…, limit)`（record `VisitorSessionRow(id, title, updatedAt)`）

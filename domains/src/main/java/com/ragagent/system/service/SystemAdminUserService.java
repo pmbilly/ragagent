@@ -9,7 +9,7 @@ import java.util.UUID;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.platform.persistence.PageRequests;
 import com.ragagent.audit.domain.AuditLog;
-import com.ragagent.audit.domain.AuditOutcome;
+import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.audit.service.AuditLogService;
 import com.ragagent.auth.domain.AuthToken;
 import com.ragagent.tenant.repository.Tenant;
