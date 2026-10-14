@@ -9,9 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.tenant.ChatHistoryConfig;
-import com.ragagent.auth.service.TenantService;
+import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.agent.tool.runtime.ThinkBlocks;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.knowledge.domain.Knowledge;
@@ -80,7 +79,7 @@ public class MessageService {
     private final MessageRepository messageRepository;
     private final MessageSuggestionRepository suggestionRepository;
     private final KnowledgeService knowledgeService;
-    private final TenantService tenantService;
+    private final TenantConfigLookup tenantService;
     private final KnowledgeBaseService knowledgeBaseService;
     /** 聊天历史检索子模块（关键词/向量/混合 + RRF + 归属过滤 + 分组）。 */
     private final MessageSearch messageSearch;
@@ -89,7 +88,7 @@ public class MessageService {
                           MessageRepository messageRepository,
                           MessageSuggestionRepository suggestionRepository,
                           KnowledgeService knowledgeService,
-                          TenantService tenantService,
+                          TenantConfigLookup tenantService,
                           KnowledgeBaseService knowledgeBaseService,
                           HybridSearchService hybridSearchService,
                           ModelRuntimeAssembler modelRuntimeAssembler) {
@@ -388,8 +387,7 @@ public class MessageService {
         if (tenantId == null) {
             return "no tenant in context";
         }
-        Tenant tenant = tenantService.getTenantById(tenantId);
-        JsonNode node = tenant == null ? null : tenant.getChatHistoryConfig();
+        JsonNode node = tenantService.chatHistoryConfig(tenantId);
         if (node == null || node.isNull()) {
             return "chat history config not set";
         }
@@ -431,13 +429,12 @@ public class MessageService {
      */
     public ChatHistoryKbStats getChatHistoryKbStats() {
         long tenantId = requireTenantId();
-        Tenant tenant = tenantService.getTenantById(tenantId);
+        JsonNode cfg = tenantService.chatHistoryConfig(tenantId);
 
         ChatHistoryKbStats stats = new ChatHistoryKbStats();
-        if (tenant == null) {
+        if (cfg == null) {
             return stats;
         }
-        JsonNode cfg = tenant.getChatHistoryConfig();
         if (cfg == null || !cfg.path("enabled").asBoolean(false)) {
             return stats;
         }

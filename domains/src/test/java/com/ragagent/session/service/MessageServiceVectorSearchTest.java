@@ -26,7 +26,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.model.service.ModelRuntimeAssembler;
@@ -98,11 +97,9 @@ class MessageServiceVectorSearchTest {
 
     private void tenantWith(com.fasterxml.jackson.databind.JsonNode chatHistory,
             com.fasterxml.jackson.databind.JsonNode retrieval) {
-        Tenant t = new Tenant();
-        t.setId(TENANT);
-        t.setChatHistoryConfig(chatHistory);
-        t.setRetrievalConfig(retrieval);
-        when(tenantService.getTenantById(TENANT)).thenReturn(t);
+        // 自 A③ 起租户配置经 L1 端口读（TenantConfigLookup），不再取实体
+        when(tenantService.chatHistoryConfig(TENANT)).thenReturn(chatHistory);
+        when(tenantService.retrievalConfig(TENANT)).thenReturn(retrieval);
     }
 
     private static SearchResult kbHit(String chunkId, String knowledgeId, double score,

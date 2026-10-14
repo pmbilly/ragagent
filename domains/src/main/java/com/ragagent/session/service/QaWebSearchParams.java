@@ -1,12 +1,13 @@
 package com.ragagent.session.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import com.ragagent.platform.web.JsonMappers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.contract.tenant.WebSearchConfig;
 
 /**
@@ -80,12 +81,9 @@ final class QaWebSearchParams {
         Long tid = TenantContext.currentTenantId();
         if (tid != null) {
             try {
-                Tenant tenant = service.tenantService.getTenantById(tid);
-                if (tenant != null && tenant.getWebSearchConfig() != null
-                        && !tenant.getWebSearchConfig().isNull()) {
-                    WebSearchConfig cfg =
-                            JSON.treeToValue(tenant.getWebSearchConfig(),
-                                    WebSearchConfig.class);
+                JsonNode webSearch = service.tenantService.webSearchConfig(tid);
+                if (webSearch != null && !webSearch.isNull()) {
+                    WebSearchConfig cfg = JSON.treeToValue(webSearch, WebSearchConfig.class);
                     int max = cfg.getMaxResults();   // 局部 cfg（本段解析出的 WebSearchConfig），非门面字段
                     if (max > 0) {
                         return max;

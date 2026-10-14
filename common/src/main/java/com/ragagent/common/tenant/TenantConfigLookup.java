@@ -24,6 +24,15 @@ public interface TenantConfigLookup {
     /** 记忆配置（{@code tenants.memory_config}：embeddingModelId / extractModelId 等）。 */
     JsonNode memoryConfig(long tenantId);
 
+    /** 网络搜索配置（{@code tenants.web_search_config}；租户不存在或配置为空返回 {@code null}）。 */
+    JsonNode webSearchConfig(long tenantId);
+
+    /** 聊天历史配置（{@code tenants.chat_history_config}；租户不存在或配置为空返回 {@code null}）。 */
+    JsonNode chatHistoryConfig(long tenantId);
+
+    /** 解析引擎配置（{@code tenants.parser_engine_config}；租户不存在或配置为空返回 {@code null}）。 */
+    JsonNode parserEngineConfig(long tenantId);
+
     /**
      * 存储域只读视图（id + 默认后端 + 存储引擎配置）。租户不存在返回 {@code null}
      * （与 {@code getTenantById} 的语义一致；调用方据此回 401/400）。

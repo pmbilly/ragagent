@@ -12,10 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.tenant.ChatHistoryConfig;
 import com.ragagent.tenant.RetrievalConfig;
-import com.ragagent.auth.service.TenantService;
+import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.common.retrieval.SearchResult;
@@ -49,14 +48,14 @@ final class MessageSearch {
     private static final double RRF_K = 60.0;
 
     private final MessageRepository messageRepository;
-    private final TenantService tenantService;
+    private final TenantConfigLookup tenantService;
     /** 聊天历史 KB 的向量检索执行面。 */
     private final HybridSearchService hybridSearchService;
     /** rerankResults 的重排模型工厂。 */
     private final ModelRuntimeAssembler modelRuntimeAssembler;
 
     MessageSearch(MessageRepository messageRepository,
-                  TenantService tenantService,
+                  TenantConfigLookup tenantService,
                   HybridSearchService hybridSearchService,
                   ModelRuntimeAssembler modelRuntimeAssembler) {
         this.messageRepository = messageRepository;
@@ -194,11 +193,7 @@ final class MessageSearch {
         if (tenantId == null) {
             return null;
         }
-        Tenant tenant = tenantService.getTenantById(tenantId);
-        if (tenant == null) {
-            return null;
-        }
-        JsonNode node = tenant.getChatHistoryConfig();
+        JsonNode node = tenantService.chatHistoryConfig(tenantId);
         if (node == null || node.isNull()) {
             return null;
         }
@@ -224,8 +219,7 @@ final class MessageSearch {
         if (tenantId == null) {
             return rc;
         }
-        Tenant tenant = tenantService.getTenantById(tenantId);
-        JsonNode node = tenant == null ? null : tenant.getRetrievalConfig();
+        JsonNode node = tenantService.retrievalConfig(tenantId);
         if (node == null || node.isNull()) {
             return rc;
         }

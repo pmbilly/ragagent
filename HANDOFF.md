@@ -1308,6 +1308,16 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **A② 全批提交**：`a7d3b13e`（第①批 42 类）· `37b5fbb8`（第②批 去框架化 37 类）· `2ee75327`（第②批 补：解锁 11 类）· 本批（第③批 9 类 + 收口）。
 - **A 的下一步**：**③ 立「域间只经契约」**（A20 已守"契约唯一实现"；还差"业务域之间只经 `contract`"这条规则——应先测现状再决定硬规则 vs 棘轮基线）。可选后续：① 的 K 级重设计（`JsonNode` → typed records）另立项。
 
+**🔶 A③ 收敛第二刀：`session` 面（2026-10-14，R10 基线 312 → 307 类）**
+- **端口扩容**：`common.tenant.TenantConfigLookup` 补 **3 个方法**（`webSearchConfig`/`chatHistoryConfig`/`parserEngineConfig`，均为 `JsonNode`，语义与既有同款："租户不存在或配置为空 ⇒ null"），实现在 `auth/TenantService`（新增私有 `configOf(tenantId, getter)` 统一取法 ✓）。
+- **迁移 4 类**（session 面同时减两条边）：`service/{QaWebSearchParams, AgentToolBackends, MessageSearch, MessageService}` — `getTenantById(tid)` + `tenant.getXxxConfig()` 改写为 `tenantService.xxxConfig(tid)`（**语义等价**：端口把"租户不存在"与"配置为空"归并为 null，与调用原判据一致 ✓）；字段/构造类型 `TenantService`（**具体类** ✗）→ `TenantConfigLookup`（L1 端口 ✓ ⇒ 同 bean，零 wiring ✓）。
+- **收益**：R10 基线 **312 → 307 类**（`session→auth` **11 → 8**、`session→tenant` **9 → 7**）；净减 5 类（4 个类各少 1 条 auth 边 + 2 个类少 tenant 边，另 1 条为死 import 清理 ✓）。
+- **⚠️ 两条现场教训**：
+  1. **整词替换会误改"同名嵌套类型"**：`QaWiring` 用的是会话内端口 `PipelinePorts.TenantService`（同名 ✗）⇒ 我的 `TenantService → TenantConfigLookup` 整词替换把它也改了 ✗ ⇒ 编译报错定位后**整文件回退** ✓（该类的租户接线属独立设计步：它已有会话内端口，迁移方式与普通类不同 ⇒ 登记）。
+  2. **死 import 既是脏也是"假依赖"**：4 个类改完后仍留 `import …tenant.repository.Tenant;` ✗ ⇒ 它同时(a)触发死成员守卫、(b)让 R10 误以为该域仍依赖 tenant ✗ ⇒ 删净后基线才真正下降（312 → 307 的最后 2 类来自这里）✓。
+- **验证**：**4987 / 失败 0 / 跳过 4** ✓；`spotlessCheck build` ✓ **1m56s** ✓ **13 守卫** ✓（环 0 / SCC 11 组）；定向（MessageService 系 / ImRedisStore ✓；后者首跑因 Redis 连接失败，单跑即绿 ⇒ 同 flaky 家族，已登记）。
+- **下一步**：`session` 面余下 8+7 类中，`QaWiring`/`SessionStreamController`/`MessageController`/`KnowledgeQaController` 共用 `currentTenant()` 模式（可一刀多类 ✓）；`QaRequestParser`/`QaTurnExecutor` 走会话内端口（独立设计步）；再往后 `auth→tenant`（24 处）/`knowledge→storage`（21 处）/`tenant.StorageEngineConfig` 类型族。
+
 **🔶 A③ 收敛第一刀：`tenant` 枢纽（2026-10-14，R10 基线 317 → 312 类）**
 - **为什么选 `tenant`**：实测五个枢纽的被引分布——`→tenant` 62 处但只 **9 个目标类**（`Tenant` 39 + `TenantLookup` 6 + 配置类等）⇒ 80/20 最优 ✓；反例：`→storage` 72 处散在 **28 个类** ✗、`→knowledge` 114 处 / 37 类 ✗、`→model` 的目标是 **Spring AI 运行时对象**（`ModelRuntimeAssembler` 等，签名不可能进纯 JDK 契约 ✗）。
 - **机制（关键发现：端口与视图早就位）**：`common.tenant.TenantConfigLookup.storageView(long)` 与其嵌套 record **`TenantStorageView(long tenantId, String defaultStorageBackendId, JsonNode storageEngineConfig)`** 已存在（由 `auth/service/TenantService` 实现——它同时实现 `TenantLookup` ⇒ **换注入类型即换 bean，零新增 wiring** ✓）⇒ 本刀是**纯迁移**：`Tenant` 实体 / `TenantLookup` ⇒ L1 端口 + 视图。

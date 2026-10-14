@@ -19,7 +19,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.knowledge.domain.Knowledge;
@@ -69,10 +68,8 @@ class MessageServiceChatHistoryIndexTest {
     }
 
     private void tenantWith(ObjectNode chatHistory) {
-        Tenant t = new Tenant();
-        t.setId(TENANT);
-        t.setChatHistoryConfig(chatHistory);
-        when(tenantService.getTenantById(TENANT)).thenReturn(t);
+        // 自 A③ 起租户配置经 L1 端口读（TenantConfigLookup），不再取实体
+        when(tenantService.chatHistoryConfig(TENANT)).thenReturn(chatHistory);
     }
 
     private static ObjectNode configured(String embeddingModelId, String kbId) {

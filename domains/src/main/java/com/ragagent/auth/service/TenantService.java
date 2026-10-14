@@ -92,6 +92,27 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
     }
 
     @Override
+    public JsonNode webSearchConfig(long tenantId) {
+        return configOf(tenantId, Tenant::getWebSearchConfig);
+    }
+
+    @Override
+    public JsonNode chatHistoryConfig(long tenantId) {
+        return configOf(tenantId, Tenant::getChatHistoryConfig);
+    }
+
+    @Override
+    public JsonNode parserEngineConfig(long tenantId) {
+        return configOf(tenantId, Tenant::getParserEngineConfig);
+    }
+
+    /** 三段配置的统一取法：租户不存在或值为 null 时返回 null（与端口 javadoc 的语义一致）。 */
+    private JsonNode configOf(long tenantId, java.util.function.Function<Tenant, JsonNode> getter) {
+        Tenant t = getTenantById(tenantId);
+        return t == null ? null : getter.apply(t);
+    }
+
+    @Override
     public TenantStorageView storageView(long tenantId) {
         Tenant t = getTenantById(tenantId);
         if (t == null) {

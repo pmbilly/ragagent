@@ -58,10 +58,9 @@ import com.ragagent.agenttools.datasource.AnalysisDuckDbJdbc;
 import com.ragagent.agenttools.datasource.DataAnalysisTool;
 import com.ragagent.agenttools.knowledge.GetDocumentInfoTool;
 import com.ragagent.agenttools.knowledge.ListKnowledgeChunksTool;
-import com.ragagent.auth.service.TenantService;
+import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.contract.tenant.WebSearchConfig;
 import com.ragagent.knowledge.storage.TenantFileStorage;
-import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.websearch.service.WebSearchService;
 import com.ragagent.retrieval.domain.WebSearchRequest;
 import com.ragagent.common.knowledge.ChunkFacts;
@@ -93,7 +92,7 @@ public class AgentToolBackends {
     private final MessageService messageService;
     private final MemoryService memoryService;
     private final WebSearchService webSearchService;
-    private final TenantService tenantService;
+    private final TenantConfigLookup tenantService;
     private final TenantFileStorage fileStorage;
     private final JdbcTemplate jdbc;
 
@@ -106,7 +105,7 @@ public class AgentToolBackends {
                              MemoryService memoryService,
                              WikiPageService wikiPageService,
                              WebSearchService webSearchService,
-                             TenantService tenantService,
+                             TenantConfigLookup tenantService,
                              TenantFileStorage fileStorage,
                              DataSource dataSource) {
         this.knowledgeService = knowledgeService;
@@ -391,14 +390,11 @@ public class AgentToolBackends {
             return null;
         }
         try {
-            Tenant tenant = tenantService.getTenantById(tid);
-            if (tenant == null || tenant.getWebSearchConfig() == null
-                    || tenant.getWebSearchConfig().isNull()) {
+            JsonNode webSearch = tenantService.webSearchConfig(tid);
+            if (webSearch == null || webSearch.isNull()) {
                 return null;
             }
-            WebSearchConfig cfg = JSON.treeToValue(
-                    tenant.getWebSearchConfig(),
-                    WebSearchConfig.class);
+            WebSearchConfig cfg = JSON.treeToValue(webSearch, WebSearchConfig.class);
             cfg.applyEffective();
             return cfg;
         } catch (RuntimeException | com.fasterxml.jackson.core.JacksonException e) {
