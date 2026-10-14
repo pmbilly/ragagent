@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.service;
+package com.ragagent.knowledge.service.chunk;
 
 import com.ragagent.knowledge.domain.span.SpanTracker;
 
@@ -115,7 +115,7 @@ public class ChunkExtractService implements ChunkExtractConsumer {
 
     /**
      * @param terminal 本次是否是该任务的**最后一次**尝试（队列侧按 {@code attempt > MAX_RETRY} 传入）。
-     *                 与 {@link QuestionGenerationService} 同款契约（K5）：失败且还会重试时**不**递减
+     *                 与 {@link com.ragagent.knowledge.service.QuestionGenerationService QuestionGenerationService} 同款契约（K5）：失败且还会重试时**不**递减
      *                 槽位——否则重试链/重复投递会把槽位扣穿、父知识在富化落库前就提前完成。
      */
     public void handleJson(String payloadJson, boolean terminal) {

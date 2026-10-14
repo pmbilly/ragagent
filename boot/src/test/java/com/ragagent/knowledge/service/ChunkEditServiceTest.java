@@ -32,6 +32,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import com.ragagent.knowledge.domain.ChunkRevisionConflictException;
 import com.ragagent.common.security.SsrfGuard;
 import com.ragagent.model.domain.ModelParameters;
+import com.ragagent.knowledge.service.chunk.ChunkEditService;
 
 /**
  * chunk 编辑链路语义（H2）：乐观锁冲突（409 面）、校验的 500 面文案、source_content

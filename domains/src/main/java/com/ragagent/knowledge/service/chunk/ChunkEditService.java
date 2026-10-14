@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.service;
+package com.ragagent.knowledge.service.chunk;
 
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 
@@ -22,6 +22,7 @@ import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
 import com.ragagent.retrieval.support.ChunkSearchUtil;
 import java.nio.charset.StandardCharsets;
 import com.ragagent.knowledge.index.ChunkVectorIndexer;
+import com.ragagent.knowledge.service.KnowledgeService;
 
 /**
  * chunk 版本化编辑面：乐观锁更新的编辑/回滚/修订历史、软删除、图片子块联动与父内容重建，

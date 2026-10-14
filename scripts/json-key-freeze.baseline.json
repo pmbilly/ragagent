@@ -77,7 +77,7 @@
     "im/wecom/WecomLongConnClient.java": "im/",
     "im/wecom/WecomWebhookAdapter.java": "im/",
     "im/yunzhijia/YunzhijiaAdapter.java": "im/",
-    "knowledge/service/ChunkExtractService.java": "knowledge/service/ChunkExtractService",
+    "knowledge/service/chunk/ChunkExtractService.java": "knowledge/service/chunk/ChunkExtractService",
     "knowledge/task/KnowledgeProcessWorker.java": "knowledge/task/KnowledgeProcessWorker",
     "llm/domain/ChatMessage.java": "llm/",
     "llm/domain/ChatOptions.java": "llm/",

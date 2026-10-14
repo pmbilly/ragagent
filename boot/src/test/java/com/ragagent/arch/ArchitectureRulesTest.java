@@ -797,7 +797,7 @@ class ArchitectureRulesTest {
             "com.ragagent.embedchannel.service.RedisEmbedTokenStore",
             "com.ragagent.im.service.ImService",
             "com.ragagent.initialization.service.InitializationConfigService",
-            "com.ragagent.knowledge.service.ChunkExtractService",
+            "com.ragagent.knowledge.service.chunk.ChunkExtractService",
             "com.ragagent.knowledge.service.faq.FaqIndexWriter",
             "com.ragagent.knowledge.service.KnowledgeBaseLookupAdapter",
             "com.ragagent.knowledge.service.KnowledgeService",

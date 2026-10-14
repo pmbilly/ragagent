@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.service;
+package com.ragagent.knowledge.service.chunk;
 
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 

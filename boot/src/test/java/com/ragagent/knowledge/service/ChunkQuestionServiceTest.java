@@ -28,6 +28,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import com.ragagent.common.security.SsrfGuard;
 import com.ragagent.model.domain.ModelParameters;
+import com.ragagent.knowledge.service.chunk.ChunkEditService;
 
 /**
  * chunk 生成问题链路语义（H2）：Upsert/Delete/Regenerate 的 400 原文与 metadata

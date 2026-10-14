@@ -14,6 +14,6 @@
  *       —— 它被 {@code task} 侧 worker 使用，留在本包会形成 {@code task → service} 环。</li>
  * </ul>
  *
- * <p><b>子面</b>：{@code faq/}（B263㉞ 从本包整簇切出——导入编排 / 条目读写 / 索引形态）。</p>
+ * <p><b>子面</b>：{@code faq/}（B263㉞ 整簇切出——导入编排 / 条目读写 / 索引形态）、{@code chunk/}（B263㉟ 切出——分块编辑 / 抽取 / 读取）。</p>
  */
 package com.ragagent.knowledge.service;

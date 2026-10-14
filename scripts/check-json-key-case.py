@@ -96,7 +96,7 @@ FROZEN_PREFIXES = (
     # 冻结悄悄失效、CI 才报"非冻结面出现新的 snake 键"。**换包时务必回来核这里** ✓。
     'common/wiki/ExtractedItem', 'chatpipeline/plugin', 'agent/AgentEngine',
     'agent/ReActIteration', 'retrieval/HybridSearchService', 'retrieval/vlm/VlmClient',
-    'knowledge/service/ChunkExtractService', 'knowledge/task/KnowledgeProcessWorker',
+    'knowledge/service/chunk/ChunkExtractService', 'knowledge/task/KnowledgeProcessWorker',  # B263㉟ 换锚：ChunkExtractService 迁 service/chunk
     'memory/mapper', 'knowledge/domain/KnowledgeBase', 'mcp/domain/McpService',
     # 上游 API 载荷的适配器族（embedding/im/websearch/rerank/asr/vlm 的 provider 与客户端：
     # 键名由对方 API 定，冻结）
