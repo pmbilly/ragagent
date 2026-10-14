@@ -1,6 +1,8 @@
 package com.ragagent.approval;
 
 import com.ragagent.contract.tool.Cancellation;
+import com.ragagent.contract.tool.ToolApprovalException;
+import com.ragagent.contract.tool.ToolEnabledChecks;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -16,7 +18,7 @@ import org.junit.jupiter.api.Timeout;
 import com.ragagent.mcp.service.Adapter;
 
 /**
- * 工具批量策略判定（{@code Gate} 与 {@code ApprovalToolPolicy} 的 enabledTools）。
+ * 工具批量策略判定（{@code Gate} 与 {@code ToolEnabledChecks} 的 enabledTools）。
  *
  * <p>覆盖点：批量只读一次、行按 (tenant, service) 过滤、只覆盖被请求的名字、
  * 身份缺失与取消信号在**查询之前**短路、底层异常原样上抛、
@@ -60,7 +62,7 @@ class ToolPolicyTest {
         assertEquals(1, svc.reads, "批量路径必须只查询一次");
 
         // 身份缺失：查询之前就报错，不得打到服务层
-        assertThrows(ApprovalException.class,
+        assertThrows(ToolApprovalException.class,
                 () -> gate.enabledTools(Cancellation.none(), 0, "svc", List.of("default")));
         assertEquals(1, svc.reads);
 
@@ -107,7 +109,7 @@ class ToolPolicyTest {
         Adapter adapter = new Adapter(svc);
 
         Map<String, Boolean> viaFreeFunction =
-                ApprovalToolPolicy.enabledTools(Cancellation.none(), adapter, 7, "svc", List.of("a", "b"));
+                ToolEnabledChecks.enabledTools(Cancellation.none(), adapter, 7, "svc", List.of("a", "b"));
         assertEquals(Map.of("a", false, "b", true), viaFreeFunction);
         assertEquals(1, svc.reads, "自由函数把批量能力转发给 Adapter，仍然只读一次");
     }

@@ -9,7 +9,10 @@ import com.ragagent.contract.event.payload.MCPOAuthRequiredData;
 import com.ragagent.contract.event.payload.MCPOAuthResolvedData;
 import com.ragagent.contract.event.payload.ToolApprovalRequiredData;
 import com.ragagent.contract.event.payload.ToolApprovalResolvedData;
+import com.ragagent.contract.tool.ToolApprovalException;
 import com.ragagent.contract.tool.ToolApprovalGate;
+import com.ragagent.contract.tool.ToolEnabledChecks;
+import com.ragagent.contract.tool.ToolPolicyChecker;
 
 import com.ragagent.contract.tool.PendingRequest;
 
@@ -88,7 +91,7 @@ public class Gate implements ToolApprovalGate, AutoCloseable {
     /** pendingId → 等待者 */
     private final Map<String, Waiter> pending = new HashMap<>();
     /** 策略查询口；为 null 表示关闭审批门 */
-    private final Checker checker;
+    private final ToolPolicyChecker checker;
     /** 审批等待时长（默认 10 分钟） */
     private final Duration timeout;
     /** Redis pubsub；为 null 即单实例模式 */
@@ -106,7 +109,7 @@ public class Gate implements ToolApprovalGate, AutoCloseable {
     /**
      * checker 可为 null（关闭审批门）、options 可为 null（默认值）、redis 可为 null（单实例）。
      */
-    public Gate(GateOptions options, Checker checker, RedisPubSub redis) {
+    public Gate(GateOptions options, ToolPolicyChecker checker, RedisPubSub redis) {
         GateOptions opts = options == null ? GateOptions.defaults() : options;
         this.checker = checker;
         this.timeout = opts.timeout();
@@ -124,7 +127,7 @@ public class Gate implements ToolApprovalGate, AutoCloseable {
     }
 
     /** 便捷构造：默认 options。 */
-    public Gate(Checker checker, RedisPubSub redis) {
+    public Gate(ToolPolicyChecker checker, RedisPubSub redis) {
         this(null, checker, redis);
     }
 
@@ -183,7 +186,7 @@ public class Gate implements ToolApprovalGate, AutoCloseable {
     /** 目录枚举用的批量启用查询。 */
     public Map<String, Boolean> enabledTools(
             Cancellation ctx, long tenantId, String serviceId, List<String> names) {
-        return ApprovalToolPolicy.enabledTools(ctx, checker, tenantId, serviceId, names);
+        return ToolEnabledChecks.enabledTools(ctx, checker, tenantId, serviceId, names);
     }
 
     // ------------------------------------------------------------------
@@ -201,7 +204,7 @@ public class Gate implements ToolApprovalGate, AutoCloseable {
             return Decision.allow();
         }
         if (req.eventBus() == null) {
-            throw ApprovalException.internal("tool approval: ApprovalEventBus is nil");
+            throw ToolApprovalException.internal("tool approval: ApprovalEventBus is nil");
         }
 
         String pendingId = UUID.randomUUID().toString();
@@ -230,7 +233,7 @@ public class Gate implements ToolApprovalGate, AutoCloseable {
             try {
                 req.eventBus().emit(evt);
             } catch (RuntimeException e) {
-                throw ApprovalException.internal("emit tool approval required: " + e.getMessage(), e);
+                throw ToolApprovalException.internal("emit tool approval required: " + e.getMessage(), e);
             }
 
             // 注册取消回调：取消即投递取消决策
@@ -266,7 +269,7 @@ public class Gate implements ToolApprovalGate, AutoCloseable {
      */
     public Decision requestOAuthAndWait(Cancellation ctx, OAuthPendingRequest req) {
         if (req.eventBus() == null) {
-            throw ApprovalException.internal("oauth gate: ApprovalEventBus is nil");
+            throw ToolApprovalException.internal("oauth gate: ApprovalEventBus is nil");
         }
 
         String pendingId = UUID.randomUUID().toString();
@@ -296,7 +299,7 @@ public class Gate implements ToolApprovalGate, AutoCloseable {
             try {
                 req.eventBus().emit(evt);
             } catch (RuntimeException e) {
-                throw ApprovalException.internal("emit mcp oauth required: " + e.getMessage(), e);
+                throw ToolApprovalException.internal("emit mcp oauth required: " + e.getMessage(), e);
             }
 
             AutoCloseable cancelReg = ctx.onCancel(() -> w.deliver(Decision.cancel("request canceled")));
@@ -331,11 +334,11 @@ public class Gate implements ToolApprovalGate, AutoCloseable {
      * 本实例没有该 pending 且配置了 Redis 时，会广播到所有副本并等 ack，
      * 从而区分“在别的实例上完成了”与“根本没有这个 pending”。</p>
      *
-     * @throws ApprovalException 按 {@link ApprovalException.Kind} 判别：
+     * @throws ToolApprovalException 按 {@link ToolApprovalException.Kind} 判别：
      *                           PENDING_NOT_FOUND / ALREADY_RESOLVED / TENANT_MISMATCH / USER_MISMATCH
      */
     public void resolve(long tenantId, String userId, String pendingId, Decision d) {
-        ApprovalException err = deliverLocal(tenantId, userId, pendingId, d);
+        ToolApprovalException err = deliverLocal(tenantId, userId, pendingId, d);
         if (err == null) {
             return;
         }
@@ -365,7 +368,7 @@ public class Gate implements ToolApprovalGate, AutoCloseable {
         try {
             // 先确认订阅生效再发布，避免漏掉 ack
             if (!sub.awaitSubscribed(SUBSCRIBE_TIMEOUT)) {
-                throw ApprovalException.internal("subscribe approval reply: timeout waiting for subscription");
+                throw ToolApprovalException.internal("subscribe approval reply: timeout waiting for subscription");
             }
 
             String payload = ApprovalJson.write(
@@ -377,12 +380,12 @@ public class Gate implements ToolApprovalGate, AutoCloseable {
             while (true) {
                 Duration left = Duration.ofNanos(deadline - System.nanoTime());
                 if (left.isZero() || left.isNegative()) {
-                    throw ApprovalException.pendingNotFound();
+                    throw ToolApprovalException.pendingNotFound();
                 }
                 String msg = sub.receiveMessage(left);
                 if (msg == null) {
                     // 超时或订阅错误：无人确认 → 视为不存在
-                    throw ApprovalException.pendingNotFound();
+                    throw ToolApprovalException.pendingNotFound();
                 }
                 ResolveAck ack = ApprovalJson.read(msg, ResolveAck.class);
                 if (ack == null) {
@@ -397,11 +400,11 @@ public class Gate implements ToolApprovalGate, AutoCloseable {
                     case ResolveAck.STATUS_OK -> {
                         return;
                     }
-                    case ResolveAck.STATUS_TENANT_MISMATCH -> throw ApprovalException.tenantMismatch();
-                    case ResolveAck.STATUS_USER_MISMATCH -> throw ApprovalException.userMismatch();
-                    case ResolveAck.STATUS_ALREADY_RESOLVED -> throw ApprovalException.alreadyResolved();
-                    case ResolveAck.STATUS_NOT_FOUND -> throw ApprovalException.pendingNotFound();
-                    default -> throw ApprovalException.internal(
+                    case ResolveAck.STATUS_TENANT_MISMATCH -> throw ToolApprovalException.tenantMismatch();
+                    case ResolveAck.STATUS_USER_MISMATCH -> throw ToolApprovalException.userMismatch();
+                    case ResolveAck.STATUS_ALREADY_RESOLVED -> throw ToolApprovalException.alreadyResolved();
+                    case ResolveAck.STATUS_NOT_FOUND -> throw ToolApprovalException.pendingNotFound();
+                    default -> throw ToolApprovalException.internal(
                             "approval reply: unexpected status \"" + ack.status() + "\"");
                 }
             }
@@ -415,27 +418,27 @@ public class Gate implements ToolApprovalGate, AutoCloseable {
      *
      * @return null 表示投递成功；否则是对应哨兵异常
      */
-    private ApprovalException deliverLocal(long tenantId, String userId, String pendingId, Decision d) {
+    private ToolApprovalException deliverLocal(long tenantId, String userId, String pendingId, Decision d) {
         Waiter w;
         synchronized (mu) {
             w = pending.get(pendingId);
             if (w == null) {
-                return ApprovalException.pendingNotFound();
+                return ToolApprovalException.pendingNotFound();
             }
             if (w.tenantId != tenantId) {
-                return ApprovalException.tenantMismatch();
+                return ToolApprovalException.tenantMismatch();
             }
             // 鉴权：注册时带 userID 的 pending，调用方必须给出**相同的非空** userID。
             // 调用方 userID 为空一律视为不匹配（fail-close），避免缺失鉴权中间件时绕过校验。
             if (!w.userId.isEmpty() && !w.userId.equals(userId)) {
-                return ApprovalException.userMismatch();
+                return ToolApprovalException.userMismatch();
             }
         }
         if (w.resolved.get()) {
-            return ApprovalException.alreadyResolved();
+            return ToolApprovalException.alreadyResolved();
         }
         if (!w.deliver(d)) {
-            return ApprovalException.alreadyResolved();
+            return ToolApprovalException.alreadyResolved();
         }
         return null;
     }
@@ -498,7 +501,7 @@ public class Gate implements ToolApprovalGate, AutoCloseable {
         if (instanceId.equals(m.originId())) {
             return;
         }
-        ApprovalException err = deliverLocal(m.tenantId(), m.userId(), m.pendingId(), m.toDecision());
+        ToolApprovalException err = deliverLocal(m.tenantId(), m.userId(), m.pendingId(), m.toDecision());
 
         // 回执给发起实例，让它返回准确的 HTTP 状态码：
         // 只有真正持有 pending（或真的检测到冲突）的实例才回复，其他副本对 NotFound 保持沉默。
@@ -515,13 +518,13 @@ public class Gate implements ToolApprovalGate, AutoCloseable {
         }
 
         // 投递成功或本副本没有该 pending 都保持安静，其他错误才告警
-        if (err != null && err.kind() != ApprovalException.Kind.PENDING_NOT_FOUND) {
+        if (err != null && err.kind() != ToolApprovalException.Kind.PENDING_NOT_FOUND) {
             log.warn("mcp approval pubsub deliver: {}", err.toString());
         }
     }
 
     /** 错误 → ack status 的映射（PENDING_NOT_FOUND → 不回执） */
-    private static String statusOf(ApprovalException err) {
+    private static String statusOf(ToolApprovalException err) {
         if (err == null) {
             return ResolveAck.STATUS_OK;
         }
@@ -663,9 +666,9 @@ public class Gate implements ToolApprovalGate, AutoCloseable {
                 return null;
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                throw ApprovalException.internal("interrupted while waiting for tool approval", e);
+                throw ToolApprovalException.internal("interrupted while waiting for tool approval", e);
             } catch (ExecutionException e) {
-                throw ApprovalException.internal("tool approval wait failed", e.getCause());
+                throw ToolApprovalException.internal("tool approval wait failed", e.getCause());
             }
         }
     }

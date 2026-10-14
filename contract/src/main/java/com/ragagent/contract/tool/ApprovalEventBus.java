@@ -10,7 +10,7 @@ package com.ragagent.contract.tool;
  *
  * <p><b>线程语义</b>：实现应**同步**执行——顺序调用 handler，
  * 任一 handler 失败即抛运行时异常，
- * {@code Gate} 会包装成 {@code ApprovalException.Kind#INTERNAL}。</p>
+ * {@code Gate} 会包装成 {@link ToolApprovalException.Kind#INTERNAL}。</p>
  */
 @FunctionalInterface
 public interface ApprovalEventBus {

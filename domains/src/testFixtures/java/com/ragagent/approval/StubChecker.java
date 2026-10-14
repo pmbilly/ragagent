@@ -1,6 +1,7 @@
 package com.ragagent.approval;
 
 import com.ragagent.contract.tool.Cancellation;
+import com.ragagent.contract.tool.ToolPolicyChecker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,12 +10,12 @@ import com.ragagent.mcp.domain.McpToolApproval;
 import com.ragagent.mcp.service.McpToolPolicySource;
 
 /**
- * 可编程的 {@link Checker} 测试替身：各判定方法可注入返回值或异常。
+ * 可编程的 {@link ToolPolicyChecker} 测试替身：各判定方法可注入返回值或异常。
  *
  * <p>字段 {@code required / requiredError / enabled / enabledError}，其中
  * {@code enabled == null} 视同放行（返回 true）的默认语义。</p>
  */
-class StubChecker implements Checker {
+class StubChecker implements ToolPolicyChecker {
 
     boolean required;
     RuntimeException requiredError;

@@ -1,5 +1,6 @@
 package com.ragagent.approval;
 
+import com.ragagent.contract.tool.ToolApprovalException;
 import com.ragagent.platform.web.JsonMappers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,7 +23,7 @@ final class ApprovalJson {
         try {
             return MAPPER.writeValueAsString(value);
         } catch (Exception e) {
-            throw ApprovalException.internal("encode approval payload: " + e.getMessage(), e);
+            throw ToolApprovalException.internal("encode approval payload: " + e.getMessage(), e);
         }
     }
 

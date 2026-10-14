@@ -3,6 +3,7 @@ package com.ragagent.approval;
 import com.ragagent.contract.tool.PendingRequest;
 
 import com.ragagent.contract.tool.Cancellation;
+import com.ragagent.contract.tool.ToolApprovalException;
 
 import com.ragagent.contract.tool.Decision;
 
@@ -58,11 +59,11 @@ class GateCrossInstanceTest {
                 .withTimeout(Duration.ofSeconds(10));
     }
 
-    private static ApprovalException captureResolve(Gate gate, long tenantId, String userId, String pendingId, Decision d) {
+    private static ToolApprovalException captureResolve(Gate gate, long tenantId, String userId, String pendingId, Decision d) {
         try {
             gate.resolve(tenantId, userId, pendingId, d);
             return null;
-        } catch (ApprovalException e) {
+        } catch (ToolApprovalException e) {
             return e;
         }
     }
@@ -86,7 +87,7 @@ class GateCrossInstanceTest {
         pubsub.awaitSubscribers(Gate.pubsubChannel(), 2, Duration.ofSeconds(2));
 
         RecordingEventBus bus = new RecordingEventBus();
-        AtomicReference<ApprovalException> callerResult = new AtomicReference<>();
+        AtomicReference<ToolApprovalException> callerResult = new AtomicReference<>();
         AtomicReference<Boolean> callerDone = new AtomicReference<>(false);
         bus.on(ResponseType.TOOL_APPROVAL_REQUIRED, evt -> {
             String pendingId = ((ToolApprovalRequiredData) evt.data()).getPendingId();
@@ -117,8 +118,8 @@ class GateCrossInstanceTest {
         pubsub.awaitSubscribers(Gate.pubsubChannel(), 2, Duration.ofSeconds(2));
 
         RecordingEventBus bus = new RecordingEventBus();
-        AtomicReference<ApprovalException> tenantErr = new AtomicReference<>();
-        AtomicReference<ApprovalException> userErr = new AtomicReference<>();
+        AtomicReference<ToolApprovalException> tenantErr = new AtomicReference<>();
+        AtomicReference<ToolApprovalException> userErr = new AtomicReference<>();
         AtomicReference<Boolean> done = new AtomicReference<>(false);
         bus.on(ResponseType.TOOL_APPROVAL_REQUIRED, evt -> {
             String pendingId = ((ToolApprovalRequiredData) evt.data()).getPendingId();
@@ -138,9 +139,9 @@ class GateCrossInstanceTest {
         awaitFlag(done, Duration.ofSeconds(5));
         assertFalse(d.approved());
         assertNotNull(tenantErr.get());
-        assertTrue(tenantErr.get().is(ApprovalException.Kind.TENANT_MISMATCH), String.valueOf(tenantErr.get()));
+        assertTrue(tenantErr.get().is(ToolApprovalException.Kind.TENANT_MISMATCH), String.valueOf(tenantErr.get()));
         assertNotNull(userErr.get());
-        assertTrue(userErr.get().is(ApprovalException.Kind.USER_MISMATCH), String.valueOf(userErr.get()));
+        assertTrue(userErr.get().is(ToolApprovalException.Kind.USER_MISMATCH), String.valueOf(userErr.get()));
     }
 
     /** 没有任何实例持有该 pending：ack 窗口内无回应 → PENDING_NOT_FOUND（而非静默成功）。 */
@@ -149,9 +150,9 @@ class GateCrossInstanceTest {
         FakeRedisPubSub pubsub = new FakeRedisPubSub();
         gateA = new Gate(options("A", Duration.ofMillis(300)), new StubChecker(true), pubsub);
 
-        ApprovalException err = captureResolve(gateA, 1, "", "missing-pending", Decision.allow());
+        ToolApprovalException err = captureResolve(gateA, 1, "", "missing-pending", Decision.allow());
         assertNotNull(err);
-        assertTrue(err.is(ApprovalException.Kind.PENDING_NOT_FOUND));
+        assertTrue(err.is(ToolApprovalException.Kind.PENDING_NOT_FOUND));
     }
 
     /** 自己发布的报文必须被 OriginID 过滤：否则会自己投递一个本地必然 miss 的请求。 */
@@ -183,7 +184,7 @@ class GateCrossInstanceTest {
         pubsub.awaitSubscribers(Gate.pubsubChannel(), 2, Duration.ofSeconds(2));
 
         RecordingEventBus bus = new RecordingEventBus();
-        AtomicReference<ApprovalException> callerResult = new AtomicReference<>();
+        AtomicReference<ToolApprovalException> callerResult = new AtomicReference<>();
         AtomicReference<Boolean> callerDone = new AtomicReference<>(false);
         bus.on(ResponseType.TOOL_APPROVAL_REQUIRED, evt -> {
             String pendingId = ((ToolApprovalRequiredData) evt.data()).getPendingId();

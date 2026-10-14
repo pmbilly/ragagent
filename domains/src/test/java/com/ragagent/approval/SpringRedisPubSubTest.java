@@ -5,6 +5,7 @@ import com.ragagent.platform.redis.RedisPubSub;
 import com.ragagent.contract.tool.PendingRequest;
 
 import com.ragagent.contract.tool.Cancellation;
+import com.ragagent.contract.tool.ToolApprovalException;
 
 import com.ragagent.contract.tool.Decision;
 
@@ -166,7 +167,7 @@ class SpringRedisPubSubTest {
         Thread.sleep(800);
 
         RecordingEventBus bus = new RecordingEventBus();
-        AtomicReference<ApprovalException> callerResult = new AtomicReference<>();
+        AtomicReference<ToolApprovalException> callerResult = new AtomicReference<>();
         AtomicReference<Boolean> callerDone = new AtomicReference<>(false);
         bus.on(ResponseType.TOOL_APPROVAL_REQUIRED, evt -> {
             String pendingId = ((ToolApprovalRequiredData) evt.data()).getPendingId();
@@ -189,11 +190,11 @@ class SpringRedisPubSubTest {
         assertNull(callerResult.get(), "A 侧必须收到 ok ack 而返回成功");
     }
 
-    private static ApprovalException resolveQuietly(Gate gate, String pendingId) {
+    private static ToolApprovalException resolveQuietly(Gate gate, String pendingId) {
         try {
             gate.resolve(1, "", pendingId, Decision.allowWith("{\"a\":2}"));
             return null;
-        } catch (ApprovalException e) {
+        } catch (ToolApprovalException e) {
             return e;
         }
     }

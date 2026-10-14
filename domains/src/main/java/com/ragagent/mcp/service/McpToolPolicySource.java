@@ -8,7 +8,7 @@ import com.ragagent.mcp.domain.McpToolApproval;
  * 逐工具策略的**整表读取口**。
  *
  * <p><b>为什么在本包再定义一个窄接口</b>：Java 没有结构化类型，
- * 无法在运行时探测一个 {@link com.ragagent.approval.Checker} 是否额外提供 {@code listByService}，
+ * 无法在运行时探测一个 {@link com.ragagent.contract.tool.ToolPolicyChecker} 是否额外提供 {@code listByService}，
  * 等价做法就是定义这个只含 {@code listByService} 的窄接口，
  * 由 {@code instanceof} 探测——因此它的实现方（MCP 服务层）只需在原类上
  * {@code implements ... McpToolPolicySource}（或用一个匿名类桥接），

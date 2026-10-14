@@ -2,10 +2,9 @@ package com.ragagent.mcp;
 
 import com.ragagent.mcp.service.Adapter;
 import com.ragagent.contract.tool.Cancellation;
-import com.ragagent.approval.Checker;
-import com.ragagent.approval.Gate;
-import com.ragagent.approval.GateOptions;
-import com.ragagent.platform.redis.RedisPubSub;
+import com.ragagent.contract.tool.ToolApprovalGate;
+import com.ragagent.contract.tool.ToolApprovalGateFactory;
+import com.ragagent.contract.tool.ToolPolicyChecker;
 import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.protocol.McpOAuthSupport;
 import com.ragagent.mcp.service.McpToolApprovalService;
@@ -19,7 +18,7 @@ import org.springframework.context.annotation.Configuration;
  *
  * 这里补上两个此前只有接口、没有实例的依赖：
  * - {@link McpClientManager}：MCP 连接池
- * - {@link Gate}：工具审批门
+ * - {@link ToolApprovalGate}：工具审批门
  *
  * 两者的消费方此前用 {@code Optional<...>} 注入，缺省时走"返回 500 / 业务失败"的兜底
  * 分支。这里提供实例后，那些分支不再触发。
@@ -41,13 +40,14 @@ public class McpWiring {
      * <p>Checker 由 {@link McpToolApprovalService} 适配而来：用 {@link Adapter}
      * 包一层，保持"目录批量查询走单次查询"的优化路径。</p>
      *
-     * <p>Redis 缺失时传 null：单实例模式，审批结果不跨实例广播。</p>
+     * <p>闸门实例由 approval 的装配工厂创建——Redis 广播等实现细节由工厂内部取，
+     * 本模块不接触实现类。</p>
      */
     @Bean(destroyMethod = "close")
-    public Gate toolApprovalGate(McpToolApprovalService toolApprovalService,
-                                 ObjectProvider<RedisPubSub> redis,
+    public ToolApprovalGate toolApprovalGate(ToolApprovalGateFactory gateFactory,
+                                 McpToolApprovalService toolApprovalService,
                                  @Value("${weknora.agent.tool-approval-timeout-seconds:0}") int timeoutSeconds) {
-        Checker checker = new Adapter(new Checker() {
+        ToolPolicyChecker checker = new Adapter(new ToolPolicyChecker() {
             @Override
             public boolean isRequired(Cancellation ctx, long tenantId, String serviceId, String toolName) {
                 return toolApprovalService.isRequired(tenantId, serviceId, toolName);
@@ -58,8 +58,7 @@ public class McpWiring {
                 return toolApprovalService.isEnabled(tenantId, serviceId, toolName);
             }
         });
-        // timeoutSeconds<=0 → GateOptions 用默认值（10 分钟）
-        return new Gate(GateOptions.fromConfig(timeoutSeconds > 0 ? timeoutSeconds : null),
-                checker, redis.getIfAvailable());
+        // timeoutSeconds<=0 → 闸门用默认值（10 分钟）
+        return gateFactory.create(checker, timeoutSeconds > 0 ? timeoutSeconds : null);
     }
 }

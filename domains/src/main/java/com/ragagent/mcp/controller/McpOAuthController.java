@@ -4,9 +4,9 @@ import java.net.URI;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.ragagent.approval.ApprovalException;
+import com.ragagent.contract.tool.ToolApprovalException;
 import com.ragagent.contract.tool.Decision;
-import com.ragagent.approval.Gate;
+import com.ragagent.contract.tool.ToolApprovalGate;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
@@ -59,7 +59,7 @@ import com.ragagent.platform.web.ApiResult;
  * Spring 的 {@code PathPattern} 对字面量段天然优先于变量段，但为避免任何歧义，
  * 请仍把回调挂在 {@code /api/v1/mcp-oauth/callback} 下。</p>
  *
- * <p>两个依赖刻意用 {@link ObjectProvider} 而非直接注入：{@code Gate} 与
+ * <p>两个依赖刻意用 {@link ObjectProvider} 而非直接注入：{@code ToolApprovalGate} 与
  * {@code McpClientManager} 的 bean 都可能缺失（未接线时），使用处各自做了
  * 缺省判断。</p>
  */
@@ -76,11 +76,11 @@ public class McpOAuthController {
     private final OAuthManager oauth;
     private final McpServiceManagement svc;
     private final ObjectProvider<McpClientManager> mcpManager;
-    private final ObjectProvider<Gate> gate;
+    private final ObjectProvider<ToolApprovalGate> gate;
 
     public McpOAuthController(OAuthManager oauth, McpServiceManagement svc,
                               ObjectProvider<McpClientManager> mcpManager,
-                              ObjectProvider<Gate> gate) {
+                              ObjectProvider<ToolApprovalGate> gate) {
         this.oauth = oauth;
         this.svc = svc;
         this.mcpManager = mcpManager;
@@ -271,8 +271,8 @@ public class McpOAuthController {
         if (tenantId == 0 || !McpPrincipal.valid(principal) || gateUserId.isEmpty()) {
             throw BizException.unauthorized("authentication required");
         }
-        Gate approvalGate = gate.getIfAvailable();
-        if (approvalGate == null) {
+        ToolApprovalGate approvalToolApprovalGate = gate.getIfAvailable();
+        if (approvalToolApprovalGate == null) {
             throw BizException.internal("OAuth gate is not configured");
         }
         if (body == null) {
@@ -291,7 +291,7 @@ public class McpOAuthController {
 
         switch (decision) {
             case "cancel", "reject", "skip" -> {
-                resolveGate(approvalGate, tenantId, gateUserId, pendingId, Decision.deny("user canceled"));
+                resolveToolApprovalGate(approvalToolApprovalGate, tenantId, gateUserId, pendingId, Decision.deny("user canceled"));
         return ApiResponse.ok();   // 204 退役 ⇒ 200 + 外壳
             }
             case "authorize" -> {
@@ -311,7 +311,7 @@ public class McpOAuthController {
             throw BizException.conflict("authorization not completed yet for this MCP service");
         }
 
-        resolveGate(approvalGate, tenantId, gateUserId, pendingId, Decision.allow());
+        resolveToolApprovalGate(approvalToolApprovalGate, tenantId, gateUserId, pendingId, Decision.allow());
         return ApiResponse.ok();   // 204 退役 ⇒ 200 + 外壳
     }
 
@@ -325,11 +325,11 @@ public class McpOAuthController {
         if (tenantId == 0 || gateUserId.isEmpty()) {
             throw BizException.unauthorized("authentication required");
         }
-        Gate approvalGate = gate.getIfAvailable();
-        if (approvalGate == null) {
+        ToolApprovalGate approvalToolApprovalGate = gate.getIfAvailable();
+        if (approvalToolApprovalGate == null) {
             throw BizException.internal("OAuth gate is not configured");
         }
-        resolveGate(approvalGate, tenantId, gateUserId, pendingId, Decision.deny("user canceled"));
+        resolveToolApprovalGate(approvalToolApprovalGate, tenantId, gateUserId, pendingId, Decision.deny("user canceled"));
         return ApiResponse.ok();   // 204 退役 ⇒ 200 + 外壳
     }
 
@@ -357,11 +357,11 @@ public class McpOAuthController {
      *
      * <p>四类哨兵 → 404 / 400 各一，其余（INTERNAL）→ 500（文案取异常消息）。</p>
      */
-    private static void resolveGate(Gate approvalGate, long tenantId, String gateUserId,
+    private static void resolveToolApprovalGate(ToolApprovalGate approvalToolApprovalGate, long tenantId, String gateUserId,
                                     String pendingId, Decision decision) {
         try {
-            approvalGate.resolve(tenantId, gateUserId, pendingId, decision);
-        } catch (ApprovalException e) {
+            approvalToolApprovalGate.resolve(tenantId, gateUserId, pendingId, decision);
+        } catch (ToolApprovalException e) {
             switch (e.kind()) {
                 case PENDING_NOT_FOUND ->
                         throw BizException.notFound("pending authorization not found or already completed");

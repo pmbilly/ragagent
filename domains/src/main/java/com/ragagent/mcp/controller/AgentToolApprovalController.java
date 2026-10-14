@@ -5,9 +5,9 @@ import java.util.Optional;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.approval.ApprovalException;
+import com.ragagent.contract.tool.ToolApprovalException;
 import com.ragagent.contract.tool.Decision;
-import com.ragagent.approval.Gate;
+import com.ragagent.contract.tool.ToolApprovalGate;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.mcp.domain.McpPrincipal;
@@ -42,9 +42,9 @@ public class AgentToolApprovalController {
     private static final ObjectMapper JSON = JsonMappers.lenient();
 
     /** 工具审批门；未接线时为 empty */
-    private final Optional<Gate> toolApprovalGate;
+    private final Optional<ToolApprovalGate> toolApprovalGate;
 
-    public AgentToolApprovalController(Optional<Gate> toolApprovalGate) {
+    public AgentToolApprovalController(Optional<ToolApprovalGate> toolApprovalGate) {
         this.toolApprovalGate = toolApprovalGate;
     }
 
@@ -57,7 +57,7 @@ public class AgentToolApprovalController {
         if (tenant == 0) {
             throw BizException.badRequest("Workspace ID cannot be empty");
         }
-        Gate gate = toolApprovalGate.orElse(null);
+        ToolApprovalGate gate = toolApprovalGate.orElse(null);
         if (gate == null) {
             throw BizException.internal("Tool approval gate is not configured");
         }
@@ -77,7 +77,7 @@ public class AgentToolApprovalController {
 
         try {
             gate.resolve(tenant, gateUserId, pendingId, decision);
-        } catch (ApprovalException e) {
+        } catch (ToolApprovalException e) {
             // 四个哨兵 → 404/400 + 各自的固定文案
             switch (e.kind()) {
                 case PENDING_NOT_FOUND -> throw BizException.notFound(

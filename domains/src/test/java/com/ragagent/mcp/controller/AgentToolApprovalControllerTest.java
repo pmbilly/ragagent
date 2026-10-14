@@ -12,9 +12,9 @@ import static org.mockito.Mockito.verify;
 import java.util.Optional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.approval.ApprovalException;
+import com.ragagent.contract.tool.ToolApprovalException;
 import com.ragagent.contract.tool.Decision;
-import com.ragagent.approval.Gate;
+import com.ragagent.contract.tool.ToolApprovalGate;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.mcp.dto.ResolveToolApprovalRequest;
@@ -34,12 +34,12 @@ class AgentToolApprovalControllerTest {
 
     private static final ObjectMapper JSON = new ObjectMapper();
 
-    private Gate gate;
+    private ToolApprovalGate gate;
     private AgentToolApprovalController controller;
 
     @BeforeEach
     void setUp() {
-        gate = mock(Gate.class);
+        gate = mock(ToolApprovalGate.class);
         controller = new AgentToolApprovalController(Optional.of(gate));
         // 处理器从租户上下文取 tenant/principal/角色，先种好上下文
         TenantContext.set(7L, TenantContext.webUserPrincipal("user-1"), "admin", false, "user-1", false);
@@ -59,7 +59,7 @@ class AgentToolApprovalControllerTest {
 
     @Test
     void pendingNotFoundMapsTo404() throws Exception {
-        doThrow(ApprovalException.pendingNotFound()).when(gate).resolve(any(Long.class), any(), any(), any());
+        doThrow(ToolApprovalException.pendingNotFound()).when(gate).resolve(any(Long.class), any(), any(), any());
 
         BizException e = assertThrows(BizException.class,
                 () -> controller.resolveToolApproval("p1", approve(null)));
@@ -70,7 +70,7 @@ class AgentToolApprovalControllerTest {
 
     @Test
     void alreadyResolvedMapsTo400() throws Exception {
-        doThrow(ApprovalException.alreadyResolved()).when(gate).resolve(any(Long.class), any(), any(), any());
+        doThrow(ToolApprovalException.alreadyResolved()).when(gate).resolve(any(Long.class), any(), any(), any());
 
         BizException e = assertThrows(BizException.class,
                 () -> controller.resolveToolApproval("p1", approve(null)));
@@ -82,7 +82,7 @@ class AgentToolApprovalControllerTest {
 
     @Test
     void tenantMismatchMapsTo400WorkspaceMismatch() throws Exception {
-        doThrow(ApprovalException.tenantMismatch()).when(gate).resolve(any(Long.class), any(), any(), any());
+        doThrow(ToolApprovalException.tenantMismatch()).when(gate).resolve(any(Long.class), any(), any(), any());
 
         BizException e = assertThrows(BizException.class,
                 () -> controller.resolveToolApproval("p1", approve(null)));
@@ -93,7 +93,7 @@ class AgentToolApprovalControllerTest {
 
     @Test
     void userMismatchMapsTo400OwnerOnly() throws Exception {
-        doThrow(ApprovalException.userMismatch()).when(gate).resolve(any(Long.class), any(), any(), any());
+        doThrow(ToolApprovalException.userMismatch()).when(gate).resolve(any(Long.class), any(), any(), any());
 
         BizException e = assertThrows(BizException.class,
                 () -> controller.resolveToolApproval("p1", approve(null)));
@@ -105,7 +105,7 @@ class AgentToolApprovalControllerTest {
 
     @Test
     void internalApprovalErrorMapsTo500() throws Exception {
-        doThrow(ApprovalException.internal("boom")).when(gate).resolve(any(Long.class), any(), any(), any());
+        doThrow(ToolApprovalException.internal("boom")).when(gate).resolve(any(Long.class), any(), any(), any());
 
         BizException e = assertThrows(BizException.class,
                 () -> controller.resolveToolApproval("p1", approve(null)));

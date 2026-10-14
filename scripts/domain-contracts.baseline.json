@@ -199,13 +199,6 @@
       "ChunkQuestionService",
       "KnowledgeSummaryService"
     ],
-    "mcp→approval": [
-      "Adapter",
-      "AgentToolApprovalController",
-      "McpCatalog",
-      "McpOAuthController",
-      "McpWiring"
-    ],
     "mcp→model": [
       "McpServiceController",
       "McpUsageInstructionsOps"

@@ -7,6 +7,7 @@ import com.ragagent.contract.tool.ApprovalEventBus;
 import com.ragagent.contract.tool.PendingRequest;
 
 import com.ragagent.contract.tool.Cancellation;
+import com.ragagent.contract.tool.ToolApprovalException;
 
 import com.ragagent.contract.tool.ApprovalEvent;
 
@@ -77,11 +78,11 @@ class GateTest {
         }
     }
 
-    private static ApprovalException captureResolve(Gate gate, long tenantId, String userId, String pendingId, Decision d) {
+    private static ToolApprovalException captureResolve(Gate gate, long tenantId, String userId, String pendingId, Decision d) {
         try {
             gate.resolve(tenantId, userId, pendingId, d);
             return null;
-        } catch (ApprovalException e) {
+        } catch (ToolApprovalException e) {
             return e;
         }
     }
@@ -184,9 +185,9 @@ class GateTest {
         assertTrue(d.contextCanceled());
         assertEquals("request canceled", d.reason());
         // 取消已投递 → 再 Resolve 必须报“已解决”（条目在 requestAndWait 返回前仍在表里）
-        ApprovalException err = captureResolve(gate, 1, "", pendingId.get(), Decision.allow());
-        assertTrue(err == null || err.is(ApprovalException.Kind.ALREADY_RESOLVED)
-                || err.is(ApprovalException.Kind.PENDING_NOT_FOUND), String.valueOf(err));
+        ToolApprovalException err = captureResolve(gate, 1, "", pendingId.get(), Decision.allow());
+        assertTrue(err == null || err.is(ToolApprovalException.Kind.ALREADY_RESOLVED)
+                || err.is(ToolApprovalException.Kind.PENDING_NOT_FOUND), String.valueOf(err));
     }
 
     /** 无 checker：不进入审批门。 */
@@ -227,9 +228,9 @@ class GateTest {
     @Test
     void resolveNotFound() {
         Gate gate = track(new Gate(options(1), new StubChecker(true), null));
-        ApprovalException err = captureResolve(gate, 1, "", "no-such-id", Decision.allow());
+        ToolApprovalException err = captureResolve(gate, 1, "", "no-such-id", Decision.allow());
         assertNotNull(err);
-        assertTrue(err.is(ApprovalException.Kind.PENDING_NOT_FOUND));
+        assertTrue(err.is(ToolApprovalException.Kind.PENDING_NOT_FOUND));
     }
 
     /** 租户不符被拒，随后合法租户可正常决议。 */
@@ -238,7 +239,7 @@ class GateTest {
         RecordingEventBus bus = new RecordingEventBus();
         Gate gate = track(new Gate(options(2), new StubChecker(true), null));
 
-        AtomicReference<ApprovalException> mismatch = new AtomicReference<>();
+        AtomicReference<ToolApprovalException> mismatch = new AtomicReference<>();
         bus.on(ResponseType.TOOL_APPROVAL_REQUIRED, evt -> {
             String pendingId = ((ToolApprovalRequiredData) evt.data()).getPendingId();
             Thread.ofVirtual().start(() -> {
@@ -253,7 +254,7 @@ class GateTest {
 
         assertFalse(d.approved());
         assertNotNull(mismatch.get());
-        assertTrue(mismatch.get().is(ApprovalException.Kind.TENANT_MISMATCH));
+        assertTrue(mismatch.get().is(ToolApprovalException.Kind.TENANT_MISMATCH));
     }
 
     /** 非会话属主不能决议。 */
@@ -262,7 +263,7 @@ class GateTest {
         RecordingEventBus bus = new RecordingEventBus();
         Gate gate = track(new Gate(options(2), new StubChecker(true), null));
 
-        AtomicReference<ApprovalException> mismatch = new AtomicReference<>();
+        AtomicReference<ToolApprovalException> mismatch = new AtomicReference<>();
         bus.on(ResponseType.TOOL_APPROVAL_REQUIRED, evt -> {
             String pendingId = ((ToolApprovalRequiredData) evt.data()).getPendingId();
             Thread.ofVirtual().start(() -> {
@@ -278,7 +279,7 @@ class GateTest {
 
         assertTrue(d.approved());
         assertNotNull(mismatch.get());
-        assertTrue(mismatch.get().is(ApprovalException.Kind.USER_MISMATCH));
+        assertTrue(mismatch.get().is(ToolApprovalException.Kind.USER_MISMATCH));
     }
 
     /**
@@ -289,7 +290,7 @@ class GateTest {
         RecordingEventBus bus = new RecordingEventBus();
         Gate gate = track(new Gate(options(2), new StubChecker(true), null));
 
-        AtomicReference<ApprovalException> mismatch = new AtomicReference<>();
+        AtomicReference<ToolApprovalException> mismatch = new AtomicReference<>();
         bus.on(ResponseType.TOOL_APPROVAL_REQUIRED, evt -> {
             String pendingId = ((ToolApprovalRequiredData) evt.data()).getPendingId();
             Thread.ofVirtual().start(() -> {
@@ -305,7 +306,7 @@ class GateTest {
 
         assertFalse(d.approved());
         assertNotNull(mismatch.get());
-        assertTrue(mismatch.get().is(ApprovalException.Kind.USER_MISMATCH));
+        assertTrue(mismatch.get().is(ToolApprovalException.Kind.USER_MISMATCH));
     }
 
     /** 超时返回后条目已删，再 Resolve 即 NotFound。 */
@@ -317,7 +318,7 @@ class GateTest {
         AtomicReference<String> pendingId = new AtomicReference<>();
         bus.on(ResponseType.TOOL_APPROVAL_REQUIRED, evt -> pendingId.set(((ToolApprovalRequiredData) evt.data()).getPendingId()));
 
-        AtomicReference<ApprovalException> lateResolve = new AtomicReference<>();
+        AtomicReference<ToolApprovalException> lateResolve = new AtomicReference<>();
         Thread resolver = Thread.ofVirtual().start(() -> {
             try {
                 // 等超时触发且 requestAndWait 的 finally 已删表（200ms 超时 + 余量）
@@ -335,7 +336,7 @@ class GateTest {
         assertTrue(d.timedOut());
         resolver.join();
         assertNotNull(lateResolve.get());
-        assertTrue(lateResolve.get().is(ApprovalException.Kind.PENDING_NOT_FOUND));
+        assertTrue(lateResolve.get().is(ToolApprovalException.Kind.PENDING_NOT_FOUND));
     }
 
     /**
@@ -347,8 +348,8 @@ class GateTest {
         Gate gate = track(new Gate(options(30), new StubChecker(true), null));
         RecordingEventBus bus = new RecordingEventBus();
 
-        AtomicReference<ApprovalException> first = new AtomicReference<>();
-        AtomicReference<ApprovalException> second = new AtomicReference<>();
+        AtomicReference<ToolApprovalException> first = new AtomicReference<>();
+        AtomicReference<ToolApprovalException> second = new AtomicReference<>();
         AtomicReference<Boolean> done = new AtomicReference<>(false);
         bus.on(ResponseType.TOOL_APPROVAL_REQUIRED, evt -> {
             String pendingId = ((ToolApprovalRequiredData) evt.data()).getPendingId();
@@ -370,8 +371,8 @@ class GateTest {
         }
         assertNull(first.get(), "first resolve must succeed");
         assertNotNull(second.get(), "second resolve must fail");
-        assertTrue(second.get().is(ApprovalException.Kind.ALREADY_RESOLVED)
-                        || second.get().is(ApprovalException.Kind.PENDING_NOT_FOUND),
+        assertTrue(second.get().is(ToolApprovalException.Kind.ALREADY_RESOLVED)
+                        || second.get().is(ToolApprovalException.Kind.PENDING_NOT_FOUND),
                 "unexpected error: " + second.get());
     }
 
@@ -429,10 +430,10 @@ class GateTest {
     @Test
     void requestAndWaitWithoutEventBusFails() {
         Gate gate = track(new Gate(options(1), new StubChecker(true), null));
-        ApprovalException err = assertThrows(ApprovalException.class, () -> gate.requestAndWait(
+        ToolApprovalException err = assertThrows(ToolApprovalException.class, () -> gate.requestAndWait(
                 Cancellation.none(),
                 PendingRequest.builder().tenantId(1).sessionId("s").serviceId("svc").mcpToolName("t").build()));
-        assertTrue(err.is(ApprovalException.Kind.INTERNAL));
+        assertTrue(err.is(ToolApprovalException.Kind.INTERNAL));
         assertTrue(err.getMessage().contains("ApprovalEventBus is nil"));
     }
 
@@ -443,11 +444,11 @@ class GateTest {
         ApprovalEventBus failing = event -> {
             throw new IllegalStateException("sse closed");
         };
-        ApprovalException err = assertThrows(ApprovalException.class, () -> gate.requestAndWait(
+        ToolApprovalException err = assertThrows(ToolApprovalException.class, () -> gate.requestAndWait(
                 Cancellation.none(),
                 PendingRequest.builder().tenantId(1).sessionId("s").eventBus(failing)
                         .serviceId("svc").mcpToolName("t").build()));
-        assertTrue(err.is(ApprovalException.Kind.INTERNAL));
+        assertTrue(err.is(ToolApprovalException.Kind.INTERNAL));
     }
 
     /** OAuth 授权成功 → Approved=true（工具调用应被重试）。 */
@@ -498,7 +499,7 @@ class GateTest {
     @Test
     void resolveWithoutRedisIsSingleInstance() {
         Gate gate = track(new Gate(options(1), new StubChecker(true), null));
-        ApprovalException err = captureResolve(gate, 1, "", "missing", Decision.allow());
-        assertTrue(err != null && err.is(ApprovalException.Kind.PENDING_NOT_FOUND));
+        ToolApprovalException err = captureResolve(gate, 1, "", "missing", Decision.allow());
+        assertTrue(err != null && err.is(ToolApprovalException.Kind.PENDING_NOT_FOUND));
     }
 }

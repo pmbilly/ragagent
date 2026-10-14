@@ -18,9 +18,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.List;
 import java.util.Map;
 
-import com.ragagent.approval.ApprovalException;
+import com.ragagent.contract.tool.ToolApprovalException;
 import com.ragagent.contract.tool.Decision;
-import com.ragagent.approval.Gate;
+import com.ragagent.contract.tool.ToolApprovalGate;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.web.error.GlobalExceptionHandler;
@@ -52,7 +52,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
  * 承担，路由注册是主会话的工作，本用例只钉住 <b>controller 自身的端点契约</b>：
  * 响应信封、状态码、重定向 fragment 的字节形态。</p>
  *
- * <p>{@code Gate} 与 {@code McpClientManager} 都还没有 Spring bean，故用
+ * <p>{@link ToolApprovalGate} 与 {@code McpClientManager} 都还没有 Spring bean，故用
  * {@link DefaultListableBeanFactory} 造 {@code ObjectProvider}：不注册 bean 即
  * 等价于 gate 未装配的分支。</p>
  */
@@ -111,7 +111,7 @@ class McpOAuthControllerTest {
         SsrfGuard.restoreWhitelist(whitelistSnapshot);
     }
 
-    private MockMvc mvc(Gate gate, McpClientManager clientManager) {
+    private MockMvc mvc(ToolApprovalGate gate, McpClientManager clientManager) {
         DefaultListableBeanFactory beans = new DefaultListableBeanFactory();
         if (gate != null) {
             beans.registerSingleton("gate", gate);
@@ -121,7 +121,7 @@ class McpOAuthControllerTest {
         }
         McpOAuthController controller = new McpOAuthController(manager, svc,
                 beans.getBeanProvider(McpClientManager.class),
-                beans.getBeanProvider(Gate.class));
+                beans.getBeanProvider(ToolApprovalGate.class));
         return MockMvcBuilders.standaloneSetup(controller)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
@@ -291,7 +291,7 @@ class McpOAuthControllerTest {
 
     @Test
     void resolveRequiresServiceId() throws Exception {
-        mvc(mock(Gate.class), null).perform(post("/api/v1/agent/mcp-oauth-resolutions/p1")
+        mvc(mock(ToolApprovalGate.class), null).perform(post("/api/v1/agent/mcp-oauth-resolutions/p1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"serviceId\":\"\"}"))
                 .andExpect(status().isBadRequest())
@@ -300,7 +300,7 @@ class McpOAuthControllerTest {
 
     @Test
     void resolveRejectsUnknownDecision() throws Exception {
-        mvc(mock(Gate.class), null).perform(post("/api/v1/agent/mcp-oauth-resolutions/p1")
+        mvc(mock(ToolApprovalGate.class), null).perform(post("/api/v1/agent/mcp-oauth-resolutions/p1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"serviceId\":\"" + SERVICE_ID + "\",\"decision\":\"maybe\"}"))
                 .andExpect(status().isBadRequest())
@@ -310,7 +310,7 @@ class McpOAuthControllerTest {
     /** 授权还没完成就恢复 → 409（免得工具调用再撞一次 authorization-required）。 */
     @Test
     void resolveRequiresCompletedAuthorization() throws Exception {
-        mvc(mock(Gate.class), null).perform(post("/api/v1/agent/mcp-oauth-resolutions/p1")
+        mvc(mock(ToolApprovalGate.class), null).perform(post("/api/v1/agent/mcp-oauth-resolutions/p1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"serviceId\":\"" + SERVICE_ID + "\"}"))
                 .andExpect(status().isConflict())
@@ -325,7 +325,7 @@ class McpOAuthControllerTest {
                 "https://app.example.com/api/v1/mcp-oauth/callback", "/");
         manager.completeAuthorization(start.attemptId(), "the-code");
 
-        Gate gate = mock(Gate.class);
+        ToolApprovalGate gate = mock(ToolApprovalGate.class);
         mvc(gate, null).perform(post("/api/v1/agent/mcp-oauth-resolutions/p1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"serviceId\":\"" + SERVICE_ID + "\"}"))
@@ -336,7 +336,7 @@ class McpOAuthControllerTest {
     /** cancel 分支：不校验 token，直接把 pending 置为拒绝。 */
     @Test
     void cancelDeniesPending() throws Exception {
-        Gate gate = mock(Gate.class);
+        ToolApprovalGate gate = mock(ToolApprovalGate.class);
         mvc(gate, null).perform(post("/api/v1/agent/mcp-oauth-resolutions/p1/cancel"))
                 .andExpect(status().isOk());   // 204 退役 ⇒ 200 + 外壳（分号在注释之前）
         org.mockito.Mockito.verify(gate).resolve(anyLong(), anyString(), anyString(), any(Decision.class));
@@ -345,8 +345,8 @@ class McpOAuthControllerTest {
     /** gate 错误的四条 HTTP 映射。 */
     @Test
     void resolveMapsGateErrors() throws Exception {
-        Gate gate = mock(Gate.class);
-        doThrow(ApprovalException.pendingNotFound())
+        ToolApprovalGate gate = mock(ToolApprovalGate.class);
+        doThrow(ToolApprovalException.pendingNotFound())
                 .when(gate).resolve(anyLong(), anyString(), anyString(), any(Decision.class));
 
         mvc(gate, null).perform(post("/api/v1/agent/mcp-oauth-resolutions/p1/cancel"))
@@ -354,7 +354,7 @@ class McpOAuthControllerTest {
                 .andExpect(jsonPath("$.error.message")
                         .value("pending authorization not found or already completed"));
 
-        doThrow(ApprovalException.userMismatch())
+        doThrow(ToolApprovalException.userMismatch())
                 .when(gate).resolve(anyLong(), anyString(), anyString(), any(Decision.class));
         mvc(gate, null).perform(post("/api/v1/agent/mcp-oauth-resolutions/p1/cancel"))
                 .andExpect(status().isBadRequest())
