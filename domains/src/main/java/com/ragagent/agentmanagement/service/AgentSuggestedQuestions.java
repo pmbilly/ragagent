@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.agentmanagement.dto.CustomAgentResult;
 import com.ragagent.agentmanagement.mapper.AgentQuestionMapper;
 import com.ragagent.common.security.TenantAPIKeyScope;
-import com.ragagent.knowledge.domain.KnowledgeBase;
+import com.ragagent.common.knowledge.KnowledgeBaseCatalogPort;
 import com.ragagent.common.wiki.WikiLanguageSupport;
 
 /**
@@ -33,10 +33,14 @@ public final class AgentSuggestedQuestions {
 
     private final CustomAgentService agents;
     private final AgentQuestionMapper questionMapper;
+    /** B264②：KB 目录走公开端口（原经 {@code agents.kbService()} 直连 knowledge.service）。 */
+    private final KnowledgeBaseCatalogPort kbCatalog;
 
-    AgentSuggestedQuestions(CustomAgentService agents, AgentQuestionMapper questionMapper) {
+    AgentSuggestedQuestions(CustomAgentService agents, AgentQuestionMapper questionMapper,
+            KnowledgeBaseCatalogPort kbCatalog) {
         this.agents = agents;
         this.questionMapper = questionMapper;
+        this.kbCatalog = kbCatalog;
     }
 
     /** 推荐问题入口（静态面：curated / 无范围 / FAQ+document chunk 池）。 */
@@ -128,12 +132,11 @@ public final class AgentSuggestedQuestions {
                 case "all" -> {
                     List<String> ids = new ArrayList<>();
                     boolean quickAnswer = "quick-answer".equals(cfg.path("agentMode").asText(""));
-                    for (KnowledgeBase kb : agents.kbService().listKnowledgeBases(null)) {
-                        var caps = kb.capabilities();
-                        if (quickAnswer && !(caps.vector() || caps.keyword())) {
+                    for (KnowledgeBaseCatalogPort.KbCapability kb : kbCatalog.listActiveCapabilities(null)) {
+                        if (quickAnswer && !(kb.vector() || kb.keyword())) {
                             continue;
                         }
-                        ids.add(kb.getId());
+                        ids.add(kb.id());
                     }
                     effectiveKbIds = ids;
                 }

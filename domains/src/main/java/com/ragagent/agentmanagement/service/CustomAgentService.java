@@ -24,7 +24,7 @@ import com.ragagent.agentmanagement.mapper.CustomAgentMapper;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
-import com.ragagent.knowledge.service.management.KnowledgeBaseService;
+import com.ragagent.common.knowledge.KnowledgeBaseCatalogPort;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.service.UserService;
 import com.ragagent.common.agent.AgentChannelCleaner;
@@ -45,7 +45,8 @@ public class CustomAgentService {
 
     private final CustomAgentMapper agentMapper;
     private final UserService userService;
-    private final KnowledgeBaseService kbService;
+    /** B264②：KB 目录端口（B257 债之一；原直连 knowledge.service.management.KnowledgeBaseService）。 */
+    private final KnowledgeBaseCatalogPort kbCatalog;
     private final BuiltinAgentRegistry registry;
     /**
      * IM 渠道清理。ObjectProvider 延迟解析：实现方（{@code ImService}）直接依赖本类
@@ -63,21 +64,16 @@ public class CustomAgentService {
     public CustomAgentService(CustomAgentMapper agentMapper,
             AgentQuestionMapper questionMapper,
             UserService userService,
-            KnowledgeBaseService kbService,
+            KnowledgeBaseCatalogPort kbCatalog,
             BuiltinAgentRegistry registry,
             org.springframework.beans.factory.ObjectProvider<
                     AgentChannelCleaner> agentChannelCleanerProvider) {
         this.agentMapper = agentMapper;
         this.userService = userService;
-        this.kbService = kbService;
+        this.kbCatalog = kbCatalog;
         this.registry = registry;
         this.agentChannelCleanerProvider = agentChannelCleanerProvider;
-        this.suggestedQuestions = new AgentSuggestedQuestions(this, questionMapper);
-    }
-
-    /** 包内协作者访问面。 */
-    KnowledgeBaseService kbService() {
-        return kbService;
+        this.suggestedQuestions = new AgentSuggestedQuestions(this, questionMapper, kbCatalog);
     }
 
     static long tenantId() {

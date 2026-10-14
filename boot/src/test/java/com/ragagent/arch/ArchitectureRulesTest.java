@@ -1024,7 +1024,6 @@ class ArchitectureRulesTest {
      */
     private static final Set<String> AGENT_ADAPTER_DOMAIN_SERVICE_BASELINE = Set.of(
             "com.ragagent.agentmanagement.controller.SkillCatalogController",
-            "com.ragagent.agentmanagement.service.AgentSuggestedQuestions",
             "com.ragagent.agentmanagement.service.CustomAgentService");
 
     @Test
