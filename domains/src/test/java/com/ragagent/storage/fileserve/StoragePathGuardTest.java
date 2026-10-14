@@ -14,6 +14,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import com.ragagent.contract.error.BizException;
 import com.ragagent.knowledge.storage.LocalStorageService;
+import com.ragagent.common.storage.fileserve.StoragePathGuard;
 
 /**
  * ③ local 双实现去重的语义验证（W5γ5.1）：单一份实现在 {@link StoragePathGuard}，

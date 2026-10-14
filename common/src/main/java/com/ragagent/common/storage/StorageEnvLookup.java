@@ -1,4 +1,4 @@
-package com.ragagent.storage.config;
+package com.ragagent.common.storage;
 
 import java.util.function.Function;
 

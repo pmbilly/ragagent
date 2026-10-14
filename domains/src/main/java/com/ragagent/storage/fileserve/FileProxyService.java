@@ -22,6 +22,7 @@ import com.ragagent.storage.service.ResourceCatalogService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import com.ragagent.platform.text.ContentTypeByFilename;
+import com.ragagent.common.storage.fileserve.FileTransport;
 
 /**
  * 文件代理面共享处理器：

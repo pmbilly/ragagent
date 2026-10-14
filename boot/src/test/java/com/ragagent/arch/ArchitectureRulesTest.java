@@ -21,7 +21,7 @@ import com.ragagent.platform.storage.config.UploadLimits;
 import com.ragagent.contract.wiki.WikiLanguageSupport;
 import com.ragagent.platform.config.AppEnvLookup;
 import com.ragagent.retrieval.config.RetrievalEnvLookup;
-import com.ragagent.storage.config.StorageEnvLookup;
+import com.ragagent.common.storage.StorageEnvLookup;
 import com.ragagent.platform.storage.config.StorageRuntimeEnv;
 import com.tngtech.archunit.core.domain.Dependency;
 import com.tngtech.archunit.core.domain.JavaAnnotation;

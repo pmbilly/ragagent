@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import com.ragagent.modelruntime.adapter.provider.chat.ImageResolver;
 import com.ragagent.storage.domain.StoredResource;
 import com.ragagent.storage.service.ResourceCatalogService;
+import com.ragagent.common.storage.fileserve.FileTransport;
 
 /**
  * 把 {@link ImageResolver} 的 {@code LocalImageResolver} 全局钩子接到存储模块。

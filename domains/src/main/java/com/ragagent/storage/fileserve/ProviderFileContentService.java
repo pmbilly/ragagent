@@ -5,7 +5,8 @@ import java.io.InputStream;
 
 import com.ragagent.storage.provider.FileService;
 import com.ragagent.storage.provider.SeekableFileService;
-import com.ragagent.storage.provider.SeekableSource;
+import com.ragagent.common.storage.provider.SeekableSource;
+import com.ragagent.common.storage.fileserve.FileTransport;
 
 /**
  * 把 A3 的 {@link com.ragagent.storage.provider.FileService}（八个 provider 的真实实现）

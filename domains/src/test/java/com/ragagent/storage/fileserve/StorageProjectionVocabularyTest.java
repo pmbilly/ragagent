@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.platform.security.CryptoService;
 import com.ragagent.storage.config.StorageProviderEnv;
 import com.ragagent.platform.storage.config.StorageRuntimeEnv;
-import com.ragagent.storage.domain.StorageBackend;
+import com.ragagent.common.storage.StorageBackend;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

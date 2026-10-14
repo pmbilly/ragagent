@@ -23,7 +23,7 @@ import com.ragagent.auth.domain.UserPreferences;
 import com.ragagent.tenant.mapper.TenantMapper;
 import com.ragagent.auth.mapper.TenantMemberMapper;
 import com.ragagent.auth.mapper.UserMapper;
-import com.ragagent.storage.domain.StorageBackend;
+import com.ragagent.common.storage.StorageBackend;
 import com.ragagent.knowledge.mapper.StorageBackendMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -165,12 +165,6 @@
     "knowledge→storage": [
       "KnowledgeBaseController",
       "KnowledgeBaseFileProxyController",
-      "KnowledgeBaseService",
-      "KnowledgeController",
-      "KnowledgeFileService",
-      "KnowledgeStorageBackendRepository",
-      "LocalStorageService",
-      "StorageBackendMapper",
       "TenantFileStorage"
     ],
     "knowledge→model": [

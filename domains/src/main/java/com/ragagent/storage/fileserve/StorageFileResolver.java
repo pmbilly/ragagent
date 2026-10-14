@@ -17,13 +17,14 @@ import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.platform.security.CryptoService;
 import com.ragagent.platform.storage.config.StorageRuntimeEnv;
 import com.ragagent.storage.config.StorageProviderEnv;
-import com.ragagent.storage.domain.StorageBackend;
+import com.ragagent.common.storage.StorageBackend;
 import com.ragagent.storage.mapper.StorageBackendRepository;
 import com.ragagent.storage.service.ResourceCatalogService;
-import com.ragagent.storage.config.StorageEnvLookup;
+import com.ragagent.common.storage.StorageEnvLookup;
 import com.ragagent.storage.provider.FileService;
 import com.ragagent.storage.provider.FileServiceFactory;
 import com.ragagent.contract.tenant.StorageEngineConfig;
+import com.ragagent.common.storage.fileserve.FileTransport;
 
 /**
  * 运行时存储解析器，三个职责：

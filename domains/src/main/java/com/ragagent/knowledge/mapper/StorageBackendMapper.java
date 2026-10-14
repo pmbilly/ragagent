@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ragagent.storage.domain.StorageBackend;
+import com.ragagent.common.storage.StorageBackend;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.contract.storage.StorageBackendProvisioner;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.storage.config.StorageProviderEnv;
-import com.ragagent.storage.domain.StorageBackend;
+import com.ragagent.common.storage.StorageBackend;
 import com.ragagent.storage.mapper.StorageBackendRepository;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;

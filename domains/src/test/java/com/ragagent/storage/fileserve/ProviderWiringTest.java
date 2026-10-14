@@ -15,7 +15,7 @@ import java.nio.charset.StandardCharsets;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.platform.security.CryptoService;
 import com.ragagent.contract.tenant.StorageEngineConfig;
-import com.ragagent.storage.domain.StorageBackend;
+import com.ragagent.common.storage.StorageBackend;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -25,7 +25,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.storage.provider.FileService;
 import com.ragagent.storage.provider.SeekableFileService;
-import com.ragagent.storage.provider.SeekableSource;
+import com.ragagent.common.storage.provider.SeekableSource;
+import com.ragagent.common.storage.fileserve.FileTransport;
 
 /**
  * 接线测试：provider 服务 → fileserve 读取面（适配器）、云 provider 分支经工厂落地、

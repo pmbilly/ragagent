@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.storage.domain.StorageBackend;
+import com.ragagent.common.storage.StorageBackend;
 import com.ragagent.storage.service.StorageBackendService;
 import com.ragagent.system.service.DeploymentCapabilitiesHolder;
 import com.ragagent.platform.web.ApiResult;

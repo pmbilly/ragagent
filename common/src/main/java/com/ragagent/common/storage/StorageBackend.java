@@ -1,4 +1,4 @@
-package com.ragagent.storage.domain;
+package com.ragagent.common.storage;
 
 import java.time.OffsetDateTime;
 import com.baomidou.mybatisplus.annotation.IdType;

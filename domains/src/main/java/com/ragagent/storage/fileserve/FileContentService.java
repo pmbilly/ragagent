@@ -1,6 +1,7 @@
 package com.ragagent.storage.fileserve;
 
 import java.io.IOException;
+import com.ragagent.common.storage.fileserve.FileTransport;
 
 /**
  * 文件服务的读取面（{@code GetFile / GetFileURL} 两个方法——文件代理面消费的最小端口）。

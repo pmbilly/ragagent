@@ -1,6 +1,7 @@
 package com.ragagent.storage.provider;
 
 import java.io.IOException;
+import com.ragagent.common.storage.provider.SeekableSource;
 
 /**
  * provider 服务的**可选**能力：SDK 返回的对象可随机读（用 Range 请求实现 Seek），

@@ -33,7 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import com.ragagent.storage.fileserve.FileTransport.OpenedFile;
+import com.ragagent.common.storage.fileserve.FileTransport.OpenedFile;
 import com.ragagent.knowledge.storage.LocalStorageService;
 import com.ragagent.knowledge.storage.TenantFileStorage;
 import java.io.ByteArrayInputStream;

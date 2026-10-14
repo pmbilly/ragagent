@@ -1,4 +1,4 @@
-package com.ragagent.storage.fileserve;
+package com.ragagent.common.storage.fileserve;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ragagent.platform.text.ContentTypeByFilename;
-import com.ragagent.storage.provider.SeekableSource;
+import com.ragagent.common.storage.provider.SeekableSource;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,7 +23,7 @@ import jakarta.servlet.http.HttpServletResponse;
  *   <li><b>仅流式</b>（{@link OpenedFile#ofStream} 的顺序读流 / 云对象）→
  *       Accept-Ranges: none，Content-Length 只认调用方的 {@code Options.size}，
  *       不缓冲整个对象来支持 seek（RFC 9110 §14.2）。云 provider 走这一支
- *       （{@link ProviderFileContentService}），本地盘仍走 seek 支路。</li>
+ *       （{@code ProviderFileContentService}），本地盘仍走 seek 支路。</li>
  * </ul>
  *
  * <p><b>多段 Range（multipart/byteranges）的边界是随机的</b>：该分支按 RFC 结构

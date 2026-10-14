@@ -14,7 +14,7 @@ import com.ragagent.contract.error.BizException;
 import com.ragagent.storage.fileserve.StorageFileResolver;
 import com.ragagent.storage.fileserve.StoragePaths;
 import com.ragagent.storage.provider.FileService;
-import com.ragagent.storage.fileserve.FileTransport.OpenedFile;
+import com.ragagent.common.storage.fileserve.FileTransport.OpenedFile;
 import com.ragagent.storage.fileserve.ProviderFileContentService;
 
 /**

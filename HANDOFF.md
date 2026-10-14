@@ -1319,6 +1319,21 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **A③ 累计（十七刀）**：边 **64 → 42（−22）**、类 **317 → 243（−74）**；三档 **① 34 条 / 157 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
 - **下一步（①档余量按性价比）**：`mcp→approval`(7) → `session` 能力边（`knowledge` 17 / `storage` 14 / `model` 12 … 共 63 类）→ `embedchannel→session` 余 2（**已拍板：转"实体→视图 + 流式契约"K 级，不建 servlet seam** ✓）
 
+**🔶 A③ 第二十七刀：`knowledge→storage` 第一刀（存储载荷 + 文件传输上提 L1）⇒ 9 → 6 类（2026-10-15，R10 类 214 → 208）**
+- **⚠️ 拍板记录（先于本刀，承上刀测量）**：`im→session`(6 类) 经**成员级**核实为 **K 级** —— im 会 `new Session()` / `new Message()` / `new MessageAttachment()`（**跨域造实体**）、填 `QaSupport.QaRequest`（会话域内部 QA 请求容器，~10 字段）、并注入 4 个会话服务；与已拍板的 `embedchannel→session` 同类 ⇒ **立 K 级**（"实体→视图 + QA 载荷"设计），不按常规刀处理。**方法论修正**：上刀"5/6 可清"只统计了"该类是否还依赖别的域"，未衡量**依赖的性质**（读能力 vs 造实体/传内部容器）⇒ 后续判收益须两者并看
+- **本刀（`knowledge→storage` 实测亦非单一端口面，分 3 子面）**：① 存储后端实体面 ② 文件传输/服务栈 ③ 模式与异常面。本刀先落前两面可机械上提的件：
+  - `StorageBackend`（实体：`@TableName` + `PgJsonTypeHandler`；无 XML 全限定引用）+ `StorageEnvLookup`（静态环境查找面，与 L1 `AppEnvLookup` 同款）⇒ **`common.storage`**
+  - `FileTransport`（565 行 servlet 文件传输工具）+ `StoragePathGuard`（纯工具）+ `SeekableSource`（23 行接口，FileTransport 的唯一 storage 依赖）⇒ **`common.storage.fileserve` / `common.storage.provider`**
+  - 连带：`FileTransportTest`（访问包级私有成员）随类搬入 **common 测试源集**（同包）⇒ domains 2952 → 2942、common 146 → 156（**账目平** ✓）
+- **读数**：`knowledge→storage` **9 → 6 类**（离开 6 类：`KnowledgeBaseService` · `KnowledgeController` · `KnowledgeFileService` · `KnowledgeStorageBackendRepository` · `LocalStorageService` · `StorageBackendMapper`）；①档 **128 → 122 类**（边数仍 31）。⚠️ 守卫"可收紧"清单依旧 `v[:4]` 截断 ⇒ 判据仍看**类/边计数**（本刀 6 类只显示 4 个名）
+- **剩余 3 类（需真端口，留后刀）**：`KnowledgeBaseController`（`support.Mode` + 两个 mode 异常）· `KnowledgeBaseFileProxyController`（`FileProxyController` / `FileAccess*` / `FileProxyService` 共 5 类型）· `TenantFileStorage`（`StorageFileResolver` / `StoragePaths` / `provider.FileService` / `ProviderFileContentService`）
+- **验证**：**13 守卫全绿** ✓（L1→业务域 0 条、R6 common bean 计数不变、大文件棘轮 `FileTransport` 565 行 < 600 线）；`spotlessCheck build` ✓ **1m34s** ✓；**4990 / 失败 0 / 跳过 4**（boot 1331 ✓）；定向 common + storage + knowledge ✓；dev 重启 ready ✓ + 冒烟（`/api/v1/knowledge-bases`、`/api/v1/storage-backends`、`/api/v1/system/info` 均 200 ✓）
+- **A③ 累计（二十七刀）**：边 **64 → 31（−33）**、类 **317 → 208（−109）**；三档 **① 23 条 / 122 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
+- **待办清单（按性质归类，供排期）**：
+  - **常规刀（承载面明确）**：`knowledge→storage` 第二刀（剩 3 类：文件代理栈 + mode 面，`FileProxyController`/`FileAccess*`/`FileProxyService` 为上提候选）
+  - **待拍板**：`mcp→agent`(9 类) —— "mcp 并入 agent-runtime 族"（零代码）vs "工具 SPI 上提契约"
+  - **K 级（实体→视图/载荷设计）**：`im→session`(6) · `embedchannel→session`(1) · `embedchannel→knowledge`(2) · `datasource→knowledge`(8)
+  - **大块**：`knowledge→model`(14) · `session→storage`(14，6 可清) · `session→knowledge`(17，2 可清) · `session→model`(12，1 可清)
 **🔶 A③ 第二十六刀：`wiki→model` 清零 ⇒ 双胞胎解析器同款收口（2026-10-15，R10 边 32 → 31、类 215 → 214）**
 - **同款照搬（model 族最小一刀）**：`DefaultWikiModelResolver.getChatModel` 与 memory 版逐字同构 ⇒ `ModelService` → `ModelCatalogPort`、`ModelRuntimeConfigs` + `ModelRowViews.of()` 两级调用 → **L2 `ChatConfigs` 一步到位**、实体 → `ModelRowView`
 - **只改实现类**：`WikiModelResolver` 接口本就只暴露 `LlmChatClient` / `WikiEmbeddingModel`（不含实体）⇒ 接口与测试（`WikiIngestTaxonomyTest` mock 接口）**零改动** ✓；embedding 支路早已走 L1 `EmbeddingModelPort` ✓

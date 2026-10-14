@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.repository;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.ragagent.storage.domain.StorageBackend;
+import com.ragagent.common.storage.StorageBackend;
 import com.ragagent.knowledge.mapper.StorageBackendMapper;
 import org.springframework.stereotype.Component;
 

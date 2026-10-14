@@ -8,7 +8,7 @@ import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 
 import com.ragagent.contract.knowledge.KnowledgeBaseFacts;
 import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.storage.config.StorageEnvLookup;
+import com.ragagent.common.storage.StorageEnvLookup;
 import com.ragagent.platform.config.RetrievalDriverProperties;
 import com.ragagent.contract.knowledge.KnowledgeBaseGateway;
 import com.ragagent.contract.knowledge.KnowledgeBaseProvisioner;
@@ -28,7 +28,7 @@ import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.storage.domain.StorageBackend;
+import com.ragagent.common.storage.StorageBackend;
 import com.ragagent.knowledge.domain.UserKbPin;
 import com.ragagent.knowledge.repository.KnowledgeStorageBackendRepository;
 import com.ragagent.knowledge.repository.UserKbPinRepository;
