@@ -1,5 +1,9 @@
 package com.ragagent.storage.fileserve;
 
+import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
+
+import com.ragagent.common.tenant.TenantConfigLookup;
+
 import com.ragagent.platform.web.JsonMappers;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -11,8 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.tenant.repository.Tenant;
-import com.ragagent.tenant.repository.TenantLookup;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.storage.domain.StoredResource;
 import com.ragagent.storage.service.ResourceCatalogService;
@@ -47,7 +49,7 @@ public class FileProxyService {
     private static final Logger log = LoggerFactory.getLogger(FileProxyService.class);
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
-    private final TenantLookup tenantConfigLookup;
+    private final TenantConfigLookup tenantConfigLookup;
     private final StorageFileResolver resolver;
     private final ResourceCatalogService catalog;
     private final FileContentService globalFileService;
@@ -56,7 +58,7 @@ public class FileProxyService {
     private final String localBaseDir;
     private final String absDir;
 
-    public FileProxyService(TenantLookup tenantConfigLookup, StorageFileResolver resolver,
+    public FileProxyService(TenantConfigLookup tenantConfigLookup, StorageFileResolver resolver,
             ResourceCatalogService catalog,
             @org.springframework.beans.factory.annotation.Value(
                     "${weknora.storage.local-base-dir:${LOCAL_STORAGE_BASE_DIR:/data/files}}")
@@ -113,7 +115,7 @@ public class FileProxyService {
                     "unauthorized: workspace context missing");
             return;
         }
-        Tenant tenant = tenantConfigLookup.tenantById(ctxTenantId);
+        TenantStorageView tenant = tenantConfigLookup.storageView(ctxTenantId);
         if (tenant == null) {
             writeErrorJson(response, HttpServletResponse.SC_UNAUTHORIZED,
                     "unauthorized: workspace context missing");
@@ -203,9 +205,9 @@ public class FileProxyService {
             writeErrorJson(response, HttpServletResponse.SC_FORBIDDEN, "invalid or expired signature");
             return;
         }
-        Tenant tenant;
+        TenantStorageView tenant;
         try {
-            tenant = tenantConfigLookup.tenantById(tenantId);
+            tenant = tenantConfigLookup.storageView(tenantId);
         } catch (RuntimeException e) {
             plainStatus(response, HttpServletResponse.SC_NOT_FOUND);
             return;
@@ -243,7 +245,7 @@ public class FileProxyService {
      * （对 API-Key 主体短路，见其 apiKey 分支）。
      */
     public void presignedPreview(HttpServletRequest request, HttpServletResponse response,
-            Tenant tenant) throws IOException {
+            TenantStorageView tenant) throws IOException {
         String filePath = requireFilePathQuery(request, response);
         if (filePath == null) {
             return;
@@ -297,9 +299,9 @@ public class FileProxyService {
             plainStatus(response, HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-        Tenant tenant;
+        TenantStorageView tenant;
         try {
-            tenant = tenantConfigLookup.tenantById(resource.getTenantId());
+            tenant = tenantConfigLookup.storageView(resource.getTenantId());
         } catch (RuntimeException e) {
             plainStatus(response, HttpServletResponse.SC_NOT_FOUND);
             return;
@@ -341,9 +343,9 @@ public class FileProxyService {
      */
     public void serveAuthorizedFile(HttpServletResponse response, HttpServletRequest request,
             FileAccess file, String tag) throws IOException {
-        Tenant tenant;
+        TenantStorageView tenant;
         try {
-            tenant = tenantConfigLookup.tenantById(file.ownerTenantId());
+            tenant = tenantConfigLookup.storageView(file.ownerTenantId());
         } catch (RuntimeException e) {
             plainStatus(response, HttpServletResponse.SC_NOT_FOUND);
             return;

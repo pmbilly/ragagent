@@ -1,5 +1,9 @@
 package com.ragagent.storage.fileserve;
 
+import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
+
+import com.ragagent.common.tenant.TenantConfigLookup;
+
 import java.io.IOException;
 
 import org.slf4j.Logger;
@@ -8,8 +12,6 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
-import com.ragagent.tenant.repository.Tenant;
-import com.ragagent.tenant.repository.TenantLookup;
 import com.ragagent.modelruntime.adapter.provider.chat.ImageResolver;
 import com.ragagent.storage.domain.StoredResource;
 import com.ragagent.storage.service.ResourceCatalogService;
@@ -52,11 +54,11 @@ public class ChatLocalImageResolverWiring implements InitializingBean, Disposabl
     private static final Logger log = LoggerFactory.getLogger(ChatLocalImageResolverWiring.class);
 
     private final ResourceCatalogService catalog;
-    private final TenantLookup tenantConfigLookup;
+    private final TenantConfigLookup tenantConfigLookup;
     private final StorageFileResolver storageResolver;
 
     public ChatLocalImageResolverWiring(ResourceCatalogService catalog,
-                                        TenantLookup tenantConfigLookup,
+                                        TenantConfigLookup tenantConfigLookup,
                                         StorageFileResolver storageResolver) {
         this.catalog = catalog;
         this.tenantConfigLookup = tenantConfigLookup;
@@ -99,7 +101,7 @@ public class ChatLocalImageResolverWiring implements InitializingBean, Disposabl
             }
 
             // 租户查不到（不存在）→ 返回 null
-            Tenant tenant = tenantConfigLookup.tenantById(tenantId);
+            TenantStorageView tenant = tenantConfigLookup.storageView(tenantId);
             if (tenant == null) {
                 return null;
             }

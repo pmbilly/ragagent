@@ -1,6 +1,8 @@
 
 package com.ragagent.session.support;
 
+import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
@@ -46,7 +48,7 @@ class MessageReferenceRewriterTest {
     }
 
     private static Rewriter stubRewriter(String url) {
-        return Rewriter.forRequest(Mode.PUBLIC, null, new StubFileService(url), null);
+        return Rewriter.forRequest(Mode.PUBLIC, (TenantStorageView) null, new StubFileService(url), null);
     }
 
     @Test

@@ -1308,6 +1308,18 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **A② 全批提交**：`a7d3b13e`（第①批 42 类）· `37b5fbb8`（第②批 去框架化 37 类）· `2ee75327`（第②批 补：解锁 11 类）· 本批（第③批 9 类 + 收口）。
 - **A 的下一步**：**③ 立「域间只经契约」**（A20 已守"契约唯一实现"；还差"业务域之间只经 `contract`"这条规则——应先测现状再决定硬规则 vs 棘轮基线）。可选后续：① 的 K 级重设计（`JsonNode` → typed records）另立项。
 
+**🔶 A③ 收敛第一刀：`tenant` 枢纽（2026-10-14，R10 基线 317 → 312 类）**
+- **为什么选 `tenant`**：实测五个枢纽的被引分布——`→tenant` 62 处但只 **9 个目标类**（`Tenant` 39 + `TenantLookup` 6 + 配置类等）⇒ 80/20 最优 ✓；反例：`→storage` 72 处散在 **28 个类** ✗、`→knowledge` 114 处 / 37 类 ✗、`→model` 的目标是 **Spring AI 运行时对象**（`ModelRuntimeAssembler` 等，签名不可能进纯 JDK 契约 ✗）。
+- **机制（关键发现：端口与视图早就位）**：`common.tenant.TenantConfigLookup.storageView(long)` 与其嵌套 record **`TenantStorageView(long tenantId, String defaultStorageBackendId, JsonNode storageEngineConfig)`** 已存在（由 `auth/service/TenantService` 实现——它同时实现 `TenantLookup` ⇒ **换注入类型即换 bean，零新增 wiring** ✓）⇒ 本刀是**纯迁移**：`Tenant` 实体 / `TenantLookup` ⇒ L1 端口 + 视图。
+- **落位**：storage 侧 6 类（`fileserve/{ChatLocalImageResolverWiring,FileProxyService,FileserveStorageBackendResolver,StorageFileResolver}`、`support/FileServiceResolver`、`support/Rewriter`）+ knowledge 侧 1 类（`storage/TenantFileStorage`）+ 测试 5 个文件；`hydrateTenantStorage` 由"造新实体"改为"造新视图"（不再触碰实体 setter ✓）。
+- **收益**：R10 基线 **317 → 312 类**（`storage→tenant` **9 → 5 类**；`knowledge→tenant` 减 1；留在边上的 4 类是 `tenant.StorageEngineConfig` **类型**引用 + 1 个过渡重载）。hmm 目标类 `StorageEngineConfig`（8 个 provider 子结构 + Jackson 注解）⇒ 属"A② 类型级残留"同族，另批。
+- **⚠️ 三条现场教训**：
+  1. **R8 与 R10 的盲区互补，接力钉出"隐形依赖"**：过渡重载里我写了**内联全限定名** ⇒ **R8 判红** ✓；改成 import 后，该依赖从 R10 的"import 扫描盲区"**现形**、被判"新增" ✓✓ —— 一条依赖被两个守卫接力抓出，正是"判据必须自证"的价值。
+  2. **签名收窄的涟漪要按"可控切面"截断**：把 resolver 的 `Tenant` 参数收成视图后，涟漪顺着调用链穿到 `session`（3 类 → 再 6 类 …）✗ ⇒ 处理＝**回退 session 侧签名改动** + 在切面边界保留**过渡重载** `Rewriter.forRequest(Mode, Tenant, …)`（1 处实体引用换掉全链迁移 ✓），并在 javadoc 写明"session 面迁完后删本重载"。
+  3. **"只许减"的守卫会拒绝合法新增** ⇒ 处理方式是**明账登记**（手工加基线条目 + 在 note 里写清收回条件），**不绕过守卫** ✗。
+- **验证**：**4987 / 失败 0 / 跳过 4** ✓；`spotlessCheck build` ✓ **2m07s** ✓ **13 守卫** ✓（环 0 / SCC 11 组）；定向测试（Tenant/FileProxy/Rewriter/FileServiceResolver/ChatLocalImage ✓）全绿。
+- **下一步（同手法）**：`session→tenant`（9 类）与 `session→auth`（11 类，因注入的是**具体类** `TenantService` ⇒ 换 L1 端口可**一刀减两条边** ✓）；再往后是 `tenant.StorageEngineConfig` 类型族（与 A② 类型级残留同批）。
+
 **✅ A③ 立「域间只经契约」（2026-10-14，新守卫 R10 —— 第 13 个守卫）**
 - **规则**：**业务域 A 不得 `import com.ragagent.<业务域B>.*`（A≠B）**；跨域调用只许经 **`contract.*`（端口/载荷）** 或**装配层**（`config`/`platform`/`common`）。域清单取方案 §8.9 的 **24 域**（脚本内显式列出，新增域须同步——否则新域的跨域引用不会被看见）。
 - **判据为什么只扫 import 就够**：跨域必然跨包 ⇒ 一定有 import（与 A② 的"同包裸引用"坑不同——那条坑只在**同包**存在）。静态 import 一并覆盖；内联全限定名由既有 **R8** 守 ✓（三方互补）。

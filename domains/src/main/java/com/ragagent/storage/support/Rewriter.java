@@ -1,5 +1,7 @@
 package com.ragagent.storage.support;
 
+import com.ragagent.tenant.repository.Tenant;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -11,7 +13,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ragagent.tenant.repository.Tenant;
+import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.common.retrieval.SearchResult;
 
 /**
@@ -184,13 +186,26 @@ public class Rewriter {
      * {@code /files} 接受调用方给的任意路径、无法绑定到 KB 白名单；而这里的引用来自
      * 调用方**本来就有权收到**的响应，所以是**服务端**而非客户端决定哪些资源拿到 URL。</p>
      */
-    public static Rewriter forRequest(Mode mode, Tenant tenant,
+    public static Rewriter forRequest(Mode mode, TenantStorageView tenant,
                                       FileUrlPort defaultSvc,
                                       StorageBackendResolver storageResolver) {
         if (mode != Mode.PUBLIC) {
             return new Rewriter(null, "API");
         }
         return new Rewriter(new FileServiceResolver(tenant, defaultSvc, storageResolver), "API");
+    }
+
+    /**
+     * 过渡重载：session 面尚未迁到 L1 端口（见 R10 基线 session→tenant），
+     * 这里把租户实体包成只读视图交给 resolver —— 行为与迁移前一致（三字段即可解析 provider 链）。
+     * <p>session 面迁移完成后本重载应删除（届时 R10 的 storage→tenant 边只剩 {@code StorageEngineConfig}）。</p>
+     */
+    public static Rewriter forRequest(Mode mode, Tenant tenant,
+            FileUrlPort defaultSvc, StorageBackendResolver storageResolver) {
+        TenantStorageView view = tenant == null ? null
+                : new TenantStorageView(tenant.getId() == null ? 0L : tenant.getId(),
+                        tenant.getDefaultStorageBackendId(), tenant.getStorageEngineConfig());
+        return forRequest(mode, view, defaultSvc, storageResolver);
     }
 
     // ── 整块到达、不需要扣留的流字段 ────────────────────────────────────────

@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.tenant.repository.Tenant;
+import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.tenant.StorageEngineConfig;
 import com.ragagent.platform.storage.config.StorageRuntimeEnv;
 import com.ragagent.storage.provider.FileServiceFactory;
@@ -54,7 +54,7 @@ public class FileServiceResolver implements Resolver {
         return baseDir.trim();
     }
 
-    private final Tenant tenant;
+    private final TenantStorageView tenant;
     private final FileUrlPort defaultSvc;
     private final StorageBackendResolver storageResolver;
     private final Map<String, FileUrlPort> cache = new HashMap<>();
@@ -63,7 +63,7 @@ public class FileServiceResolver implements Resolver {
      * <p>{@code defaultSvc} 是进程级 FileUrlPort，用于 {@code resource://} 手柄，
      * 以及租户存储配置缺失时的兜底。</p>
      */
-    public FileServiceResolver(Tenant tenant, FileUrlPort defaultSvc, StorageBackendResolver storageResolver) {
+    public FileServiceResolver(TenantStorageView tenant, FileUrlPort defaultSvc, StorageBackendResolver storageResolver) {
         this.tenant = tenant;
         this.defaultSvc = defaultSvc;
         this.storageResolver = storageResolver;
@@ -78,7 +78,7 @@ public class FileServiceResolver implements Resolver {
 
         String provider = parseProviderScheme(filePath);
         if (provider.isEmpty()) {
-            JsonNode config = tenant == null ? null : tenant.getStorageEngineConfig();
+            JsonNode config = tenant == null ? null : tenant.storageEngineConfig();
             if (config != null && config.isObject()) {
                 JsonNode defaultProvider = config.get("defaultProvider");
                 if (defaultProvider != null && defaultProvider.isTextual()) {
@@ -98,7 +98,7 @@ public class FileServiceResolver implements Resolver {
         if (storageResolver != null && tenant != null) {
             try {
                 StorageBackendResolver.Resolved resolved = storageResolver.resolveFileService(
-                        tenant.getId() == null ? 0L : tenant.getId(), backendId, provider, localStorageBaseDir());
+                        tenant.tenantId(), backendId, provider, localStorageBaseDir());
                 if (resolved != null && resolved.fileService() != null) {
                     cache.put(cacheKey, resolved.fileService());
                     return resolved.fileService();
@@ -130,7 +130,7 @@ public class FileServiceResolver implements Resolver {
      */
     private FileUrlPort buildFileServiceForProvider(String provider, FileUrlPort defaultSvc) {
         try {
-            JsonNode sec = tenant == null ? null : tenant.getStorageEngineConfig();
+            JsonNode sec = tenant == null ? null : tenant.storageEngineConfig();
             StorageEngineConfig typed = sec == null ? new StorageEngineConfig()
                     : CONFIG_MAPPER.convertValue(sec, StorageEngineConfig.class);
             FileServiceFactory.Created created = FileServiceFactory.fromStorageConfig(

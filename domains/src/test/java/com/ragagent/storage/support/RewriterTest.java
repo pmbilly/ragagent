@@ -1,5 +1,7 @@
 package com.ragagent.storage.support;
 
+import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
@@ -11,7 +13,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.tenant.repository.Tenant;
 
 /**
  * {@link Rewriter} / {@link FileServiceResolver} 的对等测试。
@@ -284,13 +285,13 @@ class RewriterTest {
     /** 默认模式不得解析任何东西。 */
     @Test
     void forRequestHandleModeIsDisabled() {
-        Rewriter w = Rewriter.forRequest(Mode.HANDLE, null, new StubFileService(), null);
+        Rewriter w = Rewriter.forRequest(Mode.HANDLE, (TenantStorageView) null, new StubFileService(), null);
         assertThat(w.enabled()).isFalse();
     }
 
     @Test
     void forRequestPublicModeIsEnabled() {
-        Rewriter w = Rewriter.forRequest(Mode.PUBLIC, null, new StubFileService(), null);
+        Rewriter w = Rewriter.forRequest(Mode.PUBLIC, (TenantStorageView) null, new StubFileService(), null);
         assertThat(w.enabled()).isTrue();
         assertThat(w.rewriteRef("resource://xifDo7NTSL300Lp1goVutw"))
                 .isEqualTo("https://cdn.example.com/resource://xifDo7NTSL300Lp1goVutw");
@@ -304,7 +305,7 @@ class RewriterTest {
      */
     @Test
     void unresolvableProviderReferenceIsLeftAsHandle() {
-        Rewriter w = Rewriter.forRequest(Mode.PUBLIC, null, null, null);
+        Rewriter w = Rewriter.forRequest(Mode.PUBLIC, (TenantStorageView) null, null, null);
         String in = "![a](minio://bucket/10000/exports/a.png)";
         assertThat(w.rewrite(in)).isEqualTo(in);
     }
@@ -316,7 +317,7 @@ class RewriterTest {
      */
     @Test
     void providerReferenceFallsBackToProcessDefaultService() {
-        Rewriter w = Rewriter.forRequest(Mode.PUBLIC, null, new StubFileService(), null);
+        Rewriter w = Rewriter.forRequest(Mode.PUBLIC, (TenantStorageView) null, new StubFileService(), null);
         assertThat(w.rewrite("![a](minio://bucket/10000/exports/a.png)"))
                 .isEqualTo("![a](https://cdn.example.com/minio://bucket/10000/exports/a.png)");
     }
@@ -372,8 +373,7 @@ class RewriterTest {
             resolved.incrementAndGet();
             return new StorageBackendResolver.Resolved(new StubFileService());
         };
-        Tenant tenant = new Tenant();
-        tenant.setId(10002L);
+        TenantStorageView tenant = new TenantStorageView(10002L, null, null);
 
         FileServiceResolver resolver = new FileServiceResolver(tenant, null, backendResolver);
         FileUrlPort first = resolver.resolveFileService("minio://bucket/10000/a.png");

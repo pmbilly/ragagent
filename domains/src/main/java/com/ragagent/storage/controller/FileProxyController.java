@@ -1,5 +1,9 @@
 package com.ragagent.storage.controller;
 
+import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
+
+import com.ragagent.common.tenant.TenantConfigLookup;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
@@ -9,8 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ragagent.tenant.repository.Tenant;
-import com.ragagent.tenant.repository.TenantLookup;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.storage.fileserve.FileProxyService;
 
@@ -46,9 +48,9 @@ import com.ragagent.platform.web.ApiResult;
 public class FileProxyController {
 
     private final FileProxyService proxy;
-    private final TenantLookup tenantConfigLookup;
+    private final TenantConfigLookup tenantConfigLookup;
 
-    public FileProxyController(FileProxyService proxy, TenantLookup tenantConfigLookup) {
+    public FileProxyController(FileProxyService proxy, TenantConfigLookup tenantConfigLookup) {
         this.proxy = proxy;
         this.tenantConfigLookup = tenantConfigLookup;
     }
@@ -88,7 +90,7 @@ public class FileProxyController {
             FileProxyService.writeErrorJson(response, 401, "unauthorized: workspace context missing");
             return;
         }
-        Tenant tenant = tenantConfigLookup.tenantById(tenantId);
+        TenantStorageView tenant = tenantConfigLookup.storageView(tenantId);
         if (tenant == null) {
             FileProxyService.writeErrorJson(response, 401, "unauthorized: workspace context missing");
             return;

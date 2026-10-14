@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.tenant.repository.Tenant;
+import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
 
 /**
  * 接线：{@code storageurl.FileServiceResolver} 的 provider 级文件服务解析顺序：
@@ -23,7 +23,6 @@ class FileServiceResolverWiringTest {
     @Test
     @DisplayName("租户配了 cos：cos:// 引用解析出真 provider 服务；无配置则回落 defaultSvc")
     void resolvesProviderServiceFromTenantConfig() {
-        Tenant tenant = new Tenant();
         ObjectNode sec = new ObjectMapper().createObjectNode();
         sec.put("defaultProvider", "cos");
         ObjectNode cos = sec.putObject("cos");
@@ -31,8 +30,8 @@ class FileServiceResolverWiringTest {
         cos.put("secretKey", "key");
         cos.put("bucketName", "bk-125");
         cos.put("region", "ap-guangzhou");
-        tenant.setStorageEngineConfig(sec);
 
+        TenantStorageView tenant = new TenantStorageView(0L, null, sec);
         FileServiceResolver resolver = new FileServiceResolver(tenant, null, null);
         FileUrlPort svc = resolver.resolveFileService("cos://bk-125/ap-guangzhou/a/b.png");
         assertNotNull(svc, "cos 配置完备时应解析出真 provider 服务");
@@ -44,7 +43,7 @@ class FileServiceResolverWiringTest {
     @Test
     @DisplayName("租户没配存储 / 配置不完备：回落 defaultSvc（引用按 handle 保留）")
     void fallsBackToDefaultService() {
-        Tenant empty = new Tenant(); // 无 storageEngineConfig
+        TenantStorageView empty = new TenantStorageView(0L, null, null); // 无 storageEngineConfig
         FileServiceResolver noConfig = new FileServiceResolver(empty, null, null);
         assertNull(noConfig.resolveFileService("cos://bk/ap-guangzhou/a/b.png"));
 
@@ -52,11 +51,10 @@ class FileServiceResolverWiringTest {
         assertNull(noConfig.resolveFileService("plain/path.png"));
 
         // 不完备的 cos 段 → 工厂抛"incomplete cos config" → 回落 defaultSvc（此处非空）
-        Tenant partial = new Tenant();
         ObjectNode sec = new ObjectMapper().createObjectNode();
         sec.put("defaultProvider", "cos");
         sec.putObject("cos").put("secretId", "id");
-        partial.setStorageEngineConfig(sec);
+        TenantStorageView partial = new TenantStorageView(0L, null, sec);
         StubUrlFileService fallback = new StubUrlFileService();
         FileServiceResolver partialResolver = new FileServiceResolver(partial, fallback, null);
         assertEquals(fallback, partialResolver.resolveFileService("cos://bk/r/a.png"));

@@ -1,5 +1,5 @@
 {
-  "note": "R10「域间只经契约」棘轮基线（方案 §5.1）。键＝\"源域→目标域\"，值＝引用该域的源类名。只许减：新增边/新增类即红。收紧用 --write（存在新增时会被拒绝）。target=0：跨域能力提到 contract 端口，调用方只 import contract。",
+  "note": "R10「域间只经契约」棘轮基线（方案 §5.1）。键＝\"源域→目标域\"，值＝引用该域的源类名。只许减：新增边/新增类即红。收紧用 --write（存在新增时会被拒绝）。target=0：跨域能力提到 contract 端口，调用方只 import contract。 注：storage→tenant 的 Rewriter 是**过渡重载**（session 面尚未迁到 L1 端口；见 storage/support/Rewriter.forRequest(Tenant,…) 的 javadoc）——session 迁移后应删该重载并收紧此条。",
   "edges": {
     "agentmanagement→agent": [
       "SkillCatalogController",
@@ -187,7 +187,6 @@
     ],
     "knowledge→tenant": [
       "FaqIndexWriter",
-      "TenantFileStorage",
       "TenantStorageService"
     ],
     "knowledge→model": [
@@ -402,12 +401,8 @@
       "AgentToolWikiBackends"
     ],
     "storage→tenant": [
-      "ChatLocalImageResolverWiring",
-      "FileProxyController",
-      "FileProxyService",
       "FileServiceFactory",
       "FileServiceResolver",
-      "FileserveStorageBackendResolver",
       "Rewriter",
       "StorageFileResolver",
       "TenantFileServiceResolver"

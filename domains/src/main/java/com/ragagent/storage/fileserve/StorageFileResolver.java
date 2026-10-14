@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.tenant.repository.Tenant;
+import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.platform.security.CryptoService;
 import com.ragagent.platform.storage.config.StorageRuntimeEnv;
 import com.ragagent.storage.config.StorageProviderEnv;
@@ -98,12 +98,12 @@ public class StorageFileResolver {
     /**
      * 返回的 Resolution.error 非 null 时 HTTP 面按各自的映射处理。
      */
-    public Resolution resolveFileService(Tenant tenant, String backendId, String provider,
+    public Resolution resolveFileService(TenantStorageView tenant, String backendId, String provider,
             String localBaseDir) {
         if (tenant == null) {
             return new Resolution(null, "", "workspace context missing");
         }
-        Tenant hydrated = hydrateTenantStorage(tenant);
+        TenantStorageView hydrated = hydrateTenantStorage(tenant);
         Objects.requireNonNull(hydrated);
 
         BackendResolution backend = resolveBackend(hydrated, backendId, provider);
@@ -124,10 +124,10 @@ public class StorageFileResolver {
                     decorate(new BackendScopedFileService(b.getId(), inner.service())),
                     inner.provider(), null);
         }
-        JsonNode sec = hydrated.getStorageEngineConfig();
+        JsonNode sec = hydrated.storageEngineConfig();
         String provider0 = provider == null ? "" : provider.trim().toLowerCase(java.util.Locale.ROOT);
         if (provider0.isEmpty() && storageEngineDefaultProvider(sec).isEmpty()) {
-            StorageBackend env = storageBackendFromEnvironment(hydrated.getId());
+            StorageBackend env = storageBackendFromEnvironment(hydrated.tenantId());
             if (env != null) {
                 provider0 = env.getProvider();
                 if (sec == null) {
@@ -146,20 +146,20 @@ public class StorageFileResolver {
     }
 
     /** backend 解析：legacy alias 与默认后端两级回落。 */
-    private BackendResolution resolveBackend(Tenant tenant, String backendId, String provider) {
+    private BackendResolution resolveBackend(TenantStorageView tenant, String backendId, String provider) {
         String id = backendId == null ? "" : backendId.trim();
         String p = provider == null ? "" : provider.trim().toLowerCase(java.util.Locale.ROOT);
         if (id.isEmpty() && !p.isEmpty()) {
-            StorageBackend alias = backendRepo.findLegacyAlias(tenant.getId(), p);
+            StorageBackend alias = backendRepo.findLegacyAlias(tenant.tenantId(), p);
             if (alias != null) {
                 return new BackendResolution(alias, null);
             }
         }
         if (id.isEmpty()) {
-            id = tenant.getDefaultStorageBackendId() == null ? "" : tenant.getDefaultStorageBackendId().trim();
+            id = tenant.defaultStorageBackendId() == null ? "" : tenant.defaultStorageBackendId().trim();
         }
         if (!id.isEmpty()) {
-            StorageBackend backend = backendRepo.getByID(tenant.getId(), id).orElse(null);
+            StorageBackend backend = backendRepo.getByID(tenant.tenantId(), id).orElse(null);
             if (backend == null) {
                 return new BackendResolution(null, "storage backend not found");
             }
@@ -171,23 +171,19 @@ public class StorageFileResolver {
         return new BackendResolution(null, null);
     }
 
-    /** stub Tenant 从库行补 DefaultStorageBackendId/配置。 */
-    private Tenant hydrateTenantStorage(Tenant tenant) {
-        if (tenant.getId() == 0 || backendRepo == null) {
+    /** stub TenantStorageView 从库行补 DefaultStorageBackendId/配置。 */
+    private TenantStorageView hydrateTenantStorage(TenantStorageView tenant) {
+        if (tenant.tenantId() == 0 || backendRepo == null) {
             // 仓储缺位（纯单元测试构造）时跳过补全：本方法只是"从库行补 stub 字段"的优化，
             // 补不了就按调用方给的实体走。
             return tenant;
         }
-        if (tenant.getDefaultStorageBackendId() != null && !tenant.getDefaultStorageBackendId().trim().isEmpty()) {
+        if (tenant.defaultStorageBackendId() != null && !tenant.defaultStorageBackendId().trim().isEmpty()) {
             return tenant;
         }
-        String storedDefault = backendRepo.tenantDefaultBackendId(tenant.getId());
+        String storedDefault = backendRepo.tenantDefaultBackendId(tenant.tenantId());
         if (storedDefault != null && !storedDefault.isEmpty()) {
-            Tenant out = new Tenant();
-            out.setId(tenant.getId());
-            out.setDefaultStorageBackendId(storedDefault);
-            out.setStorageEngineConfig(tenant.getStorageEngineConfig());
-            return out;
+            return new TenantStorageView(tenant.tenantId(), storedDefault, tenant.storageEngineConfig());
         }
         return tenant;
     }
@@ -371,12 +367,12 @@ public class StorageFileResolver {
      * 调用方走 Java 既有的本地契约（{@code resource://…} + {@code LocalStorageService}），
      * 那是 golden 锁定的落盘形态，不能换成 provider 的 {@code local://…}。</p>
      */
-    public ProviderResolution resolveProviderService(Tenant tenant, String backendId, String provider,
+    public ProviderResolution resolveProviderService(TenantStorageView tenant, String backendId, String provider,
             String localBaseDir) {
         if (tenant == null) {
             return new ProviderResolution(null, "", "workspace context missing");
         }
-        Tenant hydrated = hydrateTenantStorage(tenant);
+        TenantStorageView hydrated = hydrateTenantStorage(tenant);
         BackendResolution backend = resolveBackend(hydrated, backendId, provider);
         if (backend.error() != null) {
             return new ProviderResolution(null, "", backend.error());
@@ -385,10 +381,10 @@ public class StorageFileResolver {
             return buildProviderRaw(backend.backend().getProvider(),
                     toStorageEngineConfig(backend.backend()), localBaseDir);
         }
-        JsonNode sec = hydrated.getStorageEngineConfig();
+        JsonNode sec = hydrated.storageEngineConfig();
         String p0 = provider == null ? "" : provider.trim().toLowerCase(java.util.Locale.ROOT);
         if (p0.isEmpty() && storageEngineDefaultProvider(sec).isEmpty()) {
-            StorageBackend env = storageBackendFromEnvironment(hydrated.getId());
+            StorageBackend env = storageBackendFromEnvironment(hydrated.tenantId());
             if (env != null) {
                 p0 = env.getProvider();
                 if (sec == null) {
@@ -589,7 +585,7 @@ public class StorageFileResolver {
      * 租户级解析失败且
      * provider == 全局 STORAGE_TYPE 时回落进程级服务；否则 ok=false（调用方 400）。
      */
-    public Resolution resolveTenantFileServiceWithFallback(String logTag, Tenant tenant,
+    public Resolution resolveTenantFileServiceWithFallback(String logTag, TenantStorageView tenant,
             String backendId, String provider, String absDir, FileContentService globalFileService) {
         Resolution resolution = resolveFileService(tenant, backendId, provider, absDir);
         if (resolution.ok()) {
@@ -598,12 +594,12 @@ public class StorageFileResolver {
         String globalStorageType = StoragePaths.globalStorageType();
         if (provider != null && provider.equals(globalStorageType) && globalFileService != null) {
             log.warn("[Router] {} tenant storage config missing or invalid, fallback to global file "
-                    + "service: tenant_id={} provider={} err={}", logTag, tenant.getId(), provider,
+                    + "service: tenant_id={} provider={} err={}", logTag, tenant.tenantId(), provider,
                     resolution.error());
             return new Resolution(new DecoratedFileService(globalFileService, catalog), globalStorageType, null);
         }
         log.warn("[Router] {} resolve file service failed without fallback: tenant_id={} provider={} "
-                + "global_storage_type={} err={}", logTag, tenant.getId(), provider, globalStorageType,
+                + "global_storage_type={} err={}", logTag, tenant.tenantId(), provider, globalStorageType,
                 resolution.error());
         return new Resolution(null, "", resolution.error());
     }

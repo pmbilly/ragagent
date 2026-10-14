@@ -19,7 +19,7 @@ import java.util.Base64;
 import java.util.Optional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.tenant.repository.Tenant;
+import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.storage.domain.StorageBackend;
 import com.ragagent.modelruntime.adapter.provider.chat.ImageResolver;
@@ -81,9 +81,8 @@ class ChatLocalImageResolverWiringTest {
         when(catalog.resolvePath(url)).thenReturn(
                 new ResourceCatalogService.ResolvedPath("local://kb-assets/img.png", resource, false));
 
-        Tenant tenant = new Tenant();
-        tenant.setId(42L);
-        when(tenantService.tenantById(42L)).thenReturn(tenant);
+        TenantStorageView tenant = new TenantStorageView(42L, null, null);
+        when(tenantService.storageView(42L)).thenReturn(tenant);
 
         FileContentService fileSvc = mock(FileContentService.class);
         when(fileSvc.getFile("local://kb-assets/img.png"))
@@ -92,7 +91,7 @@ class ChatLocalImageResolverWiringTest {
                 .thenReturn(new StorageFileResolver.Resolution(fileSvc, "local", null));
 
         assertThat(wiring.resolve(url)).isEqualTo(PNG_BYTES);
-        verify(tenantService).tenantById(42L);
+        verify(tenantService).storageView(42L);
     }
 
     /** resource:// 解析失败（缺行/非法引用）→ null，且后续步骤一步都不走。 */
@@ -116,7 +115,7 @@ class ChatLocalImageResolverWiringTest {
         resource.setStorageBackendId("");
         when(catalog.resolvePath(url)).thenReturn(
                 new ResourceCatalogService.ResolvedPath("local://kb-assets/img.png", resource, false));
-        when(tenantService.tenantById(42L)).thenReturn(null);
+        when(tenantService.storageView(42L)).thenReturn(null);
 
         assertThat(wiring.resolve(url)).isNull();
         verify(storageResolver, never()).resolveFileService(any(), anyString(), anyString(), anyString());
@@ -143,9 +142,8 @@ class ChatLocalImageResolverWiringTest {
         resource.setStorageBackendId("");
         when(catalog.resolvePath(url)).thenReturn(
                 new ResourceCatalogService.ResolvedPath("local://kb-assets/img.png", resource, false));
-        Tenant tenant = new Tenant();
-        tenant.setId(42L);
-        when(tenantService.tenantById(42L)).thenReturn(tenant);
+        TenantStorageView tenant = new TenantStorageView(42L, null, null);
+        when(tenantService.storageView(42L)).thenReturn(tenant);
         when(storageResolver.resolveFileService(eq(tenant), eq(""), eq("local"), anyString()))
                 .thenReturn(new StorageFileResolver.Resolution(null, "", "storage backend not found"));
 
@@ -159,9 +157,8 @@ class ChatLocalImageResolverWiringTest {
         Files.write(img, PNG_BYTES);
         String url = "local://7/x/img.png";
         when(catalog.resolvePath(url)).thenReturn(new ResourceCatalogService.ResolvedPath(url, null, false));
-        Tenant tenant = new Tenant();
-        tenant.setId(7L);
-        when(tenantService.tenantById(7L)).thenReturn(tenant);
+        TenantStorageView tenant = new TenantStorageView(7L, null, null);
+        when(tenantService.storageView(7L)).thenReturn(tenant);
 
         FileContentService fileSvc = mock(FileContentService.class);
         when(fileSvc.getFile(url)).thenReturn(FileTransport.OpenedFile.ofSeekable(img, PNG_BYTES.length));
@@ -180,9 +177,8 @@ class ChatLocalImageResolverWiringTest {
         resource.setTenantId(7L);
         resource.setStorageBackendId("bk2");
         when(catalog.resolvePath(url)).thenReturn(new ResourceCatalogService.ResolvedPath(url, resource, false));
-        Tenant tenant = new Tenant();
-        tenant.setId(7L);
-        when(tenantService.tenantById(7L)).thenReturn(tenant);
+        TenantStorageView tenant = new TenantStorageView(7L, null, null);
+        when(tenantService.storageView(7L)).thenReturn(tenant);
 
         FileContentService fileSvc = mock(FileContentService.class);
         when(fileSvc.getFile(url)).thenReturn(FileTransport.OpenedFile.ofBytes(PNG_BYTES));
@@ -203,10 +199,9 @@ class ChatLocalImageResolverWiringTest {
         Files.createDirectories(img.getParent());
         Files.write(img, PNG_BYTES);
 
-        Tenant tenant = new Tenant();
-        tenant.setId(7L);
+        TenantStorageView tenant = new TenantStorageView(7L, null, null);
         TenantService tenants = mock(TenantService.class);
-        when(tenants.tenantById(7L)).thenReturn(tenant);
+        when(tenants.storageView(7L)).thenReturn(tenant);
 
         StorageBackendRepository backendRepo = mock(StorageBackendRepository.class);
         when(backendRepo.tenantDefaultBackendId(7L)).thenReturn(null);
@@ -241,10 +236,9 @@ class ChatLocalImageResolverWiringTest {
         ResourceRepository resourceRepo = mock(ResourceRepository.class);
         when(resourceRepo.getByHandle(HANDLE)).thenReturn(Optional.of(resource));
 
-        Tenant tenant = new Tenant();
-        tenant.setId(7L);
+        TenantStorageView tenant = new TenantStorageView(7L, null, null);
         TenantService tenants = mock(TenantService.class);
-        when(tenants.tenantById(7L)).thenReturn(tenant);
+        when(tenants.storageView(7L)).thenReturn(tenant);
 
         StorageBackendRepository backendRepo = mock(StorageBackendRepository.class);
         when(backendRepo.tenantDefaultBackendId(7L)).thenReturn(null);

@@ -1,11 +1,13 @@
 package com.ragagent.storage.fileserve;
 
+import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
+
+import com.ragagent.common.tenant.TenantConfigLookup;
+
 import java.io.IOException;
 
 import org.springframework.stereotype.Component;
 
-import com.ragagent.tenant.repository.Tenant;
-import com.ragagent.tenant.repository.TenantLookup;
 import com.ragagent.storage.support.FileUrlPort;
 import com.ragagent.storage.support.StorageBackendResolver;
 
@@ -27,10 +29,10 @@ import com.ragagent.storage.support.StorageBackendResolver;
 public class FileserveStorageBackendResolver implements StorageBackendResolver {
 
     private final StorageFileResolver storageFileResolver;
-    private final TenantLookup tenantConfigLookup;
+    private final TenantConfigLookup tenantConfigLookup;
 
     public FileserveStorageBackendResolver(StorageFileResolver storageFileResolver,
-                                           TenantLookup tenantConfigLookup) {
+                                           TenantConfigLookup tenantConfigLookup) {
         this.storageFileResolver = storageFileResolver;
         this.tenantConfigLookup = tenantConfigLookup;
     }
@@ -42,7 +44,7 @@ public class FileserveStorageBackendResolver implements StorageBackendResolver {
             // 无租户（workspace context missing）→ 调用方回落
             return new Resolved(null);
         }
-        Tenant tenant = tenantConfigLookup.tenantById(tenantId);
+        TenantStorageView tenant = tenantConfigLookup.storageView(tenantId);
         if (tenant == null) {
             return new Resolved(null);
         }

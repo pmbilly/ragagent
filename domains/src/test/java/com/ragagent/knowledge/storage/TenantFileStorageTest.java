@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.storage;
 
+import com.ragagent.common.tenant.TenantConfigLookup;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -17,7 +19,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.tenant.repository.Tenant;
+import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.storage.fileserve.StorageFileResolver;
 import com.ragagent.contract.error.BizException;
@@ -33,16 +35,16 @@ class TenantFileStorageTest {
 
     private static final String MIME_AGNOSTIC = "hello";
 
-    private TenantFileStorage facade(Path baseDir, Tenant tenant) {
+    private TenantFileStorage facade(Path baseDir, TenantStorageView tenant) {
         return new TenantFileStorage(new LocalStorageService(baseDir.toString()),
                 new StorageFileResolver(null, null), tenantServiceReturning(tenant), baseDir.toString());
     }
 
-    private static TenantService tenantServiceReturning(Tenant tenant) {
+    private static TenantConfigLookup tenantServiceReturning(TenantStorageView tenant) {
         return new TenantService(null, null, null) {
             @Override
-            public Tenant getTenantById(long id) {
-                return tenant != null && tenant.getId() != null && tenant.getId() == id ? tenant : null;
+            public TenantStorageView storageView(long id) {
+                return tenant != null && tenant.tenantId() == id ? tenant : null;
             }
         };
     }
@@ -84,12 +86,10 @@ class TenantFileStorageTest {
     @Test
     @DisplayName("租户只配 local：仍是本地契约（不换成 provider 的 local:// 布局）")
     void localProviderStaysOnLocalContract(@TempDir Path dir) {
-        Tenant tenant = new Tenant();
-        tenant.setId(7L);
         ObjectNode sec = new ObjectMapper().createObjectNode();
         sec.put("defaultProvider", "local");
-        tenant.setStorageEngineConfig(sec);
 
+        TenantStorageView tenant = new TenantStorageView(7L, null, sec);
         TenantFileStorage storage = facade(dir, tenant);
         String path = storage.save(7L, "k-2", "a.txt", "x".getBytes(StandardCharsets.UTF_8));
         assertEquals("resource://7/k-2/a.txt", path);
@@ -105,16 +105,14 @@ class TenantFileStorageTest {
     @Test
     @DisplayName("租户配云：写面解析出真 provider 服务（cos 代表，构造不触网）")
     void cloudProviderResolvedForWrite(@TempDir Path dir) {
-        Tenant tenant = new Tenant();
-        tenant.setId(9L);
         ObjectNode sec = new ObjectMapper().createObjectNode();
         sec.put("defaultProvider", "cos");
+        TenantStorageView tenant = new TenantStorageView(9L, null, sec);
         ObjectNode cos = sec.putObject("cos");
         cos.put("secretId", "id");
         cos.put("secretKey", "key");
         cos.put("bucketName", "bk-125");
         cos.put("region", "ap-guangzhou");
-        tenant.setStorageEngineConfig(sec);
 
         StorageFileResolver resolver = new StorageFileResolver(null, null);
         StorageFileResolver.ProviderResolution pr =
@@ -127,13 +125,11 @@ class TenantFileStorageTest {
     @Test
     @DisplayName("租户配了云但配置不完备：写面明确报错（不静默退回本地）")
     void brokenCloudConfigFailsExplicitly(@TempDir Path dir) {
-        Tenant tenant = new Tenant();
-        tenant.setId(9L);
         ObjectNode sec = new ObjectMapper().createObjectNode();
         sec.put("defaultProvider", "cos");
         sec.putObject("cos").put("secretId", "id"); // 缺 secretKey/bucket/region
-        tenant.setStorageEngineConfig(sec);
 
+        TenantStorageView tenant = new TenantStorageView(9L, null, sec);
         TenantFileStorage storage = facade(dir, tenant);
         IllegalStateException err = assertThrows(IllegalStateException.class,
                 () -> storage.save(9L, "k-3", "a.txt", "x".getBytes(StandardCharsets.UTF_8)));
@@ -145,12 +141,10 @@ class TenantFileStorageTest {
     @Test
     @DisplayName("读取：provider 引用在租户解析失败时折成 Failed to retrieve file 信封")
     void providerReadFailureEnvelope(@TempDir Path dir) {
-        Tenant tenant = new Tenant();
-        tenant.setId(11L);
         ObjectNode sec = new ObjectMapper().createObjectNode();
-        sec.put("defaultProvider", "cos");
-        tenant.setStorageEngineConfig(sec); // cos 段缺失 → 解析失败
+        sec.put("defaultProvider", "cos"); // cos 段缺失 → 解析失败
 
+        TenantStorageView tenant = new TenantStorageView(11L, null, sec);
         TenantFileStorage storage = facade(dir, tenant);
         BizException err =
                 assertThrows(BizException.class,
