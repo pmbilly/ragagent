@@ -20,7 +20,7 @@ import com.ragagent.im.runtime.QaQueue;
 import com.ragagent.session.domain.conversation.Session;
 
 /**
- * {@link ImStopOps} 的语义钉子：自 {@code ImService} 外提时逐字搬迁，
+ * {@link ImStopOps} 的语义钉子：自 {@code ImTurnOrchestrator} 外提时逐字搬迁，
  * 这里把原来只写在代码注释里的三条口径固化成断言——
  * <ul>
  *   <li>{@code doLocalStop} 第 4 步「本地没命中 ⇒ 写标记兜底」（给尚未创建 assistant
@@ -35,11 +35,11 @@ import com.ragagent.session.domain.conversation.Session;
 class ImStopOpsTest {
 
     /** 可变的空在途表（{@code doLocalStop} 会 {@code remove}，不可用 Map.of）。 */
-    private static Map<String, ImService.InflightEntry> emptyInflight() {
+    private static Map<String, ImTurnOrchestrator.InflightEntry> emptyInflight() {
         return new ConcurrentHashMap<>();
     }
 
-    private static ImStopOps singleInstance(Map<String, ImService.InflightEntry> inflight) {
+    private static ImStopOps singleInstance(Map<String, ImTurnOrchestrator.InflightEntry> inflight) {
         QaQueue queue = new QaQueue(1, 10, 1, req -> { });
         return new ImStopOps(null, queue, inflight, () -> null);   // null = 未启用 Redis 面
     }
@@ -91,9 +91,9 @@ class ImStopOpsTest {
     @DisplayName("在途命中：触发取消标志，并在本实例未知 session/message 时仍写标记兜底")
     void inflightHitTriggersCancelAndStillWritesMarker() {
         AtomicBoolean cancelled = new AtomicBoolean(false);
-        Map<String, ImService.InflightEntry> inflight = new ConcurrentHashMap<>();
+        Map<String, ImTurnOrchestrator.InflightEntry> inflight = new ConcurrentHashMap<>();
         String key = ImFormat.makeUserKey("ch1", "u1", "c1", "");
-        inflight.put(key, new ImService.InflightEntry(null, () -> {
+        inflight.put(key, new ImTurnOrchestrator.InflightEntry(null, () -> {
             cancelled.set(true);
             return true;
         }));
@@ -110,10 +110,10 @@ class ImStopOpsTest {
     @DisplayName("在途登记：Redis 面缺席时只更新 entry（不抛、不进 watcher）")
     void bindInflightWithoutRedisOnlyUpdatesEntry() {
         ImStopOps ops = singleInstance(emptyInflight());
-        ImService.InflightEntry entry = new ImService.InflightEntry(null, () -> false);
+        ImTurnOrchestrator.InflightEntry entry = new ImTurnOrchestrator.InflightEntry(null, () -> false);
         Session session = new Session();
         session.setId("sess-1");
-        ImService.QaAttach attach = new ImService.QaAttach(null, session, null, null,
+        ImTurnOrchestrator.QaAttach attach = new ImTurnOrchestrator.QaAttach(null, session, null, null,
                 channel("ch1", "user"), "ch1", "ch1:u1:c1", entry);
 
         ops.bindInflight(attach, "msg-9");

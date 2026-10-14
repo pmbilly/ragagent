@@ -25,7 +25,7 @@ import com.ragagent.platform.stream.StreamStopWatcher;
  * 跨实例 /stop 全链路：本地出队/在途取消、stop 事件写入 StreamManager、标记兜底、
  * 在途（inflight）映射的绑定与退场。
  *
- * <p>自 {@link ImService} 原样外提（逐字搬迁，仅改依赖取用方式）。
+ * <p>自 {@link ImTurnOrchestrator} 原样外提（逐字搬迁，仅改依赖取用方式）。
  * 这段是一条**完整的请求取消链路**（用户在一次问答的不同阶段按 /stop，会分别命中
  * 出队、在途、标记三条路径），与渠道生命周期、消息处理主管道同处一类只是历史堆积。</p>
  *
@@ -46,14 +46,14 @@ final class ImStopOps {
 
     private final ImRedisStore redisStore;
     private final QaQueue qaQueue;
-    private final Map<String, ImService.InflightEntry> inflight;
+    private final Map<String, ImTurnOrchestrator.InflightEntry> inflight;
     private final Supplier<StreamManager> streamManager;
 
     /** 跨实例 /stop 标记的本地等价物。 */
     private final Map<String, Long> stopMarkers = new ConcurrentHashMap<>();
 
     ImStopOps(ImRedisStore redisStore, QaQueue qaQueue,
-            Map<String, ImService.InflightEntry> inflight, Supplier<StreamManager> streamManager) {
+            Map<String, ImTurnOrchestrator.InflightEntry> inflight, Supplier<StreamManager> streamManager) {
         this.redisStore = redisStore;
         this.qaQueue = qaQueue;
         this.inflight = inflight;
@@ -68,7 +68,7 @@ final class ImStopOps {
                 stopThreadId);
         // 1. 本地取消：出队或在途取消（在途时同时拿到本实例已知的 session/message）。
         boolean localStopped = qaQueue.remove(inflightKey);
-        ImService.InflightEntry entry = localStopped ? null : inflight.remove(inflightKey);
+        ImTurnOrchestrator.InflightEntry entry = localStopped ? null : inflight.remove(inflightKey);
         String sessionId = "";
         String messageId = "";
         if (entry != null) {
@@ -141,8 +141,8 @@ final class ImStopOps {
      * 在途登记（assistant message 创建后调用）：绑定 entry 的 session/message、
      * 写跨实例 inflight 映射，并启动 StreamManager stop watcher（跨实例 /stop 的消费侧）。
      */
-    void bindInflight(ImService.QaAttach attach, String assistantMessageId) {
-        ImService.InflightEntry entry = attach.inflight();
+    void bindInflight(ImTurnOrchestrator.QaAttach attach, String assistantMessageId) {
+        ImTurnOrchestrator.InflightEntry entry = attach.inflight();
         if (entry == null) {
             return;
         }

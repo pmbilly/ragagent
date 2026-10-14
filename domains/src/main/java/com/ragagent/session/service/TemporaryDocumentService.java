@@ -18,7 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.knowledge.client.DocReaderClient;
-import com.ragagent.model.service.ModelRuntimeFactory;
+import com.ragagent.model.service.ModelRuntimeAssembler;
 import com.ragagent.session.domain.message.MessageAttachment;
 import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.repository.TemporaryDocumentRepository;
@@ -80,13 +80,13 @@ public class TemporaryDocumentService {
     public TemporaryDocumentService(TemporaryDocumentRepository repo,
                                     AttachmentFileStore fileStore,
                                     DocReaderClient docReader,
-                                    ModelRuntimeFactory modelRuntimeFactory,
+                                    ModelRuntimeAssembler modelRuntimeAssembler,
                                     AsrTranscriber asrTranscriber,
                                     TenantService tenantService) {
         this.repo = repo;
         this.fileStore = fileStore;
         this.processor = new TemporaryDocumentProcessor(repo, fileStore, docReader,
-                modelRuntimeFactory, asrTranscriber, tenantService);
+                modelRuntimeAssembler, asrTranscriber, tenantService);
         this.promptResolver = new TemporaryDocumentPromptResolver(repo);
     }
 

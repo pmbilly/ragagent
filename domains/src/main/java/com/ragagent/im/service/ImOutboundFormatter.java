@@ -18,9 +18,9 @@ final class ImOutboundFormatter {
 
     private static final Logger log = LoggerFactory.getLogger(ImOutboundFormatter.class);
 
-    private final ImService service;
+    private final ImTurnOrchestrator service;
 
-    ImOutboundFormatter(ImService service) {
+    ImOutboundFormatter(ImTurnOrchestrator service) {
         this.service = service;
     }
 

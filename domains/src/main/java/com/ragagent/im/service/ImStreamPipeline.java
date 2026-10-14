@@ -23,7 +23,7 @@ import com.ragagent.common.context.TenantContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ragagent.im.service.ImService.QaAttach;
+import com.ragagent.im.service.ImTurnOrchestrator.QaAttach;
 import com.ragagent.event.payload.AgentCompleteData;
 import com.ragagent.event.payload.AgentFinalAnswerData;
 import com.ragagent.event.payload.AgentThoughtData;
@@ -38,9 +38,9 @@ final class ImStreamPipeline {
 
     private static final Logger log = LoggerFactory.getLogger(ImStreamPipeline.class);
 
-    private final ImService service;
+    private final ImTurnOrchestrator service;
 
-    ImStreamPipeline(ImService service) {
+    ImStreamPipeline(ImTurnOrchestrator service) {
         this.service = service;
     }
 

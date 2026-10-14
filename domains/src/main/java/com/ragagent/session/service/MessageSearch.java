@@ -19,7 +19,7 @@ import com.ragagent.auth.service.TenantService;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.pipeline.SearchParams;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.model.service.ModelRuntimeFactory;
+import com.ragagent.model.service.ModelRuntimeAssembler;
 import com.ragagent.rerank.RankResult;
 import com.ragagent.rerank.Reranker;
 import com.ragagent.retrieval.HybridSearchService;
@@ -38,7 +38,7 @@ import com.ragagent.session.repository.MessageRepository;
  * 错误语义不变。为什么单独一类：检索簇自成一条管线（配置 → 关键词与向量两路 → RRF →
  * 归属过滤 → 补对 → 分组），与门面的消息 CRUD / 附件 / 入 KB / 统计无交集；只依赖
  * {@code messageRepository} 与检索面（{@code tenantService} / {@code hybridSearchService} /
- * {@code modelRuntimeFactory}）。共用的 {@code requireTenantId} 与检索模式词表
+ * {@code modelRuntimeAssembler}）。共用的 {@code requireTenantId} 与检索模式词表
  * （{@code MODE_*}）留在门面，本类按类名引用；{@code getChatHistoryConfig} 反过来被门面的
  * 入 KB 路径（{@code indexMessageToKb}）共用，故包内可见。</p>
  */
@@ -53,16 +53,16 @@ final class MessageSearch {
     /** 聊天历史 KB 的向量检索执行面。 */
     private final HybridSearchService hybridSearchService;
     /** rerankResults 的重排模型工厂。 */
-    private final ModelRuntimeFactory modelRuntimeFactory;
+    private final ModelRuntimeAssembler modelRuntimeAssembler;
 
     MessageSearch(MessageRepository messageRepository,
                   TenantService tenantService,
                   HybridSearchService hybridSearchService,
-                  ModelRuntimeFactory modelRuntimeFactory) {
+                  ModelRuntimeAssembler modelRuntimeAssembler) {
         this.messageRepository = messageRepository;
         this.tenantService = tenantService;
         this.hybridSearchService = hybridSearchService;
-        this.modelRuntimeFactory = modelRuntimeFactory;
+        this.modelRuntimeAssembler = modelRuntimeAssembler;
     }
 
     /**
@@ -322,7 +322,7 @@ final class MessageSearch {
 
         Reranker reranker;
         try {
-            reranker = modelRuntimeFactory.getRerankModel(rc.getRerankModelId());
+            reranker = modelRuntimeAssembler.getRerankModel(rc.getRerankModelId());
         } catch (RuntimeException e) {
             log.warn("Failed to get rerank model {}, skipping rerank: {}",
                     rc.getRerankModelId(), e.toString());

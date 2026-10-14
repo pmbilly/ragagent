@@ -25,7 +25,7 @@ import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.common.security.SsrfGuard;
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.runtime.ReplyMessage;
-import com.ragagent.im.service.ImService;
+import com.ragagent.im.service.ImTurnOrchestrator;
 
 /**
  * 企业微信长连接的
@@ -221,7 +221,7 @@ class WecomLongConnTest {
         channel.setCredentials("{\"bot_id\":\"B1\",\"bot_secret\":\"S1\","
                 + "\"ws_endpoint\":\"wss://127.0.0.1:1/\",\"bot_name\":\"WeKnora Bot\"}");
 
-        ImService.AdapterRegistration reg =
+        ImTurnOrchestrator.AdapterRegistration reg =
                 new WecomAdapterFactory((SsrfGuard) null)
                         .create(channel, (m, c) -> { });
         assertNotNull(reg.adapter());

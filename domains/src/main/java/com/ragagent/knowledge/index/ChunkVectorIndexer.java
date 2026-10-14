@@ -22,7 +22,7 @@ import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.model.domain.Model;
-import com.ragagent.model.service.ModelRuntimeFactory;
+import com.ragagent.model.service.ModelRuntimeAssembler;
 import com.ragagent.model.service.ModelService;
 import com.ragagent.model.service.ModelService.ModelNotFoundException;
 import org.slf4j.Logger;
@@ -63,7 +63,7 @@ public class ChunkVectorIndexer {
     private final EmbedderClient embedder;
     private final VectorStoreService vectorStore;
     private final KnowledgeVectorWrites vectorWrites;
-    private final ModelRuntimeFactory modelRuntimeFactory;
+    private final ModelRuntimeAssembler modelRuntimeAssembler;
     /** 批量向量化批大小（属性绑定）。 */
     private final BatchEmbedProperties batchEmbedProperties;
 
@@ -73,7 +73,7 @@ public class ChunkVectorIndexer {
                               EmbedderClient embedder,
                               VectorStoreService vectorStore,
                               KnowledgeVectorWrites vectorWrites,
-                              ModelRuntimeFactory modelRuntimeFactory,
+                              ModelRuntimeAssembler modelRuntimeAssembler,
                               BatchEmbedProperties batchEmbedProperties) {
         this.kbRepository = kbRepository;
         this.knowledgeRepository = knowledgeRepository;
@@ -81,7 +81,7 @@ public class ChunkVectorIndexer {
         this.embedder = embedder;
         this.vectorStore = vectorStore;
         this.vectorWrites = vectorWrites;
-        this.modelRuntimeFactory = modelRuntimeFactory;
+        this.modelRuntimeAssembler = modelRuntimeAssembler;
         this.batchEmbedProperties = batchEmbedProperties;
     }
 
@@ -249,7 +249,7 @@ public class ChunkVectorIndexer {
                                         CompositeRetrieveEngine engine,
                                         List<Chunk> chunks) {
         Embedder embedderRuntime =
-                modelRuntimeFactory.getEmbeddingModel(kb.getEmbeddingModelId());
+                modelRuntimeAssembler.getEmbeddingModel(kb.getEmbeddingModelId());
         List<String> ids = new ArrayList<>();
         List<IndexInfo> items = new ArrayList<>();
         Map<String, Knowledge> knowledgeCache = new HashMap<>();

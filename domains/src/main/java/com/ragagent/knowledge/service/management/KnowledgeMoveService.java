@@ -15,7 +15,7 @@ import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.retrieval.graph.RetrieveGraphRepository;
 import com.ragagent.knowledge.dto.doc.KnowledgeMoveProgress;
 import com.ragagent.knowledge.repository.ChunkRepository;
-import com.ragagent.model.service.ModelRuntimeFactory;
+import com.ragagent.model.service.ModelRuntimeAssembler;
 import com.ragagent.retrieval.engine.PgVectorEngineRepository;
 import org.springframework.stereotype.Service;
 import com.ragagent.common.graph.NameSpace;
@@ -41,7 +41,7 @@ public class KnowledgeMoveService {
     private final ChunkRepository chunkRepo;
     private final KnowledgeTagRepository tagRepository;
     private final TenantStorageService tenantStorage;
-    private final ModelRuntimeFactory modelRuntimeFactory;
+    private final ModelRuntimeAssembler modelRuntimeAssembler;
     private final KnowledgeProcessingQueue worker;
     private final KnowledgeTaskProgressStore progressStore;
     private final KnowledgeVectorWrites vectorWrites;
@@ -56,7 +56,7 @@ public class KnowledgeMoveService {
             ChunkRepository chunkRepo,
             KnowledgeTagRepository tagRepository,
             TenantStorageService tenantStorage,
-            ModelRuntimeFactory modelRuntimeFactory,
+            ModelRuntimeAssembler modelRuntimeAssembler,
             KnowledgeProcessingQueue worker,
             KnowledgeTaskProgressStore progressStore,
             KnowledgeVectorWrites vectorWrites,
@@ -69,7 +69,7 @@ public class KnowledgeMoveService {
         this.chunkRepo = chunkRepo;
         this.tagRepository = tagRepository;
         this.tenantStorage = tenantStorage;
-        this.modelRuntimeFactory = modelRuntimeFactory;
+        this.modelRuntimeAssembler = modelRuntimeAssembler;
         this.worker = worker;
         this.progressStore = progressStore;
         this.vectorWrites = vectorWrites;
@@ -270,7 +270,7 @@ public class KnowledgeMoveService {
             if (vectorWrites.boundEngine(kb, TenantContext.currentTenantId()) instanceof
                     CompositeRetrieveEngine engine) {
                 Embedder emb =
-                        modelRuntimeFactory.getEmbeddingModel(embeddingModelId);
+                        modelRuntimeAssembler.getEmbeddingModel(embeddingModelId);
                 engine.deleteByKnowledgeIdList(List.of(row.getId()), emb.getDimensions(),
                         row.getType());
                 return;
@@ -312,7 +312,7 @@ public class KnowledgeMoveService {
             if (vectorWrites.boundEngine(sourceKb, TenantContext.currentTenantId()) instanceof
                     CompositeRetrieveEngine engine) {
                 Embedder emb =
-                        modelRuntimeFactory.getEmbeddingModel(row.getEmbeddingModelId());
+                        modelRuntimeAssembler.getEmbeddingModel(row.getEmbeddingModelId());
                 engine.moveKnowledgeIndices(sourceKbId, targetKbId, knowledgeId,
                         List.of(), emb.getDimensions(), sourceKb.getType());
                 return;

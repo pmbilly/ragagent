@@ -24,7 +24,7 @@ import com.ragagent.knowledge.repository.FaqChunkRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import com.ragagent.model.service.ModelRuntimeFactory;
+import com.ragagent.model.service.ModelRuntimeAssembler;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.common.error.AppError;
 import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
@@ -76,7 +76,7 @@ public class KnowledgeTagService {
     /** 绑定 store 的向量写路由（绑定 KB 的索引清理走引擎口）。 */
     private final KnowledgeVectorWrites vectorWrites;
     /** 引擎路径删除需要的维度解析（照 deleteKnowledgeVectors 的取数口径）。 */
-    private final ModelRuntimeFactory modelRuntimeFactory;
+    private final ModelRuntimeAssembler modelRuntimeAssembler;
     /**
  * 标签下文档的批量删除：直接依赖**真正的实现者**{@code KnowledgeBatchOpsService}。
  *
@@ -99,7 +99,7 @@ public class KnowledgeTagService {
                                AuditLogService auditService,
                                VectorStoreService vectorStore,
                                KnowledgeVectorWrites vectorWrites,
-                               ModelRuntimeFactory modelRuntimeFactory,
+                               ModelRuntimeAssembler modelRuntimeAssembler,
                                KnowledgeBatchOpsService batchOpsService) {
         this.faqChunkRepository = faqChunkRepository;
 
@@ -110,7 +110,7 @@ public class KnowledgeTagService {
         this.auditService = auditService;
         this.vectorStore = vectorStore;
         this.vectorWrites = vectorWrites;
-        this.modelRuntimeFactory = modelRuntimeFactory;
+        this.modelRuntimeAssembler = modelRuntimeAssembler;
         this.batchOpsService = batchOpsService;
     }
 
@@ -350,7 +350,7 @@ public class KnowledgeTagService {
         try {
             boundEngine = vectorWrites.boundEngine(kb, TenantContext.currentTenantId());
             if (boundEngine != null) {
-                dim = modelRuntimeFactory.getEmbeddingModel(kb.getEmbeddingModelId()).getDimensions();
+                dim = modelRuntimeAssembler.getEmbeddingModel(kb.getEmbeddingModelId()).getDimensions();
             }
         } catch (Exception e) {
             log.warn("[tag] bound engine resolve failed, external index rows not deleted (kb={}, chunks={}): {}",

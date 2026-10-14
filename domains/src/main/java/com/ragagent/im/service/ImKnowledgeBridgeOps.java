@@ -16,7 +16,7 @@ import com.ragagent.knowledge.service.DuplicateKnowledgeException;
 /**
  * IM 与知识库域的全部接面：命令面的 KB 清单/检索读取，以及附件异步入库。
  *
- * <p>自 {@link ImService} 原样外提（逐字搬迁，仅改依赖取用方式）。四件事共用
+ * <p>自 {@link ImTurnOrchestrator} 原样外提（逐字搬迁，仅改依赖取用方式）。四件事共用
  * 同一个依赖（{@code ObjectProvider<KnowledgeService>}，组件缺席时静默跳过），
  * 且都属「IM 怎么够到知识域」这一个关注点——与渠道生命周期、消息入口闸门无关。</p>
  *

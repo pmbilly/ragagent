@@ -24,7 +24,7 @@ import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
-import com.ragagent.model.service.ModelRuntimeFactory;
+import com.ragagent.model.service.ModelRuntimeAssembler;
 import com.ragagent.model.service.ModelService;
 import com.ragagent.common.wiki.WikiLanguageSupport;
 import com.ragagent.session.domain.message.Message;
@@ -66,7 +66,7 @@ public class SessionService {
     private final MessageSuggestionRepository suggestionRepository;
     private final KnowledgeService knowledgeService;
     private final ModelService modelService;
-    private final ModelRuntimeFactory modelRuntimeFactory;
+    private final ModelRuntimeAssembler modelRuntimeAssembler;
     private final ConversationProperties conversationProps;
     private final WebSearchTempKbStateService webSearchTempKbState;
 
@@ -75,7 +75,7 @@ public class SessionService {
                           MessageSuggestionRepository suggestionRepository,
                           KnowledgeService knowledgeService,
                           ModelService modelService,
-                          ModelRuntimeFactory modelRuntimeFactory,
+                          ModelRuntimeAssembler modelRuntimeAssembler,
                           ConversationProperties conversationProps,
                           WebSearchTempKbStateService webSearchTempKbState) {
         this.sessionRepository = sessionRepository;
@@ -83,7 +83,7 @@ public class SessionService {
         this.suggestionRepository = suggestionRepository;
         this.knowledgeService = knowledgeService;
         this.modelService = modelService;
-        this.modelRuntimeFactory = modelRuntimeFactory;
+        this.modelRuntimeAssembler = modelRuntimeAssembler;
         this.conversationProps = conversationProps;
         this.webSearchTempKbState = webSearchTempKbState;
     }
@@ -497,7 +497,7 @@ public class SessionService {
         LlmChatClient chatModel;
         try {
             // 模型工厂失败 → 500，文案取异常原文
-            chatModel = modelRuntimeFactory.getChatModel(modelId);
+            chatModel = modelRuntimeAssembler.getChatModel(modelId);
         } catch (BizException e) {
             throw e;
         } catch (RuntimeException e) {

@@ -12,7 +12,7 @@ import com.ragagent.model.domain.ModelParameters;
  * 剥离 baseUrl/extraConfig/customHeaders/appId（见 {@link #from}）。
  * {@code credentials} 为 null 表示不可见（内置模型对非系统管理员）。</p>
  */
-public record ModelResponse(
+public record ModelDetailResponse(
         String id,
         long tenantId,
         String name,
@@ -32,7 +32,7 @@ public record ModelResponse(
      * @param canViewIntegrationSecrets Admin+ 可见完整参数
      * @param canManageBuiltin 系统管理员可管内置模型
      */
-    public static ModelResponse from(Model m,
+    public static ModelDetailResponse from(Model m,
                                      boolean canViewIntegrationSecrets,
                                      boolean canManageBuiltin) {
         ModelParameters p = m.getParameters();
@@ -64,7 +64,7 @@ public record ModelResponse(
             creds.put("apiKey", new ModelCredentialFieldMetadata(!p.getApiKey().isEmpty()));
             creds.put("appSecret", new ModelCredentialFieldMetadata(!p.getAppSecret().isEmpty()));
         }
-        return new ModelResponse(
+        return new ModelDetailResponse(
                 m.getId(), m.getTenantId() == null ? 0 : m.getTenantId(),
                 m.getName(), m.getDisplayName(), m.getType(), m.getSource(), m.getDescription(),
                 params, m.isIsDefault(), m.isIsBuiltin(), m.getStatus(),

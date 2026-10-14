@@ -31,7 +31,7 @@ import com.ragagent.retrieval.graph.RetrieveGraphRepository;
 import com.ragagent.common.context.TracingContext;
 import com.ragagent.embedding.Embedder;
 import com.ragagent.knowledge.domain.KnowledgeBaseChunkingConfig;
-import com.ragagent.model.service.ModelRuntimeFactory;
+import com.ragagent.model.service.ModelRuntimeAssembler;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.tracing.langfuse.LangfuseTaskScope;
 
@@ -100,7 +100,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
     private final KnowledgeVectorWrites vectorWrites;
     /** K10b 收敛：索引执行的唯一实现（worker 不再自建分批/IndexRow/IndexInfo）。 */
     private final ChunkVectorIndexer chunkVectorIndexer;
-    private final ModelRuntimeFactory modelRuntimeFactory;
+    private final ModelRuntimeAssembler modelRuntimeAssembler;
     private final ApplicationEventPublisher eventPublisher;
     private final SpanTracker spanTracker;
     /** 图库仓储：重处理前清旧图谱。 */
@@ -127,7 +127,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
                                   ModelService modelService,
                                   KnowledgeVectorWrites vectorWrites,
                                   ChunkVectorIndexer chunkVectorIndexer,
-                                  ModelRuntimeFactory modelRuntimeFactory,
+                                  ModelRuntimeAssembler modelRuntimeAssembler,
                                   ApplicationEventPublisher eventPublisher,
                                   SpanTracker spanTracker,
                                   RetrieveGraphRepository graphRepository,
@@ -149,7 +149,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
         this.modelService = modelService;
         this.vectorWrites = vectorWrites;
         this.chunkVectorIndexer = chunkVectorIndexer;
-        this.modelRuntimeFactory = modelRuntimeFactory;
+        this.modelRuntimeAssembler = modelRuntimeAssembler;
         this.eventPublisher = eventPublisher;
         this.spanTracker = spanTracker;
         this.graphRepository = graphRepository;
@@ -464,7 +464,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
         if (boundEngine != null) {
             try {
                 Embedder emb =
-                        modelRuntimeFactory.getEmbeddingModel(kb.getEmbeddingModelId());
+                        modelRuntimeAssembler.getEmbeddingModel(kb.getEmbeddingModelId());
                 boundEngine.deleteByKnowledgeIdList(List.of(knowledgeId),
                         emb.getDimensions(), kb.getType());
             } catch (RuntimeException e) {

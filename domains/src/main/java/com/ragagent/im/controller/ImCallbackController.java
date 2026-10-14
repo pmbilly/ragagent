@@ -15,7 +15,7 @@ import com.ragagent.im.runtime.AdapterInterfaces.Adapter;
 import com.ragagent.im.runtime.CallbackExchange;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.service.ImChannelService;
-import com.ragagent.im.service.ImService;
+import com.ragagent.im.service.ImTurnOrchestrator;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -48,11 +48,11 @@ public class ImCallbackController {
     private static final Logger log = LoggerFactory.getLogger(ImCallbackController.class);
 
     private final ImChannelService imChannelService;
-    private final ImService imService;
+    private final ImTurnOrchestrator imTurnOrchestrator;
 
-    public ImCallbackController(ImChannelService imChannelService, ImService imService) {
+    public ImCallbackController(ImChannelService imChannelService, ImTurnOrchestrator imTurnOrchestrator) {
         this.imChannelService = imChannelService;
-        this.imService = imService;
+        this.imTurnOrchestrator = imTurnOrchestrator;
     }
 
     @GetMapping("/api/v1/im/callback/{channelId}")
@@ -89,7 +89,7 @@ public class ImCallbackController {
         }
 
         // 平台工厂/运行态适配器解析；未注册 = adapter not active。
-        Adapter adapter = imService.adapterFor(channel);
+        Adapter adapter = imTurnOrchestrator.adapterFor(channel);
         if (adapter == null) {
             log.info("[IM] Callback received platform={} path_channel_id={} — adapter not active",
                     channel.getPlatform(), channelId);
@@ -140,7 +140,7 @@ public class ImCallbackController {
         writeAck(response, channel.getPlatform());
         Thread.startVirtualThread(() -> {
             try {
-                imService.handleMessage(msg, channelId);
+                imTurnOrchestrator.handleMessage(msg, channelId);
             } catch (Exception e) {
                 log.error("[IM] Handle message error for channel {}: {}", channelId, e.getMessage(), e);
             }

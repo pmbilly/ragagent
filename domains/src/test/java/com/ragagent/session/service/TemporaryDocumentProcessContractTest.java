@@ -26,7 +26,7 @@ import com.ragagent.common.context.TenantContext;
 import com.ragagent.knowledge.client.DocReaderClient;
 import com.ragagent.model.domain.Model;
 import com.ragagent.model.domain.ModelParameters;
-import com.ragagent.model.service.ModelRuntimeFactory;
+import com.ragagent.model.service.ModelRuntimeAssembler;
 import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.repository.TemporaryDocumentRepository;
 
@@ -43,7 +43,7 @@ class TemporaryDocumentProcessContractTest {
     private TemporaryDocumentRepository repo;
     private AttachmentFileStore fileStore;
     private DocReaderClient docReader;
-    private ModelRuntimeFactory modelRuntimeFactory;
+    private ModelRuntimeAssembler modelRuntimeAssembler;
     private AsrTranscriber asrTranscriber;
     private TenantService tenantService;
     private TemporaryDocumentService service;
@@ -53,11 +53,11 @@ class TemporaryDocumentProcessContractTest {
         repo = mock(TemporaryDocumentRepository.class);
         fileStore = mock(AttachmentFileStore.class);
         docReader = mock(DocReaderClient.class);
-        modelRuntimeFactory = mock(ModelRuntimeFactory.class);
+        modelRuntimeAssembler = mock(ModelRuntimeAssembler.class);
         asrTranscriber = mock(AsrTranscriber.class);
         tenantService = mock(TenantService.class);
         service = new TemporaryDocumentService(repo, fileStore, docReader,
-                modelRuntimeFactory, asrTranscriber, tenantService);
+                modelRuntimeAssembler, asrTranscriber, tenantService);
         TenantContext.set(TENANT, null, null, false, "u-1", false);
     }
 
@@ -106,7 +106,7 @@ class TemporaryDocumentProcessContractTest {
         when(repo.getById(TENANT, "d-1")).thenReturn(document("voice.mp3", ".mp3",
                 "{\"asrModelId\":\"asr-1\",\"resourceTenantId\":42}"));
         when(fileStore.getFile("local://1/exports/d-1")).thenReturn(new byte[] {1, 2, 3});
-        when(modelRuntimeFactory.getAsrModel("asr-1")).thenReturn(asrModel());
+        when(modelRuntimeAssembler.getAsrModel("asr-1")).thenReturn(asrModel());
         when(asrTranscriber.transcribe(any(), any(), any()))
                 .thenReturn(new AsrTranscriber.TranscriptionResult("转写文本", null));
 

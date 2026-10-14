@@ -4,7 +4,7 @@ import com.ragagent.agent.AgentEngine;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.limiter.Release;
 import com.ragagent.model.domain.Model;
-import com.ragagent.model.service.ModelRuntimeFactory;
+import com.ragagent.model.service.ModelRuntimeAssembler;
 import com.ragagent.retrieval.vlm.VlmClient;
 import com.ragagent.retrieval.vlm.VlmHttpTransport;
 import com.ragagent.tracing.decorators.LangfuseVlm;
@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class VlmDescriberWiring {
 
-    private final ModelRuntimeFactory runtimeFactory;
+    private final ModelRuntimeAssembler runtimeFactory;
     private final ConcurrencyGovernor concurrencyGovernor;
     private final VlmClient.Transport transport;
 
@@ -35,13 +35,13 @@ public class VlmDescriberWiring {
      * 显式 {@code @Autowired}——类里还有一个测试用的包内构造，不标注时 Spring 挑错构造。
      */
     @org.springframework.beans.factory.annotation.Autowired
-    public VlmDescriberWiring(ModelRuntimeFactory runtimeFactory,
+    public VlmDescriberWiring(ModelRuntimeAssembler runtimeFactory,
             ConcurrencyGovernor concurrencyGovernor) {
         this(runtimeFactory, concurrencyGovernor, new VlmHttpTransport());
     }
 
     /** 测试接缝：出站通道注入（生产缺省 {@link VlmHttpTransport}）。 */
-    VlmDescriberWiring(ModelRuntimeFactory runtimeFactory, ConcurrencyGovernor concurrencyGovernor,
+    VlmDescriberWiring(ModelRuntimeAssembler runtimeFactory, ConcurrencyGovernor concurrencyGovernor,
             VlmClient.Transport transport) {
         this.runtimeFactory = runtimeFactory;
         this.concurrencyGovernor = concurrencyGovernor;

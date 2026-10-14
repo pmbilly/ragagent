@@ -23,7 +23,7 @@ import com.ragagent.knowledge.chunker.Tokens;
 import com.ragagent.knowledge.client.DocReaderClient;
 import com.ragagent.knowledge.support.ParserEngineRules;
 import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
-import com.ragagent.model.service.ModelRuntimeFactory;
+import com.ragagent.model.service.ModelRuntimeAssembler;
 import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.repository.TemporaryDocumentRepository;
 import com.ragagent.session.service.TemporaryDocumentService.CreateOptions;
@@ -54,20 +54,20 @@ final class TemporaryDocumentProcessor {
     private final TemporaryDocumentRepository repo;
     private final AttachmentFileStore fileStore;
     private final DocReaderClient docReader;
-    private final ModelRuntimeFactory modelRuntimeFactory;
+    private final ModelRuntimeAssembler modelRuntimeAssembler;
     private final AsrTranscriber asrTranscriber;
     private final TenantService tenantService;
 
     TemporaryDocumentProcessor(TemporaryDocumentRepository repo,
                                AttachmentFileStore fileStore,
                                DocReaderClient docReader,
-                               ModelRuntimeFactory modelRuntimeFactory,
+                               ModelRuntimeAssembler modelRuntimeAssembler,
                                AsrTranscriber asrTranscriber,
                                TenantService tenantService) {
         this.repo = repo;
         this.fileStore = fileStore;
         this.docReader = docReader;
-        this.modelRuntimeFactory = modelRuntimeFactory;
+        this.modelRuntimeAssembler = modelRuntimeAssembler;
         this.asrTranscriber = asrTranscriber;
         this.tenantService = tenantService;
     }
@@ -219,7 +219,7 @@ final class TemporaryDocumentProcessor {
         return withResourceTenant(resourceTenantId, () -> {
             Model model;
             try {
-                model = modelRuntimeFactory.getAsrModel(asrModelId);
+                model = modelRuntimeAssembler.getAsrModel(asrModelId);
             } catch (RuntimeException e) {
                 throw new RuntimeException("load ASR model: " + e.getMessage(), e);
             }

@@ -19,7 +19,7 @@ import com.ragagent.agentmanagement.service.builtin.BuiltinAgentRegistry;
 /**
  * IM 渠道 service（CRUD + 渠道行钩子：兜底、session_mode 校验、bot_identity 计算）。
  *
- * <p><b>运行时同步</b>：写操作成功后调 {@code ImService.onChannelChanged}——
+ * <p><b>运行时同步</b>：写操作成功后调 {@code ImTurnOrchestrator.onChannelChanged}——
  * 本实例按库重建运行时（删除/禁用停连接；启用的 WS 长连接重建）+ 跨实例广播
  * （Redis 未接入时后者为空操作）。用 {@link ObjectProvider} 延迟取，
  * 避免 service 层与运行时层的启动顺序耦合。</p>
@@ -40,16 +40,16 @@ public class ImChannelService {
     private final ImChannelMapper mapper;
     private final CustomAgentMapper agentMapper;
     private final BuiltinAgentRegistry registry;
-    private final ObjectProvider<ImService> imService;
+    private final ObjectProvider<ImTurnOrchestrator> imTurnOrchestrator;
 
     public ImChannelService(ImChannelMapper mapper,
                             CustomAgentMapper agentMapper,
                             BuiltinAgentRegistry registry,
-                            ObjectProvider<ImService> imService) {
+                            ObjectProvider<ImTurnOrchestrator> imTurnOrchestrator) {
         this.mapper = mapper;
         this.agentMapper = agentMapper;
         this.registry = registry;
-        this.imService = imService;
+        this.imTurnOrchestrator = imTurnOrchestrator;
     }
 
     // ═══════════════════ 钩子 ═══════════════════
@@ -286,9 +286,9 @@ public class ImChannelService {
         return ch;
     }
 
-    /** 通知运行时（本实例重建 + 广播）；ImService 缺席时跳过（不影响 HTTP 响应）。 */
+    /** 通知运行时（本实例重建 + 广播）；ImTurnOrchestrator 缺席时跳过（不影响 HTTP 响应）。 */
     private void notifyRuntime(String channelId) {
-        ImService runtime = imService.getIfAvailable();
+        ImTurnOrchestrator runtime = imTurnOrchestrator.getIfAvailable();
         if (runtime != null && channelId != null && !channelId.isEmpty()) {
             runtime.onChannelChanged(channelId);
         }
@@ -320,7 +320,7 @@ public class ImChannelService {
 
     /**
      * 确定性前缀：渠道行缺失（404）→ disabled（503）。适配器工厂 +
-     * 平台验签/解析由 {@code ImService.adapterFor} 在控制器层判定。
+     * 平台验签/解析由 {@code ImTurnOrchestrator.adapterFor} 在控制器层判定。
      *
      * @return 渠道行（仅 enabled 且 404/503 检查已过的调用点使用）
      */
@@ -333,7 +333,7 @@ public class ImChannelService {
         if (!fresh.isEnabled()) {
             throw new CallbackChannelDisabledException();
         }
-        // 适配器可用性由 ImService.adapterFor 判定（工厂注册 + 运行态）；
+        // 适配器可用性由 ImTurnOrchestrator.adapterFor 判定（工厂注册 + 运行态）；
         // 未注册平台的渠道由控制器回 503 "channel not available"。
         return fresh;
     }

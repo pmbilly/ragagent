@@ -19,9 +19,9 @@ final class ImSessionResolver {
 
     private static final Logger log = LoggerFactory.getLogger(ImSessionResolver.class);
 
-    private final ImService service;
+    private final ImTurnOrchestrator service;
 
-    ImSessionResolver(ImService service) {
+    ImSessionResolver(ImTurnOrchestrator service) {
         this.service = service;
     }
 

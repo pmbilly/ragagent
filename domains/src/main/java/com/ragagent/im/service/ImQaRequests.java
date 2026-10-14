@@ -7,7 +7,7 @@ import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.agentmanagement.service.config.AgentConfigJson;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.ImFormat;
-import com.ragagent.im.service.ImService.InflightEntry;
+import com.ragagent.im.service.ImTurnOrchestrator.InflightEntry;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.service.QaSupport;
@@ -19,9 +19,9 @@ import com.ragagent.session.domain.message.MessageAttachment;
  */
 final class ImQaRequests {
 
-    private final ImService service;
+    private final ImTurnOrchestrator service;
 
-    ImQaRequests(ImService service) {
+    ImQaRequests(ImTurnOrchestrator service) {
         this.service = service;
     }
 
@@ -32,7 +32,7 @@ final class ImQaRequests {
             return false;
         }
         try {
-            JsonNode cfg = ImService.JSON.readTree(agent.getConfig());
+            JsonNode cfg = ImTurnOrchestrator.JSON.readTree(agent.getConfig());
             return "smart-reasoning".equals(cfg.path("agentMode").asText(""));
         } catch (Exception e) {
             return false;
@@ -52,7 +52,7 @@ final class ImQaRequests {
         if (agent != null && agent.getConfig() != null && !agent.getConfig().isEmpty()) {
             try {
                 req.agentConfig = (com.fasterxml.jackson.databind.node.ObjectNode)
-                        ImService.JSON.readTree(agent.getConfig());
+                        ImTurnOrchestrator.JSON.readTree(agent.getConfig());
                 AgentConfigJson.ensureDefaults(req.agentConfig);
             } catch (Exception ignored) {
                 req.agentConfig = null;

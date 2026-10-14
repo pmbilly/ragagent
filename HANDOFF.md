@@ -1174,6 +1174,12 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **登记**：`apikey.dto`(2) 的 `TenantAPIKeyCreateResponse`/`TenantAPIKeyResponse` 全仓**不存在** ⇒ 属**待创建**（重构级，登记）。
 - **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 ✓；`spotlessCheck build` ✓ ✓ **十二守卫** ✓（环 0 / 包级 SCC 12 组）；`:domains:javadoc` ✓；定向 `--rerun-tasks` ✓。
 
+**🔶 B266 第④步（2026-10-14，命名对齐：model 两类 + im 一类）**
+- **改名**：`model.dto.ModelResponse` → **`ModelDetailResponse`**（§8.8.4 目标名）；`model.service.ModelRuntimeFactory` → **`ModelRuntimeAssembler`**；`im.service.ImService` → **`ImTurnOrchestrator`**（§8.9 目标名，去掉"ServiceService"式的泛名）。
+- **连带**：`git mv` 3 文件 + **全仓 token 替换 68 文件**——同时改**小写标识符**（`modelRuntimeFactory` → `modelRuntimeAssembler` 92 处、`imService` → `imTurnOrchestrator` 25 处）保持"类型名/变量名"一致（本仓统一派取向）；`json-key-freeze` 键 `im/service/ImService.java` 换锚（**该基线第三次咬人**）。
+- **风险预检（做在前面）**：Strings/Bean 名（`@Qualifier`/`getBean`/配置键）全仓零命中 ✓ ⇒ 改名不动装配。
+- **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 ✓；`spotlessCheck build` ✓ **十二守卫** ✓（环 0 / 包级 SCC 12 组）；`:domains:javadoc` ✓；定向 `--rerun-tasks` ✓。
+
 **🔶 B263 第㉟步（2026-10-14，第二个子面 `service.chunk` 切出）**
 - **动前断言（把"可测"变成"可证"）**：脚本**先断言** `ChunkEditService`/`ChunkExtractService`/`ChunkReadService` 三者在 `service` 包内**入度为零**（无人引用，`package-info` 除外），断言不过就 abort —— 这样"切出只产生单向外边"不再靠推理。`ChunkQuestionService` **故意留在** `service`：它被 `QuestionGenerationService` 引用，单独搬会造出 `service ⇄ service.chunk` 环（已在子面 package-info 写明）。
 - **切出**：3 类 → `com.ragagent.knowledge.service.chunk`（`git mv` + 包声明 + 全仓 FQN 替换 3 文件）；测试面 `ChunkExtractServiceTest` 随迁；新建 `service/chunk/package-info`；`service/package-info` 同步。

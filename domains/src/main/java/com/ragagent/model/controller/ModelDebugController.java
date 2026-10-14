@@ -32,7 +32,7 @@ import com.ragagent.model.domain.ModelParameters;
 import com.ragagent.model.dto.ModelDebugAsrResponse;
 import com.ragagent.model.dto.ModelDebugChatResponse;
 import com.ragagent.model.dto.ModelDebugResult;
-import com.ragagent.model.service.ModelRuntimeFactory;
+import com.ragagent.model.service.ModelRuntimeAssembler;
 import com.ragagent.model.service.ModelService;
 import com.ragagent.model.service.ModelService.ModelNotFoundException;
 import com.ragagent.rerank.RankResult;
@@ -76,11 +76,11 @@ public class ModelDebugController {
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private final ModelService modelService;
-    private final ModelRuntimeFactory runtimeFactory;
+    private final ModelRuntimeAssembler runtimeFactory;
     private final AsrTranscriber asrTranscriber;
     private final VlmClient.Transport vlmTransport = new VlmHttpTransport();
 
-    public ModelDebugController(ModelService modelService, ModelRuntimeFactory runtimeFactory,
+    public ModelDebugController(ModelService modelService, ModelRuntimeAssembler runtimeFactory,
                                 AsrTranscriber asrTranscriber) {
         this.modelService = modelService;
         this.runtimeFactory = runtimeFactory;

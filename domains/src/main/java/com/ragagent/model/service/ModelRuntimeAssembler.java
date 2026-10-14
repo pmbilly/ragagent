@@ -41,9 +41,9 @@ import com.ragagent.tracing.decorators.LangfuseReranker;
  * （BizException 的 getMessage 带 "error code: ..." 前缀，不能直接当对外文案用）。</p>
  */
 @Component
-public class ModelRuntimeFactory {
+public class ModelRuntimeAssembler {
 
-    private static final Logger log = LoggerFactory.getLogger(ModelRuntimeFactory.class);
+    private static final Logger log = LoggerFactory.getLogger(ModelRuntimeAssembler.class);
 
     private final ModelService modelService;
     private final CryptoService cryptoService;
@@ -51,7 +51,7 @@ public class ModelRuntimeFactory {
     private final ConcurrencyGovernor concurrencyGovernor;
     private final SsrfGuard ssrfGuard;
 
-    public ModelRuntimeFactory(ModelService modelService,
+    public ModelRuntimeAssembler(ModelService modelService,
                                CryptoService cryptoService, ObjectProvider<OllamaService> ollamaService,
                                ConcurrencyGovernor concurrencyGovernor, SsrfGuard ssrfGuard) {
         this.modelService = modelService;

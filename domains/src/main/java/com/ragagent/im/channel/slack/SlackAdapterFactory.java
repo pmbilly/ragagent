@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.runtime.ImCredentials;
 import com.ragagent.im.runtime.IncomingMessage;
-import com.ragagent.im.service.ImService;
+import com.ragagent.im.service.ImTurnOrchestrator;
 
 /**
  * Slack 渠道工厂。
@@ -18,10 +18,10 @@ import com.ragagent.im.service.ImService;
  * {@code app_token}（socket mode 握手）。模式缺省 {@code websocket}。</p>
  */
 @Component
-public class SlackAdapterFactory implements ImService.AdapterFactory {
+public class SlackAdapterFactory implements ImTurnOrchestrator.AdapterFactory {
 
     @Override
-    public ImService.AdapterRegistration create(ImChannelEntity channel,
+    public ImTurnOrchestrator.AdapterRegistration create(ImChannelEntity channel,
             BiConsumer<IncomingMessage, String> msgHandler) {
         byte[] raw = channel.getCredentials() == null
                 ? new byte[0] : channel.getCredentials().getBytes(StandardCharsets.UTF_8);
@@ -31,7 +31,7 @@ public class SlackAdapterFactory implements ImService.AdapterFactory {
 
         switch (mode) {
             case "webhook":
-                return new ImService.AdapterRegistration(
+                return new ImTurnOrchestrator.AdapterRegistration(
                         new SlackAdapter(botToken, ImCredentials.getString(creds, "signing_secret")),
                         null);
             case "websocket": {
@@ -42,7 +42,7 @@ public class SlackAdapterFactory implements ImService.AdapterFactory {
                 thread.start();
                 // Socket Mode 的入站走 WS，出站仍是 REST（同 webhook 的 api 面）——
                 // 但验签只对 HTTP 回调有意义，故传空 secret。
-                return new ImService.AdapterRegistration(new SlackAdapter(botToken, ""),
+                return new ImTurnOrchestrator.AdapterRegistration(new SlackAdapter(botToken, ""),
                         client::stop);
             }
             default:

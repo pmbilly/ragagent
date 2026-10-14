@@ -28,7 +28,7 @@ import com.ragagent.common.model.ModelFacts;
 import com.ragagent.common.model.ModelGateway;
 
 /**
- * 模型配置服务（配置 CRUD + credentials 子资源 + 删除守卫；运行时工厂见 ModelRuntimeFactory）。
+ * 模型配置服务（配置 CRUD + credentials 子资源 + 删除守卫；运行时工厂见 ModelRuntimeAssembler）。
  *
  * 语义要点（golden 已锁定）：
  * - CreateModel：source=remote → active；其他 → downloading（本地 ollama 拉取不轮转，

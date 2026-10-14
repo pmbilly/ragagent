@@ -11,7 +11,7 @@ import com.ragagent.common.security.SsrfGuard;
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.runtime.ImCredentials;
 import com.ragagent.im.runtime.IncomingMessage;
-import com.ragagent.im.service.ImService;
+import com.ragagent.im.service.ImTurnOrchestrator;
 
 /**
  * QQ 机器人渠道工厂。
@@ -21,7 +21,7 @@ import com.ragagent.im.service.ImService;
  * {@code gateway_url}，其中后两者经 {@link QqBotClient} 的 SSRF 白名单校验。</p>
  */
 @Component
-public class QqBotAdapterFactory implements ImService.AdapterFactory {
+public class QqBotAdapterFactory implements ImTurnOrchestrator.AdapterFactory {
 
     private final SsrfGuard ssrfGuard;
 
@@ -41,7 +41,7 @@ public class QqBotAdapterFactory implements ImService.AdapterFactory {
     }
 
     @Override
-    public ImService.AdapterRegistration create(ImChannelEntity channel,
+    public ImTurnOrchestrator.AdapterRegistration create(ImChannelEntity channel,
             BiConsumer<IncomingMessage, String> msgHandler) {
         byte[] raw = channel.getCredentials() == null
                 ? new byte[0] : channel.getCredentials().getBytes(StandardCharsets.UTF_8);
@@ -64,6 +64,6 @@ public class QqBotAdapterFactory implements ImService.AdapterFactory {
         Thread thread = new Thread(gateway::start, "im-qqbot-ws-" + channel.getId());
         thread.setDaemon(true);
         thread.start();
-        return new ImService.AdapterRegistration(new QqBotAdapter(client), gateway::stop);
+        return new ImTurnOrchestrator.AdapterRegistration(new QqBotAdapter(client), gateway::stop);
     }
 }

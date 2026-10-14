@@ -15,7 +15,7 @@ import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.model.domain.Model;
 import com.ragagent.model.mapper.ModelMapper;
-import com.ragagent.model.service.ModelRuntimeFactory;
+import com.ragagent.model.service.ModelRuntimeAssembler;
 import org.springframework.stereotype.Component;
 import com.ragagent.tenant.Tenant;
 import com.ragagent.embedding.Embedder;
@@ -48,7 +48,7 @@ public class FaqIndexWriter {
     private final KnowledgeVectorWrites vectorWrites;
     private final VectorStoreService vectorStore;
     private final EmbedderClient embedder;
-    private final ModelRuntimeFactory modelRuntimeFactory;
+    private final ModelRuntimeAssembler modelRuntimeAssembler;
     /** 批量向量化批大小（属性绑定）。 */
     private final BatchEmbedProperties batchEmbedProperties;
 
@@ -59,7 +59,7 @@ public class FaqIndexWriter {
                           KnowledgeVectorWrites vectorWrites,
                           VectorStoreService vectorStore,
                           EmbedderClient embedder,
-                          ModelRuntimeFactory modelRuntimeFactory,
+                          ModelRuntimeAssembler modelRuntimeAssembler,
                           BatchEmbedProperties batchEmbedProperties) {
         this.knowledgeRepository = knowledgeRepository;
         this.modelMapper = modelMapper;
@@ -68,7 +68,7 @@ public class FaqIndexWriter {
         this.vectorWrites = vectorWrites;
         this.vectorStore = vectorStore;
         this.embedder = embedder;
-        this.modelRuntimeFactory = modelRuntimeFactory;
+        this.modelRuntimeAssembler = modelRuntimeAssembler;
         this.batchEmbedProperties = batchEmbedProperties;
     }
 
@@ -170,7 +170,7 @@ public class FaqIndexWriter {
         if (boundEngine != null) {
             try {
                 Embedder emb =
-                        modelRuntimeFactory.getEmbeddingModel(embeddingModel.getId());
+                        modelRuntimeAssembler.getEmbeddingModel(embeddingModel.getId());
                 boundEngine.deleteByChunkIdList(chunkIds, emb.getDimensions(), kb.getType());
                 boundEngine.batchIndex(emb, faqIndexInfos(kb, rows));
             } catch (RuntimeException e) {
@@ -239,7 +239,7 @@ public class FaqIndexWriter {
         if (boundEngine != null) {
             try {
                 Embedder emb =
-                        modelRuntimeFactory.getEmbeddingModel(embeddingModel.getId());
+                        modelRuntimeAssembler.getEmbeddingModel(embeddingModel.getId());
                 boundEngine.deleteByChunkIdList(chunkIds, emb.getDimensions(), kb.getType());
             } catch (RuntimeException e) {
                 throw e;

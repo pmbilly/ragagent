@@ -32,7 +32,7 @@ import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
-import com.ragagent.model.service.ModelRuntimeFactory;
+import com.ragagent.model.service.ModelRuntimeAssembler;
 import com.ragagent.common.wiki.WikiLanguageSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +62,7 @@ public class ChunkQuestionService implements ChunkQuestionPort {
     private final ChunkRepository chunkRepository;
     private final KnowledgeBaseRepository kbRepository;
     private final ChunkVectorIndexer chunkVectorIndexer;
-    private final ModelRuntimeFactory modelRuntimeFactory;
+    private final ModelRuntimeAssembler modelRuntimeAssembler;
     private final RetrieveEngineRegistry retrieveEngineRegistry;
     private final TenantStoreOwnership storeOwnership;
     private final TenantConfigLookup tenantConfigLookup;
@@ -74,7 +74,7 @@ public class ChunkQuestionService implements ChunkQuestionPort {
     public ChunkQuestionService(ChunkRepository chunkRepository,
                                 KnowledgeBaseRepository kbRepository,
                                 ChunkVectorIndexer chunkVectorIndexer,
-                                ModelRuntimeFactory modelRuntimeFactory,
+                                ModelRuntimeAssembler modelRuntimeAssembler,
                                 RetrieveEngineRegistry retrieveEngineRegistry,
                                 TenantStoreOwnership storeOwnership,
                                 TenantConfigLookup tenantConfigLookup,
@@ -84,7 +84,7 @@ public class ChunkQuestionService implements ChunkQuestionPort {
         this.chunkRepository = chunkRepository;
         this.kbRepository = kbRepository;
         this.chunkVectorIndexer = chunkVectorIndexer;
-        this.modelRuntimeFactory = modelRuntimeFactory;
+        this.modelRuntimeAssembler = modelRuntimeAssembler;
         this.retrieveEngineRegistry = retrieveEngineRegistry;
         this.storeOwnership = storeOwnership;
         this.tenantConfigLookup = tenantConfigLookup;
@@ -242,10 +242,10 @@ public class ChunkQuestionService implements ChunkQuestionPort {
             throw BizException.badRequest("failed to create retrieve engine: " + e.getMessage());
         }
         //     "model ID cannot be empty" / "model not found"，经
-        //     ModelRuntimeFactory.getEmbeddingModel 的 RuntimeException 原文冒出）
+        //     ModelRuntimeAssembler.getEmbeddingModel 的 RuntimeException 原文冒出）
         Embedder embeddingModel;
         try {
-            embeddingModel = modelRuntimeFactory.getEmbeddingModel(
+            embeddingModel = modelRuntimeAssembler.getEmbeddingModel(
                     kb.getEmbeddingModelId() == null ? "" : kb.getEmbeddingModelId());
         } catch (RuntimeException e) {
             throw BizException.badRequest("failed to get embedding model: " + e.getMessage());
@@ -315,7 +315,7 @@ public class ChunkQuestionService implements ChunkQuestionPort {
         // 的 handler 里统一包 400 err.Error()——"model not found" 等原文）
         LlmChatClient chatModel;
         try {
-            chatModel = modelRuntimeFactory.getChatModel(kb.getSummaryModelId());
+            chatModel = modelRuntimeAssembler.getChatModel(kb.getSummaryModelId());
         } catch (RuntimeException e) {
             throw BizException.badRequest(e.getMessage() == null ? "model not found" : e.getMessage());
         }
@@ -370,7 +370,7 @@ public class ChunkQuestionService implements ChunkQuestionPort {
         int generationRevision = chunk.getContentRevision();
         LlmChatClient chatModel;
         try {
-            chatModel = modelRuntimeFactory.getChatModel(kb.getSummaryModelId());
+            chatModel = modelRuntimeAssembler.getChatModel(kb.getSummaryModelId());
         } catch (RuntimeException e) {
             throw new IllegalStateException(
                     e.getMessage() == null ? "model not found" : e.getMessage(), e);

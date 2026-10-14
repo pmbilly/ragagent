@@ -14,7 +14,7 @@ import com.ragagent.model.domain.Model;
 import com.ragagent.model.domain.ModelParameters;
 import com.ragagent.model.dto.CreateModelRequest;
 import com.ragagent.model.dto.ModelProviderDTO;
-import com.ragagent.model.dto.ModelResponse;
+import com.ragagent.model.dto.ModelDetailResponse;
 import com.ragagent.model.dto.UpdateModelRequest;
 import com.ragagent.model.service.ModelService;
 import com.ragagent.model.service.ModelService.ModelNotFoundException;
@@ -41,7 +41,7 @@ import com.ragagent.common.web.ApiResponse;
  * 模型配置端点（CRUD + providers；写操作 = Admin+，读 = Viewer+）。
  *
  * <p>请求体为标准 DTO（字段名即 JSON 键名，camelCase）；响应直接返回
- * {@link ModelResponse} 或列表（无信封）；删除为 HTTP 204 无响应体。
+ * {@link ModelDetailResponse} 或列表（无信封）；删除为 HTTP 204 无响应体。
  * 校验失败/空体/未找到/SSRF 拒绝统一走 AppError 信封。</p>
  */
 @RestController
@@ -64,7 +64,7 @@ public class ModelController {
 
     /** 创建模型（Admin+）。 */
     @PostMapping
-    public ResponseEntity<ModelResponse> createModel(
+    public ResponseEntity<ModelDetailResponse> createModel(
             @Valid @RejectEmptyBody @NonNullBody @RequestBody(required = false) CreateModelRequest req) {
         log.info("Start creating model");
         Long tenantId = TenantContext.currentTenantId();
@@ -94,12 +94,12 @@ public class ModelController {
         model = modelService.createModel(model);
         log.info("Model created successfully, ID: {}, Name: {}", model.getId(), model.getName());
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ModelResponse.from(model, canViewIntegrationSecrets(), canManageBuiltin(model)));
+                .body(ModelDetailResponse.from(model, canViewIntegrationSecrets(), canManageBuiltin(model)));
     }
 
     /** 读取模型（Viewer+）。 */
     @GetMapping("/{id}")
-    public ResponseEntity<ModelResponse> getModel(@PathVariable("id") String id) {
+    public ResponseEntity<ModelDetailResponse> getModel(@PathVariable("id") String id) {
         log.info("Start retrieving model");
         if (isBlank(id)) {
             throw new BizException(AppError.badRequest("Model ID cannot be empty"));
@@ -111,21 +111,21 @@ public class ModelController {
             log.warn("Model not found, ID: {}", id);
             throw new BizException(AppError.notFound("Model not found"));
         }
-        return ResponseEntity.ok(ModelResponse.from(model, canViewIntegrationSecrets(), canManageBuiltin(model)));
+        return ResponseEntity.ok(ModelDetailResponse.from(model, canViewIntegrationSecrets(), canManageBuiltin(model)));
     }
 
     /** 模型列表（Viewer+）。 */
     @GetMapping
-    public ResponseEntity<List<ModelResponse>> listModels() {
+    public ResponseEntity<List<ModelDetailResponse>> listModels() {
         log.info("Start retrieving model list");
         Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null || tenantId == 0) {
             throw new BizException(AppError.badRequest("Workspace ID cannot be empty"));
         }
         List<Model> models = modelService.listModels();
-        List<ModelResponse> data = new ArrayList<>(models.size());
+        List<ModelDetailResponse> data = new ArrayList<>(models.size());
         for (Model m : models) {
-            data.add(ModelResponse.from(m, canViewIntegrationSecrets(), canManageBuiltin(m)));
+            data.add(ModelDetailResponse.from(m, canViewIntegrationSecrets(), canManageBuiltin(m)));
         }
         return ResponseEntity.ok(data);
     }
@@ -135,7 +135,7 @@ public class ModelController {
      * 凭证快照保留 + 后端托管字段保留；type/source/description/parameters 无条件覆盖。
      */
     @PutMapping("/{id}")
-    public ResponseEntity<ModelResponse> updateModel(@PathVariable("id") String id,
+    public ResponseEntity<ModelDetailResponse> updateModel(@PathVariable("id") String id,
             @Valid @RejectEmptyBody @NonNullBody @RequestBody(required = false) UpdateModelRequest req) {
         log.info("Start updating model");
         if (isBlank(id)) {
@@ -198,7 +198,7 @@ public class ModelController {
 
         model = modelService.updateModel(model);
         log.info("Model updated successfully, ID: {}", id);
-        return ResponseEntity.ok(ModelResponse.from(model, canViewIntegrationSecrets(), canManageBuiltin(model)));
+        return ResponseEntity.ok(ModelDetailResponse.from(model, canViewIntegrationSecrets(), canManageBuiltin(model)));
     }
 
     /** 删除模型（Admin+）→ 204 无响应体。 */

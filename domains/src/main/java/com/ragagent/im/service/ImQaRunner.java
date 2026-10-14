@@ -19,10 +19,10 @@ import com.ragagent.session.service.QaSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ragagent.im.service.ImService.InflightEntry;
-import com.ragagent.im.service.ImService.QaAttach;
-import com.ragagent.im.service.ImService.QaOutcome;
-import com.ragagent.im.service.ImService.QaTask;
+import com.ragagent.im.service.ImTurnOrchestrator.InflightEntry;
+import com.ragagent.im.service.ImTurnOrchestrator.QaAttach;
+import com.ragagent.im.service.ImTurnOrchestrator.QaOutcome;
+import com.ragagent.im.service.ImTurnOrchestrator.QaTask;
 import com.ragagent.event.payload.AgentCompleteData;
 import com.ragagent.event.payload.AgentFinalAnswerData;
 import com.ragagent.event.payload.ErrorData;
@@ -35,9 +35,9 @@ final class ImQaRunner {
 
     private static final Logger log = LoggerFactory.getLogger(ImQaRunner.class);
 
-    private final ImService service;
+    private final ImTurnOrchestrator service;
 
-    ImQaRunner(ImService service) {
+    ImQaRunner(ImTurnOrchestrator service) {
         this.service = service;
     }
 

@@ -29,7 +29,7 @@ import com.ragagent.modelruntime.adapter.provider.chat.common.ConcurrencyChatCli
  * - debug 包装器：受 LLMDebugEnabled 环境变量控制，
  *   未启用时等价于直接返回原对象
  * - langfuse 包装器：chat/embedding/rerank 的 tracing 包装发生在
- *   ModelRuntimeFactory 装饰层
+ *   ModelRuntimeAssembler 装饰层
  *   （LangfuseChatClient/Embedder/Reranker.wrap），不再在本类包
  */
 public final class LlmChatClients {

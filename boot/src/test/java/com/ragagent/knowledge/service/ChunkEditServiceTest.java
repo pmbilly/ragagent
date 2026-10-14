@@ -77,7 +77,7 @@ class ChunkEditServiceTest {
         TestSchema.createTables(jdbc);
         TestSchema.resetData(jdbc);
         TenantContext.set(TENANT, TenantContext.webUserPrincipal("user-1"), "owner", false, "user-1", false);
-        // 2026-09-25 接线批：deleteGeneratedQuestion 经 ModelRuntimeFactory.getEmbeddingModel
+        // 2026-09-25 接线批：deleteGeneratedQuestion 经 ModelRuntimeAssembler.getEmbeddingModel
         // 建真实 embedder——构造期做 base URL SSRF 校验，桩 URL（127.0.0.1:1）需注白名单
         whitelistSnapshot = SsrfGuard.snapshotWhitelist();
         ssrfGuard.reloadWhitelist("127.0.0.1,::1,localhost");

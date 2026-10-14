@@ -20,7 +20,7 @@ import com.ragagent.session.repository.TemporaryDocumentRepository;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
 import com.ragagent.modelruntime.adapter.provider.chat.ImageResolver;
-import com.ragagent.model.service.ModelRuntimeFactory;
+import com.ragagent.model.service.ModelRuntimeAssembler;
 
 /**
  * ResolveForPrompt + 图片落地（含 docreader 图片分支）的行为验收。
@@ -49,7 +49,7 @@ class TemporaryDocumentResolveForPromptTest {
         if (service == null) {
             fileStore = new AttachmentFileStore(tempDir.toString());
             service = new TemporaryDocumentService(repo, fileStore, docReader,
-                    mock(ModelRuntimeFactory.class),
+                    mock(ModelRuntimeAssembler.class),
                     mock(AsrTranscriber.class),
                     mock(TenantService.class));
         }
@@ -60,7 +60,7 @@ class TemporaryDocumentResolveForPromptTest {
     private TemporaryDocumentProcessor processor() {
         service(); // 确保 fileStore（真实落盘目录）已建
         return new TemporaryDocumentProcessor(repo, fileStore, docReader,
-                mock(ModelRuntimeFactory.class),
+                mock(ModelRuntimeAssembler.class),
                 mock(AsrTranscriber.class),
                 mock(TenantService.class));
     }

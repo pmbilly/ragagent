@@ -24,7 +24,7 @@ import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeProcessingSpan;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.llm.LlmChatClient;
-import com.ragagent.model.service.ModelRuntimeFactory;
+import com.ragagent.model.service.ModelRuntimeAssembler;
 import com.ragagent.tracing.langfuse.LangfuseTaskScope;
 
 import org.slf4j.Logger;
@@ -67,7 +67,7 @@ public class ChunkExtractService implements ChunkExtractConsumer {
 
     static final int CHUNK_PREVIEW_RUNES = 200;
 
-    private final ModelRuntimeFactory modelRuntimeFactory;
+    private final ModelRuntimeAssembler modelRuntimeAssembler;
     private final ChunkRepository chunkRepository;
     private final KnowledgeRepository knowledgeRepository;
     private final KnowledgeBaseRepository kbRepository;
@@ -78,19 +78,19 @@ public class ChunkExtractService implements ChunkExtractConsumer {
 
     /** 生产构造器（Spring 装配；模板来源用 vendored extract 配置）。 */
     @Autowired
-    public ChunkExtractService(ModelRuntimeFactory modelRuntimeFactory,
+    public ChunkExtractService(ModelRuntimeAssembler modelRuntimeAssembler,
                                ChunkRepository chunkRepository,
                                KnowledgeRepository knowledgeRepository,
                                KnowledgeBaseRepository kbRepository,
                                SpanTracker spanTracker,
                                RetrieveGraphRepository graphRepository,
                                WikiFinalizePort finalizer) {
-        this(modelRuntimeFactory, chunkRepository, knowledgeRepository, kbRepository, spanTracker,
+        this(modelRuntimeAssembler, chunkRepository, knowledgeRepository, kbRepository, spanTracker,
                 graphRepository, finalizer, new ExtractPrompts());
     }
 
     /** 测试可注入模板来源。 */
-    ChunkExtractService(ModelRuntimeFactory modelRuntimeFactory,
+    ChunkExtractService(ModelRuntimeAssembler modelRuntimeAssembler,
                         ChunkRepository chunkRepository,
                         KnowledgeRepository knowledgeRepository,
                         KnowledgeBaseRepository kbRepository,
@@ -98,7 +98,7 @@ public class ChunkExtractService implements ChunkExtractConsumer {
                         RetrieveGraphRepository graphRepository,
                         WikiFinalizePort finalizer,
                         ExtractPrompts extractPrompts) {
-        this.modelRuntimeFactory = modelRuntimeFactory;
+        this.modelRuntimeAssembler = modelRuntimeAssembler;
         this.chunkRepository = chunkRepository;
         this.knowledgeRepository = knowledgeRepository;
         this.kbRepository = kbRepository;
@@ -217,7 +217,7 @@ public class ChunkExtractService implements ChunkExtractConsumer {
 
         LlmChatClient chatModel;
         try {
-            chatModel = modelRuntimeFactory.getChatModel(p.modelId());
+            chatModel = modelRuntimeAssembler.getChatModel(p.modelId());
         } catch (RuntimeException e) {
             throw new IllegalStateException("failed to get chat model: " + e.getMessage(), e);
         }

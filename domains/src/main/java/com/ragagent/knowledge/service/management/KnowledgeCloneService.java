@@ -20,7 +20,7 @@ import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.dto.kb.KBCloneProgress;
-import com.ragagent.model.service.ModelRuntimeFactory;
+import com.ragagent.model.service.ModelRuntimeAssembler;
 import com.ragagent.retrieval.engine.PgVectorEngineRepository;
 import org.springframework.stereotype.Service;
 import com.ragagent.embedding.Embedder;
@@ -52,7 +52,7 @@ public class KnowledgeCloneService {
     private final KnowledgeTaskProgressStore progressStore;
     private final KnowledgeVectorWrites vectorWrites;
     private final PgVectorEngineRepository pgVectorEngineRepository;
-    private final ModelRuntimeFactory modelRuntimeFactory;
+    private final ModelRuntimeAssembler modelRuntimeAssembler;
     /** 后台任务执行器（统一命名与关停）。 */
     private final KnowledgeTaskExecutor taskExecutor;
 
@@ -64,7 +64,7 @@ public class KnowledgeCloneService {
             KnowledgeTaskProgressStore progressStore,
             KnowledgeVectorWrites vectorWrites,
             PgVectorEngineRepository pgVectorEngineRepository,
-            ModelRuntimeFactory modelRuntimeFactory) {
+            ModelRuntimeAssembler modelRuntimeAssembler) {
 
         this.taskExecutor = taskExecutor;
         this.knowledgeRepository = knowledgeRepository;
@@ -74,7 +74,7 @@ public class KnowledgeCloneService {
         this.progressStore = progressStore;
         this.vectorWrites = vectorWrites;
         this.pgVectorEngineRepository = pgVectorEngineRepository;
-        this.modelRuntimeFactory = modelRuntimeFactory;
+        this.modelRuntimeAssembler = modelRuntimeAssembler;
     }
 
 
@@ -293,7 +293,7 @@ public class KnowledgeCloneService {
                     vectorWrites.boundEngine(srcKb, TenantContext.currentTenantId());
             if (engine != null) {
                 Embedder emb =
-                        modelRuntimeFactory.getEmbeddingModel(dst.getEmbeddingModelId());
+                        modelRuntimeAssembler.getEmbeddingModel(dst.getEmbeddingModelId());
                 engine.copyIndices(src.getKnowledgeBaseId(),
                         Map.of(src.getId(), dstKnowledgeId), srcToDstChunkIds, dst.getId(),
                         emb.getDimensions(), dst.getType());

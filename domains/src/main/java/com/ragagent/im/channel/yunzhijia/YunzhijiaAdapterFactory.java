@@ -8,7 +8,7 @@ import com.ragagent.common.security.SsrfGuard;
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.runtime.ImCredentials;
 import com.ragagent.im.runtime.IncomingMessage;
-import com.ragagent.im.service.ImService;
+import com.ragagent.im.service.ImTurnOrchestrator;
 
 /**
  * 云之家渠道工厂。
@@ -23,7 +23,7 @@ import com.ragagent.im.service.ImService;
  * 起长连接并把 stop 交给调用方；其它模式报
  * {@code unsupported yunzhijia mode: X}。</p>
  */
-public class YunzhijiaAdapterFactory implements ImService.AdapterFactory {
+public class YunzhijiaAdapterFactory implements ImTurnOrchestrator.AdapterFactory {
 
     private final SsrfGuard ssrfGuard;
     private final String authUrl;
@@ -44,7 +44,7 @@ public class YunzhijiaAdapterFactory implements ImService.AdapterFactory {
     }
 
     @Override
-    public ImService.AdapterRegistration create(ImChannelEntity channel,
+    public ImTurnOrchestrator.AdapterRegistration create(ImChannelEntity channel,
             BiConsumer<IncomingMessage, String> msgHandler) {
         byte[] raw = channel.getCredentials() == null
                 ? new byte[0] : channel.getCredentials().getBytes(StandardCharsets.UTF_8);
@@ -68,7 +68,7 @@ public class YunzhijiaAdapterFactory implements ImService.AdapterFactory {
         String mode = ImCredentials.resolveMode(channel, "webhook");
         switch (mode) {
             case "webhook":
-                return new ImService.AdapterRegistration(adapter, null);
+                return new ImTurnOrchestrator.AdapterRegistration(adapter, null);
             case "websocket": {
                 String wsUrl = YunzhijiaUrl.deriveWebSocketUrl(sendMsgUrl, allowedHostSuffix);
                 YunzhijiaLongConnClient client = new YunzhijiaLongConnClient(wsUrl,
@@ -76,7 +76,7 @@ public class YunzhijiaAdapterFactory implements ImService.AdapterFactory {
                 Thread thread = new Thread(client::start, "im-yzj-ws-" + channel.getId());
                 thread.setDaemon(true);
                 thread.start();
-                return new ImService.AdapterRegistration(adapter, client::stop);
+                return new ImTurnOrchestrator.AdapterRegistration(adapter, client::stop);
             }
             default:
                 throw new IllegalArgumentException("unsupported yunzhijia mode: " + mode);

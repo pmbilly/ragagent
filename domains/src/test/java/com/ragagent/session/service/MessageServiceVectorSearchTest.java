@@ -29,7 +29,7 @@ import org.mockito.ArgumentCaptor;
 import com.ragagent.tenant.Tenant;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.common.context.TenantContext;
-import com.ragagent.model.service.ModelRuntimeFactory;
+import com.ragagent.model.service.ModelRuntimeAssembler;
 import com.ragagent.rerank.RankResult;
 import com.ragagent.rerank.Reranker;
 import com.ragagent.retrieval.HybridSearchService;
@@ -59,7 +59,7 @@ class MessageServiceVectorSearchTest {
     private MessageRepository messageRepository;
     private TenantService tenantService;
     private HybridSearchService hybridSearchService;
-    private ModelRuntimeFactory modelRuntimeFactory;
+    private ModelRuntimeAssembler modelRuntimeAssembler;
     private MessageService service;
 
     @BeforeEach
@@ -67,7 +67,7 @@ class MessageServiceVectorSearchTest {
         messageRepository = mock(MessageRepository.class);
         tenantService = mock(TenantService.class);
         hybridSearchService = mock(HybridSearchService.class);
-        modelRuntimeFactory = mock(ModelRuntimeFactory.class);
+        modelRuntimeAssembler = mock(ModelRuntimeAssembler.class);
         service = new MessageService(
                 mock(SessionRepository.class),
                 messageRepository,
@@ -76,7 +76,7 @@ class MessageServiceVectorSearchTest {
                 tenantService,
                 mock(KnowledgeBaseService.class),
                 hybridSearchService,
-                modelRuntimeFactory);
+                modelRuntimeAssembler);
         TenantContext.set(TENANT, null, null, false, "u-1", false);
     }
 
@@ -156,7 +156,7 @@ class MessageServiceVectorSearchTest {
 
         MessageSearchResult result = service.searchMessages("spring boot", "hybrid", 20, null);
 
-        verifyNoInteractions(hybridSearchService, modelRuntimeFactory);
+        verifyNoInteractions(hybridSearchService, modelRuntimeAssembler);
         assertThat(result.getTotal()).isEqualTo(1);
         // hybrid 模式的分值是 RRF 融合分 1/(60+1)；partner 补对的 "" 与 "keyword"
         // 不同 → matchType 升 hybrid（golden 钉过的同款契约）
@@ -206,7 +206,7 @@ class MessageServiceVectorSearchTest {
         assertThat(sp.isDisableKeywordsMatch()).isTrue();
         assertThat(sp.isDisableVectorMatch()).isFalse();
         // rerankModelId 为空 → 不取模型，直接返回
-        verifyNoInteractions(modelRuntimeFactory);
+        verifyNoInteractions(modelRuntimeAssembler);
 
         assertThat(result.getTotal()).isEqualTo(2);
         assertThat(result.getItems().get(0).getScore()).isEqualTo(0.9);
@@ -299,7 +299,7 @@ class MessageServiceVectorSearchTest {
                 .thenReturn(new ArrayList<>(List.of(hit1, hit2, hit3)));
 
         Reranker reranker = mock(Reranker.class);
-        when(modelRuntimeFactory.getRerankModel("rr-1")).thenReturn(reranker);
+        when(modelRuntimeAssembler.getRerankModel("rr-1")).thenReturn(reranker);
         RankResult rr1 = new RankResult();
         rr1.setIndex(2);
         rr1.setRelevanceScore(0.6);
@@ -343,7 +343,7 @@ class MessageServiceVectorSearchTest {
                         kbHit("c1", "k1", 0.9, "d1"),
                         kbHit("c2", "k2", 0.7, "d2"))));
         Reranker reranker = mock(Reranker.class);
-        when(modelRuntimeFactory.getRerankModel("rr-1")).thenReturn(reranker);
+        when(modelRuntimeAssembler.getRerankModel("rr-1")).thenReturn(reranker);
         when(reranker.rerank(anyString(), anyList()))
                 .thenThrow(new RuntimeException("rerank endpoint down"));
 

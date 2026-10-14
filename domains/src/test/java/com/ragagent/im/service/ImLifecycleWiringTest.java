@@ -12,7 +12,7 @@ import org.springframework.context.event.EventListener;
 import jakarta.annotation.PreDestroy;
 
 /**
- * 生命周期接线契约：IM 运行时的两个触发点**必须挂在门面**（{@link ImService}，它是 Spring bean）上，
+ * 生命周期接线契约：IM 运行时的两个触发点**必须挂在门面**（{@link ImTurnOrchestrator}，它是 Spring bean）上，
  * 且**只挂在那里**。
  *
  * <p>判据来自一次真实事故：「渠道运行时」整块从门面外提到 {@link ImChannelRuntimeOps}
@@ -25,7 +25,7 @@ class ImLifecycleWiringTest {
     @Test
     @DisplayName("门面的 startChannelsOnReady 带 @EventListener(ApplicationReadyEvent)")
     void startHookOnFacade() throws Exception {
-        Method m = ImService.class.getMethod("startChannelsOnReady");
+        Method m = ImTurnOrchestrator.class.getMethod("startChannelsOnReady");
         assertThat(m.getAnnotation(EventListener.class))
                 .as("渠道随应用启动的唯一入口（历史事故点）")
                 .isNotNull();
@@ -37,7 +37,7 @@ class ImLifecycleWiringTest {
     @Test
     @DisplayName("门面的 stop 带 @PreDestroy")
     void stopHookOnFacade() throws Exception {
-        Method m = ImService.class.getMethod("stop");
+        Method m = ImTurnOrchestrator.class.getMethod("stop");
         assertThat(m.getAnnotation(PreDestroy.class)).as("停机清理的唯一入口（历史事故点）").isNotNull();
     }
 

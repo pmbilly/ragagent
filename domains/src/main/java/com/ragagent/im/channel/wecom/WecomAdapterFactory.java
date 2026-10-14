@@ -12,7 +12,7 @@ import com.ragagent.common.security.SsrfGuard;
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.runtime.ImCredentials;
 import com.ragagent.im.runtime.IncomingMessage;
-import com.ragagent.im.service.ImService;
+import com.ragagent.im.service.ImTurnOrchestrator;
 
 /**
  * 企业微信渠道工厂。
@@ -23,7 +23,7 @@ import com.ragagent.im.service.ImService;
  * {@code ws_endpoint}/{@code bot_name}。</p>
  */
 @Component
-public class WecomAdapterFactory implements ImService.AdapterFactory {
+public class WecomAdapterFactory implements ImTurnOrchestrator.AdapterFactory {
 
     private final SsrfGuard ssrfGuard;
 
@@ -38,7 +38,7 @@ public class WecomAdapterFactory implements ImService.AdapterFactory {
     }
 
     @Override
-    public ImService.AdapterRegistration create(ImChannelEntity channel,
+    public ImTurnOrchestrator.AdapterRegistration create(ImChannelEntity channel,
             BiConsumer<IncomingMessage, String> msgHandler) {
         byte[] raw = channel.getCredentials() == null
                 ? new byte[0] : channel.getCredentials().getBytes(StandardCharsets.UTF_8);
@@ -48,7 +48,7 @@ public class WecomAdapterFactory implements ImService.AdapterFactory {
         switch (mode) {
             case "webhook": {
                 int corpAgentId = intOf(creds.get("corp_agent_id"));
-                return new ImService.AdapterRegistration(new WecomWebhookAdapter(
+                return new ImTurnOrchestrator.AdapterRegistration(new WecomWebhookAdapter(
                         ImCredentials.getString(creds, "corp_id"),
                         ImCredentials.getString(creds, "agent_secret"),
                         ImCredentials.getString(creds, "token"),
@@ -70,7 +70,7 @@ public class WecomAdapterFactory implements ImService.AdapterFactory {
                 thread.setDaemon(true);
                 thread.start();
                 // 先关 socket 再给取消信号（才能同步停投递）
-                return new ImService.AdapterRegistration(
+                return new ImTurnOrchestrator.AdapterRegistration(
                         new WecomWSAdapter(client, ssrfGuard), client::stop);
             }
             default:

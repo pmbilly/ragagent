@@ -64,7 +64,7 @@ public final class QaQueue {
         final AtomicBoolean cancelled = new AtomicBoolean(false);
         public final IncomingMessage msg;
 
-        /** 业务束（ImService.QaTask；队列层不解释）。 */
+        /** 业务束（ImTurnOrchestrator.QaTask；队列层不解释）。 */
         private Object attach;
 
         public QaRequest(String userKey, IncomingMessage msg) {

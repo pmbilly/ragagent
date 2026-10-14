@@ -8,7 +8,7 @@ import com.ragagent.common.security.SsrfGuard;
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.runtime.ImCredentials;
 import com.ragagent.im.runtime.IncomingMessage;
-import com.ragagent.im.service.ImService;
+import com.ragagent.im.service.ImTurnOrchestrator;
 
 /**
  * Mattermost 渠道工厂。
@@ -21,7 +21,7 @@ import com.ragagent.im.service.ImService;
  * http(s) + SSRF）、{@code outgoing_token}（<b>必填</b>）、{@code bot_user_id}（可选，
  * 防自环）、{@code post_to_main}（可选，真值则回复发到主时间线而非线程）。</p>
  */
-public class MattermostAdapterFactory implements ImService.AdapterFactory {
+public class MattermostAdapterFactory implements ImTurnOrchestrator.AdapterFactory {
 
     private final SsrfGuard ssrfGuard;
 
@@ -30,7 +30,7 @@ public class MattermostAdapterFactory implements ImService.AdapterFactory {
     }
 
     @Override
-    public ImService.AdapterRegistration create(ImChannelEntity channel,
+    public ImTurnOrchestrator.AdapterRegistration create(ImChannelEntity channel,
             BiConsumer<IncomingMessage, String> msgHandler) {
         byte[] raw = channel.getCredentials() == null
                 ? new byte[0] : channel.getCredentials().getBytes(StandardCharsets.UTF_8);
@@ -55,6 +55,6 @@ public class MattermostAdapterFactory implements ImService.AdapterFactory {
         MattermostAdapter adapter = new MattermostAdapter(client, outgoingToken, botUserId,
                 postToMain);
         // 返回空的 cancel（无长连接）
-        return new ImService.AdapterRegistration(adapter, () -> { });
+        return new ImTurnOrchestrator.AdapterRegistration(adapter, () -> { });
     }
 }

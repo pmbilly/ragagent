@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.runtime.ImCredentials;
 import com.ragagent.im.runtime.IncomingMessage;
-import com.ragagent.im.service.ImService;
+import com.ragagent.im.service.ImTurnOrchestrator;
 
 /**
  * Telegram 渠道工厂。
@@ -23,10 +23,10 @@ import com.ragagent.im.service.ImService;
  * </ul>
  */
 @Component
-public class TelegramAdapterFactory implements ImService.AdapterFactory {
+public class TelegramAdapterFactory implements ImTurnOrchestrator.AdapterFactory {
 
     @Override
-    public ImService.AdapterRegistration create(ImChannelEntity channel,
+    public ImTurnOrchestrator.AdapterRegistration create(ImChannelEntity channel,
             BiConsumer<IncomingMessage, String> msgHandler) {
         byte[] raw = channel.getCredentials() == null
                 ? new byte[0] : channel.getCredentials().getBytes(StandardCharsets.UTF_8);
@@ -37,7 +37,7 @@ public class TelegramAdapterFactory implements ImService.AdapterFactory {
         switch (mode) {
             case "webhook": {
                 String secretToken = ImCredentials.getString(creds, "secret_token");
-                return new ImService.AdapterRegistration(
+                return new ImTurnOrchestrator.AdapterRegistration(
                         new TelegramAdapter(botToken, secretToken), null);
             }
             case "websocket": {
@@ -46,7 +46,7 @@ public class TelegramAdapterFactory implements ImService.AdapterFactory {
                 Thread thread = new Thread(client::start, "im-telegram-poll-" + channel.getId());
                 thread.setDaemon(true);
                 thread.start();
-                return new ImService.AdapterRegistration(
+                return new ImTurnOrchestrator.AdapterRegistration(
                         new TelegramAdapter(botToken, ""), client::stop);
             }
             default:

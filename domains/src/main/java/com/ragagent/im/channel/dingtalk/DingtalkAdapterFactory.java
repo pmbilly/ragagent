@@ -8,7 +8,7 @@ import com.ragagent.common.security.SsrfGuard;
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.runtime.ImCredentials;
 import com.ragagent.im.runtime.IncomingMessage;
-import com.ragagent.im.service.ImService;
+import com.ragagent.im.service.ImTurnOrchestrator;
 
 /**
  * 钉钉渠道工厂。
@@ -19,7 +19,7 @@ import com.ragagent.im.service.ImService;
  * <p>HTTP 适配器<b>两种模式都建</b>（websocket 模式下的回复也走 sessionWebhook/OpenAPI）；
  * {@code websocket} 额外起 {@link DingtalkStreamClient} 消费事件，stop 句柄关连接。</p>
  */
-public class DingtalkAdapterFactory implements ImService.AdapterFactory {
+public class DingtalkAdapterFactory implements ImTurnOrchestrator.AdapterFactory {
 
     private final SsrfGuard ssrfGuard;
     private final String apiBaseUrl;
@@ -35,7 +35,7 @@ public class DingtalkAdapterFactory implements ImService.AdapterFactory {
     }
 
     @Override
-    public ImService.AdapterRegistration create(ImChannelEntity channel,
+    public ImTurnOrchestrator.AdapterRegistration create(ImChannelEntity channel,
             BiConsumer<IncomingMessage, String> msgHandler) {
         byte[] raw = channel.getCredentials() == null
                 ? new byte[0] : channel.getCredentials().getBytes(StandardCharsets.UTF_8);
@@ -50,7 +50,7 @@ public class DingtalkAdapterFactory implements ImService.AdapterFactory {
         String mode = ImCredentials.resolveMode(channel, "websocket");
         switch (mode) {
             case "webhook":
-                return new ImService.AdapterRegistration(adapter, null);
+                return new ImTurnOrchestrator.AdapterRegistration(adapter, null);
             case "websocket": {
                 // Stream 模式：HTTP 适配器两种模式都建（回复同样走 sessionWebhook/OpenAPI），
                 // 额外起 WS 长连接消费事件
@@ -62,7 +62,7 @@ public class DingtalkAdapterFactory implements ImService.AdapterFactory {
                 Thread thread = new Thread(stream::start, "im-dingtalk-ws-" + channel.getId());
                 thread.setDaemon(true);
                 thread.start();
-                return new ImService.AdapterRegistration(adapter, stream::stop);
+                return new ImTurnOrchestrator.AdapterRegistration(adapter, stream::stop);
             }
             default:
                 throw new IllegalArgumentException("unsupported dingtalk mode: " + mode);

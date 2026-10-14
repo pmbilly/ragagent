@@ -34,7 +34,7 @@ import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
-import com.ragagent.model.service.ModelRuntimeFactory;
+import com.ragagent.model.service.ModelRuntimeAssembler;
 import com.ragagent.common.wiki.WikiFinalizePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -102,7 +102,7 @@ class ChunkExtractServiceTest {
         };
     }
 
-    private ModelRuntimeFactory modelRuntimeFactory;
+    private ModelRuntimeAssembler modelRuntimeAssembler;
     private ChunkRepository chunkRepository;
     private KnowledgeRepository knowledgeRepository;
     private KnowledgeBaseRepository kbRepository;
@@ -115,7 +115,7 @@ class ChunkExtractServiceTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        modelRuntimeFactory = mock(ModelRuntimeFactory.class);
+        modelRuntimeAssembler = mock(ModelRuntimeAssembler.class);
         chunkRepository = mock(ChunkRepository.class);
         knowledgeRepository = mock(KnowledgeRepository.class);
         kbRepository = mock(KnowledgeBaseRepository.class);
@@ -129,10 +129,10 @@ class ChunkExtractServiceTest {
         chunk.setKnowledgeBaseId("kb-1");
         chunk.setKnowledgeId("kn-1");
 
-        when(modelRuntimeFactory.getChatModel("m-1")).thenReturn(emptyGraphClient());
+        when(modelRuntimeAssembler.getChatModel("m-1")).thenReturn(emptyGraphClient());
         when(chunkRepository.getChunkById(7L, "ck-1")).thenReturn(chunk);
 
-        service = new ChunkExtractService(modelRuntimeFactory, chunkRepository, knowledgeRepository,
+        service = new ChunkExtractService(modelRuntimeAssembler, chunkRepository, knowledgeRepository,
                 kbRepository, spanTracker, graphRepo, finalizer);
     }
 
@@ -183,7 +183,7 @@ class ChunkExtractServiceTest {
         service.handle(payload());
 
         assertTrue(graphRepo.addedGraphs.isEmpty());
-        verify(modelRuntimeFactory, never()).getChatModel(anyString());
+        verify(modelRuntimeAssembler, never()).getChatModel(anyString());
         verify(finalizer).finalizeWikiSubtask("kn-1");
     }
 

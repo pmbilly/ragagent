@@ -24,7 +24,7 @@ import com.ragagent.TestSchema;
 import com.ragagent.im.runtime.AdapterInterfaces.Adapter;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.ReplyMessage;
-import com.ragagent.im.service.ImService;
+import com.ragagent.im.service.ImTurnOrchestrator;
 import com.ragagent.im.runtime.CallbackExchange;
 
 /**
@@ -47,7 +47,7 @@ class ImPipelineTest {
     @Autowired
     private JdbcTemplate jdbc;
     @Autowired
-    private ImService imService;
+    private ImTurnOrchestrator imTurnOrchestrator;
 
     /** fake 适配器收到的回复（阻塞队列供测试等待）。 */
     static final BlockingQueue<ReplyMessage> REPLIES = new LinkedBlockingQueue<>();
@@ -75,7 +75,7 @@ class ImPipelineTest {
     }
 
     private void registerFakeFactory() {
-        imService.registerAdapterFactory("testplat", (channel, handler) -> {
+        imTurnOrchestrator.registerAdapterFactory("testplat", (channel, handler) -> {
             Adapter fake = new Adapter() {
                 @Override
                 public String platform() {
@@ -111,7 +111,7 @@ class ImPipelineTest {
                     return false;
                 }
             };
-            return new ImService.AdapterRegistration(fake, null);
+            return new ImTurnOrchestrator.AdapterRegistration(fake, null);
         });
     }
 

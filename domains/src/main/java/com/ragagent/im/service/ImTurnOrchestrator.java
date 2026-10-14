@@ -68,9 +68,9 @@ import com.ragagent.storage.support.Resolver;
  * </ul>
  */
 @Service
-public class ImService implements AgentChannelCleaner {
+public class ImTurnOrchestrator implements AgentChannelCleaner {
 
-    private static final Logger log = LoggerFactory.getLogger(ImService.class);
+    private static final Logger log = LoggerFactory.getLogger(ImTurnOrchestrator.class);
     static final ObjectMapper JSON = JsonMappers.lenient();
 
 
@@ -126,7 +126,7 @@ public class ImService implements AgentChannelCleaner {
         }
     }
 
-    public ImService(ImChannelMapper channels, ChannelSessionMapper channelSessions,
+    public ImTurnOrchestrator(ImChannelMapper channels, ChannelSessionMapper channelSessions,
             SessionService sessionService, MessageService messageService,
             CustomAgentService agentService,
             SessionKnowledgeQaService knowledgeQaService, SessionAgentQaService agentQaService,

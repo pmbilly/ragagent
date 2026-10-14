@@ -27,7 +27,7 @@ import com.ragagent.im.runtime.QaQueue;
  * 渠道运行时：adapter 工厂注册表、渠道生命周期（起停 / 重载 / 按库重建 / 配置广播），
  * 以及 WS 长连接选主（leader 续期、抢锁重试、释放）。
  *
- * <p>自 {@link ImService} 整块外提（逐字搬迁）。这 17 个方法是一条
+ * <p>自 {@link ImTurnOrchestrator} 整块外提（逐字搬迁）。这 17 个方法是一条
  * 完整链路：**选主决定哪台实例跑哪些渠道**，渠道起停又要读写 leader 锁——本就是同一关注点，
  * 与消息入口、停止链路、知识桥无关。整块在门面里本来就是连续的，故搬迁几乎零文本改动。</p>
  *
@@ -49,7 +49,7 @@ final class ImChannelRuntimeOps {
     private static final long LEADER_RETRY_MILLIS = 10_000L;
 
     private final ImChannelMapper channels;
-    private final Map<String, ImService.ChannelState> channelStates;
+    private final Map<String, ImTurnOrchestrator.ChannelState> channelStates;
     private final QaQueue qaQueue;
     private final ImRedisStore redisStore;
     private final RedisPubSub redisPubSub;
@@ -58,7 +58,7 @@ final class ImChannelRuntimeOps {
 
     // ── 随迁字段（自门面外提；门面不再持有） ───────────────────────────────
     /** 渠道启动时必须注册的平台工厂。 */
-    private final Map<String, ImService.AdapterFactory> adapterFactories = new ConcurrentHashMap<>();
+    private final Map<String, ImTurnOrchestrator.AdapterFactory> adapterFactories = new ConcurrentHashMap<>();
     /** 实例标识：leader 锁的值 + 广播事件源过滤（随机 UUID）。 */
     private final String instanceId = UUID.randomUUID().toString();
     /** leader 续期线程（channelId → 线程）；停止渠道时中断。 */
@@ -68,7 +68,7 @@ final class ImChannelRuntimeOps {
     /** 订阅循环与重试调度的退出标志（停止时置位）。 */
     private final AtomicBoolean shuttingDown = new AtomicBoolean(false);
 
-    ImChannelRuntimeOps(ImChannelMapper channels, Map<String, ImService.ChannelState> channelStates,
+    ImChannelRuntimeOps(ImChannelMapper channels, Map<String, ImTurnOrchestrator.ChannelState> channelStates,
             QaQueue qaQueue, ImRedisStore redisStore, RedisPubSub redisPubSub,
             BiConsumer<IncomingMessage, String> msgHandler) {
         this.channels = channels;
@@ -80,7 +80,7 @@ final class ImChannelRuntimeOps {
     }
 
     /** 注册平台工厂。 */
-    public void registerAdapterFactory(String platform, ImService.AdapterFactory factory) {
+    public void registerAdapterFactory(String platform, ImTurnOrchestrator.AdapterFactory factory) {
         adapterFactories.put(platform, factory);
     }
 
@@ -89,11 +89,11 @@ final class ImChannelRuntimeOps {
         if (channel == null || !channel.isEnabled()) {
             return null;
         }
-        ImService.AdapterFactory factory = adapterFactories.get(channel.getPlatform());
+        ImTurnOrchestrator.AdapterFactory factory = adapterFactories.get(channel.getPlatform());
         if (factory == null) {
             return null;
         }
-        ImService.ChannelState state = channelStates.get(channel.getId());
+        ImTurnOrchestrator.ChannelState state = channelStates.get(channel.getId());
         if (state == null) {
             startChannel(channel);
             state = channelStates.get(channel.getId());
@@ -103,7 +103,7 @@ final class ImChannelRuntimeOps {
 
     /** 启动渠道：经工厂建适配器并进入运行态（独占长连接先做跨实例选主）。 */
     public synchronized void startChannel(ImChannelEntity channel) {
-        ImService.AdapterFactory factory = adapterFactories.get(channel.getPlatform());
+        ImTurnOrchestrator.AdapterFactory factory = adapterFactories.get(channel.getPlatform());
         if (factory == null) {
             log.warn("[IM] no adapter factory for platform {} (channel {})",
                     channel.getPlatform(), channel.getId());
@@ -121,7 +121,7 @@ final class ImChannelRuntimeOps {
             leaderHeld = true;
         }
         AtomicReference<Runnable> stopRef = new AtomicReference<>();
-        ImService.AdapterRegistration reg;
+        ImTurnOrchestrator.AdapterRegistration reg;
         try {
             reg = factory.create(channel, msgHandler);
         } catch (RuntimeException e) {
@@ -136,7 +136,7 @@ final class ImChannelRuntimeOps {
             return;
         }
         stopRef.set(reg.stop());
-        channelStates.put(channel.getId(), new ImService.ChannelState(channel, reg.adapter(), stopRef));
+        channelStates.put(channel.getId(), new ImTurnOrchestrator.ChannelState(channel, reg.adapter(), stopRef));
         log.info("[IM] Channel started: id={} platform={} mode={}", channel.getId(),
                 channel.getPlatform(), channel.getMode());
         if (leaderHeld) {
@@ -147,7 +147,7 @@ final class ImChannelRuntimeOps {
     /** 停止渠道并拆除适配器（含 leader 线程与选主锁）。 */
     public synchronized void stopChannel(String channelId) {
         stopLeaderWatch(channelId);
-        ImService.ChannelState cs = channelStates.remove(channelId);
+        ImTurnOrchestrator.ChannelState cs = channelStates.remove(channelId);
         if (cs != null && cs.adapterStop() != null && cs.adapterStop().get() != null) {
             cs.adapterStop().get().run();
         }
@@ -185,7 +185,7 @@ final class ImChannelRuntimeOps {
      * 应用就绪后从库拉起全部 enabled 渠道（否则重启后渠道全部沉默）。失败只 WARN，不阻塞启动。
      *
      * <p><b>本类不是 Spring bean</b>（由门面 `new` 出来）⇒ 触发入口（{@code @EventListener} /
-     * {@code @PreDestroy}）**必须挂在门面** {@link ImService} 上，这里只保留实现。外提时
+     * {@code @PreDestroy}）**必须挂在门面** {@link ImTurnOrchestrator} 上，这里只保留实现。外提时
      * 曾把注解一起搬进来 ⇒ 注解静默失效（渠道不再自动启动、停机不再清理），已修回并加
      * ArchUnit A13 守卫这类问题。</p>
      */
@@ -200,7 +200,7 @@ final class ImChannelRuntimeOps {
     /**
      * 停机时停 QA 队列、全部运行中的渠道适配器与后台线程。
      *
-     * <p>触发入口是门面 {@link ImService#stop()} 上的 {@code @PreDestroy}（本类非 Spring bean）。</p>
+     * <p>触发入口是门面 {@link ImTurnOrchestrator#stop()} 上的 {@code @PreDestroy}（本类非 Spring bean）。</p>
      */
     public void stop() {
         shuttingDown.set(true);
@@ -263,7 +263,7 @@ final class ImChannelRuntimeOps {
         event.put("channel_id", channelId);
         event.put("source_instance", instanceId);
         try {
-            pubSub.publish(ImRedisKeys.CHANNEL_CONFIG_CHANNEL, ImService.JSON.writeValueAsString(event));
+            pubSub.publish(ImRedisKeys.CHANNEL_CONFIG_CHANNEL, ImTurnOrchestrator.JSON.writeValueAsString(event));
         } catch (Exception e) {
             // DB 是权威；事件只是加速（发布失败只 WARN）
             log.warn("[IM] Publish channel config event failed for {}: {}", channelId, e.getMessage());
@@ -287,7 +287,7 @@ final class ImChannelRuntimeOps {
                     }
                     JsonNode event;
                     try {
-                        event = ImService.JSON.readTree(payload);
+                        event = ImTurnOrchestrator.JSON.readTree(payload);
                     } catch (Exception e) {
                         log.warn("[IM] Ignore invalid channel config event: {}", e.getMessage());
                         continue;

@@ -32,7 +32,7 @@ import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
-import com.ragagent.model.service.ModelRuntimeFactory;
+import com.ragagent.model.service.ModelRuntimeAssembler;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
 import com.ragagent.common.retrieval.SearchChunkMerge;
 import com.ragagent.common.wiki.WikiImageMarkup;
@@ -58,7 +58,7 @@ public class KnowledgeSummaryService {
     private final KnowledgeRepository knowledgeRepository;
     private final KnowledgeBaseRepository kbRepository;
     private final ChunkRepository chunkRepo;
-    private final ModelRuntimeFactory modelRuntimeFactory;
+    private final ModelRuntimeAssembler modelRuntimeAssembler;
     private final ChunkVectorIndexer chunkVectorIndexer;
     private final ConversationProperties conversationProps;
     private final KnowledgeAccessHelper access;
@@ -70,7 +70,7 @@ public class KnowledgeSummaryService {
                             KnowledgeRepository knowledgeRepository,
                             KnowledgeBaseRepository kbRepository,
                             ChunkRepository chunkRepo,
-                            ModelRuntimeFactory modelRuntimeFactory,
+                            ModelRuntimeAssembler modelRuntimeAssembler,
                             ChunkVectorIndexer chunkVectorIndexer,
                             ConversationProperties conversationProps,
                             KnowledgeAccessHelper access) {
@@ -79,7 +79,7 @@ public class KnowledgeSummaryService {
         this.knowledgeRepository = knowledgeRepository;
         this.kbRepository = kbRepository;
         this.chunkRepo = chunkRepo;
-        this.modelRuntimeFactory = modelRuntimeFactory;
+        this.modelRuntimeAssembler = modelRuntimeAssembler;
         this.chunkVectorIndexer = chunkVectorIndexer;
         this.conversationProps = conversationProps;
         this.access = access;
@@ -149,7 +149,7 @@ public class KnowledgeSummaryService {
 
         LlmChatClient chatModel;
         try {
-            chatModel = modelRuntimeFactory.getChatModel(kb.getSummaryModelId());
+            chatModel = modelRuntimeAssembler.getChatModel(kb.getSummaryModelId());
         } catch (RuntimeException e) {
             String msg = e.getMessage() == null ? e.toString() : e.getMessage();
             // 模型解析失败文案保持原文（下游按异常类型分支）

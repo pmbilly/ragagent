@@ -21,7 +21,7 @@ import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
-import com.ragagent.model.service.ModelRuntimeFactory;
+import com.ragagent.model.service.ModelRuntimeAssembler;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.message.MessageExecutionContext;
 import com.ragagent.session.domain.message.MessageSuggestionEvent;
@@ -58,7 +58,7 @@ import com.ragagent.tracing.langfuse.Span;
  *       否则落 DefaultLanguage（WEKNORA_LANGUAGE env，缺省 zh-CN）。</li>
  * </ol>
  *
- * <p>generate 全量覆盖（generateWithModel 经 ModelRuntimeFactory
+ * <p>generate 全量覆盖（generateWithModel 经 ModelRuntimeAssembler
  * + generateFromKnowledge 经 CustomAgentService.getKnowledgeSuggestedQuestions）。</p>
  */
 @Service
@@ -84,15 +84,15 @@ public class MessageSuggestionService {
 
     private final MessageSuggestionRepository suggestionRepository;
     private final MessageService messageService;
-    private final ModelRuntimeFactory modelRuntimeFactory;
+    private final ModelRuntimeAssembler modelRuntimeAssembler;
     private final CustomAgentService customAgentService;
 
     public MessageSuggestionService(MessageSuggestionRepository suggestionRepository,
-            MessageService messageService, ModelRuntimeFactory modelRuntimeFactory,
+            MessageService messageService, ModelRuntimeAssembler modelRuntimeAssembler,
             CustomAgentService customAgentService) {
         this.suggestionRepository = suggestionRepository;
         this.messageService = messageService;
-        this.modelRuntimeFactory = modelRuntimeFactory;
+        this.modelRuntimeAssembler = modelRuntimeAssembler;
         this.customAgentService = customAgentService;
     }
 
@@ -378,7 +378,7 @@ public class MessageSuggestionService {
         long agentTenantId = message.getAgentTenantId();
         final String modelIdF = modelId;
         LlmChatClient chatModel = withAgentTenant(agentTenantId, () ->
-                modelRuntimeFactory.getChatModel(modelIdF));
+                modelRuntimeAssembler.getChatModel(modelIdF));
         List<String> categories = MessageSuggestionPipeline.strList(followUps, "categories");
         String joined = String.join(", ", categories);
         if (joined.isEmpty()) {

@@ -48,10 +48,10 @@ public class CustomAgentService {
     private final KnowledgeBaseCatalogPort kbCatalog;
     private final BuiltinAgentRegistry registry;
     /**
-     * IM 渠道清理。ObjectProvider 延迟解析：实现方（{@code ImService}）直接依赖本类
+     * IM 渠道清理。ObjectProvider 延迟解析：实现方（{@code ImTurnOrchestrator}）直接依赖本类
      * （其字段 agentService），构造期硬注入会成环。
      *
-     * <p>收的是 {@link AgentChannelCleaner} 端口而非 {@code im.service.ImService}
+     * <p>收的是 {@link AgentChannelCleaner} 端口而非 {@code im.service.ImTurnOrchestrator}
      * ——agent 在拓扑序上位于 im 之前，直连即成回边。</p>
      */
     private final org.springframework.beans.factory.ObjectProvider<
