@@ -1,6 +1,6 @@
 package com.ragagent.mcp.tool;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;

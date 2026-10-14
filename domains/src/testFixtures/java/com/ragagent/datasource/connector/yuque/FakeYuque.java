@@ -1,6 +1,6 @@
 package com.ragagent.datasource.connector.yuque;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;

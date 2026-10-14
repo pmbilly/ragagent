@@ -1,6 +1,6 @@
 package com.ragagent.retrieval.engine.tencentvectordb;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;

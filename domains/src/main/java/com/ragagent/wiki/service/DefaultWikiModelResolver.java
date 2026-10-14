@@ -1,7 +1,7 @@
 package com.ragagent.wiki.service;
 
 
-import com.ragagent.common.knowledge.EmbeddingModelPort;
+import com.ragagent.contract.knowledge.EmbeddingModelPort;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.modelruntime.application.LlmChatClients;
 import com.ragagent.llm.domain.ChatConfig;
@@ -22,7 +22,7 @@ import com.ragagent.model.service.ModelRuntimeConfigs;
  *       → {@code ModelRuntimeConfigs}（DB 模型配置 → ChatConfig） → {@link com.ragagent.modelruntime.application.LlmChatClients#create}
  *       （含并发闸门装饰器）。</li>
  *   <li>embedding：先校验模型类型确为 embedding，再复用
- *       {@link com.ragagent.common.knowledge.EmbeddingModelPort}（L1 端口；实现侧仍是最小 OpenAI 兼容客户端）。</li>
+ *       {@link com.ragagent.contract.knowledge.EmbeddingModelPort}（L1 端口；实现侧仍是最小 OpenAI 兼容客户端）。</li>
  * </ul>
  */
 @Component

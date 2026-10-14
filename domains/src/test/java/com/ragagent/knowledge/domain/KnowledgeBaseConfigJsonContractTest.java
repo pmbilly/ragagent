@@ -12,7 +12,7 @@ import java.util.stream.StreamSupport;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.knowledge.dto.kb.KBCloneProgress;
 import com.ragagent.knowledge.dto.doc.KnowledgeMoveProgress;
 

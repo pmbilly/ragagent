@@ -1,6 +1,6 @@
 package com.ragagent.mcp.oauth;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.time.Duration;
 import com.ragagent.platform.config.AppEnvLookup;
 import java.time.Instant;

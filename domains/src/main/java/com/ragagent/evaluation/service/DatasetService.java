@@ -1,6 +1,6 @@
 package com.ragagent.evaluation.service;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;

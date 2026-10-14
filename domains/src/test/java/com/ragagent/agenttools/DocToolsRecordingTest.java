@@ -23,7 +23,7 @@ import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.agenttools.knowledge.GetDocumentInfoTool;
 import com.ragagent.agenttools.knowledge.ListKnowledgeChunksTool;
 import com.ragagent.agenttools.wiki.WikiReadSourceDocTool;
-import com.ragagent.common.retrieval.SearchTarget;
+import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.agent.tool.ToolRequest;
 

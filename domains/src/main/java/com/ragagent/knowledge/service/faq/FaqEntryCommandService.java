@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.FaqChunkMetadata;
 import com.ragagent.knowledge.domain.Knowledge;

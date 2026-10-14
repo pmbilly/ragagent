@@ -1,6 +1,6 @@
 package com.ragagent.retrieval.support;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.regex.Pattern;

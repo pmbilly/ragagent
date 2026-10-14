@@ -1,6 +1,6 @@
 package com.ragagent.im.channel.wechat;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;

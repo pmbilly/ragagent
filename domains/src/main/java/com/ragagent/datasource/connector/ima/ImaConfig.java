@@ -1,6 +1,6 @@
 package com.ragagent.datasource.connector.ima;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.util.Locale;
 import java.util.Map;
 

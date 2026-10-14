@@ -1,4 +1,4 @@
-package com.ragagent.common.text;
+package com.ragagent.contract.text;
 
 import java.io.BufferedReader;
 import java.io.IOException;

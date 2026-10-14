@@ -18,7 +18,7 @@ import com.ragagent.common.knowledge.FaqChunkMetadata;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.retrieval.support.ChunkSearchUtil;
 import com.ragagent.retrieval.support.ImageInfoMatchUtil;
-import com.ragagent.common.retrieval.SearchChunkMerge;
+import com.ragagent.contract.retrieval.SearchChunkMerge;
 import com.ragagent.retrieval.support.SearchTextUtil;
 import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.retrieval.telemetry.RetrievalObs;

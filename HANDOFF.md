@@ -1296,6 +1296,18 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **验证**：**4987 / 失败 0 / 跳过 4** ✓；`spotlessCheck build` ✓ **1m52s** ✓ **12 守卫** ✓（环 0 / SCC 11 组）；`arch.*` 28 条 ✓；四模块 javadoc ✓；`JsonContractRoundTripTest` 35 条方法全绿 ✓。
 - **登记（A② 余项）**：**类型级 11 类**——`JsonNode` 7（`ChunkFacts`/`KnowledgeBaseView`/`KnowledgeDocumentFacts`/`DocumentChunkMetadata`/`FaqChunkMetadata`/`SearchResult`/`TenantConfigLookup`）· servlet 端口 1（`ApiKeyAuthPort`）· Spring 绑定 3（`TenantProperties`/`RetrievalDriverProperties`/`LanguageProperties`）；外加 A②-1 的 9 个回退件（其依赖已部分解锁，下一批处理）。
 
+**🔶 A② 契约面收纳第③批 + ✅ 收口（2026-10-14，`common/**` 90 → **12 类**）**
+- **本批（第③批，9 类 + 3 处回退）**：契约侧再落 4 类（`SearchChunkMerge`/`SearchTarget` → `contract.retrieval`；`EmbeddingModelPort` → `contract.knowledge`；`TextConv` → `contract.text`）；**5 个 Jackson 工具自 `common/web` 迁 `platform/web`**（`JsonMappers`/`SortedMapSerializer`/`ContractJsonModule`/`ContractJsonMixins{Core,Event}`——A②-2a 时被判"环阻塞"，本批复查**已无环** ✓ 顺带把线格式载体放到平台面）；FQN 替换 320 文件。
+- **⚠️ 又踩同一个坑（第 3 次）**：`ChunkSearchGateway`/`KnowledgeBaseLookup`/`KnowledgeDocumentGateway` 的依赖是**同包裸引用**（无 import ⇒ 我的"扫 import"式依赖检查看不见 ✗）⇒ 编译 + R1 抓回、**逐类按"残留类名做裸引用正则"复核后回退** ✓。⇒ **铁律升级**：*闭包/可搬性判据必须按**裸引用**扫（`(?<![\w.])Name(?![\w])`），不能只看 import* —— A②-1 与 A②-2c 两批各栽一次，已写进本记录与记忆。
+- **A② 收口读数**：四个子批共 **99 类**入契约面（42 + 37 + 11 + 9）；`common/**` **90 → 12 类**；契约面现存 `contract/**`：15 面 + `error`/`tool`/`text` = 18 面。
+- **残留 12 类（逐条登记，`12 = 7 + 4 + 1` 算术闭合）**：
+  ① **`JsonNode` 载体 7**（`ChunkFacts`/`DocumentChunkMetadata`/`FaqChunkMetadata`/`KnowledgeBaseView`/`KnowledgeDocumentFacts`/`SearchResult`/`TenantConfigLookup`）——**API 面就是 Jackson 类型**，去框架化＝换中性 JSON 表示或 typed records（K 级重设计，非机械活）；
+  ② **依赖上述载体的纯 JDK 4**（`ChunkSearchGateway`←`ChunkFacts`、`KnowledgeBaseLookup`←`KnowledgeBaseView`、`KnowledgeDocumentGateway`←`KnowledgeDocumentFacts`、`PipelineMessageView`←`SearchResult`）——**依赖闭包**不成立，随 ① 一起走；
+  ③ **servlet 端口 1**（`ApiKeyAuthPort`：`authenticate(HttpServletRequest, HttpServletResponse)`）——签名重设计＝改 auth 流转（K 级）。
+- **验证**：**4987 / 失败 0 / 跳过 4** ✓；`spotlessCheck build` ✓ **2m18s** ✓ **12 守卫** ✓（环 0 / SCC 11 组）；`arch.*` 28 条 ✓；四模块 javadoc ✓。
+- **A② 全批提交**：`a7d3b13e`（第①批 42 类）· `37b5fbb8`（第②批 去框架化 37 类）· `2ee75327`（第②批 补：解锁 11 类）· 本批（第③批 9 类 + 收口）。
+- **A 的下一步**：**③ 立「域间只经契约」**（A20 已守"契约唯一实现"；还差"业务域之间只经 `contract`"这条规则——应先测现状再决定硬规则 vs 棘轮基线）。可选后续：① 的 K 级重设计（`JsonNode` → typed records）另立项。
+
 **🔶 A② 契约面收纳第①批（2026-10-14，**v0.3.0**：42 类 → `contract.*`，§8.1 走到底）**
 - **方法（本条最重要的资产）**：① **纯度盘点**——`common/**`+`event/**` 逐类判"纯 JDK / 沾框架"⇒ **55 纯 / 42 沾框架 / 11 待裁决**；② **依赖闭包**——R1 只允许契约类依赖 JDK+自身，故只有**闭集**能整批搬（迭代剔除依赖落在集合外的）⇒ 初算 51，增补 6（3 个跨域端口 + `AgentChannelCleaner`（本就是契约端口）+ 2 个 apikey 响应 DTO——被 `ApiKeyAdminPort` 签名引用，只能留契约侧）。
 - **落位**：**42 类**入 14 个契约面（`contract/` 现 43 类 + 15 份 package-info）；`common/**` 从 90 类降到 **48 类**。FQN 替换 261 文件。

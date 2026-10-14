@@ -1,6 +1,6 @@
 package com.ragagent.audit.service;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

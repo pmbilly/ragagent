@@ -24,7 +24,7 @@ import com.ragagent.common.knowledge.KnowledgeDocumentGateway;
 import com.ragagent.platform.model.ModelGateway;
 import com.ragagent.platform.config.RetrievalDriverProperties;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.retrieval.engine.EngineTypes;
 import com.ragagent.retrieval.engine.RetrieveEngineRegistry;
 import com.ragagent.retrieval.engine.TenantStoreOwnership;

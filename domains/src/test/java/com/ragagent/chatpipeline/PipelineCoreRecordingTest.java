@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import com.ragagent.chatpipeline.plugin.PluginError;
 import com.ragagent.contract.session.PipelineMessageAttachmentView;
 import com.ragagent.contract.session.PipelineUsedMemoryView;
-import com.ragagent.common.retrieval.SearchTarget;
+import com.ragagent.contract.retrieval.SearchTarget;
 
 /**
  * 录制回放：event_manager / builder / plugin_error / chat_manage 组

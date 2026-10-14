@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.platform.access.TracingContext;
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * 问题生成**批**任务的载荷。

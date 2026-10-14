@@ -1,6 +1,6 @@
 package com.ragagent.initialization.service;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;
 import java.time.OffsetDateTime;
 import com.ragagent.platform.config.AppEnvLookup;

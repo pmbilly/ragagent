@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.ragagent.common.knowledge.EmbeddingModelPort;
+import com.ragagent.contract.knowledge.EmbeddingModelPort;
 import com.ragagent.knowledge.client.EmbedderClient;
 import com.ragagent.model.domain.Model;
 import com.ragagent.model.service.ModelService;

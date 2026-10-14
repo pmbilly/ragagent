@@ -21,11 +21,11 @@ import com.ragagent.retrieval.domain.ImageInfo;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.retrieval.support.ImageInfoMatchUtil;
 import com.ragagent.retrieval.support.SearchTextUtil;
-import com.ragagent.common.retrieval.SearchTarget;
+import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.common.knowledge.DocumentChunkMetadata;
 import com.ragagent.contract.knowledge.GeneratedQuestion;
 import com.ragagent.platform.tracing.langfuse.LangfuseManager;
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.retrieval.telemetry.RetrievalObs;
 

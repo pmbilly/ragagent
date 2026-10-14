@@ -3,7 +3,7 @@ package com.ragagent.knowledge.domain;
 import java.util.ArrayList;
 import java.util.List;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**

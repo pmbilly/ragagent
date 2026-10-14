@@ -1,7 +1,7 @@
 package com.ragagent.session.service;
 
 import com.ragagent.platform.prompt.PromptSource;
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +12,7 @@ import com.ragagent.agentmanagement.service.config.AgentConfigJson;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.common.retrieval.SearchTarget.SearchTargets;
+import com.ragagent.contract.retrieval.SearchTarget.SearchTargets;
 
 /**
  * {@code SessionAgentQaService} 的**配置装配簇**：从请求 + 知识库/文档信息构造

@@ -1,6 +1,6 @@
 package com.ragagent.im.channel.yunzhijia;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.WebSocket;

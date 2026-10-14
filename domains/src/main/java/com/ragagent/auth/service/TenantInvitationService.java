@@ -1,6 +1,6 @@
 package com.ragagent.auth.service;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.security.SecureRandom;
 import com.ragagent.platform.config.AppEnvLookup;
 import java.time.Duration;

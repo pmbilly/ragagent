@@ -1,6 +1,6 @@
 package com.ragagent.platform.text;
 
-import com.ragagent.common.text.TextConv;
+import com.ragagent.contract.text.TextConv;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

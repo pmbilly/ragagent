@@ -1,6 +1,6 @@
 package com.ragagent.storage.fileserve;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;

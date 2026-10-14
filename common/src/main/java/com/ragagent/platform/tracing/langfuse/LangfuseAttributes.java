@@ -1,6 +1,6 @@
 package com.ragagent.platform.tracing.langfuse;
 
-import com.ragagent.common.web.ContractJsonModule;
+import com.ragagent.platform.web.ContractJsonModule;
 
 import java.io.IOException;
 import java.security.SecureRandom;

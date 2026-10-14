@@ -1,6 +1,6 @@
 package com.ragagent.session.support;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.util.List;
 
 import com.fasterxml.jackson.core.type.TypeReference;

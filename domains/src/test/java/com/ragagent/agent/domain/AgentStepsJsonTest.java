@@ -1,7 +1,7 @@
 package com.ragagent.agent.domain;
 
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.OffsetDateTime;

@@ -1,7 +1,7 @@
 package com.ragagent.settings;
 
 import com.ragagent.platform.prompt.PromptSource;
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;

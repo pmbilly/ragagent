@@ -1,6 +1,6 @@
 package com.ragagent.memory.service;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;

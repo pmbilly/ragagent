@@ -1,6 +1,6 @@
 package com.ragagent.auth.service;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.nio.charset.StandardCharsets;
 import com.ragagent.auth.config.JwtProperties;
 import java.security.MessageDigest;

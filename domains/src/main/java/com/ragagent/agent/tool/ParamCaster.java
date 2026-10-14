@@ -1,6 +1,6 @@
 package com.ragagent.agent.tool;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.util.Iterator;
 import java.util.Map;
 

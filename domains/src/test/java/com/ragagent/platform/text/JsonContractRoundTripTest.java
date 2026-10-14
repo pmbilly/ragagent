@@ -143,7 +143,7 @@ class JsonContractRoundTripTest {
 
     // 裸 mapper + 契约 Json 模块：等价于搬迁前的"注解直接在类上"（§8.1 去框架化后注解在 mixin 里）
     private static final ObjectMapper MAPPER = new ObjectMapper()
-            .registerModule(new com.ragagent.common.web.ContractJsonModule());
+            .registerModule(new com.ragagent.platform.web.ContractJsonModule());
 
     // ── MCP（auth_config / headers 等 jsonb 列 + 直接作响应体） ──────────────
 

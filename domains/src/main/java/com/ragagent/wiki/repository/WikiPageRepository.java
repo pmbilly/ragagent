@@ -1,6 +1,6 @@
 package com.ragagent.wiki.repository;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.wiki.mapper.WikiPageIssueMapper;
 import com.ragagent.wiki.mapper.WikiPageMapper;
 import com.ragagent.wiki.mapper.WikiPageRevisionMapper;

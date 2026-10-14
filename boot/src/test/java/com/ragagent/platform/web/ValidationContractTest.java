@@ -1,6 +1,5 @@
 package com.ragagent.platform.web;
 
-import com.ragagent.common.web.JsonMappers;
 
 import com.ragagent.TestSchema;
 import com.ragagent.auth.domain.User;

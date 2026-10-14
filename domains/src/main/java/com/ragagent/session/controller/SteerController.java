@@ -1,6 +1,6 @@
 package com.ragagent.session.controller;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

@@ -19,7 +19,7 @@ import com.ragagent.knowledge.support.KnowledgeProjectionAdapter;
 
 import com.ragagent.knowledge.domain.access.KnowledgeReadPort;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;

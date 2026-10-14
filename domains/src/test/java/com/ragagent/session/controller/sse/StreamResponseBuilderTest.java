@@ -9,7 +9,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.web.ContractJsonModule;
+import com.ragagent.platform.web.ContractJsonModule;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.llm.domain.StreamResponse;
 import com.ragagent.common.retrieval.SearchResult;

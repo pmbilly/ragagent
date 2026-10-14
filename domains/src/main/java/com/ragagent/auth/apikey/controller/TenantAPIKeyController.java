@@ -1,6 +1,6 @@
 package com.ragagent.auth.apikey.controller;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;

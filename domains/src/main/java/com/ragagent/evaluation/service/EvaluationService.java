@@ -13,7 +13,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.ragagent.common.retrieval.SearchTarget;
+import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.chatpipeline.ChatManage;
 import com.ragagent.chatpipeline.PipelineBuilder;
 import com.ragagent.chatpipeline.SummaryConfig;

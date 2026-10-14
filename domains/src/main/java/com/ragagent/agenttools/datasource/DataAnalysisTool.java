@@ -20,7 +20,7 @@ import com.ragagent.agent.tool.BaseTool;
 import com.ragagent.agent.tool.Cleanable;
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool;
 import com.ragagent.agent.tool.runtime.SearchAuth;
-import com.ragagent.common.retrieval.SearchTarget;
+import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.agenttools.sql.SqlGuard;
 import com.ragagent.agent.tool.ToolDefinitions;
 import com.ragagent.agent.tool.ToolRequest;

@@ -1,6 +1,6 @@
 package com.ragagent.auth.apikey.controller.filter;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 

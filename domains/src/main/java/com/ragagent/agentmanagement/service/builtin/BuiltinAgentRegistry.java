@@ -3,7 +3,7 @@ package com.ragagent.agentmanagement.service.builtin;
 import com.ragagent.agentmanagement.service.config.AgentConfigJson;
 
 import com.ragagent.platform.prompt.PromptSource;
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.io.InputStream;
 import com.ragagent.contract.wiki.WikiLanguageSupport;
 import java.util.ArrayList;

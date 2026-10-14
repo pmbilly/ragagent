@@ -3,6 +3,7 @@ package com.ragagent.agent.tool.runtime;
 
 
 
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -19,8 +20,8 @@ import com.ragagent.agent.tool.runtime.SearchAuth.ChunkView;
 import com.ragagent.agent.tool.runtime.SearchAuth.KnowledgeView;
 import com.ragagent.agent.tool.runtime.SearchAuth.ScopeAuthException;
 import com.ragagent.agent.tool.runtime.SearchAuth.TagView;
-import com.ragagent.common.retrieval.SearchTarget.SearchTargets;
-import com.ragagent.common.retrieval.SearchTarget;
+import com.ragagent.contract.retrieval.SearchTarget.SearchTargets;
+import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.agenttools.RecordingSupport;
 import com.ragagent.agenttools.GoRecording45B;
 

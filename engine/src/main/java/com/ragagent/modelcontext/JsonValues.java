@@ -1,6 +1,6 @@
 package com.ragagent.modelcontext;
 
-import com.ragagent.common.web.ContractJsonModule;
+import com.ragagent.platform.web.ContractJsonModule;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

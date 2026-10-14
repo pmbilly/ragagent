@@ -25,7 +25,7 @@ import com.ragagent.chatpipeline.support.ReferencesSupport;
 import com.ragagent.contract.memory.MemoryItemView;
 import com.ragagent.contract.memory.MemoryRecall;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.common.retrieval.SearchTarget;
+import com.ragagent.contract.retrieval.SearchTarget;
 
 /**
  * 录制回放：rerank（清洗/段落/编排）+ wiki_boost + memory_recall/affinity + progress

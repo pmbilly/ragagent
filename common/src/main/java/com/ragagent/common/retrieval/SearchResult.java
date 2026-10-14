@@ -7,7 +7,7 @@ import java.util.TreeMap;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.web.SortedMapSerializer;
+import com.ragagent.platform.web.SortedMapSerializer;
 
 /**
  * 检索结果条目。

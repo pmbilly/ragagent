@@ -1,7 +1,7 @@
 package com.ragagent.websearch.controller;
 
 import com.ragagent.websearch.provider.WebSearchProvider;
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;
 import java.util.LinkedHashMap;
 import java.util.List;

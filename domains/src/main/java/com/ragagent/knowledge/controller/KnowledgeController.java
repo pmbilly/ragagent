@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.controller;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.io.IOException;
 import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;

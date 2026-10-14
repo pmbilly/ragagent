@@ -1,6 +1,6 @@
 package com.ragagent.im.runtime;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.util.Map;
 import com.ragagent.im.domain.ImChannelEntity;
 

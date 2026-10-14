@@ -2,7 +2,7 @@ package com.ragagent.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

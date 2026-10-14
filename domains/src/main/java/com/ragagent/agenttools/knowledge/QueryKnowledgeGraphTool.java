@@ -11,7 +11,7 @@ import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.common.retrieval.SearchTarget.SearchTargets;
+import com.ragagent.contract.retrieval.SearchTarget.SearchTargets;
 import com.ragagent.agent.tool.BaseTool;
 import com.ragagent.agent.tool.runtime.SearchAuth;
 import com.ragagent.agent.tool.ToolDefinitions;

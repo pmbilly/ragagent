@@ -1,6 +1,6 @@
 package com.ragagent.im.channel.dingtalk;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URLEncoder;

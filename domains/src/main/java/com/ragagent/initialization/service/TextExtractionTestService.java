@@ -1,7 +1,7 @@
 package com.ragagent.initialization.service;
 
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.http.ResponseEntity;

@@ -1,7 +1,7 @@
 package com.ragagent.config;
 
 
-import com.ragagent.common.web.ContractJsonModule;
+import com.ragagent.platform.web.ContractJsonModule;
 
 import com.ragagent.platform.tracing.langfuse.LangfuseHttpInterceptor;
 

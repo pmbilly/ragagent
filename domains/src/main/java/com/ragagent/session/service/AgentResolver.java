@@ -1,6 +1,6 @@
 package com.ragagent.session.service;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.io.IOException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;

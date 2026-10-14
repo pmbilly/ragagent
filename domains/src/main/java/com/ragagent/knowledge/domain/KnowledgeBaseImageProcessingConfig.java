@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.domain;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /** ImageProcessingConfig：单字段 */

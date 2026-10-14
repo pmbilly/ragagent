@@ -1,6 +1,6 @@
 package com.ragagent.session.service;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.LongSupplier;
@@ -21,7 +21,7 @@ import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool;
 import com.ragagent.agent.tool.runtime.SearchAuth;
 import com.ragagent.agenttools.knowledge.SearchConversationsTool;
 import com.ragagent.agenttools.knowledge.SearchMemoryTool;
-import com.ragagent.common.retrieval.SearchTarget;
+import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.agenttools.web.WebFetchTool;
 import com.ragagent.agenttools.web.WebSearchTool;
 import com.ragagent.agenttools.wiki.WikiDeletePageTool;

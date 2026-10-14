@@ -1,4 +1,4 @@
-package com.ragagent.common.knowledge;
+package com.ragagent.contract.knowledge;
 
 import java.util.List;
 

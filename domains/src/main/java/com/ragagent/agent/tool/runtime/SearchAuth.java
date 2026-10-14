@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import com.ragagent.common.retrieval.SearchTarget;
-import com.ragagent.common.retrieval.SearchTarget.SearchTargets;
+import com.ragagent.contract.retrieval.SearchTarget;
+import com.ragagent.contract.retrieval.SearchTarget.SearchTargets;
 import com.ragagent.common.knowledge.ChunkFacts;
 
 /**

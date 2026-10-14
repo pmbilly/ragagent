@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.datasource.domain.DataSourceSyncPayload;
 import com.ragagent.datasource.domain.TaskInitiator;
 import com.ragagent.knowledge.domain.ExtractChunkPayload;

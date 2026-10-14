@@ -1,7 +1,7 @@
 package com.ragagent.storage.support;
 
 import com.ragagent.storage.provider.FileService;
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;

@@ -1,6 +1,6 @@
 package com.ragagent.datasource.domain;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.util.Map;
 

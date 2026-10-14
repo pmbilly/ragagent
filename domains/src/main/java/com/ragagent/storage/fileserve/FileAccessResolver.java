@@ -1,6 +1,6 @@
 package com.ragagent.storage.fileserve;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.util.List;
 
 import org.springframework.stereotype.Component;

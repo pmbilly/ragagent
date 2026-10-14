@@ -1,6 +1,6 @@
 package com.ragagent.datasource.controller;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;
 import java.util.Map;
 

@@ -1,4 +1,4 @@
-package com.ragagent.common.web;
+package com.ragagent.platform.web;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

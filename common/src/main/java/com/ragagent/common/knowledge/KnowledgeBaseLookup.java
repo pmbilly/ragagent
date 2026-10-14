@@ -12,7 +12,7 @@ import com.ragagent.contract.knowledge.KnowledgeView;
  *
  * <p><b>本端口只覆盖读侧</b>：chunk 读写、知识行写、span、嵌入见
  * {@link com.ragagent.contract.knowledge.ChunkPort}/{@link com.ragagent.contract.knowledge.KnowledgeFinalizePort}/{@link com.ragagent.contract.knowledge.KnowledgeSpanPort}/
- * {@link com.ragagent.common.knowledge.EmbeddingModelPort}。</p>
+ * {@link com.ragagent.contract.knowledge.EmbeddingModelPort}。</p>
  */
 public interface KnowledgeBaseLookup {
 

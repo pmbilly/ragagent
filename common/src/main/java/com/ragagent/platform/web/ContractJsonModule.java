@@ -1,4 +1,4 @@
-package com.ragagent.common.web;
+package com.ragagent.platform.web;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;

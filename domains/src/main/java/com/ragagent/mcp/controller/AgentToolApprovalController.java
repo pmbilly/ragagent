@@ -1,6 +1,6 @@
 package com.ragagent.mcp.controller;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.util.Optional;
 
 import com.fasterxml.jackson.databind.JsonNode;

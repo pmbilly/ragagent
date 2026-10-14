@@ -1,6 +1,6 @@
 package com.ragagent.modelruntime.adapter.provider.chat;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.http.HttpResponse;

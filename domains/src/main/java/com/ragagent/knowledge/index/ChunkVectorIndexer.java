@@ -32,7 +32,7 @@ import com.ragagent.embedding.Embedder;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.retrieval.engine.EngineTypes;
 import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.knowledge.client.EmbedderClient;
 import com.ragagent.retrieval.engine.VectorStoreService;
 import com.ragagent.retrieval.support.ChunkSearchUtil;

@@ -139,7 +139,7 @@ class AgentEngineBoundaryTest {
         assertThat(isDomainImport("import com.ragagent.session.service.QaWiring;")).isTrue();
         assertThat(isDomainImport("import com.ragagent.mcp.domain.McpService;")).isTrue();
         assertThat(isDomainImport("import static com.ragagent.wiki.service.WikiPrompts.GO_SHA256;")).isTrue();
-        assertThat(isDomainImport("import com.ragagent.common.web.JsonMappers;")).isFalse();
+        assertThat(isDomainImport("import com.ragagent.platform.web.JsonMappers;")).isFalse();
         assertThat(isDomainImport("import com.ragagent.modelcontext.Registry;")).isFalse();
         assertThat(isDomainImport("import com.ragagent.platform.event.EventBus;")).isFalse();
         assertThat(isDomainImport("import java.util.List;")).isFalse();

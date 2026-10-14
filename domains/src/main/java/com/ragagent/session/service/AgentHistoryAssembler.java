@@ -1,7 +1,7 @@
 package com.ragagent.session.service;
 
 import com.ragagent.agent.domain.AgentToolCall;
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

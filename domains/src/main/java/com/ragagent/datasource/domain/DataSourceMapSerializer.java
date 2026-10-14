@@ -9,7 +9,7 @@ import java.util.Map;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializable;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.ragagent.common.web.SortedMapSerializer;
+import com.ragagent.platform.web.SortedMapSerializer;
 
 /**
  * {@link SortedMapSerializer} 的 datasource 版本：在"按键排序且递归"之上，**再把嵌套的

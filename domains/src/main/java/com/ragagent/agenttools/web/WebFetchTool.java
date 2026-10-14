@@ -1,6 +1,6 @@
 package com.ragagent.agenttools.web;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.ToolJson;
 import java.net.URI;
 import java.util.ArrayList;

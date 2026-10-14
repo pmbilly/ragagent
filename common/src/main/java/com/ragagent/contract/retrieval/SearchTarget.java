@@ -1,4 +1,4 @@
-package com.ragagent.common.retrieval;
+package com.ragagent.contract.retrieval;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

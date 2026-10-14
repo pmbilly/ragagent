@@ -1,6 +1,6 @@
 package com.ragagent.wiki.service.ingest;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;

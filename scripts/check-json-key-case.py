@@ -98,9 +98,9 @@ FROZEN_PREFIXES = (
     # ⚠️ 前缀冻结会在**换包**时静默失效（B168 实测 ✗）：B162 把 llm/TokenUsage 搬进 common/llm、
     # B163 把 6 个 Langfuse 装饰器从 tracing/langfuse 换包到 tracing/decorators ⇒ 旧前缀不再命中，
     # 冻结悄悄失效、CI 才报"非冻结面出现新的 snake 键"。**换包时务必回来核这里** ✓。
-    # A②-2a：契约载荷的**线格式载体**——注解从契约类搬进 mixin 模块（§8.1 纯 JDK），
+    # A②-2a/2c：契约载荷的**线格式载体**（模块自 common/web 迁 platform/web，前缀同步换锚）——注解从契约类搬进 mixin 模块（§8.1 纯 JDK），
     # 键名仍是既有 API/jsonb 契约（snake 键是设计，不是漂移）。
-    'common/web/ContractJsonMixins',
+    'platform/web/ContractJsonMixins',
     'contract/wiki/ExtractedItem', 'chatpipeline/plugin', 'agent/AgentEngine',
     'agent/ReActIteration', 'retrieval/HybridSearchService', 'retrieval/vlm/VlmClient',
     'knowledge/service/chunk/ChunkExtractService', 'knowledge/task/KnowledgeProcessWorker',  # B263㉟ 换锚：ChunkExtractService 迁 service/chunk

@@ -34,7 +34,7 @@ import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
 import com.ragagent.model.service.ModelRuntimeAssembler;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
-import com.ragagent.common.retrieval.SearchChunkMerge;
+import com.ragagent.contract.retrieval.SearchChunkMerge;
 import com.ragagent.contract.wiki.WikiImageMarkup;
 import com.ragagent.contract.wiki.WikiLanguageSupport;
 import org.slf4j.Logger;

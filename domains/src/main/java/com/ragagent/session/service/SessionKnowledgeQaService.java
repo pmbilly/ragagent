@@ -40,7 +40,7 @@ import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.session.support.PipelineViews;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.auth.service.TenantService;
-import com.ragagent.common.retrieval.SearchTarget;
+import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.platform.tracing.langfuse.LangfuseManager;
 import com.ragagent.platform.tracing.langfuse.Span;
 import com.ragagent.websearch.mapper.WebSearchProviderRepository;

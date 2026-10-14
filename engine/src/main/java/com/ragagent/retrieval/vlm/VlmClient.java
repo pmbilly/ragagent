@@ -1,6 +1,6 @@
 package com.ragagent.retrieval.vlm;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.LinkedHashMap;

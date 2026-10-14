@@ -2,7 +2,7 @@ package com.ragagent.agentmanagement.controller;
 
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.platform.web.RequestFields;
 import java.util.ArrayList;
 import java.util.List;

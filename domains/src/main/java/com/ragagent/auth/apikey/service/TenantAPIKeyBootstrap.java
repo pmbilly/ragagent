@@ -1,6 +1,6 @@
 package com.ragagent.auth.apikey.service;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.util.LinkedHashMap;
 import com.ragagent.platform.config.AppEnvLookup;
 import java.util.Map;

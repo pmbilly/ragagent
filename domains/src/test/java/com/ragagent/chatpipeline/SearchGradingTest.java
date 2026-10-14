@@ -18,7 +18,7 @@ import com.ragagent.chatpipeline.plugin.PluginSearchParallel;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.error.ErrorCode;
-import com.ragagent.common.retrieval.SearchTarget;
+import com.ragagent.contract.retrieval.SearchTarget;
 
 /**
  * 回归：KB 检索的 <b>"硬错 vs 降级" 分级</b>。

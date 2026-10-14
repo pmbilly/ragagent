@@ -1,6 +1,6 @@
 package com.ragagent.session.service;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.time.OffsetDateTime;
 import com.ragagent.platform.config.AppEnvLookup;
 import java.time.ZoneId;

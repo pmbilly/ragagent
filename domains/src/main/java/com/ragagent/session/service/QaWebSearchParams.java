@@ -1,6 +1,6 @@
 package com.ragagent.session.service;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

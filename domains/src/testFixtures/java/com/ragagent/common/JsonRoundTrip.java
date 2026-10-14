@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.web.ContractJsonModule;
+import com.ragagent.platform.web.ContractJsonModule;
 
 /**
  * JSON 往返断言工具——把「领域对象的 JSON 形状必须符合契约」变成自动化检查。

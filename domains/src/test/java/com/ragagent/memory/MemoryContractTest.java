@@ -1,6 +1,6 @@
 package com.ragagent.memory;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.OffsetDateTime;

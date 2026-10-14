@@ -21,7 +21,7 @@ import com.ragagent.agent.tool.DocChunkSupport;
 import com.ragagent.agent.tool.runtime.SearchAuth;
 import com.ragagent.agent.tool.ToolDefinitions;
 import com.ragagent.agent.tool.ToolRequest;
-import com.ragagent.common.retrieval.SearchTarget;
+import com.ragagent.contract.retrieval.SearchTarget;
 
 /**
  * wiki_read_source_doc 工具。

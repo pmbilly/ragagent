@@ -1,6 +1,6 @@
 package com.ragagent.session.service.suggestion;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import com.ragagent.contract.wiki.WikiLanguageSupport;
 import java.util.HashMap;

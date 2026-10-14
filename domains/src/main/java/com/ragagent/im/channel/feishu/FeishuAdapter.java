@@ -1,6 +1,6 @@
 package com.ragagent.im.channel.feishu;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.nio.charset.StandardCharsets;
 import java.net.URI;
 import java.net.http.HttpClient;

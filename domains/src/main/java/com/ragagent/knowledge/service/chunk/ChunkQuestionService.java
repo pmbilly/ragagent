@@ -45,7 +45,7 @@ import com.ragagent.retrieval.engine.RetrieverEngineParams;
 import com.ragagent.retrieval.engine.TenantStoreOwnership;
 import com.ragagent.retrieval.engine.EffectiveEngines;
 import com.ragagent.retrieval.engine.RetrieveEngineFactories;
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
 import com.ragagent.retrieval.support.ChunkSearchUtil;
 import com.ragagent.knowledge.index.ChunkVectorIndexer;

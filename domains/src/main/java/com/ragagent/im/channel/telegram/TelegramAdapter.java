@@ -1,6 +1,6 @@
 package com.ragagent.im.channel.telegram;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;

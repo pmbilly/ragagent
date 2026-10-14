@@ -1,4 +1,4 @@
-package com.ragagent.common.web;
+package com.ragagent.platform.web;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;

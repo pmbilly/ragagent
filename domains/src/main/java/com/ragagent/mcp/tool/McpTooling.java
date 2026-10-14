@@ -17,7 +17,7 @@ import com.ragagent.agent.tool.spi.McpToolingGateway;
 import com.ragagent.agent.tool.spi.ToolRegistryPort;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ToolCall;
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.agent.tool.AgentTool;
 import com.ragagent.agent.tool.ToolDefinitions;

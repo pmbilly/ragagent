@@ -1,6 +1,6 @@
 package com.ragagent.platform.persistence;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

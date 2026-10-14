@@ -2,7 +2,7 @@ package com.ragagent.session.qa;
 
 import com.ragagent.session.support.LogSanitizer;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.util.List;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.agentmanagement.service.config.AgentConfigJson;

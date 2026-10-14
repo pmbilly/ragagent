@@ -31,7 +31,7 @@ import com.ragagent.agent.tool.TodoWriteTool;
 import com.ragagent.agenttools.web.WebFetchTool;
 import com.ragagent.agenttools.web.WebSearchTool;
 import com.ragagent.approval.Gate;
-import com.ragagent.common.retrieval.SearchTarget;
+import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.service.management.KnowledgeService;

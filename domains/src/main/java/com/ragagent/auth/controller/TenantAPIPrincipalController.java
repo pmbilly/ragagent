@@ -1,6 +1,6 @@
 package com.ragagent.auth.controller;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;

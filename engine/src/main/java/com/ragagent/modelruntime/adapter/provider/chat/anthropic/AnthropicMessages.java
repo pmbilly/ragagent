@@ -1,6 +1,6 @@
 package com.ragagent.modelruntime.adapter.provider.chat.anthropic;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,6 +1,6 @@
 package com.ragagent.mcp.tool;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;

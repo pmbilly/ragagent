@@ -1,7 +1,7 @@
 package com.ragagent.datasource.connector.gitlab;
 
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;

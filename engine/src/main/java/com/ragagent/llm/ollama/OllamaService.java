@@ -1,6 +1,6 @@
 package com.ragagent.llm.ollama;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.io.BufferedReader;
 import com.ragagent.platform.config.AppEnvLookup;
 import java.io.IOException;

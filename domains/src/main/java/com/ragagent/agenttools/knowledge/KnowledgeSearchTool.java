@@ -1,6 +1,6 @@
 package com.ragagent.agenttools.knowledge;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ragagent.agent.tool.BaseTool;
 import com.ragagent.agent.tool.runtime.SearchAuth;
-import com.ragagent.common.retrieval.SearchTarget;
+import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.agent.tool.ToolDefinitions;
 import com.ragagent.agent.tool.ToolRequest;
 

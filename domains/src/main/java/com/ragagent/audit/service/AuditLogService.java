@@ -1,7 +1,7 @@
 package com.ragagent.audit.service;
 
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.OffsetDateTime;

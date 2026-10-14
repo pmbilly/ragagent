@@ -2,7 +2,7 @@ package com.ragagent.datasource.task;
 
 import com.ragagent.datasource.DataSourceSyncEnqueueException;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.time.Duration;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;

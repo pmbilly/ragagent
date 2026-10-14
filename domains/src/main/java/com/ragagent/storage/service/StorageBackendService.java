@@ -1,6 +1,6 @@
 package com.ragagent.storage.service;
 
-import com.ragagent.common.web.JsonMappers;
+import com.ragagent.platform.web.JsonMappers;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
