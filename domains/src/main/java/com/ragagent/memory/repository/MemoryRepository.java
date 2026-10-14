@@ -22,16 +22,16 @@ import com.ragagent.memory.domain.MemoryExtractionBatch;
 import com.ragagent.memory.domain.MemoryExtractionFailure;
 import com.ragagent.memory.domain.MemoryExtractionSession;
 import com.ragagent.memory.domain.MemoryExtractionState;
-import com.ragagent.memory.domain.MemoryItem;
-import com.ragagent.memory.domain.MemoryItemEmbedding;
+import com.ragagent.memory.domain.item.MemoryItem;
+import com.ragagent.memory.domain.item.MemoryItemEmbedding;
 import com.ragagent.memory.domain.MemoryMessageCursor;
 import com.ragagent.memory.domain.MemoryPage;
-import com.ragagent.memory.domain.MemoryScope;
-import com.ragagent.memory.domain.MemorySubject;
-import com.ragagent.memory.domain.MemoryTombstone;
+import com.ragagent.memory.domain.scope.MemoryScope;
+import com.ragagent.memory.domain.scope.MemorySubject;
+import com.ragagent.memory.domain.item.MemoryTombstone;
 import com.ragagent.memory.domain.MemoryTopicStat;
-import com.ragagent.memory.domain.MemoryVectorHit;
-import com.ragagent.memory.domain.MemoryVectorQuery;
+import com.ragagent.memory.domain.vector.MemoryVectorHit;
+import com.ragagent.memory.domain.vector.MemoryVectorQuery;
 import org.springframework.stereotype.Component;
 
 /**

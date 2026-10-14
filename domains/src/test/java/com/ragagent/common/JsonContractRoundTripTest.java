@@ -60,7 +60,7 @@ import com.ragagent.mcp.domain.McpAdvancedConfig;
 import com.ragagent.common.memory.MemoryConfig;
 import com.ragagent.memory.domain.MemoryConsolidationResult;
 import com.ragagent.memory.domain.MemoryDocView;
-import com.ragagent.memory.domain.MemorySettings;
+import com.ragagent.memory.domain.scope.MemorySettings;
 import com.ragagent.memory.domain.MemoryTopicView;
 import com.ragagent.mcp.domain.McpAuthConfig;
 import com.ragagent.mcp.domain.McpAuthType;

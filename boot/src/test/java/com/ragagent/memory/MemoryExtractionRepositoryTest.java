@@ -13,7 +13,7 @@ import com.ragagent.memory.domain.MemoryExtractionFailure;
 import com.ragagent.memory.domain.MemoryExtractionLeaseLostException;
 import com.ragagent.memory.domain.MemoryExtractionSession;
 import com.ragagent.memory.domain.MemoryMessageCursor;
-import com.ragagent.memory.domain.MemoryScope;
+import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.repository.MemoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

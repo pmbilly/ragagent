@@ -1,6 +1,6 @@
 package com.ragagent.memory.dto;
 
-import com.ragagent.memory.domain.MemoryItem;
+import com.ragagent.memory.domain.item.MemoryItem;
 import java.util.List;
 
 /**

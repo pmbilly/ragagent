@@ -1,4 +1,4 @@
-package com.ragagent.memory.domain;
+package com.ragagent.memory.domain.scope;
 
 /**
  * 一次记忆操作所属的（工作区, 主体）对。

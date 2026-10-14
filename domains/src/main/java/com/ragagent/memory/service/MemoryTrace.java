@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.ragagent.memory.domain.MemoryItem;
+import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.common.memory.MemoryKeys;
 import com.ragagent.tracing.langfuse.LangfuseManager;
 

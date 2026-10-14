@@ -1,4 +1,4 @@
-package com.ragagent.memory.domain;
+package com.ragagent.memory.domain.scope;
 
 /**
  * {@code withSubject} 在 {@code memory_subjects} 里找不到本 scope 的那一行时抛出。

@@ -1,4 +1,6 @@
-package com.ragagent.memory.domain;
+package com.ragagent.memory.domain.vector;
+
+import com.ragagent.memory.domain.item.MemoryItem;
 
 /**
  * 一条语义命中，以及它有多接近。

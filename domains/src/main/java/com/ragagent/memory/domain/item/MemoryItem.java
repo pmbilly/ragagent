@@ -1,4 +1,4 @@
-package com.ragagent.memory.domain;
+package com.ragagent.memory.domain.item;
 
 import com.ragagent.common.memory.MemoryKinds;
 import java.time.OffsetDateTime;

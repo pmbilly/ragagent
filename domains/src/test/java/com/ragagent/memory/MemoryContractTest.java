@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.memory.MemoryConfig;
 import com.ragagent.memory.domain.MemoryConsolidationResult;
 import com.ragagent.memory.domain.MemoryDocView;
-import com.ragagent.memory.domain.MemorySettings;
+import com.ragagent.memory.domain.scope.MemorySettings;
 import com.ragagent.memory.domain.MemoryTopicView;
 import org.junit.jupiter.api.Test;
 

@@ -9,11 +9,11 @@ import java.util.UUID;
 import com.ragagent.common.memory.MemoryKinds;
 import com.ragagent.common.web.ZeroTimeSerializer;
 import com.ragagent.memory.domain.MemoryConflictException;
-import com.ragagent.memory.domain.MemoryItem;
+import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.MemoryPage;
-import com.ragagent.memory.domain.MemoryScope;
-import com.ragagent.memory.domain.MemorySubjectMissingException;
-import com.ragagent.memory.domain.MemoryTombstone;
+import com.ragagent.memory.domain.scope.MemoryScope;
+import com.ragagent.memory.domain.scope.MemorySubjectMissingException;
+import com.ragagent.memory.domain.item.MemoryTombstone;
 
 /**
  * 记忆条目与墓碑的读写：条目 CRUD 与批量维护、召回所需的各类查询、

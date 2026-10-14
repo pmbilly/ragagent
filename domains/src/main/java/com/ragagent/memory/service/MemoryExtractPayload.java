@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.memory.domain.MemoryScope;
+import com.ragagent.memory.domain.scope.MemoryScope;
 
 /**
  * 一次蒸馏任务的全部输入。

@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import com.ragagent.memory.domain.MemoryVectors;
+import com.ragagent.memory.domain.vector.MemoryVectors;
 import org.junit.jupiter.api.Test;
 
 /**

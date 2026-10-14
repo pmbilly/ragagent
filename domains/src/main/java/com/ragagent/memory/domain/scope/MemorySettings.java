@@ -1,4 +1,4 @@
-package com.ragagent.memory.domain;
+package com.ragagent.memory.domain.scope;
 
 
 /**

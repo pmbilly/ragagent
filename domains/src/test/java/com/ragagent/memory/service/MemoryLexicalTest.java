@@ -7,7 +7,7 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ragagent.memory.domain.MemoryItem;
+import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.common.memory.MemoryKinds;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

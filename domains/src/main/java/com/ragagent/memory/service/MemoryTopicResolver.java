@@ -13,7 +13,7 @@ import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
 import com.ragagent.common.memory.MemoryKeys;
-import com.ragagent.memory.domain.MemoryScope;
+import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.domain.MemoryText;
 import com.ragagent.memory.domain.MemoryTopicStat;
 import com.ragagent.memory.repository.MemoryRepository;

@@ -17,12 +17,12 @@ import com.ragagent.memory.domain.MemoryExtractionBatch;
 import com.ragagent.memory.domain.MemoryExtractionFailure;
 import com.ragagent.memory.domain.MemoryExtractionLeaseLostException;
 import com.ragagent.memory.domain.MemoryExtractionSession;
-import com.ragagent.memory.domain.MemoryItem;
+import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.MemoryMessageCursor;
 import com.ragagent.memory.domain.MemoryPage;
-import com.ragagent.memory.domain.MemoryScope;
-import com.ragagent.memory.domain.MemorySubject;
-import com.ragagent.memory.domain.MemorySubjectMissingException;
+import com.ragagent.memory.domain.scope.MemoryScope;
+import com.ragagent.memory.domain.scope.MemorySubject;
+import com.ragagent.memory.domain.scope.MemorySubjectMissingException;
 import com.ragagent.memory.domain.MemoryTopicStat;
 
 /**

@@ -11,12 +11,12 @@ import java.util.List;
 import com.ragagent.TestSchema;
 import com.ragagent.common.web.ZeroTimeSerializer;
 import com.ragagent.memory.domain.MemoryDocAffinity;
-import com.ragagent.memory.domain.MemoryItem;
+import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.common.memory.MemoryKinds;
 import com.ragagent.memory.domain.MemoryPage;
-import com.ragagent.memory.domain.MemoryScope;
-import com.ragagent.memory.domain.MemorySubject;
-import com.ragagent.memory.domain.MemorySubjectMissingException;
+import com.ragagent.memory.domain.scope.MemoryScope;
+import com.ragagent.memory.domain.scope.MemorySubject;
+import com.ragagent.memory.domain.scope.MemorySubjectMissingException;
 import com.ragagent.memory.domain.MemoryText;
 import com.ragagent.memory.domain.MemoryTopicStat;
 import com.ragagent.memory.repository.MemoryRepository;
@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-import com.ragagent.memory.domain.MemoryTombstone;
+import com.ragagent.memory.domain.item.MemoryTombstone;
 
 /**
  * 记忆仓储在 H2 上的语义。

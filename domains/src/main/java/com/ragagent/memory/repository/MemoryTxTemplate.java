@@ -3,9 +3,9 @@ package com.ragagent.memory.repository;
 import com.ragagent.memory.mapper.MemorySubjectMapper;
 import java.util.function.Function;
 
-import com.ragagent.memory.domain.MemoryScope;
-import com.ragagent.memory.domain.MemorySubject;
-import com.ragagent.memory.domain.MemorySubjectMissingException;
+import com.ragagent.memory.domain.scope.MemoryScope;
+import com.ragagent.memory.domain.scope.MemorySubject;
+import com.ragagent.memory.domain.scope.MemorySubjectMissingException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -541,7 +541,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B263 | 6 | domains 域内重排①：knowledge（29 包 248 文件；SCC 拆解 + mapper/repository 主战场） | ✅ ①~㊸（mapper 归零 / `{service,task}` SCC 消除 / 门面 + 4 用例类归位 `service.management` / 五个子面切出；§8.8.2 包重排面到位；余三项属重构级，见收口记录） |
 | B264 | 6 | ②：session + agenttools/agentmanagement 落位 | ✅ ①~⑦（agentmanagement `service.{config,builtin}` / **B257 基线清零** / agenttools 四面对齐 `datasource` / session `controller.sse`+`domain` 三簇+`service.suggestion`；session 余项属重构级，见收口记录） |
 | B265 | 6 | ③：wiki（17 包 147）+ datasource（16 包 124）+ mcp（9 包 125） | ✅ ⑧~⑫（mcp 对齐 `tool`+改名 / wiki `domain` 五簇+`ingest.graph` / datasource `domain.connector`+`task`；余项属重构级与命名级，见收口记录） |
-| B266 | 6 | ④：im/memory/auth/storage/websearch/model + 其余小域 | ⬜ |
+| B266 | 6 | ④：im/memory/auth/storage/websearch/model + 其余小域 | 🔶 进行中（①：memory `domain` 三簇；六域差集盘点完成 ⇒ im `channel.*` / auth 两处 filter / model 改名 / storage·websearch 待定性） |
 | B267 | 6 | 门禁收紧收尾：§12.2「分层方向」「装配契约」两规则 + A11b 清零核查 + 复杂度指标（可选） | ⬜ |
 
 ### 15.2 批次纪律（每批通用，违者必翻车——全是本轮实锤）
@@ -1146,6 +1146,20 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **成果**：mcp 结构对齐（`tools`→`tool`、`McpServiceService`→`McpServiceManagement`）· wiki `domain` 五簇 + `service.ingest.graph` · datasource 顶层两簇落位（`domain.connector` 9 + `task` 6，根包 1）。
 - **登记为"重构级 / 命名级"（非包重排）**：① wiki `service.ingest`/`pipeline`/`task` 三簇互引（`ingest⇄pipeline` 3/7、`pipeline⇄task` 6/15）⇒ 需先断边；`WikiIngestService` 是目标树孤儿（留在 ingest 面）；② datasource `service.MapperKnowledgeBridge` vs 目标 `KnowledgeIngestClient`（命名差异，留命名批）；两域的两对 DTO 泛名（`Datasource|Mcp` 前缀是**既定防混淆决定**）；③ knowledge（B263）/session（B264）的重构级余项同理。
 - **本批资产（四条新经验）**：① **"假依赖"识别**——未使用 import 会被环/入度分析当成真边（现场：`DataSourceConstants → Connector`，删 import 即解环）；② **测试随迁要按"主体类"归位**——按"引用面启发式"会把队列/调度测试投错包，**编译揪出包内私有访问**才是终审；③ `@throws` 与 javadoc-only 类型引用**不进 import 扫描** ⇒ 必须显式写全限定；④ **snake 键的"按路径冻结前缀"与 `EVENT_MAP_FILES` 同族**——搬包必须换锚，否则守卫报"非冻结面新增键"。
+
+**🔶 B266 第①步（2026-10-14，B266 起步：memory `domain` 拆三簇；六域差集盘点）**
+- **B266 = ④：im（14 包 79）+ memory（10 包 72）+ auth（13 包 82）+ storage（8 包 41）+ websearch（7 包 35）+ model（5 包 26）+ 其余小域**。本步先做**六域 vs 目标树差集盘点**，再切第一刀。
+- **盘点结论（六域多数面已对齐）**：
+  - `storage`：`config`/`controller`/`domain`/`dto`/`mapper`/`service`/`support` **逐名一致** ✓；`fileserve` 多一类（`StoragePathGuard`，目标无）；`provider/`(11) **目标树无此面**（待定性）。
+  - `websearch`：`controller`/`domain`/`dto`/`mapper`/`provider`(19)/`service` **逐名一致** ✓；缺 `fetch/`(4：`AgentMarkdown`/`BrowserRenderer`/`FetchException`/`Fetcher`——待查落点)。
+  - `memory`：`controller`/`dto`/`mapper`/`repository`/`service`/根包 **逐名一致** ✓；`domain/`(27) 需拆 `item`(3)+`scope`(4)+`vector`(3)+留 17（**算术闭合**）。
+  - `auth`：`apikey.*` 与 `controller`/`domain`/`dto`(20)/`mapper`/`service` **逐名一致** ✓；差两处**面位置**——`filter/`(2) → 目标 `controller.filter/`、`apikey/filter/`(9) → 目标 `apikey.controller.filter/`；缺 `apikey.dto/`(2)；`api/`(1) 是本批端口模式的**自愿增面**（登记）。
+  - `im`：`controller`/`domain`/`mapper`/`runtime`(19) **逐名一致** ✓；9 个渠道面需**改名加 `channel.` 前缀**（dingtalk/feishu/mattermost/qqbot/slack/telegram/wechat/wecom/yunzhijia，44 文件）；`service.ImService` vs 目标 `ImTurnOrchestrator`（改名级）。
+  - `model`：`controller`/`domain`/`mapper` **逐名一致** ✓；三处改名（`ModelResponse`→`ModelDetailResponse`、`ModelRuntimeFactory`→`ModelRuntimeAssembler`；两个 DTO 泛名属**有意偏离**）。
+- **本步切出**：`memory.domain` → `domain.item`(3) / `domain.scope`(4) / `domain.vector`(3)，留 17；10 文件迁移 + FQN 替换 **44 文件** + 补 import 3 文件 + **4 份 package-info**（3 新建 + `domain` 补建，原本缺失）。
+- **动前断言升级（本步新得）**：判据从"新面对留存面零引用"改为**面级图 DAG 检查**——`scope → domain`（`MemorySubject` → 状态处理器/类型处理器）是**合法单向边**，硬套"零引用"会误杀 ✗；实测面级边 `domain → item`、`vector → item`、`scope → domain`，**无环** ✓（SCC 12 组）。
+- **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 ✓；`spotlessCheck build` ✓ **1m50s** ✓ **十二守卫** ✓（环 0 / 包级 SCC 12 组）；`:domains:javadoc` ✓；定向 `--rerun-tasks` ✓。
+- **登记（B266 余下）**：① im `channel.*` 改名（9 面 44 文件）；② auth 两处 filter 面归位 + `apikey.dto` 缺 2 类（查 DTO 落点）；③ model 两处改名；④ storage `provider/` 定性 + `fileserve` 多出 `StoragePathGuard`；⑤ websearch `fetch/`(4) 落点核查。
 
 **🔶 B263 第㉟步（2026-10-14，第二个子面 `service.chunk` 切出）**
 - **动前断言（把"可测"变成"可证"）**：脚本**先断言** `ChunkEditService`/`ChunkExtractService`/`ChunkReadService` 三者在 `service` 包内**入度为零**（无人引用，`package-info` 除外），断言不过就 abort —— 这样"切出只产生单向外边"不再靠推理。`ChunkQuestionService` **故意留在** `service`：它被 `QuestionGenerationService` 引用，单独搬会造出 `service ⇄ service.chunk` 环（已在子面 package-info 写明）。

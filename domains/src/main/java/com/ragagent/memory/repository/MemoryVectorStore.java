@@ -8,10 +8,10 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ragagent.memory.domain.MemoryItemEmbedding;
-import com.ragagent.memory.domain.MemoryScope;
-import com.ragagent.memory.domain.MemoryVectorHit;
-import com.ragagent.memory.domain.MemoryVectorQuery;
+import com.ragagent.memory.domain.item.MemoryItemEmbedding;
+import com.ragagent.memory.domain.scope.MemoryScope;
+import com.ragagent.memory.domain.vector.MemoryVectorHit;
+import com.ragagent.memory.domain.vector.MemoryVectorQuery;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -20,8 +20,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import com.ragagent.common.memory.MemoryKinds;
 import com.ragagent.common.web.ZeroTimeSerializer;
-import com.ragagent.memory.domain.MemoryItem;
-import com.ragagent.memory.domain.MemoryVectors;
+import com.ragagent.memory.domain.item.MemoryItem;
+import com.ragagent.memory.domain.vector.MemoryVectors;
 
 /**
  * 记忆**向量面**（item_embeddings 表 + pgvector 列）：写入/删除嵌入、按向量检索、

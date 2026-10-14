@@ -1,7 +1,7 @@
 package com.ragagent.memory.service;
 
 import com.ragagent.common.context.TenantContext;
-import com.ragagent.memory.domain.MemoryScope;
+import com.ragagent.memory.domain.scope.MemoryScope;
 
 /**
  * 只从请求上下文推导记忆空间。

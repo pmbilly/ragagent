@@ -1,4 +1,8 @@
-package com.ragagent.memory.domain;
+package com.ragagent.memory.domain.scope;
+
+import com.ragagent.memory.domain.MemoryExtractionState;
+import com.ragagent.memory.domain.MemoryExtractionStateTypeHandler;
+import com.ragagent.memory.domain.MemoryStringListTypeHandler;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;

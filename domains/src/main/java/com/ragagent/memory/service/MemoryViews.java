@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ragagent.common.memory.MemoryItemView;
-import com.ragagent.memory.domain.MemoryItem;
+import com.ragagent.memory.domain.item.MemoryItem;
 
 /**
  * 记忆实体 → L1 视图的投影：跨层出口只输出 {@link MemoryItemView}（id/kind/content），

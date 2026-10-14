@@ -4,7 +4,7 @@ import java.time.OffsetDateTime;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ragagent.memory.domain.MemoryExtractionState;
-import com.ragagent.memory.domain.MemorySubject;
+import com.ragagent.memory.domain.scope.MemorySubject;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
