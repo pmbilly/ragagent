@@ -540,7 +540,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B262 | 6 | model-runtime 包边界（模型调用 / provider / 流生命周期） | ✅ 2026-10-13 |
 | B263 | 6 | domains 域内重排①：knowledge（29 包 248 文件；SCC 拆解 + mapper/repository 主战场） | ✅ ①~㊸（mapper 归零 / `{service,task}` SCC 消除 / 门面 + 4 用例类归位 `service.management` / 五个子面切出；§8.8.2 包重排面到位；余三项属重构级，见收口记录） |
 | B264 | 6 | ②：session + agenttools/agentmanagement 落位 | ✅ ①~⑦（agentmanagement `service.{config,builtin}` / **B257 基线清零** / agenttools 四面对齐 `datasource` / session `controller.sse`+`domain` 三簇+`service.suggestion`；session 余项属重构级，见收口记录） |
-| B265 | 6 | ③：wiki（17 包 147）+ datasource（16 包 124）+ mcp（9 包 125） | 🔶 进行中（⑧：mcp `tools`→`tool`；三域差集盘点完成 ⇒ wiki 两处拆簇 / datasource 待重测） |
+| B265 | 6 | ③：wiki（17 包 147）+ datasource（16 包 124）+ mcp（9 包 125） | ✅ ⑧~⑫（mcp 对齐 `tool`+改名 / wiki `domain` 五簇+`ingest.graph` / datasource `domain.connector`+`task`；余项属重构级与命名级，见收口记录） |
 | B266 | 6 | ④：im/memory/auth/storage/websearch/model + 其余小域 | ⬜ |
 | B267 | 6 | 门禁收紧收尾：§12.2「分层方向」「装配契约」两规则 + A11b 清零核查 + 复杂度指标（可选） | ⬜ |
 
@@ -1141,6 +1141,11 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **改名**：`com.ragagent.mcp.service.McpServiceService` → **`McpServiceManagement`**（目标树名）；`git mv` + 全仓标识符替换 **14 文件**（含 1 个测试的 `mock(...)` 与若干 javadoc 提及）。
 - **换锚**：`file-size.baseline.json` 键随路径改名（**605 → 605**，体量与旧 `ServiceService` 的 605 行一致 ⇒ 顺带去掉"叠词"命名）。
 - **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 ✓；`spotlessCheck build` ✓ **1m45s** ✓ **十二守卫** ✓（环 0 / SCC 12 组）；`:domains:javadoc` ✓。
+
+**✅ B265 收口（2026-10-14，⑧~⑫）**
+- **成果**：mcp 结构对齐（`tools`→`tool`、`McpServiceService`→`McpServiceManagement`）· wiki `domain` 五簇 + `service.ingest.graph` · datasource 顶层两簇落位（`domain.connector` 9 + `task` 6，根包 1）。
+- **登记为"重构级 / 命名级"（非包重排）**：① wiki `service.ingest`/`pipeline`/`task` 三簇互引（`ingest⇄pipeline` 3/7、`pipeline⇄task` 6/15）⇒ 需先断边；`WikiIngestService` 是目标树孤儿（留在 ingest 面）；② datasource `service.MapperKnowledgeBridge` vs 目标 `KnowledgeIngestClient`（命名差异，留命名批）；两域的两对 DTO 泛名（`Datasource|Mcp` 前缀是**既定防混淆决定**）；③ knowledge（B263）/session（B264）的重构级余项同理。
+- **本批资产（四条新经验）**：① **"假依赖"识别**——未使用 import 会被环/入度分析当成真边（现场：`DataSourceConstants → Connector`，删 import 即解环）；② **测试随迁要按"主体类"归位**——按"引用面启发式"会把队列/调度测试投错包，**编译揪出包内私有访问**才是终审；③ `@throws` 与 javadoc-only 类型引用**不进 import 扫描** ⇒ 必须显式写全限定；④ **snake 键的"按路径冻结前缀"与 `EVENT_MAP_FILES` 同族**——搬包必须换锚，否则守卫报"非冻结面新增键"。
 
 **🔶 B263 第㉟步（2026-10-14，第二个子面 `service.chunk` 切出）**
 - **动前断言（把"可测"变成"可证"）**：脚本**先断言** `ChunkEditService`/`ChunkExtractService`/`ChunkReadService` 三者在 `service` 包内**入度为零**（无人引用，`package-info` 除外），断言不过就 abort —— 这样"切出只产生单向外边"不再靠推理。`ChunkQuestionService` **故意留在** `service`：它被 `QuestionGenerationService` 引用，单独搬会造出 `service ⇄ service.chunk` 环（已在子面 package-info 写明）。
