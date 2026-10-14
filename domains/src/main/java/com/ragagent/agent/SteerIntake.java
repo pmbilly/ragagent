@@ -6,9 +6,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ragagent.agent.domain.AgentState;
-import com.ragagent.event.Event;
-import com.ragagent.event.EventIds;
-import com.ragagent.event.EventType;
+import com.ragagent.platform.event.Event;
+import com.ragagent.platform.event.EventIds;
+import com.ragagent.platform.event.EventType;
 import com.ragagent.event.payload.UserMessageInjectedData;
 import com.ragagent.llm.domain.ChatMessage;
 

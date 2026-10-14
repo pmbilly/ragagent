@@ -15,7 +15,7 @@ import com.ragagent.chatpipeline.ChatManage;
 import com.ragagent.chatpipeline.PipelineLog;
 import com.ragagent.common.pipeline.SearchParams;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.event.TenantContextSnapshot;
+import com.ragagent.platform.access.TenantContextSnapshot;
 
 /**
  * 查询扩展协作者（自 {@link PluginSearch} 拆出）：

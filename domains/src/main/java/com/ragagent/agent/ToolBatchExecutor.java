@@ -9,7 +9,7 @@ import com.ragagent.agent.tool.ExecutionPolicy;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.BizException;
 import com.ragagent.common.llm.ToolResult;
-import com.ragagent.event.TenantContextSnapshot;
+import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.agent.domain.AgentToolCall;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

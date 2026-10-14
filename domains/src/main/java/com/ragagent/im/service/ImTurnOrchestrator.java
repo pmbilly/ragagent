@@ -51,7 +51,7 @@ import com.ragagent.session.service.SessionAgentQaService;
 import com.ragagent.session.service.SessionKnowledgeQaService;
 import com.ragagent.session.service.SessionService;
 import com.ragagent.platform.stream.StreamManager;
-import com.ragagent.event.TenantContextSnapshot;
+import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.storage.support.Resolver;
 
 /**

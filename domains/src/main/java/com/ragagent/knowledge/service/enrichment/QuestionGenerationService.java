@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.tracing.langfuse.LangfuseTaskScope;
+import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;

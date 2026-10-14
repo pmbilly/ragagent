@@ -8,9 +8,9 @@ import java.util.UUID;
 
 import com.ragagent.common.retrieval.SearchTarget;
 import com.ragagent.chatpipeline.plugin.PluginError;
-import com.ragagent.event.Event;
-import com.ragagent.event.EventBusInterface;
-import com.ragagent.event.EventType;
+import com.ragagent.platform.event.Event;
+import com.ragagent.platform.event.EventBusInterface;
+import com.ragagent.platform.event.EventType;
 import com.ragagent.event.payload.AgentToolCallData;
 import com.ragagent.event.payload.AgentToolResultData;
 import com.ragagent.common.retrieval.SearchResult;

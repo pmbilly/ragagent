@@ -11,8 +11,8 @@ import org.junit.jupiter.api.Test;
 
 import com.ragagent.chatpipeline.plugin.PluginChatCompletionStream;
 import com.ragagent.common.llm.ResponseType;
-import com.ragagent.event.Event;
-import com.ragagent.event.EventType;
+import com.ragagent.platform.event.Event;
+import com.ragagent.platform.event.EventType;
 import com.ragagent.event.payload.AgentFinalAnswerData;
 import com.ragagent.llm.ChatStream;
 import com.ragagent.modelruntime.adapter.provider.chat.common.QueuedChatStream;

@@ -25,7 +25,7 @@ import com.ragagent.evaluation.dto.EvaluationDtos.EvaluationTask;
 import com.ragagent.evaluation.dto.EvaluationDtos.MetricResult;
 import com.ragagent.evaluation.dto.EvaluationDtos.PipelineParams;
 import com.ragagent.evaluation.dto.EvaluationDtos.SummaryConfigParams;
-import com.ragagent.event.TenantContextSnapshot;
+import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.service.management.KnowledgeBaseService;

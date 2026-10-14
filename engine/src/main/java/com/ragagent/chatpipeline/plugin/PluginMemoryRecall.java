@@ -10,13 +10,13 @@ import com.ragagent.chatpipeline.PipelineEventType;
 import com.ragagent.chatpipeline.PipelineLog;
 import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.chatpipeline.support.MemoryUsedMemories;
-import com.ragagent.event.Event;
-import com.ragagent.event.EventType;
+import com.ragagent.platform.event.Event;
+import com.ragagent.platform.event.EventType;
 import com.ragagent.event.payload.MemoryRecalledData;
 import com.ragagent.common.memory.MemoryItemView;
 import com.ragagent.common.session.PipelineUsedMemoryView;
 import com.ragagent.retrieval.telemetry.RetrievalObs;
-import com.ragagent.event.EventBusInterface;
+import com.ragagent.platform.event.EventBusInterface;
 
 /**
  * MEMORY_RECALL 阶段插件：

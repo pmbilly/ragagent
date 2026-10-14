@@ -1263,6 +1263,17 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **测试**：**4982 / 失败 0 / 跳过 4**（boot **1329 → 1331**，正是新增 2 条规则 ✓）；启动测试 ✓；`spotlessCheck build` ✓ **1m36s** ✓ **十二守卫** ✓（环 0 / 包级 SCC 12 组）。
 - **阶段 6 收官**：B263 ✅ · B264 ✅ · B265 ✅ · B266 ✅ · B267 ✅。
 
+**🔶 B268 第①步（2026-10-14，**v0.3.0 起：§5.1/§8.2 平台面收纳第一批**）**
+- **背景**：v0.2.0 收官后转 v0.3.0，按方案把 7 个逻辑面"走到底" = ① platform 成员收纳 ② 契约面收纳 ③ 立「域间只经契约」。本步做 ① 的第一批。
+- **权威映射（脚本产物）**：把 §8.1（contracts **25 面 / 172 类**）+ §8.2（platform **23 面 / 147 类**）与 `:common`（+`:engine/tracing`）现状比对 ⇒ **213 类可确定归属、0 歧义、12 类计划未列（待裁决）**——这份映射就是后续 ②③ 批的施工图。
+- **本步搬迁（31 文件）**：`com.ragagent.event` 12 类 → **`platform.event`**；`TenantContextSnapshot` → **`platform.access`**；`com.ragagent.tracing.langfuse` 18 类 → **`platform.tracing.langfuse`**。FQN 替换 **73 文件**；测试树 **11 文件 mirror 迁移**（同名包）+ 9 处补 import。
+- **payload 26 类留在原地**：目标面 `contract.event.payload`，但 **20/26 沾 Jackson**（50×`@JsonInclude` + 6×`@JsonProperty`）与契约面「纯 JDK」（R1）冲突 ⇒ 待 ② 批**先去 Jackson** 再迁；`event/package-info` 已改写为"过渡态"说明。
+- **换锚五处（全中，含一处"漏跑"现场）**：① `FROZEN_PREFIXES`：`tracing/langfuse` → `platform/tracing/langfuse`（+注释补 B268）② 冻结快照 **3 键**换锚 ③ `check-event-face-case.py` 路径常量 `event/EventType.java` → `platform/event/EventType.java` ④ **A2** 属性扫描名单 `+platform.tracing.langfuse`（并删陈旧项 `tracing.langfuse`）⑤ **引擎边界名单** `AgentEngineBoundaryTest.ALLOWED_TOP_LEVEL` `+platform` —— 它的**红态探针字符串被全局 FQN 替换连带改写**成 `platform.event.EventBus` ⇒ 名单不补即红（探针自动跟着换包"自证" ✓）。
+- **两条曲折（值得记）**：① `/tmp/b268_1.py` 在 **`git rm` 处 `exit 1` 截断后续步骤**（换锚三步没跑）⇒ 守卫当场报"非冻结面 snake 键 + 冻结覆盖变化" ✗ ⇒ 补跑修正；**教训：脚本里会失败的动作（git rm/断言）要放最后或容错**。② `tracing/package-info.java` 迁空成"幽灵" ⇒ 删；5 处空包目录由 **B124 目录卫生守卫**点名 ⇒ 清。
+- **测试**：**4987 / 失败 0 / 跳过 4** ✓；启动测试 ✓；`spotlessCheck build` ✓ **1m40s** ✓ **十二守卫** ✓；`arch.*` 28 条 ✓（含 A2）；`:common:javadoc` / `:domains:javadoc` ✓。
+- **登记（②批及后续）**：payload 26 去 Jackson · `common.{web,prompt,text,security,crypto,mybatis,jdbc,deployment,context,embedding,model,taskqueue,error,filter,storage}` → 对应 `platform.*`（213 类里本批仅搬 31）· `engine/tracing/decorators` 5 类目标 `platform.tracing.decorators` ⇒ **跨模块**待定 · 12 类计划未列者逐条裁决（`TenantContext`/`TenantScopes`→`platform.access`、`LikeEscapes`→`platform.persistence`、`UrlBytesFetcher`→`platform.http`、两个 apikey Response DTO→`auth/apikey/dto`、`AuditWritePort`/`UserLookupPort` 等端口→`contract.<域>`）。
+- **顺带更正**：B266③ 登记的"`apikey.dto` 两类不存在"**实为误判**（当时 grep 只扫 `domains/src`，它们在 `:common/apikey`）⇒ 目标面是 §8.9 的 `auth/apikey/dto`，待 ② 批处理。
+
 **✅ 缺陷修复（2026-10-14，knowledge 处理链租户作用域缺失 ⇒ 1003 "Model not found"）**
 - **现场**：上传文档后 `parse_status=failed`、`error_message=error code: 1003, error message: Model not found`；`knowledge_processing_spans` 显示 docreader / chunking **done**、**embedding 阶段**失败（两次自动重试同点失败）；`chunks=0` 是 K4 失败清场的结果。
 - **根因（实测坐实，非本批引入）**：KB（租户 11）的 embedding/summary 模型是该租户**自建**（`is_builtin=false`）；`ModelService.getModelByID` 按可见性过滤 `tenant_id = 当前租户 OR is_builtin`，而"当前租户"读 `TenantContext`（ThreadLocal）——**worker 虚拟线程没有 HTTP Filter 链填它** ⇒ 按 0 查 ⇒ **0 行**（同一过滤式按 11 查 **1 行**，已现场对照）。wiki 摄取早有 `enterTenantScope` 修过同款，knowledge 侧没有；K10b 之前的旧路径同样走 `ModelRuntimeAssembler → getModelByID` ⇒ 旧缺陷。

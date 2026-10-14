@@ -1,8 +1,8 @@
 package com.ragagent.agenttools;
 
-import com.ragagent.event.Event;
-import com.ragagent.event.EventBus;
-import com.ragagent.event.EventType;
+import com.ragagent.platform.event.Event;
+import com.ragagent.platform.event.EventBus;
+import com.ragagent.platform.event.EventType;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

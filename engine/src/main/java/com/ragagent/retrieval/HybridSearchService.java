@@ -40,11 +40,11 @@ import com.ragagent.retrieval.engine.RetrieveEngineRegistry;
 import com.ragagent.retrieval.engine.TenantStoreOwnership;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.security.LogSanitizer;
-import com.ragagent.event.TenantContextSnapshot;
+import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.retrieval.config.RetrievalEnvLookup;
 import com.ragagent.retrieval.telemetry.RetrievalObs;
-import com.ragagent.tracing.langfuse.LangfuseManager;
-import com.ragagent.tracing.langfuse.Span;
+import com.ragagent.platform.tracing.langfuse.LangfuseManager;
+import com.ragagent.platform.tracing.langfuse.Span;
 
 /**
  * HybridSearch 执行面：多 KB 检索的 store-group 路由、扇出执行、RRF 融合

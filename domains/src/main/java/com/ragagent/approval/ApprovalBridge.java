@@ -2,8 +2,8 @@ package com.ragagent.approval;
 
 import com.ragagent.event.payload.ToolApprovalResolvedData;
 import com.ragagent.event.payload.ToolApprovalRequiredData;
-import com.ragagent.event.EventBus;
-import com.ragagent.event.Event;
+import com.ragagent.platform.event.EventBus;
+import com.ragagent.platform.event.Event;
 import com.ragagent.event.payload.MCPOAuthRequiredData;
 import com.ragagent.event.payload.MCPOAuthResolvedData;
 import com.ragagent.agent.tool.ToolCancellation;

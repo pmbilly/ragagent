@@ -15,7 +15,7 @@ import com.ragagent.session.domain.MentionedItem;
 import com.ragagent.platform.stream.StreamBatch;
 import com.ragagent.platform.stream.StreamEvent;
 import com.ragagent.platform.stream.StreamManager;
-import com.ragagent.event.TenantContextSnapshot;
+import com.ragagent.platform.access.TenantContextSnapshot;
 
 /**
  * steer 的 handler 侧后半段：每轮 QA 在建立 SSE 流时构造一个实例，

@@ -33,7 +33,7 @@ import com.ragagent.datasource.mapper.SyncLogRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import com.ragagent.tracing.langfuse.LangfuseTracing;
+import com.ragagent.platform.tracing.langfuse.LangfuseTracing;
 
 /**
  * 数据源的应用服务。

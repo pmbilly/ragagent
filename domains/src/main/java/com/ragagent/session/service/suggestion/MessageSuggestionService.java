@@ -32,10 +32,10 @@ import com.ragagent.session.repository.MessageSuggestionRepository;
 import com.ragagent.common.wiki.WikiLanguageSupport;
 import com.ragagent.common.security.APIKeyScopeContext;
 import com.ragagent.common.security.TenantAPIKeyScope;
-import com.ragagent.event.TenantContextSnapshot;
-import com.ragagent.tracing.langfuse.LangfuseManager;
-import com.ragagent.tracing.langfuse.LangfuseTracing;
-import com.ragagent.tracing.langfuse.Span;
+import com.ragagent.platform.access.TenantContextSnapshot;
+import com.ragagent.platform.tracing.langfuse.LangfuseManager;
+import com.ragagent.platform.tracing.langfuse.LangfuseTracing;
+import com.ragagent.platform.tracing.langfuse.Span;
 
 /**
  * 追问建议服务。

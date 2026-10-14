@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
 import com.ragagent.common.session.SessionMessagePort;
 import com.ragagent.common.memory.MemoryKeys;
 import com.ragagent.memory.domain.MemoryConflictException;
-import com.ragagent.tracing.langfuse.LangfuseTracing;
+import com.ragagent.platform.tracing.langfuse.LangfuseTracing;
 import com.ragagent.common.context.TenantScopes;
 
 /**

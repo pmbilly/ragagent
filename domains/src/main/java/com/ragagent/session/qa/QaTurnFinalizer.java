@@ -13,7 +13,7 @@ import com.ragagent.session.service.QaSupport.QaRequestContext;
 import com.ragagent.session.service.SessionKnowledgeQaService;
 import com.ragagent.session.service.SessionService;
 import com.ragagent.session.service.TemporaryDocumentService;
-import com.ragagent.event.TenantContextSnapshot;
+import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.memory.service.MemoryExtractionService;
 import com.ragagent.session.domain.conversation.SessionLastRequestState;
 import com.ragagent.session.service.SessionLookupScope;

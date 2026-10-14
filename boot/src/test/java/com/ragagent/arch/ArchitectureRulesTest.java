@@ -656,9 +656,9 @@ class ArchitectureRulesTest {
      */
     private static final Set<String> SELF_MADE_MAPPER_BASELINE = Set.of(
             "com.ragagent.common.web.JsonMappers",
-            "com.ragagent.tracing.langfuse.LangfuseAttributes",
+            "com.ragagent.platform.tracing.langfuse.LangfuseAttributes",
             "com.ragagent.platform.stream.StreamJson",
-            "com.ragagent.event.EventJson",
+            "com.ragagent.platform.event.EventJson",
             "com.ragagent.datasource.connector.gitlab.GitLabConnector",
             "com.ragagent.datasource.connector.notion.NotionJson",
             "com.ragagent.modelcontext.JsonValues");
@@ -896,7 +896,7 @@ class ArchitectureRulesTest {
             "org.springframework.data.redis.",
             "redis.clients.",
             "jakarta.servlet.",
-            "com.ragagent.tracing.langfuse.",
+            "com.ragagent.platform.tracing.langfuse.",
             "com.ragagent.tracing.decorators.");
 
     @Test

@@ -10,7 +10,7 @@ import com.ragagent.agent.compaction.CompactionSettings;
  * agent 常量与判定。
  *
  * <p>差异说明：{@code generateEventID} 已收编到
- * {@link com.ragagent.event.EventIds#generateEventID}，此处不重复。
+ * {@link com.ragagent.platform.event.EventIds#generateEventID}，此处不重复。
  * LLM 停顿超时 / 本轮补全预算 / 历史保留窗口 / 预算裁剪这四个读引擎配置的
  * 计算，纯计算部分拆到 {@link #llmStallTimeout(Integer)}、{@link com.ragagent.agent.budget.AgentBudgets}、
  * {@link #contextReserveTokens(int)}、{@link #clampCompletionBudgetToContext}。</p>

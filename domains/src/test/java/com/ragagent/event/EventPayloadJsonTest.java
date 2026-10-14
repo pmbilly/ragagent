@@ -1,5 +1,8 @@
 package com.ragagent.event;
 
+import com.ragagent.platform.event.EventJson;
+import com.ragagent.platform.event.EventType;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

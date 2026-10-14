@@ -25,7 +25,7 @@ import com.ragagent.knowledge.domain.KnowledgeProcessingSpan;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.model.service.ModelRuntimeAssembler;
-import com.ragagent.tracing.langfuse.LangfuseTaskScope;
+import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

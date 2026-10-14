@@ -6,8 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ragagent.chatpipeline.ChatManage;
 import com.ragagent.common.context.TenantContext;
-import com.ragagent.event.EventBusInterface;
-import com.ragagent.event.TenantContextSnapshot;
+import com.ragagent.platform.event.EventBusInterface;
+import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.llm.ChatStream;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
@@ -20,14 +20,14 @@ import com.ragagent.llm.domain.ChatResponse;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-import com.ragagent.event.Event;
-import com.ragagent.event.EventType;
+import com.ragagent.platform.event.Event;
+import com.ragagent.platform.event.EventType;
 import com.ragagent.event.payload.AgentFinalAnswerData;
 import com.ragagent.event.payload.AgentReferencesData;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.common.llm.ResponseType;
 import com.ragagent.common.prompt.AgentPromptPlaceholders;
-import com.ragagent.event.EventIds;
+import com.ragagent.platform.event.EventIds;
 
 /**
  * 知识问答降级协作者:固定文案兜底与模型兜底的消息准备与响应。

@@ -13,7 +13,7 @@ import com.ragagent.wiki.domain.TaskPendingOp;
 import com.ragagent.common.text.Whitespace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ragagent.tracing.langfuse.LangfuseTracing;
+import com.ragagent.platform.tracing.langfuse.LangfuseTracing;
 
 /**
  * wiki 摄取的写面：待办 op 持久化（task_pending_ops）、ingest/retract 投递、

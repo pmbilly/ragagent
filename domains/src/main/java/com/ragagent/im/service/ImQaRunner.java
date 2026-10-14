@@ -5,8 +5,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.common.context.TenantContext;
-import com.ragagent.event.EventBus;
-import com.ragagent.event.EventType;
+import com.ragagent.platform.event.EventBus;
+import com.ragagent.platform.event.EventType;
 import com.ragagent.im.runtime.AdapterInterfaces.FullOutputProgressSender;
 import com.ragagent.im.runtime.AdapterInterfaces.StreamSender;
 import com.ragagent.im.runtime.ImFormat;

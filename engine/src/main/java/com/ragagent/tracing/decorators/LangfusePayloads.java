@@ -1,7 +1,7 @@
 package com.ragagent.tracing.decorators;
 
 import com.ragagent.common.llm.TokenUsage;
-import com.ragagent.tracing.langfuse.LangfuseTokenUsage;
+import com.ragagent.platform.tracing.langfuse.LangfuseTokenUsage;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

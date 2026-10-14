@@ -22,7 +22,7 @@ import com.ragagent.common.session.PipelineMessageView;
 import com.ragagent.common.prompt.PromptComposer;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.prompt.AgentPromptPlaceholders;
-import com.ragagent.event.TenantContextSnapshot;
+import com.ragagent.platform.access.TenantContextSnapshot;
 
 /**
  * 管线共享工具。

@@ -22,7 +22,7 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
 import com.ragagent.datasource.domain.DataSourceSyncPayload;
-import com.ragagent.tracing.langfuse.LangfuseTaskScope;
+import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
 
 /**
  * {@link DataSourceSyncTaskQueue} 的<b>进程内</b>实现：基于虚拟线程的队列

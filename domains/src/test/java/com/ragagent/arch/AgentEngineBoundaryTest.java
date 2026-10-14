@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
  * <ol>
  *   <li><b>B0 扫描面自检</b>：扫描到的引擎侧源码文件数必须过阈值——防止路径漂移让守卫静默空转；</li>
  *   <li><b>B1 主规则</b>：{@code com.ragagent.agent} 引擎侧（{@code management/} 除外）只允许依赖
- *       <b>引擎底座</b>（L1 {@code :common} 的 {@code common}/{@code event}/{@code stream}
+ *       <b>引擎底座</b>（L1 {@code :common} 的 {@code common}/{@code platform}（含旧 {@code event}/{@code stream}）
  *       + L2 {@code :engine} 的各能力包）与自身；其余顶层包一律视为<b>业务域</b>；</li>
  *   <li><b>B2 例外登记 + 过期报红</b>：{@code management/}（唯一 HTTP 面，装配租户/空间/会话配置）
  *       按例外排除；一旦它不再依赖任何业务域，说明例外已无必要 ⇒ 本条转红，提示把管理面纳入 B1 扫描；</li>
@@ -51,7 +51,7 @@ class AgentEngineBoundaryTest {
      * 引擎底座允许清单（L1 / L2 的顶层包名）+ 自身。
      *
      * <p>清单含义是"引擎侧允许站在什么之上"，不是"当前恰好用到什么"——所以即便当下 0 引用，
-     * 底座包（如 {@code embedding}/{@code rerank}/{@code stream}）也登记在册；反过来，
+     * 底座包（如 {@code embedding}/{@code rerank}/{@code platform}）也登记在册；反过来，
      * 任何新出现的顶层包都要被当作业务域审视一次（这正是本守卫的棘轮作用）。</p>
      */
     private static final Set<String> ALLOWED_TOP_LEVEL = Set.of(
@@ -60,8 +60,9 @@ class AgentEngineBoundaryTest {
             "agenttools",
             "agent",        // 自身
             "common",       // L1（:common 主包）
-            "event",        // L1（:common 的 event 包）
-            "stream",       // L1（:common 的 stream 包）
+            "platform",     // L1（:common 的平台面：B268 起 event/stream/tracing.langfuse 均在此）
+            "event",        // L1（:common 的 event 包——现只剩 payload，待迁 contract.event.payload）
+            "stream",       // L1 旧名（已并入 platform.stream，保留登记）
             "llm",          // L2 能力
             "modelcontext", // L2 能力（模型输出上下文协议；物理位于 :engine）
             "retrieval",    // L2 能力
@@ -139,7 +140,7 @@ class AgentEngineBoundaryTest {
         assertThat(isDomainImport("import static com.ragagent.wiki.service.WikiPrompts.GO_SHA256;")).isTrue();
         assertThat(isDomainImport("import com.ragagent.common.web.JsonMappers;")).isFalse();
         assertThat(isDomainImport("import com.ragagent.modelcontext.Registry;")).isFalse();
-        assertThat(isDomainImport("import com.ragagent.event.EventBus;")).isFalse();
+        assertThat(isDomainImport("import com.ragagent.platform.event.EventBus;")).isFalse();
         assertThat(isDomainImport("import java.util.List;")).isFalse();
         assertThat(isDomainImport(" * 说明文字里的 com.ragagent.knowledge 不是 import")).isFalse();
     }

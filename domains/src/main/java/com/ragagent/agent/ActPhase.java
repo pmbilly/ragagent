@@ -27,13 +27,13 @@ import com.ragagent.common.context.TenantContext;
 import com.ragagent.event.payload.AgentActionData;
 import com.ragagent.event.payload.AgentToolCallData;
 import com.ragagent.event.payload.AgentToolResultData;
-import com.ragagent.event.Event;
-import com.ragagent.event.EventType;
-import com.ragagent.event.TenantContextSnapshot;
+import com.ragagent.platform.event.Event;
+import com.ragagent.platform.event.EventType;
+import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.llm.domain.ChatResponse;
 import com.ragagent.modelcontext.Registry;
-import com.ragagent.tracing.langfuse.LangfuseManager;
-import com.ragagent.tracing.langfuse.Span;
+import com.ragagent.platform.tracing.langfuse.LangfuseManager;
+import com.ragagent.platform.tracing.langfuse.Span;
 import com.ragagent.common.error.BizException;
 import com.ragagent.llm.domain.FunctionCall;
 

@@ -7,9 +7,9 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
-import com.ragagent.event.Event;
-import com.ragagent.event.EventBus;
-import com.ragagent.event.EventType;
+import com.ragagent.platform.event.Event;
+import com.ragagent.platform.event.EventBus;
+import com.ragagent.platform.event.EventType;
 import com.ragagent.im.runtime.AdapterInterfaces.StreamSender;
 import com.ragagent.im.runtime.ImFormat;
 import com.ragagent.im.runtime.IncomingMessage;

@@ -1,6 +1,6 @@
 package com.ragagent.agent.tool;
 
-import com.ragagent.event.EventBus;
+import com.ragagent.platform.event.EventBus;
 
 /**
  * Agent 工具执行时挂载的每次调用元数据。

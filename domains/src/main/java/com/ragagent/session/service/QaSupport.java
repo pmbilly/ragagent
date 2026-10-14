@@ -13,11 +13,11 @@ import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.dto.QaRequests.MentionedItemRequest;
 import com.ragagent.storage.support.StreamRewriter;
 import com.ragagent.platform.stream.StreamEvent;
-import com.ragagent.event.EventBus;
+import com.ragagent.platform.event.EventBus;
 import com.ragagent.agent.SteerSink;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.common.llm.ResponseType;
-import com.ragagent.event.TenantContextSnapshot;
+import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.session.domain.message.MessageAttachment;
 import com.ragagent.session.domain.SuggestionAttribution;
 

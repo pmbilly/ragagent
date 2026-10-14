@@ -16,7 +16,7 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 import com.ragagent.common.taskqueue.RedisTaskQueueCore;
-import com.ragagent.tracing.langfuse.LangfuseTaskScope;
+import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
 
 /**
  * {@link MemoryExtractTaskQueue} 的 <b>Redis</b> 实现（跨实例共享任务表）。

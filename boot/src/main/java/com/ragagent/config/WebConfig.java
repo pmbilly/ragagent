@@ -30,7 +30,7 @@ import com.ragagent.auth.apikey.service.TenantAPIKeyService;
 import com.ragagent.auth.controller.filter.WsAuthSupport;
 import com.ragagent.common.deployment.DeploymentProperties;
 import com.ragagent.system.service.DeploymentCapabilitiesHolder;
-import com.ragagent.tracing.langfuse.LangfuseHttpInterceptor;
+import com.ragagent.platform.tracing.langfuse.LangfuseHttpInterceptor;
 
 /**
  * 全局装配顺序：CORS → RequestID → Auth（认证走 servlet filter）。

@@ -7,7 +7,7 @@ import java.util.Map;
 
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.common.memory.MemoryKeys;
-import com.ragagent.tracing.langfuse.LangfuseManager;
+import com.ragagent.platform.tracing.langfuse.LangfuseManager;
 
 /**
  * 长期记忆模块的 langfuse 观测门面。
@@ -30,7 +30,7 @@ public final class MemoryTrace {
      * 一一对应，没有 try-finally 包起来。</p>
      */
     public static Span start(String name, Map<String, Object> input) {
-        com.ragagent.tracing.langfuse.Span inner = LangfuseManager.get()
+        com.ragagent.platform.tracing.langfuse.Span inner = LangfuseManager.get()
                 .startSpan(new LangfuseManager.SpanOptions(
                         name, input, null));
         return new Span(name, input, inner);
@@ -40,9 +40,9 @@ public final class MemoryTrace {
     public static final class Span {
         private final String name;
         private final Map<String, Object> input;
-        private final com.ragagent.tracing.langfuse.Span inner;
+        private final com.ragagent.platform.tracing.langfuse.Span inner;
 
-        Span(String name, Map<String, Object> input, com.ragagent.tracing.langfuse.Span inner) {
+        Span(String name, Map<String, Object> input, com.ragagent.platform.tracing.langfuse.Span inner) {
             this.name = name;
             this.input = input;
             this.inner = inner;

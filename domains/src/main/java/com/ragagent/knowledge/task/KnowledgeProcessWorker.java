@@ -33,9 +33,9 @@ import com.ragagent.embedding.Embedder;
 import com.ragagent.knowledge.domain.KnowledgeBaseChunkingConfig;
 import com.ragagent.model.service.ModelRuntimeAssembler;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
-import com.ragagent.tracing.langfuse.LangfuseTaskScope;
+import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
 
-import com.ragagent.tracing.langfuse.LangfuseTracing;
+import com.ragagent.platform.tracing.langfuse.LangfuseTracing;
 import com.ragagent.knowledge.domain.ExtractChunkPayload;
 import com.ragagent.knowledge.domain.QuestionBatchPayload;
 import com.ragagent.knowledge.support.GraphChunkSelector;

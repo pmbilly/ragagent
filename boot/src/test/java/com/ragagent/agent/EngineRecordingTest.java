@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 
 import com.ragagent.agent.domain.AgentState;
 import com.ragagent.agent.domain.AgentToolCall;
-import com.ragagent.event.EventBus;
-import com.ragagent.event.EventJson;
+import com.ragagent.platform.event.EventBus;
+import com.ragagent.platform.event.EventJson;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatResponse;
 import com.ragagent.llm.domain.StreamResponse;

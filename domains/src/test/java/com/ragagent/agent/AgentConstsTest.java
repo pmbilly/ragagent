@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.Duration;
 
 import org.junit.jupiter.api.Test;
-import com.ragagent.event.EventIds;
+import com.ragagent.platform.event.EventIds;
 import com.ragagent.agent.budget.AgentBudgets;
 
 /**

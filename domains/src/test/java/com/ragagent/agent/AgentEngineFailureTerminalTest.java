@@ -9,8 +9,8 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.ragagent.event.Event;
-import com.ragagent.event.EventType;
+import com.ragagent.platform.event.Event;
+import com.ragagent.platform.event.EventType;
 import com.ragagent.event.payload.AgentCompleteData;
 
 /**

@@ -14,7 +14,7 @@ import com.ragagent.agenttools.wiki.WikiRouteResolver;
 import com.ragagent.agenttools.wiki.WikiScope;
 import com.ragagent.agent.tool.ToolRegistry;
 import com.ragagent.common.context.TenantContext;
-import com.ragagent.event.EventBus;
+import com.ragagent.platform.event.EventBus;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.memory.service.MemoryService;

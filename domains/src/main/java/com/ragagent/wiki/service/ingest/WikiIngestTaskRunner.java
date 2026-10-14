@@ -11,7 +11,7 @@ import org.springframework.beans.factory.ObjectProvider;
 
 import com.ragagent.wiki.domain.TaskDeadLetter;
 import com.ragagent.wiki.repository.TaskDeadLetterRepository;
-import com.ragagent.tracing.langfuse.LangfuseTaskScope;
+import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
 
 /**
  * wiki 任务的<b>执行与归档公共逻辑</b>（{@link InProcessWikiIngestTaskQueue} 与

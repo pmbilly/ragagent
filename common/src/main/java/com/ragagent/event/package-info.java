@@ -8,7 +8,7 @@
  * <p>每个 payload 的键名 / 键序 / 字段省略边界都是线上契约——它们经 AgentStreamBridge
  * （{@code toolApprovalDataToMap} 即 payload 序列化 → map）转发进
  * StreamManager.appendEvent，最终出现在 continue-stream 的 SSE 帧里。
- * <b>payload 的唯一合法序列化出口是 {@link com.ragagent.event.EventJson}</b>
+ * <b>payload 的唯一合法序列化出口是 {@link com.ragagent.platform.event.EventJson}</b>
  * （HTML 转义 + map 键序 + 浮点格式 + 时间格式）。</p>
  *
  * <h2>23 个 emit 点</h2>
@@ -48,13 +48,13 @@
  * <h2>EventBus 语义</h2>
  * <ul>
  *   <li><b>同步模式（默认）</b>：按注册顺序执行；任一 handler 失败 → 立即中断链并抛
- *       {@link com.ragagent.event.EventBusException}（文案 {@code event handler failed for <type>: <原因>}）；
+ *       {@link com.ragagent.platform.event.EventBusException}（文案 {@code event handler failed for <type>: <原因>}）；
  *       Error（panic 级）原样冒出 Emit 调用方。</li>
  *   <li><b>ID 自动生成是值语义</b>：Emit 在<b>浅拷贝</b>上补 UUID，调用方的 Event 对象不变；
  *       metadata map 是共享引用，中间件对它的写入调用方可见。</li>
  *   <li><b>异步模式</b>：每个 handler 一个虚拟线程并发执行，Emit 立即返回；panic 与处理失败
  *       都不外泄（分别记日志 / 静默丢弃）。跨线程<b>显式传递</b> TenantContext 值
- *       （{@link com.ragagent.event.TenantContextSnapshot}），禁共享 ThreadLocal。</li>
+ *       （{@link com.ragagent.platform.access.TenantContextSnapshot}），禁共享 ThreadLocal。</li>
  *   <li><b>EmitAndWait</b>：两个模式下都并发跑全部 handler 并等齐；panic 包装为
  *       {@code event handler panic (type=...): ...}，再包一层 {@code event handler failed for ...}。</li>
  *   <li><b>中间件链</b>：{@code chain(first, second)} 中 first 在外层。</li>
@@ -64,7 +64,7 @@
  * <ul>
  *   <li>{@code approval} 域：{@code com.ragagent.approval.ApprovalEventBus}
  *       最小面（{@code void emit(Event)}）由接线层（approval/ApprovalBridge）适配到本包的
- *       {@link com.ragagent.event.EventBus}。</li>
+ *       {@link com.ragagent.platform.event.EventBus}。</li>
  *   <li>{@code session.sse.StreamEventEmitter} / {@code StreamManager.appendEvent}：
  *       AgentStreamBridge（session/service）订阅本包事件并转发进流。</li>
  * </ul>

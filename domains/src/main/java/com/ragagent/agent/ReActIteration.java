@@ -16,8 +16,8 @@ import com.ragagent.agent.domain.AgentStep;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatResponse;
 import com.ragagent.llm.domain.ChatTool;
-import com.ragagent.tracing.langfuse.LangfuseManager;
-import com.ragagent.tracing.langfuse.Span;
+import com.ragagent.platform.tracing.langfuse.LangfuseManager;
+import com.ragagent.platform.tracing.langfuse.Span;
 import com.ragagent.common.context.TenantContext;
 
 /**
