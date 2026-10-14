@@ -41,7 +41,7 @@ import com.ragagent.session.domain.MessageWithSession;
 import com.ragagent.session.repository.MessageRepository;
 import com.ragagent.session.repository.MessageSuggestionRepository;
 import com.ragagent.session.repository.SessionRepository;
-import com.ragagent.knowledge.service.KnowledgeBaseService;
+import com.ragagent.knowledge.service.management.KnowledgeBaseService;
 import com.ragagent.knowledge.service.management.KnowledgeService;
 
 /**

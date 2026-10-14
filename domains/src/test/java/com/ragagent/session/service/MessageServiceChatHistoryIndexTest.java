@@ -29,7 +29,7 @@ import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.session.repository.MessageRepository;
 import com.ragagent.session.repository.MessageSuggestionRepository;
 import com.ragagent.session.repository.SessionRepository;
-import com.ragagent.knowledge.service.KnowledgeBaseService;
+import com.ragagent.knowledge.service.management.KnowledgeBaseService;
 
 /**
  * 聊天历史 KB 索引的验收：

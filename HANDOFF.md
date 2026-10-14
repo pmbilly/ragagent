@@ -1020,6 +1020,15 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 ✓；`spotlessCheck build` ✓ **1m56s** ✓ **十二守卫** ✓（环 0 / 包级 SCC **12 组**）；`:domains:javadoc` ✓。
 - **登记（余步）**：协调搬迁 §8.8.2 的 `KnowledgeBaseService`/`KnowledgeFileService`/`KnowledgeParseService`/`KnowledgeFolderService` → `service.management`。动前实测：顶层残余（`AccessHelper`/`DuplicateKnowledgeException`/`EmbeddingModelAdapter`/`HousekeepingService`）**均不引用**这 4 类 ✓；**`ParseService` 必须与 `FileService`/`FolderService` 同批搬**——它既引用二者、又被门面/`BatchOps` 引用，单搬会造 `management → TOP → management` ✗。
 
+**🔶 B263 第㊸步（2026-10-14，**协调搬迁 4 类 → `service.management`**；顶层只剩访问原语与支撑）**
+- **为什么必须"协调"搬**：顶层与子面已互递归（㊶ 实测）——`management → TOP`（门面/`BatchOps`/`Clone`/`Tag` → 4 类）与"4 类 ↔ 顶层残余"并存 ⇒ 单类搬必造 `management → TOP → management` 环；其中 **`KnowledgeParseService` 必须与 `KnowledgeFileService`/`KnowledgeFolderService` 同批**（它既引用后二者、又被门面/`BatchOps` 引用）。
+- **动前断言（三查）**：① 全仓 FQN 引用面实测（KBase **19** / File 4 / Parse 3 / Folder 1 个文件）；② 顶层残余（`AccessHelper`/`DuplicateKnowledgeException`/`EmbeddingModelAdapter`/`HousekeepingService`）**均不引用**这 4 类 ✓（否则就会造反向边）；③ 4 类对子面零依赖 ✓。
+- **搬迁**：4 类 `git mv` → `com.ragagent.knowledge.service.management`；包声明 + 补 `KnowledgeAccessHelper` import（原同包免 import 的三处）；`management` 内 4 个引用者**删同包 import**；其它 **19 个文件**（`datasource`/`session`/`websearch`/`evaluation`/`initialization`/`agentmanagement` + 5 个测试）FQN 替换。
+- **新坑（"同名包"第 3 次，形态再变）**：这次是**同模块测试树的同名包**——`domains/src/test/.../knowledge/service/` 下两个测试用**裸名**引用被搬类 ⇒ 编译才暴露 ✗（㉟ 是 boot 测试树、㊱ 是"改包未搬目录"）⇒ 一并**测试随迁**到 mirror 包 `service/management/`；顺带解决 `KnowledgeFileService.afterCommit`（**包内静态测试缝**）的可见性——**不放宽可见性，让测试跟着类走**。
+- **换锚**：A16 两条 FQN（File/Parse，由通用替换同步完成）· `file-size.baseline.json` 键换锚 + 收紧（**626 → 565**）· `check-json-key-case.py` 键级豁免路径 · 两份 `package-info` 重写（顶层残部地图 + `management` 成员与"为什么能搬"）。
+- **测试**：**4980 / 失败 0 / 跳过 4** ✓（domains 仍 2949——测试**随迁**非删除）；启动测试 ✓；`spotlessCheck build` ✓ **1m46s** ✓ **十二守卫** ✓（环 0 / 包级 SCC **12 组**）；`:domains:javadoc` ✓；定向测试 `--rerun-tasks` ✓。
+- **顶层现状**：只剩 `KnowledgeAccessHelper`（㊷ 登记的环原因）+ `HousekeepingService`/`EmbeddingModelAdapter`（§8.8.2 本就留顶层）+ `DuplicateKnowledgeException`（⑦ 实测放 domain 会造环）⇒ **§8.8.2 的 service 面基本到位**。
+
 **🔶 B263 第㉟步（2026-10-14，第二个子面 `service.chunk` 切出）**
 - **动前断言（把"可测"变成"可证"）**：脚本**先断言** `ChunkEditService`/`ChunkExtractService`/`ChunkReadService` 三者在 `service` 包内**入度为零**（无人引用，`package-info` 除外），断言不过就 abort —— 这样"切出只产生单向外边"不再靠推理。`ChunkQuestionService` **故意留在** `service`：它被 `QuestionGenerationService` 引用，单独搬会造出 `service ⇄ service.chunk` 环（已在子面 package-info 写明）。
 - **切出**：3 类 → `com.ragagent.knowledge.service.chunk`（`git mv` + 包声明 + 全仓 FQN 替换 3 文件）；测试面 `ChunkExtractServiceTest` 随迁；新建 `service/chunk/package-info`；`service/package-info` 同步。

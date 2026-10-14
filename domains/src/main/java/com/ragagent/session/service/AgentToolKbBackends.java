@@ -22,7 +22,7 @@ import com.ragagent.settings.ConversationProperties;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.repository.ChunkRepository;
-import com.ragagent.knowledge.service.KnowledgeBaseService;
+import com.ragagent.knowledge.service.management.KnowledgeBaseService;
 import com.ragagent.knowledge.service.management.KnowledgeService;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
 import com.ragagent.rerank.RankResult;

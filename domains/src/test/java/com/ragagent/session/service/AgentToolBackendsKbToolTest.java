@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 import com.ragagent.common.retrieval.SearchTarget;
 import com.ragagent.settings.ConversationProperties;
 import com.ragagent.knowledge.repository.ChunkRepository;
-import com.ragagent.knowledge.service.KnowledgeBaseService;
+import com.ragagent.knowledge.service.management.KnowledgeBaseService;
 import com.ragagent.knowledge.service.management.KnowledgeService;
 import com.ragagent.memory.domain.MemoryItem;
 import com.ragagent.memory.service.MemorySearchResult;

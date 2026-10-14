@@ -29,7 +29,7 @@ import com.ragagent.session.repository.MessageSuggestionRepository;
 import com.ragagent.session.repository.SessionRepository;
 import com.ragagent.common.wiki.WikiLanguageSupport;
 import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.service.KnowledgeBaseService;
+import com.ragagent.knowledge.service.management.KnowledgeBaseService;
 import com.ragagent.session.domain.ArtifactVersions;
 
 /**

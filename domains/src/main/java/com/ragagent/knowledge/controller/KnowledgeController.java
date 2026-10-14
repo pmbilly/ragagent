@@ -21,7 +21,7 @@ import com.ragagent.knowledge.dto.chunk.UpdateImageInfoRequest;
 import com.ragagent.knowledge.dto.doc.UpdateKnowledgeRequest;
 import com.ragagent.knowledge.dto.TaskIdResponse;
 import com.ragagent.knowledge.dto.doc.UpdateManualRequest;
-import com.ragagent.knowledge.service.KnowledgeFileService;
+import com.ragagent.knowledge.service.management.KnowledgeFileService;
 import com.ragagent.knowledge.service.management.KnowledgeService;
 import com.ragagent.knowledge.storage.LocalStorageService;
 import com.ragagent.storage.fileserve.FileTransport;

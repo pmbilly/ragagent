@@ -15,9 +15,7 @@ import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.ragagent.knowledge.service.KnowledgeFileService;
 import com.ragagent.knowledge.service.KnowledgeAccessHelper;
-import com.ragagent.knowledge.service.KnowledgeParseService;
 
 /**
  * 批量面：批量删除 / 批量重解析 / 重建索引 / 清空 KB 内容。

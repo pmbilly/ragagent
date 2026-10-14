@@ -1,19 +1,20 @@
 /**
- * 知识库用例层。按能力的职责地图（队列/客户端/存储/守卫已各自分包）：
+ * 知识库用例层（顶层残部）。按能力的职责地图（队列/客户端/存储/守卫已各自分包）：
  * <ul>
- *   <li><b>处理管线</b>：KnowledgeService（门面与共享工具）+ KnowledgeParseService /
- *       KnowledgeFileService（解析生命周期、文件与手工内容）；</li>
- *       （命令、查询、导入）+ FaqChunkCodec / FaqIndexWriter / FaqIndexRows（编解码与向量写路径）；</li>
- *   <li><b>chunk 编辑与生成</b>：ChunkEditService（乐观锁编辑/回滚/软删）+ ChunkReadService +
- *       ChunkQuestionService（LLM 生成问题）+ ChunkVectorIndexer（图抽取与向量索引）；</li>
- *   <li><b>知识库与检索</b>：KnowledgeBaseService / KnowledgeTagService / KnowledgeSearchService /
- *       KnowledgeBatchOpsService / KnowledgeCloneService / KnowledgeMoveService /
- *       KnowledgeFolderService；</li>
- *   <li><b>支撑</b>：HousekeepingService（定时清理）+ KnowledgeVectorWrites（向量写路由网关）。
- *       <b>已迁出</b>（B263㉜）：SpanTracker（处理进度 span 树）→ {@code domain.span}
- *       —— 它被 {@code task} 侧 worker 使用，留在本包会形成 {@code task → service} 环。</li>
+ *   <li><b>访问原语</b>：{@code KnowledgeAccessHelper}（租户内读行 + API Key 作用域校验，被门面与
+ *       若干子服务共用；B263㊷ 登记：搬入 {@code service.management} 会与"门面 → 摘要服务"
+ *       组成 {@code enrichment ⇄ management} 环，故暂留本层）；</li>
+ *   <li><b>支撑</b>：{@code HousekeepingService}（定时清理）+ {@code EmbeddingModelAdapter}
+ *       （嵌入模型适配）——§8.8.2 目标树**本就留在本层**；{@code DuplicateKnowledgeException}
+ *       为本层业务异常（B263⑦ 实测：放 {@code domain} 会新造环）。</li>
  * </ul>
  *
- * <p><b>子面</b>：{@code management/}（B263㊳ 门面迁出——{@code KnowledgeService}）、{@code query/}（B263㊴ 切出——检索与 span）、{@code faq/}（B263㉞ 整簇切出——导入编排 / 条目读写 / 索引形态）、{@code chunk/}（B263㉟ 切出——分块编辑 / 抽取 / 读取）、{@code enrichment/}（B263㊵ 切出——知识摘要与问题生成）。</p>
+ * <p><b>子面</b>：{@code management/}（B263㊳ 门面迁入 / ㊸ 知识库、文件夹、文件、解析生命周期四类迁入）、
+ * {@code query/}（B263㊴ 检索与 span）、{@code faq/}（B263㉞ 导入编排 / 条目读写 / 索引形态）、
+ * {@code chunk/}（B263㉟ 分块编辑 / 抽取 / 读取）、{@code enrichment/}（B263㊵ 知识摘要与问题生成）。</p>
+ *
+ * <p><b>已迁出</b>：{@code SpanTracker} → {@code domain.span}（B263㉜——被 {@code task} 侧 worker
+ * 使用，留本包会形成 {@code task → service} 环）；{@code ChunkQuestionPort} → {@code domain}
+ * （B263㊷——停在任一侧都会与 {@code management}/{@code enrichment} 组成三元环）。</p>
  */
 package com.ragagent.knowledge.service;

@@ -1,12 +1,18 @@
 /**
- * 知识域**应用/门面面**（B263㊳ 由 {@code service} 迁入）：{@code KnowledgeService} 是本域对外的
- * 唯一门面（控制器与跨域消费方只认它），其余子服务（parse/summary/clone/move/search/span/batch…）
- * 留在 {@code service}，由门面向下调用。
+ * 知识域**应用/门面面**（B263㊳ 起）：对外的门面 {@code KnowledgeService}，以及它向下编排的
+ * 用例服务（知识库/文件夹、文件与手工内容、解析生命周期、克隆/移动/标签/批处理）。
  *
- * <p><b>为什么现在能搬</b>：门面在 {@code service} 包内的**代码级 in-degree 已归零**——原先的 6 个
- * "引用者"里 4 个只是 javadoc，唯一真边（{@code KnowledgeTagService} 的
- * {@code ObjectProvider<KnowledgeService>}）经 B263㊲ 证明是**残留的绕环手法**并已拆除
- * ⇒ 搬迁只产生 {@code service.management → service} 与 {@code service.{chunk,faq} → service.management}
- * 这些**单向边**，包级 SCC 不扩大。</p>
+ * <p><b>成员</b>：{@code KnowledgeService}（门面）、{@code KnowledgeBaseService}、
+ * {@code KnowledgeFolderService}、{@code KnowledgeFileService}、{@code KnowledgeParseService}、
+ * {@code KnowledgeTagService}、{@code KnowledgeBatchOpsService}、{@code KnowledgeCloneService}、
+ * {@code KnowledgeMoveService}、{@code KnowledgeBaseLookupAdapter}。</p>
+ *
+ * <p><b>为什么能搬（B263㊳/㊸ 两次动前断言）</b>：㊳ 门面的包内代码级 in-degree 已归零；
+ * ㊸ 的 4 类经实测——顶层残余（{@code KnowledgeAccessHelper} 等）**不引用**它们、它们对子面
+ * 零依赖 ⇒ 搬迁只产生 {@code management → service}（4 类用顶层 {@code KnowledgeAccessHelper}）
+ * 与外部（控制器 / 跨域消费方）→ {@code management} 的**单向边**，包级 SCC 不扩大。
+ * **注意 {@code KnowledgeParseService} 必须与 {@code KnowledgeFileService}/
+ * {@code KnowledgeFolderService} 同批搬**：它既引用后二者、又被门面/批处理引用，
+ * 单搬会造 {@code management → TOP → management} 环。</p>
  */
 package com.ragagent.knowledge.service.management;

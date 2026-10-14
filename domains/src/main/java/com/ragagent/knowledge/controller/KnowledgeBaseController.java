@@ -15,7 +15,7 @@ import com.ragagent.knowledge.dto.doc.RebuildIndexResponse;
 import com.ragagent.knowledge.dto.kb.UpdateKnowledgeBaseRequest;
 import com.ragagent.knowledge.dto.kb.CreateKnowledgeBaseRequest;
 import com.ragagent.knowledge.dto.kb.KnowledgeBaseResponse;
-import com.ragagent.knowledge.service.KnowledgeBaseService;
+import com.ragagent.knowledge.service.management.KnowledgeBaseService;
 import com.ragagent.retrieval.HybridSearchService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;

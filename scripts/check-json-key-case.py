@@ -144,7 +144,7 @@ BASELINE: dict[str, set[str]] = {
     # MyBatis 列名/参数（非 JSON 键）
     # MyBatis 列名/参数（非 JSON 键）
     # MyBatis 列名写入点（非 JSON 键）
-    'knowledge/service/KnowledgeFileService.java': {'updated_at'},
+    'knowledge/service/management/KnowledgeFileService.java': {'updated_at'},
     # MyBatis 列名/参数（非 JSON 键）
     # MyBatis 列名/参数（非 JSON 键）
     # MyBatis 列名/参数（非 JSON 键）

@@ -1,4 +1,5 @@
-package com.ragagent.knowledge.service;
+package com.ragagent.knowledge.service.management;
+
 
 import static org.assertj.core.api.Assertions.assertThat;
 

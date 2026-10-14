@@ -28,7 +28,7 @@ import com.ragagent.common.prompt.MessageAttachmentsPrompt;
 import com.ragagent.settings.ConversationProperties;
 import com.ragagent.event.EventBus;
 import com.ragagent.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.service.KnowledgeBaseService;
+import com.ragagent.knowledge.service.management.KnowledgeBaseService;
 import com.ragagent.knowledge.service.management.KnowledgeService;
 import com.ragagent.model.domain.Model;
 import com.ragagent.model.service.ModelService;
