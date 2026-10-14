@@ -5,8 +5,8 @@ import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ragagent.common.security.APIKeyScopeContext;
-import com.ragagent.common.security.TenantAPIKeyScope;
+import com.ragagent.contract.apikey.APIKeyScopeContext;
+import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.platform.storage.config.StorageRuntimeEnv;
 
 /**

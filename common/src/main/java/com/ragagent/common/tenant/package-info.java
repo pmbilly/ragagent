@@ -4,7 +4,7 @@
  * <ul>
  *   <li>{@link com.ragagent.contract.tenant.TenantRole} —— 租户角色与能力等级（rank 决定最小角色校验），
  *       <b>18 个包</b>在用（auth/knowledge/mcp/embed/wiki/…，以及 {@code common.web.RbacInterceptor}）；</li>
- *   <li>{@link com.ragagent.common.tenant.TenantProperties} —— {@code weknora.tenant} 配置项
+ *   <li>{@link com.ragagent.platform.config.TenantProperties} —— {@code weknora.tenant} 配置项
  *       （RBAC 开关、自助建租户等），auth/config/{@code common.web} 共用；</li>
  *   <li>{@link com.ragagent.common.tenant.TenantConfigLookup} —— 配置读取端口，只暴露
  *       {@code JsonNode} 配置与 {@link com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView}

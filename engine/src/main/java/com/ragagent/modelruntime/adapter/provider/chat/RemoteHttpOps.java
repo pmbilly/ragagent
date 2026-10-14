@@ -11,7 +11,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

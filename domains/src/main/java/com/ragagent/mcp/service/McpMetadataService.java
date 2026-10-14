@@ -16,7 +16,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.mcp.domain.McpConfigFingerprint;
 import com.ragagent.mcp.domain.McpMetadata;
 import com.ragagent.mcp.domain.McpMetadataSummary;

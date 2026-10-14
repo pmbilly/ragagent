@@ -3,7 +3,7 @@ package com.ragagent.llm.provider;
 import java.util.List;
 import java.util.Map;
 
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 
 /**
  * LiteLLM 网关。

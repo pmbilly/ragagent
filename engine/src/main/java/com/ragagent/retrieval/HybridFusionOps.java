@@ -13,7 +13,7 @@ import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.contract.knowledge.KnowledgeBaseSearchFacts;
 import com.ragagent.contract.retrieval.SearchParams;

@@ -26,7 +26,7 @@ import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.mapper.TenantMemberMapper;
 import com.ragagent.contract.error.AppError;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 
 /**
  * 租户 service。

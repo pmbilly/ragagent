@@ -1,6 +1,6 @@
 package com.ragagent.platform.web.error;
 
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 
 import com.ragagent.contract.error.AppError;
 

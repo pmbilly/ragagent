@@ -10,7 +10,7 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.storage.domain.StorageBackend;
 import com.ragagent.platform.storage.config.StorageAllowList;
 import com.ragagent.storage.dto.StorageBackendResponse;

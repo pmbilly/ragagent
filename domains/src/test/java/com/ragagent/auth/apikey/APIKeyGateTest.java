@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import com.ragagent.contract.apikey.APIKeyCapability;
-import com.ragagent.common.security.TenantAPIKeyScope;
+import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.auth.apikey.controller.filter.APIKeyGateInterceptor;
 import com.ragagent.auth.apikey.controller.filter.APIKeyRouteAuthorizer;
 import com.ragagent.auth.apikey.controller.filter.APIKeyRoutePolicy;
@@ -17,7 +17,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.HandlerMapping;
-import com.ragagent.common.security.APIKeyScopeContext;
+import com.ragagent.contract.apikey.APIKeyScopeContext;
 
 /**
  * API-Key 门禁的行为测试。

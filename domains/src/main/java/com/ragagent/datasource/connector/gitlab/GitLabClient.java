@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.datasource.domain.connector.ConnectorException;
 import com.ragagent.datasource.domain.connector.ConnectorHttp;
-import com.ragagent.common.text.Whitespace;
+import com.ragagent.contract.text.Whitespace;
 
 /**
  * GitLab REST 客户端。

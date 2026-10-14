@@ -13,7 +13,7 @@ import java.util.UUID;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.common.knowledge.FaqChunkMetadata;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;

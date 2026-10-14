@@ -2,9 +2,9 @@ package com.ragagent.wiki.controller;
 
 import java.util.List;
 
-import com.ragagent.common.security.TenantAPIKeyScope;
+import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.web.error.GuardForbiddenException;
 import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.common.knowledge.KnowledgeBaseLookup;

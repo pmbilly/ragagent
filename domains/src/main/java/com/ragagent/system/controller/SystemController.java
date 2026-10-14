@@ -14,7 +14,7 @@ import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.knowledge.client.DocReaderClient;
 import com.ragagent.system.dto.SystemDtos;

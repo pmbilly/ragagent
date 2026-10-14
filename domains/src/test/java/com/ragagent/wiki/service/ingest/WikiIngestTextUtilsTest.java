@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.contract.wiki.ExtractedItem;
-import com.ragagent.common.wiki.WikiImageMarkup;
+import com.ragagent.contract.wiki.WikiImageMarkup;
 import com.ragagent.wiki.service.page.WikiTextUtils;
 
 /**

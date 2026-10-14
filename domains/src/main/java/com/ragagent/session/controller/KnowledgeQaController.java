@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.session.qa.ParsedRequest;
 import com.ragagent.session.qa.QaRequestParser;
@@ -37,7 +37,7 @@ import com.ragagent.platform.stream.StreamManager;
 import jakarta.servlet.http.HttpServletResponse;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.common.security.TenantAPIKeyScope;
+import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.memory.service.MemoryExtractionService;
 import com.ragagent.session.service.SteerRunCoordinator;
 import com.ragagent.session.controller.sse.SseFrameWriter;

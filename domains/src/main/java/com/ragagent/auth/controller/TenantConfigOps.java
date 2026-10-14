@@ -4,8 +4,8 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.apikey.APIKeyCapability;
-import com.ragagent.common.security.APIKeyScopeContext;
-import com.ragagent.common.security.TenantAPIKeyScope;
+import com.ragagent.contract.apikey.APIKeyScopeContext;
+import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.tenant.ChatHistoryConfig;
 import com.ragagent.tenant.ParserEngineConfig;
@@ -15,14 +15,14 @@ import com.ragagent.tenant.repository.TenantConfigRedaction;
 import com.ragagent.contract.tenant.WebSearchConfig;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.memory.MemoryConfig;
 import com.ragagent.contract.tenant.TenantRole;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import com.ragagent.platform.prompt.PromptTemplateCatalog;
-import com.ragagent.common.wiki.WikiLanguageSupport;
+import com.ragagent.contract.wiki.WikiLanguageSupport;
 
 /**
  * KV 配置分发协作者（自 {@link TenantCatalogController} 拆出）：6 个 DB-backed key 的

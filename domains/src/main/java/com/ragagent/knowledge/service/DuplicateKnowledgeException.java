@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.service;
 
 import com.ragagent.contract.error.AppError;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.dto.kb.DuplicateKnowledgeDetails;

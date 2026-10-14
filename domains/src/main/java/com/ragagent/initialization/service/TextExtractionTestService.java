@@ -13,7 +13,7 @@ import com.ragagent.llm.extract.EntityExtraction;
 import com.ragagent.llm.extract.ExtractPrompts;
 import com.ragagent.llm.extract.PipelineConfig.PromptTemplateStructured;
 import com.ragagent.contract.error.AppError;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;

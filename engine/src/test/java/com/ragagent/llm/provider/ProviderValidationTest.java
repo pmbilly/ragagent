@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 
 /**
  * 各厂商的 ValidateConfig / Info 校验测试。

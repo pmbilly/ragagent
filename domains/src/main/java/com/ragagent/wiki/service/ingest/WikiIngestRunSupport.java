@@ -18,7 +18,7 @@ import com.ragagent.wiki.domain.page.WikiPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ragagent.contract.wiki.SlugUpdate;
-import com.ragagent.common.wiki.WikiLanguageSupport;
+import com.ragagent.contract.wiki.WikiLanguageSupport;
 import com.ragagent.wiki.service.page.WikiTextUtils;
 
 /**

@@ -24,7 +24,7 @@ import com.ragagent.chatpipeline.PipelineProgress.StageProgress;
 import com.ragagent.chatpipeline.plugin.PluginError;
 import com.ragagent.chatpipeline.SummaryConfig;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
 import com.ragagent.settings.ConversationProperties;
 import com.ragagent.platform.event.EventBus;

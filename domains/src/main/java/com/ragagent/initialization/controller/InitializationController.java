@@ -19,7 +19,7 @@ import com.ragagent.llm.extract.ExtractPrompts;
 import com.ragagent.initialization.service.OllamaDownloadTaskStore;
 import com.ragagent.platform.security.CryptoService;
 import com.ragagent.contract.error.AppError;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;

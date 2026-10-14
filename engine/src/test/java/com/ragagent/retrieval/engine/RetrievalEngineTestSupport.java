@@ -10,8 +10,8 @@ import com.ragagent.embedding.Embedder;
 import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
-import com.ragagent.common.vectorstore.VectorStoreLookup;
-import com.ragagent.common.vectorstore.VectorStoreView;
+import com.ragagent.contract.vectorstore.VectorStoreLookup;
+import com.ragagent.contract.vectorstore.VectorStoreView;
 
 /**
  * 检索引擎测试共用的假件：假引擎服务、假租户归属、假 store 仓库。

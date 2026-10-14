@@ -2,7 +2,7 @@ package com.ragagent.auth.apikey.controller.filter;
 
 import java.io.IOException;
 
-import com.ragagent.common.security.APIKeyScopeContext;
+import com.ragagent.contract.apikey.APIKeyScopeContext;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

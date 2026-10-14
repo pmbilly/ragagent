@@ -44,8 +44,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import com.ragagent.auth.apikey.controller.filter.APIKeyGateInterceptor;
-import com.ragagent.common.security.APIKeyScopeContext;
-import com.ragagent.common.security.TenantAPIKeyScope;
+import com.ragagent.contract.apikey.APIKeyScopeContext;
+import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.support.ContractJson;
 
 /**

@@ -4,9 +4,9 @@ import com.ragagent.common.web.JsonMappers;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-import com.ragagent.common.security.APIKeyScopeContext;
+import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.auth.apikey.domain.TenantAPIKey;
-import com.ragagent.common.security.TenantAPIKeyScope;
+import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.auth.apikey.mapper.TenantAPIKeyNotFoundException;
 import com.ragagent.auth.apikey.service.TenantAPIKeyService;
 import com.ragagent.tenant.repository.Tenant;

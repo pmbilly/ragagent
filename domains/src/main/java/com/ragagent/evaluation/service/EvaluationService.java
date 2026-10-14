@@ -18,7 +18,7 @@ import com.ragagent.chatpipeline.ChatManage;
 import com.ragagent.chatpipeline.PipelineBuilder;
 import com.ragagent.chatpipeline.SummaryConfig;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.evaluation.domain.QaPair;
 import com.ragagent.evaluation.dto.EvaluationDtos.EvaluationDetail;
 import com.ragagent.evaluation.dto.EvaluationDtos.EvaluationTask;

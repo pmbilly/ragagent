@@ -1,6 +1,5 @@
-package com.ragagent.common.error;
+package com.ragagent.contract.error;
 
-import com.ragagent.contract.error.AppError;
 
 
 /**

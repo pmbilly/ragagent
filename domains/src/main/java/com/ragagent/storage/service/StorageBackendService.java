@@ -11,7 +11,7 @@ import java.time.OffsetDateTime;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.error.AppError;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.storage.domain.StorageBackend;
 import com.ragagent.platform.storage.config.StorageAllowList;

@@ -19,7 +19,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import com.ragagent.TestSchema;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.mcp.domain.McpAuthConfig;
 import com.ragagent.mcp.domain.McpService;

@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.Test;
-import com.ragagent.common.text.Whitespace;
+import com.ragagent.contract.text.Whitespace;
 
 /**
  * {@link JdkHtmlToMarkdown} 的**语料级**对等测试。

@@ -7,7 +7,7 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.websearch.domain.WebSearchProviderEntity;
 import com.ragagent.websearch.service.WebSearchProviderService;
 import org.springframework.http.ResponseEntity;

@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
-import com.ragagent.common.retrieval.RetrievalDriverProperties;
+import com.ragagent.platform.config.RetrievalDriverProperties;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.retrieval.engine.VectorStoreService;
 import com.ragagent.retrieval.engine.EngineFactory;
@@ -24,7 +24,7 @@ import com.ragagent.retrieval.engine.PgVectorRetrieveRepository;
 import com.ragagent.retrieval.engine.RetrieveEngineService;
 import com.ragagent.retrieval.engine.TenantStoreOwnership;
 import com.ragagent.retrieval.engine.VectorStoreRepoOwnership;
-import com.ragagent.common.vectorstore.VectorStoreLookup;
+import com.ragagent.contract.vectorstore.VectorStoreLookup;
 import com.ragagent.retrieval.engine.doris.DorisRetrieveRepository;
 import com.ragagent.retrieval.engine.milvus.MilvusRetrieveRepository;
 import com.ragagent.retrieval.engine.qdrant.QdrantRetrieveRepository;

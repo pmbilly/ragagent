@@ -22,7 +22,7 @@ import com.ragagent.contract.knowledge.KnowledgeBaseSearchGateway;
 import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.common.knowledge.KnowledgeDocumentGateway;
 import com.ragagent.platform.model.ModelGateway;
-import com.ragagent.common.retrieval.RetrievalDriverProperties;
+import com.ragagent.platform.config.RetrievalDriverProperties;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.common.web.JsonMappers;
 import com.ragagent.retrieval.engine.EngineTypes;

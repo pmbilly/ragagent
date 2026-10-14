@@ -8,7 +8,7 @@ import java.util.Map;
 
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.conversation.Session;

@@ -23,8 +23,8 @@ import java.util.function.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ragagent.common.vectorstore.VectorStoreLookup;
-import com.ragagent.common.vectorstore.VectorStoreView;
+import com.ragagent.contract.vectorstore.VectorStoreLookup;
+import com.ragagent.contract.vectorstore.VectorStoreView;
 
 /**
  * 检索引擎注册表——两张表 + 按需重建。

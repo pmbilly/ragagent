@@ -13,7 +13,7 @@ import com.ragagent.auth.service.OidcStateCodec;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.auth.dto.OidcAuthUrlResponse;
 import com.ragagent.auth.dto.OidcConfigResponse;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.http.ResponseEntity;
 

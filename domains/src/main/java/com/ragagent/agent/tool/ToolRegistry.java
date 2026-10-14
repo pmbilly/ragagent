@@ -18,7 +18,7 @@ import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.llm.domain.FunctionDef;
 import com.ragagent.platform.web.ToolJson;
 import com.ragagent.agent.domain.ToolCallTarget;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.agent.tool.spi.McpToolingGateway;
 import com.ragagent.agent.tool.spi.ToolRegistryPort;

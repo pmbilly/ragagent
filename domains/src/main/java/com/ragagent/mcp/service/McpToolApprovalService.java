@@ -2,7 +2,7 @@ package com.ragagent.mcp.service;
 
 import java.util.List;
 
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.domain.McpToolApproval;
 import com.ragagent.mcp.domain.McpToolPolicyPatch;

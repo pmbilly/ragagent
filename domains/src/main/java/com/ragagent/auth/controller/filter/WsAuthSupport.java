@@ -12,7 +12,7 @@ import com.ragagent.auth.service.TenantMemberService;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.auth.service.ValidatedToken;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.common.tenant.TenantProperties;
+import com.ragagent.platform.config.TenantProperties;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;

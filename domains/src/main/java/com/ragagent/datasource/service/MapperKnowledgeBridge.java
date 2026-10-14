@@ -32,7 +32,7 @@ import com.ragagent.knowledge.storage.LocalStorageService;
 import org.springframework.stereotype.Component;
 import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.contract.error.AppError;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import com.ragagent.platform.http.UrlBytesFetcher;

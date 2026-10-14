@@ -7,7 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
-import com.ragagent.common.text.Whitespace;
+import com.ragagent.contract.text.Whitespace;
 
 /**
  * {@link GitLabUrl} 的行为对照表。
@@ -139,7 +139,7 @@ class GitLabCompatTest {
     // ── Whitespace（GoStrings 收敛后的共享实现）───────────────────
 
     /**
-     * {@link com.ragagent.common.text.Whitespace#trimSpace} 比 Java 的
+     * {@link com.ragagent.contract.text.Whitespace#trimSpace} 比 Java 的
      * {@code String.strip()} 多认 4 个字符（U+00A0 / U+2007 / U+202F / U+0085）。
      *
      * <p>差别落在"token 是不是空的"这个判定上——凭据常从网页复制，

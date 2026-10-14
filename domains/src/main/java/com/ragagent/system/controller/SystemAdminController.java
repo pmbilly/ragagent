@@ -21,7 +21,7 @@ import com.ragagent.auth.domain.User;
 import com.ragagent.tenant.mapper.TenantMapper;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.web.NonNullBody;
 import com.ragagent.platform.web.RejectEmptyBody;
 import com.ragagent.system.dto.SystemDtos;

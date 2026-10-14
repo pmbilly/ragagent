@@ -33,7 +33,7 @@ import com.ragagent.wiki.domain.TaskPendingOp;
 import com.ragagent.wiki.repository.TaskPendingOpsRepository;
 import com.ragagent.wiki.prompt.WikiPrompts;
 import com.ragagent.contract.wiki.SlugUpdate;
-import com.ragagent.common.wiki.WikiLanguageSupport;
+import com.ragagent.contract.wiki.WikiLanguageSupport;
 import com.ragagent.wiki.service.WikiLlmCallMetadata;
 import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.wiki.service.page.WikiPageService;

@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.llm.ChatStream;
 import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
 import com.ragagent.contract.error.AppError;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.embedding.Embedder;
 import com.ragagent.platform.storage.config.UploadLimits;
 import com.ragagent.llm.LlmChatClient;

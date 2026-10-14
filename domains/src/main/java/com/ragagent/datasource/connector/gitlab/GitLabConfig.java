@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.ragagent.datasource.domain.connector.ConnectorException;
 import com.ragagent.datasource.domain.DataSourceConfig;
-import com.ragagent.common.text.Whitespace;
+import com.ragagent.contract.text.Whitespace;
 
 /**
  * GitLab 数据源的 {@code settings} 形状与解析。

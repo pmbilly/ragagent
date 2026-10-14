@@ -1,4 +1,4 @@
-package com.ragagent.common.wiki;
+package com.ragagent.contract.wiki;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import com.ragagent.common.text.Whitespace;
+import com.ragagent.contract.text.Whitespace;
 
 /**
  * 图片 URL 脱敏 / 还原与图片标记剥离。

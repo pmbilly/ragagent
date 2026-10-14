@@ -9,7 +9,7 @@ import com.ragagent.approval.ApprovalException;
 import com.ragagent.approval.Decision;
 import com.ragagent.approval.Gate;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.mcp.domain.McpPrincipal;
 import com.ragagent.mcp.dto.ResolveToolApprovalRequest;
 import org.slf4j.Logger;

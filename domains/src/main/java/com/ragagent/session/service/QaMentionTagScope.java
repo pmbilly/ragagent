@@ -9,7 +9,7 @@ import java.util.Set;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
-import com.ragagent.common.security.TenantAPIKeyScope;
+import com.ragagent.contract.apikey.TenantAPIKeyScope;
 
 /**
  * {@code SessionQaResolution} 的**mention/tag 收敛簇**：把请求里 @ 提及的知识库/知识范围与

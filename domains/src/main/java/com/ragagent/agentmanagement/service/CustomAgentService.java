@@ -23,7 +23,7 @@ import com.ragagent.agentmanagement.mapper.AgentQuestionMapper;
 import com.ragagent.agentmanagement.mapper.CustomAgentMapper;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.knowledge.KnowledgeBaseCatalogPort;
 import com.ragagent.contract.auth.UserLookupPort;
 import com.ragagent.contract.agent.AgentChannelCleaner;

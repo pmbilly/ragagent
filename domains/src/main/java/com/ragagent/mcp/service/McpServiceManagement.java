@@ -14,7 +14,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.mcp.domain.McpAdvancedConfig;

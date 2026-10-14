@@ -2,7 +2,7 @@ package com.ragagent.session.service.suggestion;
 
 import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
-import com.ragagent.common.wiki.WikiLanguageSupport;
+import com.ragagent.contract.wiki.WikiLanguageSupport;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;

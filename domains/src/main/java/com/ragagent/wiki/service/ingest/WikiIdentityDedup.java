@@ -12,7 +12,7 @@ import com.ragagent.wiki.domain.WikiConstants;
 import com.ragagent.wiki.domain.page.WikiPage;
 import com.ragagent.wiki.domain.page.WikiPageLite;
 import com.ragagent.wiki.service.page.SlugFuzzy;
-import com.ragagent.common.text.Whitespace;
+import com.ragagent.contract.text.Whitespace;
 import com.ragagent.platform.text.CodePointOrder;
 
 /**

@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.dto.kb;
 
-import com.ragagent.common.vectorstore.VectorStoreView;
+import com.ragagent.contract.vectorstore.VectorStoreView;
 
 import java.time.OffsetDateTime;
 

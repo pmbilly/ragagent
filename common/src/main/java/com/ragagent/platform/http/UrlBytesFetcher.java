@@ -8,7 +8,7 @@ import java.time.Duration;
 import java.util.function.Consumer;
 
 import com.ragagent.contract.error.AppError;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.storage.config.UploadLimits;
 
 /**

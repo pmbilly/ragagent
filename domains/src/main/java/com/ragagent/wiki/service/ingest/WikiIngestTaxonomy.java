@@ -21,7 +21,7 @@ import com.ragagent.contract.wiki.SlugUpdate;
 import com.ragagent.wiki.service.WikiModelResolver;
 import com.ragagent.wiki.service.page.WikiPageService;
 import com.ragagent.wiki.service.page.WikiTextUtils;
-import com.ragagent.common.text.Whitespace;
+import com.ragagent.contract.text.Whitespace;
 import com.ragagent.platform.text.CodePointOrder;
 
 /**

@@ -1,6 +1,6 @@
 package com.ragagent.model.service;
 
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.embedding.EmbedderConfig;
 import com.ragagent.llm.domain.ChatConfig;
 import com.ragagent.llm.provider.Config;

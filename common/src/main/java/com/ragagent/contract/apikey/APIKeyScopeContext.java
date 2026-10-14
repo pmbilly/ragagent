@@ -1,4 +1,4 @@
-package com.ragagent.common.security;
+package com.ragagent.contract.apikey;
 
 
 /**

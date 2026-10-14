@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.storage.fileserve.StorageFileResolver;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 
 /**
  * A3-3 尾批：租户感知文件存储门面（{@link TenantFileStorage}）与写面 provider 解析。

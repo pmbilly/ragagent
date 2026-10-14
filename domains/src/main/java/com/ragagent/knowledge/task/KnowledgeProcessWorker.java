@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.graph.NameSpace;
 import com.ragagent.retrieval.graph.RetrieveGraphRepository;
 import com.ragagent.platform.access.TracingContext;

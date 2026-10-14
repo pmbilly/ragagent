@@ -1,4 +1,4 @@
-package com.ragagent.common.text;
+package com.ragagent.contract.text;
 
 /**
  * Unicode White_Space 空白处理（Java 原生组合实现）。

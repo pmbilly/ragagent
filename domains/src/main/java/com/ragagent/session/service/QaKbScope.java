@@ -8,8 +8,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
-import com.ragagent.common.security.APIKeyScopeContext;
-import com.ragagent.common.security.TenantAPIKeyScope;
+import com.ragagent.contract.apikey.APIKeyScopeContext;
+import com.ragagent.contract.apikey.TenantAPIKeyScope;
 
 /**
  * {@code SessionQaResolution} 的**KB 范围簇**：从 agent 配置推导可用知识库集合、

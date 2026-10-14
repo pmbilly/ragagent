@@ -29,7 +29,7 @@ public class AgentEngineException extends RuntimeException {
 
     /**
      * 携带 cause 的重载：供"工具异常 → 错误通道"使用——
-     * message 取 {@link com.ragagent.common.error.BizException#wireText}（保留 AppError 前缀），
+     * message 取 {@link com.ragagent.contract.error.BizException#wireText}（保留 AppError 前缀），
      * cause 保留原异常便于排障。
      */
     public AgentEngineException(String message, Throwable cause) {

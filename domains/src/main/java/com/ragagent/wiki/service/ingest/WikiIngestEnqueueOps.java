@@ -8,9 +8,9 @@ import java.util.Map;
 import java.util.Set;
 
 import com.ragagent.contract.wiki.WikiIngestPort;
-import com.ragagent.common.wiki.WikiLanguageSupport;
+import com.ragagent.contract.wiki.WikiLanguageSupport;
 import com.ragagent.wiki.domain.TaskPendingOp;
-import com.ragagent.common.text.Whitespace;
+import com.ragagent.contract.text.Whitespace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ragagent.platform.tracing.langfuse.LangfuseTracing;

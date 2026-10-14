@@ -10,7 +10,7 @@ import com.ragagent.auth.domain.User;
 import com.ragagent.auth.service.UserService;
 import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.contract.error.AppError;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.web.ToolJson;
 import com.ragagent.platform.web.RequestFields;
 import org.slf4j.Logger;

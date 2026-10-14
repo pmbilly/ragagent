@@ -16,8 +16,8 @@ import com.ragagent.wiki.domain.TaskPendingOp;
 import com.ragagent.wiki.prompt.WikiPromptTemplate;
 import com.ragagent.wiki.prompt.WikiPrompts;
 import com.ragagent.contract.wiki.SlugUpdate;
-import com.ragagent.common.wiki.WikiLanguageSupport;
-import com.ragagent.common.text.Whitespace;
+import com.ragagent.contract.wiki.WikiLanguageSupport;
+import com.ragagent.contract.text.Whitespace;
 
 /**
  * 语言持久化与 prompt 渲染的测试。

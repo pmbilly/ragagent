@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ragagent.im.channel.wechat.WechatQRCodeService;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.contract.error.AppError;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.web.ApiResult;
 
 /**

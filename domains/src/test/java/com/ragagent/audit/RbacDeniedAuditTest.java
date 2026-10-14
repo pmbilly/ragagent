@@ -1,6 +1,6 @@
 package com.ragagent.audit;
 
-import com.ragagent.common.security.TenantAPIKeyScope;
+import com.ragagent.contract.apikey.TenantAPIKeyScope;
 
 import com.ragagent.audit.domain.AuditOutcome;
 
@@ -21,7 +21,7 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ragagent.common.security.APIKeyScopeContext;
+import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.audit.mapper.AuditLogRepository;
 import com.ragagent.audit.service.AuditLogService;
@@ -29,7 +29,7 @@ import com.ragagent.audit.service.RbacDeniedAuditorRegistrar;
 import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.RbacInterceptor;
-import com.ragagent.common.tenant.TenantProperties;
+import com.ragagent.platform.config.TenantProperties;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;

@@ -2,7 +2,7 @@ package com.ragagent.model.controller;
 
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.model.domain.Model;
 import com.ragagent.model.dto.ModelCredentialsResponse;
 import com.ragagent.model.dto.ModelCredentialsPutRequest;

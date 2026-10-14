@@ -5,7 +5,7 @@ import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.mcp.domain.McpToolApproval;
 import com.ragagent.mcp.domain.McpToolPolicyPatch;
 import org.springframework.dao.DataIntegrityViolationException;

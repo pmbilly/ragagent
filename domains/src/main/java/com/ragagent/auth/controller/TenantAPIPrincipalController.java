@@ -16,7 +16,7 @@ import com.ragagent.auth.dto.APIPrincipalDtos.APIPrincipalTestTokenRequest;
 import com.ragagent.auth.dto.APIPrincipalDtos.APIPrincipalTestTokenResponse;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.contract.error.AppError;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;

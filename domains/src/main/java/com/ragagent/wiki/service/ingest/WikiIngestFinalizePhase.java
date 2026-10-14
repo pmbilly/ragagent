@@ -14,7 +14,7 @@ import com.ragagent.wiki.domain.TaskPendingOp;
 import com.ragagent.wiki.domain.WikiConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ragagent.common.wiki.WikiLanguageSupport;
+import com.ragagent.contract.wiki.WikiLanguageSupport;
 import com.ragagent.wiki.service.page.WikiCrossLinker;
 import com.ragagent.platform.access.TenantScopes;
 

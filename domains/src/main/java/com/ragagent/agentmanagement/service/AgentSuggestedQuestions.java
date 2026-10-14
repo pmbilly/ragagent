@@ -15,9 +15,9 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.agentmanagement.dto.CustomAgentResult;
 import com.ragagent.agentmanagement.mapper.AgentQuestionMapper;
-import com.ragagent.common.security.TenantAPIKeyScope;
+import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.contract.knowledge.KnowledgeBaseCatalogPort;
-import com.ragagent.common.wiki.WikiLanguageSupport;
+import com.ragagent.contract.wiki.WikiLanguageSupport;
 
 /**
  * 智能体推荐问题流：按知识库/FAQ 桶轮询取问题、混合模式归并、tag 范围解析与

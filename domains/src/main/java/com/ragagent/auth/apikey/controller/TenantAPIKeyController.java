@@ -16,7 +16,7 @@ import com.ragagent.auth.apikey.mapper.TenantAPIKeyNotFoundException;
 import com.ragagent.auth.apikey.service.TenantAPIKeyService;
 import com.ragagent.auth.apikey.service.TenantAPIKeyValidator;
 import com.ragagent.contract.error.AppError;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.knowledge.KnowledgeBaseFacts;
 import com.ragagent.contract.knowledge.KnowledgeBaseGateway;
 import org.slf4j.Logger;

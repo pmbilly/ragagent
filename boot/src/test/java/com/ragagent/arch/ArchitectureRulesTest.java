@@ -18,7 +18,7 @@ import com.ragagent.RagAgentApplication;
 import com.ragagent.platform.security.CryptoService;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.storage.config.UploadLimits;
-import com.ragagent.common.wiki.WikiLanguageSupport;
+import com.ragagent.contract.wiki.WikiLanguageSupport;
 import com.ragagent.platform.config.AppEnvLookup;
 import com.ragagent.retrieval.config.RetrievalEnvLookup;
 import com.ragagent.storage.config.StorageEnvLookup;

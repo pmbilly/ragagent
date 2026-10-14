@@ -1,4 +1,4 @@
-package com.ragagent.common.retrieval;
+package com.ragagent.platform.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

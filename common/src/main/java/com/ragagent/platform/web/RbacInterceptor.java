@@ -11,8 +11,8 @@ import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.contract.error.AppError;
-import com.ragagent.common.error.BizException;
-import com.ragagent.common.tenant.TenantProperties;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.platform.config.TenantProperties;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -21,8 +21,8 @@ import org.springframework.http.MediaType;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.HandlerMapping;
-import com.ragagent.common.security.APIKeyScopeContext;
-import com.ragagent.common.security.TenantAPIKeyScope;
+import com.ragagent.contract.apikey.APIKeyScopeContext;
+import com.ragagent.contract.apikey.TenantAPIKeyScope;
 
 /**
  * 路由级 RBAC 拦截器（角色下限 / 系统管理员守卫 / 跨空间守卫）。

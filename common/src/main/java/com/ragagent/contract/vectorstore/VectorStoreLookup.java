@@ -1,4 +1,4 @@
-package com.ragagent.common.vectorstore;
+package com.ragagent.contract.vectorstore;
 
 
 /**

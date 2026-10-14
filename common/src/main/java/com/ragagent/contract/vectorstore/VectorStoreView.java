@@ -1,8 +1,6 @@
-package com.ragagent.common.vectorstore;
+package com.ragagent.contract.vectorstore;
 
-import com.ragagent.contract.vectorstore.IndexConfig;
 
-import com.ragagent.contract.vectorstore.ConnectionConfig;
 
 
 /**

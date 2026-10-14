@@ -10,7 +10,7 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
-import com.ragagent.common.text.Whitespace;
+import com.ragagent.contract.text.Whitespace;
 
 /**
  * {@code [[slug]]} 交叉链接自动注入（{@link WikiCrossLinker} 的默认实现）。

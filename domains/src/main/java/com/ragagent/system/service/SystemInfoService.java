@@ -14,7 +14,7 @@ import java.util.Set;
 import javax.sql.DataSource;
 
 import com.ragagent.storage.domain.StorageBackend;
-import com.ragagent.common.retrieval.RetrievalDriverProperties;
+import com.ragagent.platform.config.RetrievalDriverProperties;
 import com.ragagent.platform.storage.config.StorageAllowList;
 import com.ragagent.storage.mapper.StorageBackendRepository;
 import org.springframework.beans.factory.ObjectProvider;

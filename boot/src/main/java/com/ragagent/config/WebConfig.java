@@ -11,7 +11,7 @@ import com.ragagent.auth.apikey.controller.filter.DenyAPIKeyPrincipalInterceptor
 
 import com.ragagent.platform.web.RequestIdFilter;
 
-import com.ragagent.common.tenant.TenantProperties;
+import com.ragagent.platform.config.TenantProperties;
 import java.util.List;
 
 import com.ragagent.contract.tenant.TenantRole;

@@ -1,7 +1,7 @@
 package com.ragagent.modelruntime.application;
 
 import com.ragagent.contract.error.AppError;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatConfig;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;

@@ -9,7 +9,7 @@ import com.ragagent.knowledge.domain.span.SpanTracker;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import com.ragagent.knowledge.task.KnowledgeProcessingQueue;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.repository.DocumentParser;

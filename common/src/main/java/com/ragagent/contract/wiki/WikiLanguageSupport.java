@@ -1,10 +1,9 @@
-package com.ragagent.common.wiki;
+package com.ragagent.contract.wiki;
 
-import com.ragagent.contract.wiki.SlugUpdate;
 
 import java.util.List;
 import java.util.Locale;
-import com.ragagent.common.text.Whitespace;
+import com.ragagent.contract.text.Whitespace;
 
 /**
  * prompt 语言的解析与命名。

@@ -7,7 +7,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.ragagent.common.security.TenantAPIKeyScope;
+import com.ragagent.contract.apikey.TenantAPIKeyScope;
 
 /**
  * 逐路由 API-Key 策略注册表 + 授权判定。

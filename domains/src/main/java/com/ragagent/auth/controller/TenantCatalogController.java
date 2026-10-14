@@ -9,7 +9,7 @@ import com.ragagent.auth.service.TenantMemberService;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.auth.service.UserService;
 import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.common.tenant.TenantProperties;
+import com.ragagent.platform.config.TenantProperties;
 import com.ragagent.contract.knowledge.KnowledgeBaseProvisioner;
 import com.ragagent.platform.storage.config.StorageAllowList;
 import com.ragagent.settings.SystemSettingGateway;

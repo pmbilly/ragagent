@@ -6,7 +6,7 @@ import java.util.concurrent.Semaphore;
 import java.util.regex.Pattern;
 
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.common.wiki.WikiLanguageSupport;
+import com.ragagent.contract.wiki.WikiLanguageSupport;
 import com.ragagent.platform.access.TenantScopes;
 
 /**

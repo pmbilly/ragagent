@@ -5,7 +5,7 @@ import com.ragagent.agentmanagement.service.config.AgentConfigJson;
 import com.ragagent.platform.prompt.PromptSource;
 import com.ragagent.common.web.JsonMappers;
 import java.io.InputStream;
-import com.ragagent.common.wiki.WikiLanguageSupport;
+import com.ragagent.contract.wiki.WikiLanguageSupport;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

@@ -7,7 +7,7 @@ import java.util.List;
 import com.ragagent.contract.apikey.APIKeyCapability;
 import com.ragagent.auth.apikey.domain.TenantAPIKeyRequest;
 import com.ragagent.contract.error.AppError;
-import com.ragagent.common.error.BizException;
+import com.ragagent.contract.error.BizException;
 
 /**
  * API Key 请求校验。
