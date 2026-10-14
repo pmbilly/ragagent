@@ -219,9 +219,6 @@
       "MemoryModelResolver",
       "MemoryService"
     ],
-    "memory→knowledge": [
-      "DefaultMemoryModelResolver"
-    ],
     "session→memory": [
       "AgentEngineAssembler",
       "AgentToolBackends",
@@ -363,9 +360,6 @@
     ],
     "system→settings": [
       "SystemSettingService"
-    ],
-    "websearch→knowledge": [
-      "WebSearchTempKbStateService"
     ],
     "wiki→model": [
       "DefaultWikiModelResolver"

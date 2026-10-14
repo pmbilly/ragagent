@@ -11,8 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import com.ragagent.knowledge.service.management.KnowledgeBaseService;
-import com.ragagent.knowledge.service.management.KnowledgeService;
+import com.ragagent.contract.knowledge.KnowledgeMaintenancePort;
 
 /**
  * web 搜索临时 KB 的 Redis 状态（Get/Save/Delete 三方法，键
@@ -56,15 +55,12 @@ public class WebSearchTempKbStateService {
     /** 忽略未知字段（容忍键演进）。 */
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
     private final StringRedisTemplate redis;
-    private final KnowledgeService knowledgeService;
-    private final KnowledgeBaseService knowledgeBaseService;
+    private final KnowledgeMaintenancePort knowledgeMaintenance;
 
     public WebSearchTempKbStateService(StringRedisTemplate redis,
-            KnowledgeService knowledgeService,
-            KnowledgeBaseService knowledgeBaseService) {
+            KnowledgeMaintenancePort knowledgeMaintenance) {
         this.redis = redis;
-        this.knowledgeService = knowledgeService;
-        this.knowledgeBaseService = knowledgeBaseService;
+        this.knowledgeMaintenance = knowledgeMaintenance;
     }
 
     /** 旧 blob 的键名 → 新键名（仅部署窗口用；窗口过后连同本方法删除）。 */
@@ -160,7 +156,7 @@ public class WebSearchTempKbStateService {
         List<String> knowledgeIds = state.knowledgeIds() == null ? List.of() : state.knowledgeIds();
         for (String kid : knowledgeIds) {
             try {
-                knowledgeService.deleteKnowledge(kid);
+                knowledgeMaintenance.deleteKnowledge(kid);
             } catch (RuntimeException e) {
                 log.warn("Failed to delete temp knowledge {}: {}", kid, e.toString());
             }
@@ -168,7 +164,7 @@ public class WebSearchTempKbStateService {
 
         // Delete the knowledge base
         try {
-            knowledgeBaseService.deleteKnowledgeBase(kbId);
+            knowledgeMaintenance.deleteKnowledgeBase(kbId);
         } catch (RuntimeException e) {
             log.warn("Failed to delete temp knowledge base {}: {}", kbId, e.toString());
         }

@@ -1319,6 +1319,16 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **A③ 累计（十七刀）**：边 **64 → 42（−22）**、类 **317 → 243（−74）**；三档 **① 34 条 / 157 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
 - **下一步（①档余量按性价比）**：`mcp→approval`(7) → `session` 能力边（`knowledge` 17 / `storage` 14 / `model` 12 … 共 63 类）→ `embedchannel→session` 余 2（**已拍板：转"实体→视图 + 流式契约"K 级，不建 servlet seam** ✓）
 
+**🔶 A③ 第二十刀：小边双清 ⇒ `memory→knowledge` + `websearch→knowledge`（2026-10-14，R10 边 41 → 39、类 236 → 234）**
+- **负面发现（写入方法论）**：① 档"1 类边"多**不是零碎边**，而是"某能力域的一个消费方"——本次实测三类：`EvaluationService`（1 类吃 3 条边，但用知识/模型**实体 + 域服务**，需整刀端口化）· `DefaultWikiModelResolver`/`DefaultMemoryModelResolver`（吃 model 边，属"model 能力端口化"这一族）· `SystemSettingService`（**它就是 settings 网关的实现方**，本质是归属问题而非消费）。⇒ 后续按"能力域端口化"分组作业（settings 4 条边 / model 7 条边 / storage 多条），不按"边的大小"切
+- **本刀两处（真·小边）**：
+  - `memory→knowledge`：`DefaultMemoryModelResolver` 改注入 **L1 能力端口** `platform.model.EmbeddingGateway`（提供方仍是知识域 `EmbedderClient`），`EmbedderClient.configFrom(Model)` 的实体面在调用方换成 `ModelFacts` 载荷——**端口早已存在**（检索引擎端口化的产物），本刀只是把消费方接上 ✓
+  - `websearch→knowledge`：新增契约 `contract.knowledge.KnowledgeMaintenancePort`（删知识条目 / 删知识库两个动作）+ 域内 `KnowledgeMaintenanceAdapter`；`WebSearchTempKbStateService` 的会话清理改走端口（逐条 warn 继续的容错语义与上抛点逐字保留）✓
+- **为何不"client 面上提 L1"（被否的路线）**：`knowledge.client.EmbedderClient`/`DocReaderClient` 都是 `@Service` ⇒ 搬进 common 会撞 **R6 门槛（common 内 bean 只许减不许增）**；且 `DocReaderClient` 依赖 grpc/proto，common 只有 protobuf（无 grpc）⇒ 编译不可行。正确路线是**端口化**（本轮只落 memory 一处；`system→knowledge` 2 类与 session/im 的 DocReader 消费留下批）
+- **棘轮收紧（A16）**：`DefaultMemoryModelResolver` 脱离 A16 基线（不再依赖 client 边界层）⇒ 按守卫提示删条目、存量 76 → 75 ✓（棘轮双向检查按预期点名）
+- **验证**：**13 守卫全绿** ✓；`spotlessCheck build` ✓ **1m53s** ✓；**4990 / 失败 0 / 跳过 4**（boot 1331 ✓）；定向 arch + websearch + memory **231 条** ✓；dev 重启 ready ✓ + 冒烟（`/api/v1/knowledge-bases`、`/api/v1/mcp-services` 均 200 ✓）
+- **A③ 累计（二十刀）**：边 **64 → 39（−25）**、类 **317 → 234（−83）**；三档 **① 31 条 / 148 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
+- **下一步（按能力域分组）**：settings 族（4 条边 / 11 类：`auth→settings` 3 · `session→settings` 5 · `knowledge→settings` 2 · `system→settings` 1——含 "SystemSettingService 归属" 拍板点）+ DocReader 族（`system→knowledge` 2 · im/session 各 2 类）→ model 族（7 条边 37 类，建议拆 2-3 刀）
 **🔶 A③ 第十九刀：`mcp→approval` 收官 ⇒ 5 类清零、整条边消失（2026-10-14，R10 边 42 → 41、类 241 → 236）**
 - **迁移 5 类**（装配/策略/异常面，全走 `contract.tool`）：`McpWiring`（装配改走 `ToolApprovalGateFactory`：只传 checker + 超时秒，Redis 由 approval 工厂内部取）· `Adapter`（策略适配器实现契约 checker）· `McpCatalog`（`ApprovalToolPolicy` → `ToolEnabledChecks` 静态工具）· `McpOAuthController` / `AgentToolApprovalController`（`Gate` → `ToolApprovalGate`、异常改契约）⇒ **`mcp→approval` 整条边消失** ✓（读数 41 边 / 236 类）
 - **契约面新增 6 个**：`ToolEnabledChecker`（单工具启用态）· `ToolPolicyChecker extends ToolEnabledChecker`（+ 需审批）· `ToolBulkEnabledChecker`（批量可选面）· `ToolEnabledChecks`（静态工具：批量/逐个分发 + identity/取消短路）· `ToolApprovalException`（Kind 五态 + 工厂，从 approval 原样搬）· `ToolApprovalGateFactory`（装配面 SPI）

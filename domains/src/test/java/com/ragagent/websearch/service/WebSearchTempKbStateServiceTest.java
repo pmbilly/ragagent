@@ -16,8 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
-import com.ragagent.knowledge.service.management.KnowledgeBaseService;
-import com.ragagent.knowledge.service.management.KnowledgeService;
+import com.ragagent.contract.knowledge.KnowledgeMaintenancePort;
 
 /**
  * web 搜索临时 KB 状态服务。
@@ -28,8 +27,7 @@ class WebSearchTempKbStateServiceTest {
 
     private StringRedisTemplate redis;
     private ValueOperations<String, String> valueOps;
-    private KnowledgeService knowledgeService;
-    private KnowledgeBaseService knowledgeBaseService;
+    private KnowledgeMaintenancePort knowledgeMaintenance;
     private WebSearchTempKbStateService service;
 
     @BeforeEach
@@ -38,9 +36,8 @@ class WebSearchTempKbStateServiceTest {
         redis = mock(StringRedisTemplate.class);
         valueOps = mock(ValueOperations.class);
         when(redis.opsForValue()).thenReturn(valueOps);
-        knowledgeService = mock(KnowledgeService.class);
-        knowledgeBaseService = mock(KnowledgeBaseService.class);
-        service = new WebSearchTempKbStateService(redis, knowledgeService, knowledgeBaseService);
+        knowledgeMaintenance = mock(KnowledgeMaintenancePort.class);
+        service = new WebSearchTempKbStateService(redis, knowledgeMaintenance);
     }
 
     /** 读错误 / 反序列化错误 / 键缺失 → 空三元组（空 kbId、空 map、空列表）。 */
@@ -75,7 +72,7 @@ class WebSearchTempKbStateServiceTest {
         when(valueOps.get("tempkb:s1")).thenReturn(null);
         service.deleteTempKbState("s1");
         verify(redis, never()).delete(anyString());
-        verify(knowledgeService, never()).deleteKnowledge(anyString());
+        verify(knowledgeMaintenance, never()).deleteKnowledge(anyString());
     }
 
     /** Delete 分支 2：JSON 损坏 → 只删键。 */
@@ -84,8 +81,8 @@ class WebSearchTempKbStateServiceTest {
         when(valueOps.get("tempkb:s1")).thenReturn("garbage{");
         service.deleteTempKbState("s1");
         verify(redis).delete("tempkb:s1");
-        verify(knowledgeService, never()).deleteKnowledge(anyString());
-        verify(knowledgeBaseService, never()).deleteKnowledgeBase(anyString());
+        verify(knowledgeMaintenance, never()).deleteKnowledge(anyString());
+        verify(knowledgeMaintenance, never()).deleteKnowledgeBase(anyString());
     }
 
     /** Delete 分支 3：kbId 空白 → 只删键。 */
@@ -95,7 +92,7 @@ class WebSearchTempKbStateServiceTest {
                 "{\"kbId\":\"  \",\"knowledgeIds\":[\"k1\"],\"seenUrls\":{}}");
         service.deleteTempKbState("s1");
         verify(redis).delete("tempkb:s1");
-        verify(knowledgeService, never()).deleteKnowledge(anyString());
+        verify(knowledgeMaintenance, never()).deleteKnowledge(anyString());
     }
 
     /** Delete 分支 4：逐条删知识（单条失败继续）→ 删 KB → 删键。 */
@@ -105,11 +102,11 @@ class WebSearchTempKbStateServiceTest {
                 "{\"kbId\":\"kb-1\",\"knowledgeIds\":[\"k1\",\"k2\"],"
                         + "\"seenUrls\":{\"http://a\":true}}");
         org.mockito.Mockito.doThrow(new RuntimeException("boom"))
-                .when(knowledgeService).deleteKnowledge("k1");
+                .when(knowledgeMaintenance).deleteKnowledge("k1");
         service.deleteTempKbState("s1");
-        verify(knowledgeService).deleteKnowledge("k1");
-        verify(knowledgeService).deleteKnowledge("k2");
-        verify(knowledgeBaseService).deleteKnowledgeBase("kb-1");
+        verify(knowledgeMaintenance).deleteKnowledge("k1");
+        verify(knowledgeMaintenance).deleteKnowledge("k2");
+        verify(knowledgeMaintenance).deleteKnowledgeBase("kb-1");
         verify(redis).delete("tempkb:s1");
     }
 

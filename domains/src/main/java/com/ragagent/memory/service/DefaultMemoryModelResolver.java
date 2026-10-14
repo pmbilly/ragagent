@@ -2,7 +2,6 @@ package com.ragagent.memory.service;
 
 import java.util.List;
 
-import com.ragagent.knowledge.client.EmbedderClient;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.modelruntime.application.LlmChatClients;
 import com.ragagent.llm.domain.ChatConfig;
@@ -14,13 +13,15 @@ import com.ragagent.model.service.ModelService;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 import com.ragagent.model.service.ModelRuntimeConfigs;
+import com.ragagent.contract.model.ModelFacts;
+import com.ragagent.platform.model.EmbeddingGateway;
 
 /**
  * {@link MemoryModelResolver} 的默认实现：按模型 id 取运行时的聊天 / 嵌入模型实例
  * （与 {@code wiki.service.DefaultWikiModelResolver} 同款）。
  *
- * <p><b>embedding 走 {@link EmbedderClient}</b>（最小 OpenAI 兼容客户端），
- * 单条嵌入用 {@code embedBatch} 包一层（与 wiki 的处置一致）。</p>
+ * <p><b>embedding 走 L1 能力端口 {@link EmbeddingGateway}</b>（按模型事实嵌入；
+ * 提供方是知识域的最小 OpenAI 兼容客户端），单条嵌入包一层。</p>
  */
 @Component
 public class DefaultMemoryModelResolver implements MemoryModelResolver {
@@ -31,16 +32,16 @@ public class DefaultMemoryModelResolver implements MemoryModelResolver {
     private final ModelService modelService;
     private final ObjectProvider<OllamaService> ollamaService;
     private final ConcurrencyGovernor concurrencyGovernor;
-    private final EmbedderClient embedderClient;
+    private final EmbeddingGateway embeddingGateway;
 
     public DefaultMemoryModelResolver(ModelService modelService,
                                       ObjectProvider<OllamaService> ollamaService,
                                       ConcurrencyGovernor concurrencyGovernor,
-                                      EmbedderClient embedderClient) {
+                                      EmbeddingGateway embeddingGateway) {
         this.modelService = modelService;
         this.ollamaService = ollamaService;
         this.concurrencyGovernor = concurrencyGovernor;
-        this.embedderClient = embedderClient;
+        this.embeddingGateway = embeddingGateway;
     }
 
     @Override
@@ -63,7 +64,11 @@ public class DefaultMemoryModelResolver implements MemoryModelResolver {
             throw new IllegalStateException(
                     "model " + modelId + " is not an embedding model (type=" + type + ")");
         }
-        List<float[]> vectors = embedderClient.embedBatch(EmbedderClient.configFrom(model), List.of(text));
+        ModelParameters p = model.getParameters();
+        List<float[]> vectors = embeddingGateway.embed(new ModelFacts(
+                model.getId(), model.getName(),
+                p == null || p.getBaseUrl() == null ? "" : p.getBaseUrl(),
+                p == null || p.getApiKey() == null ? "" : p.getApiKey()), List.of(text));
         if (vectors == null || vectors.isEmpty()) {
             throw new IllegalStateException("embedding response carried no vector");
         }

@@ -732,7 +732,7 @@ class ArchitectureRulesTest {
      * （{@code controller} / {@code mapper} / {@code task} / {@code client} / {@code channel}）的类。
      *
      * <p>登记理由（2026-10-13 整改立项，方案 §12.1 第 1 条）：边界层由装配层与外部调用，
-     * 用例层经 repository / 端口使用外部能力。实测存量 <b>76 类</b>入基线
+     * 用例层经 repository / 端口使用外部能力。实测存量 <b>75 类</b>入基线
      * （mapper / task / client 混合命中；controller 与 channel 已为 0）——
      * 只许减、新增即红，存量随结构收敛批次逐域消化。</p>
      */
@@ -781,7 +781,6 @@ class ArchitectureRulesTest {
             "com.ragagent.mcp.service.McpMetadataService",
             "com.ragagent.mcp.service.McpServiceManagement",
             "com.ragagent.mcp.service.McpToolApprovalService",
-            "com.ragagent.memory.service.DefaultMemoryModelResolver",
             "com.ragagent.model.service.BuiltinModelsReconciler",
             "com.ragagent.model.service.ModelService",
             "com.ragagent.session.service.QaWebSearchParams",
