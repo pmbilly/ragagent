@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.repository;
 
+import com.ragagent.common.pipeline.ChunkTypes;
+
 import com.ragagent.knowledge.support.ChunkProjectionAdapter;
 
 import java.util.List;
@@ -150,6 +152,22 @@ public class ChunkRepository implements ChunkSearchGateway {
         return chunkMapper.selectCount(new LambdaQueryWrapper<Chunk>()
                 .eq(Chunk::getKnowledgeId, knowledgeId)
                 .eq(Chunk::getChunkType, chunkType));
+    }
+
+    /** 该 knowledge 下的 TEXT 型 chunk，按 {@code chunk_index} 升序（B263㉙ 由 api 适配器直连搬入）。 */
+    public List<Chunk> listTextChunks(long tenantId, String knowledgeId) {
+        return chunkMapper.selectList(new LambdaQueryWrapper<Chunk>()
+                .eq(Chunk::getTenantId, tenantId)
+                .eq(Chunk::getKnowledgeId, knowledgeId)
+                .eq(Chunk::getChunkType, ChunkTypes.TEXT)
+                .orderByAsc(Chunk::getChunkIndex));
+    }
+
+    /** 租户内按 id 硬删（{@code delete} 语义，B263㉙ 由 api 适配器直连搬入）。 */
+    public int deleteScoped(long tenantId, String chunkId) {
+        return chunkMapper.delete(new LambdaQueryWrapper<Chunk>()
+                .eq(Chunk::getTenantId, tenantId)
+                .eq(Chunk::getId, chunkId));
     }
 
     /** 按主键整行更新（B263⑩：由 service 直连 chunkMapper 归位）。 */

@@ -15,7 +15,6 @@ import com.ragagent.common.knowledge.FaqChunkMetadata;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeTag;
 import com.ragagent.knowledge.repository.FaqChunkRepository;
-import com.ragagent.knowledge.mapper.KnowledgeTagMapper;
 import com.ragagent.knowledge.repository.KnowledgeTagRepository;
 import org.springframework.stereotype.Component;
 import com.ragagent.knowledge.dto.faq.FaqEntryPayload;
@@ -32,16 +31,13 @@ import com.ragagent.knowledge.dto.faq.FaqEntry;
 public class FaqGuard {
 
     private final KnowledgeReadPort knowledgeService;
-    private final KnowledgeTagMapper tagMapper;
     private final KnowledgeTagRepository tagRepository;
     private final FaqChunkRepository faqChunkRepository;
 
     public FaqGuard(KnowledgeReadPort knowledgeService,
-                    KnowledgeTagMapper tagMapper,
-                    KnowledgeTagRepository tagRepository,
+                                        KnowledgeTagRepository tagRepository,
                     FaqChunkRepository faqChunkRepository) {
         this.knowledgeService = knowledgeService;
-        this.tagMapper = tagMapper;
         this.tagRepository = tagRepository;
         this.faqChunkRepository = faqChunkRepository;
     }
@@ -136,7 +132,7 @@ public class FaqGuard {
     public String resolveTagID(String kbId, FaqEntryPayload payload) {
         long tid = tenantId();
         if (payload.tagId() != 0) {
-            KnowledgeTag tag = tagMapper.selectByTenantAndSeqId(tid, payload.tagId());
+            KnowledgeTag tag = tagRepository.getBySeqId(tid, payload.tagId());
             if (tag == null) {
                 throw new IllegalStateException("failed to find tag by seq_id " + payload.tagId() + ": record not found");
             }
@@ -164,7 +160,7 @@ public class FaqGuard {
             throw new BizException(AppError.notFound("knowledge base not found"));
         }
         long tid = kb.getTenantId();
-        KnowledgeTag existing = tagMapper.selectByTenantKbAndName(tid, kbId, name);
+        KnowledgeTag existing = tagRepository.getByName(tid, kbId, name);
         if (existing != null) {
             return existing;
         }
@@ -273,7 +269,7 @@ public class FaqGuard {
             }
         }
         if (!tagIds.isEmpty()) {
-            List<KnowledgeTag> tags = tagMapper.selectByTenantAndSeqIds(kb.getTenantId(), new ArrayList<>(tagIds));
+            List<KnowledgeTag> tags = tagRepository.listTagsBySeqIds(kb.getTenantId(), new ArrayList<>(tagIds));
             for (KnowledgeTag tag : tags) {
                 if (tag == null || !tagIds.contains(tag.getSeqId())) {
                     continue;

@@ -921,6 +921,13 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **偶发测试（记录）**：全量跑时 `RedisWikiDeletedTombstoneStoreTest.clearRemovesTombstone` 失败一次，**单跑即过** ⇒ Redis 依赖型偶发，与本步改动无关（本步未触碰 wiki/Redis 路径）。
 - **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m34s** ✓ 十一守卫 ✓（13 组 SCC 未变）。
 - **登记（余步）**：
+**🔶 B263 第㉙步（2026-10-14，`api/ChunkPortAdapter` + `domain/access/FaqGuard` 归仓储 ⇒ 域内 mapper 直连归零）**
+- **只新增 2 个仓储方法**：`ChunkRepository.listTextChunks(tenantId, knowledgeId)`（TEXT 型 + `chunk_index` 升序）与 `deleteScoped(tenantId, chunkId)`（租户内按 id 硬删）；其余 4 处**全复用**——`listChunksById(tenantId, ids)`（与适配器原直连同形，含空集合短路同款）、`KnowledgeTagRepository.getBySeqId` / `getByName` / `listTagsBySeqIds`（三处 tag 读取各自逐字同形，已核对）。
+- **两处"同包双入口"合并**：`ChunkPortAdapter` 与 `FaqGuard` 都**同时**注入了 mapper 与 repository（历史遗留）⇒ 删掉 mapper 入口（含字段/构造参数/import），只留仓储。
+- **连带**：`ChunkTypes` 常量其实在 `:common` 的 `com.ragagent.common.pipeline`（放仓储里引用它是对的：仓储本就依赖 common 常量）⇒ import 修正；死成员守卫点名的 1 个未使用 import 清掉；`ChunkPortAdapter` **96 → 85 行**、`FaqGuard` **299 → 296 行**。
+- **里程碑**：**`knowledge` 域内 mapper 直连归零** —— 全域只剩 `repository/` 8 个文件（数据层，合法持有）与 `service/KnowledgeBaseLookupAdapter` 那一处**刻意**的可选 mapper（㉕ 已写明理由）。
+- **测试**：**4978 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m41s** ✓ **十二守卫** ✓（环 0 / SCC 13 组未变）。
+- **登记（收尾三项，B263 余步）**：① `KnowledgeService`(716) 余部 → `service.management/*`（**需配套断边**：B263① 已实测"往子面搬会让 SCC 扩大"）；② **`task ⇄ service` 环**（现测：task→service **6** 文件 / service→task **11** 文件）；③ `escapeLikeKeyword` **多副本统一到 `common`**（§9.2 式，⑯ 登记）。
 **🔶 B263 第㉘步（2026-10-14，`KnowledgeProcessWorker` 归仓储：824 → 792 行）**
 - **本步 16 处 + 9 个新仓储方法**（都是"CAS / 条件 / 硬删"形态，SQL 逐字搬入）：`casPendingToProcessing`、`setSummaryStatus(id, status, now)`（带 updated_at 的重载）、`markIndexedEnabled`、`promoteToFinalizing`（processing→finalizing + 子任务计数）、`completeIfOwned(id, resetSummaryStatus, now)`（**K4 CAS**：只有 processing/finalizing 才许翻 completed，`resetSummaryStatus` 为真时额外写 `summary_status=none`）、`failIfProcessing`（只许 processing → failed）、`ChunkRepository.deleteByKnowledgeId`、`deleteByIds`、`countByKnowledgeIdAndChunkType`。
 - **顺手清掉一个已废弃 API**：`chunkMapper.deleteBatchIds(...)`（**MyBatis-Plus 已标 deprecated**，IDE 一直在提示）⇒ 仓储内改用非废弃的 `chunkMapper.deleteByIds(...)` ✓（外部调用方只看到 `deleteByIds(List<String>)`）。

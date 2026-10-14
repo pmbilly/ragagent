@@ -6,12 +6,9 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.common.knowledge.ChunkPort;
 import com.ragagent.common.knowledge.ChunkView;
-import com.ragagent.common.pipeline.ChunkTypes;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.mapper.ChunkMapper;
 import com.ragagent.knowledge.support.ChunkProjectionAdapter;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
@@ -32,21 +29,15 @@ import com.ragagent.retrieval.support.ImageInfoEnricher;
 @Component
 public class ChunkPortAdapter implements ChunkPort {
 
-    private final ChunkMapper chunkMapper;
     private final ChunkRepository chunkRepository;
 
-    public ChunkPortAdapter(ChunkMapper chunkMapper, ChunkRepository chunkRepository) {
-        this.chunkMapper = chunkMapper;
+    public ChunkPortAdapter(ChunkRepository chunkRepository) {
         this.chunkRepository = chunkRepository;
     }
 
     @Override
     public List<ChunkView> textChunks(long tenantId, String knowledgeId) {
-        List<Chunk> rows = chunkMapper.selectList(new LambdaQueryWrapper<Chunk>()
-                .eq(Chunk::getTenantId, tenantId)
-                .eq(Chunk::getKnowledgeId, knowledgeId)
-                .eq(Chunk::getChunkType, ChunkTypes.TEXT)
-                .orderByAsc(Chunk::getChunkIndex));
+        List<Chunk> rows = chunkRepository.listTextChunks(tenantId, knowledgeId);
         return ChunkProjectionAdapter.viewAll(rows);
     }
 
@@ -55,17 +46,13 @@ public class ChunkPortAdapter implements ChunkPort {
         if (ids == null || ids.isEmpty()) {
             return List.of();
         }
-        List<Chunk> rows = chunkMapper.selectList(new LambdaQueryWrapper<Chunk>()
-                .eq(Chunk::getTenantId, tenantId)
-                .in(Chunk::getId, ids));
+        List<Chunk> rows = chunkRepository.listChunksById(tenantId, ids);
         return ChunkProjectionAdapter.viewAll(rows);
     }
 
     @Override
     public void deleteChunk(long tenantId, String chunkId) {
-        chunkMapper.delete(new LambdaQueryWrapper<Chunk>()
-                .eq(Chunk::getTenantId, tenantId)
-                .eq(Chunk::getId, chunkId));
+        chunkRepository.deleteScoped(tenantId, chunkId);
     }
 
     @Override
