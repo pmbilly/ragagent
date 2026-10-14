@@ -1,4 +1,6 @@
-package com.ragagent.knowledge.service;
+package com.ragagent.knowledge.service.chunk;
+
+import com.ragagent.knowledge.service.ChunkQuestionPort;
 
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 
@@ -52,7 +54,7 @@ import com.ragagent.knowledge.index.ChunkVectorIndexer;
  * 写路径守卫经 {@link ChunkAccessGuard}，索引进 {@link ChunkVectorIndexer}。
  */
 @Service
-public class ChunkQuestionService {
+public class ChunkQuestionService implements ChunkQuestionPort {
 
     private static final Logger log = LoggerFactory.getLogger(ChunkQuestionService.class);
 
@@ -361,7 +363,8 @@ public class ChunkQuestionService {
      * 。</p>
      * @return 写入的问题数；0 = 跳过（内容空 / 生成失败 / revision 变化 / 分块已删）
      */
-   int generateAndStoreQuestionsForWorker(KnowledgeBase kb, Knowledge knowledge, Chunk chunk,
+    @Override
+    public int generateAndStoreQuestionsForWorker(KnowledgeBase kb, Knowledge knowledge, Chunk chunk,
             String prevContent, String nextContent, int questionCount, String customInstructions) {
         int generationRevision = chunk.getContentRevision();
         LlmChatClient chatModel;

@@ -965,6 +965,12 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **换锚一处**：`file-size.baseline.json` 的 `limits` 键随 `FaqEntryCommandService` 路径改名（**783 → 772**，顺带收紧）。
 - **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m43s** ✓ **十二守卫** ✓。
 - **登记（`service` 其余子面）**：
+**🔶 B263 第㊱步（2026-10-14，端口反转 + `ChunkQuestionService` 迁入 `service.chunk`；**并修掉新守卫自身的一个真 bug**）**
+- **环边只有一个调用点**：`QuestionGenerationService` 对 `ChunkQuestionService` 的全部使用就是**一次** `generateAndStoreQuestionsForWorker(...)` ⇒ 反转成本极低：新建 **`service.ChunkQuestionPort`**（端口放在**消费者一侧**的包，只声明那一个方法），`ChunkQuestionService` 实现之（方法放开为 `public`）⇒ `service → service.chunk` 的边消失，方向固定为 `service.chunk → service` ⇒ `ChunkQuestionService` 得以迁入子面，**SCC 实测仍 12 组**（环没有形成）。
+- **本步"抓到自己人"的一条**：搬迁脚本中途在"boot 测试树同名包"处 abort（`dst_dir` 计算没命中 `/service/` ⇒ `git mv X X` 报 128），主文件已搬、**包声明未改** ⇒ 此时 **`check-package-dirs.py`（㉖ 新增的守卫）却报"✓ 全绿"** ✗——根因是它用**前缀**匹配：`…/service/chunk/Foo.java` 也 `startswith("…/service/")` ✓ ⇒ 子目录错配溜过。**已修正为"父目录完全相等"**（并在脚本注释里写明这次误判的来由），修后复检仍全绿 ✓。
+- **补完**：主文件包声明 + 端口 import、boot 测试随迁（`ChunkQuestionServiceTest` 实际只在 boot 树）+ 包声明、`QuestionGenerationService` 改认端口、全仓 FQN 替换、子面 `package-info` 更新（不再是"暂留"）。
+- **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m42s** ✓ **十二守卫** ✓（环 0 / 包级 SCC 12 组）。
+- **登记（`service` 其余子面/收尾）**：`service.chunk` 现 4 类；`KnowledgeTagService`（零入度，可作 `service.tag`，单类面偏薄）；**门面归位的最后一关**是 `KnowledgeService` 的 6 个引用者。
 **🔶 B263 第㉟步（2026-10-14，第二个子面 `service.chunk` 切出）**
 - **动前断言（把"可测"变成"可证"）**：脚本**先断言** `ChunkEditService`/`ChunkExtractService`/`ChunkReadService` 三者在 `service` 包内**入度为零**（无人引用，`package-info` 除外），断言不过就 abort —— 这样"切出只产生单向外边"不再靠推理。`ChunkQuestionService` **故意留在** `service`：它被 `QuestionGenerationService` 引用，单独搬会造出 `service ⇄ service.chunk` 环（已在子面 package-info 写明）。
 - **切出**：3 类 → `com.ragagent.knowledge.service.chunk`（`git mv` + 包声明 + 全仓 FQN 替换 3 文件）；测试面 `ChunkExtractServiceTest` 随迁；新建 `service/chunk/package-info`；`service/package-info` 同步。

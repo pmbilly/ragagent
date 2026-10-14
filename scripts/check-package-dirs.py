@@ -54,7 +54,9 @@ def check() -> list[str]:
             problems.append(f"P1 {rel}：没有 package 声明（Java 源码必须有）")
             continue
         pkg = m.group(1)
-        if not rel.startswith(expected_dir(rel, pkg)):
+        # 必须**父目录完全相等**：早先版本用前缀匹配 ⇒ 把 `service/chunk/Foo.java`
+        # （声明 `package …service;`）误判为合规（子目录错配溜过）。
+        if os.path.dirname(rel) + '/' != expected_dir(rel, pkg):
             problems.append(
                 f"P2 {rel}：声明 `package {pkg};` 但目录与包不一致"
                 f"（应位于 {expected_dir(rel, pkg)}）——改包必须同时搬目录，"

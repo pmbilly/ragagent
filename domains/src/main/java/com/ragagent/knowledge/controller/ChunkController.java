@@ -23,7 +23,7 @@ import com.ragagent.knowledge.domain.ChunkRevisionConflictException;
 import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
 import com.ragagent.knowledge.service.chunk.ChunkEditService;
 import com.ragagent.knowledge.service.chunk.ChunkReadService;
-import com.ragagent.knowledge.service.ChunkQuestionService;
+import com.ragagent.knowledge.service.chunk.ChunkQuestionService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

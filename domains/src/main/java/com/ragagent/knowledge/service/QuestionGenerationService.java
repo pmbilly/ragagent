@@ -47,7 +47,7 @@ public class QuestionGenerationService implements QuestionGenerationConsumer {
     private final KnowledgeBaseRepository kbRepository;
     private final SpanTracker spanTracker;
     private final WikiFinalizePort finalizer;
-    private final ChunkQuestionService chunkService;
+    private final ChunkQuestionPort chunkService;
 
     @Autowired
     public QuestionGenerationService(ChunkRepository chunkRepository,
@@ -55,7 +55,7 @@ public class QuestionGenerationService implements QuestionGenerationConsumer {
                                      KnowledgeBaseRepository kbRepository,
                                      SpanTracker spanTracker,
                                      WikiFinalizePort finalizer,
-                                     ChunkQuestionService chunkService) {
+                                     ChunkQuestionPort chunkService) {
         this.chunkRepository = chunkRepository;
         this.knowledgeRepository = knowledgeRepository;
         this.kbRepository = kbRepository;
