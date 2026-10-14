@@ -1,4 +1,4 @@
-package com.ragagent.embedchannel.filter;
+package com.ragagent.embedchannel.controller.filter;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -21,7 +21,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import com.ragagent.common.tenant.TenantRole;
 import com.ragagent.storage.support.StorageUrlContext;
-import com.ragagent.tenant.Tenant;
+import com.ragagent.tenant.repository.Tenant;
 
 /**
  * embed 公开面的认证过滤器（publish token 门）。

@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.session.domain.ChatHistoryKbStats;
-import com.ragagent.tenant.Tenant;
+import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.common.web.ApiResult;
 import com.ragagent.common.web.ApiResponse;
 

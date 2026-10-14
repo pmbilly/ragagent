@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import org.springframework.stereotype.Component;
 
-import com.ragagent.tenant.Tenant;
-import com.ragagent.tenant.TenantLookup;
+import com.ragagent.tenant.repository.Tenant;
+import com.ragagent.tenant.repository.TenantLookup;
 import com.ragagent.storage.support.FileUrlPort;
 import com.ragagent.storage.support.StorageBackendResolver;
 

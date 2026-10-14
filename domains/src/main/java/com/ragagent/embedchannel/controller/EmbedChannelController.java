@@ -14,7 +14,7 @@ import com.ragagent.common.error.PlainErrorException;
 import com.ragagent.embedchannel.EmbedError;
 import com.ragagent.embedchannel.EmbedTokens;
 import com.ragagent.embedchannel.domain.EmbedChannelEntity;
-import com.ragagent.embedchannel.filter.EmbedAuthFilter;
+import com.ragagent.embedchannel.controller.filter.EmbedAuthFilter;
 import com.ragagent.embedchannel.service.EmbedChannelService;
 import com.ragagent.mcp.controller.AgentToolApprovalController;
 import com.ragagent.mcp.controller.McpOAuthController;

@@ -76,7 +76,7 @@ import com.ragagent.common.memory.MemoryRetrievalContext;
 import com.ragagent.common.pipeline.SearchParams;
 import com.ragagent.common.tenant.WebSearchConfig;
 import com.ragagent.retrieval.domain.WebSearchResult;
-import com.ragagent.tenant.Tenant;
+import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.KnowledgeBaseView;
 import com.ragagent.common.knowledge.KnowledgeDocumentFacts;

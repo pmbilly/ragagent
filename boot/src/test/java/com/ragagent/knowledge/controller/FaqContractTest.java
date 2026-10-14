@@ -9,7 +9,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import java.util.regex.Pattern;
 
 import com.ragagent.TestSchema;
-import com.ragagent.tenant.Tenant;
+import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.domain.UserPreferences;

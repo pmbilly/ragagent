@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ragagent.tenant.Tenant;
-import com.ragagent.tenant.TenantLookup;
+import com.ragagent.tenant.repository.Tenant;
+import com.ragagent.tenant.repository.TenantLookup;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.storage.fileserve.FileProxyService;
 

@@ -29,7 +29,7 @@ import com.ragagent.storage.support.Mode;
 import com.ragagent.storage.support.PublicModeForbiddenException;
 import com.ragagent.storage.support.Rewriter;
 import com.ragagent.storage.support.StorageBackendResolver;
-import com.ragagent.tenant.Tenant;
+import com.ragagent.tenant.repository.Tenant;
 
 /**
  * {@code KnowledgeQaController} 的**请求解析主体**：把 HTTP 请求（会话 id、

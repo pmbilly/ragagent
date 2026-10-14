@@ -17,7 +17,7 @@ import com.ragagent.auth.apikey.controller.filter.APIKeyGateInterceptor;
 import com.ragagent.auth.apikey.controller.filter.APIKeyRouteAuthorizer;
 import com.ragagent.auth.apikey.controller.filter.APIKeyRoutePolicies;
 import com.ragagent.auth.apikey.controller.filter.APIKeyRoutePolicy;
-import com.ragagent.tenant.Tenant;
+import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.domain.UserPreferences;

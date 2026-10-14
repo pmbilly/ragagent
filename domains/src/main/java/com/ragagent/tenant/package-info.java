@@ -1,8 +1,8 @@
 /**
- * 租户域（由 {@code common.tenant} 搬出）：租户实体 {@link com.ragagent.tenant.Tenant}、
+ * 租户域（由 {@code common.tenant} 搬出）：租户实体 {@link com.ragagent.tenant.repository.Tenant}、
  * {@code TenantMapper}、租户级配置 VO（{@code APIPrincipalConfig} / {@code ChatHistoryConfig} /
  * {@code ParserEngineConfig} / {@code RetrievalConfig} / {@code StorageEngineConfig}）、
- * {@code TenantConfigRedaction}（响应/更新面的密钥打码与合并）与 {@link com.ragagent.tenant.TenantLookup}。
+ * {@code TenantConfigRedaction}（响应/更新面的密钥打码与合并）与 {@link com.ragagent.tenant.repository.TenantLookup}。
  *
  * <p><b>为什么从 common 搬出来</b>：这些是<b>实体 + MyBatis mapper + 业务配置</b>——放在 common 意味着
  * "共享内核里住着数据模型与持久层"，是全仓最强的"common 不纯"信号（R6 棘轮正为此而设）。</p>

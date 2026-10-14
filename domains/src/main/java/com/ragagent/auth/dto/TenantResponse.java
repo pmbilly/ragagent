@@ -3,7 +3,7 @@ package com.ragagent.auth.dto;
 import java.time.OffsetDateTime;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.tenant.Tenant;
+import com.ragagent.tenant.repository.Tenant;
 
 /**
  * Tenant 的 API 投影。

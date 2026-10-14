@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.tenant.Tenant;
+import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.tenant.ChatHistoryConfig;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.agent.tool.runtime.ThinkBlocks;

@@ -11,8 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.tenant.Tenant;
-import com.ragagent.tenant.TenantLookup;
+import com.ragagent.tenant.repository.Tenant;
+import com.ragagent.tenant.repository.TenantLookup;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.storage.domain.StoredResource;
 import com.ragagent.storage.service.ResourceCatalogService;

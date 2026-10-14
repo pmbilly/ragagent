@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.tenant.Tenant;
+import com.ragagent.tenant.repository.Tenant;
 
 /**
  * {@link Rewriter} / {@link FileServiceResolver} 的对等测试。

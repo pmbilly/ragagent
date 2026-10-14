@@ -1180,6 +1180,13 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **风险预检（做在前面）**：Strings/Bean 名（`@Qualifier`/`getBean`/配置键）全仓零命中 ✓ ⇒ 改名不动装配。
 - **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 ✓；`spotlessCheck build` ✓ **十二守卫** ✓（环 0 / 包级 SCC 12 组）；`:domains:javadoc` ✓；定向 `--rerun-tasks` ✓。
 
+**🔶 B266 第⑤步（2026-10-14，tenant 3 类 → `repository/`；embedchannel `filter` → `controller.filter`）**
+- **tenant**：`Tenant` / `TenantConfigRedaction` / `TenantLookup` → **`tenant/repository`**（对齐 §8.9 的 `repository/`(3)）；根包留 6 个 `*Config` ✓（算术闭合）；测试 `TenantConfigRedactionTest` 随迁 mirror 包；FQN 替换 **87 文件**（`tenant.Tenant` 单类就有 85 个引用者）。
+- **embedchannel**：`EmbedAuthFilter` → **`controller/filter`**（对齐 §8.9 面名）。
+- **三处现场纠错**：① 脚本把一个面的**源路径写成域根** ⇒ `git mv` 前断言中止（tenant 已搬、包声明未改）⇒ 写**续跑脚本**补齐（教训：目标目录先建、源路径写全）；② 搬包后**原同包免 import** 的类需补 import——`TenantConfigRedaction` 补 `ParserEngineConfig`/`StorageEngineConfig`、`Tenant` 补 `APIPrincipalConfig`(+`TypeHandler`)、随迁测试补 2 个，**编译三轮才收敛**；③ **SCC 基线"成员换名"**：既有组 `{embedchannel, embedchannel.filter, embedchannel.service}` 成员路径变了（组结构不变）⇒ `package-cycles.baseline.json` 成员换名 **1 处**（组数仍 12）；守卫从"新增/变形"↔"已消除/变形"两侧同时报警 ⇒ 精确定位后**外科式改**，未用 `--write`（避免吞别处漂移）。
+- **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 ✓；`spotlessCheck build` ✓ **1m39s** ✓ **十二守卫** ✓（环 0 / 包级 SCC 12 组）；`:domains:javadoc` ✓。
+- **登记（B266 余下）**：① approval `24` → 4 面（root 8 + domain 7 + redis 2 + service 7，**算术闭合**）；② skill 域（现类在 `agent/skills`，目标 `skill/`，**域级**）；③ storage `provider/`(11) + `StoragePathGuard` → 计划归 **`platform.storage.*`**（现 `platform.*` 只在 `:common` 有 `stream/`）⇒ **模块级**；④ websearch `fetch/`(4) 已在 **`:engine` 的 `com.ragagent.webfetch`**（分层有意偏离）；⑤ auth `apikey.dto`(2) 待创建。
+
 **🔶 B263 第㉟步（2026-10-14，第二个子面 `service.chunk` 切出）**
 - **动前断言（把"可测"变成"可证"）**：脚本**先断言** `ChunkEditService`/`ChunkExtractService`/`ChunkReadService` 三者在 `service` 包内**入度为零**（无人引用，`package-info` 除外），断言不过就 abort —— 这样"切出只产生单向外边"不再靠推理。`ChunkQuestionService` **故意留在** `service`：它被 `QuestionGenerationService` 引用，单独搬会造出 `service ⇄ service.chunk` 环（已在子面 package-info 写明）。
 - **切出**：3 类 → `com.ragagent.knowledge.service.chunk`（`git mv` + 包声明 + 全仓 FQN 替换 3 文件）；测试面 `ChunkExtractServiceTest` 随迁；新建 `service/chunk/package-info`；`service/package-info` 同步。

@@ -44,7 +44,7 @@ import com.ragagent.session.controller.sse.SseFrameWriter;
 import com.ragagent.storage.support.FileUrlPort;
 import com.ragagent.storage.support.Mode;
 import com.ragagent.storage.support.StorageBackendResolver;
-import com.ragagent.tenant.Tenant;
+import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.common.web.ApiResult;
 
 

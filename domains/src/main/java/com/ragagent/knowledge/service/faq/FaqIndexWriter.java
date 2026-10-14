@@ -17,7 +17,7 @@ import com.ragagent.model.domain.Model;
 import com.ragagent.model.mapper.ModelMapper;
 import com.ragagent.model.service.ModelRuntimeAssembler;
 import org.springframework.stereotype.Component;
-import com.ragagent.tenant.Tenant;
+import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.embedding.Embedder;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.retrieval.engine.EngineTypes;

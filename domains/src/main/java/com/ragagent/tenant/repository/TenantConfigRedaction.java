@@ -1,4 +1,7 @@
-package com.ragagent.tenant;
+package com.ragagent.tenant.repository;
+
+import com.ragagent.tenant.ParserEngineConfig;
+import com.ragagent.tenant.StorageEngineConfig;
 
 import com.ragagent.common.tenant.WebSearchConfig;
 import com.ragagent.tenant.StorageEngineConfig.Ks3EngineConfig;

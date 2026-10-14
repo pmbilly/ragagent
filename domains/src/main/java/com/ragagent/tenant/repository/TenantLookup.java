@@ -1,4 +1,4 @@
-package com.ragagent.tenant;
+package com.ragagent.tenant.repository;
 
 /**
  * 租户实体查询端口：按 id 取 {@link Tenant} 行。

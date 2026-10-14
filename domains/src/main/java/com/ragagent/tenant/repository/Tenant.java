@@ -1,4 +1,7 @@
-package com.ragagent.tenant;
+package com.ragagent.tenant.repository;
+
+import com.ragagent.tenant.APIPrincipalConfig;
+import com.ragagent.tenant.APIPrincipalConfigTypeHandler;
 
 import java.time.OffsetDateTime;
 

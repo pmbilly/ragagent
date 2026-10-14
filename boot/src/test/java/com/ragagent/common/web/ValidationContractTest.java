@@ -5,7 +5,7 @@ import com.ragagent.auth.domain.User;
 import com.ragagent.auth.domain.UserPreferences;
 import com.ragagent.auth.mapper.TenantMemberMapper;
 import com.ragagent.auth.mapper.UserMapper;
-import com.ragagent.tenant.Tenant;
+import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.tenant.mapper.TenantMapper;
 import com.ragagent.contract.error.ErrorCode;

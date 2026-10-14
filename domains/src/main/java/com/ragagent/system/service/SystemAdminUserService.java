@@ -12,7 +12,7 @@ import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.audit.domain.AuditOutcome;
 import com.ragagent.audit.service.AuditLogService;
 import com.ragagent.auth.domain.AuthToken;
-import com.ragagent.tenant.Tenant;
+import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.mapper.AuthTokenMapper;
 import com.ragagent.auth.mapper.UserMapper;

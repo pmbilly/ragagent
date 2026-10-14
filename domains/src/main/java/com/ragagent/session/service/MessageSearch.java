@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.tenant.Tenant;
+import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.tenant.ChatHistoryConfig;
 import com.ragagent.tenant.RetrievalConfig;
 import com.ragagent.auth.service.TenantService;

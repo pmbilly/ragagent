@@ -32,7 +32,7 @@
     ],
     [
       "com.ragagent.embedchannel",
-      "com.ragagent.embedchannel.filter",
+      "com.ragagent.embedchannel.controller.filter",
       "com.ragagent.embedchannel.service"
     ],
     [

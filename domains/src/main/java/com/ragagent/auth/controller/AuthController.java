@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
-import com.ragagent.tenant.Tenant;
+import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.auth.domain.TenantInvitation;
 import com.ragagent.common.tenant.TenantRole;
 import com.ragagent.auth.domain.User;
