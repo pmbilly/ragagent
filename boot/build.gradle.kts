@@ -46,6 +46,7 @@ dependencies {
     compileOnly("jakarta.validation:jakarta.validation-api")
     implementation(project(":engine"))
     implementation(project(":common"))
+    implementation(project(":contract"))
     testImplementation(testFixtures(project(":domains")))
     testImplementation(testFixtures(project(":common")))   // EmbeddedRedis（共享测试基座）
     testImplementation("org.springframework.boot:spring-boot-starter-test")

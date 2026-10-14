@@ -2,9 +2,14 @@
 //
 // 存在意义（B116 抽取，B117 定名 :common）：把"底座不得反向依赖任何业务域"从守卫脚本规则
 // **升格为编译规则** —— 此前由 check-package-cycles.py 的 R5 守（可被改白名单绕过），现在改不动了。
-// 依赖方向：domains → common；**common → 无**（本 build 文件里没有任何 project(...)）。
+// 依赖方向：domains/engine/boot → common → **contract**（`api(project(":contract"))`）；
+// 反向无依赖（本文件除 :contract 外没有任何 project(...)）。
 //
-// 命名取 common 而非 contracts 的两个理由：
+// 2026-10-14（A③ 收口后）：契约面（com.ragagent.contract，18 面 / 116 文件）**已提取为独立模块 `:contract`**
+// —— 模块名取单数 contract（＝顶层包名），不取方案字面的 contracts（该词在本仓已被
+// domains/src/testFixtures/resources/contracts 的 1,426 金片 + 49 个 *ContractTest 占用，见下）。
+//
+// 命名取 common 而非 contracts 的两个理由（B117 记录，仍成立）：
 //   1. 与顶层包一致 —— 146/219 文件就在 com.ragagent.common 下（模块名 = 顶层包名，最常规）；
 //   2. 本仓 "contracts" 已被占用 —— domains/src/testFixtures/resources/contracts 有 1,426 个 golden
 //      契约夹具、另有 49 个 *ContractTest，再叫 contracts 会语义撞车。
@@ -55,6 +60,8 @@ dependencyManagement {
 }
 
 dependencies {
+    // 契约层（纯 JDK 公开 API/SPI）：common 的端口签名暴露契约类型 ⇒ api 传递
+    api(project(":contract"))
     // 依 common/event 的实际 import 面声明（实测：jackson / spring / mybatis-plus / slf4j /
     // jakarta 六类，无云 SDK、无 jjwt、无 jdbc 驱动）—— 不用 starter 以免把自动配置漏进库。
     api("com.fasterxml.jackson.core:jackson-databind")

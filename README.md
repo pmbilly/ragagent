@@ -12,24 +12,25 @@
 
 ## 总体架构
 
-四个 Gradle 模块，**依赖单向、边界由编译期强制**——不是文档约定：往 `:engine` 里写一行业务域 import 就编译失败（ArchUnit + 包级棘轮双守）。
+五个 Gradle 模块，**依赖单向、边界由编译期强制**——不是文档约定：往 `:engine` 里写一行业务域 import 就编译失败（ArchUnit + 包级棘轮双守）。
 
 ```
-   :boot  ──────►  :domains  ──────►  :engine  ──────►  :common
-  组合根              业务域             能力层            共享内核
-  入口 + 装配         22 个业务包        8 个能力包        4 个平台包
-  13 文件            1,383 文件         295 文件          219 文件
-  1.7k 行            217k 行            50k 行            17.5k 行
+   :boot  ──►  :domains  ──►  :engine  ──►  :common  ──►  :contract
+  组合根         业务域         能力层        平台/共享内核    契约面（纯 JDK）
+  入口 + 装配    22 个业务包    8 个能力包    4 个平台包       18 个契约面
+  13 文件        1,448 文件     309 文件      158 文件         116 文件
+  1.8k 行        219k 行        50.8k 行      12.1k 行         7.3k 行
 ```
 
 | 模块 | 职责 | 依赖 |
 |---|---|---|
-| `:boot` | 组合根：入口类、全局装配（`config/` 的 `*WiringConfig`）、扫描、打包。**只出不进**（无任何模块反向依赖它） | → domains / engine / common |
-| `:domains` | 业务域本体：HTTP 面（52 个 `*Controller`）+ 持久层（knowledge、agent、session、wiki、im、datasource…22 个包） | → engine / common |
-| `:engine` | 能力层：检索引擎适配（8 家向量库）、LLM provider 族、chatpipeline 问答编排、embedding/rerank 客户端、modelcontext。**不得依赖业务域** | → common |
-| `:common` | 共享内核：跨域端口与契约载荷、横切基础设施（web/error/approval）、事件总线（`event/`）、SSE 流管理（`stream/`）、追踪（`tracing/`）。**零 project 依赖** | 无 |
+| `:boot` | 组合根：入口类、全局装配（`config/` 的 `*WiringConfig`）、扫描、打包。**只出不进**（无任何模块反向依赖它） | → domains / engine / common / contract |
+| `:domains` | 业务域本体：HTTP 面（52 个 `*Controller`）+ 持久层（knowledge、agent、session、wiki、im、datasource…22 个包） | → engine / common / contract |
+| `:engine` | 能力层：检索引擎适配（8 家向量库）、LLM provider 族、chatpipeline 问答编排、embedding/rerank 客户端、modelcontext。**不得依赖业务域** | → common / contract |
+| `:common` | 平台/共享内核：跨域端口（L1）、横切基础设施（web/error/approval）、事件总线（`event/`）、SSE 流管理（`stream/`）、追踪（`tracing/`）、通用词汇 | → contract |
+| `:contract` | **契约面（方案 §5.1）**：纯 JDK 的公开 API / SPI / 不可变载荷（18 个面：agent / knowledge / session / model / retrieval / tenant / tool / wiki / …）。**构建文件无 dependencies 块** —— 一沾框架/其他模块即编译失败（把"契约面纯 JDK"从 ArchUnit R1 升格为编译期硬约束） | 无（纯 JDK） |
 
-**跨模块解耦靠端口下沉**：`:engine` 需要业务词汇时，接口定义下沉到 `:common`（如 `KnowledgeBaseGateway`、`SessionMessagePort`），由 `:domains` 提供实现（`KnowledgeBaseService`、`MessageRepository`）。依赖永远指向下层，无环；`scripts/check-package-cycles.py` 守着。
+**跨模块解耦靠端口下沉**：跨模块的公开 API / SPI / 载荷在 **`:contract`**（方案 §8.1）；L1 端口在 `:common`（如 `KnowledgeBaseGateway`、`SessionMessagePort`），由 `:domains` 提供实现（`KnowledgeBaseService`、`MessageRepository`）。依赖永远指向下层，无环；`scripts/check-package-cycles.py` 守着。
 
 > **包根共享，边界靠规则不靠前缀**：四个模块的 Java 包都挂在同一个 `com.ragagent` 根下——`:engine` 的包是
 > `com.ragagent.llm` / `com.ragagent.retrieval` / `com.ragagent.chatpipeline`…（**没有** `com.ragagent.engine.*` 这层）。
@@ -55,7 +56,8 @@ ragagent/
 ├── boot/                 # :boot 组合根（入口 + 装配）
 ├── domains/              # :domains 业务域（22 包，见下）
 ├── engine/               # :engine 能力层（8 包）
-├── common/               # :common 共享内核（4 包）
+├── common/               # :common 平台/共享内核（4 包）
+├── contract/             # :contract 契约面（18 面，纯 JDK）
 ├── frontend/             # Vue 3 前端（477 个源文件；api/ 类型手写，双守卫防契约漂移）
 ├── scripts/              # 工程脚本：十二守卫（check-*.py）、起停服、契约重录、A/B
 ├── migrations/           # Flyway 单份基线迁移 versioned/V1__baseline.sql
@@ -67,7 +69,7 @@ ragagent/
 ├── .github/workflows/    # CI：guards · backend · docker · frontend 四个 job
 ├── docker-compose.yml    # 本地基础设施：ParadeDB(15432) + Redis(16379) + docreader(50051)
 ├── Dockerfile            # 镜像（CI 有迁移路径自检）
-├── settings.gradle.kts   # 模块清单（4 个 include）
+├── settings.gradle.kts   # 模块清单（5 个 include）
 └── HANDOFF.md            # 接手必读：已定决策、批次总表、逐包重构范式、踩坑史
 ```
 

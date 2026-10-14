@@ -4,7 +4,7 @@ package com.ragagent.contract.apikey;
 /**
  * 当前请求的 {@link TenantAPIKeyScope} 持有者。
  *
- * <p>用与 {@link com.ragagent.platform.access.TenantContext} 一致的 ThreadLocal 方案
+ * <p>用与 {@code com.ragagent.platform.access.TenantContext}（平台侧实现，契约面不 link 模块外类型） 一致的 ThreadLocal 方案
  * 存取请求级 scope（Java 侧没有逐层透传的 ctx）：
  * **每个请求一个线程**（Servlet + 虚拟线程模型下成立），
  * 跨线程（异步任务）必须显式把 scope 值传过去，禁止共享本 ThreadLocal。</p>

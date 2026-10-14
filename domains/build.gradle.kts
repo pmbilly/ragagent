@@ -48,6 +48,7 @@ dependencyManagement {
 dependencies {
     // 共享内核（common + event）——B116 抽成独立模块后在此声明依赖（B117 定名 :common）
     implementation(project(":common"))
+    implementation(project(":contract"))
     implementation(project(":engine"))
     testImplementation(testFixtures(project(":engine")))    // wire/ 录制夹具
     testImplementation(testFixtures(project(":common")))    // EmbeddedRedis（B162 起在 :common）

@@ -1,10 +1,10 @@
 # 模块手册索引
 
-> `com.ragagent` 的 **34 个顶层包**由 **31 份模块手册**覆盖（`docs/<模块>-module-guide.md`），结构与粒度对齐样板篇 `knowledge-module-guide.md`（§0 一分钟速览 → §10 地标速查）。
+> `com.ragagent` 的 **35 个顶层包**由 **31 份模块手册** + 契约面（`:contract` 的 18 个 `contract.<面>` 包，硬约束写在各自 `package-info` 与 ArchUnit R1，不单独成册）覆盖（`docs/<模块>-module-guide.md`），结构与粒度对齐样板篇 `knowledge-module-guide.md`（§0 一分钟速览 → §10 地标速查）。
 > 未单独立册的三个包：`modelcontext`（随 `agent-module-guide` 讲）、`webfetch`（4 个文件，见包内 `package-info`）、`engine/tracing`（与 `:common` 的 tracing 合用一册）。
 > **数据口径**：**2026-10-11 实测**（`wc -l` 口径，仅 main Java）。仓库级作业规范见仓库根 `HANDOFF.md`（§12 结构地图、§13 踩坑清单、§14 逐包重构范式）；包性质判定与结构决策见 `docs/backend-package-map.md`。
 
-全仓规模：`:boot` 13 文件/1.7k 行 · `:domains` 1,383/217k（22 包）· `:engine` 295/50k（8 包）· `:common` 219/17.5k（4 包）；52 个控制器、49 个 `*ContractTest`、1,429 个契约金片、全量测试 4,876 条。
+全仓规模（2026-10-14 实测）：`:boot` 13 文件/1.8k 行 · `:domains` 1,448/219k（22 包）· `:engine` 309/50.8k（8 包）· `:common` 158/12.1k（4 包）· **`:contract` 116/7.3k（18 面，纯 JDK）**；52 个控制器、49 个 `*ContractTest`、1,429 个契约金片、全量测试 4,987 条。
 
 ## `:domains` 业务包（22）
 

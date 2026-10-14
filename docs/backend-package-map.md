@@ -3,6 +3,7 @@
 > **用途**：新人 30 分钟建立"哪个功能在哪个包"的全局观；后续会话按本文的 **P0–P3 待办**推进，
 > 不用重新摸索。**复测**：`python3 scripts/pkg-audit.py`（口径见脚本 docstring）。
 > **基线数据（2026-10-11 实测）**：**34 个顶层包**（`:domains` 22 + `:engine` 8 + `:common` 4，`config` 归 `:boot`）/ **1,910 文件 / 287k 行**（main Java）；顶层 `package-info` 全覆盖。
+> **2026-10-14 变更**：契约面提取为**独立模块 `:contract`**（`contract.<面>` 18 个包 / 116 文件 / 7.3k 行，纯 JDK；模块清单 4 → 5；A②/A③ 把 99+2 类收进该面）。其余归属不变。
 > 历史口径（2026-09-30：31 包 / 1,634 文件 / 284k 行）见 git 历史版本。§3 以下的 P0–P3 待办**保留为过程档案**（内嵌各批次的执行批注），现势以头部与 §1 为准。
 
 ## 1. 三类包（先分清性质，再判断"合理与否"）
@@ -12,6 +13,7 @@
 | **业务域（22，`:domains`）** | knowledge、agent（含 `management/` 子域）、wiki、session、datasource、memory、mcp、auth（含 `apikey/` 子域）、im、storage、model、system、**settings**、**tenant**、websearch、embedchannel、vectorstore、favorite、evaluation、initialization、audit、**approval** | 有 `controller/service/domain/dto/mapper/repository` 六件套（小域或缺省一二件），HTTP 面明确 |
 | **能力层（8，`:engine`）** | `retrieval`、`llm`、`chatpipeline`、`embedding`、`rerank`、`modelcontext`、`tracing`（检索 span 面）、`webfetch` | **无 controller 是对的**——被其他域调用的引擎/管线/provider 客户端 |
 | **平台层（4+1）** | `common`、`event`、`stream`、`tracing`（Langfuse 面，`:common`）+ `config`（`:boot` 组合根） | 横切能力；`common` 被全部业务/能力包依赖（位置正确） |
+| **契约层（18 面，`:contract`）** | `contract.agent`、`contract.knowledge`、`contract.session`、`contract.model`、`contract.retrieval`、`contract.tenant`、`contract.tool`… | 纯 JDK 的公开 API/SPI/载荷；被各模块依赖（位置最底，2026-10-14 提为独立模块） |
 
 > 包→模块归属速记：**Java 包共享 `com.ragagent` 根，模块边界由 ArchUnit + 包级棘轮强制**（见 README「总体架构」）。
 > 历史：`embed` 已改名 `embedchannel`；`modelcontext`/`webfetch` 曾先后并入 agent 侧（B35/批 1），现随 `:engine`
@@ -116,10 +118,10 @@ B33 已归位：`AppEnvLookup` → `common/deployment`、`StorageRuntimeEnv` →
 
 | 场景 | 端口放哪 | 例子 | 为什么 |
 |---|---|---|---|
-| **L3 ↔ L3**（域间互调）| `:common` 的 `common.<domain>` 包 | `common.knowledge.ChunkPort`、`common.session.SessionMessagePort` | 域之间不许互相依赖 ⇒ 契约只能下沉 L1；由**编译器**（模块边界）强制 |
+| **L3 ↔ L3**（域间互调）| **`:contract` 契约面**（§8.1；2026-10-14 起为独立模块）；历史落点 `:common` 的 `common.<domain>` 仍是 L1 端口的另一形态 | `contract.knowledge.ChunkPort`、`contract.session.SessionMessagePort` | 域之间不许互相依赖 ⇒ 契约只能下沉；由**编译器**（模块边界）强制 |
 | **L2 ↔ L3**（能力层用业务域）| **消费侧拥有**（留在 L2 包内）| `chatpipeline.PipelinePorts`（16 个内嵌接口 + 异常 + 3 个载荷 record）| 依赖方向本就合法（L3→L2 允许）⇒ 消费侧拥有接口正是依赖倒置；载荷用 L2 类型（`LlmChatClient`/`Reranker`）也合法 |
 
-**判据一句话**：接口两边**都在 L3** ⇒ 进 `common.<domain>`；**有一边是 L2** ⇒ 留在 L2 消费侧。
+**判据一句话**：接口两边**都在 L3** ⇒ 进 **`:contract`** 契约面（纯 JDK；历史形态 `common.<domain>`）；**有一边是 L2** ⇒ 留在 L2 消费侧。
 
 > **修正记录（B124 → B125）**：B124 的架构评述把「`PipelinePorts` 没进 `common`」列为"第 1 号不一致"，
 > 侦察后**修正**：它引用了 4 个 L2 类型（`llm.LlmChatClient`、`rerank.Reranker`、
@@ -209,6 +211,8 @@ L3  :domains 业务域              knowledge agent session wiki datasource im m
      └ 同级之间：禁直连对方 mapper/实体；跨域走**窄接口（port）或事件**
 L2  :engine 能力层               llm retrieval embedding rerank chatpipeline modelcontext webfetch tracing*
      └ 不得依赖 L3；只接受**配置值**而非业务实体（*引擎 span 面的 tracing）
+L1  :contract 契约面              contract.<面> ×18（agent apikey audit auth error event graph knowledge
+                                 memory model retrieval session storage tenant text tool vectorstore wiki；纯 JDK）
 L1  :common 平台                 common event stream tracing
 ```
 

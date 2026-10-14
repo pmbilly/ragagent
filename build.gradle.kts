@@ -35,6 +35,7 @@ dependencyManagement {
 //   （-Pcoverage 会同时开启各模块插桩；忘了加会因缺 exec 数据而得到空报告 ⇒ 见下方防呆）
 // 产物：build/reports/jacoco/testCodeCoverageReport/html/index.html
 dependencies {
+    jacocoAggregation(project(":contract"))
     jacocoAggregation(project(":domains"))
     jacocoAggregation(project(":engine"))
     jacocoAggregation(project(":common"))

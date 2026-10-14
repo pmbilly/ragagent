@@ -33,6 +33,7 @@ MODULE_ALLOW: dict[str, str] = {}
 
 # 源码树根（S2 扫描范围）
 SOURCE_ROOTS = (
+    "contract/src/main/java",
     "domains/src/main/java",
     "domains/src/test/java",
     "domains/src/testFixtures/java",
