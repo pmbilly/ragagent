@@ -379,19 +379,11 @@
       "TemporaryDocumentService"
     ],
     "session→tenant": [
-      "MessageSearch",
-      "MessageService",
       "QaWiring"
     ],
     "session→wiki": [
       "AgentToolBackends",
       "AgentToolWikiBackends"
-    ],
-    "storage→tenant": [
-      "FileServiceFactory",
-      "FileServiceResolver",
-      "StorageFileResolver",
-      "TenantFileServiceResolver"
     ],
     "system→auth": [
       "SystemAdminController",

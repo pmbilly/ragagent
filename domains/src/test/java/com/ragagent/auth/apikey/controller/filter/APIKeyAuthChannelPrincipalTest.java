@@ -18,7 +18,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import com.ragagent.contract.apikey.APIKeyScopeContext;
 import com.ragagent.auth.apikey.service.TenantAPIKeyService;
 import com.ragagent.tenant.repository.Tenant;
-import com.ragagent.tenant.APIPrincipalConfig;
+import com.ragagent.contract.tenant.APIPrincipalConfig;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.auth.service.UserService;
 import com.ragagent.platform.access.TenantContext;

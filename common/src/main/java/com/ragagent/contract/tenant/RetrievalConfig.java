@@ -1,6 +1,5 @@
-package com.ragagent.tenant;
+package com.ragagent.contract.tenant;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * 检索配置段。
@@ -26,14 +25,11 @@ public class RetrievalConfig {
     private String rerankModelId = "";
 
     /** 数值 0 省略键 */
-    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private int rrfK;
 
     /** 0.0 省略键（NON_DEFAULT 对 primitive double 即 0.0） */
-    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private double rrfVectorWeight;
 
-    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private double rrfKeywordWeight;
 
     public int getEmbeddingTopK() { return embeddingTopK; }

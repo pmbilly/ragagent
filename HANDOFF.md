@@ -1308,6 +1308,16 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **A② 全批提交**：`a7d3b13e`（第①批 42 类）· `37b5fbb8`（第②批 去框架化 37 类）· `2ee75327`（第②批 补：解锁 11 类）· 本批（第③批 9 类 + 收口）。
 - **A 的下一步**：**③ 立「域间只经契约」**（A20 已守"契约唯一实现"；还差"业务域之间只经 `contract`"这条规则——应先测现状再决定硬规则 vs 棘轮基线）。可选后续：① 的 K 级重设计（`JsonNode` → typed records）另立项。
 
+**🔶 A③ 收敛第四刀（D）：`tenant` 类型族入契约面（2026-10-14，R10 基线 298 → 292 类，**边 64 → 63**）**
+- **动机**：前几刀的余量多卡在"引 `tenant` 的**类型**"（`StorageEngineConfig`/`ChatHistoryConfig`/`RetrievalConfig`/`APIPrincipalConfig`）⇒ 把这一族入契约面可**一次解锁多处** ✓（与 A② 的类型级残留同族问题，但这一族**可解**：注解可分离、无 `JsonNode` ✓）。
+- **落位**：4 类 → `contract.tenant`（`StorageEngineConfig` 含 **8 个嵌套 provider 子结构**：Local/Minio/Cos/Tos/S3/Oss/Ks3/Obs ✓ 随外层一起走）；**新增 `platform/web/ContractJsonMixinsTenant`**（4 个 mixin ✓，注册进 `ContractJsonModule` ✓——嵌套子结构**无注解**故不需要 mixin ✓，`@JsonInclude(NON_NULL)` 由 mixin 承载 ⇒ golden `ct-kv-storage-*` 形态不变 ✓）。
+- **留下的两处（登记）**：`ParserEngineConfig`（含 **`JsonNode`** ✗ ⇒ 与 A② 类型级同族）；`APIPrincipalConfigTypeHandler`（MyBatis `ObjectMapper` 持久化件 ⇒ 属域内 ✓）。
+- **迁移方式**：FQN 替换 19 文件 + **同包裸引用补 import 2 文件**（`tenant/**` 内部：`APIPrincipalConfigTypeHandler`、`repository/Tenant` ✓ ——"同包裸引用"这个坑第 4 次出现，已固化在记忆里 ✓）。
+- **收益（本刀最漂亮）**：**`storage→tenant` 整条边清零** ✓、**`auth→tenant` 整条边清零** ✓ ⇒ **边数 64 → 63**；`session→tenant` 9 → **1**；基线 **298 → 292 类**。
+- **验证**：**4987 / 失败 0 / 跳过 4** ✓；`spotlessCheck build` ✓ **2m15s** ✓ **13 守卫** ✓（环 0 / SCC 11 组）；**线格式金片**（`JsonContractRoundTripTest` 35 条方法含 `tenantKvConfigsRoundTrip`/`kbConfigsRoundTrip` ✓ + storage 族 ✓）全绿 ✓ —— mixin 承载的租户配置形态与搬迁前一致 ✓。
+- **A③ 累计（四刀）**：基线 **317 → 292（−25 类）**、**边 64 → 63**；`storage→tenant` **9 → 0** · `auth→tenant` **24 引用 → 0** · `knowledge→tenant` 3 → 2 · `session→auth` 11 → 4 · `session→tenant` 9 → 1。
+- **下一步**：`session→auth` 余 4 类（`QaWiring`/`SessionKnowledgeQaService`/`TemporaryDocumentProcessor`/`TemporaryDocumentService` —— 均注入具体 `TenantService` 或走会话内端口 ⇒ 同第三刀手法 ✓，其中 `QaWiring` 走会话内端口属独立设计步）；或换向 `knowledge→storage`（21 处）/`agenttools→agent`（114 处，最大边）。
+
 **🔶 A③ 收敛第三刀：`session` 的 `currentTenant()` 一族（2026-10-14，R10 基线 307 → 298 类）**
 - **切面**：三个控制器共用同一模式（`private Tenant currentTenant()` → 传给 `Rewriter.forRequest` / `QaRequestParser`）⇒ 一刀多类 ✓，且**把第二刀留下的过渡重载一并收掉**（它的唯一用途就是这一族 ✓）。
 - **迁移 5 类**：`controller/{MessageController, SessionStreamController, KnowledgeQaController}` + `qa/{QaRequestParser, QaTurnExecutor}` —— 字段/构造/`ObjectProvider<T>` 类型 `TenantService`（具体类 ✗）→ `TenantConfigLookup`（L1 端口 ✓）；`currentTenant()` 返回 `TenantStorageView`（`storageView(tid)` ✓）；解析器参数 `Tenant readerTenant` → `TenantStorageView readerTenant`；`QaTurnExecutor` 的存在性判断改 `storageView(...) != null` ✓。

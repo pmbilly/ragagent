@@ -1,6 +1,5 @@
-package com.ragagent.tenant;
+package com.ragagent.contract.tenant;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * tenants.api_principal_config（jsonb）的载荷类型。
@@ -14,7 +13,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  * 密钥缺失/轮换时行照常加载、密钥视为未配置）。
  * 本类型自身只持有明文形态。</p>
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class APIPrincipalConfig {
     public static final String MODE_TENANT = "tenant";
     public static final String MODE_DIRECT_HEADER = "direct_header";

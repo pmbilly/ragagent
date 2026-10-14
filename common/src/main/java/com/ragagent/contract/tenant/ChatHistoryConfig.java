@@ -1,4 +1,4 @@
-package com.ragagent.tenant;
+package com.ragagent.contract.tenant;
 
 
 /**

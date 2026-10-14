@@ -1,5 +1,13 @@
 package com.ragagent.platform.web;
 
+import com.ragagent.contract.tenant.StorageEngineConfig;
+
+import com.ragagent.contract.tenant.RetrievalConfig;
+
+import com.ragagent.contract.tenant.ChatHistoryConfig;
+
+import com.ragagent.contract.tenant.APIPrincipalConfig;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -86,6 +94,10 @@ public final class ContractJsonModule extends SimpleModule {
         setMixInAnnotation(ToolResult.class, ContractJsonMixinsCore.ToolResultMixin.class);
         setMixInAnnotation(UserMessageInjectedData.class, ContractJsonMixinsEvent.UserMessageInjectedDataMixin.class);
         setMixInAnnotation(WebSearchConfig.class, ContractJsonMixinsCore.WebSearchConfigMixin.class);
+        setMixInAnnotation(APIPrincipalConfig.class, ContractJsonMixinsTenant.APIPrincipalConfigMixin.class);
+        setMixInAnnotation(ChatHistoryConfig.class, ContractJsonMixinsTenant.ChatHistoryConfigMixin.class);
+        setMixInAnnotation(RetrievalConfig.class, ContractJsonMixinsTenant.RetrievalConfigMixin.class);
+        setMixInAnnotation(StorageEngineConfig.class, ContractJsonMixinsTenant.StorageEngineConfigMixin.class);
         addSerializer(ResponseType.class, new ResponseTypeSerializer());
         addDeserializer(ResponseType.class, new ResponseTypeDeserializer());
         addSerializer(PromptCacheStatus.class, new PromptCacheStatusSerializer());

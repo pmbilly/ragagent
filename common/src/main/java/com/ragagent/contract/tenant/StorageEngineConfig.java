@@ -1,6 +1,5 @@
-package com.ragagent.tenant;
+package com.ragagent.contract.tenant;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * 存储引擎配置段（8 个 provider 子结构）。
@@ -14,28 +13,20 @@ public class StorageEngineConfig {
 
     private String defaultProvider = "";
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private LocalEngineConfig local;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private MinioEngineConfig minio;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private CosEngineConfig cos;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private TosEngineConfig tos;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private S3EngineConfig s3;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private OssEngineConfig oss;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Ks3EngineConfig ks3;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private ObsEngineConfig obs;
 
     public String getDefaultProvider() { return defaultProvider; }

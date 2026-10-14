@@ -23,7 +23,7 @@ import com.ragagent.storage.service.ResourceCatalogService;
 import com.ragagent.storage.config.StorageEnvLookup;
 import com.ragagent.storage.provider.FileService;
 import com.ragagent.storage.provider.FileServiceFactory;
-import com.ragagent.tenant.StorageEngineConfig;
+import com.ragagent.contract.tenant.StorageEngineConfig;
 
 /**
  * 运行时存储解析器，三个职责：

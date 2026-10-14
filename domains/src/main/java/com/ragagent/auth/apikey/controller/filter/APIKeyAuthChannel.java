@@ -18,7 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.service.UserService;
-import com.ragagent.tenant.APIPrincipalConfig;
+import com.ragagent.contract.tenant.APIPrincipalConfig;
 import com.ragagent.common.apikey.ApiKeyAuthPort;
 
 /**

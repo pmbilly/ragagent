@@ -1,5 +1,7 @@
 package com.ragagent.tenant;
 
+import com.ragagent.contract.tenant.APIPrincipalConfig;
+
 import com.ragagent.platform.web.JsonMappers;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;

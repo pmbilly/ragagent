@@ -5,7 +5,7 @@ import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.Set;
 
-import com.ragagent.tenant.StorageEngineConfig;
+import com.ragagent.contract.tenant.StorageEngineConfig;
 import com.ragagent.storage.fileserve.StoragePaths;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.storage.config.StorageEnvLookup;

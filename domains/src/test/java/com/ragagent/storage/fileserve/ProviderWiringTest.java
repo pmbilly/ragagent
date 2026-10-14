@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.platform.security.CryptoService;
-import com.ragagent.tenant.StorageEngineConfig;
+import com.ragagent.contract.tenant.StorageEngineConfig;
 import com.ragagent.storage.domain.StorageBackend;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
