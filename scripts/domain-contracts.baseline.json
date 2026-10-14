@@ -1,0 +1,450 @@
+{
+  "note": "R10「域间只经契约」棘轮基线（方案 §5.1）。键＝\"源域→目标域\"，值＝引用该域的源类名。只许减：新增边/新增类即红。收紧用 --write（存在新增时会被拒绝）。target=0：跨域能力提到 contract 端口，调用方只 import contract。",
+  "edges": {
+    "agentmanagement→agent": [
+      "SkillCatalogController",
+      "SkillsCatalogController"
+    ],
+    "agentmanagement→audit": [
+      "SkillCatalogController"
+    ],
+    "agenttools→agent": [
+      "DataAnalysisSessionBridge",
+      "DataAnalysisTool",
+      "DataSchemaTool",
+      "DatabaseQueryTool",
+      "GetDocumentInfoTool",
+      "GrepChunksTool",
+      "KnowledgeSearchOutputFormatter",
+      "KnowledgeSearchTool",
+      "ListKnowledgeChunksTool",
+      "QueryKnowledgeGraphTool",
+      "SearchConversationsTool",
+      "SearchMemoryTool",
+      "WebFetchTool",
+      "WebSearchTool",
+      "WikiContentRewrite",
+      "WikiDeletePageTool",
+      "WikiFlagIssueTool",
+      "WikiPageRendering",
+      "WikiReadIssueTool",
+      "WikiReadPageTool",
+      "WikiReadSourceDocTool",
+      "WikiRenamePageTool",
+      "WikiReplaceTextTool",
+      "WikiRouteResolver",
+      "WikiScope",
+      "WikiSearchTool",
+      "WikiUpdateIssueTool",
+      "WikiWritePageTool"
+    ],
+    "approval→agent": [
+      "ApprovalBridge"
+    ],
+    "auth→tenant": [
+      "APIKeyAuthChannel",
+      "AuthBindingSupport",
+      "AuthController",
+      "LoginResult",
+      "TenantAPIPrincipalController",
+      "TenantCatalogController",
+      "TenantConfigOps",
+      "TenantCreateOps",
+      "TenantCrudOps",
+      "TenantInvitationController",
+      "TenantResponse",
+      "TenantService",
+      "UserService",
+      "UserSessionOps",
+      "WsAuthSupport"
+    ],
+    "auth→settings": [
+      "AuthController",
+      "TenantCatalogController",
+      "UserService"
+    ],
+    "auth→audit": [
+      "TenantInvitationService",
+      "TenantMemberService"
+    ],
+    "datasource→knowledge": [
+      "DataSourceController",
+      "DataSourceCredentialsController",
+      "DataSourceItemOps",
+      "DataSourceSupport",
+      "DataSourceSyncExecutor",
+      "KnowledgeBridge",
+      "KnowledgeTagAutoTagProvider",
+      "MapperKnowledgeBridge"
+    ],
+    "datasource→audit": [
+      "DataSourceService",
+      "DataSourceSupport",
+      "DataSourceSyncResultOps"
+    ],
+    "datasource→tenant": [
+      "DataSourceSyncExecutor"
+    ],
+    "datasource→auth": [
+      "DataSourceService"
+    ],
+    "embedchannel→auth": [
+      "EmbedAuthFilter",
+      "EmbedWiring"
+    ],
+    "embedchannel→mcp": [
+      "EmbedChannelController",
+      "EmbedChannelDelegateOps"
+    ],
+    "embedchannel→session": [
+      "EmbedChannelController",
+      "EmbedChannelDelegateOps",
+      "EmbedChannelPublicOps",
+      "EmbedChannelService"
+    ],
+    "embedchannel→storage": [
+      "EmbedAuthFilter",
+      "EmbedChannelController"
+    ],
+    "embedchannel→knowledge": [
+      "EmbedChannelPublicOps",
+      "EmbedChannelService"
+    ],
+    "embedchannel→tenant": [
+      "EmbedAuthFilter"
+    ],
+    "embedchannel→agentmanagement": [
+      "EmbedChannelEntity",
+      "EmbedChannelService"
+    ],
+    "evaluation→knowledge": [
+      "EvaluationService"
+    ],
+    "evaluation→model": [
+      "EvaluationService"
+    ],
+    "evaluation→session": [
+      "EvaluationService"
+    ],
+    "im→agent": [
+      "ImCommandSet"
+    ],
+    "im→agentmanagement": [
+      "ChannelSessionEntity",
+      "Commands",
+      "ImChannelEntity",
+      "ImChannelService",
+      "ImCommandSet",
+      "ImQaRequests",
+      "ImQaRunner",
+      "ImStreamPipeline",
+      "ImTurnOrchestrator"
+    ],
+    "im→storage": [
+      "ImFormat",
+      "ImOutboundFormatter",
+      "ImTurnOrchestrator"
+    ],
+    "im→session": [
+      "ImAttachmentPreparer",
+      "ImQaRequests",
+      "ImQaRunner",
+      "ImSessionResolver",
+      "ImStreamPipeline",
+      "ImTurnOrchestrator"
+    ],
+    "im→approval": [
+      "ImChannelRuntimeOps",
+      "ImTurnOrchestrator"
+    ],
+    "im→knowledge": [
+      "ImAttachmentPreparer",
+      "ImKnowledgeBridgeOps",
+      "ImTurnOrchestrator"
+    ],
+    "initialization→model": [
+      "InitResponses",
+      "InitializationConfigService",
+      "InitializationController",
+      "ModelConnectivityTestService"
+    ],
+    "initialization→knowledge": [
+      "InitializationConfigService",
+      "InitializationController",
+      "InitializationRequests",
+      "ModelConnectivityTestService"
+    ],
+    "knowledge→storage": [
+      "KnowledgeBaseController",
+      "KnowledgeBaseFileProxyController",
+      "KnowledgeBaseService",
+      "KnowledgeController",
+      "KnowledgeFileService",
+      "KnowledgeStorageBackendRepository",
+      "LocalStorageService",
+      "StorageBackendMapper",
+      "TenantFileStorage"
+    ],
+    "knowledge→tenant": [
+      "FaqIndexWriter",
+      "TenantFileStorage",
+      "TenantStorageService"
+    ],
+    "knowledge→model": [
+      "ChunkExtractService",
+      "ChunkQuestionService",
+      "ChunkVectorIndexer",
+      "EmbedderClient",
+      "EmbeddingModelAdapter",
+      "FaqBatchOps",
+      "FaqEntryCommandService",
+      "FaqImportService",
+      "FaqIndexWriter",
+      "KnowledgeCloneService",
+      "KnowledgeMoveService",
+      "KnowledgeProcessWorker",
+      "KnowledgeSummaryService",
+      "KnowledgeTagService"
+    ],
+    "knowledge→settings": [
+      "ChunkQuestionService",
+      "KnowledgeSummaryService"
+    ],
+    "knowledge→audit": [
+      "FaqEntryCommandService",
+      "KnowledgeTagService"
+    ],
+    "mcp→approval": [
+      "Adapter",
+      "AgentToolApprovalController",
+      "McpCatalog",
+      "McpExposure",
+      "McpOAuthController",
+      "McpOAuthPromptSupport",
+      "McpToolWrapper",
+      "McpWiring"
+    ],
+    "mcp→model": [
+      "McpServiceController",
+      "McpUsageInstructionsOps"
+    ],
+    "mcp→agent": [
+      "McpCallTool",
+      "McpCatalog",
+      "McpCatalogPagination",
+      "McpDiscoverTool",
+      "McpExposure",
+      "McpOAuthPromptSupport",
+      "McpRegisteredTool",
+      "McpToolWrapper",
+      "McpTooling"
+    ],
+    "memory→tenant": [
+      "MemoryService"
+    ],
+    "memory→auth": [
+      "MemoryService"
+    ],
+    "memory→model": [
+      "DefaultMemoryModelResolver",
+      "MemoryModelResolver",
+      "MemoryService"
+    ],
+    "memory→knowledge": [
+      "DefaultMemoryModelResolver"
+    ],
+    "session→memory": [
+      "AgentEngineAssembler",
+      "AgentToolBackends",
+      "KnowledgeQaController",
+      "MessageRepository",
+      "QaTurnFinalizer",
+      "QaWiring",
+      "SessionAgentQaService"
+    ],
+    "session→agent": [
+      "AgentConfigAssembler",
+      "AgentEngineAssembler",
+      "AgentHistoryAssembler",
+      "AgentStepListTypeHandler",
+      "AgentStreamBridge",
+      "AgentToolBackends",
+      "AgentToolKbBackends",
+      "Message",
+      "MessageReferenceRewriter",
+      "MessageService",
+      "QaAgentConfig",
+      "QaSseOrchestrator",
+      "QaSupport",
+      "QaTurnSupport",
+      "SessionAgentQaService",
+      "SteerSinkBridge",
+      "VlmDescriberWiring"
+    ],
+    "session→storage": [
+      "AgentEngineAssembler",
+      "AgentWebPages",
+      "ArtifactCollectorWiring",
+      "ArtifactVersions",
+      "KnowledgeQaController",
+      "MessageController",
+      "MessageFileProxyController",
+      "MessageReferenceRewriter",
+      "QaRequestParser",
+      "QaSseOrchestrator",
+      "QaSupport",
+      "SessionAgentQaService",
+      "SessionStreamController",
+      "StreamEventEmitter"
+    ],
+    "session→auth": [
+      "AgentToolBackends",
+      "KnowledgeQaController",
+      "MessageController",
+      "MessageSearch",
+      "MessageService",
+      "QaTurnExecutor",
+      "QaWiring",
+      "SessionKnowledgeQaService",
+      "SessionStreamController",
+      "TemporaryDocumentProcessor",
+      "TemporaryDocumentService"
+    ],
+    "session→agentmanagement": [
+      "AgentConfigAssembler",
+      "AgentResolver",
+      "MessageSuggestionService",
+      "QaChatManageOverrides",
+      "QaKbScope",
+      "QaMentionTagScope",
+      "QaRequestParser",
+      "QaSupport",
+      "SessionAgentQaService",
+      "SessionKnowledgeQaService",
+      "SessionQaResolution",
+      "TemporaryDocumentController"
+    ],
+    "session→tenant": [
+      "AgentToolBackends",
+      "KnowledgeQaController",
+      "MessageController",
+      "MessageSearch",
+      "MessageService",
+      "QaRequestParser",
+      "QaWebSearchParams",
+      "QaWiring",
+      "SessionStreamController"
+    ],
+    "session→knowledge": [
+      "AgentEngineAssembler",
+      "AgentToolBackends",
+      "AgentToolKbBackends",
+      "MessageService",
+      "QaKbScope",
+      "QaMentionTagScope",
+      "QaModelSelection",
+      "QaSearchTargets",
+      "QaWiring",
+      "SessionAgentQaService",
+      "SessionKnowledgeQaService",
+      "SessionQaFallback",
+      "SessionQaResolution",
+      "SessionService",
+      "TemporaryDocumentController",
+      "TemporaryDocumentProcessor",
+      "TemporaryDocumentService"
+    ],
+    "session→model": [
+      "MessageSearch",
+      "MessageService",
+      "MessageSuggestionService",
+      "QaModelSelection",
+      "QaWiring",
+      "SessionAgentQaService",
+      "SessionKnowledgeQaService",
+      "SessionQaResolution",
+      "SessionService",
+      "TemporaryDocumentProcessor",
+      "TemporaryDocumentService",
+      "VlmDescriberWiring"
+    ],
+    "session→settings": [
+      "AgentToolBackends",
+      "AgentToolKbBackends",
+      "QaWiring",
+      "SessionKnowledgeQaService",
+      "SessionService"
+    ],
+    "session→websearch": [
+      "AgentToolBackends",
+      "QaWiring",
+      "SessionKnowledgeQaService",
+      "SessionService"
+    ],
+    "session→approval": [
+      "AgentEngineAssembler",
+      "SessionAgentQaService"
+    ],
+    "session→mcp": [
+      "AgentEngineAssembler",
+      "SessionAgentQaService"
+    ],
+    "session→agenttools": [
+      "AgentEngineAssembler",
+      "AgentToolBackends",
+      "AgentToolKbBackends",
+      "AgentToolWikiBackends",
+      "AgentWebPages",
+      "QaWiring"
+    ],
+    "session→wiki": [
+      "AgentToolBackends",
+      "AgentToolWikiBackends"
+    ],
+    "storage→tenant": [
+      "ChatLocalImageResolverWiring",
+      "FileProxyController",
+      "FileProxyService",
+      "FileServiceFactory",
+      "FileServiceResolver",
+      "FileserveStorageBackendResolver",
+      "Rewriter",
+      "StorageFileResolver",
+      "TenantFileServiceResolver"
+    ],
+    "system→auth": [
+      "SystemAdminController",
+      "SystemAdminUserService",
+      "SystemController",
+      "SystemDtos",
+      "SystemSettingService"
+    ],
+    "system→tenant": [
+      "SystemAdminController",
+      "SystemAdminUserService",
+      "SystemController"
+    ],
+    "system→knowledge": [
+      "ParserEngineRegistry",
+      "SystemController"
+    ],
+    "system→storage": [
+      "SystemController",
+      "SystemInfoService"
+    ],
+    "system→audit": [
+      "SystemAdminController",
+      "SystemAdminUserService",
+      "SystemSettingService"
+    ],
+    "system→settings": [
+      "SystemSettingService"
+    ],
+    "websearch→knowledge": [
+      "WebSearchTempKbStateService"
+    ],
+    "wiki→model": [
+      "DefaultWikiModelResolver"
+    ]
+  }
+}
