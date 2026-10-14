@@ -81,9 +81,6 @@
       "DataSourceSupport",
       "DataSourceSyncResultOps"
     ],
-    "datasource→tenant": [
-      "DataSourceSyncExecutor"
-    ],
     "datasource→auth": [
       "DataSourceService"
     ],
@@ -108,9 +105,6 @@
     "embedchannel→knowledge": [
       "EmbedChannelPublicOps",
       "EmbedChannelService"
-    ],
-    "embedchannel→tenant": [
-      "EmbedAuthFilter"
     ],
     "embedchannel→agentmanagement": [
       "EmbedChannelEntity",
@@ -232,9 +226,6 @@
       "McpRegisteredTool",
       "McpToolWrapper",
       "McpTooling"
-    ],
-    "memory→tenant": [
-      "MemoryService"
     ],
     "memory→auth": [
       "MemoryService"
@@ -378,11 +369,6 @@
       "SystemDtos",
       "SystemSettingService"
     ],
-    "system→tenant": [
-      "SystemAdminController",
-      "SystemAdminUserService",
-      "SystemController"
-    ],
     "system→knowledge": [
       "ParserEngineRegistry",
       "SystemController"
@@ -395,6 +381,10 @@
       "SystemAdminController",
       "SystemAdminUserService",
       "SystemSettingService"
+    ],
+    "system→tenant": [
+      "SystemAdminController",
+      "SystemAdminUserService"
     ],
     "system→settings": [
       "SystemSettingService"

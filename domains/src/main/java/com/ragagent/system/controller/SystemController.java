@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.tenant.repository.Tenant;
+import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
@@ -512,17 +512,17 @@ public class SystemController {
         return tid == null ? 0 : tid;
     }
 
-    private Tenant currentTenant() {
+    private TenantStorageView currentTenant() {
         long tid = currentTenantId();
-        return tid <= 0 ? null : tenantService.getTenantById(tid);
+        return tid <= 0 ? null : tenantService.storageView(tid);
     }
 
     /** overrides 组装：租户 ParserEngineConfig → map。 */
     private Map<String, String> engineOverrides() {
         Map<String, String> overrides = new LinkedHashMap<>();
-        Tenant tenant = currentTenant();
-        if (tenant != null) {
-            overrides.putAll(overridesFromRaw(tenant.getParserEngineConfig()));
+        JsonNode parserCfg = tenantService.parserEngineConfig(currentTenantId());
+        if (parserCfg != null) {
+            overrides.putAll(overridesFromRaw(parserCfg));
         }
         return overrides;
     }
@@ -588,9 +588,9 @@ public class SystemController {
     }
 
     private boolean isMinioConfigured(long tenantId) {
-        Tenant tenant = currentTenant();
-        if (tenant != null && tenant.getStorageEngineConfig() != null) {
-            JsonNode minio = tenant.getStorageEngineConfig().get("minio");
+        TenantStorageView tenant = currentTenant();
+        if (tenant != null && tenant.storageEngineConfig() != null) {
+            JsonNode minio = tenant.storageEngineConfig().get("minio");
             if (minio != null && !minio.isNull() && "remote".equals(minio.path("mode").asText(""))) {
                 return !minio.path("endpoint").asText("").isEmpty()
                         && !minio.path("access_key_id").asText("").isEmpty()
@@ -601,9 +601,9 @@ public class SystemController {
     }
 
     private boolean hasAllNonEmpty(long tenantId, String provider, List<String> fields, boolean envFallback) {
-        Tenant tenant = currentTenant();
-        if (tenant != null && tenant.getStorageEngineConfig() != null) {
-            JsonNode conf = tenant.getStorageEngineConfig().get(provider);
+        TenantStorageView tenant = currentTenant();
+        if (tenant != null && tenant.storageEngineConfig() != null) {
+            JsonNode conf = tenant.storageEngineConfig().get(provider);
             if (conf != null && !conf.isNull()) {
                 for (String f : fields) {
                     if (conf.path(f).asText("").isEmpty()) {
@@ -656,9 +656,9 @@ public class SystemController {
 
     /** region/bucket 非空 + (accessKey 空) == (secretKey 空)。 */
     private boolean isS3Configured(long tenantId) {
-        Tenant tenant = currentTenant();
-        if (tenant != null && tenant.getStorageEngineConfig() != null) {
-            JsonNode s3 = tenant.getStorageEngineConfig().get("s3");
+        TenantStorageView tenant = currentTenant();
+        if (tenant != null && tenant.storageEngineConfig() != null) {
+            JsonNode s3 = tenant.storageEngineConfig().get("s3");
             if (s3 != null && !s3.isNull()) {
                 String accessKey = s3.path("access_key").asText("");
                 String secretKey = s3.path("secret_key").asText("");

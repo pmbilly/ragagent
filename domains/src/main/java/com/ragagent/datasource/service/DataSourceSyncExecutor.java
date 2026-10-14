@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.datasource.domain.connector.Connector;
 import com.ragagent.datasource.domain.connector.ConnectorException;
 import com.ragagent.datasource.domain.connector.StreamHandler;
@@ -53,8 +52,7 @@ final class DataSourceSyncExecutor {
     private void processSyncStreaming(StreamingConnector sc, DataSource ds, SyncLog syncLog,
                                       DataSourceConfig config, DataSourceSyncPayload payload,
                                       boolean wasPaused, DataSourceSupport.ActivityTask activityTask) {
-        Tenant tenant = service.tenantService.getTenantById(ds.getTenantId());
-        if (tenant == null) {
+        if (!service.tenantService.exists(ds.getTenantId())) {
             log.error("[datasource] failed to get tenant info");
             service.resultOps.updateSyncRunResult(ds, syncLog, new SyncResult(), null,
                     DataSourceConstants.SYNC_LOG_STATUS_FAILED,
@@ -418,8 +416,7 @@ final class DataSourceSyncExecutor {
         SyncResult result = new SyncResult();
         result.setTotal(items == null ? 0 : items.size());
 
-        Tenant tenant = service.tenantService.getTenantById(ds.getTenantId());
-        if (tenant == null) {
+        if (!service.tenantService.exists(ds.getTenantId())) {
             log.error("[datasource] failed to get tenant info");
             syncLog.setStatus(DataSourceConstants.SYNC_LOG_STATUS_FAILED);
             syncLog.setFinishedAt(OffsetDateTime.now(ZoneOffset.UTC));

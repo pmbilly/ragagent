@@ -1308,6 +1308,17 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **A② 全批提交**：`a7d3b13e`（第①批 42 类）· `37b5fbb8`（第②批 去框架化 37 类）· `2ee75327`（第②批 补：解锁 11 类）· 本批（第③批 9 类 + 收口）。
 - **A 的下一步**：**③ 立「域间只经契约」**（A20 已守"契约唯一实现"；还差"业务域之间只经 `contract`"这条规则——应先测现状再决定硬规则 vs 棘轮基线）。可选后续：① 的 K 级重设计（`JsonNode` → typed records）另立项。
 
+**🔶 A③ 收敛第八刀：扫余量小边（2026-10-14，R10 **边 60 → 57**、类 284 → 280）**
+- **迁 4 个只读类**（一律零 API 形状变化 ✓）：
+  - `memory/MemoryService.workspaceConfig`：`getTenantById` + `tenant.getMemoryConfig()` → **`tenantService.memoryConfig(id)`** ✓（try/catch 与会零值语义保持 ✓）；
+  - `embedchannel/controller/filter/EmbedAuthFilter`：只做**存在性判断** ⇒ `tenantService.exists(tenantId)` ✓；
+  - `datasource/service/DataSourceSyncExecutor`（2 处）：同样只判存在 ⇒ `exists(...)` ✓；
+  - `system/controller/SystemController`（5 处）：`currentTenant()` 改回 **`TenantStorageView`**（`storageView(tid)` ✓）、3 处 `getStorageEngineConfig()` → `storageEngineConfig()` ✓、1 处 `getParserEngineConfig()` → **`tenantService.parserEngineConfig(tid)`** ✓。
+- **收益（一次消 3 条边）**：**`datasource→tenant` / `embedchannel→tenant` / `memory→tenant` 三条边整条清零** ✓ ⇒ **边 60 → 57**；`system→tenant` 3 → 2；类 284 → 280。
+- **残余登记（同"属主/管理面"类）**：`system→tenant` 余 2 类（`SystemAdminController` 直接 import `tenant.mapper` ✗、`SystemAdminUserService` 写实体字段 ✗）—— 与 `auth→tenant` 同性质（系统管理面），已在基线 note 的"边分级"里归为**属主边**（不追求清零，除非拍板搬管理面/改 API）。
+- **验证**：**4987 / 失败 0 / 跳过 4** ✓；`spotlessCheck build` ✓ **2m06s** ✓ **13 守卫** ✓（环 0 / SCC 11 组）；定向（Memory/Embed/DataSourceSync/SystemController ✓）全绿。
+- **A③ 累计（八刀）**：基线 **317 → 280 类（−37）**、**边 64 → 57（−7）**；**已清零 7 条**：`storage→tenant`、`session→auth`、`session→tenant`、`knowledge→tenant`、`datasource→tenant`、`embedchannel→tenant`、`memory→tenant` ✓；**属主边**：`auth→tenant`（14 类，待拍板）、`system→tenant`（2 类，同性质）。
+
 **🔶 A③ 第七刀：`auth→tenant` 分档裁定（2026-10-14，类 285 → 284；**该边判定为"属主边，不追求清零"**）**
 - **实测分档（15 类）**：**属主 4 类**（`TenantService`（mapper 13 次 + 实体 setter 12 次）/`TenantConfigOps`/`TenantCreateOps`/`UserService` —— 读写租户实体）；**管理/响应成形 11 类**（`TenantResponse` 26 次 getter、`AuthController` 10、`TenantCatalogController` 直接 `List<Tenant>` 出参 …）。
 - **关键结构结论（写进 R10 基线 note 的"边分级"）**：计划 §8.9 给 `tenant/` 定的面是 **3 包 / 10 文件**（根包配置类 + `mapper/TenantMapper` + `repository/{Tenant,TenantConfigRedaction,TenantLookup}`）——**租户的"管理面"计划上就留在 auth** ✗ ⇒ `auth→tenant` 是**域属主边**：

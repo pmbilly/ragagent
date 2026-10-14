@@ -21,7 +21,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.storage.support.StorageUrlContext;
-import com.ragagent.tenant.repository.Tenant;
 
 /**
  * embed 公开面的认证过滤器（publish token 门）。
@@ -123,9 +122,7 @@ public class EmbedAuthFilter extends OncePerRequestFilter {
         }
 
         try {
-            Tenant tenant =
-                    tenantService.getTenantById(ch.getTenantId() == null ? 0 : ch.getTenantId());
-            if (tenant == null) {
+            if (!tenantService.exists(ch.getTenantId() == null ? 0 : ch.getTenantId())) {
                 writePlain(response, 500, "workspace unavailable");
                 return;
             }

@@ -11,7 +11,6 @@ import java.util.UUID;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.platform.web.ZeroTimeSerializer;
 import com.ragagent.memory.MemoryContext;
@@ -282,18 +281,14 @@ public class MemoryService {
      * 会是空串而不是 {@code explicit_only}，只有 {@link #getSettings} 会去补它。</p>
      */
     MemoryConfig workspaceConfig(long tenantId) {
-        Tenant tenant;
+        JsonNode node;
         try {
-            tenant = tenantService.getTenantById(tenantId);
+            node = tenantService.memoryConfig(tenantId);
         } catch (RuntimeException e) {
             log.warn("memory: load workspace config failed: {}", e.toString());
             return new MemoryConfig();
         }
-        if (tenant == null || tenant.getMemoryConfig() == null) {
-            return new MemoryConfig();
-        }
-        JsonNode node = tenant.getMemoryConfig();
-        if (node.isNull()) {
+        if (node == null || node.isNull()) {
             return new MemoryConfig();
         }
         MemoryConfig cfg;
