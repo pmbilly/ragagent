@@ -26,12 +26,13 @@ import com.ragagent.embedding.provider.VolcengineEmbedder;
 import com.ragagent.embedding.provider.ZhipuEmbedder;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.model.domain.Model;
-import com.ragagent.model.domain.ModelParameters;
+import com.ragagent.common.model.ModelParameters;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import com.ragagent.model.service.ModelRuntimeConfigs;
 import com.ragagent.llm.limiter.BackgroundTaskContext;
 import com.ragagent.llm.limiter.LocalLimiter;
+import com.ragagent.model.service.ModelRowViews;
 
 /**
  * embedding 客户端的 stub server A/B：请求体/路径/头部与录制
@@ -402,7 +403,7 @@ class EmbeddingWireTest {
         p.setCustomHeaders(Map.of("X-Gateway", "g1"));
         m.setParameters(p);
 
-        EmbedderConfig cfg = ModelRuntimeConfigs.embedderConfig(m, "app", "secret");
+        EmbedderConfig cfg = ModelRuntimeConfigs.embedderConfig(ModelRowViews.of(m), "app", "secret");
         assertEquals("emb-1", cfg.getModelId());
         assertEquals("text-embedding-3-small", cfg.getModelName());
         assertEquals(1536, cfg.getDimensions());
@@ -414,7 +415,7 @@ class EmbeddingWireTest {
         assertEquals("secret", cfg.getAppSecret());
 
         assertNull(cfg.getCustomHeaders() == null ? null : null);
-        assertEquals(ModelRuntimeConfigs.embedderConfig(null, "a", "b").getModelId(), "");
+        assertEquals(ModelRuntimeConfigs.embedderConfig(ModelRowViews.of(null), "a", "b").getModelId(), "");
     }
 
     // ── 并发治理──────────

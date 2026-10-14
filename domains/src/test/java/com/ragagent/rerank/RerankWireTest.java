@@ -27,7 +27,8 @@ import com.ragagent.rerank.provider.VolcengineReranker;
 import com.ragagent.rerank.provider.ZhipuReranker;
 import com.ragagent.platform.web.ProviderJson;
 import com.ragagent.model.domain.Model;
-import com.ragagent.model.domain.ModelParameters;
+import com.ragagent.common.model.ModelParameters;
+import com.ragagent.model.service.ModelRowViews;
 
 /**
  * rerank 客户端的 stub server A/B：请求体与录制（wire/*.json）逐字节比对 +
@@ -609,7 +610,7 @@ class RerankWireTest {
         p.setCustomHeaders(Map.of("X-Gateway", "g1"));
         m.setParameters(p);
 
-        RerankerConfig c = ModelRuntimeConfigs.rerankerConfig(m, "app", "secret");
+        RerankerConfig c = ModelRuntimeConfigs.rerankerConfig(ModelRowViews.of(m), "app", "secret");
         assertEquals("rr-9", c.getModelId());
         assertEquals("rerank-model", c.getModelName());
         assertEquals("https://api.example.com/v1", c.getBaseUrl());
@@ -619,6 +620,6 @@ class RerankWireTest {
         assertEquals("g1", c.getCustomHeaders().get("X-Gateway"));
         assertEquals("app", c.getAppId());
         assertEquals("secret", c.getAppSecret());
-        assertNull(ModelRuntimeConfigs.rerankerConfig(null, "a", "b"));
+        assertNull(ModelRuntimeConfigs.rerankerConfig(ModelRowViews.of(null), "a", "b"));
     }
 }

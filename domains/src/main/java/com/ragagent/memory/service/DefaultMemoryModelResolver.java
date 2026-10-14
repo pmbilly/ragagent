@@ -8,13 +8,14 @@ import com.ragagent.llm.domain.ChatConfig;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.ollama.OllamaService;
 import com.ragagent.model.domain.Model;
-import com.ragagent.model.domain.ModelParameters;
+import com.ragagent.common.model.ModelParameters;
 import com.ragagent.model.service.ModelService;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 import com.ragagent.model.service.ModelRuntimeConfigs;
 import com.ragagent.contract.model.ModelFacts;
 import com.ragagent.platform.model.EmbeddingGateway;
+import com.ragagent.model.service.ModelRowViews;
 
 /**
  * {@link MemoryModelResolver} 的默认实现：按模型 id 取运行时的聊天 / 嵌入模型实例
@@ -48,7 +49,7 @@ public class DefaultMemoryModelResolver implements MemoryModelResolver {
     public LlmChatClient getChatModel(String modelId) {
         Model model = modelService.getModelByID(modelId);
         ModelParameters p = model.getParameters();
-        ChatConfig config = ModelRuntimeConfigs.chatConfig(model,
+        ChatConfig config = ModelRuntimeConfigs.chatConfig(ModelRowViews.of(model),
                 p == null ? null : p.getAppId(),
                 p == null ? null : p.getAppSecret());
         return LlmChatClients.create(config, ollamaService.getIfAvailable(), concurrencyGovernor);

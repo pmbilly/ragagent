@@ -2,7 +2,7 @@ package com.ragagent.model.dto;
 
 import java.util.Map;
 
-import com.ragagent.model.domain.ModelParameters;
+import com.ragagent.common.model.ModelParameters;
 
 /**
  * 模型参数请求体（创建/更新共用；JSON 字段名即 Java 字段名）。

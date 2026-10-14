@@ -1,13 +1,13 @@
 package com.ragagent.model.service;
 
 import com.ragagent.contract.error.BizException;
+import com.ragagent.modelruntime.application.ChatConfigs;
 import com.ragagent.embedding.EmbedderConfig;
 import com.ragagent.llm.domain.ChatConfig;
 import com.ragagent.llm.provider.Config;
 import com.ragagent.llm.provider.ProviderName;
 import com.ragagent.llm.provider.ProviderRegistry;
-import com.ragagent.model.domain.Model;
-import com.ragagent.model.domain.ModelParameters;
+import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.rerank.RerankerConfig;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -16,7 +16,7 @@ import com.ragagent.retrieval.vlm.VlmClient.VlmConfig;
 /**
  * 「模型行 → 各能力运行时配置」的映射（原散在 5 个能力层配置类里的 {@code fromModel} 静态工厂）。
  *
- * <p><b>为什么集中到本域</b>：映射的输入是 {@link Model}（业务实体），输出才是能力层配置。
+ * <p><b>为什么集中到本域</b>：映射的输入是模型行载荷（{@code ModelCatalogPort.ModelRowView}），输出才是能力层配置。
  * 原先工厂写在配置类上，等于让 embedding/rerank/llm/retrieval 反向 import {@code model.domain}
  * （{@code embedding ⇄ model}、{@code llm ⇄ model}、{@code model ⇄ rerank}、{@code model ⇄ retrieval} 四条环的成因）。
  * 配置类字段本就是普通值，不带实体；映射搬到这里后，依赖方向回到"调用方（本域或上层）→ 能力层配置"。
@@ -27,17 +27,17 @@ public final class ModelRuntimeConfigs {
     private ModelRuntimeConfigs() {
     }
 
-public static EmbedderConfig embedderConfig(Model m, String appId, String appSecret) {
+public static EmbedderConfig embedderConfig(ModelRowView m, String appId, String appSecret) {
         EmbedderConfig c = new EmbedderConfig();
         if (m == null) {
             return c;
         }
-        var p = m.getParameters();
-        c.setSource(m.getSource() == null ? "" : m.getSource());
+        var p = m.parameters();
+        c.setSource(m.source() == null ? "" : m.source());
         c.setBaseUrl(p == null ? "" : p.getBaseUrl());
         c.setApiKey(p == null ? "" : p.getApiKey());
-        c.setModelId(m.getId() == null ? "" : m.getId());
-        c.setModelName(m.getName() == null ? "" : m.getName());
+        c.setModelId(m.id() == null ? "" : m.id());
+        c.setModelName(m.name() == null ? "" : m.name());
         c.setDimensions(p == null ? 0 : p.getEmbeddingParameters().getDimension());
         c.setSupportsDimensionOverride(p != null && p.getEmbeddingParameters().isSupportsDimensionOverride());
         c.setTruncatePromptTokens(p == null ? 0 : p.getEmbeddingParameters().getTruncatePromptTokens());
@@ -50,17 +50,17 @@ public static EmbedderConfig embedderConfig(Model m, String appId, String appSec
         return c;
     }
 
-    public static RerankerConfig rerankerConfig(Model m, String appId, String appSecret) {
+    public static RerankerConfig rerankerConfig(ModelRowView m, String appId, String appSecret) {
         if (m == null) {
             return null;
         }
         RerankerConfig c = new RerankerConfig();
-        var p = m.getParameters();
-        c.setModelId(m.getId() == null ? "" : m.getId());
+        var p = m.parameters();
+        c.setModelId(m.id() == null ? "" : m.id());
         c.setApiKey(p == null ? "" : p.getApiKey());
         c.setBaseUrl(p == null ? "" : p.getBaseUrl());
-        c.setModelName(m.getName() == null ? "" : m.getName());
-        c.setSource(m.getSource() == null ? "" : m.getSource());
+        c.setModelName(m.name() == null ? "" : m.name());
+        c.setSource(m.source() == null ? "" : m.source());
         c.setProvider(p == null ? "" : p.getProvider());
         c.setExtraConfig(p == null ? null : p.getExtraConfig());
         c.setCustomHeaders(p == null ? null : p.getCustomHeaders());
@@ -69,56 +69,44 @@ public static EmbedderConfig embedderConfig(Model m, String appId, String appSec
         return c;
     }
 
-    public static Config providerConfig(Model model) {
+    public static Config providerConfig(ModelRowView model) {
         if (model == null) {
             throw BizException.badRequest("model is nil");
         }
-        ProviderName providerName = ProviderName.fromValue(model.getParameters().getProvider());
+        ProviderName providerName = ProviderName.fromValue(model.parameters().getProvider());
         if (providerName == null) {
             // provider 未配置时按 base URL 探测回落
-            providerName = ProviderRegistry.detectProvider(model.getParameters().getBaseUrl());
+            providerName = ProviderRegistry.detectProvider(model.parameters().getBaseUrl());
         }
         return new Config(
                 providerName,
-                model.getParameters().getBaseUrl(),
-                model.getParameters().getApiKey(),
-                model.getName(),
-                model.getId(),
+                model.parameters().getBaseUrl(),
+                model.parameters().getApiKey(),
+                model.name(),
+                model.id(),
                 null);
     }
 
-    public static ChatConfig chatConfig(Model m, String appId, String appSecret) {
-        if (m == null) {
-            return null;
-        }
-        ModelParameters p = m.getParameters();
-        ChatConfig c = new ChatConfig();
-        c.setModelId(m.getId());
-        c.setApiKey(p == null ? null : p.getApiKey());
-        c.setBaseUrl(p == null ? null : p.getBaseUrl());
-        c.setModelName(m.getName());
-        c.setSource(m.getSource());
-        c.setProvider(p == null ? null : p.getProvider());
-        c.setMaxConcurrency(p == null ? 0 : p.getMaxConcurrency());
-        c.setExtraConfig(p == null ? null : p.getExtraConfig());
-        c.setCustomHeaders(p == null ? null : p.getCustomHeaders());
-        c.setAppId(appId);
-        c.setAppSecret(appSecret);
-        return c;
+    /**
+     * chat 运行时配置：实现在 L2 门面 {@code modelruntime.application.ChatConfigs}
+     * （本域只做委托——chat 映射不依赖模型域，无需经本域中转）。
+     */
+    public static ChatConfig chatConfig(ModelRowView m, String appId, String appSecret) {
+        return ChatConfigs.chatConfig(m, appId, appSecret);
     }
 
-    public static VlmConfig vlmConfig(Model m) {
+    public static VlmConfig vlmConfig(ModelRowView m) {
         if (m == null) {
             return null;
         }
-        var p = m.getParameters();
+        var p = m.parameters();
         String ifType = p == null ? "" : p.getInterfaceType();
         if (ifType == null || ifType.isEmpty()) {
-            ifType = "local".equals(m.getSource()) ? "ollama" : "openai";
+            ifType = "local".equals(m.source()) ? "ollama" : "openai";
         }
         Map<String, String> extra = p == null ? Map.of()
                 : new LinkedHashMap<>(p.getExtraConfig() == null ? Map.of() : p.getExtraConfig());
-        return new VlmConfig(m.getSource(), p == null ? "" : p.getBaseUrl(),
-                m.getName(), p == null ? "" : p.getApiKey(), m.getId(), ifType,
+        return new VlmConfig(m.source(), p == null ? "" : p.getBaseUrl(),
+                m.name(), p == null ? "" : p.getApiKey(), m.id(), ifType,
                 p == null ? "" : p.getProvider(), extra);
     }}

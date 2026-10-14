@@ -4,7 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.ragagent.model.domain.Model;
-import com.ragagent.model.domain.ModelParameters;
+import com.ragagent.common.model.ModelParameters;
 
 /**
  * initialization POST 响应里的 models 序列化（自有契约,键 = camelCase）：

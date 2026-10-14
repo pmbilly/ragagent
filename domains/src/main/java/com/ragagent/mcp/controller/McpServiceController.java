@@ -22,7 +22,7 @@ import com.ragagent.mcp.service.McpMetadataException;
 import com.ragagent.mcp.service.McpMetadataService;
 import com.ragagent.mcp.service.McpServiceManagement;
 import com.ragagent.mcp.service.McpToolApprovalService;
-import com.ragagent.model.service.ModelService;
+import com.ragagent.common.model.ModelCatalogPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -74,7 +74,7 @@ public class McpServiceController {
     final McpMetadataService mcpMetadataService;
     final McpToolApprovalService mcpToolApprovalService;
     final SsrfGuard ssrfGuard;
-    final ModelService modelService;
+    final ModelCatalogPort modelCatalog;
     final ConcurrencyGovernor concurrencyGovernor;
     final Optional<OllamaService> ollamaService;
 
@@ -88,14 +88,14 @@ public class McpServiceController {
                                 McpMetadataService mcpMetadataService,
                                 McpToolApprovalService mcpToolApprovalService,
                                 SsrfGuard ssrfGuard,
-                                ModelService modelService,
+                                ModelCatalogPort modelCatalog,
                                 ConcurrencyGovernor concurrencyGovernor,
                                 Optional<OllamaService> ollamaService) {
         this.mcpServiceService = mcpServiceService;
         this.mcpMetadataService = mcpMetadataService;
         this.mcpToolApprovalService = mcpToolApprovalService;
         this.ssrfGuard = ssrfGuard;
-        this.modelService = modelService;
+        this.modelCatalog = modelCatalog;
         this.concurrencyGovernor = concurrencyGovernor;
         this.ollamaService = ollamaService;
         this.usageOps = new McpUsageInstructionsOps(this);

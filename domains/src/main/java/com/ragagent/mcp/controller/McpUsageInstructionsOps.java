@@ -27,16 +27,15 @@ import com.ragagent.mcp.domain.McpMetadata;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.domain.McpTool;
 import com.ragagent.mcp.domain.McpToolApproval;
-import com.ragagent.model.domain.Model;
-import com.ragagent.model.service.ModelService;
-import com.ragagent.model.service.ModelRuntimeConfigs;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-
+import com.ragagent.modelruntime.application.ChatConfigs;
+import com.ragagent.common.model.ModelCatalogPort;
+import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
 /**
  * 使用说明生成协作者（自 {@link McpServiceController} 拆出）：白名单式输入装配、
  * 60 秒限时 LLM 调用与模型选择。
@@ -130,7 +129,7 @@ final class McpUsageInstructionsOps {
             throw BizException.badRequest(McpServiceController.rawMessage(e));
         }
 
-        Model selected = selectChatModel();
+        ModelRowView selected = selectChatModel();
         if (selected == null) {
             throw BizException.badRequest(
                     "Configure an active chat model before generating usage instructions");
@@ -271,18 +270,18 @@ final class McpUsageInstructionsOps {
      * 优先取 isDefault，否则取第一个遇到的。
      *
      */
-    private Model selectChatModel() {
-        List<Model> models = ctrl.modelService.listModels();
-        Model selected = null;
-        for (Model model : models) {
-            if (model == null || !"KnowledgeQA".equals(model.getType())
-                    || !ModelService.STATUS_ACTIVE.equals(model.getStatus())) {
+    private ModelRowView selectChatModel() {
+        List<ModelRowView> models = ctrl.modelCatalog.listModels();
+        ModelRowView selected = null;
+        for (ModelRowView model : models) {
+            if (model == null || !"KnowledgeQA".equals(model.type())
+                    || !ModelCatalogPort.ACTIVE_STATUS.equals(model.status())) {
                 continue;
             }
-            if (selected == null || model.isIsDefault()) {
+            if (selected == null || model.defaultModel()) {
                 selected = model;
             }
-            if (model.isIsDefault()) {
+            if (model.defaultModel()) {
                 break;
             }
         }
@@ -290,9 +289,9 @@ final class McpUsageInstructionsOps {
     }
 
     /** 由模型配置构造 LLM 客户端 */
-    private LlmChatClient chatClientFor(Model model) {
-        var p = model.getParameters();
-        ChatConfig config = ModelRuntimeConfigs.chatConfig(model,
+    private LlmChatClient chatClientFor(ModelRowView model) {
+        var p = model.parameters();
+        ChatConfig config = ChatConfigs.chatConfig(model,
                 p == null ? null : p.getAppId(),
                 p == null ? null : p.getAppSecret());
         return LlmChatClients.create(config, ctrl.ollamaService.orElse(null), ctrl.concurrencyGovernor);

@@ -189,10 +189,6 @@
       "KnowledgeSummaryService",
       "KnowledgeTagService"
     ],
-    "mcp→model": [
-      "McpServiceController",
-      "McpUsageInstructionsOps"
-    ],
     "mcp→agent": [
       "McpCallTool",
       "McpCatalog",

@@ -1,10 +1,10 @@
-package com.ragagent.model.domain;
+package com.ragagent.common.model;
 
 /**
  * ModelParameters（models.parameters jsonb 列的落库形态）。
  *
  * <p>写库前 apiKey/appSecret 加密、读库后宽容解密——由
- * {@link ModelParametersTypeHandler} 承担。键名 = Java 字段名（camelCase）；
+ * {@code ModelParametersTypeHandler} 承担。键名 = Java 字段名（camelCase）；
  * extraConfig/customHeaders 为 map，序列化按键字母序；可空字段显式 null。</p>
  */
 public class ModelParameters {

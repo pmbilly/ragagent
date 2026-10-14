@@ -80,6 +80,7 @@ import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.KnowledgeBaseView;
 import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.knowledge.service.management.KnowledgeBaseLookupAdapter;
+import com.ragagent.model.service.ModelRowViews;
 
 /**
  * chat 管线 + QA 面装配（docs/known-issues/05-wave-4.md 的 11 seam 清单）。
@@ -132,7 +133,7 @@ public class QaWiring {
                     return null;
                 }
                 var p = model.getParameters();
-                ChatConfig config = ModelRuntimeConfigs.chatConfig(model,
+                ChatConfig config = ModelRuntimeConfigs.chatConfig(ModelRowViews.of(model),
                         p == null ? null : p.getAppId(),
                         p == null ? null : p.getAppSecret());
                 // langfuse generation 装饰（未启用时原样返回）
@@ -147,7 +148,7 @@ public class QaWiring {
                     return null;
                 }
                 var p = model.getParameters();
-                RerankerConfig config = ModelRuntimeConfigs.rerankerConfig(model,
+                RerankerConfig config = ModelRuntimeConfigs.rerankerConfig(ModelRowViews.of(model),
                         p == null ? null : p.getAppId(),
                         p == null ? null : p.getAppSecret());
                 // langfuse generation 装饰（未启用时原样返回）

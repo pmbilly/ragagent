@@ -31,7 +31,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import com.ragagent.knowledge.domain.ChunkRevisionConflictException;
 import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.model.domain.ModelParameters;
+import com.ragagent.common.model.ModelParameters;
 import com.ragagent.knowledge.service.chunk.ChunkEditService;
 
 /**

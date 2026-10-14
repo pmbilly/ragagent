@@ -18,6 +18,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.model.domain.Model;
 import com.ragagent.model.service.ModelRuntimeConfigs;
+import com.ragagent.model.service.ModelRowViews;
 
 /**
  * 厂商注册表 / URL 探测 / 按类型列出 / 厂商校验的单元测试。
@@ -257,7 +258,7 @@ class ProviderRegistryTest {
         model.getParameters().setBaseUrl("https://api.openai.com/v1");
         model.getParameters().setApiKey("sk-test");
 
-        Config detected = ModelRuntimeConfigs.providerConfig(model);
+        Config detected = ModelRuntimeConfigs.providerConfig(ModelRowViews.of(model));
         assertEquals(ProviderName.OPENAI, detected.provider());
         assertEquals("https://api.openai.com/v1", detected.baseUrl());
         assertEquals("sk-test", detected.apiKey());
@@ -266,8 +267,8 @@ class ProviderRegistryTest {
 
         // provider 显式填写时以它为准（不做 URL 探测）
         model.getParameters().setProvider("deepseek");
-        assertEquals(ProviderName.DEEPSEEK, ModelRuntimeConfigs.providerConfig(model).provider());
+        assertEquals(ProviderName.DEEPSEEK, ModelRuntimeConfigs.providerConfig(ModelRowViews.of(model)).provider());
 
-        assertThrows(BizException.class, () -> ModelRuntimeConfigs.providerConfig(null));
+        assertThrows(BizException.class, () -> ModelRuntimeConfigs.providerConfig(ModelRowViews.of(null)));
     }
 }

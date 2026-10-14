@@ -12,6 +12,7 @@ import com.ragagent.platform.security.CryptoService;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedTypes;
+import com.ragagent.common.model.ModelParameters;
 
 /**
  * ModelParameters 的 jsonb TypeHandler：

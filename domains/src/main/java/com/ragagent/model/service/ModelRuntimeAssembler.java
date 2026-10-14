@@ -11,7 +11,7 @@ import com.ragagent.modelruntime.application.LlmChatClients;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.ollama.OllamaService;
 import com.ragagent.model.domain.Model;
-import com.ragagent.model.domain.ModelParameters;
+import com.ragagent.common.model.ModelParameters;
 import com.ragagent.model.service.ModelService.ModelNotFoundException;
 import com.ragagent.rerank.Reranker;
 import com.ragagent.rerank.RerankerFactory;
@@ -69,7 +69,7 @@ public class ModelRuntimeAssembler {
         try {
             // langfuse generation 装饰（未启用时原样返回，零成本）
             return LangfuseChatClient.wrap(
-                    LlmChatClients.create(ModelRuntimeConfigs.chatConfig(model, creds[0], creds[1]),
+                    LlmChatClients.create(ModelRuntimeConfigs.chatConfig(ModelRowViews.of(model), creds[0], creds[1]),
                             ollamaService.getIfAvailable(), concurrencyGovernor));
         } catch (BizException e) {
             throw new RuntimeException(e.appError().message());
@@ -86,7 +86,7 @@ public class ModelRuntimeAssembler {
             // langfuse generation 装饰
             return LangfuseEmbedder.wrap(
                     EmbedderFactory.newEmbedder(
-                            ModelRuntimeConfigs.embedderConfig(model, creds[0], creds[1]),
+                            ModelRuntimeConfigs.embedderConfig(ModelRowViews.of(model), creds[0], creds[1]),
                             null, ollamaService.getIfAvailable(), concurrencyGovernor));
         } catch (BizException e) {
             throw new RuntimeException(e.appError().message());
@@ -102,7 +102,7 @@ public class ModelRuntimeAssembler {
             // langfuse generation 装饰
             return LangfuseReranker.wrap(
                     RerankerFactory.newReranker(
-                            ModelRuntimeConfigs.rerankerConfig(model, creds[0], creds[1])));
+                            ModelRuntimeConfigs.rerankerConfig(ModelRowViews.of(model), creds[0], creds[1])));
         } catch (BizException e) {
             throw new RuntimeException(e.appError().message());
         }
@@ -123,7 +123,7 @@ public class ModelRuntimeAssembler {
      * （模型调试端点、agent 引擎装配）直接写进 {@code data.error}。</p>
      */
     public VlmClient.VlmConfig vlmConfigFor(Model model) {
-        VlmClient.VlmConfig config = ModelRuntimeConfigs.vlmConfig(model);
+        VlmClient.VlmConfig config = ModelRuntimeConfigs.vlmConfig(ModelRowViews.of(model));
         if (!config.isOllama()) {
             validateVlmBaseUrl(config.baseUrl());
         }

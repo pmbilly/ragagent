@@ -40,6 +40,7 @@ import com.ragagent.mcp.service.McpMetadataService;
 import com.ragagent.mcp.service.McpServiceManagement;
 import com.ragagent.rerank.RerankerFactory;
 import com.ragagent.storage.service.ResourceCatalogService;
+import com.ragagent.model.service.ModelRowViews;
 
 /**
  * agent 问答 service 面。
@@ -325,7 +326,7 @@ public class SessionAgentQaService {
             return null;
         }
         var p = model.getParameters();
-        var config = ModelRuntimeConfigs.chatConfig(model,
+        var config = ModelRuntimeConfigs.chatConfig(ModelRowViews.of(model),
                 p == null ? null : p.getAppId(), p == null ? null : p.getAppSecret());
         // ⚠️ 2026-09-23 修复：governor/ollama 曾传 null——并发闸门装配（95a49c4）后
         // ConcurrencyChatClient 必调 gateNamedN，agent 路径任何 LLM 调用都会 NPE。
@@ -337,7 +338,7 @@ public class SessionAgentQaService {
     private Reranker rerankModel(String modelId) {
         var model = modelService.getModelByID(modelId);
         var p = model == null ? null : model.getParameters();
-        var config = ModelRuntimeConfigs.rerankerConfig(model,
+        var config = ModelRuntimeConfigs.rerankerConfig(ModelRowViews.of(model),
                 p == null ? null : p.getAppId(), p == null ? null : p.getAppSecret());
         // langfuse generation 装饰（未启用时原样返回）
         return LangfuseReranker.wrap(RerankerFactory.newReranker(config));

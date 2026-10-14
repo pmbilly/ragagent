@@ -1319,6 +1319,17 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **A③ 累计（十七刀）**：边 **64 → 42（−22）**、类 **317 → 243（−74）**；三档 **① 34 条 / 157 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
 - **下一步（①档余量按性价比）**：`mcp→approval`(7) → `session` 能力边（`knowledge` 17 / `storage` 14 / `model` 12 … 共 63 类）→ `embedchannel→session` 余 2（**已拍板：转"实体→视图 + 流式契约"K 级，不建 servlet seam** ✓）
 
+**🔶 A③ 第二十四刀：model 目录端口化（第一批）⇒ `mcp→model` 清零 + 载荷/配置分层就位（2026-10-15，R10 边 34 → 33、类 220 → 218）**
+- **前置测量（上刀教训的直接应用）**：逐类枚举 10 条候选边的**全部**跨域 import ⇒ 找出"所有类都只依赖该一条边"的边：`mcp→model`(2) 与 `memory→model`(3) 都是 **★可整条清零**（memory 留下刀）；`embedchannel→storage` / `system→storage` / `im→storage` / `session→memory` 各有 1–2 类另有他域 ⇒ 本刀不清
+- **分层改造（本刀核心；两次守卫红态逼出的正解）**：
+  1. `ModelParameters`（+ 嵌套 `EmbeddingParameters`）上提 **L1**（`common.model`）——12 处引用；`ModelParametersTypeHandler` 留模型域、只改 import
+  2. 新增 **L1 端口** `common.model.ModelCatalogPort`（`listModels` / `findModel` + `ModelRowView(id,name,type,source,status,defaultModel,parameters)` + `ACTIVE_STATUS` 常量）；实现 `model/api/ModelCatalogAdapter`
+  3. `ModelRuntimeConfigs`（"模型行 → 5 类能力层配置"）**先整移 L2 ⇒ 守卫立刻报 3 组环**（`embedding⇄modelruntime`、`modelruntime⇄rerank`、`modelruntime⇄retrieval`）—— **跨 L2 多域的编排不属于任何单一 L2 域** ⇒ 回退：只在 L2（engine 的 `modelruntime.application`）新建 `ChatConfigs` 承载 **chat 映射**（内聚于 llm），`ModelRuntimeConfigs` 回模型域并**委托**它；其余四映射仍留模型域（入参改 L1 载荷 `ModelRowView`）
+  4. 实体→视图转换放 `model.service.ModelRowViews`（**不放 api 包**）—— 第二次红态：`ModelRuntimeAssembler`（service）用 api 的 `of()` 导致 `model.api ⇄ model.service` 包级 SCC 合并 ⇒ 转换下沉 service，保持 api → service 单向 ✓
+- **迁移 2 类**：`McpServiceController`（`ModelService` → 端口）· `McpUsageInstructionsOps`（选模型走 `port.listModels()` + `ModelRowView`；造 chat 客户端走 **L2 的 `ChatConfigs`**）⇒ **`mcp→model` 整条边清零** ✓
+- **验证**：**13 守卫全绿** ✓（环 0 组、包级 SCC 回 10 组基线）；`spotlessCheck build` ✓ **1m48s** ✓；**4990 / 失败 0 / 跳过 4**（boot 1331 ✓）；定向 mcp/model/llm/embedding/rerank/memory/wiki **844 条** ✓；dev 重启 ready ✓ + 冒烟（`/api/v1/models` 200 ✓ 参数反序列化路径、`/api/v1/mcp-services` 200 ✓）
+- **A③ 累计（二十四刀）**：边 **64 → 33（−31）**、类 **317 → 218（−99）**；三档 **① 25 条 / 132 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
+- **下一步**：`memory→model`（3 类，★可整条清零——直接用本轮端口 + `ModelRowViews`）→ 其余 ★半清边（`system→storage` / `embedchannel→storage` 各留 1 类待他域）→ model 族余量（`session→model` 12 / `knowledge→model` 14 / `initialization→model` 4 / `wiki→model` 1——按"是否只依赖 model"逐类复测）
 **🔶 A③ 第二十三刀：DocReader 解析面端口化 ⇒ 4 类脱离 client 依赖（A16 −4）（2026-10-15，R10 类 221 → 220）**
 - **动机与实测收益的落差（写入方法论）**：本刀原估"−5 类"，实际 **R10 只减 1 类**——因为 `TemporaryDocumentProcessor`（另依赖 `knowledge.chunker.*` / `support.ParserEngineRules`）· `TemporaryDocumentService`（`knowledge.storage.LocalStorageService`）· `InitializationController`（mapper / domain / Guard / Service）· `ModelConnectivityTestService`（`LocalStorageService`）**清了 DocReader 项后仍有其他 knowledge 依赖**，边与类都留着 ⇒ **"清一类依赖"不等于"清一个类"**：判收益前必须逐类枚举**全部**跨域 import（本次只测了边，没逐类枚举剩余项）
 - **本刀动作**：契约新增 `contract.doc.DocReaderParsePort`（`parse` 5 参 + `ParsedDocumentView` / `ImageRefView` 两视图 + 便捷 2 参构造，与客户端记录同形）；knowledge 侧 `knowledge/api/DocReaderParseAdapter`（映射口径：markdown / imageCount 透传、imageRefs null → 空列表——调用方对两者同判 ✓）

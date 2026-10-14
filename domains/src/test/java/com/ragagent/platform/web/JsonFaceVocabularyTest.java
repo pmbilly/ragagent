@@ -13,7 +13,7 @@ import com.ragagent.contract.tenant.APIPrincipalConfig;
 import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.mcp.domain.McpAuthConfig;
 import com.ragagent.memory.domain.MemoryExtractionState;
-import com.ragagent.model.domain.ModelParameters;
+import com.ragagent.common.model.ModelParameters;
 import com.ragagent.contract.vectorstore.ConnectionConfig;
 import com.ragagent.contract.vectorstore.IndexConfig;
 import com.ragagent.websearch.domain.WebSearchProviderParams;

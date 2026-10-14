@@ -28,7 +28,7 @@ import com.ragagent.llm.domain.StreamResponse;
 import com.ragagent.llm.provider.ProviderName;
 import com.ragagent.llm.provider.ProviderRegistry;
 import com.ragagent.model.domain.Model;
-import com.ragagent.model.domain.ModelParameters;
+import com.ragagent.common.model.ModelParameters;
 import com.ragagent.model.dto.ModelDebugAsrResponse;
 import com.ragagent.model.dto.ModelDebugChatResponse;
 import com.ragagent.model.dto.ModelDebugResult;
@@ -48,6 +48,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import com.ragagent.model.service.ModelRuntimeConfigs;
 import com.ragagent.platform.web.ApiResult;
+import com.ragagent.model.service.ModelRowViews;
 
 /**
  * 模型调试端点（POST /api/v1/models/{id}/debug）。
@@ -192,7 +193,7 @@ public class ModelDebugController {
         chatOpts.setThinking(opts.thinking);
 
         // 组 chat 配置 + thinking 观测
-        ChatConfig chatConfig = ModelRuntimeConfigs.chatConfig(model, "", "");
+        ChatConfig chatConfig = ModelRuntimeConfigs.chatConfig(ModelRowViews.of(model), "", "");
         String thinkingControl = effectiveThinkingControl(chatConfig);
         observations.put("stream", true);
         observations.put("requestedThinking", opts.thinking != null && opts.thinking);

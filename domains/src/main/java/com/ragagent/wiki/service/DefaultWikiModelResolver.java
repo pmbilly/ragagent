@@ -8,11 +8,12 @@ import com.ragagent.llm.domain.ChatConfig;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.ollama.OllamaService;
 import com.ragagent.model.domain.Model;
-import com.ragagent.model.domain.ModelParameters;
+import com.ragagent.common.model.ModelParameters;
 import com.ragagent.model.service.ModelService;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 import com.ragagent.model.service.ModelRuntimeConfigs;
+import com.ragagent.model.service.ModelRowViews;
 
 /**
  * {@link WikiModelResolver} 的默认实现：用 Java 侧已有的部件拼出 chat / embedding 模型。
@@ -48,7 +49,7 @@ public class DefaultWikiModelResolver implements WikiModelResolver {
     public LlmChatClient getChatModel(String modelId) {
         Model model = modelService.getModelByID(modelId);
         ModelParameters p = model.getParameters();
-        ChatConfig config = ModelRuntimeConfigs.chatConfig(model,
+        ChatConfig config = ModelRuntimeConfigs.chatConfig(ModelRowViews.of(model),
                 p == null ? null : p.getAppId(),
                 p == null ? null : p.getAppSecret());
         return LlmChatClients.create(config, ollamaService.getIfAvailable(), concurrencyGovernor);

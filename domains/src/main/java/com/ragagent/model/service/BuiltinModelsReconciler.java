@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.model.domain.Model;
-import com.ragagent.model.domain.ModelParameters;
+import com.ragagent.common.model.ModelParameters;
 import com.ragagent.model.mapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

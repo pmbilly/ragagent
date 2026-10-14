@@ -28,7 +28,7 @@ import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import com.ragagent.knowledge.domain.access.KnowledgeAccessGuard;
 import com.ragagent.knowledge.service.management.KnowledgeBaseService;
 import com.ragagent.model.domain.Model;
-import com.ragagent.model.domain.ModelParameters;
+import com.ragagent.common.model.ModelParameters;
 import com.ragagent.model.service.ModelService;
 import com.ragagent.initialization.dto.InitResponses;
 
