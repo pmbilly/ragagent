@@ -32,10 +32,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.auth.service.TenantService;
+import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.session.domain.ChatHistoryKbStats;
-import com.ragagent.tenant.repository.Tenant;
+import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.ApiResponse;
 
@@ -72,12 +72,12 @@ public class MessageController {
     private final MessageService messageService;
     private final FileUrlPort fileService;
     private final StorageBackendResolver storageBackendResolver;
-    private final TenantService tenantService;
+    private final TenantConfigLookup tenantService;
 
     public MessageController(MessageService messageService,
                              ObjectProvider<FileUrlPort> fileService,
                              ObjectProvider<StorageBackendResolver> storageBackendResolver,
-                             TenantService tenantService) {
+                             TenantConfigLookup tenantService) {
         this.messageService = messageService;
         // 两个端口按 ObjectProvider 取（A3-3 起 StorageBackendResolver 有生产实现；
         // FileUrlPort 的进程级实现仍属装配项），缺 bean 时按未装配分支降级。
@@ -248,10 +248,10 @@ public class MessageController {
      * 读者租户实体（A3-3 接线；此前恒 null）——Rewriter 用它解析"引用不带 provider
      * scheme 时的租户默认 provider"。
      */
-    private Tenant currentTenant() {
+    private TenantStorageView currentTenant() {
         Long tid = TenantContext.currentTenantId();
         try {
-            return tid == null || tid <= 0 ? null : tenantService.getTenantById(tid);
+            return tid == null || tid <= 0 ? null : tenantService.storageView(tid);
         } catch (RuntimeException e) {
             return null;
         }

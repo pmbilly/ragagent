@@ -1308,6 +1308,15 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **A② 全批提交**：`a7d3b13e`（第①批 42 类）· `37b5fbb8`（第②批 去框架化 37 类）· `2ee75327`（第②批 补：解锁 11 类）· 本批（第③批 9 类 + 收口）。
 - **A 的下一步**：**③ 立「域间只经契约」**（A20 已守"契约唯一实现"；还差"业务域之间只经 `contract`"这条规则——应先测现状再决定硬规则 vs 棘轮基线）。可选后续：① 的 K 级重设计（`JsonNode` → typed records）另立项。
 
+**🔶 A③ 收敛第三刀：`session` 的 `currentTenant()` 一族（2026-10-14，R10 基线 307 → 298 类）**
+- **切面**：三个控制器共用同一模式（`private Tenant currentTenant()` → 传给 `Rewriter.forRequest` / `QaRequestParser`）⇒ 一刀多类 ✓，且**把第二刀留下的过渡重载一并收掉**（它的唯一用途就是这一族 ✓）。
+- **迁移 5 类**：`controller/{MessageController, SessionStreamController, KnowledgeQaController}` + `qa/{QaRequestParser, QaTurnExecutor}` —— 字段/构造/`ObjectProvider<T>` 类型 `TenantService`（具体类 ✗）→ `TenantConfigLookup`（L1 端口 ✓）；`currentTenant()` 返回 `TenantStorageView`（`storageView(tid)` ✓）；解析器参数 `Tenant readerTenant` → `TenantStorageView readerTenant`；`QaTurnExecutor` 的存在性判断改 `storageView(...) != null` ✓。
+- **收尾**：`storage/support/Rewriter` 的**过渡重载删除**（+ `Tenant` import 移除 ✓）⇒ `storage→tenant` 边再减 1 类 ✓；基线 note 里那段"过渡重载待收"说明同步作废 ✓。
+- **收益**：R10 基线 **307 → 298 类**（`session→auth` **−4**、`session→tenant` **−4**、`storage→tenant` **−1**）。
+- **验证**：**4987 / 失败 0 / 跳过 4** ✓；`spotlessCheck build` ✓ **2m05s** ✓ **13 守卫** ✓（环 0 / SCC 11 组）；定向（MessageController/SessionStreamController/KnowledgeQaController/QaTurnExecutor/QaRequestParser/Rewriter ✓）全绿。
+- **A③ 累计（三刀）**：`storage→tenant` 9→4 · `knowledge→tenant` 3→2 · `session→auth` 11→4 · `session→tenant` 9→3；**基线 317 → 298 类**（−19 ✓ 均为实测收紧）。
+- **下一步**：`session` 余下 `session→auth` 4 类（`QaWiring`/`SessionKnowledgeQaService`/`TemporaryDocumentProcessor`/`TemporaryDocumentService`）与 `session→tenant` 3 类（`MessageSearch`/`MessageService`/`QaWiring` —— 前两者仍引 `tenant.StorageEngineConfig`/`ChatHistoryConfig` 等**类型** ✗，属 `tenant` 类型族，与 A② 类型级残留同批处理更合算）；或换向 `auth→tenant`（24 处）。
+
 **🔶 A③ 收敛第二刀：`session` 面（2026-10-14，R10 基线 312 → 307 类）**
 - **端口扩容**：`common.tenant.TenantConfigLookup` 补 **3 个方法**（`webSearchConfig`/`chatHistoryConfig`/`parserEngineConfig`，均为 `JsonNode`，语义与既有同款："租户不存在或配置为空 ⇒ null"），实现在 `auth/TenantService`（新增私有 `configOf(tenantId, getter)` 统一取法 ✓）。
 - **迁移 4 类**（session 面同时减两条边）：`service/{QaWebSearchParams, AgentToolBackends, MessageSearch, MessageService}` — `getTenantById(tid)` + `tenant.getXxxConfig()` 改写为 `tenantService.xxxConfig(tid)`（**语义等价**：端口把"租户不存在"与"配置为空"归并为 null，与调用原判据一致 ✓）；字段/构造类型 `TenantService`（**具体类** ✗）→ `TenantConfigLookup`（L1 端口 ✓ ⇒ 同 bean，零 wiring ✓）。

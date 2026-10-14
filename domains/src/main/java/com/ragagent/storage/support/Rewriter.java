@@ -1,7 +1,5 @@
 package com.ragagent.storage.support;
 
-import com.ragagent.tenant.repository.Tenant;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -193,19 +191,6 @@ public class Rewriter {
             return new Rewriter(null, "API");
         }
         return new Rewriter(new FileServiceResolver(tenant, defaultSvc, storageResolver), "API");
-    }
-
-    /**
-     * 过渡重载：session 面尚未迁到 L1 端口（见 R10 基线 session→tenant），
-     * 这里把租户实体包成只读视图交给 resolver —— 行为与迁移前一致（三字段即可解析 provider 链）。
-     * <p>session 面迁移完成后本重载应删除（届时 R10 的 storage→tenant 边只剩 {@code StorageEngineConfig}）。</p>
-     */
-    public static Rewriter forRequest(Mode mode, Tenant tenant,
-            FileUrlPort defaultSvc, StorageBackendResolver storageResolver) {
-        TenantStorageView view = tenant == null ? null
-                : new TenantStorageView(tenant.getId() == null ? 0L : tenant.getId(),
-                        tenant.getDefaultStorageBackendId(), tenant.getStorageEngineConfig());
-        return forRequest(mode, view, defaultSvc, storageResolver);
     }
 
     // ── 整块到达、不需要扣留的流字段 ────────────────────────────────────────

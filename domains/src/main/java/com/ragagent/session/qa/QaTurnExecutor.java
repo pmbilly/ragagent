@@ -27,7 +27,7 @@ import com.ragagent.session.service.SessionAgentQaService;
 import com.ragagent.session.service.SessionKnowledgeQaService;
 import com.ragagent.platform.stream.StreamManager;
 import jakarta.servlet.http.HttpServletResponse;
-import com.ragagent.auth.service.TenantService;
+import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.session.domain.message.MessageExecutionContext;
 import com.ragagent.session.service.SessionLookupScope;
@@ -53,9 +53,9 @@ public final class QaTurnExecutor {
     private final QaSseOrchestrator sseOrchestrator;
     private final QaTurnFinalizer turnFinalizer;
     private final QaAttachmentResolver attachmentResolver;
-    private final TenantService tenantService;
+    private final TenantConfigLookup tenantService;
 
-    public QaTurnExecutor(MessageService messageService, StreamManager streamManager, SessionKnowledgeQaService knowledgeQaService, SessionAgentQaService agentQaService, SteerRunCoordinator steerCoordinator, QaSseOrchestrator sseOrchestrator, QaTurnFinalizer turnFinalizer, QaAttachmentResolver attachmentResolver, TenantService tenantService) {
+    public QaTurnExecutor(MessageService messageService, StreamManager streamManager, SessionKnowledgeQaService knowledgeQaService, SessionAgentQaService agentQaService, SteerRunCoordinator steerCoordinator, QaSseOrchestrator sseOrchestrator, QaTurnFinalizer turnFinalizer, QaAttachmentResolver attachmentResolver, TenantConfigLookup tenantService) {
         this.messageService = messageService;
         this.streamManager = streamManager;
         this.knowledgeQaService = knowledgeQaService;
@@ -185,7 +185,7 @@ public final class QaTurnExecutor {
         // 执行租户（模型/KB/MCP 解析范围；身份不变）；租户不存在则不切换。
         final TenantContextSnapshot requestTenant =
                 reqCtx.effectiveTenantId != 0
-                        && tenantService.getTenantById(reqCtx.effectiveTenantId) != null
+                        && tenantService.storageView(reqCtx.effectiveTenantId) != null
                 ? TenantContextSnapshot.capture()
                         .withTenantId(reqCtx.effectiveTenantId)
                 : TenantContextSnapshot.capture();

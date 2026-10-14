@@ -29,7 +29,7 @@ import com.ragagent.storage.support.Mode;
 import com.ragagent.storage.support.PublicModeForbiddenException;
 import com.ragagent.storage.support.Rewriter;
 import com.ragagent.storage.support.StorageBackendResolver;
-import com.ragagent.tenant.repository.Tenant;
+import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
 
 /**
  * {@code KnowledgeQaController} 的**请求解析主体**：把 HTTP 请求（会话 id、
@@ -60,7 +60,7 @@ public final class QaRequestParser {
     public ParsedRequest parseQARequest(String rawSessionId, CreateKnowledgeQARequest request,
             String resourceUrls, String logPrefix,
             AgentResolver agentResolver,
-            Tenant readerTenant) {
+            TenantStorageView readerTenant) {
         QaRequestContext rc = new QaRequestContext();
 
         String sessionId = LogSanitizer.sanitizeForLog(rawSessionId);

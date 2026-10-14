@@ -296,16 +296,6 @@
       "SessionStreamController",
       "StreamEventEmitter"
     ],
-    "session→auth": [
-      "KnowledgeQaController",
-      "MessageController",
-      "QaTurnExecutor",
-      "QaWiring",
-      "SessionKnowledgeQaService",
-      "SessionStreamController",
-      "TemporaryDocumentProcessor",
-      "TemporaryDocumentService"
-    ],
     "session→agentmanagement": [
       "AgentConfigAssembler",
       "AgentResolver",
@@ -319,15 +309,6 @@
       "SessionKnowledgeQaService",
       "SessionQaResolution",
       "TemporaryDocumentController"
-    ],
-    "session→tenant": [
-      "KnowledgeQaController",
-      "MessageController",
-      "MessageSearch",
-      "MessageService",
-      "QaRequestParser",
-      "QaWiring",
-      "SessionStreamController"
     ],
     "session→knowledge": [
       "AgentEngineAssembler",
@@ -391,6 +372,17 @@
       "AgentWebPages",
       "QaWiring"
     ],
+    "session→auth": [
+      "QaWiring",
+      "SessionKnowledgeQaService",
+      "TemporaryDocumentProcessor",
+      "TemporaryDocumentService"
+    ],
+    "session→tenant": [
+      "MessageSearch",
+      "MessageService",
+      "QaWiring"
+    ],
     "session→wiki": [
       "AgentToolBackends",
       "AgentToolWikiBackends"
@@ -398,7 +390,6 @@
     "storage→tenant": [
       "FileServiceFactory",
       "FileServiceResolver",
-      "Rewriter",
       "StorageFileResolver",
       "TenantFileServiceResolver"
     ],

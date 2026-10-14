@@ -35,7 +35,7 @@ import com.ragagent.session.controller.sse.StreamEventEmitter;
 import com.ragagent.platform.stream.StreamManager;
 
 import jakarta.servlet.http.HttpServletResponse;
-import com.ragagent.auth.service.TenantService;
+import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.memory.service.MemoryExtractionService;
@@ -44,7 +44,7 @@ import com.ragagent.session.controller.sse.SseFrameWriter;
 import com.ragagent.storage.support.FileUrlPort;
 import com.ragagent.storage.support.Mode;
 import com.ragagent.storage.support.StorageBackendResolver;
-import com.ragagent.tenant.repository.Tenant;
+import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.platform.web.ApiResult;
 
 
@@ -93,7 +93,7 @@ public class KnowledgeQaController {
     private final QaTurnExecutor executor;
 
     /** 租户服务（A3-3 接线；原 @Autowired 字段，改构造注入保持可选语义）。 */
-    private final TenantService tenantService;
+    private final TenantConfigLookup tenantService;
 
     /** 附件解析簇。 */
     private final QaAttachmentResolver attachmentResolver;
@@ -132,7 +132,7 @@ public class KnowledgeQaController {
             org.springframework.beans.factory.ObjectProvider<FileUrlPort> fileService,
             org.springframework.beans.factory.ObjectProvider<StorageBackendResolver> storageBackendResolver,
             org.springframework.beans.factory.ObjectProvider<MemoryExtractionService> memoryExtraction,
-            org.springframework.beans.factory.ObjectProvider<TenantService> tenantServiceProvider) {
+            org.springframework.beans.factory.ObjectProvider<TenantConfigLookup> tenantServiceProvider) {
         this.sessionService = sessionService;
         this.messageService = messageService;
         this.streamManager = streamManager;
@@ -249,11 +249,11 @@ public class KnowledgeQaController {
      * 现在按 TenantContext 的 id 取实体，与 {@code SystemController} /
      * {@code HybridSearchService} 同一写法。
      */
-    private Tenant currentTenant() {
+    private TenantStorageView currentTenant() {
         Long tid = TenantContext.currentTenantId();
         try {
             return tid == null || tid <= 0 || tenantService == null
-                    ? null : tenantService.getTenantById(tid);
+                    ? null : tenantService.storageView(tid);
         } catch (RuntimeException e) {
             return null;
         }

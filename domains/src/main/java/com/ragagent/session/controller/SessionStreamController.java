@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ragagent.tenant.repository.Tenant;
+import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.session.domain.message.Message;
@@ -37,7 +37,7 @@ import com.ragagent.storage.support.StreamRewriter;
 import com.ragagent.platform.stream.StreamBatch;
 import com.ragagent.platform.stream.StreamEvent;
 import com.ragagent.platform.stream.StreamManager;
-import com.ragagent.auth.service.TenantService;
+import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.ApiResult;
 
@@ -87,7 +87,7 @@ public class SessionStreamController {
     private final StreamEventEmitter emitter;
     private final FileUrlPort fileService;
     private final StorageBackendResolver storageBackendResolver;
-    private final TenantService tenantService;
+    private final TenantConfigLookup tenantService;
 
     public SessionStreamController(
             SessionService sessionService,
@@ -96,7 +96,7 @@ public class SessionStreamController {
             StreamEventEmitter emitter,
             ObjectProvider<FileUrlPort> fileService,
             ObjectProvider<StorageBackendResolver> storageBackendResolver,
-            TenantService tenantService) {
+            TenantConfigLookup tenantService) {
         this.sessionService = sessionService;
         this.messageService = messageService;
         this.streamManager = streamManager;
@@ -137,10 +137,10 @@ public class SessionStreamController {
      * 故此处按 id 取实体（与 {@code SystemController} / {@code HybridSearchService} 同一写法）。
      * 取不到时返回 null（调用方按无租户降级）。</p>
      */
-    private Tenant currentTenant() {
+    private TenantStorageView currentTenant() {
         Long tid = TenantContext.currentTenantId();
         try {
-            return tid == null || tid <= 0 ? null : tenantService.getTenantById(tid);
+            return tid == null || tid <= 0 ? null : tenantService.storageView(tid);
         } catch (RuntimeException e) {
             return null;
         }
