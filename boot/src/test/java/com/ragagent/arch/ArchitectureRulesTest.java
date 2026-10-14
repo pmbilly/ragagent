@@ -1016,15 +1016,15 @@ class ArchitectureRulesTest {
     };
 
     /**
-     * B257 基线（棘轮：只许减不许增）：现存越界点。
+     * B257 基线：**已于 B264③ 清零**（零容忍——新增即红）。
      *
-     * <p>`SkillCatalogController`（audit）/ `CustomAgentService`（knowledge、auth）/
-     * `AgentSuggestedQuestions` —— 它们直连各域 service；**落位批次 B264
-     * （agenttools/agentmanagement 落位）负责把它们改走公开用例并清零本条基线**。</p>
+     * <p>清零路径（都走"`common/&lt;域&gt;/XxxPort` + 该域 `api/` 适配器"）：`SkillCatalogController`
+     * 的 audit 直连 → {@code common.audit.AuditWritePort}；`CustomAgentService` 的 knowledge 直连
+     * → {@code common.knowledge.KnowledgeBaseCatalogPort}（B264②）、auth 直连
+     * → {@code common.auth.UserLookupPort}；`AgentSuggestedQuestions` 的条目经复核为**过期**（它只依赖
+     * {@code knowledge.domain}，规则本就不禁）已删。</p>
      */
-    private static final Set<String> AGENT_ADAPTER_DOMAIN_SERVICE_BASELINE = Set.of(
-            "com.ragagent.agentmanagement.controller.SkillCatalogController",
-            "com.ragagent.agentmanagement.service.CustomAgentService");
+    private static final Set<String> AGENT_ADAPTER_DOMAIN_SERVICE_BASELINE = Set.of();
 
     @Test
     @DisplayName("B257：agenttools / agentmanagement 不得依赖业务域 service/mapper（棘轮）")

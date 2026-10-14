@@ -25,8 +25,7 @@ import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.common.knowledge.KnowledgeBaseCatalogPort;
-import com.ragagent.auth.domain.User;
-import com.ragagent.auth.service.UserService;
+import com.ragagent.common.auth.UserLookupPort;
 import com.ragagent.common.agent.AgentChannelCleaner;
 
 /**
@@ -44,7 +43,7 @@ public class CustomAgentService {
 
 
     private final CustomAgentMapper agentMapper;
-    private final UserService userService;
+    private final UserLookupPort userLookup;
     /** B264②：KB 目录端口（B257 债之一；原直连 knowledge.service.management.KnowledgeBaseService）。 */
     private final KnowledgeBaseCatalogPort kbCatalog;
     private final BuiltinAgentRegistry registry;
@@ -63,13 +62,13 @@ public class CustomAgentService {
 
     public CustomAgentService(CustomAgentMapper agentMapper,
             AgentQuestionMapper questionMapper,
-            UserService userService,
+            UserLookupPort userLookup,
             KnowledgeBaseCatalogPort kbCatalog,
             BuiltinAgentRegistry registry,
             org.springframework.beans.factory.ObjectProvider<
                     AgentChannelCleaner> agentChannelCleanerProvider) {
         this.agentMapper = agentMapper;
-        this.userService = userService;
+        this.userLookup = userLookup;
         this.kbCatalog = kbCatalog;
         this.registry = registry;
         this.agentChannelCleanerProvider = agentChannelCleanerProvider;
@@ -217,9 +216,9 @@ public class CustomAgentService {
         if (ids.isEmpty()) {
             return;
         }
-        Map<String, User> users;
+        Map<String, UserLookupPort.UserView> users;
         try {
-            users = userService.getUsersByIds(new ArrayList<>(ids));
+            users = userLookup.byIds(new ArrayList<>(ids));
         } catch (Exception e) {
             return; // 查询失败静默跳过回填
         }
@@ -228,12 +227,12 @@ public class CustomAgentService {
                     || r.row().getCreatedBy().isEmpty()) {
                 continue;
             }
-            User u = users.get(r.row().getCreatedBy());
+            UserLookupPort.UserView u = users.get(r.row().getCreatedBy());
             if (u == null) {
                 continue;
             }
-            String name = u.getUsername() != null && !u.getUsername().isEmpty()
-                    ? u.getUsername() : (u.getEmail() == null ? "" : u.getEmail());
+            String name = u.username() != null && !u.username().isEmpty()
+                    ? u.username() : (u.email() == null ? "" : u.email());
             r.row().setCreatorName(name);
         }
     }

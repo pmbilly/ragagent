@@ -22,9 +22,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.agent.skills.Skill;
 import com.ragagent.agent.skills.SkillCatalogService;
 import com.ragagent.audit.domain.AuditAction;
-import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.audit.domain.AuditOutcome;
-import com.ragagent.audit.service.AuditLogService;
+import com.ragagent.common.audit.AuditWritePort;
 import com.ragagent.common.context.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
@@ -55,11 +54,11 @@ public class SkillCatalogController {
     private static final ObjectMapper AUDIT_MAPPER = JsonMappers.lenient();
 
     private final SkillCatalogService catalog;
-    private final AuditLogService auditService;
+    private final AuditWritePort auditWriter;
 
-    public SkillCatalogController(SkillCatalogService catalog, AuditLogService auditService) {
+    public SkillCatalogController(SkillCatalogService catalog, AuditWritePort auditWriter) {
         this.catalog = catalog;
-        this.auditService = auditService;
+        this.auditWriter = auditWriter;
     }
 
     /** 新建请求体（content = 技能正文，不含 frontmatter）。 */
@@ -267,14 +266,6 @@ public class SkillCatalogController {
 
     private void audit(String action, SkillCatalogService.SkillRow row,
             List<SkillCatalogService.SkillReference> refs) {
-        AuditLog entry = new AuditLog();
-        entry.setTenantId(TenantContext.currentTenantId() == null ? 0L : TenantContext.currentTenantId());
-        entry.setActorUserId(TenantContext.currentUserId() == null ? "" : TenantContext.currentUserId());
-        entry.setActorRole(TenantContext.currentRole() == null ? "" : TenantContext.currentRole());
-        entry.setAction(action);
-        entry.setTargetType("skill");
-        entry.setTargetUserId("");
-        entry.setOutcome(AuditOutcome.SUCCESS);
         ObjectNode details = AUDIT_MAPPER.createObjectNode();
         details.put("id", row.id());
         details.put("slug", row.slug());
@@ -289,7 +280,15 @@ public class SkillCatalogController {
             }
             details.put("referencedBy", String.join(",", names));
         }
-        entry.setDetails(details);
-        auditService.logBestEffort(entry);
+        auditWriter.logBestEffort(new AuditWritePort.AuditRecord(
+                TenantContext.currentTenantId() == null ? 0L : TenantContext.currentTenantId(),
+                TenantContext.currentUserId() == null ? "" : TenantContext.currentUserId(),
+                TenantContext.currentRole() == null ? "" : TenantContext.currentRole(),
+                action,
+                "skill",
+                "",
+                "",
+                AuditOutcome.SUCCESS,
+                details.toString()));
     }
 }

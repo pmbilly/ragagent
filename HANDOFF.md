@@ -1050,6 +1050,16 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **测试**：**4980 / 失败 0 / 跳过 4** ✓（首轮一次 `EmbedRateLimiterTest` Redis 型偶发，按约定重跑即绿）；启动测试 ✓（新增 `@Component` 装配正常）；`spotlessCheck build` ✓ **1m56s** ✓ **十二守卫** ✓（环 0 / 包级 SCC 12 组不变）；`:domains:javadoc` ✓。
 - **登记（B264 余下）**：B257 还剩两条真债（`SkillCatalogController → audit.service.AuditLogService.logBestEffort`；`CustomAgentService → auth.service.UserService.getUsersByIds`），同走"common 端口 + 域内 api 适配器"；其后 agenttools `data→datasource`、session §8.8.1。
 
+**🔶 B264 第③步（2026-10-14，B257 基线**清零**：audit + auth 两端口）**
+- **两条真债都改走"`common/<域>/XxxPort` + 该域 `api/` 适配器"**：
+  - `SkillCatalogController → audit.service.AuditLogService.logBestEffort` ⇒ **`common.audit.AuditWritePort`**（JDK 记录 `AuditRecord(tenantId, actorUserId, actorRole, action, targetType, targetId, targetUserId, outcome, detailsJson)`）+ **`audit/api/AuditWriteAdapter`**（记录 → `AuditLog` 实体 → `logBestEffort`；详情 JSON 串解析回 `JsonNode`，解析失败按"无详情"——"尽力而为"语义保持）。
+  - `CustomAgentService → auth.service.UserService.getUsersByIds` ⇒ **`common.auth.UserLookupPort`**（`record UserView(id, username, email)`）+ **`auth/api/UserLookupAdapter`**（委托 `getUsersByIds`，只投影展示字段；调用方 try/catch 与 username→email 回退**逐字保留**）。
+- **基线清零**：`AGENT_ADAPTER_DOMAIN_SERVICE_BASELINE` → **`Set.of()`**（**零容忍**，javadoc 记录清零路径）——规则首跑即绿 ⇒ `agenttools`/`agentmanagement` 现在**零**直连业务域 service/mapper ✓。
+- **语义要点**：`AuditAction`/`AuditOutcome` 是 **String 常量**（列允许任意值、刻意非 enum）⇒ 端口可 JDK-only；调用方仍依赖 `audit.domain` 常量（规则只禁 service/mapper ✓）。
+- **踩坑**：三处新目录（`common/auth`、`audit/api`、`auth/api`）不存在 ⇒ 脚本 `open('w')` 不建目录 ✗ ⇒ 先 `mkdir -p`；死成员守卫现场抓到 `CustomAgentService` 残留的 `import com.ragagent.auth.domain.User;`。
+- **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 **26s 实跑**（两个新 `@Component` 装配正常）；`spotlessCheck build` ✓ **3m15s** ✓ **十二守卫** ✓（环 0 / 包级 SCC 12 组）；`:domains:javadoc` ✓。
+- **登记（B264 余下）**：agenttools `data/` → `datasource/`（§8.8.3）；session §8.8.1 大重构（21 包）。
+
 **🔶 B263 第㉟步（2026-10-14，第二个子面 `service.chunk` 切出）**
 - **动前断言（把"可测"变成"可证"）**：脚本**先断言** `ChunkEditService`/`ChunkExtractService`/`ChunkReadService` 三者在 `service` 包内**入度为零**（无人引用，`package-info` 除外），断言不过就 abort —— 这样"切出只产生单向外边"不再靠推理。`ChunkQuestionService` **故意留在** `service`：它被 `QuestionGenerationService` 引用，单独搬会造出 `service ⇄ service.chunk` 环（已在子面 package-info 写明）。
 - **切出**：3 类 → `com.ragagent.knowledge.service.chunk`（`git mv` + 包声明 + 全仓 FQN 替换 3 文件）；测试面 `ChunkExtractServiceTest` 随迁；新建 `service/chunk/package-info`；`service/package-info` 同步。
