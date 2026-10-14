@@ -11,7 +11,7 @@ import java.util.UUID;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.auth.service.TenantService;
+import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.platform.web.ZeroTimeSerializer;
 import com.ragagent.memory.MemoryContext;
 import com.ragagent.contract.memory.MemoryConfig;
@@ -85,7 +85,7 @@ public class MemoryService {
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     final MemoryRepository repo;
-    final TenantService tenantService;
+    final TenantConfigLookup tenantService;
     final MemoryVectorService vectorService;
     final MemoryRecallSelector recallSelector;
     final MemoryTopicResolver topicResolver;
@@ -101,7 +101,7 @@ public class MemoryService {
     final MemoryRecallOps recallOps;
 
     public MemoryService(MemoryRepository repo,
-                         TenantService tenantService,
+                         TenantConfigLookup tenantService,
                          MemoryVectorService vectorService,
                          MemoryRecallSelector recallSelector,
                          MemoryTopicResolver topicResolver,

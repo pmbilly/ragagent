@@ -1,4 +1,4 @@
-package com.ragagent.agent.tool;
+package com.ragagent.contract.tool;
 
 /**
  * 工具取消探测。

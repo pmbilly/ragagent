@@ -1,5 +1,7 @@
 package com.ragagent.agent.tool;
 
+import com.ragagent.contract.tool.ToolCancellation;
+
 import com.ragagent.platform.event.EventBus;
 
 /**

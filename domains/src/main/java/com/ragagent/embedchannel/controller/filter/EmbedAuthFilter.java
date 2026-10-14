@@ -7,7 +7,7 @@ import java.util.List;
 import org.springframework.http.MediaType;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.ragagent.auth.service.TenantService;
+import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.embedchannel.EmbedError;
 import com.ragagent.embedchannel.EmbedRateLimiter;
@@ -49,10 +49,10 @@ public class EmbedAuthFilter extends OncePerRequestFilter {
     public static final String CHANNEL_ATTRIBUTE = "embed.channel";
 
     private final EmbedChannelService embedService;
-    private final TenantService tenantService;
+    private final TenantConfigLookup tenantService;
     private final EmbedRateLimiter limiter;
 
-    public EmbedAuthFilter(EmbedChannelService embedService, TenantService tenantService,
+    public EmbedAuthFilter(EmbedChannelService embedService, TenantConfigLookup tenantService,
                            EmbedRateLimiter limiter) {
         this.embedService = embedService;
         this.tenantService = tenantService;

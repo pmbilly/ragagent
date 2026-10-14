@@ -6,12 +6,13 @@
       "target": 0,
       "note": "跨域能力 / 配置 / 数据读取 ⇒ 提到 contract 端口，调用方只 import contract。这是 A③ 主线工作量；也是 `domains` 拆 Gradle 模块的先决条件（§5.2「确有编译隔离收益时再逐域拆」）。",
       "focus": [
-        "tool SPI（`agent.tool.*`：`ToolCancellation`/`ToolCapabilities`/`AgentTool`/`BaseTool`/`McpToolingGateway`/`ToolRegistryPort`/`ToolCallTarget`）提到 contract（如 `contract.agent.tool`）⇒ **一刀清 3 条**：`approval→agent`(1) / `im→agent`(1) / `mcp→agent`(9) ＝ 11 类（消费方全在族外 ✓）",
-        "`auth.service.TenantService` 读取口（L1 `tenant` 端口或 contract）⇒ **一刀清 3 条**：`datasource→auth`(1) / `embedchannel→auth`(2) / `memory→auth`(1) ＝ 4 类",
-        "`embedchannel` × 4（`agentmanagement`2 / `mcp`2 / `session`4）：**直用他域 controller 与实体** ✗（违反 §12.1 硬规则 1「controller 只被装配层与外部调用」）⇒ 优先级最高；需 session / mcp / agent 三个端口",
-        "`im` × 3（`agentmanagement`9 / `session`6 / `agent`1）：渠道绑定 + QA 跑会话 ⇒ agent 配置口 + session 口",
-        "`session` 的能力边（`knowledge`17 / `storage`14 / `model`12 / `memory`7 / `settings`5 / `websearch`4 / `wiki`2 / `approval`2 ＝ 63 类）：装配器与工具后端逐类改端口 —— session 在本族里是**装配层**，最先吃到收益",
-        "零散能力读取（`audit`/`settings`/`knowledge`/`model` 等小边）：`agentmanagement→audit`(1，只沾 domain 对象) / `embedchannel→knowledge`(2，repository+domain ✗) / `system→storage`(2，mapper) 等，同手法逐个收"
+        "✅ 已做（A③-⑨，2026-10-14）：`auth.service.TenantService` 读取口 ⇒ L1 端口 `common.tenant.TenantConfigLookup` ⇒ **一刀清 3 条**：`datasource→auth`(1) / `embedchannel→auth`(2) / `memory→auth`(1) ＝ 4 类 ✓",
+        "✅ 已做（A③-⑨）：`ToolCancellation` + `ToolCapabilities` → `contract.tool` ⇒ **清 2 条**：`approval→agent`(1) / `im→agent`(1) ✓",
+        "⏸ 工具 SPI 主体（`AgentTool`/`BaseTool`/`ToolDefinitions`/`ToolRequest`/`ToolExecContext`/`ToolRegistry`/`ToolRegistryPort`/`McpToolingGateway`/`McpCatalogGuardedTool`/`agent.domain.ToolCallTarget`）：**堵点＝签名带 Jackson `JsonNode`（`AgentTool.getParameters`/`BaseTool` schema/`ToolRegistryPort.executeInternal`）、`platform.event.EventBus`（实体类）、`llm.domain.ChatMessage`、`ToolCallTarget` 的 jsonb 线格式（mixin 路线）** ⇒ 属 A② 登记的「JsonNode 载体」K 级重设计；解决后 `mcp→agent`（9 类）清零 ✓",
+        "⏸ `embedchannel` × 3 余量（`agentmanagement`2 / `mcp`2 / `session`4）：**直用他域 controller 与实体** ✗（违反 §12.1 硬规则 1）⇒ 优先级最高；需 session / mcp / agent 三个端口",
+        "⏸ `im` × 2 余量（`agentmanagement`9 / `session`6）：渠道绑定 + QA 跑会话 ⇒ agent 配置口 + session 口",
+        "⏸ `session` 的能力边（`knowledge`17 / `storage`14 / `model`12 / `memory`7 / `settings`5 / `websearch`4 / `wiki`2 / `approval`2 ＝ 63 类）：装配器与工具后端逐类改端口 —— session 在本族里是**装配层**，最先吃到收益",
+        "⏸ 零散能力读取（`audit`/`settings`/`knowledge`/`model` 等小边）：`agentmanagement→audit`(1，只沾 domain 对象) / `embedchannel→knowledge`(2，repository+domain ✗) / `system→storage`(2，mapper) 等，同手法逐个收"
       ]
     },
     "owner": {
@@ -83,9 +84,6 @@
       "WikiUpdateIssueTool",
       "WikiWritePageTool"
     ],
-    "approval→agent": [
-      "ApprovalBridge"
-    ],
     "auth→tenant": [
       "AuthBindingSupport",
       "AuthController",
@@ -126,13 +124,6 @@
       "DataSourceSupport",
       "DataSourceSyncResultOps"
     ],
-    "datasource→auth": [
-      "DataSourceService"
-    ],
-    "embedchannel→auth": [
-      "EmbedAuthFilter",
-      "EmbedWiring"
-    ],
     "embedchannel→mcp": [
       "EmbedChannelController",
       "EmbedChannelDelegateOps"
@@ -163,9 +154,6 @@
     ],
     "evaluation→session": [
       "EvaluationService"
-    ],
-    "im→agent": [
-      "ImCommandSet"
     ],
     "im→agentmanagement": [
       "ChannelSessionEntity",
@@ -271,9 +259,6 @@
       "McpRegisteredTool",
       "McpToolWrapper",
       "McpTooling"
-    ],
-    "memory→auth": [
-      "MemoryService"
     ],
     "memory→model": [
       "DefaultMemoryModelResolver",

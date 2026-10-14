@@ -18,7 +18,7 @@ import com.ragagent.platform.web.ToolJson;
 import com.ragagent.mcp.protocol.McpClient;
 import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.protocol.McpContext;
-import com.ragagent.agent.tool.ToolCancellation;
+import com.ragagent.contract.tool.ToolCancellation;
 import com.ragagent.agent.tool.ToolExecContext;
 import com.ragagent.approval.ApprovalBridge;
 

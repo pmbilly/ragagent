@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.webfetch.FetchException;
 import com.ragagent.agent.tool.BaseTool;
-import com.ragagent.agent.tool.ToolCancellation;
+import com.ragagent.contract.tool.ToolCancellation;
 import com.ragagent.agent.tool.ToolDefinitions;
 import com.ragagent.agent.tool.ToolOutput;
 import com.ragagent.agent.tool.ToolRequest;

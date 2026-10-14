@@ -1,4 +1,4 @@
-package com.ragagent.agent.tool;
+package com.ragagent.contract.tool;
 
 import java.util.ArrayList;
 import java.util.Collection;

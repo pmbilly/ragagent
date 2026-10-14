@@ -124,7 +124,8 @@ BASELINE: dict[str, set[str]] = {
     # 模板令牌（数据值，非 JSON 键）
     'agent/AgentPrompts.java': {'current_time', 'web_search_status'},
     # 工具名（模型可见的函数名；§2.4 只管字段名，B88 决策：工具名与 enum 值保留 snake）
-    'agent/tool/ToolCapabilities.java': {'data_analysis', 'data_schema', 'database_query', 'get_document_info', 'grep_chunks', 'knowledge_search', 'list_knowledge_chunks', 'query_knowledge_graph', 'todo_write', 'wiki_delete_page', 'wiki_flag_issue', 'wiki_read_issue', 'wiki_read_page', 'wiki_read_source_doc', 'wiki_rename_page', 'wiki_replace_text', 'wiki_search', 'wiki_update_issue', 'wiki_write_page'},
+    # A③-⑨ 自 agent/tool/ 迁入 contract/tool/（按路径换锚）
+    'contract/tool/ToolCapabilities.java': {'data_analysis', 'data_schema', 'database_query', 'get_document_info', 'grep_chunks', 'knowledge_search', 'list_knowledge_chunks', 'query_knowledge_graph', 'todo_write', 'wiki_delete_page', 'wiki_flag_issue', 'wiki_read_issue', 'wiki_read_page', 'wiki_read_source_doc', 'wiki_rename_page', 'wiki_replace_text', 'wiki_search', 'wiki_update_issue', 'wiki_write_page'},
     # MyBatis 列名/参数（非 JSON 键）
     'auth/service/TenantInvitationService.java': {'invitation_id'},
     # MyBatis 列名/参数（非 JSON 键）
@@ -254,7 +255,7 @@ BASELINE: dict[str, set[str]] = {
     'memory/service/MemoryRecallOps.java': {'block_runes', 'candidate_count', 'fused_candidates', 'interest_injected', 'interest_relevant', 'interest_total', 'lexical_hits', 'matched_count', 'prompt_runes', 'ranking_mode', 'resident_count', 'subject_id', 'tenant_id', 'used_count', 'vector_hits', 'vector_outside', 'vector_skip'},
     # Langfuse 任务 span 载荷（同上，观测面）
     'memory/service/RedisMemoryExtractTaskQueue.java': {'subject_id'},
-    # 工具名（模型可见的函数名；§2.4 只管字段名，B88 决策：工具名与 enum 值保留 snake。同族见 agent/tool/ToolCapabilities.java 的登记（B257 改名自 agent/tools/，B260 迁入 agent/tool/））
+    # 工具名（模型可见的函数名；§2.4 只管字段名，B88 决策：工具名与 enum 值保留 snake。同族见 contract/tool/ToolCapabilities.java 的登记（B257 改名自 agent/tools/，B260 迁入 agent/tool/，A③-⑨ 迁入 contract/tool/））
     'modelcontext/ToolPolicy.java': {'call_mcp_tool', 'data_schema', 'discover_mcp_tools', 'edit_sandbox_file', 'edit_skill_file', 'execute_skill_script', 'get_document_info', 'grep_chunks', 'knowledge_search', 'list_knowledge_chunks', 'list_sandbox_files', 'query_knowledge_graph', 'read_file', 'read_sandbox_file', 'read_skill', 'search_conversations', 'search_memory', 'shell_exec', 'todo_write', 'web_fetch', 'web_search', 'wiki_delete_page', 'wiki_flag_issue', 'wiki_read_page', 'wiki_read_source_doc', 'wiki_rename_page', 'wiki_replace_text', 'wiki_search', 'wiki_write_page', 'write_sandbox_file', 'write_skill_file'},
     # span 观测面（followUpSpan.finish 的 metadata）
     'session/service/suggestion/MessageSuggestionService.java': {'question_count'},

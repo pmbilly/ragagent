@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.audit.domain.AuditAction;
 import com.ragagent.audit.domain.AuditOutcome;
 import com.ragagent.audit.service.AuditLogService;
-import com.ragagent.auth.service.TenantService;
+import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.datasource.domain.connector.Connector;
 import com.ragagent.datasource.domain.connector.ConnectorRegistry;
 import com.ragagent.datasource.task.DataSourceSyncHandler;
@@ -117,7 +117,7 @@ public class DataSourceService implements DataSourceSyncHandler {
     final DataSourceSyncTaskQueue taskQueue;
     final ConnectorRegistry connectorRegistry;
     final Scheduler scheduler;
-    final TenantService tenantService;
+    final TenantConfigLookup tenantService;
     final AuditLogService audit;
     final AutoTagProvider autoTagProvider;
 
@@ -139,7 +139,7 @@ public class DataSourceService implements DataSourceSyncHandler {
                              DataSourceSyncTaskQueue taskQueue,
                              ConnectorRegistry connectorRegistry,
                              Scheduler scheduler,
-                             TenantService tenantService,
+                             TenantConfigLookup tenantService,
                              AuditLogService audit,
                              AutoTagProvider autoTagProvider) {
         this.dsRepo = dsRepo;

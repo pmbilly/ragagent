@@ -1308,6 +1308,16 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **A② 全批提交**：`a7d3b13e`（第①批 42 类）· `37b5fbb8`（第②批 去框架化 37 类）· `2ee75327`（第②批 补：解锁 11 类）· 本批（第③批 9 类 + 收口）。
 - **A 的下一步**：**③ 立「域间只经契约」**（A20 已守"契约唯一实现"；还差"业务域之间只经 `contract`"这条规则——应先测现状再决定硬规则 vs 棘轮基线）。可选后续：① 的 K 级重设计（`JsonNode` → typed records）另立项。
 
+**🔶 A③ 第九刀：工具契约词表 + 租户读取口（2026-10-14，R10 **边 57 → 52**、类 280 → 274；**5 条边清零**）**
+- **起点修正（重要，推翻我上一轮估计）**：计划 §8.1 的 `contract.tool/` 应含工具 SPI（`Tool`/`ToolDefinition`/`ToolInvocation`/`ToolResult`/`ToolApproval`）⇒ 原打算"tool SPI 一刀清 3 条边"，**实测不可行**：`AgentTool.getParameters()`/`BaseTool` 的 schema/`ToolRegistryPort.executeInternal` 签名带 **Jackson `JsonNode`**、`ToolExecContext` 带 **`platform.event.EventBus`（实体类，非接口）**、`McpToolingGateway` 带 `llm.domain.ChatMessage`、`agent.domain.ToolCallTarget` 是 **jsonb 线格式载体**（`@JsonInclude`）⇒ **工具 SPI 主体＝A② 登记的「`JsonNode` 载体」K 级重设计**，不是便宜刀 ⇒ 已把**精确堵点**登记进 `contract/tool/package-info` 与基线 `tiers.clearable.focus` ✓（解决后 `mcp→agent` 9 类随之清零）。
+- **A刀（便宜部分先落）**：`ToolCancellation`（`@FunctionalInterface`，0 依赖）+ `ToolCapabilities`（工具名→KB 能力词表，仅 `java.util`）→ **`contract.tool`** ⇒ **清 2 条边**：`approval→agent`(1) / `im→agent`(1)。FQN 替换 9 文件 + 编译驱动补 import 3 处（同包裸引用者 `ToolRegistry`/`ToolExecContext`/`ToolRequest` ✓）。
+- **B刀（租户读取口，零行为变化）**：4 处由具体类 `auth.service.TenantService` → **L1 端口 `common.tenant.TenantConfigLookup`** ⇒ **清 3 条边**：`datasource→auth`(1) / `embedchannel→auth`(2) / `memory→auth`(1)；所用方法（`exists`/`memoryConfig`）端口上都有 ✓（`TenantService implements TenantConfigLookup, TenantLookup` ⇒ 换注入类型即换 bean ✓）。
+  - ⚠️ **一处纠正**：我先把 `DataSourceService.tenantService` 判为"死引用"，但**同包的 `DataSourceSyncExecutor`** 两处用 `service.tenantService.exists(...)` ⇒ 当场改为换类型（**"同包字段访问"查引用面必须跨文件** ✓）。
+- **换锚（按路径冻结第 6 类）**：`check-json-key-case.py` 的 BASELINE 条目按**文件路径**登记 ⇒ `agent/tool/ToolCapabilities.java` 搬家后失效、守卫把它当"新文件 19 个 snake 键" ✗ ⇒ 换锚为 `contract/tool/ToolCapabilities.java` + 两处交叉引用注释同步 ✓（这些 snake 是**工具名**（模型可见函数名，B88 决策保留 snake），不是 JSON 键 ✓）。
+- **⚠️ 自伤（一条，当场修）**：换锚时我把注释**插在字典条目那一行内** ⇒ `#` 吞掉该行剩余内容 ⇒ 守卫脚本 `SyntaxError: '{' was never closed` ✗ ⇒ **注释不进"字面量所在行"，只独立成行** ✓。
+- **验证**：**13 守卫全绿** ✓；`spotlessCheck build` ✓ **1m53s** ✓；**4987 / 失败 0 / 跳过 4** ✓；四模块 `javadoc` ✓。
+- **A③ 累计（九刀）**：边 **64 → 52（−12）**、类 **317 → 274（−43）**；三档 **① 44 条 / 188 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**。
+- **下一步**：①档焦点＝`embedchannel` 余 3 条（`agentmanagement`2/`mcp`2/`session`4，**直用他域 controller 与实体** ✗ 违反 §12.1 规则 1 ⇒ 优先级最高）→ `im` 余 2 条 → `session` 能力边 63 类；或按既定时序**先提 `:contracts` 模块**（契约面已纯 ✓；换锚面＝`file-size.baseline.json`（键是模块相对路径）+ 12 个脚本扫描根 + `settings.gradle.kts`/各 `build.gradle.kts`）。
 **🔶 A③ 口径定盘：R10 三档分级（2026-10-14，边 57 / 类 280 不变——本批只改"怎么读"）**
 - **回答"理想状态是不是清零"**：R10 **已只算"对他域实现类"的依赖**（`contract.*` 与装配层 `config/platform/common` 不计）⇒ "清零"＝"不再有任何域直接依赖他域实现"，有意义 ✓；但**一刀切清零会逼出假抽象** —— 属主边（如 `auth→tenant`）清零就得给"租户实体字段清单"造端口 ✗，比直接依赖更差 ⇒ **目标不是"0 条边"，而是"0 条未分类边"** ✓。
 - **三档口径（写进基线 `tiers`，检查器读档）**：

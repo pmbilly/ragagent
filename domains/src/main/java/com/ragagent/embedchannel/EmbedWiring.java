@@ -7,7 +7,7 @@ import org.springframework.core.Ordered;
 
 import com.ragagent.embedchannel.controller.filter.EmbedAuthFilter;
 import com.ragagent.embedchannel.service.EmbedChannelService;
-import com.ragagent.auth.service.TenantService;
+import com.ragagent.common.tenant.TenantConfigLookup;
 
 /**
  * embed 模块的组合根。
@@ -22,7 +22,7 @@ public class EmbedWiring {
     @Bean
     public FilterRegistrationBean<EmbedAuthFilter> embedAuthFilter(
             EmbedChannelService embedService,
-            TenantService tenantService,
+            TenantConfigLookup tenantService,
             EmbedRateLimiter limiter) {
         FilterRegistrationBean<EmbedAuthFilter> bean =
                 new FilterRegistrationBean<>(new EmbedAuthFilter(embedService, tenantService, limiter));

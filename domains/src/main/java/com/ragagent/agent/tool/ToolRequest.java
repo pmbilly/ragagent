@@ -1,5 +1,7 @@
 package com.ragagent.agent.tool;
 
+import com.ragagent.contract.tool.ToolCancellation;
+
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**

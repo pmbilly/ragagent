@@ -5,7 +5,7 @@ import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agent.tool.AgentTool;
 import com.ragagent.agent.tool.ToolExecContext;
-import com.ragagent.agent.tool.ToolCancellation;
+import com.ragagent.contract.tool.ToolCancellation;
 import com.ragagent.contract.tool.ToolResult;
 
 /**
