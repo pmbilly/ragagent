@@ -3,10 +3,10 @@ package com.ragagent.datasource.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ragagent.datasource.Connector;
-import com.ragagent.datasource.ConnectorRegistry;
-import com.ragagent.datasource.DataSourceSyncTaskQueue;
-import com.ragagent.datasource.Scheduler;
+import com.ragagent.datasource.domain.connector.Connector;
+import com.ragagent.datasource.domain.connector.ConnectorRegistry;
+import com.ragagent.datasource.task.DataSourceSyncTaskQueue;
+import com.ragagent.datasource.task.Scheduler;
 import com.ragagent.datasource.connector.feishu.core.FeishuRegion;
 import com.ragagent.datasource.connector.feishu.drive.DriveConnector;
 import com.ragagent.datasource.connector.feishu.wiki.WikiConnector;

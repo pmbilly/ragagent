@@ -3,7 +3,7 @@ package com.ragagent.datasource.connector.feishu.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ragagent.datasource.ConnectorException;
+import com.ragagent.datasource.domain.connector.ConnectorException;
 import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.PartialWikiNodeListException;
 import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.WikiNode;
 import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.WikiNodeInfoResponse;

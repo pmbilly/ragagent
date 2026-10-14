@@ -1,4 +1,4 @@
-package com.ragagent.datasource;
+package com.ragagent.datasource.domain.connector;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.ragagent.datasource;
+package com.ragagent.datasource.task;
 
 import java.time.Duration;
 
@@ -20,7 +20,7 @@ import com.ragagent.datasource.domain.DataSourceSyncPayload;
  *       一起触发——TaskID 就是让"只有第一个赢"的那一层。</li>
  *   <li><b>重试预算</b>：失败后最多重试 {@code maxRetry} 次。</li>
  *   <li><b>任务超时</b>：单次执行超时 {@code timeout}——超时后任务被取消，
- *       实现为"中断执行线程"（见 {@link Connector#sleep} 的取消语义）。</li>
+ *       实现为"中断执行线程"（见 {@link com.ragagent.datasource.domain.connector.Connector#sleep} 的取消语义）。</li>
  *   <li><b>失败要能报出来</b>：投递失败时调度器会把 sync_log 置为 {@code failed}
  *       并写下 {@code "enqueue failed: <原因>"}，所以本方法<b>抛异常</b>而不是静默丢弃。</li>
  * </ol>
@@ -54,7 +54,7 @@ public interface DataSourceSyncTaskQueue {
      * @param maxRetry 失败后的最大重试次数
      * @param timeout  单次执行的超时
      * @return {@link Outcome#ENQUEUED} 或 {@link Outcome#TASK_ID_CONFLICT}
-     * @throws DataSourceSyncEnqueueException 其它投递失败（TaskID 冲突以外的失败）
+     * @throws com.ragagent.datasource.DataSourceSyncEnqueueException 其它投递失败（TaskID 冲突以外的失败）
      */
     Outcome enqueue(DataSourceSyncPayload payload, String taskId, int maxRetry, Duration timeout);
 }

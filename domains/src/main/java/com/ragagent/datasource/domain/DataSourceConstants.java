@@ -1,5 +1,6 @@
 package com.ragagent.datasource.domain;
 
+
 /**
  * 数据源相关的全部字符串常量。
  *

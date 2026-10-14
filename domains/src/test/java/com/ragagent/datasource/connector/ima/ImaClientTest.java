@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.ragagent.datasource.ConnectorException;
+import com.ragagent.datasource.domain.connector.ConnectorException;
 import com.ragagent.datasource.connector.ima.ImaApiTypes.GetAddableKnowledgeBaseListResp;
 import com.ragagent.datasource.connector.ima.ImaApiTypes.GetKnowledgeListResp;
 import com.ragagent.datasource.connector.ima.ImaApiTypes.GetMediaInfoResp;

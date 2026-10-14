@@ -8,8 +8,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.ragagent.datasource.Connector;
-import com.ragagent.datasource.ConnectorException;
+import com.ragagent.datasource.domain.connector.Connector;
+import com.ragagent.datasource.domain.connector.ConnectorException;
 import com.ragagent.datasource.connector.ima.FakeIma.FakeFile;
 import com.ragagent.datasource.connector.ima.FakeIma.FakeFolder;
 import com.ragagent.datasource.domain.DataSourceConfig;

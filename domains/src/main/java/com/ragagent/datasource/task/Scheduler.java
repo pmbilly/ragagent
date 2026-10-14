@@ -1,4 +1,6 @@
-package com.ragagent.datasource;
+package com.ragagent.datasource.task;
+
+import com.ragagent.datasource.domain.connector.ConnectorException;
 
 import java.time.Duration;
 import java.time.Instant;

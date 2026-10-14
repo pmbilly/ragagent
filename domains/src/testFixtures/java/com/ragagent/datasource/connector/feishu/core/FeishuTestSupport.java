@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.ragagent.common.security.SsrfGuard;
-import com.ragagent.datasource.ConnectorHttp;
-import com.ragagent.datasource.StreamHandler;
+import com.ragagent.datasource.domain.connector.ConnectorHttp;
+import com.ragagent.datasource.domain.connector.StreamHandler;
 import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.domain.FetchedItem;
 import com.ragagent.datasource.domain.SyncCursor;

@@ -18,7 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.ragagent.datasource.ConnectorException;
+import com.ragagent.datasource.domain.connector.ConnectorException;
 import com.ragagent.datasource.connector.feishu.core.DocxFetcher;
 import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.DriveFile;
 import com.ragagent.datasource.connector.feishu.core.FeishuCursorCodec;
@@ -31,7 +31,7 @@ import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.domain.FetchedItem;
 import com.ragagent.datasource.domain.Resource;
 import com.ragagent.datasource.domain.SyncCursor;
-import com.ragagent.datasource.ConnectorHttp;
+import com.ragagent.datasource.domain.connector.ConnectorHttp;
 import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes;
 import com.ragagent.datasource.connector.feishu.core.FeishuClient;
 

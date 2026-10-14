@@ -2,7 +2,7 @@ package com.ragagent.datasource.connector.notion;
 
 import java.util.Map;
 
-import com.ragagent.datasource.ConnectorException;
+import com.ragagent.datasource.domain.connector.ConnectorException;
 import com.ragagent.datasource.domain.DataSourceConfig;
 
 /**

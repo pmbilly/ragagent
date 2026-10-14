@@ -19,7 +19,7 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import com.ragagent.datasource.ConnectorException;
+import com.ragagent.datasource.domain.connector.ConnectorException;
 import com.ragagent.datasource.connector.yuque.YuqueApiTypes.FlexibleStatus;
 import com.ragagent.datasource.connector.yuque.YuqueApiTypes.V2Doc;
 import com.ragagent.datasource.connector.yuque.YuqueApiTypes.V2Repo;

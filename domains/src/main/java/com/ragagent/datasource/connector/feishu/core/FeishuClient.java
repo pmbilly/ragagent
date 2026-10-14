@@ -13,9 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.datasource.Connector;
-import com.ragagent.datasource.ConnectorException;
-import com.ragagent.datasource.ConnectorHttp;
+import com.ragagent.datasource.domain.connector.Connector;
+import com.ragagent.datasource.domain.connector.ConnectorException;
+import com.ragagent.datasource.domain.connector.ConnectorHttp;
 import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.DocRawContentResponse;
 import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.DriveFile;
 import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.DriveFolderMetaResponse;
@@ -43,7 +43,7 @@ import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.WikiSpace;
  *   <li>请求级超时：落在
  *       {@link ConnectorHttp.Client} 的构造参数（{@link #REQUEST_TIMEOUT}，30 秒）；</li>
  *   <li>取消：靠线程中断，
- *       {@link com.ragagent.datasource.Connector#sleep(long)} 会把它转成
+ *       {@link com.ragagent.datasource.domain.connector.Connector#sleep(long)} 会把它转成
  *       {@link ConnectorException}。</li>
  * </ul>
  *

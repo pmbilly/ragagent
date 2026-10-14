@@ -8,9 +8,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.TokenResponse;
-import com.ragagent.datasource.Connector;
-import com.ragagent.datasource.ConnectorException;
-import com.ragagent.datasource.ConnectorHttp;
+import com.ragagent.datasource.domain.connector.Connector;
+import com.ragagent.datasource.domain.connector.ConnectorException;
+import com.ragagent.datasource.domain.connector.ConnectorHttp;
 
 /**
  * 飞书客户端的传输层：tenant access token 的取用与缓存、HTTP 交换与退避重试、

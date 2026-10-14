@@ -1,4 +1,6 @@
-package com.ragagent.datasource;
+package com.ragagent.datasource.task;
+
+import com.ragagent.datasource.DataSourceSyncEnqueueException;
 
 import com.ragagent.common.web.JsonMappers;
 import java.time.Duration;
@@ -39,7 +41,7 @@ import com.ragagent.tracing.langfuse.LangfuseTaskScope;
  *       {@code attempt > maxRetry} 后放弃（与进程内实现的循环重试等价，只是把
  *       "同线程 sleep 退避"换成"队列重排"，对调用方不可见）；</li>
  *   <li><b>任务超时</b>：独立线程执行 + {@code Future.get(timeout)}，
- *       到点中断执行线程（见 {@link Connector#sleep} 的取消语义）；</li>
+ *       到点中断执行线程（见 {@link com.ragagent.datasource.domain.connector.Connector#sleep} 的取消语义）；</li>
  *   <li><b>失败要能报出来</b>：投递失败抛 {@link DataSourceSyncEnqueueException}
  *       （调用方把 sync_log 落成 failed + "enqueue failed: ..."）。</li>
  * </ul>

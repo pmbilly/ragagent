@@ -1,4 +1,4 @@
-package com.ragagent.datasource;
+package com.ragagent.datasource.domain.connector;
 
 import java.util.List;
 
@@ -191,7 +191,7 @@ public class ConnectorException extends RuntimeException {
      * <p>抛出它时<b>结果与异常同时有效</b>——成功的条目已在 items、cursor 也已建好。
      * 所以绝不能把它当成"什么都没抓到"。调用方必须
      * <b>先读 items/cursor、再判异常类型</b>——这条语义由
-     * {@link com.ragagent.datasource.Connector.FetchIncrementalResult} 承载。</p>
+     * {@link com.ragagent.datasource.domain.connector.Connector.FetchIncrementalResult} 承载。</p>
      */
     public static class PartialFetch extends ConnectorException {
 

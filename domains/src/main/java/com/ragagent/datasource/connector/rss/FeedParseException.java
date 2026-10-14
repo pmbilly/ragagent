@@ -4,7 +4,7 @@ package com.ragagent.datasource.connector.rss;
  * feed 解析失败。
  *
  * <p>用一个<b>独立的运行时异常</b>
- * 表达，而不是复用 {@link com.ragagent.datasource.ConnectorException}——
+ * 表达，而不是复用 {@link com.ragagent.datasource.domain.connector.ConnectorException}——
  * 后者带"这是连接器层错误"的语义、会被 service 层按类型分流，
  * 而解析失败只是内容问题。这里刻意不继承它，免得调用方误判类型。</p>
  *

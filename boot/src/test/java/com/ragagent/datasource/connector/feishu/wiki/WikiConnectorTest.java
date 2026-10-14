@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 
-import com.ragagent.datasource.ConnectorException;
+import com.ragagent.datasource.domain.connector.ConnectorException;
 import com.ragagent.datasource.connector.feishu.core.FeishuRegion;
 import com.ragagent.datasource.connector.feishu.core.FeishuSupport;
 import com.ragagent.datasource.connector.feishu.core.FeishuTestServer;
@@ -33,7 +33,7 @@ import com.ragagent.datasource.domain.SyncCursor;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import com.ragagent.common.web.ZeroTimeSerializer;
-import com.ragagent.datasource.Connector;
+import com.ragagent.datasource.domain.connector.Connector;
 import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes;
 import com.ragagent.datasource.connector.feishu.core.FeishuClient;
 import com.ragagent.datasource.connector.feishu.core.FeishuConfig;

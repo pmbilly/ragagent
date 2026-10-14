@@ -232,9 +232,9 @@ BASELINE: dict[str, set[str]] = {
     'model/service/ModelService.java': {'asr_config', 'embedding_model_id', 'image_processing_config', 'knowledge_bases', 'summary_model_id', 'vlm_config', 'wiki_config'},
     # ── 集合字面量形态族（B145 加该形态扫描时逐条复核）──
     # Langfuse 任务 span 载荷（LangfuseTaskScope.start 的 metadata，观测面）
-    'datasource/InProcessDataSourceSyncTaskQueue.java': {'data_source_id'},
+    'datasource/task/InProcessDataSourceSyncTaskQueue.java': {'data_source_id'},
     # Langfuse 任务 span 载荷（同上，观测面）
-    'datasource/RedisDataSourceSyncTaskQueue.java': {'data_source_id'},
+    'datasource/task/RedisDataSourceSyncTaskQueue.java': {'data_source_id'},
     # 飞书 OAuth 请求体字段名（对方契约；值与 typed 字段解耦，见 §15.1.1 B137/B139）
     'datasource/connector/feishu/core/FeishuTransport.java': {'app_id'},
     # Langfuse 任务 span 载荷（LangfuseTaskScope.start 的 metadata，观测面）

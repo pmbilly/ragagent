@@ -1,5 +1,6 @@
 package com.ragagent.datasource.connector.gitlab;
 
+
 import com.ragagent.common.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -13,9 +14,9 @@ import java.util.Set;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.ragagent.datasource.ConnectorException;
-import com.ragagent.datasource.StreamHandler;
-import com.ragagent.datasource.StreamingConnector;
+import com.ragagent.datasource.domain.connector.ConnectorException;
+import com.ragagent.datasource.domain.connector.StreamHandler;
+import com.ragagent.datasource.domain.connector.StreamingConnector;
 import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.domain.DataSourceConstants;
 import com.ragagent.datasource.domain.FetchedItem;

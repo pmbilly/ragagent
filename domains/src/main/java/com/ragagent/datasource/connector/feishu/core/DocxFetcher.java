@@ -18,7 +18,7 @@ import com.ragagent.datasource.connector.feishu.core.DocxMarkdown.MarkdownResult
 import com.ragagent.datasource.connector.feishu.core.DocxMarkdown.PendingAttachment;
 import com.ragagent.datasource.domain.FetchedItem;
 import com.ragagent.datasource.domain.SubtreeChildIds;
-import com.ragagent.datasource.ConnectorException;
+import com.ragagent.datasource.domain.connector.ConnectorException;
 
 /**
  * docx 抓取（{@code DocxFetchInput} / {@code FetchDocxWithBlocks} /

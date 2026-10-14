@@ -8,8 +8,8 @@ import java.util.Locale;
 import java.util.Map;
 
 import com.ragagent.common.security.SsrfGuard;
-import com.ragagent.datasource.ConnectorException;
-import com.ragagent.datasource.ConnectorHttp;
+import com.ragagent.datasource.domain.connector.ConnectorException;
+import com.ragagent.datasource.domain.connector.ConnectorHttp;
 
 /**
  * RSS 连接器的出站 HTTP 客户端。

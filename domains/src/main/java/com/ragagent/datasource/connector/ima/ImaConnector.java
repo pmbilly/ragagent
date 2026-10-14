@@ -12,8 +12,8 @@ import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.datasource.Connector;
-import com.ragagent.datasource.ConnectorException;
+import com.ragagent.datasource.domain.connector.Connector;
+import com.ragagent.datasource.domain.connector.ConnectorException;
 import com.ragagent.datasource.connector.ima.ImaApiTypes.FolderInfo;
 import com.ragagent.datasource.connector.ima.ImaApiTypes.GetAddableKnowledgeBaseListResp;
 import com.ragagent.datasource.connector.ima.ImaApiTypes.GetKnowledgeListResp;

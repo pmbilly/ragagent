@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.ragagent.datasource.Connector;
-import com.ragagent.datasource.ConnectorException;
+import com.ragagent.datasource.domain.connector.Connector;
+import com.ragagent.datasource.domain.connector.ConnectorException;
 import com.ragagent.datasource.connector.yuque.YuqueApiTypes.V2Doc;
 import com.ragagent.datasource.connector.yuque.YuqueApiTypes.V2DocDetail;
 import com.ragagent.datasource.connector.yuque.YuqueApiTypes.V2Group;

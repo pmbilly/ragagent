@@ -14,9 +14,9 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ragagent.datasource.ConnectorException;
-import com.ragagent.datasource.StreamHandler;
-import com.ragagent.datasource.StreamingConnector;
+import com.ragagent.datasource.domain.connector.ConnectorException;
+import com.ragagent.datasource.domain.connector.StreamHandler;
+import com.ragagent.datasource.domain.connector.StreamingConnector;
 import com.ragagent.datasource.connector.feishu.core.DocxFetcher;
 import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.DriveFile;
 import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes.DriveFileListFailure;

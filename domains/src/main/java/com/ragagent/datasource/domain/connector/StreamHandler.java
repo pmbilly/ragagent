@@ -1,4 +1,4 @@
-package com.ragagent.datasource;
+package com.ragagent.datasource.domain.connector;
 
 import com.ragagent.datasource.domain.FetchedItem;
 import com.ragagent.datasource.domain.SyncCursor;

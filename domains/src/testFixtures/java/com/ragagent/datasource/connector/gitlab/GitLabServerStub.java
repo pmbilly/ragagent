@@ -9,7 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 
 import com.ragagent.common.security.SsrfGuard;
-import com.ragagent.datasource.ConnectorHttp;
+import com.ragagent.datasource.domain.connector.ConnectorHttp;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 

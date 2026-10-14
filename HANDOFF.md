@@ -1130,6 +1130,13 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 ✓；`spotlessCheck build` ✓ **1m41s** ✓ **十二守卫** ✓（环 0 / 包级 SCC **12 组**）；`:domains:javadoc` ✓；定向 `--rerun-tasks` ✓。
 - **登记（B265 余下）**：wiki `service.ingest`/`pipeline`/`task` 三簇**需先断边**（重构级）· `WikiIngestService` 归属 · **datasource 差集按 §8.9 精确边界重测** · mcp 两项改名（`McpServiceService` / 两个 DTO 泛名）。
 
+**🔶 B265 第⑪步（2026-10-14，datasource 顶层两簇落位：`domain.connector` 9 + `task` 6，根包留 1）**
+- **精确差集**：datasource 其实**几乎全对齐**——`connector.{feishu.core,feishu.drive,feishu.wiki,gitlab,ima,notion,rss,yuque}` 八面逐名一致 ✓、`controller`/`domain`/`mapper` ✓；缺口 = **顶层 16 文件**恰好是目标的两簇 + 根包 1（`Connector` 8 类 + `task` 7 类 + `DataSourceSyncEnqueueException`，**算术闭合**）。
+- **本步的一刀（解环）**：实测 `conn ⇄ task` 互引只有两条真边——`StreamingConnector → StreamHandler` 与 `task → Connector/ConnectorException` ⇒ 让 **`StreamHandler`（连接器的流式回调契约，被 4 个连接器 + `StreamingConnector` + `SyncExecutor` 使用）随 `domain.connector` 走**（目标列在 `task`，属**有意偏离**）⇒ 两簇单向、根包只被 task 引用 ⇒ 无环。
+- **又一处"假依赖"**：环守卫报 `{datasource.domain, datasource.domain.connector}` 新组，追下去是 `DataSourceConstants` 里**一个未使用的 import**（代码体零引用）⇒ 删掉即解环 ✓（**环的分析要区分"真引用"与"未使用 import"**）。
+- **连带**：FQN 替换 **60 文件**；**测试随迁**按主体类归位（`ConnectorFrameworkTest`/`ConnectorHttpTest` → `domain/connector`；`SchedulerTest`/`InProcess…Test`/`Redis…Test` → `task`——首版按"引用面启发式"把后两个错投到 domain/connector，编译揪出包内私有访问 `Scheduler.triggerSync`/`ConnectorHttp.statusText` ⇒ 改按主体归位）；清两处空目录（目录卫生守卫抓到）；**snake 键路径锚 ×2 换新**（`datasource/task/…`，FROZEN 覆盖按路径）；javadoc 失链 3 处改全限定 + 1 处 `@throws` 类型改全限定（**javadoc-only 引用的类型不会进 import 扫描**⇒ 必须显式写全）。
+- **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 ✓；`spotlessCheck build` ✓ **1m47s** ✓ **十二守卫** ✓（环 0 / SCC 12 组）；`:domains:javadoc` ✓；定向 `--rerun-tasks` ✓。
+
 **🔶 B263 第㉟步（2026-10-14，第二个子面 `service.chunk` 切出）**
 - **动前断言（把"可测"变成"可证"）**：脚本**先断言** `ChunkEditService`/`ChunkExtractService`/`ChunkReadService` 三者在 `service` 包内**入度为零**（无人引用，`package-info` 除外），断言不过就 abort —— 这样"切出只产生单向外边"不再靠推理。`ChunkQuestionService` **故意留在** `service`：它被 `QuestionGenerationService` 引用，单独搬会造出 `service ⇄ service.chunk` 环（已在子面 package-info 写明）。
 - **切出**：3 类 → `com.ragagent.knowledge.service.chunk`（`git mv` + 包声明 + 全仓 FQN 替换 3 文件）；测试面 `ChunkExtractServiceTest` 随迁；新建 `service/chunk/package-info`；`service/package-info` 同步。

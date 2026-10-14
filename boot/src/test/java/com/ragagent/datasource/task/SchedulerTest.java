@@ -1,4 +1,8 @@
-package com.ragagent.datasource;
+package com.ragagent.datasource.task;
+
+import com.ragagent.datasource.DataSourceSyncEnqueueException;
+
+import com.ragagent.datasource.domain.connector.ConnectorException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

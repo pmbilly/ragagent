@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Objects;
 
 import com.ragagent.tenant.Tenant;
-import com.ragagent.datasource.Connector;
-import com.ragagent.datasource.ConnectorException;
-import com.ragagent.datasource.StreamHandler;
-import com.ragagent.datasource.StreamingConnector;
+import com.ragagent.datasource.domain.connector.Connector;
+import com.ragagent.datasource.domain.connector.ConnectorException;
+import com.ragagent.datasource.domain.connector.StreamHandler;
+import com.ragagent.datasource.domain.connector.StreamingConnector;
 import com.ragagent.datasource.domain.DataSource;
 import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.domain.DataSourceConstants;

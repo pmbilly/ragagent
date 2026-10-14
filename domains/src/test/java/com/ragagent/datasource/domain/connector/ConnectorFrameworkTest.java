@@ -1,4 +1,5 @@
-package com.ragagent.datasource;
+package com.ragagent.datasource.domain.connector;
+
 
 import com.ragagent.common.web.JsonMappers;
 import static org.assertj.core.api.Assertions.assertThat;
