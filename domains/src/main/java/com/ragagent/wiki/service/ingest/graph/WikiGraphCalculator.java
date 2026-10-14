@@ -1,4 +1,4 @@
-package com.ragagent.wiki.service.ingest;
+package com.ragagent.wiki.service.ingest.graph;
 
 import java.util.ArrayList;
 import java.util.Comparator;

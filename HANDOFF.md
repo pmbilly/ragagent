@@ -1123,6 +1123,13 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **测试**：**4980 / 失败 0 / 跳过 4** ✓（首轮一次 `RedisWikiSlugLockTest` Redis 型偶发，按约定重跑即绿）；启动测试 ✓；`spotlessCheck build` ✓ **1m37s** ✓ **十二守卫** ✓（环 0 / 包级 SCC 12 组）；`:domains:javadoc` ✓。
 - **登记（B265 余下）**：`wiki/service/ingest/`(57) 拆四簇（12/21/22/1，含 task/队列/Redis 面，需核 `FROZEN_PREFIXES` 与 json 键锚）；datasource 差集按 §8.9 精确边界重测。
 
+**🔶 B265 第⑩步（2026-10-14，wiki `service.ingest.graph` 切出；另三簇实测被互引阻断）**
+- **动前图分析（56 类映射 + 簇间边）**：按目标树映射 `service.ingest`(12) + `pipeline`(21) + `task`(22) + `graph`(1)；实测 **只有 `graph` 零簇间边**——`ingest ⇄ pipeline`（3 / 7 条）与 `pipeline ⇄ task`（6 / 15 条）**互有引用** ⇒ 四簇单独切必造环 ✗ ⇒ 后三簇属**重构级**（与 session 的 turn/attachment 同型）。
+- **另发现两处事实**：① `WikiIngestService`（ingest 面门面/端口实现，被 `repository`/`service`/`WikiRedisWiring` 引用）**不在 §8.9 任一 ingest 子面** ⇒ 作为"目标树孤儿"**留在 `service.ingest`**（登记）；② `scripts/package-cycles.baseline.json` 的**第 11 组**正是 `{wiki.service, wiki.service.ingest, wiki.service.page}`（本域既有环）；本步迁出后该组**不变**（graph 是叶子）⇒ 基线零改动 ✓。
+- **切出**：`WikiGraphCalculator`（274 行）→ `com.ragagent.wiki.service.ingest.graph`；测试 `WikiGraphCalculatorTest` 随迁 mirror 包；FQN 替换 1 文件（`service/page/WikiPageServiceImpl`）；新面 package-info（写明"对本域 service 面零出边"）。
+- **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 ✓；`spotlessCheck build` ✓ **1m41s** ✓ **十二守卫** ✓（环 0 / 包级 SCC **12 组**）；`:domains:javadoc` ✓；定向 `--rerun-tasks` ✓。
+- **登记（B265 余下）**：wiki `service.ingest`/`pipeline`/`task` 三簇**需先断边**（重构级）· `WikiIngestService` 归属 · **datasource 差集按 §8.9 精确边界重测** · mcp 两项改名（`McpServiceService` / 两个 DTO 泛名）。
+
 **🔶 B263 第㉟步（2026-10-14，第二个子面 `service.chunk` 切出）**
 - **动前断言（把"可测"变成"可证"）**：脚本**先断言** `ChunkEditService`/`ChunkExtractService`/`ChunkReadService` 三者在 `service` 包内**入度为零**（无人引用，`package-info` 除外），断言不过就 abort —— 这样"切出只产生单向外边"不再靠推理。`ChunkQuestionService` **故意留在** `service`：它被 `QuestionGenerationService` 引用，单独搬会造出 `service ⇄ service.chunk` 环（已在子面 package-info 写明）。
 - **切出**：3 类 → `com.ragagent.knowledge.service.chunk`（`git mv` + 包声明 + 全仓 FQN 替换 3 文件）；测试面 `ChunkExtractServiceTest` 随迁；新建 `service/chunk/package-info`；`service/package-info` 同步。
