@@ -584,11 +584,17 @@ class ArchitectureRulesTest {
     }
 
     /**
-     * 棘轮基线：{@code :domains} 内 {@code mapper} 包里仍留着的 11 个仓储门面。
+     * 棘轮基线：{@code :domains} 内 {@code mapper} 包里仍留着的 9 个仓储门面。
      * 登记理由：本规则上线时 session / wiki / memory 三域已清零（9 类 + memory 协作者 4 类），
      * 余下域按「碰到哪域归哪域」逐域收敛，基线只许减不许增。
      * <p>口径不含 {@code :engine} 的 {@code retrieval/engine/**}——引擎适配仓储与检索是一套
      * 自成体系的目录约定，不适用本分层划分。</p>
+     * <p><b>B267 收紧（11 → 9）</b>：检测从「名字以 {@code Repository} 结尾」升级为<b>注解判据</b>——
+     * 真 MyBatis-Plus 映射接口（带 {@code @Mapper} 或祖先链含 {@code BaseMapper}）不再算门面，
+     * 两条**命名巧合**的假阳性随之下线：{@code vectorstore.mapper.VectorStoreRepository}、
+     * {@code websearch.mapper.WebSearchProviderRepository}（二者都是 {@code @Mapper} 接口，
+     * 只是名字以 Repository 结尾）。余 9 条现场核对均为 {@code @Component}/{@code @Repository}
+     * 的**手写门面**，收敛路径仍是「碰到哪域归哪域」搬去该域 {@code repository/}。</p>
      */
     private static final Set<String> REPOSITORY_IN_MAPPER_BASELINE = Set.of(
             "com.ragagent.audit.mapper.AuditLogRepository",
@@ -599,9 +605,7 @@ class ArchitectureRulesTest {
             "com.ragagent.mcp.mapper.McpOAuthRepository",
             "com.ragagent.mcp.mapper.McpToolApprovalRepository",
             "com.ragagent.storage.mapper.ResourceRepository",
-            "com.ragagent.storage.mapper.StorageBackendRepository",
-            "com.ragagent.vectorstore.mapper.VectorStoreRepository",
-            "com.ragagent.websearch.mapper.WebSearchProviderRepository");
+            "com.ragagent.storage.mapper.StorageBackendRepository");
 
     @Test
     @DisplayName("A11b：仓储门面不得留在 mapper 包（A11 的镜像面：mapper 只放 MyBatis-Plus 接口）")
@@ -612,11 +616,28 @@ class ArchitectureRulesTest {
         Set<String> actual = new TreeSet<>();
         for (JavaClass clazz : MAIN) {
             JavaClass top = topLevel(clazz);
-            if (top.getSimpleName().endsWith("Repository") && top.getPackageName().endsWith(".mapper")) {
+            if (top.getSimpleName().endsWith("Repository")
+                    && top.getPackageName().endsWith(".mapper")
+                    && !isMyBatisMapper(top)) {
                 actual.add(top.getName());
             }
         }
         ratchet("A11b mapper 包里的仓储门面", REPOSITORY_IN_MAPPER_BASELINE, actual);
+    }
+
+    /**
+     * 真 MyBatis(-Plus) 映射接口判据：带 {@code @Mapper} 注解，或祖先链含 {@code BaseMapper}。
+     *
+     * <p>为什么必须按注解判而非按名字：本仓有 40+ 个 {@code extends BaseMapper} 的映射接口，
+     * 其中两个以 {@code Repository} 结尾——按名字判会把它们当成"留在 mapper 包的门面"，
+     * 让 A11b 带着两条**假阳性**长期占着基线（B267 现场核对时逐条读注解才发现）。</p>
+     */
+    private static boolean isMyBatisMapper(JavaClass clazz) {
+        if (clazz.isAnnotatedWith("org.apache.ibatis.annotations.Mapper")) {
+            return true;
+        }
+        return clazz.getAllRawInterfaces().stream()
+                .anyMatch(i -> "com.baomidou.mybatisplus.core.mapper.BaseMapper".equals(i.getName()));
     }
 
     /**
@@ -996,6 +1017,111 @@ class ArchitectureRulesTest {
             }
         }
         ratchet("A18 运行态公共可变字段", RUNTIME_PUBLIC_FIELD_BASELINE, actual);
+    }
+
+    // ── A19 分层方向（domain 不碰技术栈 / repository 不回引 service）──────
+
+    /**
+     * 棘轮基线：{@code domain} 面里仍依赖 Spring 构造型 / {@code ..mapper..} 包 的 10 个类。
+     *
+     * <p>两类登记理由：① **4 个实体**直接 import 其他域 {@code mapper} 里的
+     * {@code JsonbRawStringTypeHandler}（{@code CustomAgentEntity} / {@code EmbedChannelEntity} /
+     * {@code ChannelSessionEntity} / {@code ImChannelEntity}）——收敛方向＝把该处理器下沉到
+     * 使用方域（或提到 {@code common}），实体只留注解引用；② **6 个 {@code @Component} 的领域
+     * 守卫 / 接线类**（knowledge 的 4 个 guard + {@code SpanTracker} + {@code ConnectorHttpWiring}）
+     * ——收敛方向＝改由装配层注入，或搬去域外的接线面。**基线只许减不许增**。</p>
+     *
+     * <p><b>有意偏离（判据边界）</b>：{@code org.apache.ibatis.type.*}（实体的
+     * {@code @TableField(jdbcType=…, typeHandler=…)} 注解参数）**未纳入判据**——它覆盖 49 个实体，
+     * 是全仓 MyBatis-Plus 实体约定，纳入即等于给日常写法立规（每加一个 JSONB 列就红）；
+     * 若将来实体注解下沉出 domain，再把该判据加进来。</p>
+     */
+    private static final Set<String> DOMAIN_TECH_DEPENDENCY_BASELINE = Set.of(
+            "com.ragagent.agentmanagement.domain.CustomAgentEntity",
+            "com.ragagent.datasource.domain.connector.ConnectorHttpWiring",
+            "com.ragagent.embedchannel.domain.EmbedChannelEntity",
+            "com.ragagent.im.domain.ChannelSessionEntity",
+            "com.ragagent.im.domain.ImChannelEntity",
+            "com.ragagent.knowledge.domain.access.ChunkAccessGuard",
+            "com.ragagent.knowledge.domain.access.FaqGuard",
+            "com.ragagent.knowledge.domain.access.KnowledgeAccessGuard",
+            "com.ragagent.knowledge.domain.access.KnowledgeRouteGuards",
+            "com.ragagent.knowledge.domain.span.SpanTracker");
+
+    @Test
+    @DisplayName("A19：domain 不得依赖 Spring 构造型 / mapper 包；repository 不得依赖 service")
+    void domainStaysTechnologyFreeAndRepositoryDoesNotDependOnService() {
+        Set<String> techInDomain = new TreeSet<>();
+        for (JavaClass clazz : MAIN) {
+            if (!clazz.isTopLevelClass() || !packageHasComponent(clazz.getPackageName(), "domain")) {
+                continue;
+            }
+            boolean hit = clazz.getDirectDependenciesFromSelf().stream()
+                    .map(dep -> dep.getTargetClass().getPackageName())
+                    .anyMatch(pkg -> pkg.startsWith("org.springframework")
+                            || packageHasComponent(pkg, "mapper"));
+            if (hit) {
+                techInDomain.add(clazz.getName());
+            }
+        }
+        ratchet("A19 domain 技术依赖", DOMAIN_TECH_DEPENDENCY_BASELINE, techInDomain);
+
+        Set<String> repositoryToService = new TreeSet<>();
+        for (JavaClass clazz : MAIN) {
+            if (!clazz.isTopLevelClass() || !packageHasComponent(clazz.getPackageName(), "repository")) {
+                continue;
+            }
+            clazz.getDirectDependenciesFromSelf().stream()
+                    .filter(dep -> isServicePackage(dep.getTargetClass().getPackageName()))
+                    .forEach(dep -> repositoryToService.add(
+                            clazz.getName() + " → " + dep.getTargetClass().getName()));
+        }
+        ratchet("A19 repository→service", Set.of(), repositoryToService);
+    }
+
+    // ── A20 装配契约（每个 common 契约端口恰一个域侧实现）────────────────
+
+    @Test
+    @DisplayName("A20：每个 common 契约端口恰有一个域侧实现（装配契约：提供方唯一）")
+    void eachContractPortHasExactlyOneImplementation() {
+        // 契约模式（B264 起）：跨域调用一律经 `common/<域>/XxxPort`，实现方是该域的 api/ 适配器
+        // （如 knowledge/api/ChunkPortAdapter）。实现方唯一是这套模式能让 @Lazy 环消失、装配面
+        // 可审计的前提：0 个 = 契约悬空（调用方拿到 NoSuchBean 才发现）；≥2 个 = 提供方不唯一，
+        // 契约失去"单点替换"语义。
+        Set<String> implemented = new TreeSet<>();
+        Set<String> duplicated = new TreeSet<>();
+        for (JavaClass clazz : MAIN) {
+            if (clazz.isInterface() || !clazz.isTopLevelClass()) {
+                continue;
+            }
+            clazz.getAllRawInterfaces().stream()
+                    .filter(ArchitectureRulesTest::isContractPort)
+                    .forEach(port -> {
+                        if (!implemented.add(port.getName())) {
+                            duplicated.add(port.getName());
+                        }
+                    });
+        }
+        Set<String> violations = new TreeSet<>();
+        for (JavaClass clazz : MAIN) {
+            if (!isContractPort(clazz) || !clazz.isTopLevelClass()) {
+                continue;
+            }
+            if (!implemented.contains(clazz.getName())) {
+                violations.add(clazz.getName() + "（0 个实现：契约悬空）");
+            }
+            if (duplicated.contains(clazz.getName())) {
+                violations.add(clazz.getName() + "（≥2 个实现：提供方不唯一）");
+            }
+        }
+        ratchet("A20 契约端口唯一实现", Set.of(), violations);
+    }
+
+    /** 契约端口判据：{@code com.ragagent.common} 下的顶层接口、名字以 {@code Port} 结尾。 */
+    private static boolean isContractPort(JavaClass clazz) {
+        return clazz.isInterface()
+                && clazz.getSimpleName().endsWith("Port")
+                && clazz.getPackageName().startsWith("com.ragagent.common");
     }
 
     // ── 工具/管理适配包不得直连业务域 service/mapper ───────────────────

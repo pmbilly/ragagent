@@ -542,7 +542,7 @@ Controller 全仓 52 个；每域 PR 入场时再做该域的"端点 × 前端�
 | B264 | 6 | ②：session + agenttools/agentmanagement 落位 | ✅ ①~⑦（agentmanagement `service.{config,builtin}` / **B257 基线清零** / agenttools 四面对齐 `datasource` / session `controller.sse`+`domain` 三簇+`service.suggestion`；session 余项属重构级，见收口记录） |
 | B265 | 6 | ③：wiki（17 包 147）+ datasource（16 包 124）+ mcp（9 包 125） | ✅ ⑧~⑫（mcp 对齐 `tool`+改名 / wiki `domain` 五簇+`ingest.graph` / datasource `domain.connector`+`task`；余项属重构级与命名级，见收口记录） |
 | B266 | 6 | ④：im/memory/auth/storage/websearch/model + 其余小域 | ✅ ①~⑤（memory `domain` 三簇 / im `channel.*` + 改名 / auth 两处 filter 归位 / model+im 命名对齐 / tenant `repository` + embedchannel `controller.filter`；余项属重构/模块级，见收口记录） |
-| B267 | 6 | 门禁收紧收尾：§12.2「分层方向」「装配契约」两规则 + A11b 清零核查 + 复杂度指标（可选） | ⬜ |
+| B267 | 6 | 门禁收紧收尾：§12.2「分层方向」「装配契约」两规则 + A11b 清零核查 + 复杂度指标（可选） | ✅ A19/A20 两规则落地 + A11b 注解判据收紧（基线 11→9）+ 复杂度报告脚本 |
 
 ### 15.2 批次纪律（每批通用，违者必翻车——全是本轮实锤）
 
@@ -1198,6 +1198,15 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
   ⑤ **auth `apikey.dto`(2)**：`TenantAPIKeyCreateResponse`/`TenantAPIKeyResponse` 全仓不存在 ⇒ 待创建。
   ⑥ `audit/api`(1)、`auth/api`(1)：本批跨域端口模式的**自愿增面**（`AuditWriteAdapter`/`UserLookupAdapter`）。
 - **本批资产（三条新经验）**：① **动前断言从"零反向边"升级为"面级图 DAG 检查"**（`scope → domain` 这类单向边合法，硬套零引用会误杀）；② **改名要连小写标识符一起改**（`modelRuntimeFactory` 92 处 / `imService` 25 处）并**预检 Strings/Bean 名**（`@Qualifier`/`getBean`/配置键零命中才动）；③ **按路径冻结的基线共三处**（`json-key-freeze.files` 两层结构、`file-size.limits` 键、`package-cycles` 组成员）——搬包/改名必须逐处换锚，其中 SCC 基线要**外科式成员换名**（别用 `--write`，会吞别处漂移）。
+
+**✅ B267 门禁收紧收尾（2026-10-14，A19/A20 两规则 + A11b 收紧 + 复杂度报告）**
+- **A19「分层方向」**（新增，两条子规则）：① **`repository` 不得依赖 `service`**——实测 **0 违例** ⇒ **零容忍硬规**（`ratchet(Set.of(), …)` 表达"基线外新增即红"，同 B257/B260 的写法）；② **`domain` 不得依赖 Spring 构造型 / `..mapper..` 包**——实测 **10 条** ⇒ 棘轮基线逐条附理由：**4 个实体**直接 import 他域 `mapper` 的 `JsonbRawStringTypeHandler`（`CustomAgentEntity`/`EmbedChannelEntity`/`ChannelSessionEntity`/`ImChannelEntity`，收敛=处理器下沉或提 `common`）、**6 个 `@Component` 领域守卫/接线**（knowledge 4 guard + `SpanTracker` + `ConnectorHttpWiring`，收敛=装配层注入或移出 domain）。
+- **A19 的判据边界（有意偏离，写进规则 javadoc）**：`org.apache.ibatis.type.*` **未纳入**判据——实体注解 `@TableField(jdbcType=…, typeHandler=…)` 让它覆盖 **49 个实体**，是全仓 MyBatis-Plus 实体约定，纳入即"每加一个 JSONB 列就红"⇒ 等于给日常写法立规 ✗；待实体注解下沉出 domain 再把判据加回。**诊断手法**：先把命中包写进违例串（`类 ⇐ 包1|包2`）跑一次、按包归类（49/6/4），定案后回退为类级基线——**"判据边界"要拿实测分布来定，不靠拍脑袋**。
+- **A20「装配契约」**（新增）：**每个 `common/**` 顶层 `*Port` 接口的 main 实现恰为 1**（0=契约悬空 / ≥2=提供方不唯一）⇒ 实测 **12/12 恰一**（`UserLookupPort`→`UserLookupAdapter` … `SessionMessagePort`→`MessageRepository`）⇒ **零容忍硬规**；规则注释写明它是"`@Lazy` 环消失 + 装配面可审计"的前提（`@Lazy` 本身由 A6 守，不重复立规）。
+- **A11b 收紧（"清零核查"结论）**：检测从「名字以 `Repository` 结尾」升级为**注解判据**（带 `@Mapper` 或祖先链含 `BaseMapper` 者视为**真映射接口**，不算门面）⇒ 剔除 2 条**命名巧合**假阳性（`vectorstore.mapper.VectorStoreRepository`、`websearch.mapper.WebSearchProviderRepository`），基线 **11 → 9**；余 9 条逐条读注解确认均为 `@Component`/`@Repository` **手写门面**（收敛路径=碰到哪域归哪域搬 `repository/`）。**这条规则此前带假阳性长期占着基线**——"基线逐条读一遍"本身就能查出规则精度问题。
+- **复杂度报告**（`scripts/complexity-report.py`，**报告级非硬门**，对齐 §12.5"候选审查线不是立即生效的全库硬门"）：首跑快照 —— 扫 2004 主源文件；**方法分支 > 15：270 处**（Top：`webfetch/Fetcher#detectContentType` 113、`agenttools/sql/SqlSelectDeepChecker#deepCheck` 104、`mcp/tool/McpInputSchemaValidator#validate` 78）；**构造器依赖 > 8：2 处**（`session/service/AgentEngineAssembler` **14**、`session/qa/QaTurnExecutor` 9）；公开可变实例字段 237（**多数是 `@ConfigurationProperties` 绑定类**，打印时已加提示"复核先剔该族"）；包级 SCC 复用既有硬门脚本不重复。`--strict` 预留为将来当门用。
+- **测试**：**4982 / 失败 0 / 跳过 4**（boot **1329 → 1331**，正是新增 2 条规则 ✓）；启动测试 ✓；`spotlessCheck build` ✓ **1m36s** ✓ **十二守卫** ✓（环 0 / 包级 SCC 12 组）。
+- **阶段 6 收官**：B263 ✅ · B264 ✅ · B265 ✅ · B266 ✅ · B267 ✅。
 
 **🔶 B263 第㉟步（2026-10-14，第二个子面 `service.chunk` 切出）**
 - **动前断言（把"可测"变成"可证"）**：脚本**先断言** `ChunkEditService`/`ChunkExtractService`/`ChunkReadService` 三者在 `service` 包内**入度为零**（无人引用，`package-info` 除外），断言不过就 abort —— 这样"切出只产生单向外边"不再靠推理。`ChunkQuestionService` **故意留在** `service`：它被 `QuestionGenerationService` 引用，单独搬会造出 `service ⇄ service.chunk` 环（已在子面 package-info 写明）。
