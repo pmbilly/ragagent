@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.ragagent.common.error.AppError;
 import java.util.Comparator;
-import com.ragagent.common.storage.UploadLimits;
+import com.ragagent.platform.storage.config.UploadLimits;
 
 /**
  * 本地存储引擎。

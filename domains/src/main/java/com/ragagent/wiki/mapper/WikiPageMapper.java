@@ -4,7 +4,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ragagent.common.web.PgJsonTypeHandler;
+import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import com.ragagent.wiki.domain.SourceRefNeedle;
 import com.ragagent.wiki.domain.index.WikiIndexEntry;
 import com.ragagent.wiki.domain.page.WikiPage;
@@ -124,7 +124,7 @@ public interface WikiPageMapper extends BaseMapper<WikiPage> {
             + "out_links = #{page.outLinks, typeHandler=com.ragagent.wiki.domain.WikiStringListTypeHandler}, "
             + "source_refs = #{page.sourceRefs, typeHandler=com.ragagent.wiki.domain.WikiStringListTypeHandler}, "
             + "chunk_refs = #{page.chunkRefs, typeHandler=com.ragagent.wiki.domain.WikiStringListTypeHandler}, "
-            + "page_metadata = #{page.pageMetadata, typeHandler=com.ragagent.common.web.PgJsonTypeHandler}, "
+            + "page_metadata = #{page.pageMetadata, typeHandler=com.ragagent.platform.persistence.PgJsonTypeHandler}, "
             + "parent_slug = #{page.parentSlug}, folder_id = #{page.folderId}, "
             + "category_path = #{page.categoryPath, typeHandler=com.ragagent.wiki.domain.WikiStringListTypeHandler}, "
             + "wiki_path = #{page.wikiPath}, depth = #{page.depth}, sort_order = #{page.sortOrder}, "
@@ -161,7 +161,7 @@ public interface WikiPageMapper extends BaseMapper<WikiPage> {
             + "status = #{status}, "
             + "source_refs = #{sourceRefs, typeHandler=com.ragagent.wiki.domain.WikiStringListTypeHandler}, "
             + "chunk_refs = #{chunkRefs, typeHandler=com.ragagent.wiki.domain.WikiStringListTypeHandler}, "
-            + "page_metadata = #{pageMetadata, typeHandler=com.ragagent.common.web.PgJsonTypeHandler}, "
+            + "page_metadata = #{pageMetadata, typeHandler=com.ragagent.platform.persistence.PgJsonTypeHandler}, "
             + "parent_slug = #{parentSlug}, folder_id = #{folderId}, "
             + "category_path = #{categoryPath, typeHandler=com.ragagent.wiki.domain.WikiStringListTypeHandler}, "
             + "wiki_path = #{wikiPath}, depth = #{depth}, sort_order = #{sortOrder}, "

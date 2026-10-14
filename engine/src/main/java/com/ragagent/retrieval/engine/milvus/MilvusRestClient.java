@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.common.security.SsrfGuard;
+import com.ragagent.platform.security.SsrfGuard;
 
 /**
  * Milvus REST v2 传输层（{@code /v2/vectordb/…}）——本仓自持 REST v2（零新依赖）。

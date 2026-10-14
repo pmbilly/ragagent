@@ -1,7 +1,7 @@
 package com.ragagent.storage.controller;
 
 import com.ragagent.common.web.JsonMappers;
-import com.ragagent.common.web.RequestFields;
+import com.ragagent.platform.web.RequestFields;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -9,10 +9,10 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.BizException;
 import com.ragagent.storage.domain.StorageBackend;
-import com.ragagent.common.storage.StorageAllowList;
+import com.ragagent.platform.storage.config.StorageAllowList;
 import com.ragagent.storage.dto.StorageBackendResponse;
 import com.ragagent.storage.dto.StorageConfig;
 import com.ragagent.storage.service.StorageBackendService;
@@ -26,8 +26,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.common.web.ApiResult;
-import com.ragagent.common.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
+import com.ragagent.platform.web.ApiResponse;
 
 /**
  * 存储后端管理面：9 条路由；读 Viewer+ / 写与测试 Admin+。

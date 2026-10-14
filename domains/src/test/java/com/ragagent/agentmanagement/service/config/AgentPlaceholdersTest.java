@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.prompt.AgentPromptPlaceholders;
+import com.ragagent.platform.prompt.AgentPromptPlaceholders;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

@@ -8,17 +8,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.security.LogSanitizer;
-import com.ragagent.common.web.RejectEmptyBody;
+import com.ragagent.platform.security.LogSanitizer;
+import com.ragagent.platform.web.RejectEmptyBody;
 import com.ragagent.evaluation.dto.EvaluationDtos.EvaluationDetail;
 import com.ragagent.evaluation.dto.EvaluationRequest;
 import com.ragagent.evaluation.service.EvaluationService;
 
 import jakarta.validation.Valid;
-import com.ragagent.common.web.ApiResult;
+import com.ragagent.platform.web.ApiResult;
 
 /**
  * 评估端点（POST = Admin：驱动 LLM+检索、跨 KB 读；GET = Viewer 读同租户任务）。

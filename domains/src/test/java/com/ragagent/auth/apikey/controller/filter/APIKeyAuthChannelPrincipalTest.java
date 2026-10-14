@@ -21,7 +21,7 @@ import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.tenant.APIPrincipalConfig;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.auth.service.UserService;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;

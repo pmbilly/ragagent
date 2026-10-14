@@ -5,7 +5,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ragagent.chatpipeline.ChatManage;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.event.EventBusInterface;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.llm.ChatStream;
@@ -15,7 +15,7 @@ import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.StreamResponse;
 import com.ragagent.modelcontext.Registry;
 import com.ragagent.chatpipeline.PipelineCommon;
-import com.ragagent.common.prompt.PromptComposer;
+import com.ragagent.platform.prompt.PromptComposer;
 import com.ragagent.llm.domain.ChatResponse;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -26,7 +26,7 @@ import com.ragagent.event.payload.AgentFinalAnswerData;
 import com.ragagent.event.payload.AgentReferencesData;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.common.llm.ResponseType;
-import com.ragagent.common.prompt.AgentPromptPlaceholders;
+import com.ragagent.platform.prompt.AgentPromptPlaceholders;
 import com.ragagent.platform.event.EventIds;
 
 /**

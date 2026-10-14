@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.model.domain.Model;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
-import com.ragagent.common.embedding.EmbeddingGateway;
+import com.ragagent.platform.model.EmbeddingGateway;
 import com.ragagent.common.model.ModelFacts;
 
 /**

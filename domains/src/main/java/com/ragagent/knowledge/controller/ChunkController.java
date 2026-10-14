@@ -1,11 +1,11 @@
 package com.ragagent.knowledge.controller;
 
 import java.util.List;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.security.LogSanitizer;
-import com.ragagent.common.web.RejectEmptyBody;
+import com.ragagent.platform.security.LogSanitizer;
+import com.ragagent.platform.web.RejectEmptyBody;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.GeneratedQuestion;
 import com.ragagent.knowledge.domain.Knowledge;
@@ -36,8 +36,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.common.web.ApiResult;
-import com.ragagent.common.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
+import com.ragagent.platform.web.ApiResponse;
 
 /**
  * chunk 路由：编辑/生成问题两服务与仓储读面的 HTTP 绑定层。

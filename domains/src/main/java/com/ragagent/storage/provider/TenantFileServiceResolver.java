@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ragagent.tenant.StorageEngineConfig;
-import com.ragagent.common.storage.StorageRuntimeEnv;
+import com.ragagent.platform.storage.config.StorageRuntimeEnv;
 
 /**
  * 租户级文件服务解析 + 回退。

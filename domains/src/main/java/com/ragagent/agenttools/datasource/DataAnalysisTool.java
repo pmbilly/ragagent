@@ -14,7 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.web.ToolJson;
+import com.ragagent.platform.web.ToolJson;
 import com.ragagent.common.llm.ToolResult;
 import com.ragagent.agent.tool.BaseTool;
 import com.ragagent.agent.tool.Cleanable;

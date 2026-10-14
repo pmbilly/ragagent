@@ -1,6 +1,6 @@
 package com.ragagent.session.repository;
 
-import com.ragagent.common.mybatis.LikeEscapes;
+import com.ragagent.platform.persistence.LikeEscapes;
 
 import com.ragagent.session.mapper.MessageMapper;
 import com.ragagent.session.mapper.SessionMapper;
@@ -15,9 +15,9 @@ import java.util.UUID;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.ragagent.common.jdbc.DatabaseDialects;
-import com.ragagent.common.mybatis.PageRequests;
-import com.ragagent.common.web.ZeroTimeSerializer;
+import com.ragagent.platform.persistence.DatabaseDialects;
+import com.ragagent.platform.persistence.PageRequests;
+import com.ragagent.platform.web.ZeroTimeSerializer;
 import com.ragagent.memory.domain.MemoryMessageCursor;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.message.MessageImage;
@@ -54,7 +54,7 @@ import com.ragagent.common.session.SessionMessagePort;
 public class MessageRepository implements SessionMessagePort {
 
     /** jsonb 列的类型处理器全限定名（3 参 set 的 mapping 串）。 */
-    private static final String PG_JSON = "com.ragagent.common.web.PgJsonTypeHandler";
+    private static final String PG_JSON = "com.ragagent.platform.persistence.PgJsonTypeHandler";
     private static final String MENTIONED_ITEMS =
             "com.ragagent.session.domain.MentionedItemListTypeHandler";
     private static final String IMAGES = "com.ragagent.session.domain.message.MessageImageListTypeHandler";

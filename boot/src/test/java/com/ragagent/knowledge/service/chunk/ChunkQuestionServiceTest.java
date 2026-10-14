@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.service.chunk;
 
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.time.OffsetDateTime;
@@ -7,7 +8,7 @@ import java.util.UUID;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.TestSchema;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.BizException;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.GeneratedQuestion;
@@ -26,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-import com.ragagent.common.security.SsrfGuard;
+import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.model.domain.ModelParameters;
 
 /**

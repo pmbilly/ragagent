@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.embedding.EmbedderPooler;
 import com.ragagent.embedding.EmbeddingHttp;
-import com.ragagent.common.web.ProviderJson;
+import com.ragagent.platform.web.ProviderJson;
 
 /**
  * Azure OpenAI embedding 客户端。

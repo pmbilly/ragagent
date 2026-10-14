@@ -1,5 +1,6 @@
 package com.ragagent.config;
 
+
 import javax.sql.DataSource;
 
 import org.slf4j.Logger;
@@ -9,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
 import com.ragagent.common.retrieval.RetrievalDriverProperties;
-import com.ragagent.common.security.SsrfGuard;
+import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.retrieval.engine.VectorStoreService;
 import com.ragagent.retrieval.engine.EngineFactory;
 import com.ragagent.retrieval.config.RetrievalEnvLookup;

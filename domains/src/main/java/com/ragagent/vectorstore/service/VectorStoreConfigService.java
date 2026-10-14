@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.security.SsrfGuard;
+import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.common.vectorstore.ConnectionConfig;
 import com.ragagent.vectorstore.domain.EnvVectorStores;
 import com.ragagent.common.vectorstore.IndexConfig;

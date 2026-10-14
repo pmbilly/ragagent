@@ -1,6 +1,7 @@
 package com.ragagent.arch;
 
 
+
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -13,14 +14,14 @@ import java.util.Set;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.ragagent.RagAgentApplication;
-import com.ragagent.common.crypto.CryptoService;
-import com.ragagent.common.security.SsrfGuard;
-import com.ragagent.common.storage.UploadLimits;
+import com.ragagent.platform.security.CryptoService;
+import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.platform.storage.config.UploadLimits;
 import com.ragagent.common.wiki.WikiLanguageSupport;
-import com.ragagent.common.deployment.AppEnvLookup;
+import com.ragagent.platform.config.AppEnvLookup;
 import com.ragagent.retrieval.config.RetrievalEnvLookup;
 import com.ragagent.storage.config.StorageEnvLookup;
-import com.ragagent.common.storage.StorageRuntimeEnv;
+import com.ragagent.platform.storage.config.StorageRuntimeEnv;
 import com.tngtech.archunit.core.domain.Dependency;
 import com.tngtech.archunit.core.domain.JavaAnnotation;
 import com.tngtech.archunit.core.domain.JavaCall;
@@ -304,7 +305,7 @@ class ArchitectureRulesTest {
      * detectPostgres 八处复制清零，相应白名单条目随之摘除）。</p>
      */
     private static final Map<String, String> JDBC_BASELINE = Map.ofEntries(
-            Map.entry("com.ragagent.common.jdbc.DatabaseDialects", "方言探测（收敛点）"),
+            Map.entry("com.ragagent.platform.persistence.DatabaseDialects", "方言探测（收敛点）"),
             Map.entry("com.ragagent.config.StartupTaskRecovery", "启动期任务修复"),
             Map.entry("com.ragagent.agent.skills.SkillCatalogService", "PG 专有 SQL（技能目录）"),
             Map.entry("com.ragagent.agenttools.datasource.AnalysisDuckDbJdbc", "非业务库引擎（DuckDB）"),
@@ -887,6 +888,10 @@ class ArchitectureRulesTest {
      * 边界层名单：边界类由装配层/外部调用；用例层（service）经 repository / 端口使用能力。
      * 注：同包依赖不算跨层（边界类若与用例同类同包，是落点问题、由 Mapper 包约定等规则管）。
      */
+    /** L1 底座顶层包：它们不是业务域/适配包，其内的 `task` 之类段名不算"边界层"。 */
+    private static final Set<String> BASE_TOP_LEVEL = Set.of(
+            "common", "platform", "contract", "event", "tracing", "stream", "config");
+
     private static final List<String> SERVICE_FORBIDDEN_BOUNDARY =
             List.of("controller", "mapper", "task", "client", "channel");
 
@@ -912,8 +917,15 @@ class ArchitectureRulesTest {
                 if (target.equals(clazz.getPackageName())) {
                     continue;
                 }
-                boolean hit = SERVICE_FORBIDDEN_BOUNDARY.stream()
-                        .anyMatch(component -> packageHasComponent(target, component));
+                // 边界层匹配：排除 L1 底座（platform/common/contract/event/tracing/stream/config）后，
+                // 任意 `com.ragagent.<段>.<边界层>` 都算 —— 既覆盖各业务域，也覆盖 agentmanagement/
+                // agenttools 这类适配包；裸段名匹配会把底座面 `platform.task` 误判成边界层（B268② 实测假阳性）。
+                String rest = target.startsWith("com.ragagent.")
+                        ? target.substring("com.ragagent.".length()) : "";
+                String head = rest.isEmpty() ? "" : rest.split("\\.", 2)[0];
+                boolean hit = !rest.isEmpty() && !BASE_TOP_LEVEL.contains(head)
+                        && SERVICE_FORBIDDEN_BOUNDARY.stream()
+                                .anyMatch(component -> packageHasComponent(rest, component));
                 if (hit) {
                     actual.add(topLevel(clazz).getName());
                     break;

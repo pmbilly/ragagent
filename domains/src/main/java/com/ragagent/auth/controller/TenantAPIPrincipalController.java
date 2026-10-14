@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.common.web.ApiResult;
+import com.ragagent.platform.web.ApiResult;
 
 /**
  * api-principal 三条路由（Owner+）：

@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.tenant.StorageEngineConfig;
-import com.ragagent.common.storage.StorageRuntimeEnv;
+import com.ragagent.platform.storage.config.StorageRuntimeEnv;
 import com.ragagent.storage.provider.FileServiceFactory;
 
 /**

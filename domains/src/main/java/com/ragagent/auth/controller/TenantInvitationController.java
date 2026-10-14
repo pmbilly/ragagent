@@ -1,6 +1,6 @@
 package com.ragagent.auth.controller;
 
-import com.ragagent.common.web.RequestFields;
+import com.ragagent.platform.web.RequestFields;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -18,7 +18,7 @@ import com.ragagent.auth.service.TenantInvitationService;
 import com.ragagent.auth.service.TenantRbacException;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.auth.service.UserService;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,8 +31,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.ragagent.contract.error.ErrorCode;
-import com.ragagent.common.web.ApiResult;
-import com.ragagent.common.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
+import com.ragagent.platform.web.ApiResponse;
 
 /**
  * 邀请相关的 9 条路由：租户侧 GET/POST /tenants/{id}/invitations、

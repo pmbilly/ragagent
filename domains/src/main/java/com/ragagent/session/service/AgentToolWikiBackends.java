@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agenttools.wiki.IndexEntryView;
 import com.ragagent.agenttools.wiki.IndexGroupView;
 import com.ragagent.agenttools.wiki.RepairResult;
-import com.ragagent.common.web.ZeroTimeSerializer;
+import com.ragagent.platform.web.ZeroTimeSerializer;
 import com.ragagent.wiki.domain.index.WikiIndexEntry;
 import com.ragagent.wiki.domain.page.WikiPageNotFoundException;
 import com.ragagent.agenttools.wiki.IndexOverviewView;

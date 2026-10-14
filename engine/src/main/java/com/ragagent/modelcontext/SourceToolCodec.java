@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ToolCall;
 
-import com.ragagent.common.web.ToolJson;
+import com.ragagent.platform.web.ToolJson;
 import com.ragagent.llm.domain.MessageContentPart;
 
 /**

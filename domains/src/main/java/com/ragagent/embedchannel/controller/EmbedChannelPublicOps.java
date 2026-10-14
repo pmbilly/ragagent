@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.ragagent.common.security.LogSanitizer;
+import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.embedchannel.EmbedTokens;
 import com.ragagent.embedchannel.EmbedError;
 import com.ragagent.embedchannel.domain.EmbedChannelEntity;

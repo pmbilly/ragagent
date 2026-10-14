@@ -1,5 +1,7 @@
 package com.ragagent.websearch.service;
 
+import com.ragagent.common.tenant.WebSearchConfig;
+
 import com.ragagent.websearch.provider.WebSearchProvider;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

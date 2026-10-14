@@ -15,7 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.ragagent.common.security.SsrfGuard;
+import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.retrieval.engine.EngineFactory.EngineNotSupportedException;
 import com.ragagent.retrieval.engine.sqlite.SqliteRetrieveRepository;
 import com.ragagent.common.vectorstore.ConnectionConfig;

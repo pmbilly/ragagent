@@ -10,7 +10,7 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
-import com.ragagent.common.web.ZeroTimeSerializer;
+import com.ragagent.platform.web.ZeroTimeSerializer;
 
 /**
  * agents CRUD 家族的响应构造（JSON 是契约）。

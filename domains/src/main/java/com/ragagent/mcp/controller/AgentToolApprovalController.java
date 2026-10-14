@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.approval.ApprovalException;
 import com.ragagent.approval.Decision;
 import com.ragagent.approval.Gate;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.BizException;
 import com.ragagent.mcp.domain.McpPrincipal;
 import com.ragagent.mcp.dto.ResolveToolApprovalRequest;
@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.common.web.ApiResponse;
-import com.ragagent.common.web.ApiResult;
+import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
 
 /**
  * 处理待审批的 MCP 工具调用。

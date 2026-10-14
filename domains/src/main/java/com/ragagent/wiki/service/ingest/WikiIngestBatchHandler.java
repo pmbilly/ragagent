@@ -30,7 +30,7 @@ import com.ragagent.common.wiki.SlugUpdate;
 import com.ragagent.wiki.service.WikiModelResolver;
 import com.ragagent.wiki.service.page.WikiPageService;
 import com.ragagent.wiki.service.page.WikiTextUtils;
-import com.ragagent.common.context.TenantScopes;
+import com.ragagent.platform.access.TenantScopes;
 
 /**
  * wiki 生成管线的批次执行体：Map（逐文档抽取/摘要/引用）→ Reduce（逐 slug 落页）→

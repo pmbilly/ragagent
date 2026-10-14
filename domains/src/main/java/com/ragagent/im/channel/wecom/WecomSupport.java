@@ -17,7 +17,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import com.ragagent.common.security.SsrfGuard;
+import com.ragagent.platform.security.SsrfGuard;
 
 /**
  * 企业微信两个模式的公共件（webhook 与长连接共用）：端点校验、下载、

@@ -1,6 +1,6 @@
 package com.ragagent.mcp.protocol;
 
-import com.ragagent.common.security.LogSanitizer;
+import com.ragagent.platform.security.LogSanitizer;
 
 /**
  * MCP 日志辅助。

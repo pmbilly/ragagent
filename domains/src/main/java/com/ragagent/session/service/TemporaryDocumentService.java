@@ -2,7 +2,7 @@ package com.ragagent.session.service;
 
 import com.ragagent.common.web.JsonMappers;
 import java.time.OffsetDateTime;
-import com.ragagent.common.deployment.AppEnvLookup;
+import com.ragagent.platform.config.AppEnvLookup;
 import java.time.ZoneId;
 import java.util.LinkedHashMap;
 import java.util.List;

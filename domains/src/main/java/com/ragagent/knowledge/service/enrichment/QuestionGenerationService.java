@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
@@ -28,7 +28,7 @@ import com.ragagent.knowledge.repository.ChunkRepository;
 
 import com.ragagent.knowledge.domain.QuestionBatchPayload;
 import com.ragagent.common.wiki.WikiFinalizePort;
-import com.ragagent.common.context.TenantScopes;
+import com.ragagent.platform.access.TenantScopes;
 
 /**
  * 问题生成**批** worker。

@@ -1,7 +1,7 @@
 package com.ragagent.agenttools.web;
 
-import com.ragagent.common.web.RequestFields;
-import com.ragagent.common.web.ToolJson;
+import com.ragagent.platform.web.RequestFields;
+import com.ragagent.platform.web.ToolJson;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;

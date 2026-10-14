@@ -8,8 +8,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonRawValue;
-import com.ragagent.common.web.NaiveOffsetDateTimeTypeHandler;
-import com.ragagent.common.web.PgJsonTypeHandler;
+import com.ragagent.platform.persistence.NaiveOffsetDateTimeTypeHandler;
+import com.ragagent.platform.persistence.PgJsonTypeHandler;
 
 /**
  * 会话附件（临时文档）。

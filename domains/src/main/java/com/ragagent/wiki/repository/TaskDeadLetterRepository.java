@@ -5,7 +5,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.ragagent.common.mybatis.PageRequests;
+import com.ragagent.platform.persistence.PageRequests;
 import com.ragagent.wiki.domain.TaskDeadLetter;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;

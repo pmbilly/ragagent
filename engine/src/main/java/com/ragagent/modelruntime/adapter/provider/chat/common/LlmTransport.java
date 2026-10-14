@@ -1,7 +1,7 @@
 package com.ragagent.modelruntime.adapter.provider.chat.common;
 
 import java.io.IOException;
-import com.ragagent.common.deployment.AppEnvLookup;
+import com.ragagent.platform.config.AppEnvLookup;
 import java.io.InputStream;
 import java.net.ProxySelector;
 import java.net.URI;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
-import com.ragagent.common.security.SsrfGuard;
+import com.ragagent.platform.security.SsrfGuard;
 
 /**
  * LLM 裸 HTTP 调用的共享传输层。

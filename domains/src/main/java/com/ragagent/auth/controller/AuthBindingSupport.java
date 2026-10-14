@@ -1,6 +1,6 @@
 package com.ragagent.auth.controller;
 
-import com.ragagent.common.web.RequestFields;
+import com.ragagent.platform.web.RequestFields;
 import java.util.List;
 
 import com.ragagent.tenant.repository.Tenant;

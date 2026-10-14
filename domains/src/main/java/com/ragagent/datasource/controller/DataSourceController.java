@@ -9,7 +9,7 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.security.TenantAPIKeyScope;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.datasource.domain.connector.ConnectorCatalog;
 import com.ragagent.datasource.domain.connector.ConnectorMetadata;
 import com.ragagent.datasource.domain.DataSource;
@@ -30,8 +30,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ragagent.datasource.service.KnowledgeBridge;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.web.ApiResponse;
-import com.ragagent.common.web.ApiResult;
+import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
 
 /**
  * 数据源管理端点。

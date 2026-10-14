@@ -16,7 +16,7 @@ import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.common.web.JsonMappers;
-import com.ragagent.common.web.ToolJson;
+import com.ragagent.platform.web.ToolJson;
 import com.ragagent.llm.domain.ChatResponse;
 
 /**

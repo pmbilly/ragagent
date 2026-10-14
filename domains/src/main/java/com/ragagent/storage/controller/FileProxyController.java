@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.tenant.repository.TenantLookup;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.storage.fileserve.FileProxyService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import com.ragagent.common.web.ApiResult;
+import com.ragagent.platform.web.ApiResult;
 
 /**
  * 文件代理面的引擎级路由。

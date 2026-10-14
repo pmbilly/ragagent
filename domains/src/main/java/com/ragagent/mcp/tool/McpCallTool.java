@@ -10,7 +10,7 @@ import com.ragagent.agent.tool.BaseTool;
 import com.ragagent.agent.tool.ToolRegistry;
 import com.ragagent.agent.tool.ToolRequest;
 import com.ragagent.agent.tool.AgentTool;
-import com.ragagent.common.web.ToolJson;
+import com.ragagent.platform.web.ToolJson;
 
 /**
  * call_mcp_tool：解析目录引用并调用其 MCP 目标。Parameters 只广告完整定义已在

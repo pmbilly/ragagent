@@ -13,7 +13,7 @@ import com.ragagent.tenant.RetrievalConfig;
 import com.ragagent.tenant.StorageEngineConfig;
 import com.ragagent.tenant.repository.TenantConfigRedaction;
 import com.ragagent.common.tenant.WebSearchConfig;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.common.memory.MemoryConfig;
@@ -21,7 +21,7 @@ import com.ragagent.common.tenant.TenantRole;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import com.ragagent.common.prompt.PromptTemplateCatalog;
+import com.ragagent.platform.prompt.PromptTemplateCatalog;
 import com.ragagent.common.wiki.WikiLanguageSupport;
 
 /**

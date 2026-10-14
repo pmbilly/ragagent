@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.web.PgJsonTypeHandler;
+import com.ragagent.platform.persistence.PgJsonTypeHandler;
 
 /**
  * {@code task_pending_ops} 表实体（表结构以

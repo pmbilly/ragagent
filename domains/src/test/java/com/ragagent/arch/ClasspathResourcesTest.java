@@ -1,5 +1,6 @@
 package com.ragagent.arch;
 
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.InputStream;

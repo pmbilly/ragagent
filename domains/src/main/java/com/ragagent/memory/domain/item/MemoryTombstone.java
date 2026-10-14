@@ -5,7 +5,7 @@ import java.time.OffsetDateTime;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.ragagent.common.web.ZeroTimeSerializer;
+import com.ragagent.platform.web.ZeroTimeSerializer;
 
 /**
  * 一条被**刻意忘掉**的陈述的记录，免得后台蒸馏下次读到那条消息时又悄悄把它加回来。

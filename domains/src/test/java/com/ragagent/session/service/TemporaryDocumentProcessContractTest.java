@@ -22,7 +22,7 @@ import org.mockito.ArgumentCaptor;
 import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
 import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.auth.service.TenantService;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.knowledge.client.DocReaderClient;
 import com.ragagent.model.domain.Model;
 import com.ragagent.model.domain.ModelParameters;

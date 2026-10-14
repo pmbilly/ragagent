@@ -1,6 +1,6 @@
 package com.ragagent.modelcontext;
 
-import com.ragagent.common.web.HtmlText;
+import com.ragagent.platform.text.HtmlText;
 
 /**
  * HTML 实体转义/反转义两个函数（本包引用的全部面）。

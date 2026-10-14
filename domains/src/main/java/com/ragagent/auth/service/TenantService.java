@@ -1,6 +1,6 @@
 package com.ragagent.auth.service;
 
-import com.ragagent.common.mybatis.LikeEscapes;
+import com.ragagent.platform.persistence.LikeEscapes;
 
 import com.ragagent.common.web.JsonMappers;
 import java.time.OffsetDateTime;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.ragagent.common.mybatis.PageRequests;
+import com.ragagent.platform.persistence.PageRequests;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.tenant.repository.Tenant;

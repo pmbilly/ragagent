@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.security.LogSanitizer;
+import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.message.MessageNotFoundException;
 import com.ragagent.session.domain.message.MessageSearchResult;
@@ -33,11 +33,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.ragagent.auth.service.TenantService;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.session.domain.ChatHistoryKbStats;
 import com.ragagent.tenant.repository.Tenant;
-import com.ragagent.common.web.ApiResult;
-import com.ragagent.common.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
+import com.ragagent.platform.web.ApiResponse;
 
 /**
  * 消息 HTTP 层。

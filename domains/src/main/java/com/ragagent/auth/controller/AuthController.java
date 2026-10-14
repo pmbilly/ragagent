@@ -46,9 +46,9 @@ import com.ragagent.auth.service.TenantService;
 import com.ragagent.auth.service.UserService;
 import com.ragagent.auth.service.ValidatedToken;
 import com.ragagent.auth.service.TokenValidationException;
-import com.ragagent.common.context.TenantContext;
-import com.ragagent.common.web.NonNullBody;
-import com.ragagent.common.web.RejectEmptyBody;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.web.NonNullBody;
+import com.ragagent.platform.web.RejectEmptyBody;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.common.tenant.TenantProperties;
@@ -68,8 +68,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.common.web.ApiResult;
-import com.ragagent.common.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
+import com.ragagent.platform.web.ApiResponse;
 
 /**
  * 认证端点（登录 / 注册 / 会话 / OIDC）。

@@ -3,7 +3,7 @@ package com.ragagent.datasource.mapper;
 import java.time.OffsetDateTime;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ragagent.common.web.PgJsonTypeHandler;
+import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import com.ragagent.datasource.domain.DataSource;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

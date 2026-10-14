@@ -1,5 +1,6 @@
 package com.ragagent.session.controller;
 
+
 import com.ragagent.session.support.LogSanitizer;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -22,7 +23,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 import com.ragagent.common.security.APIKeyScopeContext;
 import com.ragagent.common.security.TenantAPIKeyScope;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.BizException;
 import com.ragagent.common.llm.ResponseType;
 import com.ragagent.session.domain.message.Message;

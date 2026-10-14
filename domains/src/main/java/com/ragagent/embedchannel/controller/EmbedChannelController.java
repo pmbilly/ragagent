@@ -8,9 +8,9 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.error.PlainErrorException;
+import com.ragagent.platform.web.error.PlainErrorException;
 import com.ragagent.embedchannel.EmbedError;
 import com.ragagent.embedchannel.EmbedTokens;
 import com.ragagent.embedchannel.domain.EmbedChannelEntity;
@@ -41,8 +41,8 @@ import com.ragagent.session.controller.KnowledgeQaController;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.dto.StopSessionRequest;
 import com.ragagent.storage.fileserve.FileProxyService;
-import com.ragagent.common.web.ApiResponse;
-import com.ragagent.common.web.ApiResult;
+import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
 import com.ragagent.common.error.AppError;
 
 /**

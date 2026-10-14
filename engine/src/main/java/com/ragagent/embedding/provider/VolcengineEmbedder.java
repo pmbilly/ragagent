@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.embedding.EmbedderPooler;
 import com.ragagent.embedding.EmbeddingHttp;
-import com.ragagent.common.web.ProviderJson;
+import com.ragagent.platform.web.ProviderJson;
 
 /**
  * 火山引擎 Ark 多模态 embedding 客户端。

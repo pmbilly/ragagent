@@ -11,7 +11,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.web.ZeroTimeSerializer;
+import com.ragagent.platform.web.ZeroTimeSerializer;
 import com.ragagent.datasource.domain.connector.ConnectorException;
 import com.ragagent.datasource.domain.connector.ConnectorHttp;
 import com.ragagent.datasource.domain.DataSourceConfig;

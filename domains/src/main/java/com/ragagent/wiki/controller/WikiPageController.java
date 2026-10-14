@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.common.web.ApiResult;
+import com.ragagent.platform.web.ApiResult;
 import com.ragagent.common.error.AppError;
-import com.ragagent.common.web.ApiResponse;
+import com.ragagent.platform.web.ApiResponse;
 
 /**
  * Wiki 页面的 HTTP 层。

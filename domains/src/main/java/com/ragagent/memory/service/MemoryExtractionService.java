@@ -12,7 +12,7 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.web.ZeroTimeSerializer;
+import com.ragagent.platform.web.ZeroTimeSerializer;
 import com.ragagent.common.memory.MemoryConfig;
 import com.ragagent.memory.domain.MemoryExtractionBatch;
 import com.ragagent.memory.domain.MemoryExtractionFailure;
@@ -34,7 +34,7 @@ import com.ragagent.common.session.SessionMessagePort;
 import com.ragagent.common.memory.MemoryKeys;
 import com.ragagent.memory.domain.MemoryConflictException;
 import com.ragagent.platform.tracing.langfuse.LangfuseTracing;
-import com.ragagent.common.context.TenantScopes;
+import com.ragagent.platform.access.TenantScopes;
 
 /**
  * 后台蒸馏：把一段对话变成记忆。

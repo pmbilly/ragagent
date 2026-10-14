@@ -1,6 +1,6 @@
 package com.ragagent.session.service;
 
-import com.ragagent.common.prompt.PromptSource;
+import com.ragagent.platform.prompt.PromptSource;
 import com.ragagent.common.web.JsonMappers;
 import java.io.InputStream;
 import java.util.ArrayList;

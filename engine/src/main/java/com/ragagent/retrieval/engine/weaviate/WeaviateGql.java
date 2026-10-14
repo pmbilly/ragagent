@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.common.web.ToolJson;
+import com.ragagent.platform.web.ToolJson;
 import com.ragagent.retrieval.engine.weaviate.WeaviateRestClient.Json;
 
 /**

@@ -9,7 +9,7 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
-import com.ragagent.common.web.PgJsonTypeHandler;
+import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import com.ragagent.session.domain.conversation.SessionListItem;
 import com.ragagent.session.domain.conversation.SessionListQuery;
 
@@ -69,7 +69,7 @@ public interface SessionMapper extends BaseMapper<Session> {
      */
     @Update("<script>"
             + "UPDATE sessions SET "
-            + "agent_config = #{state, typeHandler=com.ragagent.common.web.PgJsonTypeHandler, "
+            + "agent_config = #{state, typeHandler=com.ragagent.platform.persistence.PgJsonTypeHandler, "
             + "jdbcType=OTHER}, "
             + "updated_at = #{updatedAt} "
             + "WHERE tenant_id = #{tenantId} AND id = #{id} AND deleted_at IS NULL "

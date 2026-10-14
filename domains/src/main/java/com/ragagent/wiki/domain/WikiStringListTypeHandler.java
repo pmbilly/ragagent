@@ -17,7 +17,7 @@ import org.apache.ibatis.type.JdbcType;
  * wiki 各表的 {@code jsonb} 字符串数组列（category_path / source_refs / chunk_refs /
  * in_links / out_links / aliases / suspected_knowledge_ids）的 TypeHandler。
  *
- * <p><b>为什么不用通用 {@link com.ragagent.common.web.PgJsonTypeHandler}</b>：
+ * <p><b>为什么不用通用 {@link com.ragagent.platform.persistence.PgJsonTypeHandler}</b>：
  * {@code List<String>} 走泛型擦除后是 {@code List.class}，Jackson 会反序列化成
  * {@code List<LinkedHashMap>} / {@code List<Object>}，元素类型丢失。</p>
  *

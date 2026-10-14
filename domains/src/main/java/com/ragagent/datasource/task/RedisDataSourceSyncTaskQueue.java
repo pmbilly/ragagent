@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
-import com.ragagent.common.taskqueue.RedisTaskQueueCore;
+import com.ragagent.platform.task.RedisTaskQueueCore;
 import com.ragagent.datasource.domain.DataSourceSyncPayload;
 import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
 

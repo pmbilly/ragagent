@@ -2,7 +2,7 @@ package com.ragagent.memory.domain;
 
 import java.time.OffsetDateTime;
 
-import com.ragagent.common.web.ZeroTimeSerializer;
+import com.ragagent.platform.web.ZeroTimeSerializer;
 
 /**
  * 这个人反复从中取材的文档。

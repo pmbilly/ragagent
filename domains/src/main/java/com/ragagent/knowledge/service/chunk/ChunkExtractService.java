@@ -17,7 +17,7 @@ import com.ragagent.llm.extract.EntityExtraction;
 import com.ragagent.llm.extract.PipelineConfig;
 import com.ragagent.retrieval.graph.RetrieveGraphRepository;
 import com.ragagent.retrieval.telemetry.RetrievalObs;
-import com.ragagent.common.prompt.PromptInstructions;
+import com.ragagent.platform.prompt.PromptInstructions;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
@@ -37,7 +37,7 @@ import com.ragagent.common.graph.GraphNode;
 import com.ragagent.common.graph.GraphRelation;
 import com.ragagent.common.graph.NameSpace;
 import com.ragagent.common.wiki.WikiFinalizePort;
-import com.ragagent.common.context.TenantScopes;
+import com.ragagent.platform.access.TenantScopes;
 
 /**
  * 分块图抽取任务：

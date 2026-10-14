@@ -62,7 +62,7 @@
   `auth/apikey/filter/APIKeyAuthChannel.java` 的 `X-Tenant-ID` 校验（400/403 手写）——都在 **DispatcherServlet 之前**写出，
   形态保持旧样（`{"error":"…"}`）；对应金片（`x-tenant-id-forbidden-403` / `w5c-files-key-*` 等）**有意保持旧形态** ✓。
   ⚠️ 注意区分：**RBAC 拦截器**（`RbacInterceptor`）在 handler 之后，能拿到路由打标 ⇒ 输出**新外壳** ✓（B201 里 converge 自纠过一个误判 ✓）。
-- **基础设施探针 `GET /health`**（`common/web/HealthController`）：k8s/docker healthcheck 与外部监控依赖
+- **基础设施探针 `GET /health`**（`platform/web/health/HealthController`）：k8s/docker healthcheck 与外部监控依赖
   `{"status":"ok"}` ⇒ **保持原样，不进外壳** ✗（B200 撤回了注解 ✓）。
 - **AuthFilter 的 401/403**：在 DispatcherServlet 之前写出，不进 advice（B189 ✓ 已实测：金片保持原样也匹配 ✓）。
 

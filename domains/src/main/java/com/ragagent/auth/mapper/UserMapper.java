@@ -18,7 +18,7 @@ public interface UserMapper extends BaseMapper<User> {
                     + " can_access_all_tenants, is_system_admin, preferences, created_at, updated_at)"
                     + " VALUES (#{id}, #{username}, #{email}, #{passwordHash}, #{avatar}, #{isActive},"
                     + " #{canAccessAllTenants}, #{isSystemAdmin},"
-                    + " #{preferences, typeHandler=com.ragagent.common.web.PgJsonTypeHandler},"
+                    + " #{preferences, typeHandler=com.ragagent.platform.persistence.PgJsonTypeHandler},"
                     + " #{createdAt}, #{updatedAt})")
     int insertTenantless(User user);
 }

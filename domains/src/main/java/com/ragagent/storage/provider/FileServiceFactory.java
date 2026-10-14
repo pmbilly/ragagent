@@ -7,7 +7,7 @@ import java.util.Set;
 
 import com.ragagent.tenant.StorageEngineConfig;
 import com.ragagent.storage.fileserve.StoragePaths;
-import com.ragagent.common.security.SsrfGuard;
+import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.storage.config.StorageEnvLookup;
 
 /**

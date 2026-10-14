@@ -1,7 +1,7 @@
 package com.ragagent.session.qa;
 
 import com.ragagent.common.web.JsonMappers;
-import com.ragagent.common.web.RequestFields;
+import com.ragagent.platform.web.RequestFields;
 import java.util.ArrayList;
 import java.util.List;
 import com.ragagent.common.error.BizException;

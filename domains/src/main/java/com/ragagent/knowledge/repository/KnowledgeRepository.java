@@ -1,13 +1,13 @@
 package com.ragagent.knowledge.repository;
 
-import com.ragagent.common.mybatis.LikeEscapes;
+import com.ragagent.platform.persistence.LikeEscapes;
 
 import java.util.Set;
 import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.List;
 import com.ragagent.knowledge.domain.KnowledgeSearchScope;
-import com.ragagent.common.mybatis.PageRequests;
+import com.ragagent.platform.persistence.PageRequests;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 
@@ -86,7 +86,7 @@ public class KnowledgeRepository {
                 .set(Knowledge::getMetadata, k.getMetadata() == null
                                 ? JsonNodeFactory.instance.objectNode()
                                 : k.getMetadata(),
-                        "typeHandler=com.ragagent.common.web.PgJsonTypeHandler")
+                        "typeHandler=com.ragagent.platform.persistence.PgJsonTypeHandler")
                 .set(Knowledge::getUpdatedAt, k.getUpdatedAt() == null ? OffsetDateTime.now(ZoneOffset.UTC) : k.getUpdatedAt()));
     }
 
@@ -108,7 +108,7 @@ public class KnowledgeRepository {
                 .set(Knowledge::getFileHash, k.getFileHash())
                 .set(Knowledge::getFilePath, k.getFilePath())
                 .set(Knowledge::getMetadata, metadata,
-                        "typeHandler=com.ragagent.common.web.PgJsonTypeHandler")
+                        "typeHandler=com.ragagent.platform.persistence.PgJsonTypeHandler")
                 .set(Knowledge::getUpdatedAt, k.getUpdatedAt())
                 .set(Knowledge::getProcessedAt, k.getProcessedAt())
                 .set(Knowledge::getErrorMessage, k.getErrorMessage()));

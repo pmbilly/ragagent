@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.function.BiPredicate;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.web.ZeroTimeSerializer;
+import com.ragagent.platform.web.ZeroTimeSerializer;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;

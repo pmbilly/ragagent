@@ -2,7 +2,7 @@ package com.ragagent.websearch.provider;
 
 import java.net.URI;
 
-import com.ragagent.common.security.SsrfGuard;
+import com.ragagent.platform.security.SsrfGuard;
 
 /**
  * SearxngBaseURL 的共享校验（服务层参数

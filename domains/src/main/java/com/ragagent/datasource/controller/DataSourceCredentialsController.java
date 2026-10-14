@@ -1,13 +1,13 @@
 package com.ragagent.datasource.controller;
 
 import com.ragagent.common.web.JsonMappers;
-import com.ragagent.common.web.RequestFields;
+import com.ragagent.platform.web.RequestFields;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.datasource.domain.DataSource;
@@ -24,8 +24,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.common.web.ApiResponse;
-import com.ragagent.common.web.ApiResult;
+import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
 
 /**
  * 数据源的凭据子资源（{@code PUT /datasource/:id/credentials} 与

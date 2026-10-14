@@ -5,8 +5,8 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.error.PlainErrorException;
-import com.ragagent.common.security.LogSanitizer;
+import com.ragagent.platform.web.error.PlainErrorException;
+import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 import com.ragagent.mcp.controller.McpOAuthController;
 import com.ragagent.mcp.dto.ResolveToolApprovalRequest;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.dto.StopSessionRequest;
-import com.ragagent.common.web.ApiResponse;
+import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.common.error.AppError;
 
 /**

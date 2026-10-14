@@ -1,7 +1,7 @@
 package com.ragagent.model.service;
 
 import java.nio.file.Files;
-import com.ragagent.common.deployment.AppEnvLookup;
+import com.ragagent.platform.config.AppEnvLookup;
 import java.nio.file.Path;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;

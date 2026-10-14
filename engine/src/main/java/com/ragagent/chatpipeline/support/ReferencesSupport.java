@@ -8,7 +8,7 @@ import java.util.Map;
 import com.ragagent.chatpipeline.ChatManage;
 import com.ragagent.chatpipeline.PipelineCommon;
 import com.ragagent.common.llm.ToolResult;
-import com.ragagent.common.prompt.PromptComposer;
+import com.ragagent.platform.prompt.PromptComposer;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.modelcontext.Registry;

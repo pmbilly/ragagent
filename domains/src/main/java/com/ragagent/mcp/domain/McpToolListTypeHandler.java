@@ -15,7 +15,7 @@ import org.apache.ibatis.type.JdbcType;
 /**
  * mcp_metadata.tools（jsonb，NOT NULL）的 TypeHandler。
  *
- * <p>为什么不用通用 {@link com.ragagent.common.web.PgJsonTypeHandler}：
+ * <p>为什么不用通用 {@link com.ragagent.platform.persistence.PgJsonTypeHandler}：
  * {@code List<McpTool>} 走泛型会退化成 {@code List<LinkedHashMap>}，元素类型丢失。</p>
  *
  * <p>⚠️ 落库键名＝{@link McpTool} 的 Java 属性名（{@code requireApproval} 驼峰）。

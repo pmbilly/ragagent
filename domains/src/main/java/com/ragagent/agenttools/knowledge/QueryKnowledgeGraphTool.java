@@ -1,5 +1,7 @@
 package com.ragagent.agenttools.knowledge;
 
+import com.ragagent.common.knowledge.KnowledgeBaseView;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;

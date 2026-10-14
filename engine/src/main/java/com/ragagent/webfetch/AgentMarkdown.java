@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import com.ragagent.common.web.HtmlToMarkdown;
-import com.ragagent.common.web.JdkHtmlToMarkdown;
+import com.ragagent.platform.text.HtmlToMarkdown;
+import com.ragagent.platform.text.JdkHtmlToMarkdown;
 
 /**
  * agent 用 HTML → Markdown 抽取。

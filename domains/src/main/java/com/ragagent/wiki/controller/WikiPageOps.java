@@ -38,7 +38,7 @@ import static com.ragagent.wiki.controller.WikiRequestSupport.q;
 import static com.ragagent.wiki.controller.WikiRequestSupport.query;
 import static com.ragagent.wiki.controller.WikiRequestSupport.requiredFieldErrors;
 import static com.ragagent.wiki.controller.WikiRequestSupport.trimSpace;
-import com.ragagent.common.web.ApiResponse;
+import com.ragagent.platform.web.ApiResponse;
 
 /**
  * 页面资源端点的执行体：CRUD、修订历史、回滚。KB 访问守卫与活动记账由

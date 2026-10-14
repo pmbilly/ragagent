@@ -12,10 +12,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.auth.service.TenantService;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.security.SsrfGuard;
+import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.knowledge.client.DocReaderClient;
 import com.ragagent.system.dto.SystemDtos;
 import com.ragagent.system.service.ParserEngineRegistry;
@@ -31,7 +31,7 @@ import com.ragagent.knowledge.config.DocReaderProperties;
 import com.ragagent.storage.domain.StorageBackend;
 import com.ragagent.storage.service.StorageBackendService;
 import com.ragagent.system.service.DeploymentCapabilitiesHolder;
-import com.ragagent.common.web.ApiResult;
+import com.ragagent.platform.web.ApiResult;
 
 /**
  * /api/v1/system 组：读端（capabilities/info/parser-engines/storage-engine-status）Viewer+；

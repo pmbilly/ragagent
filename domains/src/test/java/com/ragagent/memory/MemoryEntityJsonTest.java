@@ -24,7 +24,7 @@ import com.ragagent.memory.domain.scope.MemorySubject;
 import com.ragagent.memory.domain.item.MemoryTombstone;
 import com.ragagent.memory.domain.MemoryTopicStat;
 import org.junit.jupiter.api.Test;
-import com.ragagent.common.web.ZeroTimeSerializer;
+import com.ragagent.platform.web.ZeroTimeSerializer;
 import com.ragagent.support.ContractJson;
 
 /**

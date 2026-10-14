@@ -2,7 +2,7 @@ package com.ragagent.session.domain.conversation;
 
 import com.ragagent.common.security.APIKeyScopeContext;
 import com.ragagent.common.security.TenantAPIKeyScope;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 
 /**
  * {@code sessions.user_id} 的取值规则。

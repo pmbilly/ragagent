@@ -57,7 +57,7 @@ import org.springframework.stereotype.Service;
  *
  * <h3>上下文</h3>
  * <p>编辑来源与用户身份由 {@link WikiEditContext} +
- * {@link com.ragagent.common.context.TenantContext} 承担，service 签名不带额外的来源参数。</p>
+ * {@link com.ragagent.platform.access.TenantContext} 承担，service 签名不带额外的来源参数。</p>
  */
 @Service
 public class WikiPageServiceImpl implements WikiPageService {

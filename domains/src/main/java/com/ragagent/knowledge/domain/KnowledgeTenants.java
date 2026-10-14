@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.domain;
 
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 
 /**
  * 知识域的租户取值助手：调用线程无租户时退化为 {@code 0}（与原 {@code service.KnowledgeService#tenantId}

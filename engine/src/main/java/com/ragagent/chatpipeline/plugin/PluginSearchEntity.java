@@ -20,7 +20,7 @@ import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.common.graph.GraphRelation;
 import com.ragagent.retrieval.graph.RetrieveGraphRepository;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 
 /**
  * ENTITY_SEARCH 阶段插件：

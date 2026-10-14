@@ -1,6 +1,6 @@
 package com.ragagent.audit.service;
 
-import com.ragagent.common.web.RbacInterceptor;
+import com.ragagent.platform.web.RbacInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;

@@ -1,6 +1,6 @@
 package com.ragagent.agent.prompt;
 
-import com.ragagent.common.prompt.PromptSource;
+import com.ragagent.platform.prompt.PromptSource;
 import com.ragagent.common.web.JsonMappers;
 import java.util.List;
 

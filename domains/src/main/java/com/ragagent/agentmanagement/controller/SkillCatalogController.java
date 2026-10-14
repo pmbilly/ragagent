@@ -24,11 +24,11 @@ import com.ragagent.agent.skills.SkillCatalogService;
 import com.ragagent.audit.domain.AuditAction;
 import com.ragagent.audit.domain.AuditOutcome;
 import com.ragagent.common.audit.AuditWritePort;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.web.ApiResponse;
-import com.ragagent.common.web.ApiResult;
+import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
 
 /**
  * 技能管理（**空间级**，租户 admin）：查看 / 新建 / 编辑 / 删除。

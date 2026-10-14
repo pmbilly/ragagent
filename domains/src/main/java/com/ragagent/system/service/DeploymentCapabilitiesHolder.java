@@ -3,7 +3,7 @@ package com.ragagent.system.service;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.ragagent.common.deployment.DeploymentProperties;
+import com.ragagent.platform.config.DeploymentProperties;
 import com.ragagent.system.dto.SystemDtos;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;

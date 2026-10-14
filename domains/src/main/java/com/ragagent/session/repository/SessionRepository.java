@@ -1,6 +1,6 @@
 package com.ragagent.session.repository;
 
-import com.ragagent.common.mybatis.LikeEscapes;
+import com.ragagent.platform.persistence.LikeEscapes;
 
 import com.ragagent.session.mapper.SessionMapper;
 import java.time.OffsetDateTime;
@@ -12,8 +12,8 @@ import javax.sql.DataSource;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.ragagent.common.jdbc.DatabaseDialects;
-import com.ragagent.common.mybatis.PageRequests;
+import com.ragagent.platform.persistence.DatabaseDialects;
+import com.ragagent.platform.persistence.PageRequests;
 import com.ragagent.session.domain.conversation.EmbedVisitorSessionRow;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.domain.conversation.SessionLastRequestState;

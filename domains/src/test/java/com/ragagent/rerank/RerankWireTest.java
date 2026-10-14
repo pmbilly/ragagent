@@ -14,7 +14,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.security.SsrfGuard;
+import com.ragagent.platform.security.SsrfGuard;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import com.ragagent.model.service.ModelRuntimeConfigs;
@@ -25,7 +25,7 @@ import com.ragagent.rerank.provider.NvidiaReranker;
 import com.ragagent.rerank.provider.OpenAiReranker;
 import com.ragagent.rerank.provider.VolcengineReranker;
 import com.ragagent.rerank.provider.ZhipuReranker;
-import com.ragagent.common.web.ProviderJson;
+import com.ragagent.platform.web.ProviderJson;
 import com.ragagent.model.domain.Model;
 import com.ragagent.model.domain.ModelParameters;
 

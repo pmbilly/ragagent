@@ -21,7 +21,7 @@ import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.agentmanagement.dto.CustomAgentResult;
 import com.ragagent.agentmanagement.mapper.AgentQuestionMapper;
 import com.ragagent.agentmanagement.mapper.CustomAgentMapper;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.common.knowledge.KnowledgeBaseCatalogPort;

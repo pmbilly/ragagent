@@ -20,7 +20,7 @@ import com.ragagent.storage.fileserve.FileAccessResolver.MessageFileLookup;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import com.ragagent.session.service.MessageService;
-import com.ragagent.common.web.ApiResult;
+import com.ragagent.platform.web.ApiResult;
 
 /**
  * 消息作用域的资源代理。

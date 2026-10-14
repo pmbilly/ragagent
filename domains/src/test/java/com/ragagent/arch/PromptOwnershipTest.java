@@ -1,5 +1,6 @@
 package com.ragagent.arch;
 
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
@@ -16,11 +17,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * 提示词单源守门（F 波，配套 {@code common.prompt.PromptSource}）：
+ * 提示词单源守门（F 波，配套 {@code platform.prompt.PromptSource}）：
  *
  * <ol>
  *   <li><b>A1 归属</b>：11 个模板文件名的字符串字面量只允许出现在
- *       {@code common/prompt}（唯一权威包）——别的域再写一份就是"第二份清单"回潮；</li>
+ *       {@code platform/prompt}（唯一权威包）——别的域再写一份就是"第二份清单"回潮；</li>
  *   <li><b>A2 残迹</b>：已废弃的旧模板目录 {@code agent/management/prompt_templates} 零残留；</li>
  *   <li><b>A3 装载方式</b>：模板资源只能经 {@code PromptSource} 打开，
  *       禁止任何地方自拼 {@code getResourceAsStream("prompts/…")} 之类的路径。</li>
@@ -36,7 +37,7 @@ class PromptOwnershipTest {
 
     /** 唯一权威包：模板文件名与目录字符串只允许出现在这里。 */
     private static final Path ALLOWED_PACKAGE =
-            REPO.resolve("common/src/main/java/com/ragagent/common/prompt");
+            REPO.resolve("common/src/main/java/com/ragagent/platform/prompt");
 
     private static final List<String> MODULES = List.of("common", "engine", "domains", "boot");
 
@@ -59,7 +60,7 @@ class PromptOwnershipTest {
     }
 
     @Test
-    @DisplayName("A1：模板文件名字面量只能出现在 common/prompt（唯一权威包）")
+    @DisplayName("A1：模板文件名字面量只能出现在 platform/prompt（唯一权威包）")
     void templateNamesOnlyInAuthorityPackage() throws IOException {
         List<String> hits = scan(codeRoots("main"), (file, line) ->
                 !file.toAbsolutePath().normalize().startsWith(ALLOWED_PACKAGE)

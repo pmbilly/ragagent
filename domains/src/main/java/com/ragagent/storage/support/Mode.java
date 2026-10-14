@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import com.ragagent.common.security.APIKeyScopeContext;
 import com.ragagent.common.security.TenantAPIKeyScope;
-import com.ragagent.common.storage.StorageRuntimeEnv;
+import com.ragagent.platform.storage.config.StorageRuntimeEnv;
 
 /**
  * 存储文件在 API 响应里的引用方式。

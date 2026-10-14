@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.retrieval.domain.WebSearchResult;
-import com.ragagent.common.web.ProviderJson;
+import com.ragagent.platform.web.ProviderJson;
 
 /**
  * DuckDuckGo 搜索 provider。

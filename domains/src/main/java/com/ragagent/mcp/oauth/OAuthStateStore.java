@@ -2,7 +2,7 @@ package com.ragagent.mcp.oauth;
 
 import com.ragagent.common.web.JsonMappers;
 import java.time.Duration;
-import com.ragagent.common.deployment.AppEnvLookup;
+import com.ragagent.platform.config.AppEnvLookup;
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;

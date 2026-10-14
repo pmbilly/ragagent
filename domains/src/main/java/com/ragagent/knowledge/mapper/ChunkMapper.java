@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Update;
-import com.ragagent.common.web.PgJsonTypeHandler;
+import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import java.util.List;
 
 @Mapper
@@ -47,11 +47,11 @@ public interface ChunkMapper extends BaseMapper<Chunk> {
             + "next_chunk_id = #{c.nextChunkId}, "
             + "chunk_type = #{c.chunkType}, "
             + "parent_chunk_id = #{c.parentChunkId}, "
-            + "relation_chunks = #{c.relationChunks, typeHandler=com.ragagent.common.web.PgJsonTypeHandler, "
+            + "relation_chunks = #{c.relationChunks, typeHandler=com.ragagent.platform.persistence.PgJsonTypeHandler, "
             + "jdbcType=OTHER}, "
-            + "indirect_relation_chunks = #{c.indirectRelationChunks, typeHandler=com.ragagent.common.web.PgJsonTypeHandler, "
+            + "indirect_relation_chunks = #{c.indirectRelationChunks, typeHandler=com.ragagent.platform.persistence.PgJsonTypeHandler, "
             + "jdbcType=OTHER}, "
-            + "metadata = #{c.metadata, typeHandler=com.ragagent.common.web.PgJsonTypeHandler, "
+            + "metadata = #{c.metadata, typeHandler=com.ragagent.platform.persistence.PgJsonTypeHandler, "
             + "jdbcType=OTHER}, "
             + "content_hash = #{c.contentHash}, "
             + "image_info = #{c.imageInfo}, "

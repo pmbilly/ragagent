@@ -4,7 +4,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ragagent.common.web.PgJsonTypeHandler;
+import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import com.ragagent.datasource.domain.SyncLog;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
@@ -97,7 +97,7 @@ public interface SyncLogMapper extends BaseMapper<SyncLog> {
             + "items_updated = #{log.itemsUpdated}, items_deleted = #{log.itemsDeleted}, "
             + "items_skipped = #{log.itemsSkipped}, items_failed = #{log.itemsFailed}, "
             + "error_message = #{log.errorMessage}, "
-            + "result = #{log.result, typeHandler=com.ragagent.common.web.PgJsonTypeHandler}, "
+            + "result = #{log.result, typeHandler=com.ragagent.platform.persistence.PgJsonTypeHandler}, "
             + "updated_at = #{now} "
             + "WHERE id = #{log.id}")
     int updateResult(@Param("log") SyncLog log, @Param("now") OffsetDateTime now);

@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ragagent.common.wiki.WikiLanguageSupport;
 import com.ragagent.wiki.service.page.WikiCrossLinker;
-import com.ragagent.common.context.TenantScopes;
+import com.ragagent.platform.access.TenantScopes;
 
 /**
  * wiki 批次摄取的 Finalize 阶段协作者:终稿落库与批次收尾(从 RunSupport 分解)。

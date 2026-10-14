@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.ragagent.common.mybatis.PageRequests;
+import com.ragagent.platform.persistence.PageRequests;
 import com.ragagent.session.domain.document.TemporaryDocument;
 import org.springframework.stereotype.Component;
 
@@ -63,7 +63,7 @@ public class TemporaryDocumentRepository {
                 .eq(TemporaryDocument::getId, documentId)
                 .set(TemporaryDocument::getStatus, TemporaryDocument.STATUS_PROCESSING)
                 .set(TemporaryDocument::getStartedAt, startedAt,
-                        "typeHandler=com.ragagent.common.web.NaiveOffsetDateTimeTypeHandler")
+                        "typeHandler=com.ragagent.platform.persistence.NaiveOffsetDateTimeTypeHandler")
                 .set(TemporaryDocument::getErrorMessage, ""));
     }
 
@@ -78,12 +78,12 @@ public class TemporaryDocumentRepository {
                 .set(TemporaryDocument::getContent, content)
                 // update-Inline 的 SET 子句不带 @TableField 的 typeHandler 信息，
                 // 必须 set(col, val, mapping) 显式挂——否则真 PG 上报 jsonb/timestamptz 类型错
-                .set(TemporaryDocument::getChunks, chunks, "typeHandler=com.ragagent.common.web.PgJsonTypeHandler")
-                .set(TemporaryDocument::getImageRefs, imageRefs, "typeHandler=com.ragagent.common.web.PgJsonTypeHandler")
-                .set(TemporaryDocument::getMetadata, metadata, "typeHandler=com.ragagent.common.web.PgJsonTypeHandler")
+                .set(TemporaryDocument::getChunks, chunks, "typeHandler=com.ragagent.platform.persistence.PgJsonTypeHandler")
+                .set(TemporaryDocument::getImageRefs, imageRefs, "typeHandler=com.ragagent.platform.persistence.PgJsonTypeHandler")
+                .set(TemporaryDocument::getMetadata, metadata, "typeHandler=com.ragagent.platform.persistence.PgJsonTypeHandler")
                 .set(TemporaryDocument::getTokenCount, tokenCount)
                 .set(TemporaryDocument::getChunkCount, chunkCount)
-                .set(TemporaryDocument::getReadyAt, readyAt, "typeHandler=com.ragagent.common.web.NaiveOffsetDateTimeTypeHandler")
+                .set(TemporaryDocument::getReadyAt, readyAt, "typeHandler=com.ragagent.platform.persistence.NaiveOffsetDateTimeTypeHandler")
                 .set(TemporaryDocument::getErrorMessage, ""));
     }
 

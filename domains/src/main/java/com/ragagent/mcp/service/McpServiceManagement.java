@@ -13,10 +13,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.security.LogSanitizer;
-import com.ragagent.common.security.SsrfGuard;
+import com.ragagent.platform.security.LogSanitizer;
+import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.mcp.domain.McpAdvancedConfig;
 import com.ragagent.mcp.domain.McpAuthConfig;
 import com.ragagent.mcp.domain.McpAuthType;

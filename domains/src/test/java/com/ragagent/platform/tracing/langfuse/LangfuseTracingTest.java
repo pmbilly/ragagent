@@ -11,8 +11,8 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.context.TenantContext;
-import com.ragagent.common.context.TracingContext;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.access.TracingContext;
 import com.ragagent.memory.service.MemoryTrace;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

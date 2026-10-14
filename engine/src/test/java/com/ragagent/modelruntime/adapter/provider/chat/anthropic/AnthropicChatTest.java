@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.security.SsrfGuard;
+import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.llm.domain.CacheRetention;
 import com.ragagent.llm.domain.ChatConfig;
 import com.ragagent.llm.domain.ChatMessage;

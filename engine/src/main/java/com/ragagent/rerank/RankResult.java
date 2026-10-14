@@ -2,7 +2,7 @@ package com.ragagent.rerank;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.web.ProviderJson;
+import com.ragagent.platform.web.ProviderJson;
 
 /**
  * 单条重排结果。

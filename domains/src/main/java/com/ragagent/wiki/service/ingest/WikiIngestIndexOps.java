@@ -11,7 +11,7 @@ import com.ragagent.wiki.domain.index.WikiIndexEntry;
 import com.ragagent.wiki.domain.page.WikiPage;
 import com.ragagent.wiki.prompt.WikiPrompts;
 import com.ragagent.common.text.Whitespace;
-import com.ragagent.common.text.CodePointOrder;
+import com.ragagent.platform.text.CodePointOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

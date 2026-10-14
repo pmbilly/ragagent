@@ -3,7 +3,7 @@ package com.ragagent.agenttools.wiki;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ragagent.common.web.ToolJson;
+import com.ragagent.platform.web.ToolJson;
 
 /** agent wiki 工具的 issue seam 视图。 */
 

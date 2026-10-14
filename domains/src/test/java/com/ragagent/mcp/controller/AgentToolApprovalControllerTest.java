@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.approval.ApprovalException;
 import com.ragagent.approval.Decision;
 import com.ragagent.approval.Gate;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.BizException;
 import com.ragagent.mcp.dto.ResolveToolApprovalRequest;
 import org.junit.jupiter.api.AfterEach;

@@ -1,7 +1,7 @@
 package com.ragagent.memory.service;
 
 import com.ragagent.common.web.JsonMappers;
-import com.ragagent.common.context.TracingContext;
+import com.ragagent.platform.access.TracingContext;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;

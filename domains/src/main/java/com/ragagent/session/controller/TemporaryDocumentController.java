@@ -3,10 +3,10 @@ package com.ragagent.session.controller;
 import java.util.List;
 import java.util.Map;
 
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.security.LogSanitizer;
+import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.session.domain.conversation.SessionNotFoundException;
 import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.service.SessionService;
@@ -25,11 +25,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartFile;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
-import com.ragagent.common.web.ContentTypeByFilename;
+import com.ragagent.platform.text.ContentTypeByFilename;
 import com.ragagent.knowledge.support.ParserEngineRules;
 import com.ragagent.session.service.AgentResolver;
-import com.ragagent.common.web.ApiResult;
-import com.ragagent.common.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
+import com.ragagent.platform.web.ApiResponse;
 
 /**
  * 会话附件（临时文档）HTTP 层。

@@ -17,14 +17,14 @@ import com.ragagent.auth.dto.LoginRequest;
 import com.ragagent.auth.dto.Membership;
 import com.ragagent.auth.mapper.AuthTokenMapper;
 import com.ragagent.auth.mapper.UserMapper;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.settings.SystemSettingGateway;
 import io.jsonwebtoken.Claims;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.ragagent.common.security.UserNameLookup;
+import com.ragagent.platform.security.UserNameLookup;
 
 /**
  * 用户 service。

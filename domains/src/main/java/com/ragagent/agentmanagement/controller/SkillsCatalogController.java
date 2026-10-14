@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ragagent.agent.skills.SkillCatalogService;
-import com.ragagent.common.context.TenantContext;
-import com.ragagent.common.web.ApiResult;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.web.ApiResult;
 
 /**
  * 指令型技能选择器的数据源（智能体编辑器 → 技能区）。

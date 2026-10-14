@@ -4,7 +4,7 @@ import com.ragagent.knowledge.support.KnowledgePaths;
 
 import com.ragagent.knowledge.service.DuplicateKnowledgeException;
 
-import com.ragagent.common.jdbc.DatabaseDialects;
+import com.ragagent.platform.persistence.DatabaseDialects;
 import com.ragagent.common.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -33,9 +33,9 @@ import org.springframework.stereotype.Component;
 import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.security.SsrfGuard;
-import com.ragagent.common.web.PgJsonTypeHandler;
-import com.ragagent.common.web.UrlBytesFetcher;
+import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.platform.persistence.PgJsonTypeHandler;
+import com.ragagent.platform.http.UrlBytesFetcher;
 import com.ragagent.knowledge.storage.TenantFileStorage;
 
 /**

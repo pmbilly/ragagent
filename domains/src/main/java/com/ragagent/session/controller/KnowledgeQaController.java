@@ -36,7 +36,7 @@ import com.ragagent.platform.stream.StreamManager;
 
 import jakarta.servlet.http.HttpServletResponse;
 import com.ragagent.auth.service.TenantService;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.security.TenantAPIKeyScope;
 import com.ragagent.memory.service.MemoryExtractionService;
 import com.ragagent.session.service.SteerRunCoordinator;
@@ -45,7 +45,7 @@ import com.ragagent.storage.support.FileUrlPort;
 import com.ragagent.storage.support.Mode;
 import com.ragagent.storage.support.StorageBackendResolver;
 import com.ragagent.tenant.repository.Tenant;
-import com.ragagent.common.web.ApiResult;
+import com.ragagent.platform.web.ApiResult;
 
 
 /**

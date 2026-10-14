@@ -1,6 +1,6 @@
 package com.ragagent.agent.tool.runtime;
 
-import com.ragagent.common.web.HtmlText;
+import com.ragagent.platform.text.HtmlText;
 import java.util.ArrayList;
 import java.util.List;
 

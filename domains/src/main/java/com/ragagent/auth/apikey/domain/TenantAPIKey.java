@@ -25,7 +25,7 @@ import com.ragagent.common.apikey.TenantAPIKeyResponse;
  *       先用 AES-GCM 加密再落库；
  *       加密失败**绝不放行明文**，直接中断写入。<br>
  *       落点：{@code TenantAPIKeyRepository.insert/updateApiKeyHash} 在写库前
- *       调 {@link com.ragagent.common.crypto.CryptoService#encryptAESGCM}，
+ *       调 {@link com.ragagent.platform.security.CryptoService#encryptAESGCM}，
  *       失败抛 {@code IllegalStateException}。</li>
  *   <li><b>读路径解密</b>：读出后解密 {@code api_key}，失败**抛错**
  *       （严格模式，不是宽容模式）。<br>

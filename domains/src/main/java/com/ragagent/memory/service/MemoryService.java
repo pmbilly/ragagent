@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.auth.service.TenantService;
-import com.ragagent.common.web.ZeroTimeSerializer;
+import com.ragagent.platform.web.ZeroTimeSerializer;
 import com.ragagent.memory.MemoryContext;
 import com.ragagent.common.memory.MemoryConfig;
 import com.ragagent.memory.domain.MemoryDocAffinity;

@@ -3,13 +3,13 @@ package com.ragagent.model.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.security.SsrfGuard;
+import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.common.tenant.TenantRole;
-import com.ragagent.common.web.NonNullBody;
-import com.ragagent.common.web.RejectEmptyBody;
+import com.ragagent.platform.web.NonNullBody;
+import com.ragagent.platform.web.RejectEmptyBody;
 import com.ragagent.model.domain.Model;
 import com.ragagent.model.domain.ModelParameters;
 import com.ragagent.model.dto.CreateModelRequest;
@@ -34,8 +34,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.common.web.ApiResult;
-import com.ragagent.common.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
+import com.ragagent.platform.web.ApiResponse;
 
 /**
  * 模型配置端点（CRUD + providers；写操作 = Admin+，读 = Viewer+）。

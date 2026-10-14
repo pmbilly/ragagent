@@ -1,7 +1,7 @@
 package com.ragagent.im.controller;
 
 import com.ragagent.common.web.JsonMappers;
-import com.ragagent.common.web.RequestFields;
+import com.ragagent.platform.web.RequestFields;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -9,8 +9,8 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.context.TenantContext;
-import com.ragagent.common.error.PlainErrorException;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.web.error.PlainErrorException;
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.service.ImChannelService;
 
@@ -23,10 +23,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.ragagent.im.channel.wechat.WechatQRCodeService;
-import com.ragagent.common.web.ApiResponse;
+import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.web.ApiResult;
+import com.ragagent.platform.web.ApiResult;
 
 /**
  * IM 渠道 CRUD + 微信扫码状态面。

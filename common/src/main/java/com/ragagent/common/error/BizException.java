@@ -1,5 +1,6 @@
 package com.ragagent.common.error;
 
+
 /**
  * 承载 AppError 的业务异常。
  * service 层抛出，由 GlobalExceptionHandler 统一写出。

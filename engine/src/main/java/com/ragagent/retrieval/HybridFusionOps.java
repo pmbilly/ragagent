@@ -22,7 +22,7 @@ import com.ragagent.retrieval.HybridSearchService.RetrievalConfigView;
 import com.ragagent.retrieval.HybridSearchService.StoreGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 
 /**
  * HybridSearch 的融合与 FAQ 后处理簇：RRF 融合/按分去重、FAQ 迭代取回（只涨 TopK，

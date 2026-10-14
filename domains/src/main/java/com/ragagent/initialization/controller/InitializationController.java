@@ -17,10 +17,10 @@ import com.ragagent.initialization.service.TextExtractionTestService;
 import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
 import com.ragagent.llm.extract.ExtractPrompts;
 import com.ragagent.initialization.service.OllamaDownloadTaskStore;
-import com.ragagent.common.crypto.CryptoService;
+import com.ragagent.platform.security.CryptoService;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.security.SsrfGuard;
+import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import com.ragagent.knowledge.domain.access.KnowledgeAccessGuard;
@@ -29,7 +29,7 @@ import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.ollama.OllamaService;
 import com.ragagent.model.service.ModelService;
 import com.ragagent.knowledge.client.DocReaderClient;
-import com.ragagent.common.web.ApiResult;
+import com.ragagent.platform.web.ApiResult;
 
 /**
  * initialization 路由。系统级端点（ollama 管理、模型连通性测试、抽取）

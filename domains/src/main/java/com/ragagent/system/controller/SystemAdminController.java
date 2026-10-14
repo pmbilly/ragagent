@@ -18,11 +18,11 @@ import com.ragagent.audit.domain.AuditOutcome;
 import com.ragagent.audit.service.AuditLogService;
 import com.ragagent.auth.domain.User;
 import com.ragagent.tenant.mapper.TenantMapper;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.web.NonNullBody;
-import com.ragagent.common.web.RejectEmptyBody;
+import com.ragagent.platform.web.NonNullBody;
+import com.ragagent.platform.web.RejectEmptyBody;
 import com.ragagent.system.dto.SystemDtos;
 import com.ragagent.system.service.SystemAdminUserService;
 import jakarta.validation.Valid;
@@ -41,8 +41,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.ragagent.system.domain.SystemSetting;
 import com.ragagent.system.service.SystemSettingService;
-import com.ragagent.common.web.ApiResult;
-import com.ragagent.common.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
+import com.ragagent.platform.web.ApiResponse;
 
 /**
  * /api/v1/system/admin 组：用户管理 / 平台 API Key / 系统设置 / 运行时队列 / 配额批量应用。

@@ -4,7 +4,7 @@ import com.ragagent.common.memory.MemoryConfig;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-import com.ragagent.common.web.ZeroTimeSerializer;
+import com.ragagent.platform.web.ZeroTimeSerializer;
 
 /**
  * 记忆管理器里展示的"话题计数"形状。

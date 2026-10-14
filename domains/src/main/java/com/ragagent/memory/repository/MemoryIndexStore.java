@@ -11,7 +11,7 @@ import java.util.UUID;
 import com.ragagent.common.memory.MemoryConfig;
 import com.ragagent.common.memory.MemoryKeys;
 import com.ragagent.common.memory.MemoryKinds;
-import com.ragagent.common.web.ZeroTimeSerializer;
+import com.ragagent.platform.web.ZeroTimeSerializer;
 import com.ragagent.memory.domain.MemoryDocAffinity;
 import com.ragagent.memory.domain.MemoryExtractionBatch;
 import com.ragagent.memory.domain.MemoryExtractionFailure;

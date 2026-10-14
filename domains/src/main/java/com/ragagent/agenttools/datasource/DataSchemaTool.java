@@ -1,5 +1,8 @@
 package com.ragagent.agenttools.datasource;
 
+import com.ragagent.common.knowledge.ChunkView;
+import com.ragagent.common.knowledge.KnowledgeView;
+
 import java.util.List;
 import java.util.LinkedHashMap;
 import java.util.Map;

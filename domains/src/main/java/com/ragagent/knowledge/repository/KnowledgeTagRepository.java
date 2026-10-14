@@ -6,7 +6,7 @@ import com.ragagent.knowledge.domain.KnowledgeTag;
 import org.springframework.stereotype.Component;
 import javax.sql.DataSource;
 import java.time.OffsetDateTime;
-import com.ragagent.common.jdbc.DatabaseDialects;
+import com.ragagent.platform.persistence.DatabaseDialects;
 import com.ragagent.knowledge.mapper.KnowledgeTagMapper;
 import java.util.HashMap;
 import java.util.Map;

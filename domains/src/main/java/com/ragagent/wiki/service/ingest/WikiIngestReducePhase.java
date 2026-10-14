@@ -19,7 +19,7 @@ import com.ragagent.common.wiki.ExtractedItem;
 import com.ragagent.common.wiki.WikiLanguageSupport;
 import com.ragagent.wiki.service.page.WikiSlugHandles;
 import com.ragagent.wiki.service.page.WikiTextUtils;
-import com.ragagent.common.text.CodePointOrder;
+import com.ragagent.platform.text.CodePointOrder;
 
 /**
  * wiki 摄取 Reduce 阶段协作者:slug 更新按页归并写入(含 span 追踪与 chunk refs 合并)。

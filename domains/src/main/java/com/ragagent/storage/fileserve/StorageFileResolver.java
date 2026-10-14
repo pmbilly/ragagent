@@ -14,8 +14,8 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.tenant.repository.Tenant;
-import com.ragagent.common.crypto.CryptoService;
-import com.ragagent.common.storage.StorageRuntimeEnv;
+import com.ragagent.platform.security.CryptoService;
+import com.ragagent.platform.storage.config.StorageRuntimeEnv;
 import com.ragagent.storage.config.StorageProviderEnv;
 import com.ragagent.storage.domain.StorageBackend;
 import com.ragagent.storage.mapper.StorageBackendRepository;

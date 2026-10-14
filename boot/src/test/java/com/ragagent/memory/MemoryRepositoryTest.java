@@ -9,7 +9,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 import com.ragagent.TestSchema;
-import com.ragagent.common.web.ZeroTimeSerializer;
+import com.ragagent.platform.web.ZeroTimeSerializer;
 import com.ragagent.memory.domain.MemoryDocAffinity;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.common.memory.MemoryKinds;

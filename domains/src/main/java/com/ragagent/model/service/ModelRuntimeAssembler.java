@@ -1,9 +1,9 @@
 package com.ragagent.model.service;
 
-import com.ragagent.common.context.TenantContext;
-import com.ragagent.common.crypto.CryptoService;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.security.CryptoService;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.security.SsrfGuard;
+import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.embedding.Embedder;
 import com.ragagent.embedding.EmbedderFactory;
 import com.ragagent.llm.LlmChatClient;

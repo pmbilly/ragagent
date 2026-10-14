@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ragagent.common.session.SessionMessagePort;
-import com.ragagent.common.web.ZeroTimeSerializer;
+import com.ragagent.platform.web.ZeroTimeSerializer;
 import com.ragagent.memory.domain.MemoryExtractionSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

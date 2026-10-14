@@ -2,7 +2,7 @@ package com.ragagent.storage.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.crypto.CryptoService;
+import com.ragagent.platform.security.CryptoService;
 import com.ragagent.common.error.BizException;
 import com.ragagent.common.web.JsonMappers;
 import com.ragagent.storage.dto.StorageConfig;

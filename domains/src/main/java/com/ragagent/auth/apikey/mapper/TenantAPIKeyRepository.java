@@ -7,7 +7,7 @@ import java.util.List;
 
 import com.ragagent.auth.apikey.domain.APIKeyStringListTypeHandler;
 import com.ragagent.auth.apikey.domain.TenantAPIKey;
-import com.ragagent.common.crypto.CryptoService;
+import com.ragagent.platform.security.CryptoService;
 import org.springframework.stereotype.Component;
 
 /**

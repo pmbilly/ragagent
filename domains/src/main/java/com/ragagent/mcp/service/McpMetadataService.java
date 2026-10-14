@@ -35,7 +35,7 @@ import com.ragagent.mcp.protocol.McpOAuthSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import com.ragagent.common.security.LogSanitizer;
+import com.ragagent.platform.security.LogSanitizer;
 
 /**
  * MCP 目录快照应用层（依赖方向单向：{@link McpServiceManagement} → 本类）。

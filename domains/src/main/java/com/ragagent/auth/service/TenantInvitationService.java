@@ -2,7 +2,7 @@ package com.ragagent.auth.service;
 
 import com.ragagent.common.web.JsonMappers;
 import java.security.SecureRandom;
-import com.ragagent.common.deployment.AppEnvLookup;
+import com.ragagent.platform.config.AppEnvLookup;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -11,7 +11,7 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.ragagent.common.mybatis.PageRequests;
+import com.ragagent.platform.persistence.PageRequests;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.audit.domain.AuditAction;
@@ -22,7 +22,7 @@ import com.ragagent.auth.domain.TenantInvitation;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.common.tenant.TenantRole;
 import com.ragagent.auth.mapper.TenantInvitationMapper;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

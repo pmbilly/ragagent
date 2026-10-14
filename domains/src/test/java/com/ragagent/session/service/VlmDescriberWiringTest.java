@@ -15,8 +15,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import com.ragagent.common.crypto.CryptoService;
-import com.ragagent.common.security.SsrfGuard;
+import com.ragagent.platform.security.CryptoService;
+import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.model.domain.Model;
 import com.ragagent.model.domain.ModelParameters;

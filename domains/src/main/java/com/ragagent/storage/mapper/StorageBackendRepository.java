@@ -9,7 +9,7 @@ import java.util.Optional;
 
 import javax.sql.DataSource;
 
-import com.ragagent.common.jdbc.DatabaseDialects;
+import com.ragagent.platform.persistence.DatabaseDialects;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.storage.domain.StorageBackend;
 import org.springframework.jdbc.core.RowMapper;

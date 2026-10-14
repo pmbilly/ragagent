@@ -14,8 +14,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.ragagent.modelruntime.adapter.provider.chat.common.LlmTransport;
-import com.ragagent.common.security.IpClass;
-import com.ragagent.common.security.SsrfGuard;
+import com.ragagent.platform.security.IpClass;
+import com.ragagent.platform.security.SsrfGuard;
 
 /**
  * 公网页面抓取器。

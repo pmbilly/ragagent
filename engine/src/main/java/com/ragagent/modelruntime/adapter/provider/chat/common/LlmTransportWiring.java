@@ -1,6 +1,6 @@
 package com.ragagent.modelruntime.adapter.provider.chat.common;
 
-import com.ragagent.common.security.SsrfGuard;
+import com.ragagent.platform.security.SsrfGuard;
 
 import org.springframework.context.annotation.Configuration;
 

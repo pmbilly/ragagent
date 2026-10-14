@@ -1,7 +1,7 @@
 package com.ragagent.datasource.domain;
 
 import com.ragagent.common.web.JsonMappers;
-import com.ragagent.common.context.TracingContext;
+import com.ragagent.platform.access.TracingContext;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.DeserializationFeature;

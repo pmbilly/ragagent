@@ -25,7 +25,7 @@ import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.agentmanagement.service.CustomAgentService;
 import com.ragagent.approval.RedisPubSub;
 import com.ragagent.approval.SpringRedisPubSub;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.im.domain.ChannelSessionEntity;
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.mapper.ChannelSessionMapper;

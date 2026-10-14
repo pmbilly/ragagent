@@ -2,7 +2,7 @@ package com.ragagent.datasource.domain.connector;
 
 import org.springframework.stereotype.Component;
 
-import com.ragagent.common.security.SsrfGuard;
+import com.ragagent.platform.security.SsrfGuard;
 
 /**
  * 把 Spring 管理的 {@link SsrfGuard} 单例交给 {@link ConnectorHttp}——

@@ -6,9 +6,9 @@ import java.util.List;
 import com.ragagent.common.tenant.TenantRole;
 import com.ragagent.auth.controller.filter.AuthFilter;
 import com.ragagent.auth.service.UserService;
-import com.ragagent.common.filter.RequestIdFilter;
-import com.ragagent.common.web.ApiResultInterceptor;
-import com.ragagent.common.web.RbacInterceptor;
+import com.ragagent.platform.web.RequestIdFilter;
+import com.ragagent.platform.web.ApiResultInterceptor;
+import com.ragagent.platform.web.RbacInterceptor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,7 +28,7 @@ import com.ragagent.auth.apikey.controller.filter.AllowFileServeAPIKeyIntercepto
 import com.ragagent.auth.apikey.controller.filter.DenyAPIKeyPrincipalInterceptor;
 import com.ragagent.auth.apikey.service.TenantAPIKeyService;
 import com.ragagent.auth.controller.filter.WsAuthSupport;
-import com.ragagent.common.deployment.DeploymentProperties;
+import com.ragagent.platform.config.DeploymentProperties;
 import com.ragagent.system.service.DeploymentCapabilitiesHolder;
 import com.ragagent.platform.tracing.langfuse.LangfuseHttpInterceptor;
 

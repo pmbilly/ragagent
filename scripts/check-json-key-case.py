@@ -132,9 +132,9 @@ BASELINE: dict[str, set[str]] = {
     # PipelineLog 观测面（日志字段，非契约）
     'chatpipeline/support/SearchSupport.java': {'chunk_id', 'dropped_id', 'kept_id', 'match_type'},
     # langfuse 线上字段（第三方契约）
-    'common/context/TracingContext.java': {'lf_parent_obs_id', 'lf_session_id', 'lf_trace_id', 'lf_traceparent', 'lf_user_id'},
+    'platform/access/TracingContext.java': {'lf_parent_obs_id', 'lf_session_id', 'lf_trace_id', 'lf_traceparent', 'lf_user_id'},
     # MDC 日志键（非 JSON）
-    'common/filter/RequestIdFilter.java': {'request_id'},
+    'platform/web/RequestIdFilter.java': {'request_id'},
     # OpenSearch 字段
     'config/OpenSearchAuditSinkAdapter.java': {'dst_alias', 'src_alias'},
     # MyBatis 列名/参数（非 JSON 键）
@@ -212,7 +212,7 @@ BASELINE: dict[str, set[str]] = {
     # websearch metadata（§15.3 ① 外部决定）
     'chatpipeline/support/ReferencesSupport.java': {'published_at'},
     # 提示词模板变量（数据值，非 JSON 键）
-    'common/prompt/PromptTemplateCatalog.java': {'has_knowledge_base', 'has_web_search'},
+    'platform/prompt/PromptTemplateCatalog.java': {'has_knowledge_base', 'has_web_search'},
     # provider 配置字段（对方词汇）
     'embedding/EmbedderFactory.java': {'api_version'},
     # agent 侧解析规则族（同 chat_parser_engine_rules，§14.9 ②）

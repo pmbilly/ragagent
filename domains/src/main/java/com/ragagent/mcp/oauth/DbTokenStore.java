@@ -3,7 +3,7 @@ package com.ragagent.mcp.oauth;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.mcp.domain.McpOAuthToken;
 import com.ragagent.mcp.domain.McpPrincipal;
 import com.ragagent.mcp.protocol.McpContext;

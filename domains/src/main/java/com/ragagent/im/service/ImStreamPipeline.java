@@ -19,7 +19,7 @@ import com.ragagent.im.runtime.ToolDisplay;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.service.QaSupport;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.List;
 
 import com.ragagent.TestSchema;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.memory.MemoryContext;
 import com.ragagent.common.memory.MemoryConfig;
 import com.ragagent.memory.domain.MemoryDocAffinity;

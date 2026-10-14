@@ -32,7 +32,7 @@ import com.ragagent.agent.tool.runtime.ThinkStreamSplitter;
 import com.ragagent.modelcontext.StreamDecoder;
 import com.ragagent.llm.domain.StreamResponse;
 import com.ragagent.common.llm.TokenUsage;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.llm.domain.ToolCall;
 
 /**

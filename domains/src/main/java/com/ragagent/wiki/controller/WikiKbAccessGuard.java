@@ -3,9 +3,9 @@ package com.ragagent.wiki.controller;
 import java.util.List;
 
 import com.ragagent.common.security.TenantAPIKeyScope;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.error.GuardForbiddenException;
+import com.ragagent.platform.web.error.GuardForbiddenException;
 import com.ragagent.common.tenant.TenantRole;
 import com.ragagent.common.knowledge.KnowledgeBaseLookup;
 import com.ragagent.common.knowledge.KnowledgeBaseView;

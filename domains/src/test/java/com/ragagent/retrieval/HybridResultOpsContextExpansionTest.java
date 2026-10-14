@@ -14,14 +14,14 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.auth.service.TenantService;
-import com.ragagent.common.context.TenantContext;
-import com.ragagent.common.embedding.EmbeddingGateway;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.model.EmbeddingGateway;
 import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.ChunkSearchGateway;
 import com.ragagent.common.knowledge.KnowledgeBaseSearchGateway;
 import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.common.knowledge.KnowledgeDocumentGateway;
-import com.ragagent.common.model.ModelGateway;
+import com.ragagent.platform.model.ModelGateway;
 import com.ragagent.common.retrieval.RetrievalDriverProperties;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.common.web.JsonMappers;

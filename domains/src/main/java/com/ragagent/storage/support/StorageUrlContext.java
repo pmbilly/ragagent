@@ -7,7 +7,7 @@ package com.ragagent.storage.support;
  * 所以它必须继续走渠道作用域的 {@code /embed/…/files} 代理取图，
  * 而不是拿到一个可分享、免凭据的公网 URL。</p>
  *
- * <p><b>形态</b>：沿用与 {@link com.ragagent.common.context.TenantContext}、
+ * <p><b>形态</b>：沿用与 {@link com.ragagent.platform.access.TenantContext}、
  * {@code APIKeyScopeContext} 一致的 ThreadLocal 方案——每请求一个线程，
  * <b>跨线程必须显式传值</b>。</p>
  *

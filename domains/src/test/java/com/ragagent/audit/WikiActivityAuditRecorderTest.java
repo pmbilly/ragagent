@@ -16,7 +16,7 @@ import com.ragagent.audit.domain.AuditOutcome;
 import com.ragagent.audit.mapper.AuditLogRepository;
 import com.ragagent.audit.service.AuditLogService;
 import com.ragagent.audit.service.WikiActivityAuditRecorder;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 

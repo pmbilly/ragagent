@@ -8,7 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import com.ragagent.common.pipeline.ChunkTypes;
-import com.ragagent.common.context.TracingContext;
+import com.ragagent.platform.access.TracingContext;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.QuestionBatchPayload;
 

@@ -16,7 +16,7 @@ import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.tenant.ChatHistoryConfig;
 import com.ragagent.tenant.RetrievalConfig;
 import com.ragagent.auth.service.TenantService;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.pipeline.SearchParams;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.model.service.ModelRuntimeAssembler;

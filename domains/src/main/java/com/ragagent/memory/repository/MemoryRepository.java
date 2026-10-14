@@ -16,7 +16,7 @@ import java.util.UUID;
 
 import javax.sql.DataSource;
 
-import com.ragagent.common.jdbc.DatabaseDialects;
+import com.ragagent.platform.persistence.DatabaseDialects;
 import com.ragagent.memory.domain.MemoryDocAffinity;
 import com.ragagent.memory.domain.MemoryExtractionBatch;
 import com.ragagent.memory.domain.MemoryExtractionFailure;

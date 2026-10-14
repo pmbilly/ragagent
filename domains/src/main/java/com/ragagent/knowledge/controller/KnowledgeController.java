@@ -7,10 +7,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.security.LogSanitizer;
-import com.ragagent.common.security.SsrfGuard;
-import com.ragagent.common.web.ContentTypeByFilename;
-import com.ragagent.common.web.NonNullBody;
+import com.ragagent.platform.security.LogSanitizer;
+import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.platform.text.ContentTypeByFilename;
+import com.ragagent.platform.web.NonNullBody;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.dto.doc.ClearContentsResponse;
 import com.ragagent.knowledge.dto.doc.CreateFromUrlRequest;
@@ -43,12 +43,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import com.ragagent.common.tenant.TenantRole;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.knowledge.domain.access.KnowledgeRouteGuards;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.common.web.ApiResult;
-import com.ragagent.common.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
+import com.ragagent.platform.web.ApiResponse;
 
 /**
  * 知识文档主面：创建（文件/URL/手工）、列表/详情/批量取、解析生命周期

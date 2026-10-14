@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import com.ragagent.common.security.SsrfGuard;
+import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.domain.McpTransportType;
 import org.junit.jupiter.api.AfterEach;

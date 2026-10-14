@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import com.ragagent.common.jdbc.DatabaseDialects;
+import com.ragagent.platform.persistence.DatabaseDialects;
 import com.ragagent.mcp.domain.McpMetadata;
 import com.ragagent.mcp.domain.McpMetadataSummary;
 import org.springframework.dao.DataIntegrityViolationException;

@@ -40,7 +40,7 @@ import com.ragagent.common.llm.TokenUsage;
 import com.ragagent.modelcontext.Registry;
 import com.ragagent.platform.tracing.langfuse.LangfuseManager;
 import com.ragagent.platform.tracing.langfuse.Span;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.BizException;
 import com.ragagent.agent.budget.AgentBudgets;
 import com.ragagent.agent.budget.TokenEstimator;

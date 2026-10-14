@@ -1,18 +1,18 @@
 package com.ragagent.config;
 
-import com.ragagent.common.crypto.CryptoEnvProperties;
-import com.ragagent.common.crypto.CryptoService;
-import com.ragagent.common.security.SsrfGuard;
-import com.ragagent.common.security.SsrfWhitelistProperties;
-import com.ragagent.common.storage.UploadLimitProperties;
-import com.ragagent.common.storage.UploadLimits;
+import com.ragagent.platform.security.CryptoEnvProperties;
+import com.ragagent.platform.security.CryptoService;
+import com.ragagent.platform.security.SsrfGuard;
+import com.ragagent.platform.security.SsrfWhitelistProperties;
+import com.ragagent.platform.storage.config.UploadLimitProperties;
+import com.ragagent.platform.storage.config.UploadLimits;
 import com.ragagent.common.wiki.LanguageProperties;
 import com.ragagent.common.wiki.WikiLanguageSupport;
 import com.ragagent.storage.config.LocalStorageEnvProperties;
 import com.ragagent.storage.config.StorageProviderEnv;
 import com.ragagent.storage.config.ResourceUrlModeProperties;
 import com.ragagent.storage.config.StorageEnvLookup;
-import com.ragagent.common.storage.StorageRuntimeEnv;
+import com.ragagent.platform.storage.config.StorageRuntimeEnv;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 

@@ -4,7 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.ragagent.common.security.LogSanitizer;
+import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 import com.ragagent.embedchannel.service.EmbedChannelService;
 import com.ragagent.embedchannel.service.EmbedChannelService.UpdateCommand;
@@ -12,7 +12,7 @@ import com.ragagent.embedchannel.EmbedError;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import com.ragagent.common.web.ApiResponse;
+import com.ragagent.platform.web.ApiResponse;
 
 /**
  * embed 渠道管理面协作者（自 {@link EmbedChannelController} 拆出的管理段）：

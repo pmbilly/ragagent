@@ -7,7 +7,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ragagent.common.web.ContentTypeByFilename;
+import com.ragagent.platform.text.ContentTypeByFilename;
 import com.ragagent.storage.provider.SeekableSource;
 
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,7 +1,7 @@
 package com.ragagent.agent;
 
-import com.ragagent.common.prompt.AgentPromptPlaceholders;
-import com.ragagent.common.prompt.PromptComposer;
+import com.ragagent.platform.prompt.AgentPromptPlaceholders;
+import com.ragagent.platform.prompt.PromptComposer;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import com.ragagent.agent.compaction.ConversationSerializer;
-import com.ragagent.common.prompt.PromptConstants;
+import com.ragagent.platform.prompt.PromptConstants;
 import com.ragagent.agent.prompt.AgentPromptTemplates;
 import com.ragagent.agent.prompt.GroundingPrompt;
 import com.ragagent.agent.prompt.KnowledgeBaseInfo;

@@ -16,12 +16,12 @@ import java.util.List;
 import java.util.Map;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.CleanInvalidUtf8;
+import com.ragagent.platform.text.CleanInvalidUtf8;
 import com.ragagent.knowledge.domain.KnowledgeProcessingSpan;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.stereotype.Repository;
-import com.ragagent.common.jdbc.DatabaseDialects;
+import com.ragagent.platform.persistence.DatabaseDialects;
 
 /**
  * * 每次尝试一棵 span 树的持久化。

@@ -3,7 +3,7 @@ package com.ragagent.knowledge.service.chunk;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 
 import java.util.List;
-import com.ragagent.common.security.LogSanitizer;
+import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.repository.ChunkRepository;

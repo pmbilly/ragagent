@@ -1,5 +1,6 @@
 package com.ragagent.agent.tool;
 
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -14,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.llm.ToolResult;
 import com.ragagent.llm.domain.FunctionDef;
-import com.ragagent.common.web.ToolJson;
+import com.ragagent.platform.web.ToolJson;
 import com.ragagent.agent.domain.ToolCallTarget;
 import com.ragagent.common.error.BizException;
 import com.ragagent.llm.domain.ChatMessage;

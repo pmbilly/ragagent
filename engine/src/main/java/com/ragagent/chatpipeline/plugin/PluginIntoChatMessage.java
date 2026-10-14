@@ -10,12 +10,12 @@ import com.ragagent.chatpipeline.PipelineEventType;
 import com.ragagent.chatpipeline.PipelineLog;
 import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.chatpipeline.support.ReferencesSupport;
-import com.ragagent.common.security.InputSanitizer;
+import com.ragagent.platform.security.InputSanitizer;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.common.pipeline.ChunkTypes;
 import com.ragagent.retrieval.telemetry.RetrievalObs;
-import com.ragagent.common.prompt.MessageAttachmentsPrompt;
-import com.ragagent.common.prompt.AgentPromptPlaceholders;
+import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
+import com.ragagent.platform.prompt.AgentPromptPlaceholders;
 
 /**
  * INTO_CHAT_MESSAGE 阶段插件：

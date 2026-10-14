@@ -1,6 +1,6 @@
 package com.ragagent.settings;
 
-import com.ragagent.common.prompt.PromptSource;
+import com.ragagent.platform.prompt.PromptSource;
 import com.ragagent.common.web.JsonMappers;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *
  * <p>经 {@code @ConfigurationProperties(prefix="conversation")}
  * 绑定 application.yml 的 {@code conversation.*}；vendor 模板经
- * {@link com.ragagent.common.prompt.PromptSource}（classpath {@code prompts/}）装载。
+ * {@link com.ragagent.platform.prompt.PromptSource}（classpath {@code prompts/}）装载。
  * FindTemplateByID 语义：按 {@code PromptSource.files()} 的顺序首个 id 命中即返回 content。</p>
  */
 @org.springframework.boot.context.properties.ConfigurationProperties(prefix = "conversation")

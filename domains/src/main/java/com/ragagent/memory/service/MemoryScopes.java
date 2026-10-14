@@ -1,6 +1,6 @@
 package com.ragagent.memory.service;
 
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.memory.domain.scope.MemoryScope;
 
 /**

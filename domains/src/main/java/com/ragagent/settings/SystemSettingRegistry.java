@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
-import com.ragagent.common.web.ToolJson;
+import com.ragagent.platform.web.ToolJson;
 
 /**
  * system_settings 的 in-code 注册表（17 条）。

@@ -3,7 +3,7 @@ package com.ragagent.memory.domain;
 import java.time.OffsetDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.ragagent.common.web.ZeroTimeSerializer;
+import com.ragagent.platform.web.ZeroTimeSerializer;
 
 /**
  * {@code memory_subjects.extraction_state} 这一列的内容——**只装主体级的 worker 租约**。

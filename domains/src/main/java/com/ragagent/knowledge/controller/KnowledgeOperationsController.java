@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.security.LogSanitizer;
-import com.ragagent.common.web.NonNullBody;
+import com.ragagent.platform.security.LogSanitizer;
+import com.ragagent.platform.web.NonNullBody;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.dto.BatchDeleteRequest;
@@ -43,8 +43,8 @@ import com.ragagent.knowledge.dto.doc.KnowledgeSearchResponse;
 import com.ragagent.knowledge.dto.chunk.ReparseTaskData;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import com.ragagent.common.web.ApiResult;
-import com.ragagent.common.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
+import com.ragagent.platform.web.ApiResponse;
 
 /**
  * 知识文档运营操作面：跨库搜索、批量删除/重析、批量标签、跨 KB 搬移与进度、

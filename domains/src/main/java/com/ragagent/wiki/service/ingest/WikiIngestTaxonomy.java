@@ -22,7 +22,7 @@ import com.ragagent.wiki.service.WikiModelResolver;
 import com.ragagent.wiki.service.page.WikiPageService;
 import com.ragagent.wiki.service.page.WikiTextUtils;
 import com.ragagent.common.text.Whitespace;
-import com.ragagent.common.text.CodePointOrder;
+import com.ragagent.platform.text.CodePointOrder;
 
 /**
  * 批次目录规划与 embedding 选夹。

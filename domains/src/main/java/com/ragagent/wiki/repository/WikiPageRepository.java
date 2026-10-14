@@ -15,7 +15,7 @@ import java.util.Set;
 import javax.sql.DataSource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.jdbc.DatabaseDialects;
+import com.ragagent.platform.persistence.DatabaseDialects;
 import com.ragagent.wiki.domain.SourceRefNeedle;
 import com.ragagent.wiki.domain.index.WikiCategoryPaths;
 import com.ragagent.wiki.domain.WikiConstants;

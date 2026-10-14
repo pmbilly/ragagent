@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import com.ragagent.common.deployment.DeploymentProperties;
+import com.ragagent.platform.config.DeploymentProperties;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.agentmanagement.mapper.CustomAgentMapper;
 import com.ragagent.agentmanagement.service.CustomAgentService;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.embedchannel.EmbedError;
 import com.ragagent.embedchannel.EmbedTokens;
 import com.ragagent.embedchannel.domain.EmbedChannelEntity;

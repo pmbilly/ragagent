@@ -8,7 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.ragagent.auth.service.TenantService;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.embedchannel.EmbedError;
 import com.ragagent.embedchannel.EmbedRateLimiter;
 import com.ragagent.embedchannel.EmbedTokens;

@@ -7,14 +7,14 @@ import com.ragagent.knowledge.support.ChunkProjectionAdapter;
 import java.util.List;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.ragagent.common.mybatis.PageRequests;
-import com.ragagent.common.CleanInvalidUtf8;
+import com.ragagent.platform.persistence.PageRequests;
+import com.ragagent.platform.text.CleanInvalidUtf8;
 import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.ChunkSearchGateway;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ChunkRevision;
 import org.springframework.stereotype.Component;
-import com.ragagent.common.jdbc.DatabaseDialects;
+import com.ragagent.platform.persistence.DatabaseDialects;
 import com.ragagent.knowledge.domain.ChunkNotFoundException;
 import com.ragagent.knowledge.domain.ChunkRevisionConflictException;
 import com.ragagent.knowledge.mapper.ChunkMapper;
@@ -59,7 +59,7 @@ import javax.sql.DataSource;
 public class ChunkRepository implements ChunkSearchGateway {
 
     /** 三条 json 列共用的类型处理器（3 参 set 的 mapping 串）。 */
-    private static final String PG_JSON = "com.ragagent.common.web.PgJsonTypeHandler";
+    private static final String PG_JSON = "com.ragagent.platform.persistence.PgJsonTypeHandler";
 
     private static final int STATUS_DEFAULT = 0;
     private static final int STATUS_INDEXED = 2;

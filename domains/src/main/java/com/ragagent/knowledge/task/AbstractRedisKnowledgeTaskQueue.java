@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
-import com.ragagent.common.taskqueue.RedisTaskQueueCore;
+import com.ragagent.platform.task.RedisTaskQueueCore;
 
 /**
  * knowledge 两个 Redis 任务队列（分块抽取 / 问题生成）的共享骨架。

@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.common.web.JsonMappers;
-import com.ragagent.common.web.ToolJson;
-import com.ragagent.common.web.RequestFields;
+import com.ragagent.platform.web.ToolJson;
+import com.ragagent.platform.web.RequestFields;
 
 /**
  * 租户目录的绑定错误形态助手（全静态）：

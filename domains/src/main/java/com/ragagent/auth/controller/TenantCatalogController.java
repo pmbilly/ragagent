@@ -8,10 +8,10 @@ import com.ragagent.common.apikey.ApiKeyAdminPort;
 import com.ragagent.auth.service.TenantMemberService;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.auth.service.UserService;
-import com.ragagent.common.security.SsrfGuard;
+import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.common.tenant.TenantProperties;
 import com.ragagent.common.knowledge.KnowledgeBaseProvisioner;
-import com.ragagent.common.storage.StorageAllowList;
+import com.ragagent.platform.storage.config.StorageAllowList;
 import com.ragagent.settings.SystemSettingGateway;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.ragagent.tenant.repository.Tenant;
-import com.ragagent.common.web.ApiResult;
+import com.ragagent.platform.web.ApiResult;
 
 /**
  * 跨空间租户目录 + KV 配置分发器（五条路由）：

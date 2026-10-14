@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.modelruntime.adapter.provider.chat.PromptCache;
 import com.ragagent.llm.domain.ChatMessage;

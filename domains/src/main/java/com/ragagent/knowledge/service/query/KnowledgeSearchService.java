@@ -8,7 +8,7 @@ import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import org.springframework.stereotype.Service;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import java.util.HashMap;
 import java.util.Map;
 

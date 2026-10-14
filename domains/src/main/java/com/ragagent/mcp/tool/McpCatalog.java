@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.approval.EnabledChecker;
 import com.ragagent.approval.McpApproval;
 import com.ragagent.approval.ApprovalToolPolicy;
-import com.ragagent.common.web.ToolJson;
+import com.ragagent.platform.web.ToolJson;
 import com.ragagent.common.llm.ToolResult;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.approval.Cancellation;

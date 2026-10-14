@@ -9,7 +9,7 @@ import java.util.Map;
 
 import com.ragagent.agent.domain.AgentStep;
 
-import com.ragagent.common.prompt.MessageAttachmentsPrompt;
+import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ToolCall;
 import com.ragagent.session.domain.message.Message;

@@ -1,7 +1,7 @@
 package com.ragagent.evaluation.service;
 
-import com.ragagent.common.prompt.PromptSource;
-import com.ragagent.common.prompt.PromptTemplates;
+import com.ragagent.platform.prompt.PromptSource;
+import com.ragagent.platform.prompt.PromptTemplates;
 
 /**
  * 评估参数的生效值（golden ev-post.json 钉住的响应体内容）。

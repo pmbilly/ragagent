@@ -2,7 +2,7 @@ package com.ragagent.llm.ollama;
 
 import com.ragagent.common.web.JsonMappers;
 import java.io.BufferedReader;
-import com.ragagent.common.deployment.AppEnvLookup;
+import com.ragagent.platform.config.AppEnvLookup;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;

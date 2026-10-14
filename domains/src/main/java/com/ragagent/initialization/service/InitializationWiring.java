@@ -3,7 +3,7 @@ package com.ragagent.initialization.service;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.ragagent.common.security.SsrfGuard;
+import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
 import com.ragagent.llm.extract.ExtractPrompts;
 import com.ragagent.llm.ollama.OllamaService;

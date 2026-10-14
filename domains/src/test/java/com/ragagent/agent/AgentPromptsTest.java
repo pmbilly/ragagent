@@ -47,7 +47,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import com.ragagent.common.prompt.PromptConstants;
+import com.ragagent.platform.prompt.PromptConstants;
 import com.ragagent.agent.prompt.AgentPromptTemplates;
 import com.ragagent.agent.prompt.GroundingPrompt;
 import com.ragagent.agent.prompt.RecentDocInfo;

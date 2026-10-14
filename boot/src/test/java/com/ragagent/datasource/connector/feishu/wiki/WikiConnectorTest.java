@@ -32,7 +32,7 @@ import com.ragagent.datasource.domain.SyncCursor;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import com.ragagent.common.web.ZeroTimeSerializer;
+import com.ragagent.platform.web.ZeroTimeSerializer;
 import com.ragagent.datasource.domain.connector.Connector;
 import com.ragagent.datasource.connector.feishu.core.FeishuApiTypes;
 import com.ragagent.datasource.connector.feishu.core.FeishuClient;

@@ -3,7 +3,7 @@ package com.ragagent.mcp.mapper;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ragagent.common.web.PgJsonTypeHandler;
+import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import com.ragagent.mcp.domain.McpAuthConfigTypeHandler;
 import com.ragagent.mcp.domain.McpService;
 import org.apache.ibatis.annotations.Mapper;
@@ -101,15 +101,15 @@ public interface McpServiceMapper extends BaseMapper<McpService> {
             + ", transport_type = #{transportType}</if>"
             + "<if test=\"url != null\">, url = #{url}</if>"
             + "<if test=\"stdioConfig != null\">, stdio_config = "
-            + "#{stdioConfig, typeHandler=com.ragagent.common.web.PgJsonTypeHandler}</if>"
+            + "#{stdioConfig, typeHandler=com.ragagent.platform.persistence.PgJsonTypeHandler}</if>"
             + "<if test=\"envVars != null\">, env_vars = "
-            + "#{envVars, typeHandler=com.ragagent.common.web.PgJsonTypeHandler}</if>"
+            + "#{envVars, typeHandler=com.ragagent.platform.persistence.PgJsonTypeHandler}</if>"
             + "<if test=\"headers != null\">, headers = "
-            + "#{headers, typeHandler=com.ragagent.common.web.PgJsonTypeHandler}</if>"
+            + "#{headers, typeHandler=com.ragagent.platform.persistence.PgJsonTypeHandler}</if>"
             + "<if test=\"authConfig != null\">, auth_config = "
             + "#{authConfig, typeHandler=com.ragagent.mcp.domain.McpAuthConfigTypeHandler}</if>"
             + "<if test=\"advancedConfig != null\">, advanced_config = "
-            + "#{advancedConfig, typeHandler=com.ragagent.common.web.PgJsonTypeHandler}</if>"
+            + "#{advancedConfig, typeHandler=com.ragagent.platform.persistence.PgJsonTypeHandler}</if>"
             + " WHERE id = #{id} AND tenant_id = #{tenantId} AND deleted_at IS NULL"
             + "</script>")
     int updatePartial(McpService service);

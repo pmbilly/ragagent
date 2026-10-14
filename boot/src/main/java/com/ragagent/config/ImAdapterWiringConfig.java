@@ -6,7 +6,7 @@ import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.service.ImTurnOrchestrator;
 import com.ragagent.im.channel.slack.SlackAdapterFactory;
 import com.ragagent.im.channel.telegram.TelegramAdapterFactory;
-import com.ragagent.common.security.SsrfGuard;
+import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.im.channel.dingtalk.DingtalkAdapterFactory;
 import com.ragagent.im.channel.feishu.FeishuAdapterFactory;
 import com.ragagent.im.channel.feishu.FeishuRegion;

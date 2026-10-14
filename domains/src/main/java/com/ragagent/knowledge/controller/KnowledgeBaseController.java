@@ -3,11 +3,11 @@ package com.ragagent.knowledge.controller;
 import java.util.ArrayList;
 import java.util.List;
 import com.ragagent.common.tenant.TenantRole;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.error.GuardForbiddenException;
-import com.ragagent.common.web.NonNullBody;
+import com.ragagent.platform.web.error.GuardForbiddenException;
+import com.ragagent.platform.web.NonNullBody;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.dto.kb.CopyKnowledgeBaseRequest;
 import com.ragagent.knowledge.dto.HybridSearchRequest;
@@ -45,8 +45,8 @@ import com.ragagent.common.security.TenantAPIKeyScope;
 import com.ragagent.knowledge.support.KnowledgeTaskIdCodec;
 import com.ragagent.storage.support.Mode;
 import java.util.UUID;
-import com.ragagent.common.web.ApiResult;
-import com.ragagent.common.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
+import com.ragagent.platform.web.ApiResponse;
 
 /**
  * 知识库 CRUD 与检索入口：列表/详情/更新/删除、置顶、移动目标、混合检索

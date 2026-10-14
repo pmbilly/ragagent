@@ -38,8 +38,8 @@ import com.ragagent.platform.stream.StreamBatch;
 import com.ragagent.platform.stream.StreamEvent;
 import com.ragagent.platform.stream.StreamManager;
 import com.ragagent.auth.service.TenantService;
-import com.ragagent.common.context.TenantContext;
-import com.ragagent.common.web.ApiResult;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.web.ApiResult;
 
 /**
  * 继续接收活跃流。

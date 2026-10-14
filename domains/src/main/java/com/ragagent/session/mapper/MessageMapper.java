@@ -3,7 +3,7 @@ package com.ragagent.session.mapper;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ragagent.common.web.PgJsonTypeHandler;
+import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import com.ragagent.session.domain.AgentStepListTypeHandler;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.message.MessageArtifact;

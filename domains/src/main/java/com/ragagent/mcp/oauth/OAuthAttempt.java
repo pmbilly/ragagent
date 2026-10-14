@@ -2,7 +2,7 @@ package com.ragagent.mcp.oauth;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 
 /**
  * 一次授权流程的<b>非秘密</b>、可鉴权状态。

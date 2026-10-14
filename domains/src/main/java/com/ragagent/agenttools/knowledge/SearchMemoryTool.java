@@ -1,5 +1,7 @@
 package com.ragagent.agenttools.knowledge;
 
+import com.ragagent.common.memory.MemoryItemView;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;

@@ -14,7 +14,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
-import com.ragagent.common.security.SsrfGuard;
+import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.llm.domain.ChatMessage;
 
 import com.sun.net.httpserver.HttpServer;

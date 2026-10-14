@@ -18,7 +18,7 @@ import com.ragagent.mcp.protocol.ContentItem;
 import com.ragagent.mcp.protocol.McpClient;
 import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.protocol.McpContext;
-import com.ragagent.common.web.ToolJson;
+import com.ragagent.platform.web.ToolJson;
 import com.ragagent.approval.Decision;
 import com.ragagent.approval.PendingRequest;
 import com.ragagent.agent.tool.AgentTool;

@@ -13,7 +13,7 @@ import com.ragagent.wiki.domain.page.WikiPage;
 import com.ragagent.wiki.domain.page.WikiPageLite;
 import com.ragagent.wiki.service.page.SlugFuzzy;
 import com.ragagent.common.text.Whitespace;
-import com.ragagent.common.text.CodePointOrder;
+import com.ragagent.platform.text.CodePointOrder;
 
 /**
  * 实体/概念去重的纯算法：候选页预筛与配对打分，身份标题归一、精确同名解析与身份合并。

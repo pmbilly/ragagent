@@ -1,6 +1,5 @@
 package com.ragagent.platform.access;
 
-import com.ragagent.common.context.TenantContext;
 
 /**
  * TenantContext 的显式值快照——EventBus 异步派发（虚拟线程）跨线程传值的载体。

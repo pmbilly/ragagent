@@ -26,11 +26,6 @@
       "com.ragagent.chatpipeline.support"
     ],
     [
-      "com.ragagent.common.error",
-      "com.ragagent.common.security",
-      "com.ragagent.common.web"
-    ],
-    [
       "com.ragagent.embedchannel",
       "com.ragagent.embedchannel.controller.filter",
       "com.ragagent.embedchannel.service"

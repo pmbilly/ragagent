@@ -1,7 +1,7 @@
 package com.ragagent.wiki.service.ingest;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.ragagent.common.context.TracingContext;
+import com.ragagent.platform.access.TracingContext;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**

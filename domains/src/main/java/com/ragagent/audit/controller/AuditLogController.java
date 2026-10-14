@@ -7,10 +7,10 @@ import com.ragagent.audit.domain.AuditLogQuery;
 import com.ragagent.audit.dto.AuditLogListResponse;
 import com.ragagent.audit.service.AuditLogService;
 import com.ragagent.common.tenant.TenantRole;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.error.GuardForbiddenException;
+import com.ragagent.platform.web.error.GuardForbiddenException;
 import com.ragagent.common.knowledge.KnowledgeBaseFacts;
 import com.ragagent.common.knowledge.KnowledgeBaseGateway;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.ragagent.common.web.ApiResult;
+import com.ragagent.platform.web.ApiResult;
 
 /**
  * 审计日志端点。

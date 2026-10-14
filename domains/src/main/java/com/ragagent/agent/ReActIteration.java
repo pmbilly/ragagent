@@ -18,7 +18,7 @@ import com.ragagent.llm.domain.ChatResponse;
 import com.ragagent.llm.domain.ChatTool;
 import com.ragagent.platform.tracing.langfuse.LangfuseManager;
 import com.ragagent.platform.tracing.langfuse.Span;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 
 /**
  * 单个 ReAct 迭代（think → analyze → act → observe）的编排协作者：轮 span 生命周期、

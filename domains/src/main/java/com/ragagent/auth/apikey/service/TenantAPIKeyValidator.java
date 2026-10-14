@@ -1,5 +1,7 @@
 package com.ragagent.auth.apikey.service;
 
+import com.ragagent.common.knowledge.KnowledgeBaseLookup;
+
 import java.util.List;
 
 import com.ragagent.common.security.APIKeyCapability;

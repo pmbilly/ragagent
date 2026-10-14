@@ -3,7 +3,7 @@ package com.ragagent.knowledge.domain;
 import java.util.ArrayList;
 import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.context.TracingContext;
+import com.ragagent.platform.access.TracingContext;
 import com.ragagent.common.web.JsonMappers;
 
 /**

@@ -7,10 +7,10 @@ import java.util.Map;
 
 import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.auth.dto.TenantResponse;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.web.ToolJson;
+import com.ragagent.platform.web.ToolJson;
 import com.ragagent.common.tenant.TenantRole;
 
 import org.springframework.web.bind.annotation.PathVariable;

@@ -4,11 +4,11 @@ import com.ragagent.common.web.JsonMappers;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.web.ApiResponse;
-import com.ragagent.common.web.ApiResult;
+import com.ragagent.platform.web.ApiResponse;
+import com.ragagent.platform.web.ApiResult;
 import com.ragagent.favorite.domain.UserResourceFavorite;
 import com.ragagent.favorite.service.UserResourceFavoriteService;
 import org.springframework.http.ResponseEntity;

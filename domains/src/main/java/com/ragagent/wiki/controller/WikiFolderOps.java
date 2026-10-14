@@ -25,7 +25,7 @@ import static com.ragagent.wiki.controller.WikiRequestSupport.internal;
 import static com.ragagent.wiki.controller.WikiRequestSupport.requiredFieldErrors;
 import static com.ragagent.wiki.controller.WikiRequestSupport.sanitize;
 import static com.ragagent.wiki.controller.WikiRequestSupport.trimSpace;
-import com.ragagent.common.web.ApiResponse;
+import com.ragagent.platform.web.ApiResponse;
 
 /**
  * 文件夹资源端点的执行体：目录列表/新建/改名移动/删除，以及 move-page

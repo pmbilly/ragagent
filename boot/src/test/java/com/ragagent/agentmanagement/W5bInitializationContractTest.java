@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import com.ragagent.TestSchema;
-import com.ragagent.common.security.SsrfGuard;
+import com.ragagent.platform.security.SsrfGuard;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;

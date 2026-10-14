@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.agentmanagement.service.config.AgentConfigJson;
 import com.ragagent.chatpipeline.ChatManage;
-import com.ragagent.common.prompt.PromptSource;
+import com.ragagent.platform.prompt.PromptSource;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 
 /**

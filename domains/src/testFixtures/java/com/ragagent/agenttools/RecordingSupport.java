@@ -5,7 +5,7 @@ import java.util.Collections;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.web.ToolJson;
+import com.ragagent.platform.web.ToolJson;
 
 /** 4.5a 录制测试的共享小工具。 */
 public final class RecordingSupport {

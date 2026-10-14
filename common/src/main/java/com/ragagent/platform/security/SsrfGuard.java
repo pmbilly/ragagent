@@ -1,0 +1,363 @@
+package com.ragagent.platform.security;
+
+import java.net.IDN;
+import java.net.InetAddress;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.regex.Pattern;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+/**
+ * SSRF 校验守卫：URL 校验 / 错误格式化 / 白名单判定。
+ *
+ * 策略：用户提交的 URL 仅允许 http/https/ws/wss、禁止直连 IP（含八进制/十六进制/十进制混淆）、
+ * 禁止受限主机名/后缀/端口，DNS 解析后任一解析 IP 受限即拒绝；
+ * SSRF_WHITELIST + SSRF_WHITELIST_EXTRA 白名单豁免（仅放宽主机/IP，不放松 scheme）。
+ *
+ * 白名单有两个来源：ENV 启动期兜底（config.RuntimeSnapshotWiring 安装），
+ * 以及系统设置运行时推送（SystemSettingService 调 {@code reloadWhitelist}）。
+ */
+@Component
+public class SsrfGuard {
+
+    private static final Logger log = LoggerFactory.getLogger(SsrfGuard.class);
+
+    private static final List<String> RESTRICTED_HOSTNAMES = List.of(
+            "localhost", "127.0.0.1", "::1", "0.0.0.0",
+            "metadata.google.internal", "metadata.tencentyun.com", "metadata.aws.internal",
+            "host.docker.internal", "gateway.docker.internal", "kubernetes.docker.internal",
+            "kubernetes", "kubernetes.default", "kubernetes.default.svc",
+            "kubernetes.default.svc.cluster.local");
+
+    private static final List<String> RESTRICTED_SUFFIXES = List.of(
+            ".local", ".localhost", ".internal", ".corp", ".lan", ".home", ".localdomain",
+            ".svc.cluster.local", ".pod.cluster.local");
+
+    private static final Set<String> RESTRICTED_PORTS = Set.of(
+            "22", "23", "25", "445", "3389", "5432", "3306", "6379", "27017", "9200",
+            "2379", "2380", "8500", "4001");
+
+    /**
+     * 允许的 scheme。含 WebSocket 的两种形态：{@code wss}/{@code ws} 的风险与
+     * {@code https}/{@code http} 等价（分别为加密/明文），且 **IM 长连接只能走 wss**
+     * —— 此前只放行 http/https，导致飞书等平台的长连接 100% 建立失败
+     * （2026-10-11 实测：{@code SsrfException: invalid scheme: wss}，表现为
+     * "渠道配好了但发消息没回复"）。白名单仍只放宽主机/IP，不放松 scheme。
+     */
+    private static final Set<String> ALLOWED_SCHEMES = Set.of("http", "https", "ws", "wss");
+
+    private static final List<Pattern> IP_LIKE_PATTERNS = List.of(
+            Pattern.compile("^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"),
+            Pattern.compile("^\\d{8,10}$"),
+            Pattern.compile("^0[0-7]+\\."),
+            Pattern.compile("(?i)^0x[0-9a-f]+\\."),
+            Pattern.compile("(?i)^0x[0-9a-f]{6,8}$"),
+            Pattern.compile("(?i)^[0-9a-f:]+::[0-9a-f:]*$"),
+            Pattern.compile("(?i)^[0-9a-f]{1,4}(:[0-9a-f]{1,4}){7}$"),
+            Pattern.compile("(?i)^::ffff:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"),
+            Pattern.compile("(?i)^\\[[0-9a-f:]+\\]$"));
+
+    public record Whitelist(Set<String> exactHosts, List<String> suffixHosts,
+                             List<java.net.InetAddress[]> cidrNets, List<Integer> cidrPrefixLens) {
+        static Whitelist empty() {
+            return new Whitelist(Set.of(), List.of(), List.of(), List.of());
+        }
+    }
+
+    /**
+     * 白名单是**进程级**状态。
+     *
+     * <p>刻意用 static：白名单来自进程 env，不是每实例配置；
+     * 二是消除一个真实的偶发故障——出站工具类（{@code LlmTransport} / {@code McpHttp}）
+     * 持有的是**静态** guard 引用，而每个 Spring 测试上下文都会新建一个 {@code SsrfGuard} bean
+     * 并在构造期覆盖那把静态引用。多上下文场景下，测试对"自己的" bean 调
+     * {@code reloadWhitelist} 可能作用在一个已被替换掉的实例上，表现为契约测试随机 400。
+     * 静态化后所有上下文共享同一份白名单，行为确定。</p>
+     */
+    private static volatile Whitelist whitelist = Whitelist.empty();
+
+    public SsrfGuard() {
+        // 白名单是进程级静态；值由 config.RuntimeSnapshotWiring 启动期安装
+    }
+
+    /**
+     * 启动期安装白名单（{@code SSRF_WHITELIST} / {@code SSRF_WHITELIST_EXTRA} 的原始串）——
+     * <b>只允许装配层调用</b>：解析与合并规则仍是本类的 {@code parseWhitelistRaw/mergeRaws}。
+     */
+    public static void installWhitelist(String raw, String extraRaw) {
+        whitelist = parseWhitelistRaw(mergeRaws(raw, extraRaw));
+    }
+
+    /** 原子替换白名单（SystemSettingService 运行时调谐路径；测试亦用）。 */
+    public void reloadWhitelist(String raw) {
+        whitelist = parseWhitelistRaw(raw);
+    }
+
+    /**
+     * 快照当前进程级白名单（测试用）：{@code reloadWhitelist} 改的是 static 字段，
+     * 测试里「new 一个新实例替换进 transport」并不还原它——同 JVM 的后续测试
+     * （storage 契约测试等）会看到上一个测试留下的白名单（known-issues W5a
+     * 「SsrfGuard 互踩」家族的根因）。测试模板：@BeforeEach 里
+     * {@code snapshot = SsrfGuard.snapshotWhitelist();}，@AfterEach 里
+     * {@code SsrfGuard.restoreWhitelist(snapshot);}。
+     */
+    public static Whitelist snapshotWhitelist() {
+        return whitelist;
+    }
+
+    /** 还原 {@link #snapshotWhitelist()} 的快照（测试用）。 */
+    public static void restoreWhitelist(Whitelist snapshot) {
+        whitelist = snapshot == null ? parseWhitelistRaw("") : snapshot;
+    }
+
+    static String mergeRaws(String primary, String extra) {
+        primary = primary == null ? "" : primary.trim();
+        extra = extra == null ? "" : extra.trim();
+        if (primary.isEmpty() && extra.isEmpty()) return "";
+        if (primary.isEmpty()) return extra;
+        if (extra.isEmpty()) return primary;
+        return primary + "," + extra;
+    }
+
+    /**
+     * 空 URL 放行（由调用方决定必填）。
+     * @throws SsrfException 校验失败（消息 = 原错误文案）
+     */
+    public void validateURLForSSRF(String rawURL) {
+        if (rawURL == null || rawURL.isEmpty()) {
+            return;
+        }
+        String normalized = rawURL.contains("://") ? rawURL : "https://" + rawURL;
+        URI uri;
+        try {
+            uri = URI.create(normalized);
+        } catch (IllegalArgumentException e) {
+            throw new SsrfException("invalid URL: " + e.getMessage());
+        }
+        String hostname = uri.getHost();
+        if (hostname == null || hostname.isEmpty()) {
+            throw new SsrfException("URL has no hostname");
+        }
+        String scheme = uri.getScheme() == null ? "" : uri.getScheme().toLowerCase(Locale.ROOT);
+        if (!ALLOWED_SCHEMES.contains(scheme)) {
+            throw new SsrfException("invalid scheme: " + scheme
+                    + " (only http/https/ws/wss allowed)");
+        }
+        if (isWhitelisted(hostname)) {
+            return;
+        }
+        try {
+            isSafeURL(normalized, uri, hostname);
+        } catch (SsrfException e) {
+            // 仅 isSSRFSafeURL 的拒绝带 "SSRF validation failed: " 前缀
+            throw new SsrfException("SSRF validation failed: " + e.getMessage());
+        }
+    }
+
+    /** 受限主机名/后缀/直连 IP/IP 混淆/DNS 解析/端口 */
+    private void isSafeURL(String rawURL, URI uri, String hostname) {
+        if (rawURL.length() > 2048) {
+            throw new SsrfException("URL exceeds maximum length");
+        }
+        String lower = hostname.toLowerCase(Locale.ROOT);
+        for (String restricted : RESTRICTED_HOSTNAMES) {
+            if (lower.equals(restricted)) {
+                throw new SsrfException("hostname " + hostname + " is restricted");
+            }
+        }
+        for (String suffix : RESTRICTED_SUFFIXES) {
+            if (lower.endsWith(suffix)) {
+                throw new SsrfException("hostname suffix " + suffix + " is restricted");
+            }
+        }
+        InetAddress directIp = parseIp(hostname);
+        if (directIp != null) {
+            throw new SsrfException("direct IP address access is not allowed, "
+                    + "use domain name or add to SSRF_WHITELIST");
+        }
+        if (isIPLikeHostname(hostname)) {
+            throw new SsrfException("IP-like hostname format is not allowed");
+        }
+        InetAddress[] ips;
+        try {
+            ips = InetAddress.getAllByName(IDN.toASCII(hostname));
+        } catch (Exception e) {
+            throw new SsrfException("DNS resolution failed for hostname " + hostname
+                    + ": cannot verify if it resolves to safe IP");
+        }
+        for (InetAddress ip : ips) {
+            IpClass.Result r = IpClass.classify(ip);
+            if (r.classification() != IpClass.Class.PUBLIC) {
+                throw new SsrfException("hostname " + hostname + " resolves to restricted IP "
+                        + ip.getHostAddress() + ": " + r.reason());
+            }
+        }
+        int port = uri.getPort();
+        if (port >= 0 && RESTRICTED_PORTS.contains(String.valueOf(port))) {
+            throw new SsrfException("port " + port + " is blocked for security reasons");
+        }
+    }
+
+    /** 中文运维提示文案逐字符一致 */
+    public String formatSSRFError(String label, String rawURL, Exception err) {
+        String host = rawURL;
+        try {
+            String norm = rawURL.contains("://") ? rawURL : "https://" + rawURL;
+            URI u = URI.create(norm);
+            if (u.getHost() != null) {
+                host = u.getHost();
+            }
+        } catch (IllegalArgumentException ignored) {
+            // 保留 rawURL
+        }
+        return label + " 未通过安全校验：" + err.getMessage()
+                + "。如该地址确实可信，请联系运维在服务端环境变量 "
+                + "SSRF_WHITELIST_EXTRA 中加入该主机（支持精确域名 / *.example.com 通配 / IP / CIDR），"
+                + "示例：SSRF_WHITELIST_EXTRA=" + host + ",*.example.com,10.0.0.0/8";
+    }
+
+    /** 精确 / *.后缀 / CIDR（含解析后 CIDR 匹配） */
+    public boolean isWhitelisted(String hostname) {
+        Whitelist wl = whitelist;
+        if (wl == null) {
+            return false;
+        }
+        String lower = hostname.toLowerCase(Locale.ROOT);
+        if (wl.exactHosts().contains(lower)) {
+            return true;
+        }
+        for (String suffix : wl.suffixHosts()) {
+            if (lower.endsWith(suffix) || lower.equals(suffix.substring(1))) {
+                return true;
+            }
+        }
+        InetAddress ip = parseIp(hostname);
+        if (ip != null && inAnyCidr(ip, wl)) {
+            return true;
+        }
+        if (ip == null && !wl.cidrNets().isEmpty()) {
+            try {
+                for (InetAddress resolved : InetAddress.getAllByName(IDN.toASCII(hostname))) {
+                    if (inAnyCidr(resolved, wl)) {
+                        return true;
+                    }
+                }
+            } catch (Exception ignored) {
+                // 解析失败 → 未命中白名单
+            }
+        }
+        return false;
+    }
+
+    private static boolean inAnyCidr(InetAddress ip, Whitelist wl) {
+        byte[] addr = ip.getAddress();
+        for (int i = 0; i < wl.cidrNets().size(); i++) {
+            InetAddress[] net = wl.cidrNets().get(i);
+            int prefix = wl.cidrPrefixLens().get(i);
+            byte[] base = net[0].getAddress();
+            if (base.length != addr.length) {
+                continue;
+            }
+            int fullBytes = prefix / 8;
+            int remBits = prefix % 8;
+            boolean match = true;
+            for (int j = 0; j < fullBytes && j < addr.length; j++) {
+                if (addr[j] != base[j]) {
+                    match = false;
+                    break;
+                }
+            }
+            if (match && remBits > 0 && fullBytes < addr.length) {
+                int mask = 0xff << (8 - remBits);
+                if ((addr[fullBytes] & mask) != (base[fullBytes] & mask)) {
+                    match = false;
+                }
+            }
+            if (match) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** CIDR / *.通配 / 精确；非法条目丢弃并记日志 */
+    static Whitelist parseWhitelistRaw(String raw) {
+        if (raw == null || raw.isEmpty()) {
+            return Whitelist.empty();
+        }
+        Set<String> exact = new HashSet<>();
+        List<String> suffixes = new ArrayList<>();
+        List<InetAddress[]> nets = new ArrayList<>();
+        List<Integer> prefixLens = new ArrayList<>();
+        for (String entry : raw.split(",")) {
+            entry = entry.trim();
+            if (entry.isEmpty()) {
+                continue;
+            }
+            if (entry.contains("/")) {
+                try {
+                    String[] parts = entry.split("/");
+                    InetAddress base = InetAddress.getByName(parts[0]);
+                    int prefix = Integer.parseInt(parts[1]);
+                    nets.add(new InetAddress[]{base});
+                    prefixLens.add(prefix);
+                    continue;
+                } catch (Exception e) {
+                    log.warn("[ssrf-whitelist] dropping invalid CIDR entry \"{}\": {}", entry, e.toString());
+                    continue;
+                }
+            }
+            if (entry.startsWith("*.")) {
+                String suffix = entry.substring(1).toLowerCase(Locale.ROOT);
+                if (suffix.length() <= 1) {
+                    log.warn("[ssrf-whitelist] dropping bare wildcard entry \"{}\" (need *.<domain>)", entry);
+                    continue;
+                }
+                suffixes.add(suffix);
+                continue;
+            }
+            if (entry.contains("*")) {
+                log.warn("[ssrf-whitelist] dropping unsupported wildcard pattern \"{}\" "
+                        + "(only \"*.\" prefix is supported)", entry);
+                continue;
+            }
+            exact.add(entry.toLowerCase(Locale.ROOT));
+        }
+        return new Whitelist(Set.copyOf(exact), List.copyOf(suffixes), List.copyOf(nets), List.copyOf(prefixLens));
+    }
+
+    private static InetAddress parseIp(String host) {
+        // 仅纯 IP 字符串（net.ParseIP 语义）：不含字母、不含 '-'
+        if (host.indexOf(':') >= 0 || host.matches("[0-9.]+")) {
+            try {
+                return InetAddress.getByName(host);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+        return null;
+    }
+
+    private static boolean isIPLikeHostname(String hostname) {
+        for (Pattern p : IP_LIKE_PATTERNS) {
+            if (p.matcher(hostname).matches()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** 校验失败异常（消息文案即对外契约）。 */
+    public static class SsrfException extends RuntimeException {
+        public SsrfException(String message) {
+            super(message);
+        }
+    }
+}

@@ -8,7 +8,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
-import com.ragagent.common.text.ListMerges;
+import com.ragagent.platform.text.ListMerges;
 
 /**
  * 记忆文本的清洗、脱敏、指纹与显式指令识别。

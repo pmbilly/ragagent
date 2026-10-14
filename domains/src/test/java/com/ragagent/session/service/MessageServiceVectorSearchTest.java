@@ -28,7 +28,7 @@ import org.mockito.ArgumentCaptor;
 
 import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.auth.service.TenantService;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.model.service.ModelRuntimeAssembler;
 import com.ragagent.rerank.RankResult;
 import com.ragagent.rerank.Reranker;

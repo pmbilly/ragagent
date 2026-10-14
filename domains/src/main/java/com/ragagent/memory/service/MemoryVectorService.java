@@ -30,8 +30,8 @@ import com.ragagent.memory.repository.MemoryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import com.ragagent.common.context.TenantContext;
-import com.ragagent.common.context.TenantScopes;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.access.TenantScopes;
 
 /**
  * 向量侧的全部动作。

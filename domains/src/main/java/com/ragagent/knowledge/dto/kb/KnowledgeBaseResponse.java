@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.dto.kb;
 
+import com.ragagent.common.vectorstore.VectorStoreView;
+
 import java.time.OffsetDateTime;
 
 import com.fasterxml.jackson.annotation.JsonValue;

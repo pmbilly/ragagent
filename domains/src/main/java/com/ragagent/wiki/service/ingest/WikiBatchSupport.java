@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.regex.Pattern;
 
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.wiki.WikiLanguageSupport;
-import com.ragagent.common.context.TenantScopes;
+import com.ragagent.platform.access.TenantScopes;
 
 /**
  * 批次执行用到的零散工具：错误分类、正文清洗、有界并发扇出、span 门面。

@@ -15,13 +15,13 @@ import com.ragagent.chatpipeline.plugin.PluginError;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
-import com.ragagent.common.prompt.MessageAttachmentsPrompt;
+import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
 import com.ragagent.common.session.PipelineMessageAttachmentView;
 import com.ragagent.common.session.PipelineMessageImageView;
 import com.ragagent.common.session.PipelineMessageView;
-import com.ragagent.common.prompt.PromptComposer;
-import com.ragagent.common.context.TenantContext;
-import com.ragagent.common.prompt.AgentPromptPlaceholders;
+import com.ragagent.platform.prompt.PromptComposer;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.prompt.AgentPromptPlaceholders;
 import com.ragagent.platform.access.TenantContextSnapshot;
 
 /**

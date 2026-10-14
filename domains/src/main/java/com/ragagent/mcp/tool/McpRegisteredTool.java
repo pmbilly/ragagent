@@ -4,7 +4,7 @@ package com.ragagent.mcp.tool;
 import com.ragagent.common.llm.ToolResult;
 import com.ragagent.agent.tool.McpCatalogGuardedTool;
 import com.ragagent.agent.tool.ToolRequest;
-import com.ragagent.common.web.ToolJson;
+import com.ragagent.platform.web.ToolJson;
 
 /**
  * 绑定一个授权目录与 schema 的模型可见定义。它的定义虽然预先广告过，也<b>不得</b>

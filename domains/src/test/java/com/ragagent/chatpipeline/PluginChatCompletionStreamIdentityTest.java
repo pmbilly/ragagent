@@ -12,7 +12,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.ragagent.chatpipeline.plugin.PluginChatCompletionStream;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.llm.ResponseType;
 import com.ragagent.llm.ChatStream;
 import com.ragagent.llm.LlmChatClient;

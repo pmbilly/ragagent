@@ -13,13 +13,13 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.tenant.repository.TenantLookup;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.storage.domain.StoredResource;
 import com.ragagent.storage.service.ResourceCatalogService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import com.ragagent.common.web.ContentTypeByFilename;
+import com.ragagent.platform.text.ContentTypeByFilename;
 
 /**
  * 文件代理面共享处理器：

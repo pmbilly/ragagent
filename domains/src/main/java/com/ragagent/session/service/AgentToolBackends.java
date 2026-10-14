@@ -37,7 +37,7 @@ import com.ragagent.agenttools.wiki.WikiUpdateIssueTool;
 import com.ragagent.agenttools.wiki.WikiWritePageTool;
 import com.ragagent.agenttools.wiki.WikiSearchTool;
 import com.ragagent.agenttools.wiki.WikiReadSourceDocTool;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.service.MemorySearchResult;
 import com.ragagent.memory.service.MemoryService;

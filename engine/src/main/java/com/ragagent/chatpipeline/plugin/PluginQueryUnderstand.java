@@ -16,12 +16,12 @@ import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
-import com.ragagent.common.prompt.MessageAttachmentsPrompt;
+import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
 import com.ragagent.common.session.PipelineMessageImageView;
 import com.ragagent.common.session.PipelineMessageView;
 import com.ragagent.common.web.JsonMappers;
 import com.ragagent.llm.extract.PipelineConfig;
-import com.ragagent.common.prompt.AgentPromptPlaceholders;
+import com.ragagent.platform.prompt.AgentPromptPlaceholders;
 import com.ragagent.llm.domain.ChatResponse;
 
 /**

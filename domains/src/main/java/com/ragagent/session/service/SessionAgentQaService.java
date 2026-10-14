@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.ragagent.common.prompt.MessageAttachmentsPrompt;
+import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
 import com.ragagent.common.session.PipelineUsedMemoryView;
 import com.ragagent.knowledge.service.faq.FaqEntryQueryService;
 import com.ragagent.agent.AgentEngine;

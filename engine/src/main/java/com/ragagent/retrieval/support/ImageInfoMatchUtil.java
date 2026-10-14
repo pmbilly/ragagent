@@ -9,7 +9,7 @@ import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.retrieval.domain.ImageInfo;
-import com.ragagent.common.web.ProviderJson;
+import com.ragagent.platform.web.ProviderJson;
 
 /**
  * 检索窗口与 image_info 的互相裁剪（{@code ImageURLsInContent / ImageURLsFromInfo} 已在

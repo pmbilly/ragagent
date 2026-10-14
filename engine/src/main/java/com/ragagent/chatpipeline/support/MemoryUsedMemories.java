@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.ragagent.common.session.PipelineUsedMemoryView;
 import com.ragagent.common.memory.MemoryItemView;
-import com.ragagent.common.text.ListMerges;
+import com.ragagent.platform.text.ListMerges;
 
 /**
  * {@code memory_items} → 客户端可见形态的投影（条目投影 + 已展示记忆合并）。

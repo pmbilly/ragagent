@@ -28,7 +28,7 @@ import java.time.ZoneOffset;
 import com.ragagent.common.error.BizException;
 import com.ragagent.common.graph.NameSpace;
 import com.ragagent.retrieval.graph.RetrieveGraphRepository;
-import com.ragagent.common.context.TracingContext;
+import com.ragagent.platform.access.TracingContext;
 import com.ragagent.embedding.Embedder;
 import com.ragagent.knowledge.domain.KnowledgeBaseChunkingConfig;
 import com.ragagent.model.service.ModelRuntimeAssembler;
@@ -53,8 +53,8 @@ import java.util.concurrent.ExecutorService;
 import org.springframework.beans.factory.ObjectProvider;
 import com.ragagent.common.wiki.WikiFinalizePort;
 import com.ragagent.common.wiki.WikiIngestPort;
-import com.ragagent.common.context.TenantContext;
-import com.ragagent.common.context.TenantScopes;
+import com.ragagent.platform.access.TenantContext;
+import com.ragagent.platform.access.TenantScopes;
 
 /**
  * 知识处理后台 worker：虚拟线程队列消费 knowledge 的解析主链路

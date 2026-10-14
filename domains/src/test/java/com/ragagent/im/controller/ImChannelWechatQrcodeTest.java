@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.error.PlainErrorException;
+import com.ragagent.platform.web.error.PlainErrorException;
 import com.ragagent.im.channel.wechat.WechatQRCodeService;
 import com.ragagent.im.channel.wechat.WechatQRCodeService.LoginResult;
 import com.ragagent.im.channel.wechat.WechatQRCodeService.QRCodeResult;

@@ -2,7 +2,7 @@ package com.ragagent.wiki.service.page;
 
 import java.util.function.Supplier;
 
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.wiki.domain.WikiConstants;
 
 /**

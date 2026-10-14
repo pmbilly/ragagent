@@ -10,7 +10,7 @@ import java.util.Set;
  * 租户 API Key 的**能力（capability）模型**：能力常量表与归一化规则。
  *
  * <p><b>这是权限语义，不是配置项</b>：能力是"叠加式授权"（additive grant），
- * 与 JWT 的角色/所有权（{@link com.ragagent.common.web.RbacInterceptor}）是
+ * 与 JWT 的角色/所有权（{@link com.ragagent.platform.web.RbacInterceptor}）是
  * <b>两套独立叠加的授权</b>。full-access Key 拥有全部能力且发 Key 时不允许再带细粒度能力；
  * scoped Key 只能做能力清单里列出的动作，且其 {@code knowledgeBaseIds} 白名单
  * 在知识库相关路由上仍额外生效。</p>

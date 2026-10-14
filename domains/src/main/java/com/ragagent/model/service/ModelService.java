@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.common.tenant.TenantConfigLookup;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.model.domain.Model;
@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import com.ragagent.common.model.ModelFacts;
-import com.ragagent.common.model.ModelGateway;
+import com.ragagent.platform.model.ModelGateway;
 
 /**
  * 模型配置服务（配置 CRUD + credentials 子资源 + 删除守卫；运行时工厂见 ModelRuntimeAssembler）。

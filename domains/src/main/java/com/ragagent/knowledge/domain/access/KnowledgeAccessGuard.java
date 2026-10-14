@@ -5,7 +5,7 @@ import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import org.springframework.stereotype.Component;
 import com.ragagent.common.tenant.TenantRole;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 
 /**
  * knowledge 文档操作面路由（第二批）的守卫入口——语义与 {@link ChunkAccessGuard}

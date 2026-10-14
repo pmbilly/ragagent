@@ -4,7 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.ragagent.common.context.TracingContext;
+import com.ragagent.platform.access.TracingContext;
 
 /**
  * 异步任务侧的观测作用域：

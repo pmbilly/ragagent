@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import com.ragagent.agent.tool.ExecutionPolicy;
-import com.ragagent.common.context.TenantContext;
+import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.BizException;
 import com.ragagent.common.llm.ToolResult;
 import com.ragagent.platform.access.TenantContextSnapshot;

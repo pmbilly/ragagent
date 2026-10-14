@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ragagent.retrieval.HybridSearchService.StoreGroup;
-import com.ragagent.common.security.LogSanitizer;
+import com.ragagent.platform.security.LogSanitizer;
 
 /**
  * HybridSearch 的 store-group 解析簇：KB 按 (vectorStoreId, 属主租户) 分桶、逐组经工厂

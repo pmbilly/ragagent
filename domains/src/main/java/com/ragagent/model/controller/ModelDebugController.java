@@ -15,7 +15,7 @@ import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.embedding.Embedder;
-import com.ragagent.common.storage.UploadLimits;
+import com.ragagent.platform.storage.config.UploadLimits;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.modelruntime.adapter.provider.chat.common.ProviderAdapters;
 import com.ragagent.modelruntime.adapter.provider.chat.common.ThinkingStrategies;
@@ -47,7 +47,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import com.ragagent.model.service.ModelRuntimeConfigs;
-import com.ragagent.common.web.ApiResult;
+import com.ragagent.platform.web.ApiResult;
 
 /**
  * 模型调试端点（POST /api/v1/models/{id}/debug）。
