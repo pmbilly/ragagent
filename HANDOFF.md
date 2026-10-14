@@ -1308,6 +1308,20 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **A② 全批提交**：`a7d3b13e`（第①批 42 类）· `37b5fbb8`（第②批 去框架化 37 类）· `2ee75327`（第②批 补：解锁 11 类）· 本批（第③批 9 类 + 收口）。
 - **A 的下一步**：**③ 立「域间只经契约」**（A20 已守"契约唯一实现"；还差"业务域之间只经 `contract`"这条规则——应先测现状再决定硬规则 vs 棘轮基线）。可选后续：① 的 K 级重设计（`JsonNode` → typed records）另立项。
 
+**🔶 A③ 口径定盘：R10 三档分级（2026-10-14，边 57 / 类 280 不变——本批只改"怎么读"）**
+- **回答"理想状态是不是清零"**：R10 **已只算"对他域实现类"的依赖**（`contract.*` 与装配层 `config/platform/common` 不计）⇒ "清零"＝"不再有任何域直接依赖他域实现"，有意义 ✓；但**一刀切清零会逼出假抽象** —— 属主边（如 `auth→tenant`）清零就得给"租户实体字段清单"造端口 ✗，比直接依赖更差 ⇒ **目标不是"0 条边"，而是"0 条未分类边"** ✓。
+- **三档口径（写进基线 `tiers`，检查器读档）**：
+  - ① `clearable` **49 条 / 194 类** ← **目标 0（A③ 主线）**，也是 `domains` 拆 Gradle 模块的先决条件；
+  - ② `owner` **3 条 / 21 类**（`auth→tenant` 14 · `system→auth` 5 · `system→tenant` 2）—— 同数据属主/管理面，**登记允许**，条件＝读侧走 L1 端口、写/管理面集中在属主域；
+  - ③ `intra-family` **5 条 / 65 类** —— 族 **`agent-runtime` = `agent`/`agentmanagement`/`agenttools`/`session`** ⇒ **豁免但冻结**（本档新增类仍判红），跨族仍按 ①。
+- **分档证据**：`auth→tenant` 属主依据＝§8.9 给 `tenant/` 只留 3 包/10 文件（配置 + `TenantMapper` + `repository/Tenant|TenantConfigRedaction|TenantLookup`），**管理面计划上就留在 auth** ⇒ 清零要么违背计划面清单、要么改公开 API 形状；`system→auth` 属主依据＝§8.9 把 `SystemAdminUserService` 放在 `system/`（**待裁定**：写侧直用他域 mapper 与 §9.1「状态唯一写入者」有张力）；族内依据＝B211 试切 `:channels` 回退的结论「紧耦合对内聚优先」。
+- **④ 待判 15 条全部归位 ⇒ "未分类"清零 ✓**：13 条入 ①（tool SPI ×3 边 / `TenantService` 读取口 ×3 边 / **`embedchannel` 直用他域 controller ×4** ✗ 违反 §12.1 规则 1 / `im` ×3 / `session→mcp` 等）、1 条入 ②（`system→auth`）。
+- **① 档高杠杆刀清单（写进 `tiers.clearable.focus`，供后续逐刀）**：**tool SPI**（`agent.tool.*`）提 contract ⇒ **一刀清 3 条**（`approval→agent`/`im→agent`/`mcp→agent`，11 类，消费方全在族外）；**`auth.service.TenantService` 读取口** ⇒ **一刀清 3 条**（`datasource`/`embedchannel`/`memory→auth`，4 类）；`embedchannel` ×4（优先级最高）；`im` ×3；`session` 能力边（63 类）。
+- **守卫改造（`scripts/check-domain-contracts.py`）**：分档读自基线 + **分档元数据自检**（族内登记必须与族定义一致，否则守卫自身判红）+ `--write` 自动清理**陈旧登记**（边已消失的 tiers 条目）+ 失败信息标注"⇒ 默认入 ①（目标 0）"与"**登记不是新增许可**（棘轮先于分档）"。`--list` 现在带档位标记与 ②③ 档理由。
+- **三条安全阀实测**：① `--write` 幂等（连跑 2 次 hash 不变 ✓）；② 造新边 ⇒ strict 红 + **退出码 1** ✓、`--write` 拒绝 + 退出码 1 ✓；③ 还原 ⇒ 绿 + 退出码 0 ✓（基线 hash 复原一致）。
+- **⚠️ 两条自伤（记录）**：① 反向探针我**直接改源码造边**，撤销时多留一行空行（`git diff` 抓到）⇒ 改为"**只动基线**"的探针法（安全、可逆、零源码触碰）✓；② `cmd | head` 之后的 `$?` 取的是 `head` 的退出码 ✗ ⇒ **退出码必须不经管道测** ✓。
+- **验证**：`bash scripts/run-guards.sh` ⇒ **13 守卫全绿** ✓（R10 行现在带三档进度与族定义）；工作树仅两文件（检查器 + 基线）。
+- **A③ 的 DoD（定盘）**：① `clearable` = **0**；② `owner` 3 条带条件维持（读侧端口化已做 ✓）；③ `intra-family` 5 条冻结；**未分类 = 0（本批已达成 ✓）**。
 **🔶 A③ 收敛第八刀：扫余量小边（2026-10-14，R10 **边 60 → 57**、类 284 → 280）**
 - **迁 4 个只读类**（一律零 API 形状变化 ✓）：
   - `memory/MemoryService.workspaceConfig`：`getTenantById` + `tenant.getMemoryConfig()` → **`tenantService.memoryConfig(id)`** ✓（try/catch 与会零值语义保持 ✓）；
