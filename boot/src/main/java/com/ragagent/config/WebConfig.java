@@ -4,7 +4,7 @@ import com.ragagent.common.tenant.TenantProperties;
 import java.util.List;
 
 import com.ragagent.common.tenant.TenantRole;
-import com.ragagent.auth.filter.AuthFilter;
+import com.ragagent.auth.controller.filter.AuthFilter;
 import com.ragagent.auth.service.UserService;
 import com.ragagent.common.filter.RequestIdFilter;
 import com.ragagent.common.web.ApiResultInterceptor;
@@ -19,15 +19,15 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import com.ragagent.auth.apikey.filter.APIKeyAuthChannel;
-import com.ragagent.auth.apikey.filter.APIKeyGateInterceptor;
-import com.ragagent.auth.apikey.filter.APIKeyRouteAuthorizer;
-import com.ragagent.auth.apikey.filter.APIKeyRoutePolicies;
-import com.ragagent.auth.apikey.filter.APIKeyScopeCleanupFilter;
-import com.ragagent.auth.apikey.filter.AllowFileServeAPIKeyInterceptor;
-import com.ragagent.auth.apikey.filter.DenyAPIKeyPrincipalInterceptor;
+import com.ragagent.auth.apikey.controller.filter.APIKeyAuthChannel;
+import com.ragagent.auth.apikey.controller.filter.APIKeyGateInterceptor;
+import com.ragagent.auth.apikey.controller.filter.APIKeyRouteAuthorizer;
+import com.ragagent.auth.apikey.controller.filter.APIKeyRoutePolicies;
+import com.ragagent.auth.apikey.controller.filter.APIKeyScopeCleanupFilter;
+import com.ragagent.auth.apikey.controller.filter.AllowFileServeAPIKeyInterceptor;
+import com.ragagent.auth.apikey.controller.filter.DenyAPIKeyPrincipalInterceptor;
 import com.ragagent.auth.apikey.service.TenantAPIKeyService;
-import com.ragagent.auth.filter.WsAuthSupport;
+import com.ragagent.auth.controller.filter.WsAuthSupport;
 import com.ragagent.common.deployment.DeploymentProperties;
 import com.ragagent.system.service.DeploymentCapabilitiesHolder;
 import com.ragagent.tracing.langfuse.LangfuseHttpInterceptor;
@@ -80,7 +80,7 @@ public class WebConfig implements WebMvcConfigurer {
     }
 
     /** 认证过滤器（全局，覆盖 /*）。JWT 认证装配链在
-     *  {@link com.ragagent.auth.filter.WsAuthSupport}（@Component），
+     *  {@link com.ragagent.auth.controller.filter.WsAuthSupport}（@Component），
      *  本过滤器只组装三通道分派。 */
     @Bean
     public FilterRegistrationBean<AuthFilter> authFilter(UserService userService,

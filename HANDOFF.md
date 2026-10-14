@@ -1167,6 +1167,13 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 ✓；`spotlessCheck build` ✓ **1m42s** ✓ **十二守卫** ✓（环 0 / 包级 SCC 12 组）；`:domains:javadoc` ✓；定向 `--rerun-tasks` ✓。
 - **登记（B266 余下）**：auth 两处 filter 面归位（`filter/`→`controller.filter/`、`apikey/filter/`→`apikey.controller.filter/`）+ `apikey.dto`(2) 落点 · model 两处改名（`ModelResponse`/`ModelRuntimeFactory`）· storage `provider/` 定性 + `fileserve` 多 `StoragePathGuard` · websearch `fetch/`(4) 落点 · im `service.ImService` vs 目标 `ImTurnOrchestrator`。
 
+**🔶 B266 第③步（2026-10-14，auth 两处 filter 面归位）**
+- **归位**：`auth/filter`(2) → **`auth/controller/filter`**；`auth/apikey/filter`(9) → **`auth/apikey/controller/filter`**（对齐 §8.9 的面名）；测试 `auth/apikey/filter/APIKeyAuthChannelPrincipalTest` 随迁 mirror 包；两处新面 package-info。
+- **换锚**：`check-json-key-case.py` 键级豁免路径（`auth/apikey/controller/filter/APIKeyAuthChannel.java`）；`file-size.baseline.json` 键换锚（**717 → 717**）；FQN 替换 9 文件（含 `WebConfig`、`common/apikey/ApiKeyAuthPort` 与 4 个 boot 契约测试）。
+- **踩坑**：`git mv <file> <dir>/` **要求目标目录已存在**（首版只建了父级 `auth/controller`）⇒ 脚本报 `No such file or directory` 后中止（未产生半成品改动）⇒ 补 `mkdir -p` 目标目录重跑 ✓。
+- **登记**：`apikey.dto`(2) 的 `TenantAPIKeyCreateResponse`/`TenantAPIKeyResponse` 全仓**不存在** ⇒ 属**待创建**（重构级，登记）。
+- **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 ✓；`spotlessCheck build` ✓ ✓ **十二守卫** ✓（环 0 / 包级 SCC 12 组）；`:domains:javadoc` ✓；定向 `--rerun-tasks` ✓。
+
 **🔶 B263 第㉟步（2026-10-14，第二个子面 `service.chunk` 切出）**
 - **动前断言（把"可测"变成"可证"）**：脚本**先断言** `ChunkEditService`/`ChunkExtractService`/`ChunkReadService` 三者在 `service` 包内**入度为零**（无人引用，`package-info` 除外），断言不过就 abort —— 这样"切出只产生单向外边"不再靠推理。`ChunkQuestionService` **故意留在** `service`：它被 `QuestionGenerationService` 引用，单独搬会造出 `service ⇄ service.chunk` 环（已在子面 package-info 写明）。
 - **切出**：3 类 → `com.ragagent.knowledge.service.chunk`（`git mv` + 包声明 + 全仓 FQN 替换 3 文件）；测试面 `ChunkExtractServiceTest` 随迁；新建 `service/chunk/package-info`；`service/package-info` 同步。

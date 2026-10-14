@@ -6,9 +6,9 @@ import java.util.List;
 
 import com.ragagent.common.security.APIKeyCapability;
 import com.ragagent.common.security.TenantAPIKeyScope;
-import com.ragagent.auth.apikey.filter.APIKeyRouteAuthorizer;
-import com.ragagent.auth.apikey.filter.APIKeyRoutePolicies;
-import com.ragagent.auth.apikey.filter.APIKeyRoutePolicy;
+import com.ragagent.auth.apikey.controller.filter.APIKeyRouteAuthorizer;
+import com.ragagent.auth.apikey.controller.filter.APIKeyRoutePolicies;
+import com.ragagent.auth.apikey.controller.filter.APIKeyRoutePolicy;
 import org.junit.jupiter.api.Test;
 
 /**

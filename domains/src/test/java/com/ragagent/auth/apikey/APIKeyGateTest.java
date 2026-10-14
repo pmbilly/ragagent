@@ -6,11 +6,11 @@ import java.util.List;
 
 import com.ragagent.common.security.APIKeyCapability;
 import com.ragagent.common.security.TenantAPIKeyScope;
-import com.ragagent.auth.apikey.filter.APIKeyGateInterceptor;
-import com.ragagent.auth.apikey.filter.APIKeyRouteAuthorizer;
-import com.ragagent.auth.apikey.filter.APIKeyRoutePolicy;
-import com.ragagent.auth.apikey.filter.AllowFileServeAPIKeyInterceptor;
-import com.ragagent.auth.apikey.filter.DenyAPIKeyPrincipalInterceptor;
+import com.ragagent.auth.apikey.controller.filter.APIKeyGateInterceptor;
+import com.ragagent.auth.apikey.controller.filter.APIKeyRouteAuthorizer;
+import com.ragagent.auth.apikey.controller.filter.APIKeyRoutePolicy;
+import com.ragagent.auth.apikey.controller.filter.AllowFileServeAPIKeyInterceptor;
+import com.ragagent.auth.apikey.controller.filter.DenyAPIKeyPrincipalInterceptor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;

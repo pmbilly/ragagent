@@ -1,4 +1,4 @@
-package com.ragagent.auth.apikey.filter;
+package com.ragagent.auth.apikey.controller.filter;
 
 import com.ragagent.common.security.APIKeyCapability;
 

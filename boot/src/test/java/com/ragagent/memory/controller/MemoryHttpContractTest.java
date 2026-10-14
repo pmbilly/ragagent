@@ -13,10 +13,10 @@ import java.util.regex.Pattern;
 
 import com.ragagent.TestSchema;
 import com.ragagent.common.security.TenantAPIKeyScope;
-import com.ragagent.auth.apikey.filter.APIKeyGateInterceptor;
-import com.ragagent.auth.apikey.filter.APIKeyRouteAuthorizer;
-import com.ragagent.auth.apikey.filter.APIKeyRoutePolicies;
-import com.ragagent.auth.apikey.filter.APIKeyRoutePolicy;
+import com.ragagent.auth.apikey.controller.filter.APIKeyGateInterceptor;
+import com.ragagent.auth.apikey.controller.filter.APIKeyRouteAuthorizer;
+import com.ragagent.auth.apikey.controller.filter.APIKeyRoutePolicies;
+import com.ragagent.auth.apikey.controller.filter.APIKeyRoutePolicy;
 import com.ragagent.tenant.Tenant;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.domain.User;

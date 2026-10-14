@@ -9,7 +9,7 @@
     "domains/src/main/java/com/ragagent/agenttools/knowledge/GrepChunksTool.java": 672,
     "domains/src/main/java/com/ragagent/agenttools/web/WebFetchTool.java": 692,
     "domains/src/main/java/com/ragagent/approval/Gate.java": 655,
-    "domains/src/main/java/com/ragagent/auth/apikey/filter/APIKeyRoutePolicies.java": 717,
+    "domains/src/main/java/com/ragagent/auth/apikey/controller/filter/APIKeyRoutePolicies.java": 717,
     "domains/src/main/java/com/ragagent/auth/controller/AuthController.java": 670,
     "domains/src/main/java/com/ragagent/auth/service/UserService.java": 757,
     "domains/src/main/java/com/ragagent/datasource/connector/feishu/core/DocxBlocks.java": 730,
