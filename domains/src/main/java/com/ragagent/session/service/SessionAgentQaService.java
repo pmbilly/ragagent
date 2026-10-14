@@ -39,7 +39,7 @@ import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.service.McpMetadataService;
 import com.ragagent.mcp.service.McpServiceManagement;
 import com.ragagent.rerank.RerankerFactory;
-import com.ragagent.storage.service.ResourceCatalogService;
+import com.ragagent.common.storage.ResourceCatalogPort;
 import com.ragagent.model.service.ModelRowViews;
 
 /**
@@ -88,7 +88,7 @@ public class SessionAgentQaService {
             MemoryService memoryService,
             SessionKnowledgeQaService knowledgeQa,
             AgentToolBackends toolBackends,
-            ResourceCatalogService resourceCatalog,
+            ResourceCatalogPort resourceCatalog,
             javax.sql.DataSource dataSource,
             ArtifactCollectorWiring artifactCollectorWiring,
             KnowledgeService knowledgeService,

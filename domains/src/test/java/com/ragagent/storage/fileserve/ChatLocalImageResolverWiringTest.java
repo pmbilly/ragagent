@@ -34,6 +34,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.MockedStatic;
 import com.ragagent.common.storage.fileserve.FileTransport;
 import com.ragagent.common.storage.fileserve.StoragePaths;
+import com.ragagent.common.storage.fileserve.FileContentService;
 
 /**
  * {@link ChatLocalImageResolverWiring} 的装配单测（mock 依赖）+ 两条集成式断言

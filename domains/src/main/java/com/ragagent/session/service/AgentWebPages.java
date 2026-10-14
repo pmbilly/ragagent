@@ -8,7 +8,7 @@ import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.ragagent.agenttools.web.WebFetchTool;
-import com.ragagent.storage.service.ResourceCatalogService;
+import com.ragagent.common.storage.ResourceCatalogPort;
 
 /**
  * agent 抓取页的完整快照存取。
@@ -47,7 +47,7 @@ public class AgentWebPages implements WebFetchTool.WebPageSource {
     }
 
     private final JdbcTemplate jdbc;
-    private final ResourceCatalogService catalog;
+    private final ResourceCatalogPort catalog;
     private final Store store;
     private final Binding binding;
     private final long tenantId;
@@ -56,7 +56,7 @@ public class AgentWebPages implements WebFetchTool.WebPageSource {
     private final String messageId;
 
     /** 全参装配（store/binding 为存储写字节面的接缝，dev 可空）。 */
-    public AgentWebPages(DataSource dataSource, ResourceCatalogService catalog,
+    public AgentWebPages(DataSource dataSource, ResourceCatalogPort catalog,
             Store store, Binding binding, long tenantId,
             String ownerId, String sessionId, String messageId) {
         this.jdbc = new JdbcTemplate(dataSource);
@@ -121,10 +121,10 @@ public class AgentWebPages implements WebFetchTool.WebPageSource {
         }
         String ref = "resource://" + address.substring("web://".length());
         var resource = catalog == null ? null : catalog.resolve(ref).orElse(null);
-        if (resource == null || resource.getTenantId() != tenantId) {
+        if (resource == null || resource.tenantId() != tenantId) {
             throw new IllegalStateException("saved web page is unavailable in this session");
         }
-        if (!assistantMessageExists() || !bindingExists(resource.getId())) {
+        if (!assistantMessageExists() || !bindingExists(resource.id())) {
             throw new IllegalStateException("saved web page is unavailable in this session");
         }
         if (store == null) {

@@ -223,11 +223,7 @@
       "TemporaryDocumentController"
     ],
     "session→storage": [
-      "AgentEngineAssembler",
-      "AgentWebPages",
-      "ArtifactCollectorWiring",
-      "MessageFileProxyController",
-      "SessionAgentQaService"
+      "MessageFileProxyController"
     ],
     "session→knowledge": [
       "AgentEngineAssembler",

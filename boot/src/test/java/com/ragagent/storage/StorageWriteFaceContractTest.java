@@ -14,7 +14,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.ragagent.storage.fileserve.LocalFileContentService;
 import com.ragagent.storage.fileserve.StorageFileResolver;
-import com.ragagent.storage.fileserve.WritableFileContentService;
+import com.ragagent.common.storage.fileserve.WritableFileContentService;
 import com.ragagent.storage.service.ResourceCatalogService;
 
 /**

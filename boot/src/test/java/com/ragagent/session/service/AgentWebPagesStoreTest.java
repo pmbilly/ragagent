@@ -12,7 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.ragagent.TestSchema;
-import com.ragagent.storage.service.ResourceCatalogService;
+import com.ragagent.common.storage.ResourceCatalogPort;
 
 /**
  * AgentWebPages 生产存储接缝。
@@ -32,7 +32,7 @@ class AgentWebPagesStoreTest {
     @Autowired
     private JdbcTemplate jdbc;
     @Autowired
-    private ResourceCatalogService catalog;
+    private ResourceCatalogPort catalog;
     @Autowired
     private ArtifactCollectorWiring wiring;
 
@@ -62,7 +62,7 @@ class AgentWebPagesStoreTest {
 
         // 绑定行：web_page 关系绑到 assistant 消息
         String resourceId = catalog.resolve(
-                "resource://" + address.substring("web://".length())).orElseThrow().getId();
+                "resource://" + address.substring("web://".length())).orElseThrow().id();
         Integer bindings = jdbc.queryForObject(
                 "SELECT COUNT(*) FROM resource_bindings WHERE resource_id = ? AND owner_type = 'message' "
                         + "AND owner_id = ? AND relation = 'web_page'",
@@ -79,7 +79,7 @@ class AgentWebPagesStoreTest {
         AgentWebPages pages = pages();
         String address = pages.save("内容");
         String handle = address.substring("web://".length());
-        String resourceId = catalog.resolve("resource://" + handle).orElseThrow().getId();
+        String resourceId = catalog.resolve("resource://" + handle).orElseThrow().id();
 
         // 绑定被删 → 拒绝
         jdbc.update("DELETE FROM resource_bindings WHERE resource_id = ?", resourceId);

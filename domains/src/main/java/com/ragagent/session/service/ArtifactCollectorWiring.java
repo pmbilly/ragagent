@@ -4,12 +4,11 @@ import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.ragagent.storage.fileserve.StorageFileResolver;
-import com.ragagent.storage.fileserve.WritableFileContentService;
-import com.ragagent.storage.service.ResourceCatalogService;
+import com.ragagent.common.storage.ResourceCatalogPort;
+import com.ragagent.common.storage.fileserve.GlobalFileServicePort;
+import com.ragagent.common.storage.fileserve.WritableFileContentService;
 
 /**
  * AgentWebPages（agent 抓取页 web:// 快照）的生产装配。
@@ -22,17 +21,13 @@ public class ArtifactCollectorWiring {
 
     private static final Logger log = LoggerFactory.getLogger(ArtifactCollectorWiring.class);
 
-    private final StorageFileResolver resolver;
-    private final ResourceCatalogService catalog;
-    private final String localBaseDir;
+    private final GlobalFileServicePort globalFileService;
+    private final ResourceCatalogPort catalog;
 
-    public ArtifactCollectorWiring(StorageFileResolver resolver,
-            ResourceCatalogService catalog,
-            @Value("${weknora.storage.local-base-dir:${LOCAL_STORAGE_BASE_DIR:/data/files}}")
-            String localBaseDir) {
-        this.resolver = resolver;
+    public ArtifactCollectorWiring(GlobalFileServicePort globalFileService,
+            ResourceCatalogPort catalog) {
+        this.globalFileService = globalFileService;
         this.catalog = catalog;
-        this.localBaseDir = localBaseDir;
     }
 
     private WritableFileContentService globalStorage;
@@ -40,7 +35,7 @@ public class ArtifactCollectorWiring {
     /** 进程级装饰服务（lazy：避免装配期碰文件系统）。 */
     public synchronized WritableFileContentService globalStorage() {
         if (globalStorage == null) {
-            globalStorage = resolver.globalFileService(localBaseDir);
+            globalStorage = globalFileService.globalService();
         }
         return globalStorage;
     }

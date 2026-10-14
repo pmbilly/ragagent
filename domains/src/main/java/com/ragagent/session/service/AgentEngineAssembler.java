@@ -39,7 +39,7 @@ import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.service.McpMetadataService;
 import com.ragagent.mcp.service.McpServiceManagement;
 import com.ragagent.session.domain.conversation.SessionOwnerIds;
-import com.ragagent.storage.service.ResourceCatalogService;
+import com.ragagent.common.storage.ResourceCatalogPort;
 import com.ragagent.agent.prompt.RecentDocInfo;
 import com.ragagent.agent.prompt.SelectedDocumentInfo;
 import com.ragagent.agent.prompt.PinnedMCPServiceInfo;
@@ -70,13 +70,13 @@ final class AgentEngineAssembler {
     private final McpMetadataService mcpMetadataService;
     private final McpClientManager mcpClientManager;
     private final ToolApprovalGate toolApprovalGate;
-    private final ResourceCatalogService resourceCatalog;
+    private final ResourceCatalogPort resourceCatalog;
     private final javax.sql.DataSource dataSource;
     private final VlmDescriberWiring vlmDescriberWiring;
     /** 平台级技能目录（skills 表入库版）：装配期建 {@code DbSkillSource} 读 skills 表。 */
     private final SkillCatalogService skillCatalogService;
 
-    AgentEngineAssembler(MemoryService memoryService, SessionKnowledgeQaService knowledgeQa, AgentToolBackends toolBackends, ArtifactCollectorWiring artifactCollectorWiring, KnowledgeService knowledgeService, FaqEntryQueryService faqService, McpServiceManagement mcpServiceService, McpMetadataService mcpMetadataService, McpClientManager mcpClientManager, ToolApprovalGate toolApprovalGate, ResourceCatalogService resourceCatalog, javax.sql.DataSource dataSource, VlmDescriberWiring vlmDescriberWiring, SkillCatalogService skillCatalogService) {
+    AgentEngineAssembler(MemoryService memoryService, SessionKnowledgeQaService knowledgeQa, AgentToolBackends toolBackends, ArtifactCollectorWiring artifactCollectorWiring, KnowledgeService knowledgeService, FaqEntryQueryService faqService, McpServiceManagement mcpServiceService, McpMetadataService mcpMetadataService, McpClientManager mcpClientManager, ToolApprovalGate toolApprovalGate, ResourceCatalogPort resourceCatalog, javax.sql.DataSource dataSource, VlmDescriberWiring vlmDescriberWiring, SkillCatalogService skillCatalogService) {
         this.memoryService = memoryService;
         this.knowledgeQa = knowledgeQa;
         this.toolBackends = toolBackends;
