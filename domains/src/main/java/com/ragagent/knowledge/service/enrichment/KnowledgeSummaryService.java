@@ -1,7 +1,6 @@
 package com.ragagent.knowledge.service.enrichment;
 
 import com.ragagent.knowledge.service.KnowledgeAccessHelper;
-import com.ragagent.knowledge.service.KnowledgeFileService;
 
 import com.ragagent.knowledge.domain.KnowledgeTenants;
 
@@ -62,7 +61,6 @@ public class KnowledgeSummaryService {
     private final ModelRuntimeFactory modelRuntimeFactory;
     private final ChunkVectorIndexer chunkVectorIndexer;
     private final ConversationProperties conversationProps;
-    private final KnowledgeFileService knowledgeFileService;
     private final KnowledgeAccessHelper access;
     /** 后台任务执行器（统一命名与关停）。 */
     private final KnowledgeTaskExecutor taskExecutor;
@@ -75,7 +73,6 @@ public class KnowledgeSummaryService {
                             ModelRuntimeFactory modelRuntimeFactory,
                             ChunkVectorIndexer chunkVectorIndexer,
                             ConversationProperties conversationProps,
-                            KnowledgeFileService knowledgeFileService,
                             KnowledgeAccessHelper access) {
 
         this.taskExecutor = taskExecutor;
@@ -85,7 +82,6 @@ public class KnowledgeSummaryService {
         this.modelRuntimeFactory = modelRuntimeFactory;
         this.chunkVectorIndexer = chunkVectorIndexer;
         this.conversationProps = conversationProps;
-        this.knowledgeFileService = knowledgeFileService;
         this.access = access;
     }
 
@@ -143,13 +139,13 @@ public class KnowledgeSummaryService {
             knowledge.setDescription("");
             knowledge.setSummaryStatus(SUMMARY_FAILED);
             knowledge.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
-            knowledgeFileService.updateSummaryColumns(knowledge);
+            knowledgeRepository.updateSummaryColumns(knowledge);
             throw ERR_INSUFFICIENT_SUMMARY_CONTENT;
         }
         textChunks.sort(Comparator.comparingInt(Chunk::getChunkIndex));
         String metadataVersion = customMetadataVersion(knowledge);
         knowledge.setSummaryStatus(SUMMARY_PROCESSING);
-        knowledgeFileService.updateSummaryColumns(knowledge);
+        knowledgeRepository.updateSummaryColumns(knowledge);
 
         LlmChatClient chatModel;
         try {
@@ -185,7 +181,7 @@ public class KnowledgeSummaryService {
         knowledge.setDescription(summary);
         knowledge.setSummaryStatus(SUMMARY_COMPLETED);
         knowledge.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
-        knowledgeFileService.updateSummaryColumns(knowledge);
+        knowledgeRepository.updateSummaryColumns(knowledge);
         if (kbNeedsEmbedding(kb)) {
             int maxIndex = 0;
             for (Chunk chunk : allChunks) {
@@ -241,13 +237,13 @@ public class KnowledgeSummaryService {
             knowledge.setDescription("");
             knowledge.setSummaryStatus(SUMMARY_FAILED);
             knowledge.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
-            knowledgeFileService.updateSummaryColumns(knowledge);
+            knowledgeRepository.updateSummaryColumns(knowledge);
             return generationErr;
         }
         if (willRetry) {
             applyRetryableSummaryFailureState(knowledge, textChunks, true);
             try {
-                knowledgeFileService.updateSummaryColumns(knowledge);
+                knowledgeRepository.updateSummaryColumns(knowledge);
             } catch (RuntimeException e) {
                 log.warn("Failed to mark summary refresh pending for retry: {}", e.toString());
             }
@@ -260,7 +256,7 @@ public class KnowledgeSummaryService {
         } catch (RuntimeException staleErr) {
             knowledge.setSummaryStatus(SUMMARY_FAILED);
             try {
-                knowledgeFileService.updateSummaryColumns(knowledge);
+                knowledgeRepository.updateSummaryColumns(knowledge);
             } catch (RuntimeException ignored) {
                 // 尽力写：失败仅告警
             }
@@ -271,7 +267,7 @@ public class KnowledgeSummaryService {
             return ERR_SUMMARY_REFRESH_STALE;
         }
         applyRetryableSummaryFailureState(knowledge, textChunks, false);
-        knowledgeFileService.updateSummaryColumns(knowledge);
+        knowledgeRepository.updateSummaryColumns(knowledge);
         return generationErr;
     }
 

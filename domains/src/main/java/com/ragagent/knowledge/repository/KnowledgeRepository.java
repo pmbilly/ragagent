@@ -69,7 +69,15 @@ public class KnowledgeRepository {
                 .last("LIMIT 1"));
     }
 
-    /** 摘要列写（B263⑩：由 {@code service.KnowledgeFileService} 归位；只写摘要自己那几列）。 */
+    /**
+     * 摘要列写（B263⑩ 由 {@code service.KnowledgeFileService} 归位；B263㊶ 调用方直连本方法）。
+     * <p>❌ 勿改走 {@link #updateRow}（**全列写**）：它会把<b>加载时</b>的旧
+     * {@code parse_status} 一并写回。摘要是在导入后处理的 finalizing 交接**之后**才跑完 LLM
+     * （数十秒），回写就把 `finalizing/completed` 打回加载时的 {@code processing} ✗
+     * （用户报障：`05.03-问题发布.md` 卡 processing ✗）。</p>
+     * <p>本方法只写摘要自己那几列（description / summary_status / metadata / updated_at），
+     * 绝不碰 parse_status、enable_status、pending_subtasks_count。</p>
+     */
     public void updateSummaryColumns(Knowledge k) {
         knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
                 .eq(Knowledge::getId, k.getId())

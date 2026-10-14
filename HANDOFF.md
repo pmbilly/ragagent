@@ -1004,6 +1004,14 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **测试**：**4980 / 失败 0 / 跳过 4** ✓（domains 2949 / engine 561 / common 141 / boot 1329）；启动测试 ✓；`spotlessCheck build` ✓ **1m47s** ✓ **十二守卫** ✓（环 0 / 包级 SCC **12 组不变**）。
 - **登记（§8.8.2 剩余）**：`service.management/` 还差 `KnowledgeAccessHelper`/`KnowledgeFolderService`（二在顶层**仍有多个引用者** ⇒ 需先断边，同㉝/㊲ 的做法）；`KnowledgeBaseService`/`KnowledgeFileService`/`KnowledgeParseService` 未切面——§8.8.2 给它们的是 use-case 目标名（`ManageKnowledgeBase` 等）⇒ 属**改名级重构**，不在"包重排"范围内；`HousekeepingService`/`EmbeddingModelAdapter` 按目标树**本就留在顶层** ✓。
 
+**🔶 B263 第㊶步（2026-10-14，`enrichment` 自足化：断掉对顶层 `KnowledgeFileService` 的边）**
+- **为什么要先做这一步（㊵ 之后的动前测量结论）**：类级跨包边实测显示 `service` 顶层与子面已构成**互递归结**——`management → 顶层`（门面 → `AccessHelper`/`FileService`/`FolderService`/`ParseService`/`DuplicateKnowledgeException`；`KnowledgeCloneService`/`KnowledgeTagService` → `KnowledgeBaseService`；`BatchOps` → 3 个）与 `enrichment → 顶层`（`SummaryService` → `AccessHelper`/`FileService`、`QGS` → `ChunkQuestionPort`）并存 ⇒ **任何单类搬进子面都会造出双向边（新环）✗**（㉝ 记的"29 类互递归结"复现）⇒ 余步按"**先断边、后搬迁**"推进。
+- **本步断的边**：`SummaryService` 调用 `KnowledgeFileService.updateSummaryColumns(...)` 的 **7 处**——该方法体内逐字就是 `knowledgeRepository.updateSummaryColumns(k)`（纯薄委托，已现场比对）⇒ 7 处改**直连仓储**（`SummaryService` 本就注入 `knowledgeRepository` ✓），依赖四件套（字段/构造参数/赋值/import）全删。
+- **连带（死成员清理）**：该委托的**唯一**调用者就是这 7 处（全仓 grep 确认）⇒ 方法体 + javadoc 删除；那条**值钱的"窄写入"警告**（❌ 勿走全列写，否则把 `finalizing/completed` 打回 `processing`；用户报障 `05.03-问题发布.md`）**搬到** `KnowledgeRepository.updateSummaryColumns` 的 javadoc（`{@link #updateRow}` 指真身）——**改动删代码但不删知识**。
+- **测量教训（新，重要）**：早先跨包边扫描用了 `^import\s+FQN;$` 正则 ⇒ **CRLF 文件全部漏判**（`$` 匹配不到 `\r` 前）✗，得出"`management → 顶层` 为零"的**反向错误结论**；改**子串判据**（`'import '+FQN+';' in text`）后结论翻转 ⇒ **结构性判断前先验证扫描法本身**（与 B263㉖"守卫自身也要能被证伪"同源）。
+- **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 ✓；`spotlessCheck build` ✓ **1m53s** ✓ **十二守卫** ✓（环 0 / 包级 SCC 12 组不变）；`:domains:javadoc` ✓。
+- **登记（余步）**：`enrichment → 顶层` 仍剩 `SummaryService → KnowledgeAccessHelper`（2 处 `requireKb`，内含 API Key 作用域校验 `TenantAPIKeyScope.authorizeKnowledgeBases` ⇒ **不宜复制实现**，需端口/归属决策）与 `QGS → ChunkQuestionPort`（端口，可随 chunk 面归位）；`management` 侧的 §8.8.2 增补（`KnowledgeAccessHelper`/`KnowledgeFolderService` + `KnowledgeBaseService`/`FileService`/`ParseService`）待上述边断净后**协调一次搬**。
+
 **🔶 B263 第㉟步（2026-10-14，第二个子面 `service.chunk` 切出）**
 - **动前断言（把"可测"变成"可证"）**：脚本**先断言** `ChunkEditService`/`ChunkExtractService`/`ChunkReadService` 三者在 `service` 包内**入度为零**（无人引用，`package-info` 除外），断言不过就 abort —— 这样"切出只产生单向外边"不再靠推理。`ChunkQuestionService` **故意留在** `service`：它被 `QuestionGenerationService` 引用，单独搬会造出 `service ⇄ service.chunk` 环（已在子面 package-info 写明）。
 - **切出**：3 类 → `com.ragagent.knowledge.service.chunk`（`git mv` + 包声明 + 全仓 FQN 替换 3 文件）；测试面 `ChunkExtractServiceTest` 随迁；新建 `service/chunk/package-info`；`service/package-info` 同步。
