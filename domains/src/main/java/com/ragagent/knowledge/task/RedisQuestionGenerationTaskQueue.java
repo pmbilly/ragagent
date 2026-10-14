@@ -1,9 +1,10 @@
 package com.ragagent.knowledge.task;
 
+import com.ragagent.knowledge.domain.QuestionGenerationConsumer;
+
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 import com.ragagent.knowledge.domain.QuestionBatchPayload;
-import com.ragagent.knowledge.service.QuestionGenerationService;
 
 /**
  * {@link QuestionGenerationTaskQueue} 的 <b>Redis</b> 实现（跨实例共享任务表）。
@@ -17,10 +18,10 @@ public class RedisQuestionGenerationTaskQueue extends AbstractRedisKnowledgeTask
 
     private static final String KEY_PREFIX = "knowledge:task:qgen";
 
-    private final QuestionGenerationService service;
+    private final QuestionGenerationConsumer service;
 
     public RedisQuestionGenerationTaskQueue(StringRedisTemplate template,
-            QuestionGenerationService service) {
+            QuestionGenerationConsumer service) {
         super(template, KEY_PREFIX);
         this.service = service;
     }

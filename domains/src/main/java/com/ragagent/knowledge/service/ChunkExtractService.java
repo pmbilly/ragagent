@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.domain.ChunkExtractConsumer;
+
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 
@@ -54,7 +56,7 @@ import com.ragagent.common.wiki.WikiFinalizePort;
  * </ol>
  */
 @Service
-public class ChunkExtractService {
+public class ChunkExtractService implements ChunkExtractConsumer {
 
     private static final Logger log = LoggerFactory.getLogger(ChunkExtractService.class);
 

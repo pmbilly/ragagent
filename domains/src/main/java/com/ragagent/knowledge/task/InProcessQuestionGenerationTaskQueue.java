@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.task;
 
+import com.ragagent.knowledge.domain.QuestionGenerationConsumer;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
@@ -10,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import com.ragagent.knowledge.domain.QuestionBatchPayload;
-import com.ragagent.knowledge.service.QuestionGenerationService;
 
 /**
  * 进程内问题生成队列。
@@ -24,7 +25,7 @@ public class InProcessQuestionGenerationTaskQueue implements QuestionGenerationT
 
     static final int MAX_RETRY = 3;
 
-    private final QuestionGenerationService service;
+    private final QuestionGenerationConsumer service;
     private final ExecutorService worker = Executors.newVirtualThreadPerTaskExecutor();
     private final ScheduledExecutorService scheduler =
             Executors.newSingleThreadScheduledExecutor(r -> {
@@ -36,7 +37,7 @@ public class InProcessQuestionGenerationTaskQueue implements QuestionGenerationT
     /** 测试可覆盖重试延迟（秒）。 */
     Long retryDelayOverrideSeconds;
 
-    public InProcessQuestionGenerationTaskQueue(QuestionGenerationService service) {
+    public InProcessQuestionGenerationTaskQueue(QuestionGenerationConsumer service) {
         this.service = service;
     }
 

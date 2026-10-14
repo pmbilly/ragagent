@@ -1,9 +1,10 @@
 package com.ragagent.knowledge.task;
 
+import com.ragagent.knowledge.domain.ChunkExtractConsumer;
+
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 import com.ragagent.knowledge.domain.ExtractChunkPayload;
-import com.ragagent.knowledge.service.ChunkExtractService;
 
 /**
  * {@link ChunkExtractTaskQueue} 的 <b>Redis</b> 实现（跨实例共享任务表）。
@@ -17,9 +18,9 @@ public class RedisChunkExtractTaskQueue extends AbstractRedisKnowledgeTaskQueue
 
     private static final String KEY_PREFIX = "knowledge:task:chunk";
 
-    private final ChunkExtractService service;
+    private final ChunkExtractConsumer service;
 
-    public RedisChunkExtractTaskQueue(StringRedisTemplate template, ChunkExtractService service) {
+    public RedisChunkExtractTaskQueue(StringRedisTemplate template, ChunkExtractConsumer service) {
         super(template, KEY_PREFIX);
         this.service = service;
     }

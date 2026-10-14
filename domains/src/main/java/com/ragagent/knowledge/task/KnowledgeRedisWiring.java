@@ -1,5 +1,8 @@
 package com.ragagent.knowledge.task;
 
+import com.ragagent.knowledge.domain.ChunkExtractConsumer;
+import com.ragagent.knowledge.domain.QuestionGenerationConsumer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -8,8 +11,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
-import com.ragagent.knowledge.service.ChunkExtractService;
-import com.ragagent.knowledge.service.QuestionGenerationService;
 
 /**
  * knowledge 域的 Redis 面装配（多实例部署）。
@@ -51,7 +52,7 @@ public class KnowledgeRedisWiring {
     @Bean
     @Primary
     public ChunkExtractTaskQueue redisChunkExtractTaskQueue(StringRedisTemplate template,
-            ChunkExtractService service) {
+            ChunkExtractConsumer service) {
         return new RedisChunkExtractTaskQueue(template, service);
     }
 
@@ -59,7 +60,7 @@ public class KnowledgeRedisWiring {
     @Bean
     @Primary
     public QuestionGenerationTaskQueue redisQuestionGenerationTaskQueue(StringRedisTemplate template,
-            QuestionGenerationService service) {
+            QuestionGenerationConsumer service) {
         return new RedisQuestionGenerationTaskQueue(template, service);
     }
 

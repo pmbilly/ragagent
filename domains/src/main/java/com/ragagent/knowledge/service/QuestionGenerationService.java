@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.service;
 
+import com.ragagent.knowledge.domain.QuestionGenerationConsumer;
+
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 
@@ -32,7 +34,7 @@ import com.ragagent.common.wiki.WikiFinalizePort;
  * （{@code finalizeSubtaskDetached} 的等价物 {@link com.ragagent.wiki.service.DefaultWikiKnowledgeFinalizer#finalizeSubtask}）。</p>
  */
 @Service
-public class QuestionGenerationService {
+public class QuestionGenerationService implements QuestionGenerationConsumer {
 
     public static final String TASK_TYPE_QUESTION_GENERATION = "question:generation";
 

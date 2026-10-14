@@ -1,5 +1,7 @@
 package com.ragagent.knowledge.task;
 
+import com.ragagent.knowledge.domain.ChunkExtractConsumer;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
@@ -9,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import com.ragagent.knowledge.domain.ExtractChunkPayload;
-import com.ragagent.knowledge.service.ChunkExtractService;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -25,7 +26,7 @@ public class InProcessChunkExtractTaskQueue implements ChunkExtractTaskQueue {
 
     static final int MAX_RETRY = 3;
 
-    private final ChunkExtractService service;
+    private final ChunkExtractConsumer service;
     private final ExecutorService worker = Executors.newVirtualThreadPerTaskExecutor();
     private final ScheduledExecutorService scheduler =
             Executors.newSingleThreadScheduledExecutor(r -> {
@@ -37,7 +38,7 @@ public class InProcessChunkExtractTaskQueue implements ChunkExtractTaskQueue {
     /** 测试可覆盖重试延迟（秒）。 */
     Long retryDelayOverrideSeconds;
 
-    public InProcessChunkExtractTaskQueue(ChunkExtractService service) {
+    public InProcessChunkExtractTaskQueue(ChunkExtractConsumer service) {
         this.service = service;
     }
 
