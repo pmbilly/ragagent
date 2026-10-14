@@ -10,7 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import com.ragagent.common.knowledge.ChunkView;
+import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.common.wiki.ExtractedItem;
 import com.ragagent.common.wiki.WikiImageMarkup;
 import com.ragagent.wiki.service.page.WikiTextUtils;

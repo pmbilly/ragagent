@@ -27,7 +27,7 @@ import com.ragagent.session.domain.message.MessageNotFoundException;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.domain.message.MessageWithSession;
 import org.springframework.stereotype.Component;
-import com.ragagent.common.session.SessionMessagePort;
+import com.ragagent.contract.session.SessionMessagePort;
 
 /**
  * 消息仓储。

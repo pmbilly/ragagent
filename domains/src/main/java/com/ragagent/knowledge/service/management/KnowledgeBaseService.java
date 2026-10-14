@@ -6,14 +6,14 @@ import com.ragagent.knowledge.repository.KnowledgeRepository;
 
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 
-import com.ragagent.common.knowledge.KnowledgeBaseFacts;
+import com.ragagent.contract.knowledge.KnowledgeBaseFacts;
 import com.ragagent.common.web.JsonMappers;
 import com.ragagent.storage.config.StorageEnvLookup;
 import com.ragagent.common.retrieval.RetrievalDriverProperties;
-import com.ragagent.common.knowledge.KnowledgeBaseGateway;
-import com.ragagent.common.knowledge.KnowledgeBaseProvisioner;
-import com.ragagent.common.knowledge.KnowledgeBaseSearchFacts;
-import com.ragagent.common.knowledge.KnowledgeBaseSearchGateway;
+import com.ragagent.contract.knowledge.KnowledgeBaseGateway;
+import com.ragagent.contract.knowledge.KnowledgeBaseProvisioner;
+import com.ragagent.contract.knowledge.KnowledgeBaseSearchFacts;
+import com.ragagent.contract.knowledge.KnowledgeBaseSearchGateway;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;

@@ -7,7 +7,7 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.common.tenant.TenantRole;
+import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.platform.web.NonNullBody;
 import com.ragagent.platform.web.RejectEmptyBody;
 import com.ragagent.model.domain.Model;

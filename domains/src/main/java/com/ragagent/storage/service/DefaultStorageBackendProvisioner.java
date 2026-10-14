@@ -2,7 +2,7 @@ package com.ragagent.storage.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.common.storage.StorageBackendProvisioner;
+import com.ragagent.contract.storage.StorageBackendProvisioner;
 import com.ragagent.common.web.JsonMappers;
 import com.ragagent.storage.config.StorageProviderEnv;
 import com.ragagent.storage.domain.StorageBackend;

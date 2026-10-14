@@ -1,6 +1,5 @@
 package com.ragagent.memory.domain;
 
-import com.ragagent.common.memory.MemoryConfig;
 import java.time.OffsetDateTime;
 import java.util.List;
 

@@ -8,8 +8,8 @@ import java.util.Map;
 import org.yaml.snakeyaml.Yaml;
 
 import com.ragagent.llm.extract.PipelineConfig.PromptTemplateStructured;
-import com.ragagent.common.graph.GraphNode;
-import com.ragagent.common.graph.GraphRelation;
+import com.ragagent.contract.graph.GraphNode;
+import com.ragagent.contract.graph.GraphRelation;
 
 /**
  * config.yaml 的 {@code extract} 段装载：抽取路由用的三份提示词模板

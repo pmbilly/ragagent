@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import com.ragagent.common.knowledge.KnowledgeSpanPort;
+import com.ragagent.contract.knowledge.KnowledgeSpanPort;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.wiki.domain.WikiConstants;
 import com.ragagent.wiki.domain.page.WikiPage;

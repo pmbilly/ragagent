@@ -22,12 +22,12 @@ import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
-import com.ragagent.common.memory.MemoryConfig;
+import com.ragagent.contract.memory.MemoryConfig;
 import com.ragagent.memory.domain.MemoryExtractionBatch;
 import com.ragagent.memory.domain.MemoryExtractionFailure;
 import com.ragagent.memory.domain.MemoryExtractionSession;
 import com.ragagent.memory.domain.item.MemoryItem;
-import com.ragagent.common.memory.MemoryKinds;
+import com.ragagent.contract.memory.MemoryKinds;
 import com.ragagent.memory.domain.MemoryMessageCursor;
 import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.domain.scope.MemorySubject;
@@ -38,7 +38,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.ObjectProvider;
-import com.ragagent.common.session.SessionMessagePort;
+import com.ragagent.contract.session.SessionMessagePort;
 import com.ragagent.memory.domain.MemoryConflictException;
 
 /**

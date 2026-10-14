@@ -1,13 +1,19 @@
 package com.ragagent.config;
 
+import com.ragagent.platform.tracing.langfuse.LangfuseHttpInterceptor;
+
+import com.ragagent.platform.web.ApiResultInterceptor;
+
+import com.ragagent.auth.apikey.controller.filter.DenyAPIKeyPrincipalInterceptor;
+
+import com.ragagent.platform.web.RequestIdFilter;
+
 import com.ragagent.common.tenant.TenantProperties;
 import java.util.List;
 
-import com.ragagent.common.tenant.TenantRole;
+import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.auth.controller.filter.AuthFilter;
 import com.ragagent.auth.service.UserService;
-import com.ragagent.platform.web.RequestIdFilter;
-import com.ragagent.platform.web.ApiResultInterceptor;
 import com.ragagent.platform.web.RbacInterceptor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -25,12 +31,10 @@ import com.ragagent.auth.apikey.controller.filter.APIKeyRouteAuthorizer;
 import com.ragagent.auth.apikey.controller.filter.APIKeyRoutePolicies;
 import com.ragagent.auth.apikey.controller.filter.APIKeyScopeCleanupFilter;
 import com.ragagent.auth.apikey.controller.filter.AllowFileServeAPIKeyInterceptor;
-import com.ragagent.auth.apikey.controller.filter.DenyAPIKeyPrincipalInterceptor;
 import com.ragagent.auth.apikey.service.TenantAPIKeyService;
 import com.ragagent.auth.controller.filter.WsAuthSupport;
 import com.ragagent.platform.config.DeploymentProperties;
 import com.ragagent.system.service.DeploymentCapabilitiesHolder;
-import com.ragagent.platform.tracing.langfuse.LangfuseHttpInterceptor;
 
 /**
  * 全局装配顺序：CORS → RequestID → Auth（认证走 servlet filter）。

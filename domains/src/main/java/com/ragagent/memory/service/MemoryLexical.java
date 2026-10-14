@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.ragagent.memory.domain.item.MemoryItem;
-import com.ragagent.common.memory.MemoryKeys;
+import com.ragagent.contract.memory.MemoryKeys;
 
 /**
  * 情境召回的字面排序。

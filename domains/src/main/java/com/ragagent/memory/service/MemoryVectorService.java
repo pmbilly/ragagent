@@ -16,11 +16,11 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import com.ragagent.common.memory.MemoryConfig;
+import com.ragagent.contract.memory.MemoryConfig;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.item.MemoryItemEmbedding;
-import com.ragagent.common.memory.MemoryKinds;
-import com.ragagent.common.memory.MemoryKeys;
+import com.ragagent.contract.memory.MemoryKinds;
+import com.ragagent.contract.memory.MemoryKeys;
 import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.domain.MemoryText;
 import com.ragagent.memory.domain.vector.MemoryVectorHit;

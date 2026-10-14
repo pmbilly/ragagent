@@ -8,7 +8,7 @@ import com.ragagent.chatpipeline.PipelineEventType;
 import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.common.knowledge.KnowledgeBaseView;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.common.pipeline.ChunkTypes;
+import com.ragagent.contract.retrieval.ChunkTypes;
 
 /**
  * CHUNK_RERANK 附加插件：rerank 链之后的

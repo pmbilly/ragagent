@@ -10,7 +10,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.auth.domain.AuthToken;
 import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.auth.domain.TenantMember;
-import com.ragagent.common.tenant.TenantRole;
+import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.domain.UserPreferences;
 import com.ragagent.auth.dto.LoginRequest;

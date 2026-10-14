@@ -11,7 +11,7 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.platform.web.ToolJson;
-import com.ragagent.common.tenant.TenantRole;
+import com.ragagent.contract.tenant.TenantRole;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;

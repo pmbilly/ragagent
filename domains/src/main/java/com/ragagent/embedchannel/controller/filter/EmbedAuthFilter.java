@@ -19,7 +19,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import com.ragagent.common.tenant.TenantRole;
+import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.storage.support.StorageUrlContext;
 import com.ragagent.tenant.repository.Tenant;
 

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.security.TenantAPIKeyScope;
-import com.ragagent.common.tenant.TenantRole;
+import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.BizException;
 import com.ragagent.platform.web.error.GuardForbiddenException;

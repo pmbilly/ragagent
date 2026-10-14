@@ -18,7 +18,7 @@ import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.model.service.ModelRuntimeAssembler;
 import com.ragagent.retrieval.engine.PgVectorEngineRepository;
 import org.springframework.stereotype.Service;
-import com.ragagent.common.graph.NameSpace;
+import com.ragagent.contract.graph.NameSpace;
 import com.ragagent.embedding.Embedder;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.knowledge.task.KnowledgeTaskProgressStore;

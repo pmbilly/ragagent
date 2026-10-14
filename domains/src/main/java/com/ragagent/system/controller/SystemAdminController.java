@@ -1,5 +1,6 @@
 package com.ragagent.system.controller;
 
+
 import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -7,11 +8,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.security.APIKeyCapability;
-import com.ragagent.common.security.APIKeyScopeType;
-import com.ragagent.common.apikey.ApiKeyAdminPort;
-import com.ragagent.common.apikey.TenantAPIKeyCreateResponse;
-import com.ragagent.common.apikey.TenantAPIKeyResponse;
+import com.ragagent.contract.apikey.APIKeyCapability;
+import com.ragagent.contract.apikey.APIKeyScopeType;
+import com.ragagent.contract.apikey.ApiKeyAdminPort;
+import com.ragagent.contract.apikey.TenantAPIKeyCreateResponse;
+import com.ragagent.contract.apikey.TenantAPIKeyResponse;
 import com.ragagent.audit.domain.AuditAction;
 import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.audit.domain.AuditOutcome;

@@ -56,7 +56,6 @@
       "com.ragagent.storage.support"
     ],
     [
-      "com.ragagent.wiki.service",
       "com.ragagent.wiki.service.ingest",
       "com.ragagent.wiki.service.page"
     ]

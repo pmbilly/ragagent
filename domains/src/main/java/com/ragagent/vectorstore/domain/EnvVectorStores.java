@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.function.UnaryOperator;
 import com.ragagent.common.vectorstore.ConnectionConfig;
 import com.ragagent.common.vectorstore.IndexConfig;
-import com.ragagent.common.vectorstore.EnvStoreIds;
+import com.ragagent.contract.vectorstore.EnvStoreIds;
 
 /**
  * 由 RETRIEVE_DRIVER 派生的虚拟库（__env_* 前缀 id）。

@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import com.ragagent.agent.domain.AgentStep;
 import com.ragagent.agent.tool.runtime.ToolResultPersist;
 import com.ragagent.common.llm.ToolResult;
-import com.ragagent.common.session.PipelineUsedMemoryView;
+import com.ragagent.contract.session.PipelineUsedMemoryView;
 import com.ragagent.platform.event.Event;
 import com.ragagent.platform.event.EventBus;
 import com.ragagent.platform.event.EventType;

@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.pipeline.ChunkTypes;
+import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.platform.access.TracingContext;
 import com.ragagent.knowledge.domain.Chunk;
 import org.junit.jupiter.api.DisplayName;

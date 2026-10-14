@@ -28,7 +28,7 @@ import com.ragagent.retrieval.support.ImageInfoEnricher;
 import com.ragagent.rerank.RankResult;
 import com.ragagent.rerank.Reranker;
 import com.ragagent.retrieval.HybridSearchService;
-import com.ragagent.common.pipeline.ChunkTypes;
+import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.common.knowledge.ChunkFacts;
 
 /**

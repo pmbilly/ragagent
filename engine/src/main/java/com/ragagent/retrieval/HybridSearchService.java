@@ -24,10 +24,10 @@ import com.ragagent.common.error.BizException;
 import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.platform.model.EmbeddingGateway;
 import com.ragagent.common.knowledge.ChunkSearchGateway;
-import com.ragagent.common.knowledge.KnowledgeBaseSearchFacts;
-import com.ragagent.common.knowledge.KnowledgeBaseSearchGateway;
+import com.ragagent.contract.knowledge.KnowledgeBaseSearchFacts;
+import com.ragagent.contract.knowledge.KnowledgeBaseSearchGateway;
 import com.ragagent.common.knowledge.KnowledgeDocumentGateway;
-import com.ragagent.common.model.ModelFacts;
+import com.ragagent.contract.model.ModelFacts;
 import com.ragagent.platform.model.ModelGateway;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
@@ -35,7 +35,6 @@ import com.ragagent.retrieval.engine.EngineAwareNormalizer;
 import com.ragagent.retrieval.engine.EngineTypes;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
-import com.ragagent.retrieval.engine.RetrieveEngineFactories;
 import com.ragagent.retrieval.engine.RetrieveEngineRegistry;
 import com.ragagent.retrieval.engine.TenantStoreOwnership;
 import com.ragagent.platform.access.TenantContext;
@@ -53,7 +52,7 @@ import com.ragagent.platform.tracing.langfuse.Span;
  * <h2>store-group 路由</h2>
  * <ul>
  *   <li>KB 按 (vectorStoreId, kb.tenantId) 分组；每组经
- *       {@link RetrieveEngineFactories#createForKb} 解析复合引擎——env-store 组
+ *       {@link com.ragagent.retrieval.engine.RetrieveEngineFactories#createForKb} 解析复合引擎——env-store 组
  *       （vector_store_id NULL）回落租户有效引擎（RETRIEVE_DRIVER），绑定组走
  *       归属校验（跨租户 2200）+ 注册表解析（未注册 2201）。</li>
  *   <li>工厂哨兵按 {@code classifyFactoryError} 映射成 2200/2201 的

@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.auth.domain.TenantMember;
-import com.ragagent.common.tenant.TenantRole;
+import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.service.TenantMemberService;
 import com.ragagent.auth.service.TenantService;

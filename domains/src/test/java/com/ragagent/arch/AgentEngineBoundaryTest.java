@@ -61,7 +61,8 @@ class AgentEngineBoundaryTest {
             "agent",        // 自身
             "common",       // L1（:common 主包）
             "platform",     // L1（:common 的平台面：B268 起 event/stream/tracing.langfuse 均在此）
-            "event",        // L1（:common 的 event 包——现只剩 payload，待迁 contract.event.payload）
+            "contract",     // L1（:common 的契约面：A② 起 common/* 分流至此）
+            "event",        // L1（:common 的 event 包——现只剩 payload，待迁 com.ragagent.contract.event.payload）
             "stream",       // L1 旧名（已并入 platform.stream，保留登记）
             "llm",          // L2 能力
             "modelcontext", // L2 能力（模型输出上下文协议；物理位于 :engine）

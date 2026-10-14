@@ -1,7 +1,7 @@
 package com.ragagent.agenttools.datasource;
 
-import com.ragagent.common.knowledge.ChunkView;
-import com.ragagent.common.knowledge.KnowledgeView;
+import com.ragagent.contract.knowledge.ChunkView;
+import com.ragagent.contract.knowledge.KnowledgeView;
 
 import java.util.List;
 import java.util.LinkedHashMap;

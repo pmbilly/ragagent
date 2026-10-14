@@ -1,5 +1,8 @@
 package com.ragagent.common.knowledge;
 
+import com.ragagent.contract.knowledge.KnowledgeView;
+
+
 /**
  * 知识库 / 知识条目的**只读端口**。
  *
@@ -8,8 +11,8 @@ package com.ragagent.common.knowledge;
  * 由 {@code knowledge} 侧实现（与本项目其他端口同法：接口进 common、实现留业务域）。</p>
  *
  * <p><b>本端口只覆盖读侧</b>：chunk 读写、知识行写、span、嵌入见
- * {@link ChunkPort}/{@link KnowledgeFinalizePort}/{@link KnowledgeSpanPort}/
- * {@link EmbeddingModelPort}。</p>
+ * {@link com.ragagent.contract.knowledge.ChunkPort}/{@link com.ragagent.contract.knowledge.KnowledgeFinalizePort}/{@link com.ragagent.contract.knowledge.KnowledgeSpanPort}/
+ * {@link com.ragagent.common.knowledge.EmbeddingModelPort}。</p>
  */
 public interface KnowledgeBaseLookup {
 

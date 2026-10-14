@@ -35,14 +35,14 @@ import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
 import com.ragagent.model.service.ModelRuntimeAssembler;
-import com.ragagent.common.wiki.WikiFinalizePort;
+import com.ragagent.contract.wiki.WikiFinalizePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import com.ragagent.knowledge.domain.ExtractChunkPayload;
-import com.ragagent.common.graph.GraphData;
-import com.ragagent.common.graph.GraphNode;
-import com.ragagent.common.graph.NameSpace;
+import com.ragagent.contract.graph.GraphData;
+import com.ragagent.contract.graph.GraphNode;
+import com.ragagent.contract.graph.NameSpace;
 
 /**
  * 分块图抽取服务测试（{@code ChunkExtractService.handle} 的四条出口：

@@ -1,7 +1,7 @@
 package com.ragagent.memory.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ragagent.common.memory.MemoryKeys;
+import com.ragagent.contract.memory.MemoryKeys;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;

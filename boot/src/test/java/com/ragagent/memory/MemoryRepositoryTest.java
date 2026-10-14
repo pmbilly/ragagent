@@ -12,7 +12,7 @@ import com.ragagent.TestSchema;
 import com.ragagent.platform.web.ZeroTimeSerializer;
 import com.ragagent.memory.domain.MemoryDocAffinity;
 import com.ragagent.memory.domain.item.MemoryItem;
-import com.ragagent.common.memory.MemoryKinds;
+import com.ragagent.contract.memory.MemoryKinds;
 import com.ragagent.memory.domain.MemoryPage;
 import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.domain.scope.MemorySubject;

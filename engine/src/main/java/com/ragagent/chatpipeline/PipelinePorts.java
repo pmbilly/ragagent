@@ -4,15 +4,14 @@ import java.util.List;
 import java.util.Map;
 
 import com.ragagent.llm.LlmChatClient;
-import com.ragagent.common.memory.MemoryRecall;
-import com.ragagent.common.memory.MemoryRetrievalContext;
+import com.ragagent.contract.memory.MemoryRecall;
+import com.ragagent.contract.memory.MemoryRetrievalContext;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.common.session.PipelineMessageImageView;
+import com.ragagent.contract.session.PipelineMessageImageView;
 import com.ragagent.common.session.PipelineMessageView;
 import com.ragagent.retrieval.domain.WebSearchResult;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.retrieval.graph.RetrieveGraphRepository;
 import com.ragagent.common.pipeline.SearchParams;
 import com.ragagent.common.llm.ToolResult;
 import com.ragagent.common.tenant.WebSearchConfig;
@@ -39,7 +38,7 @@ import com.ragagent.rerank.Reranker;
  *   <li>{@link MemoryService} → memory.service.MemoryService（recall/retrievalContextFor/
  *       documentAffinity 签名已对齐）。</li>
  *   <li>websearch 面 → 域侧适配器转成执行面配置（见 {@code session/QaWiring}）。</li>
- *   <li>{@link RetrieveGraphRepository} → 图检索仓储（neo4j/图库面）。</li>
+ *   <li>{@link com.ragagent.retrieval.graph.RetrieveGraphRepository} → 图检索仓储（neo4j/图库面）。</li>
  *   <li>{@link TenantService} / {@link SessionService} / {@link WebSearchStateService} /
  *       {@link WebSearchProviderRepository}：占位接口——管线只判空、从不调用其方法。</li>
  * </ul>

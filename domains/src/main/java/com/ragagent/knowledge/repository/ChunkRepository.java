@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.repository;
 
-import com.ragagent.common.pipeline.ChunkTypes;
+import com.ragagent.contract.retrieval.ChunkTypes;
 
 import com.ragagent.knowledge.support.ChunkProjectionAdapter;
 

@@ -20,7 +20,7 @@ import org.mockito.ArgumentCaptor;
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
-import com.ragagent.common.knowledge.KnowledgeFinalizePort;
+import com.ragagent.contract.knowledge.KnowledgeFinalizePort;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import com.ragagent.knowledge.repository.KnowledgeRepository;

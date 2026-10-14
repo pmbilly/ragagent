@@ -22,7 +22,7 @@ import com.ragagent.platform.prompt.PromptInstructions;
 import com.ragagent.settings.ConversationProperties;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.DocumentChunkMetadata;
-import com.ragagent.common.knowledge.GeneratedQuestion;
+import com.ragagent.contract.knowledge.GeneratedQuestion;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.ChunkNotFoundException;

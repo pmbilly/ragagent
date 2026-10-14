@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.ragagent.memory.domain.item.MemoryItem;
-import com.ragagent.common.memory.MemoryKinds;
+import com.ragagent.contract.memory.MemoryKinds;
 import com.ragagent.memory.domain.vector.MemoryVectorHit;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

@@ -13,7 +13,7 @@ import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
-import com.ragagent.common.memory.MemoryKeys;
+import com.ragagent.contract.memory.MemoryKeys;
 import com.ragagent.memory.domain.MemoryTopicStat;
 import com.ragagent.memory.repository.MemoryRepository;
 import org.junit.jupiter.api.DisplayName;

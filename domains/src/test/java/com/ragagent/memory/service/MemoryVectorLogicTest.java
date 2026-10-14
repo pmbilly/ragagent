@@ -6,10 +6,10 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 import com.ragagent.memory.domain.item.MemoryItem;
-import com.ragagent.common.memory.MemoryKinds;
+import com.ragagent.contract.memory.MemoryKinds;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import com.ragagent.common.memory.MemoryConfig;
+import com.ragagent.contract.memory.MemoryConfig;
 import com.ragagent.memory.repository.MemoryRepository;
 
 /**

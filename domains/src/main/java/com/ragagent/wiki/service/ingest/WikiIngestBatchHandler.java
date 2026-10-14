@@ -1,5 +1,6 @@
 package com.ragagent.wiki.service.ingest;
 
+
 import com.ragagent.common.web.JsonMappers;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -8,15 +9,15 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.knowledge.ChunkPort;
-import com.ragagent.common.knowledge.ChunkView;
+import com.ragagent.contract.knowledge.ChunkPort;
+import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.common.knowledge.KnowledgeBaseLookup;
 import com.ragagent.common.knowledge.KnowledgeBaseView;
-import com.ragagent.common.knowledge.KnowledgeSpanPort;
-import com.ragagent.common.knowledge.KnowledgeView;
+import com.ragagent.contract.knowledge.KnowledgeSpanPort;
+import com.ragagent.contract.knowledge.KnowledgeView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.llm.LlmChatClient;
-import com.ragagent.common.audit.WikiActivityAudit;
+import com.ragagent.contract.audit.WikiActivityAudit;
 import com.ragagent.wiki.domain.WikiConfig;
 import com.ragagent.wiki.domain.WikiConstants;
 import com.ragagent.wiki.domain.WikiExtractionGranularity;

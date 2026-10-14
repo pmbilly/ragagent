@@ -5,14 +5,13 @@ import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agent.tool.AgentTool;
 import com.ragagent.agent.tool.ToolExecContext;
-import com.ragagent.agent.tool.ToolRegistry;
 import com.ragagent.agent.tool.ToolCancellation;
 import com.ragagent.common.llm.ToolResult;
 
 /**
  * 工具注册表端口（引擎侧接口）：MCP 适配层注册/摘除工具、共享执行管线的唯一通道。
  *
- * <p>语义与 {@link ToolRegistry} 的注册原语逐条对齐（first-wins、deferred 标记随注册设定），
+ * <p>语义与 {@link com.ragagent.agent.tool.ToolRegistry} 的注册原语逐条对齐（first-wins、deferred 标记随注册设定），
  * 以免搬运过程中改变行为。实现由注册表自己提供（{@code ToolRegistry.port()}，包内匿名实现），
  * 因此注册表的包内封装不被打开——外部只能看到这些动作。</p>
  */

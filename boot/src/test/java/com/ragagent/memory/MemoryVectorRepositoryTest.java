@@ -9,7 +9,7 @@ import java.util.Map;
 import com.ragagent.TestSchema;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.item.MemoryItemEmbedding;
-import com.ragagent.common.memory.MemoryKinds;
+import com.ragagent.contract.memory.MemoryKinds;
 import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.domain.vector.MemoryVectorHit;
 import com.ragagent.memory.domain.vector.MemoryVectorQuery;

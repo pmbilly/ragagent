@@ -8,10 +8,10 @@ import org.springframework.stereotype.Component;
 
 import com.ragagent.auth.apikey.domain.TenantAPIKey;
 import com.ragagent.auth.apikey.domain.TenantAPIKeyProjections;
-import com.ragagent.common.apikey.ApiKeyAdminPort;
-import com.ragagent.common.apikey.TenantAPIKeyCreateResponse;
-import com.ragagent.common.apikey.TenantAPIKeyResponse;
-import com.ragagent.common.security.APIKeyScopeType;
+import com.ragagent.contract.apikey.ApiKeyAdminPort;
+import com.ragagent.contract.apikey.TenantAPIKeyCreateResponse;
+import com.ragagent.contract.apikey.TenantAPIKeyResponse;
+import com.ragagent.contract.apikey.APIKeyScopeType;
 
 /**
  * {@link ApiKeyAdminPort} 的属主模块实现。

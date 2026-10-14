@@ -19,7 +19,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.im.runtime.AdapterInterfaces;
 import com.ragagent.im.runtime.CallbackExchange;
-import com.ragagent.im.runtime.FeishuWecomCrypt;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.ReplyMessage;
 
@@ -44,7 +43,7 @@ import com.ragagent.im.runtime.ReplyMessage;
  *   <li>卡片 markdown 图片：外链图先下载（≤10MB）再上传换 image_key（按 app 缓存、URL 去 query），
  *       失败降级为纯链接（label 取 alt 或区域默认）；</li>
  *   <li>token：{@code tenant_access_token/internal}，缓存留 5 分钟余量；</li>
- *   <li>解密走 {@link FeishuWecomCrypt#feishuDecrypt}（AES-256-CBC，密钥 = SHA-256(encrypt_key)，
+ *   <li>解密走 {@link com.ragagent.im.runtime.FeishuWecomCrypt#feishuDecrypt}（AES-256-CBC，密钥 = SHA-256(encrypt_key)，
  *       IV 为密文前 16 字节）。</li>
  * </ul>
  *

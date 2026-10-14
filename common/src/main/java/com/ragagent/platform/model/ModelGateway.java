@@ -1,6 +1,6 @@
 package com.ragagent.platform.model;
 
-import com.ragagent.common.model.ModelFacts;
+import com.ragagent.contract.model.ModelFacts;
 
 /**
  * 模型的**只读端口**（跨域读取模型最小事实集）。

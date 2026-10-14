@@ -1,7 +1,7 @@
 package com.ragagent.retrieval.graph;
 
-import com.ragagent.common.graph.GraphData;
-import com.ragagent.common.graph.NameSpace;
+import com.ragagent.contract.graph.GraphData;
+import com.ragagent.contract.graph.NameSpace;
 import java.util.List;
 
 /** 图检索仓储端口（原为 chatpipeline.PipelinePorts 的嵌套接口；由本域实现，故下沉到实现方）。 */

@@ -9,7 +9,7 @@ import java.util.List;
 import com.ragagent.TestSchema;
 import com.ragagent.memory.domain.MemoryConflictException;
 import com.ragagent.memory.domain.item.MemoryItem;
-import com.ragagent.common.memory.MemoryKinds;
+import com.ragagent.contract.memory.MemoryKinds;
 import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.domain.scope.MemorySubjectMissingException;
 import com.ragagent.memory.repository.MemoryRepository;

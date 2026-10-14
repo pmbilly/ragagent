@@ -2,7 +2,7 @@ package com.ragagent.platform.model;
 
 import java.util.List;
 
-import com.ragagent.common.model.ModelFacts;
+import com.ragagent.contract.model.ModelFacts;
 
 /**
  * 文本嵌入的**能力端口**：按"模型事实"（base_url / api_key / 模型名）调用嵌入服务，

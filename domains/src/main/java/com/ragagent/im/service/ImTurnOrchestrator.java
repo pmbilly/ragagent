@@ -1,5 +1,6 @@
 package com.ragagent.im.service;
 
+
 import com.ragagent.common.web.JsonMappers;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -18,7 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import com.ragagent.common.agent.AgentChannelCleaner;
+import com.ragagent.contract.agent.AgentChannelCleaner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;

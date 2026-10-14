@@ -13,7 +13,7 @@ import com.ragagent.retrieval.support.ImageInfoEnricher;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.modelcontext.Registry;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.common.pipeline.ChunkTypes;
+import com.ragagent.contract.retrieval.ChunkTypes;
 
 /**
  * 模型上下文装配：把检索结果里的位置 ID 换成请求内 model 句柄。

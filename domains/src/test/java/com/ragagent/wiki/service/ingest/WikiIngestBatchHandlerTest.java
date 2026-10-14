@@ -25,11 +25,11 @@ import org.springframework.beans.factory.ObjectProvider;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.knowledge.KnowledgeBaseView;
-import com.ragagent.common.knowledge.KnowledgeSpanPort;
-import com.ragagent.common.knowledge.ChunkPort;
+import com.ragagent.contract.knowledge.KnowledgeSpanPort;
+import com.ragagent.contract.knowledge.ChunkPort;
 import com.ragagent.common.knowledge.KnowledgeBaseLookup;
 import com.ragagent.llm.LlmChatClient;
-import com.ragagent.common.audit.WikiActivityAudit;
+import com.ragagent.contract.audit.WikiActivityAudit;
 import com.ragagent.wiki.domain.TaskPendingOp;
 import com.ragagent.wiki.domain.page.WikiPageLite;
 import com.ragagent.wiki.domain.WikiConstants;

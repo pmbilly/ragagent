@@ -10,9 +10,9 @@ import com.ragagent.common.retrieval.SearchTarget;
 import com.ragagent.platform.event.EventBusInterface;
 import com.ragagent.llm.domain.ChatResponse;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.common.session.PipelineMessageAttachmentView;
-import com.ragagent.common.session.PipelineUsedMemoryView;
-import com.ragagent.common.graph.GraphData;
+import com.ragagent.contract.session.PipelineMessageAttachmentView;
+import com.ragagent.contract.session.PipelineUsedMemoryView;
+import com.ragagent.contract.graph.GraphData;
 
 /**
  * 一次 chat 管线执行的全部配置、状态与运行时句柄，按请求段、状态段、运行时段三部分组织。

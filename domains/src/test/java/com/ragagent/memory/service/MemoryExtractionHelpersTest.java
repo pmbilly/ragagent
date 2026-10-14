@@ -14,7 +14,7 @@ import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.llm.domain.ChatResponse;
 import com.ragagent.memory.domain.item.MemoryItem;
-import com.ragagent.common.memory.MemoryKinds;
+import com.ragagent.contract.memory.MemoryKinds;
 import com.ragagent.memory.domain.MemoryText;
 import com.ragagent.memory.domain.item.MemoryTombstone;
 import com.ragagent.memory.domain.MemoryTopicStat;

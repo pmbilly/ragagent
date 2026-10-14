@@ -1,5 +1,6 @@
 package com.ragagent.initialization.service;
 
+
 import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +17,7 @@ import com.ragagent.common.error.BizException;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
-import com.ragagent.common.graph.GraphRelation;
+import com.ragagent.contract.graph.GraphRelation;
 
 /**
  * 文本抽取测试端点用例（text-relation/fabri-tag/fabri-text）。

@@ -7,7 +7,7 @@ import java.util.Map;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
-import com.ragagent.common.knowledge.KnowledgeSpanPort;
+import com.ragagent.contract.knowledge.KnowledgeSpanPort;
 import com.ragagent.knowledge.domain.KnowledgeProcessingSpan;
 
 /**

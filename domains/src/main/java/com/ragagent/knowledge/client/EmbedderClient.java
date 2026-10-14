@@ -14,7 +14,7 @@ import com.ragagent.model.domain.Model;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
 import com.ragagent.platform.model.EmbeddingGateway;
-import com.ragagent.common.model.ModelFacts;
+import com.ragagent.contract.model.ModelFacts;
 
 /**
  * 最小 OpenAI 兼容 embedding 客户端。

@@ -1,5 +1,8 @@
 package com.ragagent.common.security;
 
+import com.ragagent.contract.apikey.APIKeyCapability;
+import com.ragagent.contract.apikey.APIKeyScopeType;
+
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;

@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.tenant.repository.TenantLookup;
 import com.ragagent.tenant.mapper.TenantMapper;
-import com.ragagent.common.storage.StorageBackendProvisioner;
+import com.ragagent.contract.storage.StorageBackendProvisioner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

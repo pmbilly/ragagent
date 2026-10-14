@@ -3,7 +3,6 @@ package com.ragagent.auth.apikey.mapper;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-import com.ragagent.auth.apikey.domain.APIKeyRawJsonbTypeHandler;
 import com.ragagent.auth.apikey.domain.APIKeyStringListTypeHandler;
 import com.ragagent.auth.apikey.domain.TenantAPIKey;
 import org.apache.ibatis.annotations.Insert;
@@ -30,7 +29,7 @@ import org.apache.ibatis.annotations.Update;
  *       其余读语句都要解密。
  *       解密动作在 {@link TenantAPIKeyRepository} 里做，不在这里——
  *       哪条读路径解密，按方法名肉眼可查。</li>
- *   <li><b>jsonb 列</b>：写路径用 {@link APIKeyRawJsonbTypeHandler}（参数是**已编码文本**，
+ *   <li><b>jsonb 列</b>：写路径用 {@link com.ragagent.auth.apikey.domain.APIKeyRawJsonbTypeHandler}（参数是**已编码文本**，
  *       null 编码为字面量 {@code null}）；读路径用 {@link APIKeyStringListTypeHandler}。
  *       两套 handler 的分工见前者的类注释（NOT NULL 列不能写 SQL NULL）。</li>
  * </ul>

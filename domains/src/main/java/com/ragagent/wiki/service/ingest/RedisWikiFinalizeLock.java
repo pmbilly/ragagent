@@ -9,8 +9,6 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import com.ragagent.wiki.service.page.RedisWikiSlugLock;
-import com.ragagent.wiki.service.page.WikiSlugLock;
 
 /**
  * {@link WikiFinalizeLock} 的 <b>Redis</b> 实现。
@@ -23,11 +21,11 @@ import com.ragagent.wiki.service.page.WikiSlugLock;
  *       让调用方让任务失败并重试，而不是在无锁状态下与并发 finalize 抢同一条索引页
  *       （读→改→写的丢失更新）；</li>
  *   <li>持有期间每 {@link WikiIngestConstants#FINALIZE_LOCK_RENEW}（20 秒）续期一次
- *       （{@link ScheduledExecutorService} 调度，见 {@link WikiSlugLock} 的同类取舍）；</li>
+ *       （{@link ScheduledExecutorService} 调度，见 {@link com.ragagent.wiki.service.page.WikiSlugLock} 的同类取舍）；</li>
  *   <li>释放时先停掉续期任务再 DEL 键。</li>
  * </ul>
  *
- * <p><b>装配</b>：与 {@link RedisWikiSlugLock} 同一模式——本类是普通类
+ * <p><b>装配</b>：与 {@link com.ragagent.wiki.service.page.RedisWikiSlugLock} 同一模式——本类是普通类
  * （<b>不是</b> {@code @Component}），由主装配会话显式注册 bean：</p>
  * <pre>{@code
  * @Bean

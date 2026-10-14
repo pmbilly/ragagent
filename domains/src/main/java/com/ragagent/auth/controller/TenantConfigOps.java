@@ -3,7 +3,7 @@ package com.ragagent.auth.controller;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.security.APIKeyCapability;
+import com.ragagent.contract.apikey.APIKeyCapability;
 import com.ragagent.common.security.APIKeyScopeContext;
 import com.ragagent.common.security.TenantAPIKeyScope;
 import com.ragagent.tenant.repository.Tenant;
@@ -16,8 +16,8 @@ import com.ragagent.common.tenant.WebSearchConfig;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.memory.MemoryConfig;
-import com.ragagent.common.tenant.TenantRole;
+import com.ragagent.contract.memory.MemoryConfig;
+import com.ragagent.contract.tenant.TenantRole;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;

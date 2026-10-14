@@ -6,8 +6,8 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
-import com.ragagent.common.knowledge.ChunkPort;
-import com.ragagent.common.knowledge.ChunkView;
+import com.ragagent.contract.knowledge.ChunkPort;
+import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.support.ChunkProjectionAdapter;
 import com.ragagent.knowledge.repository.ChunkRepository;

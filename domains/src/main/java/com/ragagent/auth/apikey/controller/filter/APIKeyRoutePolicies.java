@@ -1,6 +1,6 @@
 package com.ragagent.auth.apikey.controller.filter;
 
-import com.ragagent.common.security.APIKeyCapability;
+import com.ragagent.contract.apikey.APIKeyCapability;
 
 /**
  * API-Key 策略表（集中登记所有带 API-Key 策略的路由声明）。

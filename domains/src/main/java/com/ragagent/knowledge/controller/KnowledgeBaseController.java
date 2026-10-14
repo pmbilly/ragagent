@@ -2,7 +2,7 @@ package com.ragagent.knowledge.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.ragagent.common.tenant.TenantRole;
+import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;

@@ -12,13 +12,13 @@ import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.chatpipeline.support.ImageInfoCollector;
 import com.ragagent.chatpipeline.support.MatchTypes;
 import com.ragagent.chatpipeline.support.SearchSupport;
-import com.ragagent.common.graph.GraphData;
-import com.ragagent.common.graph.GraphNode;
-import com.ragagent.common.graph.NameSpace;
+import com.ragagent.contract.graph.GraphData;
+import com.ragagent.contract.graph.GraphNode;
+import com.ragagent.contract.graph.NameSpace;
 import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.common.graph.GraphRelation;
+import com.ragagent.contract.graph.GraphRelation;
 import com.ragagent.retrieval.graph.RetrieveGraphRepository;
 import com.ragagent.platform.access.TenantContext;
 

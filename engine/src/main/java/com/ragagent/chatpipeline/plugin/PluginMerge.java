@@ -20,7 +20,7 @@ import com.ragagent.retrieval.support.ChunkSearchUtil;
 import com.ragagent.retrieval.support.ImageInfoMatchUtil;
 import com.ragagent.common.retrieval.SearchChunkMerge;
 import com.ragagent.retrieval.support.SearchTextUtil;
-import com.ragagent.common.pipeline.ChunkTypes;
+import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.retrieval.telemetry.RetrievalObs;
 import com.ragagent.retrieval.domain.ImageInfo;
 

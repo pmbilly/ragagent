@@ -15,13 +15,13 @@ import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.platform.web.ZeroTimeSerializer;
 import com.ragagent.memory.MemoryContext;
-import com.ragagent.common.memory.MemoryConfig;
+import com.ragagent.contract.memory.MemoryConfig;
 import com.ragagent.memory.domain.MemoryDocAffinity;
 import com.ragagent.memory.domain.MemoryDocView;
 import com.ragagent.memory.domain.MemoryConflictException;
 import com.ragagent.memory.domain.item.MemoryItem;
-import com.ragagent.common.memory.MemoryKinds;
-import com.ragagent.common.memory.MemoryKeys;
+import com.ragagent.contract.memory.MemoryKinds;
+import com.ragagent.contract.memory.MemoryKeys;
 import com.ragagent.memory.domain.MemoryPage;
 import com.ragagent.memory.domain.MemoryRender;
 import com.ragagent.memory.domain.scope.MemoryScope;
@@ -34,8 +34,8 @@ import com.ragagent.memory.repository.MemoryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import com.ragagent.common.memory.MemoryRecall;
-import com.ragagent.common.memory.MemoryRetrievalContext;
+import com.ragagent.contract.memory.MemoryRecall;
+import com.ragagent.contract.memory.MemoryRetrievalContext;
 import com.ragagent.model.domain.Model;
 
 /**

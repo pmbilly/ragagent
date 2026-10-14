@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.agentmanagement.dto.CustomAgentResult;
 import com.ragagent.agentmanagement.mapper.AgentQuestionMapper;
 import com.ragagent.common.security.TenantAPIKeyScope;
-import com.ragagent.common.knowledge.KnowledgeBaseCatalogPort;
+import com.ragagent.contract.knowledge.KnowledgeBaseCatalogPort;
 import com.ragagent.common.wiki.WikiLanguageSupport;
 
 /**

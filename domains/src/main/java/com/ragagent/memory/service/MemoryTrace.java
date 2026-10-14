@@ -1,12 +1,14 @@
 package com.ragagent.memory.service;
 
+import com.ragagent.platform.tracing.langfuse.Span;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.ragagent.memory.domain.item.MemoryItem;
-import com.ragagent.common.memory.MemoryKeys;
+import com.ragagent.contract.memory.MemoryKeys;
 import com.ragagent.platform.tracing.langfuse.LangfuseManager;
 
 /**

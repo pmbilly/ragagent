@@ -1,6 +1,5 @@
 package com.ragagent.memory.domain.item;
 
-import com.ragagent.common.memory.MemoryKinds;
 import java.time.OffsetDateTime;
 
 import com.baomidou.mybatisplus.annotation.IdType;

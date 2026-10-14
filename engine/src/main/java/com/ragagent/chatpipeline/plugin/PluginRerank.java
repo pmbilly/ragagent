@@ -23,10 +23,10 @@ import com.ragagent.retrieval.support.ImageInfoMatchUtil;
 import com.ragagent.retrieval.support.SearchTextUtil;
 import com.ragagent.common.retrieval.SearchTarget;
 import com.ragagent.common.knowledge.DocumentChunkMetadata;
-import com.ragagent.common.knowledge.GeneratedQuestion;
+import com.ragagent.contract.knowledge.GeneratedQuestion;
 import com.ragagent.platform.tracing.langfuse.LangfuseManager;
 import com.ragagent.common.web.JsonMappers;
-import com.ragagent.common.pipeline.ChunkTypes;
+import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.retrieval.telemetry.RetrievalObs;
 
 /**

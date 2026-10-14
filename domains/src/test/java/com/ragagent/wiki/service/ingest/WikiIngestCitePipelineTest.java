@@ -14,8 +14,8 @@ import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.ragagent.common.knowledge.ChunkView;
-import com.ragagent.common.knowledge.ChunkPort;
+import com.ragagent.contract.knowledge.ChunkView;
+import com.ragagent.contract.knowledge.ChunkPort;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.wiki.prompt.WikiPrompts;
 import com.ragagent.common.wiki.ExtractedItem;

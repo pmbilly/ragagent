@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.ragagent.common.web.SortedMapSerializer;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.common.llm.ResponseType;
 

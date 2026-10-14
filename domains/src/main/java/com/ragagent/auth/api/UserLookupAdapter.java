@@ -2,7 +2,7 @@ package com.ragagent.auth.api;
 
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.service.UserService;
-import com.ragagent.common.auth.UserLookupPort;
+import com.ragagent.contract.auth.UserLookupPort;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;

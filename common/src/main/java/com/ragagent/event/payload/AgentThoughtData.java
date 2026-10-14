@@ -1,6 +1,7 @@
 package com.ragagent.event.payload;
 
 
+
 /**
  * Agent 思考流式数据。
  * emit 点：ThinkPhase（主思考流 / thinking tool 流），见包注释 emit 表 #1/#5。

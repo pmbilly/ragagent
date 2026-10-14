@@ -1,6 +1,7 @@
 package com.ragagent;
 
 
+
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.boot.SpringApplication;

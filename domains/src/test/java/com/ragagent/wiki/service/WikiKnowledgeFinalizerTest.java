@@ -10,7 +10,7 @@ import static org.mockito.Mockito.when;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.ragagent.common.knowledge.KnowledgeFinalizePort;
+import com.ragagent.contract.knowledge.KnowledgeFinalizePort;
 
 /**
  * {@link DefaultWikiKnowledgeFinalizer} 的行为测试。

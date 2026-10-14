@@ -1,5 +1,6 @@
 package com.ragagent.common.vectorstore;
 
+
 /**
  * 向量库定义只读视图。
  *

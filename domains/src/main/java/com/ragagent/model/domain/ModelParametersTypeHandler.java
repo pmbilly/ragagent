@@ -1,5 +1,6 @@
 package com.ragagent.model.domain;
 
+
 import com.ragagent.common.web.JsonMappers;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;

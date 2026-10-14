@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.ragagent.common.wiki.SlugUpdate;
-import com.ragagent.common.knowledge.ChunkView;
+import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.wiki.service.WikiImageEnricher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

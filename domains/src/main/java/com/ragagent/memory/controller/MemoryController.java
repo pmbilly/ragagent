@@ -9,7 +9,7 @@ import com.ragagent.memory.domain.MemoryConflictException;
 import com.ragagent.memory.domain.MemoryConsolidationResult;
 import com.ragagent.memory.domain.MemoryDocView;
 import com.ragagent.memory.domain.item.MemoryItem;
-import com.ragagent.common.memory.MemoryKinds;
+import com.ragagent.contract.memory.MemoryKinds;
 import com.ragagent.memory.domain.MemoryPage;
 import com.ragagent.memory.domain.scope.MemorySettings;
 import com.ragagent.memory.domain.MemoryTopicView;

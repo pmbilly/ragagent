@@ -1,5 +1,10 @@
 package com.ragagent.platform.text;
 
+import com.ragagent.audit.domain.AuditOutcome;
+
+import com.ragagent.audit.dto.AuditLogListResponse;
+
+
 
 import static com.ragagent.common.JsonRoundTrip.assertRoundTrips;
 
@@ -11,15 +16,13 @@ import java.util.Set;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.auth.apikey.domain.TenantAPIKey;
-import com.ragagent.audit.dto.AuditLogListResponse;
 import com.ragagent.audit.domain.AuditAction;
 import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.agent.domain.AgentStep;
 import com.ragagent.agent.domain.AgentToolCall;
 import com.ragagent.agent.domain.ToolCallTarget;
 import com.ragagent.common.llm.ToolResult;
-import com.ragagent.audit.domain.AuditOutcome;
-import com.ragagent.common.apikey.TenantAPIKeyCreateResponse;
+import com.ragagent.contract.apikey.TenantAPIKeyCreateResponse;
 import com.ragagent.datasource.domain.DataSource;
 import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.domain.DataSourceConstants;
@@ -33,12 +36,12 @@ import com.ragagent.datasource.domain.TaskInitiator;
 import com.ragagent.datasource.dto.DatasourceCredentialFieldMetadata;
 import com.ragagent.datasource.dto.DatasourceCredentialsResponse;
 import com.ragagent.datasource.dto.DataSourceResponse;
-import com.ragagent.common.apikey.TenantAPIKeyResponse;
+import com.ragagent.contract.apikey.TenantAPIKeyResponse;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ChunkRevision;
 import com.ragagent.common.knowledge.DocumentChunkMetadata;
 import com.ragagent.common.knowledge.FaqChunkMetadata;
-import com.ragagent.common.knowledge.GeneratedQuestion;
+import com.ragagent.contract.knowledge.GeneratedQuestion;
 import com.ragagent.knowledge.domain.KnowledgeBaseAsrConfig;
 import com.ragagent.knowledge.domain.KnowledgeBaseChunkingConfig;
 import com.ragagent.knowledge.domain.KnowledgeBaseImageProcessingConfig;
@@ -58,7 +61,7 @@ import com.ragagent.common.vectorstore.ConnectionConfig;
 import com.ragagent.common.vectorstore.IndexConfig;
 import com.ragagent.websearch.domain.WebSearchProviderParams;
 import com.ragagent.mcp.domain.McpAdvancedConfig;
-import com.ragagent.common.memory.MemoryConfig;
+import com.ragagent.contract.memory.MemoryConfig;
 import com.ragagent.memory.domain.MemoryConsolidationResult;
 import com.ragagent.memory.domain.MemoryDocView;
 import com.ragagent.memory.domain.scope.MemorySettings;

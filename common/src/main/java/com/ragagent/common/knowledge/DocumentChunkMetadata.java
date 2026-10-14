@@ -1,5 +1,7 @@
 package com.ragagent.common.knowledge;
 
+import com.ragagent.contract.knowledge.GeneratedQuestion;
+
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;

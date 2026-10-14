@@ -8,9 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ragagent.common.security.APIKeyScopeType;
-import com.ragagent.common.security.APIKeyCapability;
-import com.ragagent.common.apikey.TenantAPIKeyResponse;
+import com.ragagent.contract.apikey.APIKeyScopeType;
 
 /**
  * tenant_api_keys 表实体。
@@ -42,7 +40,7 @@ import com.ragagent.common.apikey.TenantAPIKeyResponse;
  *
  * <p><b>JSON 契约</b>：本实体**不是**响应体——四个 api-keys 端点都经
  * {@code tenantAPIKeyForResponse} 投影到
- * {@link TenantAPIKeyResponse}。字段命名对齐响应契约（camelCase），
+ * {@link com.ragagent.contract.apikey.TenantAPIKeyResponse}。字段命名对齐响应契约（camelCase），
  * 且 {@code key_hash} 必须双向忽略（不进 JSON）。</p>
  */
 @TableName(value = "tenant_api_keys", autoResultMap = true)

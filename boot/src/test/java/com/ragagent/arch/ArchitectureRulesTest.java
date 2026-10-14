@@ -2,6 +2,7 @@ package com.ragagent.arch;
 
 
 
+
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -1129,11 +1130,16 @@ class ArchitectureRulesTest {
         ratchet("A20 契约端口唯一实现", Set.of(), violations);
     }
 
-    /** 契约端口判据：{@code com.ragagent.common} 下的顶层接口、名字以 {@code Port} 结尾。 */
+    /**
+     * 契约端口判据：顶层接口、名字以 {@code Port} 结尾、位于契约面（{@code com.ragagent.contract}）
+     * 或尚未迁完的 {@code com.ragagent.common}（A② 收纳进行中——两处都收，规则不会因搬家而静默失去
+     * 覆盖面；待 {@code common} 侧端口清零后再收窄为单前缀）。
+     */
     private static boolean isContractPort(JavaClass clazz) {
         return clazz.isInterface()
                 && clazz.getSimpleName().endsWith("Port")
-                && clazz.getPackageName().startsWith("com.ragagent.common");
+                && (clazz.getPackageName().startsWith("com.ragagent.contract")
+                        || clazz.getPackageName().startsWith("com.ragagent.common"));
     }
 
     // ── 工具/管理适配包不得直连业务域 service/mapper ───────────────────

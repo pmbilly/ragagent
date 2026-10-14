@@ -16,7 +16,6 @@ import com.ragagent.audit.domain.AuditOutcome;
 import com.ragagent.audit.service.AuditLogService;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.datasource.domain.connector.Connector;
-import com.ragagent.datasource.domain.connector.ConnectorException;
 import com.ragagent.datasource.domain.connector.ConnectorRegistry;
 import com.ragagent.datasource.task.DataSourceSyncHandler;
 import com.ragagent.datasource.task.DataSourceSyncTaskQueue;
@@ -66,12 +65,12 @@ import com.ragagent.platform.tracing.langfuse.LangfuseTracing;
  *
  * <h2>错误语义：哨兵 message → 异常类型</h2>
  * <ul>
- *   <li>{@value #ERR_DATA_SOURCE_INVALID} → {@link DataSourceException}
+ *   <li>{@value #ERR_DATA_SOURCE_INVALID} → {@link com.ragagent.datasource.domain.DataSourceException}
  *       （handler 直接把 message 当响应体输出）；</li>
  *   <li>{@value #ERR_KNOWLEDGE_BASE_NOT_FOUND} 与
- *       {@value #ERR_DATA_SOURCE_NOT_ACTIVE} → {@link DataSourceException}；</li>
- *   <li>{@link ConnectorException.InvalidConfig}（{@value #ERR_INVALID_CONFIG}）；</li>
- *   <li>注册表未命中 → {@link ConnectorException.NotFound}
+ *       {@value #ERR_DATA_SOURCE_NOT_ACTIVE} → {@link com.ragagent.datasource.domain.DataSourceException}；</li>
+ *   <li>{@link com.ragagent.datasource.domain.connector.ConnectorException.InvalidConfig}（{@value #ERR_INVALID_CONFIG}）；</li>
+ *   <li>注册表未命中 → {@link com.ragagent.datasource.domain.connector.ConnectorException.NotFound}
  *       （{@code "connector type not found in registry"}）。</li>
  * </ul>
  * <p>仓储的 {@code findById} 未命中抛 {@link DataSourceException.NotFoundException}

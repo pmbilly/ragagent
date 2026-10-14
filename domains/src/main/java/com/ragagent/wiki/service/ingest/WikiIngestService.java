@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.knowledge.ChunkView;
+import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.common.knowledge.KnowledgeBaseLookup;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.wiki.domain.TaskPendingOp;
@@ -19,12 +19,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
-import com.ragagent.common.wiki.WikiIngestPort;
+import com.ragagent.contract.wiki.WikiIngestPort;
 import com.ragagent.common.wiki.ExtractedItem;
 import com.ragagent.common.wiki.SlugUpdate;
 import com.ragagent.wiki.service.WikiImageEnricher;
 import com.ragagent.wiki.service.WikiKnowledgeFinalizer;
-import com.ragagent.wiki.service.WikiLlmCallMetadata;
 import com.ragagent.wiki.service.page.WikiCrossLinker;
 import com.ragagent.wiki.service.page.WikiPageService;
 import com.ragagent.wiki.service.page.WikiSlugLock;
@@ -50,7 +49,7 @@ import com.ragagent.wiki.service.page.WikiSlugLock;
  *       {@link WikiInflightLimiter}、{@link WikiDeletedTombstoneStore}。
  *       默认都是进程内实现（单 JVM 语义）。</li>
  *   <li><b>context.Context → 显式传参 + TenantContext</b>：取消传播改用线程中断
- *       （见 {@link WikiCleanupScope}）；LLM 记账元数据改用 {@link WikiLlmCallMetadata}。</li>
+ *       （见 {@link WikiCleanupScope}）；LLM 记账元数据改用 {@link com.ragagent.wiki.service.WikiLlmCallMetadata}。</li>
  * </ol>
  *
  * <h2>接缝</h2>

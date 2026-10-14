@@ -1,6 +1,7 @@
 package com.ragagent.event.payload;
 
 
+
 /**
  * Agent 反思数据。
  *

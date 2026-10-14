@@ -10,7 +10,7 @@ import com.ragagent.auth.dto.TenantResponse;
 import com.ragagent.auth.dto.Membership;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.tenant.TenantRole;
+import com.ragagent.contract.tenant.TenantRole;
 
 /**
  * AuthController 的绑定支持簇：登录响应组装、请求体宽松读（未知字段忽略）、

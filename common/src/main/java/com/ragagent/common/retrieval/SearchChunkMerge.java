@@ -3,7 +3,7 @@ package com.ragagent.common.retrieval;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import com.ragagent.common.knowledge.ChunkView;
+import com.ragagent.contract.knowledge.ChunkView;
 
 
 

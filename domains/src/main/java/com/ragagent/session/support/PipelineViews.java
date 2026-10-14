@@ -3,10 +3,10 @@ package com.ragagent.session.support;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ragagent.common.session.PipelineMessageAttachmentView;
-import com.ragagent.common.session.PipelineMessageImageView;
+import com.ragagent.contract.session.PipelineMessageAttachmentView;
+import com.ragagent.contract.session.PipelineMessageImageView;
 import com.ragagent.common.session.PipelineMessageView;
-import com.ragagent.common.session.PipelineUsedMemoryView;
+import com.ragagent.contract.session.PipelineUsedMemoryView;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.message.MessageAttachment;
 import com.ragagent.session.domain.message.MessageImage;

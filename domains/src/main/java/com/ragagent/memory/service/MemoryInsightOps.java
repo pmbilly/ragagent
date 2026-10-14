@@ -1,14 +1,14 @@
 package com.ragagent.memory.service;
 
-import com.ragagent.common.memory.MemoryRetrievalContext;
+import com.ragagent.contract.memory.MemoryRetrievalContext;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.ragagent.common.memory.MemoryConfig;
-import com.ragagent.common.memory.MemoryKeys;
-import com.ragagent.common.memory.MemoryKinds;
+import com.ragagent.contract.memory.MemoryConfig;
+import com.ragagent.contract.memory.MemoryKeys;
+import com.ragagent.contract.memory.MemoryKinds;
 import com.ragagent.memory.domain.MemoryDocAffinity;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.scope.MemoryScope;

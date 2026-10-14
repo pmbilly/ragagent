@@ -3,7 +3,7 @@ package com.ragagent.wiki.controller;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.ragagent.common.audit.WikiActivityAudit;
+import com.ragagent.contract.audit.WikiActivityAudit;
 import com.ragagent.wiki.domain.page.WikiPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

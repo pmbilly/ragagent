@@ -42,7 +42,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
-import com.ragagent.knowledge.task.KnowledgeProcessWorker;
 import java.util.Collections;
 import com.ragagent.knowledge.index.ChunkVectorIndexer;
 
@@ -532,7 +531,7 @@ public class KnowledgeSummaryService {
 
     /**
      * post-process 的摘要 fan-out。
-     * <p>调用方 {@link KnowledgeProcessWorker} 在索引完成后调用（知识行此时已落
+     * <p>调用方 {@link com.ragagent.knowledge.task.KnowledgeProcessWorker} 在索引完成后调用（知识行此时已落
      * {@code summary_status=none}）。
      * 本方法完成三件事：cancelled/deleting → 跳过（L1148-1156）；无 summary model
      * → 落 failed 不抛（L1133-1138）；否则 pending 落库 + 异步生成（重试/吞错语义

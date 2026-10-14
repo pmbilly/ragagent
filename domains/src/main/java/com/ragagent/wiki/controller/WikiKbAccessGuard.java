@@ -6,7 +6,7 @@ import com.ragagent.common.security.TenantAPIKeyScope;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.BizException;
 import com.ragagent.platform.web.error.GuardForbiddenException;
-import com.ragagent.common.tenant.TenantRole;
+import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.common.knowledge.KnowledgeBaseLookup;
 import com.ragagent.common.knowledge.KnowledgeBaseView;
 import org.springframework.http.HttpStatus;

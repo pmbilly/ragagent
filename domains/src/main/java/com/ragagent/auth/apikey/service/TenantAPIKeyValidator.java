@@ -4,7 +4,7 @@ import com.ragagent.common.knowledge.KnowledgeBaseLookup;
 
 import java.util.List;
 
-import com.ragagent.common.security.APIKeyCapability;
+import com.ragagent.contract.apikey.APIKeyCapability;
 import com.ragagent.auth.apikey.domain.TenantAPIKeyRequest;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;

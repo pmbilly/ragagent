@@ -8,10 +8,10 @@ import java.util.List;
 import com.ragagent.TestSchema;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.memory.MemoryContext;
-import com.ragagent.common.memory.MemoryConfig;
+import com.ragagent.contract.memory.MemoryConfig;
 import com.ragagent.memory.domain.MemoryDocAffinity;
 import com.ragagent.memory.domain.item.MemoryItem;
-import com.ragagent.common.memory.MemoryKinds;
+import com.ragagent.contract.memory.MemoryKinds;
 import com.ragagent.memory.domain.scope.MemoryScope;
 import com.ragagent.memory.domain.scope.MemorySettings;
 import com.ragagent.memory.repository.MemoryRepository;
@@ -24,8 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-import com.ragagent.common.memory.MemoryRetrievalContext;
-import com.ragagent.common.memory.MemoryKeys;
+import com.ragagent.contract.memory.MemoryRetrievalContext;
+import com.ragagent.contract.memory.MemoryKeys;
 
 /**
  * service 层的编排逻辑，跑在**真实 H2 仓储**上（照 §7.5 与

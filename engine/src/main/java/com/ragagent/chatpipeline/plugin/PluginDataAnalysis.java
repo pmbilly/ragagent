@@ -19,7 +19,7 @@ import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.common.web.JsonMappers;
-import com.ragagent.common.pipeline.ChunkTypes;
+import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatResponse;
 

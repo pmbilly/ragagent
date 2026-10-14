@@ -13,7 +13,7 @@ import com.ragagent.retrieval.engine.tencentvectordb.TencentVectorDbRetrieveRepo
 import com.ragagent.retrieval.engine.weaviate.WeaviateRetrieveRepository;
 import com.ragagent.common.vectorstore.ConnectionConfig;
 import com.ragagent.common.vectorstore.IndexConfig;
-import com.ragagent.common.vectorstore.EnvStoreIds;
+import com.ragagent.contract.vectorstore.EnvStoreIds;
 import com.ragagent.common.vectorstore.VectorStoreView;
 
 /**

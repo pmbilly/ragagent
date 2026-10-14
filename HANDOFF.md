@@ -1283,6 +1283,23 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **测试**：**4987 / 失败 0 / 跳过 4** ✓；启动测试 ✓；`spotlessCheck build` ✓ **1m50s** ✓ **十二守卫** ✓；`arch.*` 28 条 ✓；`:domains:javadoc` / `:common:javadoc` ✓。
 - **登记（下一批）**：**契约面去框架化**（`AppError` · `FaqChunkMetadata` · `SearchResult` · `WikiLanguageSupport` · `TenantAPIKeyScope` 去 Jackson/去 platform 依赖 ⇒ 之后 payload 26 与 4 个共用工具才可归位 `contract.*`/`platform.*`）；`common/{agent,apikey,audit,auth,graph,knowledge,llm,memory,pipeline,retrieval,session,storage,tenant,vectorstore,wiki}` → `contract.*`（映射表已建）；`engine/tracing/decorators` → `platform.tracing.decorators` 属**跨模块**待定；12 类计划未列者待裁决。
 
+**🔶 A② 契约面收纳第①批（2026-10-14，**v0.3.0**：42 类 → `contract.*`，§8.1 走到底）**
+- **方法（本条最重要的资产）**：① **纯度盘点**——`common/**`+`event/**` 逐类判"纯 JDK / 沾框架"⇒ **55 纯 / 42 沾框架 / 11 待裁决**；② **依赖闭包**——R1 只允许契约类依赖 JDK+自身，故只有**闭集**能整批搬（迭代剔除依赖落在集合外的）⇒ 初算 51，增补 6（3 个跨域端口 + `AgentChannelCleaner`（本就是契约端口）+ 2 个 apikey 响应 DTO——被 `ApiKeyAdminPort` 签名引用，只能留契约侧）。
+- **落位**：**42 类**入 14 个契约面（`contract/` 现 43 类 + 15 份 package-info）；`common/**` 从 90 类降到 **48 类**。FQN 替换 261 文件。
+- **换锚**：`FROZEN_PREFIXES` 与冻结快照（`ExtractedItem` 一度被我**错锚**——该类其实沾 Jackson 未搬 ⇒ 当场回退 ✓）；**A20 判据扩容**（`common`+`contract` 双前缀——防移植后规则静默失覆盖 ✓）；引擎边界名单 `+contract`；SCC 基线**外科收紧**（wiki 组去掉已离开成员，组数 12→**11**）。
+- **⚠️ 七处自伤与教训（本批最值钱的部分，全部由守卫/编译/规则抓出）**：
+  1. **面名当包名**：`package {face};`（少了 `com.ragagent.`）⇒ 71 处声明 + 457 处 import 全错 ✗（编译暴露）；
+  2. **闭包只算 import，漏"原同包裸引用"** ⇒ 9 个类搬走后仍引 `common.*` ✗（**R1 当场抓回**，为规则立功）；
+  3. **回退脚本漏剥 `.java`** ⇒ 包声明变成 `com.ragagent.common.knowledge.ChunkSearchGateway` ✗ ⇒ **B263㉖ 路径/包对应守卫（P2）点名** ✓✓（守卫立功）；
+  4. **补 import 缺"简单名已被别的 import 占用"判据** ⇒ 同名类型冲突（连续两批各一次）✗；
+  5. **遮罩 import 清理规则过宽** ⇒ 删掉**合法**的 `io.opentelemetry.proto.trace.v1.Span`（Java 允许单类型 import 遮罩同包同名）✗；
+  6. **"清理未使用 import"宽扫误删 javadoc-only import**（29 文件）⇒ javadoc 报 24 处 `reference not found` ✗ ⇒ 升级为 **javadoc 驱动的全限定修正器**（21 处自动 + 3 处手工）；
+  7. **payload 6 类**依赖 `QueryData.orEmpty`（**包私有**）⇒ 半个面搬不动 ⇒ 回退（必须整批 26 类一起去 Jackson）。
+  ⇒ **结论：宽扫类脚本（批量补/清 import）风险最高，必须带"同名占用 + 同包/自身 + javadoc 引用"三重判据；编译驱动的定向修补优于宽扫**（本批后半程改用此法才收敛）。
+- **验证**：**4987 / 失败 0 / 跳过 4** ✓；启动测试 ✓；`spotlessCheck build` ✓ **1m54s** ✓ **12 守卫** ✓（环 0 / 包级 SCC **11 组**）；`arch.*` **28 条** ✓（R1 覆盖新契约类、A20 双前缀、A19、A16 均绿）；四模块 `javadoc` ✓。
+- **flaky 发现（登记）**：`EmbedRateLimiterTest.redisPathSharesBudgetAcrossInstances` 全量**首跑红、单跑与重跑绿** ⇒ 嵌入式 Redis + 跨实例共享预算在并行下抖动，与本批改动无关。
+- **登记（A② 余项）**：**42 个沾框架类**待"去框架化"（Jackson 28 / Spring 3 / Servlet 1 / …：`AppError`、5 个 knowledge 元数据、3 个 llm 值对象、`TenantProperties` 等）；**payload 26 类**待整批；`BizException`（计划归 platform.web.error，但契约侧 `TenantAPIKeyScope` 仍在用 ⇒ 移动会造 contract→platform 反转）· `TextConv`/`Whitespace`/`JsonMappers`/`SortedMapSerializer`（被契约面共用 ⇒ 留 L1 底座）；因闭包外依赖回退的 9 类：`TenantAPIKeyScope`←`BizException`、`PipelineMessageView`←`SearchResult`、`WikiImageMarkup`/`WikiLanguageSupport`←`Whitespace`、`ChunkSearchGateway`/`KnowledgeBaseLookup`/`KnowledgeDocumentGateway`←`KnowledgeBaseView`(沾 Jackson)、`VectorStoreView`←`ConnectionConfig`/`IndexConfig`、`EmbeddingModelPort`←`DocumentChunkMetadata`、`SearchChunkMerge`/`SearchTarget`←`SearchResult`/`SearchParams`、`APIKeyScopeContext`←`TenantAPIKeyScope`。
+
 **✅ 缺陷修复（2026-10-14，knowledge 处理链租户作用域缺失 ⇒ 1003 "Model not found"）**
 - **现场**：上传文档后 `parse_status=failed`、`error_message=error code: 1003, error message: Model not found`；`knowledge_processing_spans` 显示 docreader / chunking **done**、**embedding 阶段**失败（两次自动重试同点失败）；`chunks=0` 是 K4 失败清场的结果。
 - **根因（实测坐实，非本批引入）**：KB（租户 11）的 embedding/summary 模型是该租户**自建**（`is_builtin=false`）；`ModelService.getModelByID` 按可见性过滤 `tenant_id = 当前租户 OR is_builtin`，而"当前租户"读 `TenantContext`（ThreadLocal）——**worker 虚拟线程没有 HTTP Filter 链填它** ⇒ 按 0 查 ⇒ **0 行**（同一过滤式按 11 查 **1 行**，已现场对照）。wiki 摄取早有 `enterTenantScope` 修过同款，knowledge 侧没有；K10b 之前的旧路径同样走 `ModelRuntimeAssembler → getModelByID` ⇒ 旧缺陷。

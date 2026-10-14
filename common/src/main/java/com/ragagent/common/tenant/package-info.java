@@ -2,7 +2,7 @@
  * 租户**跨域词汇**（拆分后留下来的四类"谁都要用"的东西）：
  *
  * <ul>
- *   <li>{@link com.ragagent.common.tenant.TenantRole} —— 租户角色与能力等级（rank 决定最小角色校验），
+ *   <li>{@link com.ragagent.contract.tenant.TenantRole} —— 租户角色与能力等级（rank 决定最小角色校验），
  *       <b>18 个包</b>在用（auth/knowledge/mcp/embed/wiki/…，以及 {@code common.web.RbacInterceptor}）；</li>
  *   <li>{@link com.ragagent.common.tenant.TenantProperties} —— {@code weknora.tenant} 配置项
  *       （RBAC 开关、自助建租户等），auth/config/{@code common.web} 共用；</li>

@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import com.ragagent.common.error.BizException;
 import com.ragagent.common.knowledge.ChunkFacts;
-import com.ragagent.common.knowledge.KnowledgeBaseSearchFacts;
+import com.ragagent.contract.knowledge.KnowledgeBaseSearchFacts;
 import com.ragagent.common.pipeline.SearchParams;
 
 import com.ragagent.retrieval.HybridSearchService.RetrievalConfigView;

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 import com.ragagent.common.knowledge.KnowledgeBaseLookup;
 import com.ragagent.common.knowledge.KnowledgeBaseView;
-import com.ragagent.common.knowledge.KnowledgeView;
+import com.ragagent.contract.knowledge.KnowledgeView;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.domain.KnowledgeBase;

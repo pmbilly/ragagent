@@ -1,5 +1,11 @@
 package com.ragagent.audit;
 
+import com.ragagent.common.security.TenantAPIKeyScope;
+
+import com.ragagent.audit.domain.AuditOutcome;
+
+import com.ragagent.audit.domain.AuditAction;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -16,14 +22,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ragagent.common.security.APIKeyScopeContext;
-import com.ragagent.common.security.TenantAPIKeyScope;
-import com.ragagent.audit.domain.AuditAction;
 import com.ragagent.audit.domain.AuditLog;
-import com.ragagent.audit.domain.AuditOutcome;
 import com.ragagent.audit.mapper.AuditLogRepository;
 import com.ragagent.audit.service.AuditLogService;
 import com.ragagent.audit.service.RbacDeniedAuditorRegistrar;
-import com.ragagent.common.tenant.TenantRole;
+import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.RbacInterceptor;
 import com.ragagent.common.tenant.TenantProperties;

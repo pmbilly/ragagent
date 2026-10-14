@@ -3,8 +3,8 @@ package com.ragagent.chatpipeline.support;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ragagent.common.session.PipelineUsedMemoryView;
-import com.ragagent.common.memory.MemoryItemView;
+import com.ragagent.contract.session.PipelineUsedMemoryView;
+import com.ragagent.contract.memory.MemoryItemView;
 import com.ragagent.platform.text.ListMerges;
 
 /**

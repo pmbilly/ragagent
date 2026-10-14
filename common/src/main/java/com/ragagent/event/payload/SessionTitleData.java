@@ -1,6 +1,7 @@
 package com.ragagent.event.payload;
 
 
+
 /**
  * 会话标题更新数据。
  * 两字段全部恒输出：零值输出 {@code {"sessionId":"","title":""}}。

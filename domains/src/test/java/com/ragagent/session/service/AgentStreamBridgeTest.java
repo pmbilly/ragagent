@@ -19,7 +19,7 @@ import org.mockito.ArgumentCaptor;
 
 import com.ragagent.common.llm.ResponseType;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.common.session.PipelineUsedMemoryView;
+import com.ragagent.contract.session.PipelineUsedMemoryView;
 import com.ragagent.platform.event.Event;
 import com.ragagent.platform.event.EventBus;
 import com.ragagent.platform.event.EventType;

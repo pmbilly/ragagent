@@ -8,7 +8,6 @@ import java.util.Map;
 import com.ragagent.chatpipeline.ChatManage;
 import com.ragagent.chatpipeline.History;
 import com.ragagent.chatpipeline.PipelineLog;
-import com.ragagent.chatpipeline.plugin.PluginSearch;
 import com.ragagent.common.retrieval.SearchChunkMerge;
 import com.ragagent.retrieval.support.SearchTextUtil;
 import com.ragagent.common.retrieval.SearchResult;
@@ -17,7 +16,7 @@ import com.ragagent.retrieval.telemetry.RetrievalObs;
 /**
  * 检索的纯函数辅助：
  * 历史引用提取、去重、部分重叠移除、分数采样日志。
- * plugin 主体在 {@link PluginSearch}；removePartialOverlaps 里的
+ * plugin 主体在 {@link com.ragagent.chatpipeline.plugin.PluginSearch}；removePartialOverlaps 里的
  * 归一化/包含/重叠率全部走 searchutil。
  */
 public final class SearchSupport {

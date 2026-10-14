@@ -4,7 +4,6 @@ import java.time.OffsetDateTime;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.web.SortedMapSerializer;
 import com.ragagent.platform.web.ZeroTimeSerializer;
 import com.ragagent.datasource.domain.DataSource;
 import com.ragagent.datasource.domain.DataSourceConfig;

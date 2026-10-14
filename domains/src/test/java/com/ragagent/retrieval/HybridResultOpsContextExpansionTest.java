@@ -18,7 +18,7 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.model.EmbeddingGateway;
 import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.ChunkSearchGateway;
-import com.ragagent.common.knowledge.KnowledgeBaseSearchGateway;
+import com.ragagent.contract.knowledge.KnowledgeBaseSearchGateway;
 import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.common.knowledge.KnowledgeDocumentGateway;
 import com.ragagent.platform.model.ModelGateway;

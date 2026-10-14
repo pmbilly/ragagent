@@ -1,6 +1,7 @@
 package com.ragagent.chatpipeline.plugin;
 
 
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -14,8 +15,8 @@ import com.ragagent.chatpipeline.support.MemoryUsedMemories;
 import com.ragagent.platform.event.Event;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.event.payload.MemoryRecalledData;
-import com.ragagent.common.memory.MemoryItemView;
-import com.ragagent.common.session.PipelineUsedMemoryView;
+import com.ragagent.contract.memory.MemoryItemView;
+import com.ragagent.contract.session.PipelineUsedMemoryView;
 import com.ragagent.retrieval.telemetry.RetrievalObs;
 import com.ragagent.platform.event.EventBusInterface;
 

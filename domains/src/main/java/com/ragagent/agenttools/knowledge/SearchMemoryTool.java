@@ -1,6 +1,6 @@
 package com.ragagent.agenttools.knowledge;
 
-import com.ragagent.common.memory.MemoryItemView;
+import com.ragagent.contract.memory.MemoryItemView;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

@@ -3,7 +3,7 @@ package com.ragagent.memory.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ragagent.common.memory.MemoryItemView;
+import com.ragagent.contract.memory.MemoryItemView;
 import com.ragagent.memory.domain.item.MemoryItem;
 
 /**

@@ -1,6 +1,7 @@
 package com.ragagent.chatpipeline;
 
 
+
 import static com.ragagent.chatpipeline.Rec46cSupport.assertRec;
 import static com.ragagent.chatpipeline.Rec46cSupport.errOf;
 import static com.ragagent.chatpipeline.Rec46cSupport.json;
@@ -23,11 +24,11 @@ import com.ragagent.chatpipeline.plugin.PluginIntoChatMessage;
 import com.ragagent.chatpipeline.plugin.PluginWebFetch;
 import com.ragagent.chatpipeline.support.ReferencesSupport;
 import com.ragagent.common.llm.ResponseType;
-import com.ragagent.common.session.PipelineMessageAttachmentView;
+import com.ragagent.contract.session.PipelineMessageAttachmentView;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.common.graph.GraphData;
-import com.ragagent.common.graph.GraphNode;
-import com.ragagent.common.graph.GraphRelation;
+import com.ragagent.contract.graph.GraphData;
+import com.ragagent.contract.graph.GraphNode;
+import com.ragagent.contract.graph.GraphRelation;
 import com.ragagent.llm.extract.EntityExtraction;
 import com.ragagent.llm.extract.PipelineConfig;
 import com.ragagent.llm.domain.StreamResponse;

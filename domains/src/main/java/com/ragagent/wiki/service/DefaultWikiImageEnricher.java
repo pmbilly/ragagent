@@ -3,8 +3,8 @@ package com.ragagent.wiki.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ragagent.common.knowledge.ChunkPort;
-import com.ragagent.common.knowledge.ChunkView;
+import com.ragagent.contract.knowledge.ChunkPort;
+import com.ragagent.contract.knowledge.ChunkView;
 import org.springframework.stereotype.Component;
 
 /**

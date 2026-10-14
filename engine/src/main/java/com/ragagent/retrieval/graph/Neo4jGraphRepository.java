@@ -18,10 +18,10 @@ import org.neo4j.driver.types.Node;
 import org.neo4j.driver.types.Relationship;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ragagent.common.graph.GraphData;
-import com.ragagent.common.graph.GraphNode;
-import com.ragagent.common.graph.GraphRelation;
-import com.ragagent.common.graph.NameSpace;
+import com.ragagent.contract.graph.GraphData;
+import com.ragagent.contract.graph.GraphNode;
+import com.ragagent.contract.graph.GraphRelation;
+import com.ragagent.contract.graph.NameSpace;
 
 /**
  * Neo4j 图仓储：实体/关系图谱的写（AddGraph）/删（DelGraph）/读（SearchNode）。

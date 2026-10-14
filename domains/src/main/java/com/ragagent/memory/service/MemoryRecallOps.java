@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.ragagent.common.memory.MemoryConfig;
-import com.ragagent.common.memory.MemoryKeys;
-import com.ragagent.common.memory.MemoryRecall;
-import com.ragagent.common.memory.MemoryKinds;
+import com.ragagent.contract.memory.MemoryConfig;
+import com.ragagent.contract.memory.MemoryKeys;
+import com.ragagent.contract.memory.MemoryRecall;
+import com.ragagent.contract.memory.MemoryKinds;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.MemoryRender;
 import com.ragagent.memory.domain.scope.MemoryScope;

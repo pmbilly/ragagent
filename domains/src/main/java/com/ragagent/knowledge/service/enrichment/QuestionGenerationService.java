@@ -27,7 +27,7 @@ import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.repository.ChunkRepository;
 
 import com.ragagent.knowledge.domain.QuestionBatchPayload;
-import com.ragagent.common.wiki.WikiFinalizePort;
+import com.ragagent.contract.wiki.WikiFinalizePort;
 import com.ragagent.platform.access.TenantScopes;
 
 /**

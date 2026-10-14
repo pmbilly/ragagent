@@ -24,9 +24,9 @@ import com.ragagent.agentmanagement.mapper.CustomAgentMapper;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.knowledge.KnowledgeBaseCatalogPort;
-import com.ragagent.common.auth.UserLookupPort;
-import com.ragagent.common.agent.AgentChannelCleaner;
+import com.ragagent.contract.knowledge.KnowledgeBaseCatalogPort;
+import com.ragagent.contract.auth.UserLookupPort;
+import com.ragagent.contract.agent.AgentChannelCleaner;
 
 /**
  * agents CRUD 家族 service。

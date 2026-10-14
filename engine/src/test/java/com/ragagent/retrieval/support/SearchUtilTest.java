@@ -9,7 +9,7 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
-import com.ragagent.common.knowledge.ChunkView;
+import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.common.retrieval.SearchChunkMerge;
 import com.ragagent.retrieval.domain.ImageInfo;
 import com.ragagent.common.retrieval.SearchResult;

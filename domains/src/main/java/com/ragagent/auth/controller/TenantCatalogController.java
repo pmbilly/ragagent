@@ -4,13 +4,13 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.apikey.ApiKeyAdminPort;
+import com.ragagent.contract.apikey.ApiKeyAdminPort;
 import com.ragagent.auth.service.TenantMemberService;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.auth.service.UserService;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.common.tenant.TenantProperties;
-import com.ragagent.common.knowledge.KnowledgeBaseProvisioner;
+import com.ragagent.contract.knowledge.KnowledgeBaseProvisioner;
 import com.ragagent.platform.storage.config.StorageAllowList;
 import com.ragagent.settings.SystemSettingGateway;
 import org.springframework.http.ResponseEntity;

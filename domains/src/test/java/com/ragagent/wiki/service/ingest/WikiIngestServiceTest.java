@@ -35,7 +35,7 @@ import com.ragagent.wiki.prompt.WikiPrompts;
 import com.ragagent.common.wiki.SlugUpdate;
 import com.ragagent.common.wiki.WikiLanguageSupport;
 import com.ragagent.wiki.service.WikiLlmCallMetadata;
-import com.ragagent.common.knowledge.ChunkView;
+import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.wiki.service.page.WikiPageService;
 import com.ragagent.wiki.service.page.WikiTextUtils;
 import com.ragagent.common.knowledge.KnowledgeBaseLookup;

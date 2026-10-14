@@ -23,7 +23,7 @@ import com.ragagent.agent.skills.Skill;
 import com.ragagent.agent.skills.SkillCatalogService;
 import com.ragagent.audit.domain.AuditAction;
 import com.ragagent.audit.domain.AuditOutcome;
-import com.ragagent.common.audit.AuditWritePort;
+import com.ragagent.contract.audit.AuditWritePort;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.AppError;
 import com.ragagent.common.error.BizException;

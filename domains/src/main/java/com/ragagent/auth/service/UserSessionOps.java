@@ -11,9 +11,6 @@ import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.domain.UserPreferences;
-import com.ragagent.auth.service.UserService.RefreshTokenException;
-import com.ragagent.auth.service.UserService.SwitchTenantException;
-import com.ragagent.auth.service.UserService.LogoutException;
 import io.jsonwebtoken.Claims;
 
 /**

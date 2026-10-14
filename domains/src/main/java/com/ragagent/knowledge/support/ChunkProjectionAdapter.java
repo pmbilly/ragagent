@@ -4,7 +4,7 @@ package com.ragagent.knowledge.support;
 import java.util.ArrayList;
 import java.util.List;
 import com.ragagent.common.knowledge.ChunkFacts;
-import com.ragagent.common.knowledge.ChunkView;
+import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.knowledge.domain.Chunk;
 
 /**

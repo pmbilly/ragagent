@@ -1,11 +1,10 @@
 package com.ragagent.wiki.service;
-import com.ragagent.wiki.service.ingest.WikiIngestService;
 
 /**
  * 知识文档的「wiki 子任务已终结」记账端口。
  *
  * <p><b>为什么是端口</b>：finalizing 计数归 knowledge 模块所有；把它抽成这个窄端口，
- * 让 {@link WikiIngestService#requeueFailedOps} 能在 op 到达终态（映射成功或进了死信）
+ * 让 {@link com.ragagent.wiki.service.ingest.WikiIngestService#requeueFailedOps} 能在 op 到达终态（映射成功或进了死信）
  * 时释放该文档在 finalizing 计数里的槽位，而不必依赖 knowledge 模块的内部实现。</p>
  *
  * <h2>业务语义</h2>

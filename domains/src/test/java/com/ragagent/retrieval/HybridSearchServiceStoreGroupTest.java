@@ -1,6 +1,7 @@
 package com.ragagent.retrieval;
 
 
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -19,10 +20,10 @@ import com.ragagent.common.pipeline.SearchParams;
 import com.ragagent.platform.model.EmbeddingGateway;
 import com.ragagent.common.error.BizException;
 import com.ragagent.common.knowledge.ChunkSearchGateway;
-import com.ragagent.common.knowledge.KnowledgeBaseSearchFacts;
-import com.ragagent.common.knowledge.KnowledgeBaseSearchGateway;
+import com.ragagent.contract.knowledge.KnowledgeBaseSearchFacts;
+import com.ragagent.contract.knowledge.KnowledgeBaseSearchGateway;
 import com.ragagent.common.knowledge.KnowledgeDocumentGateway;
-import com.ragagent.common.model.ModelFacts;
+import com.ragagent.contract.model.ModelFacts;
 import com.ragagent.platform.model.ModelGateway;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.retrieval.engine.EngineTypes;

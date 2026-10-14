@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.ragagent.common.wiki.WikiIngestPort;
+import com.ragagent.contract.wiki.WikiIngestPort;
 import com.ragagent.common.wiki.WikiLanguageSupport;
 import com.ragagent.wiki.domain.TaskPendingOp;
 import com.ragagent.common.text.Whitespace;

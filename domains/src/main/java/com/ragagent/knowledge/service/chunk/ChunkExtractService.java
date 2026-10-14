@@ -1,5 +1,6 @@
 package com.ragagent.knowledge.service.chunk;
 
+
 import com.ragagent.knowledge.domain.span.SpanTracker;
 
 import com.ragagent.knowledge.domain.ChunkExtractConsumer;
@@ -32,11 +33,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import com.ragagent.knowledge.domain.ExtractChunkPayload;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.ragagent.common.graph.GraphData;
-import com.ragagent.common.graph.GraphNode;
-import com.ragagent.common.graph.GraphRelation;
-import com.ragagent.common.graph.NameSpace;
-import com.ragagent.common.wiki.WikiFinalizePort;
+import com.ragagent.contract.graph.GraphData;
+import com.ragagent.contract.graph.GraphNode;
+import com.ragagent.contract.graph.GraphRelation;
+import com.ragagent.contract.graph.NameSpace;
+import com.ragagent.contract.wiki.WikiFinalizePort;
 import com.ragagent.platform.access.TenantScopes;
 
 /**

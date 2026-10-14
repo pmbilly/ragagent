@@ -6,7 +6,6 @@ import com.ragagent.approval.Checker;
 import com.ragagent.approval.Gate;
 import com.ragagent.approval.GateOptions;
 import com.ragagent.approval.RedisPubSub;
-import com.ragagent.mcp.oauth.McpOAuthSupportImpl;
 import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.protocol.McpOAuthSupport;
 import com.ragagent.mcp.service.McpToolApprovalService;
@@ -29,7 +28,7 @@ import org.springframework.context.annotation.Configuration;
 public class McpWiring {
 
     /**
-     * MCP 连接池。OAuth 支持由 {@link McpOAuthSupportImpl} 提供（协议层预留的注入点）。
+     * MCP 连接池。OAuth 支持由 {@link com.ragagent.mcp.oauth.McpOAuthSupportImpl} 提供（协议层预留的注入点）。
      */
     @Bean(destroyMethod = "shutdown")
     public McpClientManager mcpClientManager(ObjectProvider<McpOAuthSupport> oauthSupport) {

@@ -1,6 +1,7 @@
 package com.ragagent.knowledge.service.chunk;
 
 
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.time.OffsetDateTime;
@@ -11,7 +12,7 @@ import com.ragagent.TestSchema;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.BizException;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.common.knowledge.GeneratedQuestion;
+import com.ragagent.contract.knowledge.GeneratedQuestion;
 import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;

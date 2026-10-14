@@ -2,8 +2,7 @@ package com.ragagent.wiki.service;
 
 import java.util.List;
 
-import com.ragagent.common.knowledge.ChunkView;
-import com.ragagent.wiki.service.ingest.WikiIngestService;
+import com.ragagent.contract.knowledge.ChunkView;
 
 /**
  * 把图片的 OCR / caption 文本内联进文档正文的可插拔端口。
@@ -16,7 +15,7 @@ import com.ragagent.wiki.service.ingest.WikiIngestService;
  * <h2>富化三步</h2>
  * <ol>
  *   <li>{@code content = reconstructContent(chunks)} —— 纯文本重建（见
- *       {@link WikiIngestService#reconstructContent}）；</li>
+ *       {@link com.ragagent.wiki.service.ingest.WikiIngestService#reconstructContent}）；</li>
  *   <li>收集文本 chunk 的 ID，按 chunk 汇总图片信息；</li>
  *   <li>把 {@code <image>/<imageOcr>/<imageCaption>} 块内联进正文。</li>
  * </ol>

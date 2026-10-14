@@ -5,9 +5,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 
-import com.ragagent.common.security.APIKeyCapability;
+import com.ragagent.contract.apikey.APIKeyCapability;
 import com.ragagent.common.security.APIKeyScopeContext;
-import com.ragagent.common.security.APIKeyScopeType;
+import com.ragagent.contract.apikey.APIKeyScopeType;
 import com.ragagent.auth.apikey.domain.APIKeyStringListTypeHandler;
 import com.ragagent.auth.apikey.domain.TenantAPIKey;
 import com.ragagent.common.security.TenantAPIKeyScope;
