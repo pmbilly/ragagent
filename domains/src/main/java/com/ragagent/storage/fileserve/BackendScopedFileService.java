@@ -3,6 +3,7 @@ package com.ragagent.storage.fileserve;
 import java.io.IOException;
 import java.net.URI;
 import com.ragagent.common.storage.fileserve.FileTransport;
+import com.ragagent.common.storage.fileserve.StoragePaths;
 
 /**
  * 后端作用域包装（{@code GetFile / GetFileURL} 子集）：

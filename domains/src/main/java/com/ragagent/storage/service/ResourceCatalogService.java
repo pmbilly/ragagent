@@ -15,7 +15,7 @@ import javax.crypto.spec.SecretKeySpec;
 import org.springframework.stereotype.Service;
 
 import com.ragagent.storage.domain.StoredResource;
-import com.ragagent.storage.fileserve.StoragePaths;
+import com.ragagent.common.storage.fileserve.StoragePaths;
 import com.ragagent.storage.mapper.ResourceRepository;
 
 /**

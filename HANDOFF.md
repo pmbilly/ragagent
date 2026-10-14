@@ -1331,6 +1331,17 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **验证**：**13 守卫全绿** ✓（环 0 组、R9 包级 SCC 基线按提示刷新后仍 10 组、L1→域 0 条、R6 不变）；`spotlessCheck build` ✓ **1m38s** ✓；**4991 / 失败 0 / 跳过 4**（boot 1331 ✓）；dev 重启 ready ✓ + 冒烟（`/api/v1/storage-backends`、`/api/v1/knowledge-bases` 200 ✓；`/api/v1/messages/{id}/load` 业务级 404 "session not found" ✓ 路由/鉴权/新注入链路正常）
 - **A③ 累计（二十八刀）**：边 **64 → 30（−34）**、类 **317 → 195（−122）**；三档 **① 22 条 / 109 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
 - **下一步候选**：`knowledge→storage` 第三刀（余 2 类：`KnowledgeBaseFileProxyController` 需文件代理端口、`TenantFileStorage` 需 provider 存储端口）· `embedchannel→storage`（余 1 类）· **待拍板** `mcp→agent`(9) · **K 级** `im→session`(6) · `datasource→knowledge`(8) · **大块** `knowledge→model`(14) · `session→knowledge`(17) · `session→storage`(6 余)
+**🔶 A③ 第三十刀：`knowledge→storage` 收官 ⇒ 租户文件门面走 provider 端口（2026-10-15，R10 边 29 → 28、类 193 → 191）**
+- **接缝**：`knowledge→storage` 余最后 1 类 `TenantFileStorage`（租户文件门面：本地卷 + 云 provider 分流）
+- **L1 新增 2 件**：`common.storage.fileserve.ProviderFileStorePort`（三态 `Resolution`：`none()`＝无租户/无云配置走本地 · `error` 非空＝配了云但解析失败（不静默退回本地）· `ok()`＝可用）+ `Ops` 六面（saveFile / saveBytes / getFileURL / getFile / open / deleteFile）；并把 **`StoragePaths` 上提**（纯静态路径件，依赖仅 platform.*）
+- **存储域新增 `api` 包 + `ProviderFileStoreAdapter`**：解析口径自 `TenantFileStorage#resolveProvider` **原样搬入**（租户视图取不到 ⇒ `none()`；解析失败 ⇒ error 非空），`Ops` 实现逐字复刻原写/读/删/直出路径（`FileService.saveFile` 的惰性开流、`ProviderFileContentService.open` 的流式适配）
+- **`TenantFileStorage` 改造**：构造 4 参 → 2 参（`LocalStorageService` + 端口）；"本地 / 云"分流与错误信封口径**逐字保留**（写面抛 `IllegalStateException`、读面折 `Failed to retrieve file`、删除 best-effort 只 warn、`local://` 归本地）
+- **读数**：`knowledge→storage` **整条边清零** ✓；顺带 `session→storage` **6 → 5**（`StoragePaths` 上提使 `ArtifactVersions` 脱边）；**R9 包级环组数 10 → 9**（真实结构改善，按提示刷新基线 ✓）
+- **⚠️ 一次约定测试红态（新增的注释放错词）**：新 JavaDoc 里写了 `golden` 一词 ⇒ 仓库约定测试 `KnowledgeCodeConventionsTest`（禁词 `golden|波N|对照 Go`）直接点名 ⇒ 改写成白话表述。**教训**：新增/改注释后要过**各域"代码约定"测试的禁词表**，不能只跑编译
+- **测试适配**：`TenantFileStorageTest` 的 6 个用例改经真实适配器装配（两个纯 resolver 断言改为端口 `Resolution` 断言，语义等价、覆盖不丢）
+- **验证**：**13 守卫全绿** ✓；`spotlessCheck build` ✓ **2m01s** ✓；**4991 / 失败 0 / 跳过 4**（boot 1331 ✓）；定向 knowledge/storage/session/datasource **1111 条** ✓；dev 重启 ready ✓（新适配器 bean + 门面 2 参构造装配通过）+ 冒烟（knowledge-bases / storage-backends / parser-engines 均 200 ✓、KB 文件路由 `{"code":1003,...}` 信封逐字 ✓）
+- **A③ 累计（三十刀）**：边 **64 → 28（−36）**、类 **317 → 191（−126）**；三档 **① 20 条 / 105 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
+- **下一步**：`session→storage` 余 5（`MessageFileProxyController` 可复用文件代理端口族；`Artifact*`/`AgentWebPages`/`AgentEngineAssembler`/`SessionAgentQaService` 多与 `ResourceCatalogService` 相关，需资源目录端口）→ **待拍板** `mcp→agent`(9) → **K 级** `im→session`(6) / `datasource→knowledge`(8) → **大块** `knowledge→model`(14) / `session→knowledge`(17)
 **🔶 A③ 第二十九刀：文件代理面端口化 ⇒ `embedchannel→storage` 清零 + `knowledge→storage` 2 → 1（2026-10-15，R10 边 30 → 29、类 195 → 193）**
 - **接缝选择**：`knowledge→storage`(2 类) 与 `embedchannel→storage`(1 类) 共享同一套"文件直出"件（`FileProxyService` / `FileProxyController.writeGinNoRoute` / `FileAccess*`）⇒ 一次端口化清两条边
 - **L1 新增 2 件**：`common.storage.fileserve.FileServeHttp`（响应小件：NoRoute 形 / HEAD-404 / 空体状态 / 错误信封 / JSON 写出 / `requireFilePathQuery`——原存储域静态辅助，被知识库、消息、embed 三条路由共用）+ `common.storage.fileserve.FileProxyPort`（`serveTenantFiles` · `serveKbFile(属主租户, kbId, req, res)`）

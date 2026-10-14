@@ -25,6 +25,7 @@ import com.ragagent.storage.provider.FileService;
 import com.ragagent.storage.provider.FileServiceFactory;
 import com.ragagent.contract.tenant.StorageEngineConfig;
 import com.ragagent.common.storage.fileserve.FileTransport;
+import com.ragagent.common.storage.fileserve.StoragePaths;
 
 /**
  * 运行时存储解析器，三个职责：

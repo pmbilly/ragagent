@@ -46,11 +46,6 @@
       "com.ragagent.retrieval.engine.weaviate"
     ],
     [
-      "com.ragagent.storage.fileserve",
-      "com.ragagent.storage.provider",
-      "com.ragagent.storage.service"
-    ],
-    [
       "com.ragagent.wiki.service.ingest",
       "com.ragagent.wiki.service.page"
     ]

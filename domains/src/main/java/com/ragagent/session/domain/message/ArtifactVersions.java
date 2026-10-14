@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.ragagent.storage.fileserve.StoragePaths;
+import com.ragagent.common.storage.fileserve.StoragePaths;
 
 /**
  * 产物版本澄清。

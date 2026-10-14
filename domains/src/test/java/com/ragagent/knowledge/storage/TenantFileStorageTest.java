@@ -21,6 +21,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.auth.service.TenantService;
+import com.ragagent.common.storage.fileserve.ProviderFileStorePort;
+import com.ragagent.storage.api.ProviderFileStoreAdapter;
 import com.ragagent.storage.fileserve.StorageFileResolver;
 import com.ragagent.contract.error.BizException;
 
@@ -37,7 +39,14 @@ class TenantFileStorageTest {
 
     private TenantFileStorage facade(Path baseDir, TenantStorageView tenant) {
         return new TenantFileStorage(new LocalStorageService(baseDir.toString()),
-                new StorageFileResolver(null, null), tenantServiceReturning(tenant), baseDir.toString());
+                new ProviderFileStoreAdapter(new StorageFileResolver(null, null),
+                        tenantServiceReturning(tenant), baseDir.toString()));
+    }
+
+    /** 端口实现（真实适配器 + 直连 resolver）：写面 provider 解析的钉子。 */
+    private static ProviderFileStorePort providerStore(Path baseDir, TenantStorageView tenant) {
+        return new ProviderFileStoreAdapter(new StorageFileResolver(null, null),
+                tenantServiceReturning(tenant), baseDir.toString());
     }
 
     private static TenantConfigLookup tenantServiceReturning(TenantStorageView tenant) {
@@ -95,11 +104,10 @@ class TenantFileStorageTest {
         assertEquals("resource://7/k-2/a.txt", path);
         // local 的 provider 服务为 null（写面解析的"走本地"信号）。
         // 经租户 defaultProvider 表达——显式传 provider 会走 legacy alias 查询（要 DB 仓储）。
-        StorageFileResolver.ProviderResolution pr = new StorageFileResolver(null, null)
-                .resolveProviderService(tenant, "", null, dir.toString());
-        assertNull(pr.service());
-        assertNull(pr.error());
-        assertFalse(pr.ok());
+        ProviderFileStorePort.Resolution r = providerStore(dir, tenant).resolve(7L, null);
+        assertNull(r.ops());
+        assertNull(r.error());
+        assertFalse(r.ok());
     }
 
     @Test
@@ -114,12 +122,10 @@ class TenantFileStorageTest {
         cos.put("bucketName", "bk-125");
         cos.put("region", "ap-guangzhou");
 
-        StorageFileResolver resolver = new StorageFileResolver(null, null);
-        StorageFileResolver.ProviderResolution pr =
-                resolver.resolveProviderService(tenant, "", null, dir.toString());
-        assertTrue(pr.ok(), pr.error());
-        assertEquals("cos", pr.provider());
-        assertNotNull(pr.service());
+        ProviderFileStorePort.Resolution r = providerStore(dir, tenant).resolve(9L, null);
+        assertTrue(r.ok(), r.error());
+        assertEquals("cos", r.provider());
+        assertNotNull(r.ops());
     }
 
     @Test

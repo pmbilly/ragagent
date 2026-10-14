@@ -153,9 +153,6 @@
       "InitializationRequests",
       "ModelConnectivityTestService"
     ],
-    "knowledge→storage": [
-      "TenantFileStorage"
-    ],
     "knowledge→model": [
       "ChunkExtractService",
       "ChunkQuestionService",
@@ -229,7 +226,6 @@
       "AgentEngineAssembler",
       "AgentWebPages",
       "ArtifactCollectorWiring",
-      "ArtifactVersions",
       "MessageFileProxyController",
       "SessionAgentQaService"
     ],

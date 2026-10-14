@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.ragagent.common.storage.fileserve.StoragePathGuard;
 import com.ragagent.common.storage.fileserve.FileTransport;
+import com.ragagent.common.storage.fileserve.StoragePaths;
 
 /**
  * 本地盘文件服务（GetFile / GetFileURL / SaveBytes / DeleteFile）。

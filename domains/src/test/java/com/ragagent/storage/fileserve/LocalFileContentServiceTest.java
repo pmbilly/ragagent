@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import com.ragagent.common.storage.fileserve.FileTransport;
+import com.ragagent.common.storage.fileserve.StoragePaths;
 
 /**
  * {@link LocalFileContentService} 的路径规范化与守卫（safe-path 边界 +

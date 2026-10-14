@@ -23,6 +23,7 @@ import com.ragagent.platform.text.ContentTypeByFilename;
 import com.ragagent.common.storage.fileserve.FileProxyPort;
 import com.ragagent.common.storage.fileserve.FileServeHttp;
 import com.ragagent.common.storage.fileserve.FileTransport;
+import com.ragagent.common.storage.fileserve.StoragePaths;
 
 /**
  * 文件代理面共享处理器：

@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.storage.domain.StoredResource;
 import com.ragagent.storage.service.ResourceCatalogService;
+import com.ragagent.common.storage.fileserve.StoragePaths;
 
 /**
  * KB / 消息两个 scoped 文件代理的授权判定（ResolveKBFile / ResolveMessageFile /

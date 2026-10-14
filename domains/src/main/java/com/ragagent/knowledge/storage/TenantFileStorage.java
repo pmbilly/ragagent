@@ -1,41 +1,28 @@
 package com.ragagent.knowledge.storage;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
-import com.ragagent.common.tenant.TenantConfigLookup;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.storage.fileserve.StorageFileResolver;
-import com.ragagent.storage.fileserve.StoragePaths;
-import com.ragagent.storage.provider.FileService;
+
 import com.ragagent.common.storage.fileserve.FileTransport.OpenedFile;
-import com.ragagent.storage.fileserve.ProviderFileContentService;
+import com.ragagent.common.storage.fileserve.ProviderFileStorePort;
+import com.ragagent.common.storage.fileserve.StoragePaths;
+import com.ragagent.contract.error.BizException;
+import com.ragagent.contract.error.AppError;
 
 /**
- * 租户感知的文件存储门面（A3-3 尾批）——知识上传 / 读取 / 删除的**唯一入口**。
- * <h2>为什么需要</h2>
- * <p>接线前这三件事直连 {@link LocalStorageService}（本地盘），配了云后端的租户也照落本地：
- * 库里的 {@code file_path} 恒为 {@code resource://{tenant}/{knowledge}/{name}}。本门面按
- * <b>引用形态</b>分流：</p>
+ * 租户感知的文件存储门面：本地卷（{@link LocalStorageService}）与云 provider 的分流。
+ *
+ * <p><b>跨域口径</b>：云 provider 面经 L1 端口 {@link ProviderFileStorePort}（解析 + 写/读/删操作），
+ * 本类不再 import 存储域类型；"本地 / 云"分流与错误信封口径<b>逐字保留</b>：</p>
  * <ul>
- *   <li><b>本地</b>（无 scheme / {@code local://} / {@code resource://} 或租户 default
- *       provider 为空或 {@code local}）：<b>原样</b>走 {@link LocalStorageService}——
- *       {@code resource://} 是 契约样例锁定的落盘契约，不能换成 provider 的 {@code local://…}
- *       （换了会让既有行读不回来、契约样例 全红）；</li>
- *   <li><b>云</b>（引用带 {@code cos://}/{@code s3://}/{@code oss://}… 或租户 default
- *       provider 是云）：走 A3 的 provider 服务——{@code SaveFile} 落
- *       {@code {prefix}{tenant}/{knowledge}/{uuid}{ext}}、{@code GetFile} 读回、
- * </ul>
- * <ul>
- *   <li>上传时租户配了云却解析失败（配置不全/凭据错）→ <b>抛出</b>，不静默回落本地
- *       （否则"配置错了却在本地悄悄成功"是最难查的一类事故）；</li>
- *   <li>删除是 best-effort：本地目录树恒清，云对象失败只记日志。</li>
+ *   <li>无租户 / 租户无云配置（{@code none}）⇒ 本地契约（{@code resource://…} 既定形态，契约样例锁定）；</li>
+ *   <li>配了云但解析失败（{@code error} 非空）⇒ **不静默退回本地**：写面抛、读面折成
+ *       {@code Failed to retrieve file} 信封、删除只记 warn；</li>
+ *   <li>引用带 {@code local://} scheme ⇒ 归本地盘（Go local provider 的原生形态）。</li>
  * </ul>
  */
 @Service
@@ -44,19 +31,12 @@ public class TenantFileStorage {
     private static final Logger log = LoggerFactory.getLogger(TenantFileStorage.class);
 
     private final LocalStorageService local;
-    private final StorageFileResolver resolver;
-    private final TenantConfigLookup tenantConfigLookup;
-    private final String localBaseDir;
+    private final ProviderFileStorePort providerStore;
 
     public TenantFileStorage(LocalStorageService local,
-                             StorageFileResolver resolver,
-                             TenantConfigLookup tenantConfigLookup,
-                             @Value("${weknora.storage.local-base-dir:${LOCAL_STORAGE_BASE_DIR:/data/files}}")
-                                     String localBaseDir) {
+                             ProviderFileStorePort providerStore) {
         this.local = local;
-        this.resolver = resolver;
-        this.tenantConfigLookup = tenantConfigLookup;
-        this.localBaseDir = localBaseDir;
+        this.providerStore = providerStore;
     }
 
     // ── 写 ──────────────────────────────────────────────────────────────────
@@ -65,12 +45,9 @@ public class TenantFileStorage {
      * 保存知识文件→ 落库的 file_path。
      */
     public String save(long tenantId, String knowledgeId, String fileName, byte[] content) {
-        StorageFileResolver.ProviderResolution resolved = resolveProvider(tenantId, null);
+        ProviderFileStorePort.Resolution resolved = providerStore.resolve(tenantId, null);
         if (resolved.ok()) {
-            String path = resolved.service().saveFile(
-                    new FileService.UploadFile(fileName, content.length,
-                            () -> new ByteArrayInputStream(content), ""),
-                    tenantId, knowledgeId);
+            String path = resolved.ops().saveFile(content, fileName, tenantId, knowledgeId);
             log.info("stored knowledge file on provider {}: knowledge_id={} path={}",
                     resolved.provider(), knowledgeId, path);
             return path;
@@ -84,21 +61,21 @@ public class TenantFileStorage {
 
     /**
      * 导出结果：{@code handled=false} = "租户走本地存储，调用方自便"；
+     * {@code handled=true} 且 {@code url=null} = "云上导出失败，调用方按失败处理"。
      */
     public record Exported(String url, boolean handled) {
     }
 
     /**
-     * {@code fileSvc.SaveBytes(ctx, data, tenantID, fileName, temp)} + {@code GetFileURL}
-     * （知识 FAQ 导入的失败明细 CSV 走这条，temp=true → 云上落临时桶）。
+     * 保存导出字节并取 URL（知识 FAQ 导入的失败明细 CSV 走这条，temp=true → 云上落临时桶）。
      * <p>本地租户返回 {@code handled=false}：调用方保留既有本地落盘与 {@code local://} 引用
-     * （那是 契约样例锁定的形态）。</p>
+     * （那是契约样例锁定的形态）。</p>
      */
     public Exported saveExportedBytesToUrl(long tenantId, String fileName, byte[] data, boolean temp) {
-        StorageFileResolver.ProviderResolution resolved = resolveProvider(tenantId, null);
+        ProviderFileStorePort.Resolution resolved = providerStore.resolve(tenantId, null);
         if (resolved.ok()) {
-            String ref = resolved.service().saveBytes(data, tenantId, fileName, temp);
-            String url = resolved.service().getFileURL(ref);
+            String ref = resolved.ops().saveBytes(data, tenantId, fileName, temp);
+            String url = resolved.ops().getFileURL(ref);
             log.info("exported bytes on provider {}: ref={}", resolved.provider(), ref);
             return new Exported(url, true);
         }
@@ -147,8 +124,8 @@ public class TenantFileStorage {
     }
 
     /**
-     * （minio 可 seek / aws-sdk 族流式）——复用文件代理面的同一适配器
-     * （{@link com.ragagent.storage.fileserve.ProviderFileContentService}），不重复一套分流逻辑。
+     * provider 引用打开为流式对象（minio 可 seek / aws-sdk 族流式）——复用文件代理面的同一适配器
+     * （端口实现内的 {@code ProviderFileContentService}），不重复一套分流逻辑。
      * <p>错误折叠成与 {@link #readChecked} 同一个 {@code Failed to retrieve file} 信封
      * （契约样例 {@code kg-download-404/traversal} 锁的就是它）。</p>
      */
@@ -158,13 +135,12 @@ public class TenantFileStorage {
             return local.openChecked(filePath);
         }
         try {
-            StorageFileResolver.ProviderResolution resolved = resolveProvider(tenantId, provider);
+            ProviderFileStorePort.Resolution resolved = providerStore.resolve(tenantId, provider);
             if (!resolved.ok()) {
                 throw new IllegalStateException("read from provider \"" + provider + "\" failed: "
                         + resolved.error());
             }
-            return new ProviderFileContentService(resolved.service())
-                    .getFile(filePath);
+            return resolved.ops().open(filePath);
         } catch (BizException e) {
             throw e;
         } catch (IOException | RuntimeException e) {
@@ -186,13 +162,13 @@ public class TenantFileStorage {
             return;
         }
         try {
-            StorageFileResolver.ProviderResolution resolved = resolveProvider(tenantId, provider);
+            ProviderFileStorePort.Resolution resolved = providerStore.resolve(tenantId, provider);
             if (!resolved.ok()) {
                 log.warn("delete provider object skipped: provider={} err={}",
                         provider, resolved.error());
                 return;
             }
-            resolved.service().deleteFile(filePath);
+            resolved.ops().deleteFile(filePath);
             log.info("deleted provider object: provider={} path={}", provider, filePath);
         } catch (RuntimeException e) {
             log.warn("delete provider object failed: path={} err={}", filePath, e.toString());
@@ -206,31 +182,17 @@ public class TenantFileStorage {
     }
 
     private byte[] readFromProvider(long tenantId, String provider, String filePath) {
-        StorageFileResolver.ProviderResolution resolved = resolveProvider(tenantId, provider);
+        ProviderFileStorePort.Resolution resolved = providerStore.resolve(tenantId, provider);
         if (!resolved.ok()) {
             throw new IllegalStateException("read from provider \"" + provider + "\" failed: "
                     + resolved.error());
         }
-        try (InputStream in = resolved.service().getFile(filePath)) {
+        try (InputStream in = resolved.ops().getFile(filePath)) {
             return in == null ? new byte[0] : in.readAllBytes();
         } catch (IOException e) {
             throw new IllegalStateException("failed to read file: " + e.getMessage(), e);
         } catch (RuntimeException e) {
             throw new IllegalStateException(e.getMessage() == null ? e.toString() : e.getMessage(), e);
         }
-    }
-
-    /**
-     * 按租户解析 provider 服务；{@code provider} 为空表示"用租户默认"。
-     * <p>取不到租户（无 tenantId / 库里无行）→ (null, "", null)：<b>当作没有云配置</b>，
-     * 走本地契约——这与"配了云但解析失败"（错误非空 → 抛出）是两种姿态，
-     * 后者不能静默退回本地。</p>
-     */
-    private StorageFileResolver.ProviderResolution resolveProvider(long tenantId, String provider) {
-        TenantStorageView tenant = tenantId <= 0 ? null : tenantConfigLookup.storageView(tenantId);
-        if (tenant == null) {
-            return new StorageFileResolver.ProviderResolution(null, "", null);
-        }
-        return resolver.resolveProviderService(tenant, "", provider, localBaseDir);
     }
 }

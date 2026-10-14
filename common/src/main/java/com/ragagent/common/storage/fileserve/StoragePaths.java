@@ -1,4 +1,4 @@
-package com.ragagent.storage.fileserve;
+package com.ragagent.common.storage.fileserve;
 
 import com.ragagent.platform.web.JsonMappers;
 import java.nio.charset.StandardCharsets;
