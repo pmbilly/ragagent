@@ -15,7 +15,7 @@ import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeTag;
 import com.ragagent.knowledge.repository.KnowledgeTagRepository;
 import com.ragagent.knowledge.service.KnowledgeBaseService;
-import com.ragagent.knowledge.service.KnowledgeTagService;
+import com.ragagent.knowledge.service.management.KnowledgeTagService;
 
 /**
  * 自动标签生产实现（按名称查找或创建标签）：

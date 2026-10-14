@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.service;
+package com.ragagent.knowledge.service.management;
 
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;

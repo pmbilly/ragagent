@@ -55,14 +55,11 @@ import java.util.Set;
 import java.util.TreeSet;
 import com.ragagent.knowledge.index.ChunkVectorIndexer;
 import com.ragagent.knowledge.service.KnowledgeAccessHelper;
-import com.ragagent.knowledge.service.KnowledgeMoveService;
-import com.ragagent.knowledge.service.KnowledgeCloneService;
 import com.ragagent.knowledge.service.KnowledgeFolderService;
-import com.ragagent.knowledge.service.KnowledgeBatchOpsService;
 import com.ragagent.knowledge.service.KnowledgeParseService;
 import com.ragagent.knowledge.service.KnowledgeSummaryService;
-import com.ragagent.knowledge.service.KnowledgeSearchService;
-import com.ragagent.knowledge.service.KnowledgeSpanService;
+import com.ragagent.knowledge.service.query.KnowledgeSearchService;
+import com.ragagent.knowledge.service.query.KnowledgeSpanService;
 import com.ragagent.knowledge.service.KnowledgeFileService;
 import com.ragagent.knowledge.service.DuplicateKnowledgeException;
 

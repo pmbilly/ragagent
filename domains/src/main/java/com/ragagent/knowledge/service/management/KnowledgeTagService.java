@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.service;
+package com.ragagent.knowledge.service.management;
 
 import com.ragagent.common.web.JsonMappers;
 import java.time.OffsetDateTime;
@@ -32,6 +32,7 @@ import com.ragagent.retrieval.engine.VectorStoreService;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import com.ragagent.knowledge.index.KnowledgeVectorWrites;
+import com.ragagent.knowledge.service.KnowledgeBaseService;
 
 /**
  * <h2>路由链与 Java 落地</h2>

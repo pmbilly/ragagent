@@ -60,7 +60,7 @@ public class KnowledgeParseService {
         worker.enqueue(existing.getId());
         return existing;
     }
-    static void resetKnowledgeForReparse(Knowledge k, KnowledgeBase kb) {
+    public static void resetKnowledgeForReparse(Knowledge k, KnowledgeBase kb) {
         k.setParseStatus(Knowledge.PARSE_PENDING);
         k.setEnableStatus("disabled");
         k.setDescription("");

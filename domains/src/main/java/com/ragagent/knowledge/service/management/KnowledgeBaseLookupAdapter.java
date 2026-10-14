@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.service;
+package com.ragagent.knowledge.service.management;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.beans.factory.ObjectProvider;

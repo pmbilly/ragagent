@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.service;
+package com.ragagent.knowledge.service.query;
 
 import java.util.ArrayList;
 import java.util.List;

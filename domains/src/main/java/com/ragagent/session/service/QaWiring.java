@@ -80,7 +80,7 @@ import com.ragagent.tenant.Tenant;
 import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.KnowledgeBaseView;
 import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
-import com.ragagent.knowledge.service.KnowledgeBaseLookupAdapter;
+import com.ragagent.knowledge.service.management.KnowledgeBaseLookupAdapter;
 
 /**
  * chat 管线 + QA 面装配（docs/known-issues/05-wave-4.md 的 11 seam 清单）。

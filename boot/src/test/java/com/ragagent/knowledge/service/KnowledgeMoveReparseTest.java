@@ -18,7 +18,7 @@ import com.ragagent.common.context.TenantContext;
 import com.ragagent.knowledge.service.management.KnowledgeService;
 
 /**
- * move 的 reparse 模式的 H2 钉子。覆盖 {@link com.ragagent.knowledge.service.KnowledgeMoveService}
+ * move 的 reparse 模式的 H2 钉子。覆盖 {@link com.ragagent.knowledge.service.management.KnowledgeMoveService}
  * 的 {@code moveKnowledgeReparse} + {@code enqueueMovedKnowledge}：
  *
  * <ol>

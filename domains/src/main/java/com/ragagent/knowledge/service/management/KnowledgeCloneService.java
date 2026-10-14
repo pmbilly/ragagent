@@ -1,4 +1,4 @@
-package com.ragagent.knowledge.service;
+package com.ragagent.knowledge.service.management;
 
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
@@ -32,6 +32,7 @@ import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import com.ragagent.knowledge.index.KnowledgeVectorWrites;
+import com.ragagent.knowledge.service.KnowledgeBaseService;
 
 /**
  * KB clone（copy 路由 worker 面）+ Duplicate（同步 settings-only）+ 跨库兼容性校验。

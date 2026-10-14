@@ -180,7 +180,7 @@ public class KnowledgeBaseService
             throw new BizException(AppError.internal("failed to verify vector store binding"));
         }
     }
-    static void ensureDefaults(KnowledgeBase kb) {
+    public static void ensureDefaults(KnowledgeBase kb) {
         if (kb.getType().isEmpty()) {
             kb.setType("document");
         }

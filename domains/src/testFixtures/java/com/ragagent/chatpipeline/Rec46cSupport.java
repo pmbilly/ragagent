@@ -51,7 +51,7 @@ import com.ragagent.support.ContractJson;
 import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.KnowledgeBaseView;
 import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
-import com.ragagent.knowledge.service.KnowledgeBaseLookupAdapter;
+import com.ragagent.knowledge.service.management.KnowledgeBaseLookupAdapter;
 
 /**
  * 4.6c 录制回放的替身与掩码工具。

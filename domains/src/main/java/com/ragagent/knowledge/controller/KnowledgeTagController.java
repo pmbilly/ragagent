@@ -12,7 +12,7 @@ import com.ragagent.knowledge.dto.tag.KnowledgeTagResponse;
 import com.ragagent.knowledge.dto.tag.TagPageResult;
 import com.ragagent.knowledge.dto.tag.UpdateTagRequest;
 import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
-import com.ragagent.knowledge.service.KnowledgeTagService;
+import com.ragagent.knowledge.service.management.KnowledgeTagService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

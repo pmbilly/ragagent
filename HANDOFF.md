@@ -986,7 +986,16 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **两处换锚**：`file-size.baseline.json` 的 `limits`（**796 → 717**，换锚 + 收紧）、`check-json-key-case.py` 的键级豁免 `{'updated_at'}`（路径换锚，键与理由不变）。
 - **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m41s** ✓ **十二守卫** ✓ —— **包级 SCC 仍 12 组**（门面归位未造环，㉝/㊲ 的断边工作在此兑现）。
 - **B263 结构目标至此收口**：mapper 直连归零 · `{service, task}` SCC 消除 · 门面归位（`service.management`）· 两个子面（`service.faq` 8 类 / `service.chunk` 4 类）已切出。
-- **登记（后续可选，非 B263 必需）**：`service` 其余子面继续细分（`KnowledgeTagService` 可作 `service.tag`；`DuplicateKnowledgeException`/`KnowledgeAccessHelper`/`KnowledgeSpanService` 与 11 个协作者面）；"ObjectProvider 需自述理由"守卫（㊲ 登记）。`service.chunk` 现 4 类；`KnowledgeTagService`（零入度，可作 `service.tag`，单类面偏薄）；**门面归位的最后一关**是 `KnowledgeService` 的 6 个引用者。
+- **登记（后续可选，非 B263 必需）**：
+**🔶 B263 第㊴步（2026-10-14，`service.query` 切出 + `service.management` 增补；**对齐 §8.8.2 命名**）**
+- **先做目标树体检（重要发现）**：§8.8.2 的目标树**大部分已实现**——`dto.{chunk(13),doc(17),faq(22),kb(16),tag(8)}` 与顶层 `dto/`（3 类）**与计划精确吻合** ✓；`repository/mapper/task/storage/controller/chunker/config/client` 均已对齐。**但 `domain.{document,task,graph}` 的 12 个类型（`KnowledgeDocument`/`ProcessingTask`/`ExtractPrompts`…）在仓库里根本不存在** ⇒ 那是"待创建"的目标，属**重构**而非包重排 ⇒ **本批不做**（登记）。
+- **本步两簇（都按纪律先证后搬）**：
+  - `service.query/`（§8.8.2 命名）：`KnowledgeSearchService`、`KnowledgeSpanService`、`KnowledgeSpanAdapter` —— 三者在 `service` 顶层**代码级入度为零** ✓。
+  - `service.management/` 增补：`KnowledgeBaseLookupAdapter`、`KnowledgeTagService`、`KnowledgeBatchOpsService`、`KnowledgeMoveService`、`KnowledgeCloneService` —— 同样零入度 ✓（门面已在其中）。
+- **断言升级（本步抓到的东西）**：首版断言把"**同面成员之间**的引用"也算违规 ✗（`KnowledgeTagService → KnowledgeBatchOpsService` 被误报）⇒ 改为**同面放行**；同时**先测跨面边**：`query → management` 零 ✓、`management → query` **仅门面**（→`KnowledgeSearchService`/`KnowledgeSpanService`）✓ ⇒ 单向链 `service.management → service.query → service`，无环 ✓（实测 SCC 仍 12 组）。
+- **顺带修 3 处跨包可见性**：搬出顶层包后，`KnowledgeFileService.updateKnowledgeRow`、`KnowledgeBaseService.ensureDefaults`、`KnowledgeParseService.resetKnowledgeForReparse` 变成"跨包调用包内方法" ✗ ⇒ 提为 `public` ✓（它们本就是跨面协作者）。为此写了一个**按编译错误自动提可见性**的小工具（正则首版漏了**返回类型** ✗ ⇒ 补上后一次改净）。
+- **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 25 例 ✓；`spotlessCheck build` ✓ **1m56s** ✓ **十二守卫** ✓（环 0 / 包级 SCC 12 组）。
+- **登记（§8.8.2 剩余）**：`service.enrichment/`（`KnowledgeSummaryService`/`QuestionGenerationService` 可并入——本仓 FAQ 已单列 `service.faq`，属**有意偏离**）、`service.process/`（本仓等价物是 `service.chunk`）、`service.index/ingest/`（目标类型不存在）；`domain.{document,task,graph}`（需先造类型）。`service` 其余子面继续细分（`KnowledgeTagService` 可作 `service.tag`；`DuplicateKnowledgeException`/`KnowledgeAccessHelper`/`KnowledgeSpanService` 与 11 个协作者面）；"ObjectProvider 需自述理由"守卫（㊲ 登记）。`service.chunk` 现 4 类；`KnowledgeTagService`（零入度，可作 `service.tag`，单类面偏薄）；**门面归位的最后一关**是 `KnowledgeService` 的 6 个引用者。
 **🔶 B263 第㉟步（2026-10-14，第二个子面 `service.chunk` 切出）**
 - **动前断言（把"可测"变成"可证"）**：脚本**先断言** `ChunkEditService`/`ChunkExtractService`/`ChunkReadService` 三者在 `service` 包内**入度为零**（无人引用，`package-info` 除外），断言不过就 abort —— 这样"切出只产生单向外边"不再靠推理。`ChunkQuestionService` **故意留在** `service`：它被 `QuestionGenerationService` 引用，单独搬会造出 `service ⇄ service.chunk` 环（已在子面 package-info 写明）。
 - **切出**：3 类 → `com.ragagent.knowledge.service.chunk`（`git mv` + 包声明 + 全仓 FQN 替换 3 文件）；测试面 `ChunkExtractServiceTest` 随迁；新建 `service/chunk/package-info`；`service/package-info` 同步。
