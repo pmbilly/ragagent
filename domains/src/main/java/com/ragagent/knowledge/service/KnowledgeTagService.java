@@ -31,7 +31,6 @@ import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
 import com.ragagent.retrieval.engine.VectorStoreService;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import org.springframework.beans.factory.ObjectProvider;
 import com.ragagent.knowledge.index.KnowledgeVectorWrites;
 
 /**
@@ -79,11 +78,14 @@ public class KnowledgeTagService {
     /** 引擎路径删除需要的维度解析（照 deleteKnowledgeVectors 的取数口径）。 */
     private final ModelRuntimeFactory modelRuntimeFactory;
     /**
-     * 标签下文档的批量删除。ObjectProvider：KnowledgeService 依赖面极广，
-     * 延迟解析规避任何潜在的装配环。
+     * 标签下文档的批量删除：直接依赖**真正的实现者** {@code KnowledgeBatchOpsService}。
+     *
+     * <p>B263㊲：原为 {@code ObjectProvider<KnowledgeService>}（注释自称"延迟解析规避潜在装配环"），
+     * 实测是**残留的绕环手法**——它只用门面一个方法 {@code batchDeleteKnowledge}，而门面里那方法是
+     * **纯转派**给 {@code KnowledgeBatchOpsService}，且门面**并不依赖本类**（无环可绕）。
+     * 去掉 Provider 后本类对门面的代码边消失，门面归位（`service.management`）才不再被钉住。</p>
      */
-    private final ObjectProvider<KnowledgeService>
-            knowledgeServiceProvider;
+    private final KnowledgeBatchOpsService batchOpsService;
 
     private static final int INDEX_DELETE_BATCH_SIZE = 100;
     /** 后台任务执行器（统一命名与关停）。 */
@@ -98,8 +100,7 @@ public class KnowledgeTagService {
                                VectorStoreService vectorStore,
                                KnowledgeVectorWrites vectorWrites,
                                ModelRuntimeFactory modelRuntimeFactory,
-                               ObjectProvider<KnowledgeService>
-                                       knowledgeServiceProvider) {
+                               KnowledgeBatchOpsService batchOpsService) {
         this.faqChunkRepository = faqChunkRepository;
 
         this.taskExecutor = taskExecutor;
@@ -110,7 +111,7 @@ public class KnowledgeTagService {
         this.vectorStore = vectorStore;
         this.vectorWrites = vectorWrites;
         this.modelRuntimeFactory = modelRuntimeFactory;
-        this.knowledgeServiceProvider = knowledgeServiceProvider;
+        this.batchOpsService = batchOpsService;
     }
 
     // ── 读：ListTags（tag） ──────────────────────────────────────
@@ -395,15 +396,9 @@ public class KnowledgeTagService {
         if (knowledgeIds.isEmpty()) {
             return;
         }
-        KnowledgeService knowledgeService = knowledgeServiceProvider.getIfAvailable();
-        if (knowledgeService == null) {
-            log.warn("[tag] knowledge service unavailable, skip list delete: kb={} tag={}",
-                    kb.getId(), tag.getId());
-            return;
-        }
         taskExecutor.submit("tag-knowledge-delete", () -> {
             try {
-                knowledgeService.batchDeleteKnowledge(kb.getId(), knowledgeIds);
+                batchOpsService.batchDeleteKnowledge(kb.getId(), knowledgeIds);
                 log.info("[tag] deleted {} knowledge under tag {}", knowledgeIds.size(), tag.getId());
             } catch (RuntimeException e) {
                 log.warn("[tag] knowledge list delete failed (kb={}, tag={}, count={}): {}",
