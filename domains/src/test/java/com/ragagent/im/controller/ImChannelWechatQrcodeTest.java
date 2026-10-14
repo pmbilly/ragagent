@@ -12,9 +12,9 @@ import org.springframework.http.ResponseEntity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.common.error.PlainErrorException;
-import com.ragagent.im.wechat.WechatQRCodeService;
-import com.ragagent.im.wechat.WechatQRCodeService.LoginResult;
-import com.ragagent.im.wechat.WechatQRCodeService.QRCodeResult;
+import com.ragagent.im.channel.wechat.WechatQRCodeService;
+import com.ragagent.im.channel.wechat.WechatQRCodeService.LoginResult;
+import com.ragagent.im.channel.wechat.WechatQRCodeService.QRCodeResult;
 
 /**
  * 微信扫码两个端点的响应面：成功体是裸对象（键名即字段名，camelCase）；

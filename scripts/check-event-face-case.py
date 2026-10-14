@@ -18,7 +18,7 @@
      `finalContent`/`userCreatedAt`/`assistantCreatedAt` 3 键）。名单须逐条写理由。
 
 豁免：
-  · 供应商/平台线格式（`llm/chat/**`、`datasource/connector/**`、`im/feishu/**`）本脚本不扫；
+  · 供应商/平台线格式（`llm/chat/**`、`datasource/connector/**`、`im/channel/feishu/**`）本脚本不扫；
   · 查询参数白名单见 QUERY_WHITELIST（每条须注明判定依据）。
 """
 

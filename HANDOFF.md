@@ -1161,6 +1161,12 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 ✓；`spotlessCheck build` ✓ **1m50s** ✓ **十二守卫** ✓（环 0 / 包级 SCC 12 组）；`:domains:javadoc` ✓；定向 `--rerun-tasks` ✓。
 - **登记（B266 余下）**：① im `channel.*` 改名（9 面 44 文件）；② auth 两处 filter 面归位 + `apikey.dto` 缺 2 类（查 DTO 落点）；③ model 两处改名；④ storage `provider/` 定性 + `fileserve` 多出 `StoragePathGuard`；⑤ websearch `fetch/`(4) 落点核查。
 
+**🔶 B266 第②步（2026-10-14，im 九渠道面加 `channel.` 前缀）**
+- **改名**：`im.{dingtalk,feishu,mattermost,qqbot,slack,telegram,wechat,wecom,yunzhijia}` → **`im.channel.<name>`**（对齐 §8.9）；main **42** 文件 + 测试 **14** 文件（**9 个测试面同名包一起随迁**）。
+- **换锚（本步踩到两处"按路径冻结"）**：① `json-key-freeze.baseline.json` 的 **24 条** `im/<face>/…` 键——它的结构是 `{"note","files"}` **两层**，第一版脚本在顶层改键 ⇒ **换锚 0 条**，复跑守卫才暴露 ✗ ⇒ 改在 `files` 层换锚 ✓；② `file-size.baseline.json` 3 条键（值不变）；③ `FROZEN_PREFIXES` 本身是宽前缀 `'im/'`（覆盖子路径）⇒ 无需改；④ `check-event-face-case.py` 注释里的 `im/feishu/**` 一并更新。
+- **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 ✓；`spotlessCheck build` ✓ **1m42s** ✓ **十二守卫** ✓（环 0 / 包级 SCC 12 组）；`:domains:javadoc` ✓；定向 `--rerun-tasks` ✓。
+- **登记（B266 余下）**：auth 两处 filter 面归位（`filter/`→`controller.filter/`、`apikey/filter/`→`apikey.controller.filter/`）+ `apikey.dto`(2) 落点 · model 两处改名（`ModelResponse`/`ModelRuntimeFactory`）· storage `provider/` 定性 + `fileserve` 多 `StoragePathGuard` · websearch `fetch/`(4) 落点 · im `service.ImService` vs 目标 `ImTurnOrchestrator`。
+
 **🔶 B263 第㉟步（2026-10-14，第二个子面 `service.chunk` 切出）**
 - **动前断言（把"可测"变成"可证"）**：脚本**先断言** `ChunkEditService`/`ChunkExtractService`/`ChunkReadService` 三者在 `service` 包内**入度为零**（无人引用，`package-info` 除外），断言不过就 abort —— 这样"切出只产生单向外边"不再靠推理。`ChunkQuestionService` **故意留在** `service`：它被 `QuestionGenerationService` 引用，单独搬会造出 `service ⇄ service.chunk` 环（已在子面 package-info 写明）。
 - **切出**：3 类 → `com.ragagent.knowledge.service.chunk`（`git mv` + 包声明 + 全仓 FQN 替换 3 文件）；测试面 `ChunkExtractServiceTest` 随迁；新建 `service/chunk/package-info`；`service/package-info` 同步。
