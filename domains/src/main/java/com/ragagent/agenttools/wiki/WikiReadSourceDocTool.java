@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.llm.ToolResult;
+import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.agent.tool.DocChunkSupport.ChunkPage;
 import com.ragagent.agent.tool.DocChunkSupport.ImageInfoCollector;
 import com.ragagent.agent.tool.DocChunkSupport.KnowledgeInfoReader;

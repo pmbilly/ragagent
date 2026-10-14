@@ -8,7 +8,7 @@ import com.ragagent.audit.dto.AuditLogListResponse;
 import com.ragagent.audit.service.AuditLogService;
 import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.common.error.AppError;
+import com.ragagent.contract.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.platform.web.error.GuardForbiddenException;
 import com.ragagent.contract.knowledge.KnowledgeBaseFacts;

@@ -5,7 +5,7 @@ import java.util.function.BooleanSupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ragagent.common.llm.ResponseType;
+import com.ragagent.contract.model.ResponseType;
 
 /**
  * 流停止事件轮询（跨实例 /stop 的消费侧）：周期读本轮次的流事件，

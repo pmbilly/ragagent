@@ -16,7 +16,7 @@ import com.ragagent.agenttools.knowledge.KnowledgeSearchTool;
 import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool;
 import com.ragagent.agent.tool.runtime.SearchAuth;
 import com.ragagent.common.retrieval.SearchTarget;
-import com.ragagent.common.pipeline.SearchParams;
+import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.settings.ConversationProperties;
 import com.ragagent.knowledge.domain.Knowledge;

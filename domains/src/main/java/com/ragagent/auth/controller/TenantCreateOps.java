@@ -11,7 +11,7 @@ import com.ragagent.common.security.TenantAPIKeyScope;
 import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.domain.User;
-import com.ragagent.common.error.AppError;
+import com.ragagent.contract.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.contract.tenant.TenantRole;

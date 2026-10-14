@@ -1,6 +1,6 @@
 package com.ragagent.mcp.service;
 
-import com.ragagent.common.error.AppError;
+import com.ragagent.contract.error.AppError;
 import com.ragagent.common.error.BizException;
 
 /**

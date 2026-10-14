@@ -7,7 +7,7 @@ import com.ragagent.knowledge.repository.KnowledgeTagRepository;
 import com.ragagent.knowledge.service.management.KnowledgeBaseService;
 import com.ragagent.knowledge.service.management.KnowledgeTagService;
 import org.springframework.stereotype.Component;
-import com.ragagent.common.error.AppError;
+import com.ragagent.contract.error.AppError;
 
 /**
  * 自动标签的生产实现：同名标签存在 → 直接用；否则走 {@link KnowledgeTagService#createTag}

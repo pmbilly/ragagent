@@ -3,7 +3,7 @@ package com.ragagent.wiki.service.ingest;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ragagent.common.wiki.ExtractedItem;
+import com.ragagent.contract.wiki.ExtractedItem;
 
 /**
  * {@code WikiKnowledgeExtractPrompt} / {@code WikiCandidateSlugPrompt} 输出的解析结果：

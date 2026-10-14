@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.ragagent.common.llm.ResponseType;
+import com.ragagent.contract.model.ResponseType;
 import org.junit.jupiter.api.Test;
 
 /**

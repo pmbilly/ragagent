@@ -10,7 +10,7 @@ import java.nio.file.Path;
 import java.time.OffsetDateTime;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.error.AppError;
+import com.ragagent.contract.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.storage.domain.StorageBackend;

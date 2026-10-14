@@ -17,9 +17,9 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.tenant.TenantConfigLookup;
-import com.ragagent.common.pipeline.SearchParams;
+import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.common.retrieval.RetrievalDriverProperties;
-import com.ragagent.common.error.AppError;
+import com.ragagent.contract.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.platform.model.EmbeddingGateway;

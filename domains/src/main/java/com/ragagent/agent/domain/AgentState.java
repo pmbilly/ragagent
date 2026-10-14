@@ -3,7 +3,7 @@ package com.ragagent.agent.domain;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ragagent.common.llm.TokenUsage;
+import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.common.retrieval.SearchResult;
 
 /**

@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agent.tool.AgentTool;
 import com.ragagent.agent.tool.ToolExecContext;
 import com.ragagent.agent.tool.ToolCancellation;
-import com.ragagent.common.llm.ToolResult;
+import com.ragagent.contract.tool.ToolResult;
 
 /**
  * 工具注册表端口（引擎侧接口）：MCP 适配层注册/摘除工具、共享执行管线的唯一通道。

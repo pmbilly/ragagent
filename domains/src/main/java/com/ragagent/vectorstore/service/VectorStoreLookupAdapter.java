@@ -2,8 +2,8 @@ package com.ragagent.vectorstore.service;
 
 import org.springframework.stereotype.Component;
 
-import com.ragagent.common.vectorstore.ConnectionConfig;
-import com.ragagent.common.vectorstore.IndexConfig;
+import com.ragagent.contract.vectorstore.ConnectionConfig;
+import com.ragagent.contract.vectorstore.IndexConfig;
 import com.ragagent.common.vectorstore.VectorStoreLookup;
 import com.ragagent.common.vectorstore.VectorStoreView;
 import com.ragagent.vectorstore.domain.VectorStore;

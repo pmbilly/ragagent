@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
-import com.ragagent.common.llm.ResponseType;
+import com.ragagent.contract.model.ResponseType;
 
 /**
  * 测试用事件总线（额外记录已 emit 的事件供断言）。

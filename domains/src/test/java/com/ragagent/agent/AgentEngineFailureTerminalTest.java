@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import com.ragagent.platform.event.Event;
 import com.ragagent.platform.event.EventType;
-import com.ragagent.event.payload.AgentCompleteData;
+import com.ragagent.contract.event.payload.AgentCompleteData;
 
 /**
  * AGENT 失败收束的终态契约（整改 A1-AGENT）。

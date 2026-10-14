@@ -21,7 +21,7 @@ import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.agent.domain.AgentStep;
 import com.ragagent.agent.domain.AgentToolCall;
 import com.ragagent.agent.domain.ToolCallTarget;
-import com.ragagent.common.llm.ToolResult;
+import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.contract.apikey.TenantAPIKeyCreateResponse;
 import com.ragagent.datasource.domain.DataSource;
 import com.ragagent.datasource.domain.DataSourceConfig;
@@ -52,13 +52,13 @@ import com.ragagent.knowledge.domain.KnowledgeBaseVlmConfig;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatTool;
-import com.ragagent.common.llm.ResponseType;
+import com.ragagent.contract.model.ResponseType;
 import com.ragagent.llm.domain.StreamResponse;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.common.llm.TokenUsage;
+import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.storage.dto.StorageConfig;
-import com.ragagent.common.vectorstore.ConnectionConfig;
-import com.ragagent.common.vectorstore.IndexConfig;
+import com.ragagent.contract.vectorstore.ConnectionConfig;
+import com.ragagent.contract.vectorstore.IndexConfig;
 import com.ragagent.websearch.domain.WebSearchProviderParams;
 import com.ragagent.mcp.domain.McpAdvancedConfig;
 import com.ragagent.contract.memory.MemoryConfig;
@@ -89,9 +89,9 @@ import com.ragagent.platform.stream.LiveRunPayload;
 import com.ragagent.platform.stream.StreamEvent;
 import com.ragagent.wiki.domain.WikiConfig;
 import com.ragagent.wiki.service.ingest.CombinedExtraction;
-import com.ragagent.common.wiki.ExtractedItem;
+import com.ragagent.contract.wiki.ExtractedItem;
 import com.ragagent.wiki.service.page.NewSlugFromCitation;
-import com.ragagent.common.wiki.SlugUpdate;
+import com.ragagent.contract.wiki.SlugUpdate;
 import com.ragagent.wiki.service.ingest.WikiFinalizeChange;
 import com.ragagent.wiki.service.ingest.WikiFinalizeRow;
 import com.ragagent.wiki.service.ingest.WikiIngestConstants;
@@ -121,7 +121,7 @@ import com.ragagent.auth.dto.InvitationLookupResponse;
 import com.ragagent.auth.dto.OidcAuthUrlResponse;
 import com.ragagent.auth.dto.OidcConfigResponse;
 import com.ragagent.auth.dto.UserInfo;
-import com.ragagent.common.tenant.WebSearchConfig;
+import com.ragagent.contract.tenant.WebSearchConfig;
 import com.ragagent.evaluation.dto.EvaluationDtos;
 import com.ragagent.system.domain.SystemSetting;
 import com.ragagent.tenant.ChatHistoryConfig;
@@ -141,7 +141,9 @@ import com.ragagent.auth.apikey.domain.TenantAPIKeyProjections;
  */
 class JsonContractRoundTripTest {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    // 裸 mapper + 契约 Json 模块：等价于搬迁前的"注解直接在类上"（§8.1 去框架化后注解在 mixin 里）
+    private static final ObjectMapper MAPPER = new ObjectMapper()
+            .registerModule(new com.ragagent.common.web.ContractJsonModule());
 
     // ── MCP（auth_config / headers 等 jsonb 列 + 直接作响应体） ──────────────
 

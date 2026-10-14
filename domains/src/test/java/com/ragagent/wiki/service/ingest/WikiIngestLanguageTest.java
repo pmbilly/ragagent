@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.wiki.domain.TaskPendingOp;
 import com.ragagent.wiki.prompt.WikiPromptTemplate;
 import com.ragagent.wiki.prompt.WikiPrompts;
-import com.ragagent.common.wiki.SlugUpdate;
+import com.ragagent.contract.wiki.SlugUpdate;
 import com.ragagent.common.wiki.WikiLanguageSupport;
 import com.ragagent.common.text.Whitespace;
 

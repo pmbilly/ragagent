@@ -25,7 +25,7 @@ import com.ragagent.common.security.APIKeyScopeContext;
 import com.ragagent.common.security.TenantAPIKeyScope;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.llm.ResponseType;
+import com.ragagent.contract.model.ResponseType;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.message.MessageNotFoundException;
 import com.ragagent.session.domain.conversation.Session;
@@ -34,6 +34,7 @@ import com.ragagent.session.service.MessageService;
 import com.ragagent.session.controller.sse.SseFrameWriter;
 import com.ragagent.session.controller.sse.StreamEventEmitter;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.common.web.ContractJsonModule;
 import com.ragagent.session.service.SessionService;
 import com.ragagent.platform.stream.StreamBatch;
 import com.ragagent.platform.stream.StreamEvent;
@@ -62,7 +63,8 @@ class SessionStreamControllerTest {
 
     /** 控制器测试用的普通 mapper（帧字节形态由 {@code SseFrameWriterTest} 覆盖）。 */
     private static ObjectMapper streamMapper() {
-        return new ObjectMapper();
+        // 契约载荷（ResponseType 等）的线格式由 mixin 模块承载（B268-A②）
+        return new ObjectMapper().registerModule(new ContractJsonModule());
     }
 
     @BeforeEach

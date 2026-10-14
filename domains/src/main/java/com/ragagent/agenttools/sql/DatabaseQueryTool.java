@@ -9,7 +9,7 @@ import java.util.function.LongSupplier;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.platform.web.ToolJson;
-import com.ragagent.common.llm.ToolResult;
+import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.agent.tool.BaseTool;
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool;
 import com.ragagent.agent.tool.runtime.SearchAuth;

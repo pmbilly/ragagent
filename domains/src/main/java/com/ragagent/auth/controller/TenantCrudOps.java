@@ -8,7 +8,7 @@ import java.util.Map;
 import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.auth.dto.TenantResponse;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.common.error.AppError;
+import com.ragagent.contract.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.platform.web.ToolJson;
 import com.ragagent.contract.tenant.TenantRole;

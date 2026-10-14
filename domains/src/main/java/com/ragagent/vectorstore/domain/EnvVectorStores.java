@@ -3,8 +3,8 @@ package com.ragagent.vectorstore.domain;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.UnaryOperator;
-import com.ragagent.common.vectorstore.ConnectionConfig;
-import com.ragagent.common.vectorstore.IndexConfig;
+import com.ragagent.contract.vectorstore.ConnectionConfig;
+import com.ragagent.contract.vectorstore.IndexConfig;
 import com.ragagent.contract.vectorstore.EnvStoreIds;
 
 /**

@@ -1,12 +1,12 @@
 package com.ragagent.llm.domain;
 
-import com.ragagent.common.llm.TokenUsage;
+import com.ragagent.contract.model.TokenUsage;
 import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.common.llm.ResponseType;
+import com.ragagent.contract.model.ResponseType;
 
 /**
  * 流式响应。

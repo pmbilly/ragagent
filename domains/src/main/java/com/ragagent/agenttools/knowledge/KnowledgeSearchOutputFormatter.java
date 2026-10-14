@@ -8,7 +8,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.llm.ToolResult;
+import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.agent.tool.DocChunkSupport.ImageInfoView;
 import com.ragagent.common.knowledge.FaqChunkMetadata;
 import com.ragagent.common.knowledge.ChunkFacts;

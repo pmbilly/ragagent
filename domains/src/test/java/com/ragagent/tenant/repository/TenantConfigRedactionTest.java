@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.ragagent.common.tenant.WebSearchConfig;
+import com.ragagent.contract.tenant.WebSearchConfig;
 import com.ragagent.tenant.StorageEngineConfig.CosEngineConfig;
 import com.ragagent.tenant.StorageEngineConfig.Ks3EngineConfig;
 import com.ragagent.tenant.StorageEngineConfig.MinioEngineConfig;

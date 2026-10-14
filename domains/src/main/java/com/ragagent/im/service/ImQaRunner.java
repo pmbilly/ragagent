@@ -23,9 +23,9 @@ import com.ragagent.im.service.ImTurnOrchestrator.InflightEntry;
 import com.ragagent.im.service.ImTurnOrchestrator.QaAttach;
 import com.ragagent.im.service.ImTurnOrchestrator.QaOutcome;
 import com.ragagent.im.service.ImTurnOrchestrator.QaTask;
-import com.ragagent.event.payload.AgentCompleteData;
-import com.ragagent.event.payload.AgentFinalAnswerData;
-import com.ragagent.event.payload.ErrorData;
+import com.ragagent.contract.event.payload.AgentCompleteData;
+import com.ragagent.contract.event.payload.AgentFinalAnswerData;
+import com.ragagent.contract.event.payload.ErrorData;
 
 /**
  * IM QA 执行编排：队列 worker 的租户上下文绑定与在途登记、full-output / 流式 /

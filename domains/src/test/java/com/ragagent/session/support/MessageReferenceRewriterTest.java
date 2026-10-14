@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import com.ragagent.agent.domain.AgentStep;
 import com.ragagent.agent.domain.AgentToolCall;
-import com.ragagent.common.llm.ToolResult;
+import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.message.MessageImage;

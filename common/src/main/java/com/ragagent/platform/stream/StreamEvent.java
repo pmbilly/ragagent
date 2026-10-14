@@ -6,8 +6,8 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.ragagent.common.llm.ResponseType;
-import com.ragagent.common.llm.TokenUsage;
+import com.ragagent.contract.model.ResponseType;
+import com.ragagent.contract.model.TokenUsage;
 
 /**
  * 流中的单个事件。

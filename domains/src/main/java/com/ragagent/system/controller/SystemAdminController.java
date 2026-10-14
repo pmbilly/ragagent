@@ -20,7 +20,7 @@ import com.ragagent.audit.service.AuditLogService;
 import com.ragagent.auth.domain.User;
 import com.ragagent.tenant.mapper.TenantMapper;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.common.error.AppError;
+import com.ragagent.contract.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.platform.web.NonNullBody;
 import com.ragagent.platform.web.RejectEmptyBody;

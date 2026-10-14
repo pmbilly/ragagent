@@ -16,7 +16,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import com.ragagent.common.llm.ResponseType;
+import com.ragagent.contract.model.ResponseType;
 import org.junit.jupiter.api.Test;
 
 /**

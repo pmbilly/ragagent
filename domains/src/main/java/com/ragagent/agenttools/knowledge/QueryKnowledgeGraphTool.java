@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.llm.ToolResult;
+import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.common.retrieval.SearchTarget.SearchTargets;
 import com.ragagent.agent.tool.BaseTool;
 import com.ragagent.agent.tool.runtime.SearchAuth;

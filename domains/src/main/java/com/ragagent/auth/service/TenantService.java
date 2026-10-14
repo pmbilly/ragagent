@@ -25,7 +25,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.mapper.TenantMemberMapper;
-import com.ragagent.common.error.AppError;
+import com.ragagent.contract.error.AppError;
 import com.ragagent.common.error.BizException;
 
 /**

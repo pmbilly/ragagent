@@ -12,9 +12,9 @@ import com.ragagent.common.session.PipelineMessageView;
 import com.ragagent.retrieval.domain.WebSearchResult;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.pipeline.SearchParams;
-import com.ragagent.common.llm.ToolResult;
-import com.ragagent.common.tenant.WebSearchConfig;
+import com.ragagent.contract.retrieval.SearchParams;
+import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.contract.tenant.WebSearchConfig;
 import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.common.knowledge.KnowledgeBaseView;

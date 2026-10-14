@@ -6,7 +6,7 @@ import java.util.Optional;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.common.error.AppError;
+import com.ragagent.contract.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.security.SsrfGuard;

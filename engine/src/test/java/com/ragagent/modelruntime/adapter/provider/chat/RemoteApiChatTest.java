@@ -20,6 +20,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.common.web.ContractJsonModule;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.common.error.BizException;
 import com.ragagent.platform.security.SsrfGuard;
@@ -28,9 +29,9 @@ import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
 import com.ragagent.llm.domain.ChatTool;
-import com.ragagent.common.llm.ResponseType;
+import com.ragagent.contract.model.ResponseType;
 import com.ragagent.llm.domain.StreamResponse;
-import com.ragagent.common.llm.TokenUsage;
+import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.llm.domain.ToolCall;
 import com.sun.net.httpserver.HttpServer;
 
@@ -49,7 +50,9 @@ import com.ragagent.modelruntime.adapter.provider.chat.common.ProviderAdapters;
  */
 class RemoteApiChatTest {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    // TokenUsage 的线格式（snake 键 + NON_DEFAULT 省略）自 B268-A② 起由契约 mixin 模块承载
+    private static final ObjectMapper MAPPER = new ObjectMapper()
+            .registerModule(new ContractJsonModule());
 
     /** 无 provider、无 baseURL 的默认实例。 */
     private static RemoteApiChat newTestRemoteChat() {

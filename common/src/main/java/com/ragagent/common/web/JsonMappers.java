@@ -31,6 +31,8 @@ public final class JsonMappers {
         return JsonMapper.builder()
                 .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                 .addModule(new JavaTimeModule())
+                // 契约载荷的线格式（键名/省略策略/枚举字面量）由 mixin 模块承载（§8.1 契约面纯 JDK）
+                .addModule(new ContractJsonModule())
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .build();
     }

@@ -1283,6 +1283,19 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **测试**：**4987 / 失败 0 / 跳过 4** ✓；启动测试 ✓；`spotlessCheck build` ✓ **1m50s** ✓ **十二守卫** ✓；`arch.*` 28 条 ✓；`:domains:javadoc` / `:common:javadoc` ✓。
 - **登记（下一批）**：**契约面去框架化**（`AppError` · `FaqChunkMetadata` · `SearchResult` · `WikiLanguageSupport` · `TenantAPIKeyScope` 去 Jackson/去 platform 依赖 ⇒ 之后 payload 26 与 4 个共用工具才可归位 `contract.*`/`platform.*`）；`common/{agent,apikey,audit,auth,graph,knowledge,llm,memory,pipeline,retrieval,session,storage,tenant,vectorstore,wiki}` → `contract.*`（映射表已建）；`engine/tracing/decorators` → `platform.tracing.decorators` 属**跨模块**待定；12 类计划未列者待裁决。
 
+**🔶 A② 契约面收纳第②批（2026-10-14，**去框架化 31 类 + payload 26 整批**）**
+- **分档方法**：42 个沾框架类按 **"类型级 vs 仅注解"** 切开——**仅注解 31**（可 mixin 去框架化）/ **类型级 8**（`JsonNode`×7 + servlet×1）/ **Spring 绑定 3**（`@ConfigurationProperties`）。**算术闭合 42 = 31 + 8 + 3** ✓。
+- **落位**：31 类（`AppError`/`TokenUsage`/`SearchParams`/`WebSearchConfig`/`ToolResult`/`ConnectionConfig`/`IndexConfig`/`ExtractedItem`/`SlugUpdate`/`ResponseType`/`PromptCacheStatus` + 20 个事件载荷）+ **6 个 `orEmpty` 组载荷**（整批 26 ✓）= **37 类**入 8 个契约面；FQN 替换 292 + 12 文件。
+- **机制（关键资产）**：**Jackson mixin + 集中模块**——线格式（键名/省略策略/枚举字面量/派生 getter 抑制）从契约类剥离到 `common/web/ContractJsonMixins{Core,Event}` + `ContractJsonModule`，契约类恢复纯 JDK ✓。**注册点 7 处**：`JsonMappers.lenient()`（jsonb 读路径）· `EventJson`（事件）· `StreamJson`（SSE 流）· `JsonValues`（上下文预算）· `LangfuseAttributes` · **boot 的 Spring MVC customizer**（HTTP 出参/入参）· 测试侧 5 处自建 mapper。枚举（`ResponseType`/`PromptCacheStatus`）走显式 ser/deser（避 mixin 静态工厂）。
+- **⚠️ 四条现场教训**：
+  1. **`@JsonIgnore` 写在 mixin 方法上不被 Jackson 采信** ✗（`JsonContractRoundTripTest` 抓到派生 getter 仍输出）⇒ 改**类级 `@JsonIgnoreProperties`** ✓（且必须 `value = {...}` 具名——数组默认值放在具名属性前是**非法注解** ✗）；**我用一个临时探针测试**（`MixinProbeTest`，跑清即删）把"生产模块/成员级/类级/两者同发"四种机制一次试清，才定位到真因是**测试助手自建 mapper** ✗。
+  2. **R1 假阳性**：`SearchParams.queryEmbedding` 的 `float[]` ⇒ JVM 描述符 `[F` 剥括号后是单字母 `F`、不以 `java.` 开头 ⇒ 被判"契约面引入框架依赖" ✗ ⇒ 规则补"原始类型（含数组）描述符 ⇒ 归 JDK" ✓（与 B267 的 A11b 精度收紧同族）。
+  3. **"去框架化"的真实边界**：注解可分离 ✓，但 **API 面用框架类型**（`JsonNode` 7 类、`HttpServletRequest` 端口 1 类、`@ConfigurationProperties` 3 类）**不是机械活**——后者需重设计（中性 JSON 表示/typed records/端口签名），属 K 级 ⇒ 本批**不硬做**，走登记 ✓。
+  4. **测试侧 mapper 也是线格式守门人**：换 mixin 后所有自建 mapper 的测试都必须注册模块（本批踩 6 处）⇒ **这恰好让"哪条路径没注册"暴露**（守卫 + R1 + 测试三方夹击）✓；`check-json-key` 前缀冻结也当场点名 4 处"离开前缀覆盖" ⇒ 快照刷新（`--write`，本脚本既定路径）+ mixin 模块入**冻结面**（它就是线格式载体 ✓）。
+- **换锚**：`FROZEN_PREFIXES` —— `common/llm` 整目录迁空 ⇒ 拆 4 个文件级前缀（`contract/model/{ResponseType,TokenUsage,PromptCacheStatus}`、`contract/tool/ToolResult`）；`SearchParams`/`ExtractedItem` 换 home；**新增 `common/web/ContractJsonMixins`**；冻结快照 4 键换锚 + 覆盖 146 文件重登记；事件面守卫 2 处路径常量（`contract/event/payload`、`contract/model/ResponseType`）；死包目录 5 个；2 份 package-info 补 `com.ragagent.` 前缀（R7 守卫点名 ✓）。
+- **验证**：**4987 / 失败 0 / 跳过 4** ✓；`spotlessCheck build` ✓ **1m52s** ✓ **12 守卫** ✓（环 0 / SCC 11 组）；`arch.*` 28 条 ✓；四模块 javadoc ✓；`JsonContractRoundTripTest` 35 条方法全绿 ✓。
+- **登记（A② 余项）**：**类型级 11 类**——`JsonNode` 7（`ChunkFacts`/`KnowledgeBaseView`/`KnowledgeDocumentFacts`/`DocumentChunkMetadata`/`FaqChunkMetadata`/`SearchResult`/`TenantConfigLookup`）· servlet 端口 1（`ApiKeyAuthPort`）· Spring 绑定 3（`TenantProperties`/`RetrievalDriverProperties`/`LanguageProperties`）；外加 A②-1 的 9 个回退件（其依赖已部分解锁，下一批处理）。
+
 **🔶 A② 契约面收纳第①批（2026-10-14，**v0.3.0**：42 类 → `contract.*`，§8.1 走到底）**
 - **方法（本条最重要的资产）**：① **纯度盘点**——`common/**`+`event/**` 逐类判"纯 JDK / 沾框架"⇒ **55 纯 / 42 沾框架 / 11 待裁决**；② **依赖闭包**——R1 只允许契约类依赖 JDK+自身，故只有**闭集**能整批搬（迭代剔除依赖落在集合外的）⇒ 初算 51，增补 6（3 个跨域端口 + `AgentChannelCleaner`（本就是契约端口）+ 2 个 apikey 响应 DTO——被 `ApiKeyAdminPort` 签名引用，只能留契约侧）。
 - **落位**：**42 类**入 14 个契约面（`contract/` 现 43 类 + 15 份 package-info）；`common/**` 从 90 类降到 **48 类**。FQN 替换 261 文件。

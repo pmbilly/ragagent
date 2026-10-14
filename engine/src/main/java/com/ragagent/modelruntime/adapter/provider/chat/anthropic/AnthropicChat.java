@@ -28,9 +28,9 @@ import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
 import com.ragagent.llm.domain.FunctionCall;
-import com.ragagent.common.llm.ResponseType;
+import com.ragagent.contract.model.ResponseType;
 import com.ragagent.llm.domain.StreamResponse;
-import com.ragagent.common.llm.TokenUsage;
+import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.llm.domain.ToolCall;
 import com.ragagent.llm.provider.ProviderBaseURLs;
 

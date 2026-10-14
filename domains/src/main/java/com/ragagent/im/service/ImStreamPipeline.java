@@ -24,12 +24,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ragagent.im.service.ImTurnOrchestrator.QaAttach;
-import com.ragagent.event.payload.AgentCompleteData;
-import com.ragagent.event.payload.AgentFinalAnswerData;
-import com.ragagent.event.payload.AgentThoughtData;
-import com.ragagent.event.payload.AgentToolCallData;
-import com.ragagent.event.payload.AgentToolResultData;
-import com.ragagent.event.payload.ErrorData;
+import com.ragagent.contract.event.payload.AgentCompleteData;
+import com.ragagent.contract.event.payload.AgentFinalAnswerData;
+import com.ragagent.contract.event.payload.AgentThoughtData;
+import com.ragagent.contract.event.payload.AgentToolCallData;
+import com.ragagent.contract.event.payload.AgentToolResultData;
+import com.ragagent.contract.event.payload.ErrorData;
 
 /**
  * IM 流式回复管线：事件订阅组、流缓冲袋、300ms 冲刷循环与 finalize/收尾落库。

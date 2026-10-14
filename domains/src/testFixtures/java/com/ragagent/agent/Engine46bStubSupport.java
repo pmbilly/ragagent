@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.llm.ToolResult;
+import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.agent.tool.BaseTool;
 import com.ragagent.agent.tool.ToolRequest;
 import com.ragagent.agent.tool.ToolRegistry;
@@ -19,7 +19,7 @@ import com.ragagent.modelruntime.adapter.provider.chat.common.QueuedChatStream;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.domain.ChatResponse;
-import com.ragagent.common.llm.ResponseType;
+import com.ragagent.contract.model.ResponseType;
 import com.ragagent.llm.domain.StreamResponse;
 import com.ragagent.llm.domain.ToolCall;
 import com.ragagent.llm.domain.FunctionCall;

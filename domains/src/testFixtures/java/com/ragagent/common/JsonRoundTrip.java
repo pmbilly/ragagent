@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.common.web.ContractJsonModule;
 
 /**
  * JSON 往返断言工具——把「领域对象的 JSON 形状必须符合契约」变成自动化检查。
@@ -42,7 +43,10 @@ public final class JsonRoundTrip {
      * <p>挂 jsr310 模块（标准 Java 时间序列化）：
      * {@code OffsetDateTime} 的读写由 JavaTimeModule 承担。</p>
      */
+    // 契约载荷的线格式（键名/省略策略/派生 getter 抑制）自 B268-A② 起由 mixin 模块承载 ⇒
+    // 严格 mapper 必须注册它，否则断言会在"格式没搬过来"上失败（这是刻意的：换包漏注册就会被抓）。
     private static final ObjectMapper STRICT = new ObjectMapper()
+            .registerModule(new ContractJsonModule())
             .registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule())
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
 

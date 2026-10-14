@@ -14,12 +14,12 @@ import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.error.AppError;
+import com.ragagent.contract.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.common.vectorstore.ConnectionConfig;
+import com.ragagent.contract.vectorstore.ConnectionConfig;
 import com.ragagent.vectorstore.domain.EnvVectorStores;
-import com.ragagent.common.vectorstore.IndexConfig;
+import com.ragagent.contract.vectorstore.IndexConfig;
 import com.ragagent.vectorstore.domain.VectorStore;
 import com.ragagent.vectorstore.domain.VectorStoreEngines;
 import com.ragagent.vectorstore.mapper.VectorStoreRepository;

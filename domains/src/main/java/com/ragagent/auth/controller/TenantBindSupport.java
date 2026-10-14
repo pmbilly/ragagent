@@ -2,7 +2,7 @@ package com.ragagent.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.ragagent.common.error.AppError;
+import com.ragagent.contract.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.common.web.JsonMappers;
 import com.ragagent.platform.web.ToolJson;

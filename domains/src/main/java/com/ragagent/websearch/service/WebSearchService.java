@@ -1,6 +1,6 @@
 package com.ragagent.websearch.service;
 
-import com.ragagent.common.tenant.WebSearchConfig;
+import com.ragagent.contract.tenant.WebSearchConfig;
 
 import com.ragagent.websearch.provider.WebSearchProvider;
 import java.util.ArrayList;
@@ -328,7 +328,7 @@ public class WebSearchService {
          *
          * <p>缺省合并口径与迁移前逐字一致：{@code cfg == null} → 全默认；各字段空值回落默认。</p>
          */
-        public static WebSearchConfig from(com.ragagent.common.tenant.WebSearchConfig cfg) {
+        public static WebSearchConfig from(com.ragagent.contract.tenant.WebSearchConfig cfg) {
             WebSearchConfig out = new WebSearchConfig();
             if (cfg == null) {
                 return out;

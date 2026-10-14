@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.chatpipeline.PipelinePorts;
-import com.ragagent.common.llm.ToolResult;
+import com.ragagent.contract.tool.ToolResult;
 
 /**
  * {@link PipelinePorts.DataAnalysisSessionFactory} 的 agent 侧实现（由 {@code chatpipeline} 搬入）。

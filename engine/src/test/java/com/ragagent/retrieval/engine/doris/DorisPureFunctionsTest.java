@@ -11,7 +11,7 @@ import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.ragagent.common.vectorstore.IndexConfig;
+import com.ragagent.contract.vectorstore.IndexConfig;
 
 /**
  * Doris 驱动纯函数族：

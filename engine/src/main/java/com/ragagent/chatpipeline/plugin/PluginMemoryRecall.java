@@ -14,7 +14,7 @@ import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.chatpipeline.support.MemoryUsedMemories;
 import com.ragagent.platform.event.Event;
 import com.ragagent.platform.event.EventType;
-import com.ragagent.event.payload.MemoryRecalledData;
+import com.ragagent.contract.event.payload.MemoryRecalledData;
 import com.ragagent.contract.memory.MemoryItemView;
 import com.ragagent.contract.session.PipelineUsedMemoryView;
 import com.ragagent.retrieval.telemetry.RetrievalObs;

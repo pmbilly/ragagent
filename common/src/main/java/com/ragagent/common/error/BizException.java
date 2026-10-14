@@ -1,5 +1,7 @@
 package com.ragagent.common.error;
 
+import com.ragagent.contract.error.AppError;
+
 
 /**
  * 承载 AppError 的业务异常。

@@ -8,7 +8,7 @@ import com.ragagent.auth.domain.User;
 import com.ragagent.auth.dto.AuthLoginResponse;
 import com.ragagent.auth.dto.TenantResponse;
 import com.ragagent.auth.dto.Membership;
-import com.ragagent.common.error.AppError;
+import com.ragagent.contract.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.contract.tenant.TenantRole;
 

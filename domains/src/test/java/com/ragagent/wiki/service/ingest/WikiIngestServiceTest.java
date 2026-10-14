@@ -32,7 +32,7 @@ import com.ragagent.llm.domain.ChatResponse;
 import com.ragagent.wiki.domain.TaskPendingOp;
 import com.ragagent.wiki.repository.TaskPendingOpsRepository;
 import com.ragagent.wiki.prompt.WikiPrompts;
-import com.ragagent.common.wiki.SlugUpdate;
+import com.ragagent.contract.wiki.SlugUpdate;
 import com.ragagent.common.wiki.WikiLanguageSupport;
 import com.ragagent.wiki.service.WikiLlmCallMetadata;
 import com.ragagent.contract.knowledge.ChunkView;

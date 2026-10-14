@@ -1,6 +1,6 @@
 package com.ragagent.llm.domain;
 
-import com.ragagent.common.llm.TokenUsage;
+import com.ragagent.contract.model.TokenUsage;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;

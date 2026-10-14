@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.common.error.BizException;
-import com.ragagent.common.llm.ResponseType;
+import com.ragagent.contract.model.ResponseType;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.message.MessageNotFoundException;
 import com.ragagent.session.domain.conversation.SessionNotFoundException;

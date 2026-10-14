@@ -11,8 +11,8 @@ import com.ragagent.chatpipeline.plugin.PluginError;
 import com.ragagent.platform.event.Event;
 import com.ragagent.platform.event.EventBusInterface;
 import com.ragagent.platform.event.EventType;
-import com.ragagent.event.payload.AgentToolCallData;
-import com.ragagent.event.payload.AgentToolResultData;
+import com.ragagent.contract.event.payload.AgentToolCallData;
+import com.ragagent.contract.event.payload.AgentToolResultData;
 import com.ragagent.common.retrieval.SearchResult;
 
 /**

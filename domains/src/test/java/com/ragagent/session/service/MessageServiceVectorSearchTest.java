@@ -34,7 +34,7 @@ import com.ragagent.rerank.RankResult;
 import com.ragagent.rerank.Reranker;
 import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.common.pipeline.SearchParams;
+import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.message.MessageSearchResult;
 import com.ragagent.session.domain.message.MessageWithSession;

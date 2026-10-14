@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.ragagent.common.wiki.SlugUpdate;
+import com.ragagent.contract.wiki.SlugUpdate;
 import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.wiki.service.WikiImageEnricher;
 import org.slf4j.Logger;

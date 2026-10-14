@@ -18,7 +18,7 @@ import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.contract.knowledge.ChunkPort;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.wiki.prompt.WikiPrompts;
-import com.ragagent.common.wiki.ExtractedItem;
+import com.ragagent.contract.wiki.ExtractedItem;
 import com.ragagent.wiki.service.page.NewSlugFromCitation;
 
 /**

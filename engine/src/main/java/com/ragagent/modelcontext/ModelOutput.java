@@ -9,7 +9,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import com.ragagent.common.llm.ToolResult;
+import com.ragagent.contract.tool.ToolResult;
 
 /**
  * 给 LLM 的紧凑、以 source 为中心的工具结果渲染。规范的 ToolResult.Output 保持不动，供 UI/日志/存储。

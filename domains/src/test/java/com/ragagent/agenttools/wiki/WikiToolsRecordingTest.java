@@ -11,7 +11,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.llm.ToolResult;
+import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.agent.tool.runtime.SearchAuth.KnowledgeTagsFetcher;
 import com.ragagent.agent.tool.runtime.SearchAuth.TagView;
 import com.ragagent.agent.tool.ToolCancellation;

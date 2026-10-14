@@ -3,7 +3,7 @@ package com.ragagent.memory.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ragagent.common.error.AppError;
+import com.ragagent.contract.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.memory.domain.MemoryConflictException;
 import com.ragagent.memory.domain.MemoryConsolidationResult;

@@ -1,0 +1,57 @@
+package com.ragagent.contract.tool;
+
+import java.util.List;
+import java.util.Map;
+
+
+/**
+ * 一次工具执行的结果——**工具调用协议的共享载荷**：agent 侧工具执行器产出、
+ * modelcontext 侧打包进模型消息、chatpipeline/session 侧消费。
+ *
+ * <p>为什么在 {@code common/llm}：与 {@code ResponseType} 同为跨域契约（原先在
+ * {@code agent.domain} 时被 modelcontext 反向依赖，构成 agent ⇄ modelcontext 环）。</p>
+ *
+ * <p>字段序即线上契约，不要重排。{@code outputFiles} 是**运行时**字段
+ * （沙箱引用；历史用最终答案的持久资源引用）——故 {@code @JsonIgnore}。</p>
+ */
+public class ToolResult {
+
+    /**
+     * 沙箱引用，**仅本次活结果**有效；历史用的是最终答案的持久资源引用。
+     */
+    private List<String> outputFiles;
+
+    private boolean success;
+
+    /** 人能读的输出（恒输出，含空串）。 */
+    private String output = "";
+
+    /** 结构化数据，供程序化使用。空时省略。键序递归恒排序（与既有 jsonb 记录逐字节一致）。 */
+    private Map<String, Object> data;
+
+    /** 执行失败时的错误信息。空时省略。 */
+    private String error;
+
+    /** 工具产出的 base64 data URI（如 MCP 图片内容）。空时省略。 */
+    private List<String> images;
+
+    public List<String> getOutputFiles() { return outputFiles; }
+    public void setOutputFiles(List<String> v) { outputFiles = v; }
+
+    public boolean isSuccess() { return success; }
+    public void setSuccess(boolean v) { success = v; }
+
+    public String getOutput() { return output; }
+    public void setOutput(String v) { output = v == null ? "" : v; }
+
+    public Map<String, Object> getData() { return data; }
+    public void setData(Map<String, Object> v) { data = v; }
+
+    public String getError() { return error == null ? "" : error; }
+
+    /** 字符串零值约定为 ""：传入 null 归一为 ""（消费侧可直接 isEmpty）。 */
+    public void setError(String v) { error = v == null ? "" : v; }
+
+    public List<String> getImages() { return images; }
+    public void setImages(List<String> v) { images = v; }
+}

@@ -1,5 +1,8 @@
 package com.ragagent.config;
 
+
+import com.ragagent.common.web.ContractJsonModule;
+
 import com.ragagent.platform.tracing.langfuse.LangfuseHttpInterceptor;
 
 import com.ragagent.platform.web.ApiResultInterceptor;
@@ -43,6 +46,18 @@ import com.ragagent.system.service.DeploymentCapabilitiesHolder;
  */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+
+    /**
+     * Spring MVC 侧的 Jackson 装配：注册契约载荷的 mixin 模块（§8.1 契约面纯 JDK 的配套）。
+     *
+     * <p>没有这一处，HTTP 出参/入参的键名与省略策略会回退成 Jackson 默认——即"线格式在
+     * HTTP 这条路径上静默变化"。其余路径（jsonb/事件/SSE/上下文/Langfuse）各自显式注册。</p>
+     */
+    @Bean
+    public org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer
+            contractJsonCustomizer() {
+        return builder -> builder.modulesToInstall(new ContractJsonModule());
+    }
 
     private final TenantProperties tenantProperties;
 

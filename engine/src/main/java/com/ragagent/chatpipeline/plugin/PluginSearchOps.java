@@ -12,7 +12,7 @@ import com.ragagent.common.retrieval.SearchTarget;
 import com.ragagent.chatpipeline.ChatManage;
 import com.ragagent.chatpipeline.PipelineLog;
 import com.ragagent.chatpipeline.PipelinePorts;
-import com.ragagent.common.pipeline.SearchParams;
+import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.common.knowledge.KnowledgeBaseView;
@@ -20,7 +20,7 @@ import com.ragagent.platform.tracing.langfuse.LangfuseManager;
 import com.ragagent.platform.tracing.langfuse.Span;
 import com.ragagent.retrieval.domain.WebSearchResult;
 import com.ragagent.retrieval.support.WebResultConverter;
-import com.ragagent.common.tenant.WebSearchConfig;
+import com.ragagent.contract.tenant.WebSearchConfig;
 
 /**
  * 检索执行协作者（自 {@link PluginSearch} 拆出）：

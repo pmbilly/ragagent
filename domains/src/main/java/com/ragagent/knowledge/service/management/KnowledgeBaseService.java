@@ -22,7 +22,7 @@ import java.util.UUID;
 import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.platform.security.UserNameLookup;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.common.error.AppError;
+import com.ragagent.contract.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.knowledge.domain.KnowledgeBaseIndexingStrategy;

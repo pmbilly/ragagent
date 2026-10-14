@@ -19,9 +19,9 @@ import com.ragagent.approval.McpOauthRequiredData;
 import com.ragagent.approval.McpOauthResolvedData;
 import com.ragagent.approval.ApprovalRequiredNotice;
 import com.ragagent.approval.ApprovalResolvedNotice;
-import com.ragagent.common.llm.ResponseType;
-import com.ragagent.event.payload.MCPOAuthRequiredData;
-import com.ragagent.event.payload.MCPOAuthResolvedData;
+import com.ragagent.contract.model.ResponseType;
+import com.ragagent.contract.event.payload.MCPOAuthRequiredData;
+import com.ragagent.contract.event.payload.MCPOAuthResolvedData;
 import com.ragagent.approval.ApprovalBridge;
 
 /**
@@ -56,7 +56,7 @@ class ApprovalBridgeTest {
                 1759500000L, "call-1", "req-1"));
 
         var data = assertInstanceOf(
-                com.ragagent.event.payload.ToolApprovalRequiredData.class, evt.getData());
+                com.ragagent.contract.event.payload.ToolApprovalRequiredData.class, evt.getData());
         assertEquals("pending-1", data.getPendingId());
         assertEquals(7L, data.getTenantId());
         assertEquals("sess-1", data.getSessionId());
@@ -84,7 +84,7 @@ class ApprovalBridgeTest {
                 Map.of(),
                 "req-2"));
         var resolvedData = assertInstanceOf(
-                com.ragagent.event.payload.ToolApprovalResolvedData.class, resolved.get().getData());
+                com.ragagent.contract.event.payload.ToolApprovalResolvedData.class, resolved.get().getData());
         assertTrue(resolvedData.isApproved());
         assertFalse(resolvedData.isTimedOut());
 

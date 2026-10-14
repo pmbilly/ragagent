@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.ragagent.tenant.repository.Tenant;
 import com.ragagent.tenant.repository.TenantLookup;
-import com.ragagent.common.error.AppError;
+import com.ragagent.contract.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.storage.fileserve.StorageFileResolver;
 import com.ragagent.storage.fileserve.StoragePaths;

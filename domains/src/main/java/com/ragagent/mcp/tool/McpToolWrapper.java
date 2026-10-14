@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.ragagent.approval.McpApproval;
-import com.ragagent.common.llm.ToolResult;
+import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.mcp.domain.McpService;
 import com.ragagent.mcp.domain.McpTool;
 import com.ragagent.mcp.protocol.CallToolResult;

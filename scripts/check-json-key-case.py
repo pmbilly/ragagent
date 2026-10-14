@@ -87,14 +87,21 @@ FROZEN_PREFIXES = (
     'datasource/connector/notion/NotionMarkdown',
     'datasource/connector/notion/NotionProperties',
     'datasource/connector/yuque/YuqueApiTypes',
-    'llm/', 'modelruntime/', 'common/llm', 'common/tenant',
-    'common/pipeline/SearchParams', 'mcp/oauth', 'memory/service/MemoryExtractionLlm',
+    # A②-2a（2026-10-14）：`common/llm` 整目录迁入契约面 ⇒ 前缀拆成 4 个文件级
+    # （前缀冻结在换包时静默失效——本文件开头已记过两次，这是第三次实战）
+    'contract/model/ResponseType', 'contract/model/TokenUsage', 'contract/model/PromptCacheStatus',
+    'contract/tool/ToolResult',
+    'llm/', 'modelruntime/', 'common/tenant',
+    'contract/retrieval/SearchParams', 'mcp/oauth', 'memory/service/MemoryExtractionLlm',
     'memory/service/MemoryExtractPayload', 'docreader', 'rerank/RankResult',
     'platform/tracing/langfuse', 'tracing/decorators', 'retrieval/engine/doris', 'retrieval/domain/ImageInfo',
     # ⚠️ 前缀冻结会在**换包**时静默失效（B168 实测 ✗）：B162 把 llm/TokenUsage 搬进 common/llm、
     # B163 把 6 个 Langfuse 装饰器从 tracing/langfuse 换包到 tracing/decorators ⇒ 旧前缀不再命中，
     # 冻结悄悄失效、CI 才报"非冻结面出现新的 snake 键"。**换包时务必回来核这里** ✓。
-    'common/wiki/ExtractedItem', 'chatpipeline/plugin', 'agent/AgentEngine',
+    # A②-2a：契约载荷的**线格式载体**——注解从契约类搬进 mixin 模块（§8.1 纯 JDK），
+    # 键名仍是既有 API/jsonb 契约（snake 键是设计，不是漂移）。
+    'common/web/ContractJsonMixins',
+    'contract/wiki/ExtractedItem', 'chatpipeline/plugin', 'agent/AgentEngine',
     'agent/ReActIteration', 'retrieval/HybridSearchService', 'retrieval/vlm/VlmClient',
     'knowledge/service/chunk/ChunkExtractService', 'knowledge/task/KnowledgeProcessWorker',  # B263㉟ 换锚：ChunkExtractService 迁 service/chunk
     'memory/mapper', 'knowledge/domain/KnowledgeBase', 'mcp/domain/McpService',

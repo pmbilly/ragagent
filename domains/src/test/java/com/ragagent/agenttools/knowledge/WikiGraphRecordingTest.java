@@ -13,7 +13,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.llm.ToolResult;
+import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool.ExtractConfigView;
 import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool.GraphNodeView;
 import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool.GraphRelationView;

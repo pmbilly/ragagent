@@ -18,8 +18,8 @@ import org.junit.jupiter.api.Test;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.retrieval.engine.EngineFactory.EngineNotSupportedException;
 import com.ragagent.retrieval.engine.sqlite.SqliteRetrieveRepository;
-import com.ragagent.common.vectorstore.ConnectionConfig;
-import com.ragagent.common.vectorstore.IndexConfig;
+import com.ragagent.contract.vectorstore.ConnectionConfig;
+import com.ragagent.contract.vectorstore.IndexConfig;
 import com.ragagent.common.vectorstore.VectorStoreView;
 import com.sun.net.httpserver.HttpServer;
 

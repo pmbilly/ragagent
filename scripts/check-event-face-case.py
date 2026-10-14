@@ -29,13 +29,13 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-# 多模块（B116）：event/* 与 common/llm/ResponseType 都随底座搬入了 contracts，
+# 多模块（B116/B268-A②）：event/* 与 ResponseType 都随底座搬入了 contracts 面（contract.event.payload / contract.model），
 # 路径改成按模块查找（新增模块无需改这里）。
 import _source_roots as _sr
 
-PAYLOAD_DIR = _sr.find_pkg_path("event/payload")
+PAYLOAD_DIR = _sr.find_pkg_path("contract/event/payload")
 EVENT_TYPE = _sr.find_pkg_path("platform/event/EventType.java")
-RESPONSE_TYPE = _sr.find_pkg_path("common/llm/ResponseType.java")
+RESPONSE_TYPE = _sr.find_pkg_path("contract/model/ResponseType.java")
 
 # 查询参数白名单（键 → 判定依据）。OIDC/OAuth2 标准参数，由外部协议决定，不得改名。
 QUERY_WHITELIST = {

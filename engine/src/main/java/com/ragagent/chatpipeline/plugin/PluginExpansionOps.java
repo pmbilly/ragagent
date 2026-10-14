@@ -13,7 +13,7 @@ import java.util.concurrent.Semaphore;
 import com.ragagent.common.retrieval.SearchTarget;
 import com.ragagent.chatpipeline.ChatManage;
 import com.ragagent.chatpipeline.PipelineLog;
-import com.ragagent.common.pipeline.SearchParams;
+import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.platform.access.TenantContextSnapshot;
 

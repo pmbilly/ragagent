@@ -11,8 +11,8 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.support.ContractJson;
-import com.ragagent.common.llm.ToolResult;
-import com.ragagent.common.error.AppError;
+import com.ragagent.contract.tool.ToolResult;
+import com.ragagent.contract.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.agenttools.RecordingSupport;
 import com.ragagent.agenttools.GoRecording45A;

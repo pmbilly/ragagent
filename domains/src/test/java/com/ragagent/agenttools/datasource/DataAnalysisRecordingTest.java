@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.llm.ToolResult;
+import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.agenttools.datasource.DataAnalysisTool.AnalysisDuckDb;
 import com.ragagent.agenttools.datasource.DataAnalysisTool.KnowledgeData;
 import com.ragagent.agenttools.datasource.DataAnalysisTool.KnowledgeFileMaterializer;

@@ -11,7 +11,7 @@ import java.util.Map;
 
 import com.ragagent.auth.apikey.domain.TenantAPIKeyRequest;
 import com.ragagent.auth.apikey.service.TenantAPIKeyValidator;
-import com.ragagent.common.error.AppError;
+import com.ragagent.contract.error.AppError;
 import com.ragagent.common.error.BizException;
 import org.junit.jupiter.api.Test;
 

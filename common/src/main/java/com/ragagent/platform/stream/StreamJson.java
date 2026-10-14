@@ -1,5 +1,7 @@
 package com.ragagent.platform.stream;
 
+import com.ragagent.common.web.ContractJsonModule;
+
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -37,6 +39,7 @@ public final class StreamJson {
     private static ObjectMapper build() {
         ObjectMapper mapper = JsonMapper.builder()
                 .addModule(new JavaTimeModule())
+                .addModule(new ContractJsonModule())
                 .addModule(offsetDateTimeModule())
                 .enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS)
                 .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)

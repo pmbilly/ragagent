@@ -49,7 +49,7 @@ import com.ragagent.auth.service.TokenValidationException;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.web.NonNullBody;
 import com.ragagent.platform.web.RejectEmptyBody;
-import com.ragagent.common.error.AppError;
+import com.ragagent.contract.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.common.tenant.TenantProperties;
 import com.ragagent.settings.SystemSettingRegistry;

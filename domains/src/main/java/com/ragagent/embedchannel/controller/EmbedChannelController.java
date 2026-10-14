@@ -43,7 +43,7 @@ import com.ragagent.session.dto.StopSessionRequest;
 import com.ragagent.storage.fileserve.FileProxyService;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
-import com.ragagent.common.error.AppError;
+import com.ragagent.contract.error.AppError;
 
 /**
  * embed 渠道 HTTP 层（管理面/公开面路由）。

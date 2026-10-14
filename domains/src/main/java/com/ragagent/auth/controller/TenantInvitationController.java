@@ -19,7 +19,7 @@ import com.ragagent.auth.service.TenantRbacException;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.auth.service.UserService;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.common.error.AppError;
+import com.ragagent.contract.error.AppError;
 import com.ragagent.common.error.BizException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.env.Environment;

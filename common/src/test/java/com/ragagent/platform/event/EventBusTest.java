@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.event.payload.AgentThoughtData;
+import com.ragagent.contract.event.payload.AgentThoughtData;
 import org.junit.jupiter.api.Test;
 
 /**

@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.dto.StopSessionRequest;
 import com.ragagent.platform.web.ApiResponse;
-import com.ragagent.common.error.AppError;
+import com.ragagent.contract.error.AppError;
 
 /**
  * embed 委托协作者（自 {@link EmbedChannelController} 拆出的

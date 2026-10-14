@@ -16,8 +16,8 @@ import org.junit.jupiter.api.Test;
 
 import com.ragagent.common.knowledge.KnowledgeBaseView;
 import com.ragagent.wiki.domain.WikiConstants;
-import com.ragagent.common.wiki.ExtractedItem;
-import com.ragagent.common.wiki.SlugUpdate;
+import com.ragagent.contract.wiki.ExtractedItem;
+import com.ragagent.contract.wiki.SlugUpdate;
 import com.ragagent.wiki.service.WikiModelResolver;
 import com.ragagent.wiki.service.page.WikiPageService;
 import com.ragagent.llm.LlmChatClient;

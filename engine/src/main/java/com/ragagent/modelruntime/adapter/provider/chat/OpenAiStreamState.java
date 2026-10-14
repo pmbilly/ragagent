@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.llm.TokenUsage;
+import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.llm.domain.ToolCall;
 import com.ragagent.modelruntime.adapter.provider.chat.common.ThinkingEmitter;
 

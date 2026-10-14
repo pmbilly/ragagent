@@ -14,7 +14,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.llm.ToolResult;
+import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.webfetch.FetchException;
 import com.ragagent.agent.tool.BaseTool;
 import com.ragagent.agent.tool.ToolCancellation;

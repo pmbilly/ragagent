@@ -16,7 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.ragagent.auth.service.TenantService;
-import com.ragagent.common.pipeline.SearchParams;
+import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.platform.model.EmbeddingGateway;
 import com.ragagent.common.error.BizException;
 import com.ragagent.common.knowledge.ChunkSearchGateway;

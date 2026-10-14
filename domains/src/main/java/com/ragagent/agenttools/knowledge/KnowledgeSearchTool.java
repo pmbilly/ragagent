@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.llm.ToolResult;
+import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.common.knowledge.ChunkFacts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

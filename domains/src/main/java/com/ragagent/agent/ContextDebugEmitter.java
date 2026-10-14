@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import com.ragagent.agent.compaction.CompactionSettings;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatTool;
-import com.ragagent.common.llm.TokenUsage;
+import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.agent.budget.ContextDiagnostics;
 
 /**

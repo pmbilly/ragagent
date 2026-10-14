@@ -1,5 +1,7 @@
 package com.ragagent.common.wiki;
 
+import com.ragagent.contract.wiki.SlugUpdate;
+
 import java.util.List;
 import java.util.Locale;
 import com.ragagent.common.text.Whitespace;

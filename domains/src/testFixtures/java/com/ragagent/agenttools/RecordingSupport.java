@@ -5,12 +5,14 @@ import java.util.Collections;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.common.web.ContractJsonModule;
 import com.ragagent.platform.web.ToolJson;
 
 /** 4.5a 录制测试的共享小工具。 */
 public final class RecordingSupport {
 
-    public static final ObjectMapper PLAIN = new ObjectMapper();
+    public static final ObjectMapper PLAIN = new ObjectMapper()
+            .registerModule(new ContractJsonModule());
 
     /**
      * 数字文本归一——把文本里的数字 token 统一成 Java {@code Double.toString} 形态
@@ -50,7 +52,8 @@ public final class RecordingSupport {
     }
 
     /** JSON mapper（map 键序由类型上的 serializer 负责；2026-10-03 起标准转义）。 */
-    public static final ObjectMapper JSON_MAPPER = new ObjectMapper();
+    public static final ObjectMapper JSON_MAPPER = new ObjectMapper()
+            .registerModule(new ContractJsonModule());
 
     private RecordingSupport() {
     }

@@ -23,7 +23,7 @@ import com.ragagent.chatpipeline.plugin.PluginError;
 import com.ragagent.chatpipeline.plugin.PluginIntoChatMessage;
 import com.ragagent.chatpipeline.plugin.PluginWebFetch;
 import com.ragagent.chatpipeline.support.ReferencesSupport;
-import com.ragagent.common.llm.ResponseType;
+import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.session.PipelineMessageAttachmentView;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.contract.graph.GraphData;

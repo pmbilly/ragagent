@@ -10,7 +10,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.llm.ToolResult;
+import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.agent.tool.runtime.SearchAuth;
 import com.ragagent.agent.tool.ToolRequest;
 import com.ragagent.agenttools.GoRecording45B;

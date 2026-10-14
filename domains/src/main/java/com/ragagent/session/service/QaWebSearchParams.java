@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.tenant.repository.Tenant;
-import com.ragagent.common.tenant.WebSearchConfig;
+import com.ragagent.contract.tenant.WebSearchConfig;
 
 /**
  * WebSearch / WebFetch 的**有效参数解析**：provider 选择、开关、fetch topN 与结果条数上限。

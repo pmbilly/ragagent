@@ -10,7 +10,7 @@ import java.util.List;
 import com.ragagent.contract.tenant.TenantRole;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.ErrorCode;
-import com.ragagent.common.error.AppError;
+import com.ragagent.contract.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.common.tenant.TenantProperties;
 import jakarta.servlet.http.HttpServletRequest;

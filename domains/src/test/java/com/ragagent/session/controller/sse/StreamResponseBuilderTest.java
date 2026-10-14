@@ -9,7 +9,8 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.llm.ResponseType;
+import com.ragagent.common.web.ContractJsonModule;
+import com.ragagent.contract.model.ResponseType;
 import com.ragagent.llm.domain.StreamResponse;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.platform.stream.StreamEvent;
@@ -33,7 +34,9 @@ import com.ragagent.support.ContractJson;
 class StreamResponseBuilderTest {
 
     /** 与线上一致：默认 mapper（本类型不含时间字段，无需 JacksonConfig 的 OffsetDateTime 覆盖）。 */
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    // 契约载荷（ToolResult/ResponseType 等）的线格式由 mixin 模块承载（B268-A②）
+    private static final ObjectMapper MAPPER = new ObjectMapper()
+            .registerModule(new ContractJsonModule());
 
     private static String write(StreamResponse response) throws Exception {
         return MAPPER.writeValueAsString(response);

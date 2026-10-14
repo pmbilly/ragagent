@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.ragagent.auth.service.OidcService;
 import com.ragagent.auth.service.UserService;
 import com.ragagent.auth.service.OidcStateCodec;
-import com.ragagent.common.error.AppError;
+import com.ragagent.contract.error.AppError;
 import com.ragagent.auth.dto.OidcAuthUrlResponse;
 import com.ragagent.auth.dto.OidcConfigResponse;
 import com.ragagent.common.error.BizException;

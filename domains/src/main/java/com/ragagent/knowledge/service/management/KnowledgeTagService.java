@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import com.ragagent.model.service.ModelRuntimeAssembler;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
-import com.ragagent.common.error.AppError;
+import com.ragagent.contract.error.AppError;
 import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
 import com.ragagent.retrieval.engine.VectorStoreService;
 import java.util.HashMap;

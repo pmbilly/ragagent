@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.controller;
 
 import java.util.List;
-import com.ragagent.common.error.AppError;
+import com.ragagent.contract.error.AppError;
 import com.ragagent.common.error.BizException;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.web.NonNullBody;

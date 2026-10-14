@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.llm.ToolResult;
+import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.retrieval.domain.WebSearchResult;
 import com.ragagent.agent.tool.ToolCancellation;
 import com.ragagent.agent.tool.ToolRequest;

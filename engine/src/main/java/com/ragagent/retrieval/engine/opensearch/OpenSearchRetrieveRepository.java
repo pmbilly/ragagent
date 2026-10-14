@@ -26,7 +26,7 @@ import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveParams;
 import com.ragagent.retrieval.engine.EngineTypes.RetrieveResult;
 import com.ragagent.retrieval.engine.RetrieveEngineRepository;
-import com.ragagent.common.vectorstore.IndexConfig;
+import com.ragagent.contract.vectorstore.IndexConfig;
 
 /**
  * OpenSearch k-NN 检索引擎仓库。HTTP 自持（java.net.http），与 ES v7/v8 驱动同一姿态。

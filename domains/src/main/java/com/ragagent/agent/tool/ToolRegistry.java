@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.llm.ToolResult;
+import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.llm.domain.FunctionDef;
 import com.ragagent.platform.web.ToolJson;
 import com.ragagent.agent.domain.ToolCallTarget;

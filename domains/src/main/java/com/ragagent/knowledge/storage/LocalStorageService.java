@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import com.ragagent.common.error.AppError;
+import com.ragagent.contract.error.AppError;
 import java.util.Comparator;
 import com.ragagent.platform.storage.config.UploadLimits;
 

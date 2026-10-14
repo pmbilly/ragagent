@@ -140,11 +140,21 @@ class ContractBoundaryRulesTest {
         assertThat(stale).as(rule + "：基线条目已不再违例——请删条目收紧基线").isEmpty();
     }
 
-    /** ArchUnit 对数组类型给出 JVM 描述符（{@code [Lcom.x.Y;}）——归一化成类名再判。 */
+    /**
+     * ArchUnit 对数组类型给出 JVM 描述符（{@code [Lcom.x.Y;} / {@code [F}）——归一化成类名再判。
+     *
+     * <p><b>B268-A② 现场修正（假阳性）</b>：原始类型数组的描述符剥掉方括号后是单字母
+     * （{@code [F} = {@code float[]}），旧实现会得到 {@code "F"} 且不以 {@code java.} 开头 ⇒
+     * 把 {@code SearchParams.queryEmbedding}（{@code float[]}）误判成"契约面引入框架依赖" ✗。
+     * 单字母即原始类型，归 JDK。</p>
+     */
     private static String normalizeDescriptor(String name) {
         String n = name;
         while (n.startsWith("[")) {
             n = n.substring(1);
+        }
+        if (n.length() == 1 && "ZBCDFIJSV".indexOf(n.charAt(0)) >= 0) {
+            return "java.lang.primitive." + n;
         }
         if (n.startsWith("L") && n.endsWith(";")) {
             n = n.substring(1, n.length() - 1);

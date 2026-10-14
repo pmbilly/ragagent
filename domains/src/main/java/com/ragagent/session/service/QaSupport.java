@@ -16,7 +16,7 @@ import com.ragagent.platform.stream.StreamEvent;
 import com.ragagent.platform.event.EventBus;
 import com.ragagent.agent.SteerSink;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
-import com.ragagent.common.llm.ResponseType;
+import com.ragagent.contract.model.ResponseType;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.session.domain.message.MessageAttachment;
 import com.ragagent.session.domain.SuggestionAttribution;

@@ -1,5 +1,9 @@
 package com.ragagent.common.vectorstore;
 
+import com.ragagent.contract.vectorstore.IndexConfig;
+
+import com.ragagent.contract.vectorstore.ConnectionConfig;
+
 
 /**
  * 向量库定义只读视图。
