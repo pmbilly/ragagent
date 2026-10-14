@@ -1091,6 +1091,16 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **约定（此后）**：**代码注释不写批次/步骤号**；要留痕写进提交信息与 HANDOFF；注释只写"是什么 / 为什么 / 坑在哪"。
 - **测试**：**4980 / 失败 0 / 跳过 4** ✓；`spotlessCheck build` ✓ **1m38s** ✓ **十二守卫** ✓；`:domains:javadoc` ✓（失链 0）。
 
+**🔶 B264 第⑦步（2026-10-14，session `service.suggestion` 切出；其余候选簇实测不可切）**
+- **动前图分析（本步主要产出，结论改变后续走法）**：
+  - `service.suggestion` = {`MessageSuggestionPipeline`, `MessageSuggestionService`} 是 session 内**唯一双向边为零**的簇：入边只有 `QaTurnFinalizer`（回合收尾），出边只有 `MessageService` ⇒ 切出后 `turn → suggestion → service` 单向，无环 ✓。
+  - 其余候选簇（§8.8.1 的 `service.attachment` / `service.history` / `service.turn`）实测**互有引用**：`attachment ⇄ turn`（`QaTurnExecutor → QaAttachmentResolver` vs `QaAttachmentResolver → QaTurnFinalizer/QaTurnSupport/QaSupport`）、`history ⇄ turn`（`SessionAgentQaService → …` vs `AgentConfigAssembler → QaAgentConfig/QaSupport`）、`turn ⇄ service`（`SessionKnowledgeQaService → turn` vs `turn → MessageService/SessionService/SessionLookupScope`）⇒ **单独切必造环** ✗ ⇒ 需先做**重构级断边**，不在"包重排"范围（与 B263① 同型结论：提前切面 = 环扩大）。
+  - 另：§8.8.1 的 service 子面**多数类名今日并不存在**（`ChatManage` / `Plugin*` / `SubmitTurnUseCase` / `TurnExecutionCoordinator` …）⇒ 那一层是**重构**（把 rag pipeline 与 turn 用例落位），不是重排。
+- **切出**：2 类 → `com.ragagent.session.service.suggestion`；测试 `MessageSuggestionGenerateTest`（用嵌套类型 `GenerationContext`/`Evidence`）随迁 mirror 包；补 `MessageService` import（原同包免 import）。
+- **换锚**：`check-json-key-case.py` 键级豁免路径（`{'question_count'}`）；`file-size.baseline.json` 键换锚（**601 → 601**，路径变、体量不变）；A17 基线 FQN 换名（由通用替换同步）。
+- **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 ✓；`spotlessCheck build` ✓ **1m49s** ✓ **十二守卫** ✓（环 0 / 包级 SCC 12 组）；`:domains:javadoc` ✓；定向 `--rerun-tasks` ✓。
+- **登记（session 余下）**：`service.attachment` / `service.history` / `service.turn`（及 `service.rag` / `rag.stage` / `enrichment` 的目标类）**需先做断边重构**；`api/`(4) / `event/`(2) / `task/`(1) 同为**待创建**。
+
 **🔶 B263 第㉟步（2026-10-14，第二个子面 `service.chunk` 切出）**
 - **动前断言（把"可测"变成"可证"）**：脚本**先断言** `ChunkEditService`/`ChunkExtractService`/`ChunkReadService` 三者在 `service` 包内**入度为零**（无人引用，`package-info` 除外），断言不过就 abort —— 这样"切出只产生单向外边"不再靠推理。`ChunkQuestionService` **故意留在** `service`：它被 `QuestionGenerationService` 引用，单独搬会造出 `service ⇄ service.chunk` 环（已在子面 package-info 写明）。
 - **切出**：3 类 → `com.ragagent.knowledge.service.chunk`（`git mv` + 包声明 + 全仓 FQN 替换 3 文件）；测试面 `ChunkExtractServiceTest` 随迁；新建 `service/chunk/package-info`；`service/package-info` 同步。

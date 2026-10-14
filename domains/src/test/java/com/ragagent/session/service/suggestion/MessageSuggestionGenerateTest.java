@@ -1,4 +1,4 @@
-package com.ragagent.session.service;
+package com.ragagent.session.service.suggestion;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

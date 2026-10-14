@@ -6,7 +6,7 @@ import com.ragagent.common.context.TenantContext;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.service.MessageService;
-import com.ragagent.session.service.MessageSuggestionService;
+import com.ragagent.session.service.suggestion.MessageSuggestionService;
 import com.ragagent.session.service.QaSupport;
 import com.ragagent.session.service.QaSupport.QaMode;
 import com.ragagent.session.service.QaSupport.QaRequestContext;

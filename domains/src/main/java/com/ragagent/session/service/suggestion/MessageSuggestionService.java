@@ -1,4 +1,6 @@
-package com.ragagent.session.service;
+package com.ragagent.session.service.suggestion;
+
+import com.ragagent.session.service.MessageService;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;

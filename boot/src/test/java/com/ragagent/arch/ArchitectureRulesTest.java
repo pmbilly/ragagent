@@ -811,7 +811,7 @@ class ArchitectureRulesTest {
             "com.ragagent.model.service.ModelRuntimeFactory",
             "com.ragagent.model.service.ModelService",
             "com.ragagent.session.service.AgentEngineAssembler",
-            "com.ragagent.session.service.MessageSuggestionService",
+            "com.ragagent.session.service.suggestion.MessageSuggestionService",
             "com.ragagent.session.service.QaWiring",
             "com.ragagent.session.service.SessionAgentQaService",
             "com.ragagent.session.service.SessionKnowledgeQaService",

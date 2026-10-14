@@ -23,7 +23,7 @@ import com.ragagent.session.dto.QaRequests.CreateKnowledgeQARequest;
 import com.ragagent.session.dto.QaRequests.SearchKnowledgeRequest;
 import com.ragagent.session.service.AgentResolver;
 import com.ragagent.session.service.MessageService;
-import com.ragagent.session.service.MessageSuggestionService;
+import com.ragagent.session.service.suggestion.MessageSuggestionService;
 import com.ragagent.session.service.QaSupport;
 import com.ragagent.session.service.QaSupport.QaMode;
 import com.ragagent.session.service.QaSupport.QaRequestContext;

@@ -1,4 +1,4 @@
-package com.ragagent.session.service;
+package com.ragagent.session.service.suggestion;
 
 import com.ragagent.common.web.JsonMappers;
 import java.util.ArrayList;
@@ -16,8 +16,8 @@ import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.retrieval.support.SearchTextUtil;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.SuggestionItem;
-import com.ragagent.session.service.MessageSuggestionService.Evidence;
-import com.ragagent.session.service.MessageSuggestionService.GenerationContext;
+import com.ragagent.session.service.suggestion.MessageSuggestionService.Evidence;
+import com.ragagent.session.service.suggestion.MessageSuggestionService.GenerationContext;
 
 /**
  * {@code MessageSuggestionService} 的**无状态管道子模块**：生成输入的上下文装配

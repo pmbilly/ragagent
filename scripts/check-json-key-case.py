@@ -250,7 +250,7 @@ BASELINE: dict[str, set[str]] = {
     # 工具名（模型可见的函数名；§2.4 只管字段名，B88 决策：工具名与 enum 值保留 snake。同族见 agent/tool/ToolCapabilities.java 的登记（B257 改名自 agent/tools/，B260 迁入 agent/tool/））
     'modelcontext/ToolPolicy.java': {'call_mcp_tool', 'data_schema', 'discover_mcp_tools', 'edit_sandbox_file', 'edit_skill_file', 'execute_skill_script', 'get_document_info', 'grep_chunks', 'knowledge_search', 'list_knowledge_chunks', 'list_sandbox_files', 'query_knowledge_graph', 'read_file', 'read_sandbox_file', 'read_skill', 'search_conversations', 'search_memory', 'shell_exec', 'todo_write', 'web_fetch', 'web_search', 'wiki_delete_page', 'wiki_flag_issue', 'wiki_read_page', 'wiki_read_source_doc', 'wiki_rename_page', 'wiki_replace_text', 'wiki_search', 'wiki_write_page', 'write_sandbox_file', 'write_skill_file'},
     # span 观测面（followUpSpan.finish 的 metadata）
-    'session/service/MessageSuggestionService.java': {'question_count'},
+    'session/service/suggestion/MessageSuggestionService.java': {'question_count'},
     # span 观测面（同本文件既有条目）
     'session/service/SessionKnowledgeQaService.java': {'error_type', 'event_type', 'knowledge_base_ids', 'search_targets', 'total_stages'},
     # 队列任务 span 载荷（观测面；同名键在别处是 DB 列名，此处不是）

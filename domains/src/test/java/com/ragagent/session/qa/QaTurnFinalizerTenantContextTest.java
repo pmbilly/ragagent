@@ -14,7 +14,7 @@ import com.ragagent.common.context.TenantContext;
 import com.ragagent.event.TenantContextSnapshot;
 import com.ragagent.memory.service.MemoryExtractionService;
 import com.ragagent.session.service.MessageService;
-import com.ragagent.session.service.MessageSuggestionService;
+import com.ragagent.session.service.suggestion.MessageSuggestionService;
 import com.ragagent.session.service.SessionService;
 import com.ragagent.session.service.TemporaryDocumentService;
 

@@ -10,7 +10,7 @@ import com.ragagent.session.domain.message.MessageNotFoundException;
 import com.ragagent.session.domain.message.MessageSuggestionSet;
 import com.ragagent.session.domain.message.MessageSuggestionSetNotFoundException;
 import com.ragagent.session.domain.conversation.SessionNotFoundException;
-import com.ragagent.session.service.MessageSuggestionService;
+import com.ragagent.session.service.suggestion.MessageSuggestionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
