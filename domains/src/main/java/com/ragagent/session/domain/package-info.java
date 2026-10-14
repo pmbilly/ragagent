@@ -1,5 +1,5 @@
 /**
- * 会话域实体（留存面；B264⑥ 已切出三簇：{@code conversation/}（会话与分页）、
+ * 会话域实体（留存面；已切出三簇：{@code conversation/}（会话与分页）、
  * {@code document/}（临时文档）、{@code message/}（消息族 + artifact 版本化））。
  *
  * <p>留存成员：{@code AbstractJsonListTypeHandler} / {@code AgentStepListTypeHandler} /

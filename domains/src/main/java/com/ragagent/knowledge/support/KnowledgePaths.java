@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.nio.charset.StandardCharsets;
 
 /**
- * knowledge 的**文件名/下载名规则**（B263⑧：由 {@code service.KnowledgeService} 抽出，
+ * knowledge 的**文件名/下载名规则**（由 {@code service.KnowledgeService} 抽出，
  * 与 {@code datasource.MapperKnowledgeBridge} 的同名私有实现**逐字比对等价**后合并为单一实现
  * ——§9.2"同一规则只允许一份实现"）。
  *

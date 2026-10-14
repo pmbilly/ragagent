@@ -42,7 +42,7 @@ import com.ragagent.knowledge.task.KnowledgeProcessingQueue;
 import com.sun.net.httpserver.HttpServer;
 
 /**
- * 数据源 URL 摄取（整改 K2 / B238）：下载在同步期完成、与文件行同形。
+ * 数据源 URL 摄取（整改 K2 /）：下载在同步期完成、与文件行同形。
  *
  * <p>历史缺口：原实现只写 {@code source=url} + {@code filePath=""} 就入队，而 worker 对
  * 非 manual 只读 filePath ⇒ 空路径必被存储层拒绝（整条链是死的）。这里用真实 HTTP 回环
@@ -89,7 +89,7 @@ class MapperKnowledgeBridgeUrlIngestTest {
         ArgumentCaptor<Knowledge> captor = ArgumentCaptor.forClass(Knowledge.class);
         verify(knowledgeMapper).insert(captor.capture());
         Knowledge row = captor.getValue();
-        assertThat(row.getFilePath()).as("URL 行必须与文件行同形（B238 关键断言）").isEqualTo("kb-1/doc.md");
+        assertThat(row.getFilePath()).as("URL 行必须与文件行同形（关键断言）").isEqualTo("kb-1/doc.md");
         assertThat(row.getFileHash()).isEqualTo(LocalStorageService.md5Hex(body));
         assertThat(row.getFileSize()).isEqualTo(body.length);
         assertThat(row.getSource()).isEqualTo(url);

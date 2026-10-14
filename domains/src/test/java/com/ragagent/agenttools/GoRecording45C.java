@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  * 重生成需重跑录制程序，按每行 rec.jsonl → 一条 R_&lt;GROUP&gt;_&lt;ID&gt; 常量重新生成本文件。
  * 超长常量用 StringBuilder 运行期拼接（javac 对字面量常量折叠会再撞 CONSTANT_Utf8
  *
- * <p>2026-10-10（B219）：删除 5 个超大常量（4 个 {@code shell_exec/*} +
+ * <p>2026-10-10：删除 5 个超大常量（4 个 {@code shell_exec/*} +
  * 1 个 {@code mcp_tool/extract_images_skipped}）—— 它们随沙箱功能裁剪（2026-09-28）
  * 成为**无引用数据**（无直接引用、反射路径也只取 mcp_stub 组），却占本文件 95.5% 体积：
  * 其中一条是单行 3.5 MB，IDE 打不开、评审无法 diff。其余常量未动。</p>

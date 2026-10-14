@@ -3,16 +3,16 @@ package com.ragagent.common.knowledge;
 import java.util.List;
 
 /**
- * 知识库目录端口（B264②）：按租户列出**活动**知识库及其检索能力标志。
+ * 知识库目录端口：按租户列出**活动**知识库及其检索能力标志。
  *
  * <p>实现留在 {@code knowledge} 侧（{@code api/KnowledgeBaseCatalogAdapter}）——它委托
  * {@code KnowledgeBaseService.listKnowledgeBases(creator)}（含 {@code ensureDefaults} 的能力默认值回填；
- * <b>2026-09-25 线上抓回</b>：缺这一步会让 {@code capabilities()} 全假 ⇒ 建议问题范围为空数组），
+ * <b>2026-09-25 线上抓回</b>：缺这一步会让 {@code capabilities} 全假 ⇒ 建议问题范围为空数组），
  * 再投影成本端口的记录。</p>
  *
- * <p><b>为什么要有它</b>：{@code agentmanagement} 属**适配面**，按 B257 规则只允许依赖
+ * <p><b>为什么要有它</b>：{@code agentmanagement} 属**适配面**，按 规则只允许依赖
  * contracts/platform 与各域**公开用例**——直连 {@code knowledge.service.*} 会绕过域边界
- * （本条债务即 B257 基线的三处之一）。</p>
+ * （本条债务即 基线的三处之一）。</p>
  */
 public interface KnowledgeBaseCatalogPort {
 

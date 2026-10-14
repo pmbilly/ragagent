@@ -19,7 +19,7 @@ import com.ragagent.retrieval.support.ImageInfoEnricher;
  * <p>"实体 → L1 载荷"的公用投影已抽到
  * {@link com.ragagent.knowledge.support.ChunkProjectionAdapter#view}
  * /{@link com.ragagent.knowledge.support.ChunkProjectionAdapter#viewAll}
- * （B263②：原先作为静态助手挂在本类，令 `repository` 反向依赖 `service` ⇒ 现落环外 `support/`）。
+ * （原先作为静态助手挂在本类，令 `repository` 反向依赖 `service` ⇒ 现落环外 `support/`）。
  *
  * <p>四个方法的过滤条件/降级姿态与迁移前的 wiki 侧实现<b>逐字一致</b>：
  * {@code textChunks} 来自 {@code WikiIngestBatchHandler}、{@code chunksByIds} 来自

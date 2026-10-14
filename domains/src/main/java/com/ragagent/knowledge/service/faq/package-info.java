@@ -1,5 +1,5 @@
 /**
- * FAQ 面（B263㉞ 从 {@code service} 整簇切出的第一个子面）。
+ * FAQ 面（从 {@code service} 整簇切出的第一个子面）。
  *
  * <p>成员：导入编排（{@code FaqImportService} + 其批次/校验协作者 {@code FaqBatchOps}/{@code FaqValidateOps}）、
  * 条目读写（{@code FaqEntryCommandService}/{@code FaqEntryQueryService}）、索引与形态（{@code FaqIndexWriter}/

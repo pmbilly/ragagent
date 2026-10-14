@@ -1084,6 +1084,13 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **测试**：**4980 / 失败 0 / 跳过 4** ✓；启动测试 ✓；`spotlessCheck build` ✓ **1m43s** ✓ **十二守卫** ✓（环 0 / 包级 SCC 12 组）；`:domains:javadoc` ✓。
 - **登记（session 余下）**：`qa/`(10) 拆入 `service.turn`/`service.rag`；`service/`(37) 拆入 `service.{attachment,enrichment,history,rag,rag.stage,suggestion,turn}`；新增 `api/`(4)/`event/`(2)/`task/`(1)；顶层 1 文件。
 
+**🔶 注释风格（用户反馈，2026-10-14）：代码注释不带过程编号**
+- **背景**：B232 起各批在 javadoc / 行内注释里留了 `B2xx㊸` 这类**批次与步骤编号**（如「（B263⑧：由 service 直连归位）」）。用户指出**新人看不懂**——这些编号只对参与过整改的人有意义，还会随批次表过期。
+- **处置（本步）**：只扫**注释段**（字符串字面量与 `@DisplayName` 一律不动）去掉编号、**保留事实与理由**：`（B263⑧：与 X 逐字等价…）`→`（与 X 逐字等价…）`；`**B264④ 改名**：`→`**改名**：`；`「B260」零容忍守卫`→`零容忍守卫`；`B261（§8.4）：…`→`…`。共 **145 处 / 85 文件**。
+- **有意保留**：ArchUnit 的**守卫标签字符串**（`@DisplayName("B257：…")` 与 `ratchet("B257 适配包→域 service/mapper", …)`）——它们是守卫输出里指代规则的"规则名"，改了会让复现口径与历史记录对不上；`HANDOFF.md` 与记忆仍属过程文档，照旧带批次号。
+- **约定（此后）**：**代码注释不写批次/步骤号**；要留痕写进提交信息与 HANDOFF；注释只写"是什么 / 为什么 / 坑在哪"。
+- **测试**：**4980 / 失败 0 / 跳过 4** ✓；`spotlessCheck build` ✓ **1m38s** ✓ **十二守卫** ✓；`:domains:javadoc` ✓（失链 0）。
+
 **🔶 B263 第㉟步（2026-10-14，第二个子面 `service.chunk` 切出）**
 - **动前断言（把"可测"变成"可证"）**：脚本**先断言** `ChunkEditService`/`ChunkExtractService`/`ChunkReadService` 三者在 `service` 包内**入度为零**（无人引用，`package-info` 除外），断言不过就 abort —— 这样"切出只产生单向外边"不再靠推理。`ChunkQuestionService` **故意留在** `service`：它被 `QuestionGenerationService` 引用，单独搬会造出 `service ⇄ service.chunk` 环（已在子面 package-info 写明）。
 - **切出**：3 类 → `com.ragagent.knowledge.service.chunk`（`git mv` + 包声明 + 全仓 FQN 替换 3 文件）；测试面 `ChunkExtractServiceTest` 随迁；新建 `service/chunk/package-info`；`service/package-info` 同步。

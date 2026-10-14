@@ -44,7 +44,7 @@ public class CustomAgentService {
 
     private final CustomAgentMapper agentMapper;
     private final UserLookupPort userLookup;
-    /** B264②：KB 目录端口（B257 债之一；原直连 knowledge.service.management.KnowledgeBaseService）。 */
+    /** KB 目录端口（债之一；原直连 knowledge.service.management.KnowledgeBaseService）。 */
     private final KnowledgeBaseCatalogPort kbCatalog;
     private final BuiltinAgentRegistry registry;
     /**

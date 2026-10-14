@@ -1,8 +1,8 @@
 package com.ragagent.common.audit;
 
 /**
- * 审计写入端口（B264③）：供**适配面**（{@code agenttools}/{@code agentmanagement}）写审计日志，
- * 而不直连 {@code audit.service.*}（B257 规则）。
+ * 审计写入端口：供**适配面**（{@code agenttools}/{@code agentmanagement}）写审计日志，
+ * 而不直连 {@code audit.service.*}（规则）。
  *
  * <p>实现留在 audit 侧（{@code api/AuditWriteAdapter}）——它把本端口的 JDK 记录映射成
  * {@code audit.domain.AuditLog} 再调 {@code AuditLogService#logBestEffort}

@@ -7,7 +7,7 @@ import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.dto.kb.DuplicateKnowledgeDetails;
 
 /**
- * 重复知识冲突（B263⑦：由 {@code KnowledgeService} 的**嵌套类**提为**顶层类型**）。
+ * 重复知识冲突（由 {@code KnowledgeService} 的**嵌套类**提为**顶层类型**）。
  *
  * <p>它被 {@code datasource}/{@code im}/{@code chatpipeline} 等多个域以
  * {@code DuplicateKnowledgeException} 形式引用——嵌套在门面里会让这些域

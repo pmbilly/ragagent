@@ -15,7 +15,7 @@ import com.ragagent.knowledge.mapper.KnowledgeMapper;
 /**
  * {@link KnowledgeBaseLookup} 的 knowledge 侧实现。
  *
- * <p><b>本类为何仍持有一个可选 mapper</b>（B263㉕）：{@code ObjectProvider<KnowledgeMapper>} 是
+ * <p><b>本类为何仍持有一个可选 mapper</b>：{@code ObjectProvider<KnowledgeMapper>} 是
  * **刻意的装配裁剪容忍**——某些装配/测试裁剪下知识表 mapper 不存在，此时保守返回（与迁移前一致）；
  * 而 {@code KnowledgeRepository} 是无条件 Bean、构造期就要求 mapper，换成它会让"缺 mapper"从
  * "保守返回"变成"上下文启动失败"。故保留该可选依赖（与 R6 禁 {@code @Lazy} 规避环无关），

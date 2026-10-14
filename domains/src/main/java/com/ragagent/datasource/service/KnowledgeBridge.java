@@ -80,15 +80,15 @@ public interface KnowledgeBridge {
                              Map<String, String> metadata, List<String> tagIds, String channel);
 
     /**
-     * 抓取 URL 内容并按**文件**写入知识库（B238 起：下载在同步期完成，行形态与
-     * {@link #createFromFile} 一致——filePath / hash / size 齐备，处理队列无需特判）。
-     *
-     * <p>SSRF 校验由本端口的实现自行执行（同步线程没有 controller 兜底）。</p>
-     *
-     * <p>返回的行<b>还没有</b> datasource 的 metadata——调用方随后显式补上
-     * （见 {@link #attachMetadata}），因为"重复内容"分支会复用一条已有行，
-     * 那条行不该被重新打标。</p>
-     */
+ * 抓取 URL 内容并按**文件**写入知识库（下载在同步期完成，行形态与
+ * {@link #createFromFile} 一致——filePath / hash / size 齐备，处理队列无需特判）。
+ *
+ * <p>SSRF 校验由本端口的实现自行执行（同步线程没有 controller 兜底）。</p>
+ *
+ * <p>返回的行<b>还没有</b> datasource 的 metadata——调用方随后显式补上
+ * （见 {@link #attachMetadata}），因为"重复内容"分支会复用一条已有行，
+ * 那条行不该被重新打标。</p>
+ */
     Knowledge createFromUrl(long tenantId, String kbId, String url, String fileName, String title,
                             List<String> tagIds, String channel);
 

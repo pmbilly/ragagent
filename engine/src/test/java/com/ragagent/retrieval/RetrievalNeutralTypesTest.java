@@ -13,7 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * B255：**检索编排只依赖中立类型**（`EngineTypes.IndexWithScore` / `EngineTypes.RetrieveResult`）。
+ * **检索编排只依赖中立类型**（`EngineTypes.IndexWithScore` / `EngineTypes.RetrieveResult`）。
  *
  * <p>此前编排（`HybridSearchService` / `HybridFusionOps` / `HybridResultOps` / `RetrievalObs`）
  * 直接说 `PgVectorRetrieveRepository.IndexHit` / `RetrieveResult`——那是**具体向量库适配器**的

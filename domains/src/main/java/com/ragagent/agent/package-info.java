@@ -2,7 +2,7 @@
  * ReAct 引擎域：AgentEngine 门面与八个段协作者（think/act/observe/prompt/finalize/steer/context-debug/ReAct 迭代）、
  * 提示词装配、token 预算与取消探测。对外入口 = {@code AgentEngine.execute}。
  *
- * <p>子包：{@code tool/}（工具框架：契约/定义/注册/校验/执行上下文/运行时修正，B260 由 {@code agenttools} 迁入；
+ * <p>子包：{@code tool/}（工具框架：契约/定义/注册/校验/执行上下文/运行时修正，由 {@code agenttools} 迁入；
  * 业务工具**实现**在 {@code com.ragagent.agenttools}）、{@code compaction/}（上下文压缩）、
  * {@code skills/}（技能装载）、{@code domain/}（引擎值类型）、{@code budget/}（token 预算与上下文占用诊断）、
  * {@code prompt/}（提示词模板选取与接地指引）、{@code modelcontext/}（模型输出上下文协议：来源注册表 /
@@ -12,12 +12,12 @@
  *
  * <h2>一轮的时序（loop）</h2>
  * <ol>
- *   <li>裁剪 / 压缩上下文 —— {@code ObservePhase.manageContextWindow}（策略在 {@code compaction/}）</li>
- *   <li>注入用户中途插话 —— {@code SteerIntake.drainSteerMessages}</li>
- *   <li>调模型 —— {@code ThinkPhase.callLLMWithRetry}（消息与提示词由 {@code ConversationAssembler} 装配）</li>
- *   <li>判定响应 —— {@code ObservePhase.analyzeResponse}（终答 / 继续 / 中断）</li>
- *   <li>执行工具 —— {@code ActPhase.executeToolCalls}（工具定义在 {@code tools/}）</li>
- *   <li>回灌结果与图片 —— {@code ObservePhase.appendToolResults} / {@code appendToolImages}</li>
+ * <li>裁剪 / 压缩上下文 —— {@code ObservePhase.manageContextWindow}（策略在 {@code compaction/}）</li>
+ * <li>注入用户中途插话 —— {@code SteerIntake.drainSteerMessages}</li>
+ * <li>调模型 —— {@code ThinkPhase.callLLMWithRetry}（消息与提示词由 {@code ConversationAssembler} 装配）</li>
+ * <li>判定响应 —— {@code ObservePhase.analyzeResponse}（终答 / 继续 / 中断）</li>
+ * <li>执行工具 —— {@code ActPhase.executeToolCalls}（工具定义在 {@code tools/}）</li>
+ * <li>回灌结果与图片 —— {@code ObservePhase.appendToolResults} / {@code appendToolImages}</li>
  * </ol>
  * <p>循环驱动：{@code AgentEngine.executeLoop}（轮首刷新工具定义、取消探测、迭代预算判定）；
  * 单轮编排：{@code ReActIteration}；收尾兜底：{@code FinalizePhase}。类头「主循环地图」见 {@code AgentEngine}。</p>

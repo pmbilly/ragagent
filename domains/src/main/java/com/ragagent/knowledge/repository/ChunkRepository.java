@@ -101,18 +101,18 @@ public class ChunkRepository implements ChunkSearchGateway {
         return c == null ? 0 : c;
     }
 
-    /** 级联软删：该 KB 下全部 chunk 行（B263⑪：删库路径归位）。 */
+    /** 级联软删：该 KB 下全部 chunk 行（删库路径归位）。 */
     public void softDeleteByKnowledgeBaseId(String knowledgeBaseId, OffsetDateTime now) {
         chunkMapper.update(null, new LambdaUpdateWrapper<Chunk>()
                 .eq(Chunk::getKnowledgeBaseId, knowledgeBaseId).set(Chunk::getDeletedAt, now));
     }
 
-    /** 插入新 chunk 行（B263⑨：由 service 直连 chunkMapper 归位）。 */
+    /** 插入新 chunk 行（由 service 直连 chunkMapper 归位）。 */
     public void insert(Chunk chunk) {
         chunkMapper.insert(chunk);
     }
 
-    /** 搬 KB：改 {@code knowledge_base_id} + 推 updated_at（B263㉓ 由 service 直连归位）。 */
+    /** 搬 KB：改 {@code knowledge_base_id} + 推 updated_at（由 service 直连归位）。 */
     public int moveToKnowledgeBase(String knowledgeId, String targetKbId, OffsetDateTime now) {
         return chunkMapper.update(null, new LambdaUpdateWrapper<Chunk>()
                 .eq(Chunk::getKnowledgeId, knowledgeId)
@@ -120,7 +120,7 @@ public class ChunkRepository implements ChunkSearchGateway {
                 .set(Chunk::getUpdatedAt, now));
     }
 
-    /** 该 knowledge 下未软删的 chunk（租户 + knowledge_id + 未软删；B263㉔ 由 service 直连归位）。 */
+    /** 该 knowledge 下未软删的 chunk（租户 + knowledge_id + 未软删；由 service 直连归位）。 */
     public List<Chunk> listActiveByKnowledgeId(long tenantId, String knowledgeId) {
         return chunkMapper.selectList(new LambdaQueryWrapper<Chunk>()
                 .eq(Chunk::getKnowledgeId, knowledgeId)
@@ -133,13 +133,13 @@ public class ChunkRepository implements ChunkSearchGateway {
         return chunkMapper.selectById(id);
     }
 
-    /** 硬删该 knowledge 的全部 chunk 行（{@code delete} 语义；B263㉘ 由 worker 直连搬入）。 */
+    /** 硬删该 knowledge 的全部 chunk 行（{@code delete} 语义；由 worker 直连搬入）。 */
     public int deleteByKnowledgeId(String knowledgeId) {
         return chunkMapper.delete(new LambdaQueryWrapper<Chunk>()
                 .eq(Chunk::getKnowledgeId, knowledgeId));
     }
 
-    /** 按 id 集合硬删（用非废弃的 {@code deleteByIds}；B263㉘ 由 worker 直连 {@code deleteBatchIds} 归位）。 */
+    /** 按 id 集合硬删（用非废弃的 {@code deleteByIds}； 由 worker 直连 {@code deleteBatchIds} 归位）。 */
     public int deleteByIds(List<String> ids) {
         if (ids == null || ids.isEmpty()) {
             return 0;
@@ -147,14 +147,14 @@ public class ChunkRepository implements ChunkSearchGateway {
         return chunkMapper.deleteByIds(ids);
     }
 
-    /** 计数：该 knowledge 下指定 chunk_type 的行数（B263㉘ 由 worker 直连归位）。 */
+    /** 计数：该 knowledge 下指定 chunk_type 的行数（由 worker 直连归位）。 */
     public long countByKnowledgeIdAndChunkType(String knowledgeId, String chunkType) {
         return chunkMapper.selectCount(new LambdaQueryWrapper<Chunk>()
                 .eq(Chunk::getKnowledgeId, knowledgeId)
                 .eq(Chunk::getChunkType, chunkType));
     }
 
-    /** 该 knowledge 下的 TEXT 型 chunk，按 {@code chunk_index} 升序（B263㉙ 由 api 适配器直连搬入）。 */
+    /** 该 knowledge 下的 TEXT 型 chunk，按 {@code chunk_index} 升序（由 api 适配器直连搬入）。 */
     public List<Chunk> listTextChunks(long tenantId, String knowledgeId) {
         return chunkMapper.selectList(new LambdaQueryWrapper<Chunk>()
                 .eq(Chunk::getTenantId, tenantId)
@@ -163,32 +163,32 @@ public class ChunkRepository implements ChunkSearchGateway {
                 .orderByAsc(Chunk::getChunkIndex));
     }
 
-    /** 租户内按 id 硬删（{@code delete} 语义，B263㉙ 由 api 适配器直连搬入）。 */
+    /** 租户内按 id 硬删（{@code delete} 语义，由 api 适配器直连搬入）。 */
     public int deleteScoped(long tenantId, String chunkId) {
         return chunkMapper.delete(new LambdaQueryWrapper<Chunk>()
                 .eq(Chunk::getTenantId, tenantId)
                 .eq(Chunk::getId, chunkId));
     }
 
-    /** 按主键整行更新（B263⑩：由 service 直连 chunkMapper 归位）。 */
+    /** 按主键整行更新（由 service 直连 chunkMapper 归位）。 */
     public void updateById(Chunk chunk) {
         chunkMapper.updateById(chunk);
     }
 
-    /** 按 knowledgeId 软删该知识下全部 chunk 行（B263⑨）。 */
+    /** 按 knowledgeId 软删该知识下全部 chunk 行。 */
     public void softDeleteByKnowledgeId(String knowledgeId, OffsetDateTime now) {
         chunkMapper.update(null, new LambdaUpdateWrapper<Chunk>()
                 .eq(Chunk::getKnowledgeId, knowledgeId).set(Chunk::getDeletedAt, now));
     }
 
     /**
-     * 与 {@link #getChunkById} 同查询，但**找不到返回 {@code null}**（不抛）。
-     *
-     * <p>B263⑩：图片信息更新路径的原契约是"null → 调用方抛
-     * {@code AppError.internal(\"chunk not found\")}（500）"——复用会抛
-     * {@link ChunkNotFoundException} 的版本会改变对外错误形状（契约测试
-     * {@code KnowledgeOperationsContractTest} 当场抓住）。</p>
-     */
+ * 与 {@link #getChunkById} 同查询，但**找不到返回 {@code null}**（不抛）。
+ *
+ * <p> 图片信息更新路径的原契约是"null → 调用方抛
+ * {@code AppError.internal(\"chunk not found\")}（500）"——复用会抛
+ * {@link ChunkNotFoundException} 的版本会改变对外错误形状（契约测试
+ * {@code KnowledgeOperationsContractTest} 当场抓住）。</p>
+ */
     public Chunk findByIdOrNull(long tenantId, String id) {
         return chunkMapper.selectOne(new LambdaQueryWrapper<Chunk>()
                 .eq(Chunk::getTenantId, tenantId)

@@ -63,17 +63,17 @@ import com.ragagent.common.wiki.WikiIngestPort;
  * deleting/cancelled 检查点短路。</p>
  * <p>三个关键不变量：</p>
  * <ol>
- *   <li><b>索引文本形态</b>：嵌入文本与 embeddings.content 一致，均为
- *       title 前缀 + ContextHeader + trim 正文（BM25 与向量评分对象必须同源）；</li>
- *   <li><b>重处理预清理</b>：先删旧 chunks 行（无条件）+ 全部向量行（仅向量化启用
- *       且模型可用时），失败清理只清本次产物；模型解析失败发生在预清理之前——
- *       既有数据保持不动；</li>
- *   <li><b>wiki 交接</b>：wiki_enabled 且有文本 chunk 时 processing 原子晋升
- *       finalizing（pending_subtasks_count 由子任务持有）再入队 ingest，
- *       由 DefaultWikiKnowledgeFinalizer 递减并晋升 completed。</li>
+ * <li><b>索引文本形态</b>：嵌入文本与 embeddings.content 一致，均为
+ * title 前缀 + ContextHeader + trim 正文（BM25 与向量评分对象必须同源）；</li>
+ * <li><b>重处理预清理</b>：先删旧 chunks 行（无条件）+ 全部向量行（仅向量化启用
+ * 且模型可用时），失败清理只清本次产物；模型解析失败发生在预清理之前——
+ * 既有数据保持不动；</li>
+ * <li><b>wiki 交接</b>：wiki_enabled 且有文本 chunk 时 processing 原子晋升
+ * finalizing（pending_subtasks_count 由子任务持有）再入队 ingest，
+ * 由 DefaultWikiKnowledgeFinalizer 递减并晋升 completed。</li>
  * </ol>
  *
- * <p>规模：B263㉘ 把仓储访问外提后本类已降到 800 行以下（超 600 行仍在大文件棘轮基线内，
+ * <p>规模： 把仓储访问外提后本类已降到 800 行以下（超 600 行仍在大文件棘轮基线内，
  * 只许减不许增）。</p> */
 @Service
 public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
@@ -353,7 +353,7 @@ public class KnowledgeProcessWorker implements KnowledgeProcessingQueue {
                         "chunks_to_embed", chunks.size(),
                         "model_id", k.getEmbeddingModelId() == null
                                 ? "" : k.getEmbeddingModelId()));
-        // K10b（B249）：索引执行收敛——委托索引器的唯一实现（分批 / IndexRow·IndexInfo 构造 /
+        // K10b：索引执行收敛——委托索引器的唯一实现（分批 / IndexRow·IndexInfo 构造 /
         // 引擎口 / 问题行 / parent_text 过滤 / 按块 enabled 全在那儿）。worker 只保留：
         // span 埋点、embedConfig 空即跳过、失败不吞（外层失败清场与终态契约依赖 RuntimeException）。
         try {

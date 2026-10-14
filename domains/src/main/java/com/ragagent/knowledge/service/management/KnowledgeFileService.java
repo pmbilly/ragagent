@@ -163,7 +163,7 @@ public class KnowledgeFileService {
      * 全列写（DeletedAt/PendingSubtasksCount 除外）：
      * description=""/processed_at=NULL 这类零值也必须落库，不能走 MP 默认的跳空列。
      */
-    /** B263⑩：语句体已归位 {@code repository.KnowledgeRepository#updateRow}，此处保留薄委托（调用方不变）。 */
+    /** 语句体已归位 {@code repository.KnowledgeRepository#updateRow}，此处保留薄委托（调用方不变）。 */
     public void updateKnowledgeRow(Knowledge k, JsonNode metadata) {
         knowledgeRepository.updateRow(k, metadata);
     }

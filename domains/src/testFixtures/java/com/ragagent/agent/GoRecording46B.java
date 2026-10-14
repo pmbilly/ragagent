@@ -172,7 +172,7 @@ public final class GoRecording46B {
 
     public static final String R_EXECUTE_STREAM_ERROR_STATE = "null";
 
-    // 2026-10-13（B240）签名变更：AGENT 失败收束顺序改为「错误 → 终态」——原金片把
+    // 2026-10-13签名变更：AGENT 失败收束顺序改为「错误 → 终态」——原金片把
     // 「终态 → 错误」当契约，但终态帧（agentComplete）是 SSE 的退出条件，会把错误帧
     // 挤到流关闭之后；同时终态载荷新增 extra={"outcome":"failed","error":…}。
     public static final String R_EXECUTE_STREAM_ERROR_EVENTS = "[{\"type\":\"error\",\"id\":\"xxxxxxxx-error\",\"sessionId\":\"sess-1\",\"data\":{\"error\":\"LLM call failed: LLM stream error: provider exploded\",\"stage\":\"agent_execution\",\"sessionId\":\"sess-1\"}},{\"type\":\"agentComplete\",\"id\":\"xxxxxxxx-complete\",\"sessionId\":\"sess-1\",\"data\":{\"sessionId\":\"\",\"totalSteps\":0,\"finalAnswer\":\"\",\"agentSteps\":[],\"usage\":null,\"messageId\":\"msg-1\",\"extra\":{\"outcome\":\"failed\",\"error\":\"LLM call failed: LLM stream error: provider exploded\"}}}]";

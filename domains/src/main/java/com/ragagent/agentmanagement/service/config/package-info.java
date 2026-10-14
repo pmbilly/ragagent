@@ -1,5 +1,5 @@
 /**
- * 智能体配置面（B264① 从 {@code agentmanagement.service} 切出，对齐方案 §8.8.3）：
+ * 智能体配置面（从 {@code agentmanagement.service} 切出，对齐方案 §8.8.3）：
  * agent config jsonb 读写（{@code AgentConfigJson}）、占位符（{@code AgentPlaceholders}）、
  * 类型预设（{@code AgentTypePresets}）。
  *

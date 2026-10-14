@@ -80,41 +80,41 @@ public class KnowledgeTagRepository {
      * （knowledge / repository/knowledge）：
      * 携带任一指定标签的文档 id（DISTINCT）。标签删除时用它列出待清理的文档。
      */
-    /** 单条 knowledge 的标签行（B263⑨：由 service 直连 tagMapper 归位）。 */
+    /** 单条 knowledge 的标签行（由 service 直连 tagMapper 归位）。 */
     public List<KnowledgeTag> listTagsWithKnowledgeId(String knowledgeId) {
         return tagMapper.selectTagsWithKnowledgeId(List.of(knowledgeId));
     }
 
-    /** 按 id 集合 + 租户取标签（B263⑨）。 */
+    /** 按 id 集合 + 租户取标签。 */
     public List<KnowledgeTag> listTagsByIds(long tenantId, List<String> ids) {
         return tagMapper.selectByTenantAndIds(tenantId, ids);
     }
 
-    /** 清理该 KB 下未引用的标签，返回删除行数（B263⑲ 由 service 直连归位）。 */
+    /** 清理该 KB 下未引用的标签，返回删除行数（由 service 直连归位）。 */
     public int deleteUnusedTags(long tenantId, String kbId) {
         return tagMapper.deleteUnusedTags(tenantId, kbId);
     }
 
     /**
-     * KB 内标签分页（limit/offset 原样透传；分页归一与关键词过滤见 {@link #listByKb}）。
-     *
-     * <p>B263⑳ 由 service 直连 {@code tagMapper.listByKB} 归位。</p>
-     */
+ * KB 内标签分页（limit/offset 原样透传；分页归一与关键词过滤见 {@link #listByKb}）。
+ *
+ * <p> 由 service 直连 {@code tagMapper.listByKB} 归位。</p>
+ */
     public List<KnowledgeTag> listTagsByKbPage(long tenantId, String kbId, int limit, int offset) {
         return tagMapper.listByKB(tenantId, kbId, limit, offset);
     }
 
-    /** 按 seqId 集合取标签（B263⑳ 由 service 直连归位）。 */
+    /** 按 seqId 集合取标签（由 service 直连归位）。 */
     public List<KnowledgeTag> listTagsBySeqIds(long tenantId, List<Long> seqIds) {
         return tagMapper.selectByTenantAndSeqIds(tenantId, seqIds);
     }
 
-    /** 删除该 knowledge 的标签关系（B263⑨）。 */
+    /** 删除该 knowledge 的标签关系。 */
     public void deleteRelations(String knowledgeId) {
         tagMapper.deleteRelations(knowledgeId);
     }
 
-    /** 建立标签关系（B263⑨）。 */
+    /** 建立标签关系。 */
     public void insertRelation(String knowledgeId, String tagId) {
         tagMapper.insertRelation(knowledgeId, tagId);
     }

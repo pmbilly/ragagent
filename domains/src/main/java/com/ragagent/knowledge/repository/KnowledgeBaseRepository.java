@@ -9,7 +9,7 @@ import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
 import org.springframework.stereotype.Component;
 
 /**
- * knowledge_base 行级读写（B263⑪：由 {@code service.KnowledgeBaseService} 的直连 kbMapper 抽出；
+ * knowledge_base 行级读写（由 {@code service.KnowledgeBaseService} 的直连 kbMapper 抽出；
  * 对应方案 §8.8.2 的 {@code repository/KnowledgeBaseRepository}）。
  *
  * <p>契约同 {@link KnowledgeRepository}：只做数据访问，不抛业务异常、不依赖 service，
@@ -26,11 +26,11 @@ public class KnowledgeBaseRepository {
 
     /** 插入新行。 */
     /**
-     * 同租户 + 未软删的全部 KB（**含临时库、不排序**）。
-     *
-     * <p>与 {@link #listActiveByTenant(long)} 的区别是后者额外排除临时库并按 created_at 倒序；
-     * 检索面要的是"租户下所有库"（B263⑯ 由 {@code KnowledgeSearchService} 的直连搬入）。</p>
-     */
+ * 同租户 + 未软删的全部 KB（**含临时库、不排序**）。
+ *
+ * <p>与 {@link #listActiveByTenant(long)} 的区别是后者额外排除临时库并按 created_at 倒序；
+ * 检索面要的是"租户下所有库"（由 {@code KnowledgeSearchService} 的直连搬入）。</p>
+ */
     public List<KnowledgeBase> listByTenant(long tenantId) {
         return kbMapper.selectList(new LambdaQueryWrapper<KnowledgeBase>()
                 .eq(KnowledgeBase::getTenantId, tenantId)

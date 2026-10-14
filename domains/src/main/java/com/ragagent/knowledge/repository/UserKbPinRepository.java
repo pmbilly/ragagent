@@ -6,7 +6,7 @@ import com.ragagent.knowledge.mapper.UserKbPinMapper;
 import org.springframework.stereotype.Component;
 
 /**
- * user_kb_pin 行级读写（B263⑫：由 {@code service.KnowledgeBaseService} 的直连 pinMapper 抽出）。
+ * user_kb_pin 行级读写（由 {@code service.KnowledgeBaseService} 的直连 pinMapper 抽出）。
  *
  * <p>方案 §8.8.2 的 repository 面未给这张表列类名，本类按本批既有命名（表 → XxxRepository）落位；
  * 契约同其它仓储：只做数据访问、不抛业务异常、不依赖 service。</p>

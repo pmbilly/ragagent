@@ -27,7 +27,7 @@ import com.ragagent.knowledge.mapper.KnowledgeMapper;
 import org.springframework.stereotype.Component;
 
 /**
- * knowledge 行级读写（B263⑧：由 {@code service.KnowledgeService} 的直连 mapper 抽出；对应方案
+ * knowledge 行级读写（由 {@code service.KnowledgeService} 的直连 mapper 抽出；对应方案
  * §8.8.2 的 {@code repository/KnowledgeRepository}）。
  *
  * <p>契约（避免复活已断的环）：本层**只做数据访问**——不抛业务异常（重复冲突由 service 侧判定并
@@ -70,14 +70,14 @@ public class KnowledgeRepository {
     }
 
     /**
-     * 摘要列写（B263⑩ 由 {@code service.KnowledgeFileService} 归位；B263㊶ 调用方直连本方法）。
-     * <p>❌ 勿改走 {@link #updateRow}（**全列写**）：它会把<b>加载时</b>的旧
-     * {@code parse_status} 一并写回。摘要是在导入后处理的 finalizing 交接**之后**才跑完 LLM
-     * （数十秒），回写就把 `finalizing/completed` 打回加载时的 {@code processing} ✗
-     * （用户报障：`05.03-问题发布.md` 卡 processing ✗）。</p>
-     * <p>本方法只写摘要自己那几列（description / summary_status / metadata / updated_at），
-     * 绝不碰 parse_status、enable_status、pending_subtasks_count。</p>
-     */
+ * 摘要列写（由 {@code service.KnowledgeFileService} 归位；调用方直连本方法）。
+ * <p>❌ 勿改走 {@link #updateRow}（**全列写**）：它会把<b>加载时</b>的旧
+ * {@code parse_status} 一并写回。摘要是在导入后处理的 finalizing 交接**之后**才跑完 LLM
+ * （数十秒），回写就把 `finalizing/completed` 打回加载时的 {@code processing} ✗
+ * （用户报障：`05.03-问题发布.md` 卡 processing ✗）。</p>
+ * <p>本方法只写摘要自己那几列（description / summary_status / metadata / updated_at），
+ * 绝不碰 parse_status、enable_status、pending_subtasks_count。</p>
+ */
     public void updateSummaryColumns(Knowledge k) {
         knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
                 .eq(Knowledge::getId, k.getId())
@@ -90,7 +90,7 @@ public class KnowledgeRepository {
                 .set(Knowledge::getUpdatedAt, k.getUpdatedAt() == null ? OffsetDateTime.now(ZoneOffset.UTC) : k.getUpdatedAt()));
     }
 
-    /** 全列写（DeletedAt/PendingSubtasksCount 除外；零值也落库）——B263⑩ 由 KnowledgeFileService 归位。 */
+    /** 全列写（DeletedAt/PendingSubtasksCount 除外；零值也落库）—— 由 KnowledgeFileService 归位。 */
     public void updateRow(Knowledge k, JsonNode metadata) {
         knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
                 .eq(Knowledge::getId, k.getId())
@@ -114,7 +114,7 @@ public class KnowledgeRepository {
                 .set(Knowledge::getErrorMessage, k.getErrorMessage()));
     }
 
-    /** 只刷 file_hash + updated_at（图片信息更新后的对照哈希）——B263⑩ 归位。 */
+    /** 只刷 file_hash + updated_at（图片信息更新后的对照哈希）—— 归位。 */
     public void updateFileHash(String id, String fileHash, OffsetDateTime now) {
         knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
                 .eq(Knowledge::getId, id)
@@ -139,7 +139,7 @@ public class KnowledgeRepository {
         return c == null ? 0 : c;
     }
 
-    /** 级联软删：该 KB 下全部 knowledge 行（B263⑪：删库路径归位）。 */
+    /** 级联软删：该 KB 下全部 knowledge 行（删库路径归位）。 */
     public void softDeleteByKnowledgeBaseId(String knowledgeBaseId, OffsetDateTime now) {
         knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
                 .eq(Knowledge::getKnowledgeBaseId, knowledgeBaseId).set(Knowledge::getDeletedAt, now));
@@ -188,13 +188,13 @@ public class KnowledgeRepository {
     }
 
     /**
-     * 检索主查询（B263⑯ 由 {@code KnowledgeSearchService} 的查询构建整体搬入）。
-     *
-     * <p>语义逐字保留：未软删 + 作用域 OR 组（每对 tenant/kb 一组）+ keyword 对
-     * {@code LOWER(file_name)}/{@code LOWER(title)} LIKE（转义后）+ 文件类型别名模式
-     * （{@code <<url>>} 走 {@code type='url'} 分支）；created_at DESC；取 {@code limit+1} 行用于
-     * 探测 has_more，total 是过滤后的全量计数（由调用方切分）。</p>
-     */
+ * 检索主查询（由 {@code KnowledgeSearchService} 的查询构建整体搬入）。
+ *
+ * <p>语义逐字保留：未软删 + 作用域 OR 组（每对 tenant/kb 一组）+ keyword 对
+ * {@code LOWER(file_name)}/{@code LOWER(title)} LIKE（转义后）+ 文件类型别名模式
+ * （{@code <<url>>} 走 {@code type='url'} 分支）；created_at DESC；取 {@code limit+1} 行用于
+ * 探测 has_more，total 是过滤后的全量计数（由调用方切分）。</p>
+ */
     public SearchRows searchScopedRows(List<KnowledgeSearchScope> scopes, String keyword,
                                        List<String> fileTypes, int offset, int limit) {
         LambdaQueryWrapper<Knowledge> qw = new LambdaQueryWrapper<Knowledge>().isNull(Knowledge::getDeletedAt);
@@ -310,11 +310,11 @@ public class KnowledgeRepository {
     }
 
     /**
-     * 按 id 取行，**不过滤软删**（与 {@code mapper.selectById} 一致）。
-     *
-     * <p>与 {@link #findByIdOnly(String)} 的区别：后者排除软删行。管线任务（图抽取/问题生成）
-     * 需要看到已软删行以判定 aborted 并跳过，故单列此法（B263⑱）。</p>
-     */
+ * 按 id 取行，**不过滤软删**（与 {@code mapper.selectById} 一致）。
+ *
+ * <p>与 {@link #findByIdOnly(String)} 的区别：后者排除软删行。管线任务（图抽取/问题生成）
+ * 需要看到已软删行以判定 aborted 并跳过，故单列此法。</p>
+ */
     public Knowledge findByIdAny(String id) {
         return knowledgeMapper.selectById(id);
     }
@@ -335,11 +335,11 @@ public class KnowledgeRepository {
     }
 
     /**
-     * 软删（**仅当尚未软删**：带 {@code isNull(deleted_at)}，返回影响行数）。
-     *
-     * <p>与 {@link #softDelete(String, OffsetDateTime)} 的区别就在这个条件——批量删除路径
-     * 逐条调用它（B263㉑ 由 service 直连归位）。</p>
-     */
+ * 软删（**仅当尚未软删**：带 {@code isNull(deleted_at)}，返回影响行数）。
+ *
+ * <p>与 {@link #softDelete(String, OffsetDateTime)} 的区别就在这个条件——批量删除路径
+ * 逐条调用它（由 service 直连归位）。</p>
+ */
     public int softDeleteIfActive(String id, OffsetDateTime now) {
         return knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
                 .eq(Knowledge::getId, id)
@@ -347,7 +347,7 @@ public class KnowledgeRepository {
                 .set(Knowledge::getDeletedAt, now));
     }
 
-    /** 批量置 {@code parse_status='deleting'} 并推 updated_at（清空知识库用，B263㉑）。 */
+    /** 批量置 {@code parse_status='deleting'} 并推 updated_at（清空知识库用）。 */
     public int setParseStatusDeleting(List<String> ids, OffsetDateTime now) {
         return knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
                 .in(Knowledge::getId, ids)
@@ -356,9 +356,9 @@ public class KnowledgeRepository {
     }
 
     /**
-     * 状态列更新（worker 用）：{@code errorMessage} / {@code enable} 为 {@code null} 表示**不更新该列**；
-     * {@code enable} 非空时同时写 {@code enable_status} 与 {@code processed_at}（B263㉑ 由 service 直连归位，条件语义逐字保留）。
-     */
+ * 状态列更新（worker 用）：{@code errorMessage} / {@code enable} 为 {@code null} 表示**不更新该列**；
+ * {@code enable} 非空时同时写 {@code enable_status} 与 {@code processed_at}（由 service 直连归位，条件语义逐字保留）。
+ */
     public int updateStatusColumns(String id, String parseStatus, String errorMessage, Boolean enable,
                                    OffsetDateTime now) {
         LambdaUpdateWrapper<Knowledge> uw = new LambdaUpdateWrapper<Knowledge>()
@@ -375,7 +375,7 @@ public class KnowledgeRepository {
         return knowledgeMapper.update(null, uw);
     }
 
-    /** 只写 {@code summary_status}（pending/failed 等；B263㉒ 由 service 直连归位）。 */
+    /** 只写 {@code summary_status}（pending/failed 等；由 service 直连归位）。 */
     public int setSummaryStatus(String id, String summaryStatus) {
         return knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
                 .eq(Knowledge::getId, id)
@@ -383,9 +383,9 @@ public class KnowledgeRepository {
     }
 
     /**
-     * 搬行到目标 KB：改 {@code knowledge_base_id} + 落终态 completed + 清 error_message + 推 updated_at
-     * （原样搬 {@code reuse_vectors} 分支的直连语句，B263㉓）。
-     */
+ * 搬行到目标 KB：改 {@code knowledge_base_id} + 落终态 completed + 清 error_message + 推 updated_at
+ * （原样搬 {@code reuse_vectors} 分支的直连语句）。
+ */
     public int moveRowToKnowledgeBase(String id, String targetKbId, OffsetDateTime now) {
         return knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
                 .eq(Knowledge::getId, id)
@@ -396,8 +396,8 @@ public class KnowledgeRepository {
     }
 
     /**
-     * 搬行到目标 KB 的**待解析态**（{@code reparse} 模式：改 KB/嵌入模型 + pending + disabled + 清描述/时间/容量，B263㉓）。
-     */
+ * 搬行到目标 KB 的**待解析态**（{@code reparse} 模式：改 KB/嵌入模型 + pending + disabled + 清描述/时间/容量）。
+ */
     public int resetRowForReparseInKnowledgeBase(String id, String targetKbId, String embeddingModelId,
                                                  OffsetDateTime now) {
         return knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
@@ -414,9 +414,9 @@ public class KnowledgeRepository {
     }
 
     /**
-     * 子任务收尾：原子递减 {@code pending_subtasks_count} 并**钳在零**（{@code > 0} 才减），
-     * 返回影响行数（0 = 已经是零）。B263㉗ 由 wiki finalize 适配器直连语句原样搬入。
-     */
+ * 子任务收尾：原子递减 {@code pending_subtasks_count} 并**钳在零**（{@code > 0} 才减），
+ * 返回影响行数（0 = 已经是零）。 由 wiki finalize 适配器直连语句原样搬入。
+ */
     public int decrementPendingSubtasks(String id, OffsetDateTime now) {
         return knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
                 .eq(Knowledge::getId, id)
@@ -426,9 +426,9 @@ public class KnowledgeRepository {
     }
 
     /**
-     * 带守卫的晋升：仅当 {@code parse_status = finalizing} 且 {@code pending_subtasks_count = 0}
-     * 时置 completed（清 error、写 processed_at）。返回影响行数（0 = 未满足条件）。B263㉗ 搬入。
-     */
+ * 带守卫的晋升：仅当 {@code parse_status = finalizing} 且 {@code pending_subtasks_count = 0}
+ * 时置 completed（清 error、写 processed_at）。返回影响行数（0 = 未满足条件）。 搬入。
+ */
     public int promoteFinalizingToCompleted(String id, OffsetDateTime now) {
         return knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
                 .eq(Knowledge::getId, id)
@@ -440,7 +440,7 @@ public class KnowledgeRepository {
                 .set(Knowledge::getUpdatedAt, now));
     }
 
-    /** CAS：{@code pending → processing}（被抢/取消则 0 行）。B263㉘ 由 worker 直连搬入。 */
+    /** CAS：{@code pending → processing}（被抢/取消则 0 行）。 由 worker 直连搬入。 */
     public int casPendingToProcessing(String id, OffsetDateTime now) {
         return knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
                 .eq(Knowledge::getId, id)
@@ -449,7 +449,7 @@ public class KnowledgeRepository {
                 .set(Knowledge::getUpdatedAt, now));
     }
 
-    /** 写 {@code summary_status} 并推 updated_at（B263㉘；无 updated_at 的旧重载见 {@link #setSummaryStatus(String, String)}）。 */
+    /** 写 {@code summary_status} 并推 updated_at（无 updated_at 的旧重载见 {@link #setSummaryStatus(String, String)}）。 */
     public int setSummaryStatus(String id, String summaryStatus, OffsetDateTime now) {
         return knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
                 .eq(Knowledge::getId, id)
@@ -457,7 +457,7 @@ public class KnowledgeRepository {
                 .set(Knowledge::getUpdatedAt, now));
     }
 
-    /** 索引完成的无条件推进：{@code enable_status=enabled} + {@code processed_at} + updated_at（B263㉘）。 */
+    /** 索引完成的无条件推进：{@code enable_status=enabled} + {@code processed_at} + updated_at。 */
     public int markIndexedEnabled(String id, OffsetDateTime now) {
         return knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
                 .eq(Knowledge::getId, id)
@@ -466,7 +466,7 @@ public class KnowledgeRepository {
                 .set(Knowledge::getUpdatedAt, now));
     }
 
-    /** CAS：{@code processing → finalizing} 并写子任务计数（0 行 = 行已被 cancel/delete 抢走）。B263㉘。 */
+    /** CAS：{@code processing → finalizing} 并写子任务计数（0 行 = 行已被 cancel/delete 抢走）。。 */
     public int promoteToFinalizing(String id, int pendingSubtasks, OffsetDateTime now) {
         return knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
                 .eq(Knowledge::getId, id)
@@ -477,10 +477,10 @@ public class KnowledgeRepository {
     }
 
     /**
-     * K4 CAS：只有仍由本次尝试占用的行（{@code processing}/{@code finalizing}）才许翻终态 completed
-     * （顺带 enabled + processed_at + updated_at）；{@code resetSummaryStatus} 为真时额外写
-     * {@code summary_status=none}（仅当 KB 配了 summary model）。返回影响行数（0 = 不归本次所有）。B263㉘。
-     */
+ * K4 CAS：只有仍由本次尝试占用的行（{@code processing}/{@code finalizing}）才许翻终态 completed
+ * （顺带 enabled + processed_at + updated_at）；{@code resetSummaryStatus} 为真时额外写
+ * {@code summary_status=none}（仅当 KB 配了 summary model）。返回影响行数（0 = 不归本次所有）。。
+ */
     public int completeIfOwned(String id, boolean resetSummaryStatus, OffsetDateTime now) {
         LambdaUpdateWrapper<Knowledge> uw = new LambdaUpdateWrapper<Knowledge>()
                 .eq(Knowledge::getId, id)
@@ -495,7 +495,7 @@ public class KnowledgeRepository {
         return knowledgeMapper.update(null, uw);
     }
 
-    /** K4 CAS：只有仍 {@code processing} 的行才许翻 failed 并写 error_message。返回影响行数。B263㉘。 */
+    /** K4 CAS：只有仍 {@code processing} 的行才许翻 failed 并写 error_message。返回影响行数。。 */
     public int failIfProcessing(String id, String errorMessage, OffsetDateTime now) {
         return knowledgeMapper.update(null, new LambdaUpdateWrapper<Knowledge>()
                 .eq(Knowledge::getId, id)

@@ -6,7 +6,7 @@ import com.ragagent.knowledge.mapper.StorageBackendMapper;
 import org.springframework.stereotype.Component;
 
 /**
- * storage_backend 行级读写（B263⑫：由 {@code service.KnowledgeBaseService} 的直连
+ * storage_backend 行级读写（由 {@code service.KnowledgeBaseService} 的直连
  * storageBackendMapper 抽出）。契约同上（只做数据访问）。
  *
  * <p>**命名注意**：{@code storage} 域已有一个同名 {@code StorageBackendRepository}

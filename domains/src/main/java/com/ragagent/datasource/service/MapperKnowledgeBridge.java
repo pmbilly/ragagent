@@ -193,16 +193,16 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
     }
 
     /**
-     * URL 写入：**同步抓取后与文件同形**（B238）。
-     *
-     * <p>历史缺口：原实现只写 {@code source=url} + {@code filePath=""} 就入队，指望处理队列
-     * 下载——但 worker 对非 manual 只读 {@code filePath}，空路径必被存储层拒绝（这条链是死的）。
-     * 现在：SSRF 校验 → 抓取（{@link UrlBytesFetcher}，含大小上限）→ 与
-     * {@link #createFromFile} 同一条落行闭环（hash / 落 Storage / 入队），行形态与普通文件一致。</p>
-     *
-     * <p>⚠️ <b>返回的行没有 datasource 的 metadata</b>——调用方在"新建"
-     * 分支上再补一次（重复分支复用已有行，不该被重新打标）。</p>
-     */
+ * URL 写入：**同步抓取后与文件同形**。
+ *
+ * <p>历史缺口：原实现只写 {@code source=url} + {@code filePath=""} 就入队，指望处理队列
+ * 下载——但 worker 对非 manual 只读 {@code filePath}，空路径必被存储层拒绝（这条链是死的）。
+ * 现在：SSRF 校验 → 抓取（{@link UrlBytesFetcher}，含大小上限）→ 与
+ * {@link #createFromFile} 同一条落行闭环（hash / 落 Storage / 入队），行形态与普通文件一致。</p>
+ *
+ * <p>⚠️ <b>返回的行没有 datasource 的 metadata</b>——调用方在"新建"
+ * 分支上再补一次（重复分支复用已有行，不该被重新打标）。</p>
+ */
     @Override
     public Knowledge createFromUrl(long tenantId, String kbId, String url, String fileName,
                                    String title, List<String> tagIds, String channel) {
@@ -380,7 +380,7 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
 
     /**
      * 从 URL 提取文件名（去 query 串、取最后一段；空则 {@code "download"}）。
-     */    /** B263⑧：与 {@code knowledge.support.KnowledgePaths} 逐字等价，改为委托（§9.2 单一实现）。 */
+     */    /** 与 {@code knowledge.support.KnowledgePaths} 逐字等价，改为委托（§9.2 单一实现）。 */
     static String extractFileNameFromUrl(String url) {
         return KnowledgePaths.extractFileNameFromUrl(url);
     }

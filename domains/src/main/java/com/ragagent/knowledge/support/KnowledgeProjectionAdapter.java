@@ -13,8 +13,8 @@ import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeTag;
 
 /**
- * knowledge 实体 → L1/线格式载荷的**域内公用投影**（B263⑦：由 {@code service.KnowledgeService}
- * 的静态助手抽出；与 B263② 的 {@link ChunkProjectionAdapter} 同一条思路——"实体 → 载荷"的
+ * knowledge 实体 → L1/线格式载荷的**域内公用投影**（由 {@code service.KnowledgeService}
+ * 的静态助手抽出；与 的 {@link ChunkProjectionAdapter} 同一条思路——"实体 → 载荷"的
  * 映射只留一份，跨面复用不漂移）。
  *
  * <p>含：{@code factsOf(List<Knowledge>)} / {@code factsOf(Knowledge)}（→ {@link KnowledgeDocumentFacts}）、
@@ -23,7 +23,7 @@ import com.ragagent.knowledge.domain.KnowledgeTag;
  */
 public final class KnowledgeProjectionAdapter {
 
-    /** 与全局 Jackson 配置同式（B263⑦：随 {@code tagView} 一起从 KnowledgeService 抽出）。 */
+    /** 与全局 Jackson 配置同式（随 {@code tagView} 一起从 KnowledgeService 抽出）。 */
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     private KnowledgeProjectionAdapter() {

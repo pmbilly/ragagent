@@ -7,6 +7,6 @@
  *
  * <p>**边界**：这里是引擎侧框架，**不含**按业务能力分族的工具实现（那些在
  * {@code com.ragagent.agenttools}）。方向固定 **实现面 → 本面**，反向由
- * {@code ArchitectureRulesTest}「B260」零容忍守卫（B260 由 {@code agenttools} 迁入）。</p>
+ * {@code ArchitectureRulesTest}零容忍守卫（由 {@code agenttools} 迁入）。</p>
  */
 package com.ragagent.agent.tool;

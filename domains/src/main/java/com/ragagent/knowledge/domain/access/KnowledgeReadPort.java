@@ -5,7 +5,7 @@ import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 
 /**
- * 访问守卫所需的**最小知识读取面**（B263③）。
+ * 访问守卫所需的**最小知识读取面**。
  *
  * <p>原先三个守卫（{@code FaqGuard} / {@code KnowledgeAccessGuard} / {@code KnowledgeRouteGuards}）
  * 直接持有整个 {@code KnowledgeService}（796 行的枢纽）——这构成 knowledge SCC 的一条真实成环边

@@ -85,7 +85,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
 
     /** duplicate 的配置克隆用：知识实体带 OffsetDateTime，往返 mapper 必须挂 JSR310（本仓约定 步 3 教训）。 */
 
-    /** 5 个 canonical 阶段名（B263㉜ 委任 {@link KnowledgeProcessingSpan#ALL_STAGES}，公共常量不变）。 */
+    /** 5 个 canonical 阶段名（委任 {@link KnowledgeProcessingSpan#ALL_STAGES}，公共常量不变）。 */
     public static final List<String> ALL_STAGES = KnowledgeProcessingSpan.ALL_STAGES;
 
     private final KnowledgeRepository knowledgeRepository;
@@ -143,9 +143,9 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
     }
 
     /**
-     * 同包开放的历史入口：B263㉝ 起**委任** {@link KnowledgeTenants#tenantId()}（实现已上移到 domain，
-     * 供不再依赖门面的子服务复用）。
-     */
+ * 同包开放的历史入口： 起**委任**{@link KnowledgeTenants#tenantId}（实现已上移到 domain，
+ * 供不再依赖门面的子服务复用）。
+ */
     static long tenantId() {
         return KnowledgeTenants.tenantId();
     }

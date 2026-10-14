@@ -33,7 +33,7 @@ public final class AgentSuggestedQuestions {
 
     private final CustomAgentService agents;
     private final AgentQuestionMapper questionMapper;
-    /** B264②：KB 目录走公开端口（原经 {@code agents.kbService()} 直连 knowledge.service）。 */
+    /** KB 目录走公开端口（原经 {@code agents.kbService} 直连 knowledge.service）。 */
     private final KnowledgeBaseCatalogPort kbCatalog;
 
     AgentSuggestedQuestions(CustomAgentService agents, AgentQuestionMapper questionMapper,

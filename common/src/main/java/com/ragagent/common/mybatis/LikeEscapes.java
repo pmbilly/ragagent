@@ -4,7 +4,7 @@ package com.ragagent.common.mybatis;
  * SQL {@code LIKE} 参数转义：把 {@code \} {@code %} {@code _} 变成字面量（PG 的 LIKE 默认
  * {@code ESCAPE} 就是反斜杠，故拼 {@code "%" + escape(kw) + "%"} 后 {@code %} 不再退化成"匹配一切"）。
  *
- * <p><b>为什么集中到一处</b>（B263㉚）：此前本仓库有**三份逐字相同**的私有实现——
+ * <p><b>为什么集中到一处</b>：此前本仓库有**三份逐字相同**的私有实现——
  * {@code auth/service/TenantService}、{@code session/repository/SessionRepository}
  * （并被 {@code session/repository/MessageRepository} 借用）、{@code knowledge/repository/KnowledgeRepository}
  * （由检索查询搬入）。三份完全一样却各自演化，属"同一政策多副本"的经典坏味道 ⇒ 合一，

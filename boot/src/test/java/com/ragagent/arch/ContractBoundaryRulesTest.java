@@ -15,7 +15,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * B258（方案 §12.2 头两条）：**契约面纯度** + **跨域边界** + **当前模块布局的 DAG 方向**。
+ *（方案 §12.2 头两条）：**契约面纯度**+ **跨域边界**+ **当前模块布局的 DAG 方向**。
  *
  * <p>为什么单开一个类：`ArchitectureRulesTest` 已 1000+ 行（大文件棘轮盯的是主源码，但规则
  * 文件也不该无限膨胀）；这三条规则与 contracts 面同批引入，单独成篇便于演进。</p>
@@ -153,11 +153,11 @@ class ContractBoundaryRulesTest {
     }
 
     /**
-     * R4 · 平台面（B259 起收纳 `com.ragagent.platform`）不得依赖业务域与三个 runtime 的实现。
-     *
-     * <p>§8 的 DAG：`platform → contracts`。平台放的是事件/流/任务/HTTP/持久化助手/文本与解析
-     * 等**技术底座**；一旦它反向依赖业务域或 runtime，模块提取与"顶层不依赖具体实现"就同时破产。</p>
-     */
+ * R4 · 平台面（起收纳 `com.ragagent.platform`）不得依赖业务域与三个 runtime 的实现。
+ *
+ * <p>§8 的 DAG：`platform → contracts`。平台放的是事件/流/任务/HTTP/持久化助手/文本与解析
+ * 等**技术底座**；一旦它反向依赖业务域或 runtime，模块提取与"顶层不依赖具体实现"就同时破产。</p>
+ */
     @Test
     @DisplayName("B259-R4：platform 面不得依赖业务域与 runtime 实现")
     void platformFaceStaysBelowBusiness() {
@@ -178,11 +178,11 @@ class ContractBoundaryRulesTest {
 
     /** 三个 runtime 的实现包面（含 engine 模块内与领域侧同名包）。 */
     /**
-     * B261（§8.4）：检索面（`:engine` 的 `com.ragagent.retrieval..`）属运行时底座的一部分，
-     * 只依赖 contracts / platform / common 与自身。反向依赖业务域或工具实现面，会让检索与业务
-     * 编排再次互相缠绕——B261 之前 `GrepChunksScoring` 借用工具侧 `FaqSnippet`、`GrepChunkView`
-     * 藏在工具类里，就是这么缠起来的（前者已归位 {@code SearchTextUtil}）。
-     */
+ * 检索面（`:engine` 的 `com.ragagent.retrieval..`）属运行时底座的一部分，
+ * 只依赖 contracts / platform / common 与自身。反向依赖业务域或工具实现面，会让检索与业务
+ * 编排再次互相缠绕—— 之前 `GrepChunksScoring` 借用工具侧 `FaqSnippet`、`GrepChunkView`
+ * 藏在工具类里，就是这么缠起来的（前者已归位 {@code SearchTextUtil}）。
+ */
     @Test
     @DisplayName("B261：retrieval 面不得依赖业务域与工具实现面（零容忍）")
     void retrievalFaceStaysBelowBusiness() {
@@ -203,12 +203,12 @@ class ContractBoundaryRulesTest {
     }
 
     /**
-     * B262（§8.5）：模型运行时面（`com.ragagent.modelruntime..`，本批由 `llm.chat` 落位）
-     * 只管模型调用/provider/流生命周期——不得依赖业务域或工具实现面。
-     *
-     * <p>同 B261：`:engine` 看不见 `:domains`，"反向依赖"会直接编译不过；本规则的职责是
-     * 把"已经证明不存在"的方向**锁死**，防止日后把域/工具类型塞进 provider 适配。</p>
-     */
+ * 模型运行时面（`com.ragagent.modelruntime..`，本批由 `llm.chat` 落位）
+ * 只管模型调用/provider/流生命周期——不得依赖业务域或工具实现面。
+ *
+ * <p>同 `:engine` 看不见 `:domains`，"反向依赖"会直接编译不过；本规则的职责是
+ * 把"已经证明不存在"的方向**锁死**，防止日后把域/工具类型塞进 provider 适配。</p>
+ */
     @Test
     @DisplayName("B262：modelruntime 面不得依赖业务域与工具实现面（零容忍）")
     void modelRuntimeFaceStaysBelowBusiness() {
@@ -243,7 +243,7 @@ class ContractBoundaryRulesTest {
         return parts.length >= 3 ? parts[2] : packageName;
     }
 
-    /** `:common` 侧的包面（B258 起含契约面）。 */
+    /** `:common` 侧的包面（起含契约面）。 */
     private static boolean isCommonSide(String packageName) {
         return packageName.startsWith("com.ragagent.contract")
                 || packageName.startsWith("com.ragagent.platform")

@@ -73,7 +73,7 @@ class QaTurnFinalizerCommitGateTest {
         verify(messageService, times(2)).completeMessageOnce(any());
         verify(messageService, times(1)).updateMessage(any());
         verify(memoryExtraction, times(1)).scheduleExtraction(anyString(), anyString(), anyString());
-        // 建议生成也跑在虚拟线程上：必须等待（轮询断言），否则是竞态假红（B250 闸门实测抓到）
+        // 建议生成也跑在虚拟线程上：必须等待（轮询断言），否则是竞态假红（闸门实测抓到）
         verify(suggestionService, timeout(5_000).times(1))
                 .ensureFollowUps(anyString(), anyString(), anyBoolean());
     }

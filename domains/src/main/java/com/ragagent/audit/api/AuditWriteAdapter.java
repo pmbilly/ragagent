@@ -8,7 +8,7 @@ import com.ragagent.common.web.JsonMappers;
 import org.springframework.stereotype.Component;
 
 /**
- * {@link AuditWritePort} 的 audit 侧实现（B264③）：记录 → {@code AuditLog} 实体 →
+ * {@link AuditWritePort} 的 audit 侧实现：记录 → {@code AuditLog} 实体 →
  * {@code AuditLogService#logBestEffort}（尽力而为）。
  *
  * <p>详情以 JSON 字符串过端口（调用方本就以 Jackson 构造 details），此处解析回 {@code JsonNode}；

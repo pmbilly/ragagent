@@ -78,13 +78,13 @@ public class KnowledgeTagService {
     /** 引擎路径删除需要的维度解析（照 deleteKnowledgeVectors 的取数口径）。 */
     private final ModelRuntimeFactory modelRuntimeFactory;
     /**
-     * 标签下文档的批量删除：直接依赖**真正的实现者** {@code KnowledgeBatchOpsService}。
-     *
-     * <p>B263㊲：原为 {@code ObjectProvider<KnowledgeService>}（注释自称"延迟解析规避潜在装配环"），
-     * 实测是**残留的绕环手法**——它只用门面一个方法 {@code batchDeleteKnowledge}，而门面里那方法是
-     * **纯转派**给 {@code KnowledgeBatchOpsService}，且门面**并不依赖本类**（无环可绕）。
-     * 去掉 Provider 后本类对门面的代码边消失，门面归位（`service.management`）才不再被钉住。</p>
-     */
+ * 标签下文档的批量删除：直接依赖**真正的实现者**{@code KnowledgeBatchOpsService}。
+ *
+ * <p> 原为 {@code ObjectProvider<KnowledgeService>}（注释自称"延迟解析规避潜在装配环"），
+ * 实测是**残留的绕环手法**——它只用门面一个方法 {@code batchDeleteKnowledge}，而门面里那方法是
+ * **纯转派**给 {@code KnowledgeBatchOpsService}，且门面**并不依赖本类**（无环可绕）。
+ * 去掉 Provider 后本类对门面的代码边消失，门面归位（`service.management`）才不再被钉住。</p>
+ */
     private final KnowledgeBatchOpsService batchOpsService;
 
     private static final int INDEX_DELETE_BATCH_SIZE = 100;

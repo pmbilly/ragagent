@@ -9,7 +9,7 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 /**
- * {@link UserLookupPort} 的 auth 侧实现（B264③）：委托 {@code UserService#getUsersByIds}
+ * {@link UserLookupPort} 的 auth 侧实现：委托 {@code UserService#getUsersByIds}
  * （租户范围与空集合短路语义在服务内逐字保留），只投影展示字段。</p>
  */
 @Component

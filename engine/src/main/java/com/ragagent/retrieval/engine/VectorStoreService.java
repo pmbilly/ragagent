@@ -53,7 +53,7 @@ public class VectorStoreService {
      * （{@link #deleteByChunkId} / {@link #deleteByKnowledgeId} / {@link #deleteBySourceId}），
      */
     public void saveIndexRows(List<IndexRow> rows, List<float[]> vectors) {
-        // K10b（B248 登记）：按位置配行的最后一道闸——错位/少条到此为止，不静默写错行。
+        // K10b（登记）：按位置配行的最后一道闸——错位/少条到此为止，不静默写错行。
         if (rows == null || vectors == null || rows.size() != vectors.size()) {
             throw new IllegalStateException("index rows/vectors size mismatch: rows="
                     + (rows == null ? "null" : rows.size()) + " vectors="

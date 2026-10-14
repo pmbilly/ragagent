@@ -10,7 +10,7 @@ import com.ragagent.knowledge.domain.Chunk;
 /**
  * chunk 实体 → L1 载荷（{@link ChunkFacts} / {@link ChunkView}）的**域内公用投影**。
  *
- * <p>B263② 由 {@code com.ragagent.knowledge.api.ChunkPortAdapter} 的静态助手抽到本层（`support/`）：它被
+ * <p> 由 {@code com.ragagent.knowledge.api.ChunkPortAdapter} 的静态助手抽到本层（`support/`）：它被
  * `repository`（{@code ChunkRepository}）、`service`、`session`、`chatpipeline`、`agenttools`
  * 与测试夹具共用；留在适配器类里会让 **repository 反向依赖 service**（knowledge 四节点 SCC
  * 的一条真实成环边），落 `service.process` 则会把 `service.process` 也拖进环。放环外的

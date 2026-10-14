@@ -1,9 +1,9 @@
 package com.ragagent.knowledge.domain;
 
 /**
- * 分块抽取对"JSON 载荷消费者"的端口（B263㉛ 依赖反转）。
+ * 分块抽取对"JSON 载荷消费者"的端口（依赖反转）。
  *
- * <p><b>为什么要有它</b>：`RedisChunkExtractTaskQueue` / `InProcessChunkExtractTaskQueue` 与装配类 `KnowledgeRedisWiring` 原先**直接持有** {@code service.ChunkExtractService} ⇒ 形成
+ * <p><b>为什么要有它</b>：`RedisChunkExtractTaskQueue` / `InProcessChunkExtractTaskQueue` 与装配类 `KnowledgeRedisWiring` 原先**直接持有**{@code service.ChunkExtractService} ⇒ 形成
  * {@code task → service} 边，与既有的 {@code service → task}（{@code KnowledgeProcessingQueue} 等）合成
  * 一对**包级环**。反转后队列只认本端口，{@code ChunkExtractService} {@code implements} 之 ⇒ 方向固定为
  * {@code service → task}（单向），环随之消解；方法签名与原调用 {@code service.handleJson(body, finalAttempt)}

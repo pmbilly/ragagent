@@ -362,11 +362,11 @@ public class ChunkVectorIndexer {
     }
 
     /**
-     * 解析批量向量化批大小（空/null → 5；非法值 → {@code IllegalStateException}）。
-     *
-     * <p>B263⑥：本类由 `service/` 归位 `index/` 后，{@code service.FaqIndexWriter} 仍需要同一份
-     * 解析语义 ⇒ 提为 public（纯静态解析，无状态；两处调用共用一份规则，不复制）。</p>
-     */
+ * 解析批量向量化批大小（空/null → 5；非法值 → {@code IllegalStateException}）。
+ *
+ * <p> 本类由 `service/` 归位 `index/` 后，{@code service.FaqIndexWriter} 仍需要同一份
+ * 解析语义 ⇒ 提为 public（纯静态解析，无状态；两处调用共用一份规则，不复制）。</p>
+ */
     public static int embedBatchSize(String raw) {
         String env = raw;
         if (env == null || env.isEmpty()) {

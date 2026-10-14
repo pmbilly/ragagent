@@ -560,7 +560,7 @@ class ArchitectureRulesTest {
                 .because("依赖方向必须 controller → service → repository/mapper；"
                         + "service 回头引用 controller 即分层倒挂")
                 .check(MAIN);
-        // `..domain.access..`（B263 落位，方案 §8.8.2）：**访问守卫**面——`ChunkAccessGuard` /
+        // `..domain.access..`（落位，方案 §8.8.2）：**访问守卫**面——`ChunkAccessGuard` /
         // `FaqGuard` / `KnowledgeAccessGuard` 的职责就是"代表域校验访问"，必须查 service 侧状态；
         // 它是守卫/适配面而非数据模型，故从本规则的域模型面中排除（其余 `..domain..` 不变）。
         noClasses().that().resideInAPackage("..domain..")
@@ -998,17 +998,17 @@ class ArchitectureRulesTest {
         ratchet("A18 运行态公共可变字段", RUNTIME_PUBLIC_FIELD_BASELINE, actual);
     }
 
-    // ── B257 工具/管理适配包不得直连业务域 service/mapper ───────────────────
+    // ── 工具/管理适配包不得直连业务域 service/mapper ───────────────────
 
     /**
-     * B257（§7.3）：`agenttools` / `agentmanagement` 是 domains 侧对 Agent 的**适配包**
-     * （工具实现 / Agent 定义管理），只能依赖 contracts/platform 与各域**公开用例**；
-     * 直接 import 业务域的 `service` / `mapper` 会绕过域边界，把域内部结构（事务边界、
-     * 持久层）纳入 Agent 面——这正是阶段 6 要消除的一类耦合。
-     *
-     * <p>域清单**显式列举**（单段域包的 service/mapper）：不用 `com.ragagent.*.service..`
-     * 通配——那会把适配包**自己的** `agentmanagement.service/mapper` 也算成违规（假阳性）。</p>
-     */
+ * `agenttools` / `agentmanagement` 是 domains 侧对 Agent 的**适配包**
+ * （工具实现 / Agent 定义管理），只能依赖 contracts/platform 与各域**公开用例**；
+ * 直接 import 业务域的 `service` / `mapper` 会绕过域边界，把域内部结构（事务边界、
+ * 持久层）纳入 Agent 面——这正是阶段 6 要消除的一类耦合。
+ *
+ * <p>域清单**显式列举**（单段域包的 service/mapper）：不用 `com.ragagent.*.service..`
+ * 通配——那会把适配包**自己的**`agentmanagement.service/mapper` 也算成违规（假阳性）。</p>
+ */
     private static final String[] FORBIDDEN_DOMAIN_PACKAGES = {
             "session", "knowledge", "wiki", "memory", "datasource", "model", "im", "storage",
             "websearch", "vectorstore", "settings", "auth", "mcp", "audit", "approval",
@@ -1016,14 +1016,14 @@ class ArchitectureRulesTest {
     };
 
     /**
-     * B257 基线：**已于 B264③ 清零**（零容忍——新增即红）。
-     *
-     * <p>清零路径（都走"`common/&lt;域&gt;/XxxPort` + 该域 `api/` 适配器"）：`SkillCatalogController`
-     * 的 audit 直连 → {@code common.audit.AuditWritePort}；`CustomAgentService` 的 knowledge 直连
-     * → {@code common.knowledge.KnowledgeBaseCatalogPort}（B264②）、auth 直连
-     * → {@code common.auth.UserLookupPort}；`AgentSuggestedQuestions` 的条目经复核为**过期**（它只依赖
-     * {@code knowledge.domain}，规则本就不禁）已删。</p>
-     */
+ * 基线：**已于 清零**（零容忍——新增即红）。
+ *
+ * <p>清零路径（都走"`common/&lt;域&gt;/XxxPort` + 该域 `api/` 适配器"）：`SkillCatalogController`
+ * 的 audit 直连 → {@code common.audit.AuditWritePort}；`CustomAgentService` 的 knowledge 直连
+ * → {@code common.knowledge.KnowledgeBaseCatalogPort}、auth 直连
+ * → {@code common.auth.UserLookupPort}；`AgentSuggestedQuestions` 的条目经复核为**过期**（它只依赖
+ * {@code knowledge.domain}，规则本就不禁）已删。</p>
+ */
     private static final Set<String> AGENT_ADAPTER_DOMAIN_SERVICE_BASELINE = Set.of();
 
     @Test
@@ -1045,18 +1045,18 @@ class ArchitectureRulesTest {
         ratchet("B257 适配包→域 service/mapper", AGENT_ADAPTER_DOMAIN_SERVICE_BASELINE, actual);
     }
 
-    // ── B260 运行面不得依赖工具实现面 ────────────────────────────────────────
+    // ── 运行面不得依赖工具实现面 ────────────────────────────────────────
 
     /**
-     * B260（§8.3 / §7.3）：工具**框架**（{@code AgentTool} / {@code BaseTool} / {@code ToolDefinitions} /
-     * {@code ToolRegistry} / 执行上下文与预算 / 参数校验 / 输出持久化 / 流式修正 —— 现落
-     * {@code com.ragagent.agent.tool*}）属 **Agent 运行面**；工具**实现**（按能力分族的业务工具 ——
-     * {@code com.ragagent.agenttools}）属 **适配面**。
-     *
-     * <p>运行面反向依赖实现面，等于把"引擎 → 具体工具"写成硬编码依赖：引擎只该看框架与注册表，
-     * 具体工具经注册/契约进入。B260 已把基础设施由 {@code agenttools} 迁入 {@code agent.tool*}，
-     * 本规则把该方向**锁死**（基线 0 = 零容忍：运行面新增任何一条 {@code agenttools} import 即越界）。</p>
-     */
+ * 工具**框架**（{@code AgentTool} / {@code BaseTool} / {@code ToolDefinitions} /
+ * {@code ToolRegistry} / 执行上下文与预算 / 参数校验 / 输出持久化 / 流式修正 —— 现落
+ * {@code com.ragagent.agent.tool*}）属 **Agent 运行面**；工具**实现**（按能力分族的业务工具 ——
+ * {@code com.ragagent.agenttools}）属 **适配面**。
+ *
+ * <p>运行面反向依赖实现面，等于把"引擎 → 具体工具"写成硬编码依赖：引擎只该看框架与注册表，
+ * 具体工具经注册/契约进入。 已把基础设施由 {@code agenttools} 迁入 {@code agent.tool*}，
+ * 本规则把该方向**锁死**（基线 0 = 零容忍：运行面新增任何一条 {@code agenttools} import 即越界）。</p>
+ */
     @Test
     @DisplayName("B260：Agent 运行面不得依赖工具实现面（agent → agenttools = 0）")
     void agentRuntimeDoesNotDependOnToolImplementations() {
