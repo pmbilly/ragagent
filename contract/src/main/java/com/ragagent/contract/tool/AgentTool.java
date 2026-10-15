@@ -1,7 +1,5 @@
-package com.ragagent.common.agent.tool;
+package com.ragagent.contract.tool;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.contract.tool.ToolResult;
 
 /**
  * Agent 工具接口。
@@ -21,8 +19,11 @@ public interface AgentTool {
     /** 给模型看的描述。 */
     String getDescription();
 
-    /** 参数 JSON Schema。 */
-    JsonNode getParameters();
+    /**
+     * 参数 JSON Schema（**纯 JDK 值**：对象→{@code Map}、数组→{@code List}；
+     * 需按 JSON 树读时用 {@code JsonMappers.toJsonNode(...)} 归一）。
+     */
+    Object getParameters();
 
     /** 执行工具。 */
     ToolResult execute(ToolRequest request);

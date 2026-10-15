@@ -17,10 +17,11 @@ import com.ragagent.retrieval.domain.WebSearchFilters;
 import com.ragagent.retrieval.domain.WebSearchResult;
 import com.ragagent.common.agent.tool.BaseTool;
 import com.ragagent.contract.tool.ToolDefinitions;
-import com.ragagent.common.agent.tool.ToolOutput;
-import com.ragagent.common.agent.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolOutput;
+import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.contract.tenant.WebSearchConfig;
 import com.ragagent.retrieval.domain.WebSearchRequest;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * web_search 工具。
@@ -139,7 +140,7 @@ public class WebSearchTool extends BaseTool {
     public ToolResult execute(ToolRequest request) {
         SearchInput input;
         try {
-            input = parseInput(request.args());
+            input = parseInput(JsonMappers.toJsonNode(request.args()));
         } catch (RuntimeException e) {
             return fail("Failed to parse args: " + e.getMessage());
         }

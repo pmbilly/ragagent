@@ -1,8 +1,7 @@
-package com.ragagent.common.agent.tool;
+package com.ragagent.contract.tool;
 
-import com.ragagent.contract.tool.ToolCancellation;
 
-import com.ragagent.platform.event.EventBus;
+import com.ragagent.contract.event.EventBusInterface;
 
 /**
  * Agent 工具执行时挂载的每次调用元数据。
@@ -12,7 +11,7 @@ import com.ragagent.platform.event.EventBus;
  * {@code request.execMeta()}（无值时 null）。</p>
  *
  * <p>审批等待真正需要的是"不带默认工具超时的取消源"，表达为
- * {@link #approvalCancellation}；null 时回落到外层取消源。
+ * {@code #approvalCancellation}；null 时回落到外层取消源。
  * {@code execTimeoutMillis} 为 0 表示"回落到 60s"。</p>
  */
 public record ToolExecContext(
@@ -21,7 +20,7 @@ public record ToolExecContext(
         String requestId,
         String toolCallId,
         String userId,
-        EventBus eventBus,
+        EventBusInterface eventBus,
         ToolCancellation approvalCancellation,
         long execTimeoutMillis) {
 

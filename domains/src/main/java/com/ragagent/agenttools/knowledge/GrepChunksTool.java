@@ -18,7 +18,8 @@ import com.ragagent.common.agent.tool.BaseTool;
 import com.ragagent.agent.tool.runtime.SearchAuth;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.contract.tool.ToolDefinitions;
-import com.ragagent.common.agent.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolRequest;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * grep_chunks 工具。
@@ -107,7 +108,7 @@ public class GrepChunksTool extends BaseTool {
 
     @Override
     public ToolResult execute(ToolRequest request) {
-        JsonNode args = request.args();
+        JsonNode args = JsonMappers.toJsonNode(request.args());
 
         // 入参只有 "query" 一个字段（历史 schema 的数组形态 queries/patterns/pattern
         // 仅为旧前端兼容别名，不再解析）。

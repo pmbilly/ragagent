@@ -19,8 +19,8 @@ import com.ragagent.webfetch.FetchException;
 import com.ragagent.common.agent.tool.BaseTool;
 import com.ragagent.contract.tool.ToolCancellation;
 import com.ragagent.contract.tool.ToolDefinitions;
-import com.ragagent.common.agent.tool.ToolOutput;
-import com.ragagent.common.agent.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolOutput;
+import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.webfetch.Fetcher;
 
 /**
@@ -147,7 +147,7 @@ public class WebFetchTool extends BaseTool {
 
     @Override
     public ToolResult execute(ToolRequest request) {
-        ParsedItems parsed = parseItems(request.args());
+        ParsedItems parsed = parseItems(JsonMappers.toJsonNode(request.args()));
         if (parsed.error() != null) {
             return fail(parsed.error());
         }

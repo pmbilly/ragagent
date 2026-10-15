@@ -6,7 +6,8 @@ import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.common.agent.tool.BaseTool;
-import com.ragagent.common.agent.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolRequest;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * discover_mcp_tools：暴露授权目录与精确工具定义。描述与来源摘要伴随 direct 工具
@@ -46,7 +47,7 @@ public class McpDiscoverTool extends BaseTool {
         if (authErr != null) {
             return mcpDiscoveryFailure(authErr, "unavailable");
         }
-        JsonNode raw = request.args();
+        JsonNode raw = JsonMappers.toJsonNode(request.args());
         McpCatalog.McpDiscoveryArgs args = parseDiscoveryArgs(raw);
         if (args == null) {
             return mcpDiscoveryFailure("invalid JSON", "error");
@@ -155,7 +156,7 @@ public class McpDiscoverTool extends BaseTool {
                             if (!usage.isEmpty()) {
                                 out.put("usageInstructions", usage);
                             }
-                            out.put("inputSchema", tool.getParameters());
+                            out.put("inputSchema", JsonMappers.toJsonNode(tool.getParameters()));
                             ToolResult result = McpCatalog.mcpJsonResult(out);
                             if (result.getOutput().codePointCount(0, result.getOutput().length())
                                     > McpCatalog.MAX_MCP_DEFINITION_CHARS) {

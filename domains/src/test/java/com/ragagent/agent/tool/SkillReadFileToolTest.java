@@ -14,7 +14,8 @@ import com.ragagent.agent.skills.Manager;
 import com.ragagent.agent.skills.Skill;
 import com.ragagent.agent.skills.SkillSource;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.common.agent.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolRequest;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * {@code read_file}（技能资源）的行为契约。
@@ -118,7 +119,7 @@ class SkillReadFileToolTest {
 
         assertThat(tool.getName()).isEqualTo("read_file");
         // schema 与描述都是发给模型的字节契约：录像逐字
-        assertThat(tool.getParameters().toString())
+        assertThat(JsonMappers.toJsonNode(tool.getParameters()).toString())
                 .isEqualTo("{\"type\":\"object\",\"properties\":{\"path\":{\"type\":\"string\","
                         + "\"description\":\"Workspace path, skill:// resource, or saved web:// page\"},"
                         + "\"lineOffset\":{\"type\":\"integer\",\"description\":\"Web only: character offset within a long line\"},"

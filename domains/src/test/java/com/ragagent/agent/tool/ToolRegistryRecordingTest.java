@@ -17,8 +17,8 @@ import com.ragagent.contract.error.BizException;
 import com.ragagent.agenttools.RecordingSupport;
 import com.ragagent.agenttools.GoRecording45A;
 import com.ragagent.contract.tool.ToolDefinitions;
-import com.ragagent.common.agent.tool.ToolRequest;
-import com.ragagent.common.agent.tool.AgentTool;
+import com.ragagent.contract.tool.ToolRequest;
+import com.ragagent.contract.tool.AgentTool;
 
 /**
  * ToolRegistry 的录制判定（17 条）。覆盖：first-wins 拒绝重名、ListTools/defs 按名排序且

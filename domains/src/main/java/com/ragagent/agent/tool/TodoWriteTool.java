@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.contract.tool.ToolDefinitions;
-import com.ragagent.common.agent.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.common.agent.tool.BaseTool;
 
 /**
@@ -173,7 +173,7 @@ public class TodoWriteTool extends BaseTool {
 
     @Override
     public ToolResult execute(ToolRequest request) {
-        JsonNode args = request.args();
+        JsonNode args = JsonMappers.toJsonNode(request.args());
         String task = args.path("task").asText("");
         List<PlanStep> steps = parseSteps(args.get("steps"));
 

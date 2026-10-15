@@ -8,7 +8,8 @@ import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.common.agent.tool.BaseTool;
 import com.ragagent.agent.tool.runtime.SearchAuth;
 import com.ragagent.contract.tool.ToolDefinitions;
-import com.ragagent.common.agent.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolRequest;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * wiki_read_issue 工具。
@@ -46,7 +47,7 @@ public class WikiReadIssueTool extends BaseTool {
 
     @Override
     public ToolResult execute(ToolRequest request) {
-        JsonNode args = request.args();
+        JsonNode args = JsonMappers.toJsonNode(request.args());
         String issueId = args.path("issueId").asText("").trim();
         String slug = args.path("slug").asText("").trim();
 

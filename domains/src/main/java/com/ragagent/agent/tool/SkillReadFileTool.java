@@ -11,8 +11,9 @@ import com.ragagent.agent.skills.Manager;
 import com.ragagent.agent.skills.Skill;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.contract.tool.ToolDefinitions;
-import com.ragagent.common.agent.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.common.agent.tool.BaseTool;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * {@code read_file}：技能资源读取（无沙箱部署下技能是唯一可读的"文件源"）。
@@ -69,7 +70,7 @@ public class SkillReadFileTool extends BaseTool {
 
     @Override
     public ToolResult execute(ToolRequest request) {
-        JsonNode args = request.args();
+        JsonNode args = JsonMappers.toJsonNode(request.args());
         String path = args == null ? "" : args.path("path").asText("");
         if (args != null && args.path("lineOffset").asInt(0) != 0) {
             // 录像：line_offset 只对保存的 web:// 页面有意义

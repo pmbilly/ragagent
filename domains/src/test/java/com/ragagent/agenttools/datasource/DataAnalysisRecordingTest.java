@@ -29,9 +29,10 @@ import com.ragagent.agenttools.datasource.DataAnalysisTool.KnowledgeFileMaterial
 import com.ragagent.agenttools.datasource.DataAnalysisTool.KnowledgeLoader;
 import com.ragagent.agenttools.datasource.DataAnalysisTool.QueryResult;
 import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.common.agent.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.agenttools.GoRecording45B;
 import com.ragagent.agenttools.RecordingSupport;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * 4.5b 回放：data_analysis 的录制回放。
@@ -401,7 +402,7 @@ class DataAnalysisRecordingTest {
     @Test
     void schemaContract() {
         JsonNode schema = RecordingSupport.readTree(rec("data_analysis_schema").get("schema").asText());
-        assertThat(tool().getParameters()).isEqualTo(schema);
+        assertThat(JsonMappers.toJsonNode(tool().getParameters())).isEqualTo(schema);
     }
 
     @Test

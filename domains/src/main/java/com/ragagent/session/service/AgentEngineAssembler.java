@@ -21,7 +21,7 @@ import com.ragagent.agent.skills.DbSkillSource;
 import com.ragagent.agent.skills.Manager;
 import com.ragagent.agent.skills.Skill;
 import com.ragagent.agent.skills.SkillCatalogService;
-import com.ragagent.common.agent.tool.AgentTool;
+import com.ragagent.contract.tool.AgentTool;
 import com.ragagent.agent.tool.SequentialThinkingTool;
 import com.ragagent.agent.tool.SkillReadFileTool;
 import com.ragagent.agent.tool.TodoWriteTool;

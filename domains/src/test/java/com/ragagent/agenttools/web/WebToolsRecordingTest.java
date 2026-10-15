@@ -15,7 +15,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.retrieval.domain.WebSearchResult;
 import com.ragagent.contract.tool.ToolCancellation;
-import com.ragagent.common.agent.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolRequest;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * web_search / web_fetch 工具钉。
@@ -55,12 +56,12 @@ class WebToolsRecordingTest {
         WebSearchTool search = new WebSearchTool(
                 (tenantId, providerId, config, query) -> List.of(), 10, "p", () -> 10002L, null);
         // schema 的 JsonNode toString 与录制 RAW 常量逐字节一致（同序同形）
-        assertThat(fetch.getParameters().toString()).isEqualTo(GO_FETCH_SCHEMA);
-        assertThat(search.getParameters().toString()).isEqualTo(GO_SEARCH_SCHEMA);
+        assertThat(JsonMappers.toJsonNode(fetch.getParameters()).toString()).isEqualTo(GO_FETCH_SCHEMA);
+        assertThat(JsonMappers.toJsonNode(search.getParameters()).toString()).isEqualTo(GO_SEARCH_SCHEMA);
         // 解析重排后仍然同构（防实现里改键序）
-        assertThat(MAPPER.readTree(fetch.getParameters().toString()))
+        assertThat(MAPPER.readTree(JsonMappers.toJsonNode(fetch.getParameters()).toString()))
                 .isEqualTo(MAPPER.readTree(GO_FETCH_SCHEMA));
-        assertThat(MAPPER.readTree(search.getParameters().toString()))
+        assertThat(MAPPER.readTree(JsonMappers.toJsonNode(search.getParameters()).toString()))
                 .isEqualTo(MAPPER.readTree(GO_SEARCH_SCHEMA));
         assertThat(fetch.getName()).isEqualTo("web_fetch");
         assertThat(search.getName()).isEqualTo("web_search");

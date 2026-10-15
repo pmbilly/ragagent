@@ -22,10 +22,10 @@ import com.ragagent.mcp.protocol.McpContext;
 import com.ragagent.platform.web.ToolJson;
 import com.ragagent.contract.tool.Decision;
 import com.ragagent.contract.tool.PendingRequest;
-import com.ragagent.common.agent.tool.AgentTool;
-import com.ragagent.common.agent.tool.ToolRequest;
+import com.ragagent.contract.tool.AgentTool;
+import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.contract.tool.ToolDefinitions;
-import com.ragagent.common.agent.tool.ToolExecContext;
+import com.ragagent.contract.tool.ToolExecContext;
 
 /**
  * MCP 工具的动态包装。
@@ -122,7 +122,7 @@ public class McpToolWrapper implements AgentTool {
     }
 
     @Override
-    public com.fasterxml.jackson.databind.JsonNode getParameters() {
+    public Object getParameters() {
         if (mcpTool.getInputSchema() != null) {
             return MCP_JSON.valueToTree(mcpTool.getInputSchema());
         }
@@ -203,7 +203,7 @@ public class McpToolWrapper implements AgentTool {
         // 审批携带的是原始 args，modifiedArgs 批准后整棵重解析）。
         Map<String, Object> input;
         try {
-            input = MCP_JSON.convertValue(request.args(),
+            input = MCP_JSON.convertValue(JsonMappers.toJsonNode(request.args()),
                     MCP_JSON.getTypeFactory().constructMapType(LinkedHashMap.class, String.class, Object.class));
         } catch (Exception e) {
             ToolResult r = new ToolResult();
@@ -229,7 +229,7 @@ public class McpToolWrapper implements AgentTool {
                                 .mcpToolName(mcpTool.getName())
                                 .registeredToolName(getName())
                                 .description(mcpTool.getDescription())
-                                .args(request.args().toString())
+                                .args(JsonMappers.toJsonNode(request.args()).toString())
                                 .toolCallId(meta.toolCallId())
                                 .build());
                 if (!decision.approved()) {

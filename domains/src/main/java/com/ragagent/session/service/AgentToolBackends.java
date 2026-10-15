@@ -51,7 +51,7 @@ import com.ragagent.contract.knowledge.ChunkPageView;
 import com.ragagent.rerank.Reranker;
 import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.contract.wiki.WikiPageOpsPort;
-import com.ragagent.common.agent.tool.AgentTool;
+import com.ragagent.contract.tool.AgentTool;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.agenttools.datasource.AnalysisDuckDbJdbc;
 import com.ragagent.agenttools.datasource.DataAnalysisTool;

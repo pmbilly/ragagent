@@ -1525,8 +1525,8 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 
 | 账 | 读数 | 状态 |
 |---|---|---|
-| `:contract` | **225 件** | ✅ 已独立（零依赖） |
-| `common/*` | **64 件**（125 → … → 67 → 66 → 64） | 收敛中 |
+| `:contract` | **229 件** | ✅ 已独立（零依赖） |
+| `common/*` | **60 件**（125 → … → 66 → 64 → 60） | 收敛中 |
 | `platform/*` | 139 件 · `:common` 总 **237** | — |
 | **C2 实体** | **0** ✅ | **C 收官**（14 → 0） |
 | **C1 受控导入根** | 10 根 / **57 文件** | 冻结只许减 |
@@ -1792,6 +1792,21 @@ public interface AdminUserPort {
 - **读数**：**C1 受控导入根 61 → 59 文件**；**域侧 handler 10 → 1**；`common/*` 91 → **82**（−9）；`:contract` 203（不变）；载荷 0 保持；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
 - **验证**：**14 守卫全绿**（C1/C2 基线已 `--write`）；**1349 金片签名一致**；`spotlessCheck build` **2m5s**；**4991 / 失败 0 / 跳过 4**；dev 冒烟（sessions / KB / tenants / system-info **200** ✓；`GET /sessions/{id}/messages` ⇒ **500**——**查日志证实为既有的 `HttpRequestMethodNotSupportedException`（405 应然却映射为 500）**，与 handler 无关 ⇒ 该独立小刀仍在队列）
 - **余量**：域侧 handler 仅剩 `wiki/domain/WikiStringListTypeHandler`（L1 用户 `WikiIndexEntry` ⇒ 随其切开）· Jackson 味域内值类型 22 件（其中 session 7 件被 L1 平台面载荷引用 ⇒ 与载荷同生命周期）
+**🔶 G1-n·工具 API 整体入 `contract.tool`（`AgentTool` / `ToolRequest` / `ToolExecContext` / `ToolOutput`）（2026-10-15）**
+- **触发**：工具族刀序第 4 步（收尾）；前置①`JsonValues` 门面（G1-k）②被读取面迁移（G1-l）③platform 卡点清除（G1-m）均已完成
+- **四个阶段**：
+  1. **`ToolExecContext.eventBus`**（platform `EventBus` ✗）→ **契约 `EventBusInterface`** ✓：`EventBus`（G1-m 起已实现该接口 ✓）满足之；`ApprovalEventBuses.toEventBus` 收到接口 ✓；`McpOAuthSession.eventBus` 同改 ✓；**唯一构造点 `ActPhase` 无需改动** ✓
+  2. **`ToolRequest.args`**：`JsonNode` → **`Object`**（纯 JDK）+ `of(Object)`；**边界归一在 `ToolRegistry`**（`JsonMappers.toJavaValue(castArgs)` ✓）；**工具实现侧 28 文件**统一 `JsonMappers.toJsonNode(request.args())`（**幂等** ⇒ 兼容期测试直接传节点亦可 ✓✓）
+  3. **`AgentTool.getParameters()`**：`JsonNode` → **`Object`**（schema 纯 JDK）+ 实现/调用点归一（`BaseTool` · `McpToolWrapper`/`McpCallTool` 覆盖 · `McpDiscoverTool` 的 `put` · `ToolRegistry` 的 `castParams`/`validateParams`/`FunctionDef` 三处）+ 测试断言 4 文件归一
+  4. **随行件**：`ToolOutput`（纯 JDK 常量 + 截断逻辑，被 `ToolRequest.outputBudget()` 引用）→ 一并入 `contract.tool` ✓
+- **动作统计**：4 类 `git mv` ✓ · FQN 引用更新 **57 文件** + 同包补 import ✓ · 工具实现包装 **28 文件** ✓
+- ⚠️ **两条判据（都是"编译无声、运行期才炸"家族）**：
+  1. **Java 协变返回救了一次**：测试内的 `AgentTool` 实现类返回 `JsonNode`（接口已放宽为 `Object`）⇒ **合法** ✓ 无需改动；但**测试断言**（`assertThat(tool.getParameters()).isEqualTo(schema)` / `.toString()` 等 **4 文件**）会在**运行期**失配 ✗（纯 JDK `Map` vs `JsonNode`）⇒ 统一 `toJsonNode(...)` 归一 ✓
+     **判据：接口放宽到 `Object` 后，"编译通过" ≠ "语义正确"；所有断言与 `.toString()` 站点必须逐个核查**（＝ G1-k 陷阱的第二次现身）
+  2. **`ToolRequest` 曾引 L1 `ToolOutput.DEFAULT_MAX_TOOL_OUTPUT`** ✗（契约装不下）⇒ **常量/工具类随 API 入契约** ✓（纯 JDK 且语义属该 API）
+- **读数**：`:contract` 225 → **229**（+4）；`common/*` 64 → **60**（−4）；**R10 保持 6 条边 / 51 类 / ①档 0** ✓；C1 = 57 文件；C4 登记不变（platform 面 8 · Jackson 语义必要 2）✓
+- **验证**：**14 守卫全绿**（含 **R8 内联 FQN 归零** ✓）；**1349 金片签名一致** ✓；`:common:javadoc` 通过（`fix-javadoc-links.py` 降级 5 处 ✓）；`spotlessCheck build` **2m8s**；**4996 / 失败 0 / 跳过 4**；冒烟（sessions / agents / system-info / knowledge-bases **200** ✓）
+- **工具族完成度**：① `JsonValues` 门面 ✓ ② 被读取面迁移 ✓（`AgentLookup`）③ platform 卡点 ✓（事件核心上提）④ **工具 API 本体 ✓（本刀）** ⇒ 余：`BaseTool`（抽象基类，**正当留 L1**＝实现面）+ 各工具实现内部的 JSON 读（已归一到实现侧 ✓）
 **🔶 G1-m·事件核心上提契约 `contract.event`（`Event`/`EventHandler`/`EventBusInterface`/`EventBusException`）+ `EventBus` 实现契约口（工具族的解锁路径）（2026-10-15）**
 - **触发＝工具族的"卡点测量"**：`AgentTool.execute(ToolRequest)` 引 L1 `ToolRequest` ⇒ 级联后唯一硬阻塞＝`ToolRequest.execMeta` 的 **`ToolExecContext` 带 platform `EventBus`** ✗
 - **⭐ 决定性测量（卡点其实极小）**：① `ToolExecContext.eventBus()` 真实使用者仅 **1-2 处**（`McpToolWrapper` / `McpOAuthPromptSupport`）② 构造点仅 **1 处**（`ActPhase:430`）③ **`Event` / `EventHandler` / `EventBusInterface` 本身全是纯 JDK** ✓（只依赖 `java.util`）⇒ **正解＝事件核心上提契约**（`EventBus` 留 platform 作实现 ✓）

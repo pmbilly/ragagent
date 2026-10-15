@@ -2,7 +2,7 @@ package com.ragagent.mcp.tool;
 
 import com.ragagent.contract.tool.ApprovalEventBus;
 import com.ragagent.contract.event.Event;
-import com.ragagent.platform.event.EventBus;
+import com.ragagent.contract.event.EventBusInterface;
 
 /**
  * 平台事件总线 → 审批门的事件总线（{@link ApprovalEventBus}）。
@@ -16,7 +16,7 @@ final class ApprovalEventBuses {
     private ApprovalEventBuses() {
     }
 
-    static ApprovalEventBus toEventBus(EventBus bus) {
+    static ApprovalEventBus toEventBus(EventBusInterface bus) {
         if (bus == null) {
             return null;
         }

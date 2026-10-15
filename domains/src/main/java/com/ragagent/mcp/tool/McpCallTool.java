@@ -8,8 +8,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.common.agent.tool.BaseTool;
 
-import com.ragagent.common.agent.tool.ToolRequest;
-import com.ragagent.common.agent.tool.AgentTool;
+import com.ragagent.contract.tool.ToolRequest;
+import com.ragagent.contract.tool.AgentTool;
 import com.ragagent.platform.web.ToolJson;
 import com.ragagent.chatpipeline.spi.ToolRegistryPort;
 import com.ragagent.chatpipeline.spi.McpToolingGateway;
@@ -34,7 +34,7 @@ public class McpCallTool extends BaseTool {
 
     /** 只广告已 describe 的 refs（mcpPrepared 时来自注册的引用）。 */
     @Override
-    public JsonNode getParameters() {
+    public Object getParameters() {
         List<String> refs = new ArrayList<>();
         List<McpRegisteredTool> registered = new ArrayList<>();
         for (AgentTool candidate : registry.tools()) {
@@ -63,7 +63,7 @@ public class McpCallTool extends BaseTool {
     /** 解析 catalog 目标并跑共享执行管线。 */
     @Override
     public ToolResult execute(ToolRequest request) {
-        ResolveResult resolved = resolve(request, request.args());
+        ResolveResult resolved = resolve(request, JsonMappers.toJsonNode(request.args()));
         if (resolved.error() != null) {
             return McpCatalog.mcpDiscoveryFailure(resolved.error(), "unavailable");
         }

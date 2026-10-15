@@ -11,7 +11,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.common.agent.tool.BaseTool;
 import com.ragagent.contract.tool.ToolDefinitions;
-import com.ragagent.common.agent.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolRequest;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * data_schema 工具。
@@ -87,7 +88,7 @@ public class DataSchemaTool extends BaseTool {
 
     @Override
     public ToolResult execute(ToolRequest request) {
-        JsonNode args = request.args();
+        JsonNode args = JsonMappers.toJsonNode(request.args());
         String knowledgeId = args.path("knowledgeId").asText("");
 
         // 取知识以拿租户（IDOnly 以支持跨租户共享 KB；设置了授权器则走授权）

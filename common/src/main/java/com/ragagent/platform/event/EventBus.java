@@ -43,7 +43,7 @@ import com.ragagent.contract.event.EventBusException;
  * （{@code Thread.ofVirtual()}）上。无 context 参数；同步模式 handler 跑在调用线程，
  * TenantContext 天然可见。</p>
  */
-public class EventBus {
+public class EventBus implements EventBusInterface {
 
     private static final Logger log = LoggerFactory.getLogger(EventBus.class);
 

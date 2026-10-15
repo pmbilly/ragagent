@@ -22,7 +22,7 @@ import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.agent.tool.runtime.JsonRepair;
 import com.ragagent.agent.tool.runtime.NormalizeToolCallId;
-import com.ragagent.common.agent.tool.ToolExecContext;
+import com.ragagent.contract.tool.ToolExecContext;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.event.payload.AgentActionData;
 import com.ragagent.contract.event.payload.AgentToolCallData;

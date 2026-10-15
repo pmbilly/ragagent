@@ -21,9 +21,10 @@ import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.agenttools.sql.DatabaseQueryTool.QueryResult;
 import com.ragagent.agenttools.sql.DatabaseQueryTool.SqlQueryExecutor;
 import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.common.agent.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.agenttools.GoRecording45B;
 import com.ragagent.agenttools.RecordingSupport;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * 4.5b 回放：database_query 的录制回放。
@@ -205,7 +206,7 @@ class DatabaseQueryRecordingTest {
     void schemaContract() {
         // _schema 语料：录制下来的 schema 原字节。
         JsonNode schema = RecordingSupport.readTree(rec("database_query_schema").get("schema").asText());
-        assertThat(tool(wholeKb("aa45bq01")).getParameters()).isEqualTo(schema);
+        assertThat(JsonMappers.toJsonNode(tool(wholeKb("aa45bq01")).getParameters())).isEqualTo(schema);
     }
 
     @Test

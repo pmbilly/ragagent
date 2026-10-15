@@ -12,7 +12,8 @@ import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.agent.tool.runtime.SearchAuth.KnowledgeTagsFetcher;
 import com.ragagent.common.agent.tool.BaseTool;
 import com.ragagent.contract.tool.ToolDefinitions;
-import com.ragagent.common.agent.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolRequest;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * wiki_search 工具。
@@ -75,7 +76,7 @@ public class WikiSearchTool extends BaseTool {
 
     @Override
     public ToolResult execute(ToolRequest request) {
-        JsonNode args = request.args();
+        JsonNode args = JsonMappers.toJsonNode(request.args());
 
         List<String> queriesToRun = new ArrayList<>();
         queriesToRun.addAll(WikiTexts.parseStringOrArray(args.get("queries")));

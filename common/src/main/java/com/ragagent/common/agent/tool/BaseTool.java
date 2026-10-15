@@ -3,6 +3,7 @@ package com.ragagent.common.agent.tool;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.contract.tool.AgentTool;
 
 /**
  * 工具基类。
@@ -46,8 +47,8 @@ public abstract class BaseTool implements AgentTool {
     }
 
     @Override
-    public JsonNode getParameters() {
-        return schema;
+    public Object getParameters() {
+        return JsonMappers.toJavaValue(schema);
     }
 
     /**

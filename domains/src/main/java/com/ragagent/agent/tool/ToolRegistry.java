@@ -24,12 +24,13 @@ import com.ragagent.contract.error.BizException;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.chatpipeline.spi.McpToolingGateway;
 import com.ragagent.chatpipeline.spi.ToolRegistryPort;
-import com.ragagent.common.agent.tool.ToolOutput;
+import com.ragagent.contract.tool.ToolOutput;
 import com.ragagent.contract.tool.McpCatalogGuardedTool;
-import com.ragagent.common.agent.tool.ToolExecContext;
+import com.ragagent.contract.tool.ToolExecContext;
 import com.ragagent.contract.tool.ToolDefinitions;
-import com.ragagent.common.agent.tool.ToolRequest;
-import com.ragagent.common.agent.tool.AgentTool;
+import com.ragagent.contract.tool.ToolRequest;
+import com.ragagent.contract.tool.AgentTool;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * 工具注册表。
@@ -145,7 +146,8 @@ public class ToolRegistry {
                 continue;
             }
             AgentTool tool = e.getValue();
-            definitions.add(new FunctionDef(tool.getName(), tool.getDescription(), tool.getParameters()));
+            definitions.add(new FunctionDef(tool.getName(), tool.getDescription(),
+                    JsonMappers.toJsonNode(tool.getParameters())));
         }
         return definitions;
     }
@@ -212,7 +214,7 @@ public class ToolRegistry {
         }
         String name = tool.getName();
         // 执行前先按 schema 做参数矫正——处理 "true" 代替 true 之类的常见 LLM 怪癖。
-        JsonNode castArgs = ParamCaster.castParams(args, tool.getParameters());
+        JsonNode castArgs = ParamCaster.castParams(args, JsonMappers.toJsonNode(tool.getParameters()));
 
         // 执行前按 JSON Schema 校验参数——尽早拦截，省掉一次白费的工具执行 + LLM 回合。
         List<ParamValidator.ValidationError> validationErrs;
@@ -222,7 +224,7 @@ public class ToolRegistry {
                     ? List.of(new ParamValidator.ValidationError("", errText))
                     : List.of();
         } else {
-            validationErrs = ParamValidator.validateParams(castArgs, tool.getParameters());
+            validationErrs = ParamValidator.validateParams(castArgs, JsonMappers.toJsonNode(tool.getParameters()));
         }
         if (!validationErrs.isEmpty()) {
             String errMsg = ParamValidator.formatValidationErrors(validationErrs);
@@ -252,7 +254,7 @@ public class ToolRegistry {
         }
         ToolResult result;
         try {
-            result = tool.execute(new ToolRequest(castArgs, meta, cancel, maxOutput));
+            result = tool.execute(new ToolRequest(JsonMappers.toJavaValue(castArgs), meta, cancel, maxOutput));
         } catch (RuntimeException e) {
             // 工具抛了运行时异常时折进 error 文案：
             // BizException（AppError）要带 `error code: N, error message: `

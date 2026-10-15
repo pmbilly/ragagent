@@ -15,7 +15,8 @@ import com.ragagent.agenttools.knowledge.KnowledgeSearchTool;
 import com.ragagent.agent.tool.runtime.SearchAuth;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.contract.tool.ToolDefinitions;
-import com.ragagent.common.agent.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolRequest;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * database_query 工具。
@@ -139,7 +140,7 @@ public class DatabaseQueryTool extends BaseTool {
 
     @Override
     public ToolResult execute(ToolRequest request) {
-        JsonNode args = request.args();
+        JsonNode args = JsonMappers.toJsonNode(request.args());
 
         long tenantID = tenantIdProvider != null ? tenantIdProvider.getAsLong() : 0;
 

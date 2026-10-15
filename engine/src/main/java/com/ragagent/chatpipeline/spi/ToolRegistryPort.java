@@ -3,8 +3,8 @@ package com.ragagent.chatpipeline.spi;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.agent.tool.AgentTool;
-import com.ragagent.common.agent.tool.ToolExecContext;
+import com.ragagent.contract.tool.AgentTool;
+import com.ragagent.contract.tool.ToolExecContext;
 import com.ragagent.contract.tool.ToolCancellation;
 import com.ragagent.contract.tool.ToolResult;
 

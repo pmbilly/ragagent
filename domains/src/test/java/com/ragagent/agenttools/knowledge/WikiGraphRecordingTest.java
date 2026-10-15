@@ -23,7 +23,7 @@ import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool.SearchResultVie
 import com.ragagent.agent.tool.runtime.SearchAuth.KnowledgeTagsFetcher;
 import com.ragagent.agent.tool.runtime.SearchAuth.TagView;
 import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.common.agent.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.agenttools.GoRecording45B;
 import com.ragagent.agenttools.RecordingSupport;
 

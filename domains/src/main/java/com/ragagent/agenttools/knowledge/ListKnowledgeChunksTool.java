@@ -20,7 +20,8 @@ import com.ragagent.agent.tool.DocChunkSupport;
 import com.ragagent.agent.tool.runtime.SearchAuth;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.contract.tool.ToolDefinitions;
-import com.ragagent.common.agent.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolRequest;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * list_knowledge_chunks 工具。
@@ -97,7 +98,7 @@ public class ListKnowledgeChunksTool extends BaseTool {
 
     @Override
     public ToolResult execute(ToolRequest request) {
-        JsonNode args = request.args();
+        JsonNode args = JsonMappers.toJsonNode(request.args());
 
         String chunkID = args.path("faqId").asText("").trim();
         if (chunkID.isEmpty()) {

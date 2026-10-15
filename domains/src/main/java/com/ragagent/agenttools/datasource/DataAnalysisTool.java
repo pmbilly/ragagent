@@ -23,7 +23,8 @@ import com.ragagent.agent.tool.runtime.SearchAuth;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.agenttools.sql.SqlGuard;
 import com.ragagent.contract.tool.ToolDefinitions;
-import com.ragagent.common.agent.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolRequest;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * data_analysis 工具。
@@ -294,7 +295,7 @@ public class DataAnalysisTool extends BaseTool implements Cleanable {
 
     @Override
     public ToolResult execute(ToolRequest request) {
-        JsonNode args = request.args();
+        JsonNode args = JsonMappers.toJsonNode(request.args());
         String knowledgeID = args == null ? "" : args.path("knowledgeId").asText("");
         String sql = args == null ? "" : args.path("sql").asText("");
 

@@ -15,7 +15,8 @@ import com.ragagent.contract.retrieval.SearchTarget.SearchTargets;
 import com.ragagent.common.agent.tool.BaseTool;
 import com.ragagent.agent.tool.runtime.SearchAuth;
 import com.ragagent.contract.tool.ToolDefinitions;
-import com.ragagent.common.agent.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolRequest;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * query_knowledge_graph 工具。
@@ -138,7 +139,7 @@ public class QueryKnowledgeGraphTool extends BaseTool {
 
     @Override
     public ToolResult execute(ToolRequest request) {
-        JsonNode args = request.args();
+        JsonNode args = JsonMappers.toJsonNode(request.args());
 
         List<String> knowledgeBaseIDs = new ArrayList<>();
         JsonNode kbNode = args.get("knowledgeBaseIds");

@@ -1,5 +1,5 @@
 package com.ragagent.agent.tool;
-import com.ragagent.common.agent.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolRequest;
 
 /**
  * 预算分摊。

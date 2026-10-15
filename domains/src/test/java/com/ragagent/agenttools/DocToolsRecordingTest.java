@@ -25,7 +25,7 @@ import com.ragagent.agenttools.knowledge.ListKnowledgeChunksTool;
 import com.ragagent.agenttools.wiki.WikiReadSourceDocTool;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.contract.knowledge.ChunkFacts;
-import com.ragagent.common.agent.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolRequest;
 import com.ragagent.knowledge.support.ChunkRowViews;
 
 /**

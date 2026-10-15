@@ -7,7 +7,6 @@ import com.ragagent.contract.tool.Cancellation;
 import com.ragagent.contract.tool.Decision;
 import com.ragagent.contract.tool.OAuthPendingRequest;
 import com.ragagent.contract.event.Event;
-import com.ragagent.platform.event.EventBus;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.contract.event.payload.MCPOAuthRequiredData;
 import com.ragagent.mcp.domain.McpService;
@@ -19,7 +18,8 @@ import com.ragagent.mcp.protocol.McpClient;
 import com.ragagent.mcp.protocol.McpClientManager;
 import com.ragagent.mcp.protocol.McpContext;
 import com.ragagent.contract.tool.ToolCancellation;
-import com.ragagent.common.agent.tool.ToolExecContext;
+import com.ragagent.contract.tool.ToolExecContext;
+import com.ragagent.contract.event.EventBusInterface;
 
 /**
  * MCP OAuth 的会话挂载与重试。
@@ -55,7 +55,7 @@ public final class McpOAuthPromptSupport {
      * approvalCancellation 是无每操作超时的取消源；execTimeout 是授权成功后重试的上限。
      */
     public record McpOAuthSession(
-            EventBus eventBus,
+            EventBusInterface eventBus,
             String sessionId,
             String assistantMessageId,
             String userId,

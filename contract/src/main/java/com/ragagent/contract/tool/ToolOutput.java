@@ -1,4 +1,4 @@
-package com.ragagent.common.agent.tool;
+package com.ragagent.contract.tool;
 
 /**
  * 工具输出截断。

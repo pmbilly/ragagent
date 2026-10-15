@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agent.tool.TodoWriteTool;
-import com.ragagent.common.agent.tool.ToolRequest;
+import com.ragagent.contract.tool.ToolRequest;
 
 /**
  * TodoWriteTool 的录制语料（5 条有效用例；bad_json 一条不录——录制侧
