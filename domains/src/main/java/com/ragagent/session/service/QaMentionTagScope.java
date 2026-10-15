@@ -7,9 +7,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
+import com.ragagent.common.knowledge.KnowledgeRowView;
 
 /**
  * {@code SessionQaResolution} 的**mention/tag 收敛簇**：把请求里 @ 提及的知识库/知识范围与
@@ -85,7 +85,7 @@ final class QaMentionTagScope {
         }
         List<String> filteredKnowledge = knowledgeIds;
         if (knowledgeIds != null && !knowledgeIds.isEmpty()) {
-            List<Knowledge> rows;
+            List<KnowledgeRowView> rows;
             try {
                 rows = service.knowledgeCatalog.getKnowledgeBatch(agent.getTenantId(), knowledgeIds);
             } catch (RuntimeException e) {
@@ -95,7 +95,7 @@ final class QaMentionTagScope {
             }
             filteredKnowledge = new ArrayList<>();
             if (rows != null) {
-                for (Knowledge k : rows) {
+                for (KnowledgeRowView k : rows) {
                     if (k != null && allowedSet.contains(k.getKnowledgeBaseId())) {
                         filteredKnowledge.add(k.getId());
                     } else if (k != null) {

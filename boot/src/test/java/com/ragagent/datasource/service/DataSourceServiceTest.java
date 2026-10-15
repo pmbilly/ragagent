@@ -38,7 +38,6 @@ import com.ragagent.datasource.domain.SyncLog;
 import com.ragagent.datasource.domain.SyncResult;
 import com.ragagent.datasource.mapper.DataSourceRepository;
 import com.ragagent.datasource.mapper.SyncLogRepository;
-import com.ragagent.common.knowledge.domain.Knowledge;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +48,7 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
 import com.ragagent.datasource.DataSourceSyncEnqueueException;
 import com.ragagent.common.knowledge.KnowledgeBaseRowView;
+import com.ragagent.common.knowledge.KnowledgeRowView;
 
 /**
  * {@link DataSourceService} 的语义测试。
@@ -92,12 +92,12 @@ class DataSourceServiceTest {
     /** 可编程的知识库侧替身。 */
     private static final class FakeBridge implements KnowledgeBridge {
         KnowledgeBaseRowView kb;
-        final List<Knowledge> created = new ArrayList<>();
+        final List<KnowledgeRowView> created = new ArrayList<>();
         final List<String> softDeleted = new ArrayList<>();
         final List<String> hardDeleted = new ArrayList<>();
         final List<String> hardDeletedLists = new ArrayList<>();
-        Knowledge existingByExternalId;
-        Knowledge existingByPrefix;
+        KnowledgeRowView existingByExternalId;
+        KnowledgeRowView existingByPrefix;
         /**
          * 逐次消费的"灌入结果"队列：{@code null} = 这一次成功，非 null = 抛它。
          * 队列空之后一律成功——这样"第 N 条失败、其余成功"的分支可以精确构造。
@@ -112,7 +112,7 @@ class DataSourceServiceTest {
         }
 
         @Override
-        public Knowledge findByDataSourceExternalId(long tenantId, String kbId, String dataSourceId,
+        public KnowledgeRowView findByDataSourceExternalId(long tenantId, String kbId, String dataSourceId,
                                                     String externalId) {
             if (lookupFailure != null) {
                 throw lookupFailure;
@@ -121,34 +121,34 @@ class DataSourceServiceTest {
         }
 
         @Override
-        public List<Knowledge> findByMetadataKeyPrefix(long tenantId, String kbId, String key,
+        public List<KnowledgeRowView> findByMetadataKeyPrefix(long tenantId, String kbId, String key,
                                                        String prefix) {
             return existingByPrefix == null ? List.of() : List.of(existingByPrefix);
         }
 
         @Override
-        public Knowledge createFromFile(long tenantId, String kbId, byte[] content, String fileName,
+        public KnowledgeRowView createFromFile(long tenantId, String kbId, byte[] content, String fileName,
                                         Map<String, String> metadata, List<String> tagIds,
                                         String channel) {
             maybeFailCreate();
-            Knowledge k = newKnowledge("file", fileName);
+            KnowledgeRowView k = newKnowledge("file", fileName);
             k.setMetadata(toNode(metadata));
             created.add(k);
             return k;
         }
 
         @Override
-        public Knowledge createFromUrl(long tenantId, String kbId, String url, String fileName,
+        public KnowledgeRowView createFromUrl(long tenantId, String kbId, String url, String fileName,
                                        String title, List<String> tagIds, String channel) {
             maybeFailCreate();
-            Knowledge k = newKnowledge("url", title);
+            KnowledgeRowView k = newKnowledge("url", title);
             k.setSource(url);
             created.add(k);
             return k;
         }
 
         @Override
-        public void attachMetadata(Knowledge knowledge, Map<String, String> metadata) {
+        public void attachMetadata(KnowledgeRowView knowledge, Map<String, String> metadata) {
             knowledge.setMetadata(toNode(metadata));
         }
 
@@ -181,8 +181,8 @@ class DataSourceServiceTest {
             }
         }
 
-        private static Knowledge newKnowledge(String type, String title) {
-            Knowledge k = new Knowledge();
+        private static KnowledgeRowView newKnowledge(String type, String title) {
+            KnowledgeRowView k = new KnowledgeRowView();
             k.setId(UUID.randomUUID().toString());
             k.setType(type);
             k.setTitle(title);
@@ -848,7 +848,7 @@ class DataSourceServiceTest {
         ds.setSyncDeletions(true);
         SyncLog log = runningLog(ds.getId());
 
-        Knowledge existing = new Knowledge();
+        KnowledgeRowView existing = new KnowledgeRowView();
         existing.setId("k-1");
         bridge.existingByExternalId = existing;
         connector.incrementalItems = List.of(deletedItem("e1"));
@@ -867,7 +867,7 @@ class DataSourceServiceTest {
         jdbc.update("UPDATE data_sources SET sync_deletions = FALSE WHERE id = ?", ds.getId());
         ds.setSyncDeletions(false);
         SyncLog log = runningLog(ds.getId());
-        bridge.existingByExternalId = new Knowledge();
+        bridge.existingByExternalId = new KnowledgeRowView();
         connector.incrementalItems = List.of(deletedItem("e1"));
 
         service.handle(payload(ds.getId(), log.getId(), false));

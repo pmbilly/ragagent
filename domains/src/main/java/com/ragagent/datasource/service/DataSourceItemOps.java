@@ -13,10 +13,10 @@ import com.ragagent.datasource.domain.FetchedItem;
 import com.ragagent.datasource.domain.SubtreeChildIds;
 import com.ragagent.datasource.domain.SyncItemError;
 import com.ragagent.datasource.domain.SyncResult;
-import com.ragagent.common.knowledge.domain.Knowledge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ragagent.common.knowledge.service.DuplicateKnowledgeException;
+import com.ragagent.common.knowledge.KnowledgeRowView;
 
 /**
  * 同步条目的灌入：新增/更新/删除的判定与落地、冲突消解（同节点判等）、
@@ -118,7 +118,7 @@ final class DataSourceItemOps {
 
     /** 删除分支：处理"源端已删除"的单条抓取结果。 */
     private void applyDeletion(DataSource ds, FetchedItem item, SyncResult result) {
-        Knowledge existing;
+        KnowledgeRowView existing;
         try {
             existing = service.knowledge.findByDataSourceExternalId(
                     ds.getTenantId(), ds.getKnowledgeBaseId(), ds.getId(), item.getExternalId());
@@ -200,7 +200,7 @@ final class DataSourceItemOps {
 
         boolean isUpdate = false;
         if (item.getExternalId() != null && !item.getExternalId().isEmpty()) {
-            Knowledge existing;
+            KnowledgeRowView existing;
             try {
                 existing = service.knowledge.findByDataSourceExternalId(
                         ds.getTenantId(), ds.getKnowledgeBaseId(), ds.getId(), item.getExternalId());
@@ -243,7 +243,7 @@ final class DataSourceItemOps {
         }
 
         if (item.getUrl() != null && !item.getUrl().isEmpty()) {
-            Knowledge created;
+            KnowledgeRowView created;
             try {
                 created = service.knowledge.createFromUrl(ds.getTenantId(), ds.getKnowledgeBaseId(),
                         item.getUrl(), item.getFileName(), item.getTitle(), tagIDs, channel);
@@ -293,7 +293,7 @@ final class DataSourceItemOps {
         if (!item.isReplacesSubtree() || item.getExternalId() == null || item.getExternalId().isEmpty()) {
             return;
         }
-        List<Knowledge> children;
+        List<KnowledgeRowView> children;
         try {
             children = service.knowledge.findByMetadataKeyPrefix(ds.getTenantId(), ds.getKnowledgeBaseId(),
                     "externalId", SubtreeChildIds.subtreeChildPrefix(item.getExternalId()));
@@ -307,7 +307,7 @@ final class DataSourceItemOps {
         }
         List<String> subtreeKeep = item.getSubtreeKeep() == null ? List.of() : item.getSubtreeKeep();
         List<String> ids = new ArrayList<>();
-        for (Knowledge child : children) {
+        for (KnowledgeRowView child : children) {
             // 限定本次数据源：同一个知识库里另一个连接器的同前缀 externalId 不该被清扫
             if (!Objects.equals(DataSourceSupport.readMetadataValue(child, "datasourceId"), ds.getId())) {
                 continue;

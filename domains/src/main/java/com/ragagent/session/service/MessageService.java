@@ -13,7 +13,6 @@ import com.ragagent.contract.tenant.ChatHistoryConfig;
 import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.agent.tool.runtime.ThinkBlocks;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.retrieval.HybridSearchService;
@@ -30,6 +29,7 @@ import com.ragagent.contract.wiki.WikiLanguageSupport;
 
 import com.ragagent.session.domain.message.ArtifactVersions;
 import com.ragagent.common.knowledge.KnowledgeBaseRowView;
+import com.ragagent.common.knowledge.KnowledgeRowView;
 
 /**
  * 消息服务。
@@ -354,7 +354,7 @@ public class MessageService {
         // Q&A 合成一条 passage：同段对语义搜索更友好
         String passage = "[Session: " + sessionId + "]\nQ: " + query + "\nA: " + answer;
 
-        Knowledge knowledge;
+        KnowledgeRowView knowledge;
         try {
             knowledge = knowledgeCatalog.createFromPassageSync(
                     cfg.getKnowledgeBaseId(), List.of(passage), "");

@@ -26,7 +26,6 @@ import com.ragagent.evaluation.dto.EvaluationDtos.MetricResult;
 import com.ragagent.evaluation.dto.EvaluationDtos.PipelineParams;
 import com.ragagent.evaluation.dto.EvaluationDtos.SummaryConfigParams;
 import com.ragagent.platform.access.TenantContextSnapshot;
-import com.ragagent.common.knowledge.domain.Knowledge;
 
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.model.ModelCatalogPort;
@@ -39,6 +38,7 @@ import org.springframework.stereotype.Service;
 import com.ragagent.evaluation.dto.EvaluationDtos;
 import com.ragagent.contract.knowledge.KnowledgeIngest;
 import com.ragagent.common.knowledge.KnowledgeBaseRowView;
+import com.ragagent.common.knowledge.KnowledgeRowView;
 
 /**
  * 评估服务（评估任务 + 结果；内存任务存储）。
@@ -244,7 +244,7 @@ public class EvaluationService {
         // 2) 段落表（按 PID 铺平，空洞留 ""）
         List<String> passages = getPassageList(dataset);
         // 3) 建临时知识（同步建索引；此步失败即抛出——清理尚未注册，会残留临时 KB）
-        Knowledge knowledge = knowledgeCatalog.createFromPassageSync(knowledgeBaseId, passages, "");
+        KnowledgeRowView knowledge = knowledgeCatalog.createFromPassageSync(knowledgeBaseId, passages, "");
 
         try {
             // 4) 并行评估（并发上限 = CPU 核数-1）

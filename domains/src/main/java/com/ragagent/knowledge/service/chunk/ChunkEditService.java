@@ -12,7 +12,7 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ChunkRevision;
-import com.ragagent.common.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.domain.ChunkRevisionConflictException;
 import org.slf4j.Logger;

@@ -18,7 +18,6 @@ import javax.sql.DataSource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.common.knowledge.domain.Knowledge;
 import org.springframework.stereotype.Component;
 import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.contract.error.AppError;
@@ -28,6 +27,8 @@ import com.ragagent.platform.http.UrlBytesFetcher;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.KnowledgeIngest;
 import com.ragagent.common.knowledge.KnowledgeBaseRowView;
+import com.ragagent.common.knowledge.KnowledgeRowView;
+import com.ragagent.common.knowledge.KnowledgeParseStatus;
 
 /**
  * {@link KnowledgeBridge} 的生产实现：直接用 knowledge 模块的
@@ -103,13 +104,13 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
     // ── 查询 ─────────────────────────────────────────────────────────────────
 
     @Override
-    public Knowledge findByDataSourceExternalId(long tenantId, String kbId, String dataSourceId,
+    public KnowledgeRowView findByDataSourceExternalId(long tenantId, String kbId, String dataSourceId,
                                                 String externalId) {
         if (postgres) {
             return knowledgeCatalog.findKnowledgeByExternalId(tenantId, kbId,
                     dataSourceId, externalId);
         }
-        for (Knowledge k : listLive(tenantId, kbId)) {
+        for (KnowledgeRowView k : listLive(tenantId, kbId)) {
             Map<String, String> md = readMetadata(k);
             if (dataSourceId.equals(md.get("datasourceId")) && externalId.equals(md.get("externalId"))) {
                 return k;
@@ -119,15 +120,15 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
     }
 
     @Override
-    public List<Knowledge> findByMetadataKeyPrefix(long tenantId, String kbId, String key, String prefix) {
-        List<Knowledge> out = new ArrayList<>();
+    public List<KnowledgeRowView> findByMetadataKeyPrefix(long tenantId, String kbId, String key, String prefix) {
+        List<KnowledgeRowView> out = new ArrayList<>();
         if (key == null || key.isEmpty() || prefix == null || prefix.isEmpty()) {
             return out;
         }
         if (postgres) {
             return knowledgeCatalog.listKnowledgeByMetadataPrefix(tenantId, kbId, key, prefix);
         }
-        for (Knowledge k : listLive(tenantId, kbId)) {
+        for (KnowledgeRowView k : listLive(tenantId, kbId)) {
             String value = readMetadata(k).get(key);
             if (value != null && value.startsWith(prefix)) {
                 out.add(k);
@@ -146,7 +147,7 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
      * 标签关系、按 KB 选存储引擎、处理任务载荷形态都不在这里。</p>
      */
     @Override
-    public Knowledge createFromFile(long tenantId, String kbId, byte[] content, String fileName,
+    public KnowledgeRowView createFromFile(long tenantId, String kbId, byte[] content, String fileName,
                                     Map<String, String> metadata, List<String> tagIds, String channel) {
         KnowledgeBaseRowView kb = findKnowledgeBase(kbId);
         if (kb == null) {
@@ -169,7 +170,7 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
  * 分支上再补一次（重复分支复用已有行，不该被重新打标）。</p>
  */
     @Override
-    public Knowledge createFromUrl(long tenantId, String kbId, String url, String fileName,
+    public KnowledgeRowView createFromUrl(long tenantId, String kbId, String url, String fileName,
                                    String title, List<String> tagIds, String channel) {
         KnowledgeBaseRowView kb = findKnowledgeBase(kbId);
         if (kb == null) {
@@ -189,21 +190,21 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
      *
      * @param source URL 型条目写原始 URL；文件型传 {@code null}（不写 source）
      */
-    private Knowledge insertFileRow(long tenantId, KnowledgeBaseRowView kb, byte[] content, String fileName,
+    private KnowledgeRowView insertFileRow(long tenantId, KnowledgeBaseRowView kb, byte[] content, String fileName,
                                     String rowTitle, String source, Map<String, String> metadata,
                                     String channel) {
         String fileType = fileTypeOf(fileName);
         String hash = knowledgeIngest.contentHash(content);
 
         // 重复检测：同库同哈希同类型即重复
-        Knowledge dup = knowledgeCatalog.findKnowledgeByHash(kb.getId(), hash, fileType);
+        KnowledgeRowView dup = knowledgeCatalog.findKnowledgeByHash(kb.getId(), hash, fileType);
         if (dup != null) {
             throw new DuplicateKnowledgeException(
                     dup, ErrorCode.KNOWLEDGE_DUPLICATE_FILE,
                     "文件已存在（相同内容）");
         }
 
-        Knowledge k = newKnowledge(tenantId, kb, rowTitle, fileType, channel);
+        KnowledgeRowView k = newKnowledge(tenantId, kb, rowTitle, fileType, channel);
         k.setFileName(fileName);
         if (source != null) {
             k.setSource(source);
@@ -218,7 +219,7 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
     }
 
     @Override
-    public void attachMetadata(Knowledge knowledge, Map<String, String> metadata) {
+    public void attachMetadata(KnowledgeRowView knowledge, Map<String, String> metadata) {
         knowledgeCatalog.updateKnowledgeMetadataRow(knowledge, metadata);
         knowledge.setMetadata(metadataNode(metadata));
     }
@@ -259,12 +260,12 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
     // ── 内部 ─────────────────────────────────────────────────────────────────
 
     /** 非 PG 路径的候选集：本租户 + 本知识库 + 未软删。 */
-    private List<Knowledge> listLive(long tenantId, String kbId) {
+    private List<KnowledgeRowView> listLive(long tenantId, String kbId) {
         return knowledgeCatalog.listKnowledgeLive(tenantId, kbId);
     }
 
     /** 从 {@code metadata} 列读出字符串 map。 */
-    private static Map<String, String> readMetadata(Knowledge k) {
+    private static Map<String, String> readMetadata(KnowledgeRowView k) {
         Map<String, String> out = new LinkedHashMap<>();
         com.fasterxml.jackson.databind.JsonNode md = k.getMetadata();
         if (md == null || !md.isObject()) {
@@ -292,9 +293,9 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
     /**
      * 构造一条新知识行（字段集与 {@code KnowledgeService.newKnowledge} 相同，但<b>显式传租户</b>）。
      */
-    private static Knowledge newKnowledge(long tenantId, KnowledgeBaseRowView kb, String title,
+    private static KnowledgeRowView newKnowledge(long tenantId, KnowledgeBaseRowView kb, String title,
                                           String fileType, String channel) {
-        Knowledge k = new Knowledge();
+        KnowledgeRowView k = new KnowledgeRowView();
         k.setId(UUID.randomUUID().toString());
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
         k.setCreatedAt(now);
@@ -305,7 +306,7 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
         k.setTitle(title == null ? "" : title);
         k.setFileName(title);
         k.setFileType(fileType);
-        k.setParseStatus(Knowledge.PARSE_PENDING);
+        k.setParseStatus(KnowledgeParseStatus.PARSE_PENDING);
         k.setEnableStatus("disabled");
         k.setEmbeddingModelId(kb.getEmbeddingModelId());
         k.setChannel(channel);

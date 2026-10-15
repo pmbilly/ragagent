@@ -44,7 +44,6 @@ import com.ragagent.contract.memory.MemorySearchPort;
 import com.ragagent.session.domain.message.MessageSearchGroupItem;
 import com.ragagent.session.domain.message.MessageSearchResult;
 import com.ragagent.common.settings.ConversationProperties;
-import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.ChunkRowView;
 
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
@@ -62,6 +61,7 @@ import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.contract.tenant.WebSearchConfig;
 import com.ragagent.chatpipeline.spi.WebSearchExecutor;
 import com.ragagent.common.knowledge.ChunkFacts;
+import com.ragagent.common.knowledge.KnowledgeRowView;
 
 /**
  * agent 引擎检索工具族的接缝适配（2026-09-23 接线批）。
@@ -173,7 +173,7 @@ public class AgentToolBackends {
         DataAnalysisTool tool =
                 new DataAnalysisTool(
                         knowledgeId -> {
-                            Knowledge k = knowledgeCatalog.getKnowledgeByIdOnly(knowledgeId);
+                            KnowledgeRowView k = knowledgeCatalog.getKnowledgeByIdOnly(knowledgeId);
                             if (k == null) {
                                 return null;
                             }
@@ -432,7 +432,7 @@ public class AgentToolBackends {
     /** data_schema 按 id 取 knowledge（拿 tenant 用）。 */
     public DataSchemaTool.KnowledgeLookup dataSchemaKnowledgeLookup() {
         return knowledgeId -> {
-            Knowledge k = knowledgeCatalog.getKnowledgeByIdOnly(knowledgeId);
+            KnowledgeRowView k = knowledgeCatalog.getKnowledgeByIdOnly(knowledgeId);
             if (k == null) {
                 return null;
             }
@@ -444,7 +444,7 @@ public class AgentToolBackends {
     /** 分页取 chunk（先按租户取 knowledge 行）。 */
     public DataSchemaTool.ChunkLister dataSchemaChunkLister() {
         return (knowledgeId, page, pageSize, chunkTypes, enabled) -> {
-            Knowledge k = knowledgeCatalog.getKnowledgeByIdOnly(knowledgeId);
+            KnowledgeRowView k = knowledgeCatalog.getKnowledgeByIdOnly(knowledgeId);
             long tenant = k == null || k.getTenantId() == null ? 0L : k.getTenantId();
             int offset = Math.max(page - 1, 0) * Math.max(pageSize, 0);
             ChunkPageView p = knowledgeCatalog.listPagedChunksByKnowledgeId(
@@ -464,7 +464,7 @@ public class AgentToolBackends {
         return knowledgeId -> {
             SearchAuth.KnowledgeView scoped = SearchAuth.authorizeKnowledgeInSearchTargets(
                     targets, knowledgeId, DocChunkSupport.asScopeReader(knowledgeInfoReader()));
-            Knowledge k = knowledgeCatalog.getKnowledgeByIdOnly(scoped.id());
+            KnowledgeRowView k = knowledgeCatalog.getKnowledgeByIdOnly(scoped.id());
             return new DataSchemaTool.KnowledgeView(scoped.id(),
                     k == null || k.getTenantId() == null ? 0L : k.getTenantId());
         };

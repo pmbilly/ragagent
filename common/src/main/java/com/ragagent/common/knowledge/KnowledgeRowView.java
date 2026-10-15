@@ -1,47 +1,35 @@
-package com.ragagent.common.knowledge.domain;
+package com.ragagent.common.knowledge;
 
 import java.time.OffsetDateTime;
 import java.util.List;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.platform.persistence.PgJsonTypeHandler;
 
 /**
- * knowledges 表实体。
- * 仓储行为契约：
- * - 软删除 → 显式 isNull("deleted_at")
- * - 钩子 BeforeCreate：id UUID + custom_metadata 补 '{}'（Java 由 service 显式赋值，语义等价）
- * - metadata jsonb：文件型文档为内部摄取状态（NULL 常见）；手工知识为 ManualKnowledgeMetadata
- * - tags 为 无列映射标签 关联（不回填 → 恒 null，契约样例锁定 "tags":null）
+ * 知识行（文档）**行视图**（L1）：KnowledgeCatalogPort 知识行面（读 / 建 / 批 / 写）的载荷。
+ *
+ * <p><b>为什么有它</b>：实体 Knowledge 已归位 knowledge/domain（HANDOFF §12.0 判据 1）；
+ * 跨域方（会话 10 文件、数据源 4 文件、初始化 / 评估 / wiki / config）与 L1 的
+ * KnowledgeProjectionAdapter 只应经本视图。</p>
+ *
+ * <p><b>口径</b>：镜像实体全部 30 字段（含 3 个 JsonNode 与 2 个 @TableField(exist=false) 字段），
+ * 访问器体与实体逐字一致；字段序与实体一致 ⇒ 序列化等价（doc-*.json 金片钉住）。</p>
+ *
+ * <p><b>落点登记（HANDOFF §12.5）</b>：含 3 个 JsonNode ⇒ :contract 零依赖装不下 ⇒ 留 L1，
+ * 登记待去 Jackson（去 Jackson 后与端口知识行面整批入 contract.knowledge）。</p>
  */
-@TableName(value = "knowledges", autoResultMap = true)
-public class Knowledge {
+public class KnowledgeRowView {
 
-    public static final String PARSE_PENDING = "pending";
-    public static final String PARSE_PROCESSING = "processing";
-    public static final String PARSE_FINALIZING = "finalizing";
-    public static final String PARSE_COMPLETED = "completed";
-    public static final String PARSE_FAILED = "failed";
-    public static final String PARSE_DELETING = "deleting";
-    public static final String PARSE_CANCELLED = "cancelled";
-
-    @TableId(type = IdType.INPUT)
     private String id;
     private Long tenantId;
     private String knowledgeBaseId;
-    /** 无列映射标签 关联回填；不回填 → 恒 null */
-    @TableField(exist = false)
     private List<JsonNode> tags;
     private String type;
     private String title;
     private String description = "";
     private String source = "";
     private String channel = "web";
-    private String parseStatus = PARSE_PENDING;
+    private String parseStatus = KnowledgeParseStatus.PARSE_PENDING;
     private int pendingSubtasksCount;
     private String summaryStatus = "none";
     private String enableStatus = "enabled";
@@ -53,21 +41,14 @@ public class Knowledge {
     private String fileHash;
     private String filePath;
     private long storageSize;
-    /** 恒输出：NULL → "metadata":null */
-    @TableField(typeHandler = PgJsonTypeHandler.class)
     private JsonNode metadata;
-    @TableField(typeHandler = PgJsonTypeHandler.class)
     private JsonNode customMetadata;
-    /** 恒输出：NULL → null */
-    @TableField(typeHandler = PgJsonTypeHandler.class)
     private JsonNode lastFaqImportResult;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
     private OffsetDateTime processedAt;
     private String errorMessage = "";
     private OffsetDateTime deletedAt;
-    /** 无列映射标签 查询回填（跨 KB 列表场景；恒输出，默认 ""） */
-    @TableField(exist = false)
     private String knowledgeBaseName = "";
 
     public String getId() { return id; }
@@ -130,10 +111,4 @@ public class Knowledge {
     public void setDeletedAt(OffsetDateTime v) { deletedAt = v; }
     public String getKnowledgeBaseName() { return knowledgeBaseName == null ? "" : knowledgeBaseName; }
     public void setKnowledgeBaseName(String v) { knowledgeBaseName = v == null ? "" : v; }
-
-    /** deleting/cancelled 即中止 */
-    @JsonIgnore
-    public boolean isAborted() {
-        return PARSE_DELETING.equals(parseStatus) || PARSE_CANCELLED.equals(parseStatus);
-    }
 }

@@ -3,8 +3,8 @@ package com.ragagent.datasource.service;
 import java.util.List;
 import java.util.Map;
 
-import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.KnowledgeBaseRowView;
+import com.ragagent.common.knowledge.KnowledgeRowView;
 
 /**
  * 数据源同步往知识库里写东西时要用的那一小片能力（知识库服务 + 仓储
@@ -37,7 +37,7 @@ import com.ragagent.common.knowledge.KnowledgeBaseRowView;
  *
  * <h2>不落响应体</h2>
  * <p>本端口的任何方法都不产出 HTTP 响应（同步是后台的），所以这里不存在
- * "字节对齐"要求；{@link Knowledge} 只是被读写的数据载体。</p>
+ * "字节对齐"要求；{@code Knowledge} 只是被读写的数据载体。</p>
  */
 public interface KnowledgeBridge {
 
@@ -57,7 +57,7 @@ public interface KnowledgeBridge {
      * {@code metadata->>'datasource_id'} + {@code metadata->>'externalId'} 找，
      * <b>限定本租户与知识库、排除软删行</b>；找不到回 {@code null}（不是错误）。
      */
-    Knowledge findByDataSourceExternalId(long tenantId, String kbId, String dataSourceId,
+    KnowledgeRowView findByDataSourceExternalId(long tenantId, String kbId, String dataSourceId,
                                          String externalId);
 
     /**
@@ -65,7 +65,7 @@ public interface KnowledgeBridge {
      * {@code prefix} 开头的行（用于"清扫"文档下已消失的子项）。
      * 无命中回空列表。
      */
-    List<Knowledge> findByMetadataKeyPrefix(long tenantId, String kbId, String key, String prefix);
+    List<KnowledgeRowView> findByMetadataKeyPrefix(long tenantId, String kbId, String key, String prefix);
 
     /**
      * 把已抓取到的字节写进知识库。
@@ -76,7 +76,7 @@ public interface KnowledgeBridge {
      * @throws com.ragagent.common.knowledge.service.DuplicateKnowledgeException
      *         内容重复
      */
-    Knowledge createFromFile(long tenantId, String kbId, byte[] content, String fileName,
+    KnowledgeRowView createFromFile(long tenantId, String kbId, byte[] content, String fileName,
                              Map<String, String> metadata, List<String> tagIds, String channel);
 
     /**
@@ -89,11 +89,11 @@ public interface KnowledgeBridge {
  * （见 {@link #attachMetadata}），因为"重复内容"分支会复用一条已有行，
  * 那条行不该被重新打标。</p>
  */
-    Knowledge createFromUrl(long tenantId, String kbId, String url, String fileName, String title,
+    KnowledgeRowView createFromUrl(long tenantId, String kbId, String url, String fileName, String title,
                             List<String> tagIds, String channel);
 
     /** 把 metadata 合并写进该 knowledge 行。 */
-    void attachMetadata(Knowledge knowledge, Map<String, String> metadata);
+    void attachMetadata(KnowledgeRowView knowledge, Map<String, String> metadata);
 
     /** 软删单条（含级联与存储清理）。 */
     void softDelete(long tenantId, String knowledgeId);

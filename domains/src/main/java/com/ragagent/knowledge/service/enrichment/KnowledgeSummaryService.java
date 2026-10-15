@@ -24,7 +24,7 @@ import com.ragagent.platform.prompt.AgentPromptPlaceholders;
 import com.ragagent.common.settings.ConversationProperties;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.domain.KnowledgeBaseIndexingStrategy;
-import com.ragagent.common.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.task.KnowledgeProcessedEvent;

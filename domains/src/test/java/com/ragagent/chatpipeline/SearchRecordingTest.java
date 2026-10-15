@@ -27,7 +27,7 @@ import com.ragagent.contract.graph.GraphData;
 import com.ragagent.contract.graph.GraphNode;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.common.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.Knowledge;
 
 /**
  * 录制回放：查询扩展 / 去重 / 部分重叠 / filter_top_k / search / search_by_targets /

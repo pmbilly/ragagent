@@ -24,7 +24,7 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.retrieval.graph.RetrieveGraphRepository;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.common.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;

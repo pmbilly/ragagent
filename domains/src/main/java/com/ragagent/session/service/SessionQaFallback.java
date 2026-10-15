@@ -25,10 +25,10 @@ import com.ragagent.platform.event.Event;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.contract.event.payload.AgentFinalAnswerData;
 import com.ragagent.contract.event.payload.AgentReferencesData;
-import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.platform.prompt.AgentPromptPlaceholders;
 import com.ragagent.platform.event.EventIds;
+import com.ragagent.common.knowledge.KnowledgeRowView;
 
 /**
  * 知识问答降级协作者:固定文案兜底与模型兜底的消息准备与响应。
@@ -199,14 +199,14 @@ final class SessionQaFallback {
             if (total >= maxDocuments) {
                 break;
             }
-            List<Knowledge> knowledges;
+            List<KnowledgeRowView> knowledges;
             try {
                 knowledges = service.knowledgeCatalog.listKnowledge(kbId, 1, 10000, null, null, null, null, false).getRecords();
             } catch (RuntimeException e) {
                 log.warn("buildKBDocumentListing: failed to list knowledge for KB {}: {}", kbId, e.toString());
                 continue;
             }
-            for (Knowledge k : knowledges) {
+            for (KnowledgeRowView k : knowledges) {
                 if (total >= maxDocuments) {
                     break;
                 }

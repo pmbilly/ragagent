@@ -19,11 +19,11 @@ import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.domain.DataSourceException;
 import com.ragagent.datasource.domain.SyncLog;
 import com.ragagent.datasource.domain.TaskInitiator;
-import com.ragagent.common.knowledge.domain.Knowledge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ragagent.platform.web.ZeroTimeSerializer;
 import com.ragagent.common.knowledge.KnowledgeBaseRowView;
+import com.ragagent.common.knowledge.KnowledgeRowView;
 
 /**
  * 数据源支撑件：配置的校验/解析/深比较、知识库归属校验、身份与"零值时间"等判据、
@@ -168,7 +168,7 @@ final class DataSourceSupport {
         return t == null || ZeroTimeSerializer.isZeroValue(t);
     }
 
-    static String readMetadataValue(Knowledge k, String key) {
+    static String readMetadataValue(KnowledgeRowView k, String key) {
         com.fasterxml.jackson.databind.JsonNode md = k.getMetadata();
         if (md == null || !md.isObject()) {
             return null;

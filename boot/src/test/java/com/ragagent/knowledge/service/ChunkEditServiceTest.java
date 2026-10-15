@@ -13,7 +13,7 @@ import com.ragagent.contract.error.BizException;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ChunkRevision;
 import com.ragagent.common.knowledge.domain.KnowledgeBaseIndexingStrategy;
-import com.ragagent.common.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.mapper.ChunkMapper;
 import com.ragagent.knowledge.repository.ChunkRepository;

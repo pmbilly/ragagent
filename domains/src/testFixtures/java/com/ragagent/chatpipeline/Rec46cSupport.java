@@ -43,7 +43,7 @@ import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.session.support.PipelineViews;
 import com.ragagent.contract.tenant.WebSearchConfig;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.common.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.common.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.retrieval.domain.WebSearchResult;
@@ -53,6 +53,7 @@ import com.ragagent.common.knowledge.KnowledgeBaseView;
 import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.knowledge.service.management.KnowledgeBaseLookupAdapter;
 import com.ragagent.knowledge.support.ChunkRowViews;
+import com.ragagent.knowledge.support.KnowledgeRowViews;
 
 /**
  * 4.6c 录制回放的替身与掩码工具。
@@ -564,7 +565,7 @@ final class Rec46cSupport {
             k.setFileName(id + ".csv");
             k.setDescription("描述");
             // B114：端口载荷是 facts，实体只在替身内部（镜像生产侧 QaWiring 的投影）。
-            return KnowledgeProjectionAdapter.factsOf(k);
+            return KnowledgeProjectionAdapter.factsOf(KnowledgeRowViews.rowView(k));
         }
 
         @Override
@@ -597,7 +598,7 @@ final class Rec46cSupport {
                     out.add(k);
                 }
             }
-            return KnowledgeProjectionAdapter.factsOf(out);
+            return KnowledgeProjectionAdapter.factsOf(KnowledgeRowViews.rowViews(out));
         }
     }
 

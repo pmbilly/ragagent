@@ -6,8 +6,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.KnowledgeBaseRowView;
+import com.ragagent.common.knowledge.KnowledgeRowView;
 
 /**
  * {@code SessionQaResolution} 的**agent 覆盖簇**：把 custom agent 的配置
@@ -95,14 +95,14 @@ final class QaSearchTargets {
         }
         Map<String, List<String>> kbToKnowledgeIds = new LinkedHashMap<>();
         if (!knowledgeIds.isEmpty()) {
-            List<Knowledge> knowledgeList;
+            List<KnowledgeRowView> knowledgeList;
             try {
                 knowledgeList = service.knowledgeCatalog.getKnowledgeBatchWithSharedAccess(tenantId, knowledgeIds);
             } catch (RuntimeException e) {
                 log.warn("Failed to get knowledge batch for search targets: {}", e.toString());
                 return targets; // Return what we have, don't fail
             }
-            for (Knowledge k : knowledgeList) {
+            for (KnowledgeRowView k : knowledgeList) {
                 if (k == null || k.getKnowledgeBaseId() == null || k.getKnowledgeBaseId().isEmpty()) {
                     continue;
                 }

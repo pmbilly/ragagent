@@ -8,7 +8,7 @@ import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.web.RejectEmptyBody;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.contract.knowledge.GeneratedQuestion;
-import com.ragagent.common.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.dto.chunk.ChunkPageResponse;
 import com.ragagent.knowledge.dto.chunk.ChunkRevisionResponse;
 import com.ragagent.knowledge.dto.chunk.ChunkUpdateResponse;

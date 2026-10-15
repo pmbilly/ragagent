@@ -28,7 +28,6 @@ import com.ragagent.agent.tool.TodoWriteTool;
 import com.ragagent.agenttools.web.WebFetchTool;
 import com.ragagent.agenttools.web.WebSearchTool;
 import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.common.session.domain.conversation.SessionOwnerIds;
 import com.ragagent.contract.storage.ResourceCatalogPort;
@@ -40,6 +39,7 @@ import com.ragagent.agent.prompt.KnowledgeBaseInfo;
 import com.ragagent.chatpipeline.spi.McpToolingGateway;
 import com.ragagent.chatpipeline.spi.McpToolRegistrationPort;
 import com.ragagent.common.knowledge.KnowledgeBaseRowView;
+import com.ragagent.common.knowledge.KnowledgeRowView;
 
 /**
  * {@code SessionAgentQaService} 的**引擎/工具装配簇**（§14.9c 刀 3）：创建 agent 引擎（LLM/记忆/审批门/
@@ -301,7 +301,7 @@ final class AgentEngineAssembler {
                             null, null, false);
                     docCount = (int) Math.max(page.getTotal(), 0);
                     if (page.getRecords() != null) {
-                        for (Knowledge k : page.getRecords()) {
+                        for (KnowledgeRowView k : page.getRecords()) {
                             if (k == null || recentDocs.size() >= 10) {
                                 break;
                             }
@@ -345,7 +345,7 @@ final class AgentEngineAssembler {
         }
         List<SelectedDocumentInfo> selectedDocs = new ArrayList<>();
         for (String kid : ids) {
-            Knowledge k;
+            KnowledgeRowView k;
             try {
                 k = knowledgeService.getKnowledgeByIdOnly(kid);
             } catch (RuntimeException e) {

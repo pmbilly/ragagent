@@ -25,7 +25,7 @@ import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.security.InputSanitizer;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.common.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

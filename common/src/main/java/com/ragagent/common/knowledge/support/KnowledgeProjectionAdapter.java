@@ -6,14 +6,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
-import com.ragagent.common.knowledge.domain.Knowledge;
+import com.ragagent.common.knowledge.KnowledgeRowView;
 
 /**
  * knowledge 实体 → L1/线格式载荷的**域内公用投影**（由 {@code service.KnowledgeService}
  * 的静态助手抽出；与 的 {@link ChunkProjectionAdapter} 同一条思路——"实体 → 载荷"的
  * 映射只留一份，跨面复用不漂移）。
  *
- * <p>含：{@code factsOf(List<Knowledge>)} / {@code factsOf(Knowledge)}（→ {@link KnowledgeDocumentFacts}）、
+ * <p>含：{@code factsOf(List<KnowledgeRowView>)} / {@code factsOf(KnowledgeRowView)}（→ {@link KnowledgeDocumentFacts}）、
  * {@code timeString(OffsetDateTime)}（线格式时间）。
  * 依赖方向：support ← 任意面（本类不依赖任何 service）。</p>
  */
@@ -23,9 +23,9 @@ public final class KnowledgeProjectionAdapter {
     }
 
     /** 批量投影（保持入参顺序）。 */
-    public static List<KnowledgeDocumentFacts> factsOf(List<Knowledge> rows) {
+    public static List<KnowledgeDocumentFacts> factsOf(List<KnowledgeRowView> rows) {
         List<KnowledgeDocumentFacts> out = new ArrayList<>();
-        for (Knowledge k : rows) {
+        for (KnowledgeRowView k : rows) {
             out.add(factsOf(k));
         }
         return out;
@@ -36,7 +36,7 @@ public final class KnowledgeProjectionAdapter {
      */
 
 
-    public static KnowledgeDocumentFacts factsOf(Knowledge k) {
+    public static KnowledgeDocumentFacts factsOf(KnowledgeRowView k) {
         if (k == null) {
             return null;
         }

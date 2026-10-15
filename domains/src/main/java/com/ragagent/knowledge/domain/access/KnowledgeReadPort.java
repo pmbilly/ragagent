@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.domain.access;
 
 import java.util.List;
-import com.ragagent.common.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 
 /**

@@ -19,7 +19,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import com.ragagent.common.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.Knowledge;
 
 import jakarta.annotation.PreDestroy;
 import com.ragagent.knowledge.task.KnowledgeTaskExecutor;

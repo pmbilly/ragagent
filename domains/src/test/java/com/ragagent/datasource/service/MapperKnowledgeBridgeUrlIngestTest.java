@@ -29,13 +29,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.storage.LocalStorageService;
 import com.sun.net.httpserver.HttpServer;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.KnowledgeIngest;
 import com.ragagent.knowledge.support.KnowledgePaths;
 import com.ragagent.common.knowledge.KnowledgeBaseRowView;
+import com.ragagent.common.knowledge.KnowledgeRowView;
+import com.ragagent.common.knowledge.KnowledgeParseStatus;
 
 /**
  * 数据源 URL 摄取（整改 K2 /）：下载在同步期完成、与文件行同形。
@@ -77,12 +78,12 @@ class MapperKnowledgeBridgeUrlIngestTest {
                 .thenReturn("kb-1/doc.md");
         KnowledgeIngest ingest = ingestMock();
 
-        Knowledge created = bridge(catalog, ingest)
+        KnowledgeRowView created = bridge(catalog, ingest)
                 .createFromUrl(42L, "kb-1", url, null, "标题", List.of(), "ima");
 
-        ArgumentCaptor<Knowledge> captor = ArgumentCaptor.forClass(Knowledge.class);
+        ArgumentCaptor<KnowledgeRowView> captor = ArgumentCaptor.forClass(KnowledgeRowView.class);
         verify(catalog).insertKnowledge(captor.capture());
-        Knowledge row = captor.getValue();
+        KnowledgeRowView row = captor.getValue();
         assertThat(row.getFilePath()).as("URL 行必须与文件行同形（关键断言）").isEqualTo("kb-1/doc.md");
         assertThat(row.getFileHash()).isEqualTo(LocalStorageService.md5Hex(body));
         assertThat(row.getFileSize()).isEqualTo(body.length);
@@ -91,7 +92,7 @@ class MapperKnowledgeBridgeUrlIngestTest {
         assertThat(row.getFileType()).isEqualTo("md");
         assertThat(row.getTitle()).isEqualTo("标题");
         assertThat(row.getType()).isEqualTo("file");
-        assertThat(row.getParseStatus()).isEqualTo(Knowledge.PARSE_PENDING);
+        assertThat(row.getParseStatus()).isEqualTo(KnowledgeParseStatus.PARSE_PENDING);
         assertThat(created.getId()).isEqualTo(row.getId());
         verify(ingest).enqueueProcessing(row.getId());
     }
@@ -111,7 +112,7 @@ class MapperKnowledgeBridgeUrlIngestTest {
                 null, List.of(), "ima"))
                 .isInstanceOf(SsrfGuard.SsrfException.class);
 
-        verify(catalog, never()).insertKnowledge(any(Knowledge.class));
+        verify(catalog, never()).insertKnowledge(any(KnowledgeRowView.class));
         verifyNoInteractions(ingest);
     }
 
@@ -129,9 +130,9 @@ class MapperKnowledgeBridgeUrlIngestTest {
                 "abc".getBytes(StandardCharsets.UTF_8), "a.txt", Map.of("externalId", "e1"),
                 List.of(), "rss");
 
-        ArgumentCaptor<Knowledge> captor = ArgumentCaptor.forClass(Knowledge.class);
+        ArgumentCaptor<KnowledgeRowView> captor = ArgumentCaptor.forClass(KnowledgeRowView.class);
         verify(catalog).insertKnowledge(captor.capture());
-        Knowledge row = captor.getValue();
+        KnowledgeRowView row = captor.getValue();
         assertThat(row.getSource()).isEmpty();
         assertThat(row.getFileName()).isEqualTo("a.txt");
         assertThat(row.getFilePath()).isEqualTo("kb-1/a.txt");

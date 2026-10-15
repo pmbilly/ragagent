@@ -21,13 +21,13 @@ import org.junit.jupiter.api.Test;
 
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.session.repository.MessageRepository;
 import com.ragagent.session.repository.MessageSuggestionRepository;
 import com.ragagent.session.repository.SessionRepository;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
+import com.ragagent.common.knowledge.KnowledgeRowView;
 
 /**
  * 聊天历史 KB 索引的验收：
@@ -78,8 +78,8 @@ class MessageServiceChatHistoryIndexTest {
         return n;
     }
 
-    private static Knowledge knowledge(String id) {
-        Knowledge k = new Knowledge();
+    private static KnowledgeRowView knowledge(String id) {
+        KnowledgeRowView k = new KnowledgeRowView();
         k.setId(id);
         return k;
     }

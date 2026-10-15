@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.common.knowledge.KnowledgeBaseRowView;
+import com.ragagent.common.knowledge.KnowledgeRowView;
 
 /**
  * {@code SessionQaResolution} 的**模型选择簇**：按请求/知识库/会话推导 chat 模型 id
@@ -72,10 +72,10 @@ final class QaModelSelection {
         if (kbIds.isEmpty() && !knowledgeIds.isEmpty()) {
             long tenantId = SessionKnowledgeQaService.requireTenantId();
             try {
-                List<Knowledge> knowledgeList = service.knowledgeCatalog.getKnowledgeBatchWithSharedAccess(
+                List<KnowledgeRowView> knowledgeList = service.knowledgeCatalog.getKnowledgeBatchWithSharedAccess(
                         tenantId, knowledgeIds);
                 Set<String> kbIdSet = new LinkedHashSet<>();
-                for (Knowledge k : knowledgeList) {
+                for (KnowledgeRowView k : knowledgeList) {
                     if (k != null && k.getKnowledgeBaseId() != null && !k.getKnowledgeBaseId().isEmpty()) {
                         kbIdSet.add(k.getKnowledgeBaseId());
                     }

@@ -3,7 +3,7 @@ package com.ragagent.common.knowledge.service;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.error.ErrorCode;
-import com.ragagent.common.knowledge.domain.Knowledge;
+import com.ragagent.common.knowledge.KnowledgeRowView;
 import com.ragagent.contract.knowledge.service.DuplicateKnowledgeDetails;
 
 /**
@@ -22,14 +22,14 @@ import com.ragagent.contract.knowledge.service.DuplicateKnowledgeDetails;
  * （{@code {code,data,message,success}}）。</p>
  */
 public class DuplicateKnowledgeException extends BizException {
-    private final Knowledge existing;
+    private final KnowledgeRowView existing;
 
-    public DuplicateKnowledgeException(Knowledge existing, ErrorCode code, String message) {
+    public DuplicateKnowledgeException(KnowledgeRowView existing, ErrorCode code, String message) {
         super(new AppError(code.value(), message, null, 409)
                 .withDetails(existing == null ? null
                         : new DuplicateKnowledgeDetails(existing.getId())));
         this.existing = existing;
     }
 
-    public Knowledge existing() { return existing; }
+    public KnowledgeRowView existing() { return existing; }
 }

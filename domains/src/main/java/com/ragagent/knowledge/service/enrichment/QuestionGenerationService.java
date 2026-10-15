@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.platform.tracing.langfuse.LangfuseTaskScope;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.common.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.repository.ChunkRepository;
 

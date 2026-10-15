@@ -20,7 +20,7 @@ import com.ragagent.retrieval.graph.RetrieveGraphRepository;
 import com.ragagent.retrieval.telemetry.RetrievalObs;
 import com.ragagent.platform.prompt.PromptInstructions;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.common.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeProcessingSpan;
 import com.ragagent.knowledge.repository.ChunkRepository;

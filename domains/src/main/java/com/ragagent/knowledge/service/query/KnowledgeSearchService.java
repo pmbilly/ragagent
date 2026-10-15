@@ -2,7 +2,7 @@ package com.ragagent.knowledge.service.query;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.ragagent.common.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeSearchScope;
 import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;

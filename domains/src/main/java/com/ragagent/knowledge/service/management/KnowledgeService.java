@@ -38,7 +38,7 @@ import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.common.knowledge.KnowledgeDocumentGateway;
 import com.ragagent.platform.security.InputSanitizer;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.common.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeTag;
 import com.ragagent.contract.knowledge.KnowledgeIngest;
@@ -61,6 +61,7 @@ import com.ragagent.knowledge.service.query.KnowledgeSearchService;
 import com.ragagent.knowledge.service.query.KnowledgeSpanService;
 import com.ragagent.common.knowledge.service.DuplicateKnowledgeException;
 import com.ragagent.knowledge.support.TagViews;
+import com.ragagent.knowledge.support.KnowledgeRowViews;
 
 /**
  * （覆盖 file/url/manual 创建、分页列表、get/update/delete、folders；
@@ -174,7 +175,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
         // 重复文件检查
         Knowledge dup = knowledgeRepository.findDuplicateByHash(kbId, hash);
         if (dup != null) {
-            throw new DuplicateKnowledgeException(dup, ErrorCode.KNOWLEDGE_DUPLICATE_FILE,
+            throw new DuplicateKnowledgeException(KnowledgeRowViews.rowView(dup), ErrorCode.KNOWLEDGE_DUPLICATE_FILE,
                     "文件已存在（相同内容）");
         }
         String title = displayName != null && !displayName.isEmpty() ? displayName : fileName;
@@ -201,7 +202,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
         String hash = LocalStorageService.md5Hex(content);
         Knowledge dup = knowledgeRepository.findDuplicateBySource(kbId, url);
         if (dup != null) {
-            throw new DuplicateKnowledgeException(dup, ErrorCode.KNOWLEDGE_DUPLICATE_URL,
+            throw new DuplicateKnowledgeException(KnowledgeRowViews.rowView(dup), ErrorCode.KNOWLEDGE_DUPLICATE_URL,
                     "URL 已存在");
         }
         String fname = fileName != null && !fileName.isEmpty() ? fileName : KnowledgePaths.extractFileNameFromUrl(url);
@@ -433,7 +434,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
     public List<KnowledgeDocumentFacts> findAccessibleDocuments(long tenantId, List<String> knowledgeIds) {
         List<KnowledgeDocumentFacts> out = new ArrayList<>();
         for (Knowledge k : getKnowledgeBatchWithSharedAccess(tenantId, knowledgeIds)) {
-            out.add(KnowledgeProjectionAdapter.factsOf(k));
+            out.add(KnowledgeProjectionAdapter.factsOf(KnowledgeRowViews.rowView(k)));
         }
         return out;
     }

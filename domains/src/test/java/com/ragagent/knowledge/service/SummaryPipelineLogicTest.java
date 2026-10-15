@@ -9,7 +9,7 @@ import java.util.function.BiFunction;
 
 import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.common.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.retrieval.domain.ImageInfo;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
 import org.junit.jupiter.api.Test;

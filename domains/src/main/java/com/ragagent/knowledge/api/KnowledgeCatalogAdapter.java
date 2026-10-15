@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.FaqEntryPageView;
 import com.ragagent.contract.knowledge.FaqEntryView;
-import com.ragagent.common.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.service.faq.FaqEntryQueryService;
@@ -27,7 +27,6 @@ import com.ragagent.knowledge.mapper.ChunkMapper;
 import com.ragagent.knowledge.domain.KnowledgeTag;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import java.util.Map;
-import java.util.ArrayList;
 import java.time.ZoneOffset;
 import java.time.OffsetDateTime;
 import com.ragagent.knowledge.repository.KnowledgeTagRepository;
@@ -43,6 +42,8 @@ import com.ragagent.common.knowledge.ChunkRowView;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.KnowledgeBaseRowView;
 import com.ragagent.knowledge.support.KnowledgeBaseRowViews;
+import com.ragagent.common.knowledge.KnowledgeRowView;
+import com.ragagent.knowledge.support.KnowledgeRowViews;
 
 /**
  * {@link KnowledgeCatalogPort} 的知识域实现：读写逐字转发两个门面服务，
@@ -91,31 +92,31 @@ public class KnowledgeCatalogAdapter implements KnowledgeCatalogPort {
     }
 
     @Override
-    public Knowledge getKnowledgeByIdOnly(String id) {
-        return knowledgeService.getKnowledgeByIdOnly(id);
+    public KnowledgeRowView getKnowledgeByIdOnly(String id) {
+        return KnowledgeRowViews.rowView(knowledgeService.getKnowledgeByIdOnly(id));
     }
 
     @Override
-    public List<Knowledge> getKnowledgeBatch(long tenantId, List<String> ids) {
-        return knowledgeService.getKnowledgeBatch(tenantId, ids);
+    public List<KnowledgeRowView> getKnowledgeBatch(long tenantId, List<String> ids) {
+        return KnowledgeRowViews.rowViews(knowledgeService.getKnowledgeBatch(tenantId, ids));
     }
 
     @Override
-    public List<Knowledge> getKnowledgeBatchWithSharedAccess(long tenantId, List<String> ids) {
-        return knowledgeService.getKnowledgeBatchWithSharedAccess(tenantId, ids);
+    public List<KnowledgeRowView> getKnowledgeBatchWithSharedAccess(long tenantId, List<String> ids) {
+        return KnowledgeRowViews.rowViews(knowledgeService.getKnowledgeBatchWithSharedAccess(tenantId, ids));
     }
 
     @Override
-    public Knowledge getKnowledgeInTenant(long tenantId, String id) {
-        return knowledgeService.getKnowledgeInTenant(tenantId, id);
+    public KnowledgeRowView getKnowledgeInTenant(long tenantId, String id) {
+        return KnowledgeRowViews.rowView(knowledgeService.getKnowledgeInTenant(tenantId, id));
     }
 
     @Override
-    public Page<Knowledge> listKnowledge(String kbId, long page, long pageSize,
+    public Page<KnowledgeRowView> listKnowledge(String kbId, long page, long pageSize,
             String keyword, String parseStatus, String fileType,
             String folderPath, boolean folderPresent) {
-        return knowledgeService.listKnowledge(kbId, page, pageSize, keyword, parseStatus,
-                fileType, folderPath, folderPresent);
+        return KnowledgeRowViews.pageView(knowledgeService.listKnowledge(kbId, page, pageSize, keyword, parseStatus,
+                fileType, folderPath, folderPresent));
     }
 
     @Override
@@ -124,15 +125,15 @@ public class KnowledgeCatalogAdapter implements KnowledgeCatalogPort {
     }
 
     @Override
-    public Knowledge createFromPassageSync(String kbId, List<String> passages, String channel) {
-        return knowledgeService.createFromPassageSync(kbId, passages, channel);
+    public KnowledgeRowView createFromPassageSync(String kbId, List<String> passages, String channel) {
+        return KnowledgeRowViews.rowView(knowledgeService.createFromPassageSync(kbId, passages, channel));
     }
 
     @Override
-    public Knowledge createFromFile(String kbId, byte[] fileContent, String fileName,
+    public KnowledgeRowView createFromFile(String kbId, byte[] fileContent, String fileName,
             String displayName, JsonNode customMetadata, String channel) {
-        return knowledgeService.createFromFile(kbId, fileContent, fileName, displayName,
-                customMetadata, channel);
+        return KnowledgeRowViews.rowView(knowledgeService.createFromFile(kbId, fileContent, fileName,
+                displayName, customMetadata, channel));
     }
 
     @Override
@@ -256,7 +257,7 @@ public class KnowledgeCatalogAdapter implements KnowledgeCatalogPort {
     }
 
     @Override
-    public Knowledge findKnowledgeByExternalId(long tenantId, String kbId, String dataSourceId, String externalId) {
+    public KnowledgeRowView findKnowledgeByExternalId(long tenantId, String kbId, String dataSourceId, String externalId) {
         List<Knowledge> rows = knowledgeMapper.selectList(
                 new LambdaQueryWrapper<Knowledge>()
                         .eq(Knowledge::getTenantId, tenantId)
@@ -265,11 +266,11 @@ public class KnowledgeCatalogAdapter implements KnowledgeCatalogPort {
                         .apply("metadata->>'datasourceId' = {0}", dataSourceId)
                         .apply("metadata->>'externalId' = {0}", externalId)
                         .last("LIMIT 1"));
-        return rows == null || rows.isEmpty() ? null : rows.get(0);
+        return rows == null || rows.isEmpty() ? null : KnowledgeRowViews.rowView(rows.get(0));
     }
 
     @Override
-    public List<Knowledge> listKnowledgeByMetadataPrefix(long tenantId, String kbId,
+    public List<KnowledgeRowView> listKnowledgeByMetadataPrefix(long tenantId, String kbId,
             String metadataKey, String rawPrefix) {
         List<Knowledge> rows = knowledgeMapper.selectList(
                 new LambdaQueryWrapper<Knowledge>()
@@ -278,31 +279,31 @@ public class KnowledgeCatalogAdapter implements KnowledgeCatalogPort {
                         .apply("deleted_at IS NULL")
                         .apply("metadata->>'" + metadataKey.replace("'", "''") + "' LIKE {0} ESCAPE '\\\\'",
                                 escapeLike(rawPrefix) + "%"));
-        return rows == null ? new ArrayList<>() : rows;
+        return rows == null ? List.of() : KnowledgeRowViews.rowViews(rows);
     }
 
     @Override
-    public List<Knowledge> listKnowledgeLive(long tenantId, String kbId) {
+    public List<KnowledgeRowView> listKnowledgeLive(long tenantId, String kbId) {
         List<Knowledge> rows = knowledgeMapper.selectList(new LambdaQueryWrapper<Knowledge>()
                 .eq(Knowledge::getTenantId, tenantId)
                 .eq(Knowledge::getKnowledgeBaseId, kbId)
                 .isNull(Knowledge::getDeletedAt));
-        return rows == null ? new ArrayList<>() : rows;
+        return rows == null ? List.of() : KnowledgeRowViews.rowViews(rows);
     }
 
     @Override
-    public Knowledge findKnowledgeByHash(String kbId, String fileHash, String fileType) {
-        return knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
+    public KnowledgeRowView findKnowledgeByHash(String kbId, String fileHash, String fileType) {
+        return KnowledgeRowViews.rowView(knowledgeMapper.selectOne(new LambdaQueryWrapper<Knowledge>()
                 .eq(Knowledge::getKnowledgeBaseId, kbId)
                 .eq(Knowledge::getFileHash, fileHash)
                 .eq(Knowledge::getFileType, fileType)
                 .isNull(Knowledge::getDeletedAt)
-                .last("LIMIT 1"));
+                .last("LIMIT 1")));
     }
 
     @Override
-    public void insertKnowledge(Knowledge knowledge) {
-        knowledgeMapper.insert(knowledge);
+    public void insertKnowledge(KnowledgeRowView knowledge) {
+        knowledgeMapper.insert(KnowledgeRowViews.toEntity(knowledge));
     }
 
     @Override
@@ -316,7 +317,7 @@ public class KnowledgeCatalogAdapter implements KnowledgeCatalogPort {
     }
 
     @Override
-    public void updateKnowledgeMetadataRow(Knowledge knowledge, Map<String, String> metadata) {
+    public void updateKnowledgeMetadataRow(KnowledgeRowView knowledge, Map<String, String> metadata) {
         LambdaUpdateWrapper<Knowledge> uw = new LambdaUpdateWrapper<Knowledge>()
                 .eq(Knowledge::getId, knowledge.getId())
                 .eq(Knowledge::getTenantId, knowledge.getTenantId())

@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ragagent.common.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.Knowledge;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper

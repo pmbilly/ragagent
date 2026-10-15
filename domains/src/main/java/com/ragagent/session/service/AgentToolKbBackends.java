@@ -19,7 +19,6 @@ import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.common.settings.ConversationProperties;
-import com.ragagent.common.knowledge.domain.Knowledge;
 
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
@@ -30,6 +29,7 @@ import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.ChunkPageView;
 import com.ragagent.common.knowledge.KnowledgeBaseRowView;
+import com.ragagent.common.knowledge.KnowledgeRowView;
 
 /**
  * {@code AgentToolBackends} 的**知识库检索簇**：知识库检索 / chunk 列举 /
@@ -399,7 +399,7 @@ final class AgentToolKbBackends {
         return new DocChunkSupport.KnowledgeInfoReader() {
             @Override
             public DocChunkSupport.KnowledgeInfoView byIdOnly(String knowledgeId) {
-                Knowledge k = knowledgeCatalog.getKnowledgeByIdOnly(knowledgeId);
+                KnowledgeRowView k = knowledgeCatalog.getKnowledgeByIdOnly(knowledgeId);
                 if (k == null) {
                     return null;
                 }

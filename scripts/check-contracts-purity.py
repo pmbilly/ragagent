@@ -146,6 +146,9 @@ PENDING_DEJACKSON = {
         "JsonNode wikiConfig/extractConfig（1 处消费触达）⇒ 待去 Jackson",
     "com/ragagent/common/knowledge/KnowledgeDocumentFacts.java":
         "JsonNode metadata（2 处消费触达）⇒ 待去 Jackson",
+    "com/ragagent/common/knowledge/KnowledgeRowView.java":
+        "JsonNode × 3（metadata/customMetadata/lastFaqImportResult）+ List<JsonNode> tags ⇒ 待去 Jackson；"
+        "doc-*.json 金片钉住线格式",
     "com/ragagent/common/knowledge/KnowledgeBaseRowView.java":
         "JsonNode × 5（extract/faq/questionGeneration/autoTag/wiki 配置）+ 6 个 typed config ⇒ 待去 Jackson；"
         "KB API 与 init 线格式由 kb-*.json / init-*.json 金片钉住",

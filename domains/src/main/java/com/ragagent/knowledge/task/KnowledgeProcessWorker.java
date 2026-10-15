@@ -10,7 +10,7 @@ import java.util.concurrent.Executors;
 import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.common.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeProcessingSpan;
 import com.ragagent.common.knowledge.chunker.Chunker;

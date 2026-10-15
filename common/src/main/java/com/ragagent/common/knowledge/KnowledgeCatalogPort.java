@@ -6,7 +6,6 @@ import java.util.Map;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.knowledge.FaqEntryPageView;
-import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.contract.knowledge.KnowledgeTagView;
 
 /**
@@ -14,7 +13,7 @@ import com.ragagent.contract.knowledge.KnowledgeTagView;
  *
  * <p><b>为什么是端口</b>：会话 / 评测 / IM / 数据源等域只做"按 id 取行、按租户列行、
  * 建/删"，而实现（含 409 重复冲突、租户可见性、内嵌状态机）在知识域。
- * 实体 {@code Knowledge}/{@code KnowledgeBase} 已**归位各域**（C 批）；跨域面只搬
+ * 实体 {@code KnowledgeRowView}/{@code KnowledgeBase} 已**归位各域**（C 批）；跨域面只搬
  * {@link KnowledgeBaseRowView} 等 L1 行视图（HANDOFF §12.0 判据 1）。</p>
  *
  * <p><b>失败语义</b>与知识域一致：id 空 / 不可见 / 状态异常 ⇒ 运行时异常原样上抛；
@@ -25,19 +24,19 @@ public interface KnowledgeCatalogPort {
     // ── 知识条目（读） ──
 
     /** 按 id 取知识（仅本人可见口径，与域实现一致）。 */
-    Knowledge getKnowledgeByIdOnly(String id);
+    KnowledgeRowView getKnowledgeByIdOnly(String id);
 
     /** 批量取知识。 */
-    List<Knowledge> getKnowledgeBatch(long tenantId, List<String> ids);
+    List<KnowledgeRowView> getKnowledgeBatch(long tenantId, List<String> ids);
 
     /** 批量取知识（含共享访问口径）。 */
-    List<Knowledge> getKnowledgeBatchWithSharedAccess(long tenantId, List<String> ids);
+    List<KnowledgeRowView> getKnowledgeBatchWithSharedAccess(long tenantId, List<String> ids);
 
     /** 租户内按 id 取知识。 */
-    Knowledge getKnowledgeInTenant(long tenantId, String id);
+    KnowledgeRowView getKnowledgeInTenant(long tenantId, String id);
 
     /** 知识分页列表（关键字 / 解析状态 / 文件类型 / 目录过滤）。 */
-    Page<Knowledge> listKnowledge(String kbId, long page, long pageSize,
+    Page<KnowledgeRowView> listKnowledge(String kbId, long page, long pageSize,
             String keyword, String parseStatus, String fileType,
             String folderPath, boolean folderPresent);
 
@@ -47,10 +46,10 @@ public interface KnowledgeCatalogPort {
     String deleteKnowledge(String id);
 
     /** 从段落同步建知识（评测造数路径）。 */
-    Knowledge createFromPassageSync(String kbId, List<String> passages, String channel);
+    KnowledgeRowView createFromPassageSync(String kbId, List<String> passages, String channel);
 
     /** 从文件内容建知识（IM 附件落库路径）；重复 ⇒ 409 异常。 */
-    Knowledge createFromFile(String kbId, byte[] fileContent, String fileName,
+    KnowledgeRowView createFromFile(String kbId, byte[] fileContent, String fileName,
             String displayName, JsonNode customMetadata, String channel);
 
     // ── 分块（读，权限解析用） ──
@@ -128,19 +127,19 @@ public interface KnowledgeCatalogPort {
     KnowledgeBaseRowView findKnowledgeBaseRow(String kbId);
 
     /** 按（租户 + 库 + 元数据 datasourceId/externalId）查行（PG 口径，LIMIT 1）；无 ⇒ null。 */
-    Knowledge findKnowledgeByExternalId(long tenantId, String kbId, String dataSourceId, String externalId);
+    KnowledgeRowView findKnowledgeByExternalId(long tenantId, String kbId, String dataSourceId, String externalId);
 
     /** 按元数据某键前缀查行（PG 口径；前缀转义在实现内做）。 */
-    List<Knowledge> listKnowledgeByMetadataPrefix(long tenantId, String kbId, String metadataKey, String rawPrefix);
+    List<KnowledgeRowView> listKnowledgeByMetadataPrefix(long tenantId, String kbId, String metadataKey, String rawPrefix);
 
     /** 租户 + 库下的知识行（未删除口径，非 PG 回退路径用）。 */
-    List<Knowledge> listKnowledgeLive(long tenantId, String kbId);
+    List<KnowledgeRowView> listKnowledgeLive(long tenantId, String kbId);
 
     /** 按（库 + 文件哈希 + 文件类型）查重（未删除口径）；无 ⇒ null。 */
-    Knowledge findKnowledgeByHash(String kbId, String fileHash, String fileType);
+    KnowledgeRowView findKnowledgeByHash(String kbId, String fileHash, String fileType);
 
     /** 落库新知识行。 */
-    void insertKnowledge(Knowledge knowledge);
+    void insertKnowledge(KnowledgeRowView knowledge);
 
     /** 存知识文件（本地/云分流由域内门面决定），返回存储引用。 */
     String saveKnowledgeFile(long tenantId, String knowledgeId, String fileName, byte[] content);
@@ -149,7 +148,7 @@ public interface KnowledgeCatalogPort {
     void deleteKnowledgeFile(long tenantId, String knowledgeId, String filePath);
 
     /** 更新知识行的元数据（含 updatedAt）。 */
-    void updateKnowledgeMetadataRow(Knowledge knowledge, Map<String, String> metadata);
+    void updateKnowledgeMetadataRow(KnowledgeRowView knowledge, Map<String, String> metadata);
 
     /** 软删知识 + 其 chunk（置 deletedAt）+ 清文件（best-effort）。 */
     void softDeleteKnowledgeFull(String knowledgeId, long tenantId, java.time.OffsetDateTime now);

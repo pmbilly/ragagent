@@ -17,7 +17,7 @@ import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.domain.KnowledgeBaseIndexingStrategy;
-import com.ragagent.common.knowledge.domain.Knowledge;
+import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.dto.kb.KBCloneProgress;
 import com.ragagent.chatpipeline.spi.ModelRuntimePort;
