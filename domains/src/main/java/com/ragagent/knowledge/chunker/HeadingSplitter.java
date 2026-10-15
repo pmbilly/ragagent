@@ -1,8 +1,9 @@
-package com.ragagent.common.knowledge.chunker;
+package com.ragagent.knowledge.chunker;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
+import com.ragagent.common.knowledge.chunker.CodePoints;
 
 /**
  * Tier 1：Markdown 标题感知切分。

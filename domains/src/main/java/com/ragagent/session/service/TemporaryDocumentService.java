@@ -23,6 +23,7 @@ import com.ragagent.common.session.domain.message.MessageAttachment;
 import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.repository.TemporaryDocumentRepository;
 import com.ragagent.platform.storage.config.UploadLimits;
+import com.ragagent.contract.knowledge.DocumentChunkingPort;
 
 /**
  * 会话附件服务。
@@ -82,11 +83,12 @@ public class TemporaryDocumentService {
                                     DocReaderParsePort docReader,
                                     ModelRuntimePort modelRuntimeAssembler,
                                     AsrTranscriber asrTranscriber,
-                                    TenantConfigLookup tenantService) {
+                                    TenantConfigLookup tenantService,
+                                    DocumentChunkingPort documentChunking) {
         this.repo = repo;
         this.fileStore = fileStore;
         this.processor = new TemporaryDocumentProcessor(repo, fileStore, docReader,
-                modelRuntimeAssembler, asrTranscriber, tenantService);
+                modelRuntimeAssembler, asrTranscriber, tenantService, documentChunking);
         this.promptResolver = new TemporaryDocumentPromptResolver(repo);
     }
 

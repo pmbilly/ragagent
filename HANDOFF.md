@@ -1741,6 +1741,21 @@ public interface AdminUserPort {
 - **读数**：C2 实体保持 **13**；C4 基线 **31**；**14 守卫全绿**（run-guards 标签已更到 C1/C2/C3/C4）
 - **验证**：`spotlessCheck build` ✓ **2m12s** ✓；**4991 / 失败 0 / 跳过 4** ✓；dev 重启 ready ✓ + 冒烟（KB/models/sessions 200 ✓；`/api/v1/knowledge-bases/{id}/tags` ⇒ 404 + 标准信封 ✓——正是经 `:contract` 视图的链路）
 - **下一步（继续 C）**：次批候选按筛表——`MessageSuggestionSet`(2) / `WikiPageIssue`(4) / `StorageBackend`(8) / `WikiPage`(7)；**新视图一律落 `:contract`**
+**🔶 E1·知识分块簇归位域 + 分块能力契约化（`common/*` 125 → 113）（2026-10-15）**
+- **依据**：方案 §8.8.2 把分块实现明列在 `knowledge/chunker/` ⇒ 该簇归位域内；`Tokens`/`CodePoints` 是**跨域共享文本工具**（engine/agent/session/im/wiki）⇒ 留 L1
+- **先测后动的四项实测（其中两项推翻了先前判断）**：
+  1. 簇**无 L1 外引用者** ✓（此前扫描报"engine 8 / agenttools 5 引用 `CodePoints`"——**去字符串后为 0**，是字符串/标识符假阳性）
+  2. 跨域直引**仅 1 处**（session `TemporaryDocumentProcessor`）
+  3. `CodePoints` 是**包私有**且唯一 L1 使用者是 `Tokens`（`len`/`of`/`count`）⇒ 保持 L1 + 公开（类 + 5 方法）
+  4. `Tokens` 公开且被 session 直接用 ⇒ **无需端口化**（只有 `Chunker`/`ParsedChunk`/`SplitterConfig` 需过端口）
+- **动作**：① 12 件 `git mv` → `domains/knowledge/chunker`；测试 **`ChunkerTest`（760 行 / 45 用例）随迁** `domains/src/test` ② 7 件补 `CodePoints`/`Tokens` import（**"原同包兄弟"坑第 7 次——本次已在脚本里预判** ✓）③ **新建契约端口 `contract.knowledge.DocumentChunkingPort`**（`STRATEGY_AUTO` · `SplitterConfigView`＝跨域实际设置的 3 字段 · `ChunkedPart`＝seq/content/contextHeader/start/end/embeddingContent · `split`）④ **域内适配器 `knowledge/api/DocumentChunkingAdapter`**（逐字转发 `Chunker`；配置只设跨域三字段、其余取域内默认 ⇒ **行为等价**）⑤ session 链注入：`TemporaryDocumentService`（构造 +1 参）→ `TemporaryDocumentProcessor` ⑥ 两处测试补桩（**委托真实 `Chunker`** ⇒ 保住对 chunks JSON 的语义断言）
+- **⚠️ 两次红态（都由守卫当场点名，且守卫自身给出正解）**：
+  1. **R10**：`session→knowledge`（1 类 `TemporaryDocumentProcessor`）——守卫提示原文＝"**把该能力提到 contract 端口**" ⇒ 端口落地后 **R10 立即回绿（6 边 / 51 类）** ✓
+  2. **B121 大文件棘轮**：`LegacySplitter`（615 行）因**移位**被判"新增超大文件" ⇒ **判据：棘轮按路径记账，移位会误报——`--write` 重记（旧路径条目同时清掉，净零）**；另 **B124 死包目录** 1 处（`common/src/test/.../chunker` 搬空）已删
+- **读数**：`common/*` **125 → 113**（−12）；`:contract` 179 → **180**（+1 端口）；**C1 = 61 文件**；**C2 = 0** 保持；**R10 6 边 / 51 类 / ①档 0** ✓
+- **验证**：**14 守卫全绿**；**1349 金片签名一致** ✓；`spotlessCheck build` **2m1s**；**4991 / 失败 0 / 跳过 4**（用例随迁：domains 2849 → **2894**、common 250 → **205**，**总数不变** ✓）；定向 knowledge + session **312 条** ✓；dev ready + 冒烟（sessions / KB / system-info / storage-backends **200** ✓ + **`POST /api/v1/chunker/preview` ⇒ 200 真实分块输出**（profile：12 字符 / 检测语言 `zh`；chunks：seq/start/end/contextHeader/content；stats）——**簇从新家端到端跑通的最强证据** ✓✓）
+- **`common/*` 113 件余量**：② TypeHandler 10 · ③ 框架味 8 · ④ Jackson 味 44（含 12 件待去 Jackson 登记）· ⑤ 纯 JDK 39（含共享工具 `CodePoints`/`Tokens` 与各域内件）· ⑥ 其它 24
+- **下一刀候选**：**G1-b 去 Jackson**（12 件登记载荷 ⇒ 去 Jackson 后整批入 `:contract`，直接清 C4 待归位）· **C-14b 租户用例归位**（需拍板）· ⑥ 桶的逐件裁定（`ToolExecContext`/`StoragePaths` 等）
 **🔶 D1·契约料余量 9 件入 `:contract`（`:contract` 169 → 178；**全程零红态**）（2026-10-15）**
 - **搬入 9 件**（含新建 `contract.settings` 包）：`tool` 3（`McpCatalogGuardedTool` · `ToolDefinitions` · `McpApprovalOps`）· `session` 1（`EmbedSessionOps`）· `settings` 1（`SystemSettingGateway`）· `wiki` 4（`WikiLinkRepairResult` · `WikiConstants` · `WikiException` · `WikiPageNotFoundException`）
 - **按第三道判据筛掉的（不搬有据）**：`knowledge/chunker/*` **9 件**（§8.8.2 明列在 `knowledge/chunker` ＝**域内件**，属域归位轨）· `ToolOutput`（**截断逻辑＝实现件**，待 agent-engine 模块）· `WikiCategoryPaths`（算法件）· `dto/AsrConfigView`（**域内 dto**，属 G1-h 家族）
@@ -2656,7 +2671,7 @@ public interface AdminUserPort {
 
 | 目标模块 | 实际 | 差距 |
 |---|---|---|
-| `contracts` | `:contract` **178 件** ✅ 已独立 | 包覆盖：方案 **25** 包 vs 实际 **20** ⇒ 缺 `access` · `execution` · `integration` · `parsing` · `settings` · `task`；多 `auth` · `doc` · `text` |
+| `contracts` | `:contract` **180 件** ✅ 已独立 | 包覆盖：方案 **25** 包 vs 实际 **20** ⇒ 缺 `access` · `execution` · `integration` · `parsing` · `settings` · `task`；多 `auth` · `doc` · `text` |
 | `platform` | `com.ragagent.platform.*` **139 件仍在 `:common`** | **未独立成模块**；包覆盖：方案 **23** vs 实际 **15** ⇒ 缺 `execution` · `outbox` · `parsing` · `storage.config` · `storage.provider` · `tracing.decorators` · `tracing.langfuse` · `transaction` · `web.error` · `web.health`；多 `redis` · `tracing` |
 | `agent-engine` · `retrieval-engine` · `model-runtime` | `:engine` **318 件 / 9 顶层包**（chatpipeline · embedding · llm · modelcontext · modelruntime · rerank · retrieval · tracing · webfetch） | 未拆分（**条件触发**项） |
 | `domains` | `:domains` **1343 件** | 域间边 **7 条**（①clearable **0** / ②owner 2 / ③族内 5）；域布局抽样见 C |
@@ -2671,7 +2686,7 @@ public interface AdminUserPort {
 | `:common` 载荷型 | **14 待归位** + 7 platform 面登记 + 3 待去 Jackson | C4 |
 | `:common` 受控依赖根 | 10 根 / 61 文件 | C1 |
 | `:contract` **误搬件** | **8 → 3**（D0a/D0b 已归位 5 件）（D0a/D0b 已归位 5 件；余 3 件 `KnowledgeBase*Config` 实体耦合，见 G1-h） | **待加 C5/C6** |
-| `:common` 规模 | **265 件** = `common/*` **125** + `platform/*` 139 + `event/*` 1（D1 后） | — |
+| `:common` 规模 | **253 件** = `common/*` **113** + `platform/*` 139 + `event/*` 1（E1 后） | — |
 
 **C. 域布局抽样（以方案 §8.8.2 `knowledge/` 为范本）**
 

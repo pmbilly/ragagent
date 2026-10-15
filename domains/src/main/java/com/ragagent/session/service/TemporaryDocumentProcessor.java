@@ -18,9 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ragagent.common.tenant.TenantConfigLookup;
-import com.ragagent.common.knowledge.chunker.Chunker;
-import com.ragagent.common.knowledge.chunker.ParsedChunk;
-import com.ragagent.common.knowledge.chunker.SplitterConfig;
+import com.ragagent.contract.knowledge.DocumentChunkingPort;
 import com.ragagent.common.knowledge.chunker.Tokens;
 import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.common.knowledge.support.ParserEngineRules;
@@ -59,19 +57,22 @@ final class TemporaryDocumentProcessor {
     private final ModelRuntimePort modelRuntimeAssembler;
     private final AsrTranscriber asrTranscriber;
     private final TenantConfigLookup tenantService;
+    private final DocumentChunkingPort documentChunking;
 
     TemporaryDocumentProcessor(TemporaryDocumentRepository repo,
                                AttachmentFileStore fileStore,
                                DocReaderParsePort docReader,
                                ModelRuntimePort modelRuntimeAssembler,
                                AsrTranscriber asrTranscriber,
-                               TenantConfigLookup tenantService) {
+                               TenantConfigLookup tenantService,
+                                       DocumentChunkingPort documentChunking) {
         this.repo = repo;
         this.fileStore = fileStore;
         this.docReader = docReader;
         this.modelRuntimeAssembler = modelRuntimeAssembler;
         this.asrTranscriber = asrTranscriber;
         this.tenantService = tenantService;
+        this.documentChunking = documentChunking;
     }
 
     private static final int CHUNK_SIZE = 1600;
@@ -174,11 +175,9 @@ final class TemporaryDocumentProcessor {
 
         content = cleanInvalidUtf8(content);
         String lang = Tokens.detectLanguage(content);
-        SplitterConfig cfg = new SplitterConfig();
-        cfg.setChunkSize(CHUNK_SIZE);
-        cfg.setChunkOverlap(CHUNK_OVERLAP);
-        cfg.setStrategy(Chunker.STRATEGY_AUTO);
-        List<ParsedChunk> parts = Chunker.split(content, cfg);
+        List<DocumentChunkingPort.ChunkedPart> parts = documentChunking.split(content,
+                new DocumentChunkingPort.SplitterConfigView(CHUNK_SIZE, CHUNK_OVERLAP,
+                        DocumentChunkingPort.STRATEGY_AUTO));
         repo.markReady(tenantId, documentId, content, chunksJson(parts, lang), imageRefs,
                 quoteMap(metadata), Tokens.approxTokenCount(content, lang),
                 parts.size(), OffsetDateTime.now(ZoneId.systemDefault()));
@@ -383,21 +382,21 @@ final class TemporaryDocumentProcessor {
         }
     }
     /** chunks jsonb（元素形态＝`DocumentChunk` 的字段名，contextHeader 空时不写）。 */
-    private static String chunksJson(List<ParsedChunk> parts, String lang) {
+    private static String chunksJson(List<DocumentChunkingPort.ChunkedPart> parts, String lang) {
         StringBuilder sb = new StringBuilder("[");
         boolean first = true;
-        for (ParsedChunk part : parts) {
+        for (DocumentChunkingPort.ChunkedPart part : parts) {
             if (!first) {
                 sb.append(',');
             }
             first = false;
-            sb.append("{\"seq\":").append(part.getSeq())
-                    .append(",\"content\":").append(quote(part.getContent()));
-            if (!part.getContextHeader().isEmpty()) {
-                sb.append(",\"contextHeader\":").append(quote(part.getContextHeader()));
+            sb.append("{\"seq\":").append(part.seq())
+                    .append(",\"content\":").append(quote(part.content()));
+            if (!part.contextHeader().isEmpty()) {
+                sb.append(",\"contextHeader\":").append(quote(part.contextHeader()));
             }
-            sb.append(",\"start\":").append(part.getStart())
-                    .append(",\"end\":").append(part.getEnd())
+            sb.append(",\"start\":").append(part.start())
+                    .append(",\"end\":").append(part.end())
                     .append(",\"tokenCount\":")
                     .append(Tokens.approxTokenCount(part.embeddingContent(), lang))
                     .append('}');

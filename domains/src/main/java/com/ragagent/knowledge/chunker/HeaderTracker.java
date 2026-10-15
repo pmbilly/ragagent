@@ -1,10 +1,11 @@
-package com.ragagent.common.knowledge.chunker;
+package com.ragagent.knowledge.chunker;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import com.ragagent.common.knowledge.chunker.CodePoints;
 
 /**
  * 上下文表头追踪。

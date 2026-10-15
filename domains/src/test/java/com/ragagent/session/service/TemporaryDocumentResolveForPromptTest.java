@@ -21,6 +21,7 @@ import com.ragagent.auth.service.TenantService;
 import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
 import com.ragagent.modelruntime.adapter.provider.chat.ImageResolver;
 import com.ragagent.chatpipeline.spi.ModelRuntimePort;
+import com.ragagent.contract.knowledge.DocumentChunkingPort;
 
 /**
  * ResolveForPrompt + 图片落地（含 docreader 图片分支）的行为验收。
@@ -51,7 +52,8 @@ class TemporaryDocumentResolveForPromptTest {
             service = new TemporaryDocumentService(repo, fileStore, docReader,
                     mock(ModelRuntimePort.class),
                     mock(AsrTranscriber.class),
-                    mock(TenantService.class));
+                    mock(TenantService.class),
+                    chunkingStub());
         }
         return service;
     }
@@ -62,7 +64,8 @@ class TemporaryDocumentResolveForPromptTest {
         return new TemporaryDocumentProcessor(repo, fileStore, docReader,
                 mock(ModelRuntimePort.class),
                 mock(AsrTranscriber.class),
-                mock(TenantService.class));
+                mock(TenantService.class),
+                chunkingStub());
     }
 
     // ── fixtures ─────────────────────────────────────────────────────────
@@ -431,5 +434,19 @@ class TemporaryDocumentResolveForPromptTest {
         } catch (java.io.IOException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    /** 分块桩：委托**真实**域内实现（保持测试对 chunks JSON 的语义断言）。 */
+    private static DocumentChunkingPort chunkingStub() {
+        return (content, cfg) -> {
+            com.ragagent.knowledge.chunker.SplitterConfig sc = new com.ragagent.knowledge.chunker.SplitterConfig();
+            sc.setChunkSize(cfg.chunkSize());
+            sc.setChunkOverlap(cfg.chunkOverlap());
+            sc.setStrategy(cfg.strategy());
+            return com.ragagent.knowledge.chunker.Chunker.split(content, sc).stream()
+                    .map(x -> new DocumentChunkingPort.ChunkedPart(x.getContent(), x.getContextHeader(),
+                            x.embeddingContent(), x.getSeq(), x.getStart(), x.getEnd()))
+                    .toList();
+        };
     }
 }

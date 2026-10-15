@@ -1,4 +1,4 @@
-package com.ragagent.common.knowledge.chunker;
+package com.ragagent.knowledge.chunker;
 
 import java.util.ArrayList;
 import java.util.List;

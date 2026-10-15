@@ -1,4 +1,4 @@
-package com.ragagent.common.knowledge.chunker;
+package com.ragagent.knowledge.chunker;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.function.IntPredicate;
+import com.ragagent.common.knowledge.chunker.CodePoints;
 
 /**
  * Tier 3 legacy（递归字符）切分器。

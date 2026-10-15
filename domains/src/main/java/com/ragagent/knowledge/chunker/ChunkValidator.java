@@ -1,6 +1,7 @@
-package com.ragagent.common.knowledge.chunker;
+package com.ragagent.knowledge.chunker;
 
 import java.util.List;
+import com.ragagent.common.knowledge.chunker.CodePoints;
 
 /**
  * 层级输出校验。

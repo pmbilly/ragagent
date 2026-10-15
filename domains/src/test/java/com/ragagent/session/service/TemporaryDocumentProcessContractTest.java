@@ -28,6 +28,7 @@ import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.repository.TemporaryDocumentRepository;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.knowledge.DocumentChunkingPort;
 
 /**
  * 附件解析链路的验收（资源租户、引擎回落与音频分支）：
@@ -56,7 +57,8 @@ class TemporaryDocumentProcessContractTest {
         asrTranscriber = mock(AsrTranscriber.class);
         tenantService = mock(TenantConfigLookup.class);
         service = new TemporaryDocumentService(repo, fileStore, docReader,
-                modelRuntimeAssembler, asrTranscriber, tenantService);
+                modelRuntimeAssembler, asrTranscriber, tenantService,
+chunkingStub());
         TenantContext.set(TENANT, null, null, false, "u-1", false);
     }
 
@@ -165,5 +167,19 @@ class TemporaryDocumentProcessContractTest {
 
         verify(docReader).parse(any(), eq("report.pdf"), eq("pdf"), eq("report.pdf"),
                 eq("simple"));
+    }
+
+    /** 分块桩：委托**真实**域内实现（保持测试对 chunks JSON 的语义断言）。 */
+    private static DocumentChunkingPort chunkingStub() {
+        return (content, cfg) -> {
+            com.ragagent.knowledge.chunker.SplitterConfig sc = new com.ragagent.knowledge.chunker.SplitterConfig();
+            sc.setChunkSize(cfg.chunkSize());
+            sc.setChunkOverlap(cfg.chunkOverlap());
+            sc.setStrategy(cfg.strategy());
+            return com.ragagent.knowledge.chunker.Chunker.split(content, sc).stream()
+                    .map(x -> new DocumentChunkingPort.ChunkedPart(x.getContent(), x.getContextHeader(),
+                            x.embeddingContent(), x.getSeq(), x.getStart(), x.getEnd()))
+                    .toList();
+        };
     }
 }
