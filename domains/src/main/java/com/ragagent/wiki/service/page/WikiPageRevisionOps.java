@@ -8,7 +8,7 @@ import java.util.UUID;
 import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.contract.wiki.WikiException;
 import com.ragagent.common.wiki.domain.WikiPage;
-import com.ragagent.common.wiki.domain.WikiPageIssue;
+import com.ragagent.wiki.domain.WikiPageIssue;
 import com.ragagent.wiki.domain.page.WikiPageRevision;
 import com.ragagent.wiki.domain.page.WikiPageRevisionListResponse;
 import com.ragagent.wiki.domain.page.WikiRevisionPruneRequest;

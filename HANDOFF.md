@@ -1496,6 +1496,15 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **读数**：**R10 保持 7 条边 / 52 类**（端口在 L1 ⇒ 无新边）✓；14 守卫全绿；**净删 2 个文件**（知识域不再持有该表 mapper）
 - **验证**：`spotlessCheck build` **2m05s**；**4991 / 失败 0 / 跳过 4**；dev ready + 冒烟（knowledge-bases / **storage-backends** / sessions / models 200 ✓）
 - **意义**：`StorageBackend` 实体收窄（C 余量之一）**已具备前提**——唯一持久面在 storage 域，实体回域后跨域只剩端口读（+ system 的少量写面）
+**🔶 C 批 1·第八子批：`WikiPageIssue` 收窄 + 契约视图（实体 7 → 6）（2026-10-15）**
+- **对象**：`WikiPageIssue`（12 字段 `@TableName` 实体；跨域消费仅 **session 的 wiki 工具后端** `AgentToolWikiBackends`——**1 个构造点**（8 setters）+ 1 个读取映射；此前"56 setters"实为全仓计数，实际很可控）
+- **风险评估（先测后动）**：`GET /api/v1/knowledgebase/{kbId}/wiki/issues` 由 **wiki 域自己的 `maintenanceOps`** 服务（**不经 L1 端口**）⇒ 线格式不动 ✓；端口 3 个 issue 方法只 `listIssues`/`createIssue` 涉实体（`updateIssueStatus` 收字符串 ✓）
+- **落点（本批最干净）**：视图字段全 JDK（`String`/`Long`/`List<String>`/`OffsetDateTime`）且**不直接出面给客户端**（工具侧另有其 `IssueView`）⇒ **`contract.wiki.WikiPageIssueView`（纯 JDK bean）直接落 `:contract`** ✓ ——**本批无需 C4 登记**（视图不在 common）
+- **动作**：① 新建 `contract.wiki.WikiPageIssueView`（12 字段，**访问器名与实体逐一相同**，含空值归一语义）② 端口 2 方法改视图 ③ 适配器加 `toIssueView`/`toIssueEntity`/**`copyIssueInto`（回填）** 三助手 ④ 实体回 `wiki/domain` ⑤ session `AgentToolWikiBackends` 改视图
+- **伴生类处理（判据）**：`WikiStringListTypeHandler` / `EmptyListAsNullSerializer` **不随迁**——实测它们与 `WikiPage`、`WikiIndexEntry` 共用 ⇒ **随 `WikiPage` 批次一起走**（持久化闭包的共享件不跟着单个实体跑）
+- **读数**：**C2 实体 7 → 6**；C1 受控根 68 → **67 文件**；C4 待归位 14、登记不变（视图落契约面）；**R10 保持 7 条边 / 52 类 / ①档 0** ✓
+- **验证**：**14 守卫全绿**（C2 = 6，基线已 `--write`）；**1349 金片签名一致** ✓；`spotlessCheck build` **1m55s**；**4991 / 失败 0 / 跳过 4**；定向 wiki + session **551 条** ✓；dev ready + 冒烟（KB / sessions / storage-backends / system/info **200** ✓；**`GET /api/v1/knowledgebase/{kbId}/wiki/issues` ⇒ 404 + `{"code":1003,"message":"knowledge base not found","data":null}` 标准业务信封** ✓——正是本刀重构的路由族）
+- **C 余量（6 实体）**：`Chunk` / `Knowledge` / `KnowledgeBase`（**宽字段**）· `WikiPage`（**写面 + 两个伴生类随迁**）· `Tenant` / `User`（**管理面**，用例归位）
 **🔶 C 批 1·第七子批：`StorageBackend` 收窄 + 行视图（实体 8 → 7）（2026-10-15）**
 - **前置解锁（本刀为何现在能做）**：`da22387b`（存储后端单一持久面）删掉了 knowledge 的重复 `StorageBackendMapper`/`KnowledgeStorageBackendRepository` ⇒ **归属收口（storage 是唯一持久面）**，此前"双方都有 mapper"的裁定障碍消失
 - **JSON 风险评估（先测后动）**：三处跨域消费**都不走实体 JSON**——`SystemInfoService.activeBackendProviders`（读 status/provider → 构建 `Map<String,Boolean>`）· `SystemController.connectivityFallback`（**构造**实体做探测 → 返回字符串信封）· `KnowledgeBaseService.applyAndValidateStorageBackend`（读 id/name/provider/tenantId）；而 `sb-*.json` 金片覆盖的是 **storage 域自己的 controller**（仍返回实体）⇒ **线格式逐字节不变** ✓
@@ -2508,10 +2517,10 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 
 | 项 | 现状 | 门禁 |
 |---|---|---|
-| `:common` 持久化实体 | **7**（`User` · `Chunk` · `Knowledge` · `KnowledgeBase` · `Tenant` · `WikiPage` · `WikiPageIssue`；`StorageBackend` 已归位） | C2（只许减） |
+| `:common` 持久化实体 | **6**（`User` · `Chunk` · `Knowledge` · `KnowledgeBase` · `Tenant` · `WikiPage`；`StorageBackend`/`WikiPageIssue` 已归位） | C2（只许减） |
 | `:common` 域侧 TypeHandler | **10** | C2 |
 | `:common` 载荷型 | **14 待归位** + 7 platform 面登记 + 3 待去 Jackson | C4 |
-| `:common` 受控依赖根 | 10 根 / 68 文件 | C1 |
+| `:common` 受控依赖根 | 10 根 / 67 文件 | C1 |
 | `:contract` **误搬件** | **8 → 3**（D0a/D0b 已归位 5 件）（D0a/D0b 已归位 5 件；余 3 件 `KnowledgeBase*Config` 实体耦合，见 G1-h） | **待加 C5/C6** |
 | `:common` 规模 | **265 件** = `common/*` **125** + `platform/*` 139 + `event/*` 1（D1 后） | — |
 

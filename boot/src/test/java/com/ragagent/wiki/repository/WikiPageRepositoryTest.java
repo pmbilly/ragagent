@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-import com.ragagent.common.wiki.domain.WikiPageIssue;
+import com.ragagent.wiki.domain.WikiPageIssue;
 import com.ragagent.wiki.domain.page.WikiPageLite;
 
 /**

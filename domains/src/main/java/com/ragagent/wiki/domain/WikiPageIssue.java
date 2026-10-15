@@ -1,4 +1,4 @@
-package com.ragagent.common.wiki.domain;
+package com.ragagent.wiki.domain;
 
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -10,6 +10,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.ragagent.common.wiki.domain.EmptyListAsNullSerializer;
+import com.ragagent.common.wiki.domain.WikiStringListTypeHandler;
 
 /**
  * wiki_page_issues 表实体（表结构以 migrations/versioned/V1__baseline.sql 为准）。

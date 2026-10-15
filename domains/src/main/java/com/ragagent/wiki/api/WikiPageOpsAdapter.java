@@ -8,7 +8,8 @@ import com.ragagent.contract.wiki.WikiLinkRepairResult;
 import com.ragagent.common.wiki.WikiPageOpsPort;
 import com.ragagent.common.wiki.domain.WikiIndex;
 import com.ragagent.common.wiki.domain.WikiPage;
-import com.ragagent.common.wiki.domain.WikiPageIssue;
+import com.ragagent.contract.wiki.WikiPageIssueView;
+import com.ragagent.wiki.domain.WikiPageIssue;
 import com.ragagent.wiki.service.page.WikiEditContext;
 import com.ragagent.wiki.service.page.WikiPageService;
 
@@ -73,13 +74,17 @@ public class WikiPageOpsAdapter implements WikiPageOpsPort {
     }
 
     @Override
-    public List<WikiPageIssue> listIssues(String kbId, String slug, String status) {
-        return wikiPageService.listIssues(kbId, slug, status);
+    public List<WikiPageIssueView> listIssues(String kbId, String slug, String status) {
+        return wikiPageService.listIssues(kbId, slug, status).stream()
+                .map(WikiPageOpsAdapter::toIssueView).toList();
     }
 
     @Override
-    public WikiPageIssue createIssue(WikiPageIssue issue) {
-        return wikiPageService.createIssue(issue);
+    public WikiPageIssueView createIssue(WikiPageIssueView issue) {
+        WikiPageIssue saved = wikiPageService.createIssue(toIssueEntity(issue));
+        // 旧语义：域服务就地把 id/createdAt 等写回**调用方那个对象** ⇒ 这里回填传入视图
+        copyIssueInto(issue, saved);
+        return toIssueView(saved);
     }
 
     @Override
@@ -96,5 +101,67 @@ public class WikiPageOpsAdapter implements WikiPageOpsPort {
     public WikiIndex.Response getIndexView(String kbId, int topK) {
         // 索引视图：无类型过滤、无游标（全量统计口径）
         return wikiPageService.getIndexView(kbId, null, topK, "");
+    }
+
+    /** 实体 → 契约视图（逐字段搬运；null 透传）。 */
+    static WikiPageIssueView toIssueView(WikiPageIssue e) {
+        if (e == null) {
+            return null;
+        }
+        WikiPageIssueView v = new WikiPageIssueView();
+        v.setId(e.getId());
+        v.setTenantId(e.getTenantId());
+        v.setKnowledgeBaseId(e.getKnowledgeBaseId());
+        v.setSlug(e.getSlug());
+        v.setIssueType(e.getIssueType());
+        v.setDescription(e.getDescription());
+        v.setSuspectedKnowledgeIds(e.getSuspectedKnowledgeIds());
+        v.setStatus(e.getStatus());
+        v.setReportedBy(e.getReportedBy());
+        v.setCreatedAt(e.getCreatedAt());
+        v.setUpdatedAt(e.getUpdatedAt());
+        v.setDeletedAt(e.getDeletedAt());
+        return v;
+    }
+
+    /** 契约视图 → 实体（写面用；经实体 setter ⇒ 保留其空值归一语义；null 透传）。 */
+    static WikiPageIssue toIssueEntity(WikiPageIssueView v) {
+        if (v == null) {
+            return null;
+        }
+        WikiPageIssue e = new WikiPageIssue();
+        e.setId(v.getId());
+        e.setTenantId(v.getTenantId());
+        e.setKnowledgeBaseId(v.getKnowledgeBaseId());
+        e.setSlug(v.getSlug());
+        e.setIssueType(v.getIssueType());
+        e.setDescription(v.getDescription());
+        e.setSuspectedKnowledgeIds(v.getSuspectedKnowledgeIds());
+        e.setStatus(v.getStatus());
+        e.setReportedBy(v.getReportedBy());
+        e.setCreatedAt(v.getCreatedAt());
+        e.setUpdatedAt(v.getUpdatedAt());
+        e.setDeletedAt(v.getDeletedAt());
+        return e;
+    }
+
+    /** 把落库后的实体字段回填到传入视图（保持"同对象被填充"的旧语义；null 安全）。 */
+    static void copyIssueInto(WikiPageIssueView v, WikiPageIssue e) {
+        if (v == null || e == null) {
+            return;
+        }
+        WikiPageIssueView fresh = toIssueView(e);
+        v.setId(fresh.getId());
+        v.setTenantId(fresh.getTenantId());
+        v.setKnowledgeBaseId(fresh.getKnowledgeBaseId());
+        v.setSlug(fresh.getSlug());
+        v.setIssueType(fresh.getIssueType());
+        v.setDescription(fresh.getDescription());
+        v.setSuspectedKnowledgeIds(fresh.getSuspectedKnowledgeIds());
+        v.setStatus(fresh.getStatus());
+        v.setReportedBy(fresh.getReportedBy());
+        v.setCreatedAt(fresh.getCreatedAt());
+        v.setUpdatedAt(fresh.getUpdatedAt());
+        v.setDeletedAt(fresh.getDeletedAt());
     }
 }

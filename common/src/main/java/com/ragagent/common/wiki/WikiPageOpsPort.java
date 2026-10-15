@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.ragagent.common.wiki.domain.WikiIndex;
 import com.ragagent.common.wiki.domain.WikiPage;
-import com.ragagent.common.wiki.domain.WikiPageIssue;
+import com.ragagent.contract.wiki.WikiPageIssueView;
 import com.ragagent.contract.wiki.WikiPageNotFoundException;
 import com.ragagent.contract.wiki.WikiLinkRepairResult;
 
@@ -45,10 +45,10 @@ public interface WikiPageOpsPort {
     void rebuildIndexPage(String kbId);
 
     /** 列 issue（kbId/slug/status 均可空串 = 不过滤）。 */
-    List<WikiPageIssue> listIssues(String kbId, String slug, String status);
+    List<WikiPageIssueView> listIssues(String kbId, String slug, String status);
 
     /** 登记 issue。 */
-    WikiPageIssue createIssue(WikiPageIssue issue);
+    WikiPageIssueView createIssue(WikiPageIssueView issue);
 
     /** 更新 issue 状态。 */
     void updateIssueStatus(String issueId, String status);

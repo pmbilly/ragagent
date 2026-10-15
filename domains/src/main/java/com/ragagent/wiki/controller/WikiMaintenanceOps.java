@@ -7,7 +7,7 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.wiki.domain.issue.WikiLintReport;
-import com.ragagent.common.wiki.domain.WikiPageIssue;
+import com.ragagent.wiki.domain.WikiPageIssue;
 import com.ragagent.wiki.service.page.WikiLintService;
 import com.ragagent.wiki.service.page.WikiPageService;
 import jakarta.servlet.http.HttpServletRequest;

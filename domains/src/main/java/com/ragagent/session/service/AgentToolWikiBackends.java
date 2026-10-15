@@ -18,7 +18,7 @@ import com.ragagent.agenttools.wiki.PageView;
 import com.ragagent.agenttools.wiki.WikiPages;
 import com.ragagent.common.wiki.domain.WikiIndex;
 import com.ragagent.common.wiki.domain.WikiPage;
-import com.ragagent.common.wiki.domain.WikiPageIssue;
+import com.ragagent.contract.wiki.WikiPageIssueView;
 
 /**
  * {@code AgentToolBackends} 的**wiki 工具簇**：WikiPages 工具端口的实现与
@@ -111,7 +111,7 @@ final class AgentToolWikiBackends {
             @Override
             public List<IssueView> listIssues(String kbId, String slug, String status) {
                 List<IssueView> out = new ArrayList<>();
-                for (WikiPageIssue issue : wikiPageOps.listIssues(kbId, slug, status)) {
+                for (WikiPageIssueView issue : wikiPageOps.listIssues(kbId, slug, status)) {
                     if (issue != null) {
                         out.add(toIssueView(issue));
                     }
@@ -121,7 +121,7 @@ final class AgentToolWikiBackends {
 
             @Override
             public IssueView createIssue(IssueView issue) {
-                WikiPageIssue entity = new WikiPageIssue();
+                WikiPageIssueView entity = new WikiPageIssueView();
                 entity.setTenantId(issue.tenantId());
                 entity.setKnowledgeBaseId(issue.knowledgeBaseId());
                 entity.setSlug(issue.slug());
@@ -211,7 +211,7 @@ final class AgentToolWikiBackends {
         return entity;
     }
     /** WikiPageIssue → 工具侧 issue 视图（时间以 RFC3339 文本透传）。 */
-    static IssueView toIssueView(WikiPageIssue issue) {
+    static IssueView toIssueView(WikiPageIssueView issue) {
         IssueView view = new IssueView();
         view.setId(issue.getId());
         view.setTenantId(issue.getTenantId() == null ? 0L : issue.getTenantId());

@@ -9,7 +9,7 @@ import com.ragagent.wiki.domain.graph.WikiGraph;
 import com.ragagent.common.wiki.domain.WikiIndex;
 import com.ragagent.common.wiki.domain.WikiIndexEntry;
 import com.ragagent.common.wiki.domain.WikiPage;
-import com.ragagent.common.wiki.domain.WikiPageIssue;
+import com.ragagent.wiki.domain.WikiPageIssue;
 import com.ragagent.wiki.domain.page.WikiPageLite;
 import com.ragagent.wiki.domain.page.WikiPageListRequest;
 import com.ragagent.wiki.domain.page.WikiPageListResponse;
