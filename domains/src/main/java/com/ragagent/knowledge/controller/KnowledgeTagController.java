@@ -5,7 +5,7 @@ import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.web.NonNullBody;
-import com.ragagent.common.knowledge.domain.KnowledgeTag;
+import com.ragagent.knowledge.domain.KnowledgeTag;
 import com.ragagent.knowledge.dto.tag.CreateTagRequest;
 import com.ragagent.knowledge.dto.tag.DeleteTagRequest;
 import com.ragagent.knowledge.dto.tag.KnowledgeTagResponse;

@@ -9,7 +9,6 @@ import com.ragagent.common.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.domain.ChunkPage;
 import com.ragagent.common.knowledge.domain.FaqEntryPage;
 import com.ragagent.common.knowledge.domain.Knowledge;
-import com.ragagent.common.knowledge.domain.KnowledgeTag;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
 
 /**
@@ -163,8 +162,8 @@ public interface KnowledgeCatalogPort {
     void hardDeleteKnowledgeBatch(long tenantId, List<String> knowledgeIds);
 
     /** 建知识标签（校验与排序口径同域实现）。 */
-    KnowledgeTag createKnowledgeTag(String kbId, String name, String color, int sortOrder);
+    KnowledgeTagView createKnowledgeTag(String kbId, String name, String color, int sortOrder);
 
     /** 按（租户 + 库 + 名）查标签；无 ⇒ null。 */
-    KnowledgeTag findKnowledgeTagByName(long tenantId, String kbId, String name);
+    KnowledgeTagView findKnowledgeTagByName(long tenantId, String kbId, String name);
 }

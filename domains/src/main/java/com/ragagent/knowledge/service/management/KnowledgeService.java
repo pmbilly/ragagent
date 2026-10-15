@@ -40,7 +40,7 @@ import com.ragagent.platform.security.InputSanitizer;
 import com.ragagent.common.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
-import com.ragagent.common.knowledge.domain.KnowledgeTag;
+import com.ragagent.knowledge.domain.KnowledgeTag;
 import com.ragagent.common.knowledge.task.KnowledgeProcessingQueue;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,6 +60,7 @@ import com.ragagent.knowledge.service.enrichment.KnowledgeSummaryService;
 import com.ragagent.knowledge.service.query.KnowledgeSearchService;
 import com.ragagent.knowledge.service.query.KnowledgeSpanService;
 import com.ragagent.common.knowledge.service.DuplicateKnowledgeException;
+import com.ragagent.knowledge.support.TagViews;
 
 /**
  * （覆盖 file/url/manual 创建、分页列表、get/update/delete、folders；
@@ -444,7 +445,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
         }
         List<KnowledgeTag> rows = tagRepository.listTagsWithKnowledgeId(k.getId());
         if (!rows.isEmpty()) {
-            k.setTags(new ArrayList<>(rows.stream().map(KnowledgeProjectionAdapter::tagView).toList()));
+            k.setTags(new ArrayList<>(rows.stream().map(TagViews::tagView).toList()));
         }
     }
 

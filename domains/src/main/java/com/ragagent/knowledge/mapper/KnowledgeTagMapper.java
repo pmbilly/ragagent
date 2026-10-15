@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
-import com.ragagent.common.knowledge.domain.KnowledgeTag;
+import com.ragagent.knowledge.domain.KnowledgeTag;
 import org.apache.ibatis.annotations.Param;
 
 /**

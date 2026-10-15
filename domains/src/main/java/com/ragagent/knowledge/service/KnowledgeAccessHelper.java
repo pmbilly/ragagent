@@ -2,7 +2,6 @@ package com.ragagent.knowledge.service;
 
 import com.ragagent.knowledge.domain.KnowledgeTenants;
 
-import com.ragagent.common.knowledge.support.KnowledgeProjectionAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +14,9 @@ import com.ragagent.knowledge.repository.KnowledgeBaseRepository;
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 import com.ragagent.knowledge.repository.KnowledgeTagRepository;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
-import com.ragagent.common.knowledge.domain.KnowledgeTag;
+import com.ragagent.knowledge.domain.KnowledgeTag;
 import org.springframework.stereotype.Component;
+import com.ragagent.knowledge.support.TagViews;
 
 /**
  * 知识域访问面收敛点（M2 解环：原 KnowledgeService 门面 helper 下沉）。
@@ -101,7 +101,7 @@ public class KnowledgeAccessHelper {
         }
         List<KnowledgeTag> rows = tagRepository.listTagsWithKnowledgeId(k.getId());
         if (!rows.isEmpty()) {
-            k.setTags(new ArrayList<>(rows.stream().map(KnowledgeProjectionAdapter::tagView).toList()));
+            k.setTags(new ArrayList<>(rows.stream().map(TagViews::tagView).toList()));
         }
     }
 }

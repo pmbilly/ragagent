@@ -2,10 +2,10 @@ package com.ragagent.datasource.service;
 
 import com.ragagent.contract.error.BizException;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
-import com.ragagent.common.knowledge.domain.KnowledgeTag;
 import org.springframework.stereotype.Component;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
+import com.ragagent.common.knowledge.KnowledgeTagView;
 
 /**
  * 自动标签的生产实现：同名标签存在 → 直接用；否则走 {@code KnowledgeTagService#createTag}
@@ -37,12 +37,12 @@ public class KnowledgeTagAutoTagProvider implements AutoTagProvider {
             throw BizException.notFound("knowledge base not found");
         }
         // 先查现有标签（tenant + kb + name）
-        KnowledgeTag existing = knowledgeCatalog.findKnowledgeTagByName(kb.getTenantId(), kbId, trimmed);
+        KnowledgeTagView existing = knowledgeCatalog.findKnowledgeTagByName(kb.getTenantId(), kbId, trimmed);
         if (existing != null) {
-            return existing.getId();
+            return existing.id();
         }
         // 建标签；校验链（写权限/重名）在 createTag 内
-        KnowledgeTag created = knowledgeCatalog.createKnowledgeTag(kbId, trimmed, null, 0);
-        return created.getId();
+        KnowledgeTagView created = knowledgeCatalog.createKnowledgeTag(kbId, trimmed, null, 0);
+        return created.id();
     }
 }

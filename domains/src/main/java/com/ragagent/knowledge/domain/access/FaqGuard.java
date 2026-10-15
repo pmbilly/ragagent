@@ -13,7 +13,7 @@ import com.ragagent.contract.error.BizException;
 import com.ragagent.common.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.FaqChunkMetadata;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
-import com.ragagent.common.knowledge.domain.KnowledgeTag;
+import com.ragagent.knowledge.domain.KnowledgeTag;
 import com.ragagent.knowledge.repository.FaqChunkRepository;
 import com.ragagent.knowledge.repository.KnowledgeTagRepository;
 import org.springframework.stereotype.Component;

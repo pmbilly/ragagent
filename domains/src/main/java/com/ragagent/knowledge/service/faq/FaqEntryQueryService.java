@@ -15,7 +15,7 @@ import com.ragagent.common.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.FaqChunkMetadata;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
-import com.ragagent.common.knowledge.domain.KnowledgeTag;
+import com.ragagent.knowledge.domain.KnowledgeTag;
 import com.ragagent.common.knowledge.domain.FaqEntry;
 import com.ragagent.common.knowledge.domain.FaqEntryPage;
 import com.ragagent.knowledge.dto.faq.FaqExportEntry;

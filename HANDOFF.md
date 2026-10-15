@@ -224,6 +224,27 @@ common    → JDK（+ 工具链）            （平台与契约底座）
 
 **现状（实测 2026-10-15）**：`common` 有 **14 个 `@TableName` 持久化实体 + 12 个域侧 TypeHandler**；跨域主源消费 ≈**252 文件**（另测试 ≈77）。
 
+### ⚠️ 收窄的**总判据**（C 批执行前必读；由首个实做子批实测得出）
+
+**收窄实体会重建跨域边**——除非**同批**把三件事一起做完：
+
+1. **读面** → 换 L1 **不可变视图**（record；字段＝消费者实际用度）；
+2. **写面** → 走 L1 **写端口**（或按 §12.0 把用例移入属主域）；
+3. **L1 里以实体为参数的组件** → **改吃视图**或**下沉回域**（投影器 / 端口签名 / 载荷；典型：`KnowledgeProjectionAdapter`、`ChunkProjectionAdapter`、`ChunkPage`、`BaseTool`）；
+4. 然后实体才回 `domains/<域>/`（域内消费者 import 回退）。
+
+**难度与"L1 耦合点数量"正相关**（实测筛表，跨域读/写 + L1 耦合）：
+
+| 实体 | 跨域读 | L1 耦合点 | 收窄评估 |
+|---|---|---|---|
+| **`KnowledgeTag`** ✅**已完成** | 1 | 2（端口 + 投影器） | **首个实做子批**（见下） |
+| `AuthToken` | 0 | 0 | 但唯一跨域消费者是**写面**（`SystemAdminUserService`）⇒ 需写端口/用例归位（②owner 待裁定项） |
+| `MessageSuggestionSet` / `WikiPageIssue` / `StorageBackend` / `WikiPage` | 0~3 | 1 | 次批候选（各含一个 L1 端口签名） |
+| `Message` / `Chunk` / `Model` / `Session` | 3~6 | 2~4 | **非机械**：视图要覆盖大量字段（`Chunk` 24 访问器 vs 现有视图 6 字段）+ 跨域写面 + L1 组件（`BaseTool`/`ChunkPage`）⇒ 需设计 |
+| `KnowledgeBase` / `Knowledge` / `User` / `Tenant` | 4~10 | 0~3 | 最后（写面 16~48 处，多为管理面 ⇒ 用例归位） |
+
+**进度**：C2 实体 **14 → 13**（`KnowledgeTag` 已归域，2026-10-15）；R10 保持 **7 条边 / 52 类**（收窄未重建边 ✓）。
+
 | 实体 | 行数 | 跨域主源 | 已有 `contract.*` 视图可对齐 |
 |---|---|---|---|
 | `Tenant` | 145 | 52 | `TenantStorageView`/`TenantQuotaView`（部分） |
@@ -1403,6 +1424,23 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **验证**：**13 守卫全绿** ✓（环 0 组、R9 包级 SCC 基线按提示刷新后仍 10 组、L1→域 0 条、R6 不变）；`spotlessCheck build` ✓ **1m38s** ✓；**4991 / 失败 0 / 跳过 4**（boot 1331 ✓）；dev 重启 ready ✓ + 冒烟（`/api/v1/storage-backends`、`/api/v1/knowledge-bases` 200 ✓；`/api/v1/messages/{id}/load` 业务级 404 "session not found" ✓ 路由/鉴权/新注入链路正常）
 - **A③ 累计（二十八刀）**：边 **64 → 30（−34）**、类 **317 → 195（−122）**；三档 **① 22 条 / 109 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
 - **下一步候选**：`knowledge→storage` 第三刀（余 2 类：`KnowledgeBaseFileProxyController` 需文件代理端口、`TenantFileStorage` 需 provider 存储端口）· `embedchannel→storage`（余 1 类）· **待拍板** `mcp→agent`(9) · **K 级** `im→session`(6) · `datasource→knowledge`(8) · **大块** `knowledge→model`(14) · `session→knowledge`(17) · `session→storage`(6 余)
+**🔶 C 批 1·第一子批：`KnowledgeTag` 实体收窄归域（实体 14 → 13；R10 保持 7 边 / 52 类）（2026-10-15）**
+- **背景**：①档已清零（A③-54），此后工作重心＝§12.0 判据下的**欠债收窄**（C；B 门禁 C1/C2/C3 已上线、A 清单已在 §12.4）
+- **本刀最重要的产出＝"收窄总判据"（写入 §12.4）**：**收窄实体会重建跨域边**，必须同批做四件事——①读面换 **L1 不可变视图** ②写面走 **L1 写端口**（或用例归位）③**L1 里以实体为参数的组件改吃视图或下沉回域**（投影器/端口签名/载荷）④实体才回域
+- **实测筛表（14 实体 × 跨域读/写 × L1 耦合点）**：`KnowledgeTag`（读 1 / L1 耦合 2）是**首批**；`AuthToken`（L1 耦合 0 但唯一消费者是写面）需写端口；**`Chunk` 被实测证否为"机械批"**（24 访问器 vs 视图 6 字段 + 跨域写面 7 处 + L1 耦合 4 处含 `BaseTool`/`ChunkPage`）⇒ §12.4 的批 1 顺序据此修正（先做"窄读 + 少 L1 耦合"的实体）
+- **本子批动作**：
+  1. **L1 新增 `common.knowledge.KnowledgeTagView`（record，6 字段＝消费者实际用度）**——对齐 §5.1「不可变载荷」
+  2. `KnowledgeCatalogPort` 的 2 个标签方法改返回视图；`KnowledgeCatalogAdapter` 域内投影（私有 `tagView(实体)`）
+  3. **投影下沉**：`KnowledgeProjectionAdapter.tagView(KnowledgeTag)`（吃实体）逐字搬入域内 `knowledge/support/TagViews.java`；L1 只留吃载荷的 `timeString`；**连带删死字段 `MAPPER`**（搬走后的遗留，B131 点名）
+  4. `KnowledgeTag` 实体回 `knowledge/domain`（域内 13 文件 import 回退）；`datasource/KnowledgeTagAutoTagProvider` + 其测试改用视图（`existing.id()`）
+- **读数**：**C2 实体 14 → 13**（域侧 handler 12 不变；C1 受控根 76 → 75 文件）；**R10 保持 7 条边 / 52 类 / ①档 0（收窄未重建任何边 ✓ = 本刀的核心验收点）**
+- **⚠️ 四次摩擦（都已固化）**：
+  1. **路径常量少一层 `common/`**（脚本 dst 落成 `common/.../knowledge/`）⇒ R7 同一坑**第 3 次**；已在脚本里固化修正
+  2. **"死代码"判据漏了方法引用形态**：我按 `tagView(` 扫判"无调用方"⇒ 删掉后编译报 **`KnowledgeProjectionAdapter::tagView` 两处方法引用**未匹配 ✗ ⇒ **判死代码必须同时 grep `::name`**（第 3 次"字符串/引用形态漏检"）
+  3. **守卫 C2 误报**：新视图 javadoc 里写 `@TableName` 字样被当作持久化形状 ⇒ 守卫改为**剥离注释后再判**（更稳，避免此类误报）
+  4. 写面处理：`KnowledgeTagAutoTagProvider` 只读视图 ✓（无写端口需求）——**本子批最小面**
+- **验证**：**14 守卫全绿** ✓（C2 = 13 实体，基线已 `--write` 收紧）；`spotlessCheck build` ✓ **2m01s** ✓；**4991 / 失败 0 / 跳过 4** ✓；定向 datasource + knowledge **814 条** ✓；dev 重启 ready ✓ + 冒烟（`GET/POST /api/v1/knowledge-bases/{id}/tags` ⇒ **404 + `{"code":1003,"message":"knowledge base not found","data":null}`** 标准信封 ✓ 正是本刀改动的端口/适配器链路；KB/models/sessions 200 ✓）
+- **下一步（次批候选，按筛表）**：`MessageSuggestionSet`（2）/ `WikiPageIssue`（4）/ `StorageBackend`（8）/ `WikiPage`（7）——各含**一个 L1 端口签名**（`EmbedSessionPort` / `WikiPageOpsPort` / `StorageBackendPort`）⇒ 同款四步；`Chunk`/`Knowledge`/`KnowledgeBase` 需先做设计（视图字段面 + 写面归位）
 **🔶 A③ 第五十四刀：②owner 档·实体上提 + 读侧端口化 ⇒ `system→tenant` 清零、owner 21 → 2 类（2026-10-15，R10 边 8 → 7、类 71 → 52）**
 - **读数**：**`system→tenant` 整条边清零** ✓（边 **8 → 7**）；类 **71 → 52（−19）**；②owner **3 条 / 21 类 → 2 条 / 2 类**；累计 边 **64 → 7（−57）**、类 **317 → 52（−265）**
 - **第一步·实体上提 7 件**（登记条件认可的机械面，且是历次最高杠杆）：

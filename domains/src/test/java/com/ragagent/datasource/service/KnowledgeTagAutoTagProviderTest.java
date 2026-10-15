@@ -12,8 +12,8 @@ import org.junit.jupiter.api.Test;
 
 import com.ragagent.contract.error.BizException;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
-import com.ragagent.common.knowledge.domain.KnowledgeTag;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
+import com.ragagent.common.knowledge.KnowledgeTagView;
 
 /**
  * 自动标签生产实现（按名称查找或创建标签）：
@@ -53,8 +53,7 @@ class KnowledgeTagAutoTagProviderTest {
         kb.setId("kb-1");
         kb.setTenantId(10002L);
         when(catalog.getAllTenantById("kb-1")).thenReturn(kb);
-        KnowledgeTag existing = new KnowledgeTag();
-        existing.setId("tag-1");
+        KnowledgeTagView existing = new KnowledgeTagView("tag-1", "kb-1", 10002L, "tag", null, 0);
         when(catalog.findKnowledgeTagByName(10002L, "kb-1", "tag")).thenReturn(existing);
 
         assertThat(provider.findOrCreateTagId("kb-1", " tag ")).isEqualTo("tag-1");
@@ -70,8 +69,7 @@ class KnowledgeTagAutoTagProviderTest {
         kb.setTenantId(10002L);
         when(catalog.getAllTenantById("kb-1")).thenReturn(kb);
         when(catalog.findKnowledgeTagByName(10002L, "kb-1", "tag")).thenReturn(null);
-        KnowledgeTag created = new KnowledgeTag();
-        created.setId("tag-new");
+        KnowledgeTagView created = new KnowledgeTagView("tag-new", "kb-1", 10002L, "tag", null, 0);
         when(catalog.createKnowledgeTag("kb-1", "tag", null, 0)).thenReturn(created);
 
         assertThat(provider.findOrCreateTagId("kb-1", "tag")).isEqualTo("tag-new");

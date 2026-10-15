@@ -76,12 +76,18 @@ def scan_imports() -> dict[str, list[str]]:
     return {k: sorted(v) for k, v in out.items()}
 
 
+def strip_comments(src: str) -> str:
+    """剥离注释：C2 只认真代码里的注解（javadoc 里提 @TableName 不算持久化形状）。"""
+    src = re.sub(r"/\*.*?\*/", "", src, flags=re.S)
+    return re.sub(r"//[^\n]*", "", src)
+
+
 def scan_persistence() -> dict[str, list[str]]:
     """C2：持久化形状（实体 + 域侧 TypeHandler）。"""
     entities, handlers = [], []
     for f in COMMON_SRC.rglob("*.java"):
         rel = str(f.relative_to(COMMON_SRC))
-        s = f.read_text(encoding="utf-8")
+        s = strip_comments(f.read_text(encoding="utf-8"))
         if "@TableName" in s:
             entities.append(rel)
         elif re.search(r"(BaseTypeHandler|implements TypeHandler|TypeHandler<)", s):

@@ -25,7 +25,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import com.ragagent.knowledge.service.management.KnowledgeTagService;
 import com.ragagent.knowledge.mapper.ChunkMapper;
-import com.ragagent.common.knowledge.domain.KnowledgeTag;
+import com.ragagent.knowledge.domain.KnowledgeTag;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import java.util.Map;
 import java.util.ArrayList;
@@ -35,6 +35,7 @@ import com.ragagent.knowledge.repository.KnowledgeTagRepository;
 import com.ragagent.platform.web.JsonMappers;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.common.knowledge.KnowledgeTagView;
 
 /**
  * {@link KnowledgeCatalogPort} 的知识域实现：读写逐字转发两个门面服务，
@@ -330,13 +331,22 @@ public class KnowledgeCatalogAdapter implements KnowledgeCatalogPort {
     }
 
     @Override
-    public KnowledgeTag createKnowledgeTag(String kbId, String name, String color, int sortOrder) {
-        return knowledgeTagService.createTag(kbId, name, color, sortOrder);
+    public KnowledgeTagView createKnowledgeTag(String kbId, String name, String color, int sortOrder) {
+        return tagView(knowledgeTagService.createTag(kbId, name, color, sortOrder));
+    }
+
+    /** 实体 → L1 视图（域内投影；空透传）。 */
+    private static KnowledgeTagView tagView(KnowledgeTag t) {
+        if (t == null) {
+            return null;
+        }
+        return new KnowledgeTagView(t.getId(), t.getKnowledgeBaseId(), t.getTenantId(),
+                t.getName(), t.getColor(), t.getSortOrder());
     }
 
     @Override
-    public KnowledgeTag findKnowledgeTagByName(long tenantId, String kbId, String name) {
-        return knowledgeTagRepository.getByName(tenantId, kbId, name);
+    public KnowledgeTagView findKnowledgeTagByName(long tenantId, String kbId, String name) {
+        return tagView(knowledgeTagRepository.getByName(tenantId, kbId, name));
     }
 
     /** metadata map → JSON 节点（自 datasource 侧 verbatim 搬入）。 */
