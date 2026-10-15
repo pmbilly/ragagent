@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.platform.config.TenantConfigLookup.TenantStorageView;
 import com.ragagent.contract.tenant.StorageEngineConfig;
 import com.ragagent.platform.storage.config.StorageRuntimeEnv;
 import com.ragagent.storage.provider.FileServiceFactory;

@@ -28,7 +28,7 @@ import com.ragagent.knowledge.storage.TenantFileStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
-import com.ragagent.common.knowledge.FaqChunkMetadataCodec;
+import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
 
 /**
  * FaqImportService 的批量导入簇：分批写入+进度回报、CSV 生成、结果落库与消息组装。

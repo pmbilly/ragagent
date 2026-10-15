@@ -19,7 +19,7 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import com.ragagent.common.tenant.TenantConfigLookup;
+import com.ragagent.platform.config.TenantConfigLookup;
 import com.ragagent.platform.security.UserNameLookup;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;

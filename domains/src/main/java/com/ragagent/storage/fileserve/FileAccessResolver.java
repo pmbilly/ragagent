@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.storage.domain.StoredResource;
 import com.ragagent.storage.service.ResourceCatalogService;
-import com.ragagent.common.storage.fileserve.StoragePaths;
+import com.ragagent.platform.storage.fileserve.StoragePaths;
 import com.ragagent.contract.storage.fileserve.MessageFactsLookup;
 import com.ragagent.contract.storage.fileserve.MessageFileFacts;
 

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.ragagent.common.storage.fileserve.StoragePaths;
+import com.ragagent.platform.storage.fileserve.StoragePaths;
 import com.ragagent.contract.session.MessageArtifact;
 
 /**

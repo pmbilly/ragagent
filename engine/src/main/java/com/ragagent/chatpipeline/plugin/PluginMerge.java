@@ -24,7 +24,7 @@ import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.retrieval.telemetry.RetrievalObs;
 import com.ragagent.retrieval.domain.ImageInfo;
 import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.common.knowledge.FaqChunkMetadataCodec;
+import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
 
 /**
  * CHUNK_MERGE 阶段插件。

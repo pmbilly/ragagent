@@ -1,9 +1,9 @@
 package com.ragagent.storage.fileserve;
 
-import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.platform.config.TenantConfigLookup.TenantStorageView;
 import com.ragagent.contract.error.BizException;
 
-import com.ragagent.common.tenant.TenantConfigLookup;
+import com.ragagent.platform.config.TenantConfigLookup;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -24,7 +24,7 @@ import com.ragagent.platform.storage.fileserve.FileProxyPort;
 import com.ragagent.contract.storage.fileserve.MessageFactsLookup;
 import com.ragagent.platform.storage.fileserve.FileServeHttp;
 import com.ragagent.platform.storage.fileserve.FileTransport;
-import com.ragagent.common.storage.fileserve.StoragePaths;
+import com.ragagent.platform.storage.fileserve.StoragePaths;
 import com.ragagent.common.storage.fileserve.FileContentService;
 
 /**

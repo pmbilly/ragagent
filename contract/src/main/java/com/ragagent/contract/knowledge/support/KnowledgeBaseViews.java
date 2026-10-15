@@ -1,4 +1,4 @@
-package com.ragagent.common.knowledge.support;
+package com.ragagent.contract.knowledge.support;
 
 import com.ragagent.contract.knowledge.KnowledgeBaseLookup;
 import com.ragagent.contract.knowledge.KnowledgeBaseView;

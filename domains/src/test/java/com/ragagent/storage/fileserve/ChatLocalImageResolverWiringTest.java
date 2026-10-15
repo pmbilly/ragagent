@@ -19,7 +19,7 @@ import java.util.Base64;
 import java.util.Optional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.platform.config.TenantConfigLookup.TenantStorageView;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.storage.domain.StorageBackend;
 import com.ragagent.modelruntime.adapter.provider.chat.ImageResolver;
@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.MockedStatic;
 import com.ragagent.platform.storage.fileserve.FileTransport;
-import com.ragagent.common.storage.fileserve.StoragePaths;
+import com.ragagent.platform.storage.fileserve.StoragePaths;
 import com.ragagent.common.storage.fileserve.FileContentService;
 
 /**

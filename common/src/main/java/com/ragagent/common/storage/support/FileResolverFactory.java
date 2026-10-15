@@ -1,6 +1,6 @@
 package com.ragagent.common.storage.support;
 
-import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.platform.config.TenantConfigLookup.TenantStorageView;
 import com.ragagent.contract.storage.support.FileUrlPort;
 import com.ragagent.contract.storage.support.StorageBackendResolver;
 import com.ragagent.contract.storage.support.Resolver;

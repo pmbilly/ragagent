@@ -1,8 +1,8 @@
 package com.ragagent.storage.controller;
 
-import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.platform.config.TenantConfigLookup.TenantStorageView;
 
-import com.ragagent.common.tenant.TenantConfigLookup;
+import com.ragagent.platform.config.TenantConfigLookup;
 
 import java.io.IOException;
 

@@ -37,7 +37,7 @@ import com.ragagent.contract.wiki.WikiLanguageSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import com.ragagent.common.tenant.TenantConfigLookup;
+import com.ragagent.platform.config.TenantConfigLookup;
 import com.ragagent.embedding.Embedder;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.retrieval.engine.RetrieveEngineRegistry;

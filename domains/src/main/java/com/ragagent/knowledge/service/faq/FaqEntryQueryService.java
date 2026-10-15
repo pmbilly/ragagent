@@ -33,7 +33,7 @@ import com.ragagent.knowledge.dto.faq.FaqSearchRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.nio.charset.StandardCharsets;
 import com.ragagent.knowledge.domain.ChunkPage;
-import com.ragagent.common.knowledge.FaqChunkMetadataCodec;
+import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
 
 /**
  * FAQ 条目查询面：分页列表、详情、导出（CSV/JSON）与混合检索。

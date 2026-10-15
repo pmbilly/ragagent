@@ -7,7 +7,7 @@ import org.springframework.core.Ordered;
 
 import com.ragagent.embedchannel.controller.filter.EmbedAuthFilter;
 import com.ragagent.embedchannel.service.EmbedChannelService;
-import com.ragagent.common.tenant.TenantConfigLookup;
+import com.ragagent.platform.config.TenantConfigLookup;
 
 /**
  * embed 模块的组合根。

@@ -6,8 +6,8 @@
  *       <b>18 个包</b>在用（auth/knowledge/mcp/embed/wiki/…，以及 {@code common.web.RbacInterceptor}）；</li>
  *   <li>{@link com.ragagent.platform.config.TenantProperties} —— {@code weknora.tenant} 配置项
  *       （RBAC 开关、自助建租户等），auth/config/{@code common.web} 共用；</li>
- *   <li>{@link com.ragagent.common.tenant.TenantConfigLookup} —— 配置读取端口，只暴露
- *       {@code JsonNode} 配置与 {@link com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView}
+ *   <li>{@link com.ragagent.platform.config.TenantConfigLookup} —— 配置读取端口，只暴露
+ *       {@code JsonNode} 配置与 {@link com.ragagent.platform.config.TenantConfigLookup.TenantStorageView}
  *       （L1 安全），供 L2（retrieval）与各 L3 域共用；</li>
  *   <li>{@link com.ragagent.contract.tenant.WebSearchConfig} —— 租户级联网检索配置，
  *       <b>L2 chatpipeline</b> 也要读 ⇒ 必须留在 L1（否则新增 L2→L3 边）。</li>

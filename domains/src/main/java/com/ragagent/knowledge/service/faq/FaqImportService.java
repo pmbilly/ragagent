@@ -36,7 +36,7 @@ import com.ragagent.knowledge.dto.faq.FaqEntryFieldsBatchUpdate;
 import com.ragagent.knowledge.dto.faq.FaqEntryFieldsUpdate;
 import com.fasterxml.jackson.core.JacksonException;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
-import com.ragagent.common.knowledge.FaqChunkMetadataCodec;
+import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
 
 /**
  * FAQ 条目批量导入（upsert）与进度面：append/replace 两种模式的 dry-run 校验、

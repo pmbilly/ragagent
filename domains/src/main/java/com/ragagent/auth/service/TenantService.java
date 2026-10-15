@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.tenant.TenantConfigLookup;
+import com.ragagent.platform.config.TenantConfigLookup;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.mapper.TenantMemberMapper;
 import com.ragagent.contract.error.AppError;

@@ -6,7 +6,7 @@ import com.ragagent.common.storage.support.FileResolverFactory;
 import com.ragagent.contract.storage.support.FileUrlPort;
 import com.ragagent.contract.storage.support.Resolver;
 import com.ragagent.contract.storage.support.StorageBackendResolver;
-import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.platform.config.TenantConfigLookup.TenantStorageView;
 
 /**
  * {@link FileResolverFactory} 的存储域实现：把 L1 的"按请求组装解析器"落到域内实现

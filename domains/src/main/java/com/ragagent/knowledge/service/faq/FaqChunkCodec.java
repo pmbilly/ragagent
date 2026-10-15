@@ -7,7 +7,7 @@ import com.ragagent.contract.knowledge.FaqChunkMetadata;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.dto.faq.FaqEntry;
 import org.springframework.stereotype.Component;
-import com.ragagent.common.knowledge.FaqChunkMetadataCodec;
+import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
 
 /**
  * FAQ 条目与 chunk 行之间的双向编解码：metadata JSON 的解析与写回（含 content_hash

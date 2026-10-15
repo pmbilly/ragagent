@@ -1,8 +1,8 @@
 package com.ragagent.storage.fileserve;
 
-import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.platform.config.TenantConfigLookup.TenantStorageView;
 
-import com.ragagent.common.tenant.TenantConfigLookup;
+import com.ragagent.platform.config.TenantConfigLookup;
 
 import java.io.IOException;
 
@@ -16,7 +16,7 @@ import com.ragagent.modelruntime.adapter.provider.chat.ImageResolver;
 import com.ragagent.storage.domain.StoredResource;
 import com.ragagent.storage.service.ResourceCatalogService;
 import com.ragagent.platform.storage.fileserve.FileTransport;
-import com.ragagent.common.storage.fileserve.StoragePaths;
+import com.ragagent.platform.storage.fileserve.StoragePaths;
 
 /**
  * 把 {@link ImageResolver} 的 {@code LocalImageResolver} 全局钩子接到存储模块。

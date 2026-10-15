@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import com.ragagent.contract.storage.support.FileUrlPort;
 import com.ragagent.common.storage.support.Mode;
 import com.ragagent.common.storage.support.Rewriter;
-import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.platform.config.TenantConfigLookup.TenantStorageView;
 import com.ragagent.contract.storage.support.StorageBackendResolver;
 
 /**

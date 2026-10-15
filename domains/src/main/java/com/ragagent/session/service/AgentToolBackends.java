@@ -57,7 +57,7 @@ import com.ragagent.agenttools.datasource.AnalysisDuckDbJdbc;
 import com.ragagent.agenttools.datasource.DataAnalysisTool;
 import com.ragagent.agenttools.knowledge.GetDocumentInfoTool;
 import com.ragagent.agenttools.knowledge.ListKnowledgeChunksTool;
-import com.ragagent.common.tenant.TenantConfigLookup;
+import com.ragagent.platform.config.TenantConfigLookup;
 import com.ragagent.contract.tenant.WebSearchConfig;
 import com.ragagent.chatpipeline.spi.WebSearchExecutor;
 import com.ragagent.contract.knowledge.ChunkFacts;

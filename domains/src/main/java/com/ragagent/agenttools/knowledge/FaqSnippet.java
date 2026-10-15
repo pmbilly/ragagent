@@ -8,7 +8,7 @@ import java.util.StringJoiner;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.knowledge.FaqChunkMetadata;
 import com.ragagent.platform.web.JsonMappers;
-import com.ragagent.common.knowledge.FaqChunkMetadataCodec;
+import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
 
 /**
  * FAQ 元数据在工具输出中的投影。

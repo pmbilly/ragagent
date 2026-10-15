@@ -7,7 +7,7 @@ import com.ragagent.contract.knowledge.FaqChunkMetadata;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.retrieval.engine.VectorStoreService;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.knowledge.FaqChunkMetadataCodec;
+import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
 
 /**
  * FAQ 索引行组装。2026-09-22 走查批接线：此前的

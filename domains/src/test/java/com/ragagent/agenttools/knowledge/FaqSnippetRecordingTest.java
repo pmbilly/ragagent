@@ -13,7 +13,7 @@ import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.knowledge.FaqChunkMetadata;
 import com.ragagent.agenttools.GoRecording45A;
 import com.ragagent.agenttools.RecordingSupport;
-import com.ragagent.common.knowledge.FaqChunkMetadataCodec;
+import com.ragagent.platform.knowledge.FaqChunkMetadataCodec;
 
 /**
  * FaqSnippet 的录制语料（10 条）。XML 投影逐字节比对（含相似问截断的 omitted 标记）。

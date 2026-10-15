@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.platform.config.TenantConfigLookup.TenantStorageView;
 import com.ragagent.platform.security.CryptoService;
 import com.ragagent.platform.storage.config.StorageRuntimeEnv;
 import com.ragagent.storage.config.StorageProviderEnv;
@@ -25,7 +25,7 @@ import com.ragagent.storage.provider.FileService;
 import com.ragagent.storage.provider.FileServiceFactory;
 import com.ragagent.contract.tenant.StorageEngineConfig;
 import com.ragagent.platform.storage.fileserve.FileTransport;
-import com.ragagent.common.storage.fileserve.StoragePaths;
+import com.ragagent.platform.storage.fileserve.StoragePaths;
 import com.ragagent.common.storage.fileserve.WritableFileContentService;
 import com.ragagent.common.storage.fileserve.FileContentService;
 

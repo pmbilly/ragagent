@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.ragagent.platform.storage.fileserve.FileTransport.OpenedFile;
 import com.ragagent.common.storage.fileserve.ProviderFileStorePort;
-import com.ragagent.common.storage.fileserve.StoragePaths;
+import com.ragagent.platform.storage.fileserve.StoragePaths;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.error.AppError;
 

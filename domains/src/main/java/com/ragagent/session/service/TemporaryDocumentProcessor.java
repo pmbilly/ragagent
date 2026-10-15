@@ -17,7 +17,7 @@ import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ragagent.common.tenant.TenantConfigLookup;
+import com.ragagent.platform.config.TenantConfigLookup;
 import com.ragagent.contract.knowledge.DocumentChunkingPort;
 import com.ragagent.contract.knowledge.chunker.Tokens;
 import com.ragagent.contract.doc.DocReaderParsePort;

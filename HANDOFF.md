@@ -1792,6 +1792,19 @@ public interface AdminUserPort {
 - **读数**：**C1 受控导入根 61 → 59 文件**；**域侧 handler 10 → 1**；`common/*` 91 → **82**（−9）；`:contract` 203（不变）；载荷 0 保持；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
 - **验证**：**14 守卫全绿**（C1/C2 基线已 `--write`）；**1349 金片签名一致**；`spotlessCheck build` **2m5s**；**4991 / 失败 0 / 跳过 4**；dev 冒烟（sessions / KB / tenants / system-info **200** ✓；`GET /sessions/{id}/messages` ⇒ **500**——**查日志证实为既有的 `HttpRequestMethodNotSupportedException`（405 应然却映射为 500）**，与 handler 无关 ⇒ 该独立小刀仍在队列）
 - **余量**：域侧 handler 仅剩 `wiki/domain/WikiStringListTypeHandler`（L1 用户 `WikiIndexEntry` ⇒ 随其切开）· Jackson 味域内值类型 22 件（其中 session 7 件被 L1 平台面载荷引用 ⇒ 与载荷同生命周期）
+**🔶 清 `:common` 子批 B·3 件 → `:platform`、1 件 → `:contract`（`common/*` 38 → 34）（2026-10-16）**
+- **依赖闭包预检（上刀新关卡的第二次执行，四件全绿）**：
+  - `FaqChunkMetadataCodec`：platform 引 `JsonMappers`；**无 common/域反引** ✓ ⇒ `platform.knowledge`
+  - `StoragePaths`：platform 引 `JsonMappers`/`StorageRuntimeEnv`/`CryptoService`；无 common/域反引 ✓ ⇒ `platform.storage.fileserve`
+  - `TenantConfigLookup`：仅引 `contract.APIPrincipalConfig`；无 platform/common/域反引 ✓ ⇒ `platform.config`
+  - `KnowledgeBaseViews`：仅引 contract ⇒ `contract.knowledge.support`
+- ⭐ **判据兑现：反向引用类阻塞的标准解法＝"先伙伴、后自身"**——上刀被拦的 `KnowledgeBaseViews`（引 `common.KnowledgeBaseLookup` ✗）**本刀自动解锁**（伙伴上刀已入契约 ⇒ 反向引用消失 ✓）
+- **读数**：`:contract` 239 → **240**；`common/*` **38 → 34**；`platform` 144 → **147**；C1 = 2 文件；登记 platform 面 8 + Jackson 语义必要 2 ✓；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
+- **验证**：**14 守卫全绿** · **1349 金片签名一致** · gate **1m56s / 4996 / 失败 0 / 跳过 4** · 冒烟（sessions / knowledge-bases / **tenants** / system-info / storage-backends **200** ✓——其中 `/tenants` 直接覆盖 `TenantConfigLookup` 归位链 ✓）
+- **剩余 34 件（收敛路线）**：
+  - **被拦 3 件**（`FileContentService` · `Mode` · `MemoryMessageCursor`）⇒ 摘掉其 platform 依赖后入契约，连带成对伙伴（`WritableFileContentService` · `StreamRewriter`）一并处置 ✓
+  - **(d) 线格式待决策 ~12 件**（`SearchResult` · `MessageView` · `AgentStep` · `AgentToolCall` · `ToolCallTarget` · `UserPreferences`(+`AdminUserPort`/`AdminUserView`) · `ParserEngineConfig` · `PipelineMessageView` · `SessionQaPort` · `Rewriter`）——**`:common` 完全解散的最后卡点**
+  - **13 件 `package-info`**：随所在包解散而删除 ✓
 **🔶 清 `:common` 子批 A·8 件纯 JDK 跨域件入 `:contract`（`common/*` 46 → 38）（2026-10-16）**
 - **归类法（本刀先做）**：46 件逐件测「**真** Jackson 面（去注释/字符串）× 注解清点 × 框架 import × **引用者分域**」⇒ 一次性得出四路径名单（(a)→contract / (b)→platform / (c)→域内 / (d)→线格式待决策）
 - **入契约 8 件**：`ChunkSearchGateway` · `KnowledgeBaseLookup` · `KnowledgeDocumentGateway` · `CodePoints` · `Tokens` · `ChunkProjectionAdapter` · `KnowledgeProjectionAdapter` · **`MessageExecutionContext`**（末件去掉**冗余** `@JsonIgnoreProperties` ✓——其 jsonb 读取统一经 `JsonMappers.lenient()` ✓，承 G1-g 判据）

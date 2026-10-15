@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 import com.ragagent.platform.storage.fileserve.FileTransport;
 import com.ragagent.common.storage.fileserve.ProviderFileStorePort;
-import com.ragagent.common.tenant.TenantConfigLookup;
+import com.ragagent.platform.config.TenantConfigLookup;
 import com.ragagent.storage.fileserve.ProviderFileContentService;
 import com.ragagent.storage.fileserve.StorageFileResolver;
 import com.ragagent.storage.provider.FileService;
