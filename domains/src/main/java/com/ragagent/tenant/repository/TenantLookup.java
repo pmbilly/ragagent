@@ -1,5 +1,5 @@
 package com.ragagent.tenant.repository;
-import com.ragagent.common.tenant.TenantRowView;
+import com.ragagent.contract.tenant.TenantRowView;
 
 /**
  * 租户实体查询端口：按 id 取 {@code com.ragagent.tenant.domain.Tenant} 行。

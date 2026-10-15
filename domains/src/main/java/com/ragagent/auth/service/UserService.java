@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.ragagent.platform.security.UserNameLookup;
-import com.ragagent.common.tenant.TenantRowView;
+import com.ragagent.contract.tenant.TenantRowView;
 
 /**
  * 用户 service。

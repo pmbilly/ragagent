@@ -11,7 +11,7 @@ import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.domain.User;
 import com.ragagent.common.auth.domain.UserPreferences;
 import io.jsonwebtoken.Claims;
-import com.ragagent.common.tenant.TenantRowView;
+import com.ragagent.contract.tenant.TenantRowView;
 
 /**
  * 用户会话令牌操作（logout / refresh / switch-tenant，

@@ -50,10 +50,13 @@ public final class JsonMappers {
     }
 
     /**
-     * 纯 JDK 值 → {@code JsonNode}（{@link #toJavaValue} 的逆；null ⇒ {@code NullNode}）。
-     * 供"载荷已去 Jackson、但域内仍需 JSON 树"的一侧还原。
+     * 纯 JDK 值 → {@code JsonNode}（{@link #toJavaValue} 的逆）。**null 保持 null**（不产
+     * {@code NullNode}）——域内多处用 {@code == null} 判定"未设置"并套默认值（如
+     * {@code TenantService.createTenant} 的 retriever_engines 兜底），返回 {@code NullNode}
+     * 会让这些分支失效 ⇒ 必须保 null。需要显式 JSON {@code null} 字面量时由调用方自行
+     * {@code MAPPER.nullNode()}。
      */
     public static com.fasterxml.jackson.databind.JsonNode toJsonNode(Object value) {
-        return lenient().valueToTree(value);
+        return value == null ? null : lenient().valueToTree(value);
     }
 }

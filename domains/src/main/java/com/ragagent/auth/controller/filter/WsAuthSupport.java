@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import com.ragagent.common.tenant.TenantRowView;
+import com.ragagent.contract.tenant.TenantRowView;
 
 /**
  * JWT 认证装配支持（沙箱终端 WS 等非过滤器入口复用）。

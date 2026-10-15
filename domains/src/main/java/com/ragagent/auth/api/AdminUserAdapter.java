@@ -22,7 +22,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import com.ragagent.contract.auth.AuthTokenAdminPort;
 import java.util.ArrayList;
-import com.ragagent.common.tenant.TenantRowView;
+import com.ragagent.contract.tenant.TenantRowView;
 
 /**
  * 系统管理员 P0 用户管理（注册 / 建管理员 / 重置密码 / 列管理员 / 撤管理员）。

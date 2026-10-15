@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.dto.Membership;
-import com.ragagent.common.tenant.TenantRowView;
+import com.ragagent.contract.tenant.TenantRowView;
 
 /**
  * 登录结果（service 层形态）。

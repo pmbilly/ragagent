@@ -146,9 +146,6 @@ PENDING_DEJACKSON = {
         "JsonNode wikiConfig/extractConfig（1 处消费触达）⇒ 待去 Jackson",
     "com/ragagent/common/knowledge/KnowledgeDocumentFacts.java":
         "JsonNode metadata（2 处消费触达）⇒ 待去 Jackson",
-    "com/ragagent/common/tenant/TenantRowView.java":
-        "JsonNode × 10（retrieverEngines/contextConfig/…/memoryConfig）+ APIPrincipalConfig ⇒ L1；"
-        "与 TenantConfigLookup 同包，维持 auth→tenant 登记边只由 TenantService 一个类承载",
     "com/ragagent/common/auth/AdminUserView.java":
         "管理面用户行视图（12 字段镜像，去 passwordHash）；**含 preferences（Jackson 类型）且直接出面**"
         "⇒ 与端口同族登记（HANDOFF §12.6.4 硬约束 2）；去 Jackson 后可入 contract.auth",

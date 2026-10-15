@@ -16,7 +16,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ragagent.platform.persistence.PageRequests;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.common.tenant.TenantRowView;
+import com.ragagent.contract.tenant.TenantRowView;
 import com.ragagent.tenant.domain.Tenant;
 import com.ragagent.tenant.repository.TenantLookup;
 import com.ragagent.tenant.mapper.TenantMapper;
@@ -232,7 +232,7 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
      * 旧租户行读取失败/不存在按"无旧值"处理（selectById 返回 null）。
      */
     private void validateStorageBucketUniqueness(TenantRowView tenant) {
-        JsonNode cfg = tenant.getStorageEngineConfig();
+        JsonNode cfg = JsonMappers.toJsonNode(tenant.getStorageEngineConfig());
         if (cfg == null || cfg.isNull()) {
             return;
         }
@@ -437,20 +437,20 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
         v.setName(t.getName());
         v.setDescription(t.getDescription());
         v.setStatus(t.getStatus());
-        v.setRetrieverEngines(t.getRetrieverEngines());
+        v.setRetrieverEngines(JsonMappers.toJavaValue(t.getRetrieverEngines()));
         v.setBusiness(t.getBusiness());
         v.setStorageQuota(t.getStorageQuota());
         v.setStorageUsed(t.getStorageUsed());
-        v.setContextConfig(t.getContextConfig());
-        v.setWebSearchConfig(t.getWebSearchConfig());
-        v.setParserEngineConfig(t.getParserEngineConfig());
-        v.setCredentials(t.getCredentials());
-        v.setStorageEngineConfig(t.getStorageEngineConfig());
+        v.setContextConfig(JsonMappers.toJavaValue(t.getContextConfig()));
+        v.setWebSearchConfig(JsonMappers.toJavaValue(t.getWebSearchConfig()));
+        v.setParserEngineConfig(JsonMappers.toJavaValue(t.getParserEngineConfig()));
+        v.setCredentials(JsonMappers.toJavaValue(t.getCredentials()));
+        v.setStorageEngineConfig(JsonMappers.toJavaValue(t.getStorageEngineConfig()));
         v.setDefaultStorageBackendId(t.getDefaultStorageBackendId());
-        v.setChatHistoryConfig(t.getChatHistoryConfig());
-        v.setRetrievalConfig(t.getRetrievalConfig());
-        v.setMemoryConfig(t.getMemoryConfig());
-        v.setApiPrincipalConfig(t.getApiPrincipalConfig());
+        v.setChatHistoryConfig(JsonMappers.toJavaValue(t.getChatHistoryConfig()));
+        v.setRetrievalConfig(JsonMappers.toJavaValue(t.getRetrievalConfig()));
+        v.setMemoryConfig(JsonMappers.toJavaValue(t.getMemoryConfig()));
+        v.setApiPrincipalConfigValue(t.getApiPrincipalConfig());
         v.setCreatedAt(t.getCreatedAt());
         v.setUpdatedAt(t.getUpdatedAt());
         v.setDeletedAt(t.getDeletedAt());
@@ -479,20 +479,20 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
         t.setName(v.getName());
         t.setDescription(v.getDescription());
         t.setStatus(v.getStatus());
-        t.setRetrieverEngines(v.getRetrieverEngines());
+        t.setRetrieverEngines(JsonMappers.toJsonNode(v.getRetrieverEngines()));
         t.setBusiness(v.getBusiness());
         t.setStorageQuota(v.getStorageQuota());
         t.setStorageUsed(v.getStorageUsed());
-        t.setContextConfig(v.getContextConfig());
-        t.setWebSearchConfig(v.getWebSearchConfig());
-        t.setParserEngineConfig(v.getParserEngineConfig());
-        t.setCredentials(v.getCredentials());
-        t.setStorageEngineConfig(v.getStorageEngineConfig());
+        t.setContextConfig(JsonMappers.toJsonNode(v.getContextConfig()));
+        t.setWebSearchConfig(JsonMappers.toJsonNode(v.getWebSearchConfig()));
+        t.setParserEngineConfig(JsonMappers.toJsonNode(v.getParserEngineConfig()));
+        t.setCredentials(JsonMappers.toJsonNode(v.getCredentials()));
+        t.setStorageEngineConfig(JsonMappers.toJsonNode(v.getStorageEngineConfig()));
         t.setDefaultStorageBackendId(v.getDefaultStorageBackendId());
-        t.setChatHistoryConfig(v.getChatHistoryConfig());
-        t.setRetrievalConfig(v.getRetrievalConfig());
-        t.setMemoryConfig(v.getMemoryConfig());
-        t.setApiPrincipalConfig(v.getApiPrincipalConfig());
+        t.setChatHistoryConfig(JsonMappers.toJsonNode(v.getChatHistoryConfig()));
+        t.setRetrievalConfig(JsonMappers.toJsonNode(v.getRetrievalConfig()));
+        t.setMemoryConfig(JsonMappers.toJsonNode(v.getMemoryConfig()));
+        t.setApiPrincipalConfig(v.apiPrincipalConfigValue());
         t.setCreatedAt(v.getCreatedAt());
         t.setUpdatedAt(v.getUpdatedAt());
         t.setDeletedAt(v.getDeletedAt());
@@ -522,7 +522,7 @@ public class TenantService implements TenantConfigLookup, TenantLookup {
         v.setChatHistoryConfig(fresh.getChatHistoryConfig());
         v.setRetrievalConfig(fresh.getRetrievalConfig());
         v.setMemoryConfig(fresh.getMemoryConfig());
-        v.setApiPrincipalConfig(fresh.getApiPrincipalConfig());
+        v.setApiPrincipalConfigValue(fresh.apiPrincipalConfigValue());
         v.setCreatedAt(fresh.getCreatedAt());
         v.setUpdatedAt(fresh.getUpdatedAt());
         v.setDeletedAt(fresh.getDeletedAt());

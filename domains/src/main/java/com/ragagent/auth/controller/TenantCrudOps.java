@@ -14,7 +14,7 @@ import com.ragagent.contract.tenant.TenantRole;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import com.ragagent.common.tenant.TenantRowView;
+import com.ragagent.contract.tenant.TenantRowView;
 
 /**
  * tenants CRUD 协作者（自 {@link TenantCatalogController} 拆出）：单空间列表、读取/更新/删除与

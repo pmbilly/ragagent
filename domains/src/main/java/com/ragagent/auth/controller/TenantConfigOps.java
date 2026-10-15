@@ -22,7 +22,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import com.ragagent.platform.prompt.PromptTemplateCatalog;
 import com.ragagent.contract.wiki.WikiLanguageSupport;
-import com.ragagent.common.tenant.TenantRowView;
+import com.ragagent.contract.tenant.TenantRowView;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * KV 配置分发协作者（自 {@link TenantCatalogController} 拆出）：6 个 DB-backed key 的
@@ -149,7 +150,7 @@ final class TenantConfigOps {
     private WebSearchConfig getWebSearch() {
         TenantRowView tenant = requireContextTenant();
         return TenantConfigRedaction.webSearchForResponse(
-                parseConfig(tenant.getWebSearchConfig(), WebSearchConfig.class));
+                parseConfig(JsonMappers.toJsonNode(tenant.getWebSearchConfig()), WebSearchConfig.class));
     }
 
     private Object putWebSearch(String rawBody) {
@@ -159,7 +160,7 @@ final class TenantConfigOps {
         }
         TenantRowView tenant = requireContextTenant();
         WebSearchConfig merged = TenantConfigRedaction.mergeWebSearch(
-                cfg, parseConfig(tenant.getWebSearchConfig(), WebSearchConfig.class));
+                cfg, parseConfig(JsonMappers.toJsonNode(tenant.getWebSearchConfig()), WebSearchConfig.class));
         if (merged.getMaxResults() < 1 || merged.getMaxResults() > 50) {
             throw new BizException(AppError.badRequest("max_results must be between 1 and 50"));
         }
@@ -177,7 +178,7 @@ final class TenantConfigOps {
     private ParserEngineConfig getParserEngine() {
         TenantRowView tenant = requireContextTenant();
         ParserEngineConfig data = TenantConfigRedaction.parserEngineForResponse(
-                parseConfig(tenant.getParserEngineConfig(), ParserEngineConfig.class));
+                parseConfig(JsonMappers.toJsonNode(tenant.getParserEngineConfig()), ParserEngineConfig.class));
         return data == null ? new ParserEngineConfig() : data;
     }
 
@@ -188,7 +189,7 @@ final class TenantConfigOps {
         }
         TenantRowView tenant = requireContextTenant();
         ParserEngineConfig merged = TenantConfigRedaction.mergeParserEngine(
-                cfg, parseConfig(tenant.getParserEngineConfig(), ParserEngineConfig.class));
+                cfg, parseConfig(JsonMappers.toJsonNode(tenant.getParserEngineConfig()), ParserEngineConfig.class));
         validateParserEngineOutboundUrls(merged);
         tenant.setParserEngineConfig(TenantBindSupport.MAPPER.valueToTree(merged));
         try {
@@ -232,7 +233,7 @@ final class TenantConfigOps {
     private StorageEngineConfig getStorageEngine() {
         TenantRowView tenant = requireContextTenant();
         StorageEngineConfig data = TenantConfigRedaction.storageEngineForResponse(
-                parseConfig(tenant.getStorageEngineConfig(), StorageEngineConfig.class));
+                parseConfig(JsonMappers.toJsonNode(tenant.getStorageEngineConfig()), StorageEngineConfig.class));
         return data == null ? new StorageEngineConfig() : data;
     }
 
@@ -257,7 +258,7 @@ final class TenantConfigOps {
         cfg.setDefaultProvider(provider);
         TenantRowView tenant = requireContextTenant();
         StorageEngineConfig merged = TenantConfigRedaction.mergeStorageEngine(
-                cfg, parseConfig(tenant.getStorageEngineConfig(), StorageEngineConfig.class));
+                cfg, parseConfig(JsonMappers.toJsonNode(tenant.getStorageEngineConfig()), StorageEngineConfig.class));
         tenant.setStorageEngineConfig(TenantBindSupport.MAPPER.valueToTree(merged));
         try {
             service.tenantService.updateTenant(tenant);
@@ -277,7 +278,7 @@ final class TenantConfigOps {
 
     private ChatHistoryConfig getChatHistory() {
         TenantRowView tenant = requireContextTenant();
-        ChatHistoryConfig data = parseConfig(tenant.getChatHistoryConfig(), ChatHistoryConfig.class);
+        ChatHistoryConfig data = parseConfig(JsonMappers.toJsonNode(tenant.getChatHistoryConfig()), ChatHistoryConfig.class);
         return data == null ? new ChatHistoryConfig() : data;
     }
 
@@ -287,7 +288,7 @@ final class TenantConfigOps {
             req = new ChatHistoryConfig();
         }
         TenantRowView tenant = requireContextTenant();
-        ChatHistoryConfig existing = parseConfig(tenant.getChatHistoryConfig(), ChatHistoryConfig.class);
+        ChatHistoryConfig existing = parseConfig(JsonMappers.toJsonNode(tenant.getChatHistoryConfig()), ChatHistoryConfig.class);
 
         // 重建对象（knowledgeBaseId 不受客户端控制），
         // 嵌入模型未变时沿用存量 KB
@@ -326,7 +327,7 @@ final class TenantConfigOps {
 
     private RetrievalConfig getRetrieval() {
         TenantRowView tenant = requireContextTenant();
-        RetrievalConfig data = parseConfig(tenant.getRetrievalConfig(), RetrievalConfig.class);
+        RetrievalConfig data = parseConfig(JsonMappers.toJsonNode(tenant.getRetrievalConfig()), RetrievalConfig.class);
         return data == null ? new RetrievalConfig() : data;
     }
 
@@ -365,7 +366,7 @@ final class TenantConfigOps {
 
     private MemoryConfig getMemory() {
         TenantRowView tenant = requireContextTenant();
-        MemoryConfig data = parseConfig(tenant.getMemoryConfig(), MemoryConfig.class);
+        MemoryConfig data = parseConfig(JsonMappers.toJsonNode(tenant.getMemoryConfig()), MemoryConfig.class);
         if (data == null) {
             data = new MemoryConfig();
         }

@@ -2,8 +2,7 @@ package com.ragagent.auth.dto;
 
 import java.time.OffsetDateTime;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.tenant.TenantRowView;
+import com.ragagent.contract.tenant.TenantRowView;
 
 /**
  * Tenant 的 API 投影。
@@ -17,26 +16,26 @@ public record TenantResponse(
         String name,
         String description,
         String status,
-        JsonNode retrieverEngines,
+        Object retrieverEngines,
         String business,
         Long storageQuota,
         Long storageUsed,
 
-        JsonNode contextConfig,
+        Object contextConfig,
 
-        JsonNode webSearchConfig,
+        Object webSearchConfig,
 
-        JsonNode parserEngineConfig,
+        Object parserEngineConfig,
 
-        JsonNode credentials,
+        Object credentials,
 
-        JsonNode storageEngineConfig,
+        Object storageEngineConfig,
 
-        JsonNode chatHistoryConfig,
+        Object chatHistoryConfig,
 
-        JsonNode retrievalConfig,
+        Object retrievalConfig,
 
-        JsonNode memoryConfig,
+        Object memoryConfig,
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt,
         OffsetDateTime deletedAt) {

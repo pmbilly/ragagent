@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.ragagent.platform.web.ApiResult;
-import com.ragagent.common.tenant.TenantRowView;
+import com.ragagent.contract.tenant.TenantRowView;
 
 /**
  * api-principal 三条路由（Owner+）：
@@ -70,7 +70,7 @@ public class TenantAPIPrincipalController {
     public APIPrincipalConfigResponse getAPIPrincipalConfig(@PathVariable String id) {
         long tenantId = parseTenantId(id);
         TenantRowView tenant = loadTenant(tenantId);
-        return configForResponse(tenant.getApiPrincipalConfig());
+        return configForResponse(tenant.apiPrincipalConfigValue());
     }
 
     /** PUT /tenants/{id}/api-principal-config（Owner+；*** = 保留存量密钥） */
@@ -93,7 +93,7 @@ public class TenantAPIPrincipalController {
         }
 
         TenantRowView tenant = loadTenant(tenantId);
-        APIPrincipalConfig existing = tenant.getApiPrincipalConfig();
+        APIPrincipalConfig existing = tenant.apiPrincipalConfigValue();
         String existingSecret = existing == null ? "" : existing.hmacSecret;
         String hmacSecret = existingSecret;
         if (req.hasHmacSecret()) {
@@ -113,10 +113,10 @@ public class TenantAPIPrincipalController {
                 && (cfg.hmacSecret == null || cfg.hmacSecret.trim().isEmpty())) {
             throw new BizException(AppError.validation("hmac_secret is required for signed_token mode"));
         }
-        tenant.setApiPrincipalConfig(cfg);
+        tenant.setApiPrincipalConfigValue(cfg);
 
         TenantRowView updated = tenantService.updateTenant(tenant);
-        return configForResponse(updated.getApiPrincipalConfig());
+        return configForResponse(updated.apiPrincipalConfigValue());
     }
 
     /** POST /tenants/{id}/api-principal-test-token（Owner+；HS256，TTL 15min 缺省 / 1h 上限） */
@@ -130,7 +130,7 @@ public class TenantAPIPrincipalController {
         validateExternalUserId(externalUserId);
 
         TenantRowView tenant = loadTenant(tenantId);
-        APIPrincipalConfig cfg = tenant.getApiPrincipalConfig();
+        APIPrincipalConfig cfg = tenant.apiPrincipalConfigValue();
         if (cfg == null || !APIPrincipalConfig.MODE_SIGNED_TOKEN.equals(cfg.mode)) {
             throw new BizException(AppError.validation("signed_token mode is required"));
         }

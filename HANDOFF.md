@@ -1741,6 +1741,16 @@ public interface AdminUserPort {
 - **读数**：C2 实体保持 **13**；C4 基线 **31**；**14 守卫全绿**（run-guards 标签已更到 C1/C2/C3/C4）
 - **验证**：`spotlessCheck build` ✓ **2m12s** ✓；**4991 / 失败 0 / 跳过 4** ✓；dev 重启 ready ✓ + 冒烟（KB/models/sessions 200 ✓；`/api/v1/knowledge-bases/{id}/tags` ⇒ 404 + 标准信封 ✓——正是经 `:contract` 视图的链路）
 - **下一步（继续 C）**：次批候选按筛表——`MessageSuggestionSet`(2) / `WikiPageIssue`(4) / `StorageBackend`(8) / `WikiPage`(7)；**新视图一律落 `:contract`**
+**🔶 G1-b-2·`TenantRowView` 去 Jackson 入 `contract.tenant`（C4 载荷 12 → 11）（2026-10-15）**
+- **对象**：`TenantRowView`（21 字段 / **9 个 jsonb `JsonNode`**）——消费面实测：**0 处内容读取**（纯透传：`TenantResponse` 与 3 个 auth 控制器）
+- **两处必须对症处理的设计点（先测后动）**：
+  1. **该视图确实"出面 + 入面"**：`GET /api/v1/tenants/all` 直接返回 `List<TenantRowView>`；且 `TenantCreateOps` 用 `bindBody(..., TenantRowView.class)` **反序列化请求体** ⇒ `@JsonIgnore apiPrincipalConfig` **有语义**（防秘密外泄）⇒ **契约面等价表达＝非 getter 命名**（`getApiPrincipalConfig()` → `apiPrincipalConfigValue()`；Jackson 默认只序列化 getter 命名 ⇒ 序列化/反序列化双向等价）✓
+  2. **`TenantConfigOps` 的"合并"型读取**（先前按 `.path(` 形态测量漏判）⇒ 10 处需 `JsonMappers.toJsonNode(...)` **还原**后再合并 ✓（语义等价）
+- **动作**：① 9 字段 `JsonNode` → `Object`（纯 JDK：对象→`Map`、数组→`List`、标量→包装类型）② 忽略字段改非 getter 命名 ③ `git mv` → **`contract.tenant`** ④ `TenantService` 映射器 9×2 处边界转换 + 2 处访问器改名（**实体侧保持原名**——实体/视图命名分离）⑤ `TenantResponse` 9 个 `JsonNode` 组件 → `Object` ⑥ `TenantConfigOps` 10 处还原
+- **⚠️ 一次真回归（5 条契约测试红，一次定位一处修好）**：`JsonMappers.toJsonNode(null)` 我原返回 **`NullNode`**，而域内多处用 **`== null`** 判定"未设置"并套默认值（`createTenant` 的 retriever_engines→空数组兜底、`contextConfig`→字面量 null、KV 配置 null 兜底）⇒ `NullNode` 让这些分支全部失效 ✗ ⇒ 5 条金片红（`{"engines":[]}` 变 null、`data:null` 变默认对象…）。**修法：`toJsonNode` 改为 null 保持 null**（需要显式 JSON `null` 字面量时由调用方 `MAPPER.nullNode()`）✓ 5 条全绿。**判据沉淀：跨边界"null ↔ 空节点"必须与原语义逐字一致，否则所有 `== null` 默认值分支会静默失效**
+- **读数**：**C4 载荷型 12 → 11**；`common/*` 111 → **110**；`:contract` 182 → **183**；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
+- **验证**：**14 守卫全绿**；**1349 金片签名一致** ✓；`spotlessCheck build` **2m3s**；**4991 / 失败 0 / 跳过 4**；dev 冒烟待与本轮后续子批合并执行
+- **G1-b 余量（10 件）**：`ChunkRowView`/`ChunkPageView` · `ChunkFacts`（record，2 个 JsonNode 组件）· `KnowledgeDocumentFacts`（record，1）· `KnowledgeBaseView`（class，2）· `KnowledgeRowView`（class，4）· `KnowledgeBaseRowView`（record，5 + **4 个 L1 config 类型**＝G1-h 耦合）· `WikiPageView`（class，1 + **6 个 `@JsonSerialize`**）· `AdminUserView`+`AdminUserPort`（`UserPreferences`＝Jackson 注解**类型**）
 **🔶 G1-b-1·`StorageBackendView` 去 Jackson + 视图/端口整批入 `:contract`（C4 载荷 13 → 12）（2026-10-15）**
 - **G1-b（去 Jackson）的第一步：12 件登记载荷里最小、最干净的一件** —— 先测"内容读取 vs 透传"：`StorageBackendView.config` **0 处内容读取 / 20 处透传** ✓
 - **⭐ 机制（后续 11 件可复用）**：
@@ -2682,7 +2692,7 @@ public interface AdminUserPort {
 
 | 目标模块 | 实际 | 差距 |
 |---|---|---|
-| `contracts` | `:contract` **182 件** ✅ 已独立（G1-b-1 后） | 包覆盖：方案 **25** 包 vs 实际 **20** ⇒ 缺 `access` · `execution` · `integration` · `parsing` · `settings` · `task`；多 `auth` · `doc` · `text` |
+| `contracts` | `:contract` **183 件** ✅ 已独立（G1-b-2 后） | 包覆盖：方案 **25** 包 vs 实际 **20** ⇒ 缺 `access` · `execution` · `integration` · `parsing` · `settings` · `task`；多 `auth` · `doc` · `text` |
 | `platform` | `com.ragagent.platform.*` **139 件仍在 `:common`** | **未独立成模块**；包覆盖：方案 **23** vs 实际 **15** ⇒ 缺 `execution` · `outbox` · `parsing` · `storage.config` · `storage.provider` · `tracing.decorators` · `tracing.langfuse` · `transaction` · `web.error` · `web.health`；多 `redis` · `tracing` |
 | `agent-engine` · `retrieval-engine` · `model-runtime` | `:engine` **318 件 / 9 顶层包**（chatpipeline · embedding · llm · modelcontext · modelruntime · rerank · retrieval · tracing · webfetch） | 未拆分（**条件触发**项） |
 | `domains` | `:domains` **1343 件** | 域间边 **7 条**（①clearable **0** / ②owner 2 / ③族内 5）；域布局抽样见 C |
@@ -2697,7 +2707,7 @@ public interface AdminUserPort {
 | `:common` 载荷型 | **14 待归位** + 7 platform 面登记 + 3 待去 Jackson | C4 |
 | `:common` 受控依赖根 | 10 根 / 61 文件 | C1 |
 | `:contract` **误搬件** | **8 → 3**（D0a/D0b 已归位 5 件）（D0a/D0b 已归位 5 件；余 3 件 `KnowledgeBase*Config` 实体耦合，见 G1-h） | **待加 C5/C6** |
-| `:common` 规模 | **251 件** = `common/*` **111** + `platform/*` 139 + `event/*` 1（G1-b-1 后） | — |
+| `:common` 规模 | **250 件** = `common/*` **110** + `platform/*` 139 + `event/*` 1（G1-b-2 后） | — |
 
 **C. 域布局抽样（以方案 §8.8.2 `knowledge/` 为范本）**
 
