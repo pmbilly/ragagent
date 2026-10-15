@@ -1,6 +1,5 @@
-package com.ragagent.common.memory;
+package com.ragagent.contract.memory;
 
-import com.ragagent.contract.memory.MemoryRecall;
 
 /**
  * 记忆召回读取端口（L1）：会话侧 QA 的"记忆开着吗 + 召回一轮"最小读面。

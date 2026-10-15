@@ -19,7 +19,7 @@ import com.ragagent.platform.event.EventType;
 import com.ragagent.contract.event.payload.MemoryRecalledData;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
-import com.ragagent.common.memory.MemoryRecallPort;
+import com.ragagent.contract.memory.MemoryRecallPort;
 import com.ragagent.rerank.Reranker;
 
 import com.ragagent.session.support.PipelineViews;
@@ -33,7 +33,7 @@ import com.ragagent.tracing.decorators.LangfuseChatClient;
 import com.ragagent.tracing.decorators.LangfuseReranker;
 import com.ragagent.chatpipeline.spi.McpToolRegistrationPort;
 import com.ragagent.rerank.RerankerFactory;
-import com.ragagent.common.storage.ResourceCatalogPort;
+import com.ragagent.contract.storage.ResourceCatalogPort;
 import com.ragagent.common.model.ModelCatalogPort;
 import com.ragagent.modelruntime.application.ChatConfigs;
 import com.ragagent.rerank.RerankerConfigs;

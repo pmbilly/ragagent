@@ -13,7 +13,7 @@ import com.ragagent.session.domain.message.MessageSearchResult;
 import com.ragagent.session.domain.conversation.SessionNotFoundException;
 import com.ragagent.session.dto.SearchMessagesRequest;
 import com.ragagent.session.service.MessageService;
-import com.ragagent.common.storage.support.FileUrlPort;
+import com.ragagent.contract.storage.support.FileUrlPort;
 import com.ragagent.common.storage.support.Mode;
 import com.ragagent.common.storage.support.PublicModeForbiddenException;
 import com.ragagent.common.storage.support.ResourceModeException;

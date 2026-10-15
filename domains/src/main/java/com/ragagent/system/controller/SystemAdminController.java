@@ -42,7 +42,7 @@ import com.ragagent.system.domain.SystemSetting;
 import com.ragagent.system.service.SystemSettingService;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.platform.web.ApiResponse;
-import com.ragagent.common.tenant.TenantStorageQuotaPort;
+import com.ragagent.contract.tenant.TenantStorageQuotaPort;
 
 /**
  * /api/v1/system/admin 组：用户管理 / 平台 API Key / 系统设置 / 运行时队列 / 配额批量应用。

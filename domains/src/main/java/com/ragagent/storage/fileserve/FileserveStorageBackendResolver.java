@@ -8,7 +8,7 @@ import java.io.IOException;
 
 import org.springframework.stereotype.Component;
 
-import com.ragagent.common.storage.support.FileUrlPort;
+import com.ragagent.contract.storage.support.FileUrlPort;
 import com.ragagent.common.storage.support.StorageBackendResolver;
 import com.ragagent.common.storage.fileserve.FileContentService;
 

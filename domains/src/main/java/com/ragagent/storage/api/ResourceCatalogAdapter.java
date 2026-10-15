@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
-import com.ragagent.common.storage.ResourceCatalogPort;
+import com.ragagent.contract.storage.ResourceCatalogPort;
 import com.ragagent.storage.domain.StoredResource;
 import com.ragagent.storage.service.ResourceCatalogService;
 

@@ -1,6 +1,7 @@
 package com.ragagent.common.storage.support;
 
 import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.contract.storage.support.FileUrlPort;
 
 /**
  * 文件解析器（{@link Resolver}）的构造面（L1）：按"当前租户 + 进程级默认文件服务 + 后端解析器"

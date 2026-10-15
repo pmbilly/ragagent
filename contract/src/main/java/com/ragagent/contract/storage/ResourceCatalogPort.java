@@ -1,4 +1,4 @@
-package com.ragagent.common.storage;
+package com.ragagent.contract.storage;
 
 import java.util.Optional;
 
@@ -7,7 +7,7 @@ import java.util.Optional;
  *
  * <p><b>面向的调用方</b>：会话域 agent 抓取页（{@code web://} 快照）——读时需确认
  * "资源属于本租户"、写时需把资源绑到 assistant 消息。此前直接依赖存储域的目录服务与资源实体，
- * 本端口只给最小视图（{@link ResourceView}）与两个动作。</p>
+ * 本端口只给最小视图（{@code ResourceView}）与两个动作。</p>
  */
 public interface ResourceCatalogPort {
 

@@ -1,4 +1,4 @@
-package com.ragagent.common.memory;
+package com.ragagent.contract.memory;
 
 /**
  * 记忆抽取触发端口（L1）：一轮落库后异步抽取记忆的触发面。

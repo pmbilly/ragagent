@@ -1,4 +1,4 @@
-package com.ragagent.common.tenant;
+package com.ragagent.contract.tenant;
 
 /**
  * 租户存储配额的读/写端口（L1）。租户行的 {@code storage_quota}/{@code storage_used} 归

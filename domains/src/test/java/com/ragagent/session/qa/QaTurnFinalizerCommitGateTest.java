@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.ragagent.common.memory.MemoryExtractionPort;
+import com.ragagent.contract.memory.MemoryExtractionPort;
 import com.ragagent.common.session.domain.message.Message;
 import com.ragagent.session.service.MessageService;
 import com.ragagent.session.service.suggestion.MessageSuggestionService;

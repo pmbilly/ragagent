@@ -7,7 +7,7 @@ import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
 
-import com.ragagent.common.storage.support.FileUrlPort;
+import com.ragagent.contract.storage.support.FileUrlPort;
 import com.ragagent.common.storage.support.Mode;
 import com.ragagent.common.storage.support.Rewriter;
 import com.ragagent.common.tenant.TenantConfigLookup.TenantStorageView;

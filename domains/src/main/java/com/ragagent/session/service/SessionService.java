@@ -37,7 +37,7 @@ import com.ragagent.session.repository.MessageSuggestionRepository;
 import com.ragagent.session.repository.SessionRepository;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.common.session.domain.conversation.SessionLastRequestState;
-import com.ragagent.common.websearch.WebSearchTempStatePort;
+import com.ragagent.contract.websearch.WebSearchTempStatePort;
 import com.ragagent.common.model.ModelCatalogPort;
 import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
 

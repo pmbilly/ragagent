@@ -24,7 +24,7 @@ import static com.ragagent.session.service.QaSupport.KnowledgeTargets;
 import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.common.session.domain.message.MessageExecutionContext;
 import com.ragagent.session.domain.conversation.SessionNotFoundException;
-import com.ragagent.common.storage.support.FileUrlPort;
+import com.ragagent.contract.storage.support.FileUrlPort;
 import com.ragagent.common.storage.support.Mode;
 import com.ragagent.common.storage.support.PublicModeForbiddenException;
 import com.ragagent.common.storage.support.Rewriter;

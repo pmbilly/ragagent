@@ -15,7 +15,7 @@ import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.common.retrieval.SearchResult;
 import com.ragagent.common.session.domain.message.Message;
 import com.ragagent.common.session.domain.message.MessageImage;
-import com.ragagent.common.storage.support.FileUrlPort;
+import com.ragagent.contract.storage.support.FileUrlPort;
 import com.ragagent.common.storage.support.Rewriter;
 import com.ragagent.common.storage.support.Mode;
 

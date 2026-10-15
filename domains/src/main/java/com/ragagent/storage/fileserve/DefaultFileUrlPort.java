@@ -2,7 +2,7 @@ package com.ragagent.storage.fileserve;
 
 import java.io.IOException;
 
-import com.ragagent.common.storage.support.FileUrlPort;
+import com.ragagent.contract.storage.support.FileUrlPort;
 import com.ragagent.common.storage.fileserve.FileContentService;
 
 /**

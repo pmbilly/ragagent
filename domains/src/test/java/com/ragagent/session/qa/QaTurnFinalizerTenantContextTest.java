@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.access.TenantContextSnapshot;
-import com.ragagent.common.memory.MemoryExtractionPort;
+import com.ragagent.contract.memory.MemoryExtractionPort;
 import com.ragagent.session.service.MessageService;
 import com.ragagent.session.service.suggestion.MessageSuggestionService;
 import com.ragagent.session.service.SessionService;

@@ -8,7 +8,7 @@ import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.ragagent.agenttools.web.WebFetchTool;
-import com.ragagent.common.storage.ResourceCatalogPort;
+import com.ragagent.contract.storage.ResourceCatalogPort;
 
 /**
  * agent 抓取页的完整快照存取。

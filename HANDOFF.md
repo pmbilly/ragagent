@@ -1445,6 +1445,20 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **验证**：**13 守卫全绿** ✓（环 0 组、R9 包级 SCC 基线按提示刷新后仍 10 组、L1→域 0 条、R6 不变）；`spotlessCheck build` ✓ **1m38s** ✓；**4991 / 失败 0 / 跳过 4**（boot 1331 ✓）；dev 重启 ready ✓ + 冒烟（`/api/v1/storage-backends`、`/api/v1/knowledge-bases` 200 ✓；`/api/v1/messages/{id}/load` 业务级 404 "session not found" ✓ 路由/鉴权/新注入链路正常）
 - **A③ 累计（二十八刀）**：边 **64 → 30（−34）**、类 **317 → 195（−122）**；三档 **① 22 条 / 109 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
 - **下一步候选**：`knowledge→storage` 第三刀（余 2 类：`KnowledgeBaseFileProxyController` 需文件代理端口、`TenantFileStorage` 需 provider 存储端口）· `embedchannel→storage`（余 1 类）· **待拍板** `mcp→agent`(9) · **K 级** `im→session`(6) · `datasource→knowledge`(8) · **大块** `knowledge→model`(14) · `session→knowledge`(17) · `session→storage`(6 余)
+**🔶 G1-a 首批：`common` 载荷归位 `:contract` ⇒ 净搬 11 件（C4 31 → 22）（2026-10-15）**
+- **背景**：§12.5 准入 G1（`:common` 载荷型文件清零/登记）；分类已测——31 件分四组：**① 纯 JDK 13** · ② 仅 Jackson 3 · ③ 框架味 4 · ④ 引本仓其它包 11
+- **本批动作（落点规则＝保相对路径：`com.ragagent.common.<rest>` → `com.ragagent.contract.<rest>`）**：**净搬 11 件**入 `:contract`：
+  - `memory` 5（`MemoryExtractionPort`/`MemoryRecallPort`/`MemorySearchPort`/`MemorySearchHits` + **级联** `MemorySearchHit`——与既有 `contract.memory.MemoryRecall` 汇合）
+  - `storage` 1（`ResourceCatalogPort`）· `storage/fileserve` 1（`MessageFileFacts`）· `storage/support` 1（`FileUrlPort`）
+  - `tenant` 1（`TenantStorageQuotaPort`）· `websearch` 2（`WebSearchProviderPort`/`WebSearchTempStatePort`）
+- **⚠️ 退回 3 件（重要判据）**：`FileContentService` 引 `FileTransport.OpenedFile`（**servlet 味**），而它是**同包裸名引用**（无 import）⇒ 我的"纯度门"只看 import 漏判 ✗ ⇒ `FileContentService` + `WritableFileContentService` + `GlobalFileServicePort` **成组退回 `common`**。**判据补强：纯度检查必须同时看"同包裸名引用"**（同包裸名依赖链——**第 4 次实战**，这次它骗过了门禁本身）
+- **读数**：**C4 载荷型文件 31 → 22**（基线已 `--write`）；C2 实体保持 13；**R10 保持 7 条边 / 52 类 / ①档 0** ✓（契约搬迁不涉域间边）
+- **⚠️ 三次摩擦**：
+  1. **补 import 脚本把 `package-info.java` 当类型** ⇒ 在 `KnowledgeCodeConventionsTest` 插出 `import ...package-info;` 导致测试编译红 ⇒ 全仓清除该伪 import（脚本需排除 `package-info`）
+  2. **契约面 javadoc 跨模块链接**：搬入的 `FileUrlPort` 有 `{@link Rewriter}`（非契约类型）⇒ `:contract:javadoc` 红 ⇒ 改 `{@code}`（**该规则第 N 次**）
+  3. **我的批量 javadoc 转换误伤成员链接**（`{@link #成员}` → `{@code #成员}`，17 文件）⇒ **精准回滚**（`{@code #` → `{@link #`）；并把 **18 个非搬迁文件的纯 javadoc 改动整批回滚**（避免无谓 churn——只有真红的才改）
+- **验证**：**14 守卫全绿** ✓（C4 = 22）；`:contract:javadoc` 绿 ✓；`spotlessCheck build` ✓ **2m12s** ✓；**4991 / 失败 0 / 跳过 4** ✓；dev 重启 ready ✓ + 冒烟（knowledge-bases / models / sessions / tenants 200 ✓）
+- **G1-a 余项（下一步）**：② **仅 Jackson 3 件**（`ChunkFacts`/`KnowledgeBaseView`/`KnowledgeDocumentFacts`）⇒ 需"**去 Jackson**"（改纯 JDK 形状）或落 platform 面——与 B258 登记的"`AppError` 去 Jackson"**同一课题**；③ **框架味 4 件** ⇒ platform 面登记（等 platform 模块）；④ **11 件** ⇒ 随 C 的实体收窄逐批处理
 **🔶 计划更新：模块提取立项（§12.5）+ 载荷落点修正 + C4 门禁上线（2026-10-15）**
 - **计划更新（回答"`common` 何时完全拆成 contract/platform"）**：
   1. **§12.1 改实测版**：模块是 **5 个**（`:contract` 已独立 136 件、`:common` 312 件未拆）——旧图写 4 个模块属失真，已修；依赖方向 `domains/engine/boot → common → contract`（`common/build.gradle.kts:64` 的 `api(project(":contract"))`）

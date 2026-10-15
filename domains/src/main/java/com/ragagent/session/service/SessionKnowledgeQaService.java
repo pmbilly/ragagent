@@ -42,7 +42,7 @@ import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.platform.tracing.langfuse.LangfuseManager;
 import com.ragagent.platform.tracing.langfuse.Span;
-import com.ragagent.common.websearch.WebSearchProviderPort;
+import com.ragagent.contract.websearch.WebSearchProviderPort;
 import com.ragagent.common.model.ModelCatalogPort;
 import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
 

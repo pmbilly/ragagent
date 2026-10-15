@@ -1,4 +1,4 @@
-package com.ragagent.common.websearch;
+package com.ragagent.contract.websearch;
 
 /**
  * 联网搜索 provider 读取端口（L1）：会话侧解析"默认 provider"所需的最小读面。

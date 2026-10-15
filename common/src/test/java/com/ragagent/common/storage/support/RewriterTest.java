@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 
 import com.ragagent.common.retrieval.SearchResult;
+import com.ragagent.contract.storage.support.FileUrlPort;
 
 /**
  * {@link Rewriter} / {@link FileServiceResolver} 的对等测试。

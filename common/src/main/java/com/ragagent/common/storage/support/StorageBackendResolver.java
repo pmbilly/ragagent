@@ -1,4 +1,5 @@
 package com.ragagent.common.storage.support;
+import com.ragagent.contract.storage.support.FileUrlPort;
 
 /**
  * 按租户配置解析存储后端。

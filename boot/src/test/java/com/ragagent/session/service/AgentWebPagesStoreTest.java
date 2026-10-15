@@ -12,7 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.ragagent.TestSchema;
-import com.ragagent.common.storage.ResourceCatalogPort;
+import com.ragagent.contract.storage.ResourceCatalogPort;
 
 /**
  * AgentWebPages 生产存储接缝。

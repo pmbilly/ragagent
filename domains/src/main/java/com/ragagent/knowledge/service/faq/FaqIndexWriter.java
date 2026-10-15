@@ -20,7 +20,7 @@ import com.ragagent.retrieval.engine.EngineTypes;
 import com.ragagent.retrieval.engine.EngineTypes.IndexInfo;
 import com.ragagent.common.knowledge.FaqChunkMetadata;
 import com.ragagent.knowledge.client.EmbedderClient;
-import com.ragagent.common.tenant.TenantStorageQuotaPort;
+import com.ragagent.contract.tenant.TenantStorageQuotaPort;
 import com.ragagent.retrieval.engine.VectorStoreService;
 import com.ragagent.knowledge.index.KnowledgeVectorWrites;
 import com.ragagent.knowledge.index.ChunkVectorIndexer;

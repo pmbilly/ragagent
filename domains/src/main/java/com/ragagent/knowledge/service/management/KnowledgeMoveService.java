@@ -23,7 +23,7 @@ import com.ragagent.embedding.Embedder;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.knowledge.task.KnowledgeTaskProgressStore;
 import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
-import com.ragagent.common.tenant.TenantStorageQuotaPort;
+import com.ragagent.contract.tenant.TenantStorageQuotaPort;
 import java.time.Instant;
 import java.util.Objects;
 import com.ragagent.knowledge.index.KnowledgeVectorWrites;

@@ -14,7 +14,7 @@ import com.ragagent.session.service.SessionKnowledgeQaService;
 import com.ragagent.session.service.SessionService;
 import com.ragagent.session.service.TemporaryDocumentService;
 import com.ragagent.platform.access.TenantContextSnapshot;
-import com.ragagent.common.memory.MemoryExtractionPort;
+import com.ragagent.contract.memory.MemoryExtractionPort;
 import com.ragagent.common.session.domain.conversation.SessionLastRequestState;
 import com.ragagent.session.service.SessionLookupScope;
 

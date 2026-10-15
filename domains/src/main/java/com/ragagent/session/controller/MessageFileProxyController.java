@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ragagent.common.storage.fileserve.FileProxyPort;
 import com.ragagent.common.storage.fileserve.FileServeHttp;
-import com.ragagent.common.storage.fileserve.MessageFileFacts;
+import com.ragagent.contract.storage.fileserve.MessageFileFacts;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.common.session.domain.message.Message;
 import com.ragagent.session.service.MessageService;

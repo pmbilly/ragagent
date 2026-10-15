@@ -1,4 +1,4 @@
-package com.ragagent.common.memory;
+package com.ragagent.contract.memory;
 
 /**
  * 记忆查找端口（L1）：agent 的 search_memory 工具取数面。

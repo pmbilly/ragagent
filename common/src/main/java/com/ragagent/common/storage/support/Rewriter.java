@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ragagent.common.retrieval.SearchResult;
+import com.ragagent.contract.storage.support.FileUrlPort;
 
 /**
  * 把内部存储引用替换成客户端可直接加载的 HTTP URL。

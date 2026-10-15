@@ -5,11 +5,11 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.ragagent.common.memory.MemoryExtractionPort;
-import com.ragagent.common.memory.MemoryRecallPort;
-import com.ragagent.common.memory.MemorySearchHit;
-import com.ragagent.common.memory.MemorySearchHits;
-import com.ragagent.common.memory.MemorySearchPort;
+import com.ragagent.contract.memory.MemoryExtractionPort;
+import com.ragagent.contract.memory.MemoryRecallPort;
+import com.ragagent.contract.memory.MemorySearchHit;
+import com.ragagent.contract.memory.MemorySearchHits;
+import com.ragagent.contract.memory.MemorySearchPort;
 import com.ragagent.contract.memory.MemoryRecall;
 import com.ragagent.memory.service.MemoryExtractionService;
 import com.ragagent.memory.service.MemoryService;

@@ -1,4 +1,4 @@
-package com.ragagent.common.memory;
+package com.ragagent.contract.memory;
 
 import java.util.List;
 

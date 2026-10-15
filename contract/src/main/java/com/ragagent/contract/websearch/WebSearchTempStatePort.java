@@ -1,4 +1,4 @@
-package com.ragagent.common.websearch;
+package com.ragagent.contract.websearch;
 
 /**
  * 联网搜索临时库状态清理端口（L1）：会话删除时的伴生清理面。

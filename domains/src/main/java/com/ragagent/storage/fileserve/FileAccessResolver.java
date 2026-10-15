@@ -11,7 +11,7 @@ import com.ragagent.storage.domain.StoredResource;
 import com.ragagent.storage.service.ResourceCatalogService;
 import com.ragagent.common.storage.fileserve.StoragePaths;
 import com.ragagent.common.storage.fileserve.MessageFactsLookup;
-import com.ragagent.common.storage.fileserve.MessageFileFacts;
+import com.ragagent.contract.storage.fileserve.MessageFileFacts;
 
 /**
  * KB / 消息两个 scoped 文件代理的授权判定（ResolveKBFile / ResolveMessageFile /

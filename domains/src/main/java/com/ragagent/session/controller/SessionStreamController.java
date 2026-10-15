@@ -32,7 +32,7 @@ import com.ragagent.common.storage.support.PublicModeForbiddenException;
 import com.ragagent.common.storage.support.ResourceModeException;
 import com.ragagent.common.storage.support.Rewriter;
 import com.ragagent.common.storage.support.StorageBackendResolver;
-import com.ragagent.common.storage.support.FileUrlPort;
+import com.ragagent.contract.storage.support.FileUrlPort;
 import com.ragagent.common.storage.support.StreamRewriter;
 import com.ragagent.platform.stream.StreamBatch;
 import com.ragagent.platform.stream.StreamEvent;

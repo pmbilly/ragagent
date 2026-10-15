@@ -6,7 +6,7 @@ import java.time.Instant;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import com.ragagent.common.tenant.TenantStorageQuotaPort;
+import com.ragagent.contract.tenant.TenantStorageQuotaPort;
 import com.ragagent.tenant.mapper.TenantMapper;
 import com.ragagent.common.tenant.domain.Tenant;
 
