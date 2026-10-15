@@ -264,7 +264,7 @@ def main() -> int:
     msg = (f"✓ 契约层纯度：受控导入根 {len(cur['imports'])} 个（{sum(len(v) for v in cur['imports'].values())} 文件）"
            f"· 实体 {len(cur['persistence']['entities'])} · 域侧 handler {len(cur['persistence']['handlers'])}"
            f"· build 依赖 {len(cur['build_deps'])} · 载荷型文件 {len(cur['payloads'])}（全部冻结只许减；"
-           f"另有 {len(PLATFORM_FACE)} 件 platform 面 + {len(PENDING_DEJACKSON)} 件待去 Jackson 已登记）")
+           f"另有 {len(PLATFORM_FACE)} 件 platform 面 + {len(PENDING_DEJACKSON)} 件待去 Jackson + {len(JACKSON_SEMANTICS_REQUIRED)} 件 Jackson 语义必要已登记）")
     if shrinks:
         print(msg + f"；可收紧 {len(shrinks)} 处 —— 对账后跑 --write：")
         for s in shrinks[:8]:

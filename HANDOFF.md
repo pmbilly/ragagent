@@ -1519,6 +1519,48 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 | **system** | 1 | `SystemAdminUserService` 读 1 + `new` | 同端口 | 与 `User` 同一刀的附属改动 |
 | **⚠️ 架构旁账（登记，不在本批）** | — | **租户管理用例寄居 `auth`**（`TenantService`/`TenantCreateOps`/`TenantConfigOps`/`TenantInvitationController`/`TenantMember*`）而 `domains/tenant` 只有 mapper/lookup/配额 | **用例归位（未来设计批）**：租户 CRUD 与配置用例应迁 `domains/tenant`，`auth` 只留"注册时建租户"一个调用点 | 当前用端口承载**先解依赖**；归位属结构性重构（动控制器/路由归属）⇒ 单独立项登记 |
 
+#### 16.0 阶段对账（2026-10-15 · 三张账总核对）
+
+**A. 权威读数（可复现命令：`scripts/run-guards.sh` + `find … | wc -l`）**
+
+| 账 | 读数 | 状态 |
+|---|---|---|
+| `:contract` | **197 件** | ✅ 已独立（零依赖） |
+| `common/*` | **97 件**（125 → 103 → 102 → 97，E1/G1-b/G1-h 三轮共 −28） | 收敛中 |
+| `platform/*` | 139 件 · `:common` 总 **237** | — |
+| **C2 实体** | **0** ✅ | **C 收官**（14 → 0） |
+| **C1 受控导入根** | 10 根 / **61 文件** | 冻结只许减 |
+| **C4 载荷** | `common/*` 残余 **12 件** + 登记 **9 件**（platform 面 7 · Jackson 语义必要 2 · 待去 Jackson 0） | ✅ 待去 Jackson 全清 |
+| 域侧 handler | 10 件（TypeHandler） | 登记 |
+| build 依赖 | 12 | 冻结 |
+| **R10** | **6 条边 / 51 类**（①clearable **0** · ②owner 1〔`auth→tenant` 属主边〕· ③intra-family 5） | ✅ ①档达标 |
+| 测试 | **4991 / 失败 0 / 跳过 4**；金片 **1349 签名一致** | — |
+
+**B. `common/*` 97 件处置表（6 组，全部有明确归属）**
+
+| 组 | 件数 | 处置 | 负责轨 |
+|---|---|---|---|
+| **C4 残余载荷 12** | 12 | 见 C 表（逐件入契约或登记） | **G1-c（下一批，已定清单）** |
+| **TypeHandler** | 10 | **随实体持久化闭包回域**（实体已在各域；handler 被 `@TableField(typeHandler=…)` 引） | 域归位轨（需核 MyBatis handler 扫描配置） |
+| **Jackson 味域内值类型** | 31 | **按域批量回迁**（`AgentStep`/`MessageArtifact`/`SuggestionItem`/`SearchResult`/`MemoryMessageCursor`/`ParserEngineConfig` 等＝已归位实体的**字段类型**） | 域归位轨（按域切批：session 12 · agent 7 · knowledge 4 · tenant 2 · settings 2 · 其余 4） |
+| **纯 JDK 契约候选/域内件** | 33 | 拆两类：① 契约候选（含上表 12 件载荷）② 域内件（`chunker/{Tokens,CodePoints}` 共享工具 · `knowledge/support/*ProjectionAdapter` 投影器 · `storage/support/*` · `wiki/domain/{WikiCategoryPaths,WikiIndex}` · `tenant/domain/TenantConfigRedaction`） | 逐件裁定（随各自生态） |
+| **登记项** | 9 | **留在 L1 且有据**（platform 框架类型 7 · Jackson 语义必要 2） | 已在册，无需动作 |
+| **说明件** | 13 | `package-info`（包级说明） | 常态 |
+
+**C. 下一批已定清单＝C4 残余 12 件载荷（G1-c）**
+
+| 件 | 预判处置 |
+|---|---|
+| `knowledge/dto/{Asr,Chunking,ImageProcessing,Indexing,Vlm}ConfigView`（5） | **入 `contract.knowledge`**（纯 JDK；KB API 线格式件） |
+| `knowledge/dto/KnowledgeBaseResponse`（1） | 先 de-Jackson（其组件若为 `JsonNode`）再入契约；`kb-*.json` 金片护航 |
+| `storage/fileserve/{GlobalFileServicePort,ProviderFileStorePort}`（2） | **入 `contract.storage`**（纯 JDK 能力端口；框架型兄弟 `FileProxyPort` 留 L1 登记 ✓） |
+| `wiki/WikiPageOpsPort`（1） | **入 `contract.wiki`**（纯 JDK；其载荷 `WikiPageView` 已入契约 ✓ 自然跟进） |
+| `session/qa/{SessionQaPort,QaRequestPayload}` + `session/PipelineMessageView`（3） | 逐件核：`QaRequestPayload` 若带 `JsonNode` 先 de-Jackson；`PipelineMessageView` 只是"面载荷"注册或入契约 |
+
+**D. ⚠️ 对账发现的台账缺口（4 件）**：`session/dto/StopSessionRequest` · `storage/fileserve/{FileServeHttp,FileTransport}` · `wiki/domain/WikiIndexEntry` —— 带框架类型但**未登记**（既不在 platform 面字典也不在两类 Jackson 字典）⇒ 需**补登记为 platform 面**（框架类型装不进零依赖契约）或另行处理；建议随 G1-c 一并补册。
+
+**E. 对账纪律（写入本节作为后续批次的前置）**：① 每批结束跑 `check-contracts-purity.py --write` 收紧并**同步三色分类**（platform 面 / Jackson 语义必要 / 待去 Jackson）② 任何"未登记且含框架类型"的文件＝台账缺口，须当批补册 ③ 对账数字进 §16.1 表，保持"可复现命令 + 读数"成对。
+
 #### 12.6.4 C-13a 执行规格（2026-10-15 实测完成，下一刀可直接照此实施）
 
 **目标**：`users` 单一持久面 + 清偿 `system→auth` 边（②owner 登记项）+ 用户端口合并；**同批**完成 `User` 实体回域（因端口化后跨域面全部视图化 ⇒ 搬迁已无阻）。
