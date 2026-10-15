@@ -26,16 +26,13 @@ import com.ragagent.rerank.Reranker;
 import com.ragagent.session.support.PipelineViews;
 import com.ragagent.agent.budget.AgentBudgets;
 import com.ragagent.agent.skills.SkillCatalogService;
-import com.ragagent.contract.tool.ToolApprovalGate;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.modelruntime.application.LlmChatClients;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.ollama.OllamaService;
 import com.ragagent.tracing.decorators.LangfuseChatClient;
 import com.ragagent.tracing.decorators.LangfuseReranker;
-import com.ragagent.mcp.protocol.McpClientManager;
-import com.ragagent.mcp.service.McpMetadataService;
-import com.ragagent.mcp.service.McpServiceManagement;
+import com.ragagent.chatpipeline.spi.McpToolRegistrationPort;
 import com.ragagent.rerank.RerankerFactory;
 import com.ragagent.common.storage.ResourceCatalogPort;
 import com.ragagent.common.model.ModelCatalogPort;
@@ -76,6 +73,9 @@ public class SessionAgentQaService {
     /** 引擎/工具装配簇。 */
     private final AgentEngineAssembler engineAssembler;
 
+    /** MCP 按需目录注册端口（引擎侧 SPI，MCP 域实现）。 */
+    private final McpToolRegistrationPort mcpTools;
+
     /** 并发闸门（chat 工厂注入；null 会让 ConcurrencyChatClient NPE）。 */
     private final ConcurrencyGovernor concurrencyGovernor;
     private final org.springframework.beans.factory.ObjectProvider<OllamaService>
@@ -96,15 +96,13 @@ public class SessionAgentQaService {
             ConcurrencyGovernor concurrencyGovernor,
             org.springframework.beans.factory.ObjectProvider<OllamaService>
                     ollamaService,
-            McpServiceManagement mcpServiceService,
-            McpMetadataService mcpMetadataService,
-            McpClientManager mcpClientManager,
-            ToolApprovalGate toolApprovalGate,
+            McpToolRegistrationPort mcpTools,
             VlmDescriberWiring vlmDescriberWiring,
             SkillCatalogService skillCatalogService,
             AgentResolver agentResolver) {
         this.concurrencyGovernor = concurrencyGovernor;
         this.agentResolver = agentResolver;
+        this.mcpTools = mcpTools;
         this.ollamaService = ollamaService;
         this.modelCatalog = modelCatalog;
         this.memoryService = memoryService;
@@ -119,10 +117,7 @@ public class SessionAgentQaService {
                         artifactCollectorWiring,
                         knowledgeService,
                         faqService,
-                        mcpServiceService,
-                        mcpMetadataService,
-                        mcpClientManager,
-                        toolApprovalGate,
+                        mcpTools,
                         resourceCatalog,
                         dataSource,
                         vlmDescriberWiring,

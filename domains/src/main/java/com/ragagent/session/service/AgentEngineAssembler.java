@@ -8,7 +8,6 @@ import com.ragagent.knowledge.dto.faq.FaqEntryPage;
 import com.ragagent.knowledge.service.faq.FaqEntryQueryService;
 import com.ragagent.agent.AgentConfig;
 import com.ragagent.agent.AgentEngine;
-import com.ragagent.mcp.tool.McpExposure;
 import com.ragagent.common.agent.tool.ToolDefinitions;
 import com.ragagent.agenttools.wiki.WikiRouteResolver;
 import com.ragagent.agenttools.wiki.WikiScope;
@@ -16,7 +15,6 @@ import com.ragagent.agent.tool.ToolRegistry;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.event.EventBus;
 import com.ragagent.llm.LlmChatClient;
-import com.ragagent.mcp.domain.McpService;
 import com.ragagent.memory.service.MemoryService;
 import com.ragagent.rerank.Reranker;
 import com.ragagent.agent.prompt.AgentPromptTemplates;
@@ -30,14 +28,10 @@ import com.ragagent.agent.tool.SkillReadFileTool;
 import com.ragagent.agent.tool.TodoWriteTool;
 import com.ragagent.agenttools.web.WebFetchTool;
 import com.ragagent.agenttools.web.WebSearchTool;
-import com.ragagent.contract.tool.ToolApprovalGate;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
-import com.ragagent.mcp.protocol.McpClientManager;
-import com.ragagent.mcp.service.McpMetadataService;
-import com.ragagent.mcp.service.McpServiceManagement;
 import com.ragagent.session.domain.conversation.SessionOwnerIds;
 import com.ragagent.common.storage.ResourceCatalogPort;
 import com.ragagent.agent.prompt.RecentDocInfo;
@@ -45,8 +39,8 @@ import com.ragagent.agent.prompt.SelectedDocumentInfo;
 import com.ragagent.agent.prompt.PinnedMCPServiceInfo;
 import com.ragagent.agent.prompt.PinnedSkillInfo;
 import com.ragagent.agent.prompt.KnowledgeBaseInfo;
-import com.ragagent.mcp.tool.McpTooling;
 import com.ragagent.chatpipeline.spi.McpToolingGateway;
+import com.ragagent.chatpipeline.spi.McpToolRegistrationPort;
 
 /**
  * {@code SessionAgentQaService} 的**引擎/工具装配簇**（§14.9c 刀 3）：创建 agent 引擎（LLM/记忆/审批门/
@@ -67,27 +61,21 @@ final class AgentEngineAssembler {
     private final ArtifactCollectorWiring artifactCollectorWiring;
     private final KnowledgeCatalogPort knowledgeService;
     private final FaqEntryQueryService faqService;
-    private final McpServiceManagement mcpServiceService;
-    private final McpMetadataService mcpMetadataService;
-    private final McpClientManager mcpClientManager;
-    private final ToolApprovalGate toolApprovalGate;
+    private final McpToolRegistrationPort mcpTools;
     private final ResourceCatalogPort resourceCatalog;
     private final javax.sql.DataSource dataSource;
     private final VlmDescriberWiring vlmDescriberWiring;
     /** 平台级技能目录（skills 表入库版）：装配期建 {@code DbSkillSource} 读 skills 表。 */
     private final SkillCatalogService skillCatalogService;
 
-    AgentEngineAssembler(MemoryService memoryService, SessionKnowledgeQaService knowledgeQa, AgentToolBackends toolBackends, ArtifactCollectorWiring artifactCollectorWiring, KnowledgeCatalogPort knowledgeService, FaqEntryQueryService faqService, McpServiceManagement mcpServiceService, McpMetadataService mcpMetadataService, McpClientManager mcpClientManager, ToolApprovalGate toolApprovalGate, ResourceCatalogPort resourceCatalog, javax.sql.DataSource dataSource, VlmDescriberWiring vlmDescriberWiring, SkillCatalogService skillCatalogService) {
+    AgentEngineAssembler(MemoryService memoryService, SessionKnowledgeQaService knowledgeQa, AgentToolBackends toolBackends, ArtifactCollectorWiring artifactCollectorWiring, KnowledgeCatalogPort knowledgeService, FaqEntryQueryService faqService, McpToolRegistrationPort mcpTools, ResourceCatalogPort resourceCatalog, javax.sql.DataSource dataSource, VlmDescriberWiring vlmDescriberWiring, SkillCatalogService skillCatalogService) {
         this.memoryService = memoryService;
         this.knowledgeQa = knowledgeQa;
         this.toolBackends = toolBackends;
         this.artifactCollectorWiring = artifactCollectorWiring;
         this.knowledgeService = knowledgeService;
         this.faqService = faqService;
-        this.mcpServiceService = mcpServiceService;
-        this.mcpMetadataService = mcpMetadataService;
-        this.mcpClientManager = mcpClientManager;
-        this.toolApprovalGate = toolApprovalGate;
+        this.mcpTools = mcpTools;
         this.resourceCatalog = resourceCatalog;
         this.dataSource = dataSource;
         this.vlmDescriberWiring = vlmDescriberWiring;
@@ -118,7 +106,7 @@ final class AgentEngineAssembler {
         }
         registerTools(toolRegistry, config, rerankModel, sessionId);
         // MCP 编排端口注入：引擎只持端口，MCP 目录逻辑（原 ToolRegistry 内）在 McpTooling
-        McpTooling mcpTooling = new McpTooling(toolRegistry.port());
+        McpToolingGateway mcpTooling = mcpTools.createTooling(toolRegistry.port());
         toolRegistry.setMcpTooling(mcpTooling);
         // registerMcpTools：按 agent 配置的
         // mcp_selection_mode 注册受限 MCP 目录（按需发现，不连上游、不广告完整 schema）
@@ -221,78 +209,26 @@ final class AgentEngineAssembler {
         return engine;
     }
     /**
-     * 从本租户的启用服务注册受限
-     * MCP 目录（discover_mcp_tools / call_mcp_tool），不连接上游、不广告完整 schema；
-     * 具体工具定义在模型调用 discover 时按需列举。
-     *
-     * <p>身份与装载参数说明（Java 无 ctx 的显式化，见 McpExposure/McpOAuthSupport 备案）：
-     * {@code hasToolExecContext=false}——装配发生在引擎准备阶段，此处没有 per-turn 的
-     * ToolExecContext；OAuth 服务无快照时给出"先去授权"的方向。
-     * 失败只记警告，不影响引擎创建。</p>
+     * 从本租户的启用服务注册受限 MCP 目录（discover_mcp_tools / call_mcp_tool）：
+     * 注册编排在 MCP 域适配器内，这里只做 agent 配置侧的裁剪（模式归一化与空清单短路）
+     * 后委托端口。失败只记警告，不影响引擎创建。
      */
     private void registerMcpTools(ToolRegistry toolRegistry, QaAgentConfig config,
             McpToolingGateway mcpTooling) {
-        long tenantId = TenantContext.currentTenantId() == null ? 0L : TenantContext.currentTenantId();
-        if (tenantId == 0) {
-            // 租户缺失直接 return；补一条日志——否则该分支
-            // 完全静默，装配线程丢租户时表现为"MCP 工具凭空消失"（排查成本高）。
-            log.info("Skipping MCP registration: no tenant in execution context");
-            return;
-        }
         String mcpMode = config.getMcpSelectionMode() == null || config.getMcpSelectionMode().isEmpty()
                 ? "all" : config.getMcpSelectionMode();
         if ("none".equals(mcpMode)) {
             log.info("MCP services disabled by agent config (mode: none)");
             return;
         }
-
-        List<McpService> services;
-        try {
-            if ("selected".equals(mcpMode)) {
-                List<String> selected = config.getMcpServices();
-                if (selected == null || selected.isEmpty()) {
-                    log.info("MCP services disabled by agent config (mode: selected, no services)");
-                    return;
-                }
-                services = mcpServiceService.listMCPServicesByIDs(tenantId, selected);
-                log.info("Using {} selected MCP services from agent config", services.size());
-            } else {
-                services = mcpServiceService.listMCPServices(tenantId);
-            }
-        } catch (RuntimeException e) {
-            log.warn("Failed to list MCP services: {}", e.toString());
+        List<String> selected = config.getMcpServices();
+        if ("selected".equals(mcpMode) && (selected == null || selected.isEmpty())) {
+            log.info("MCP services disabled by agent config (mode: selected, no services)");
             return;
         }
-
-        List<McpService> enabled = new ArrayList<>();
-        for (McpService service : services) {
-            if (service != null && service.isEnabled()) {
-                enabled.add(service);
-            }
-        }
-        if (enabled.isEmpty()) {
-            return;
-        }
-
-        try {
-            int registered = McpExposure.registerMcpTools(
-                    toolRegistry.port(),
-                    mcpTooling,
-                    enabled,
-                    mcpClientManager,
-                    toolApprovalGate,
-                    config.getMcpAuthWaitTimeout(),
-                    tenantId,
-                    mcpServiceService::getMCPServiceByID,
-                    new McpExposure.McpMetadataIO(
-                            mcpMetadataService::getMCPMetadata,
-                            mcpMetadataService::persistMCPMetadata),
-                    false,
-                    toolApprovalGate::requestOAuthAndWait);
-            log.info("Registered {} MCP service(s) for on-demand discovery", registered);
-        } catch (Exception e) {
-            log.warn("Failed to register MCP directory: {}", e.toString());
-        }
+        long tenantId = TenantContext.currentTenantId() == null ? 0L : TenantContext.currentTenantId();
+        mcpTools.registerOnDemandTools(tenantId, mcpMode, selected == null ? List.of() : selected,
+                toolRegistry.port(), mcpTooling, config.getMcpAuthWaitTimeout());
     }
     /** KnowledgeBases 优先，否则 SearchTargets 全集。 */
     private record KbScopes(List<String> kbIds, Map<String, Long> kbTenantMap) {

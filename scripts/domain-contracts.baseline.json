@@ -169,10 +169,6 @@
       "SessionAgentQaService",
       "TemporaryDocumentService"
     ],
-    "session→mcp": [
-      "AgentEngineAssembler",
-      "SessionAgentQaService"
-    ],
     "session→agenttools": [
       "AgentEngineAssembler",
       "AgentToolBackends",
