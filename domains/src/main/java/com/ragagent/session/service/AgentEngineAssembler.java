@@ -39,7 +39,7 @@ import com.ragagent.agent.prompt.KnowledgeBaseInfo;
 import com.ragagent.chatpipeline.spi.McpToolingGateway;
 import com.ragagent.chatpipeline.spi.McpToolRegistrationPort;
 import com.ragagent.common.knowledge.KnowledgeBaseRowView;
-import com.ragagent.common.knowledge.KnowledgeRowView;
+import com.ragagent.contract.knowledge.KnowledgeRowView;
 
 /**
  * {@code SessionAgentQaService} 的**引擎/工具装配簇**（§14.9c 刀 3）：创建 agent 引擎（LLM/记忆/审批门/

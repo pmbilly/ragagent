@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.ragagent.common.knowledge.KnowledgeBaseRowView;
-import com.ragagent.common.knowledge.KnowledgeRowView;
+import com.ragagent.contract.knowledge.KnowledgeRowView;
 
 /**
  * 数据源同步往知识库里写东西时要用的那一小片能力（知识库服务 + 仓储

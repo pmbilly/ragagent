@@ -145,9 +145,6 @@ PENDING_DEJACKSON = {
         "⇒ 与端口同族登记（HANDOFF §12.6.4 硬约束 2）；去 Jackson 后可入 contract.auth",
     "com/ragagent/common/auth/AdminUserPort.java":
         "管理面端口（读/建/晋升/撤权/重置密码/密码策略）；与 AdminUserView 同族，随其去 Jackson 后入 contract.auth",
-    "com/ragagent/common/knowledge/KnowledgeRowView.java":
-        "JsonNode × 3（metadata/customMetadata/lastFaqImportResult）+ List<JsonNode> tags ⇒ 待去 Jackson；"
-        "doc-*.json 金片钉住线格式",
     "com/ragagent/common/knowledge/KnowledgeBaseRowView.java":
         "JsonNode × 5（extract/faq/questionGeneration/autoTag/wiki 配置）+ 6 个 typed config ⇒ 待去 Jackson；"
         "KB API 与 init 线格式由 kb-*.json / init-*.json 金片钉住",

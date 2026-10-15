@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import com.ragagent.common.knowledge.KnowledgeBaseRowView;
-import com.ragagent.common.knowledge.KnowledgeRowView;
+import com.ragagent.contract.knowledge.KnowledgeRowView;
 
 /**
  * {@code SessionQaResolution} 的**agent 覆盖簇**：把 custom agent 的配置

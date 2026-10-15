@@ -9,6 +9,7 @@ import com.ragagent.contract.knowledge.FaqEntryPageView;
 import com.ragagent.contract.knowledge.KnowledgeTagView;
 import com.ragagent.contract.knowledge.ChunkRowView;
 import com.ragagent.contract.knowledge.ChunkPageView;
+import com.ragagent.contract.knowledge.KnowledgeRowView;
 
 /**
  * 知识目录读写端口（L1）：知识条目与知识库两族的按 id/租户读取与增删。

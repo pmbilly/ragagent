@@ -29,7 +29,8 @@ import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.knowledge.ChunkPageView;
 import com.ragagent.common.knowledge.KnowledgeBaseRowView;
-import com.ragagent.common.knowledge.KnowledgeRowView;
+import com.ragagent.contract.knowledge.KnowledgeRowView;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * {@code AgentToolBackends} 的**知识库检索簇**：知识库检索 / chunk 列举 /
@@ -408,7 +409,7 @@ final class AgentToolKbBackends {
                         AgentToolBackends.nz(k.getKnowledgeBaseId()), AgentToolBackends.nz(k.getTitle()), AgentToolBackends.nz(k.getDescription()),
                         AgentToolBackends.nz(k.getType()), AgentToolBackends.nz(k.getSource()), AgentToolBackends.nz(k.getFileName()), AgentToolBackends.nz(k.getFileType()),
                         k.getFileSize() == null ? 0L : k.getFileSize(), AgentToolBackends.nz(k.getParseStatus()),
-                        metadataMap(k.getMetadata()));
+                        metadataMap(JsonMappers.toJsonNode(k.getMetadata())));
             }
 
             @Override

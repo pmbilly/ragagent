@@ -1,4 +1,4 @@
-package com.ragagent.common.knowledge;
+package com.ragagent.contract.knowledge;
 
 /** 解析状态词汇（L1）：实体 `Knowledge` 的 PARSE_* 常量已迁此并委托，
  * 供跨域方（数据源建行时置 pending 等）与域内共用，避免为了一个字符串常量依赖域实体。 */

@@ -59,4 +59,28 @@ public final class JsonMappers {
     public static com.fasterxml.jackson.databind.JsonNode toJsonNode(Object value) {
         return value == null ? null : lenient().valueToTree(value);
     }
+
+    /** {@code List<JsonNode>} → 纯 JDK 列表（逐元素 {@link #toJavaValue}；null 保持 null）。 */
+    public static java.util.List<Object> toJavaList(java.util.List<com.fasterxml.jackson.databind.JsonNode> nodes) {
+        if (nodes == null) {
+            return null;
+        }
+        java.util.List<Object> out = new java.util.ArrayList<>(nodes.size());
+        for (com.fasterxml.jackson.databind.JsonNode n : nodes) {
+            out.add(toJavaValue(n));
+        }
+        return out;
+    }
+
+    /** 纯 JDK 列表 → {@code List<JsonNode>}（逐元素 {@link #toJsonNode}；null 保持 null）。 */
+    public static java.util.List<com.fasterxml.jackson.databind.JsonNode> toJsonList(java.util.List<Object> values) {
+        if (values == null) {
+            return null;
+        }
+        java.util.List<com.fasterxml.jackson.databind.JsonNode> out = new java.util.ArrayList<>(values.size());
+        for (Object v : values) {
+            out.add(toJsonNode(v));
+        }
+        return out;
+    }
 }

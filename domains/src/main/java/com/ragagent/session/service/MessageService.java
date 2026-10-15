@@ -29,7 +29,7 @@ import com.ragagent.contract.wiki.WikiLanguageSupport;
 
 import com.ragagent.session.domain.message.ArtifactVersions;
 import com.ragagent.common.knowledge.KnowledgeBaseRowView;
-import com.ragagent.common.knowledge.KnowledgeRowView;
+import com.ragagent.contract.knowledge.KnowledgeRowView;
 
 /**
  * 消息服务。

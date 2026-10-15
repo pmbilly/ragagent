@@ -16,7 +16,7 @@ import com.ragagent.datasource.domain.SyncResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ragagent.common.knowledge.service.DuplicateKnowledgeException;
-import com.ragagent.common.knowledge.KnowledgeRowView;
+import com.ragagent.contract.knowledge.KnowledgeRowView;
 
 /**
  * 同步条目的灌入：新增/更新/删除的判定与落地、冲突消解（同节点判等）、

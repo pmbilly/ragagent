@@ -3,9 +3,10 @@ package com.ragagent.knowledge.support;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ragagent.common.knowledge.KnowledgeRowView;
+import com.ragagent.contract.knowledge.KnowledgeRowView;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * 知识行实体 → 行视图的**域内单一映射**（供端口适配器、投影器调用点共用）。
@@ -28,7 +29,7 @@ public final class KnowledgeRowViews {
         v.setId(e.getId());
         v.setTenantId(e.getTenantId());
         v.setKnowledgeBaseId(e.getKnowledgeBaseId());
-        v.setTags(e.getTags());
+        v.setTags(JsonMappers.toJavaList(e.getTags()));
         v.setType(e.getType());
         v.setTitle(e.getTitle());
         v.setDescription(e.getDescription());
@@ -46,9 +47,9 @@ public final class KnowledgeRowViews {
         v.setFileHash(e.getFileHash());
         v.setFilePath(e.getFilePath());
         v.setStorageSize(e.getStorageSize());
-        v.setMetadata(e.getMetadata());
-        v.setCustomMetadata(e.getCustomMetadata());
-        v.setLastFaqImportResult(e.getLastFaqImportResult());
+        v.setMetadata(JsonMappers.toJavaValue(e.getMetadata()));
+        v.setCustomMetadata(JsonMappers.toJavaValue(e.getCustomMetadata()));
+        v.setLastFaqImportResult(JsonMappers.toJavaValue(e.getLastFaqImportResult()));
         v.setCreatedAt(e.getCreatedAt());
         v.setUpdatedAt(e.getUpdatedAt());
         v.setProcessedAt(e.getProcessedAt());
@@ -79,7 +80,7 @@ public final class KnowledgeRowViews {
         e.setId(v.getId());
         e.setTenantId(v.getTenantId());
         e.setKnowledgeBaseId(v.getKnowledgeBaseId());
-        e.setTags(v.getTags());
+        e.setTags(JsonMappers.toJsonList(v.getTags()));
         e.setType(v.getType());
         e.setTitle(v.getTitle());
         e.setDescription(v.getDescription());
@@ -97,9 +98,9 @@ public final class KnowledgeRowViews {
         e.setFileHash(v.getFileHash());
         e.setFilePath(v.getFilePath());
         e.setStorageSize(v.getStorageSize());
-        e.setMetadata(v.getMetadata());
-        e.setCustomMetadata(v.getCustomMetadata());
-        e.setLastFaqImportResult(v.getLastFaqImportResult());
+        e.setMetadata(JsonMappers.toJsonNode(v.getMetadata()));
+        e.setCustomMetadata(JsonMappers.toJsonNode(v.getCustomMetadata()));
+        e.setLastFaqImportResult(JsonMappers.toJsonNode(v.getLastFaqImportResult()));
         e.setCreatedAt(v.getCreatedAt());
         e.setUpdatedAt(v.getUpdatedAt());
         e.setProcessedAt(v.getProcessedAt());

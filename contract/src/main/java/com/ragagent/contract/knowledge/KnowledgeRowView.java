@@ -1,9 +1,8 @@
-package com.ragagent.common.knowledge;
+package com.ragagent.contract.knowledge;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * 知识行（文档）**行视图**（L1）：KnowledgeCatalogPort 知识行面（读 / 建 / 批 / 写）的载荷。
@@ -23,7 +22,8 @@ public class KnowledgeRowView {
     private String id;
     private Long tenantId;
     private String knowledgeBaseId;
-    private List<JsonNode> tags;
+    /** 标签 jsonb 列表：纯 JDK 值（对象/数组/标量）。 */
+    private List<Object> tags;
     private String type;
     private String title;
     private String description = "";
@@ -41,9 +41,12 @@ public class KnowledgeRowView {
     private String fileHash;
     private String filePath;
     private long storageSize;
-    private JsonNode metadata;
-    private JsonNode customMetadata;
-    private JsonNode lastFaqImportResult;
+    /** jsonb 原样（对象/数组/标量；null 表示无）。 */
+    private Object metadata;
+    /** jsonb 原样（对象/数组/标量；null 表示无）。 */
+    private Object customMetadata;
+    /** jsonb 原样（对象/数组/标量；null 表示无）。 */
+    private Object lastFaqImportResult;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
     private OffsetDateTime processedAt;
@@ -57,8 +60,8 @@ public class KnowledgeRowView {
     public void setTenantId(Long v) { tenantId = v; }
     public String getKnowledgeBaseId() { return knowledgeBaseId; }
     public void setKnowledgeBaseId(String v) { knowledgeBaseId = v; }
-    public List<JsonNode> getTags() { return tags; }
-    public void setTags(List<JsonNode> v) { tags = v; }
+    public List<Object> getTags() { return tags; }
+    public void setTags(List<Object> v) { tags = v; }
     public String getType() { return type; }
     public void setType(String v) { type = v; }
     public String getTitle() { return title; }
@@ -93,12 +96,12 @@ public class KnowledgeRowView {
     public void setFilePath(String v) { filePath = v; }
     public long getStorageSize() { return storageSize; }
     public void setStorageSize(long v) { storageSize = v; }
-    public JsonNode getMetadata() { return metadata; }
-    public void setMetadata(JsonNode v) { metadata = v; }
-    public JsonNode getCustomMetadata() { return customMetadata; }
-    public void setCustomMetadata(JsonNode v) { customMetadata = v; }
-    public JsonNode getLastFaqImportResult() { return lastFaqImportResult; }
-    public void setLastFaqImportResult(JsonNode v) { lastFaqImportResult = v; }
+    public Object getMetadata() { return metadata; }
+    public void setMetadata(Object v) { metadata = v; }
+    public Object getCustomMetadata() { return customMetadata; }
+    public void setCustomMetadata(Object v) { customMetadata = v; }
+    public Object getLastFaqImportResult() { return lastFaqImportResult; }
+    public void setLastFaqImportResult(Object v) { lastFaqImportResult = v; }
     public OffsetDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(OffsetDateTime v) { createdAt = v; }
     public OffsetDateTime getUpdatedAt() { return updatedAt; }

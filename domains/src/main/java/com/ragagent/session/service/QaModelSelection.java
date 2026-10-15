@@ -7,7 +7,7 @@ import java.util.Set;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.common.knowledge.KnowledgeBaseRowView;
-import com.ragagent.common.knowledge.KnowledgeRowView;
+import com.ragagent.contract.knowledge.KnowledgeRowView;
 
 /**
  * {@code SessionQaResolution} 的**模型选择簇**：按请求/知识库/会话推导 chat 模型 id

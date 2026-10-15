@@ -27,8 +27,8 @@ import com.ragagent.platform.http.UrlBytesFetcher;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.KnowledgeIngest;
 import com.ragagent.common.knowledge.KnowledgeBaseRowView;
-import com.ragagent.common.knowledge.KnowledgeRowView;
-import com.ragagent.common.knowledge.KnowledgeParseStatus;
+import com.ragagent.contract.knowledge.KnowledgeRowView;
+import com.ragagent.contract.knowledge.KnowledgeParseStatus;
 
 /**
  * {@link KnowledgeBridge} 的生产实现：直接用 knowledge 模块的
@@ -267,7 +267,7 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
     /** 从 {@code metadata} 列读出字符串 map。 */
     private static Map<String, String> readMetadata(KnowledgeRowView k) {
         Map<String, String> out = new LinkedHashMap<>();
-        com.fasterxml.jackson.databind.JsonNode md = k.getMetadata();
+        com.fasterxml.jackson.databind.JsonNode md = JsonMappers.toJsonNode(k.getMetadata());
         if (md == null || !md.isObject()) {
             return out;
         }

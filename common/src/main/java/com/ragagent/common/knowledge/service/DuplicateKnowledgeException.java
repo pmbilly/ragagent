@@ -3,7 +3,7 @@ package com.ragagent.common.knowledge.service;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.error.ErrorCode;
-import com.ragagent.common.knowledge.KnowledgeRowView;
+import com.ragagent.contract.knowledge.KnowledgeRowView;
 import com.ragagent.contract.knowledge.service.DuplicateKnowledgeDetails;
 
 /**

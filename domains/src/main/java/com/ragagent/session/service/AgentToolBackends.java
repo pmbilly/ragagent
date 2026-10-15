@@ -61,7 +61,7 @@ import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.contract.tenant.WebSearchConfig;
 import com.ragagent.chatpipeline.spi.WebSearchExecutor;
 import com.ragagent.contract.knowledge.ChunkFacts;
-import com.ragagent.common.knowledge.KnowledgeRowView;
+import com.ragagent.contract.knowledge.KnowledgeRowView;
 
 /**
  * agent 引擎检索工具族的接缝适配（2026-09-23 接线批）。

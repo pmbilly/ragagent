@@ -28,7 +28,7 @@ import com.ragagent.contract.event.payload.AgentReferencesData;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.platform.prompt.AgentPromptPlaceholders;
 import com.ragagent.platform.event.EventIds;
-import com.ragagent.common.knowledge.KnowledgeRowView;
+import com.ragagent.contract.knowledge.KnowledgeRowView;
 
 /**
  * 知识问答降级协作者:固定文案兜底与模型兜底的消息准备与响应。

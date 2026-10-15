@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.platform.persistence.PgJsonTypeHandler;
-import com.ragagent.common.knowledge.KnowledgeParseStatus;
+import com.ragagent.contract.knowledge.KnowledgeParseStatus;
 
 /**
  * knowledges 表实体。

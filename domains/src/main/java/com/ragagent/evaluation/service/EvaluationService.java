@@ -38,7 +38,7 @@ import org.springframework.stereotype.Service;
 import com.ragagent.evaluation.dto.EvaluationDtos;
 import com.ragagent.contract.knowledge.KnowledgeIngest;
 import com.ragagent.common.knowledge.KnowledgeBaseRowView;
-import com.ragagent.common.knowledge.KnowledgeRowView;
+import com.ragagent.contract.knowledge.KnowledgeRowView;
 
 /**
  * 评估服务（评估任务 + 结果；内存任务存储）。

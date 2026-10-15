@@ -23,7 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ragagent.platform.web.ZeroTimeSerializer;
 import com.ragagent.common.knowledge.KnowledgeBaseRowView;
-import com.ragagent.common.knowledge.KnowledgeRowView;
+import com.ragagent.contract.knowledge.KnowledgeRowView;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * 数据源支撑件：配置的校验/解析/深比较、知识库归属校验、身份与"零值时间"等判据、
@@ -169,7 +170,7 @@ final class DataSourceSupport {
     }
 
     static String readMetadataValue(KnowledgeRowView k, String key) {
-        com.fasterxml.jackson.databind.JsonNode md = k.getMetadata();
+        com.fasterxml.jackson.databind.JsonNode md = JsonMappers.toJsonNode(k.getMetadata());
         if (md == null || !md.isObject()) {
             return null;
         }

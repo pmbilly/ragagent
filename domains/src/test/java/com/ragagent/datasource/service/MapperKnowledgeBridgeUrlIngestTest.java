@@ -35,8 +35,9 @@ import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.KnowledgeIngest;
 import com.ragagent.knowledge.support.KnowledgePaths;
 import com.ragagent.common.knowledge.KnowledgeBaseRowView;
-import com.ragagent.common.knowledge.KnowledgeRowView;
-import com.ragagent.common.knowledge.KnowledgeParseStatus;
+import com.ragagent.contract.knowledge.KnowledgeRowView;
+import com.ragagent.contract.knowledge.KnowledgeParseStatus;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * 数据源 URL 摄取（整改 K2 /）：下载在同步期完成、与文件行同形。
@@ -136,7 +137,7 @@ class MapperKnowledgeBridgeUrlIngestTest {
         assertThat(row.getSource()).isEmpty();
         assertThat(row.getFileName()).isEqualTo("a.txt");
         assertThat(row.getFilePath()).isEqualTo("kb-1/a.txt");
-        assertThat(row.getMetadata().get("externalId").asText()).isEqualTo("e1");
+        assertThat(JsonMappers.toJsonNode(row.getMetadata()).get("externalId").asText()).isEqualTo("e1");
     }
 
     // ── 夹具 ────────────────────────────────────────────────────────────────

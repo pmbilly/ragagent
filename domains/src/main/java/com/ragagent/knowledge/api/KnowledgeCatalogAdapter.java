@@ -42,7 +42,7 @@ import com.ragagent.contract.knowledge.ChunkRowView;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.KnowledgeBaseRowView;
 import com.ragagent.knowledge.support.KnowledgeBaseRowViews;
-import com.ragagent.common.knowledge.KnowledgeRowView;
+import com.ragagent.contract.knowledge.KnowledgeRowView;
 import com.ragagent.knowledge.support.KnowledgeRowViews;
 
 /**
