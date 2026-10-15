@@ -1,10 +1,11 @@
-package com.ragagent.common.session.domain.message;
+package com.ragagent.session.domain.message;
 
-import com.ragagent.common.session.domain.AbstractJsonListTypeHandler;
+import com.ragagent.session.domain.AbstractJsonListTypeHandler;
 
 import java.util.List;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.ragagent.common.session.domain.message.MessageArtifact;
 
 /**
  * {@code messages} 表上 {@code List<MessageArtifact>} 型 jsonb 列的处理器。

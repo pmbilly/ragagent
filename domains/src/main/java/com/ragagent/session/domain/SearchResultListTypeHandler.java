@@ -1,4 +1,4 @@
-package com.ragagent.common.session.domain;
+package com.ragagent.session.domain;
 
 import java.util.List;
 

@@ -56,8 +56,6 @@
    "com/ragagent/platform/persistence/TenantFilterGuard.java"
   ],
   "org.apache": [
-   "com/ragagent/common/session/domain/AbstractJsonListTypeHandler.java",
-   "com/ragagent/common/tenant/domain/APIPrincipalConfigTypeHandler.java",
    "com/ragagent/common/wiki/domain/WikiStringListTypeHandler.java",
    "com/ragagent/platform/persistence/FullTableWriteGuard.java",
    "com/ragagent/platform/persistence/JsonbRawStringTypeHandler.java",
@@ -101,15 +99,6 @@
  "persistence": {
   "entities": [],
   "handlers": [
-   "com/ragagent/common/session/domain/AbstractJsonListTypeHandler.java",
-   "com/ragagent/common/session/domain/AgentStepListTypeHandler.java",
-   "com/ragagent/common/session/domain/MentionedItemListTypeHandler.java",
-   "com/ragagent/common/session/domain/SearchResultListTypeHandler.java",
-   "com/ragagent/common/session/domain/UsedMemoryListTypeHandler.java",
-   "com/ragagent/common/session/domain/message/MessageArtifactListTypeHandler.java",
-   "com/ragagent/common/session/domain/message/MessageAttachmentListTypeHandler.java",
-   "com/ragagent/common/session/domain/message/MessageImageListTypeHandler.java",
-   "com/ragagent/common/tenant/domain/APIPrincipalConfigTypeHandler.java",
    "com/ragagent/common/wiki/domain/WikiStringListTypeHandler.java"
   ]
  }

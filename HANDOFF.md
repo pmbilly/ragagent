@@ -1526,12 +1526,12 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 | 账 | 读数 | 状态 |
 |---|---|---|
 | `:contract` | **203 件** | ✅ 已独立（零依赖） |
-| `common/*` | **91 件**（125 → 113 → 102 → 97 → 92 → 91；E1/G1-b/G1-h/G1-c 各刀） | 收敛中 |
+| `common/*` | **82 件**（125 → … → 91 → 82；G1-d 再 −9） | 收敛中 |
 | `platform/*` | 139 件 · `:common` 总 **237** | — |
 | **C2 实体** | **0** ✅ | **C 收官**（14 → 0） |
-| **C1 受控导入根** | 10 根 / **61 文件** | 冻结只许减 |
+| **C1 受控导入根** | 10 根 / **59 文件** | 冻结只许减 |
 | **C4 载荷** | `common/*` 残余 **0 件** ✅ + 登记 **15 件**（platform 面 11 · Jackson 语义必要 2 · 待去 Jackson 2） | ✅ **载荷账清零** |
-| 域侧 handler | 10 件（TypeHandler） | 登记 |
+| 域侧 handler | **1 件**（TypeHandler；其余 9 件已随实体回域 ✓） | 登记 |
 | build 依赖 | 12 | 冻结 |
 | **R10** | **6 条边 / 51 类**（①clearable **0** · ②owner 1〔`auth→tenant` 属主边〕· ③intra-family 5） | ✅ ①档达标 |
 | 测试 | **4991 / 失败 0 / 跳过 4**；金片 **1349 签名一致** | — |
@@ -1783,6 +1783,15 @@ public interface AdminUserPort {
 - **读数**：C2 实体保持 **13**；C4 基线 **31**；**14 守卫全绿**（run-guards 标签已更到 C1/C2/C3/C4）
 - **验证**：`spotlessCheck build` ✓ **2m12s** ✓；**4991 / 失败 0 / 跳过 4** ✓；dev 重启 ready ✓ + 冒烟（KB/models/sessions 200 ✓；`/api/v1/knowledge-bases/{id}/tags` ⇒ 404 + 标准信封 ✓——正是经 `:contract` 视图的链路）
 - **下一步（继续 C）**：次批候选按筛表——`MessageSuggestionSet`(2) / `WikiPageIssue`(4) / `StorageBackend`(8) / `WikiPage`(7)；**新视图一律落 `:contract`**
+**🔶 G1-d·9 件 TypeHandler 随实体回域（域侧 handler 10 → 1）（2026-10-15）**
+- **对象**：session 8 件（`AbstractJsonListTypeHandler` + `AgentStep`/`MentionedItem`/`SearchResult`/`UsedMemory` List + message 的 `Artifact`/`Attachment`/`Image` List）+ tenant 1 件（`APIPrincipalConfigTypeHandler`）
+- **先测三件（都支持搬迁）**：① 各 handler 的引用者**只有各自域**（+ 同组 handler 内部）✓ ② **MyBatis 无 handler 包扫描配置**（走显式 `@TableField(typeHandler=…)` ⇒ 无配置需改 ✓）③ wiki 的 handler **留 L1**（其用户含 L1 的 `WikiIndexEntry` ✗）⇒ 登记 ✓（故 10 → 1）
+- **两个关键细节**：① `MessageRepository` 用**字符串 FQN** 引用 handler ⇒ 引用更新必须**同时覆盖字符串字面量** ✓；② handler 引用**留在 L1 的值类型**（`MentionedItem`/`UsedMemory`/`MessageArtifact`…）⇒ 迁后补 import（**"原同包兄弟"坑第 10 次**，已脚本化）
+- **⚠️ 一次自伤与恢复（诚实记录，两条判据沉淀）**：中途我用"按路径推导 package"的脚本回正包声明，但 `common/src/main/java` 下**有 3 个源根**（`com/ragagent/{common,platform,event}` ✗）⇒ 公式产出 `com.ragagent.com.ragagent.platform` 之类 ✗，**改坏 222 个文件的 package 行 + 136 个文件的引用** ✗。处置：① 破态 diff 备份 `/tmp/botched_batch_backup.patch`（4207 行）② 本刀涉及路径 `git checkout HEAD -- …` 恢复（**本仓在本刀开始时干净 ⇒ 未触及任何既有改动** ✓）③ 清残留与误建目录树 `domains/session`（S1 抓到）④ 复核（工作区 0 项、编译 OK、14 守卫全绿）⑤ **外科式重做**：只替换 9 个类的**精确 FQN**，绝不改整包 ✓
+  **判据**：① **包名不可由路径公式推断**——一个模块可有多个源根；包声明的唯一可信来源是文件自身声明与构建配置 ② **批量改写前先对 1 个文件试改**（或 dry-run）确认替换范围，再全仓执行
+- **读数**：**C1 受控导入根 61 → 59 文件**；**域侧 handler 10 → 1**；`common/*` 91 → **82**（−9）；`:contract` 203（不变）；载荷 0 保持；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
+- **验证**：**14 守卫全绿**（C1/C2 基线已 `--write`）；**1349 金片签名一致**；`spotlessCheck build` **2m5s**；**4991 / 失败 0 / 跳过 4**；dev 冒烟（sessions / KB / tenants / system-info **200** ✓；`GET /sessions/{id}/messages` ⇒ **500**——**查日志证实为既有的 `HttpRequestMethodNotSupportedException`（405 应然却映射为 500）**，与 handler 无关 ⇒ 该独立小刀仍在队列）
+- **余量**：域侧 handler 仅剩 `wiki/domain/WikiStringListTypeHandler`（L1 用户 `WikiIndexEntry` ⇒ 随其切开）· Jackson 味域内值类型 22 件（其中 session 7 件被 L1 平台面载荷引用 ⇒ 与载荷同生命周期）
 **🔶 G1-c-2·`KnowledgeBaseResponse` 入契约（新技法：枚举"常量名即值"）+ 余 4 件按证据登记 ⇒ ⭐ C4 载荷型文件 = 0（2026-10-15）**
 - **对象（对账 §16.0-C 余 5 件）**：`KnowledgeBaseResponse` · `wiki/{WikiPageOpsPort,WikiIndex}` · `session/qa/{SessionQaPort,QaRequestPayload}` · `session/PipelineMessageView`
 - **结果分三类（先测后动）**：

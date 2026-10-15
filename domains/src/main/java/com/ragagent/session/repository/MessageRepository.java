@@ -56,14 +56,14 @@ public class MessageRepository implements SessionMessagePort {
     /** jsonb 列的类型处理器全限定名（3 参 set 的 mapping 串）。 */
     private static final String PG_JSON = "com.ragagent.platform.persistence.PgJsonTypeHandler";
     private static final String MENTIONED_ITEMS =
-            "com.ragagent.common.session.domain.MentionedItemListTypeHandler";
-    private static final String IMAGES = "com.ragagent.common.session.domain.message.MessageImageListTypeHandler";
+            "com.ragagent.session.domain.MentionedItemListTypeHandler";
+    private static final String IMAGES = "com.ragagent.session.domain.message.MessageImageListTypeHandler";
     private static final String ATTACHMENTS =
-            "com.ragagent.common.session.domain.message.MessageAttachmentListTypeHandler";
+            "com.ragagent.session.domain.message.MessageAttachmentListTypeHandler";
     private static final String ARTIFACTS =
-            "com.ragagent.common.session.domain.message.MessageArtifactListTypeHandler";
+            "com.ragagent.session.domain.message.MessageArtifactListTypeHandler";
     private static final String USED_MEMORIES =
-            "com.ragagent.common.session.domain.UsedMemoryListTypeHandler";
+            "com.ragagent.session.domain.UsedMemoryListTypeHandler";
 
     private final MessageMapper mapper;
     private final SessionMapper sessionMapper;

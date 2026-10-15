@@ -1,11 +1,11 @@
 package com.ragagent.session.domain.message;
 
-import com.ragagent.common.session.domain.AgentStepListTypeHandler;
+import com.ragagent.session.domain.AgentStepListTypeHandler;
 import com.ragagent.common.session.domain.MentionedItem;
-import com.ragagent.common.session.domain.MentionedItemListTypeHandler;
-import com.ragagent.common.session.domain.SearchResultListTypeHandler;
+import com.ragagent.session.domain.MentionedItemListTypeHandler;
+import com.ragagent.session.domain.SearchResultListTypeHandler;
 import com.ragagent.common.session.domain.UsedMemory;
-import com.ragagent.common.session.domain.UsedMemoryListTypeHandler;
+import com.ragagent.session.domain.UsedMemoryListTypeHandler;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -24,9 +24,6 @@ import com.ragagent.common.session.domain.message.MessageExecutionContext;
 import com.ragagent.common.session.domain.message.MessageArtifact;
 import com.ragagent.common.session.domain.message.MessageImage;
 import com.ragagent.common.session.domain.message.MessageAttachment;
-import com.ragagent.common.session.domain.message.MessageArtifactListTypeHandler;
-import com.ragagent.common.session.domain.message.MessageAttachmentListTypeHandler;
-import com.ragagent.common.session.domain.message.MessageImageListTypeHandler;
 
 /**
  * messages 表实体。
