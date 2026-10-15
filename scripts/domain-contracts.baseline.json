@@ -94,7 +94,6 @@
       "WsAuthSupport"
     ],
     "datasource→knowledge": [
-      "DataSourceItemOps",
       "KnowledgeTagAutoTagProvider",
       "MapperKnowledgeBridge"
     ],
@@ -118,10 +117,6 @@
       "ImQaRunner",
       "ImSessionResolver",
       "ImStreamPipeline",
-      "ImTurnOrchestrator"
-    ],
-    "im→knowledge": [
-      "ImKnowledgeBridgeOps",
       "ImTurnOrchestrator"
     ],
     "initialization→model": [
@@ -183,8 +178,6 @@
       "MessageService",
       "QaWiring",
       "SessionAgentQaService",
-      "SessionKnowledgeQaService",
-      "SessionService",
       "TemporaryDocumentController",
       "TemporaryDocumentProcessor",
       "TemporaryDocumentService"

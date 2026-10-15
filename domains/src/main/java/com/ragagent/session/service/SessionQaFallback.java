@@ -201,7 +201,7 @@ final class SessionQaFallback {
             }
             List<Knowledge> knowledges;
             try {
-                knowledges = service.knowledgeService.listKnowledge(kbId, 1, 10000, null, null, null, null, false).getRecords();
+                knowledges = service.knowledgeCatalog.listKnowledge(kbId, 1, 10000, null, null, null, null, false).getRecords();
             } catch (RuntimeException e) {
                 log.warn("buildKBDocumentListing: failed to list knowledge for KB {}: {}", kbId, e.toString());
                 continue;

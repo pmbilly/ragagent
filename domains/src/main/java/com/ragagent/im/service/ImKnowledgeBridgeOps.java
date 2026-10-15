@@ -10,18 +10,18 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.runtime.ImCommandSet;
 import com.ragagent.im.runtime.ImFormat;
-import com.ragagent.knowledge.service.management.KnowledgeService;
-import com.ragagent.knowledge.service.DuplicateKnowledgeException;
+import com.ragagent.common.knowledge.KnowledgeCatalogPort;
+import com.ragagent.common.knowledge.service.DuplicateKnowledgeException;
 
 /**
  * IM 与知识库域的全部接面：命令面的 KB 清单/检索读取，以及附件异步入库。
  *
  * <p>自 {@link ImTurnOrchestrator} 原样外提（逐字搬迁，仅改依赖取用方式）。四件事共用
- * 同一个依赖（{@code ObjectProvider<KnowledgeService>}，组件缺席时静默跳过），
+ * 同一个依赖（{@code ObjectProvider<KnowledgeCatalogPort>}，组件缺席时静默跳过），
  * 且都属「IM 怎么够到知识域」这一个关注点——与渠道生命周期、消息入口闸门无关。</p>
  *
  * <p><b>待办登记（外提时核对发现，当时只搬不修）</b>：{@link #kbLister()} 与
- * {@link #knowledgeSearcher()} 目前是**返回空列表的桩**，而 {@code KnowledgeService}
+ * {@link #knowledgeSearcher()} 目前是**返回空列表的桩**，而 {@code KnowledgeCatalogPort}
  * 明明已注入——{@link ImCommandSet.InfoCommand}/{@code SearchCommand} 会读到它们，
  * 因此生产上 {@code /info} 与 {@code /search} 的 KB/检索面**恒为空**。这是功能缺口
  * （疑似未接线），不是重构问题，待另行专项核查；搬到一个类里正是为了让这处显眼。</p>
@@ -35,9 +35,9 @@ final class ImKnowledgeBridgeOps {
             "pdf", "txt", "docx", "doc", "md", "markdown",
             "png", "jpg", "jpeg", "gif", "csv", "xlsx", "xls", "pptx", "ppt");
 
-    private final ObjectProvider<KnowledgeService> knowledgeServices;
+    private final ObjectProvider<KnowledgeCatalogPort> knowledgeServices;
 
-    ImKnowledgeBridgeOps(ObjectProvider<KnowledgeService> knowledgeServices) {
+    ImKnowledgeBridgeOps(ObjectProvider<KnowledgeCatalogPort> knowledgeServices) {
         this.knowledgeServices = knowledgeServices;
     }
 
@@ -98,7 +98,7 @@ final class ImKnowledgeBridgeOps {
             log.info("[IM] Unsupported file type after download: {} (file={})", ext, raw.fileName());
             return;
         }
-        KnowledgeService service = knowledgeServices.getIfAvailable();
+        KnowledgeCatalogPort service = knowledgeServices.getIfAvailable();
         if (service == null) {
             return;
         }

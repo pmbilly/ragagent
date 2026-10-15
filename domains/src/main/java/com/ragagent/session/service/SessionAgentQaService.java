@@ -27,7 +27,7 @@ import com.ragagent.session.support.PipelineViews;
 import com.ragagent.agent.budget.AgentBudgets;
 import com.ragagent.agent.skills.SkillCatalogService;
 import com.ragagent.contract.tool.ToolApprovalGate;
-import com.ragagent.knowledge.service.management.KnowledgeService;
+import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.modelruntime.application.LlmChatClients;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.ollama.OllamaService;
@@ -91,7 +91,7 @@ public class SessionAgentQaService {
             ResourceCatalogPort resourceCatalog,
             javax.sql.DataSource dataSource,
             ArtifactCollectorWiring artifactCollectorWiring,
-            KnowledgeService knowledgeService,
+            KnowledgeCatalogPort knowledgeService,
             FaqEntryQueryService faqService,
             ConcurrencyGovernor concurrencyGovernor,
             org.springframework.beans.factory.ObjectProvider<OllamaService>

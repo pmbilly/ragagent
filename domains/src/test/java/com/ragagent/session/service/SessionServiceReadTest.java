@@ -16,13 +16,13 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.domain.conversation.SessionNotFoundException;
 import com.ragagent.session.repository.SessionRepository;
-import com.ragagent.knowledge.service.management.KnowledgeService;
 import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.session.repository.MessageRepository;
 import com.ragagent.session.repository.MessageSuggestionRepository;
 import com.ragagent.common.settings.ConversationProperties;
 import com.ragagent.websearch.service.WebSearchTempKbStateService;
 import com.ragagent.common.model.ModelCatalogPort;
+import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 
 /**
  * 会话读路径的可见性判定（{@code loadSessionForRead} /
@@ -46,7 +46,7 @@ class SessionServiceReadTest {
         service = new SessionService(repo,
                 org.mockito.Mockito.mock(MessageRepository.class),
                 org.mockito.Mockito.mock(MessageSuggestionRepository.class),
-                org.mockito.Mockito.mock(KnowledgeService.class),
+                org.mockito.Mockito.mock(KnowledgeCatalogPort.class),
                 org.mockito.Mockito.mock(ModelCatalogPort.class),
                 org.mockito.Mockito.mock(ModelRuntimePort.class),
                 org.mockito.Mockito.mock(ConversationProperties.class),

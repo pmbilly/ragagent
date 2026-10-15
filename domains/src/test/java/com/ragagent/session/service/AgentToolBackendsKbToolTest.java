@@ -19,8 +19,6 @@ import org.junit.jupiter.api.Test;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.common.settings.ConversationProperties;
 import com.ragagent.knowledge.repository.ChunkRepository;
-import com.ragagent.knowledge.service.management.KnowledgeBaseService;
-import com.ragagent.knowledge.service.management.KnowledgeService;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.service.MemorySearchResult;
 import com.ragagent.memory.service.MemoryService;
@@ -31,6 +29,7 @@ import com.ragagent.wiki.service.page.WikiPageService;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.knowledge.storage.TenantFileStorage;
 import com.ragagent.websearch.service.WebSearchService;
+import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 
 /**
  * 工具接线钉（2026-09-23 接线批：工作包 1 KB 五件 + 工作包 2a 会话/记忆/DB 三件）。
@@ -49,8 +48,7 @@ class AgentToolBackendsKbToolTest {
         messageService = mock(MessageService.class);
         memoryService = mock(MemoryService.class);
         backends = new AgentToolBackends(
-                mock(KnowledgeBaseService.class),
-                mock(KnowledgeService.class),
+                mock(KnowledgeCatalogPort.class),
                 mock(ChunkRepository.class),
                 mock(HybridSearchService.class),
                 mock(ConversationProperties.class),

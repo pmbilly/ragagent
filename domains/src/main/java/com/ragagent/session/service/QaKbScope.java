@@ -39,7 +39,7 @@ final class QaKbScope {
             case "all" -> {
                 // 能力过滤（DeriveKBFilterForAgent）：取 tool 能力面判定，非 wiki/rerank 工具
                 // 只要求 vector/keyword。
-                List<KnowledgeBase> allKbs = service.knowledgeBaseService.listKnowledgeBases(null);
+                List<KnowledgeBase> allKbs = service.knowledgeCatalog.listKnowledgeBases(null);
                 List<String> kbIds = new ArrayList<>();
                 Set<String> kbIdSet = new LinkedHashSet<>();
                 int ownSkipped = 0;

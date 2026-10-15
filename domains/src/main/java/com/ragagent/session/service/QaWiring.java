@@ -44,8 +44,8 @@ import com.ragagent.common.settings.ConversationProperties;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.repository.ChunkRepository;
-import com.ragagent.knowledge.service.management.KnowledgeBaseService;
-import com.ragagent.knowledge.service.management.KnowledgeService;
+
+import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.modelruntime.application.LlmChatClients;
 import com.ragagent.llm.domain.ChatConfig;
@@ -187,7 +187,7 @@ public class QaWiring {
     /** {@link PipelinePorts.KnowledgeBaseService} 的 chat_pipeline 子集。 */
     @Bean
     public PipelinePorts.KnowledgeBaseService qaPipelineKnowledgeBaseService(
-            KnowledgeBaseService kbService, HybridSearchService hybridSearchService) {
+            KnowledgeCatalogPort kbService, HybridSearchService hybridSearchService) {
         return new PipelinePorts.KnowledgeBaseService() {
             @Override
             public KnowledgeBaseView getKnowledgeBaseByIdUnscoped(String id) {
@@ -246,7 +246,7 @@ public class QaWiring {
 
     /** {@link PipelinePorts.KnowledgeService} 的 chat_pipeline 子集。 */
     @Bean
-    public PipelinePorts.KnowledgeService qaPipelineKnowledgeService(KnowledgeService knowledgeService) {
+    public PipelinePorts.KnowledgeService qaPipelineKnowledgeService(KnowledgeCatalogPort knowledgeService) {
         return new PipelinePorts.KnowledgeService() {
             @Override
             public KnowledgeDocumentFacts getKnowledgeById(String id) {
@@ -291,7 +291,7 @@ public class QaWiring {
 
     /** {@link PipelinePorts.KnowledgeRepository}（getKnowledgeBatch）。 */
     @Bean
-    public PipelinePorts.KnowledgeRepository qaPipelineKnowledgeRepository(KnowledgeService knowledgeService) {
+    public PipelinePorts.KnowledgeRepository qaPipelineKnowledgeRepository(KnowledgeCatalogPort knowledgeService) {
         return new PipelinePorts.KnowledgeRepository() {
             @Override
             public List<KnowledgeDocumentFacts> getKnowledgeBatch(long tenantId, List<String> ids) {
@@ -303,7 +303,7 @@ public class QaWiring {
     /** {@link PipelinePorts.KnowledgeBaseRepository}（getKnowledgeBaseByIds）。 */
     @Bean
     public PipelinePorts.KnowledgeBaseRepository qaPipelineKnowledgeBaseRepository(
-            KnowledgeBaseService kbService) {
+            KnowledgeCatalogPort kbService) {
         return new PipelinePorts.KnowledgeBaseRepository() {
             @Override
             public List<KnowledgeBaseView> getKnowledgeBaseByIds(List<String> ids) {

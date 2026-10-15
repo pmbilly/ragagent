@@ -87,7 +87,7 @@ final class QaMentionTagScope {
         if (knowledgeIds != null && !knowledgeIds.isEmpty()) {
             List<Knowledge> rows;
             try {
-                rows = service.knowledgeService.getKnowledgeBatch(agent.getTenantId(), knowledgeIds);
+                rows = service.knowledgeCatalog.getKnowledgeBatch(agent.getTenantId(), knowledgeIds);
             } catch (RuntimeException e) {
                 log.warn("Failed to validate knowledge IDs against agent scope: {}, blocking all",
                         e.toString());

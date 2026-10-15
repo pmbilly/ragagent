@@ -59,7 +59,7 @@ import com.ragagent.knowledge.service.KnowledgeAccessHelper;
 import com.ragagent.knowledge.service.enrichment.KnowledgeSummaryService;
 import com.ragagent.knowledge.service.query.KnowledgeSearchService;
 import com.ragagent.knowledge.service.query.KnowledgeSpanService;
-import com.ragagent.knowledge.service.DuplicateKnowledgeException;
+import com.ragagent.common.knowledge.service.DuplicateKnowledgeException;
 
 /**
  * （覆盖 file/url/manual 创建、分页列表、get/update/delete、folders；

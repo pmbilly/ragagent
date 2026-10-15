@@ -44,7 +44,7 @@ import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.QaQueue;
 import com.ragagent.im.runtime.ReplyMessage;
 import com.ragagent.contract.doc.DocReaderParsePort;
-import com.ragagent.knowledge.service.management.KnowledgeService;
+import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.service.MessageService;
 import com.ragagent.session.service.SessionAgentQaService;
@@ -133,7 +133,7 @@ public class ImTurnOrchestrator implements AgentChannelCleaner {
             java.util.Optional<Resolver> storageResolver,
             ObjectProvider<StringRedisTemplate> redisTemplates,
             ObjectProvider<DocReaderParsePort> docReaders,
-            ObjectProvider<KnowledgeService> knowledgeServices,
+            ObjectProvider<KnowledgeCatalogPort> knowledgeServices,
             @Value("${im.workers:5}") int workers,
             @Value("${im.max-queue:50}") int maxQueue,
             @Value("${im.max-per-user:3}") int maxPerUser,

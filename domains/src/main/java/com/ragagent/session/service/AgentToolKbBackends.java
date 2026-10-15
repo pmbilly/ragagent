@@ -22,8 +22,8 @@ import com.ragagent.common.settings.ConversationProperties;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.repository.ChunkRepository;
-import com.ragagent.knowledge.service.management.KnowledgeBaseService;
-import com.ragagent.knowledge.service.management.KnowledgeService;
+
+import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
 import com.ragagent.rerank.RankResult;
 import com.ragagent.rerank.Reranker;
@@ -45,9 +45,7 @@ final class AgentToolKbBackends {
     /** chunk 列举的 text+faq 类型过滤。 */
     private static final List<String> TEXT_FAQ_TYPES = List.of(
             ChunkTypes.TEXT, ChunkTypes.FAQ);
-
-    private final KnowledgeBaseService kbService;
-    private final KnowledgeService knowledgeService;
+    private final KnowledgeCatalogPort knowledgeCatalog;
     private final ChunkRepository chunkRepository;
     private final HybridSearchService hybridSearchService;
     /** 检索阈值配置（与门面共用同一份租户配置对象）。 */
@@ -55,14 +53,12 @@ final class AgentToolKbBackends {
     /** 门面的 JdbcTemplate（grep/图谱/回填都走它）。 */
     private final JdbcTemplate jdbc;
 
-    AgentToolKbBackends(KnowledgeBaseService kbService,
-                        KnowledgeService knowledgeService,
+    AgentToolKbBackends(KnowledgeCatalogPort knowledgeCatalog,
                         ChunkRepository chunkRepository,
                         HybridSearchService hybridSearchService,
                         ConversationProperties conversation,
                         JdbcTemplate jdbc) {
-        this.kbService = kbService;
-        this.knowledgeService = knowledgeService;
+        this.knowledgeCatalog = knowledgeCatalog;
         this.chunkRepository = chunkRepository;
         this.hybridSearchService = hybridSearchService;
         this.conversation = conversation;
@@ -79,7 +75,7 @@ final class AgentToolKbBackends {
         return new KnowledgeSearchTool.KnowledgeSearchBackend() {
             @Override
             public KnowledgeSearchTool.KBView getKnowledgeBaseById(String kbId) {
-                KnowledgeBase kb = kbService.getAllTenantById(kbId);
+                KnowledgeBase kb = knowledgeCatalog.getAllTenantById(kbId);
                 if (kb == null) {
                     throw new RuntimeException("knowledge base not found");
                 }
@@ -94,7 +90,7 @@ final class AgentToolKbBackends {
                 }
                 for (String id : ids) {
                     try {
-                        KnowledgeBase kb = kbService.getAllTenantById(id);
+                        KnowledgeBase kb = knowledgeCatalog.getAllTenantById(id);
                         if (kb != null) {
                             out.add(toKbView(kb));
                         }
@@ -406,7 +402,7 @@ final class AgentToolKbBackends {
         return new DocChunkSupport.KnowledgeInfoReader() {
             @Override
             public DocChunkSupport.KnowledgeInfoView byIdOnly(String knowledgeId) {
-                Knowledge k = knowledgeService.getKnowledgeByIdOnly(knowledgeId);
+                Knowledge k = knowledgeCatalog.getKnowledgeByIdOnly(knowledgeId);
                 if (k == null) {
                     return null;
                 }
@@ -465,7 +461,7 @@ final class AgentToolKbBackends {
         return new QueryKnowledgeGraphTool.GraphSearch() {
             @Override
             public QueryKnowledgeGraphTool.KnowledgeBaseView getKnowledgeBaseByIdUnscoped(String kbId) {
-                KnowledgeBase kb = kbService.getAllTenantById(kbId);
+                KnowledgeBase kb = knowledgeCatalog.getAllTenantById(kbId);
                 if (kb == null) {
                     return null;
                 }

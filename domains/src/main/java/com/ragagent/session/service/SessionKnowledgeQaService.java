@@ -30,8 +30,8 @@ import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
 import com.ragagent.common.settings.ConversationProperties;
 import com.ragagent.platform.event.EventBus;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
-import com.ragagent.knowledge.service.management.KnowledgeBaseService;
-import com.ragagent.knowledge.service.management.KnowledgeService;
+
+import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.common.retrieval.SearchResult;
 
 import static com.ragagent.session.service.QaSupport.TagScope;
@@ -65,8 +65,7 @@ public class SessionKnowledgeQaService {
     final EventManager eventManager;
     final ConversationProperties cfg;
     final ModelCatalogPort modelCatalog;
-    final KnowledgeService knowledgeService;
-    final KnowledgeBaseService knowledgeBaseService;
+    final KnowledgeCatalogPort knowledgeCatalog;
     final PipelinePorts.ModelService pipelineModelService;
     final TenantConfigLookup tenantService;
     final WebSearchProviderRepository webSearchProviderRepository;
@@ -83,8 +82,7 @@ public class SessionKnowledgeQaService {
     public SessionKnowledgeQaService(EventManager eventManager,
             ConversationProperties cfg,
             ModelCatalogPort modelCatalog,
-            KnowledgeService knowledgeService,
-            KnowledgeBaseService knowledgeBaseService,
+            KnowledgeCatalogPort knowledgeCatalog,
             PipelinePorts.ModelService pipelineModelService,
             TenantConfigLookup tenantService,
             WebSearchProviderRepository webSearchProviderRepository,
@@ -93,8 +91,7 @@ public class SessionKnowledgeQaService {
         this.eventManager = eventManager;
         this.cfg = cfg;
         this.modelCatalog = modelCatalog;
-        this.knowledgeService = knowledgeService;
-        this.knowledgeBaseService = knowledgeBaseService;
+        this.knowledgeCatalog = knowledgeCatalog;
         this.pipelineModelService = pipelineModelService;
         this.tenantService = tenantService;
         this.webSearchProviderRepository = webSearchProviderRepository;

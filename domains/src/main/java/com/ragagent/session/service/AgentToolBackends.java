@@ -47,8 +47,8 @@ import com.ragagent.common.settings.ConversationProperties;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.knowledge.service.management.KnowledgeBaseService;
-import com.ragagent.knowledge.service.management.KnowledgeService;
+
+import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.rerank.Reranker;
 import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.wiki.service.page.WikiPageService;
@@ -81,7 +81,7 @@ public class AgentToolBackends {
     static final ObjectMapper JSON = JsonMappers.lenient();
 
 
-    private final KnowledgeService knowledgeService;
+    private final KnowledgeCatalogPort knowledgeCatalog;
     private final ChunkRepository chunkRepository;
 
     /** 知识库检索簇：KB 检索/grep/图谱/chunk 列举等工具后端。 */
@@ -96,8 +96,7 @@ public class AgentToolBackends {
     private final TenantFileStorage fileStorage;
     private final JdbcTemplate jdbc;
 
-    public AgentToolBackends(KnowledgeBaseService kbService,
-                             KnowledgeService knowledgeService,
+    public AgentToolBackends(KnowledgeCatalogPort knowledgeCatalog,
                              ChunkRepository chunkRepository,
                              HybridSearchService hybridSearchService,
                              ConversationProperties conversation,
@@ -108,7 +107,7 @@ public class AgentToolBackends {
                              TenantConfigLookup tenantService,
                              TenantFileStorage fileStorage,
                              DataSource dataSource) {
-        this.knowledgeService = knowledgeService;
+        this.knowledgeCatalog = knowledgeCatalog;
         this.chunkRepository = chunkRepository;
         this.messageService = messageService;
         this.memoryService = memoryService;
@@ -116,7 +115,7 @@ public class AgentToolBackends {
         this.tenantService = tenantService;
         this.fileStorage = fileStorage;
         this.jdbc = new JdbcTemplate(dataSource);
-        this.kbBackends = new AgentToolKbBackends(kbService, knowledgeService, chunkRepository,
+        this.kbBackends = new AgentToolKbBackends(knowledgeCatalog, chunkRepository,
                 hybridSearchService, conversation, jdbc);
         this.wikiBackends = new AgentToolWikiBackends(wikiPageService);
     }
@@ -156,7 +155,7 @@ public class AgentToolBackends {
                         return t == null ? 0L : t;
                     });
             case ToolDefinitions.TOOL_DATA_SCHEMA -> {
-                // data_schema 装配：knowledgeService + chunkRepo 两个取数 seam，外加检索范围授权
+                // data_schema 装配：knowledgeCatalog + chunkRepo 两个取数 seam，外加检索范围授权
                 DataSchemaTool tool = new DataSchemaTool(dataSchemaKnowledgeLookup(),
                         dataSchemaChunkLister());
                 if (targets != null) {
@@ -182,7 +181,7 @@ public class AgentToolBackends {
         DataAnalysisTool tool =
                 new DataAnalysisTool(
                         knowledgeId -> {
-                            Knowledge k = knowledgeService.getKnowledgeByIdOnly(knowledgeId);
+                            Knowledge k = knowledgeCatalog.getKnowledgeByIdOnly(knowledgeId);
                             if (k == null) {
                                 return null;
                             }
@@ -456,7 +455,7 @@ public class AgentToolBackends {
     /** data_schema 按 id 取 knowledge（拿 tenant 用）。 */
     public DataSchemaTool.KnowledgeLookup dataSchemaKnowledgeLookup() {
         return knowledgeId -> {
-            Knowledge k = knowledgeService.getKnowledgeByIdOnly(knowledgeId);
+            Knowledge k = knowledgeCatalog.getKnowledgeByIdOnly(knowledgeId);
             if (k == null) {
                 return null;
             }
@@ -468,7 +467,7 @@ public class AgentToolBackends {
     /** 分页取 chunk（先按租户取 knowledge 行）。 */
     public DataSchemaTool.ChunkLister dataSchemaChunkLister() {
         return (knowledgeId, page, pageSize, chunkTypes, enabled) -> {
-            Knowledge k = knowledgeService.getKnowledgeByIdOnly(knowledgeId);
+            Knowledge k = knowledgeCatalog.getKnowledgeByIdOnly(knowledgeId);
             long tenant = k == null || k.getTenantId() == null ? 0L : k.getTenantId();
             int offset = Math.max(page - 1, 0) * Math.max(pageSize, 0);
             ChunkRepository.ChunkPage p = chunkRepository.listPagedChunksByKnowledgeId(
@@ -488,7 +487,7 @@ public class AgentToolBackends {
         return knowledgeId -> {
             SearchAuth.KnowledgeView scoped = SearchAuth.authorizeKnowledgeInSearchTargets(
                     targets, knowledgeId, DocChunkSupport.asScopeReader(knowledgeInfoReader()));
-            Knowledge k = knowledgeService.getKnowledgeByIdOnly(scoped.id());
+            Knowledge k = knowledgeCatalog.getKnowledgeByIdOnly(scoped.id());
             return new DataSchemaTool.KnowledgeView(scoped.id(),
                     k == null || k.getTenantId() == null ? 0L : k.getTenantId());
         };

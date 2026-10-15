@@ -72,7 +72,7 @@ final class QaModelSelection {
         if (kbIds.isEmpty() && !knowledgeIds.isEmpty()) {
             long tenantId = SessionKnowledgeQaService.requireTenantId();
             try {
-                List<Knowledge> knowledgeList = service.knowledgeService.getKnowledgeBatchWithSharedAccess(
+                List<Knowledge> knowledgeList = service.knowledgeCatalog.getKnowledgeBatchWithSharedAccess(
                         tenantId, knowledgeIds);
                 Set<String> kbIdSet = new LinkedHashSet<>();
                 for (Knowledge k : knowledgeList) {
@@ -121,7 +121,7 @@ final class QaModelSelection {
     }
     KnowledgeBase findKb(String kbId) {
         try {
-            return service.knowledgeBaseService.getAllTenantById(kbId);
+            return service.knowledgeCatalog.getAllTenantById(kbId);
         } catch (RuntimeException e) {
             return null;
         }

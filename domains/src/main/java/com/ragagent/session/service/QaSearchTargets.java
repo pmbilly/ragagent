@@ -43,7 +43,7 @@ final class QaSearchTargets {
         if (!kbIdsToFetch.isEmpty()) {
             List<KnowledgeBase> kbs = new ArrayList<>();
             for (String id : kbIdsToFetch) {
-                KnowledgeBase kb = service.knowledgeBaseService.getAllTenantById(id);
+                KnowledgeBase kb = service.knowledgeCatalog.getAllTenantById(id);
                 if (kb != null) {
                     kbs.add(kb);
                 }
@@ -97,7 +97,7 @@ final class QaSearchTargets {
         if (!knowledgeIds.isEmpty()) {
             List<Knowledge> knowledgeList;
             try {
-                knowledgeList = service.knowledgeService.getKnowledgeBatchWithSharedAccess(tenantId, knowledgeIds);
+                knowledgeList = service.knowledgeCatalog.getKnowledgeBatchWithSharedAccess(tenantId, knowledgeIds);
             } catch (RuntimeException e) {
                 log.warn("Failed to get knowledge batch for search targets: {}", e.toString());
                 return targets; // Return what we have, don't fail

@@ -19,7 +19,7 @@ import com.ragagent.platform.event.EventBus;
 import com.ragagent.platform.event.EventIds;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.contract.event.payload.SessionTitleData;
-import com.ragagent.knowledge.service.management.KnowledgeService;
+import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatOptions;
@@ -64,7 +64,7 @@ public class SessionService {
     private final SessionRepository sessionRepository;
     private final MessageRepository messageRepository;
     private final MessageSuggestionRepository suggestionRepository;
-    private final KnowledgeService knowledgeService;
+    private final KnowledgeCatalogPort knowledgeService;
     private final ModelCatalogPort modelCatalog;
     private final ModelRuntimePort modelRuntimeAssembler;
     private final ConversationProperties conversationProps;
@@ -73,7 +73,7 @@ public class SessionService {
     public SessionService(SessionRepository sessionRepository,
                           MessageRepository messageRepository,
                           MessageSuggestionRepository suggestionRepository,
-                          KnowledgeService knowledgeService,
+                          KnowledgeCatalogPort knowledgeService,
                           ModelCatalogPort modelCatalog,
                           ModelRuntimePort modelRuntimeAssembler,
                           ConversationProperties conversationProps,
