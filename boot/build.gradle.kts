@@ -48,7 +48,7 @@ dependencies {
     implementation(project(":common"))
     implementation(project(":contract"))
     testImplementation(testFixtures(project(":domains")))
-    testImplementation(testFixtures(project(":common")))   // EmbeddedRedis（共享测试基座）
+    testImplementation(testFixtures(project(":platform")))   // EmbeddedRedis（共享测试基座）
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     // 集成测试走内存库（与 :domains 同口径）。⚠️ testRuntimeOnly **不可传递** ⇒ 必须显式声明，
     // 否则测试会落到 application.yml 里的真 PG URL 上，TestSchema 的 H2 专有 DDL 直接 bad SQL grammar。

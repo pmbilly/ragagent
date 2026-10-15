@@ -15,81 +15,20 @@
  ],
  "imports": {
   "com.baomidou": [
-   "com/ragagent/common/knowledge/KnowledgeCatalogPort.java",
-   "com/ragagent/platform/persistence/FullTableWriteGuard.java",
-   "com/ragagent/platform/persistence/PageRequests.java",
-   "com/ragagent/platform/persistence/PgJsonTypeHandler.java",
-   "com/ragagent/platform/persistence/TenantFilterGuard.java"
-  ],
-  "com.google": [
-   "com/ragagent/platform/tracing/langfuse/OtlpHttpExporter.java"
-  ],
-  "io.opentelemetry": [
-   "com/ragagent/platform/tracing/langfuse/OtlpHttpExporter.java"
-  ],
-  "jakarta.servlet.FilterChain": [
-   "com/ragagent/platform/web/RequestIdFilter.java"
-  ],
-  "jakarta.servlet.ServletException": [
-   "com/ragagent/platform/web/RequestIdFilter.java"
+   "com/ragagent/common/knowledge/KnowledgeCatalogPort.java"
   ],
   "jakarta.servlet.http": [
    "com/ragagent/common/apikey/ApiKeyAuthPort.java",
    "com/ragagent/common/session/embed/EmbedSessionPort.java",
    "com/ragagent/common/storage/fileserve/FileProxyPort.java",
    "com/ragagent/common/storage/fileserve/FileServeHttp.java",
-   "com/ragagent/common/storage/fileserve/FileTransport.java",
-   "com/ragagent/platform/tracing/langfuse/LangfuseHttpInterceptor.java",
-   "com/ragagent/platform/web/ApiResultInterceptor.java",
-   "com/ragagent/platform/web/ApiResultSupport.java",
-   "com/ragagent/platform/web/RbacInterceptor.java",
-   "com/ragagent/platform/web/RequestIdFilter.java",
-   "com/ragagent/platform/web/error/GlobalExceptionHandler.java"
+   "com/ragagent/common/storage/fileserve/FileTransport.java"
   ],
   "jakarta.validation.constraints": [
-   "com/ragagent/common/session/dto/StopSessionRequest.java",
-   "com/ragagent/platform/web/PageParams.java"
-  ],
-  "net.sf": [
-   "com/ragagent/platform/persistence/FullTableWriteGuard.java",
-   "com/ragagent/platform/persistence/TenantFilterGuard.java"
-  ],
-  "org.apache": [
-   "com/ragagent/platform/persistence/FullTableWriteGuard.java",
-   "com/ragagent/platform/persistence/JsonbRawStringTypeHandler.java",
-   "com/ragagent/platform/persistence/NaiveOffsetDateTimeTypeHandler.java",
-   "com/ragagent/platform/persistence/PgJsonTypeHandler.java",
-   "com/ragagent/platform/persistence/TenantFilterGuard.java"
+   "com/ragagent/common/session/dto/StopSessionRequest.java"
   ],
   "org.springframework": [
-   "com/ragagent/common/session/embed/EmbedSessionPort.java",
-   "com/ragagent/platform/config/DeploymentProperties.java",
-   "com/ragagent/platform/config/LanguageProperties.java",
-   "com/ragagent/platform/config/RetrievalDriverProperties.java",
-   "com/ragagent/platform/config/TenantProperties.java",
-   "com/ragagent/platform/persistence/DatabaseDialects.java",
-   "com/ragagent/platform/redis/SpringRedisPubSub.java",
-   "com/ragagent/platform/security/CryptoEnvProperties.java",
-   "com/ragagent/platform/security/CryptoService.java",
-   "com/ragagent/platform/security/SsrfGuard.java",
-   "com/ragagent/platform/security/SsrfWhitelistProperties.java",
-   "com/ragagent/platform/storage/config/StorageAllowList.java",
-   "com/ragagent/platform/storage/config/StorageAllowListProperties.java",
-   "com/ragagent/platform/storage/config/UploadLimitProperties.java",
-   "com/ragagent/platform/stream/RedisStreamManager.java",
-   "com/ragagent/platform/stream/StreamManagerConfig.java",
-   "com/ragagent/platform/stream/StreamProperties.java",
-   "com/ragagent/platform/task/RedisTaskQueueCore.java",
-   "com/ragagent/platform/tracing/langfuse/LangfuseEnvProperties.java",
-   "com/ragagent/platform/tracing/langfuse/LangfuseHttpInterceptor.java",
-   "com/ragagent/platform/web/ApiResultAdvice.java",
-   "com/ragagent/platform/web/ApiResultInterceptor.java",
-   "com/ragagent/platform/web/ApiResultSupport.java",
-   "com/ragagent/platform/web/NonNullRequestBodyAdvice.java",
-   "com/ragagent/platform/web/RbacInterceptor.java",
-   "com/ragagent/platform/web/RequestIdFilter.java",
-   "com/ragagent/platform/web/error/GlobalExceptionHandler.java",
-   "com/ragagent/platform/web/health/HealthController.java"
+   "com/ragagent/common/session/embed/EmbedSessionPort.java"
   ]
  },
  "note": "契约层纯度基线（C1 受控导入根 / C2 持久化形状 / C3 build 依赖）——只许减；由 scripts/check-contracts-purity.py --write 生成。判据见 HANDOFF §12.0。",

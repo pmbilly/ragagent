@@ -51,7 +51,7 @@ dependencies {
     implementation(project(":contract"))
     implementation(project(":engine"))
     testImplementation(testFixtures(project(":engine")))    // wire/ 录制夹具
-    testImplementation(testFixtures(project(":common")))    // EmbeddedRedis（B162 起在 :common）
+    testImplementation(testFixtures(project(":platform")))    // EmbeddedRedis（B162 起在 :common）
     // Spring
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")

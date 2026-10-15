@@ -19,17 +19,14 @@
 //    是守卫 R6 的棘轮基线，只许减不许增。
 plugins {
     `java-library`
-    `java-test-fixtures`   // 共享测试基座（EmbeddedRedis：L1 与上层测试共用）
     id("io.spring.dependency-management")
     id("com.diffplug.spotless")
-    id("com.google.protobuf")   // OTLP proto（tracing 核心随 B163 迁入）
 }
 
 // 格式卫生：四个模块同口径（ratchet 从 seed 起只检查触碰过的文件）。
 spotless {
     java {
         ratchetFrom("seed")
-        // proto 插件把生成目录加进 source set ⇒ 生成的 OTLP 代码会被扫到（B161 engine 同款）
         targetExclude("build/**")
         removeUnusedImports()
         trimTrailingWhitespace()
@@ -43,15 +40,7 @@ java {
     }
 }
 
-protobuf {
-    protoc {
-        artifact = "com.google.protobuf:protoc:${libs.versions.protobuf.get()}"
-    }
-}
 
-sourceSets["main"].proto {
-    srcDir("$rootDir/otlp-proto")
-}
 
 dependencyManagement {
     imports {
@@ -62,6 +51,7 @@ dependencyManagement {
 dependencies {
     // 契约层（纯 JDK 公开 API/SPI）：common 的端口签名暴露契约类型 ⇒ api 传递
     api(project(":contract"))
+    api(project(":platform"))   // stage 6：平台层已独立成模块（包名不变，消费方零改动）
     // 依 common/event 的实际 import 面声明（实测：jackson / spring / mybatis-plus / slf4j /
     // jakarta 六类，无云 SDK、无 jjwt、无 jdbc 驱动）—— 不用 starter 以免把自动配置漏进库。
     api("com.fasterxml.jackson.core:jackson-databind")
@@ -74,13 +64,10 @@ dependencies {
     api("org.springframework.boot:spring-boot-autoconfigure")
     api("org.springframework.data:spring-data-redis")
     api("org.slf4j:slf4j-api")
-    implementation(libs.protobuf.java)
     // mybatis-plus：提供 org.apache.ibatis.* 与 com.baomidou.*（含 net.sf.jsqlparser）
     api(libs.mybatis.plus.starter)
     compileOnly("jakarta.servlet:jakarta.servlet-api")
     compileOnly("jakarta.validation:jakarta.validation-api")
-
-    testFixturesImplementation("io.lettuce:lettuce-core")   // EmbeddedRedis 建连接用
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     // 主源码用 compileOnly 的 API（servlet/validation），测试期也要在类路径上（B163 实测）
     testImplementation("jakarta.servlet:jakarta.servlet-api")

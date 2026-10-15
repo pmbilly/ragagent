@@ -1792,6 +1792,35 @@ public interface AdminUserPort {
 - **读数**：**C1 受控导入根 61 → 59 文件**；**域侧 handler 10 → 1**；`common/*` 91 → **82**（−9）；`:contract` 203（不变）；载荷 0 保持；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
 - **验证**：**14 守卫全绿**（C1/C2 基线已 `--write`）；**1349 金片签名一致**；`spotlessCheck build` **2m5s**；**4991 / 失败 0 / 跳过 4**；dev 冒烟（sessions / KB / tenants / system-info **200** ✓；`GET /sessions/{id}/messages` ⇒ **500**——**查日志证实为既有的 `HttpRequestMethodNotSupportedException`（405 应然却映射为 500）**，与 handler 无关 ⇒ 该独立小刀仍在队列）
 - **余量**：域侧 handler 仅剩 `wiki/domain/WikiStringListTypeHandler`（L1 用户 `WikiIndexEntry` ⇒ 随其切开）· Jackson 味域内值类型 22 件（其中 session 7 件被 L1 平台面载荷引用 ⇒ 与载荷同生命周期）
+**🔶 阶段 6 首步·`:platform` 模块提取 ⇒ 后端定型为 6 模块（`common` 拆为 `:contract` / `:platform` / `:common`）（2026-10-16）**
+
+### 一、准入 G1~G4 核验（§12.5「模块提取专项」；计划纪律"准入未达标前不新增 Gradle 模块"）
+| 准入 | 实测 | 判定 |
+|---|---|---|
+| **G1** C4 载荷清零/登记 | 载荷 **0 残余** + 登记 12（platform 面 8 · Jackson 语义必要 2 · 待去 Jackson 0） | ✅ |
+| **G2** platform ↔ common 无环 | **`platform → common` = 0 文件** ✓ · `common → platform` = 13（单向 ✓）· **`platform → domains` = 0** ✓ | ✅ |
+| **G3** 扫描面同步 | `@SpringBootApplication`（默认根）· `@MapperScan("com.ragagent.**.mapper")` · `@ConfigurationPropertiesScan`（显式列 5 个 `com.ragagent.platform.*` 包）**全按包名索引** ⇒ **包名不变 ⇒ 零改动** ✓；资源侧无平台包引用 ✓；唯一随迁配置件＝ **protobuf 插件 + `sourceSets["main"].proto`**（其生成类只被 `platform/tracing/langfuse/OtlpHttpExporter` 用） | ✅ |
+| **G4** 编译隔离收益 | `platform` 唯一内部依赖＝ **contracts（16 处）** ＝方案 §5.2 目标边 `platform → contracts` ✓；`platform → domains` 0 ⇒ §12.2 模块 DAG 由 **Gradle 编译边强制**（强于守卫） | ✅ |
+
+### 二、动作
+① `settings.gradle.kts` += `include("platform")` ② 新建 `platform/build.gradle.kts`（plugins / spotless / java / proto / `protobuf{protoc{}}` / 依赖全套）③ `git mv` 三棵树：`common/src/main/java/com/ragagent/platform`（135 件）· `common/src/test/java/.../platform`（22 件）· `common/src/testFixtures/java/.../platform`（`EmbeddedRedis`）④ `:common` 去 protobuf/proto/testFixtures 插件与依赖 + 加 `api(project(":platform"))` ⇒ **domains/engine/boot 消费方零改动**（仅 testFixtures 指向改 3 行）⑤ `scripts/_source_roots.py` 的 `MODULE_DIRS` += platform（**该助手即为此设计**："新增模块只需加一行" ⇒ 两个路径键守卫 json-key 冻结面 / 事件面命名 **自动恢复** ✓）⑥ `scripts/test-summary.py` MODULES += platform
+
+### 三、⚠️ 四个"搬家漏项"（当场全修好；判据可复用）
+1. **搬插件漏搬它的配置块** ✗：protobuf 插件迁走、`protobuf { protoc { artifact = … } }` 没迁 ⇒ 生成码与运行时版本不匹配（`RuntimeVersion` 不存在）⇒ **判据：搬构建插件必须连其配置块一起搬**
+2. **`:platform` 测试静默不跑** ✗✗：漏抄 `tasks.withType<Test> { useJUnitPlatform() }` ⇒ `build` 全绿但 **platform tests 一条不采** —— **正是 `:common` 注释里记录过的同款陷阱** ⇒ 补上后 **144 条**恢复 ⇒ **判据：新模块建好后必须核对"测试条数总量守恒"（本轮 4996 ✓）；`build` 绿 ≠ 测试跑了**
+3. **资源随迁遗漏两处** ✗：① `prompts/`（`PromptSourceTest` 按**模块相对路径** `src/main/resources/prompts` 读 ⇒ 随 `:platform`）② **`common/text/TS{Characters,Phrases}.txt`**（由 **`contract.text.TextConv` 按 classpath 加载** ⇒ **本属 `:contract`** ⇒ 迁入 `contract/src/main/resources/`，**classpath 路径不变** ⇒ 全模块可见）⇒ **判据：资源的归属看"谁加载"，不是"谁旁边"**
+4. **Gradle 配置期自解析** ✗：`:platform` 的 test block 在配置期读自身 `testRuntimeClasspath` ⇒ 报 `project :platform local metadata has not been calculated yet` ⇒ 改 `doFirst` **惰性求值** ✓
+
+### 四、基线收紧（合规、非掩盖）
+- C1 扫描树＝`:common` 面 ⇒ 平台拆出后 **57 → 8 文件**（**只减** ✓）
+- B183 pending 条目**路径重指**（同一 `/health` 基础设施探针，**理由原文保留** ✓，pending 数仍 **2** ＝只减不增 ✓）
+- B169 冻结覆盖随 `MODULE_DIRS` 扩展**自动恢复**（**无需 `--write`** ✓ —— 守卫自陈"换包后务必回核前缀"，本轮即按此办理）
+
+### 五、读数与验证
+- 模块 **5 → 6**：`contract` 230 · **`platform` 135** · `common` 57 · `engine` 318 · `domains` 1390 · `boot` 13
+- C1 **10 根 / 8 文件** · C2 **0** · 域侧 handler **0** · C4 **0 残余 + 12 登记** · R10 **6 边 / 51 类**（①0 / ②1 / ③5）✓
+- **14 守卫全绿** · **1349 金片签名一致** · gate **1m50s / 4996 / 失败 0 / 跳过 4**（**6 模块**）· 冒烟（sessions / knowledge-bases / system-info **200** ✓）
+- **下一步（阶段 6 续）**：三个 runtime（`:engine` → `agent-engine` / `retrieval-engine` / `model-runtime`；注意"agent 执行核心从 `domains/agent` 提成 `agent-engine`"会把 ③ 族内边变成跨模块依赖 ⇒ 建议 **A③ ①档清零后再动**）；同步更新 `docs/` 与 HANDOFF 的模块图
 **🔶 §16.2 收口·`DuplicateKnowledgeException` 入契约 + `KnowledgeBaseViews` 裁定留 L1（两条判据）（2026-10-15）**
 - **裁定 1｜跨域域异常 ⇒ 入契约**：`DuplicateKnowledgeException` → **`contract.knowledge.service`** ✓
   - 依据三条：① 依赖面**全是契约件**（`BizException` / `AppError` / `KnowledgeRowView` / `DuplicateKnowledgeDetails` ✓）② 被 **4 个域**抛出/捕获（`datasource` / `im` / `chatpipeline` / `knowledge` ✓）③ **契约已有异常先例 7 个**（`BizException` · `WikiException` · `WikiPageNotFoundException` · `ResourceModeException` · `PublicModeForbiddenException` · `ToolApprovalException` · `EventBusException` ✓）
