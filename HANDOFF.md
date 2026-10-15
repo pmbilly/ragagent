@@ -1526,11 +1526,11 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 | 账 | 读数 | 状态 |
 |---|---|---|
 | `:contract` | **203 件** | ✅ 已独立（零依赖） |
-| `common/*` | **92 件**（125 → 97 → 92，E1/G1-b/G1-h/G1-c-1 共 −33） | 收敛中 |
+| `common/*` | **91 件**（125 → 113 → 102 → 97 → 92 → 91；E1/G1-b/G1-h/G1-c 各刀） | 收敛中 |
 | `platform/*` | 139 件 · `:common` 总 **237** | — |
 | **C2 实体** | **0** ✅ | **C 收官**（14 → 0） |
 | **C1 受控导入根** | 10 根 / **61 文件** | 冻结只许减 |
-| **C4 载荷** | `common/*` 残余 **5 件** + 登记 **11 件**（platform 面 9 · Jackson 语义必要 2 · 待去 Jackson 0） | ✅ 待去 Jackson 全清 |
+| **C4 载荷** | `common/*` 残余 **0 件** ✅ + 登记 **15 件**（platform 面 11 · Jackson 语义必要 2 · 待去 Jackson 2） | ✅ **载荷账清零** |
 | 域侧 handler | 10 件（TypeHandler） | 登记 |
 | build 依赖 | 12 | 冻结 |
 | **R10** | **6 条边 / 51 类**（①clearable **0** · ②owner 1〔`auth→tenant` 属主边〕· ③intra-family 5） | ✅ ①档达标 |
@@ -1794,7 +1794,7 @@ public interface AdminUserPort {
 - **⚠️ 两次摩擦（都已处置 + 判据）**：
   1. **搬迁脚本目标文件名漏 `.java`** ⇒ `git mv` 生成无扩展名文件（javac 忽略 ⇒ "class WikiIndex does not exist"）⇒ **判据：搬迁脚本的目标路径必须以 `.java` 结尾**（与上一刀"目标包显式映射"同族：**别让路径/命名的隐式假设替代事实**）
   2. **守卫零态缺陷**：载荷集归零后 `--write` 不写空 `payloads` 字段 ⇒ 守卫误报"旧基线" ✗ ⇒ 改为**按键存在性**判定（**空集是正当终态**）✓——这条正是"达到里程碑后工具必须能表达零"的实例
-- **读数**：`:contract` 197 → **203**（+6）；`common/*` 97 → **88**（−9）；**C4 载荷 12 → 0**；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
+- **读数**：`:contract` 197 → **203**（+6）；`common/*` 92 → **91**（−1；本刀净减 1：`KnowledgeBaseResponse` 出 + wiki 两件回退）；**C4 载荷 12 → 0**；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
 - **验证**：**14 守卫全绿**；**1349 金片签名一致**（枚举改名 + 去 Jackson 后**线格式逐字节不变** ✓）；`spotlessCheck build` **1m52s**；**4991 / 失败 0 / 跳过 4**；冒烟（KB 200 ✓ · init 404 业务信封 ✓ · sessions 200 ✓）
 **🔶 G1-c-1·KB 侧 5 件 `*ConfigView` 入契约 + 2 件 fileserve 端口按证据登记（C4 载荷 12 → 5）（2026-10-15）**
 - **对象（对账 §16.0-C 清单的前 7 件）**：`knowledge/dto/{Asr,Chunking,ImageProcessing,Indexing,Vlm}ConfigView` · `storage/fileserve/{GlobalFileServicePort,ProviderFileStorePort}`
