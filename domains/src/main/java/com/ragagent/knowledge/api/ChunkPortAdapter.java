@@ -8,10 +8,11 @@ import org.springframework.stereotype.Component;
 
 import com.ragagent.contract.knowledge.ChunkPort;
 import com.ragagent.contract.knowledge.ChunkView;
-import com.ragagent.common.knowledge.domain.Chunk;
+import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.support.ChunkProjectionAdapter;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
+import com.ragagent.knowledge.support.ChunkRowViews;
 
 /**
  * {@link ChunkPort} 的 knowledge 侧实现。
@@ -38,7 +39,7 @@ public class ChunkPortAdapter implements ChunkPort {
     @Override
     public List<ChunkView> textChunks(long tenantId, String knowledgeId) {
         List<Chunk> rows = chunkRepository.listTextChunks(tenantId, knowledgeId);
-        return ChunkProjectionAdapter.viewAll(rows);
+        return ChunkProjectionAdapter.viewAll(ChunkRowViews.rowViews(rows));
     }
 
     @Override
@@ -47,7 +48,7 @@ public class ChunkPortAdapter implements ChunkPort {
             return List.of();
         }
         List<Chunk> rows = chunkRepository.listChunksById(tenantId, ids);
-        return ChunkProjectionAdapter.viewAll(rows);
+        return ChunkProjectionAdapter.viewAll(ChunkRowViews.rowViews(rows));
     }
 
     @Override
@@ -71,7 +72,8 @@ public class ChunkPortAdapter implements ChunkPort {
             return content;
         }
         Map<String, String> imageInfoMap = ImageInfoEnricher.collectImageInfoByChunkIds(
-                (tid, pids) -> ChunkProjectionAdapter.factsAll(chunkRepository.listChunksByParentIDs(tid, pids)),
+                (tid, pids) -> ChunkProjectionAdapter.factsAll(
+                        ChunkRowViews.rowViews(chunkRepository.listChunksByParentIDs(tid, pids))),
                 tenantId, ids);
         String mergedImageInfo = ImageInfoEnricher.mergeImageInfoJson(imageInfoMap);
         if (mergedImageInfo == null || mergedImageInfo.isEmpty()) {

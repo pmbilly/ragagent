@@ -22,7 +22,7 @@ import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.prompt.AgentPromptPlaceholders;
 import com.ragagent.common.settings.ConversationProperties;
-import com.ragagent.common.knowledge.domain.Chunk;
+import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.domain.KnowledgeBaseIndexingStrategy;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
@@ -44,6 +44,7 @@ import org.springframework.stereotype.Service;
 import com.ragagent.knowledge.task.KnowledgeTaskExecutor;
 import java.util.Collections;
 import com.ragagent.knowledge.index.ChunkVectorIndexer;
+import com.ragagent.knowledge.support.ChunkRowViews;
 
 /**
  * 知识摘要生成管线：同步重生（含 fallback/重试状态机）与异步刷新入队；
@@ -389,14 +390,15 @@ public class KnowledgeSummaryService {
             }
             chunkContents = String.join("\n\n", parts);
         } else {
-            chunkContents = SearchChunkMerge.mergeTextChunks(ChunkProjectionAdapter.viewAll(sortedChunks), "");
+            chunkContents = SearchChunkMerge.mergeTextChunks(ChunkProjectionAdapter.viewAll(ChunkRowViews.rowViews(sortedChunks)), "");
         }
         List<String> chunkIds = new ArrayList<>(sortedChunks.size());
         for (Chunk chunk : sortedChunks) {
             chunkIds.add(chunk.getId());
         }
         Map<String, String> imageInfoMap = ImageInfoEnricher.collectImageInfoByChunkIds(
-                (tid, pids) -> ChunkProjectionAdapter.factsAll(chunkRepo.listChunksByParentIDs(tid, pids)),
+                (tid, pids) -> ChunkProjectionAdapter.factsAll(
+                        ChunkRowViews.rowViews(chunkRepo.listChunksByParentIDs(tid, pids))),
                 knowledge.getTenantId(), chunkIds);
         String mergedImageInfo = ImageInfoEnricher.mergeImageInfoJson(imageInfoMap);
         if (mergedImageInfo != null && !mergedImageInfo.isEmpty()) {

@@ -29,7 +29,7 @@ import com.ragagent.rerank.Reranker;
 import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.common.knowledge.ChunkFacts;
-import com.ragagent.common.knowledge.domain.ChunkPage;
+import com.ragagent.common.knowledge.ChunkPageView;
 
 /**
  * {@code AgentToolBackends} 的**知识库检索簇**：知识库检索 / chunk 列举 /
@@ -437,7 +437,7 @@ final class AgentToolKbBackends {
     public DocChunkSupport.PagedChunks pagedChunks() {
         return (tenantId, knowledgeId, page, pageSize) -> {
             int offset = Math.max(page - 1, 0) * Math.max(pageSize, 0);
-            ChunkPage page1 = knowledgeCatalog.listPagedChunksByKnowledgeId(
+            ChunkPageView page1 = knowledgeCatalog.listPagedChunksByKnowledgeId(
                     tenantId, knowledgeId, offset, pageSize,
                     TEXT_FAQ_TYPES, null, "", "", "", "", Boolean.TRUE);
             return new DocChunkSupport.ChunkPage(ChunkProjectionAdapter.factsAll(page1.items()), page1.total());

@@ -12,7 +12,7 @@ import com.ragagent.embedchannel.EmbedTokens;
 import com.ragagent.embedchannel.EmbedError;
 import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 import com.ragagent.embedchannel.service.EmbedChannelService;
-import com.ragagent.common.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.ChunkRowView;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -107,7 +107,7 @@ final class EmbedChannelPublicOps {
             return EmbedChannelController.plainError(400, "chunk_id is required");
         }
         try {
-            Chunk chunk = ctrl.service.embedChunk(ch, cid);
+            ChunkRowView chunk = ctrl.service.embedChunk(ch, cid);
             return ResponseEntity.ok(chunk);
         } catch (EmbedChannelService.ChunkNotFoundError e) {
             return EmbedChannelController.plainError(404, "chunk not found");

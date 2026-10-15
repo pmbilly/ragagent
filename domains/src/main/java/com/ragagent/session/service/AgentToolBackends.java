@@ -45,10 +45,10 @@ import com.ragagent.session.domain.message.MessageSearchGroupItem;
 import com.ragagent.session.domain.message.MessageSearchResult;
 import com.ragagent.common.settings.ConversationProperties;
 import com.ragagent.common.knowledge.domain.Knowledge;
-import com.ragagent.common.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.ChunkRowView;
 
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
-import com.ragagent.common.knowledge.domain.ChunkPage;
+import com.ragagent.common.knowledge.ChunkPageView;
 import com.ragagent.rerank.Reranker;
 import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.common.wiki.WikiPageOpsPort;
@@ -447,11 +447,11 @@ public class AgentToolBackends {
             Knowledge k = knowledgeCatalog.getKnowledgeByIdOnly(knowledgeId);
             long tenant = k == null || k.getTenantId() == null ? 0L : k.getTenantId();
             int offset = Math.max(page - 1, 0) * Math.max(pageSize, 0);
-            ChunkPage p = knowledgeCatalog.listPagedChunksByKnowledgeId(
+            ChunkPageView p = knowledgeCatalog.listPagedChunksByKnowledgeId(
                     tenant, knowledgeId, offset, pageSize, chunkTypes, null,
                     "", "", "", "", enabled);
             List<DataSchemaTool.ChunkView> out = new ArrayList<>();
-            for (Chunk c : p.items()) {
+            for (ChunkRowView c : p.items()) {
                 out.add(new DataSchemaTool.ChunkView(nz(c.getChunkType()), c.getContent()));
             }
             return out;

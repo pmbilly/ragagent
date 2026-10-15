@@ -37,7 +37,7 @@ import com.ragagent.datasource.dto.DatasourceCredentialFieldMetadata;
 import com.ragagent.datasource.dto.DatasourceCredentialsResponse;
 import com.ragagent.datasource.dto.DataSourceResponse;
 import com.ragagent.contract.apikey.TenantAPIKeyResponse;
-import com.ragagent.common.knowledge.domain.Chunk;
+import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ChunkRevision;
 import com.ragagent.common.knowledge.DocumentChunkMetadata;
 import com.ragagent.common.knowledge.FaqChunkMetadata;

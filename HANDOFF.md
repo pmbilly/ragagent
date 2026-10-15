@@ -1496,6 +1496,17 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **读数**：**R10 保持 7 条边 / 52 类**（端口在 L1 ⇒ 无新边）✓；14 守卫全绿；**净删 2 个文件**（知识域不再持有该表 mapper）
 - **验证**：`spotlessCheck build` **2m05s**；**4991 / 失败 0 / 跳过 4**；dev ready + 冒烟（knowledge-bases / **storage-backends** / sessions / models 200 ✓）
 - **意义**：`StorageBackend` 实体收窄（C 余量之一）**已具备前提**——唯一持久面在 storage 域，实体回域后跨域只剩端口读（+ system 的少量写面）
+**🔶 C 批 1·第十子批：`Chunk` 收窄 + JSON 等价行视图（实体 5 → 4）（2026-10-15）**
+- **规模**：`Chunk` = **30 字段 / 60 访问器**（3 个 `JsonNode`（relationChunks/indirectRelationChunks/metadata）+ 2 个 `@JsonIgnore`（sourceContent/contextHeader））——本仓最宽实体；跨域消费：embedchannel ×2、session ×2、chatpipeline（投影）
+- **⭐ 两条新判据（本刀最有价值处）**：
+  1. **"实体 JSON 即公开 API"识别**：实测 `EmbedChannelPublicOps.chunk()` 直接 `ResponseEntity.ok(chunk)` ⇒ 实体序列化即 **embed 公开响应**，且有金片 **`emb-pub-chunk-ok.json`** ⇒ 视图必须**逐字节等价**（字段＝序列化面、**字段序与实体一致**）
+  2. **`@JsonIgnore` 字段也镜像 + 同标注解**：先按"序列化面"跳过那 2 字段 ⇒ 映射器要搬 30 字段时**编译红** ⇒ 正解＝视图**含该 2 字段并同标 `@JsonIgnore`**（L1 允许 Jackson；消费方可读、JSON 仍等价）
+- **命名**：既有 `contract.knowledge.ChunkView`（6 字段）已占名 ⇒ 本视图命名 **`ChunkRowView`**（+ **`ChunkPageView`** 分页包装）落 L1，登记 **PENDING_DEJACKSON**
+- **动作**：① 新建 `common.knowledge.ChunkRowView`（30 字段，**访问器体逐字提取**）+ `ChunkPageView` ② 端口 5 方法改视图；`ChunkPage`（实体版）随迁 `knowledge/domain` ③ 域内新增**单一映射器** `knowledge/support/ChunkRowViews`（`rowView`/`rowViews`/`pageView`）④ 实体 `Chunk` 回 `knowledge/domain` ⑤ L1 投影器 `ChunkProjectionAdapter` 改吃视图；域内"喂实体给投影器"的 8 处（`ChunkRepository` · `KnowledgeSummaryService` · `ChunkPortAdapter` · 管线适配器 · 测试夹具 ×2 · 测试 ×1）统一经映射器转换 ⑥ 跨域消费改视图（embedchannel ×2 · session ×2）
+- **⚠️ 一次红态（arch 回归钉过期——新判据）**：`AgentEngineBoundaryTest` 的 B3 探针里有一条**钉旧状态的断言**——`import com.ragagent.knowledge.domain.Chunk` 期望"**非**业务域"（那是实体上提 L1 时代钉的）⇒ 实体回域后判为业务域是**正确**的 ⇒ 更新为 `isTrue()` 并补一条 L1 视图的钉（`common.knowledge.ChunkRowView` ⇒ false）。**判据：实体回域时必须同步清扫"钉旧状态的回归钉"**（同族门禁适配：R8 内联 FQN、C4 登记）
+- **读数**：**C2 实体 5 → 4**；C1 受控根 66 → **65 文件**；C4 待归位 14、登记 platform 面 7 + **待去 Jackson 5 → 7**；**R10 保持 7 条边 / 52 类 / ①档 0** ✓
+- **验证**：**14 守卫全绿**（C2 = 4，基线已 `--write`）；**1349 金片签名一致** ✓（关键＝`emb-pub-chunk-ok.json` ⇒ **视图 JSON 与实体逐字节等价**）；`spotlessCheck build` **1m52s**；**4991 / 失败 0 / 跳过 4**；定向 embedchannel 金片测试 + knowledge/session/agenttools ✓；dev ready + 冒烟（KB / sessions / embed-channels / system-info **200** ✓；`GET /api/v1/embed/{ch}/chunks/{chunkId}` ⇒ **401 `{"error":"embed publish token is required"}`** 渠道闸门信封 ✓）
+- **C 余量（4 实体）**：`Knowledge` · `KnowledgeBase`（宽字段；后者连带 **G1-h 的 3 件 config**）· `Tenant` / `User`（**管理面**，用例归位）
 **🔶 C 批 1·第九子批：`WikiPage` 收窄 + 全字段镜像视图（实体 6 → 5）（2026-10-15）**
 - **对象**：`WikiPage`（297 行 / **27 字段 / 54 访问器**；含 `JsonNode pageMetadata`、6 个 `@JsonSerialize`（`EmptyListAsNullSerializer`）列表与 `@JsonInclude` 省略语义——本仓最"重"的实体之一）
 - **实测决定视图宽度**：session 的 wiki 工具后端对该实体用到 **42 个访问器**（20 读 + 22 写）+ 1 个构造点 ⇒ **窄视图不成立**，必须**镜像全 27 字段**
@@ -2528,10 +2539,10 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 
 | 项 | 现状 | 门禁 |
 |---|---|---|
-| `:common` 持久化实体 | **5**（`User` · `Chunk` · `Knowledge` · `KnowledgeBase` · `Tenant`；`StorageBackend`/`WikiPageIssue`/`WikiPage` 已归位） | C2（只许减） |
+| `:common` 持久化实体 | **4**（`User` · `Knowledge` · `KnowledgeBase` · `Tenant`；`StorageBackend`/`WikiPageIssue`/`WikiPage`/`Chunk` 已归位） | C2（只许减） |
 | `:common` 域侧 TypeHandler | **10** | C2 |
 | `:common` 载荷型 | **14 待归位** + 7 platform 面登记 + 3 待去 Jackson | C4 |
-| `:common` 受控依赖根 | 10 根 / 66 文件 | C1 |
+| `:common` 受控依赖根 | 10 根 / 65 文件 | C1 |
 | `:contract` **误搬件** | **8 → 3**（D0a/D0b 已归位 5 件）（D0a/D0b 已归位 5 件；余 3 件 `KnowledgeBase*Config` 实体耦合，见 G1-h） | **待加 C5/C6** |
 | `:common` 规模 | **265 件** = `common/*` **125** + `platform/*` 139 + `event/*` 1（D1 后） | — |
 

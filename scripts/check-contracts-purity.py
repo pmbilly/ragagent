@@ -146,6 +146,11 @@ PENDING_DEJACKSON = {
         "JsonNode wikiConfig/extractConfig（1 处消费触达）⇒ 待去 Jackson",
     "com/ragagent/common/knowledge/KnowledgeDocumentFacts.java":
         "JsonNode metadata（2 处消费触达）⇒ 待去 Jackson",
+    "com/ragagent/common/knowledge/ChunkRowView.java":
+        "JsonNode × 3（relationChunks/indirectRelationChunks/metadata）⇒ 待去 Jackson；"
+        "**JSON 等价由 emb-pub-chunk-ok.json 金片钉住**（字段＝实体序列化面 + 2 个 @JsonIgnore 字段）",
+    "com/ragagent/common/knowledge/ChunkPageView.java":
+        "分页包装（items/total，元素为 ChunkRowView）⇒ 随 ChunkRowView 同批去 Jackson 后入 contract.knowledge",
     "com/ragagent/common/wiki/WikiPageView.java":
         "JsonNode pageMetadata（页元数据 jsonb）+ 6 个 @JsonSerialize 列表 ⇒ 待去 Jackson；"
         "去 Jackson 后与 WikiPageOpsPort 的页面面整批入 contract.wiki",

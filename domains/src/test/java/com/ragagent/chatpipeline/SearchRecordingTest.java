@@ -26,7 +26,7 @@ import com.ragagent.retrieval.support.SearchTextUtil;
 import com.ragagent.contract.graph.GraphData;
 import com.ragagent.contract.graph.GraphNode;
 import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.common.knowledge.domain.Chunk;
+import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.domain.Knowledge;
 
 /**

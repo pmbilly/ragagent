@@ -136,8 +136,10 @@ class AgentEngineBoundaryTest {
     @DisplayName("B3（红态探针）：判定函数对业务域必红、对底座不误报")
     void predicateTurnsRedOnDomainImports() {
         assertThat(isDomainImport("import com.ragagent.knowledge.service.management.KnowledgeService;")).isTrue();
-        // A③-㊴/㊶ 知识实体与支持面上提 L1 后，这些 import 属底座（回归钉：不许再判为业务域）
-        assertThat(isDomainImport("import com.ragagent.common.knowledge.domain.Chunk;")).isFalse();
+        // C 批起：持久化实体已**回归各域**（`knowledge.domain.Chunk` 属业务域 ⇒ 必红）；
+        // 底座对应面改由 L1 视图承接（`common.knowledge.ChunkRowView` ⇒ 不误报）
+        assertThat(isDomainImport("import com.ragagent.knowledge.domain.Chunk;")).isTrue();
+        assertThat(isDomainImport("import com.ragagent.common.knowledge.ChunkRowView;")).isFalse();
         assertThat(isDomainImport("import com.ragagent.session.service.QaWiring;")).isTrue();
         assertThat(isDomainImport("import com.ragagent.mcp.domain.McpService;")).isTrue();
         assertThat(isDomainImport("import static com.ragagent.wiki.service.WikiPrompts.GO_SHA256;")).isTrue();

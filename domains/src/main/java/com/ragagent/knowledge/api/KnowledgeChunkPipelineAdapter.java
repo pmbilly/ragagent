@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
-import com.ragagent.common.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.support.ChunkProjectionAdapter;
+import com.ragagent.common.knowledge.ChunkRowView;
 
 /**
  * {@link PipelinePorts.ChunkRepository}（管线面）的 knowledge 域实现：
@@ -32,7 +32,7 @@ public class KnowledgeChunkPipelineAdapter implements PipelinePorts.ChunkReposit
 
     @Override
     public List<ChunkFacts> listChunksByParentIds(long tenantId, List<String> parentIds) {
-        List<Chunk> out = new ArrayList<>();
+        List<ChunkRowView> out = new ArrayList<>();
         for (String parentId : parentIds) {
             out.addAll(knowledgeCatalog.listChunkByParentId(tenantId, parentId));
         }

@@ -19,13 +19,14 @@ import com.ragagent.agent.tool.DocChunkSupport.KnowledgeInfoReader;
 import com.ragagent.agent.tool.DocChunkSupport.KnowledgeInfoView;
 import com.ragagent.agent.tool.DocChunkSupport.PagedChunks;
 import com.ragagent.agent.tool.runtime.SearchAuth.TagView;
-import com.ragagent.common.knowledge.domain.Chunk;
+import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.agenttools.knowledge.GetDocumentInfoTool;
 import com.ragagent.agenttools.knowledge.ListKnowledgeChunksTool;
 import com.ragagent.agenttools.wiki.WikiReadSourceDocTool;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.common.agent.tool.ToolRequest;
+import com.ragagent.knowledge.support.ChunkRowViews;
 
 /**
  * 4.5b 回放：wiki_read_source_doc / get_document_info / list_knowledge_chunks
@@ -82,7 +83,7 @@ class DocToolsRecordingTest {
                 return new ChunkPage(List.of(), total);
             }
             int end = Math.min(start + pageSize, all.size());
-            return new ChunkPage(ChunkProjectionAdapter.factsAll(all.subList(start, end)), total);
+            return new ChunkPage(ChunkProjectionAdapter.factsAll(ChunkRowViews.rowViews(all.subList(start, end))), total);
         }
     }
 
@@ -334,8 +335,8 @@ class DocToolsRecordingTest {
         repo.totals.put("ds3", 3L);
 
         Map<String, ChunkFacts> byID = new LinkedHashMap<>();
-        byID.put("c1", ChunkProjectionAdapter.factsOf(c1));
-        byID.put("c2", ChunkProjectionAdapter.factsOf(c2));
+        byID.put("c1", ChunkProjectionAdapter.factsOf(ChunkRowViews.rowView(c1)));
+        byID.put("c2", ChunkProjectionAdapter.factsOf(ChunkRowViews.rowView(c2)));
 
         GetDocumentInfoTool tool = new GetDocumentInfoTool(kn, byID::get, repo, kb1Targets());
 
@@ -377,8 +378,8 @@ class DocToolsRecordingTest {
         repo.totals.put("d0", 0L);
 
         Map<String, ChunkFacts> byID = new LinkedHashMap<>();
-        byID.put("c1", ChunkProjectionAdapter.factsOf(c1));
-        byID.put("g9", ChunkProjectionAdapter.factsOf(textChunk("g9", "d1", "kb1", 5, "单块内容")));
+        byID.put("c1", ChunkProjectionAdapter.factsOf(ChunkRowViews.rowView(c1)));
+        byID.put("g9", ChunkProjectionAdapter.factsOf(ChunkRowViews.rowView(textChunk("g9", "d1", "kb1", 5, "单块内容"))));
 
         ListKnowledgeChunksTool tool = new ListKnowledgeChunksTool(kn, byID::get, repo,
                 new FakeImageCollector(), kb1Targets());

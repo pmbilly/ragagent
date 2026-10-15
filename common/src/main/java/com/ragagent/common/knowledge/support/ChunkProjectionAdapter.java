@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.contract.knowledge.ChunkView;
-import com.ragagent.common.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.ChunkRowView;
 
 /**
  * chunk 实体 → L1 载荷（{@link ChunkFacts} / {@link ChunkView}）的**域内公用投影**。
@@ -26,7 +26,7 @@ public final class ChunkProjectionAdapter {
      * 域内公用投影，供 chat 管线的 {@code PipelinePorts.ChunkRepository} 装配点复用，
      * 避免映射逻辑两处漂移）。仅带调用方真正读取的字段。
      */
-    public static ChunkFacts factsOf(Chunk c) {
+    public static ChunkFacts factsOf(ChunkRowView c) {
         if (c == null) {
             return null;
         }
@@ -37,15 +37,15 @@ public final class ChunkProjectionAdapter {
     }
 
     /** 批量投影（保持入参顺序；{@code null} 元素原样保留）。 */
-    public static List<ChunkFacts> factsAll(List<Chunk> rows) {
+    public static List<ChunkFacts> factsAll(List<ChunkRowView> rows) {
         List<ChunkFacts> out = new ArrayList<>();
-        for (Chunk c : rows) {
+        for (ChunkRowView c : rows) {
             out.add(factsOf(c));
         }
         return out;
     }
 
-    public static ChunkView view(Chunk c) {
+    public static ChunkView view(ChunkRowView c) {
         if (c == null) {
             return null;
         }
@@ -59,10 +59,10 @@ public final class ChunkProjectionAdapter {
         return v;
     }
 
-    public static List<ChunkView> viewAll(List<Chunk> rows) {
+    public static List<ChunkView> viewAll(List<ChunkRowView> rows) {
         List<ChunkView> out = new ArrayList<>(rows == null ? 0 : rows.size());
         if (rows != null) {
-            for (Chunk c : rows) {
+            for (ChunkRowView c : rows) {
                 out.add(view(c));
             }
         }

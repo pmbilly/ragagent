@@ -19,7 +19,7 @@ import com.ragagent.embedchannel.EmbedError;
 import com.ragagent.embedchannel.EmbedTokens;
 import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 import com.ragagent.embedchannel.mapper.EmbedChannelMapper;
-import com.ragagent.common.knowledge.domain.Chunk;
+import com.ragagent.common.knowledge.ChunkRowView;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 
 /**
@@ -565,12 +565,12 @@ public class EmbedChannelService {
     }
 
     /** 公开分块读取：404 优先、跨租户/不在白名单 → forbidden。 */
-    public Chunk embedChunk(EmbedChannelEntity ch, String chunkId) {
+    public ChunkRowView embedChunk(EmbedChannelEntity ch, String chunkId) {
         String cid = chunkId == null ? "" : chunkId.trim();
         if (cid.isEmpty()) {
             throw new ChunkNotFoundError();
         }
-        Chunk chunk;
+        ChunkRowView chunk;
         try {
             chunk = knowledgeCatalog.getChunkByIdOnly(cid);
         } catch (RuntimeException e) {
@@ -589,7 +589,7 @@ public class EmbedChannelService {
     public static final class ChunkForbiddenError extends RuntimeException {}
 
     /** 分块可见性：无 KB 约束时按 agent 的选择模式放行。 */
-    private boolean chunkAllowedForEmbed(EmbedChannelEntity ch, Chunk chunk) {
+    private boolean chunkAllowedForEmbed(EmbedChannelEntity ch, ChunkRowView chunk) {
         if (chunk == null || chunk.getKnowledgeBaseId() == null || chunk.getKnowledgeBaseId().isEmpty()) {
             return false;
         }

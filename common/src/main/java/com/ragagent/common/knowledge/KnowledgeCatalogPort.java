@@ -5,8 +5,6 @@ import java.util.Map;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.knowledge.domain.Chunk;
-import com.ragagent.common.knowledge.domain.ChunkPage;
 import com.ragagent.contract.knowledge.FaqEntryPageView;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
@@ -61,21 +59,21 @@ public interface KnowledgeCatalogPort {
      * 按 id 取分块。<b>无租户过滤</b>（调用方自行做权限裁决，如 embed 公开读取的
      * 白名单校验）；软删行不可见，找不到 ⇒ 域内 not-found 运行时异常原样上抛。
      */
-    Chunk getChunkByIdOnly(String id);
+    ChunkRowView getChunkByIdOnly(String id);
 
     // ── chunk 批量读（工具/管线面，租户过滤口径与域仓储一致） ──
 
     /** 按 id 批量取 chunk（租户内、软删不可见）。 */
-    List<Chunk> listChunksById(long tenantId, List<String> ids);
+    List<ChunkRowView> listChunksById(long tenantId, List<String> ids);
 
     /** 按父 id 取子 chunk。 */
-    List<Chunk> listChunkByParentId(long tenantId, String parentId);
+    List<ChunkRowView> listChunkByParentId(long tenantId, String parentId);
 
     /** 按父 id 批量取子 chunk。 */
-    List<Chunk> listChunksByParentIDs(long tenantId, List<String> parentIds);
+    List<ChunkRowView> listChunksByParentIDs(long tenantId, List<String> parentIds);
 
     /** 按知识条目分页取 chunk（过滤参数与域仓储逐一同形）。 */
-    ChunkPage listPagedChunksByKnowledgeId(long tenantId, String knowledgeId, int offset,
+    ChunkPageView listPagedChunksByKnowledgeId(long tenantId, String knowledgeId, int offset,
             int limit, List<String> chunkTypes, List<String> tagIds,
             String keyword, String searchField, String sortOrder,
             String knowledgeType, Boolean isEnabled);

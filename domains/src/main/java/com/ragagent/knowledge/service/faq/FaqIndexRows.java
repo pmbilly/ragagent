@@ -2,7 +2,7 @@ package com.ragagent.knowledge.service.faq;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.ragagent.common.knowledge.domain.Chunk;
+import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.FaqChunkMetadata;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.retrieval.engine.VectorStoreService;

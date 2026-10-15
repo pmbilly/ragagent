@@ -42,7 +42,7 @@ import com.ragagent.retrieval.graph.RetrieveGraphRepository;
 import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.session.support.PipelineViews;
 import com.ragagent.contract.tenant.WebSearchConfig;
-import com.ragagent.common.knowledge.domain.Chunk;
+import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.common.knowledge.domain.KnowledgeBaseIndexingStrategy;
@@ -52,6 +52,7 @@ import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.KnowledgeBaseView;
 import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.knowledge.service.management.KnowledgeBaseLookupAdapter;
+import com.ragagent.knowledge.support.ChunkRowViews;
 
 /**
  * 4.6c 录制回放的替身与掩码工具。
@@ -678,7 +679,7 @@ final class Rec46cSupport {
                     out.add(chunk);
                 }
             }
-            return ChunkProjectionAdapter.factsAll(out);
+            return ChunkProjectionAdapter.factsAll(ChunkRowViews.rowViews(out));
         }
 
         @Override
@@ -690,7 +691,7 @@ final class Rec46cSupport {
                     out.add(c);
                 }
             }
-            return ChunkProjectionAdapter.factsAll(out);
+            return ChunkProjectionAdapter.factsAll(ChunkRowViews.rowViews(out));
         }
     }
 

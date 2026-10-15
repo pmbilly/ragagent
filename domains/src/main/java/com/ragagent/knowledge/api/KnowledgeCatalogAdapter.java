@@ -7,8 +7,6 @@ import org.springframework.stereotype.Component;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
-import com.ragagent.common.knowledge.domain.Chunk;
-import com.ragagent.common.knowledge.domain.ChunkPage;
 import com.ragagent.contract.knowledge.FaqEntryPageView;
 import com.ragagent.contract.knowledge.FaqEntryView;
 import com.ragagent.common.knowledge.domain.Knowledge;
@@ -39,6 +37,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.contract.knowledge.KnowledgeTagView;
 import com.ragagent.knowledge.dto.faq.FaqEntry;
 import com.ragagent.knowledge.dto.faq.FaqEntryPage;
+import com.ragagent.knowledge.support.ChunkRowViews;
+import com.ragagent.common.knowledge.ChunkPageView;
+import com.ragagent.common.knowledge.ChunkRowView;
+import com.ragagent.knowledge.domain.Chunk;
 
 /**
  * {@link KnowledgeCatalogPort} 的知识域实现：读写逐字转发两个门面服务，
@@ -132,33 +134,33 @@ public class KnowledgeCatalogAdapter implements KnowledgeCatalogPort {
     }
 
     @Override
-    public Chunk getChunkByIdOnly(String id) {
-        return chunkRepository.getChunkByIdOnly(id);
+    public ChunkRowView getChunkByIdOnly(String id) {
+        return ChunkRowViews.rowView(chunkRepository.getChunkByIdOnly(id));
     }
 
     @Override
-    public List<Chunk> listChunksById(long tenantId, List<String> ids) {
-        return chunkRepository.listChunksById(tenantId, ids);
+    public List<ChunkRowView> listChunksById(long tenantId, List<String> ids) {
+        return ChunkRowViews.rowViews(chunkRepository.listChunksById(tenantId, ids));
     }
 
     @Override
-    public List<Chunk> listChunkByParentId(long tenantId, String parentId) {
-        return chunkRepository.listChunkByParentId(tenantId, parentId);
+    public List<ChunkRowView> listChunkByParentId(long tenantId, String parentId) {
+        return ChunkRowViews.rowViews(chunkRepository.listChunkByParentId(tenantId, parentId));
     }
 
     @Override
-    public List<Chunk> listChunksByParentIDs(long tenantId, List<String> parentIds) {
-        return chunkRepository.listChunksByParentIDs(tenantId, parentIds);
+    public List<ChunkRowView> listChunksByParentIDs(long tenantId, List<String> parentIds) {
+        return ChunkRowViews.rowViews(chunkRepository.listChunksByParentIDs(tenantId, parentIds));
     }
 
     @Override
-    public ChunkPage listPagedChunksByKnowledgeId(long tenantId, String knowledgeId,
+    public ChunkPageView listPagedChunksByKnowledgeId(long tenantId, String knowledgeId,
             int offset, int limit, List<String> chunkTypes, List<String> tagIds,
             String keyword, String searchField, String sortOrder,
             String knowledgeType, Boolean isEnabled) {
-        return chunkRepository.listPagedChunksByKnowledgeId(tenantId, knowledgeId, offset,
-                limit, chunkTypes, tagIds, keyword, searchField, sortOrder,
-                knowledgeType, isEnabled);
+        return ChunkRowViews.pageView(chunkRepository.listPagedChunksByKnowledgeId(tenantId, knowledgeId,
+                offset, limit, chunkTypes, tagIds, keyword, searchField, sortOrder,
+                knowledgeType, isEnabled));
     }
 
     @Override

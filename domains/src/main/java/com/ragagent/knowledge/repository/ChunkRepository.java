@@ -11,7 +11,7 @@ import com.ragagent.platform.persistence.PageRequests;
 import com.ragagent.platform.text.CleanInvalidUtf8;
 import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.ChunkSearchGateway;
-import com.ragagent.common.knowledge.domain.Chunk;
+import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ChunkRevision;
 import org.springframework.stereotype.Component;
 import com.ragagent.platform.persistence.DatabaseDialects;
@@ -24,7 +24,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import javax.sql.DataSource;
-import com.ragagent.common.knowledge.domain.ChunkPage;
+import com.ragagent.knowledge.domain.ChunkPage;
+import com.ragagent.knowledge.support.ChunkRowViews;
 
 /**
  * chunk 仓储（文档与 FAQ 的 chunk 行读写，方法式门面）。数据访问契约如下，
@@ -236,7 +237,7 @@ public class ChunkRepository implements ChunkSearchGateway {
      */
     @Override
     public List<ChunkFacts> findChunks(long tenantId, List<String> chunkIds) {
-        return ChunkProjectionAdapter.factsAll(listChunksById(tenantId, chunkIds));
+        return ChunkProjectionAdapter.factsAll(ChunkRowViews.rowViews(listChunksById(tenantId, chunkIds)));
     }
 
     /**
