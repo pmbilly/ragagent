@@ -31,8 +31,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.ragagent.contract.tenant.TenantRole;
 
-import com.ragagent.common.session.dto.StopSessionRequest;
-import com.ragagent.common.storage.fileserve.FileProxyPort;
+import com.ragagent.platform.session.dto.StopSessionRequest;
+import com.ragagent.platform.storage.fileserve.FileProxyPort;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.contract.error.AppError;

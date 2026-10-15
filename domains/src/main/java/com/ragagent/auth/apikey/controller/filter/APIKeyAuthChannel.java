@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.service.UserService;
 import com.ragagent.contract.tenant.APIPrincipalConfig;
-import com.ragagent.common.apikey.ApiKeyAuthPort;
+import com.ragagent.platform.apikey.ApiKeyAuthPort;
 
 /**
  * X-API-Key 认证通道（认证链的第 3 条通道）。

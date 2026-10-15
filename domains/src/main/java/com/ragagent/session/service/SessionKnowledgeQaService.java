@@ -27,11 +27,11 @@ import com.ragagent.chatpipeline.SummaryConfig;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
-import com.ragagent.common.settings.ConversationProperties;
+import com.ragagent.platform.settings.ConversationProperties;
 import com.ragagent.platform.event.EventBus;
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 
-import com.ragagent.common.knowledge.KnowledgeCatalogPort;
+import com.ragagent.platform.knowledge.KnowledgeCatalogPort;
 import com.ragagent.common.retrieval.SearchResult;
 
 import static com.ragagent.session.service.QaSupport.TagScope;

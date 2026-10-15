@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ragagent.common.storage.fileserve.FileProxyPort;
-import com.ragagent.common.storage.fileserve.FileServeHttp;
+import com.ragagent.platform.storage.fileserve.FileProxyPort;
+import com.ragagent.platform.storage.fileserve.FileServeHttp;
 import com.ragagent.contract.storage.fileserve.MessageFileFacts;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.session.domain.message.Message;

@@ -18,9 +18,9 @@ import com.ragagent.agent.tool.runtime.SearchAuth;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.common.settings.ConversationProperties;
+import com.ragagent.platform.settings.ConversationProperties;
 
-import com.ragagent.common.knowledge.KnowledgeCatalogPort;
+import com.ragagent.platform.knowledge.KnowledgeCatalogPort;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
 import com.ragagent.rerank.RankResult;
 import com.ragagent.rerank.Reranker;

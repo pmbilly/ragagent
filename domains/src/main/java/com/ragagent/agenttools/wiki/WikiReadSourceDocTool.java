@@ -16,7 +16,7 @@ import com.ragagent.agent.tool.DocChunkSupport.KnowledgeInfoReader;
 import com.ragagent.agent.tool.DocChunkSupport.KnowledgeInfoView;
 import com.ragagent.agent.tool.DocChunkSupport.PagedChunks;
 import com.ragagent.contract.knowledge.ChunkFacts;
-import com.ragagent.common.agent.tool.BaseTool;
+import com.ragagent.platform.tool.BaseTool;
 import com.ragagent.agent.tool.DocChunkSupport;
 import com.ragagent.agent.tool.runtime.SearchAuth;
 import com.ragagent.contract.tool.ToolDefinitions;

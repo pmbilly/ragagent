@@ -10,7 +10,7 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.runtime.ImCommandSet;
 import com.ragagent.im.runtime.ImFormat;
-import com.ragagent.common.knowledge.KnowledgeCatalogPort;
+import com.ragagent.platform.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.service.DuplicateKnowledgeException;
 
 /**

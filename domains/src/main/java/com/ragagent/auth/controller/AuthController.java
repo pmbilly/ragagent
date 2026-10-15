@@ -51,7 +51,7 @@ import com.ragagent.platform.web.RejectEmptyBody;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.config.TenantProperties;
-import com.ragagent.common.settings.SystemSettingRegistry;
+import com.ragagent.platform.settings.SystemSettingRegistry;
 import com.ragagent.contract.settings.SystemSettingGateway;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

@@ -7,7 +7,7 @@ import java.io.InputStream;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.ragagent.common.storage.fileserve.FileTransport;
+import com.ragagent.platform.storage.fileserve.FileTransport;
 import com.ragagent.common.storage.fileserve.ProviderFileStorePort;
 import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.storage.fileserve.ProviderFileContentService;

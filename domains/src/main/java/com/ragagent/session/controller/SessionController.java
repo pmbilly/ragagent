@@ -23,7 +23,7 @@ import com.ragagent.session.dto.GenerateTitleRequest;
 import com.ragagent.session.dto.GenerateTitleResponse;
 import com.ragagent.session.dto.SessionListResponse;
 import com.ragagent.session.dto.SessionPinResponse;
-import com.ragagent.common.session.dto.StopSessionRequest;
+import com.ragagent.platform.session.dto.StopSessionRequest;
 import com.ragagent.session.dto.UpdateSessionRequest;
 import com.ragagent.session.service.SessionService;
 import jakarta.validation.Valid;

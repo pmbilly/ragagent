@@ -1,6 +1,7 @@
 package com.ragagent.common.storage.fileserve;
 
 import java.io.IOException;
+import com.ragagent.platform.storage.fileserve.FileTransport;
 
 
 /**

@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.retrieval.domain.WebSearchFilters;
 import com.ragagent.retrieval.domain.WebSearchResult;
-import com.ragagent.common.agent.tool.BaseTool;
+import com.ragagent.platform.tool.BaseTool;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolOutput;
 import com.ragagent.contract.tool.ToolRequest;

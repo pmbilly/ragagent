@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.common.agent.tool.BaseTool;
+import com.ragagent.platform.tool.BaseTool;
 import com.ragagent.agent.tool.runtime.SearchAuth;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolRequest;

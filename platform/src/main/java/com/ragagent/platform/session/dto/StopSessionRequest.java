@@ -1,4 +1,4 @@
-package com.ragagent.common.session.dto;
+package com.ragagent.platform.session.dto;
 
 import jakarta.validation.constraints.NotBlank;
 

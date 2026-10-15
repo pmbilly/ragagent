@@ -14,18 +14,8 @@
   "org.springframework:spring-webmvc"
  ],
  "imports": {
-  "com.baomidou": [
-   "com/ragagent/common/knowledge/KnowledgeCatalogPort.java"
-  ],
   "jakarta.servlet.http": [
-   "com/ragagent/common/apikey/ApiKeyAuthPort.java",
-   "com/ragagent/common/session/embed/EmbedSessionPort.java",
-   "com/ragagent/common/storage/fileserve/FileProxyPort.java",
-   "com/ragagent/common/storage/fileserve/FileServeHttp.java",
-   "com/ragagent/common/storage/fileserve/FileTransport.java"
-  ],
-  "jakarta.validation.constraints": [
-   "com/ragagent/common/session/dto/StopSessionRequest.java"
+   "com/ragagent/common/session/embed/EmbedSessionPort.java"
   ],
   "org.springframework": [
    "com/ragagent/common/session/embed/EmbedSessionPort.java"

@@ -44,7 +44,7 @@ import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.QaQueue;
 import com.ragagent.im.runtime.ReplyMessage;
 import com.ragagent.contract.doc.DocReaderParsePort;
-import com.ragagent.common.knowledge.KnowledgeCatalogPort;
+import com.ragagent.platform.knowledge.KnowledgeCatalogPort;
 import com.ragagent.platform.stream.StreamManager;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.contract.storage.support.Resolver;

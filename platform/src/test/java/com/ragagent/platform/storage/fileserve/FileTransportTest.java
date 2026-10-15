@@ -1,4 +1,4 @@
-package com.ragagent.common.storage.fileserve;
+package com.ragagent.platform.storage.fileserve;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;

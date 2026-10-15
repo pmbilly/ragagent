@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.agent.tool.runtime.SearchAuth.KnowledgeScopeReader;
 import com.ragagent.contract.retrieval.SearchTarget.SearchTargets;
-import com.ragagent.common.agent.tool.BaseTool;
+import com.ragagent.platform.tool.BaseTool;
 import com.ragagent.agenttools.knowledge.FaqSnippet;
 import com.ragagent.agent.tool.runtime.SearchAuth;
 import com.ragagent.contract.tool.ToolDefinitions;

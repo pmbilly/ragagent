@@ -31,7 +31,7 @@ import org.mockito.ArgumentCaptor;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.knowledge.storage.LocalStorageService;
 import com.sun.net.httpserver.HttpServer;
-import com.ragagent.common.knowledge.KnowledgeCatalogPort;
+import com.ragagent.platform.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.KnowledgeIngest;
 import com.ragagent.knowledge.support.KnowledgePaths;
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;

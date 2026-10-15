@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.message.MessageSuggestionSet;
-import com.ragagent.common.session.dto.StopSessionRequest;
+import com.ragagent.platform.session.dto.StopSessionRequest;
 import com.ragagent.common.session.embed.EmbedSessionPort;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.session.controller.KnowledgeQaController;

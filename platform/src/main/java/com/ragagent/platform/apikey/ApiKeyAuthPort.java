@@ -1,4 +1,4 @@
-package com.ragagent.common.apikey;
+package com.ragagent.platform.apikey;
 
 import java.io.IOException;
 

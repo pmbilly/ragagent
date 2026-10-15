@@ -38,9 +38,9 @@ import com.ragagent.chatpipeline.plugin.PluginWebFetch;
 import com.ragagent.chatpipeline.plugin.PluginWikiBoost;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.retrieval.HybridSearchService;
-import com.ragagent.common.settings.ConversationProperties;
+import com.ragagent.platform.settings.ConversationProperties;
 
-import com.ragagent.common.knowledge.KnowledgeCatalogPort;
+import com.ragagent.platform.knowledge.KnowledgeCatalogPort;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.modelruntime.application.LlmChatClients;
 import com.ragagent.llm.domain.ChatConfig;

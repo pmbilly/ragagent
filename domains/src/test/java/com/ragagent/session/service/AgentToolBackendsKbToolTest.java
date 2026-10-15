@@ -17,7 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.ragagent.contract.retrieval.SearchTarget;
-import com.ragagent.common.settings.ConversationProperties;
+import com.ragagent.platform.settings.ConversationProperties;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.contract.memory.MemorySearchHit;
 import com.ragagent.contract.memory.MemorySearchHits;
@@ -28,7 +28,7 @@ import com.ragagent.session.domain.message.MessageSearchResult;
 import com.ragagent.contract.wiki.WikiPageOpsPort;
 import com.ragagent.auth.service.TenantService;
 import com.ragagent.chatpipeline.spi.WebSearchExecutor;
-import com.ragagent.common.knowledge.KnowledgeCatalogPort;
+import com.ragagent.platform.knowledge.KnowledgeCatalogPort;
 
 /**
  * 工具接线钉（2026-09-23 接线批：工作包 1 KB 五件 + 工作包 2a 会话/记忆/DB 三件）。

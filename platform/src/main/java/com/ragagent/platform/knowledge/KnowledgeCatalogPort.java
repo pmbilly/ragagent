@@ -1,4 +1,4 @@
-package com.ragagent.common.knowledge;
+package com.ragagent.platform.knowledge;
 
 import java.util.List;
 import java.util.Map;

@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 
 
-import com.ragagent.common.session.dto.StopSessionRequest;
+import com.ragagent.platform.session.dto.StopSessionRequest;
 import com.ragagent.platform.web.ApiResponse;
 
 import jakarta.servlet.http.HttpServletResponse;

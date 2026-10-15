@@ -1792,6 +1792,21 @@ public interface AdminUserPort {
 - **读数**：**C1 受控导入根 61 → 59 文件**；**域侧 handler 10 → 1**；`common/*` 91 → **82**（−9）；`:contract` 203（不变）；载荷 0 保持；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
 - **验证**：**14 守卫全绿**（C1/C2 基线已 `--write`）；**1349 金片签名一致**；`spotlessCheck build` **2m5s**；**4991 / 失败 0 / 跳过 4**；dev 冒烟（sessions / KB / tenants / system-info **200** ✓；`GET /sessions/{id}/messages` ⇒ **500**——**查日志证实为既有的 `HttpRequestMethodNotSupportedException`（405 应然却映射为 500）**，与 handler 无关 ⇒ 该独立小刀仍在队列）
 - **余量**：域侧 handler 仅剩 `wiki/domain/WikiStringListTypeHandler`（L1 用户 `WikiIndexEntry` ⇒ 随其切开）· Jackson 味域内值类型 22 件（其中 session 7 件被 L1 平台面载荷引用 ⇒ 与载荷同生命周期）
+**🔶 清 `:common` 第一刀·11 件出账（8 → `:platform` · 1 → `:contract` · 1 → `platform.tool` · 1 回退登记）（2026-10-16）**
+- **缘起（用户提问"`:common` 不先清掉吗？"）**：**是** —— 方案 §5.1 目标树**没有 `common`**（`contracts` / `platform` / agent-engine / retrieval-engine / model-runtime / domains / boot）⇒ `:common` 是**过渡模块**，其清空＝"阶段 6 第 1 步（contracts/platform）"的**收尾**，**应先于三个 runtime** ✓
+- **先测两条决定性事实**：① **7 件框架味端口对业务域引用 = 0** ✓ ⇒ 入 platform 不破坏 §12.2 DAG（`platform → 业务域` 禁止）② **`ParserEngineRules` 真 Jackson 面 = 0**（G1-k 已纯化 ✓）⇒ 可直接入契约（先例：`contract.text.TextConv` ✓）
+- **出账 11 件**：**platform 8**（`ApiKeyAuthPort` · `KnowledgeCatalogPort` · `StopSessionRequest` · `FileProxyPort` · `FileServeHttp` · `FileTransport` · `SystemSettingRegistry` · `ConversationProperties`）· **contract 1**（`ParserEngineRules` → `contract.knowledge.support`）· **platform.tool 1**（`BaseTool`）；随迁测试 3 件（`FileTransportTest` · `SystemSettingRegistryTest` · `ParserEngineRulesTest`）；**回退登记 1**（`EmbedSessionPort`）
+- ⚠️ **四个教训（全部当场修好，判据可复用）**：
+  1. **R10 新增边** ✗✗：`BaseTool` 落 `domains/agent` ⇒ 新增 `mcp→agent`（2 类）+ `agenttools→agent`（8 类）✗（R10 只许减）⇒ 改投 **`:platform`**（其引用面全为 contract/platform ⇒ **零域边** ✓）⇒ R10 回 **6 边 / 51 类** ✓
+     **判据：搬件入某域前，先判"它是不是跨域共享件"——共享件只能去契约或平台；R10 守卫是唯一裁判**
+  2. **反向依赖** ✗：`EmbedSessionPort` 的方法面引 L1 `MessageView` ⇒ 进 platform 会造出 **`platform → common`** ✗（违反 §5.2/§12.2）⇒ 回退 + 登记（附未来路径）
+     **判据：往下层搬必须核"对**被留下那层**（`common`）的引用"，不能只核"对业务域的引用"**（首轮只测了后者 ✗）
+  3. **扫描面清单漏同步** ✗（**1212 条 boot 测试红**）：`@ConfigurationPropertiesScan` 里仍是 `com.ragagent.common.settings` ⇒ `ConversationProperties` 迁走后 Spring 绑不上 ⇒ **上下文起不来** ✗ ⇒ 同步一处 ⇒ 全绿 ✓
+     **判据：搬家＝"代码 + 扫描面清单 + 资源/处理器 + 随迁测试"四件套**（G3 验收项的具体化）
+  4. **随迁测试**：测试留原地会因 **package-private 成员不可见**而红 ✗（`FileTransportTest.parseRange` ✗）⇒ **测试跟主体走** ✓；另：搬入文件需过 spotless、空目录需清（B124 抓到 ✓）
+- **读数**：`:contract` 230 → **231**；`platform` 135 → **144**；`common/*` **56 → 46**（`:common` 总 47）；**C1 = 2 文件** ✓；登记 platform 面 8 + Jackson 语义必要 2 ✓；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
+- **验证**：**14 守卫全绿** · **1349 金片签名一致** · gate **1m35s / 4996 / 失败 0 / 跳过 4** · 冒烟（sessions / knowledge-bases / system-info / storage-backends **200** ✓）
+- **清 `:common` 余量（46 件）与路径**：**(a)** 纯 JDK 跨域端口/载荷 → `:contract` ✓；**(b)** 框架味/HTTP 面 → `:platform`（**先核反向依赖** ✓）；**(c)** 域内件 → 各自域（**先核 R10** ✓）；**(d)** **线格式绑定件**（`SearchResult` · `MessageView` 等）→ 需 **product 决策** ⇒ **`common` 的完全解散卡在 (d)**：决策落定前，`:common` 作为"线格式 L1 残座"存在（账目清白，无未登记项）✓
 **🔶 阶段 6 首步·`:platform` 模块提取 ⇒ 后端定型为 6 模块（`common` 拆为 `:contract` / `:platform` / `:common`）（2026-10-16）**
 
 ### 一、准入 G1~G4 核验（§12.5「模块提取专项」；计划纪律"准入未达标前不新增 Gradle 模块"）

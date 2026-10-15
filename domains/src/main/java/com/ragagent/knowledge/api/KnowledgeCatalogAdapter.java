@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.common.knowledge.KnowledgeCatalogPort;
+import com.ragagent.platform.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.FaqEntryPageView;
 import com.ragagent.contract.knowledge.FaqEntryView;
 import com.ragagent.knowledge.domain.Knowledge;

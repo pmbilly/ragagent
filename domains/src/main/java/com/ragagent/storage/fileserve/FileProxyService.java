@@ -20,10 +20,10 @@ import com.ragagent.storage.service.ResourceCatalogService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import com.ragagent.platform.text.ContentTypeByFilename;
-import com.ragagent.common.storage.fileserve.FileProxyPort;
+import com.ragagent.platform.storage.fileserve.FileProxyPort;
 import com.ragagent.contract.storage.fileserve.MessageFactsLookup;
-import com.ragagent.common.storage.fileserve.FileServeHttp;
-import com.ragagent.common.storage.fileserve.FileTransport;
+import com.ragagent.platform.storage.fileserve.FileServeHttp;
+import com.ragagent.platform.storage.fileserve.FileTransport;
 import com.ragagent.common.storage.fileserve.StoragePaths;
 import com.ragagent.common.storage.fileserve.FileContentService;
 

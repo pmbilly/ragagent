@@ -27,7 +27,7 @@ import com.ragagent.evaluation.dto.EvaluationDtos.PipelineParams;
 import com.ragagent.evaluation.dto.EvaluationDtos.SummaryConfigParams;
 import com.ragagent.platform.access.TenantContextSnapshot;
 
-import com.ragagent.common.knowledge.KnowledgeCatalogPort;
+import com.ragagent.platform.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.chatpipeline.spi.KnowledgeQaEventPort;

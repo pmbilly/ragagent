@@ -2,6 +2,7 @@ package com.ragagent.common.storage.fileserve;
 
 import java.io.IOException;
 import java.io.InputStream;
+import com.ragagent.platform.storage.fileserve.FileTransport;
 
 /**
  * 租户云 provider 的存储能力端口（L1）：解析"该租户用哪个 provider 服务"，并给出一组文件操作。

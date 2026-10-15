@@ -21,7 +21,7 @@ import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.contract.knowledge.DocumentChunkingPort;
 import com.ragagent.common.knowledge.chunker.Tokens;
 import com.ragagent.contract.doc.DocReaderParsePort;
-import com.ragagent.common.knowledge.support.ParserEngineRules;
+import com.ragagent.contract.knowledge.support.ParserEngineRules;
 import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
 import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.session.domain.document.TemporaryDocument;

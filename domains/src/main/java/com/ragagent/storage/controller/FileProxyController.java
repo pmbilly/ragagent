@@ -18,7 +18,7 @@ import com.ragagent.storage.fileserve.FileProxyService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import com.ragagent.platform.web.ApiResult;
-import com.ragagent.common.storage.fileserve.FileServeHttp;
+import com.ragagent.platform.storage.fileserve.FileServeHttp;
 
 /**
  * 文件代理面的引擎级路由。

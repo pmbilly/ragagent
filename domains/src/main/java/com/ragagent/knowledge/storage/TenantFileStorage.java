@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.ragagent.common.storage.fileserve.FileTransport.OpenedFile;
+import com.ragagent.platform.storage.fileserve.FileTransport.OpenedFile;
 import com.ragagent.common.storage.fileserve.ProviderFileStorePort;
 import com.ragagent.common.storage.fileserve.StoragePaths;
 import com.ragagent.contract.error.BizException;

@@ -6,7 +6,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.common.storage.fileserve.FileTransport;
+import com.ragagent.platform.storage.fileserve.FileTransport;
 import com.ragagent.contract.storage.fileserve.StoragePathGuard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

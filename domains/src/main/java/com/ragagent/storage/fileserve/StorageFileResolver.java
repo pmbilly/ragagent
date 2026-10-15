@@ -24,7 +24,7 @@ import com.ragagent.contract.storage.StorageEnvLookup;
 import com.ragagent.storage.provider.FileService;
 import com.ragagent.storage.provider.FileServiceFactory;
 import com.ragagent.contract.tenant.StorageEngineConfig;
-import com.ragagent.common.storage.fileserve.FileTransport;
+import com.ragagent.platform.storage.fileserve.FileTransport;
 import com.ragagent.common.storage.fileserve.StoragePaths;
 import com.ragagent.common.storage.fileserve.WritableFileContentService;
 import com.ragagent.common.storage.fileserve.FileContentService;

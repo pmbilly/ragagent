@@ -15,7 +15,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.filter.OncePerRequestFilter;
-import com.ragagent.common.apikey.ApiKeyAuthPort;
+import com.ragagent.platform.apikey.ApiKeyAuthPort;
 
 /**
  * 全局认证过滤器：三通道认证链。

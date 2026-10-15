@@ -6,7 +6,7 @@ import java.io.InputStream;
 import com.ragagent.storage.provider.FileService;
 import com.ragagent.storage.provider.SeekableFileService;
 import com.ragagent.contract.storage.provider.SeekableSource;
-import com.ragagent.common.storage.fileserve.FileTransport;
+import com.ragagent.platform.storage.fileserve.FileTransport;
 import com.ragagent.common.storage.fileserve.WritableFileContentService;
 
 /**

@@ -1,4 +1,4 @@
-package com.ragagent.common.agent.tool;
+package com.ragagent.platform.tool;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

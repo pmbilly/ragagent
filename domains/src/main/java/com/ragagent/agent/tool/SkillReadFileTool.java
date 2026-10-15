@@ -12,8 +12,8 @@ import com.ragagent.agent.skills.Skill;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.contract.tool.ToolRequest;
-import com.ragagent.common.agent.tool.BaseTool;
 import com.ragagent.platform.web.JsonMappers;
+import com.ragagent.platform.tool.BaseTool;
 
 /**
  * {@code read_file}：技能资源读取（无沙箱部署下技能是唯一可读的"文件源"）。

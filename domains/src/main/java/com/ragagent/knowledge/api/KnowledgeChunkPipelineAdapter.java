@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.contract.knowledge.ChunkFacts;
-import com.ragagent.common.knowledge.KnowledgeCatalogPort;
+import com.ragagent.platform.knowledge.KnowledgeCatalogPort;
 import com.ragagent.common.knowledge.support.ChunkProjectionAdapter;
 import com.ragagent.contract.knowledge.ChunkRowView;
 

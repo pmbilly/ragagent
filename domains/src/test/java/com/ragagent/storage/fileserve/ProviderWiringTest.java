@@ -26,7 +26,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.storage.provider.FileService;
 import com.ragagent.storage.provider.SeekableFileService;
 import com.ragagent.contract.storage.provider.SeekableSource;
-import com.ragagent.common.storage.fileserve.FileTransport;
+import com.ragagent.platform.storage.fileserve.FileTransport;
 
 /**
  * 接线测试：provider 服务 → fileserve 读取面（适配器）、云 provider 分支经工厂落地、

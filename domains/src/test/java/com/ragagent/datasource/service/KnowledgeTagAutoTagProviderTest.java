@@ -11,7 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.ragagent.contract.error.BizException;
-import com.ragagent.common.knowledge.KnowledgeCatalogPort;
+import com.ragagent.platform.knowledge.KnowledgeCatalogPort;
 import com.ragagent.contract.knowledge.KnowledgeTagView;
 import com.ragagent.contract.knowledge.KnowledgeBaseRowView;
 

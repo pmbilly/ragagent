@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import com.ragagent.modelruntime.adapter.provider.chat.ImageResolver;
 import com.ragagent.storage.domain.StoredResource;
 import com.ragagent.storage.service.ResourceCatalogService;
-import com.ragagent.common.storage.fileserve.FileTransport;
+import com.ragagent.platform.storage.fileserve.FileTransport;
 import com.ragagent.common.storage.fileserve.StoragePaths;
 
 /**

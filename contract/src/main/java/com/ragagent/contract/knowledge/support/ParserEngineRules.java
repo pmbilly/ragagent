@@ -1,4 +1,4 @@
-package com.ragagent.common.knowledge.support;
+package com.ragagent.contract.knowledge.support;
 
 import java.util.Locale;
 import com.ragagent.contract.json.JsonValues;

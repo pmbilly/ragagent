@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
-import com.ragagent.common.storage.fileserve.FileProxyPort;
-import com.ragagent.common.storage.fileserve.FileServeHttp;
+import com.ragagent.platform.storage.fileserve.FileProxyPort;
+import com.ragagent.platform.storage.fileserve.FileServeHttp;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

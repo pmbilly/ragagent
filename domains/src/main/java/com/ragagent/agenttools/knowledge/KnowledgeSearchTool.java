@@ -13,7 +13,7 @@ import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ragagent.common.agent.tool.BaseTool;
+import com.ragagent.platform.tool.BaseTool;
 import com.ragagent.agent.tool.runtime.SearchAuth;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.contract.tool.ToolDefinitions;
