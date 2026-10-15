@@ -8,7 +8,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 import com.ragagent.common.session.domain.message.Message;
-import com.ragagent.session.domain.SuggestionItem;
+import com.ragagent.common.session.domain.SuggestionItem;
 import com.ragagent.common.retrieval.SearchResult;
 
 /**

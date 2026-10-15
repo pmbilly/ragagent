@@ -93,9 +93,6 @@
       "UserSessionOps",
       "WsAuthSupport"
     ],
-    "embedchannel→session": [
-      "EmbedChannelController"
-    ],
     "session→agentmanagement": [
       "AgentConfigAssembler",
       "AgentResolver",

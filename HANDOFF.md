@@ -1331,6 +1331,20 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **验证**：**13 守卫全绿** ✓（环 0 组、R9 包级 SCC 基线按提示刷新后仍 10 组、L1→域 0 条、R6 不变）；`spotlessCheck build` ✓ **1m38s** ✓；**4991 / 失败 0 / 跳过 4**（boot 1331 ✓）；dev 重启 ready ✓ + 冒烟（`/api/v1/storage-backends`、`/api/v1/knowledge-bases` 200 ✓；`/api/v1/messages/{id}/load` 业务级 404 "session not found" ✓ 路由/鉴权/新注入链路正常）
 - **A③ 累计（二十八刀）**：边 **64 → 30（−34）**、类 **317 → 195（−122）**；三档 **① 22 条 / 109 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
 - **下一步候选**：`knowledge→storage` 第三刀（余 2 类：`KnowledgeBaseFileProxyController` 需文件代理端口、`TenantFileStorage` 需 provider 存储端口）· `embedchannel→storage`（余 1 类）· **待拍板** `mcp→agent`(9) · **K 级** `im→session`(6) · `datasource→knowledge`(8) · **大块** `knowledge→model`(14) · `session→knowledge`(17) · `session→storage`(6 余)
+**🔶 A③ 第五十三刀：`embedchannel→session` 收官 ⇒ **①档清零（0 条 / 0 类）**（2026-10-15，R10 边 9 → 8、类 72 → 71）**
+- **🎯 A③ 主线达标**：`① clearable` 从基线 **64 条边 / 317 类**（起始）降到 **0 条 / 0 类**；余下为 ②owner（3 条 / 21 类，登记允许）与 ③族内（5 条 / 50 类，冻结豁免）
+- **本刀对象**：①档最后一类 `EmbedChannelController`（含其协作者 `EmbedChannelDelegateOps` 的 7 处调用）——embed 委托层原先直持**会话域 4 个控制器**（`KnowledgeQaController` / `MessageController` / `SessionController` / `MessageSuggestionController`）
+- **L1 新增 `common.session.embed.EmbedSessionPort`（7 方法）**：`knowledgeQa` / `agentQa`（SSE 直写 servlet 响应，无壳）· `loadMessages` → `ResponseEntity<List<Message>>` · `stopSession` → `ApiResponse<Void>` · `getSuggestions` / `ensureSuggestions` → `ResponseEntity<MessageSuggestionSet>` · `recordSuggestionEvent` → `ApiResponse<Void>`
+- **⭐ 设计决策：端口"带响应壳"（本刀最有价值的一条，写入方法论）**：既有端口有三种形态——① 返回 L1 载荷（`ModelCatalogPort`）② 直写 servlet 响应（`FileProxyPort` 的 `serveKbFile`）③ **返回响应壳（本刀）**。依据：L1 `common` 早已 `api(spring-web)` 且有 5 处 L1 文件在用 `org.springframework.http` ⇒ **壳可用**；而 7 个端点内部是**厚逻辑**（body 绑定 / 解析 / 执行器分发 / 资源重写 / 状态码决策），端口若"无壳"就必须在 embed 侧重建壳与状态码规则 ⇒ **逻辑重复 + 漂移风险**。带壳 ⇒ 适配器**逐参数转发**，零逻辑重复、零行为变化 ✓
+- **会话侧适配器 `session/api/EmbedSessionAdapter`**：注入 4 个控制器并逐字转发（**含两处细节保真**：建议读取固定传 `idFallback=null`（与委托层原调用一致）· `limit`/`beforeTime` 保持**原始字符串**形态不做预解析）
+- **L1 上提 3 件（建议载荷谱系，均纯）**：`MessageSuggestionSet`（含 4 个状态常量与落库隐式行为注释）· `SuggestionItem` · `SuggestionItemListTypeHandler`
+- **embedchannel 侧**：`EmbedChannelController` 的 4 个控制器字段/构造参 → 单端口（构造 −3 参）· `EmbedChannelDelegateOps` 7 处调用改 `ctrl.sessionPort.*`；**渠道策略仍留 embed 侧**（`ensureSession` 会话归属闸门 / `suppressedIfChannelOff` 渠道开关 / `fileProxyService` 文件代理）——它们是渠道语义不是会话能力
+- **验证**：**13 守卫全绿** ✓（环 0、R9 = 8 组、R8 违规 0）；`spotlessCheck build` ✓ **2m07s** ✓；**4991 / 失败 0 / 跳过 4** ✓（domains 2849 / common 250 / engine 561 / boot 1331）；定向 embedchannel/session **180 条** ✓；dev 重启 ready ✓（新端口+适配器装配通过）+ 冒烟（embed-channels / sessions / knowledge-bases / models 200 ✓；`/api/v1/embed/sessions/{id}/messages` ⇒ 401 `{"error":"embed publish token is required"}` **渠道鉴权闸门信封** ✓ 路由与过滤器链正常）
+- **A③ 累计（五十三刀）**：边 **64 → 8（−56）**、类 **317 → 71（−246）**；三档 **① 0 条 / 0 类 · ② 3 条 / 21 类 · ③ 5 条 / 50 类**
+- **①档收官后的下一步（三条线，按杠杆）**：
+  1. **K 级清单（设计先行）**：`init` 模型管理读写面（`InitResponses` 16 字段线格式 + 写面）· knowledge 写面余量（`EvaluationService` 的 `new KnowledgeBase()`/`createFromPassageSync`）· memory 抽取触发与游标载荷 · `datasource→knowledge` 余量（`MapperKnowledgeBridge` 的 mapper 直连与摄取写面）
+  2. **②owner 档（3 条 / 21 类，登记时已写明条件"读侧走 L1 端口"）**：`auth→tenant`(14) · `system→tenant`(2) · `system→auth`(5) ⇒ 按登记条件逐条核，能走端口的走端口
+  3. **③族内档（5 条 / 50 类，冻结豁免）**：`agenttools→agent`/`session→agent` 等，属家族内部面；若继续收窄需先动"族"的边界决策（**须用户拍板**）
 **🔶 A③ 第五十二刀：批 4-④ 第二阶段·会话 QA 面端口化 ⇒ `im→session` 清零（2026-10-15，R10 边 10 → 9、类 77 → 72）**
 - **读数**：**`im→session` 整条边清零** ✓（边 **10 → 9**）；类 **77 → 72（−5）**；**①档仅剩 1 条 / 1 类**（`embedchannel→session` / `EmbedChannelController`）
 - **L1 新增 2 件**：`common.session.qa.QaRequestPayload`（**11 字段**：session / query / assistantMessageId / userMessageId / agentId / agentConfig / webSearchEnabled / quotedContext / cancellationProbe / attachments / imageUrls——**字段默认值刻意与运行容器一致**：attachments=`new ArrayList<>()`、imageUrls=null）· `common.session.qa.SessionQaPort`（**6 方法**：`createMessage` / `updateMessage`（void）· `getSession` / `createSession` / `deleteSession` · `knowledgeQa` / `agentQa`）

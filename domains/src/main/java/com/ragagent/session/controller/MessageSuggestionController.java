@@ -7,7 +7,7 @@ import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.session.domain.message.MessageNotFoundException;
-import com.ragagent.session.domain.message.MessageSuggestionSet;
+import com.ragagent.common.session.domain.message.MessageSuggestionSet;
 import com.ragagent.session.domain.message.MessageSuggestionSetNotFoundException;
 import com.ragagent.session.domain.conversation.SessionNotFoundException;
 import com.ragagent.session.service.suggestion.MessageSuggestionService;

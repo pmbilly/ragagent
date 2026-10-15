@@ -11,7 +11,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ragagent.platform.persistence.DatabaseDialects;
 import com.ragagent.session.domain.message.MessageSuggestionEvent;
-import com.ragagent.session.domain.message.MessageSuggestionSet;
+import com.ragagent.common.session.domain.message.MessageSuggestionSet;
 import com.ragagent.session.domain.message.MessageSuggestionSetNotFoundException;
 import org.springframework.stereotype.Component;
 
@@ -40,7 +40,7 @@ public class MessageSuggestionRepository {
     private static final Duration LEASE_TTL = Duration.ofMinutes(3);
 
     private static final String QUESTIONS_HANDLER =
-            "com.ragagent.session.domain.SuggestionItemListTypeHandler";
+            "com.ragagent.common.session.domain.SuggestionItemListTypeHandler";
 
     private final MessageSuggestionMapper mapper;
     private final boolean postgres;

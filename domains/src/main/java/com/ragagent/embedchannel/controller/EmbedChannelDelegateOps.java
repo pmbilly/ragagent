@@ -59,11 +59,11 @@ final class EmbedChannelDelegateOps {
         ctrl.ensureSession(LogSanitizer.sanitize(sessionId));
         String patched = patchEmbedChatPayload(rawBody, ch, agentMode);
         if (agentMode && !"builtin-quick-answer".equals(ch.getAgentId())) {
-            ctrl.knowledgeQaController.agentQA(LogSanitizer.sanitize(sessionId), patched,
+            ctrl.sessionPort.agentQa(LogSanitizer.sanitize(sessionId), patched,
                     resourceUrls, response);
             return;
         }
-        ctrl.knowledgeQaController.knowledgeQA(LogSanitizer.sanitize(sessionId), patched,
+        ctrl.sessionPort.knowledgeQa(LogSanitizer.sanitize(sessionId), patched,
                 resourceUrls, response);
     }
 
@@ -131,7 +131,7 @@ final class EmbedChannelDelegateOps {
                                                     @RequestParam(name = "before_time", required = false) String beforeTime,
                                                     @RequestParam(name = "resource_urls", required = false) String resourceUrls) {
         ctrl.ensureSession(LogSanitizer.sanitize(sessionId));
-        return ctrl.messageController.loadMessages(LogSanitizer.sanitize(sessionId), limit, beforeTime,
+        return ctrl.sessionPort.loadMessages(LogSanitizer.sanitize(sessionId), limit, beforeTime,
                 resourceUrls);
     }
 
@@ -145,7 +145,7 @@ final class EmbedChannelDelegateOps {
                                   @RequestBody(required = false)
                                   StopSessionRequest body) {
         ctrl.ensureSession(LogSanitizer.sanitize(sessionId));
-        return ctrl.sessionController.stopSession(LogSanitizer.sanitize(sessionId), body);
+        return ctrl.sessionPort.stopSession(LogSanitizer.sanitize(sessionId), body);
     }
 
     /** 建议读取：channel 级 suppressed 分支优先于委托。 */
@@ -157,7 +157,7 @@ final class EmbedChannelDelegateOps {
         if (suppressed != null) {
             return suppressed;
         }
-        return ctrl.suggestionController.get(LogSanitizer.sanitize(sessionId), null,
+        return ctrl.sessionPort.getSuggestions(LogSanitizer.sanitize(sessionId),
                 LogSanitizer.sanitize(messageId));
     }
 
@@ -171,7 +171,7 @@ final class EmbedChannelDelegateOps {
         if (suppressed != null) {
             return suppressed;
         }
-        return ctrl.suggestionController.ensure(LogSanitizer.sanitize(sessionId),
+        return ctrl.sessionPort.ensureSuggestions(LogSanitizer.sanitize(sessionId),
                 LogSanitizer.sanitize(messageId), rawBody);
     }
 
@@ -179,7 +179,7 @@ final class EmbedChannelDelegateOps {
     public ApiResponse<Void> suggestionEvents(@PathVariable("sessionId") String sessionId,
                                               @RequestBody(required = false) String rawBody) {
         ctrl.ensureSession(LogSanitizer.sanitize(sessionId));
-        return ctrl.suggestionController.recordEvent(LogSanitizer.sanitize(sessionId), rawBody);
+        return ctrl.sessionPort.recordSuggestionEvent(LogSanitizer.sanitize(sessionId), rawBody);
     }
 
     /**

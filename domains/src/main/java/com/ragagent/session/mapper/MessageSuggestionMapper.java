@@ -2,7 +2,7 @@ package com.ragagent.session.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ragagent.session.domain.message.MessageSuggestionEvent;
-import com.ragagent.session.domain.message.MessageSuggestionSet;
+import com.ragagent.common.session.domain.message.MessageSuggestionSet;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -31,7 +31,7 @@ public interface MessageSuggestionMapper extends BaseMapper<MessageSuggestionSet
             + "VALUES (#{s.id}, #{s.tenantId}, #{s.sessionId}, #{s.assistantMessageId}, "
             + "        #{s.agentId}, #{s.agentTenantId}, #{s.placement}, #{s.configHash}, "
             + "        #{s.locale}, #{s.status}, #{s.allowRegenerate}, #{s.suppressionReason}, "
-            + "        #{s.questions, typeHandler=com.ragagent.session.domain.SuggestionItemListTypeHandler, "
+            + "        #{s.questions, typeHandler=com.ragagent.common.session.domain.SuggestionItemListTypeHandler, "
             + "         jdbcType=OTHER}, "
             + "        #{s.modelId}, #{s.promptTokens}, #{s.completionTokens}, #{s.latencyMs}, "
             + "        #{s.errorCode}, #{s.leaseUntil}, #{s.generatedAt}, "
@@ -48,7 +48,7 @@ public interface MessageSuggestionMapper extends BaseMapper<MessageSuggestionSet
             + "SELECT #{s.id}, #{s.tenantId}, #{s.sessionId}, #{s.assistantMessageId}, "
             + "       #{s.agentId}, #{s.agentTenantId}, #{s.placement}, #{s.configHash}, "
             + "       #{s.locale}, #{s.status}, #{s.allowRegenerate}, #{s.suppressionReason}, "
-            + "       #{s.questions, typeHandler=com.ragagent.session.domain.SuggestionItemListTypeHandler, "
+            + "       #{s.questions, typeHandler=com.ragagent.common.session.domain.SuggestionItemListTypeHandler, "
             + "        jdbcType=OTHER}, "
             + "       #{s.modelId}, #{s.promptTokens}, #{s.completionTokens}, #{s.latencyMs}, "
             + "       #{s.errorCode}, #{s.leaseUntil}, #{s.generatedAt}, "

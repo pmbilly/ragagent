@@ -18,9 +18,6 @@ import com.ragagent.embedchannel.EmbedTokens;
 import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 import com.ragagent.embedchannel.controller.filter.EmbedAuthFilter;
 import com.ragagent.embedchannel.service.EmbedChannelService;
-import com.ragagent.session.controller.MessageController;
-import com.ragagent.session.controller.MessageSuggestionController;
-import com.ragagent.session.controller.SessionController;
 import com.ragagent.common.storage.support.StorageUrlContext;
 
 import org.springframework.http.ResponseEntity;
@@ -33,13 +30,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.ragagent.contract.tenant.TenantRole;
-import com.ragagent.session.controller.KnowledgeQaController;
 import com.ragagent.common.session.domain.message.Message;
 import com.ragagent.common.session.dto.StopSessionRequest;
 import com.ragagent.common.storage.fileserve.FileProxyPort;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.contract.error.AppError;
+import com.ragagent.common.session.embed.EmbedSessionPort;
 
 /**
  * embed 渠道 HTTP 层（管理面/公开面路由）。
@@ -74,12 +71,10 @@ public class EmbedChannelController {
 static final ObjectMapper MAPPER = JsonMappers.lenient();
     final EmbedChannelService service;
     final EmbedSessionOps embedSessionOps;
-    final MessageController messageController;
-    final SessionController sessionController;
-    final MessageSuggestionController suggestionController;
+    /** 会话对外操作面（L1 端口；实现由 session 提供）。 */
+    final EmbedSessionPort sessionPort;
     /** MCP OAuth 授权与工具审批解析（L1 端口；实现由 mcp 提供）。 */
     final McpApprovalOps mcpApprovalOps;
-final KnowledgeQaController knowledgeQaController;
 final FileProxyPort fileProxyService;
 
     /** 管理面协作者。 */
@@ -93,19 +88,13 @@ final FileProxyPort fileProxyService;
 
     public EmbedChannelController(EmbedChannelService service,
                                   EmbedSessionOps embedSessionOps,
-                                  MessageController messageController,
-                                  SessionController sessionController,
-                                  MessageSuggestionController suggestionController,
+                                  EmbedSessionPort sessionPort,
                                   McpApprovalOps mcpApprovalOps,
-                                  KnowledgeQaController knowledgeQaController,
                                   FileProxyPort fileProxyService) {
         this.service = service;
         this.embedSessionOps = embedSessionOps;
-        this.messageController = messageController;
-        this.sessionController = sessionController;
-        this.suggestionController = suggestionController;
+        this.sessionPort = sessionPort;
         this.mcpApprovalOps = mcpApprovalOps;
-        this.knowledgeQaController = knowledgeQaController;
         this.fileProxyService = fileProxyService;
         this.mgmtOps = new EmbedChannelMgmtOps(this);
         this.publicOps = new EmbedChannelPublicOps(this);
