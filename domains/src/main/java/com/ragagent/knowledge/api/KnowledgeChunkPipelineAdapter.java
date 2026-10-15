@@ -9,7 +9,7 @@ import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.common.knowledge.support.ChunkProjectionAdapter;
-import com.ragagent.common.knowledge.ChunkRowView;
+import com.ragagent.contract.knowledge.ChunkRowView;
 
 /**
  * {@link PipelinePorts.ChunkRepository}（管线面）的 knowledge 域实现：

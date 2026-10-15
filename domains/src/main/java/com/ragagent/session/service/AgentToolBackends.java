@@ -44,10 +44,10 @@ import com.ragagent.contract.memory.MemorySearchPort;
 import com.ragagent.session.domain.message.MessageSearchGroupItem;
 import com.ragagent.session.domain.message.MessageSearchResult;
 import com.ragagent.common.settings.ConversationProperties;
-import com.ragagent.common.knowledge.ChunkRowView;
+import com.ragagent.contract.knowledge.ChunkRowView;
 
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
-import com.ragagent.common.knowledge.ChunkPageView;
+import com.ragagent.contract.knowledge.ChunkPageView;
 import com.ragagent.rerank.Reranker;
 import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.common.wiki.WikiPageOpsPort;

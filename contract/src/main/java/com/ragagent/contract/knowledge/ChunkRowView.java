@@ -1,9 +1,7 @@
-package com.ragagent.common.knowledge;
+package com.ragagent.contract.knowledge;
 
 import java.time.OffsetDateTime;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * 知识分块**行视图**（L1）：{@code KnowledgeCatalogPort} 分块面与 embed 公开分块响应（{@code /chunk}）的载荷。
@@ -29,7 +27,7 @@ public class ChunkRowView {
     private String tagId;
     private String content;
 
-    @JsonIgnore
+    /** **非 getter 访问器**（sourceContentValue()）⇒ 等价原 {@code @JsonIgnore}（默认只序列化 getter 命名）。 */
     private String sourceContent;
     private int contentRevision;
     private String indexStatus = "ready";
@@ -44,13 +42,16 @@ public class ChunkRowView {
     private String nextChunkId;
     private String chunkType = "text";
     private String parentChunkId;
-    private JsonNode relationChunks;
-    private JsonNode indirectRelationChunks;
-    private JsonNode metadata;
+    /** jsonb 原样（对象/数组/标量；null 表示无）。 */
+    private Object relationChunks;
+    /** jsonb 原样（对象/数组/标量；null 表示无）。 */
+    private Object indirectRelationChunks;
+    /** jsonb 原样（对象/数组/标量；null 表示无）。 */
+    private Object metadata;
     private String contentHash;
     private String imageInfo;
 
-    @JsonIgnore
+    /** **非 getter 访问器**（contextHeaderValue()）⇒ 等价原 {@code @JsonIgnore}（默认只序列化 getter 命名）。 */
     private String contextHeader;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
@@ -76,9 +77,9 @@ public class ChunkRowView {
     public String getNextChunkId() { return nextChunkId == null ? "" : nextChunkId; }
     public String getChunkType() { return chunkType; }
     public String getParentChunkId() { return parentChunkId == null ? "" : parentChunkId; }
-    public JsonNode getRelationChunks() { return relationChunks; }
-    public JsonNode getIndirectRelationChunks() { return indirectRelationChunks; }
-    public JsonNode getMetadata() { return metadata; }
+    public Object getRelationChunks() { return relationChunks; }
+    public Object getIndirectRelationChunks() { return indirectRelationChunks; }
+    public Object getMetadata() { return metadata; }
     public String getContentHash() { return contentHash == null ? "" : contentHash; }
     public String getImageInfo() { return imageInfo == null ? "" : imageInfo; }
     public OffsetDateTime getCreatedAt() { return createdAt; }
@@ -104,20 +105,20 @@ public class ChunkRowView {
     public void setNextChunkId(String v) { nextChunkId = v; }
     public void setChunkType(String v) { chunkType = v == null ? "text" : v; }
     public void setParentChunkId(String v) { parentChunkId = v; }
-    public void setRelationChunks(JsonNode v) { relationChunks = v; }
-    public void setIndirectRelationChunks(JsonNode v) { indirectRelationChunks = v; }
-    public void setMetadata(JsonNode v) { metadata = v; }
+    public void setRelationChunks(Object v) { relationChunks = v; }
+    public void setIndirectRelationChunks(Object v) { indirectRelationChunks = v; }
+    public void setMetadata(Object v) { metadata = v; }
     public void setContentHash(String v) { contentHash = v; }
     public void setImageInfo(String v) { imageInfo = v; }
     public void setCreatedAt(OffsetDateTime v) { createdAt = v; }
     public void setUpdatedAt(OffsetDateTime v) { updatedAt = v; }
     public void setDeletedAt(OffsetDateTime v) { deletedAt = v; }
 
-    public String getSourceContent() { return sourceContent; }
+    public String sourceContentValue() { return sourceContent; }
 
-    public void setSourceContent(String v) { sourceContent = v; }
+    public void setSourceContentValue(String v) { sourceContent = v; }
 
-    public String getContextHeader() { return contextHeader; }
+    public String contextHeaderValue() { return contextHeader; }
 
-    public void setContextHeader(String v) { contextHeader = v; }
+    public void setContextHeaderValue(String v) { contextHeader = v; }
 }

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.contract.knowledge.ChunkView;
-import com.ragagent.common.knowledge.ChunkRowView;
+import com.ragagent.contract.knowledge.ChunkRowView;
 
 /**
  * chunk 实体 → L1 载荷（{@link ChunkFacts} / {@link ChunkView}）的**域内公用投影**。

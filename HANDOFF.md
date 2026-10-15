@@ -1741,6 +1741,15 @@ public interface AdminUserPort {
 - **读数**：C2 实体保持 **13**；C4 基线 **31**；**14 守卫全绿**（run-guards 标签已更到 C1/C2/C3/C4）
 - **验证**：`spotlessCheck build` ✓ **2m12s** ✓；**4991 / 失败 0 / 跳过 4** ✓；dev 重启 ready ✓ + 冒烟（KB/models/sessions 200 ✓；`/api/v1/knowledge-bases/{id}/tags` ⇒ 404 + 标准信封 ✓——正是经 `:contract` 视图的链路）
 - **下一步（继续 C）**：次批候选按筛表——`MessageSuggestionSet`(2) / `WikiPageIssue`(4) / `StorageBackend`(8) / `WikiPage`(7)；**新视图一律落 `:contract`**
+**🔶 G1-b-4·`ChunkRowView` + `ChunkPageView` 入 `contract.knowledge`（**embed 公开 API 金片护航**）（2026-10-15）**
+- **对象**：`ChunkRowView`（30 字段 / **3 个 JsonNode** / **2 个 `@JsonIgnore`**（`sourceContent`/`contextHeader`））+ `ChunkPageView`（分页包装）
+- **关键风险与对策**：该视图**就是 embed 公开 API 的响应体**（`ResponseEntity.ok(chunk)`），且有 **`emb-pub-chunk-ok.json` 金片** ⇒ 逐个字段保等价：
+  1. 3 个 JsonNode → `Object`（边界转换，键序保留 ⇒ 字节一致 ✓）
+  2. 两个 `@JsonIgnore` 字段 ⇒ **非 getter 访问器**（`sourceContentValue()`/`setSourceContentValue(...)`）**等价表达**（Jackson 默认只序列化 getter 命名 ⇒ 序列化/反序列化双向不出面 ✓）
+- **动作**：① 转换 + 忽略字段改名 ② `git mv` → `contract.knowledge` ③ **同包引用者补 import**（本批自动化：脚本先"补同包引用者 import"再编译 ⇒ 未再靠编译暴露）④ 域内映射器 `ChunkRowViews` 双向转换 + 忽略字段改名 ⑤ **其余零改动**（3 个 JsonNode 的消费者全部操作实体 ⇒ 无消费侧还原）
+- **读数**：`:contract` 186 → **188**；`common/*` 107 → **105**；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
+- **验证**：**14 守卫全绿**；**1349 金片签名一致** ✓ + **`EmbedContractTest` 通过** ✓✓（**公开 API JSON 逐字节不变**）；`spotlessCheck build` **2m14s**；**4991 / 失败 0 / 跳过 4**；五模块编译全绿
+- **G1-b 进度**：**7/12 完成**；**余 5 件（都是"有耦合"的）**：`KnowledgeRowView`（4 JsonNode；`customMetadata` 2 处内容读取）· `KnowledgeBaseRowView`（5 JsonNode + **4 个 L1 config 类型**（G1-h）⇒ 需把 config 类型一并入 contract——**实体可引契约 ✓ 一并解 G1-h**）· `WikiPageView`（1 JsonNode + **6 个 `@JsonSerialize`**（空列表→null）⇒ 需"生产者置 null"等价替换）· `AdminUserView`+`AdminUserPort`（`UserPreferences` 是 **Jackson 注解类型**（`@JsonIgnoreProperties`/`@JsonInclude`）⇒ 去注解须证 JSON 等价）
 **🔶 G1-b-3·`ChunkFacts` + `KnowledgeDocumentFacts` + `KnowledgeBaseView` 三件入 `contract.knowledge`（2026-10-15）**
 - **三件一并**（都是"检索/装配事实"类载荷）：`ChunkFacts`（record，17 组件含 2 个 JsonNode）· `KnowledgeDocumentFacts`（record，11 组件含 1）· `KnowledgeBaseView`（class，15 字段含 2）
 - **动作**：① 三件 `JsonNode` → `Object`（record 组件 / class 字段）② `git mv` → `contract.knowledge` ③ **补"原同包引用者"的 import**（`ChunkSearchGateway`/`KnowledgeDocumentGateway`/`KnowledgeBaseLookup` 三个 L1 文件——**该坑第 8 次**，本次同样由编译暴露后批量补齐）④ **消费侧还原**共 9 处（engine 5：`PluginExtractEntity`/`PluginMerge`/`PluginSearchEntity`(2)/`HybridFusionOps`/`HybridResultOps`(2)；domains 2：`FaqSnippet`/`WikiIngestBatchHandler`）——统一用 `JsonMappers.toJsonNode(...)`（**null 保持 null** ✓，与 G1-b-2 修好的语义一致；`PluginSearchEntity` 的多处读取改为一次局部还原）
@@ -2699,7 +2708,7 @@ public interface AdminUserPort {
 
 | 目标模块 | 实际 | 差距 |
 |---|---|---|
-| `contracts` | `:contract` **186 件** ✅ 已独立（G1-b-3 后） | 包覆盖：方案 **25** 包 vs 实际 **20** ⇒ 缺 `access` · `execution` · `integration` · `parsing` · `settings` · `task`；多 `auth` · `doc` · `text` |
+| `contracts` | `:contract` **188 件** ✅ 已独立（G1-b-4 后） | 包覆盖：方案 **25** 包 vs 实际 **20** ⇒ 缺 `access` · `execution` · `integration` · `parsing` · `settings` · `task`；多 `auth` · `doc` · `text` |
 | `platform` | `com.ragagent.platform.*` **139 件仍在 `:common`** | **未独立成模块**；包覆盖：方案 **23** vs 实际 **15** ⇒ 缺 `execution` · `outbox` · `parsing` · `storage.config` · `storage.provider` · `tracing.decorators` · `tracing.langfuse` · `transaction` · `web.error` · `web.health`；多 `redis` · `tracing` |
 | `agent-engine` · `retrieval-engine` · `model-runtime` | `:engine` **318 件 / 9 顶层包**（chatpipeline · embedding · llm · modelcontext · modelruntime · rerank · retrieval · tracing · webfetch） | 未拆分（**条件触发**项） |
 | `domains` | `:domains` **1343 件** | 域间边 **7 条**（①clearable **0** / ②owner 2 / ③族内 5）；域布局抽样见 C |
@@ -2714,7 +2723,7 @@ public interface AdminUserPort {
 | `:common` 载荷型 | **14 待归位** + 7 platform 面登记 + 3 待去 Jackson | C4 |
 | `:common` 受控依赖根 | 10 根 / 61 文件 | C1 |
 | `:contract` **误搬件** | **8 → 3**（D0a/D0b 已归位 5 件）（D0a/D0b 已归位 5 件；余 3 件 `KnowledgeBase*Config` 实体耦合，见 G1-h） | **待加 C5/C6** |
-| `:common` 规模 | **247 件** = `common/*` **107** + `platform/*` 139 + `event/*` 1（G1-b-3 后） | — |
+| `:common` 规模 | **245 件** = `common/*` **105** + `platform/*` 139 + `event/*` 1（G1-b-4 后） | — |
 
 **C. 域布局抽样（以方案 §8.8.2 `knowledge/` 为范本）**
 

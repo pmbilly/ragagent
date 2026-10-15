@@ -19,7 +19,7 @@ import com.ragagent.embedchannel.EmbedError;
 import com.ragagent.embedchannel.EmbedTokens;
 import com.ragagent.embedchannel.domain.EmbedChannelEntity;
 import com.ragagent.embedchannel.mapper.EmbedChannelMapper;
-import com.ragagent.common.knowledge.ChunkRowView;
+import com.ragagent.contract.knowledge.ChunkRowView;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 
 /**

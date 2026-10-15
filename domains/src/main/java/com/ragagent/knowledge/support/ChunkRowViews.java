@@ -3,10 +3,11 @@ package com.ragagent.knowledge.support;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ragagent.common.knowledge.ChunkPageView;
-import com.ragagent.common.knowledge.ChunkRowView;
+import com.ragagent.contract.knowledge.ChunkPageView;
+import com.ragagent.contract.knowledge.ChunkRowView;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ChunkPage;
+import com.ragagent.platform.web.JsonMappers;
 
 /**
  * 分块实体 → 行视图的**域内单一映射**（供知识域的三个端口适配器与仓储共用）。
@@ -32,7 +33,7 @@ public final class ChunkRowViews {
         v.setKnowledgeBaseId(c.getKnowledgeBaseId());
         v.setTagId(c.getTagId());
         v.setContent(c.getContent());
-        v.setSourceContent(c.getSourceContent());
+        v.setSourceContentValue(c.getSourceContent());
         v.setContentRevision(c.getContentRevision());
         v.setIndexStatus(c.getIndexStatus());
         v.setLastEditorId(c.getLastEditorId());
@@ -46,12 +47,12 @@ public final class ChunkRowViews {
         v.setNextChunkId(c.getNextChunkId());
         v.setChunkType(c.getChunkType());
         v.setParentChunkId(c.getParentChunkId());
-        v.setRelationChunks(c.getRelationChunks());
-        v.setIndirectRelationChunks(c.getIndirectRelationChunks());
-        v.setMetadata(c.getMetadata());
+        v.setRelationChunks(JsonMappers.toJavaValue(c.getRelationChunks()));
+        v.setIndirectRelationChunks(JsonMappers.toJavaValue(c.getIndirectRelationChunks()));
+        v.setMetadata(JsonMappers.toJavaValue(c.getMetadata()));
         v.setContentHash(c.getContentHash());
         v.setImageInfo(c.getImageInfo());
-        v.setContextHeader(c.getContextHeader());
+        v.setContextHeaderValue(c.getContextHeader());
         v.setCreatedAt(c.getCreatedAt());
         v.setUpdatedAt(c.getUpdatedAt());
         v.setDeletedAt(c.getDeletedAt());

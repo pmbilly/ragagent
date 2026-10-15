@@ -27,7 +27,7 @@ import com.ragagent.rerank.Reranker;
 import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.contract.retrieval.ChunkTypes;
 import com.ragagent.contract.knowledge.ChunkFacts;
-import com.ragagent.common.knowledge.ChunkPageView;
+import com.ragagent.contract.knowledge.ChunkPageView;
 import com.ragagent.common.knowledge.KnowledgeBaseRowView;
 import com.ragagent.common.knowledge.KnowledgeRowView;
 
