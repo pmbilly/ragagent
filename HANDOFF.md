@@ -1331,6 +1331,36 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **验证**：**13 守卫全绿** ✓（环 0 组、R9 包级 SCC 基线按提示刷新后仍 10 组、L1→域 0 条、R6 不变）；`spotlessCheck build` ✓ **1m38s** ✓；**4991 / 失败 0 / 跳过 4**（boot 1331 ✓）；dev 重启 ready ✓ + 冒烟（`/api/v1/storage-backends`、`/api/v1/knowledge-bases` 200 ✓；`/api/v1/messages/{id}/load` 业务级 404 "session not found" ✓ 路由/鉴权/新注入链路正常）
 - **A③ 累计（二十八刀）**：边 **64 → 30（−34）**、类 **317 → 195（−122）**；三档 **① 22 条 / 109 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
 - **下一步候选**：`knowledge→storage` 第三刀（余 2 类：`KnowledgeBaseFileProxyController` 需文件代理端口、`TenantFileStorage` 需 provider 存储端口）· `embedchannel→storage`（余 1 类）· **待拍板** `mcp→agent`(9) · **K 级** `im→session`(6) · `datasource→knowledge`(8) · **大块** `knowledge→model`(14) · `session→knowledge`(17) · `session→storage`(6 余)
+**🔶 A③ 第四十五刀（批 3 前半④）：wiki 实体闭包上提 L1 + 页读写端口 ⇒ `session→wiki` 清零（2026-10-15，R10 边 16 → 15、类 108 → 106）**
+- **实体闭包 10 文件入 L1 `common.wiki.domain`**（同包裸名依赖链逐类核完）：`WikiPage`/`WikiPageIssue`/`WikiPageNotFoundException`（连带 `WikiException` 基类——异常上提镜像 ㊵ 的 `DuplicateKnowledgeException` 做法不成立，NotFound 由会话接缝 catch ⇒ 必须上提；`WikiException` 其余 5 个子类留域内、改 import 即可）· `WikiIndex`（纯载荷）· `WikiIndexEntry`/`WikiCategoryPaths`/`WikiConstants`（JDK 纯链）/`WikiStringListTypeHandler`（MyBatis+Jackson+platform.web）/`EmptyListAsNullSerializer`——FQN 换锚 50+ 文件
+- **⚠️ 三类非常规引用点（换锚脚本的盲区，逐一扫净）**：① **MyBatis SQL 字符串里的 `typeHandler=<FQN>`**（`WikiPageMapper`/`WikiPageRevisionMapper` 共 16 处——**运行期按 FQN 解析、编译不报**，不修就是写路径运行时炸）；② **javadoc 全限定 `{@link}`**（无分号形态，import 粒度替换扫不到 ⇒ javadoc 任务必红，刀14/35 的教训第 3 次显形）；③ **同包自 import**（闭包互引搬迁后成同包，spotless 抓）
+- **L1 新增**：`common.wiki.WikiPageOpsPort`（13 方法：页 CRUD 5 + 修复/注入/重建 3 + issue 3 + 搜索/索引概览 2；**editSource 归因参数化**——`WikiEditContext.callWith/runWith` 收进适配器，会话侧的逐调用传递语义不变）+ `WikiLinkRepairResult`（域内嵌套 record 的 L1 影子）+ package-info；`wiki/api/WikiPageOpsAdapter`
+- **session 2 类脱边**：`AgentToolWikiBackends`（`WikiPageService` → 端口；NotFound→null / 三处视图转换 / RFC3339 时间文本逐字保留）· `AgentToolBackends`（注入换端口）
+- **测试随行**：boot 契约测试 `AgentToolBackendsWikiTest` 走真实服务栈（H2）端到端不变 ✓（FQN 换锚脚本顺带改完，零手工）；`WikiDomainTest` 混合测试留 domains 补 L1 import（判据：仍依赖未上提域类型就不迁）
+- **验证**：**13 守卫全绿** ✓；`spotlessCheck build` ✓ **1m52s** ✓；**4991 / 失败 0 / 跳过 4** ✓；dev 重启 ready ✓ + 冒烟（八路由 200 ✓、datasource 400 业务信封与 ㊵ 记录一致 ✓、evaluation 1007 业务信封 ✓ 新构造链路装配正常）
+- **A③ 累计（四十五刀）**：边 **64 → 15（−49）**、类 **317 → 106（−211）**；三档 **① 7 条 / 30 类 · ② 3 条 / 21 类 · ③ 5 条 / 55 类**
+**🔶 A③ 第四十四刀（批 3 前半③）：MCP 按需目录注册端口化 ⇒ `session→mcp` 清零（2026-10-15，R10 边 17 → 16、类 110 → 108）**
+- **L1 判断**：端口落 **engine `chatpipeline.spi`** 而非 L1——签名引 `ToolRegistryPort`/`McpToolingGateway` 引擎 SPI，L1 看不到（刀35 同判据）；**审批门不进端口签名**，由 mcp 适配器自行注入 ⇒ 会话链路顺带 shed 掉 `ToolApprovalGate` 透传（装配器里它本就只喂 mcp 块）
+- **新增**：`chatpipeline.spi.McpToolRegistrationPort`（`createTooling` + `registerOnDemandTools`）；`mcp/api/McpToolRegistrationAdapter`——注册编排（列表→启用过滤→按需暴露）逐字保留，含各分支日志文案与 `hasToolExecContext=false` 备案注释
+- **session 2 类脱边**：`AgentEngineAssembler`（−3 mcp 字段/参数 + −toolApprovalGate；`new McpTooling` → `createTooling`；私有 `registerMcpTools` 只留 agent 配置侧裁剪——模式归一化、`none`/空清单短路——后委托）；`SessionAgentQaService`（**4 个纯透传参数全删**，mcp import 清零——盘点的"纯透传"判据省了半刀）
+- **读数**：**`session→mcp` 整条边清零** ✓（边 **17 → 16**）；①档 8 条 / 32 类
+- **验证**：**13 守卫全绿** ✓；`spotlessCheck build` ✓ **1m54s** ✓；**4991 / 失败 0 / 跳过 4** ✓
+- **A③ 累计（四十四刀）**：边 **64 → 16（−48）**、类 **317 → 108（−209）**；三档 **① 8 条 / 32 类 · ② 3 条 / 21 类 · ③ 5 条 / 55 类**
+**🔶 A③ 第四十三刀（批 3 前半②）：websearch 双面适配器 + 支撑端口 ⇒ `session→websearch` 清零（2026-10-15，R10 边 18 → 17、类 114 → 110、A16 基线 54 → 52）**
+- **同源双面**：`websearch/api/WebSearchBackendsAdapter` 同时实现 **`WebSearchExecutor`**（engine 新 SPI，工具面；出入参都是引擎词汇 ⇒ L1 放不下）与 **`PipelinePorts.WebSearch`**（管线面）——`toServiceConfig` 自 `AgentToolBackends`、`from()`+当前租户补 0 自 `QaWiring` 原样搬入；`QaWiring` 的 `qaPipelineWebSearch` bean 删除，适配器按类型注入顶上
+- **L1 新增 `common/websearch` 包**：`WebSearchProviderPort`（`findDefaultProviderId`——循环判据逐字搬入适配器）+ `WebSearchTempStatePort`（`deleteTempKbState`）
+- **session 4 类脱边**：`AgentToolBackends`（`webSearchBackend()` 改方法引用委托，签名与端口逐参一致）· `QaWiring` · `SessionKnowledgeQaService`+`QaWebSearchParams`（**mapper 直连 → 端口**）· `SessionService`
+- **⚠️ A16 棘轮顺带收紧**：`QaWebSearchParams` / `SessionKnowledgeQaService` 两条不再违例 ⇒ 按守卫提示删除（**基线 54 → 52，真实结构改善**；㊷ 提交信息里误写"A16 41→39"是把结项对账的 A17=41 安错域，以本记录为准）
+- **⚠️ EmbedRateLimiterTest 全量并行下 Redis 连接失败 1 次**：刀41 已登记的并行 Lettuce 竞争，单跑绿 ✓ 非本批回归
+- **验证**：**13 守卫全绿** ✓；`spotlessCheck build` ✓ **1m43s** ✓；**4991 / 失败 0 / 跳过 4** ✓
+- **A③ 累计（四十三刀）**：边 **64 → 17（−47）**、类 **317 → 110（−207）**；三档 **① 9 条 / 34 类 · ② 3 条 / 21 类 · ③ 5 条 / 55 类**
+**🔶 A③ 第四十二刀（批 3 前半①）：`embedchannel→knowledge` + `evaluation→session` 双清（2026-10-15，R10 边 20 → 18、类 116 → 114）**
+- **`KnowledgeCatalogPort` 扩 1 方法**：`getChunkByIdOnly`（无租户过滤、权限解析用；`Chunk` ㊶ 已在 L1，端口直接搬运）——`KnowledgeCatalogAdapter` 补 `ChunkRepository` 注入逐字转发；`EmbedChannelService` 的 `embedChunk` 权限裁决（白名单校验 + catch RuntimeException 兜 not-found）留在域侧
+- **engine 新 SPI `chatpipeline.spi.KnowledgeQaEventPort`**：入参 `ChatManage` 是 engine 类型 ⇒ L1 放不下（刀36 同判据）；`session/api/KnowledgeQaEventAdapter` 逐字转发；`EvaluationService` 的 `knowledgeQAByEvent` 单点调用换端口
+- **读数**：**两条边同时清零** ✓（边 **20 → 18**）；①档 12 → 10 条 / 38 类
+- **验证**：**13 守卫全绿** ✓；`spotlessCheck build` ✓ **1m59s** ✓；**4991 / 失败 0 / 跳过 4** ✓
+- **A③ 累计（四十二刀）**：边 **64 → 18（−46）**、类 **317 → 114（−203）**；三档 **① 10 条 / 38 类 · ② 3 条 / 21 类 · ③ 5 条 / 55 类**
+- **批 3 前半收官（四刀同日，机制沿用：一次全档盘点 + 按承载面打包 + 批内先跑守卫）**：①档 **12 → 7 条 / 40 → 30 类**；**下一步（①档 7 条）**：`session→memory`(7，需"memory 抽取触发"端口 + 游标载荷设计) · `session→knowledge`(6，余 `ChunkRepository` 直连 3 类 + `TenantFileStorage`/`LocalStorageService` bean 两件) · `datasource→knowledge`(2，`MapperKnowledgeBridge` 重) · `im→session`(6 K) / `embedchannel→session`(2 K) / `initialization→knowledge`(3 K) / `initialization→model`(4 K，**K-模型管理读写面待拍板**)
 **🔶 A③ 第四十一刀：批 2·D 项 ⇒ chunker/支持面上提 + `evaluation→knowledge` 清零（2026-10-15，R10 边 21 → 20、类 121 → 116）**
 - **D 项纯度测量先行**（10 个候选件逐一核）：**全纯可上提 14 件**——`Chunk`/`KnowledgeTag`（实体，依赖仅 `PgJsonTypeHandler`）· **chunker 全家 14 件**（`Chunker`/`ParsedChunk`/`SplitterConfig`/`Tokens` + 首轮编译暴露的 10 个同包兄弟：`DocumentProfiler`/`ChunkValidator`/`CodePoints`/`HeadingSplitter` 等——**"同包裸名依赖链"判据的第二次实战**）· `ParserEngineRules` · `KnowledgeTaskIdCodec` · `ChunkProjectionAdapter`/`KnowledgeProjectionAdapter`（静态工具类）；**bean 两件不迁**（`LocalStorageService`/`TenantFileStorage` 是 @Service ⇒ R6 棘轮管着，留待端口设计）
 - **读数**：**`evaluation→knowledge` 整条边清零** ✓（边 **21 → 20**）；`embedchannel→knowledge` 2 → 1、`session→knowledge` 11 → 9；类 **121 → 116（−5）**；①档 **12 条 / 40 类**
