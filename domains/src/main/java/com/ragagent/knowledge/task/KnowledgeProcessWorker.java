@@ -53,8 +53,8 @@ import com.ragagent.contract.wiki.WikiFinalizePort;
 import com.ragagent.contract.wiki.WikiIngestPort;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.access.TenantScopes;
-import com.ragagent.common.model.ModelCatalogPort;
-import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.model.ModelCatalogPort;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.common.knowledge.task.KnowledgeProcessingQueue;
 
 /**

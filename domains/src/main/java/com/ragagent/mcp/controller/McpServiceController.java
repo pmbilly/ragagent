@@ -22,7 +22,7 @@ import com.ragagent.mcp.service.McpMetadataException;
 import com.ragagent.mcp.service.McpMetadataService;
 import com.ragagent.mcp.service.McpServiceManagement;
 import com.ragagent.mcp.service.McpToolApprovalService;
-import com.ragagent.common.model.ModelCatalogPort;
+import com.ragagent.contract.model.ModelCatalogPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;

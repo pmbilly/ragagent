@@ -38,8 +38,8 @@ import com.ragagent.session.repository.SessionRepository;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.common.session.domain.conversation.SessionLastRequestState;
 import com.ragagent.contract.websearch.WebSearchTempStatePort;
-import com.ragagent.common.model.ModelCatalogPort;
-import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.model.ModelCatalogPort;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 
 /**
  * 会话 service：读路径（{@link #getSession(String)} / {@link #getOwnedSession(String)} /

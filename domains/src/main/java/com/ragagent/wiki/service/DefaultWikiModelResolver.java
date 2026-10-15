@@ -3,9 +3,9 @@ package com.ragagent.wiki.service;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
-import com.ragagent.common.model.ModelCatalogPort;
-import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
-import com.ragagent.common.model.ModelParameters;
+import com.ragagent.contract.model.ModelCatalogPort;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.contract.knowledge.EmbeddingModelPort;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.llm.domain.ChatConfig;

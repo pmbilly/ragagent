@@ -2,7 +2,7 @@ package com.ragagent.memory.service;
 
 import java.util.List;
 
-import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.llm.LlmChatClient;
 
 /**

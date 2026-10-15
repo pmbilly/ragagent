@@ -16,9 +16,9 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import com.ragagent.contract.error.BizException;
-import com.ragagent.common.model.Model;
 import com.ragagent.model.service.ModelRuntimeConfigs;
 import com.ragagent.model.service.ModelRowViews;
+import com.ragagent.model.domain.Model;
 
 /**
  * 厂商注册表 / URL 探测 / 按类型列出 / 厂商校验的单元测试。

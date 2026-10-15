@@ -1,9 +1,9 @@
-package com.ragagent.common.model;
+package com.ragagent.contract.model;
 
 import java.util.List;
 
 /**
- * 模型目录读面（L1）：跨域消费方按 id / 全量取"模型行"，不 import model 域实现。
+ * 模型目录读面（契约面）：跨域消费方按 id / 全量取"模型行"，不 import model 域实现。
  *
  * <p><b>为什么是端口</b>：mcp 的模型选用与运行时配置组装此前直连 model 域的
  * {@code ModelService}（域服务 ✗）并把 {@code Model} 实体当跨域视图传递（实体出域 ✗）。
@@ -38,17 +38,17 @@ public interface ModelCatalogPort {
 
     // ── 管理写面（初始化向导 / 调试端点用） ──
 
-    /** 按 id 取模型行（**实体全字段**，管理/初始化面用）；失败语义同 {@link #findModel}。 */
-    Model getModelRow(String id);
+    /** 按 id 取模型行（**全字段视图**，管理/初始化面用）；失败语义同 {@link #findModel}。 */
+    ModelView getModelRow(String id);
 
-    /** 租户可见模型行（**实体全字段**）；不可见 ⇒ null。 */
-    Model getModelRowVisible(long tenantId, String id);
+    /** 租户可见模型行（**全字段视图**）；不可见 ⇒ null。 */
+    ModelView getModelRowVisible(long tenantId, String id);
 
     /** 建模型行（返回落库后的行）。 */
-    Model createModel(Model model);
+    ModelView createModel(ModelView model);
 
     /** 更新模型行（返回更新后的行）。 */
-    Model updateModel(Model model);
+    ModelView updateModel(ModelView model);
 
     /**
      * 模型行视图：挑模型（id/name/type）与造运行时配置（source/parameters）所需的最小字段集。

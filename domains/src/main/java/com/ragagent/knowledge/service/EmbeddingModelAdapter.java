@@ -6,8 +6,8 @@ import org.springframework.stereotype.Component;
 
 import com.ragagent.contract.knowledge.EmbeddingModelPort;
 import com.ragagent.knowledge.client.EmbedderClient;
-import com.ragagent.common.model.ModelCatalogPort;
-import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.model.ModelCatalogPort;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 
 /**
  * {@link EmbeddingModelPort} 的 knowledge 侧实现。

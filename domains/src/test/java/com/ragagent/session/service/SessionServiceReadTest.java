@@ -21,7 +21,7 @@ import com.ragagent.session.repository.MessageRepository;
 import com.ragagent.session.repository.MessageSuggestionRepository;
 import com.ragagent.common.settings.ConversationProperties;
 import com.ragagent.contract.websearch.WebSearchTempStatePort;
-import com.ragagent.common.model.ModelCatalogPort;
+import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 
 /**

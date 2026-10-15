@@ -34,7 +34,7 @@ import com.ragagent.tracing.decorators.LangfuseReranker;
 import com.ragagent.chatpipeline.spi.McpToolRegistrationPort;
 import com.ragagent.rerank.RerankerFactory;
 import com.ragagent.contract.storage.ResourceCatalogPort;
-import com.ragagent.common.model.ModelCatalogPort;
+import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.modelruntime.application.ChatConfigs;
 import com.ragagent.rerank.RerankerConfigs;
 

@@ -1,4 +1,4 @@
-package com.ragagent.common.model;
+package com.ragagent.model.domain;
 
 
 import com.ragagent.platform.web.JsonMappers;
@@ -12,6 +12,7 @@ import com.ragagent.platform.security.CryptoService;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedTypes;
+import com.ragagent.contract.model.ModelParameters;
 
 /**
  * ModelParameters 的 jsonb TypeHandler：

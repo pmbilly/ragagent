@@ -25,14 +25,14 @@ import com.ragagent.embedding.provider.OpenAiEmbedder;
 import com.ragagent.embedding.provider.VolcengineEmbedder;
 import com.ragagent.embedding.provider.ZhipuEmbedder;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
-import com.ragagent.common.model.Model;
-import com.ragagent.common.model.ModelParameters;
+import com.ragagent.contract.model.ModelParameters;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import com.ragagent.model.service.ModelRuntimeConfigs;
 import com.ragagent.llm.limiter.BackgroundTaskContext;
 import com.ragagent.llm.limiter.LocalLimiter;
 import com.ragagent.model.service.ModelRowViews;
+import com.ragagent.model.domain.Model;
 
 /**
  * embedding 客户端的 stub server A/B：请求体/路径/头部与录制

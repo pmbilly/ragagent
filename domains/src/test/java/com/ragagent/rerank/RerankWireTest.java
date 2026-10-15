@@ -26,9 +26,9 @@ import com.ragagent.rerank.provider.OpenAiReranker;
 import com.ragagent.rerank.provider.VolcengineReranker;
 import com.ragagent.rerank.provider.ZhipuReranker;
 import com.ragagent.platform.web.ProviderJson;
-import com.ragagent.common.model.Model;
-import com.ragagent.common.model.ModelParameters;
+import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.model.service.ModelRowViews;
+import com.ragagent.model.domain.Model;
 
 /**
  * rerank 客户端的 stub server A/B：请求体与录制（wire/*.json）逐字节比对 +

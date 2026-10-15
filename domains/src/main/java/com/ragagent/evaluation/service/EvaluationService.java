@@ -31,8 +31,8 @@ import com.ragagent.common.knowledge.domain.KnowledgeBase;
 
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.common.knowledge.support.KnowledgeTaskIdCodec;
-import com.ragagent.common.model.ModelCatalogPort;
-import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.model.ModelCatalogPort;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.chatpipeline.spi.KnowledgeQaEventPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

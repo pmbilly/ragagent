@@ -20,7 +20,7 @@ import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.mapper.ChunkRevisionMapper;
 import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
-import com.ragagent.common.model.Model;
+import com.ragagent.model.domain.Model;
 import com.ragagent.model.mapper.ModelMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +31,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import com.ragagent.knowledge.domain.ChunkRevisionConflictException;
 import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.common.model.ModelParameters;
+import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.knowledge.service.chunk.ChunkEditService;
 
 /**

@@ -25,7 +25,7 @@ import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.ollama.OllamaService;
 import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.platform.web.ApiResult;
-import com.ragagent.common.model.ModelCatalogPort;
+import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 
 /**

@@ -10,8 +10,8 @@ import com.ragagent.llm.LlmChatClient;
 import com.ragagent.modelruntime.application.LlmChatClients;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.ollama.OllamaService;
-import com.ragagent.common.model.Model;
-import com.ragagent.common.model.ModelParameters;
+import com.ragagent.model.domain.Model;
+import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.model.service.ModelService.ModelNotFoundException;
 import com.ragagent.rerank.Reranker;
 import com.ragagent.rerank.RerankerFactory;
@@ -24,7 +24,7 @@ import com.ragagent.tracing.decorators.LangfuseEmbedder;
 import com.ragagent.tracing.decorators.LangfuseReranker;
 import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.retrieval.vlm.VlmClient.VlmConfig;
-import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 
 /**
  * 模型运行时工厂（chat / embedding / rerank / vlm / asr 五类运行时客户端的装配归口，

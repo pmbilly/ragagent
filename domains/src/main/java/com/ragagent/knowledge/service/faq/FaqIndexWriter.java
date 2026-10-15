@@ -24,8 +24,8 @@ import com.ragagent.contract.tenant.TenantStorageQuotaPort;
 import com.ragagent.retrieval.engine.VectorStoreService;
 import com.ragagent.knowledge.index.KnowledgeVectorWrites;
 import com.ragagent.knowledge.index.ChunkVectorIndexer;
-import com.ragagent.common.model.ModelCatalogPort;
-import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.model.ModelCatalogPort;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 
 /**
  * FAQ 条目的落库与向量索引写路径：FAQ 容器 knowledge 的查找/惰性创建、嵌入模型

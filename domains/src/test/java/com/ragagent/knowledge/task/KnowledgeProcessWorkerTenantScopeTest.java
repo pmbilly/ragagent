@@ -28,7 +28,7 @@ import com.ragagent.knowledge.storage.TenantFileStorage;
 import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.retrieval.engine.VectorStoreService;
 import com.ragagent.retrieval.graph.RetrieveGraphRepository;
-import com.ragagent.common.model.ModelCatalogPort;
+import com.ragagent.contract.model.ModelCatalogPort;
 
 /**
  * 回归：worker 管线必须在<b>知识行租户作用域</b>内执行。

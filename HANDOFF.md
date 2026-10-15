@@ -268,7 +268,7 @@ contract  → JDK                                  （纯 JDK：公开 API / SPI
 | `Message` / `Chunk` / `Model` / `Session` | 3~6 | 2~4 | **非机械**：视图要覆盖大量字段（`Chunk` 24 访问器 vs 现有视图 6 字段）+ 跨域写面 + L1 组件（`BaseTool`/`ChunkPage`）⇒ 需设计 |
 | `KnowledgeBase` / `Knowledge` / `User` / `Tenant` | 4~10 | 0~3 | 最后（写面 16~48 处，多为管理面 ⇒ 用例归位） |
 
-**进度（2026-10-15）**：C2 实体 **14 → 11**（`KnowledgeTag`、`AuthToken`、`MessageSuggestionSet` 已归域；域侧 handler 12 → 11）；C4 待归位载荷 15、登记 8（platform 面 5 + 待去 Jackson 3）；R10 保持 **7 条边 / 52 类**（收窄未重建边 ✓）。
+**进度（2026-10-15）**：C2 实体 **14 → 10**（`KnowledgeTag`、`AuthToken`、`MessageSuggestionSet`、`Model` 已归域；域侧 handler 12 → 10）；C4 待归位载荷 14、登记 8（platform 面 5 + 待去 Jackson 3）；R10 保持 **7 条边 / 52 类**（收窄未重建边 ✓）。
 
 **次批三候选的实测阻断（已测，勿重复测量）**：`MessageSuggestionSet`＝**API 线格式**（`EmbedSessionPort` 返回 `ResponseEntity<…>` ⇒ 换视图即改 embed 公开面）· `StorageBackend`＝**实体跨域归属**（storage 与 knowledge **双方都有它的 mapper**）· `WikiPageIssue`＝**跨域写面**（`session/AgentToolWikiBackends` 12 读 + 56 setters）⇒ 三者均需**先决策**（线格式确认 / 归属裁定 / 用例归位）。**已解锁示范两支**：读面换视图（`KnowledgeTag`）· 写面走契约端口（`AuthToken`，同时清偿了 ②owner 的"写侧直用他域 mapper"）。
 
@@ -1451,6 +1451,17 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **验证**：**13 守卫全绿** ✓（环 0 组、R9 包级 SCC 基线按提示刷新后仍 10 组、L1→域 0 条、R6 不变）；`spotlessCheck build` ✓ **1m38s** ✓；**4991 / 失败 0 / 跳过 4**（boot 1331 ✓）；dev 重启 ready ✓ + 冒烟（`/api/v1/storage-backends`、`/api/v1/knowledge-bases` 200 ✓；`/api/v1/messages/{id}/load` 业务级 404 "session not found" ✓ 路由/鉴权/新注入链路正常）
 - **A③ 累计（二十八刀）**：边 **64 → 30（−34）**、类 **317 → 195（−122）**；三档 **① 22 条 / 109 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
 - **下一步候选**：`knowledge→storage` 第三刀（余 2 类：`KnowledgeBaseFileProxyController` 需文件代理端口、`TenantFileStorage` 需 provider 存储端口）· `embedchannel→storage`（余 1 类）· **待拍板** `mcp→agent`(9) · **K 级** `im→session`(6) · `datasource→knowledge`(8) · **大块** `knowledge→model`(14) · `session→knowledge`(17) · `session→storage`(6 余)
+**🔶 C 批 1·第四子批：`Model` 收窄 + **端口入契约面**（实体 11 → 10）（2026-10-15）**
+- **落点比上刀更干净（三件直接进 `:contract`）**：`ModelParameters`（**纯 JDK**）→ `contract.model` · 新 `contract.model.ModelView` · **`ModelCatalogPort` 整体入契约面**（它只 import `java.util.List` ⇒ 4 方法改视图后成纯 JDK）
+- **`ModelView` 用 bean 风格（15 字段）且访问器名与实体**逐一相同**（含 `isIsDefault()`/`isIsBuiltin()`）⇒ **消费方零改动 + JSON 等价**；先例＝`ChunkView`（`:contract` 内的可写 DTO 已被接受）
+- **端口 4 方法改面**：`getModelRow`/`getModelRowVisible` → `ModelView`；`createModel`/`updateModel` 收 `ModelView`；`ModelViews` 从"吃实体投影"改为**契约面内映射** `rowView(ModelView)`（null 透传，字段搬运逐字保持）
+- **实体 `Model` + `ModelParametersTypeHandler` 回 `model/domain`**；适配器加 `toView` / `toEntity` / **`copyInto`（回填）** 三助手；init 三件迁移（`InitResponses.rawModel(ModelView)` · `InitializationConfigService` · `ModelConnectivityTestService` 的 4 处 `ModelViews.of→rowView`）
+- **读数**：**C2 实体 11 → 10、域侧 handler 11 → 10**；C1 受控根 73 → **71 文件**；**C4 待归位 15 → 14**（端口离 `common`）；**R10 保持 7 条边 / 52 类 / ①档 0** ✓
+- **⚠️ 两次红态（第二次是金片两度救场，价值实证）**：
+  1. **回填语义丢失**：`ModelService.createModel(entity)` 会**就地把 id/createdAt/status 写回传入实体**，而适配器传的是**拷贝** ⇒ 调用方 `processed` 列表里 id 为 null ⇒ init 的 `embeddingModelId` 变 null ✗ ⇒ **金片 `init-post-initialize.json` 抓到** ✓ 修法：`copyInto(view, saved)` 把落库结果回填到传入视图（保持"同对象被填充"的旧语义）
+  2. **批量替换污染字符串字面量**（我的脚本 bug）：`replace_outside_strings` 末尾又对整文跑了一次正则 ⇒ 字符串 `"LLM Model for Knowledge QA"` 被改成 `"LLM ModelView for …"` ⇒ **金片第二次抓到** ✓ 修 4 处并**全仓扫"字符串内 ModelView"**确认无同类污染。**判据：类型批量替换必须复核"字符串字面量未被改"，替换函数的最终 pass 不得覆盖已保护段**
+- **验证**：**14 守卫全绿**（C2 10 / 域侧 handler 10 / C4 14，基线已收紧）；**金片测试 ✓**（`AgentContractTest` + init/model 契约测试）+ **`check-contract-sync`：1349 金片签名一致** ✓；`spotlessCheck build` **2m06s**；**4991 / 失败 0 / 跳过 4**；dev ready + 冒烟（models / KB / sessions / `initialization/ollama/status` 200 ✓；`/api/v1/initialization/config/{kbId}` ⇒ 404 + 标准信封 ✓）
+- **C 余量（10 个实体）**：`Chunk` / `Knowledge` / `KnowledgeBase`（宽字段 + 写面）· `Session` / `Message`（线格式）· `StorageBackend`（**需裁定归属**：storage 与 knowledge 都有它的 mapper）· `WikiPage` / `WikiPageIssue`（**需写面归位**：session 侧 56 setters）· `Tenant` / `User`（管理面，用例归位）
 **🔶 C 批 1·第三子批：`MessageSuggestionSet` 收窄 + **线格式等价视图**（实体 12 → 11）（2026-10-15）**
 - **对象**：`MessageSuggestionSet`（跨域主源 0——除 L1 端口外**全在会话域内**引用）⇒ 唯一障碍是 **embed 面端口 `EmbedSessionPort` 返回它**（线格式风险）
 - **⭐ 判据先行（本刀最关键的一步）**：动线格式类型**先核金片**——实测 `emb-pub-suggestions-get/off/get-none/ensure-badbody` **4 条金片** + 应用面 `MessageSuggestionContractTest` ⇒ **有护栏才动**

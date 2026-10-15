@@ -1,6 +1,6 @@
 package com.ragagent.chatpipeline.spi;
 
-import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.embedding.Embedder;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.rerank.Reranker;

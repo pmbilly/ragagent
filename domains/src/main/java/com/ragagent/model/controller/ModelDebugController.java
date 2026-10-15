@@ -27,8 +27,8 @@ import com.ragagent.contract.model.ResponseType;
 import com.ragagent.llm.domain.StreamResponse;
 import com.ragagent.llm.provider.ProviderName;
 import com.ragagent.llm.provider.ProviderRegistry;
-import com.ragagent.common.model.Model;
-import com.ragagent.common.model.ModelParameters;
+import com.ragagent.model.domain.Model;
+import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.model.dto.ModelDebugAsrResponse;
 import com.ragagent.model.dto.ModelDebugChatResponse;
 import com.ragagent.model.dto.ModelDebugResult;
@@ -49,7 +49,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ragagent.model.service.ModelRuntimeConfigs;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.model.service.ModelRowViews;
-import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 
 /**
  * 模型调试端点（POST /api/v1/models/{id}/debug）。

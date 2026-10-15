@@ -8,7 +8,7 @@ import com.ragagent.retrieval.vlm.VlmClient;
 import com.ragagent.retrieval.vlm.VlmHttpTransport;
 import com.ragagent.tracing.decorators.LangfuseVlm;
 import org.springframework.stereotype.Component;
-import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 
 /**
  * 工具结果图片 VLM 描述器的装配：取 VLM 模型并组装 predict 回调。

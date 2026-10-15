@@ -67,8 +67,8 @@ import com.ragagent.contract.tenant.WebSearchConfig;
 import com.ragagent.common.knowledge.KnowledgeBaseView;
 import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
 import com.ragagent.common.knowledge.support.KnowledgeBaseViews;
-import com.ragagent.common.model.ModelCatalogPort;
-import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.model.ModelCatalogPort;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.modelruntime.application.ChatConfigs;
 import com.ragagent.rerank.RerankerConfigs;
 

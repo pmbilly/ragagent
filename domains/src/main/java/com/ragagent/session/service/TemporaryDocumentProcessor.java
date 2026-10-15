@@ -30,7 +30,7 @@ import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.repository.TemporaryDocumentRepository;
 import com.ragagent.session.service.TemporaryDocumentService.CreateOptions;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 
 /**
  * {@code TemporaryDocumentService} 的**解析 / 落盘管线子模块**（§14 步骤 2）：异步投递与重试、

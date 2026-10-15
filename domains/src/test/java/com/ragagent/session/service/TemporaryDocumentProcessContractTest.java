@@ -23,11 +23,11 @@ import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
 import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.doc.DocReaderParsePort;
-import com.ragagent.common.model.ModelParameters;
+import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.session.domain.document.TemporaryDocument;
 import com.ragagent.session.repository.TemporaryDocumentRepository;
-import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 
 /**
  * 附件解析链路的验收（资源租户、引擎回落与音频分支）：

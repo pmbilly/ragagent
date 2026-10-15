@@ -1,7 +1,7 @@
 package com.ragagent.model.service;
 
-import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
-import com.ragagent.common.model.Model;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.model.domain.Model;
 
 /**
  * 模型实体 → L1 载荷视图（{@link ModelRowView}）的转换。

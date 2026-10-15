@@ -35,8 +35,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import com.ragagent.contract.memory.MemoryRecall;
 import com.ragagent.contract.memory.MemoryRetrievalContext;
-import com.ragagent.common.model.ModelCatalogPort;
-import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.model.ModelCatalogPort;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 
 /**
  * 跨会话长期记忆的写入、召回与记忆管理器。

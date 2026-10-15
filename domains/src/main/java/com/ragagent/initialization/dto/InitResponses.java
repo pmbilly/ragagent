@@ -3,8 +3,8 @@ package com.ragagent.initialization.dto;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.ragagent.common.model.Model;
-import com.ragagent.common.model.ModelParameters;
+import com.ragagent.contract.model.ModelParameters;
+import com.ragagent.contract.model.ModelView;
 
 /**
  * initialization POST 响应里的 models 序列化（自有契约,键 = camelCase）：
@@ -15,7 +15,7 @@ public final class InitResponses {
 
     private InitResponses() {}
 
-    public static Map<String, Object> rawModel(Model m) {
+    public static Map<String, Object> rawModel(ModelView m) {
         Map<String, Object> out = new LinkedHashMap<>();
         out.put("id", m.getId());
         out.put("tenantId", m.getTenantId() == null ? 0L : m.getTenantId());

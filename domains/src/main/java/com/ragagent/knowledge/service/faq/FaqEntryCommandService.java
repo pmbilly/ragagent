@@ -42,7 +42,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import com.ragagent.knowledge.index.KnowledgeVectorWrites;
-import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 
 /**
  * FAQ 条目命令面：创建、更新、相似问追加、批量字段/标签更新与删除，

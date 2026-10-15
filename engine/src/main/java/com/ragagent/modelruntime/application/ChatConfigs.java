@@ -1,7 +1,7 @@
 package com.ragagent.modelruntime.application;
 
-import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
-import com.ragagent.common.model.ModelParameters;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.llm.domain.ChatConfig;
 
 /**

@@ -34,8 +34,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import com.ragagent.modelruntime.application.ChatConfigs;
-import com.ragagent.common.model.ModelCatalogPort;
-import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.model.ModelCatalogPort;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 /**
  * 使用说明生成协作者（自 {@link McpServiceController} 拆出）：白名单式输入装配、
  * 60 秒限时 LLM 调用与模型选择。

@@ -1,6 +1,6 @@
 package com.ragagent.embedding;
 
-import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 
 /**
  * 「模型行 → embedding 运行时配置」的 L2 映射。

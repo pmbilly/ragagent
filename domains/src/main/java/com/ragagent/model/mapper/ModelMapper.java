@@ -1,7 +1,7 @@
 package com.ragagent.model.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ragagent.common.model.Model;
+import com.ragagent.model.domain.Model;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper

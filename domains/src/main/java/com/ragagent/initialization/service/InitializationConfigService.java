@@ -21,11 +21,11 @@ import com.ragagent.common.knowledge.domain.KnowledgeBaseAsrConfig;
 import com.ragagent.common.knowledge.domain.KnowledgeBaseVlmConfig;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.common.knowledge.dto.KnowledgeBaseResponse;
-import com.ragagent.common.model.Model;
-import com.ragagent.common.model.ModelParameters;
+import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.initialization.dto.InitResponses;
-import com.ragagent.common.model.ModelCatalogPort;
+import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
+import com.ragagent.contract.model.ModelView;
 
 /**
  * initialization config/initialize 端点用例：KB 初始化配置读写、初始化装配与请求绑定。
@@ -55,14 +55,14 @@ public final class InitializationConfigService {
         if (kb == null) {
             throw new BizException(AppError.notFound("知识库不存在"));
         }
-        List<Model> models = new ArrayList<>();
+        List<ModelView> models = new ArrayList<>();
         for (String id : List.of(ModelConnectivityTestService.orEmpty(kb.getEmbeddingModelId()), ModelConnectivityTestService.orEmpty(kb.getSummaryModelId()),
                 ModelConnectivityTestService.orEmpty(kb.getVlmConfig().getModelId()))) {
             if (id.isEmpty()) {
                 continue;
             }
             try {
-                Model m = modelCatalog.getModelRow(id);
+                ModelView m = modelCatalog.getModelRow(id);
                 if (m != null) {
                     models.add(m);
                 }
@@ -81,11 +81,11 @@ public final class InitializationConfigService {
         KnowledgeBase kb = kbForWrite(kbId);
         validateConfigs(req);
 
-        List<Model> processed = new ArrayList<>();
+        List<ModelView> processed = new ArrayList<>();
         for (ModelDescriptor d : buildModelDescriptors(req)) {
-            Model model = toModel(d);
+            ModelView model = toModel(d);
             String existingId = findExistingModelId(kb, d.type());
-            Model existing = null;
+            ModelView existing = null;
             if (!existingId.isEmpty()) {
                 try {
                     existing = modelCatalog.getModelRow(existingId);
@@ -392,8 +392,8 @@ public final class InitializationConfigService {
         return list;
     }
 
-    private Model toModel(ModelDescriptor d) {
-        Model m = new Model();
+    private ModelView toModel(ModelDescriptor d) {
+        ModelView m = new ModelView();
         m.setType(d.type());
         m.setName(d.name());
         m.setSource(d.source());
@@ -425,11 +425,11 @@ public final class InitializationConfigService {
     }
 
     private void applyInitialization(KnowledgeBase kb, InitializationRequests.InitializationRequest req,
-            List<Model> processed) {
+            List<ModelView> processed) {
         String embeddingId = "";
         String llmId = "";
         String vlmId = "";
-        for (Model m : processed) {
+        for (ModelView m : processed) {
             switch (m.getType()) {
                 case "Embedding" -> embeddingId = m.getId();
                 case "KnowledgeQA" -> llmId = m.getId();
@@ -492,13 +492,13 @@ public final class InitializationConfigService {
 
     // ══════════════ GET config 响应（全 map 字母序）══════════════
 
-    private Map<String, Object> configResponse(List<Model> models, KnowledgeBase kb,
+    private Map<String, Object> configResponse(List<ModelView> models, KnowledgeBase kb,
             boolean hasFiles) {
         Map<String, Object> config = new TreeMap<>();
         config.put("hasFiles", hasFiles);
         boolean canView = canViewIntegrationSecrets();
 
-        for (Model m : models) {
+        for (ModelView m : models) {
             String baseUrl = m.getParameters() == null ? "" : m.getParameters().getBaseUrl();
             if (m.isIsBuiltin() || !canView) {
                 baseUrl = "";
@@ -661,7 +661,7 @@ public final class InitializationConfigService {
             throw new BizException(AppError.badRequest(message));
         }
         try {
-            Model m = modelCatalog.getModelRow(id);
+            ModelView m = modelCatalog.getModelRow(id);
             if (m != null) {
                 return;
             }

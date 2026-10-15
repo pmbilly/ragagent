@@ -2,8 +2,8 @@ package com.ragagent.model.dto;
 
 import java.time.OffsetDateTime;
 import java.util.Map;
-import com.ragagent.common.model.Model;
-import com.ragagent.common.model.ModelParameters;
+import com.ragagent.model.domain.Model;
+import com.ragagent.contract.model.ModelParameters;
 
 /**
  * 模型响应（HTTP 视图；JSON 字段名即 Java 字段名，输出序 = 组件声明序）。

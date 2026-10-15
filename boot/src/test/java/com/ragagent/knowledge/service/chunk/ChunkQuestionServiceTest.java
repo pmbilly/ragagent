@@ -19,7 +19,7 @@ import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.mapper.ChunkMapper;
 import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;
 import com.ragagent.knowledge.mapper.KnowledgeMapper;
-import com.ragagent.common.model.Model;
+import com.ragagent.model.domain.Model;
 import com.ragagent.model.mapper.ModelMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +29,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import com.ragagent.platform.security.SsrfGuard;
-import com.ragagent.common.model.ModelParameters;
+import com.ragagent.contract.model.ModelParameters;
 
 /**
  * chunk 生成问题链路语义（H2）：Upsert/Delete/Regenerate 的 400 原文与 metadata

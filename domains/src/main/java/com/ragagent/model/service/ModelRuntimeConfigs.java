@@ -7,7 +7,7 @@ import com.ragagent.llm.domain.ChatConfig;
 import com.ragagent.llm.provider.Config;
 import com.ragagent.llm.provider.ProviderName;
 import com.ragagent.llm.provider.ProviderRegistry;
-import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.rerank.RerankerConfig;
 import java.util.LinkedHashMap;
 import java.util.Map;

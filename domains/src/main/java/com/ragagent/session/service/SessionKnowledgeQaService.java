@@ -43,8 +43,8 @@ import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.platform.tracing.langfuse.LangfuseManager;
 import com.ragagent.platform.tracing.langfuse.Span;
 import com.ragagent.contract.websearch.WebSearchProviderPort;
-import com.ragagent.common.model.ModelCatalogPort;
-import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
+import com.ragagent.contract.model.ModelCatalogPort;
+import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 
 /**
  * 知识问答 service 面（chat_pipeline 的调用方）。

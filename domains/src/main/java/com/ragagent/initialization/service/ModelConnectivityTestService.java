@@ -26,8 +26,7 @@ import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.llm.limiter.ConcurrencyGovernor;
 import com.ragagent.llm.ollama.OllamaService;
 import com.ragagent.modelruntime.adapter.provider.asr.AsrTranscriber;
-import com.ragagent.common.model.Model;
-import com.ragagent.common.model.ModelParameters;
+import com.ragagent.contract.model.ModelParameters;
 import com.ragagent.rerank.RerankerFactory;
 import com.ragagent.embedding.Embedder;
 import com.ragagent.embedding.EmbedderConfig;
@@ -36,11 +35,12 @@ import com.ragagent.contract.doc.DocReaderParsePort;
 import com.ragagent.platform.storage.config.UploadLimits;
 import com.ragagent.llm.provider.ProviderName;
 import com.ragagent.llm.provider.ProviderRegistry;
-import com.ragagent.common.model.ModelCatalogPort;
+import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.modelruntime.application.ChatConfigs;
 import com.ragagent.embedding.EmbedderConfigs;
 import com.ragagent.rerank.RerankerConfigs;
-import com.ragagent.common.model.ModelViews;
+import com.ragagent.contract.model.ModelViews;
+import com.ragagent.contract.model.ModelView;
 
 /**
  * 模型连通性测试端点用例（remote/embedding/rerank/asr/multimodal）与测试模型装配、SSRF 校验、密钥解密机制。
@@ -78,12 +78,12 @@ public final class ModelConnectivityTestService {
             throw new BizException(AppError.badRequest("模型名称和Base URL不能为空"));
         }
         requireSsrf("Base URL", req.baseUrl());
-        Model model = buildTestModel(req, "KnowledgeQA", "remote");
+        ModelView model = buildTestModel(req, "KnowledgeQA", "remote");
         boolean available;
         String message;
         try {
             LlmChatClient chat = LlmChatClients.create(
-                    ChatConfigs.chatConfig(ModelViews.of(model), "", ""), ollamaService, concurrencyGovernor);
+                    ChatConfigs.chatConfig(ModelViews.rowView(model), "", ""), ollamaService, concurrencyGovernor);
             ChatOptions opts = new ChatOptions();
             opts.setMaxTokens(1);
             opts.setThinking(Boolean.FALSE); // for dashscope.aliyuncs qwen3-32b
@@ -128,8 +128,8 @@ public final class ModelConnectivityTestService {
                 return ok(data);
             }
         }
-        Model model = buildTestModel(r, "Embedding", "remote");
-        EmbedderConfig config = EmbedderConfigs.embedderConfig(ModelViews.of(model), "", "");
+        ModelView model = buildTestModel(r, "Embedding", "remote");
+        EmbedderConfig config = EmbedderConfigs.embedderConfig(ModelViews.rowView(model), "", "");
         Embedder emb;
         try {
             // pooler：单文本 embed 不触达批路径
@@ -153,7 +153,7 @@ public final class ModelConnectivityTestService {
             throw new BizException(AppError.badRequest("模型名称和Base URL不能为空"));
         }
         requireSsrf("Base URL", req.baseUrl());
-        Model model = buildTestModel(req, "Rerank", "remote");
+        ModelView model = buildTestModel(req, "Rerank", "remote");
         String appID = "";
         String appSecret = "";
         String providerName = providerValue(model);
@@ -164,7 +164,7 @@ public final class ModelConnectivityTestService {
         boolean available;
         String message;
         try {
-            var config = RerankerConfigs.rerankerConfig(ModelViews.of(model), appID, appSecret);
+            var config = RerankerConfigs.rerankerConfig(ModelViews.rowView(model), appID, appSecret);
             var reranker = RerankerFactory.newReranker(config);
             var results = reranker.rerank("ping", List.of("pong"));
             int count = results == null ? 0 : results.size();
@@ -189,7 +189,7 @@ public final class ModelConnectivityTestService {
             throw new BizException(AppError.badRequest("模型名称和Base URL不能为空"));
         }
         requireSsrf("Base URL", req.baseUrl());
-        Model model = buildTestModel(req, "ASR", "remote");
+        ModelView model = buildTestModel(req, "ASR", "remote");
         var p = model.getParameters();
         var config = new AsrTranscriber.AsrConfig(p.getBaseUrl(), model.getName(), p.getApiKey(),
                 model.getId(), "", p.getCustomHeaders());
@@ -410,7 +410,7 @@ public final class ModelConnectivityTestService {
         if (!req.apiKey().isEmpty() && !req.appSecret().isEmpty() && req.extraConfig() != null) {
             return req;
         }
-        Model stored;
+        ModelView stored;
         try {
             stored = modelCatalog.getModelRow(req.modelId());
         } catch (RuntimeException e) {
@@ -428,13 +428,13 @@ public final class ModelConnectivityTestService {
                 req.customHeaders(), extra, appSecret, req.modelId());
     }
 
-    /** 测试请求 → 临时 Model（不落库）。 */
-    private static Model buildTestModel(ModelTestRequest req, String modelType, String defaultSource) {
+    /** 测试请求 → 临时 ModelView（不落库）。 */
+    private static ModelView buildTestModel(ModelTestRequest req, String modelType, String defaultSource) {
         String source = req.source() == null ? "" : req.source().toLowerCase(Locale.ROOT);
         if (source.isEmpty()) {
             source = defaultSource;
         }
-        Model m = new Model();
+        ModelView m = new ModelView();
         m.setName(req.modelName());
         m.setType(modelType);
         m.setSource(source);
@@ -488,14 +488,14 @@ public final class ModelConnectivityTestService {
             throw new IllegalStateException("model ID cannot be empty");
         }
         long tid = TenantContext.currentTenantId() == null ? 0 : TenantContext.currentTenantId();
-        Model model = modelCatalog.getModelRowVisible(tid, modelId);
+        ModelView model = modelCatalog.getModelRowVisible(tid, modelId);
         if (model == null) {
             throw new IllegalStateException("model not found");
         }
         var p = model.getParameters();
         String appID = p == null ? "" : orEmpty(p.getAppId());
         String appSecret = p == null ? "" : decryptModelAppSecret(p.getAppSecret());
-        return LlmChatClients.create(ChatConfigs.chatConfig(ModelViews.of(model), appID, appSecret),
+        return LlmChatClients.create(ChatConfigs.chatConfig(ModelViews.rowView(model), appID, appSecret),
                 ollamaService, concurrencyGovernor);
     }
 
@@ -511,7 +511,7 @@ public final class ModelConnectivityTestService {
         }
     }
 
-    private static String providerValue(Model model) {
+    private static String providerValue(ModelView model) {
         var p = model.getParameters();
         String value = p == null ? "" : orEmpty(p.getProvider());
         var name = ProviderName.fromValue(value);
