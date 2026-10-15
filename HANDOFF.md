@@ -1496,6 +1496,40 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **读数**：**R10 保持 7 条边 / 52 类**（端口在 L1 ⇒ 无新边）✓；14 守卫全绿；**净删 2 个文件**（知识域不再持有该表 mapper）
 - **验证**：`spotlessCheck build` **2m05s**；**4991 / 失败 0 / 跳过 4**；dev ready + 冒烟（knowledge-bases / **storage-backends** / sessions / models 200 ✓）
 - **意义**：`StorageBackend` 实体收窄（C 余量之一）**已具备前提**——唯一持久面在 storage 域，实体回域后跨域只剩端口读（+ system 的少量写面）
+### 12.6 管理面载体选型表（`User` / `Tenant`；C 收官设计批，2026-10-15）
+
+> **背景**：C2 只剩 `User`（13 字段）与 `Tenant`（21 字段）两个**管理面**实体。实测（去字符串后）真实跨域消费：`User` **25 文件**、`Tenant` **18 文件**；两者的共同特征是"**用例密度高于字段宽度**"——不能只换视图，必须先定每个消费簇的负责人。
+> **口径**：每簇按 §12.6 四选一（契约视图/SPI · 域写端口 · 用例归位 · platform 面），并写明**复用哪个既有端口**（等价物核查）。
+
+#### 12.6.1 `User`（现 `common/auth/domain`，自然归属 `domains/auth`）
+
+| 消费簇 | 文件数 | 实测用法 | 选型 | 依据 |
+|---|---|---|---|---|
+| **auth 自身** | **19** | 读 8 + `new` + set×30（`UserService`）· `UserInfo` 读 10 · `JwtService` 读 2 … | **随实体回 `auth/domain`**（in-domain，零改动） | 实体归属＝auth ✓（`UserMapper` 在 auth ✓ 唯一持久面） |
+| **system** | 4 | `SystemDtos.UserInfoResponse.from(User)` **读 11** · `SystemAdminController` 读 4 · `SystemSettingService` 读 2（**已经走 `UserDirectoryPort`** ✓） | **⭐ 端口合并（等价物核查结论）**：`UserLookupPort`（**已在 `:contract`**，视图口径）与 `UserDirectoryPort`（L1，实体口径）**是同一能力的两个载体** ⇒ 本批应**合并为一**（保留契约面的 `UserLookupPort`，`UserDirectoryPort.userById` 迁入其中后删除旧端口） | 方案 §8.1 的 contracts 清单只列了 `contract.auth.UserLookupPort` ✓ ⇒ 以契约为准 |
+| **system 的写面（⚠️ 新发现）** | 1（`SystemAdminUserService`） | **直引 auth 内部件**：`auth.mapper.UserMapper` + `auth.service.{TenantMemberService,TenantService}` + **直用 `LambdaQueryWrapper<User>`** ⇒ 既是 **`users` 表的第二个持久面** ✗，也是 **②owner 登记边（`system→auth`）的实体** ✗ | **写面 + 读面归位**：auth 提供写端口（`promote`/`revoke`/`getById`/`getByEmail`），system 去 mapper/service 直引改调端口 | 与 `storage_backends` 单一持久面改造**同型**（§9.1 状态唯一写入者）；**刀序必须在实体回域之前**；**本刀即可清偿 ②owner 的 `system→auth` 边** |
+| websearch / boot | 0 | 假阳性（`"User-Agent"` 字符串） | — | 去字符串扫描已排除 ✓ |
+
+#### 12.6.2 `Tenant`（现 `common/tenant/domain`，自然归属 `domains/tenant`）
+
+| 消费簇 | 文件数 | 实测用法 | 选型 | 依据 |
+|---|---|---|---|---|
+| **tenant 自身** | 3 | `TenantMapper`（持久面）· `TenantLookup` · `TenantStorageQuotaAdapter` 读 2 | **随实体回 `tenant/domain`** | `tenants` 表唯一持久面在 tenant 域 ✓ |
+| **auth** | **14** | `TenantResponse` **读 19** · `TenantService` 读 11 set×12 · `TenantConfigOps` 读 6 set×11 · `TenantCreateOps` **`new`** + set×5 · `UserService` **`new`** + set · 3 个租户控制器 | **L1 管理面视图 + 契约写/读端口**（`TenantAdminPort`） | auth 是**注册/登录/邀请**用例所在（建租户、改配置、成员管理）⇒ 跨域面必然存在；用镜像视图 + 端口承载 |
+| **system** | 1 | `SystemAdminUserService` 读 1 + `new` | 同端口 | 与 `User` 同一刀的附属改动 |
+| **⚠️ 架构旁账（登记，不在本批）** | — | **租户管理用例寄居 `auth`**（`TenantService`/`TenantCreateOps`/`TenantConfigOps`/`TenantInvitationController`/`TenantMember*`）而 `domains/tenant` 只有 mapper/lookup/配额 | **用例归位（未来设计批）**：租户 CRUD 与配置用例应迁 `domains/tenant`，`auth` 只留"注册时建租户"一个调用点 | 当前用端口承载**先解依赖**；归位属结构性重构（动控制器/路由归属）⇒ 单独立项登记 |
+
+#### 12.6.3 批次切分（每批独立闸门 + 单独提交）
+
+| 批 | 内容 | 前置 | 主要风险 |
+|---|---|---|---|
+| **C-13a** | **`users` 单一持久面 + `system→auth` 边清偿**：auth 新增写端口（`promote`/`revoke`/`getById`/`getByEmail`），`SystemAdminUserService` 去 `UserMapper`/`TenantService`/`TenantMemberService` 直引改调端口；**合并 `UserDirectoryPort` → `contract.auth.UserLookupPort`** | 无 | 语义逐字保留（与 storage 刀同法）；端口合并不改行为（`UserView` 字段面已覆盖 `userById` 消费） |
+| **C-13b** | **`UserRowView`（13 字段，跳过 `@JsonIgnore`）+ 端口改视图 + 实体回 `auth/domain`** | C-13a | `UserDirectoryPort`/`UserLookupPort` 两个端口都要改面；system 4 文件改视图 |
+| **C-14a** | **`TenantRowView`（21 字段）+ `TenantAdminPort`（读/建/改）+ 实体回 `tenant/domain`** | C-13b（同为管理面，先做窄的 `User` 积累路径） | 21 字段含 5 个 TypeHandler 载荷（随视图镜像，视图留 L1）；auth 14 文件是**最大改道面** |
+| **C-14b（登记）** | 租户用例归位 `domains/tenant` | 独立立项 | 动控制器/路由归属 ⇒ 需单独评审 |
+
+**共同纪律**：① 每批先做"**等价物核查**"（复用 `UserDirectoryPort`/`UserLookupPort`，不新建重复端口——两者并存本身是历史欠账，本批登记）；② 实体常量若被跨域用 ⇒ 外提 L1 + 实体委托（`KnowledgeParseStatus` 先例）；③ 逐批跑 14 守卫 + 金片 + 全量闸门。
+
 **🔶 C 批 1·第十二子批：`Knowledge` 收窄 + 状态常量外提（实体 3 → 2）（2026-10-15）**
 - **规模**：139 行 / **30 字段 / 61 访问器**（3 个 `JsonNode` + `List<JsonNode> tags` + 2 个 `@TableField(exist=false)`；无 `@JsonIgnore`）
 - **跨域消费 ~19 文件**（session 10 · datasource 4 · init 1 · eval 1 · wiki 1 · config 1）+ L1 三个耦合：端口 **13 方法**（含 `Page<Knowledge>` 分页与 `insertKnowledge`/`updateKnowledgeMetadataRow` 写面）· `KnowledgeProjectionAdapter`（投影 `KnowledgeDocumentFacts`）· 异常 `DuplicateKnowledgeException`（持有 existing 行）
