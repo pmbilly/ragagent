@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.chatpipeline.plugin.PluginMerge;
 import com.ragagent.chatpipeline.support.SearchSupport;
 import com.ragagent.knowledge.domain.Chunk;
-import com.ragagent.common.retrieval.SearchResult;
+import com.ragagent.platform.retrieval.SearchResult;
 import com.ragagent.contract.knowledge.FaqChunkMetadata;
 import com.ragagent.contract.retrieval.SearchChunkMerge;
 

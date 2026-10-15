@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ToolCall;
-import com.ragagent.common.retrieval.SearchResult;
+import com.ragagent.platform.retrieval.SearchResult;
 
 /**
  * model-context registry 的 source-reference 半边：chunk/document/knowledge base/web page 的

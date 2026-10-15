@@ -1,4 +1,4 @@
-package com.ragagent.common.storage.support;
+package com.ragagent.platform.storage.support;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Test;
 
-import com.ragagent.common.retrieval.SearchResult;
+import com.ragagent.platform.retrieval.SearchResult;
 import com.ragagent.contract.storage.support.FileUrlPort;
 import com.ragagent.contract.storage.support.Resolver;
 

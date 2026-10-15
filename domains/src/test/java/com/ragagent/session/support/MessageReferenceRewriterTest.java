@@ -12,11 +12,11 @@ import org.junit.jupiter.api.Test;
 import com.ragagent.common.agent.domain.AgentStep;
 import com.ragagent.common.agent.domain.AgentToolCall;
 import com.ragagent.contract.tool.ToolResult;
-import com.ragagent.common.retrieval.SearchResult;
+import com.ragagent.platform.retrieval.SearchResult;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.contract.session.MessageImage;
 import com.ragagent.contract.storage.support.FileUrlPort;
-import com.ragagent.common.storage.support.Rewriter;
+import com.ragagent.platform.storage.support.Rewriter;
 import com.ragagent.contract.storage.support.Mode;
 
 /**

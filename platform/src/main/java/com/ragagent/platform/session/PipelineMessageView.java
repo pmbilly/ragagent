@@ -1,4 +1,4 @@
-package com.ragagent.common.session;
+package com.ragagent.platform.session;
 
 import com.ragagent.contract.session.PipelineMessageAttachmentView;
 import com.ragagent.contract.session.PipelineMessageImageView;
@@ -6,7 +6,7 @@ import com.ragagent.contract.session.PipelineMessageImageView;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-import com.ragagent.common.retrieval.SearchResult;
+import com.ragagent.platform.retrieval.SearchResult;
 
 /**
  * 会话消息的「聊天管线视图」——chat 管线在端口往返与历史装载时真正读取的字段。

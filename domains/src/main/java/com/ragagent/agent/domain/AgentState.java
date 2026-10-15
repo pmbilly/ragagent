@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ragagent.contract.model.TokenUsage;
-import com.ragagent.common.retrieval.SearchResult;
+import com.ragagent.platform.retrieval.SearchResult;
 import com.ragagent.common.agent.domain.AgentStep;
 
 /**

@@ -6,9 +6,9 @@ import java.util.Map;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.contract.memory.MemoryRecall;
 import com.ragagent.contract.memory.MemoryRetrievalContext;
-import com.ragagent.common.retrieval.SearchResult;
+import com.ragagent.platform.retrieval.SearchResult;
 import com.ragagent.contract.session.PipelineMessageImageView;
-import com.ragagent.common.session.PipelineMessageView;
+import com.ragagent.platform.session.PipelineMessageView;
 import com.ragagent.retrieval.domain.WebSearchResult;
 
 import com.fasterxml.jackson.databind.JsonNode;

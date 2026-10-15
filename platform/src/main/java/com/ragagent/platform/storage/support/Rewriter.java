@@ -1,4 +1,4 @@
-package com.ragagent.common.storage.support;
+package com.ragagent.platform.storage.support;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ragagent.common.retrieval.SearchResult;
+import com.ragagent.platform.retrieval.SearchResult;
 import com.ragagent.contract.storage.support.FileUrlPort;
 import com.ragagent.contract.storage.support.Resolver;
 import com.ragagent.contract.storage.support.Mode;

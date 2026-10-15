@@ -29,7 +29,7 @@ import com.ragagent.contract.knowledge.KnowledgeBaseSearchGateway;
 import com.ragagent.contract.knowledge.KnowledgeDocumentGateway;
 import com.ragagent.contract.model.ModelFacts;
 import com.ragagent.platform.model.ModelGateway;
-import com.ragagent.common.retrieval.SearchResult;
+import com.ragagent.platform.retrieval.SearchResult;
 import com.ragagent.retrieval.engine.CompositeRetrieveEngine;
 import com.ragagent.retrieval.engine.EngineAwareNormalizer;
 import com.ragagent.retrieval.engine.EngineTypes;

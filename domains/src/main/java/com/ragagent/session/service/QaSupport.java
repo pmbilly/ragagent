@@ -11,7 +11,7 @@ import com.ragagent.contract.session.MentionedItem;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.dto.QaRequests.MentionedItemRequest;
-import com.ragagent.common.storage.support.StreamRewriter;
+import com.ragagent.platform.storage.support.StreamRewriter;
 import com.ragagent.platform.stream.StreamEvent;
 import com.ragagent.platform.event.EventBus;
 import com.ragagent.agent.SteerSink;

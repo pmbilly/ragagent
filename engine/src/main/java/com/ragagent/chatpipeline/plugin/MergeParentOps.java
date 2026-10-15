@@ -9,7 +9,7 @@ import com.ragagent.chatpipeline.ChatManage;
 import com.ragagent.chatpipeline.PipelineLog;
 import com.ragagent.chatpipeline.support.ImageInfoCollector;
 import com.ragagent.contract.retrieval.ChunkTypes;
-import com.ragagent.common.retrieval.SearchResult;
+import com.ragagent.platform.retrieval.SearchResult;
 import com.ragagent.contract.knowledge.ChunkFacts;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
 import com.ragagent.retrieval.support.ChunkSearchUtil;

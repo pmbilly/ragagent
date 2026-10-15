@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import com.ragagent.contract.knowledge.ChunkView;
 import com.ragagent.contract.retrieval.SearchChunkMerge;
 import com.ragagent.retrieval.domain.ImageInfo;
-import com.ragagent.common.retrieval.SearchResult;
+import com.ragagent.platform.retrieval.SearchResult;
 import com.ragagent.retrieval.domain.WebSearchResult;
 
 /**

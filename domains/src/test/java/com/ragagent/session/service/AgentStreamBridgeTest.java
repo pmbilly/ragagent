@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import com.ragagent.contract.model.ResponseType;
-import com.ragagent.common.retrieval.SearchResult;
+import com.ragagent.platform.retrieval.SearchResult;
 import com.ragagent.contract.session.PipelineUsedMemoryView;
 import com.ragagent.contract.event.Event;
 import com.ragagent.platform.event.EventBus;

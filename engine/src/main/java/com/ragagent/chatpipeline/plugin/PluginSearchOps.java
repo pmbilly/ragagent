@@ -13,7 +13,7 @@ import com.ragagent.chatpipeline.ChatManage;
 import com.ragagent.chatpipeline.PipelineLog;
 import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.contract.retrieval.SearchParams;
-import com.ragagent.common.retrieval.SearchResult;
+import com.ragagent.platform.retrieval.SearchResult;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.contract.knowledge.KnowledgeBaseView;
 import com.ragagent.platform.tracing.langfuse.LangfuseManager;

@@ -20,7 +20,7 @@ import com.ragagent.chatpipeline.plugin.PluginFilterTopK;
 import com.ragagent.chatpipeline.plugin.PluginSearch;
 import com.ragagent.chatpipeline.plugin.PluginSearchParallel;
 import com.ragagent.chatpipeline.support.SearchSupport;
-import com.ragagent.common.retrieval.SearchResult;
+import com.ragagent.platform.retrieval.SearchResult;
 import com.ragagent.retrieval.domain.WebSearchResult;
 import com.ragagent.retrieval.support.SearchTextUtil;
 import com.ragagent.contract.graph.GraphData;

@@ -37,7 +37,7 @@ import com.ragagent.contract.event.payload.ToolApprovalResolvedData;
 import com.ragagent.contract.event.payload.UserMessageInjectedData;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.model.TokenUsage;
-import com.ragagent.common.retrieval.SearchResult;
+import com.ragagent.platform.retrieval.SearchResult;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.support.PipelineViews;
 import com.ragagent.platform.stream.StreamEvent;

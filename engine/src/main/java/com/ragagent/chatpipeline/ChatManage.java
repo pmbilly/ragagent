@@ -9,7 +9,7 @@ import java.util.Map;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.llm.domain.ChatResponse;
-import com.ragagent.common.retrieval.SearchResult;
+import com.ragagent.platform.retrieval.SearchResult;
 import com.ragagent.contract.session.PipelineMessageAttachmentView;
 import com.ragagent.contract.session.PipelineUsedMemoryView;
 import com.ragagent.contract.graph.GraphData;

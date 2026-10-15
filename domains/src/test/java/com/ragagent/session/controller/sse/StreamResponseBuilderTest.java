@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.platform.web.ContractJsonModule;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.llm.domain.StreamResponse;
-import com.ragagent.common.retrieval.SearchResult;
+import com.ragagent.platform.retrieval.SearchResult;
 import com.ragagent.platform.stream.StreamEvent;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletResponse;

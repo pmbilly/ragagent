@@ -1,4 +1,4 @@
-package com.ragagent.common.retrieval;
+package com.ragagent.platform.retrieval;
 
 import java.util.List;
 import java.util.Map;

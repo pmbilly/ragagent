@@ -24,7 +24,7 @@ import com.ragagent.chatpipeline.plugin.PluginWikiBoost;
 import com.ragagent.chatpipeline.support.ReferencesSupport;
 import com.ragagent.contract.memory.MemoryItemView;
 import com.ragagent.contract.memory.MemoryRecall;
-import com.ragagent.common.retrieval.SearchResult;
+import com.ragagent.platform.retrieval.SearchResult;
 import com.ragagent.contract.retrieval.SearchTarget;
 
 /**

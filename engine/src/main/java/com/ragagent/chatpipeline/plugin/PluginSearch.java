@@ -16,7 +16,7 @@ import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.chatpipeline.support.SearchSupport;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.access.TenantContextSnapshot;
-import com.ragagent.common.retrieval.SearchResult;
+import com.ragagent.platform.retrieval.SearchResult;
 
 /**
  * CHUNK_SEARCH 阶段插件（含查询扩展与检索执行协作者）。

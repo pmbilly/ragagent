@@ -18,7 +18,7 @@ import com.ragagent.contract.storage.support.Mode;
 import com.ragagent.contract.storage.support.PublicModeForbiddenException;
 import com.ragagent.contract.storage.support.ResourceModeException;
 import com.ragagent.session.support.MessageReferenceRewriter;
-import com.ragagent.common.storage.support.Rewriter;
+import com.ragagent.platform.storage.support.Rewriter;
 import com.ragagent.contract.storage.support.StorageBackendResolver;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;

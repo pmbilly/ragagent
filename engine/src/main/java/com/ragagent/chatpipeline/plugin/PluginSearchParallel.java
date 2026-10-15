@@ -12,7 +12,7 @@ import com.ragagent.chatpipeline.PipelineEventType;
 import com.ragagent.chatpipeline.PipelineLog;
 import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.chatpipeline.support.SearchSupport;
-import com.ragagent.common.retrieval.SearchResult;
+import com.ragagent.platform.retrieval.SearchResult;
 import com.ragagent.retrieval.graph.RetrieveGraphRepository;
 
 /**

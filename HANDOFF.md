@@ -1792,6 +1792,16 @@ public interface AdminUserPort {
 - **读数**：**C1 受控导入根 61 → 59 文件**；**域侧 handler 10 → 1**；`common/*` 91 → **82**（−9）；`:contract` 203（不变）；载荷 0 保持；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
 - **验证**：**14 守卫全绿**（C1/C2 基线已 `--write`）；**1349 金片签名一致**；`spotlessCheck build` **2m5s**；**4991 / 失败 0 / 跳过 4**；dev 冒烟（sessions / KB / tenants / system-info **200** ✓；`GET /sessions/{id}/messages` ⇒ **500**——**查日志证实为既有的 `HttpRequestMethodNotSupportedException`（405 应然却映射为 500）**，与 handler 无关 ⇒ 该独立小刀仍在队列）
 - **余量**：域侧 handler 仅剩 `wiki/domain/WikiStringListTypeHandler`（L1 用户 `WikiIndexEntry` ⇒ 随其切开）· Jackson 味域内值类型 22 件（其中 session 7 件被 L1 平台面载荷引用 ⇒ 与载荷同生命周期）
+**🔶 清 `:common` 子批 D1·hub 先行：`SearchResult` + 2 件连带入 `:platform`（`common/*` 33 → 29）（2026-10-16）**
+- **决策依据（用户问"d 你的建议"后的定案）**：**(d) 簇不改线格式**（线格式是逐字节契约：1349 金片 + SSE 字节序 + 前端契约 ⇒ 改协议成本远高于收益 ✗），改按**落点法则**处置：
+  > **形状是否需要 Jackson/框架语义 ⇒ 决定它进 `:contract` 还是 `:platform`**（契约＝纯 JDK，连 slf4j 都没有；**platform＝唯一"低于业务域且允许框架"的层**，且 `domains → platform` 是方案 §5.2 合法方向）
+  ⇒ **协议决策与架构收口解耦**：将来若要"契约面也含这些形状"，属 Phase 2 独立立项 ✓
+- **本刀（hub 先行）**：`SearchResult` → `platform.retrieval`（引用者 engine 29 / session 16 / chatpipeline 5 …，**hub** ✓）· `Rewriter` → `platform.storage.support` · `PipelineMessageView` → `platform.session`；随迁测试 `RewriterTest` ✓ + 连带 **`StreamRewriter` + `StreamRewriterTest`**（其唯一阻塞方 `Rewriter` 迁走后自动解锁 ✓ + 测试夹具跨模块不可见 ✗ ⇒ 主体与测试同行 ✓）
+- **三维闭包预检（本刀起用）**：import ✓ + **同包裸名** ✓ + **字符串 FQN/注册名** ✓ 全绿（预检在 D1 抓到"测试夹具依赖"这一类 ✓）
+- **读数**：`common/*` **33 → 29**；`platform` 148 → **152**；`:common` 测试 **32 → 0**（其测试全属已迁类 ✓）；`:contract` 241 ✓；**R10 保持 6 边 / 51 类 / ①档 0** ✓
+- **验证**：**14 守卫全绿** · **1349 金片签名一致** · gate **1m36s / 4996 / 失败 0 / 跳过 4**（platform 测试 156 → **188** ✓）· 冒烟（sessions / KB / system-info **200** ✓）
+- ⚠️ **javadoc 裸名链接第 15 次**：`common/FileResolverFactory` 引已迁的 `Rewriter` ✗ ⇒ 手工降级 `{@code}` ✓（因 `:common` 即将解散，脚本扩展待办记入下轮）
+- **D2（下轮）**：`MessageView` · `SessionQaPort` · `AgentStep` · `AgentToolCall` · `ToolCallTarget` · `UserPreferences` · `AdminUserView` · `AdminUserPort` · `EmbedSessionPort` · `FileContentService`/`WritableFileContentService` · `MemoryMessageCursor` → `:platform`；**D3**：`ParserEngineConfig` 临时落 platform · 删 13 个 `package-info` · **删 `:common` 模块**（settings/消费方/守卫脚本同步 ✓）
 **🔶 清 `:common` 子批 C·`Mode` 入契约（`common/*` 34 → 33；沉淀"零依赖边界"与"同包闭包"两条新判据）（2026-10-16）**
 - **目标**：`Mode`（资源 URL 模式 enum，跨域消费 session 6 / storage / mcp / knowledge ✓）
 - **两处 platform 耦合，两处解法都沉淀成判据**：

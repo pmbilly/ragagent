@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.ragagent.chatpipeline.PipelinePorts;
-import com.ragagent.common.retrieval.SearchResult;
+import com.ragagent.platform.retrieval.SearchResult;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
 
 /**

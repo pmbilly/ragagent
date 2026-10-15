@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ragagent.contract.error.BizException;
-import com.ragagent.common.retrieval.SearchResult;
+import com.ragagent.platform.retrieval.SearchResult;
 import com.ragagent.session.qa.ParsedRequest;
 import com.ragagent.session.qa.QaRequestParser;
 import com.ragagent.session.qa.QaSseOrchestrator;

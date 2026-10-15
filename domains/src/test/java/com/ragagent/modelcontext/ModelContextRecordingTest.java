@@ -19,7 +19,7 @@ import com.ragagent.llm.domain.ChatMessage;
 import com.ragagent.llm.domain.ChatTool;
 import com.ragagent.llm.domain.FunctionCall;
 import com.ragagent.llm.domain.ToolCall;
-import com.ragagent.common.retrieval.SearchResult;
+import com.ragagent.platform.retrieval.SearchResult;
 import com.ragagent.llm.domain.ChatResponse;
 
 /**

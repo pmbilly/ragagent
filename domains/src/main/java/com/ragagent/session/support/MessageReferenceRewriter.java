@@ -10,7 +10,7 @@ import com.ragagent.common.agent.domain.AgentStep;
 import com.ragagent.common.agent.domain.AgentToolCall;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.contract.session.MessageImage;
-import com.ragagent.common.storage.support.Rewriter;
+import com.ragagent.platform.storage.support.Rewriter;
 
 /**
  * 消息历史响应的存储引用重写。

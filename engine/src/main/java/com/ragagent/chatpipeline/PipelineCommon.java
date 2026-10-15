@@ -18,7 +18,7 @@ import com.ragagent.llm.domain.ChatOptions;
 import com.ragagent.platform.prompt.MessageAttachmentsPrompt;
 import com.ragagent.contract.session.PipelineMessageAttachmentView;
 import com.ragagent.contract.session.PipelineMessageImageView;
-import com.ragagent.common.session.PipelineMessageView;
+import com.ragagent.platform.session.PipelineMessageView;
 import com.ragagent.platform.prompt.PromptComposer;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.prompt.AgentPromptPlaceholders;

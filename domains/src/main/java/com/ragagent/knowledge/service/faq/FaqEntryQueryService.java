@@ -24,7 +24,7 @@ import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.retrieval.HybridSearchService;
-import com.ragagent.common.retrieval.SearchResult;
+import com.ragagent.platform.retrieval.SearchResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

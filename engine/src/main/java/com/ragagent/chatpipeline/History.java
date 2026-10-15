@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ragagent.common.retrieval.SearchResult;
+import com.ragagent.platform.retrieval.SearchResult;
 
 /**
  * 一轮问答历史。

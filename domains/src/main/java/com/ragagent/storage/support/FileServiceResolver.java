@@ -14,7 +14,7 @@ import com.ragagent.platform.config.TenantConfigLookup.TenantStorageView;
 import com.ragagent.contract.tenant.StorageEngineConfig;
 import com.ragagent.platform.storage.config.StorageRuntimeEnv;
 import com.ragagent.storage.provider.FileServiceFactory;
-import com.ragagent.common.storage.support.Rewriter;
+import com.ragagent.platform.storage.support.Rewriter;
 import com.ragagent.contract.storage.support.StorageBackendResolver;
 import com.ragagent.contract.storage.support.FileUrlPort;
 import com.ragagent.contract.storage.support.Resolver;
