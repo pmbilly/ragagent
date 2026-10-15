@@ -15,7 +15,7 @@ import com.ragagent.agenttools.wiki.WikiPages;
 import com.ragagent.agenttools.wiki.WikiRouteResolver;
 import com.ragagent.agenttools.wiki.WikiContentRewrite;
 import com.ragagent.agenttools.wiki.WikiScope;
-import com.ragagent.common.wiki.domain.WikiPage;
+import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.contract.wiki.WikiPageNotFoundException;
 import com.ragagent.wiki.service.page.WikiPageService;
 import org.junit.jupiter.api.BeforeEach;

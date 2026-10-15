@@ -8,7 +8,7 @@ import com.ragagent.wiki.domain.folder.WikiFolderNode;
 import com.ragagent.wiki.domain.graph.WikiGraph;
 import com.ragagent.common.wiki.domain.WikiIndex;
 import com.ragagent.common.wiki.domain.WikiIndexEntry;
-import com.ragagent.common.wiki.domain.WikiPage;
+import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.WikiPageIssue;
 import com.ragagent.wiki.domain.page.WikiPageLite;
 import com.ragagent.wiki.domain.page.WikiPageListRequest;

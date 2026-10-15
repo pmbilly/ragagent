@@ -9,7 +9,7 @@ import java.util.Set;
 
 import com.ragagent.contract.wiki.ExtractedItem;
 import com.ragagent.contract.wiki.WikiConstants;
-import com.ragagent.common.wiki.domain.WikiPage;
+import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.page.WikiPageLite;
 import com.ragagent.wiki.service.page.SlugFuzzy;
 import com.ragagent.contract.text.Whitespace;

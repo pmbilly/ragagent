@@ -40,7 +40,7 @@ import com.ragagent.wiki.service.WikiModelResolver;
 import com.ragagent.wiki.service.page.WikiPageService;
 import com.ragagent.wiki.domain.WikiConfig;
 import com.ragagent.wiki.domain.WikiExtractionGranularity;
-import com.ragagent.common.wiki.domain.WikiPage;
+import com.ragagent.wiki.domain.WikiPage;
 
 /**
  * {@link WikiIngestBatchHandler} 的行为测试，外加批次主干里几个可独立验证的纯函数

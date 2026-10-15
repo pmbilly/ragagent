@@ -3,7 +3,6 @@ package com.ragagent.common.wiki;
 import java.util.List;
 
 import com.ragagent.common.wiki.domain.WikiIndex;
-import com.ragagent.common.wiki.domain.WikiPage;
 import com.ragagent.contract.wiki.WikiPageIssueView;
 import com.ragagent.contract.wiki.WikiPageNotFoundException;
 import com.ragagent.contract.wiki.WikiLinkRepairResult;
@@ -21,16 +20,16 @@ import com.ragagent.contract.wiki.WikiLinkRepairResult;
 public interface WikiPageOpsPort {
 
     /** 按 KB + slug 取页；不存在 ⇒ {@link WikiPageNotFoundException}。 */
-    WikiPage getPageBySlug(String kbId, String slug);
+    WikiPageView getPageBySlug(String kbId, String slug);
 
     /** 建页（editSource 为写归因来源，落库时读取）。 */
-    WikiPage createPage(WikiPage page, String editSource);
+    WikiPageView createPage(WikiPageView page, String editSource);
 
     /** 更新页正文/字段（editSource 同上）。 */
-    void updatePage(WikiPage page, String editSource);
+    void updatePage(WikiPageView page, String editSource);
 
     /** 更新页内自动链接内容（editSource 同上）。 */
-    void updateAutoLinkedContent(WikiPage page, String editSource);
+    void updateAutoLinkedContent(WikiPageView page, String editSource);
 
     /** 删页（软删；editSource 同上）。 */
     void deletePage(String kbId, String slug, String editSource);
@@ -54,7 +53,7 @@ public interface WikiPageOpsPort {
     void updateIssueStatus(String issueId, String status);
 
     /** 关键字搜页。 */
-    List<WikiPage> searchPages(String kbId, String query, int limit);
+    List<WikiPageView> searchPages(String kbId, String query, int limit);
 
     /** 索引概览（无类型过滤、全量统计口径）；无 overview ⇒ null。 */
     WikiIndex.Response getIndexView(String kbId, int topK);

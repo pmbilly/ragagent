@@ -1,4 +1,4 @@
-package com.ragagent.common.wiki.domain;
+package com.ragagent.wiki.domain;
 
 
 import java.time.OffsetDateTime;
@@ -13,6 +13,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.ragagent.platform.persistence.PgJsonTypeHandler;
+import com.ragagent.common.wiki.domain.EmptyListAsNullSerializer;
+import com.ragagent.common.wiki.domain.WikiStringListTypeHandler;
+import com.ragagent.common.wiki.domain.WikiCategoryPaths;
 
 /**
  * wiki_pages 表实体。JSON 键为 snake（前端按此解析）。

@@ -10,7 +10,7 @@ import com.ragagent.wiki.domain.folder.WikiFolderCreateRequest;
 import com.ragagent.wiki.domain.folder.WikiFolderListResponse;
 import com.ragagent.wiki.domain.folder.WikiFolderNode;
 import com.ragagent.wiki.domain.folder.WikiFolderUpdateRequest;
-import com.ragagent.common.wiki.domain.WikiPage;
+import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.page.WikiPageMoveRequest;
 import com.ragagent.wiki.service.page.WikiPageService;
 import jakarta.servlet.http.HttpServletRequest;

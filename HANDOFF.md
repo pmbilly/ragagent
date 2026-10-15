@@ -1496,6 +1496,17 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **读数**：**R10 保持 7 条边 / 52 类**（端口在 L1 ⇒ 无新边）✓；14 守卫全绿；**净删 2 个文件**（知识域不再持有该表 mapper）
 - **验证**：`spotlessCheck build` **2m05s**；**4991 / 失败 0 / 跳过 4**；dev ready + 冒烟（knowledge-bases / **storage-backends** / sessions / models 200 ✓）
 - **意义**：`StorageBackend` 实体收窄（C 余量之一）**已具备前提**——唯一持久面在 storage 域，实体回域后跨域只剩端口读（+ system 的少量写面）
+**🔶 C 批 1·第九子批：`WikiPage` 收窄 + 全字段镜像视图（实体 6 → 5）（2026-10-15）**
+- **对象**：`WikiPage`（297 行 / **27 字段 / 54 访问器**；含 `JsonNode pageMetadata`、6 个 `@JsonSerialize`（`EmptyListAsNullSerializer`）列表与 `@JsonInclude` 省略语义——本仓最"重"的实体之一）
+- **实测决定视图宽度**：session 的 wiki 工具后端对该实体用到 **42 个访问器**（20 读 + 22 写）+ 1 个构造点 ⇒ **窄视图不成立**，必须**镜像全 27 字段**
+- **落点**：视图含 `JsonNode pageMetadata` ⇒ 非纯 JDK ⇒ **L1 `common.wiki.WikiPageView`** + 登记 **PENDING_DEJACKSON**（去 Jackson 后与端口页面面整批入 `contract.wiki`）
+- **伴生类继续留 L1（判据）**：`WikiStringListTypeHandler`/`EmptyListAsNullSerializer` 仍被 **`WikiIndexEntry`/`WikiIndex`（L1）与 wiki mappers 共用** ⇒ 不随 `WikiPage` 迁（"共享持久化闭包件等所有用户都迁完再走"——与上一子批同判据）
+- **⭐ 方法学（本批新沉淀）**：**视图与访问器体从实体"逐字提取"生成**——脚本解析实体字段表（27）+ 全部访问器体（54）→ 直接生成视图（含空值归一语义逐字一致）；适配器三助手（`toPageView`/`toPageEntity`/`copyPageInto`）按字段表**自动生成** ⇒ 免手抄 27 字段、零抄写偏差、语义镜像
+- **动作**：① 新建 `common.wiki.WikiPageView` ② 端口 5 方法改视图（`getPageBySlug`/`createPage`/`updatePage`/`updateAutoLinkedContent`/`searchPages`）③ 适配器：`createPage` 回填传入视图、`updatePage`/`updateAutoLinkedContent` 亦**回填**（同"同对象被填充"旧语义）④ 实体回 `wiki/domain` ⑤ session `AgentToolWikiBackends` 改视图
+- **⚠️ 一次编译红态（"原同包兄弟"补 import——该坑第 6 次）**：实体迁出后仍需 **3 个 import**（`WikiStringListTypeHandler`/`EmptyListAsNullSerializer`/`WikiCategoryPaths`；后者是被 `sourceKnowledgeIDs()` 调用的同包工具类）⇒ 迁出后**必须扫"同包裸名引用"**（本仓已第 6 次，仍未机械化进脚本——M2 待办）
+- **读数**：**C2 实体 6 → 5**；C1 受控根 67 → **66 文件**；C4 待归位 14、登记 platform 面 7 + **待去 Jackson 4 → 5**；**R10 保持 7 条边 / 52 类 / ①档 0** ✓
+- **验证**：**14 守卫全绿**（C2 = 5，基线已 `--write`）；**1349 金片签名一致** ✓；`spotlessCheck build` **1m52s**；**4991 / 失败 0 / 跳过 4**；定向 wiki + session + agenttools **680 条** ✓；dev ready + 冒烟（KB / sessions / system-info **200** ✓；`GET /api/v1/knowledgebase/{kbId}/wiki/pages` 与 `…/wiki/issues` ⇒ **404 + `{"code":1003,"message":"knowledge base not found","data":null}` 标准业务信封** ✓——本刀重构的路由族）
+- **C 余量（5 实体）**：`Chunk` / `Knowledge` / `KnowledgeBase`（**宽字段**；`KnowledgeBase` 收窄时一并处置 **G1-h 的 3 件 config**）· `Tenant` / `User`（**管理面**，用例归位）
 **🔶 C 批 1·第八子批：`WikiPageIssue` 收窄 + 契约视图（实体 7 → 6）（2026-10-15）**
 - **对象**：`WikiPageIssue`（12 字段 `@TableName` 实体；跨域消费仅 **session 的 wiki 工具后端** `AgentToolWikiBackends`——**1 个构造点**（8 setters）+ 1 个读取映射；此前"56 setters"实为全仓计数，实际很可控）
 - **风险评估（先测后动）**：`GET /api/v1/knowledgebase/{kbId}/wiki/issues` 由 **wiki 域自己的 `maintenanceOps`** 服务（**不经 L1 端口**）⇒ 线格式不动 ✓；端口 3 个 issue 方法只 `listIssues`/`createIssue` 涉实体（`updateIssueStatus` 收字符串 ✓）
@@ -2517,10 +2528,10 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 
 | 项 | 现状 | 门禁 |
 |---|---|---|
-| `:common` 持久化实体 | **6**（`User` · `Chunk` · `Knowledge` · `KnowledgeBase` · `Tenant` · `WikiPage`；`StorageBackend`/`WikiPageIssue` 已归位） | C2（只许减） |
+| `:common` 持久化实体 | **5**（`User` · `Chunk` · `Knowledge` · `KnowledgeBase` · `Tenant`；`StorageBackend`/`WikiPageIssue`/`WikiPage` 已归位） | C2（只许减） |
 | `:common` 域侧 TypeHandler | **10** | C2 |
 | `:common` 载荷型 | **14 待归位** + 7 platform 面登记 + 3 待去 Jackson | C4 |
-| `:common` 受控依赖根 | 10 根 / 67 文件 | C1 |
+| `:common` 受控依赖根 | 10 根 / 66 文件 | C1 |
 | `:contract` **误搬件** | **8 → 3**（D0a/D0b 已归位 5 件）（D0a/D0b 已归位 5 件；余 3 件 `KnowledgeBase*Config` 实体耦合，见 G1-h） | **待加 C5/C6** |
 | `:common` 规模 | **265 件** = `common/*` **125** + `platform/*` 139 + `event/*` 1（D1 后） | — |
 

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ragagent.contract.wiki.WikiConstants;
-import com.ragagent.common.wiki.domain.WikiPage;
+import com.ragagent.wiki.domain.WikiPage;
 
 /**
  * 交叉链接注入的<b>可插拔端口</b>。

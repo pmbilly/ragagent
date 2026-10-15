@@ -12,7 +12,7 @@ import java.util.Set;
 import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.contract.wiki.WikiException;
 import com.ragagent.wiki.domain.graph.WikiGraph;
-import com.ragagent.common.wiki.domain.WikiPage;
+import com.ragagent.wiki.domain.WikiPage;
 
 /**
  * 图谱子集计算。

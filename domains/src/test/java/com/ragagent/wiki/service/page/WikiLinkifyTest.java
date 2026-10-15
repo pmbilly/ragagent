@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import com.ragagent.wiki.service.page.WikiCrossLinker.LinkRef;
 import com.ragagent.contract.wiki.WikiConstants;
-import com.ragagent.common.wiki.domain.WikiPage;
+import com.ragagent.wiki.domain.WikiPage;
 
 /**
  * {@link WikiLinkify} 的表驱动测试。

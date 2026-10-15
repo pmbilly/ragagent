@@ -22,7 +22,6 @@
    "com/ragagent/common/knowledge/domain/KnowledgeBase.java",
    "com/ragagent/common/tenant/domain/Tenant.java",
    "com/ragagent/common/wiki/domain/WikiIndexEntry.java",
-   "com/ragagent/common/wiki/domain/WikiPage.java",
    "com/ragagent/platform/persistence/FullTableWriteGuard.java",
    "com/ragagent/platform/persistence/PageRequests.java",
    "com/ragagent/platform/persistence/PgJsonTypeHandler.java",
@@ -125,8 +124,7 @@
    "com/ragagent/common/knowledge/domain/Chunk.java",
    "com/ragagent/common/knowledge/domain/Knowledge.java",
    "com/ragagent/common/knowledge/domain/KnowledgeBase.java",
-   "com/ragagent/common/tenant/domain/Tenant.java",
-   "com/ragagent/common/wiki/domain/WikiPage.java"
+   "com/ragagent/common/tenant/domain/Tenant.java"
   ],
   "handlers": [
    "com/ragagent/common/session/domain/AbstractJsonListTypeHandler.java",

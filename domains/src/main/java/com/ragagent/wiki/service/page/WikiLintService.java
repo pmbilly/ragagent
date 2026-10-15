@@ -15,7 +15,7 @@ import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.contract.wiki.WikiException;
 import com.ragagent.wiki.domain.issue.WikiLintIssue;
 import com.ragagent.wiki.domain.issue.WikiLintReport;
-import com.ragagent.common.wiki.domain.WikiPage;
+import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.page.WikiStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

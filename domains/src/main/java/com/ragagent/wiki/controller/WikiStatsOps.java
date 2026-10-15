@@ -7,7 +7,7 @@ import java.util.Map;
 
 import com.ragagent.wiki.domain.graph.WikiGraph;
 import com.ragagent.common.wiki.domain.WikiIndex;
-import com.ragagent.common.wiki.domain.WikiPage;
+import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.page.WikiStats;
 import com.ragagent.wiki.service.page.WikiPageService;
 import jakarta.servlet.http.HttpServletRequest;

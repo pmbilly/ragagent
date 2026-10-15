@@ -20,7 +20,7 @@ import com.ragagent.wiki.domain.SourceRefNeedle;
 import com.ragagent.common.wiki.domain.WikiCategoryPaths;
 import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.common.wiki.domain.WikiIndexEntry;
-import com.ragagent.common.wiki.domain.WikiPage;
+import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.page.WikiPageConflictException;
 import com.ragagent.wiki.domain.WikiPageIssue;
 import com.ragagent.wiki.domain.page.WikiPageLite;

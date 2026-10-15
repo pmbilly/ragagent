@@ -17,7 +17,7 @@ import com.ragagent.agenttools.wiki.IssueView;
 import com.ragagent.agenttools.wiki.PageView;
 import com.ragagent.agenttools.wiki.WikiPages;
 import com.ragagent.common.wiki.domain.WikiIndex;
-import com.ragagent.common.wiki.domain.WikiPage;
+import com.ragagent.common.wiki.WikiPageView;
 import com.ragagent.contract.wiki.WikiPageIssueView;
 
 /**
@@ -64,7 +64,7 @@ final class AgentToolWikiBackends {
 
             @Override
             public PageView createPage(PageView page, String editSource) {
-                WikiPage entity = toEntity(page);
+                WikiPageView entity = toEntity(page);
                 // 工具经 PageView.copy() 会带来旧 ID，必须在接缝处清掉——
                 // 新建路径语义是"由 service 生成新 UUID"，否则与旧页撞主键。
                 entity.setId(null);
@@ -141,7 +141,7 @@ final class AgentToolWikiBackends {
             @Override
             public List<PageView> searchPages(String kbId, String query, int limit) {
                 List<PageView> out = new ArrayList<>();
-                for (WikiPage page : wikiPageOps.searchPages(kbId, query, limit)) {
+                for (WikiPageView page : wikiPageOps.searchPages(kbId, query, limit)) {
                     if (page != null) {
                         out.add(toPageView(page));
                     }
@@ -164,7 +164,7 @@ final class AgentToolWikiBackends {
         };
     }
     /** WikiPage → 工具侧页视图。 */
-    static PageView toPageView(WikiPage page) {
+    static PageView toPageView(WikiPageView page) {
         PageView view = PageView.of(page.getKnowledgeBaseId(),
                 page.getSlug());
         view.setId(page.getId());
@@ -187,8 +187,8 @@ final class AgentToolWikiBackends {
         return view;
     }
     /** 工具侧页视图 → WikiPage 实体（service 就地补全 ID/Status/Version/OutLinks）。 */
-    static WikiPage toEntity(PageView view) {
-        WikiPage entity = new WikiPage();
+    static WikiPageView toEntity(PageView view) {
+        WikiPageView entity = new WikiPageView();
         entity.setId(view.id());
         entity.setTenantId(view.tenantId());
         entity.setKnowledgeBaseId(view.knowledgeBaseId());

@@ -17,7 +17,7 @@ import com.ragagent.wiki.domain.folder.WikiFolderConflictException;
 import com.ragagent.wiki.domain.folder.WikiFolderNode;
 import com.ragagent.wiki.domain.folder.WikiFolderNotFoundException;
 import com.ragagent.wiki.domain.folder.WikiFolderNotEmptyException;
-import com.ragagent.common.wiki.domain.WikiPage;
+import com.ragagent.wiki.domain.WikiPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

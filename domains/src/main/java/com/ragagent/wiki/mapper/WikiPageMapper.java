@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import com.ragagent.wiki.domain.SourceRefNeedle;
 import com.ragagent.common.wiki.domain.WikiIndexEntry;
-import com.ragagent.common.wiki.domain.WikiPage;
+import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.domain.page.WikiPageLite;
 import com.ragagent.common.wiki.domain.WikiStringListTypeHandler;
 import org.apache.ibatis.annotations.Mapper;

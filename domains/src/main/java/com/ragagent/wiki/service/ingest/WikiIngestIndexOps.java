@@ -8,7 +8,7 @@ import java.util.Set;
 import com.ragagent.llm.LlmChatClient;
 import com.ragagent.contract.wiki.WikiConstants;
 import com.ragagent.common.wiki.domain.WikiIndexEntry;
-import com.ragagent.common.wiki.domain.WikiPage;
+import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.wiki.prompt.WikiPrompts;
 import com.ragagent.contract.text.Whitespace;
 import com.ragagent.platform.text.CodePointOrder;

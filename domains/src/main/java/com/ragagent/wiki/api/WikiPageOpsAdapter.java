@@ -7,7 +7,8 @@ import org.springframework.stereotype.Component;
 import com.ragagent.contract.wiki.WikiLinkRepairResult;
 import com.ragagent.common.wiki.WikiPageOpsPort;
 import com.ragagent.common.wiki.domain.WikiIndex;
-import com.ragagent.common.wiki.domain.WikiPage;
+import com.ragagent.common.wiki.WikiPageView;
+import com.ragagent.wiki.domain.WikiPage;
 import com.ragagent.contract.wiki.WikiPageIssueView;
 import com.ragagent.wiki.domain.WikiPageIssue;
 import com.ragagent.wiki.service.page.WikiEditContext;
@@ -30,24 +31,32 @@ public class WikiPageOpsAdapter implements WikiPageOpsPort {
     }
 
     @Override
-    public WikiPage getPageBySlug(String kbId, String slug) {
-        return wikiPageService.getPageBySlug(kbId, slug);
+    public WikiPageView getPageBySlug(String kbId, String slug) {
+        return toPageView(wikiPageService.getPageBySlug(kbId, slug));
     }
 
     @Override
-    public WikiPage createPage(WikiPage page, String editSource) {
-        return WikiEditContext.callWith(editSource, () -> wikiPageService.createPage(page));
+    public WikiPageView createPage(WikiPageView page, String editSource) {
+        WikiPage saved = WikiEditContext.callWith(editSource,
+                () -> wikiPageService.createPage(toPageEntity(page)));
+        // 旧语义：域服务就地把 id/createdAt 等写回**调用方那个对象** ⇒ 这里回填传入视图
+        copyPageInto(page, saved);
+        return toPageView(saved);
     }
 
     @Override
-    public void updatePage(WikiPage page, String editSource) {
-        WikiEditContext.callWith(editSource, () -> wikiPageService.updatePage(page));
+    public void updatePage(WikiPageView page, String editSource) {
+        WikiPage entity = toPageEntity(page);
+        WikiEditContext.callWith(editSource, () -> wikiPageService.updatePage(entity));
+        copyPageInto(page, entity);
     }
 
     @Override
-    public void updateAutoLinkedContent(WikiPage page, String editSource) {
+    public void updateAutoLinkedContent(WikiPageView page, String editSource) {
+        WikiPage entity = toPageEntity(page);
         WikiEditContext.runWith(editSource,
-                () -> wikiPageService.updateAutoLinkedContent(page));
+                () -> wikiPageService.updateAutoLinkedContent(entity));
+        copyPageInto(page, entity);
     }
 
     @Override
@@ -93,8 +102,9 @@ public class WikiPageOpsAdapter implements WikiPageOpsPort {
     }
 
     @Override
-    public List<WikiPage> searchPages(String kbId, String query, int limit) {
-        return wikiPageService.searchPages(kbId, query, limit);
+    public List<WikiPageView> searchPages(String kbId, String query, int limit) {
+        return wikiPageService.searchPages(kbId, query, limit).stream()
+                .map(WikiPageOpsAdapter::toPageView).toList();
     }
 
     @Override
@@ -160,6 +170,113 @@ public class WikiPageOpsAdapter implements WikiPageOpsPort {
         v.setSuspectedKnowledgeIds(fresh.getSuspectedKnowledgeIds());
         v.setStatus(fresh.getStatus());
         v.setReportedBy(fresh.getReportedBy());
+        v.setCreatedAt(fresh.getCreatedAt());
+        v.setUpdatedAt(fresh.getUpdatedAt());
+        v.setDeletedAt(fresh.getDeletedAt());
+    }
+
+    /** 实体 → 行视图（逐字段搬运；null 透传）。 */
+    static WikiPageView toPageView(WikiPage e) {
+        if (e == null) {
+            return null;
+        }
+        WikiPageView v = new WikiPageView();
+        v.setId(e.getId());
+        v.setTenantId(e.getTenantId());
+        v.setKnowledgeBaseId(e.getKnowledgeBaseId());
+        v.setSlug(e.getSlug());
+        v.setTitle(e.getTitle());
+        v.setPageType(e.getPageType());
+        v.setStatus(e.getStatus());
+        v.setContent(e.getContent());
+        v.setSummary(e.getSummary());
+        v.setAliases(e.getAliases());
+        v.setParentSlug(e.getParentSlug());
+        v.setFolderId(e.getFolderId());
+        v.setCategoryPath(e.getCategoryPath());
+        v.setWikiPath(e.getWikiPath());
+        v.setDepth(e.getDepth());
+        v.setSortOrder(e.getSortOrder());
+        v.setSourceRefs(e.getSourceRefs());
+        v.setChunkRefs(e.getChunkRefs());
+        v.setInLinks(e.getInLinks());
+        v.setOutLinks(e.getOutLinks());
+        v.setPageMetadata(e.getPageMetadata());
+        v.setVersion(e.getVersion());
+        v.setLastEditSource(e.getLastEditSource());
+        v.setLastEditorId(e.getLastEditorId());
+        v.setCreatedAt(e.getCreatedAt());
+        v.setUpdatedAt(e.getUpdatedAt());
+        v.setDeletedAt(e.getDeletedAt());
+        return v;
+    }
+
+    /** 行视图 → 实体（写面用；经实体 setter ⇒ 保留其空值归一语义；null 透传）。 */
+    static WikiPage toPageEntity(WikiPageView v) {
+        if (v == null) {
+            return null;
+        }
+        WikiPage e = new WikiPage();
+        e.setId(v.getId());
+        e.setTenantId(v.getTenantId());
+        e.setKnowledgeBaseId(v.getKnowledgeBaseId());
+        e.setSlug(v.getSlug());
+        e.setTitle(v.getTitle());
+        e.setPageType(v.getPageType());
+        e.setStatus(v.getStatus());
+        e.setContent(v.getContent());
+        e.setSummary(v.getSummary());
+        e.setAliases(v.getAliases());
+        e.setParentSlug(v.getParentSlug());
+        e.setFolderId(v.getFolderId());
+        e.setCategoryPath(v.getCategoryPath());
+        e.setWikiPath(v.getWikiPath());
+        e.setDepth(v.getDepth());
+        e.setSortOrder(v.getSortOrder());
+        e.setSourceRefs(v.getSourceRefs());
+        e.setChunkRefs(v.getChunkRefs());
+        e.setInLinks(v.getInLinks());
+        e.setOutLinks(v.getOutLinks());
+        e.setPageMetadata(v.getPageMetadata());
+        e.setVersion(v.getVersion());
+        e.setLastEditSource(v.getLastEditSource());
+        e.setLastEditorId(v.getLastEditorId());
+        e.setCreatedAt(v.getCreatedAt());
+        e.setUpdatedAt(v.getUpdatedAt());
+        e.setDeletedAt(v.getDeletedAt());
+        return e;
+    }
+
+    /** 把落库后的实体字段回填到传入视图（保持"同对象被填充"的旧语义；null 安全）。 */
+    static void copyPageInto(WikiPageView v, WikiPage e) {
+        if (v == null || e == null) {
+            return;
+        }
+        WikiPageView fresh = toPageView(e);
+        v.setId(fresh.getId());
+        v.setTenantId(fresh.getTenantId());
+        v.setKnowledgeBaseId(fresh.getKnowledgeBaseId());
+        v.setSlug(fresh.getSlug());
+        v.setTitle(fresh.getTitle());
+        v.setPageType(fresh.getPageType());
+        v.setStatus(fresh.getStatus());
+        v.setContent(fresh.getContent());
+        v.setSummary(fresh.getSummary());
+        v.setAliases(fresh.getAliases());
+        v.setParentSlug(fresh.getParentSlug());
+        v.setFolderId(fresh.getFolderId());
+        v.setCategoryPath(fresh.getCategoryPath());
+        v.setWikiPath(fresh.getWikiPath());
+        v.setDepth(fresh.getDepth());
+        v.setSortOrder(fresh.getSortOrder());
+        v.setSourceRefs(fresh.getSourceRefs());
+        v.setChunkRefs(fresh.getChunkRefs());
+        v.setInLinks(fresh.getInLinks());
+        v.setOutLinks(fresh.getOutLinks());
+        v.setPageMetadata(fresh.getPageMetadata());
+        v.setVersion(fresh.getVersion());
+        v.setLastEditSource(fresh.getLastEditSource());
+        v.setLastEditorId(fresh.getLastEditorId());
         v.setCreatedAt(fresh.getCreatedAt());
         v.setUpdatedAt(fresh.getUpdatedAt());
         v.setDeletedAt(fresh.getDeletedAt());
