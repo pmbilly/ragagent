@@ -5,7 +5,7 @@ import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import org.springframework.stereotype.Component;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
-import com.ragagent.common.knowledge.KnowledgeTagView;
+import com.ragagent.contract.knowledge.KnowledgeTagView;
 
 /**
  * 自动标签的生产实现：同名标签存在 → 直接用；否则走 {@code KnowledgeTagService#createTag}

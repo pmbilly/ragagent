@@ -10,6 +10,7 @@ import com.ragagent.common.knowledge.domain.ChunkPage;
 import com.ragagent.common.knowledge.domain.FaqEntryPage;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
+import com.ragagent.contract.knowledge.KnowledgeTagView;
 
 /**
  * 知识目录读写端口（L1）：知识条目与知识库两族的按 id/租户读取与增删。

@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
-import com.ragagent.common.knowledge.KnowledgeTagView;
+import com.ragagent.contract.knowledge.KnowledgeTagView;
 
 /**
  * 自动标签生产实现（按名称查找或创建标签）：

@@ -181,17 +181,38 @@ contracts → JDK
 - ⇒ **立欠债：「实体 → 视图」收窄专项**（清单与分批路径见 **§12.4**；本地工作稿 `outputs/a3-entity-narrowing-plan-2026-10-15.md`——⚠️ `outputs/` 被 gitignore，**以 §12.4 为准**）；**`common` 侧的门禁已上线**（§12.3 新增「契约层纯度」守卫：受控依赖根与持久化形状均冻结、只许减）；
 - ⇒ **新工作一律按本判据选载体**：窄读→`contract.*` 视图；宽字段/写面→**用例移入属主域**（不共享实体）；**不得再上提持久化实体**。
 
-### 12.1 Gradle 模块与依赖方向（实测 build.gradle.kts）
+### 12.1 Gradle 模块与依赖方向（**实测 2026-10-15**：5 个模块）
 
 ```
-boot      → domains, engine, common   （唯一组合根；不执行业务 SQL）
-domains   → engine, common            （业务域；34 顶层包）
-engine    → common（api 暴露）         （检索 / LLM / chatpipeline 能力层）
-common    → JDK（+ 工具链）            （平台与契约底座）
+boot      → domains, engine, common, contract   （唯一组合根；不执行业务 SQL）
+domains   → engine, common, contract             （业务域；implementation）
+engine    → common, contract                     （能力层）
+common    → contract                             （api(project(":contract"))；common → contract 单向）
+contract  → JDK                                  （纯 JDK：公开 API / SPI / 不可变载荷）
 ```
 
-- `:engine` 的包根是 `com.ragagent.llm` / `retrieval` / `chatpipeline` 等（**无 `engine.` 中缀**）——模块边界靠 ArchUnit 与脚本规则强制，不靠包名前缀。
-- v0.2.0 阶段 6：`common` 收敛为 `contracts` + `platform` 两个面、`engine` 收敛为 agent-engine / retrieval-engine / model-runtime 三个面（**先包边界 + 规则，后 Gradle 模块**，见整改方案 §5.2）。
+- `:contract` **已独立**（136 件，与整改方案 §8.1 的 `contracts/` 清单对齐：`contract.{agent,apikey,audit,auth,doc,knowledge,session,...}`）；**`:common` 已依赖 `:contract`** ⇒ 端口/视图可落 `:contract` 并被 `common`/域共同使用 ✓
+- **`:common` 尚未拆**：312 件 = `com.ragagent.common.*` **172** + `com.ragagent.platform.*` **139** + `com.ragagent.event.*` 1 ⇒ **`platform` 仍是包边界级（B259），未独立成模块**
+- `:engine` 的包根是 `com.ragagent.llm` / `retrieval` / `chatpipeline` 等（**无 `engine.` 中缀**）——模块边界靠 ArchUnit 与脚本规则强制，不靠包名前缀
+- v0.2.0 阶段 6 的 **B256~B267 十二批已 ✅，但完成口径是"包边界 + 规则"**（评审明确建议"本期只做包边界与规则，不新增 Gradle 模块；模块提取待包边界稳定后**单独立项**"）⇒ **模块提取的立项与准入见 §12.5**
+
+### 12.5 模块提取专项（**立项：待 §12.5 准入清单达标后启动**）
+
+> 依据：整改方案 §5.2（"**仍是单进程分层单体。先建立包边界与 ArchUnit 规则，确有编译隔离收益时再逐域拆 Gradle 模块**"）+ 实施方案评审 P0-3（"模块提取待包边界稳定后单独立项"）。
+> **纪律**：**准入未达标前不新增 Gradle 模块**（避免"拆完还要回头搬内容"的返工）。
+
+**准入清单（gate list，逐条可机械判定）**
+
+| # | 门槛 | 判定方式 |
+|---|---|---|
+| **G1** | `:common` 内**载荷型文件清零或全登记**（`*View`/`*Facts`/`*Payload`/`*Response`/`*Port`，实测 2026-10-15＝**32 件**）——载荷应落 `:contract`、持久化实体回域 | 新增门禁 **C4**（`check-contracts-purity.py`，只许减）+ C1/C2 |
+| **G2** | `com.ragagent.platform.*` 与 `com.ragagent.common.*` **依赖单向无环** | R5/R6/R9（包级 SCC）已覆盖；拆前复跑 |
+| **G3** | **组件/属性/Mapper 扫描面清单同步**（方案阶段 6 验收原文：每步同步更新，**不刷新 baseline 掩盖违例**） | 拆某一模块时逐项核对 `@ConfigurationPropertiesScan`/`@ComponentScan`/`@MapperScan` |
+| **G4** | **"确有编译隔离收益"的证据**（方案触发条件） | 口径：该包簇的**改动频率 × 受影响模块数**、增量编译范围；给出量化对比后再动手 |
+
+**提取顺序（方案 §5.2 / 阶段 6 原文）**：**先 `contracts`（✅ 已独立）→ 再 `platform`（139 件，低风险）→ 再三个 runtime（`engine` 318 件：agent-engine / retrieval-engine / model-runtime）→ 最后 `domains` 内部重排**；"一次只搬一个包簇 → 全绿 → 提交"。
+
+**与当前工作（C 实体收窄）的关系**：**C 主体先做完**——因为 `:common` 里"既非契约也非平台"的内容（实体 + 载荷）正是 G1 的对象；G1 达标与 C 完成**互为前提**，否则拆完仍要搬运。
 
 ### 12.2 域内分层约定（整改方案 §6 表）
 
@@ -1424,6 +1445,16 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **验证**：**13 守卫全绿** ✓（环 0 组、R9 包级 SCC 基线按提示刷新后仍 10 组、L1→域 0 条、R6 不变）；`spotlessCheck build` ✓ **1m38s** ✓；**4991 / 失败 0 / 跳过 4**（boot 1331 ✓）；dev 重启 ready ✓ + 冒烟（`/api/v1/storage-backends`、`/api/v1/knowledge-bases` 200 ✓；`/api/v1/messages/{id}/load` 业务级 404 "session not found" ✓ 路由/鉴权/新注入链路正常）
 - **A③ 累计（二十八刀）**：边 **64 → 30（−34）**、类 **317 → 195（−122）**；三档 **① 22 条 / 109 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
 - **下一步候选**：`knowledge→storage` 第三刀（余 2 类：`KnowledgeBaseFileProxyController` 需文件代理端口、`TenantFileStorage` 需 provider 存储端口）· `embedchannel→storage`（余 1 类）· **待拍板** `mcp→agent`(9) · **K 级** `im→session`(6) · `datasource→knowledge`(8) · **大块** `knowledge→model`(14) · `session→knowledge`(17) · `session→storage`(6 余)
+**🔶 计划更新：模块提取立项（§12.5）+ 载荷落点修正 + C4 门禁上线（2026-10-15）**
+- **计划更新（回答"`common` 何时完全拆成 contract/platform"）**：
+  1. **§12.1 改实测版**：模块是 **5 个**（`:contract` 已独立 136 件、`:common` 312 件未拆）——旧图写 4 个模块属失真，已修；依赖方向 `domains/engine/boot → common → contract`（`common/build.gradle.kts:64` 的 `api(project(":contract"))`）
+  2. **新增 §12.5「模块提取专项」**：承方案 §5.2（"**确有编译隔离收益时再逐域拆 Gradle 模块**"）与评审 P0-3（"模块提取待包边界稳定后**单独立项**"）⇒ **B256~B267 的完成口径＝"包边界 + 规则"**；**准入清单 G1~G4**：G1 `:common` 载荷型文件清零/登记（C4 棘轮）· G2 platform↔common 无环 · G3 组件/属性/Mapper 扫描面同步 · G4 编译隔离收益证据；**顺序**：platform（139 件，低风险）→ 三 runtime（engine 318 件）→ domains 重排；**纪律：准入未达标前不新增 Gradle 模块**；**与 C 的关系**：G1 的对象正是 C 收窄的内容 ⇒ **C 主体先做完**
+  3. 实施方案文档（`outputs/` 本地稿）同步加"**修订 3**"
+- **载荷落点修正**：`KnowledgeTagView` 从 `common.knowledge` **移入 `:contract`**（`com.ragagent.contract.knowledge`，与 `ChunkView`/`KnowledgeView` 同处）——依据：`:common` 已依赖 `:contract` ⇒ 端口可返回契约类型；至此**"视图/事实/端口接口 → `:contract`；持久化实体 → 域"**口径落地
+- **新增 C4 门禁**（`check-contracts-purity.py`）：`common/**`（非 platform）的**载荷型文件**（`*View`/`*Facts`/`*Payload`/`*Response`/`*Port`）棘轮**只许减**，基线 **31 件**（移动前 32 ⇒ 本次修正本身即 −1）；红态探针有据（注入 `ProbeView.java` ⇒ 32 且判红 ✓）
+- **读数**：C2 实体保持 **13**；C4 基线 **31**；**14 守卫全绿**（run-guards 标签已更到 C1/C2/C3/C4）
+- **验证**：`spotlessCheck build` ✓ **2m12s** ✓；**4991 / 失败 0 / 跳过 4** ✓；dev 重启 ready ✓ + 冒烟（KB/models/sessions 200 ✓；`/api/v1/knowledge-bases/{id}/tags` ⇒ 404 + 标准信封 ✓——正是经 `:contract` 视图的链路）
+- **下一步（继续 C）**：次批候选按筛表——`MessageSuggestionSet`(2) / `WikiPageIssue`(4) / `StorageBackend`(8) / `WikiPage`(7)；**新视图一律落 `:contract`**
 **🔶 C 批 1·第一子批：`KnowledgeTag` 实体收窄归域（实体 14 → 13；R10 保持 7 边 / 52 类）（2026-10-15）**
 - **背景**：①档已清零（A③-54），此后工作重心＝§12.0 判据下的**欠债收窄**（C；B 门禁 C1/C2/C3 已上线、A 清单已在 §12.4）
 - **本刀最重要的产出＝"收窄总判据"（写入 §12.4）**：**收窄实体会重建跨域边**，必须同批做四件事——①读面换 **L1 不可变视图** ②写面走 **L1 写端口**（或用例归位）③**L1 里以实体为参数的组件改吃视图或下沉回域**（投影器/端口签名/载荷）④实体才回域

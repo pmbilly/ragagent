@@ -21,6 +21,10 @@
      `platform/persistence/` 下的通用基础设施 handler **不计**（属 `platform` 正当内容）。
   C3 build 依赖清单：`common/build.gradle.kts` 的 `api(...)` / `implementation(...)` 坐标集合。
      新增坐标 ⇒ 红（要加必须在本脚本说明理由并 `--write`，即"加依赖要签字的显式动作"）。
+  C4 载荷落点：`common/.../com/ragagent/common/**` 下的**载荷型文件**
+     （`*View` / `*Facts` / `*Payload` / `*Response` / `*Port`）——终态应落 **`:contract`** 或回各域
+     （HANDOFF §12.0/§12.5 G1）；新增 ⇒ 红，减少 ⇒ 提示 `--write` 收紧。
+     （`:common` 已 `api(project(":contract"))`，端口/视图可落 `:contract` 并被 common 与各域共用。）
 
 白名单（= 允许的根；改这里等于改判据，需同步 HANDOFF §12.0）：
   `java.` / `javax.` / `com.ragagent.` / `com.fasterxml.jackson`（序列化）/ `org.slf4j`（日志）
@@ -105,8 +109,23 @@ def scan_build_deps() -> list[str]:
     return sorted({m.group(1) for m in pat.finditer(s)})
 
 
+PAYLOAD_SUFFIXES = ("View", "Facts", "Payload", "Response", "Port")
+
+
+def scan_payloads() -> list[str]:
+    """C4：`common`（非 platform）里的载荷型文件。"""
+    base = ROOT / "common" / "src" / "main" / "java"
+    root = base / "com" / "ragagent" / "common"
+    out = []
+    for f in root.rglob("*.java"):
+        if f.name.endswith(tuple(s + ".java" for s in PAYLOAD_SUFFIXES)):
+            out.append(str(f.relative_to(base)))
+    return sorted(out)
+
+
 def collect() -> dict:
-    return {"imports": scan_imports(), "persistence": scan_persistence(), "build_deps": scan_build_deps()}
+    return {"imports": scan_imports(), "persistence": scan_persistence(),
+            "build_deps": scan_build_deps(), "payloads": scan_payloads()}
 
 
 def load() -> dict:
@@ -125,7 +144,7 @@ def write(cur: dict) -> None:
     total = sum(len(v) for v in cur["imports"].values())
     print(f"✓ 基线已写入：受控导入根 {len(cur['imports'])} 个 / 共 {total} 文件，"
           f"实体 {len(cur['persistence']['entities'])}，域侧 handler {len(cur['persistence']['handlers'])}，"
-          f"build 依赖 {len(cur['build_deps'])}")
+          f"build 依赖 {len(cur['build_deps'])}，载荷型文件 {len(cur['payloads'])}")
 
 
 def main() -> int:
@@ -163,6 +182,17 @@ def main() -> int:
         gone = sorted(set(base["persistence"][key]) - set(cur["persistence"][key]))
         if gone:
             shrinks.append(f"C2 {label} 减少 {len(gone)} 个（{gone[:3]}）")
+    # C4
+    base_payloads = base.get("payloads", [])
+    if not base_payloads:
+        problems.append("C4 基线缺少 payloads 字段（旧基线）⇒ 确认后用 --write 重建")
+    new_payloads = sorted(set(cur["payloads"]) - set(base_payloads))
+    if new_payloads:
+        problems.append(f"C4 common 新增载荷型文件：{new_payloads[:4]}（共 {len(new_payloads)} 个）"
+                        f"——载荷应落 :contract 或回域（HANDOFF §12.5 G1）")
+    gone_payloads = sorted(set(base_payloads) - set(cur["payloads"]))
+    if gone_payloads:
+        shrinks.append(f"C4 载荷型文件减少 {len(gone_payloads)} 个（{gone_payloads[:3]}）")
     # C3
     new_deps = sorted(set(cur["build_deps"]) - set(base["build_deps"]))
     if new_deps:
@@ -179,7 +209,7 @@ def main() -> int:
         return 1
     msg = (f"✓ 契约层纯度：受控导入根 {len(cur['imports'])} 个（{sum(len(v) for v in cur['imports'].values())} 文件）"
            f"· 实体 {len(cur['persistence']['entities'])} · 域侧 handler {len(cur['persistence']['handlers'])}"
-           f"· build 依赖 {len(cur['build_deps'])}（全部冻结只许减）")
+           f"· build 依赖 {len(cur['build_deps'])} · 载荷型文件 {len(cur['payloads'])}（全部冻结只许减）")
     if shrinks:
         print(msg + f"；可收紧 {len(shrinks)} 处 —— 对账后跑 --write：")
         for s in shrinks[:8]:

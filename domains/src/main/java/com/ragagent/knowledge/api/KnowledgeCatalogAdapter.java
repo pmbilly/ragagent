@@ -35,7 +35,7 @@ import com.ragagent.knowledge.repository.KnowledgeTagRepository;
 import com.ragagent.platform.web.JsonMappers;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.common.knowledge.KnowledgeTagView;
+import com.ragagent.contract.knowledge.KnowledgeTagView;
 
 /**
  * {@link KnowledgeCatalogPort} 的知识域实现：读写逐字转发两个门面服务，

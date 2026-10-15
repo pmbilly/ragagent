@@ -38,7 +38,7 @@ run '异常语义（B217：检索引擎层不得在 catch 里清空条件——�
 run '契约同步（B221：金片键签名变了必须签字，防"后端改契约前端不知情"）' python3 scripts/check-contract-sync.py
 run '路径/包对应（B263㉖：源码目录必须与 package 声明一致，防"改包不搬目录"）' python3 scripts/check-package-dirs.py
 run '域间只经契约（R10/A③：跨域只经 contract 或装配层，棘轮只许减）' python3 scripts/check-domain-contracts.py
-run '契约层纯度（C1/C2/C3：common/contracts 的受控依赖根与持久化形状冻结、只许减）' python3 scripts/check-contracts-purity.py
+run '契约层纯度（C1/C2/C3/C4：受控依赖根 · 持久化形状 · build 依赖 · 载荷落点，全部冻结只许减）' python3 scripts/check-contracts-purity.py
 
 echo
 # 汇总行**自计数**（B267 结项实测的漂移）：加第 12 个守卫时头注释/README/CI 都改了，唯独这里
