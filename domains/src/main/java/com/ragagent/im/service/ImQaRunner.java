@@ -13,7 +13,6 @@ import com.ragagent.im.runtime.ImFormat;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.QaQueue;
 import com.ragagent.im.runtime.ReplyMessage;
-import com.ragagent.common.session.domain.message.Message;
 import com.ragagent.common.session.domain.conversation.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +25,7 @@ import com.ragagent.contract.event.payload.AgentCompleteData;
 import com.ragagent.contract.event.payload.AgentFinalAnswerData;
 import com.ragagent.contract.event.payload.ErrorData;
 import com.ragagent.common.session.qa.QaRequestPayload;
+import com.ragagent.common.session.embed.MessageView;
 
 /**
  * IM QA 执行编排：队列 worker 的租户上下文绑定与在途登记、full-output / 流式 /
@@ -207,9 +207,9 @@ final class ImQaRunner {
         Session session = attach.session();
         String requestId = UUID.randomUUID().toString();
 
-        Message userMsg = service.qaRequests.createUserMessage(session.getId(), attach.msg().content,
+        MessageView userMsg = service.qaRequests.createUserMessage(session.getId(), attach.msg().content,
                 requestId, prepared.attachments());
-        Message assistantMsg = service.qaRequests.createAssistantMessage(session.getId(), requestId);
+        MessageView assistantMsg = service.qaRequests.createAssistantMessage(session.getId(), requestId);
         // 在途登记：跨实例 /stop 的 IDs 映射 + stop watcher
         service.bindInflight(attach, assistantMsg.getId());
 

@@ -75,7 +75,7 @@ import com.ragagent.mcp.domain.McpTestResult;
 import com.ragagent.mcp.domain.McpTool;
 import com.ragagent.mcp.domain.McpToolApproval;
 import com.ragagent.common.session.domain.MentionedItem;
-import com.ragagent.common.session.domain.message.Message;
+import com.ragagent.session.domain.message.Message;
 import com.ragagent.common.session.domain.message.MessageArtifact;
 import com.ragagent.common.session.domain.message.MessageAttachment;
 import com.ragagent.common.session.domain.message.MessageExecutionContext;

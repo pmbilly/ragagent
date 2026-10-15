@@ -12,10 +12,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import com.ragagent.common.session.domain.message.Message;
 import com.ragagent.common.session.dto.StopSessionRequest;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.contract.error.AppError;
+import com.ragagent.common.session.embed.MessageView;
 
 /**
  * embed 委托协作者（自 {@link EmbedChannelController} 拆出的
@@ -126,7 +126,7 @@ final class EmbedChannelDelegateOps {
     }
 
     /** 先 ensureSession，再委托 MessageController.loadMessages。 */
-    public ResponseEntity<List<Message>> load(@PathVariable("sessionId") String sessionId,
+    public ResponseEntity<List<MessageView>> load(@PathVariable("sessionId") String sessionId,
                                                     @RequestParam(name = "limit", required = false) String limit,
                                                     @RequestParam(name = "before_time", required = false) String beforeTime,
                                                     @RequestParam(name = "resource_urls", required = false) String resourceUrls) {

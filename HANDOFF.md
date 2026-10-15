@@ -268,7 +268,7 @@ contract  → JDK                                  （纯 JDK：公开 API / SPI
 | `Message` / `Chunk` / `Model` / `Session` | 3~6 | 2~4 | **非机械**：视图要覆盖大量字段（`Chunk` 24 访问器 vs 现有视图 6 字段）+ 跨域写面 + L1 组件（`BaseTool`/`ChunkPage`）⇒ 需设计 |
 | `KnowledgeBase` / `Knowledge` / `User` / `Tenant` | 4~10 | 0~3 | 最后（写面 16~48 处，多为管理面 ⇒ 用例归位） |
 
-**进度（2026-10-15）**：C2 实体 **14 → 10**（`KnowledgeTag`、`AuthToken`、`MessageSuggestionSet`、`Model` 已归域；域侧 handler 12 → 10）；C4 待归位载荷 14、登记 8（platform 面 5 + 待去 Jackson 3）；R10 保持 **7 条边 / 52 类**（收窄未重建边 ✓）。
+**进度（2026-10-15）**：C2 实体 **14 → 9**（`KnowledgeTag`、`AuthToken`、`MessageSuggestionSet`、`Model`、`Message` 已归域；域侧 handler 12 → 10）；C4 待归位载荷 14、登记 8（platform 面 5 + 待去 Jackson 3）；R10 保持 **7 条边 / 52 类**（收窄未重建边 ✓）。
 
 **次批三候选的实测阻断（已测，勿重复测量）**：`MessageSuggestionSet`＝**API 线格式**（`EmbedSessionPort` 返回 `ResponseEntity<…>` ⇒ 换视图即改 embed 公开面）· `StorageBackend`＝**实体跨域归属**（storage 与 knowledge **双方都有它的 mapper**）· `WikiPageIssue`＝**跨域写面**（`session/AgentToolWikiBackends` 12 读 + 56 setters）⇒ 三者均需**先决策**（线格式确认 / 归属裁定 / 用例归位）。**已解锁示范两支**：读面换视图（`KnowledgeTag`）· 写面走契约端口（`AuthToken`，同时清偿了 ②owner 的"写侧直用他域 mapper"）。
 
@@ -1451,6 +1451,18 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **验证**：**13 守卫全绿** ✓（环 0 组、R9 包级 SCC 基线按提示刷新后仍 10 组、L1→域 0 条、R6 不变）；`spotlessCheck build` ✓ **1m38s** ✓；**4991 / 失败 0 / 跳过 4**（boot 1331 ✓）；dev 重启 ready ✓ + 冒烟（`/api/v1/storage-backends`、`/api/v1/knowledge-bases` 200 ✓；`/api/v1/messages/{id}/load` 业务级 404 "session not found" ✓ 路由/鉴权/新注入链路正常）
 - **A③ 累计（二十八刀）**：边 **64 → 30（−34）**、类 **317 → 195（−122）**；三档 **① 22 条 / 109 类 · ② 3 条 / 21 类 · ③ 5 条 / 65 类**
 - **下一步候选**：`knowledge→storage` 第三刀（余 2 类：`KnowledgeBaseFileProxyController` 需文件代理端口、`TenantFileStorage` 需 provider 存储端口）· `embedchannel→storage`（余 1 类）· **待拍板** `mcp→agent`(9) · **K 级** `im→session`(6) · `datasource→knowledge`(8) · **大块** `knowledge→model`(14) · `session→knowledge`(17) · `session→storage`(6 余)
+**🔶 C 批 1·第五子批：`Message` 收窄 + 消息线格式视图（实体 10 → 9）（2026-10-15）**
+- **判据先行（连续第三次靠金片护航）**：`EmbedContractTest` 对 `GET /embed/{c}/messages/{s}/load` 有 **4~5 条金片断言** ⇒ 动之前确认护栏在
+- **动作**：
+  1. **L1 新增 `common.session.embed.MessageView`**：26 字段**逐一镜像实体的字段与默认值**（含六个列表 `new ArrayList<>()`、`id/sessionId/... = ""`），并在**同样的三个字段**标 `@JsonIgnore`（`renderedContent`/`agentTenantId`/`executionContext`）⇒ **JSON 逐字节等价**；访问器名与实体一致 ⇒ 消费方零改动（视图落 `common` 而非 `:contract` 的原因：**需要 Jackson 注解复刻 `@JsonIgnore` 面**）
+  2. **端口改面**：`SessionQaPort.createMessage/updateMessage` → 视图；`EmbedSessionPort.loadMessages` → `List<MessageView>`
+  3. **适配器**：`SessionQaAdapter` 加 `toView`/`toEntity`/**`copyInto`（回填——Model 刀的教训已固化为默认动作）**；`EmbedSessionAdapter.loadMessages` 保壳换 body；`EmbedChannelController` 端点签名随之
+  4. **4 个消费方迁移**（im×3 + embedchannel×1）：改用**只改代码段**的替换器（严格避开字符串字面量与注释——正是上刀 bug 的教训落地）
+  5. 实体 `Message` 回 `session/domain/message`；其 **TypeHandler 仍留 L1**（载荷类型 `SearchResult`/`AgentStep`/`MentionedItem`/`MessageImage`/`MessageAttachment`/`MessageArtifact` 都在 L1）
+- **⚠️ 一次红态（"同包裸名"的**反向**坑）**：实体**搬出**原包后，与原同包的 4 个载荷（`MessageAttachment`/`MessageImage`/`MessageArtifact`/`MessageExecutionContext`）与 3 个 TypeHandler 都**需要补 import**（脚本漏了）⇒ 编译报 10+ 处 cannot find symbol ⇒ 补 7 个 import。**判据：实体搬出后必须补"原同包兄弟"的 import——搬入时是"裸名依赖链"，搬出时是"import 缺口"，两个方向都要扫**
+- **读数**：**C2 实体 10 → 9**；C1 受控根 71 → **70 文件**；C4 待归位 14、**登记 platform 面 5 → 6**；**R10 保持 7 条边 / 52 类 / ①档 0** ✓
+- **验证**：**14 守卫全绿**；**金片测试 ✓**（`EmbedContractTest` + 会话契约测试）+ **1349 金片签名一致** ✓；`spotlessCheck build` **2m14s**；**4991 / 失败 0 / 跳过 4**；dev ready + 冒烟（sessions/models/KB/embed-channels 200 ✓；`/api/v1/embed/.../messages/{s}/load` ⇒ 401 渠道闸门信封 ✓）
+- **C 余量（9 个实体）**：`Session`（**需会话语义决策**：`QaRequestPayload.session` 是实体字段 ⇒ 视图化需定"容器如何拿到完整会话"）· `Chunk`/`Knowledge`/`KnowledgeBase`（宽字段 + 写面）· `StorageBackend`（**归属裁定**）· `WikiPage`/`WikiPageIssue`（**写面归位**）· `Tenant`/`User`（管理面）
 **🔶 C 批 1·第四子批：`Model` 收窄 + **端口入契约面**（实体 11 → 10）（2026-10-15）**
 - **落点比上刀更干净（三件直接进 `:contract`）**：`ModelParameters`（**纯 JDK**）→ `contract.model` · 新 `contract.model.ModelView` · **`ModelCatalogPort` 整体入契约面**（它只 import `java.util.List` ⇒ 4 方法改视图后成纯 JDK）
 - **`ModelView` 用 bean 风格（15 字段）且访问器名与实体**逐一相同**（含 `isIsDefault()`/`isIsBuiltin()`）⇒ **消费方零改动 + JSON 等价**；先例＝`ChunkView`（`:contract` 内的可写 DTO 已被接受）

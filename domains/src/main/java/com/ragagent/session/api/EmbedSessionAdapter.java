@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import com.ragagent.common.session.domain.message.Message;
+import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.message.MessageSuggestionSet;
 import com.ragagent.common.session.dto.StopSessionRequest;
 import com.ragagent.common.session.embed.EmbedSessionPort;
@@ -18,6 +18,7 @@ import com.ragagent.session.controller.SessionController;
 
 import jakarta.servlet.http.HttpServletResponse;
 import com.ragagent.common.session.embed.MessageSuggestionView;
+import com.ragagent.common.session.embed.MessageView;
 
 /**
  * {@link EmbedSessionPort} 的会话域实现：逐参数转发到既有的四个端点方法
@@ -55,9 +56,12 @@ public class EmbedSessionAdapter implements EmbedSessionPort {
     }
 
     @Override
-    public ResponseEntity<List<Message>> loadMessages(String sessionId, String limit,
+    public ResponseEntity<List<MessageView>> loadMessages(String sessionId, String limit,
             String beforeTime, String resourceUrls) {
-        return messageController.loadMessages(sessionId, limit, beforeTime, resourceUrls);
+        ResponseEntity<List<Message>> resp = messageController.loadMessages(sessionId, limit, beforeTime, resourceUrls);
+        List<MessageView> views = resp.getBody() == null ? null
+                : resp.getBody().stream().map(SessionQaAdapter::toView).toList();
+        return ResponseEntity.status(resp.getStatusCode()).headers(resp.getHeaders()).body(views);
     }
 
     @Override

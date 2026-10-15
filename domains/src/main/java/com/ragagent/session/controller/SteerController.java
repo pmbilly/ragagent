@@ -15,7 +15,7 @@ import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.common.session.domain.MentionedItem;
-import com.ragagent.common.session.domain.message.Message;
+import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.conversation.SessionNotFoundException;
 import com.ragagent.session.service.MessageService;
 import com.ragagent.session.service.SessionService;

@@ -13,7 +13,7 @@ import com.ragagent.common.agent.domain.AgentStep;
 import com.ragagent.common.agent.domain.AgentToolCall;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.common.session.domain.message.Message;
+import com.ragagent.session.domain.message.Message;
 import com.ragagent.common.session.domain.message.MessageImage;
 import com.ragagent.contract.storage.support.FileUrlPort;
 import com.ragagent.common.storage.support.Rewriter;

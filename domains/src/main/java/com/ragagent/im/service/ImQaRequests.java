@@ -7,10 +7,10 @@ import com.ragagent.common.agent.AgentLookup;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.ImFormat;
 import com.ragagent.im.service.ImTurnOrchestrator.InflightEntry;
-import com.ragagent.common.session.domain.message.Message;
 import com.ragagent.common.session.domain.conversation.Session;
 import com.ragagent.common.session.qa.QaRequestPayload;
 import com.ragagent.common.session.domain.message.MessageAttachment;
+import com.ragagent.common.session.embed.MessageView;
 
 /**
  * QA 管线的共享底座：agent 模式判定、IM 请求构造（含 agent config 缺省补全）、
@@ -66,9 +66,9 @@ final class ImQaRequests {
     }
 
     /** 用户消息落库（带附件元数据；无附件传空表）。 */
-    Message createUserMessage(String sessionId, String content, String requestId,
+    MessageView createUserMessage(String sessionId, String content, String requestId,
             List<MessageAttachment> attachments) {
-        Message m = new Message();
+        MessageView m = new MessageView();
         m.setSessionId(sessionId);
         m.setRole("user");
         m.setContent(content);
@@ -82,8 +82,8 @@ final class ImQaRequests {
     }
 
     /** 助手消息落库。 */
-    Message createAssistantMessage(String sessionId, String requestId) {
-        Message m = new Message();
+    MessageView createAssistantMessage(String sessionId, String requestId) {
+        MessageView m = new MessageView();
         m.setSessionId(sessionId);
         m.setRole("assistant");
         m.setRequestId(requestId);

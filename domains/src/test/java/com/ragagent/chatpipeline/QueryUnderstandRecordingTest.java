@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 import com.ragagent.chatpipeline.plugin.PluginError;
 import com.ragagent.chatpipeline.plugin.PluginQueryUnderstand;
 import com.ragagent.contract.session.PipelineMessageAttachmentView;
-import com.ragagent.common.session.domain.message.Message;
+import com.ragagent.session.domain.message.Message;
 import com.ragagent.common.session.domain.message.MessageAttachment;
 import com.ragagent.llm.extract.PipelineConfig;
 import com.ragagent.llm.domain.ChatMessage;

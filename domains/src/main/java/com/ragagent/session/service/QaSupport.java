@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.ragagent.common.session.domain.MentionedItem;
-import com.ragagent.common.session.domain.message.Message;
+import com.ragagent.session.domain.message.Message;
 import com.ragagent.common.session.domain.conversation.Session;
 import com.ragagent.session.dto.QaRequests.MentionedItemRequest;
 import com.ragagent.common.storage.support.StreamRewriter;

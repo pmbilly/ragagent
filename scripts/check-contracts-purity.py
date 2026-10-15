@@ -125,6 +125,9 @@ PLATFORM_FACE = {
         "带 jakarta.servlet + Spring ResponseEntity ⇒ platform 面",
     "com/ragagent/common/storage/fileserve/FileProxyPort.java":
         "带 jakarta.servlet 请求/响应类型 ⇒ platform 面",
+    "com/ragagent/common/session/embed/MessageView.java":
+        "embed 面 messages/load 响应形状 + 会话 QA 面消息载荷（platform 面端口载荷）；"
+        "JSON 逐字节等价由 emb-pub-messages-load*.json 金片钉住",
     "com/ragagent/common/session/embed/MessageSuggestionView.java":
         "embed 面端口（EmbedSessionPort）的**响应线格式形状**，随该端口同属 platform 面；"
         "JSON 逐字节等价由 emb-pub-suggestions-get.json 金片钉住",

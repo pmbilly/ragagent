@@ -5,7 +5,7 @@ import java.util.List;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import com.ragagent.common.session.domain.AgentStepListTypeHandler;
-import com.ragagent.common.session.domain.message.Message;
+import com.ragagent.session.domain.message.Message;
 import com.ragagent.common.session.domain.message.MessageArtifact;
 import com.ragagent.common.session.domain.message.MessageArtifactListTypeHandler;
 import com.ragagent.common.session.domain.message.MessageAttachment;

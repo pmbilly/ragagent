@@ -15,7 +15,7 @@ import com.ragagent.contract.event.payload.AgentThoughtData;
 import com.ragagent.contract.event.payload.ErrorData;
 import com.ragagent.contract.event.payload.AgentFinalAnswerData;
 import com.ragagent.contract.event.payload.AgentCompleteData;
-import com.ragagent.common.session.domain.message.Message;
+import com.ragagent.session.domain.message.Message;
 import com.ragagent.common.session.domain.message.MessageAttachment;
 import com.ragagent.common.session.domain.message.MessageImage;
 import com.ragagent.session.service.MessageService;

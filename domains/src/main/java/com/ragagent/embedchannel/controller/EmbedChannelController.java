@@ -30,13 +30,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.ragagent.contract.tenant.TenantRole;
-import com.ragagent.common.session.domain.message.Message;
+
 import com.ragagent.common.session.dto.StopSessionRequest;
 import com.ragagent.common.storage.fileserve.FileProxyPort;
 import com.ragagent.platform.web.ApiResponse;
 import com.ragagent.platform.web.ApiResult;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.common.session.embed.EmbedSessionPort;
+import com.ragagent.common.session.embed.MessageView;
 
 /**
  * embed 渠道 HTTP 层（管理面/公开面路由）。
@@ -213,7 +214,7 @@ final FileProxyPort fileProxyService;
     }
 
     @GetMapping("/api/v1/embed/{channelId}/messages/{sessionId}/load")
-    public ResponseEntity<List<Message>> load(@PathVariable("sessionId") String sessionId,
+    public ResponseEntity<List<MessageView>> load(@PathVariable("sessionId") String sessionId,
                                                     @RequestParam(name = "limit", required = false) String limit,
                                                     @RequestParam(name = "before_time", required = false) String beforeTime,
                                                     @RequestParam(name = "resource_urls", required = false) String resourceUrls) {

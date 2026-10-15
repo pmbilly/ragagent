@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 
-import com.ragagent.common.session.domain.message.Message;
+
 import com.ragagent.common.session.dto.StopSessionRequest;
 import com.ragagent.platform.web.ApiResponse;
 
@@ -36,7 +36,7 @@ public interface EmbedSessionPort {
                  HttpServletResponse response) throws IOException;
 
     /** 会话消息列表（含资源 URL 重写）。 */
-    ResponseEntity<List<Message>> loadMessages(String sessionId, String limit,
+    ResponseEntity<List<MessageView>> loadMessages(String sessionId, String limit,
             String beforeTime, String resourceUrls);
 
     /** 停止助手消息生成。 */

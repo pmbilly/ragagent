@@ -16,7 +16,6 @@ import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.StreamSection;
 import com.ragagent.im.runtime.ThinkDisplay;
 import com.ragagent.im.runtime.ToolDisplay;
-import com.ragagent.common.session.domain.message.Message;
 import com.ragagent.common.session.domain.conversation.Session;
 import com.ragagent.platform.access.TenantContext;
 import org.slf4j.Logger;
@@ -30,6 +29,7 @@ import com.ragagent.contract.event.payload.AgentToolCallData;
 import com.ragagent.contract.event.payload.AgentToolResultData;
 import com.ragagent.contract.event.payload.ErrorData;
 import com.ragagent.common.session.qa.QaRequestPayload;
+import com.ragagent.common.session.embed.MessageView;
 
 /**
  * IM 流式回复管线：事件订阅组、流缓冲袋、300ms 冲刷循环与 finalize/收尾落库。
@@ -67,9 +67,9 @@ final class ImStreamPipeline {
 
         Session session = attach.session();
         String requestId = UUID.randomUUID().toString();
-        Message userMsg = service.qaRequests.createUserMessage(session.getId(), msg.content,
+        MessageView userMsg = service.qaRequests.createUserMessage(session.getId(), msg.content,
                 requestId, prepared.attachments());
-        Message assistantMsg = service.qaRequests.createAssistantMessage(session.getId(), requestId);
+        MessageView assistantMsg = service.qaRequests.createAssistantMessage(session.getId(), requestId);
         buf.assistantMessage = assistantMsg;
         // 在途登记：跨实例 /stop 的 IDs 映射 + stop watcher（与 runQA 路径同款）
         service.bindInflight(attach, assistantMsg.getId());
@@ -176,7 +176,7 @@ final class ImStreamPipeline {
         Exception qaErr;
         boolean agentDone;
         boolean streamedAny;
-        Message assistantMessage;
+        MessageView assistantMessage;
         String agentCompleteFinalAnswer = "";
         final Map<String, Boolean> seenToolCalls = new ConcurrentHashMap<>();
         final Map<String, Integer> agentToolIdx = new ConcurrentHashMap<>();

@@ -1,4 +1,4 @@
-package com.ragagent.common.session.domain.message;
+package com.ragagent.session.domain.message;
 
 import com.ragagent.common.session.domain.AgentStepListTypeHandler;
 import com.ragagent.common.session.domain.MentionedItem;
@@ -20,6 +20,13 @@ import com.ragagent.common.agent.domain.AgentStep;
 import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import com.ragagent.contract.model.TokenUsage;
 import com.ragagent.common.retrieval.SearchResult;
+import com.ragagent.common.session.domain.message.MessageExecutionContext;
+import com.ragagent.common.session.domain.message.MessageArtifact;
+import com.ragagent.common.session.domain.message.MessageImage;
+import com.ragagent.common.session.domain.message.MessageAttachment;
+import com.ragagent.common.session.domain.message.MessageArtifactListTypeHandler;
+import com.ragagent.common.session.domain.message.MessageAttachmentListTypeHandler;
+import com.ragagent.common.session.domain.message.MessageImageListTypeHandler;
 
 /**
  * messages 表实体。

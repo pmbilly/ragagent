@@ -1,7 +1,7 @@
 package com.ragagent.common.session.qa;
 
 import com.ragagent.common.session.domain.conversation.Session;
-import com.ragagent.common.session.domain.message.Message;
+import com.ragagent.common.session.embed.MessageView;
 import com.ragagent.platform.event.EventBus;
 
 /**
@@ -16,10 +16,10 @@ import com.ragagent.platform.event.EventBus;
 public interface SessionQaPort {
 
     /** 消息落库（返回落库后的行；口径同会话域 {@code MessageService#createMessage}）。 */
-    Message createMessage(Message message);
+    MessageView createMessage(MessageView message);
 
     /** 更新消息行（口径同会话域 {@code MessageService#updateMessage}）。 */
-    void updateMessage(Message message);
+    void updateMessage(MessageView message);
 
     /** 按 id 取会话（不可见 / 不存在 ⇒ null，口径同域实现）。 */
     Session getSession(String sessionId);

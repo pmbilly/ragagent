@@ -8,7 +8,7 @@ import com.ragagent.agentmanagement.domain.CustomAgentEntity;
 import com.ragagent.agentmanagement.service.config.AgentConfigJson;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.BizException;
-import com.ragagent.common.session.domain.message.Message;
+import com.ragagent.session.domain.message.Message;
 import com.ragagent.common.session.domain.message.MessageAttachment;
 import com.ragagent.common.session.domain.SuggestionAttribution;
 import com.ragagent.session.domain.document.TemporaryDocument;

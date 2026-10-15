@@ -9,7 +9,7 @@ import java.util.Map;
 
 import com.ragagent.TestSchema;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.common.session.domain.message.Message;
+import com.ragagent.session.domain.message.Message;
 import com.ragagent.common.session.domain.message.MessageArtifact;
 import com.ragagent.common.session.domain.message.MessageAttachment;
 import com.ragagent.common.session.domain.message.MessageImage;

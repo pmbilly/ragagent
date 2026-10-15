@@ -26,7 +26,7 @@ import com.ragagent.contract.apikey.TenantAPIKeyScope;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.contract.model.ResponseType;
-import com.ragagent.common.session.domain.message.Message;
+import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.message.MessageNotFoundException;
 import com.ragagent.common.session.domain.conversation.Session;
 import com.ragagent.session.domain.conversation.SessionNotFoundException;

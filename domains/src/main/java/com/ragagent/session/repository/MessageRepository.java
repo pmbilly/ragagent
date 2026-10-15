@@ -19,7 +19,7 @@ import com.ragagent.platform.persistence.DatabaseDialects;
 import com.ragagent.platform.persistence.PageRequests;
 import com.ragagent.platform.web.ZeroTimeSerializer;
 import com.ragagent.common.memory.domain.MemoryMessageCursor;
-import com.ragagent.common.session.domain.message.Message;
+import com.ragagent.session.domain.message.Message;
 import com.ragagent.common.session.domain.message.MessageImage;
 import com.ragagent.common.session.domain.message.MessageArtifact;
 import com.ragagent.common.session.domain.message.MessageAttachment;

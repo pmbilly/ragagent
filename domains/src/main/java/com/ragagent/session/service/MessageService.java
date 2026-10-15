@@ -18,7 +18,7 @@ import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.retrieval.HybridSearchService;
 import com.ragagent.session.domain.ChatHistoryKbStats;
-import com.ragagent.common.session.domain.message.Message;
+import com.ragagent.session.domain.message.Message;
 import com.ragagent.common.session.domain.message.MessageArtifact;
 import com.ragagent.common.session.domain.message.MessageAttachment;
 import com.ragagent.common.session.domain.message.MessageImage;
