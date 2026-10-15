@@ -1,4 +1,4 @@
-package com.ragagent.common.auth.domain;
+package com.ragagent.auth.domain;
 
 import java.time.OffsetDateTime;
 
@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.ragagent.platform.persistence.PgJsonTypeHandler;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ragagent.common.auth.domain.UserPreferences;
 
 /**
  * users 表实体。

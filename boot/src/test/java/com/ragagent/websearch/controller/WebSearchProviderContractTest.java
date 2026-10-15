@@ -18,7 +18,7 @@ import com.ragagent.retrieval.domain.WebSearchResult;
 import com.ragagent.websearch.provider.WebSearchProviderRegistry;
 import com.ragagent.common.tenant.domain.Tenant;
 import com.ragagent.auth.domain.TenantMember;
-import com.ragagent.common.auth.domain.User;
+import com.ragagent.auth.domain.User;
 import com.ragagent.common.auth.domain.UserPreferences;
 import com.ragagent.tenant.mapper.TenantMapper;
 import com.ragagent.auth.mapper.TenantMemberMapper;

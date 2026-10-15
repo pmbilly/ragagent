@@ -1,329 +1,108 @@
 package com.ragagent.system.service;
 
-import com.ragagent.platform.web.JsonMappers;
-import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.ragagent.platform.persistence.PageRequests;
+import com.ragagent.platform.web.JsonMappers;
 import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.contract.audit.AuditWritePort;
-import com.ragagent.common.tenant.domain.Tenant;
-import com.ragagent.common.auth.domain.User;
-import com.ragagent.auth.mapper.UserMapper;
-import com.ragagent.auth.service.PasswordPolicy;
-import com.ragagent.auth.service.TenantMemberService;
-import com.ragagent.auth.service.TenantService;
 import com.ragagent.platform.access.TenantContext;
-import com.ragagent.contract.error.AppError;
-import com.ragagent.contract.error.BizException;
-import com.ragagent.platform.security.LogSanitizer;
+import com.ragagent.contract.apikey.APIKeyScopeContext;
+import com.ragagent.common.auth.AdminUserPort;
+import com.ragagent.common.auth.AdminUserView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.ragagent.contract.apikey.APIKeyScopeContext;
-import com.ragagent.contract.auth.AuthTokenAdminPort;
 
 /**
- * 系统管理员 P0 用户管理（注册 / 建管理员 / 重置密码 / 列管理员 / 撤管理员）。
+ * 系统管理员 P0 用户管理的**系统侧壳**：审计写入 + 控制器委托面。
  *
- * <p>异常语义逐分支固定（错误消息是契约）：</p>
+ * <p><b>本刀（C-13a）后</b>：用户/租户/成员的实际读写都归 auth 域（{@link AdminUserPort} 的实现
+ * {@code auth/api/AdminUserAdapter}）——system 不再直引 {@code auth.mapper.UserMapper} /
+ * {@code TenantService} / {@code TenantMemberService}（HANDOFF §12.6.4）。本类只负责：</p>
  * <ul>
- *   <li>promote：user_id/email 双空 → 400 "Either user_id or email is required"；
- *       查无 → 404 "User not found"；已是管理员 → 幂等 200（审计 idempotent=true）。</li>
- *   <li>revoke：自撤 → 400 "Cannot revoke your own system admin privileges"；
- *       最后一名 → 400 "Cannot revoke the last remaining system administrator"；
- *       查无 → 404；非管理员 → 幂等 200（changed=false）。</li>
- *   <li>create：身份重复且完全一致 → 200 幂等返回既有行；仅部分冲突 → 409。</li>
+ *   <li>{@link #emitAdminAudit}：租户 0 + target user 的 best-effort 审计（失败记 WARN）；</li>
+ *   <li>{@link #systemAuditActorRole}：主体角色（平台 API-Key → {@code platform_api_key}）；</li>
+ *   <li>{@link #isValidEmail}：binding 的 required,email 等价校验；</li>
+ *   <li>其余方法**逐字转发**端口（语义、错误消息与幂等分支留在实现侧，本类不改写）。</li>
  * </ul>
- *
- * <p><b>已知差异（Lite）</b>：撤管理员无 SELECT ... FOR UPDATE 事务，
- * 用顺序读-判-写（SystemAdmin 面无并发竞争窗）。
- * 密码生成用 SecureRandom + base64url，输出长度可能与旧实现不同——
- * 生成密码只出现一次且契约测试掩码。</p>
  */
 @Service
 public class SystemAdminUserService {
 
     private static final Logger log = LoggerFactory.getLogger(SystemAdminUserService.class);
 
-    /** 密码策略错误原文（400 响应体）；实现收拢到 {@link PasswordPolicy}。 */
-    public static final String ERR_PASSWORD_POLICY = PasswordPolicy.ERR_PASSWORD_POLICY;
-    public static final String ERR_COMPLEX_PASSWORD_POLICY = PasswordPolicy.ERR_COMPLEX_PASSWORD_POLICY;
+    /** 身份冲突错误原文（再导出自端口，供控制器 / 契约测试引用）。 */
+    public static final String ERR_USER_EMAIL_EXISTS = AdminUserPort.ERR_USER_EMAIL_EXISTS;
+    public static final String ERR_USER_USERNAME_EXISTS = AdminUserPort.ERR_USER_USERNAME_EXISTS;
+    public static final String ERR_USER_IDENTITY_CONFLICT = AdminUserPort.ERR_USER_IDENTITY_CONFLICT;
 
-    static final String PASSWORD_SPECIAL_CHARS = "!@#$%^&*()_+-=[]{}|;:,.<>?";
-
-    private final UserMapper userMapper;
-    private final AuthTokenAdminPort authTokenAdmin;
-    private final TenantService tenantService;
-    private final TenantMemberService memberService;
-    private final AuditWritePort auditWriter;
+    private final AdminUserPort adminUserPort;
     private final SystemSettingService settingService;
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final AuditWritePort auditWriter;
 
-    public SystemAdminUserService(UserMapper userMapper,
-                                  AuthTokenAdminPort authTokenAdmin,
-                                  TenantService tenantService,
-                                  TenantMemberService memberService,
-                                  AuditWritePort auditWriter,
-                                  SystemSettingService settingService) {
-        this.userMapper = userMapper;
-        this.authTokenAdmin = authTokenAdmin;
-        this.tenantService = tenantService;
-        this.memberService = memberService;
-        this.auditWriter = auditWriter;
+    public SystemAdminUserService(AdminUserPort adminUserPort,
+                                  SystemSettingService settingService,
+                                  AuditWritePort auditWriter) {
+        this.adminUserPort = adminUserPort;
         this.settingService = settingService;
+        this.auditWriter = auditWriter;
     }
 
-    // ── 密码策略 ──────────────────────────────────────────────────────────
+    // ── 委托面（逐字转发，不改语义） ──────────────────────────────────────
+
+    public AdminUserView getUserById(String id) {
+        return adminUserPort.byId(id);
+    }
+
+    public AdminUserView getUserByEmail(String email) {
+        return adminUserPort.byEmail(email);
+    }
+
+    public AdminUserView getByUsername(String username) {
+        return adminUserPort.byUsername(username);
+    }
+
+    public AdminUserPort.AdminUserPage listSystemAdmins(int offset, int limit) {
+        return adminUserPort.listSystemAdmins(offset, limit);
+    }
+
+    public AdminUserView promote(AdminUserView user) {
+        return adminUserPort.promote(user);
+    }
+
+    public AdminUserView revoke(String userId, String callerId) {
+        return adminUserPort.revoke(userId, callerId);
+    }
+
+    public void adminResetPassword(AdminUserView user, String newPassword) {
+        adminUserPort.resetPassword(user.getId(), newPassword);
+    }
+
+    public AdminUserPort.CreateResult adminCreateUser(String rawUsername, String rawEmail,
+                                                     String password, boolean passwordPresent,
+                                                     String provisioning) {
+        return adminUserPort.createUser(rawUsername, rawEmail, password, passwordPresent, provisioning,
+                complexPasswordEnabled());
+    }
 
     public boolean complexPasswordEnabled() {
         return settingService.getBool(
                 "auth.complex_password_enabled", "WEKNORA_AUTH_COMPLEX_PASSWORD_ENABLED", false);
     }
 
-    /** @return null = 通过；否则 = 错误消息（契约原文）。实现委托 PasswordPolicy.validate。 */
     public String validatePasswordPolicy(String password, boolean complexEnabled) {
-        return PasswordPolicy.validate(password, complexEnabled);
+        return adminUserPort.validatePasswordPolicy(password, complexEnabled);
     }
 
-    /** 生成直到过策略（复杂 → 16 位复杂密码）。 */
     public String generatePolicyCompliantPassword(boolean complexEnabled) {
-        java.security.SecureRandom random = new java.security.SecureRandom();
-        while (true) {
-            String password;
-            if (complexEnabled) {
-                StringBuilder sb = new StringBuilder();
-                String all = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-                        + PASSWORD_SPECIAL_CHARS;
-                for (int i = 0; i < 16; i++) {
-                    sb.append(all.charAt(random.nextInt(all.length())));
-                }
-                password = sb.toString();
-            } else {
-                byte[] bytes = new byte[24];
-                random.nextBytes(bytes);
-                password = java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
-            }
-            if (validatePasswordPolicy(password, complexEnabled) == null) {
-                return password;
-            }
-        }
+        return adminUserPort.generatePolicyCompliantPassword(complexEnabled);
     }
 
-    // ── promote / revoke / list ───────────────────────────────────────────
-
-    public User getUserById(String id) {
-        return id == null || id.isEmpty() ? null
-                : userMapper.selectOne(new LambdaQueryWrapper<User>()
-                        .eq(User::getId, id).isNull(User::getDeletedAt).last("LIMIT 1"));
-    }
-
-    public User getUserByEmail(String email) {
-        return userMapper.selectOne(new LambdaQueryWrapper<User>()
-                .eq(User::getEmail, email).isNull(User::getDeletedAt).last("LIMIT 1"));
-    }
-
-    /** 真实写分支（幂等分支由 controller 处理）。 */
-    public User promote(User user) {
-        user.setIsSystemAdmin(true);
-        user.setUpdatedAt(OffsetDateTime.now());
-        userMapper.updateById(user);
-        return user;
-    }
-
-    /**
-     * 撤管理员（无事务，顺序读-判-写）：
-     * @return user 行；self/last-admin/not-found 抛 AppError 信封（400/404）。
-     */
-    public User revoke(String userId, String callerId) {
-        if (userId.equals(callerId)) {
-            throw new BizException(AppError.badRequest(
-                    "Cannot revoke your own system admin privileges"));
-        }
-        User user = getUserById(userId);
-        if (user == null) {
-            throw new BizException(AppError.notFound("User not found"));
-        }
-        if (!user.isIsSystemAdmin()) {
-            return user; // idempotent 分支（handler 落 changed=false 审计）
-        }
-        Long total = countSystemAdmins();
-        if (total == null || total <= 1) {
-            throw new BizException(AppError.badRequest(
-                    "Cannot revoke the last remaining system administrator"));
-        }
-        user.setIsSystemAdmin(false);
-        userMapper.updateById(user);
-        return user;
-    }
-
-    /** count + created_at DESC, id ASC 分页。 */
-    public record AdminPage(List<User> users, long total) {
-    }
-
-    public AdminPage listSystemAdmins(int offset, int limit) {
-        Long total = countSystemAdmins();
-        // offset/limit 语义的 API：atOffset 表达任意偏移，LIMIT/OFFSET 交给分页插件
-        List<User> users = userMapper.selectList(PageRequests.atOffset(offset, limit),
-                new LambdaQueryWrapper<User>()
-                        .eq(User::isIsSystemAdmin, true)
-                        .isNull(User::getDeletedAt)
-                        .orderByDesc(User::getCreatedAt)
-                        .orderByAsc(User::getId));
-        return new AdminPage(users, total == null ? 0 : total);
-    }
-
-    private Long countSystemAdmins() {
-        return userMapper.selectCount(new LambdaQueryWrapper<User>()
-                .eq(User::isIsSystemAdmin, true)
-                .isNull(User::getDeletedAt));
-    }
-
-    // ── reset-password ────────────────────────────────────────────────────
-
-    /** 换 hash + 吊销全部会话。 */
-    public void adminResetPassword(User user, String newPassword) {
-        user.setPasswordHash(passwordEncoder.encode(newPassword));
-        user.setUpdatedAt(OffsetDateTime.now());
-        userMapper.updateById(user);
-        revokeTokensByUserId(user.getId());
-    }
-
-    private void revokeTokensByUserId(String userId) {
-        try {
-            authTokenAdmin.revokeAllForUser(userId);
-        } catch (RuntimeException e) {
-            log.warn("Failed to revoke tokens for user {}: {}", userId, e.toString());
-        }
-    }
-
-    // ── create-user ──────────────────────────────────────────────────────
-
-    public static final String ERR_USER_EMAIL_EXISTS = "user with this email already exists";
-    public static final String ERR_USER_USERNAME_EXISTS = "user with this username already exists";
-    public static final String ERR_USER_IDENTITY_CONFLICT =
-            "email and username refer to conflicting existing identities";
-
-    /** create 的结果三态（controller 折叠成 201/200/409）。 */
-    public sealed interface CreateResult {
-        record Created(User user, String generatedPassword) implements CreateResult {
-        }
-
-        record Idempotent(User user) implements CreateResult {
-        }
-    }
-
-    /** 注册后的空间预配模式。 */
     public String resolveDefaultTenantMode() {
         String def = "create_personal";
         String mode = settingService.getString(
                 "auth.default_tenant_mode", "WEKNORA_AUTH_DEFAULT_TENANT_MODE", def);
         return "tenantless".equals(mode) ? "tenantless" : "create_personal";
-    }
-
-    public CreateResult adminCreateUser(String rawUsername, String rawEmail,
-                                        String password, boolean passwordPresent,
-                                        String provisioning) {
-        String username = LogSanitizer.sanitize(rawUsername == null ? "" : rawUsername.trim());
-        String email = LogSanitizer.sanitize(rawEmail == null ? "" : rawEmail.trim());
-        String effectivePassword = password;
-        boolean generated = false;
-        if (!passwordPresent) {
-            effectivePassword = generatePolicyCompliantPassword(complexPasswordEnabled());
-            generated = true;
-        }
-        String policyError = validatePasswordPolicy(effectivePassword, complexPasswordEnabled());
-        if (policyError != null) {
-            throw new BizException(AppError.badRequest(policyError));
-        }
-
-        User existing;
-        try {
-            existing = register(username, email, effectivePassword, provisioning);
-        } catch (DuplicateIdentityException dup) {
-            User row = ERR_USER_EMAIL_EXISTS.equals(dup.message)
-                    ? getUserByEmail(email)
-                    : getByUsername(username);
-            if (row != null && username.equals(row.getUsername()) && email.equals(row.getEmail())) {
-                return new CreateResult.Idempotent(row);
-            }
-            throw new BizException(AppError.conflict(ERR_USER_IDENTITY_CONFLICT));
-        }
-        return generated ? new CreateResult.Created(existing, effectivePassword)
-                : new CreateResult.Created(existing, "");
-    }
-
-    /** 部分身份冲突（email 与 username 各自命中不同行）的载体。 */
-    public static final class DuplicateIdentityException extends RuntimeException {
-        public final String message;
-
-        public DuplicateIdentityException(String message) {
-            super(message);
-            this.message = message;
-        }
-    }
-
-    public User getByUsername(String username) {
-        return userMapper.selectOne(new LambdaQueryWrapper<User>()
-                .eq(User::getUsername, username).isNull(User::getDeletedAt).last("LIMIT 1"));
-    }
-
-    /** create_personal 租户：建空间 + Owner 成员；失败回滚。 */
-    private User register(String username, String email, String hashedPassword, String provisioning) {
-        if (getUserByEmail(email) != null) {
-            throw new DuplicateIdentityException(ERR_USER_EMAIL_EXISTS);
-        }
-        if (getByUsername(username) != null) {
-            throw new DuplicateIdentityException(ERR_USER_USERNAME_EXISTS);
-        }
-        Tenant createdTenant = null;
-        if ("create_personal".equals(provisioning)) {
-            createdTenant = new Tenant();
-            createdTenant.setName(LogSanitizer.sanitize(username) + "'s Workspace");
-            createdTenant.setDescription("Default workspace");
-            createdTenant.setStatus("active");
-            tenantService.createTenant(createdTenant);
-        }
-        User user = new User();
-        user.setId(UUID.randomUUID().toString());
-        user.setUsername(username);
-        user.setEmail(email);
-        user.setPasswordHash(passwordEncoder.encode(hashedPassword));
-        user.setIsActive(true);
-        user.setCreatedAt(OffsetDateTime.now());
-        user.setUpdatedAt(OffsetDateTime.now());
-        if (createdTenant != null) {
-            user.setTenantId(createdTenant.getId());
-        }
-        try {
-            userMapper.insert(user);
-        } catch (RuntimeException e) {
-            if (createdTenant != null) {
-                try {
-                    tenantService.deleteTenant(createdTenant.getId());
-                } catch (RuntimeException rollbackErr) {
-                    log.warn("Failed to roll back tenant {} after user creation failure: {}",
-                            createdTenant.getId(), rollbackErr.toString());
-                }
-            }
-            throw new IllegalStateException("failed to create user");
-        }
-        if (createdTenant != null) {
-            try {
-                memberService.addMember(user.getId(), createdTenant.getId(), "owner", "");
-            } catch (RuntimeException e) {
-                log.warn("Failed to create owner membership for user {} tenant {}: {}",
-                        user.getId(), createdTenant.getId(), e.toString());
-                userMapper.deleteById(user.getId());
-                tenantService.deleteTenant(createdTenant.getId());
-                throw new IllegalStateException("failed to finalise workspace ownership");
-            }
-        }
-        return user;
     }
 
     // ── 审计 ──────────────────────────────────────────────────────────────
@@ -338,7 +117,7 @@ public class SystemAdminUserService {
     }
 
     /** tenant_id=0 + target user。details 可空 → {}。 */
-    public void emitAdminAudit(String action, User target, Map<String, Object> details) {
+    public void emitAdminAudit(String action, AdminUserView target, Map<String, Object> details) {
         if (auditWriter == null) {
             return;
         }

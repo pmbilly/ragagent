@@ -15,7 +15,6 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import com.ragagent.contract.audit.AuditAction;
 import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.contract.audit.AuditWritePort;
-import com.ragagent.common.auth.domain.User;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.contract.settings.SystemSettingGateway;
@@ -27,7 +26,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
-import com.ragagent.common.auth.UserDirectoryPort;
+import com.ragagent.common.auth.AdminUserPort;
+import com.ragagent.common.auth.AdminUserView;
 
 /**
  * 系统设置服务。
@@ -62,7 +62,7 @@ public class SystemSettingService implements SystemSettingGateway {
     private final SsrfGuard ssrfGuard;
     /** 三层解析的 ENV 层（Spring Environment，不读裸 System.getenv；键名由调用方给）。 */
     private final Environment environment;
-    private final UserDirectoryPort userDirectoryPort;
+    private final AdminUserPort adminUserPort;
     /** 配置兜底：未配置 → self_serve。 */
     @Value("${weknora.auth.registration-mode:}")
     private String configuredRegistrationMode;
@@ -71,8 +71,8 @@ public class SystemSettingService implements SystemSettingGateway {
                                 AuditWritePort auditWriter,
                                 SsrfGuard ssrfGuard,
                                 Environment environment,
-                                UserDirectoryPort userDirectoryPort) {
-        this.userDirectoryPort = userDirectoryPort;
+                                AdminUserPort adminUserPort) {
+        this.adminUserPort = adminUserPort;
         this.mapper = mapper;
         this.auditWriter = auditWriter;
         this.ssrfGuard = ssrfGuard;
@@ -493,7 +493,7 @@ public class SystemSettingService implements SystemSettingGateway {
             if (!nameById.get(id).isEmpty()) {
                 continue;
             }
-            User u = userDirectoryPort.userById(id);
+            AdminUserView u = adminUserPort.byId(id);
             if (u != null) {
                 if (!u.getUsername().trim().isEmpty()) {
                     nameById.put(id, u.getUsername());

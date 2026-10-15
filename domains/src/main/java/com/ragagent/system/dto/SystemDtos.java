@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.ragagent.common.auth.domain.UserPreferences;
-import com.ragagent.common.auth.domain.User;
+import com.ragagent.common.auth.AdminUserView;
 
 /**
  * 系统管理端的响应 DTO 集（JSON 字段名即 Java 字段名，camelCase；可空字段显式 null）。
@@ -30,7 +30,7 @@ public final class SystemDtos {
             OffsetDateTime updatedAt) {
 
         /** 字段直拷（avatar 等已由实体 getter 归一）。 */
-        public static UserInfoResponse from(User u) {
+        public static UserInfoResponse from(AdminUserView u) {
             return new UserInfoResponse(
                     u.getId(), u.getUsername(), u.getEmail(), u.getAvatar(),
                     u.getTenantId(), u.isIsActive(), u.isCanAccessAllTenants(),

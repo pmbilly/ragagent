@@ -1585,6 +1585,14 @@ public interface AdminUserPort {
 
 **共同纪律**：① 每批先做"**等价物核查**"（复用 `UserDirectoryPort`/`UserLookupPort`，不新建重复端口——两者并存本身是历史欠账，本批登记）；② 实体常量若被跨域用 ⇒ 外提 L1 + 实体委托（`KnowledgeParseStatus` 先例）；③ 逐批跑 14 守卫 + 金片 + 全量闸门。
 
+**🔶 C 批 1·第十三子批：C-13a 落地——`users` 单一持久面 + `system→auth` 边清偿 + `User` 实体回域（实体 2 → 1；R10 6 边 / 51 类）（2026-10-15）**
+- **按 §12.6.4 规格执行 8 步**：① `common.auth.AdminUserView`（12 字段镜像，去 `@JsonIgnore passwordHash`）+ ② `common.auth.AdminUserPort`（10 方法 + 嵌套 `AdminUserPage` / `CreateResult`）③ `auth/api/AdminUserAdapter`（**由 `SystemAdminUserService` 复制改造**：内部实体口径、仅在端口边界做 view↔entity 转换；`toView`/`toEntity`/`copyInto` 三助手）④ `SystemAdminUserService` 瘦身为**系统侧壳**（审计 + `isValidEmail` + 逐字转发）⑤ `SystemDtos`/控制器改视图 ⑥ **端口合并**（`SystemSettingService` 的 `UserDirectoryPort.userById` → `AdminUserPort.byId`；**删 `UserDirectoryPort` + `UserDirectoryAdapter`**）⑦ 实体 `User` 回 `auth/domain`（54 处 FQN 回退）⑧ 全量验证
+- **⭐ 本刀核心读数**：**`system→auth` 边清零 ⇒ R10 6 条边 / 51 类 · ②owner 2 → 1** ✓；**C2 实体 2 → 1**（仅剩 `Tenant`）；C1 63 → **62 文件**；C4 登记 platform 面 7 + **待去 Jackson 9 → 11**（新视图与端口登记）
+- **⚠️ 两次红态（都已处置，判据可复用）**：
+  1. **循环依赖**（启动即挂：`systemSettingService` → `adminUserAdapter` → `systemSettingGateway`（＝`systemSettingService`）✗）⇒ **正解＝按边界重切而非 `@Lazy` 掩盖**：两个设置读取方法（`complexPasswordEnabled`/`resolveDefaultTenantMode`）**移出端口**（语义上属 system 设置面）、端口 `createUser` 显式收 `complexEnabled` 参数 ⇒ 适配器不再依赖设置网关，**环消除** ✓
+  2. **两条 arch 基线条目变陈旧**（A16 service→mapper / A17 service→MyBatis 对本文件不再违例）⇒ 删条目收紧基线 ⇒ **本刀顺带修掉两个历史登记** ✓
+- **验证**：**14 守卫全绿**（C2 = 1，基线已 `--write`）；**1349 金片签名一致** ✓；`spotlessCheck build` **1m43s**；**4991 / 失败 0 / 跳过 4**（含先前失败的 **106 条 system+auth 测试全绿** ✓）；dev ready + 冒烟（`auth/me` · `system/info` · `sessions` · `knowledge-bases` **200** ✓；`GET /api/v1/system/admin/list` 与 `POST /promote` ⇒ **403 `{"code":1002,"message":"Forbidden: system administrator required"}`** 系统管理员闸门信封 ✓——路由与守卫链正常，管理面行为由 106 条契约测试覆盖）
+- **C 余量（1 实体）**：**`Tenant`** ⇒ 按 §12.6.3 走 **C-14a**（`TenantRowView`（21 字段）+ `TenantAdminPort`（读/建/改）+ 实体回 `tenant/domain`；**auth 14 文件是最大改道面**）——设计与判据齐备，可直接照做
 **🔶 C 批 1·第十二子批：`Knowledge` 收窄 + 状态常量外提（实体 3 → 2）（2026-10-15）**
 - **规模**：139 行 / **30 字段 / 61 访问器**（3 个 `JsonNode` + `List<JsonNode> tags` + 2 个 `@TableField(exist=false)`；无 `@JsonIgnore`）
 - **跨域消费 ~19 文件**（session 10 · datasource 4 · init 1 · eval 1 · wiki 1 · config 1）+ L1 三个耦合：端口 **13 方法**（含 `Page<Knowledge>` 分页与 `insertKnowledge`/`updateKnowledgeMetadataRow` 写面）· `KnowledgeProjectionAdapter`（投影 `KnowledgeDocumentFacts`）· 异常 `DuplicateKnowledgeException`（持有 existing 行）
@@ -2650,10 +2658,10 @@ public interface AdminUserPort {
 
 | 项 | 现状 | 门禁 |
 |---|---|---|
-| `:common` 持久化实体 | **2**（`User` · `Tenant`；`StorageBackend`/`WikiPageIssue`/`WikiPage`/`Chunk`/`KnowledgeBase`/`Knowledge` 已归位） | C2（只许减） |
+| `:common` 持久化实体 | **1**（仅 `Tenant`；`StorageBackend`/`WikiPageIssue`/`WikiPage`/`Chunk`/`KnowledgeBase`/`Knowledge`/`User` 已归位） | C2（只许减） |
 | `:common` 域侧 TypeHandler | **10** | C2 |
 | `:common` 载荷型 | **14 待归位** + 7 platform 面登记 + 3 待去 Jackson | C4 |
-| `:common` 受控依赖根 | 10 根 / 63 文件 | C1 |
+| `:common` 受控依赖根 | 10 根 / 62 文件 | C1 |
 | `:contract` **误搬件** | **8 → 3**（D0a/D0b 已归位 5 件）（D0a/D0b 已归位 5 件；余 3 件 `KnowledgeBase*Config` 实体耦合，见 G1-h） | **待加 C5/C6** |
 | `:common` 规模 | **265 件** = `common/*` **125** + `platform/*` 139 + `event/*` 1（D1 后） | — |
 

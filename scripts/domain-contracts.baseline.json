@@ -21,8 +21,7 @@
       ]
     },
     "owner": {
-      "auth→tenant": "域属主边：租户/成员/RBAC 的管理面计划上就在 auth（§8.9：`auth/service/TenantService`、`auth/domain/TenantMember`；`tenant/` 只留 3 包/10 文件＝配置类 + `mapper/TenantMapper` + `repository/{Tenant,TenantConfigRedaction,TenantLookup}`）⇒ auth 依赖 tenant 持久层写租户数据。条件：读侧已走 L1 端口（`TenantConfigLookup`/`apiPrincipalConfig`/`exists`/`memoryConfig`/`parserEngineConfig`/`storageEngineConfig` ✓）；写/管理面集中在属主域 ✓。清零路径与计划面清单相悖（搬管理面）或改公开 API 形状（实体→视图）⇒ 需拍板。",
-      "system→auth": "域属主边：用户目录的**系统级管理面**（§8.9 把 `SystemAdminUserService` 放在 `system/`）⇒ 直用 `auth.domain`(User/AuthToken) + `auth.mapper`(UserMapper/AuthTokenMapper) + `PasswordPolicy`/`TenantMemberService`。**待裁定项**：写侧直用他域 mapper 与 §9.1「状态唯一写入者」有张力 ⇒ 二选一：改经 auth 口，或承认它是 auth 管理面的一部分（搬 `SystemAdminUserService`）。"
+      "auth→tenant": "域属主边：租户/成员/RBAC 的管理面计划上就在 auth（§8.9：`auth/service/TenantService`、`auth/domain/TenantMember`；`tenant/` 只留 3 包/10 文件＝配置类 + `mapper/TenantMapper` + `repository/{Tenant,TenantConfigRedaction,TenantLookup}`）⇒ auth 依赖 tenant 持久层写租户数据。条件：读侧已走 L1 端口（`TenantConfigLookup`/`apiPrincipalConfig`/`exists`/`memoryConfig`/`parserEngineConfig`/`storageEngineConfig` ✓）；写/管理面集中在属主域 ✓。清零路径与计划面清单相悖（搬管理面）或改公开 API 形状（实体→视图）⇒ 需拍板。"
     },
     "intra-family": {
       "note": "运行面族内：**豁免但冻结**（本档新增类仍判红）。族判据＝同一 runtime 的零件互调，不为拆而拆（B211 试切 `:channels` 回退的结论「紧耦合对内聚优先」）。跨族仍按 ① 档。",
@@ -113,9 +112,6 @@
       "AgentToolWikiBackends",
       "AgentWebPages",
       "QaWiring"
-    ],
-    "system→auth": [
-      "SystemAdminUserService"
     ]
   }
 }

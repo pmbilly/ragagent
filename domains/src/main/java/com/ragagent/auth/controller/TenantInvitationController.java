@@ -12,7 +12,7 @@ import com.ragagent.common.tenant.domain.Tenant;
 import com.ragagent.auth.domain.TenantInvitation;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.contract.tenant.TenantRole;
-import com.ragagent.common.auth.domain.User;
+import com.ragagent.auth.domain.User;
 import com.ragagent.auth.dto.TenantInvitationResponse;
 import com.ragagent.auth.service.TenantInvitationService;
 import com.ragagent.auth.service.TenantRbacException;

@@ -16,7 +16,8 @@ import com.ragagent.contract.apikey.TenantAPIKeyResponse;
 import com.ragagent.contract.audit.AuditAction;
 import com.ragagent.contract.audit.AuditOutcome;
 import com.ragagent.contract.audit.AuditWritePort;
-import com.ragagent.common.auth.domain.User;
+import com.ragagent.common.auth.AdminUserPort;
+import com.ragagent.common.auth.AdminUserView;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
@@ -96,7 +97,7 @@ public class SystemAdminController {
         if (uid.isEmpty() && mail.isEmpty()) {
             throw new BizException(AppError.badRequest("Either userId or email is required"));
         }
-        User user = uid.isEmpty() ? users.getUserByEmail(mail) : users.getUserById(uid);
+        AdminUserView user = uid.isEmpty() ? users.getUserByEmail(mail) : users.getUserById(uid);
         if (user == null) {
             throw new BizException(AppError.notFound("User not found"));
         }
@@ -107,7 +108,7 @@ public class SystemAdminController {
                     "idempotent", true));
             return ResponseEntity.ok(SystemDtos.UserInfoResponse.from(user));
         }
-        User promoted = users.promote(user);
+        AdminUserView promoted = users.promote(user);
         users.emitAdminAudit(AuditAction.SYSTEM_ADMIN_PROMOTED, promoted, Map.of(
                 "target_email", promoted.getEmail(),
                 "target_username", promoted.getUsername(),
@@ -123,7 +124,7 @@ public class SystemAdminController {
     public ResponseEntity<SystemDtos.UserInfoResponse> revoke(
             @Valid @RejectEmptyBody @NonNullBody @RequestBody(required = false) RevokeRequest req) {
         String callerId = TenantContext.currentUserId() == null ? "" : TenantContext.currentUserId();
-        User user = users.revoke(req.userId(), callerId);
+        AdminUserView user = users.revoke(req.userId(), callerId);
         if (!user.isIsSystemAdmin()) {
             // ErrUserNotSystemAdmin → 幂等 200（changed=false 审计）
             users.emitAdminAudit(AuditAction.SYSTEM_ADMIN_REVOKED, user, Map.of(
@@ -167,9 +168,9 @@ public class SystemAdminController {
         if (lim > 200) {
             lim = 200;
         }
-        SystemAdminUserService.AdminPage page = users.listSystemAdmins(off, lim);
+        AdminUserPort.AdminUserPage page = users.listSystemAdmins(off, lim);
         List<SystemDtos.UserInfoResponse> infos = new ArrayList<>();
-        for (User u : page.users()) {
+        for (AdminUserView u : page.users()) {
             infos.add(SystemDtos.UserInfoResponse.from(u));
         }
         return ResponseEntity.ok(new SystemDtos.SystemAdminListResponse(page.total(), infos));
@@ -195,7 +196,7 @@ public class SystemAdminController {
         if (policyError != null) {
             throw new BizException(AppError.badRequest(policyError));
         }
-        User user = users.getUserByEmail(email);
+        AdminUserView user = users.getUserByEmail(email);
         if (user == null) {
             throw new BizException(AppError.notFound("User not found"));
         }
@@ -226,10 +227,10 @@ public class SystemAdminController {
             throw new BizException(AppError.badRequest("Invalid user creation request"));
         }
         boolean passwordPresent = req.password() != null;
-        SystemAdminUserService.CreateResult result = users.adminCreateUser(
+        AdminUserPort.CreateResult result = users.adminCreateUser(
                 req.username(), req.email(), req.password(), passwordPresent,
                 users.resolveDefaultTenantMode());
-        if (result instanceof SystemAdminUserService.CreateResult.Idempotent idem) {
+        if (result instanceof AdminUserPort.CreateResult.Idempotent idem) {
             users.emitAdminAudit(AuditAction.SYSTEM_USER_CREATED, idem.user(), Map.of(
                     "target_email", idem.user().getEmail(),
                     "target_username", idem.user().getUsername(),
@@ -238,7 +239,7 @@ public class SystemAdminController {
             return ResponseEntity.ok(new SystemDtos.CreateUserResponse(
                     SystemDtos.UserInfoResponse.from(idem.user()), null));
         }
-        var created = (SystemAdminUserService.CreateResult.Created) result;
+        var created = (AdminUserPort.CreateResult.Created) result;
         users.emitAdminAudit(AuditAction.SYSTEM_USER_CREATED, created.user(), Map.of(
                 "target_email", created.user().getEmail(),
                 "target_username", created.user().getUsername(),

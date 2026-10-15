@@ -9,7 +9,7 @@ import com.ragagent.auth.domain.AuthToken;
 import com.ragagent.auth.dto.Membership;
 import com.ragagent.common.tenant.domain.Tenant;
 import com.ragagent.auth.domain.TenantMember;
-import com.ragagent.common.auth.domain.User;
+import com.ragagent.auth.domain.User;
 import com.ragagent.common.auth.domain.UserPreferences;
 import io.jsonwebtoken.Claims;
 
