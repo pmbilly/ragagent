@@ -41,12 +41,7 @@ final class QaWebSearchParams {
             }
         }
         try {
-            for (var provider : service.webSearchProviderRepository.list(tenantId)) {
-                if (provider != null && provider.isDefault() && provider.getId() != null
-                        && !provider.getId().isEmpty()) {
-                    return provider.getId();
-                }
-            }
+            return service.webSearchProviders.findDefaultProviderId(tenantId);
         } catch (RuntimeException ignored) {
             // 获取失败 → 留空
         }

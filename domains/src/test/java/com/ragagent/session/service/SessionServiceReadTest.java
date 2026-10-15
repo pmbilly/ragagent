@@ -20,7 +20,7 @@ import com.ragagent.chatpipeline.spi.ModelRuntimePort;
 import com.ragagent.session.repository.MessageRepository;
 import com.ragagent.session.repository.MessageSuggestionRepository;
 import com.ragagent.common.settings.ConversationProperties;
-import com.ragagent.websearch.service.WebSearchTempKbStateService;
+import com.ragagent.common.websearch.WebSearchTempStatePort;
 import com.ragagent.common.model.ModelCatalogPort;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
 
@@ -51,7 +51,7 @@ class SessionServiceReadTest {
                 org.mockito.Mockito.mock(ModelRuntimePort.class),
                 org.mockito.Mockito.mock(ConversationProperties.class),
                 org.mockito.Mockito.mock(
-                        WebSearchTempKbStateService.class));
+                        WebSearchTempStatePort.class));
         TenantContext.set(TENANT, null, null, false, "u-1", false);
     }
 

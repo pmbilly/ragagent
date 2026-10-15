@@ -42,7 +42,7 @@ import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.platform.tracing.langfuse.LangfuseManager;
 import com.ragagent.platform.tracing.langfuse.Span;
-import com.ragagent.websearch.mapper.WebSearchProviderRepository;
+import com.ragagent.common.websearch.WebSearchProviderPort;
 import com.ragagent.common.model.ModelCatalogPort;
 import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
 
@@ -68,7 +68,7 @@ public class SessionKnowledgeQaService {
     final KnowledgeCatalogPort knowledgeCatalog;
     final PipelinePorts.ModelService pipelineModelService;
     final TenantConfigLookup tenantService;
-    final WebSearchProviderRepository webSearchProviderRepository;
+    final WebSearchProviderPort webSearchProviders;
     final javax.sql.DataSource dataSource;
     /** agent 解析（im 面请求只带 agentId：入口按需补 agentRow）。 */
     final AgentResolver agentResolver;
@@ -85,7 +85,7 @@ public class SessionKnowledgeQaService {
             KnowledgeCatalogPort knowledgeCatalog,
             PipelinePorts.ModelService pipelineModelService,
             TenantConfigLookup tenantService,
-            WebSearchProviderRepository webSearchProviderRepository,
+            WebSearchProviderPort webSearchProviders,
             javax.sql.DataSource dataSource,
             AgentResolver agentResolver) {
         this.eventManager = eventManager;
@@ -94,7 +94,7 @@ public class SessionKnowledgeQaService {
         this.knowledgeCatalog = knowledgeCatalog;
         this.pipelineModelService = pipelineModelService;
         this.tenantService = tenantService;
-        this.webSearchProviderRepository = webSearchProviderRepository;
+        this.webSearchProviders = webSearchProviders;
         this.dataSource = dataSource;
         this.agentResolver = agentResolver;
         this.resolution = new SessionQaResolution(this);

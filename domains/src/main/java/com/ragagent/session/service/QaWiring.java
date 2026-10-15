@@ -59,7 +59,6 @@ import com.ragagent.platform.prompt.PromptSource;
 import com.ragagent.common.retrieval.SearchResult;
 import java.io.InputStream;
 import com.ragagent.session.support.PipelineViews;
-import com.ragagent.websearch.service.WebSearchService;
 import com.ragagent.chatpipeline.PipelinePorts;
 import com.ragagent.tracing.decorators.LangfuseChatClient;
 import com.ragagent.tracing.decorators.LangfuseReranker;
@@ -72,7 +71,6 @@ import com.ragagent.contract.memory.MemoryRecall;
 import com.ragagent.contract.memory.MemoryRetrievalContext;
 import com.ragagent.contract.retrieval.SearchParams;
 import com.ragagent.contract.tenant.WebSearchConfig;
-import com.ragagent.retrieval.domain.WebSearchResult;
 import com.ragagent.common.knowledge.ChunkFacts;
 import com.ragagent.common.knowledge.KnowledgeBaseView;
 import com.ragagent.common.knowledge.KnowledgeDocumentFacts;
@@ -364,20 +362,7 @@ public class QaWiring {
         };
     }
 
-    /** {@link PipelinePorts.WebSearch}：委托 {@link WebSearchService#search}。 */
-    @Bean
-    public PipelinePorts.WebSearch qaPipelineWebSearch(WebSearchService webSearchService) {
-        return new PipelinePorts.WebSearch() {
-            @Override
-            public List<WebSearchResult> search(
-                    String providerId, WebSearchConfig config, String query) {
-                // L1 租户配置 → 执行面配置的转换留在域侧（管线不接触 WebSearchService.WebSearchConfig）
-                WebSearchService.WebSearchConfig exec = WebSearchService.WebSearchConfig.from(config);
-                Long tenantId = TenantContext.currentTenantId();
-                return webSearchService.search(tenantId == null ? 0L : tenantId, providerId, exec, query);
-            }
-        };
-    }
+    /** {@link PipelinePorts.WebSearch} 的实现在 websearch 域适配器（管线/工具双面），此处只按类型注入。 */
 
     // ── EventManager（插件注册序） ───────────────
 

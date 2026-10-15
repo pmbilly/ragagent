@@ -781,8 +781,6 @@ class ArchitectureRulesTest {
             "com.ragagent.mcp.service.McpToolApprovalService",
             "com.ragagent.model.service.BuiltinModelsReconciler",
             "com.ragagent.model.service.ModelService",
-            "com.ragagent.session.service.QaWebSearchParams",
-            "com.ragagent.session.service.SessionKnowledgeQaService",
             "com.ragagent.storage.service.DefaultStorageBackendProvisioner",
             "com.ragagent.storage.service.ResourceCatalogService",
             "com.ragagent.storage.service.StorageBackendService",

@@ -37,7 +37,7 @@ import com.ragagent.session.repository.MessageSuggestionRepository;
 import com.ragagent.session.repository.SessionRepository;
 import com.ragagent.platform.security.LogSanitizer;
 import com.ragagent.session.domain.conversation.SessionLastRequestState;
-import com.ragagent.websearch.service.WebSearchTempKbStateService;
+import com.ragagent.common.websearch.WebSearchTempStatePort;
 import com.ragagent.common.model.ModelCatalogPort;
 import com.ragagent.common.model.ModelCatalogPort.ModelRowView;
 
@@ -68,7 +68,7 @@ public class SessionService {
     private final ModelCatalogPort modelCatalog;
     private final ModelRuntimePort modelRuntimeAssembler;
     private final ConversationProperties conversationProps;
-    private final WebSearchTempKbStateService webSearchTempKbState;
+    private final WebSearchTempStatePort webSearchTempState;
 
     public SessionService(SessionRepository sessionRepository,
                           MessageRepository messageRepository,
@@ -77,7 +77,7 @@ public class SessionService {
                           ModelCatalogPort modelCatalog,
                           ModelRuntimePort modelRuntimeAssembler,
                           ConversationProperties conversationProps,
-                          WebSearchTempKbStateService webSearchTempKbState) {
+                          WebSearchTempStatePort webSearchTempState) {
         this.sessionRepository = sessionRepository;
         this.messageRepository = messageRepository;
         this.suggestionRepository = suggestionRepository;
@@ -85,7 +85,7 @@ public class SessionService {
         this.modelCatalog = modelCatalog;
         this.modelRuntimeAssembler = modelRuntimeAssembler;
         this.conversationProps = conversationProps;
-        this.webSearchTempKbState = webSearchTempKbState;
+        this.webSearchTempState = webSearchTempState;
     }
 
     // ── 包级辅助 ──────────────────────────────────────────────────────
@@ -435,7 +435,7 @@ public class SessionService {
             log.warn("Failed to get knowledge IDs for session {}: {}", sessionId, e.toString());
         }
         try {
-            webSearchTempKbState.deleteTempKbState(sessionId);
+            webSearchTempState.deleteTempKbState(sessionId);
         } catch (RuntimeException e) {
             log.warn("Failed to cleanup temporary KB for session {}: {}", sessionId, e.toString());
         }

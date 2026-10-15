@@ -61,8 +61,7 @@ import com.ragagent.agenttools.knowledge.ListKnowledgeChunksTool;
 import com.ragagent.common.tenant.TenantConfigLookup;
 import com.ragagent.contract.tenant.WebSearchConfig;
 import com.ragagent.knowledge.storage.TenantFileStorage;
-import com.ragagent.websearch.service.WebSearchService;
-import com.ragagent.retrieval.domain.WebSearchRequest;
+import com.ragagent.chatpipeline.spi.WebSearchExecutor;
 import com.ragagent.common.knowledge.ChunkFacts;
 
 /**
@@ -91,7 +90,7 @@ public class AgentToolBackends {
     private final AgentToolWikiBackends wikiBackends;
     private final MessageService messageService;
     private final MemoryService memoryService;
-    private final WebSearchService webSearchService;
+    private final WebSearchExecutor webSearchExecutor;
     private final TenantConfigLookup tenantService;
     private final TenantFileStorage fileStorage;
     private final JdbcTemplate jdbc;
@@ -103,7 +102,7 @@ public class AgentToolBackends {
                              MessageService messageService,
                              MemoryService memoryService,
                              WikiPageService wikiPageService,
-                             WebSearchService webSearchService,
+                             WebSearchExecutor webSearchExecutor,
                              TenantConfigLookup tenantService,
                              TenantFileStorage fileStorage,
                              DataSource dataSource) {
@@ -111,7 +110,7 @@ public class AgentToolBackends {
         this.chunkRepository = chunkRepository;
         this.messageService = messageService;
         this.memoryService = memoryService;
-        this.webSearchService = webSearchService;
+        this.webSearchExecutor = webSearchExecutor;
         this.tenantService = tenantService;
         this.fileStorage = fileStorage;
         this.jdbc = new JdbcTemplate(dataSource);
@@ -356,26 +355,11 @@ public class AgentToolBackends {
         };
     }
 
-    /** 执行后端：把 L2 请求载荷适配成 websearch 域的执行配置（域边界适配，方向 = 域 → L2）。 */
+    /** 执行后端：委托引擎侧执行端口（请求→执行配置的转换在 websearch 域适配器）。 */
     public WebSearchTool.WebSearchBackend webSearchBackend() {
-        return (tenantId, providerId, request, query) ->
-                webSearchService.search(tenantId, providerId, toServiceConfig(request), query);
+        return webSearchExecutor::search;
     }
 
-    /** L2 {@link WebSearchRequest} → websearch 域执行配置（域内形状不外泄给工具）。 */
-    private static WebSearchService.WebSearchConfig toServiceConfig(WebSearchRequest request) {
-        WebSearchService.WebSearchConfig cfg = new WebSearchService.WebSearchConfig();
-        cfg.provider = request.provider();
-        cfg.apiKey = request.apiKey();
-        cfg.maxResults = request.maxResults();
-        cfg.includeDate = request.includeDate();
-        cfg.blacklist = new ArrayList<>(request.blacklist());
-        cfg.embeddingModelId = request.embeddingModelId();
-        cfg.documentFragments = request.documentFragments();
-        cfg.proxyUrl = request.proxyUrl();
-        cfg.filters = request.filters();
-        return cfg;
-    }
 
     /**
      * 读租户的联网搜索配置并做有效性归一化：
