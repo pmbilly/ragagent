@@ -1519,6 +1519,61 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 | **system** | 1 | `SystemAdminUserService` 读 1 + `new` | 同端口 | 与 `User` 同一刀的附属改动 |
 | **⚠️ 架构旁账（登记，不在本批）** | — | **租户管理用例寄居 `auth`**（`TenantService`/`TenantCreateOps`/`TenantConfigOps`/`TenantInvitationController`/`TenantMember*`）而 `domains/tenant` 只有 mapper/lookup/配额 | **用例归位（未来设计批）**：租户 CRUD 与配置用例应迁 `domains/tenant`，`auth` 只留"注册时建租户"一个调用点 | 当前用端口承载**先解依赖**；归位属结构性重构（动控制器/路由归属）⇒ 单独立项登记 |
 
+#### 12.6.4 C-13a 执行规格（2026-10-15 实测完成，下一刀可直接照此实施）
+
+**目标**：`users` 单一持久面 + 清偿 `system→auth` 边（②owner 登记项）+ 用户端口合并；**同批**完成 `User` 实体回域（因端口化后跨域面全部视图化 ⇒ 搬迁已无阻）。
+
+**实测决定的三条硬约束（照此设计，勿再试别的落点）**：
+
+| # | 事实 | 后果 |
+|---|---|---|
+| 1 | `SystemAdminUserService`（340 行）**直引 auth 内部件**：`auth.mapper.UserMapper` · `auth.service.TenantService` · `auth.service.TenantMemberService` · `auth.service.PasswordPolicy` | ⇒ 这**整套逻辑属 auth**（用户管理 + 注册建租户 + 成员）；应**迁入 auth 侧适配器**，system 只留审计与 DTO |
+| 2 | **决定性**：`User.preferences` 类型 `UserPreferences`（`common/auth/domain`）带 **Jackson 注解**（`@JsonIgnoreProperties`/`@JsonInclude`），且被 `SystemDtos.UserInfoResponse.from(User)` **直接出面**（线格式） | ⇒ 视图**必须保留 `preferences`** ⇒ 端口与视图**都落 L1（`common.auth`）**，**不能进 `:contract`**（零依赖装不下 Jackson 类型）；与 `MessageView`/`SessionView` 同族登记 |
+| 3 | `auth.mapper.UserMapper` 就**是** system 直引的那个类（未重复） | ⇒ 逻辑搬迁**类型不变、以复制为主** ⇒ 低风险；**不需要**像 `storage_backends` 那样新建仓储 |
+
+**端口面（`common/auth/AdminUserPort`，与视图同包）**：
+
+```java
+public interface AdminUserPort {
+    // 视图与分页/创建结果作为嵌套类型（与 UserLookupPort.UserView 同风格）
+    record AdminUserView(/* 12 字段镜像实体，去掉 @JsonIgnore 的 passwordHash */) {}
+    record AdminUserPage(List<AdminUserView> users, long total) {}
+    sealed interface CreateResult {
+        record Created(AdminUserView user, String generatedPassword) implements CreateResult {}
+        record Idempotent(AdminUserView user) implements CreateResult {}
+    }
+
+    AdminUserView byId(String id);                 // 兼作 UserDirectoryPort.userById 的替代
+    AdminUserView byEmail(String email);
+    AdminUserView byUsername(String username);
+    AdminUserPage listSystemAdmins(int offset, int limit);
+    AdminUserView promote(AdminUserView user);     // 置 isSystemAdmin + updatedAt
+    AdminUserView revoke(String userId, String callerId);
+    void resetPassword(String userId, String newPassword);   // 换 hash + 吊销令牌（内部走 AuthTokenAdminPort）
+    CreateResult createUser(String rawUsername, String rawEmail, String password,
+                            boolean passwordPresent, String provisioning);
+    boolean complexPasswordEnabled();
+    String validatePasswordPolicy(String password, boolean complexEnabled);
+    String generatePolicyCompliantPassword(boolean complexEnabled);
+    String resolveDefaultTenantMode();
+}
+```
+
+**实施步骤（8 步，每步后可编译）**：
+
+1. **`common/auth/AdminUserView`**（L1，12 字段镜像实体；**访问器名逐字一致**含 `isIsActive()`/`isIsSystemAdmin()`；脚本从实体提取访问器体，**跳过 `passwordHash`**）；
+2. **`common/auth/AdminUserPort`**（上表）；
+3. **`domains/auth/api/AdminUserAdapter`**：由 `SystemAdminUserService` **复制改造**而成——内部保持**实体口径**（auth 域内 ✓），只在**端口边界**做 `toView`/`toEntity` 转换；`settingService.getBool/getString` 改走**已有的 `contract.settings.SystemSettingGateway`** ✓；`authTokenAdmin`（`AuthTokenAdminPort`）不变 ✓；
+4. **`SystemAdminUserService` 瘦身**为委托壳：保留 `AuditWritePort` 审计、`systemAuditActorRole()`、`PasswordPolicy` 常量再导出；数据操作全部 `adminUserPort.*`；
+5. **`SystemDtos.UserInfoResponse.from(AdminUserView)`**（访问器同名 ⇒ 体不变）+ `CreateUserResponse` 的 `CreateResult` 类型改指端口嵌套类型；
+6. **控制器**局部类型 `User` → `AdminUserView`（代码段替换）；
+7. **端口合并**：删 `UserDirectoryPort` + `UserDirectoryAdapter`；`SystemSettingService:496` 的 `userDirectoryPort.userById(id)` → `adminUserPort.byId(id)`（它读 `getEmail()`，视图已覆盖 ✓）；`contract.auth.UserLookupPort` **保持不动**（agenttools 的展示面，另一用途，不合并）；
+8. **实体 `User` → `domains/auth/domain`** + FQN 回退（auth 域内 19 文件零改动；`UserPreferences` **留 L1**——被视图引用，随视图家族）；随后 14 守卫 + 金片 + 全量闸门 + 冒烟（`/api/v1/system/users*` 与 `auth/me`）。
+
+**验收读数**：②owner 边 **2 → 1**（`system→auth` 清零；余 `system→tenant` 等待 C-14）；C1 受控根 −1 文件；C2 实体 **2 → 1**（仅 `Tenant`）；线格式不变（`sys-*.json` 等金片）。
+
+**登记（本批不做）**：`UserDirectoryPort`/`UserLookupPort` 的**双端口历史**已在本批消除一个；`UserPreferences` 的 Jackson 注释 ⇒ 若未来去 Jackson，`AdminUserView` + `AdminUserPort` 可整批入 `contract.auth`（与 `MessageView`/`StorageBackendView` 同族）。
+
 #### 12.6.3 批次切分（每批独立闸门 + 单独提交）
 
 | 批 | 内容 | 前置 | 主要风险 |
