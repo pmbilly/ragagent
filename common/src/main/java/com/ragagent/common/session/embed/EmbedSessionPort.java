@@ -10,6 +10,7 @@ import com.ragagent.common.session.dto.StopSessionRequest;
 import com.ragagent.platform.web.ApiResponse;
 
 import jakarta.servlet.http.HttpServletResponse;
+import com.ragagent.contract.session.MessageSuggestionView;
 
 /**
  * embed 渠道的**会话对外操作面**（L1）：embed 委托层不再直接持有会话域控制器。

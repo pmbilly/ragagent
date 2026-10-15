@@ -17,7 +17,7 @@ import com.ragagent.im.runtime.ImFormat;
 import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
 import com.ragagent.im.runtime.QaQueue;
-import com.ragagent.common.session.embed.SessionView;
+import com.ragagent.contract.session.SessionView;
 
 /**
  * {@link ImStopOps} 的语义钉子：自 {@code ImTurnOrchestrator} 外提时逐字搬迁，

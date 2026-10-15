@@ -17,7 +17,7 @@ import com.ragagent.session.controller.MessageSuggestionController;
 import com.ragagent.session.controller.SessionController;
 
 import jakarta.servlet.http.HttpServletResponse;
-import com.ragagent.common.session.embed.MessageSuggestionView;
+import com.ragagent.contract.session.MessageSuggestionView;
 import com.ragagent.common.session.embed.MessageView;
 
 /**

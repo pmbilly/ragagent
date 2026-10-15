@@ -4,9 +4,9 @@ package com.ragagent.contract.tool;
  * 审批闸门的错误哨兵（四种可判别的失败 + 一种内部错误）。
  *
  * <p>handler 用 {@code e.kind()} 做 switch 判别并映射 HTTP 状态码；
- * {@link Kind} 的默认消息保留原始英文文案，便于日志对照。</p>
+ * {@code Kind} 的默认消息保留原始英文文案，便于日志对照。</p>
  *
- * <p>另外 {@link Kind#INTERNAL} 承载非哨兵的一般内部错误
+ * <p>另外 {@code Kind#INTERNAL} 承载非哨兵的一般内部错误
  * （事件总线为 null、emit 失败、跨实例订阅失败等）。</p>
  *
  * <p>本异常是 <b>unchecked</b>：checker/事件总线实现（Spring/MyBatis）抛的都是运行时异常，

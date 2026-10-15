@@ -85,7 +85,7 @@ public final class WikiConstants {
     }
 
     /**
-     * 未知 / 空值一律映射为 {@link #EDIT_SOURCE_PIPELINE}，
+     * 未知 / 空值一律映射为 {@code #EDIT_SOURCE_PIPELINE}，
      * 让历史行与漏改的调用点退化成历史行为（"机器写的"）。
      */
     public static String normalizeEditSource(String source) {

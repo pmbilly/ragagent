@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ragagent.platform.persistence.PgJsonTypeHandler;
-import com.ragagent.common.session.domain.conversation.SessionLastRequestState;
+import com.ragagent.contract.session.SessionLastRequestState;
 
 /**
  * 列表里的一行会话 = 会话字段 + IM 来源字段。

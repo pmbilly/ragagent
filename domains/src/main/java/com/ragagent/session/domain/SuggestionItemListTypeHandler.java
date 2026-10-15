@@ -3,7 +3,7 @@ package com.ragagent.session.domain;
 import java.util.List;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.ragagent.common.session.domain.SuggestionItem;
+import com.ragagent.contract.session.SuggestionItem;
 
 /**
  * {@code message_suggestion_sets.questions} 列（{@code List<SuggestionItem>}）的处理器。

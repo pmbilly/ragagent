@@ -1,6 +1,6 @@
 package com.ragagent.common.session.qa;
 
-import com.ragagent.common.session.embed.SessionView;
+import com.ragagent.contract.session.SessionView;
 import com.ragagent.common.session.embed.MessageView;
 import com.ragagent.platform.event.EventBus;
 

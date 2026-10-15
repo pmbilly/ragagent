@@ -8,7 +8,7 @@ package com.ragagent.contract.tool;
  * 每个名字前的短路。不引入隐式的全局上下文，改为显式传入一个可被取消的信号。</p>
  *
  * <p><b>接线提示</b>：SSE 断连 / 用户点“停止生成”时把该信号置为已取消即可；
- * 无需取消的场景用 {@link #none()}。</p>
+ * 无需取消的场景用 {@code #none()}。</p>
  *
  * <p>这里只有最小面，不做派生树；超时不用它表达，
  * gate 自己的 timeout / WaitTimeout 已经覆盖。</p>
@@ -31,7 +31,7 @@ public interface Cancellation {
         return NoneCancellation.INSTANCE;
     }
 
-    /** {@link #none()} 的单例实现 */
+    /** {@code #none()} 的单例实现 */
     final class NoneCancellation implements Cancellation {
 
         static final NoneCancellation INSTANCE = new NoneCancellation();

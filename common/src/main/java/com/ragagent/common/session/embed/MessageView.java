@@ -7,7 +7,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ragagent.common.agent.domain.AgentStep;
 import com.ragagent.common.retrieval.SearchResult;
-import com.ragagent.common.session.domain.MentionedItem;
+import com.ragagent.contract.session.MentionedItem;
 import com.ragagent.common.session.domain.UsedMemory;
 import com.ragagent.common.session.domain.message.MessageArtifact;
 import com.ragagent.common.session.domain.message.MessageAttachment;

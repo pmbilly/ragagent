@@ -16,7 +16,7 @@ import com.ragagent.contract.error.BizException;
  * {@link APIKeyScopeContext} 挂在请求线程上，供
  * {@code APIKeyRouteAuthorizer} 等下游消费方与 KB 白名单判定读取。</p>
  *
- * <p>所有判定方法都先 {@link #normalize()}——"输入永远先规范化一遍"，
+ * <p>所有判定方法都先 {@code #normalize()}——"输入永远先规范化一遍"，
  * 所以在构造后直接调用也是安全的。</p>
  *
  * <p>本类型**不参与 JSON**（只在进程内传递），因此没有序列化注解。</p>

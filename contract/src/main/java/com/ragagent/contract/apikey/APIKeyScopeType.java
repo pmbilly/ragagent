@@ -4,7 +4,7 @@ package com.ragagent.contract.apikey;
  * API Key 的作用域类型。
  *
  * <p>用字符串常量 + 静态归一化方法表达（不引入枚举）：所有出口都过
- * {@link #normalize(String)}，任何无法识别的输入（含空串）都归为
+ * {@code #normalize(String)}，任何无法识别的输入（含空串）都归为
  * {@code tenant}；实体字段可以直连 DB 的 {@code varchar(16)} 列，不需要 TypeHandler。</p>
  */
 public final class APIKeyScopeType {

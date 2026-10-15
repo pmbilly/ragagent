@@ -25,7 +25,7 @@ import com.ragagent.contract.event.payload.AgentFinalAnswerData;
 import com.ragagent.contract.event.payload.ErrorData;
 import com.ragagent.common.session.qa.QaRequestPayload;
 import com.ragagent.common.session.embed.MessageView;
-import com.ragagent.common.session.embed.SessionView;
+import com.ragagent.contract.session.SessionView;
 
 /**
  * IM QA 执行编排：队列 worker 的租户上下文绑定与在途登记、full-output / 流式 /

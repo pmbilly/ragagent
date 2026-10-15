@@ -1525,8 +1525,8 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 
 | 账 | 读数 | 状态 |
 |---|---|---|
-| `:contract` | **206 件** | ✅ 已独立（零依赖） |
-| `common/*` | **77 件**（125 → … → 82 → 78 → 77；G1-f 再 −1） | 收敛中 |
+| `:contract` | **211 件** | ✅ 已独立（零依赖） |
+| `common/*` | **72 件**（125 → … → 78 → 77 → 72；G1-g 再 −5） | 收敛中 |
 | `platform/*` | 139 件 · `:common` 总 **237** | — |
 | **C2 实体** | **0** ✅ | **C 收官**（14 → 0） |
 | **C1 受控导入根** | 10 根 / **57 文件** | 冻结只许减 |
@@ -1792,6 +1792,29 @@ public interface AdminUserPort {
 - **读数**：**C1 受控导入根 61 → 59 文件**；**域侧 handler 10 → 1**；`common/*` 91 → **82**（−9）；`:contract` 203（不变）；载荷 0 保持；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
 - **验证**：**14 守卫全绿**（C1/C2 基线已 `--write`）；**1349 金片签名一致**；`spotlessCheck build` **2m5s**；**4991 / 失败 0 / 跳过 4**；dev 冒烟（sessions / KB / tenants / system-info **200** ✓；`GET /sessions/{id}/messages` ⇒ **500**——**查日志证实为既有的 `HttpRequestMethodNotSupportedException`（405 应然却映射为 500）**，与 handler 无关 ⇒ 该独立小刀仍在队列）
 - **余量**：域侧 handler 仅剩 `wiki/domain/WikiStringListTypeHandler`（L1 用户 `WikiIndexEntry` ⇒ 随其切开）· Jackson 味域内值类型 22 件（其中 session 7 件被 L1 平台面载荷引用 ⇒ 与载荷同生命周期）
+**🔶 G1-g·会话载荷契约化 5 件（解环）+ `SearchResult` 判定登记 + javadoc 链接脚本化（`common/*` 77 → 72）（2026-10-15）**
+- **触发**：队列第 1 项（检索能力面契约化）
+
+**结果 1｜`SearchResult` 判定＝不可迁（登记）**
+- 它是**线格式载荷**（SSE `references` 事件 + `Message.knowledge_references` 逐字节），注解**全部载重**：**6 个 `@JsonInclude`**（`NON_NULL`/`NON_EMPTY` ⇒ 键省略语义）+ **`@JsonPropertyOrder`**（字节序）+ **4 个 `@JsonIgnore`** + `SortedMapSerializer`（平台件）
+- ⇒ 零依赖契约**装不下** ⇒ 登记 **Jackson 语义必要**；未来路径：① 线格式改"恒出键"（product 决策）② 出参改 Map 形状、出口单独装配
+
+**结果 2｜实得：原被"环"阻塞的两对解环并迁入 `contract.session`（5 件）**
+1. `SessionView` + `SessionLastRequestState` + **连带 `MentionedItem`**（前者引用它；**L1 的 `MessageView` 也可引契约 ⇒ 无阻塞** ✓）
+2. `MessageSuggestionView` + `SuggestionItem`
+- ⭐ **关键判据（省掉一类"假阻塞"）**：这两个值类型带 `@JsonIgnoreProperties(ignoreUnknown = true)`（看似"必须留 L1" ✗）⇒ 实测**它们只走 TypeHandler 的 jsonb 路径**，而 `AbstractJsonListTypeHandler` 用的正是 **`JsonMappers.lenient()`（已 `disable(FAIL_ON_UNKNOWN_PROPERTIES)`）** ✓ ⇒ **注解冗余，可安全去掉** ✓✓
+  **判据：见到 `ignoreUnknown`/容错类注解，先查"读取路径用的 mapper 是否已容忍"，再判它是否载重**
+- `SessionView` 的 `@JsonIgnore embedVisitorId` 用**非 getter 命名**承接（`embedVisitorIdValue()`；2 处调用点同步 ✓）——与 G1-b-2/G1-b-4 同法
+
+**结果 3｜M2 脚本化（兑现"12 次教训"）**
+- 新增 **`scripts/fix-javadoc-links.py`**：扫 `contract/` 的 `{@link}`（**裸名与 FQN 两种形态**）——不可解析者降级 `{@code}`；默认 **dry-run**，`--write` 落盘
+- 首次运行：**降级 60 处 / 29 文件** ⇒ `:contract:javadoc` 由红转绿 ✓（此前只处理 FQN 形态 ⇒ **裸名漏网**是本轮红态的真因）
+
+**读数**：`:contract` 206 → **211**；`common/*` 77 → **72**；C4 **登记 platform 面 10 → 8**（两条陈旧登记随迁摘除 ✓）；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
+
+**验证**：**14 守卫全绿**；**1349 金片签名一致**（`session-*.json` / `emb-pub-sessions-*.json` / `emb-pub-suggestions-get.json` ⇒ **embed 线格式逐字节不变** ✓）；`spotlessCheck build` **1m48s**；**4992 / 失败 0 / 跳过 4**；冒烟（sessions / KB / system-info **200** ✓ · **`GET /api/v1/sessions/{id}` 200**（`SessionView` 消费链 ✓）· `GET /api/v1/chunker/preview` **405** 复核 ✓）
+
+**余留**：`MessageView` 被 **wire-bound `SearchResult`** 硬阻 ⇒ 与 `SearchResult` 同批（product 决策项）；session 值类型余件（`SuggestionAttribution`/`UsedMemory`/`MessageArtifact`/`MessageImage`/`MessageExecutionContext` 等）随 `MessageView` 一并
 **🔶 G1-f·405 映射修复 + Jackson 味值类型按域回迁（1 件实迁 / 21 件转台账）+ §16.0 数字刷新（2026-10-15）**
 
 **① `HttpRequestMethodNotSupportedException ⇒ 405`（清账项，此前两次现身）**

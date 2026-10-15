@@ -29,7 +29,7 @@ import com.ragagent.contract.event.payload.AgentToolResultData;
 import com.ragagent.contract.event.payload.ErrorData;
 import com.ragagent.common.session.qa.QaRequestPayload;
 import com.ragagent.common.session.embed.MessageView;
-import com.ragagent.common.session.embed.SessionView;
+import com.ragagent.contract.session.SessionView;
 
 /**
  * IM 流式回复管线：事件订阅组、流缓冲袋、300ms 冲刷循环与 finalize/收尾落库。

@@ -1,10 +1,8 @@
-package com.ragagent.common.session.domain.conversation;
+package com.ragagent.contract.session;
 
-import com.ragagent.common.session.domain.MentionedItem;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * 上次发问时的输入栏状态。
@@ -22,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  * <p>⚠️ <b>存量行必须跑迁移</b>：早前写进 {@code agent_config} 的键是下划线形式
  * （{@code agent_id}/{@code knowledge_base_ids}/…），宽松读会把它们**静默吞成空值**。</p>
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class SessionLastRequestState {
 
     private String agentId;

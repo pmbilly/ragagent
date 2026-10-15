@@ -10,8 +10,8 @@ import java.io.InputStream;
  * {@code Accept-Ranges: bytes} + Range/206；只能顺序读的（aws-sdk 族的 body）
  * 走流式 + {@code Accept-Ranges: none}。</p>
  *
- * <p>本接口是 provider 侧对"能 seek"能力的投影：{@link #size()} 取对象长度、
- * {@link #open(long)} 从偏移处打开流（实现可用 Range 请求，不必缓冲整个对象）。</p>
+ * <p>本接口是 provider 侧对"能 seek"能力的投影：{@code #size()} 取对象长度、
+ * {@code #open(long)} 从偏移处打开流（实现可用 Range 请求，不必缓冲整个对象）。</p>
  */
 public interface SeekableSource {
 

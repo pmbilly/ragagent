@@ -15,7 +15,7 @@ public interface ChunkPort {
      *
      * <p>迁移前为 {@code WikiIngestBatchHandler.listTextChunksByKnowledgeID}（按租户 + 知识 id +
      * chunk_type=text）。<b>只取 text</b>：summary / parent_text / image 等其他类型
-     * 走 {@link #chunksByIds(long, List)} 或富化路径。</p>
+     * 走 {@code #chunksByIds(long, List)} 或富化路径。</p>
      */
     List<ChunkView> textChunks(long tenantId, String knowledgeId);
 

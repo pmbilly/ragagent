@@ -8,10 +8,10 @@ import java.util.List;
  * <p><b>为什么是端口</b>：mcp 的模型选用与运行时配置组装此前直连 model 域的
  * {@code ModelService}（域服务 ✗）并把 {@code Model} 实体当跨域视图传递（实体出域 ✗）。
  * 本端口把读路径收回属主域实现（{@code model/api/ModelCatalogAdapter}），
- * 调用方只 import 本端口与 {@link ModelRowView}。</p>
+ * 调用方只 import 本端口与 {@code ModelRowView}。</p>
  *
  * <p>运行时的"模型行 → 各能力层配置"映射（{@code modelruntime.config.ModelRuntimeConfigs}）
- * 收 {@link ModelRowView} 而非实体——它属 L2，不得反向依赖模型域。</p>
+ * 收 {@code ModelRowView} 而非实体——它属 L2，不得反向依赖模型域。</p>
  */
 public interface ModelCatalogPort {
 
@@ -38,7 +38,7 @@ public interface ModelCatalogPort {
 
     // ── 管理写面（初始化向导 / 调试端点用） ──
 
-    /** 按 id 取模型行（**全字段视图**，管理/初始化面用）；失败语义同 {@link #findModel}。 */
+    /** 按 id 取模型行（**全字段视图**，管理/初始化面用）；失败语义同 {@code #findModel}。 */
     ModelView getModelRow(String id);
 
     /** 租户可见模型行（**全字段视图**）；不可见 ⇒ null。 */

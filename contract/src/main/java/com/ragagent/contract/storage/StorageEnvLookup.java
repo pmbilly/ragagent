@@ -12,7 +12,7 @@ import java.util.function.Function;
  * <b>启动期装配的查找面</b>：值仍来自 Spring {@code Environment}（系统环境变量本就是它的
  * 一个 property source），从此「读环境」只有这一个入口，且可被属性源 / 命令行参数覆盖。</p>
  *
- * <p><b>只允许装配层调用 {@link #install}</b>；未装配时一律视为未配置（{@code null}）
+ * <p><b>只允许装配层调用 {@code #install}</b>；未装配时一律视为未配置（{@code null}）
  * ——各调用方原有的「空值→缺省」语义保持不变。</p>
  */
 public final class StorageEnvLookup {

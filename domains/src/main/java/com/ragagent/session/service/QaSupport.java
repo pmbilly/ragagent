@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.ragagent.common.session.domain.MentionedItem;
+import com.ragagent.contract.session.MentionedItem;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.dto.QaRequests.MentionedItemRequest;

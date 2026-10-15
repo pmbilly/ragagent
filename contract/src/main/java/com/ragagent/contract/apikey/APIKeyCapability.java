@@ -75,7 +75,7 @@ public final class APIKeyCapability {
 
     /**
      * 全部已知能力
-     * （仅用于文档/调试，判定一律走 {@link #normalize(String)}）。
+     * （仅用于文档/调试，判定一律走 {@code #normalize(String)}）。
      */
     public static final List<String> ALL = List.of(
             RETRIEVE, CHAT, READ_AGENTS, INGEST, MANAGE_KBS, MANAGE_AGENTS, MESSAGE_HISTORY,

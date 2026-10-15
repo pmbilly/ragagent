@@ -10,7 +10,7 @@ import com.ragagent.im.service.ImTurnOrchestrator.InflightEntry;
 import com.ragagent.common.session.qa.QaRequestPayload;
 import com.ragagent.common.session.domain.message.MessageAttachment;
 import com.ragagent.common.session.embed.MessageView;
-import com.ragagent.common.session.embed.SessionView;
+import com.ragagent.contract.session.SessionView;
 
 /**
  * QA 管线的共享底座：agent 模式判定、IM 请求构造（含 agent config 缺省补全）、

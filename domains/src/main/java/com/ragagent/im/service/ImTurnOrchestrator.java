@@ -49,7 +49,7 @@ import com.ragagent.platform.stream.StreamManager;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.contract.storage.support.Resolver;
 import com.ragagent.common.session.qa.SessionQaPort;
-import com.ragagent.common.session.embed.SessionView;
+import com.ragagent.contract.session.SessionView;
 
 /**
  * IM 执行体核心。

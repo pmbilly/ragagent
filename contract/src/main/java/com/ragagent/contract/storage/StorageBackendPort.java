@@ -11,7 +11,7 @@ import java.util.List;
  */
 public interface StorageBackendPort {
 
-    /** 连通性探测：不可达 ⇒ 抛 {@link RuntimeException}（消息为 SDK 原文，供调用方分派文案）。 */
+    /** 连通性探测：不可达 ⇒ 抛 {@code RuntimeException}（消息为 SDK 原文，供调用方分派文案）。 */
     void test(StorageBackendView backend);
 
     /** 连通性错误信息脱敏（抹掉凭证、内网地址等敏感片段）。 */

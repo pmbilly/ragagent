@@ -13,7 +13,7 @@ import com.ragagent.session.service.QaSupport;
 import com.ragagent.session.service.SessionAgentQaService;
 import com.ragagent.session.service.SessionKnowledgeQaService;
 import com.ragagent.session.service.SessionService;
-import com.ragagent.common.session.embed.SessionView;
+import com.ragagent.contract.session.SessionView;
 
 /**
  * {@link SessionQaPort} 的会话域实现：消息落库与会话读取逐字转发；
@@ -211,7 +211,7 @@ public class SessionQaAdapter implements SessionQaPort {
         v.setDescription(s.getDescription());
         v.setTenantId(s.getTenantId());
         v.setUserId(s.getUserId());
-        v.setEmbedVisitorId(s.getEmbedVisitorId());
+        v.setEmbedVisitorId(s.embedVisitorIdValue());
         v.setPinned(s.isPinned());
         v.setPinnedAt(s.getPinnedAt());
         v.setLastRequestState(s.getLastRequestState());
@@ -234,7 +234,7 @@ public class SessionQaAdapter implements SessionQaPort {
         e.setDescription(v.getDescription());
         e.setTenantId(v.getTenantId());
         e.setUserId(v.getUserId());
-        e.setEmbedVisitorId(v.getEmbedVisitorId());
+        e.setEmbedVisitorId(v.embedVisitorIdValue());
         e.setPinned(v.isPinned());
         e.setPinnedAt(v.getPinnedAt());
         e.setLastRequestState(v.getLastRequestState());
@@ -256,7 +256,7 @@ public class SessionQaAdapter implements SessionQaPort {
         v.setDescription(fresh.getDescription());
         v.setTenantId(fresh.getTenantId());
         v.setUserId(fresh.getUserId());
-        v.setEmbedVisitorId(fresh.getEmbedVisitorId());
+        v.setEmbedVisitorId(fresh.embedVisitorIdValue());
         v.setPinned(fresh.isPinned());
         v.setPinnedAt(fresh.getPinnedAt());
         v.setLastRequestState(fresh.getLastRequestState());

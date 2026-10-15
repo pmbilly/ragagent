@@ -12,8 +12,8 @@ package com.ragagent.contract.apikey;
  * <p>存放的是**已归一化**的 scope：写入前先归一化。</p>
  *
  * <p>生命周期由 {@code APIKeyAuthChannel} 负责：认证成功时
- * {@link #set(TenantAPIKeyScope)}，请求结束（finally）{@link #clear()}。
- * JWT 会话没有 API Key scope → {@link #current()} 返回 {@code null}，
+ * {@code #set(TenantAPIKeyScope)}，请求结束（finally）{@code #clear()}。
+ * JWT 会话没有 API Key scope → {@code #current()} 返回 {@code null}，
  * 这正是"JWT 直通、API Key 才受门禁"的判定依据。</p>
  */
 public final class APIKeyScopeContext {

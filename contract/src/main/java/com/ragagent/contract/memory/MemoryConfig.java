@@ -19,7 +19,7 @@ package com.ragagent.contract.memory;
  * 改过键名后的存量行必须跑迁移 SQL。旧键读进来会被静默忽略
  * → 工作区配置"看起来被重置"，不会报错。</p>
  *
- * <h2>⚠️ 两个三态开关必须是可空 {@link Boolean}</h2>
+ * <h2>⚠️ 两个三态开关必须是可空 {@code Boolean}</h2>
  * <p>"没配"（null，走默认）与"显式配成 false"是两回事；
  * 压成 {@code boolean} 会把 null 变成 false，等于替工作区管理员做了决定。
  * 同理它们**不加** {@code NON_NULL}——{@code null} 是要写出去的。</p>
@@ -32,7 +32,7 @@ public class MemoryConfig {
      */
     private boolean enabled;
 
-    /** {@link #WRITE_MODE_EXPLICIT_ONLY} 或 {@link #WRITE_MODE_AUTO}。 */
+    /** {@code #WRITE_MODE_EXPLICIT_ONLY} 或 {@code #WRITE_MODE_AUTO}。 */
     private String writeMode = "";
 
     /**
@@ -41,7 +41,7 @@ public class MemoryConfig {
      */
     private String extractModelId = "";
 
-    /** 每个 subject 的活跃条目上限。0 表示 {@link #DEFAULT_MAX_ITEMS}。 */
+    /** 每个 subject 的活跃条目上限。0 表示 {@code #DEFAULT_MAX_ITEMS}。 */
     private int maxItems;
 
     /** 一轮结束后等多久才做蒸馏。0 表示默认值。 */
@@ -71,7 +71,7 @@ public class MemoryConfig {
 
     /**
      * 是否让记忆参与**检索**（查询改写、按文档排序），而不只是拼进回答的提示词。
-     * <b>三态</b>，同 {@link #vectorRecall}。
+     * <b>三态</b>，同 {@code #vectorRecall}。
      */
     private Boolean retrievalConditioning;
 
@@ -89,7 +89,7 @@ public class MemoryConfig {
 
     /** {@code maxItems} 的默认值（等同于 {@link MemoryKinds#DEFAULT_MAX_ITEMS}）。 */
     public static final int DEFAULT_MAX_ITEMS = MemoryKinds.DEFAULT_MAX_ITEMS;
-    /** {@code maxItems} 的上限；{@link #normalize()} 会把更大的值夹回来。 */
+    /** {@code maxItems} 的上限；{@code #normalize()} 会把更大的值夹回来。 */
     public static final int MAX_ITEMS_CAP = 2000;
     /** {@code extractInstructions} 的码点上限。 */
     public static final int MAX_EXTRACT_INSTRUCTIONS_RUNES = MemoryKinds.MAX_EXTRACT_INSTRUCTIONS_RUNES;
@@ -227,7 +227,7 @@ public class MemoryConfig {
 
     /**
      * 套默认值，并把未知的 write mode 打回
-     * {@link #WRITE_MODE_EXPLICIT_ONLY}。
+     * {@code #WRITE_MODE_EXPLICIT_ONLY}。
      *
      * <p>逐字段处理，包括三处容易漏的：{@code extractModelId} 与
      * {@code embeddingModelId} 去空白、{@code extractInstructions} 去空白后按

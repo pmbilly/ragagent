@@ -8,13 +8,13 @@ package com.ragagent.contract.text;
  * <h2>为什么不能用 {@code String.trim()} / {@code String.strip()}</h2>
  * <ul>
  *   <li>{@code trim()} 只去 {@code <= 0x20}，漏掉 U+0085 / U+00A0 / U+2000 等；</li>
- *   <li>{@code strip()} = {@link Character#isWhitespace}，<b>不含</b> U+00A0 / U+2007 /
+ *   <li>{@code strip()} = {@code Character#isWhitespace}，<b>不含</b> U+00A0 / U+2007 /
  *       U+202F / U+0085 这 4 个（Java 刻意排除）。</li>
  * </ul>
  * <p>实际影响：凭据常从网页复制、夹进 NBSP——判定"配置缺失"（保存时报错）还是拿着
  * 含 NBSP 的串发请求（同步时 401），故障点差一个数量级。</p>
  *
- * <p><b>实现选择</b>：{@link Character#isSpaceChar}（覆盖全部 Zs / Zl / Zp，含 U+00A0 /
+ * <p><b>实现选择</b>：{@code Character#isSpaceChar}（覆盖全部 Zs / Zl / Zp，含 U+00A0 /
  * U+2007 / U+202F）+ 6 个 ASCII 控制字符（09-0D、85）——与 White_Space 精确等价，
  * 且复用 JDK 的 Unicode 表（不维护自有码点清单）。</p>
  */
@@ -30,7 +30,7 @@ public final class Whitespace {
                 || cp == 0x85;
     }
 
-    /** 裁掉首尾空白（定义见 {@link #isSpace}）；{@code null} → 空串。按码点推进，代理对不拆开。 */
+    /** 裁掉首尾空白（定义见 {@code #isSpace}）；{@code null} → 空串。按码点推进，代理对不拆开。 */
     public static String trimSpace(String s) {
         if (s == null || s.isEmpty()) {
             return "";

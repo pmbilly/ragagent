@@ -1,8 +1,7 @@
-package com.ragagent.common.session.domain;
+package com.ragagent.contract.session;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * 渲染给终端用户的一条**可归因**的追问建议。
@@ -16,7 +15,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  * {@code path("text")} / {@code path("category")} 后手工 new 出来。所以键名换 camelCase
  * 不影响提示词那条路（模型若回 {@code knowledge_base_ids} 本来也没人读）。</p>
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class SuggestionItem {
 
     private String id = "";

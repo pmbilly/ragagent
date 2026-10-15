@@ -3,7 +3,7 @@ package com.ragagent.contract.tool;
 /**
  * 一次待决审批所需的全部上下文。
  *
- * <p>{@code args} 是原始 JSON 字符串。构造用 {@link #builder()}（项目约定不使用 Lombok）。</p>
+ * <p>{@code args} 是原始 JSON 字符串。构造用 {@code #builder()}（项目约定不使用 Lombok）。</p>
  *
  * <p><b>userId</b>：发起调用的会话属主，用于 {@code Resolve} 鉴权；为空表示跳过用户校验。</p>
  */

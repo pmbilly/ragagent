@@ -9,7 +9,7 @@ import com.ragagent.im.runtime.ImTypes;
 import com.ragagent.im.runtime.IncomingMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ragagent.common.session.embed.SessionView;
+import com.ragagent.contract.session.SessionView;
 
 /**
  * IM 消息的会话解析：user / thread 两种模式的映射查找与首建（含并发撞唯一约束时的

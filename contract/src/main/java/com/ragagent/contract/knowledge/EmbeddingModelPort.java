@@ -9,7 +9,7 @@ import java.util.List;
  * {@code EmbedderClient.configFrom} → {@code embedBatch}）。wiki 侧只拿一个函数式客户端，
  * 不再接触 {@code EmbedderClient.EmbedConfig}。</p>
  *
- * <p>类型闸门语义不变：非 embedding 模型抛 {@link IllegalStateException}
+ * <p>类型闸门语义不变：非 embedding 模型抛 {@code IllegalStateException}
  * （调用方据此降级为"喂全部目录"）。</p>
  */
 public interface EmbeddingModelPort {

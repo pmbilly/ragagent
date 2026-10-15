@@ -1,7 +1,7 @@
 package com.ragagent.session.domain.message;
 
 import com.ragagent.session.domain.AgentStepListTypeHandler;
-import com.ragagent.common.session.domain.MentionedItem;
+import com.ragagent.contract.session.MentionedItem;
 import com.ragagent.session.domain.MentionedItemListTypeHandler;
 import com.ragagent.session.domain.SearchResultListTypeHandler;
 import com.ragagent.common.session.domain.UsedMemory;

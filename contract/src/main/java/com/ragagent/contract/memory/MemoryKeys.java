@@ -20,9 +20,9 @@ import java.util.Set;
  *   <li><b>排序是 UTF-8 字节序</b>，不是 Java 的 UTF-16 码元序。
  *       两者只在「BMP 的 U+E000–U+FFFF 与增补平面混排」时分叉——本项目
  *       目前全是 BMP（中文在 U+4E00–U+9FFF），但为杜绝这类键序坑，
- *       这里统一用 {@link #utf8Compare}。（{@code MemoryRender} 的排序同理。）</li>
+ *       这里统一用 {@code #utf8Compare}。（{@code MemoryRender} 的排序同理。）</li>
  *   <li><b>长度按码点数计</b>：{@code String.length()} 是 UTF-16 码元数。所有截断都走
- *       {@link #runeLength}/{@link #runeSlice}，别直接用 {@code substring}。</li>
+ *       {@code #runeLength}/{@code #runeSlice}，别直接用 {@code substring}。</li>
  * </ol>
  *
  * <p>{@code unicode.Is(unicode.Han, r)} 用 {@link Character.UnicodeScript#HAN} 表达：
@@ -129,7 +129,7 @@ public final class MemoryKeys {
     /**
      * 把主题标签压成一个稳定的身份 key。
      *
-     * <p>**刻意不是** {@link #normalizeMemoryKey}。后者排序去重字符——对记忆条目说得通
+     * <p>**刻意不是** {@code #normalizeMemoryKey}。后者排序去重字符——对记忆条目说得通
      * （词序不该有影响，漏掉的靠包含判定兜住），但作为主题身份两个方向都错：
      * 它会把"门店排班管理"与"门店的排班管理"当成不同主题（差一个字符），
      * 又会把两个异位词当成同一个。</p>

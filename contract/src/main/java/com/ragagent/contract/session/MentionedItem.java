@@ -1,6 +1,5 @@
-package com.ragagent.common.session.domain;
+package com.ragagent.contract.session;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * 被 @ 提及的知识库 / 文件 / 标签 / MCP 工具 / skill。
@@ -12,10 +11,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  * <p>⚠️ 它**落两处 jsonb**（{@code messages.mentionedItems} 与
  * {@code sessions.agent_config.mentionedItems}），换键名必须配存量迁移。</p>
  *
- * <p>{@link #fromRawMap} 负责从 steer 事件里 JSON 安全的 map 形态重建本结构
+ * <p>{@code #fromRawMap} 负责从 steer 事件里 JSON 安全的 map 形态重建本结构
  * （只认 string 类型的值，其余当空串）。</p>
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class MentionedItem {
 
     private String id = "";

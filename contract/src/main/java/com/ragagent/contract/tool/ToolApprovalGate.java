@@ -19,7 +19,7 @@ public interface ToolApprovalGate {
     /** 该工具调用是否需要审批（策略查询错误已在实现内按 fail-close / fail-open 吞掉）。 */
     boolean needsApproval(Cancellation ctx, long tenantId, String serviceId, String toolName);
 
-    /** 该工具当前是否启用；查询失败时抛运行时异常（与 {@link #needsApproval} 的吞错口径不同）。 */
+    /** 该工具当前是否启用；查询失败时抛运行时异常（与 {@code #needsApproval} 的吞错口径不同）。 */
     boolean isEnabled(Cancellation ctx, long tenantId, String serviceId, String toolName);
 
     /** 批量查启用态：key ＝ 工具名，value ＝ 是否启用。 */

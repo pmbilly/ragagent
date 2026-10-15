@@ -3,7 +3,7 @@ package com.ragagent.session.domain;
 import java.util.List;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.ragagent.common.session.domain.MentionedItem;
+import com.ragagent.contract.session.MentionedItem;
 
 /**
  * {@code messages} 表上 {@code List<MentionedItem>} 型 jsonb 列的处理器。

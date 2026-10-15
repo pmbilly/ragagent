@@ -1,9 +1,7 @@
-package com.ragagent.common.session.embed;
+package com.ragagent.contract.session;
 
 import java.time.OffsetDateTime;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ragagent.common.session.domain.conversation.SessionLastRequestState;
 
 /**
  * 会话行**线格式视图**（会话 QA 面载荷与装配面读写形状）。
@@ -26,8 +24,6 @@ public class SessionView {
     private Long tenantId;
 
     private String userId = "";
-
-    @JsonIgnore
     private String embedVisitorId;
 
     private boolean pinned;
@@ -84,7 +80,8 @@ public class SessionView {
         this.userId = userId;
     }
 
-    public String getEmbedVisitorId() {
+    /** **非 getter 命名**（embedVisitorIdValue()）⇒ 等价原 @JsonIgnore（序列化不出面）。 */
+    public String embedVisitorIdValue() {
         return embedVisitorId;
     }
 

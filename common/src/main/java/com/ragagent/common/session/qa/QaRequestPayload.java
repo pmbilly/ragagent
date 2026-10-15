@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.common.session.embed.SessionView;
+import com.ragagent.contract.session.SessionView;
 import com.ragagent.common.session.domain.message.MessageAttachment;
 
 /**

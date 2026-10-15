@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ragagent.platform.persistence.PgJsonTypeHandler;
-import com.ragagent.common.session.domain.conversation.SessionLastRequestState;
+import com.ragagent.contract.session.SessionLastRequestState;
 import com.ragagent.common.session.domain.conversation.SessionOwnerIds;
 
 /**
@@ -227,7 +227,7 @@ public class Session {
         this.userId = v;
     }
 
-    public String getEmbedVisitorId() {
+    public String embedVisitorIdValue() {
         return embedVisitorId;
     }
 

@@ -12,7 +12,7 @@ package com.ragagent.contract.storage.support;
  * <b>跨线程必须显式传值</b>。</p>
  *
  * <p><b>生命周期由设置方负责</b>：在能进入本包的入口（未来是 embed 渠道过滤器）
- * {@link #force()}，并在请求结束的 finally 里 {@link #clear()}。
+ * {@code #force()}，并在请求结束的 finally 里 {@code #clear()}。
  * ThreadLocal 不会随作用域自动失效——漏清会污染同线程的下一个请求。</p>
  */
 public final class StorageUrlContext {

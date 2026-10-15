@@ -14,12 +14,12 @@ import com.ragagent.contract.text.Whitespace;
  * worker 是从排队的 op 解析 prompt 语言的（{@code WikiPendingOp.Language}）。</p>
  *
  * <h2>locale 的线程本地承载</h2>
- * <p>当前请求的 locale 由语言中间件（或调用方）经 {@link #setCurrentLocale} 在请求入口
+ * <p>当前请求的 locale 由语言中间件（或调用方）经 {@code #setCurrentLocale} 在请求入口
  * 设置；线程本地，不跨虚拟线程传递，
  * 因此<b>入队时就要把 locale 落进 op 载荷</b>。</p>
  *
- * <p>未接语言中间件时，{@link #languageFromContextOrDefault} 恒返回
- * {@link #defaultLanguage()}（{@code WEKNORA_LANGUAGE} 或 {@code zh-CN}）——
+ * <p>未接语言中间件时，{@code #languageFromContextOrDefault} 恒返回
+ * {@code #defaultLanguage()}（{@code WEKNORA_LANGUAGE} 或 {@code zh-CN}）——
  * <b>绝不是空串</b>。</p>
  */
 public final class WikiLanguageSupport {
@@ -69,7 +69,7 @@ public final class WikiLanguageSupport {
      */
     private static volatile String configuredLanguage = "";
 
-    /** 启动期安装默认语言（{@code null}/空白 → 回落 {@code zh-CN}，见 {@link #defaultLanguage()}）。 */
+    /** 启动期安装默认语言（{@code null}/空白 → 回落 {@code zh-CN}，见 {@code #defaultLanguage()}）。 */
     public static void installLanguage(String raw) {
         configuredLanguage = raw == null ? "" : raw;
     }
@@ -84,7 +84,7 @@ public final class WikiLanguageSupport {
      * → {@code zh-CN}。<b>永不返回空串</b>。
      *
      * <p>由 {@code agent.management.service.BuiltinAgentRegistry} 上移至此：这是
-     * "env + HTTP header → locale" 的纯解析，与 {@link #envLanguage()} 同一语义族；
+     * "env + HTTP header → locale" 的纯解析，与 {@code #envLanguage()} 同一语义族；
      * 留在 agent 域会让 {@code auth} 为了一个 header 工具而依赖整个 agent 域。</p>
      */
     public static String localeFromRequest(String acceptLanguage) {
@@ -128,7 +128,7 @@ public final class WikiLanguageSupport {
      * 把 locale 渲染成 prompt 模板
      * 插值用的人类可读名称（如 {@code "Chinese (Simplified)"}）。
      *
-     * <p>对<b>已经解析过</b>的名称是幂等的：{@link #localeName} 会把未知值原样透传，
+     * <p>对<b>已经解析过</b>的名称是幂等的：{@code #localeName} 会把未知值原样透传，
      * 因此重复解析一个显示名会原样返回它。</p>
      */
     public static String resolveLanguageName(String locale) {

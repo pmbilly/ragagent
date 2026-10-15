@@ -72,7 +72,7 @@ public final class SearchChunkMerge {
 
     /**
      * 精确重叠拼接的返回值：{@code value} 是拼接后的文本，{@code ok=false} 表示坐标不可信、
-     * 调用方应回退 {@link #appendWithOverlap}。
+     * 调用方应回退 {@code #appendWithOverlap}。
      */
     public record ExactResult(String value, boolean ok) {
     }
@@ -81,7 +81,7 @@ public final class SearchChunkMerge {
      * 坐标可信时按已知精确重叠量拼接：校验 acc 末 overlap 个字符与 next 前 overlap
      * 个字符逐字相等，相等则精确裁剪；overlap 为 0 直接拼接。
      *
-     * @return 拼接结果；{@code ok=false} 时调用方回退 {@link #appendWithOverlap}
+     * @return 拼接结果；{@code ok=false} 时调用方回退 {@code #appendWithOverlap}
      */
 
     public static ExactResult appendWithExactOverlap(String acc, String next, int overlap) {
@@ -111,7 +111,7 @@ public final class SearchChunkMerge {
     }
 
     /**
-     * 按 StartAt（并列时按 ChunkIndex）排序后用 {@link #appendWithOverlap} 重建全文。
+     * 按 StartAt（并列时按 ChunkIndex）排序后用 {@code #appendWithOverlap} 重建全文。
      * gapSep 用于位置不相邻（有间隙）或 EndAt==0 的两段之间；传空串直接拼接。
      * 调用方负责先做类型过滤（本函数不感知 ChunkType）。
      */

@@ -10,7 +10,7 @@ package com.ragagent.contract.storage.support;
  *   <li>返回 **可被外部客户端直接加载的 http(s) URL**；返回非 http(s) 的值
  *       （例如 {@code local://…}）会被 {@code Rewriter} 当成"没解析出来"，
  *       引用保持为 handle——这是刻意的降级，不是错误。</li>
- *   <li>失败时抛 {@link RuntimeException}；{@code Rewriter} 会捕获、WARN、并把引用原样留下。</li>
+ *   <li>失败时抛 {@code RuntimeException}；{@code Rewriter} 会捕获、WARN、并把引用原样留下。</li>
  * </ul>
  *
  * <p><b>接线状态</b>：生产实现是

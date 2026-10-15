@@ -66,7 +66,7 @@ public record KnowledgeBaseResponse(
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt) {
 
-    /** 知识库类型。库内取值只有这两种，非法值按 {@link #document} 处理。 */
+    /** 知识库类型。库内取值只有这两种，非法值按 {@code #document} 处理。 */
     public enum Type {
         /** 常量名即线格式值（原 {@code @JsonValue value()} 的零依赖等价：Jackson 枚举默认按 name 序列化）。 */
         document,

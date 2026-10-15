@@ -9,10 +9,10 @@ import java.util.Map;
  * <p><b>为什么需要它</b>：{@code system} 的系统管理面（解析引擎清单页、重连动作）此前直连
  * 知识域的 {@code knowledge.client.DocReaderClient} 与 {@code knowledge.config.DocReaderProperties}
  * （域实现 + 域配置 ✗）。本端口只暴露管理面真正用到的东西：连接态三元（
- * {@link #isConnected()} / {@link #reconnect(String)} / {@link #listEngines(Map)}）与配置视图
- * （{@link #config()}）；解析面（{@code read}）不在本端口范围内。</p>
+ * {@code #isConnected()} / {@code #reconnect(String)} / {@code #listEngines(Map)}）与配置视图
+ * （{@code #config()}）；解析面（{@code read}）不在本端口范围内。</p>
  *
- * <p>失败语义与迁移前一致：{@link #listEngines(Map)} 的连接不可用/查询失败以运行时异常表达，
+ * <p>失败语义与迁移前一致：{@code #listEngines(Map)} 的连接不可用/查询失败以运行时异常表达，
  * 调用方按"无远端引擎"降级。</p>
  */
 public interface DocReaderAdminPort {
