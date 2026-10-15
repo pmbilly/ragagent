@@ -1,7 +1,7 @@
 package com.ragagent.mcp.tool;
 
 import com.ragagent.contract.tool.ApprovalEventBus;
-import com.ragagent.platform.event.Event;
+import com.ragagent.contract.event.Event;
 import com.ragagent.platform.event.EventBus;
 
 /**

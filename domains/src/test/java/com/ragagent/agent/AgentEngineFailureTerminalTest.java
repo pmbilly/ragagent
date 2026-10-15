@@ -9,7 +9,7 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.ragagent.platform.event.Event;
+import com.ragagent.contract.event.Event;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.contract.event.payload.AgentCompleteData;
 

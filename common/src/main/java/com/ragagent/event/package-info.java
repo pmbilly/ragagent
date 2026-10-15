@@ -48,7 +48,7 @@
  * <h2>EventBus 语义</h2>
  * <ul>
  *   <li><b>同步模式（默认）</b>：按注册顺序执行；任一 handler 失败 → 立即中断链并抛
- *       {@link com.ragagent.platform.event.EventBusException}（文案 {@code event handler failed for <type>: <原因>}）；
+ *       {@link com.ragagent.contract.event.EventBusException}（文案 {@code event handler failed for <type>: <原因>}）；
  *       Error（panic 级）原样冒出 Emit 调用方。</li>
  *   <li><b>ID 自动生成是值语义</b>：Emit 在<b>浅拷贝</b>上补 UUID，调用方的 Event 对象不变；
  *       metadata map 是共享引用，中间件对它的写入调用方可见。</li>

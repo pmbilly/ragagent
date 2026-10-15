@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import com.ragagent.contract.event.payload.AgentFinalAnswerData;
 import com.ragagent.contract.event.payload.AgentThoughtData;
 import com.ragagent.contract.event.payload.AgentToolCallData;
-import com.ragagent.platform.event.Event;
+import com.ragagent.contract.event.Event;
 import com.ragagent.platform.event.EventIds;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.llm.ChatStream;

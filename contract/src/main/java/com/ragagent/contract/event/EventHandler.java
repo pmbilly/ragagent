@@ -1,4 +1,4 @@
-package com.ragagent.platform.event;
+package com.ragagent.contract.event;
 
 /**
  * 事件处理器。
@@ -9,7 +9,7 @@ package com.ragagent.platform.event;
  * <p><b>异常即处理失败信号</b>：同步 Emit 收到异常会中断 handler 链并包成
  * {@link EventBusException}（{@code event handler failed for <type>: ...}）；
  * 异步 / EmitAndWait 模式下 Error 及其他 Throwable 按 panic 处理
- * （隔离 / 转包装），见 {@link EventBus} 的类注释。</p>
+ * （隔离 / 转包装），见 {@code EventBus} 的类注释。</p>
  */
 @FunctionalInterface
 public interface EventHandler {

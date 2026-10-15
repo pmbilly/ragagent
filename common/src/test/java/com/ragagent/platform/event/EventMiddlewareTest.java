@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import com.ragagent.contract.event.Event;
+import com.ragagent.contract.event.EventHandler;
+import com.ragagent.contract.event.EventBusException;
 
 /**
  * 中间件行为断言（执行序与文案由固定录制钉住）。

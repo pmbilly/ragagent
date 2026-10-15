@@ -7,7 +7,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.ragagent.contract.agent.AgentLookup;
-import com.ragagent.platform.event.Event;
+import com.ragagent.contract.event.Event;
 import com.ragagent.platform.event.EventBus;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.im.runtime.AdapterInterfaces.StreamSender;

@@ -4,7 +4,7 @@ import com.ragagent.contract.event.payload.ToolApprovalRequiredData;
 import com.ragagent.contract.model.ResponseType;
 import com.ragagent.contract.tool.ApprovalEvent;
 import com.ragagent.contract.tool.ApprovalEventBus;
-import com.ragagent.platform.event.Event;
+import com.ragagent.contract.event.Event;
 import com.ragagent.platform.event.EventBus;
 import com.ragagent.platform.event.EventType;
 import org.junit.jupiter.api.Test;

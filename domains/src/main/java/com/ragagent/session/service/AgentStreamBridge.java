@@ -16,7 +16,7 @@ import com.ragagent.common.agent.domain.AgentStep;
 import com.ragagent.agent.tool.runtime.ToolResultPersist;
 import com.ragagent.contract.tool.ToolResult;
 import com.ragagent.contract.session.PipelineUsedMemoryView;
-import com.ragagent.platform.event.Event;
+import com.ragagent.contract.event.Event;
 import com.ragagent.platform.event.EventBus;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.contract.event.payload.AgentCompleteData;

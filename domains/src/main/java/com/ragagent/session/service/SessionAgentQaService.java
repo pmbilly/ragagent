@@ -12,7 +12,7 @@ import com.ragagent.contract.session.PipelineUsedMemoryView;
 import com.ragagent.agent.AgentEngine;
 import com.ragagent.agent.AgentEngineException;
 import com.ragagent.agentmanagement.service.config.AgentConfigJson;
-import com.ragagent.platform.event.Event;
+import com.ragagent.contract.event.Event;
 import com.ragagent.platform.event.EventBus;
 import com.ragagent.contract.event.payload.ErrorData;
 import com.ragagent.platform.event.EventType;

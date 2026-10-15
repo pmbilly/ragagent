@@ -1,4 +1,4 @@
-package com.ragagent.platform.event;
+package com.ragagent.contract.event;
 
 /**
  * 事件总线的最小接口。

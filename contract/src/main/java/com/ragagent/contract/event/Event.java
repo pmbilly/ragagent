@@ -1,4 +1,4 @@
-package com.ragagent.platform.event;
+package com.ragagent.contract.event;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -10,14 +10,14 @@ import java.util.UUID;
  * <p>字段：ID / Type / SessionID / Data / Metadata / RequestID。
  * 发射路径按引用传递，两处约定用于隔离调用方对象：</p>
  * <ul>
- *   <li>{@link #shallowCopy()}：{@link EventBus} 发射前先做浅拷贝，发射中补出的 UUID
+ *   <li>{@code #shallowCopy()}：{@code EventBus} 发射前先做浅拷贝，发射中补出的 UUID
  *       只写在拷贝上，调用方的 Event 对象不被写回。</li>
  *   <li>{@code metadata} 是<b>共享引用</b>：浅拷贝不复制 map，中间件写
  *       {@code duration_ms} 后调用方原对象也能看到。</li>
  * </ul>
  *
- * <p>便捷构造：{@link #newEvent(String, Object)}（metadata 建空 map）；
- * {@link #withSessionId}/{@link #withRequestId}/{@link #withMetadata}
+ * <p>便捷构造：{@code #newEvent(String, Object)}（metadata 建空 map）；
+ * {@code #withSessionId}/{@code #withRequestId}/{@code #withMetadata}
  * 返回新 Event，metadata map 共享，withMetadata 就地写入。</p>
  *
  * <p>注意：本类本身不是线上 JSON 契约（线上契约是 data 里装的 payload 与 StreamEvent），
@@ -28,7 +28,7 @@ public class Event {
     /** 事件 ID（自动生成 UUID，用于流式更新追踪；同一 id 的 final_answer 分片在客户端重组） */
     private String id = "";
 
-    /** 事件类型（取值见 {@link EventType}） */
+    /** 事件类型（取值见 {@code EventType}） */
     private String type = "";
 
     /** 会话 ID */
@@ -146,9 +146,9 @@ public class Event {
 
     /**
      * 生成标准 UUID（v4，36 字符小写）。
-     * 注意与 {@link EventIds#generateEventID} 不同——那个带类型后缀且只取前 8 位。
+     * 注意与 {@code EventIds#generateEventID} 不同——那个带类型后缀且只取前 8 位。
      */
-    static String newUuid() {
+    public static String newUuid() {
         return UUID.randomUUID().toString();
     }
 }

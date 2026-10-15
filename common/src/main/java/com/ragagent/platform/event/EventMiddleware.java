@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.ragagent.contract.event.EventHandler;
 
 /**
  * 事件中间件。

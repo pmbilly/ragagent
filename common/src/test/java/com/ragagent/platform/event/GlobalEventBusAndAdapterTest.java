@@ -12,6 +12,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Test;
+import com.ragagent.contract.event.Event;
+import com.ragagent.contract.event.EventBusInterface;
+import com.ragagent.contract.event.EventBusException;
 
 /**
  * 全局事件总线 + 适配器 + ID 生成的行为断言。

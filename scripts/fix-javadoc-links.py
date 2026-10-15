@@ -20,13 +20,14 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
+SCAN_ROOTS = [p / "src" / "main" / "java" for p in
+              [ROOT / "contract", ROOT / "common", ROOT / "domains", ROOT / "engine", ROOT / "boot"]]
 CONTRACT = ROOT / "contract" / "src" / "main" / "java"
 
 
 def main() -> int:
     write = "--write" in sys.argv
     files = list(CONTRACT.rglob("*.java"))
-    same_pkg = {f.stem for f in files}
     fixed_total = 0
     files_touched = []
     for f in files:
@@ -40,8 +41,11 @@ def main() -> int:
             # 只处理类名（可能带 #member / 泛型）
             head = re.split(r"[#\s(]", target, 1)[0].strip()
             if "com.ragagent" in head:
-                if head.startswith("com.ragagent.contract."):
-                    continue  # FQN 契约内 → 保留
+                # 仅**契约模块内**的 FQN 链接必须指向契约（那里的非契约 FQN 解析不到）；
+                # 其它模块的 FQN 链接照常保留（各自可达）
+                is_contract_file = CONTRACT in f.parents
+                if (not is_contract_file) or head.startswith("com.ragagent.contract."):
+                    continue
                 replacement = "{@code " + target + "}"
                 out.append((m.start(), m.end(), replacement))
                 changed = True
@@ -49,7 +53,11 @@ def main() -> int:
             if head.startswith("#") or "." in head:
                 continue
             simple = re.sub(r"<.*>", "", head)
-            if simple in same_pkg or simple in imported_simple:
+            same_pkg = {p.stem for p in f.parent.glob("*.java")}
+            # JDK 类型（java.lang 等）与同包/已 import 类型 → 保留
+            if simple in same_pkg or simple in imported_simple or simple in {
+                    "String", "Object", "List", "Map", "Set", "Integer", "Long", "Boolean", "Double",
+                    "Exception", "RuntimeException", "Throwable", "Optional", "Collection", "Iterable"}:
                 continue
             replacement = "{@code " + target + "}"
             out.append((m.start(), m.end(), replacement))

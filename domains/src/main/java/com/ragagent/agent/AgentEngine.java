@@ -30,7 +30,7 @@ import com.ragagent.agent.skills.Manager;
 import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.agent.tool.ToolRegistry;
 import com.ragagent.contract.event.payload.ErrorData;
-import com.ragagent.platform.event.Event;
+import com.ragagent.contract.event.Event;
 import com.ragagent.platform.event.EventBus;
 import com.ragagent.platform.event.EventIds;
 import com.ragagent.platform.event.EventType;

@@ -1525,7 +1525,7 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 
 | 账 | 读数 | 状态 |
 |---|---|---|
-| `:contract` | **221 件** | ✅ 已独立（零依赖） |
+| `:contract` | **225 件** | ✅ 已独立（零依赖） |
 | `common/*` | **64 件**（125 → … → 67 → 66 → 64） | 收敛中 |
 | `platform/*` | 139 件 · `:common` 总 **237** | — |
 | **C2 实体** | **0** ✅ | **C 收官**（14 → 0） |
@@ -1792,6 +1792,18 @@ public interface AdminUserPort {
 - **读数**：**C1 受控导入根 61 → 59 文件**；**域侧 handler 10 → 1**；`common/*` 91 → **82**（−9）；`:contract` 203（不变）；载荷 0 保持；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
 - **验证**：**14 守卫全绿**（C1/C2 基线已 `--write`）；**1349 金片签名一致**；`spotlessCheck build` **2m5s**；**4991 / 失败 0 / 跳过 4**；dev 冒烟（sessions / KB / tenants / system-info **200** ✓；`GET /sessions/{id}/messages` ⇒ **500**——**查日志证实为既有的 `HttpRequestMethodNotSupportedException`（405 应然却映射为 500）**，与 handler 无关 ⇒ 该独立小刀仍在队列）
 - **余量**：域侧 handler 仅剩 `wiki/domain/WikiStringListTypeHandler`（L1 用户 `WikiIndexEntry` ⇒ 随其切开）· Jackson 味域内值类型 22 件（其中 session 7 件被 L1 平台面载荷引用 ⇒ 与载荷同生命周期）
+**🔶 G1-m·事件核心上提契约 `contract.event`（`Event`/`EventHandler`/`EventBusInterface`/`EventBusException`）+ `EventBus` 实现契约口（工具族的解锁路径）（2026-10-15）**
+- **触发＝工具族的"卡点测量"**：`AgentTool.execute(ToolRequest)` 引 L1 `ToolRequest` ⇒ 级联后唯一硬阻塞＝`ToolRequest.execMeta` 的 **`ToolExecContext` 带 platform `EventBus`** ✗
+- **⭐ 决定性测量（卡点其实极小）**：① `ToolExecContext.eventBus()` 真实使用者仅 **1-2 处**（`McpToolWrapper` / `McpOAuthPromptSupport`）② 构造点仅 **1 处**（`ActPhase:430`）③ **`Event` / `EventHandler` / `EventBusInterface` 本身全是纯 JDK** ✓（只依赖 `java.util`）⇒ **正解＝事件核心上提契约**（`EventBus` 留 platform 作实现 ✓）
+- **动作**：① 4 类 `git mv` → **`contract.event`** ② 全仓引用更新 **26 文件** ③ **预防式补"同包兄弟" import**（platform/event 4 文件 + **测试侧 4 文件**——脚本首轮只扫 `src/main` ✗ ⇒ 已补 `src/test` ✓）④ **`EventBus implements EventBusInterface`**（platform → 契约 ✓，并保留原 `asEventBusInterface()`）⑤ 跨包可见性：`Event.newUuid()` / `EventBusException.wrap(..)` 原为**包私有** ⇒ 改 `public`（现被 platform 兄弟调用 ✓）
+- **⚠️ 三次摩擦（判据固化）**：
+  1. **补 import 脚本遇 `package-info.java`（无 import 行）中断** ✗ ⇒ 判据：**插入 import 必须按 `package` 行兜底** ✓
+  2. **javadoc 裸名链接**（`EventIds`/`EventType` 的 `{@link Event#…}`——**纯 javadoc 引用**，代码扫描看不到 ✗）⇒ 改 `{@code}` ✓ —— **此坑第 13 次**
+  3. 我一度把 `scripts/fix-javadoc-links.py` 扩到**全仓**扫描 ⇒ dry-run 报 **824 处 / 389 文件** ✗✗（非契约模块的 FQN 链接本可解析，属**误伤**）⇒ **回退为契约模块扫描** ✓（只在契约内降级 FQN）
+     **判据：javadoc 链接规则按模块分层——契约内严格、其它模块宽松；不要用一把尺子扫全仓**
+- **读数**：`:contract` 221 → **225**（+4）；`common/*` **64**（platform 侧文件不计入 C1 ✓）；C1 = 57 文件；C4 登记不变（platform 面 8 · Jackson 语义必要 2）✓；**R10 保持 6 条边 / 51 类 / ①档 0** ✓
+- **验证**：**14 守卫全绿**；**1349 金片签名一致** ✓；`:common:javadoc` 通过 ✓；`spotlessCheck build` **1m43s**；**4996 / 失败 0 / 跳过 4**；冒烟（sessions / knowledge-bases / system-info / agents **200** ✓）
+- **⭐ 工具族刀序更新**：① `JsonValues` 门面 ✓（G1-k）→ ② 被读取面迁移 ✓（G1-l `AgentLookup`）→ ③ **platform 卡点已清（本刀）** ⇒ 下一步：`ToolExecContext.eventBus` → `EventBusInterface`（1-2 处）⇒ `ToolExecContext` 变纯 ⇒ 随 `ToolRequest`（`args` → `Object`，**~37 处消费点**经 `JsonValues` 迁移）与 `AgentTool` 一并入 **`contract.tool`**
 **🔶 G1-l·`AgentLookup` 入 `contract.agent` + `QaRequestPayload` 入 `contract.session`（刀序第 2 步首个面）（2026-10-15）**
 - **触发**：G1-k 定下的刀序第 2 步（逐面迁移）——第一个面带 `ObjectNode`/`ArrayNode`
 - **交付 1｜`AgentLookup` 去 Jackson 并入 `contract.agent`**（其 javadoc 原写"待 `JsonNode` 载体 **K 级重设计**时再上提契约面"⇒ 门面就绪后**兑现** ✓）：`ObjectNode defaultedConfig(String)` → **`Object`**；`ArrayNode suggestedQuestions(...)` → **`List<Object>`**；适配器边界 `JsonMappers.toJavaValue/toJavaArray` 归一；消费方读面用 `contract.json.JsonValues` ✓

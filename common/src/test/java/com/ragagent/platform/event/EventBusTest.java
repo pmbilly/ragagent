@@ -19,6 +19,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.event.payload.AgentThoughtData;
 import org.junit.jupiter.api.Test;
+import com.ragagent.contract.event.Event;
+import com.ragagent.contract.event.EventHandler;
+import com.ragagent.contract.event.EventBusException;
 
 /**
  * EventBus 行为断言——期望值由录制真值钉住。

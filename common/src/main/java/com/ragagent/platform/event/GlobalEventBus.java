@@ -1,6 +1,8 @@
 package com.ragagent.platform.event;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import com.ragagent.contract.event.Event;
+import com.ragagent.contract.event.EventHandler;
 
 /**
  * 全局事件总线：单例 + 可替换 + 静态门面。

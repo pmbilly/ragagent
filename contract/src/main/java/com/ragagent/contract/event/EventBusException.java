@@ -1,4 +1,4 @@
-package com.ragagent.platform.event;
+package com.ragagent.contract.event;
 
 /**
  * EventBus 的失败信号（包装错误）。
@@ -16,7 +16,7 @@ public class EventBusException extends RuntimeException {
     }
 
     /** 包装为标准 message 格式；cause message 为空时以类名兜底（防御）。 */
-    static EventBusException wrap(String eventType, Throwable cause) {
+    public static EventBusException wrap(String eventType, Throwable cause) {
         String reason = cause.getMessage() != null ? cause.getMessage() : cause.getClass().getName();
         return new EventBusException("event handler failed for " + eventType + ": " + reason, cause);
     }

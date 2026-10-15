@@ -27,7 +27,7 @@ import com.ragagent.platform.access.TenantContext;
 import com.ragagent.contract.event.payload.AgentActionData;
 import com.ragagent.contract.event.payload.AgentToolCallData;
 import com.ragagent.contract.event.payload.AgentToolResultData;
-import com.ragagent.platform.event.Event;
+import com.ragagent.contract.event.Event;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.platform.access.TenantContextSnapshot;
 import com.ragagent.llm.domain.ChatResponse;

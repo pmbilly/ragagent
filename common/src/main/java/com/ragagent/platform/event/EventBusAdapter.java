@@ -1,4 +1,7 @@
 package com.ragagent.platform.event;
+import com.ragagent.contract.event.Event;
+import com.ragagent.contract.event.EventHandler;
+import com.ragagent.contract.event.EventBusInterface;
 
 /**
  * {@link EventBus} 到 {@link EventBusInterface} 的适配。

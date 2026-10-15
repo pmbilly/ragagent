@@ -9,7 +9,7 @@ package com.ragagent.platform.event;
  * tool_approval_required / ...。接线层如需 ResponseType 枚举，按值映射即可）。</p>
  *
  * <p>事件类型同时是 {@link EventBus} 的订阅键
- * 与 {@link Event#getType()} 的取值。不要在别处散写字面量——这里是唯一权威。</p>
+ * 与 {@code Event#getType()} 的取值。不要在别处散写字面量——这里是唯一权威。</p>
  */
 public final class EventType {
 

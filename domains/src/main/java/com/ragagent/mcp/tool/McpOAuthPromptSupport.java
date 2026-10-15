@@ -6,7 +6,7 @@ import java.time.Instant;
 import com.ragagent.contract.tool.Cancellation;
 import com.ragagent.contract.tool.Decision;
 import com.ragagent.contract.tool.OAuthPendingRequest;
-import com.ragagent.platform.event.Event;
+import com.ragagent.contract.event.Event;
 import com.ragagent.platform.event.EventBus;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.contract.event.payload.MCPOAuthRequiredData;

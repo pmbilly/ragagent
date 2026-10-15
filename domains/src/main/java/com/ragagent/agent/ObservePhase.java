@@ -21,7 +21,7 @@ import com.ragagent.contract.tool.ToolDefinitions;
 import com.ragagent.agent.tool.runtime.ThinkBlocks;
 import com.ragagent.contract.event.payload.AgentFinalAnswerData;
 import com.ragagent.contract.event.payload.ContextCompactedData;
-import com.ragagent.platform.event.Event;
+import com.ragagent.contract.event.Event;
 import com.ragagent.platform.event.EventIds;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.llm.domain.ChatMessage;

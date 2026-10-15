@@ -8,8 +8,8 @@ import java.util.UUID;
 
 import com.ragagent.contract.retrieval.SearchTarget;
 import com.ragagent.chatpipeline.plugin.PluginError;
-import com.ragagent.platform.event.Event;
-import com.ragagent.platform.event.EventBusInterface;
+import com.ragagent.contract.event.Event;
+import com.ragagent.contract.event.EventBusInterface;
 import com.ragagent.platform.event.EventType;
 import com.ragagent.contract.event.payload.AgentToolCallData;
 import com.ragagent.contract.event.payload.AgentToolResultData;
