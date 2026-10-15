@@ -9,7 +9,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
-import com.ragagent.contract.knowledge.task.KnowledgeProcessingQueue;
+import com.ragagent.contract.knowledge.KnowledgeIngest;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.access.ChunkAccessGuard;
@@ -28,18 +28,18 @@ public class KnowledgeBatchOpsService {
 
     private final KnowledgeRepository knowledgeRepository;
     private final ChunkRepository chunkRepository;
-    private final KnowledgeProcessingQueue worker;
+    private final KnowledgeIngest knowledgeIngest;
     private final KnowledgeFileService knowledgeFileService;
     private final KnowledgeAccessHelper access;
 
     public KnowledgeBatchOpsService(KnowledgeRepository knowledgeRepository,
                                     ChunkRepository chunkRepository,
-                                    KnowledgeProcessingQueue worker,
+                                    KnowledgeIngest knowledgeIngest,
                                     KnowledgeFileService knowledgeFileService,
                                     KnowledgeAccessHelper access) {
         this.knowledgeRepository = knowledgeRepository;
         this.chunkRepository = chunkRepository;
-        this.worker = worker;
+        this.knowledgeIngest = knowledgeIngest;
         this.knowledgeFileService = knowledgeFileService;
         this.access = access;
     }
@@ -70,7 +70,7 @@ public class KnowledgeBatchOpsService {
             Knowledge k = access.getKnowledge(id);
             KnowledgeParseService.resetKnowledgeForReparse(k, kb);
             knowledgeFileService.updateKnowledgeRow(k, k.getMetadata());
-            worker.enqueue(k.getId());
+            knowledgeIngest.enqueueProcessing(k.getId());
         }
         return UUID.randomUUID().toString();
     }
@@ -87,7 +87,7 @@ public class KnowledgeBatchOpsService {
         for (Knowledge k : rows) {
             KnowledgeParseService.resetKnowledgeForReparse(k, kb);
             knowledgeFileService.updateKnowledgeRow(k, k.getMetadata());
-            worker.enqueue(k.getId());
+            knowledgeIngest.enqueueProcessing(k.getId());
         }
         return rows.size();
     }

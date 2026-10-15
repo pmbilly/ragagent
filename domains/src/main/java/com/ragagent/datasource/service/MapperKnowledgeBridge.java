@@ -1,6 +1,5 @@
 package com.ragagent.datasource.service;
 
-import com.ragagent.contract.knowledge.support.KnowledgePaths;
 
 import com.ragagent.common.knowledge.service.DuplicateKnowledgeException;
 
@@ -21,15 +20,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
-import com.ragagent.contract.knowledge.task.KnowledgeProcessingQueue;
 import org.springframework.stereotype.Component;
 import com.ragagent.contract.error.ErrorCode;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.platform.http.UrlBytesFetcher;
-import com.ragagent.contract.knowledge.support.KnowledgeHashes;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
+import com.ragagent.contract.knowledge.KnowledgeIngest;
 
 /**
  * {@link KnowledgeBridge} 的生产实现：直接用 knowledge 模块的
@@ -73,17 +71,18 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
 
     /** A3-3 尾批：租户感知文件存储（本地契约不变；云 provider 租户落对象存储）。 */
     private final KnowledgeCatalogPort knowledgeCatalog;
-    private final KnowledgeProcessingQueue worker;
+    /** 摄取面（契约端口）：幂等锚 / 文件名推导 / 任务号 / 处理队列投递。 */
+    private final KnowledgeIngest knowledgeIngest;
     /** SSRF 守卫：同步线程没有 controller 兜底，URL 抓取前必须自己校验。 */
     private final SsrfGuard ssrfGuard;
     private final boolean postgres;
 
     public MapperKnowledgeBridge(KnowledgeCatalogPort knowledgeCatalog,
-                                 KnowledgeProcessingQueue worker,
+                                 KnowledgeIngest knowledgeIngest,
                                  SsrfGuard ssrfGuard,
                                  DataSource dataSource) {
         this.knowledgeCatalog = knowledgeCatalog;
-        this.worker = worker;
+        this.knowledgeIngest = knowledgeIngest;
         this.ssrfGuard = ssrfGuard;
         this.postgres = DatabaseDialects.isPostgres(dataSource);
     }
@@ -181,7 +180,7 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
         byte[] content = UrlBytesFetcher.fetch(url, ssrfGuard::validateURLForSSRF);
         String name = fileName != null && !fileName.isEmpty()
                 ? fileName
-                : extractFileNameFromUrl(url);
+                : knowledgeIngest.fileNameFromUrl(url);
         String rowTitle = title != null && !title.isEmpty() ? title : name;
         return insertFileRow(tenantId, kb, content, name, rowTitle, url, null, channel);
     }
@@ -195,7 +194,7 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
                                     String rowTitle, String source, Map<String, String> metadata,
                                     String channel) {
         String fileType = fileTypeOf(fileName);
-        String hash = KnowledgeHashes.md5Hex(content);
+        String hash = knowledgeIngest.contentHash(content);
 
         // 重复检测：同库同哈希同类型即重复
         Knowledge dup = knowledgeCatalog.findKnowledgeByHash(kb.getId(), hash, fileType);
@@ -215,7 +214,7 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
         k.setFilePath(knowledgeCatalog.saveKnowledgeFile(tenantId, k.getId(), fileName, content));
         k.setMetadata(metadataNode(metadata));
         knowledgeCatalog.insertKnowledge(k);
-        worker.enqueue(k.getId());
+        knowledgeIngest.enqueueProcessing(k.getId());
         return k;
     }
 
@@ -314,13 +313,6 @@ public class MapperKnowledgeBridge implements KnowledgeBridge {
         k.setFolderPath("");
         k.setCustomMetadata(MAPPER.createObjectNode());
         return k;
-    }
-
-    /**
-     * 从 URL 提取文件名（去 query 串、取最后一段；空则 {@code "download"}）。
-     */    /** 与 {@code knowledge.support.KnowledgePaths} 逐字等价，改为委托（§9.2 单一实现）。 */
-    static String extractFileNameFromUrl(String url) {
-        return KnowledgePaths.extractFileNameFromUrl(url);
     }
 
     /** 取最后一个点之后的小写扩展名（无点则空串）。 */

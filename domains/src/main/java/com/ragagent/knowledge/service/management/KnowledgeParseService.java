@@ -8,7 +8,7 @@ import com.ragagent.knowledge.domain.span.SpanTracker;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import com.ragagent.contract.knowledge.task.KnowledgeProcessingQueue;
+import com.ragagent.contract.knowledge.KnowledgeIngest;
 import com.ragagent.contract.error.BizException;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
@@ -27,7 +27,7 @@ public class KnowledgeParseService {
     private final KnowledgeFileService fileService;
     private final DocumentParser documentParser;
     private final SpanTracker spanTracker;
-    private final KnowledgeProcessingQueue worker;
+    private final KnowledgeIngest knowledgeIngest;
 
     public KnowledgeParseService(
                             KnowledgeAccessHelper access,
@@ -35,13 +35,13 @@ public class KnowledgeParseService {
                             KnowledgeFileService fileService,
                             DocumentParser documentParser,
                             SpanTracker spanTracker,
-                            KnowledgeProcessingQueue worker) {
+                            KnowledgeIngest knowledgeIngest) {
         this.access = access;
         this.folderService = folderService;
         this.fileService = fileService;
         this.documentParser = documentParser;
         this.spanTracker = spanTracker;
-        this.worker = worker;
+        this.knowledgeIngest = knowledgeIngest;
     }
 
     /**
@@ -59,7 +59,7 @@ public class KnowledgeParseService {
         KnowledgeBase kb = access.requireKb(existing.getKnowledgeBaseId());
         resetKnowledgeForReparse(existing, kb);
         fileService.updateKnowledgeRow(existing, existing.getMetadata());
-        worker.enqueue(existing.getId());
+        knowledgeIngest.enqueueProcessing(existing.getId());
         return existing;
     }
     public static void resetKnowledgeForReparse(Knowledge k, KnowledgeBase kb) {

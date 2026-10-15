@@ -8,7 +8,7 @@ import com.ragagent.knowledge.repository.KnowledgeRepository;
 
 import com.ragagent.knowledge.repository.ChunkRepository;
 
-import com.ragagent.contract.knowledge.support.KnowledgePaths;
+import com.ragagent.knowledge.support.KnowledgePaths;
 
 import com.ragagent.platform.web.JsonMappers;
 import java.time.OffsetDateTime;
@@ -19,7 +19,7 @@ import java.util.UUID;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ragagent.contract.knowledge.task.KnowledgeProcessingQueue;
+import com.ragagent.contract.knowledge.KnowledgeIngest;
 import com.ragagent.platform.text.CleanInvalidUtf8;
 import com.ragagent.contract.error.AppError;
 import com.ragagent.contract.error.BizException;
@@ -58,7 +58,7 @@ public class KnowledgeFileService {
     private final TenantFileStorage fileStorage;
     private final KnowledgeRepository knowledgeRepository;
     private final ChunkRepository chunkRepository;
-    private final KnowledgeProcessingQueue worker;
+    private final KnowledgeIngest knowledgeIngest;
 
     public KnowledgeFileService(
                             KnowledgeRepository knowledgeRepository,
@@ -67,14 +67,14 @@ public class KnowledgeFileService {
                             KnowledgeAccessHelper access,
                             KnowledgeFolderService folderService,
                             TenantFileStorage fileStorage,
-                            KnowledgeProcessingQueue worker) {
+                            KnowledgeIngest knowledgeIngest) {
         this.chunkRepository = chunkRepository;
         this.chunkVectorIndexer = chunkVectorIndexer;
         this.access = access;
         this.folderService = folderService;
         this.fileStorage = fileStorage;
         this.knowledgeRepository = knowledgeRepository;
-        this.worker = worker;
+        this.knowledgeIngest = knowledgeIngest;
     }
 
     public Knowledge updateManualKnowledge(String id, String title, String content,
@@ -154,7 +154,7 @@ public class KnowledgeFileService {
         existing.setProcessedAt(null);
         updateKnowledgeRow(existing, meta);
         existing.setMetadata(meta);
-        worker.enqueue(existing.getId());
+        knowledgeIngest.enqueueProcessing(existing.getId());
         return existing;
     }
 

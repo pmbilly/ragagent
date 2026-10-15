@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import com.ragagent.contract.error.AppError;
 import java.util.Comparator;
 import com.ragagent.platform.storage.config.UploadLimits;
-import com.ragagent.contract.knowledge.support.KnowledgeHashes;
+import com.ragagent.knowledge.support.KnowledgeHashes;
 
 /**
  * 本地存储引擎。

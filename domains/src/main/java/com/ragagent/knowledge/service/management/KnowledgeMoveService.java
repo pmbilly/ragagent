@@ -8,7 +8,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-import com.ragagent.contract.knowledge.task.KnowledgeProcessingQueue;
+import com.ragagent.contract.knowledge.KnowledgeIngest;
 import com.ragagent.platform.access.TenantContext;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
@@ -42,7 +42,7 @@ public class KnowledgeMoveService {
     private final KnowledgeTagRepository tagRepository;
     private final TenantStorageQuotaPort tenantStorage;
     private final ModelRuntimePort modelRuntimeAssembler;
-    private final KnowledgeProcessingQueue worker;
+    private final KnowledgeIngest knowledgeIngest;
     private final KnowledgeTaskProgressStore progressStore;
     private final KnowledgeVectorWrites vectorWrites;
     private final PgVectorEngineRepository pgVectorEngineRepository;
@@ -57,7 +57,7 @@ public class KnowledgeMoveService {
             KnowledgeTagRepository tagRepository,
             TenantStorageQuotaPort tenantStorage,
             ModelRuntimePort modelRuntimeAssembler,
-            KnowledgeProcessingQueue worker,
+            KnowledgeIngest knowledgeIngest,
             KnowledgeTaskProgressStore progressStore,
             KnowledgeVectorWrites vectorWrites,
             PgVectorEngineRepository pgVectorEngineRepository,
@@ -70,7 +70,7 @@ public class KnowledgeMoveService {
         this.tagRepository = tagRepository;
         this.tenantStorage = tenantStorage;
         this.modelRuntimeAssembler = modelRuntimeAssembler;
-        this.worker = worker;
+        this.knowledgeIngest = knowledgeIngest;
         this.progressStore = progressStore;
         this.vectorWrites = vectorWrites;
         this.pgVectorEngineRepository = pgVectorEngineRepository;
@@ -225,7 +225,7 @@ public class KnowledgeMoveService {
             tenantStorage.adjustUsed(tenantId, -storageSize);
         }
         // 4) 重新解析入队（目标 KB 的配置在 worker 按行上的 KB 现读）
-        worker.enqueue(knowledgeId);
+        knowledgeIngest.enqueueProcessing(knowledgeId);
     }
 
     /**

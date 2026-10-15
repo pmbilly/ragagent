@@ -32,9 +32,10 @@ import com.ragagent.platform.security.SsrfGuard;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.storage.LocalStorageService;
-import com.ragagent.contract.knowledge.task.KnowledgeProcessingQueue;
 import com.sun.net.httpserver.HttpServer;
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
+import com.ragagent.contract.knowledge.KnowledgeIngest;
+import com.ragagent.knowledge.support.KnowledgePaths;
 
 /**
  * 数据源 URL 摄取（整改 K2 /）：下载在同步期完成、与文件行同形。
@@ -74,9 +75,9 @@ class MapperKnowledgeBridgeUrlIngestTest {
                 .thenReturn(kb(42L, "kb-1"));
         when(catalog.saveKnowledgeFile(anyLong(), anyString(), anyString(), any(byte[].class)))
                 .thenReturn("kb-1/doc.md");
-        KnowledgeProcessingQueue worker = mock(KnowledgeProcessingQueue.class);
+        KnowledgeIngest ingest = ingestMock();
 
-        Knowledge created = bridge(catalog, worker)
+        Knowledge created = bridge(catalog, ingest)
                 .createFromUrl(42L, "kb-1", url, null, "标题", List.of(), "ima");
 
         ArgumentCaptor<Knowledge> captor = ArgumentCaptor.forClass(Knowledge.class);
@@ -92,7 +93,7 @@ class MapperKnowledgeBridgeUrlIngestTest {
         assertThat(row.getType()).isEqualTo("file");
         assertThat(row.getParseStatus()).isEqualTo(Knowledge.PARSE_PENDING);
         assertThat(created.getId()).isEqualTo(row.getId());
-        verify(worker).enqueue(row.getId());
+        verify(ingest).enqueueProcessing(row.getId());
     }
 
     @Test
@@ -102,16 +103,16 @@ class MapperKnowledgeBridgeUrlIngestTest {
         KnowledgeCatalogPort catalog = mock(KnowledgeCatalogPort.class);
         when(catalog.findKnowledgeBaseRow(anyString()))
                 .thenReturn(kb(42L, "kb-1"));
-        KnowledgeProcessingQueue worker = mock(KnowledgeProcessingQueue.class);
+        KnowledgeIngest ingest = ingestMock();
 
-        MapperKnowledgeBridge bridge = bridge(catalog, worker);
+        MapperKnowledgeBridge bridge = bridge(catalog, ingest);
 
         assertThatThrownBy(() -> bridge.createFromUrl(42L, "kb-1", "http://localhost/doc.md", null,
                 null, List.of(), "ima"))
                 .isInstanceOf(SsrfGuard.SsrfException.class);
 
         verify(catalog, never()).insertKnowledge(any(Knowledge.class));
-        verifyNoInteractions(worker);
+        verifyNoInteractions(ingest);
     }
 
     @Test
@@ -122,9 +123,9 @@ class MapperKnowledgeBridgeUrlIngestTest {
                 .thenReturn(kb(42L, "kb-1"));
         when(catalog.saveKnowledgeFile(anyLong(), anyString(), anyString(), any(byte[].class)))
                 .thenReturn("kb-1/a.txt");
-        KnowledgeProcessingQueue worker = mock(KnowledgeProcessingQueue.class);
+        KnowledgeIngest ingest = ingestMock();
 
-        bridge(catalog, worker).createFromFile(42L, "kb-1",
+        bridge(catalog, ingest).createFromFile(42L, "kb-1",
                 "abc".getBytes(StandardCharsets.UTF_8), "a.txt", Map.of("externalId", "e1"),
                 List.of(), "rss");
 
@@ -140,14 +141,14 @@ class MapperKnowledgeBridgeUrlIngestTest {
     // ── 夹具 ────────────────────────────────────────────────────────────────
 
     private MapperKnowledgeBridge bridge(KnowledgeCatalogPort catalog,
-                                         KnowledgeProcessingQueue worker) throws Exception {
+                                         KnowledgeIngest ingest) throws Exception {
         Connection connection = mock(Connection.class);
         DatabaseMetaData meta = mock(DatabaseMetaData.class);
         when(meta.getDatabaseProductName()).thenReturn("H2");
         when(connection.getMetaData()).thenReturn(meta);
         DataSource dataSource = mock(DataSource.class);
         when(dataSource.getConnection()).thenReturn(connection);
-        return new MapperKnowledgeBridge(catalog, worker, new SsrfGuard(), dataSource);
+        return new MapperKnowledgeBridge(catalog, ingest, new SsrfGuard(), dataSource);
     }
 
     private int startServer(String path, byte[] body) throws IOException {
@@ -168,5 +169,14 @@ class MapperKnowledgeBridgeUrlIngestTest {
         kb.setTenantId(tenantId);
         kb.setEmbeddingModelId("em-1");
         return kb;
+    }
+
+    /** 摄取面 mock：哈希与文件名走**真实语义**（委托域内实现），队列可验证。 */
+    private static KnowledgeIngest ingestMock() {
+        KnowledgeIngest ingest = mock(KnowledgeIngest.class);
+        when(ingest.contentHash(any())).thenAnswer(inv -> LocalStorageService.md5Hex(inv.getArgument(0)));
+        when(ingest.fileNameFromUrl(any()))
+                .thenAnswer(inv -> KnowledgePaths.extractFileNameFromUrl(inv.getArgument(0)));
+        return ingest;
     }
 }

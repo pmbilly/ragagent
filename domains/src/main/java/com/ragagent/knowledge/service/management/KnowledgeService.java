@@ -10,7 +10,7 @@ import com.ragagent.knowledge.domain.KnowledgeSearchScope;
 
 import com.ragagent.knowledge.repository.ChunkRepository;
 
-import com.ragagent.contract.knowledge.support.KnowledgePaths;
+import com.ragagent.knowledge.support.KnowledgePaths;
 
 import com.ragagent.knowledge.repository.KnowledgeRepository;
 
@@ -41,7 +41,7 @@ import com.ragagent.common.knowledge.domain.Chunk;
 import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.domain.KnowledgeTag;
-import com.ragagent.contract.knowledge.task.KnowledgeProcessingQueue;
+import com.ragagent.contract.knowledge.KnowledgeIngest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.ragagent.knowledge.dto.doc.UpdateKnowledgeRequest;
@@ -95,7 +95,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
     private final KnowledgeTagRepository tagRepository;
     /** A3-3 尾批：租户感知文件存储（本地契约不变；云 provider 租户真正落对象存储）。 */
     private final TenantFileStorage fileStorage;
-    private final KnowledgeProcessingQueue knowledgeQueue;
+    private final KnowledgeIngest knowledgeIngest;
     /** 门面 helper 下沉（M2 解环）：requireKb/getKnowledge 等访问原语的收敛点。 */
     private final KnowledgeAccessHelper access;
     private final ChunkVectorIndexer chunkVectorIndexer;
@@ -114,7 +114,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
                             ChunkRepository chunkRepository,
                             KnowledgeTagRepository tagRepository,
                             TenantFileStorage fileStorage,
-                            KnowledgeProcessingQueue knowledgeQueue,
+                            KnowledgeIngest knowledgeIngest,
                             KnowledgeAccessHelper access,
                             ChunkVectorIndexer chunkVectorIndexer,
                             KnowledgeMoveService moveService,
@@ -130,7 +130,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
         this.chunkRepository = chunkRepository;
         this.tagRepository = tagRepository;
         this.fileStorage = fileStorage;
-        this.knowledgeQueue = knowledgeQueue;
+        this.knowledgeIngest = knowledgeIngest;
         this.access = access;
         this.chunkVectorIndexer = chunkVectorIndexer;
         this.moveService = moveService;
@@ -189,7 +189,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
         k.setFilePath(fileStorage.save(tenantId(), k.getId(), fileName, fileContent));
         k.setCustomMetadata(mergeCustomMetadata(customMetadata));
         knowledgeRepository.insert(k);
-        knowledgeQueue.enqueue(k.getId());
+        knowledgeIngest.enqueueProcessing(k.getId());
         return k;
     }
 
@@ -215,7 +215,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
         k.setFilePath(fileStorage.save(tenantId(), k.getId(), fname, content));
         k.setCustomMetadata(mergeCustomMetadata(null));
         knowledgeRepository.insert(k);
-        knowledgeQueue.enqueue(k.getId());
+        knowledgeIngest.enqueueProcessing(k.getId());
         return k;
     }
 
@@ -247,7 +247,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
         }
         knowledgeRepository.insert(k);
         if ("publish".equals(status)) {
-            knowledgeQueue.enqueue(k.getId());
+            knowledgeIngest.enqueueProcessing(k.getId());
         }
         return k;
     }
@@ -723,7 +723,7 @@ public class KnowledgeService implements KnowledgeReadPort, KnowledgeDocumentGat
 
 
 
-    /** 入队端口外提为 {@link com.ragagent.contract.knowledge.task.KnowledgeProcessingQueue}
+    /** 入队端口外提为 {@code KnowledgeProcessingQueue}
      *  （实现：KnowledgeProcessWorker）——原嵌套接口让全部提交方反向依赖门面类型，
      *  是 M2 解环的根之一，已删。 */
 }

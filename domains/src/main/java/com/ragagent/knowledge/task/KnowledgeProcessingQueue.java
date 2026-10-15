@@ -1,4 +1,4 @@
-package com.ragagent.contract.knowledge.task;
+package com.ragagent.knowledge.task;
 
 /**
  * 知识处理入队端口（原 {@code KnowledgeService.KnowledgeProcessWorker} 嵌套接口外提）。

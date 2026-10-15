@@ -1,4 +1,4 @@
-package com.ragagent.contract.knowledge.support;
+package com.ragagent.knowledge.task;
 
 import java.util.UUID;
 

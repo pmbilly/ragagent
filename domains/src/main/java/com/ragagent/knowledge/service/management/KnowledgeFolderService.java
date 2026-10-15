@@ -4,7 +4,7 @@ import com.ragagent.knowledge.service.KnowledgeAccessHelper;
 
 import com.ragagent.knowledge.domain.KnowledgeTenants;
 
-import com.ragagent.contract.knowledge.support.KnowledgePaths;
+import com.ragagent.knowledge.support.KnowledgePaths;
 
 import com.ragagent.platform.web.JsonMappers;
 import java.time.OffsetDateTime;

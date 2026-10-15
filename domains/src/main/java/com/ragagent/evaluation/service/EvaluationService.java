@@ -30,7 +30,6 @@ import com.ragagent.common.knowledge.domain.Knowledge;
 import com.ragagent.common.knowledge.domain.KnowledgeBase;
 
 import com.ragagent.common.knowledge.KnowledgeCatalogPort;
-import com.ragagent.contract.knowledge.support.KnowledgeTaskIdCodec;
 import com.ragagent.contract.model.ModelCatalogPort;
 import com.ragagent.contract.model.ModelCatalogPort.ModelRowView;
 import com.ragagent.chatpipeline.spi.KnowledgeQaEventPort;
@@ -39,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.ragagent.evaluation.dto.EvaluationDtos;
+import com.ragagent.contract.knowledge.KnowledgeIngest;
 
 /**
  * 评估服务（评估任务 + 结果；内存任务存储）。
@@ -98,6 +98,7 @@ public class EvaluationService {
     private final ModelCatalogPort modelCatalog;
     private final DatasetService datasetService;
     private final KnowledgeCatalogPort knowledgeCatalog;
+    private final KnowledgeIngest knowledgeIngest;
     private final KnowledgeQaEventPort knowledgeQaEvents;
 
     /** 任务存储：taskID → detail。 */
@@ -106,10 +107,12 @@ public class EvaluationService {
     public EvaluationService(ModelCatalogPort modelCatalog,
                              DatasetService datasetService,
                              KnowledgeCatalogPort knowledgeCatalog,
+                             KnowledgeIngest knowledgeIngest,
                              KnowledgeQaEventPort knowledgeQaEvents) {
         this.modelCatalog = modelCatalog;
         this.datasetService = datasetService;
         this.knowledgeCatalog = knowledgeCatalog;
+        this.knowledgeIngest = knowledgeIngest;
         this.knowledgeQaEvents = knowledgeQaEvents;
     }
 
@@ -189,7 +192,7 @@ public class EvaluationService {
         // 建任务（taskID 契约同 utils.GenerateTaskID："evaluation_<tenant>_<millis>_<8hex>_<biz>"）
         EvaluationDetail detail = new EvaluationDetail();
         EvaluationTask task = new EvaluationTask();
-        task.id = KnowledgeTaskIdCodec.generateTaskId("evaluation", tenantId, dsId);
+        task.id = knowledgeIngest.newTaskId("evaluation", tenantId, dsId);
         task.tenantId = tenantId;
         task.datasetId = dsId;
         task.status = EvaluationDtos.STATUS_PENDING;

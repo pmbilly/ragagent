@@ -208,6 +208,7 @@ contract  → JDK                                  （纯 JDK：公开 API / SPI
 | **G1** | `:common` 内**载荷型文件清零或全登记**（`*View`/`*Facts`/`*Payload`/`*Response`/`*Port`）——载荷应落 `:contract`、持久化实体回域。**进度 2026-10-15**：门禁口径（C4 载荷型）**待归位 14 件** + 登记 7 件（4 platform 面 + 3 待去 Jackson）；**契约料归位批 A/B 已完成**：`storage` 9 + `knowledge` 10 = **19 件入 `:contract`**（清单与两道搬前判据见下方「契约料盘点」） | 新增门禁 **C4**（`check-contracts-purity.py`，只许减）+ C1/C2 |
 | **G1-b（立项）** | **「去 Jackson」专项**：`ChunkFacts`/`KnowledgeBaseView`/`KnowledgeDocumentFacts` 的 `JsonNode` 字段（触达 7/1/2 处消费）+ B258 登记的 `AppError` ⇒ 改造口径二选一：**(a)** `JsonNode` → JDK `Map<String,Object>`（线格式基本等价，需金片复核 `NullNode`/空值语义）；**(b)** 载荷只带**消费者实际用度的键**（收窄成纯 JDK record，线格式**会变** ⇒ 需前端确认）。**改造完成即整批入 `:contract`** | C4 的 `PENDING_DEJACKSON` 登记 |
 | **G1-c（登记）** | 4 件**框架味**（`ApiKeyAuthPort` servlet · `KnowledgeCatalogPort` MyBatis-Plus Page · `EmbedSessionPort` servlet+ResponseEntity · `FileProxyPort` servlet）⇒ **永远进不了零依赖 `:contract`**，归未来 `platform` 模块 | C4 的 `PLATFORM_FACE` 登记 |
+| **G1-g（登记·D0a）** | `contract/knowledge/service/DuplicateKnowledgeDetails`：与 **L1 异常** `common.knowledge.service.DuplicateKnowledgeException` 耦合（异常把 details 放进 `AppError.withDetails(...)`；异常被 datasource/im/chatpipeline 多域引用）⇒ **留 contract 有据**，随「异常面整体收窄」批次一并处理（方案 §8.9 把 details 列在 `knowledge/dto.kb/`，届时应连异常一起归位） | 本表登记 |
 | **G1-f（登记）** | `common/knowledge/DocumentChunkMetadata`（Jackson `@JsonIgnore`）· `common/knowledge/FaqChunkMetadata`（Jackson + **platform 的 `JsonMappers`**）⇒ 前者归「待去 Jackson」、后者归「platform 面 + 待去 Jackson」；二者均在方案 §8.1 的 `contract.knowledge/` 名单内（**未搬有据**） | 本表登记 |
 | **G1-e（登记）** | `common/retrieval/SearchResult`（**不带 C4 后缀**故未入 C4 计数，但实为载荷）：引 Jackson 注解 + `JsonNode` + **platform 的 `SortedMapSerializer`** ⇒ **既非纯 JDK 也非域内容** ⇒ 归 platform 面／待去 Jackson；**引用面 66 处**（影响面大，改造需单独批次）。`PipelineMessageView` 因此随它一起等 | 本表登记 |
 | **G1-d（随 C）** | 余 15 件中的实体相关项（7 个实体端口 + 3 个 `*ConfigView` + `KnowledgeBaseResponse` + `PipelineMessageView` 等）⇒ **随 C 的实体收窄逐批处理**（视图/端口改吃契约视图） | C4 基线（只许减） |
@@ -1573,6 +1574,23 @@ MyBatis 列名与 SQL 参数、租户配置 jsonb 列、`agent_steps`/`messages`
 - **读数**：C2 实体保持 **13**；C4 基线 **31**；**14 守卫全绿**（run-guards 标签已更到 C1/C2/C3/C4）
 - **验证**：`spotlessCheck build` ✓ **2m12s** ✓；**4991 / 失败 0 / 跳过 4** ✓；dev 重启 ready ✓ + 冒烟（KB/models/sessions 200 ✓；`/api/v1/knowledge-bases/{id}/tags` ⇒ 404 + 标准信封 ✓——正是经 `:contract` 视图的链路）
 - **下一步（继续 C）**：次批候选按筛表——`MessageSuggestionSet`(2) / `WikiPageIssue`(4) / `StorageBackend`(8) / `WikiPage`(7)；**新视图一律落 `:contract`**
+**🔶 D0a·`KnowledgeIngest` 端口落地 + 4 件内部件归位（`:contract` 172 → 169）（2026-10-15）**
+- **背景**：批 A/B 的第三道判据补上后，8 件误搬件立案；本批执行其中"有跨域调用点"的 4 件（另 4 件＝3 config + FaqEntry/FaqEntryPage 留 D0b）
+- **动作**：
+  1. **新建契约端口 `contract.knowledge.KnowledgeIngest`（4 方法）**：`contentHash(byte[])`（幂等锚，md5Hex 口径）· `fileNameFromUrl(String)`（URL→落库名，KnowledgePaths 口径）· `newTaskId(taskType, tenantId, businessId)`（任务号，KnowledgeTaskIdCodec 口径）· `enqueueProcessing(String)`（处理队列投递，enqueue 口径）——**语义逐字一致**；javadoc 明示与方案 §8.9 的偏差（完整 `KnowledgeIngestCommand/Result/Policy` 属 K 级设计项，本端口为其**能力面首版**）
+  2. **4 件归位回域**（方案 §8.9 有据）：`KnowledgeHashes` · `KnowledgePaths` → `knowledge/support`；`KnowledgeTaskIdCodec` · `KnowledgeProcessingQueue` → `knowledge/task`
+  3. **适配器** `knowledge/api/KnowledgeIngestAdapter`：逐字转发域内四件（异常语义同域内）
+  4. **消费方改道**：数据源 `MapperKnowledgeBridge`（哈希/文件名/入队三处 + 删静态委托方法）；评估 `EvaluationService`（任务号；构造 +1 参）
+  5. **5 个域内服务也改走端口**（见红态 2）
+- **⚠️ 两次红态（都是"归位不是纯搬运"的新实例，已固化）**：
+  1. **R10 抓到 2 条新边**（`datasource→knowledge{MapperKnowledgeBridge}` · `evaluation→knowledge{EvaluationService}`）——正是"回域即重建边"的条件句兑现 ⇒ 用端口改道后 **R10 立即回绿（7 边 / 52 类）** ✓
+  2. **A16 抓到 4 个知识服务**（`KnowledgeBatchOpsService`/`KnowledgeFileService`/`KnowledgeParseService`/`KnowledgeService`）：队列接口回到 `knowledge/task` 后，**service 直接注入 task 包＝依赖边界层** ✗（这些条目在队列上提 L1 时曾被当作"真实过期"删除，现在必须还回来）
+     **正解（本批取此路）**：**服务也改走 `KnowledgeIngest` 契约端口** ⇒ 既清 A16，又让"入队口"全仓只有一个（`enqueueProcessing`）；**而非**把 4 条违例重新登记进基线
+      **判据沉淀：内部件回域时，除了 R10（跨域边），还要预期三处反弹——A16（service→task/mapper）、A17（service→技术件）、B124（死包目录）**
+- **登记（有据不搬）**：`DuplicateKnowledgeDetails` 留 `:contract`（与 **L1 异常** `DuplicateKnowledgeException` 耦合，异常被 datasource/im/chatpipeline 多域引用）⇒ 新增 **G1-g**，随「异常面收窄」批次处理
+- **读数**：`:contract` **172 → 169**（4 件出 + 1 端口入）；`contract/knowledge` 26 → **23 件**；**R10 保持 7 条边 / 52 类 / ①档 0** ✓；**A16 归零**（4 条违例被修掉而非登记）
+- **验证**：**14 守卫全绿**；**1349 金片签名一致** ✓；`spotlessCheck build` **1m46s**；**4991 / 失败 0 / 跳过 4**；定向 datasource/evaluation/knowledge **834 条** ✓ + `ArchitectureRulesTest` ✓；dev ready + 冒烟（datasource/types · knowledge-bases · sessions **200** ✓）
+- **D0 余量（下一批）**：**D0b**＝3 件 `KnowledgeBase*Config`（→ `knowledge/domain`，需 `initialization` 消费换端口）+ `FaqEntry`/`FaqEntryPage`（→ `knowledge/dto.faq`，需 session 消费核查）；随后 **D1**（`wiki`/`agent/tool`/`settings`/`session` 载荷 + 互引 15 件同批）
 **🔶 契约料归位·批 A/B：`storage` 9 件 + `knowledge` 10 件 → `:contract`（2026-10-15）**
 - **背景**：§12.5 新写入「**契约料盘点（87 件三分）**」——`common/*` 153 件的构成全量分类（8 实体 + 10 handler + 8 框架味 + 3 待去 Jackson + 87 无框架依赖 + ~37 Jackson 味），本批实施其中最干净的一批
 - **搬前两道判据（本批新增，写入 §12.5）**：① **同包裸名共居检查**（脚本口径：候选件的同包兄弟若被裸名引用且不可搬 ⇒ 该件不可搬）——`storage/fileserve` 5 件因裸名引 `FileTransport`（**servlet 味**）被**正确挡下**；② **消费域核查**——19 件全部有跨域消费（session/knowledge/im/embedchannel/initialization/datasource/evaluation），排除"只被本域用 ⇒ 该回域而非进契约"的误搬
